@@ -41,6 +41,9 @@ data = {
     ['have a trick with'] = '调侃一下',
     ['teammates where'] = '团队中',
     ['nearby players where'] = '附近的',
+    -- MY_CheckUpdate.lua
+    ['new version found.'] = '发现新版本！',
+    ['new version found, would you want to download immediately?'] = '发现新版本！是否立即前往下载？',
     -- MY_RescueTeam.lua
     ['rescue team helper'] = '救场必备',
     -- MY_RollMon.lua
