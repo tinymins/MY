@@ -181,7 +181,8 @@ _MY_TalkEx.Init = function()
             elseif MY_TalkEx.tTrickFilter == 'NEARBY' then
                 tPlayers = MY.GetNearPlayer()
             end
-            
+            -- 去掉自己 _(:з」∠)_调侃自己是闹哪样
+            tPlayers[GetClientPlayer().dwID]=nil
             for _, player in pairs(tPlayers) do
                 if MY_TalkEx.tTrickFilterForce == -1 or MY_TalkEx.tTrickFilterForce == player.dwForceID then
                     local szText = string.gsub(MY_TalkEx.szTrickText, "%$mb", '['..player.szName..']')

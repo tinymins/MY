@@ -27,16 +27,13 @@ MY.LoadLangPack = function()
 end
 local _L = MY.LoadLangPack()
 -----------------------------------------------
--- ……
------------------------------------------------
--- RegisterCustomData("_WYAutoData.")
------------------------------------------------
 -- 私有函数
 -----------------------------------------------
- _MY = {
+local _MY = {
     frame = nil,
     hBox = nil,
-    nDebugLevel = 1,
+    hRequest = nil,
+    nDebugLevel = 3,
     dwVersion = 0x0000100,
     szBuildDate = "20140209",
     szIniFile = "Interface\\MY\\ui\\MY.ini",
@@ -54,13 +51,16 @@ local _L = MY.LoadLangPack()
     tBreatheCall = {},  -- breathe call 队列
     tDelayCall = {},    -- delay call 队列
     tRequest = {},      -- 网络请求队列
+    bRequest = false,   -- 网络请求繁忙中
     tTabs = {},         -- 标签页
     tUiEventListener = {},  -- UI响应函数
     tEvent = {},            -- 游戏事件绑定
+    UI = {},
 }
 _MY.Init = function()
 	-- var
 	_MY.hBox = _MY.frame:Lookup("","Box_1")
+	_MY.hRequest = Station.Lookup("Normal/MY/Page_1")
     -- 窗口消息响应绑定
     for i, szEventName in pairs {
         "OnCheckBoxCheck", "OnCheckBoxUncheck",
@@ -231,12 +231,42 @@ end
 --[[ (void) MY.RemoteRequest(string szUrl, func fnAction)		-- 发起远程 HTTP 请求
 -- szUrl		-- 请求的完整 URL（包含 http:// 或 https://）
 -- fnAction 	-- 请求完成后的回调函数，回调原型：function(szTitle, szContent)]]
-MY.RemoteRequest = function(szUrl, fnAction)
-	local page = Station.Lookup("Normal/MY/Page_1")
-	if page then
-		_MY.tRequest[szUrl] = fnAction
-		page:Navigate(szUrl)
-	end
+MY.RemoteRequest = function(szUrl, fnSuccess, fnError, nTimeout)
+    -- 格式化参数
+    if type(szUrl)~="string" then return end
+    if type(fnSuccess)~="function" then return end
+    if type(fnError)~="function" then fnError = function(szUrl,errMsg) MY.Debug(szUrl..' - '..errMsg.."\n",'RemoteRequest',1) end end
+    if type(nTimeout)~="number" then nTimeout = 10000 end
+    -- 在请求队列尾部插入请求
+	table.insert(_MY.tRequest,{ szUrl = szUrl, fnSuccess = fnSuccess, fnError = fnError, nTimeout = nTimeout })
+    -- 开始处理请求队列
+    _MY.DoRemoteRequest()
+end
+-- 处理远程请求队列
+_MY.DoRemoteRequest = function()
+    MY.Debug('Do Remote Request Queue.\n','DoRR',1)
+    -- 如果队列为空 则置队列状态为空闲并返回
+    if table.getn(_MY.tRequest)==0 then _MY.bRequest = false MY.Debug('Remote Request Queue Is Clear.\n','DoRR',1) return end
+    -- 如果当前队列有未处理的请求 并且远程请求队列处于空闲状态
+    if not _MY.bRequest then
+        -- 获取队列第一个元素
+        local rr = _MY.tRequest[1]
+        -- 注册请求超时处理函数的时钟
+        MY.DelayCall(function()
+            -- 请求超时 回调请求超时函数
+            rr.fnError(_MY.tRequest[1].szUrl, "timeout")
+            -- 从请求队列移除首元素
+            table.remove(_MY.tRequest, 1)
+            -- 重置请求队列状态为空闲
+            _MY.bRequest = false
+            -- 处理下一个远程请求
+            _MY.DoRemoteRequest()
+        end,rr.nTimeout,"MY_Remote_Request_Timeout")
+        -- 开始请求网络资源
+        _MY.hRequest:Navigate(rr.szUrl)
+        -- 置请求队列状态为繁忙中
+        _MY.bRequest = true
+    end
 end
 --[[ 求N2在N1的面向角  --  重载+2
     -- 输入N1坐标、面向、N2坐标 
@@ -524,11 +554,22 @@ end
     MY.Sysmsg(szContent, szPrefix)
     szContent   要显示的主体消息
     szPrefix    消息头部
+    tContentCol 主体消息文字颜色rgb[可选，为空使用默认颜色。]
+    tPrefixCol  消息头部文字颜色rgb[可选，为空和主体消息文字颜色相同。]
 ]]
-MY.Sysmsg = function(szContent, szPrefix)
+MY.Sysmsg = function(szContent, szPrefix, tContentCol, tPrefixCol)
     if type(szContent)=="boolean" then szContent = (szContent and 'true') or 'false' end
     szPrefix = szPrefix or _MY.szShortName
-    OutputMessage("MSG_SYS", string.format("[%s]%s", szPrefix, szContent) )
+    if tContentCol then
+        tPrefixCol = tPrefixCol or tContentCol
+        OutputMessage("MSG_SYS", FormatString(
+            "<text>text=\"[<D0>] \" font=10 r=<D1> g=<D2> b=<D3></text><text>text=\"<D4>\n\" font=10 r=<D5> g=<D6> b=<D7></text>",
+            szPrefix, tPrefixCol[1] or 0, tPrefixCol[2] or 0, tPrefixCol[3] or 0,
+            szContent, tContentCol[1] or 0, tContentCol[2] or 0, tContentCol[3] or 0
+        ), true)
+    else
+        OutputMessage("MSG_SYS", string.format("[%s] %s", szPrefix, szContent) )
+    end
 end
 --[[ Debug输出
     (void)MY.Debug(szText, szHead, nLevel)
@@ -544,13 +585,25 @@ MY.Debug = function(szText, szHead, nLevel)
     end
 end
 --[[ 延迟调用
-    (void) MY.DelayCall(func fnAction, number nDelay)
+    (void) MY.DelayCall(func fnAction, number nDelay, string szName)
     fnAction	-- 调用函数
     nTime		-- 延迟调用时间，单位：毫秒，实际调用延迟延迟是 62.5 的整倍数
+    szName      -- 延迟调用ID 用于取消调用
+    取消调用
+    (void) MY.DelayCall(string szName)
+    szName      -- 延迟调用ID
 ]]
-MY.DelayCall = function(fnAction, nDelay)
-	local nTime = nDelay + GetTime()
-	table.insert(_MY.tDelayCall, { nTime = nTime, fnAction = fnAction })
+MY.DelayCall = function(fnAction, nDelay, szName)
+    if type(fnAction)=="function" then
+        local nTime = nDelay + GetTime()
+        if type(szName) == "string" then
+            _MY.tDelayCall[szName] = { nTime = nTime, fnAction = fnAction }
+        else
+            table.insert(_MY.tDelayCall, { nTime = nTime, fnAction = fnAction })
+        end
+    elseif type(fnAction)=="string" then
+        _MY.tDelayCall[fnAction] = nil
+    end
 end
 --[[ 注册呼吸循环调用函数
     (void) MY.BreatheCall(string szKey, func fnAction[, number nTime])
@@ -725,6 +778,77 @@ MY.RegisterPanel = function( szName, szTitle, szIniFile, fnOnload, szIconTex, dw
     end
     MY.RedrawTabPanel()
 end
+-- 打开浏览器
+MY.UI.OpenInternetExplorer = function(szAddr, bDisableSound)
+    local nIndex, nLast = nil, nil
+    for i = 1, 10, 1 do
+        if not _MY.UI.IsInternetExplorerOpened(i) then
+            nIndex = i
+            break
+        elseif not nLast then
+            nLast = i
+        end
+    end
+    if not nIndex then
+        OutputMessage("MSG_ANNOUNCE_RED", g_tStrings.MSG_OPEN_TOO_MANY)
+        return nil
+    end
+    local x, y = _MY.UI.IE_GetNewIEFramePos()
+    local frame = Wnd.OpenWindow("InternetExplorer", "IE"..nIndex)
+    frame.bIE = true
+    frame.nIndex = nIndex
+
+    frame:BringToTop()
+    if nLast then
+        frame:SetAbsPos(x, y)
+        frame:CorrectPos()
+        frame.x = x
+        frame.y = y
+    else
+        frame:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
+        frame.x, frame.y = frame:GetAbsPos()
+    end
+    local webPage = frame:Lookup("WebPage_Page")
+    if szAddr then
+        webPage:Navigate(szAddr)
+    end
+    Station.SetFocusWindow(webPage)
+    if not bDisableSound then
+        PlaySound(SOUND.UI_SOUND,g_sound.OpenFrame)
+    end
+    return webPage
+end
+-- 判断浏览器是否已开启
+_MY.UI.IsInternetExplorerOpened = function(nIndex)
+    local frame = Station.Lookup("Topmost/IE"..nIndex)
+    if frame and frame:IsVisible() then
+        return true
+    end
+    return false
+end
+-- 获取浏览器绝对位置
+_MY.UI.IE_GetNewIEFramePos = function()
+    local nLastTime = 0
+    local nLastIndex = nil
+    for i = 1, 10, 1 do
+        local frame = Station.Lookup("Topmost/IE"..i)
+        if frame and frame:IsVisible() then
+            if frame.nOpenTime > nLastTime then
+                nLastTime = frame.nOpenTime
+                nLastIndex = i
+            end
+        end
+    end
+    if nLastIndex then
+        local frame = Station.Lookup("Topmost/IE"..nLastIndex)
+        x, y = frame:GetAbsPos()
+        local wC, hC = Station.GetClientSize()
+        if x + 890 <= wC and y + 630 <= hC then
+            return x + 30, y + 30
+        end
+    end
+    return 40, 40
+end
 --[[ 添加复选框
     MY.UI.AddCheckBox(szPanelName,szName,x,y,szText,col,bChecked)
     szPanelName 要添加复选框的标签页ID
@@ -846,14 +970,13 @@ MY.OnFrameBreathe = function()
 	end
 	-- run delay calls
 	local nTime = GetTime()
-	for k = #_MY.tDelayCall, 1, -1 do
-		local v = _MY.tDelayCall[k]
+	for k, v in pairs(_MY.tDelayCall) do
 		if v.nTime <= nTime then
 			local res, err = pcall(v.fnAction)
 			if not res then
 				MY.Debug("DelayCall#" .. k .." ERROR: " .. err)
 			end
-			table.remove(_MY.tDelayCall, k)
+			_MY.tDelayCall[k] = nil
 		end
 	end
 end
@@ -862,11 +985,23 @@ MY.OnFrameCreate = function()
 end
 -- web page title changed
 MY.OnTitleChanged = function()
-	local szUrl, szTitle = this:GetLocationURL(), this:GetLocationName()
-	if szUrl ~= szTitle and _MY.tRequest[szUrl] then
-		local fnAction = _MY.tRequest[szUrl]
-		fnAction(szTitle, this:GetDocument())
-		_MY.tRequest[szUrl] = nil
+    -- 判断是否有远程请求等待回调 没有则直接返回
+    if not _MY.bRequest then return end
+    -- 处理回调
+	local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
+    local rr = _MY.tRequest[1]
+	if rr.szUrl == szUrl and ( szUrl ~= szTitle or szContent ) then
+        MY.Debug(string.format("[url]%s, [title]%s\n", szUrl, szTitle),'OnTitleChanged',1)
+        -- 注销超时处理时钟
+        MY.DelayCall("MY_Remote_Request_Timeout")
+        -- 成功回调函数
+		rr.fnSuccess(szTitle, this:GetDocument())
+        -- 从请求列表移除
+		table.remove(_MY.tRequest, 1)
+        -- 重置请求状态为空闲
+        _MY.bRequest = false
+        -- 处理下一个远程请求
+        _MY.DoRemoteRequest()
 	end
 end
 -- key down
