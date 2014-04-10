@@ -100,6 +100,7 @@ _MY.Init = function()
     Player_AppendAddonMenu( tMenu )
     -- ÏÔÊ¾»¶Ó­ÐÅÏ¢
     MY.Sysmsg(string.format(_L["%s, welcome to use mingyi plugins!"], GetClientPlayer().szName) .. " v" .. MY.GetVersion() .. ' Build ' .. _MY.szBuildDate .. "\n")
+    if _MY.nDebugLevel >=3 then _MY.frame:Hide() end
 end
 -- get channel header
 _MY.tTalkChannelHeader = {
@@ -1027,7 +1028,8 @@ RegisterEvent("DOODAD_LEAVE_SCENE", function() _MY.tNearDoodad[arg0] = nil end)
 
 AppendCommand("equip", MY.Equip)
 
-RegisterEvent("CALL_LUA_ERROR", function() OutputMessage("MSG_SYS", arg0) end)
+if _MY.nDebugLevel <3 then RegisterEvent("CALL_LUA_ERROR", function() OutputMessage("MSG_SYS", arg0) end) end
+
 -- MY.RegisterEvent("CUSTOM_DATA_LOADED", _MY.Init)
 MY.RegisterEvent("LOADING_END", _MY.Init)
 
