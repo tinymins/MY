@@ -1,0 +1,2 @@
+Farme	Group	GroupIndex	GroupFrameDelay	Left	Top	Width	Height	Name
+0	0	0		0	0	32	32	UIImage.tga
