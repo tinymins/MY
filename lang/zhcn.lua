@@ -41,6 +41,7 @@ data = {
     ['have a trick with'] = '调侃一下',
     ['teammates where'] = '团队中',
     ['nearby players where'] = '附近的',
+    ['please input something.'] = '请先输入一些内容。',
     -- MY_CheckUpdate.lua
     ['new version found.'] = '发现新版本！',
     ['new version found, would you want to download immediately?'] = '发现新版本！是否立即前往下载？',

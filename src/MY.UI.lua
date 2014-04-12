@@ -1,5 +1,10 @@
 MY = MY or {}
-local _MY = {}
+local _MY = {
+    szIniFileEditBox = "Interface\\MY\\ui\\WndEditBox.ini",
+    szIniFileButton = "Interface\\MY\\ui\\WndButton.ini",
+    szIniFileCheckBox = "Interface\\MY\\ui\\WndCheckBox.ini",
+    szIniFileMainPanel = "Interface\\MY\\ui\\MainPanel.ini",
+}
 ---------------------------------------------------------------------
 -- 本地的 UI 组件对象
 ---------------------------------------------------------------------
@@ -36,7 +41,7 @@ local GetChildren = function(root)
         -- 如果有Handle则将所有Handle子元素加入子元素表
         local status, handle = pcall(function() return raw:Lookup('','') end) -- raw可能没有Lookup方法 用pcall包裹
         if status and handle then
-            children[table.concat({ handle:GetTreePath() })] = handle
+            children[table.concat({ handle:GetTreePath(), '/Handle' })] = handle
             for i = 0, handle:GetItemCount() - 1, 1 do
                 children[table.concat({ handle:Lookup(i):GetTreePath() })] = handle:Lookup(i)
             end
@@ -65,19 +70,31 @@ end
 -- ui object creator 
 -- same as jQuery.$()
 function _MY.UI:ctor(raw, tab)
-    self.eles = self.eles or {}
-    -- farmat raw
-    if type(raw)=="string" then raw = Station.Lookup(raw) end
-    -- format tab
-    if type(tab)~="table" then tab = {} end
-    local szType = raw:GetType()
-    if not tab.txt and szType == "Text" then tab.txt = raw end
-    if not tab.img and szType == "Image" then tab.img = raw end
-    if not tab.chk and szType == "WndCheckBox" then tab.chk = raw end
-    if not tab.txt and szType == "WndCheckBox" then tab.chk = raw end
-    if string.sub(szType, 1, 3) == "Wnd" then tab.wnd = raw else tab.itm = raw end
-    if raw then table.insert( self.eles, { raw = raw, txt = tab.txt, img = tab.img, tab.chk, wnd = tab.wnd, itm = tab.itm } ) end
+    if type(raw)=="table" and type(raw.eles)=="table" then
+        self.eles = raw.eles
+    else
+        self.eles = self.eles or {}
+        -- farmat raw
+        if type(raw)=="string" then raw = Station.Lookup(raw) end
+        -- format tab
+        if type(tab)~="table" then tab = {} end
+        local szType = raw:GetType()
+        if not tab.txt and szType == "Text" then tab.txt = raw end
+        if not tab.img and szType == "Image" then tab.img = raw end
+        if not tab.chk and szType == "WndCheckBox" then tab.chk = raw end
+        if not tab.edt and szType == "WndEdit" then tab.edt = raw end
+        if not tab.sdw and szType == "Shadow" then tab.sdw = raw end
+        if string.sub(szType, 1, 3) == "Wnd" then tab.wnd = raw else tab.itm = raw end
+        if raw then table.insert( self.eles, { raw = raw, txt = tab.txt, img = tab.img, chk = tab.chk, edt = tab.edt, wnd = tab.wnd, itm = tab.itm, sdw = tab.sdw } ) end
+    end
     return self
+end
+
+-- clone
+-- clone and return a new class
+function _MY.UI:clone(eles)
+    eles = eles or self.eles
+    return _MY.UI.new({eles = eles})
 end
 
 -- conv raw to eles array
@@ -85,85 +102,92 @@ function _MY.UI:raw2ele(raw, tab)
     -- format tab
     if type(tab)~="table" then tab = {} end
     local szType = raw:GetType()
-    if not tab.txt and  szType == "Text" then tab.txt = raw end
-    if not tab.img and  szType == "Image" then tab.img = raw end
-    if not tab.chk and  szType == "WndCheckBox" then tab.chk = raw end
+    if not tab.txt and szType == "Text" then tab.txt = raw end
+    if not tab.img and szType == "Image" then tab.img = raw end
+    if not tab.chk and szType == "WndCheckBox" then tab.chk = raw end
+    if not tab.edt and szType == "WndEdit" then tab.edt = raw end
+        if not tab.sdw and szType == "Shadow" then tab.sdw = raw end
     if string.sub(szType, 1, 3) == "Wnd" then tab.wnd = raw else tab.itm = raw end
-    return { raw = raw, txt = tab.txt, img = tab.img, chk = tab.chk, wnd = tab.wnd, itm = tab.itm }
+    return { raw = raw, txt = tab.txt, img = tab.img, chk = tab.chk, edt = tab.edt, wnd = tab.wnd, itm = tab.itm, sdw = tab.sdw }
 end
 
 -- add a ele to object
 -- same as jQuery.add()
 function _MY.UI:add(raw, tab)
+    local eles = self.eles
     -- farmat raw
     if type(raw)=="string" then raw = Station.Lookup(raw) end
     -- insert into eles
-    if raw then table.insert( self.eles, self:raw2ele(raw, tab) ) end
-    return self
+    if raw then table.insert( eles, self:raw2ele(raw, tab) ) end
+    return self:clone(eles)
 end
 
 -- delete elements from object
 -- same as jQuery.not()
 function _MY.UI:del(raw)
+    local eles = self.eles
     if type(raw) == "string" then
         -- delete ele those id/class fits filter:raw
         if string.sub(raw, 1, 1) == "#" then
             raw = string.sub(raw, 2)
-            for i = #self.eles, 1, -1 do
-                if self.eles[i].raw:GetName() == raw then
-                    table.remove(self.eles, i)
+            for i = #eles, 1, -1 do
+                if eles[i].raw:GetName() == raw then
+                    table.remove(eles, i)
                 end
             end
         elseif string.sub(raw, 1, 1) == "." then
             raw = string.sub(raw, 2)
-            for i = #self.eles, 1, -1 do
-                if self.eles[i].raw:GetType() == raw then
-                    table.remove(self.eles, i)
+            for i = #eles, 1, -1 do
+                if eles[i].raw:GetType() == raw then
+                    table.remove(eles, i)
                 end
             end
         end
     else
         -- delete ele those treepath is the same as raw
         raw = table.concat({ raw:GetTreePath() })
-        for i = #self.eles, 1, -1 do
-            if table.concat({ self.eles[i].raw:GetTreePath() }) == raw then
-                table.remove(self.eles, i)
+        for i = #eles, 1, -1 do
+            if table.concat({ eles[i].raw:GetTreePath() }) == raw then
+                table.remove(eles, i)
             end
         end
     end
-    return self
+    return self:clone(eles)
 end
 
 -- filter elements from object
 -- same as jQuery.filter()
 function _MY.UI:filter(raw)
+    local eles = self.eles
     if type(raw) == "string" then
         -- delete ele those id/class not fits filter:raw
         if string.sub(raw, 1, 1) == "#" then
             raw = string.sub(raw, 2)
-            for i = #self.eles, 1, -1 do
-                if self.eles[i].raw:GetName() ~= raw then
-                    table.remove(self.eles, i)
+            for i = #eles, 1, -1 do
+                if eles[i].raw:GetName() ~= raw then
+                    table.remove(eles, i)
                 end
             end
         elseif string.sub(raw, 1, 1) == "." then
             raw = string.sub(raw, 2)
-            for i = #self.eles, 1, -1 do
-                if self.eles[i].raw:GetType() ~= raw then
-                    table.remove(self.eles, i)
+            for i = #eles, 1, -1 do
+                if eles[i].raw:GetType() ~= raw then
+                    table.remove(eles, i)
                 end
             end
         end
+    elseif type(raw)=="nil" then
+        return self
     else
         -- delete ele those treepath is not the same as raw
         raw = table.concat({ raw:GetTreePath() })
-        for i = #self.eles, 1, -1 do
-            if table.concat({ self.eles[i].raw:GetTreePath() }) ~= raw then
-                table.remove(self.eles, i)
+        for i = #eles, 1, -1 do
+            if table.concat({ eles[i].raw:GetTreePath() }) ~= raw then
+                table.remove(eles, i)
             end
         end
     end
-    return self
+    return self:clone(eles)
 end
 
 -- get parent
@@ -178,8 +202,7 @@ function _MY.UI:parent()
         -- insert into eles
         table.insert( eles, self:raw2ele(raw) )
     end
-    self.eles = eles
-    return self
+    return self:clone(eles)
 end
 
 -- get child
@@ -204,13 +227,12 @@ function _MY.UI:child()
         -- insert into eles
         table.insert( eles, self:raw2ele(raw) )
     end
-    self.eles = eles
-    return self
+    return self:clone(eles)
 end
 
 -- get all children
--- same as jQuery.children()
-function _MY.UI:children()
+-- same as jQuery.children(filter)
+function _MY.UI:children(filter)
     local children = {}
     for _, ele in pairs(self.eles) do
         for szTreePath, raw in pairs(GetChildren(ele.raw)) do
@@ -222,8 +244,7 @@ function _MY.UI:children()
         -- insert into eles
         table.insert( eles, self:raw2ele(raw) )
     end
-    self.eles = eles
-    return self
+    return self:clone(eles):filter(filter)
 end
 
 -- find ele
@@ -235,9 +256,11 @@ end
 -- each
 -- same as jQuery.each(function(){})
 function _MY.UI:each(fn)
-    for _, ele in pairs(self.eles) do
+    local eles = self.eles
+    for _, ele in pairs(eles) do
         pcall(fn, ele.raw)
     end
+    return self
 end
 
 -- eq
@@ -264,22 +287,25 @@ end
 -- slice -- index starts from 1
 -- same as jQuery.slice(selector, pos)
 function _MY.UI:slice(startpos, endpos)
-    endpos = endpos or #self.eles
-    if endpos < 0 then endpos = #self.eles + endpos + 1 end
-    for i = #self.eles, endpos + 1, -1 do
-        table.remove(self.eles)
+    local eles = self.eles
+    endpos = endpos or #eles
+    if endpos < 0 then endpos = #eles + endpos + 1 end
+    for i = #eles, endpos + 1, -1 do
+        table.remove(eles)
     end
-    if startpos < 0 then startpos = #self.eles + startpos + 1 end
+    if startpos < 0 then startpos = #eles + startpos + 1 end
     for i = startpos, 2, -1 do
-        table.remove(self.eles, 1)
+        table.remove(eles, 1)
     end
-    return self
+    return self:clone(eles)
 end
 
 -- get raw
 -- same as jQuery[index]
 function _MY.UI:raw(index)
-    if index < #self.eles then return self.eles[index].raw end
+    local eles = self.eles
+    if index < 0 then index = #eles + index + 1 end
+    if index > 0 and index <= #eles then return eles[index].raw end
 end
 
 -----------------------------------------------------------
@@ -289,16 +315,18 @@ end
 -- remove
 -- same as jQuery.remove()
 function _MY.UI:remove()
-    if self.fnDestroy then
-        self.fnDestroy(self.raw)
+    for _, ele in pairs(self.eles) do
+        pcall(function() ele.fnDestroy(ele.raw) end)
+        if ele.raw:GetType() == "WndFrame" then
+            Wnd.CloseWindow(self.raw)
+        elseif string.sub(ele.raw:GetType(), 1, 3) == "Wnd" then
+            ele.raw:Destroy()
+        else
+            ele.raw:GetParent():RemoveItem(ele.raw:GetIndex())
+        end
     end
-    if self.raw:GetType() == "WndFrame" then
-        Wnd.CloseWindow(self.raw)
-    elseif string.sub(self.raw:GetType(), 1, 3) == "Wnd" then
-        self.raw:Destroy()
-    else
-        self.raw:GetParent():RemoveItem(self.raw:GetIndex())
-    end
+    self.eles = {}
+    return self
 end
 
 -----------------------------------------------------------
@@ -306,7 +334,7 @@ end
 -----------------------------------------------------------
 
 -- show/hide eles
-function _MY.UI:Toggle(bShow)
+function _MY.UI:toggle(bShow)
     for _, ele in pairs(self.eles) do
         pcall(function() if bShow == false or (not bShow and ele.raw:IsVisible()) then ele.raw:Hide() else ele.raw:Show() end end)
     end
@@ -314,52 +342,98 @@ function _MY.UI:Toggle(bShow)
 end
 
 -- get/set ui object text
-function _MY.UI:Text(szText)
+function _MY.UI:text(szText)
     if szText then
         for _, ele in pairs(self.eles) do
-            pcall(function() ele.txt:SetText(szText) end)
+            pcall(function() ele.raw:SetText(szText) end)
         end
         return self
     else
+        -- select the first item
         local ele = self.eles[1]
-        return pcall(function() return ele.txt:GetText() end)
+        -- try to get its name
+        local status, err = pcall(function() return ele.raw:GetText() end)
+        -- if succeed then return its name
+        if status then return err else MY.Debug(err,'ERROR _MY.UI:text' ,3) return nil end
     end
 end
 
 -- get/set ui object name
-function _MY.UI:Name(szText)
+function _MY.UI:name(szText)
     if szText then -- set name
         for _, ele in pairs(self.eles) do
             pcall(function() ele.raw:SetName(szText) end)
         end
         return self
-    else -- get name
+    else -- get
         -- select the first item
         local ele = self.eles[1]
         -- try to get its name
         local status, err = pcall(function() return ele.raw:GetName() end)
         -- if succeed then return its name
-        if status then return err end
+        if status then return err else MY.Debug(err,'ERROR _MY.UI:name' ,3) return nil end
     end
 end
 
 -- get/set ui alpha
-function _MY.UI:Alpha(nAlpha)
+function _MY.UI:alpha(nAlpha)
     if nAlpha then -- set name
         for _, ele in pairs(self.eles) do
             pcall(function() ele.raw:SetAlpha(nAlpha) end)
         end
         return self
-    else -- get name
+    else -- get
         -- select the first item
         local ele = self.eles[1]
         -- try to get its name
         local status, err = pcall(function() return ele.raw:GetAlpha() end)
         -- if succeed then return its name
-        if status then return err end
+        if status then return err else MY.Debug(err,'ERROR _MY.UI:alpha' ,3) return nil end
     end
 end
 
+
+-- (number) Instance:font()
+-- (self) Instance:font(number nFont)
+function _MY.UI:font(nFont)
+    if nFont then-- set name
+        for _, ele in pairs(self.eles) do
+            pcall(function() ele.raw:SetFontScheme(nFont) end)
+        end
+        return self
+    else -- get
+        -- select the first item
+        local ele = self.eles[1]
+        -- try to get its name
+        local status, err = pcall(function() return ele.raw:GetFontScheme() end)
+        -- if succeed then return its name
+        if status then return err else MY.Debug(err,'ERROR _MY.UI:font' ,3) return nil end
+    end
+end
+
+-- (number, number, number) Instance:color()
+-- (self) Instance:color(number nRed, number nGreen, number nBlue)
+function _MY.UI:color(nRed, nGreen, nBlue)
+    if type(nRed) == "table" then
+        nBlue = nRed[3]
+        nGreen = nRed[2]
+        nRed = nRed[1]
+    end
+    if nBlue then
+        for _, ele in pairs(self.eles) do
+            pcall(function() ele.sdw:SetColorRGB(nRed, nGreen, nBlue) end)
+            pcall(function() (ele.edt or ele.txt):SetFontColor(nRed, nGreen, nBlue) end)
+        end
+        return self
+    else -- get
+        -- select the first item
+        local ele = self.eles[1]
+        -- try to get its name
+        local status, r,g,b = pcall(function() if ele.sdw then return ele.sdw:GetColorRGB() else return (ele.edt or ele.txt):GetFontColor() end end)
+        -- if succeed then return its name
+        if status then return r,g,b else MY.Debug(err,'ERROR _MY.UI:font' ,3) return nil end
+    end
+end
 -----------------------------------------------------------
 -- my ui events handle
 -----------------------------------------------------------
@@ -393,11 +467,59 @@ function _MY.UI:hover(fnHover, fnLeave)
             if ele.wnd then ele.wnd.OnMouseEnter = function() fnHover(true) end end
             if ele.wnd then ele.wnd.OnMouseLeave = function() fnLeave(false) end end
             if ele.itm then ele.itm.OnItemMouseEnter = function() fnHover(true) end end
-            if ele.itm then ele.itm.OnItemMouseLeave = function() fnHover(false) end end
+            if ele.itm then ele.itm.OnItemMouseLeave = function() fnLeave(false) end end
         end
     end
     return self
 end
+
+--[[ check 复选框状态变化
+    :check(fnOnCheckBoxCheck[, fnOnCheckBoxUncheck]) 绑定
+    :check()                返回是否已勾选
+    :check(bool bChecked)   勾选/取消勾选
+]]
+function _MY.UI:check(fnCheck, fnUncheck)
+    fnUncheck = fnUncheck or fnCheck
+    if type(fnCheck)=="function" then
+        for _, ele in pairs(self.eles) do
+            if ele.chk then ele.chk.OnCheckBoxCheck = function() fnCheck(true) end end
+            if ele.chk then ele.chk.OnCheckBoxUncheck = function() fnUncheck(false) end end
+        end
+        return self
+    elseif type(fnCheck) == "boolean" then
+        for _, ele in pairs(self.eles) do
+            if ele.chk then ele.chk:Check(fnCheck) end
+        end
+        return self
+    else
+        -- select the first item
+        local ele = self.eles[1]
+        -- try to get its name
+        local status, err = pcall(function() return ele.chk:IsCheckBoxChecked() end)
+        -- if succeed then return its name
+        if status then return err else MY.Debug(err,'ERROR _MY.UI:check' ,3) return nil end
+    end
+end
+
+--[[ change 输入框文字变化
+    :change(fnOnEditChanged) 绑定
+    :change()   调用处理函数
+]]
+function _MY.UI:change(fnOnEditChanged)
+    if fnOnEditChanged then
+        for _, ele in pairs(self.eles) do
+            if ele.edt then ele.edt.OnEditChanged = fnOnEditChanged end
+        end
+        return self
+    else
+        for _, ele in pairs(self.eles) do
+            if ele.edt then pcall(ele.edt.OnEditChanged) end
+        end
+        return self
+    end
+end
+
+-- OnGetFocus 获取焦点
 
 -----------------------------------------------------------
 -- MY.UI
@@ -409,7 +531,7 @@ MY.UI = MY.UI or {}
 setmetatable(MY.UI, { __call = function(me, ...) return me.Fetch(...) end, __metatable = true })
 
 --[[ 构造函数 类似jQuery: $(selector) ]]
-MY.UI.Fetch = function(selector) return _MY.UI.new(selector) end
+MY.UI.Fetch = function(selector, tab) return _MY.UI.new(selector, tab) end
 
 -- 打开浏览器
 MY.UI.OpenInternetExplorer = function(szAddr, bDisableSound)
@@ -494,8 +616,9 @@ end
  ]]
 MY.UI.AddCheckBox = function(szPanelName,szName,x,y,szText,col,bChecked)
 	local fx = Wnd.OpenWindow(_MY.szIniFileCheckBox, "aCheckBox")
+    local item
 	if fx then    
-		local item = fx:Lookup("WndCheckBox")
+		item = fx:Lookup("WndCheckBox")
 		if item then
 			item:ChangeRelation(MY.GetFrame():Lookup("Window_Main/MainPanel_"..szPanelName), true, true)
 			item:SetName(szName)
@@ -519,8 +642,9 @@ end
  ]]
 MY.UI.AddButton = function(szPanelName,szName,x,y,szText,col)
 	local fx = Wnd.OpenWindow(_MY.szIniFileButton, "aWndButton")
+    local item
 	if fx then    
-		local item = fx:Lookup("WndButton")
+		item = fx:Lookup("WndButton")
 		if item then
 			item:ChangeRelation(MY.GetFrame():Lookup("Window_Main/MainPanel_"..szPanelName), true, true)
 			item:SetName(szName)
@@ -544,8 +668,9 @@ end
  ]]
 MY.UI.AddEdit = function(szPanelName,szName,x,y,w,h,szText,bMultiLine)
 	local fx = Wnd.OpenWindow(_MY.szIniFileEditBox, "aEditBox")
+    local item
 	if fx then	
-		local  item = fx:Lookup("WndEdit")
+		item = fx:Lookup("WndEdit")
 		if item then
 			item:ChangeRelation(MY.GetFrame():Lookup("Window_Main/MainPanel_"..szPanelName), true, true)
 			item:SetName("WndEdit"..szName)
@@ -557,9 +682,9 @@ MY.UI.AddEdit = function(szPanelName,szName,x,y,w,h,szText,bMultiLine)
 			item:Lookup("","Edit_Image"):SetSize(w,h)
 			item:SetRelPos(x,y)
 		end
-		Wnd.CloseWindow(fx)
 	end 
-    return MY.UI(item)
+    Wnd.CloseWindow(fx)
+    return MY.UI(item, { edt = item:Lookup(szName) })
 end
 --[[ 寻找指定panel下的指定id的控件 ]]
 MY.UI.Lookup = function(szPanelName, szLookupName)
