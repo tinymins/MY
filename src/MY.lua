@@ -34,12 +34,13 @@ local _MY = {
     hBox = nil,
     hRequest = nil,
     bAddonMenuAdded = false,
-    nDebugLevel = 0,
+    nDebugLevel = 3,
     dwVersion = 0x0000100,
     szBuildDate = "20140209",
     szName = _L["mingyi plugins"],
     szShortName = _L["mingyi plugin"],
     szIniFile = "Interface\\MY\\ui\\MY.ini",
+    szIniFileTabBox = "Interface\\MY\\ui\\WndTabBox.ini",
     tNearNpc = {},      -- 附近的NPC
     tNearPlayer = {},   -- 附近的玩家
     tNearDoodad = {},   -- 附近的物品
@@ -57,32 +58,8 @@ _MY.Init = function()
 	-- var
 	_MY.hBox = MY.GetFrame():Lookup("","Box_1")
 	_MY.hRequest = MY.GetFrame():Lookup("Page_1")
-    -- 窗口消息响应绑定
-    for i, szEventName in pairs {
-        "OnCheckBoxCheck", "OnCheckBoxUncheck",
-        "OnItemMouseEnter", "OnItemMouseLeave",
-        "OnMouseEnter", "OnMouseLeave",
-        "OnLButtonClick", "OnLButtonDown", "OnLButtonUp",
-        "OnRButtonClick", "OnRButtonDown", "OnRButtonUp",
-        "OnItemLButtonClick", "OnItemLButtonDown", "OnItemLButtonUp",
-        "OnItemRButtonClick", "OnItemRButtonDown", "OnItemRButtonUp",
-        "OnGetFocus",
-        "OnEditChanged",
-        } do
-        MY[szEventName] = function()
-            local szName = this:GetName()
-            local evelnr = _MY.tUiEventListener[szName]
-            if evelnr and type(evelnr[szEventName]) == "function" then
-                evelnr[szEventName]()
-            else 
-                MY.Debug(szEventName .. ' ' .. szName .."\n","unsolved event",1)
-            end
-        end
-    end
     -- 窗口按钮
-    MY.UI.RegisterEvent("Button_WindowClose",{
-        OnLButtonClick = function() if _MY.frame then _MY.frame:Hide() end end
-    })
+    MY.UI(MY.GetFrame()):find("#Button_WindowClose"):click(function() MY.UI(MY.GetFrame()):toggle(false) end)
     -- 创建菜单
     if not _MY.bAddonMenuAdded then
         local tMenu = { function() return {{
@@ -572,7 +549,7 @@ MY.Sysmsg = function(szContent, szPrefix, tContentCol, tPrefixCol)
     if tContentCol then
         tPrefixCol = tPrefixCol or tContentCol
         OutputMessage("MSG_SYS", FormatString(
-            "<text>text=\"[<D0>] \" font=10 r=<D1> g=<D2> b=<D3></text><text>text=\"<D4>\n\" font=10 r=<D5> g=<D6> b=<D7></text>",
+            "<text>text=\"[<D0>] \" font=10 r=<D1> g=<D2> b=<D3></text><text>text=\"<D4>\" font=10 r=<D5> g=<D6> b=<D7></text>",
             szPrefix, tPrefixCol[1] or 0, tPrefixCol[2] or 0, tPrefixCol[3] or 0,
             szContent, tContentCol[1] or 0, tContentCol[2] or 0, tContentCol[3] or 0
         ), true)
@@ -745,23 +722,23 @@ MY.RedrawTabPanel = function()
         Wnd.CloseWindow(fx)
         -- insert main panel
         fx = Wnd.OpenWindow(tTab.szIniFile, "aMainPanel")
+        local mainpanel
         if fx then    
-            local item = fx:Lookup("MainPanel")
-            if item then
-                item:ChangeRelation(MY.GetFrame():Lookup("Window_Main"), true, true)
-                item:SetName("MainPanel_" .. szName)
-                item:SetRelPos(0,0)
-                item:Hide()
+            mainpanel = fx:Lookup("MainPanel")
+            if mainpanel then
+                mainpanel:ChangeRelation(MY.GetFrame():Lookup("Window_Main"), true, true)
+                mainpanel:SetName("MainPanel_" .. szName)
+                mainpanel:SetRelPos(0,0)
+                mainpanel:Hide()
             end
-            -- call init functions
-            pcall(tTab.fnOnUiLoad, item)
         end
         Wnd.CloseWindow(fx)
 
         -- call init functions
-        pcall(tTab.fnOnDataLoad)
+        pcall(tTab.fnOnUiLoad, mainpanel)
+        pcall(tTab.fnOnDataLoad, mainpanel)
         -- register function which will be called once user data loaded
-        MY.RegisterEvent("CUSTOM_DATA_LOADED", "_MY_MAIN_PANEL_DATA_LOAD_"..szName, tTab.fnOnDataLoad)
+        if tTab.fnOnDataLoad then MY.RegisterEvent("CUSTOM_DATA_LOADED", "_MY_MAIN_PANEL_DATA_LOAD_"..szName, function() pcall(tTab.fnOnDataLoad, mainpanel) end) end
     end
 end
 --[[ 注册选项卡
@@ -792,25 +769,6 @@ MY.RegisterPanel = function( szName, szTitle, szIniFile, szIconTex, dwIconFrame,
         _MY.tTabs[szName] = { szTitle = szTitle, fnOnUiLoad = fnOnUiLoad, fnOnDataLoad = fnOnDataLoad, szIniFile = szIniFile, szIconTex = szIconTex, dwIconFrame = dwIconFrame, rgbTitleColor = {rgbaTitleColor[1],rgbaTitleColor[2],rgbaTitleColor[3]}, alpha = rgbaTitleColor[4] }
     end
     MY.RedrawTabPanel()
-end
------------------------------------------------------------------------------
--- UI Event Listener
------------------------------------------------------------------------------
---[[ 注册UI消息响应函数
-    MY.UI.RegisterEvent(szName, fn) 
-    szName 响应窗体名称
-    fn 响应函数数组
-    Ex: MY.UI.RegisterEvent("TabBox", { OnMouseEnter = function() end } ) -- 注册TabBox响应函数
-    Ex: MY.UI.RegisterEvent("TabBox") -- 注销TabBox响应函数
- ]]
-MY.UI.RegisterEvent = function(szName, fn) 
-    if type(szName) == "string" then
-        if type(fn) == "table" then
-            _MY.tUiEventListener[szName] = fn
-        else
-            _MY.tUiEventListener[szName] = nil
-        end
-    end
 end
 
 -----------------------------------------------
