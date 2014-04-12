@@ -33,17 +33,13 @@ local _MY = {
     frame = nil,
     hBox = nil,
     hRequest = nil,
-    nDebugLevel = 3,
+    bAddonMenuAdded = false,
+    nDebugLevel = 0,
     dwVersion = 0x0000100,
     szBuildDate = "20140209",
-    szIniFile = "Interface\\MY\\ui\\MY.ini",
-    szIniFileEditBox = "Interface\\MY\\ui\\WndEditBox.ini",
-    szIniFileButton = "Interface\\MY\\ui\\WndButton.ini",
-    szIniFileTabBox = "Interface\\MY\\ui\\WndTabBox.ini",
-    szIniFileCheckBox = "Interface\\MY\\ui\\WndCheckBox.ini",
-    szIniFileMainPanel = "Interface\\MY\\ui\\MainPanel.ini",
     szName = _L["mingyi plugins"],
     szShortName = _L["mingyi plugin"],
+    szIniFile = "Interface\\MY\\ui\\MY.ini",
     tNearNpc = {},      -- 附近的NPC
     tNearPlayer = {},   -- 附近的玩家
     tNearDoodad = {},   -- 附近的物品
@@ -59,8 +55,8 @@ local _MY = {
 }
 _MY.Init = function()
 	-- var
-	_MY.hBox = _MY.frame:Lookup("","Box_1")
-	_MY.hRequest = Station.Lookup("Normal/MY/Page_1")
+	_MY.hBox = MY.GetFrame():Lookup("","Box_1")
+	_MY.hRequest = MY.GetFrame():Lookup("Page_1")
     -- 窗口消息响应绑定
     for i, szEventName in pairs {
         "OnCheckBoxCheck", "OnCheckBoxUncheck",
@@ -88,16 +84,19 @@ _MY.Init = function()
         OnLButtonClick = function() if _MY.frame then _MY.frame:Hide() end end
     })
     -- 创建菜单
-    local tMenu = { function() return {{
-        szOption = _L["mingyi plugins"],
-        fnAction = function()
-            Station.Lookup("Normal/MY"):ToggleVisible()
-        end,
-        bCheck = true,
-        bChecked = Station.Lookup("Normal/MY"):IsVisible(),
-    }} end }
-    TraceButton_AppendAddonMenu( tMenu )
-    Player_AppendAddonMenu( tMenu )
+    if not _MY.bAddonMenuAdded then
+        local tMenu = { function() return {{
+            szOption = _L["mingyi plugins"],
+            fnAction = function()
+                Station.Lookup("Normal/MY"):ToggleVisible()
+            end,
+            bCheck = true,
+            bChecked = Station.Lookup("Normal/MY"):IsVisible(),
+        }} end }
+        TraceButton_AppendAddonMenu( tMenu )
+        Player_AppendAddonMenu( tMenu )
+        _MY.bAddonMenuAdded = true
+    end
     -- 显示欢迎信息
     MY.Sysmsg(string.format(_L["%s, welcome to use mingyi plugins!"], GetClientPlayer().szName) .. " v" .. MY.GetVersion() .. ' Build ' .. _MY.szBuildDate .. "\n")
     if _MY.nDebugLevel >=3 then _MY.frame:Hide() end
@@ -221,6 +220,15 @@ MY.GetVersion = function()
 		szVersion = szVersion .. "b" .. tostring(v%0x100)
 	end
 	return szVersion, v
+end
+--[[ 获取主窗体句柄
+    (frame) MY.GetFrame()
+]]
+MY.GetFrame = function() 
+    if not _MY.frame then 
+        _MY.frame = Wnd.OpenWindow(_MY.szIniFile, "MY")
+    end
+    return _MY.frame
 end
 -- (void) MY.MenuTip(string str)	-- MenuTip
 MY.MenuTip = function(str)
@@ -672,7 +680,9 @@ MY.RegisterEvent = function(szEventName, szListenerId, fnListener)
             table.insert(_MY.tEvent[szEventName], fnListener)
         end
     elseif type(szListenerId)=="string" then -- 注销指定ID的事件监听
-        _MY.tEvent[szEventName][szListenerId] = nil
+        if type(_MY.tEvent[szEventName])=="table" then -- 如果事件已注册 则注销
+            _MY.tEvent[szEventName][szListenerId] = nil 
+        end
     elseif type(szListenerId)=="nil" then -- 注销所有事件监听
         _MY.tEvent[szEventName] = {}
     end
@@ -680,13 +690,13 @@ end
 --[[ 重绘Tab窗口 ]]
 MY.RedrawTabPanel = function()
     local nTop = 3
-    local frame = Station.Lookup("Normal/MY/Window_Tabs"):GetFirstChild()
+    local frame = MY.GetFrame():Lookup("Window_Tabs"):GetFirstChild()
     while frame do
         local frame_d = frame
         frame = frame:GetNext()
         frame_d:Destroy()
     end
-    local frame = Station.Lookup("Normal/MY/Window_Main"):GetFirstChild()
+    local frame = MY.GetFrame():Lookup("Window_Main"):GetFirstChild()
     while frame do
         local frame_d = frame
         frame = frame:GetNext()
@@ -698,7 +708,7 @@ MY.RedrawTabPanel = function()
         if fx then    
             local item = fx:Lookup("TabBox")
             if item then
-                item:ChangeRelation(Station.Lookup("Normal/MY/Window_Tabs"), true, true)
+                item:ChangeRelation(MY.GetFrame():Lookup("Window_Tabs"), true, true)
                 item:SetName("TabBox_" .. szName)
                 item:SetRelPos(0,nTop)
                 item:Lookup("","Text_TabBox_Title"):SetText(tTab.szTitle)
@@ -708,6 +718,29 @@ MY.RedrawTabPanel = function()
                 local w,h = item:GetSize()
                 nTop = nTop + h
             end
+            -- register tab mouse event
+            item.OnMouseEnter = function()
+                this:Lookup("","Image_TabBox_Background"):Hide()
+                this:Lookup("","Image_TabBox_Background_Hover"):Show()
+            end
+            item.OnMouseLeave = function()
+                this:Lookup("","Image_TabBox_Background"):Show()
+                this:Lookup("","Image_TabBox_Background_Hover"):Hide()
+            end
+            item.OnLButtonDown = function()
+                local p = this:GetParent():GetFirstChild()
+                while p do
+                    p:Lookup("","Image_TabBox_Background_Sel"):Hide()
+                    p = p:GetNext()
+                end
+                this:Lookup("","Image_TabBox_Background_Sel"):Show()
+                local frame = MY.GetFrame():Lookup("Window_Main"):GetFirstChild()
+                while frame do
+                    frame:Hide()
+                    frame = frame:GetNext()
+                end
+                MY.GetFrame():Lookup("Window_Main/MainPanel_" .. szName):Show()
+            end
         end
         Wnd.CloseWindow(fx)
         -- insert main panel
@@ -715,40 +748,20 @@ MY.RedrawTabPanel = function()
         if fx then    
             local item = fx:Lookup("MainPanel")
             if item then
-                item:ChangeRelation(Station.Lookup("Normal/MY/Window_Main"), true, true)
+                item:ChangeRelation(MY.GetFrame():Lookup("Window_Main"), true, true)
                 item:SetName("MainPanel_" .. szName)
                 item:SetRelPos(0,0)
                 item:Hide()
             end
+            -- call init functions
+            pcall(tTab.fnOnUiLoad, item)
         end
         Wnd.CloseWindow(fx)
-        -- register tab mouse event
-        MY.UI.RegisterEvent("TabBox_" .. szName, {
-            OnMouseEnter = function()
-                this:Lookup("","Image_TabBox_Background"):Hide()
-                this:Lookup("","Image_TabBox_Background_Hover"):Show()
-            end,
-            OnMouseLeave = function()
-                this:Lookup("","Image_TabBox_Background"):Show()
-                this:Lookup("","Image_TabBox_Background_Hover"):Hide()
-            end,
-            OnLButtonDown = function()
-                local p = this:GetParent():GetFirstChild()
-                while p do
-                    p:Lookup("","Image_TabBox_Background_Sel"):Hide()
-                    p = p:GetNext()
-                end
-                this:Lookup("","Image_TabBox_Background_Sel"):Show()
-                local frame = Station.Lookup("Normal/MY/Window_Main"):GetFirstChild()
-                while frame do
-                    frame:Hide()
-                    frame = frame:GetNext()
-                end
-                Station.Lookup("Normal/MY/Window_Main/MainPanel_" .. szName):Show()
-            end,
-        })
-        -- call init function
-        pcall(tTab.fnOnload)
+
+        -- call init functions
+        pcall(tTab.fnOnDataLoad)
+        -- register function which will be called once user data loaded
+        MY.RegisterEvent("CUSTOM_DATA_LOADED", "_MY_MAIN_PANEL_DATA_LOAD_"..szName, tTab.fnOnDataLoad)
     end
 end
 --[[ 注册选项卡
@@ -762,176 +775,23 @@ end
     rgbaTitleColor  选项卡文字rgba
     Ex： MY.RegisterPanel( "TalkEx", "喊话辅助", "interface\\MY\\ui\\MainPanel.ini", "UI/Image/UICommon/ScienceTreeNode.UITex", 123, {255,255,0,200} )
  ]]
-MY.RegisterPanel = function( szName, szTitle, szIniFile, fnOnload, szIconTex, dwIconFrame, rgbaTitleColor )
+MY.RegisterPanel = function( szName, szTitle, szIniFile, szIconTex, dwIconFrame, rgbaTitleColor, fnOnUiLoad, fnOnDataLoad )
     if szTitle == nil then
         _MY.tTabs[szName] = nil
     else
         if type(szIniFile)~="string" then szIniFile = _MY.szIniFileMainPanel end
         if type(szIconTex)~="string" then szIniFile = 'UI/Image/Common/Logo.UITex' end
         if type(dwIconFrame)~="number" then dwIconFrame = 6 end
-        if type(fnOnload)~="function" then fnOnload = function()end end
+        if type(fnOnUiLoad)~="function" then fnOnUiLoad = nil end
+        if type(fnOnDataLoad)~="function" then fnOnDataLoad = nil end
         if type(rgbaTitleColor)~="table" then rgbaTitleColor = { 255, 255, 255, 200 } end
         if type(rgbaTitleColor[1])~="number" then rgbaTitleColor[1] = 255 end
         if type(rgbaTitleColor[2])~="number" then rgbaTitleColor[2] = 255 end
         if type(rgbaTitleColor[3])~="number" then rgbaTitleColor[3] = 255 end
         if type(rgbaTitleColor[4])~="number" then rgbaTitleColor[4] = 200 end
-        _MY.tTabs[szName] = { szTitle = szTitle, fnOnload = fnOnload, szIniFile = szIniFile, szIconTex = szIconTex, dwIconFrame = dwIconFrame, rgbTitleColor = {rgbaTitleColor[1],rgbaTitleColor[2],rgbaTitleColor[3]}, alpha = rgbaTitleColor[4] }
+        _MY.tTabs[szName] = { szTitle = szTitle, fnOnUiLoad = fnOnUiLoad, fnOnDataLoad = fnOnDataLoad, szIniFile = szIniFile, szIconTex = szIconTex, dwIconFrame = dwIconFrame, rgbTitleColor = {rgbaTitleColor[1],rgbaTitleColor[2],rgbaTitleColor[3]}, alpha = rgbaTitleColor[4] }
     end
     MY.RedrawTabPanel()
-end
--- 打开浏览器
-MY.UI.OpenInternetExplorer = function(szAddr, bDisableSound)
-    local nIndex, nLast = nil, nil
-    for i = 1, 10, 1 do
-        if not _MY.UI.IsInternetExplorerOpened(i) then
-            nIndex = i
-            break
-        elseif not nLast then
-            nLast = i
-        end
-    end
-    if not nIndex then
-        OutputMessage("MSG_ANNOUNCE_RED", g_tStrings.MSG_OPEN_TOO_MANY)
-        return nil
-    end
-    local x, y = _MY.UI.IE_GetNewIEFramePos()
-    local frame = Wnd.OpenWindow("InternetExplorer", "IE"..nIndex)
-    frame.bIE = true
-    frame.nIndex = nIndex
-
-    frame:BringToTop()
-    if nLast then
-        frame:SetAbsPos(x, y)
-        frame:CorrectPos()
-        frame.x = x
-        frame.y = y
-    else
-        frame:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
-        frame.x, frame.y = frame:GetAbsPos()
-    end
-    local webPage = frame:Lookup("WebPage_Page")
-    if szAddr then
-        webPage:Navigate(szAddr)
-    end
-    Station.SetFocusWindow(webPage)
-    if not bDisableSound then
-        PlaySound(SOUND.UI_SOUND,g_sound.OpenFrame)
-    end
-    return webPage
-end
--- 判断浏览器是否已开启
-_MY.UI.IsInternetExplorerOpened = function(nIndex)
-    local frame = Station.Lookup("Topmost/IE"..nIndex)
-    if frame and frame:IsVisible() then
-        return true
-    end
-    return false
-end
--- 获取浏览器绝对位置
-_MY.UI.IE_GetNewIEFramePos = function()
-    local nLastTime = 0
-    local nLastIndex = nil
-    for i = 1, 10, 1 do
-        local frame = Station.Lookup("Topmost/IE"..i)
-        if frame and frame:IsVisible() then
-            if frame.nOpenTime > nLastTime then
-                nLastTime = frame.nOpenTime
-                nLastIndex = i
-            end
-        end
-    end
-    if nLastIndex then
-        local frame = Station.Lookup("Topmost/IE"..nLastIndex)
-        x, y = frame:GetAbsPos()
-        local wC, hC = Station.GetClientSize()
-        if x + 890 <= wC and y + 630 <= hC then
-            return x + 30, y + 30
-        end
-    end
-    return 40, 40
-end
---[[ 添加复选框
-    MY.UI.AddCheckBox(szPanelName,szName,x,y,szText,col,bChecked)
-    szPanelName 要添加复选框的标签页ID
-    szName      复选框名称
-    x,y         复选框坐标
-    szText      复选框标题
-    col         标题颜色rgb
-    bChecked    复选框是否勾选
- ]]
-MY.UI.AddCheckBox = function(szPanelName,szName,x,y,szText,col,bChecked)
-	local fx = Wnd.OpenWindow(_MY.szIniFileCheckBox, "aCheckBox")
-	if fx then    
-		local item = fx:Lookup("WndCheckBox")
-		if item then
-			item:ChangeRelation(Station.Lookup("Normal/MY/Window_Main/MainPanel_"..szPanelName), true, true)
-			item:SetName(szName)
-			item:Check(bChecked)
-			item:SetRelPos(x,y)
-			item:Lookup("","CheckBox_Text"):SetText(szText)
-			item:Lookup("","CheckBox_Text"):SetFontScheme(18)
-			item:Lookup("","CheckBox_Text"):SetFontColor(unpack(col))
-		end
-	end
-	Wnd.CloseWindow(fx)
-end
---[[ 添加按钮
-    MY.UI.AddButton(szPanelName,szName,x,y,szText,col)
-    szPanelName 要添加按钮的标签页ID
-    szName      按钮名称
-    x,y         按钮坐标
-    szText      按钮标题
-    col         标题颜色rgb
- ]]
-MY.UI.AddButton = function(szPanelName,szName,x,y,szText,col)
-	local fx = Wnd.OpenWindow(_MY.szIniFileButton, "aWndButton")
-	if fx then    
-		local item = fx:Lookup("WndButton")
-		if item then
-			item:ChangeRelation(Station.Lookup("Normal/MY/Window_Main/MainPanel_"..szPanelName), true, true)
-			item:SetName(szName)
-			item:SetRelPos(x,y)
-			item:Lookup("","Text_Default"):SetText(szText)
-			item:Lookup("","Text_Default"):SetFontScheme(18)
-			item:Lookup("","Text_Default"):SetFontColor(unpack(col))
-		end
-	end
-	Wnd.CloseWindow(fx)
-end
---[[ 添加文本输入框
-    MY.UI.AddButton(szPanelName,szName,x,y,w,h,bMultiLine)
-    szPanelName 要添加文本输入框的标签页ID
-    szName      文本输入框名称
-    x,y         文本输入框坐标
-    w,h         文本输入框大小
-    szText      文本框文本
-    bMultiLine  文本框是否允许多行
- ]]
-MY.UI.AddEdit = function(szPanelName,szName,x,y,w,h,szText,bMultiLine)
-	local fx = Wnd.OpenWindow(_MY.szIniFileEditBox, "aEditBox")
-	if fx then	
-		local  item = fx:Lookup("WndEdit")
-		if item then
-			item:ChangeRelation(Station.Lookup("Normal/MY/Window_Main/MainPanel_"..szPanelName), true, true)
-			item:SetName("WndEdit"..szName)
-            item:SetSize(w,h)
-			item:Lookup("Edit_Text"):SetSize(w-8,h-4)
-			item:Lookup("Edit_Text"):SetMultiLine(bMultiLine)
-			item:Lookup("Edit_Text"):SetText(szText or '')
-			item:Lookup("Edit_Text"):SetName(szName)
-			item:Lookup("","Edit_Image"):SetSize(w,h)
-			item:SetRelPos(x,y)
-		end
-		Wnd.CloseWindow(fx)
-	end 
-end
---[[ 寻找指定panel下的指定id的控件 ]]
-MY.UI.Lookup = function(szPanelName, szLookupName, szLookupName2)
-    if szLookupName2 then
-        return _MY.frame:Lookup("Window_Main/MainPanel_"..szPanelName):Lookup(szLookupName,szLookupName2)
-    else
-        return _MY.frame:Lookup("Window_Main/MainPanel_"..szPanelName):Lookup(szLookupName)
-    end
 end
 -----------------------------------------------------------------------------
 -- UI Event Listener
@@ -1013,9 +873,6 @@ MY.OnFrameKeyDown = function()
 	end
 	return 0
 end
----------------------------------------------------
---打开窗体
-_MY.frame = Wnd.OpenWindow(_MY.szIniFile, "MY")
 ---------------------------------------------------
 ---------------------------------------------------
 -- 事件、快捷键注册
