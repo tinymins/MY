@@ -135,17 +135,24 @@ _MY_TalkEx.OnUiLoad = function(wnd)
     -- 调侃按钮
     MY.UI.AddButton('TalkEx','WndButton_TalkEx_Trick',435,415,_L['have a trick with'],{255,255,255}):click(function()
         if #MY_TalkEx.szTrickText == 0 then MY.Sysmsg(_L["please input something."].."\n",nil,{255,0,0}) return end
-        if #MY_TalkEx.szTrickTextBegin > 0 then MY.Talk(PLAYER_TALK_CHANNEL[MY_TalkEx.tTrickChannel], MY_TalkEx.szTrickTextBegin) end
-        local tPlayers = {}
+        local tPlayers, iPlayers = {}, 0
         if MY_TalkEx.tTrickFilter == 'RAID' then
-            for _, i in pairs(GetClientTeam().GetTeamMemberList()) do
-                if GetPlayer(i) then table.insert(tPlayers, GetPlayer(i)) end
+            for _, dwID in pairs(GetClientTeam().GetTeamMemberList()) do
+                local p = GetPlayer(dwID)
+                if p then
+                    tPlayers[dwID] = p
+                    iPlayers = iPlayers + 1
+                end
             end
         elseif MY_TalkEx.tTrickFilter == 'NEARBY' then
-            tPlayers = MY.GetNearPlayer()
+            tPlayers, iPlayers = MY.GetNearPlayer()
         end
         -- 去掉自己 _(:з」∠)_调侃自己是闹哪样
-        tPlayers[GetClientPlayer().dwID]=nil
+        if tPlayers[GetClientPlayer().dwID] then iPlayers=iPlayers-1 tPlayers[GetClientPlayer().dwID]=nil end
+        -- none target
+        if iPlayers == 0 then MY.Sysmsg(_L["no trick target found."].."\n",nil,{255,0,0}) return end
+        -- start tricking
+        if #MY_TalkEx.szTrickTextBegin > 0 then MY.Talk(PLAYER_TALK_CHANNEL[MY_TalkEx.tTrickChannel], MY_TalkEx.szTrickTextBegin) end
         for _, player in pairs(tPlayers) do
             if MY_TalkEx.tTrickFilterForce == -1 or MY_TalkEx.tTrickFilterForce == player.dwForceID then
                 local szText = string.gsub(MY_TalkEx.szTrickText, "%$mb", '['..player.szName..']')
