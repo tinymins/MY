@@ -6,7 +6,7 @@
 -----------------------------------------------
 -- 本地函数和变量
 -----------------------------------------------
-MY = { UI = {} }
+MY = { }
 --[[ 多语言处理
     (table) MY.LoadLangPack(void)
 ]]
@@ -34,7 +34,7 @@ local _MY = {
     hBox = nil,
     hRequest = nil,
     bAddonMenuAdded = false,
-    nDebugLevel = 3,
+    nDebugLevel = 0,
     dwVersion = 0x0000100,
     szBuildDate = "20140209",
     szName = _L["mingyi plugins"],
@@ -50,9 +50,7 @@ local _MY = {
     tRequest = {},      -- 网络请求队列
     bRequest = false,   -- 网络请求繁忙中
     tTabs = {},         -- 标签页
-    tUiEventListener = {},  -- UI响应函数
-    tEvent = {},            -- 游戏事件绑定
-    UI = {},
+    tEvent = {},        -- 游戏事件绑定
 }
 _MY.Init = function()
 	-- var
@@ -232,7 +230,7 @@ end
 _MY.DoRemoteRequest = function()
     MY.Debug('Do Remote Request Queue.\n','DoRR',1)
     -- 如果队列为空 则置队列状态为空闲并返回
-    if table.getn(_MY.tRequest)==0 then _MY.bRequest = false MY.Debug('Remote Request Queue Is Clear.\n','DoRR',1) return end
+    if table.getn(_MY.tRequest)==0 then _MY.bRequest = false MY.Debug('Remote Request Queue Is Clear.\n','DoRR',0) return end
     -- 如果当前队列有未处理的请求 并且远程请求队列处于空闲状态
     if not _MY.bRequest then
         -- 获取队列第一个元素
@@ -240,7 +238,7 @@ _MY.DoRemoteRequest = function()
         -- 注册请求超时处理函数的时钟
         MY.DelayCall(function()
             -- 请求超时 回调请求超时函数
-            rr.fnError(_MY.tRequest[1].szUrl, "timeout")
+            pcall(rr.fnError, rr.szUrl, "timeout")
             -- 从请求队列移除首元素
             table.remove(_MY.tRequest, 1)
             -- 重置请求队列状态为空闲
@@ -408,15 +406,54 @@ end
 --[[ 获取附近NPC列表
     (table) MY.GetNearNpc(void)
 ]]
-MY.GetNearNpc = function() return _MY.tNearNpc end
+MY.GetNearNpc = function(nLimit)
+    local tNpc, i = {}, 0
+    for dwID, _ in pairs(_MY.tNearNpc) do
+        local npc = GetNpc(dwID)
+        if not npc then
+            _MY.tNearNpc[dwID] = nil
+        else
+            i = i + 1
+            tNpc[dwID] = npc
+            if nLimit and i == nLimit then break end
+        end
+    end
+    return tNpc, i
+end
 --[[ 获取附近玩家列表
     (table) MY.GetNearPlayer(void)
 ]]
-MY.GetNearPlayer = function() return _MY.tNearPlayer end
+MY.GetNearPlayer = function(nLimit)
+    local tPlayer, i = {}, 0
+    for dwID, _ in pairs(_MY.tNearPlayer) do
+        local player = GetPlayer(dwID)
+        if not player then
+            _MY.tNearPlayer[dwID] = nil
+        else
+            i = i + 1
+            tPlayer[dwID] = player
+            if nLimit and i == nLimit then break end
+        end
+    end
+    return tPlayer, i
+end
 --[[ 获取附近物品列表
     (table) MY.GetNearPlayer(void)
 ]]
-MY.GetNearDoodad = function() return _MY.tNearDoodad end
+MY.GetNearDoodad = function(nLimit)
+    local tDoodad, i = {}, 0
+    for dwID, _ in pairs(_MY.tNearDoodad) do
+        local dooded = GetDoodad(dwID)
+        if not dooded then
+            _MY.tNearDoodad[dwID] = nil
+        else
+            i = i + 1
+            tDoodad[dwID] = dooded
+            if nLimit and i == nLimit then break end
+        end
+    end
+    return tDoodad, i
+end
 --[[ (KObject) MY.GetTarget()														-- 取得当前目标操作对象
 -- (KObject) MY.GetTarget([number dwType, ]number dwID)	-- 根据 dwType 类型和 dwID 取得操作对象]]
 MY.GetTarget = function(dwType, dwID)
@@ -566,8 +603,16 @@ end
 MY.Debug = function(szText, szHead, nLevel)
     if type(nLevel)~="number" then nLevel = 1 end
     if type(szHead)~="string" then szHead = 'MY DEBUG' end
-    if nLevel > _MY.nDebugLevel then
-        MY.Sysmsg(szText, szHead)
+    local color = { 255, 255, 0 }
+    if nLevel == 0 then
+        color = { 0, 255, 127 }
+    elseif nLevel == 1 then
+        color = { 255, 170, 170 }
+    elseif nLevel == 2 then
+        color = { 255, 86, 86 }
+    end
+    if nLevel >= _MY.nDebugLevel then
+        MY.Sysmsg(szText, szHead, color)
     end
 end
 --[[ 延迟调用
@@ -639,18 +684,22 @@ end
     MY.RegisterEvent( szEventName )
  ]]
 MY.RegisterEvent = function(szEventName, szListenerId, fnListener)
+    if type(szEventName)~="string" then return end
     if type(szListenerId)=="function" then fnListener = szListenerId szListenerId = nil end
     if type(fnListener)=="function" then -- 添加事件监听
+        -- 第一次添加注册系统事件
         if type(_MY.tEvent[szEventName])~="table" then
             _MY.tEvent[szEventName] = {}
             RegisterEvent(szEventName, function(...)
                 if type(_MY.tEvent[szEventName])=="table" then
-                    for i, event in pairs(_MY.tEvent[szEventName]) do
-                        event(...)
+                    for _, fnEvent in pairs(_MY.tEvent[szEventName]) do
+                        local status, err = pcall(fnEvent, ...)
+                        if not status then MY.Debug(err, 'MY.RegisterEvent', 2) end
                     end
                 end
             end)
         end
+        -- 往事件数组中添加
         if type(szListenerId)=="string" then
             _MY.tEvent[szEventName][szListenerId] = fnListener
         else
@@ -735,10 +784,10 @@ MY.RedrawTabPanel = function()
         Wnd.CloseWindow(fx)
 
         -- call init functions
-        pcall(tTab.fnOnUiLoad, mainpanel)
-        pcall(tTab.fnOnDataLoad, mainpanel)
+        if type(tTab.fnOnUiLoad)=="function" then pcall(tTab.fnOnUiLoad, mainpanel) end
+        if type(tTab.fnOnDataLoad)=="function" then pcall(tTab.fnOnDataLoad, mainpanel) end
         -- register function which will be called once user data loaded
-        if tTab.fnOnDataLoad then MY.RegisterEvent("CUSTOM_DATA_LOADED", "_MY_MAIN_PANEL_DATA_LOAD_"..szName, function() pcall(tTab.fnOnDataLoad, mainpanel) end) end
+        if type(tTab.fnOnDataLoad)=="function" then MY.RegisterEvent("CUSTOM_DATA_LOADED", "_MY_MAIN_PANEL_DATA_LOAD_"..szName, function() pcall(tTab.fnOnDataLoad, mainpanel) end) end
     end
 end
 --[[ 注册选项卡
@@ -802,26 +851,29 @@ end
 -- create frame
 MY.OnFrameCreate = function()
 end
--- web page title changed
-MY.OnTitleChanged = function()
+
+-- web page complete
+MY.OnDocumentComplete = function()
     -- 判断是否有远程请求等待回调 没有则直接返回
     if not _MY.bRequest then return end
     -- 处理回调
-	local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
+    local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
+    -- 获取请求队列首部元素
     local rr = _MY.tRequest[1]
-	if rr.szUrl == szUrl and ( szUrl ~= szTitle or szContent ) then
-        MY.Debug(string.format("[url]%s, [title]%s\n", szUrl, szTitle),'OnTitleChanged',1)
+    -- 判断当前页面是否符合请求
+    if rr.szUrl == szUrl and ( szUrl ~= szTitle or szContent ) then
+        MY.Debug(string.format("\n [url]%s\n [title]%s\n", szUrl, szTitle),'OnTitleChanged',0)
         -- 注销超时处理时钟
         MY.DelayCall("MY_Remote_Request_Timeout")
         -- 成功回调函数
-		rr.fnSuccess(szTitle, this:GetDocument())
+        pcall(rr.fnSuccess, szTitle, szContent)
         -- 从请求列表移除
-		table.remove(_MY.tRequest, 1)
+        table.remove(_MY.tRequest, 1)
         -- 重置请求状态为空闲
         _MY.bRequest = false
         -- 处理下一个远程请求
         _MY.DoRemoteRequest()
-	end
+    end
 end
 -- key down
 MY.OnFrameKeyDown = function()
@@ -834,12 +886,12 @@ end
 ---------------------------------------------------
 ---------------------------------------------------
 -- 事件、快捷键注册
-RegisterEvent("NPC_ENTER_SCENE", function() if GetNpc(arg0) then _MY.tNearNpc[arg0] = GetNpc(arg0) end end)
-RegisterEvent("NPC_LEAVE_SCENE", function() _MY.tNearNpc[arg0] = nil end)
-RegisterEvent("PLAYER_ENTER_SCENE", function() if GetPlayer(arg0) then _MY.tNearPlayer[arg0] = GetPlayer(arg0) end end)
-RegisterEvent("PLAYER_LEAVE_SCENE", function() _MY.tNearPlayer[arg0] = nil end)
-RegisterEvent("DOODAD_ENTER_SCENE", function() if GetDoodad(arg0) then _MY.tNearDoodad[arg0] = GetDoodad(arg0) end end)
-RegisterEvent("DOODAD_LEAVE_SCENE", function() _MY.tNearDoodad[arg0] = nil end)
+RegisterEvent("NPC_ENTER_SCENE",    function() _MY.tNearNpc[arg0]    = true end)
+RegisterEvent("NPC_LEAVE_SCENE",    function() _MY.tNearNpc[arg0]    = nil  end)
+RegisterEvent("PLAYER_ENTER_SCENE", function() _MY.tNearPlayer[arg0] = true end)
+RegisterEvent("PLAYER_LEAVE_SCENE", function() _MY.tNearPlayer[arg0] = nil  end)
+RegisterEvent("DOODAD_ENTER_SCENE", function() _MY.tNearDoodad[arg0] = true end)
+RegisterEvent("DOODAD_LEAVE_SCENE", function() _MY.tNearDoodad[arg0] = nil  end)
 
 AppendCommand("equip", MY.Equip)
 
