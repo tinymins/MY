@@ -228,15 +228,16 @@ MY.RemoteRequest = function(szUrl, fnSuccess, fnError, nTimeout)
 end
 -- 处理远程请求队列
 _MY.DoRemoteRequest = function()
-    MY.Debug('Do Remote Request Queue.\n','DoRR',1)
     -- 如果队列为空 则置队列状态为空闲并返回
-    if table.getn(_MY.tRequest)==0 then _MY.bRequest = false MY.Debug('Remote Request Queue Is Clear.\n','DoRR',0) return end
+    if table.getn(_MY.tRequest)==0 then _MY.bRequest = false MY.Debug('Remote Request Queue Is Clear.\n','MYRR',0) return end
     -- 如果当前队列有未处理的请求 并且远程请求队列处于空闲状态
     if not _MY.bRequest then
         -- 获取队列第一个元素
         local rr = _MY.tRequest[1]
         -- 注册请求超时处理函数的时钟
         MY.DelayCall(function()
+            -- debug
+            MY.Debug('Remote Request Timeout.\n','MYRR',1)
             -- 请求超时 回调请求超时函数
             pcall(rr.fnError, rr.szUrl, "timeout")
             -- 从请求队列移除首元素
@@ -862,7 +863,7 @@ MY.OnDocumentComplete = function()
     local rr = _MY.tRequest[1]
     -- 判断当前页面是否符合请求
     if rr.szUrl == szUrl and ( szUrl ~= szTitle or szContent ) then
-        MY.Debug(string.format("\n [url]%s\n [title]%s\n", szUrl, szTitle),'OnTitleChanged',0)
+        MY.Debug(string.format("\n [RemoteRequest - OnDocumentComplete]\n [U] %s\n [T] %s\n", szUrl, szTitle),'MYRR',0)
         -- 注销超时处理时钟
         MY.DelayCall("MY_Remote_Request_Timeout")
         -- 成功回调函数

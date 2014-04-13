@@ -33,9 +33,9 @@ MY.RegisterEvent("LOADING_END", function() if MY_CheckUpdate.bChecked then retur
             }
             MessageBox(tVersionInfo)
         end
-        MY.Debug("Latest: "..nLatestVersion.."\n",'#Version',1)
+        MY.Debug("Latest version: "..nLatestVersion..", local version: "..nVersion..' ('..szVersion..")\n",'MYVC',0)
     else
-        MY.Debug("Version check failed, sever resopnse unknow data.\n",'#Version',1)
+        MY.Debug(L["version check failed, sever resopnse unknow data.\n"],'MYVC',2)
     end
-end) MY.Debug('Start Version Check!\n','SVC',1) end)
-MY.Debug('Version Check Mod Loaded!\n','LOAD',1)
+end) MY.Debug('Start Version Check!\n','MYVC',0) end)
+MY.Debug('Version Check Mod Loaded!\n','MYVC',0)
