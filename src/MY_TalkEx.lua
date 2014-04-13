@@ -145,7 +145,12 @@ _MY_TalkEx.OnUiLoad = function(wnd)
                 end
             end
         elseif MY_TalkEx.tTrickFilter == 'NEARBY' then
-            tPlayers, iPlayers = MY.GetNearPlayer()
+            for dwID, p in pairs(MY.GetNearPlayer()) do
+                if MY_TalkEx.tTrickFilterForce == -1 or MY_TalkEx.tTrickFilterForce == p.dwForceID then
+                    tPlayers[dwID] = p
+                    iPlayers = iPlayers + 1
+                end
+            end
         end
         -- 去掉自己 _(:з」∠)_调侃自己是闹哪样
         if tPlayers[GetClientPlayer().dwID] then iPlayers=iPlayers-1 tPlayers[GetClientPlayer().dwID]=nil end
@@ -154,10 +159,8 @@ _MY_TalkEx.OnUiLoad = function(wnd)
         -- start tricking
         if #MY_TalkEx.szTrickTextBegin > 0 then MY.Talk(PLAYER_TALK_CHANNEL[MY_TalkEx.tTrickChannel], MY_TalkEx.szTrickTextBegin) end
         for _, player in pairs(tPlayers) do
-            if MY_TalkEx.tTrickFilterForce == -1 or MY_TalkEx.tTrickFilterForce == player.dwForceID then
-                local szText = string.gsub(MY_TalkEx.szTrickText, "%$mb", '['..player.szName..']')
-                MY.Talk(PLAYER_TALK_CHANNEL[MY_TalkEx.tTrickChannel], szText)
-            end
+            local szText = string.gsub(MY_TalkEx.szTrickText, "%$mb", '['..player.szName..']')
+            MY.Talk(PLAYER_TALK_CHANNEL[MY_TalkEx.tTrickChannel], szText)
         end
         if #MY_TalkEx.szTrickTextEnd > 0 then MY.Talk(PLAYER_TALK_CHANNEL[MY_TalkEx.tTrickChannel], MY_TalkEx.szTrickTextEnd) end
     end)
