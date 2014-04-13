@@ -139,7 +139,7 @@ _MY_TalkEx.OnUiLoad = function(wnd)
         if MY_TalkEx.tTrickFilter == 'RAID' then
             for _, dwID in pairs(GetClientTeam().GetTeamMemberList()) do
                 local p = GetPlayer(dwID)
-                if p then
+                if p and (MY_TalkEx.tTrickFilterForce == -1 or MY_TalkEx.tTrickFilterForce == p.dwForceID) then
                     tPlayers[dwID] = p
                     iPlayers = iPlayers + 1
                 end
