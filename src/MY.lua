@@ -232,6 +232,12 @@ _MY.DoRemoteRequest = function()
     if table.getn(_MY.tRequest)==0 then _MY.bRequest = false MY.Debug('Remote Request Queue Is Clear.\n','MYRR',0) return end
     -- 如果当前队列有未处理的请求 并且远程请求队列处于空闲状态
     if not _MY.bRequest then
+        -- check if network plugins inited
+        if not _MY.hRequest then
+            MY.DelayCall( _MY.DoRemoteRequest, 3000 )
+            MY.Debug('network plugin has not been initalized yet!\n','MYRR',1)
+            return
+        end
         -- 获取队列第一个元素
         local rr = _MY.tRequest[1]
         -- 注册请求超时处理函数的时钟
@@ -486,6 +492,22 @@ end
 -- dwType	-- *可选* 目标类型
 -- dwID		-- 目标 ID]]
 MY.SetTarget = function(dwType, dwID)
+    if type(dwType)=="string" then dwType, dwID = 0, dwType end
+    if type(dwID)=="string" then
+        for _, p in pairs(MY.GetNearNpc()) do
+            if p.szName == dwID then
+                dwType, dwID = TARGET.NPC, p.dwID
+            end
+        end
+    end
+    if type(dwID)=="string" then
+        for _, p in pairs(MY.GetNearPlayer()) do
+            if p.szName == dwID then
+                dwType = TARGET.PLAYER
+                dwID = p.dwID
+            end
+        end
+    end
 	if not dwType or dwType <= 0 then
 		dwType, dwID = TARGET.NO_TARGET, 0
 	elseif not dwID then
@@ -586,10 +608,10 @@ MY.Sysmsg = function(szContent, szPrefix, tContentCol, tPrefixCol)
     szPrefix = szPrefix or _MY.szShortName
     if tContentCol then
         tPrefixCol = tPrefixCol or tContentCol
-        OutputMessage("MSG_SYS", FormatString(
-            "<text>text=\"[<D0>] \" font=10 r=<D1> g=<D2> b=<D3></text><text>text=\"<D4>\" font=10 r=<D5> g=<D6> b=<D7></text>",
-            szPrefix, tPrefixCol[1] or 0, tPrefixCol[2] or 0, tPrefixCol[3] or 0,
-            szContent, tContentCol[1] or 0, tContentCol[2] or 0, tContentCol[3] or 0
+        OutputMessage("MSG_SYS", string.format(
+            '<text>text="[%s] " font=10 r=%d g=%d b=%d</text><text>text="%s" font=10 r=%d g=%d b=%d</text>',
+            string.gsub(szPrefix, '"','\\"'), tPrefixCol[1]  or 0, tPrefixCol[2]  or 0, tPrefixCol[3]  or 0,
+            string.gsub(szContent,'"','\\"'), tContentCol[1] or 0, tContentCol[2] or 0, tContentCol[3] or 0
         ), true)
     else
         OutputMessage("MSG_SYS", string.format("[%s] %s", szPrefix, szContent) )
@@ -627,14 +649,13 @@ end
 ]]
 MY.DelayCall = function(fnAction, nDelay, szName)
     if type(fnAction)=="function" then
-        local nTime = nDelay + GetTime()
-        if type(szName) == "string" then
-            _MY.tDelayCall[szName] = { nTime = nTime, fnAction = fnAction }
-        else
-            table.insert(_MY.tDelayCall, { nTime = nTime, fnAction = fnAction })
-        end
+        table.insert(_MY.tDelayCall, { nTime = nDelay + GetTime(), fnAction = fnAction, szName = szName })
     elseif type(fnAction)=="string" then
-        _MY.tDelayCall[fnAction] = nil
+        for i = #_MY.tDelayCall, 1, -1 do
+            if _MY.tDelayCall[i].szName == fnAction then
+                table.remove(_MY.tDelayCall, i)
+            end
+        end
     end
 end
 --[[ 注册呼吸循环调用函数
@@ -684,33 +705,42 @@ end
     MY.RegisterEvent( szEventName, szListenerId )
     MY.RegisterEvent( szEventName )
  ]]
-MY.RegisterEvent = function(szEventName, szListenerId, fnListener)
+MY.RegisterEvent = function(szEventName, arg1, arg2)
+    local szListenerId, fnListener
+    -- param check
     if type(szEventName)~="string" then return end
-    if type(szListenerId)=="function" then fnListener = szListenerId szListenerId = nil end
-    if type(fnListener)=="function" then -- 添加事件监听
+    if type(arg1)=="function" then fnListener=arg1 elseif type(arg1)=="string" then szListenerId=arg1 end
+    if type(arg2)=="function" then fnListener=arg2 elseif type(arg2)=="string" then szListenerId=arg2 end
+    if fnListener then -- register event
         -- 第一次添加注册系统事件
         if type(_MY.tEvent[szEventName])~="table" then
             _MY.tEvent[szEventName] = {}
             RegisterEvent(szEventName, function(...)
-                if type(_MY.tEvent[szEventName])=="table" then
-                    for _, fnEvent in pairs(_MY.tEvent[szEventName]) do
-                        local status, err = pcall(fnEvent, ...)
-                        if not status then MY.Debug(err, 'MY.RegisterEvent', 2) end
+                for i = #_MY.tEvent[szEventName], 1, -1 do
+                    local hEvent = _MY.tEvent[szEventName][i]
+                    if type(hEvent.fn)=="function" then
+                        -- try to run event function
+                        local status, err = pcall(hEvent.fn, ...)
+                        -- error report
+                        if not status then MY.Debug(err, 'OnEvent#'..szEventName, 2) end
+                    else
+                        -- remove none function event
+                        table.remove(_MY.tEvent[szEventName], i)
+                        -- report error
+                        MY.Debug((hEvent.szName or 'id:anonymous')..' is not a function.\n', 'OnEvent#'..szEventName, 2)
                     end
                 end
             end)
         end
         -- 往事件数组中添加
-        if type(szListenerId)=="string" then
-            _MY.tEvent[szEventName][szListenerId] = fnListener
-        else
-            table.insert(_MY.tEvent[szEventName], fnListener)
+        table.insert( _MY.tEvent[szEventName], { fn = fnListener, szName = szListenerId } )
+    elseif szListenerId and _MY.tEvent[szEventName] then -- unregister event handle by id
+        for i = #_MY.tEvent[szEventName], 1, -1 do
+            if _MY.tEvent[szEventName][i].szName == fnListener then
+                table.remove(_MY.tEvent[szEventName], i)
+            end
         end
-    elseif type(szListenerId)=="string" then -- 注销指定ID的事件监听
-        if type(_MY.tEvent[szEventName])=="table" then -- 如果事件已注册 则注销
-            _MY.tEvent[szEventName][szListenerId] = nil 
-        end
-    elseif type(szListenerId)=="nil" then -- 注销所有事件监听
+    elseif szEventName and _MY.tEvent[szEventName] then -- unregister all event handle
         _MY.tEvent[szEventName] = {}
     end
 end
@@ -837,17 +867,18 @@ MY.OnFrameBreathe = function()
 			end
 		end
 	end
-	-- run delay calls
-	local nTime = GetTime()
-	for k, v in pairs(_MY.tDelayCall) do
-		if v.nTime <= nTime then
-			local res, err = pcall(v.fnAction)
-			if not res then
-				MY.Debug("DelayCall#" .. k .." ERROR: " .. err)
-			end
-			_MY.tDelayCall[k] = nil
-		end
-	end
+    -- run delay calls
+    local nTime = GetTime()
+    for i = #_MY.tDelayCall, 1, -1 do
+        local dc = _MY.tDelayCall[i]
+        if dc.nTime <= nTime then
+            local res, err = pcall(dc.fnAction)
+            if not res then
+                MY.Debug("DelayCall#" .. (dc.szName or 'anonymous') .." ERROR: " .. err)
+            end
+            table.remove(_MY.tDelayCall, i)
+        end
+    end
 end
 -- create frame
 MY.OnFrameCreate = function()
