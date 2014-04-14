@@ -6,15 +6,15 @@ local _MY = {
     szIniFileMainPanel = "Interface\\MY\\ui\\MainPanel.ini",
 }
 ---------------------------------------------------------------------
--- æœ¬åœ°çš„ UI ç»„ä»¶å¯¹è±¡
+-- ±¾µØµÄ UI ×é¼ş¶ÔÏó
 ---------------------------------------------------------------------
 -------------------------------------
 -- UI object class
 -------------------------------------
 _MY.UI = class()
 
--- ä¸ä¼šç©å…ƒè¡¨ (â•¯â€µâ–¡â€²)â•¯ï¸µâ”»â”â”»
--- -- è®¾ç½®å…ƒè¡¨ï¼Œè¿™æ ·å¯ä»¥å½“ä½œtableè°ƒç”¨ï¼Œå…¶æ•ˆæœç›¸å½“äº .eles[i].raw
+-- ²»»áÍæÔª±í (¨s¨F¡õ¡ä)¨s¦à©ß©¥©ß
+-- -- ÉèÖÃÔª±í£¬ÕâÑù¿ÉÒÔµ±×÷tableµ÷ÓÃ£¬ÆäĞ§¹ûÏàµ±ÓÚ .eles[i].raw
 -- setmetatable(_MY.UI, {  __call = function(me, ...) return me:ctor(...) end, __index = function(t, k) 
     -- if type(k) == "number" then
         -- return t.eles[k].raw
@@ -28,32 +28,32 @@ _MY.UI = class()
 -----------------------------------------------------------
 -- my ui common functions
 -----------------------------------------------------------
--- è·å–ä¸€ä¸ªçª—ä½“çš„æ‰€æœ‰å­å…ƒç´ 
+-- »ñÈ¡Ò»¸ö´°ÌåµÄËùÓĞ×ÓÔªËØ
 local GetChildren = function(root)
-    local stack = { root }  -- åˆå§‹æ ˆ
-    local children = {}     -- ä¿å­˜æ‰€æœ‰å­å…ƒç´  szTreePath => element é”®å€¼å¯¹
-    while #stack > 0 do     -- å¾ªç¯ç›´åˆ°æ ˆç©º
-        --### å¼¹æ ˆ: å¼¹å‡ºæ ˆé¡¶å…ƒç´ 
+    local stack = { root }  -- ³õÊ¼Õ»
+    local children = {}     -- ±£´æËùÓĞ×ÓÔªËØ szTreePath => element ¼üÖµ¶Ô
+    while #stack > 0 do     -- Ñ­»·Ö±µ½Õ»¿Õ
+        --### µ¯Õ»: µ¯³öÕ»¶¥ÔªËØ
         local raw = stack[#stack]
         table.remove(stack, #stack)
-        -- å°†å½“å‰å¼¹å‡ºçš„å…ƒç´ åŠ å…¥å­å…ƒç´ è¡¨
+        -- ½«µ±Ç°µ¯³öµÄÔªËØ¼ÓÈë×ÓÔªËØ±í
         children[table.concat({ raw:GetTreePath() })] = raw
-        -- å¦‚æœæœ‰Handleåˆ™å°†æ‰€æœ‰Handleå­å…ƒç´ åŠ å…¥å­å…ƒç´ è¡¨
-        local status, handle = pcall(function() return raw:Lookup('','') end) -- rawå¯èƒ½æ²¡æœ‰Lookupæ–¹æ³• ç”¨pcallåŒ…è£¹
+        -- Èç¹ûÓĞHandleÔò½«ËùÓĞHandle×ÓÔªËØ¼ÓÈë×ÓÔªËØ±í
+        local status, handle = pcall(function() return raw:Lookup('','') end) -- raw¿ÉÄÜÃ»ÓĞLookup·½·¨ ÓÃpcall°ü¹ü
         if status and handle then
             children[table.concat({ handle:GetTreePath(), '/Handle' })] = handle
             for i = 0, handle:GetItemCount() - 1, 1 do
                 children[table.concat({ handle:Lookup(i):GetTreePath() })] = handle:Lookup(i)
             end
         end
-        --### å‹æ ˆ: å°†åˆšåˆšå¼¹æ ˆçš„å…ƒç´ çš„æ‰€æœ‰å­çª—ä½“å‹æ ˆ
-        local status, sub_raw = pcall(function() return raw:GetFirstChild() end) -- rawå¯èƒ½æ²¡æœ‰GetFirstChildæ–¹æ³• ç”¨pcallåŒ…è£¹
+        --### Ñ¹Õ»: ½«¸Õ¸Õµ¯Õ»µÄÔªËØµÄËùÓĞ×Ó´°ÌåÑ¹Õ»
+        local status, sub_raw = pcall(function() return raw:GetFirstChild() end) -- raw¿ÉÄÜÃ»ÓĞGetFirstChild·½·¨ ÓÃpcall°ü¹ü
         while status and sub_raw do
             table.insert(stack, sub_raw)
             sub_raw = sub_raw:GetNext()
         end
     end
-    -- å› ä¸ºæ˜¯æ±‚å­å…ƒç´  æ‰€ä»¥ç§»é™¤ç¬¬ä¸€ä¸ªå‹æ ˆçš„å…ƒç´ ï¼ˆçˆ¶å…ƒç´ ï¼‰
+    -- ÒòÎªÊÇÇó×ÓÔªËØ ËùÒÔÒÆ³ıµÚÒ»¸öÑ¹Õ»µÄÔªËØ£¨¸¸ÔªËØ£©
     children[table.concat({ root:GetTreePath() })] = nil
     return children
 end
@@ -84,8 +84,13 @@ function _MY.UI:ctor(raw, tab)
         if not tab.chk and szType == "WndCheckBox" then tab.chk = raw end
         if not tab.edt and szType == "WndEdit" then tab.edt = raw end
         if not tab.sdw and szType == "Shadow" then tab.sdw = raw end
-        if string.sub(szType, 1, 3) == "Wnd" then tab.wnd = raw else tab.itm = raw end
-        if raw then table.insert( self.eles, { raw = raw, txt = tab.txt, img = tab.img, chk = tab.chk, edt = tab.edt, wnd = tab.wnd, itm = tab.itm, sdw = tab.sdw } ) end
+        if not tab.hdl and szType == "Handle" then tab.hdl = raw end
+        if string.sub(szType, 1, 3) == "Wnd" then
+            tab.wnd = tab.wnd or raw
+            tab.hdl = tab.hdl or raw:Lookup('','')
+            tab.txt = tab.txt or raw:Lookup('','Text_Default')
+        else tab.itm = raw end
+        if raw then table.insert( self.eles, { raw = raw, wnd = tab.wnd, itm = tab.itm, hdl = tab.hdl, txt = tab.txt, img = tab.img, chk = tab.chk, edt = tab.edt, sdw = tab.sdw } ) end
     end
     return self
 end
@@ -106,9 +111,14 @@ function _MY.UI:raw2ele(raw, tab)
     if not tab.img and szType == "Image" then tab.img = raw end
     if not tab.chk and szType == "WndCheckBox" then tab.chk = raw end
     if not tab.edt and szType == "WndEdit" then tab.edt = raw end
-        if not tab.sdw and szType == "Shadow" then tab.sdw = raw end
-    if string.sub(szType, 1, 3) == "Wnd" then tab.wnd = raw else tab.itm = raw end
-    return { raw = raw, txt = tab.txt, img = tab.img, chk = tab.chk, edt = tab.edt, wnd = tab.wnd, itm = tab.itm, sdw = tab.sdw }
+    if not tab.sdw and szType == "Shadow" then tab.sdw = raw end
+    if not tab.hdl and szType == "Handle" then tab.hdl = raw end
+    if string.sub(szType, 1, 3) == "Wnd" then
+        tab.wnd = tab.wnd or raw
+        tab.hdl = tab.hdl or raw:Lookup('','')
+        tab.txt = tab.txt or raw:Lookup('','Text_Default')
+    else tab.itm = raw end
+    return { raw = raw, wnd = tab.wnd, itm = tab.itm, hdl = tab.hdl, txt = tab.txt, img = tab.img, chk = tab.chk, edt = tab.edt, sdw = tab.sdw }
 end
 
 -- add a ele to object
@@ -210,13 +220,13 @@ end
 function _MY.UI:child()
     local child = {}
     for _, ele in pairs(self.eles) do
-        -- å­handle
-        local status, handle = pcall(function() return ele.raw.Lookup('','') end) -- rawå¯èƒ½æ²¡æœ‰Lookupæ–¹æ³• ç”¨pcallåŒ…è£¹
+        -- ×Óhandle
+        local status, handle = pcall(function() return ele.raw.Lookup('','') end) -- raw¿ÉÄÜÃ»ÓĞLookup·½·¨ ÓÃpcall°ü¹ü
         if status and handle then
             child[handle:GetTreePath()] = handle
         end
-        -- å­çª—ä½“
-        local status, sub_raw = pcall(function() return ele.raw:GetFirstChild() end) -- rawå¯èƒ½æ²¡æœ‰GetFirstChildæ–¹æ³• ç”¨pcallåŒ…è£¹
+        -- ×Ó´°Ìå
+        local status, sub_raw = pcall(function() return ele.raw:GetFirstChild() end) -- raw¿ÉÄÜÃ»ÓĞGetFirstChild·½·¨ ÓÃpcall°ü¹ü
         while status and sub_raw do
             child[sub_raw:GetTreePath()] = sub_raw
             sub_raw = sub_raw:GetNext()
@@ -329,6 +339,32 @@ function _MY.UI:remove()
     return self
 end
 
+-- append
+-- similar as jQuery.append()
+-- Instance:append(szName, szType, tArg)
+function _MY.UI:append(szName, szType, tArg)
+    for _, ele in pairs(self.eles) do
+        if ( string.sub(szType, 1, 3) == "Wnd" and ele.wnd ) then
+            -- append from ini file
+            local szFile = "interface\\MY\\ui\\" .. szType .. ".ini"
+            local frame = Wnd.OpenWindow(szFile, "MY_TempWnd")
+            if not frame then
+                return MY.Sysmsg(_L("Unable to open ini file [%s]", szFile))
+            end
+            wnd = frame:Lookup(szType)
+            if not wnd then
+                MY.Sysmsg(_L("Can not find wnd component [%s]", szType))
+            else
+                wnd:SetName(szName)
+                wnd:ChangeRelation(ele.wnd, true, true)
+            end
+            Wnd.CloseWindow(frame)
+        elseif ( string.sub(szType, 1, 3) ~= "Wnd" and ele.hdl ) then
+            
+        end
+    end
+end
+
 -----------------------------------------------------------
 -- my ui property visitors
 -----------------------------------------------------------
@@ -354,7 +390,7 @@ function _MY.UI:text(szText)
         -- try to get its name
         local status, err = pcall(function() return ele.raw:GetText() end)
         -- if succeed then return its name
-        if status then return err else MY.Debug(err,'ERROR _MY.UI:text' ,3) return nil end
+        if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:text' ,3) return nil end
     end
 end
 
@@ -371,7 +407,7 @@ function _MY.UI:name(szText)
         -- try to get its name
         local status, err = pcall(function() return ele.raw:GetName() end)
         -- if succeed then return its name
-        if status then return err else MY.Debug(err,'ERROR _MY.UI:name' ,3) return nil end
+        if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:name' ,3) return nil end
     end
 end
 
@@ -388,7 +424,7 @@ function _MY.UI:alpha(nAlpha)
         -- try to get its name
         local status, err = pcall(function() return ele.raw:GetAlpha() end)
         -- if succeed then return its name
-        if status then return err else MY.Debug(err,'ERROR _MY.UI:alpha' ,3) return nil end
+        if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:alpha' ,3) return nil end
     end
 end
 
@@ -407,7 +443,7 @@ function _MY.UI:font(nFont)
         -- try to get its name
         local status, err = pcall(function() return ele.raw:GetFontScheme() end)
         -- if succeed then return its name
-        if status then return err else MY.Debug(err,'ERROR _MY.UI:font' ,3) return nil end
+        if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:font' ,3) return nil end
     end
 end
 
@@ -431,17 +467,32 @@ function _MY.UI:color(nRed, nGreen, nBlue)
         -- try to get its name
         local status, r,g,b = pcall(function() if ele.sdw then return ele.sdw:GetColorRGB() else return (ele.edt or ele.txt):GetFontColor() end end)
         -- if succeed then return its name
-        if status then return r,g,b else MY.Debug(err,'ERROR _MY.UI:font' ,3) return nil end
+        if status then return r,g,b else MY.Debug(err..'\n','ERROR _MY.UI:font' ,3) return nil end
+    end
+end
+
+-- (number) Instance:left()
+-- (self) Instance:left(number)
+function _MY.UI:left(nLeft)
+    if nLeft then
+    
+    else -- get
+        -- select the first item
+        local ele = self.eles[1]
+        -- try to get its name
+        local status, r,g,b = pcall(function() if ele.sdw then return ele.sdw:SetRelPos() else return (ele.edt or ele.txt):GetFontColor() end end)
+        -- if succeed then return its name
+        if status then return r,g,b else MY.Debug(err..'\n','ERROR _MY.UI:font' ,3) return nil end
     end
 end
 -----------------------------------------------------------
 -- my ui events handle
 -----------------------------------------------------------
 
---[[ click é¼ æ ‡å•å‡»äº‹ä»¶
+--[[ click Êó±êµ¥»÷ÊÂ¼ş
     same as jQuery.click()
-    :click(fnAction) ç»‘å®š
-    :click()         è§¦å‘
+    :click(fnAction) °ó¶¨
+    :click()         ´¥·¢
 ]]
 function _MY.UI:click(fn)
     for _, ele in pairs(self.eles) do
@@ -456,9 +507,9 @@ function _MY.UI:click(fn)
     return self
 end
 
---[[ hover é¼ æ ‡æ‚¬åœäº‹ä»¶
+--[[ hover Êó±êĞüÍ£ÊÂ¼ş
     same as jQuery.hover()
-    :hover(fnHover[, fnLeave]) ç»‘å®š
+    :hover(fnHover[, fnLeave]) °ó¶¨
 ]]
 function _MY.UI:hover(fnHover, fnLeave)
     fnLeave = fnLeave or fnHover
@@ -473,10 +524,10 @@ function _MY.UI:hover(fnHover, fnLeave)
     return self
 end
 
---[[ check å¤é€‰æ¡†çŠ¶æ€å˜åŒ–
-    :check(fnOnCheckBoxCheck[, fnOnCheckBoxUncheck]) ç»‘å®š
-    :check()                è¿”å›æ˜¯å¦å·²å‹¾é€‰
-    :check(bool bChecked)   å‹¾é€‰/å–æ¶ˆå‹¾é€‰
+--[[ check ¸´Ñ¡¿ò×´Ì¬±ä»¯
+    :check(fnOnCheckBoxCheck[, fnOnCheckBoxUncheck]) °ó¶¨
+    :check()                ·µ»ØÊÇ·ñÒÑ¹´Ñ¡
+    :check(bool bChecked)   ¹´Ñ¡/È¡Ïû¹´Ñ¡
 ]]
 function _MY.UI:check(fnCheck, fnUncheck)
     fnUncheck = fnUncheck or fnCheck
@@ -491,19 +542,21 @@ function _MY.UI:check(fnCheck, fnUncheck)
             if ele.chk then ele.chk:Check(fnCheck) end
         end
         return self
-    else
+    elseif not fnCheck then
         -- select the first item
         local ele = self.eles[1]
         -- try to get its name
         local status, err = pcall(function() return ele.chk:IsCheckBoxChecked() end)
         -- if succeed then return its name
-        if status then return err else MY.Debug(err,'ERROR _MY.UI:check' ,3) return nil end
+        if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:check' ,1) return nil end
+    else
+        MY.Debug('fnCheck:'..type(fnCheck)..' fnUncheck:'..type(fnUncheck)..'\n', 'ERROR _MY.UI:check' ,1)
     end
 end
 
---[[ change è¾“å…¥æ¡†æ–‡å­—å˜åŒ–
-    :change(fnOnEditChanged) ç»‘å®š
-    :change()   è°ƒç”¨å¤„ç†å‡½æ•°
+--[[ change ÊäÈë¿òÎÄ×Ö±ä»¯
+    :change(fnOnEditChanged) °ó¶¨
+    :change()   µ÷ÓÃ´¦Àíº¯Êı
 ]]
 function _MY.UI:change(fnOnEditChanged)
     if fnOnEditChanged then
@@ -519,7 +572,7 @@ function _MY.UI:change(fnOnEditChanged)
     end
 end
 
--- OnGetFocus è·å–ç„¦ç‚¹
+-- OnGetFocus »ñÈ¡½¹µã
 
 -----------------------------------------------------------
 -- MY.UI
@@ -527,13 +580,13 @@ end
 
 MY.UI = MY.UI or {}
 
--- è®¾ç½®å…ƒè¡¨ï¼Œè¿™æ ·å¯ä»¥å½“ä½œå‡½æ•°è°ƒç”¨ï¼Œå…¶æ•ˆæœç›¸å½“äº MY.UI.Fetch
+-- ÉèÖÃÔª±í£¬ÕâÑù¿ÉÒÔµ±×÷º¯Êıµ÷ÓÃ£¬ÆäĞ§¹ûÏàµ±ÓÚ MY.UI.Fetch
 setmetatable(MY.UI, { __call = function(me, ...) return me.Fetch(...) end, __metatable = true })
 
---[[ æ„é€ å‡½æ•° ç±»ä¼¼jQuery: $(selector) ]]
+--[[ ¹¹Ôìº¯Êı ÀàËÆjQuery: $(selector) ]]
 MY.UI.Fetch = function(selector, tab) return _MY.UI.new(selector, tab) end
 
--- æ‰“å¼€æµè§ˆå™¨
+-- ´ò¿ªä¯ÀÀÆ÷
 MY.UI.OpenInternetExplorer = function(szAddr, bDisableSound)
     local nIndex, nLast = nil, nil
     for i = 1, 10, 1 do
@@ -573,7 +626,7 @@ MY.UI.OpenInternetExplorer = function(szAddr, bDisableSound)
     end
     return webPage
 end
--- åˆ¤æ–­æµè§ˆå™¨æ˜¯å¦å·²å¼€å¯
+-- ÅĞ¶Ïä¯ÀÀÆ÷ÊÇ·ñÒÑ¿ªÆô
 _MY.UI.IsInternetExplorerOpened = function(nIndex)
     local frame = Station.Lookup("Topmost/IE"..nIndex)
     if frame and frame:IsVisible() then
@@ -581,7 +634,7 @@ _MY.UI.IsInternetExplorerOpened = function(nIndex)
     end
     return false
 end
--- è·å–æµè§ˆå™¨ç»å¯¹ä½ç½®
+-- »ñÈ¡ä¯ÀÀÆ÷¾ø¶ÔÎ»ÖÃ
 _MY.UI.IE_GetNewIEFramePos = function()
     local nLastTime = 0
     local nLastIndex = nil
@@ -605,14 +658,24 @@ _MY.UI.IE_GetNewIEFramePos = function()
     return 40, 40
 end
 
---[[ æ·»åŠ å¤é€‰æ¡†
+--[[ append an item to parent
+    MY.UI.Append(hParent, szName, szType, tArg)
+    hParent     -- an Window, Handle or MY.UI object
+    szName      -- name of the object inserted
+    tArg        -- param like width, height, left, right, etc.
+]]
+MY.UI.Append = function(hParent, szName, szType, tArg)
+    return MY.UI(hParent):append(szName, szType, tArg)
+end
+
+--[[ Ìí¼Ó¸´Ñ¡¿ò
     MY.UI.AddCheckBox(szPanelName,szName,x,y,szText,col,bChecked)
-    szPanelName è¦æ·»åŠ å¤é€‰æ¡†çš„æ ‡ç­¾é¡µID
-    szName      å¤é€‰æ¡†åç§°
-    x,y         å¤é€‰æ¡†åæ ‡
-    szText      å¤é€‰æ¡†æ ‡é¢˜
-    col         æ ‡é¢˜é¢œè‰²rgb
-    bChecked    å¤é€‰æ¡†æ˜¯å¦å‹¾é€‰
+    szPanelName ÒªÌí¼Ó¸´Ñ¡¿òµÄ±êÇ©Ò³ID
+    szName      ¸´Ñ¡¿òÃû³Æ
+    x,y         ¸´Ñ¡¿ò×ø±ê
+    szText      ¸´Ñ¡¿ò±êÌâ
+    col         ±êÌâÑÕÉ«rgb
+    bChecked    ¸´Ñ¡¿òÊÇ·ñ¹´Ñ¡
  ]]
 MY.UI.AddCheckBox = function(szPanelName,szName,x,y,szText,col,bChecked)
 	local fx = Wnd.OpenWindow(_MY.szIniFileCheckBox, "aCheckBox")
@@ -632,13 +695,13 @@ MY.UI.AddCheckBox = function(szPanelName,szName,x,y,szText,col,bChecked)
 	Wnd.CloseWindow(fx)
     return MY.UI(item)
 end
---[[ æ·»åŠ æŒ‰é’®
+--[[ Ìí¼Ó°´Å¥
     MY.UI.AddButton(szPanelName,szName,x,y,szText,col)
-    szPanelName è¦æ·»åŠ æŒ‰é’®çš„æ ‡ç­¾é¡µID
-    szName      æŒ‰é’®åç§°
-    x,y         æŒ‰é’®åæ ‡
-    szText      æŒ‰é’®æ ‡é¢˜
-    col         æ ‡é¢˜é¢œè‰²rgb
+    szPanelName ÒªÌí¼Ó°´Å¥µÄ±êÇ©Ò³ID
+    szName      °´Å¥Ãû³Æ
+    x,y         °´Å¥×ø±ê
+    szText      °´Å¥±êÌâ
+    col         ±êÌâÑÕÉ«rgb
  ]]
 MY.UI.AddButton = function(szPanelName,szName,x,y,szText,col)
 	local fx = Wnd.OpenWindow(_MY.szIniFileButton, "aWndButton")
@@ -657,14 +720,14 @@ MY.UI.AddButton = function(szPanelName,szName,x,y,szText,col)
 	Wnd.CloseWindow(fx)
     return MY.UI(item)
 end
---[[ æ·»åŠ æ–‡æœ¬è¾“å…¥æ¡†
+--[[ Ìí¼ÓÎÄ±¾ÊäÈë¿ò
     MY.UI.AddButton(szPanelName,szName,x,y,w,h,bMultiLine)
-    szPanelName è¦æ·»åŠ æ–‡æœ¬è¾“å…¥æ¡†çš„æ ‡ç­¾é¡µID
-    szName      æ–‡æœ¬è¾“å…¥æ¡†åç§°
-    x,y         æ–‡æœ¬è¾“å…¥æ¡†åæ ‡
-    w,h         æ–‡æœ¬è¾“å…¥æ¡†å¤§å°
-    szText      æ–‡æœ¬æ¡†æ–‡æœ¬
-    bMultiLine  æ–‡æœ¬æ¡†æ˜¯å¦å…è®¸å¤šè¡Œ
+    szPanelName ÒªÌí¼ÓÎÄ±¾ÊäÈë¿òµÄ±êÇ©Ò³ID
+    szName      ÎÄ±¾ÊäÈë¿òÃû³Æ
+    x,y         ÎÄ±¾ÊäÈë¿ò×ø±ê
+    w,h         ÎÄ±¾ÊäÈë¿ò´óĞ¡
+    szText      ÎÄ±¾¿òÎÄ±¾
+    bMultiLine  ÎÄ±¾¿òÊÇ·ñÔÊĞí¶àĞĞ
  ]]
 MY.UI.AddEdit = function(szPanelName,szName,x,y,w,h,szText,bMultiLine)
 	local fx = Wnd.OpenWindow(_MY.szIniFileEditBox, "aEditBox")
@@ -686,9 +749,9 @@ MY.UI.AddEdit = function(szPanelName,szName,x,y,w,h,szText,bMultiLine)
     Wnd.CloseWindow(fx)
     return MY.UI(item, { edt = item:Lookup(szName) })
 end
---[[ å¯»æ‰¾æŒ‡å®španelä¸‹çš„æŒ‡å®šidçš„æ§ä»¶ ]]
+--[[ Ñ°ÕÒÖ¸¶¨panelÏÂµÄÖ¸¶¨idµÄ¿Ø¼ş ]]
 MY.UI.Lookup = function(szPanelName, szLookupName)
     return MY.UI(MY.GetFrame():Lookup("Window_Main/MainPanel_"..szPanelName)):find('#'..szLookupName)
 end
 
-MY.Debug("ui plugins inited!\n",nil,1)
+MY.Debug("ui plugins inited!\n",nil,0)
