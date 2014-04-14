@@ -43,7 +43,7 @@ _MY_TalkEx.tChannels = {
     ['CAMP'] = { szName = _L['camp channel'], tCol = GetMsgFontColor("MSG_CAMP", true) },
     ['WORLD'] = { szName = _L['world channel'], tCol = GetMsgFontColor("MSG_WORLD", true) },
 }
-_MY_TalkEx.OnUiLoad = function(wnd)
+_MY_TalkEx.OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
     -------------------------------------
     -- º°»°²¿·Ö
@@ -165,4 +165,4 @@ _MY_TalkEx.OnUiLoad = function(wnd)
         if #MY_TalkEx.szTrickTextEnd > 0 then MY.Talk(PLAYER_TALK_CHANNEL[MY_TalkEx.tTrickChannel], MY_TalkEx.szTrickTextEnd) end
     end)
 end
-MY.RegisterPanel("TalkEx", _L["talk ex"], "interface\\MY\\ui\\MY_TalkEx.ini", "UI/Image/UICommon/ScienceTreeNode.UITex|123", {255,255,0,200}, {OnPanelActive = _MY_TalkEx.OnUiLoad} )
+MY.RegisterPanel("TalkEx", _L["talk ex"], "interface\\MY\\ui\\MY_TalkEx.ini", "UI/Image/UICommon/ScienceTreeNode.UITex|123", {255,255,0,200}, {OnPanelActive = _MY_TalkEx.OnPanelActive} )
