@@ -227,7 +227,7 @@ end
 function _MY.UI:parent()
     local parent = {}
     for _, ele in pairs(self.eles) do
-        parent[ele.raw:GetParent():GetTreePath()] = ele.raw:GetParent()
+        parent[table.concat{ele.raw:GetParent():GetTreePath()}] = ele.raw:GetParent()
     end
     local eles = {}
     for _, raw in pairs(parent) do
@@ -242,16 +242,22 @@ end
 function _MY.UI:child(filter)
     local child = {}
     for _, ele in pairs(self.eles) do
-        -- 子handle
-        local status, handle = pcall(function() return ele.raw.Lookup('','') end) -- raw可能没有Lookup方法 用pcall包裹
-        if status and handle then
-            child[handle:GetTreePath()] = handle
-        end
-        -- 子窗体
-        local status, sub_raw = pcall(function() return ele.raw:GetFirstChild() end) -- raw可能没有GetFirstChild方法 用pcall包裹
-        while status and sub_raw do
-            child[sub_raw:GetTreePath()] = sub_raw
-            sub_raw = sub_raw:GetNext()
+        if ele.raw:GetType() == "Handle" then
+            for i = 0, ele.raw:GetItemCount() - 1, 1 do
+                child[table.concat({ ele.raw:Lookup(i):GetTreePath() })] = ele.raw:Lookup(i)
+            end
+        else
+            -- 子handle
+            local status, handle = pcall(function() return ele.raw:Lookup('','') end) -- raw可能没有Lookup方法 用pcall包裹
+            if status and handle then
+                child[table.concat{handle:GetTreePath(),'/Handle'}] = handle
+            end
+            -- 子窗体
+            local status, sub_raw = pcall(function() return ele.raw:GetFirstChild() end) -- raw可能没有GetFirstChild方法 用pcall包裹
+            while status and sub_raw do
+                child[table.concat{sub_raw:GetTreePath()}] = sub_raw
+                sub_raw = sub_raw:GetNext()
+            end
         end
     end
     local eles = {}
@@ -364,6 +370,14 @@ function _MY.UI:remove()
     return self
 end
 
+-- xml string
+_MY.tItemXML = {
+	["Text"] = "<text>w=150 h=30 valign=1 font=162 eventid=257 </text>",
+	["Image"] = "<image>w=100 h=100 eventid=257 </image>",
+	["Box"] = "<box>w=48 h=48 eventid=525311 </text>",
+	["Shadow"] = "<shadow>w=15 h=15 eventid=277 </shadow>",
+	["Handle"] = "<handle>w=10 h=10</handle>",
+}
 -- append
 -- similar as jQuery.append()
 -- Instance:append(szName, szType, tArg)
@@ -386,7 +400,20 @@ function _MY.UI:append(szName, szType, tArg)
             end
             Wnd.CloseWindow(frame)
         elseif ( string.sub(szType, 1, 3) ~= "Wnd" and ele.hdl ) then
-            
+            local szXml = _MY.tItemXML[szType]
+            if szXml then
+                -- append from xml
+                local nCount = ele.hdl:GetItemCount()
+                ele.hdl:AppendItemFromString(szXml)
+                hnd = ele.hdl:Lookup(nCount)
+                if hnd then hnd:SetName(szName) end
+            else
+                -- append from ini
+                hnd = ele.hdl:AppendItemFromIni("interface\\MY\\ui\\HandleItems.ini","Handle_" .. szType, szName)
+            end
+            if not hnd then
+                return MY.Debug(_L("Unable to append handle item [%s]", szType)..'\n','MY#UI*append',2)
+            end
         end
     end
     return self
@@ -530,7 +557,8 @@ function _MY.UI:pos(nLeft, nTop)
             if ele.wnd then
                 pcall(function() (ele.wnd or ele.raw):SetRelPos(nLeft, nTop) end)
             elseif ele.itm then
-                pcall(function() (ele.itm or ele.raw):SetRelPos(nLeft, nTop) (ele.itm or ele.raw):GetParent():FormatAllItemPos() end)
+                pcall(function() (ele.itm or ele.raw):SetRelPos(nLeft, nTop) end)
+                pcall(function() (ele.itm or ele.raw):GetParent():FormatAllItemPos() end)
             end
         end
         return self
@@ -580,7 +608,8 @@ function _MY.UI:size(nWidth, nHeight)
                 pcall(function() ele.edt:SetSize(nWidth-8, nHeight-4) end)
                 pcall(function() ele.hdl:FormatAllItemPos() end)
             elseif ele.itm then
-                pcall(function() (ele.itm or ele.raw):SetSize(nWidth, nHeight) (ele.itm or ele.raw):GetParent():FormatAllItemPos() end)
+                pcall(function() (ele.itm or ele.raw):SetSize(nWidth, nHeight) end)
+                pcall(function() (ele.itm or ele.raw):GetParent():FormatAllItemPos() end)
             end
         end
         return self
