@@ -59,7 +59,7 @@ _MY.Init = function()
 	_MY.hBox = MY.GetFrame():Lookup("","Box_1")
 	_MY.hRequest = MY.GetFrame():Lookup("Page_1")
     -- 窗口按钮
-    MY.UI(MY.GetFrame()):find("#Button_WindowClose"):click(function() MY.UI(MY.GetFrame()):toggle(false) end)
+    MY.UI(MY.GetFrame()):find("#Button_WindowClose"):click(function() _MY.ClosePanel() end)
     -- 创建菜单
     local tMenu = function() return {
         szOption = _L["mingyi plugins"],
@@ -794,14 +794,15 @@ MY.RedrawTabPanel = function()
         frame = frame:GetNext()
         frame_d:Destroy()
     end
-    for szName, tTab in pairs(_MY.tTabs) do 
+    for i = 1, #_MY.tTabs, 1 do
+        local tTab = _MY.tTabs[i]
         -- insert tab
         local fx = Wnd.OpenWindow(_MY.szIniFileTabBox, "aTabBox")
         if fx then    
             local item = fx:Lookup("TabBox")
             if item then
                 item:ChangeRelation(MY.GetFrame():Lookup("Window_Tabs"), true, true)
-                item:SetName("TabBox_" .. szName)
+                item:SetName("TabBox_" .. tTab.szName)
                 item:SetRelPos(0,nTop)
                 item:Lookup("","Text_TabBox_Title"):SetText(tTab.szTitle)
                 item:Lookup("","Text_TabBox_Title"):SetFontColor(unpack(tTab.rgbTitleColor))
@@ -825,6 +826,7 @@ MY.RedrawTabPanel = function()
             end
             item.OnLButtonDown = function()
                 if this:Lookup("","Image_TabBox_Background_Sel"):IsVisible() then return end
+                PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
                 local p = this:GetParent():GetFirstChild()
                 while p do
                     p:Lookup("","Image_TabBox_Background_Sel"):Hide()
@@ -872,7 +874,11 @@ end
  ]]
 MY.RegisterPanel = function( szName, szTitle, szIniFile, szIconTex, rgbaTitleColor, fn )
     if szTitle == nil then
-        _MY.tTabs[szName] = nil
+        for i = #_MY.tTabs, 1, -1 do
+            if _MY.tTabs[i].szName == szName then
+                table.remove(_MY.tTabs, i)
+            end
+        end
     else
         -- format szIconTex
         if type(szIconTex)~="string" then szIconTex = 'UI/Image/Common/Logo.UITex|6' end
@@ -888,7 +894,7 @@ MY.RegisterPanel = function( szName, szTitle, szIniFile, szIconTex, rgbaTitleCol
         if type(rgbaTitleColor[2])~="number" then rgbaTitleColor[2] = 255 end
         if type(rgbaTitleColor[3])~="number" then rgbaTitleColor[3] = 255 end
         if type(rgbaTitleColor[4])~="number" then rgbaTitleColor[4] = 200 end
-        _MY.tTabs[szName] = { szTitle = szTitle, fn = fn, szIniFile = szIniFile, szIconTex = szIconTex, dwIconFrame = dwIconFrame, rgbTitleColor = {rgbaTitleColor[1],rgbaTitleColor[2],rgbaTitleColor[3]}, alpha = rgbaTitleColor[4] }
+        table.insert( _MY.tTabs, { szName = szName, szTitle = szTitle, fn = fn, szIniFile = szIniFile, szIconTex = szIconTex, dwIconFrame = dwIconFrame, rgbTitleColor = {rgbaTitleColor[1],rgbaTitleColor[2],rgbaTitleColor[3]}, alpha = rgbaTitleColor[4] } )
     end
     MY.RedrawTabPanel()
 end
