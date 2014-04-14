@@ -491,26 +491,35 @@ end
 -- (self) Instance:left(number)
 function _MY.UI:left(nLeft)
     if nLeft then
-    
-    else -- get
-        -- select the first item
-        local ele = self.eles[1]
-        -- try to get its name
-        local status, r,g,b = pcall(function() if ele.sdw then return ele.sdw:SetRelPos() else return (ele.edt or ele.txt):GetFontColor() end end)
-        -- if succeed then return its name
-        if status then return r,g,b else MY.Debug(err..'\n','ERROR _MY.UI:left' ,3) return nil end
+        return self:pos(nLeft, nil)
+    else
+        local l, t = self:pos()
+        return l
+    end
+end
+
+-- (number) Instance:top()
+-- (self) Instance:top(number)
+function _MY.UI:top(nTop)
+    if nTop then
+        return self:pos(nil, nTop)
+    else
+        local l, t = self:pos()
+        return t
     end
 end
 
 -- (number, number) Instance:pos()
--- (self) Instance:pos(nLeft, nRight)
-function _MY.UI:pos(nLeft, nRight)
-    if nRight then
+-- (self) Instance:pos(nLeft, nTop)
+function _MY.UI:pos(nLeft, nTop)
+    if nLeft or nTop then
         for _, ele in pairs(self.eles) do
+            local _nLeft, _nTop = ele.raw:GetRelPos()
+            nLeft, nTop = nLeft or _nLeft, nTop or _nTop
             if ele.wnd then
-                pcall(function() (ele.wnd or ele.raw):SetRelPos(nLeft, nRight) end)
+                pcall(function() (ele.wnd or ele.raw):SetRelPos(nLeft, nTop) end)
             elseif ele.itm then
-                pcall(function() (ele.itm or ele.raw):SetRelPos(nLeft, nRight) (ele.itm or ele.raw):GetParent():FormatAllItemPos() end)
+                pcall(function() (ele.itm or ele.raw):SetRelPos(nLeft, nTop) (ele.itm or ele.raw):GetParent():FormatAllItemPos() end)
             end
         end
         return self
@@ -518,9 +527,55 @@ function _MY.UI:pos(nLeft, nRight)
         -- select the first item
         local ele = self.eles[1]
         -- try to get its name
-        local status, l, t = pcall(function() (ele.itm or ele.raw):GetRelPos() end)
+        local status, l, t = pcall(function() return ele.raw:GetRelPos() end)
         -- if succeed then return its name
-        if status then return l, t else MY.Debug(err..'\n','ERROR _MY.UI:pos' ,3) return nil end
+        if status then return l, t else MY.Debug(err..'\n','ERROR _MY.UI:left|top|pos' ,1) return nil end
+    end
+end
+
+-- (number) Instance:width()
+-- (self) Instance:width(number)
+function _MY.UI:width(nWidth)
+    if nWidth then
+        return self:size(nWidth, nil)
+    else
+        local w, h = self:size()
+        return w
+    end
+end
+
+-- (number) Instance:height()
+-- (self) Instance:height(number)
+function _MY.UI:height(nHeight)
+    if nHeight then
+        return self:size(nil, nHeight)
+    else
+        local w, h = self:size()
+        return h
+    end
+end
+
+-- (number, number) Instance:size()
+-- (self) Instance:size(nLeft, nTop)
+function _MY.UI:size(nWidth, nHeight)
+    if nWidth or nHeight then
+        for _, ele in pairs(self.eles) do
+            local _nWidth, _nHeight = ele.raw:GetSize()
+            nWidth, nHeight = nWidth or _nWidth, nHeight or _nHeight
+            if ele.wnd then
+                pcall(function() (ele.wnd or ele.raw):SetSize(nWidth, nHeight) end)
+            elseif ele.itm then
+                pcall(function() (ele.itm or ele.raw):SetSize(nWidth, nHeight) (ele.itm or ele.raw):GetParent():FormatAllItemPos() end)
+            end
+        end
+        return self
+    else -- get
+        -- select the first item
+        local ele = self.eles[1]
+        -- try to get its name
+        local status, w, h = pcall(function() return ele.raw:GetSize() end)
+        -- if succeed then return its name
+        if status then return w, h else MY.Debug(err..'\n','ERROR _MY.UI:height|width|size' ,1) return nil end
     end
 end
 
