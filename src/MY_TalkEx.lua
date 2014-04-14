@@ -49,18 +49,18 @@ _MY_TalkEx.OnUiLoad = function(wnd)
     -- 喊话部分
     -------------------------------------
     -- 喊话输入框
-    MY.UI.AddEdit('TalkEx','WndEdit_TalkEx_Talk',25,25,510,210,MY_TalkEx.szTalk,true):change(function() MY_TalkEx.szTalk = this:GetText() end)
+    ui:append('WndEdit_Talk','WndEditBox'):child('#WndEdit_Talk'):pos(25,25):size(510,210):text(MY_TalkEx.szTalk):change(function() MY_TalkEx.szTalk = this:GetText() end)
     -- 喊话频道
     local i = 22
     for szChannel, tChannel in pairs(_MY_TalkEx.tChannels) do
-        MY.UI.AddCheckBox('TalkEx','WndCheckBox_TalkEx_'..szChannel,540,i,tChannel.szName,tChannel.tCol,MY_TalkEx.tTalkChannel[szChannel]):check(
+        ui:append('WndCheckBox_TalkEx_'..szChannel,'WndCheckBox'):child('#WndCheckBox_TalkEx_'..szChannel):pos(540,i):text(tChannel.szName):color(tChannel.tCol):check(
             function() MY_TalkEx.tTalkChannel[szChannel] = true end,
             function() MY_TalkEx.tTalkChannel[szChannel] = false end
-        )
+        ):check(MY_TalkEx.tTalkChannel[szChannel] or false)
         i = i + 18
     end
     -- 喊话按钮
-    MY.UI.AddButton('TalkEx','WndButton_TalkEx_Talk',540,210,_L['send'],{255,255,255}):click(function() 
+    ui:append('WndButton_Talk','WndButton'):child('#WndButton_Talk'):pos(540,210):text(_L['send'],{255,255,255}):click(function() 
         if #MY_TalkEx.szTalk == 0 then MY.Sysmsg(_L["please input something."].."\n",nil,{255,0,0}) return end
         for szChannel, bSend in pairs(MY_TalkEx.tTalkChannel) do
             if bSend then MY.Talk(PLAYER_TALK_CHANNEL[szChannel],MY_TalkEx.szTalk) end
@@ -106,11 +106,11 @@ _MY_TalkEx.OnUiLoad = function(wnd)
         end)())
     end)
     -- 调侃内容输入框：第一句
-    MY.UI.AddEdit('TalkEx','WndEdit_TalkEx_TrickBegin',25,285,510,25,MY_TalkEx.szTrickTextBegin,true):change(function() MY_TalkEx.szTrickTextBegin = this:GetText() end)
+    ui:append('WndEdit_TrickBegin','WndEditBox'):child('#WndEdit_TrickBegin'):pos(25,285):size(510,25):text(MY_TalkEx.szTrickTextBegin):change(function() MY_TalkEx.szTrickTextBegin = this:GetText() end)
     -- 调侃内容输入框：调侃内容
-    MY.UI.AddEdit('TalkEx','WndEdit_TalkEx_Trick',25,310,510,75,MY_TalkEx.szTrickText,true):change(function() MY_TalkEx.szTrickText = this:GetText() end)
+    ui:append('WndEdit_Trick','WndEditBox'):child('#WndEdit_Trick'):pos(25,310):size(510,75):text(MY_TalkEx.szTrickText):change(function() MY_TalkEx.szTrickText = this:GetText() end)
     -- 调侃内容输入框：最后一句
-    MY.UI.AddEdit('TalkEx','WndEdit_TalkEx_TrickEnd',25,385,510,25,MY_TalkEx.szTrickTextEnd,true):change(function() MY_TalkEx.szTrickTextEnd = this:GetText() end)
+    ui:append('WndEdit_TrickEnd','WndEditBox'):child('#WndEdit_TrickEnd'):pos(25,385):size(510,25):text(MY_TalkEx.szTrickTextEnd):change(function() MY_TalkEx.szTrickTextEnd = this:GetText() end)
     -- 调侃发送频道提示框
     ui:find("#Text_TalkEx_Trick_Sendto"):text(_L['send to'])
     -- 调侃发送频道
@@ -133,7 +133,7 @@ _MY_TalkEx.OnUiLoad = function(wnd)
         end)())
     end)
     -- 调侃按钮
-    MY.UI.AddButton('TalkEx','WndButton_TalkEx_Trick',435,415,_L['have a trick with'],{255,255,255}):click(function()
+    ui:append('WndButton_Trick','WndButton'):child('#WndButton_Trick'):color({255,255,255}):pos(435,415):text(_L['have a trick with']):click(function()
         if #MY_TalkEx.szTrickText == 0 then MY.Sysmsg(_L["please input something."].."\n",nil,{255,0,0}) return end
         local tPlayers, iPlayers = {}, 0
         if MY_TalkEx.tTrickFilter == 'RAID' then
