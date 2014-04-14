@@ -81,14 +81,19 @@ function _MY.UI:ctor(raw, tab)
         if type(raw)=="string" then raw = Station.Lookup(raw) end
         -- format tab
         if type(tab)~="table" then tab = {} end
-        local szType = raw:GetType()
+        local szType = raw.szMyuiType or raw:GetType()
         if not tab.txt and szType == "Text" then tab.txt = raw end
         if not tab.img and szType == "Image" then tab.img = raw end
         if not tab.chk and szType == "WndCheckBox" then tab.chk = raw end
         if not tab.edt and szType == "WndEdit" then tab.edt = raw end
         if not tab.sdw and szType == "Shadow" then tab.sdw = raw end
         if not tab.hdl and szType == "Handle" then tab.hdl = raw end
-        if string.sub(szType, 1, 3) == "Wnd" then
+        if szType=="WndEditBox" then
+            tab.wnd = tab.wnd or raw
+            tab.hdl = tab.hdl or raw:Lookup('','')
+            tab.edt = tab.edt or raw:Lookup('WndEdit_Default')
+            tab.img = tab.img or raw:Lookup('','Image_Default')
+        elseif string.sub(szType, 1, 3) == "Wnd" then
             tab.wnd = tab.wnd or raw
             tab.hdl = tab.hdl or raw:Lookup('','')
             tab.txt = tab.txt or raw:Lookup('','Text_Default')
@@ -109,14 +114,19 @@ end
 function _MY.UI:raw2ele(raw, tab)
     -- format tab
     if type(tab)~="table" then tab = {} end
-    local szType = raw:GetType()
+    local szType = raw.szMyuiType or raw:GetType()
     if not tab.txt and szType == "Text" then tab.txt = raw end
     if not tab.img and szType == "Image" then tab.img = raw end
     if not tab.chk and szType == "WndCheckBox" then tab.chk = raw end
     if not tab.edt and szType == "WndEdit" then tab.edt = raw end
     if not tab.sdw and szType == "Shadow" then tab.sdw = raw end
     if not tab.hdl and szType == "Handle" then tab.hdl = raw end
-    if string.sub(szType, 1, 3) == "Wnd" then
+    if szType=="WndEditBox" then
+        tab.wnd = tab.wnd or raw
+        tab.hdl = tab.hdl or raw:Lookup('','')
+        tab.edt = tab.edt or raw:Lookup('WndEdit_Default')
+        tab.img = tab.img or raw:Lookup('','Image_Default')
+    elseif string.sub(szType, 1, 3) == "Wnd" then
         tab.wnd = tab.wnd or raw
         tab.hdl = tab.hdl or raw:Lookup('','')
         tab.txt = tab.txt or raw:Lookup('','Text_Default')
@@ -157,7 +167,7 @@ function _MY.UI:del(raw)
         elseif string.sub(raw, 1, 1) == "." then
             raw = string.sub(raw, 2)
             for i = #eles, 1, -1 do
-                if eles[i].raw:GetType() == raw then
+                if (eles[i].raw.szMyuiType or eles[i].raw:GetType()) == raw then
                     table.remove(eles, i)
                 end
             end
@@ -193,7 +203,7 @@ function _MY.UI:filter(raw)
         elseif string.sub(raw, 1, 1) == "." then
             raw = string.sub(raw, 2)
             for i = #eles, 1, -1 do
-                if eles[i].raw:GetType() ~= raw then
+                if (eles[i].raw.szMyuiType or eles[i].raw:GetType()) ~= raw then
                     table.remove(eles, i)
                 end
             end
@@ -364,12 +374,13 @@ function _MY.UI:append(szName, szType, tArg)
             local szFile = "interface\\MY\\ui\\" .. szType .. ".ini"
             local frame = Wnd.OpenWindow(szFile, "MY_TempWnd")
             if not frame then
-                return MY.Sysmsg(_L("Unable to open ini file [%s]", szFile))
+                return MY.Debug(_L("Unable to open ini file [%s]", szFile)..'\n', 'MY#UI#append', 2)
             end
             wnd = frame:Lookup(szType)
             if not wnd then
-                MY.Sysmsg(_L("Can not find wnd component [%s]", szType))
+                MY.Debug(_L("Can not find wnd component [%s]", szType)..'\n', 'MY#UI#append', 2)
             else
+                wnd.szMyuiType = szType
                 wnd:SetName(szName)
                 wnd:ChangeRelation(ele.wnd, true, true)
             end
@@ -388,7 +399,7 @@ end
 -- show/hide eles
 function _MY.UI:toggle(bShow)
     for _, ele in pairs(self.eles) do
-        pcall(function() if bShow == false or (not bShow and ele.raw:IsVisible()) then ele.raw:Hide() else ele.raw:Show() end end)
+        pcall(function() if bShow == false or (not bShow and ele.raw:IsVisible()) then ele.raw:Hide() ele.hdl:Hide() else ele.raw:Show() ele.hdl:Show() end end)
     end
     return self
 end
@@ -397,14 +408,14 @@ end
 function _MY.UI:text(szText)
     if szText then
         for _, ele in pairs(self.eles) do
-            pcall(function() (ele.txt or ele.raw):SetText(szText) end)
+            pcall(function() (ele.txt or ele.edt or ele.raw):SetText(szText) end)
         end
         return self
     else
         -- select the first item
         local ele = self.eles[1]
         -- try to get its name
-        local status, err = pcall(function() return (ele.txt or ele.raw):GetText() end)
+        local status, err = pcall(function() return (ele.txt or ele.edt or ele.raw):GetText() end)
         -- if succeed then return its name
         if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:text' ,3) return nil end
     end
@@ -563,7 +574,11 @@ function _MY.UI:size(nWidth, nHeight)
             local _nWidth, _nHeight = ele.raw:GetSize()
             nWidth, nHeight = nWidth or _nWidth, nHeight or _nHeight
             if ele.wnd then
-                pcall(function() (ele.wnd or ele.raw):SetSize(nWidth, nHeight) end)
+                pcall(function() ele.wnd:SetSize(nWidth, nHeight) end)
+                pcall(function() ele.txt:SetSize(nWidth, nHeight) end)
+                pcall(function() ele.img:SetSize(nWidth, nHeight) end)
+                pcall(function() ele.edt:SetSize(nWidth-8, nHeight-4) end)
+                pcall(function() ele.hdl:FormatAllItemPos() end)
             elseif ele.itm then
                 pcall(function() (ele.itm or ele.raw):SetSize(nWidth, nHeight) (ele.itm or ele.raw):GetParent():FormatAllItemPos() end)
             end
@@ -760,92 +775,6 @@ end
 ]]
 MY.UI.Append = function(hParent, szName, szType, tArg)
     return MY.UI(hParent):append(szName, szType, tArg)
-end
-
---[[ 添加复选框
-    MY.UI.AddCheckBox(szPanelName,szName,x,y,szText,col,bChecked)
-    szPanelName 要添加复选框的标签页ID
-    szName      复选框名称
-    x,y         复选框坐标
-    szText      复选框标题
-    col         标题颜色rgb
-    bChecked    复选框是否勾选
- ]]
-MY.UI.AddCheckBox = function(szPanelName,szName,x,y,szText,col,bChecked)
-	local fx = Wnd.OpenWindow(_MY.szIniFileCheckBox, "aCheckBox")
-    local item
-	if fx then    
-		item = fx:Lookup("WndCheckBox")
-		if item then
-			item:ChangeRelation(MY.GetFrame():Lookup("Window_Main/MainPanel_"..szPanelName), true, true)
-			item:SetName(szName)
-			item:Check(bChecked)
-			item:SetRelPos(x,y)
-			item:Lookup("","CheckBox_Text"):SetText(szText)
-			item:Lookup("","CheckBox_Text"):SetFontScheme(18)
-			item:Lookup("","CheckBox_Text"):SetFontColor(unpack(col))
-		end
-	end
-	Wnd.CloseWindow(fx)
-    return MY.UI(item)
-end
---[[ 添加按钮
-    MY.UI.AddButton(szPanelName,szName,x,y,szText,col)
-    szPanelName 要添加按钮的标签页ID
-    szName      按钮名称
-    x,y         按钮坐标
-    szText      按钮标题
-    col         标题颜色rgb
- ]]
-MY.UI.AddButton = function(szPanelName,szName,x,y,szText,col)
-	local fx = Wnd.OpenWindow(_MY.szIniFileButton, "aWndButton")
-    local item
-	if fx then    
-		item = fx:Lookup("WndButton")
-		if item then
-			item:ChangeRelation(MY.GetFrame():Lookup("Window_Main/MainPanel_"..szPanelName), true, true)
-			item:SetName(szName)
-			item:SetRelPos(x,y)
-			item:Lookup("","Text_Default"):SetText(szText)
-			item:Lookup("","Text_Default"):SetFontScheme(18)
-			item:Lookup("","Text_Default"):SetFontColor(unpack(col))
-		end
-	end
-	Wnd.CloseWindow(fx)
-    return MY.UI(item)
-end
---[[ 添加文本输入框
-    MY.UI.AddButton(szPanelName,szName,x,y,w,h,bMultiLine)
-    szPanelName 要添加文本输入框的标签页ID
-    szName      文本输入框名称
-    x,y         文本输入框坐标
-    w,h         文本输入框大小
-    szText      文本框文本
-    bMultiLine  文本框是否允许多行
- ]]
-MY.UI.AddEdit = function(szPanelName,szName,x,y,w,h,szText,bMultiLine)
-	local fx = Wnd.OpenWindow(_MY.szIniFileEditBox, "aEditBox")
-    local item
-	if fx then	
-		item = fx:Lookup("WndEdit")
-		if item then
-			item:ChangeRelation(MY.GetFrame():Lookup("Window_Main/MainPanel_"..szPanelName), true, true)
-			item:SetName("WndEdit"..szName)
-            item:SetSize(w,h)
-			item:Lookup("Edit_Text"):SetSize(w-8,h-4)
-			item:Lookup("Edit_Text"):SetMultiLine(bMultiLine)
-			item:Lookup("Edit_Text"):SetText(szText or '')
-			item:Lookup("Edit_Text"):SetName(szName)
-			item:Lookup("","Edit_Image"):SetSize(w,h)
-			item:SetRelPos(x,y)
-		end
-	end 
-    Wnd.CloseWindow(fx)
-    return MY.UI(item, { edt = item:Lookup(szName) })
-end
---[[ 寻找指定panel下的指定id的控件 ]]
-MY.UI.Lookup = function(szPanelName, szLookupName)
-    return MY.UI(MY.GetFrame():Lookup("Window_Main/MainPanel_"..szPanelName)):find('#'..szLookupName)
 end
 
 MY.Debug("ui plugins inited!\n",nil,0)
