@@ -33,7 +33,6 @@ local _MY = {
     frame = nil,
     hBox = nil,
     hRequest = nil,
-    bAddonMenuAdded = false,
     nDebugLevel = 0,
     dwVersion = 0x0000100,
     szBuildDate = "20140209",
@@ -51,6 +50,9 @@ local _MY = {
     bRequest = false,   -- 网络请求繁忙中
     tTabs = {},         -- 标签页
     tEvent = {},        -- 游戏事件绑定
+    tPlayerMenu = {},   -- 玩家头像菜单
+    tTargetMenu = {},   -- 目标头像菜单
+    tTraceMenu  = {},   -- 工具栏菜单
 }
 _MY.Init = function()
 	-- var
@@ -59,21 +61,18 @@ _MY.Init = function()
     -- 窗口按钮
     MY.UI(MY.GetFrame()):find("#Button_WindowClose"):click(function() MY.UI(MY.GetFrame()):toggle(false) end)
     -- 创建菜单
-    if not _MY.bAddonMenuAdded then
-        local tMenu = { function() return {{
-            szOption = _L["mingyi plugins"],
-            fnAction = function()
-                Station.Lookup("Normal/MY"):ToggleVisible()
-            end,
-            bCheck = true,
-            bChecked = Station.Lookup("Normal/MY"):IsVisible(),
-        }} end }
-        TraceButton_AppendAddonMenu( tMenu )
-        Player_AppendAddonMenu( tMenu )
-        _MY.bAddonMenuAdded = true
-    end
+    local tMenu = function() return {
+        szOption = _L["mingyi plugins"],
+        fnAction = function()
+            Station.Lookup("Normal/MY"):ToggleVisible()
+        end,
+        bCheck = true,
+        bChecked = Station.Lookup("Normal/MY"):IsVisible(),
+    } end
+    MY.RegisterPlayerAddonMenu( 'MY_MAIN_MENU', tMenu)
+    MY.RegisterTraceButtonMenu( 'MY_MAIN_MENU', tMenu)
     -- 显示欢迎信息
-    MY.Sysmsg(string.format(_L["%s, welcome to use mingyi plugins!"], GetClientPlayer().szName) .. " v" .. MY.GetVersion() .. ' Build ' .. _MY.szBuildDate .. "\n")
+    MY.Sysmsg(_L("%s, welcome to use mingyi plugins!", GetClientPlayer().szName) .. " v" .. MY.GetVersion() .. ' Build ' .. _MY.szBuildDate .. "\n")
     if _MY.nDebugLevel >=3 then _MY.frame:Hide() end
 end
 -- get channel header
@@ -182,6 +181,42 @@ _MY.ClosePanel = function(bRealClose)
 		end
 		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 	end
+end
+-- get player addon menu
+_MY.GetPlayerAddonMenu = function()
+    local menu = {}
+    table.insert(menu, { bDevide = true })
+    for i = 1, #_MY.tPlayerMenu, 1 do
+        local m = _MY.tPlayerMenu[i].Menu
+        if type(m)=="function" then m = m() end
+        table.insert(menu, m)
+    end
+    if #menu==1 then menu={} end
+    return menu
+end
+-- get target addon menu
+_MY.GetTargetAddonMenu = function()
+    local menu = {}
+    table.insert(menu, { bDevide = true })
+    for i = 1, #_MY.tTargetMenu, 1 do
+        local m = _MY.tTargetMenu[i].Menu
+        if type(m)=="function" then m = m() end
+        table.insert(menu, m)
+    end
+    if #menu==1 then menu={} end
+    return menu
+end
+-- get trace button menu
+_MY.GetTraceButtonMenu = function()
+    local menu = {}
+    table.insert(menu, { bDevide = true })
+    for i = 1, #_MY.tTraceMenu, 1 do
+        local m = _MY.tTraceMenu[i].Menu
+        if type(m)=="function" then m = m() end
+        table.insert(menu, m)
+    end
+    if #menu==1 then menu={} end
+    return menu
 end
 -----------------------------------------------
 -- 通用函数
@@ -789,6 +824,7 @@ MY.RedrawTabPanel = function()
                 this:Lookup("","Image_TabBox_Background_Hover"):Hide()
             end
             item.OnLButtonDown = function()
+                if this:Lookup("","Image_TabBox_Background_Sel"):IsVisible() then return end
                 local p = this:GetParent():GetFirstChild()
                 while p do
                     p:Lookup("","Image_TabBox_Background_Sel"):Hide()
@@ -809,7 +845,6 @@ MY.RedrawTabPanel = function()
                     mainpanel = fx:Lookup("MainPanel")
                     if mainpanel then
                         mainpanel:ChangeRelation(MY.GetFrame():Lookup("Window_Main"), true, true)
-                        mainpanel:SetName("MainPanel_" .. szName)
                         mainpanel:SetRelPos(0,0)
                         mainpanel.fn = tTab.fn
                     end
@@ -857,7 +892,99 @@ MY.RegisterPanel = function( szName, szTitle, szIniFile, szIconTex, rgbaTitleCol
     end
     MY.RedrawTabPanel()
 end
-
+--[[ 注册玩家头像菜单
+    -- 注册
+    (void) MY.RegisterPlayerAddonMenu(szName,Menu)
+    (void) MY.RegisterPlayerAddonMenu(Menu)
+    -- 注销
+    (void) MY.RegisterPlayerAddonMenu(szName)
+]]
+MY.RegisterPlayerAddonMenu = function(arg1, arg2)
+    local szName, Menu
+    if type(arg1)=='string' then szName = arg1 end
+    if type(arg2)=='string' then szName = arg2 end
+    if type(arg1)=='table' then Menu = arg1 end
+    if type(arg1)=='function' then Menu = arg1 end
+    if type(arg2)=='table' then Menu = arg2 end
+    if type(arg2)=='function' then Menu = arg2 end
+    if Menu then
+        if szName then for i = #_MY.tPlayerMenu, 1, -1 do
+            if _MY.tPlayerMenu[i].szName == szName then
+                _MY.tPlayerMenu[i] = {szName = szName, Menu = Menu}
+                return nil
+            end
+        end end
+        table.insert(_MY.tPlayerMenu, {szName = szName, Menu = Menu})
+    elseif szName then
+        for i = #_MY.tPlayerMenu, 1, -1 do
+            if _MY.tPlayerMenu[i].szName == szName then
+                table.remove(_MY.tPlayerMenu, i)
+            end
+        end
+    end
+end
+--[[ 注册目标头像菜单
+    -- 注册
+    (void) MY.RegisterTargetAddonMenu(szName,Menu)
+    (void) MY.RegisterTargetAddonMenu(Menu)
+    -- 注销
+    (void) MY.RegisterTargetAddonMenu(szName)
+]]
+MY.RegisterTargetAddonMenu = function(arg1, arg2)
+    local szName, Menu
+    if type(arg1)=='string' then szName = arg1 end
+    if type(arg2)=='string' then szName = arg2 end
+    if type(arg1)=='table' then Menu = arg1 end
+    if type(arg1)=='function' then Menu = arg1 end
+    if type(arg2)=='table' then Menu = arg2 end
+    if type(arg2)=='function' then Menu = arg2 end
+    if Menu then
+        if szName then for i = #_MY.tTargetMenu, 1, -1 do
+            if _MY.tTargetMenu[i].szName == szName then
+                _MY.tTargetMenu[i] = {szName = szName, Menu = Menu}
+                return nil
+            end
+        end end
+        table.insert(_MY.tTargetMenu, {szName = szName, Menu = Menu})
+    elseif szName then
+        for i = #_MY.tTargetMenu, 1, -1 do
+            if _MY.tTargetMenu[i].szName == szName then
+                table.remove(_MY.tTargetMenu, i)
+            end
+        end
+    end
+end
+--[[ 注册工具栏菜单
+    -- 注册
+    (void) MY.RegisterTraceButtonMenu(szName,Menu)
+    (void) MY.RegisterTraceButtonMenu(Menu)
+    -- 注销
+    (void) MY.RegisterTraceButtonMenu(szName)
+]]
+MY.RegisterTraceButtonMenu = function(arg1, arg2)
+    local szName, Menu
+    if type(arg1)=='string' then szName = arg1 end
+    if type(arg2)=='string' then szName = arg2 end
+    if type(arg1)=='table' then Menu = arg1 end
+    if type(arg1)=='function' then Menu = arg1 end
+    if type(arg2)=='table' then Menu = arg2 end
+    if type(arg2)=='function' then Menu = arg2 end
+    if Menu then
+        if szName then for i = #_MY.tTraceMenu, 1, -1 do
+            if _MY.tTraceMenu[i].szName == szName then
+                _MY.tTraceMenu[i] = {szName = szName, Menu = Menu}
+                return nil
+            end
+        end end
+        table.insert(_MY.tTraceMenu, {szName = szName, Menu = Menu})
+    elseif szName then
+        for i = #_MY.tTraceMenu, 1, -1 do
+            if _MY.tTraceMenu[i].szName == szName then
+                table.remove(_MY.tTraceMenu, i)
+            end
+        end
+    end
+end
 -----------------------------------------------
 -- 窗口函数
 -----------------------------------------------
@@ -924,7 +1051,7 @@ MY.OnFrameKeyDown = function()
 end
 ---------------------------------------------------
 ---------------------------------------------------
--- 事件、快捷键注册
+-- 事件、快捷键、菜单注册
 RegisterEvent("NPC_ENTER_SCENE",    function() _MY.tNearNpc[arg0]    = true end)
 RegisterEvent("NPC_LEAVE_SCENE",    function() _MY.tNearNpc[arg0]    = nil  end)
 RegisterEvent("PLAYER_ENTER_SCENE", function() _MY.tNearPlayer[arg0] = true end)
@@ -933,6 +1060,10 @@ RegisterEvent("DOODAD_ENTER_SCENE", function() _MY.tNearDoodad[arg0] = true end)
 RegisterEvent("DOODAD_LEAVE_SCENE", function() _MY.tNearDoodad[arg0] = nil  end)
 
 AppendCommand("equip", MY.Equip)
+
+TraceButton_AppendAddonMenu( { _MY.GetTraceButtonMenu } )
+Player_AppendAddonMenu( { _MY.GetPlayerAddonMenu } )
+Target_AppendAddonMenu( { _MY.GetTargetAddonMenu } )
 
 if _MY.nDebugLevel <3 then RegisterEvent("CALL_LUA_ERROR", function() OutputMessage("MSG_SYS", arg0) end) end
 
