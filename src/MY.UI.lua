@@ -70,10 +70,13 @@ end
 -- ui object creator 
 -- same as jQuery.$()
 function _MY.UI:ctor(raw, tab)
+    self.eles = self.eles or {}
     if type(raw)=="table" and type(raw.eles)=="table" then
+        for i = 1, #raw.eles, 1 do
+            table.insert(self.eles, raw.eles[i])
+        end
         self.eles = raw.eles
     else
-        self.eles = self.eles or {}
         -- farmat raw
         if type(raw)=="string" then raw = Station.Lookup(raw) end
         -- format tab
@@ -124,7 +127,10 @@ end
 -- add a ele to object
 -- same as jQuery.add()
 function _MY.UI:add(raw, tab)
-    local eles = self.eles
+    local eles = {}
+    for i = 1, #self.eles, 1 do
+        table.insert(eles, self.eles[i])
+    end
     -- farmat raw
     if type(raw)=="string" then raw = Station.Lookup(raw) end
     -- insert into eles
@@ -135,7 +141,10 @@ end
 -- delete elements from object
 -- same as jQuery.not()
 function _MY.UI:del(raw)
-    local eles = self.eles
+    local eles = {}
+    for i = 1, #self.eles, 1 do
+        table.insert(eles, self.eles[i])
+    end
     if type(raw) == "string" then
         -- delete ele those id/class fits filter:raw
         if string.sub(raw, 1, 1) == "#" then
@@ -169,7 +178,7 @@ end
 -- same as jQuery.filter()
 function _MY.UI:filter(raw)
     local eles = {}
-    for i = #self.eles, 1, -1 do
+    for i = 1, #self.eles, 1 do
         table.insert(eles, self.eles[i])
     end
     if type(raw) == "string" then
@@ -220,7 +229,7 @@ end
 
 -- get child
 -- same as jQuery.child()
-function _MY.UI:child()
+function _MY.UI:child(filter)
     local child = {}
     for _, ele in pairs(self.eles) do
         -- ×Óhandle
@@ -240,7 +249,7 @@ function _MY.UI:child()
         -- insert into eles
         table.insert( eles, self:raw2ele(raw) )
     end
-    return self:clone(eles)
+    return self:clone(eles):filter(filter)
 end
 
 -- get all children
@@ -300,7 +309,10 @@ end
 -- slice -- index starts from 1
 -- same as jQuery.slice(selector, pos)
 function _MY.UI:slice(startpos, endpos)
-    local eles = self.eles
+    local eles = {}
+    for i = 1, #self.eles, 1 do
+        table.insert(eles, self.eles[i])
+    end
     endpos = endpos or #eles
     if endpos < 0 then endpos = #eles + endpos + 1 end
     for i = #eles, endpos + 1, -1 do
@@ -366,6 +378,7 @@ function _MY.UI:append(szName, szType, tArg)
             
         end
     end
+    return self
 end
 
 -----------------------------------------------------------
@@ -384,14 +397,14 @@ end
 function _MY.UI:text(szText)
     if szText then
         for _, ele in pairs(self.eles) do
-            pcall(function() ele.raw:SetText(szText) end)
+            pcall(function() (ele.txt or ele.raw):SetText(szText) end)
         end
         return self
     else
         -- select the first item
         local ele = self.eles[1]
         -- try to get its name
-        local status, err = pcall(function() return ele.raw:GetText() end)
+        local status, err = pcall(function() return (ele.txt or ele.raw):GetText() end)
         -- if succeed then return its name
         if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:text' ,3) return nil end
     end
@@ -470,7 +483,7 @@ function _MY.UI:color(nRed, nGreen, nBlue)
         -- try to get its name
         local status, r,g,b = pcall(function() if ele.sdw then return ele.sdw:GetColorRGB() else return (ele.edt or ele.txt):GetFontColor() end end)
         -- if succeed then return its name
-        if status then return r,g,b else MY.Debug(err..'\n','ERROR _MY.UI:font' ,3) return nil end
+        if status then return r,g,b else MY.Debug(err..'\n','ERROR _MY.UI:color' ,3) return nil end
     end
 end
 
@@ -485,9 +498,32 @@ function _MY.UI:left(nLeft)
         -- try to get its name
         local status, r,g,b = pcall(function() if ele.sdw then return ele.sdw:SetRelPos() else return (ele.edt or ele.txt):GetFontColor() end end)
         -- if succeed then return its name
-        if status then return r,g,b else MY.Debug(err..'\n','ERROR _MY.UI:font' ,3) return nil end
+        if status then return r,g,b else MY.Debug(err..'\n','ERROR _MY.UI:left' ,3) return nil end
     end
 end
+
+-- (number, number) Instance:pos()
+-- (self) Instance:pos(nLeft, nRight)
+function _MY.UI:pos(nLeft, nRight)
+    if nRight then
+        for _, ele in pairs(self.eles) do
+            if ele.wnd then
+                pcall(function() (ele.wnd or ele.raw):SetRelPos(nLeft, nRight) end)
+            elseif ele.itm then
+                pcall(function() (ele.itm or ele.raw):SetRelPos(nLeft, nRight) (ele.itm or ele.raw):GetParent():FormatAllItemPos() end)
+            end
+        end
+        return self
+    else -- get
+        -- select the first item
+        local ele = self.eles[1]
+        -- try to get its name
+        local status, l, t = pcall(function() (ele.itm or ele.raw):GetRelPos() end)
+        -- if succeed then return its name
+        if status then return l, t else MY.Debug(err..'\n','ERROR _MY.UI:pos' ,3) return nil end
+    end
+end
+
 -----------------------------------------------------------
 -- my ui events handle
 -----------------------------------------------------------
