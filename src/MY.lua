@@ -771,7 +771,11 @@ MY.RedrawTabPanel = function()
                 item:Lookup("","Text_TabBox_Title"):SetText(tTab.szTitle)
                 item:Lookup("","Text_TabBox_Title"):SetFontColor(unpack(tTab.rgbTitleColor))
                 item:Lookup("","Text_TabBox_Title"):SetAlpha(tTab.alpha)
-                item:Lookup("","Image_TabBox_Icon"):FromUITex(tTab.szIconTex, tTab.dwIconFrame)
+                if tTab.dwIconFrame then
+                    item:Lookup("","Image_TabBox_Icon"):FromUITex(tTab.szIconTex, tTab.dwIconFrame)
+                else
+                    item:Lookup("","Image_TabBox_Icon"):FromTextureFile(tTab.szIconTex)
+                end
                 local w,h = item:GetSize()
                 nTop = nTop + h
             end
@@ -793,60 +797,63 @@ MY.RedrawTabPanel = function()
                 this:Lookup("","Image_TabBox_Background_Sel"):Show()
                 local frame = MY.GetFrame():Lookup("Window_Main"):GetFirstChild()
                 while frame do
-                    frame:Hide()
+                    local status, err = pcall(frame.fn.OnPanelDeactive, frame)
+                    if not status then MY.Debug(err..'\n','MY#OnPanelDeactive',1) end
+                    frame:Destroy()
                     frame = frame:GetNext()
                 end
-                MY.GetFrame():Lookup("Window_Main/MainPanel_" .. szName):Show()
+                -- insert main panel
+                local fx = Wnd.OpenWindow(tTab.szIniFile, "aMainPanel")
+                local mainpanel
+                if fx then    
+                    mainpanel = fx:Lookup("MainPanel")
+                    if mainpanel then
+                        mainpanel:ChangeRelation(MY.GetFrame():Lookup("Window_Main"), true, true)
+                        mainpanel:SetName("MainPanel_" .. szName)
+                        mainpanel:SetRelPos(0,0)
+                        mainpanel.fn = tTab.fn
+                    end
+                end
+                Wnd.CloseWindow(fx)
+                local status, err = pcall(tTab.fn.OnPanelActive, mainpanel)
+                if not status then MY.Debug(err..'\n','MY#OnPanelActive',1) end
             end
         end
         Wnd.CloseWindow(fx)
-        -- insert main panel
-        fx = Wnd.OpenWindow(tTab.szIniFile, "aMainPanel")
-        local mainpanel
-        if fx then    
-            mainpanel = fx:Lookup("MainPanel")
-            if mainpanel then
-                mainpanel:ChangeRelation(MY.GetFrame():Lookup("Window_Main"), true, true)
-                mainpanel:SetName("MainPanel_" .. szName)
-                mainpanel:SetRelPos(0,0)
-                mainpanel:Hide()
-            end
-        end
-        Wnd.CloseWindow(fx)
-
-        -- call init functions
-        if type(tTab.fnOnUiLoad)=="function" then pcall(tTab.fnOnUiLoad, mainpanel) end
-        if type(tTab.fnOnDataLoad)=="function" then pcall(tTab.fnOnDataLoad, mainpanel) end
-        -- register function which will be called once user data loaded
-        if type(tTab.fnOnDataLoad)=="function" then MY.RegisterEvent("CUSTOM_DATA_LOADED", "_MY_MAIN_PANEL_DATA_LOAD_"..szName, function() pcall(tTab.fnOnDataLoad, mainpanel) end) end
     end
 end
 --[[ 注册选项卡
-    (void) MY.RegisterPanel( szName, szTitle, szIniFile, fnOnload, szIconTex, dwIconFrame, rgbaTitleColor )
+    (void) MY.RegisterPanel( szName, szTitle, szIniFile, szIconTex, rgbaTitleColor, fn )
     szName          选项卡唯一ID
     szTitle         选项卡按钮标题
     szIniFile       选项卡主页面UI文件
-    fnOnload        选项卡UI加载完成后执行的函数
-    szIconTex       选项卡图标文件
-    dwIconFrame     选项卡图标帧
+    szIconTex       选项卡图标文件|图标帧
     rgbaTitleColor  选项卡文字rgba
-    Ex： MY.RegisterPanel( "TalkEx", "喊话辅助", "interface\\MY\\ui\\MainPanel.ini", "UI/Image/UICommon/ScienceTreeNode.UITex", 123, {255,255,0,200} )
+    fn              选项卡各种响应函数 {
+        fn.OnPanelActive(wnd)      选项卡激活    wnd为当前MainPanel
+        fn.OnPanelDeactive(wnd)    选项卡取消激活
+    }
+    Ex： MY.RegisterPanel( "Test", "测试标签", "interface\\MY\\ui\\MainPanel.ini", "UI/Image/UICommon/ScienceTreeNode.UITex|123", {255,255,0,200}, { OnPanelActive = function(wnd) end } )
  ]]
-MY.RegisterPanel = function( szName, szTitle, szIniFile, szIconTex, dwIconFrame, rgbaTitleColor, fnOnUiLoad, fnOnDataLoad )
+MY.RegisterPanel = function( szName, szTitle, szIniFile, szIconTex, rgbaTitleColor, fn )
     if szTitle == nil then
         _MY.tTabs[szName] = nil
     else
+        -- format szIconTex
+        if type(szIconTex)~="string" then szIconTex = 'UI/Image/Common/Logo.UITex|6' end
+        local dwIconFrame = string.gsub(szIconTex, '.*%|(%d+)', '%1')
+        if dwIconFrame then dwIconFrame = tonumber(dwIconFrame) end
+        szIconTex = string.gsub(szIconTex, '%|.*', '')
+        
+        -- format other params
         if type(szIniFile)~="string" then szIniFile = _MY.szIniFileMainPanel end
-        if type(szIconTex)~="string" then szIniFile = 'UI/Image/Common/Logo.UITex' end
-        if type(dwIconFrame)~="number" then dwIconFrame = 6 end
-        if type(fnOnUiLoad)~="function" then fnOnUiLoad = nil end
-        if type(fnOnDataLoad)~="function" then fnOnDataLoad = nil end
+        if type(fn)~="table" then fn = {} end
         if type(rgbaTitleColor)~="table" then rgbaTitleColor = { 255, 255, 255, 200 } end
         if type(rgbaTitleColor[1])~="number" then rgbaTitleColor[1] = 255 end
         if type(rgbaTitleColor[2])~="number" then rgbaTitleColor[2] = 255 end
         if type(rgbaTitleColor[3])~="number" then rgbaTitleColor[3] = 255 end
         if type(rgbaTitleColor[4])~="number" then rgbaTitleColor[4] = 200 end
-        _MY.tTabs[szName] = { szTitle = szTitle, fnOnUiLoad = fnOnUiLoad, fnOnDataLoad = fnOnDataLoad, szIniFile = szIniFile, szIconTex = szIconTex, dwIconFrame = dwIconFrame, rgbTitleColor = {rgbaTitleColor[1],rgbaTitleColor[2],rgbaTitleColor[3]}, alpha = rgbaTitleColor[4] }
+        _MY.tTabs[szName] = { szTitle = szTitle, fn = fn, szIniFile = szIniFile, szIconTex = szIconTex, dwIconFrame = dwIconFrame, rgbTitleColor = {rgbaTitleColor[1],rgbaTitleColor[2],rgbaTitleColor[3]}, alpha = rgbaTitleColor[4] }
     end
     MY.RedrawTabPanel()
 end

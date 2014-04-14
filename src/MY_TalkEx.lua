@@ -33,7 +33,7 @@ _MY_TalkEx.tForce = { [-1] = _L['all force'] } for i=0,10,1 do _MY_TalkEx.tForce
 _MY_TalkEx.tFilter = { ['NEARBY'] = _L['nearby players where'], ['RAID'] = _L['teammates where'], }
 _MY_TalkEx.tChannels = { 
     ['NEARBY'] = { szName = _L['nearby channel'], tCol = GetMsgFontColor("MSG_NORMAL", true) },
-    ['FRIEND'] = { szName = _L['friend channel'], tCol = GetMsgFontColor("MSG_FRIEND", true) },
+    ['FRIENDS'] = { szName = _L['friend channel'], tCol = GetMsgFontColor("MSG_FRIEND", true) },
     ['TEAM'] = { szName = _L['team channel'], tCol = GetMsgFontColor("MSG_TEAM", true) },
     ['RAID'] = { szName = _L['raid channel'], tCol = GetMsgFontColor("MSG_TEAM", true) },
     ['TONG'] = { szName = _L['tong channel'], tCol = GetMsgFontColor("MSG_GUILD", true) },
@@ -165,40 +165,4 @@ _MY_TalkEx.OnUiLoad = function(wnd)
         if #MY_TalkEx.szTrickTextEnd > 0 then MY.Talk(PLAYER_TALK_CHANNEL[MY_TalkEx.tTrickChannel], MY_TalkEx.szTrickTextEnd) end
     end)
 end
-_MY_TalkEx.OnDataLoad = function(wnd)
-    local ui = MY.UI(wnd)
-    -------------------------------------
-    -- 喊话部分
-    -------------------------------------
-    -- 喊话输入框
-    ui:find("#WndEdit_TalkEx_Talk"):text(MY_TalkEx.szTalk)
-    -- 喊话频道
-    for szChannel, tChannel in pairs(_MY_TalkEx.tChannels) do
-        ui:find('#WndCheckBox_TalkEx_'..szChannel):check(MY_TalkEx.tTalkChannel[szChannel])
-    end
-    -- 喊话按钮
-    ui:find('#WndButton_TalkEx_Talk'):text(_L['send'])
-    -------------------------------------
-    -- 调侃部分
-    -------------------------------------
-    -- 文本标题
-    ui:find("#Text_TalkEx_Trick_With"):text(_L['have a trick with'])
-    -- 调侃对象范围过滤器
-    ui:find("#Text_TalkEx_Trick_Filter"):text(_MY_TalkEx.tFilter[MY_TalkEx.tTrickFilter])
-    -- 调侃门派过滤器
-    ui:find("#Text_TalkEx_Trick_Force"):text(_MY_TalkEx.tForce[MY_TalkEx.tTrickFilterForce])
-    -- 调侃内容输入框：第一句
-    ui:find('#WndEdit_TalkEx_TrickBegin'):text(MY_TalkEx.szTrickTextBegin)
-    -- 调侃内容输入框：调侃内容
-    ui:find('#WndEdit_TalkEx_Trick'):text(MY_TalkEx.szTrickText)
-    -- 调侃内容输入框：最后一句
-    ui:find('#WndEdit_TalkEx_TrickEnd'):text(MY_TalkEx.szTrickTextEnd)
-    -- 调侃发送频道提示框
-    ui:find("#Text_TalkEx_Trick_Sendto"):text(_L['send to'])
-    -- 调侃发送频道
-    ui:find("#Text_TalkEx_Trick_Sendto_Filter"):text(_MY_TalkEx.tChannels[MY_TalkEx.tTrickChannel].szName)
-    ui:find("#Text_TalkEx_Trick_Sendto_Filter"):color(_MY_TalkEx.tChannels[MY_TalkEx.tTrickChannel].tCol)
-    -- 调侃按钮
-    ui:find('#WndButton_TalkEx_Trick'):text(_L['have a trick with'])
-end
-MY.RegisterPanel("TalkEx", _L["talk ex"], "interface\\MY\\ui\\MY_TalkEx.ini", "UI/Image/UICommon/ScienceTreeNode.UITex", 123, {255,255,0,200}, _MY_TalkEx.OnUiLoad, _MY_TalkEx.OnDataLoad )
+MY.RegisterPanel("TalkEx", _L["talk ex"], "interface\\MY\\ui\\MY_TalkEx.ini", "UI/Image/UICommon/ScienceTreeNode.UITex|123", {255,255,0,200}, {OnPanelActive = _MY_TalkEx.OnUiLoad} )
