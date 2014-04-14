@@ -168,7 +168,10 @@ end
 -- filter elements from object
 -- same as jQuery.filter()
 function _MY.UI:filter(raw)
-    local eles = self.eles
+    local eles = {}
+    for i = #self.eles, 1, -1 do
+        table.insert(eles, self.eles[i])
+    end
     if type(raw) == "string" then
         -- delete ele those id/class not fits filter:raw
         if string.sub(raw, 1, 1) == "#" then
