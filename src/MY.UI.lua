@@ -43,7 +43,7 @@ local GetChildren = function(root)
         if status and handle then
             children[table.concat({ handle:GetTreePath(), '/Handle' })] = handle
             for i = 0, handle:GetItemCount() - 1, 1 do
-                children[table.concat({ handle:Lookup(i):GetTreePath() })] = handle:Lookup(i)
+                children[table.concat({ handle:Lookup(i):GetTreePath(), i })] = handle:Lookup(i)
             end
         end
         --### 压栈: 将刚刚弹栈的元素的所有子窗体压栈
@@ -241,27 +241,35 @@ end
 -- same as jQuery.child()
 function _MY.UI:child(filter)
     local child = {}
+    local childHash = {}
     for _, ele in pairs(self.eles) do
         if ele.raw:GetType() == "Handle" then
             for i = 0, ele.raw:GetItemCount() - 1, 1 do
-                child[table.concat({ ele.raw:Lookup(i):GetTreePath() })] = ele.raw:Lookup(i)
+                if not childHash[table.concat({ ele.raw:Lookup(i):GetTreePath(), i })] then
+                    table.insert(child, ele.raw:Lookup(i))
+                    childHash[table.concat({ ele.raw:Lookup(i):GetTreePath(), i })] = true
+                end
             end
         else
             -- 子handle
             local status, handle = pcall(function() return ele.raw:Lookup('','') end) -- raw可能没有Lookup方法 用pcall包裹
-            if status and handle then
-                child[table.concat{handle:GetTreePath(),'/Handle'}] = handle
+            if status and handle and not childHash[table.concat{handle:GetTreePath(),'/Handle'}] then
+                table.insert(child, handle)
+                childHash[table.concat({handle:GetTreePath(),'/Handle'})] = true
             end
             -- 子窗体
             local status, sub_raw = pcall(function() return ele.raw:GetFirstChild() end) -- raw可能没有GetFirstChild方法 用pcall包裹
             while status and sub_raw do
-                child[table.concat{sub_raw:GetTreePath()}] = sub_raw
+                if not childHash[table.concat{sub_raw:GetTreePath()}] then
+                    table.insert( child, sub_raw )
+                    childHash[table.concat({sub_raw:GetTreePath()})] = true
+                end
                 sub_raw = sub_raw:GetNext()
             end
         end
     end
     local eles = {}
-    for _, raw in pairs(child) do
+    for _, raw in ipairs(child) do
         -- insert into eles
         table.insert( eles, self:raw2ele(raw) )
     end
@@ -430,10 +438,23 @@ function _MY.UI:append(szName, szType, tArg)
                     hnd = ele.hdl:Lookup(i)
                     if hnd and hnd:GetName()=='' then hnd:SetName('Unnamed_Item'..i) end
                 end
+                ele.hdl:FormatAllItemPos()
                 if nCount == ele.hdl:GetItemCount() then
                     return MY.Debug(_L("Unable to append handle item from string.")..'\n','MY#UI*append',2)
                 end
             end
+        end
+    end
+    return self
+end
+
+-- clear
+-- clear handle
+-- (self) Instance:clear()
+function _MY.UI:clear()
+    for _, ele in pairs(self.eles) do
+        if ele.hdl then
+            pcall(function() ele.hdl:Clear() end)
         end
     end
     return self
