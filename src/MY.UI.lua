@@ -171,6 +171,12 @@ function _MY.UI:del(raw)
                     table.remove(eles, i)
                 end
             end
+        elseif string.sub(raw, 1, 1) == "^" then
+            for i = #eles, 1, -1 do
+                if table.find(eles[i].raw:GetName(), raw) then
+                    table.remove(eles, i)
+                end
+            end
         end
     else
         -- delete ele those treepath is the same as raw
@@ -204,6 +210,12 @@ function _MY.UI:filter(raw)
             raw = string.sub(raw, 2)
             for i = #eles, 1, -1 do
                 if (eles[i].raw.szMyuiType or eles[i].raw:GetType()) ~= raw then
+                    table.remove(eles, i)
+                end
+            end
+        elseif string.sub(raw, 1, 1) == "^" then
+            for i = #eles, 1, -1 do
+                if not table.find(eles[i].raw:GetName(), raw) then
                     table.remove(eles, i)
                 end
             end
