@@ -643,6 +643,25 @@ function _MY.UI:size(nWidth, nHeight)
     end
 end
 
+-- (boolean) Instance:multiLine()
+-- (self) Instance:multiLine(bMultiLine)
+function _MY.UI:multiLine(bMultiLine)
+    if type(bMultiLine)=='boolean' then
+        for _, ele in pairs(self.eles) do
+            pcall(function() ele.edt:SetMultiLine(bMultiLine) end)
+            pcall(function() ele.txt:SetMultiLine(bMultiLine) end)
+        end
+        return self
+    else -- get
+        -- select the first item
+        local ele = self.eles[1]
+        -- try to get its name
+        local status, bMultiLine = pcall(function() return (ele.edt or ele.txt):IsMultiLine() end)
+        -- if succeed then return its name
+        if status then return bMultiLine else MY.Debug(err..'\n','ERROR _MY.UI:multiLine' ,1) return nil end
+    end
+end
+
 -----------------------------------------------------------
 -- my ui events handle
 -----------------------------------------------------------
