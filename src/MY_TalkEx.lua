@@ -49,7 +49,7 @@ _MY_TalkEx.OnPanelActive = function(wnd)
     -- 喊话部分
     -------------------------------------
     -- 喊话输入框
-    ui:append('WndEdit_Talk','WndEditBox'):child('#WndEdit_Talk'):pos(25,25):size(510,210):text(MY_TalkEx.szTalk):change(function() MY_TalkEx.szTalk = this:GetText() end)
+    ui:append('WndEdit_Talk','WndEditBox'):child('#WndEdit_Talk'):pos(25,25):size(510,210):text(MY_TalkEx.szTalk):multiLine(true):change(function() MY_TalkEx.szTalk = this:GetText() end)
     -- 喊话频道
     local i = 22
     for szChannel, tChannel in pairs(_MY_TalkEx.tChannels) do
@@ -108,7 +108,7 @@ _MY_TalkEx.OnPanelActive = function(wnd)
     -- 调侃内容输入框：第一句
     ui:append('WndEdit_TrickBegin','WndEditBox'):child('#WndEdit_TrickBegin'):pos(25,285):size(510,25):text(MY_TalkEx.szTrickTextBegin):change(function() MY_TalkEx.szTrickTextBegin = this:GetText() end)
     -- 调侃内容输入框：调侃内容
-    ui:append('WndEdit_Trick','WndEditBox'):child('#WndEdit_Trick'):pos(25,310):size(510,75):text(MY_TalkEx.szTrickText):change(function() MY_TalkEx.szTrickText = this:GetText() end)
+    ui:append('WndEdit_Trick','WndEditBox'):child('#WndEdit_Trick'):pos(25,310):size(510,75):multiLine(true):text(MY_TalkEx.szTrickText):change(function() MY_TalkEx.szTrickText = this:GetText() end)
     -- 调侃内容输入框：最后一句
     ui:append('WndEdit_TrickEnd','WndEditBox'):child('#WndEdit_TrickEnd'):pos(25,385):size(510,25):text(MY_TalkEx.szTrickTextEnd):change(function() MY_TalkEx.szTrickTextEnd = this:GetText() end)
     -- 调侃发送频道提示框
