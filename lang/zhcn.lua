@@ -14,6 +14,19 @@ data = {
     ['world channel'] = '世界频道',
     ['system channel'] = '系统频道',
     
+    ['NEARBY'] = '近聊',
+    ['FRIENDS'] = '好友',
+    ['TEAM'] = '队伍',
+    ['RAID'] = '团队/战场',
+    ['TONG'] = '帮会',
+    ['TONG_ALLIANCE'] = '同盟',
+    ['MAP'] = '地图',
+    ['SCHOOL'] = '门派',
+    ['CAMP'] = '阵营',
+    ['WHISPER'] = '密聊',
+    ['WORLD'] = '世界',
+    ['SYSTEM'] = '系统',
+    
     ['send'] = '发送',
     ['send to'] = '发送到',
     
@@ -42,9 +55,12 @@ data = {
     ['teammates where'] = '团队中',
     ['nearby players where'] = '附近的',
     ['please input something.'] = '请先输入一些内容。',
+    ['no trick target found.'] = '找不到可以调侃的玩家，您可以尝试更改筛选条件。',
     -- MY_CheckUpdate.lua
     ['new version found.'] = '发现新版本！',
     ['new version found, would you want to download immediately?'] = '发现新版本！是否立即前往下载？',
+    -- MY_ChatMonitor.lua
+    ['chat monitor'] = '聊天监控',
     -- MY_RescueTeam.lua
     ['rescue team helper'] = '救场必备',
     -- MY_RollMon.lua
