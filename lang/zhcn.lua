@@ -45,6 +45,10 @@ data = {
     ['QiXiu'] = '七秀',
     ['ShaoLin'] = '少林',
     ['TangMen'] = '唐门',
+    
+    ['start'] = '开始',
+    ['stop'] = '停止',
+    ['clear'] = '清空',
     -- MY.lua
     ['mingyi plugin'] = '茗伊插件',
     ['mingyi plugins'] = '茗伊插件集',
@@ -61,6 +65,10 @@ data = {
     ['new version found, would you want to download immediately?'] = '发现新版本！是否立即前往下载？',
     -- MY_ChatMonitor.lua
     ['chat monitor'] = '聊天监控',
+    ['waiting...'] = '等待中…',
+    ['regexp'] = '正则',
+    ['key words:'] = '关键字：',
+    
     -- MY_RescueTeam.lua
     ['rescue team helper'] = '救场必备',
     -- MY_RollMon.lua
