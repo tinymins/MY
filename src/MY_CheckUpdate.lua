@@ -21,8 +21,8 @@ MY.RegisterEvent("LOADING_END", function() if MY_CheckUpdate.bChecked then retur
             local szFile = MY_CheckUpdate.GetValue(szContent, 'file')
             local szPage = MY_CheckUpdate.GetValue(szContent, 'page')
             local szFeature = MY_CheckUpdate.GetValue(szContent, 'feature')
-            MY.Sysmsg(_L["new version found."], nil, { 255, 0, 0})
-            MY.Sysmsg(szFeature, nil, { 255, 0, 0})
+            MY.Sysmsg(_L["new version found."]..'\n', nil, { 255, 0, 0})
+            MY.Sysmsg(szFeature..'\n', nil, { 255, 0, 0})
             local tVersionInfo = {
                 szName = "MY_VersionInfo",
                 szMessage = string.format("[%s] %s", _L["mingyi plugins"], _L["new version found, would you want to download immediately?"]), {
