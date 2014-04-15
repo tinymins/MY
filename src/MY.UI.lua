@@ -828,7 +828,7 @@ MY.UI.Fetch = function(selector, tab) return _MY.UI.new(selector, tab) end
 MY.UI.OpenInternetExplorer = function(szAddr, bDisableSound)
     local nIndex, nLast = nil, nil
     for i = 1, 10, 1 do
-        if not _MY.UI.IsInternetExplorerOpened(i) then
+        if not _MY.IsInternetExplorerOpened(i) then
             nIndex = i
             break
         elseif not nLast then
@@ -839,7 +839,7 @@ MY.UI.OpenInternetExplorer = function(szAddr, bDisableSound)
         OutputMessage("MSG_ANNOUNCE_RED", g_tStrings.MSG_OPEN_TOO_MANY)
         return nil
     end
-    local x, y = _MY.UI.IE_GetNewIEFramePos()
+    local x, y = _MY.IE_GetNewIEFramePos()
     local frame = Wnd.OpenWindow("InternetExplorer", "IE"..nIndex)
     frame.bIE = true
     frame.nIndex = nIndex
@@ -865,7 +865,7 @@ MY.UI.OpenInternetExplorer = function(szAddr, bDisableSound)
     return webPage
 end
 -- ÅÐ¶Ïä¯ÀÀÆ÷ÊÇ·ñÒÑ¿ªÆô
-_MY.UI.IsInternetExplorerOpened = function(nIndex)
+_MY.IsInternetExplorerOpened = function(nIndex)
     local frame = Station.Lookup("Topmost/IE"..nIndex)
     if frame and frame:IsVisible() then
         return true
@@ -873,7 +873,7 @@ _MY.UI.IsInternetExplorerOpened = function(nIndex)
     return false
 end
 -- »ñÈ¡ä¯ÀÀÆ÷¾ø¶ÔÎ»ÖÃ
-_MY.UI.IE_GetNewIEFramePos = function()
+_MY.IE_GetNewIEFramePos = function()
     local nLastTime = 0
     local nLastIndex = nil
     for i = 1, 10, 1 do
