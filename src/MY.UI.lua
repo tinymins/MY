@@ -159,22 +159,36 @@ function _MY.UI:del(raw)
         -- delete ele those id/class fits filter:raw
         if string.sub(raw, 1, 1) == "#" then
             raw = string.sub(raw, 2)
-            for i = #eles, 1, -1 do
-                if eles[i].raw:GetName() == raw then
-                    table.remove(eles, i)
+            if string.sub(raw, 1, 1) == "^" then
+                -- regexp
+                for i = #eles, 1, -1 do
+                    if table.find(eles[i].raw:GetName(), raw) then
+                        table.remove(eles, i)
+                    end
+                end
+            else
+                -- normal
+                for i = #eles, 1, -1 do
+                    if eles[i].raw:GetName() == raw then
+                        table.remove(eles, i)
+                    end
                 end
             end
         elseif string.sub(raw, 1, 1) == "." then
             raw = string.sub(raw, 2)
-            for i = #eles, 1, -1 do
-                if (eles[i].raw.szMyuiType or eles[i].raw:GetType()) == raw then
-                    table.remove(eles, i)
+            if string.sub(raw, 1, 1) == "^" then
+                -- regexp
+                for i = #eles, 1, -1 do
+                    if (eles[i].raw.szMyuiType or eles[i].raw:GetType()) == raw then
+                        table.remove(eles, i)
+                    end
                 end
-            end
-        elseif string.sub(raw, 1, 1) == "^" then
-            for i = #eles, 1, -1 do
-                if table.find(eles[i].raw:GetName(), raw) then
-                    table.remove(eles, i)
+            else
+                -- normal
+                for i = #eles, 1, -1 do
+                    if table.find((eles[i].raw.szMyuiType or eles[i].raw:GetType()), raw) then
+                        table.remove(eles, i)
+                    end
                 end
             end
         end
@@ -201,22 +215,36 @@ function _MY.UI:filter(raw)
         -- delete ele those id/class not fits filter:raw
         if string.sub(raw, 1, 1) == "#" then
             raw = string.sub(raw, 2)
-            for i = #eles, 1, -1 do
-                if eles[i].raw:GetName() ~= raw then
-                    table.remove(eles, i)
+            if string.sub(raw, 1, 1) == "^" then
+                -- regexp
+                for i = #eles, 1, -1 do
+                    if not string.find(eles[i].raw:GetName(), raw) then
+                        table.remove(eles, i)
+                    end
+                end
+            else
+                -- normal
+                for i = #eles, 1, -1 do
+                    if eles[i].raw:GetName() ~= raw then
+                        table.remove(eles, i)
+                    end
                 end
             end
         elseif string.sub(raw, 1, 1) == "." then
             raw = string.sub(raw, 2)
-            for i = #eles, 1, -1 do
-                if (eles[i].raw.szMyuiType or eles[i].raw:GetType()) ~= raw then
-                    table.remove(eles, i)
+            if string.sub(raw, 1, 1) == "^" then
+                -- regexp
+                for i = #eles, 1, -1 do
+                    if not string.find((eles[i].raw.szMyuiType or eles[i].raw:GetType()), raw) then
+                        table.remove(eles, i)
+                    end
                 end
-            end
-        elseif string.sub(raw, 1, 1) == "^" then
-            for i = #eles, 1, -1 do
-                if not table.find(eles[i].raw:GetName(), raw) then
-                    table.remove(eles, i)
+            else
+                -- normal
+                for i = #eles, 1, -1 do
+                    if (eles[i].raw.szMyuiType or eles[i].raw:GetType()) ~= raw then
+                        table.remove(eles, i)
+                    end
                 end
             end
         end
