@@ -381,38 +381,58 @@ _MY.tItemXML = {
 -- append
 -- similar as jQuery.append()
 -- Instance:append(szName, szType, tArg)
+-- Instance:append(szItemString)
 function _MY.UI:append(szName, szType, tArg)
-    for _, ele in pairs(self.eles) do
-        if ( string.sub(szType, 1, 3) == "Wnd" and ele.wnd ) then
-            -- append from ini file
-            local szFile = "interface\\MY\\ui\\" .. szType .. ".ini"
-            local frame = Wnd.OpenWindow(szFile, "MY_TempWnd")
-            if not frame then
-                return MY.Debug(_L("Unable to open ini file [%s]", szFile)..'\n', 'MY#UI#append', 2)
+    if szType then
+        for _, ele in pairs(self.eles) do
+            if ( string.sub(szType, 1, 3) == "Wnd" and ele.wnd ) then
+                -- append from ini file
+                local szFile = "interface\\MY\\ui\\" .. szType .. ".ini"
+                local frame = Wnd.OpenWindow(szFile, "MY_TempWnd")
+                if not frame then
+                    return MY.Debug(_L("Unable to open ini file [%s]", szFile)..'\n', 'MY#UI#append', 2)
+                end
+                local wnd = frame:Lookup(szType)
+                if not wnd then
+                    MY.Debug(_L("Can not find wnd component [%s]", szType)..'\n', 'MY#UI#append', 2)
+                else
+                    wnd.szMyuiType = szType
+                    wnd:SetName(szName)
+                    wnd:ChangeRelation(ele.wnd, true, true)
+                end
+                Wnd.CloseWindow(frame)
+            elseif ( string.sub(szType, 1, 3) ~= "Wnd" and ele.hdl ) then
+                local szXml = _MY.tItemXML[szType]
+                local hnd
+                if szXml then
+                    -- append from xml
+                    local nCount = ele.hdl:GetItemCount()
+                    ele.hdl:AppendItemFromString(szXml)
+                    hnd = ele.hdl:Lookup(nCount)
+                    if hnd then hnd:SetName(szName) end
+                else
+                    -- append from ini
+                    hnd = ele.hdl:AppendItemFromIni("interface\\MY\\ui\\HandleItems.ini","Handle_" .. szType, szName)
+                end
+                if not hnd then
+                    return MY.Debug(_L("Unable to append handle item [%s]", szType)..'\n','MY#UI*append',2)
+                end
             end
-            wnd = frame:Lookup(szType)
-            if not wnd then
-                MY.Debug(_L("Can not find wnd component [%s]", szType)..'\n', 'MY#UI#append', 2)
-            else
-                wnd.szMyuiType = szType
-                wnd:SetName(szName)
-                wnd:ChangeRelation(ele.wnd, true, true)
-            end
-            Wnd.CloseWindow(frame)
-        elseif ( string.sub(szType, 1, 3) ~= "Wnd" and ele.hdl ) then
-            local szXml = _MY.tItemXML[szType]
-            if szXml then
+        end
+    else
+        for _, ele in pairs(self.eles) do
+            if ele.hdl then
                 -- append from xml
                 local nCount = ele.hdl:GetItemCount()
-                ele.hdl:AppendItemFromString(szXml)
-                hnd = ele.hdl:Lookup(nCount)
-                if hnd then hnd:SetName(szName) end
-            else
-                -- append from ini
-                hnd = ele.hdl:AppendItemFromIni("interface\\MY\\ui\\HandleItems.ini","Handle_" .. szType, szName)
-            end
-            if not hnd then
-                return MY.Debug(_L("Unable to append handle item [%s]", szType)..'\n','MY#UI*append',2)
+                ele.hdl:AppendItemFromString(szName)
+                local hnd 
+                for i = nCount, ele.hdl:GetItemCount()-1, 1 do
+                    hnd = ele.hdl:Lookup(i)
+                    if hnd and hnd:GetName()=='' then hnd:SetName('Unnamed_Item'..i) end
+                end
+                if nCount == ele.hdl:GetItemCount() then
+                    return MY.Debug(_L("Unable to append handle item from string.")..'\n','MY#UI*append',2)
+                end
             end
         end
     end
@@ -699,7 +719,7 @@ end
 function _MY.UI:change(fnOnEditChanged)
     if fnOnEditChanged then
         for _, ele in pairs(self.eles) do
-            if ele.edt then ele.edt.OnEditChanged = fnOnEditChanged end
+            if ele.edt then ele.edt.OnEditChanged = function() pcall(fnOnEditChanged,ele.edt:GetText()) end end
         end
         return self
     else
