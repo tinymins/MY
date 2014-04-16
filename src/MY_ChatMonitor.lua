@@ -115,5 +115,5 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
     end
     _MY_ChatMonitor.ui = MY.UI(wnd)
 end
-MY.RegisterPanel( "ChatMonitor", _L["chat monitor"], "interface\\MY\\ui\\MainPanel.ini", "UI/Image/Minimap/Minimap.UITex|197", {255,127,0,200}, { OnPanelActive = _MY_ChatMonitor.OnPanelActive, OnPanelDeactive = function() 
+MY.RegisterPanel( "ChatMonitor", _L["chat monitor"], "UI/Image/Minimap/Minimap.UITex|197", {255,127,0,200}, { OnPanelActive = _MY_ChatMonitor.OnPanelActive, OnPanelDeactive = function() 
     _MY_ChatMonitor.bCapture = false end } )
