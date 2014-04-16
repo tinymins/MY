@@ -737,6 +737,26 @@ function _MY.UI:multiLine(bMultiLine)
     end
 end
 
+-- (self) Instance:image(szImageAndFrame)
+-- (self) Instance:image(szImage, nFrame)
+function _MY.UI:image(szImage, nFrame)
+    if szImage then
+        nFrame = nFrame or string.gsub(szImage, '.*%|(%d+)', '%1')
+        szImage = string.gsub(szImage, '%|.*', '')
+        if nFrame then
+            nFrame = tonumber(nFrame)
+            for _, ele in pairs(self.eles) do
+                pcall(function() ele.img:FromUITex(szImage, nFrame) end)
+            end
+        else
+            for _, ele in pairs(self.eles) do
+                pcall(function() ele.img:FromTextureFile(szImage) end)
+            end
+        end
+    end
+    return self
+end
+
 -----------------------------------------------------------
 -- my ui events handle
 -----------------------------------------------------------
