@@ -33,6 +33,7 @@ local _MY = {
     frame = nil,
     hBox = nil,
     hRequest = nil,
+    bLoaded = false,
     nDebugLevel = 0,
     dwVersion = 0x0000200,
     szBuildDate = "20140416",
@@ -55,7 +56,9 @@ local _MY = {
     tTraceMenu  = {},   -- 工具栏菜单
 }
 _MY.Init = function()
+    if _MY.bLoaded then return end
 	-- var
+    _MY.bLoaded = true
 	_MY.hBox = MY.GetFrame():Lookup("","Box_1")
 	_MY.hRequest = MY.GetFrame():Lookup("Page_1")
     -- 窗口按钮
@@ -757,7 +760,7 @@ MY.RegisterEvent = function(szEventName, arg1, arg2)
                         -- try to run event function
                         local status, err = pcall(hEvent.fn, ...)
                         -- error report
-                        if not status then MY.Debug(err, 'OnEvent#'..szEventName, 2) end
+                        if not status then MY.Debug(err..'\n', 'OnEvent#'..szEventName, 2) end
                     else
                         -- remove none function event
                         table.remove(_MY.tEvent[szEventName], i)
