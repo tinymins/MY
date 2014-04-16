@@ -5,6 +5,7 @@ local _MY = {
     szIniFileCheckBox = "Interface\\MY\\ui\\WndCheckBox.ini",
     szIniFileMainPanel = "Interface\\MY\\ui\\MainPanel.ini",
 }
+local _L = MY.LoadLangPack()
 ---------------------------------------------------------------------
 -- 本地的 UI 组件对象
 ---------------------------------------------------------------------
@@ -450,11 +451,11 @@ function _MY.UI:append(szName, szType, tArg)
                 local szFile = "interface\\MY\\ui\\" .. szType .. ".ini"
                 local frame = Wnd.OpenWindow(szFile, "MY_TempWnd")
                 if not frame then
-                    return MY.Debug(_L("Unable to open ini file [%s]", szFile)..'\n', 'MY#UI#append', 2)
+                    return MY.Debug(_L("unable to open ini file [%s]", szFile)..'\n', 'MY#UI#append', 2)
                 end
                 local wnd = frame:Lookup(szType)
                 if not wnd then
-                    MY.Debug(_L("Can not find wnd component [%s]", szType)..'\n', 'MY#UI#append', 2)
+                    MY.Debug(_L("can not find wnd component [%s]", szType)..'\n', 'MY#UI#append', 2)
                 else
                     wnd.szMyuiType = szType
                     wnd:SetName(szName)
@@ -475,7 +476,7 @@ function _MY.UI:append(szName, szType, tArg)
                     hnd = ele.hdl:AppendItemFromIni("interface\\MY\\ui\\HandleItems.ini","Handle_" .. szType, szName)
                 end
                 if not hnd then
-                    return MY.Debug(_L("Unable to append handle item [%s]", szType)..'\n','MY#UI*append',2)
+                    return MY.Debug(_L("unable to append handle item [%s]", szType)..'\n','MY#UI*append',2)
                 end
             end
         end
@@ -492,7 +493,7 @@ function _MY.UI:append(szName, szType, tArg)
                 end
                 ele.hdl:FormatAllItemPos()
                 if nCount == ele.hdl:GetItemCount() then
-                    return MY.Debug(_L("Unable to append handle item from string.")..'\n','MY#UI*append',2)
+                    return MY.Debug(_L("unable to append handle item from string.")..'\n','MY#UI*append',2)
                 end
             end
         end
@@ -699,7 +700,7 @@ function _MY.UI:size(nWidth, nHeight)
                 pcall(function() ele.txt:SetSize(nWidth, nHeight) end)
                 pcall(function() ele.img:SetSize(nWidth, nHeight) end)
                 pcall(function() ele.edt:SetSize(nWidth-8, nHeight-4) end)
-                pcall(function() local w, h= ele.cmb:GetSize() ele.cmb:SetRelPos(nWidth-w-5, (nHeight-h)/2) end)
+                pcall(function() local w, h= ele.cmb:GetSize() ele.cmb:SetRelPos(nWidth-w-5, (nHeight-h-1)/2+1) end)
                 pcall(function() ele.hdl:FormatAllItemPos() end)
             elseif ele.itm then
                 pcall(function() (ele.itm or ele.raw):SetSize(nWidth, nHeight) end)

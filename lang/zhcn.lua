@@ -53,6 +53,10 @@ data = {
     ['mingyi plugin'] = '茗伊插件',
     ['mingyi plugins'] = '茗伊插件集',
     ['%s, welcome to use mingyi plugins!'] = '欢迎%s使用茗伊插件集！',
+    ["unable to open ini file [%s]"] = "无法打开界面 INI 文件 [%s]",
+    ["can not find wnd component [%s]"] = "找不到窗体组件 [%s]",
+    ["unable to append handle item [%s]"] = "无法追加容器组件 [%s]",
+    ["unable to append handle item from string."] = "从字符串追加容器组件失败。",
     -- MY_TalkEx.lua
     ['talk ex'] = '喊话辅助',
     ['have a trick with'] = '调侃一下',
