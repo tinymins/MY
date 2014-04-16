@@ -93,12 +93,18 @@ function _MY.UI:ctor(raw, tab)
             tab.hdl = tab.hdl or raw:Lookup('','')
             tab.edt = tab.edt or raw:Lookup('WndEdit_Default')
             tab.img = tab.img or raw:Lookup('','Image_Default')
+        elseif szType=="WndComboBox" then
+            tab.wnd = tab.wnd or raw
+            tab.hdl = tab.hdl or raw:Lookup('','')
+            tab.cmb = tab.cmb or raw:Lookup('Btn_ComboBox')
+            tab.txt = tab.txt or raw:Lookup('','Text_Default')
+            tab.img = tab.img or raw:Lookup('','Image_Default')
         elseif string.sub(szType, 1, 3) == "Wnd" then
             tab.wnd = tab.wnd or raw
             tab.hdl = tab.hdl or raw:Lookup('','')
             tab.txt = tab.txt or raw:Lookup('','Text_Default')
         else tab.itm = raw end
-        if raw then table.insert( self.eles, { raw = raw, wnd = tab.wnd, itm = tab.itm, hdl = tab.hdl, txt = tab.txt, img = tab.img, chk = tab.chk, edt = tab.edt, sdw = tab.sdw } ) end
+        if raw then table.insert( self.eles, { raw = raw, wnd = tab.wnd, itm = tab.itm, hdl = tab.hdl, txt = tab.txt, img = tab.img, chk = tab.chk, edt = tab.edt, sdw = tab.sdw, cmb = tab.cmb } ) end
     end
     return self
 end
@@ -126,12 +132,18 @@ function _MY.UI:raw2ele(raw, tab)
         tab.hdl = tab.hdl or raw:Lookup('','')
         tab.edt = tab.edt or raw:Lookup('WndEdit_Default')
         tab.img = tab.img or raw:Lookup('','Image_Default')
+    elseif szType=="WndComboBox" then
+        tab.wnd = tab.wnd or raw
+        tab.hdl = tab.hdl or raw:Lookup('','')
+        tab.cmb = tab.cmb or raw:Lookup('Btn_ComboBox')
+        tab.txt = tab.txt or raw:Lookup('','Text_Default')
+        tab.img = tab.img or raw:Lookup('','Image_Default')
     elseif string.sub(szType, 1, 3) == "Wnd" then
         tab.wnd = tab.wnd or raw
         tab.hdl = tab.hdl or raw:Lookup('','')
         tab.txt = tab.txt or raw:Lookup('','Text_Default')
     else tab.itm = raw end
-    return { raw = raw, wnd = tab.wnd, itm = tab.itm, hdl = tab.hdl, txt = tab.txt, img = tab.img, chk = tab.chk, edt = tab.edt, sdw = tab.sdw }
+    return { raw = raw, wnd = tab.wnd, itm = tab.itm, hdl = tab.hdl, txt = tab.txt, img = tab.img, chk = tab.chk, edt = tab.edt, sdw = tab.sdw, cmb = tab.cmb }
 end
 
 -- add a ele to object
@@ -687,6 +699,7 @@ function _MY.UI:size(nWidth, nHeight)
                 pcall(function() ele.txt:SetSize(nWidth, nHeight) end)
                 pcall(function() ele.img:SetSize(nWidth, nHeight) end)
                 pcall(function() ele.edt:SetSize(nWidth-8, nHeight-4) end)
+                pcall(function() local w, h= ele.cmb:GetSize() ele.cmb:SetRelPos(nWidth-w-5, (nHeight-h)/2) end)
                 pcall(function() ele.hdl:FormatAllItemPos() end)
             elseif ele.itm then
                 pcall(function() (ele.itm or ele.raw):SetSize(nWidth, nHeight) end)
