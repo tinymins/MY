@@ -749,6 +749,7 @@ function _MY.UI:click(fn)
     for _, ele in pairs(self.eles) do
         if fn then
             if ele.wnd then ele.wnd.OnLButtonClick = fn end
+            if ele.cmb then ele.cmb.OnLButtonClick = fn end
             if ele.itm then ele.itm.OnItemLButtonClick = fn end
         else
             if ele.wnd then pcall(ele.wnd.OnLButtonClick) end
