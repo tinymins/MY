@@ -41,6 +41,7 @@ local _MY = {
     szShortName = _L["mingyi plugin"],
     szIniFile = "Interface\\MY\\ui\\MY.ini",
     szIniFileTabBox = "Interface\\MY\\ui\\WndTabBox.ini",
+    szIniFileMainPanel = "Interface\\MY\\ui\\MainPanel.ini",
     tNearNpc = {},      -- 附近的NPC
     tNearPlayer = {},   -- 附近的玩家
     tNearDoodad = {},   -- 附近的物品
@@ -844,7 +845,7 @@ MY.RedrawTabPanel = function()
                     frame = frame:GetNext()
                 end
                 -- insert main panel
-                local fx = Wnd.OpenWindow(tTab.szIniFile, "aMainPanel")
+                local fx = Wnd.OpenWindow(_MY.szIniFileMainPanel, "aMainPanel")
                 local mainpanel
                 if fx then    
                     mainpanel = fx:Lookup("MainPanel")
@@ -866,16 +867,15 @@ end
     (void) MY.RegisterPanel( szName, szTitle, szIniFile, szIconTex, rgbaTitleColor, fn )
     szName          选项卡唯一ID
     szTitle         选项卡按钮标题
-    szIniFile       选项卡主页面UI文件
     szIconTex       选项卡图标文件|图标帧
     rgbaTitleColor  选项卡文字rgba
     fn              选项卡各种响应函数 {
         fn.OnPanelActive(wnd)      选项卡激活    wnd为当前MainPanel
         fn.OnPanelDeactive(wnd)    选项卡取消激活
     }
-    Ex： MY.RegisterPanel( "Test", "测试标签", "interface\\MY\\ui\\MainPanel.ini", "UI/Image/UICommon/ScienceTreeNode.UITex|123", {255,255,0,200}, { OnPanelActive = function(wnd) end } )
+    Ex： MY.RegisterPanel( "Test", "测试标签", "UI/Image/UICommon/ScienceTreeNode.UITex|123", {255,255,0,200}, { OnPanelActive = function(wnd) end } )
  ]]
-MY.RegisterPanel = function( szName, szTitle, szIniFile, szIconTex, rgbaTitleColor, fn )
+MY.RegisterPanel = function( szName, szTitle, szIconTex, rgbaTitleColor, fn )
     if szTitle == nil then
         for i = #_MY.tTabs, 1, -1 do
             if _MY.tTabs[i].szName == szName then
@@ -890,14 +890,13 @@ MY.RegisterPanel = function( szName, szTitle, szIniFile, szIconTex, rgbaTitleCol
         szIconTex = string.gsub(szIconTex, '%|.*', '')
         
         -- format other params
-        if type(szIniFile)~="string" then szIniFile = _MY.szIniFileMainPanel end
         if type(fn)~="table" then fn = {} end
         if type(rgbaTitleColor)~="table" then rgbaTitleColor = { 255, 255, 255, 200 } end
         if type(rgbaTitleColor[1])~="number" then rgbaTitleColor[1] = 255 end
         if type(rgbaTitleColor[2])~="number" then rgbaTitleColor[2] = 255 end
         if type(rgbaTitleColor[3])~="number" then rgbaTitleColor[3] = 255 end
         if type(rgbaTitleColor[4])~="number" then rgbaTitleColor[4] = 200 end
-        table.insert( _MY.tTabs, { szName = szName, szTitle = szTitle, fn = fn, szIniFile = szIniFile, szIconTex = szIconTex, dwIconFrame = dwIconFrame, rgbTitleColor = {rgbaTitleColor[1],rgbaTitleColor[2],rgbaTitleColor[3]}, alpha = rgbaTitleColor[4] } )
+        table.insert( _MY.tTabs, { szName = szName, szTitle = szTitle, fn = fn, szIconTex = szIconTex, dwIconFrame = dwIconFrame, rgbTitleColor = {rgbaTitleColor[1],rgbaTitleColor[2],rgbaTitleColor[3]}, alpha = rgbaTitleColor[4] } )
     end
     MY.RedrawTabPanel()
 end

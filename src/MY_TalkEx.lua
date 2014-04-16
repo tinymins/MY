@@ -44,7 +44,7 @@ _MY_TalkEx.tChannels = {
     ['WORLD'] = { szName = _L['world channel'], tCol = GetMsgFontColor("MSG_WORLD", true) },
 }
 _MY_TalkEx.OnPanelActive = function(wnd)
-    local ui = MY.UI(wnd)
+     ui = MY.UI(wnd)
     -------------------------------------
     -- 喊话部分
     -------------------------------------
@@ -69,35 +69,35 @@ _MY_TalkEx.OnPanelActive = function(wnd)
     -------------------------------------
     -- 调侃部分
     -------------------------------------
+    -- <hr />
+    ui:append('Image_TalkEx_Spliter','Image'):find('#Image_TalkEx_Spliter'):pos(5,240):size(636,2):image('UI/Image/UICommon/ScienceTreeNode.UITex',62)
     -- 文本标题
-    ui:find("#Text_TalkEx_Trick_With"):text(_L['have a trick with'])
+    ui:append('Text_Trick_With','Text'):find("#Text_Trick_With"):pos(27,256):text(_L['have a trick with'])
     -- 调侃对象范围过滤器
-    ui:find("#Text_TalkEx_Trick_Filter"):text(_MY_TalkEx.tFilter[MY_TalkEx.tTrickFilter])
-    ui:find("#Button_TalkEx_Trick_Filter"):click(function()
+    ui:append('WndComboBox_Trick_Filter','WndComboBox'):find("#WndComboBox_Trick_Filter"):pos(95,257):size(80,25):click(function()
         PopupMenu((function() 
             local t = {}
             for szFilterId,szTitle in pairs(_MY_TalkEx.tFilter) do
                 table.insert(t,{
                     szOption = szTitle,
                     fnAction = function()
-                        ui:find("#Text_TalkEx_Trick_Filter"):text(szTitle)
+                        ui:find("#WndComboBox_Trick_Filter"):text(szTitle)
                         MY_TalkEx.tTrickFilter = szFilterId
                     end,
                 })
             end
             return t
         end)())
-    end)
+    end):text(_MY_TalkEx.tFilter[MY_TalkEx.tTrickFilter] or '')
     -- 调侃门派过滤器
-    ui:find("#Text_TalkEx_Trick_Force"):text(_MY_TalkEx.tForce[MY_TalkEx.tTrickFilterForce])
-    ui:find("#Button_TalkEx_Trick_Force"):click(function()
+    ui:append("WndComboBox_Trick_Force",'WndComboBox'):child('#WndComboBox_Trick_Force'):pos(175,256):size(80,25):text(_MY_TalkEx.tForce[MY_TalkEx.tTrickFilterForce]):click(function()
         PopupMenu((function() 
             local t = {}
             for szFilterId,szTitle in pairs(_MY_TalkEx.tForce) do
                 table.insert(t,{
                     szOption = szTitle,
                     fnAction = function()
-                        ui:find("#Text_TalkEx_Trick_Force"):text(szTitle)
+                        ui:find("#WndComboBox_Trick_Force"):text(szTitle)
                         MY_TalkEx.tTrickFilterForce = szFilterId
                     end,
                 })
@@ -112,18 +112,16 @@ _MY_TalkEx.OnPanelActive = function(wnd)
     -- 调侃内容输入框：最后一句
     ui:append('WndEdit_TrickEnd','WndEditBox'):child('#WndEdit_TrickEnd'):pos(25,385):size(510,25):text(MY_TalkEx.szTrickTextEnd):change(function() MY_TalkEx.szTrickTextEnd = this:GetText() end)
     -- 调侃发送频道提示框
-    ui:find("#Text_TalkEx_Trick_Sendto"):text(_L['send to'])
+    ui:append("Text_Trick_Sendto",'Text'):find('#Text_Trick_Sendto'):pos(27,415):size(100,26):text(_L['send to'])
     -- 调侃发送频道
-    ui:find("#Text_TalkEx_Trick_Sendto_Filter"):text(_MY_TalkEx.tChannels[MY_TalkEx.tTrickChannel].szName)
-    ui:find("#Text_TalkEx_Trick_Sendto_Filter"):color(_MY_TalkEx.tChannels[MY_TalkEx.tTrickChannel].tCol)
-    ui:find("#Button_TalkEx_Trick_Sendto_Filter"):click(function()
+    ui:append("WndComboBox_Trick_Sendto_Filter",'WndComboBox'):child('#WndComboBox_Trick_Sendto_Filter'):pos(80,415):size(100,25):click(function()
         PopupMenu((function() 
             local t = {}
             for szChannel,tChannel in pairs(_MY_TalkEx.tChannels) do
                 table.insert(t,{
                     szOption = tChannel.szName,
                     fnAction = function()
-                        ui:find("#Text_TalkEx_Trick_Sendto_Filter"):text(tChannel.szName):color(tChannel.tCol)
+                        ui:find("#WndComboBox_Trick_Sendto_Filter"):text(tChannel.szName):color(tChannel.tCol)
                         MY_TalkEx.tTrickChannel = szChannel
                     end,
                     rgb = tChannel.tCol,
@@ -131,7 +129,7 @@ _MY_TalkEx.OnPanelActive = function(wnd)
             end
             return t
         end)())
-    end)
+    end):text(_MY_TalkEx.tChannels[MY_TalkEx.tTrickChannel].szName or ''):color(_MY_TalkEx.tChannels[MY_TalkEx.tTrickChannel].tCol)
     -- 调侃按钮
     ui:append('WndButton_Trick','WndButton'):child('#WndButton_Trick'):color({255,255,255}):pos(435,415):text(_L['have a trick with']):click(function()
         if #MY_TalkEx.szTrickText == 0 then MY.Sysmsg(_L["please input something."].."\n",nil,{255,0,0}) return end
@@ -165,4 +163,4 @@ _MY_TalkEx.OnPanelActive = function(wnd)
         if #MY_TalkEx.szTrickTextEnd > 0 then MY.Talk(PLAYER_TALK_CHANNEL[MY_TalkEx.tTrickChannel], MY_TalkEx.szTrickTextEnd) end
     end)
 end
-MY.RegisterPanel("TalkEx", _L["talk ex"], "interface\\MY\\ui\\MY_TalkEx.ini", "UI/Image/UICommon/ScienceTreeNode.UITex|123", {255,255,0,200}, {OnPanelActive = _MY_TalkEx.OnPanelActive} )
+MY.RegisterPanel("TalkEx", _L["talk ex"], "UI/Image/UICommon/ScienceTreeNode.UITex|123", {255,255,0,200}, {OnPanelActive = _MY_TalkEx.OnPanelActive} )
