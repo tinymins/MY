@@ -424,7 +424,7 @@ function _MY.UI:remove()
         elseif string.sub(ele.raw:GetType(), 1, 3) == "Wnd" then
             ele.raw:Destroy()
         else
-            ele.raw:GetParent():RemoveItem(ele.raw:GetIndex())
+            pcall(function() ele.raw:GetParent():RemoveItem(ele.raw:GetIndex()) end)
         end
     end
     self.eles = {}
@@ -615,7 +615,7 @@ function _MY.UI:color(nRed, nGreen, nBlue)
         -- try to get its name
         local status, r,g,b = pcall(function() if ele.sdw then return ele.sdw:GetColorRGB() else return (ele.edt or ele.txt):GetFontColor() end end)
         -- if succeed then return its name
-        if status then return r,g,b else MY.Debug(err..'\n','ERROR _MY.UI:color' ,3) return nil end
+        if status then return r,g,b else MY.Debug(r..'\n','ERROR _MY.UI:color' ,3) return nil end
     end
 end
 
@@ -662,7 +662,7 @@ function _MY.UI:pos(nLeft, nTop)
         -- try to get its name
         local status, l, t = pcall(function() return ele.raw:GetRelPos() end)
         -- if succeed then return its name
-        if status then return l, t else MY.Debug(err..'\n','ERROR _MY.UI:left|top|pos' ,1) return nil end
+        if status then return l, t else MY.Debug(l..'\n','ERROR _MY.UI:left|top|pos' ,1) return nil end
     end
 end
 
@@ -714,7 +714,7 @@ function _MY.UI:size(nWidth, nHeight)
         -- try to get its name
         local status, w, h = pcall(function() return ele.raw:GetSize() end)
         -- if succeed then return its name
-        if status then return w, h else MY.Debug(err..'\n','ERROR _MY.UI:height|width|size' ,1) return nil end
+        if status then return w, h else MY.Debug(w..'\n','ERROR _MY.UI:height|width|size' ,1) return nil end
     end
 end
 
@@ -733,7 +733,7 @@ function _MY.UI:multiLine(bMultiLine)
         -- try to get its name
         local status, bMultiLine = pcall(function() return (ele.edt or ele.txt):IsMultiLine() end)
         -- if succeed then return its name
-        if status then return bMultiLine else MY.Debug(err..'\n','ERROR _MY.UI:multiLine' ,1) return nil end
+        if status then return bMultiLine else MY.Debug(bMultiLine..'\n','ERROR _MY.UI:multiLine' ,1) return nil end
     end
 end
 
