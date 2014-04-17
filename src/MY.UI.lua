@@ -435,6 +435,27 @@ function _MY.UI:raw(index)
     if index > 0 and index <= #eles then return eles[index].raw end
 end
 
+-- get wnd
+function _MY.UI:wnd(index)
+    local eles = self.eles
+    if index < 0 then index = #eles + index + 1 end
+    if index > 0 and index <= #eles then return eles[index].wnd end
+end
+
+-- get item
+function _MY.UI:itm(index)
+    local eles = self.eles
+    if index < 0 then index = #eles + index + 1 end
+    if index > 0 and index <= #eles then return eles[index].itm end
+end
+
+-- get handle
+function _MY.UI:hdl(index)
+    local eles = self.eles
+    if index < 0 then index = #eles + index + 1 end
+    if index > 0 and index <= #eles then return eles[index].hdl end
+end
+
 -----------------------------------------------------------
 -- my ui opreation -- same as jQuery -- by tinymins --
 -----------------------------------------------------------
@@ -530,7 +551,7 @@ function _MY.UI:append(szName, szType, tArg)
                             wnd:Lookup("WndNewScrollBar_Default"):Lookup("WndButton_Scroll"):SetSize(15,( hb - nStep > _max and _max ) or hb - nStep )
                             wnd:Lookup("WndNewScrollBar_Default"):SetStepCount(nStep)
                         end
-                        wnd.UpdateScroll()
+                        pcall( wnd.UpdateScroll )
                     end
                 end
                 Wnd.CloseWindow(frame)
@@ -547,6 +568,7 @@ function _MY.UI:append(szName, szType, tArg)
                     -- append from ini
                     hnd = ele.hdl:AppendItemFromIni("interface\\MY\\ui\\HandleItems.ini","Handle_" .. szType, szName)
                 end
+                ele.hdl:FormatAllItemPos()
                 if not hnd then
                     return MY.Debug(_L("unable to append handle item [%s]", szType)..'\n','MY#UI*append',2)
                 end
@@ -564,6 +586,7 @@ function _MY.UI:append(szName, szType, tArg)
                     if hnd and hnd:GetName()=='' then hnd:SetName('Unnamed_Item'..i) end
                 end
                 ele.hdl:FormatAllItemPos()
+                pcall( ele.raw.UpdateScroll )
                 if nCount == ele.hdl:GetItemCount() then
                     return MY.Debug(_L("unable to append handle item from string.")..'\n','MY#UI*append',2)
                 end
@@ -833,6 +856,16 @@ function _MY.UI:image(szImage, nFrame)
             for _, ele in pairs(self.eles) do
                 pcall(function() ele.img:FromTextureFile(szImage) end)
             end
+        end
+    end
+    return self
+end
+
+-- (self) Instance:handleStyle(dwStyle)
+function _MY.UI:handleStyle(dwStyle)
+    if dwStyle then
+        for _, ele in pairs(self.eles) do
+            pcall(function() ele.hdl:SetHandleStyle(dwStyle) end)
         end
     end
     return self
