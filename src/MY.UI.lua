@@ -37,21 +37,27 @@ local GetChildren = function(root)
         --### 弹栈: 弹出栈顶元素
         local raw = stack[#stack]
         table.remove(stack, #stack)
-        -- 将当前弹出的元素加入子元素表
-        children[table.concat({ raw:GetTreePath() })] = raw
-        -- 如果有Handle则将所有Handle子元素加入子元素表
-        local status, handle = pcall(function() return raw:Lookup('','') end) -- raw可能没有Lookup方法 用pcall包裹
-        if status and handle then
-            children[table.concat({ handle:GetTreePath(), '/Handle' })] = handle
-            for i = 0, handle:GetItemCount() - 1, 1 do
-                children[table.concat({ handle:Lookup(i):GetTreePath(), i })] = handle:Lookup(i)
+        if raw:GetType()=="Handle" then
+            -- 将当前弹出的Handle加入子元素表
+            children[table.concat({ raw:GetTreePath(), '/Handle' })] = raw
+            for i = 0, raw:GetItemCount() - 1, 1 do
+                -- 如果子元素是Handle/将他压栈
+                if raw:Lookup(i):GetType()=='Handle' then table.insert(stack, raw:Lookup(i))
+                -- 否则压入结果队列
+                else children[table.concat({ raw:Lookup(i):GetTreePath(), i })] = raw:Lookup(i) end
             end
-        end
-        --### 压栈: 将刚刚弹栈的元素的所有子窗体压栈
-        local status, sub_raw = pcall(function() return raw:GetFirstChild() end) -- raw可能没有GetFirstChild方法 用pcall包裹
-        while status and sub_raw do
-            table.insert(stack, sub_raw)
-            sub_raw = sub_raw:GetNext()
+        else
+            -- 如果有Handle则将所有Handle压栈待处理
+            local status, handle = pcall(function() return raw:Lookup('','') end) -- raw可能没有Lookup方法 用pcall包裹
+            if status and handle then table.insert(stack, handle) end
+            -- 将当前弹出的元素加入子元素表
+            children[table.concat({ raw:GetTreePath() })] = raw
+            --### 压栈: 将刚刚弹栈的元素的所有子窗体压栈
+            local status, sub_raw = pcall(function() return raw:GetFirstChild() end) -- raw可能没有GetFirstChild方法 用pcall包裹
+            while status and sub_raw do
+                table.insert(stack, sub_raw)
+                sub_raw = sub_raw:GetNext()
+            end
         end
     end
     -- 因为是求子元素 所以移除第一个压栈的元素（父元素）
@@ -100,6 +106,10 @@ function _MY.UI:ctor(raw, tab)
             tab.cmb = tab.cmb or raw:Lookup('Btn_ComboBox')
             tab.txt = tab.txt or raw:Lookup('','Text_Default')
             tab.img = tab.img or raw:Lookup('','Image_Default')
+        elseif szType=="WndScrollBox" then
+            tab.wnd = tab.wnd or raw
+            tab.hdl = tab.hdl or raw:Lookup('','Handle_Scroll')
+            tab.img = tab.img or raw:Lookup('','Image_Default')
         elseif string.sub(szType, 1, 3) == "Wnd" then
             tab.wnd = tab.wnd or raw
             tab.hdl = tab.hdl or raw:Lookup('','')
@@ -138,6 +148,10 @@ function _MY.UI:raw2ele(raw, tab)
         tab.hdl = tab.hdl or raw:Lookup('','')
         tab.cmb = tab.cmb or raw:Lookup('Btn_ComboBox')
         tab.txt = tab.txt or raw:Lookup('','Text_Default')
+        tab.img = tab.img or raw:Lookup('','Image_Default')
+    elseif szType=="WndScrollBox" then
+        tab.wnd = tab.wnd or raw
+        tab.hdl = tab.hdl or raw:Lookup('','Handle_Scroll')
         tab.img = tab.img or raw:Lookup('','Image_Default')
     elseif string.sub(szType, 1, 3) == "Wnd" then
         tab.wnd = tab.wnd or raw
@@ -460,6 +474,56 @@ function _MY.UI:append(szName, szType, tArg)
                     wnd.szMyuiType = szType
                     wnd:SetName(szName)
                     wnd:ChangeRelation(ele.wnd, true, true)
+                    if szType == "WndScrollBox" then
+                        wnd:Lookup('WndButton_Up').OnLButtonHold = function()
+                            wnd:Lookup("WndNewScrollBar_Default"):ScrollPrev(1)
+                        end
+                        wnd:Lookup('WndButton_Down').OnLButtonHold = function()
+                            wnd:Lookup("WndNewScrollBar_Default"):ScrollNext(1)
+                        end
+                        wnd:Lookup('WndButton_Up').OnLButtonDown = function()
+                            wnd:Lookup("WndNewScrollBar_Default"):ScrollPrev(1)
+                            Output(1)
+                        end
+                        wnd:Lookup('WndButton_Down').OnLButtonDown = function()
+                            wnd:Lookup("WndNewScrollBar_Default"):ScrollNext(1)
+                        end
+                        wnd:Lookup("WndNewScrollBar_Default").OnScrollBarPosChanged = function()
+                            local nCurrentValue = this:GetScrollPos()
+                            local frame = this:GetParent()
+                            if nCurrentValue == 0 then
+                                frame:Lookup("WndButton_Up"):Enable(false)
+                            else
+                                frame:Lookup("WndButton_Up"):Enable(true)
+                            end
+                            if nCurrentValue == this:GetStepCount() then
+                                frame:Lookup("WndButton_Down"):Enable(false)
+                            else
+                                frame:Lookup("WndButton_Down"):Enable(true)
+                            end
+
+                            local handle = frame:Lookup("", "Handle_Scroll")
+                            handle:SetItemStartRelPos(0, - nCurrentValue * 10)
+                        end
+                        wnd.UpdateScroll = function()
+                            local handle = wnd:Lookup("", "Handle_Scroll")
+                            handle:FormatAllItemPos()
+                            local wA, hA = handle:GetAllItemSize()
+                            local w, h = handle:GetSize()
+                            local nStep = (hA - h) / 10
+                            if nStep > 0 then
+                                wnd:Lookup("WndNewScrollBar_Default"):Show()
+                                wnd:Lookup("WndButton_Up"):Show()
+                                wnd:Lookup("WndButton_Down"):Show()
+                            else
+                                wnd:Lookup("WndNewScrollBar_Default"):Hide()
+                                wnd:Lookup("WndButton_Up"):Hide()
+                                wnd:Lookup("WndButton_Down"):Hide()
+                            end
+                            wnd:Lookup("WndNewScrollBar_Default"):Lookup("WndButton_Scroll"):SetSize(15,130 - nStep * 2)
+                            wnd:Lookup("WndNewScrollBar_Default"):SetStepCount(nStep)
+                        end
+                    end
                 end
                 Wnd.CloseWindow(frame)
             elseif ( string.sub(szType, 1, 3) ~= "Wnd" and ele.hdl ) then
