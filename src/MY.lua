@@ -1025,7 +1025,10 @@ end
 -- create frame
 MY.OnFrameCreate = function()
 end
-
+function MY.OnMouseWheel()
+    MY.Debug(string.format('OnMouseWheel#%s.%s:%i\n',this:GetName(),this:GetType(),Station.GetMessageWheelDelta()),nil,0)
+    return true
+end
 -- web page complete
 MY.OnDocumentComplete = function()
     -- 判断是否有远程请求等待回调 没有则直接返回
