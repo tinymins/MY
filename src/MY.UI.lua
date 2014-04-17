@@ -31,6 +31,7 @@ _MY.UI = class()
 -----------------------------------------------------------
 -- 获取一个窗体的所有子元素
 local GetChildren = function(root)
+    if not root then return {} end
     local stack = { root }  -- 初始栈
     local children = {}     -- 保存所有子元素 szTreePath => element 键值对
     while #stack > 0 do     -- 循环直到栈空
@@ -87,35 +88,40 @@ function _MY.UI:ctor(raw, tab)
         -- farmat raw
         if type(raw)=="string" then raw = Station.Lookup(raw) end
         -- format tab
-        if type(tab)~="table" then tab = {} end
+        local _tab = { raw = raw }
+        if type(tab)=="table" then for k, v in pairs(tab) do _tab[k]=v end end
         local szType = raw.szMyuiType or raw:GetType()
-        if not tab.txt and szType == "Text" then tab.txt = raw end
-        if not tab.img and szType == "Image" then tab.img = raw end
-        if not tab.chk and szType == "WndCheckBox" then tab.chk = raw end
-        if not tab.edt and szType == "WndEdit" then tab.edt = raw end
-        if not tab.sdw and szType == "Shadow" then tab.sdw = raw end
-        if not tab.hdl and szType == "Handle" then tab.hdl = raw end
+        if not _tab.txt and szType == "Text"        then _tab.txt = raw end
+        if not _tab.img and szType == "Image"       then _tab.img = raw end
+        if not _tab.chk and szType == "WndCheckBox" then _tab.chk = raw end
+        if not _tab.edt and szType == "WndEdit"     then _tab.edt = raw end
+        if not _tab.sdw and szType == "Shadow"      then _tab.sdw = raw end
+        if not _tab.hdl and szType == "Handle"      then _tab.hdl = raw end
         if szType=="WndEditBox" then
-            tab.wnd = tab.wnd or raw
-            tab.hdl = tab.hdl or raw:Lookup('','')
-            tab.edt = tab.edt or raw:Lookup('WndEdit_Default')
-            tab.img = tab.img or raw:Lookup('','Image_Default')
+            _tab.wnd = _tab.wnd or raw
+            _tab.hdl = _tab.hdl or raw:Lookup('','')
+            _tab.edt = _tab.edt or raw:Lookup('WndEdit_Default')
+            _tab.img = _tab.img or raw:Lookup('','Image_Default')
         elseif szType=="WndComboBox" then
-            tab.wnd = tab.wnd or raw
-            tab.hdl = tab.hdl or raw:Lookup('','')
-            tab.cmb = tab.cmb or raw:Lookup('Btn_ComboBox')
-            tab.txt = tab.txt or raw:Lookup('','Text_Default')
-            tab.img = tab.img or raw:Lookup('','Image_Default')
+            _tab.wnd = _tab.wnd or raw
+            _tab.hdl = _tab.hdl or raw:Lookup('','')
+            _tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
+            _tab.txt = _tab.txt or raw:Lookup('','Text_Default')
+            _tab.img = _tab.img or raw:Lookup('','Image_Default')
         elseif szType=="WndScrollBox" then
-            tab.wnd = tab.wnd or raw
-            tab.hdl = tab.hdl or raw:Lookup('','Handle_Scroll')
-            tab.img = tab.img or raw:Lookup('','Image_Default')
+            _tab.wnd = _tab.wnd or raw
+            _tab.hdl = _tab.hdl or raw:Lookup('','Handle_Scroll')
+            _tab.img = _tab.img or raw:Lookup('','Image_Default')
+            _tab.sbu = _tab.sbu or raw:Lookup('WndButton_Up')
+            _tab.sbd = _tab.sbd or raw:Lookup('WndButton_Down')
+            _tab.sbn = _tab.sbn or raw:Lookup('WndNewScrollBar_Default')
+            _tab.shd = _tab.shd or raw:Lookup('','Handle_Scroll')
         elseif string.sub(szType, 1, 3) == "Wnd" then
-            tab.wnd = tab.wnd or raw
-            tab.hdl = tab.hdl or raw:Lookup('','')
-            tab.txt = tab.txt or raw:Lookup('','Text_Default')
-        else tab.itm = raw end
-        if raw then table.insert( self.eles, { raw = raw, wnd = tab.wnd, itm = tab.itm, hdl = tab.hdl, txt = tab.txt, img = tab.img, chk = tab.chk, edt = tab.edt, sdw = tab.sdw, cmb = tab.cmb } ) end
+            _tab.wnd = _tab.wnd or raw
+            _tab.hdl = _tab.hdl or raw:Lookup('','')
+            _tab.txt = _tab.txt or raw:Lookup('','Text_Default')
+        else _tab.itm = raw end
+        if raw then table.insert( self.eles, _tab ) end
     end
     return self
 end
@@ -130,35 +136,40 @@ end
 -- conv raw to eles array
 function _MY.UI:raw2ele(raw, tab)
     -- format tab
-    if type(tab)~="table" then tab = {} end
+    local _tab = { raw = raw }
+    if type(tab)=="table" then for k, v in pairs(tab) do _tab[k]=v end end
     local szType = raw.szMyuiType or raw:GetType()
-    if not tab.txt and szType == "Text" then tab.txt = raw end
-    if not tab.img and szType == "Image" then tab.img = raw end
-    if not tab.chk and szType == "WndCheckBox" then tab.chk = raw end
-    if not tab.edt and szType == "WndEdit" then tab.edt = raw end
-    if not tab.sdw and szType == "Shadow" then tab.sdw = raw end
-    if not tab.hdl and szType == "Handle" then tab.hdl = raw end
+    if not _tab.txt and szType == "Text" then        _tab.txt = raw end
+    if not _tab.img and szType == "Image" then       _tab.img = raw end
+    if not _tab.chk and szType == "WndCheckBox" then _tab.chk = raw end
+    if not _tab.edt and szType == "WndEdit" then     _tab.edt = raw end
+    if not _tab.sdw and szType == "Shadow" then      _tab.sdw = raw end
+    if not _tab.hdl and szType == "Handle" then      _tab.hdl = raw end
     if szType=="WndEditBox" then
-        tab.wnd = tab.wnd or raw
-        tab.hdl = tab.hdl or raw:Lookup('','')
-        tab.edt = tab.edt or raw:Lookup('WndEdit_Default')
-        tab.img = tab.img or raw:Lookup('','Image_Default')
+        _tab.wnd = _tab.wnd or raw
+        _tab.hdl = _tab.hdl or raw:Lookup('','')
+        _tab.edt = _tab.edt or raw:Lookup('WndEdit_Default')
+        _tab.img = _tab.img or raw:Lookup('','Image_Default')
     elseif szType=="WndComboBox" then
-        tab.wnd = tab.wnd or raw
-        tab.hdl = tab.hdl or raw:Lookup('','')
-        tab.cmb = tab.cmb or raw:Lookup('Btn_ComboBox')
-        tab.txt = tab.txt or raw:Lookup('','Text_Default')
-        tab.img = tab.img or raw:Lookup('','Image_Default')
+        _tab.wnd = _tab.wnd or raw
+        _tab.hdl = _tab.hdl or raw:Lookup('','')
+        _tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
+        _tab.txt = _tab.txt or raw:Lookup('','Text_Default')
+        _tab.img = _tab.img or raw:Lookup('','Image_Default')
     elseif szType=="WndScrollBox" then
-        tab.wnd = tab.wnd or raw
-        tab.hdl = tab.hdl or raw:Lookup('','Handle_Scroll')
-        tab.img = tab.img or raw:Lookup('','Image_Default')
+        _tab.wnd = _tab.wnd or raw
+        _tab.hdl = _tab.hdl or raw:Lookup('','Handle_Scroll')
+        _tab.img = _tab.img or raw:Lookup('','Image_Default')
+        _tab.sbu = _tab.sbu or raw:Lookup('WndButton_Up')
+        _tab.sbd = _tab.sbd or raw:Lookup('WndButton_Down')
+        _tab.sbn = _tab.sbn or raw:Lookup('WndNewScrollBar_Default')
+        _tab.shd = _tab.shd or raw:Lookup('','Handle_Scroll')
     elseif string.sub(szType, 1, 3) == "Wnd" then
-        tab.wnd = tab.wnd or raw
-        tab.hdl = tab.hdl or raw:Lookup('','')
-        tab.txt = tab.txt or raw:Lookup('','Text_Default')
-    else tab.itm = raw end
-    return { raw = raw, wnd = tab.wnd, itm = tab.itm, hdl = tab.hdl, txt = tab.txt, img = tab.img, chk = tab.chk, edt = tab.edt, sdw = tab.sdw, cmb = tab.cmb }
+        _tab.wnd = _tab.wnd or raw
+        _tab.hdl = _tab.hdl or raw:Lookup('','')
+        _tab.txt = _tab.txt or raw:Lookup('','Text_Default')
+    else _tab.itm = raw end
+    return _tab
 end
 
 -- add a ele to object
@@ -488,22 +499,16 @@ function _MY.UI:append(szName, szType, tArg)
                         wnd:Lookup('WndButton_Down').OnLButtonDown = function()
                             wnd:Lookup("WndNewScrollBar_Default"):ScrollNext(1)
                         end
+                        wnd.OnMouseWheel = function()                                   -- listening Mouse Wheel
+                            local nDistance = Station.GetMessageWheelDelta()            -- get distance
+                            wnd:Lookup("WndNewScrollBar_Default"):ScrollNext(nDistance) -- wheel scroll position
+                            return 1
+                        end
                         wnd:Lookup("WndNewScrollBar_Default").OnScrollBarPosChanged = function()
                             local nCurrentValue = this:GetScrollPos()
-                            local frame = this:GetParent()
-                            if nCurrentValue == 0 then
-                                frame:Lookup("WndButton_Up"):Enable(false)
-                            else
-                                frame:Lookup("WndButton_Up"):Enable(true)
-                            end
-                            if nCurrentValue == this:GetStepCount() then
-                                frame:Lookup("WndButton_Down"):Enable(false)
-                            else
-                                frame:Lookup("WndButton_Down"):Enable(true)
-                            end
-
-                            local handle = frame:Lookup("", "Handle_Scroll")
-                            handle:SetItemStartRelPos(0, - nCurrentValue * 10)
+                            wnd:Lookup("WndButton_Up"):Enable( nCurrentValue ~= 0 )
+                            wnd:Lookup("WndButton_Down"):Enable( nCurrentValue ~= this:GetStepCount() )
+                            wnd:Lookup("", "Handle_Scroll"):SetItemStartRelPos(0, - nCurrentValue * 10)
                         end
                         wnd.UpdateScroll = function()
                             local handle = wnd:Lookup("", "Handle_Scroll")
@@ -520,9 +525,12 @@ function _MY.UI:append(szName, szType, tArg)
                                 wnd:Lookup("WndButton_Up"):Hide()
                                 wnd:Lookup("WndButton_Down"):Hide()
                             end
-                            wnd:Lookup("WndNewScrollBar_Default"):Lookup("WndButton_Scroll"):SetSize(15,130 - nStep * 2)
+                            local wb, hb = wnd:Lookup("WndNewScrollBar_Default"):GetSize()
+                            local _max = hb * 2 / 3
+                            wnd:Lookup("WndNewScrollBar_Default"):Lookup("WndButton_Scroll"):SetSize(15,( hb - nStep > _max and _max ) or hb - nStep )
                             wnd:Lookup("WndNewScrollBar_Default"):SetStepCount(nStep)
                         end
+                        wnd.UpdateScroll()
                     end
                 end
                 Wnd.CloseWindow(frame)
@@ -761,6 +769,7 @@ function _MY.UI:size(nWidth, nHeight)
             nWidth, nHeight = nWidth or _nWidth, nHeight or _nHeight
             if ele.wnd then
                 pcall(function() ele.wnd:SetSize(nWidth, nHeight) end)
+                pcall(function() ele.hdl:SetSize(nWidth, nHeight) end)
                 pcall(function() ele.txt:SetSize(nWidth, nHeight) end)
                 pcall(function() ele.img:SetSize(nWidth, nHeight) end)
                 pcall(function() ele.edt:SetSize(nWidth-8, nHeight-4) end)
@@ -769,6 +778,14 @@ function _MY.UI:size(nWidth, nHeight)
             elseif ele.itm then
                 pcall(function() (ele.itm or ele.raw):SetSize(nWidth, nHeight) end)
                 pcall(function() (ele.itm or ele.raw):GetParent():FormatAllItemPos() end)
+            end
+            if ele.sbu then
+                ele.sbu:SetRelPos(nWidth-25, 10)
+                ele.sbd:SetRelPos(nWidth-25, nHeight-30)
+                ele.sbn:SetRelPos(nWidth-21.5, 30)
+                ele.sbn:SetSize(15, nHeight-60)
+                ele.shd:SetSize(nWidth-35, nHeight-20)
+                ele.raw.UpdateScroll()
             end
         end
         return self
