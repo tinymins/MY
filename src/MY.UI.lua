@@ -532,28 +532,33 @@ function _MY.UI:append(szName, szType, tArg)
                             wnd:Lookup("", "Handle_Scroll"):SetItemStartRelPos(0, - nCurrentValue * 10)
                         end
                         wnd.UpdateScroll = function()
-                            local handle = wnd:Lookup("", "Handle_Scroll")
-                            handle:FormatAllItemPos()
-                            local wA, hA = handle:GetAllItemSize()
-                            local w, h = handle:GetSize()
+                            local hHandle     = wnd:Lookup("", "Handle_Scroll")
+                            local hScrollBar  = wnd:Lookup("WndNewScrollBar_Default")
+                            local hButtonUp   = wnd:Lookup("WndButton_Up")
+                            local hButtonDown = wnd:Lookup("WndButton_Down")
+                            local bBottom     = hScrollBar:GetStepCount() == hScrollBar:GetScrollPos()
+                            hHandle:FormatAllItemPos()
+                            local wA, hA = hHandle:GetAllItemSize()
+                            local w, h = hHandle:GetSize()
                             local nStep = (hA - h) / 10
                             if nStep > 0 then
-                                wnd:Lookup("WndNewScrollBar_Default"):Show()
-                                wnd:Lookup("WndButton_Up"):Show()
-                                wnd:Lookup("WndButton_Down"):Show()
+                                hScrollBar:Show()
+                                hButtonUp:Show()
+                                hButtonDown:Show()
                             else
-                                wnd:Lookup("WndNewScrollBar_Default"):Hide()
-                                wnd:Lookup("WndButton_Up"):Hide()
-                                wnd:Lookup("WndButton_Down"):Hide()
+                                hScrollBar:Hide()
+                                hButtonUp:Hide()
+                                hButtonDown:Hide()
                             end
-                            local wb, hb = wnd:Lookup("WndNewScrollBar_Default"):GetSize()
+                            local wb, hb = hScrollBar:GetSize()
                             local _max = ( 150 > (hb * 1 / 2) and (hb * 1 / 2) ) or 150
                             local _min = ( 50 > hb and (hb * 1 / 3) ) or 50
                             local hs = hb - nStep
                             local hs = ( hs > _max and _max ) or hs
                             local hs = ( hs < _min and _min ) or hs
-                            wnd:Lookup("WndNewScrollBar_Default"):Lookup("WndButton_Scroll"):SetSize( 15, hs )
-                            wnd:Lookup("WndNewScrollBar_Default"):SetStepCount(nStep)
+                            hScrollBar:Lookup("WndButton_Scroll"):SetSize( 15, hs )
+                            hScrollBar:SetStepCount(nStep)
+                            if bBottom then hScrollBar:SetScrollPos(hScrollBar:GetStepCount()) end
                         end
                         pcall( wnd.UpdateScroll )
                     end
