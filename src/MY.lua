@@ -575,7 +575,7 @@ MY.SwitchChat = function(nChannel)
 	if szHeader then
 		SwitchChatChannel(szHeader)
 	elseif type(nChannel) == "string" then
-		SwitchChatChannel("/w " .. nChannel .. " ")
+		SwitchChatChannel("/w " .. string.gsub(nChannel,'[%[%]]','') .. " ")
 	end
 end
 --[[ 发布聊天内容
