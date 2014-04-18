@@ -879,16 +879,43 @@ end
     same as jQuery.click()
     :click(fnAction) °ó¶¨
     :click()         ´¥·¢
+    :click(number n) ´¥·¢
+    n: 1    ×ó¼ü
+       0    ÖÐ¼ü
+      -1    ÓÒ¼ü
 ]]
-function _MY.UI:click(fn)
+function _MY.UI:click(fnLeft, fnRight, fnMiddle)
     for _, ele in pairs(self.eles) do
-        if fn then
-            if ele.wnd then ele.wnd.OnLButtonClick = fn end
-            if ele.cmb then ele.cmb.OnLButtonClick = fn end
-            if ele.itm then ele.itm.OnItemLButtonClick = fn end
+        if type(fnLeft)=="function" then
+            fnRight = fnRight or fnLeft
+            fnMiddle = fnMiddle or fnLeft
+            if ele.wnd then
+                ele.wnd.OnLButtonClick = function() fnLeft(1) end
+                ele.wnd.OnRButtonClick = function() fnRight(-1) end
+            end
+            if ele.itm then
+                ele.itm.OnItemLButtonClick = function() fnLeft(1) end 
+                ele.itm.OnItemRButtonClick = function() fnRight(-1) end 
+            end
+            if ele.hdl then
+                ele.hdl.OnItemLButtonClick = function() fnLeft(1) end 
+                ele.hdl.OnItemRButtonClick = function() fnRight(-1) end 
+            end
+            if ele.cmb then
+                ele.cmb.OnLButtonClick = function() fnLeft(1) end
+                ele.cmb.OnRButtonClick = function() fnRight(-1) end
+            end
         else
-            if ele.wnd then pcall(ele.wnd.OnLButtonClick) end
-            if ele.itm then pcall(ele.wnd.OnItemLButtonClick) end
+            local nFlag = fnLeft or 1
+            if nFlag==1 then
+                if ele.wnd then pcall(ele.wnd.OnLButtonClick) end
+                if ele.itm then pcall(ele.itm.OnItemLButtonClick) end
+            elseif nFlag==0 then
+            
+            elseif nFlag==-1 then
+                if ele.wnd then pcall(ele.wnd.OnRButtonClick) end
+                if ele.itm then pcall(ele.itm.OnItemRButtonClick) end
+            end
         end
     end
     return self
