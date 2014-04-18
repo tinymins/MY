@@ -359,9 +359,9 @@ end
 function _MY.UI:children(filter)
     local children = {}
     for _, ele in pairs(self.eles) do
-        for szTreePath, raw in pairs(GetChildren(ele.raw)) do
+        if ele.raw then for szTreePath, raw in pairs(GetChildren(ele.raw)) do
             children[szTreePath] = raw
-        end
+        end end
     end
     local eles = {}
     for _, raw in pairs(children) do
@@ -570,7 +570,7 @@ function _MY.UI:append(szName, szType, tArg)
                 end
                 ele.hdl:FormatAllItemPos()
                 if not hnd then
-                    return MY.Debug(_L("unable to append handle item [%s]", szType)..'\n','MY#UI*append',2)
+                    return MY.Debug(_L("unable to append handle item [%s]", szType)..'\n','MY#UI:append',2)
                 end
             end
         end
@@ -588,7 +588,7 @@ function _MY.UI:append(szName, szType, tArg)
                 ele.hdl:FormatAllItemPos()
                 pcall( ele.raw.UpdateScroll )
                 if nCount == ele.hdl:GetItemCount() then
-                    return MY.Debug(_L("unable to append handle item from string.")..'\n','MY#UI*append',2)
+                    return MY.Debug(_L("unable to append handle item from string.")..'\n','MY#UI:append',2)
                 end
             end
         end
