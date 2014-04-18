@@ -200,7 +200,7 @@ function _MY.UI:del(raw)
             if string.sub(raw, 1, 1) == "^" then
                 -- regexp
                 for i = #eles, 1, -1 do
-                    if table.find(eles[i].raw:GetName(), raw) then
+                    if string.find(eles[i].raw:GetName(), raw) then
                         table.remove(eles, i)
                     end
                 end
@@ -217,14 +217,14 @@ function _MY.UI:del(raw)
             if string.sub(raw, 1, 1) == "^" then
                 -- regexp
                 for i = #eles, 1, -1 do
-                    if (eles[i].raw.szMyuiType or eles[i].raw:GetType()) == raw then
+                    if string.find((eles[i].raw.szMyuiType or eles[i].raw:GetType()), raw) then
                         table.remove(eles, i)
                     end
                 end
             else
                 -- normal
                 for i = #eles, 1, -1 do
-                    if table.find((eles[i].raw.szMyuiType or eles[i].raw:GetType()), raw) then
+                    if (eles[i].raw.szMyuiType or eles[i].raw:GetType()) == raw then
                         table.remove(eles, i)
                     end
                 end
@@ -547,8 +547,12 @@ function _MY.UI:append(szName, szType, tArg)
                                 wnd:Lookup("WndButton_Down"):Hide()
                             end
                             local wb, hb = wnd:Lookup("WndNewScrollBar_Default"):GetSize()
-                            local _max = hb * 2 / 3
-                            wnd:Lookup("WndNewScrollBar_Default"):Lookup("WndButton_Scroll"):SetSize(15,( hb - nStep > _max and _max ) or hb - nStep )
+                            local _max = ( 150 > (hb * 1 / 2) and (hb * 1 / 2) ) or 150
+                            local _min = ( 50 > hb and (hb * 1 / 3) ) or 50
+                            local hs = hb - nStep
+                            local hs = ( hs > _max and _max ) or hs
+                            local hs = ( hs < _min and _min ) or hs
+                            wnd:Lookup("WndNewScrollBar_Default"):Lookup("WndButton_Scroll"):SetSize( 15, hs )
                             wnd:Lookup("WndNewScrollBar_Default"):SetStepCount(nStep)
                         end
                         pcall( wnd.UpdateScroll )
@@ -603,6 +607,9 @@ function _MY.UI:clear()
     for _, ele in pairs(self.eles) do
         if ele.hdl then
             pcall(function() ele.hdl:Clear() end)
+        end
+        if ele.sbu then
+            ele.raw.UpdateScroll()
         end
     end
     return self
