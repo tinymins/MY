@@ -275,6 +275,7 @@ _MY.DoRemoteRequest = function()
         if not _MY.hRequest then
             MY.DelayCall( _MY.DoRemoteRequest, 3000 )
             MY.Debug('network plugin has not been initalized yet!\n','MYRR',1)
+            _MY.hRequest = MY.GetFrame():Lookup("Page_1")
             return
         end
         -- 获取队列第一个元素
@@ -1025,7 +1026,7 @@ end
 -- create frame
 MY.OnFrameCreate = function()
 end
-function MY.OnMouseWheel()
+MY.OnMouseWheel = function()
     MY.Debug(string.format('OnMouseWheel#%s.%s:%i\n',this:GetName(),this:GetType(),Station.GetMessageWheelDelta()),nil,0)
     return true
 end
