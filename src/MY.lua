@@ -186,6 +186,11 @@ _MY.ClosePanel = function(bRealClose)
 		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 	end
 end
+-- open window
+_MY.OpenPanel = function()
+    local frame = MY.GetFrame()
+    frame:Show()
+end
 -- get player addon menu
 _MY.GetPlayerAddonMenu = function()
     local menu = {}
@@ -244,6 +249,8 @@ MY.GetFrame = function()
     end
     return _MY.frame
 end
+MY.ClosePanel = _MY.ClosePanel
+MY.OpenPanel = _MY.OpenPanel
 -- (void) MY.MenuTip(string str)	-- MenuTip
 MY.MenuTip = function(str)
 	local szText="<image>path=\"ui/Image/UICommon/Talk_Face.UITex\" frame=25 w=24 h=24</image> <text>text=" .. EncodeComponentsString(str) .." font=207 </text>"
