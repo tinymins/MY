@@ -688,6 +688,7 @@ function _MY.UI:text(szText)
     if szText then
         for _, ele in pairs(self.eles) do
             pcall(function() (ele.txt or ele.edt or ele.raw):SetText(szText) end)
+            pcall(function() (ele.txt or ele.edt or ele.raw):GetParent():FormatAllItemPos() end)
         end
         return self
     else
@@ -959,6 +960,7 @@ function _MY.UI:size(nWidth, nHeight)
             elseif ele.itm then
                 pcall(function() (ele.itm or ele.raw):SetSize(nWidth, nHeight) end)
                 pcall(function() (ele.itm or ele.raw):GetParent():FormatAllItemPos() end)
+                pcall(function() ele.hdl:FormatAllItemPos() end)
             end
             if ele.sbu then
                 ele.sbu:SetRelPos(nWidth-25, 10)
@@ -986,7 +988,9 @@ function _MY.UI:multiLine(bMultiLine)
     if type(bMultiLine)=='boolean' then
         for _, ele in pairs(self.eles) do
             pcall(function() ele.edt:SetMultiLine(bMultiLine) end)
+            pcall(function() ele.edt:GetParent():FormatAllItemPos() end)
             pcall(function() ele.txt:SetMultiLine(bMultiLine) end)
+            pcall(function() ele.txt:GetParent():FormatAllItemPos() end)
         end
         return self
     else -- get
@@ -1009,10 +1013,12 @@ function _MY.UI:image(szImage, nFrame)
             nFrame = tonumber(nFrame)
             for _, ele in pairs(self.eles) do
                 pcall(function() ele.img:FromUITex(szImage, nFrame) end)
+                pcall(function() ele.img:GetParent():FormatAllItemPos() end)
             end
         else
             for _, ele in pairs(self.eles) do
                 pcall(function() ele.img:FromTextureFile(szImage) end)
+                pcall(function() ele.img:GetParent():FormatAllItemPos() end)
             end
         end
     end
@@ -1157,6 +1163,31 @@ setmetatable(MY.UI, { __call = function(me, ...) return me.Fetch(...) end, __met
 
 --[[ 构造函数 类似jQuery: $(selector) ]]
 MY.UI.Fetch = function(selector, tab) return _MY.UI.new(selector, tab) end
+
+-- open new frame
+MY.UI.OpenFrame = function(szName, szStyle, bDummyFrame)
+    local frm, szDummy = nil, ''
+    if bDummyFrame then szDummy = 'Dummy' end
+    local szIniFile = "interface\\MY\\ui\\WndFrameNormal"..szDummy..".ini"
+    if szStyle=='Topmost' then
+        szIniFile = "interface\\MY\\ui\\WndFrameTopmost"..szDummy..".ini"
+    elseif szStyle=='Lowest' then
+        szIniFile = "interface\\MY\\ui\\WndFrameLowest"..szDummy..".ini"
+    else
+        szStyle = 'Normal'
+    end
+    if type(szName) == "string" then
+        frm = Station.Lookup(szStyle.."/" .. szName)
+        if frm then
+            Wnd.CloseWindow(frm)
+        end
+        frm = Wnd.OpenWindow(szIniFile, szName)
+    else
+        frm = Wnd.OpenWindow(szIniFile)
+    end
+    frm:Show()
+    return MY.UI(frm)
+end
 
 -- 打开浏览器
 MY.UI.OpenInternetExplorer = function(szAddr, bDisableSound)
