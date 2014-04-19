@@ -905,6 +905,18 @@ MY.RegisterPanel = function( szName, szTitle, szIconTex, rgbaTitleColor, fn )
     end
     MY.RedrawTabPanel()
 end
+--[[ 激活选项卡
+    (void) MY.ActivePanel( szName )
+    szName          选项卡唯一ID
+]]
+MY.ActivePanel = function( szName )
+    local eTab = MY.GetFrame():Lookup("Window_Tabs"):Lookup('TabBox_'..szName)
+    if not eTab then return end
+    local _this = this
+    this = eTab
+    pcall(eTab.OnLButtonDown)
+    this = _this
+end
 --[[ 注册玩家头像菜单
     -- 注册
     (void) MY.RegisterPlayerAddonMenu(szName,Menu)
