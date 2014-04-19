@@ -13,7 +13,17 @@ MY_CheckUpdate.GetValue = function(szText, szKey)
 end
 MY.RegisterEvent("LOADING_END", function()
     if MY_CheckUpdate.bChecked then return end
-    MY.RemoteRequest(string.format("%s?_=%i&n=%s&i=%s&t=", MY_CheckUpdate.szUrl, GetCurrentTime(), GetClientPlayer().szName, GetClientPlayer().dwID, GetTongClient().szTongName), function(szTitle,szContent)
+    local function escape(w)
+        pattern="[^%w%d%._%-%* ]"
+        s=string.gsub(w,pattern,function(c)
+            local c=string.format("%%%02X",string.byte(c))
+            return c
+        end)
+        s=string.gsub(s," ","+")
+        return s
+    end
+    local me = GetClientPlayer()
+    MY.RemoteRequest(string.format("%s?n=%s&i=%s&l=%s&f=%s&r=%s&c=%s&t=%s&_=%i", MY_CheckUpdate.szUrl, escape(me.szName), me.dwID, me.nLevel, me.dwForceID, me.nRoleType, me.nCamp, escape(GetTongClient().szTongName), GetCurrentTime()), function(szTitle,szContent)
         MY_CheckUpdate.bChecked = true
         local szVersion, nVersion = MY.GetVersion()
         local nLatestVersion = tonumber(MY_CheckUpdate.GetValue(szContent,'ver'))
