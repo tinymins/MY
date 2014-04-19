@@ -97,6 +97,7 @@ function _MY.UI:ctor(raw, tab)
         if not _tab.edt and szType == "WndEdit"     then _tab.edt = raw end
         if not _tab.sdw and szType == "Shadow"      then _tab.sdw = raw end
         if not _tab.hdl and szType == "Handle"      then _tab.hdl = raw end
+        if not _tab.frm and szType == "WndFrame"    then _tab.frm = raw end
         if szType=="WndEditBox" then
             _tab.wnd = _tab.wnd or raw
             _tab.hdl = _tab.hdl or raw:Lookup('','')
@@ -130,7 +131,11 @@ end
 -- clone and return a new class
 function _MY.UI:clone(eles)
     eles = eles or self.eles
-    return _MY.UI.new({eles = eles})
+    local _eles = {}
+    for i = 1, #eles, 1 do
+        if eles[i].raw then table.insert(_eles, self:raw2ele(eles[i].raw)) end
+    end
+    return _MY.UI.new({eles = _eles})
 end
 
 -- conv raw to eles array
@@ -139,12 +144,13 @@ function _MY.UI:raw2ele(raw, tab)
     local _tab = { raw = raw }
     if type(tab)=="table" then for k, v in pairs(tab) do _tab[k]=v end end
     local szType = raw.szMyuiType or raw:GetType()
-    if not _tab.txt and szType == "Text" then        _tab.txt = raw end
-    if not _tab.img and szType == "Image" then       _tab.img = raw end
+    if not _tab.txt and szType == "Text"        then _tab.txt = raw end
+    if not _tab.img and szType == "Image"       then _tab.img = raw end
     if not _tab.chk and szType == "WndCheckBox" then _tab.chk = raw end
-    if not _tab.edt and szType == "WndEdit" then     _tab.edt = raw end
-    if not _tab.sdw and szType == "Shadow" then      _tab.sdw = raw end
-    if not _tab.hdl and szType == "Handle" then      _tab.hdl = raw end
+    if not _tab.edt and szType == "WndEdit"     then _tab.edt = raw end
+    if not _tab.sdw and szType == "Shadow"      then _tab.sdw = raw end
+    if not _tab.hdl and szType == "Handle"      then _tab.hdl = raw end
+    if not _tab.frm and szType == "WndFrame"    then _tab.frm = raw end
     if szType=="WndEditBox" then
         _tab.wnd = _tab.wnd or raw
         _tab.hdl = _tab.hdl or raw:Lookup('','')
@@ -429,31 +435,63 @@ end
 
 -- get raw
 -- same as jQuery[index]
-function _MY.UI:raw(index)
+function _MY.UI:raw(index, key)
+    key = key or 'raw'
     local eles = self.eles
     if index < 0 then index = #eles + index + 1 end
-    if index > 0 and index <= #eles then return eles[index].raw end
+    if index > 0 and index <= #eles then return eles[index][key] end
+end
+
+-- get ele
+function _MY.UI:ele(index)
+    local eles, ele = self.eles, {}
+    if index < 0 then index = #eles + index + 1 end
+    if index > 0 and index <= #eles then 
+        for k, v in pairs(eles[index]) do
+            ele[k] = v
+        end
+    end
+    return ele
+end
+
+-- get frm
+function _MY.UI:frm(index)
+    local eles = {}
+    if index < 0 then index = #self.eles + index + 1 end
+    if index > 0 and index <= #self.eles and self.eles[index].frm then
+        table.insert(eles, { raw = self.eles[index].frm })
+    end
+    return self:clone(eles)
 end
 
 -- get wnd
 function _MY.UI:wnd(index)
-    local eles = self.eles
-    if index < 0 then index = #eles + index + 1 end
-    if index > 0 and index <= #eles then return eles[index].wnd end
+    local eles = {}
+    if index < 0 then index = #self.eles + index + 1 end
+    if index > 0 and index <= #self.eles and self.eles[index].wnd then
+        table.insert(eles, { raw = self.eles[index].wnd })
+    end
+    return self:clone(eles)
 end
 
 -- get item
 function _MY.UI:itm(index)
-    local eles = self.eles
+    local eles = {}
     if index < 0 then index = #eles + index + 1 end
-    if index > 0 and index <= #eles then return eles[index].itm end
+    if index > 0 and index <= #self.eles and self.eles[index].itm then
+        table.insert(eles, { raw = self.eles[index].itm })
+    end
+    return self:clone(eles)
 end
 
 -- get handle
 function _MY.UI:hdl(index)
-    local eles = self.eles
+    local eles = {}
     if index < 0 then index = #eles + index + 1 end
-    if index > 0 and index <= #eles then return eles[index].hdl end
+    if index > 0 and index <= #self.eles and self.eles[index].hdl then
+        table.insert(eles, { raw = self.eles[index].hdl })
+    end
+    return self:clone(eles)
 end
 
 -----------------------------------------------------------
@@ -683,6 +721,36 @@ function _MY.UI:toggle(bShow)
     return self
 end
 
+-- drag area
+-- (self) drag(boolean bEnableDrag) -- enable/disable drag
+-- (self) drag(number x, number y, number w, number h) -- set drag positon and area
+function _MY.UI:drag(x, y, w, h)
+    if type(x) == 'boolean' then
+        for _, ele in pairs(self.eles) do
+            pcall(function() (ele.frm or ele.raw):EnableDrag(x) end)
+        end
+        return self
+    elseif x or y or w or h then
+        for i = 1, #self.eles, 1 do
+            local s, err =pcall(function()
+                local _w, _h = self:eq(i):size()
+                x, y, w, h = x or 0, y or 0, w or _w, h or _h
+                self:frm(i):raw(1):SetDragArea(x, y, w, h)
+                Output(x, y, w, h)
+            end)
+            Output(err)
+        end
+        return self
+    else
+        -- select the first item
+        local ele = self.eles[1]
+        -- try to get its name
+        local status, err = pcall(function() return (ele.frm or ele.raw):IsDragable() end)
+        -- if succeed then return its name
+        if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:drag' ,1) return nil end
+    end
+end
+
 -- get/set ui object text
 function _MY.UI:text(szText)
     if szText then
@@ -768,7 +836,8 @@ end
 function _MY.UI:fadeIn(nTime, callback)
     nTime = nTime or 300
     for i = 1, #self.eles, 1 do
-        self:eq(i):data('nOpacity', self:eq(i):alpha())
+        local ele = self:eq(i)
+        if ele:alpha() > 0 then ele:data('nOpacity', ele:alpha()) end
     end
     self:fadeTo(nTime, 0, callback)
     return self
@@ -816,7 +885,8 @@ end
 function _MY.UI:slideUp(nTime, callback)
     nTime = nTime or 300
     for i = 1, #self.eles, 1 do
-        self:eq(i):data('nSlideTo', self:eq(i):height())
+        local ele = self:eq(i)
+        if ele:height() > 0 then ele:data('nSlideTo', ele:height()) end
     end
     self:slideTo(nTime, 0, callback)
     return self
