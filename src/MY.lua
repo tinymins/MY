@@ -851,8 +851,10 @@ MY.RedrawTabPanel = function()
                 this:Lookup("","Image_TabBox_Background_Sel"):Show()
                 local frame = MY.GetFrame():Lookup("Window_Main"):GetFirstChild()
                 while frame do
-                    local status, err = pcall(frame.fn.OnPanelDeactive, frame)
-                    if not status then MY.Debug(err..'\n','MY#OnPanelDeactive',1) end
+                    if frame.fn.OnPanelDeactive then
+                        local status, err = pcall(frame.fn.OnPanelDeactive, frame)
+                        if not status then MY.Debug(err..'\n','MY#OnPanelDeactive',1) end
+                    end
                     frame:Destroy()
                     frame = frame:GetNext()
                 end
@@ -868,8 +870,10 @@ MY.RedrawTabPanel = function()
                     end
                 end
                 Wnd.CloseWindow(fx)
-                local status, err = pcall(tTab.fn.OnPanelActive, mainpanel)
-                if not status then MY.Debug(err..'\n','MY#OnPanelActive',1) end
+                if tTab.fn.OnPanelActiv then
+                    local status, err = pcall(tTab.fn.OnPanelActive, mainpanel)
+                    if not status then MY.Debug(err..'\n','MY#OnPanelActive',1) end
+                end
             end
         end
         Wnd.CloseWindow(fx)
