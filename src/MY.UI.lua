@@ -836,10 +836,8 @@ end
 function _MY.UI:fadeIn(nTime, callback)
     nTime = nTime or 300
     for i = 1, #self.eles, 1 do
-        local ele = self:eq(i)
-        if ele:alpha() > 0 then ele:data('nOpacity', ele:alpha()) end
+        self:eq(i):fadeTo(nTime, self:eq(i):data('nOpacity') or 255, callback)
     end
-    self:fadeTo(nTime, 0, callback)
     return self
 end
 
@@ -847,8 +845,10 @@ end
 function _MY.UI:fadeOut(nTime, callback)
     nTime = nTime or 300
     for i = 1, #self.eles, 1 do
-        self:eq(i):fadeTo(nTime, self:eq(i):data('nOpacity') or 255, callback)
+        local ele = self:eq(i)
+        if ele:alpha() > 0 then ele:data('nOpacity', ele:alpha()) end
     end
+    self:fadeTo(nTime, 0, callback)
     return self
 end
 
