@@ -626,7 +626,7 @@ function _MY.UI:append(szName, szType, tArg)
             if ele.hdl then
                 -- append from xml
                 local nCount = ele.hdl:GetItemCount()
-                ele.hdl:AppendItemFromString(szName)
+                pcall(function() ele.hdl:AppendItemFromString(szName) end)
                 local hnd 
                 for i = nCount, ele.hdl:GetItemCount()-1, 1 do
                     hnd = ele.hdl:Lookup(i)
@@ -817,7 +817,7 @@ function _MY.UI:fadeTo(nTime, nOpacity, callback)
             MY.BreatheCall(function() 
                 local nCurrentAlpha = fnCurrent(nStartAlpha, nOpacity, nTime, GetTime()-nStartTime)
                 ele:alpha(nCurrentAlpha)
-                MY.Debug(string.format('%d %d %d %d\n', nStartAlpha, nOpacity, nCurrentAlpha, (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity)), 'fade', 0)
+                -- MY.Debug(string.format('%d %d %d %d\n', nStartAlpha, nOpacity, nCurrentAlpha, (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity)), 'fade', 0)
                 if (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity) <= 0 then
                     ele:alpha(nOpacity)
                     if nOpacity == 0 then
@@ -866,7 +866,7 @@ function _MY.UI:slideTo(nTime, nHeight, callback)
             MY.BreatheCall(function() 
                 local nCurrentValue = fnCurrent(nStartValue, nHeight, nTime, GetTime()-nStartTime)
                 ele:height(nCurrentValue)
-                MY.Debug(string.format('%d %d %d %d\n', nStartValue, nHeight, nCurrentValue, (nStartValue - nCurrentValue)*(nCurrentValue - nHeight)), 'slide', 0)
+                -- MY.Debug(string.format('%d %d %d %d\n', nStartValue, nHeight, nCurrentValue, (nStartValue - nCurrentValue)*(nCurrentValue - nHeight)), 'slide', 0)
                 if (nStartValue - nCurrentValue)*(nCurrentValue - nHeight) <= 0 then
                     ele:height(nHeight)
                     if nHeight == 0 then
