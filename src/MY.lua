@@ -1109,5 +1109,5 @@ Target_AppendAddonMenu( { _MY.GetTargetAddonMenu } )
 if _MY.nDebugLevel <3 then RegisterEvent("CALL_LUA_ERROR", function() OutputMessage("MSG_SYS", arg0) end) end
 
 -- MY.RegisterEvent("CUSTOM_DATA_LOADED", _MY.Init)
--- MY.RegisterEvent("LOADING_END", _MY.Init)
-MY.RegisterEvent("PLAYER_ENTER_GAME", _MY.Init)
+MY.RegisterEvent("LOADING_END", _MY.Init)
+-- MY.RegisterEvent("PLAYER_ENTER_GAME", _MY.Init)
