@@ -34,7 +34,7 @@ local _MY = {
     hBox = nil,
     hRequest = nil,
     bLoaded = false,
-    nDebugLevel = 4,
+    nDebugLevel = 0,
     dwVersion = 0x0000300,
     szBuildDate = "20140419",
     szName = _L["mingyi plugins"],
@@ -704,16 +704,20 @@ end
     fnAction	-- 循环呼吸调用函数，设为 nil 则表示取消这个 key 下的呼吸处理函数
     nTime		-- 调用间隔，单位：毫秒，默认为 62.5，即每秒调用 16次，其值自动被处理成 62.5 的整倍数
 ]]
-MY.BreatheCall = function(szKey, fnAction, nTime)
-	local key = StringLowerW(szKey)
+MY.BreatheCall = function(fnAction, nInterval, szName)
+	szName = StringLowerW(szName)
 	if type(fnAction) == "function" then
 		local nFrame = 1
-		if nTime and nTime > 0 then
-			nFrame = math.ceil(nTime / 62.5)
+		if nInterval and nInterval > 0 then
+			nFrame = math.ceil(nInterval / 62.5)
 		end
-		_MY.tBreatheCall[key] = { fnAction = fnAction, nNext = GetLogicFrameCount() + 1, nFrame = nFrame }
-	else
-		_MY.tBreatheCall[key] = nil
+		table.insert( _MY.tBreatheCall, { szName = szName, fnAction = fnAction, nNext = GetLogicFrameCount() + 1, nFrame = nFrame } )
+	elseif type(fnAction) == "string" then
+        for i = #_MY.tBreatheCall, 1, -1 do
+            if _MY.tBreatheCall[i].szName == fnAction then
+                table.remove(_MY.tBreatheCall, i)
+            end
+        end
 	end
 end
 --[[ 改变呼吸调用频率
@@ -1001,15 +1005,17 @@ end
 MY.OnFrameBreathe = function()
 	-- run breathe calls
 	local nFrame = GetLogicFrameCount()
-	for k, v in pairs(_MY.tBreatheCall) do
-		if nFrame >= v.nNext then
-			v.nNext = nFrame + v.nFrame
-			local res, err = pcall(v.fnAction)
-			if not res then
-				MY.Debug("BreatheCall#" .. k .." ERROR: " .. err)
-			end
-		end
-	end
+    for i = #_MY.tBreatheCall, 1, -1 do
+        if nFrame >= _MY.tBreatheCall[i].nNext then
+            _MY.tBreatheCall[i].nNext = nFrame + _MY.tBreatheCall[i].nFrame
+            local res, err = pcall(_MY.tBreatheCall[i].fnAction)
+            if not res then
+                MY.Debug("BreatheCall#" .. (_MY.tBreatheCall[i].szName or ('anonymous_'..i)) .." ERROR: " .. err)
+            elseif err == 0 then    -- function return 0 means to stop its breathe
+                table.remove(_MY.tBreatheCall, i)
+            end
+        end
+    end
     -- run delay calls
     local nTime = GetTime()
     for i = #_MY.tDelayCall, 1, -1 do
