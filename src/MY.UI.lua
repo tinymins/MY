@@ -643,6 +643,38 @@ function _MY.UI:data(key, value)
     end
 end
 
+-- show
+function _MY.UI:show()
+    for _, ele in pairs(self.eles) do
+        pcall(function() ele.raw:Show() end)
+        pcall(function() ele.hdl:Show() end)
+    end
+    return self
+end
+
+-- hide
+function _MY.UI:hide()
+    for _, ele in pairs(self.eles) do
+        pcall(function() ele.raw:Hide() end)
+        pcall(function() ele.hdl:Hide() end)
+    end
+    return self
+end
+
+-- visiable
+function _MY.UI:visiable(bVisiable)
+    if type(bVisiable)=='boolean' then
+        return self:toggle(bVisiable)
+    else -- get
+        -- select the first item
+        local ele = self.eles[1]
+        -- try to get its name
+        local status, err = pcall(function() return ele.raw:IsVisible() end)
+        -- if succeed then return its name
+        if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:visiable' ,1) return nil end
+    end
+end
+
 -- show/hide eles
 function _MY.UI:toggle(bShow)
     for _, ele in pairs(self.eles) do
