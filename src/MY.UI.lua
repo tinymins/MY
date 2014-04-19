@@ -851,14 +851,12 @@ function _MY.UI:fadeTo(nTime, nOpacity, callback)
             end
             if not ele:visiable() then ele:alpha(0):toggle(true) end
             MY.BreatheCall(function() 
+                ele:show()
                 local nCurrentAlpha = fnCurrent(nStartAlpha, nOpacity, nTime, GetTime()-nStartTime)
                 ele:alpha(nCurrentAlpha)
                 -- MY.Debug(string.format('%d %d %d %d\n', nStartAlpha, nOpacity, nCurrentAlpha, (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity)), 'fade', 0)
                 if (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity) <= 0 then
-                    ele:alpha(nOpacity)
-                    if nOpacity == 0 then
-                        ele:toggle(false)
-                    end
+                    ele:alpha(nOpacity):toggle(nOpacity ~= 0)
                     pcall(callback)
                     return 0
                 end
@@ -903,14 +901,12 @@ function _MY.UI:slideTo(nTime, nHeight, callback)
             end
             if not ele:visiable() then ele:height(0):toggle(true) end
             MY.BreatheCall(function() 
+                ele:show()
                 local nCurrentValue = fnCurrent(nStartValue, nHeight, nTime, GetTime()-nStartTime)
                 ele:height(nCurrentValue)
                 -- MY.Debug(string.format('%d %d %d %d\n', nStartValue, nHeight, nCurrentValue, (nStartValue - nCurrentValue)*(nCurrentValue - nHeight)), 'slide', 0)
                 if (nStartValue - nCurrentValue)*(nCurrentValue - nHeight) <= 0 then
-                    ele:height(nHeight)
-                    if nHeight == 0 then
-                        ele:toggle(false)
-                    end
+                    ele:height(nHeight):toggle( nHeight ~= 0 )
                     pcall(callback)
                     return 0
                 end
@@ -1149,6 +1145,15 @@ function _MY.UI:handleStyle(dwStyle)
         for _, ele in pairs(self.eles) do
             pcall(function() ele.hdl:SetHandleStyle(dwStyle) end)
         end
+    end
+    return self
+end
+
+-- (self) Instance:bringToTop()
+function _MY.UI:bringToTop()
+    self:_checksum()
+    for _, ele in pairs(self.eles) do
+        pcall(function() ele.frm:BringToTop() end)
     end
     return self
 end
