@@ -624,6 +624,25 @@ end
 -- my ui property visitors
 -----------------------------------------------------------
 
+-- data set/get
+function _MY.UI:data(key, value)
+    if key and value then -- set name
+        for _, ele in pairs(self.eles) do
+            pcall(function() ele.raw[key] = value end)
+        end
+        return self
+    elseif key then -- get
+        -- select the first item
+        local ele = self.eles[1]
+        -- try to get its name
+        local status, err = pcall(function() return ele.raw[key] end)
+        -- if succeed then return its name
+        if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:data' ,1) return nil end
+    else
+        return self
+    end
+end
+
 -- show/hide eles
 function _MY.UI:toggle(bShow)
     for _, ele in pairs(self.eles) do
@@ -683,6 +702,101 @@ function _MY.UI:alpha(nAlpha)
     end
 end
 
+-- (self) Instance:fadeTo(nTime, nOpacity, callback)
+function _MY.UI:fadeTo(nTime, nOpacity, callback)
+    if nTime and nOpacity then
+        for i = 1, #self.eles, 1 do
+            local ele = self:eq(i)
+            local nStartAlpha = ele:alpha()
+            local nStartTime = GetTime()
+            local fnCurrent = function(nStart, nEnd, nTotalTime, nDuringTime)
+                return ( nEnd - nStart ) * nDuringTime / nTotalTime + nStart -- 线性模型
+            end
+            ele:toggle(true)
+            MY.BreatheCall(function() 
+                local nCurrentAlpha = fnCurrent(nStartAlpha, nOpacity, nTime, GetTime()-nStartTime)
+                ele:alpha(nCurrentAlpha)
+                MY.Debug(string.format('%d %d %d %d\n', nStartAlpha, nOpacity, nCurrentAlpha, (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity)), 'fade', 0)
+                if (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity) <= 0 then
+                    ele:alpha(nOpacity)
+                    if nOpacity == 0 then
+                        ele:toggle(false)
+                    end
+                    pcall(callback)
+                    return 0
+                end
+            end)
+        end
+    end
+    return self
+end
+
+-- (self) Instance:fadeIn(nTime, callback)
+function _MY.UI:fadeIn(nTime, callback)
+    nTime = nTime or 300
+    for i = 1, #self.eles, 1 do
+        self:eq(i):data('nOpacity', self:eq(i):alpha())
+    end
+    self:fadeTo(nTime, 0, callback)
+    return self
+end
+
+-- (self) Instance:fadeOut(nTime, callback)
+function _MY.UI:fadeOut(nTime, callback)
+    nTime = nTime or 300
+    for i = 1, #self.eles, 1 do
+        self:eq(i):fadeTo(nTime, self:eq(i):data('nOpacity') or 255, callback)
+    end
+    return self
+end
+
+-- (self) Instance:slideTo(nTime, nHeight, callback)
+function _MY.UI:slideTo(nTime, nHeight, callback)
+    if nTime and nHeight then
+        for i = 1, #self.eles, 1 do
+            local ele = self:eq(i)
+            local nStartValue = ele:height()
+            local nStartTime = GetTime()
+            local fnCurrent = function(nStart, nEnd, nTotalTime, nDuringTime)
+                return ( nEnd - nStart ) * nDuringTime / nTotalTime + nStart -- 线性模型
+            end
+            ele:toggle(true)
+            MY.BreatheCall(function() 
+                local nCurrentValue = fnCurrent(nStartValue, nHeight, nTime, GetTime()-nStartTime)
+                ele:height(nCurrentValue)
+                MY.Debug(string.format('%d %d %d %d\n', nStartValue, nHeight, nCurrentValue, (nStartValue - nCurrentValue)*(nCurrentValue - nHeight)), 'slide', 0)
+                if (nStartValue - nCurrentValue)*(nCurrentValue - nHeight) <= 0 then
+                    ele:height(nHeight)
+                    if nHeight == 0 then
+                        ele:toggle(false)
+                    end
+                    pcall(callback)
+                    return 0
+                end
+            end)
+        end
+    end
+    return self
+end
+
+-- (self) Instance:slideUp(nTime, callback)
+function _MY.UI:slideUp(nTime, callback)
+    nTime = nTime or 300
+    for i = 1, #self.eles, 1 do
+        self:eq(i):data('nSlideTo', self:eq(i):height())
+    end
+    self:slideTo(nTime, 0, callback)
+    return self
+end
+
+-- (self) Instance:slideDown(nTime, callback)
+function _MY.UI:slideDown(nTime, callback)
+    nTime = nTime or 300
+    for i = 1, #self.eles, 1 do
+        self:eq(i):slideTo(nTime, self:eq(i):data('nSlideTo'), callback)
+    end
+    return self
+end
 
 -- (number) Instance:font()
 -- (self) Instance:font(number nFont)
