@@ -553,7 +553,6 @@ function _MY.UI:append(szName, szType, tArg)
                         end
                         wnd:Lookup('WndButton_Up').OnLButtonDown = function()
                             wnd:Lookup("WndNewScrollBar_Default"):ScrollPrev(1)
-                            Output(1)
                         end
                         wnd:Lookup('WndButton_Down').OnLButtonDown = function()
                             wnd:Lookup("WndNewScrollBar_Default"):ScrollNext(1)
@@ -736,9 +735,7 @@ function _MY.UI:drag(x, y, w, h)
                 local _w, _h = self:eq(i):size()
                 x, y, w, h = x or 0, y or 0, w or _w, h or _h
                 self:frm(i):raw(1):SetDragArea(x, y, w, h)
-                Output(x, y, w, h)
             end)
-            Output(err)
         end
         return self
     else
