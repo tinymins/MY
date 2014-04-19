@@ -130,6 +130,7 @@ end
 -- clone
 -- clone and return a new class
 function _MY.UI:clone(eles)
+    self:_checksum()
     eles = eles or self.eles
     local _eles = {}
     for i = 1, #eles, 1 do
@@ -178,9 +179,21 @@ function _MY.UI:raw2ele(raw, tab)
     return _tab
 end
 
+--  del bad eles
+-- (self) _checksum()
+function _MY.UI:_checksum()
+    for i = #self.eles, 1, -1 do
+        local ele = self.eles[i]
+        local status, err = pcall(function() return ele.raw:GetType() end)
+        if (not status) or (err=='') then table.remove(self.eles, i) end
+    end
+    return self
+end
+
 -- add a ele to object
 -- same as jQuery.add()
 function _MY.UI:add(raw, tab)
+    self:_checksum()
     local eles = {}
     for i = 1, #self.eles, 1 do
         table.insert(eles, self.eles[i])
@@ -195,6 +208,7 @@ end
 -- delete elements from object
 -- same as jQuery.not()
 function _MY.UI:del(raw)
+    self:_checksum()
     local eles = {}
     for i = 1, #self.eles, 1 do
         table.insert(eles, self.eles[i])
@@ -251,6 +265,7 @@ end
 -- filter elements from object
 -- same as jQuery.filter()
 function _MY.UI:filter(raw)
+    self:_checksum()
     local eles = {}
     for i = 1, #self.eles, 1 do
         table.insert(eles, self.eles[i])
@@ -309,6 +324,7 @@ end
 -- get parent
 -- same as jQuery.parent()
 function _MY.UI:parent()
+    self:_checksum()
     local parent = {}
     for _, ele in pairs(self.eles) do
         parent[table.concat{ele.raw:GetParent():GetTreePath()}] = ele.raw:GetParent()
@@ -324,6 +340,7 @@ end
 -- get child
 -- same as jQuery.child()
 function _MY.UI:child(filter)
+    self:_checksum()
     local child = {}
     local childHash = {}
     for _, ele in pairs(self.eles) do
@@ -363,6 +380,7 @@ end
 -- get all children
 -- same as jQuery.children(filter)
 function _MY.UI:children(filter)
+    self:_checksum()
     local children = {}
     for _, ele in pairs(self.eles) do
         if ele.raw then for szTreePath, raw in pairs(GetChildren(ele.raw)) do
@@ -386,6 +404,7 @@ end
 -- each
 -- same as jQuery.each(function(){})
 function _MY.UI:each(fn)
+    self:_checksum()
     local eles = self.eles
     for _, ele in pairs(eles) do
         pcall(fn, ele.raw)
@@ -417,6 +436,7 @@ end
 -- slice -- index starts from 1
 -- same as jQuery.slice(selector, pos)
 function _MY.UI:slice(startpos, endpos)
+    self:_checksum()
     local eles = {}
     for i = 1, #self.eles, 1 do
         table.insert(eles, self.eles[i])
@@ -436,6 +456,7 @@ end
 -- get raw
 -- same as jQuery[index]
 function _MY.UI:raw(index, key)
+    self:_checksum()
     key = key or 'raw'
     local eles = self.eles
     if index < 0 then index = #eles + index + 1 end
@@ -444,6 +465,7 @@ end
 
 -- get ele
 function _MY.UI:ele(index)
+    self:_checksum()
     local eles, ele = self.eles, {}
     if index < 0 then index = #eles + index + 1 end
     if index > 0 and index <= #eles then 
@@ -456,6 +478,7 @@ end
 
 -- get frm
 function _MY.UI:frm(index)
+    self:_checksum()
     local eles = {}
     if index < 0 then index = #self.eles + index + 1 end
     if index > 0 and index <= #self.eles and self.eles[index].frm then
@@ -466,6 +489,7 @@ end
 
 -- get wnd
 function _MY.UI:wnd(index)
+    self:_checksum()
     local eles = {}
     if index < 0 then index = #self.eles + index + 1 end
     if index > 0 and index <= #self.eles and self.eles[index].wnd then
@@ -476,6 +500,7 @@ end
 
 -- get item
 function _MY.UI:itm(index)
+    self:_checksum()
     local eles = {}
     if index < 0 then index = #eles + index + 1 end
     if index > 0 and index <= #self.eles and self.eles[index].itm then
@@ -486,6 +511,7 @@ end
 
 -- get handle
 function _MY.UI:hdl(index)
+    self:_checksum()
     local eles = {}
     if index < 0 then index = #eles + index + 1 end
     if index > 0 and index <= #self.eles and self.eles[index].hdl then
@@ -501,6 +527,7 @@ end
 -- remove
 -- same as jQuery.remove()
 function _MY.UI:remove()
+    self:_checksum()
     for _, ele in pairs(self.eles) do
         pcall(function() ele.fnDestroy(ele.raw) end)
         if ele.raw:GetType() == "WndFrame" then
@@ -528,6 +555,7 @@ _MY.tItemXML = {
 -- Instance:append(szName, szType, tArg)
 -- Instance:append(szItemString)
 function _MY.UI:append(szName, szType, tArg)
+    self:_checksum()
     if szType then
         for _, ele in pairs(self.eles) do
             if ( string.sub(szType, 1, 3) == "Wnd" and ele.wnd ) then
@@ -646,6 +674,7 @@ end
 -- clear handle
 -- (self) Instance:clear()
 function _MY.UI:clear()
+    self:_checksum()
     for _, ele in pairs(self.eles) do
         if ele.hdl then
             pcall(function() ele.hdl:Clear() end)
@@ -663,6 +692,7 @@ end
 
 -- data set/get
 function _MY.UI:data(key, value)
+    self:_checksum()
     if key and value then -- set name
         for _, ele in pairs(self.eles) do
             pcall(function() ele.raw[key] = value end)
@@ -682,6 +712,7 @@ end
 
 -- show
 function _MY.UI:show()
+    self:_checksum()
     for _, ele in pairs(self.eles) do
         pcall(function() ele.raw:Show() end)
         pcall(function() ele.hdl:Show() end)
@@ -691,6 +722,7 @@ end
 
 -- hide
 function _MY.UI:hide()
+    self:_checksum()
     for _, ele in pairs(self.eles) do
         pcall(function() ele.raw:Hide() end)
         pcall(function() ele.hdl:Hide() end)
@@ -700,6 +732,7 @@ end
 
 -- visiable
 function _MY.UI:visiable(bVisiable)
+    self:_checksum()
     if type(bVisiable)=='boolean' then
         return self:toggle(bVisiable)
     else -- get
@@ -714,6 +747,7 @@ end
 
 -- show/hide eles
 function _MY.UI:toggle(bShow)
+    self:_checksum()
     for _, ele in pairs(self.eles) do
         pcall(function() if bShow == false or (not bShow and ele.raw:IsVisible()) then ele.raw:Hide() ele.hdl:Hide() else ele.raw:Show() ele.hdl:Show() end end)
     end
@@ -724,6 +758,7 @@ end
 -- (self) drag(boolean bEnableDrag) -- enable/disable drag
 -- (self) drag(number x, number y, number w, number h) -- set drag positon and area
 function _MY.UI:drag(x, y, w, h)
+    self:_checksum()
     if type(x) == 'boolean' then
         for _, ele in pairs(self.eles) do
             pcall(function() (ele.frm or ele.raw):EnableDrag(x) end)
@@ -750,6 +785,7 @@ end
 
 -- get/set ui object text
 function _MY.UI:text(szText)
+    self:_checksum()
     if szText then
         for _, ele in pairs(self.eles) do
             pcall(function() (ele.txt or ele.edt or ele.raw):SetText(szText) end)
@@ -768,6 +804,7 @@ end
 
 -- get/set ui object name
 function _MY.UI:name(szText)
+    self:_checksum()
     if szText then -- set name
         for _, ele in pairs(self.eles) do
             pcall(function() ele.raw:SetName(szText) end)
@@ -785,6 +822,7 @@ end
 
 -- get/set ui alpha
 function _MY.UI:alpha(nAlpha)
+    self:_checksum()
     if nAlpha then -- set name
         for _, ele in pairs(self.eles) do
             pcall(function() ele.raw:SetAlpha(nAlpha) end)
@@ -802,6 +840,7 @@ end
 
 -- (self) Instance:fadeTo(nTime, nOpacity, callback)
 function _MY.UI:fadeTo(nTime, nOpacity, callback)
+    self:_checksum()
     if nTime and nOpacity then
         for i = 1, #self.eles, 1 do
             local ele = self:eq(i)
@@ -831,6 +870,7 @@ end
 
 -- (self) Instance:fadeIn(nTime, callback)
 function _MY.UI:fadeIn(nTime, callback)
+    self:_checksum()
     nTime = nTime or 300
     for i = 1, #self.eles, 1 do
         self:eq(i):fadeTo(nTime, self:eq(i):data('nOpacity') or 255, callback)
@@ -840,6 +880,7 @@ end
 
 -- (self) Instance:fadeOut(nTime, callback)
 function _MY.UI:fadeOut(nTime, callback)
+    self:_checksum()
     nTime = nTime or 300
     for i = 1, #self.eles, 1 do
         local ele = self:eq(i)
@@ -851,6 +892,7 @@ end
 
 -- (self) Instance:slideTo(nTime, nHeight, callback)
 function _MY.UI:slideTo(nTime, nHeight, callback)
+    self:_checksum()
     if nTime and nHeight then
         for i = 1, #self.eles, 1 do
             local ele = self:eq(i)
@@ -880,6 +922,7 @@ end
 
 -- (self) Instance:slideUp(nTime, callback)
 function _MY.UI:slideUp(nTime, callback)
+    self:_checksum()
     nTime = nTime or 300
     for i = 1, #self.eles, 1 do
         local ele = self:eq(i)
@@ -891,6 +934,7 @@ end
 
 -- (self) Instance:slideDown(nTime, callback)
 function _MY.UI:slideDown(nTime, callback)
+    self:_checksum()
     nTime = nTime or 300
     for i = 1, #self.eles, 1 do
         self:eq(i):slideTo(nTime, self:eq(i):data('nSlideTo'), callback)
@@ -901,6 +945,7 @@ end
 -- (number) Instance:font()
 -- (self) Instance:font(number nFont)
 function _MY.UI:font(nFont)
+    self:_checksum()
     if nFont then-- set name
         for _, ele in pairs(self.eles) do
             pcall(function() ele.raw:SetFontScheme(nFont) end)
@@ -919,6 +964,7 @@ end
 -- (number, number, number) Instance:color()
 -- (self) Instance:color(number nRed, number nGreen, number nBlue)
 function _MY.UI:color(nRed, nGreen, nBlue)
+    self:_checksum()
     if type(nRed) == "table" then
         nBlue = nRed[3]
         nGreen = nRed[2]
@@ -965,6 +1011,7 @@ end
 -- (number, number) Instance:pos()
 -- (self) Instance:pos(nLeft, nTop)
 function _MY.UI:pos(nLeft, nTop)
+    self:_checksum()
     if nLeft or nTop then
         for _, ele in pairs(self.eles) do
             local _nLeft, _nTop = ele.raw:GetRelPos()
@@ -1012,6 +1059,7 @@ end
 -- (number, number) Instance:size()
 -- (self) Instance:size(nLeft, nTop)
 function _MY.UI:size(nWidth, nHeight)
+    self:_checksum()
     if nWidth or nHeight then
         for _, ele in pairs(self.eles) do
             local _nWidth, _nHeight = ele.raw:GetSize()
@@ -1052,6 +1100,7 @@ end
 -- (boolean) Instance:multiLine()
 -- (self) Instance:multiLine(bMultiLine)
 function _MY.UI:multiLine(bMultiLine)
+    self:_checksum()
     if type(bMultiLine)=='boolean' then
         for _, ele in pairs(self.eles) do
             pcall(function() ele.edt:SetMultiLine(bMultiLine) end)
@@ -1073,6 +1122,7 @@ end
 -- (self) Instance:image(szImageAndFrame)
 -- (self) Instance:image(szImage, nFrame)
 function _MY.UI:image(szImage, nFrame)
+    self:_checksum()
     if szImage then
         nFrame = nFrame or string.gsub(szImage, '.*%|(%d+)', '%1')
         szImage = string.gsub(szImage, '%|.*', '')
@@ -1094,6 +1144,7 @@ end
 
 -- (self) Instance:handleStyle(dwStyle)
 function _MY.UI:handleStyle(dwStyle)
+    self:_checksum()
     if dwStyle then
         for _, ele in pairs(self.eles) do
             pcall(function() ele.hdl:SetHandleStyle(dwStyle) end)
@@ -1116,6 +1167,7 @@ end
       -1    右键
 ]]
 function _MY.UI:click(fnLeft, fnRight, fnMiddle)
+    self:_checksum()
     for _, ele in pairs(self.eles) do
         if type(fnLeft)=="function" then
             fnRight = fnRight or fnLeft
@@ -1157,6 +1209,7 @@ end
     :hover(fnHover[, fnLeave]) 绑定
 ]]
 function _MY.UI:hover(fnHover, fnLeave)
+    self:_checksum()
     fnLeave = fnLeave or fnHover
     if fnHover then
         for _, ele in pairs(self.eles) do
@@ -1175,6 +1228,7 @@ end
     :check(bool bChecked)   勾选/取消勾选
 ]]
 function _MY.UI:check(fnCheck, fnUncheck)
+    self:_checksum()
     fnUncheck = fnUncheck or fnCheck
     if type(fnCheck)=="function" then
         for _, ele in pairs(self.eles) do
@@ -1204,6 +1258,7 @@ end
     :change()   调用处理函数
 ]]
 function _MY.UI:change(fnOnEditChanged)
+    self:_checksum()
     if fnOnEditChanged then
         for _, ele in pairs(self.eles) do
             if ele.edt then ele.edt.OnEditChanged = function() pcall(fnOnEditChanged,ele.edt:GetText()) end end
