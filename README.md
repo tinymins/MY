@@ -9,7 +9,7 @@
 
   * 最新版本：[MY-20140419.zip](http://j3my.sinaapp.com/index.html#.%2Finterface%2Fmy%2F)
   * 官方网站：<http://j3my.sinaapp.com>
-  * 历史版本：<http://j3my.sinaapp.com/index.html#.%2Finterface%2Fmy%2F%E5%8E%86%E5%8F%B2%E7%89%88%E6%9C%AC%2F>
+  * 历史版本：[History](http://j3my.sinaapp.com/index.html#.%2Finterface%2Fmy%2F%E5%8E%86%E5%8F%B2%E7%89%88%E6%9C%AC%2F)
   * 更新日志：<https://github.com/tinymins/jx3my/commits/master>
   * 建议&BUG报告：<https://github.com/tinymins/jx3my/issues>
 
