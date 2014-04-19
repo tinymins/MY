@@ -504,7 +504,7 @@ function _MY.UI:remove()
     for _, ele in pairs(self.eles) do
         pcall(function() ele.fnDestroy(ele.raw) end)
         if ele.raw:GetType() == "WndFrame" then
-            Wnd.CloseWindow(self.raw)
+            Wnd.CloseWindow(ele.raw)
         elseif string.sub(ele.raw:GetType(), 1, 3) == "Wnd" then
             ele.raw:Destroy()
         else
@@ -1142,13 +1142,13 @@ function _MY.UI:click(fnLeft, fnRight, fnMiddle)
         else
             local nFlag = fnLeft or 1
             if nFlag==1 then
-                if ele.wnd then pcall(ele.wnd.OnLButtonClick) end
-                if ele.itm then pcall(ele.itm.OnItemLButtonClick) end
+                if ele.wnd then local _this = this this = ele.wnd pcall(ele.wnd.OnLButtonClick) this = _this end
+                if ele.itm then local _this = this this = ele.itm pcall(ele.itm.OnItemLButtonClick) this = _this end
             elseif nFlag==0 then
             
             elseif nFlag==-1 then
-                if ele.wnd then pcall(ele.wnd.OnRButtonClick) end
-                if ele.itm then pcall(ele.itm.OnItemRButtonClick) end
+                if ele.wnd then local _this = this this = ele.wnd pcall(ele.wnd.OnRButtonClick) this = _this end
+                if ele.itm then local _this = this this = ele.itm pcall(ele.itm.OnItemRButtonClick) this = _this end
             end
         end
     end
@@ -1214,7 +1214,7 @@ function _MY.UI:change(fnOnEditChanged)
         return self
     else
         for _, ele in pairs(self.eles) do
-            if ele.edt then pcall(ele.edt.OnEditChanged) end
+            if ele.edt then local _this = this this = ele.edt pcall(ele.edt.OnEditChanged) this = _this  end
         end
         return self
     end
