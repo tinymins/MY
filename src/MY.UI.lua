@@ -810,7 +810,7 @@ function _MY.UI:fadeTo(nTime, nOpacity, callback)
             local fnCurrent = function(nStart, nEnd, nTotalTime, nDuringTime)
                 return ( nEnd - nStart ) * nDuringTime / nTotalTime + nStart -- 线性模型
             end
-            ele:toggle(true)
+            if not ele:visiable() then ele:alpha(0):toggle(true) end
             MY.BreatheCall(function() 
                 local nCurrentAlpha = fnCurrent(nStartAlpha, nOpacity, nTime, GetTime()-nStartTime)
                 ele:alpha(nCurrentAlpha)
@@ -859,7 +859,7 @@ function _MY.UI:slideTo(nTime, nHeight, callback)
             local fnCurrent = function(nStart, nEnd, nTotalTime, nDuringTime)
                 return ( nEnd - nStart ) * nDuringTime / nTotalTime + nStart -- 线性模型
             end
-            ele:toggle(true)
+            if not ele:visiable() then ele:height(0):toggle(true) end
             MY.BreatheCall(function() 
                 local nCurrentValue = fnCurrent(nStartValue, nHeight, nTime, GetTime()-nStartTime)
                 ele:height(nCurrentValue)
