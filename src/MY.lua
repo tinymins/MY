@@ -870,7 +870,7 @@ MY.RedrawTabPanel = function()
                     end
                 end
                 Wnd.CloseWindow(fx)
-                if tTab.fn.OnPanelActiv then
+                if tTab.fn.OnPanelActive then
                     local status, err = pcall(tTab.fn.OnPanelActive, mainpanel)
                     if not status then MY.Debug(err..'\n','MY#OnPanelActive',1) end
                 end
