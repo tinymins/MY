@@ -71,6 +71,8 @@ data = {
     -- MY_CheckUpdate.lua
     ['new version found.'] = '发现新版本！',
     ['new version found, would you want to download immediately?'] = '发现新版本！是否立即前往下载？',
+    ['download immediately'] = '立即下载',
+    ['see new feature'] = '更新日志',
     -- MY_ChatMonitor.lua
     ['chat monitor'] = '聊天监控',
     ['waiting...'] = '等待中…',
