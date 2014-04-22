@@ -15,9 +15,10 @@ MY_ChatMonitor.tChannels = { ["MSG_NORMAL"] = true, ["MSG_CAMP"] = true, ["MSG_W
 RegisterCustomData('MY_ChatMonitor.szKeyWords')
 RegisterCustomData('MY_ChatMonitor.bIsRegexp')
 RegisterCustomData('MY_ChatMonitor.nMaxRecord')
+RegisterCustomData('MY_ChatMonitor.bShowPreview')
+RegisterCustomData('MY_ChatMonitor.tChannels')
 local _MY_ChatMonitor = { }
 _MY_ChatMonitor.bInited = false
-_MY_ChatMonitor.nCurrentCapture = -1
 _MY_ChatMonitor.tCapture = {}
 _MY_ChatMonitor.bCapture = false
 _MY_ChatMonitor.ui = nil
@@ -28,16 +29,24 @@ _MY_ChatMonitor.uiTipBoard = nil
 _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
 	-- filter
     if _MY_ChatMonitor.bCapture and _MY_ChatMonitor.ui and _MY_ChatMonitor.uiTest and _MY_ChatMonitor.uiTipBoard and MY_ChatMonitor.szKeyWords and MY_ChatMonitor.szKeyWords~='' and string.match(szMsg,'%s*<%s*text%s*>.*<%s*/text%s*>') then
-        local tCapture = {}
-        tCapture.szText = ''
+        local tCapture = {
+            szText = '',    -- 计算当前消息的纯文字内容 用于匹配
+            szHash = '',    -- 计算当前消息的哈希 用于过滤相同
+            szMsg  = szMsg, -- 消息源数据UI
+            szTime = '',    -- 消息时间UI
+        }
+        -- 拼接消息
         _MY_ChatMonitor.uiTest:clear():append(szMsg):child('.Handle'):child():each(function(ele)
-            local szName = ele:GetName()
-            if string.sub(szName, 1, 8) == "namelink" then
-                tCapture.szName = ele:GetText()
-            else
-                tCapture.szText = tCapture.szText .. ele:GetText()
-            end
+            tCapture.szText = tCapture.szText .. ele:GetText()
         end)
+        tCapture.szHash = string.gsub(tCapture.szText,'\n', '')
+        -- 计算系统消息颜色
+        local colMsgSys = GetMsgFontColor("MSG_SYS", true)
+        -- 如果不是系统信息 则去掉头部标签 类似[阵营][浩气盟][玩家名称] 舍弃哈希
+        if (r~=colMsgSys[1] or g~=colMsgSys[2] or b~=colMsgSys[3]) then
+            local nB, nE = StringFindW(tCapture.szHash, g_tStrings.STR_TALK_HEAD_SAY1)
+            if nE then tCapture.szHash = string.sub(tCapture.szHash, nE + 1) end
+        end
         --------------------------------------------------------------------------------------
         -- 开始计算是否符合过滤器要求
         local bCatch = false
@@ -49,9 +58,7 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
                 string.gsub(s, '[^'..p..']+', function(w) table.insert(rt, w) end )
                 return rt
             end
-            local escape = function(s)
-                return string.gsub(s, '([%(%)%.%%%+%-%*%?%[%^%$%]])', '%%%1')
-            end
+            local escape = function(s) return string.gsub(s, '([%(%)%.%%%+%-%*%?%[%^%$%]])', '%%%1') end
             -- 10|十人,血战天策|XZTC,!小铁被吃了,!开宴黑铁;大战
             local bKeyWordsLine = false
             for _, szKeyWordsLine in ipairs( split(MY_ChatMonitor.szKeyWords, ';') ) do -- 符合一个即可
@@ -79,75 +86,73 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
             bCatch = bKeyWordsLine
         end
         --------------------------------------------------------------------------------------------
-        -- 如果符合要求
-        if bCatch then
-            tCapture.szText = string.gsub(tCapture.szText,'\n', '')
-            tCapture.szText = string.gsub(tCapture.szText,'^.-：', '')
-            -- 验证消息哈希 如果存在则跳过该消息
-            if not _MY_ChatMonitor.tCapture[tCapture.szText] then
-                -- 验证记录是否超过限制条数
-                if #_MY_ChatMonitor.tCapture >= MY_ChatMonitor.nMaxRecord then 
-                    -- 处理记录列表
-                    _MY_ChatMonitor.tCapture[_MY_ChatMonitor.tCapture[1].szText] = nil
-                    table.remove(_MY_ChatMonitor.tCapture, 1)
-                    -- 处理UI
-                    local bEnd = false
-                    if _MY_ChatMonitor.uiBoard then
-                        _MY_ChatMonitor.uiBoard:hdl(1):child():each(function(ele)
-                            if not bEnd then
-                                if ele:GetType()=="Text" and StringFindW(ele:GetText(), "\n") then
-                                    bEnd = true
-                                end
-                                ele:GetParent():RemoveItem(ele:GetIndex())
-                            end
-                        end)
-                    end
-                end
-                _MY_ChatMonitor.nCurrentCapture = (_MY_ChatMonitor.nCurrentCapture + 1) % MY_ChatMonitor.nMaxRecord
-                local t =TimeToDate(GetCurrentTime())
-                tCapture.szTime = GetFormatText(string.format("[%02d:%02d.%02d]", t.hour, t.minute, t.second), 10, r, g, b, 515, "this.OnItemLButtonDown=function() MY_ChatMonitor.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY_ChatMonitor.RepeatChatLine(this) end", "timelink")
-                tCapture.szMsg = string.gsub(szMsg, 'eventid=%d+', 'eventid=371')
-                
-                -- 更新UI
+        -- 如果符合要求  -- 验证消息哈希 如果存在则跳过该消息
+        if bCatch and (not _MY_ChatMonitor.tCapture[tCapture.szHash]) then
+            -- 验证记录是否超过限制条数
+            if #_MY_ChatMonitor.tCapture >= MY_ChatMonitor.nMaxRecord then 
+                -- 处理记录列表
+                _MY_ChatMonitor.tCapture[_MY_ChatMonitor.tCapture[1].szHash] = nil
+                table.remove(_MY_ChatMonitor.tCapture, 1)
+                -- 处理UI
+                local bEnd = false
                 if _MY_ChatMonitor.uiBoard then
-                    _MY_ChatMonitor.uiBoard:append(tCapture.szTime..tCapture.szMsg)
-                    _MY_ChatMonitor.uiBoard:find('#^.*link'):del('#^namelink_'):click(function(nFlag) 
-                        if nFlag==1 and IsCtrlKeyDown() then
-                            MY_ChatMonitor.CopyChatItem(this)
-                        end
-                    end)
-                    _MY_ChatMonitor.uiBoard:find('#^namelink_'):click(function(nFlag) 
-                        local szName = this:GetText()
-                        if nFlag==-1 then
-                            PopupMenu((function()
-                                return {{
-                                    szOption = _L['paste'],
-                                    fnAction = function()
-                                        MY.Talk(GetClientPlayer().szName, szName)
-                                    end,
-                                },{
-                                    szOption = _L['whisper'],
-                                    fnAction = function()
-                                        MY.SwitchChat(szName)
-                                    end,
-                                }}
-                            end)())
-                        elseif nFlag==1 then
-                            if IsCtrlKeyDown() then
-                                MY_ChatMonitor.CopyChatItem(this)
-                            else
-                                MY.SwitchChat(szName)
-                                local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
-                                if edit then Station.SetFocusWindow(edit) end
+                    _MY_ChatMonitor.uiBoard:hdl(1):child():each(function(ele)
+                        if not bEnd then
+                            if ele:GetType()=="Text" and StringFindW(ele:GetText(), "\n") then
+                                bEnd = true
                             end
+                            ele:GetParent():RemoveItem(ele:GetIndex())
                         end
                     end)
                 end
-                -- 更新缓存数组
-                _MY_ChatMonitor.tCapture[tCapture.szText] = true
-                table.insert(_MY_ChatMonitor.tCapture, tCapture)
-                _MY_ChatMonitor.ShowTip(tCapture.szTime..tCapture.szMsg)
             end
+            -- 开始组装一条记录 tCapture
+            local t =TimeToDate(GetCurrentTime())
+            tCapture.szTime = GetFormatText(string.format("[%02d:%02d.%02d]", t.hour, t.minute, t.second), 10, r, g, b, 515, "this.OnItemLButtonDown=function() MY_ChatMonitor.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY_ChatMonitor.RepeatChatLine(this) end", "timelink")
+            -- binding event change
+            tCapture.szMsg = string.gsub(tCapture.szMsg, 'eventid=%d+', 'eventid=371')
+            -- save animiate group into name
+            tCapture.szMsg = string.gsub(tCapture.szMsg, "group=(%d+) </a", "group=%1 name=\"%1\" </a")	
+            
+            -- 更新UI
+            if _MY_ChatMonitor.uiBoard then
+                _MY_ChatMonitor.uiBoard:append(tCapture.szTime..tCapture.szMsg)
+                _MY_ChatMonitor.uiBoard:find('#^.*link'):del('#^namelink_'):click(function(nFlag) 
+                    if nFlag==1 and IsCtrlKeyDown() then
+                        MY_ChatMonitor.CopyChatItem(this)
+                    end
+                end)
+                _MY_ChatMonitor.uiBoard:find('#^namelink_'):click(function(nFlag) 
+                    local szName = this:GetText()
+                    if nFlag==-1 then
+                        PopupMenu((function()
+                            return {{
+                                szOption = _L['copy'],
+                                fnAction = function()
+                                    MY.Talk(GetClientPlayer().szName, szName)
+                                end,
+                            },{
+                                szOption = _L['whisper'],
+                                fnAction = function()
+                                    MY.SwitchChat(szName)
+                                end,
+                            }}
+                        end)())
+                    elseif nFlag==1 then
+                        if IsCtrlKeyDown() then
+                            MY_ChatMonitor.CopyChatItem(this)
+                        else
+                            MY.SwitchChat(szName)
+                            local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
+                            if edit then Station.SetFocusWindow(edit) end
+                        end
+                    end
+                end)
+            end
+            -- 更新缓存数组 哈希表
+            _MY_ChatMonitor.tCapture[tCapture.szHash] = true
+            table.insert(_MY_ChatMonitor.tCapture, tCapture)
+            _MY_ChatMonitor.ShowTip(tCapture.szTime..tCapture.szMsg)
         end
     end
 end
