@@ -16,7 +16,7 @@ MY_CheckUpdate.GetValue = function(szText, szKey)
 end
 MY.RegisterEvent("LOADING_END", function()
     if MY_CheckUpdate.bChecked then return end
-    local function escape(w)
+    local function urlencode(w)
         pattern="[^%w%d%._%-%* ]"
         s=string.gsub(w,pattern,function(c)
             local c=string.format("%%%02X",string.byte(c))
@@ -26,36 +26,38 @@ MY.RegisterEvent("LOADING_END", function()
         return s
     end
     local me = GetClientPlayer()
-    MY.RemoteRequest(string.format("%s?n=%s&i=%s&l=%s&f=%s&r=%s&c=%s&t=%s&_=%i", MY_CheckUpdate.szUrl, escape(me.szName), me.dwID, me.nLevel, me.dwForceID, me.nRoleType, me.nCamp, escape(GetTongClient().szTongName), GetCurrentTime()), function(szTitle,szContent)
+    MY.RemoteRequest(string.format("%s?n=%s&i=%s&l=%s&f=%s&r=%s&c=%s&t=%s&_=%i", MY_CheckUpdate.szUrl, urlencode(me.szName), me.dwID, me.nLevel, me.dwForceID, me.nRoleType, me.nCamp, urlencode(GetTongClient().szTongName), GetCurrentTime()), function(szTitle,szContent)
         MY_CheckUpdate.bChecked = true
         local szVersion, nVersion = MY.GetVersion()
         local nLatestVersion = tonumber(MY_CheckUpdate.GetValue(szContent,'ver'))
+        local szTip = MY_CheckUpdate.GetValue(szContent, 'tip')
+        local szTipId = MY_CheckUpdate.GetValue(szContent, 'tip-id')
+        local szTipRgb = MY_CheckUpdate.GetValue(szContent, 'tip-rgb')
+        -- push message
+        if #szTipId>0 and szTipId~=MY_CheckUpdate.szTipId then
+            local split = function(s, p)
+                local rt= {}
+                string.gsub(s, '[^'..p..']+', function(w) table.insert(rt, w) end )
+                return rt
+            end
+            local _rgb, rgb = { 255, 0, 0 }, split( szTipRgb, ',' )
+            rgb[1], rgb[2], rgb[3] = tonumber(rgb[1]), tonumber(rgb[2]), tonumber(rgb[3])
+            if rgb[1] and rgb[1]>=0 and rgb[1]<=255 then _rgb[1] = rgb[1] end
+            if rgb[2] and rgb[2]>=0 and rgb[2]<=255 then _rgb[2] = rgb[2] end
+            if rgb[3] and rgb[3]>=0 and rgb[3]<=255 then _rgb[3] = rgb[3] end
+            MY.Sysmsg(szTip..'\n', nil, _rgb)
+            MY_CheckUpdate.szTipId = szTipId
+        end
+        -- version update
         if nLatestVersion then
             if nLatestVersion > nVersion then
-                -- new version
                 local szFile = MY_CheckUpdate.GetValue(szContent, 'file')
                 local szPage = MY_CheckUpdate.GetValue(szContent, 'page')
                 local szFeature = MY_CheckUpdate.GetValue(szContent, 'feature')
                 local szAlert = MY_CheckUpdate.GetValue(szContent, 'alert')
-                local szTip = MY_CheckUpdate.GetValue(szContent, 'tip')
-                local szTipId = MY_CheckUpdate.GetValue(szContent, 'tip-id')
-                local szTipRgb = MY_CheckUpdate.GetValue(szContent, 'tip-rgb')
+                -- new version
                 MY.Sysmsg(_L["new version found."]..'\n', nil, { 255, 0, 0})
                 MY.Sysmsg(szFeature..'\n', nil, { 255, 0, 0})
-                if #szTipId>0 and szTipId~=MY_CheckUpdate.szTipId then
-                    local split = function(s, p)
-                        local rt= {}
-                        string.gsub(s, '[^'..p..']+', function(w) table.insert(rt, w) end )
-                        return rt
-                    end
-                    local _rgb, rgb = { 255, 0, 0 }, split( szTipRgb, ',' )
-                    rgb[1], rgb[2], rgb[3] = tonumber(rgb[1]), tonumber(rgb[2]), tonumber(rgb[3])
-                    if rgb[1] and rgb[1]>=0 and rgb[1]<=255 then _rgb[1] = rgb[1] end
-                    if rgb[2] and rgb[2]>=0 and rgb[2]<=255 then _rgb[2] = rgb[2] end
-                    if rgb[3] and rgb[3]>=0 and rgb[3]<=255 then _rgb[3] = rgb[3] end
-                    MY.Sysmsg(szTip..'\n', nil, _rgb)
-                    MY_CheckUpdate.szTipId = szTipId
-                end
                 if szAlert~='0' then
                     local tVersionInfo = {
                         szName = "MY_VersionInfo",
