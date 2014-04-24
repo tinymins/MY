@@ -4,7 +4,6 @@ MY_CheckUpdate = {
     szTipId = nil,
 }
 RegisterCustomData('MY_CheckUpdate.szTipId')
-MY_CheckUpdate.bChecked = false
 MY_CheckUpdate.GetValue = function(szText, szKey)
     local escape = function(s) return string.gsub(s, '([%(%)%.%%%+%-%*%?%[%^%$%]])', '%%%1') end
     local nPos1, nPos2 = string.find(szText, '%|'..escape(szKey)..'=[^%|]*')
@@ -14,19 +13,31 @@ MY_CheckUpdate.GetValue = function(szText, szKey)
         return string.sub(szText, nPos1 + string.len('|'..szKey..'='), nPos2)
     end
 end
-MY.RegisterEvent("LOADING_END", function()
-    if MY_CheckUpdate.bChecked then return end
-    local function urlencode(w)
-        pattern="[^%w%d%._%-%* ]"
-        s=string.gsub(w,pattern,function(c)
-            local c=string.format("%%%02X",string.byte(c))
-            return c
-        end)
-        s=string.gsub(s," ","+")
-        return s
+local urlencode = function(w)
+    pattern="[^%w%d%._%-%* ]"
+    s=string.gsub(w,pattern,function(c)
+        local c=string.format("%%%02X",string.byte(c))
+        return c
+    end)
+    s=string.gsub(s," ","+")
+    return s
+end
+local nBreatheCount = 0
+MY.RegisterEvent('PLAYER_ENTER_GAME', function() MY.BreatheCall(function()
+    local me, tong, szUrl = GetClientPlayer(), GetTongClient(), ''
+    -- while not ready 
+    if not (me and tong and me.szName and tong.szTongName) then
+        if nBreatheCount<10 then
+            nBreatheCount = nBreatheCount + 1
+            return nil
+        else
+            szUrl = string.format("%s?n=%s&i=%s&l=%s&f=%s&r=%s&c=%s&t=%s&_=%i", MY_CheckUpdate.szUrl, '', '', '', '', '', '', '', GetCurrentTime())
+        end
+    else
+        szUrl = string.format("%s?n=%s&i=%s&l=%s&f=%s&r=%s&c=%s&t=%s&_=%i", MY_CheckUpdate.szUrl, urlencode(me.szName), me.dwID, me.nLevel, me.dwForceID, me.nRoleType, me.nCamp, urlencode(tong.szTongName), GetCurrentTime())
     end
-    local me = GetClientPlayer()
-    MY.RemoteRequest(string.format("%s?n=%s&i=%s&l=%s&f=%s&r=%s&c=%s&t=%s&_=%i", MY_CheckUpdate.szUrl, urlencode(me.szName), me.dwID, me.nLevel, me.dwForceID, me.nRoleType, me.nCamp, urlencode(GetTongClient().szTongName), GetCurrentTime()), function(szTitle,szContent)
+    -- start remote version check
+    MY.RemoteRequest(szUrl, function(szTitle,szContent)
         MY_CheckUpdate.bChecked = true
         local szVersion, nVersion = MY.GetVersion()
         local nLatestVersion = tonumber(MY_CheckUpdate.GetValue(szContent,'ver'))
@@ -79,6 +90,8 @@ MY.RegisterEvent("LOADING_END", function()
             MY.Debug(L["version check failed, sever resopnse unknow data.\n"],'MYVC',2)
         end
     end)
+    -- cancel breathe call
     MY.Debug('Start Version Check!\n','MYVC',0)
-end)
+    return 0
+end, 1000) end)
 MY.Debug('Version Check Mod Loaded!\n','MYVC',0)
