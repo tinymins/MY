@@ -29,13 +29,13 @@ local _L = MY.LoadLangPack()
 -----------------------------------------------
 -- Ë½ÓÐº¯Êý
 -----------------------------------------------
-local _MY = {
+ _MY = {
     frame = nil,
     hBox = nil,
     hRequest = nil,
     bLoaded = false,
     nDebugLevel = 4,
-    dwVersion = 0x0000303,
+    dwVersion = 0x0000304,
     szBuildDate = "20140422",
     szName = _L["mingyi plugins"],
     szShortName = _L["mingyi plugin"],
@@ -98,20 +98,20 @@ _MY.ParseFaceIcon = function(t)
 		_MY.tFaceIcon = {}
 		for i = 1, g_tTable.FaceIcon:GetRowCount() do
 			local tLine = g_tTable.FaceIcon:GetRow(i)
-			_MY.tFaceIcon[tLine.szCommand] = true
+			_MY.tFaceIcon[tLine.szCommand] = tLine.dwID
 		end
 	end
 	local t2 = {}
 	for _, v in ipairs(t) do
 		if v.type ~= "text" then
-			if v.type == "faceicon" then
+			if v.type == "emotion" then
 				v.type = "text"
 			end
 			table.insert(t2, v)
 		else
 			local nOff, nLen = 1, string.len(v.text)
 			while nOff <= nLen do
-				local szFace = nil
+				local szFace, dwFaceID = nil, nil
 				local nPos = StringFindW(v.text, "#", nOff)
 				if not nPos then
 					nPos = nLen
@@ -120,7 +120,7 @@ _MY.ParseFaceIcon = function(t)
 						if i <= nLen then
 							local szTest = string.sub(v.text, nPos, i)
 							if _MY.tFaceIcon[szTest] then
-								szFace = szTest
+								szFace, dwFaceID = szTest, _MY.tFaceIcon[szTest]
 								nPos = nPos - 1
 								break
 							end
@@ -132,7 +132,7 @@ _MY.ParseFaceIcon = function(t)
 					nOff = nPos + 1
 				end
 				if szFace then
-					table.insert(t2, { type = "text", text = szFace })
+					table.insert(t2, { type = "emotion", text = szFace, id = dwFaceID })
 					nOff = nOff + string.len(szFace)
 				end
 			end

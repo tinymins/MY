@@ -183,9 +183,9 @@ _MY_ChatMonitor.InitFaceIcon = function()
 		for i = 1, g_tTable.FaceIcon:GetRowCount() do
 			local tLine = g_tTable.FaceIcon:GetRow(i)
 			if tLine.szType == "animate" then
-				t.animate[tLine.nFrame] = tLine.szCommand
+				t.animate[tLine.nFrame] = { szCmd = tLine.szCommand, dwID = tLine.dwID }
 			else
-				t.image[tLine.nFrame] = tLine.szCommand
+				t.image[tLine.nFrame] = { szCmd = tLine.szCommand, dwID = tLine.dwID }
 			end
 		end
 		_MY_ChatMonitor.tFacIcon = t
@@ -268,16 +268,16 @@ _MY_ChatMonitor.CopyChatLine = function(hTime)
 			end
 		elseif p:GetType() == "Image" then
 			local nFrame = p:GetFrame()
-			local szCmd = _MY_ChatMonitor.tFacIcon.image[nFrame]
-			if szCmd then
-				edit:InsertObj(szCmd, { type = "text", text = szCmd })
+			local tEmotion = _MY_ChatMonitor.tFacIcon.image[nFrame]
+			if tEmotion then
+				edit:InsertObj(tEmotion.szCmd, { type = "emotion", text = tEmotion.szCmd, id = tEmotion.dwID })
 			end
 		elseif p:GetType() == "Animate" then
 			local nGroup = tonumber(p:GetName())
 			if nGroup then
-				local szCmd = _MY_ChatMonitor.tFacIcon.animate[nGroup]
-				if szCmd then
-					edit:InsertObj(szCmd, { type = "text", text = szCmd })
+				local tEmotion = _MY_ChatMonitor.tFacIcon.animate[nGroup]
+				if tEmotion then
+					edit:InsertObj(tEmotion.szCmd, { type = "emotion", text = tEmotion.szCmd, id = tEmotion.dwID })
 				end
 			end
 		end
