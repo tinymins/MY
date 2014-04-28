@@ -29,12 +29,12 @@ local _L = MY.LoadLangPack()
 -----------------------------------------------
 -- 私有函数
 -----------------------------------------------
- _MY = {
+local _MY = {
     frame = nil,
     hBox = nil,
     hRequest = nil,
     bLoaded = false,
-    nDebugLevel = 4,
+    nDebugLevel = 0,
     dwVersion = 0x0000304,
     szBuildDate = "20140422",
     szName = _L["mingyi plugins"],
@@ -52,9 +52,11 @@ local _L = MY.LoadLangPack()
     bRequest = false,   -- 网络请求繁忙中
     tTabs = {},         -- 标签页
     tEvent = {},        -- 游戏事件绑定
+    tHotkey = {},       -- 热键
     tPlayerMenu = {},   -- 玩家头像菜单
     tTargetMenu = {},   -- 目标头像菜单
     tTraceMenu  = {},   -- 工具栏菜单
+    tInitFun = {},      -- 初始化函数
 }
 _MY.Init = function()
     if _MY.bLoaded then return end
@@ -64,17 +66,15 @@ _MY.Init = function()
 	_MY.hRequest = MY.GetFrame():Lookup("Page_1")
     -- 窗口按钮
     MY.UI(MY.GetFrame()):find("#Button_WindowClose"):click(function() _MY.ClosePanel() end)
-    -- 创建菜单
-    local tMenu = function() return {
-        szOption = _L["mingyi plugins"],
-        fnAction = function()
-            Station.Lookup("Normal/MY"):ToggleVisible()
-        end,
-        bCheck = true,
-        bChecked = Station.Lookup("Normal/MY"):IsVisible(),
-    } end
-    MY.RegisterPlayerAddonMenu( 'MY_MAIN_MENU', tMenu)
-    MY.RegisterTraceButtonMenu( 'MY_MAIN_MENU', tMenu)
+    -- init functions
+    for i = 1, #_MY.tInitFun, 1 do
+        pcall(_MY.tInitFun[i].fn)
+    end
+    -- hotkey
+    Hotkey.AddBinding("MY_Total", _L["Open/Close setting panel"], _MY.szName, _MY.TogglePanel, nil)
+    for _, v in ipairs(_MY.tHotkey) do
+        Hotkey.AddBinding(v.szName, v.szTitle, "", v.fnAction, nil)
+    end
     -- 显示欢迎信息
     MY.Sysmsg(_L("%s, welcome to use mingyi plugins!", GetClientPlayer().szName) .. " v" .. MY.GetVersion() .. ' Build ' .. _MY.szBuildDate .. "\n")
     if _MY.nDebugLevel >=3 then _MY.frame:Hide() end
@@ -175,7 +175,7 @@ _MY.ParseName = function(t)
 end
 -- close window
 _MY.ClosePanel = function(bRealClose)
-	local frame = Station.Lookup("Normal/MY")
+	local frame = MY.GetFrame()
 	if frame then
 		if not bRealClose then
 			frame:Hide()
@@ -189,7 +189,18 @@ end
 -- open window
 _MY.OpenPanel = function()
     local frame = MY.GetFrame()
-    frame:Show()
+    if frame then
+        frame:Show()
+    end
+end
+-- toggle panel
+_MY.TogglePanel = function()
+    local frame = MY.GetFrame()
+    if frame and frame:IsVisible() then
+        frame:Hide()
+    elseif frame then
+        frame:Show()
+    end
 end
 -- get player addon menu
 _MY.GetPlayerAddonMenu = function()
@@ -748,6 +759,35 @@ MY.BreatheCallDelayOnce = function(szKey, nTime)
 		t.nNext = GetLogicFrameCount() + math.ceil(nTime / 62.5)
 	end
 end
+--[[ 注册初始化函数
+    RegisterInit(string szFunName, function fn) -- 注册
+    RegisterInit(function fn)                   -- 注册
+    RegisterInit(string szFunName)              -- 注销
+]]
+MY.RegisterInit = function(arg1, arg2)
+    local szFunName, fn
+    if type(arg1)=='function' then fn = arg1 end
+    if type(arg1)=='string'   then szFunName = arg1 end
+    if type(arg2)=='function' then fn = arg1 end
+    if type(arg2)=='string'   then szFunName = arg1 end
+    if fn then
+        if szFunName then
+            for i = #_MY.tInitFun, 1, -1 do
+                if _MY.tInitFun[i].szFunName == szFunName then
+                    _MY.tInitFun[i] = { szFunName = szFunName, fn = fn }
+                    return nil
+                end
+            end
+        end
+        table.insert(_MY.tInitFun, { szFunName = szFunName, fn = fn })
+    elseif szFunName then
+        for i = #_MY.tInitFun, 1, -1 do
+            if _MY.tInitFun[i].szFunName == szFunName then
+                table.remove(_MY.tInitFun, i)
+            end
+        end
+    end
+end
 --[[ 注册游戏事件监听
     -- 注册
     MY.RegisterEvent( szEventName, szListenerId, fnListener )
@@ -1093,6 +1133,62 @@ end
 ---------------------------------------------------
 ---------------------------------------------------
 -- 事件、快捷键、菜单注册
+--[[ 增加系统快捷键
+    (void) MY.AddHotKey(string szName, string szTitle, func fnAction)	-- 增加系统快捷键
+]]
+MY.AddHotKey = function(szName, szTitle, fnAction)
+    if string.sub(szName, 1, 3) ~= "MY_" then
+        szName = "MY_" .. szName
+    end
+    table.insert(_MY.tHotkey, { szName = szName, szTitle = szTitle, fnAction = fnAction })
+end
+--[[ 获取快捷键名称
+    (string) MY.GetHotKeyName(string szName, boolean bBracket, boolean bShort)		-- 取得快捷键名称
+]]
+MY.GetHotKeyName = function(szName, bBracket, bShort)
+	if string.sub(szName, 1, 3) ~= "MY_" then
+		szName = "MY_" .. szName
+	end
+	local nKey, bShift, bCtrl, bAlt = Hotkey.Get(szName)
+    local szKey = GetKeyShow(nKey, bShift, bCtrl, bAlt, bShort == true)
+    if szKey ~= "" and bBracket then
+        szKey = "(" .. szKey .. ")"
+    end
+    return szKey
+end
+--[[ 获取快捷键
+    (table) MY.GetHotKey(string szName, true , true )		-- 取得快捷键
+    (number nKey, boolean bShift, boolean bCtrl, boolean bAlt) MY.GetHotKey(string szName, true , fasle)		-- 取得快捷键
+]]
+MY.GetHotKey = function(szName, bBracket, bShort)
+	if string.sub(szName, 1, 3) ~= "MY_" then
+		szName = "MY_" .. szName
+	end
+	local nKey, bShift, bCtrl, bAlt = Hotkey.Get(szName)
+    if nKey==0 then return nil end
+    if bBracket then
+        return { nKey = nKey, bShift = bShift, bCtrl = bCtrl, bAlt = bAlt }
+    else
+        return nKey, bShift, bCtrl, bAlt
+    end
+end
+--[[ 设置快捷键/打开快捷键设置面板
+    (void) MY.SetHotKey()								-- 打开快捷键设置面板
+    (void) MY.SetHotKey(string szGroup)		-- 打开快捷键设置面板并定位到 szGroup 分组（不可用）
+    (void) MY.SetHotKey(string szCommand, number nKey )		-- 设置快捷键
+    (void) MY.SetHotKey(string szCommand, number nIndex, number nKey [, boolean bShift [, boolean bCtrl [, boolean bAlt] ] ])		-- 设置快捷键
+]]
+MY.SetHotKey = function(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
+    if nIndex then
+        if string.sub(szCommand, 1, 3) ~= "MY_" then
+            szCommand = "MY_" .. szCommand
+        end
+        if not nKey then nIndex, nKey = 1, nIndex end
+        Hotkey.Set(szCommand, nIndex, nKey, bShift == true, bCtrl == true, bAlt == true)
+    else
+        HotkeyPanel_Open(szCommand or MY.szName)
+    end
+end
 RegisterEvent("NPC_ENTER_SCENE",    function() _MY.tNearNpc[arg0]    = true end)
 RegisterEvent("NPC_LEAVE_SCENE",    function() _MY.tNearNpc[arg0]    = nil  end)
 RegisterEvent("PLAYER_ENTER_SCENE", function() _MY.tNearPlayer[arg0] = true end)
@@ -1110,4 +1206,17 @@ if _MY.nDebugLevel <3 then RegisterEvent("CALL_LUA_ERROR", function() OutputMess
 
 -- MY.RegisterEvent("CUSTOM_DATA_LOADED", _MY.Init)
 MY.RegisterEvent("LOADING_END", _MY.Init)
+MY.RegisterInit(function()
+    -- 创建菜单
+    local tMenu = function() return {
+        szOption = _L["mingyi plugins"],
+        fnAction = function()
+            Station.Lookup("Normal/MY"):ToggleVisible()
+        end,
+        bCheck = true,
+        bChecked = Station.Lookup("Normal/MY"):IsVisible(),
+    } end
+    MY.RegisterPlayerAddonMenu( 'MY_MAIN_MENU', tMenu)
+    MY.RegisterTraceButtonMenu( 'MY_MAIN_MENU', tMenu)
+end)
 -- MY.RegisterEvent("PLAYER_ENTER_GAME", _MY.Init)
