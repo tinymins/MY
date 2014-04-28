@@ -403,11 +403,15 @@ end
 
 -- each
 -- same as jQuery.each(function(){})
+-- :each(_MY.UI each_self)  -- you can use 'this' to visit raw element likes jQuery
 function _MY.UI:each(fn)
     self:_checksum()
     local eles = self.eles
     for _, ele in pairs(eles) do
-        pcall(fn, ele.raw)
+        local _this = this
+        this = ele.raw
+        pcall(fn, self:clone({{raw = ele.raw}}))
+        this = _this
     end
     return self
 end
@@ -1161,6 +1165,33 @@ end
 -----------------------------------------------------------
 -- my ui events handle
 -----------------------------------------------------------
+
+--[[ menu 弹出菜单
+    :menu(table menu)  弹出菜单menu
+    :menu(functin fn)  弹出菜单function返回值table
+]]
+function _MY.UI:menu(menu)
+    self:_checksum()
+    for _, ele in pairs(self.eles) do
+        self:each(function(eself)
+            eself:click(function()
+                local _menu = nil
+                local nX, nY = eself:raw(1):GetAbsPos()
+                local nW, nH = eself:raw(1):GetSize()
+                if type(menu) == "function" then
+                    _menu = menu()
+                else
+                    _menu = menu
+                end
+                _menu.nMiniWidth = nW
+                _menu.x = nX
+                _menu.y = nY + nH
+                PopupMenu(_menu)
+            end)
+        end)
+    end
+    return self
+end
 
 --[[ click 鼠标单击事件
     same as jQuery.click()

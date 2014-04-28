@@ -36,8 +36,8 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
             szTime = '',    -- 消息时间UI
         }
         -- 拼接消息
-        _MY_ChatMonitor.uiTest:clear():append(szMsg):child('.Handle'):child():each(function(ele)
-            tCapture.szText = tCapture.szText .. ele:GetText()
+        _MY_ChatMonitor.uiTest:clear():append(szMsg):child('.Handle'):child():each(function()
+            tCapture.szText = tCapture.szText .. this:GetText()
         end)
         tCapture.szHash = string.gsub(tCapture.szText,'\n', '')
         -- 计算系统消息颜色
@@ -96,12 +96,12 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
                 -- 处理UI
                 local bEnd = false
                 if _MY_ChatMonitor.uiBoard then
-                    _MY_ChatMonitor.uiBoard:hdl(1):child():each(function(ele)
+                    _MY_ChatMonitor.uiBoard:hdl(1):child():each(function()
                         if not bEnd then
-                            if ele:GetType()=="Text" and StringFindW(ele:GetText(), "\n") then
+                            if this:GetType()=="Text" and StringFindW(this:GetText(), "\n") then
                                 bEnd = true
                             end
-                            ele:GetParent():RemoveItem(ele:GetIndex())
+                            this:GetParent():RemoveItem(this:GetIndex())
                         end
                     end)
                 end
