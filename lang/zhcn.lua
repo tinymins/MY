@@ -29,6 +29,7 @@ data = {
     
     ['send'] = '发送',
     ['send to'] = '发送到',
+    ['send to ...'] = '发送到...',
     
     ['ji guan'] = '机关',
     ['nu jian'] = '弩箭',
@@ -57,6 +58,7 @@ data = {
     ['mingyi plugin'] = '茗伊插件',
     ['mingyi plugins'] = '茗伊插件集',
     ['%s, welcome to use mingyi plugins!'] = '欢迎%s使用茗伊插件集！',
+    ['Open/Close main panel'] = '打开/关闭主界面',
     ["unable to open ini file [%s]"] = "无法打开界面 INI 文件 [%s]",
     ["can not find wnd component [%s]"] = "找不到窗体组件 [%s]",
     ["unable to append handle item [%s]"] = "无法追加容器组件 [%s]",
@@ -83,7 +85,29 @@ data = {
     ['key words:'] = '关键字：',
     ['CHAT_MONITOR_KEYWORDS_SAMPLE'] = "10|十人,血战天策|XZTC,!小铁被吃了,!开宴黑铁;大战",
     ['CHAT_MONITOR_TIP'] = '关键字过滤器\n说明：\n半角分号;分隔多个条件\n每个条件中用半角逗号,表示且\n每个条件中用半角分隔符|表示或\n每个条件中用半角感叹号!表示非\n\n例1：大明宫;DMG;血战天策;XZTC\n-----------------\n如上例子代表匹配含有DMG或大明宫或XZTC或血战天策的聊天记录。\n\n例2：25,大明宫;10,血战天策\n-----------------\n如上例子代表匹配同时含有"25"和"大明宫"或者同时含有"10"和"血战天策"的聊天记录。\n\n例3：\n10|十人,血战天策|XZTC,!小铁被吃了,!开宴黑铁;大战\n-----------------\n如上例子代表匹配同时含有"10"或"十人"，"XZTC"或"血战天策"，并且不含有"小铁被吃了"，也不含有"开宴黑铁"的句子；或者含有"大战"的聊天记录。\n\n关于正则，不会正则表达式的小伙伴不要随便打钩哦~~会正则表达式的小伙伴(┘￣︶￣)┘└(￣︶￣└)[GiveMeFive!] \n-----------------\nPs：作者语言表达能力不佳，有什么看不懂的，你拓麻来打我啊hhhhhhhhhhhhhhhhhhhhhhh…',
+    -- MY_Logoff.lua
+    ['express logoff'] = '快速登出',
+    ['# condition logoff'] = '● 条件登出',
+    ['# express logoff'] = '● 快速登出',
+    ['while'] = '当',
+    ['[ select a target ]'] = '[请选择目标]',
+    ['( current target )'] = '(当前目标)',
+    ['life below       %'] = '血量低于　　　%时',
+    ['%d player(s) selected'] = '已选择的%d个玩家',
+    ['all disappeared'] = '全部离开视野时',
+    ['while client level exceeds'] = '当自身等级达到　　　级时',
+    ['second(s) later'] = '秒之后',
+    ['While it meets any condition below'] = '符合以上条件之一时',
+    ['return to role list'] = '返回角色选择',
+    ['return to game login'] = '返回账号登录',
+    ['return to role list while not fight'] = '脱战后返回角色选择',
+    ['return to game login while not fight'] = '脱战后返回账号登录',
+    ['* hotkey setting'] = '☆ 快捷键设置',
     
+    -- MY_ToolBox.lua
+    ['tool box'] = '常用工具',
+    -- MY_ScreenShotHelper.lua
+    ['screen shot helper'] = '截图助手',
     -- MY_RescueTeam.lua
     ['rescue team helper'] = '救场必备',
     -- MY_RollMon.lua
