@@ -71,7 +71,7 @@ _MY.Init = function()
         pcall(_MY.tInitFun[i].fn)
     end
     -- hotkey
-    Hotkey.AddBinding("MY_Total", _L["Open/Close setting panel"], _MY.szName, _MY.TogglePanel, nil)
+    Hotkey.AddBinding("MY_Total", _L["Open/Close main panel"], _MY.szName, _MY.TogglePanel, nil)
     for _, v in ipairs(_MY.tHotkey) do
         Hotkey.AddBinding(v.szName, v.szTitle, "", v.fnAction, nil)
     end
@@ -622,6 +622,8 @@ MY.Talk = function(nChannel, szText, bNoEscape, bSaveDeny)
 		end
 	elseif nChannel == PLAYER_TALK_CHANNEL.RAID and me.GetScene().nType == MAP_TYPE.BATTLE_FIELD then
 		nChannel = PLAYER_TALK_CHANNEL.BATTLE_FIELD
+    elseif nChannel == PLAYER_TALK_CHANNEL.LOCAL_SYS then
+        return MY.Sysmsg(szText, '')
 	end
 	-- say body
 	local tSay = nil
@@ -663,6 +665,7 @@ end
 ]]
 MY.Sysmsg = function(szContent, szPrefix, tContentCol, tPrefixCol)
     if type(szContent)=="boolean" then szContent = (szContent and 'true') or 'false' end
+    if not szContent then return nil end
     szPrefix = szPrefix or _MY.szShortName
     if tContentCol then
         tPrefixCol = tPrefixCol or tContentCol
@@ -672,7 +675,11 @@ MY.Sysmsg = function(szContent, szPrefix, tContentCol, tPrefixCol)
             string.gsub(szContent,'"','\\"'), tContentCol[1] or 0, tContentCol[2] or 0, tContentCol[3] or 0
         ), true)
     else
-        OutputMessage("MSG_SYS", string.format("[%s] %s", szPrefix, szContent) )
+        if szPrefix=='' then
+            OutputMessage("MSG_SYS", szContent )
+        else
+            OutputMessage("MSG_SYS", string.format("[%s] %s", szPrefix, szContent) )
+        end
     end
 end
 --[[ DebugÊä³ö
