@@ -729,7 +729,17 @@ end
     fnAction	-- 循环呼吸调用函数，设为 nil 则表示取消这个 key 下的呼吸处理函数
     nTime		-- 调用间隔，单位：毫秒，默认为 62.5，即每秒调用 16次，其值自动被处理成 62.5 的整倍数
 ]]
-MY.BreatheCall = function(fnAction, nInterval, szName)
+MY.BreatheCall = function(arg1, arg1, arg2)
+    local fnAction, nInterval, szName = nil, nil, nil
+    if type(arg1)=='string' then szName = arg1 end
+    if type(arg2)=='string' then szName = arg2 end
+    if type(arg3)=='string' then szName = arg3 end
+    if type(arg1)=='number' then nInterval = arg1 end
+    if type(arg2)=='number' then nInterval = arg2 end
+    if type(arg3)=='number' then nInterval = arg3 end
+    if type(arg1)=='function' then fnAction = arg1 end
+    if type(arg2)=='function' then fnAction = arg2 end
+    if type(arg3)=='function' then fnAction = arg3 end
 	szName = StringLowerW(szName)
 	if type(fnAction) == "function" then
 		local nFrame = 1
