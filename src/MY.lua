@@ -729,31 +729,31 @@ end
     fnAction	-- 循环呼吸调用函数，设为 nil 则表示取消这个 key 下的呼吸处理函数
     nTime		-- 调用间隔，单位：毫秒，默认为 62.5，即每秒调用 16次，其值自动被处理成 62.5 的整倍数
 ]]
-MY.BreatheCall = function(arg1, arg1, arg2)
+MY.BreatheCall = function(arg1, arg2, arg3)
     local fnAction, nInterval, szName = nil, nil, nil
-    if type(arg1)=='string' then szName = arg1 end
-    if type(arg2)=='string' then szName = arg2 end
-    if type(arg3)=='string' then szName = arg3 end
+    if type(arg1)=='string' then szName = StringLowerW(arg1) end
+    if type(arg2)=='string' then szName = StringLowerW(arg2) end
+    if type(arg3)=='string' then szName = StringLowerW(arg3) end
     if type(arg1)=='number' then nInterval = arg1 end
     if type(arg2)=='number' then nInterval = arg2 end
     if type(arg3)=='number' then nInterval = arg3 end
     if type(arg1)=='function' then fnAction = arg1 end
     if type(arg2)=='function' then fnAction = arg2 end
     if type(arg3)=='function' then fnAction = arg3 end
-	szName = StringLowerW(szName)
-	if type(fnAction) == "function" then
-		local nFrame = 1
-		if nInterval and nInterval > 0 then
-			nFrame = math.ceil(nInterval / 62.5)
-		end
-		table.insert( _MY.tBreatheCall, { szName = szName, fnAction = fnAction, nNext = GetLogicFrameCount() + 1, nFrame = nFrame } )
-	elseif type(fnAction) == "string" then
+    if szName then
         for i = #_MY.tBreatheCall, 1, -1 do
-            if _MY.tBreatheCall[i].szName == fnAction then
+            if _MY.tBreatheCall[i].szName == szName then
                 table.remove(_MY.tBreatheCall, i)
             end
         end
-	end
+    end
+    if fnAction then
+        local nFrame = 1
+        if nInterval and nInterval > 0 then
+            nFrame = math.ceil(nInterval / 62.5)
+        end
+        table.insert( _MY.tBreatheCall, { szName = szName, fnAction = fnAction, nNext = GetLogicFrameCount() + 1, nFrame = nFrame } )
+    end
 end
 --[[ 改变呼吸调用频率
     (void) MY.BreatheCallDelay(string szKey, nTime)
