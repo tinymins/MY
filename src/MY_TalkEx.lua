@@ -44,7 +44,7 @@ _MY_TalkEx.tChannels = {
     ['WORLD'] = { szName = _L['world channel'], tCol = GetMsgFontColor("MSG_WORLD", true) },
 }
 _MY_TalkEx.OnPanelActive = function(wnd)
-     ui = MY.UI(wnd)
+    local ui = MY.UI(wnd)
     -------------------------------------
     -- º°»°²¿·Ö
     -------------------------------------
