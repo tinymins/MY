@@ -4,7 +4,8 @@ data = {
     ['nearby channel'] = '近聊频道',
     ['friend channel'] = '好友频道',
     ['team channel'] = '队伍频道',
-    ['raid channel'] = '团队/战场',
+    ['raid channel'] = '团队频道',
+    ['raid/battle channel'] = '团队/战场',
     ['tong channel'] = '帮会频道',
     ['tong alliance channel'] = '同盟频道',
     ['map channel'] = '地图频道',
@@ -50,6 +51,17 @@ data = {
     ['start'] = '开始',
     ['stop'] = '停止',
     ['clear'] = '清空',
+    ['cancel'] = '取消',
+    ['use'] = '使用',
+    ['publish'] = '发布',
+    ['publish setting'] = '发布设置',
+    ['publish top %d'] = '发布前%d名',
+    ['publish all'] = '发布所有',
+    
+    ['add'] = '添加',
+    ['delete'] = '删除',
+    ['add group'] = '添加分组',
+    ['delete group'] = '删除分组',
     
     ['copy'] = '复制',
     ['paste'] = '粘贴',
@@ -78,6 +90,7 @@ data = {
     -- MY_ChatMonitor.lua
     ['chat monitor'] = '聊天监控',
     ['waiting...'] = '等待中…',
+    ['load preset'] = '加载预设',
     ['regexp'] = '正则',
     ['regular expression'] = '正则表达式',
     ['show message preview box'] = '新消息弹窗',
@@ -103,6 +116,10 @@ data = {
     ['return to role list while not fight'] = '脱战后返回角色选择',
     ['return to game login while not fight'] = '脱战后返回账号登录',
     ['* hotkey setting'] = '☆ 快捷键设置',
+    ['force return to role list.'] = '强制返回角色选择页面。',
+    ['force return to game login.'] = '强制返回账户登录页面。',
+    ['return to role list while leaving fighting.'] = '在下一次脱离战斗的一瞬间返回角色选择页面。',
+    ['return to game login while leaving fighting.'] = '在下一次脱离战斗的一瞬间返回账户登录页面。',
     
     -- MY_ToolBox.lua
     ['tool box'] = '常用工具',
@@ -112,4 +129,13 @@ data = {
     ['rescue team helper'] = '救场必备',
     -- MY_RollMon.lua
     ['roll monitor'] = '点数监控',
+    ['ROLL_MONITOR_EXP'] = '"([^"]*)掷出(%d+)点。%(1 %- 100%)"',
+    ['only first score'] = '只记录第一次',
+    ['only last score'] = '只记录最后一次',
+    ['highest score'] = '多次摇点取最高点',
+    ['lowest score'] = '多次摇点取最低点',
+    ['average score'] = '多次摇点取平均值',
+    ['average score with out pole'] = '去掉最高最低取平均值',
+    ["haven't roll yet."] = '尚未掷骰子。',
+    ['[%s] rolls for %d times, valid score is %s.'] = '[%s]掷了%d次骰子，有效点数为%s。',
 }
