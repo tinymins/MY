@@ -251,11 +251,17 @@ MY.GetVersion = function()
 	end
 	return szVersion, v
 end
+--[[ 获取游戏语言
+]]
+MY.GetLang = function()
+    local _, _, lang = GetVersion()
+    return lang
+end
 --[[ 获取主窗体句柄
     (frame) MY.GetFrame()
 ]]
-MY.GetFrame = function() 
-    if not _MY.frame then 
+MY.GetFrame = function()
+    if not _MY.frame then
         _MY.frame = Wnd.OpenWindow(_MY.szIniFile, "MY")
     end
     return _MY.frame
@@ -318,7 +324,7 @@ _MY.DoRemoteRequest = function()
     end
 end
 --[[ 求N2在N1的面向角  --  重载+2
-    -- 输入N1坐标、面向、N2坐标 
+    -- 输入N1坐标、面向、N2坐标
     (number) MY.GetFaceToTargetDegree(nX,nY,nFace,nTX,nTY)
     -- 输入N1、N2
     (number) MY.GetFaceToTargetDegree(oN1, oN2)
@@ -391,7 +397,7 @@ end
 --[[ 通过技能名称获取技能对象
     (table) MY.GetSkillByName(szName)
 ]]
-MY.GetSkillByName = function(szName) 
+MY.GetSkillByName = function(szName)
 	if table.getn(_MY.tPlayerSkills)==0 then
         for i = 1, g_tTable.Skill:GetRowCount() do
             local tLine = g_tTable.Skill:GetRow(i)
@@ -871,7 +877,7 @@ MY.RedrawTabPanel = function()
         local tTab = _MY.tTabs[i]
         -- insert tab
         local fx = Wnd.OpenWindow(_MY.szIniFileTabBox, "aTabBox")
-        if fx then    
+        if fx then
             local item = fx:Lookup("TabBox")
             if item then
                 item:ChangeRelation(MY.GetFrame():Lookup("Window_Tabs"), true, true)
@@ -918,7 +924,7 @@ MY.RedrawTabPanel = function()
                 -- insert main panel
                 local fx = Wnd.OpenWindow(_MY.szIniFileMainPanel, "aMainPanel")
                 local mainpanel
-                if fx then    
+                if fx then
                     mainpanel = fx:Lookup("MainPanel")
                     if mainpanel then
                         mainpanel:ChangeRelation(MY.GetFrame():Lookup("Window_Main"), true, true)
@@ -961,7 +967,7 @@ MY.RegisterPanel = function( szName, szTitle, szIconTex, rgbaTitleColor, fn )
         local dwIconFrame = string.gsub(szIconTex, '.*%|(%d+)', '%1')
         if dwIconFrame then dwIconFrame = tonumber(dwIconFrame) end
         szIconTex = string.gsub(szIconTex, '%|.*', '')
-        
+
         -- format other params
         if type(fn)~="table" then fn = {} end
         if type(rgbaTitleColor)~="table" then rgbaTitleColor = { 255, 255, 255, 200 } end
@@ -1204,7 +1210,7 @@ MY.SetHotKey = function(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
         Hotkey.Set(szCommand, nIndex, nKey, bShift == true, bCtrl == true, bAlt == true)
     else
         local szGroup = szCommand or _MY.szName
-        
+
         local frame = Station.Lookup("Topmost/HotkeyPanel")
         if not frame then
             frame = Wnd.OpenWindow("HotkeyPanel")
