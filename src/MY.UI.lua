@@ -109,6 +109,12 @@ function _MY.UI:ctor(raw, tab)
             _tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
             _tab.txt = _tab.txt or raw:Lookup('','Text_Default')
             _tab.img = _tab.img or raw:Lookup('','Image_Default')
+        elseif szType=="WndEditComboBox" then
+            _tab.wnd = _tab.wnd or raw
+            _tab.hdl = _tab.hdl or raw:Lookup('','')
+            _tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
+            _tab.edt = _tab.edt or raw:Lookup('WndEdit_Default')
+            _tab.img = _tab.img or raw:Lookup('','Image_Default')
         elseif szType=="WndScrollBox" then
             _tab.wnd = _tab.wnd or raw
             _tab.hdl = _tab.hdl or raw:Lookup('','Handle_Scroll')
@@ -163,6 +169,12 @@ function _MY.UI:raw2ele(raw, tab)
         _tab.hdl = _tab.hdl or raw:Lookup('','')
         _tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
         _tab.txt = _tab.txt or raw:Lookup('','Text_Default')
+        _tab.img = _tab.img or raw:Lookup('','Image_Default')
+    elseif szType=="WndEditComboBox" then
+        _tab.wnd = _tab.wnd or raw
+        _tab.hdl = _tab.hdl or raw:Lookup('','')
+        _tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
+        _tab.edt = _tab.edt or raw:Lookup('WndEdit_Default')
         _tab.img = _tab.img or raw:Lookup('','Image_Default')
     elseif szType=="WndScrollBox" then
         _tab.wnd = _tab.wnd or raw
@@ -637,6 +649,21 @@ function _MY.UI:append(szName, szType, tArg)
                             if bBottom then hScrollBar:SetScrollPos(hScrollBar:GetStepCount()) end
                         end
                         pcall( wnd.UpdateScroll )
+                    elseif szType=='WndTrackBar' then
+                        wnd:Lookup("Scroll_Track").OnScrollBarPosChanged = function()
+                            local nCurrentPercentage = this:GetScrollPos() * 100 / this:GetStepCount()
+                            wnd:Lookup("", "Text_Default"):SetText(nCurrentPercentage..'%')
+                        end
+                        wnd:Lookup("Scroll_Track").OnMouseWheel = function()                                   -- listening Mouse Wheel
+                            local nDistance = Station.GetMessageWheelDelta()            -- get distance
+                            wnd:Lookup("Scroll_Track"):ScrollNext(-nDistance*2)            -- wheel scroll position
+                            return 1
+                        end
+                        wnd:Lookup("Scroll_Track"):Lookup('Btn_Track').OnMouseWheel = function()               -- listening Mouse Wheel
+                            local nDistance = Station.GetMessageWheelDelta()            -- get distance
+                            wnd:Lookup("Scroll_Track"):ScrollNext(-nDistance)            -- wheel scroll position
+                            return 1
+                        end
                     end
                 end
                 Wnd.CloseWindow(frame)
@@ -1080,6 +1107,7 @@ function _MY.UI:size(nWidth, nHeight)
                 pcall(function() ele.txt:SetSize(nWidth, nHeight) end)
                 pcall(function() ele.img:SetSize(nWidth, nHeight) end)
                 pcall(function() ele.edt:SetSize(nWidth-8, nHeight-4) end)
+                pcall(function() local w, h= ele.cmb:GetSize() ele.edt:SetSize(nWidth-8-w, nHeight-4) end)
                 pcall(function() local w, h= ele.cmb:GetSize() ele.cmb:SetRelPos(nWidth-w-5, (nHeight-h-1)/2+1) end)
                 pcall(function() ele.hdl:FormatAllItemPos() end)
             elseif ele.itm then
