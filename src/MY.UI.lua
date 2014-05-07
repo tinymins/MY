@@ -1107,7 +1107,7 @@ function _MY.UI:size(nWidth, nHeight)
                 pcall(function() ele.txt:SetSize(nWidth, nHeight) end)
                 pcall(function() ele.img:SetSize(nWidth, nHeight) end)
                 pcall(function() ele.edt:SetSize(nWidth-8, nHeight-4) end)
-                pcall(function() local w, h= ele.cmb:GetSize() ele.edt:SetSize(nWidth-8-w, nHeight-4) end)
+                pcall(function() local w, h= ele.cmb:GetSize() ele.edt:SetSize(nWidth-10-w, nHeight-4) end)
                 pcall(function() local w, h= ele.cmb:GetSize() ele.cmb:SetRelPos(nWidth-w-5, (nHeight-h-1)/2+1) end)
                 pcall(function() ele.hdl:FormatAllItemPos() end)
             elseif ele.itm then
