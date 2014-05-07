@@ -112,6 +112,7 @@ function _MY.UI:ctor(raw, tab)
         elseif szType=="WndScrollBox" then
             _tab.wnd = _tab.wnd or raw
             _tab.hdl = _tab.hdl or raw:Lookup('','Handle_Scroll')
+            _tab.txt = _tab.txt or raw:Lookup('','Handle_Scroll'):Lookup('Text_Default')
             _tab.img = _tab.img or raw:Lookup('','Image_Default')
             _tab.sbu = _tab.sbu or raw:Lookup('WndButton_Up')
             _tab.sbd = _tab.sbd or raw:Lookup('WndButton_Down')
@@ -166,6 +167,7 @@ function _MY.UI:raw2ele(raw, tab)
     elseif szType=="WndScrollBox" then
         _tab.wnd = _tab.wnd or raw
         _tab.hdl = _tab.hdl or raw:Lookup('','Handle_Scroll')
+        _tab.txt = _tab.txt or raw:Lookup('','Handle_Scroll'):Lookup('Text_Default')
         _tab.img = _tab.img or raw:Lookup('','Image_Default')
         _tab.sbu = _tab.sbu or raw:Lookup('WndButton_Up')
         _tab.sbd = _tab.sbd or raw:Lookup('WndButton_Down')
@@ -184,7 +186,12 @@ end
 function _MY.UI:_checksum()
     for i = #self.eles, 1, -1 do
         local ele = self.eles[i]
-        local status, err = pcall(function() return ele.raw:GetType() end)
+        local status, err = true, 'szType'
+        if not ele.raw then
+            status, err = false, ''
+        else
+            status, err = pcall(function() return ele.raw:GetType() end)
+        end
         if (not status) or (err=='') then table.remove(self.eles, i) end
     end
     return self
@@ -794,6 +801,9 @@ function _MY.UI:text(szText)
         for _, ele in pairs(self.eles) do
             pcall(function() (ele.txt or ele.edt or ele.raw):SetText(szText) end)
             pcall(function() (ele.txt or ele.edt or ele.raw):GetParent():FormatAllItemPos() end)
+            if ele.sbu then
+                ele.raw.UpdateScroll()
+            end
         end
         return self
     else
@@ -1158,6 +1168,17 @@ function _MY.UI:bringToTop()
     self:_checksum()
     for _, ele in pairs(self.eles) do
         pcall(function() ele.frm:BringToTop() end)
+    end
+    return self
+end
+
+-- (self) Instance:refresh()
+function _MY.UI:refresh()
+    self:_checksum()
+    for _, ele in pairs(self.eles) do
+        if ele.sbu then
+            ele.raw.UpdateScroll()
+        end
     end
     return self
 end
