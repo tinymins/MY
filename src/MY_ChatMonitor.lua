@@ -24,6 +24,7 @@ _MY_ChatMonitor.bCapture = false
 _MY_ChatMonitor.ui = nil
 _MY_ChatMonitor.uiBoard = nil
 _MY_ChatMonitor.uiTipBoard = nil
+_MY_ChatMonitor.szLuaData = 'interface/MY/data/MY_ChatMonitor.'.. MY.GetLang() ..'.dat'
 
 -- 插入聊天内容时监控聊天信息
 _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
@@ -39,6 +40,7 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
         _MY_ChatMonitor.uiTest:clear():append(szMsg):child('.Handle'):child():each(function()
             tCapture.szText = tCapture.szText .. this:GetText()
         end)
+        if not MY_ChatMonitor.bIsRegexp then tCapture.szText = StringLowerW(tCapture.szText) end
         tCapture.szHash = string.gsub(tCapture.szText,'\n', '')
         -- 计算系统消息颜色
         local colMsgSys = GetMsgFontColor("MSG_SYS", true)
@@ -61,7 +63,7 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
             local escape = function(s) return string.gsub(s, '([%(%)%.%%%+%-%*%?%[%^%$%]])', '%%%1') end
             -- 10|十人,血战天策|XZTC,!小铁被吃了,!开宴黑铁;大战
             local bKeyWordsLine = false
-            for _, szKeyWordsLine in ipairs( split(MY_ChatMonitor.szKeyWords, ';') ) do -- 符合一个即可
+            for _, szKeyWordsLine in ipairs( split(StringLowerW(MY_ChatMonitor.szKeyWords), ';') ) do -- 符合一个即可
                 if bKeyWordsLine then break end
                 -- 10|十人,血战天策|XZTC,!小铁被吃了,!开宴黑铁
                 local bKeyWords = true
@@ -330,7 +332,43 @@ end
 _MY_ChatMonitor.OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
     ui:append('Label_KeyWord','Text'):children('#Label_KeyWord'):pos(22,15):size(100,25):text(_L['key words:'])
-    ui:append('EditBox_KeyWord','WndEditBox'):children('#EditBox_KeyWord'):pos(80,15):size(400,25):text(MY_ChatMonitor.szKeyWords):change(function(szText) MY_ChatMonitor.szKeyWords = szText end)
+    ui:append('EditBox_KeyWord','WndEditComboBox'):child('#EditBox_KeyWord'):pos(80,15):size(400,25):text(MY_ChatMonitor.szKeyWords):change(function(szText) MY_ChatMonitor.szKeyWords = szText end):menu(function()
+        local edit, t = ui:child('#EditBox_KeyWord'), {}
+        for _, szOpt in ipairs(LoadLUAData(_MY_ChatMonitor.szLuaData) or {}) do
+            if type(szOpt)=="string" then
+                table.insert(t, {
+                    szOption = szOpt, {
+                        szOption = _L['use'],
+                        fnAction = function() edit:text(szOpt) end
+                    }, {
+                        szOption = _L['delete'],
+                        fnAction = function()
+                            local t = LoadLUAData(_MY_ChatMonitor.szLuaData) or {}
+                            for i = #t, 1, -1 do 
+                                if t[i] == szOpt then table.remove(t, i) end
+                            end
+                            SaveLUAData(_MY_ChatMonitor.szLuaData, t)
+                        end
+                    }
+                })
+            end
+        end
+        if #t > 0 then table.insert(t, { bDevide = true }) end
+        table.insert(t, { szOption = _L['add'], fnAction = function()
+            GetUserInput("", function(szVal)
+                szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
+                if szVal~="" then
+                    local t = LoadLUAData(_MY_ChatMonitor.szLuaData) or {}
+                    for i = #t, 1, -1 do 
+                        if t[i] == szVal then return end
+                    end
+                    table.insert(t, szVal)
+                    SaveLUAData(_MY_ChatMonitor.szLuaData, t)
+                end
+            end, function() end, function() end, nil, edit:text() )
+        end })
+        return t
+    end):alpha(180)
     ui:append('Image_Help','Image'):children('#Image_Help'):image('UI/Image/UICommon/Commonpanel2.UITex',48):pos(8,10):size(25,25):hover(function(bIn) this:SetAlpha( (bIn and 255 ) or 180) end):click(function(nButton)
         local szText="<image>path=\"ui/Image/UICommon/Talk_Face.UITex\" frame=25 w=24 h=24</image> <text>text=" .. EncodeComponentsString(_L['CHAT_MONITOR_TIP']) .." font=207 </text>"
         local x, y = Cursor.GetPos()
