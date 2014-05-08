@@ -1,6 +1,6 @@
 local _L = MY.LoadLangPack()
 MY_CheckUpdate = {
-    szUrl = "http://j3my.sinaapp.com/interface/my/latest_version.html",
+    szUrl = "http://jx3_my.jd-app.com/down/update.php",
     szTipId = nil,
 }
 RegisterCustomData('MY_CheckUpdate.szTipId')
@@ -25,17 +25,36 @@ end
 local nBreatheCount = 0
 MY.RegisterEvent('PLAYER_ENTER_GAME', function() MY.BreatheCall(function()
     local me, tong, szUrl = GetClientPlayer(), GetTongClient(), ''
-    -- while not ready 
-    if not (me and tong and me.szName and tong.szTongName) then
-        if nBreatheCount<10 then
-            nBreatheCount = nBreatheCount + 1
-            return nil
-        else
-            szUrl = string.format("%s?n=%s&i=%s&l=%s&f=%s&r=%s&c=%s&t=%s&_=%i", MY_CheckUpdate.szUrl, '', '', '', '', '', '', '', GetCurrentTime())
-        end
-    else
-        szUrl = string.format("%s?n=%s&i=%s&l=%s&f=%s&r=%s&c=%s&t=%s&_=%i", MY_CheckUpdate.szUrl, urlencode(me.szName), me.dwID, me.nLevel, me.dwForceID, me.nRoleType, me.nCamp, urlencode(tong.szTongName), GetCurrentTime())
+    local szClientVer, szExeVer, szLang, szClientType = GetVersion()
+    local data = {
+        n = '', -- me.szName
+        i = '', -- me.dwID
+        l = '', -- me.nLevel
+        f = '', -- me.dwForceID
+        r = '', -- me.nRoleType
+        c = '', -- me.nCamp
+        t = '', -- tong.szTongName
+        _ = GetCurrentTime(),
+        vc = szClientVer,
+        ve = szExeVer,
+        vl = szLang,
+        vt = szClientType,
+    }
+    -- while not ready
+    if me and me.szName then
+        data.n, data.i, data.l, data.f, data.r, data.c = me.szName, me.dwID, me.nLevel, me.dwForceID, me.nRoleType, me.nCamp
     end
+    if tong and tong.szTongName then
+        data.t = tong.szTongName
+    end
+    if (not (me and tong and me.szName and tong.szTongName)) and nBreatheCount<10 then
+        nBreatheCount = nBreatheCount + 1
+        return nil
+    end
+    for k, v in pairs(data) do
+        szUrl = szUrl .. '&' .. k .. '=' .. urlencode(v)
+    end
+    szUrl = string.format("%s?%s", MY_CheckUpdate.szUrl, szUrl)
     -- start remote version check
     MY.RemoteRequest(szUrl, function(szTitle,szContent)
         MY_CheckUpdate.bChecked = true
