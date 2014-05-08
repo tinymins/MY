@@ -449,7 +449,40 @@ _MY_ChatMonitor.ShowTip = function(szMsg)
     local w, h = Station.GetClientSize() 
     local _w, _h = _MY_ChatMonitor.uiFrame:size()
     _MY_ChatMonitor.uiFrame:pos(w - _w - 100, h - _h - 150):bringToTop()
-    if szMsg then _MY_ChatMonitor.uiTipBoard:clear():append(szMsg) end
+    if szMsg then
+        _MY_ChatMonitor.uiTipBoard:clear():append(szMsg)
+        _MY_ChatMonitor.uiTipBoard:find('#^.*link'):del('#^namelink_'):click(function(nFlag) 
+            if nFlag==1 and IsCtrlKeyDown() then
+                MY_ChatMonitor.CopyChatItem(this)
+            end
+        end)
+        _MY_ChatMonitor.uiTipBoard:find('#^namelink_'):click(function(nFlag) 
+            local szName = this:GetText()
+            if nFlag==-1 then
+                PopupMenu((function()
+                    return {{
+                        szOption = _L['copy'],
+                        fnAction = function()
+                            MY.Talk(GetClientPlayer().szName, szName)
+                        end,
+                    },{
+                        szOption = _L['whisper'],
+                        fnAction = function()
+                            MY.SwitchChat(szName)
+                        end,
+                    }}
+                end)())
+            elseif nFlag==1 then
+                if IsCtrlKeyDown() then
+                    MY_ChatMonitor.CopyChatItem(this)
+                else
+                    MY.SwitchChat(szName)
+                    local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
+                    if edit then Station.SetFocusWindow(edit) end
+                end
+            end
+        end)
+    end
     _MY_ChatMonitor.uiFrame:fadeTo(500,255)
     MY.DelayCall('MY_ChatMonitor_Hide')
     MY.DelayCall(function() _MY_ChatMonitor.uiFrame:fadeOut(500) end,5000,'MY_ChatMonitor_Hide')
