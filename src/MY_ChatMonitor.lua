@@ -128,17 +128,21 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
                     local szName = this:GetText()
                     if nFlag==-1 then
                         PopupMenu((function()
-                            return {{
+                            local t = {}
+                            table.insert(t, {
                                 szOption = _L['copy'],
                                 fnAction = function()
                                     MY.Talk(GetClientPlayer().szName, szName)
                                 end,
-                            },{
+                            })
+                            table.insert(t, {
                                 szOption = _L['whisper'],
                                 fnAction = function()
                                     MY.SwitchChat(szName)
                                 end,
-                            }}
+                            })
+                            InsertInviteTeamMenu(t, string.gsub(szName, '[%[%]]', ''))
+                            return t
                         end)())
                     elseif nFlag==1 then
                         if IsCtrlKeyDown() then
@@ -460,17 +464,21 @@ _MY_ChatMonitor.ShowTip = function(szMsg)
             local szName = this:GetText()
             if nFlag==-1 then
                 PopupMenu((function()
-                    return {{
+                    local t = {}
+                    table.insert(t, {
                         szOption = _L['copy'],
                         fnAction = function()
                             MY.Talk(GetClientPlayer().szName, szName)
                         end,
-                    },{
+                    })
+                    table.insert(t, {
                         szOption = _L['whisper'],
                         fnAction = function()
                             MY.SwitchChat(szName)
                         end,
-                    }}
+                    })
+                    pcall(InsertInviteTeamMenu, t, string.gsub(szName, '[%[%]]', ''))
+                    return t
                 end)())
             elseif nFlag==1 then
                 if IsCtrlKeyDown() then
