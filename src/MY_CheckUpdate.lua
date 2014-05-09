@@ -26,6 +26,7 @@ local nBreatheCount = 0
 MY.RegisterEvent('PLAYER_ENTER_GAME', function() MY.BreatheCall(function()
     local me, tong, szUrl = GetClientPlayer(), GetTongClient(), ''
     local szClientVer, szExeVer, szLang, szClientType = GetVersion()
+    local szVerMY, iVerMY = MY.GetVersion()
     local data = {
         n = '', -- me.szName
         i = '', -- me.dwID
@@ -39,6 +40,8 @@ MY.RegisterEvent('PLAYER_ENTER_GAME', function() MY.BreatheCall(function()
         ve = szExeVer,
         vl = szLang,
         vt = szClientType,
+        mv = szVerMY,
+        mi = iVerMY,
     }
     -- while not ready
     if me and me.szName then
