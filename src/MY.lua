@@ -35,7 +35,7 @@ local _MY = {
     hRequest = nil,
     bLoaded = false,
     nDebugLevel = 4,
-    dwVersion = 0x0000400,
+    dwVersion = 0x0000401,
     szBuildDate = "20140422",
     szName = _L["mingyi plugins"],
     szShortName = _L["mingyi plugin"],
@@ -268,13 +268,6 @@ MY.GetFrame = function()
 end
 MY.ClosePanel = _MY.ClosePanel
 MY.OpenPanel = _MY.OpenPanel
--- (void) MY.MenuTip(string str)	-- MenuTip
-MY.MenuTip = function(str)
-	local szText="<image>path=\"ui/Image/UICommon/Talk_Face.UITex\" frame=25 w=24 h=24</image> <text>text=" .. EncodeComponentsString(str) .." font=207 </text>"
-	local x, y = this:GetAbsPos()
-	local w, h = this:GetSize()
-	OutputTip(szText, 450, {x, y, w, h})
-end
 --[[ (void) MY.RemoteRequest(string szUrl, func fnAction)		-- 发起远程 HTTP 请求
 -- szUrl		-- 请求的完整 URL（包含 http:// 或 https://）
 -- fnAction 	-- 请求完成后的回调函数，回调原型：function(szTitle, szContent)]]
