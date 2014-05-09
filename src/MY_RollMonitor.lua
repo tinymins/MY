@@ -1,7 +1,9 @@
 local _L = MY.LoadLangPack()
-MY_RollMonitor = { nMode = 1, nPublish = 0 }
+MY_RollMonitor = { nMode = 1, nPublish = 0, nPublishChannel = PLAYER_TALK_CHANNEL.RAID, bPublishRestart = true }
 RegisterCustomData('MY_RollMonitor.nMode')
 RegisterCustomData('MY_RollMonitor.nPublish')
+RegisterCustomData('MY_RollMonitor.bPublishRestart')
+RegisterCustomData('MY_RollMonitor.nPublishChannel')
 local _MY_RollMonitor = {
     bInvalidRectangle = false,
     uiTextBoard = nil,
@@ -15,10 +17,10 @@ local _MY_RollMonitor = {
         [6] = { szID = 'nAvg2' , szName = _L['average score with out pole'] },    -- 去掉最高最低取平均值
     },
     tChannels = {
-        ['NEARBY'] = { szName = _L['nearby channel'], rgb = GetMsgFontColor("MSG_NORMAL", true) },
-        ['TEAM'] = { szName = _L['team channel'], rgb = GetMsgFontColor("MSG_TEAM", true) },
-        ['RAID'] = { szName = _L['raid channel'], rgb = GetMsgFontColor("MSG_TEAM", true) },
-        ['TONG'] = { szName = _L['tong channel'], rgb = GetMsgFontColor("MSG_GUILD", true) },
+        { nChannel = PLAYER_TALK_CHANNEL.NEARBY, szName = _L['nearby channel'], rgb = GetMsgFontColor("MSG_NORMAL", true) },
+        { nChannel = PLAYER_TALK_CHANNEL.TEAM  , szName = _L['team channel']  , rgb = GetMsgFontColor("MSG_TEAM"  , true) },
+        { nChannel = PLAYER_TALK_CHANNEL.RAID  , szName = _L['raid channel']  , rgb = GetMsgFontColor("MSG_TEAM"  , true) },
+        { nChannel = PLAYER_TALK_CHANNEL.TONG  , szName = _L['tong channel']  , rgb = GetMsgFontColor("MSG_GUILD" , true) },
     }
 }
 -- 标签激活响应函数
@@ -40,11 +42,31 @@ _MY_RollMonitor.OnPanelActive = function(wnd)
         return t
     end)
     -- 清空
-    ui:append('WndButton_Clear','WndButton'):child('#WndButton_Clear'):text(_L['clear']):pos(460,20):width(80):click(function()
+    ui:append('WndButton_Clear','WndButton'):child('#WndButton_Clear'):text(_L['restart']):pos(450,20):width(90):lclick(function(nButton)
         _MY_RollMonitor.aRecords, _MY_RollMonitor.bInvalidRectangle = {}, true
-    end)
+        if MY_RollMonitor.bPublishRestart then
+            MY.Talk(MY_RollMonitor.nPublishChannel, _L['--------------- roll restart ----------------']..'\n')
+        end
+    end):rmenu(function()
+        local t = { {
+            szOption = _L['publish setting'], 
+            bCheck = true, bMCheck = false, bChecked = MY_RollMonitor.bPublishRestart,
+            fnAction = function() MY_RollMonitor.bPublishRestart = not MY_RollMonitor.bPublishRestart end,
+        }, { bDevide = true } }
+        for _, tChannel in ipairs(_MY_RollMonitor.tChannels) do
+            table.insert( t, { 
+                szOption = tChannel.szName,
+                rgb = tChannel.rgb,
+                bCheck = true, bMCheck = true, bChecked = MY_RollMonitor.nPublishChannel == tChannel.nChannel,
+                fnAction = function()
+                    MY_RollMonitor.nPublishChannel = tChannel.nChannel
+                end
+            } )
+        end
+        return t
+    end):tip(_L['left click to restart, right click to open setting.'], MY.Const.UI.Tip.POS_TOP)
     -- 发布
-    ui:append('WndButton_Publish','WndButton'):child('#WndButton_Publish'):text(_L['publish']):pos(540,20):width(80):menu(function()
+    ui:append('WndButton_Publish','WndButton'):child('#WndButton_Publish'):text(_L['publish']):pos(540,20):width(80):rmenu(function()
         local t = { {
             szOption = _L['publish setting'], {
                 bCheck = true, bMCheck = true, bChecked = MY_RollMonitor.nPublish == 3,
@@ -64,39 +86,42 @@ _MY_RollMonitor.OnPanelActive = function(wnd)
                 szOption = _L['publish all']
             }
         }, { bDevide = true } }
-        for szChannel, tChannel in pairs(_MY_RollMonitor.tChannels) do
+        for _, tChannel in ipairs(_MY_RollMonitor.tChannels) do
             table.insert( t, { 
                 szOption = tChannel.szName,
                 rgb = tChannel.rgb,
+                bCheck = true, bMCheck = true, bChecked = MY_RollMonitor.nPublishChannel == tChannel.nChannel,
                 fnAction = function()
-                    MY.Talk(PLAYER_TALK_CHANNEL[szChannel], string.format('[%s][%s]%s\n',_L['mingyi plugin'],_L["roll monitor"],_MY_RollMonitor.aMode[MY_RollMonitor.nMode].szName), true)
-                    MY.Talk(PLAYER_TALK_CHANNEL[szChannel], '---------------------------------------------'..'\n')
-                    for i, aRecord in ipairs(_MY_RollMonitor.aRecords) do
-                        if MY_RollMonitor.nPublish > 0 and i > MY_RollMonitor.nPublish then break end
-                        MY.Talk(PLAYER_TALK_CHANNEL[szChannel], _L( '[%s] rolls for %d times, valid score is %s.', aRecord.szName, #aRecord, (string.gsub(aRecord[_MY_RollMonitor.aMode[MY_RollMonitor.nMode].szID],'(%d+%.%d%d)%d+','%1')) ) .. '\n')
-                    end
-                    local team = GetClientTeam()
-                    if team then
-                        local szUnrolledNames = ''
-                        for _, dwID in ipairs(team.GetTeamMemberList()) do
-                            local szName, bUnRoll = team.GetClientTeamMemberName(dwID), true
-                            for _, aRecord in ipairs(_MY_RollMonitor.aRecords) do
-                                if aRecord.szName == szName then
-                                    bUnRoll = false
-                                end
-                            end
-                            if bUnRoll then szUnrolledNames = szUnrolledNames .. '[' .. szName .. ']' end
-                        end
-                        if szUnrolledNames~='' then
-                            MY.Talk(PLAYER_TALK_CHANNEL[szChannel], szUnrolledNames .. _L["haven't roll yet."]..'\n')
-                        end
-                    end
-                    MY.Talk(PLAYER_TALK_CHANNEL[szChannel], '---------------------------------------------'..'\n')
+                    MY_RollMonitor.nPublishChannel = tChannel.nChannel
                 end
             } )
         end
         return t
-    end)
+    end):lclick(function()
+        MY.Talk(MY_RollMonitor.nPublishChannel, string.format('[%s][%s]%s\n',_L['mingyi plugin'],_L["roll monitor"],_MY_RollMonitor.aMode[MY_RollMonitor.nMode].szName), true)
+        MY.Talk(MY_RollMonitor.nPublishChannel, _L['---------------------------------------------']..'\n')
+        for i, aRecord in ipairs(_MY_RollMonitor.aRecords) do
+            if MY_RollMonitor.nPublish > 0 and i > MY_RollMonitor.nPublish then break end
+            MY.Talk(MY_RollMonitor.nPublishChannel, _L( '[%s] rolls for %d times, valid score is %s.', aRecord.szName, #aRecord, (string.gsub(aRecord[_MY_RollMonitor.aMode[MY_RollMonitor.nMode].szID],'(%d+%.%d%d)%d+','%1')) ) .. '\n')
+        end
+        local team = GetClientTeam()
+        if team then
+            local szUnrolledNames = ''
+            for _, dwID in ipairs(team.GetTeamMemberList()) do
+                local szName, bUnRoll = team.GetClientTeamMemberName(dwID), true
+                for _, aRecord in ipairs(_MY_RollMonitor.aRecords) do
+                    if aRecord.szName == szName then
+                        bUnRoll = false
+                    end
+                end
+                if bUnRoll then szUnrolledNames = szUnrolledNames .. '[' .. szName .. ']' end
+            end
+            if szUnrolledNames~='' then
+                MY.Talk(MY_RollMonitor.nPublishChannel, szUnrolledNames .. _L["haven't roll yet."]..'\n')
+            end
+        end
+        MY.Talk(MY_RollMonitor.nPublishChannel, _L['---------------------------------------------']..'\n')
+    end):tip(_L['left click to publish, right click to open setting.'], MY.Const.UI.Tip.POS_TOP, { x = -80 })
     -- 输出板
     ui:append('WndScrollBox_Record','WndScrollBox'):child('#WndScrollBox_Record'):handleStyle(3):pos(20,50):size(600,400):text(_L['去掉最高最低取平均值']):append('Text_Default','Text'):children('#Text_Default')
     _MY_RollMonitor.uiBoard = ui:child('#WndScrollBox_Record')
