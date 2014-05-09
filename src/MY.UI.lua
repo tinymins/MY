@@ -1387,7 +1387,9 @@ function _MY.UI:tip(szTip, nPosType, tOffset, bNoEncode)
         end
         x, y = x + tOffset.x, y + tOffset.y
         OutputTip(szTip, tOffset.w, {x, y, w, h}, nPosType)
-    end, nil, true)
+    end, function()
+        OutputTip( "<text>text=\"\" font=207 </text>", 0, {-100,-100,0,0})
+    end, true)
 end
 
 --[[ check ¸´Ñ¡¿ò×´Ì¬±ä»¯
