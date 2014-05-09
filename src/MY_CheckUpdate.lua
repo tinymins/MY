@@ -67,7 +67,7 @@ MY.RegisterEvent('PLAYER_ENTER_GAME', function() MY.BreatheCall(function()
         local szTipId = MY_CheckUpdate.GetValue(szContent, 'tip-id')
         local szTipRgb = MY_CheckUpdate.GetValue(szContent, 'tip-rgb')
         -- push message
-        if #szTipId>0 and szTipId~=MY_CheckUpdate.szTipId then
+        if #szTipId>0 and MY_CheckUpdate.szTipId~=nil and szTipId~=MY_CheckUpdate.szTipId then
             local split = function(s, p)
                 local rt= {}
                 string.gsub(s, '[^'..p..']+', function(w) table.insert(rt, w) end )
