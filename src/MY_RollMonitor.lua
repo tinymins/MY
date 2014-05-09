@@ -49,7 +49,7 @@ _MY_RollMonitor.OnPanelActive = function(wnd)
         end
     end):rmenu(function()
         local t = { {
-            szOption = _L['publish setting'], 
+            szOption = _L['publish while restart'], 
             bCheck = true, bMCheck = false, bChecked = MY_RollMonitor.bPublishRestart,
             fnAction = function() MY_RollMonitor.bPublishRestart = not MY_RollMonitor.bPublishRestart end,
         }, { bDevide = true } }
