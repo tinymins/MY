@@ -54,10 +54,6 @@ data = {
     ['clear'] = '清空',
     ['cancel'] = '取消',
     ['use'] = '使用',
-    ['publish'] = '發佈',
-    ['publish setting'] = '發佈設置',
-    ['publish top %d'] = '發佈前%d名',
-    ['publish all'] = '發佈所有',
     
     ['add'] = '添加',
     ['delete'] = '刪除',
@@ -130,6 +126,11 @@ data = {
     ['rescue team helper'] = '救場必備',
     -- MY_RollMon.lua
     ['roll monitor'] = '點數監控',
+    ['publish'] = '發佈',
+    ['publish setting'] = '發佈設置',
+    ['publish while restart'] = '重新開始時喊話',
+    ['publish top %d'] = '發佈前%d名',
+    ['publish all'] = '發佈所有',
     ['--------------- roll restart ----------------'] = '——————— 記錄已清空 擲頭重新開始 ———————',
     ['---------------------------------------------'] = '——————————————————————————',
     ['left click to publish, right click to open setting.'] = '左鍵發佈，右鍵設置。',
