@@ -49,6 +49,7 @@ data = {
     ['TangMen'] = '唐門',
     
     ['start'] = '開始',
+    ['restart'] = '重新開始',
     ['stop'] = '停止',
     ['clear'] = '清空',
     ['cancel'] = '取消',
@@ -129,6 +130,10 @@ data = {
     ['rescue team helper'] = '救場必備',
     -- MY_RollMon.lua
     ['roll monitor'] = '點數監控',
+    ['--------------- roll restart ----------------'] = '——————— 記錄已清空 擲頭重新開始 ———————',
+    ['---------------------------------------------'] = '——————————————————————————',
+    ['left click to publish, right click to open setting.'] = '左鍵發佈，右鍵設置。',
+    ['left click to restart, right click to open setting.'] = '左鍵重新開始，右鍵設置。',
     ['ROLL_MONITOR_EXP'] = '"([^"]*)擲出(%d+)點。%(1 %- 100%)"',
     ['only first score'] = '只記錄第一次',
     ['only last score'] = '只記錄最後一次',
