@@ -1219,27 +1219,55 @@ end
     :menu(table menu)  弹出菜单menu
     :menu(functin fn)  弹出菜单function返回值table
 ]]
-function _MY.UI:menu(menu)
+function _MY.UI:menu(lmenu, rmenu, bNoAutoBind)
     self:_checksum()
-    for _, ele in pairs(self.eles) do
+    if not bNoAutoBind then
+        rmenu = rmenu or lmenu
+    end
+    -- pop menu function
+    local fnPopMenu = function(raw, menu)
+        local _menu = nil
+        local nX, nY = raw:GetAbsPos()
+        local nW, nH = raw:GetSize()
+        if type(menu) == "function" then
+            _menu = menu()
+        else
+            _menu = menu
+        end
+        _menu.nMiniWidth = nW
+        _menu.x = nX
+        _menu.y = nY + nH
+        PopupMenu(_menu)
+    end
+    -- bind left click
+    if lmenu then 
         self:each(function(eself)
-            eself:click(function()
-                local _menu = nil
-                local nX, nY = eself:raw(1):GetAbsPos()
-                local nW, nH = eself:raw(1):GetSize()
-                if type(menu) == "function" then
-                    _menu = menu()
-                else
-                    _menu = menu
-                end
-                _menu.nMiniWidth = nW
-                _menu.x = nX
-                _menu.y = nY + nH
-                PopupMenu(_menu)
-            end)
+            eself:lclick(function() fnPopMenu(eself:raw(1), lmenu) end)
+        end)
+    end
+    -- bind right click
+    if rmenu then 
+        self:each(function(eself)
+            eself:rclick(function() fnPopMenu(eself:raw(1), rmenu) end)
         end)
     end
     return self
+end
+
+--[[ lmenu 弹出左键菜单
+    :lmenu(table menu)  弹出菜单menu
+    :lmenu(functin fn)  弹出菜单function返回值table
+]]
+function _MY.UI:lmenu(menu)
+    return self:menu(menu, nil, true)
+end
+
+--[[ rmenu 弹出右键菜单
+    :lmenu(table menu)  弹出菜单menu
+    :lmenu(functin fn)  弹出菜单function返回值table
+]]
+function _MY.UI:rmenu(menu)
+    return self:menu(nil, menu, true)
 end
 
 --[[ click 鼠标单击事件
@@ -1251,36 +1279,41 @@ end
        0    中键
       -1    右键
 ]]
-function _MY.UI:click(fnLeft, fnRight, fnMiddle)
+function _MY.UI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
     self:_checksum()
-    for _, ele in pairs(self.eles) do
-        if type(fnLeft)=="function" then
-            fnRight = fnRight or fnLeft
-            fnMiddle = fnMiddle or fnLeft
-            if ele.wnd then
-                ele.wnd.OnLButtonClick = function() fnLeft(1) end
-                ele.wnd.OnRButtonClick = function() fnRight(-1) end
+    if type(fnLClick)=="function" or type(fnMClick)=="function" or type(fnRClick)=="function" then
+        if not bNoAutoBind then
+            fnMClick = fnMClick or fnLClick
+            fnRClick = fnRClick or fnLClick
+        end
+        for _, ele in pairs(self.eles) do
+            if type(fnLClick)=="function" then
+                if ele.wnd then MY.UI.RegisterUIEvent(ele.wnd ,'OnLButtonClick' , function() fnLClick(MY.Const.Event.Mouse.LBUTTON) end) end
+                if ele.itm then MY.UI.RegisterUIEvent(ele.itm ,'OnItemLButtonClick' , function() fnLClick(MY.Const.Event.Mouse.LBUTTON) end) end
+                if ele.hdl then MY.UI.RegisterUIEvent(ele.hdl ,'OnItemLButtonClick' , function() fnLClick(MY.Const.Event.Mouse.LBUTTON) end) end
+                if ele.cmb then MY.UI.RegisterUIEvent(ele.cmb ,'OnLButtonClick' , function() fnLClick(MY.Const.Event.Mouse.LBUTTON) end) end
             end
-            if ele.itm then
-                ele.itm.OnItemLButtonClick = function() fnLeft(1) end 
-                ele.itm.OnItemRButtonClick = function() fnRight(-1) end 
+            if type(fnMClick)=="function" then
+                
             end
-            if ele.hdl then
-                ele.hdl.OnItemLButtonClick = function() fnLeft(1) end 
-                ele.hdl.OnItemRButtonClick = function() fnRight(-1) end 
+            if type(fnRClick)=="function" then
+                if ele.wnd then MY.UI.RegisterUIEvent(ele.wnd ,'OnRButtonClick' , function() fnRClick(MY.Const.Event.Mouse.RBUTTON) end) end
+                if ele.itm then MY.UI.RegisterUIEvent(ele.itm ,'OnItemRButtonClick' , function() fnRClick(MY.Const.Event.Mouse.RBUTTON) end) end
+                if ele.hdl then MY.UI.RegisterUIEvent(ele.hdl ,'OnItemRButtonClick' , function() fnRClick(MY.Const.Event.Mouse.RBUTTON) end) end
+                if ele.cmb then MY.UI.RegisterUIEvent(ele.cmb ,'OnRButtonClick' , function() fnRClick(MY.Const.Event.Mouse.RBUTTON) end) end
             end
-            if ele.cmb then
-                ele.cmb.OnLButtonClick = function() fnLeft(1) end
-                ele.cmb.OnRButtonClick = function() fnRight(-1) end
-            end
-        else
-            local nFlag = fnLeft or 1
-            if nFlag==1 then
+        end
+    else
+        local nFlag = fnLClick or fnMClick or fnRClick or MY.Const.Event.Mouse.LBUTTON
+        if nFlag==MY.Const.Event.Mouse.LBUTTON then
+            for _, ele in pairs(self.eles) do
                 if ele.wnd then local _this = this this = ele.wnd pcall(ele.wnd.OnLButtonClick) this = _this end
                 if ele.itm then local _this = this this = ele.itm pcall(ele.itm.OnItemLButtonClick) this = _this end
-            elseif nFlag==0 then
+            end
+        elseif nFlag==MY.Const.Event.Mouse.MBUTTON then
             
-            elseif nFlag==-1 then
+        elseif nFlag==MY.Const.Event.Mouse.RBUTTON then
+            for _, ele in pairs(self.eles) do
                 if ele.wnd then local _this = this this = ele.wnd pcall(ele.wnd.OnRButtonClick) this = _this end
                 if ele.itm then local _this = this this = ele.itm pcall(ele.itm.OnItemRButtonClick) this = _this end
             end
@@ -1289,22 +1322,72 @@ function _MY.UI:click(fnLeft, fnRight, fnMiddle)
     return self
 end
 
+--[[ lclick 鼠标左键单击事件
+    same as jQuery.lclick()
+    :lclick(fnAction) 绑定
+    :lclick()         触发
+]]
+function _MY.UI:lclick(fnLClick)
+    return self:click(fnLClick or MY.Const.Event.Mouse.LBUTTON, nil, nil, true)
+end
+
+--[[ rclick 鼠标右键单击事件
+    same as jQuery.rclick()
+    :rclick(fnAction) 绑定
+    :rclick()         触发
+]]
+function _MY.UI:rclick(fnRClick)
+    return self:click(nil, fnRClick or MY.Const.Event.Mouse.RBUTTON, nil, true)
+end
+
 --[[ hover 鼠标悬停事件
     same as jQuery.hover()
     :hover(fnHover[, fnLeave]) 绑定
 ]]
-function _MY.UI:hover(fnHover, fnLeave)
+function _MY.UI:hover(fnHover, fnLeave, bNoAutoBind)
     self:_checksum()
-    fnLeave = fnLeave or fnHover
+    if not bNoAutoBind then fnLeave = fnLeave or fnHover end
     if fnHover then
         for _, ele in pairs(self.eles) do
-            if ele.wnd then ele.wnd.OnMouseEnter = function() fnHover(true) end end
-            if ele.wnd then ele.wnd.OnMouseLeave = function() fnLeave(false) end end
-            if ele.itm then ele.itm.OnItemMouseEnter = function() fnHover(true) end end
-            if ele.itm then ele.itm.OnItemMouseLeave = function() fnLeave(false) end end
+            if ele.wnd then MY.UI.RegisterUIEvent(ele.wnd, 'OnMouseEnter' , function() fnHover(true) end) end
+            if ele.itm then MY.UI.RegisterUIEvent(ele.itm, 'OnItemMouseEnter', function() fnHover(true) end) end
+        end
+    end
+    if fnLeave then
+        for _, ele in pairs(self.eles) do
+            if ele.wnd then MY.UI.RegisterUIEvent(ele.wnd, 'OnMouseLeave' , function() fnLeave(true) end) end
+            if ele.itm then MY.UI.RegisterUIEvent(ele.itm, 'OnItemMouseLeave', function() fnLeave(true) end) end
         end
     end
     return self
+end
+
+--[[ tip 鼠标悬停提示
+    (self) Instance:tip( szTip[, nPosType[, tOffset[, bNoEncode] ] ] ) 绑定tip事件
+    string szTip:       要提示的文字文本或序列化的DOM文本
+    number nPosType:    提示位置 有效值为MY.Const.UI.Tip.枚举
+    table tOffset:      提示框偏移量{ x = x, y = y }
+    boolean bNoEncode:  当szTip为纯文本时保持这个参数为false 当szTip为格式化的DOM字符串时设置该参数为true
+]]
+function _MY.UI:tip(szTip, nPosType, tOffset, bNoEncode)
+    if not bNoEncode then
+        szTip = "<text>text=" .. EncodeComponentsString(szTip) .." font=207 </text>"
+    end
+    tOffset = tOffset or {}
+    tOffset.x = tOffset.x or 0
+    tOffset.y = tOffset.y or 0
+    tOffset.w = tOffset.w or 450
+    nPosType = nPosType or MY.Const.UI.Tip.POS_FOLLOW_MOUSE
+    return self:hover(function()
+        local x, y = this:GetAbsPos()
+        local w, h = this:GetSize()
+        if nPosType == MY.Const.UI.Tip.POS_FOLLOW_MOUSE then
+            x, y = Cursor.GetPos()
+            x, y = x - 0, y - 40
+        end
+        x, y = x + tOffset.x, y + tOffset.y
+        OutputTip(szTip, tOffset.w, {x, y, w, h}, nPosType)
+    end, nil, true)
 end
 
 --[[ check 复选框状态变化
@@ -1364,12 +1447,33 @@ end
 -----------------------------------------------------------
 
 MY.UI = MY.UI or {}
+MY.Const = MY.Const or {}
+MY.Const.Event = MY.Const.Event or {}
+MY.Const.Event.Mouse = MY.Const.Event.Mouse or {}
+MY.Const.Event.Mouse.LBUTTON = 1
+MY.Const.Event.Mouse.MBUTTON = 0
+MY.Const.Event.Mouse.RBUTTON = -1
+MY.Const.UI = MY.Const.UI or {}
+MY.Const.UI.Tip = MY.Const.UI.Tip or {}
+MY.Const.UI.Tip.POS_FOLLOW_MOUSE = 0
+MY.Const.UI.Tip.POS_LEFT         = 1
+MY.Const.UI.Tip.POS_RIGHT        = 2
+MY.Const.UI.Tip.POS_TOP          = 3
+MY.Const.UI.Tip.POS_BOTTOM       = 4
+MY.Const.UI.Tip.POS_RIGHT_BOTTOM = 5
 
 -- 设置元表，这样可以当作函数调用，其效果相当于 MY.UI.Fetch
 setmetatable(MY.UI, { __call = function(me, ...) return me.Fetch(...) end, __metatable = true })
 
 --[[ 构造函数 类似jQuery: $(selector) ]]
 MY.UI.Fetch = function(selector, tab) return _MY.UI.new(selector, tab) end
+-- 绑定UI事件
+MY.UI.RegisterUIEvent = function(raw, szEvent, fnEvent)
+    if not raw['tMy'..szEvent] then
+        raw['tMy'..szEvent], raw[szEvent] = { raw[szEvent] }, function() for _, fn in ipairs(this['tMy'..szEvent]) do pcall(fn) end end
+    end
+    if fnEvent then table.insert(raw['tMy'..szEvent], fnEvent) end
+end
 
 -- open new frame
 MY.UI.OpenFrame = function(szName, szStyle, bDummyFrame)
