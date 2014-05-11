@@ -1366,7 +1366,7 @@ end
     (self) Instance:tip( szTip[, nPosType[, tOffset[, bNoEncode] ] ] ) 绑定tip事件
     string szTip:       要提示的文字文本或序列化的DOM文本
     number nPosType:    提示位置 有效值为MY.Const.UI.Tip.枚举
-    table tOffset:      提示框偏移量{ x = x, y = y }
+    table tOffset:      提示框偏移量等附加信息{ x = x, y = y, hide = MY.Const.UI.Tip.Hide枚举 }
     boolean bNoEncode:  当szTip为纯文本时保持这个参数为false 当szTip为格式化的DOM字符串时设置该参数为true
 ]]
 function _MY.UI:tip(szTip, nPosType, tOffset, bNoEncode)
@@ -1377,6 +1377,7 @@ function _MY.UI:tip(szTip, nPosType, tOffset, bNoEncode)
     tOffset.x = tOffset.x or 0
     tOffset.y = tOffset.y or 0
     tOffset.w = tOffset.w or 450
+    tOffset.hide = tOffset.hide or MY.Const.UI.Tip.HIDE
     nPosType = nPosType or MY.Const.UI.Tip.POS_FOLLOW_MOUSE
     return self:hover(function()
         local x, y = this:GetAbsPos()
@@ -1388,7 +1389,11 @@ function _MY.UI:tip(szTip, nPosType, tOffset, bNoEncode)
         x, y = x + tOffset.x, y + tOffset.y
         OutputTip(szTip, tOffset.w, {x, y, w, h}, nPosType)
     end, function()
-        OutputTip( "<text>text=\"\" font=207 </text>", 0, {-100,-100,0,0})
+        if tOffset.hide == MY.Const.UI.Tip.HIDE then
+            HideTip(false)
+        elseif tOffset.hide == MY.Const.UI.Tip.ANIMATE_HIDE then
+            HideTip(true)
+        end
     end, true)
 end
 
@@ -1463,6 +1468,10 @@ MY.Const.UI.Tip.POS_RIGHT        = 2
 MY.Const.UI.Tip.POS_TOP          = 3
 MY.Const.UI.Tip.POS_BOTTOM       = 4
 MY.Const.UI.Tip.POS_RIGHT_BOTTOM = 5
+
+MY.Const.UI.Tip.NO_HIDE      = 100
+MY.Const.UI.Tip.HIDE         = 101
+MY.Const.UI.Tip.ANIMATE_HIDE = 102
 
 -- 设置元表，这样可以当作函数调用，其效果相当于 MY.UI.Fetch
 setmetatable(MY.UI, { __call = function(me, ...) return me.Fetch(...) end, __metatable = true })
