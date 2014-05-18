@@ -823,7 +823,7 @@ MY.RegisterEvent = function(szEventName, arg1, arg2)
         if type(_MY.tEvent[szEventName])~="table" then
             _MY.tEvent[szEventName] = {}
             RegisterEvent(szEventName, function(...)
-                local param = {...}
+                local param = {}
                 for i = 0, 100, 1 do
                     if _G['arg'..i] then
                         table.insert(param, _G['arg'..i])
