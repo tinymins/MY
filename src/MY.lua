@@ -823,11 +823,19 @@ MY.RegisterEvent = function(szEventName, arg1, arg2)
         if type(_MY.tEvent[szEventName])~="table" then
             _MY.tEvent[szEventName] = {}
             RegisterEvent(szEventName, function(...)
+                local param = {...}
+                for i = 0, 100, 1 do
+                    if _G['arg'..i] then
+                        table.insert(param, _G['arg'..i])
+                    else
+                        break
+                    end
+                end
                 for i = #_MY.tEvent[szEventName], 1, -1 do
                     local hEvent = _MY.tEvent[szEventName][i]
                     if type(hEvent.fn)=="function" then
                         -- try to run event function
-                        local status, err = pcall(hEvent.fn, ...)
+                        local status, err = pcall(hEvent.fn, unpack(param))
                         -- error report
                         if not status then MY.Debug(err..'\n', 'OnEvent#'..szEventName, 2) end
                     else
