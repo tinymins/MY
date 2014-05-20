@@ -549,19 +549,22 @@ end
 -- dwType	-- *可选* 目标类型
 -- dwID		-- 目标 ID]]
 MY.SetTarget = function(dwType, dwID)
-    if type(dwType)=="string" then dwType, dwID = 0, dwType end
+    -- check dwType
+    if type(dwType)=="userdata" then 
+        dwType, dwID = ( IsPlayer(dwType) and TARGET.PLAYER ) or TARGET.NPC, dwType.dwID
+    elseif type(dwType)=="string" then
+        dwType, dwID = 0, dwType
+    end
+    -- conv if dwID is string
     if type(dwID)=="string" then
         for _, p in pairs(MY.GetNearNpc()) do
             if p.szName == dwID then
                 dwType, dwID = TARGET.NPC, p.dwID
             end
         end
-    end
-    if type(dwID)=="string" then
         for _, p in pairs(MY.GetNearPlayer()) do
             if p.szName == dwID then
-                dwType = TARGET.PLAYER
-                dwID = p.dwID
+                dwType, dwID = TARGET.PLAYER, p.dwID
             end
         end
     end
