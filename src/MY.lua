@@ -263,6 +263,7 @@ end
 MY.GetFrame = function()
     if not _MY.frame then
         _MY.frame = Wnd.OpenWindow(_MY.szIniFile, "MY")
+        _MY.frame:Hide()
     end
     return _MY.frame
 end
