@@ -27,6 +27,7 @@ MY.RegisterEvent('PLAYER_ENTER_GAME', function() MY.BreatheCall(function()
     local me, tong, szUrl = GetClientPlayer(), GetTongClient(), ''
     local szClientVer, szExeVer, szLang, szClientType = GetVersion()
     local szVerMY, iVerMY = MY.GetVersion()
+    local _, tServer = MY.GetServer()
     local data = {
         n = '', -- me.szName
         i = '', -- me.dwID
@@ -42,6 +43,8 @@ MY.RegisterEvent('PLAYER_ENTER_GAME', function() MY.BreatheCall(function()
         vt = szClientType,
         mv = szVerMY,
         mi = iVerMY,
+        s1 = tServer[1],
+        s2 = tServer[2],
     }
     -- while not ready
     if me and me.szName then
@@ -73,12 +76,12 @@ MY.RegisterEvent('PLAYER_ENTER_GAME', function() MY.BreatheCall(function()
                 string.gsub(s, '[^'..p..']+', function(w) table.insert(rt, w) end )
                 return rt
             end
-            local _rgb, rgb = { 255, 0, 0 }, split( szTipRgb, ',' )
+            local oContent, rgb = { szTip, r=255, g=0, b=0 }, split( szTipRgb, ',' )
             rgb[1], rgb[2], rgb[3] = tonumber(rgb[1]), tonumber(rgb[2]), tonumber(rgb[3])
-            if rgb[1] and rgb[1]>=0 and rgb[1]<=255 then _rgb[1] = rgb[1] end
-            if rgb[2] and rgb[2]>=0 and rgb[2]<=255 then _rgb[2] = rgb[2] end
-            if rgb[3] and rgb[3]>=0 and rgb[3]<=255 then _rgb[3] = rgb[3] end
-            MY.Sysmsg(szTip..'\n', nil, _rgb)
+            if rgb[1] and rgb[1]>=0 and rgb[1]<=255 then oContent.r = rgb[1] end
+            if rgb[2] and rgb[2]>=0 and rgb[2]<=255 then oContent.g = rgb[2] end
+            if rgb[3] and rgb[3]>=0 and rgb[3]<=255 then oContent.b = rgb[3] end
+            MY.Sysmsg(oContent, nil)
             MY_CheckUpdate.szTipId = szTipId
         end
         -- version update
@@ -89,8 +92,8 @@ MY.RegisterEvent('PLAYER_ENTER_GAME', function() MY.BreatheCall(function()
                 local szFeature = MY_CheckUpdate.GetValue(szContent, 'feature')
                 local szAlert = MY_CheckUpdate.GetValue(szContent, 'alert')
                 -- new version
-                MY.Sysmsg(_L["new version found."]..'\n', nil, { 255, 0, 0})
-                MY.Sysmsg(szFeature..'\n', nil, { 255, 0, 0})
+                MY.Sysmsg({_L["new version found."], r=255, g=0, b=0}, nil)
+                MY.Sysmsg({szFeature, r=255, g=0, b=0}, nil)
                 if szAlert~='0' then
                     local tVersionInfo = {
                         szName = "MY_VersionInfo",
