@@ -43,6 +43,12 @@ _MY_TalkEx.tChannels = {
     ['CAMP'] = { szName = _L['camp channel'], tCol = GetMsgFontColor("MSG_CAMP", true) },
     ['WORLD'] = { szName = _L['world channel'], tCol = GetMsgFontColor("MSG_WORLD", true) },
 }
+_MY_TalkEx.tTrickChannels = { 
+    ['TEAM'] = { szName = _L['team channel'], tCol = GetMsgFontColor("MSG_TEAM", true) },
+    ['RAID'] = { szName = _L['raid channel'], tCol = GetMsgFontColor("MSG_TEAM", true) },
+    ['TONG'] = { szName = _L['tong channel'], tCol = GetMsgFontColor("MSG_GUILD", true) },
+    ['TONG_ALLIANCE'] = { szName = _L['tong alliance channel'], tCol = GetMsgFontColor("MSG_GUILD_ALLIANCE", true) },
+}
 _MY_TalkEx.OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
     -------------------------------------
@@ -61,7 +67,7 @@ _MY_TalkEx.OnPanelActive = function(wnd)
     end
     -- 喊话按钮
     ui:append('WndButton_Talk','WndButton'):child('#WndButton_Talk'):pos(540,210):text(_L['send'],{255,255,255}):click(function() 
-        if #MY_TalkEx.szTalk == 0 then MY.Sysmsg(_L["please input something."].."\n",nil,{255,0,0}) return end
+        if #MY_TalkEx.szTalk == 0 then MY.Sysmsg({_L["please input something."], r=255, g=0, b=0},nil) return end
         for szChannel, bSend in pairs(MY_TalkEx.tTalkChannel) do
             if bSend then MY.Talk(PLAYER_TALK_CHANNEL[szChannel],MY_TalkEx.szTalk) end
         end
@@ -90,7 +96,7 @@ _MY_TalkEx.OnPanelActive = function(wnd)
         end)())
     end):text(_MY_TalkEx.tFilter[MY_TalkEx.tTrickFilter] or '')
     -- 调侃门派过滤器
-    ui:append("WndComboBox_Trick_Force",'WndComboBox'):child('#WndComboBox_Trick_Force'):pos(175,256):size(80,25):text(_MY_TalkEx.tForce[MY_TalkEx.tTrickFilterForce]):click(function()
+    ui:append("WndComboBox_Trick_Force",'WndComboBox'):child('#WndComboBox_Trick_Force'):pos(175,257):size(80,25):text(_MY_TalkEx.tForce[MY_TalkEx.tTrickFilterForce]):click(function()
         PopupMenu((function() 
             local t = {}
             for szFilterId,szTitle in pairs(_MY_TalkEx.tForce) do
@@ -117,7 +123,7 @@ _MY_TalkEx.OnPanelActive = function(wnd)
     ui:append("WndComboBox_Trick_Sendto_Filter",'WndComboBox'):child('#WndComboBox_Trick_Sendto_Filter'):pos(80,415):size(100,25):click(function()
         PopupMenu((function() 
             local t = {}
-            for szChannel,tChannel in pairs(_MY_TalkEx.tChannels) do
+            for szChannel,tChannel in pairs(_MY_TalkEx.tTrickChannels) do
                 table.insert(t,{
                     szOption = tChannel.szName,
                     fnAction = function()
@@ -132,7 +138,7 @@ _MY_TalkEx.OnPanelActive = function(wnd)
     end):text(_MY_TalkEx.tChannels[MY_TalkEx.tTrickChannel].szName or ''):color(_MY_TalkEx.tChannels[MY_TalkEx.tTrickChannel].tCol)
     -- 调侃按钮
     ui:append('WndButton_Trick','WndButton'):child('#WndButton_Trick'):color({255,255,255}):pos(435,415):text(_L['have a trick with']):click(function()
-        if #MY_TalkEx.szTrickText == 0 then MY.Sysmsg(_L["please input something."].."\n",nil,{255,0,0}) return end
+        if #MY_TalkEx.szTrickText == 0 then MY.Sysmsg({_L["please input something."], r=255, g=0, b=0},nil) return end
         local tPlayers, iPlayers = {}, 0
         if MY_TalkEx.tTrickFilter == 'RAID' then
             for _, dwID in pairs(GetClientTeam().GetTeamMemberList()) do
@@ -153,7 +159,7 @@ _MY_TalkEx.OnPanelActive = function(wnd)
         -- 去掉自己 _(:з」∠)_调侃自己是闹哪样
         if tPlayers[GetClientPlayer().dwID] then iPlayers=iPlayers-1 tPlayers[GetClientPlayer().dwID]=nil end
         -- none target
-        if iPlayers == 0 then MY.Sysmsg(_L["no trick target found."].."\n",nil,{255,0,0}) return end
+        if iPlayers == 0 then MY.Sysmsg({_L["no trick target found."], r=255, g=0, b=0},nil) return end
         -- start tricking
         if #MY_TalkEx.szTrickTextBegin > 0 then MY.Talk(PLAYER_TALK_CHANNEL[MY_TalkEx.tTrickChannel], MY_TalkEx.szTrickTextBegin) end
         for _, player in pairs(tPlayers) do

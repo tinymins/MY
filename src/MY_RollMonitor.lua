@@ -17,7 +17,6 @@ local _MY_RollMonitor = {
         [6] = { szID = 'nAvg2' , szName = _L['average score with out pole'] },    -- 去掉最高最低取平均值
     },
     tChannels = {
-        { nChannel = PLAYER_TALK_CHANNEL.NEARBY, szName = _L['nearby channel'], rgb = GetMsgFontColor("MSG_NORMAL", true) },
         { nChannel = PLAYER_TALK_CHANNEL.TEAM  , szName = _L['team channel']  , rgb = GetMsgFontColor("MSG_TEAM"  , true) },
         { nChannel = PLAYER_TALK_CHANNEL.RAID  , szName = _L['raid channel']  , rgb = GetMsgFontColor("MSG_TEAM"  , true) },
         { nChannel = PLAYER_TALK_CHANNEL.TONG  , szName = _L['tong channel']  , rgb = GetMsgFontColor("MSG_GUILD" , true) },
