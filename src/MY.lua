@@ -35,8 +35,8 @@ local _MY = {
     hRequest = nil,
     bLoaded = false,
     nDebugLevel = 4,
-    dwVersion = 0x0000401,
-    szBuildDate = "20140422",
+    dwVersion = 0x0000402,
+    szBuildDate = "20140523",
     szName = _L["mingyi plugins"],
     szShortName = _L["mingyi plugin"],
     szIniFile = "Interface\\MY\\ui\\MY.ini",
@@ -206,37 +206,43 @@ end
 -- get player addon menu
 _MY.GetPlayerAddonMenu = function()
     local menu = {}
-    table.insert(menu, { bDevide = true })
     for i = 1, #_MY.tPlayerMenu, 1 do
         local m = _MY.tPlayerMenu[i].Menu
         if type(m)=="function" then m = m() end
         table.insert(menu, m)
     end
-    if #menu==1 then menu={} end
+    if #menu>1 then
+        table.insert(menu, 1, { bDevide = true })
+        table.insert(menu, { bDevide = true })
+    end
     return menu
 end
 -- get target addon menu
 _MY.GetTargetAddonMenu = function()
     local menu = {}
-    table.insert(menu, { bDevide = true })
     for i = 1, #_MY.tTargetMenu, 1 do
         local m = _MY.tTargetMenu[i].Menu
         if type(m)=="function" then m = m() end
         table.insert(menu, m)
     end
-    if #menu==1 then menu={} end
+    if #menu>1 then
+        table.insert(menu, 1, { bDevide = true })
+        table.insert(menu, { bDevide = true })
+    end
     return menu
 end
 -- get trace button menu
 _MY.GetTraceButtonMenu = function()
     local menu = {}
-    table.insert(menu, { bDevide = true })
     for i = 1, #_MY.tTraceMenu, 1 do
         local m = _MY.tTraceMenu[i].Menu
         if type(m)=="function" then m = m() end
         table.insert(menu, m)
     end
-    if #menu==1 then menu={} end
+    if #menu>1 then
+        table.insert(menu, 1, { bDevide = true })
+        table.insert(menu, { bDevide = true })
+    end
     return menu
 end
 -----------------------------------------------
