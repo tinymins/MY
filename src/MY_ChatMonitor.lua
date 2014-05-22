@@ -24,7 +24,7 @@ _MY_ChatMonitor.bCapture = false
 _MY_ChatMonitor.ui = nil
 _MY_ChatMonitor.uiBoard = nil
 _MY_ChatMonitor.uiTipBoard = nil
-_MY_ChatMonitor.szLuaData = 'interface/MY/data/MY_ChatMonitor.'.. MY.GetLang() ..'.dat'
+_MY_ChatMonitor.szLuaData = 'MY_CHATMONITOR_CONFIG'
 
 -- 插入聊天内容时监控聊天信息
 _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
@@ -338,7 +338,7 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
     ui:append('Label_KeyWord','Text'):children('#Label_KeyWord'):pos(22,15):size(100,25):text(_L['key words:'])
     ui:append('EditBox_KeyWord','WndEditComboBox'):child('#EditBox_KeyWord'):pos(80,15):size(400,25):text(MY_ChatMonitor.szKeyWords):change(function(szText) MY_ChatMonitor.szKeyWords = szText end):menu(function()
         local edit, t = ui:child('#EditBox_KeyWord'), {}
-        for _, szOpt in ipairs(LoadLUAData(_MY_ChatMonitor.szLuaData) or {}) do
+        for _, szOpt in ipairs(MY.LoadLUAData(_MY_ChatMonitor.szLuaData) or {}) do
             if type(szOpt)=="string" then
                 table.insert(t, {
                     szOption = szOpt, {
@@ -347,11 +347,11 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
                     }, {
                         szOption = _L['delete'],
                         fnAction = function()
-                            local t = LoadLUAData(_MY_ChatMonitor.szLuaData) or {}
+                            local t = MY.LoadLUAData(_MY_ChatMonitor.szLuaData) or {}
                             for i = #t, 1, -1 do 
                                 if t[i] == szOpt then table.remove(t, i) end
                             end
-                            SaveLUAData(_MY_ChatMonitor.szLuaData, t)
+                            MY.SaveLUAData(_MY_ChatMonitor.szLuaData, t)
                         end
                     }
                 })
@@ -362,12 +362,12 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
             GetUserInput("", function(szVal)
                 szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
                 if szVal~="" then
-                    local t = LoadLUAData(_MY_ChatMonitor.szLuaData) or {}
+                    local t = MY.LoadLUAData(_MY_ChatMonitor.szLuaData) or {}
                     for i = #t, 1, -1 do 
                         if t[i] == szVal then return end
                     end
                     table.insert(t, szVal)
-                    SaveLUAData(_MY_ChatMonitor.szLuaData, t)
+                    MY.SaveLUAData(_MY_ChatMonitor.szLuaData, t)
                 end
             end, function() end, function() end, nil, edit:text() )
         end })
