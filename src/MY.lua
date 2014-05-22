@@ -584,6 +584,38 @@ end
 MY.GetServer = function()
     return table.concat({GetUserServer()},'_'), {GetUserServer()}
 end
+--[[ 保存数据文件：相对于data文件夹，自动区分客户端语言
+    MY.SaveLUAData( szFile, tData[, szLang] )
+]]
+MY.SaveLUAData = function(szFile, tData, szLang)
+    szFile = string.gsub(szFile, '/', '\\')
+    while(string.sub(szFile, 1, 1)=='\\') do
+        szFile = string.sub(szFile, 2)
+    end
+    if type(szLang)~='string' then
+        local _, _, lang = GetVersion()
+        szLang = string.upper(lang)
+    end
+    if #szLang>0 then szLang = '_'..szLang end
+    szFile = '\\Interface\\MY\\data\\' .. szFile  .. '.MYDATA' .. szLang
+    SaveLUAData(szFile, tData)
+end
+--[[ 加载数据文件：相对于data文件夹，自动区分客户端语言
+    MY.LoadLUAData( szFile[, szLang] )
+]]
+MY.LoadLUAData = function(szFile, szLang)
+    szFile = string.gsub(szFile, '/', '\\')
+    while(string.sub(szFile, 1, 1)=='\\') do
+        szFile = string.sub(szFile, 2)
+    end
+    if type(szLang)~='string' then
+        local _, _, lang = GetVersion()
+        szLang = string.upper(lang)
+    end
+    if #szLang>0 then szLang = '_'..szLang end
+    szFile = '\\Interface\\MY\\data\\' .. szFile  .. '.MYDATA' .. szLang
+    return LoadLUAData(szFile)
+end
 --[[ 判断某个频道能否发言
 -- (bool) MY.CanTalk(number nChannel)]]
 MY.CanTalk = function(nChannel)
