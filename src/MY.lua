@@ -199,6 +199,7 @@ _MY.TogglePanel = function()
     if frame and frame:IsVisible() then
         frame:Hide()
     elseif frame then
+        frame:BringToTop()
         frame:Show()
     end
 end
@@ -1407,11 +1408,9 @@ pcall(function()
     -- ´´½¨²Ëµ¥
     local tMenu = function() return {
         szOption = _L["mingyi plugins"],
-        fnAction = function()
-            Station.Lookup("Normal/MY"):ToggleVisible()
-        end,
+        fnAction = _MY.TogglePanel,
         bCheck = true,
-        bChecked = Station.Lookup("Normal/MY"):IsVisible(),
+        bChecked = MY.GetFrame():IsVisible(),
     } end
     MY.RegisterPlayerAddonMenu( 'MY_MAIN_MENU', tMenu)
     MY.RegisterTraceButtonMenu( 'MY_MAIN_MENU', tMenu)
