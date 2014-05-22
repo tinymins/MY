@@ -158,6 +158,7 @@ data = {
     ['[%s] rolls for %d times, valid score is %s.'] = '[%s]掷了%d次骰子，有效点数为%s。',
     -- MY_Farbnamen.lua
     ['Farbnamen'] = '职业染色',
+    ['set max cache count'] = '最大缓存数量',
     ['MingYiPlugin - Farbnamen'] = '茗伊插件·职业染色',
     ['cache data deleted.'] = '缓存已清除。',
     ['%d player(s) data cached:'] = '已缓存角色数据 %d 份：',
