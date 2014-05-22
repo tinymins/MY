@@ -13,8 +13,8 @@ MY_Farbnamen = MY_Farbnamen or {
 }
 RegisterCustomData("Account\\MY_Farbnamen.bEnabled")
 local _MY_Farbnamen = {
-    szConfigPath = "\\Interface\\MY\\data\\PLAYER_FORCE_COLOR.MYDATA",
-    szDataCache  = string.format("\\Interface\\MY\\data\\PLAYER_INFO_CACHE\\%s.MYDATA", (MY.GetServer())),
+    szConfigPath = "PLAYER_FORCE_COLOR",
+    szDataCache  = "PLAYER_INFO_CACHE\\" .. (MY.GetServer()),
     tForceColor  = {},
     tForceString = {
         [0]  = _L['JiangHu'],
@@ -151,13 +151,13 @@ end
 
 -- 保存配置
 function MY_Farbnamen.SaveData()
-    SaveLUAData(_MY_Farbnamen.szDataCache, _MY_Farbnamen.tPlayerInfo)
+    MY.SaveLUAData(_MY_Farbnamen.szDataCache, _MY_Farbnamen.tPlayerInfo)
 end
 -- 加载配置
 function MY_Farbnamen.LoadData()
-    local data = LoadLUAData(_MY_Farbnamen.szConfigPath) or {}
+    local data = MY.LoadLUAData(_MY_Farbnamen.szConfigPath, '') or {}
     _MY_Farbnamen.tForceColor   = data  or _MY_Farbnamen.tForceColor
-    _MY_Farbnamen.tPlayerInfo = LoadLUAData(_MY_Farbnamen.szDataCache) or _MY_Farbnamen.tPlayerInfo
+    _MY_Farbnamen.tPlayerInfo = MY.LoadLUAData(_MY_Farbnamen.szDataCache) or _MY_Farbnamen.tPlayerInfo
 end
 --------------------------------------------------------------
 -- 数据统计

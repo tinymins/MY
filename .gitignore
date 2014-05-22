@@ -214,4 +214,4 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
-data/PLAYER_INFO_CACHE/*.MYDATA
+data/PLAYER_INFO_CACHE/*.MYDATA*
