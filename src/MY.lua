@@ -76,7 +76,7 @@ _MY.Init = function()
         Hotkey.AddBinding(v.szName, v.szTitle, "", v.fnAction, nil)
     end
     -- 显示欢迎信息
-    MY.Sysmsg(_L("%s, welcome to use mingyi plugins!", GetClientPlayer().szName) .. " v" .. MY.GetVersion() .. ' Build ' .. _MY.szBuildDate .. "\n")
+    MY.Sysmsg({_L("%s, welcome to use mingyi plugins!", GetClientPlayer().szName) .. " v" .. MY.GetVersion() .. ' Build ' .. _MY.szBuildDate})
     if _MY.nDebugLevel >=3 then _MY.frame:Hide() end
 end
 -- get channel header
@@ -579,6 +579,11 @@ MY.SetTarget = function(dwType, dwID)
 	end
 	SetTarget(dwType, dwID)
 end
+--[[ 获取当前服务器
+]]
+MY.GetServer = function()
+    return table.concat({GetUserServer()},'_'), {GetUserServer()}
+end
 --[[ 判断某个频道能否发言
 -- (bool) MY.CanTalk(number nChannel)]]
 MY.CanTalk = function(nChannel)
@@ -626,7 +631,7 @@ MY.Talk = function(nChannel, szText, bNoEscape, bSaveDeny)
 	elseif nChannel == PLAYER_TALK_CHANNEL.RAID and me.GetScene().nType == MAP_TYPE.BATTLE_FIELD then
 		nChannel = PLAYER_TALK_CHANNEL.BATTLE_FIELD
     elseif nChannel == PLAYER_TALK_CHANNEL.LOCAL_SYS then
-        return MY.Sysmsg(szText, '')
+        return MY.Sysmsg({szText}, '')
 	end
 	-- say body
 	local tSay = nil
@@ -660,30 +665,39 @@ MY.Talk = function(nChannel, szText, bNoEscape, bSaveDeny)
 	end
 end
 --[[ 显示本地信息
-    MY.Sysmsg(szContent, szPrefix)
-    szContent   要显示的主体消息
-    szPrefix    消息头部
-    tContentCol 主体消息文字颜色rgb[可选，为空使用默认颜色。]
-    tPrefixCol  消息头部文字颜色rgb[可选，为空和主体消息文字颜色相同。]
+    MY.Sysmsg(oContent, oTitle)
+    szContent    要显示的主体消息
+    szTitle      消息头部
+    tContentRgbF 主体消息文字颜色rgbf[可选，为空使用默认颜色字体。]
+    tTitleRgbF   消息头部文字颜色rgbf[可选，为空和主体消息文字颜色相同。]
 ]]
-MY.Sysmsg = function(szContent, szPrefix, tContentCol, tPrefixCol)
-    if type(szContent)=="boolean" then szContent = (szContent and 'true') or 'false' end
-    if not szContent then return nil end
-    szPrefix = szPrefix or _MY.szShortName
-    if tContentCol then
-        tPrefixCol = tPrefixCol or tContentCol
-        OutputMessage("MSG_SYS", string.format(
-            '<text>text="[%s] " font=10 r=%d g=%d b=%d</text><text>text="%s" font=10 r=%d g=%d b=%d</text>',
-            string.gsub(szPrefix, '"','\\"'), tPrefixCol[1]  or 0, tPrefixCol[2]  or 0, tPrefixCol[3]  or 0,
-            string.gsub(szContent,'"','\\"'), tContentCol[1] or 0, tContentCol[2] or 0, tContentCol[3] or 0
-        ), true)
-    else
-        if szPrefix=='' then
-            OutputMessage("MSG_SYS", szContent )
-        else
-            OutputMessage("MSG_SYS", string.format("[%s] %s", szPrefix, szContent) )
+MY.Sysmsg = function(oContent, oTitle)
+    oTitle = oTitle or _MY.szShortName
+    if type(oTitle)~='table' then oTitle = { oTitle, bNoWrap = true } end
+    if type(oContent)~='table' then oContent = { oContent, bNoWrap = true } end
+    oContent.r, oContent.g, oContent.b = oContent.r or 255, oContent.g or 255, oContent.b or 0
+    
+    for i = #oContent, 1, -1 do
+        if type(oContent[i])=="number"  then oContent[i] = '' .. oContent[i] end
+        if type(oContent[i])=="boolean" then oContent[i] = (oContent[i] and 'true') or 'false' end
+        -- auto wrap each line
+        if (not oContent.bNoWrap) and type(oContent[i])=="string" and string.sub(oContent[i], -1)~='\n' then
+            oContent[i] = oContent[i] .. '\n'
         end
     end
+    
+    -- calc szMsg
+    local szMsg = ''
+    for i = 1, #oTitle, 1 do
+        if oTitle[i]~='' then
+            szMsg = szMsg .. GetFormatText( '['..oTitle[i]..']', oTitle.f or oContent.f, oTitle.r or oContent.r, oTitle.g or oContent.g, oTitle.b or oContent.b )
+        end
+    end
+    for i = 1, #oContent, 1 do
+        szMsg = szMsg .. GetFormatText(oContent[i], oContent.f, oContent.r, oContent.g, oContent.b)
+    end
+    -- Output
+    OutputMessage("MSG_SYS", szMsg, true)
 end
 --[[ Debug输出
     (void)MY.Debug(szText, szHead, nLevel)
@@ -694,16 +708,17 @@ end
 MY.Debug = function(szText, szHead, nLevel)
     if type(nLevel)~="number" then nLevel = 1 end
     if type(szHead)~="string" then szHead = 'MY DEBUG' end
-    local color = { 255, 255, 0 }
+    local oContent = { r=255, g=255, b=0 }
     if nLevel == 0 then
-        color = { 0, 255, 127 }
+        oContent = { r=0,   g=255, b=127 }
     elseif nLevel == 1 then
-        color = { 255, 170, 170 }
+        oContent = { r=255, g=170, b=170 }
     elseif nLevel == 2 then
-        color = { 255, 86, 86 }
+        oContent = { r=255, g=86,  b=86  }
     end
+    table.insert(oContent, szText)
     if nLevel >= _MY.nDebugLevel then
-        MY.Sysmsg(szText, szHead, color)
+        MY.Sysmsg(oContent, szHead)
     end
 end
 --[[ 延迟调用
@@ -1356,7 +1371,7 @@ if _MY.nDebugLevel <3 then RegisterEvent("CALL_LUA_ERROR", function() OutputMess
 
 -- MY.RegisterEvent("CUSTOM_DATA_LOADED", _MY.Init)
 MY.RegisterEvent("LOADING_END", _MY.Init)
-MY.RegisterInit(function()
+pcall(function()
     -- 创建菜单
     local tMenu = function() return {
         szOption = _L["mingyi plugins"],
