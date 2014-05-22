@@ -36,17 +36,26 @@ data = {
     ['nu jian'] = '弩箭',
     
     ['all force'] = '所有人',
-    ['JiangHu'] = '江湖',
-    ['ChunYang'] = '纯阳',
-    ['TianCe'] = '天策',
-    ['CangJian'] = '藏剑',
-    ['GaiBang'] = '丐帮',
-    ['WuDu'] = '五毒',
-    ['MingJiao'] = '明教',
-    ['WanHua'] = '万花',
-    ['QiXiu'] = '七秀',
-    ['ShaoLin'] = '少林',
-    ['TangMen'] = '唐门',
+    ['JiangHu']   = '江湖',
+    ['ShaoLin']   = '少林',
+    ['WanHua']    = '万花',
+    ['TianCe']    = '天策',
+    ['ChunYang']  = '纯阳',
+    ['QiXiu']     = '七秀',
+    ['WuDu']      = '五毒',
+    ['TangMen']   = '唐门',
+    ['CangJian']  = '藏剑',
+    ['GaiBang']   = '丐帮',
+    ['MingJiao']  = '明教',
+    
+    ['man']   = '成男',
+    ['woman'] = '成女',
+    ['boy']   = '少侠',
+    ['girl']  = '萝莉',
+    
+    ['ZhongLi']   = '中立',
+    ['HaoQiMeng'] = '浩气盟',
+    ['ERenGu']    = '恶人谷',
     
     ['start'] = '开始',
     ['restart'] = '重新开始',
@@ -54,6 +63,9 @@ data = {
     ['clear'] = '清空',
     ['cancel'] = '取消',
     ['use'] = '使用',
+    
+    ['reset data'] = '重置数据',
+    ['analyse data'] = '分析数据',
     
     ['add'] = '添加',
     ['delete'] = '删除',
@@ -144,4 +156,10 @@ data = {
     ['average score with out pole'] = '去掉最高最低取平均值',
     ["haven't roll yet."] = '尚未掷骰子。',
     ['[%s] rolls for %d times, valid score is %s.'] = '[%s]掷了%d次骰子，有效点数为%s。',
+    -- MY_Farbnamen.lua
+    ['Farbnamen'] = '职业染色',
+    ['MingYiPlugin - Farbnamen'] = '茗伊插件·职业染色',
+    ['cache data deleted.'] = '缓存已清除。',
+    ['%d player(s) data cached:'] = '已缓存角色数据 %d 份：',
+    ['plugin conflict detected,duowan force color has been forced down.'] = '检测到插件冲突，已关闭盒子职业染色。',
 }
