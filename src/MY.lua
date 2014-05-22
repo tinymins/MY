@@ -729,8 +729,11 @@ MY.Sysmsg = function(oContent, oTitle)
     local szMsg = ''
     for i = 1, #oTitle, 1 do
         if oTitle[i]~='' then
-            szMsg = szMsg .. GetFormatText( '['..oTitle[i]..']', oTitle.f or oContent.f, oTitle.r or oContent.r, oTitle.g or oContent.g, oTitle.b or oContent.b )
+            szMsg = szMsg .. '['..oTitle[i]..']'
         end
+    end
+    if #szMsg > 0 then 
+        szMsg = GetFormatText( szMsg..' ', oTitle.f or oContent.f, oTitle.r or oContent.r, oTitle.g or oContent.g, oTitle.b or oContent.b )
     end
     for i = 1, #oContent, 1 do
         szMsg = szMsg .. GetFormatText(oContent[i], oContent.f, oContent.r, oContent.g, oContent.b)
