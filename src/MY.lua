@@ -77,7 +77,11 @@ _MY.Init = function()
     end
     -- ÏÔÊ¾»¶Ó­ÐÅÏ¢
     MY.Sysmsg({_L("%s, welcome to use mingyi plugins!", GetClientPlayer().szName) .. " v" .. MY.GetVersion() .. ' Build ' .. _MY.szBuildDate})
-    if _MY.nDebugLevel >=3 then _MY.frame:Hide() end
+    if _MY.nDebugLevel >=3 then
+        _MY.frame:Hide()
+    else
+        _MY.frame:Show()
+    end
 end
 -- get channel header
 _MY.tTalkChannelHeader = {
