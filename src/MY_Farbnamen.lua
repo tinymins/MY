@@ -10,11 +10,10 @@ local _L = MY.LoadLangPack()
 ---------------------------------------------------------------
 MY_Farbnamen = MY_Farbnamen or {
     bEnabled = true,
-    nMaxCache= 2000,
 }
 RegisterCustomData("Account\\MY_Farbnamen.bEnabled")
-RegisterCustomData("Account\\MY_Farbnamen.nMaxCache")
 local _MY_Farbnamen = {
+    nMaxCache= 2000,
     szConfigPath = "PLAYER_FORCE_COLOR",
     szDataCache  = "PLAYER_INFO_CACHE\\" .. (MY.GetServer()),
     tForceColor  = {},
@@ -42,7 +41,8 @@ local _MY_Farbnamen = {
         [1] = _L['HaoQiMeng'],
         [2] = _L['ERenGu'],
     },
-    tPlayerInfo  = {},
+    tPlayerCache = {},
+    aPlayerQueu = {},
 }
 setmetatable(_MY_Farbnamen.tForceString, { __index = function(t, k) return k end, __call = function(t, k, ...) return string.format(t[k], ...) end, })
 setmetatable(_MY_Farbnamen.tRoleType,    { __index = function(t, k) return k end, __call = function(t, k, ...) return string.format(t[k], ...) end, })
@@ -122,13 +122,13 @@ end
 ---------------------------------------------------------------
 -- 通过szName获取信息
 function MY_Farbnamen.GetAusName(szName)
-    return MY_Farbnamen.GetAusID(_MY_Farbnamen.tPlayerInfo[szName])
+    return MY_Farbnamen.GetAusID(_MY_Farbnamen.tPlayerCache[szName])
 end
 -- 通过dwID获取信息
 function MY_Farbnamen.GetAusID(dwID)
     MY_Farbnamen.AddAusID(dwID)
     -- deal with return data
-    local result =  clone(_MY_Farbnamen.tPlayerInfo[dwID])
+    local result =  clone(_MY_Farbnamen.tPlayerCache[dwID])
     if result then
         result.rgb = _MY_Farbnamen.tForceColor[result.dwForceID]
     end
@@ -138,7 +138,7 @@ end
 function MY_Farbnamen.AddAusID(dwID)
     local player = GetPlayer(dwID)
     if player and player.szName and player.szName~='' then
-        _MY_Farbnamen.tPlayerInfo[player.dwID  ] = {
+        local tPlayer = {
             dwID      = player.dwID,
             dwForceID = player.dwForceID,
             szName    = player.szName,
@@ -149,35 +149,50 @@ function MY_Farbnamen.AddAusID(dwID)
             szTongID  = GetTongClient().ApplyGetTongName(player.dwTongID),
             dwTime    = GetCurrentTime(),
         }
-        _MY_Farbnamen.tPlayerInfo[player.szName] = player.dwID
+        
+        _MY_Farbnamen.tPlayerCache[player.dwID  ] = tPlayer
+        _MY_Farbnamen.tPlayerCache[player.szName] = player.dwID
     end
 end
 -- 保存配置
 function MY_Farbnamen.SaveData()
-    local t = {}
-    for dwID, data in pairs(_MY_Farbnamen.tPlayerInfo) do
+    local t = {
+        ['aCached']   = {}                      ,     -- 保存的用户表
+        ['nMaxCache'] = _MY_Farbnamen.nMaxCache ,     -- 最大缓存数量
+    }
+    for dwID, data in pairs(_MY_Farbnamen.tPlayerCache) do
         if type(dwID)=='number' then
-            table.insert(t, data)
+            table.insert(t.aCached, data)
         end
     end
-    if #t > MY_Farbnamen.nMaxCache then
-        table.sort(t, function(a, b) return a.dwTime > b.dwTime end)
-    end
-    for i=MY_Farbnamen.nMaxCache+1, #t, 1 do
-        table.remove(t)
+    if #t.aCached > t.nMaxCache then
+        table.sort(t.aCached, function(a, b) return a.dwTime > b.dwTime end)
+        for i=t.nMaxCache+1, #t.aCached, 1 do
+            table.remove(t.aCached)
+        end
     end
     MY.SaveLUAData(_MY_Farbnamen.szDataCache, t)
 end
 -- 加载配置
 function MY_Farbnamen.LoadData()
     local data = MY.LoadLUAData(_MY_Farbnamen.szDataCache) or {}
-    local t = {}
+    local t = {
+        ['aCached']   = data.aCached   or {}   ,     -- 保存的用户表
+        -- ['nCached']   = data.nCached   or 0    ,     -- 当前缓存数量
+        ['nMaxCache'] = data.nMaxCache or 2000 ,     -- 最大缓存数量
+    }
+    -- 转移旧版本数据
     for i=1, #data, 1 do
-        t[data[i].dwID  ] = data[i]
-        t[data[i].szName] = data[i].dwID
+        -- 插入缓存列表
+        table.insert(t.aCached, data[i])
+    end
+    
+    -- 添加加载的数据
+    for _, p in ipairs(t.aCached) do
+        _MY_Farbnamen.tPlayerCache[p.dwID] = p
     end
     _MY_Farbnamen.tForceColor = MY.LoadLUAData(_MY_Farbnamen.szConfigPath, '') or _MY_Farbnamen.tForceColor
-    _MY_Farbnamen.tPlayerInfo = t or _MY_Farbnamen.tPlayerInfo
+    _MY_Farbnamen.nMaxCache = t.nMaxCache or _MY_Farbnamen.nMaxCache
 end
 --------------------------------------------------------------
 -- 数据统计
@@ -185,7 +200,7 @@ end
 function MY_Farbnamen.AnalyseForceInfo()
 	local t = { }
     -- 统计各门派人数
-	for k, v in pairs(_MY_Farbnamen.tPlayerInfo) do
+	for k, v in pairs(_MY_Farbnamen.tPlayerCache) do
 		if type(v)=='table' and type(v.dwForceID)=='number' then
 			t[v.dwForceID] = ( t[v.dwForceID] or 0 ) + 1
 		end
@@ -220,7 +235,7 @@ MY_Farbnamen.GetMenu = function()
         bChecked = MY_Farbnamen.bEnabled, {
             szOption = _L["set max cache count"],
             fnAction = function()
-                GetUserInputNumber(MY_Farbnamen.nMaxCache, 9999, nil, function(num) MY_Farbnamen.nMaxCache = num end, function() end, function() end)
+                GetUserInputNumber(_MY_Farbnamen.nMaxCache, 10000, nil, function(num) _MY_Farbnamen.nMaxCache = num end, function() end, function() end)
             end,
         },  {
             szOption = _L["analyse data"],
@@ -228,7 +243,7 @@ MY_Farbnamen.GetMenu = function()
         },{
             szOption = _L["reset data"],
             fnAction = function()
-                _MY_Farbnamen.tPlayerInfo = {}
+                _MY_Farbnamen.tPlayerCache = {}
                 MY.Sysmsg({_L['cache data deleted.']}, _L['Farbnamen'])
             end,
         }
