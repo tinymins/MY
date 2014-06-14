@@ -120,8 +120,12 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
             if _MY_ChatMonitor.uiBoard then
                 _MY_ChatMonitor.uiBoard:append(tCapture.szTime..tCapture.szMsg)
                 _MY_ChatMonitor.uiBoard:find('#^.*link'):del('#^namelink_'):click(function(nFlag) 
-                    if nFlag==1 and IsCtrlKeyDown() then
-                        MY_ChatMonitor.CopyChatItem(this)
+                    if nFlag==1 then
+                        if IsCtrlKeyDown() then
+                            MY_ChatMonitor.CopyChatItem(this)
+                        else
+                            OnItemLinkDown(this)
+                        end
                     end
                 end)
                 _MY_ChatMonitor.uiBoard:find('#^namelink_'):click(function(nFlag) 
