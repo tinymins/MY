@@ -116,6 +116,9 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
             -- save animiate group into name
             tCapture.szMsg = string.gsub(tCapture.szMsg, "group=(%d+) </a", "group=%1 name=\"%1\" </a")	
             
+            -- 发出提示音
+            PlaySound(SOUND.UI_SOUND, "Interface\\MY\\audio\\CrystalRing.wav")
+            
             -- 更新UI
             if _MY_ChatMonitor.uiBoard then
                 _MY_ChatMonitor.uiBoard:append(tCapture.szTime..tCapture.szMsg)
