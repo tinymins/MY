@@ -1,9 +1,9 @@
 MY = MY or {}
 local _MY = {
-    szIniFileEditBox = "Interface\\MY\\ui\\WndEditBox.ini",
-    szIniFileButton = "Interface\\MY\\ui\\WndButton.ini",
-    szIniFileCheckBox = "Interface\\MY\\ui\\WndCheckBox.ini",
-    szIniFileMainPanel = "Interface\\MY\\ui\\MainPanel.ini",
+    szIniFileEditBox = "Interface\\MY\\.Framework\\ui\\WndEditBox.ini",
+    szIniFileButton = "Interface\\MY\\.Framework\\ui\\WndButton.ini",
+    szIniFileCheckBox = "Interface\\MY\\.Framework\\ui\\WndCheckBox.ini",
+    szIniFileMainPanel = "Interface\\MY\\.Framework\\ui\\MainPanel.ini",
 }
 local _L = MY.LoadLangPack()
 ---------------------------------------------------------------------
@@ -581,9 +581,15 @@ function _MY.UI:append(szName, szType, tArg)
     self:_checksum()
     if szType then
         for _, ele in pairs(self.eles) do
-            if ( string.sub(szType, 1, 3) == "Wnd" and ele.wnd ) then
+            if ( ele.wnd and ( string.sub(szType, 1, 3) == "Wnd" or string.sub(szType, -4) == ".ini" ) ) then
                 -- append from ini file
-                local szFile = "interface\\MY\\ui\\" .. szType .. ".ini"
+                local szFile = szType
+                if string.sub(szType, -4) == ".ini" then
+                    szType = string.gsub(szType,".*[/\\]","")
+                    szType = string.sub(szType,0,-5)
+                else
+                    szFile = "interface\\MY\\.Framework\\ui\\" .. szFile .. ".ini"
+                end
                 local frame = Wnd.OpenWindow(szFile, "MY_TempWnd")
                 if not frame then
                     return MY.Debug(_L("unable to open ini file [%s]", szFile)..'\n', 'MY#UI#append', 2)
@@ -678,7 +684,7 @@ function _MY.UI:append(szName, szType, tArg)
                     if hnd then hnd:SetName(szName) end
                 else
                     -- append from ini
-                    hnd = ele.hdl:AppendItemFromIni("interface\\MY\\ui\\HandleItems.ini","Handle_" .. szType, szName)
+                    hnd = ele.hdl:AppendItemFromIni("interface\\MY\\.Framework\\ui\\HandleItems.ini","Handle_" .. szType, szName)
                 end
                 ele.hdl:FormatAllItemPos()
                 if not hnd then
@@ -1491,11 +1497,11 @@ end
 MY.UI.OpenFrame = function(szName, szStyle, bDummyFrame)
     local frm, szDummy = nil, ''
     if bDummyFrame then szDummy = 'Dummy' end
-    local szIniFile = "interface\\MY\\ui\\WndFrameNormal"..szDummy..".ini"
+    local szIniFile = "interface\\MY\\.Framework\\ui\\WndFrameNormal"..szDummy..".ini"
     if szStyle=='Topmost' then
-        szIniFile = "interface\\MY\\ui\\WndFrameTopmost"..szDummy..".ini"
+        szIniFile = "interface\\MY\\.Framework\\ui\\WndFrameTopmost"..szDummy..".ini"
     elseif szStyle=='Lowest' then
-        szIniFile = "interface\\MY\\ui\\WndFrameLowest"..szDummy..".ini"
+        szIniFile = "interface\\MY\\.Framework\\ui\\WndFrameLowest"..szDummy..".ini"
     else
         szStyle = 'Normal'
     end
