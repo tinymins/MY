@@ -7,13 +7,14 @@
 -- 本地函数和变量
 -----------------------------------------------
 MY = { }
+RegisterEvent("CALL_LUA_ERROR", function() OutputMessage("MSG_SYS", arg0) end)
 --[[ 多语言处理
     (table) MY.LoadLangPack(void)
 ]]
 MY.LoadLangPack = function()
 	local _, _, szLang = GetVersion()
-	local t0 = LoadLUAData("interface\\MY\\lang\\default.lua") or {}
-	local t1 = LoadLUAData("interface\\MY\\lang\\" .. szLang .. ".lua") or {}
+	local t0 = LoadLUAData("interface\\MY\\.Framework\\lang\\default.lua") or {}
+	local t1 = LoadLUAData("interface\\MY\\.Framework\\lang\\" .. szLang .. ".lua") or {}
 	for k, v in pairs(t0) do
 		if not t1[k] then
 			t1[k] = v
@@ -34,14 +35,14 @@ local _MY = {
     hBox = nil,
     hRequest = nil,
     bLoaded = false,
-    nDebugLevel = 4,
+    nDebugLevel = 1,
     dwVersion = 0x0000402,
     szBuildDate = "20140523",
     szName = _L["mingyi plugins"],
     szShortName = _L["mingyi plugin"],
-    szIniFile = "Interface\\MY\\ui\\MY.ini",
-    szIniFileTabBox = "Interface\\MY\\ui\\WndTabBox.ini",
-    szIniFileMainPanel = "Interface\\MY\\ui\\MainPanel.ini",
+    szIniFile = "Interface\\MY\\.Framework\\ui\\MY.ini",
+    szIniFileTabBox = "Interface\\MY\\.Framework\\ui\\WndTabBox.ini",
+    szIniFileMainPanel = "Interface\\MY\\.Framework\\ui\\MainPanel.ini",
     tNearNpc = {},      -- 附近的NPC
     tNearPlayer = {},   -- 附近的玩家
     tNearDoodad = {},   -- 附近的物品
@@ -66,6 +67,8 @@ _MY.Init = function()
 	_MY.hRequest = MY.GetFrame():Lookup("Page_1")
     -- 窗口按钮
     MY.UI(MY.GetFrame()):find("#Button_WindowClose"):click(function() _MY.ClosePanel() end)
+    -- 重绘选项卡
+    MY.RedrawTabPanel()
     -- init functions
     for i = 1, #_MY.tInitFun, 1 do
         pcall(_MY.tInitFun[i].fn)
@@ -608,7 +611,7 @@ MY.SaveLUAData = function(szFile, tData, szLang)
         szLang = string.upper(lang)
     end
     if #szLang>0 then szLang = '_'..szLang end
-    szFile = '\\Interface\\MY\\data\\' .. szFile  .. '.MYDATA' .. szLang
+    szFile = '\\Interface\\MY\\.Framework\\data\\' .. szFile  .. '.MYDATA' .. szLang
     SaveLUAData(szFile, tData)
 end
 --[[ 加载数据文件：相对于data文件夹，自动区分客户端语言
@@ -624,7 +627,7 @@ MY.LoadLUAData = function(szFile, szLang)
         szLang = string.upper(lang)
     end
     if #szLang>0 then szLang = '_'..szLang end
-    szFile = '\\Interface\\MY\\data\\' .. szFile  .. '.MYDATA' .. szLang
+    szFile = '\\Interface\\MY\\.Framework\\data\\' .. szFile  .. '.MYDATA' .. szLang
     return LoadLUAData(szFile)
 end
 --[[ 判断某个频道能否发言
