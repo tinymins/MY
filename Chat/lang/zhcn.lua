@@ -1,0 +1,27 @@
+-- language data (zhcn) updated at 2014-4-10 03:38:11
+data = {
+    ['SAY']      = '说',
+    ['MAP']      = '地',
+    ['WORLD']    = '世',
+    ['PARTY']    = '队',
+    ['TEAM']     = '团',
+    ['BATTLE']   = '战',
+    ['FACTION']  = '帮',
+    ['SCHOOL']   = '派',
+    ['CAMP']     = '阵',
+    ['FRIEND']   = '友',
+    ['ALLIANCE'] = '盟',
+    ['AWAY']     = '离',
+    ['BUSY']     = '扰',
+    
+    ['about...'] = '关于...',
+    ['lock postion'] = '锁定位置',
+    ['team balloon'] = '队伍泡泡',
+    ['chat copy'] = '聊天复制',
+    ['chat filter'] = '聊天过滤',
+    ['keyword manager'] = '关键字管理',
+    ['chat time'] = '聊天时间',
+    ['hh:mm'] = '时：分',
+    ['hh:mm:ss'] = '时：分：秒',
+    ['channel setting'] = '频道设置',
+}
