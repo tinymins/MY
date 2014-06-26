@@ -11,20 +11,29 @@ RegisterEvent("CALL_LUA_ERROR", function() OutputMessage("MSG_SYS", arg0) end)
 --[[ ∂‡”Ô—‘¥¶¿Ì
     (table) MY.LoadLangPack(void)
 ]]
-MY.LoadLangPack = function()
+MY.LoadLangPack = function(szLangFolder)
 	local _, _, szLang = GetVersion()
 	local t0 = LoadLUAData("interface\\MY\\.Framework\\lang\\default.lua") or {}
 	local t1 = LoadLUAData("interface\\MY\\.Framework\\lang\\" .. szLang .. ".lua") or {}
-	for k, v in pairs(t0) do
-		if not t1[k] then
-			t1[k] = v
-		end
+	for k, v in pairs(t1) do
+		t0[k] = v
 	end
-	setmetatable(t1, {
+    if type(szLangFolder)=="string" then
+        szLangFolder = string.gsub(szLangFolder,"[/\\]+$","")
+        local t2 = LoadLUAData(szLangFolder.."\\default.lua") or {}
+        for k, v in pairs(t2) do
+            t0[k] = v
+        end
+        local t3 = LoadLUAData(szLangFolder.."\\" .. szLang .. ".lua") or {}
+        for k, v in pairs(t3) do
+            t0[k] = v
+        end
+    end
+	setmetatable(t0, {
 		__index = function(t, k) return k end,
 		__call = function(t, k, ...) return string.format(t[k], ...) end,
 	})
-	return t1
+	return t0
 end
 local _L = MY.LoadLangPack()
 -----------------------------------------------
