@@ -94,6 +94,7 @@ function _MY.UI:ctor(raw, tab)
         if not _tab.txt and szType == "Text"        then _tab.txt = raw end
         if not _tab.img and szType == "Image"       then _tab.img = raw end
         if not _tab.chk and szType == "WndCheckBox" then _tab.chk = raw end
+        if not _tab.chk and szType == "WndRadioBox" then _tab.chk = raw end
         if not _tab.edt and szType == "WndEdit"     then _tab.edt = raw end
         if not _tab.sdw and szType == "Shadow"      then _tab.sdw = raw end
         if not _tab.hdl and szType == "Handle"      then _tab.hdl = raw end
@@ -155,6 +156,7 @@ function _MY.UI:raw2ele(raw, tab)
     if not _tab.txt and szType == "Text"        then _tab.txt = raw end
     if not _tab.img and szType == "Image"       then _tab.img = raw end
     if not _tab.chk and szType == "WndCheckBox" then _tab.chk = raw end
+    if not _tab.chk and szType == "WndRadioBox" then _tab.chk = raw end
     if not _tab.edt and szType == "WndEdit"     then _tab.edt = raw end
     if not _tab.sdw and szType == "Shadow"      then _tab.sdw = raw end
     if not _tab.hdl and szType == "Handle"      then _tab.hdl = raw end
@@ -991,7 +993,7 @@ function _MY.UI:font(nFont)
     self:_checksum()
     if nFont then-- set name
         for _, ele in pairs(self.eles) do
-            pcall(function() ele.raw:SetFontScheme(nFont) end)
+            pcall(function() (ele.txt or ele.edt or ele.raw):SetFontScheme(nFont) end)
         end
         return self
     else -- get
@@ -1414,8 +1416,10 @@ function _MY.UI:check(fnCheck, fnUncheck)
     fnUncheck = fnUncheck or fnCheck
     if type(fnCheck)=="function" then
         for _, ele in pairs(self.eles) do
-            if ele.chk then ele.chk.OnCheckBoxCheck = function() fnCheck(true) end end
-            if ele.chk then ele.chk.OnCheckBoxUncheck = function() fnUncheck(false) end end
+            if ele.chk then
+                MY.UI.RegisterUIEvent(ele.chk, 'OnCheckBoxCheck' , function() fnCheck(true) end)
+                MY.UI.RegisterUIEvent(ele.chk, 'OnCheckBoxUncheck' , function() fnCheck(false) end)
+            end
         end
         return self
     elseif type(fnCheck) == "boolean" then
@@ -1488,7 +1492,12 @@ MY.UI.Fetch = function(selector, tab) return _MY.UI.new(selector, tab) end
 -- °ó¶¨UIÊÂ¼þ
 MY.UI.RegisterUIEvent = function(raw, szEvent, fnEvent)
     if not raw['tMy'..szEvent] then
-        raw['tMy'..szEvent], raw[szEvent] = { raw[szEvent] }, function() for _, fn in ipairs(this['tMy'..szEvent]) do pcall(fn) end end
+        raw['tMy'..szEvent], raw[szEvent] = { raw[szEvent] }, function()
+            local _this = this
+            this = raw
+            for _, fn in ipairs(this['tMy'..szEvent]) do pcall(fn) end
+            this = _this
+        end
     end
     if fnEvent then table.insert(raw['tMy'..szEvent], fnEvent) end
 end
