@@ -46,14 +46,9 @@ MY_Chat.OnFrameDragEnd = function() this:CorrectPos() MY_Chat.anchor = GetFrameA
 MY_Chat.frame = Wnd.OpenWindow("Interface\\MY\\Chat\\ui\\Chat.ini", "MY_Chat")
 -- load settings
 MY_Chat.frame:EnableDrag(not MY_Chat.bLockPostion)
-MY_Chat.frame:SetPoint(MY_Chat.anchor.s, 0, 0, MY_Chat.anchor.r, MY_Chat.anchor.x, MY_Chat.anchor.y)
-MY_Chat.frame:CorrectPos()
-MY.RegisterEvent("UI_SCALED",function()
-    MY_Chat.frame:SetPoint(MY_Chat.anchor.s, 0, 0, MY_Chat.anchor.r, MY_Chat.anchor.x, MY_Chat.anchor.y)
-    MY_Chat.frame:CorrectPos()
-end)
-
-MY_Chat.L
+MY_Chat.UpdateAnchor = function() MY_Chat.frame:SetPoint(MY_Chat.anchor.s, 0, 0, MY_Chat.anchor.r, MY_Chat.anchor.x, MY_Chat.anchor.y) MY_Chat.frame:CorrectPos() end
+MY_Chat.UpdateAnchor()
+MY.RegisterEvent( "UI_SCALED", MY_Chat.UpdateAnchor )
 
 MY.RegisterInit(function()
     -- init ui
@@ -73,6 +68,7 @@ MY.RegisterInit(function()
         MY.UI(MY_Chat.frame):append(v.name,"WndRadioBox"):child("#"..v.name):width(20):text(v.title):font(197):color(v.color):pos(i*30+15,25):check(function()
             -- Switch Chat Channel Here
             MY.SwitchChat(v.channel)
+            Station.SetFocusWindow("Lowest2/EditBox/Edit_Input")
             MY.UI(this):check(false)
         end):find(".Text"):pos(4,-18):width(20)
     end
@@ -144,4 +140,6 @@ MY.RegisterInit(function()
             }
         }
     } end)
+    -- load settings
+    MY_Chat.frame:EnableDrag(not MY_Chat.bLockPostion)
 end)
