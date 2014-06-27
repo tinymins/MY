@@ -117,7 +117,7 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
             tCapture.szMsg = string.gsub(tCapture.szMsg, "group=(%d+) </a", "group=%1 name=\"%1\" </a")	
             
             -- 发出提示音
-            PlaySound(SOUND.UI_SOUND, "Interface\\MY\\audio\\CrystalRing.wav")
+            PlaySound(SOUND.UI_SOUND, "Interface\\MY\\ChatMonitor\\audio\\MsgArrive.wav")
             
             -- 更新UI
             if _MY_ChatMonitor.uiBoard then
