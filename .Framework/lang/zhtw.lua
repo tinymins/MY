@@ -1,6 +1,8 @@
 -- language data (zhcn) updated at 2014-4-10 03:38:11
 data = {
     -- common
+    ['*'] = '※',
+    
     ['nearby channel'] = '近聊頻道',
     ['friend channel'] = '好友頻道',
     ['team channel'] = '隊伍頻道',
