@@ -1418,7 +1418,7 @@ function _MY.UI:check(fnCheck, fnUncheck)
         for _, ele in pairs(self.eles) do
             if ele.chk then
                 MY.UI.RegisterUIEvent(ele.chk, 'OnCheckBoxCheck' , function() fnCheck(true) end)
-                MY.UI.RegisterUIEvent(ele.chk, 'OnCheckBoxUncheck' , function() fnCheck(false) end)
+                MY.UI.RegisterUIEvent(ele.chk, 'OnCheckBoxUncheck' , function() fnUncheck(false) end)
             end
         end
         return self
