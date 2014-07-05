@@ -7,7 +7,7 @@
 -- 本地函数和变量
 -----------------------------------------------
 MY = { }
-RegisterEvent("CALL_LUA_ERROR", function() OutputMessage("MSG_SYS", arg0) end)
+
 --[[ 多语言处理
     (table) MY.LoadLangPack(void)
 ]]
