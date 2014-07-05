@@ -67,6 +67,7 @@ local _MY = {
     tTargetMenu = {},   -- 目标头像菜单
     tTraceMenu  = {},   -- 工具栏菜单
     tInitFun = {},      -- 初始化函数
+    tHookChatFun = {},  -- HOOK Chat Functions
 }
 _MY.Init = function()
     if _MY.bLoaded then return end
@@ -574,7 +575,7 @@ end
 -- dwID		-- 目标 ID]]
 MY.SetTarget = function(dwType, dwID)
     -- check dwType
-    if type(dwType)=="userdata" then 
+    if type(dwType)=="userdata" then
         dwType, dwID = ( IsPlayer(dwType) and TARGET.PLAYER ) or TARGET.NPC, dwType.dwID
     elseif type(dwType)=="string" then
         dwType, dwID = 0, dwType
@@ -650,13 +651,20 @@ MY.CanTalk = function(nChannel)
 	return false
 end
 --[[ 切换聊天频道
--- (void) MY.SwitchChat(number nChannel)]]
+    (void) MY.SwitchChat(number nChannel)
+    (void) MY.SwitchChat(string szHeader)
+    (void) MY.SwitchChat(string szName)
+]]
 MY.SwitchChat = function(nChannel)
 	local szHeader = _MY.tTalkChannelHeader[nChannel]
 	if szHeader then
 		SwitchChatChannel(szHeader)
 	elseif type(nChannel) == "string" then
-		SwitchChatChannel("/w " .. string.gsub(nChannel,'[%[%]]','') .. " ")
+        if string.sub(nChannel, 1, 1) == "/" then
+            SwitchChatChannel(nChannel.." ")
+        else
+            SwitchChatChannel("/w " .. string.gsub(nChannel,'[%[%]]','') .. " ")
+        end
 	end
 end
 --[[ 发布聊天内容
@@ -731,7 +739,7 @@ MY.Sysmsg = function(oContent, oTitle)
     if type(oTitle)~='table' then oTitle = { oTitle, bNoWrap = true } end
     if type(oContent)~='table' then oContent = { oContent, bNoWrap = true } end
     oContent.r, oContent.g, oContent.b = oContent.r or 255, oContent.g or 255, oContent.b or 0
-    
+
     for i = #oContent, 1, -1 do
         if type(oContent[i])=="number"  then oContent[i] = '' .. oContent[i] end
         if type(oContent[i])=="boolean" then oContent[i] = (oContent[i] and 'true') or 'false' end
@@ -740,7 +748,7 @@ MY.Sysmsg = function(oContent, oTitle)
             oContent[i] = oContent[i] .. '\n'
         end
     end
-    
+
     -- calc szMsg
     local szMsg = ''
     for i = 1, #oTitle, 1 do
@@ -748,7 +756,7 @@ MY.Sysmsg = function(oContent, oTitle)
             szMsg = szMsg .. '['..oTitle[i]..']'
         end
     end
-    if #szMsg > 0 then 
+    if #szMsg > 0 then
         szMsg = GetFormatText( szMsg..' ', oTitle.f or oContent.f, oTitle.r or oContent.r, oTitle.g or oContent.g, oTitle.b or oContent.b )
     end
     for i = 1, #oContent, 1 do
@@ -1162,6 +1170,57 @@ MY.RegisterTraceButtonMenu = function(arg1, arg2)
         end
     end
 end
+--[[ HOOK聊天栏 ]]
+MY.HookChatPanel = function(arg0, arg1, arg2)
+    local fnBefore, fnAfter, id
+    if type(arg0)=="string" then
+        id, fnBefore, fnAfter = arg0, arg1, arg2
+    elseif type(arg1)=="string" then
+        id, fnBefore, fnAfter = arg1, arg0, arg2
+    elseif type(arg2)=="string" then
+        id, fnBefore, fnAfter = arg2, arg0, arg1
+    else
+        id, fnBefore, fnAfter = nil, arg0, arg1
+    end
+    if type(fnBefore)~="function" and type(fnAfter)~="function" then
+        return nil
+    end
+    if id then
+        for i=#_MY.tHookChatFun, 1, -1 do
+            if _MY.tHookChatFun[i].id == id then
+                table.remove(_MY.tHookChatFun, i)
+            end
+        end
+    end
+    if fnBefore then
+        table.insert(_MY.tHookChatFun, {fnBefore = fnBefore, fnAfter = fnAfter, id = id})
+    end
+end
+_MY.HookChatPanelHandle = function(h, szMsg)
+    -- deal with fnBefore
+    for i,handle in ipairs(_MY.tHookChatFun) do
+        -- try to execute fnBefore and get return values
+        local result = { pcall(handle.fnBefore, h, szMsg) }
+        -- when fnBefore execute succeed
+        if result[1] then
+            -- remove execute status flag
+            table.remove(result, 1)
+            if type(result[1])=="string" then
+                szMsg = result[1]
+            end
+            -- remove returned szMsg
+            table.remove(result, 1)
+        end
+        -- the rest is fnAfter param
+        _MY.tHookChatFun[i].param = result
+    end
+    -- call ori append
+    h:_AppendItemFromString_MY(szMsg)
+    -- deal with fnAfter
+    for i,handle in ipairs(_MY.tHookChatFun) do
+        pcall(handle.fnAfter, h, szMsg, unpack(handle.param))
+    end
+end
 -----------------------------------------------
 -- 窗口函数
 -----------------------------------------------
@@ -1439,5 +1498,15 @@ pcall(function()
     } end
     MY.RegisterPlayerAddonMenu( 'MY_MAIN_MENU', tMenu)
     MY.RegisterTraceButtonMenu( 'MY_MAIN_MENU', tMenu)
+end)
+MY.RegisterEvent("CHAT_PANEL_INIT", function ()
+    for i = 1, 10 do
+        local h = Station.Lookup("Lowest2/ChatPanel" .. i .. "/Wnd_Message", "Handle_Message")
+        local ttl = Station.Lookup("Lowest2/ChatPanel" .. i .. "/CheckBox_Title", "Text_TitleName")
+        if h and (not ttl or ttl:GetText() ~= g_tStrings.CHANNEL_MENTOR) then
+            h._AppendItemFromString_MY = h._AppendItemFromString_MY or h.AppendItemFromString
+            h.AppendItemFromString = _MY.HookChatPanelHandle
+        end
+    end
 end)
 -- MY.RegisterEvent("PLAYER_ENTER_GAME", _MY.Init)
