@@ -45,7 +45,7 @@ local GetChildren = function(root)
                 -- 如果子元素是Handle/将他压栈
                 if raw:Lookup(i):GetType()=='Handle' then table.insert(stack, raw:Lookup(i))
                 -- 否则压入结果队列
-                else children[table.concat({ raw:Lookup(i):GetTreePath(), i })] = raw:Lookup(i) end
+                else children[table.concat({table.concat({ raw:Lookup(i):GetTreePath() }), i})] = raw:Lookup(i) end
             end
         else
             -- 如果有Handle则将所有Handle压栈待处理
@@ -369,7 +369,7 @@ function _MY.UI:child(filter)
             for i = 0, ele.raw:GetItemCount() - 1, 1 do
                 if not childHash[table.concat({ ele.raw:Lookup(i):GetTreePath(), i })] then
                     table.insert(child, ele.raw:Lookup(i))
-                    childHash[table.concat({ ele.raw:Lookup(i):GetTreePath(), i })] = true
+                    childHash[table.concat({ table.concat({ ele.raw:Lookup(i):GetTreePath() }), i })] = true
                 end
             end
         else
