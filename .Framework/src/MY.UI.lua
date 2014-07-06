@@ -98,7 +98,6 @@ function _MY.UI:ctor(raw, tab)
         if not _tab.edt and szType == "WndEdit"     then _tab.edt = raw end
         if not _tab.sdw and szType == "Shadow"      then _tab.sdw = raw end
         if not _tab.hdl and szType == "Handle"      then _tab.hdl = raw end
-        if not _tab.frm and szType == "WndFrame"    then _tab.frm = raw end
         if szType=="WndEditBox" then
             _tab.wnd = _tab.wnd or raw
             _tab.hdl = _tab.hdl or raw:Lookup('','')
@@ -125,6 +124,11 @@ function _MY.UI:ctor(raw, tab)
             _tab.sbd = _tab.sbd or raw:Lookup('WndButton_Down')
             _tab.sbn = _tab.sbn or raw:Lookup('WndNewScrollBar_Default')
             _tab.shd = _tab.shd or raw:Lookup('','Handle_Scroll')
+        elseif szType=="WndFrame" then
+            _tab.frm = _tab.frm or raw
+            _tab.wnd = _tab.wnd or raw:Lookup("Window_Main")
+            _tab.hdl = _tab.hdl or (_tab.wnd or _tab.frm):Lookup("", "")
+            _tab.txt = _tab.txt or raw:Lookup("", "Text_Title")
         elseif string.sub(szType, 1, 3) == "Wnd" then
             _tab.wnd = _tab.wnd or raw
             _tab.hdl = _tab.hdl or raw:Lookup('','')
@@ -160,7 +164,6 @@ function _MY.UI:raw2ele(raw, tab)
     if not _tab.edt and szType == "WndEdit"     then _tab.edt = raw end
     if not _tab.sdw and szType == "Shadow"      then _tab.sdw = raw end
     if not _tab.hdl and szType == "Handle"      then _tab.hdl = raw end
-    if not _tab.frm and szType == "WndFrame"    then _tab.frm = raw end
     if szType=="WndEditBox" then
         _tab.wnd = _tab.wnd or raw
         _tab.hdl = _tab.hdl or raw:Lookup('','')
@@ -187,6 +190,11 @@ function _MY.UI:raw2ele(raw, tab)
         _tab.sbd = _tab.sbd or raw:Lookup('WndButton_Down')
         _tab.sbn = _tab.sbn or raw:Lookup('WndNewScrollBar_Default')
         _tab.shd = _tab.shd or raw:Lookup('','Handle_Scroll')
+    elseif szType=="WndFrame" then
+        _tab.frm = _tab.frm or raw
+        _tab.wnd = _tab.wnd or raw:Lookup("Window_Main")
+        _tab.hdl = _tab.hdl or (_tab.wnd or _tab.frm):Lookup("", "")
+        _tab.txt = _tab.txt or raw:Lookup("", "Text_Title")
     elseif string.sub(szType, 1, 3) == "Wnd" then
         _tab.wnd = _tab.wnd or raw
         _tab.hdl = _tab.hdl or raw:Lookup('','')
@@ -545,6 +553,12 @@ function _MY.UI:hdl(index)
     return self:clone(eles)
 end
 
+-- get count
+function _MY.UI:count()
+    self:_checksum()
+    return #self.eles
+end
+
 -----------------------------------------------------------
 -- my ui opreation -- same as jQuery -- by tinymins --
 -----------------------------------------------------------
@@ -560,7 +574,11 @@ function _MY.UI:remove()
         elseif string.sub(ele.raw:GetType(), 1, 3) == "Wnd" then
             ele.raw:Destroy()
         else
-            pcall(function() ele.raw:GetParent():RemoveItem(ele.raw:GetIndex()) end)
+            pcall(function()
+                local h = ele.raw:GetParent()
+                h:RemoveItem(ele.raw:GetIndex())
+                h:FormatAllItemPos()
+            end)
         end
     end
     self.eles = {}
@@ -583,7 +601,7 @@ function _MY.UI:append(szName, szType, tArg)
     self:_checksum()
     if szType then
         for _, ele in pairs(self.eles) do
-            if ( ele.wnd and ( string.sub(szType, 1, 3) == "Wnd" or string.sub(szType, -4) == ".ini" ) ) then
+            if ( (ele.wnd or ele.frm) and ( string.sub(szType, 1, 3) == "Wnd" or string.sub(szType, -4) == ".ini" ) ) then
                 -- append from ini file
                 local szFile = szType
                 if string.sub(szType, -4) == ".ini" then
@@ -602,7 +620,7 @@ function _MY.UI:append(szName, szType, tArg)
                 else
                     wnd.szMyuiType = szType
                     wnd:SetName(szName)
-                    wnd:ChangeRelation(ele.wnd, true, true)
+                    wnd:ChangeRelation((ele.wnd or ele.frm), true, true)
                     if szType == "WndScrollBox" then
                         wnd:Lookup('WndButton_Up').OnLButtonHold = function()
                             wnd:Lookup("WndNewScrollBar_Default"):ScrollPrev(1)
@@ -905,11 +923,11 @@ function _MY.UI:fadeTo(nTime, nOpacity, callback)
                 ele:alpha(nCurrentAlpha)
                 -- MY.Debug(string.format('%d %d %d %d\n', nStartAlpha, nOpacity, nCurrentAlpha, (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity)), 'fade', 0)
                 if (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity) <= 0 then
-                    ele:alpha(nOpacity):toggle(nOpacity ~= 0)
-                    pcall(callback)
+                    ele:alpha(nOpacity)
+                    pcall(callback, ele)
                     return 0
                 end
-            end)
+            end, "MY_FADE_"..table.concat({ele:raw(1):GetTreePath()}))
         end
     end
     return self
@@ -933,7 +951,10 @@ function _MY.UI:fadeOut(nTime, callback)
         local ele = self:eq(i)
         if ele:alpha() > 0 then ele:data('nOpacity', ele:alpha()) end
     end
-    self:fadeTo(nTime, 0, callback)
+    self:fadeTo(nTime, 0, function(ele)
+        ele:toggle(false)
+        pcall(callback, ele)
+    end)
     return self
 end
 
@@ -1061,7 +1082,9 @@ function _MY.UI:pos(nLeft, nTop)
         for _, ele in pairs(self.eles) do
             local _nLeft, _nTop = ele.raw:GetRelPos()
             nLeft, nTop = nLeft or _nLeft, nTop or _nTop
-            if ele.wnd then
+            if ele.frm then
+                pcall(function() (ele.frm or ele.raw):SetRelPos(nLeft, nTop) end)
+            elseif ele.wnd then
                 pcall(function() (ele.wnd or ele.raw):SetRelPos(nLeft, nTop) end)
             elseif ele.itm then
                 pcall(function() (ele.itm or ele.raw):SetRelPos(nLeft, nTop) end)
@@ -1109,7 +1132,54 @@ function _MY.UI:size(nWidth, nHeight)
         for _, ele in pairs(self.eles) do
             local _nWidth, _nHeight = ele.raw:GetSize()
             nWidth, nHeight = nWidth or _nWidth, nHeight or _nHeight
-            if ele.wnd then
+            if ele.frm then
+                local frm = ele.frm
+                local hnd = frm:Lookup("", "")
+                -- empty frame
+                if not ele.wnd then
+                    ele.frm:SetSize(nWidth, nHeight)
+                    ele.hdl:SetSize(nWidth, nHeight)
+                else
+                    -- 特别注意：窗体最小高度为 200，宽度自动按接近取  234/380/770 中的一个
+                    -- fix size
+                    if nWidth > 400 then
+                        nWidth = 770
+                        hnd:Lookup("Image_CBg1"):SetSize(385, 70)
+                        hnd:Lookup("Image_CBg2"):SetSize(384, 70)
+                        hnd:Lookup("Image_CBg1"):SetFrame(2)
+                        hnd:Lookup("Image_CBg2"):SetFrame(2)
+                    elseif nWidth > 250 then
+                        nWidth = 380
+                        hnd:Lookup("Image_CBg1"):SetSize(190, 70)
+                        hnd:Lookup("Image_CBg2"):SetSize(189, 70)
+                        hnd:Lookup("Image_CBg1"):SetFrame(1)
+                        hnd:Lookup("Image_CBg2"):SetFrame(1)
+                    else
+                        nWidth = 234
+                        hnd:Lookup("Image_CBg1"):SetSize(117, 70)
+                        hnd:Lookup("Image_CBg2"):SetSize(117, 70)
+                        hnd:Lookup("Image_CBg1"):SetFrame(0)
+                        hnd:Lookup("Image_CBg2"):SetFrame(0)
+                    end
+                    if nHeight < 200 then nHeight = 200 end
+                    -- set size
+                    frm:SetSize(nWidth, nHeight)
+                    frm:SetDragArea(0, 0, nWidth, 55)
+                    hnd:SetSize(nWidth, nHeight)
+                    hnd:Lookup("Image_CBg3"):SetSize(8, nHeight - 160)
+                    hnd:Lookup("Image_CBg4"):SetSize(nWidth - 16, nHeight - 160)
+                    hnd:Lookup("Image_CBg5"):SetSize(8, nHeight - 160)
+                    hnd:Lookup("Image_CBg7"):SetSize(nWidth - 132, 85)
+                    hnd:Lookup("Text_Title"):SetSize(nWidth - 90, 30)
+                    hnd:FormatAllItemPos()
+                    frm:Lookup("Btn_Close"):SetRelPos(nWidth - 35, 15)
+                    ele.wnd:SetSize(nWidth - 40, nHeight - 90)
+                    ele.wnd:Lookup("", ""):SetSize(nWidth - 40, nHeight - 90)
+                    -- reset position
+                    local an = GetFrameAnchor(frm)
+                    frm:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
+                end
+            elseif ele.wnd then
                 pcall(function() ele.wnd:SetSize(nWidth, nHeight) end)
                 pcall(function() ele.hdl:SetSize(nWidth, nHeight) end)
                 pcall(function() ele.txt:SetSize(nWidth, nHeight) end)
@@ -1363,8 +1433,8 @@ function _MY.UI:hover(fnHover, fnLeave, bNoAutoBind)
     end
     if fnLeave then
         for _, ele in pairs(self.eles) do
-            if ele.wnd then MY.UI.RegisterUIEvent(ele.wnd, 'OnMouseLeave' , function() fnLeave(true) end) end
-            if ele.itm then MY.UI.RegisterUIEvent(ele.itm, 'OnItemMouseLeave', function() fnLeave(true) end) end
+            if ele.wnd then MY.UI.RegisterUIEvent(ele.wnd, 'OnMouseLeave' , function() fnLeave(false) end) end
+            if ele.itm then MY.UI.RegisterUIEvent(ele.itm, 'OnItemMouseLeave', function() fnLeave(false) end) end
         end
     end
     return self
@@ -1502,20 +1572,16 @@ MY.UI.RegisterUIEvent = function(raw, szEvent, fnEvent)
     if fnEvent then table.insert(raw['tMy'..szEvent], fnEvent) end
 end
 
--- open new frame
-MY.UI.OpenFrame = function(szName, szStyle, bDummyFrame)
-    local frm, szDummy = nil, ''
-    if bDummyFrame then szDummy = 'Dummy' end
-    local szIniFile = "interface\\MY\\.Framework\\ui\\WndFrameNormal"..szDummy..".ini"
-    if szStyle=='Topmost' then
-        szIniFile = "interface\\MY\\.Framework\\ui\\WndFrameTopmost"..szDummy..".ini"
-    elseif szStyle=='Lowest' then
-        szIniFile = "interface\\MY\\.Framework\\ui\\WndFrameLowest"..szDummy..".ini"
-    else
-        szStyle = 'Normal'
+-- create new frame
+MY.UI.CreateFrame = function(szName, bEmpty)
+    local frm
+    local szIniFile = "interface\\MY\\.Framework\\ui\\WndFrame.ini"
+    if bEmpty then
+        szIniFile = "interface\\MY\\.Framework\\ui\\WndFrameEmpty.ini"
     end
+    
     if type(szName) == "string" then
-        frm = Station.Lookup(szStyle.."/" .. szName)
+        frm = Station.Lookup("Normal/" .. szName)
         if frm then
             Wnd.CloseWindow(frm)
         end
@@ -1524,6 +1590,16 @@ MY.UI.OpenFrame = function(szName, szStyle, bDummyFrame)
         frm = Wnd.OpenWindow(szIniFile)
     end
     frm:Show()
+    if not bEmpty then
+        frm:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
+        frm:Lookup("Btn_Close").OnLButtonClick = function()
+            if frm.bClose then
+                Wnd.CloseWindow(frm)
+            else
+                frm:Hide()
+            end
+        end
+    end
     return MY.UI(frm)
 end
 
