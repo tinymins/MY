@@ -24,4 +24,7 @@ data = {
     ['hh:mm'] = '时：分',
     ['hh:mm:ss'] = '时：分：秒',
     ['channel setting'] = '频道设置',
+    
+    ['always show *'] = '总是显示※号',
+    ['always be white'] = '永远为白色',
 }
