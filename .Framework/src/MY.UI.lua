@@ -209,7 +209,7 @@ function _MY.UI:_checksum()
     for i = #self.eles, 1, -1 do
         local ele = self.eles[i]
         local status, err = true, 'szType'
-        if not ele.raw then
+        if (not ele.raw) or (not ele.raw.___id) then
             status, err = false, ''
         else
             status, err = pcall(function() return ele.raw:GetType() end)
