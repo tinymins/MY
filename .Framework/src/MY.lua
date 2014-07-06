@@ -796,15 +796,22 @@ end
     (void) MY.DelayCall(string szName)
     szName      -- 延迟调用ID
 ]]
-MY.DelayCall = function(fnAction, nDelay, szName)
-    if type(fnAction)=="function" then
-        table.insert(_MY.tDelayCall, { nTime = nDelay + GetTime(), fnAction = fnAction, szName = szName })
-    elseif type(fnAction)=="string" then
+MY.DelayCall = function(arg0, arg1, arg2)
+    local fnAction, nDelay, szName
+    if type(arg0) == "function" then fnAction = arg0 elseif type(arg1) == "function" then fnAction = arg1 elseif type(arg2) == "function" then fnAction = arg2 end
+    if type(arg0) == "string"   then szName   = arg0 elseif type(arg1) == "string"   then szName   = arg1 elseif type(arg2) == "string"   then szName   = arg2 end
+    if type(arg0) == "number"   then nDelay   = arg0 elseif type(arg1) == "number"   then nDelay   = arg1 elseif type(arg2) == "number"   then nDelay   = arg2 end
+    if not fnAction and not szName then return nil end
+    
+    if szName then
         for i = #_MY.tDelayCall, 1, -1 do
-            if _MY.tDelayCall[i].szName == fnAction then
+            if _MY.tDelayCall[i].szName == szName then
                 table.remove(_MY.tDelayCall, i)
             end
         end
+    end
+    if fnAction and nDelay then
+        table.insert(_MY.tDelayCall, { nTime = nDelay + GetTime(), fnAction = fnAction, szName = szName })
     end
 end
 --[[ 注册呼吸循环调用函数
