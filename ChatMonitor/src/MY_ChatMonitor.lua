@@ -508,7 +508,7 @@ _MY_ChatMonitor.Init = function()
     
     _MY_ChatMonitor.RegisterMsgMonitor()
     local fnOnTipClick = function() MY.ActivePanel('ChatMonitor') MY.OpenPanel() _MY_ChatMonitor.uiFrame:fadeOut(500) end
-    _MY_ChatMonitor.uiFrame = MY.UI.OpenFrame('MY_ChatMonitor'):size(250,150):hover(function(bIn)
+    _MY_ChatMonitor.uiFrame = MY.UI.CreateFrame('MY_ChatMonitor',true):size(250,150):hover(function(bIn)
         MY.DelayCall('MY_ChatMonitor_Hide')
         if not bIn then MY.DelayCall(function() _MY_ChatMonitor.uiFrame:fadeOut(500) end,5000,'MY_ChatMonitor_Hide') end
     end):toggle(false)
