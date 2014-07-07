@@ -367,18 +367,20 @@ end)
 -- hook chat panel
 MY.HookChatPanel("MY_Chat", function(h, szMsg)
     -- chat filter
-    local t = MY.Chat.FormatContent(szMsg)
-    local szText = ""
-    for k, v in ipairs(t) do
-        if v.text ~= "" then
-            if v.type == "text" or v.type == "faceicon" then
-                szText = szText .. v.text
+    if MY_Chat.bBlockWords then
+        local t = MY.Chat.FormatContent(szMsg)
+        local szText = ""
+        for k, v in ipairs(t) do
+            if v.text ~= "" then
+                if v.type == "text" or v.type == "faceicon" then
+                    szText = szText .. v.text
+                end
             end
         end
-    end
-    for _,szWord in ipairs(MY_Chat.tBlockWords) do
-        if string.find(szText, MY.String.PatternEscape(szWord)) then
-            return ""
+        for _,szWord in ipairs(MY_Chat.tBlockWords) do
+            if string.find(szText, MY.String.PatternEscape(szWord)) then
+                return ""
+            end
         end
     end
     -- save animiate group into name
@@ -388,7 +390,7 @@ MY.HookChatPanel("MY_Chat", function(h, szMsg)
     
     return szMsg, h:GetItemCount()
 end, function(h, szMsg, i)
-    if MY_Chat.bChatTime or MY_Chat.bChatCopy then
+    if (MY_Chat.bChatTime or MY_Chat.bChatCopy) and i then
         -- chat time
         local h2 = h:Lookup(i)
         if h2 and h2:GetType() == "Text" then
