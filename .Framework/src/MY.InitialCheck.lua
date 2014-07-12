@@ -27,7 +27,7 @@ MY.RegisterEvent('PLAYER_ENTER_GAME', function() MY.BreatheCall(function()
     local me, tong, szUrl = GetClientPlayer(), GetTongClient(), ''
     local szClientVer, szExeVer, szLang, szClientType = GetVersion()
     local szVerMY, iVerMY = MY.GetVersion()
-    local _, tServer = MY.GetServer()
+    local _, tServer = MY.Game.GetServer()
     local data = {
         n = '', -- me.szName
         i = '', -- me.dwID

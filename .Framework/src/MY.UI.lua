@@ -366,9 +366,9 @@ function _MY.UI:parent()
     return self:clone(eles)
 end
 
--- get child
--- same as jQuery.child()
-function _MY.UI:child(filter)
+-- get children
+-- same as jQuery.children()
+function _MY.UI:children(filter)
     self:_checksum()
     local child = {}
     local childHash = {}
@@ -406,9 +406,9 @@ function _MY.UI:child(filter)
     return self:clone(eles):filter(filter)
 end
 
--- get all children
--- same as jQuery.children(filter)
-function _MY.UI:children(filter)
+-- find ele
+-- same as jQuery.find()
+function _MY.UI:find(filter)
     self:_checksum()
     local children = {}
     for _, ele in pairs(self.eles) do
@@ -422,12 +422,6 @@ function _MY.UI:children(filter)
         table.insert( eles, self:raw2ele(raw) )
     end
     return self:clone(eles):filter(filter)
-end
-
--- find ele
--- same as jQuery.find()
-function _MY.UI:find(filter)
-    return self:children():filter(filter)
 end
 
 -- each

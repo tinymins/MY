@@ -15,7 +15,7 @@ RegisterCustomData("Account\\MY_Farbnamen.bEnabled")
 local _MY_Farbnamen = {
     nMaxCache= 2000,
     szConfigPath = "PLAYER_FORCE_COLOR",
-    szDataCache  = "PLAYER_INFO_CACHE\\" .. (MY.GetServer()),
+    szDataCache  = "PLAYER_INFO_CACHE\\" .. (MY.Game.GetServer()),
     tForceColor  = {},
     tForceString = {
         [0]  = _L['JiangHu'],

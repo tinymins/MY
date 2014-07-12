@@ -163,7 +163,7 @@ MY_Chat.ReInitUI = function()
     for _, v in ipairs(_Cache.tChannels) do
         if MY_Chat.tChannel[v.name] then
             i = i + 1
-            MY.UI(MY_Chat.frame):append(v.name,"WndRadioBox"):child("#"..v.name):width(20):text(v.title):font(197):color(v.color):pos(i*30+15,25):check(function()
+            MY.UI(MY_Chat.frame):append(v.name,"WndRadioBox"):children("#"..v.name):width(20):text(v.title):font(197):color(v.color):pos(i*30+15,25):check(function()
                 -- Switch Chat Channel Here
                 MY.SwitchChat(v.channel)
                 Station.SetFocusWindow("Lowest2/EditBox/Edit_Input")
@@ -174,7 +174,7 @@ MY_Chat.ReInitUI = function()
     
     if MY_Chat.tChannel.Check_Away then
         i = i + 1
-        MY.UI(MY_Chat.frame):append("Check_Away","WndCheckBox"):child("#Check_Away"):width(25):text(_L["AWAY"]):pos(i*30+15,25):check(function()
+        MY.UI(MY_Chat.frame):append("Check_Away","WndCheckBox"):children("#Check_Away"):width(25):text(_L["AWAY"]):pos(i*30+15,25):check(function()
             MY.SwitchChat("/afk")
         end, function()
             MY.SwitchChat("/cafk")
@@ -183,7 +183,7 @@ MY_Chat.ReInitUI = function()
     
     if MY_Chat.tChannel.Check_Busy then
         i = i + 1
-        MY.UI(MY_Chat.frame):append("Check_Busy","WndCheckBox"):child("#Check_Busy"):width(25):text(_L["BUSY"]):pos(i*30+15,25):check(function()
+        MY.UI(MY_Chat.frame):append("Check_Busy","WndCheckBox"):children("#Check_Busy"):width(25):text(_L["BUSY"]):pos(i*30+15,25):check(function()
             MY.SwitchChat("/atr")
         end, function()
             MY.SwitchChat("/catr")
@@ -199,10 +199,18 @@ end
 MY.RegisterInit(function()
     MY_Chat.ReInitUI()
     
-    MY.UI(MY_Chat.frame):child("#Btn_Option"):menu(function()
+    MY.UI(MY_Chat.frame):children("#Btn_Option"):menu(function()
         local t = {
             {
-                szOption = _L["about..."]
+                szOption = _L["about..."],
+                fnAction = function()
+                    local t = {
+                        szName = "MY_Chat_About",
+                        szMessage = _L["Mingyi Plugins - Chatpanel\nThis plugin is developed by Zhai YiMing @ derzh.com."],
+                        {szOption = g_tStrings.STR_HOTKEY_SURE,fnAction = function() end},
+                    }
+                    MessageBox(t)
+                end,
             }, {
                 bDevide = true
             }, {
@@ -253,12 +261,12 @@ MY.RegisterInit(function()
                     fnAction = function()
                         local muDel
                         local AddListItem = function(muList, szText)
-                            local i = muList:hdl(1):child():count()
-                            local muItem = muList:append('<handle><image>w=300 h=25 eventid=371 name="Image_Bg" </image><text>name="Text_Default" </text></handle>'):hdl(1):child():last()
+                            local i = muList:hdl(1):children():count()
+                            local muItem = muList:append('<handle><image>w=300 h=25 eventid=371 name="Image_Bg" </image><text>name="Text_Default" </text></handle>'):hdl(1):children():last()
                             local hHandle = muItem:raw(1)
                             hHandle.Value = szText
-                            local hText = muItem:child("#Text_Default"):pos(10, 2):text(szText or ""):raw(1)
-                            muItem:child("#Image_Bg"):image("UI/Image/Common/TextShadow.UITex",5):alpha(0):hover(function(bIn)
+                            local hText = muItem:children("#Text_Default"):pos(10, 2):text(szText or ""):raw(1)
+                            muItem:children("#Image_Bg"):image("UI/Image/Common/TextShadow.UITex",5):alpha(0):hover(function(bIn)
                                 if hHandle.Selected then return nil end
                                 if bIn then
                                     MY.UI(this):fadeIn(100)
@@ -300,7 +308,7 @@ MY.RegisterInit(function()
                         end)
                         -- del
                         muDel = ui:append("WndButton_Del", "WndButton"):find("#WndButton_Del"):pos(260,0):width(80):text(_L["delete"]):click(function()
-                            muList:hdl(1):child():each(function(ui)
+                            muList:hdl(1):children():each(function(ui)
                                 if this.Selected then
                                     for i=#MY_Chat.tBlockWords, 1, -1 do
                                         if MY_Chat.tBlockWords[i]==this.Value then
