@@ -1,4 +1,4 @@
-local _L = MY.LoadLangPack("Interface/MY/Chat/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Chat/lang/")
 local CHAT_TIME = {
     HOUR_MIN = 1,
     HOUR_MIN_SEC = 2,

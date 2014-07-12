@@ -1,11 +1,10 @@
-local _L = MY.LoadLangPack()
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."RollMonitor/lang/")
 MY_RollMonitor = { nMode = 1, nPublish = 0, nPublishChannel = PLAYER_TALK_CHANNEL.RAID, bPublishRestart = true }
 RegisterCustomData('MY_RollMonitor.nMode')
 RegisterCustomData('MY_RollMonitor.nPublish')
 RegisterCustomData('MY_RollMonitor.bPublishRestart')
 RegisterCustomData('MY_RollMonitor.nPublishChannel')
 local _MY_RollMonitor = {
-    bInvalidRectangle = false,
     uiTextBoard = nil,
     aRecords = {},
     aMode = {
@@ -33,7 +32,8 @@ _MY_RollMonitor.OnPanelActive = function(wnd)
             table.insert( t, { 
                 szOption = tMode.szName,
                 fnAction = function()
-                    MY_RollMonitor.nMode, _MY_RollMonitor.bInvalidRectangle = iMode, true
+                    MY_RollMonitor.nMode = iMode
+                    _MY_RollMonitor.RedrawBoard()
                     table.sort(_MY_RollMonitor.aRecords,function(v1,v2)return v1[tMode.szID] > v2[tMode.szID] end)
                     ui:children('#WndCombo_RecordType'):text(tMode.szName)
                 end
@@ -43,7 +43,8 @@ _MY_RollMonitor.OnPanelActive = function(wnd)
     end)
     -- 清空
     ui:append('WndButton_Clear','WndButton'):children('#WndButton_Clear'):text(_L['restart']):pos(w-196,20):width(90):lclick(function(nButton)
-        _MY_RollMonitor.aRecords, _MY_RollMonitor.bInvalidRectangle = {}, true
+        _MY_RollMonitor.aRecords = {}
+        _MY_RollMonitor.RedrawBoard()
         if MY_RollMonitor.bPublishRestart then
             MY.Talk(MY_RollMonitor.nPublishChannel, _L['--------------- roll restart ----------------']..'\n')
         end
@@ -125,13 +126,6 @@ _MY_RollMonitor.OnPanelActive = function(wnd)
     -- 输出板
     ui:append('WndScrollBox_Record','WndScrollBox'):children('#WndScrollBox_Record'):handleStyle(3):pos(20,50):size(w-46,400):text(_L['去掉最高最低取平均值']):append('Text_Default','Text'):find('#Text_Default')
     _MY_RollMonitor.uiBoard = ui:children('#WndScrollBox_Record')
-    -- 直接在RegisterMonitor里面进行UI操作会在ReloadUIAddon之后疯狂报错… 于是我开了一个定时器刷新界面
-    MY.BreatheCall('MY_RollMonitorRedraw',100,function()
-        if _MY_RollMonitor.bInvalidRectangle then
-            _MY_RollMonitor.bInvalidRectangle = false
-            _MY_RollMonitor.RedrawBoard()
-        end
-    end)
     _MY_RollMonitor.RedrawBoard()
 end
 _MY_RollMonitor.OnPanelDeactive = function()
@@ -207,7 +201,7 @@ _MY_RollMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
         end
         table.insert(_MY_RollMonitor.aRecords, aRecord)
         table.sort(_MY_RollMonitor.aRecords,function(v1,v2)return v1[_MY_RollMonitor.aMode[MY_RollMonitor.nMode].szID] > v2[_MY_RollMonitor.aMode[MY_RollMonitor.nMode].szID] end)
-        _MY_RollMonitor.bInvalidRectangle = true
+        _MY_RollMonitor.RedrawBoard()
     end
 end
 -- 注册系统频道监控

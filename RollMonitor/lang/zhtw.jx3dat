@@ -1,0 +1,23 @@
+-- language data (zhcn) updated at 2014-4-10 03:38:11
+data = {
+    -- MY_RollMon.lua
+    ['roll monitor'] = '點數監控',
+    ['publish'] = '發佈',
+    ['publish setting'] = '發佈設置',
+    ['publish while restart'] = '重新開始時喊話',
+    ['publish top %d'] = '發佈前%d名',
+    ['publish all'] = '發佈所有',
+    ['--------------- roll restart ----------------'] = '——————— 記錄已清空 擲頭重新開始 ———————',
+    ['---------------------------------------------'] = '——————————————————————————',
+    ['left click to publish, right click to open setting.'] = '左鍵發佈，右鍵設置。',
+    ['left click to restart, right click to open setting.'] = '左鍵重新開始，右鍵設置。',
+    ['ROLL_MONITOR_EXP'] = '"([^"]*)擲出(%d+)點。%(1 %- 100%)"',
+    ['only first score'] = '只記錄第一次',
+    ['only last score'] = '只記錄最後一次',
+    ['highest score'] = '多次搖點取最高點',
+    ['lowest score'] = '多次搖點取最低點',
+    ['average score'] = '多次搖點取平均值',
+    ['average score with out pole'] = '去掉最高最低取平均值',
+    ["haven't roll yet."] = '尚未擲骰子。',
+    ['[%s] rolls for %d times, valid score is %s.'] = '[%s]擲了%d次骰子，有效點數為%s。',
+}
