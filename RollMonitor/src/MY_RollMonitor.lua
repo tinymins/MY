@@ -25,8 +25,9 @@ local _MY_RollMonitor = {
 -- 标签激活响应函数
 _MY_RollMonitor.OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
+    local w, h = ui:size()
     -- 记录模式
-    ui:append('WndCombo_RecordType','WndComboBox'):child('#WndCombo_RecordType'):text(_MY_RollMonitor.aMode[MY_RollMonitor.nMode].szName):pos(20,20):width(180):menu(function()
+    ui:append('WndCombo_RecordType','WndComboBox'):children('#WndCombo_RecordType'):text(_MY_RollMonitor.aMode[MY_RollMonitor.nMode].szName):pos(20,20):width(180):menu(function()
         local t = {}
         for iMode, tMode in ipairs(_MY_RollMonitor.aMode) do
             table.insert( t, { 
@@ -34,14 +35,14 @@ _MY_RollMonitor.OnPanelActive = function(wnd)
                 fnAction = function()
                     MY_RollMonitor.nMode, _MY_RollMonitor.bInvalidRectangle = iMode, true
                     table.sort(_MY_RollMonitor.aRecords,function(v1,v2)return v1[tMode.szID] > v2[tMode.szID] end)
-                    ui:child('#WndCombo_RecordType'):text(tMode.szName)
+                    ui:children('#WndCombo_RecordType'):text(tMode.szName)
                 end
             } )
         end
         return t
     end)
     -- 清空
-    ui:append('WndButton_Clear','WndButton'):child('#WndButton_Clear'):text(_L['restart']):pos(450,20):width(90):lclick(function(nButton)
+    ui:append('WndButton_Clear','WndButton'):children('#WndButton_Clear'):text(_L['restart']):pos(w-196,20):width(90):lclick(function(nButton)
         _MY_RollMonitor.aRecords, _MY_RollMonitor.bInvalidRectangle = {}, true
         if MY_RollMonitor.bPublishRestart then
             MY.Talk(MY_RollMonitor.nPublishChannel, _L['--------------- roll restart ----------------']..'\n')
@@ -65,7 +66,7 @@ _MY_RollMonitor.OnPanelActive = function(wnd)
         return t
     end):tip(_L['left click to restart, right click to open setting.'], MY.Const.UI.Tip.POS_TOP)
     -- 发布
-    ui:append('WndButton_Publish','WndButton'):child('#WndButton_Publish'):text(_L['publish']):pos(540,20):width(80):rmenu(function()
+    ui:append('WndButton_Publish','WndButton'):children('#WndButton_Publish'):text(_L['publish']):pos(w-106,20):width(80):rmenu(function()
         local t = { {
             szOption = _L['publish setting'], {
                 bCheck = true, bMCheck = true, bChecked = MY_RollMonitor.nPublish == 3,
@@ -122,8 +123,8 @@ _MY_RollMonitor.OnPanelActive = function(wnd)
         MY.Talk(MY_RollMonitor.nPublishChannel, _L['---------------------------------------------']..'\n')
     end):tip(_L['left click to publish, right click to open setting.'], MY.Const.UI.Tip.POS_TOP, { x = -80 })
     -- 输出板
-    ui:append('WndScrollBox_Record','WndScrollBox'):child('#WndScrollBox_Record'):handleStyle(3):pos(20,50):size(600,400):text(_L['去掉最高最低取平均值']):append('Text_Default','Text'):children('#Text_Default')
-    _MY_RollMonitor.uiBoard = ui:child('#WndScrollBox_Record')
+    ui:append('WndScrollBox_Record','WndScrollBox'):children('#WndScrollBox_Record'):handleStyle(3):pos(20,50):size(w-46,400):text(_L['去掉最高最低取平均值']):append('Text_Default','Text'):find('#Text_Default')
+    _MY_RollMonitor.uiBoard = ui:children('#WndScrollBox_Record')
     -- 直接在RegisterMonitor里面进行UI操作会在ReloadUIAddon之后疯狂报错… 于是我开了一个定时器刷新界面
     MY.BreatheCall('MY_RollMonitorRedraw',100,function()
         if _MY_RollMonitor.bInvalidRectangle then

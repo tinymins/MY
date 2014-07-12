@@ -37,7 +37,7 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
             szTime = '',    -- 消息时间UI
         }
         -- 拼接消息
-        _MY_ChatMonitor.uiTest:clear():append(szMsg):child('.Handle'):child():each(function()
+        _MY_ChatMonitor.uiTest:clear():append(szMsg):children('.Handle'):children():each(function()
             tCapture.szText = tCapture.szText .. this:GetText()
         end)
         if not MY_ChatMonitor.bIsRegexp then tCapture.szText = StringLowerW(tCapture.szText) end
@@ -98,7 +98,7 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
                 -- 处理UI
                 local bEnd = false
                 if _MY_ChatMonitor.uiBoard then
-                    _MY_ChatMonitor.uiBoard:hdl(1):child():each(function()
+                    _MY_ChatMonitor.uiBoard:hdl(1):children():each(function()
                         if not bEnd then
                             if this:GetType()=="Text" and StringFindW(this:GetText(), "\n") then
                                 bEnd = true
@@ -342,9 +342,10 @@ end
 
 _MY_ChatMonitor.OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
-    ui:append('Label_KeyWord','Text'):children('#Label_KeyWord'):pos(22,15):size(100,25):text(_L['key words:'])
-    ui:append('EditBox_KeyWord','WndEditComboBox'):child('#EditBox_KeyWord'):pos(80,15):size(400,25):text(MY_ChatMonitor.szKeyWords):change(function(szText) MY_ChatMonitor.szKeyWords = szText end):menu(function()
-        local edit, t = ui:child('#EditBox_KeyWord'), {}
+    local w, h = ui:size()
+    ui:append('Label_KeyWord','Text'):find('#Label_KeyWord'):pos(22,15):size(100,25):text(_L['key words:'])
+    ui:append('EditBox_KeyWord','WndEditComboBox'):children('#EditBox_KeyWord'):pos(80,15):size(w-246,25):text(MY_ChatMonitor.szKeyWords):change(function(szText) MY_ChatMonitor.szKeyWords = szText end):menu(function()
+        local edit, t = ui:children('#EditBox_KeyWord'), {}
         for _, szOpt in ipairs(MY.LoadLUAData(_MY_ChatMonitor.szLuaData) or {}) do
             if type(szOpt)=="string" then
                 table.insert(t, {
@@ -380,13 +381,13 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
         end })
         return t
     end):alpha(180)
-    ui:append('Image_Help','Image'):children('#Image_Help'):image('UI/Image/UICommon/Commonpanel2.UITex',48):pos(8,10):size(25,25):hover(function(bIn) this:SetAlpha( (bIn and 255 ) or 180) end):click(function(nButton)
+    ui:append('Image_Help','Image'):find('#Image_Help'):image('UI/Image/UICommon/Commonpanel2.UITex',48):pos(8,10):size(25,25):hover(function(bIn) this:SetAlpha( (bIn and 255 ) or 180) end):click(function(nButton)
         local szText="<image>path=\"ui/Image/UICommon/Talk_Face.UITex\" frame=25 w=24 h=24</image> <text>text=" .. EncodeComponentsString(_L['CHAT_MONITOR_TIP']) .." font=207 </text>"
         local x, y = Cursor.GetPos()
         local w, h = this:GetSize()
         OutputTip(szText, 450, {x, y, w, h})
     end):alpha(180)
-    ui:append('Image_Setting','Image'):children('#Image_Setting'):pos(600,13):image('UI/Image/UICommon/Commonpanel.UITex',18):size(30,30):alpha(200):hover(function(bIn) this:SetAlpha((bIn and 255) or 200) end):click(function()
+    ui:append('Image_Setting','Image'):find('#Image_Setting'):pos(w-46,13):image('UI/Image/UICommon/Commonpanel.UITex',18):size(30,30):alpha(200):hover(function(bIn) this:SetAlpha((bIn and 255) or 200) end):click(function()
         PopupMenu((function() 
             local t = {}
             for szChannel, tChannel in pairs({
@@ -434,7 +435,7 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
             return t
         end)())
     end)
-    ui:append('Button_Switcher','WndButton'):children('#Button_Switcher'):pos(490,15):width(50):text((_MY_ChatMonitor.bCapture and _L['stop']) or _L['start']):click(function()
+    ui:append('Button_Switcher','WndButton'):find('#Button_Switcher'):pos(w-156,15):width(50):text((_MY_ChatMonitor.bCapture and _L['stop']) or _L['start']):click(function()
         if _MY_ChatMonitor.bCapture then
             MY.UI(this):text(_L['start'])
             _MY_ChatMonitor.bCapture = false
@@ -443,11 +444,11 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
             _MY_ChatMonitor.bCapture = true
         end
     end)
-    ui:append('Button_Clear','WndButton'):children('#Button_Clear'):pos(545,15):width(50):text(_L['clear']):click(function()
+    ui:append('Button_Clear','WndButton'):find('#Button_Clear'):pos(w-101,15):width(50):text(_L['clear']):click(function()
         _MY_ChatMonitor.tCapture = {}
         _MY_ChatMonitor.uiBoard:clear()
     end)
-    _MY_ChatMonitor.uiBoard = ui:append('WndScrollBox_TalkList','WndScrollBox'):child('#WndScrollBox_TalkList'):handleStyle(3):pos(20,50):size(605,405)
+    _MY_ChatMonitor.uiBoard = ui:append('WndScrollBox_TalkList','WndScrollBox'):children('#WndScrollBox_TalkList'):handleStyle(3):pos(20,50):size(w-41,405)
     for i = 1, #_MY_ChatMonitor.tCapture, 1 do
         _MY_ChatMonitor.uiBoard:append( _MY_ChatMonitor.tCapture[i].szTime .. _MY_ChatMonitor.tCapture[i].szMsg )
     end
@@ -513,8 +514,8 @@ _MY_ChatMonitor.Init = function()
         if not bIn then MY.DelayCall(function() _MY_ChatMonitor.uiFrame:fadeOut(500) end,5000,'MY_ChatMonitor_Hide') end
     end):toggle(false)
     _MY_ChatMonitor.uiFrame:append('Image_bg',"Image"):find('#Image_bg'):image('UI/Image/Minimap/Minimap2.UITex',8):size(300,300):click(fnOnTipClick)
-    _MY_ChatMonitor.uiTest = _MY_ChatMonitor.uiFrame:append('WndWindow_Test','WndWindow'):child('#WndWindow_Test'):toggle(false)
-    _MY_ChatMonitor.uiTipBoard = _MY_ChatMonitor.uiFrame:append('Handle_Tip',"Handle"):children('#Handle_Tip'):handleStyle(3):pos(10,10):size(230,130)
+    _MY_ChatMonitor.uiTest = _MY_ChatMonitor.uiFrame:append('WndWindow_Test','WndWindow'):children('#WndWindow_Test'):toggle(false)
+    _MY_ChatMonitor.uiTipBoard = _MY_ChatMonitor.uiFrame:append('Handle_Tip',"Handle"):find('#Handle_Tip'):handleStyle(3):pos(10,10):size(230,130)
 
     _MY_ChatMonitor.uiTipBoard:append('Text1','Text'):find('#Text1'):text(_L['welcome to use mingyi chat monitor.']):click(fnOnTipClick)
     _MY_ChatMonitor.ShowTip()

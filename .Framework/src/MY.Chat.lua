@@ -266,3 +266,256 @@ MY.Chat.FormatContent = function(szMsg)
     end
     return t2
 end
+
+--[[ 判断某个频道能否发言
+-- (bool) MY.CanTalk(number nChannel)]]
+MY.Chat.CanTalk = function(nChannel)
+    for _, v in ipairs({"WHISPER", "TEAM", "RAID", "BATTLE_FIELD", "NEARBY", "TONG", "TONG_ALLIANCE" }) do
+        if nChannel == PLAYER_TALK_CHANNEL[v] then
+            return true
+        end
+    end
+    return false
+end
+MY.CanTalk = MY.Chat.CanTalk
+
+-- get channel header
+_Cache.tTalkChannelHeader = {
+    [PLAYER_TALK_CHANNEL.NEARBY] = "/s ",
+    [PLAYER_TALK_CHANNEL.FRIENDS] = "/o ",
+    [PLAYER_TALK_CHANNEL.TONG_ALLIANCE] = "/a ",
+    [PLAYER_TALK_CHANNEL.RAID] = "/t ",
+    [PLAYER_TALK_CHANNEL.BATTLE_FIELD] = "/b ",
+    [PLAYER_TALK_CHANNEL.TONG] = "/g ",
+    [PLAYER_TALK_CHANNEL.SENCE] = "/y ",
+    [PLAYER_TALK_CHANNEL.FORCE] = "/f ",
+    [PLAYER_TALK_CHANNEL.CAMP] = "/c ",
+    [PLAYER_TALK_CHANNEL.WORLD] = "/h ",
+}
+--[[ 切换聊天频道
+    (void) MY.SwitchChat(number nChannel)
+    (void) MY.SwitchChat(string szHeader)
+    (void) MY.SwitchChat(string szName)
+]]
+MY.Chat.SwitchChat = function(nChannel)
+    local szHeader = _Cache.tTalkChannelHeader[nChannel]
+    if szHeader then
+        SwitchChatChannel(szHeader)
+    elseif type(nChannel) == "string" then
+        if string.sub(nChannel, 1, 1) == "/" then
+            SwitchChatChannel(nChannel.." ")
+        else
+            SwitchChatChannel("/w " .. string.gsub(nChannel,'[%[%]]','') .. " ")
+        end
+    end
+end
+MY.SwitchChat = MY.Chat.SwitchChat
+
+
+-- parse faceicon in talking message
+MY.Chat.ParseFaceIcon = function(t)
+    if not _Cache.tFaceIcon then
+        _Cache.tFaceIcon = {}
+        for i = 1, g_tTable.FaceIcon:GetRowCount() do
+            local tLine = g_tTable.FaceIcon:GetRow(i)
+            _Cache.tFaceIcon[tLine.szCommand] = tLine.dwID
+        end
+    end
+    local t2 = {}
+    for _, v in ipairs(t) do
+        if v.type ~= "text" then
+            if v.type == "emotion" then
+                v.type = "text"
+            end
+            table.insert(t2, v)
+        else
+            local nOff, nLen = 1, string.len(v.text)
+            while nOff <= nLen do
+                local szFace, dwFaceID = nil, nil
+                local nPos = StringFindW(v.text, "#", nOff)
+                if not nPos then
+                    nPos = nLen
+                else
+                    for i = nPos + 6, nPos + 2, -2 do
+                        if i <= nLen then
+                            local szTest = string.sub(v.text, nPos, i)
+                            if _Cache.tFaceIcon[szTest] then
+                                szFace, dwFaceID = szTest, _Cache.tFaceIcon[szTest]
+                                nPos = nPos - 1
+                                break
+                            end
+                        end
+                    end
+                end
+                if nPos >= nOff then
+                    table.insert(t2, { type = "text", text = string.sub(v.text, nOff, nPos) })
+                    nOff = nPos + 1
+                end
+                if szFace then
+                    table.insert(t2, { type = "emotion", text = szFace, id = dwFaceID })
+                    nOff = nOff + string.len(szFace)
+                end
+            end
+        end
+    end
+    return t2
+end
+-- parse name in talking message
+MY.Chat.ParseName = function(t)
+    local t2 = {}
+    for _, v in ipairs(t) do
+        if v.type ~= "text" then
+            if v.type == "name" then
+                v = { type = "text", text = "["..v.name.."]" }
+            end
+            table.insert(t2, v)
+        else
+            local nOff, nLen = 1, string.len(v.text)
+            while nOff <= nLen do
+                local szName = nil
+                local nPos1, nPos2 = string.find(v.text, '%[[^%[%]]+%]', nOff)
+                if not nPos1 then
+                    nPos1 = nLen
+                else
+                    szName = string.sub(v.text, nPos1 + 1, nPos2 - 1)
+                    nPos1 = nPos1 - 1
+                end
+                if nPos1 >= nOff then
+                    table.insert(t2, { type = "text", text = string.sub(v.text, nOff, nPos1) })
+                    nOff = nPos1 + 1
+                end
+                if szName then
+                    table.insert(t2, { type = "name", name = szName })
+                    nOff = nPos2 + 1
+                end
+            end
+        end
+    end
+    return t2
+end
+--[[ 发布聊天内容
+-- (void) MY.Talk(string szTarget, string szText[, boolean bNoEscape])
+-- (void) MY.Talk([number nChannel, ] string szText[, boolean bNoEscape])
+-- szTarget         -- 密聊的目标角色名
+-- szText               -- 聊天内容，（亦可为兼容 KPlayer.Talk 的 table）
+-- nChannel         -- *可选* 聊天频道，PLAYER_TALK_CHANNLE.*，默认为近聊
+-- bNoEscape    -- *可选* 不解析聊天内容中的表情图片和名字，默认为 false
+-- bSaveDeny    -- *可选* 在聊天输入栏保留不可发言的频道内容，默认为 false
+-- 特别注意：nChannel, szText 两者的参数顺序可以调换，战场/团队聊天频道智能切换]]
+MY.Chat.Talk = function(nChannel, szText, bNoEscape, bSaveDeny)
+    local szTarget, me = "", GetClientPlayer()
+    -- channel
+    if not nChannel then
+        nChannel = PLAYER_TALK_CHANNEL.NEARBY
+    elseif type(nChannel) == "string" then
+        if not szText then
+            szText = nChannel
+            nChannel = PLAYER_TALK_CHANNEL.NEARBY
+        elseif type(szText) == "number" then
+            szText, nChannel = nChannel, szText
+        else
+            szTarget = nChannel
+            nChannel = PLAYER_TALK_CHANNEL.WHISPER
+        end
+    elseif nChannel == PLAYER_TALK_CHANNEL.RAID and me.GetScene().nType == MAP_TYPE.BATTLE_FIELD then
+        nChannel = PLAYER_TALK_CHANNEL.BATTLE_FIELD
+    elseif nChannel == PLAYER_TALK_CHANNEL.LOCAL_SYS then
+        return MY.Sysmsg({szText}, '')
+    end
+    -- say body
+    local tSay = nil
+    if type(szText) == "table" then
+        tSay = szText
+    else
+        local tar = MY.GetTarget(me.GetTarget())
+        szText = string.gsub(szText, "%$zj", '['..me.szName..']')
+        if tar then
+            szText = string.gsub(szText, "%$mb", '['..tar.szName..']')
+        end
+        tSay = {{ type = "text", text = szText .. "\n"}}
+    end
+    if not bNoEscape then
+        tSay = MY.Chat.ParseFaceIcon(tSay)
+        tSay = MY.Chat.ParseName(tSay)
+    end
+    me.Talk(nChannel, szTarget, tSay)
+    if bSaveDeny and not MY.CanTalk(nChannel) then
+        local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
+        edit:ClearText()
+        for _, v in ipairs(tSay) do
+            if v.type == "text" then
+                edit:InsertText(v.text)
+            else
+                edit:InsertObj(v.text, v)
+            end
+        end
+        -- change to this channel
+        MY.SwitchChat(nChannel)
+    end
+end
+MY.Talk = MY.Chat.Talk
+
+_Cache.tHookChatFun = {}
+--[[ HOOK聊天栏 ]]
+MY.Chat.HookChatPanel = function(arg0, arg1, arg2)
+    local fnBefore, fnAfter, id
+    if type(arg0)=="string" then
+        id, fnBefore, fnAfter = arg0, arg1, arg2
+    elseif type(arg1)=="string" then
+        id, fnBefore, fnAfter = arg1, arg0, arg2
+    elseif type(arg2)=="string" then
+        id, fnBefore, fnAfter = arg2, arg0, arg1
+    else
+        id, fnBefore, fnAfter = nil, arg0, arg1
+    end
+    if type(fnBefore)~="function" and type(fnAfter)~="function" then
+        return nil
+    end
+    if id then
+        for i=#_Cache.tHookChatFun, 1, -1 do
+            if _Cache.tHookChatFun[i].id == id then
+                table.remove(_Cache.tHookChatFun, i)
+            end
+        end
+    end
+    if fnBefore then
+        table.insert(_Cache.tHookChatFun, {fnBefore = fnBefore, fnAfter = fnAfter, id = id})
+    end
+end
+MY.HookChatPanel = MY.Chat.HookChatPanel
+
+_Cache.HookChatPanelHandle = function(h, szMsg)
+    -- deal with fnBefore
+    for i,handle in ipairs(_Cache.tHookChatFun) do
+        -- try to execute fnBefore and get return values
+        local result = { pcall(handle.fnBefore, h, szMsg) }
+        -- when fnBefore execute succeed
+        if result[1] then
+            -- remove execute status flag
+            table.remove(result, 1)
+            if type(result[1])=="string" then
+                szMsg = result[1]
+            end
+            -- remove returned szMsg
+            table.remove(result, 1)
+        end
+        -- the rest is fnAfter param
+        _Cache.tHookChatFun[i].param = result
+    end
+    -- call ori append
+    h:_AppendItemFromString_MY(szMsg)
+    -- deal with fnAfter
+    for i,handle in ipairs(_Cache.tHookChatFun) do
+        pcall(handle.fnAfter, h, szMsg, unpack(handle.param))
+    end
+end
+MY.RegisterEvent("CHAT_PANEL_INIT", function ()
+    for i = 1, 10 do
+        local h = Station.Lookup("Lowest2/ChatPanel" .. i .. "/Wnd_Message", "Handle_Message")
+        local ttl = Station.Lookup("Lowest2/ChatPanel" .. i .. "/CheckBox_Title", "Text_TitleName")
+        if h and (not ttl or ttl:GetText() ~= g_tStrings.CHANNEL_MENTOR) then
+            h._AppendItemFromString_MY = h._AppendItemFromString_MY or h.AppendItemFromString
+            h.AppendItemFromString = _Cache.HookChatPanelHandle
+        end
+    end
+end)
