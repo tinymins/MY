@@ -5,18 +5,20 @@
 --
 -- 主要功能: 按关键字过滤获取聊天消息
 -- 
-local _L = MY.LoadLangPack()
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."ChatMonitor/lang/")
 MY_ChatMonitor = {}
 MY_ChatMonitor.szKeyWords = _L['CHAT_MONITOR_KEYWORDS_SAMPLE']
 MY_ChatMonitor.bIsRegexp = false
 MY_ChatMonitor.nMaxRecord = 30
 MY_ChatMonitor.bShowPreview = true
+MY_ChatMonitor.bPlaySound = true
 MY_ChatMonitor.tChannels = { ["MSG_NORMAL"] = true, ["MSG_CAMP"] = true, ["MSG_WORLD"] = true, ["MSG_MAP"] = true, ["MSG_SCHOOL"] = true, ["MSG_GUILD"] = true, ["MSG_FRIEND"] = true }
 RegisterCustomData('MY_ChatMonitor.szKeyWords')
 RegisterCustomData('MY_ChatMonitor.bIsRegexp')
 RegisterCustomData('MY_ChatMonitor.nMaxRecord')
 RegisterCustomData('MY_ChatMonitor.bShowPreview')
 RegisterCustomData('MY_ChatMonitor.tChannels')
+RegisterCustomData('MY_ChatMonitor.bPlaySound')
 local _MY_ChatMonitor = { }
 _MY_ChatMonitor.bInited = false
 _MY_ChatMonitor.tCapture = {}
@@ -36,44 +38,38 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
             szMsg  = szMsg, -- 消息源数据UI
             szTime = '',    -- 消息时间UI
         }
-        -- 拼接消息
-        _MY_ChatMonitor.uiTest:clear():append(szMsg):children('.Handle'):children():each(function()
-            tCapture.szText = tCapture.szText .. this:GetText()
-        end)
-        if not MY_ChatMonitor.bIsRegexp then tCapture.szText = StringLowerW(tCapture.szText) end
-        tCapture.szHash = string.gsub(tCapture.szText,'\n', '')
         -- 计算系统消息颜色
         local colMsgSys = GetMsgFontColor("MSG_SYS", true)
-        -- 如果不是系统信息 则去掉头部标签 类似[阵营][浩气盟][玩家名称] 舍弃哈希
-        if (r~=colMsgSys[1] or g~=colMsgSys[2] or b~=colMsgSys[3]) then
-            local nB, nE = StringFindW(tCapture.szHash, g_tStrings.STR_TALK_HEAD_SAY1)
-            if nE then tCapture.szHash = string.sub(tCapture.szHash, nE + 1) end
+        -- 拼接消息
+        for i, v in ipairs(MY.Chat.FormatContent(szMsg)) do
+            -- 如果不是系统信息且第一个是名字 类似“[阵营][浩气盟][茗伊]说：” 则舍弃头部标签
+            if (r~=colMsgSys[1] or g~=colMsgSys[2] or b~=colMsgSys[3]) and (i~=1 or v[2].type~="name") then
+                tCapture.szText = tCapture.szText .. v[1]
+            end
         end
+        if not MY_ChatMonitor.bIsRegexp then
+            tCapture.szText = StringLowerW(tCapture.szText)
+        end
+        tCapture.szHash = string.gsub(tCapture.szText,'\n', '')
         --------------------------------------------------------------------------------------
         -- 开始计算是否符合过滤器要求
         local bCatch = false
         if MY_ChatMonitor.bIsRegexp then    -- regexp
             if string.find(tCapture.szText, MY_ChatMonitor.szKeyWords) then bCatch = true end
         else        -- normal
-            local split = function(s, p)
-                local rt= {}
-                string.gsub(s, '[^'..p..']+', function(w) table.insert(rt, w) end )
-                return rt
-            end
-            local escape = function(s) return string.gsub(s, '([%(%)%.%%%+%-%*%?%[%^%$%]])', '%%%1') end
             -- 10|十人,血战天策|XZTC,!小铁被吃了,!开宴黑铁;大战
             local bKeyWordsLine = false
-            for _, szKeyWordsLine in ipairs( split(StringLowerW(MY_ChatMonitor.szKeyWords), ';') ) do -- 符合一个即可
+            for _, szKeyWordsLine in ipairs( MY.String.Split(StringLowerW(MY_ChatMonitor.szKeyWords), ';') ) do -- 符合一个即可
                 if bKeyWordsLine then break end
                 -- 10|十人,血战天策|XZTC,!小铁被吃了,!开宴黑铁
                 local bKeyWords = true
-                for _, szKeyWords in ipairs( split(szKeyWordsLine, ',') ) do            -- 必须全部符合
+                for _, szKeyWords in ipairs( MY.String.Split(szKeyWordsLine, ',') ) do            -- 必须全部符合
                     if not bKeyWords then break end
                     -- 10|十人
                     local bKeyWord = false
-                    for _, szKeyWord in ipairs( split(szKeyWords, '|') ) do         -- 符合一个即可
+                    for _, szKeyWord in ipairs( MY.String.Split(szKeyWords, '|') ) do         -- 符合一个即可
                         if bKeyWord then break end
-                        szKeyWord = escape(szKeyWord)
+                        szKeyWord = MY.String.PatternEscape(szKeyWord)
                         if string.sub(szKeyWord, 1, 1)=="!" then    -- !小铁被吃了
                             szKeyWord = string.sub(szKeyWord, 2)
                             if not string.find(tCapture.szText, szKeyWord) then bKeyWord = true end
@@ -110,14 +106,14 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
             end
             -- 开始组装一条记录 tCapture
             local t =TimeToDate(GetCurrentTime())
-            tCapture.szTime = GetFormatText(string.format("[%02d:%02d.%02d]", t.hour, t.minute, t.second), 10, r, g, b, 515, "this.OnItemLButtonDown=function() MY_ChatMonitor.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY_ChatMonitor.RepeatChatLine(this) end", "timelink")
+            tCapture.szTime = GetFormatText(string.format("[%02d:%02d.%02d]", t.hour, t.minute, t.second), 10, r, g, b, 515, "this.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end", "timelink")
             -- binding event change
             tCapture.szMsg = string.gsub(tCapture.szMsg, 'eventid=%d+', 'eventid=371')
             -- save animiate group into name
             tCapture.szMsg = string.gsub(tCapture.szMsg, "group=(%d+) </a", "group=%1 name=\"%1\" </a")	
             
             -- 发出提示音
-            PlaySound(SOUND.UI_SOUND, "Interface\\MY\\ChatMonitor\\audio\\MsgArrive.wav")
+            if MY_ChatMonitor.bPlaySound then PlaySound(SOUND.UI_SOUND, MY.GetAddonInfo().szRoot.."ChatMonitor\\audio\\MsgArrive.wav") end
             
             -- 更新UI
             if _MY_ChatMonitor.uiBoard then
@@ -125,7 +121,7 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
                 _MY_ChatMonitor.uiBoard:find('#^.*link'):del('#^namelink_'):click(function(nFlag) 
                     if nFlag==1 then
                         if IsCtrlKeyDown() then
-                            MY_ChatMonitor.CopyChatItem(this)
+                            MY.Chat.CopyChatItem(this)
                         else
                             OnItemLinkDown(this)
                         end
@@ -153,7 +149,7 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
                         end)())
                     elseif nFlag==1 then
                         if IsCtrlKeyDown() then
-                            MY_ChatMonitor.CopyChatItem(this)
+                            MY.Chat.CopyChatItem(this)
                         else
                             MY.SwitchChat(szName)
                             local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
@@ -167,176 +163,6 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
             table.insert(_MY_ChatMonitor.tCapture, tCapture)
             _MY_ChatMonitor.ShowTip(tCapture.szTime..tCapture.szMsg)
         end
-    end
-end
-
--- 海鳗里面抠出来的
--- 聊天复制并发布
-_MY_ChatMonitor.RepeatChatLine = function(hTime)
-	local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
-	if not edit then
-		return
-	end
-	_MY_ChatMonitor.CopyChatLine(hTime)
-	local tMsg = edit:GetTextStruct()
-	if #tMsg == 0 then
-		return
-	end
-	local nChannel, szName = EditBox_GetChannel()
-	if MY.CanTalk(nChannel) then
-		GetClientPlayer().Talk(nChannel, szName or "", tMsg)
-		edit:ClearText()
-	end
-end
-
--- 聊天表情初始化
-_MY_ChatMonitor.InitFaceIcon = function()
-	if not _MY_ChatMonitor.tFacIcon then
-		local t = { image = {}, animate = {} }
-		for i = 1, g_tTable.FaceIcon:GetRowCount() do
-			local tLine = g_tTable.FaceIcon:GetRow(i)
-			if tLine.szType == "animate" then
-				t.animate[tLine.nFrame] = { szCmd = tLine.szCommand, dwID = tLine.dwID }
-			else
-				t.image[tLine.nFrame] = { szCmd = tLine.szCommand, dwID = tLine.dwID }
-			end
-		end
-		_MY_ChatMonitor.tFacIcon = t
-	end
-end
-
--- 聊天复制功能
-_MY_ChatMonitor.CopyChatLine = function(hTime)
-	local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
-	if not edit then
-		return
-	end
-	edit:ClearText()
-	local h, i, bBegin = hTime:GetParent(), hTime:GetIndex(), nil
-	-- loop
-	_MY_ChatMonitor.InitFaceIcon()
-	for i = i + 1, h:GetItemCount() - 1 do
-		local p = h:Lookup(i)
-		if p:GetType() == "Text" then
-			local szName = p:GetName()
-			if szName ~= "timelink" and szName ~= "copylink" and szName ~= "msglink" and szName ~= "time" then
-				local szText, bEnd = p:GetText(), false
-				if StringFindW(szText, "\n") then
-					szText = StringReplaceW(szText, "\n", "")
-					bEnd = true
-				end
-				if szName == "itemlink" then
-					edit:InsertObj(szText, { type = "item", text = szText, item = p:GetUserData() })
-				elseif szName == "iteminfolink" then
-					edit:InsertObj(szText, { type = "iteminfo", text = szText, version = p.nVersion, tabtype = p.dwTabType, index = p.dwIndex })
-				elseif string.sub(szName, 1, 8) == "namelink" then
-					if bBegin == nil then
-						bBegin = false
-					end
-					edit:InsertObj(szText, { type = "name", text = szText, name = string.match(szText, "%[(.*)%]") })
-				elseif szName == "questlink" then
-					edit:InsertObj(szText, { type = "quest", text = szText, questid = p:GetUserData() })
-				elseif szName == "recipelink" then
-					edit:InsertObj(szText, { type = "recipe", text = szText, craftid = p.dwCraftID, recipeid = p.dwRecipeID })
-				elseif szName == "enchantlink" then
-					edit:InsertObj(szText, { type = "enchant", text = szText, proid = p.dwProID, craftid = p.dwCraftID, recipeid = p.dwRecipeID })
-				elseif szName == "skilllink" then
-					local o = clone(p.skillKey)
-					o.type, o.text = "skill", szText
-					edit:InsertObj(szText, o)
-				elseif szName =="skillrecipelink" then
-					edit:InsertObj(szText, { type = "skillrecipe", text = szText, id = p.dwID, level = p.dwLevelD })
-				elseif szName =="booklink" then
-					edit:InsertObj(szText, { type = "book", text = szText, tabtype = p.dwTabType, index = p.dwIndex, bookinfo = p.nBookRecipeID, version = p.nVersion })
-				elseif szName =="achievementlink" then
-					edit:InsertObj(szText, { type = "achievement", text = szText, id = p.dwID })
-				elseif szName =="designationlink" then
-					edit:InsertObj(szText, { type = "designation", text = szText, id = p.dwID, prefix = p.bPrefix })
-				elseif szName =="eventlink" then
-					edit:InsertObj(szText, { type = "eventlink", text = szText, name = p.szName, linkinfo = p.szLinkInfo })
-				else
-					-- NPC 喊话特殊处理
-					if bBegin == nil then
-						local r, g, b = p:GetFontColor()
-						if r == 255 and g == 150 and b == 0 then
-							bBegin = false
-						end
-					end
-					if bBegin == false then
-						for _, v in ipairs({g_tStrings.STR_TALK_HEAD_WHISPER, g_tStrings.STR_TALK_HEAD_SAY, g_tStrings.STR_TALK_HEAD_SAY1, g_tStrings.STR_TALK_HEAD_SAY2 }) do
-							local nB, nE = StringFindW(szText, v)
-							if nB then
-								szText, bBegin = string.sub(szText, nB + nE), true
-								edit:ClearText()
-							end
-						end
-					end
-					if szText ~= "" and (table.getn(edit:GetTextStruct()) > 0 or szText ~= g_tStrings.STR_FACE) then
-						edit:InsertText(szText)
-					end
-				end
-				if bEnd then
-					break
-				end
-			end
-		elseif p:GetType() == "Image" then
-			local nFrame = p:GetFrame()
-			local tEmotion = _MY_ChatMonitor.tFacIcon.image[nFrame]
-			if tEmotion then
-				edit:InsertObj(tEmotion.szCmd, { type = "emotion", text = tEmotion.szCmd, id = tEmotion.dwID })
-			end
-		elseif p:GetType() == "Animate" then
-			local nGroup = tonumber(p:GetName())
-			if nGroup then
-				local tEmotion = _MY_ChatMonitor.tFacIcon.animate[nGroup]
-				if tEmotion then
-					edit:InsertObj(tEmotion.szCmd, { type = "emotion", text = tEmotion.szCmd, id = tEmotion.dwID })
-				end
-			end
-		end
-	end
-	Station.SetFocusWindow(edit)
-end
-
--- 复制Item到输入框
-_MY_ChatMonitor.CopyChatItem = function(p)
-    local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
-    if not edit then
-        return
-    end
-    if p:GetType() == "Text" then
-        local szText, szName = p:GetText(), p:GetName()
-        if szName == "itemlink" then
-            edit:InsertObj(szText, { type = "item", text = szText, item = p:GetUserData() })
-        elseif szName == "iteminfolink" then
-            edit:InsertObj(szText, { type = "iteminfo", text = szText, version = p.nVersion, tabtype = p.dwTabType, index = p.dwIndex })
-        elseif string.sub(szName, 1, 8) == "namelink" then
-            if bBegin == nil then
-                bBegin = false
-            end
-            edit:InsertObj(szText, { type = "name", text = szText, name = string.match(szText, "%[(.*)%]") })
-        elseif szName == "questlink" then
-            edit:InsertObj(szText, { type = "quest", text = szText, questid = p:GetUserData() })
-        elseif szName == "recipelink" then
-            edit:InsertObj(szText, { type = "recipe", text = szText, craftid = p.dwCraftID, recipeid = p.dwRecipeID })
-        elseif szName == "enchantlink" then
-            edit:InsertObj(szText, { type = "enchant", text = szText, proid = p.dwProID, craftid = p.dwCraftID, recipeid = p.dwRecipeID })
-        elseif szName == "skilllink" then
-            local o = clone(p.skillKey)
-            o.type, o.text = "skill", szText
-            edit:InsertObj(szText, o)
-        elseif szName =="skillrecipelink" then
-            edit:InsertObj(szText, { type = "skillrecipe", text = szText, id = p.dwID, level = p.dwLevelD })
-        elseif szName =="booklink" then
-            edit:InsertObj(szText, { type = "book", text = szText, tabtype = p.dwTabType, index = p.dwIndex, bookinfo = p.nBookRecipeID, version = p.nVersion })
-        elseif szName =="achievementlink" then
-            edit:InsertObj(szText, { type = "achievement", text = szText, id = p.dwID })
-        elseif szName =="designationlink" then
-            edit:InsertObj(szText, { type = "designation", text = szText, id = p.dwID, prefix = p.bPrefix })
-        elseif szName =="eventlink" then
-            edit:InsertObj(szText, { type = "eventlink", text = szText, name = p.szName, linkinfo = p.szLinkInfo })
-        end
-        Station.SetFocusWindow(edit)
     end
 end
 
@@ -422,6 +248,14 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
                 end,
                 bCheck = true,
                 bChecked = MY_ChatMonitor.bShowPreview
+            })
+            table.insert(t,{
+                szOption = _L['play new message alert sound'],
+                fnAction = function()
+                    MY_ChatMonitor.bPlaySound = not MY_ChatMonitor.bPlaySound
+                end,
+                bCheck = true,
+                bChecked = MY_ChatMonitor.bPlaySound
             })
             table.insert(t, { bDevide = true })
             table.insert(t,{
@@ -514,7 +348,7 @@ _MY_ChatMonitor.Init = function()
         if not bIn then MY.DelayCall(function() _MY_ChatMonitor.uiFrame:fadeOut(500) end,5000,'MY_ChatMonitor_Hide') end
     end):toggle(false)
     _MY_ChatMonitor.uiFrame:append('Image_bg',"Image"):find('#Image_bg'):image('UI/Image/Minimap/Minimap2.UITex',8):size(300,300):click(fnOnTipClick)
-    _MY_ChatMonitor.uiTest = _MY_ChatMonitor.uiFrame:append('WndWindow_Test','WndWindow'):children('#WndWindow_Test'):toggle(false)
+    -- _MY_ChatMonitor.uiTest = _MY_ChatMonitor.uiFrame:append('WndWindow_Test','WndWindow'):children('#WndWindow_Test'):toggle(false)
     _MY_ChatMonitor.uiTipBoard = _MY_ChatMonitor.uiFrame:append('Handle_Tip',"Handle"):find('#Handle_Tip'):handleStyle(3):pos(10,10):size(230,130)
 
     _MY_ChatMonitor.uiTipBoard:append('Text1','Text'):find('#Text1'):text(_L['welcome to use mingyi chat monitor.']):click(fnOnTipClick)

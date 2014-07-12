@@ -1,6 +1,6 @@
 MY_TalkEx = MY_TalkEx or {}
 local _MY_TalkEx = {}
-local _L = MY.LoadLangPack()
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."TalkEx/lang/")
 MY_TalkEx.tTalkChannel = {
     ['NEARBY'] = false,
     ['FRIEND'] = false,
@@ -17,9 +17,9 @@ MY_TalkEx.szTalk = ''
 MY_TalkEx.tTrickChannel = 'RAID'
 MY_TalkEx.tTrickFilter = 'RAID'
 MY_TalkEx.tTrickFilterForce = 4
-MY_TalkEx.szTrickTextBegin = '$zj斜眼看了身边的羊群，冥想了一会。'
-MY_TalkEx.szTrickText = '$zj麻利的拔光了$mb的羊毛。'
-MY_TalkEx.szTrickTextEnd = '$zj收拾了一下背包里的羊毛，希望今年能卖个好价钱。'
+MY_TalkEx.szTrickTextBegin = _L['$zj look around and have a little thought.']
+MY_TalkEx.szTrickText = _L['$zj epilate $mb\'s feather clearly.']
+MY_TalkEx.szTrickTextEnd = _L['$zj collected the feather epilated just now and wanted it sold well.']
 RegisterCustomData('MY_TalkEx.tTalkChannel')
 RegisterCustomData('MY_TalkEx.szTalk')
 RegisterCustomData('MY_TalkEx.tTrickChannel')
@@ -81,20 +81,18 @@ _MY_TalkEx.OnPanelActive = function(wnd)
     -- 文本标题
     ui:append('Text_Trick_With','Text'):find("#Text_Trick_With"):pos(27,256):text(_L['have a trick with'])
     -- 调侃对象范围过滤器
-    ui:append('WndComboBox_Trick_Filter','WndComboBox'):find("#WndComboBox_Trick_Filter"):pos(95,257):size(80,25):click(function()
-        PopupMenu((function() 
-            local t = {}
-            for szFilterId,szTitle in pairs(_MY_TalkEx.tFilter) do
-                table.insert(t,{
-                    szOption = szTitle,
-                    fnAction = function()
-                        ui:find("#WndComboBox_Trick_Filter"):text(szTitle)
-                        MY_TalkEx.tTrickFilter = szFilterId
-                    end,
-                })
-            end
-            return t
-        end)())
+    ui:append('WndComboBox_Trick_Filter','WndComboBox'):find("#WndComboBox_Trick_Filter"):pos(95,257):size(80,25):menu(function()
+        local t = {}
+        for szFilterId,szTitle in pairs(_MY_TalkEx.tFilter) do
+            table.insert(t,{
+                szOption = szTitle,
+                fnAction = function()
+                    ui:find("#WndComboBox_Trick_Filter"):text(szTitle)
+                    MY_TalkEx.tTrickFilter = szFilterId
+                end,
+            })
+        end
+        return t
     end):text(_MY_TalkEx.tFilter[MY_TalkEx.tTrickFilter] or '')
     -- 调侃门派过滤器
     ui:append("WndComboBox_Trick_Force",'WndComboBox'):children('#WndComboBox_Trick_Force'):pos(175,257):size(80,25):text(_MY_TalkEx.tForce[MY_TalkEx.tTrickFilterForce]):menu(function()
@@ -119,21 +117,19 @@ _MY_TalkEx.OnPanelActive = function(wnd)
     -- 调侃发送频道提示框
     ui:append("Text_Trick_Sendto",'Text'):find('#Text_Trick_Sendto'):pos(27,415):size(100,26):text(_L['send to'])
     -- 调侃发送频道
-    ui:append("WndComboBox_Trick_Sendto_Filter",'WndComboBox'):children('#WndComboBox_Trick_Sendto_Filter'):pos(80,415):size(100,25):click(function()
-        PopupMenu((function() 
-            local t = {}
-            for szChannel,tChannel in pairs(_MY_TalkEx.tTrickChannels) do
-                table.insert(t,{
-                    szOption = tChannel.szName,
-                    fnAction = function()
-                        ui:find("#WndComboBox_Trick_Sendto_Filter"):text(tChannel.szName):color(tChannel.tCol)
-                        MY_TalkEx.tTrickChannel = szChannel
-                    end,
-                    rgb = tChannel.tCol,
-                })
-            end
-            return t
-        end)())
+    ui:append("WndComboBox_Trick_Sendto_Filter",'WndComboBox'):children('#WndComboBox_Trick_Sendto_Filter'):pos(80,415):size(100,25):menu(function()
+        local t = {}
+        for szChannel,tChannel in pairs(_MY_TalkEx.tTrickChannels) do
+            table.insert(t,{
+                szOption = tChannel.szName,
+                fnAction = function()
+                    ui:find("#WndComboBox_Trick_Sendto_Filter"):text(tChannel.szName):color(tChannel.tCol)
+                    MY_TalkEx.tTrickChannel = szChannel
+                end,
+                rgb = tChannel.tCol,
+            })
+        end
+        return t
     end):text(_MY_TalkEx.tChannels[MY_TalkEx.tTrickChannel].szName or ''):color(_MY_TalkEx.tChannels[MY_TalkEx.tTrickChannel].tCol)
     -- 调侃按钮
     ui:append('WndButton_Trick','WndButton'):children('#WndButton_Trick'):color({255,255,255}):pos(435,415):text(_L['have a trick with']):click(function()

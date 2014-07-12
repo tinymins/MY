@@ -4,7 +4,7 @@
 -- ZhaiYiMing.CoM
 -- 2014年5月19日05:07:02
 --
-local _L = MY.LoadLangPack()
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Farbnamen/src/MY_Farbnamen/lang/")
 ---------------------------------------------------------------
 -- 设置和数据
 ---------------------------------------------------------------
@@ -51,65 +51,49 @@ setmetatable(_MY_Farbnamen.tCampString,  { __index = function(t, k) return k end
 -- 聊天复制和时间显示相关
 ---------------------------------------------------------------
 -- 插入聊天内容的 HOOK （过滤、加入时间 ）
-_MY_Farbnamen.AppendChatItem = function(h, szMsg)
-    if MY_Farbnamen.bEnabled then
-        -- change name item event binding: binding mouse in-out event
-        szMsg = string.gsub(szMsg, 'eventid=515</', 'eventid=771</')
-        -- get current item count
-        local iPos = h:GetItemCount()
-        -- normal append
-        h:_AppendItemFromString_MY_Farbnamen(szMsg)
-        -- if enabled
-        -- color each text item
-        for i = iPos, h:GetItemCount(), 1 do
-            local h2 = h:Lookup(i)
-            -- 判断这个Item是不是人名Text 如果是则处理
-            if h2 and h2:GetType() == "Text" and string.find(h2:GetName(), '^namelink_%d+$') then
-                -- 取发信玩家的ID加入表
-                local szID = string.gsub(h2:GetName(), '%D', '')
-                local dwID = tonumber(szID)
-                MY_Farbnamen.AddAusID(dwID)
-                -- 取玩家的名字
-                local szName = string.gsub(h2:GetText(), '[%[%]]', '')
-                -- 根据名称获取染色颜色
-                local tInfo = MY_Farbnamen.GetAusName(szName)
-                -- 如果获取成功则染色
-                if tInfo then
-                    -- 名称 等级
-                    local szTip = string.format('%s(%d)', tInfo.szName, tInfo.nLevel)
-                    -- 称号
-                    if tInfo.szTitle and #tInfo.szTitle > 0 then
-                        szTip = string.format('%s\n%s', szTip, tInfo.szTitle)
-                    end
-                    -- 帮会
-                    if tInfo.szTongID and #tInfo.szTongID > 0 then
-                        szTip = string.format('%s\n[%s]', szTip, tInfo.szTongID)
-                    end
-                    -- 门派 体型 阵营
-                    local szTip = string.format('%s\n%s·%s·%s', szTip, _MY_Farbnamen.tForceString[tInfo.dwForceID], _MY_Farbnamen.tRoleType[tInfo.nRoleType], _MY_Farbnamen.tCampString[tInfo.nCamp])
-                    -- 绑定tip提示
-                    MY.UI(h2):tip(szTip, MY.Const.UI.Tip.POS_TOP):color(tInfo.rgb)
+MY.Chat.HookChatPanel(function(h, szMsg)
+    if not MY_Farbnamen.bEnabled then return nil end
+    -- change name item event binding: binding mouse in-out event
+    szMsg = string.gsub(szMsg, 'eventid=515</', 'eventid=771</')
+    -- get current item count
+    return szMsg, h:GetItemCount()
+end, function(h, szMsg, iPos)
+    if not MY_Farbnamen.bEnabled then return nil end
+    -- if enabled
+    -- color each text item
+    for i = iPos, h:GetItemCount(), 1 do
+        local h2 = h:Lookup(i)
+        -- 判断这个Item是不是人名Text 如果是则处理
+        if h2 and h2:GetType() == "Text" and string.find(h2:GetName(), '^namelink_%d+$') then
+            -- 取发信玩家的ID加入表
+            local szID = string.gsub(h2:GetName(), '%D', '')
+            local dwID = tonumber(szID)
+            MY_Farbnamen.AddAusID(dwID)
+            -- 取玩家的名字
+            local szName = string.gsub(h2:GetText(), '[%[%]]', '')
+            -- 根据名称获取染色颜色
+            local tInfo = MY_Farbnamen.GetAusName(szName)
+            -- 如果获取成功则染色
+            if tInfo then
+                -- 名称 等级
+                local szTip = string.format('%s(%d)', tInfo.szName, tInfo.nLevel)
+                -- 称号
+                if tInfo.szTitle and #tInfo.szTitle > 0 then
+                    szTip = string.format('%s\n%s', szTip, tInfo.szTitle)
                 end
+                -- 帮会
+                if tInfo.szTongID and #tInfo.szTongID > 0 then
+                    szTip = string.format('%s\n[%s]', szTip, tInfo.szTongID)
+                end
+                -- 门派 体型 阵营
+                local szTip = string.format('%s\n%s·%s·%s', szTip, _MY_Farbnamen.tForceString[tInfo.dwForceID], _MY_Farbnamen.tRoleType[tInfo.nRoleType], _MY_Farbnamen.tCampString[tInfo.nCamp])
+                -- 绑定tip提示
+                MY.UI(h2):tip(szTip, MY.Const.UI.Tip.POS_TOP):color(tInfo.rgb)
             end
         end
-    else
-        -- normal append
-        h:_AppendItemFromString_MY_Farbnamen(szMsg)
     end
-end
+end)
 
--- chat time/copy
-_MY_Farbnamen.OnChatPanelInit = function()
-	for i = 1, 10 do
-		local h = Station.Lookup("Lowest2/ChatPanel" .. i .. "/Wnd_Message", "Handle_Message")
-		local ttl = Station.Lookup("Lowest2/ChatPanel" .. i .. "/CheckBox_Title", "Text_TitleName")
-		if h and (not ttl or ttl:GetText() ~= g_tStrings.CHANNEL_MENTOR) then
-			h._AppendItemFromString_MY_Farbnamen = h._AppendItemFromString_MY_Farbnamen or h.AppendItemFromString
-			h.AppendItemFromString = _MY_Farbnamen.AppendChatItem
-		end
-	end
-end
-MY_Farbnamen.OnChatPanelInit = _MY_Farbnamen.OnChatPanelInit
 -- 处理插件冲突
 function MY_Farbnamen.DoConflict()
     if MY_Farbnamen.bEnabled and Chat and Chat.bColor then
@@ -260,7 +244,6 @@ MY.RegisterTraceButtonMenu( 'MY_Farbenamen', MY_Farbnamen.GetMenu )
 --------------------------------------------------------------
 -- 注册事件
 --------------------------------------------------------------
-MY.RegisterEvent("CHAT_PANEL_INIT", _MY_Farbnamen.OnChatPanelInit)
 MY.RegisterEvent('LOGIN_GAME', MY_Farbnamen.LoadData)
 MY.RegisterEvent('PLAYER_ENTER_GAME', MY_Farbnamen.LoadData)
 MY.RegisterEvent('GAME_EXIT', MY_Farbnamen.SaveData)

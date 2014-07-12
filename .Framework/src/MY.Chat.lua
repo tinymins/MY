@@ -182,30 +182,29 @@ end
 
 --解析消息
 MY.Chat.FormatContent = function(szMsg)
+    MY.Chat.InitFaceIcon()
     local t = {}
-    for w in string.gfind(szMsg, "<text>text=(.-)</text>") do
+    for n, w in string.gfind(szMsg, "<(%w+)>(.-)</%1>") do
         if w then
             table.insert(t, w)
         end
     end
-    --Output(t)
+    -- Output(t)
     local t2 = {}
     for k, v in pairs(t) do
         if not string.find(v, "name=") then
             if string.find(v, "frame=") then
                 local n = string.match(v, "frame=(%d+)")
-                local szCmd, nFaceID = ChatPanel.GetFaceCommand("image", tonumber(n))
-                table.insert(t2, {type = "faceicon", text = szCmd, nFaceID = nFaceID})
+                local tEmotion = _Cache.tFacIcon.image[tonumber(n)]
+                table.insert(t2, {tEmotion.szCmd, {type = "emotion", text = tEmotion.szCmd, id = tEmotion.dwID}})
             elseif string.find(v, "group=") then
                 local n = string.match(v, "group=(%d+)")
-                local szCmd, nFaceID = ChatPanel.GetFaceCommand("animate", tonumber(n))
-                table.insert(t2, {type = "faceicon", text = szCmd, nFaceID = nFaceID})
+                local tEmotion = _Cache.tFacIcon.animate[tonumber(n)]
+                table.insert(t2, {tEmotion.szCmd, {type = "emotion", text = tEmotion.szCmd, id = tEmotion.dwID}})
             else
-                local s = string.match(v, "\"(.-)\"")
-                if string.find(s, "：") then
-                    s = string.sub(s, string.find(s, "：") + 2, -1)
-                end
-                table.insert(t2, {type= "text", text = s})
+                --普通文字
+                local s = string.match(v, "\"(.*)\"")
+                table.insert(t2, {s, {type= "text", text = s}})
             end
         else
             --物品链接
@@ -214,10 +213,10 @@ MY.Chat.FormatContent = function(szMsg)
                 table.insert(t2, {"["..name.."]", {type = "item", text = name, item = userdata}})
             --物品信息
             elseif string.find(v, "name=\"iteminfolink\"") then
-                local name, version, tab, index = string.match(v,"%[(.-)%].-script=\"this.nVersion=(%d+)\\this.dwTabType=(%d+)\\this.dwIndex=(%d+)")
+                local name, version, tab, index = string.match(v,"%[(.-)%].-script=\"this.nVersion=(%d+)\\%s*this.dwTabType=(%d+)\\%s*this.dwIndex=(%d+)")
                 table.insert(t2, {"["..name.."]", {type = "iteminfo", text = name, version = version, tabtype = tab, index = index}})
             --姓名
-            elseif string.find(v, "name=\"namelink\"") then
+            elseif string.find(v, "name=\"namelink_%d+\"") then
                 local name = string.match(v,"%[(.-)%]")
                 table.insert(t2, {"["..name.."]", {type = "name", text = "["..name.."]", name = name}})
             --任务
@@ -226,7 +225,7 @@ MY.Chat.FormatContent = function(szMsg)
                 table.insert(t2, {"["..name.."]", {type = "quest", text = name, questid = userdata}})
             --生活技艺
             elseif string.find(v, "name=\"recipelink\"") then
-                local name, craft, recipe = string.match(v,"%[(.-)%].-script=\"this.dwCraftID=(%d+)\\this.dwRecipeID=(%d+)")
+                local name, craft, recipe = string.match(v,"%[(.-)%].-script=\"this.dwCraftID=(%d+)\\%s*this.dwRecipeID=(%d+)")
                 table.insert(t2, {"["..name.."]", {type = "recipe", text = name, craftid = craft, recipeid = recipe}})
             --技能
             elseif string.find(v, "name=\"skilllink\"") then
@@ -239,15 +238,15 @@ MY.Chat.FormatContent = function(szMsg)
                 table.insert(t2, {"["..name.."]", skillKey})
             --称号
             elseif string.find(v, "name=\"designationlink\"") then
-                local name, id, fix = string.match(v,"%[(.-)%].-script=\"this.dwID=(%d+)\\this.bPrefix=(.-)")
+                local name, id, fix = string.match(v,"%[(.-)%].-script=\"this.dwID=(%d+)\\%s*this.bPrefix=(.-)")
                 table.insert(t2, {"["..name.."]", {type = "designation", text = name, id = id, prefix = fix}})
             --技能秘籍
             elseif string.find(v, "name=\"skillrecipelink\"") then
-                local name, id, level = string.match(v,"%[(.-)%].-script=\"this.dwID=(%d+)\\this.dwLevel=(%d+)")
+                local name, id, level = string.match(v,"%[(.-)%].-script=\"this.dwID=(%d+)\\%s*this.dwLevel=(%d+)")
                 table.insert(t2, {"["..name.."]", {type = "skillrecipe", text = name, id = id, level = level}})
             --书籍
             elseif string.find(v, "name=\"booklink\"") then
-                local name, version, tab, index, id = string.match(v,"%[(.-)%].-script=\"this.nVersion=(%d+)\\this.dwTabType=(%d+)\\this.dwIndex=(%d+)\\this.nBookRecipeID=(%d+)")
+                local name, version, tab, index, id = string.match(v,"%[(.-)%].-script=\"this.nVersion=(%d+)\\%s*this.dwTabType=(%d+)\\%s*this.dwIndex=(%d+)\\%s*this.nBookRecipeID=(%d+)")
                 table.insert(t2, {"["..name.."]", {type = "book", text = name, version = version, tabtype = tab, index = index, bookinfo = id}})
             --成就
             elseif string.find(v, "name=\"achievementlink\"") then
@@ -255,11 +254,11 @@ MY.Chat.FormatContent = function(szMsg)
                 table.insert(t2, {"["..name.."]", {type = "achievement", text = name, id = id}})
             --强化
             elseif string.find(v, "name=\"enchantlink\"") then
-                local name, pro, craft, recipe = string.match(v,"%[(.-)%].-script=\"this.dwProID=(%d+)\\this.dwCraftID=(%d+)\\this.dwRecipeID=(%d+)")
+                local name, pro, craft, recipe = string.match(v,"%[(.-)%].-script=\"this.dwProID=(%d+)\\%s*this.dwCraftID=(%d+)\\%s*this.dwRecipeID=(%d+)")
                 table.insert(t2, {"["..name.."]", {type = "enchant", text = name, proid = pro, craftid = craft, recipeid = recipe}})
             --事件
             elseif string.find(v, "name=\"eventlink\"") then
-                local name, na, info = string.match(v,"%[(.-)%].-script=\"this.szName=\"(.-)\"\\this.szLinkInfo=\"(.-)\"")
+                local name, na, info = string.match(v,"%[(.-)%].-script=\"this.szName=\"(.-)\"\\%s*this.szLinkInfo=\"(.-)\"")
                 table.insert(t2, {"["..name.."]", {type = "eventlink", text = name, name = na, linkinfo = info or ""}})
             end
         end
