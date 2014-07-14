@@ -115,10 +115,6 @@ data = {
     ['return to role list while leaving fighting.'] = '在下一次脫離戰鬥的一瞬間返回角色選擇頁面。',
     ['return to game login while leaving fighting.'] = '在下一次脫離戰鬥的一瞬間返回賬戶登錄頁面。',
     
-    -- MY_ToolBox.lua
-    ['tool box'] = '常用工具',
     -- MY_ScreenShotHelper.lua
     ['screen shot helper'] = '截圖助手',
-    -- MY_RescueTeam.lua
-    ['rescue team helper'] = '救場必備',
 }
