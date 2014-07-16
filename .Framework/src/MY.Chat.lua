@@ -8,6 +8,7 @@
 -----------------------------------------------
 MY = MY or {}
 MY.Chat = MY.Chat or {}
+MY.Chat.bHookedAlready = false
 local _Cache, _L = {}, MY.LoadLangPack()
 
 -- 海鳗里面抠出来的
@@ -517,4 +518,12 @@ MY.RegisterEvent("CHAT_PANEL_INIT", function ()
             h.AppendItemFromString = _Cache.HookChatPanelHandle
         end
     end
+end)
+MY.RegisterInit(function()
+    if Station.Lookup("Lowest2/ChatPanel1/Wnd_Message").bMyHooked then
+        MY.Chat.bHookedAlready = true
+    else
+        MY.Chat.bHookedAlready = false
+    end
+    Station.Lookup("Lowest2/ChatPanel1/Wnd_Message").bMyHooked = true   
 end)
