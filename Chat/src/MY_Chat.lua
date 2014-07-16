@@ -324,32 +324,35 @@ MY.RegisterInit(function()
                             AddListItem(muList, v)
                         end
                     end,
-                }
-            }, {
-                szOption = _L["chat time"],
-                bCheck = true,
-                bChecked = MY_Chat.bChatTime,
-                fnAction = function()
-                    MY_Chat.bChatTime = not MY_Chat.bChatTime
-                end, {
-                    szOption = _L['hh:mm'],
-                    bMCheck = true,
-                    bChecked = MY_Chat.nChatTime == CHAT_TIME.HOUR_MIN,
-                    fnAction = function()
-                        MY_Chat.nChatTime = CHAT_TIME.HOUR_MIN
-                    end,
-                },{
-                    szOption = _L['hh:mm:ss'],
-                    bMCheck = true,
-                    bChecked = MY_Chat.nChatTime == CHAT_TIME.HOUR_MIN_SEC,
-                    fnAction = function()
-                        MY_Chat.nChatTime = CHAT_TIME.HOUR_MIN_SEC
-                    end,
-                }
-            }, {
-                bDevide = true
-            }
+                },
+            },
         }
+        if (MY_Farbnamen and MY_Farbnamen.GetMenu) then
+            table.insert(t, MY_Farbnamen.GetMenu())
+        end
+        table.insert(t, {
+            szOption = _L["chat time"],
+            bCheck = true,
+            bChecked = MY_Chat.bChatTime,
+            fnAction = function()
+                MY_Chat.bChatTime = not MY_Chat.bChatTime
+            end, {
+                szOption = _L['hh:mm'],
+                bMCheck = true,
+                bChecked = MY_Chat.nChatTime == CHAT_TIME.HOUR_MIN,
+                fnAction = function()
+                    MY_Chat.nChatTime = CHAT_TIME.HOUR_MIN
+                end,
+            },{
+                szOption = _L['hh:mm:ss'],
+                bMCheck = true,
+                bChecked = MY_Chat.nChatTime == CHAT_TIME.HOUR_MIN_SEC,
+                fnAction = function()
+                    MY_Chat.nChatTime = CHAT_TIME.HOUR_MIN_SEC
+                end,
+            }
+        })
+        table.insert(t, { bDevide = true })
         local tChannel = { szOption = _L['channel setting'] }
         for _, v in ipairs(_Cache.tChannels) do
             table.insert(tChannel, {
