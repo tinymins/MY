@@ -4,7 +4,7 @@
 -- ZhaiYiMing.CoM
 -- 2014年5月19日05:07:02
 --
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Farbnamen/src/MY_Farbnamen/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Farbnamen/lang/")
 ---------------------------------------------------------------
 -- 设置和数据
 ---------------------------------------------------------------
