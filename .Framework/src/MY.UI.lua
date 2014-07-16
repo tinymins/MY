@@ -1096,6 +1096,33 @@ function _MY.UI:pos(nLeft, nTop)
     end
 end
 
+-- (anchor) Instance:anchor()
+-- (self) Instance:anchor(anchor)
+function _MY.UI:anchor(anchor)
+    self:_checksum()
+    if anchor then
+        for _, ele in pairs(self.eles) do
+            if ele.frm then
+                pcall(function() 
+                    ele.frm:SetPoint(anchor.s, 0, 0, anchor.r, anchor.x, anchor.y)
+                    ele.frm:CorrectPos()
+                end)
+            end
+        end
+        return self
+    else -- get
+        -- select the first item
+        local ele = self.eles[1]
+        -- try to get its name
+        local status, anchor = pcall(function()
+            ele.frm:CorrectPos()
+            return GetFrameAnchor(ele.frm)
+        end)
+        -- if succeed then return its name
+        if status then return anchor else MY.Debug(anchor..'\n','ERROR _MY.UI:anchor' ,1) return nil end
+    end
+end
+
 -- (number) Instance:width()
 -- (self) Instance:width(number)
 function _MY.UI:width(nWidth)
@@ -1567,15 +1594,23 @@ MY.UI.RegisterUIEvent = function(raw, szEvent, fnEvent)
 end
 
 -- create new frame
-MY.UI.CreateFrame = function(szName, bEmpty)
+MY.UI.CreateFrame = function(szName, bEmpty, bLowest)
     local frm
-    local szIniFile = "interface\\MY\\.Framework\\ui\\WndFrame.ini"
+    local szIniFile = MY.GetAddonInfo().szFrameworkRoot.."ui\\WndFrame.ini"
     if bEmpty then
-        szIniFile = "interface\\MY\\.Framework\\ui\\WndFrameEmpty.ini"
+        if bLowest then
+            szIniFile = MY.GetAddonInfo().szFrameworkRoot.."ui\\WndFrameEmptyLowest.ini"
+        else
+            szIniFile = MY.GetAddonInfo().szFrameworkRoot.."ui\\WndFrameEmpty.ini"
+        end
     end
     
     if type(szName) == "string" then
-        frm = Station.Lookup("Normal/" .. szName)
+        if bEmpty and bLowest then
+            frm = Station.Lookup("Lowest/" .. szName)
+        else
+            frm = Station.Lookup("Normal/" .. szName)
+        end
         if frm then
             Wnd.CloseWindow(frm)
         end
