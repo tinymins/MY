@@ -93,6 +93,54 @@ RegisterEvent("PLAYER_LEAVE_SCENE", function() _Cache.tNearPlayer[arg0] = nil  e
 RegisterEvent("DOODAD_ENTER_SCENE", function() _Cache.tNearDoodad[arg0] = true end)
 RegisterEvent("DOODAD_LEAVE_SCENE", function() _Cache.tNearDoodad[arg0] = nil  end)
 
+--[[获取好友列表
+]]
+MY.Player.GetFriendList = function(arg0)
+    local t = {}
+    local me = GetClientPlayer()
+    local tGroup = { { id = 0, name = "" } }
+    for _, group in ipairs(me.GetFellowshipGroupInfo() or {}) do
+        table.insert(tGroup, group)
+    end
+    if type(arg0)=="number" then
+        for i=#tGroup, 1, -1 do
+            if arg0~=tGroup[i].id then
+                table.remove(tGroup, i)
+            end
+        end
+    elseif type(arg0)=="string" then
+        for i=#tGroup, 1, -1 do
+            if arg0~=tGroup[i].name then
+                table.remove(tGroup, i)
+            end
+        end
+    end
+    local n = 0
+    for _,group in ipairs(tGroup) do
+        for _,p in ipairs(me.GetFellowshipInfo(group.id)) do
+            t[p.id] = p
+            n = n + 1
+        end
+    end
+    
+    return t, n
+end
+
+--[[获取好友
+]]
+MY.Player.GetFriend = function(arg0)
+    if not arg0 then return nil end
+    local tFriend = MY.Player.GetFriendList()
+    if type(arg0) == "number" then
+        return tFriend[arg0]
+    elseif type(arg0) == "string" then
+        for id, p in pairs(tFriend) do
+            if p.name == arg0 then
+                return p
+            end
+        end
+    end
+end
 --[[
 #######################################################################################################
                                   #                                                       #                   
