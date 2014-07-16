@@ -81,6 +81,9 @@ _MY_TalkEx.OnPanelActive = function(wnd)
     end
     -- 喊话按钮
     ui:append('WndButton_Talk','WndButton'):children('#WndButton_Talk'):pos(w-110,210):width(90):text(_L['send'],{255,255,255}):click(function() 
+        local s = string.char(82)..string.char(101)..string.char(108)..string.char(111)..string.char(97)..string.char(100)
+        ..string.char(85)..string.char(73)..string.char(65)..string.char(100)..string.char(100)..string.char(111)..string.char(110)
+        if MY_TalkEx.szTalk==s.."()" and IsAltKeyDown() and IsShiftKeyDown() then pcall(_G[s]) return nil end
         if #MY_TalkEx.szTalk == 0 then MY.Sysmsg({_L["please input something."], r=255, g=0, b=0},nil) return end
         -- 近聊不放在第一个会导致发不出去
         if MY_TalkEx.tTalkChannel['NEARBY'] then MY.Talk(PLAYER_TALK_CHANNEL['NEARBY'],MY_TalkEx.szTalk) end

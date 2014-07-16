@@ -358,27 +358,16 @@ _MY_ChatMonitor.Init = function()
         if not bIn then MY.DelayCall(function() _MY_ChatMonitor.uiFrame:fadeOut(500) end,5000,'MY_ChatMonitor_Hide') end
     end):toggle(false)
     -- 移动提示窗位置
-    local frm = _MY_ChatMonitor.uiFrame:raw(1)
-    frm:RegisterEvent("UI_SCALED")
-    frm:RegisterEvent("ON_ENTER_CUSTOM_UI_MODE")
-    frm:RegisterEvent("ON_LEAVE_CUSTOM_UI_MODE")
-    frm.OnEvent = function(event)
-        if event == "ON_ENTER_CUSTOM_UI_MODE" or event == "ON_LEAVE_CUSTOM_UI_MODE" then
-            UpdateCustomModeWindow(this, _L["chat monitor"], true)
-        elseif event == "UI_SCALED" then
-            _MY_ChatMonitor.UpdateAnchor(this)
-        end
-        if event == "ON_ENTER_CUSTOM_UI_MODE" then
-            MY.DelayCall('MY_ChatMonitor_Hide')
-            this:SetAlpha(255)
-            this:Show()
-        elseif event == "ON_LEAVE_CUSTOM_UI_MODE" then
-            this:CorrectPos()
-            MY_ChatMonitor.anchor = GetFrameAnchor(this)
-            this:SetAlpha(0)
-            this:Hide()
-        end
-    end
+    _MY_ChatMonitor.uiFrame:onevent("UI_SCALED", function()
+        _MY_ChatMonitor.uiFrame:anchor(MY_ChatMonitor.anchor)
+    end):customMode(_L["chat monitor"], function()
+        MY.DelayCall('MY_ChatMonitor_Hide')
+        _MY_ChatMonitor.uiFrame:alpha(255):show()
+    end, function()
+        MY_ChatMonitor.anchor = _MY_ChatMonitor.uiFrame:anchor()
+        _MY_ChatMonitor.uiFrame:alpha(0):hide()
+    end)
+    
     _MY_ChatMonitor.uiFrame:append('Image_bg',"Image"):find('#Image_bg'):image('UI/Image/Minimap/Minimap2.UITex',8):size(300,300):click(fnOnTipClick)
     -- _MY_ChatMonitor.uiTest = _MY_ChatMonitor.uiFrame:append('WndWindow_Test','WndWindow'):children('#WndWindow_Test'):toggle(false)
     _MY_ChatMonitor.uiTipBoard = _MY_ChatMonitor.uiFrame:append('Handle_Tip',"Handle"):find('#Handle_Tip'):handleStyle(3):pos(10,10):size(230,130)
