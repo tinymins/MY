@@ -1314,6 +1314,55 @@ end
 -- my ui events handle
 -----------------------------------------------------------
 
+-- 绑定Frame的UI事件
+function _MY.UI:onevent(szEvent, fnEvent)
+    self:_checksum()
+    if type(szEvent)~="string" then return self end
+    if type(fnEvent)=="function" then
+        for _, ele in pairs(self.eles) do
+            if ele.frm then
+                if not ele.frm.tMyOnEvent then
+                    ele.frm.tMyOnEvent = {}
+                    ele.frm.OnEvent = function(event)
+                        for _, fn in ipairs(ele.frm.tMyOnEvent[event] or {}) do pcall(fn) end
+                    end
+                end
+                if not ele.frm.tMyOnEvent[szEvent] then
+                    ele.frm:RegisterEvent(szEvent)
+                    ele.frm.tMyOnEvent[szEvent] = {}
+                end
+                table.insert(ele.frm.tMyOnEvent[szEvent], fnEvent)
+            end
+        end
+    else
+        for _, ele in pairs(self.eles) do
+            if ele.frm then
+                if ele.frm.tMyOnEvent then
+                    ele.frm.tMyOnEvent[szEvent] = {}
+                end
+            end
+        end
+    end
+    return self
+end
+
+--[[ customMode 设置Frame的CustomMode
+    (self) Instance:customMode(string szTip, function fnOnEnterCustomMode, function fnOnLeaveCustomMode)
+]]
+function _MY.UI:customMode(szTip, fnOnEnterCustomMode, fnOnLeaveCustomMode)
+    self:_checksum()
+    if type(szTip)=="string" then
+        self:onevent("ON_ENTER_CUSTOM_UI_MODE", function()
+            UpdateCustomModeWindow(this, szTip, true)
+        end):onevent("ON_LEAVE_CUSTOM_UI_MODE", function()
+            UpdateCustomModeWindow(this, szTip, true)
+        end)
+        if type(fnOnEnterCustomMode)=="function" then self:onevent("ON_ENTER_CUSTOM_UI_MODE", fnOnEnterCustomMode) end
+        if type(fnOnLeaveCustomMode)=="function" then self:onevent("ON_LEAVE_CUSTOM_UI_MODE", fnOnLeaveCustomMode) end
+    end
+    return self
+end
+
 --[[ menu 弹出菜单
     :menu(table menu)  弹出菜单menu
     :menu(functin fn)  弹出菜单function返回值table
