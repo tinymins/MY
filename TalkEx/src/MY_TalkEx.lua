@@ -33,16 +33,27 @@ _MY_TalkEx.tForce = { [-1] = _L['all force'] } for i=0,10,1 do _MY_TalkEx.tForce
 _MY_TalkEx.tFilter = { ['NEARBY'] = _L['nearby players where'], ['RAID'] = _L['teammates where'], }
 _MY_TalkEx.tChannels = { 
     ['NEARBY'] = { szName = _L['nearby channel'], tCol = GetMsgFontColor("MSG_NORMAL", true) },
-    ['FRIENDS'] = { szName = _L['friend channel'], tCol = GetMsgFontColor("MSG_FRIEND", true) },
     ['TEAM'] = { szName = _L['team channel'], tCol = GetMsgFontColor("MSG_TEAM", true) },
     ['RAID'] = { szName = _L['raid channel'], tCol = GetMsgFontColor("MSG_TEAM", true) },
     ['TONG'] = { szName = _L['tong channel'], tCol = GetMsgFontColor("MSG_GUILD", true) },
     ['TONG_ALLIANCE'] = { szName = _L['tong alliance channel'], tCol = GetMsgFontColor("MSG_GUILD_ALLIANCE", true) },
-    ['SENCE'] = { szName = _L['map channel'], tCol = GetMsgFontColor("MSG_MAP", true) },
-    ['FORCE'] = { szName = _L['school channel'], tCol = GetMsgFontColor("MSG_SCHOOL", true) },
-    ['CAMP'] = { szName = _L['camp channel'], tCol = GetMsgFontColor("MSG_CAMP", true) },
-    ['WORLD'] = { szName = _L['world channel'], tCol = GetMsgFontColor("MSG_WORLD", true) },
 }
+MY.RegisterInit(function()
+    if MY.Chat.bHookedAlready then
+        _MY_TalkEx.tChannels = { 
+            ['NEARBY'] = { szName = _L['nearby channel'], tCol = GetMsgFontColor("MSG_NORMAL", true) },
+            ['FRIENDS'] = { szName = _L['friend channel'], tCol = GetMsgFontColor("MSG_FRIEND", true) },
+            ['TEAM'] = { szName = _L['team channel'], tCol = GetMsgFontColor("MSG_TEAM", true) },
+            ['RAID'] = { szName = _L['raid channel'], tCol = GetMsgFontColor("MSG_TEAM", true) },
+            ['TONG'] = { szName = _L['tong channel'], tCol = GetMsgFontColor("MSG_GUILD", true) },
+            ['TONG_ALLIANCE'] = { szName = _L['tong alliance channel'], tCol = GetMsgFontColor("MSG_GUILD_ALLIANCE", true) },
+            ['SENCE'] = { szName = _L['map channel'], tCol = GetMsgFontColor("MSG_MAP", true) },
+            ['FORCE'] = { szName = _L['school channel'], tCol = GetMsgFontColor("MSG_SCHOOL", true) },
+            ['CAMP'] = { szName = _L['camp channel'], tCol = GetMsgFontColor("MSG_CAMP", true) },
+            ['WORLD'] = { szName = _L['world channel'], tCol = GetMsgFontColor("MSG_WORLD", true) },
+        }
+    end
+end)
 _MY_TalkEx.tTrickChannels = { 
     ['TEAM'] = { szName = _L['team channel'], tCol = GetMsgFontColor("MSG_TEAM", true) },
     ['RAID'] = { szName = _L['raid channel'], tCol = GetMsgFontColor("MSG_TEAM", true) },
@@ -59,18 +70,22 @@ _MY_TalkEx.OnPanelActive = function(wnd)
     ui:append('WndEdit_Talk','WndEditBox'):children('#WndEdit_Talk'):pos(25,25):size(w-136,210):text(MY_TalkEx.szTalk):multiLine(true):change(function() MY_TalkEx.szTalk = this:GetText() end)
     -- 喊话频道
     local i = 22
+    local nChannelCount = 0
+    for _,_ in pairs(_MY_TalkEx.tChannels) do nChannelCount = nChannelCount + 1 end
     for szChannel, tChannel in pairs(_MY_TalkEx.tChannels) do
         ui:append('WndCheckBox_TalkEx_'..szChannel,'WndCheckBox'):children('#WndCheckBox_TalkEx_'..szChannel):pos(w-110,i):text(tChannel.szName):color(tChannel.tCol):check(
             function() MY_TalkEx.tTalkChannel[szChannel] = true end,
             function() MY_TalkEx.tTalkChannel[szChannel] = false end
         ):check(MY_TalkEx.tTalkChannel[szChannel] or false)
-        i = i + 18
+        i = i + 180/nChannelCount
     end
     -- 喊话按钮
     ui:append('WndButton_Talk','WndButton'):children('#WndButton_Talk'):pos(w-110,210):width(90):text(_L['send'],{255,255,255}):click(function() 
         if #MY_TalkEx.szTalk == 0 then MY.Sysmsg({_L["please input something."], r=255, g=0, b=0},nil) return end
+        -- 近聊不放在第一个会导致发不出去
+        if MY_TalkEx.tTalkChannel['NEARBY'] then MY.Talk(PLAYER_TALK_CHANNEL['NEARBY'],MY_TalkEx.szTalk) end
         for szChannel, bSend in pairs(MY_TalkEx.tTalkChannel) do
-            if bSend then MY.Talk(PLAYER_TALK_CHANNEL[szChannel],MY_TalkEx.szTalk) end
+            if szChannel~="NEARBY" and bSend then MY.Talk(PLAYER_TALK_CHANNEL[szChannel],MY_TalkEx.szTalk) end
         end
     end)
     -------------------------------------
