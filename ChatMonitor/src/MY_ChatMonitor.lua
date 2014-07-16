@@ -299,8 +299,6 @@ end
 
 _MY_ChatMonitor.ShowTip = function(szMsg)
     if not MY_ChatMonitor.bShowPreview then return end
-    
-    _MY_ChatMonitor.UpdateAnchor(_MY_ChatMonitor.uiFrame:raw(1))
     if szMsg then
         _MY_ChatMonitor.uiTipBoard:clear():append(szMsg)
         _MY_ChatMonitor.uiTipBoard:find('#^.*link'):del('#^namelink_'):click(function(nFlag) 
@@ -343,10 +341,6 @@ _MY_ChatMonitor.ShowTip = function(szMsg)
     MY.DelayCall('MY_ChatMonitor_Hide')
     MY.DelayCall(function() _MY_ChatMonitor.uiFrame:fadeOut(500) end,5000,'MY_ChatMonitor_Hide')
 end
-_MY_ChatMonitor.UpdateAnchor = function(frm)
-    frm:SetPoint(MY_ChatMonitor.anchor.s, 0, 0, MY_ChatMonitor.anchor.r, MY_ChatMonitor.anchor.x, MY_ChatMonitor.anchor.y)
-    frm:CorrectPos()
-end
 _MY_ChatMonitor.Init = function()
     if _MY_ChatMonitor.bInited then return end
     _MY_ChatMonitor.bInited = true
@@ -362,11 +356,11 @@ _MY_ChatMonitor.Init = function()
         _MY_ChatMonitor.uiFrame:anchor(MY_ChatMonitor.anchor)
     end):customMode(_L["chat monitor"], function()
         MY.DelayCall('MY_ChatMonitor_Hide')
-        _MY_ChatMonitor.uiFrame:alpha(255):show()
+        _MY_ChatMonitor.uiFrame:show():alpha(255)
     end, function()
         MY_ChatMonitor.anchor = _MY_ChatMonitor.uiFrame:anchor()
         _MY_ChatMonitor.uiFrame:alpha(0):hide()
-    end)
+    end):anchor(MY_ChatMonitor.anchor)
     
     _MY_ChatMonitor.uiFrame:append('Image_bg',"Image"):find('#Image_bg'):image('UI/Image/Minimap/Minimap2.UITex',8):size(300,300):click(fnOnTipClick)
     -- _MY_ChatMonitor.uiTest = _MY_ChatMonitor.uiFrame:append('WndWindow_Test','WndWindow'):children('#WndWindow_Test'):toggle(false)
