@@ -417,7 +417,7 @@ end, function(h, szMsg, i)
                 if MY_Chat.bChatCopyAlwaysWhite then
                     _r, _g, _b = 255, 255, 255
                 end
-                szTime = GetFormatText(_L["*"], 10, _r, _g, _b, 515, "this.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end", "copylink")
+                szTime = GetFormatText(_L[" * "], 10, _r, _g, _b, 515, "this.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end", "copylink")
             elseif MY_Chat.bChatCopyAlwaysWhite then
                 r, g, b = 255, 255, 255
             end
