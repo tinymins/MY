@@ -90,32 +90,32 @@ function _MY.UI:ctor(raw, tab)
         -- format tab
         local _tab = { raw = raw }
         if type(tab)=="table" then for k, v in pairs(tab) do _tab[k]=v end end
-        local szType = raw.szMyuiType or raw:GetType()
-        if not _tab.txt and szType == "Text"        then _tab.txt = raw end
-        if not _tab.img and szType == "Image"       then _tab.img = raw end
-        if not _tab.chk and szType == "WndCheckBox" then _tab.chk = raw end
-        if not _tab.chk and szType == "WndRadioBox" then _tab.chk = raw end
-        if not _tab.edt and szType == "WndEdit"     then _tab.edt = raw end
-        if not _tab.sdw and szType == "Shadow"      then _tab.sdw = raw end
-        if not _tab.hdl and szType == "Handle"      then _tab.hdl = raw end
-        if szType=="WndEditBox" then
+        _tab.type = raw.szMyuiType or raw:GetType()
+        if not _tab.txt and _tab.type == "Text"        then _tab.txt = raw end
+        if not _tab.img and _tab.type == "Image"       then _tab.img = raw end
+        if not _tab.chk and _tab.type == "WndCheckBox" then _tab.chk = raw end
+        if not _tab.chk and _tab.type == "WndRadioBox" then _tab.chk = raw end
+        if not _tab.edt and _tab.type == "WndEdit"     then _tab.edt = raw end
+        if not _tab.sdw and _tab.type == "Shadow"      then _tab.sdw = raw end
+        if not _tab.hdl and _tab.type == "Handle"      then _tab.hdl = raw end
+        if _tab.type=="WndEditBox" then
             _tab.wnd = _tab.wnd or raw
             _tab.hdl = _tab.hdl or raw:Lookup('','')
             _tab.edt = _tab.edt or raw:Lookup('WndEdit_Default')
             _tab.img = _tab.img or raw:Lookup('','Image_Default')
-        elseif szType=="WndComboBox" then
+        elseif _tab.type=="WndComboBox" then
             _tab.wnd = _tab.wnd or raw
             _tab.hdl = _tab.hdl or raw:Lookup('','')
             _tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
             _tab.txt = _tab.txt or raw:Lookup('','Text_Default')
             _tab.img = _tab.img or raw:Lookup('','Image_Default')
-        elseif szType=="WndEditComboBox" then
+        elseif _tab.type=="WndEditComboBox" then
             _tab.wnd = _tab.wnd or raw
             _tab.hdl = _tab.hdl or raw:Lookup('','')
             _tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
             _tab.edt = _tab.edt or raw:Lookup('WndEdit_Default')
             _tab.img = _tab.img or raw:Lookup('','Image_Default')
-        elseif szType=="WndScrollBox" then
+        elseif _tab.type=="WndScrollBox" then
             _tab.wnd = _tab.wnd or raw
             _tab.hdl = _tab.hdl or raw:Lookup('','Handle_Scroll')
             _tab.txt = _tab.txt or raw:Lookup('','Handle_Scroll'):Lookup('Text_Default')
@@ -124,12 +124,12 @@ function _MY.UI:ctor(raw, tab)
             _tab.sbd = _tab.sbd or raw:Lookup('WndButton_Down')
             _tab.sbn = _tab.sbn or raw:Lookup('WndNewScrollBar_Default')
             _tab.shd = _tab.shd or raw:Lookup('','Handle_Scroll')
-        elseif szType=="WndFrame" then
+        elseif _tab.type=="WndFrame" then
             _tab.frm = _tab.frm or raw
             _tab.wnd = _tab.wnd or raw:Lookup("Window_Main")
             _tab.hdl = _tab.hdl or (_tab.wnd or _tab.frm):Lookup("", "")
             _tab.txt = _tab.txt or raw:Lookup("", "Text_Title")
-        elseif string.sub(szType, 1, 3) == "Wnd" then
+        elseif string.sub(_tab.type, 1, 3) == "Wnd" then
             _tab.wnd = _tab.wnd or raw
             _tab.hdl = _tab.hdl or raw:Lookup('','')
             _tab.txt = _tab.txt or raw:Lookup('','Text_Default')
@@ -156,32 +156,32 @@ function _MY.UI:raw2ele(raw, tab)
     -- format tab
     local _tab = { raw = raw }
     if type(tab)=="table" then for k, v in pairs(tab) do _tab[k]=v end end
-    local szType = raw.szMyuiType or raw:GetType()
-    if not _tab.txt and szType == "Text"        then _tab.txt = raw end
-    if not _tab.img and szType == "Image"       then _tab.img = raw end
-    if not _tab.chk and szType == "WndCheckBox" then _tab.chk = raw end
-    if not _tab.chk and szType == "WndRadioBox" then _tab.chk = raw end
-    if not _tab.edt and szType == "WndEdit"     then _tab.edt = raw end
-    if not _tab.sdw and szType == "Shadow"      then _tab.sdw = raw end
-    if not _tab.hdl and szType == "Handle"      then _tab.hdl = raw end
-    if szType=="WndEditBox" then
+    _tab.type = raw.szMyuiType or raw:GetType()
+    if not _tab.txt and _tab.type == "Text"        then _tab.txt = raw end
+    if not _tab.img and _tab.type == "Image"       then _tab.img = raw end
+    if not _tab.chk and _tab.type == "WndCheckBox" then _tab.chk = raw end
+    if not _tab.chk and _tab.type == "WndRadioBox" then _tab.chk = raw end
+    if not _tab.edt and _tab.type == "WndEdit"     then _tab.edt = raw end
+    if not _tab.sdw and _tab.type == "Shadow"      then _tab.sdw = raw end
+    if not _tab.hdl and _tab.type == "Handle"      then _tab.hdl = raw end
+    if _tab.type=="WndEditBox" then
         _tab.wnd = _tab.wnd or raw
         _tab.hdl = _tab.hdl or raw:Lookup('','')
         _tab.edt = _tab.edt or raw:Lookup('WndEdit_Default')
         _tab.img = _tab.img or raw:Lookup('','Image_Default')
-    elseif szType=="WndComboBox" then
+    elseif _tab.type=="WndComboBox" then
         _tab.wnd = _tab.wnd or raw
         _tab.hdl = _tab.hdl or raw:Lookup('','')
         _tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
         _tab.txt = _tab.txt or raw:Lookup('','Text_Default')
         _tab.img = _tab.img or raw:Lookup('','Image_Default')
-    elseif szType=="WndEditComboBox" then
+    elseif _tab.type=="WndEditComboBox" then
         _tab.wnd = _tab.wnd or raw
         _tab.hdl = _tab.hdl or raw:Lookup('','')
         _tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
         _tab.edt = _tab.edt or raw:Lookup('WndEdit_Default')
         _tab.img = _tab.img or raw:Lookup('','Image_Default')
-    elseif szType=="WndScrollBox" then
+    elseif _tab.type=="WndScrollBox" then
         _tab.wnd = _tab.wnd or raw
         _tab.hdl = _tab.hdl or raw:Lookup('','Handle_Scroll')
         _tab.txt = _tab.txt or raw:Lookup('','Handle_Scroll'):Lookup('Text_Default')
@@ -190,12 +190,17 @@ function _MY.UI:raw2ele(raw, tab)
         _tab.sbd = _tab.sbd or raw:Lookup('WndButton_Down')
         _tab.sbn = _tab.sbn or raw:Lookup('WndNewScrollBar_Default')
         _tab.shd = _tab.shd or raw:Lookup('','Handle_Scroll')
-    elseif szType=="WndFrame" then
+    elseif _tab.type=="WndFrame" then
         _tab.frm = _tab.frm or raw
         _tab.wnd = _tab.wnd or raw:Lookup("Window_Main")
         _tab.hdl = _tab.hdl or (_tab.wnd or _tab.frm):Lookup("", "")
         _tab.txt = _tab.txt or raw:Lookup("", "Text_Title")
-    elseif string.sub(szType, 1, 3) == "Wnd" then
+    elseif _tab.type=="WndSliderBox" then
+        _tab.wnd = _tab.wnd or raw
+        _tab.hdl = _tab.hdl or raw:Lookup('','')
+        _tab.sld = _tab.sld or raw:Lookup("WndNewScrollBar_Default")
+        _tab.txt = _tab.txt or raw:Lookup('','Text_Default')
+    elseif string.sub(_tab.type, 1, 3) == "Wnd" then
         _tab.wnd = _tab.wnd or raw
         _tab.hdl = _tab.hdl or raw:Lookup('','')
         _tab.txt = _tab.txt or raw:Lookup('','Text_Default')
@@ -669,19 +674,33 @@ function _MY.UI:append(szName, szType, tArg)
                             if bBottom then hScrollBar:SetScrollPos(hScrollBar:GetStepCount()) end
                         end
                         pcall( wnd.UpdateScroll )
-                    elseif szType=='WndTrackBar' then
-                        wnd:Lookup("Scroll_Track").OnScrollBarPosChanged = function()
-                            local nCurrentPercentage = this:GetScrollPos() * 100 / this:GetStepCount()
-                            wnd:Lookup("", "Text_Default"):SetText(nCurrentPercentage..'%')
+                    elseif szType=='WndSliderBox' then
+                        wnd.bShowPercentage = true
+                        wnd.nOffset = 0
+                        wnd.tMyOnChange = {}
+                        wnd:Lookup("WndNewScrollBar_Default").OnScrollBarPosChanged = function()
+                            if wnd.bShowPercentage then
+                                local nCurrentPercentage = this:GetScrollPos() * 100 / this:GetStepCount()
+                                wnd:Lookup("", "Text_Default"):SetText(nCurrentPercentage..'%')
+                                for _, fn in ipairs(wnd.tMyOnChange) do
+                                    pcall(fn, nCurrentPercentage)
+                                end
+                            else
+                                local nCurrentValue = this:GetScrollPos() + wnd.nOffset
+                                wnd:Lookup("", "Text_Default"):SetText(nCurrentValue)
+                                for _, fn in ipairs(wnd.tMyOnChange) do
+                                    pcall(fn, nCurrentValue)
+                                end
+                            end
                         end
-                        wnd:Lookup("Scroll_Track").OnMouseWheel = function()                                   -- listening Mouse Wheel
+                        wnd:Lookup("WndNewScrollBar_Default").OnMouseWheel = function()                                   -- listening Mouse Wheel
                             local nDistance = Station.GetMessageWheelDelta()            -- get distance
-                            wnd:Lookup("Scroll_Track"):ScrollNext(-nDistance*2)            -- wheel scroll position
+                            wnd:Lookup("WndNewScrollBar_Default"):ScrollNext(-nDistance*2)            -- wheel scroll position
                             return 1
                         end
-                        wnd:Lookup("Scroll_Track"):Lookup('Btn_Track').OnMouseWheel = function()               -- listening Mouse Wheel
+                        wnd:Lookup("WndNewScrollBar_Default"):Lookup('Btn_Track').OnMouseWheel = function()               -- listening Mouse Wheel
                             local nDistance = Station.GetMessageWheelDelta()            -- get distance
-                            wnd:Lookup("Scroll_Track"):ScrollNext(-nDistance)            -- wheel scroll position
+                            wnd:Lookup("WndNewScrollBar_Default"):ScrollNext(-nDistance)            -- wheel scroll position
                             return 1
                         end
                     end
@@ -1234,6 +1253,29 @@ function _MY.UI:size(nWidth, nHeight)
     end
 end
 
+-- (number, number) Instance:range()
+-- (self) Instance:range(nMin, nMax)
+function _MY.UI:range(nMin, nMax)
+    self:_checksum()
+    if type(nMin)=='number' and type(nMax)=='number' and nMax>nMin then
+        for _, ele in pairs(self.eles) do
+            if ele.type=="WndSliderBox" then
+                ele.wnd.nOffset = nMin
+                ele.sld:SetStepCount(nMax - nMin)
+            end
+        end
+        return self
+    else -- get
+        -- select the first item
+        local ele = self.eles[1]
+        -- try to get its name
+        local status, bMultiLine = pcall(function() return (ele.edt or ele.txt):IsMultiLine() end)
+        -- if succeed then return its name
+        if status then return bMultiLine else MY.Debug(bMultiLine..'\n','ERROR _MY.UI:multiLine' ,1) return nil end
+    end
+end
+
+
 -- (boolean) Instance:multiLine()
 -- (self) Instance:multiLine(bMultiLine)
 function _MY.UI:multiLine(bMultiLine)
@@ -1285,6 +1327,17 @@ function _MY.UI:handleStyle(dwStyle)
     if dwStyle then
         for _, ele in pairs(self.eles) do
             pcall(function() ele.hdl:SetHandleStyle(dwStyle) end)
+        end
+    end
+    return self
+end
+
+-- (self) _MY.UI:sliderStyle(bShowPercentage)
+function _MY.UI:sliderStyle(bShowPercentage)
+    self:_checksum()
+    for _, ele in pairs(self.eles) do
+        if ele.type=="WndSliderBox" then
+            ele.wnd.bShowPercentage = bShowPercentage
         end
     end
     return self
@@ -1584,19 +1637,25 @@ function _MY.UI:check(fnCheck, fnUncheck)
 end
 
 --[[ change 输入框文字变化
-    :change(fnOnEditChanged) 绑定
+    :change(fnOnChange) 绑定
     :change()   调用处理函数
 ]]
-function _MY.UI:change(fnOnEditChanged)
+function _MY.UI:change(fnOnChange)
     self:_checksum()
-    if fnOnEditChanged then
+    if fnOnChange then
         for _, ele in pairs(self.eles) do
-            if ele.edt then ele.edt.OnEditChanged = function() pcall(fnOnEditChanged,ele.edt:GetText()) end end
+            if ele.edt then ele.edt.OnEditChanged = function() pcall(fnOnChange,ele.edt:GetText()) end end
+            if ele.type=="WndSliderBox" then
+                table.insert(ele.wnd.tMyOnChange, fnOnChange)
+            end
         end
         return self
     else
         for _, ele in pairs(self.eles) do
             if ele.edt then local _this = this this = ele.edt pcall(ele.edt.OnEditChanged) this = _this  end
+            if ele.type=="WndSliderBox" then
+                local _this = this this = ele.sld pcall(ele.sld.OnScrollBarPosChanged) this = _this
+            end
         end
         return self
     end
