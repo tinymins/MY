@@ -278,7 +278,6 @@ MY.Player.Equip = function(szName)
         end
     end
 end
-AppendCommand("equip", MY.Player.Equip)
 
 --[[ 获取对象的buff列表
     (table) MY.GetBuffList(obj)
