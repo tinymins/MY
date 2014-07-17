@@ -1497,14 +1497,18 @@ function _MY.UI:hover(fnHover, fnLeave, bNoAutoBind)
     if not bNoAutoBind then fnLeave = fnLeave or fnHover end
     if fnHover then
         for _, ele in pairs(self.eles) do
-            if ele.wnd then MY.UI.RegisterUIEvent(ele.wnd, 'OnMouseEnter' , function() fnHover(true) end) end
-            if ele.itm then MY.UI.RegisterUIEvent(ele.itm, 'OnItemMouseEnter', function() fnHover(true) end) end
+            local wnd = ele.edt or ele.wnd
+            local itm = ele.itm or ele.itm
+            if wnd then MY.UI.RegisterUIEvent(wnd, 'OnMouseEnter' , function() fnHover(true) end) end
+            if itm then MY.UI.RegisterUIEvent(itm, 'OnItemMouseEnter', function() fnHover(true) end) end
         end
     end
     if fnLeave then
         for _, ele in pairs(self.eles) do
-            if ele.wnd then MY.UI.RegisterUIEvent(ele.wnd, 'OnMouseLeave' , function() fnLeave(false) end) end
-            if ele.itm then MY.UI.RegisterUIEvent(ele.itm, 'OnItemMouseLeave', function() fnLeave(false) end) end
+            local wnd = ele.edt or ele.wnd
+            local itm = ele.itm or ele.itm
+            if wnd then MY.UI.RegisterUIEvent(wnd, 'OnMouseLeave' , function() fnLeave(false) end) end
+            if itm then MY.UI.RegisterUIEvent(itm, 'OnItemMouseLeave', function() fnLeave(false) end) end
         end
     end
     return self
