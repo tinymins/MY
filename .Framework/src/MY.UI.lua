@@ -1269,9 +1269,30 @@ function _MY.UI:range(nMin, nMax)
         -- select the first item
         local ele = self.eles[1]
         -- try to get its name
-        local status, bMultiLine = pcall(function() return (ele.edt or ele.txt):IsMultiLine() end)
-        -- if succeed then return its name
-        if status then return bMultiLine else MY.Debug(bMultiLine..'\n','ERROR _MY.UI:multiLine' ,1) return nil end
+        if ele.type=="WndSliderBox" then
+            return ele.wnd.nOffset, ele.sld:GetStepCount()
+        end
+    end
+end
+
+-- (number, number) Instance:value()
+-- (self) Instance:value(nValue)
+function _MY.UI:value(nValue)
+    self:_checksum()
+    if nValue then
+        for _, ele in pairs(self.eles) do
+            if ele.type=="WndSliderBox" then
+                ele.sld:SetScrollPos(nValue - ele.wnd.nOffset)
+            end
+        end
+        return self
+    else -- get
+        -- select the first item
+        local ele = self.eles[1]
+        -- try to get its name
+        if ele.type=="WndSliderBox" then
+            return ele.wnd.nOffset + ele.sld:GetScrollPos()
+        end
     end
 end
 
