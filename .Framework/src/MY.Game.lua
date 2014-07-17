@@ -207,7 +207,7 @@ end
 
 MY.RegisterInit(function()
     -- hotkey
-    Hotkey.AddBinding("MY_Total", _L["Open/Close main panel"], MY.GetPluginsInfo().szName, MY.TogglePanel, nil)
+    Hotkey.AddBinding("MY_Total", _L["Open/Close main panel"], MY.GetAddonInfo().szName, MY.TogglePanel, nil)Output(_Cache)
     for _, v in ipairs(_Cache.tHotkey) do
         Hotkey.AddBinding(v.szName, v.szTitle, "", v.fnAction, nil)
     end
