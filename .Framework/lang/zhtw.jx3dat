@@ -2,6 +2,7 @@
 data = {
     -- common
     ['*'] = '※',
+    [' * '] = ' ※ ',
     
     ['nearby channel'] = '近聊頻道',
     ['friend channel'] = '好友頻道',
