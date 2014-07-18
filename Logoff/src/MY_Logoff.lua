@@ -245,7 +245,9 @@ _MY_Logoff.OnPanelActive = function(wnd)
     ui:append('Text_HotKeySet','Text'):find('#Text_HotKeySet'):text(_L['* hotkey setting']):pos(30,390):color({255,255,0}):click(function() MY.Game.SetHotKey() end)
 end
 --
-MY.RegisterPanel( "Logoff", _L["express logoff"], "UI/Image/UICommon/LoginSchool.UITex|24", {255,0,0,200}, { OnPanelActive = _MY_Logoff.OnPanelActive } )
+if MY.Chat.bHookedAlready then
+    MY.RegisterPanel( "Logoff", _L["express logoff"], "UI/Image/UICommon/LoginSchool.UITex|24", {255,0,0,200}, { OnPanelActive = _MY_Logoff.OnPanelActive } )
+end
 MY.RegisterInit(function()
     -- ´´½¨²Ëµ¥
     local tMenu = function() return {
