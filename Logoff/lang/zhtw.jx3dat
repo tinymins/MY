@@ -1,0 +1,25 @@
+-- language data (zhcn) updated at 2014-4-10 03:38:11
+data = {
+    -- MY_Logoff.lua
+    ['express logoff'] = '快速登出',
+    ['# condition logoff'] = '● 條件登出',
+    ['# express logoff'] = '● 快速登出',
+    ['while'] = '當',
+    ['[ select a target ]'] = '[請選擇目標]',
+    ['( current target )'] = '(當前目標)',
+    ['life below       %'] = '血量低於　　　%時',
+    ['%d player(s) selected'] = '已選擇的%d個玩家',
+    ['all disappeared'] = '全部離開視野時',
+    ['while client level exceeds'] = '當自身等級達到　　　級時',
+    ['second(s) later'] = '秒之後',
+    ['While it meets any condition below'] = '符合以上條件之一時',
+    ['return to role list'] = '返回角色選擇',
+    ['return to game login'] = '返回賬號登錄',
+    ['return to role list while not fight'] = '脫戰後返回角色選擇',
+    ['return to game login while not fight'] = '脫戰後返回賬號登錄',
+    ['* hotkey setting'] = '☆ 快捷鍵設定',
+    ['force return to role list.'] = '强制返回角色選擇页面。',
+    ['force return to game login.'] = '强制返回账户登录页面。',
+    ['return to role list while leaving fighting.'] = '在下一次脫離戰鬥的一瞬間返回角色選擇頁面。',
+    ['return to game login while leaving fighting.'] = '在下一次脫離戰鬥的一瞬間返回賬戶登錄頁面。',
+}
