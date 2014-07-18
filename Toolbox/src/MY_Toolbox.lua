@@ -78,4 +78,4 @@ _MY_ToolBox.OnPanelActive = function(wnd)
         _MY_ToolBox.FriendHeadTip(MY_ToolBox.bFriendHeadTip)
     end)
 end
-MY.RegisterPanel( "MY_ToolBox", _L["toolbox"], "UI/Image/Helper/Help.UITex|26", {255,255,0,200}, { OnPanelActive = _MY_ToolBox.OnPanelActive } )
+MY.RegisterPanel( "MY_ToolBox", _L["toolbox"], "UI/Image/Common/Money.UITex|243", {255,255,0,200}, { OnPanelActive = _MY_ToolBox.OnPanelActive } )
