@@ -300,9 +300,15 @@ MY.RegisterInit(function()
                         ui:append("WndButton_Add", "WndButton"):find("#WndButton_Add"):pos(180,0):width(80):text(_L["add"]):click(function()
                             local szText = muEditBox:text()
                             muEditBox:text("")
+                            -- 去掉前后空格
+                            szText = (string.gsub(szText, "^%s*(.-)%s*$", "%1"))
+                            -- 验证是否为空
+                            if szText=="" then return nil end
+                            -- 验证是否重复
                             for i, v in ipairs(MY_Chat.tBlockWords) do
                                 if v==szText then return nil end
                             end
+                            -- 加入表
                             table.insert(MY_Chat.tBlockWords, szText)
                             AddListItem(muList, szText)
                         end)
