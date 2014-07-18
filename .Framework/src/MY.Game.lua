@@ -79,7 +79,7 @@ MY.Game.SetHotKey = function(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
         if not nKey then nIndex, nKey = 1, nIndex end
         Hotkey.Set(szCommand, nIndex, nKey, bShift == true, bCtrl == true, bAlt == true)
     else
-        local szGroup = szCommand or _Cache.szName
+        local szGroup = szCommand or MY.GetAddonInfo().szName
 
         local frame = Station.Lookup("Topmost/HotkeyPanel")
         if not frame then
