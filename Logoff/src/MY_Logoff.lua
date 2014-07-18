@@ -245,9 +245,11 @@ _MY_Logoff.OnPanelActive = function(wnd)
     ui:append('Text_HotKeySet','Text'):find('#Text_HotKeySet'):text(_L['* hotkey setting']):pos(30,390):color({255,255,0}):click(function() MY.Game.SetHotKey() end)
 end
 --
-if MY.Chat.bHookedAlready then
-    MY.RegisterPanel( "Logoff", _L["express logoff"], "UI/Image/UICommon/LoginSchool.UITex|24", {255,0,0,200}, { OnPanelActive = _MY_Logoff.OnPanelActive } )
-end
+MY.RegisterInit(function()
+    if MY.Chat.bHookedAlready then
+        MY.RegisterPanel( "Logoff", _L["express logoff"], "UI/Image/UICommon/LoginSchool.UITex|24", {255,0,0,200}, { OnPanelActive = _MY_Logoff.OnPanelActive } )
+    end
+end)
 MY.RegisterInit(function()
     -- 创建菜单
     local tMenu = function() return {
@@ -287,6 +289,14 @@ MY.RegisterInit(function()
             bChecked = false,
             fnAction = function()
                 MY_Logoff.LogOffEx(true, true)
+            end,
+            fnAutoClose = function() return true end
+        }, {
+            bDevide  = true,
+        },  {  -- 设置快捷键
+            szOption = _L['set hotkey'],
+            fnAction = function()
+                MY.Game.SetHotKey()
             end,
             fnAutoClose = function() return true end
         },
