@@ -78,6 +78,9 @@ data = {
     ['copy'] = '複製',
     ['paste'] = '粘貼',
     ['whisper'] = '密聊',
+    
+    ['set hotkey'] = '設置快捷鍵',
+    
     -- MY.lua
     ['mingyi plugin'] = '茗伊插件',
     ['mingyi plugins'] = '茗伊插件集',
