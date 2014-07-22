@@ -48,7 +48,7 @@ MY_Chat.tChannel = {
 }
 -- register settings
 RegisterCustomData("Account\\MY_Chat.bLockPostion")
-RegisterCustomData("Account\\MY_Chat.postion")
+RegisterCustomData("Account\\MY_Chat.anchor")
 RegisterCustomData("Account\\MY_Chat.bEnableBalloon")
 RegisterCustomData("Account\\MY_Chat.bChatCopy")
 RegisterCustomData("Account\\MY_Chat.bBlockWords")
