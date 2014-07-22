@@ -284,6 +284,7 @@ _Cache.tTalkChannelHeader = {
     [PLAYER_TALK_CHANNEL.NEARBY] = "/s ",
     [PLAYER_TALK_CHANNEL.FRIENDS] = "/o ",
     [PLAYER_TALK_CHANNEL.TONG_ALLIANCE] = "/a ",
+    [PLAYER_TALK_CHANNEL.TEAM] = "/p ",
     [PLAYER_TALK_CHANNEL.RAID] = "/t ",
     [PLAYER_TALK_CHANNEL.BATTLE_FIELD] = "/b ",
     [PLAYER_TALK_CHANNEL.TONG] = "/g ",
