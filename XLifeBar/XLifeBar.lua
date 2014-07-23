@@ -94,7 +94,7 @@ local Config = {
 XLifeBar = {}
 local _XLifeBar = {
 	dwVersion = 0x0000700,
-	szConfig = "config",
+	szConfig = "userdata/XLifeBar/CFG",
 	tObject = {},
 	tTongList = {},
 	tNpc = {},
@@ -110,7 +110,8 @@ local _XLifeBar = {
 }
 -- SaveLUAData(_XLifeBar.szConfig,Config) -- ต๗สิ
 MY.RegisterInit(function()
-	Config = MY.Sys.LoadUserData(_XLifeBar.szConfig, _SUB_ADDON_FOLDER_NAME_) or Config
+	Config = MY.Sys.LoadUserData(_XLifeBar.szConfig) or Config
+	_XLifeBar.Reset(true)
 end)
 
 
@@ -422,10 +423,12 @@ _XLifeBar.GetForce = function(dwID)
 	return "Neutrality" -- "Other"
 end
 
-_XLifeBar.Reset = function()
+_XLifeBar.Reset = function(bNoSave)
 	_XLifeBar.tObject = {}
 	_XLifeBar.Frame:Lookup("",""):Clear()
-	MY.Sys.SaveUserData(Config, _XLifeBar.szConfig, _SUB_ADDON_FOLDER_NAME_)
+	if not bNoSave then
+		MY.Sys.SaveUserData(_XLifeBar.szConfig, Config)
+	end
 end
 
 local HP = class()

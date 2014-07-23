@@ -15,8 +15,8 @@ MY_Farbnamen = MY_Farbnamen or {
 RegisterCustomData("Account\\MY_Farbnamen.bEnabled")
 local _MY_Farbnamen = {
     nMaxCache= 2000,
-    szConfigPath = "PLAYER_FORCE_COLOR",
-    szDataCache  = "PLAYER_INFO_CACHE\\" .. (MY.Game.GetServer()),
+    szConfigPath = "config/PLAYER_FORCE_COLOR",
+    szDataCache  = "cache/PLAYER_INFO/" .. (MY.Game.GetServer()),
     tForceColor  = {},
     tForceString = {
         [0]  = _L['JiangHu'],
@@ -156,12 +156,12 @@ function MY_Farbnamen.SaveData()
             table.remove(t.aCached)
         end
     end
-    MY.SaveLUAData(MY.Json.Encode(t), _MY_Farbnamen.szDataCache, _SUB_ADDON_FOLDER_NAME_)
+    MY.SaveLUAData(_MY_Farbnamen.szDataCache, MY.Json.Encode(t))
 end
 -- 加载配置
 function MY_Farbnamen.LoadData()
     -- 读取数据文件
-    local data = MY.LoadLUAData(_MY_Farbnamen.szDataCache, _SUB_ADDON_FOLDER_NAME_) or {}
+    local data = MY.LoadLUAData(_MY_Farbnamen.szDataCache) or {}
     -- 如果是Json格式的数据 则解码
     if type(data)=="string" then
         data = MY.Json.Decode(data) or {}
@@ -181,7 +181,7 @@ function MY_Farbnamen.LoadData()
     for _, p in ipairs(t.aCached) do
         _MY_Farbnamen.tPlayerCache[p.dwID] = p
     end
-    _MY_Farbnamen.tForceColor = MY.LoadLUAData(_MY_Farbnamen.szConfigPath, _SUB_ADDON_FOLDER_NAME_, true) or _MY_Farbnamen.tForceColor
+    _MY_Farbnamen.tForceColor = MY.LoadLUAData(_MY_Farbnamen.szConfigPath, true) or _MY_Farbnamen.tForceColor
     _MY_Farbnamen.nMaxCache = t.nMaxCache or _MY_Farbnamen.nMaxCache
 end
 --------------------------------------------------------------
