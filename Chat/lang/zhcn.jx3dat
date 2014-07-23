@@ -26,6 +26,8 @@ data = {
     ['channel setting'] = '频道设置',
     
     ['always show *'] = '总是显示※号',
-    ['always be white'] = '永远为白色',
+    ['always be white'] = '永远显示为白色',
+    ['hide system msg copy'] = '不复制系统消息',
+    
     ['Mingyi Plugins - Chatpanel\nThis plugin is developed by Zhai YiMing @ derzh.com.'] = '[茗伊插件集] - 聊天辅助\n------------\n√该插件由翟一鸣小朋宇独立开发完成。\n√有问题请联系：茗伊@双梦镇@光明顶@荻花宫@体服',
 }
