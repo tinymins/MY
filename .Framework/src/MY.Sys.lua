@@ -35,86 +35,80 @@ MY.GetLang = MY.Sys.GetLang
   # #     #   #       #     # # #     #       #       #       # #                 #   #       #  
 #######################################################################################################
 ]]
---[[ 保存数据文件：相对于data文件夹
-    MY.SaveLUAData( szFileName, tData[, szSubAddonName][, bNoDistinguishLang] )
-    szFileName          数据文件名称
+--[[ 保存数据文件
+    MY.SaveLUAData( szFileUri, tData[, bNoDistinguishLang] )
+    szFileUri           数据文件路径(1)
     tData               要保存的数据
-    szSubAddonName      子插件目录名称
-    bNoDistinguishLang  是否自动区分客户端语言
+    bNoDistinguishLang  是否取消自动区分客户端语言
+    (1)： 当路径为绝对路径时(以斜杠开头)不作处理
+          当路径为相对路径时 相对于插件下@DATA目录
 ]]
-MY.Sys.SaveLUAData = function(tData, szFileName, szSubAddonName, bNoDistinguishLang)
-    local szFullName = ""
-    if type(szSubAddonName)=="string" then
-        szFullName = szFullName .. MY.GetAddonInfo().szRoot..szSubAddonName..'\\'
-    else
-        bNoDistinguishLang = szSubAddonName
-        szFullName = szFullName .. MY.GetAddonInfo().szFrameworkRoot
+MY.Sys.SaveLUAData = function(szFileUri, tData, bNoDistinguishLang)
+    -- 统一化目录分隔符
+    szFileUri = string.gsub(szFileUri, '\\', '/')
+    -- 如果是相对路径则从/@DATA/补全
+    if string.sub(szFileUri, 1, 1)~='/' then
+        szFileUri = MY.GetAddonInfo().szRoot .. "@DATA/" .. szFileUri
     end
-    
-    szFileName = string.gsub(szFileName, '/', '\\')
-    while(string.sub(szFileName, 1, 1)=='\\') do
-        szFileName = string.sub(szFileName, 2)
-    end
-    szFullName = szFullName .. 'data\\' .. szFileName .. '.MYDATA'
-    
+    -- 统一后缀
+    szFileUri = szFileUri .. '.MYDATA'
+    -- 添加游戏语言后缀
     if not bNoDistinguishLang then
         local _, _, lang = GetVersion()
         lang = string.upper(lang)
         if #lang>0 then
-            szFullName = szFullName .. '_' .. lang
+            szFileUri = szFileUri .. '_' .. lang
         end
     end
-    return SaveLUAData(szFullName, tData)
+    -- 调用系统API
+    return SaveLUAData(szFileUri, tData)
 end
 MY.SaveLUAData = MY.Sys.SaveLUAData
 --[[ 加载数据文件：相对于data文件夹
-    MY.LoadLUAData( szFileName[, szSubAddonName][, bNoDistinguishLang] )
-    szFileName          数据文件名称
-    szSubAddonName      子插件目录名称
-    bNoDistinguishLang  是否自动区分客户端语言
+    MY.LoadLUAData( szFileUri[, bNoDistinguishLang] )
+    szFileUri           数据文件路径(1)
+    bNoDistinguishLang  是否取消自动区分客户端语言
+    (1)： 当路径为绝对路径时(以斜杠开头)不作处理
+          当路径为相对路径时 相对于插件下@DATA目录
 ]]
-MY.Sys.LoadLUAData = function(szFileName, szSubAddonName, bNoDistinguishLang)
-    local szFullName = ""
-    if type(szSubAddonName)=="string" then
-        szFullName = szFullName .. MY.GetAddonInfo().szRoot..szSubAddonName..'\\'
-    else
-        bNoDistinguishLang = szSubAddonName
-        szFullName = szFullName .. MY.GetAddonInfo().szFrameworkRoot
+MY.Sys.LoadLUAData = function(szFileUri, bNoDistinguishLang)
+    -- 统一化目录分隔符
+    szFileUri = string.gsub(szFileUri, '\\', '/')
+    -- 如果是相对路径则从/@DATA/补全
+    if string.sub(szFileUri, 1, 1)~='/' then
+        szFileUri = MY.GetAddonInfo().szRoot .. "@DATA/" .. szFileUri
     end
-    
-    szFileName = string.gsub(szFileName, '/', '\\')
-    while(string.sub(szFileName, 1, 1)=='\\') do
-        szFileName = string.sub(szFileName, 2)
-    end
-    szFullName = szFullName .. 'data\\' .. szFileName .. '.MYDATA'
-    
+    -- 统一后缀
+    szFileUri = szFileUri .. '.MYDATA'
+    -- 添加游戏语言后缀
     if not bNoDistinguishLang then
         local _, _, lang = GetVersion()
         lang = string.upper(lang)
         if #lang>0 then
-            szFullName = szFullName .. '_' .. lang
+            szFileUri = szFileUri .. '_' .. lang
         end
     end
-    return LoadLUAData(szFullName)
+    -- 调用系统API
+    return LoadLUAData(szFileUri)
 end
 MY.LoadLUAData = MY.Sys.LoadLUAData
 
 --[[ 保存用户数据 注意要在游戏初始化之后使用不然没有ClientPlayer对象
-    (data) MY.Sys.SaveUserData(szFile [,szSubAddonName])
+    (data) MY.Sys.SaveUserData(szFileUri, tData)
 ]]
-MY.Sys.SaveUserData = function(tData, szFileName, szSubAddonName, bNoDistinguishLang)
-    return MY.Sys.SaveLUAData(tData, szFileName.."_"..(MY.Game.GetServer()).."_"..GetClientPlayer().dwID, szSubAddonName, bNoDistinguishLang)
+MY.Sys.SaveUserData = function(szFileUri, tData)
+    return MY.Sys.SaveLUAData(szFileUri.."_"..(MY.Game.GetServer()).."_"..GetClientPlayer().dwID, tData)
 end
 
 --[[ 加载用户数据 注意要在游戏初始化之后使用不然没有ClientPlayer对象
     (data) MY.Sys.LoadUserData(szFile [,szSubAddonName])
 ]]
-MY.Sys.LoadUserData = function(szFileName, szSubAddonName, bNoDistinguishLang)
-    return MY.Sys.LoadLUAData(szFileName.."_"..(MY.Game.GetServer()).."_"..GetClientPlayer().dwID, szSubAddonName, bNoDistinguishLang)
+MY.Sys.LoadUserData = function(szFileUri)
+    return MY.Sys.LoadLUAData(szFileUri.."_"..(MY.Game.GetServer()).."_"..GetClientPlayer().dwID)
 end
 
 --szName [, szDataFile]
-MY.RegisterUserData = function(szName, szSubAddonName)
+MY.RegisterUserData = function(szName, szFileName)
     
 end
 --[[
