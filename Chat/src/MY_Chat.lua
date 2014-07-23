@@ -19,6 +19,11 @@ local _Cache = {
         {name="Radio_Friend",   title=_L["FRIEND"],   head={string=g_tStrings.HEADER_SHOW_FRIEND,       code="/o "}, channel=PLAYER_TALK_CHANNEL.FRIENDS      , color={241, 114, 183}},--”—
         {name="Radio_Alliance", title=_L["ALLIANCE"], head={string=g_tStrings.HEADER_SHOW_CHAT_ALLIANCE,code="/a "}, channel=PLAYER_TALK_CHANNEL.TONG_ALLIANCE, color={178, 240, 164}},--√À
     },
+    szFilterAnimate = '<animate>path="ui\\\\Image\\\\UICommon\\\\Talk_face%.UITex"[^<]*group=(%d+)[^<]-</animate>',
+    szFilterImage = '<image>path="ui\\\\Image\\\\UICommon\\\\Talk_face%.UITex"[^<]*frame=(%d+)[^<]-</image>',
+    szTplAnimate = '<animate>path="ui\\\\Image\\\\UICommon\\\\Talk_face.UITex" disablescale=1 group=%d name="%d" </animate>',
+    szTplImage = '<image>path="ui\\\\Image\\\\UICommon\\\\Talk_face.UITex" disablescale=1 frame=%d </image>',
+    szTplText = '<text>text="%s" </text>',
 }
 MY_Chat.bLockPostion = false
 MY_Chat.anchor = { x=10, y=-60, s="BOTTOMLEFT", r="BOTTOMLEFT" }
@@ -30,6 +35,7 @@ MY_Chat.bChatTime = true
 MY_Chat.nChatTime = CHAT_TIME.HOUR_MIN_SEC
 MY_Chat.bChatCopyAlwaysShowMask = false
 MY_Chat.bChatCopyAlwaysWhite = false
+MY_Chat.bReplaceIcon = false
 
 MY_Chat.tChannel = {
     ["Radio_Say"] = true,
@@ -57,6 +63,7 @@ RegisterCustomData("Account\\MY_Chat.bChatTime")
 RegisterCustomData("Account\\MY_Chat.nChatTime")
 RegisterCustomData("Account\\MY_Chat.bChatCopyAlwaysShowMask")
 RegisterCustomData("Account\\MY_Chat.bChatCopyAlwaysWhite")
+RegisterCustomData("Account\\MY_Chat.bReplaceIcon")
 for k, _ in pairs(MY_Chat.tChannel) do RegisterCustomData("Account\\MY_Chat.tChannel."..k) end
 
 MY_Chat.OnFrameDragEnd = function() this:CorrectPos() MY_Chat.anchor = GetFrameAnchor(this) end
@@ -381,10 +388,43 @@ MY.RegisterInit(function()
     end)
     -- load settings
     MY_Chat.frame:EnableDrag(not MY_Chat.bLockPostion)
+    -- init icon replace table
+    local tAnimate = MY.Chat.GetEmotion().animate
+    local tImage = MY.Chat.GetEmotion().image
+    _Cache.tReplaceIcon = { animate = {}, image = {} }
+    for s1, s2 in pairs(LoadLUAData('interface/MY/Chat/data/replace.dat') or {}) do
+        if tAnimate[s1] then
+            local nID1 = tAnimate[s1]
+            if tAnimate[s2] then _Cache.tReplaceIcon.animate[nID1] = string.format(_Cache.szTplAnimate , tAnimate[s2], tAnimate[s2])
+            elseif tImage[s2] then _Cache.tReplaceIcon.animate[nID1] = string.format(_Cache.szTplImage , tImage[s2])
+            else _Cache.tReplaceIcon.animate[nID1] = string.format(_Cache.szTplText , s2) end
+        elseif tImage[s1] then
+            local nID1 = tImage[s1]
+            if tAnimate[s2] then _Cache.tReplaceIcon.image[nID1] = string.format(_Cache.szTplAnimate , tAnimate[s2], tAnimate[s2])
+            elseif tImage[s2] then _Cache.tReplaceIcon.image[nID1] = string.format(_Cache.szTplImage , tImage[s2])
+            else _Cache.tReplaceIcon.image[nID1] = string.format(_Cache.szTplText , s2) end
+        end
+    end
 end)
 
 -- hook chat panel
 MY.HookChatPanel("MY_Chat", function(h, szMsg)
+    -- icon filter
+    if MY_Chat.bReplaceIcon then
+        szMsg = string.gsub(szMsg, _Cache.szFilterAnimate, function (s)
+            s = tonumber(s)
+            s = _Cache.tReplaceIcon.animate[s] or string.format(_Cache.szTplAnimate , s, s)
+            s = tostring(s)
+            return s
+        end)
+        szMsg = string.gsub(szMsg, _Cache.szFilterImage, function (s)
+            s = tonumber(s)
+            s = _Cache.tReplaceIcon.image[s] or string.format(_Cache.szTplImage , s)
+            s = tostring(s)
+            return s
+        end)
+    end
+    
     -- chat filter
     if MY_Chat.bBlockWords then
         local t = MY.Chat.FormatContent(szMsg)
