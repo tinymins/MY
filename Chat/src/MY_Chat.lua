@@ -35,6 +35,7 @@ MY_Chat.bChatTime = true
 MY_Chat.nChatTime = CHAT_TIME.HOUR_MIN_SEC
 MY_Chat.bChatCopyAlwaysShowMask = false
 MY_Chat.bChatCopyAlwaysWhite = false
+MY_Chat.bChatCopyNoCopySysmsg = true
 MY_Chat.bReplaceIcon = false
 
 MY_Chat.tChannel = {
@@ -258,6 +259,13 @@ MY.RegisterInit(function()
                 fnAction = function()
                     MY_Chat.bChatCopyAlwaysWhite = not MY_Chat.bChatCopyAlwaysWhite
                 end,
+                }, {
+                szOption = _L['hide system msg copy'],
+                bCheck = true,
+                bChecked = MY_Chat.bChatCopyNoCopySysmsg,
+                fnAction = function()
+                    MY_Chat.bChatCopyNoCopySysmsg = not MY_Chat.bChatCopyNoCopySysmsg
+                end,
                 },
             }, {
                 szOption = _L["chat filter"],
@@ -452,7 +460,7 @@ end, function(h, szMsg, i)
         local h2 = h:Lookup(i)
         if h2 and h2:GetType() == "Text" then
             local r, g, b = h2:GetFontColor()
-            if r == 255 and g == 255 and b == 0 then
+            if r == 255 and g == 255 and b == 0 and MY_Chat.bChatCopyNoCopySysmsg then
                 return
             end
             
