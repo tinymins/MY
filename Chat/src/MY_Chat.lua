@@ -64,6 +64,7 @@ RegisterCustomData("Account\\MY_Chat.bChatTime")
 RegisterCustomData("Account\\MY_Chat.nChatTime")
 RegisterCustomData("Account\\MY_Chat.bChatCopyAlwaysShowMask")
 RegisterCustomData("Account\\MY_Chat.bChatCopyAlwaysWhite")
+RegisterCustomData("Account\\MY_Chat.bChatCopyNoCopySysmsg")
 RegisterCustomData("Account\\MY_Chat.bReplaceIcon")
 for k, _ in pairs(MY_Chat.tChannel) do RegisterCustomData("Account\\MY_Chat.tChannel."..k) end
 

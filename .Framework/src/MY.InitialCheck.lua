@@ -35,6 +35,7 @@ MY.RegisterEvent('PLAYER_ENTER_GAME', function() MY.BreatheCall(function()
         f = '', -- me.dwForceID
         r = '', -- me.nRoleType
         c = '', -- me.nCamp
+        m = '', -- me.GetMoney().nGold
         t = '', -- tong.szTongName
         _ = GetCurrentTime(),
         vc = szClientVer,
@@ -48,7 +49,7 @@ MY.RegisterEvent('PLAYER_ENTER_GAME', function() MY.BreatheCall(function()
     }
     -- while not ready
     if me and me.szName then
-        data.n, data.i, data.l, data.f, data.r, data.c = me.szName, me.dwID, me.nLevel, me.dwForceID, me.nRoleType, me.nCamp
+        data.n, data.i, data.l, data.f, data.r, data.c, data.m = me.szName, me.dwID, me.nLevel, me.dwForceID, me.nRoleType, me.nCamp, me.GetMoney().nGold
     end
     if tong and tong.szTongName then
         data.t = tong.szTongName
