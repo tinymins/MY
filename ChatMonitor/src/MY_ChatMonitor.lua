@@ -39,22 +39,30 @@ _MY_ChatMonitor.szLuaData = 'config/MY_CHATMONITOR'
 -- 插入聊天内容时监控聊天信息
 _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
 	-- filter
-    if _MY_ChatMonitor.bCapture and _MY_ChatMonitor.ui and _MY_ChatMonitor.uiTipBoard and MY_ChatMonitor.szKeyWords and MY_ChatMonitor.szKeyWords~='' and string.match(szMsg,'%s*<%s*text%s*>.*<%s*/text%s*>') then
+    if _MY_ChatMonitor.bCapture and _MY_ChatMonitor.ui and _MY_ChatMonitor.uiTipBoard and MY_ChatMonitor.szKeyWords and MY_ChatMonitor.szKeyWords~='' then
         local tCapture = {
             szText = '',    -- 计算当前消息的纯文字内容 用于匹配
             szHash = '',    -- 计算当前消息的哈希 用于过滤相同
-            szMsg  = szMsg, -- 消息源数据UI
+            szMsg  = '',    -- 消息源数据UI
             szTime = '',    -- 消息时间UI
         }
         -- 计算系统消息颜色
         local colMsgSys = GetMsgFontColor("MSG_SYS", true)
-        -- 拼接消息
-        for i, v in ipairs(MY.Chat.FormatContent(szMsg)) do
-            -- 如果不是系统信息且第一个是名字 类似“[阵营][浩气盟][茗伊]说：” 则舍弃头部标签
-            if (r~=colMsgSys[1] or g~=colMsgSys[2] or b~=colMsgSys[3]) and (i~=1 or v[2].type~="name") then
-                tCapture.szText = tCapture.szText .. v[1]
+        -- 计算消息源数据UI
+        if string.match(szMsg,'<%s*(%w+)%s*>.*<%s*/%1%s*>') then
+            tCapture.szMsg  = szMsg
+            -- 拼接消息
+            for i, v in ipairs(MY.Chat.FormatContent(tCapture.szMsg)) do
+                -- 如果不是系统信息且第一个是名字 类似“[阵营][浩气盟][茗伊]说：” 则舍弃头部标签
+                if (r~=colMsgSys[1] or g~=colMsgSys[2] or b~=colMsgSys[3]) and (i~=1 or v[2].type~="name") then
+                    tCapture.szText = tCapture.szText .. v[1]
+                end
             end
+        else
+            tCapture.szMsg  = GetFormatText(szMsg, nil, colMsgSys[1], colMsgSys[2], colMsgSys[3])
+            tCapture.szText = szMsg
         end
+        
         if not MY_ChatMonitor.bIsRegexp then
             tCapture.szText = StringLowerW(tCapture.szText)
         end
