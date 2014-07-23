@@ -31,18 +31,39 @@ MY.Chat.RepeatChatLine = function(hTime)
 end
 
 -- 聊天表情初始化
-MY.Chat.InitFaceIcon = function()
-    if not _Cache.tFacIcon then
+_Cache.InitEmotion = function()
+    if not _Cache.tEmotion then
         local t = { image = {}, animate = {} }
         for i = 1, g_tTable.FaceIcon:GetRowCount() do
             local tLine = g_tTable.FaceIcon:GetRow(i)
             if tLine.szType == "animate" then
-                t.animate[tLine.nFrame] = { szCmd = tLine.szCommand, dwID = tLine.dwID }
+                t.animate[tLine.nFrame] = { szCmd = tLine.szCommand, nFrame = tLine.nFrame, dwID = tLine.dwID }
+                t.animate[tLine.szCommand] = t.animate[tLine.nFrame]
             else
-                t.image[tLine.nFrame] = { szCmd = tLine.szCommand, dwID = tLine.dwID }
+                t.image[tLine.nFrame] = { szCmd = tLine.szCommand, nFrame = tLine.nFrame, dwID = tLine.dwID }
+                t.image[tLine.szCommand] = t.image[tLine.nFrame]
             end
         end
-        _Cache.tFacIcon = t
+        _Cache.tEmotion = t
+    end
+end
+
+-- 获取聊天表情列表
+-- (table) MY.Chat.GetEmotion()
+-- (table) MY.Chat.GetEmotion(szCmd)
+-- (table) MY.Chat.GetEmotion(nFrame, bIsAnimate)
+MY.Chat.GetEmotion = function(arg0, arg1)
+    _Cache.InitEmotion()
+    if type(arg0)=="nil" then
+        return clone(_Cache.tEmotion)
+    elseif type(arg0)=="string" then
+        return _Cache.tEmotion.image[arg0] or _Cache.tEmotion.animate[arg0]
+    if type(arg0)=="number" then
+        if arg1 then
+            return _Cache.tEmotion.animate[arg0]
+        else
+            return _Cache.tEmotion.image[arg1]
+        end
     end
 end
 
@@ -55,7 +76,6 @@ MY.Chat.CopyChatLine = function(hTime)
     edit:ClearText()
     local h, i, bBegin = hTime:GetParent(), hTime:GetIndex(), nil
     -- loop
-    MY.Chat.InitFaceIcon()
     for i = i + 1, h:GetItemCount() - 1 do
         local p = h:Lookup(i)
         if p:GetType() == "Text" then
@@ -122,14 +142,14 @@ MY.Chat.CopyChatLine = function(hTime)
             end
         elseif p:GetType() == "Image" then
             local nFrame = p:GetFrame()
-            local tEmotion = _Cache.tFacIcon.image[nFrame]
+            local tEmotion = MY.Chat.GetEmotion(nFrame, false)
             if tEmotion then
                 edit:InsertObj(tEmotion.szCmd, { type = "emotion", text = tEmotion.szCmd, id = tEmotion.dwID })
             end
         elseif p:GetType() == "Animate" then
             local nGroup = tonumber(p:GetName())
             if nGroup then
-                local tEmotion = _Cache.tFacIcon.animate[nGroup]
+                local tEmotion = MY.Chat.GetEmotion(nGroup, true)
                 if tEmotion then
                     edit:InsertObj(tEmotion.szCmd, { type = "emotion", text = tEmotion.szCmd, id = tEmotion.dwID })
                 end
@@ -183,7 +203,6 @@ end
 
 --解析消息
 MY.Chat.FormatContent = function(szMsg)
-    MY.Chat.InitFaceIcon()
     local t = {}
     for n, w in string.gfind(szMsg, "<(%w+)>(.-)</%1>") do
         if w then
@@ -196,11 +215,11 @@ MY.Chat.FormatContent = function(szMsg)
         if not string.find(v, "name=") then
             if string.find(v, "frame=") then
                 local n = string.match(v, "frame=(%d+)")
-                local tEmotion = _Cache.tFacIcon.image[tonumber(n)]
+                local tEmotion = MY.Chat.GetEmotion(tonumber(n), false)
                 table.insert(t2, {tEmotion.szCmd, {type = "emotion", text = tEmotion.szCmd, id = tEmotion.dwID}})
             elseif string.find(v, "group=") then
                 local n = string.match(v, "group=(%d+)")
-                local tEmotion = _Cache.tFacIcon.animate[tonumber(n)]
+                local tEmotion = MY.Chat.GetEmotion(tonumber(n), true)
                 table.insert(t2, {tEmotion.szCmd, {type = "emotion", text = tEmotion.szCmd, id = tEmotion.dwID}})
             else
                 --普通文字
@@ -315,13 +334,6 @@ MY.SwitchChat = MY.Chat.SwitchChat
 
 -- parse faceicon in talking message
 MY.Chat.ParseFaceIcon = function(t)
-    if not _Cache.tFaceIcon then
-        _Cache.tFaceIcon = {}
-        for i = 1, g_tTable.FaceIcon:GetRowCount() do
-            local tLine = g_tTable.FaceIcon:GetRow(i)
-            _Cache.tFaceIcon[tLine.szCommand] = tLine.dwID
-        end
-    end
     local t2 = {}
     for _, v in ipairs(t) do
         if v.type ~= "text" then
@@ -340,8 +352,8 @@ MY.Chat.ParseFaceIcon = function(t)
                     for i = nPos + 6, nPos + 2, -2 do
                         if i <= nLen then
                             local szTest = string.sub(v.text, nPos, i)
-                            if _Cache.tFaceIcon[szTest] then
-                                szFace, dwFaceID = szTest, _Cache.tFaceIcon[szTest]
+                            if MY.Chat.GetEmotion(szTest) then
+                                szFace, dwFaceID = szTest, MY.Chat.GetEmotion(szTest).dwID
                                 nPos = nPos - 1
                                 break
                             end
