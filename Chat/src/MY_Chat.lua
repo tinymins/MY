@@ -459,33 +459,38 @@ end, function(h, szMsg, i)
     if (MY_Chat.bChatTime or MY_Chat.bChatCopy) and i then
         -- chat time
         local h2 = h:Lookup(i)
-        if h2 and h2:GetType() == "Text" then
-            local r, g, b = h2:GetFontColor()
+        -- check if timestrap can insert
+        local r, g, b = 255, 255, 0
+        if not h2 then
+            return
+        elseif h2:GetType() == "Text" then
+            r, g, b = h2:GetFontColor()
             if r == 255 and g == 255 and b == 0 and MY_Chat.bChatCopyNoCopySysmsg then
                 return
             end
-            
-            -- create timestrap text
-            local szTime = ""
-            if MY_Chat.bChatCopy and (MY_Chat.bChatCopyAlwaysShowMask or not MY_Chat.bChatTime) then
-                local _r, _g, _b = r, g, b
-                if MY_Chat.bChatCopyAlwaysWhite then
-                    _r, _g, _b = 255, 255, 255
-                end
-                szTime = GetFormatText(_L[" * "], 10, _r, _g, _b, 515, "this.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end", "copylink")
-            elseif MY_Chat.bChatCopyAlwaysWhite then
-                r, g, b = 255, 255, 255
-            end
-            if MY_Chat.bChatTime then
-                local t =TimeToDate(GetCurrentTime())
-                if MY_Chat.nChatTime == CHAT_TIME.HOUR_MIN_SEC then
-                    szTime = szTime .. GetFormatText(string.format("[%02d:%02d:%02d]", t.hour, t.minute, t.second), 10, r, g, b, 515, "this.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end", "timelink")
-                else
-                    szTime = szTime .. GetFormatText(string.format("[%02d:%02d]", t.hour, t.minute), 10, r, g, b, 515, "this.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end", "timelink")
-                end
-            end
-            -- insert timestrap text
-            h:InsertItemFromString(i, false, szTime)
+        elseif MY_Chat.bChatCopyNoCopySysmsg then
+            return
         end
+        -- create timestrap text
+        local szTime = ""
+        if MY_Chat.bChatCopy and (MY_Chat.bChatCopyAlwaysShowMask or not MY_Chat.bChatTime) then
+            local _r, _g, _b = r, g, b
+            if MY_Chat.bChatCopyAlwaysWhite then
+                _r, _g, _b = 255, 255, 255
+            end
+            szTime = GetFormatText(_L[" * "], 10, _r, _g, _b, 515, "this.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end", "copylink")
+        elseif MY_Chat.bChatCopyAlwaysWhite then
+            r, g, b = 255, 255, 255
+        end
+        if MY_Chat.bChatTime then
+            local t =TimeToDate(GetCurrentTime())
+            if MY_Chat.nChatTime == CHAT_TIME.HOUR_MIN_SEC then
+                szTime = szTime .. GetFormatText(string.format("[%02d:%02d:%02d]", t.hour, t.minute, t.second), 10, r, g, b, 515, "this.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end", "timelink")
+            else
+                szTime = szTime .. GetFormatText(string.format("[%02d:%02d]", t.hour, t.minute), 10, r, g, b, 515, "this.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end", "timelink")
+            end
+        end
+        -- insert timestrap text
+        h:InsertItemFromString(i, false, szTime)
     end
 end)
