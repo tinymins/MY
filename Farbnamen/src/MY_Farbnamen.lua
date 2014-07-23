@@ -5,6 +5,7 @@
 -- 2014年5月19日05:07:02
 --
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Farbnamen/lang/")
+local _SUB_ADDON_FOLDER_NAME_ = "Farbnamen"
 ---------------------------------------------------------------
 -- 设置和数据
 ---------------------------------------------------------------
@@ -155,21 +156,20 @@ function MY_Farbnamen.SaveData()
             table.remove(t.aCached)
         end
     end
-    MY.SaveLUAData(_MY_Farbnamen.szDataCache, MY.Json.Encode(t))
+    MY.SaveLUAData(MY.Json.Encode(t), _MY_Farbnamen.szDataCache, _SUB_ADDON_FOLDER_NAME_)
 end
 -- 加载配置
 function MY_Farbnamen.LoadData()
     -- 读取数据文件
-    local data = MY.LoadLUAData(_MY_Farbnamen.szDataCache) or {}
+    local data = MY.LoadLUAData(_MY_Farbnamen.szDataCache, _SUB_ADDON_FOLDER_NAME_) or {}
     -- 如果是Json格式的数据 则解码
     if type(data)=="string" then
         data = MY.Json.Decode(data) or {}
     end
     -- 解析数据
     local t = {
-        ['aCached']   = data.aCached   or {}   ,     -- 保存的用户表
-        -- ['nCached']   = data.nCached   or 0    ,     -- 当前缓存数量
-        ['nMaxCache'] = data.nMaxCache or 2000 ,     -- 最大缓存数量
+        ['aCached']   = data.aCached   or {} ,    -- 保存的用户表
+        ['nMaxCache'] = data.nMaxCache or 100,    -- 最大缓存数量
     }
     -- 转移旧版本数据
     for i=1, #data, 1 do
@@ -181,7 +181,7 @@ function MY_Farbnamen.LoadData()
     for _, p in ipairs(t.aCached) do
         _MY_Farbnamen.tPlayerCache[p.dwID] = p
     end
-    _MY_Farbnamen.tForceColor = MY.LoadLUAData(_MY_Farbnamen.szConfigPath, '') or _MY_Farbnamen.tForceColor
+    _MY_Farbnamen.tForceColor = MY.LoadLUAData(_MY_Farbnamen.szConfigPath, _SUB_ADDON_FOLDER_NAME_, true) or _MY_Farbnamen.tForceColor
     _MY_Farbnamen.nMaxCache = t.nMaxCache or _MY_Farbnamen.nMaxCache
 end
 --------------------------------------------------------------

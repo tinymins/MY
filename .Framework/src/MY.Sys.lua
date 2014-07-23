@@ -35,41 +35,88 @@ MY.GetLang = MY.Sys.GetLang
   # #     #   #       #     # # #     #       #       #       # #                 #   #       #  
 #######################################################################################################
 ]]
---[[ 保存数据文件：相对于data文件夹，自动区分客户端语言
-    MY.SaveLUAData( szFile, tData[, szLang] )
+--[[ 保存数据文件：相对于data文件夹
+    MY.SaveLUAData( szFileName, tData[, szSubAddonName][, bNoDistinguishLang] )
+    szFileName          数据文件名称
+    tData               要保存的数据
+    szSubAddonName      子插件目录名称
+    bNoDistinguishLang  是否自动区分客户端语言
 ]]
-MY.Sys.SaveLUAData = function(szFile, tData, szLang)
-    szFile = string.gsub(szFile, '/', '\\')
-    while(string.sub(szFile, 1, 1)=='\\') do
-        szFile = string.sub(szFile, 2)
+MY.Sys.SaveLUAData = function(tData, szFileName, szSubAddonName, bNoDistinguishLang)
+    local szFullName = ""
+    if type(szSubAddonName)=="string" then
+        szFullName = szFullName .. MY.GetAddonInfo().szRoot..szSubAddonName..'\\'
+    else
+        bNoDistinguishLang = szSubAddonName
+        szFullName = szFullName .. MY.GetAddonInfo().szFrameworkRoot
     end
-    if type(szLang)~='string' then
+    
+    szFileName = string.gsub(szFileName, '/', '\\')
+    while(string.sub(szFileName, 1, 1)=='\\') do
+        szFileName = string.sub(szFileName, 2)
+    end
+    szFullName = szFullName .. 'data\\' .. szFileName .. '.MYDATA'
+    
+    if not bNoDistinguishLang then
         local _, _, lang = GetVersion()
-        szLang = string.upper(lang)
+        lang = string.upper(lang)
+        if #lang>0 then
+            szFullName = szFullName .. '_' .. lang
+        end
     end
-    if #szLang>0 then szLang = '_'..szLang end
-    szFile = MY.GetAddonInfo().szFrameworkRoot..'data\\' .. szFile  .. '.MYDATA' .. szLang
-    SaveLUAData(szFile, tData)
+    return SaveLUAData(szFullName, tData)
 end
 MY.SaveLUAData = MY.Sys.SaveLUAData
---[[ 加载数据文件：相对于data文件夹，自动区分客户端语言
-    MY.LoadLUAData( szFile[, szLang] )
+--[[ 加载数据文件：相对于data文件夹
+    MY.LoadLUAData( szFileName[, szSubAddonName][, bNoDistinguishLang] )
+    szFileName          数据文件名称
+    szSubAddonName      子插件目录名称
+    bNoDistinguishLang  是否自动区分客户端语言
 ]]
-MY.Sys.LoadLUAData = function(szFile, szLang)
-    szFile = string.gsub(szFile, '/', '\\')
-    while(string.sub(szFile, 1, 1)=='\\') do
-        szFile = string.sub(szFile, 2)
+MY.Sys.LoadLUAData = function(szFileName, szSubAddonName, bNoDistinguishLang)
+    local szFullName = ""
+    if type(szSubAddonName)=="string" then
+        szFullName = szFullName .. MY.GetAddonInfo().szRoot..szSubAddonName..'\\'
+    else
+        bNoDistinguishLang = szSubAddonName
+        szFullName = szFullName .. MY.GetAddonInfo().szFrameworkRoot
     end
-    if type(szLang)~='string' then
+    
+    szFileName = string.gsub(szFileName, '/', '\\')
+    while(string.sub(szFileName, 1, 1)=='\\') do
+        szFileName = string.sub(szFileName, 2)
+    end
+    szFullName = szFullName .. 'data\\' .. szFileName .. '.MYDATA'
+    
+    if not bNoDistinguishLang then
         local _, _, lang = GetVersion()
-        szLang = string.upper(lang)
+        lang = string.upper(lang)
+        if #lang>0 then
+            szFullName = szFullName .. '_' .. lang
+        end
     end
-    if #szLang>0 then szLang = '_'..szLang end
-    szFile = MY.GetAddonInfo().szFrameworkRoot..'data\\' .. szFile  .. '.MYDATA' .. szLang
-    return LoadLUAData(szFile)
+    return LoadLUAData(szFullName)
 end
 MY.LoadLUAData = MY.Sys.LoadLUAData
 
+--[[ 保存用户数据 注意要在游戏初始化之后使用不然没有ClientPlayer对象
+    (data) MY.Sys.SaveUserData(szFile [,szSubAddonName])
+]]
+MY.Sys.SaveUserData = function(tData, szFileName, szSubAddonName, bNoDistinguishLang)
+    return MY.Sys.SaveLUAData(tData, szFileName.."_"..(MY.Game.GetServer()).."_"..GetClientPlayer().dwID, szSubAddonName, bNoDistinguishLang)
+end
+
+--[[ 加载用户数据 注意要在游戏初始化之后使用不然没有ClientPlayer对象
+    (data) MY.Sys.LoadUserData(szFile [,szSubAddonName])
+]]
+MY.Sys.LoadUserData = function(szFileName, szSubAddonName, bNoDistinguishLang)
+    return MY.Sys.LoadLUAData(szFileName.."_"..(MY.Game.GetServer()).."_"..GetClientPlayer().dwID, szSubAddonName, bNoDistinguishLang)
+end
+
+--szName [, szDataFile]
+MY.RegisterUserData = function(szName, szSubAddonName)
+    
+end
 --[[
 -- Remote Request
 #######################################################################################################
