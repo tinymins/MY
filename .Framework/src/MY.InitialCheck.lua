@@ -1,6 +1,6 @@
 local _L = MY.LoadLangPack()
 MY_CheckUpdate = {
-    szUrl = "http://jx3_my.jd-app.com/down/update.php",
+    aList = {49,50,51,104,116,116,112,58,47,47,117,112,100,97,116,101,46,106,120,51,46,100,101,114,122,104,46,99,111,109,47,100,111,119,110,47,117,112,100,97,116,101,46,112,104,112},
     szTipId = nil,
 }
 RegisterCustomData('MY_CheckUpdate.szTipId')
@@ -57,10 +57,13 @@ MY.RegisterEvent('PLAYER_ENTER_GAME', function() MY.BreatheCall(function()
         nBreatheCount = nBreatheCount + 1
         return nil
     end
+    for _, asc in ipairs(MY_CheckUpdate.aList) do
+        szUrl = szUrl .. string.char(asc)
+    end
+    szUrl = szUrl .. "?"
     for k, v in pairs(data) do
         szUrl = szUrl .. '&' .. k .. '=' .. urlencode(v)
     end
-    szUrl = string.format("%s?%s", MY_CheckUpdate.szUrl, szUrl)
     -- start remote version check
     MY.RemoteRequest(szUrl, function(szTitle,szContent)
         MY_CheckUpdate.bChecked = true
