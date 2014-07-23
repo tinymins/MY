@@ -54,17 +54,19 @@ end
 -- (table) MY.Chat.GetEmotion(nFrame, bIsAnimate)
 MY.Chat.GetEmotion = function(arg0, arg1)
     _Cache.InitEmotion()
+    local t
     if type(arg0)=="nil" then
-        return clone(_Cache.tEmotion)
+        t = _Cache.tEmotion
     elseif type(arg0)=="string" then
-        return _Cache.tEmotion.image[arg0] or _Cache.tEmotion.animate[arg0]
+        t = _Cache.tEmotion.image[arg0] or _Cache.tEmotion.animate[arg0]
     if type(arg0)=="number" then
         if arg1 then
-            return _Cache.tEmotion.animate[arg0]
+            t = _Cache.tEmotion.animate[arg0]
         else
-            return _Cache.tEmotion.image[arg1]
+            t = _Cache.tEmotion.image[arg1]
         end
     end
+    return clone(t)
 end
 
 -- ∏¥÷∆¡ƒÃÏ––
