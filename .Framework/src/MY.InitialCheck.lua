@@ -15,7 +15,7 @@ MY_CheckUpdate.GetValue = function(szText, szKey)
 end
 local urlencode = function(w)
     pattern="[^%w%d%._%-%* ]"
-    s=string.gsub(w,pattern,function(c)
+    local s=string.gsub(w,pattern,function(c)
         local c=string.format("%%%02X",string.byte(c))
         return c
     end)
