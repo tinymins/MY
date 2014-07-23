@@ -40,6 +40,9 @@ MY.Player.GetNearNpc = function(nLimit)
             _Cache.tNearNpc[dwID] = nil
         else
             i = i + 1
+            if npc.szName=="" then
+                npc.szName = string.gsub(Table_GetNpcTemplateName(npc.dwTemplateID), "^%s*(.-)%s*$", "%1")
+            end
             tNpc[dwID] = npc
             if nLimit and i == nLimit then break end
         end
