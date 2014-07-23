@@ -1,2 +1,4 @@
-﻿.Framework/data/PLAYER_INFO_CACHE/*
-.Framework/data/PLAYER_INFO_CACHE/逐鹿中原测试区_山雨欲来.MYDATA_ZHCN.jx3dat
+﻿
+@DATA/userdata/XLifeBar/*.jx3dat
+@DATA/cache/PLAYER_INFO/*.jx3dat
+\!src-dist/*
