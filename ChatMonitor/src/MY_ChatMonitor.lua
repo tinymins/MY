@@ -6,6 +6,7 @@
 -- 主要功能: 按关键字过滤获取聊天消息
 -- 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."ChatMonitor/lang/")
+local _SUB_ADDON_FOLDER_NAME_ = "ChatMonitor"
 MY_ChatMonitor = {}
 MY_ChatMonitor.szKeyWords = _L['CHAT_MONITOR_KEYWORDS_SAMPLE']
 MY_ChatMonitor.bIsRegexp = false
@@ -179,7 +180,7 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
     ui:append('Label_KeyWord','Text'):find('#Label_KeyWord'):pos(22,15):size(100,25):text(_L['key words:'])
     ui:append('EditBox_KeyWord','WndEditComboBox'):children('#EditBox_KeyWord'):pos(80,15):size(w-246,25):text(MY_ChatMonitor.szKeyWords):change(function(szText) MY_ChatMonitor.szKeyWords = szText end):menu(function()
         local edit, t = ui:children('#EditBox_KeyWord'), {}
-        for _, szOpt in ipairs(MY.LoadLUAData(_MY_ChatMonitor.szLuaData) or {}) do
+        for _, szOpt in ipairs(MY.LoadLUAData(_MY_ChatMonitor.szLuaData, _SUB_ADDON_FOLDER_NAME_) or {}) do
             if type(szOpt)=="string" then
                 table.insert(t, {
                     szOption = szOpt, {
@@ -188,11 +189,11 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
                     }, {
                         szOption = _L['delete'],
                         fnAction = function()
-                            local t = MY.LoadLUAData(_MY_ChatMonitor.szLuaData) or {}
+                            local t = MY.LoadLUAData(_MY_ChatMonitor.szLuaData, _SUB_ADDON_FOLDER_NAME_) or {}
                             for i = #t, 1, -1 do 
                                 if t[i] == szOpt then table.remove(t, i) end
                             end
-                            MY.SaveLUAData(_MY_ChatMonitor.szLuaData, t)
+                            MY.SaveLUAData(t, _MY_ChatMonitor.szLuaData, _SUB_ADDON_FOLDER_NAME_)
                         end
                     }
                 })
@@ -203,12 +204,12 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
             GetUserInput("", function(szVal)
                 szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
                 if szVal~="" then
-                    local t = MY.LoadLUAData(_MY_ChatMonitor.szLuaData) or {}
+                    local t = MY.LoadLUAData(_MY_ChatMonitor.szLuaData, _SUB_ADDON_FOLDER_NAME_) or {}
                     for i = #t, 1, -1 do 
                         if t[i] == szVal then return end
                     end
                     table.insert(t, szVal)
-                    MY.SaveLUAData(_MY_ChatMonitor.szLuaData, t)
+                    MY.SaveLUAData(t, _MY_ChatMonitor.szLuaData, _SUB_ADDON_FOLDER_NAME_)
                 end
             end, function() end, function() end, nil, edit:text() )
         end })
