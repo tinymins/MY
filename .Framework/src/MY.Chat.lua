@@ -63,7 +63,7 @@ MY.Chat.GetEmotion = function(arg0, arg1)
         if arg1 then
             t = _Cache.tEmotion.animate[arg0]
         else
-            t = _Cache.tEmotion.image[arg1]
+            t = _Cache.tEmotion.image[arg0]
         end
     end
     return clone(t)
@@ -143,7 +143,7 @@ MY.Chat.CopyChatLine = function(hTime)
                 end
             end
         elseif p:GetType() == "Image" then
-            local nFrame = p:GetFrame()
+            local nFrame = tonumber(p:GetFrame())
             local tEmotion = MY.Chat.GetEmotion(nFrame, false)
             if tEmotion then
                 edit:InsertObj(tEmotion.szCmd, { type = "emotion", text = tEmotion.szCmd, id = tEmotion.dwID })
