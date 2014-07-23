@@ -59,7 +59,7 @@ MY.Chat.GetEmotion = function(arg0, arg1)
         t = _Cache.tEmotion
     elseif type(arg0)=="string" then
         t = _Cache.tEmotion.image[arg0] or _Cache.tEmotion.animate[arg0]
-    if type(arg0)=="number" then
+    elseif type(arg0)=="number" then
         if arg1 then
             t = _Cache.tEmotion.animate[arg0]
         else
