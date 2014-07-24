@@ -49,12 +49,12 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
         -- 计算系统消息颜色
         local colMsgSys = GetMsgFontColor("MSG_SYS", true)
         -- 计算消息源数据UI
-        if string.match(szMsg,'<%s*(%w+)%s*>.*<%s*/%1%s*>') then
+        if bRich then
             tCapture.szMsg  = szMsg
             -- 拼接消息
-            for i, v in ipairs(MY.Chat.FormatContent(tCapture.szMsg)) do
+            for i, v in ipairs(MY.Chat.FormatContent(szMsg)) do
                 -- 如果不是系统信息且第一个是名字 类似“[阵营][浩气盟][茗伊]说：” 则舍弃头部标签
-                if (r~=colMsgSys[1] or g~=colMsgSys[2] or b~=colMsgSys[3]) and (i~=1 or v[2].type~="name") then
+                if (r==colMsgSys[1] and g==colMsgSys[2] and b==colMsgSys[3]) or (i~=1 or v[2].type~="name") then
                     tCapture.szText = tCapture.szText .. v[1]
                 end
             end
