@@ -33,38 +33,39 @@ end
 -- 聊天表情初始化
 _Cache.InitEmotion = function()
     if not _Cache.tEmotion then
-        local t = { image = {}, animate = {} }
+        local t = {}
         for i = 1, g_tTable.FaceIcon:GetRowCount() do
             local tLine = g_tTable.FaceIcon:GetRow(i)
-            if tLine.szType == "animate" then
-                t.animate[tLine.nFrame] = { szCmd = tLine.szCommand, nFrame = tLine.nFrame, dwID = tLine.dwID }
-                t.animate[tLine.szCommand] = t.animate[tLine.nFrame]
-            else
-                t.image[tLine.nFrame] = { szCmd = tLine.szCommand, nFrame = tLine.nFrame, dwID = tLine.dwID }
-                t.image[tLine.szCommand] = t.image[tLine.nFrame]
-            end
+            t[tLine.dwID] = {
+                nFrame = tLine.nFrame,
+                dwID   = tLine.dwID,
+                szCmd  = tLine.szCommand,
+                szType = tLine.szType,
+                szImageFile = tLine.szImageFile
+            }
+            t[tLine.szCommand] = t[tLine.dwID]
+            t[tLine.szImageFile..','..tLine.nFrame..','..tLine.szType] = t[tLine.dwID]
         end
         _Cache.tEmotion = t
     end
 end
 
--- 获取聊天表情列表
--- (table) MY.Chat.GetEmotion()
--- (table) MY.Chat.GetEmotion(szCmd)
--- (table) MY.Chat.GetEmotion(nFrame, bIsAnimate)
-MY.Chat.GetEmotion = function(arg0, arg1)
+--[[ 获取聊天表情列表
+    typedef emo table
+    (emo[]) MY.Chat.GetEmotion()                             -- 返回所有表情列表
+    (emo)   MY.Chat.GetEmotion(szCommand)                    -- 返回指定Cmd的表情
+    (emo)   MY.Chat.GetEmotion(szImageFile, nFrame, szType)  -- 返回指定图标的表情
+]]
+MY.Chat.GetEmotion = function(arg0, arg1, arg2)
     _Cache.InitEmotion()
     local t
-    if type(arg0)=="nil" then
+    if not arg0 then
         t = _Cache.tEmotion
-    elseif type(arg0)=="string" then
-        t = _Cache.tEmotion.image[arg0] or _Cache.tEmotion.animate[arg0]
-    elseif type(arg0)=="number" then
-        if arg1 then
-            t = _Cache.tEmotion.animate[arg0]
-        else
-            t = _Cache.tEmotion.image[arg0]
-        end
+    elseif not arg1 then
+        t = _Cache.tEmotion[arg0]
+    elseif arg2 then
+        arg0 = string.gsub(arg0, '\\\\', '\\')
+        t = _Cache.tEmotion[arg0..','..arg1..','..arg2]
     end
     return clone(t)
 end
@@ -142,18 +143,12 @@ MY.Chat.CopyChatLine = function(hTime)
                     break
                 end
             end
-        elseif p:GetType() == "Image" then
-            local nFrame = tonumber(p:GetFrame())
-            local tEmotion = MY.Chat.GetEmotion(nFrame, false)
-            if tEmotion then
-                edit:InsertObj(tEmotion.szCmd, { type = "emotion", text = tEmotion.szCmd, id = tEmotion.dwID })
-            end
-        elseif p:GetType() == "Animate" then
-            local nGroup = tonumber(p:GetName())
-            if nGroup then
-                local tEmotion = MY.Chat.GetEmotion(nGroup, true)
-                if tEmotion then
-                    edit:InsertObj(tEmotion.szCmd, { type = "emotion", text = tEmotion.szCmd, id = tEmotion.dwID })
+        elseif p:GetType() == "Image" or p:GetType() == "Animate" then
+            local dwID = tonumber(p:GetName())
+            if dwID then
+                local emo = MY.Chat.GetEmotion(dwID)
+                if emo then
+                    edit:InsertObj(emo.szCmd, { type = "emotion", text = emo.szCmd, id = emo.dwID })
                 end
             end
         end
@@ -217,12 +212,18 @@ MY.Chat.FormatContent = function(szMsg)
         if not string.find(v, "name=") then
             if string.find(v, "frame=") then
                 local n = string.match(v, "frame=(%d+)")
-                local tEmotion = MY.Chat.GetEmotion(tonumber(n), false)
-                table.insert(t2, {tEmotion.szCmd, {type = "emotion", text = tEmotion.szCmd, id = tEmotion.dwID}})
+                local p = string.match(v, 'path="(.-)"')
+                local emo = MY.Chat.GetEmotion(p, n, 'image')
+                if emo then
+                    table.insert(t2, {emo.szCmd, {type = "emotion", text = emo.szCmd, id = emo.dwID}})
+                end
             elseif string.find(v, "group=") then
                 local n = string.match(v, "group=(%d+)")
-                local tEmotion = MY.Chat.GetEmotion(tonumber(n), true)
-                table.insert(t2, {tEmotion.szCmd, {type = "emotion", text = tEmotion.szCmd, id = tEmotion.dwID}})
+                local p = string.match(v, 'path="(.-)"')
+                local emo = MY.Chat.GetEmotion(p, n, 'animate')
+                if emo then
+                    table.insert(t2, {emo.szCmd, {type = "emotion", text = emo.szCmd, id = emo.dwID}})
+                end
             else
                 --普通文字
                 local s = string.match(v, "\"(.*)\"")
@@ -354,8 +355,9 @@ MY.Chat.ParseFaceIcon = function(t)
                     for i = nPos + 6, nPos + 2, -2 do
                         if i <= nLen then
                             local szTest = string.sub(v.text, nPos, i)
-                            if MY.Chat.GetEmotion(szTest) then
-                                szFace, dwFaceID = szTest, MY.Chat.GetEmotion(szTest).dwID
+                            local emo = MY.Chat.GetEmotion(szTest)
+                            if emo then
+                                szFace, dwFaceID = szTest, emo.dwID
                                 nPos = nPos - 1
                                 break
                             end
@@ -500,6 +502,19 @@ end
 MY.HookChatPanel = MY.Chat.HookChatPanel
 
 _Cache.HookChatPanelHandle = function(h, szMsg)
+    -- add name to emotion icon
+    szMsg = string.gsub(szMsg, "<animate>.-path=\"(.-)\"(.-)group=(%d+).-</animate>", function (szImagePath, szExtra, szGroup)
+        local emo = MY.Chat.GetEmotion(szImagePath, szGroup, 'animate')
+        if emo then
+            return '<animate>path="'..szImagePath..'"'..szExtra..'group='..szGroup..' name="'..emo.dwID..'"</animate>'
+        end
+    end)
+    szMsg = string.gsub(szMsg, "<image>.-path=\"(.-)\"(.-)frame=(%d+).-</image>", function (szImagePath, szExtra, szFrame)
+        local emo = MY.Chat.GetEmotion(szImagePath, szFrame, 'image')
+        if emo then
+            return '<image>path="'..szImagePath..'"'..szExtra..'frame='..szFrame..' name="'..emo.dwID..'"</image>'
+        end
+    end)
     -- deal with fnBefore
     for i,handle in ipairs(_Cache.tHookChatFun) do
         -- try to execute fnBefore and get return values

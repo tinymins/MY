@@ -531,7 +531,7 @@ MY.Sysmsg = function(oContent, oTitle)
     oTitle = oTitle or MY.GetAddonInfo().szShortName
     if type(oTitle)~='table' then oTitle = { oTitle, bNoWrap = true } end
     if type(oContent)~='table' then oContent = { oContent, bNoWrap = true } end
-    oContent.r, oContent.g, oContent.b = oContent.r or 255, oContent.g or 255, oContent.b or 0
+    oContent.r, oContent.g, oContent.b, oContent.f = oContent.r or 255, oContent.g or 255, oContent.b or 0, oContent.f or 10
 
     for i = #oContent, 1, -1 do
         if type(oContent[i])=="number"  then oContent[i] = '' .. oContent[i] end
