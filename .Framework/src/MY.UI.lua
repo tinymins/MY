@@ -822,6 +822,24 @@ function _MY.UI:visiable(bVisiable)
     end
 end
 
+-- enable or disable elements
+function _MY.UI:enable(bEnable)
+    self:_checksum()
+    if type(bEnable)=='boolean' then
+        for _, ele in pairs(self.eles) do
+            pcall(function() (ele.chk or ele.wnd or ele.raw):Enable(bEnable) end)
+        end
+        return self
+    else -- get
+        -- select the first item
+        local ele = self.eles[1]
+        -- try to get its name
+        local status, err = pcall(function() return ele.raw:IsEnabled() end)
+        -- if succeed then return its name
+        if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:enable' ,1) return nil end
+    end
+end
+
 -- show/hide eles
 function _MY.UI:toggle(bShow)
     self:_checksum()
