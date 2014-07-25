@@ -60,6 +60,14 @@ _MY_TalkEx.tTrickChannels = {
     ['TONG'] = { szName = _L['tong channel'], tCol = GetMsgFontColor("MSG_GUILD", true) },
     ['TONG_ALLIANCE'] = { szName = _L['tong alliance channel'], tCol = GetMsgFontColor("MSG_GUILD_ALLIANCE", true) },
 }
+_MY_TalkEx.Talk = function()
+    if #MY_TalkEx.szTalk == 0 then MY.Sysmsg({_L["please input something."], r=255, g=0, b=0},nil) return end
+    -- 近聊不放在第一个会导致发不出去
+    if MY_TalkEx.tTalkChannel['NEARBY'] then MY.Talk(PLAYER_TALK_CHANNEL['NEARBY'],MY_TalkEx.szTalk) end
+    for szChannel, bSend in pairs(MY_TalkEx.tTalkChannel) do
+        if szChannel~="NEARBY" and bSend then MY.Talk(PLAYER_TALK_CHANNEL[szChannel],MY_TalkEx.szTalk) end
+    end
+end
 _MY_TalkEx.OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
     local w, h = ui:size()
@@ -84,12 +92,7 @@ _MY_TalkEx.OnPanelActive = function(wnd)
         local s = string.char(82)..string.char(101)..string.char(108)..string.char(111)..string.char(97)..string.char(100)
         ..string.char(85)..string.char(73)..string.char(65)..string.char(100)..string.char(100)..string.char(111)..string.char(110)
         if MY_TalkEx.szTalk==s.."()" and IsAltKeyDown() and IsShiftKeyDown() then pcall(_G[s]) return nil end
-        if #MY_TalkEx.szTalk == 0 then MY.Sysmsg({_L["please input something."], r=255, g=0, b=0},nil) return end
-        -- 近聊不放在第一个会导致发不出去
-        if MY_TalkEx.tTalkChannel['NEARBY'] then MY.Talk(PLAYER_TALK_CHANNEL['NEARBY'],MY_TalkEx.szTalk) end
-        for szChannel, bSend in pairs(MY_TalkEx.tTalkChannel) do
-            if szChannel~="NEARBY" and bSend then MY.Talk(PLAYER_TALK_CHANNEL[szChannel],MY_TalkEx.szTalk) end
-        end
+        _MY_TalkEx.Talk()
     end)
     -------------------------------------
     -- 调侃部分
@@ -183,3 +186,4 @@ _MY_TalkEx.OnPanelActive = function(wnd)
     end)
 end
 MY.RegisterPanel("TalkEx", _L["talk ex"], "UI/Image/UICommon/ScienceTreeNode.UITex|123", {255,255,0,200}, {OnPanelActive = _MY_TalkEx.OnPanelActive} )
+MY.Game.AddHotKey("MY_TalkEx_Talk", _L["TalkEx Talk"], function() _MY_TalkEx.Talk() end, nil)
