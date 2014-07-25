@@ -80,6 +80,7 @@ data = {
     ['whisper'] = '密聊',
     
     ['set hotkey'] = '设置快捷键',
+    ['>> set hotkey <<'] = '>> 设置快捷键 <<',
     
     -- MY.lua
     ['mingyi plugin'] = '茗伊插件',
