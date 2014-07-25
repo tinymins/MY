@@ -87,11 +87,13 @@ local Config = {
 	nSecondHeight = 30,
 	nPerHeight = 11,
 	nLifeHeight = 0,
-	nDistance = 50,
+	nDistance = 24,
 }
 
 
 XLifeBar = {}
+XLifeBar.bEnabled = false
+RegisterCustomData("XLifeBar.bEnabled")
 local _XLifeBar = {
 	dwVersion = 0x0000700,
 	szConfig = "userdata/XLifeBar/CFG",
@@ -118,8 +120,40 @@ end)
 _XLifeBar.GetMenu = function()
 	local menu = {
 		szOption = "扁平血条",
+		bCheck = true,
+		bChecked = XLifeBar.bEnabled,
+		fnAction = function()
+			XLifeBar.bEnabled = not XLifeBar.bEnabled
+			if not XLifeBar.bEnabled then
+				_XLifeBar.Reset(true)
+			end
+		end,
 	}
-	table.insert(menu,{	szOption = "扁平血条 By 临梧@梦江南" , bDisable = true})
+	table.insert(menu,{	szOption = "开启/关闭",
+		{
+			szOption = "开启",
+			bCheck = true,
+			bMCheck = true,
+			bChecked = XLifeBar.bEnabled,
+			fnAction = function()
+				XLifeBar.bEnabled = true
+				if not XLifeBar.bEnabled then
+					_XLifeBar.Reset(true)
+				end
+			end,
+		}, {
+			szOption = "关闭",
+			bCheck = true,
+			bMCheck = true,
+			bChecked = not XLifeBar.bEnabled,
+			fnAction = function()
+				XLifeBar.bEnabled = false
+				if not XLifeBar.bEnabled then
+					_XLifeBar.Reset(true)
+				end
+			end,
+		}
+	})
 	table.insert(menu,{	bDevide = true} )
 	-- 显示名字
 	table.insert(menu,{	szOption = "名字显示设置"})
@@ -623,6 +657,7 @@ function XLifeBar.OnFrameCreate()
 end
 
 function XLifeBar.OnFrameBreathe()
+	if not XLifeBar.bEnabled then return end
 	local me = GetClientPlayer()
 	if not me then return end
 	-- local _, _, fPitch = Camera_GetRTParams()
