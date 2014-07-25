@@ -58,7 +58,7 @@ _MY_ToolBox.OnPanelActive = function(wnd)
         end
         local IsGongZhan = function(obj)
             for k, v in pairs(MY.Player.GetBuffList(obj)) do
-                if string.find(Table_GetBuffName(v.dwID, v.nLevel), "共战") ~= nil then
+                if (not v.bCanCancel) and string.find(Table_GetBuffName(v.dwID, v.nLevel), "共战") ~= nil then
                     MY.Talk( PLAYER_TALK_CHANNEL.RAID, _L("检测到[%s]共战BUFF剩余%d秒。", obj.szName, FrameToSecondLeft(v.nEndFrame) ) )
                     return true
                 end
