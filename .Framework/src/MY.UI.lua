@@ -87,54 +87,56 @@ function _MY.UI:ctor(raw, tab)
     else
         -- farmat raw
         if type(raw)=="string" then raw = Station.Lookup(raw) end
-        -- format tab
-        local _tab = { raw = raw }
-        if type(tab)=="table" then for k, v in pairs(tab) do _tab[k]=v end end
-        _tab.type = raw.szMyuiType or raw:GetType()
-        if not _tab.txt and _tab.type == "Text"        then _tab.txt = raw end
-        if not _tab.img and _tab.type == "Image"       then _tab.img = raw end
-        if not _tab.chk and _tab.type == "WndCheckBox" then _tab.chk = raw end
-        if not _tab.chk and _tab.type == "WndRadioBox" then _tab.chk = raw end
-        if not _tab.edt and _tab.type == "WndEdit"     then _tab.edt = raw end
-        if not _tab.sdw and _tab.type == "Shadow"      then _tab.sdw = raw end
-        if not _tab.hdl and _tab.type == "Handle"      then _tab.hdl = raw end
-        if _tab.type=="WndEditBox" then
-            _tab.wnd = _tab.wnd or raw
-            _tab.hdl = _tab.hdl or raw:Lookup('','')
-            _tab.edt = _tab.edt or raw:Lookup('WndEdit_Default')
-            _tab.img = _tab.img or raw:Lookup('','Image_Default')
-        elseif _tab.type=="WndComboBox" then
-            _tab.wnd = _tab.wnd or raw
-            _tab.hdl = _tab.hdl or raw:Lookup('','')
-            _tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
-            _tab.txt = _tab.txt or raw:Lookup('','Text_Default')
-            _tab.img = _tab.img or raw:Lookup('','Image_Default')
-        elseif _tab.type=="WndEditComboBox" then
-            _tab.wnd = _tab.wnd or raw
-            _tab.hdl = _tab.hdl or raw:Lookup('','')
-            _tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
-            _tab.edt = _tab.edt or raw:Lookup('WndEdit_Default')
-            _tab.img = _tab.img or raw:Lookup('','Image_Default')
-        elseif _tab.type=="WndScrollBox" then
-            _tab.wnd = _tab.wnd or raw
-            _tab.hdl = _tab.hdl or raw:Lookup('','Handle_Scroll')
-            _tab.txt = _tab.txt or raw:Lookup('','Handle_Scroll'):Lookup('Text_Default')
-            _tab.img = _tab.img or raw:Lookup('','Image_Default')
-            _tab.sbu = _tab.sbu or raw:Lookup('WndButton_Up')
-            _tab.sbd = _tab.sbd or raw:Lookup('WndButton_Down')
-            _tab.sbn = _tab.sbn or raw:Lookup('WndNewScrollBar_Default')
-            _tab.shd = _tab.shd or raw:Lookup('','Handle_Scroll')
-        elseif _tab.type=="WndFrame" then
-            _tab.frm = _tab.frm or raw
-            _tab.wnd = _tab.wnd or raw:Lookup("Window_Main")
-            _tab.hdl = _tab.hdl or (_tab.wnd or _tab.frm):Lookup("", "")
-            _tab.txt = _tab.txt or raw:Lookup("", "Text_Title")
-        elseif string.sub(_tab.type, 1, 3) == "Wnd" then
-            _tab.wnd = _tab.wnd or raw
-            _tab.hdl = _tab.hdl or raw:Lookup('','')
-            _tab.txt = _tab.txt or raw:Lookup('','Text_Default')
-        else _tab.itm = raw end
-        if raw then table.insert( self.eles, _tab ) end
+        if raw then
+            -- format tab
+            local _tab = { raw = raw }
+            if type(tab)=="table" then for k, v in pairs(tab) do _tab[k]=v end end
+            _tab.type = raw.szMyuiType
+            if not _tab.txt and _tab.type == "Text"        then _tab.txt = raw end
+            if not _tab.img and _tab.type == "Image"       then _tab.img = raw end
+            if not _tab.chk and _tab.type == "WndCheckBox" then _tab.chk = raw end
+            if not _tab.chk and _tab.type == "WndRadioBox" then _tab.chk = raw end
+            if not _tab.edt and _tab.type == "WndEdit"     then _tab.edt = raw end
+            if not _tab.sdw and _tab.type == "Shadow"      then _tab.sdw = raw end
+            if not _tab.hdl and _tab.type == "Handle"      then _tab.hdl = raw end
+            if _tab.type=="WndEditBox" then
+                _tab.wnd = _tab.wnd or raw
+                _tab.hdl = _tab.hdl or raw:Lookup('','')
+                _tab.edt = _tab.edt or raw:Lookup('WndEdit_Default')
+                _tab.img = _tab.img or raw:Lookup('','Image_Default')
+            elseif _tab.type=="WndComboBox" then
+                _tab.wnd = _tab.wnd or raw
+                _tab.hdl = _tab.hdl or raw:Lookup('','')
+                _tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
+                _tab.txt = _tab.txt or raw:Lookup('','Text_Default')
+                _tab.img = _tab.img or raw:Lookup('','Image_Default')
+            elseif _tab.type=="WndEditComboBox" then
+                _tab.wnd = _tab.wnd or raw
+                _tab.hdl = _tab.hdl or raw:Lookup('','')
+                _tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
+                _tab.edt = _tab.edt or raw:Lookup('WndEdit_Default')
+                _tab.img = _tab.img or raw:Lookup('','Image_Default')
+            elseif _tab.type=="WndScrollBox" then
+                _tab.wnd = _tab.wnd or raw
+                _tab.hdl = _tab.hdl or raw:Lookup('','Handle_Scroll')
+                _tab.txt = _tab.txt or raw:Lookup('','Handle_Scroll'):Lookup('Text_Default')
+                _tab.img = _tab.img or raw:Lookup('','Image_Default')
+                _tab.sbu = _tab.sbu or raw:Lookup('WndButton_Up')
+                _tab.sbd = _tab.sbd or raw:Lookup('WndButton_Down')
+                _tab.sbn = _tab.sbn or raw:Lookup('WndNewScrollBar_Default')
+                _tab.shd = _tab.shd or raw:Lookup('','Handle_Scroll')
+            elseif _tab.type=="WndFrame" then
+                _tab.frm = _tab.frm or raw
+                _tab.wnd = _tab.wnd or raw:Lookup("Window_Main")
+                _tab.hdl = _tab.hdl or (_tab.wnd or _tab.frm):Lookup("", "")
+                _tab.txt = _tab.txt or raw:Lookup("", "Text_Title")
+            elseif string.sub(_tab.type, 1, 3) == "Wnd" then
+                _tab.wnd = _tab.wnd or raw
+                _tab.hdl = _tab.hdl or raw:Lookup('','')
+                _tab.txt = _tab.txt or raw:Lookup('','Text_Default')
+            else _tab.itm = raw end
+            table.insert( self.eles, _tab )
+        end
     end
     return self
 end
