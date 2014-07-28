@@ -91,7 +91,7 @@ function _MY.UI:ctor(raw, tab)
             -- format tab
             local _tab = { raw = raw }
             if type(tab)=="table" then for k, v in pairs(tab) do _tab[k]=v end end
-            _tab.type = raw.szMyuiType
+            _tab.type = raw.szMyuiType or raw:GetType()
             if not _tab.txt and _tab.type == "Text"        then _tab.txt = raw end
             if not _tab.img and _tab.type == "Image"       then _tab.img = raw end
             if not _tab.chk and _tab.type == "WndCheckBox" then _tab.chk = raw end
