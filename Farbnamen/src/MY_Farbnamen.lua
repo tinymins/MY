@@ -14,10 +14,22 @@ MY_Farbnamen = MY_Farbnamen or {
 }
 RegisterCustomData("Account\\MY_Farbnamen.bEnabled")
 local _MY_Farbnamen = {
-    nMaxCache= 2000,
+    nMaxCache= 200,
     szConfigPath = "config/PLAYER_FORCE_COLOR",
     szDataCache  = "cache/PLAYER_INFO/" .. (MY.Game.GetServer()),
-    tForceColor  = {},
+    tForceColor  =  {
+        [0]  = { 255, 255, 255 },       --江湖
+        [1]  = { 255, 178, 95  },       --少林
+        [2]  = { 196, 152, 255 },       --万花
+        [3]  = { 255, 111, 83  },       --天策
+        [4]  = { 89 , 224, 232 },       --纯阳
+        [5]  = { 255, 129, 176 },       --七秀
+        [6]  = { 55 , 147, 255 },       --五毒
+        [7]  = { 121, 183, 54  },       --唐门
+        [8]  = { 214, 249, 93  },       --藏剑
+        [9]  = { 205, 133, 63  },       --丐帮
+        [10] = { 240, 70 , 96  },       --明教
+    },
     tForceString = {
         [0]  = _L['JiangHu'],
         [1]  = _L['ShaoLin'],
