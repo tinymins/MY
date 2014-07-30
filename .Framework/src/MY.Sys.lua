@@ -165,7 +165,8 @@ _Cache.DoRemoteRequest = function()
                     -- 获取请求队列首部元素
                     local rr = _Cache.tRequest[1]
                     -- 判断当前页面是否符合请求
-                    if rr.szUrl == szUrl and ( szUrl ~= szTitle or szContent ) then
+                    if szUrl ~= szTitle or szContent~="" then
+                        -- 处理请求回调
                         MY.Debug(string.format("\n [RemoteRequest - OnDocumentComplete]\n [U] %s\n [T] %s\n", szUrl, szTitle),'MYRR',0)
                         -- 注销超时处理时钟
                         MY.DelayCall("MY_Remote_Request_Timeout")
