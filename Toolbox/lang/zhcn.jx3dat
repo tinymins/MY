@@ -6,4 +6,21 @@ data = {
     
     ['check nearby gongzhan'] = '检测附近共战',
     ['Detected [%s] has Gongzhan BUFF for %d second(s).'] = "检测到[%s]共战BUFF剩余%d秒。",
+    
+    ['* infomation tips'] = '※ 信息条（SHIFT+U移动位置）',
+    
+    ['fps monitor'] = '游戏帧数',
+    ['target distance'] = '目标距离',
+    ['system time'] = '系统时间',
+    ['fight clock'] = '战斗计时',
+    ['lotus clock'] = '藕和桂花',
+    ['show background'] = '显示背景条',
+    
+    ['FPS: %d'] = 'FPS：%d',
+    ['No Target'] = '没有目标',
+    ['Distance: %d Foot'] = '目标距离：%d尺',
+    ['Time: %02d:%02d:%02d'] = '系统时间：%02d:%02d:%02d',
+    ['Never Fight'] = '打一架再说',
+    ['Fight Clock: %d:%02d:%02d'] = '战斗计时：%d:%02d:%02d',
+    ['Lotus Clock: %d:%d:%d'] = '藕和桂花：%d:%d:%d',
 }
