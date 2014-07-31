@@ -637,10 +637,10 @@ function HP:DrawLife(Lifeper,col)
 		local Life = (Config.nWidth - 4) * Lifeper
 
 		
-		sha:AppendCharacterID(self.dwID,true,r,g,b,200,{0,0,0,bcX,bcY})
-		sha:AppendCharacterID(self.dwID,true,r,g,b,200,{0,0,0,bcX+Life,bcY})
-		sha:AppendCharacterID(self.dwID,true,r,g,b,200,{0,0,0,bcX+Life,bcY+(Config.nHeight - 4)})
-		sha:AppendCharacterID(self.dwID,true,r,g,b,200,{0,0,0,bcX,bcY+(Config.nHeight - 4)})
+		sha:AppendCharacterID(self.dwID,true,r,g,b,100,{0,0,0,bcX,bcY})
+		sha:AppendCharacterID(self.dwID,true,r,g,b,100,{0,0,0,bcX+Life,bcY})
+		sha:AppendCharacterID(self.dwID,true,r,g,b,100,{0,0,0,bcX+Life,bcY+(Config.nHeight - 4)})
+		sha:AppendCharacterID(self.dwID,true,r,g,b,100,{0,0,0,bcX,bcY+(Config.nHeight - 4)})
 	end
 	return self
 end
