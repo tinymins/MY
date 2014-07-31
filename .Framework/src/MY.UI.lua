@@ -1451,8 +1451,29 @@ function _MY.UI:customMode(szTip, fnOnEnterCustomMode, fnOnLeaveCustomMode)
         end):onevent("ON_LEAVE_CUSTOM_UI_MODE", function()
             UpdateCustomModeWindow(this, szTip, true)
         end)
-        if type(fnOnEnterCustomMode)=="function" then self:onevent("ON_ENTER_CUSTOM_UI_MODE", fnOnEnterCustomMode) end
-        if type(fnOnLeaveCustomMode)=="function" then self:onevent("ON_LEAVE_CUSTOM_UI_MODE", fnOnLeaveCustomMode) end
+        if type(fnOnEnterCustomMode)=="function" then
+            self:onevent("ON_ENTER_CUSTOM_UI_MODE", function()
+                pcall(fnOnEnterCustomMode, GetFrameAnchor(this))
+            end)
+        end
+        if type(fnOnLeaveCustomMode)=="function" then
+            self:onevent("ON_LEAVE_CUSTOM_UI_MODE", function()
+                pcall(fnOnLeaveCustomMode, GetFrameAnchor(this))
+            end)
+        end
+    end
+    return self
+end
+
+--[[ breathe …Ë÷√Frameµƒbreathe
+    (self) Instance:breathe(function fnOnFrameBreathe)
+]]
+function _MY.UI:breathe(fnOnFrameBreathe)
+    self:_checksum()
+    if type(fnOnFrameBreathe)=="function" then
+        for _, ele in pairs(self.eles) do
+            if ele.frm then MY.UI.RegisterUIEvent(ele.frm, "OnFrameBreathe", fnOnFrameBreathe) end
+        end
     end
     return self
 end
