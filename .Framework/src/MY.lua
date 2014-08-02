@@ -126,8 +126,8 @@ MY = { }
 #######################################################################################################
 ]]
 local _DEBUG_ = 4
-local _BUILD_ = "20140725"
-local _VERSION_ = 0x1000100
+local _BUILD_ = "20140801"
+local _VERSION_ = 0x1000200
 local _ADDON_ROOT_ = '\\Interface\\MY\\'
 local _FRAMEWORK_ROOT_ = '\\Interface\\MY\\.Framework\\'
 
@@ -173,6 +173,7 @@ local _MY = {
     szName = _L["mingyi plugins"],
     szShortName = _L["mingyi plugin"],
     szIniFile = _FRAMEWORK_ROOT_.."ui\\MY.ini",
+    szUITexPath = _FRAMEWORK_ROOT_.."image\\UIImage.UITex",
     szIniFileTabBox = _FRAMEWORK_ROOT_.."ui\\WndTabBox.ini",
     szIniFileMainPanel = _FRAMEWORK_ROOT_.."ui\\MainPanel.ini",
     
@@ -184,6 +185,7 @@ MY.GetAddonInfo = function()
     local t = {}
     t.szName      = _MY.szName
     t.szShortName = _MY.szShortName
+    t.szUITexPath = _MY.szUITexPath
     t.dwVersion   = _VERSION_
     t.szBuildDate = _BUILD_
     t.nDebugLevel = _DEBUG_

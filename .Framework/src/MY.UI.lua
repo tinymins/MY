@@ -379,38 +379,57 @@ function _MY.UI:children(filter)
     self:_checksum()
     local child = {}
     local childHash = {}
-    for _, ele in pairs(self.eles) do
-        if ele.raw:GetType() == "Handle" then
-            for i = 0, ele.raw:GetItemCount() - 1, 1 do
-                if not childHash[table.concat({ ele.raw:Lookup(i):GetTreePath(), i })] then
-                    table.insert(child, ele.raw:Lookup(i))
-                    childHash[table.concat({ table.concat({ ele.raw:Lookup(i):GetTreePath() }), i })] = true
+    if string.sub(filter, 1, 1)=="#" then
+        filter = string.sub(filter, 2)
+        for _, ele in pairs(self.eles) do
+            table.insert(child, ele.raw:Lookup(filter))
+            childHash[table.concat({ table.concat({ ele.raw:Lookup(filter):GetTreePath() }), filter })] = true
+        end
+        local eles = {}
+        for _, raw in ipairs(child) do
+            -- insert into eles
+            table.insert( eles, self:raw2ele(raw) )
+        end
+        return self:clone(eles)
+    else
+        for _, ele in pairs(self.eles) do
+            if ele.raw:GetType() == "Handle" then
+                for i = 0, ele.raw:GetItemCount() - 1, 1 do
+                    if not childHash[table.concat({ ele.raw:Lookup(i):GetTreePath(), i })] then
+                        table.insert(child, ele.raw:Lookup(i))
+                        childHash[table.concat({ table.concat({ ele.raw:Lookup(i):GetTreePath() }), i })] = true
+                    end
                 end
-            end
-        else
-            -- 子handle
-            local status, handle = pcall(function() return ele.raw:Lookup('','') end) -- raw可能没有Lookup方法 用pcall包裹
-            if status and handle and not childHash[table.concat{handle:GetTreePath(),'/Handle'}] then
-                table.insert(child, handle)
-                childHash[table.concat({handle:GetTreePath(),'/Handle'})] = true
-            end
-            -- 子窗体
-            local status, sub_raw = pcall(function() return ele.raw:GetFirstChild() end) -- raw可能没有GetFirstChild方法 用pcall包裹
-            while status and sub_raw do
-                if not childHash[table.concat{sub_raw:GetTreePath()}] then
-                    table.insert( child, sub_raw )
-                    childHash[table.concat({sub_raw:GetTreePath()})] = true
+            else
+                -- 子handle
+                local status, handle = pcall(function() return ele.raw:Lookup('','') end) -- raw可能没有Lookup方法 用pcall包裹
+                if status and handle and not childHash[table.concat{handle:GetTreePath(),'/Handle'}] then
+                    table.insert(child, handle)
+                    childHash[table.concat({handle:GetTreePath(),'/Handle'})] = true
                 end
-                sub_raw = sub_raw:GetNext()
+                -- 子窗体
+                local status, sub_raw = pcall(function() return ele.raw:GetFirstChild() end) -- raw可能没有GetFirstChild方法 用pcall包裹
+                while status and sub_raw do
+                    if not childHash[table.concat{sub_raw:GetTreePath()}] then
+                        table.insert( child, sub_raw )
+                        childHash[table.concat({sub_raw:GetTreePath()})] = true
+                    end
+                    sub_raw = sub_raw:GetNext()
+                end
             end
         end
+        local eles = {}
+        for _, raw in ipairs(child) do
+            -- insert into eles
+            table.insert( eles, self:raw2ele(raw) )
+        end
+        return self:clone(eles):filter(filter)
     end
-    local eles = {}
-    for _, raw in ipairs(child) do
-        -- insert into eles
-        table.insert( eles, self:raw2ele(raw) )
-    end
-    return self:clone(eles):filter(filter)
+end
+
+-- get child-item
+function _MY.UI:item(filter)
+    return self:hdl():children(filter)
 end
 
 -- find ele
@@ -547,9 +566,15 @@ end
 function _MY.UI:hdl(index)
     self:_checksum()
     local eles = {}
-    if index < 0 then index = #eles + index + 1 end
-    if index > 0 and index <= #self.eles and self.eles[index].hdl then
-        table.insert(eles, { raw = self.eles[index].hdl })
+    if index then
+        if index < 0 then index = #eles + index + 1 end
+        if index > 0 and index <= #self.eles and self.eles[index].hdl then
+            table.insert(eles, { raw = self.eles[index].hdl })
+        end
+    else
+        for _, ele in ipairs(self.eles) do
+            table.insert(eles, { raw = ele.hdl })
+        end
     end
     return self:clone(eles)
 end
@@ -680,20 +705,24 @@ function _MY.UI:append(szName, szType, tArg)
                         wnd.bShowPercentage = true
                         wnd.nOffset = 0
                         wnd.tMyOnChange = {}
-                        wnd:Lookup("WndNewScrollBar_Default").FormatText = function(value)
-                            return value
+                        wnd:Lookup("WndNewScrollBar_Default").FormatText = function(value, bPercentage)
+                            if bPercentage then
+                                return string.format("%.2f%%", value)
+                            else
+                                return value
+                            end
                         end
                         wnd:Lookup("WndNewScrollBar_Default").OnScrollBarPosChanged = function()
                             local fnFormat = wnd:Lookup("WndNewScrollBar_Default").FormatText
                             if wnd.bShowPercentage then
                                 local nCurrentPercentage = this:GetScrollPos() * 100 / this:GetStepCount()
-                                wnd:Lookup("", "Text_Default"):SetText(fnFormat(nCurrentPercentage..'%'))
+                                wnd:Lookup("", "Text_Default"):SetText(fnFormat(nCurrentPercentage, true))
                                 for _, fn in ipairs(wnd.tMyOnChange) do
                                     pcall(fn, nCurrentPercentage)
                                 end
                             else
                                 local nCurrentValue = this:GetScrollPos() + wnd.nOffset
-                                wnd:Lookup("", "Text_Default"):SetText(fnFormat(nCurrentValue))
+                                wnd:Lookup("", "Text_Default"):SetText(fnFormat(nCurrentValue, false))
                                 for _, fn in ipairs(wnd.tMyOnChange) do
                                     pcall(fn, nCurrentValue)
                                 end
@@ -1815,6 +1844,46 @@ MY.UI.CreateFrame = function(szName, bEmpty, bLowest)
         end
     end
     return MY.UI(frm)
+end
+-- 打开取色板
+MY.UI.OpenColorPicker = function(callback, t)
+    OpenColorTablePanel(callback,nil,nil,t or {
+        { r = 0,   g = 255, b = 0  },
+        { r = 0,   g = 255, b = 255},
+        { r = 255, g = 0  , b = 0  },
+        { r = 40,  g = 140, b = 218},
+        { r = 211, g = 229, b = 37 },
+        { r = 65,  g = 50 , b = 160},
+        { r = 170, g = 65 , b = 180},
+    })
+end
+-- 打开字体选择
+MY.UI.OpenFontPicker = function(callback, t)
+    local clientW, clientH = Station.GetClientSize()
+    local w, h = 820, 650
+    local ui = MY.UI.CreateFrame("_MY_Color_Picker", true):size(w,h):pos((clientW-w)/2,(clientH-h)/2):drag(true):drag(0,0,w,h)
+    PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
+    ui:append('Image_bg',"Image"):item('#Image_bg'):image(MY.GetAddonInfo().szUITexPath,1):size(w,h):alpha(150)
+    ui:append("Text_Close", "WndButton"):children("#Text_Close"):pos((w-150)/2, h-30):width(150)
+      :text(_L['close']):click(function() PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame);ui:remove() end)
+    for i = 0, 255 do
+        local txt = ui:append("Text_"..i, "Text"):item("#Text_"..i)
+          :width(70)
+          :pos(i % 10 * 80+20, math.floor(i / 10) * 25+20)
+          :text(_L("Font %d", i))
+          :font(i):alpha(155)
+          :click(function()
+            pcall(callback,i)
+            PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
+            ui:remove()
+          end)
+          :hover(function()
+            MY.UI(this):alpha(255)
+          end,function()
+            MY.UI(this):alpha(155)
+          end)
+        if txt:font()~=i then txt:remove() end
+    end
 end
 
 -- 打开浏览器
