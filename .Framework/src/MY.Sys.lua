@@ -111,6 +111,29 @@ end
 MY.RegisterUserData = function(szName, szFileName)
     
 end
+
+--[[ 播放声音
+    MY.Sys.PlaySound(szFilePath[, szCustomPath])
+    szFilePath   音频文件地址
+    szCustomPath 个性化音频文件地址
+    注：优先播放szCustomPath, szCustomPath不存在才会播放szFilePath
+]]
+MY.Sys.PlaySound = function(szFilePath, szCustomPath)
+    szCustomPath = szCustomPath or szFilePath
+    -- 统一化目录分隔符
+    szCustomPath = string.gsub(szCustomPath, '\\', '/')
+    -- 如果是相对路径则从/@Custom/补全
+    if string.sub(szCustomPath, 1, 1)~='/' then szCustomPath = MY.GetAddonInfo().szRoot .. "@Custom/" .. szCustomPath end
+    if IsFileExist(szCustomPath) then
+        PlaySound(SOUND.UI_SOUND, szCustomPath)
+    else
+        -- 统一化目录分隔符
+        szFilePath = string.gsub(szFilePath, '\\', '/')
+        -- 如果是相对路径则从/@Custom/补全
+        if string.sub(szFilePath, 1, 1)~='/' then szFilePath = MY.GetAddonInfo().szFrameworkRoot .. "audio/" .. szFilePath end
+        PlaySound(SOUND.UI_SOUND, szFilePath)
+    end
+end
 --[[
 -- Remote Request
 #######################################################################################################
