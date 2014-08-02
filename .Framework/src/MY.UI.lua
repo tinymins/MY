@@ -680,16 +680,20 @@ function _MY.UI:append(szName, szType, tArg)
                         wnd.bShowPercentage = true
                         wnd.nOffset = 0
                         wnd.tMyOnChange = {}
+                        wnd:Lookup("WndNewScrollBar_Default").FormatText = function(value)
+                            return value
+                        end
                         wnd:Lookup("WndNewScrollBar_Default").OnScrollBarPosChanged = function()
+                            local fnFormat = wnd:Lookup("WndNewScrollBar_Default").FormatText
                             if wnd.bShowPercentage then
                                 local nCurrentPercentage = this:GetScrollPos() * 100 / this:GetStepCount()
-                                wnd:Lookup("", "Text_Default"):SetText(nCurrentPercentage..'%')
+                                wnd:Lookup("", "Text_Default"):SetText(fnFormat(nCurrentPercentage..'%'))
                                 for _, fn in ipairs(wnd.tMyOnChange) do
                                     pcall(fn, nCurrentPercentage)
                                 end
                             else
                                 local nCurrentValue = this:GetScrollPos() + wnd.nOffset
-                                wnd:Lookup("", "Text_Default"):SetText(nCurrentValue)
+                                wnd:Lookup("", "Text_Default"):SetText(fnFormat(nCurrentValue))
                                 for _, fn in ipairs(wnd.tMyOnChange) do
                                     pcall(fn, nCurrentValue)
                                 end
@@ -885,10 +889,14 @@ function _MY.UI:text(szText)
     self:_checksum()
     if szText then
         for _, ele in pairs(self.eles) do
-            pcall(function() (ele.txt or ele.edt or ele.raw):SetText(szText) end)
-            pcall(function() (ele.txt or ele.edt or ele.raw):GetParent():FormatAllItemPos() end)
-            if ele.sbu then
+            if type(szText)~="function" then
+                pcall(function() (ele.txt or ele.edt or ele.raw):SetText(szText) end)
+                pcall(function() (ele.txt or ele.edt or ele.raw):GetParent():FormatAllItemPos() end)
+            end
+            if ele.type == "WndScrollBox" then
                 ele.raw.UpdateScroll()
+            elseif ele.type == "WndSliderBox" and type(szText)=="function" then
+                ele.sld.FormatText = szText
             end
         end
         return self
@@ -1744,6 +1752,9 @@ MY.Const.UI.Tip.POS_RIGHT        = 2
 MY.Const.UI.Tip.POS_TOP          = 3
 MY.Const.UI.Tip.POS_BOTTOM       = 4
 MY.Const.UI.Tip.POS_RIGHT_BOTTOM = 5
+MY.Const.UI.Slider = MY.Const.UI.Slider or {}
+MY.Const.UI.Slider.SHOW_VALUE    = false
+MY.Const.UI.Slider.SHOW_PERCENT  = true
 
 MY.Const.UI.Tip.NO_HIDE      = 100
 MY.Const.UI.Tip.HIDE         = 101
