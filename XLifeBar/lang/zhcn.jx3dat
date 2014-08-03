@@ -1,0 +1,36 @@
+-- language data (zhcn) updated at 2014-4-10 03:38:11
+data = {
+    ['x lifebar'] = '扁平血条',
+    
+    ['name display config'] = '名字显示设置',
+    ['player name display'] = '玩家名字显示',
+    ['npc name display'] = 'Npc名字显示',
+    
+    ['title display config'] = '称号显示设置',
+    ['player title display'] = '玩家称号显示',
+    ['npc title display'] = 'Npc称号显示',
+    
+    ['tong display config'] = '帮会显示设置',
+    ['player tong display'] = '玩家帮会显示',
+    
+    ['lifebar display config'] = '血条显示设置',
+    ['player lifebar display'] = '玩家血条显示',
+    ['npc lifebar display'] = 'Npc血条显示',
+    
+    ['lifepercentage display config'] = '血量百分比显示设置',
+    ['player lifepercentage display'] = '玩家百分比显示',
+    ['npc lifepercentage display'] = 'Npc百分比显示',
+    
+    ['show special npc'] = '显示特殊Npc',
+    
+    ['Max Distance: %s foot.'] = '最大显示距离：%s尺。',
+    ['Font: %d'] = '字体：%d',
+    ['lifebar width: %s px.'] = '血条长度%spx。',
+    ['lifebar height: %s px.'] = '血条高度%spx。',
+    ['lifebar alpha: %.0f%%.'] = '血条透明度%.0f%%。',
+    ['1st line offset-y: %d px.'] = '第一行字高度偏移%spx。',
+    ['2nd line offset-y: %d px.'] = '第二行字高度偏移%spx。',
+    ['3rd line offset-y: %d px.'] = '第三行字高度偏移%spx。',
+    ['percentage offset-y: %d px.'] = '百分比高度偏移%spx。',
+    ['lifebar offset-y: %d px.'] = '血条高度偏移%spx。',
+}
