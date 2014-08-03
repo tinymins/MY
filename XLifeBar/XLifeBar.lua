@@ -112,13 +112,6 @@ local _XLifeBar = {
     tNpc = {},
     tPlayer = {},
     dwTargetID = 0,
-    Lang = {
-        Neutrality = "中立关系",
-        Enemy = "敌对关系",
-        Ally = "友好关系",
-        Party = "队友关系",
-        Self = "自己",
-    }
 }
 
 _XLifeBar.GetName = function(tar)
@@ -590,7 +583,7 @@ _Cache.OnPanelActive = function(wnd)
         table.insert(t,{    szOption = _L["player name display"] , bDisable = true} )
         for k,v in pairs(Config.bShowName.Player) do
             table.insert(t,{
-                szOption = _XLifeBar.Lang[k], 
+                szOption = _L[k], 
                 bCheck = true, 
                 bChecked = Config.bShowName.Player[k],
                 fnAction = function() 
@@ -609,7 +602,7 @@ _Cache.OnPanelActive = function(wnd)
         table.insert(t,{    szOption = _L["npc name display"] , bDisable = true} )
         for k,v in pairs(Config.bShowName.Npc) do
             table.insert(t,{
-                szOption = _XLifeBar.Lang[k], 
+                szOption = _L[k], 
                 bCheck = true, 
                 bChecked = Config.bShowName.Npc[k],
                 fnAction = function() 
@@ -636,7 +629,7 @@ _Cache.OnPanelActive = function(wnd)
         table.insert(t,{    szOption = _L["player title display"] , bDisable = true} )
         for k,v in pairs(Config.bShowTitle.Player) do
             table.insert(t,{
-                szOption = _XLifeBar.Lang[k], 
+                szOption = _L[k], 
                 bCheck = true, 
                 bChecked = Config.bShowTitle.Player[k],
                 fnAction = function() 
@@ -655,7 +648,7 @@ _Cache.OnPanelActive = function(wnd)
         table.insert(t,{    szOption = _L["npc title display"] , bDisable = true} )
         for k,v in pairs(Config.bShowTitle.Npc) do
             table.insert(t,{
-                szOption = _XLifeBar.Lang[k], 
+                szOption = _L[k], 
                 bCheck = true, 
                 bChecked = Config.bShowTitle.Npc[k],
                 fnAction = function() 
@@ -682,7 +675,7 @@ _Cache.OnPanelActive = function(wnd)
         table.insert(t,{    szOption = _L["player tong display"] , bDisable = true} )
         for k,v in pairs(Config.bShowTong.Player) do
             table.insert(t,{
-                szOption = _XLifeBar.Lang[k], 
+                szOption = _L[k], 
                 bCheck = true, 
                 bChecked = Config.bShowTong.Player[k],
                 fnAction = function() 
@@ -709,7 +702,7 @@ _Cache.OnPanelActive = function(wnd)
         table.insert(t,{    szOption = _L["player lifebar display"] , bDisable = true} )
         for k,v in pairs(Config.bShowLife.Player) do
             table.insert(t,{
-                szOption = _XLifeBar.Lang[k], 
+                szOption = _L[k], 
                 bCheck = true, 
                 bChecked = Config.bShowLife.Player[k],
                 fnAction = function() 
@@ -728,7 +721,7 @@ _Cache.OnPanelActive = function(wnd)
         table.insert(t,{    szOption = _L["npc lifebar display"] , bDisable = true} )
         for k,v in pairs(Config.bShowLife.Npc) do
             table.insert(t,{
-                szOption = _XLifeBar.Lang[k], 
+                szOption = _L[k], 
                 bCheck = true, 
                 bChecked = Config.bShowLife.Npc[k],
                 fnAction = function() 
@@ -755,7 +748,7 @@ _Cache.OnPanelActive = function(wnd)
         table.insert(t,{    szOption = _L["player lifepercentage display"] , bDisable = true} )
         for k,v in pairs(Config.bShowPer.Player) do
             table.insert(t,{
-                szOption = _XLifeBar.Lang[k], 
+                szOption = _L[k], 
                 bCheck = true, 
                 bChecked = Config.bShowPer.Player[k],
                 fnAction = function() 
@@ -774,7 +767,7 @@ _Cache.OnPanelActive = function(wnd)
         table.insert(t,{    szOption = _L["npc lifepercentage display"] , bDisable = true} )
         for k,v in pairs(Config.bShowPer.Npc) do
             table.insert(t,{
-                szOption = _XLifeBar.Lang[k], 
+                szOption = _L[k], 
                 bCheck = true, 
                 bChecked = Config.bShowPer.Npc[k],
                 fnAction = function() 
