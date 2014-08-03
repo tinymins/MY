@@ -67,6 +67,9 @@ data = {
     ['cancel'] = '取消',
     ['use'] = '使用',
     
+    ['close'] = '关闭',
+    ['enable/disable'] = '开启/关闭',
+    
     ['reset data'] = '重置数据',
     ['analyse data'] = '分析数据',
     
@@ -81,6 +84,7 @@ data = {
     
     ['set hotkey'] = '设置快捷键',
     ['>> set hotkey <<'] = '>> 设置快捷键 <<',
+    ['use global config'] = '使用所有角色公共设置',
     
     -- MY.lua
     ['mingyi plugin'] = '茗伊插件',
@@ -91,6 +95,7 @@ data = {
     ["can not find wnd component [%s]"] = "找不到窗体组件 [%s]",
     ["unable to append handle item [%s]"] = "无法追加容器组件 [%s]",
     ["unable to append handle item from string."] = "从字符串追加容器组件失败。",
+    ['Font %d'] = '字体 %d',
     
     -- MY_CheckUpdate.lua
     ['new version found.'] = '发现新版本！',
@@ -98,6 +103,4 @@ data = {
     ['download immediately'] = '立即下载',
     ['see new feature'] = '更新日志',
     
-    -- MY_ScreenShotHelper.lua
-    ['screen shot helper'] = '截图助手',
 }
