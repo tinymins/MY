@@ -33,4 +33,10 @@ data = {
     ['3rd line offset-y: %d px.'] = '第三行字高度偏移%spx。',
     ['percentage offset-y: %d px.'] = '百分比高度偏移%spx。',
     ['lifebar offset-y: %d px.'] = '血条高度偏移%spx。',
+    
+    ['Neutrality'] = "中立关系",
+    ['Enemy'] = "敌对关系",
+    ['Ally'] = "友好关系",
+    ['Party'] = "队友关系",
+    ['Self'] = "自己",
 }
