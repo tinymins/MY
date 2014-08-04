@@ -1282,14 +1282,28 @@ function _MY.UI:size(nWidth, nHeight)
                 pcall(function() ele.txt:SetSize(nWidth, nHeight) end)
                 pcall(function() ele.img:SetSize(nWidth, nHeight) end)
                 pcall(function() ele.edt:SetSize(nWidth-8, nHeight-4) end)
-                pcall(function() local w, h= ele.cmb:GetSize() ele.edt:SetSize(nWidth-10-w, nHeight-4) end)
-                pcall(function() local w, h= ele.cmb:GetSize() ele.cmb:SetRelPos(nWidth-w-5, (nHeight-h-1)/2+1) end)
                 pcall(function() ele.hdl:FormatAllItemPos() end)
             elseif ele.itm then
                 pcall(function() (ele.itm or ele.raw):SetSize(nWidth, nHeight) end)
                 pcall(function() (ele.itm or ele.raw):GetParent():FormatAllItemPos() end)
                 pcall(function() ele.hdl:FormatAllItemPos() end)
             end
+            pcall(function()
+                if ele.type=="WndCheckBox" then
+                    
+                elseif ele.type=="WndComboBox" then
+                    local w, h= ele.cmb:GetSize()
+                    ele.cmb:SetRelPos(nWidth-w-5, math.ceil((nHeight - h)/2))
+                    ele.cmb:Lookup("", ""):SetAbsPos(ele.hdl:GetAbsPos())
+                    ele.cmb:Lookup("", ""):SetSize(nWidth, nHeight)
+                elseif ele.type=="WndEditComboBox" then
+                    local w, h= ele.cmb:GetSize()
+                    ele.edt:SetSize(nWidth-10-w, nHeight-4)
+                    ele.cmb:SetRelPos(nWidth-w-5, (nHeight-h-1)/2+1)
+                elseif ele.type=="WndEditBox" then
+                    
+                end
+            end)
             if ele.sbu then
                 ele.sbu:SetRelPos(nWidth-25, 10)
                 ele.sbd:SetRelPos(nWidth-25, nHeight-30)
