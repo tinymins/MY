@@ -23,7 +23,7 @@ MY_ToolBox.InfoTip = {
                   breathe = function()
                     local p, s = (MY.Player.GetTarget()), _L["No Target"]
                     if p then
-                        s = _L('Distance: %d Foot', GetCharacterDistance(GetClientPlayer().dwID, p.dwID)/64)
+                        s = _L('Distance: %.1f Foot', GetCharacterDistance(GetClientPlayer().dwID, p.dwID)/64)
                     end
                     MY.UI(this):find("#Text_Default"):text(s)
                   end },
