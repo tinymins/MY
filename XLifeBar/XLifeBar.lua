@@ -2,7 +2,7 @@ local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."XLifeBar/lang/")
 local _Cache = {}
 
 -- 这个只是默认配置 改这里没用的 会修改的话 修改data文件
-local Config = {
+local Config_Default = {
     Col = {
         Player = {
             Self = {30,140,220}, -- 自己
@@ -97,7 +97,7 @@ local Config = {
     nLifeHeight = 0,
     nDistance = 24,
 }
-
+local Config = clone(Config_Default)
 
 XLifeBar = {}
 XLifeBar.bEnabled = false
@@ -196,8 +196,10 @@ _XLifeBar.Reload = function()
         _Config = MY.Sys.LoadUserData(_XLifeBar.szConfig)
     end
     if _Config then
-        for k, v in pairs(_Config) do
-            Config[k] = v
+        for k, v in pairs(Config_Default) do
+            if type(Config[k])~=type(Config_Default[k]) then
+                Config[k] = clone(Config_Default[k])
+            end
         end
         _XLifeBar.Reset(true)
     end
@@ -546,17 +548,7 @@ _Cache.OnPanelActive = function(wnd)
     local w, h = ui:size()
     local x, y = 20, 20
     local offsety = 40
-    -- 开启/关闭
-    ui:append("WndCheckBox_Switcher", "WndCheckBox"):children("#WndCheckBox_Switcher")
-      :pos(x,y):text(_L["enable/disable"])
-      :check(function(bChecked) XLifeBar.bEnabled = bChecked _XLifeBar.Reset(true) end)
-      :check(XLifeBar.bEnabled)
-    -- 使用所有角色公共设置
-    ui:append("WndCheckBox_GlobalConfig", "WndCheckBox"):children("#WndCheckBox_GlobalConfig")
-      :pos(x+110,y):text(_L["use global config"])
-      :check(function(bChecked)
-        XLifeBar.bUseGlobalConfig = bChecked
-        _XLifeBar.Reload()
+    local fnLoadUI = function(ui)
         ui:children("#WndCheckBox_ShowSpecialNpc"):check(Config.bShowSpecialNpc)
         ui:children("#WndButton_Font"):text(_L("Font: %d",Config.nFont))
         ui:children("#WndSliderBox_Distance"):value(Config.nDistance)
@@ -568,6 +560,19 @@ _Cache.OnPanelActive = function(wnd)
         ui:children("#WndSliderBox_ThirdHeight"):value(Config.nLineHeight[3])
         ui:children("#WndSliderBox_PerHeight"):value(Config.nPerHeight)
         ui:children("#WndSliderBox_LifeHeight"):value(Config.nLifeHeight)
+    end
+    -- 开启/关闭
+    ui:append("WndCheckBox_Switcher", "WndCheckBox"):children("#WndCheckBox_Switcher")
+      :pos(x,y):text(_L["enable/disable"])
+      :check(function(bChecked) XLifeBar.bEnabled = bChecked _XLifeBar.Reset(true) end)
+      :check(XLifeBar.bEnabled)
+    -- 使用所有角色公共设置
+    ui:append("WndCheckBox_GlobalConfig", "WndCheckBox"):children("#WndCheckBox_GlobalConfig")
+      :pos(x+110,y):text(_L["use global config"])
+      :check(function(bChecked)
+        XLifeBar.bUseGlobalConfig = bChecked
+        _XLifeBar.Reload()
+        fnLoadUI(ui)
       end)
       :check(XLifeBar.bEnabled)
     y = y + offsety
@@ -799,6 +804,22 @@ _Cache.OnPanelActive = function(wnd)
             Config.nFont = nFont;_XLifeBar.Reset()
             ui:children("#WndButton_Font"):text(_L("Font: %d",Config.nFont))
         end)
+      end)
+    x = x + 150
+    
+    ui:append("WndButton_Reset", "WndButton"):children("#WndButton_Reset")
+      :pos(x,y):width(120):text(_L['reset config'])
+      :click(function()
+            MessageBox({
+                szName = "XLifeBar_Reset",
+                szMessage = _L['Are you sure to reset config?'], {
+                    szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function()
+                        Config = clone(Config_Default)
+                        _XLifeBar.Reset()
+                        fnLoadUI(ui)
+                    end
+                }, {szOption = g_tStrings.STR_HOTKEY_CANCEL,fnAction = function() end},
+            })
       end)
     y = y + offsety
     
