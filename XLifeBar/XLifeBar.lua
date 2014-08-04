@@ -87,6 +87,21 @@ local Config_Default = {
             Ally = false,
         },
     },
+    bShowSkillPer = {
+        Player = {
+            Self = false,
+            Party = false,
+            Neutrality = false,
+            Enemy = false,
+            Ally = false,
+        },
+        Npc = {
+            Party = false,
+            Neutrality = false,
+            Enemy = false,
+            Ally = false,
+        },
+    },
     nLineHeight = { 70, 50, 30},
     bShowSpecialNpc = false,
     nWidth = 80,
@@ -196,6 +211,7 @@ _XLifeBar.Reload = function()
         _Config = MY.Sys.LoadUserData(_XLifeBar.szConfig)
     end
     if _Config then
+        Config = _Config
         for k, v in pairs(Config_Default) do
             if type(Config[k])~=type(Config_Default[k]) then
                 Config[k] = clone(Config_Default[k])
@@ -777,6 +793,52 @@ _Cache.OnPanelActive = function(wnd)
                 bChecked = Config.bShowPer.Npc[k],
                 fnAction = function() 
                     Config.bShowPer.Npc[k] = not Config.bShowPer.Npc[k];
+                    _XLifeBar.Reset() 
+                end,
+                rgb = Config.Col.Npc[k],
+                bColorTable = true,
+                fnChangeColor = function(_,r,g,b)
+                    Config.Col.Npc[k] = {r,g,b}
+                    _XLifeBar.Reset()
+                end
+            })
+        end
+        return t
+      end)
+    y = y + offsety
+    
+    -- œ‘ æ∂¡Ãı%
+    ui:append("WndComboBox_SkillPercentage", "WndComboBox"):children("#WndComboBox_SkillPercentage")
+      :pos(x,y):text(_L["skillpercentage display config"])
+      :menu(function()
+        local t = {}
+        table.insert(t,{    szOption = _L["player skillpercentage display"] , bDisable = true} )
+        for k,v in pairs(Config.bShowSkillPer.Player) do
+            table.insert(t,{
+                szOption = _L[k], 
+                bCheck = true, 
+                bChecked = Config.bShowSkillPer.Player[k],
+                fnAction = function() 
+                    Config.bShowSkillPer.Player[k] = not Config.bShowSkillPer.Player[k]
+                    _XLifeBar.Reset() 
+                end,
+                rgb = Config.Col.Player[k],
+                bColorTable = true,
+                fnChangeColor = function(_,r,g,b)
+                    Config.Col.Player[k] = {r,g,b}
+                    _XLifeBar.Reset()
+                end
+            })
+        end
+        table.insert(t,{    bDevide = true} )
+        table.insert(t,{    szOption = _L["npc skillpercentage display"] , bDisable = true} )
+        for k,v in pairs(Config.bShowSkillPer.Npc) do
+            table.insert(t,{
+                szOption = _L[k], 
+                bCheck = true, 
+                bChecked = Config.bShowSkillPer.Npc[k],
+                fnAction = function() 
+                    Config.bShowSkillPer.Npc[k] = not Config.bShowSkillPer.Npc[k];
                     _XLifeBar.Reset() 
                 end,
                 rgb = Config.Col.Npc[k],

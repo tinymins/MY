@@ -21,6 +21,10 @@ data = {
     ['player lifepercentage display'] = '玩家百分比显示',
     ['npc lifepercentage display'] = 'Npc百分比显示',
     
+    ['skillpercentage display config'] = '读条显示设置',
+    ['player skillpercentage display'] = '玩家读条显示',
+    ['npc skillpercentage display'] = 'Npc读条显示',
+    
     ['show special npc'] = '显示特殊Npc',
     
     ['Max Distance: %s foot.'] = '最大显示距离：%s尺。',
