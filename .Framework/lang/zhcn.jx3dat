@@ -85,6 +85,7 @@ data = {
     ['set hotkey'] = '设置快捷键',
     ['>> set hotkey <<'] = '>> 设置快捷键 <<',
     ['use global config'] = '使用所有角色公共设置',
+    ['reset config'] = '恢复默认设置',
     
     -- MY.lua
     ['mingyi plugin'] = '茗伊插件',
