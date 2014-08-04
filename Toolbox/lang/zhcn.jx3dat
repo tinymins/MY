@@ -18,7 +18,7 @@ data = {
     
     ['FPS: %d'] = 'FPS：%d',
     ['No Target'] = '没有目标',
-    ['Distance: %d Foot'] = '目标距离：%d尺',
+    ['Distance: %.1f Foot'] = '目标距离：%.1f尺',
     ['Time: %02d:%02d:%02d'] = '系统时间：%02d:%02d:%02d',
     ['Never Fight'] = '打一架再说',
     ['Fight Clock: %d:%02d:%02d'] = '战斗计时：%d:%02d:%02d',
