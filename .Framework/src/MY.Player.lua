@@ -229,13 +229,17 @@ MY.SetTarget = MY.Player.SetTarget
 ]]
 _Cache.pTempTarget = { TARGET.NO_TARGET, 0 }
 MY.Player.SetTempTarget = function(dwType, dwID)
-    _Cache.pTempTarget = { MY.Player.GetTarget() }
+    TargetPanel_SetOpenState(true)
+    _Cache.pTempTarget = { GetClientPlayer().GetTarget() }
     MY.Player.SetTarget(dwType, dwID)
+    TargetPanel_SetOpenState(false)
 end
 MY.SetTempTarget = MY.Player.SetTempTarget
 MY.Player.ResumeTarget = function()
+    TargetPanel_SetOpenState(true)
     MY.Player.SetTarget(unpack(_Cache.pTempTarget))
     _Cache.pTempTarget = { TARGET.NO_TARGET, 0 }
+    TargetPanel_SetOpenState(false)
 end
 MY.ResumeTarget = MY.Player.ResumeTarget
 --[[ 求N2在N1的面向角  --  重载+2
