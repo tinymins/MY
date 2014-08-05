@@ -379,7 +379,7 @@ function _MY.UI:children(filter)
     self:_checksum()
     local child = {}
     local childHash = {}
-    if string.sub(filter, 1, 1)=="#" then
+    if type(filter)=="string" and string.sub(filter, 1, 1)=="#" then
         filter = string.sub(filter, 2)
         for _, ele in pairs(self.eles) do
             table.insert(child, ele.raw:Lookup(filter))
