@@ -223,7 +223,21 @@ MY.Player.SetTarget = function(dwType, dwID)
     SetTarget(dwType, dwID)
 end
 MY.SetTarget = MY.Player.SetTarget
-
+--[[ 设置/取消 临时目标
+    -- MY.Player.SetTempTarget(dwType, dwID)
+    -- MY.Player.ResumeTarget()
+]]
+_Cache.pTempTarget = { TARGET.NO_TARGET, 0 }
+MY.Player.SetTempTarget = function(dwType, dwID)
+    _Cache.pTempTarget = { MY.Player.GetTarget() }
+    MY.Player.SetTarget(dwType, dwID)
+end
+MY.SetTempTarget = MY.Player.SetTempTarget
+MY.Player.ResumeTarget = function()
+    MY.Player.SetTarget(unpack(_Cache.pTempTarget))
+    _Cache.pTempTarget = { TARGET.NO_TARGET, 0 }
+end
+MY.ResumeTarget = MY.Player.ResumeTarget
 --[[ 求N2在N1的面向角  --  重载+2
     -- 输入N1坐标、面向、N2坐标
     (number) MY.GetFaceToTargetDegree(nX,nY,nFace,nTX,nTY)
