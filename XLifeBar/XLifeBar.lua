@@ -5,111 +5,40 @@ local _Cache = {}
 local Config_Default = {
     Col = {
         Player = {
-            Self = {30,140,220}, -- 自己
-            Party = {30,140,220},-- 团队
-            Enemy = {255,30,30},-- 敌对
-            Neutrality = {255,255,0},-- 中立
-            Ally = {30,255,30},-- 相同阵营
+            Self  = {30 ,140,220},      -- 自己
+            Party = {30 ,140,220},      -- 团队
+            Enemy = {255,30 ,30 },      -- 敌对
+            Neutrality = {255,255,0},   -- 中立
+            Ally  = {30 ,255,30 },      -- 相同阵营
         },
         Npc = {
-            Party = {30,140,220},-- 团队
-            Enemy = {255,30,30},-- 敌对
+            Party = {30 ,140,220},-- 团队
+            Enemy = {255,30 ,30 },-- 敌对
             Neutrality = {255,255,0},-- 中立
-            Ally = {30,255,30},-- 相同阵营
+            Ally  = {30 ,255,30 },-- 相同阵营
         }
     },
-    bShowName = {
-        Player = {
-            Self = true,
-            Party = true,
-            Neutrality = true,
-            Enemy = true,
-            Ally = true,
-        },
-        Npc = {
-            Party = true,
-            Neutrality = true,
-            Enemy = true,
-            Ally = true,
-        },
-    },
-    bShowTitle = {
-        Player = {
-            Self = true,
-            Party = true,
-            Neutrality = true,
-            Enemy = true,
-            Ally = true,
-        },
-        Npc = {
-            Party = true,
-            Neutrality = true,
-            Enemy = true,
-            Ally = true,
-        },
-    },
-    bShowTong = {
-        Player = {
-            Self = true,
-            Party = true,
-            Neutrality = true,
-            Enemy = true,
-            Ally = true,
-        },
-    },
-    bShowLife = {
-        Player = {
-            Self = true,
-            Party = true,
-            Neutrality = true,
-            Enemy = true,
-            Ally = true,
-        },
-        Npc = {
-            Party = false,
-            Neutrality = true,
-            Enemy = true,
-            Ally = true,
-        },
-    },
-    bShowPer = {
-        Player = {
-            Self = false,
-            Party = false,
-            Neutrality = false,
-            Enemy = false,
-            Ally = false,
-        },
-        Npc = {
-            Party = false,
-            Neutrality = false,
-            Enemy = false,
-            Ally = false,
-        },
-    },
-    bShowSkillPer = {
-        Player = {
-            Self = false,
-            Party = false,
-            Neutrality = false,
-            Enemy = false,
-            Ally = false,
-        },
-        Npc = {
-            Party = false,
-            Neutrality = false,
-            Enemy = false,
-            Ally = false,
-        },
-    },
-    nLineHeight = { 70, 50, 30},
+    bShowName    = { Player = { Self = true , Party = true , Neutrality = true , Enemy = true , Ally = true , }, Npc = { Party = true , Neutrality = true , Enemy = true , Ally = true , }, },
+    bShowTitle   = { Player = { Self = true , Party = true , Neutrality = true , Enemy = true , Ally = true , }, Npc = { Party = true , Neutrality = true , Enemy = true , Ally = true , }, },
+    bShowTong    = { Player = { Self = true , Party = true , Neutrality = true , Enemy = true , Ally = true , },},
+    bShowLife    = { Player = { Self = true , Party = true , Neutrality = true , Enemy = true , Ally = true , }, Npc = { Party = false, Neutrality = true , Enemy = true , Ally = true , }, },
+    bShowLifePer = { Player = { Self = false, Party = false, Neutrality = false, Enemy = false, Ally = false, }, Npc = { Party = false, Neutrality = false, Enemy = false, Ally = false, }, },
+    bShowOTBar   = { Player = { Self = true , Party = false, Neutrality = false, Enemy = true , Ally = false, }, Npc = { Party = false, Neutrality = false, Enemy = true , Ally = false, }, },
+    nLineHeight = { 100, 80, 60},
     bShowSpecialNpc = false,
-    nWidth = 80,
-    nHeight = 8,
+    
+    nLifeWidth = 80,
+    nLifeHeight = 8,
+    nLifeOffsetY = 27,
+    nPerHeight = 42,
+    
+    nOTBarWidth = 80,
+    nOTBarHeight = 6,
+    nOTBarOffsetY = 22,
+    nOTTitleHeight = 21,
+    
     nAlpha = 200,
     nFont = 16,
-    nPerHeight = 14,
-    nLifeHeight = 0,
     nDistance = 24,
 }
 local Config = clone(Config_Default)
@@ -248,9 +177,12 @@ function HP:Create()
         Force = self.force,
     }
     if not handle:Lookup(string.format("bg_%s",self.dwID)) then
-        handle:AppendItemFromString( string.format("<shadow>name=\"bg_%s\"</shadow>",self.dwID) )
-        handle:AppendItemFromString( string.format("<shadow>name=\"bg2_%s\"</shadow>",self.dwID) )
+        handle:AppendItemFromString( string.format("<shadow>name=\"hp_bg_%s\"</shadow>",self.dwID) )
+        handle:AppendItemFromString( string.format("<shadow>name=\"hp_bg2_%s\"</shadow>",self.dwID) )
         handle:AppendItemFromString( string.format("<shadow>name=\"hp_%s\"</shadow>",self.dwID) )
+        handle:AppendItemFromString( string.format("<shadow>name=\"ot_bg_%s\"</shadow>",self.dwID) )
+        handle:AppendItemFromString( string.format("<shadow>name=\"ot_bg2_%s\"</shadow>",self.dwID) )
+        handle:AppendItemFromString( string.format("<shadow>name=\"ot_%s\"</shadow>",self.dwID) )
         handle:AppendItemFromString( string.format("<shadow>name=\"name_%s\"</shadow>",self.dwID) )
         self:DrawBorder(Config.nAlpha)
         self:DrawName()
@@ -272,45 +204,6 @@ function HP:Remove()
     return self
 end
 
--- 填充边框 默认200的nAlpha
-function HP:DrawBorder(nAlpha)
-    local tab = _XLifeBar.tObject[self.dwID]
-    local handle = tab.handle
-    
-    local cfgLife = Config.bShowLife.Npc[self.force]
-    if IsPlayer(self.dwID) then
-        cfgLife = Config.bShowLife.Player[self.force]
-    end
-    
-    
-    if cfgLife then
-        -- 绘制外边框
-        local sha = handle:Lookup(string.format("bg_%s",self.dwID))
-        sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
-        sha:SetD3DPT(D3DPT.TRIANGLEFAN)
-        sha:ClearTriangleFanPoint()
-        local bcX,bcY = - Config.nWidth / 2 ,(- Config.nHeight) - Config.nLifeHeight
-
-        sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX,bcY})
-        sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX+Config.nWidth,bcY})
-        sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX+Config.nWidth,bcY+Config.nHeight})
-        sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX,bcY+Config.nHeight})
-
-        -- 绘制内边框
-        local sha = handle:Lookup(string.format("bg2_%s",self.dwID))
-        sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
-        sha:SetD3DPT(D3DPT.TRIANGLEFAN)
-        sha:ClearTriangleFanPoint()        
-        local bcX,bcY = - (Config.nWidth / 2 - 1),(- (Config.nHeight - 1)) - Config.nLifeHeight
-
-        sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX,bcY})
-        sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX+(Config.nWidth - 2),bcY})
-        sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX+(Config.nWidth - 2),bcY+(Config.nHeight - 2)})
-        sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX,bcY+(Config.nHeight - 2)})        
-    end
-    return self
-end
-
 function HP:DrawName(col)
     local nAlpha = Config.nAlpha
     local tab = _XLifeBar.tObject[self.dwID]
@@ -321,17 +214,19 @@ function HP:DrawName(col)
     local cfgName = Config.bShowName.Player[self.force]
     local cfgTitle = Config.bShowTitle.Player[self.force]
     local cfgTong = Config.bShowTong.Player[self.force]
-    local cfgLifePer = Config.bShowPer.Player[self.force]
+    local cfgLifePer = Config.bShowLifePer.Player[self.force]
+    local cfgOTTitle = Config.bShowOTBar.Player[self.force]
     local r,g,b = unpack(Config.Col.Player[self.force])
     
     if not IsPlayer(self.dwID) then
         cfgName = Config.bShowName.Npc[self.force]
         cfgTitle = Config.bShowTitle.Npc[self.force]
         cfgTong = false
-        cfgLifePer = Config.bShowPer.Npc[self.force]
+        cfgLifePer = Config.bShowLifePer.Npc[self.force]
+        cfgOTTitle = Config.bShowOTBar.Npc[self.force]
         r,g,b = unpack(Config.Col.Npc[self.force])
     end
-    local szName, szTitle, szTong, szLifePer
+    local szName, szTitle, szTong, szLifePer, szOTTitle
     if cfgName  then szName  = _XLifeBar.GetName(self.self) end
     if cfgTitle and self.self.szTitle and self.self.szTitle~="" then szTitle = "<" .. self.self.szTitle .. ">" end
     if cfgTong and self.self.dwTongID ~= 0 then
@@ -345,6 +240,7 @@ function HP:DrawName(col)
         end
     end
     if cfgLifePer then szLifePer = string.format("%.1f", 100 * tab.Lifeper) end
+    if cfgOTTitle and tab.szOTTitle~="" then szOTTitle = tab.szOTTitle end
     
     if type(col) == "table" then
         r,g,b = unpack(col)
@@ -360,6 +256,9 @@ function HP:DrawName(col)
     if szLifePer then
         sha:AppendCharacterID(self.dwID,true,r,g,b,nAlpha,{0,0,0,0,- Config.nPerHeight},Config.nFont,string.format("%.1f", 100 * tab.Lifeper),1,1)
     end
+    if szOTTitle then
+        sha:AppendCharacterID(self.dwID,true,r,g,b,nAlpha,{0,0,0,0,- Config.nOTTitleHeight},Config.nFont,tab.szOTTitle,1,1)
+    end
     local i = #Config.nLineHeight
     if szTong then
         sha:AppendCharacterID(self.dwID,true,r,g,b,nAlpha,{0,0,0,0,- Config.nLineHeight[i]},Config.nFont,szTong,1,1)
@@ -373,6 +272,85 @@ function HP:DrawName(col)
         sha:AppendCharacterID(self.dwID,true,r,g,b,nAlpha,{0,0,0,0,- Config.nLineHeight[i]},Config.nFont,szName,1,1)
         i = i - 1
     end
+end
+
+-- 填充边框 默认200的nAlpha
+function HP:DrawBorder(nAlpha)
+    local tab = _XLifeBar.tObject[self.dwID]
+    local handle = tab.handle
+    
+    local cfgLife = Config.bShowLife.Npc[self.force]
+    if IsPlayer(self.dwID) then
+        cfgLife = Config.bShowLife.Player[self.force]
+    end
+    
+    
+    if cfgLife then
+        -- 绘制外边框
+        local sha = handle:Lookup(string.format("hp_bg_%s",self.dwID))
+        sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
+        sha:SetD3DPT(D3DPT.TRIANGLEFAN)
+        sha:ClearTriangleFanPoint()
+        local bcX,bcY = - Config.nLifeWidth / 2 ,(- Config.nLifeHeight) - Config.nLifeOffsetY
+
+        sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX,bcY})
+        sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX+Config.nLifeWidth,bcY})
+        sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX+Config.nLifeWidth,bcY+Config.nLifeHeight})
+        sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX,bcY+Config.nLifeHeight})
+
+        -- 绘制内边框
+        local sha = handle:Lookup(string.format("hp_bg2_%s",self.dwID))
+        sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
+        sha:SetD3DPT(D3DPT.TRIANGLEFAN)
+        sha:ClearTriangleFanPoint()        
+        local bcX,bcY = - (Config.nLifeWidth / 2 - 1),(- (Config.nLifeHeight - 1)) - Config.nLifeOffsetY
+
+        sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX,bcY})
+        sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX+(Config.nLifeWidth - 2),bcY})
+        sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX+(Config.nLifeWidth - 2),bcY+(Config.nLifeHeight - 2)})
+        sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX,bcY+(Config.nLifeHeight - 2)})        
+    end
+    return self
+end
+
+
+-- 填充边框 默认200的nAlpha
+function HP:DrawOTBarBorder(nAlpha)
+    local tab = _XLifeBar.tObject[self.dwID]
+    local handle = tab.handle
+    
+    local cfgOTBar = Config.bShowOTBar.Npc[self.force]
+    if IsPlayer(self.dwID) then
+        cfgOTBar = Config.bShowOTBar.Player[self.force]
+    end
+    
+    
+    if cfgOTBar then
+        -- 绘制外边框
+        local sha = handle:Lookup(string.format("ot_bg_%s",self.dwID))
+        sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
+        sha:SetD3DPT(D3DPT.TRIANGLEFAN)
+        sha:ClearTriangleFanPoint()
+        local bcX,bcY = - Config.nOTBarWidth / 2 ,(- Config.nOTBarHeight) - Config.nOTBarOffsetY
+
+        sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX,bcY})
+        sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX+Config.nOTBarWidth,bcY})
+        sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX+Config.nOTBarWidth,bcY+Config.nOTBarHeight})
+        sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX,bcY+Config.nOTBarHeight})
+
+        -- 绘制内边框
+        local sha = handle:Lookup(string.format("ot_bg2_%s",self.dwID))
+        sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
+        sha:SetD3DPT(D3DPT.TRIANGLEFAN)
+        sha:ClearTriangleFanPoint()        
+        local bcX,bcY = - (Config.nOTBarWidth / 2 - 1),(- (Config.nOTBarHeight - 1)) - Config.nOTBarOffsetY
+
+        sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX,bcY})
+        sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX+(Config.nOTBarWidth - 2),bcY})
+        sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX+(Config.nOTBarWidth - 2),bcY+(Config.nOTBarHeight - 2)})
+        sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX,bcY+(Config.nOTBarHeight - 2)})        
+    end
+    return self
 end
 
 -- 填充血条
@@ -400,15 +378,53 @@ function HP:DrawLife(Lifeper,col)
         sha:SetD3DPT(D3DPT.TRIANGLEFAN)
         sha:ClearTriangleFanPoint()
 
-        local bcX,bcY = - (Config.nWidth / 2 - 2),(- (Config.nHeight - 2)) - Config.nLifeHeight
+        local bcX,bcY = - (Config.nLifeWidth / 2 - 2),(- (Config.nLifeHeight - 2)) - Config.nLifeOffsetY
         local Lifeper = Lifeper or tab.Lifeper
-        local Life = (Config.nWidth - 4) * Lifeper
+        local Life = (Config.nLifeWidth - 4) * Lifeper
 
         
         sha:AppendCharacterID(self.dwID,true,r,g,b,Config.nAlpha,{0,0,0,bcX,bcY})
         sha:AppendCharacterID(self.dwID,true,r,g,b,Config.nAlpha,{0,0,0,bcX+Life,bcY})
-        sha:AppendCharacterID(self.dwID,true,r,g,b,Config.nAlpha,{0,0,0,bcX+Life,bcY+(Config.nHeight - 4)})
-        sha:AppendCharacterID(self.dwID,true,r,g,b,Config.nAlpha,{0,0,0,bcX,bcY+(Config.nHeight - 4)})
+        sha:AppendCharacterID(self.dwID,true,r,g,b,Config.nAlpha,{0,0,0,bcX+Life,bcY+(Config.nLifeHeight - 4)})
+        sha:AppendCharacterID(self.dwID,true,r,g,b,Config.nAlpha,{0,0,0,bcX,bcY+(Config.nLifeHeight - 4)})
+    end
+    return self
+end
+
+-- 填充头顶读条
+function HP:DrawOTBar(Lifeper,col)
+    local tab = _XLifeBar.tObject[self.dwID]
+    local handle = tab.handle
+    
+    local r,g,b = unpack(Config.Col.Player[self.force])
+    local cfgOTBar = Config.bShowOTBar.Player[self.force]
+    if not IsPlayer(self.dwID) then
+        cfgOTBar = Config.bShowOTBar.Npc[self.force]
+        r,g,b = unpack(Config.Col.Npc[self.force])
+    end
+    if type(col)=="table" then
+        r,g,b = unpack(col)
+    elseif type(col)=="function" then
+        r,g,b = col(r,g,b)
+    end
+
+    if cfgOTBar then
+        --绘制技能读条
+        local sha = handle:Lookup(string.format("ot_%s",self.dwID))
+
+        sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
+        sha:SetD3DPT(D3DPT.TRIANGLEFAN)
+        sha:ClearTriangleFanPoint()
+
+        local bcX,bcY = - (Config.nOTBarWidth / 2 - 2),(- (Config.nOTBarHeight - 2)) - Config.nOTBarOffsetY
+        local Lifeper = Lifeper or tab.Lifeper
+        local Life = (Config.nOTBarWidth - 4) * Lifeper
+
+        
+        sha:AppendCharacterID(self.dwID,true,r,g,b,Config.nAlpha,{0,0,0,bcX,bcY})
+        sha:AppendCharacterID(self.dwID,true,r,g,b,Config.nAlpha,{0,0,0,bcX+Life,bcY})
+        sha:AppendCharacterID(self.dwID,true,r,g,b,Config.nAlpha,{0,0,0,bcX+Life,bcY+(Config.nOTBarHeight - 4)})
+        sha:AppendCharacterID(self.dwID,true,r,g,b,Config.nAlpha,{0,0,0,bcX,bcY+(Config.nOTBarHeight - 4)})
     end
     return self
 end
@@ -446,7 +462,31 @@ function XLifeBar.OnFrameBreathe()
                     tab.Lifeper = lifeper
                     XLifeBar(object):DrawLife(lifeper):DrawName() -- 血量变动的时候重绘名字 
                 end
-
+                -- 读条判定
+                local otper = 0
+                local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = object.GetSkillPrepareState()
+                if bIsPrepare then
+                    otper = fProgress
+                    tab.szOTTitle = Table_GetSkillName(dwSkillID, dwSkillLevel)
+                else
+                    otper = 0
+                    tab.szOTTitle = nil
+                end
+                if otper ~= tab.Otper then
+                    if tab.Otper==0 then
+                        XLifeBar(object):DrawOTBarBorder(Config.nAlpha):DrawName() -- 读条状态变动的时候重绘名字 
+                    elseif otper==0 then
+                        XLifeBar(object):DrawOTBarBorder(0):DrawName() -- 读条状态变动的时候重绘名字 
+                    end
+                    tab.Otper = otper
+                    XLifeBar(object):DrawOTBar(otper)
+                    -- 当前目标
+                    if _XLifeBar.dwTargetID == object.dwID then
+                        XLifeBar(object):DrawOTBar(otper, fnHighLight)
+                    else
+                        XLifeBar(object):DrawOTBar(otper)
+                    end
+                end
                 
                 -- 势力切换
                 local Force = _XLifeBar.GetForce(k)
@@ -477,7 +517,7 @@ function XLifeBar.OnFrameBreathe()
         if object.szName ~= "" then
             if GetCharacterDistance(me.dwID,k) / 64 < Config.nDistance --[[ 这是镜头补偿判断 但是不好用先不加 and (fPitch > -0.8 or _XLifeBar.GetNz(me.nZ,object.nZ) < Config.nDistance / 2.5)]] then
                 if not _XLifeBar.tObject[k] then
-                    XLifeBar(object):Create()
+                    XLifeBar(object):Create():DrawBorder(255)
                 else
                     local tab = _XLifeBar.tObject[k]
                     -- 血量判定
@@ -486,6 +526,32 @@ function XLifeBar.OnFrameBreathe()
                     if lifeper ~= tab.Lifeper then
                         tab.Lifeper = lifeper
                         XLifeBar(object):DrawLife(lifeper):DrawName() -- 血量变动的时候重绘名字 
+                    end
+                    -- 读条判定
+                    local otper = 0
+                    if object.GetOTActionState()==1 then
+                        MY.Player.SetTempTarget(TARGET.PLAYER, k)
+                        local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = object.GetSkillPrepareState()
+                        otper = fProgress
+                        tab.szOTTitle = Table_GetSkillName(dwSkillID, dwSkillLevel)
+                        MY.Player.ResumeTarget()
+                    else
+                        otper = 0
+                        tab.szOTTitle = nil
+                    end
+                    if otper ~= tab.Otper then
+                        if tab.Otper==0 then
+                            XLifeBar(object):DrawOTBarBorder(Config.nAlpha):DrawName() -- 读条状态变动的时候重绘名字 
+                        elseif otper==0 then
+                            XLifeBar(object):DrawOTBarBorder(0):DrawName() -- 读条状态变动的时候重绘名字 
+                        end
+                        tab.Otper = otper
+                        -- 当前目标
+                        if _XLifeBar.dwTargetID == object.dwID then
+                            XLifeBar(object):DrawOTBar(otper, fnHighLight)
+                        else
+                            XLifeBar(object):DrawOTBar(otper)
+                        end
                     end
                     
                     -- 势力切换
@@ -562,20 +628,24 @@ Wnd.OpenWindow("interface/MY/XLifeBar/XLifeBar.ini","XLifeBar")
 _Cache.OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
     local w, h = ui:size()
+    
     local x, y = 20, 20
     local offsety = 40
     local fnLoadUI = function(ui)
-        ui:children("#WndCheckBox_ShowSpecialNpc"):check(Config.bShowSpecialNpc)
-        ui:children("#WndButton_Font"):text(_L("Font: %d",Config.nFont))
-        ui:children("#WndSliderBox_Distance"):value(Config.nDistance)
-        ui:children("#WndSliderBox_LifebarWidth"):value(Config.nWidth)
-        ui:children("#WndSliderBox_LifebarHeight"):value(Config.nHeight)
-        ui:children("#WndSliderBox_LifebarAlpha"):value(Config.nAlpha)
+        ui:children("#WndSliderBox_LifebarWidth"):value(Config.nLifeWidth)
+        ui:children("#WndSliderBox_LifebarHeight"):value(Config.nLifeHeight)
+        ui:children("#WndSliderBox_LifeHeight"):value(Config.nLifeOffsetY)
+        ui:children("#WndSliderBox_OTbarWidth"):value(Config.nOTBarWidth)
+        ui:children("#WndSliderBox_OTbarHeight"):value(Config.nOTBarHeight)
+        ui:children("#WndSliderBox_OTHeight"):value(Config.nOTBarOffsetY)
         ui:children("#WndSliderBox_FristHeight"):value(Config.nLineHeight[1])
         ui:children("#WndSliderBox_SecondHeight"):value(Config.nLineHeight[2])
         ui:children("#WndSliderBox_ThirdHeight"):value(Config.nLineHeight[3])
         ui:children("#WndSliderBox_PerHeight"):value(Config.nPerHeight)
-        ui:children("#WndSliderBox_LifeHeight"):value(Config.nLifeHeight)
+        ui:children("#WndSliderBox_Distance"):value(Config.nDistance)
+        ui:children("#WndSliderBox_Alpha"):value(Config.nAlpha)
+        ui:children("#WndCheckBox_ShowSpecialNpc"):check(Config.bShowSpecialNpc)
+        ui:children("#WndButton_Font"):text(_L("Font: %d",Config.nFont))
     end
     -- 开启/关闭
     ui:append("WndCheckBox_Switcher", "WndCheckBox"):children("#WndCheckBox_Switcher")
@@ -595,7 +665,101 @@ _Cache.OnPanelActive = function(wnd)
     -- <hr />
     ui:append('Image_Spliter','Image'):find('#Image_Spliter'):pos(x,y-7):size(w-x*2,2):image('UI/Image/UICommon/ScienceTreeNode.UITex',62)
     
+    x, y = 20, 80
+    offsety = 33
+    ui:append("WndSliderBox_LifebarWidth", "WndSliderBox"):children("#WndSliderBox_LifebarWidth")
+      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(5,150)
+      :text(function(value) return _L("lifebar width: %s px.", value) end)--血条长度
+      :change(function(value) Config.nLifeWidth = value;_XLifeBar.Reset() end)
+      :value(Config.nLifeWidth)
+    y = y + offsety
+    
+    ui:append("WndSliderBox_LifebarHeight", "WndSliderBox"):children("#WndSliderBox_LifebarHeight")
+      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(5,150)
+      :text(function(value) return _L("lifebar height: %s px.", value) end)--血条高度
+      :change(function(value) Config.nLifeHeight = value;_XLifeBar.Reset() end)
+      :value(Config.nLifeHeight)
+    y = y + offsety
+    
+    ui:append("WndSliderBox_LifeHeight", "WndSliderBox"):children("#WndSliderBox_LifeHeight")
+      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
+      :text(function(value) return _L("lifebar offset-y: %d px.", value) end)--血条高度偏移
+      :change(function(value) Config.nLifeOffsetY = value;_XLifeBar.Reset() end)
+      :value(Config.nLifeOffsetY)
+    y = y + offsety
+    
+    ui:append("WndSliderBox_PerHeight", "WndSliderBox"):children("#WndSliderBox_PerHeight")
+      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
+      :text(function(value) return _L("percentage offset-y: %d px.", value) end)--百分比高度
+      :change(function(value) Config.nPerHeight = value;_XLifeBar.Reset() end)
+      :value(Config.nPerHeight)
+    y = y + offsety
+    
+    ui:append("WndSliderBox_OTBarWidth", "WndSliderBox"):children("#WndSliderBox_OTBarWidth")
+      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(5,150)
+      :text(function(value) return _L("otbar width: %s px.", value) end)--OT长度
+      :change(function(value) Config.nOTBarWidth = value;_XLifeBar.Reset() end)
+      :value(Config.nOTBarWidth)
+    y = y + offsety
+    
+    ui:append("WndSliderBox_OTBarHeight", "WndSliderBox"):children("#WndSliderBox_OTBarHeight")
+      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(5,150)
+      :text(function(value) return _L("otbar height: %s px.", value) end)--OT高度
+      :change(function(value) Config.nOTBarHeight = value;_XLifeBar.Reset() end)
+      :value(Config.nOTBarHeight)
+    y = y + offsety
+    
+    ui:append("WndSliderBox_OTHeight", "WndSliderBox"):children("#WndSliderBox_OTHeight")
+      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
+      :text(function(value) return _L("otbar offset-y: %d px.", value) end)--OT高度偏移
+      :change(function(value) Config.nOTBarOffsetY = value;_XLifeBar.Reset() end)
+      :value(Config.nOTBarOffsetY)
+    y = y + offsety
+    
+    ui:append("WndSliderBox_OTTitleHeight", "WndSliderBox"):children("#WndSliderBox_OTTitleHeight")
+      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
+      :text(function(value) return _L("ot title offset-y: %d px.", value) end)--OT名称高度
+      :change(function(value) Config.nOTTitleHeight = value;_XLifeBar.Reset() end)
+      :value(Config.nOTTitleHeight)
+    y = y + offsety
+    
+    ui:append("WndSliderBox_FristHeight", "WndSliderBox"):children("#WndSliderBox_FristHeight")
+      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
+      :text(function(value) return _L("1st line offset-y: %d px.", value) end)--第一行字高度
+      :change(function(value) Config.nLineHeight[1] = value;_XLifeBar.Reset() end)
+      :value(Config.nLineHeight[1])
+    y = y + offsety
+    
+    ui:append("WndSliderBox_SecondHeight", "WndSliderBox"):children("#WndSliderBox_SecondHeight")
+      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
+      :text(function(value) return _L("2nd line offset-y: %d px.", value) end)--第二行字高度
+      :change(function(value) Config.nLineHeight[2] = value;_XLifeBar.Reset() end)
+      :value(Config.nLineHeight[2])
+    y = y + offsety
+    
+    ui:append("WndSliderBox_ThirdHeight", "WndSliderBox"):children("#WndSliderBox_ThirdHeight")
+      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
+      :text(function(value) return _L("3rd line offset-y: %d px.", value) end)--第三行字高度
+      :change(function(value) Config.nLineHeight[3] = value;_XLifeBar.Reset() end)
+      :value(Config.nLineHeight[3])
+    y = y + offsety
+    
+    -- 右半边
     x, y = 350, 80
+    ui:append("WndSliderBox_Distance", "WndSliderBox"):children("#WndSliderBox_Distance")
+      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,300)
+      :text(function(value) return _L("Max Distance: %s foot.", value) end)
+      :change(function(value) Config.nDistance = value;_XLifeBar.Reset() end)
+      :value(Config.nDistance)
+    y = y + offsety
+    
+    ui:append("WndSliderBox_Alpha", "WndSliderBox"):children("#WndSliderBox_Alpha")
+      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_PERCENT):range(0,255)
+      :text(function(value) return _L("alpha: %.0f%%.", value) end)--透明度
+      :change(function(value) Config.nAlpha = value*255/100;_XLifeBar.Reset() end)
+      :value(Config.nAlpha)
+    y = y + offsety
+    offsety = 38
     -- 显示名字
     ui:append("WndComboBox_Name", "WndComboBox"):children("#WndComboBox_Name")
       :pos(x,y):text(_L["name display config"])
@@ -767,13 +931,13 @@ _Cache.OnPanelActive = function(wnd)
       :menu(function()
         local t = {}
         table.insert(t,{    szOption = _L["player lifepercentage display"] , bDisable = true} )
-        for k,v in pairs(Config.bShowPer.Player) do
+        for k,v in pairs(Config.bShowLifePer.Player) do
             table.insert(t,{
                 szOption = _L[k], 
                 bCheck = true, 
-                bChecked = Config.bShowPer.Player[k],
+                bChecked = Config.bShowLifePer.Player[k],
                 fnAction = function() 
-                    Config.bShowPer.Player[k] = not Config.bShowPer.Player[k]
+                    Config.bShowLifePer.Player[k] = not Config.bShowLifePer.Player[k]
                     _XLifeBar.Reset() 
                 end,
                 rgb = Config.Col.Player[k],
@@ -786,13 +950,13 @@ _Cache.OnPanelActive = function(wnd)
         end
         table.insert(t,{    bDevide = true} )
         table.insert(t,{    szOption = _L["npc lifepercentage display"] , bDisable = true} )
-        for k,v in pairs(Config.bShowPer.Npc) do
+        for k,v in pairs(Config.bShowLifePer.Npc) do
             table.insert(t,{
                 szOption = _L[k], 
                 bCheck = true, 
-                bChecked = Config.bShowPer.Npc[k],
+                bChecked = Config.bShowLifePer.Npc[k],
                 fnAction = function() 
-                    Config.bShowPer.Npc[k] = not Config.bShowPer.Npc[k];
+                    Config.bShowLifePer.Npc[k] = not Config.bShowLifePer.Npc[k];
                     _XLifeBar.Reset() 
                 end,
                 rgb = Config.Col.Npc[k],
@@ -813,13 +977,13 @@ _Cache.OnPanelActive = function(wnd)
       :menu(function()
         local t = {}
         table.insert(t,{    szOption = _L["player skillpercentage display"] , bDisable = true} )
-        for k,v in pairs(Config.bShowSkillPer.Player) do
+        for k,v in pairs(Config.bShowOTBar.Player) do
             table.insert(t,{
                 szOption = _L[k], 
                 bCheck = true, 
-                bChecked = Config.bShowSkillPer.Player[k],
+                bChecked = Config.bShowOTBar.Player[k],
                 fnAction = function() 
-                    Config.bShowSkillPer.Player[k] = not Config.bShowSkillPer.Player[k]
+                    Config.bShowOTBar.Player[k] = not Config.bShowOTBar.Player[k]
                     _XLifeBar.Reset() 
                 end,
                 rgb = Config.Col.Player[k],
@@ -832,13 +996,13 @@ _Cache.OnPanelActive = function(wnd)
         end
         table.insert(t,{    bDevide = true} )
         table.insert(t,{    szOption = _L["npc skillpercentage display"] , bDisable = true} )
-        for k,v in pairs(Config.bShowSkillPer.Npc) do
+        for k,v in pairs(Config.bShowOTBar.Npc) do
             table.insert(t,{
                 szOption = _L[k], 
                 bCheck = true, 
-                bChecked = Config.bShowSkillPer.Npc[k],
+                bChecked = Config.bShowOTBar.Npc[k],
                 fnAction = function() 
-                    Config.bShowSkillPer.Npc[k] = not Config.bShowSkillPer.Npc[k];
+                    Config.bShowOTBar.Npc[k] = not Config.bShowOTBar.Npc[k];
                     _XLifeBar.Reset() 
                 end,
                 rgb = Config.Col.Npc[k],
@@ -883,70 +1047,6 @@ _Cache.OnPanelActive = function(wnd)
                 }, {szOption = g_tStrings.STR_HOTKEY_CANCEL,fnAction = function() end},
             })
       end)
-    y = y + offsety
-    
-    x, y = 20, 80
-    ui:append("WndSliderBox_Distance", "WndSliderBox"):children("#WndSliderBox_Distance")
-      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,300)
-      :text(function(value) return _L("Max Distance: %s foot.", value) end)
-      :change(function(value) Config.nDistance = value;_XLifeBar.Reset() end)
-      :value(Config.nDistance)
-    y = y + offsety
-    
-    ui:append("WndSliderBox_LifebarWidth", "WndSliderBox"):children("#WndSliderBox_LifebarWidth")
-      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
-      :text(function(value) return _L("lifebar width: %s px.", value) end)--血条长度
-      :change(function(value) Config.nWidth = value;_XLifeBar.Reset() end)
-      :value(Config.nWidth)
-    y = y + offsety
-    
-    ui:append("WndSliderBox_LifebarHeight", "WndSliderBox"):children("#WndSliderBox_LifebarHeight")
-      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
-      :text(function(value) return _L("lifebar height: %s px.", value) end)--血条高度
-      :change(function(value) Config.nHeight = value;_XLifeBar.Reset() end)
-      :value(Config.nHeight)
-    y = y + offsety
-    
-    ui:append("WndSliderBox_LifebarAlpha", "WndSliderBox"):children("#WndSliderBox_LifebarAlpha")
-      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_PERCENT):range(0,255)
-      :text(function(value) return _L("lifebar alpha: %.0f%%.", value) end)--血条透明度
-      :change(function(value) Config.nAlpha = value*255/100;_XLifeBar.Reset() end)
-      :value(Config.nAlpha)
-    y = y + offsety
-    
-    ui:append("WndSliderBox_FristHeight", "WndSliderBox"):children("#WndSliderBox_FristHeight")
-      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
-      :text(function(value) return _L("1st line offset-y: %d px.", value) end)--第一行字高度
-      :change(function(value) Config.nLineHeight[1] = value;_XLifeBar.Reset() end)
-      :value(Config.nLineHeight[1])
-    y = y + offsety
-    
-    ui:append("WndSliderBox_SecondHeight", "WndSliderBox"):children("#WndSliderBox_SecondHeight")
-      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
-      :text(function(value) return _L("2nd line offset-y: %d px.", value) end)--第二行字高度
-      :change(function(value) Config.nLineHeight[2] = value;_XLifeBar.Reset() end)
-      :value(Config.nLineHeight[2])
-    y = y + offsety
-    
-    ui:append("WndSliderBox_ThirdHeight", "WndSliderBox"):children("#WndSliderBox_ThirdHeight")
-      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
-      :text(function(value) return _L("3rd line offset-y: %d px.", value) end)--第三行字高度
-      :change(function(value) Config.nLineHeight[3] = value;_XLifeBar.Reset() end)
-      :value(Config.nLineHeight[3])
-    y = y + offsety
-    
-    ui:append("WndSliderBox_PerHeight", "WndSliderBox"):children("#WndSliderBox_PerHeight")
-      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
-      :text(function(value) return _L("percentage offset-y: %d px.", value) end)--百分比高度
-      :change(function(value) Config.nPerHeight = value;_XLifeBar.Reset() end)
-      :value(Config.nPerHeight)
-    y = y + offsety
-    
-    ui:append("WndSliderBox_LifeHeight", "WndSliderBox"):children("#WndSliderBox_LifeHeight")
-      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
-      :text(function(value) return _L("lifebar offset-y: %d px.", value) end)--血条高度
-      :change(function(value) Config.nLifeHeight = value;_XLifeBar.Reset() end)
-      :value(Config.nLifeHeight)
     y = y + offsety
 end
 MY.RegisterPanel( "XLifeBar", _L["x lifebar"], "UI/Image/Minimap/Minimap.UITex|197", {255,127,0,200}, { OnPanelActive = _Cache.OnPanelActive, OnPanelDeactive = nil } )

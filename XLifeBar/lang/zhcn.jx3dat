@@ -31,12 +31,18 @@ data = {
     ['Font: %d'] = '字体：%d',
     ['lifebar width: %s px.'] = '血条长度%spx。',
     ['lifebar height: %s px.'] = '血条高度%spx。',
-    ['lifebar alpha: %.0f%%.'] = '血条透明度%.0f%%。',
+    ['lifebar offset-y: %d px.'] = '血条高度偏移%spx。',
+    ['percentage offset-y: %d px.'] = '百分比高度偏移%spx。',
+    
+    ['otbar width: %s px.'] = '技能读条长度%spx。',
+    ['otbar height: %s px.'] = '技能读条高度%spx。',
+    ['otbar offset-y: %d px.'] = '技能读条高度偏移%spx。',
+    ['ot title offset-y: %d px.'] = '技能名称高度偏移%spx。',
+    
     ['1st line offset-y: %d px.'] = '第一行字高度偏移%spx。',
     ['2nd line offset-y: %d px.'] = '第二行字高度偏移%spx。',
     ['3rd line offset-y: %d px.'] = '第三行字高度偏移%spx。',
-    ['percentage offset-y: %d px.'] = '百分比高度偏移%spx。',
-    ['lifebar offset-y: %d px.'] = '血条高度偏移%spx。',
+    ['alpha: %.0f%%.'] = '透明度%.0f%%。',
     
     ['Neutrality'] = "中立关系",
     ['Enemy'] = "敌对关系",
