@@ -1,0 +1,3608 @@
+data = 
+{
+  [1019] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2038] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2041] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8176] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2048] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2050] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6146] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [2054] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5131] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4128] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3093] = 
+  {
+    ["nChannelFrame"] = 40,
+  },
+  [1039] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4152] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1041] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7229] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3107] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [1045] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1047] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2094] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1049] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1051] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4200] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4204] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4208] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1055] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1056] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3135] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5247] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5255] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3143] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4240] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4248] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4252] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1067] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6314] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6318] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7361] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3173] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7369] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [3177] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3179] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4312] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1081] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7393] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7397] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3197] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4360] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4364] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6414] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4372] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2198] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4400] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5427] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8808] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4412] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7485] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5443] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5447] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5459] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1112] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 5120,
+    ["nMinRadius"] = 0,
+  },
+  [1115] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [4456] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3257] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5495] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8968] = 
+  {
+    ["nAreaRadius"] = 2560,
+    ["nMaxRadius"] = 2560,
+    ["nMinRadius"] = 0,
+  },
+  [4496] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5523] = 
+  {
+    ["nAreaRadius"] = 256,
+    ["nMaxRadius"] = 1600,
+    ["nMinRadius"] = 0,
+  },
+  [565] = 
+  {
+    ["nChannelFrame"] = 48,
+  },
+  [9024] = 
+  {
+    ["nAreaRadius"] = 320,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [1133] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1134] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1135] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1136] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1138] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1139] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3301] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 12800,
+    ["nMinRadius"] = 0,
+  },
+  [7625] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2282] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1143] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1144] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3313] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 2560,
+    ["nMinRadius"] = 0,
+  },
+  [1147] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4584] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 3840,
+    ["nMinRadius"] = 0,
+  },
+  [2296] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7661] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5627] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5631] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7681] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8201] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2312] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7721] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6714] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [7741] = 
+  {
+    ["nAreaRadius"] = 192,
+    ["nMaxRadius"] = 2560,
+    ["nMinRadius"] = 0,
+  },
+  [3365] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3367] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [2346] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2348] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [589] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [3377] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2360] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2362] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2366] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2368] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2370] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7809] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4744] = 
+  {
+    ["nAreaRadius"] = 192,
+    ["nMaxRadius"] = 3840,
+    ["nMinRadius"] = 0,
+  },
+  [1193] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1194] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4772] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 3200,
+    ["nMinRadius"] = 0,
+  },
+  [300] = 
+  {
+    ["nChannelFrame"] = 80,
+  },
+  [7869] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8593] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [302] = 
+  {
+    ["nAreaRadius"] = 0,
+    ["nMaxRadius"] = 0,
+    ["nMinRadius"] = 0,
+  },
+  [7897] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7905] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7913] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [304] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 3200,
+    ["nMinRadius"] = 0,
+  },
+  [7925] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7933] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7941] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6926] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7953] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7957] = 
+  {
+    ["nAreaRadius"] = 1920,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [8753] = 
+  {
+    ["nMaxRadius"] = 6400,
+    ["nAreaRadius"] = 320,
+    ["nBrokenRate"] = 0,
+    ["nMinRadius"] = 0,
+  },
+  [7977] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7985] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8809] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8865] = 
+  {
+    ["nAreaRadius"] = 320,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [1245] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4980] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1248] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1249] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8977] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3531] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2510] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3535] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2514] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3539] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6063] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [3547] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3549] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6079] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [6083] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [2534] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6103] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [3571] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3577] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8177] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3585] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6147] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [3593] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3595] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3597] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7194] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [323] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 3200,
+    ["nMinRadius"] = 0,
+  },
+  [3603] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4137] = 
+  {
+    ["nAreaRadius"] = 192,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [7210] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6191] = 
+  {
+    ["nAreaRadius"] = 0,
+    ["nMaxRadius"] = 63999936,
+    ["nMinRadius"] = 0,
+  },
+  [7218] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3613] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6203] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 12800,
+    ["nMinRadius"] = 0,
+  },
+  [325] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 3200,
+    ["nMinRadius"] = 0,
+  },
+  [6211] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [4169] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3623] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [326] = 
+  {
+    ["nAreaRadius"] = 256,
+    ["nMaxRadius"] = 3200,
+    ["nMinRadius"] = 0,
+  },
+  [4181] = 
+  {
+    ["nAreaRadius"] = 256,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [4185] = 
+  {
+    ["nAreaRadius"] = 256,
+    ["nMaxRadius"] = 512,
+    ["nMinRadius"] = 0,
+  },
+  [5212] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [4193] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3641] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6263] = 
+  {
+    ["nAreaRadius"] = 256,
+    ["nMaxRadius"] = 256,
+    ["nMinRadius"] = 0,
+  },
+  [5244] = 
+  {
+    ["nAreaRadius"] = 0,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [329] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [3651] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5256] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [330] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [5268] = 
+  {
+    ["nChannelFrame"] = 40,
+  },
+  [7318] = 
+  {
+    ["nChannelFrame"] = 64,
+  },
+  [331] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [5284] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4265] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [4269] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [332] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 3200,
+    ["nMinRadius"] = 0,
+  },
+  [2654] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [1330] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8578] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3685] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7370] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [334] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 3200,
+    ["nMinRadius"] = 0,
+  },
+  [3691] = 
+  {
+    ["nAreaRadius"] = 0,
+    ["nMaxRadius"] = 63999936,
+    ["nMinRadius"] = 0,
+  },
+  [2674] = 
+  {
+    ["nMinRadius"] = 0,
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 1280,
+    ["nChannelFrame"] = 8,
+  },
+  [1340] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3703] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4337] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1344] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3713] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1347] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3717] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3719] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8730] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1351] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4377] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6427] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4385] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3731] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5416] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 5120,
+    ["nMinRadius"] = 0,
+  },
+  [1357] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1362] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2724] = 
+  {
+    ["nChannelFrame"] = 40,
+  },
+  [8850] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8858] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [4457] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1375] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5496] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5512] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1381] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3793] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [9026] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2782] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2798] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5616] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2812] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5624] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [706] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 3200,
+    ["nMinRadius"] = 0,
+  },
+  [2824] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1414] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 19200,
+    ["nMinRadius"] = 0,
+  },
+  [708] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 3200,
+    ["nMinRadius"] = 0,
+  },
+  [7722] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7730] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6711] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [6715] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [8331] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8339] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3881] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [3887] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [3891] = 
+  {
+    ["nAreaRadius"] = 192,
+    ["nMaxRadius"] = 63999936,
+    ["nMinRadius"] = 0,
+  },
+  [4713] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [7786] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [2874] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2880] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2882] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1443] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2886] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2890] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2892] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1448] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1452] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8531] = 
+  {
+    ["nAreaRadius"] = 192,
+    ["nMaxRadius"] = 3840,
+    ["nMinRadius"] = 0,
+  },
+  [4801] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4813] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7894] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7898] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7902] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [368] = 
+  {
+    ["nMinRadius"] = 0,
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 960,
+    ["nChannelFrame"] = 80,
+  },
+  [4861] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4865] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7942] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6927] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7954] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3985] = 
+  {
+    ["nBrokenRate"] = 0,
+    ["nChannelFrame"] = 128,
+  },
+  [6951] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6963] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6971] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6979] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1492] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4953] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8026] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8891] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8907] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4023] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4977] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8939] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7047] = 
+  {
+    ["nAreaRadius"] = 320,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [3022] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8090] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 3840,
+    ["nMinRadius"] = 0,
+  },
+  [1514] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8098] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3032] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 6399936,
+    ["nMinRadius"] = 0,
+  },
+  [6076] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [6080] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [6084] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [9133] = 
+  {
+    ["nBrokenRate"] = 0,
+    ["nChannelFrame"] = 96,
+  },
+  [9147] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4083] = 
+  {
+    ["nAreaRadius"] = 128,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [9163] = 
+  {
+    ["nAreaRadius"] = 576,
+    ["nMaxRadius"] = 2560,
+    ["nMinRadius"] = 0,
+  },
+  [9130] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [9112] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8178] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [9100] = 
+  {
+    ["nAreaRadius"] = 2560,
+    ["nMaxRadius"] = 2560,
+    ["nMinRadius"] = 0,
+  },
+  [9091] = 
+  {
+    ["nAreaRadius"] = 2560,
+    ["nMaxRadius"] = 2560,
+    ["nMinRadius"] = 0,
+  },
+  [6144] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [9063] = 
+  {
+    ["nAreaRadius"] = 256,
+    ["nMaxRadius"] = 3840,
+    ["nMinRadius"] = 0,
+  },
+  [8204] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5133] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5137] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [9023] = 
+  {
+    ["nAreaRadius"] = 320,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [2532] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6444] = 
+  {
+    ["nChannelFrame"] = 40,
+  },
+  [1546] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1547] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6184] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8932] = 
+  {
+    ["nBrokenRate"] = 0,
+    ["nChannelFrame"] = 96,
+  },
+  [7215] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3100] = 
+  {
+    ["nBrokenRate"] = 0,
+    ["nChannelFrame"] = 48,
+  },
+  [8300] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [6204] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 2560,
+    ["nMinRadius"] = 0,
+  },
+  [2029] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3108] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [4170] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8916] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4310] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1413] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1560] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7259] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1562] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7790] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4202] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4206] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5233] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8838] = 
+  {
+    ["nAreaRadius"] = 256,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [3134] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6268] = 
+  {
+    ["nAreaRadius"] = 256,
+    ["nMaxRadius"] = 64000,
+    ["nMinRadius"] = 0,
+  },
+  [8837] = 
+  {
+    ["nAreaRadius"] = 320,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [4230] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6280] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5400] = 
+  {
+    ["nAreaRadius"] = 320,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [6288] = 
+  {
+    ["nAreaRadius"] = 320,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [4734] = 
+  {
+    ["nAreaRadius"] = 256,
+    ["nMaxRadius"] = 3840,
+    ["nMinRadius"] = 0,
+  },
+  [4250] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5277] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2203] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7331] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1142] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5293] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5297] = 
+  {
+    ["nMaxRadius"] = 6400,
+    ["nAreaRadius"] = 512,
+    ["nBrokenRate"] = 0,
+    ["nMinRadius"] = 0,
+  },
+  [2141] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3166] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6332] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8792] = 
+  {
+    ["nAreaRadius"] = 192,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [8790] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7367] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [7371] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 1600,
+    ["nMinRadius"] = 0,
+  },
+  [4306] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2157] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3182] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8788] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8785] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [7395] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7399] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8778] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8767] = 
+  {
+    ["nAreaRadius"] = 192,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [3196] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8763] = 
+  {
+    ["nAreaRadius"] = 320,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [4757] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8739] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8738] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8737] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8724] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8736] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [7203] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7204] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2193] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4751] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7983] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2199] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4398] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5425] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8666] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8658] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8627] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5441] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8836] = 
+  {
+    ["nAreaRadius"] = 320,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [8608] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [8606] = 
+  {
+    ["nMinRadius"] = 0,
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 1280,
+    ["nChannelFrame"] = 80,
+  },
+  [7503] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8604] = 
+  {
+    ["nChannelFrame"] = 80,
+  },
+  [3246] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8108] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5473] = 
+  {
+    ["nAreaRadius"] = 320,
+    ["nMaxRadius"] = 5120,
+    ["nMinRadius"] = 0,
+  },
+  [5477] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5481] = 
+  {
+    ["nMaxRadius"] = 1920,
+    ["nAreaRadius"] = 128,
+    ["nBrokenRate"] = 0,
+    ["nMinRadius"] = 0,
+  },
+  [3256] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2235] = 
+  {
+    ["nBrokenRate"] = 0,
+    ["nChannelFrame"] = 128,
+  },
+  [5493] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1632] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8594] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [1634] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1635] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5513] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8592] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 12800,
+    ["nMinRadius"] = 0,
+  },
+  [4498] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [1639] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2255] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1641] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2259] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8122] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8532] = 
+  {
+    ["nAreaRadius"] = 192,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [1645] = 
+  {
+    ["nBrokenRate"] = 0,
+    ["nChannelFrame"] = 84,
+  },
+  [8530] = 
+  {
+    ["nAreaRadius"] = 192,
+    ["nMaxRadius"] = 3200,
+    ["nMinRadius"] = 0,
+  },
+  [8450] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2271] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8447] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [7358] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 1600,
+    ["nMinRadius"] = 0,
+  },
+  [8442] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [1652] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8440] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [3306] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 12800,
+    ["nMinRadius"] = 0,
+  },
+  [2285] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4570] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 3840,
+    ["nMinRadius"] = 0,
+  },
+  [2289] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8438] = 
+  {
+    ["nAreaRadius"] = 960,
+    ["nMaxRadius"] = 640000,
+    ["nMinRadius"] = 0,
+  },
+  [4582] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 3840,
+    ["nMinRadius"] = 0,
+  },
+  [3318] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8434] = 
+  {
+    ["nAreaRadius"] = 320,
+    ["nMaxRadius"] = 3200,
+    ["nMinRadius"] = 0,
+  },
+  [8425] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [832] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8421] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [8405] = 
+  {
+    ["nAreaRadius"] = 1280,
+    ["nMaxRadius"] = 9600,
+    ["nMinRadius"] = 0,
+  },
+  [7679] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8197] = 
+  {
+    ["nChannelFrame"] = 80,
+  },
+  [2311] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7242] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8307] = 
+  {
+    ["nAreaRadius"] = 320,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [1328] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8360] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8354] = 
+  {
+    ["nAreaRadius"] = 320,
+    ["nMaxRadius"] = 2880,
+    ["nMinRadius"] = 0,
+  },
+  [8350] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 3200,
+    ["nMinRadius"] = 0,
+  },
+  [8330] = 
+  {
+    ["nChannelFrame"] = 128,
+  },
+  [7719] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8277] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [8329] = 
+  {
+    ["nChannelFrame"] = 128,
+  },
+  [3356] = 
+  {
+    ["nAreaRadius"] = 192,
+    ["nMaxRadius"] = 12800,
+    ["nMinRadius"] = 0,
+  },
+  [1680] = 
+  {
+    ["nMaxRadius"] = 1280,
+    ["nAreaRadius"] = 192,
+    ["nBrokenRate"] = 0,
+    ["nMinRadius"] = 256,
+  },
+  [841] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3961] = 
+  {
+    ["nChannelFrame"] = 120,
+  },
+  [7747] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7751] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7379] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2347] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2349] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8325] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 16384,
+    ["nMinRadius"] = 0,
+  },
+  [3149] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8381] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 16384,
+    ["nMinRadius"] = 0,
+  },
+  [8304] = 
+  {
+    ["nAreaRadius"] = 256,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [8299] = 
+  {
+    ["nAreaRadius"] = 256,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [2361] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8287] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 76800,
+    ["nMinRadius"] = 0,
+  },
+  [4726] = 
+  {
+    ["nAreaRadius"] = 256,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [7799] = 
+  {
+    ["nAreaRadius"] = 256,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [3392] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2371] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4742] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 3840,
+    ["nMinRadius"] = 0,
+  },
+  [3398] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7392] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8270] = 
+  {
+    ["nAreaRadius"] = 320,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [8262] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [8206] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7835] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8205] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [854] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8194] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [855] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8130] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8129] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8127] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7867] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8126] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8124] = 
+  {
+    ["nAreaRadius"] = 256,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [8589] = 
+  {
+    ["nAreaRadius"] = 320,
+    ["nMaxRadius"] = 2560,
+    ["nMinRadius"] = 0,
+  },
+  [8597] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1963] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7676] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8096] = 
+  {
+    ["nAreaRadius"] = 192,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [8091] = 
+  {
+    ["nAreaRadius"] = 192,
+    ["nMaxRadius"] = 3200,
+    ["nMinRadius"] = 0,
+  },
+  [847] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7731] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1332] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7789] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7919] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1182] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7813] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7844] = 
+  {
+    ["nAreaRadius"] = 32000,
+    ["nMaxRadius"] = 320000,
+    ["nMinRadius"] = 0,
+  },
+  [8000] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6916] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8717] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8725] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3250] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8741] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7952] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7963] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7967] = 
+  {
+    ["nChannelFrame"] = 96,
+  },
+  [1036] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7917] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7979] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1742] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7908] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6968] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6972] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8829] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [8003] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8007] = 
+  {
+    ["nAreaRadius"] = 256,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [7806] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7797] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7795] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8877] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3504] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8031] = 
+  {
+    ["nAreaRadius"] = 256,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [7787] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8039] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7782] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7770] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7763] = 
+  {
+    ["nAreaRadius"] = 320,
+    ["nMaxRadius"] = 12800,
+    ["nMinRadius"] = 0,
+  },
+  [7758] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7757] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7744] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2636] = 
+  {
+    ["nChannelFrame"] = 80,
+  },
+  [3393] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 1600,
+    ["nMinRadius"] = 0,
+  },
+  [8075] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3530] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1767] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5599] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3536] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1770] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8099] = 
+  {
+    ["nAreaRadius"] = 192,
+    ["nMaxRadius"] = 3840,
+    ["nMinRadius"] = 0,
+  },
+  [7080] = 
+  {
+    ["nAreaRadius"] = 320,
+    ["nMaxRadius"] = 5120,
+    ["nMinRadius"] = 0,
+  },
+  [6225] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7662] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6069] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [7660] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 9600,
+    ["nMinRadius"] = 64,
+  },
+  [6077] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [6081] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [6085] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [2535] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6277] = 
+  {
+    ["nAreaRadius"] = 768,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [7629] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3564] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3566] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7623] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6286] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6306] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7562] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7535] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3578] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6133] = 
+  {
+    ["nAreaRadius"] = 130,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [461] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [7492] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6145] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [7469] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3590] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3592] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6161] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7398] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7225] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4127] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3602] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3604] = 
+  {
+    ["nAreaRadius"] = 2560,
+    ["nMaxRadius"] = 2560,
+    ["nMinRadius"] = 0,
+  },
+  [1804] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8278] = 
+  {
+    ["nMaxRadius"] = 6400,
+    ["nAreaRadius"] = 384,
+    ["nBrokenRate"] = 0,
+    ["nMinRadius"] = 0,
+  },
+  [7216] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2589] = 
+  {
+    ["nChannelFrame"] = 96,
+  },
+  [7381] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3616] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6209] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [8326] = 
+  {
+    ["nChannelFrame"] = 96,
+  },
+  [4171] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7373] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [4179] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3628] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5210] = 
+  {
+    ["nAreaRadius"] = 0,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [7372] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [455] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 3200,
+    ["nMinRadius"] = 0,
+  },
+  [6245] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8398] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1821] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7280] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7366] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 256,
+    ["nMinRadius"] = 0,
+  },
+  [7364] = 
+  {
+    ["nMaxRadius"] = 2560,
+    ["nAreaRadius"] = 128,
+    ["nBrokenRate"] = 0,
+    ["nMinRadius"] = 0,
+  },
+  [6269] = 
+  {
+    ["nAreaRadius"] = 256,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [8446] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [4231] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7347] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7343] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7339] = 
+  {
+    ["nAreaRadius"] = 192,
+    ["nMaxRadius"] = 1600,
+    ["nMinRadius"] = 0,
+  },
+  [3660] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7320] = 
+  {
+    ["nChannelFrame"] = 128,
+  },
+  [3664] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3666] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6309] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4267] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [7319] = 
+  {
+    ["nChannelFrame"] = 96,
+  },
+  [7317] = 
+  {
+    ["nChannelFrame"] = 48,
+  },
+  [7314] = 
+  {
+    ["nChannelFrame"] = 32,
+  },
+  [5306] = 
+  {
+    ["nAreaRadius"] = 288,
+    ["nMaxRadius"] = 3200,
+    ["nMinRadius"] = 0,
+  },
+  [7281] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3682] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3684] = 
+  {
+    ["nMaxRadius"] = 1280,
+    ["nAreaRadius"] = 512,
+    ["nBrokenRate"] = 0,
+    ["nMinRadius"] = 0,
+  },
+  [7368] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [3688] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [462] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [7230] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4315] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7228] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [463] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [7396] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7220] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7219] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [464] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [4343] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7217] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7206] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3714] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7205] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3718] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8726] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8734] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7202] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4379] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7200] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2707] = 
+  {
+    ["nChannelFrame"] = 48,
+  },
+  [7196] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7190] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4399] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4403] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5430] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7104] = 
+  {
+    ["nAreaRadius"] = 192,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [5438] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8830] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [5446] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5450] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [72] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5458] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4975] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3254] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3760] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7520] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [4455] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4210] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8918] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [2522] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5549] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4177] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [62] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6675] = 
+  {
+    ["nChannelFrame"] = 80,
+  },
+  [3780] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 5120,
+    ["nMinRadius"] = 0,
+  },
+  [8974] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1778] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2531] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8998] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2533] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3792] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4381] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2279] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [333] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 3200,
+    ["nMinRadius"] = 0,
+  },
+  [2777] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6198] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [6313] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7608] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [2548] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7616] = 
+  {
+    ["nAreaRadius"] = 320,
+    ["nMaxRadius"] = 5120,
+    ["nMinRadius"] = 0,
+  },
+  [5609] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6278] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3580] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7632] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2051] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [322] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 3200,
+    ["nMinRadius"] = 0,
+  },
+  [6275] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [1542] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [324] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 3200,
+    ["nMinRadius"] = 0,
+  },
+  [1294] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2809] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7664] = 
+  {
+    ["nAreaRadius"] = 640,
+    ["nMaxRadius"] = 12800,
+    ["nMinRadius"] = 0,
+  },
+  [1919] = 
+  {
+    ["nAreaRadius"] = 0,
+    ["nMaxRadius"] = 0,
+    ["nMinRadius"] = 0,
+  },
+  [6223] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [961] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2118] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2080] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5642] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3111] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [327] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [2829] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [328] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [2105] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3128] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3129] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7720] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3137] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6705] = 
+  {
+    ["nAreaRadius"] = 256,
+    ["nMaxRadius"] = 64000,
+    ["nMinRadius"] = 0,
+  },
+  [7732] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7736] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8311] = 
+  {
+    ["nAreaRadius"] = 256,
+    ["nMaxRadius"] = 32000,
+    ["nMinRadius"] = 0,
+  },
+  [3874] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8327] = 
+  {
+    ["nChannelFrame"] = 96,
+  },
+  [5282] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3880] = 
+  {
+    ["nAreaRadius"] = 192,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [3669] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3671] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3886] = 
+  {
+    ["nAreaRadius"] = 192,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [8375] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3164] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [974] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7784] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3180] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4723] = 
+  {
+    ["nAreaRadius"] = 256,
+    ["nMaxRadius"] = 3840,
+    ["nMinRadius"] = 0,
+  },
+  [3900] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2879] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2881] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2883] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2885] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2887] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2889] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3914] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5531] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1960] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1342] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3705] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2901] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3926] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [465] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [1348] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5480] = 
+  {
+    ["nAreaRadius"] = 128,
+    ["nMaxRadius"] = 960,
+    ["nMinRadius"] = 0,
+  },
+  [1349] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7868] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1970] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [986] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4402] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2208] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2212] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1280,
+    ["nMinRadius"] = 0,
+  },
+  [8615] = 
+  {
+    ["nChannelFrame"] = 160,
+  },
+  [5270] = 
+  {
+    ["nBrokenRate"] = 0,
+    ["nChannelFrame"] = 153,
+  },
+  [1977] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1624] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1979] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7912] = 
+  {
+    ["nAreaRadius"] = 960,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [1629] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2233] = 
+  {
+    ["nMinRadius"] = 0,
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1280,
+    ["nChannelFrame"] = 80,
+  },
+  [1630] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1631] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [5211] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [3970] = 
+  {
+    ["nMaxRadius"] = 1280,
+    ["nAreaRadius"] = 256,
+    ["nBrokenRate"] = 0,
+    ["nMinRadius"] = 0,
+  },
+  [173] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7944] = 
+  {
+    ["nAreaRadius"] = 512,
+    ["nMaxRadius"] = 1600,
+    ["nMinRadius"] = 0,
+  },
+  [6925] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6929] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1640] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [567] = 
+  {
+    ["nChannelFrame"] = 160,
+  },
+  [4848] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [7968] = 
+  {
+    ["nChannelFrame"] = 96,
+  },
+  [570] = 
+  {
+    ["nChannelFrame"] = 80,
+  },
+  [1996] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [7980] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1140] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8807] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4737] = 
+  {
+    ["nAreaRadius"] = 256,
+    ["nMaxRadius"] = 3840,
+    ["nMinRadius"] = 0,
+  },
+  [6973] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6977] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1146] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2290] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2005] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1148] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4720] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [2008] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8028] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2010] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8903] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8911] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2013] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4274] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2015] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3912] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3917] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3011] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4999] = 
+  {
+    ["nAreaRadius"] = 256,
+    ["nMaxRadius"] = 6400,
+    ["nMinRadius"] = 0,
+  },
+  [2354] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 2560,
+    ["nMinRadius"] = 0,
+  },
+  [8076] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1184] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1953] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4738] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 3840,
+    ["nMinRadius"] = 0,
+  },
+  [3025] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2026] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [8100] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [4782] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3033] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3708] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2031] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [3533] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [6078] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [6082] = 
+  {
+    ["nAreaRadius"] = 384,
+    ["nMaxRadius"] = 1920,
+    ["nMinRadius"] = 0,
+  },
+  [1482] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [2036] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+  [1501] = 
+  {
+    ["nBrokenRate"] = 0,
+  },
+}

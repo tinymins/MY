@@ -398,3 +398,14 @@ MY.Player.LogOff = function(bCompletely)
         ReInitUI(LOAD_LOGIN_REASON.RETURN_ROLE_LIST)
     end
 end
+
+-- 根据技能 ID 获取引导帧数，非引导技能返回 nil
+-- (number) MY.Player.GetChannelSkillFrame(number dwSkillID)
+MY.Player.GetChannelSkillFrame = function(dwSkillID)
+    local t = _Cache.tSkillEx[dwSkillID]
+    if t then
+        return t.nChannelFrame
+    end
+end
+-- Load skill extend data
+_Cache.tSkillEx = LoadLUAData(MY.GetAddonInfo().szFrameworkRoot.."data/skill_ex") or {}
