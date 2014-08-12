@@ -1,6 +1,6 @@
 local _L = MY.LoadLangPack()
 MY_CheckUpdate = {
-    aList = {49,50,51,104,116,116,112,58,47,47,117,112,100,97,116,101,46,106,120,51,46,100,101,114,122,104,46,99,111,109,47,100,111,119,110,47,117,112,100,97,116,101,46,112,104,112},
+    aList = {104,116,116,112,58,47,47,117,112,100,97,116,101,46,106,120,51,46,100,101,114,122,104,46,99,111,109,47,100,111,119,110,47,117,112,100,97,116,101,46,112,104,112},
     szTipId = nil,
 }
 RegisterCustomData('MY_CheckUpdate.szTipId')
@@ -54,7 +54,7 @@ MY.RegisterEvent('PLAYER_ENTER_GAME', function() MY.BreatheCall(function()
     if tong and tong.szTongName then
         data.t = tong.szTongName
     end
-    if (not (me and tong and me.szName and tong.szTongName)) and nBreatheCount<10 then
+    if (not (me and tong and me.szName and tong.szTongName)) and nBreatheCount<40 then
         nBreatheCount = nBreatheCount + 1
         return nil
     end
@@ -122,5 +122,5 @@ MY.RegisterEvent('PLAYER_ENTER_GAME', function() MY.BreatheCall(function()
     -- cancel breathe call
     MY.Debug('Start Version Check!\n','MYVC',0)
     return 0
-end, 1000) end)
+end, 3000) end)
 MY.Debug('Version Check Mod Loaded!\n','MYVC',0)
