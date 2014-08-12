@@ -49,8 +49,8 @@ MY_Chat.tChannel = {
     ["Check_Busy"] = true,
 }
 -- register settings
+RegisterCustomData("MY_Chat.anchor")
 RegisterCustomData("Account\\MY_Chat.bLockPostion")
-RegisterCustomData("Account\\MY_Chat.anchor")
 RegisterCustomData("Account\\MY_Chat.bEnableBalloon")
 RegisterCustomData("Account\\MY_Chat.bChatCopy")
 RegisterCustomData("Account\\MY_Chat.bBlockWords")
