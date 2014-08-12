@@ -1,21 +1,33 @@
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."XLifeBar/lang/")
 local _Cache = {}
+local OT_STATE = {
+    START_SKILL   = 1,  -- ÂºÄÂßãÊäÄËÉΩËØªÊù°(ÊòæÁ§∫ËæπÊ°Ü)
+    START_PREPARE = 2,  -- ÂºÄÂßãËØªÊù°(ÊòæÁ§∫ËæπÊ°Ü)
+    START_CHANNEL = 3,  -- ÂºÄÂßãÈÄÜËØªÊù°(ÊòæÁ§∫ËæπÊ°Ü)
+    ON_SKILL      = 4,  -- Ê≠£Âú®ÊäÄËÉΩËØªÊù°(ÈúÄË¶ÅÊØèÂ∏ßËé∑ÂèñÂÄºÈáçÁªò)
+    ON_PREPARE    = 5,  -- Ê≠£Âú®Ê≠£ÂêëËØªÊù°(ÈúÄË¶ÅÊØèÂ∏ßËÆ°ÁÆóÈáçÁªò)
+    ON_CHANNEL    = 6,  -- Ê≠£Âú®ÈÄÜÂêëËØªÊù°(ÈúÄË¶ÅÊØèÂ∏ßËÆ°ÁÆóÈáçÁªò)
+    BREAK = 7,          -- ÊâìÊñ≠ËØªÊù°(ÂèòÁ∫¢ÈöêËóè)
+    SUCCEED = 8,        -- ËØªÊù°ÊàêÂäüÁªìÊùü(ÈöêËóè)
+    FAILED = 9,         -- ËØªÊù°Â§±Ë¥•ÁªìÊùü(ÈöêËóè)
+    IDLE  = 10,         -- Ê≤°ÊúâËØªÊù°(Á©∫Èó≤)
+}
 
--- ’‚∏ˆ÷ª «ƒ¨»œ≈‰÷√ ∏ƒ’‚¿Ô√ª”√µƒ ª·–ﬁ∏ƒµƒª∞ –ﬁ∏ƒdataŒƒº˛
+-- Ëøô‰∏™Âè™ÊòØÈªòËÆ§ÈÖçÁΩÆ ÊîπËøôÈáåÊ≤°Áî®ÁöÑ ‰ºö‰øÆÊîπÁöÑËØù ‰øÆÊîπdataÊñá‰ª∂
 local Config_Default = {
     Col = {
         Player = {
-            Self  = {30 ,140,220},      -- ◊‘º∫
-            Party = {30 ,140,220},      -- Õ≈∂”
-            Enemy = {255,30 ,30 },      -- µ–∂‘
-            Neutrality = {255,255,0},   -- ÷–¡¢
-            Ally  = {30 ,255,30 },      -- œ‡Õ¨’Û”™
+            Self  = {30 ,140,220},      -- Ëá™Â∑±
+            Party = {30 ,140,220},      -- Âõ¢Èòü
+            Enemy = {255,30 ,30 },      -- ÊïåÂØπ
+            Neutrality = {255,255,0},   -- ‰∏≠Á´ã
+            Ally  = {30 ,255,30 },      -- Áõ∏ÂêåÈòµËê•
         },
         Npc = {
-            Party = {30 ,140,220},-- Õ≈∂”
-            Enemy = {255,30 ,30 },-- µ–∂‘
-            Neutrality = {255,255,0},-- ÷–¡¢
-            Ally  = {30 ,255,30 },-- œ‡Õ¨’Û”™
+            Party = {30 ,140,220},-- Âõ¢Èòü
+            Enemy = {255,30 ,30 },-- ÊïåÂØπ
+            Neutrality = {255,255,0},-- ‰∏≠Á´ã
+            Ally  = {30 ,255,30 },-- Áõ∏ÂêåÈòµËê•
         }
     },
     bShowName    = { Player = { Self = true , Party = true , Neutrality = true , Enemy = true , Ally = true , }, Npc = { Party = true , Neutrality = true , Enemy = true , Ally = true , }, },
@@ -43,13 +55,13 @@ local Config_Default = {
 }
 local Config = clone(Config_Default)
 
-XLifeBar = {}
+XLifeBar = XLifeBar or {}
+setmetatable(XLifeBar, { __call = function(me, ...) return me.X.new(...) end, __metatable = true })
 XLifeBar.bEnabled = false
 XLifeBar.bUseGlobalConfig = false
 RegisterCustomData("XLifeBar.bEnabled")
 RegisterCustomData("XLifeBar.bUseGlobalConfig")
 local _XLifeBar = {
-    dwVersion = 0x0000700,
     szConfig = "userdata/XLifeBar/CFG",
     tObject = {},
     tTongList = {},
@@ -57,6 +69,7 @@ local _XLifeBar = {
     tPlayer = {},
     dwTargetID = 0,
 }
+local HP = XLifeBar.HP
 
 _XLifeBar.GetName = function(tar)
     local szName = tar.szName
@@ -105,7 +118,7 @@ _XLifeBar.GetForce = function(dwID)
     if IsNeutrality(me.dwID,dwID) then
         return "Neutrality"
     end
-    if IsEnemy(me.dwID,dwID) then -- µ–∂‘πÿœµ
+    if IsEnemy(me.dwID,dwID) then -- ÊïåÂØπÂÖ≥Á≥ª
         local r,g,b = GetHeadTextForceFontColor(dwID,me.dwID)
         if r == 255 and g == 255 and b == 0 then
             return "Neutrality"
@@ -113,13 +126,39 @@ _XLifeBar.GetForce = function(dwID)
             return "Enemy"
         end
     end
-    if IsAlly(me.dwID, dwID) then -- œ‡Õ¨’Û”™
+    if IsAlly(me.dwID, dwID) then -- Áõ∏ÂêåÈòµËê•
         return "Ally"
     end
     
     return "Neutrality" -- "Other"
 end
 
+_XLifeBar.GetTongName = function(dwTongID, szFormatString)
+    szFormatString = szFormatString or "%s"
+    if not _XLifeBar.tTongList[dwTongID] then
+        if GetTongClient().ApplyGetTongName(dwTongID) then
+            _XLifeBar.tTongList[dwTongID] = GetTongClient().ApplyGetTongName(dwTongID)
+        end
+    end
+    if _XLifeBar.tTongList[dwTongID] then
+        return string.format(szFormatString, _XLifeBar.tTongList[dwTongID])
+    end
+end
+
+-- Ëé∑ÂèñËØªÊù°Áä∂ÊÄÅ
+_XLifeBar.GetPrepareState = function(object)
+    local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = object.GetSkillPrepareState()
+    if (not bIsPrepare) and object.GetOTActionState then   -- Â¶ÇÊûúÊ≤°ËØªÊù° Âà§Êñ≠‰∏Ä‰∏ãÂ¶ÇÊûúÊòØÁé©ÂÆ∂(Êúâobject.GetOTActionStateÊñπÊ≥ï)ÁöÑËØù Âà§Êñ≠OTActionStateÊòØÂê¶‰∏∫0
+        if object.GetOTActionState()==1 then    -- ‰∏∫1 ËØ¥ÊòéÂú®ÂâØÊú¨Â§ñ‰∏çËÉΩËé∑Âèñ ËÆæÁΩÆ‰∏Ä‰∏ã‰∏¥Êó∂ÁõÆÊ†áÂÜçËØï‰∏ÄÊ¨°
+            MY.Player.SetTempTarget(TARGET.PLAYER, dwID)
+            bIsPrepare, dwSkillID, dwSkillLevel, fProgress = object.GetSkillPrepareState()
+            MY.Player.ResumeTarget()
+        end
+    end
+    return bIsPrepare, dwSkillID, dwSkillLevel, fProgress
+end
+
+-- ÈáçÁªòÊâÄÊúâUIÔºåÂπ∂Âú®bNoSave‰∏∫ÂÅáÊó∂‰øùÂ≠òÈÖçÁΩÆÊñá‰ª∂
 _XLifeBar.Reset = function(bNoSave)
     _XLifeBar.tObject = {}
     _XLifeBar.Frame:Lookup("",""):Clear()
@@ -131,7 +170,7 @@ _XLifeBar.Reset = function(bNoSave)
         end
     end
 end
-
+-- ÈáçËΩΩÈÖçÁΩÆÊñá‰ª∂Âπ∂ÈáçÁªò
 _XLifeBar.Reload = function()
     local _Config
     if XLifeBar.bUseGlobalConfig then
@@ -151,290 +190,257 @@ _XLifeBar.Reload = function()
 end
 MY.RegisterInit(_XLifeBar.Reload)
 
-local HP = class()
-
-function HP:ctor(object) -- KGobject
-    self.self = object
-    self.dwID = object.dwID
-    self.force = _XLifeBar.GetForce(object.dwID)
-    return self
-end
--- ¥¥Ω®
-function HP:Create()
-    -- Create handle
-    local frame = _XLifeBar.Frame
-    if not frame:Lookup("",tostring(self.dwID)) then
-        local Total = frame:Lookup("","")
-        Total:AppendItemFromString(FormatHandle( string.format("name=\"%s\"",self.dwID) ))
-    end
-    local handle = frame:Lookup("",tostring(self.dwID))
-    local lifeper = self.self.nCurrentLife / self.self.nMaxLife
-    if lifeper > 1 or lifeper < 0 then lifeper = 1 end -- fix
-    
-    _XLifeBar.tObject[self.dwID] = {
-        Lifeper = lifeper,
-        handle = handle,
-        Force = self.force,
+XLifeBar.X = class()
+-- ÊûÑÈÄ†ÂáΩÊï∞
+function XLifeBar.X:ctor(object)
+    _XLifeBar.tObject[object.dwID] = _XLifeBar.tObject[object.dwID] or {
+        handle = nil,
+        Name = '',
+        Tong = '',
+        Title = '',
+        Life = -1,
+        Force = _XLifeBar.GetForce(object.dwID),
+        OT = {
+            nState = OT_STATE.IDLE,
+            nPercentage = 0,
+            szTitle = "",
+            nStartFrame = 0,
+            nFrameCount = 0,
+        },
     }
-    if not handle:Lookup(string.format("bg_%s",self.dwID)) then
-        handle:AppendItemFromString( string.format("<shadow>name=\"hp_bg_%s\"</shadow>",self.dwID) )
-        handle:AppendItemFromString( string.format("<shadow>name=\"hp_bg2_%s\"</shadow>",self.dwID) )
-        handle:AppendItemFromString( string.format("<shadow>name=\"hp_%s\"</shadow>",self.dwID) )
-        handle:AppendItemFromString( string.format("<shadow>name=\"ot_bg_%s\"</shadow>",self.dwID) )
-        handle:AppendItemFromString( string.format("<shadow>name=\"ot_bg2_%s\"</shadow>",self.dwID) )
-        handle:AppendItemFromString( string.format("<shadow>name=\"ot_%s\"</shadow>",self.dwID) )
-        handle:AppendItemFromString( string.format("<shadow>name=\"name_%s\"</shadow>",self.dwID) )
-        self:DrawBorder(Config.nAlpha)
-        self:DrawName()
-    end
-    --ªÊ÷∆—™Ãı
-    self:DrawLife(lifeper)
+    self.self = object
+    self.tab = _XLifeBar.tObject[object.dwID]
+    self.force = self.tab.Force
+    self.hp = HP.new(object.dwID, _XLifeBar.Frame, _XLifeBar.tObject[object.dwID].handle)
     return self
 end
-
-
--- …æ≥˝
-function HP:Remove()
-    local frame = _XLifeBar.Frame
-    if frame:Lookup("",tostring(self.dwID)) then
-        local Total = frame:Lookup("","")
-        Total:RemoveItem(frame:Lookup("",tostring(self.dwID)))        
+-- ÂàõÂª∫UI
+function XLifeBar.X:Create()
+    if not self.hp.handle then
+        -- ÂàõÂª∫UI
+        self.hp:Create()
+        -- handleÂÜôÂõûÁºìÂ≠ò Èò≤Ê≠¢‰∫åÊ¨°Create()
+        _XLifeBar.tObject[self.self.dwID].handle = self.hp.handle
+        -- ÂºÄÂßãÁªòÂà∂Ê∞∏Ëøú‰∏ç‰ºöÈáçÁªòÁöÑ‰∏úË•ø
+        -- ÁªòÂà∂Ë°ÄÊù°ËæπÊ°Ü
+        local cfgLife
+        if IsPlayer(self.self.dwID) then
+            cfgLife = Config.bShowLife.Player[self.force]
+        else
+            cfgLife = Config.bShowLife.Npc[self.force]
+        end
+        if cfgLife then
+            self.hp:DrawLifeBorder(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, Config.nAlpha)
+        end
     end
-    _XLifeBar.tObject[self.dwID] = nil
     return self
 end
-
-function HP:DrawName(col)
-    local nAlpha = Config.nAlpha
+-- Âà†Èô§UI
+function XLifeBar.X:Remove()
+    if self.hp.handle then
+        self.hp:Remove()
+    end
+    _XLifeBar.tObject[self.self.dwID] = nil
+    return self
+end
+-- ÂØπÁõÆÊ†áÂ§¥È°∂È¢úËâ≤ËøõË°åÊª§ÈïúÂ§ÑÁêÜÔºàÈ´ò‰∫Æ/Ê≠ª‰∫°Ôºâ
+function XLifeBar.X:FxColor(r,g,b,a)
+    -- Ê≠ª‰∫°Âà§ÂÆö
+    if self.self.nMoveState == MOVE_STATE.ON_DEATH then
+        if _XLifeBar.dwTargetID == self.self.dwID then
+            return math.ceil(r/2.2), math.ceil(g/2.2), math.ceil(b/2.2), a
+        else
+            return math.ceil(r/2.5), math.ceil(g/2.5), math.ceil(b/2.5), a
+        end
+    elseif _XLifeBar.dwTargetID == self.self.dwID then
+        return 255-(255-r)*0.3, 255-(255-g)*0.3, 255-(255-b)*0.3, a
+    else
+        return r,g,b,a
+    end
+end
+-- ËÆæÁΩÆÂêçÂ≠ó
+function XLifeBar.X:SetName(szName)
+    if self.tab.Name ~= szName then
+        self.tab.Name = szName
+        self:DrawNames()
+    end
+    return self
+end
+-- ËÆæÁΩÆÁß∞Âè∑
+function XLifeBar.X:SetTitle(szTitle)
+    if self.tab.Title ~= Title then
+        self.tab.Title = Title
+        self:DrawNames()
+    end
+    return self
+end
+-- ËÆæÁΩÆÂ∏Æ‰ºö
+function XLifeBar.X:SetTong(szTongName)
+    if self.tab.Tong ~= Tong then
+        self.tab.Tong = Tong
+        self:DrawNames()
+    end
+    return self
+end
+-- ÈáçÁªòÂ§¥È°∂ÊñáÂ≠ó
+function XLifeBar.X:DrawNames()
+    local tWordlines = {}
+    local r,g,b,a,f
+    local cfgName, cfgTitle, cfgTong
     local tab = _XLifeBar.tObject[self.dwID]
-    local handle = tab.handle
-    local sha = handle:Lookup(string.format("name_%s",self.dwID))
-
-    
-    local cfgName = Config.bShowName.Player[self.force]
-    local cfgTitle = Config.bShowTitle.Player[self.force]
-    local cfgTong = Config.bShowTong.Player[self.force]
-    local cfgLifePer = Config.bShowLifePer.Player[self.force]
-    local cfgOTTitle = Config.bShowOTBar.Player[self.force]
-    local r,g,b = unpack(Config.Col.Player[self.force])
-    
-    if not IsPlayer(self.dwID) then
-        cfgName = Config.bShowName.Npc[self.force]
+    if IsPlayer(self.dwID) then
+        cfgName  = Config.bShowName.Player[self.force]
+        cfgTitle = Config.bShowTitle.Player[self.force]
+        cfgTong  = Config.bShowTong.Player[self.force]
+        r,g,b    = unpack(Config.Col.Player[self.force])
+    else
+        cfgName  = Config.bShowName.Npc[self.force]
         cfgTitle = Config.bShowTitle.Npc[self.force]
-        cfgTong = false
-        cfgLifePer = Config.bShowLifePer.Npc[self.force]
-        cfgOTTitle = Config.bShowOTBar.Npc[self.force]
-        r,g,b = unpack(Config.Col.Npc[self.force])
+        cfgTong  = false
+        r,g,b    = unpack(Config.Col.Npc[self.force])
     end
-    local szName, szTitle, szTong, szLifePer, szOTTitle
-    if cfgName  then szName  = _XLifeBar.GetName(self.self) end
-    if cfgTitle and self.self.szTitle and self.self.szTitle~="" then szTitle = "<" .. self.self.szTitle .. ">" end
-    if cfgTong and self.self.dwTongID ~= 0 then
-        if not _XLifeBar.tTongList[self.self.dwTongID] then
-            if GetTongClient().ApplyGetTongName(self.self.dwTongID) then
-                _XLifeBar.tTongList[self.self.dwTongID] = GetTongClient().ApplyGetTongName(self.self.dwTongID)
-            end
-        end
-        if _XLifeBar.tTongList[self.self.dwTongID] then
-            szTong = "[" .. _XLifeBar.tTongList[self.self.dwTongID] .. "]"
-        end
-    end
-    if cfgLifePer then szLifePer = string.format("%.1f", 100 * tab.Lifeper) end
-    if cfgOTTitle and tab.szOTTitle~="" then szOTTitle = tab.szOTTitle end
+    a,f = Config.nAlpha, Config.nFont
+    r,g,b,a = self:FxColor(r,g,b,a)
     
-    if type(col) == "table" then
-        r,g,b = unpack(col)
-    elseif type(col) == "function" then
-        r,g,b = col(r,g,b)
-    elseif type(col) == "number" then
-        r,g,b = math.ceil(r/col),math.ceil(g/col),math.ceil(b/col)
-    end
-    
-    sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
-    sha:ClearTriangleFanPoint()
-    
-    if szLifePer then
-        sha:AppendCharacterID(self.dwID,true,r,g,b,nAlpha,{0,0,0,0,- Config.nPerHeight},Config.nFont,string.format("%.1f", 100 * tab.Lifeper),1,1)
-    end
-    if szOTTitle then
-        sha:AppendCharacterID(self.dwID,true,r,g,b,nAlpha,{0,0,0,0,- Config.nOTTitleHeight},Config.nFont,tab.szOTTitle,1,1)
-    end
+    local szName, szTitle, szTong
     local i = #Config.nLineHeight
-    if szTong then
-        sha:AppendCharacterID(self.dwID,true,r,g,b,nAlpha,{0,0,0,0,- Config.nLineHeight[i]},Config.nFont,szTong,1,1)
+    if cfgTong and self.self.dwTongID and self.self.dwTongID ~= 0 then
+        local szTongName = _XLifeBar.GetTongName(self.self.dwTongID, "[%s]")
+        if szTongName then
+            table.insert( tWordlines, {szTongName, Config.nLineHeight[i]} )
+            i = i - 1
+        end
+    end
+    if cfgTitle and self.self.szTitle and self.self.szTitle~="" then
+        table.insert( tWordlines, {"<" .. self.self.szTitle .. ">", Config.nLineHeight[i]} )
         i = i - 1
     end
-    if szTitle then
-        sha:AppendCharacterID(self.dwID,true,r,g,b,nAlpha,{0,0,0,0,- Config.nLineHeight[i]},Config.nFont,szTitle,1,1)
+    if cfgName  then
+        table.insert( tWordlines, {_XLifeBar.GetName(self.self), Config.nLineHeight[i]} )
         i = i - 1
     end
-    if szName then
-        sha:AppendCharacterID(self.dwID,true,r,g,b,nAlpha,{0,0,0,0,- Config.nLineHeight[i]},Config.nFont,szName,1,1)
-        i = i - 1
-    end
+    
+    self.hp:DrawWordlines(tWordlines, {r,g,b,a,f})
+    return self
 end
-
--- ÃÓ≥‰±ﬂøÚ ƒ¨»œ200µƒnAlpha
-function HP:DrawBorder(nAlpha)
-    local tab = _XLifeBar.tObject[self.dwID]
-    local handle = tab.handle
-    
-    local cfgLife = Config.bShowLife.Npc[self.force]
-    if IsPlayer(self.dwID) then
-        cfgLife = Config.bShowLife.Player[self.force]
+-- ËÆæÁΩÆË°ÄÈáè
+function XLifeBar.X:SetLife(dwLifePercentage)
+    if dwLifePercentage < 0 or dwLifePercentage > 1 then dwLifePercentage = 1 end -- fix
+    if self.tab.Life ~= dwLifePercentage then
+        self.tab.Life = dwLifePercentage
+        self:DrawLife()
     end
-    
-    
+    return self
+end
+function XLifeBar.X:DrawLife()
+    local cfgLife, cfgLifePer, r,g,b,a,f
+    if IsPlayer(self.self.dwID) then
+        cfgLife    = Config.bShowLife.Player[self.force]
+        cfgLifePer = Config.bShowLifePer.Player[self.force]
+        r,g,b      = unpack(Config.Col.Player[self.force])
+    else
+        cfgLife    = Config.bShowLife.Npc[self.force]
+        cfgLifePer = Config.bShowLifePer.Npc[self.force]
+        r,g,b      = unpack(Config.Col.Npc[self.force])
+    end
+    a, f = Config.nAlpha, Config.nFont
+    r,g,b,a = self:FxColor(r,g,b,a)
     if cfgLife then
-        -- ªÊ÷∆Õ‚±ﬂøÚ
-        local sha = handle:Lookup(string.format("hp_bg_%s",self.dwID))
-        sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
-        sha:SetD3DPT(D3DPT.TRIANGLEFAN)
-        sha:ClearTriangleFanPoint()
-        local bcX,bcY = - Config.nLifeWidth / 2 ,(- Config.nLifeHeight) - Config.nLifeOffsetY
-
-        sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX,bcY})
-        sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX+Config.nLifeWidth,bcY})
-        sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX+Config.nLifeWidth,bcY+Config.nLifeHeight})
-        sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX,bcY+Config.nLifeHeight})
-
-        -- ªÊ÷∆ƒ⁄±ﬂøÚ
-        local sha = handle:Lookup(string.format("hp_bg2_%s",self.dwID))
-        sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
-        sha:SetD3DPT(D3DPT.TRIANGLEFAN)
-        sha:ClearTriangleFanPoint()        
-        local bcX,bcY = - (Config.nLifeWidth / 2 - 1),(- (Config.nLifeHeight - 1)) - Config.nLifeOffsetY
-
-        sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX,bcY})
-        sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX+(Config.nLifeWidth - 2),bcY})
-        sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX+(Config.nLifeWidth - 2),bcY+(Config.nLifeHeight - 2)})
-        sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX,bcY+(Config.nLifeHeight - 2)})        
+        self.hp:DrawLifebar(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, {r,g,b,a,self.tab.Life})
+    end
+    if cfgLifePer then
+        self.hp:DrawLifePercentage({string.format("%.1f", 100 * self.tab.Life), Config.nPerHeight}, {r,g,b,a,f})
     end
     return self
 end
-
-
--- ÃÓ≥‰±ﬂøÚ ƒ¨»œ200µƒnAlpha
-function HP:DrawOTBarBorder(nAlpha)
-    local tab = _XLifeBar.tObject[self.dwID]
-    local handle = tab.handle
-    
-    local cfgOTBar = Config.bShowOTBar.Npc[self.force]
-    if IsPlayer(self.dwID) then
-        cfgOTBar = Config.bShowOTBar.Player[self.force]
+-- ËÆæÁΩÆ/Ëé∑ÂèñOTÁä∂ÊÄÅ
+function XLifeBar.X:SetOTState(nState)
+    if nState == OT_STATE.BREAK then
+        self.tab.OT.nStartFrame = GetLogicFrameCount()
+        self:DrawOTBar({255,0,0}):DrawOTTitle({255,0,0})
+    elseif nState == OT_STATE.SUCCEED then
+        self.tab.OT.nStartFrame = GetLogicFrameCount()
     end
-    
-    
+    self.tab.OT.nState = nState
+    return self
+end
+function XLifeBar.X:GetOTState()
+    return self.tab.OT.nState
+end
+-- ËÆæÁΩÆËØªÊù°Ê†áÈ¢ò
+function XLifeBar.X:SetOTTitle(szOTTitle, rgba)
+    if self.tab.OT.szTitle ~= szOTTitle then
+        self.tab.OT.szTitle = szOTTitle
+        self:DrawOTTitle(rgba)
+    end
+    return self
+end
+function XLifeBar.X:DrawOTTitle(rgba)
+    local cfgOTBar, r,g,b,a,f
+    if IsPlayer(self.self.dwID) then
+        cfgOTBar   = Config.bShowOTBar.Player[self.force]
+        r,g,b      = unpack(Config.Col.Player[self.force])
+    else
+        cfgOTBar   = Config.bShowOTBar.Npc[self.force]
+        r,g,b      = unpack(Config.Col.Npc[self.force])
+    end
+    a, f = Config.nAlpha, Config.nFont
+    if rgba then r,g,b,a = rgba[1] or r, rgba[2] or g, rgba[3] or b, rgba[4] or a end
+    r,g,b,a = self:FxColor(r,g,b,a)
     if cfgOTBar then
-        -- ªÊ÷∆Õ‚±ﬂøÚ
-        local sha = handle:Lookup(string.format("ot_bg_%s",self.dwID))
-        sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
-        sha:SetD3DPT(D3DPT.TRIANGLEFAN)
-        sha:ClearTriangleFanPoint()
-        local bcX,bcY = - Config.nOTBarWidth / 2 ,(- Config.nOTBarHeight) - Config.nOTBarOffsetY
-
-        sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX,bcY})
-        sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX+Config.nOTBarWidth,bcY})
-        sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX+Config.nOTBarWidth,bcY+Config.nOTBarHeight})
-        sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX,bcY+Config.nOTBarHeight})
-
-        -- ªÊ÷∆ƒ⁄±ﬂøÚ
-        local sha = handle:Lookup(string.format("ot_bg2_%s",self.dwID))
-        sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
-        sha:SetD3DPT(D3DPT.TRIANGLEFAN)
-        sha:ClearTriangleFanPoint()        
-        local bcX,bcY = - (Config.nOTBarWidth / 2 - 1),(- (Config.nOTBarHeight - 1)) - Config.nOTBarOffsetY
-
-        sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX,bcY})
-        sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX+(Config.nOTBarWidth - 2),bcY})
-        sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX+(Config.nOTBarWidth - 2),bcY+(Config.nOTBarHeight - 2)})
-        sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX,bcY+(Config.nOTBarHeight - 2)})        
+        self.hp:DrawOTTitle({self.tab.OT.szTitle, Config.nOTTitleHeight }, {r,g,b,a,f})
     end
     return self
 end
-
--- ÃÓ≥‰—™Ãı
-function HP:DrawLife(Lifeper,col)
-    local tab = _XLifeBar.tObject[self.dwID]
-    local handle = tab.handle
-    
-    local r,g,b = unpack(Config.Col.Player[self.force])
-    local cfgLife = Config.bShowLife.Player[self.force]
-    if not IsPlayer(self.dwID) then
-        cfgLife = Config.bShowLife.Npc[self.force]
-        r,g,b = unpack(Config.Col.Npc[self.force])
-    end
-    if type(col)=="table" then
-        r,g,b = unpack(col)
-    elseif type(col)=="function" then
-        r,g,b = col(r,g,b)
-    end
-
-    if cfgLife then
-        --ªÊ÷∆—™Ãı
-        local sha = handle:Lookup(string.format("hp_%s",self.dwID))
-
-        sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
-        sha:SetD3DPT(D3DPT.TRIANGLEFAN)
-        sha:ClearTriangleFanPoint()
-
-        local bcX,bcY = - (Config.nLifeWidth / 2 - 2),(- (Config.nLifeHeight - 2)) - Config.nLifeOffsetY
-        local Lifeper = Lifeper or tab.Lifeper
-        local Life = (Config.nLifeWidth - 4) * Lifeper
-
-        
-        sha:AppendCharacterID(self.dwID,true,r,g,b,Config.nAlpha,{0,0,0,bcX,bcY})
-        sha:AppendCharacterID(self.dwID,true,r,g,b,Config.nAlpha,{0,0,0,bcX+Life,bcY})
-        sha:AppendCharacterID(self.dwID,true,r,g,b,Config.nAlpha,{0,0,0,bcX+Life,bcY+(Config.nLifeHeight - 4)})
-        sha:AppendCharacterID(self.dwID,true,r,g,b,Config.nAlpha,{0,0,0,bcX,bcY+(Config.nLifeHeight - 4)})
+-- ËÆæÁΩÆËØªÊù°ËøõÂ∫¶
+function XLifeBar.X:SetOTPercentage(nPercentage, rgba)
+    if nPercentage > 1 then nPercentage = 1 elseif nPercentage < 0 then nPercentage = 0 end
+    if self.tab.OT.nPercentage ~= nPercentage then
+        self.tab.OT.nPercentage = nPercentage
+        self:DrawOTBar(rgba)
     end
     return self
 end
-
--- ÃÓ≥‰Õ∑∂•∂¡Ãı
-function HP:DrawOTBar(Lifeper,col)
-    local tab = _XLifeBar.tObject[self.dwID]
-    local handle = tab.handle
-    
-    local r,g,b = unpack(Config.Col.Player[self.force])
-    local cfgOTBar = Config.bShowOTBar.Player[self.force]
-    if not IsPlayer(self.dwID) then
-        cfgOTBar = Config.bShowOTBar.Npc[self.force]
-        r,g,b = unpack(Config.Col.Npc[self.force])
+function XLifeBar.X:DrawOTBar(rgba)
+    local cfgOTBar, r,g,b,a,f
+    if IsPlayer(self.self.dwID) then
+        cfgOTBar   = Config.bShowOTBar.Player[self.force]
+        r,g,b      = unpack(Config.Col.Player[self.force])
+    else
+        cfgOTBar   = Config.bShowOTBar.Npc[self.force]
+        r,g,b      = unpack(Config.Col.Npc[self.force])
     end
-    if type(col)=="table" then
-        r,g,b = unpack(col)
-    elseif type(col)=="function" then
-        r,g,b = col(r,g,b)
-    end
-
+    a, f = Config.nAlpha, Config.nFont
+    if rgba then r,g,b,a,p = rgba[1] or r, rgba[2] or g, rgba[3] or b, rgba[4] or a end
+    r,g,b,a = self:FxColor(r,g,b,a)
     if cfgOTBar then
-        --ªÊ÷∆ººƒ‹∂¡Ãı
-        local sha = handle:Lookup(string.format("ot_%s",self.dwID))
-
-        sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
-        sha:SetD3DPT(D3DPT.TRIANGLEFAN)
-        sha:ClearTriangleFanPoint()
-
-        local bcX,bcY = - (Config.nOTBarWidth / 2 - 2),(- (Config.nOTBarHeight - 2)) - Config.nOTBarOffsetY
-        local Lifeper = Lifeper or tab.Lifeper
-        local Life = (Config.nOTBarWidth - 4) * Lifeper
-
-        
-        sha:AppendCharacterID(self.dwID,true,r,g,b,Config.nAlpha,{0,0,0,bcX,bcY})
-        sha:AppendCharacterID(self.dwID,true,r,g,b,Config.nAlpha,{0,0,0,bcX+Life,bcY})
-        sha:AppendCharacterID(self.dwID,true,r,g,b,Config.nAlpha,{0,0,0,bcX+Life,bcY+(Config.nOTBarHeight - 4)})
-        sha:AppendCharacterID(self.dwID,true,r,g,b,Config.nAlpha,{0,0,0,bcX,bcY+(Config.nOTBarHeight - 4)})
+        self.hp:DrawOTBar(Config.nOTBarWidth, Config.nOTBarHeight, Config.nOTBarOffsetY, {r,g,b,a,self.tab.OT.nPercentage})
     end
     return self
 end
-
-
-XLifeBar.Create = function(...)
-    local self = HP.new(...)
+function XLifeBar.X:DrawOTBarBorder(nAlpha)
+    nAlpha = nAlpha or Config.nAlpha
+    if IsPlayer(self.self.dwID) then
+        cfgOTBar   = Config.bShowOTBar.Player[self.force]
+    else
+        cfgOTBar   = Config.bShowOTBar.Npc[self.force]
+    end
+    if cfgOTBar then
+        self.hp:DrawOTBarBorder(Config.nOTBarWidth, Config.nOTBarHeight, Config.nOTBarOffsetY, nAlpha)
+    end
     return self
 end
-setmetatable(XLifeBar, { __call = function(me, ...) return me.Create(...) end, __metatable = true })
+-- ÂºÄÂßãËØªÊù°
+function XLifeBar.X:StartOTBar(szOTTitle, nFrameCount, bIsChannelSkill)
+    local tab = _XLifeBar.tObject[self.self.dwID]
+    tab.OT = {
+        nState = ( bIsChannelSkill and OT_STATE.START_CHANNEL ) or OT_STATE.START_PREPARE,
+        szTitle = szOTTitle,
+        nStartFrame = GetLogicFrameCount(),
+        nFrameCount = nFrameCount,
+    }
+    return self
+end
 
 function XLifeBar.OnFrameCreate()
     _XLifeBar.Frame = this
@@ -444,144 +450,119 @@ function XLifeBar.OnFrameBreathe()
     if not XLifeBar.bEnabled then return end
     local me = GetClientPlayer()
     if not me then return end
-    local fnHighLight = function(r,g,b) return 255-(255-r)*0.3, 255-(255-g)*0.3, 255-(255-b)*0.3 end
-    -- local _, _, fPitch = Camera_GetRTParams()
-    for k , v in pairs(_XLifeBar.tNpc) do
-        local object = GetNpc(k)
-        if GetCharacterDistance(me.dwID,k) / 64 < Config.nDistance --[[ ’‚ «æµÕ∑≤π≥•≈–∂œ µ´ «≤ª∫√”√œ»≤ªº” and (fPitch > -0.8 or _XLifeBar.GetNz(me.nZ,object.nZ) < Config.nDistance / 2.5)]] then
-            if not _XLifeBar.tObject[k] then
-                if object.CanSeeName() or Config.bShowSpecialNpc then
-                    XLifeBar(object):Create()
-                end
-            else
-                local tab = _XLifeBar.tObject[k]
-                -- —™¡ø≈–∂®
-                local lifeper = object.nCurrentLife / object.nMaxLife
-                if lifeper > 1 or lifeper < 0 then lifeper = 1 end -- fix
-                if lifeper ~= tab.Lifeper then
-                    tab.Lifeper = lifeper
-                    XLifeBar(object):DrawLife(lifeper):DrawName() -- —™¡ø±‰∂Øµƒ ±∫Ú÷ÿªÊ√˚◊÷ 
-                end
-                -- ∂¡Ãı≈–∂®
-                local otper = 0
-                local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = object.GetSkillPrepareState()
-                if bIsPrepare then
-                    otper = fProgress
-                    tab.szOTTitle = Table_GetSkillName(dwSkillID, dwSkillLevel)
-                else
-                    otper = 0
-                    tab.szOTTitle = nil
-                end
-                if otper ~= tab.Otper then
-                    if tab.Otper==0 then
-                        XLifeBar(object):DrawOTBarBorder(Config.nAlpha):DrawName() -- ∂¡Ãı◊¥Ã¨±‰∂Øµƒ ±∫Ú÷ÿªÊ√˚◊÷ 
-                    elseif otper==0 then
-                        XLifeBar(object):DrawOTBarBorder(0):DrawName() -- ∂¡Ãı◊¥Ã¨±‰∂Øµƒ ±∫Ú÷ÿªÊ√˚◊÷ 
+    local fnCheckInvalidRect = function(object)
+        if not object then return end
+        local dwID, bIsPlayer = object.dwID, IsPlayer(object.dwID)
+        if GetCharacterDistance(me.dwID,dwID) / 64 < Config.nDistance --[[ ËøôÊòØÈïúÂ§¥Ë°•ÂÅøÂà§Êñ≠ ‰ΩÜÊòØ‰∏çÂ•ΩÁî®ÂÖà‰∏çÂä† and (fPitch > -0.8 or _XLifeBar.GetNz(me.nZ,object.nZ) < Config.nDistance / 2.5)]] then
+            if _XLifeBar.tObject[dwID] and _XLifeBar.tObject[dwID].handle then
+                local tab = _XLifeBar.tObject[dwID]
+                local xlb = XLifeBar(object)
+                -- Âü∫Êú¨Â±ûÊÄßËÆæÁΩÆ
+                xlb:SetLife(object.nCurrentLife / object.nMaxLife)
+                   :SetTong(_XLifeBar.GetTongName(object.dwTongID, "[%s]"))
+                   :SetTitle(object.szTitle)
+                   :SetName(object.szName)
+                -- ËØªÊù°Âà§ÂÆö
+                local nState = xlb:GetOTState()
+                if nState ~= OT_STATE.ON_SKILL then
+                    local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = _XLifeBar.GetPrepareState(object)
+                    if bIsPrepare then
+                        xlb:SetOTTitle(Table_GetSkillName(dwSkillID, dwSkillLevel)):DrawOTTitle():SetOTPercentage(fProgress):SetOTState(OT_STATE.START_SKILL)
                     end
-                    tab.Otper = otper
-                    XLifeBar(object):DrawOTBar(otper)
-                    -- µ±«∞ƒø±Í
-                    if _XLifeBar.dwTargetID == object.dwID then
-                        XLifeBar(object):DrawOTBar(otper, fnHighLight)
+                end
+                if nState == OT_STATE.START_SKILL then                              -- ÊäÄËÉΩËØªÊù°ÂºÄÂßã
+                    xlb:DrawOTBarBorder(Config.nAlpha):SetOTPercentage(0):SetOTState(OT_STATE.ON_SKILL)
+                elseif nState == OT_STATE.ON_SKILL then                             -- ÊäÄËÉΩËØªÊù°‰∏≠
+                    local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = _XLifeBar.GetPrepareState(object)
+                    if bIsPrepare then
+                        xlb:SetOTPercentage(fProgress):SetOTTitle(Table_GetSkillName(dwSkillID, dwSkillLevel))
                     else
-                        XLifeBar(object):DrawOTBar(otper)
+                        xlb:SetOTPercentage(1):SetOTState(OT_STATE.SUCCEED)
+                    end
+                elseif nState == OT_STATE.START_PREPARE then                        -- ËØªÊù°ÂºÄÂßã
+                    xlb:DrawOTBarBorder(Config.nAlpha):SetOTPercentage(0):SetOTState(OT_STATE.ON_PREPARE):DrawOTTitle()
+                elseif nState == OT_STATE.ON_PREPARE then                           -- ËØªÊù°‰∏≠
+                    if object.GetOTActionState()==0 then    -- ‰∏∫0 ËØ¥ÊòéÊ≤°ÊúâËØªÊù°
+                        xlb:SetOTPercentage(1):SetOTState(OT_STATE.SUCCEED)
+                    else
+                        xlb:SetOTPercentage(( GetLogicFrameCount() - tab.OT.nStartFrame ) / tab.OT.nFrameCount)
+                    end
+                elseif nState == OT_STATE.START_CHANNEL then                        -- ÈÄÜËØªÊù°ÂºÄÂßã
+                    xlb:DrawOTBarBorder(Config.nAlpha):SetOTPercentage(1):SetOTState(OT_STATE.ON_CHANNEL):DrawOTTitle()
+                elseif nState == OT_STATE.ON_CHANNEL then                           -- ÈÄÜËØªÊù°‰∏≠
+                    local nPercentage = 1 - ( GetLogicFrameCount() - tab.OT.nStartFrame ) / tab.OT.nFrameCount
+                    if object.GetOTActionState()==2 and nPercentage >= 0 then    -- ‰∏∫2 ËØ¥ÊòéÂú®ËØªÊù°ÂºïÂØº‰øùÊä§ ËÆ°ÁÆóÂΩìÂâçÂ∏ßËøõÂ∫¶
+                        xlb:SetOTPercentage(nPercentage):DrawOTTitle()
+                    else
+                        xlb:SetOTPercentage(0):SetOTState(OT_STATE.SUCCEED)
+                    end
+                elseif nState == OT_STATE.SUCCEED then                              -- ËØªÊù°ÊàêÂäü
+                    if GetLogicFrameCount() - tab.OT.nStartFrame < 16 then -- Ê∏êÂèò
+                        local rgba = { nil,nil,nil, Config.nAlpha - (GetLogicFrameCount() - tab.OT.nStartFrame) * (Config.nAlpha/16) }
+                        xlb:DrawOTBarBorder(rgba[4]):DrawOTBar(rgba):DrawOTTitle(rgba)
+                    else
+                        local rgba = { nil,nil,nil, 0 }
+                        xlb:SetOTTitle("", rgba):SetOTState(OT_STATE.IDLE):DrawOTBarBorder(0):DrawOTBar(rgba)
+                    end
+                elseif nState == OT_STATE.BREAK then                                -- ËØªÊù°ÊâìÊñ≠
+                    if GetLogicFrameCount() - tab.OT.nStartFrame < 16 then -- Ê∏êÂèò
+                        local rgba = { 255,0,0, Config.nAlpha - (GetLogicFrameCount() - tab.OT.nStartFrame) * (Config.nAlpha/16) }
+                        xlb:DrawOTBarBorder(rgba[4]):DrawOTBar(rgba):DrawOTTitle(rgba)
+                    else
+                        xlb:SetOTTitle(""):SetOTState(OT_STATE.IDLE):DrawOTBarBorder(0):DrawOTBar({nil,nil,nil,0})
                     end
                 end
                 
-                --  ∆¡¶«–ªª
-                local Force = _XLifeBar.GetForce(k)
+                -- ÂäøÂäõÂàáÊç¢
+                local Force = _XLifeBar.GetForce(dwID)
                 if Force ~= tab.Force then
                     XLifeBar(object):Remove():Create()
                 end
-                -- µ±«∞ƒø±Í
-                if _XLifeBar.dwTargetID == object.dwID then
-                    XLifeBar(object):DrawLife(lifeper,fnHighLight):DrawName(fnHighLight) -- ‘›∂® 
-                end
-                
-                    -- À¿Õˆ≈–∂®
-                if object.nMoveState == MOVE_STATE.ON_DEATH then
-                    if _XLifeBar.dwTargetID == object.dwID then
-                        XLifeBar(object):DrawLife(0):DrawName(2.2)
-                    else
-                        XLifeBar(object):DrawLife(0):DrawName(2.5)
-                    end
+            else
+                if bIsPlayer or object.CanSeeName() or Config.bShowSpecialNpc then
+                    XLifeBar(object):Create()
                 end
             end
-        elseif _XLifeBar.tObject[k] then
+        elseif _XLifeBar.tObject[dwID] then
             XLifeBar(object):Remove()
         end
     end
-    
-    for k , v in pairs(_XLifeBar.tPlayer) do
-        local object = GetPlayer(k)
-        if object.szName ~= "" then
-            if GetCharacterDistance(me.dwID,k) / 64 < Config.nDistance --[[ ’‚ «æµÕ∑≤π≥•≈–∂œ µ´ «≤ª∫√”√œ»≤ªº” and (fPitch > -0.8 or _XLifeBar.GetNz(me.nZ,object.nZ) < Config.nDistance / 2.5)]] then
-                if not _XLifeBar.tObject[k] then
-                    XLifeBar(object):Create():DrawBorder(255)
-                else
-                    local tab = _XLifeBar.tObject[k]
-                    -- —™¡ø≈–∂®
-                    local lifeper = object.nCurrentLife / object.nMaxLife
-                    if lifeper > 1 or lifeper < 0 then lifeper = 1 end -- fix
-                    if lifeper ~= tab.Lifeper then
-                        tab.Lifeper = lifeper
-                        XLifeBar(object):DrawLife(lifeper):DrawName() -- —™¡ø±‰∂Øµƒ ±∫Ú÷ÿªÊ√˚◊÷ 
-                    end
-                    -- ∂¡Ãı≈–∂®
-                    local otper = 0
-                    if object.GetOTActionState()==1 then
-                        MY.Player.SetTempTarget(TARGET.PLAYER, k)
-                        local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = object.GetSkillPrepareState()
-                        otper = fProgress
-                        tab.szOTTitle = Table_GetSkillName(dwSkillID, dwSkillLevel)
-                        MY.Player.ResumeTarget()
-                    else
-                        otper = 0
-                        tab.szOTTitle = nil
-                    end
-                    if otper ~= tab.Otper then
-                        if tab.Otper==0 then
-                            XLifeBar(object):DrawOTBarBorder(Config.nAlpha):DrawName() -- ∂¡Ãı◊¥Ã¨±‰∂Øµƒ ±∫Ú÷ÿªÊ√˚◊÷ 
-                        elseif otper==0 then
-                            XLifeBar(object):DrawOTBarBorder(0):DrawName() -- ∂¡Ãı◊¥Ã¨±‰∂Øµƒ ±∫Ú÷ÿªÊ√˚◊÷ 
-                        end
-                        tab.Otper = otper
-                        -- µ±«∞ƒø±Í
-                        if _XLifeBar.dwTargetID == object.dwID then
-                            XLifeBar(object):DrawOTBar(otper, fnHighLight)
-                        else
-                            XLifeBar(object):DrawOTBar(otper)
-                        end
-                    end
-                    
-                    --  ∆¡¶«–ªª
-                    local Force = _XLifeBar.GetForce(k)
-                    if Force ~= tab.Force then
-                        XLifeBar(object):Remove():Create()
-                    end
-                    
-                    -- µ±«∞ƒø±Í
-                    if _XLifeBar.dwTargetID == object.dwID then
-                        XLifeBar(object):DrawLife(lifeper,fnHighLight):DrawName(fnHighLight) -- ‘›∂® 
-                    end
-                    
-                    -- À¿Õˆ≈–∂®
-                    if object.nMoveState == MOVE_STATE.ON_DEATH then
-                        if _XLifeBar.dwTargetID == object.dwID then
-                            XLifeBar(object):DrawLife(0):DrawName(2.2)
-                        else
-                            XLifeBar(object):DrawLife(0):DrawName(2.5)
-                        end
-                    end
-                    
-                end
-            elseif _XLifeBar.tObject[k] then
-                XLifeBar(object):Remove()
-            end
-        end
+    -- local _, _, fPitch = Camera_GetRTParams()
+    for k , v in pairs(_XLifeBar.tNpc) do
+        fnCheckInvalidRect(GetNpc(k))
     end
     
+    for k , v in pairs(_XLifeBar.tPlayer) do
+        fnCheckInvalidRect(GetPlayer(k))
+    end
 end
+
+-- ÈÄÜËØªÊù°‰∫ã‰ª∂ÂìçÂ∫î
+MY.RegisterEvent("DO_SKILL_CAST", function()
+    local dwID, dwSkillID = arg0, arg1
+    local skill = GetSkill(arg1, 1)
+    if skill.bIsChannelSkill then
+        local tab = _XLifeBar.tObject[dwID]
+        local nFrame = MY.Player.GetChannelSkillFrame(dwSkillID) or 0
+        XLifeBar(GetPlayer(dwID)):StartOTBar(skill.szSkillName, nFrame, true)
+    end
+end)
+-- ËØªÊù°ÊâìÊñ≠‰∫ã‰ª∂ÂìçÂ∫î
+MY.RegisterEvent("OT_ACTION_PROGRESS_BREAK", function()
+    local object = _XLifeBar.GetObject(arg0)
+    if object then
+        XLifeBar(object):SetOTState(OT_STATE.BREAK)
+    end
+end)
+-- ÊãæÂèñ‰∫ã‰ª∂ÂìçÂ∫î
+MY.RegisterEvent("DO_PICK_PREPARE_PROGRESS", function()
+    local dooadad = GetDoodad(arg1)
+    local szName = dooadad.szName
+    if szName=="" then
+        szName = GetDoodadTemplate(dooadad.dwTemplateID).szName
+    end
+    XLifeBar(GetClientPlayer()):StartOTBar(szName, arg0, false)
+end)
 
 RegisterEvent("NPC_ENTER_SCENE",function()
     _XLifeBar.tNpc[arg0] = true
@@ -604,25 +585,22 @@ RegisterEvent("PLAYER_LEAVE_SCENE",function()
 end)
 
 RegisterEvent("UPDATE_SELECT_TARGET",function()
-    local dwID,_ = Target_GetTargetData()
+    local dwID, _ = Target_GetTargetData()
     if _XLifeBar.dwTargetID == dwID then
         return
     end
-    if _XLifeBar.tObject[_XLifeBar.dwTargetID] then
-        XLifeBar(_XLifeBar.GetObject(_XLifeBar.dwTargetID)):DrawLife():DrawName()
-    end
+    local dwOldTargetID = _XLifeBar.dwTargetID
     _XLifeBar.dwTargetID = dwID
+    if _XLifeBar.tObject[dwOldTargetID] then
+        local object = _XLifeBar.GetObject(dwOldTargetID)
+        XLifeBar(object):DrawNames():DrawLife()
+    end
+    if _XLifeBar.tObject[dwID] then
+        local object = _XLifeBar.GetObject(dwID)
+        XLifeBar(object):DrawNames():DrawLife()
+    end
 end)
 
--- RegisterEvent("CALL_LUA_ERROR", function()
-    -- Output(arg0)
--- end)
-
--- RegisterEvent("FIRST_LOADING_END", function()
---     Player_AppendAddonMenu({function() return {_XLifeBar.GetMenu()} end})
---     -- Wnd.ToggleWindow("CombatTextWnd")
---     -- Wnd.ToggleWindow("CombatTextWnd")
--- end)
 Wnd.OpenWindow("interface/MY/XLifeBar/XLifeBar.ini","XLifeBar")
 
 _Cache.OnPanelActive = function(wnd)
@@ -647,12 +625,12 @@ _Cache.OnPanelActive = function(wnd)
         ui:children("#WndCheckBox_ShowSpecialNpc"):check(Config.bShowSpecialNpc)
         ui:children("#WndButton_Font"):text(_L("Font: %d",Config.nFont))
     end
-    -- ø™∆Ù/πÿ±’
+    -- ÂºÄÂêØ/ÂÖ≥Èó≠
     ui:append("WndCheckBox_Switcher", "WndCheckBox"):children("#WndCheckBox_Switcher")
       :pos(x,y):text(_L["enable/disable"])
       :check(function(bChecked) XLifeBar.bEnabled = bChecked _XLifeBar.Reset(true) end)
       :check(XLifeBar.bEnabled)
-    --  π”√À˘”–Ω«…´π´π≤…Ë÷√
+    -- ‰ΩøÁî®ÊâÄÊúâËßíËâ≤ÂÖ¨ÂÖ±ËÆæÁΩÆ
     ui:append("WndCheckBox_GlobalConfig", "WndCheckBox"):children("#WndCheckBox_GlobalConfig")
       :pos(x+110,y):text(_L["use global config"])
       :check(function(bChecked)
@@ -669,82 +647,82 @@ _Cache.OnPanelActive = function(wnd)
     offsety = 33
     ui:append("WndSliderBox_LifebarWidth", "WndSliderBox"):children("#WndSliderBox_LifebarWidth")
       :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(5,150)
-      :text(function(value) return _L("lifebar width: %s px.", value) end)--—™Ãı≥§∂»
+      :text(function(value) return _L("lifebar width: %s px.", value) end)--Ë°ÄÊù°ÈïøÂ∫¶
       :change(function(value) Config.nLifeWidth = value;_XLifeBar.Reset() end)
       :value(Config.nLifeWidth)
     y = y + offsety
     
     ui:append("WndSliderBox_LifebarHeight", "WndSliderBox"):children("#WndSliderBox_LifebarHeight")
       :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(5,150)
-      :text(function(value) return _L("lifebar height: %s px.", value) end)--—™Ãı∏ﬂ∂»
+      :text(function(value) return _L("lifebar height: %s px.", value) end)--Ë°ÄÊù°È´òÂ∫¶
       :change(function(value) Config.nLifeHeight = value;_XLifeBar.Reset() end)
       :value(Config.nLifeHeight)
     y = y + offsety
     
     ui:append("WndSliderBox_LifeHeight", "WndSliderBox"):children("#WndSliderBox_LifeHeight")
       :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
-      :text(function(value) return _L("lifebar offset-y: %d px.", value) end)--—™Ãı∏ﬂ∂»∆´“∆
+      :text(function(value) return _L("lifebar offset-y: %d px.", value) end)--Ë°ÄÊù°È´òÂ∫¶ÂÅèÁßª
       :change(function(value) Config.nLifeOffsetY = value;_XLifeBar.Reset() end)
       :value(Config.nLifeOffsetY)
     y = y + offsety
     
     ui:append("WndSliderBox_PerHeight", "WndSliderBox"):children("#WndSliderBox_PerHeight")
       :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
-      :text(function(value) return _L("percentage offset-y: %d px.", value) end)--∞Ÿ∑÷±»∏ﬂ∂»
+      :text(function(value) return _L("percentage offset-y: %d px.", value) end)--ÁôæÂàÜÊØîÈ´òÂ∫¶
       :change(function(value) Config.nPerHeight = value;_XLifeBar.Reset() end)
       :value(Config.nPerHeight)
     y = y + offsety
     
     ui:append("WndSliderBox_OTBarWidth", "WndSliderBox"):children("#WndSliderBox_OTBarWidth")
       :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(5,150)
-      :text(function(value) return _L("otbar width: %s px.", value) end)--OT≥§∂»
+      :text(function(value) return _L("otbar width: %s px.", value) end)--OTÈïøÂ∫¶
       :change(function(value) Config.nOTBarWidth = value;_XLifeBar.Reset() end)
       :value(Config.nOTBarWidth)
     y = y + offsety
     
     ui:append("WndSliderBox_OTBarHeight", "WndSliderBox"):children("#WndSliderBox_OTBarHeight")
       :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(5,150)
-      :text(function(value) return _L("otbar height: %s px.", value) end)--OT∏ﬂ∂»
+      :text(function(value) return _L("otbar height: %s px.", value) end)--OTÈ´òÂ∫¶
       :change(function(value) Config.nOTBarHeight = value;_XLifeBar.Reset() end)
       :value(Config.nOTBarHeight)
     y = y + offsety
     
     ui:append("WndSliderBox_OTHeight", "WndSliderBox"):children("#WndSliderBox_OTHeight")
       :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
-      :text(function(value) return _L("otbar offset-y: %d px.", value) end)--OT∏ﬂ∂»∆´“∆
+      :text(function(value) return _L("otbar offset-y: %d px.", value) end)--OTÈ´òÂ∫¶ÂÅèÁßª
       :change(function(value) Config.nOTBarOffsetY = value;_XLifeBar.Reset() end)
       :value(Config.nOTBarOffsetY)
     y = y + offsety
     
     ui:append("WndSliderBox_OTTitleHeight", "WndSliderBox"):children("#WndSliderBox_OTTitleHeight")
       :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
-      :text(function(value) return _L("ot title offset-y: %d px.", value) end)--OT√˚≥∆∏ﬂ∂»
+      :text(function(value) return _L("ot title offset-y: %d px.", value) end)--OTÂêçÁß∞È´òÂ∫¶
       :change(function(value) Config.nOTTitleHeight = value;_XLifeBar.Reset() end)
       :value(Config.nOTTitleHeight)
     y = y + offsety
     
     ui:append("WndSliderBox_FristHeight", "WndSliderBox"):children("#WndSliderBox_FristHeight")
       :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
-      :text(function(value) return _L("1st line offset-y: %d px.", value) end)--µ⁄“ª––◊÷∏ﬂ∂»
+      :text(function(value) return _L("1st line offset-y: %d px.", value) end)--Á¨¨‰∏ÄË°åÂ≠óÈ´òÂ∫¶
       :change(function(value) Config.nLineHeight[1] = value;_XLifeBar.Reset() end)
       :value(Config.nLineHeight[1])
     y = y + offsety
     
     ui:append("WndSliderBox_SecondHeight", "WndSliderBox"):children("#WndSliderBox_SecondHeight")
       :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
-      :text(function(value) return _L("2nd line offset-y: %d px.", value) end)--µ⁄∂˛––◊÷∏ﬂ∂»
+      :text(function(value) return _L("2nd line offset-y: %d px.", value) end)--Á¨¨‰∫åË°åÂ≠óÈ´òÂ∫¶
       :change(function(value) Config.nLineHeight[2] = value;_XLifeBar.Reset() end)
       :value(Config.nLineHeight[2])
     y = y + offsety
     
     ui:append("WndSliderBox_ThirdHeight", "WndSliderBox"):children("#WndSliderBox_ThirdHeight")
       :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
-      :text(function(value) return _L("3rd line offset-y: %d px.", value) end)--µ⁄»˝––◊÷∏ﬂ∂»
+      :text(function(value) return _L("3rd line offset-y: %d px.", value) end)--Á¨¨‰∏âË°åÂ≠óÈ´òÂ∫¶
       :change(function(value) Config.nLineHeight[3] = value;_XLifeBar.Reset() end)
       :value(Config.nLineHeight[3])
     y = y + offsety
     
-    -- ”“∞Î±ﬂ
+    -- Âè≥ÂçäËæπ
     x, y = 350, 80
     ui:append("WndSliderBox_Distance", "WndSliderBox"):children("#WndSliderBox_Distance")
       :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,300)
@@ -755,12 +733,12 @@ _Cache.OnPanelActive = function(wnd)
     
     ui:append("WndSliderBox_Alpha", "WndSliderBox"):children("#WndSliderBox_Alpha")
       :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_PERCENT):range(0,255)
-      :text(function(value) return _L("alpha: %.0f%%.", value) end)--Õ∏√˜∂»
+      :text(function(value) return _L("alpha: %.0f%%.", value) end)--ÈÄèÊòéÂ∫¶
       :change(function(value) Config.nAlpha = value*255/100;_XLifeBar.Reset() end)
       :value(Config.nAlpha)
     y = y + offsety
     offsety = 38
-    -- œ‘ æ√˚◊÷
+    -- ÊòæÁ§∫ÂêçÂ≠ó
     ui:append("WndComboBox_Name", "WndComboBox"):children("#WndComboBox_Name")
       :pos(x,y):text(_L["name display config"])
       :menu(function()
@@ -806,7 +784,7 @@ _Cache.OnPanelActive = function(wnd)
       end)
     y = y + offsety
 
-    -- ≥∆∫≈
+    -- Áß∞Âè∑
     ui:append("WndComboBox_Title", "WndComboBox"):children("#WndComboBox_Title")
       :pos(x,y):text(_L["title display config"])
       :menu(function()
@@ -852,7 +830,7 @@ _Cache.OnPanelActive = function(wnd)
       end)
     y = y + offsety
     
-    -- ∞Ôª·
+    -- Â∏Æ‰ºö
     ui:append("WndComboBox_Tong", "WndComboBox"):children("#WndComboBox_Tong")
       :pos(x,y):text(_L["tong display config"])
       :menu(function()
@@ -879,7 +857,7 @@ _Cache.OnPanelActive = function(wnd)
       end)
     y = y + offsety
       
-    -- —™Ãı…Ë÷√
+    -- Ë°ÄÊù°ËÆæÁΩÆ
     ui:append("WndComboBox_Lifebar", "WndComboBox"):children("#WndComboBox_Lifebar")
       :pos(x,y):text(_L["lifebar display config"])
       :menu(function()
@@ -925,7 +903,7 @@ _Cache.OnPanelActive = function(wnd)
       end)
     y = y + offsety
     
-    -- œ‘ æ—™¡ø%
+    -- ÊòæÁ§∫Ë°ÄÈáè%
     ui:append("WndComboBox_LifePercentage", "WndComboBox"):children("#WndComboBox_LifePercentage")
       :pos(x,y):text(_L["lifepercentage display config"])
       :menu(function()
@@ -971,7 +949,7 @@ _Cache.OnPanelActive = function(wnd)
       end)
     y = y + offsety
     
-    -- œ‘ æ∂¡Ãı%
+    -- ÊòæÁ§∫ËØªÊù°%
     ui:append("WndComboBox_SkillPercentage", "WndComboBox"):children("#WndComboBox_SkillPercentage")
       :pos(x,y):text(_L["skillpercentage display config"])
       :menu(function()
