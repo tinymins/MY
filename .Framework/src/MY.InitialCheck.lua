@@ -48,13 +48,24 @@ MY.RegisterEvent('PLAYER_ENTER_GAME', function() MY.BreatheCall(function()
         s2 = tServer[2],
     }
     -- while not ready
+    local bReady = true
     if me and me.szName then
         data.n, data.i, data.l, data.f, data.r, data.c, data.m = me.szName, me.dwID, me.nLevel, me.dwForceID, me.nRoleType, me.nCamp, me.GetMoney().nGold
+        if not tong then
+            bReady = false
+        end
+        if me.dwTongID > 0 then
+            data.t = tostring(tong.ApplyGetTongName(me.dwTongID))
+            if (not data.t) or data.t == "" then
+                bReady = false
+            end
+        else
+            data.t = ""
+        end
+    else
+        bReady = false
     end
-    if tong and tong.szTongName then
-        data.t = tong.szTongName
-    end
-    if (not (me and tong and me.szName and tong.szTongName)) and nBreatheCount<40 then
+    if (not bReady) and nBreatheCount<40 then
         nBreatheCount = nBreatheCount + 1
         return nil
     end

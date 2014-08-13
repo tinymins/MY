@@ -48,6 +48,7 @@ local Config_Default = {
     nOTBarHeight = 6,
     nOTBarOffsetY = 22,
     nOTTitleHeight = 21,
+    bOTEnhancedMod = false,
     
     nAlpha = 200,
     nFont = 16,
@@ -146,16 +147,38 @@ _XLifeBar.GetTongName = function(dwTongID, szFormatString)
 end
 
 -- 获取读条状态
-_XLifeBar.GetPrepareState = function(object)
-    local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = object.GetSkillPrepareState()
-    if (not bIsPrepare) and object.GetOTActionState then   -- 如果没读条 判断一下如果是玩家(有object.GetOTActionState方法)的话 判断OTActionState是否为0
-        if object.GetOTActionState()==1 then    -- 为1 说明在副本外不能获取 设置一下临时目标再试一次
-            MY.Player.SetTempTarget(TARGET.PLAYER, dwID)
-            bIsPrepare, dwSkillID, dwSkillLevel, fProgress = object.GetSkillPrepareState()
-            MY.Player.ResumeTarget()
+_XLifeBar.bLock = false
+_XLifeBar.aCallback = {}
+_XLifeBar.WithPrepareStateHandle = function()
+    if _XLifeBar.bLock then return end
+    if #_XLifeBar.aCallback > 0 then
+        _XLifeBar.bLock = true
+        local r = table.remove(_XLifeBar.aCallback, 1)
+        local object, callback = r.object, r.callback
+        
+        local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = object.GetSkillPrepareState()
+        if (not bIsPrepare) and object.GetOTActionState then   -- 如果没读条 判断一下如果是玩家(有object.GetOTActionState方法)的话 判断OTActionState是否为0
+            if object.GetOTActionState()==1 then    -- 为1 说明在副本外不能获取 设置一下临时目标再试一次
+                MY.Player.SetTempTarget(TARGET.PLAYER, object.dwID)
+                bIsPrepare, dwSkillID, dwSkillLevel, fProgress = object.GetSkillPrepareState()
+                MY.Player.ResumeTarget()
+            end
         end
+        
+        pcall(callback, bIsPrepare, dwSkillID, dwSkillLevel, fProgress, param)
+        _XLifeBar.bLock = false
+        _XLifeBar.WithPrepareStateHandle()
     end
-    return bIsPrepare, dwSkillID, dwSkillLevel, fProgress
+end
+_XLifeBar.WithPrepareState = function(object, callback, param)
+    if Config.bOTEnhancedMod then   -- 增强模式（切换目标）
+        -- 因为客户端多线程 所以加上资源锁 防止设置临时目标冲突
+        table.insert(_XLifeBar.aCallback, {object = object, callback = callback, param = param})
+        _XLifeBar.WithPrepareStateHandle()
+    else
+        local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = object.GetSkillPrepareState()
+        pcall(callback, bIsPrepare, dwSkillID, dwSkillLevel, fProgress, param)
+    end
 end
 
 -- 重绘所有UI，并在bNoSave为假时保存配置文件
@@ -268,16 +291,16 @@ function XLifeBar.X:SetName(szName)
 end
 -- 设置称号
 function XLifeBar.X:SetTitle(szTitle)
-    if self.tab.Title ~= Title then
-        self.tab.Title = Title
+    if self.tab.Title ~= szTitle then
+        self.tab.Title = szTitle
         self:DrawNames()
     end
     return self
 end
 -- 设置帮会
 function XLifeBar.X:SetTong(szTongName)
-    if self.tab.Tong ~= Tong then
-        self.tab.Tong = Tong
+    if self.tab.Tong ~= szTongName then
+        self.tab.Tong = szTongName
         self:DrawNames()
     end
     return self
@@ -327,7 +350,11 @@ end
 function XLifeBar.X:SetLife(dwLifePercentage)
     if dwLifePercentage < 0 or dwLifePercentage > 1 then dwLifePercentage = 1 end -- fix
     if self.tab.Life ~= dwLifePercentage then
+        local dwLife = self.tab.Life
         self.tab.Life = dwLifePercentage
+        if dwLife < 0.01 or dwLifePercentage < 0.01 then
+            self:DrawNames()
+        end
         self:DrawLife()
     end
     return self
@@ -465,20 +492,22 @@ function XLifeBar.OnFrameBreathe()
                 -- 读条判定
                 local nState = xlb:GetOTState()
                 if nState ~= OT_STATE.ON_SKILL then
-                    local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = _XLifeBar.GetPrepareState(object)
-                    if bIsPrepare then
-                        xlb:SetOTTitle(Table_GetSkillName(dwSkillID, dwSkillLevel)):DrawOTTitle():SetOTPercentage(fProgress):SetOTState(OT_STATE.START_SKILL)
-                    end
+                    _XLifeBar.WithPrepareState(object, function(bIsPrepare, dwSkillID, dwSkillLevel, fProgress, xlb)
+                        if bIsPrepare then
+                            xlb:SetOTTitle(Table_GetSkillName(dwSkillID, dwSkillLevel)):DrawOTTitle():SetOTPercentage(fProgress):SetOTState(OT_STATE.START_SKILL)
+                        end
+                    end, xlb)
                 end
                 if nState == OT_STATE.START_SKILL then                              -- 技能读条开始
                     xlb:DrawOTBarBorder(Config.nAlpha):SetOTPercentage(0):SetOTState(OT_STATE.ON_SKILL)
                 elseif nState == OT_STATE.ON_SKILL then                             -- 技能读条中
-                    local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = _XLifeBar.GetPrepareState(object)
-                    if bIsPrepare then
-                        xlb:SetOTPercentage(fProgress):SetOTTitle(Table_GetSkillName(dwSkillID, dwSkillLevel))
-                    else
-                        xlb:SetOTPercentage(1):SetOTState(OT_STATE.SUCCEED)
-                    end
+                    _XLifeBar.WithPrepareState(object, function(bIsPrepare, dwSkillID, dwSkillLevel, fProgress, xlb)
+                        if bIsPrepare then
+                            xlb:SetOTPercentage(fProgress):SetOTTitle(Table_GetSkillName(dwSkillID, dwSkillLevel))
+                        else
+                            xlb:SetOTPercentage(1):SetOTState(OT_STATE.SUCCEED)
+                        end
+                    end, xlb)
                 elseif nState == OT_STATE.START_PREPARE then                        -- 读条开始
                     xlb:DrawOTBarBorder(Config.nAlpha):SetOTPercentage(0):SetOTState(OT_STATE.ON_PREPARE):DrawOTTitle()
                 elseif nState == OT_STATE.ON_PREPARE then                           -- 读条中
@@ -537,6 +566,14 @@ function XLifeBar.OnFrameBreathe()
     end
 end
 
+-- -- event
+-- MY.RegisterEvent("SYS_MSG", function()
+--     if arg0 == "UI_OME_SKILL_HIT_LOG" and arg3 == SKILL_EFFECT_TYPE.SKILL then
+--         Output(arg1, arg4, arg5, arg0, "UI_OME_SKILL_HIT_LOG")
+--     elseif arg0 == "UI_OME_SKILL_EFFECT_LOG" and arg4 == SKILL_EFFECT_TYPE.SKILL then
+--         Output(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10 ,arg11, arg12, arg13, GetPlayer(arg1).szName, GetSkill(arg5, arg6).szSkillName)
+--     end
+-- end)
 -- 逆读条事件响应
 MY.RegisterEvent("DO_SKILL_CAST", function()
     local dwID, dwSkillID = arg0, arg1
@@ -549,11 +586,16 @@ MY.RegisterEvent("DO_SKILL_CAST", function()
 end)
 -- 读条打断事件响应
 MY.RegisterEvent("OT_ACTION_PROGRESS_BREAK", function()
-    local object = _XLifeBar.GetObject(arg0)
-    if object then
+    if _XLifeBar.tObject[arg0] then
+        local object = _XLifeBar.GetObject(arg0)
         XLifeBar(object):SetOTState(OT_STATE.BREAK)
     end
 end)
+-- MY.RegisterEvent("OT_ACTION_PROGRESS", function()Output("OT_ACTION_PROGRESS",arg0, arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13) end)
+-- MY.RegisterEvent("OT_ACTION_PROGRESS_UPDATE", function()Output("OT_ACTION_PROGRESS_UPDATE",arg0, arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13) end)
+-- MY.RegisterEvent("DO_SKILL_PREPARE_PROGRESS", function()Output("DO_SKILL_PREPARE_PROGRESS",arg0, arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13) end)
+-- MY.RegisterEvent("DO_SKILL_CHANNEL_PROGRESS", function()Output("DO_SKILL_CHANNEL_PROGRESS",arg0, arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13) end)
+-- MY.RegisterEvent("DO_SKILL_HOARD_PROGRESS", function()Output("DO_SKILL_HOARD_PROGRESS",arg0, arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13) end)
 -- 拾取事件响应
 MY.RegisterEvent("DO_PICK_PREPARE_PROGRESS", function()
     local dooadad = GetDoodad(arg1)
@@ -563,6 +605,9 @@ MY.RegisterEvent("DO_PICK_PREPARE_PROGRESS", function()
     end
     XLifeBar(GetClientPlayer()):StartOTBar(szName, arg0, false)
 end)
+-- MY.RegisterEvent("DO_CUSTOM_OTACTION_PROGRESS ", function()Output("DO_CUSTOM_OTACTION_PROGRESS",arg0, arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13) end)
+-- MY.RegisterEvent("DO_RECIPE_PREPARE_PROGRESS", function()Output("DO_RECIPE_PREPARE_PROGRESS",arg0, arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13) end)
+-- MY.RegisterEvent("ON_SKILL_CHANNEL_PROGRESS ", function()Output("ON_SKILL_CHANNEL_PROGRESS",arg0, arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13) end)
 
 RegisterEvent("NPC_ENTER_SCENE",function()
     _XLifeBar.tNpc[arg0] = true
@@ -954,6 +999,22 @@ _Cache.OnPanelActive = function(wnd)
       :pos(x,y):text(_L["skillpercentage display config"])
       :menu(function()
         local t = {}
+        table.insert(t,{
+            szOption = _L['enhanced mod'], 
+            bCheck = true, 
+            bChecked = Config.bOTEnhancedMod,
+            fnAction = function() 
+                Config.bOTEnhancedMod = not Config.bOTEnhancedMod
+                _XLifeBar.Reset() 
+            end,
+            fnMouseEnter = function()
+                local szText="<text>text=" .. EncodeComponentsString(_L['Check this option may cause target switch.']) .." font=16 </text>"
+                local x, y = this:GetAbsPos()
+                local w, h = this:GetSize()
+                OutputTip(szText, 450, {x, y, w, h}, MY.Const.UI.Tip.POS_RIGHT)
+            end,
+        })
+        table.insert(t,{    bDevide = true} )
         table.insert(t,{    szOption = _L["player skillpercentage display"] , bDisable = true} )
         for k,v in pairs(Config.bShowOTBar.Player) do
             table.insert(t,{
