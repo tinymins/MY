@@ -1011,7 +1011,7 @@ _Cache.OnPanelActive = function(wnd)
                 local szText="<text>text=" .. EncodeComponentsString(_L['Check this option may cause target switch.']) .." font=16 </text>"
                 local x, y = this:GetAbsPos()
                 local w, h = this:GetSize()
-                OutputTip(szText, 450, {x, y, w, h}, MY.Const.UI.Tip.POS_RIGHT)
+                OutputTip(szText, 100, {x, y, w, h}, MY.Const.UI.Tip.POS_RIGHT)
             end,
         })
         table.insert(t,{    bDevide = true} )
