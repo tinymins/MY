@@ -165,7 +165,7 @@ _XLifeBar.WithPrepareStateHandle = function()
             end
         end
         
-        pcall(callback, bIsPrepare, dwSkillID, dwSkillLevel, fProgress, param)
+        pcall(callback, bIsPrepare, dwSkillID, dwSkillLevel, fProgress, r.param)
         _XLifeBar.bLock = false
         _XLifeBar.WithPrepareStateHandle()
     end
