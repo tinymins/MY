@@ -57,8 +57,8 @@ data = {
     ['girl']  = '蘿莉',
     
     ['ZhongLi']   = '中立',
-    ['HaoQiMeng'] = '浩气盟',
-    ['ERenGu']    = '恶人谷',
+    ['HaoQiMeng'] = '浩氣盟',
+    ['ERenGu']    = '惡人谷',
     
     ['start'] = '開始',
     ['restart'] = '重新開始',
@@ -66,6 +66,9 @@ data = {
     ['clear'] = '清空',
     ['cancel'] = '取消',
     ['use'] = '使用',
+    
+    ['close'] = '關閉',
+    ['enable/disable'] = '開啓/關閉',
     
     ['reset data'] = '重置數據',
     ['analyse data'] = '分析數據',
@@ -75,11 +78,15 @@ data = {
     ['add group'] = '添加分組',
     ['delete group'] = '刪除分組',
     
-    ['copy'] = '複製',
+    ['copy'] = '複制',
     ['paste'] = '粘貼',
     ['whisper'] = '密聊',
     
     ['set hotkey'] = '設置快捷鍵',
+    ['>> set hotkey <<'] = '>> 設置快捷鍵 <<',
+    ['use global config'] = '使用所有角色公共設置',
+    ['reset config'] = '恢複默認設置',
+    ['Are you sure to reset config?'] = '確認真的要恢複默認設置麽？',
     
     -- MY.lua
     ['mingyi plugin'] = '茗伊插件',
@@ -90,13 +97,12 @@ data = {
     ["can not find wnd component [%s]"] = "找不到窗體組件 [%s]",
     ["unable to append handle item [%s]"] = "無法追加容器組件 [%s]",
     ["unable to append handle item from string."] = "從字符串追加容器組件失敗。",
+    ['Font %d'] = '字體 %d',
     
     -- MY_CheckUpdate.lua
     ['new version found.'] = '發現新版本！',
     ['new version found, would you want to download immediately?'] = '發現新版本！是否立即前往下載？',
     ['download immediately'] = '立即下載',
-    ['see new feature'] = '更新日誌',
+    ['see new feature'] = '更新日志',
     
-    -- MY_ScreenShotHelper.lua
-    ['screen shot helper'] = '截圖助手',
 }
