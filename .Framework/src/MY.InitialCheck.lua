@@ -55,7 +55,7 @@ MY.RegisterEvent('PLAYER_ENTER_GAME', function() MY.BreatheCall(function()
             bReady = false
         end
         if me.dwTongID > 0 then
-            data.t = tostring(tong.ApplyGetTongName(me.dwTongID))
+            data.t = tong.ApplyGetTongName(me.dwTongID)
             if (not data.t) or data.t == "" then
                 bReady = false
             end

@@ -1,3 +1,33 @@
 -- language data (zhcn) updated at 2014-4-10 03:38:11
 data = {
+    ['SAY']      = '說',
+    ['MAP']      = '地',
+    ['WORLD']    = '世',
+    ['PARTY']    = '隊',
+    ['TEAM']     = '團',
+    ['BATTLE']   = '戰',
+    ['FACTION']  = '幫',
+    ['SCHOOL']   = '派',
+    ['CAMP']     = '陣',
+    ['FRIEND']   = '友',
+    ['ALLIANCE'] = '盟',
+    ['AWAY']     = '離',
+    ['BUSY']     = '擾',
+    
+    ['about...'] = '關于...',
+    ['lock postion'] = '鎖定位置',
+    ['team balloon'] = '隊伍泡泡',
+    ['chat copy'] = '聊天複制',
+    ['chat filter'] = '聊天過濾',
+    ['keyword manager'] = '關鍵字管理',
+    ['chat time'] = '聊天時間',
+    ['hh:mm'] = '時：分',
+    ['hh:mm:ss'] = '時：分：秒',
+    ['channel setting'] = '頻道設置',
+    
+    ['always show *'] = '總是顯示※號',
+    ['always be white'] = '永遠顯示爲白色',
+    ['hide system msg copy'] = '不複制系統消息',
+    
+    ['Mingyi Plugins - Chatpanel\nThis plugin is developed by Zhai YiMing @ derzh.com.'] = '[茗伊插件集] - 聊天輔助\n------------\n√該插件由翟一鳴小朋宇獨立開發完成。\n√有問題請聯系：茗伊@雙夢鎮@光明頂@荻花宮@體服',
 }

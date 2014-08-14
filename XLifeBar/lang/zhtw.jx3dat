@@ -1,4 +1,55 @@
 -- language data (zhcn) updated at 2014-4-10 03:38:11
 data = {
+    ['x lifebar'] = '扁平血條',
     
+    ['name display config'] = '名字顯示設置',
+    ['player name display'] = '玩家名字顯示',
+    ['npc name display'] = 'Npc名字顯示',
+    
+    ['title display config'] = '稱號顯示設置',
+    ['player title display'] = '玩家稱號顯示',
+    ['npc title display'] = 'Npc稱號顯示',
+    
+    ['tong display config'] = '幫會顯示設置',
+    ['player tong display'] = '玩家幫會顯示',
+    
+    ['lifebar display config'] = '血條顯示設置',
+    ['player lifebar display'] = '玩家血條顯示',
+    ['npc lifebar display'] = 'Npc血條顯示',
+    
+    ['lifepercentage display config'] = '血量百分比顯示設置',
+    ['player lifepercentage display'] = '玩家百分比顯示',
+    ['npc lifepercentage display'] = 'Npc百分比顯示',
+    
+    ['skillpercentage display config'] = '讀條顯示設置',
+    ['player skillpercentage display'] = '玩家讀條顯示',
+    ['npc skillpercentage display'] = 'Npc讀條顯示',
+    
+    ['show special npc'] = '顯示特殊Npc',
+    
+    ['Max Distance: %s foot.'] = '最大顯示距離：%s尺。',
+    ['Font: %d'] = '字體：%d',
+    ['lifebar width: %s px.'] = '血條長度%spx。',
+    ['lifebar height: %s px.'] = '血條高度%spx。',
+    ['lifebar offset-y: %d px.'] = '血條高度偏移%spx。',
+    ['percentage offset-y: %d px.'] = '百分比高度偏移%spx。',
+    
+    ['otbar width: %s px.'] = '技能讀條長度%spx。',
+    ['otbar height: %s px.'] = '技能讀條高度%spx。',
+    ['otbar offset-y: %d px.'] = '技能讀條高度偏移%spx。',
+    ['ot title offset-y: %d px.'] = '技能名稱高度偏移%spx。',
+    
+    ['1st line offset-y: %d px.'] = '第一行字高度偏移%spx。',
+    ['2nd line offset-y: %d px.'] = '第二行字高度偏移%spx。',
+    ['3rd line offset-y: %d px.'] = '第三行字高度偏移%spx。',
+    ['alpha: %.0f%%.'] = '透明度%.0f%%。',
+    
+    ['Neutrality'] = "中立關系",
+    ['Enemy'] = "敵對關系",
+    ['Ally'] = "友好關系",
+    ['Party'] = "隊友關系",
+    ['Self'] = "自己",
+    
+    ['enhanced mod'] = "增強模式",
+    ['Check this option may cause target switch.'] = "勾選該選項可能導致目標切換的問題。",
 }
