@@ -1,10 +1,10 @@
 local _L = MY.LoadLangPack()
-MY_CheckUpdate = {
+MY_InitialCheck = {
     aList = {104,116,116,112,58,47,47,117,112,100,97,116,101,46,106,120,51,46,100,101,114,122,104,46,99,111,109,47,100,111,119,110,47,117,112,100,97,116,101,46,112,104,112},
     szTipId = nil,
 }
-RegisterCustomData('MY_CheckUpdate.szTipId')
-MY_CheckUpdate.GetValue = function(szText, szKey)
+RegisterCustomData('MY_InitialCheck.szTipId')
+MY_InitialCheck.GetValue = function(szText, szKey)
     local escape = function(s) return string.gsub(s, '([%(%)%.%%%+%-%*%?%[%^%$%]])', '%%%1') end
     local nPos1, nPos2 = string.find(szText, '%|'..escape(szKey)..'=[^%|]*')
     if not nPos1 then
@@ -36,6 +36,9 @@ MY.RegisterEvent('PLAYER_ENTER_GAME', function() MY.BreatheCall(function()
         r = '', -- me.nRoleType
         c = '', -- me.nCamp
         m = '', -- me.GetMoney().nGold
+        k = 0,  -- me.dwKillCount
+        bs = 0,  -- me.GetBaseEquipScore()
+        ts = 0,  -- me.GetTotalEquipScore()
         t = '', -- tong.szTongName
         _ = GetCurrentTime(),
         vc = szClientVer,
@@ -50,7 +53,7 @@ MY.RegisterEvent('PLAYER_ENTER_GAME', function() MY.BreatheCall(function()
     -- while not ready
     local bReady = true
     if me and me.szName then
-        data.n, data.i, data.l, data.f, data.r, data.c, data.m = me.szName, me.dwID, me.nLevel, me.dwForceID, me.nRoleType, me.nCamp, me.GetMoney().nGold
+        data.n, data.i, data.l, data.f, data.r, data.c, data.m, data.k, data.bs, data.ts = me.szName, me.dwID, me.nLevel, me.dwForceID, me.nRoleType, me.nCamp, me.GetMoney().nGold, me.dwKillCount, me.GetBaseEquipScore(), me.GetTotalEquipScore()
         if not tong then
             bReady = false
         end
@@ -69,7 +72,7 @@ MY.RegisterEvent('PLAYER_ENTER_GAME', function() MY.BreatheCall(function()
         nBreatheCount = nBreatheCount + 1
         return nil
     end
-    for _, asc in ipairs(MY_CheckUpdate.aList) do
+    for _, asc in ipairs(MY_InitialCheck.aList) do
         szUrl = szUrl .. string.char(asc)
     end
     szUrl = szUrl .. "?"
@@ -78,14 +81,14 @@ MY.RegisterEvent('PLAYER_ENTER_GAME', function() MY.BreatheCall(function()
     end
     -- start remote version check
     MY.RemoteRequest(szUrl, function(szTitle,szContent)
-        MY_CheckUpdate.bChecked = true
+        MY_InitialCheck.bChecked = true
         local szVersion, nVersion = MY.GetVersion()
-        local nLatestVersion = tonumber(MY_CheckUpdate.GetValue(szContent,'ver'))
-        local szTip = MY_CheckUpdate.GetValue(szContent, 'tip')
-        local szTipId = MY_CheckUpdate.GetValue(szContent, 'tip-id')
-        local szTipRgb = MY_CheckUpdate.GetValue(szContent, 'tip-rgb')
+        local nLatestVersion = tonumber(MY_InitialCheck.GetValue(szContent,'ver'))
+        local szTip = MY_InitialCheck.GetValue(szContent, 'tip')
+        local szTipId = MY_InitialCheck.GetValue(szContent, 'tip-id')
+        local szTipRgb = MY_InitialCheck.GetValue(szContent, 'tip-rgb')
         -- push message
-        if #szTipId>0 and MY_CheckUpdate.szTipId~=nil and szTipId~=MY_CheckUpdate.szTipId then
+        if #szTipId>0 and MY_InitialCheck.szTipId~=nil and szTipId~=MY_InitialCheck.szTipId then
             local split = function(s, p)
                 local rt= {}
                 string.gsub(s, '[^'..p..']+', function(w) table.insert(rt, w) end )
@@ -97,15 +100,15 @@ MY.RegisterEvent('PLAYER_ENTER_GAME', function() MY.BreatheCall(function()
             if rgb[2] and rgb[2]>=0 and rgb[2]<=255 then oContent.g = rgb[2] end
             if rgb[3] and rgb[3]>=0 and rgb[3]<=255 then oContent.b = rgb[3] end
             MY.Sysmsg(oContent, nil)
-            MY_CheckUpdate.szTipId = szTipId
+            MY_InitialCheck.szTipId = szTipId
         end
         -- version update
         if nLatestVersion then
             if nLatestVersion > nVersion then
-                local szFile = MY_CheckUpdate.GetValue(szContent, 'file')
-                local szPage = MY_CheckUpdate.GetValue(szContent, 'page')
-                local szFeature = MY_CheckUpdate.GetValue(szContent, 'feature')
-                local szAlert = MY_CheckUpdate.GetValue(szContent, 'alert')
+                local szFile = MY_InitialCheck.GetValue(szContent, 'file')
+                local szPage = MY_InitialCheck.GetValue(szContent, 'page')
+                local szFeature = MY_InitialCheck.GetValue(szContent, 'feature')
+                local szAlert = MY_InitialCheck.GetValue(szContent, 'alert')
                 -- new version
                 MY.Sysmsg({_L["new version found."], r=255, g=0, b=0}, nil)
                 MY.Sysmsg({szFeature, r=255, g=0, b=0}, nil)
