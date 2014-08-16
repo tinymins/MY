@@ -1721,14 +1721,16 @@ end
     :check()                返回是否已勾选
     :check(bool bChecked)   勾选/取消勾选
 ]]
-function _MY.UI:check(fnCheck, fnUncheck)
+function _MY.UI:check(fnCheck, fnUncheck, bNoAutoBind)
     self:_checksum()
-    fnUncheck = fnUncheck or fnCheck
-    if type(fnCheck)=="function" then
+    if not bNoAutoBind then
+        fnUncheck = fnUncheck or fnCheck
+    end
+    if type(fnCheck)=="function" or type(fnUncheck)=="function" then
         for _, ele in pairs(self.eles) do
             if ele.chk then
-                MY.UI.RegisterUIEvent(ele.chk, 'OnCheckBoxCheck' , function() fnCheck(true) end)
-                MY.UI.RegisterUIEvent(ele.chk, 'OnCheckBoxUncheck' , function() fnUncheck(false) end)
+                if type(fnCheck)=="function" then MY.UI.RegisterUIEvent(ele.chk, 'OnCheckBoxCheck' , function() fnCheck(true) end) end
+                if type(fnUncheck)=="function" then MY.UI.RegisterUIEvent(ele.chk, 'OnCheckBoxUncheck' , function() fnUncheck(false) end) end
             end
         end
         return self
