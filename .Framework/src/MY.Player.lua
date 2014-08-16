@@ -316,7 +316,8 @@ MY.Player.GetBuffList = function(obj)
     return aBuffTable
 end
 
-_Cache.tPlayerSkills = {} -- 玩家技能列表[缓存]
+_Cache.tPlayerSkills = {}   -- 玩家技能列表[缓存]   -- 技能名反查ID
+_Cache.tSkillCache = {}     -- 技能列表缓存         -- 技能ID查技能名称图标
 --[[ 通过技能名称获取技能对象
     (table) MY.GetSkillByName(szName)
 ]]
@@ -385,6 +386,25 @@ MY.Player.UseSkill = function(dwSkillID, bForceStopCurrentAction, eTargetType, d
         if dwTargetID then SetTarget(oTTP, oTID) end
         return false
     end
+end
+-- 根据技能 ID 及等级获取技能的名称及图标 ID（内置缓存处理）
+-- (string, number) MY.Player.GetSkillName(number dwSkillID[, number dwLevel])
+MY.Player.GetSkillName = function(dwSkillID, dwLevel)
+    if not _Cache.tSkillCache[dwSkillID] then
+        local tLine = Table_GetSkill(dwSkillID, dwLevel)
+        if tLine and tLine.dwSkillID > 0 and tLine.bShow
+            and (StringFindW(tLine.szDesc, "_") == nil  or StringFindW(tLine.szDesc, "<") ~= nil)
+        then
+            _Cache.tSkillCache[dwSkillID] = { tLine.szName, tLine.dwIconID }
+        else
+            local szName = "SKILL#" .. dwSkillID
+            if dwLevel then
+                szName = szName .. ":" .. dwLevel
+            end
+            _Cache.tSkillCache[dwSkillID] = { szName, 13 }
+        end
+    end
+    return unpack(_Cache.tSkillCache[dwSkillID])
 end
 
 --[[ 登出游戏
