@@ -53,6 +53,9 @@ local Config_Default = {
     nAlpha = 200,
     nFont = 16,
     nDistance = 24,
+    
+    bHideLifePercentageWhenFight = false,
+    bHideLifePercentageDecimal = false,
 }
 local Config = clone(Config_Default)
 
@@ -69,6 +72,7 @@ local _XLifeBar = {
     tNpc = {},
     tPlayer = {},
     dwTargetID = 0,
+    bFightState = false,
 }
 local HP = XLifeBar.HP
 
@@ -376,7 +380,13 @@ function XLifeBar.X:DrawLife()
         self.hp:DrawLifebar(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, {r,g,b,a,self.tab.Life})
     end
     if cfgLifePer then
-        self.hp:DrawLifePercentage({string.format("%.1f", 100 * self.tab.Life), Config.nPerHeight}, {r,g,b,a,f})
+        local szFormatString = '%.1f'
+        if Config.bHideLifePercentageWhenFight and not GetClientPlayer().bFightState then
+            szFormatString = ''
+        elseif Config.bHideLifePercentageDecimal then
+            szFormatString = '%.0f'
+        end
+        self.hp:DrawLifePercentage({string.format(szFormatString, 100 * self.tab.Life), Config.nPerHeight}, {r,g,b,a,f})
     end
     return self
 end
@@ -489,6 +499,9 @@ function XLifeBar.OnFrameBreathe()
                    :SetTong(_XLifeBar.GetTongName(object.dwTongID, "[%s]"))
                    :SetTitle(object.szTitle)
                    :SetName(object.szName)
+                if me.bFightState ~= _XLifeBar.bFightState then
+                    xlb:DrawLife()
+                end
                 -- 读条判定
                 local nState = xlb:GetOTState()
                 if nState ~= OT_STATE.ON_SKILL then
@@ -563,6 +576,10 @@ function XLifeBar.OnFrameBreathe()
     
     for k , v in pairs(_XLifeBar.tPlayer) do
         fnCheckInvalidRect(GetPlayer(k))
+    end
+    
+    if me.bFightState ~= _XLifeBar.bFightState then
+        _XLifeBar.bFightState = me.bFightState
     end
 end
 
@@ -990,6 +1007,25 @@ _Cache.OnPanelActive = function(wnd)
                 end
             })
         end
+        table.insert(t,{    bDevide = true} )
+        table.insert(t,{
+            szOption = _L['hide when unfight'], 
+            bCheck = true, 
+            bChecked = Config.bHideLifePercentageWhenFight,
+            fnAction = function() 
+                Config.bHideLifePercentageWhenFight = not Config.bHideLifePercentageWhenFight;
+                _XLifeBar.Reset() 
+            end,
+        })
+        table.insert(t,{
+            szOption = _L['hide decimal'], 
+            bCheck = true, 
+            bChecked = Config.bHideLifePercentageDecimal,
+            fnAction = function() 
+                Config.bHideLifePercentageDecimal = not Config.bHideLifePercentageDecimal;
+                _XLifeBar.Reset() 
+            end,
+        })
         return t
       end)
     y = y + offsety

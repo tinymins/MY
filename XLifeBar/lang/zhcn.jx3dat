@@ -52,4 +52,7 @@ data = {
     
     ['enhanced mod'] = "增强模式",
     ['Check this option may cause target switch.'] = "勾选该选项可能导致目标切换的问题。",
+    
+    ['hide when unfight'] = '脱战时隐藏',
+    ['hide decimal'] = '不显示小数',
 }
