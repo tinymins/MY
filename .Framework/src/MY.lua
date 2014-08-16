@@ -272,6 +272,9 @@ end
 MY.GetFrame = function()
     if not _MY.frame then
         _MY.frame = Wnd.OpenWindow(_MY.szIniFile, "MY")
+        local W, H = Station.GetClientSize()
+        local w, h = _MY.frame:GetSize()
+        _MY.frame:SetRelPos((W-w)/2, (H-h)/2)
         _MY.frame:Hide()
     end
     return _MY.frame
