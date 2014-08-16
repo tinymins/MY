@@ -937,6 +937,12 @@ function _MY.UI:text(szText)
                 ele.raw.UpdateScroll()
             elseif ele.type == "WndSliderBox" and type(szText)=="function" then
                 ele.sld.FormatText = szText
+            elseif ele.type == "WndEditBox" then
+                if szText=="" then
+                    ele.phd:Show()
+                else
+                    ele.phd:Hide()
+                end
             end
         end
         return self
