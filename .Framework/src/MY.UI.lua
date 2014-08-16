@@ -104,6 +104,7 @@ function _MY.UI:ctor(raw, tab)
                 _tab.hdl = _tab.hdl or raw:Lookup('','')
                 _tab.edt = _tab.edt or raw:Lookup('WndEdit_Default')
                 _tab.img = _tab.img or raw:Lookup('','Image_Default')
+                _tab.phd = _tab.phd or raw:Lookup('','Text_PlaceHolder')
             elseif _tab.type=="WndComboBox" then
                 _tab.wnd = _tab.wnd or raw
                 _tab.hdl = _tab.hdl or raw:Lookup('','')
@@ -171,6 +172,7 @@ function _MY.UI:raw2ele(raw, tab)
         _tab.hdl = _tab.hdl or raw:Lookup('','')
         _tab.edt = _tab.edt or raw:Lookup('WndEdit_Default')
         _tab.img = _tab.img or raw:Lookup('','Image_Default')
+        _tab.phd = _tab.phd or raw:Lookup('','Text_PlaceHolder')
     elseif _tab.type=="WndComboBox" then
         _tab.wnd = _tab.wnd or raw
         _tab.hdl = _tab.hdl or raw:Lookup('','')
@@ -738,6 +740,15 @@ function _MY.UI:append(szName, szType, tArg)
                             wnd:Lookup("WndNewScrollBar_Default"):ScrollNext(-nDistance)            -- wheel scroll position
                             return 1
                         end
+                    elseif szType=='WndEditBox' then
+                        wnd:Lookup("WndEdit_Default").OnSetFocus = function()
+                            wnd:Lookup("", "Text_PlaceHolder"):Hide()
+                        end
+                        wnd:Lookup("WndEdit_Default").OnKillFocus = function()
+                            if wnd:Lookup("WndEdit_Default"):GetText() == "" then
+                                wnd:Lookup("", "Text_PlaceHolder"):Show()
+                            end
+                        end
                     end
                 end
                 Wnd.CloseWindow(frame)
@@ -934,6 +945,24 @@ function _MY.UI:text(szText)
         local ele = self.eles[1]
         -- try to get its name
         local status, err = pcall(function() return (ele.txt or ele.edt or ele.raw):GetText() end)
+        -- if succeed then return its name
+        if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:text' ,3) return nil end
+    end
+end
+
+-- get/set ui object text
+function _MY.UI:placeholder(szText)
+    self:_checksum()
+    if szText then
+        for _, ele in pairs(self.eles) do
+            if ele.phd then ele.phd:SetText(szText) end
+        end
+        return self
+    else
+        -- select the first item
+        local ele = self.eles[1]
+        -- try to get its name
+        local status, err = pcall(function() return ele.phd:GetText() end)
         -- if succeed then return its name
         if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:text' ,3) return nil end
     end
