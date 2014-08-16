@@ -23,4 +23,13 @@ data = {
     ['Never Fight'] = '打一架再说',
     ['Fight Clock: %d:%02d:%02d'] = '战斗计时：%d:%02d:%02d',
     ['Lotus Clock: %d:%d:%d'] = '藕和桂花：%d:%d:%d',
+    
+    ['Time Limited'] = '限时',
+    ['Search'] = '搜索',
+    ['package searcher'] = '仓库背包搜索',
+    
+    ['GongZhan'] = '共战',
+    ['Detected [%s] has GongZhan buff for %d sec(s).'] = '检测到[%s]共战BUFF剩余%d秒。',
+    ['Nearby GongZhan Total Count: %d.'] = '附近共战数量：%d。',
+    ['------------------------------------'] = '————————————————————————'
 }

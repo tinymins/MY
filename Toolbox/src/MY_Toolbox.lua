@@ -10,17 +10,259 @@ local _MY_ToolBox = {
     bFighting = false,
     nLastFightStartTimestarp = -1,
     nLastFightEndTimestarp = -1,
+    tChannels = {
+        { nChannel = PLAYER_TALK_CHANNEL.LOCAL_SYS  , szName = _L['system channel']  , rgb = GetMsgFontColor("MSG_SYS"  , true) },
+        { nChannel = PLAYER_TALK_CHANNEL.TEAM  , szName = _L['team channel']  , rgb = GetMsgFontColor("MSG_TEAM"  , true) },
+        { nChannel = PLAYER_TALK_CHANNEL.RAID  , szName = _L['raid channel']  , rgb = GetMsgFontColor("MSG_TEAM"  , true) },
+        { nChannel = PLAYER_TALK_CHANNEL.TONG  , szName = _L['tong channel']  , rgb = GetMsgFontColor("MSG_GUILD" , true) },
+    }
 }
 MY_ToolBox = {}
+--[[
+#######################################################################################################
+            #                         #             #               #                 # # # #     
+          #   #             # # # # # # # # # #       #             #     #           #           
+        #       #           #                                       #       #   # # # # # # # #   
+      #           #         #       #                     # # # # # # #         #     #       #   
+  # #               # #     # # # # # # # # # #   # # #             #           #     # # #       
+      # # # # # #           #     #                   #     #       #     #     # # # #       #   
+      #         #           #   #     #               #       #     #       #   #       # # # #   
+      #         #           #   # # # # # # #         #       #     #           #     #           
+      #         #           #         #               #             #           #       #         
+      #     # #     #       # # # # # # # # # #       #         # # #       #   #   #       #     
+      #             #       #         #             #   #                 #     # #   #   #   #   
+        # # # # # # #     #           #           #       # # # # # # #       #       # # #       
+#######################################################################################################
+]]
+MY_ToolBox.bBagSearch = true
+RegisterCustomData("MY_ToolBox.bBagSearch")
+_MY_ToolBox.OnBreathe = function()
+    -- bag
+    local chks = {
+        Station.Lookup("Normal/BigBagPanel/CheckBox_Totle"),
+        Station.Lookup("Normal/BigBagPanel/CheckBox_Task"),
+        Station.Lookup("Normal/BigBagPanel/CheckBox_Equipment"),
+        Station.Lookup("Normal/BigBagPanel/CheckBox_Drug"),
+        Station.Lookup("Normal/BigBagPanel/CheckBox_Material"),
+        Station.Lookup("Normal/BigBagPanel/CheckBox_Book"),
+        Station.Lookup("Normal/BigBagPanel/CheckBox_Grey"),
+    }
+    local chkLtd = Station.Lookup("Normal/BigBagPanel/CheckBox_TimeLtd")
+    local iptKwd = Station.Lookup("Normal/BigBagPanel/WndEditBox_KeyWord")
+    if not MY_ToolBox.bBagSearch then
+        if chkLtd then
+            chkLtd:Destroy()
+            iptKwd:Destroy()
+        end
+    elseif chks[7] then
+        if not chkLtd then
+            local nX, nY = chks[7]:GetRelPos()
+            local w, h = chks[7]:GetSize()
+            for _, chk in ipairs(chks) do
+                chk.OnCheckBoxUncheck = function() _MY_ToolBox.bBagTimeLtd = false end
+            end
+            chkLtd = MY.UI("Normal/BigBagPanel")
+              :append("CheckBox_TimeLtd", "WndRadioBox"):children("#CheckBox_TimeLtd")
+              :text(_L['Time Limited']):size(w,h):pos(nX + chks[7]:Lookup("",""):GetSize(), nY)
+              :check(function(bChecked)
+                if bChecked then
+                    for _, chk in ipairs(chks) do
+                        chk:Check(false)
+                    end
+                    MY.UI(this):check(false)
+                end
+                _MY_ToolBox.bBagTimeLtd = bChecked
+                _MY_ToolBox.DoFilterBag()
+              end):raw(1)
+            MY.UI(chkLtd):item("#Text_Default"):left(20)
+        end
+        if not iptKwd then
+            iptKwd = MY.UI("Normal/BigBagPanel")
+              :append("WndEditBox_KeyWord", "WndEditBox"):children("#WndEditBox_KeyWord")
+              :text(_MY_ToolBox.szBagFilter or ""):size(100,21):pos(60, 30):placeholder(_L['Search'])
+              :change(function(txt)
+                _MY_ToolBox.szBagFilter = txt
+                _MY_ToolBox.DoFilterBag()
+              end):raw(1)
+        end
+    end
+    -- bank
+    local frmBank = Station.Lookup("Normal/BigBankPanel")
+    local chkLtd = Station.Lookup("Normal/BigBankPanel/CheckBox_TimeLtd")
+    local iptKwd = Station.Lookup("Normal/BigBankPanel/WndEditBox_KeyWord")
+    if not MY_ToolBox.bBagSearch then
+        if chkLtd then
+            chkLtd:Destroy()
+            iptKwd:Destroy()
+        end
+    elseif frmBank then
+        if not chkLtd then
+            chkLtd = MY.UI("Normal/BigBankPanel")
+              :append("CheckBox_TimeLtd", "WndCheckBox"):children("#CheckBox_TimeLtd")
+              :text(_L['Time Limited']):pos(277, 56):check(_MY_ToolBox.bBankTimeLtd or false)
+              :check(function(bChecked)
+                _MY_ToolBox.bBankTimeLtd = bChecked
+                _MY_ToolBox.DoFilterBank()
+              end):alpha(200):raw(1)
+            _MY_ToolBox.DoFilterBank()
+        end
+        if not iptKwd then
+            iptKwd = MY.UI("Normal/BigBankPanel")
+              :append("WndEditBox_KeyWord", "WndEditBox"):children("#WndEditBox_KeyWord")
+              :text(_MY_ToolBox.szBankFilter or ""):size(100,21):pos(280, 80):placeholder(_L['Search'])
+              :change(function(txt)
+                _MY_ToolBox.szBankFilter = txt
+                _MY_ToolBox.DoFilterBank()
+              end):raw(1)
+            _MY_ToolBox.DoFilterBank()
+        end
+    end
+    -- guild bank
+    local frmBank = Station.Lookup("Normal/GuildBankPanel")
+    local iptKwd = Station.Lookup("Normal/GuildBankPanel/WndEditBox_KeyWord")
+    if not MY_ToolBox.bBagSearch then
+        if iptKwd then
+            iptKwd:Destroy()
+        end
+    elseif frmBank then
+        if not iptKwd then
+            iptKwd = MY.UI("Normal/GuildBankPanel")
+              :append("WndEditBox_KeyWord", "WndEditBox"):children("#WndEditBox_KeyWord")
+              :text(_MY_ToolBox.szGuildBankFilter or ""):size(100,21):pos(60, 25):placeholder(_L['Search'])
+              :change(function(txt)
+                _MY_ToolBox.szGuildBankFilter = txt
+                _MY_ToolBox.DoFilterGuildBank()
+              end):raw(1)
+            _MY_ToolBox.DoFilterGuildBank()
+        end
+    end
+end
+-- 过滤背包
+_MY_ToolBox.DoFilterBag = function()
+    _MY_ToolBox.FilterPackage("Normal/BigBagPanel/", _MY_ToolBox.szBagFilter, _MY_ToolBox.bBagTimeLtd)
+end
+-- 过滤仓库
+_MY_ToolBox.DoFilterBank = function()
+    _MY_ToolBox.FilterPackage("Normal/BigBankPanel/", _MY_ToolBox.szBankFilter, _MY_ToolBox.bBankTimeLtd)
+end
+-- 过滤帮会仓库
+_MY_ToolBox.DoFilterGuildBank = function()
+    _MY_ToolBox.FilterGuildPackage("Normal/GuildBankPanel/", _MY_ToolBox.szGuildBankFilter)
+end
+-- 过滤背包原始函数
+_MY_ToolBox.FilterPackage = function(szTreePath, szFilter, bTimeLtd)
+    szFilter = szFilter or ""
+    local me = GetClientPlayer()
+    MY.UI(szTreePath):find(".Box"):each(function(ui)
+        if this.bBag then return end
+        local dwBox, dwX, bMatch = this.dwBox, this.dwX, true
+        local item = me.GetItem(dwBox, dwX)
+        if not item then return end
+        if not string.find(item.szName, szFilter) then
+            bMatch = false
+        end
+        if bTimeLtd and item:GetLeftExistTime() == 0 then
+            bMatch = false
+        end
+        if bMatch then
+            this:SetAlpha(255)
+        else
+            this:SetAlpha(50)
+        end
+    end)
+end
+-- 过滤帮会仓库原始函数
+_MY_ToolBox.FilterGuildPackage = function(szTreePath, szFilter)
+    szFilter = szFilter or ""
+    local me = GetClientPlayer()
+    MY.UI(szTreePath):find(".Box"):each(function(ui)
+        local uIID, _, nPage, dwIndex = this:GetObjectData()
+        if uIID < 0 then return end
+        if not string.find(GetItemNameByUIID(uIID), szFilter) then
+            this:SetAlpha(50)
+        else
+            this:SetAlpha(255)
+        end
+    end)
+end
+-- 事件注册
+MY.RegisterEvent("BAG_ITEM_UPDATE", _MY_ToolBox.DoFilterBag)
+MY.RegisterEvent("BAG_ITEM_UPDATE", _MY_ToolBox.DoFilterBank)
+MY.RegisterEvent("BAG_ITEM_UPDATE", _MY_ToolBox.DoFilterGuildBank)
+MY.RegisterInit(function() MY.BreatheCall(_MY_ToolBox.OnBreathe, 130) end)
+--[[
+#######################################################################################################
+      #                           #                         #                       #             
+      #     # # # # #             #               # # # # # # # # # # #   # # # # # # # # # # #   
+      #             #     # # # # # # # # # # #                                                   
+  # # # # #       #             #                     # # # # # # #           # # # # # # #       
+    #     #     #               #                     #           #           #           #       
+    #     #     #               # # # # # #           # # # # # # #           # # # # # # #       
+    #     # # # # # # #       #   #       #                                                       
+  #     #       #             #   #       #       # # # # # # # # # # #   # # # # # # # # # # #   
+    #   #       #           #       #   #         #                   #   #                   #   
+      #         #           #         #           #     # # # # #     #       # # # # # #         
+    #   #       #         #       # #   # #       #     #       #     #       #         #     #   
+  #       #   # #             # #           # #   #     # # # # #   # #   # #             # # #  
+#######################################################################################################
+]]
 MY_ToolBox.bFriendHeadTip = false
 RegisterCustomData("MY_ToolBox.bFriendHeadTip")
+_MY_ToolBox.FriendHeadTip = function(bEnable)
+    if bEnable then
+        local frm = MY.UI.CreateFrame("MY_Shadow",true,true):show()
+        local fnPlayerEnter = function(dwID)
+            local p = MY.Player.GetFriend(dwID)
+            if p then
+                local shadow = frm:append("MY_FRIEND_TIP"..dwID,"Shadow"):find("#MY_FRIEND_TIP"..dwID):raw(1)
+                if shadow then
+                    local r,g,b,a = 255,255,255,255
+                    local szTip = ">> "..p.name.." <<"
+                    shadow:ClearTriangleFanPoint()
+                    shadow:SetTriangleFan(GEOMETRY_TYPE.TEXT)
+                    shadow:AppendCharacterID(dwID, false, r, g, b, a, 0, 40, szTip, 0, 1)
+                    --shadow:AppendCharacterID(dwCharacterID, bCharacterTop, r, g, b, a [[,fTopDelta, dwFontSchemeID, szText, fSpace, fScale]])
+                    shadow:Show()
+                end
+            end
+        end
+        MY.RegisterEvent("PLAYER_ENTER_SCENE","MY_FRIEND_TIP",fnPlayerEnter)
+        MY.RegisterEvent("PLAYER_LEAVE_SCENE","MY_FRIEND_TIP",function(arg0)
+            frm:find("#MY_FRIEND_TIP"..arg0):remove()
+        end)
+        for _, p in pairs(MY.Player.GetNearPlayer()) do
+            fnPlayerEnter(p.dwID)
+        end
+    else
+        MY.RegisterEvent("PLAYER_ENTER_SCENE","MY_FRIEND_TIP")
+        MY.RegisterEvent("PLAYER_LEAVE_SCENE","MY_FRIEND_TIP")
+        MY.UI("Lowest/MY_Shadow"):remove()
+    end
+end
+MY.RegisterInit(function() if MY_ToolBox.bFriendHeadTip then _MY_ToolBox.FriendHeadTip(true) end end)
+--[[
+#######################################################################################################
+      #       #                   #                     #                 
+      #         #           # # # # # # # # #         # # # # # # #       
+    #   # # # # # # # #     #               #       #   #       #         
+    #                       # # # # # # # # #             # # #           
+  # #     # # # # # #       #               #         # #       # #       
+    #                       # # # # # # # # #     # #       #       # #   
+    #     # # # # # #       #               #               #             
+    #                       # # # # # # # # #       # # # # # # # # #     
+    #     # # # # # #               #                       #             
+    #     #         #       #   #     #     #         #     #     #       
+    #     # # # # # #       #   #         #   #     #       #       #     
+    #     #         #     #       # # # # #   #   #       # #         #   
+#######################################################################################################
+]]
 MY_ToolBox.InfoTip = {
     -- FPS
     FPS       = { bEnable = false, bShowBg = true, anchor =  { x=-10, y=-190, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }, title = _L['fps monitor'],
                   breathe = function() MY.UI(this):find("#Text_Default"):text(_L("FPS: %d", GetFPS())) end },
     -- 目标距离
     Distance  = { bEnable = false, bShowBg = true, anchor =  { x=-10, y=-160, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }, title = _L['target distance'],
-                  breathe = function()
+                      breathe = function()
                     local p, s = (MY.Player.GetTarget()), _L["No Target"]
                     if p then
                         s = _L('Distance: %.1f Foot', GetCharacterDistance(GetClientPlayer().dwID, p.dwID)/64)
@@ -77,38 +319,7 @@ for k, v in pairs(MY_ToolBox.InfoTip) do
     RegisterCustomData("MY_ToolBox.InfoTip."..k..".bShowBg")
     RegisterCustomData("MY_ToolBox.InfoTip."..k..".anchor")
 end
-
-_MY_ToolBox.FriendHeadTip = function(bEnable)
-    if bEnable then
-        local frm = MY.UI.CreateFrame("MY_Shadow",true,true):show()
-        local fnPlayerEnter = function(dwID)
-            local p = MY.Player.GetFriend(dwID)
-            if p then
-                local shadow = frm:append("MY_FRIEND_TIP"..dwID,"Shadow"):find("#MY_FRIEND_TIP"..dwID):raw(1)
-                if shadow then
-                    local r,g,b,a = 255,255,255,255
-                    local szTip = ">> "..p.name.." <<"
-                    shadow:ClearTriangleFanPoint()
-                    shadow:SetTriangleFan(GEOMETRY_TYPE.TEXT)
-                    shadow:AppendCharacterID(dwID, false, r, g, b, a, 0, 40, szTip, 0, 1)
-                    --shadow:AppendCharacterID(dwCharacterID, bCharacterTop, r, g, b, a [[,fTopDelta, dwFontSchemeID, szText, fSpace, fScale]])
-                    shadow:Show()
-                end
-            end
-        end
-        MY.RegisterEvent("PLAYER_ENTER_SCENE","MY_FRIEND_TIP",fnPlayerEnter)
-        MY.RegisterEvent("PLAYER_LEAVE_SCENE","MY_FRIEND_TIP",function(arg0)
-            frm:find("#MY_FRIEND_TIP"..arg0):remove()
-        end)
-        for _, p in pairs(MY.Player.GetNearPlayer()) do
-            fnPlayerEnter(p.dwID)
-        end
-    else
-        MY.RegisterEvent("PLAYER_ENTER_SCENE","MY_FRIEND_TIP")
-        MY.RegisterEvent("PLAYER_LEAVE_SCENE","MY_FRIEND_TIP")
-        MY.UI("Lowest/MY_Shadow"):remove()
-    end
-end
+-- 显示信息条
 _MY_ToolBox.ReloadInfoTip = function()
     for id, p in pairs(MY_ToolBox.InfoTip) do
         local frm = MY.UI('Normal/MY_InfoTip_'..id)
@@ -137,45 +348,74 @@ _MY_ToolBox.ReloadInfoTip = function()
     end
 end
 -- 注册INIT事件
-MY.RegisterInit(function()
-    if MY_ToolBox.bFriendHeadTip then _MY_ToolBox.FriendHeadTip(true) end
-    _MY_ToolBox.ReloadInfoTip()
-end)
+MY.RegisterInit(function() _MY_ToolBox.ReloadInfoTip() end)
+--[[
+#######################################################################################################
+    #       # # # #         # # # # # # # # #                                 #             # #   
+      #     #     #         #     #   #     #     # # # # # # # # # # #       #     # # # #       
+            #     #         # # # # # # # # #               #                 #     #             
+            #     #                 #                     #               # # # #   #             
+  # # #   #         # #   # # # # # # # # # # #     # # # # # # # # # #       #     # # # # # #   
+      #                             #               #     #     #     #     # # #   #   #     #   
+      #   # # # # # #         # # # # # # #         #     # # # #     #     # #   # #   #     #   
+      #     #       #         #           #         #     #     #     #   #   #     #   #   #     
+      #       #   #           #           #         #     # # # #     #       #     #   #   #     
+      # #       #             #     #     #         #     #     #     #       #     #     #       
+      #       #   #           #     #     #         # # # # # # # # # #       #   #     #   #     
+          # #       # #   # # # # # # # # # # #     #                 #       # #     #       #   
+#######################################################################################################
+]]
 -- 标签栏激活
 _MY_ToolBox.OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
     local w, h = ui:size()
     
-    ui:append('WndButton_GongzhanCheck', 'WndButton'):children('#WndButton_GongzhanCheck'):pos(150,20):width(120)
-      :text(_L['check nearby gongzhan'])
-      :click(function()
-        -- (number) TMS.FrameToSecondLeft(nEndFrame)     -- 获取nEndFrame剩余秒数
-        local FrameToSecondLeft = function(nEndFrame)
-            local nLeftFrame = nEndFrame - GetLogicFrameCount()
-            return nLeftFrame / 16
-        end
-        local IsGongZhan = function(obj)
-            for k, v in pairs(MY.Player.GetBuffList(obj)) do
-                if (not v.bCanCancel) and string.find(Table_GetBuffName(v.dwID, v.nLevel), "共战") ~= nil then
-                    MY.Talk( PLAYER_TALK_CHANNEL.RAID, _L("检测到[%s]共战BUFF剩余%d秒。", obj.szName, FrameToSecondLeft(v.nEndFrame) ) )
-                    return true
-                end
-            end
-            return false
-        end
-        local i = 0
-        for k, v in pairs(MY.GetNearPlayer()) do
-            if IsGongZhan(v) then
-                i = i + 1
-            end
-        end
-        MY.Talk(PLAYER_TALK_CHANNEL.RAID, "附近共战数量："..i.."。")
-    end)
     ui:append("WndCheckBox_FriendHeadTip", "WndCheckBox"):children("#WndCheckBox_FriendHeadTip"):pos(20,20)
       :text(_L['friend headtop tips']):check(MY_ToolBox.bFriendHeadTip)
       :check(function(bCheck)
         MY_ToolBox.bFriendHeadTip = not MY_ToolBox.bFriendHeadTip
         _MY_ToolBox.FriendHeadTip(MY_ToolBox.bFriendHeadTip)
+    end)
+    
+    ui:append("WndCheckBox_BagSearch", "WndCheckBox"):children("#WndCheckBox_BagSearch"):pos(140,20)
+      :text(_L['package searcher']):check(MY_ToolBox.bBagSearch)
+      :check(function(bChecked)
+        MY_ToolBox.bBagSearch = bChecked
+    end)
+    
+    ui:append('WndButton_GongzhanCheck', 'WndButton'):children('#WndButton_GongzhanCheck'):pos(270,20):width(120)
+      :text(_L['check nearby gongzhan'])
+      :lclick(function()
+        local tGongZhans = {}
+        for _, p in pairs(MY.GetNearPlayer()) do
+            for _, buff in pairs(MY.Player.GetBuffList(p)) do
+                if (not buff.bCanCancel) and string.find(Table_GetBuffName(buff.dwID, buff.nLevel), _L["GongZhan"]) ~= nil then
+                    table.insert(tGongZhans, {p = p, time = (buff.nEndFrame - GetLogicFrameCount()) / 16})
+                end
+            end
+        end
+        
+        local nChannel = MY_ToolBox.nGongzhanPublishChannel or PLAYER_TALK_CHANNEL.LOCAL_SYS
+        
+        MY.Talk(nChannel, _L["------------------------------------"])
+        for _, r in ipairs(tGongZhans) do
+            MY.Talk( nChannel, _L("Detected [%s] has GongZhan buff for %d sec(s).", r.p.szName, r.time) )
+        end
+        MY.Talk(nChannel, _L("Nearby GongZhan Total Count: %d.", #tGongZhans))
+        MY.Talk(nChannel, _L["------------------------------------"])
+    end):rmenu(function()
+        local t = { { szOption = _L['send to ...'], bDisable = true }, { bDevide = true } }
+        for _, tChannel in ipairs(_MY_ToolBox.tChannels) do
+            table.insert( t, { 
+                szOption = tChannel.szName,
+                rgb = tChannel.rgb,
+                bCheck = true, bMCheck = true, bChecked = MY_ToolBox.nGongzhanPublishChannel == tChannel.nChannel,
+                fnAction = function()
+                    MY_ToolBox.nGongzhanPublishChannel = tChannel.nChannel
+                end
+            } )
+        end
+        return t
     end)
     
     local x, y = 20, 50
