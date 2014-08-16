@@ -350,6 +350,139 @@ end
 -- 注册INIT事件
 MY.RegisterInit(function() _MY_ToolBox.ReloadInfoTip() end)
 --[[
+##########################################################################################################################
+      *         *   *                   *                                   *                           *     *           
+      *         *     *         *       *         * * * * * * * * * * *       *     * * * * *           *     *           
+      * * *     *                 *     *                           *     * * * *   *       *         *       *       *   
+      *         * * * *             *   *                           *           *   *   *   *         *       *     *     
+      *     * * *           *           *           * * * * * *     *         *     *   *   *       * *       *   *       
+  * * * * *     *   *         *         *           *         *     *         * *   *   *   *     *   *       * *         
+  *       *     *   *           *       *           *         *     *       * *   * *   *   *         *       *           
+  *       *     *   *                   * * * *     *         *     *     *   *     *   *   *         *     * *           
+  *       *       *       * * * * * * * *           * * * * * *     *         *       *   *           *   *   *           
+  * * * * *     * *   *                 *           *               *         *       *   *           *       *       *   
+  *           *     * *                 *                           *         *     *     *   *       *       *       *   
+            *         *                 *                       * * *         *   *         * *       *         * * * *   
+##########################################################################################################################
+]]
+MY_ToolBox.bVisualSkill = false
+MY_ToolBox.anchorVisualSkill = { x=0, y=-220, s="BOTTOMCENTER", r="BOTTOMCENTER" }
+MY_ToolBox.nVisualSkillBoxCount = 5
+RegisterCustomData("MY_ToolBox.bVisualSkill")
+RegisterCustomData("MY_ToolBox.anchorVisualSkill")
+RegisterCustomData("MY_ToolBox.nVisualSkillBoxCount")
+-- 加载界面
+_MY_ToolBox.ReloadVisualSkill = function()
+    -- distory ui
+    MY.UI("Normal/MY_ToolBox_VisualSkill"):remove()
+    -- unbind event
+    MY.RegisterEvent("DO_SKILL_CAST", "MY_ToolBox_VisualSkillCast")
+    -- create new   
+    if MY_ToolBox.bVisualSkill then
+        -- create ui
+        local ui = MY.UI.CreateFrame("MY_ToolBox_VisualSkill", true)
+        ui:size(399, 52):anchor(MY_ToolBox.anchorVisualSkill)
+          :onevent("UI_SCALED", function()
+            MY.UI(this):anchor(MY_ToolBox.anchorVisualSkill)
+          end):customMode(_L['visual skill'], function(anchor)
+            MY_ToolBox.anchorVisualSkill = anchor
+          end, function(anchor)
+            MY_ToolBox.anchorVisualSkill = anchor
+          end)
+        -- draw background
+        local uiL = ui:append("WndWindow_Lowest", "WndWindow"):children("#WndWindow_Lowest"):size(399, 52)
+        uiL:append("Image_Bg_10", "Image"):item("#Image_Bg_10"):pos(0,0):size(130, 52):image("ui/Image/UICommon/Skills.UITex", 28)
+        uiL:append("Image_Bg_11", "Image"):item("#Image_Bg_11"):pos(130,0):size( 53 * MY_ToolBox.nVisualSkillBoxCount - 32, 52):image("ui/Image/UICommon/Skills.UITex", 31)
+        uiL:append("Image_Bg_12", "Image"):item("#Image_Bg_12"):pos(130 + 53 * MY_ToolBox.nVisualSkillBoxCount - 32, 0):size(80, 52):image("ui/Image/UICommon/Skills.UITex", 29)
+        -- create skill boxes
+        local uiN = ui:append("WndWindow_Normal", "WndWindow"):children("#WndWindow_Normal"):size(399, 52)
+        local y = 45
+        for i= 1, MY_ToolBox.nVisualSkillBoxCount do
+            uiN:append("Box_1"..i, "Box"):item("#Box_1"..i):pos(y+i*53,3):alpha(0)
+        end
+        uiN:append("Box_10", "Box"):item("#Box_10"):pos(y+MY_ToolBox.nVisualSkillBoxCount*53+300,3):alpha(0)
+        -- draw front mask
+        local uiT = ui:append("WndWindow_Top", "WndWindow"):children("#WndWindow_Top"):size(399, 52)
+        local y = 42
+        for i= 1, MY_ToolBox.nVisualSkillBoxCount do
+            uiT:append("Image_1"..i, "Image"):item("#Image_1"..i):pos(y+i*53,0):size(55, 53):image("ui/Image/UICommon/Skills.UITex", 15)
+        end
+        -- init data and bind event
+        _MY_ToolBox.nVisualSkillBoxIndex = 0
+        MY.RegisterEvent("DO_SKILL_CAST", "MY_ToolBox_VisualSkillCast", function()
+            local dwID, dwSkillID, dwSkillLevel = arg0, arg1, arg2
+            if dwID == GetClientPlayer().dwID then
+                MY_ToolBox.VisualSkillCast(dwSkillID, dwSkillLevel)
+            end
+        end)
+    end
+end
+MY_ToolBox.VisualSkillCast = function(dwSkillID, dwSkillLevel)
+    local ui = MY.UI("Normal/MY_ToolBox_VisualSkill/WndWindow_Normal")
+    if ui:count()==0 then return end
+    -- get name
+    local szSkillName, dwIconID = MY.Player.GetSkillName(dwSkillID, dwSkillLevel)
+    if not szSkillName or szSkillName == "" or dwIconID == 13 then
+        return
+    end
+    local nAnimateFrameCount, nStartFrame = 8, GetLogicFrameCount()
+    -- box enter
+    local i = _MY_ToolBox.nVisualSkillBoxIndex
+    local boxEnter = ui:item("#Box_1"..i)
+    boxEnter:raw(1):EnableObject(false)
+    boxEnter:raw(1):SetObjectCoolDown(1)
+    boxEnter:raw(1):SetObject(UI_OBJECT_SKILL, dwSkillID, dwSkillLevel)
+    boxEnter:raw(1):SetObjectIcon(Table_GetSkillIconID(dwSkillID, dwSkillLevel))
+    UpdataSkillCDProgress(GetClientPlayer(), boxEnter:raw(1))
+    local nEnterDesLeft = MY_ToolBox.nVisualSkillBoxCount*53 + 45
+    MY.BreatheCall(function()
+        local nLeft = boxEnter:left()
+        local nSpentFrameCount = GetLogicFrameCount() - nStartFrame
+        if nSpentFrameCount < nAnimateFrameCount then
+            boxEnter:alpha(255 * (nSpentFrameCount/nAnimateFrameCount)):left(nLeft - (nLeft - nEnterDesLeft)/(nAnimateFrameCount - nSpentFrameCount))
+        else
+            boxEnter:alpha(255):left(nEnterDesLeft):raw(1):SetObjectCoolDown(0)
+            return 0
+        end
+    end)
+    
+    -- box leave
+    i = ( i + 1 ) % (MY_ToolBox.nVisualSkillBoxCount + 1)
+    local boxLeave = ui:item("#Box_1"..i)
+    boxLeave:raw(1):SetObjectCoolDown(0)
+    local nLeaveDesLeft = -200
+    MY.BreatheCall(function()
+        local nLeft = boxLeave:left()
+        local nSpentFrameCount = GetLogicFrameCount() - nStartFrame
+        if nSpentFrameCount < nAnimateFrameCount then
+            boxLeave:alpha(255 * (1-nSpentFrameCount/nAnimateFrameCount)):left(nLeft - (nLeft - nLeaveDesLeft)/(nAnimateFrameCount - nSpentFrameCount))
+        else
+            boxLeave:alpha(0):left(45+MY_ToolBox.nVisualSkillBoxCount*53+300)
+            return 0
+        end
+    end)
+    
+    -- box middle
+    for j = 2, MY_ToolBox.nVisualSkillBoxCount do
+        i = ( i + 1 ) % (MY_ToolBox.nVisualSkillBoxCount + 1)
+        local box, nDesLeft = ui:item("#Box_1"..i), j*53-8
+        MY.BreatheCall(function()
+            local nLeft = box:left()
+            local nSpentFrameCount = GetLogicFrameCount() - nStartFrame
+            if nSpentFrameCount < nAnimateFrameCount then
+                box:left(nLeft - (nLeft - nDesLeft)/(nAnimateFrameCount - nSpentFrameCount))
+            else
+                box:left(nDesLeft)
+                return 0
+            end
+        end)
+    end
+    
+    -- update index
+    _MY_ToolBox.nVisualSkillBoxIndex = ( _MY_ToolBox.nVisualSkillBoxIndex + 1 ) % (MY_ToolBox.nVisualSkillBoxCount + 1)
+end
+MY.RegisterInit(_MY_ToolBox.ReloadVisualSkill)
+--[[
 #######################################################################################################
     #       # # # #         # # # # # # # # #                                 #             # #   
       #     #     #         #     #   #     #     # # # # # # # # # # #       #     # # # #       
@@ -383,7 +516,23 @@ _MY_ToolBox.OnPanelActive = function(wnd)
         MY_ToolBox.bBagSearch = bChecked
     end)
     
-    ui:append('WndButton_GongzhanCheck', 'WndButton'):children('#WndButton_GongzhanCheck'):pos(270,20):width(120)
+    ui:append("WndCheckBox_VisualSkill", "WndCheckBox"):children("#WndCheckBox_VisualSkill"):pos(260,20)
+      :text(_L['visual skill']):check(MY_ToolBox.bVisualSkill)
+      :check(function(bChecked)
+        MY_ToolBox.bVisualSkill = bChecked
+        _MY_ToolBox.ReloadVisualSkill()
+    end)
+    
+    ui:append("WndSliderBox_VisualSkillCast", "WndSliderBox"):children("#WndSliderBox_VisualSkillCast"):pos(370, 20)
+      :sliderStyle(false):range(1, 16):value(MY_ToolBox.nVisualSkillBoxCount)
+      :text(_L("display %d skills.", MY_ToolBox.nVisualSkillBoxCount))
+      :text(function(val) return _L("display %d skills.", val) end)
+      :change(function(val)
+        MY_ToolBox.nVisualSkillBoxCount = val
+        _MY_ToolBox.ReloadVisualSkill()
+      end)
+    
+    ui:append('WndButton_GongzhanCheck', 'WndButton'):children('#WndButton_GongzhanCheck'):pos(390,60):width(120)
       :text(_L['check nearby gongzhan'])
       :lclick(function()
         local tGongZhans = {}
