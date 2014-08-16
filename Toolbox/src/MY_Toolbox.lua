@@ -381,7 +381,7 @@ _MY_ToolBox.ReloadVisualSkill = function()
     if MY_ToolBox.bVisualSkill then
         -- create ui
         local ui = MY.UI.CreateFrame("MY_ToolBox_VisualSkill", true)
-        ui:size(399, 52):anchor(MY_ToolBox.anchorVisualSkill)
+        ui:size(130 + 53 * MY_ToolBox.nVisualSkillBoxCount - 32 + 80, 52):anchor(MY_ToolBox.anchorVisualSkill)
           :onevent("UI_SCALED", function()
             MY.UI(this):anchor(MY_ToolBox.anchorVisualSkill)
           end):customMode(_L['visual skill'], function(anchor)
@@ -390,19 +390,19 @@ _MY_ToolBox.ReloadVisualSkill = function()
             MY_ToolBox.anchorVisualSkill = anchor
           end)
         -- draw background
-        local uiL = ui:append("WndWindow_Lowest", "WndWindow"):children("#WndWindow_Lowest"):size(399, 52)
+        local uiL = ui:append("WndWindow_Lowest", "WndWindow"):children("#WndWindow_Lowest"):size(130 + 53 * MY_ToolBox.nVisualSkillBoxCount - 32 + 80, 52)
         uiL:append("Image_Bg_10", "Image"):item("#Image_Bg_10"):pos(0,0):size(130, 52):image("ui/Image/UICommon/Skills.UITex", 28)
         uiL:append("Image_Bg_11", "Image"):item("#Image_Bg_11"):pos(130,0):size( 53 * MY_ToolBox.nVisualSkillBoxCount - 32, 52):image("ui/Image/UICommon/Skills.UITex", 31)
         uiL:append("Image_Bg_12", "Image"):item("#Image_Bg_12"):pos(130 + 53 * MY_ToolBox.nVisualSkillBoxCount - 32, 0):size(80, 52):image("ui/Image/UICommon/Skills.UITex", 29)
         -- create skill boxes
-        local uiN = ui:append("WndWindow_Normal", "WndWindow"):children("#WndWindow_Normal"):size(399, 52)
+        local uiN = ui:append("WndWindow_Normal", "WndWindow"):children("#WndWindow_Normal"):size(130 + 53 * MY_ToolBox.nVisualSkillBoxCount - 32 + 80, 52)
         local y = 45
         for i= 1, MY_ToolBox.nVisualSkillBoxCount do
             uiN:append("Box_1"..i, "Box"):item("#Box_1"..i):pos(y+i*53,3):alpha(0)
         end
         uiN:append("Box_10", "Box"):item("#Box_10"):pos(y+MY_ToolBox.nVisualSkillBoxCount*53+300,3):alpha(0)
         -- draw front mask
-        local uiT = ui:append("WndWindow_Top", "WndWindow"):children("#WndWindow_Top"):size(399, 52)
+        local uiT = ui:append("WndWindow_Top", "WndWindow"):children("#WndWindow_Top"):size(130 + 53 * MY_ToolBox.nVisualSkillBoxCount - 32 + 80, 52)
         local y = 42
         for i= 1, MY_ToolBox.nVisualSkillBoxCount do
             uiT:append("Image_1"..i, "Image"):item("#Image_1"..i):pos(y+i*53,0):size(55, 53):image("ui/Image/UICommon/Skills.UITex", 15)
