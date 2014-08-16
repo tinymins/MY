@@ -163,7 +163,7 @@ function MY_Farbnamen.SaveData()
         end
     end
     if #t.aCached > t.nMaxCache then
-        table.sort(t.aCached, function(a, b) return a.dwTime > b.dwTime end)
+        table.sort(t.aCached, function(a, b) return a.dwTime < b.dwTime end)
         for i=t.nMaxCache+1, #t.aCached, 1 do
             table.remove(t.aCached)
         end
