@@ -524,7 +524,7 @@ _MY_ToolBox.OnPanelActive = function(wnd)
     end)
     
     ui:append("WndSliderBox_VisualSkillCast", "WndSliderBox"):children("#WndSliderBox_VisualSkillCast"):pos(370, 20)
-      :sliderStyle(false):range(1, 16):value(MY_ToolBox.nVisualSkillBoxCount)
+      :sliderStyle(false):range(1, 32):value(MY_ToolBox.nVisualSkillBoxCount)
       :text(_L("display %d skills.", MY_ToolBox.nVisualSkillBoxCount))
       :text(function(val) return _L("display %d skills.", val) end)
       :change(function(val)
