@@ -382,7 +382,7 @@ MY.RegisterEvent = function(szEventName, arg1, arg2)
         table.insert( _MY.tEvent[szEventName], { fn = fnListener, szName = szListenerId } )
     elseif szListenerId and _MY.tEvent[szEventName] then -- unregister event handle by id
         for i = #_MY.tEvent[szEventName], 1, -1 do
-            if _MY.tEvent[szEventName][i].szName == fnListener then
+            if _MY.tEvent[szEventName][i].szName == szListenerId then
                 table.remove(_MY.tEvent[szEventName], i)
             end
         end
