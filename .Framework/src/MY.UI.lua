@@ -1300,6 +1300,10 @@ function _MY.UI:size(nWidth, nHeight)
                     local w, h= ele.cmb:GetSize()
                     ele.edt:SetSize(nWidth-10-w, nHeight-4)
                     ele.cmb:SetRelPos(nWidth-w-5, (nHeight-h-1)/2+1)
+                elseif ele.type=="WndRadioBox" then
+                    local w, h= ele.txt:GetSize()
+                    ele.txt:SetRelPos(26, math.ceil((nHeight - h)/2))
+                    ele.hdl:FormatAllItemPos()
                 elseif ele.type=="WndEditBox" then
                     
                 end
