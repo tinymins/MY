@@ -1124,4 +1124,4 @@ _Cache.OnPanelActive = function(wnd)
       end)
     y = y + offsety
 end
-MY.RegisterPanel( "XLifeBar", _L["x lifebar"], "UI/Image/Minimap/Minimap.UITex|197", {255,127,0,200}, { OnPanelActive = _Cache.OnPanelActive, OnPanelDeactive = nil } )
+MY.RegisterPanel( "XLifeBar", _L["x lifebar"], "UI/Image/LootPanel/LootPanel.UITex|74", {255,127,0,200}, { OnPanelActive = _Cache.OnPanelActive, OnPanelDeactive = nil } )
