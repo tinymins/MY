@@ -26,6 +26,7 @@ data = {
     ['npc skillpercentage display'] = 'Npc读条显示',
     
     ['show special npc'] = '显示特殊Npc',
+    ['adjust index'] = '自适应遮挡顺序',
     
     ['Max Distance: %s foot.'] = '最大显示距离：%s尺。',
     ['Font: %d'] = '字体：%d',
@@ -55,4 +56,5 @@ data = {
     
     ['hide when unfight'] = '脱战时隐藏',
     ['hide decimal'] = '不显示小数',
+    
 }

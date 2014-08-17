@@ -56,6 +56,8 @@ local Config_Default = {
     
     bHideLifePercentageWhenFight = false,
     bHideLifePercentageDecimal = false,
+    
+    bAdjustIndex = false,
 }
 local Config = clone(Config_Default)
 
@@ -196,6 +198,30 @@ _XLifeBar.Reset = function(bNoSave)
             MY.Sys.SaveUserData(_XLifeBar.szConfig, Config)
         end
     end
+    -- auto adjust index
+    MY.BreatheCall("XLifeBar_AdjustIndex")
+    if Config.bAdjustIndex then
+        MY.BreatheCall("XLifeBar_AdjustIndex", function()
+            -- refresh current index data
+            for dwID, tab in pairs(_XLifeBar.tObject) do
+                PostThreadCall(function(tab, xScreen, yScreen)
+                    tab.nIndex = yScreen or 0
+                end, tab, "Scene_GetCharacterTopScreenPos", dwID)
+            end
+            -- sort
+            local t = {}
+            for dwID, tab in pairs(_XLifeBar.tObject) do
+                table.insert(t, { handle = tab.handle, index = tab.nIndex })
+            end
+            table.sort(t, function(a, b) return a.index < b.index end)
+            -- adjust
+            for i = 1, #t do
+                if t[i].handle then
+                    t[i].handle:ExchangeIndex(i-1)
+                end
+            end
+        end, 300)
+    end
 end
 -- 重载配置文件并重绘
 _XLifeBar.Reload = function()
@@ -234,6 +260,7 @@ function XLifeBar.X:ctor(object)
             nStartFrame = 0,
             nFrameCount = 0,
         },
+        nIndex = 0,
     }
     self.self = object
     self.tab = _XLifeBar.tObject[object.dwID]
@@ -1094,8 +1121,13 @@ _Cache.OnPanelActive = function(wnd)
     
     ui:append("WndCheckBox_ShowSpecialNpc", "WndCheckBox"):children("#WndCheckBox_ShowSpecialNpc")
       :pos(x,y):text(_L['show special npc'])
-      :check(function(bChecked) Config.bShowSpecialNpc = not Config.bShowSpecialNpc;_XLifeBar.Reset() end)
+      :check(function(bChecked) Config.bShowSpecialNpc = bChecked;_XLifeBar.Reset() end)
       :check(Config.bShowSpecialNpc)
+      
+    ui:append("WndCheckBox_AdjustIndex", "WndCheckBox"):children("#WndCheckBox_AdjustIndex")
+      :pos(x + 120, y):text(_L['adjust index'])
+      :check(function(bChecked) Config.bAdjustIndex = bChecked;_XLifeBar.Reset() end)
+      :check(Config.bAdjustIndex)
     y = y + offsety
     
     ui:append("WndButton_Font", "WndButton"):children("#WndButton_Font")
