@@ -26,6 +26,7 @@ data = {
     ['npc skillpercentage display'] = 'Npc讀條顯示',
     
     ['show special npc'] = '顯示特殊Npc',
+    ['adjust index'] = '自適應遮擋順序',
     
     ['Max Distance: %s foot.'] = '最大顯示距離：%s尺。',
     ['Font: %d'] = '字體：%d',
