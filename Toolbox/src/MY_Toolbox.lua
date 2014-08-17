@@ -263,7 +263,7 @@ MY_ToolBox.InfoTip = {
     -- Ä¿±ê¾àÀë
     Distance  = { bEnable = false, bShowBg = true, anchor =  { x=-10, y=-160, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }, title = _L['target distance'],
                       breathe = function()
-                    local p, s = (MY.Player.GetTarget()), _L["No Target"]
+                    local p, s = MY.GetObject(MY.GetTarget()), _L["No Target"]
                     if p then
                         s = _L('Distance: %.1f Foot', GetCharacterDistance(GetClientPlayer().dwID, p.dwID)/64)
                     end
