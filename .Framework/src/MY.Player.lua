@@ -160,9 +160,28 @@ end
     #                 #   #               # # #                 #               #         #       # #         
 #######################################################################################################
 ]]
---[[ (KObject) MY.GetTarget()                                                       -- 取得当前目标操作对象
--- (KObject) MY.GetTarget([number dwType, ]number dwID) -- 根据 dwType 类型和 dwID 取得操作对象]]
-MY.Player.GetTarget = function(dwType, dwID)
+--[[ 取得目标类型和ID
+    (dwType, dwID) MY.GetTarget()       -- 取得自己当前的目标类型和ID
+    (dwType, dwID) MY.GetTarget(object) -- 取得指定操作对象当前的目标类型和ID
+]]
+MY.Player.GetTarget = function(object)
+    if not object then
+        object = GetClientPlayer()
+    end
+    if object then
+        return object.GetTarget()
+    else
+        return TARGET.NO_TARGET, 0
+    end
+end
+--[[ 取得操作对象
+    (KObject) MY.GetObject([number dwType, ]number dwID)
+    -- dwType: [可选]对象类型枚举 TARGET.*
+    -- dwID  : 对象ID
+    -- return: 根据 dwType 类型和 dwID 取得操作对象
+    --         不存在时返回nil
+]]
+MY.Player.GetObject = function(dwType, dwID)
     if not dwType then
         local me = GetClientPlayer()
         if me then
@@ -177,16 +196,16 @@ MY.Player.GetTarget = function(dwType, dwID)
         end
     end
     if dwID <= 0 or dwType == TARGET.NO_TARGET then
-        return nil, TARGET.NO_TARGET
+        return nil
     elseif dwType == TARGET.PLAYER then
-        return GetPlayer(dwID), TARGET.PLAYER
+        return GetPlayer(dwID)
     elseif dwType == TARGET.DOODAD then
-        return GetDoodad(dwID), TARGET.DOODAD
+        return GetDoodad(dwID)
     else
-        return GetNpc(dwID), TARGET.NPC
+        return GetNpc(dwID)
     end
 end
-MY.GetTarget = MY.Player.GetTarget
+MY.GetObject = MY.Player.GetObject
 
 --[[ 根据 dwType 类型和 dwID 设置目标
 -- (void) MY.SetTarget([number dwType, ]number dwID)
@@ -237,6 +256,10 @@ end
 MY.SetTempTarget = MY.Player.SetTempTarget
 MY.Player.ResumeTarget = function()
     TargetPanel_SetOpenState(true)
+    -- 当之前的目标不存在时，切到空目标
+    if not MY.GetObject(unpack(_Cache.pTempTarget)) then
+        _Cache.pTempTarget = { TARGET.NO_TARGET, 0 }
+    end
     MY.Player.SetTarget(unpack(_Cache.pTempTarget))
     _Cache.pTempTarget = { TARGET.NO_TARGET, 0 }
     TargetPanel_SetOpenState(false)

@@ -444,7 +444,7 @@ MY.Chat.Talk = function(nChannel, szText, bNoEscape, bSaveDeny)
     if type(szText) == "table" then
         tSay = szText
     else
-        local tar = MY.GetTarget(me.GetTarget())
+        local tar = MY.GetObject(me.GetTarget())
         szText = string.gsub(szText, "%$zj", '['..me.szName..']')
         if tar then
             szText = string.gsub(szText, "%$mb", '['..tar.szName..']')
