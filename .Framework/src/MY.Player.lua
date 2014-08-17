@@ -174,6 +174,7 @@ MY.Player.GetTarget = function(object)
         return TARGET.NO_TARGET, 0
     end
 end
+MY.GetTarget = MY.Player.GetTarget
 --[[ 取得操作对象
     (KObject) MY.GetObject([number dwType, ]number dwID)
     -- dwType: [可选]对象类型枚举 TARGET.*
