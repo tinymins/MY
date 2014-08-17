@@ -532,7 +532,7 @@ _MY_ToolBox.OnPanelActive = function(wnd)
         _MY_ToolBox.ReloadVisualSkill()
       end)
     
-    ui:append('WndButton_GongzhanCheck', 'WndButton'):children('#WndButton_GongzhanCheck'):pos(390,60):width(120)
+    ui:append('WndButton_GongzhanCheck', 'WndButton'):children('#WndButton_GongzhanCheck'):pos(256,52):width(120)
       :text(_L['check nearby gongzhan'])
       :lclick(function()
         local tGongZhans = {}
