@@ -588,9 +588,11 @@ MY_BuffMonitor.ReloadBuffMonitor = function()
             end
             -- update missed buff info
             for _, mon in ipairs(tBuffMonList) do
-                if mon.nRenderFrame and mon.nRenderFrame > 0 and mon.nRenderFrame ~= nCurrentFrame then
+                if mon.nRenderFrame and mon.nRenderFrame >= 0 and mon.nRenderFrame ~= nCurrentFrame then
                     mon.nRenderFrame = -1
                     local box = handleBoxs[mon.szName]
+                    box.dwPercent = 0
+                    box:SetCoolDownPercentage(0)
                     box:SetOverText(0, "")
                     box:SetOverText(1, "")
                     box:SetObjectStaring(false)
