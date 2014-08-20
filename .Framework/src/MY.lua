@@ -216,6 +216,14 @@ _MY.Init = function()
     else
         _MY.frame:Show()
     end
+    
+    -- 显示作者信息
+    MY.UI(MY.GetFrame()):children("#Window_Tabs"):append("Text_Weibo", "Text"):item("#Text_Weibo")
+      :pos(10, 450):size(100, 30):color(255,255,0):alpha(100):text(_L['author\'s weibo'])
+      :hover(function(bIn) MY.UI(this):alpha((bIn and 255) or 100) end)
+      :click(function()
+        MY.UI.OpenInternetExplorer("http://weibo.com/zymah")
+      end)
 end
 
 --[[
