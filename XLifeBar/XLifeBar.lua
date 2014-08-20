@@ -341,8 +341,8 @@ function XLifeBar.X:DrawNames()
     local tWordlines = {}
     local r,g,b,a,f
     local cfgName, cfgTitle, cfgTong
-    local tab = _XLifeBar.tObject[self.dwID]
-    if IsPlayer(self.dwID) then
+    local tab = _XLifeBar.tObject[self.self.dwID]
+    if IsPlayer(self.self.dwID) then
         cfgName  = Config.bShowName.Player[self.force]
         cfgTitle = Config.bShowTitle.Player[self.force]
         cfgTong  = Config.bShowTong.Player[self.force]
