@@ -258,7 +258,7 @@ MY.SetTempTarget = MY.Player.SetTempTarget
 MY.Player.ResumeTarget = function()
     TargetPanel_SetOpenState(true)
     -- 当之前的目标不存在时，切到空目标
-    if not MY.GetObject(unpack(_Cache.pTempTarget)) then
+    if _Cache.pTempTarget[1] ~= TARGET.NO_TARGET and not MY.GetObject(unpack(_Cache.pTempTarget)) then
         _Cache.pTempTarget = { TARGET.NO_TARGET, 0 }
     end
     MY.Player.SetTarget(unpack(_Cache.pTempTarget))
