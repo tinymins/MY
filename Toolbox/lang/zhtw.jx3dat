@@ -36,7 +36,7 @@ data = {
     ['visual skill'] = '技能可視化',
     ['display %d skills.'] = '顯示%d格。',
     
-    ['* buff monitor'] = 'BUFF監控',
+    ['* buff monitor'] = '※ BUFF監控',
     ['self buff monitor'] = '自身BUFF監控',
     ['target buff monitor'] = '目標BUFF監控',
     ['set self buff monitor'] = '設置自身BUFF監控',
@@ -44,4 +44,17 @@ data = {
     ['mingyi self buff monitor'] = '茗伊自身BUFF監控',
     ['mingyi target buff monitor'] = '茗伊目標BUFF監控',
     ['please input buff name:'] = '請輸入BUFF名稱：',
+    
+    ['my anmerkungen'] = '茗伊隨身便箋',
+    ['* anmerkungen'] = '※ 隨身便箋 記在小本子上',
+    ['width: %dpx.'] = '寬度：%d像素。',
+    ['height: %dpx.'] = '高度：%d像素。',
+    ['edit player note'] = '設置玩家標簽',
+    ['my anmerkungen - player note edit'] = '把TA記進小本本',
+    ['Name:'] = '名稱：',
+    ['Content:'] = '內容：',
+    ['alert when group'] = 'TA進組時對話框警告我。',
+    ['tip when group'] = 'TA進組時聊天欄提示我。',
+    ['Tip: [%s] is in your team.\nNote: %s'] = '提示：[%s]進入你所在的隊伍。\n備注：%s',
+    ['Tip: [%s] is in your team.\nNote: %s\n'] = '提示：[%s]進入你所在的隊伍。\n備注：%s\n',
 }
