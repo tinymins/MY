@@ -41,7 +41,7 @@ _MY_ChatMonitor.szLuaData = 'config/MY_CHATMONITOR'
 -- 插入聊天内容时监控聊天信息
 _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
 	-- filter
-    if _MY_ChatMonitor.bCapture and _MY_ChatMonitor.ui and _MY_ChatMonitor.uiTipBoard and MY_ChatMonitor.szKeyWords and MY_ChatMonitor.szKeyWords~='' then
+    if _MY_ChatMonitor.bCapture and MY_ChatMonitor.szKeyWords and MY_ChatMonitor.szKeyWords~='' then
         local tCapture = {
             szText = '',    -- 计算当前消息的纯文字内容 用于匹配
             szHash = '',    -- 计算当前消息的哈希 用于过滤相同
@@ -314,7 +314,7 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
             return t
         end)())
     end)
-    ui:append('Button_Switcher','WndButton'):find('#Button_Switcher'):pos(w-156,15):width(50):text((_MY_ChatMonitor.bCapture and _L['stop']) or _L['start']):click(function()
+    ui:append('Button_ChatMonitor_Switcher','WndButton'):find('#Button_ChatMonitor_Switcher'):pos(w-156,15):width(50):text((_MY_ChatMonitor.bCapture and _L['stop']) or _L['start']):click(function()
         if _MY_ChatMonitor.bCapture then
             MY.UI(this):text(_L['start'])
             _MY_ChatMonitor.bCapture = false
@@ -407,6 +407,7 @@ _MY_ChatMonitor.Init = function()
     _MY_ChatMonitor.uiTipBoard:append('Text1','Text'):find('#Text1'):text(_L['welcome to use mingyi chat monitor.']):click(fnOnTipClick)
     _MY_ChatMonitor.ShowTip()
 end
+MY.RegisterInit(_MY_ChatMonitor.Init)
 _MY_ChatMonitor.RegisterMsgMonitor = function()
     local t = {}
     for szChannel, bCapture in pairs(MY_ChatMonitor.tChannels) do
@@ -415,6 +416,17 @@ _MY_ChatMonitor.RegisterMsgMonitor = function()
     UnRegisterMsgMonitor(_MY_ChatMonitor.OnMsgArrive)
     RegisterMsgMonitor(_MY_ChatMonitor.OnMsgArrive, t)
 end
+MY.Game.AddHotKey("MY_ChatMonitor_Hotkey", _L["chat monitor"],
+    function()
+        if _MY_ChatMonitor.bCapture then
+            MY.UI(MY.GetFrame()):find('#Button_ChatMonitor_Switcher'):text(_L['start'])
+            _MY_ChatMonitor.bCapture = false
+        else
+            MY.UI(MY.GetFrame()):find('#Button_ChatMonitor_Switcher'):text(_L['stop'])
+            _MY_ChatMonitor.bCapture = true
+        end
+    end
+, nil)
 MY_ChatMonitor.CopyChatLine = _MY_ChatMonitor.CopyChatLine
 MY_ChatMonitor.RepeatChatLine = _MY_ChatMonitor.RepeatChatLine
 MY_ChatMonitor.CopyChatItem = _MY_ChatMonitor.CopyChatItem
