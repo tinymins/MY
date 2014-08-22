@@ -277,7 +277,16 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
             table.insert(t,{
                 szOption = _L['regular expression'],
                 fnAction = function()
-                    MY_ChatMonitor.bIsRegexp = not MY_ChatMonitor.bIsRegexp
+                    if MY_ChatMonitor.bIsRegexp then
+                        MY_ChatMonitor.bIsRegexp = not MY_ChatMonitor.bIsRegexp
+                    else
+                        MessageBox({
+                            szName = "MY_ChatMonitor_Regexp",
+                            szMessage = _L["Are you sure you want to turn on regex mode?\nRegex is something advanced, make sure you know what you are doing."],
+                            {szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function() MY_ChatMonitor.bIsRegexp = not MY_ChatMonitor.bIsRegexp end},
+                            {szOption = g_tStrings.STR_HOTKEY_CANCEL, fnAction = function() end},
+                        })
+                    end
                 end,
                 bCheck = true,
                 bChecked = MY_ChatMonitor.bIsRegexp
