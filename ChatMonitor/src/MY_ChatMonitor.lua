@@ -154,12 +154,13 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
                                     MY.Talk(GetClientPlayer().szName, szName)
                                 end,
                             })
-                            table.insert(t, {
-                                szOption = _L['whisper'],
-                                fnAction = function()
-                                    MY.SwitchChat(szName)
-                                end,
-                            })
+                            -- table.insert(t, {
+                            --     szOption = _L['whisper'],
+                            --     fnAction = function()
+                            --         MY.SwitchChat(szName)
+                            --     end,
+                            -- })
+                            InsertPlayerCommonMenu(t, 0, string.gsub(szName, '[%[%]]', ''))
                             InsertInviteTeamMenu(t, string.gsub(szName, '[%[%]]', ''))
                             return t
                         end)())
