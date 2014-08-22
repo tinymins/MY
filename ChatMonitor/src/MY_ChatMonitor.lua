@@ -13,6 +13,7 @@ MY_ChatMonitor.bIsRegexp = false
 MY_ChatMonitor.nMaxRecord = 30
 MY_ChatMonitor.bShowPreview = true
 MY_ChatMonitor.bPlaySound = true
+MY_ChatMonitor.bRedirectSysChannel = false
 MY_ChatMonitor.tChannels = { ["MSG_NORMAL"] = true, ["MSG_CAMP"] = true, ["MSG_WORLD"] = true, ["MSG_MAP"] = true, ["MSG_SCHOOL"] = true, ["MSG_GUILD"] = true, ["MSG_FRIEND"] = true }
 MY_ChatMonitor.anchor = {
     x = -100,
@@ -26,6 +27,7 @@ RegisterCustomData('MY_ChatMonitor.nMaxRecord')
 RegisterCustomData('MY_ChatMonitor.bShowPreview')
 RegisterCustomData('MY_ChatMonitor.tChannels')
 RegisterCustomData('MY_ChatMonitor.bPlaySound')
+RegisterCustomData('MY_ChatMonitor.bRedirectSysChannel')
 RegisterCustomData('MY_ChatMonitor.anchor')
 local _MY_ChatMonitor = { }
 _MY_ChatMonitor.bInited = false
@@ -51,10 +53,14 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
         -- 计算消息源数据UI
         if bRich then
             tCapture.szMsg  = szMsg
+            -- 格式化消息
+            local tMsgContent = MY.Chat.FormatContent(szMsg)
+            -- 检测消息是否是插件产生的
+            if tMsgContent[1][2].type=="text" and tMsgContent[1][1]=="" then return end
             -- 拼接消息
-            for i, v in ipairs(MY.Chat.FormatContent(szMsg)) do
+            for i, v in ipairs(tMsgContent) do
                 -- 如果不是系统信息且第一个是名字 类似“[阵营][浩气盟][茗伊]说：” 则舍弃头部标签
-                if (r==colMsgSys[1] and g==colMsgSys[2] and b==colMsgSys[3]) or (i~=1 or v[2].type~="name") then
+                if i~=1 or (r==colMsgSys[1] and g==colMsgSys[2] and b==colMsgSys[3]) or v[2].type~="name" then
                     tCapture.szText = tCapture.szText .. v[1]
                 end
             end
@@ -130,6 +136,11 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
             
             -- 发出提示音
             if MY_ChatMonitor.bPlaySound then MY.Sys.PlaySound(MY.GetAddonInfo().szRoot.."ChatMonitor\\audio\\MsgArrive.wav", "MsgArrive.wav") end
+            
+            -- 如果设置重定向到系统消息则输出
+            if MY_ChatMonitor.bRedirectSysChannel and not ( r==255 and g==255 and b==0 ) then
+                OutputMessage("MSG_SYS", GetFormatText("",nil, 255,255,0)..szMsg, true)
+            end
             
             -- 更新UI
             if _MY_ChatMonitor.uiBoard then
@@ -273,6 +284,14 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
                 end,
                 bCheck = true,
                 bChecked = MY_ChatMonitor.bPlaySound
+            })
+            table.insert(t,{
+                szOption = _L['output to system channel'],
+                fnAction = function()
+                    MY_ChatMonitor.bRedirectSysChannel = not MY_ChatMonitor.bRedirectSysChannel
+                end,
+                bCheck = true,
+                bChecked = MY_ChatMonitor.bRedirectSysChannel
             })
             table.insert(t, { bDevide = true })
             table.insert(t,{
