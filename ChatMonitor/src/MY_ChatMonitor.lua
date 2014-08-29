@@ -14,6 +14,7 @@ MY_ChatMonitor.nMaxRecord = 30
 MY_ChatMonitor.bShowPreview = true
 MY_ChatMonitor.bPlaySound = true
 MY_ChatMonitor.bRedirectSysChannel = false
+MY_ChatMonitor.bCapture = false
 MY_ChatMonitor.tChannels = { ["MSG_NORMAL"] = true, ["MSG_CAMP"] = true, ["MSG_WORLD"] = true, ["MSG_MAP"] = true, ["MSG_SCHOOL"] = true, ["MSG_GUILD"] = true, ["MSG_FRIEND"] = true }
 MY_ChatMonitor.anchor = {
     x = -100,
@@ -25,6 +26,7 @@ RegisterCustomData('MY_ChatMonitor.szKeyWords')
 RegisterCustomData('MY_ChatMonitor.bIsRegexp')
 RegisterCustomData('MY_ChatMonitor.nMaxRecord')
 RegisterCustomData('MY_ChatMonitor.bShowPreview')
+RegisterCustomData('MY_ChatMonitor.bCapture')
 RegisterCustomData('MY_ChatMonitor.tChannels')
 RegisterCustomData('MY_ChatMonitor.bPlaySound')
 RegisterCustomData('MY_ChatMonitor.bRedirectSysChannel')
@@ -32,7 +34,6 @@ RegisterCustomData('MY_ChatMonitor.anchor')
 local _MY_ChatMonitor = { }
 _MY_ChatMonitor.bInited = false
 _MY_ChatMonitor.tCapture = {}
-_MY_ChatMonitor.bCapture = false
 _MY_ChatMonitor.ui = nil
 _MY_ChatMonitor.uiBoard = nil
 _MY_ChatMonitor.uiTipBoard = nil
@@ -41,7 +42,7 @@ _MY_ChatMonitor.szLuaData = 'config/MY_CHATMONITOR'
 -- 插入聊天内容时监控聊天信息
 _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
 	-- filter
-    if _MY_ChatMonitor.bCapture and MY_ChatMonitor.szKeyWords and MY_ChatMonitor.szKeyWords~='' then
+    if MY_ChatMonitor.bCapture and MY_ChatMonitor.szKeyWords and MY_ChatMonitor.szKeyWords~='' then
         local tCapture = {
             szText = '',    -- 计算当前消息的纯文字内容 用于匹配
             szHash = '',    -- 计算当前消息的哈希 用于过滤相同
@@ -314,13 +315,13 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
             return t
         end)())
     end)
-    ui:append('Button_ChatMonitor_Switcher','WndButton'):find('#Button_ChatMonitor_Switcher'):pos(w-156,15):width(50):text((_MY_ChatMonitor.bCapture and _L['stop']) or _L['start']):click(function()
-        if _MY_ChatMonitor.bCapture then
+    ui:append('Button_ChatMonitor_Switcher','WndButton'):find('#Button_ChatMonitor_Switcher'):pos(w-156,15):width(50):text((MY_ChatMonitor.bCapture and _L['stop']) or _L['start']):click(function()
+        if MY_ChatMonitor.bCapture then
             MY.UI(this):text(_L['start'])
-            _MY_ChatMonitor.bCapture = false
+            MY_ChatMonitor.bCapture = false
         else
             MY.UI(this):text(_L['stop'])
-            _MY_ChatMonitor.bCapture = true
+            MY_ChatMonitor.bCapture = true
         end
     end)
     ui:append('Button_Clear','WndButton'):find('#Button_Clear'):pos(w-101,15):width(50):text(_L['clear']):click(function()
@@ -418,12 +419,12 @@ _MY_ChatMonitor.RegisterMsgMonitor = function()
 end
 MY.Game.AddHotKey("MY_ChatMonitor_Hotkey", _L["chat monitor"],
     function()
-        if _MY_ChatMonitor.bCapture then
+        if MY_ChatMonitor.bCapture then
             MY.UI(MY.GetFrame()):find('#Button_ChatMonitor_Switcher'):text(_L['start'])
-            _MY_ChatMonitor.bCapture = false
+            MY_ChatMonitor.bCapture = false
         else
             MY.UI(MY.GetFrame()):find('#Button_ChatMonitor_Switcher'):text(_L['stop'])
-            _MY_ChatMonitor.bCapture = true
+            MY_ChatMonitor.bCapture = true
         end
     end
 , nil)
