@@ -1163,9 +1163,6 @@ _MY_ToolBox.OnPanelActive = function(wnd)
       end)
     -- ÀÊ…Ì±„º„
     local x, y = 20, 300
-    ui:append('WndButton_Anmerkungen_PlayerNote', 'WndButton'):children('#WndButton_Anmerkungen_PlayerNote'):pos(x + 200,y + 2):width(140)
-      :text(_L['edit player note'])
-      :click(function() MY_Anmerkungen.OpenPlayerNoteEditPanel() end)
     ui:append("Text_Anmerkungen", "Text"):item("#Text_Anmerkungen"):text(_L['* anmerkungen']):color(255,255,0):pos(x, y)
     y = y + 30
     ui:append("WndCheckBox_Anmerkungen_NotePanel", "WndCheckBox"):children("#WndCheckBox_Anmerkungen_NotePanel"):pos(x, y)
