@@ -139,15 +139,33 @@ _MY_ToolBox.OnBreathe = function()
 end
 -- 过滤背包
 _MY_ToolBox.DoFilterBag = function()
-    _MY_ToolBox.FilterPackage("Normal/BigBagPanel/", _MY_ToolBox.szBagFilter, _MY_ToolBox.bBagTimeLtd)
+    -- 优化性能 当过滤器为空时不遍历筛选
+    if _MY_ToolBox.szBagFilter or _MY_ToolBox.bBagTimeLtd then
+        _MY_ToolBox.FilterPackage("Normal/BigBagPanel/", _MY_ToolBox.szBagFilter, _MY_ToolBox.bBagTimeLtd)
+        if _MY_ToolBox.szBagFilter == "" then
+            _MY_ToolBox.szBagFilter = nil
+        end
+    end
 end
 -- 过滤仓库
 _MY_ToolBox.DoFilterBank = function()
-    _MY_ToolBox.FilterPackage("Normal/BigBankPanel/", _MY_ToolBox.szBankFilter, _MY_ToolBox.bBankTimeLtd)
+    -- 优化性能 当过滤器为空时不遍历筛选
+    if _MY_ToolBox.szBankFilter or _MY_ToolBox.bBankTimeLtd then
+        _MY_ToolBox.FilterPackage("Normal/BigBankPanel/", _MY_ToolBox.szBankFilter, _MY_ToolBox.bBankTimeLtd)
+        if _MY_ToolBox.szBankFilter == "" then
+            _MY_ToolBox.szBankFilter = nil
+        end
+    end
 end
 -- 过滤帮会仓库
 _MY_ToolBox.DoFilterGuildBank = function()
-    _MY_ToolBox.FilterGuildPackage("Normal/GuildBankPanel/", _MY_ToolBox.szGuildBankFilter)
+    -- 优化性能 当过滤器为空时不遍历筛选
+    if _MY_ToolBox.szGuildBankFilter then
+        _MY_ToolBox.FilterGuildPackage("Normal/GuildBankPanel/", _MY_ToolBox.szGuildBankFilter)
+        if _MY_ToolBox.szGuildBankFilter == "" then
+            _MY_ToolBox.szGuildBankFilter = nil
+        end
+    end
 end
 -- 过滤背包原始函数
 _MY_ToolBox.FilterPackage = function(szTreePath, szFilter, bTimeLtd)
@@ -425,15 +443,13 @@ MY_ToolBox.VisualSkillCast = function(dwSkillID, dwSkillLevel)
     if not szSkillName or szSkillName == "" or dwIconID == 13 then
         return
     end
+    
     local nAnimateFrameCount, nStartFrame = 8, GetLogicFrameCount()
     -- box enter
     local i = _MY_ToolBox.nVisualSkillBoxIndex
     local boxEnter = ui:item("#Box_1"..i)
-    boxEnter:raw(1):EnableObject(false)
-    boxEnter:raw(1):SetObjectCoolDown(1)
     boxEnter:raw(1):SetObject(UI_OBJECT_SKILL, dwSkillID, dwSkillLevel)
     boxEnter:raw(1):SetObjectIcon(Table_GetSkillIconID(dwSkillID, dwSkillLevel))
-    UpdataSkillCDProgress(GetClientPlayer(), boxEnter:raw(1))
     local nEnterDesLeft = MY_ToolBox.nVisualSkillBoxCount*53 + 45
     MY.BreatheCall(function()
         local nLeft = boxEnter:left()
@@ -441,7 +457,7 @@ MY_ToolBox.VisualSkillCast = function(dwSkillID, dwSkillLevel)
         if nSpentFrameCount < nAnimateFrameCount then
             boxEnter:alpha(255 * (nSpentFrameCount/nAnimateFrameCount)):left(nLeft - (nLeft - nEnterDesLeft)/(nAnimateFrameCount - nSpentFrameCount))
         else
-            boxEnter:alpha(255):left(nEnterDesLeft):raw(1):SetObjectCoolDown(0)
+            boxEnter:alpha(255):left(nEnterDesLeft)
             return 0
         end
     end)
@@ -586,19 +602,19 @@ MY_BuffMonitor.ReloadBuffMonitor = function()
                     end
                 end
             end
-            -- update missed buff info
-            for _, mon in ipairs(tBuffMonList) do
-                if mon.nRenderFrame and mon.nRenderFrame >= 0 and mon.nRenderFrame ~= nCurrentFrame then
-                    mon.nRenderFrame = -1
-                    local box = handleBoxs[mon.szName]
-                    box.dwPercent = 0
-                    box:SetCoolDownPercentage(0)
-                    box:SetOverText(0, "")
-                    box:SetOverText(1, "")
-                    box:SetObjectStaring(false)
-                    box:ClearExtentAnimate()
-                    box:SetObjectSparking(true)
-                end
+        end
+        -- update missed buff info
+        for _, mon in ipairs(tBuffMonList) do
+            if mon.nRenderFrame and mon.nRenderFrame >= 0 and mon.nRenderFrame ~= nCurrentFrame then
+                mon.nRenderFrame = -1
+                local box = handleBoxs[mon.szName]
+                box.dwPercent = 0
+                box:SetCoolDownPercentage(0)
+                box:SetOverText(0, "")
+                box:SetOverText(1, "")
+                box:SetObjectStaring(false)
+                box:ClearExtentAnimate()
+                box:SetObjectSparking(true)
             end
         end
     end
@@ -632,9 +648,8 @@ MY_BuffMonitor.ReloadBuffMonitor = function()
             MY_BuffMonitor.anchorSelf = anchor
           end, function(anchor)
             MY_BuffMonitor.anchorSelf = anchor
-          end)
-        -- register render function
-        MY.BreatheCall("MY_BuffMonitor_Render_Self", function()
+          end):breathe(function()
+            -- register render function
             refreshObjectBuff(GetClientPlayer(), MY_BuffMonitor.tBuffList[dwKungFuID].Self, _Cache.handleBoxs.Self)
         end)
     end
@@ -666,9 +681,8 @@ MY_BuffMonitor.ReloadBuffMonitor = function()
             MY_BuffMonitor.anchorTarget = anchor
           end, function(anchor)
             MY_BuffMonitor.anchorTarget = anchor
-          end)
-        -- register render function
-        MY.BreatheCall("MY_BuffMonitor_Render", function()
+          end):breathe(function()
+            -- register render function
             refreshObjectBuff(MY.GetObject(MY.GetTarget()), MY_BuffMonitor.tBuffList[dwKungFuID].Target, _Cache.handleBoxs.Target)
         end)
     end
