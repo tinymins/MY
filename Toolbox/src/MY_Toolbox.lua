@@ -737,7 +737,7 @@ MY_Anmerkungen.ReloadNotePanel = function()
         -- input box
         ui:append("WndEditBox_Anmerkungen", "WndEditBox"):children("#WndEditBox_Anmerkungen")
           :pos(0, 25):size(MY_Anmerkungen.nNotePanelWidth, MY_Anmerkungen.nNotePanelHeight - 25)
-          :text(MY_Anmerkungen.szNotePanelContent):multiLine(true)
+          :multiLine(true):text(MY_Anmerkungen.szNotePanelContent)
           :change(function(txt) MY_Anmerkungen.szNotePanelContent = txt end)
           
         MY.UI.RegisterUIEvent(ui:raw(1), "OnFrameDragEnd", function()
