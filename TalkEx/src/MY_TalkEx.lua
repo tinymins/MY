@@ -75,7 +75,10 @@ _MY_TalkEx.OnPanelActive = function(wnd)
     -- 喊话部分
     -------------------------------------
     -- 喊话输入框
-    ui:append('WndEdit_Talk','WndEditBox'):children('#WndEdit_Talk'):pos(25,25):size(w-136,210):text(MY_TalkEx.szTalk):multiLine(true):change(function() MY_TalkEx.szTalk = this:GetText() end)
+    ui:append('WndEdit_Talk','WndEditBox'):children('#WndEdit_Talk'):pos(25,25)
+      :size(w-136,210):multiLine(true)
+      :text(MY_TalkEx.szTalk)
+      :change(function() MY_TalkEx.szTalk = this:GetText() end)
     -- 喊话频道
     local i = 22
     local nChannelCount = 0
