@@ -309,5 +309,5 @@ end)
 -----------------------------------------------
 MY.Game.AddHotKey("LogOff_RUI", _L['return to role list'], function() MY_Logoff.LogOffEx(true) end, nil)
 MY.Game.AddHotKey("LogOff_RRL", _L['return to game login'], function() MY_Logoff.LogOffEx(false) end, nil)
-MY.Game.AddHotKey("LogOff_RUI_UNFIGHT", _L['return to role list while not fight'], function() MY_Logoff.LogOffEx(true, true) end, nil)
-MY.Game.AddHotKey("LogOff_RRL_UNFIGHT", _L['return to game login while not fight'], function() MY_Logoff.LogOffEx(false, true) end, nil)
+MY.Game.AddHotKey("LogOff_RUI_UNFIGHT", _L['return to role list while not fight'], function() MY_Logoff.LogOffEx(false, true) end, nil)
+MY.Game.AddHotKey("LogOff_RRL_UNFIGHT", _L['return to game login while not fight'], function() MY_Logoff.LogOffEx(true, true) end, nil)
