@@ -142,6 +142,9 @@ end
 
 _XLifeBar.GetTongName = function(dwTongID, szFormatString)
     szFormatString = szFormatString or "%s"
+    if type(dwTongID) ~= 'number' or dwTongID == 0 then
+        return nil
+    end
     if not _XLifeBar.tTongList[dwTongID] then
         if GetTongClient().ApplyGetTongName(dwTongID) then
             _XLifeBar.tTongList[dwTongID] = GetTongClient().ApplyGetTongName(dwTongID)
