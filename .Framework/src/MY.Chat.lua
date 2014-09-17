@@ -455,6 +455,21 @@ MY.Chat.Talk = function(nChannel, szText, bNoEscape, bSaveDeny)
         tSay = MY.Chat.ParseFaceIcon(tSay)
         tSay = MY.Chat.ParseName(tSay)
     end
+    if not MY.Chat.bHookedAlready then
+        local nLen = 0
+        for i, v in ipairs(tSay) do
+            if nLen <= 64 then
+                nLen = nLen + MY.String.LenW(v.text or v.name or '')
+                if nLen > 64 then
+                    if v.text then v.text = MY.String.SubW(v.text, 1, 64 - nLen ) end
+                    if v.name then v.name = MY.String.SubW(v.name, 1, 64 - nLen ) end
+                    for j=#tSay, i+1, -1 do
+                        table.remove(tSay, j)
+                    end
+                end
+            end
+        end
+    end
     me.Talk(nChannel, szTarget, tSay)
     if bSaveDeny and not MY.CanTalk(nChannel) then
         local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")

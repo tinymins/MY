@@ -394,22 +394,25 @@ MY.RegisterInit(function()
     MY_Chat.frame:EnableDrag(not MY_Chat.bLockPostion)
     -- init icon replace table
     _Cache.tReplaceIcon = {}
-    for s1, s2 in pairs(LoadLUAData('interface/MY/!src-dist/replace_icon') or {}) do
-        local emo = MY.Chat.GetEmotion(s2)
-        if emo then
-            if emo.szType=="image" then
-                _Cache.tReplaceIcon[s1] = string.format(
-                    '<image>path="%s" disablescale=1 frame=%d name="%d" </image>',
-                    string.gsub(emo.szImageFile, '\\', '\\\\'), emo.nFrame, emo.dwID
-                )
+    local data = LoadLUAData('interface/MY/@DATA/config/replace_icon') or { bEnabled = false, data = {} }
+    if data.bEnabled then
+        for s1, s2 in pairs(data.data) do
+            local emo = MY.Chat.GetEmotion(s2)
+            if emo then
+                if emo.szType=="image" then
+                    _Cache.tReplaceIcon[s1] = string.format(
+                        '<image>path="%s" disablescale=1 frame=%d name="%d" </image>',
+                        string.gsub(emo.szImageFile, '\\', '\\\\'), emo.nFrame, emo.dwID
+                    )
+                else
+                    _Cache.tReplaceIcon[s1] = string.format(
+                        '<animate>path="%s" disablescale=1 group=%d name="%d" </animate>',
+                        string.gsub(emo.szImageFile, '\\', '\\\\'), emo.nFrame, emo.dwID
+                    )
+                end
             else
-                _Cache.tReplaceIcon[s1] = string.format(
-                    '<animate>path="%s" disablescale=1 group=%d name="%d" </animate>',
-                    string.gsub(emo.szImageFile, '\\', '\\\\'), emo.nFrame, emo.dwID
-                )
+                _Cache.tReplaceIcon[s1] = string.format( '<text>text="%s"</text>', s2 )
             end
-        else
-            _Cache.tReplaceIcon[s1] = string.format( '<text>text="%s"</text>', s2 )
         end
     end
 end)
