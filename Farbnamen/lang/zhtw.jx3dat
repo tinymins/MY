@@ -7,4 +7,6 @@ data = {
     ['cache data deleted.'] = '緩存已清除。',
     ['%d player(s) data cached:'] = '已緩存角色數據 %d 份：',
     ['plugin conflict detected,duowan force color has been forced down.'] = '檢測到插件衝突，已關閉盒子職業染色。',
+    ['customize color'] = '自定義顏色',
+    ['load default setting'] = '恢復默認設置',
 }
