@@ -13,11 +13,11 @@ MY_Farbnamen = MY_Farbnamen or {
     bEnabled = true,
 }
 RegisterCustomData("Account\\MY_Farbnamen.bEnabled")
-local _MY_Farbnamen = {
+local SZ_CONFIG_PATH = "config/PLAYER_FORCE_COLOR"
+local SZ_CACHE_PATH = "cache/PLAYER_INFO/" .. (MY.Game.GetServer())
+local Config_Default = {
     nMaxCache= 200,
-    szConfigPath = "config/PLAYER_FORCE_COLOR",
-    szDataCache  = "cache/PLAYER_INFO/" .. (MY.Game.GetServer()),
-    tForceColor  =  {
+    tForceColor  = MY.LoadLUAData(SZ_CONFIG_PATH, true) or {
         [0]  = { 255, 255, 255 },       --江湖
         [1]  = { 255, 178, 95  },       --少林
         [2]  = { 196, 152, 255 },       --万花
@@ -30,6 +30,9 @@ local _MY_Farbnamen = {
         [9]  = { 205, 133, 63  },       --丐帮
         [10] = { 240, 70 , 96  },       --明教
     },
+}
+local Config = clone(Config_Default)
+local _MY_Farbnamen = {
     tForceString = {
         [0]  = _L['JiangHu'],
         [1]  = _L['ShaoLin'],
@@ -127,7 +130,7 @@ function MY_Farbnamen.GetAusID(dwID)
     -- deal with return data
     local result =  clone(_MY_Farbnamen.tPlayerCache[dwID])
     if result then
-        result.rgb = _MY_Farbnamen.tForceColor[result.dwForceID]
+        result.rgb = Config.tForceColor[result.dwForceID]
     end
     return result
 end
@@ -151,11 +154,24 @@ function MY_Farbnamen.AddAusID(dwID)
         _MY_Farbnamen.tPlayerCache[player.szName] = player.dwID
     end
 end
+-- 保存用户设置
+function _MY_Farbnamen.SaveCustomData()
+    local t = {}
+    t.tForceColor = Config.tForceColor
+    MY.Sys.SaveUserData(SZ_CONFIG_PATH, t)
+end
+-- 加载用户配置
+function _MY_Farbnamen.LoadCustomData()
+    local t = MY.Sys.LoadUserData(SZ_CONFIG_PATH) or {}
+    if t.tForceColor then
+        Config.tForceColor = t.tForceColor
+    end
+end
 -- 保存配置
 function MY_Farbnamen.SaveData()
     local t = {
         ['aCached']   = {}                      ,     -- 保存的用户表
-        ['nMaxCache'] = _MY_Farbnamen.nMaxCache ,     -- 最大缓存数量
+        ['nMaxCache'] = Config.nMaxCache        ,     -- 最大缓存数量
     }
     for dwID, data in pairs(_MY_Farbnamen.tPlayerCache) do
         if type(dwID)=='number' then
@@ -168,12 +184,12 @@ function MY_Farbnamen.SaveData()
             table.remove(t.aCached)
         end
     end
-    MY.SaveLUAData(_MY_Farbnamen.szDataCache, MY.Json.Encode(t))
+    MY.SaveLUAData(SZ_CACHE_PATH, MY.Json.Encode(t))
 end
 -- 加载配置
 function MY_Farbnamen.LoadData()
     -- 读取数据文件
-    local data = MY.LoadLUAData(_MY_Farbnamen.szDataCache) or {}
+    local data = MY.LoadLUAData(SZ_CACHE_PATH) or {}
     -- 如果是Json格式的数据 则解码
     if type(data)=="string" then
         data = MY.Json.Decode(data) or {}
@@ -193,8 +209,7 @@ function MY_Farbnamen.LoadData()
     for _, p in ipairs(t.aCached) do
         _MY_Farbnamen.tPlayerCache[p.dwID] = p
     end
-    _MY_Farbnamen.tForceColor = MY.LoadLUAData(_MY_Farbnamen.szConfigPath, true) or _MY_Farbnamen.tForceColor
-    _MY_Farbnamen.nMaxCache = t.nMaxCache or _MY_Farbnamen.nMaxCache
+    Config.nMaxCache = t.nMaxCache or Config.nMaxCache
 end
 --------------------------------------------------------------
 -- 数据统计
@@ -228,28 +243,54 @@ end
 -- 菜单
 --------------------------------------------------------------
 MY_Farbnamen.GetMenu = function()
-    return { 
+    local t = {
         szOption = _L["Farbnamen"],
         fnAction = function()
             MY_Farbnamen.bEnabled = not MY_Farbnamen.bEnabled
         end,
         bCheck = true,
-        bChecked = MY_Farbnamen.bEnabled, {
-            szOption = _L["set max cache count"],
-            fnAction = function()
-                GetUserInputNumber(_MY_Farbnamen.nMaxCache, 10000, nil, function(num) _MY_Farbnamen.nMaxCache = num end, function() end, function() end)
-            end,
-        },  {
-            szOption = _L["analyse data"],
-            fnAction = MY_Farbnamen.AnalyseForceInfo,
-        },{
-            szOption = _L["reset data"],
-            fnAction = function()
-                _MY_Farbnamen.tPlayerCache = {}
-                MY.Sysmsg({_L['cache data deleted.']}, _L['Farbnamen'])
-            end,
-        }
+        bChecked = MY_Farbnamen.bEnabled
     }
+    table.insert(t, {
+        szOption = _L['customize color'],
+    })
+    for nForce, szForce in pairs(_MY_Farbnamen.tForceString) do
+        table.insert(t[#t], {
+            szOption = szForce,
+            rgb = Config.tForceColor[nForce],
+            bColorTable = true,
+            fnChangeColor = function(_,r,g,b)
+                Config.tForceColor[nForce] = {r,g,b}
+                _MY_Farbnamen.SaveCustomData()
+            end
+            
+        })
+    end
+    table.insert(t[#t], { bDevide = true })
+    table.insert(t[#t], {
+        szOption = _L['load default setting'],
+        fnAction = function()
+            Config.tForceColor = clone(Config_Default.tForceColor)
+        end,
+    })
+    table.insert(t, {
+        szOption = _L["set max cache count"],
+        fnAction = function()
+            GetUserInputNumber(Config.nMaxCache, 10000, nil, function(num) Config.nMaxCache = num end, function() end, function() end)
+        end,
+    })
+    table.insert(t, {
+        szOption = _L["analyse data"],
+        fnAction = MY_Farbnamen.AnalyseForceInfo,
+    })
+    table.insert(t, {
+        szOption = _L["reset data"],
+        fnAction = function()
+            _MY_Farbnamen.tPlayerCache = {}
+            MY.Sysmsg({_L['cache data deleted.']}, _L['Farbnamen'])
+        end,
+    })
+    return t
 end
 MY.RegisterPlayerAddonMenu( 'MY_Farbenamen', MY_Farbnamen.GetMenu )
 MY.RegisterTraceButtonMenu( 'MY_Farbenamen', MY_Farbnamen.GetMenu )
@@ -258,6 +299,8 @@ MY.RegisterTraceButtonMenu( 'MY_Farbenamen', MY_Farbnamen.GetMenu )
 --------------------------------------------------------------
 MY.RegisterEvent('LOGIN_GAME', MY_Farbnamen.LoadData)
 MY.RegisterEvent('PLAYER_ENTER_GAME', MY_Farbnamen.LoadData)
+MY.RegisterEvent('LOGIN_GAME', _MY_Farbnamen.LoadCustomData)
+MY.RegisterEvent('PLAYER_ENTER_GAME', _MY_Farbnamen.LoadCustomData)
 MY.RegisterEvent('GAME_EXIT', MY_Farbnamen.SaveData)
 MY.RegisterEvent('PLAYER_EXIT_GAME', MY_Farbnamen.SaveData)
 MY.RegisterEvent("PLAYER_ENTER_SCENE", MY_Farbnamen.DoConflict)
