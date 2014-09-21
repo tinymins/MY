@@ -134,6 +134,20 @@ MY.Sys.PlaySound = function(szFilePath, szCustomPath)
         PlaySound(SOUND.UI_SOUND, szFilePath)
     end
 end
+-- МгдизЂВсЪ§Он
+MY.RegisterInit(function()
+    for v_name, v_data in pairs(MY.LoadLUAData('config/initalized_var') or {}) do
+        local t = _G
+        local k = MY.String.Split(v_name, '.')
+        for i=1, #k-1 do
+            if type(t[k[i]])=='nil' then
+                t[k[i]] = {}
+            end
+            t = t[k[i]]
+        end
+        t[k[#k]] = v_data
+    end
+end)
 --[[
 -- Remote Request
 #######################################################################################################
