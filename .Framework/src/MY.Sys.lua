@@ -411,19 +411,25 @@ _Cache.tPlayerMenu = {}   -- 玩家头像菜单
 _Cache.tTargetMenu = {}   -- 目标头像菜单
 _Cache.tTraceMenu  = {}   -- 工具栏菜单
 
+-- get plugin folder menu
+_Cache.GetMainMenu = function()
+    return {
+        szOption = _L["mingyi plugins"],
+        fnAction = MY.TogglePanel,
+        bCheck = true,
+        bChecked = MY.GetFrame():IsVisible(),
+    }
+end
 -- get player addon menu
 _Cache.GetPlayerAddonMenu = function()
-    local menu = {}
+    -- 创建菜单
+    local menu = _Cache.GetMainMenu()
     for i = 1, #_Cache.tPlayerMenu, 1 do
         local m = _Cache.tPlayerMenu[i].Menu
         if type(m)=="function" then m = m() end
         table.insert(menu, m)
     end
-    if #menu>1 then
-        table.insert(menu, 1, { bDevide = true })
-        table.insert(menu, { bDevide = true })
-    end
-    return menu
+    return {menu}
 end
 -- get target addon menu
 _Cache.GetTargetAddonMenu = function()
@@ -441,17 +447,13 @@ _Cache.GetTargetAddonMenu = function()
 end
 -- get trace button menu
 _Cache.GetTraceButtonMenu = function()
-    local menu = {}
+    local menu = _Cache.GetMainMenu()
     for i = 1, #_Cache.tTraceMenu, 1 do
         local m = _Cache.tTraceMenu[i].Menu
         if type(m)=="function" then m = m() end
         table.insert(menu, m)
     end
-    if #menu>1 then
-        table.insert(menu, 1, { bDevide = true })
-        table.insert(menu, { bDevide = true })
-    end
-    return menu
+    return {menu}
 end
 --[[ 注册玩家头像菜单
     -- 注册
@@ -546,18 +548,6 @@ MY.RegisterTraceButtonMenu = function(arg1, arg2)
         end
     end
 end
-
-pcall(function()
-    -- 创建菜单
-    local tMenu = function() return {
-        szOption = _L["mingyi plugins"],
-        fnAction = MY.TogglePanel,
-        bCheck = true,
-        bChecked = MY.GetFrame():IsVisible(),
-    } end
-    MY.RegisterPlayerAddonMenu( 'MY_MAIN_MENU', tMenu)
-    MY.RegisterTraceButtonMenu( 'MY_MAIN_MENU', tMenu)
-end)
 
 TraceButton_AppendAddonMenu( { _Cache.GetTraceButtonMenu } )
 Player_AppendAddonMenu( { _Cache.GetPlayerAddonMenu } )
