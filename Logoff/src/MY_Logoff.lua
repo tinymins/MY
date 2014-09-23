@@ -256,7 +256,7 @@ MY.RegisterInit(function()
         szOption = _L["express logoff"],
         {  -- 返回角色选择
             szOption = _L['return to role list'],
-            szIcon = "ui/Image/UICommon/Talk_Face.UITex";nFrame=119;szLayer = "ICON_RIGHT",
+            -- szIcon = "ui/Image/UICommon/Talk_Face.UITex";nFrame=119;szLayer = "ICON_RIGHT",
             bCheck = false,
             bChecked = false,
             fnAction = function()
@@ -265,7 +265,7 @@ MY.RegisterInit(function()
             fnAutoClose = function() return true end
         }, {  -- 返回用户登录
             szOption = _L['return to game login'],
-            szIcon = "ui/Image/UICommon/Talk_Face.UITex";nFrame=119;szLayer = "ICON_RIGHT",
+            -- szIcon = "ui/Image/UICommon/Talk_Face.UITex";nFrame=119;szLayer = "ICON_RIGHT",
             bCheck = false,
             bChecked = false,
             fnAction = function()
@@ -274,7 +274,7 @@ MY.RegisterInit(function()
             fnAutoClose = function() return true end
         }, {  -- 脱战后返回角色选择
             szOption = _L['return to role list while not fight'],
-            szIcon = "ui/Image/UICommon/Talk_Face.UITex";nFrame=119;szLayer = "ICON_RIGHT",
+            -- szIcon = "ui/Image/UICommon/Talk_Face.UITex";nFrame=119;szLayer = "ICON_RIGHT",
             bCheck = false,
             bChecked = false,
             fnAction = function()
@@ -284,7 +284,7 @@ MY.RegisterInit(function()
         },
         {  -- 脱战后返回用户登录
             szOption = _L['return to game login while not fight'],
-            szIcon = "ui/Image/UICommon/Talk_Face.UITex";nFrame=119;szLayer = "ICON_RIGHT",
+            -- szIcon = "ui/Image/UICommon/Talk_Face.UITex";nFrame=119;szLayer = "ICON_RIGHT",
             bCheck = false,
             bChecked = false,
             fnAction = function()
