@@ -24,13 +24,14 @@ MY.String.UrlEncode = function(w)
     return s
 end
 MY.String.LenW = function(str)
-    return #(string.gsub(str, '[\128-\255][\128-\255]', ' '))
+    return wstring.len(str)
 end
 MY.String.SubW = function(str,s,e)
-    str=str:gsub('([\001-\127])','\000%1')
-    s = s and ((s>=0 and s*2-1) or s*2)
-    e = e and ((e>=0 and e*2) or e*2+1)
-    str = str:sub(s, e)
-    str = str:gsub('\000','')
-    return str
+    if s < 0 then
+        s = wstring.len(str) + s
+    end
+    if e < 0 then
+        e = wstring.len(str) + e
+    end
+    return wstring.sub(str, s, e)
 end
