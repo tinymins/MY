@@ -80,21 +80,25 @@ local HP = XLifeBar.HP
 
 _XLifeBar.GetName = function(tar)
     local szName = tar.szName
-    if szName == "" and not IsPlayer(tar.dwID) then
-        szName = string.gsub(Table_GetNpcTemplateName(tar.dwTemplateID), "^%s*(.-)%s*$", "%1")
+    if IsPlayer(tar.dwID) then
+        return szName
+    else
         if szName == "" then
-            szName = tar.dwID
+            szName = string.gsub(Table_GetNpcTemplateName(tar.dwTemplateID), "^%s*(.-)%s*$", "%1")
+            if szName == "" then
+                szName = tar.dwID
+            end
         end
-    end
-    if tar.dwEmployer and tar.dwEmployer ~= 0 and szName == Table_GetNpcTemplateName(tar.dwTemplateID) then
-        local emp = GetPlayer(tar.dwEmployer)
-        if not emp then
-            szName =  g_tStrings.STR_SOME_BODY .. g_tStrings.STR_PET_SKILL_LOG .. tar.szName
-        else
-            szName = emp.szName .. g_tStrings.STR_PET_SKILL_LOG .. tar.szName
+        if tar.dwEmployer and tar.dwEmployer ~= 0 and szName == Table_GetNpcTemplateName(tar.dwTemplateID) then
+            local emp = GetPlayer(tar.dwEmployer)
+            if not emp then
+                szName =  g_tStrings.STR_SOME_BODY .. g_tStrings.STR_PET_SKILL_LOG .. tar.szName
+            else
+                szName = emp.szName .. g_tStrings.STR_PET_SKILL_LOG .. tar.szName
+            end
         end
+        return szName
     end
-    return szName
 end
 
 
