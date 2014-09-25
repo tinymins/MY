@@ -1,5 +1,4 @@
 ﻿
 @DATA/userdata/XLifeBar/*.jx3dat
 @DATA/cache/PLAYER_INFO/*.jx3dat
-\!src-dist/*
 @DATA/config/*.jx3dat
