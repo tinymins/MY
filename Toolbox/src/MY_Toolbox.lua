@@ -274,69 +274,96 @@ MY.RegisterInit(function() if MY_ToolBox.bFriendHeadTip then _MY_ToolBox.FriendH
     #     #         #     #       # # # # #   #   #       # #         #   
 #######################################################################################################
 ]]
-MY_ToolBox.InfoTip = {
-    -- FPS
-    FPS       = { bEnable = false, bShowBg = true, anchor =  { x=-10, y=-190, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }, title = _L['fps monitor'],
-                  breathe = function() MY.UI(this):find("#Text_Default"):text(_L("FPS: %d", GetFPS())) end },
-    -- 目标距离
-    Distance  = { bEnable = false, bShowBg = true, anchor =  { x=-10, y=-160, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }, title = _L['target distance'],
-                      breathe = function()
-                    local p, s = MY.GetObject(MY.GetTarget()), _L["No Target"]
-                    if p then
-                        s = _L('Distance: %.1f Foot', GetCharacterDistance(GetClientPlayer().dwID, p.dwID)/64)
-                    end
-                    MY.UI(this):find("#Text_Default"):text(s)
-                  end },
-    -- 系统时间
-    SysTime   = { bEnable = false, bShowBg = true, anchor =  { x=-10, y=-130, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }, title = _L['system time'],
-                  breathe = function()
-                    local tDateTime = TimeToDate(GetCurrentTime())
-                    MY.UI(this):find("#Text_Default"):text(_L("Time: %02d:%02d:%02d", tDateTime.hour, tDateTime.minute, tDateTime.second))
-                  end },
-    -- 战斗计时
-    FightTime = { bEnable = false, bShowBg = true, anchor =  { x=-10, y=-100, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }, title = _L['fight clock'],
-                  breathe = function()
-                    local s, nTotal = _L["Never Fight"], 0
-                    -- 判定战斗边界
-                    if GetClientPlayer().bFightState then
-                        -- 进入战斗判断
-                        if not _MY_ToolBox.bFighting then
-                            _MY_ToolBox.bFighting = true
-                            -- 5秒脱战判定缓冲 防止明教隐身错误判定
-                            if GetLogicFrameCount() - _MY_ToolBox.nLastFightEndTimestarp > 16*5 then
-                                _MY_ToolBox.nLastFightStartTimestarp = GetLogicFrameCount()
-                            end
-                        end
-                        nTotal = GetLogicFrameCount() - _MY_ToolBox.nLastFightStartTimestarp
-                    else
-                        -- 退出战斗判定
-                        if _MY_ToolBox.bFighting then
-                            _MY_ToolBox.bFighting = false
-                            _MY_ToolBox.nLastFightEndTimestarp = GetLogicFrameCount()
-                        end
-                        if _MY_ToolBox.nLastFightStartTimestarp > 0 then 
-                            nTotal = _MY_ToolBox.nLastFightEndTimestarp - _MY_ToolBox.nLastFightStartTimestarp
-                        end
-                    end
-                    
-                    if nTotal > 0 then
-                        nTotal = nTotal/16
-                        s = _L("Fight Clock: %d:%02d:%02d", math.floor(nTotal/(60*60)), math.floor(nTotal/60%60), math.floor(nTotal%60))
-                    end
-                    MY.UI(this):find("#Text_Default"):text(s)
-                  end },
-    -- 莲花和藕倒计时
-    LotusTime = { bEnable = false, bShowBg = true, anchor =  { x=-10, y=-70, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }, title = _L['lotus clock'],
-                  breathe = function()
-                    local nTotal = 6*60*60 - GetLogicFrameCount()/16%(6*60*60)
-                    MY.UI(this):find("#Text_Default"):text(_L("Lotus Clock: %d:%d:%d", math.floor(nTotal/(60*60)), math.floor(nTotal/60%60), math.floor(nTotal%60)))
-                  end },
+local _SZ_CONFIG_FILE_ = 'config/MY_ToolBox'
+local Config = Config or {}
+local _Cache = _Cache or {}
+local SaveConfig = function() MY.Sys.SaveUserData(_SZ_CONFIG_FILE_, Config) end
+local LoadConfig = function() Config = MY.Sys.LoadUserData(_SZ_CONFIG_FILE_) or Config end
+Config.InfoTip = {
+    FPS       = { -- FPS
+        bEnable = false, bShowBg = true, bShowTitle = true,
+        anchor =  { x=-10, y=-190, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    },
+    Distance  = { -- 目标距离
+        bEnable = false, bShowBg = true, bShowTitle = true,
+        anchor =  { x=-10, y=-160, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    },
+    SysTime   = { -- 系统时间
+        bEnable = false, bShowBg = true, bShowTitle = true,
+        anchor =  { x=-10, y=-130, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    },
+    FightTime = { -- 战斗计时
+        bEnable = false, bShowBg = true, bShowTitle = true,
+        anchor =  { x=-10, y=-100, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    },
+    LotusTime = { -- 莲花和藕倒计时
+        bEnable = false, bShowBg = true, bShowTitle = true,
+        anchor =  { x=-10, y=-70, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    },
 }
-for k, v in pairs(MY_ToolBox.InfoTip) do
-    RegisterCustomData("MY_ToolBox.InfoTip."..k..".bEnable")
-    RegisterCustomData("MY_ToolBox.InfoTip."..k..".bShowBg")
-    RegisterCustomData("MY_ToolBox.InfoTip."..k..".anchor")
-end
+_Cache.InfoTip = {
+    FPS       = { -- FPS
+        formatString = '', title = _L['fps monitor'], prefix = _L['FPS: '], content = _L['%d'],
+        GetContent = function() return string.format(_Cache.InfoTip.FPS.formatString, GetFPS()) end
+    },
+    Distance  = { -- 目标距离
+        formatString = '', title = _L['target distance'], prefix = _L['Distance: '], content = _L['%.1f Foot'],
+        GetContent = function()
+            local p, s = MY.GetObject(MY.GetTarget()), _L["No Target"]
+            if p then
+                s = string.format(_Cache.InfoTip.Distance.formatString, GetCharacterDistance(GetClientPlayer().dwID, p.dwID)/64)
+            end
+            return s
+        end
+    },
+    SysTime   = { -- 系统时间
+        formatString = '', title = _L['system time'], prefix = _L['Time: '], content = _L['%02d:%02d:%02d'],
+        GetContent = function()
+            local tDateTime = TimeToDate(GetCurrentTime())
+            return string.format(_Cache.InfoTip.SysTime.formatString, tDateTime.hour, tDateTime.minute, tDateTime.second)
+        end
+    },
+    FightTime = { -- 战斗计时
+        formatString = '', title = _L['fight clock'], prefix = _L['Fight Clock: '], content = _L['%d:%02d:%02d'],
+        GetContent = function()
+            local s, nTotal = _L["Never Fight"], 0
+            -- 判定战斗边界
+            if GetClientPlayer().bFightState then
+                -- 进入战斗判断
+                if not _MY_ToolBox.bFighting then
+                    _MY_ToolBox.bFighting = true
+                    -- 5秒脱战判定缓冲 防止明教隐身错误判定
+                    if GetLogicFrameCount() - _MY_ToolBox.nLastFightEndTimestarp > 16*5 then
+                        _MY_ToolBox.nLastFightStartTimestarp = GetLogicFrameCount()
+                    end
+                end
+                nTotal = GetLogicFrameCount() - _MY_ToolBox.nLastFightStartTimestarp
+            else
+                -- 退出战斗判定
+                if _MY_ToolBox.bFighting then
+                    _MY_ToolBox.bFighting = false
+                    _MY_ToolBox.nLastFightEndTimestarp = GetLogicFrameCount()
+                end
+                if _MY_ToolBox.nLastFightStartTimestarp > 0 then 
+                    nTotal = _MY_ToolBox.nLastFightEndTimestarp - _MY_ToolBox.nLastFightStartTimestarp
+                end
+            end
+            
+            if nTotal > 0 then
+                nTotal = nTotal/16
+                s = string.format(_Cache.InfoTip.FightTime.formatString, math.floor(nTotal/(60*60)), math.floor(nTotal/60%60), math.floor(nTotal%60))
+            end
+            return s
+        end
+    },
+    LotusTime = { -- 莲花和藕倒计时
+        formatString = '', title = _L['lotus clock'], prefix = _L['Lotus Clock: '], content = _L['%d:%d:%d'],
+        GetContent = function()
+            local nTotal = 6*60*60 - GetLogicFrameCount()/16%(6*60*60)
+            return string.format(_Cache.InfoTip.LotusTime.formatString, math.floor(nTotal/(60*60)), math.floor(nTotal/60%60), math.floor(nTotal%60))
+        end
+    },
+}
 -- 注册UI
 MY.BreatheCall(function()
     local h = Station.Lookup("Topmost1/WorldMap/Wnd_All", "Handle_CopyBtn")
@@ -381,34 +408,48 @@ MY.BreatheCall(function()
 end, 130)
 -- 显示信息条
 _MY_ToolBox.ReloadInfoTip = function()
-    for id, p in pairs(MY_ToolBox.InfoTip) do
+    for id, cache in pairs(_Cache.InfoTip) do
+        local cfg = Config.InfoTip[id]
         local frm = MY.UI('Normal/MY_InfoTip_'..id)
-        if p.bEnable then
+        if cfg.bEnable then
             if frm:count()==0 then
                 frm = MY.UI.CreateFrame('MY_InfoTip_'..id,true):size(150,30):onevent("UI_SCALED", function()
-                    MY.UI(this):anchor(p.anchor)
-                end):customMode(p.title, function(anchor)
-                    p.anchor = anchor
+                    MY.UI(this):anchor(cfg.anchor)
+                end):customMode(cache.title, function(anchor)
+                    cfg.anchor = anchor
+                    SaveConfig()
                 end, function(anchor)
-                    p.anchor = anchor
-                end):breathe(p.breathe):drag(0,0,0,0):drag(false)
-                frm:append("Image_Default","Image"):find("#Image_Default"):size(150,30):image("UI/Image/UICommon/Commonpanel.UITex",86):alpha(180)
-                frm:append("Text_Default", "Text"):find("#Text_Default"):size(150,30):text(p.title):font(2):raw(1):SetHAlign(1)
-                -- frm:find("#Text_Default"):raw(1):SetVAlign(1)
+                    cfg.anchor = anchor
+                    SaveConfig()
+                end):drag(0,0,0,0):drag(false)
+                frm:append("Image_Default","Image"):item("#Image_Default"):size(150,30):image("UI/Image/UICommon/Commonpanel.UITex",86):alpha(180)
+                frm:append("Text_Default", "Text"):item("#Text_Default"):size(150,30):text(cache.title):font(2):raw(1):SetHAlign(1)
+                local txt = frm:find("#Text_Default")
+                frm:breathe(function() txt:text(cache.GetContent()) end)
             end
-            if p.bShowBg then
+            if cfg.bShowBg then
                 frm:find("#Image_Default"):show()
             else
                 frm:find("#Image_Default"):hide()
             end
-            frm:anchor(p.anchor)
+            if cfg.bShowTitle then
+                cache.formatString = _L[cache.prefix] .. _L[cache.content]
+            else
+                cache.formatString = _L[cache.content]
+            end
+            frm:item("#Text_Default"):font(cfg.nFont or 0):color(cfg.rgb or {255,255,255})
+            frm:anchor(cfg.anchor)
         else
             frm:remove()
         end
     end
+    SaveConfig()
 end
 -- 注册INIT事件
-MY.RegisterInit(function() _MY_ToolBox.ReloadInfoTip() end)
+MY.RegisterInit(function()
+    LoadConfig()
+    _MY_ToolBox.ReloadInfoTip()
+end)
 --[[
 ##########################################################################################################################
       *         *   *                   *                                   *                           *     *           
@@ -1087,21 +1128,49 @@ _MY_ToolBox.OnPanelActive = function(wnd)
     
     ui:append("Text_InfoTip", "Text"):find("#Text_InfoTip"):text(_L['* infomation tips']):color(255,255,0):pos(x, y)
     y = y + 30
-    for id, p in pairs(MY_ToolBox.InfoTip) do
+    for id, cache in pairs(_Cache.InfoTip) do
+        local cfg = Config.InfoTip[id]
         ui:append("WndCheckBox_InfoTip_"..id, "WndCheckBox"):children("#WndCheckBox_InfoTip_"..id):pos(x, y)
-          :text(p.title):check(MY_ToolBox.InfoTip[id].bEnable)
+          :text(cache.title):check(cfg.bEnable or false)
           :check(function(bChecked)
-            MY_ToolBox.InfoTip[id].bEnable = bChecked
+            cfg.bEnable = bChecked
             _MY_ToolBox.ReloadInfoTip()
           end)
-        x = x + 120
+        x = x + 90
+        ui:append("WndCheckBox_InfoTipTitle_"..id, "WndCheckBox"):children("#WndCheckBox_InfoTipTitle_"..id):pos(x, y)
+          :text(_L['title']):check(cfg.bShowTitle or false)
+          :check(function(bChecked)
+            cfg.bShowTitle = bChecked
+            _MY_ToolBox.ReloadInfoTip()
+          end)
+        x = x + 60
         ui:append("WndCheckBox_InfoTipBg_"..id, "WndCheckBox"):children("#WndCheckBox_InfoTipBg_"..id):pos(x, y)
-          :text(_L['show background']):check(MY_ToolBox.InfoTip[id].bShowBg)
+          :text(_L['background']):check(cfg.bShowBg or false)
           :check(function(bChecked)
-            MY_ToolBox.InfoTip[id].bShowBg = bChecked
+            cfg.bShowBg = bChecked
             _MY_ToolBox.ReloadInfoTip()
           end)
-        x = x + 150
+        x = x + 60
+        ui:append("WndButton_InfoTipFont_"..id, "WndButton"):children("#WndButton_InfoTipFont_"..id):pos(x, y)
+          :width(60):text(_L['font'])
+          :click(function()
+            MY.UI.OpenFontPicker(function(f)
+                cfg.nFont = f
+                _MY_ToolBox.ReloadInfoTip()
+            end)
+          end)
+        x = x + 70
+        ui:append("Shadow_InfoTipColor_"..id, "Shadow"):item("#Shadow_InfoTipColor_"..id):pos(x, y)
+          :size(20, 20):color(cfg.rgb or {255,255,255})
+          :click(function()
+            local me = this
+            MY.UI.OpenColorPicker(function(r, g, b)
+                MY.UI(me):color(r, g, b)
+                cfg.rgb = { r, g, b }
+                _MY_ToolBox.ReloadInfoTip()
+            end)
+          end)
+        x = x + 50
         if x + 150 > w then
             x, y = 20, y + 30
         end
