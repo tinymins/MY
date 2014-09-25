@@ -1902,15 +1902,16 @@ MY.UI.CreateFrame = function(szName, bEmpty, bLowest)
 end
 -- 打开取色板
 MY.UI.OpenColorPicker = function(callback, t)
-    OpenColorTablePanel(callback,nil,nil,t or {
-        { r = 0,   g = 255, b = 0  },
-        { r = 0,   g = 255, b = 255},
-        { r = 255, g = 0  , b = 0  },
-        { r = 40,  g = 140, b = 218},
-        { r = 211, g = 229, b = 37 },
-        { r = 65,  g = 50 , b = 160},
-        { r = 170, g = 65 , b = 180},
-    })
+    OpenColorTablePanel(callback,nil,nil,t)
+    --  or {
+    --     { r = 0,   g = 255, b = 0  },
+    --     { r = 0,   g = 255, b = 255},
+    --     { r = 255, g = 0  , b = 0  },
+    --     { r = 40,  g = 140, b = 218},
+    --     { r = 211, g = 229, b = 37 },
+    --     { r = 65,  g = 50 , b = 160},
+    --     { r = 170, g = 65 , b = 180},
+    -- }
 end
 -- 打开字体选择
 MY.UI.OpenFontPicker = function(callback, t)
