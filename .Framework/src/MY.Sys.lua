@@ -418,6 +418,11 @@ _Cache.GetMainMenu = function()
         fnAction = MY.TogglePanel,
         bCheck = true,
         bChecked = MY.GetFrame():IsVisible(),
+        
+        szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
+        nFrame = 105, nMouseOverFrame = 106,
+        szLayer = "ICON_RIGHT",
+        fnClickIcon = MY.TogglePanel
     }
 end
 -- get player addon menu
