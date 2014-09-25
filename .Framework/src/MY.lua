@@ -135,12 +135,12 @@ local _FRAMEWORK_ROOT_ = '\\Interface\\MY\\.Framework\\'
     (table) MY.LoadLangPack(void)
 ]]
 MY.LoadLangPack = function(szLangFolder)
-	local _, _, szLang = GetVersion()
-	local t0 = LoadLUAData(_FRAMEWORK_ROOT_.."lang\\default") or {}
-	local t1 = LoadLUAData(_FRAMEWORK_ROOT_.."lang\\" .. szLang) or {}
-	for k, v in pairs(t1) do
-		t0[k] = v
-	end
+    local _, _, szLang = GetVersion()
+    local t0 = LoadLUAData(_FRAMEWORK_ROOT_.."lang\\default") or {}
+    local t1 = LoadLUAData(_FRAMEWORK_ROOT_.."lang\\" .. szLang) or {}
+    for k, v in pairs(t1) do
+        t0[k] = v
+    end
     if type(szLangFolder)=="string" then
         szLangFolder = string.gsub(szLangFolder,"[/\\]+$","")
         local t2 = LoadLUAData(szLangFolder.."\\default") or {}
@@ -152,11 +152,11 @@ MY.LoadLangPack = function(szLangFolder)
             t0[k] = v
         end
     end
-	setmetatable(t0, {
-		__index = function(t, k) return k end,
-		__call = function(t, k, ...) return string.format(t[k], ...) end,
-	})
-	return t0
+    setmetatable(t0, {
+        __index = function(t, k) return k end,
+        __call = function(t, k, ...) return string.format(t[k], ...) end,
+    })
+    return t0
 end
 local _L = MY.LoadLangPack()
 -----------------------------------------------
@@ -195,10 +195,10 @@ MY.GetAddonInfo = function()
 end
 _MY.Init = function()
     if _MY.bLoaded then return end
-	-- var
+    -- var
     _MY.bLoaded = true
-	_MY.hBox = MY.GetFrame():Lookup("","Box_1")
-	_MY.hRequest = MY.GetFrame():Lookup("Page_1")
+    _MY.hBox = MY.GetFrame():Lookup("","Box_1")
+    _MY.hRequest = MY.GetFrame():Lookup("Page_1")
     -- 窗口按钮
     MY.UI(MY.GetFrame()):find("#Button_WindowClose"):click(function() MY.ClosePanel() end)
     -- 重绘选项卡
@@ -244,16 +244,16 @@ end
 ]]
 -- close window
 MY.ClosePanel = function(bRealClose)
-	local frame = MY.GetFrame()
-	if frame then
-		if not bRealClose then
-			frame:Hide()
-		else
-			Wnd.CloseWindow(frame)
-			_MY.frame = nil
-		end
-		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
-	end
+    local frame = MY.GetFrame()
+    if frame then
+        if not bRealClose then
+            frame:Hide()
+        else
+            Wnd.CloseWindow(frame)
+            _MY.frame = nil
+        end
+        PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
+    end
 end
 -- open window
 MY.OpenPanel = function()
@@ -262,15 +262,18 @@ MY.OpenPanel = function()
         frame:Show()
         frame:BringToTop()
     end
+    PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 end
 -- toggle panel
 MY.TogglePanel = function()
     local frame = MY.GetFrame()
-    if frame and frame:IsVisible() then
-        frame:Hide()
-    elseif frame then
-        frame:Show()
-        frame:BringToTop()
+    if not frame then
+        return nil
+    end
+    if frame:IsVisible() then
+        MY.ClosePanel()
+    else
+        MY.OpenPanel()
     end
 end
 
