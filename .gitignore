@@ -2,3 +2,6 @@
 @DATA/userdata/XLifeBar/*.jx3dat
 @DATA/cache/PLAYER_INFO/*.jx3dat
 @DATA/config/*.jx3dat
+*/manifest.dat
+*/manifest.key
+*/publisher.key
