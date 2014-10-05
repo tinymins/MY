@@ -1,5 +1,13 @@
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."RollMonitor/lang/")
 MY_RollMonitor = { nMode = 1, nPublish = 0, nPublishChannel = PLAYER_TALK_CHANNEL.RAID, bPublishRestart = true }
+MY_RollMonitor.SortType = {
+    FIRST = 1,  -- 只记录第一次
+    LAST  = 2,  -- 只记录最后一次
+    MAX   = 3,  -- 多次摇点取最高点
+    MIN   = 4,  -- 多次摇点取最低点
+    AVG   = 5,  -- 多次摇点取平均值
+    AVG2  = 6,  -- 去掉最高最低取平均值
+}
 RegisterCustomData('MY_RollMonitor.nMode')
 RegisterCustomData('MY_RollMonitor.nPublish')
 RegisterCustomData('MY_RollMonitor.bPublishRestart')
@@ -21,6 +29,84 @@ local _MY_RollMonitor = {
         { nChannel = PLAYER_TALK_CHANNEL.TONG  , szName = _L['tong channel']  , rgb = GetMsgFontColor("MSG_GUILD" , true) },
     }
 }
+-- 事件响应处理
+--[[ 打开面板
+    (void) MY_RollMonitor.OpenPanel()
+]]
+MY_RollMonitor.OpenPanel = function()
+    MY.OpenPanel()
+    MY.ActivePanel('RollMonitor')
+end
+--[[ 清空ROLL点
+     (void) MY_RollMonitor.Clear([settings])
+        (array) settings : 参数键值对，所有参数都是可选的，默认读取用户设置。
+          (boolean) echo       : 是否发送重新开始聊天消息
+          (number)  channel    : 发送频道
+]]
+MY_RollMonitor.Clear = function(param)
+    param = param or {}
+    if type(param.echo) == 'nil' then
+        param.echo = MY_RollMonitor.bPublishRestart
+    end
+    param.channel = param.channel or MY_RollMonitor.nPublishChannel
+    
+    _MY_RollMonitor.aRecords = {}
+    _MY_RollMonitor.RedrawBoard()
+    if param.echo then
+        MY.Talk(param.channel, _L['----------- roll restart -----------']..'\n')
+    end
+end
+--[[ 获得排序结果
+]]
+MY_RollMonitor.GetResult = function(sortType)
+    sortType = sortType or MY_RollMonitor.nMode
+    local t = {}
+    for _, aRecord in pairs(_MY_RollMonitor.aRecords) do
+        table.insert(t, { szName = aRecord.szName, nRoll = aRecord[_MY_RollMonitor.aMode[sortType].szID], nCount = #aRecord })
+    end
+    table.sort(t, function(v1, v2) return v1.nRoll > v2.nRoll end)
+    return t
+end
+--[[ 发布ROLL点
+     (void) MY_RollMonitor.Echo([settings])
+        (array) settings : 参数键值对，所有参数都是可选的，默认读取用户设置。
+          (enum)    sortType   : 排序方式 枚举 MY_RollMonitor.SortType
+          (number)  limit      : 最大显示条数限制
+          (number)  channel    : 发送频道
+          (boolean) showUnroll : 是否显示未ROLL点
+]]
+MY_RollMonitor.Echo = function(param)
+    param = param or {}
+    param.sortType = param.sortType or MY_RollMonitor.nMode
+    param.limit    = param.limit    or MY_RollMonitor.nPublish
+    param.channel  = param.channel  or MY_RollMonitor.nPublishChannel
+    if type(param.showUnroll) == 'nil' then param.showUnroll = MY_RollMonitor.bPublishUnroll end
+
+    MY.Talk(param.channel, string.format('[%s][%s]%s\n',_L['mingyi plugin'],_L["roll monitor"],_MY_RollMonitor.aMode[param.sortType].szName), true)
+    MY.Talk(param.channel, _L['-------------------------------']..'\n')
+    for i, aRecord in ipairs(MY_RollMonitor.GetResult(param.sortType)) do
+        if param.limit > 0 and i > param.limit then break end
+        MY.Talk(param.channel, _L( '[%s] rolls for %d times, valid score is %s.', aRecord.szName, aRecord.nCount, string.gsub(aRecord.nRoll, '(%d+%.%d%d)%d+','%1')) .. '\n' )
+    end
+    local team = GetClientTeam()
+    if team and param.showUnroll then
+        local szUnrolledNames = ''
+        for _, dwID in ipairs(team.GetTeamMemberList()) do
+            local szName, bUnRoll = team.GetClientTeamMemberName(dwID), true
+            for _, aRecord in ipairs(_MY_RollMonitor.aRecords) do
+                if aRecord.szName == szName then
+                    bUnRoll = false
+                end
+            end
+            if bUnRoll then szUnrolledNames = szUnrolledNames .. '[' .. szName .. ']' end
+        end
+        if szUnrolledNames~='' then
+            MY.Talk(param.channel, szUnrolledNames .. _L["haven't roll yet."]..'\n')
+        end
+    end
+    MY.Talk(param.channel, _L['-------------------------------']..'\n')
+end
+
 -- 标签激活响应函数
 _MY_RollMonitor.OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
@@ -43,11 +129,7 @@ _MY_RollMonitor.OnPanelActive = function(wnd)
     end)
     -- 清空
     ui:append('WndButton_Clear','WndButton'):children('#WndButton_Clear'):text(_L['restart']):pos(w-196,20):width(90):lclick(function(nButton)
-        _MY_RollMonitor.aRecords = {}
-        _MY_RollMonitor.RedrawBoard()
-        if MY_RollMonitor.bPublishRestart then
-            MY.Talk(MY_RollMonitor.nPublishChannel, _L['--------------- roll restart ----------------']..'\n')
-        end
+        MY_RollMonitor.Clear()
     end):rmenu(function()
         local t = { {
             szOption = _L['publish while restart'], 
@@ -85,6 +167,10 @@ _MY_RollMonitor.OnPanelActive = function(wnd)
                 bCheck = true, bMCheck = true, bChecked = MY_RollMonitor.nPublish == 0,
                 fnAction = function() MY_RollMonitor.nPublish = 0 end,
                 szOption = _L['publish all']
+            }, { bDevide = true }, {
+                bCheck = true, bChecked = MY_RollMonitor.bPublishUnroll,
+                fnAction = function() MY_RollMonitor.bPublishUnroll = not MY_RollMonitor.bPublishUnroll end,
+                szOption = _L['publish unroll']
             }
         }, { bDevide = true } }
         for _, tChannel in ipairs(_MY_RollMonitor.tChannels) do
@@ -99,29 +185,7 @@ _MY_RollMonitor.OnPanelActive = function(wnd)
         end
         return t
     end):lclick(function()
-        MY.Talk(MY_RollMonitor.nPublishChannel, string.format('[%s][%s]%s\n',_L['mingyi plugin'],_L["roll monitor"],_MY_RollMonitor.aMode[MY_RollMonitor.nMode].szName), true)
-        MY.Talk(MY_RollMonitor.nPublishChannel, _L['---------------------------------------------']..'\n')
-        for i, aRecord in ipairs(_MY_RollMonitor.aRecords) do
-            if MY_RollMonitor.nPublish > 0 and i > MY_RollMonitor.nPublish then break end
-            MY.Talk(MY_RollMonitor.nPublishChannel, _L( '[%s] rolls for %d times, valid score is %s.', aRecord.szName, #aRecord, (string.gsub(aRecord[_MY_RollMonitor.aMode[MY_RollMonitor.nMode].szID],'(%d+%.%d%d)%d+','%1')) ) .. '\n')
-        end
-        local team = GetClientTeam()
-        if team then
-            local szUnrolledNames = ''
-            for _, dwID in ipairs(team.GetTeamMemberList()) do
-                local szName, bUnRoll = team.GetClientTeamMemberName(dwID), true
-                for _, aRecord in ipairs(_MY_RollMonitor.aRecords) do
-                    if aRecord.szName == szName then
-                        bUnRoll = false
-                    end
-                end
-                if bUnRoll then szUnrolledNames = szUnrolledNames .. '[' .. szName .. ']' end
-            end
-            if szUnrolledNames~='' then
-                MY.Talk(MY_RollMonitor.nPublishChannel, szUnrolledNames .. _L["haven't roll yet."]..'\n')
-            end
-        end
-        MY.Talk(MY_RollMonitor.nPublishChannel, _L['---------------------------------------------']..'\n')
+        MY_RollMonitor.Echo()
     end):tip(_L['left click to publish, right click to open setting.'], MY.Const.UI.Tip.POS_TOP, { x = -80 })
     -- 输出板
     ui:append('WndScrollBox_Record','WndScrollBox'):children('#WndScrollBox_Record'):handleStyle(3):pos(20,50):size(w-46,400):text(_L['去掉最高最低取平均值']):append('Text_Default','Text'):find('#Text_Default')
@@ -136,8 +200,8 @@ end
 _MY_RollMonitor.RedrawBoard = function()
     if _MY_RollMonitor.uiBoard then
         local szText = ''
-        for _, aRecord in ipairs(_MY_RollMonitor.aRecords) do
-            szText = szText .. _L( '[%s] rolls for %d times, valid score is %s.', aRecord.szName, #aRecord, (string.gsub(aRecord[_MY_RollMonitor.aMode[MY_RollMonitor.nMode].szID],'(%d+%.%d%d)%d+','%1')) ) .. '\n'
+        for _, aRecord in ipairs(MY_RollMonitor.GetResult()) do
+            szText = szText .. _L( '[%s] rolls for %d times, valid score is %s.', aRecord.szName, aRecord.nCount, (string.gsub(aRecord.nRoll,'(%d+%.%d%d)%d+','%1')) ) .. '\n'
         end
         local team = GetClientTeam()
         if team then
@@ -200,7 +264,6 @@ _MY_RollMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
             end
         end
         table.insert(_MY_RollMonitor.aRecords, aRecord)
-        table.sort(_MY_RollMonitor.aRecords,function(v1,v2)return v1[_MY_RollMonitor.aMode[MY_RollMonitor.nMode].szID] > v2[_MY_RollMonitor.aMode[MY_RollMonitor.nMode].szID] end)
         _MY_RollMonitor.RedrawBoard()
     end
 end
