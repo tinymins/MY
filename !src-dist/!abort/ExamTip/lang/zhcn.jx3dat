@@ -1,9 +1,0 @@
--- language data (zhcn) updated at 2014-4-10 03:38:11
-data = {
-    -- MY_Toolbox.lua
-    ['toolbox'] = '常用工具',
-    ['friend headtop tips'] = '附近好友高亮',
-    
-    ['check nearby gongzhan'] = '检测附近共战',
-    ['Detected [%s] has Gongzhan BUFF for %d second(s).'] = "检测到[%s]共战BUFF剩余%d秒。",
-}

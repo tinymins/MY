@@ -1,0 +1,8 @@
+-- language data (zhcn) updated at 2014-4-10 03:38:11
+data = {
+    ['exam tip'] = '科舉助手',
+    ['%s record(s) commited, %s record(s) accepted!'] = '已爲您自動提交了%s條題庫數據，其中%s條已被系統通過采納！',
+    ["Querying, please wait..."] = '查詢中，請稍後……',
+    ["No result found. Here's from open search engine:"] = '沒有搜索到匹配的結果，以下數據來自開放搜索引擎：',
+    ['Loading failed.'] = '加載失敗',
+}
