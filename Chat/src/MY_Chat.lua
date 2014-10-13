@@ -461,7 +461,7 @@ end, function(h, szMsg, i)
         -- chat time
         -- get msg rgb
         local r, g, b = 255, 255, 0
-        for j = i, h:GetItemCount() do
+        for j = i, h:GetItemCount() - 1 do
             local h2 = h:Lookup(j)
             if not h2 then
                 return
