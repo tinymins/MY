@@ -95,7 +95,7 @@ MY_Farbnamen.Render = function(szMsg)
                 )
             end
         end)
-    elseif type(szMsg) == 'userdata' then
+    elseif type(szMsg) == 'table' and type(szMsg.GetName) == 'function' and szMsg:GetName():sub(1, 8) == 'namelink' then
         local namelink = szMsg
         local szName = string.gsub(namelink:GetText(), '[%[%]]', '')
         local tInfo = MY_Farbnamen.GetAusName(szName)
