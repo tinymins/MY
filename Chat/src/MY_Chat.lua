@@ -459,19 +459,23 @@ MY.HookChatPanel("MY_Chat", function(h, szMsg)
 end, function(h, szMsg, i)
     if (MY_Chat.bChatTime or MY_Chat.bChatCopy) and i then
         -- chat time
-        local h2 = h:Lookup(i)
-        -- check if timestrap can insert
+        -- get msg rgb
         local r, g, b = 255, 255, 0
-        if not h2 then
-            return
-        elseif h2:GetType() == "Text" then
-            r, g, b = h2:GetFontColor()
-            if r == 255 and g == 255 and b == 0 and MY_Chat.bChatCopyNoCopySysmsg then
+        for j = i, h:GetItemCount() do
+            local h2 = h:Lookup(j)
+            if not h2 then
                 return
+            elseif h2:GetType() == "Text" and h2:GetName():sub(1, 8) ~= 'namelink' then
+                r, g, b = h2:GetFontColor()
+                break
             end
-        elseif MY_Chat.bChatCopyNoCopySysmsg then
+        end
+        
+        -- check if timestrap can insert
+        if r == 255 and g == 255 and b == 0 and MY_Chat.bChatCopyNoCopySysmsg then
             return
         end
+        
         -- create timestrap text
         local szTime = ""
         if MY_Chat.bChatCopy and (MY_Chat.bChatCopyAlwaysShowMask or not MY_Chat.bChatTime) then
@@ -491,6 +495,7 @@ end, function(h, szMsg, i)
                 szTime = szTime .. GetFormatText(string.format("[%02d:%02d]", t.hour, t.minute), 10, r, g, b, 515, "this.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end", "timelink")
             end
         end
+        
         -- insert timestrap text
         h:InsertItemFromString(i, false, szTime)
     end

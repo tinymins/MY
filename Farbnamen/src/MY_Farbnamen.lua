@@ -87,8 +87,8 @@ MY_Farbnamen.Render = function(szMsg)
             local tInfo = MY_Farbnamen.GetAusName(szName)
             if tInfo then
                 szExtra1 = string.gsub(szExtra1, ' [rgb]=%d+', '')
-                szExtra2 = string.gsub(szExtra1, ' [rgb]=%d+', '')
-                szExtra3 = string.gsub(szExtra1, ' [rgb]=%d+', '')
+                szExtra2 = string.gsub(szExtra2, ' [rgb]=%d+', '')
+                szExtra3 = string.gsub(szExtra3, ' [rgb]=%d+', '')
                 return string.format(
                     '<text>%stext="[%s]"%seventid=771 script="this.OnItemMouseEnter=function() MY_Farbnamen.ShowTip(this) end\nthis.OnItemMouseLeave=function() HideTip() end"%s r=%d g=%d b=%d</text>',
                     szExtra1, szName, szExtra2, szExtra3, tInfo.rgb[1], tInfo.rgb[2], tInfo.rgb[3]
