@@ -82,16 +82,17 @@ end)
 MY_Farbnamen.Render = function(szMsg)
     if type(szMsg) == 'string' then
         -- <text>text="[就是个阵眼]" font=10 r=255 g=255 b=255  name="namelink_4662931" eventid=515</text><text>text="说：" font=10 r=255 g=255 b=255 </text><text>text="[茗伊]" font=10 r=255 g=255 b=255  name="namelink_4662931" eventid=771</text><text>text="\n" font=10 r=255 g=255 b=255 </text>
-        szMsg = string.gsub( szMsg, '<text>([^<]-)text="([^<]-)"([^<]-name="namelink_%d-"[^<]-)eventid=515([^<]-)</text>', function (szExtra1, szName, szExtra2, szExtra3)
+        szMsg = string.gsub( szMsg, '<text>([^<]-)text="([^<]-)"([^<]-name="namelink_%d-"[^<]-)</text>', function (szExtra1, szName, szExtra2)
             szName = string.gsub(szName, '[%[%]]', '')
             local tInfo = MY_Farbnamen.GetAusName(szName)
             if tInfo then
-                szExtra1 = string.gsub(szExtra1, ' [rgb]=%d+', '')
-                szExtra2 = string.gsub(szExtra2, ' [rgb]=%d+', '')
-                szExtra3 = string.gsub(szExtra3, ' [rgb]=%d+', '')
+                szExtra1 = string.gsub(szExtra1, '[rgb]=%d+', '')
+                szExtra2 = string.gsub(szExtra2, '[rgb]=%d+', '')
+                szExtra1 = string.gsub(szExtra1, 'eventid=%d+', '')
+                szExtra2 = string.gsub(szExtra2, 'eventid=%d+', '')
                 return string.format(
-                    '<text>%stext="[%s]"%seventid=771 script="this.OnItemMouseEnter=function() MY_Farbnamen.ShowTip(this) end\nthis.OnItemMouseLeave=function() HideTip() end"%s r=%d g=%d b=%d</text>',
-                    szExtra1, szName, szExtra2, szExtra3, tInfo.rgb[1], tInfo.rgb[2], tInfo.rgb[3]
+                    '<text>%stext="[%s]"%s eventid=771 script="this.OnItemMouseEnter=function() MY_Farbnamen.ShowTip(this) end\nthis.OnItemMouseLeave=function() HideTip() end" r=%d g=%d b=%d</text>',
+                    szExtra1, szName, szExtra2, tInfo.rgb[1], tInfo.rgb[2], tInfo.rgb[3]
                 )
             end
         end)
