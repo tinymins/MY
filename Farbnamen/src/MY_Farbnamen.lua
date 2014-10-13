@@ -71,15 +71,15 @@ MY.Chat.HookChatPanel(function(h, szMsg)
     if not MY_Farbnamen.bEnabled then
         return nil
     end
-    szMsg = MY_Farbnamen.FormatMsg(szMsg)
+    szMsg = MY_Farbnamen.Render(szMsg)
     
     return szMsg
 end)
 --[[ 开放的名称染色接口
-    (userdata) MY_Farbnamen.FormatMsg(userdata namelink)    处理namelink染色 namelink是一个姓名Text元素
-    (string) MY_Farbnamen.FormatMsg(string szMsg)           格式化szMsg 处理里面的名字
+    (userdata) MY_Farbnamen.Render(userdata namelink)    处理namelink染色 namelink是一个姓名Text元素
+    (string) MY_Farbnamen.Render(string szMsg)           格式化szMsg 处理里面的名字
 ]]
-MY_Farbnamen.FormatMsg = function(szMsg)
+MY_Farbnamen.Render = function(szMsg)
     if type(szMsg) == 'string' then
         -- <text>text="[就是个阵眼]" font=10 r=255 g=255 b=255  name="namelink_4662931" eventid=515</text><text>text="说：" font=10 r=255 g=255 b=255 </text><text>text="[茗伊]" font=10 r=255 g=255 b=255  name="namelink_4662931" eventid=771</text><text>text="\n" font=10 r=255 g=255 b=255 </text>
         szMsg = string.gsub( szMsg, '<text>([^<]-)text="([^<]-)"([^<]-name="namelink_%d-"[^<]-)eventid=515([^<]-)</text>', function (szExtra1, szName, szExtra2, szExtra3)
