@@ -75,22 +75,47 @@ MY.Chat.HookChatPanel(function(h, szMsg)
     
     return szMsg
 end)
--- 格式化szMsg 处理里面的名字
+--[[ 开放的名称染色接口
+    (userdata) MY_Farbnamen.FormatMsg(userdata namelink)    处理namelink染色 namelink是一个姓名Text元素
+    (string) MY_Farbnamen.FormatMsg(string szMsg)           格式化szMsg 处理里面的名字
+]]
 MY_Farbnamen.FormatMsg = function(szMsg)
-    -- <text>text="[就是个阵眼]" font=10 r=255 g=255 b=255  name="namelink_4662931" eventid=515</text><text>text="说：" font=10 r=255 g=255 b=255 </text><text>text="[茗伊]" font=10 r=255 g=255 b=255  name="namelink_4662931" eventid=771</text><text>text="\n" font=10 r=255 g=255 b=255 </text>
-    szMsg = string.gsub( szMsg, '<text>([^<]-)text="([^<]-)"([^<]-name="namelink_%d-"[^<]-)eventid=515([^<]-)</text>', function (szExtra1, szName, szExtra2, szExtra3)
-        szName = string.gsub(szName, '[%[%]]', '')
+    if type(szMsg) == 'string' then
+        -- <text>text="[就是个阵眼]" font=10 r=255 g=255 b=255  name="namelink_4662931" eventid=515</text><text>text="说：" font=10 r=255 g=255 b=255 </text><text>text="[茗伊]" font=10 r=255 g=255 b=255  name="namelink_4662931" eventid=771</text><text>text="\n" font=10 r=255 g=255 b=255 </text>
+        szMsg = string.gsub( szMsg, '<text>([^<]-)text="([^<]-)"([^<]-name="namelink_%d-"[^<]-)eventid=515([^<]-)</text>', function (szExtra1, szName, szExtra2, szExtra3)
+            szName = string.gsub(szName, '[%[%]]', '')
+            local tInfo = MY_Farbnamen.GetAusName(szName)
+            if tInfo then
+                szExtra1 = string.gsub(szExtra1, ' [rgb]=%d+', '')
+                szExtra2 = string.gsub(szExtra1, ' [rgb]=%d+', '')
+                szExtra3 = string.gsub(szExtra1, ' [rgb]=%d+', '')
+                return string.format(
+                    '<text>%stext="[%s]"%seventid=771 script="this.OnItemMouseEnter=function() MY_Farbnamen.ShowTip(this) end\nthis.OnItemMouseLeave=function() HideTip() end"%s r=%d g=%d b=%d</text>',
+                    szExtra1, szName, szExtra2, szExtra3, tInfo.rgb[1], tInfo.rgb[2], tInfo.rgb[3]
+                )
+            end
+        end)
+    elseif type(szMsg) == 'userdata' then
+        local namelink = szMsg
+        local szName = string.gsub(namelink:GetText(), '[%[%]]', '')
         local tInfo = MY_Farbnamen.GetAusName(szName)
         if tInfo then
-            szExtra1 = string.gsub(szExtra1, ' [rgb]=%d+', '')
-            szExtra2 = string.gsub(szExtra1, ' [rgb]=%d+', '')
-            szExtra3 = string.gsub(szExtra1, ' [rgb]=%d+', '')
-            return string.format(
-                '<text>%stext="[%s]"%seventid=771 script="this.OnItemMouseEnter=function() MY_Farbnamen.ShowTip(this) end\nthis.OnItemMouseLeave=function() HideTip() end"%s r=%d g=%d b=%d</text>',
-                szExtra1, szName, szExtra2, szExtra3, tInfo.rgb[1], tInfo.rgb[2], tInfo.rgb[3]
-            )
+            -- 名称 等级
+            local szTip = string.format('%s(%d)', tInfo.szName, tInfo.nLevel)
+            -- 称号
+            if tInfo.szTitle and #tInfo.szTitle > 0 then
+                szTip = string.format('%s\n%s', szTip, tInfo.szTitle)
+            end
+            -- 帮会
+            if tInfo.szTongID and #tInfo.szTongID > 0 then
+                szTip = string.format('%s\n[%s]', szTip, tInfo.szTongID)
+            end
+            -- 门派 体型 阵营
+            szTip = string.format('%s\n%s·%s·%s', szTip, _MY_Farbnamen.tForceString[tInfo.dwForceID], _MY_Farbnamen.tRoleType[tInfo.nRoleType], _MY_Farbnamen.tCampString[tInfo.nCamp])
+            -- 绑定tip提示
+            MY.UI(namelink):tip(szTip, MY.Const.UI.Tip.POS_TOP):color(tInfo.rgb)
         end
-    end)
+    end
     
     return szMsg
 end
