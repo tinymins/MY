@@ -68,48 +68,62 @@ setmetatable(_MY_Farbnamen.tCampString,  { __index = function(t, k) return k end
 ---------------------------------------------------------------
 -- 插入聊天内容的 HOOK （过滤、加入时间 ）
 MY.Chat.HookChatPanel(function(h, szMsg)
-    if not MY_Farbnamen.bEnabled then return nil end
-    -- change name item event binding: binding mouse in-out event
-    szMsg = string.gsub(szMsg, 'eventid=515</', 'eventid=771</')
-    -- get current item count
-    return szMsg, h:GetItemCount()
-end, function(h, szMsg, iPos)
-    if not MY_Farbnamen.bEnabled then return nil end
-    -- if enabled
-    -- color each text item
-    for i = iPos, h:GetItemCount(), 1 do
-        local h2 = h:Lookup(i)
-        -- 判断这个Item是不是人名Text 如果是则处理
-        if h2 and h2:GetType() == "Text" and string.find(h2:GetName(), '^namelink_%d+$') then
-            -- 取发信玩家的ID加入表
-            local szID = string.gsub(h2:GetName(), '%D', '')
-            local dwID = tonumber(szID)
-            MY_Farbnamen.AddAusID(dwID)
-            -- 取玩家的名字
-            local szName = string.gsub(h2:GetText(), '[%[%]]', '')
-            -- 根据名称获取染色颜色
-            local tInfo = MY_Farbnamen.GetAusName(szName)
-            -- 如果获取成功则染色
-            if tInfo then
-                -- 名称 等级
-                local szTip = string.format('%s(%d)', tInfo.szName, tInfo.nLevel)
-                -- 称号
-                if tInfo.szTitle and #tInfo.szTitle > 0 then
-                    szTip = string.format('%s\n%s', szTip, tInfo.szTitle)
-                end
-                -- 帮会
-                if tInfo.szTongID and #tInfo.szTongID > 0 then
-                    szTip = string.format('%s\n[%s]', szTip, tInfo.szTongID)
-                end
-                -- 门派 体型 阵营
-                local szTip = string.format('%s\n%s·%s·%s', szTip, _MY_Farbnamen.tForceString[tInfo.dwForceID], _MY_Farbnamen.tRoleType[tInfo.nRoleType], _MY_Farbnamen.tCampString[tInfo.nCamp])
-                -- 绑定tip提示
-                MY.UI(h2):tip(szTip, MY.Const.UI.Tip.POS_TOP):color(tInfo.rgb)
-            end
-        end
+    if not MY_Farbnamen.bEnabled then
+        return nil
     end
+    szMsg = MY_Farbnamen.FormatMsg(szMsg)
+    
+    return szMsg
 end)
-
+-- 格式化szMsg 处理里面的名字
+MY_Farbnamen.FormatMsg = function(szMsg)
+    -- <text>text="[就是个阵眼]" font=10 r=255 g=255 b=255  name="namelink_4662931" eventid=515</text><text>text="说：" font=10 r=255 g=255 b=255 </text><text>text="[茗伊]" font=10 r=255 g=255 b=255  name="namelink_4662931" eventid=771</text><text>text="\n" font=10 r=255 g=255 b=255 </text>
+    szMsg = string.gsub( szMsg, '<text>([^<]-)text="([^<]-)"([^<]-name="namelink_%d-"[^<]-)eventid=515([^<]-)</text>', function (szExtra1, szName, szExtra2, szExtra3)
+        szName = string.gsub(szName, '[%[%]]', '')
+        local tInfo = MY_Farbnamen.GetAusName(szName)
+        if tInfo then
+            szExtra1 = string.gsub(szExtra1, ' [rgb]=%d+', '')
+            szExtra2 = string.gsub(szExtra1, ' [rgb]=%d+', '')
+            szExtra3 = string.gsub(szExtra1, ' [rgb]=%d+', '')
+            return string.format(
+                '<text>%stext="[%s]"%seventid=771 script="this.OnItemMouseEnter=function() MY_Farbnamen.ShowTip(this) end\nthis.OnItemMouseLeave=function() HideTip() end"%s r=%d g=%d b=%d</text>',
+                szExtra1, szName, szExtra2, szExtra3, tInfo.rgb[1], tInfo.rgb[2], tInfo.rgb[3]
+            )
+        end
+    end)
+    
+    return szMsg
+end
+-- 显示Tip
+MY_Farbnamen.ShowTip = function(namelink)
+    local x, y, w, h = 0, 0, 0, 0
+    namelink = namelink or this
+    if not namelink then
+        return
+    end
+    local szName = string.gsub(namelink:GetText(), '[%[%]]', '')
+    x, y = namelink:GetAbsPos()
+    w, h = namelink:GetSize()
+    
+    local tInfo = MY_Farbnamen.GetAusName(szName)
+    if tInfo then
+        -- 名称 等级
+        local szTip = string.format('%s(%d)', tInfo.szName, tInfo.nLevel)
+        -- 称号
+        if tInfo.szTitle and #tInfo.szTitle > 0 then
+            szTip = string.format('%s\n%s', szTip, tInfo.szTitle)
+        end
+        -- 帮会
+        if tInfo.szTongID and #tInfo.szTongID > 0 then
+            szTip = string.format('%s\n[%s]', szTip, tInfo.szTongID)
+        end
+        -- 门派 体型 阵营
+        szTip = string.format('%s\n%s·%s·%s', szTip, _MY_Farbnamen.tForceString[tInfo.dwForceID], _MY_Farbnamen.tRoleType[tInfo.nRoleType], _MY_Farbnamen.tCampString[tInfo.nCamp])
+        
+        szTip = GetFormatText(szTip, 136, nil, nil, nil)
+        OutputTip(szTip, 450, {x, y, w, h}, MY.Const.UI.Tip.POS_TOP)
+    end
+end
 -- 处理插件冲突
 function MY_Farbnamen.DoConflict()
     if MY_Farbnamen.bEnabled and Chat and Chat.bColor then
