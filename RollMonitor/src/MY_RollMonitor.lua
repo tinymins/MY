@@ -199,9 +199,11 @@ end
 -- 重绘窗口
 _MY_RollMonitor.RedrawBoard = function()
     if _MY_RollMonitor.uiBoard then
-        local szText = ''
+        local szHTML = ''
         for _, aRecord in ipairs(MY_RollMonitor.GetResult()) do
-            szText = szText .. _L( '[%s] rolls for %d times, valid score is %s.', aRecord.szName, aRecord.nCount, (string.gsub(aRecord.nRoll,'(%d+%.%d%d)%d+','%1')) ) .. '\n'
+            szHTML = szHTML ..
+                GetFormatText('['..aRecord.szName..']', nil, nil, nil, nil, 515, nil, 'namelink_0') ..
+                GetFormatText(_L( ' rolls for %d times, valid score is %s.', aRecord.nCount, (string.gsub(aRecord.nRoll,'(%d+%.%d%d)%d+','%1')) ) .. '\n')
         end
         local team = GetClientTeam()
         if team then
@@ -213,12 +215,18 @@ _MY_RollMonitor.RedrawBoard = function()
                         bUnRoll = false
                     end
                 end
-                if bUnRoll then szUnrolledNames = szUnrolledNames .. '[' .. szName .. ']' end
+                if bUnRoll then
+                    szUnrolledNames = szUnrolledNames .. GetFormatText('['..szName..']', nil, nil, nil, nil, 515, nil, 'namelink_0')
+                end
             end
-            if szUnrolledNames~='' then szUnrolledNames = szUnrolledNames .. _L["haven't roll yet."] end
-            szText = szText .. szUnrolledNames
+            if szUnrolledNames~='' then
+                szHTML = szHTML .. szUnrolledNames .. GetFormatText(_L["haven't roll yet."])
+            end
         end
-        _MY_RollMonitor.uiBoard:text(szText)
+        if MY_Farbnamen and MY_Farbnamen.Render then
+            szHTML = MY_Farbnamen.Render(szHTML)
+        end
+        _MY_RollMonitor.uiBoard:clear():append(szHTML)
     end
 end
 -- 系统频道监控处理函数
