@@ -771,7 +771,7 @@ function _MY.UI:append(szName, szType, tArg)
                 end
             end
         end
-    else
+    elseif type(szName) == 'string' and #szName > 0 then
         for _, ele in pairs(self.eles) do
             if ele.hdl then
                 -- append from xml
