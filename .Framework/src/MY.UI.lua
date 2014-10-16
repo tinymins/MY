@@ -1537,9 +1537,9 @@ function _MY.UI:customMode(szTip, fnOnEnterCustomMode, fnOnLeaveCustomMode)
     self:_checksum()
     if type(szTip)=="string" then
         self:onevent("ON_ENTER_CUSTOM_UI_MODE", function()
-            UpdateCustomModeWindow(this, szTip, true)
+            UpdateCustomModeWindow(this, szTip)
         end):onevent("ON_LEAVE_CUSTOM_UI_MODE", function()
-            UpdateCustomModeWindow(this, szTip, true)
+            UpdateCustomModeWindow(this, szTip)
         end)
         if type(fnOnEnterCustomMode)=="function" then
             self:onevent("ON_ENTER_CUSTOM_UI_MODE", function()
