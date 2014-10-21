@@ -232,6 +232,7 @@ MY.Chat.RenderLink = function(argv)
             end
             
             if #script > 0 then
+                xml[1][''].eventid = 883
                 xml[1][''].script = script
             end
             html = MY.Xml.Encode(xml)
