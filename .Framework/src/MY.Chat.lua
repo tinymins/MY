@@ -204,8 +204,8 @@ MY.Chat.LinkEventHandler = {
     end,
 }
 --[[ 绑定link事件响应
-    (userdata) MY_Farbnamen.Render(userdata link)    处理link的各种事件绑定 namelink是一个超链接Text元素
-    (string) MY_Farbnamen.Render(string szMsg)       格式化szMsg 处理里面的超链接 添加时间相应
+    (userdata) MY.Chat.RenderLink(userdata link)    处理link的各种事件绑定 namelink是一个超链接Text元素
+    (string) MY.Chat.RenderLink(string szMsg)       格式化szMsg 处理里面的超链接 添加时间相应
 ]]
 MY.Chat.RenderLink = function(argv)
     if type(argv) == 'string' then
