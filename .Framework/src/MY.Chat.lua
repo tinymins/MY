@@ -156,6 +156,105 @@ MY.Chat.CopyChatLine = function(hTime)
     Station.SetFocusWindow(edit)
 end
 
+MY.Chat.LinkEventHandler = {
+    OnNameLClick = function()
+        if IsCtrlKeyDown() then
+            MY.Chat.CopyChatItem(this)
+        else
+            MY.SwitchChat(MY.UI(this):text())
+            local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
+            if edit then
+                Station.SetFocusWindow(edit)
+            end
+        end
+    end,
+    OnNameRClick = function()
+        PopupMenu((function()
+            local t = {}
+            local szName = MY.UI(this):text():gsub('[%[%]]', '')
+            table.insert(t, {
+                szOption = _L['copy'],
+                fnAction = function()
+                    MY.Talk(GetClientPlayer().szName, szName)
+                end,
+            })
+            table.insert(t, {
+                szOption = _L['whisper'],
+                fnAction = function()
+                    MY.SwitchChat(szName)
+                end,
+            })
+            pcall(InsertInviteTeamMenu, t, szName)
+            return t
+        end)())
+    end,
+    OnCopyLClick = function()
+        MY.Chat.CopyChatLine(this)
+    end,
+    OnCopyRClick = function()
+        MY.Chat.RepeatChatLine(this)
+    end,
+    OnItemLClick = function()
+        OnItemLinkDown(this)
+    end,
+    OnItemRClick = function()
+        if IsCtrlKeyDown() then
+            MY.Chat.CopyChatItem(this)
+        end
+    end,
+}
+-- 绑定link事件响应
+MY.Chat.RenderLink = function(argv)
+    if type(argv) == 'string' then
+        local szMsg = argv
+        szMsg = string.gsub(szMsg, "(<text>.-</text>)", function (html)
+            local xml = MY.Xml.Decode(html)
+            if not (xml and xml[1] and xml[1][''] and xml[1][''].name) then
+                return
+            end
+            
+            local name, script = xml[1][''].name, xml[1][''].script
+            if script then
+                script = script .. '\n'
+            else
+                script = ''
+            end
+            
+            if name:sub(1, 8) == 'namelink' then
+                script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.Chat.LinkEventHandler.OnNameLClick\nthis.OnItemRButtonDown=MY.Chat.LinkEventHandler.OnNameRClick'
+            elseif name == 'copy' or name == 'copylink' then
+                script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end'
+            else
+                script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.LinkEventHandler.OnItemLClick(this) end\nthis.OnItemRButtonDown=MY.Chat.LinkEventHandler.OnItemRClick'
+            end
+            
+            if #script > 0 then
+                xml[1][''].script = script
+            end
+            html = MY.Xml.Encode(xml)
+            
+            return html
+        end)
+        argv = szMsg
+    elseif type(argv) == 'table' and type(argv.GetName) == 'function' then
+        if argv.bMyChatRendered then
+            return
+        end
+        local link = MY.UI(argv)
+        local name = link:name()
+        if name:sub(1, 8) == 'namelink' then
+            link:click(MY.Chat.LinkEventHandler.OnNameLClick, MY.Chat.LinkEventHandler.OnNameRClick)
+        elseif name == 'copy' or name == 'copylink' then
+            link:click(MY.Chat.LinkEventHandler.OnCopyLClick, MY.Chat.LinkEventHandler.OnCopyRClick)
+        else
+            link:click(MY.Chat.LinkEventHandler.OnItemLClick, MY.Chat.LinkEventHandler.OnItemRClick)
+        end
+        argv.bMyChatRendered = true
+    end
+    
+    return argv
+end
+
 -- 复制Item到输入框
 MY.Chat.CopyChatItem = function(p)
     local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
