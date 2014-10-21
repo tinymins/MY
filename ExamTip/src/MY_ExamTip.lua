@@ -78,16 +78,16 @@ MY_ExamTip.ShowResult = function(szQues, szAnsw, szTip)
     
     if hTxt1:GetText() == szAnsw then
         hTxt1:SetFontColor(255, 255, 0)
-        -- hChk1:Check(true)
+        hChk1:Check(true)
     elseif hTxt2:GetText() == szAnsw then
         hTxt2:SetFontColor(255, 255, 0)
-        -- hChk2:Check(true)
+        hChk2:Check(true)
     elseif hTxt3:GetText() == szAnsw then
         hTxt3:SetFontColor(255, 255, 0)
-        -- hChk3:Check(true)
+        hChk3:Check(true)
     elseif hTxt4:GetText() == szAnsw then
         hTxt4:SetFontColor(255, 255, 0)
-        -- hChk4:Check(true)
+        hChk4:Check(true)
     end
 end
 -- 收集结果
