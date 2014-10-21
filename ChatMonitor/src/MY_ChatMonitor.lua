@@ -41,7 +41,7 @@ _MY_ChatMonitor.szLuaData = 'config/MY_CHATMONITOR'
 
 -- 插入聊天内容时监控聊天信息
 _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
-	-- filter
+    -- filter
     if MY_ChatMonitor.bCapture and MY_ChatMonitor.szKeyWords and MY_ChatMonitor.szKeyWords~='' then
         local tCapture = {
             szText = '',    -- 计算当前消息的纯文字内容 用于匹配
@@ -130,11 +130,14 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
             -- 开始组装一条记录 tCapture
             local t =TimeToDate(GetCurrentTime())
             tCapture.szTime = GetFormatText(string.format("[%02d:%02d.%02d]", t.hour, t.minute, t.second), 10, r, g, b, 515, "this.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end", "timelink")
-            -- binding event change
-            tCapture.szMsg = string.gsub(tCapture.szMsg, 'eventid=%d+', 'eventid=371')
             -- save animiate group into name
             tCapture.szMsg = string.gsub(tCapture.szMsg, "group=(%d+) </a", "group=%1 name=\"%1\" </a")	
-            
+            -- render link event
+            tCapture.szMsg = MY.Chat.RenderLink(tCapture.szMsg)
+            -- render player name color
+            if MY_Farbnamen and MY_Farbnamen.Render then
+                tCapture.szMsg = MY_Farbnamen.Render(tCapture.szMsg)
+            end
             -- 发出提示音
             if MY_ChatMonitor.bPlaySound then MY.Sys.PlaySound(MY.GetAddonInfo().szRoot.."ChatMonitor\\audio\\MsgArrive.wav", "MsgArrive.wav") end
             
@@ -142,50 +145,12 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
             if MY_ChatMonitor.bRedirectSysChannel and not ( r==255 and g==255 and b==0 ) then
                 OutputMessage("MSG_SYS", GetFormatText("",nil, 255,255,0)..szMsg, true)
             end
-            
             -- 更新UI
             if _MY_ChatMonitor.uiBoard then
                 _MY_ChatMonitor.uiBoard:append(tCapture.szTime..tCapture.szMsg)
-                _MY_ChatMonitor.uiBoard:find('#^.*link'):del('#^namelink_'):click(function(nFlag) 
-                    if nFlag==1 then
-                        if IsCtrlKeyDown() then
-                            MY.Chat.CopyChatItem(this)
-                        else
-                            OnItemLinkDown(this)
-                        end
-                    end
-                end)
-                _MY_ChatMonitor.uiBoard:find('#^namelink_'):click(function(nFlag) 
-                    local szName = this:GetText()
-                    if nFlag==-1 then
-                        PopupMenu((function()
-                            local t = {}
-                            table.insert(t, {
-                                szOption = _L['copy'],
-                                fnAction = function()
-                                    MY.Talk(GetClientPlayer().szName, szName)
-                                end,
-                            })
-                            -- table.insert(t, {
-                            --     szOption = _L['whisper'],
-                            --     fnAction = function()
-                            --         MY.SwitchChat(szName)
-                            --     end,
-                            -- })
-                            InsertPlayerCommonMenu(t, 0, string.gsub(szName, '[%[%]]', ''))
-                            InsertInviteTeamMenu(t, string.gsub(szName, '[%[%]]', ''))
-                            return t
-                        end)())
-                    elseif nFlag==1 then
-                        if IsCtrlKeyDown() then
-                            MY.Chat.CopyChatItem(this)
-                        else
-                            MY.SwitchChat(szName)
-                            local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
-                            if edit then Station.SetFocusWindow(edit) end
-                        end
-                    end
-                end)
+                -- _MY_ChatMonitor.uiBoard:find('#^.*link'):each(function()
+                --     MY.Chat.RenderLink(this)
+                -- end)
             end
             -- 更新缓存数组 哈希表
             _MY_ChatMonitor.tCapture[tCapture.szHash] = true
