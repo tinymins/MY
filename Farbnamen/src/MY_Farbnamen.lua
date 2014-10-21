@@ -82,20 +82,42 @@ end)
 MY_Farbnamen.Render = function(szMsg)
     if type(szMsg) == 'string' then
         -- <text>text="[就是个阵眼]" font=10 r=255 g=255 b=255  name="namelink_4662931" eventid=515</text><text>text="说：" font=10 r=255 g=255 b=255 </text><text>text="[茗伊]" font=10 r=255 g=255 b=255  name="namelink_4662931" eventid=771</text><text>text="\n" font=10 r=255 g=255 b=255 </text>
-        szMsg = string.gsub( szMsg, '<text>([^<]-)text="([^<]-)"([^<]-name="namelink_%d-"[^<]-)</text>', function (szExtra1, szName, szExtra2)
-            szName = string.gsub(szName, '[%[%]]', '')
-            local tInfo = MY_Farbnamen.GetAusName(szName)
-            if tInfo then
-                szExtra1 = string.gsub(szExtra1, '[rgb]=%d+', '')
-                szExtra2 = string.gsub(szExtra2, '[rgb]=%d+', '')
-                szExtra1 = string.gsub(szExtra1, 'eventid=%d+', '')
-                szExtra2 = string.gsub(szExtra2, 'eventid=%d+', '')
-                return string.format(
-                    '<text>%stext="[%s]"%s eventid=771 script="this.OnItemMouseEnter=function() MY_Farbnamen.ShowTip(this) end\nthis.OnItemMouseLeave=function() HideTip() end" r=%d g=%d b=%d</text>',
-                    szExtra1, szName, szExtra2, tInfo.rgb[1], tInfo.rgb[2], tInfo.rgb[3]
-                )
+        local xml = MY.Xml.Decode(szMsg)
+        if xml then
+            for _, ele in ipairs(xml) do
+                if ele[''].name and ele[''].name:sub(1, 9) == 'namelink_' then
+                    local szName = string.gsub(ele[''].text, '[%[%]]', '')
+                    local tInfo = MY_Farbnamen.GetAusName(szName)
+                    if tInfo then
+                        ele[''].r = tInfo.rgb[1]
+                        ele[''].g = tInfo.rgb[2]
+                        ele[''].b = tInfo.rgb[3]
+                        ele[''].eventid = 883
+                        if ele[''].script then
+                            ele[''].script = ele[''].script .. '\n'
+                        else
+                            ele[''].script = ''
+                        end
+                        ele[''].script = ele[''].script .. 'this.OnItemMouseEnter=function() MY_Farbnamen.ShowTip(this) end\nthis.OnItemMouseLeave=function() HideTip() end'
+                    end
+                end
             end
-        end)
+            szMsg = MY.Xml.Encode(xml)
+        end
+        -- szMsg = string.gsub( szMsg, '<text>([^<]-)text="([^<]-)"([^<]-name="namelink_%d-"[^<]-)</text>', function (szExtra1, szName, szExtra2)
+        --     szName = string.gsub(szName, '[%[%]]', '')
+        --     local tInfo = MY_Farbnamen.GetAusName(szName)
+        --     if tInfo then
+        --         szExtra1 = string.gsub(szExtra1, '[rgb]=%d+', '')
+        --         szExtra2 = string.gsub(szExtra2, '[rgb]=%d+', '')
+        --         szExtra1 = string.gsub(szExtra1, 'eventid=%d+', '')
+        --         szExtra2 = string.gsub(szExtra2, 'eventid=%d+', '')
+        --         return string.format(
+        --             '<text>%stext="[%s]"%s eventid=883 script="this.OnItemMouseEnter=function() MY_Farbnamen.ShowTip(this) end\nthis.OnItemMouseLeave=function() HideTip() end" r=%d g=%d b=%d</text>',
+        --             szExtra1, szName, szExtra2, tInfo.rgb[1], tInfo.rgb[2], tInfo.rgb[3]
+        --         )
+        --     end
+        -- end)
     elseif type(szMsg) == 'table' and type(szMsg.GetName) == 'function' and szMsg:GetName():sub(1, 8) == 'namelink' then
         local namelink = szMsg
         local szName = string.gsub(namelink:GetText(), '[%[%]]', '')
