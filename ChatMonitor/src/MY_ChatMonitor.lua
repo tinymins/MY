@@ -314,7 +314,7 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
     end)
     _MY_ChatMonitor.uiBoard = ui:append('WndScrollBox_TalkList','WndScrollBox'):children('#WndScrollBox_TalkList'):handleStyle(3):pos(20,50):size(w-41,405)
     for i = 1, #_tRecords, 1 do
-        _MY_ChatMonitor.uiBoard:append( _tRecords[i].szTime .. _tRecords[i].szMsg )
+        _MY_ChatMonitor.uiBoard:append( _tRecords[i].html )
     end
     _MY_ChatMonitor.ui = MY.UI(wnd)
     _MY_ChatMonitor.Init()
