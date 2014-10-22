@@ -305,9 +305,6 @@ MY.Chat.CopyChatItem = function(p)
         elseif szName == "iteminfolink" then
             edit:InsertObj(szText, { type = "iteminfo", text = szText, version = p.nVersion, tabtype = p.dwTabType, index = p.dwIndex })
         elseif string.sub(szName, 1, 8) == "namelink" then
-            if bBegin == nil then
-                bBegin = false
-            end
             edit:InsertObj(szText, { type = "name", text = szText, name = string.match(szText, "%[(.*)%]") })
         elseif szName == "questlink" then
             edit:InsertObj(szText, { type = "quest", text = szText, questid = p:GetUserData() })
@@ -351,41 +348,41 @@ MY.Chat.FormatContent = function(szMsg)
                 local p = string.match(v, 'path="(.-)"')
                 local emo = MY.Chat.GetEmotion(p, n, 'image')
                 if emo then
-                    table.insert(t2, {emo.szCmd, {type = "emotion", text = emo.szCmd, id = emo.dwID}})
+                    table.insert(t2, {type = "emotion", text = emo.szCmd, innerText = emo.szCmd, id = emo.dwID})
                 end
             elseif string.find(v, "group=") then
                 local n = string.match(v, "group=(%d+)")
                 local p = string.match(v, 'path="(.-)"')
                 local emo = MY.Chat.GetEmotion(p, n, 'animate')
                 if emo then
-                    table.insert(t2, {emo.szCmd, {type = "emotion", text = emo.szCmd, id = emo.dwID}})
+                    table.insert(t2, {type = "emotion", text = emo.szCmd, innerText = emo.szCmd, id = emo.dwID})
                 end
             else
                 --普通文字
                 local s = string.match(v, "\"(.*)\"")
-                table.insert(t2, {s, {type= "text", text = s}})
+                table.insert(t2, {type= "text", text = s, innerText = s})
             end
         else
             --物品链接
             if string.find(v, "name=\"itemlink\"") then
                 local name, userdata = string.match(v,"%[(.-)%].-userdata=(%d+)")
-                table.insert(t2, {"["..name.."]", {type = "item", text = name, item = userdata}})
+                table.insert(t2, {type = "item", text = "["..name.."]", innerText = name, item = userdata})
             --物品信息
             elseif string.find(v, "name=\"iteminfolink\"") then
                 local name, version, tab, index = string.match(v,"%[(.-)%].-script=\"this.nVersion=(%d+)\\%s*this.dwTabType=(%d+)\\%s*this.dwIndex=(%d+)")
-                table.insert(t2, {"["..name.."]", {type = "iteminfo", text = name, version = version, tabtype = tab, index = index}})
+                table.insert(t2, {type = "iteminfo", text = "["..name.."]", innerText = name, version = version, tabtype = tab, index = index})
             --姓名
             elseif string.find(v, "name=\"namelink_%d+\"") then
                 local name = string.match(v,"%[(.-)%]")
-                table.insert(t2, {"["..name.."]", {type = "name", text = "["..name.."]", name = name}})
+                table.insert(t2, {type = "name", text = "["..name.."]", innerText = "["..name.."]", name = name})
             --任务
             elseif string.find(v, "name=\"questlink\"") then
                 local name, userdata = string.match(v,"%[(.-)%].-userdata=(%d+)")
-                table.insert(t2, {"["..name.."]", {type = "quest", text = name, questid = userdata}})
+                table.insert(t2, {type = "quest", text = "["..name.."]", innerText = name, questid = userdata})
             --生活技艺
             elseif string.find(v, "name=\"recipelink\"") then
                 local name, craft, recipe = string.match(v,"%[(.-)%].-script=\"this.dwCraftID=(%d+)\\%s*this.dwRecipeID=(%d+)")
-                table.insert(t2, {"["..name.."]", {type = "recipe", text = name, craftid = craft, recipeid = recipe}})
+                table.insert(t2, {type = "recipe", text = "["..name.."]", innerText = name, craftid = craft, recipeid = recipe})
             --技能
             elseif string.find(v, "name=\"skilllink\"") then
                 local name, skillinfo = string.match(v,"%[(.-)%].-script=\"this.skillKey=%{(.-)%}")
@@ -394,31 +391,33 @@ MY.Chat.FormatContent = function(szMsg)
                     local k, v  = string.match(w, "(.-)=(%w+)")
                     skillKey[k] = v
                 end
-                table.insert(t2, {"["..name.."]", skillKey})
+                skillKey.text = "["..name.."]"
+                skillKey.innerText = "["..name.."]"
+                table.insert(t2, skillKey)
             --称号
             elseif string.find(v, "name=\"designationlink\"") then
                 local name, id, fix = string.match(v,"%[(.-)%].-script=\"this.dwID=(%d+)\\%s*this.bPrefix=(.-)")
-                table.insert(t2, {"["..name.."]", {type = "designation", text = name, id = id, prefix = fix}})
+                table.insert(t2, {type = "designation", text = "["..name.."]", innerText = name, id = id, prefix = fix})
             --技能秘籍
             elseif string.find(v, "name=\"skillrecipelink\"") then
                 local name, id, level = string.match(v,"%[(.-)%].-script=\"this.dwID=(%d+)\\%s*this.dwLevel=(%d+)")
-                table.insert(t2, {"["..name.."]", {type = "skillrecipe", text = name, id = id, level = level}})
+                table.insert(t2, {type = "skillrecipe", text = "["..name.."]", innerText = name, id = id, level = level})
             --书籍
             elseif string.find(v, "name=\"booklink\"") then
                 local name, version, tab, index, id = string.match(v,"%[(.-)%].-script=\"this.nVersion=(%d+)\\%s*this.dwTabType=(%d+)\\%s*this.dwIndex=(%d+)\\%s*this.nBookRecipeID=(%d+)")
-                table.insert(t2, {"["..name.."]", {type = "book", text = name, version = version, tabtype = tab, index = index, bookinfo = id}})
+                table.insert(t2, {type = "book", text = "["..name.."]", innerText = name, version = version, tabtype = tab, index = index, bookinfo = id})
             --成就
             elseif string.find(v, "name=\"achievementlink\"") then
                 local name, id = string.match(v,"%[(.-)%].-script=\"this.dwID=(%d+)")
-                table.insert(t2, {"["..name.."]", {type = "achievement", text = name, id = id}})
+                table.insert(t2, {type = "achievement", text = "["..name.."]", innerText = name, id = id})
             --强化
             elseif string.find(v, "name=\"enchantlink\"") then
                 local name, pro, craft, recipe = string.match(v,"%[(.-)%].-script=\"this.dwProID=(%d+)\\%s*this.dwCraftID=(%d+)\\%s*this.dwRecipeID=(%d+)")
-                table.insert(t2, {"["..name.."]", {type = "enchant", text = name, proid = pro, craftid = craft, recipeid = recipe}})
+                table.insert(t2, {type = "enchant", text = "["..name.."]", innerText = name, proid = pro, craftid = craft, recipeid = recipe})
             --事件
             elseif string.find(v, "name=\"eventlink\"") then
                 local name, na, info = string.match(v,"%[(.-)%].-script=\"this.szName=\"(.-)\"\\%s*this.szLinkInfo=\"(.-)\"")
-                table.insert(t2, {"["..name.."]", {type = "eventlink", text = name, name = na, linkinfo = info or ""}})
+                table.insert(t2, {type = "eventlink", text = "["..name.."]", innerText = name, name = na, linkinfo = info or ""})
             end
         end
     end
