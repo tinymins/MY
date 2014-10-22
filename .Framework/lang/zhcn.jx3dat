@@ -82,6 +82,7 @@ data = {
     ['copy'] = '复制',
     ['paste'] = '粘贴',
     ['whisper'] = '密聊',
+    ['show equipment'] = '查看装备',
     
     ['set hotkey'] = '设置快捷键',
     ['>> set hotkey <<'] = '>> 设置快捷键 <<',
