@@ -202,6 +202,7 @@ _MY_RollMonitor.RedrawBoard = function()
         local szHTML = ''
         for _, aRecord in ipairs(MY_RollMonitor.GetResult()) do
             szHTML = szHTML ..
+                MY.Chat.GetCopyLinkText() ..
                 GetFormatText('['..aRecord.szName..']', nil, nil, nil, nil, 515, nil, 'namelink_0') ..
                 GetFormatText(_L( ' rolls for %d times, valid score is %s.', aRecord.nCount, (string.gsub(aRecord.nRoll,'(%d+%.%d%d)%d+','%1')) ) .. '\n')
         end
@@ -220,9 +221,12 @@ _MY_RollMonitor.RedrawBoard = function()
                 end
             end
             if szUnrolledNames~='' then
-                szHTML = szHTML .. szUnrolledNames .. GetFormatText(_L["haven't roll yet."])
+                szHTML = szHTML ..
+                MY.Chat.GetCopyLinkText() ..
+                szUnrolledNames .. GetFormatText(_L["haven't roll yet."])
             end
         end
+        szHTML = MY.Chat.RenderLink(szHTML)
         if MY_Farbnamen and MY_Farbnamen.Render then
             szHTML = MY_Farbnamen.Render(szHTML)
         end
