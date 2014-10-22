@@ -70,6 +70,25 @@ MY.Chat.GetEmotion = function(arg0, arg1, arg2)
     return clone(t)
 end
 
+-- 获取复制聊天行Text
+MY.Chat.GetCopyLinkText = function(szText, rgbf)
+    szText = szText or _L[' * ']
+    rgbf   = rgbf   or { f = 10 }
+    
+    return GetFormatText(szText, rgbf.f, rgbf.r, rgbf.g, rgbf.b, 515,
+        "this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end",
+        "copylink")
+end
+
+-- 获取复制聊天行Text
+MY.Chat.GetTimeLinkText = function(rgbf)
+    rgbf = rgbf or { f = 10 }
+    
+    return GetFormatText(string.format("[%02d:%02d.%02d]", t.hour, t.minute, t.second), rgbf.f, rgbf.r, rgbf.g, rgbf.b, 515,
+        "this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end",
+        "timelink")
+end
+
 -- 复制聊天行
 MY.Chat.CopyChatLine = function(hTime)
     local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
@@ -185,6 +204,20 @@ MY.Chat.LinkEventHandler = {
                 end,
             })
             pcall(InsertInviteTeamMenu, t, szName)
+            if MY_Farbnamen then
+                local tInfo = MY_Farbnamen.GetAusName(szName)
+                if tInfo then
+                    local dwID = tonumber(tInfo.dwID)
+                    table.insert(t, {
+                        szOption = _L['show equipment'],
+                        fnAction = function()
+                            Output('ViewInviteToPlayer' , dwID)
+                            ViewInviteToPlayer(dwID)
+                            Output('ViewInviteToPlayer' , dwID)
+                        end,
+                    })
+                end
+            end
             return t
         end)())
     end,
@@ -225,7 +258,7 @@ MY.Chat.RenderLink = function(argv)
             
             if name:sub(1, 8) == 'namelink' then
                 script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.Chat.LinkEventHandler.OnNameLClick\nthis.OnItemRButtonDown=MY.Chat.LinkEventHandler.OnNameRClick'
-            elseif name == 'copy' or name == 'copylink' then
+            elseif name == 'copy' or name == 'copylink' or name == 'timelink' then
                 script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end'
             else
                 script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.LinkEventHandler.OnItemLClick(this) end\nthis.OnItemRButtonDown=MY.Chat.LinkEventHandler.OnItemRClick'
