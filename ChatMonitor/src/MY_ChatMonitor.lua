@@ -57,7 +57,7 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
             -- 格式化消息
             local tMsgContent = MY.Chat.FormatContent(szMsg)
             -- 检测消息是否是插件产生的
-            if tMsgContent[1][2].type=="text" and tMsgContent[1][1]=="" then return end
+            if tMsgContent[1].type=="text" and tMsgContent[1].text=="" then return end
             -- 拼接消息
             for i, v in ipairs(tMsgContent) do
                 -- 如果不是系统信息且第一个是名字 类似“[阵营][浩气盟][茗伊]说：” 则舍弃头部标签

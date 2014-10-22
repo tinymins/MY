@@ -440,8 +440,8 @@ MY.HookChatPanel("MY_Chat", function(h, szMsg)
         local t = MY.Chat.FormatContent(szMsg)
         local szText = ""
         for k, v in ipairs(t) do
-            if v[2].type == "text" then
-                szText = szText .. v[1]
+            if v.type == "text" then
+                szText = szText .. v.text
             end
         end
         for _,szWord in ipairs(MY_Chat.tBlockWords) do
