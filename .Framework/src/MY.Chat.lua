@@ -84,6 +84,7 @@ end
 MY.Chat.GetTimeLinkText = function(rgbf)
     rgbf = rgbf or { f = 10 }
     
+    local t =TimeToDate(GetCurrentTime())
     return GetFormatText(string.format("[%02d:%02d.%02d]", t.hour, t.minute, t.second), rgbf.f, rgbf.r, rgbf.g, rgbf.b, 515,
         "this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end",
         "timelink")
@@ -194,7 +195,7 @@ MY.Chat.LinkEventHandler = {
             table.insert(t, {
                 szOption = _L['copy'],
                 fnAction = function()
-                    MY.Talk(GetClientPlayer().szName, szName)
+                    MY.Talk(GetClientPlayer().szName, '[' .. szName .. ']')
                 end,
             })
             table.insert(t, {
@@ -208,14 +209,14 @@ MY.Chat.LinkEventHandler = {
                 local tInfo = MY_Farbnamen.GetAusName(szName)
                 if tInfo then
                     local dwID = tonumber(tInfo.dwID)
-                    table.insert(t, {
-                        szOption = _L['show equipment'],
-                        fnAction = function()
-                            Output('ViewInviteToPlayer' , dwID)
-                            ViewInviteToPlayer(dwID)
-                            Output('ViewInviteToPlayer' , dwID)
-                        end,
-                    })
+                    if GetClientPlayer().dwID ~= dwID then
+                        table.insert(t, {
+                            szOption = _L['show equipment'],
+                            fnAction = function()
+                                ViewInviteToPlayer(dwID)
+                            end,
+                        })
+                    end
                 end
             end
             return t
