@@ -144,7 +144,7 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
             end
             
             -- 开始组装一条记录 rec
-            rec.html = MY.Chat.GetTimeLinkText() .. rec.html
+            rec.html = MY.Chat.GetTimeLinkText({r=r, g=g, b=b, f=nFont}) .. rec.html
             -- save animiate group into name
             rec.html = string.gsub(rec.html, "group=(%d+) </a", "group=%1 name=\"%1\" </a")	
             -- render link event
