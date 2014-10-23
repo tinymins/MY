@@ -763,11 +763,15 @@ function _MY.UI:append(szName, szType, tArg)
                         local edt = wnd:Lookup("WndEdit_Default")
                         edt.OnSetFocus = function()
                             wnd:Lookup("", "Text_PlaceHolder"):Hide()
-                            -- MY.UI(wnd):autocomplete('search')
+                            -- check disabled
+                            if wnd.tMyAcOption.disabled or wnd.tMyAcOption.disabledTmp then
+                                return
+                            end
+                            MY.UI(wnd):autocomplete('search')
                         end
                         edt.OnEditChanged = function()
                             -- disabled
-                            if wnd.tMyAcOption.disabled or Station.GetFocusWindow() ~= this then
+                            if wnd.tMyAcOption.disabled or wnd.tMyAcOption.disabledTmp or Station.GetFocusWindow() ~= this then
                                 return
                             end
                             -- placeholder
@@ -1106,10 +1110,9 @@ function _MY.UI:autocomplete(method, arg1, arg2)
                         local t = {
                             szOption = szOption,
                             fnAction = function()
-                                local disabled = option.disabled
-                                option.disabled = true
+                                option.disabledTmp = true
                                 MY.UI(ele.raw):text(szOption)
-                                option.disabled = disabled
+                                option.disabledTmp = nil
                                 Wnd.CloseWindow('PopupMenuPanel')
                             end,
                         }
@@ -1155,7 +1158,9 @@ function _MY.UI:autocomplete(method, arg1, arg2)
                     end
                     -- popup menu
                     if #menu > 0 then
+                        option.disabledTmp = true
                         PopupMenu(menu)
+                        option.disabledTmp = nil
                     else
                         Wnd.CloseWindow('PopupMenuPanel')
                     end
