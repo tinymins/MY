@@ -9,6 +9,7 @@ data = {
     ['show message preview box'] = '新消息彈窗',
     ['play new message alert sound'] = '播放提示音',
     ['output to system channel'] = '輸出聊天欄',
+    ['ignore same message'] = '不顯示重複',
     ['welcome to use mingyi chat monitor.'] = '歡迎使用茗伊聊天監控。',
     ['key words:'] = '關鍵字：',
     ['Are you sure you want to turn on regex mode?\nRegex is something advanced, make sure you know what you are doing.'] = '你確定要開啓正則表達式模式嗎？\n正則表達式是一種高級匹配規則，如果您不知道這是什麽，請點擊取消。\n更多關于正則表達式請上網搜索『Lua正則表達式』。',
