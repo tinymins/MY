@@ -799,7 +799,7 @@ function _MY.UI:append(szName, szType, tArg)
                             beforeSearch = nil  , -- @param: wnd, option
                             beforePopup  = nil  , -- @param: menu, wnd, option
                             beforeDelete = nil  , -- @param: szOption, fnDoDelete, option
-                            afterDelete  = nil  , -- @param: 
+                            afterDelete  = nil  , -- @param: szOption, option
                             
                             ignoreCase   = true ,  -- ignore case while matching
                             anyMatch     = true ,  -- match any part of option list
