@@ -15,6 +15,7 @@ MY_ChatMonitor.bShowPreview = true
 MY_ChatMonitor.bPlaySound = true
 MY_ChatMonitor.bRedirectSysChannel = false
 MY_ChatMonitor.bCapture = false
+MY_ChatMonitor.bIgnoreSame = true
 MY_ChatMonitor.tChannels = { ["MSG_NORMAL"] = true, ["MSG_CAMP"] = true, ["MSG_WORLD"] = true, ["MSG_MAP"] = true, ["MSG_SCHOOL"] = true, ["MSG_GUILD"] = true, ["MSG_FRIEND"] = true }
 MY_ChatMonitor.anchor = {
     x = -100,
@@ -31,6 +32,7 @@ RegisterCustomData('MY_ChatMonitor.tChannels')
 RegisterCustomData('MY_ChatMonitor.bPlaySound')
 RegisterCustomData('MY_ChatMonitor.bRedirectSysChannel')
 RegisterCustomData('MY_ChatMonitor.anchor')
+RegisterCustomData('MY_ChatMonitor.bIgnoreSame')
 local _tRecords = {}
 local _MY_ChatMonitor = { }
 _MY_ChatMonitor.bInited = false
@@ -123,21 +125,30 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
         end
         --------------------------------------------------------------------------------------------
         -- 如果符合要求  -- 验证消息哈希 如果存在则跳过该消息
-        if bCatch and (not _tRecords[rec.hash]) then
+        if bCatch and (not (_tRecords[rec.hash] and MY_ChatMonitor.bIgnoreSame)) then
             -- 验证记录是否超过限制条数
             if #_tRecords >= MY_ChatMonitor.nMaxRecord then 
                 -- 处理记录列表
-                _tRecords[_tRecords[1].szHash] = nil
+                _tRecords[_tRecords[1].hash] = _tRecords[_tRecords[1].hash] - 1
+                if _tRecords[_tRecords[1].hash] <= 0 then
+                    _tRecords[_tRecords[1].hash] = nil
+                end
                 table.remove(_tRecords, 1)
                 -- 处理UI
-                local bEnd = false
                 if _MY_ChatMonitor.uiBoard then
-                    _MY_ChatMonitor.uiBoard:hdl(1):children():each(function()
-                        if not bEnd then
-                            if this:GetType()=="Text" and StringFindW(this:GetText(), "\n") then
-                                bEnd = true
+                    local nCopyLinkCount = 0
+                    _MY_ChatMonitor.uiBoard:hdl(1):children():each(function(ui)
+                        if nCopyLinkCount <= 1 then
+                            local name = ui:name()
+                            if this:GetType() == "Text" and
+                            (name == 'timelink' or
+                             name == 'copylink' or
+                             name == 'copy') then
+                                nCopyLinkCount = nCopyLinkCount + 1
                             end
-                            this:GetParent():RemoveItem(this:GetIndex())
+                        end
+                        if nCopyLinkCount <= 1 then
+                            ui:remove()
                         end
                     end)
                 end
@@ -173,7 +184,7 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
             end
             
             -- 更新缓存数组 哈希表
-            _tRecords[rec.hash] = true
+            _tRecords[rec.hash] = (_tRecords[rec.hash] or 0) + 1
             table.insert(_tRecords, rec)
         end
     end
@@ -277,6 +288,14 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
                 end,
                 bCheck = true,
                 bChecked = MY_ChatMonitor.bRedirectSysChannel
+            })
+            table.insert(t,{
+                szOption = _L['ignore same message'],
+                fnAction = function()
+                    MY_ChatMonitor.bIgnoreSame = not MY_ChatMonitor.bIgnoreSame
+                end,
+                bCheck = true,
+                bChecked = MY_ChatMonitor.bIgnoreSame
             })
             table.insert(t, { bDevide = true })
             table.insert(t,{
