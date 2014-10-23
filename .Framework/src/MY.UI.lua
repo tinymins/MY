@@ -386,8 +386,11 @@ function _MY.UI:children(filter)
     if type(filter)=="string" and string.sub(filter, 1, 1)=="#" then
         filter = string.sub(filter, 2)
         for _, ele in pairs(self.eles) do
-            table.insert(child, ele.raw:Lookup(filter))
-            childHash[table.concat({ table.concat({ ele.raw:Lookup(filter):GetTreePath() }), filter })] = true
+            local c = ele.raw:Lookup(filter)
+            if c then
+                table.insert(child, c)
+                childHash[table.concat({ table.concat({ c:GetTreePath() }), filter })] = true
+            end
         end
         local eles = {}
         for _, raw in ipairs(child) do
@@ -763,14 +766,28 @@ function _MY.UI:append(szName, szType, tArg)
                             -- MY.UI(wnd):autocomplete('search')
                         end
                         edt.OnEditChanged = function()
+                            -- disabled
+                            if wnd.tMyAcOption.disabled then
+                                return
+                            end
+                            -- placeholder
                             local len = this:GetText():len()
                             if len == 0 then
                                 wnd:Lookup("", "Text_PlaceHolder"):Show()
                             else
                                 wnd:Lookup("", "Text_PlaceHolder"):Hide()
                             end
-                            MY.UI(wnd):autocomplete('search')
-                            Station.SetFocusWindow(edt)
+                            -- min search length
+                            if len >= wnd.tMyAcOption.minLength then
+                                -- delay search
+                                MY.DelayCall(wnd.tMyAcOption.delay, function()
+                                    MY.UI(wnd):autocomplete('search')
+                                    -- for compatible
+                                    Station.SetFocusWindow(edt)
+                                end)
+                            else
+                                MY.UI(wnd):autocomplete('close')
+                            end
                         end
                         edt.OnKillFocus = function()
                             if edt:GetText() == "" then
@@ -779,11 +796,17 @@ function _MY.UI:append(szName, szType, tArg)
                             -- Wnd.CloseWindow("PopupMenuPanel")
                         end
                         wnd.tMyAcOption = {
-                            autoFill = false,
-                            delay = 0,
-                            disabled = false,
-                            minLength = 0,
-                            source = {},
+                            beforeSearch = nil, -- @param: wnd, option
+                            beforePopup  = nil, -- @param: menu, wnd, option
+                            beforeDelete = nil, -- @param: szOption, fnDoDelete, option
+                            afterDelete  = nil, -- @param: 
+                            
+                            anyMatch  = true ,  -- match any part of option list
+                            autoFill  = false,  -- auto fill edit with first match (conflict withanyMatch)
+                            delay     = 0    ,  -- delay time when edit changed
+                            disabled  = false,  -- disable autocomplete
+                            minLength = 0    ,  -- the min length of the searching string
+                            source    = {}   ,  -- option list
                         }
                     end
                 end
@@ -1024,7 +1047,7 @@ function _MY.UI:autocomplete(method, arg1, arg2)
         if method == 'option' then
             if type(arg1) == 'string' then
                 arg1 = {
-                    ['arg1'] = arg2
+                    [arg1] = arg2
                 }
             end
             if type(arg1) == 'table' then
@@ -1050,10 +1073,17 @@ function _MY.UI:autocomplete(method, arg1, arg2)
         elseif method == 'search' then
             for _, ele in pairs(self.eles) do
                 if ele.raw.tMyAcOption then
+                    local option = ele.raw.tMyAcOption
+                    if type(option.beforeSearch) == 'function' then
+                        option.beforeSearch(ele.raw, option)
+                    end
                     local keyword = MY.String.PatternEscape(ele.raw:Lookup("WndEdit_Default"):GetText())
+                    if not option.anyMatch then
+                        keyword = '^' .. keyword
+                    end
                     local tOption = {}
                     -- get matched list
-                    for _, src in ipairs(ele.raw.tMyAcOption.source) do
+                    for _, src in ipairs(option.source) do
                         if string.find(src, keyword) then
                             table.insert(tOption, src)
                         end
@@ -1065,21 +1095,36 @@ function _MY.UI:autocomplete(method, arg1, arg2)
                             local t = {
                                 szOption = szOption,
                                 fnAction = function()
+                                    local disabled = option.disabled
+                                    option.disabled = true
                                     MY.UI(ele.raw):text(szOption)
+                                    option.disabled = disabled
+                                    Wnd.CloseWindow('PopupMenuPanel')
                                 end,
                             }
-                            if ele.raw.tMyAcOption.ondelete then
+                            if option.beforeDelete or option.afterDelete then
                                 t.szIcon = 'UI/Image/Button/CommonButton_1.UITex'
                                 t.nFrame = 26
                                 t.nMouseOverFrame = 41
                                 t.szLayer = "ICON_RIGHT"
                                 t.fnClickIcon = function()
-                                    for i=#ele.raw.tMyAcOption.source, 1, -1 do
-                                        if ele.raw.tMyAcOption.source[i] == szOption then
-                                            table.remove(ele.raw.tMyAcOption.source, i)
+                                    local bSure = true
+                                    local fnDoDelete = function()
+                                        for i=#option.source, 1, -1 do
+                                            if option.source[i] == szOption then
+                                                table.remove(option.source, i)
+                                            end
                                         end
                                     end
-                                    ele.raw.tMyAcOption.ondelete(szOption)
+                                    if option.beforeDelete then
+                                        bSure = option.beforeDelete(szOption, fnDoDelete, option)
+                                    end
+                                    if bSure then
+                                        fnDoDelete()
+                                    end
+                                    if option.afterDelete then
+                                        option.afterDelete(szOption, option)
+                                    end
                                 end
                             end
                             table.insert(menu, t)
@@ -1092,6 +1137,9 @@ function _MY.UI:autocomplete(method, arg1, arg2)
                         menu.bDisableSound = true
                         menu.bShowKillFocus = true
                         
+                        if type(option.beforePopup) == 'function' then
+                            option.beforePopup(menu, ele.raw, option)
+                        end
                         PopupMenu(menu)
                     else
                         Wnd.CloseWindow('PopupMenuPanel')
