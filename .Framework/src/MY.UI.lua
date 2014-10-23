@@ -1868,19 +1868,19 @@ function _MY.UI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
         end
         for _, ele in pairs(self.eles) do
             if type(fnLClick)=="function" then
-                if ele.wnd then MY.UI.RegisterUIEvent(ele.wnd ,'OnLButtonClick' , function() fnLClick(MY.Const.Event.Mouse.LBUTTON) end) end
-                if ele.itm then MY.UI.RegisterUIEvent(ele.itm ,'OnItemLButtonClick' , function() fnLClick(MY.Const.Event.Mouse.LBUTTON) end) end
-                if ele.hdl then MY.UI.RegisterUIEvent(ele.hdl ,'OnItemLButtonClick' , function() fnLClick(MY.Const.Event.Mouse.LBUTTON) end) end
-                if ele.cmb then MY.UI.RegisterUIEvent(ele.cmb ,'OnLButtonClick' , function() fnLClick(MY.Const.Event.Mouse.LBUTTON) end) end
+                if ele.wnd then MY.UI.RegisterUIEvent(ele.wnd ,'OnLButtonClick'     , function() fnLClick(MY.Const.Event.Mouse.LBUTTON, ele.raw) end) end
+                if ele.itm then MY.UI.RegisterUIEvent(ele.itm ,'OnItemLButtonClick' , function() fnLClick(MY.Const.Event.Mouse.LBUTTON, ele.raw) end) end
+                if ele.hdl then MY.UI.RegisterUIEvent(ele.hdl ,'OnItemLButtonClick' , function() fnLClick(MY.Const.Event.Mouse.LBUTTON, ele.raw) end) end
+                if ele.cmb then MY.UI.RegisterUIEvent(ele.cmb ,'OnLButtonClick'     , function() fnLClick(MY.Const.Event.Mouse.LBUTTON, ele.raw) end) end
             end
             if type(fnMClick)=="function" then
                 
             end
             if type(fnRClick)=="function" then
-                if ele.wnd then MY.UI.RegisterUIEvent(ele.wnd ,'OnRButtonClick' , function() fnRClick(MY.Const.Event.Mouse.RBUTTON) end) end
-                if ele.itm then MY.UI.RegisterUIEvent(ele.itm ,'OnItemRButtonClick' , function() fnRClick(MY.Const.Event.Mouse.RBUTTON) end) end
-                if ele.hdl then MY.UI.RegisterUIEvent(ele.hdl ,'OnItemRButtonClick' , function() fnRClick(MY.Const.Event.Mouse.RBUTTON) end) end
-                if ele.cmb then MY.UI.RegisterUIEvent(ele.cmb ,'OnRButtonClick' , function() fnRClick(MY.Const.Event.Mouse.RBUTTON) end) end
+                if ele.wnd then MY.UI.RegisterUIEvent(ele.wnd ,'OnRButtonClick'     , function() fnRClick(MY.Const.Event.Mouse.RBUTTON, ele.raw) end) end
+                if ele.itm then MY.UI.RegisterUIEvent(ele.itm ,'OnItemRButtonClick' , function() fnRClick(MY.Const.Event.Mouse.RBUTTON, ele.raw) end) end
+                if ele.hdl then MY.UI.RegisterUIEvent(ele.hdl ,'OnItemRButtonClick' , function() fnRClick(MY.Const.Event.Mouse.RBUTTON, ele.raw) end) end
+                if ele.cmb then MY.UI.RegisterUIEvent(ele.cmb ,'OnRButtonClick'     , function() fnRClick(MY.Const.Event.Mouse.RBUTTON, ele.raw) end) end
             end
         end
     else
