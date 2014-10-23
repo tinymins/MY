@@ -1111,10 +1111,12 @@ function _MY.UI:autocomplete(method, arg1, arg2)
                             end,
                         }
                         if option.beforeDelete or option.afterDelete then
-                            t.szIcon = 'UI/Image/Button/CommonButton_1.UITex'
-                            t.nFrame = 26
-                            t.nMouseOverFrame = 41
-                            t.szLayer = "ICON_RIGHT"
+                            t.szIcon = "ui/Image/UICommon/CommonPanel2.UITex"
+                            t.nFrame = 49
+                            t.nMouseOverFrame = 51
+                            t.nIconWidth = 17
+                            t.nIconHeight = 17
+                            t.szLayer = "ICON_RIGHTMOST"
                             t.fnClickIcon = function()
                                 local bSure = true
                                 local fnDoDelete = function()
