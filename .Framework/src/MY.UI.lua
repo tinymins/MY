@@ -111,7 +111,7 @@ function _MY.UI:ctor(raw, tab)
                 _tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
                 _tab.txt = _tab.txt or raw:Lookup('','Text_Default')
                 _tab.img = _tab.img or raw:Lookup('','Image_Default')
-            elseif _tab.type=="WndEditComboBox" then
+            elseif _tab.type=="WndEditComboBox" or _tab.type=="WndAutoComplete" then
                 _tab.wnd = _tab.wnd or raw
                 _tab.hdl = _tab.hdl or raw:Lookup('','')
                 _tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
@@ -179,7 +179,7 @@ function _MY.UI:raw2ele(raw, tab)
         _tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
         _tab.txt = _tab.txt or raw:Lookup('','Text_Default')
         _tab.img = _tab.img or raw:Lookup('','Image_Default')
-    elseif _tab.type=="WndEditComboBox" then
+    elseif _tab.type=="WndEditComboBox" or _tab.type=="WndAutoComplete" then
         _tab.wnd = _tab.wnd or raw
         _tab.hdl = _tab.hdl or raw:Lookup('','')
         _tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
@@ -754,6 +754,35 @@ function _MY.UI:append(szName, szType, tArg)
                                 wnd:Lookup("", "Text_PlaceHolder"):Show()
                             end
                         end
+                    elseif szType=='WndAutoComplete' then
+                        local edt = wnd:Lookup("WndEdit_Default")
+                        edt.OnSetFocus = function()
+                            wnd:Lookup("", "Text_PlaceHolder"):Hide()
+                            -- MY.UI(wnd):autocomplete('search')
+                        end
+                        edt.OnEditChanged = function()
+                            local len = this:GetText():len()
+                            if len == 0 then
+                                wnd:Lookup("", "Text_PlaceHolder"):Show()
+                            else
+                                wnd:Lookup("", "Text_PlaceHolder"):Hide()
+                            end
+                            MY.UI(wnd):autocomplete('search')
+                            Station.SetFocusWindow(edt)
+                        end
+                        edt.OnKillFocus = function()
+                            if edt:GetText() == "" then
+                                wnd:Lookup("", "Text_PlaceHolder"):Show()
+                            end
+                            -- Wnd.CloseWindow("PopupMenuPanel")
+                        end
+                        wnd.tMyAcOption = {
+                            autoFill = false,
+                            delay = 0,
+                            disabled = false,
+                            minLength = 0,
+                            source = {},
+                        }
                     end
                 end
                 Wnd.CloseWindow(frame)
@@ -976,6 +1005,134 @@ function _MY.UI:placeholder(szText)
         local status, err = pcall(function() return ele.phd:GetText() end)
         -- if succeed then return its name
         if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:text' ,3) return nil end
+    end
+end
+
+-- ui autocomplete interface
+function _MY.UI:autocomplete(method, arg1, arg2)
+    self:_checksum()
+    if method == 'option' and (type(arg1) == 'nil' or (type(arg1) == 'string' and type(arg2) == nil)) then -- get
+        -- select the first item
+        local ele = self.eles[1]
+        -- try to get its option
+        if ele then
+            return clone(ele.raw.tMyAcOption)
+        end
+    else -- set
+        if method == 'option' then
+            if type(arg1) == 'string' then
+                arg1 = {
+                    ['arg1'] = arg2
+                }
+            end
+            if type(arg1) == 'table' then
+                for _, ele in pairs(self.eles) do
+                    ele.raw.tMyAcOption = ele.raw.tMyAcOption or {}
+                    for k, v in pairs(arg1) do
+                        ele.raw.tMyAcOption[k] = v
+                    end
+                end
+            end
+        elseif method == 'close' then
+            Wnd.CloseWindow('PopupMenuPanel')
+        elseif method == 'destroy' then
+            for _, ele in pairs(self.eles) do
+                ele.raw:Lookup("WndEdit_Default").OnSetFocus = nil
+                ele.raw:Lookup("WndEdit_Default").OnKillFocus = nil
+                ele.raw:Lookup("", "Text_PlaceHolder"):Hide()
+            end
+        elseif method == 'disable' then
+            self:autocomplete('option', 'disable', true)
+        elseif method == 'enable' then
+            self:autocomplete('option', 'disable', false)
+        elseif method == 'search' then
+            for _, ele in pairs(self.eles) do
+                if ele.raw.tMyAcOption then
+                    local keyword = MY.String.PatternEscape(ele.raw:Lookup("WndEdit_Default"):GetText())
+                    local tOption = {}
+                    -- get matched list
+                    for _, src in ipairs(ele.raw.tMyAcOption.source) do
+                        if string.find(src, keyword) then
+                            table.insert(tOption, src)
+                        end
+                    end
+                    -- popup menu
+                    if #tOption > 0 then
+                        local menu = {}
+                        for _, szOption in ipairs(tOption) do
+                            local t = {
+                                szOption = szOption,
+                                fnAction = function()
+                                    MY.UI(ele.raw):text(szOption)
+                                end,
+                            }
+                            if ele.raw.tMyAcOption.ondelete then
+                                t.szIcon = 'UI/Image/Button/CommonButton_1.UITex'
+                                t.nFrame = 26
+                                t.nMouseOverFrame = 41
+                                t.szLayer = "ICON_RIGHT"
+                                t.fnClickIcon = function()
+                                    for i=#ele.raw.tMyAcOption.source, 1, -1 do
+                                        if ele.raw.tMyAcOption.source[i] == szOption then
+                                            table.remove(ele.raw.tMyAcOption.source, i)
+                                        end
+                                    end
+                                    ele.raw.tMyAcOption.ondelete(szOption)
+                                end
+                            end
+                            table.insert(menu, t)
+                        end
+                        
+                        local nX, nY = ele.raw:GetAbsPos()
+                        local nW, nH = ele.raw:GetSize()
+                        menu.nMiniWidth = nW
+                        menu.x, menu.y = nX, nY + nH
+                        menu.bDisableSound = true
+                        menu.bShowKillFocus = true
+                        
+                        PopupMenu(menu)
+                    else
+                        Wnd.CloseWindow('PopupMenuPanel')
+                    end
+                end
+            end
+        elseif method == 'insert' then
+            if type(arg1) == 'string' then
+                arg1 = { arg1 }
+            end
+            if type(arg1) == 'table' then
+                for _, src in ipairs(arg1) do
+                    if type(src) == 'string' then
+                        for _, ele in pairs(self.eles) do
+                            for i=#ele.raw.tMyAcOption.source, 1, -1 do
+                                 if ele.raw.tMyAcOption.source[i] == src then
+                                    table.remove(ele.raw.tMyAcOption.source, i)
+                                 end
+                             end
+                            table.insert(ele.raw.tMyAcOption.source, src)
+                        end
+                    end
+                end
+            end
+        elseif method == 'delete' then
+            if type(arg1) == 'string' then
+                arg1 = { arg1 }
+            end
+            if type(arg1) == 'table' then
+                for _, src in ipairs(arg1) do
+                    if type(src) == 'string' then
+                        for _, ele in pairs(self.eles) do
+                            for i=#ele.raw.tMyAcOption.source, 1, -1 do
+                                 if ele.raw.tMyAcOption.source[i] == arg1 then
+                                    table.remove(ele.raw.tMyAcOption.source, i)
+                                 end
+                             end
+                        end
+                    end
+                end
+            end
+        end
+        return self
     end
 end
 
@@ -1336,7 +1493,7 @@ function _MY.UI:size(nWidth, nHeight)
                     ele.cmb:SetRelPos(nWidth-w-5, math.ceil((nHeight - h)/2))
                     ele.cmb:Lookup("", ""):SetAbsPos(ele.hdl:GetAbsPos())
                     ele.cmb:Lookup("", ""):SetSize(nWidth, nHeight)
-                elseif ele.type=="WndEditComboBox" then
+                elseif ele.type=="WndEditComboBox" or ele.type=="WndAutoComplete" then
                     local w, h= ele.cmb:GetSize()
                     ele.edt:SetSize(nWidth-10-w, nHeight-4)
                     ele.cmb:SetRelPos(nWidth-w-5, (nHeight-h-1)/2+1)
@@ -1803,7 +1960,9 @@ function _MY.UI:change(fnOnChange)
     self:_checksum()
     if fnOnChange then
         for _, ele in pairs(self.eles) do
-            if ele.edt then ele.edt.OnEditChanged = function() pcall(fnOnChange,ele.edt:GetText()) end end
+            if ele.edt then
+                MY.UI.RegisterUIEvent(ele.edt, 'OnEditChanged', function() pcall(fnOnChange,ele.edt:GetText()) end)
+            end
             if ele.type=="WndSliderBox" then
                 table.insert(ele.wnd.tMyOnChange, fnOnChange)
             end
