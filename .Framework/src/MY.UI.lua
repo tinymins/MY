@@ -1127,7 +1127,7 @@ function _MY.UI:autocomplete(method, arg1, arg2)
                                     if option.beforeDelete then
                                         bSure = option.beforeDelete(szOption, fnDoDelete, option)
                                     end
-                                    if bSure then
+                                    if bSure ~= false then
                                         fnDoDelete()
                                     end
                                     if option.afterDelete then
