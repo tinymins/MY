@@ -796,17 +796,18 @@ function _MY.UI:append(szName, szType, tArg)
                             -- Wnd.CloseWindow("PopupMenuPanel")
                         end
                         wnd.tMyAcOption = {
-                            beforeSearch = nil, -- @param: wnd, option
-                            beforePopup  = nil, -- @param: menu, wnd, option
-                            beforeDelete = nil, -- @param: szOption, fnDoDelete, option
-                            afterDelete  = nil, -- @param: 
+                            beforeSearch = nil  , -- @param: wnd, option
+                            beforePopup  = nil  , -- @param: menu, wnd, option
+                            beforeDelete = nil  , -- @param: szOption, fnDoDelete, option
+                            afterDelete  = nil  , -- @param: 
                             
-                            anyMatch  = true ,  -- match any part of option list
-                            autoFill  = false,  -- auto fill edit with first match (conflict withanyMatch)
-                            delay     = 0    ,  -- delay time when edit changed
-                            disabled  = false,  -- disable autocomplete
-                            minLength = 0    ,  -- the min length of the searching string
-                            source    = {}   ,  -- option list
+                            ignoreCase   = true ,  -- ignore case while matching
+                            anyMatch     = true ,  -- match any part of option list
+                            autoFill     = false,  -- auto fill edit with first match (conflict withanyMatch)
+                            delay        = 0    ,  -- delay time when edit changed
+                            disabled     = false,  -- disable autocomplete
+                            minLength    = 0    ,  -- the min length of the searching string
+                            source       = {}   ,  -- option list
                         }
                     end
                 end
@@ -1081,10 +1082,17 @@ function _MY.UI:autocomplete(method, arg1, arg2)
                     if not option.anyMatch then
                         keyword = '^' .. keyword
                     end
+                    if option.ignoreCase then
+                        keyword = StringLowerW(keyword)
+                    end
                     local tOption = {}
                     -- get matched list
                     for _, src in ipairs(option.source) do
-                        if string.find(src, keyword) then
+                        local s = src
+                        if option.ignoreCase then
+                            s = StringLowerW(src)
+                        end
+                        if string.find(s, keyword) then
                             table.insert(tOption, src)
                         end
                     end
