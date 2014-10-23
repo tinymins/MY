@@ -457,7 +457,12 @@ end
 -- :each(_MY.UI each_self)  -- you can use 'this' to visit raw element likes jQuery
 function _MY.UI:each(fn)
     self:_checksum()
-    local eles = self.eles
+    local eles = {}
+    -- get a copy of ele list
+    for _, ele in pairs(self.eles) do
+        table.insert(eles, ele)
+    end
+    -- for each in the list call function
     for _, ele in pairs(eles) do
         local _this = this
         this = ele.raw
