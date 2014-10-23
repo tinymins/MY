@@ -117,6 +117,7 @@ function _MY.UI:ctor(raw, tab)
                 _tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
                 _tab.edt = _tab.edt or raw:Lookup('WndEdit_Default')
                 _tab.img = _tab.img or raw:Lookup('','Image_Default')
+                _tab.phd = _tab.phd or raw:Lookup('','Text_PlaceHolder')
             elseif _tab.type=="WndScrollBox" then
                 _tab.wnd = _tab.wnd or raw
                 _tab.hdl = _tab.hdl or raw:Lookup('','Handle_Scroll')
@@ -185,6 +186,7 @@ function _MY.UI:raw2ele(raw, tab)
         _tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
         _tab.edt = _tab.edt or raw:Lookup('WndEdit_Default')
         _tab.img = _tab.img or raw:Lookup('','Image_Default')
+        _tab.phd = _tab.phd or raw:Lookup('','Text_PlaceHolder')
     elseif _tab.type=="WndScrollBox" then
         _tab.wnd = _tab.wnd or raw
         _tab.hdl = _tab.hdl or raw:Lookup('','Handle_Scroll')
