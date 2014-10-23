@@ -1123,6 +1123,7 @@ function _MY.UI:autocomplete(method, arg1, arg2)
                                                 table.remove(option.source, i)
                                             end
                                         end
+                                        MY.UI(ele.raw):autocomplete('search')
                                     end
                                     if option.beforeDelete then
                                         bSure = option.beforeDelete(szOption, fnDoDelete, option)
