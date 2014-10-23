@@ -194,29 +194,28 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
     local w, h = ui:size()
     ui:append('Label_KeyWord','Text'):find('#Label_KeyWord'):pos(22,15):size(100,25):text(_L['key words:'])
-    ui:append('EditBox_KeyWord','WndEditComboBox'):children('#EditBox_KeyWord'):pos(80,15):size(w-246,25):text(MY_ChatMonitor.szKeyWords):change(function(szText) MY_ChatMonitor.szKeyWords = szText end):menu(function()
-        local edit, t = ui:children('#EditBox_KeyWord'), {}
+    ui:append('WndAutoComplete_KeyWord','WndAutoComplete'):children('#WndAutoComplete_KeyWord')
+      :pos(80,15):size(w-246,25):text(MY_ChatMonitor.szKeyWords)
+      :change(function(szText) MY_ChatMonitor.szKeyWords = szText end)
+      :click(function(nButton, raw)
+        if IsPopupMenuOpened() then
+            MY.UI(raw):autocomplete('close')
+        else
+            MY.UI(raw):autocomplete('search')
+        end
+    end):autocomplete('option', 'beforeSearch', function(wnd, option)
+        option.source = {}
         for _, szOpt in ipairs(MY.LoadLUAData(_MY_ChatMonitor.szLuaData) or {}) do
             if type(szOpt)=="string" then
-                table.insert(t, {
-                    szOption = szOpt, {
-                        szOption = _L['use'],
-                        fnAction = function() edit:text(szOpt) end
-                    }, {
-                        szOption = _L['delete'],
-                        fnAction = function()
-                            local t = MY.LoadLUAData(_MY_ChatMonitor.szLuaData) or {}
-                            for i = #t, 1, -1 do 
-                                if t[i] == szOpt then table.remove(t, i) end
-                            end
-                            MY.SaveLUAData(_MY_ChatMonitor.szLuaData, t)
-                        end
-                    }
-                })
+                table.insert(option.source, szOpt)
             end
         end
-        if #t > 0 then table.insert(t, { bDevide = true }) end
-        table.insert(t, { szOption = _L['add'], fnAction = function()
+    end):autocomplete('option', 'beforePopup', function(menu, wnd, option)
+        if #menu > 0 then
+            table.insert(menu, { bDevide = true })
+        end
+        table.insert(menu, { szOption = _L['add'], fnAction = function()
+            local edit = ui:children('#WndAutoComplete_KeyWord')
             GetUserInput("", function(szVal)
                 szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
                 if szVal~="" then
@@ -229,8 +228,16 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
                 end
             end, function() end, function() end, nil, edit:text() )
         end })
-        return t
-    end):alpha(180)
+    end):autocomplete('option', 'beforeDelete', function(szOption, fnDoDelete, option)
+        local t = MY.LoadLUAData(_MY_ChatMonitor.szLuaData) or {}
+        for i = #t, 1, -1 do 
+            if t[i] == szOption then
+                table.remove(t, i)
+            end
+        end
+        MY.SaveLUAData(_MY_ChatMonitor.szLuaData, t)
+    end)
+
     ui:append('Image_Help','Image'):find('#Image_Help'):image('UI/Image/UICommon/Commonpanel2.UITex',48):pos(8,10):size(25,25):hover(function(bIn) this:SetAlpha( (bIn and 255 ) or 180) end):click(function(nButton)
         local szText="<image>path=\"ui/Image/UICommon/Talk_Face.UITex\" frame=25 w=24 h=24</image> <text>text=" .. EncodeComponentsString(_L['CHAT_MONITOR_TIP']) .." font=207 </text>"
         local x, y = Cursor.GetPos()
