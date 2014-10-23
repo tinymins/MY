@@ -261,6 +261,7 @@ MY.OpenPanel = function()
     if frame then
         frame:Show()
         frame:BringToTop()
+        Station.SetFocusWindow(frame)
     end
     PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 end
@@ -283,9 +284,11 @@ end
 MY.GetFrame = function()
     if not _MY.frame then
         _MY.frame = Wnd.OpenWindow(_MY.szIniFile, "MY")
-        local W, H = Station.GetClientSize()
-        local w, h = _MY.frame:GetSize()
-        _MY.frame:SetRelPos((W-w)/2, (H-h)/2)
+        -- local W, H = Station.GetClientSize()
+        -- local w, h = _MY.frame:GetSize()
+        -- _MY.frame:SetRelPos((W-w)/2, (H-h)/2)
+        _MY.frame:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
+        _MY.frame:CorrectPos()
         _MY.frame:Hide()
     end
     return _MY.frame
