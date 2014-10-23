@@ -767,7 +767,7 @@ function _MY.UI:append(szName, szType, tArg)
                         end
                         edt.OnEditChanged = function()
                             -- disabled
-                            if wnd.tMyAcOption.disabled then
+                            if wnd.tMyAcOption.disabled or Station.GetFocusWindow() ~= this then
                                 return
                             end
                             -- placeholder
