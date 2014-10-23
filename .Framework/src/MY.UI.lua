@@ -1160,6 +1160,7 @@ function _MY.UI:autocomplete(method, arg1, arg2)
                     if #menu > 0 then
                         option.disabledTmp = true
                         PopupMenu(menu)
+                        Station.SetFocusWindow(ele.raw:Lookup("WndEdit_Default"))
                         option.disabledTmp = nil
                     else
                         Wnd.CloseWindow('PopupMenuPanel')
