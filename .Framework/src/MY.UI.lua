@@ -793,7 +793,10 @@ function _MY.UI:append(szName, szType, tArg)
                             if edt:GetText() == "" then
                                 wnd:Lookup("", "Text_PlaceHolder"):Show()
                             end
-                            -- Wnd.CloseWindow("PopupMenuPanel")
+                            
+                            if Station.GetFocusWindow() and Station.GetFocusWindow():GetName() ~= 'PopupMenuPanel' then
+                                Wnd.CloseWindow("PopupMenuPanel")
+                            end
                         end
                         wnd.tMyAcOption = {
                             beforeSearch = nil  , -- @param: wnd, option
