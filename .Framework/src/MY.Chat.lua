@@ -198,13 +198,13 @@ MY.Chat.LinkEventHandler = {
                     MY.Talk(GetClientPlayer().szName, '[' .. szName .. ']')
                 end,
             })
-            table.insert(t, {
-                szOption = _L['whisper'],
-                fnAction = function()
-                    MY.SwitchChat(szName)
-                end,
-            })
-            pcall(InsertInviteTeamMenu, t, szName)
+            -- table.insert(t, {
+            --     szOption = _L['whisper'],
+            --     fnAction = function()
+            --         MY.SwitchChat(szName)
+            --     end,
+            -- })
+            pcall(InsertPlayerCommonMenu, t, nil, szName)
             if MY_Farbnamen then
                 local tInfo = MY_Farbnamen.GetAusName(szName)
                 if tInfo then
@@ -219,6 +219,7 @@ MY.Chat.LinkEventHandler = {
                     end
                 end
             end
+            pcall(InsertInviteTeamMenu, t, szName)
             return t
         end)())
     end,
