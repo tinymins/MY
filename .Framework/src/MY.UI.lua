@@ -1096,59 +1096,60 @@ function _MY.UI:autocomplete(method, arg1, arg2)
                             table.insert(tOption, src)
                         end
                     end
-                    -- popup menu
-                    if #tOption > 0 then
-                        local menu = {}
-                        for _, szOption in ipairs(tOption) do
-                            local t = {
-                                szOption = szOption,
-                                fnAction = function()
-                                    local disabled = option.disabled
-                                    option.disabled = true
-                                    MY.UI(ele.raw):text(szOption)
-                                    option.disabled = disabled
-                                    Wnd.CloseWindow('PopupMenuPanel')
-                                end,
-                            }
-                            if option.beforeDelete or option.afterDelete then
-                                t.szIcon = 'UI/Image/Button/CommonButton_1.UITex'
-                                t.nFrame = 26
-                                t.nMouseOverFrame = 41
-                                t.szLayer = "ICON_RIGHT"
-                                t.fnClickIcon = function()
-                                    local bSure = true
-                                    local fnDoDelete = function()
-                                        for i=#option.source, 1, -1 do
-                                            if option.source[i] == szOption then
-                                                table.remove(option.source, i)
-                                            end
+                    
+                    -- create menu
+                    local menu = {}
+                    for _, szOption in ipairs(tOption) do
+                        local t = {
+                            szOption = szOption,
+                            fnAction = function()
+                                local disabled = option.disabled
+                                option.disabled = true
+                                MY.UI(ele.raw):text(szOption)
+                                option.disabled = disabled
+                                Wnd.CloseWindow('PopupMenuPanel')
+                            end,
+                        }
+                        if option.beforeDelete or option.afterDelete then
+                            t.szIcon = 'UI/Image/Button/CommonButton_1.UITex'
+                            t.nFrame = 26
+                            t.nMouseOverFrame = 41
+                            t.szLayer = "ICON_RIGHT"
+                            t.fnClickIcon = function()
+                                local bSure = true
+                                local fnDoDelete = function()
+                                    for i=#option.source, 1, -1 do
+                                        if option.source[i] == szOption then
+                                            table.remove(option.source, i)
                                         end
-                                        MY.UI(ele.raw):autocomplete('search')
                                     end
-                                    if option.beforeDelete then
-                                        bSure = option.beforeDelete(szOption, fnDoDelete, option)
-                                    end
-                                    if bSure ~= false then
-                                        fnDoDelete()
-                                    end
-                                    if option.afterDelete then
-                                        option.afterDelete(szOption, option)
-                                    end
+                                    MY.UI(ele.raw):autocomplete('search')
+                                end
+                                if option.beforeDelete then
+                                    bSure = option.beforeDelete(szOption, fnDoDelete, option)
+                                end
+                                if bSure ~= false then
+                                    fnDoDelete()
+                                end
+                                if option.afterDelete then
+                                    option.afterDelete(szOption, option)
                                 end
                             end
-                            table.insert(menu, t)
                         end
-                        
-                        local nX, nY = ele.raw:GetAbsPos()
-                        local nW, nH = ele.raw:GetSize()
-                        menu.nMiniWidth = nW
-                        menu.x, menu.y = nX, nY + nH
-                        menu.bDisableSound = true
-                        menu.bShowKillFocus = true
-                        
-                        if type(option.beforePopup) == 'function' then
-                            option.beforePopup(menu, ele.raw, option)
-                        end
+                        table.insert(menu, t)
+                    end
+                    local nX, nY = ele.raw:GetAbsPos()
+                    local nW, nH = ele.raw:GetSize()
+                    menu.nMiniWidth = nW
+                    menu.x, menu.y = nX, nY + nH
+                    menu.bDisableSound = true
+                    menu.bShowKillFocus = true
+                    
+                    if type(option.beforePopup) == 'function' then
+                        option.beforePopup(menu, ele.raw, option)
+                    end
+                    -- popup menu
+                    if #menu > 0 then
                         PopupMenu(menu)
                     else
                         Wnd.CloseWindow('PopupMenuPanel')
