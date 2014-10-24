@@ -7,6 +7,7 @@ data = {
     ['cache data deleted.'] = '缓存已清除。',
     ['%d player(s) data cached:'] = '已缓存角色数据 %d 份：',
     ['plugin conflict detected,duowan force color has been forced down.'] = '检测到插件冲突，已关闭盒子职业染色。',
+    ["Are you sure you want to set cache limit to %d?\nThis may cause some performance problem, please make sure your computer is strong enough."] = '你确定要将最大缓存数量设置为%d？\n数值设置太大可能导致游戏出现性能问题（掉帧卡顿等），如果你对你的电脑有信心，你可以忽略这段话，否则建议不要设置超过5000。',
     ['customize color'] = '自定义颜色',
     ['load default setting'] = '恢复默认设置',
 }
