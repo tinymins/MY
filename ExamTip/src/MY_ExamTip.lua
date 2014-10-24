@@ -136,12 +136,13 @@ MY.RegisterInit(function()
     MY.BreatheCall(_Cache.OnFrameBreathe)
     MY.RegisterEvent("BAG_ITEM_UPDATE", function()
         local item = GetClientPlayer().GetItem(arg0, arg1)
-        if item.szName == '会试行文' then
-            MY.DelayCall(function(nExamPrintRemainSpace)
+        if item and item.szName == '会试行文' then
+            local nExamPrintRemainSpace = _Cache.nExamPrintRemainSpace
+            MY.DelayCall(function()
                 if nExamPrintRemainSpace - GetClientPlayer().GetExamPrintRemainSpace() == 100  then
                     MY_ExamTip.SubmitData()
                 end
-            end, { _Cache.nExamPrintRemainSpace }, 5000)
+            end, 2000)
         end
     end)
 end)
