@@ -513,6 +513,7 @@ _MY_ToolBox.ReloadVisualSkill = function()
         MY.RegisterEvent("DO_SKILL_CAST", "MY_ToolBox_VisualSkillCast", function()
             local dwID, dwSkillID, dwSkillLevel = arg0, arg1, arg2
             if dwID == GetClientPlayer().dwID then
+                Output(dwSkillID, dwSkillLevel)
                 MY_ToolBox.VisualSkillCast(dwSkillID, dwSkillLevel)
             end
         end)
@@ -520,10 +521,50 @@ _MY_ToolBox.ReloadVisualSkill = function()
 end
 MY_ToolBox.VisualSkillCast = function(dwSkillID, dwSkillLevel)
     local ui = MY.UI("Normal/MY_ToolBox_VisualSkill/WndWindow_Normal")
-    if ui:count()==0 then return end
+    if ui:count()==0 then
+        return
+    end
     -- get name
     local szSkillName, dwIconID = MY.Player.GetSkillName(dwSkillID, dwSkillLevel)
-    if not szSkillName or szSkillName == "" or dwIconID == 13 then
+    if dwSkillID == 4097 then -- 骑乘
+        dwIconID = 1899
+    elseif Table_IsSkillFormation(dwSkillID, dwSkillLevel)        -- 阵法技能
+        or Table_IsSkillFormationCaster(dwSkillID, dwSkillLevel)  -- 阵法释放技能
+        -- or dwSkillID == 230     -- (230)  万花伤害阵法施放  七绝逍遥阵
+        -- or dwSkillID == 347     -- (347)  纯阳气宗阵法施放  九宫八卦阵
+        -- or dwSkillID == 526     -- (526)  七秀治疗阵法施放  花月凌风阵
+        -- or dwSkillID == 662     -- (662)  天策防御阵法释放  九襄地玄阵
+        -- or dwSkillID == 740     -- (740)  少林防御阵法施放  金刚伏魔阵
+        -- or dwSkillID == 745     -- (745)  少林攻击阵法施放  天鼓雷音阵
+        -- or dwSkillID == 754     -- (754)  天策攻击阵法释放  卫公折冲阵
+        -- or dwSkillID == 778     -- (778)  纯阳剑宗阵法施放  北斗七星阵
+        -- or dwSkillID == 781     -- (781)  七秀伤害阵法施放  九音惊弦阵
+        -- or dwSkillID == 1020    -- (1020) 万花治疗阵法施放  落星惊鸿阵
+        -- or dwSkillID == 1866    -- (1866) 藏剑阵法释放      依山观澜阵
+        -- or dwSkillID == 2481    -- (2481) 五毒治疗阵法施放  妙手织天阵
+        -- or dwSkillID == 2487    -- (2487) 五毒攻击阵法施放  万蛊噬心阵
+        -- or dwSkillID == 3216    -- (3216) 唐门外功阵法施放  流星赶月阵
+        -- or dwSkillID == 3217    -- (3217) 唐门内功阵法施放  千机百变阵
+        -- or dwSkillID == 4674    -- (4674) 明教攻击阵法施放  炎威破魔阵
+        -- or dwSkillID == 4687    -- (4687) 明教防御阵法施放  无量光明阵
+        -- or dwSkillID == 5311    -- (5311) 丐帮攻击阵法释放  降龙伏虎阵
+        -- or dwSkillID == 13228   -- (13228)  临川列山阵释放  临川列山阵
+        -- or dwSkillID == 13275   -- (13275)  锋凌横绝阵施放  锋凌横绝阵
+        or dwSkillID == 10         -- (10) 横扫千军   横扫千军
+        or dwSkillID == 11         -- (11) 普通攻击-棍攻击   六合棍
+        or dwSkillID == 12         -- (12) 普通攻击-枪攻击   梅花枪法
+        or dwSkillID == 13         -- (13) 普通攻击-剑攻击   三柴剑法
+        or dwSkillID == 14         -- (14) 普通攻击-拳套攻击  长拳
+        or dwSkillID == 15         -- (15) 普通攻击-双兵攻击  连环双刀
+        or dwSkillID == 16         -- (16) 普通攻击-笔攻击   判官笔法
+        or dwSkillID == 17         -- (17) 江湖-防身武艺-打坐 打坐
+        or dwSkillID == 18         -- (18) 踏云 踏云
+        or dwIconID  == 1817       -- 闭阵
+        or dwIconID  == 533        -- 打坐
+        or dwIconID  == 13         -- 子技能
+        or not szSkillName
+        or szSkillName == ""
+    then
         return
     end
     
@@ -532,7 +573,7 @@ MY_ToolBox.VisualSkillCast = function(dwSkillID, dwSkillLevel)
     local i = _MY_ToolBox.nVisualSkillBoxIndex
     local boxEnter = ui:item("#Box_1"..i)
     boxEnter:raw(1):SetObject(UI_OBJECT_SKILL, dwSkillID, dwSkillLevel)
-    boxEnter:raw(1):SetObjectIcon(Table_GetSkillIconID(dwSkillID, dwSkillLevel))
+    boxEnter:raw(1):SetObjectIcon(dwIconID)
     local nEnterDesLeft = MY_ToolBox.nVisualSkillBoxCount*53 + 45
     MY.BreatheCall(function()
         local nLeft = boxEnter:left()
