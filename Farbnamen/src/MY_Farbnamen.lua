@@ -338,7 +338,24 @@ MY_Farbnamen.GetMenu = function()
     table.insert(t, {
         szOption = _L["set max cache count"],
         fnAction = function()
-            GetUserInputNumber(Config.nMaxCache, 10000, nil, function(num) Config.nMaxCache = num end, function() end, function() end)
+            GetUserInputNumber(
+                Config.nMaxCache,
+                999999, nil,
+                function(num)
+                    if num > 5000 then
+                        MessageBox({
+                            szName = "MY_Farbnamen_HighCache",
+                            szMessage = _L("Are you sure you want to set cache limit to %d?\nThis may cause some performance problem, please make sure your computer is strong enough.", num),
+                            {szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function() Config.nMaxCache = num end},
+                            {szOption = g_tStrings.STR_HOTKEY_CANCEL, fnAction = function() end},
+                        })
+                    else
+                        Config.nMaxCache = num
+                    end
+                end,
+                function() end,
+                function() end
+            )
         end,
     })
     table.insert(t, {
