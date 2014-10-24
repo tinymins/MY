@@ -67,12 +67,23 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
                     rec.text = rec.text .. v.text
                 end
             else -- 如果不是系统信息则舍弃第一个名字之前的东西 类似“[阵营][浩气盟][茗伊]说：”
+                -- STR_TALK_HEAD_WHISPER = "悄悄地说：",
+                -- STR_TALK_HEAD_WHISPER_REPLY = "你悄悄地对",
+                -- STR_TALK_HEAD_SAY = "说：",
+                -- STR_TALK_HEAD_SAY1 = "：",
+                -- STR_TALK_HEAD_SAY2 = "大声喊：",
                 local bSkiped = false
                 for i, v in ipairs(tMsgContent) do
-                    if bSkiped or v.type~="name" or i>3 then
-                        rec.text = rec.text .. v.text
-                    else
+                    if (i < 4 and not bSkiped) and (
+                        v.text == g_tStrings.STR_TALK_HEAD_WHISPER or
+                        v.text == g_tStrings.STR_TALK_HEAD_SAY or
+                        v.text == g_tStrings.STR_TALK_HEAD_SAY1 or
+                        v.text == g_tStrings.STR_TALK_HEAD_SAY2
+                    ) then
                         bSkiped = true
+                        rec.text = ''
+                    else
+                        rec.text = rec.text .. v.text
                     end
                 end
             end
