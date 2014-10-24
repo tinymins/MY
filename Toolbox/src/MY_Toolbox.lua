@@ -513,7 +513,6 @@ _MY_ToolBox.ReloadVisualSkill = function()
         MY.RegisterEvent("DO_SKILL_CAST", "MY_ToolBox_VisualSkillCast", function()
             local dwID, dwSkillID, dwSkillLevel = arg0, arg1, arg2
             if dwID == GetClientPlayer().dwID then
-                Output(dwSkillID, dwSkillLevel)
                 MY_ToolBox.VisualSkillCast(dwSkillID, dwSkillLevel)
             end
         end)
