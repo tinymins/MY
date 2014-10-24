@@ -574,30 +574,34 @@ MY_ToolBox.VisualSkillCast = function(dwSkillID, dwSkillLevel)
     boxEnter:raw(1):SetObject(UI_OBJECT_SKILL, dwSkillID, dwSkillLevel)
     boxEnter:raw(1):SetObjectIcon(dwIconID)
     local nEnterDesLeft = MY_ToolBox.nVisualSkillBoxCount*53 + 45
+    boxEnter:fadeTo(nAnimateFrameCount * 75, 255)
     MY.BreatheCall(function()
         local nLeft = boxEnter:left()
         local nSpentFrameCount = GetLogicFrameCount() - nStartFrame
         if nSpentFrameCount < nAnimateFrameCount then
-            boxEnter:alpha(255 * (nSpentFrameCount/nAnimateFrameCount)):left(nLeft - (nLeft - nEnterDesLeft)/(nAnimateFrameCount - nSpentFrameCount))
+            boxEnter:left(nLeft - (nLeft - nEnterDesLeft)/(nAnimateFrameCount - nSpentFrameCount))
         else
-            boxEnter:alpha(255):left(nEnterDesLeft)
+            boxEnter:left(nEnterDesLeft)
             return 0
         end
     end, "#Box_1"..i)
+    MY.DelayCall(function()
+        boxEnter:fadeTo(nAnimateFrameCount * 75, 0)
+    end, "#Box_1"..i, 15000)
     
     -- box leave
     i = ( i + 1 ) % (MY_ToolBox.nVisualSkillBoxCount + 1)
     local boxLeave = ui:item("#Box_1"..i)
     boxLeave:raw(1):SetObjectCoolDown(0)
     local nLeaveDesLeft = -200
+    boxLeave:fadeTo(nAnimateFrameCount * 75, 0)
     MY.BreatheCall(function()
         local nLeft = boxLeave:left()
         local nSpentFrameCount = GetLogicFrameCount() - nStartFrame
         if nSpentFrameCount < nAnimateFrameCount then
-            boxLeave:alpha(255 * (1-nSpentFrameCount/nAnimateFrameCount))
-            :left(nLeft - (nLeft - nLeaveDesLeft)/(nAnimateFrameCount - nSpentFrameCount))
+            boxLeave:left(nLeft - (nLeft - nLeaveDesLeft)/(nAnimateFrameCount - nSpentFrameCount))
         else
-            boxLeave:alpha(0):left(45+MY_ToolBox.nVisualSkillBoxCount*53+300)
+            boxLeave:left(45+MY_ToolBox.nVisualSkillBoxCount*53+300)
             return 0
         end
     end, "#Box_1"..i)
@@ -610,7 +614,7 @@ MY_ToolBox.VisualSkillCast = function(dwSkillID, dwSkillLevel)
             local nLeft = box:left()
             local nSpentFrameCount = GetLogicFrameCount() - nStartFrame
             if nSpentFrameCount < nAnimateFrameCount then
-                box:alpha(255):left(nLeft - (nLeft - nDesLeft)/(nAnimateFrameCount - nSpentFrameCount))
+                box:left(nLeft - (nLeft - nDesLeft)/(nAnimateFrameCount - nSpentFrameCount))
             else
                 box:left(nDesLeft)
                 return 0
