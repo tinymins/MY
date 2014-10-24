@@ -583,7 +583,7 @@ MY_ToolBox.VisualSkillCast = function(dwSkillID, dwSkillLevel)
             boxEnter:alpha(255):left(nEnterDesLeft)
             return 0
         end
-    end)
+    end, "#Box_1"..i)
     
     -- box leave
     i = ( i + 1 ) % (MY_ToolBox.nVisualSkillBoxCount + 1)
@@ -594,12 +594,13 @@ MY_ToolBox.VisualSkillCast = function(dwSkillID, dwSkillLevel)
         local nLeft = boxLeave:left()
         local nSpentFrameCount = GetLogicFrameCount() - nStartFrame
         if nSpentFrameCount < nAnimateFrameCount then
-            boxLeave:alpha(255 * (1-nSpentFrameCount/nAnimateFrameCount)):left(nLeft - (nLeft - nLeaveDesLeft)/(nAnimateFrameCount - nSpentFrameCount))
+            boxLeave:alpha(255 * (1-nSpentFrameCount/nAnimateFrameCount))
+            :left(nLeft - (nLeft - nLeaveDesLeft)/(nAnimateFrameCount - nSpentFrameCount))
         else
             boxLeave:alpha(0):left(45+MY_ToolBox.nVisualSkillBoxCount*53+300)
             return 0
         end
-    end)
+    end, "#Box_1"..i)
     
     -- box middle
     for j = 2, MY_ToolBox.nVisualSkillBoxCount do
@@ -609,12 +610,12 @@ MY_ToolBox.VisualSkillCast = function(dwSkillID, dwSkillLevel)
             local nLeft = box:left()
             local nSpentFrameCount = GetLogicFrameCount() - nStartFrame
             if nSpentFrameCount < nAnimateFrameCount then
-                box:left(nLeft - (nLeft - nDesLeft)/(nAnimateFrameCount - nSpentFrameCount))
+                box:alpha(255):left(nLeft - (nLeft - nDesLeft)/(nAnimateFrameCount - nSpentFrameCount))
             else
                 box:left(nDesLeft)
                 return 0
             end
-        end)
+        end, "#Box_1"..i)
     end
     
     -- update index
