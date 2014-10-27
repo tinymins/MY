@@ -418,8 +418,8 @@ MY.Chat.FormatContent = function(szMsg)
                 table.insert(t2, {type = "enchant", text = "["..name.."]", innerText = name, proid = pro, craftid = craft, recipeid = recipe})
             --ÊÂ¼þ
             elseif string.find(v, "name=\"eventlink\"") then
-                local name, na, info = string.match(v,'%[(.-)%].-script="this.szName=\\"(.-)\\"\\%s*this.szLinkInfo=\\"(.-)\\"')
-                table.insert(t2, {type = "eventlink", text = "["..name.."]", innerText = name, name = na, linkinfo = info or ""})
+                local name, na, info = string.match(v,'text="(.-)".-script="this.szName=\\"(.-)\\"\\%s*this.szLinkInfo=\\"(.-)\\"')
+                table.insert(t2, {type = "eventlink", text = name, innerText = name, name = na, linkinfo = info or ""})
             end
         end
     end
