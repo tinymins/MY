@@ -237,6 +237,7 @@ _MY.Init = function()
     
     -- 显示作者信息
     MY.UI(MY.GetFrame()):children("#Wnd_Total"):children("#Btn_Weibo")
+      :text(_L['author\'s weibo'])
       :click(function()
         MY.UI.OpenInternetExplorer("http://weibo.com/zymah")
       end)
