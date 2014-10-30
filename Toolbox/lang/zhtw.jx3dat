@@ -14,8 +14,8 @@ data = {
     ['system time'] = '系統時間',
     ['fight clock'] = '戰鬥計時',
     ['lotus clock'] = '藕和桂花',
-    ['background'] = '背景',
-    ['title'] = '標題',
+    ['background'] = '圖',
+    ['title'] = '標',
     ['font'] = '字體',
     
     ['FPS: '] = 'FPS：',

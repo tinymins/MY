@@ -177,7 +177,25 @@ local _MY = {
     szIniFileTabBox = _FRAMEWORK_ROOT_.."ui\\WndTabBox.ini",
     szIniFileMainPanel = _FRAMEWORK_ROOT_.."ui\\MainPanel.ini",
     
-    tTabs = {},         -- 标签页
+    tTabs = {   -- 标签页
+        { id = _L["General"], }, 
+        { id = _L["Target"] , }, 
+        { id = _L["Battle"] , }, 
+        { id = _L["Others"]  , }, 
+    },
+    --[[ tTabs: 
+    {
+        {
+            id = ,
+            {
+                [tab]
+            }, {...}
+        },
+        {
+            [category]
+        }, {...}
+    }
+    ]]
     tEvent = {},        -- 游戏事件绑定
     tInitFun = {},      -- 初始化函数
 }
@@ -200,9 +218,9 @@ _MY.Init = function()
     _MY.hBox = MY.GetFrame():Lookup("","Box_1")
     _MY.hRequest = MY.GetFrame():Lookup("Page_1")
     -- 窗口按钮
-    MY.UI(MY.GetFrame()):find("#Button_WindowClose"):click(function() MY.ClosePanel() end)
+    MY.UI(MY.GetFrame()):children("#Btn_Close"):click(function() MY.ClosePanel() end)
     -- 重绘选项卡
-    MY.RedrawTabPanel()
+    MY.RedrawCategory()
     -- init functions
     for i = 1, #_MY.tInitFun, 1 do
         local status, err = pcall(_MY.tInitFun[i].fn)
@@ -218,9 +236,7 @@ _MY.Init = function()
     end
     
     -- 显示作者信息
-    MY.UI(MY.GetFrame()):children("#Window_Tabs"):append("Text_Weibo", "Text"):item("#Text_Weibo")
-      :pos(10, 450):size(100, 30):color(255,255,0):alpha(100):text(_L['author\'s weibo'])
-      :hover(function(bIn) MY.UI(this):alpha((bIn and 255) or 100) end)
+    MY.UI(MY.GetFrame()):children("#Wnd_Total"):children("#Btn_Weibo")
       :click(function()
         MY.UI.OpenInternetExplorer("http://weibo.com/zymah")
       end)
@@ -421,7 +437,7 @@ end
 #######################################################################################################
 ]]
 --[[ 重绘Tab窗口 ]]
-MY.RedrawTabPanel = function()
+MY.RedrawTabPanel1 = function()
     local nTop = 3
     local frame = MY.GetFrame():Lookup("Window_Tabs"):GetFirstChild()
     while frame do
@@ -435,8 +451,8 @@ MY.RedrawTabPanel = function()
         frame = frame:GetNext()
         frame_d:Destroy()
     end
-    for i = 1, #_MY.tTabs, 1 do
-        local tTab = _MY.tTabs[i]
+    for i = 1, #_MY.aTabs, 1 do
+        local tTab = _MY.aTabs[i]
         -- insert tab
         local fx = Wnd.OpenWindow(_MY.szIniFileTabBox, "aTabBox")
         if fx then
@@ -504,42 +520,236 @@ MY.RedrawTabPanel = function()
         Wnd.CloseWindow(fx)
     end
 end
+
+MY.RedrawCategory = function(szCategory)
+    local frame = MY.GetFrame()
+    if not frame then
+        return
+    end
+    
+    -- draw category
+    local wndCategoryList = frame:Lookup('Wnd_Total/WndContainer_Category')
+    wndCategoryList:Clear()
+    for _, ctg in pairs(_MY.tTabs) do
+        if #ctg > 0 then
+            local chkCategory = wndCategoryList:AppendContentFromIni(_MY.szIniFile, "CheckBox_Category")
+            chkCategory:SetName('CheckBox_Category_' .. ctg.id)
+            chkCategory.szCategory = ctg.id
+            chkCategory:Lookup('', 'Text_Category'):SetText(ctg.id)
+            chkCategory.OnCheckBoxCheck = function()
+                if chkCategory.bActived then
+                    return
+                end
+                
+                PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
+                local p = chkCategory:GetParent():GetFirstChild()
+                while p do
+                    if p.szCategory ~= chkCategory.szCategory then
+                        p.bActived = false
+                        p:Check(false)
+                    end
+                    p = p:GetNext()
+                end
+                MY.RedrawTab(chkCategory.szCategory)
+            end
+            szCategory = szCategory or ctg.id
+        end
+    end
+    wndCategoryList:FormatAllContentPos()
+    
+    MY.SwitchCategory(szCategory)
+end
+
+-- MY.SwitchCategory(szCategory)
+MY.SwitchCategory = function(szCategory)
+    local frame = MY.GetFrame()
+    if not frame then
+        return
+    end
+    
+    local chkCategory
+    if szCategory then
+        chkCategory = frame:Lookup('Wnd_Total/WndContainer_Category/CheckBox_Category_' .. szCategory)
+    end
+    if not chkCategory then
+        chkCategory = frame:Lookup('Wnd_Total/WndContainer_Category'):GetFirstChild()
+        if not chkCategory then
+            return
+        end
+    end
+    chkCategory:Check(true)
+end
+
+MY.RedrawTab = function(szCategory)
+    local frame = MY.GetFrame()
+    if not (frame and szCategory) then
+        return
+    end
+    
+    -- draw tabs
+    local wndTabs = frame:Lookup('Wnd_Total/WndScroll_Tabs/WndContainer_Tabs')
+    wndTabs:Clear()
+    
+    for _, ctg in ipairs(_MY.tTabs) do
+        if ctg.id == szCategory then
+            for i, tab in ipairs(ctg) do
+                local wndTab = wndTabs:AppendContentFromIni(_MY.szIniFile, "Wnd_TabT")
+                wndTab.szID = tab.szID
+                wndTab:SetName('Wnd_Tab_' .. tab.szID)
+                wndTab:Lookup('Btn_TabBg', ''):Lookup('Text_Tab'):SetText(tab.szTitle)
+                if tab.dwIconFrame then
+                    wndTab:Lookup('Btn_TabBg', ''):Lookup('Image_TabIcon'):FromUITex(tab.szIconTex, tab.dwIconFrame)
+                else
+                    wndTab:Lookup('Btn_TabBg', ''):Lookup('Image_TabIcon'):FromTextureFile(tab.szIconTex)
+                end
+                wndTab:Lookup('Btn_TabBg').OnLButtonClick = function()
+                    MY.SwitchTab(this:GetParent().szID)
+                end
+            end
+        end
+    end
+    wndTabs:FormatAllContentPos()
+    
+    MY.SwitchTab()
+end
+
+MY.SwitchTab = function(szID)
+    local frame = MY.GetFrame()
+    if not frame then
+        return
+    end
+    
+    if szID then
+        -- get tab window
+        local wndTab = frame:Lookup('Wnd_Total/WndScroll_Tabs/WndContainer_Tabs/Wnd_Tab_' .. szID)
+        if (not wndTab) or wndTab.bActived then
+            return
+        end
+        -- deal with ui response
+        PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
+        local p = wndTab:GetParent():GetFirstChild()
+        while p do
+            p.bActived = false
+            p:Lookup("Btn_TabBg"):SetAnimateGroupNormal(11)
+            p:Lookup("Btn_TabBg"):SetAnimateGroupMouseOver(9)
+            p = p:GetNext()
+        end
+        wndTab.bActived = true
+        wndTab:Lookup("Btn_TabBg"):SetAnimateGroupNormal(10)
+        wndTab:Lookup("Btn_TabBg"):SetAnimateGroupMouseOver(10)
+    end
+    
+    -- get main panel
+    local wndMainPanel = frame:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel')
+    if wndMainPanel.szID == szID then
+        -- return
+    end
+    -- fire custom registered on switch event
+    if wndMainPanel.OnPanelDeactive then
+        local res, err = pcall(wndMainPanel.OnPanelDeactive, wndMainPanel)
+        if not res then
+            MY.Debug(err..'\n', 'MY#OnPanelDeactive', 1)
+        end
+    end
+    wndMainPanel.OnPanelDeactive = nil
+    wndMainPanel:Clear()
+    wndMainPanel:Lookup('', ''):Clear()
+    
+    if not szID then
+        -- 欢迎页
+        local ui = MY.UI(wndMainPanel)
+        ui:append('Image_Adv', 'Image'):item('#Image_Adv'):pos(0, 0):size(557, 278)
+          :image(MY.GetAddonInfo().szFrameworkRoot .. 'image/UIImage.UITex', 2)
+        
+        local txt = ui:append('Text_Adv', 'Text'):item('#Text_Adv'):pos(10, 300):width(250):font(200)
+        MY.BreatheCall(function()
+            local player = GetClientPlayer()
+            if player then
+                txt:text(_L('%s, welcome to use mingyi plugins!', player.szName))
+                return 0
+            end
+        end, 500)
+        wndMainPanel:FormatAllContentPos()
+    else
+        for _, ctg in ipairs(_MY.tTabs) do
+            for _, tab in ipairs(ctg) do
+                if tab.szID == szID then
+                    if tab.fn.OnPanelActive then
+                        local res, err = pcall(tab.fn.OnPanelActive, wndMainPanel)
+                        if not res then
+                            MY.Debug(err..'\n', 'MY#OnPanelActive', 1)
+                        else
+                            wndMainPanel:FormatAllContentPos()
+                        end
+                    end
+                    wndMainPanel.OnPanelDeactive = tab.fn.OnPanelDeactive
+                    break
+                end
+            end
+        end
+    end
+    wndMainPanel.szID = szID
+end
 --[[ 注册选项卡
-    (void) MY.RegisterPanel( szName, szTitle, szIniFile, szIconTex, rgbaTitleColor, fn )
-    szName          选项卡唯一ID
+    (void) MY.RegisterPanel( szID, szTitle, szCategory, szIconTex, rgbaTitleColor, fn )
+    szID            选项卡唯一ID
     szTitle         选项卡按钮标题
+    szCategory      选项卡所在分类
     szIconTex       选项卡图标文件|图标帧
     rgbaTitleColor  选项卡文字rgba
     fn              选项卡各种响应函数 {
         fn.OnPanelActive(wnd)      选项卡激活    wnd为当前MainPanel
         fn.OnPanelDeactive(wnd)    选项卡取消激活
     }
-    Ex： MY.RegisterPanel( "Test", "测试标签", "UI/Image/UICommon/ScienceTreeNode.UITex|123", {255,255,0,200}, { OnPanelActive = function(wnd) end } )
+    Ex： MY.RegisterPanel( "Test", "测试标签", "测试", "UI/Image/UICommon/ScienceTreeNode.UITex|123", {255,255,0,200}, { OnPanelActive = function(wnd) end } )
  ]]
-MY.RegisterPanel = function( szName, szTitle, szIconTex, rgbaTitleColor, fn )
-    if szTitle == nil then
-        for i = #_MY.tTabs, 1, -1 do
-            if _MY.tTabs[i].szName == szName then
-                table.remove(_MY.tTabs, i)
+MY.RegisterPanel = function( szID, szTitle, szCategory, szIconTex, rgbaTitleColor, fn )
+    local category
+    for _, ctg in ipairs(_MY.tTabs) do
+        for i = #ctg, 1, -1 do
+            if ctg[i].szID == szID then
+                table.remove(ctg, i)
             end
         end
-    else
-        -- format szIconTex
-        if type(szIconTex)~="string" then szIconTex = 'UI/Image/Common/Logo.UITex|6' end
-        local dwIconFrame = string.gsub(szIconTex, '.*%|(%d+)', '%1')
-        if dwIconFrame then dwIconFrame = tonumber(dwIconFrame) end
-        szIconTex = string.gsub(szIconTex, '%|.*', '')
-
-        -- format other params
-        if type(fn)~="table" then fn = {} end
-        if type(rgbaTitleColor)~="table" then rgbaTitleColor = { 255, 255, 255, 200 } end
-        if type(rgbaTitleColor[1])~="number" then rgbaTitleColor[1] = 255 end
-        if type(rgbaTitleColor[2])~="number" then rgbaTitleColor[2] = 255 end
-        if type(rgbaTitleColor[3])~="number" then rgbaTitleColor[3] = 255 end
-        if type(rgbaTitleColor[4])~="number" then rgbaTitleColor[4] = 200 end
-        table.insert( _MY.tTabs, { szName = szName, szTitle = szTitle, fn = fn, szIconTex = szIconTex, dwIconFrame = dwIconFrame, rgbTitleColor = {rgbaTitleColor[1],rgbaTitleColor[2],rgbaTitleColor[3]}, alpha = rgbaTitleColor[4] } )
+        if ctg.id == szCategory then
+            category = ctg
+        end
     end
-    MY.RedrawTabPanel()
+    if szTitle == nil then
+        return
+    end
+    
+    if not category then
+        table.insert(_MY.tTabs, {
+            id = szCategory,
+        })
+        category = _MY.tTabs[#_MY.tTabs]
+    end
+    -- format szIconTex
+    if type(szIconTex)~="string" then szIconTex = 'UI/Image/Common/Logo.UITex|6' end
+    local dwIconFrame = string.gsub(szIconTex, '.*%|(%d+)', '%1')
+    if dwIconFrame then dwIconFrame = tonumber(dwIconFrame) end
+    szIconTex = string.gsub(szIconTex, '%|.*', '')
+
+    -- format other params
+    if type(fn)~="table" then fn = {} end
+    if type(rgbaTitleColor)~="table" then rgbaTitleColor = { 255, 255, 255, 255 } end
+    if type(rgbaTitleColor[1])~="number" then rgbaTitleColor[1] = 255 end
+    if type(rgbaTitleColor[2])~="number" then rgbaTitleColor[2] = 255 end
+    if type(rgbaTitleColor[3])~="number" then rgbaTitleColor[3] = 255 end
+    if type(rgbaTitleColor[4])~="number" then rgbaTitleColor[4] = 200 end
+    table.insert( category, {
+        szID        = szID       ,
+        szTitle     = szTitle    ,
+        szCategory  = szCategory ,
+        fn          = fn         ,
+        szIconTex   = szIconTex  ,
+        dwIconFrame = dwIconFrame,
+        rgbTitle    = {rgbaTitleColor[1],rgbaTitleColor[2],rgbaTitleColor[3]},
+        alpha       = rgbaTitleColor[4],
+    })
+
+    MY.RedrawCategory()
 end
 --[[ 激活选项卡
     (void) MY.ActivePanel( szName )

@@ -1188,23 +1188,23 @@ _MY_ToolBox.OnPanelActive = function(wnd)
             cfg.bShowTitle = bChecked
             _MY_ToolBox.ReloadInfoTip()
           end)
-        x = x + 60
+        x = x + 40
         ui:append("WndCheckBox_InfoTipBg_"..id, "WndCheckBox"):children("#WndCheckBox_InfoTipBg_"..id):pos(x, y)
           :text(_L['background']):check(cfg.bShowBg or false)
           :check(function(bChecked)
             cfg.bShowBg = bChecked
             _MY_ToolBox.ReloadInfoTip()
           end)
-        x = x + 60
+        x = x + 45
         ui:append("WndButton_InfoTipFont_"..id, "WndButton"):children("#WndButton_InfoTipFont_"..id):pos(x, y)
-          :width(60):text(_L['font'])
+          :width(50):text(_L['font'])
           :click(function()
             MY.UI.OpenFontPicker(function(f)
                 cfg.nFont = f
                 _MY_ToolBox.ReloadInfoTip()
             end)
           end)
-        x = x + 70
+        x = x + 60
         ui:append("Shadow_InfoTipColor_"..id, "Shadow"):item("#Shadow_InfoTipColor_"..id):pos(x, y)
           :size(20, 20):color(cfg.rgb or {255,255,255})
           :click(function()
@@ -1215,7 +1215,7 @@ _MY_ToolBox.OnPanelActive = function(wnd)
                 _MY_ToolBox.ReloadInfoTip()
             end)
           end)
-        x = x + 50
+        x = x + 30
         if x + 150 > w then
             x, y = 20, y + 30
         end
@@ -1321,13 +1321,16 @@ _MY_ToolBox.OnPanelActive = function(wnd)
     local x, y = 20, 300
     ui:append("Text_Anmerkungen", "Text"):item("#Text_Anmerkungen"):text(_L['* anmerkungen']):color(255,255,0):pos(x, y)
     y = y + 30
+    y = y + 10
     ui:append("WndCheckBox_Anmerkungen_NotePanel", "WndCheckBox"):children("#WndCheckBox_Anmerkungen_NotePanel"):pos(x, y)
       :text(_L['my anmerkungen']):check(MY_Anmerkungen.bNotePanelEnable)
       :check(function(bChecked)
         MY_Anmerkungen.bNotePanelEnable = bChecked
         MY_Anmerkungen.ReloadNotePanel()
       end)
-    ui:append("WndSliderBox_Anmerkungen_Width", "WndSliderBox"):children("#WndSliderBox_Anmerkungen_Width"):pos(x + 130, y)
+    
+    y = y - 10
+    ui:append("WndSliderBox_Anmerkungen_Width", "WndSliderBox"):children("#WndSliderBox_Anmerkungen_Width"):pos(x + 150, y)
       :sliderStyle(false):range(25, 1000):value(MY_Anmerkungen.nNotePanelWidth)
       :text(_L("width: %dpx.", MY_Anmerkungen.nNotePanelWidth))
       :text(function(val) return _L("width: %dpx.", val) end)
@@ -1335,7 +1338,9 @@ _MY_ToolBox.OnPanelActive = function(wnd)
         MY_Anmerkungen.nNotePanelWidth = val
         MY_Anmerkungen.ReloadNotePanel()
       end)
-    ui:append("WndSliderBox_Anmerkungen_Height", "WndSliderBox"):children("#WndSliderBox_Anmerkungen_Height"):pos(x + 380, y)
+    
+    y = y + 20
+    ui:append("WndSliderBox_Anmerkungen_Height", "WndSliderBox"):children("#WndSliderBox_Anmerkungen_Height"):pos(x + 150, y)
       :sliderStyle(false):range(50, 1000):value(MY_Anmerkungen.nNotePanelHeight)
       :text(_L("height: %dpx.", MY_Anmerkungen.nNotePanelHeight))
       :text(function(val) return _L("height: %dpx.", val) end)
@@ -1344,4 +1349,4 @@ _MY_ToolBox.OnPanelActive = function(wnd)
         MY_Anmerkungen.ReloadNotePanel()
       end)
 end
-MY.RegisterPanel( "MY_ToolBox", _L["toolbox"], "UI/Image/Common/Money.UITex|243", {255,255,0,200}, { OnPanelActive = _MY_ToolBox.OnPanelActive } )
+MY.RegisterPanel( "MY_ToolBox", _L["toolbox"], _L['General'], "UI/Image/Common/Money.UITex|243", {255,255,0,200}, { OnPanelActive = _MY_ToolBox.OnPanelActive } )

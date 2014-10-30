@@ -1,3 +1,4 @@
 Farme	Group	GroupIndex	GroupFrameDelay	Left	Top	Width	Height	Name
 0	0	0		0	0	32	32	UIImage.tga
 1				32	0	256	256	Black.tga
+2				0	256	512	256	Advertisement.tga

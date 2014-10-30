@@ -141,11 +141,11 @@ _MY_ScreenShot.OnPanelActive = function(wnd)
       end)
       :tip(_L['Set destination folder which screenshot file will be saved. Absolute path required.\nEx: D:/JX3_ScreenShot/\nAttention: let it blank will save screenshot to default folder.'],MY.Const.UI.Tip.POS_TOP)
     
-    ui:append("WndButton_HotkeyCheck", "WndButton"):children("#WndButton_HotkeyCheck"):pos(w-200, 30):width(170)
+    ui:append("WndButton_HotkeyCheck", "WndButton"):children("#WndButton_HotkeyCheck"):pos(w-180, 30):width(170)
       :text(_L["set default screenshot tool"])
       :click(function() MY.Game.SetHotKey("MY_ScreenShot_Hotkey",1,44,false,false,false) end)
     
-    ui:append("Text_SetHotkey", "Text"):find("#Text_SetHotkey"):pos(w-160, 60):color(255,255,0)
+    ui:append("Text_SetHotkey", "Text"):find("#Text_SetHotkey"):pos(w-140, 60):color(255,255,0)
       :text(_L['>> set hotkey <<'])
       :click(function() MY.Game.SetHotKey() end)
     
@@ -169,4 +169,4 @@ end
 MY.Game.AddHotKey("MY_ScreenShot_Hotkey", _L["shotscreen"], function() MY_ScreenShot.ShotScreen((MY_ScreenShot.GetConfig('bAutoHideUI') and MY_ScreenShot.Const.HIDE_UI) or nil) end, nil)
 MY.Game.AddHotKey("MY_ScreenShot_Hotkey_HideUI", _L["shotscreen without ui"], function() MY_ScreenShot.ShotScreen(MY_ScreenShot.Const.HIDE_UI) end, nil)
 MY.Game.AddHotKey("MY_ScreenShot_Hotkey_ShowUI", _L["shotscreen with ui"], function() MY_ScreenShot.ShotScreen(MY_ScreenShot.Const.SHOW_UI) end, nil)
-MY.RegisterPanel( "ScreenShot", _L["screenshot helper"], "UI/Image/UICommon/Commonpanel.UITex|9", {255,127,0,200}, { OnPanelActive = _MY_ScreenShot.OnPanelActive, OnPanelDeactive = _MY_ScreenShot.OnPanelDeactive } )
+MY.RegisterPanel( "ScreenShot", _L["screenshot helper"], _L['General'], "UI/Image/UICommon/Commonpanel.UITex|9", {255,127,0,200}, { OnPanelActive = _MY_ScreenShot.OnPanelActive, OnPanelDeactive = _MY_ScreenShot.OnPanelDeactive } )

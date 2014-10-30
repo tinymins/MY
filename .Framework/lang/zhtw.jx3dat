@@ -4,6 +4,11 @@ data = {
     ['*'] = '※',
     [' * '] = ' ※ ',
     
+    ["General"] = "常用",
+    ["Target"] = "目標",
+    ["Battle"] = "戰鬥",
+    ["Others"] = "其它",
+    
     ['nearby channel'] = '近聊頻道',
     ['friend channel'] = '好友頻道',
     ['team channel'] = '隊伍頻道',
