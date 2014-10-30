@@ -1225,6 +1225,18 @@ function _MY.UI:name(szText)
     end
 end
 
+-- set ui penetrable
+function _MY.UI:penetrable(bPenetrable)
+    self:_checksum()
+    if type(bPenetrable) == 'boolean' then -- set penetrable
+        for _, ele in pairs(self.eles) do
+            pcall(function() ele.raw:SetMousePenetrable(bPenetrable) end)
+            pcall(function() ele.wnd:SetMousePenetrable(bPenetrable) end)
+        end
+    end
+    return self
+end
+
 -- get/set ui alpha
 function _MY.UI:alpha(nAlpha)
     self:_checksum()
