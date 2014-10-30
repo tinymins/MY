@@ -52,7 +52,7 @@ local Config_Default = {
     
     nAlpha = 200,
     nFont = 16,
-    nDistance = 24,
+    nDistance = 24 * 24 * 64 * 64,
     
     bHideLifePercentageWhenFight = false,
     bHideLifePercentageDecimal = false,
@@ -227,7 +227,7 @@ _XLifeBar.Reset = function(bNoSave)
                     t[i].handle:ExchangeIndex(i-1)
                 end
             end
-        end, 300)
+        end, 500)
     end
 end
 -- 重载配置文件并重绘
@@ -517,99 +517,110 @@ function XLifeBar.OnFrameCreate()
     _XLifeBar.Frame = this
 end
 
-function XLifeBar.OnFrameBreathe()
-    if not XLifeBar.bEnabled then return end
-    local me = GetClientPlayer()
-    if not me then return end
-    local fnCheckInvalidRect = function(object)
-        if not object then return end
-        local dwID, bIsPlayer = object.dwID, IsPlayer(object.dwID)
-        if GetCharacterDistance(me.dwID,dwID) / 64 < Config.nDistance --[[ 这是镜头补偿判断 但是不好用先不加 and (fPitch > -0.8 or _XLifeBar.GetNz(me.nZ,object.nZ) < Config.nDistance / 2.5)]] then
-            if _XLifeBar.tObject[dwID] and _XLifeBar.tObject[dwID].handle then
-                local tab = _XLifeBar.tObject[dwID]
-                local xlb = XLifeBar(object)
-                -- 基本属性设置
-                xlb:SetLife(object.nCurrentLife / object.nMaxLife)
-                   :SetTong(_XLifeBar.GetTongName(object.dwTongID, "[%s]"))
-                   :SetTitle(object.szTitle)
-                   :SetName(object.szName)
-                if me.bFightState ~= _XLifeBar.bFightState then
-                    xlb:DrawLife()
-                end
-                -- 读条判定
-                local nState = xlb:GetOTState()
-                if nState ~= OT_STATE.ON_SKILL then
-                    _XLifeBar.WithPrepareState(object, function(bIsPrepare, dwSkillID, dwSkillLevel, fProgress, xlb)
-                        if bIsPrepare then
-                            xlb:SetOTTitle(Table_GetSkillName(dwSkillID, dwSkillLevel)):DrawOTTitle():SetOTPercentage(fProgress):SetOTState(OT_STATE.START_SKILL)
-                        end
-                    end, xlb)
-                end
-                if nState == OT_STATE.START_SKILL then                              -- 技能读条开始
-                    xlb:DrawOTBarBorder(Config.nAlpha):SetOTPercentage(0):SetOTState(OT_STATE.ON_SKILL)
-                elseif nState == OT_STATE.ON_SKILL then                             -- 技能读条中
-                    _XLifeBar.WithPrepareState(object, function(bIsPrepare, dwSkillID, dwSkillLevel, fProgress, xlb)
-                        if bIsPrepare then
-                            xlb:SetOTPercentage(fProgress):SetOTTitle(Table_GetSkillName(dwSkillID, dwSkillLevel))
-                        else
-                            xlb:SetOTPercentage(1):SetOTState(OT_STATE.SUCCEED)
-                        end
-                    end, xlb)
-                elseif nState == OT_STATE.START_PREPARE then                        -- 读条开始
-                    xlb:DrawOTBarBorder(Config.nAlpha):SetOTPercentage(0):SetOTState(OT_STATE.ON_PREPARE):DrawOTTitle()
-                elseif nState == OT_STATE.ON_PREPARE then                           -- 读条中
-                    if object.GetOTActionState()==0 then    -- 为0 说明没有读条
+local _nDisX, _nDisY
+local CheckInvalidRect = function(object, me)
+    if not object then return end
+    local dwID, bIsPlayer = object.dwID, IsPlayer(object.dwID)
+    _nDisX, _nDisY = me.nX - object.nX, me.nY - object.nY
+    if _nDisX * _nDisX + _nDisY * _nDisY < Config.nDistance --[[ 这是镜头补偿判断 但是不好用先不加 and (fPitch > -0.8 or _XLifeBar.GetNz(me.nZ,object.nZ) < Config.nDistance / 2.5)]] then
+        if _XLifeBar.tObject[dwID] and _XLifeBar.tObject[dwID].handle then
+            local tab = _XLifeBar.tObject[dwID]
+            local xlb = XLifeBar(object)
+            -- 基本属性设置
+            xlb:SetLife(object.nCurrentLife / object.nMaxLife)
+               :SetTong(_XLifeBar.GetTongName(object.dwTongID, "[%s]"))
+               :SetTitle(object.szTitle)
+               :SetName(object.szName)
+            if me.bFightState ~= _XLifeBar.bFightState then
+                xlb:DrawLife()
+            end
+            -- 读条判定
+            local nState = xlb:GetOTState()
+            if nState ~= OT_STATE.ON_SKILL then
+                _XLifeBar.WithPrepareState(object, function(bIsPrepare, dwSkillID, dwSkillLevel, fProgress, xlb)
+                    if bIsPrepare then
+                        xlb:SetOTTitle(Table_GetSkillName(dwSkillID, dwSkillLevel)):DrawOTTitle():SetOTPercentage(fProgress):SetOTState(OT_STATE.START_SKILL)
+                    end
+                end, xlb)
+            end
+            if nState == OT_STATE.START_SKILL then                              -- 技能读条开始
+                xlb:DrawOTBarBorder(Config.nAlpha):SetOTPercentage(0):SetOTState(OT_STATE.ON_SKILL)
+            elseif nState == OT_STATE.ON_SKILL then                             -- 技能读条中
+                _XLifeBar.WithPrepareState(object, function(bIsPrepare, dwSkillID, dwSkillLevel, fProgress, xlb)
+                    if bIsPrepare then
+                        xlb:SetOTPercentage(fProgress):SetOTTitle(Table_GetSkillName(dwSkillID, dwSkillLevel))
+                    else
                         xlb:SetOTPercentage(1):SetOTState(OT_STATE.SUCCEED)
-                    else
-                        xlb:SetOTPercentage(( GetLogicFrameCount() - tab.OT.nStartFrame ) / tab.OT.nFrameCount)
                     end
-                elseif nState == OT_STATE.START_CHANNEL then                        -- 逆读条开始
-                    xlb:DrawOTBarBorder(Config.nAlpha):SetOTPercentage(1):SetOTState(OT_STATE.ON_CHANNEL):DrawOTTitle()
-                elseif nState == OT_STATE.ON_CHANNEL then                           -- 逆读条中
-                    local nPercentage = 1 - ( GetLogicFrameCount() - tab.OT.nStartFrame ) / tab.OT.nFrameCount
-                    if object.GetOTActionState()==2 and nPercentage >= 0 then    -- 为2 说明在读条引导保护 计算当前帧进度
-                        xlb:SetOTPercentage(nPercentage):DrawOTTitle()
-                    else
-                        xlb:SetOTPercentage(0):SetOTState(OT_STATE.SUCCEED)
-                    end
-                elseif nState == OT_STATE.SUCCEED then                              -- 读条成功
-                    if GetLogicFrameCount() - tab.OT.nStartFrame < 16 then -- 渐变
-                        local rgba = { nil,nil,nil, Config.nAlpha - (GetLogicFrameCount() - tab.OT.nStartFrame) * (Config.nAlpha/16) }
-                        xlb:DrawOTBarBorder(rgba[4]):DrawOTBar(rgba):DrawOTTitle(rgba)
-                    else
-                        local rgba = { nil,nil,nil, 0 }
-                        xlb:SetOTTitle("", rgba):SetOTState(OT_STATE.IDLE):DrawOTBarBorder(0):DrawOTBar(rgba)
-                    end
-                elseif nState == OT_STATE.BREAK then                                -- 读条打断
-                    if GetLogicFrameCount() - tab.OT.nStartFrame < 16 then -- 渐变
-                        local rgba = { 255,0,0, Config.nAlpha - (GetLogicFrameCount() - tab.OT.nStartFrame) * (Config.nAlpha/16) }
-                        xlb:DrawOTBarBorder(rgba[4]):DrawOTBar(rgba):DrawOTTitle(rgba)
-                    else
-                        xlb:SetOTTitle(""):SetOTState(OT_STATE.IDLE):DrawOTBarBorder(0):DrawOTBar({nil,nil,nil,0})
-                    end
+                end, xlb)
+            elseif nState == OT_STATE.START_PREPARE then                        -- 读条开始
+                xlb:DrawOTBarBorder(Config.nAlpha):SetOTPercentage(0):SetOTState(OT_STATE.ON_PREPARE):DrawOTTitle()
+            elseif nState == OT_STATE.ON_PREPARE then                           -- 读条中
+                if object.GetOTActionState()==0 then    -- 为0 说明没有读条
+                    xlb:SetOTPercentage(1):SetOTState(OT_STATE.SUCCEED)
+                else
+                    xlb:SetOTPercentage(( GetLogicFrameCount() - tab.OT.nStartFrame ) / tab.OT.nFrameCount)
                 end
-                
-                -- 势力切换
-                local Force = _XLifeBar.GetForce(dwID)
-                if Force ~= tab.Force then
-                    XLifeBar(object):Remove():Create()
+            elseif nState == OT_STATE.START_CHANNEL then                        -- 逆读条开始
+                xlb:DrawOTBarBorder(Config.nAlpha):SetOTPercentage(1):SetOTState(OT_STATE.ON_CHANNEL):DrawOTTitle()
+            elseif nState == OT_STATE.ON_CHANNEL then                           -- 逆读条中
+                local nPercentage = 1 - ( GetLogicFrameCount() - tab.OT.nStartFrame ) / tab.OT.nFrameCount
+                if object.GetOTActionState()==2 and nPercentage >= 0 then    -- 为2 说明在读条引导保护 计算当前帧进度
+                    xlb:SetOTPercentage(nPercentage):DrawOTTitle()
+                else
+                    xlb:SetOTPercentage(0):SetOTState(OT_STATE.SUCCEED)
                 end
-            else
-                if bIsPlayer or object.CanSeeName() or Config.bShowSpecialNpc then
-                    XLifeBar(object):Create()
+            elseif nState == OT_STATE.SUCCEED then                              -- 读条成功
+                if GetLogicFrameCount() - tab.OT.nStartFrame < 16 then -- 渐变
+                    local rgba = { nil,nil,nil, Config.nAlpha - (GetLogicFrameCount() - tab.OT.nStartFrame) * (Config.nAlpha/16) }
+                    xlb:DrawOTBarBorder(rgba[4]):DrawOTBar(rgba):DrawOTTitle(rgba)
+                else
+                    local rgba = { nil,nil,nil, 0 }
+                    xlb:SetOTTitle("", rgba):SetOTState(OT_STATE.IDLE):DrawOTBarBorder(0):DrawOTBar(rgba)
+                end
+            elseif nState == OT_STATE.BREAK then                                -- 读条打断
+                if GetLogicFrameCount() - tab.OT.nStartFrame < 16 then -- 渐变
+                    local rgba = { 255,0,0, Config.nAlpha - (GetLogicFrameCount() - tab.OT.nStartFrame) * (Config.nAlpha/16) }
+                    xlb:DrawOTBarBorder(rgba[4]):DrawOTBar(rgba):DrawOTTitle(rgba)
+                else
+                    xlb:SetOTTitle(""):SetOTState(OT_STATE.IDLE):DrawOTBarBorder(0):DrawOTBar({nil,nil,nil,0})
                 end
             end
-        elseif _XLifeBar.tObject[dwID] then
-            XLifeBar(object):Remove()
+            
+            -- 势力切换
+            local Force = _XLifeBar.GetForce(dwID)
+            if Force ~= tab.Force then
+                XLifeBar(object):Remove():Create()
+            end
+        else
+            if bIsPlayer or object.CanSeeName() or Config.bShowSpecialNpc then
+                XLifeBar(object):Create()
+            end
         end
+    elseif _XLifeBar.tObject[dwID] then
+        XLifeBar(object):Remove()
     end
+end
+
+local _nFrameCount = 0
+function XLifeBar.OnFrameBreathe()
+    if not XLifeBar.bEnabled then return end
+    if _nFrameCount == 3 then
+        _nFrameCount = 0
+    else
+        _nFrameCount = _nFrameCount + 1
+        return
+    end
+    local me = GetClientPlayer()
+    if not me then return end
+    
     -- local _, _, fPitch = Camera_GetRTParams()
     for k , v in pairs(_XLifeBar.tNpc) do
-        fnCheckInvalidRect(GetNpc(k))
+        CheckInvalidRect(GetNpc(k), me)
     end
     
     for k , v in pairs(_XLifeBar.tPlayer) do
-        fnCheckInvalidRect(GetPlayer(k))
+        CheckInvalidRect(GetPlayer(k), me)
     end
     
     if me.bFightState ~= _XLifeBar.bFightState then
@@ -716,7 +727,7 @@ _Cache.OnPanelActive = function(wnd)
         ui:children("#WndSliderBox_SecondHeight"):value(Config.nLineHeight[2])
         ui:children("#WndSliderBox_ThirdHeight"):value(Config.nLineHeight[3])
         ui:children("#WndSliderBox_PerHeight"):value(Config.nPerHeight)
-        ui:children("#WndSliderBox_Distance"):value(Config.nDistance)
+        ui:children("#WndSliderBox_Distance"):value(math.sqrt(Config.nDistance) / 64 / 64)
         ui:children("#WndSliderBox_Alpha"):value(Config.nAlpha)
         ui:children("#WndCheckBox_ShowSpecialNpc"):check(Config.bShowSpecialNpc)
         ui:children("#WndButton_Font"):text(_L("Font: %d",Config.nFont))
@@ -823,8 +834,8 @@ _Cache.OnPanelActive = function(wnd)
     ui:append("WndSliderBox_Distance", "WndSliderBox"):children("#WndSliderBox_Distance")
       :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,300)
       :text(function(value) return _L("Max Distance: %s foot.", value) end)
-      :change(function(value) Config.nDistance = value;_XLifeBar.Reset() end)
-      :value(Config.nDistance)
+      :change(function(value) Config.nDistance = value * value * 64 * 64;_XLifeBar.Reset() end)
+      :value(math.sqrt(Config.nDistance / 64 / 64))
     y = y + offsety
     
     ui:append("WndSliderBox_Alpha", "WndSliderBox"):children("#WndSliderBox_Alpha")
