@@ -421,7 +421,7 @@ _MY_ToolBox.ReloadInfoTip = function()
                 end, function(anchor)
                     cfg.anchor = anchor
                     SaveConfig()
-                end):drag(0,0,0,0):drag(false)
+                end):drag(0,0,0,0):drag(false):penetrable(true)
                 frm:append("Image_Default","Image"):item("#Image_Default"):size(150,30):image("UI/Image/UICommon/Commonpanel.UITex",86):alpha(180)
                 frm:append("Text_Default", "Text"):item("#Text_Default"):size(150,30):text(cache.title):font(2):raw(1):SetHAlign(1)
                 local txt = frm:find("#Text_Default")
@@ -489,7 +489,7 @@ _MY_ToolBox.ReloadVisualSkill = function()
             MY_ToolBox.anchorVisualSkill = anchor
           end, function(anchor)
             MY_ToolBox.anchorVisualSkill = anchor
-          end)
+          end):penetrable(true)
         -- draw background
         local uiL = ui:append("WndWindow_Lowest", "WndWindow"):children("#WndWindow_Lowest"):size(130 + 53 * MY_ToolBox.nVisualSkillBoxCount - 32 + 80, 52)
         uiL:append("Image_Bg_10", "Image"):item("#Image_Bg_10"):pos(0,0):size(130, 52):image("ui/Image/UICommon/Skills.UITex", 28)
