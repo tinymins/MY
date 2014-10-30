@@ -214,6 +214,9 @@ function MY_Farbnamen.AddAusID(dwID)
         
         _MY_Farbnamen.tPlayerCache[player.dwID  ] = tPlayer
         _MY_Farbnamen.tPlayerCache[player.szName] = player.dwID
+        return true
+    else
+        return false
     end
 end
 -- 保存用户设置
@@ -382,10 +385,16 @@ MY.RegisterEvent('LOGIN_GAME', _MY_Farbnamen.LoadCustomData)
 MY.RegisterEvent('PLAYER_ENTER_GAME', _MY_Farbnamen.LoadCustomData)
 MY.RegisterEvent('GAME_EXIT', MY_Farbnamen.SaveData)
 MY.RegisterEvent('PLAYER_EXIT_GAME', MY_Farbnamen.SaveData)
-MY.RegisterEvent("PLAYER_ENTER_SCENE", MY_Farbnamen.DoConflict)
+-- MY.RegisterEvent("PLAYER_ENTER_SCENE", MY_Farbnamen.DoConflict)
 MY.RegisterEvent("PLAYER_ENTER_SCENE", function(...)
     if MY_Farbnamen.bEnabled then
         local dwID = arg0
-        MY.DelayCall( function() MY_Farbnamen.AddAusID(dwID) end, 500 )
+        local nRetryCount = 0
+        MY.BreatheCall( function()
+            if MY_Farbnamen.AddAusID(dwID) or nRetryCount > 5 then
+                return 0
+            end
+            nRetryCount = nRetryCount + 1
+        end, 500 )
     end
 end)
