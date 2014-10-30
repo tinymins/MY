@@ -204,9 +204,12 @@ end
 _MY_ChatMonitor.OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
     local w, h = ui:size()
-    ui:append('Label_KeyWord','Text'):find('#Label_KeyWord'):pos(22,15):size(100,25):text(_L['key words:'])
+    
+    ui:append('Label_KeyWord','Text'):find('#Label_KeyWord')
+      :pos(22,15):size(100,25):text(_L['key words:'])
+    
     ui:append('WndAutoComplete_KeyWord','WndAutoComplete'):children('#WndAutoComplete_KeyWord')
-      :pos(80,15):size(w-246,25):text(MY_ChatMonitor.szKeyWords)
+      :pos(80,15):size(w-226,25):text(MY_ChatMonitor.szKeyWords)
       :change(function(szText) MY_ChatMonitor.szKeyWords = szText end)
       :click(function(nButton, raw)
         if IsPopupMenuOpened() then
@@ -249,13 +252,18 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
         MY.SaveLUAData(_MY_ChatMonitor.szLuaData, t)
     end)
 
-    ui:append('Image_Help','Image'):find('#Image_Help'):image('UI/Image/UICommon/Commonpanel2.UITex',48):pos(8,10):size(25,25):hover(function(bIn) this:SetAlpha( (bIn and 255 ) or 180) end):click(function(nButton)
-        local szText="<image>path=\"ui/Image/UICommon/Talk_Face.UITex\" frame=25 w=24 h=24</image> <text>text=" .. EncodeComponentsString(_L['CHAT_MONITOR_TIP']) .." font=207 </text>"
+    ui:append('Image_Help','Image'):find('#Image_Help')
+      :image('UI/Image/UICommon/Commonpanel2.UITex',48)
+      :pos(8,10):size(25,25)
+      :hover(function(bIn) this:SetAlpha( (bIn and 255 ) or 180) end)
+      :click(function(nButton)
+        local szText = "<image>path=\"ui/Image/UICommon/Talk_Face.UITex\" frame=25 w=24 h=24</image> <text>text=" .. EncodeComponentsString(_L['CHAT_MONITOR_TIP']) .." font=207 </text>"
         local x, y = Cursor.GetPos()
         local w, h = this:GetSize()
         OutputTip(szText, 450, {x, y, w, h})
     end):alpha(180)
-    ui:append('Image_Setting','Image'):find('#Image_Setting'):pos(w-46,13):image('UI/Image/UICommon/Commonpanel.UITex',18):size(30,30):alpha(200):hover(function(bIn) this:SetAlpha((bIn and 255) or 200) end):click(function()
+    
+    ui:append('Image_Setting','Image'):find('#Image_Setting'):pos(w-26,13):image('UI/Image/UICommon/Commonpanel.UITex',18):size(30,30):alpha(200):hover(function(bIn) this:SetAlpha((bIn and 255) or 200) end):click(function()
         PopupMenu((function() 
             local t = {}
             for szChannel, tChannel in pairs({
@@ -336,7 +344,8 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
             return t
         end)())
     end)
-    ui:append('Button_ChatMonitor_Switcher','WndButton'):find('#Button_ChatMonitor_Switcher'):pos(w-156,15):width(50):text((MY_ChatMonitor.bCapture and _L['stop']) or _L['start']):click(function()
+
+    ui:append('Button_ChatMonitor_Switcher','WndButton'):find('#Button_ChatMonitor_Switcher'):pos(w-136,15):width(50):text((MY_ChatMonitor.bCapture and _L['stop']) or _L['start']):click(function()
         if MY_ChatMonitor.bCapture then
             MY.UI(this):text(_L['start'])
             MY_ChatMonitor.bCapture = false
@@ -345,11 +354,17 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
             MY_ChatMonitor.bCapture = true
         end
     end)
-    ui:append('Button_Clear','WndButton'):find('#Button_Clear'):pos(w-101,15):width(50):text(_L['clear']):click(function()
+    
+    ui:append('Button_Clear','WndButton'):find('#Button_Clear'):pos(w-81,15):width(50):text(_L['clear']):click(function()
         _tRecords = {}
         _MY_ChatMonitor.uiBoard:clear()
     end)
-    _MY_ChatMonitor.uiBoard = ui:append('WndScrollBox_TalkList','WndScrollBox'):children('#WndScrollBox_TalkList'):handleStyle(3):pos(20,50):size(w-41,405)
+    
+    _MY_ChatMonitor.uiBoard = ui
+      :append('WndScrollBox_TalkList','WndScrollBox')
+      :children('#WndScrollBox_TalkList')
+      :handleStyle(3):pos(20,50):size(w-21, h - 70)
+    
     for i = 1, #_tRecords, 1 do
         _MY_ChatMonitor.uiBoard:append( _tRecords[i].html )
     end
@@ -431,7 +446,7 @@ MY.Game.AddHotKey("MY_ChatMonitor_Hotkey", _L["chat monitor"],
     end
 , nil)
 
-MY.RegisterPanel( "ChatMonitor", _L["chat monitor"], "UI/Image/Minimap/Minimap.UITex|197", {255,127,0,200}, {
+MY.RegisterPanel( "ChatMonitor", _L["chat monitor"], _L['General'], "UI/Image/Minimap/Minimap.UITex|197", {255,127,0,200}, {
     OnPanelActive = _MY_ChatMonitor.OnPanelActive,
     OnPanelDeactive = function()
         _MY_ChatMonitor.uiBoard = nil

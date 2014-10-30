@@ -112,7 +112,9 @@ _MY_RollMonitor.OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
     local w, h = ui:size()
     -- 记录模式
-    ui:append('WndCombo_RecordType','WndComboBox'):children('#WndCombo_RecordType'):text(_MY_RollMonitor.aMode[MY_RollMonitor.nMode].szName):pos(20,20):width(180):menu(function()
+    ui:append('WndCombo_RecordType','WndComboBox'):children('#WndCombo_RecordType')
+      :pos(20, 10):width(180):text(_MY_RollMonitor.aMode[MY_RollMonitor.nMode].szName)
+      :menu(function()
         local t = {}
         for iMode, tMode in ipairs(_MY_RollMonitor.aMode) do
             table.insert( t, { 
@@ -128,7 +130,9 @@ _MY_RollMonitor.OnPanelActive = function(wnd)
         return t
     end)
     -- 清空
-    ui:append('WndButton_Clear','WndButton'):children('#WndButton_Clear'):text(_L['restart']):pos(w-196,20):width(90):lclick(function(nButton)
+    ui:append('WndButton_Clear','WndButton'):children('#WndButton_Clear')
+      :pos(w-176, 10):width(90):text(_L['restart'])
+      :lclick(function(nButton)
         MY_RollMonitor.Clear()
     end):rmenu(function()
         local t = { {
@@ -149,7 +153,9 @@ _MY_RollMonitor.OnPanelActive = function(wnd)
         return t
     end):tip(_L['left click to restart, right click to open setting.'], MY.Const.UI.Tip.POS_TOP)
     -- 发布
-    ui:append('WndButton_Publish','WndButton'):children('#WndButton_Publish'):text(_L['publish']):pos(w-106,20):width(80):rmenu(function()
+    ui:append('WndButton_Publish','WndButton'):children('#WndButton_Publish')
+      :pos(w-86, 10):width(80):text(_L['publish'])
+      :rmenu(function()
         local t = { {
             szOption = _L['publish setting'], {
                 bCheck = true, bMCheck = true, bChecked = MY_RollMonitor.nPublish == 3,
@@ -188,8 +194,11 @@ _MY_RollMonitor.OnPanelActive = function(wnd)
         MY_RollMonitor.Echo()
     end):tip(_L['left click to publish, right click to open setting.'], MY.Const.UI.Tip.POS_TOP, { x = -80 })
     -- 输出板
-    ui:append('WndScrollBox_Record','WndScrollBox'):children('#WndScrollBox_Record'):handleStyle(3):pos(20,50):size(w-46,400):text(_L['去掉最高最低取平均值']):append('Text_Default','Text'):find('#Text_Default')
-    _MY_RollMonitor.uiBoard = ui:children('#WndScrollBox_Record')
+    _MY_RollMonitor.uiBoard = ui
+      :append('WndScrollBox_Record','WndScrollBox'):children('#WndScrollBox_Record')
+      :pos(20, 40):size(w-26, h-60):handleStyle(3)
+      :text(_L['去掉最高最低取平均值'])
+    
     _MY_RollMonitor.RedrawBoard()
 end
 _MY_RollMonitor.OnPanelDeactive = function()
@@ -286,4 +295,4 @@ _MY_RollMonitor.RegisterMsgMonitor = function()
     RegisterMsgMonitor(_MY_RollMonitor.OnMsgArrive, t)
 end
 _MY_RollMonitor.RegisterMsgMonitor()
-MY.RegisterPanel( "RollMonitor", _L["roll monitor"], "UI/Image/UICommon/LoginCommon.UITex|30", {255,255,0,200}, { OnPanelActive = _MY_RollMonitor.OnPanelActive, OnPanelDeactive = _MY_RollMonitor.OnPanelDeactive } )
+MY.RegisterPanel( "RollMonitor", _L["roll monitor"], _L['General'], "UI/Image/UICommon/LoginCommon.UITex|30", {255,255,0,200}, { OnPanelActive = _MY_RollMonitor.OnPanelActive, OnPanelDeactive = _MY_RollMonitor.OnPanelDeactive } )
