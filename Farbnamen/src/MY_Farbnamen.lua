@@ -155,20 +155,38 @@ MY_Farbnamen.ShowTip = function(namelink)
     
     local tInfo = MY_Farbnamen.GetAusName(szName)
     if tInfo then
+        local tTip = {}
         -- 名称 等级
-        local szTip = string.format('%s(%d)', tInfo.szName, tInfo.nLevel)
+        table.insert(tTip, string.format('%s(%d)', tInfo.szName, tInfo.nLevel))
         -- 称号
         if tInfo.szTitle and #tInfo.szTitle > 0 then
-            szTip = string.format('%s\n%s', szTip, tInfo.szTitle)
+            table.insert(tTip, tInfo.szTitle)
         end
         -- 帮会
         if tInfo.szTongID and #tInfo.szTongID > 0 then
-            szTip = string.format('%s\n[%s]', szTip, tInfo.szTongID)
+            table.insert(tTip, '[' .. tInfo.szTongID .. ']')
         end
         -- 门派 体型 阵营
-        szTip = string.format('%s\n%s·%s·%s', szTip, _MY_Farbnamen.tForceString[tInfo.dwForceID], _MY_Farbnamen.tRoleType[tInfo.nRoleType], _MY_Farbnamen.tCampString[tInfo.nCamp])
+        table.insert(tTip, string.format('%s·%s·%s', _MY_Farbnamen.tForceString[tInfo.dwForceID], _MY_Farbnamen.tRoleType[tInfo.nRoleType], _MY_Farbnamen.tCampString[tInfo.nCamp]))
         
-        szTip = GetFormatText(szTip, 136, nil, nil, nil)
+        local bAuthor = false
+        for i, v in pairs(MY.GetAddonInfo().tAuthor) do
+            if tInfo.dwID == i and tInfo.szName == v then
+                bAuthor = true
+                break
+            end
+        end
+        
+        local szTip
+        if bAuthor then
+            szTip = GetFormatText(_L['[mingyi plugins]'], 11, 0, 255, 0)
+                 .. GetFormatText(' ', 136)
+                 .. GetFormatText(_L['author']..'\n', 230, 0, 255, 0)
+                 .. GetFormatText('     ' .. table.concat(tTip, '\n     '), 136)
+        else
+            szTip = GetFormatText(table.concat(tTip, '\n'), 136, nil, nil, nil)
+        end
+        
         OutputTip(szTip, 450, {x, y, w, h}, MY.Const.UI.Tip.POS_TOP)
     end
 end

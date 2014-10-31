@@ -50,7 +50,7 @@ end
 -- 提交玩家正确答案 -- 云数据来源
 MY_ExamTip.SubmitData = function()
     local _, _, szLang, _ = GetVersion()
-    MY_Anmerkungen.szNotePanelContent = string.format(_Cache.szSubmitUrl, szLang, MY.String.UrlEncode(MY.Json.Encode(_Cache.tCached)))
+    -- MY_Anmerkungen.szNotePanelContent = string.format(_Cache.szSubmitUrl, szLang, MY.String.UrlEncode(MY.Json.Encode(_Cache.tCached)))
     MY.RemoteRequest(string.format(_Cache.szSubmitUrl, szLang, MY.String.UrlEncode(MY.Json.Encode(_Cache.tCached))), function(szTitle, szContent)
         local r = MY.Json.Decode(szContent)
         MY.Sysmsg({_L('%s record(s) commited, %s record(s) accepted!', r.received, r.accepted)}, _L['exam tip'])
