@@ -126,7 +126,7 @@ MY = { }
 #######################################################################################################
 ]]
 local _DEBUG_ = 4
-local _BUILD_ = "20141030"
+local _BUILD_ = "20141031"
 local _VERSION_ = 0x2001200
 local _ADDON_ROOT_ = '\\Interface\\MY\\'
 local _FRAMEWORK_ROOT_ = '\\Interface\\MY\\.Framework\\'
@@ -209,6 +209,13 @@ MY.GetAddonInfo = function()
     t.nDebugLevel = _DEBUG_
     t.szRoot      = _ADDON_ROOT_
     t.szFrameworkRoot = _FRAMEWORK_ROOT_
+    t.tAuthor = {
+      [3007396] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 枫泾古镇
+      [1600498] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 追风蹑影
+      [4664780] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 日月明尊
+      -- [4662931] = string.char( 0xBE, 0xCD, 0xCA, 0xC7, 0xB8, 0xF6, 0xD5, 0xF3, 0xD1, 0xDB ), -- 日月明尊
+      -- [3438030] = string.char( 0xB4, 0xE5, 0xBF, 0xDA, 0xB5, 0xC4, 0xCD, 0xF5, 0xCA, 0xA6, 0xB8, 0xB5 ), -- 枫泾古镇
+    }
     return t
 end
 _MY.Init = function()
