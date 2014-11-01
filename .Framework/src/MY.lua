@@ -210,6 +210,7 @@ MY.GetAddonInfo = function()
     t.szRoot      = _ADDON_ROOT_
     t.szFrameworkRoot = _FRAMEWORK_ROOT_
     t.tAuthor = {
+      [43567]   = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 体服
       [3007396] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 枫泾古镇
       [1600498] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 追风蹑影
       [4664780] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 日月明尊
