@@ -1230,6 +1230,7 @@ function _MY.UI:penetrable(bPenetrable)
     self:_checksum()
     if type(bPenetrable) == 'boolean' then -- set penetrable
         for _, ele in pairs(self.eles) do
+            pcall(function() ele.raw.bPenetrable = bPenetrable end)
             pcall(function() ele.raw:SetMousePenetrable(bPenetrable) end)
             pcall(function() ele.wnd:SetMousePenetrable(bPenetrable) end)
         end
@@ -1782,9 +1783,9 @@ function _MY.UI:customMode(szTip, fnOnEnterCustomMode, fnOnLeaveCustomMode)
     self:_checksum()
     if type(szTip)=="string" then
         self:onevent("ON_ENTER_CUSTOM_UI_MODE", function()
-            UpdateCustomModeWindow(this, szTip)
+            UpdateCustomModeWindow(this, szTip, this.bPenetrable)
         end):onevent("ON_LEAVE_CUSTOM_UI_MODE", function()
-            UpdateCustomModeWindow(this, szTip)
+            UpdateCustomModeWindow(this, szTip, this.bPenetrable)
         end)
         if type(fnOnEnterCustomMode)=="function" then
             self:onevent("ON_ENTER_CUSTOM_UI_MODE", function()
