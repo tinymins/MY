@@ -282,25 +282,33 @@ local LoadConfig = function() Config = MY.Sys.LoadUserData(_SZ_CONFIG_FILE_) or 
 Config.InfoTip = {
     FPS       = { -- FPS
         bEnable = false, bShowBg = true, bShowTitle = true,
-        anchor =  { x=-10, y=-190, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+        anchor  = { x=-10, y=-190, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
     },
     Distance  = { -- 目标距离
         bEnable = false, bShowBg = true, bShowTitle = true,
-        anchor =  { x=-10, y=-160, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+        anchor  = { x=-10, y=-160, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
     },
     SysTime   = { -- 系统时间
         bEnable = false, bShowBg = true, bShowTitle = true,
-        anchor =  { x=-10, y=-130, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+        anchor  = { x=-10, y=-130, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
     },
     FightTime = { -- 战斗计时
         bEnable = false, bShowBg = true, bShowTitle = true,
-        anchor =  { x=-10, y=-100, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+        anchor  = { x=-10, y=-100, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
     },
     LotusTime = { -- 莲花和藕倒计时
         bEnable = false, bShowBg = true, bShowTitle = true,
-        anchor =  { x=-10, y=-70, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+        anchor  = { x=-10, y=-70, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
     },
 }
+RegisterEvent("CUSTOM_UI_MODE_SET_DEFAULT", function()
+    Config.InfoTip.FPS.anchor       = { x=-10, y=-190, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    Config.InfoTip.Distance.anchor  = { x=-10, y=-160, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    Config.InfoTip.SysTime.anchor   = { x=-10, y=-130, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    Config.InfoTip.FightTime.anchor = { x=-10, y=-100, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    Config.InfoTip.LotusTime.anchor = { x=-10, y=-70 , s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    _MY_ToolBox.ReloadInfoTip()
+end)
 _Cache.InfoTip = {
     FPS       = { -- FPS
         formatString = '', title = _L['fps monitor'], prefix = _L['FPS: '], content = _L['%d'],
@@ -518,6 +526,10 @@ _MY_ToolBox.ReloadVisualSkill = function()
         end)
     end
 end
+RegisterEvent("CUSTOM_UI_MODE_SET_DEFAULT", function()
+    MY_ToolBox.anchorVisualSkill = { x=0, y=-220, s="BOTTOMCENTER", r="BOTTOMCENTER" }
+    _MY_ToolBox.ReloadVisualSkill()
+end)
 MY_ToolBox.VisualSkillCast = function(dwSkillID, dwSkillLevel)
     local ui = MY.UI("Normal/MY_ToolBox_VisualSkill/WndWindow_Normal")
     if ui:count()==0 then
@@ -664,6 +676,11 @@ MY_BuffMonitor.ReloadDefaultConfig = function()
     MY_BuffMonitor.tBuffList = MY.LoadLUAData(_DEFAULT_BUFFMONITOR_CONFIG_FILE_)
     MY_BuffMonitor.ReloadBuffMonitor()
 end
+RegisterEvent("CUSTOM_UI_MODE_SET_DEFAULT", function()
+    MY_BuffMonitor.anchorSelf = { s = "CENTER", r = "CENTER", x = -320, y = 150 }
+    MY_BuffMonitor.anchorTarget = { s = "CENTER", r = "CENTER", x = -320, y = 98 }
+    MY_BuffMonitor.ReloadBuffMonitor()
+end)
 -- 初始化UI
 MY_BuffMonitor.ReloadBuffMonitor = function()
     -- unregister render function
