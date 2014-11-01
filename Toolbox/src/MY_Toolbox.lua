@@ -528,7 +528,7 @@ _MY_ToolBox.ReloadVisualSkill = function()
 end
 RegisterEvent("CUSTOM_UI_MODE_SET_DEFAULT", function()
     MY_ToolBox.anchorVisualSkill = { x=0, y=-220, s="BOTTOMCENTER", r="BOTTOMCENTER" }
-    _MY_ToolBox.ReloadVisualSkill()
+    MY.UI('Normal/MY_ToolBox_VisualSkill'):anchor(MY_ToolBox.anchorVisualSkill)
 end)
 MY_ToolBox.VisualSkillCast = function(dwSkillID, dwSkillLevel)
     local ui = MY.UI("Normal/MY_ToolBox_VisualSkill/WndWindow_Normal")
@@ -679,7 +679,8 @@ end
 RegisterEvent("CUSTOM_UI_MODE_SET_DEFAULT", function()
     MY_BuffMonitor.anchorSelf = { s = "CENTER", r = "CENTER", x = -320, y = 150 }
     MY_BuffMonitor.anchorTarget = { s = "CENTER", r = "CENTER", x = -320, y = 98 }
-    MY_BuffMonitor.ReloadBuffMonitor()
+    MY.UI("Normal/MY_BuffMonitor_Self"):anchor(MY_BuffMonitor.anchorSelf)
+    MY.UI("Normal/MY_BuffMonitor_Target"):anchor(MY_BuffMonitor.anchorTarget)
 end)
 -- ≥ı ºªØUI
 MY_BuffMonitor.ReloadBuffMonitor = function()
