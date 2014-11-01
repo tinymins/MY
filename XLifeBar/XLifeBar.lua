@@ -605,7 +605,7 @@ end
 local _nFrameCount = 0
 function XLifeBar.OnFrameBreathe()
     if not XLifeBar.bEnabled then return end
-    if _nFrameCount == 3 then
+    if _nFrameCount == 1 then
         _nFrameCount = 0
     else
         _nFrameCount = _nFrameCount + 1
@@ -727,7 +727,7 @@ _Cache.OnPanelActive = function(wnd)
         ui:children("#WndSliderBox_SecondHeight"):value(Config.nLineHeight[2])
         ui:children("#WndSliderBox_ThirdHeight"):value(Config.nLineHeight[3])
         ui:children("#WndSliderBox_PerHeight"):value(Config.nPerHeight)
-        ui:children("#WndSliderBox_Distance"):value(math.sqrt(Config.nDistance) / 64 / 64)
+        ui:children("#WndSliderBox_Distance"):value(math.sqrt(Config.nDistance) / 64)
         ui:children("#WndSliderBox_Alpha"):value(Config.nAlpha)
         ui:children("#WndCheckBox_ShowSpecialNpc"):check(Config.bShowSpecialNpc)
         ui:children("#WndButton_Font"):text(_L("Font: %d",Config.nFont))
@@ -832,7 +832,7 @@ _Cache.OnPanelActive = function(wnd)
     ui:append("WndSliderBox_Distance", "WndSliderBox"):children("#WndSliderBox_Distance")
       :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,300)
       :text(function(value) return _L("Max Distance: %s foot.", value) end)
-      :value(math.sqrt((Config.nDistance or Config_Default.nDistance) / 64 / 64))
+      :value(math.sqrt(Config.nDistance or Config_Default.nDistance) / 64)
       :change(function(value) Config.nDistance = value * value * 64 * 64;_XLifeBar.Reset() end)
     y = y + offsety
     
