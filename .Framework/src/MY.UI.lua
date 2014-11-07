@@ -1085,7 +1085,8 @@ function _MY.UI:autocomplete(method, arg1, arg2)
                     if type(option.beforeSearch) == 'function' then
                         option.beforeSearch(ele.raw, option)
                     end
-                    local keyword = MY.String.PatternEscape(ele.raw:Lookup("WndEdit_Default"):GetText())
+                    local keyword = arg1 or ele.raw:Lookup("WndEdit_Default"):GetText()
+                    keyword = MY.String.PatternEscape(keyword)
                     if not option.anyMatch then
                         keyword = '^' .. keyword
                     end
