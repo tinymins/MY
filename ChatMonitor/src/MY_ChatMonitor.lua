@@ -215,7 +215,7 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
         if IsPopupMenuOpened() then
             MY.UI(raw):autocomplete('close')
         else
-            MY.UI(raw):autocomplete('search')
+            MY.UI(raw):autocomplete('search', '')
         end
     end):autocomplete('option', 'beforeSearch', function(wnd, option)
         option.source = {}
