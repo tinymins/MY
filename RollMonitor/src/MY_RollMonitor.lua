@@ -35,7 +35,7 @@ local _MY_RollMonitor = {
 ]]
 MY_RollMonitor.OpenPanel = function()
     MY.OpenPanel()
-    MY.ActivePanel('RollMonitor')
+    MY.SwitchTab('RollMonitor')
 end
 --[[ Çå¿ÕROLLµã
      (void) MY_RollMonitor.Clear([settings])
