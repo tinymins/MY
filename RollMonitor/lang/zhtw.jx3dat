@@ -19,6 +19,7 @@ data = {
     ['average score'] = '多次搖點取平均值',
     ['average score with out pole'] = '去掉最高最低取平均值',
     ["haven't roll yet."] = '尚未擲骰子。',
+    ['[%s] rolls for %d times, valid score is %s.'] = '[%s]擲了%d次骰子，有效點數爲%s。',
     [' rolls for %d times, valid score is %s.'] = '擲了%d次骰子，有效點數爲%s。',
     ['publish unroll'] = '發布未擲骰名單',
 }
