@@ -760,18 +760,6 @@ MY.RegisterPanel = function( szID, szTitle, szCategory, szIconTex, rgbaTitleColo
 
     MY.RedrawCategory()
 end
---[[ 激活选项卡
-    (void) MY.ActivePanel( szName )
-    szName          选项卡唯一ID
-]]
-MY.ActivePanel = function( szName )
-    local eTab = MY.GetFrame():Lookup("Window_Tabs"):Lookup('TabBox_'..szName)
-    if not eTab then return end
-    local _this = this
-    this = eTab
-    pcall(eTab.OnLButtonDown)
-    this = _this
-end
 
 --[[
 #######################################################################################################
