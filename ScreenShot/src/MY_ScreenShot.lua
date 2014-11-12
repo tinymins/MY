@@ -101,7 +101,7 @@ _MY_ScreenShot.OnPanelActive = function(wnd)
         ui:children("#WndEditBox_SsRoot"):text(MY_ScreenShot.GetConfig("szFilePath"))
     end
     
-    ui:append("WndCheckBox_UseGlobal", "WndCheckBox"):children("#WndCheckBox_UseGlobal"):pos(30,30)
+    ui:append("WndCheckBox_UseGlobal", "WndCheckBox"):children("#WndCheckBox_UseGlobal"):pos(30,30):width(200)
       :text(_L["use global config"]):tip(_L['Check to use global config, otherwise use private setting.'])
       :check(function(bChecked) MY_ScreenShot.bUseGlobalConfig = bChecked fnRefreshPanel(ui) end)
       :check(MY_ScreenShot.bUseGlobalConfig)

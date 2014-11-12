@@ -1194,21 +1194,21 @@ _MY_ToolBox.OnPanelActive = function(wnd)
     y = y + 30
     for id, cache in pairs(_Cache.InfoTip) do
         local cfg = Config.InfoTip[id]
-        ui:append("WndCheckBox_InfoTip_"..id, "WndCheckBox"):children("#WndCheckBox_InfoTip_"..id):pos(x, y)
+        ui:append("WndCheckBox_InfoTip_"..id, "WndCheckBox"):children("#WndCheckBox_InfoTip_"..id):pos(x, y):width(100)
           :text(cache.title):check(cfg.bEnable or false)
           :check(function(bChecked)
             cfg.bEnable = bChecked
             _MY_ToolBox.ReloadInfoTip()
           end)
         x = x + 90
-        ui:append("WndCheckBox_InfoTipTitle_"..id, "WndCheckBox"):children("#WndCheckBox_InfoTipTitle_"..id):pos(x, y)
+        ui:append("WndCheckBox_InfoTipTitle_"..id, "WndCheckBox"):children("#WndCheckBox_InfoTipTitle_"..id):pos(x, y):width(60)
           :text(_L['title']):check(cfg.bShowTitle or false)
           :check(function(bChecked)
             cfg.bShowTitle = bChecked
             _MY_ToolBox.ReloadInfoTip()
           end)
         x = x + 40
-        ui:append("WndCheckBox_InfoTipBg_"..id, "WndCheckBox"):children("#WndCheckBox_InfoTipBg_"..id):pos(x, y)
+        ui:append("WndCheckBox_InfoTipBg_"..id, "WndCheckBox"):children("#WndCheckBox_InfoTipBg_"..id):pos(x, y):width(60)
           :text(_L['background']):check(cfg.bShowBg or false)
           :check(function(bChecked)
             cfg.bShowBg = bChecked
