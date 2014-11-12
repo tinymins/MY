@@ -363,7 +363,6 @@ function XLifeBar.X:DrawNames()
     a,f = Config.nAlpha, Config.nFont
     r,g,b,a = self:FxColor(r,g,b,a)
     
-    local szName, szTitle, szTong
     local i = #Config.nLineHeight
     if cfgTong and self.self.dwTongID and self.self.dwTongID ~= 0 then
         local szTongName = _XLifeBar.GetTongName(self.self.dwTongID, "[%s]")
@@ -376,11 +375,19 @@ function XLifeBar.X:DrawNames()
         table.insert( tWordlines, {"<" .. self.self.szTitle .. ">", Config.nLineHeight[i]} )
         i = i - 1
     end
-    if cfgName  then
-        table.insert( tWordlines, {_XLifeBar.GetName(self.self), Config.nLineHeight[i]} )
-        i = i - 1
+    if cfgName then
+        local szName = _XLifeBar.GetName(self.self)
+        if szName and not tonumber(szName) then
+            table.insert( tWordlines, {_XLifeBar.GetName(self.self), Config.nLineHeight[i]} )
+            i = i - 1
+        end
     end
     
+    -- 没有名字的玩意隐藏血条
+    if #tWordlines == 0 then
+        self.hp:DrawLifebar(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, {r,g,b,0,self.tab.Life})
+        self.hp:DrawLifeBorder(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, 0)
+    end
     self.hp:DrawWordlines(tWordlines, {r,g,b,a,f})
     return self
 end
@@ -530,7 +537,7 @@ local CheckInvalidRect = function(object, me)
             xlb:SetLife(object.nCurrentLife / object.nMaxLife)
                :SetTong(_XLifeBar.GetTongName(object.dwTongID, "[%s]"))
                :SetTitle(object.szTitle)
-               :SetName(object.szName)
+               :SetName(_XLifeBar.GetName(object.szName))
             if me.bFightState ~= _XLifeBar.bFightState then
                 xlb:DrawLife()
             end
