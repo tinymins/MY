@@ -746,7 +746,7 @@ _Cache.OnPanelActive = function(wnd)
       :check(function(bChecked) XLifeBar.bEnabled = bChecked _XLifeBar.Reset(true) end)
     -- 使用所有角色公共设置
     ui:append("WndCheckBox_GlobalConfig", "WndCheckBox"):children("#WndCheckBox_GlobalConfig")
-      :pos(x+110,y):text(_L["use global config"])
+      :width(200):pos(x+110,y):text(_L["use global config"])
       :check(XLifeBar.bEnabled or false)
       :check(function(bChecked)
         XLifeBar.bUseGlobalConfig = bChecked

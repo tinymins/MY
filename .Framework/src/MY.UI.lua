@@ -1572,7 +1572,11 @@ function _MY.UI:size(nWidth, nHeight)
             end
             pcall(function()
                 if ele.type=="WndCheckBox" then
-                    
+                    ele.wnd:SetSize(nHeight, nHeight)
+                    ele.txt:SetSize(nWidth - nHeight - 1, nHeight)
+                    ele.hdl:SetRelPos(nHeight + 1, 0)
+                    ele.hdl:SetSize(nWidth, nHeight)
+                    ele.hdl:FormatAllItemPos()
                 elseif ele.type=="WndComboBox" then
                     local w, h= ele.cmb:GetSize()
                     ele.cmb:SetRelPos(nWidth-w-5, math.ceil((nHeight - h)/2))
