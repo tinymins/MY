@@ -411,7 +411,7 @@ _MY_ChatMonitor.Init = function()
       :image('UI/Image/Minimap/Minimap2.UITex',8)
       :click(function()
         MY.OpenPanel()
-        MY.ActivePanel('ChatMonitor')
+        MY.SwitchTab('ChatMonitor')
         _MY_ChatMonitor.uiFrame:fadeOut(500)
       end)
     
