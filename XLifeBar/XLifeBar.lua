@@ -384,7 +384,7 @@ function XLifeBar.X:DrawNames()
     end
     
     -- 没有名字的玩意隐藏血条
-    if #tWordlines == 0 then
+    if cfgName and #tWordlines == 0 then
         self.hp:DrawLifebar(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, {r,g,b,0,self.tab.Life})
         self.hp:DrawLifeBorder(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, 0)
     end
