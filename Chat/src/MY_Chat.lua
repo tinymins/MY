@@ -248,20 +248,29 @@ MY.RegisterInit(function()
                     fnAction = function()
                         MY_Chat.bChatCopyAlwaysShowMask = not MY_Chat.bChatCopyAlwaysShowMask
                     end,
+                    fnDisable = function()
+                        return not MY_Chat.bChatCopy
+                    end,
                 }, {
-                szOption = _L['always be white'],
-                bCheck = true,
-                bChecked = MY_Chat.bChatCopyAlwaysWhite,
-                fnAction = function()
-                    MY_Chat.bChatCopyAlwaysWhite = not MY_Chat.bChatCopyAlwaysWhite
-                end,
+                    szOption = _L['always be white'],
+                    bCheck = true,
+                    bChecked = MY_Chat.bChatCopyAlwaysWhite,
+                    fnAction = function()
+                        MY_Chat.bChatCopyAlwaysWhite = not MY_Chat.bChatCopyAlwaysWhite
+                    end,
+                    fnDisable = function()
+                        return not MY_Chat.bChatCopy
+                    end,
                 }, {
-                szOption = _L['hide system msg copy'],
-                bCheck = true,
-                bChecked = MY_Chat.bChatCopyNoCopySysmsg,
-                fnAction = function()
-                    MY_Chat.bChatCopyNoCopySysmsg = not MY_Chat.bChatCopyNoCopySysmsg
-                end,
+                    szOption = _L['hide system msg copy'],
+                    bCheck = true,
+                    bChecked = MY_Chat.bChatCopyNoCopySysmsg,
+                    fnAction = function()
+                        MY_Chat.bChatCopyNoCopySysmsg = not MY_Chat.bChatCopyNoCopySysmsg
+                    end,
+                    fnDisable = function()
+                        return not MY_Chat.bChatCopy
+                    end,
                 },
             }, {
                 szOption = _L["chat filter"],
@@ -343,6 +352,9 @@ MY.RegisterInit(function()
                             AddListItem(muList, v)
                         end
                     end,
+                    fnDisable = function()
+                        return not MY_Chat.bBlockWords
+                    end
                 },
             },
         }
@@ -362,12 +374,18 @@ MY.RegisterInit(function()
                 fnAction = function()
                     MY_Chat.nChatTime = CHAT_TIME.HOUR_MIN
                 end,
+                fnDisable = function()
+                    return not MY_Chat.bChatTime
+                end,
             },{
                 szOption = _L['hh:mm:ss'],
                 bMCheck = true,
                 bChecked = MY_Chat.nChatTime == CHAT_TIME.HOUR_MIN_SEC,
                 fnAction = function()
                     MY_Chat.nChatTime = CHAT_TIME.HOUR_MIN_SEC
+                end,
+                fnDisable = function()
+                    return not MY_Chat.bChatTime
                 end,
             }
         })

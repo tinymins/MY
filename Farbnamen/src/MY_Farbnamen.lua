@@ -336,6 +336,9 @@ MY_Farbnamen.GetMenu = function()
     }
     table.insert(t, {
         szOption = _L['customize color'],
+        fnDisable = function()
+            return not MY_Farbnamen.bEnabled
+        end,
     })
     for nForce, szForce in pairs(_MY_Farbnamen.tForceString) do
         table.insert(t[#t], {
@@ -345,8 +348,7 @@ MY_Farbnamen.GetMenu = function()
             fnChangeColor = function(_,r,g,b)
                 Config.tForceColor[nForce] = {r,g,b}
                 _MY_Farbnamen.SaveCustomData()
-            end
-            
+            end,
         })
     end
     table.insert(t[#t], { bDevide = true })
@@ -354,6 +356,9 @@ MY_Farbnamen.GetMenu = function()
         szOption = _L['load default setting'],
         fnAction = function()
             Config.tForceColor = clone(Config_Default.tForceColor)
+        end,
+        fnDisable = function()
+            return not MY_Farbnamen.bEnabled
         end,
     })
     table.insert(t, {
@@ -378,16 +383,25 @@ MY_Farbnamen.GetMenu = function()
                 function() end
             )
         end,
+        fnDisable = function()
+            return not MY_Farbnamen.bEnabled
+        end,
     })
     table.insert(t, {
         szOption = _L["analyse data"],
         fnAction = MY_Farbnamen.AnalyseForceInfo,
+        fnDisable = function()
+            return not MY_Farbnamen.bEnabled
+        end,
     })
     table.insert(t, {
         szOption = _L["reset data"],
         fnAction = function()
             _MY_Farbnamen.tPlayerCache = {}
             MY.Sysmsg({_L['cache data deleted.']}, _L['Farbnamen'])
+        end,
+        fnDisable = function()
+            return not MY_Farbnamen.bEnabled
         end,
     })
     return t
