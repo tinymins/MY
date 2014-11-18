@@ -561,15 +561,20 @@ MY_ToolBox.VisualSkillCast = function(dwSkillID, dwSkillLevel)
         -- or dwSkillID == 5311    -- (5311) 丐帮攻击阵法释放  降龙伏虎阵
         -- or dwSkillID == 13228   -- (13228)  临川列山阵释放  临川列山阵
         -- or dwSkillID == 13275   -- (13275)  锋凌横绝阵施放  锋凌横绝阵
-        or dwSkillID == 10         -- (10) 横扫千军   横扫千军
-        or dwSkillID == 11         -- (11) 普通攻击-棍攻击   六合棍
-        or dwSkillID == 12         -- (12) 普通攻击-枪攻击   梅花枪法
-        or dwSkillID == 13         -- (13) 普通攻击-剑攻击   三柴剑法
-        or dwSkillID == 14         -- (14) 普通攻击-拳套攻击  长拳
-        or dwSkillID == 15         -- (15) 普通攻击-双兵攻击  连环双刀
-        or dwSkillID == 16         -- (16) 普通攻击-笔攻击   判官笔法
-        or dwSkillID == 17         -- (17) 江湖-防身武艺-打坐 打坐
-        or dwSkillID == 18         -- (18) 踏云 踏云
+        or dwSkillID == 10         -- (10)    横扫千军           横扫千军
+        or dwSkillID == 11         -- (11)    普通攻击-棍攻击    六合棍
+        or dwSkillID == 12         -- (12)    普通攻击-枪攻击    梅花枪法
+        or dwSkillID == 13         -- (13)    普通攻击-剑攻击    三柴剑法
+        or dwSkillID == 14         -- (14)    普通攻击-拳套攻击  长拳
+        or dwSkillID == 15         -- (15)    普通攻击-双兵攻击  连环双刀
+        or dwSkillID == 16         -- (16)    普通攻击-笔攻击    判官笔法
+        or dwSkillID == 1795       -- (1795)  普通攻击-重剑攻击  四季剑法
+        or dwSkillID == 2183       -- (2183)  普通攻击-虫笛攻击  大荒笛法
+        or dwSkillID == 3121       -- (3121)  普通攻击-弓攻击    罡风镖法
+        or dwSkillID == 4326       -- (4326)  普通攻击-双刀攻击  大漠刀法
+        or dwSkillID == 13039      -- (13039) 普通攻击_盾刀攻击  卷雪刀
+        or dwSkillID == 17         -- (17)    江湖-防身武艺-打坐 打坐
+        or dwSkillID == 18         -- (18)    踏云 踏云
         or dwIconID  == 1817       -- 闭阵
         or dwIconID  == 533        -- 打坐
         or dwIconID  == 13         -- 子技能
