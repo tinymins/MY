@@ -51,6 +51,9 @@ end
 -- rgbaf: 红,绿,蓝,透明度,字体
 -- tWordlines: {[文字,高度偏移],...}
 function HP:DrawWordlines(tWordlines, rgbaf)
+    if not self.handle then
+        return
+    end
     local r,g,b,a,f = unpack(rgbaf)
     local sha = self.handle:Lookup(string.format("lines_%s",self.dwID))
     
@@ -65,6 +68,9 @@ end
 
 -- 绘制血量百分比文字（减少重绘次数所以和Wordlines分离）
 function HP:DrawLifePercentage(aWordline, rgbaf)
+    if not self.handle then
+        return
+    end
     local r,g,b,a,f = unpack(rgbaf)
     local sha = self.handle:Lookup(string.format("hp_title_%s",self.dwID))
     
@@ -76,6 +82,9 @@ end
 
 -- 绘制读条名称（减少重绘次数所以和Wordlines分离）
 function HP:DrawOTTitle(aWordline, rgbaf)
+    if not self.handle then
+        return
+    end
     local r,g,b,a,f = unpack(rgbaf)
     local sha = self.handle:Lookup(string.format("ot_title_%s",self.dwID))
     
@@ -89,6 +98,9 @@ end
 
 -- 填充边框 默认200的nAlpha
 function HP:DrawBorder(nWidth, nHeight, nOffsetY, nAlpha, szShadowName, szShadowName2)
+    if not self.handle then
+        return
+    end
     nAlpha = nAlpha or 200
     local handle = self.handle
     
@@ -131,6 +143,9 @@ end
 -- 填充矩形（进度条/血条）
 -- rgbap: 红,绿,蓝,透明度,进度
 function HP:DrawRect(nWidth, nHeight, nOffsetY, rgbap, szShadowName)
+    if not self.handle then
+        return
+    end
     local r,g,b,a,p = unpack(rgbap)
     if p > 1 then p = 1 elseif p < 0 then p = 0 end -- fix
     local sha = self.handle:Lookup(string.format(szShadowName,self.dwID))
