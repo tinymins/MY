@@ -278,35 +278,56 @@ local _SZ_CONFIG_FILE_ = 'config/MY_ToolBox'
 local Config = Config or {}
 local _Cache = _Cache or {}
 local SaveConfig = function() MY.Sys.SaveUserData(_SZ_CONFIG_FILE_, Config) end
-local LoadConfig = function() Config = MY.Sys.LoadUserData(_SZ_CONFIG_FILE_) or Config end
+local LoadConfig = function()
+    local config = MY.Sys.LoadUserData(_SZ_CONFIG_FILE_)
+    if config then
+        if not Config then
+            Config = {}
+        end
+        for k, v in pairs(config) do
+            if k == 'InfoTip' then
+                for k, v in pairs(v) do
+                    Config.InfoTip[k] = config.InfoTip[k] or Config.InfoTip[k]
+                end
+            else
+                Config[k] = config[k] or Config[k]
+            end
+        end
+    end
+end
 Config.InfoTip = {
     FPS       = { -- FPS
         bEnable = false, bShowBg = true, bShowTitle = true,
-        anchor  = { x=-10, y=-190, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+        anchor  = { x=-10, y=-220, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
     },
     Distance  = { -- 目标距离
         bEnable = false, bShowBg = true, bShowTitle = true,
-        anchor  = { x=-10, y=-160, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+        anchor  = { x=-10, y=-190, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
     },
     SysTime   = { -- 系统时间
         bEnable = false, bShowBg = true, bShowTitle = true,
-        anchor  = { x=-10, y=-130, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+        anchor  = { x=-10, y=-160, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
     },
     FightTime = { -- 战斗计时
         bEnable = false, bShowBg = true, bShowTitle = true,
-        anchor  = { x=-10, y=-100, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+        anchor  = { x=-10, y=-130, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
     },
     LotusTime = { -- 莲花和藕倒计时
         bEnable = false, bShowBg = true, bShowTitle = true,
+        anchor  = { x=-10, y=-100, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    },
+    GPS = { -- 角色坐标
+        bEnable = false, bShowBg = true, bShowTitle = false,
         anchor  = { x=-10, y=-70, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
     },
 }
 RegisterEvent("CUSTOM_UI_MODE_SET_DEFAULT", function()
-    Config.InfoTip.FPS.anchor       = { x=-10, y=-190, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
-    Config.InfoTip.Distance.anchor  = { x=-10, y=-160, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
-    Config.InfoTip.SysTime.anchor   = { x=-10, y=-130, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
-    Config.InfoTip.FightTime.anchor = { x=-10, y=-100, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
-    Config.InfoTip.LotusTime.anchor = { x=-10, y=-70 , s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    Config.InfoTip.FPS.anchor       = { x=-10, y=-220, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    Config.InfoTip.Distance.anchor  = { x=-10, y=-190, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    Config.InfoTip.SysTime.anchor   = { x=-10, y=-160, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    Config.InfoTip.FightTime.anchor = { x=-10, y=-130, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    Config.InfoTip.LotusTime.anchor = { x=-10, y=-100, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    Config.InfoTip.GPS.anchor       = { x=-10, y=-70 , s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
     _MY_ToolBox.ReloadInfoTip()
 end)
 _Cache.InfoTip = {
@@ -371,6 +392,13 @@ _Cache.InfoTip = {
             return string.format(_Cache.InfoTip.LotusTime.formatString, math.floor(nTotal/(60*60)), math.floor(nTotal/60%60), math.floor(nTotal%60))
         end
     },
+    GPS = { -- 角色坐标
+        formatString = '', title = _L['GPS'], prefix = _L['Position: '], content = _L['[%d]%d,%d,%d'],
+        GetContent = function()
+            local player = GetClientPlayer()
+            return string.format(_Cache.InfoTip.GPS.formatString, player.GetMapID(), player.nX, player.nY, player.nZ)
+        end
+    },
 }
 -- 注册UI
 MY.BreatheCall(function()
@@ -421,7 +449,7 @@ _MY_ToolBox.ReloadInfoTip = function()
         local frm = MY.UI('Normal/MY_InfoTip_'..id)
         if cfg.bEnable then
             if frm:count()==0 then
-                frm = MY.UI.CreateFrame('MY_InfoTip_'..id,true):size(150,30):onevent("UI_SCALED", function()
+                frm = MY.UI.CreateFrame('MY_InfoTip_'..id,true):size(180,30):onevent("UI_SCALED", function()
                     MY.UI(this):anchor(cfg.anchor)
                 end):customMode(cache.title, function(anchor)
                     cfg.anchor = anchor
@@ -430,8 +458,8 @@ _MY_ToolBox.ReloadInfoTip = function()
                     cfg.anchor = anchor
                     SaveConfig()
                 end):drag(0,0,0,0):drag(false):penetrable(true)
-                frm:append("Image_Default","Image"):item("#Image_Default"):size(150,30):image("UI/Image/UICommon/Commonpanel.UITex",86):alpha(180)
-                frm:append("Text_Default", "Text"):item("#Text_Default"):size(150,30):text(cache.title):font(2):raw(1):SetHAlign(1)
+                frm:append("Image_Default","Image"):item("#Image_Default"):size(180,30):image("UI/Image/UICommon/Commonpanel.UITex",86):alpha(180)
+                frm:append("Text_Default", "Text"):item("#Text_Default"):size(180,30):text(cache.title):font(2):raw(1):SetHAlign(1)
                 local txt = frm:find("#Text_Default")
                 frm:breathe(function() txt:text(cache.GetContent()) end)
             end
