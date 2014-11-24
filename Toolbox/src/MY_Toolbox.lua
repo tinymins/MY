@@ -449,7 +449,7 @@ _MY_ToolBox.ReloadInfoTip = function()
         local frm = MY.UI('Normal/MY_InfoTip_'..id)
         if cfg.bEnable then
             if frm:count()==0 then
-                frm = MY.UI.CreateFrame('MY_InfoTip_'..id,true):size(180,30):onevent("UI_SCALED", function()
+                frm = MY.UI.CreateFrame('MY_InfoTip_'..id,true):size(220,30):onevent("UI_SCALED", function()
                     MY.UI(this):anchor(cfg.anchor)
                 end):customMode(cache.title, function(anchor)
                     cfg.anchor = anchor
@@ -458,8 +458,8 @@ _MY_ToolBox.ReloadInfoTip = function()
                     cfg.anchor = anchor
                     SaveConfig()
                 end):drag(0,0,0,0):drag(false):penetrable(true)
-                frm:append("Image_Default","Image"):item("#Image_Default"):size(180,30):image("UI/Image/UICommon/Commonpanel.UITex",86):alpha(180)
-                frm:append("Text_Default", "Text"):item("#Text_Default"):size(180,30):text(cache.title):font(2):raw(1):SetHAlign(1)
+                frm:append("Image_Default","Image"):item("#Image_Default"):size(220,30):image("UI/Image/UICommon/Commonpanel.UITex",86):alpha(180)
+                frm:append("Text_Default", "Text"):item("#Text_Default"):size(220,30):text(cache.title):font(2):raw(1):SetHAlign(1)
                 local txt = frm:find("#Text_Default")
                 frm:breathe(function() txt:text(cache.GetContent()) end)
             end
