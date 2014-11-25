@@ -42,6 +42,7 @@ data = {
     ['Nearby GongZhan Total Count: %d.'] = '附近共戰數量：%d。',
     ['------------------------------------'] = '————————————————————————',
     
+    ['avoid blacking shenxing cd'] = '防止神行CD被吃',
     ['Shenxing has been cancelled, cause you got the zhenyan.'] = '您獲取到陣眼，為防止神行千里CD被黑，讀條已自動打斷。',
     
     ['visual skill'] = '技能可視化',
