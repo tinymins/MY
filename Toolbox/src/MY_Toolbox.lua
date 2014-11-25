@@ -67,9 +67,31 @@ _MY_ToolBox.FriendHeadTip = function(bEnable)
         MY.UI("Lowest/MY_Shadow"):remove()
     end
 end
+MY_ToolBox.bAvoidBlackShenxingCD = true
+RegisterCustomData("MY_ToolBox.bAvoidBlackShenxingCD")
 MY_ToolBox.ApplyConfig = function()
     if MY_ToolBox.bFriendHeadTip then
         _MY_ToolBox.FriendHeadTip(true)
+    end
+    
+    if MY_ToolBox.bAvoidBlackShenxingCD then
+        MY.RegisterEvent('DO_SKILL_CAST', 'MY_ToolBox_AvoidBlackShenxingCD', function()
+            local dwID, dwSkillID, dwSkillLevel = arg0, arg1, arg2
+            local player = GetClientPlayer()
+            if not( player and
+            player.dwID == dwID and
+            Table_IsSkillFormationCaster(dwSkillID, dwSkillLevel)) then
+                return
+            end
+            local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = player.GetSkillPrepareState()
+            if not (bIsPrepare and dwSkillID == 3691) then
+                return
+            end
+            MY.Sysmsg(_L['Shenxing has been cancelled, cause you got the zhenyan.'])
+            player.StopCurrentAction()
+        end)
+    else
+        MY.RegisterEvent('DO_SKILL_CAST', 'MY_ToolBox_AvoidBlackShenxingCD')
     end
 end
 MY.RegisterInit(MY_ToolBox.ApplyConfig)
@@ -208,6 +230,14 @@ _MY_ToolBox.OnPanelActive = function(wnd)
             x, y = 20, y + 30
         end
     end
+    
+    local x, y = 220, 200
+    ui:append("WndCheckBox_AvoidBlackShenxingCD", "WndCheckBox"):children("#WndCheckBox_AvoidBlackShenxingCD"):pos(x, y)
+      :text(_L['avoid shenxing cd been blacked']):check(MY_ToolBox.bAvoidBlackShenxingCD or false)
+      :check(function(bChecked)
+        MY_ToolBox.bAvoidBlackShenxingCD = bChecked
+        MY_ToolBox.ApplyConfig()
+      end)
     
     local x, y = 20, 200
     ui:append("Text_BuffMonitorTip", "Text"):item("#Text_BuffMonitorTip"):text(_L['* buff monitor']):color(255,255,0):pos(x, y)

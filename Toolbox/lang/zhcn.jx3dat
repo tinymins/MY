@@ -9,6 +9,7 @@ data = {
     
     ['* infomation tips'] = '※ 信息条（SHIFT+U移动位置）',
     
+    ['GPS'] = '当前位置',
     ['fps monitor'] = '游戏帧数',
     ['target distance'] = '目标距离',
     ['system time'] = '系统时间',
@@ -18,6 +19,7 @@ data = {
     ['title'] = '标',
     ['font'] = '字体',
     
+    ['Location: '] = '当前位置：',
     ['FPS: '] = 'FPS：',
     ['%d'] = '%d',
     ['No Target'] = '没有目标',
@@ -42,6 +44,8 @@ data = {
     
     ['visual skill'] = '技能可视化',
     ['display %d skills.'] = '显示%d格。',
+    
+    ['Shenxing has been cancelled, cause you got the zhenyan.'] = '您获取到阵眼，为防止神行千里CD被黑，读条已自动打断。',
     
     ['* buff monitor'] = '※ BUFF监控',
     ['self buff monitor'] = '自身BUFF监控',
