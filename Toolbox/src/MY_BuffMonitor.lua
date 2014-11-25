@@ -138,6 +138,7 @@ MY_BuffMonitor.ReloadBuffMonitor = function()
                 
                 box:SetObject(1,0)
                 box:SetObjectIcon(mon.dwIconID)
+                box:SetCoolDownPercentage(0)
                 box:SetObjectCoolDown(1)
                 box:SetOverText(0, "")
                 box:SetOverText(1, "")
