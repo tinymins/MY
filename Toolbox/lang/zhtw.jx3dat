@@ -9,6 +9,7 @@ data = {
     
     ['* infomation tips'] = '※ 信息條（SHIFT+U移動位置）',
     
+    ['GPS'] = '當前位置',
     ['fps monitor'] = '遊戲幀數',
     ['target distance'] = '目標距離',
     ['system time'] = '系統時間',
@@ -18,6 +19,7 @@ data = {
     ['title'] = '標',
     ['font'] = '字體',
     
+    ['Location: '] = '當前位置：',
     ['FPS: '] = 'FPS：',
     ['%d'] = '%d',
     ['No Target'] = '沒有目標',
@@ -39,6 +41,8 @@ data = {
     ['Detected [%s] has GongZhan buff for %d sec(s).'] = '檢測到[%s]共戰BUFF剩余%d秒。',
     ['Nearby GongZhan Total Count: %d.'] = '附近共戰數量：%d。',
     ['------------------------------------'] = '————————————————————————',
+    
+    ['Shenxing has been cancelled, cause you got the zhenyan.'] = '您獲取到陣眼，為防止神行千里CD被黑，讀條已自動打斷。',
     
     ['visual skill'] = '技能可視化',
     ['display %d skills.'] = '顯示%d格。',
