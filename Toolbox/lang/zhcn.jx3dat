@@ -45,6 +45,7 @@ data = {
     ['visual skill'] = '技能可视化',
     ['display %d skills.'] = '显示%d格。',
     
+    ['avoid blacking shenxing cd'] = '防止神行CD被吃',
     ['Shenxing has been cancelled, cause you got the zhenyan.'] = '您获取到阵眼，为防止神行千里CD被黑，读条已自动打断。',
     
     ['* buff monitor'] = '※ BUFF监控',

@@ -87,7 +87,7 @@ MY_ToolBox.ApplyConfig = function()
             if not (bIsPrepare and dwSkillID == 3691) then
                 return
             end
-            MY.Sysmsg(_L['Shenxing has been cancelled, cause you got the zhenyan.'])
+            MY.Sysmsg({_L['Shenxing has been cancelled, cause you got the zhenyan.']})
             player.StopCurrentAction()
         end)
     else
@@ -232,8 +232,9 @@ _MY_ToolBox.OnPanelActive = function(wnd)
     end
     
     local x, y = 220, 200
-    ui:append("WndCheckBox_AvoidBlackShenxingCD", "WndCheckBox"):children("#WndCheckBox_AvoidBlackShenxingCD"):pos(x, y)
-      :text(_L['avoid shenxing cd been blacked']):check(MY_ToolBox.bAvoidBlackShenxingCD or false)
+    ui:append("WndCheckBox_AvoidBlackShenxingCD", "WndCheckBox"):children("#WndCheckBox_AvoidBlackShenxingCD")
+      :pos(x, y):width(150)
+      :text(_L['avoid blacking shenxing cd']):check(MY_ToolBox.bAvoidBlackShenxingCD or false)
       :check(function(bChecked)
         MY_ToolBox.bAvoidBlackShenxingCD = bChecked
         MY_ToolBox.ApplyConfig()
