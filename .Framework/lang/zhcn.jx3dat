@@ -89,6 +89,7 @@ data = {
     ['whisper'] = '密聊',
     ['show equipment'] = '查看装备',
     
+    ['none-function hotkey'] = '空白快捷键',
     ['set hotkey'] = '设置快捷键',
     ['>> set hotkey <<'] = '>> 设置快捷键 <<',
     ['use global config'] = '使用所有角色公共设置',

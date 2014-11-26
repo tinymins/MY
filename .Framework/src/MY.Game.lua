@@ -211,6 +211,9 @@ MY.RegisterInit(function()
     for _, v in ipairs(_Cache.tHotkey) do
         Hotkey.AddBinding(v.szName, v.szTitle, "", v.fnAction, nil)
     end
+    for i = 1, 5 do
+        Hotkey.AddBinding('MY_HotKey_Null_'..i, _L['none-function hotkey'], "", function() end, nil)
+    end
 end)
 --[[
 #######################################################################################################
