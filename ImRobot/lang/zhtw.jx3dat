@@ -1,0 +1,5 @@
+-- language data (zhcn) updated at 2014-4-10 03:38:11
+data = {
+    ['enable im robot'] = '啟用ImRobot',
+    ['(auto mode)'] = '(自動模式)',
+}
