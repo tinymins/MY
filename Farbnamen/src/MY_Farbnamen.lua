@@ -176,7 +176,14 @@ MY_Farbnamen.ShowTip = function(namelink)
                 break
             end
         end
-        
+
+        if MY_Anmerkungen then
+            local tPlayerNote = MY_Anmerkungen.GetPlayerNote(tInfo.dwID)
+            if tPlayerNote then
+                table.insert(tTip, tPlayerNote.szContent)
+            end
+        end
+
         local szTip
         if bAuthor then
             szTip = GetFormatText(_L['[mingyi plugins]'], 11, 0, 255, 0)
@@ -186,7 +193,7 @@ MY_Farbnamen.ShowTip = function(namelink)
         else
             szTip = GetFormatText(table.concat(tTip, '\n'), 136, nil, nil, nil)
         end
-        
+
         OutputTip(szTip, 450, {x, y, w, h}, MY.Const.UI.Tip.POS_TOP)
     end
 end
