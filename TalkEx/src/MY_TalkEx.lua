@@ -29,7 +29,10 @@ RegisterCustomData('MY_TalkEx.szTrickTextBegin')
 RegisterCustomData('MY_TalkEx.szTrickText')
 RegisterCustomData('MY_TalkEx.szTrickTextEnd')
 
-_MY_TalkEx.tForce = { [-1] = _L['all force'] } for i=0,10,1 do _MY_TalkEx.tForce[i] = GetForceTitle(i) end
+_MY_TalkEx.tForce = { [-1] = _L['all force'] }
+for i, v in pairs(g_tStrings.tForceTitle) do
+    _MY_TalkEx.tForce[i] = v -- GetForceTitle(i)
+end
 _MY_TalkEx.tFilter = { ['NEARBY'] = _L['nearby players where'], ['RAID'] = _L['teammates where'], }
 _MY_TalkEx.tChannels = { 
     ['NEARBY'] = { szName = _L['nearby channel'], tCol = GetMsgFontColor("MSG_NORMAL", true) },
