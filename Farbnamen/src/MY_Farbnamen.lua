@@ -33,33 +33,23 @@ local Config_Default = {
 }
 local Config = clone(Config_Default)
 local _MY_Farbnamen = {
-    tForceString = {
-        [0]  = _L['JiangHu'],
-        [1]  = _L['ShaoLin'],
-        [2]  = _L['WanHua'],
-        [3]  = _L['TianCe'],
-        [4]  = _L['ChunYang'],
-        [5]  = _L['QiXiu'],
-        [6]  = _L['WuDu'],
-        [7]  = _L['TangMen'],
-        [8]  = _L['CangJian'],
-        [9]  = _L['GaiBang'],
-        [10] = _L['MingJiao'],
-    },
+    tForceString = {},
     tRoleType    = {
         [1] = _L['man'],
         [2] = _L['woman'],
         [5] = _L['boy'],
         [6] = _L['girl'],
     },
-    tCampString  = {
-        [0] = _L['ZhongLi'],
-        [1] = _L['HaoQiMeng'],
-        [2] = _L['ERenGu'],
-    },
+    tCampString  = {},
     tPlayerCache = {},
     aPlayerQueu = {},
 }
+for k, v in pairs(g_tStrings.tForceTitle) do
+    _MY_Farbnamen.tForceString[k] = v
+end
+for k, v in pairs(g_tStrings.STR_GUILD_CAMP_NAME) do
+    _MY_Farbnamen.tCampString[k] = v
+end
 setmetatable(_MY_Farbnamen.tForceString, { __index = function(t, k) return k end, __call = function(t, k, ...) return string.format(t[k], ...) end, })
 setmetatable(_MY_Farbnamen.tRoleType,    { __index = function(t, k) return k end, __call = function(t, k, ...) return string.format(t[k], ...) end, })
 setmetatable(_MY_Farbnamen.tCampString,  { __index = function(t, k) return k end, __call = function(t, k, ...) return string.format(t[k], ...) end, })
@@ -217,7 +207,7 @@ function MY_Farbnamen.GetAusID(dwID)
     -- deal with return data
     local result =  clone(_MY_Farbnamen.tPlayerCache[dwID])
     if result then
-        result.rgb = Config.tForceColor[result.dwForceID]
+        result.rgb = Config.tForceColor[result.dwForceID] or {255, 255, 255}
     end
     return result
 end
@@ -254,7 +244,9 @@ end
 function _MY_Farbnamen.LoadCustomData()
     local t = MY.Sys.LoadUserData(SZ_CONFIG_PATH) or {}
     if t.tForceColor then
-        Config.tForceColor = t.tForceColor
+        for k, v in pairs(t.tForceColor) do
+            Config.tForceColor[k] = v
+        end
     end
 end
 -- ±£¥Ê≈‰÷√
