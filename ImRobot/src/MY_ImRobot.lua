@@ -22,7 +22,7 @@ MY_ImRobot.OnWhisper = function(szName, szMsg)
     end
     
     local szUrl = _Cache.szQueryUrl .. MY.String.UrlEncode(szMsg)
-    MY.RemoteRequest(szUrl, function(szTitle, szContent)Output(szContent)
+    MY.RemoteRequest(szUrl, function(szTitle, szContent)
         local data = MY.Json.Decode(szContent)
         if not data then
             return nil
@@ -62,7 +62,10 @@ _Cache.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
         end
     end
     
-    MY_ImRobot.OnWhisper(szName, szText)Output(szName, szText)
+    if szText == '离开一会,稍后回来!' then
+        return
+    end
+    MY_ImRobot.OnWhisper(szName, szText)
 end
 
 MY_ImRobot.Reply = function()
@@ -70,7 +73,7 @@ MY_ImRobot.Reply = function()
         return
     end
     
-    local rec = table.remove(_Cache.tQueue, 1)Output(rec)
+    local rec = table.remove(_Cache.tQueue, 1)
     MY.Talk(rec.szName, rec.szText)
 end
 
