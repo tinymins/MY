@@ -235,7 +235,7 @@ MY_Anmerkungen.PartyAddMember = function(dwID)
             })
         end
         if t.bTipWhenGroup then
-            MY.Sysmsg(_L("Tip: [%s] is in your team.\nNote: %s", t.szName, t.szContent))
+            MY.Sysmsg({_L("Tip: [%s] is in your team.\nNote: %s", t.szName, t.szContent)})
         end
     end
 end
