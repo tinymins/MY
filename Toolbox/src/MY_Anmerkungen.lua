@@ -117,8 +117,20 @@ MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
             ui:children("#WndCheckBox_TipWhenGroup"):check(rec.bTipWhenGroup)
             ui:children("#WndCheckBox_AlertWhenGroup"):check(rec.bAlertWhenGroup)
         else
-            ui:children("#WndButton_Submit"):enable(false)
-            ui:children("#WndEditBox_ID"):text('')
+            local tInfo
+            if MY_Farbnamen then
+                tInfo = MY_Farbnamen.GetAusName(szName)
+            end
+            if tInfo then
+                ui:children("#WndButton_Submit"):enable(true)
+                ui:children("#WndEditBox_ID"):text(tInfo.dwID)
+                ui:children("#WndEditBox_Content"):text('')
+                ui:children("#WndCheckBox_TipWhenGroup"):check(true)
+                ui:children("#WndCheckBox_AlertWhenGroup"):check(false)
+            else
+                ui:children("#WndButton_Submit"):enable(false)
+                ui:children("#WndEditBox_ID"):text('')
+            end
         end
       end)
     -- content
