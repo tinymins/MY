@@ -86,34 +86,39 @@ MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
       :text(_L['ID:'])
     -- id input
     ui:append("WndEditBox_ID", "WndEditBox"):children("#WndEditBox_ID"):pos(80, 40)
-      :size(200, 25):text(dwID or note.dwID or ""):multiLine(false)
-      :change(function(dwID)
-        if dwID == "" or string.find(dwID, "[^%d]") then
-            ui:children("#WndButton_Submit"):enable(false)
-        else
-            ui:children("#WndButton_Submit"):enable(true)
-            local rec = MY_Anmerkungen.GetPlayerNote(dwID)
-            if rec then
-                ui:children("#WndEditBox_Name"):text(rec.szName)
-                ui:children("#WndEditBox_Content"):text(rec.szContent)
-                ui:children("#WndCheckBox_TipWhenGroup"):check(rec.bTipWhenGroup)
-                ui:children("#WndCheckBox_AlertWhenGroup"):check(rec.bAlertWhenGroup)
-            end
-        end
-      end)
+      :size(200, 25):multiLine(false):enable(false):color(200,200,200)
+      :text(dwID or note.dwID or "")
+      -- :change(function(dwID)
+      --   if dwID == "" or string.find(dwID, "[^%d]") then
+      --       ui:children("#WndButton_Submit"):enable(false)
+      --   else
+      --       ui:children("#WndButton_Submit"):enable(true)
+      --       local rec = MY_Anmerkungen.GetPlayerNote(dwID)
+      --       if rec then
+      --           ui:children("#WndEditBox_Name"):text(rec.szName)
+      --           ui:children("#WndEditBox_Content"):text(rec.szContent)
+      --           ui:children("#WndCheckBox_TipWhenGroup"):check(rec.bTipWhenGroup)
+      --           ui:children("#WndCheckBox_AlertWhenGroup"):check(rec.bAlertWhenGroup)
+      --       end
+      --   end
+      -- end)
     -- name
     ui:append("Label_Name", "Text"):item("#Label_Name"):pos(20,70)
       :text(_L['Name:'])
     -- name input
     ui:append("WndEditBox_Name", "WndEditBox"):children("#WndEditBox_Name"):pos(80, 70)
-      :size(200, 25):text(szName or note.szName or ""):multiLine(false)
+      :size(200, 25):multiLine(false):text(szName or note.szName or "")
       :change(function(szName)
         local rec = MY_Anmerkungen.GetPlayerNote(szName)
         if rec then
+            ui:children("#WndButton_Submit"):enable(true)
             ui:children("#WndEditBox_ID"):text(rec.dwID)
             ui:children("#WndEditBox_Content"):text(rec.szContent)
             ui:children("#WndCheckBox_TipWhenGroup"):check(rec.bTipWhenGroup)
             ui:children("#WndCheckBox_AlertWhenGroup"):check(rec.bAlertWhenGroup)
+        else
+            ui:children("#WndButton_Submit"):enable(false)
+            ui:children("#WndEditBox_ID"):text('')
         end
       end)
     -- content
@@ -121,12 +126,14 @@ MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
       :text(_L['Content:'])
     -- content input
     ui:append("WndEditBox_Content", "WndEditBox"):children("#WndEditBox_Content"):pos(80, 100)
-      :size(200, 80):text(note.szContent or ""):multiLine(true)
+      :size(200, 80):multiLine(true):text(note.szContent or "")
     -- alert when group
-    ui:append("WndCheckBox_AlertWhenGroup", "WndCheckBox"):children("#WndCheckBox_AlertWhenGroup"):pos(78, 180)
+    ui:append("WndCheckBox_AlertWhenGroup", "WndCheckBox"):children("#WndCheckBox_AlertWhenGroup")
+      :pos(78, 180):width(200)
       :text(_L['alert when group']):check(note.bAlertWhenGroup or false)
     -- tip when group
-    ui:append("WndCheckBox_TipWhenGroup", "WndCheckBox"):children("#WndCheckBox_TipWhenGroup"):pos(78, 200)
+    ui:append("WndCheckBox_TipWhenGroup", "WndCheckBox"):children("#WndCheckBox_TipWhenGroup")
+      :pos(78, 200):width(200)
       :text(_L['tip when group']):check(note.bTipWhenGroup or true)
     -- submit button
     ui:append("WndButton_Submit", "WndButton"):children("#WndButton_Submit"):pos(78, 230):width(80)
