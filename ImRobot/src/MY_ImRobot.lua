@@ -91,6 +91,10 @@ _Cache.OnPanelActive = function(wnd)
             UnRegisterMsgMonitor(_Cache.OnMsgArrive)
         end
     end)
+    
+    ui:append("Text_SetHotkey", "Text"):find("#Text_SetHotkey"):pos(w-140, 20):color(255,255,0)
+      :text(_L['>> set hotkey <<'])
+      :click(function() MY.Game.SetHotKey() end)
 end
 
 MY.RegisterPanel( "ImRobot", _L["im robot"], _L['General'], "ui/Image/UICommon/PlugIn.UITex|6", {255,127,0,200}, {
