@@ -29,6 +29,8 @@ _Cache.OnFrameBreathe = function()
             xT = x + 5
             if xT + wT > W then
                 xT = W - wT
+            elseif xT < 0 then
+                xT = 0
             end
             
             if y >= hT then -- 顶部可以显示的下
@@ -59,7 +61,7 @@ end
 local SNAPLINES_RGB = {255, 255, 255}
 local TIP_RGB = {255, 0, 0}
 MY.RegisterInit(function()
-    _Cache.frame = MY.UI.CreateFrame('MY_DevTools', MY.Const.UI.Frame.TOPMOST_EMPTY):raw(1)
+    _Cache.frame = MY.UI.CreateFrame('MY_DevTools', MY.Const.UI.Frame.TOPMOST2_EMPTY):raw(1)
     local ui = MY.UI(_Cache.frame)
     local W, H = Station.GetClientSize()
     ui:size(W, H)
