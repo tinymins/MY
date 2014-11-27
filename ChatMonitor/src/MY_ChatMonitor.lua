@@ -390,7 +390,7 @@ _MY_ChatMonitor.Init = function()
     _MY_ChatMonitor.bInited = true
     _MY_ChatMonitor.RegisterMsgMonitor()
     
-    _MY_ChatMonitor.uiFrame = MY.UI.CreateFrame('MY_ChatMonitor',true):size(250,150):hover(function(bIn)
+    _MY_ChatMonitor.uiFrame = MY.UI.CreateFrame('MY_ChatMonitor', MY.Const.UI.Frame.TOPMOST_EMPTY):size(250,150):hover(function(bIn)
         MY.DelayCall('MY_ChatMonitor_Hide')
         if not bIn then MY.DelayCall(function() _MY_ChatMonitor.uiFrame:fadeOut(500) end,5000,'MY_ChatMonitor_Hide') end
     end):toggle(false)

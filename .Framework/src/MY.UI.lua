@@ -383,7 +383,7 @@ function _MY.UI:children(filter)
     self:_checksum()
     local child = {}
     local childHash = {}
-    if type(filter)=="string" and string.sub(filter, 1, 1)=="#" then
+    if type(filter)=="string" and string.sub(filter, 1, 1)=="#" and string.sub(filter, 2, 2)~="^" then
         filter = string.sub(filter, 2)
         for _, ele in pairs(self.eles) do
             local c = ele.raw:Lookup(filter)
@@ -2097,6 +2097,13 @@ MY.Const.UI.Tip.NO_HIDE      = 100
 MY.Const.UI.Tip.HIDE         = 101
 MY.Const.UI.Tip.ANIMATE_HIDE = 102
 
+MY.Const.UI.Frame = MY.Const.UI.Frame or {}
+MY.Const.UI.Frame.TOPMOST       = 1
+MY.Const.UI.Frame.TOPMOST_EMPTY = 2
+MY.Const.UI.Frame.NORMAL        = 3
+MY.Const.UI.Frame.NORMAL_EMPTY  = 4
+MY.Const.UI.Frame.LOWEST        = 5
+MY.Const.UI.Frame.LOWEST_EMPTY  = 6
 -- 设置元表，这样可以当作函数调用，其效果相当于 MY.UI.Fetch
 setmetatable(MY.UI, { __call = function(me, ...) return me.Fetch(...) end, __metatable = true })
 
@@ -2116,22 +2123,35 @@ MY.UI.RegisterUIEvent = function(raw, szEvent, fnEvent)
 end
 
 -- create new frame
-MY.UI.CreateFrame = function(szName, bEmpty, bLowest)
-    local frm
-    local szIniFile = MY.GetAddonInfo().szFrameworkRoot.."ui\\WndFrame.ini"
-    if bEmpty then
-        if bLowest then
-            szIniFile = MY.GetAddonInfo().szFrameworkRoot.."ui\\WndFrameEmptyLowest.ini"
-        else
-            szIniFile = MY.GetAddonInfo().szFrameworkRoot.."ui\\WndFrameEmpty.ini"
-        end
+MY.UI.CreateFrame = function(szName, nStyle)
+    local szIniFile
+    -- 加载对应窗体文件
+    nStyle = nStyle or MY.Const.UI.Frame.NORMAL
+    if nStyle == MY.Const.UI.Frame.TOPMOST then
+        szIniFile = MY.GetAddonInfo().szFrameworkRoot.."ui\\WndFrame\\Topmost.ini"
+    elseif nStyle == MY.Const.UI.Frame.TOPMOST_EMPTY then
+        szIniFile = MY.GetAddonInfo().szFrameworkRoot.."ui\\WndFrame\\TopmostEmpty.ini"
+    elseif nStyle == MY.Const.UI.Frame.NORMAL then
+        szIniFile = MY.GetAddonInfo().szFrameworkRoot.."ui\\WndFrame\\Normal.ini"
+    elseif nStyle == MY.Const.UI.Frame.NORMAL_EMPTY then
+        szIniFile = MY.GetAddonInfo().szFrameworkRoot.."ui\\WndFrame\\NormalEmpty.ini"
+    elseif nStyle == MY.Const.UI.Frame.LOWEST then
+        szIniFile = MY.GetAddonInfo().szFrameworkRoot.."ui\\WndFrame\\Lowest.ini"
+    elseif nStyle == MY.Const.UI.Frame.LOWEST_EMPTY then
+        szIniFile = MY.GetAddonInfo().szFrameworkRoot.."ui\\WndFrame\\LowestEmpty.ini"
+    else
+        return
     end
     
+    local frm
+    -- 关闭已有窗口
     if type(szName) == "string" then
-        if bEmpty and bLowest then
-            frm = Station.Lookup("Lowest/" .. szName)
-        else
+        if nStyle == MY.Const.UI.Frame.TOPMOST or nStyle == MY.Const.UI.Frame.TOPMOST_EMPTY then
+            frm = Station.Lookup("Topmost/" .. szName)
+        elseif nStyle == MY.Const.UI.Frame.NORMAL or nStyle == MY.Const.UI.Frame.NORMAL_EMPTY then
             frm = Station.Lookup("Normal/" .. szName)
+        elseif nStyle == MY.Const.UI.Frame.LOWEST or nStyle == MY.Const.UI.Frame.LOWEST_EMPTY then
+            frm = Station.Lookup("Lowest/" .. szName)
         end
         if frm then
             Wnd.CloseWindow(frm)
@@ -2141,7 +2161,9 @@ MY.UI.CreateFrame = function(szName, bEmpty, bLowest)
         frm = Wnd.OpenWindow(szIniFile)
     end
     frm:Show()
-    if not bEmpty then
+    if nStyle == MY.Const.UI.Frame.NORMAL or
+    nStyle == MY.Const.UI.Frame.LOWEST or
+    nStyle == MY.Const.UI.Frame.TOPMOST then
         frm:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
         frm:Lookup("Btn_Close").OnLButtonClick = function()
             if frm.bClose then

@@ -128,7 +128,7 @@ MY_BuffMonitor.ReloadBuffMonitor = function()
     -- check if enable
     if MY_BuffMonitor.bSelfOn then
         -- create frame
-        local ui = MY.UI.CreateFrame("MY_BuffMonitor_Self", true):drag(false)
+        local ui = MY.UI.CreateFrame("MY_BuffMonitor_Self", MY.Const.UI.Frame.NORMAL_EMPTY):drag(false)
         -- draw boxes
         local nCount = 0
         for _, mon in ipairs(MY_BuffMonitor.tBuffList[dwKungFuID].Self) do
