@@ -22,11 +22,13 @@ MY_BuffMonitor = MY_BuffMonitor or {}
 
 MY_BuffMonitor.bSelfOn = false
 MY_BuffMonitor.bTargetOn = false
+MY_BuffMonitor.bDragable = false
 MY_BuffMonitor.anchorSelf = { s = "CENTER", r = "CENTER", x = -320, y = 150 }
 MY_BuffMonitor.anchorTarget = { s = "CENTER", r = "CENTER", x = -320, y = 98 }
 MY_BuffMonitor.tBuffList = MY.LoadLUAData(_DEFAULT_BUFFMONITOR_CONFIG_FILE_)
 RegisterCustomData("MY_BuffMonitor.bSelfOn")
 RegisterCustomData("MY_BuffMonitor.bTargetOn")
+RegisterCustomData("MY_BuffMonitor.bDragable")
 RegisterCustomData("MY_BuffMonitor.anchorSelf")
 RegisterCustomData("MY_BuffMonitor.anchorTarget")
 RegisterCustomData("MY_BuffMonitor.tBuffList")
@@ -128,7 +130,7 @@ MY_BuffMonitor.ReloadBuffMonitor = function()
     -- check if enable
     if MY_BuffMonitor.bSelfOn then
         -- create frame
-        local ui = MY.UI.CreateFrame("MY_BuffMonitor_Self", MY.Const.UI.Frame.NORMAL_EMPTY):drag(false)
+        local ui = MY.UI.CreateFrame("MY_BuffMonitor_Self", MY.Const.UI.Frame.NORMAL_EMPTY)
         -- draw boxes
         local nCount = 0
         for _, mon in ipairs(MY_BuffMonitor.tBuffList[dwKungFuID].Self) do
@@ -160,6 +162,13 @@ MY_BuffMonitor.ReloadBuffMonitor = function()
             -- register render function
             refreshObjectBuff(GetClientPlayer(), MY_BuffMonitor.tBuffList[dwKungFuID].Self, _Cache.handleBoxs.Self)
         end)
+        if MY_BuffMonitor.bDragable then
+            ui:drag(0, 0, nCount * 52, 52):drag(nil, function()
+                MY_BuffMonitor.anchorSelf = ui:anchor()
+            end)
+        else
+            ui:drag(false):penetrable(true)
+        end
     end
     if MY_BuffMonitor.bTargetOn then
         -- create frame

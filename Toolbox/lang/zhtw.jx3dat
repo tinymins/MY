@@ -49,6 +49,7 @@ data = {
     ['display %d skills.'] = '顯示%d格。',
     
     ['* buff monitor'] = '※ BUFF監控',
+    ['undragable'] = '禁止拖動',
     ['self buff monitor'] = '自身BUFF監控',
     ['target buff monitor'] = '目標BUFF監控',
     ['set self buff monitor'] = '設置自身BUFF監控',

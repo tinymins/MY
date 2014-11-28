@@ -242,6 +242,14 @@ _MY_ToolBox.OnPanelActive = function(wnd)
     
     local x, y = 20, 200
     ui:append("Text_BuffMonitorTip", "Text"):item("#Text_BuffMonitorTip"):text(_L['* buff monitor']):color(255,255,0):pos(x, y)
+    x = x + 100
+    ui:append("WndCheckBox_BuffMonitor_Undragable", "WndCheckBox"):children("#WndCheckBox_BuffMonitor_Undragable"):pos(x, y)
+      :text(_L['undragable']):check(not MY_BuffMonitor.bDragable)
+      :check(function(bChecked)
+        MY_BuffMonitor.bDragable = not bChecked
+        MY_BuffMonitor.ReloadBuffMonitor()
+      end)
+    x = 20
     y = y + 30
     ui:append("WndCheckBox_BuffMonitor_Self", "WndCheckBox"):children("#WndCheckBox_BuffMonitor_Self"):pos(x, y)
       :text(_L['self buff monitor']):check(MY_BuffMonitor.bSelfOn)
