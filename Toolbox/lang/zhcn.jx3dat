@@ -49,6 +49,7 @@ data = {
     ['Shenxing has been cancelled, cause you got the zhenyan.'] = '您获取到阵眼，为防止神行千里CD被黑，读条已自动打断。',
     
     ['* buff monitor'] = '※ BUFF监控',
+    ['undragable'] = '禁止拖动',
     ['self buff monitor'] = '自身BUFF监控',
     ['target buff monitor'] = '目标BUFF监控',
     ['set self buff monitor'] = '设置自身BUFF监控',
