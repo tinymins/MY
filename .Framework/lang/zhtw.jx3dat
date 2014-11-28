@@ -8,6 +8,7 @@ data = {
     ["Target"] = "目標",
     ["Battle"] = "戰鬥",
     ["Others"] = "其它",
+    ["Development"] = "開發",
     
     ['nearby channel'] = '近聊頻道',
     ['friend channel'] = '好友頻道',
