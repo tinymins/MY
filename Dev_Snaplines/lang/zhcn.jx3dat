@@ -1,0 +1,10 @@
+-- language data (zhcn) updated at 2014-4-10 03:38:11
+data = {
+    ['Snaplines'] = '元素辅助',
+    ['enable tree path view'] = '启用UI元素辅助线与信息显示',
+    ['show tip'] = '显示信息',
+    ['font'] = '字体',
+    ['show wnd snaplines'] = '显示窗体辅助线',
+    ['show item snaplines'] = '显示组件容器辅助线',
+    ['auto detect box'] = '自动查找鼠标滑过的Box',
+}
