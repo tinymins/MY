@@ -965,6 +965,7 @@ end
 -- drag area
 -- (self) drag(boolean bEnableDrag) -- enable/disable drag
 -- (self) drag(number x, number y, number w, number h) -- set drag positon and area
+-- (self) drag(function fnOnDrag, function fnOnDragEnd)-- bind frame/item frag event handle
 function _MY.UI:drag(x, y, w, h)
     self:_checksum()
     if type(x) == 'boolean' then
@@ -972,13 +973,37 @@ function _MY.UI:drag(x, y, w, h)
             pcall(function() (ele.frm or ele.raw):EnableDrag(x) end)
         end
         return self
-    elseif x or y or w or h then
+    elseif type(x) == 'number' or
+    type(y) == 'number' or
+    type(w) == 'number' or
+    type(h) == 'number' then
         for i = 1, #self.eles, 1 do
             local s, err =pcall(function()
                 local _w, _h = self:eq(i):size()
                 x, y, w, h = x or 0, y or 0, w or _w, h or _h
                 self:frm(i):raw(1):SetDragArea(x, y, w, h)
             end)
+        end
+        return self
+    elseif type(x) == 'function' or
+    type(y) == 'function' or
+    type(w) == 'function' then
+        for _, ele in pairs(self.eles) do
+            if ele.frm then
+                if x then
+                    MY.UI.RegisterUIEvent(ele.frm, 'OnFrameDragSetPosEnd', x)
+                end
+                if y then
+                    MY.UI.RegisterUIEvent(ele.frm, 'OnFrameDragEnd', y)
+                end
+            elseif ele.itm then
+                if x then
+                    MY.UI.RegisterUIEvent(ele.itm, 'OnItemLButtonDrag', x)
+                end
+                if y then
+                    MY.UI.RegisterUIEvent(ele.itm, 'OnItemLButtonDragEnd', y)
+                end
+            end
         end
         return self
     else
