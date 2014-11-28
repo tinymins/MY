@@ -172,7 +172,7 @@ MY_BuffMonitor.ReloadBuffMonitor = function()
     end
     if MY_BuffMonitor.bTargetOn then
         -- create frame
-        local ui = MY.UI.CreateFrame("MY_BuffMonitor_Target", true):drag(false)
+        local ui = MY.UI.CreateFrame("MY_BuffMonitor_Target", MY.Const.UI.Frame.NORMAL_EMPTY)
         -- draw boxes
         local nCount = 0
         for _, mon in ipairs(MY_BuffMonitor.tBuffList[dwKungFuID].Target) do
@@ -202,6 +202,13 @@ MY_BuffMonitor.ReloadBuffMonitor = function()
             -- register render function
             refreshObjectBuff(MY.GetObject(MY.GetTarget()), MY_BuffMonitor.tBuffList[dwKungFuID].Target, _Cache.handleBoxs.Target)
         end)
+        if MY_BuffMonitor.bDragable then
+            ui:drag(0, 0, nCount * 52, 52):drag(nil, function()
+                MY_BuffMonitor.anchorTarget = ui:anchor()
+            end)
+        else
+            ui:drag(false):penetrable(true)
+        end
     end
 end
 MY.RegisterInit(MY_BuffMonitor.ReloadBuffMonitor)
