@@ -1607,10 +1607,12 @@ function _MY.UI:size(nWidth, nHeight)
     else -- get
         -- select the first item
         local ele = self.eles[1]
-        -- try to get its name
-        local status, w, h = pcall(function() return ele.raw:GetSize() end)
-        -- if succeed then return its name
-        if status then return w, h else MY.Debug(w..'\n','ERROR _MY.UI:height|width|size' ,1) return nil end
+        if ele and ele.raw then
+            -- try to get its name
+            local status, w, h = pcall(function() return ele.raw:GetSize() end)
+            -- if succeed then return its name
+            if status then return w, h else MY.Debug(w..'\n','ERROR _MY.UI:height|width|size' ,1) return nil end
+        end
     end
 end
 
@@ -2252,7 +2254,7 @@ end
 MY.UI.OpenFontPicker = function(callback, t)
     local clientW, clientH = Station.GetClientSize()
     local w, h = 820, 650
-    local ui = MY.UI.CreateFrame("_MY_Color_Picker", true):size(w,h):pos((clientW-w)/2,(clientH-h)/2):drag(true):drag(0,0,w,h)
+    local ui = MY.UI.CreateFrame("_MY_Color_Picker", MY.Const.UI.Frame.NORMAL_EMPTY):size(w,h):pos((clientW-w)/2,(clientH-h)/2):drag(true):drag(0,0,w,h)
     PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
     ui:append('Image_bg',"Image"):item('#Image_bg'):image(MY.GetAddonInfo().szUITexPath,1):size(w,h):alpha(150)
     ui:append("Text_Close", "WndButton"):children("#Text_Close"):pos((w-150)/2, h-30):width(150)
