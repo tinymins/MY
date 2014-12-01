@@ -1,0 +1,5 @@
+-- language data (zhcn) updated at 2014-4-10 03:38:11
+data = {
+    ['UITexViewer'] = '图像资源',
+    ['(left click to generate xml)'] = '(左键点击可生成XML)',
+}
