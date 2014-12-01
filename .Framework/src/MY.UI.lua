@@ -814,6 +814,7 @@ function _MY.UI:append(szName, szType, tArg)
                             delay        = 0    ,  -- delay time when edit changed
                             disabled     = false,  -- disable autocomplete
                             minLength    = 0    ,  -- the min length of the searching string
+                            maxOption    = 0    ,  -- the max number of displayed options (0 means no limitation)
                             source       = {}   ,  -- option list
                         }
                     end
@@ -1133,6 +1134,11 @@ function _MY.UI:autocomplete(method, arg1, arg2)
                     -- create menu
                     local menu = {}
                     for _, szOption in ipairs(tOption) do
+                        -- max option limit
+                        if option.maxOption > 0 and #menu >= option.maxOption then
+                            break
+                        end
+                        -- create new option
                         local t = {
                             szOption = szOption,
                             fnAction = function()
