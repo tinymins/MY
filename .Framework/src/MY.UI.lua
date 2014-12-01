@@ -703,7 +703,7 @@ function _MY.UI:append(szName, szType, tArg)
                                 hButtonDown:Hide()
                             end
                             local wb, hb = hScrollBar:GetSize()
-                            local _max = ( 150 > (hb * 1 / 2) and (hb * 1 / 2) ) or 150
+                            local _max = ( 100 > (hb * 1 / 2) and (hb * 1 / 2) ) or 100
                             local _min = ( 50 > hb and (hb * 1 / 3) ) or 50
                             local hs = hb - nStep
                             local hs = ( hs > _max and _max ) or hs
