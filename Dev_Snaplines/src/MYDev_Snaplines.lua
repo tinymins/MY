@@ -61,16 +61,20 @@ MYDev_Snaplines.GetElementTip = function(raw, tTip)
         table.insert(tTip, _L('FontProjection: %s', raw:GetFontProjection()))
         table.insert(tTip, _L('TextExtent: %s', raw:GetTextExtent()))
         table.insert(tTip, _L('TextPosExtent: %s', raw:GetTextPosExtent()))
+        table.insert(tTip, _L('Index: %s', raw:GetIndex()))
     elseif szType == 'Image' then
         table.insert(tTip, _L('Frame: %s', raw:GetFrame()))
         table.insert(tTip, _L('ImageType: %s', raw:GetImageType()))
         table.insert(tTip, _L('ImageID: %s', raw:GetImageID()))
+        table.insert(tTip, _L('Index: %s', raw:GetIndex()))
     elseif szType == 'Shadow' then
         table.insert(tTip, _L('ShadowColor: %s', raw:GetShadowColor()))
         table.insert(tTip, _L('ColorRGB: %s, %s, %s', raw:GetColorRGB()))
         table.insert(tTip, _L('IsTriangleFan: %s', tostring(raw:IsTriangleFan())))
+        table.insert(tTip, _L('Index: %s', raw:GetIndex()))
     elseif szType == 'Animate' then
         table.insert(tTip, _L('IsFinished: %s', tostring(raw:IsFinished())))
+        table.insert(tTip, _L('Index: %s', raw:GetIndex()))
     elseif szType == 'Box' then
         table.insert(tTip, _L('BoxIndex: %s', raw:GetBoxIndex()))
         -- table.insert(tTip, _L('Object: %s', raw:GetObject()))
@@ -98,6 +102,7 @@ MYDev_Snaplines.GetElementTip = function(raw, tTip)
             table.insert(tTip, _L('OverTextFontScheme4: %s', raw:GetOverTextFontScheme(4)))
             table.insert(tTip, _L('OverTextPosition4: %s', raw:GetOverTextPosition(4)))
         end
+        table.insert(tTip, _L('Index: %s', raw:GetIndex()))
 
     end
     
@@ -125,9 +130,7 @@ _Cache.OnFrameBreathe = function()
             ui:item("#Shadow_HoverWndBottom"):pos(0, yW + hW):show()
             if MYDev_Snaplines.bDetectBox and not (item and item:GetType() == 'Box') then
                 MY.UI(wnd):find('.Box'):each(function()
-                    local x, y = this:GetAbsPos()
-                    local w, h = this:GetSize()
-                    if xC >= x and xC <= x + w and yC >= y and yC <= y + h then
+                    if this:PtInItem(xC, yC) then
                         table.insert(tTip, '---------------------')
                         tTip = MYDev_Snaplines.GetElementTip(this, tTip)
                     end
