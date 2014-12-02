@@ -14,6 +14,7 @@ _Cache.OnPanelActive = function(wnd)
     local w, h = ui:size()
     local x, y = 20, 20
     
+    _Cache.tUITexList = LoadLUAData(MY.GetAddonInfo().szRoot .. 'Dev_UITexViewer/data/data') or {}
     
     local uiBoard = ui:append('WndScrollBox_ImageList','WndScrollBox')
       :children('#WndScrollBox_ImageList')
@@ -65,10 +66,15 @@ _Cache.OnPanelActive = function(wnd)
         end
       end)
       :autocomplete('option', 'maxOption', 20)
-      :autocomplete('option', 'source', LoadLUAData(MY.GetAddonInfo().szRoot .. 'Dev_UITexViewer/data/data') or {})
+      :autocomplete('option', 'source', _Cache.tUITexList)
       :change()
 end
 
+_Cache.OnPanelDeactive = function(wnd)
+    _Cache.tUITexList = nil
+    collectgarbage("collect")
+end
+
 MY.RegisterPanel( "Dev_UITexViewer", _L["UITexViewer"], _L['Development'], "ui/Image/UICommon/BattleFiled.UITex|7", {255,127,0,200}, {
-    OnPanelActive = _Cache.OnPanelActive, OnPanelDeactive = nil
+    OnPanelActive = _Cache.OnPanelActive, OnPanelDeactive = _Cache.OnPanelDeactive
 })
