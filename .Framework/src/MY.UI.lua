@@ -1736,6 +1736,29 @@ function _MY.UI:image(szImage, nFrame)
     return self
 end
 
+-- (self) Instance:frame(nFrame)
+-- (number) Instance:frame()
+function _MY.UI:frame(nFrame)
+    self:_checksum()
+    if nFrame then
+        nFrame = tonumber(nFrame)
+        for _, ele in pairs(self.eles) do
+            pcall(function() ele.img:SetFrame(nFrame) end)
+            pcall(function() ele.img:GetParent():FormatAllItemPos() end)
+        end
+    else
+        -- select the first item
+        local ele = self.eles[1]
+        if ele and ele.type == 'Image' then
+            -- try to get its frame
+            local status, nFrame = pcall(function() return ele.raw:GetFrame() end)
+            -- if succeed then return its name
+            if status then return nFrame else MY.Debug(nFrame..'\n','ERROR _MY.UI:frame' ,1) return nil end
+        end
+    end
+    return self
+end
+
 -- (self) Instance:handleStyle(dwStyle)
 function _MY.UI:handleStyle(dwStyle)
     self:_checksum()
