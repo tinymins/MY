@@ -58,6 +58,9 @@ data = {
     ['mingyi target buff monitor'] = '茗伊目标BUFF监控',
     ['please input buff name:'] = '请输入BUFF名称：',
     
+    ['The kill sequence is: '] = '正确击杀顺序：',
+    ['failed to calc.'] = '计算失败。',
+    
     ['my anmerkungen'] = '茗伊随身便笺',
     ['* anmerkungen'] = '※ 随身便笺 记在小本子上',
     ['width: %dpx.'] = '宽度：%d像素。',
