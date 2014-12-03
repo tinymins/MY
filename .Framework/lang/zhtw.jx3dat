@@ -109,7 +109,7 @@ data = {
     ['Font %d'] = '字體 %d',
     
     ['author\'s weibo'] = '作者 @一名宅',
-    ['MingYi @ Double Dream Town'] = '茗伊 @ 電五·雙夢鎮',
+    ['MingYi @ Double Dream Town'] = '茗伊 @ 雙夢鎮',
     
     -- MY_CheckUpdate.lua
     ['new version found.'] = '發現新版本！',
