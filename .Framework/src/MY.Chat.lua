@@ -704,8 +704,8 @@ end)
 MY.RegisterInit(function()
     if Station.Lookup("Lowest2/ChatPanel1/Wnd_Message").bMyHooked then
         MY.Chat.bHookedAlready = true
-    else
-        MY.Chat.bHookedAlready = false
+    -- else
+    --     MY.Chat.bHookedAlready = false
     end
-    Station.Lookup("Lowest2/ChatPanel1/Wnd_Message").bMyHooked = true   
+    Station.Lookup("Lowest2/ChatPanel1/Wnd_Message").bMyHooked = true
 end)
