@@ -15,6 +15,11 @@
 #######################################################################################################
 ]]
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
+local _Cache = {
+    bFighting = false,
+    nLastFightStartTimestarp = 0,
+    nLastFightEndTimestarp = 0,
+}
 MY_InfoTip = {}
 MY_InfoTip.Config = {
     FPS       = { -- FPS
