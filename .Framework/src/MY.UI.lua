@@ -629,7 +629,7 @@ _MY.tItemXML = {
 	["Image"] = "<image>w=100 h=100 eventid=371 </image>",
 	["Box"] = "<box>w=48 h=48 eventid=525311 </text>",
 	["Shadow"] = "<shadow>w=15 h=15 eventid=277 </shadow>",
-	["Handle"] = "<handle>w=10 h=10</handle>",
+	["Handle"] = "<handle>firstpostype=0 w=10 h=10</handle>",
 }
 -- append
 -- similar as jQuery.append()
