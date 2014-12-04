@@ -236,3 +236,29 @@ end)
 MY.Game.GetServer = function()
     return table.concat({GetUserServer()},'_'), {GetUserServer()}
 end
+
+--[[ 获取指定对象的名字
+]]
+MY.Game.GetObjectName = function(tar)
+    local szName = tar.szName
+    if IsPlayer(tar.dwID) then
+        return szName
+    else
+        if szName == "" then
+            szName = string.gsub(Table_GetNpcTemplateName(tar.dwTemplateID), "^%s*(.-)%s*$", "%1")
+            if szName == "" then
+                szName = tar.dwID
+            end
+        end
+        if tar.dwEmployer and tar.dwEmployer ~= 0 and szName == Table_GetNpcTemplateName(tar.dwTemplateID) then
+            local emp = GetPlayer(tar.dwEmployer)
+            if not emp then
+                szName =  g_tStrings.STR_SOME_BODY .. g_tStrings.STR_PET_SKILL_LOG .. tar.szName
+            else
+                szName = emp.szName .. g_tStrings.STR_PET_SKILL_LOG .. tar.szName
+            end
+        end
+        return szName
+    end
+end
+MY.GetObjectName = MY.Game.GetObjectName
