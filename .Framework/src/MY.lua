@@ -174,7 +174,6 @@ local _MY = {
     szShortName = _L["mingyi plugin"],
     szIniFile = _FRAMEWORK_ROOT_.."ui\\MY.ini",
     szUITexPath = _FRAMEWORK_ROOT_.."image\\UIImage.UITex",
-    szIniFileTabBox = _FRAMEWORK_ROOT_.."ui\\WndTabBox.ini",
     szIniFileMainPanel = _FRAMEWORK_ROOT_.."ui\\MainPanel.ini",
     
     tTabs = {   -- ±Í«©“≥
@@ -446,90 +445,6 @@ end
   #       # # # # # # #         # #           #           #               
 #######################################################################################################
 ]]
---[[ ÷ÿªÊTab¥∞ø⁄ ]]
-MY.RedrawTabPanel1 = function()
-    local nTop = 3
-    local frame = MY.GetFrame():Lookup("Window_Tabs"):GetFirstChild()
-    while frame do
-        local frame_d = frame
-        frame = frame:GetNext()
-        frame_d:Destroy()
-    end
-    local frame = MY.GetFrame():Lookup("Window_Main"):GetFirstChild()
-    while frame do
-        local frame_d = frame
-        frame = frame:GetNext()
-        frame_d:Destroy()
-    end
-    for i = 1, #_MY.aTabs, 1 do
-        local tTab = _MY.aTabs[i]
-        -- insert tab
-        local fx = Wnd.OpenWindow(_MY.szIniFileTabBox, "aTabBox")
-        if fx then
-            local item = fx:Lookup("TabBox")
-            if item then
-                item:ChangeRelation(MY.GetFrame():Lookup("Window_Tabs"), true, true)
-                item:SetName("TabBox_" .. tTab.szName)
-                item:SetRelPos(0,nTop)
-                item:Lookup("","Text_TabBox_Title"):SetText(tTab.szTitle)
-                item:Lookup("","Text_TabBox_Title"):SetFontColor(unpack(tTab.rgbTitleColor))
-                item:Lookup("","Text_TabBox_Title"):SetAlpha(tTab.alpha)
-                if tTab.dwIconFrame then
-                    item:Lookup("","Image_TabBox_Icon"):FromUITex(tTab.szIconTex, tTab.dwIconFrame)
-                else
-                    item:Lookup("","Image_TabBox_Icon"):FromTextureFile(tTab.szIconTex)
-                end
-                local w,h = item:GetSize()
-                nTop = nTop + h
-            end
-            -- register tab mouse event
-            item.OnMouseEnter = function()
-                this:Lookup("","Image_TabBox_Background"):Hide()
-                this:Lookup("","Image_TabBox_Background_Hover"):Show()
-            end
-            item.OnMouseLeave = function()
-                this:Lookup("","Image_TabBox_Background"):Show()
-                this:Lookup("","Image_TabBox_Background_Hover"):Hide()
-            end
-            item.OnLButtonDown = function()
-                if this:Lookup("","Image_TabBox_Background_Sel"):IsVisible() then return end
-                PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
-                local p = this:GetParent():GetFirstChild()
-                while p do
-                    p:Lookup("","Image_TabBox_Background_Sel"):Hide()
-                    p = p:GetNext()
-                end
-                this:Lookup("","Image_TabBox_Background_Sel"):Show()
-                local frame = MY.GetFrame():Lookup("Window_Main"):GetFirstChild()
-                while frame do
-                    if frame.fn.OnPanelDeactive then
-                        local status, err = pcall(frame.fn.OnPanelDeactive, frame)
-                        if not status then MY.Debug(err..'\n','MY#OnPanelDeactive',1) end
-                    end
-                    frame:Destroy()
-                    frame = frame:GetNext()
-                end
-                -- insert main panel
-                local fx = Wnd.OpenWindow(_MY.szIniFileMainPanel, "aMainPanel")
-                local mainpanel
-                if fx then
-                    mainpanel = fx:Lookup("MainPanel")
-                    if mainpanel then
-                        mainpanel:ChangeRelation(MY.GetFrame():Lookup("Window_Main"), true, true)
-                        mainpanel:SetRelPos(0,0)
-                        mainpanel.fn = tTab.fn
-                    end
-                end
-                Wnd.CloseWindow(fx)
-                if tTab.fn.OnPanelActive then
-                    local status, err = pcall(tTab.fn.OnPanelActive, mainpanel)
-                    if not status then MY.Debug(err..'\n','MY#OnPanelActive',1) end
-                end
-            end
-        end
-        Wnd.CloseWindow(fx)
-    end
-end
 
 MY.RedrawCategory = function(szCategory)
     local frame = MY.GetFrame()
