@@ -38,7 +38,7 @@ MY_ToolBox.bFriendHeadTip = false
 RegisterCustomData("MY_ToolBox.bFriendHeadTip")
 _MY_ToolBox.FriendHeadTip = function(bEnable)
     if bEnable then
-        local frm = MY.UI.CreateFrame("MY_Shadow",true,true):show()
+        local frm = MY.UI.CreateFrame("MY_Shadow", MY.Const.UI.Frame.LOWEST_EMPTY):show()
         local fnPlayerEnter = function(dwID)
             local p = MY.Player.GetFriend(dwID)
             if p then
