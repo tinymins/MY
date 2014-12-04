@@ -144,6 +144,8 @@ MY_MiddleMapMark.SaveData = function()
     MY.SaveLUAData(SZ_CACHE_PATH, MY.Json.Encode(Data))
 end
 
+local m_nLastRedrawFrame = GetLogicFrameCount()
+local MARK_RENDER_INTERVAL = GLOBAL.GAME_FPS * 5
 MY.RegisterEvent("NPC_ENTER_SCENE",    "MY_MiddleMapMark", function()
     local npc = GetNpc(arg0)
     local player = GetClientPlayer()
@@ -186,6 +188,11 @@ MY.RegisterEvent("NPC_ENTER_SCENE",    "MY_MiddleMapMark", function()
         szTitle = npc.szTitle,
         dwTemplateID = npc.dwTemplateID,
     })
+    -- redraw ui
+    if GetLogicFrameCount() - m_nLastRedrawFrame > MARK_RENDER_INTERVAL then
+        m_nLastRedrawFrame = GetLogicFrameCount()
+        MY_MiddleMapMark.Search(_Cache.szKeyword)
+    end
 end)
 MY.RegisterEvent("DOODAD_ENTER_SCENE", "MY_MiddleMapMark", function()
     local doodad = GetDoodad(arg0)
@@ -224,6 +231,11 @@ MY.RegisterEvent("DOODAD_ENTER_SCENE", "MY_MiddleMapMark", function()
         szTitle = doodad.szTitle,
         dwTemplateID = doodad.dwTemplateID,
     })
+    -- redraw ui
+    if GetLogicFrameCount() - m_nLastRedrawFrame > MARK_RENDER_INTERVAL then
+        m_nLastRedrawFrame = GetLogicFrameCount()
+        MY_MiddleMapMark.Search(_Cache.szKeyword)
+    end
 end)
 MY.RegisterEvent('LOGIN_GAME', MY_MiddleMapMark.LoadData)
 MY.RegisterEvent('PLAYER_ENTER_GAME', MY_MiddleMapMark.LoadData)
