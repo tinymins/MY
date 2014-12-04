@@ -35,7 +35,7 @@ MY_Anmerkungen.ReloadNotePanel = function()
     MY.UI("Normal/MY_Anmerkungen_NotePanel"):remove()
     if MY_Anmerkungen.bNotePanelEnable then
         -- frame
-        local ui = MY.UI.CreateFrame("MY_Anmerkungen_NotePanel", true)
+        local ui = MY.UI.CreateFrame("MY_Anmerkungen_NotePanel", MY.Const.UI.Frame.NORMAL_EMPTY)
         ui:size(MY_Anmerkungen.nNotePanelWidth, MY_Anmerkungen.nNotePanelHeight)
           :drag(true):drag(0,0,MY_Anmerkungen.nNotePanelWidth, 25)
           :anchor(MY_Anmerkungen.anchorNotePanel)
