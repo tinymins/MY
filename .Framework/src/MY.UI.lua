@@ -921,8 +921,8 @@ function _MY.UI:hide()
     return self
 end
 
--- visiable
-function _MY.UI:visiable(bVisiable)
+-- visible
+function _MY.UI:visible(bVisiable)
     self:_checksum()
     if type(bVisiable)=='boolean' then
         return self:toggle(bVisiable)
@@ -932,7 +932,7 @@ function _MY.UI:visiable(bVisiable)
         -- try to get its name
         local status, err = pcall(function() return ele.raw:IsVisible() end)
         -- if succeed then return its name
-        if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:visiable' ,1) return nil end
+        if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:visible' ,1) return nil end
     end
 end
 
@@ -1299,7 +1299,7 @@ function _MY.UI:fadeTo(nTime, nOpacity, callback)
             local fnCurrent = function(nStart, nEnd, nTotalTime, nDuringTime)
                 return ( nEnd - nStart ) * nDuringTime / nTotalTime + nStart -- 线性模型
             end
-            if not ele:visiable() then ele:alpha(0):toggle(true) end
+            if not ele:visible() then ele:alpha(0):toggle(true) end
             MY.BreatheCall(function() 
                 ele:show()
                 local nCurrentAlpha = fnCurrent(nStartAlpha, nOpacity, nTime, GetTime()-nStartTime)
@@ -1352,7 +1352,7 @@ function _MY.UI:slideTo(nTime, nHeight, callback)
             local fnCurrent = function(nStart, nEnd, nTotalTime, nDuringTime)
                 return ( nEnd - nStart ) * nDuringTime / nTotalTime + nStart -- 线性模型
             end
-            if not ele:visiable() then ele:height(0):toggle(true) end
+            if not ele:visible() then ele:height(0):toggle(true) end
             MY.BreatheCall(function() 
                 ele:show()
                 local nCurrentValue = fnCurrent(nStartValue, nHeight, nTime, GetTime()-nStartTime)
