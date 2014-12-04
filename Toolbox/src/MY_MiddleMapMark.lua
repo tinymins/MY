@@ -85,6 +85,11 @@ MY.RegisterEvent("NPC_ENTER_SCENE",    "MY_MiddleMapMark", function()
     if npc.dwEmployer and npc.dwEmployer ~= 0 then
         return
     end
+    -- avoid full number named npc
+    local szName = MY.GetObjectName(npc)
+    if tonumber(szName) then
+        return
+    end
     -- switch map
     local dwMapID = tostring(player.GetMapID())
     if not Data[dwMapID] then
@@ -117,6 +122,11 @@ MY.RegisterEvent("DOODAD_ENTER_SCENE", "MY_MiddleMapMark", function()
     local doodad = GetDoodad(arg0)
     local player = GetClientPlayer()
     if not (doodad and player) then
+        return
+    end
+    -- avoid full number named doodad
+    local szName = MY.GetObjectName(doodad)
+    if tonumber(szName) then
         return
     end
     -- switch map
