@@ -73,4 +73,6 @@ data = {
     ['tip when group'] = 'TA进组时聊天栏提示我。',
     ['Tip: [%s] is in your team.\nNote: %s'] = '提示：[%s]进入你所在的队伍。\n备注：%s',
     ['Tip: [%s] is in your team.\nNote: %s\n'] = '提示：[%s]进入你所在的队伍。\n备注：%s\n',
+    
+    ['Type to search, use comma to split.'] = '输入文字进行搜索，半角逗号分隔多个搜索项。\n如：皇竹草,甜象草',
 }

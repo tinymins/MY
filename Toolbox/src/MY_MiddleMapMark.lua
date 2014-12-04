@@ -14,14 +14,61 @@ local SZ_CACHE_PATH = "cache/npc_doodad_rec"
 local MAX_DISTINCT_DISTANCE = 4 -- 最大独立距离4尺（低于该距离的两个实体视为同一个）
 MAX_DISTINCT_DISTANCE = MAX_DISTINCT_DISTANCE * MAX_DISTINCT_DISTANCE * 64 * 64
 
--- HOOK
+-- HOOK MAP SWITCH
+if not MiddleMap._MY_MMM_ShowMap then
+    MiddleMap._MY_MMM_ShowMap = MiddleMap.ShowMap
+end
+MiddleMap.ShowMap = function(...)
+    if MiddleMap._MY_MMM_ShowMap then
+        MiddleMap._MY_MMM_ShowMap(...)
+    end
+    MY_MiddleMapMark.Search(_Cache.szKeyword)
+end
+-- HOOK OnEditChanged
 if not MiddleMap._MY_MMM_OnEditChanged then
     MiddleMap._MY_MMM_OnEditChanged = MiddleMap.OnEditChanged
 end
 MiddleMap.OnEditChanged = function()
-    MY_MiddleMapMark.Search(this:GetText())
-    MiddleMap._MY_MMM_OnEditChanged()
+    if this:GetName() == 'Edit_Search' then
+        MY_MiddleMapMark.Search(this:GetText())
+    end
+    if MiddleMap._MY_MMM_OnEditChanged then
+        MiddleMap._MY_MMM_OnEditChanged()
+    end
 end
+-- HOOK OnMouseEnter
+if not MiddleMap._MY_MMM_OnMouseEnter then
+    MiddleMap._MY_MMM_OnMouseEnter = MiddleMap.OnMouseEnter
+end
+MiddleMap.OnMouseEnter = function()
+    if this:GetName() == 'Edit_Search' then
+        local x, y = this:GetAbsPos()
+        local w, h = this:GetSize()
+        OutputTip(
+            GetFormatText(_L['Type to search, use comma to split.'], nil, 255, 255, 0),
+            w,
+            {x - 10, y, w, h},
+            MY.Const.UI.Tip.POS_TOP
+        )
+    end
+    if MiddleMap._MY_MMM_OnMouseEnter then
+        MiddleMap._MY_MMM_OnMouseEnter()
+    end
+end
+-- HOOK OnMouseLeave
+if not MiddleMap._MY_MMM_OnMouseLeave then
+    MiddleMap._MY_MMM_OnMouseLeave = MiddleMap.OnMouseLeave
+end
+MiddleMap.OnMouseLeave = function()
+    if this:GetName() == 'Edit_Search' then
+        HideTip()
+    end
+    if MiddleMap._MY_MMM_OnMouseLeave then
+        MiddleMap._MY_MMM_OnMouseLeave()
+    end
+end
+
+-- start search
 MY_MiddleMapMark.Search = function(szKeyword)
     local ui = MY.UI("Topmost1/MiddleMap")
     local player = GetClientPlayer()
@@ -36,15 +83,29 @@ MY_MiddleMapMark.Search = function(szKeyword)
     end
     uiHandle:clear()
     
-    if szKeyword == '' then
+    _Cache.szKeyword = szKeyword
+    if not szKeyword or szKeyword == '' then
         return
     end
 
     local dwMapID = tostring(MiddleMap.dwMapID or player.GetMapID())
+    local tKeyword = MY.String.Split(szKeyword, ',')
+    -- check if data exist
+    if not Data[dwMapID] then
+        return
+    end
     
+    -- render npc mark
     for _, npc in ipairs(Data[dwMapID].Npc) do
-        if string.find(npc.szName, szKeyword) or
-        string.find(npc.szTitle, szKeyword) then
+        local bMatch = false
+        for _, kw in ipairs(tKeyword) do
+            if string.find(npc.szName, kw) or
+            string.find(npc.szTitle, kw) then
+                bMatch = true
+                break
+            end
+        end
+        if bMatch then
             uiHandle:append('Image_Npc_' .. npc.dwID, 'Image'):item('#Image_Npc_' .. npc.dwID)
               :image('ui/Image/Minimap/MapMark.UITex|95')
               :size(13, 13)
@@ -56,8 +117,16 @@ MY_MiddleMapMark.Search = function(szKeyword)
         end
     end
     
+    -- render doodad mark
     for _, doodad in ipairs(Data[dwMapID].Doodad) do
-        if string.find(doodad.szName, szKeyword) then
+        local bMatch = false
+        for _, kw in ipairs(tKeyword) do
+        if string.find(doodad.szName, kw) then
+                bMatch = true
+                break
+            end
+        end
+        if bMatch then
             uiHandle:append('Image_Doodad_' .. doodad.dwID, 'Image'):item('#Image_Doodad_' .. doodad.dwID)
               :image('ui/Image/Minimap/MapMark.UITex|95')
               :size(13, 13)
