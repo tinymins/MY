@@ -33,7 +33,7 @@ MY_VisualSkill.Reload = function()
     -- create new   
     if MY_VisualSkill.bEnable then
         -- create ui
-        local ui = MY.UI.CreateFrame("MY_VisualSkill", true)
+        local ui = MY.UI.CreateFrame("MY_VisualSkill", MY.Const.UI.Frame.NORMAL_EMPTY)
         ui:size(130 + 53 * MY_VisualSkill.nVisualSkillBoxCount - 32 + 80, 52):anchor(MY_VisualSkill.anchorVisualSkill)
           :onevent("UI_SCALED", function()
             MY.UI(this):anchor(MY_VisualSkill.anchorVisualSkill)
