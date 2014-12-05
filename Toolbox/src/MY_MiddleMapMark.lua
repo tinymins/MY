@@ -23,6 +23,13 @@ MiddleMap.ShowMap = function(...)
         MiddleMap._MY_MMM_ShowMap(...)
     end
     MY_MiddleMapMark.Search(_Cache.szKeyword)
+    -- for mapid changing
+    local dwMapID = MiddleMap.dwMapID
+    MY.DelayCall(function()
+        if dwMapID ~= MiddleMap.dwMapID then
+            MY_MiddleMapMark.Search(_Cache.szKeyword)
+        end
+    end, 200)
 end
 -- HOOK OnEditChanged
 if not MiddleMap._MY_MMM_OnEditChanged then
