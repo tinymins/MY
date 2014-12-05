@@ -290,15 +290,23 @@ MY.DelayCall = function(arg0, arg1, arg2, arg3)
     if type(arg3)=='table' then param = arg3 end
     if not fnAction and not szName then return nil end
     
-    if szName then
+    if szName and nDelay and not fnAction then -- 调整DelayCall延迟时间
         for i = #_Cache.tDelayCall, 1, -1 do
             if _Cache.tDelayCall[i].szName == szName then
-                table.remove(_Cache.tDelayCall, i)
+                _Cache.tDelayCall[i].nTime = nDelay + GetTime()
             end
         end
-    end
-    if fnAction and nDelay then
-        table.insert(_Cache.tDelayCall, { nTime = nDelay + GetTime(), fnAction = fnAction, szName = szName, param = {} })
+    else -- 一个新的DelayCall（或者覆盖原来的）
+        if szName then
+            for i = #_Cache.tDelayCall, 1, -1 do
+                if _Cache.tDelayCall[i].szName == szName then
+                    table.remove(_Cache.tDelayCall, i)
+                end
+            end
+        end
+        if fnAction and nDelay then
+            table.insert(_Cache.tDelayCall, { nTime = nDelay + GetTime(), fnAction = fnAction, szName = szName, param = {} })
+        end
     end
 end
 --[[ 注册呼吸循环调用函数
