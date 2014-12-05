@@ -127,19 +127,21 @@ MY_MiddleMapMark.Search = function(szKeyword)
     
     -- render doodad mark
     for _, doodad in ipairs(data.Doodad) do
-        local bMatch = false
-        for _, kw in ipairs(tKeyword) do
-        if string.find(doodad.szName, kw) then
-                bMatch = true
-                break
+        if doodad.dwTemplateID ~= 82 then -- 切磋用旗帜
+            local bMatch = false
+            for _, kw in ipairs(tKeyword) do
+            if string.find(doodad.szName, kw) then
+                    bMatch = true
+                    break
+                end
             end
-        end
-        if bMatch then
-            uiHandle:append('Image_Doodad_' .. doodad.dwID, 'Image'):item('#Image_Doodad_' .. doodad.dwID)
-              :image('ui/Image/Minimap/MapMark.UITex|95')
-              :size(13, 13)
-              :pos(MiddleMap.LPosToHPos(doodad.nX, doodad.nY, 13, 13))
-              :tip(doodad.szName, MY.Const.UI.Tip.POS_TOP)
+            if bMatch then
+                uiHandle:append('Image_Doodad_' .. doodad.dwID, 'Image'):item('#Image_Doodad_' .. doodad.dwID)
+                  :image('ui/Image/Minimap/MapMark.UITex|95')
+                  :size(13, 13)
+                  :pos(MiddleMap.LPosToHPos(doodad.nX, doodad.nY, 13, 13))
+                  :tip(doodad.szName, MY.Const.UI.Tip.POS_TOP)
+            end
         end
     end
 end
