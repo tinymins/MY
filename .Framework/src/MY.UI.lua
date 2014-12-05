@@ -2011,16 +2011,16 @@ function _MY.UI:hover(fnHover, fnLeave, bNoAutoBind)
         for _, ele in pairs(self.eles) do
             local wnd = ele.edt or ele.wnd
             local itm = ele.itm or ele.itm
-            if wnd then MY.UI.RegisterUIEvent(wnd, 'OnMouseEnter' , function() fnHover(true) end) end
-            if itm then MY.UI.RegisterUIEvent(itm, 'OnItemMouseEnter', function() fnHover(true) end) end
+            if wnd then MY.UI.RegisterUIEvent(wnd, 'OnMouseEnter' , function() fnHover(true, this:PtInWindow(Cursor.GetPos())) end)
+            elseif itm then MY.UI.RegisterUIEvent(itm, 'OnItemMouseEnter', function() fnHover(true, this:PtInItem(Cursor.GetPos())) end) end
         end
     end
     if fnLeave then
         for _, ele in pairs(self.eles) do
             local wnd = ele.edt or ele.wnd
             local itm = ele.itm or ele.itm
-            if wnd then MY.UI.RegisterUIEvent(wnd, 'OnMouseLeave' , function() fnLeave(false) end) end
-            if itm then MY.UI.RegisterUIEvent(itm, 'OnItemMouseLeave', function() fnLeave(false) end) end
+            if wnd then MY.UI.RegisterUIEvent(wnd, 'OnMouseLeave' , function() fnLeave(false, this:PtInWindow(Cursor.GetPos())) end)
+            elseif itm then MY.UI.RegisterUIEvent(itm, 'OnItemMouseLeave', function() fnLeave(false, this:PtInItem(Cursor.GetPos())) end) end
         end
     end
     return self
