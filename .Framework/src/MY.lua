@@ -126,8 +126,8 @@ MY = { }
 #######################################################################################################
 ]]
 local _DEBUG_ = 4
-local _BUILD_ = "20141202"
-local _VERSION_ = 0x2001500
+local _BUILD_ = "20141205"
+local _VERSION_ = 0x2001600
 local _ADDON_ROOT_ = '\\Interface\\MY\\'
 local _FRAMEWORK_ROOT_ = '\\Interface\\MY\\.Framework\\'
 
