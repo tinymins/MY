@@ -126,8 +126,8 @@ MY_ToolBox.ApplyConfig = function()
             else
                 szText = szText .. _L['failed to calc.']
             end
-            OutputWarningMessage("MSG_WARNING_RED", szText, 10)
             MY.Sysmsg({szText})
+            OutputWarningMessage("MSG_WARNING_RED", szText, 10)
         end)
     end)
     
