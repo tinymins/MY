@@ -8,9 +8,9 @@
 
 MY_MiddleMapMark = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
-local _Cache = {}
+local _Cache = { tMapDataChanged = {} }
 local Data = {}
-local SZ_CACHE_PATH = "cache/npc_doodad_rec"
+local SZ_CACHE_PATH = "cache/NPC_DOODAD_REC/"
 local MAX_DISTINCT_DISTANCE = 4 -- 最大独立距离4尺（低于该距离的两个实体视为同一个）
 MAX_DISTINCT_DISTANCE = MAX_DISTINCT_DISTANCE * MAX_DISTINCT_DISTANCE * 64 * 64
 
@@ -88,15 +88,16 @@ MY_MiddleMapMark.Search = function(szKeyword)
         return
     end
 
-    local dwMapID = tostring(MiddleMap.dwMapID or player.GetMapID())
+    local dwMapID = MiddleMap.dwMapID or player.GetMapID()
     local tKeyword = MY.String.Split(szKeyword, ',')
     -- check if data exist
-    if not Data[dwMapID] then
+    local data = MY_MiddleMapMark.GetMapData(dwMapID)
+    if not data then
         return
     end
     
     -- render npc mark
-    for _, npc in ipairs(Data[dwMapID].Npc) do
+    for _, npc in ipairs(data.Npc) do
         local bMatch = false
         for _, kw in ipairs(tKeyword) do
             if string.find(npc.szName, kw) or
@@ -118,7 +119,7 @@ MY_MiddleMapMark.Search = function(szKeyword)
     end
     
     -- render doodad mark
-    for _, doodad in ipairs(Data[dwMapID].Doodad) do
+    for _, doodad in ipairs(data.Doodad) do
         local bMatch = false
         for _, kw in ipairs(tKeyword) do
         if string.find(doodad.szName, kw) then
@@ -136,12 +137,43 @@ MY_MiddleMapMark.Search = function(szKeyword)
     end
 end
 
-MY_MiddleMapMark.LoadData = function()
-    Data = MY.Json.Decode(MY.LoadLUAData(SZ_CACHE_PATH)) or {}
+MY_MiddleMapMark.GetMapData = function(dwMapID)
+    -- if data not loaded, load it now
+    if not Data[dwMapID] then
+        MY_MiddleMapMark.StartDelayUnloadMapData(dwMapID)
+        Data[dwMapID] = MY.Json.Decode(MY.LoadLUAData(SZ_CACHE_PATH .. dwMapID)) or {
+            Npc = {},
+            Doodad = {},
+        }
+        MY.Debug(Table_GetMapName(dwMapID) .. '(' .. dwMapID .. ') map data loaded.', 'MY_MiddleMapMark', 0)
+    end
+    return Data[dwMapID]
 end
 
-MY_MiddleMapMark.SaveData = function()
-    MY.SaveLUAData(SZ_CACHE_PATH, MY.Json.Encode(Data))
+-- 开始指定地图的延时数据卸载时钟
+MY_MiddleMapMark.StartDelayUnloadMapData = function(dwMapID)
+    -- breathe until unload data
+    MY.BreatheCall('MY_MiddleMapMark_DataUnload_' .. dwMapID, function()
+        local player = GetClientPlayer()
+        if player and player.GetMapID() ~= dwMapID and MiddleMap.dwMapID ~= dwMapID then
+            MY_MiddleMapMark.UnloadMapData(dwMapID)
+            return 0
+        end
+    end, 60000)
+end
+
+MY_MiddleMapMark.UnloadMapData = function(dwMapID)
+    MY.Debug(Table_GetMapName(dwMapID) .. '(' .. dwMapID .. ') map data unloaded.', 'MY_MiddleMapMark', 0)
+    Data[dwMapID] = nil
+end
+
+MY_MiddleMapMark.SaveMapData = function()
+    for dwMapID, data in pairs(Data) do
+        MY_MiddleMapMark.StartDelayUnloadMapData(dwMapID)
+        if _Cache.tMapDataChanged[dwMapID] then
+            MY.SaveLUAData(SZ_CACHE_PATH .. dwMapID, MY.Json.Encode(data))
+        end
+    end
 end
 
 local m_nLastRedrawFrame = GetLogicFrameCount()
@@ -162,24 +194,20 @@ MY.RegisterEvent("NPC_ENTER_SCENE",    "MY_MiddleMapMark", function()
         return
     end
     -- switch map
-    local dwMapID = tostring(player.GetMapID())
-    if not Data[dwMapID] then
-        Data[dwMapID] = {
-            Npc = {},
-            Doodad = {},
-        }
-    end
+    local dwMapID = player.GetMapID()
+    local data = MY_MiddleMapMark.GetMapData(dwMapID)
+    
     -- keep data distinct
-    for i = #Data[dwMapID].Npc, 1, -1 do
-        local p = Data[dwMapID].Npc[i]
+    for i = #data.Npc, 1, -1 do
+        local p = data.Npc[i]
         if p.dwID == npc.dwID or
         p.dwTemplateID == npc.dwTemplateID and
         math.pow(npc.nX - p.nX, 2) + math.pow(npc.nY - p.nY, 2) <= MAX_DISTINCT_DISTANCE then
-            table.remove(Data[dwMapID].Npc, i)
+            table.remove(data.Npc, i)
         end
     end
     -- add rec
-    table.insert(Data[dwMapID].Npc, {
+    table.insert(data.Npc, {
         nX = npc.nX,
         nY = npc.nY,
         dwID = npc.dwID,
@@ -193,6 +221,7 @@ MY.RegisterEvent("NPC_ENTER_SCENE",    "MY_MiddleMapMark", function()
         m_nLastRedrawFrame = GetLogicFrameCount()
         MY_MiddleMapMark.Search(_Cache.szKeyword)
     end
+    _Cache.tMapDataChanged[dwMapID] = true
 end)
 MY.RegisterEvent("DOODAD_ENTER_SCENE", "MY_MiddleMapMark", function()
     local doodad = GetDoodad(arg0)
@@ -206,24 +235,20 @@ MY.RegisterEvent("DOODAD_ENTER_SCENE", "MY_MiddleMapMark", function()
         return
     end
     -- switch map
-    local dwMapID = tostring(player.GetMapID())
-    if not Data[dwMapID] then
-        Data[dwMapID] = {
-            Npc = {},
-            Doodad = {},
-        }
-    end
+    local dwMapID = player.GetMapID()
+    local data = MY_MiddleMapMark.GetMapData(dwMapID)
+    
     -- keep data distinct
-    for i = #Data[dwMapID].Doodad, 1, -1 do
-        local p = Data[dwMapID].Doodad[i]
+    for i = #data.Doodad, 1, -1 do
+        local p = data.Doodad[i]
         if p.dwID == doodad.dwID or
         p.dwTemplateID == doodad.dwTemplateID and
         math.pow(doodad.nX - p.nX, 2) + math.pow(doodad.nY - p.nY, 2) <= MAX_DISTINCT_DISTANCE then
-            table.remove(Data[dwMapID].Doodad, i)
+            table.remove(data.Doodad, i)
         end
     end
     -- add rec
-    table.insert(Data[dwMapID].Doodad, {
+    table.insert(data.Doodad, {
         nX = doodad.nX,
         nY = doodad.nY,
         dwID = doodad.dwID,
@@ -236,8 +261,7 @@ MY.RegisterEvent("DOODAD_ENTER_SCENE", "MY_MiddleMapMark", function()
         m_nLastRedrawFrame = GetLogicFrameCount()
         MY_MiddleMapMark.Search(_Cache.szKeyword)
     end
+    _Cache.tMapDataChanged[dwMapID] = true
 end)
-MY.RegisterEvent('LOGIN_GAME', MY_MiddleMapMark.LoadData)
-MY.RegisterEvent('PLAYER_ENTER_GAME', MY_MiddleMapMark.LoadData)
-MY.RegisterEvent('GAME_EXIT', MY_MiddleMapMark.SaveData)
-MY.RegisterEvent('PLAYER_EXIT_GAME', MY_MiddleMapMark.SaveData)
+MY.RegisterEvent('LOADING_END', MY_MiddleMapMark.SaveMapData)
+MY.RegisterEvent('PLAYER_EXIT_GAME', MY_MiddleMapMark.SaveMapData)
