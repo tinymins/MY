@@ -417,13 +417,16 @@ _MY_ChatMonitor.Init = function()
         _MY_ChatMonitor.uiFrame:fadeOut(500)
       end)
       :hover(function(bIn, bCurIn)
+        if bIn ~= bCurIn then
+            return
+        end
         if bCurIn then
             MY.DelayCall('MY_ChatMonitor_Hide')
             _MY_ChatMonitor.uiFrame:fadeIn(500)
         else
             MY.DelayCall(function()
                 _MY_ChatMonitor.uiFrame:fadeOut(500)
-            end,5000,'MY_ChatMonitor_Hide')
+            end, 5000, 'MY_ChatMonitor_Hide')
         end
       end)
     
