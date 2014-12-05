@@ -127,21 +127,19 @@ MY_MiddleMapMark.Search = function(szKeyword)
     
     -- render doodad mark
     for _, doodad in ipairs(data.Doodad) do
-        if doodad.dwTemplateID ~= 82 then -- 切磋用旗帜
-            local bMatch = false
-            for _, kw in ipairs(tKeyword) do
-            if string.find(doodad.szName, kw) then
-                    bMatch = true
-                    break
-                end
+        local bMatch = false
+        for _, kw in ipairs(tKeyword) do
+        if string.find(doodad.szName, kw) then
+                bMatch = true
+                break
             end
-            if bMatch then
-                uiHandle:append('Image_Doodad_' .. doodad.dwID, 'Image'):item('#Image_Doodad_' .. doodad.dwID)
-                  :image('ui/Image/Minimap/MapMark.UITex|95')
-                  :size(13, 13)
-                  :pos(MiddleMap.LPosToHPos(doodad.nX, doodad.nY, 13, 13))
-                  :tip(doodad.szName, MY.Const.UI.Tip.POS_TOP)
-            end
+        end
+        if bMatch then
+            uiHandle:append('Image_Doodad_' .. doodad.dwID, 'Image'):item('#Image_Doodad_' .. doodad.dwID)
+              :image('ui/Image/Minimap/MapMark.UITex|95')
+              :size(13, 13)
+              :pos(MiddleMap.LPosToHPos(doodad.nX, doodad.nY, 13, 13))
+              :tip(doodad.szName, MY.Const.UI.Tip.POS_TOP)
         end
     end
 end
@@ -236,6 +234,10 @@ MY.RegisterEvent("DOODAD_ENTER_SCENE", "MY_MiddleMapMark", function()
     local doodad = GetDoodad(arg0)
     local player = GetClientPlayer()
     if not (doodad and player) then
+        return
+    end
+    -- avoid special doodad
+    if doodad.dwTemplateID == 82 then -- 切磋用旗帜
         return
     end
     -- avoid full number named doodad
