@@ -377,10 +377,13 @@ _MY_ChatMonitor.ShowTip = function(szMsg)
         _MY_ChatMonitor.uiTipBoard:clear():append(szMsg)
     end
     _MY_ChatMonitor.uiFrame:fadeTo(500, 255)
-    MY.DelayCall('MY_ChatMonitor_Hide')
-    MY.DelayCall('MY_ChatMonitor_Hide', function()
-        _MY_ChatMonitor.uiFrame:fadeOut(500)
-    end, 5000)
+    if Station.GetMouseOverWindow():GetRoot():GetName() == 'MY_ChatMonitor' then
+        MY.DelayCall('MY_ChatMonitor_Hide', 5000)
+    else
+        MY.DelayCall('MY_ChatMonitor_Hide', function()
+            _MY_ChatMonitor.uiFrame:fadeOut(500)
+        end, 5000)
+    end
 end
 
 _MY_ChatMonitor.Init = function()
@@ -390,21 +393,20 @@ _MY_ChatMonitor.Init = function()
     _MY_ChatMonitor.bInited = true
     _MY_ChatMonitor.RegisterMsgMonitor()
     
-    _MY_ChatMonitor.uiFrame = MY.UI.CreateFrame('MY_ChatMonitor', MY.Const.UI.Frame.TOPMOST_EMPTY):size(250,150):hover(function(bIn)
-        MY.DelayCall('MY_ChatMonitor_Hide')
-        if not bIn then MY.DelayCall(function() _MY_ChatMonitor.uiFrame:fadeOut(500) end,5000,'MY_ChatMonitor_Hide') end
-    end):toggle(false)
-    
-    -- 移动提示窗位置
-    _MY_ChatMonitor.uiFrame:onevent("UI_SCALED", function()
+    _MY_ChatMonitor.uiFrame = MY.UI.CreateFrame('MY_ChatMonitor', MY.Const.UI.Frame.TOPMOST_EMPTY)
+      :size(250,150)
+      :toggle(false)
+      :onevent("UI_SCALED", function() -- 移动提示窗位置
         _MY_ChatMonitor.uiFrame:anchor(MY_ChatMonitor.anchor)
-    end):customMode(_L["chat monitor"], function()
+      end)
+      :customMode(_L["chat monitor"], function()
         MY.DelayCall('MY_ChatMonitor_Hide')
         _MY_ChatMonitor.uiFrame:show():alpha(255)
-    end, function()
+      end, function()
         MY_ChatMonitor.anchor = _MY_ChatMonitor.uiFrame:anchor()
         _MY_ChatMonitor.uiFrame:alpha(0):hide()
-    end):anchor(MY_ChatMonitor.anchor)
+      end)
+      :anchor(MY_ChatMonitor.anchor)
     
     _MY_ChatMonitor.uiFrame:append('Image_bg',"Image")
       :find('#Image_bg'):size(300,300)
@@ -413,6 +415,16 @@ _MY_ChatMonitor.Init = function()
         MY.OpenPanel()
         MY.SwitchTab('ChatMonitor')
         _MY_ChatMonitor.uiFrame:fadeOut(500)
+      end)
+      :hover(function(bIn, bCurIn)
+        if bCurIn then
+            MY.DelayCall('MY_ChatMonitor_Hide')
+            _MY_ChatMonitor.uiFrame:fadeIn(500)
+        else
+            MY.DelayCall(function()
+                _MY_ChatMonitor.uiFrame:fadeOut(500)
+            end,5000,'MY_ChatMonitor_Hide')
+        end
       end)
     
     _MY_ChatMonitor.uiTipBoard = _MY_ChatMonitor.uiFrame:append('Handle_Tip',"Handle")
