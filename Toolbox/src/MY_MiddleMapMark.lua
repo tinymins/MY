@@ -264,7 +264,6 @@ MY.RegisterEvent("DOODAD_ENTER_SCENE", "MY_MiddleMapMark", function()
         nY = doodad.nY,
         dwID = doodad.dwID,
         szName  = MY.GetObjectName(doodad),
-        szTitle = doodad.szTitle,
         dwTemplateID = doodad.dwTemplateID,
     })
     -- redraw ui
