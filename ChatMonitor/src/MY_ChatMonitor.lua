@@ -40,6 +40,36 @@ _MY_ChatMonitor.ui = nil
 _MY_ChatMonitor.uiBoard = nil
 _MY_ChatMonitor.uiTipBoard = nil
 _MY_ChatMonitor.szLuaData = 'config/MY_CHATMONITOR'
+_MY_ChatMonitor.tChannelGroups = {
+    {
+        szCaption = g_tStrings.CHANNEL_CHANNEL,
+        tChannels = {
+            "MSG_NORMAL", "MSG_PARTY", "MSG_MAP", "MSG_BATTLE_FILED", "MSG_GUILD", "MSG_GUILD_ALLIANCE", "MSG_SCHOOL",
+            "MSG_WORLD", "MSG_TEAM", "MSG_CAMP", "MSG_GROUP", "MSG_WHISPER", "MSG_SEEK_MENTOR", "MSG_FRIEND", "MSG_SYS"
+        },
+    }, {
+        szCaption = g_tStrings.FIGHT_CHANNEL,
+        tChannels = {
+            [g_tStrings.STR_NAME_OWN] = {
+                "MSG_SKILL_SELF_SKILL", "MSG_SKILL_SELF_BUFF", "MSG_SKILL_SELF_DEBUFF", 
+                "MSG_SKILL_SELF_MISS", "MSG_SKILL_SELF_FAILED"
+            },
+            [g_tStrings.TEAMMATE] = {"MSG_SKILL_PARTY_SKILL", "MSG_SKILL_PARTY_BUFF", "MSG_SKILL_PARTY_DEBUFF", "MSG_SKILL_PARTY_MISS"},
+            [g_tStrings.OTHER_PLAYER] = {"MSG_SKILL_OTHERS_SKILL", "MSG_SKILL_OTHERS_MISS"},
+            ["NPC"] = {"MSG_SKILL_NPC_SKILL", "MSG_SKILL_NPC_MISS"},
+            [g_tStrings.OTHER] = {"MSG_OTHER_DEATH", "MSG_OTHER_ENCHANT", "MSG_OTHER_SCENE"},
+        }
+    }, {
+        szCaption = g_tStrings.CHANNEL_COMMON,
+        tChannels = {
+            [g_tStrings.ENVIROMENT] = {"MSG_NPC_NEARBY", "MSG_NPC_YELL", "MSG_NPC_PARTY", "MSG_NPC_WHISPER"},
+            [g_tStrings.EARN] = {
+                "MSG_MONEY", "MSG_EXP", "MSG_ITEM", "MSG_REPUTATION", "MSG_CONTRIBUTE", "MSG_ATTRACTION", "MSG_PRESTIGE",
+                "MSG_TRAIN", "MSG_DESGNATION", "MSG_ACHIEVEMENT", "MSG_MENTOR_VALUE", "MSG_THEW_STAMINA", "MSG_TONG_FUND"
+            },
+        }
+    }
+}
 
 -- 插入聊天内容时监控聊天信息
 _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
@@ -266,29 +296,45 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
     ui:append('Image_Setting','Image'):find('#Image_Setting'):pos(w-26,13):image('UI/Image/UICommon/Commonpanel.UITex',18):size(30,30):alpha(200):hover(function(bIn) this:SetAlpha((bIn and 255) or 200) end):click(function()
         PopupMenu((function() 
             local t = {}
-            for szChannel, tChannel in pairs({
-                ['MSG_NORMAL'] = { szName = _L['nearby channel'], tCol = GetMsgFontColor("MSG_NORMAL", true) },
-                ['MSG_SYS'] = { szName = _L['system channel'], tCol = GetMsgFontColor("MSG_SYS", true) },
-                ['MSG_FRIEND'] = { szName = _L['friend channel'], tCol = GetMsgFontColor("MSG_FRIEND", true) },
-                ['MSG_TEAM'] = { szName = _L['raid channel'], tCol = GetMsgFontColor("MSG_TEAM", true) },
-                ['MSG_GUILD'] = { szName = _L['tong channel'], tCol = GetMsgFontColor("MSG_GUILD", true) },
-                ['MSG_GUILD_ALLIANCE'] = { szName = _L['tong alliance channel'], tCol = GetMsgFontColor("MSG_GUILD_ALLIANCE", true) },
-                ['MSG_MAP'] = { szName = _L['map channel'], tCol = GetMsgFontColor("MSG_MAP", true) },
-                ['MSG_SCHOOL'] = { szName = _L['school channel'], tCol = GetMsgFontColor("MSG_SCHOOL", true) },
-                ['MSG_CAMP'] = { szName = _L['camp channel'], tCol = GetMsgFontColor("MSG_CAMP", true) },
-                ['MSG_WORLD'] = { szName = _L['world channel'], tCol = GetMsgFontColor("MSG_WORLD", true) },
-                ['MSG_WHISPER'] = { szName = _L['whisper channel'], tCol = GetMsgFontColor("MSG_WHISPER", true) },
-            }) do
-                table.insert(t,{
-                    szOption = tChannel.szName,
-                    rgb = tChannel.tCol,
-                    fnAction = function()
-                        MY_ChatMonitor.tChannels[szChannel] = not MY_ChatMonitor.tChannels[szChannel]
-                        _MY_ChatMonitor.RegisterMsgMonitor()
-                    end,
-                    bCheck = true,
-                    bChecked = MY_ChatMonitor.tChannels[szChannel]
-                })
+            for _, cg in ipairs(_MY_ChatMonitor.tChannelGroups) do
+                local _t = { szOption = cg.szCaption }
+                if cg.tChannels[1] then
+                    for _, szChannel in ipairs(cg.tChannels) do
+                        table.insert(_t,{
+                            szOption = g_tStrings.tChannelName[szChannel],
+                            rgb = GetMsgFontColor(szChannel, true),
+                            fnAction = function()
+                                MY_ChatMonitor.tChannels[szChannel] = not MY_ChatMonitor.tChannels[szChannel]
+                                _MY_ChatMonitor.RegisterMsgMonitor()
+                            end,
+                            bCheck = true,
+                            bChecked = MY_ChatMonitor.tChannels[szChannel]
+                        })
+                    end
+                else
+                    for szPrefix, tChannels in pairs(cg.tChannels) do
+                        if #_t > 0 then
+                            table.insert(_t,{ bDevide = true })
+                        end
+                        table.insert(_t,{
+                            szOption = szPrefix,
+                            bDisable = true,
+                        })
+                        for _, szChannel in ipairs(tChannels) do
+                            table.insert(_t,{
+                                szOption = g_tStrings.tChannelName[szChannel],
+                                rgb = GetMsgFontColor(szChannel, true),
+                                fnAction = function()
+                                    MY_ChatMonitor.tChannels[szChannel] = not MY_ChatMonitor.tChannels[szChannel]
+                                    _MY_ChatMonitor.RegisterMsgMonitor()
+                                end,
+                                bCheck = true,
+                                bChecked = MY_ChatMonitor.tChannels[szChannel]
+                            })
+                        end
+                    end
+                end
+                table.insert(t, _t)
             end
             table.insert(t, { bDevide = true })
             table.insert(t,{
