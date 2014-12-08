@@ -97,14 +97,14 @@ MY.LoadLUAData = MY.Sys.LoadLUAData
     (data) MY.Sys.SaveUserData(szFileUri, tData)
 ]]
 MY.Sys.SaveUserData = function(szFileUri, tData)
-    return MY.Sys.SaveLUAData(szFileUri.."_"..(MY.Game.GetServer()).."_"..GetClientPlayer().dwID, tData)
+    return MY.Sys.SaveLUAData(szFileUri.."_"..(MY.Game.GetServer()).."_"..UI_GetClientPlayerID(), tData)
 end
 
 --[[ 加载用户数据 注意要在游戏初始化之后使用不然没有ClientPlayer对象
     (data) MY.Sys.LoadUserData(szFile [,szSubAddonName])
 ]]
 MY.Sys.LoadUserData = function(szFileUri)
-    return MY.Sys.LoadLUAData(szFileUri.."_"..(MY.Game.GetServer()).."_"..GetClientPlayer().dwID)
+    return MY.Sys.LoadLUAData(szFileUri.."_"..(MY.Game.GetServer()).."_"..UI_GetClientPlayerID())
 end
 
 --szName [, szDataFile]
