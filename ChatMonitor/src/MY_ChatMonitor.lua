@@ -438,7 +438,8 @@ _MY_ChatMonitor.Init = function()
     end
     _MY_ChatMonitor.bInited = true
     _MY_ChatMonitor.RegisterMsgMonitor()
-    
+
+    -- create tip frame
     _MY_ChatMonitor.uiFrame = MY.UI.CreateFrame('MY_ChatMonitor', MY.Const.UI.Frame.TOPMOST_EMPTY)
       :size(250,150)
       :toggle(false)
@@ -453,7 +454,8 @@ _MY_ChatMonitor.Init = function()
         _MY_ChatMonitor.uiFrame:alpha(0):hide()
       end)
       :anchor(MY_ChatMonitor.anchor)
-    
+      
+    -- bind animate function
     _MY_ChatMonitor.uiFrame:append('Image_bg',"Image")
       :find('#Image_bg'):size(300,300)
       :image('UI/Image/Minimap/Minimap2.UITex',8)
@@ -475,13 +477,18 @@ _MY_ChatMonitor.Init = function()
             end, 5000, 'MY_ChatMonitor_Hide')
         end
       end)
-    
+    -- init tip panel animate
+    MY.DelayCall(function()
+        _MY_ChatMonitor.uiFrame:fadeOut(500)
+    end, 10000, 'MY_ChatMonitor_Hide')
+
+    -- init tip panel handle
     _MY_ChatMonitor.uiTipBoard = _MY_ChatMonitor.uiFrame:append('Handle_Tip',"Handle")
       :find('#Handle_Tip'):handleStyle(3):pos(10,10):size(230,130)
-
+    -- init welcome word
     _MY_ChatMonitor.uiTipBoard:append('Text1','Text'):find('#Text1')
       :text(_L['welcome to use mingyi chat monitor.'])
-    
+    -- show tip
     _MY_ChatMonitor.ShowTip()
 end
 MY.RegisterInit(_MY_ChatMonitor.Init)
