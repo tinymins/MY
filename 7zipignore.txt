@@ -1,0 +1,10 @@
+.git\
+.gitignore
+7z.exe
+7zip.bat
+7zipignore.txt
+!src-dist\
+@Data\
+Dev_*\
+ImRobot\
+ExamTip\
