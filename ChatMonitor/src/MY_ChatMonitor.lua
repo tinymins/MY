@@ -457,7 +457,7 @@ _MY_ChatMonitor.Init = function()
       
     -- bind animate function
     _MY_ChatMonitor.uiFrame:append('Image_bg',"Image")
-      :find('#Image_bg'):size(300,300)
+      :find('#Image_bg'):size(250,150)
       :image('UI/Image/Minimap/Minimap2.UITex',8)
       :click(function()
         MY.OpenPanel()
