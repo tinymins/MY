@@ -1840,7 +1840,7 @@ end
 --[[ customMode 设置Frame的CustomMode
     (self) Instance:customMode(string szTip, function fnOnEnterCustomMode, function fnOnLeaveCustomMode)
 ]]
-function _MY.UI:customMode(szTip, fnOnEnterCustomMode, fnOnLeaveCustomMode)
+function _MY.UI:customMode(szTip, fnOnEnterCustomMode, fnOnLeaveCustomMode, szPoint)
     self:_checksum()
     if type(szTip)=="string" then
         self:onevent("ON_ENTER_CUSTOM_UI_MODE", function()
@@ -1850,12 +1850,12 @@ function _MY.UI:customMode(szTip, fnOnEnterCustomMode, fnOnLeaveCustomMode)
         end)
         if type(fnOnEnterCustomMode)=="function" then
             self:onevent("ON_ENTER_CUSTOM_UI_MODE", function()
-                pcall(fnOnEnterCustomMode, GetFrameAnchor(this))
+                pcall(fnOnEnterCustomMode, GetFrameAnchor(this, szPoint))
             end)
         end
         if type(fnOnLeaveCustomMode)=="function" then
             self:onevent("ON_LEAVE_CUSTOM_UI_MODE", function()
-                pcall(fnOnLeaveCustomMode, GetFrameAnchor(this))
+                pcall(fnOnLeaveCustomMode, GetFrameAnchor(this, szPoint))
             end)
         end
     end
@@ -2332,7 +2332,74 @@ MY.UI.OpenFontPicker = function(callback, t)
         if txt:font()~=i then txt:remove() end
     end
 end
-
+-- 打开文本列表编辑器
+MY.UI.OpenListEditor = function(szFrameName, tTextList, OnAdd, OnDel)
+    local muDel
+    local AddListItem = function(muList, szText)
+        local i = muList:hdl(1):children():count()
+        local muItem = muList:append('<handle><image>w=300 h=25 eventid=371 name="Image_Bg" </image><text>name="Text_Default" </text></handle>'):hdl(1):children():last()
+        local hHandle = muItem:raw(1)
+        hHandle.Value = szText
+        local hText = muItem:children("#Text_Default"):pos(10, 2):text(szText or ""):raw(1)
+        muItem:children("#Image_Bg"):image("UI/Image/Common/TextShadow.UITex",5):alpha(0):hover(function(bIn)
+            if hHandle.Selected then return nil end
+            if bIn then
+                MY.UI(this):fadeIn(100)
+            else
+                MY.UI(this):fadeTo(500,0)
+            end
+        end):click(function(nButton)
+            if nButton == MY.Const.Event.Mouse.RBUTTON then
+                hHandle.Selected = true
+                PopupMenu({{
+                    szOption = _L["delete"],
+                    fnAction = function()
+                        muDel:click()
+                    end,
+                }})
+            else
+                hHandle.Selected = not hHandle.Selected
+            end
+            if hHandle.Selected then
+                MY.UI(this):image("UI/Image/Common/TextShadow.UITex",2)
+            else
+                MY.UI(this):image("UI/Image/Common/TextShadow.UITex",5)
+            end
+        end)
+    end
+    local ui = MY.UI.CreateFrame(szFrameName)
+    ui:append("Image_Spliter", "Image"):find("#Image_Spliter"):pos(-10,25):size(360, 10):image("UI/Image/UICommon/Commonpanel.UITex",42)
+    local muEditBox = ui:append("WndEditBox_Keyword", "WndEditBox"):find("#WndEditBox_Keyword"):pos(0,0):size(170, 25)
+    local muList = ui:append("WndScrollBox_KeywordList", "WndScrollBox"):find("#WndScrollBox_KeywordList"):handleStyle(3):pos(0,30):size(340, 380)
+    -- add
+    ui:append("WndButton_Add", "WndButton"):find("#WndButton_Add"):pos(180,0):width(80):text(_L["add"]):click(function()
+        local szText = muEditBox:text()
+        -- 加入表
+        if OnAdd then
+            if OnAdd(szText) ~= false then
+                AddListItem(muList, szText)
+            end
+        else
+            AddListItem(muList, szText)
+        end
+    end)
+    -- del
+    muDel = ui:append("WndButton_Del", "WndButton"):find("#WndButton_Del"):pos(260,0):width(80):text(_L["delete"]):click(function()
+        muList:hdl(1):children():each(function(ui)
+            if this.Selected then
+                if OnDel then
+                    OnDel(this.Value)
+                end
+                ui:remove()
+            end
+        end)
+    end)
+    -- insert data to ui
+    for i, v in ipairs(tTextList) do
+        AddListItem(muList, v)
+    end
+    return ui
+end
 -- 打开浏览器
 MY.UI.OpenInternetExplorer = function(szAddr, bDisableSound)
     local nIndex, nLast = nil, nil
