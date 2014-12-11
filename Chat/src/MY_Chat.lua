@@ -281,76 +281,27 @@ MY.RegisterInit(function()
                 end, {
                     szOption = _L['keyword manager'],
                     fnAction = function()
-                        local muDel
-                        local AddListItem = function(muList, szText)
-                            local i = muList:hdl(1):children():count()
-                            local muItem = muList:append('<handle><image>w=300 h=25 eventid=371 name="Image_Bg" </image><text>name="Text_Default" </text></handle>'):hdl(1):children():last()
-                            local hHandle = muItem:raw(1)
-                            hHandle.Value = szText
-                            local hText = muItem:children("#Text_Default"):pos(10, 2):text(szText or ""):raw(1)
-                            muItem:children("#Image_Bg"):image("UI/Image/Common/TextShadow.UITex",5):alpha(0):hover(function(bIn)
-                                if hHandle.Selected then return nil end
-                                if bIn then
-                                    MY.UI(this):fadeIn(100)
-                                else
-                                    MY.UI(this):fadeTo(500,0)
-                                end
-                            end):click(function(nButton)
-                                if nButton == MY.Const.Event.Mouse.RBUTTON then
-                                    hHandle.Selected = true
-                                    PopupMenu({{
-                                        szOption = _L["delete"],
-                                        fnAction = function()
-                                            muDel:click()
-                                        end,
-                                    }})
-                                else
-                                    hHandle.Selected = not hHandle.Selected
-                                end
-                                if hHandle.Selected then
-                                    MY.UI(this):image("UI/Image/Common/TextShadow.UITex",2)
-                                else
-                                    MY.UI(this):image("UI/Image/Common/TextShadow.UITex",5)
-                                end
-                            end)
-                        end
-                        local ui = MY.UI.CreateFrame("MY_Chat_KeywordManager"):text(_L["keyword manager"])
-                        ui:append("Image_Spliter", "Image"):find("#Image_Spliter"):pos(-10,25):size(360, 10):image("UI/Image/UICommon/Commonpanel.UITex",42)
-                        local muEditBox = ui:append("WndEditBox_Keyword", "WndEditBox"):find("#WndEditBox_Keyword"):pos(0,0):size(170, 25)
-                        local muList = ui:append("WndScrollBox_KeywordList", "WndScrollBox"):find("#WndScrollBox_KeywordList"):handleStyle(3):pos(0,30):size(340, 380)
-                        -- add
-                        ui:append("WndButton_Add", "WndButton"):find("#WndButton_Add"):pos(180,0):width(80):text(_L["add"]):click(function()
-                            local szText = muEditBox:text()
-                            muEditBox:text("")
+                        MY.UI.OpenListEditor('MY_Chat_KeywordManager', MY_Chat.tBlockWords, function(szText)
                             -- 去掉前后空格
                             szText = (string.gsub(szText, "^%s*(.-)%s*$", "%1"))
                             -- 验证是否为空
                             if szText=="" then return nil end
                             -- 验证是否重复
                             for i, v in ipairs(MY_Chat.tBlockWords) do
-                                if v==szText then return nil end
+                                if v==szText then
+                                    return false
+                                end
                             end
                             -- 加入表
                             table.insert(MY_Chat.tBlockWords, szText)
-                            AddListItem(muList, szText)
-                        end)
-                        -- del
-                        muDel = ui:append("WndButton_Del", "WndButton"):find("#WndButton_Del"):pos(260,0):width(80):text(_L["delete"]):click(function()
-                            muList:hdl(1):children():each(function(ui)
-                                if this.Selected then
-                                    for i=#MY_Chat.tBlockWords, 1, -1 do
-                                        if MY_Chat.tBlockWords[i]==this.Value then
-                                            table.remove(MY_Chat.tBlockWords, i)
-                                        end
-                                    end
-                                    ui:remove()
+                        end, function(szText)
+                            for i=#MY_Chat.tBlockWords, 1, -1 do
+                                if MY_Chat.tBlockWords[i]==szText then
+                                    table.remove(MY_Chat.tBlockWords, i)
                                 end
-                            end)
+                            end
                         end)
-                        -- insert data to ui
-                        for i, v in ipairs(MY_Chat.tBlockWords) do
-                            AddListItem(muList, v)
-                        end
+                        :text(_L["keyword manager"])
                     end,
                     fnDisable = function()
                         return not MY_Chat.bBlockWords
