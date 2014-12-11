@@ -1489,7 +1489,7 @@ end
 -- (self) Instance:anchor(anchor)
 function _MY.UI:anchor(anchor)
     self:_checksum()
-    if anchor then
+    if type(anchor) == 'table' then
         for _, ele in pairs(self.eles) do
             if ele.frm then
                 pcall(function() 
@@ -1505,7 +1505,7 @@ function _MY.UI:anchor(anchor)
         -- try to get its name
         local status, anchor = pcall(function()
             ele.frm:CorrectPos()
-            return GetFrameAnchor(ele.frm)
+            return GetFrameAnchor(ele.frm, anchor)
         end)
         -- if succeed then return its name
         if status then return anchor else MY.Debug(anchor..'\n','ERROR _MY.UI:anchor' ,1) return nil end
