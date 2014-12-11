@@ -1,0 +1,11 @@
+-- language data (zhcn) updated at 2014-4-10 03:38:11
+data = {
+    ['focus list'] = '焦點列表',
+    ['enable'] = '啓用',
+    ['hide when empty'] = '無焦點時隱藏',
+    ['auto focus'] = '啓用默認焦點',
+    ['namelist manager'] = '默認焦點管理',
+    ['delete focus'] = '刪除焦點',
+    ['add to focus list'] = '加入茗伊焦點',
+    ['max display length'] = '最大顯示數量',
+}
