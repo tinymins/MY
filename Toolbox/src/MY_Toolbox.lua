@@ -136,12 +136,15 @@ MY_ToolBox.ApplyConfig = function()
     if MY_ToolBox.bAvoidBlackShenxingCD then
         MY.RegisterEvent('DO_SKILL_CAST', 'MY_ToolBox_AvoidBlackShenxingCD', function()
             local dwID, dwSkillID, dwSkillLevel = arg0, arg1, arg2
-            local player = GetClientPlayer()
-            if not( player and
-            player.dwID == dwID and
+            if not(UI_GetClientPlayerID() == dwID and
             Table_IsSkillFormationCaster(dwSkillID, dwSkillLevel)) then
                 return
             end
+            local player = GetClientPlayer()
+            if not player then
+                return
+            end
+            
             local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = player.GetSkillPrepareState()
             if not (bIsPrepare and dwSkillID == 3691) then
                 return
