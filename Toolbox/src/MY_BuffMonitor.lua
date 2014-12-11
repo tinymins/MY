@@ -23,8 +23,8 @@ MY_BuffMonitor = MY_BuffMonitor or {}
 MY_BuffMonitor.bSelfOn = false
 MY_BuffMonitor.bTargetOn = false
 MY_BuffMonitor.bDragable = false
-MY_BuffMonitor.anchorSelf = { s = "CENTER", r = "CENTER", x = -320, y = 150 }
-MY_BuffMonitor.anchorTarget = { s = "CENTER", r = "CENTER", x = -320, y = 98 }
+MY_BuffMonitor.anchorSelf = { s = "LEFTCENTER", r = "LEFTCENTER", x = 320, y = 150 }
+MY_BuffMonitor.anchorTarget = { s = "LEFTCENTER", r = "LEFTCENTER", x = 320, y = 98 }
 MY_BuffMonitor.tBuffList = MY.LoadLUAData(_DEFAULT_BUFFMONITOR_CONFIG_FILE_)
 RegisterCustomData("MY_BuffMonitor.bSelfOn")
 RegisterCustomData("MY_BuffMonitor.bTargetOn")
@@ -34,14 +34,14 @@ RegisterCustomData("MY_BuffMonitor.anchorTarget")
 RegisterCustomData("MY_BuffMonitor.tBuffList")
 -- 重置默认设置
 MY_BuffMonitor.ReloadDefaultConfig = function()
-    MY_BuffMonitor.anchorSelf = { s = "CENTER", r = "CENTER", x = -320, y = 150 }
-    MY_BuffMonitor.anchorTarget = { s = "CENTER", r = "CENTER", x = -320, y = 98 }
+    MY_BuffMonitor.anchorSelf = { s = "LEFTCENTER", r = "LEFTCENTER", x = 320, y = 150 }
+    MY_BuffMonitor.anchorTarget = { s = "LEFTCENTER", r = "LEFTCENTER", x = 320, y = 98 }
     MY_BuffMonitor.tBuffList = MY.LoadLUAData(_DEFAULT_BUFFMONITOR_CONFIG_FILE_)
     MY_BuffMonitor.ReloadBuffMonitor()
 end
 RegisterEvent("CUSTOM_UI_MODE_SET_DEFAULT", function()
-    MY_BuffMonitor.anchorSelf = { s = "CENTER", r = "CENTER", x = -320, y = 150 }
-    MY_BuffMonitor.anchorTarget = { s = "CENTER", r = "CENTER", x = -320, y = 98 }
+    MY_BuffMonitor.anchorSelf = { s = "LEFTCENTER", r = "LEFTCENTER", x = 320, y = 150 }
+    MY_BuffMonitor.anchorTarget = { s = "LEFTCENTER", r = "LEFTCENTER", x = 320, y = 98 }
     MY.UI("Normal/MY_BuffMonitor_Self"):anchor(MY_BuffMonitor.anchorSelf)
     MY.UI("Normal/MY_BuffMonitor_Target"):anchor(MY_BuffMonitor.anchorTarget)
 end)
@@ -151,17 +151,21 @@ MY_BuffMonitor.ReloadBuffMonitor = function()
                 nCount = nCount + 1
             end
         end
+        
         ui:size(nCount * 52, 52):anchor(MY_BuffMonitor.anchorSelf)
           :onevent("UI_SCALED", function()
             MY.UI(this):anchor(MY_BuffMonitor.anchorSelf)
-          end):customMode(_L['mingyi self buff monitor'], function(anchor)
+          end)
+          :customMode(_L['mingyi self buff monitor'], function(anchor)
             MY_BuffMonitor.anchorSelf = anchor
           end, function(anchor)
             MY_BuffMonitor.anchorSelf = anchor
-          end):breathe(function()
+          end, 'LEFTCENTER')
+          :breathe(function()
             -- register render function
             refreshObjectBuff(GetClientPlayer(), MY_BuffMonitor.tBuffList[dwKungFuID].Self, _Cache.handleBoxs.Self)
-        end)
+          end)
+        
         if MY_BuffMonitor.bDragable then
             ui:drag(0, 0, nCount * 52, 52):drag(nil, function()
                 MY_BuffMonitor.anchorSelf = ui:anchor()
@@ -191,17 +195,21 @@ MY_BuffMonitor.ReloadBuffMonitor = function()
                 nCount = nCount + 1
             end
         end
+        
         ui:size(nCount * 52, 52):anchor(MY_BuffMonitor.anchorTarget)
           :onevent("UI_SCALED", function()
             MY.UI(this):anchor(MY_BuffMonitor.anchorTarget)
-          end):customMode(_L['mingyi target buff monitor'], function(anchor)
+          end)
+          :customMode(_L['mingyi target buff monitor'], function(anchor)
             MY_BuffMonitor.anchorTarget = anchor
           end, function(anchor)
             MY_BuffMonitor.anchorTarget = anchor
-          end):breathe(function()
+          end, 'LEFTCENTER')
+          :breathe(function()
             -- register render function
             refreshObjectBuff(MY.GetObject(MY.GetTarget()), MY_BuffMonitor.tBuffList[dwKungFuID].Target, _Cache.handleBoxs.Target)
-        end)
+          end)
+        
         if MY_BuffMonitor.bDragable then
             ui:drag(0, 0, nCount * 52, 52):drag(nil, function()
                 MY_BuffMonitor.anchorTarget = ui:anchor()
