@@ -423,7 +423,8 @@ _MY_ChatMonitor.ShowTip = function(szMsg)
         _MY_ChatMonitor.uiTipBoard:clear():append(szMsg)
     end
     _MY_ChatMonitor.uiFrame:fadeTo(500, 255)
-    if Station.GetMouseOverWindow():GetRoot():GetName() == 'MY_ChatMonitor' then
+    if Station.GetMouseOverWindow() and
+    Station.GetMouseOverWindow():GetRoot():GetName() == 'MY_ChatMonitor' then
         MY.DelayCall('MY_ChatMonitor_Hide', 5000)
     else
         MY.DelayCall('MY_ChatMonitor_Hide', function()
