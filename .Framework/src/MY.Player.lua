@@ -243,6 +243,7 @@ MY.Player.SetTarget = function(dwType, dwID)
     SetTarget(dwType, dwID)
 end
 MY.SetTarget = MY.Player.SetTarget
+
 --[[ 设置/取消 临时目标
     -- MY.Player.SetTempTarget(dwType, dwID)
     -- MY.Player.ResumeTarget()
@@ -266,6 +267,41 @@ MY.Player.ResumeTarget = function()
     TargetPanel_SetOpenState(false)
 end
 MY.ResumeTarget = MY.Player.ResumeTarget
+
+--[[ 临时设置目标为指定目标并执行函数
+    (void) MY.Player.WithTarget(dwType, dwID, callback)
+]]
+_Cache.tWithTarget = {}
+_Cache.lockWithTarget = false
+_Cache.WithTargetHandle = function()
+    if _Cache.lockWithTarget or
+    #_Cache.tWithTarget == 0 then
+        return
+    end
+
+    _Cache.lockWithTarget = true
+    local r = table.remove(_Cache.tWithTarget, 1)
+    
+    MY.Player.SetTempTarget(r.dwType, r.dwID)
+    local status, err = pcall(r.callback)
+    if not status then
+        MY.Debug(err, 'MY.Player.lua#WithTargetHandle', 2)
+    end
+    MY.Player.ResumeTarget()
+    
+    _Cache.lockWithTarget = false
+    _Cache.WithTargetHandle()
+end
+MY.Player.WithTarget = function(dwType, dwID, callback)
+    -- 因为客户端多线程 所以加上资源锁 防止设置临时目标冲突
+    table.insert(_Cache.tWithTarget, {
+        dwType   = dwType  ,
+        dwID     = dwID    ,
+        callback = callback,
+    })
+    _Cache.WithTargetHandle()
+end
+
 --[[ 求N2在N1的面向角  --  重载+2
     -- 输入N1坐标、面向、N2坐标
     (number) MY.GetFaceToTargetDegree(nX,nY,nFace,nTX,nTY)
