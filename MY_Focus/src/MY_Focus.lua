@@ -278,7 +278,7 @@ end
 
 -- 绘制指定的焦点Handle（没有则添加创建）
 MY_Focus.DrawFocus = function(dwType, dwID)
-    local obj = MY.Game.GetObjcet(dwType, dwID)
+    local obj, info = MY.Game.GetObjcet(dwType, dwID)
     local hList = Station.Lookup('Normal/MY_Focus', 'Handle_List')
     if not (obj and hList) then
         return
@@ -300,24 +300,28 @@ MY_Focus.DrawFocus = function(dwType, dwID)
         end
     end
     -- 血量
-    local szLife = ''
-    if obj.nCurrentLife > 10000 then
-        szLife = szLife .. FormatString(g_tStrings.MPNEY_TENTHOUSAND, math.floor(obj.nCurrentLife / 1000) / 10)
-    else
-        szLife = szLife .. obj.nCurrentLife
-    end
-    if obj.nMaxLife > 0 then
-        local nPercent = math.floor(obj.nCurrentLife / obj.nMaxLife * 100)
-        if nPercent > 100 then
-            nPercent = 100
+    if dwType ~= TARGET.DOODAD then
+        local nCurrentLife, nMaxLife = info.nCurrentLife, info.nMaxLife
+        local nCurrentMana, nMaxMana = info.nCurrentMana, info.nMaxMana
+        local szLife = ''
+        if nCurrentLife > 10000 then
+            szLife = szLife .. FormatString(g_tStrings.MPNEY_TENTHOUSAND, math.floor(nCurrentLife / 1000) / 10)
+        else
+            szLife = szLife .. nCurrentLife
         end
-        szLife = szLife .. '(' .. nPercent .. '%)'
-        hItem:Lookup('Handle_LM/Image_Health'):SetPercentage(obj.nCurrentLife / obj.nMaxLife)
-        hItem:Lookup('Handle_LM/Text_Health'):SetText(szLife)
-    end
-    if obj.nMaxMana > 0 then
-        hItem:Lookup('Handle_LM/Image_Mana'):SetPercentage(obj.nCurrentMana / obj.nMaxMana)
-        hItem:Lookup('Handle_LM/Text_Mana'):SetText(obj.nCurrentMana .. '/' .. obj.nMaxMana)
+        if nMaxLife > 0 then
+            local nPercent = math.floor(nCurrentLife / nMaxLife * 100)
+            if nPercent > 100 then
+                nPercent = 100
+            end
+            szLife = szLife .. '(' .. nPercent .. '%)'
+            hItem:Lookup('Handle_LM/Image_Health'):SetPercentage(nCurrentLife / nMaxLife)
+            hItem:Lookup('Handle_LM/Text_Health'):SetText(szLife)
+        end
+        if nMaxMana > 0 then
+            hItem:Lookup('Handle_LM/Image_Mana'):SetPercentage(nCurrentMana / nMaxMana)
+            hItem:Lookup('Handle_LM/Text_Mana'):SetText(nCurrentMana .. '/' .. nMaxMana)
+        end
     end
     -- 选中状态
     hItem:Lookup('Image_Select'):Hide()
@@ -329,7 +333,7 @@ MY_Focus.DrawFocus = function(dwType, dwID)
         end
     end
     -- 目标距离
-    local nDistance = math.floor(GetCharacterDistance(UI_GetClientPlayerID(), dwID) * 10 / 64) / 10
+    local nDistance = math.floor(math.sqrt(math.pow(player.nX - obj.nX, 2) + math.pow(player.nY - obj.nY, 2)) * 10 / 64) / 10
     hItem:Lookup('Handle_Compass/Compass_Distance'):SetText(nDistance)
     -- 自身面向
     if player then
