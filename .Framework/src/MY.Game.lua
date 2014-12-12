@@ -263,7 +263,7 @@ MY.Game.GetObjcet = function(dwType, dwID)
         elseif me.IsPlayerInMyParty(dwID) then
             p, info = GetPlayer(dwID), GetClientTeam().GetMemberInfo(dwID)
         else
-            p, info = GetPlayer(dwID),GetPlayer(dwID)
+            p, info = GetPlayer(dwID), GetPlayer(dwID)
         end
     elseif dwType == TARGET.NPC then
         p, info = GetNpc(dwID), GetNpc(dwID)
