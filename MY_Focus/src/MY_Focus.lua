@@ -114,7 +114,7 @@ MY_Focus.DelAutoFocus = function(szName)
         -- 全字符匹配模式：检查是否在永久焦点中 没有则删除Handle
         for i = #_Cache.tFocusList, 1, -1 do
             local p = _Cache.tFocusList[i]
-            local h = GetTargetHandle(p.dwType, p.dwID)
+            local h = MY.Game.GetObjcet(p.dwType, p.dwID)
             if h and MY.Game.GetObjectName(h) == szName and
             not MY_Focus.tFocusList[p.dwType][p.dwID] then
                 MY_Focus.OnObjectLeaveScene(p.dwType, p.dwID)
@@ -162,7 +162,7 @@ MY_Focus.OnObjectEnterScene = function(dwType, dwID, nRetryCount)
     if nRetryCount and nRetryCount >5 then
         return
     end
-    local obj = GetTargetHandle(dwType, dwID)
+    local obj = MY.Game.GetObjcet(dwType, dwID)
     if not obj then
         return
     end
@@ -278,7 +278,7 @@ end
 
 -- 绘制指定的焦点Handle（没有则添加创建）
 MY_Focus.DrawFocus = function(dwType, dwID)
-    local obj = GetTargetHandle(dwType, dwID)
+    local obj = MY.Game.GetObjcet(dwType, dwID)
     local hList = Station.Lookup('Normal/MY_Focus', 'Handle_List')
     if not (obj and hList) then
         return
