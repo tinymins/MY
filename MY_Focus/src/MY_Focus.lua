@@ -294,9 +294,13 @@ MY_Focus.DrawFocus = function(dwType, dwID)
     hItem:Lookup('Handle_Name/Text_Name'):SetText(MY.Game.GetObjectName(obj))
     -- 心法
     if dwType == TARGET.PLAYER then
-        local kungfu = obj.GetKungfuMount()
-        if kungfu then
-            hItem:Lookup('Handle_Name/Text_Kungfu'):SetText(MY_Focus.GetKungfuName(kungfu.dwSkillID))
+        if info.dwMountKungfuID then
+            hItem:Lookup('Handle_Name/Text_Kungfu'):SetText(MY_Focus.GetKungfuName(info.dwMountKungfuID))
+        else
+            local kungfu = obj.GetKungfuMount()
+            if kungfu then
+                hItem:Lookup('Handle_Name/Text_Kungfu'):SetText(MY_Focus.GetKungfuName(kungfu.dwSkillID))
+            end
         end
     end
     -- 血量
@@ -321,6 +325,17 @@ MY_Focus.DrawFocus = function(dwType, dwID)
         if nMaxMana > 0 then
             hItem:Lookup('Handle_LM/Image_Mana'):SetPercentage(nCurrentMana / nMaxMana)
             hItem:Lookup('Handle_LM/Text_Mana'):SetText(nCurrentMana .. '/' .. nMaxMana)
+        end
+    end
+    -- 读条
+    if dwType ~= TARGET.DOODAD then
+        local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = obj.GetSkillPrepareState()
+        if bIsPrepare then
+            hItem:Lookup('Handle_Progress/Image_Progress'):SetPercentage(fProgress)
+            hItem:Lookup('Handle_Progress/Text_Progress'):SetText(MY_Focus.GetSkillName(dwSkillID, dwSkillLevel))
+        else
+            hItem:Lookup('Handle_Progress/Image_Progress'):SetPercentage(0)
+            hItem:Lookup('Handle_Progress/Text_Progress'):SetText('')
         end
     end
     -- 选中状态
@@ -403,6 +418,15 @@ MY_Focus.GetKungfuName = function(dwKungfuID)
     return m_tKungfuName[dwKungfuID]
 end
 
+-- 获取技能名称字符串
+local m_tSkillName = {}
+MY_Focus.GetSkillName = function(dwSkillID, dwSkillLevel)
+    if not m_tSkillName[dwSkillID] then
+        m_tSkillName[dwSkillID] = Table_GetSkillName(dwSkillID, dwSkillLevel)
+    end
+    return m_tSkillName[dwSkillID]
+end
+
 --[[
 ##########################################################################
                                     #                 #         #         
@@ -421,16 +445,16 @@ end
 ]]
 
 -- 周期重绘
-local m_nTick = 0
+-- local m_nTick = 0
 MY_Focus.OnFrameBreathe = function()
-    if m_nTick == 0 then
+    -- if m_nTick == 0 then
         MY_Focus.UpdateList()
-    end
+    -- end
     MY_Focus.AdjustUI()
-    m_nTick = m_nTick + 1
-    if m_nTick > 1 then
-        m_nTick = 0
-    end
+    -- m_nTick = m_nTick + 1
+    -- if m_nTick > 1 then
+    --     m_nTick = 0
+    -- end
 end
 
 MY_Focus.OnFrameDragSetPosEnd = function()
