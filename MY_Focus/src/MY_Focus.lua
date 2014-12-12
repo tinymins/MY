@@ -13,6 +13,7 @@ MY_Focus.bEnable    = true  -- 是否启用
 MY_Focus.bAutoHide  = true  -- 无焦点自动隐藏
 MY_Focus.nMaxDisplay = 5    -- 最大显示数量
 MY_Focus.bAutoFocus = true  -- 启用默认焦点
+MY_Focus.bTraversal = false -- 遍历焦点列表
 MY_Focus.tAutoFocus = {     -- 默认焦点
     string.char(0xB4, 0xE5, 0xBF, 0xDA, 0xB5, 0xC4, 0xCD, 0xF5, 0xCA, 0xA6, 0xB8, 0xB5)
 }
@@ -28,6 +29,7 @@ RegisterCustomData("MY_Focus.nMaxDisplay")
 RegisterCustomData("MY_Focus.bAutoFocus")
 RegisterCustomData("MY_Focus.tAutoFocus")
 RegisterCustomData("MY_Focus.tFocusList")
+RegisterCustomData("MY_Focus.bTraversal")
 RegisterCustomData("MY_Focus.anchor")
 
 local m_frame
@@ -330,12 +332,26 @@ MY_Focus.DrawFocus = function(dwType, dwID)
     -- 读条
     if dwType ~= TARGET.DOODAD then
         local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = obj.GetSkillPrepareState()
-        if bIsPrepare then
-            hItem:Lookup('Handle_Progress/Image_Progress'):SetPercentage(fProgress)
-            hItem:Lookup('Handle_Progress/Text_Progress'):SetText(MY_Focus.GetSkillName(dwSkillID, dwSkillLevel))
+        if MY_Focus.bTraversal and dwType == TARGET.PLAYER
+        and (not bIsPrepare and obj.GetOTActionState() == 1) then
+            MY.Player.WithTarget(dwType, dwID, function()
+                local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = obj.GetSkillPrepareState()
+                if bIsPrepare then
+                    hItem:Lookup('Handle_Progress/Image_Progress'):SetPercentage(fProgress)
+                    hItem:Lookup('Handle_Progress/Text_Progress'):SetText(MY_Focus.GetSkillName(dwSkillID, dwSkillLevel))
+                else
+                    hItem:Lookup('Handle_Progress/Image_Progress'):SetPercentage(0)
+                    hItem:Lookup('Handle_Progress/Text_Progress'):SetText('')
+                end
+            end)
         else
-            hItem:Lookup('Handle_Progress/Image_Progress'):SetPercentage(0)
-            hItem:Lookup('Handle_Progress/Text_Progress'):SetText('')
+            if bIsPrepare then
+                hItem:Lookup('Handle_Progress/Image_Progress'):SetPercentage(fProgress)
+                hItem:Lookup('Handle_Progress/Text_Progress'):SetText(MY_Focus.GetSkillName(dwSkillID, dwSkillLevel))
+            else
+                hItem:Lookup('Handle_Progress/Image_Progress'):SetPercentage(0)
+                hItem:Lookup('Handle_Progress/Text_Progress'):SetText('')
+            end
         end
     end
     -- 选中状态
@@ -531,6 +547,16 @@ MY_Focus.GetMenu = function()
                 return not MY_Focus.bEnable
             end,
         }, {
+            szOption = _L['traversal object'],
+            bCheck = true,
+            bChecked = MY_Focus.bTraversal,
+            fnAction = function()
+                MY_Focus.bTraversal = not MY_Focus.bTraversal
+            end,
+            fnDisable = function()
+                return not MY_Focus.bAutoFocus
+            end,
+        }, {
             szOption = _L["auto focus"],
             bCheck = true,
             bChecked = MY_Focus.bAutoFocus,
@@ -570,6 +596,9 @@ MY_Focus.GetMenu = function()
 
     local t1 = {
         szOption = _L['max display length'],
+        fnDisable = function()
+            return not MY_Focus.bAutoFocus
+        end,
     }
     for i = 1, 15 do
         table.insert(t1, {
@@ -593,7 +622,7 @@ MY.RegisterTargetAddonMenu('MY_Focus', function()
         szOption = _L['add to focus list'],
         fnAction = function()
             MY_Focus.AddStaticFocus(dwType, dwID)
-        end
+        end,
     }
 end)
 
