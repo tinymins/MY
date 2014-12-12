@@ -554,7 +554,7 @@ MY_Focus.GetMenu = function()
                 MY_Focus.bTraversal = not MY_Focus.bTraversal
             end,
             fnDisable = function()
-                return not MY_Focus.bAutoFocus
+                return not MY_Focus.bEnable
             end,
         }, {
             szOption = _L["auto focus"],
@@ -597,7 +597,7 @@ MY_Focus.GetMenu = function()
     local t1 = {
         szOption = _L['max display length'],
         fnDisable = function()
-            return not MY_Focus.bAutoFocus
+            return not MY_Focus.bEnable
         end,
     }
     for i = 1, 15 do
