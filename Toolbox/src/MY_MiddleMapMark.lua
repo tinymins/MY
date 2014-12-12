@@ -14,11 +14,7 @@ local SZ_CACHE_PATH = "cache/NPC_DOODAD_REC/"
 local MAX_DISTINCT_DISTANCE = 4 -- 最大独立距离4尺（低于该距离的两个实体视为同一个）
 MAX_DISTINCT_DISTANCE = MAX_DISTINCT_DISTANCE * MAX_DISTINCT_DISTANCE * 64 * 64
 
--- HOOK MAP SWITCH
-if not MiddleMap._MY_MMM_ShowMap then
-    MiddleMap._MY_MMM_ShowMap = MiddleMap.ShowMap
-end
-MiddleMap.ShowMap = function(...)
+local MiddleMap_ShowMap = function(...)
     if MiddleMap._MY_MMM_ShowMap then
         MiddleMap._MY_MMM_ShowMap(...)
     end
@@ -31,11 +27,12 @@ MiddleMap.ShowMap = function(...)
         end
     end, 200)
 end
--- HOOK OnEditChanged
-if not MiddleMap._MY_MMM_OnEditChanged then
-    MiddleMap._MY_MMM_OnEditChanged = MiddleMap.OnEditChanged
+-- HOOK MAP SWITCH
+if not (MiddleMap._MY_MMM_ShowMap or MiddleMap.ShowMap == MiddleMap_ShowMap) then
+    MiddleMap._MY_MMM_ShowMap = MiddleMap.ShowMap
 end
-MiddleMap.OnEditChanged = function()
+
+local MiddleMap_OnEditChanged = function()
     if this:GetName() == 'Edit_Search' then
         MY_MiddleMapMark.Search(this:GetText())
     end
@@ -43,11 +40,12 @@ MiddleMap.OnEditChanged = function()
         MiddleMap._MY_MMM_OnEditChanged()
     end
 end
--- HOOK OnMouseEnter
-if not MiddleMap._MY_MMM_OnMouseEnter then
-    MiddleMap._MY_MMM_OnMouseEnter = MiddleMap.OnMouseEnter
+-- HOOK OnEditChanged
+if not (MiddleMap._MY_MMM_OnEditChanged or MiddleMap.OnEditChanged == MiddleMap_OnEditChanged) then
+    MiddleMap._MY_MMM_OnEditChanged = MiddleMap.OnEditChanged
 end
-MiddleMap.OnMouseEnter = function()
+
+local MiddleMap_OnMouseEnter = function()
     if this:GetName() == 'Edit_Search' then
         local x, y = this:GetAbsPos()
         local w, h = this:GetSize()
@@ -62,17 +60,22 @@ MiddleMap.OnMouseEnter = function()
         MiddleMap._MY_MMM_OnMouseEnter()
     end
 end
--- HOOK OnMouseLeave
-if not MiddleMap._MY_MMM_OnMouseLeave then
-    MiddleMap._MY_MMM_OnMouseLeave = MiddleMap.OnMouseLeave
+-- HOOK OnMouseEnter
+if not (MiddleMap._MY_MMM_OnMouseEnter or MiddleMap.OnMouseEnter == MiddleMap_OnMouseEnter) then
+    MiddleMap._MY_MMM_OnMouseEnter = MiddleMap.OnMouseEnter
 end
-MiddleMap.OnMouseLeave = function()
+
+local MiddleMap_OnMouseLeave = function()
     if this:GetName() == 'Edit_Search' then
         HideTip()
     end
     if MiddleMap._MY_MMM_OnMouseLeave then
         MiddleMap._MY_MMM_OnMouseLeave()
     end
+end
+-- HOOK OnMouseLeave
+if not (MiddleMap._MY_MMM_OnMouseLeave or MiddleMap.OnMouseLeave == MiddleMap_OnMouseLeave) then
+    MiddleMap._MY_MMM_OnMouseLeave = MiddleMap.OnMouseLeave
 end
 
 -- start search
