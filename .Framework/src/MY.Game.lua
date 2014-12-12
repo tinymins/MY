@@ -237,6 +237,43 @@ MY.Game.GetServer = function()
     return table.concat({GetUserServer()},'_'), {GetUserServer()}
 end
 
+--[[ 获取指定对象
+    (obj) MY.Game.GetObjcet([dwType,] dwID)
+]]
+MY.Game.GetObjcet = function(dwType, dwID)
+    if not dwID then
+        dwType, dwID = nil, dwType
+    end
+    local p, info
+    
+    if not dwType then
+        if IsPlayer(dwID) then
+            dwType = TARGET.PLAYER
+        elseif GetDoodad(dwID) then
+            dwType = TARGET.DOODAD
+        else
+            dwType = TARGET.NPC
+        end
+    end
+    
+    if dwType == TARGET.PLAYER then
+        local me = GetClientPlayer()
+        if dwID == me.dwID then
+            p, info = me, me
+        elseif me.IsPlayerInMyParty(dwID) then
+            p, info = GetPlayer(dwID), GetClientTeam().GetMemberInfo(dwID)
+        else
+            p, info = GetPlayer(dwID),GetPlayer(dwID)
+        end
+    elseif dwType == TARGET.NPC then
+        p, info = GetNpc(dwID), GetNpc(dwID)
+    elseif dwType == TARGET.DOODAD then
+        p, info = GetDoodad(dwID), GetDoodad(dwID)
+    end
+    return p, info
+end
+MY.GetObjcet = MY.Game.GetObjcet
+
 --[[ 获取指定对象的名字
 ]]
 MY.Game.GetObjectName = function(tar)
