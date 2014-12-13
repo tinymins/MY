@@ -4,6 +4,7 @@ data = {
     ['enable'] = '启用',
     ['hide when empty'] = '无焦点时隐藏',
     ['traversal object'] = '遍历焦点目标',
+    ['show focus\'s target'] = '显示目标目标',
     ['auto focus'] = '启用默认焦点',
     ['namelist manager'] = '默认焦点管理',
     ['delete focus'] = '删除焦点',
