@@ -238,9 +238,9 @@ MY.Game.GetServer = function()
 end
 
 --[[ 获取指定对象
-    (obj) MY.Game.GetObjcet([dwType,] dwID)
+    (obj) MY.Game.GetObject([dwType,] dwID)
 ]]
-MY.Game.GetObjcet = function(dwType, dwID)
+MY.Game.GetObject = function(dwType, dwID)
     if not dwID then
         dwType, dwID = nil, dwType
     end
@@ -272,7 +272,7 @@ MY.Game.GetObjcet = function(dwType, dwID)
     end
     return p, info
 end
-MY.GetObjcet = MY.Game.GetObjcet
+MY.GetObject = MY.Game.GetObject
 
 --[[ 获取指定对象的名字
 ]]
