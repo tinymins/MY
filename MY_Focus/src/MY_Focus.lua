@@ -11,8 +11,9 @@ _Cache.bMinimize = false
 MY_Focus = {}
 MY_Focus.bEnable    = true  -- 是否启用
 MY_Focus.bAutoHide  = true  -- 无焦点自动隐藏
-MY_Focus.nMaxDisplay = 5    -- 最大显示数量
+MY_Focus.nMaxDisplay= 5     -- 最大显示数量
 MY_Focus.bAutoFocus = true  -- 启用默认焦点
+MY_Focus.bShowTarget= false -- 显示目标的目标
 MY_Focus.bTraversal = false -- 遍历焦点列表
 MY_Focus.tAutoFocus = {     -- 默认焦点
     string.char(0xB4, 0xE5, 0xBF, 0xDA, 0xB5, 0xC4, 0xCD, 0xF5, 0xCA, 0xA6, 0xB8, 0xB5)
@@ -29,6 +30,7 @@ RegisterCustomData("MY_Focus.nMaxDisplay")
 RegisterCustomData("MY_Focus.bAutoFocus")
 RegisterCustomData("MY_Focus.tAutoFocus")
 RegisterCustomData("MY_Focus.tFocusList")
+RegisterCustomData("MY_Focus.bShowTarget")
 RegisterCustomData("MY_Focus.bTraversal")
 RegisterCustomData("MY_Focus.anchor")
 
@@ -354,6 +356,16 @@ MY_Focus.DrawFocus = function(dwType, dwID)
             end
         end
     end
+    -- 目标的目标
+    if MY_Focus.bShowTarget and dwType ~= TARGET.DOODAD then
+        local tp, id = obj.GetTarget()
+        local tar = MY.Game.GetObjcet(tp, id)
+        if tar then
+            hItem:Lookup('Handle_Progress/Text_Target'):SetText(MY.Game.GetObjectName(tar, tp))
+        else
+            hItem:Lookup('Handle_Progress/Text_Target'):SetText('')
+        end
+    end
     -- 选中状态
     hItem:Lookup('Image_Select'):Hide()
     local player = GetClientPlayer()
@@ -542,6 +554,17 @@ MY_Focus.GetMenu = function()
             bChecked = MY_Focus.bAutoHide,
             fnAction = function()
                 MY_Focus.bAutoHide = not MY_Focus.bAutoHide
+            end,
+            fnDisable = function()
+                return not MY_Focus.bEnable
+            end,
+        }, {
+            szOption = _L['show focus\'s target'],
+            bCheck = true,
+            bChecked = MY_Focus.bShowTarget,
+            fnAction = function()
+                MY_Focus.bShowTarget = not MY_Focus.bShowTarget
+                MY_Focus.RedrawList()
             end,
             fnDisable = function()
                 return not MY_Focus.bEnable
