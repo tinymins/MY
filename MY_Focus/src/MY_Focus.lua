@@ -15,9 +15,7 @@ MY_Focus.nMaxDisplay= 5     -- 最大显示数量
 MY_Focus.bAutoFocus = true  -- 启用默认焦点
 MY_Focus.bShowTarget= false -- 显示目标的目标
 MY_Focus.bTraversal = false -- 遍历焦点列表
-MY_Focus.tAutoFocus = {     -- 默认焦点
-    string.char(0xB4, 0xE5, 0xBF, 0xDA, 0xB5, 0xC4, 0xCD, 0xF5, 0xCA, 0xA6, 0xB8, 0xB5)
-}
+MY_Focus.tAutoFocus = {}    -- 默认焦点
 MY_Focus.tFocusList = {     -- 永久焦点
     [TARGET.NPC]    = {},
     [TARGET.PLAYER] = {},
