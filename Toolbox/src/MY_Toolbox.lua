@@ -77,6 +77,9 @@ MY_ToolBox.ApplyConfig = function()
     
     -- 试炼之地九宫助手
     MY.RegisterEvent('OPEN_WINDOW', 'JiugongHelper', function(arg0, szText)
+        if not MY_ToolBox.bJiugongHelper then
+            return
+        end
         -- 确定当前对话对象是醉逍遥（18707）
         local target = GetTargetHandle(GetClientPlayer().GetTarget())
         if target and target.dwTemplateID ~= 18707 then
