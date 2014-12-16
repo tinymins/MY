@@ -50,11 +50,20 @@ end
 -- 提交玩家正确答案 -- 云数据来源
 MY_ExamTip.SubmitData = function()
     local _, _, szLang, _ = GetVersion()
+    local nCommited, nAccepted, nUnsubmit = 0, 0, 0
     -- MY_Anmerkungen.szNotePanelContent = string.format(_Cache.szSubmitUrl, szLang, MY.String.UrlEncode(MY.Json.Encode(_Cache.tCached)))
-    MY.RemoteRequest(string.format(_Cache.szSubmitUrl, szLang, MY.String.UrlEncode(MY.Json.Encode(_Cache.tCached))), function(szTitle, szContent)
-        local r = MY.Json.Decode(szContent)
-        MY.Sysmsg({_L('%s record(s) commited, %s record(s) accepted!', r.received, r.accepted)}, _L['exam tip'])
-    end)
+    for szQues, szAnsw in pairs(_Cache.tCached) do
+        nUnsubmit = nUnsubmit + 1
+        MY.RemoteRequest(string.format(_Cache.szSubmitUrl, szLang, MY.String.UrlEncode(MY.Json.Encode({[szQues] = szAnsw}))), function(szTitle, szContent)
+            local r = MY.Json.Decode(szContent)
+            nUnsubmit = nUnsubmit - 1
+            nCommited = nCommited + r.received
+            nAccepted = nAccepted + r.accepted
+            if nUnsubmit == 0 then
+                MY.Sysmsg({_L('%s record(s) commited, %s record(s) accepted!', nCommited, nAccepted)}, _L['exam tip'])
+            end
+        end)
+    end
 end
 -- 显示结果
 MY_ExamTip.ShowResult = function(szQues, szAnsw, szTip)
