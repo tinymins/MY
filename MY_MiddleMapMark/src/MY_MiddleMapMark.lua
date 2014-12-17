@@ -272,7 +272,7 @@ _Cache.OnPanelActive = function(wnd)
                 local tNames = {}
                 for _, p in ipairs(data.Npc) do
                     if not tNames[p.szName] and string.find(p.szName, v) then
-                        AddListItem('[' .. Table_GetMapName(dwMapID) .. ']' .. p.szName, {
+                        AddListItem('[' .. Table_GetMapName(dwMapID) .. '] ' .. p.szName, {
                             dwMapID = dwMapID,
                             szName  = p.szName ,
                         })
@@ -282,7 +282,7 @@ _Cache.OnPanelActive = function(wnd)
                 local tNames = {}
                 for _, p in ipairs(data.Doodad) do
                     if not tNames[p.szName] and string.find(p.szName, v) then
-                        AddListItem('[' .. Table_GetMapName(dwMapID) .. ']' .. p.szName, {
+                        AddListItem('[' .. Table_GetMapName(dwMapID) .. '] ' .. p.szName, {
                             dwMapID = dwMapID,
                             szName  = p.szName ,
                         })
@@ -357,6 +357,10 @@ MY.RegisterEvent("DOODAD_ENTER_SCENE", "MY_MiddleMapMark", function()
     end
     -- avoid special doodad
     if doodad.dwTemplateID == 82 then -- 切磋用旗帜
+        return
+    end
+    -- avoid player's doodad
+    if doodad.dwEmployer and doodad.dwEmployer ~= 0 then
         return
     end
     -- avoid full number named doodad
