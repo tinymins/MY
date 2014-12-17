@@ -224,6 +224,11 @@ _Cache.OnPanelActive = function(wnd)
       :size(w - 32, h - 50)
       :handleStyle(3)
     
+    local muProgress = ui:append('Image_Progress', 'Image'):item('#Image_Progress')
+      :pos(20, 31)
+      :size(w - 30, 4)
+      :image('ui/Image/UICommon/RaidTotal.UITex|45')
+    
     local AddListItem = function(szText, data)
         local muItem = muList:append('<handle><image>w=300 h=25 eventid=371 name="Image_Bg" </image><text>name="Text_Default" </text></handle>'):hdl(1):children():last()
         
@@ -250,36 +255,49 @@ _Cache.OnPanelActive = function(wnd)
     end
     
     ui:append('WndEdit_Search', 'WndEditBox'):children('#WndEdit_Search')
-      :pos(20, 10)
-      :size(w - 30, 25)
+      :pos(18, 10)
+      :size(w - 26, 25)
       :change(function(v)
         if not (v and #v > 0) then
             return
         end
         muList:clear()
-        for _, dwMapID in pairs(GetMapList()) do
-            local data = MY_MiddleMapMark.GetMapData(dwMapID)
-            local tNames = {}
-            for _, p in ipairs(data.Npc) do
-                if not tNames[p.szName] and string.find(p.szName, v) then
-                    AddListItem('[' .. Table_GetMapName(dwMapID) .. ']' .. p.szName, {
-                        dwMapID = dwMapID,
-                        szName  = p.szName ,
-                    })
-                    tNames[p.szName] = true
+        local aMap = GetMapList()
+        local i, N = 1, #aMap
+        
+        MY.BreatheCall('MY_MiddleMapMark_Searching_Threading', function()
+            for _ = 1, 10 do
+                local dwMapID = aMap[i]
+                local data = MY_MiddleMapMark.GetMapData(dwMapID)
+                local tNames = {}
+                for _, p in ipairs(data.Npc) do
+                    if not tNames[p.szName] and string.find(p.szName, v) then
+                        AddListItem('[' .. Table_GetMapName(dwMapID) .. ']' .. p.szName, {
+                            dwMapID = dwMapID,
+                            szName  = p.szName ,
+                        })
+                        tNames[p.szName] = true
+                    end
+                end
+                local tNames = {}
+                for _, p in ipairs(data.Doodad) do
+                    if not tNames[p.szName] and string.find(p.szName, v) then
+                        AddListItem('[' .. Table_GetMapName(dwMapID) .. ']' .. p.szName, {
+                            dwMapID = dwMapID,
+                            szName  = p.szName ,
+                        })
+                        tNames[p.szName] = true
+                    end
+                end
+                muProgress:width((w - 32) * i / N)
+
+                i = i + 1
+                if i > N then
+                    return 0
                 end
             end
-            local tNames = {}
-            for _, p in ipairs(data.Doodad) do
-                if not tNames[p.szName] and string.find(p.szName, v) then
-                    AddListItem('[' .. Table_GetMapName(dwMapID) .. ']' .. p.szName, {
-                        dwMapID = dwMapID,
-                        szName  = p.szName ,
-                    })
-                    tNames[p.szName] = true
-                end
-            end
-        end
+        end)
+        
       end)
     
 end
