@@ -1036,6 +1036,10 @@ function _MY.UI:text(szText)
                 else
                     ele.phd:Hide()
                 end
+            elseif ele.type == "Text" then
+                if ele.raw.bAutoSize then
+                    ele.raw:AutoSize()
+                end
             end
         end
         return self
@@ -1622,7 +1626,8 @@ function _MY.UI:size(nWidth, nHeight)
                     ele.txt:SetRelPos(26, math.ceil((nHeight - h)/2))
                     ele.hdl:FormatAllItemPos()
                 elseif ele.type=="WndEditBox" then
-                    
+                elseif ele.type=="Text" then
+                    ele.raw.bAutoSize = false
                 end
             end)
             if ele.sbu then
@@ -1645,6 +1650,26 @@ function _MY.UI:size(nWidth, nHeight)
             if status then return w, h else MY.Debug(w..'\n','ERROR _MY.UI:height|width|size' ,1) return nil end
         end
     end
+end
+
+-- (self) Instance:autoSize() -- resize Text element by autosize
+-- (self) Instance:autoSize(bool bAutoSize) -- set if Text ele autosize
+function _MY.UI:autoSize(bAutoSize)
+    self:_checksum()
+    if bAutoSize == nil then
+        for _, ele in pairs(self.eles) do
+            if ele.type == 'Text' then
+                ele.raw:AutoSize()
+            end
+        end
+    elseif type(bAutoSize) == 'boolean' then
+        for _, ele in pairs(self.eles) do
+            if ele.type == 'Text' then
+                ele.raw.bAutoSize = true
+            end
+        end
+    end
+    return self
 end
 
 -- (number, number) Instance:range()
