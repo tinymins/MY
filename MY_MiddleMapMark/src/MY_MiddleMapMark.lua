@@ -394,4 +394,8 @@ MY.RegisterEvent("DOODAD_ENTER_SCENE", "MY_MiddleMapMark", function()
 end)
 MY.RegisterEvent('LOADING_END', MY_MiddleMapMark.SaveMapData)
 MY.RegisterEvent('PLAYER_EXIT_GAME', MY_MiddleMapMark.SaveMapData)
-MY.RegisterPanel( "MY_MiddleMapMark", _L["middle map mark"], _L['General'], "UI/Image/Common/Money.UITex|243", {255,255,0,200}, { OnPanelActive = _Cache.OnPanelActive } )
+MY.RegisterPanel( "MY_MiddleMapMark", _L["middle map mark"], _L['General'],
+    "ui/Image/MiddleMap/MapWindow2.UITex|4", {255,255,0,200}, {
+        OnPanelActive = _Cache.OnPanelActive
+    }
+)
