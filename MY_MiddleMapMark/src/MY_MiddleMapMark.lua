@@ -249,7 +249,7 @@ _Cache.OnPanelActive = function(wnd)
           :click(function(nButton)
             if nButton == MY.Const.Event.Mouse.LBUTTON then
                 OpenMiddleMap(data.dwMapID, 0)
-                MY.UI('Topmost1/MiddleMap/Wnd_Tool/Edit_Search'):text(data.szName)
+                MY.UI('Topmost1/MiddleMap/Wnd_Tool/Edit_Search'):text(MY.String.PatternEscape(data.szName))
                 Station.SetFocusWindow('Topmost1/MiddleMap')
             end
           end)
@@ -265,6 +265,7 @@ _Cache.OnPanelActive = function(wnd)
         muList:clear()
         local aMap = GetMapList()
         local i, N = 1, #aMap
+        local n, M = 0, 200
         
         MY.BreatheCall('MY_MiddleMapMark_Searching_Threading', function()
             for _ = 1, 10 do
@@ -272,22 +273,33 @@ _Cache.OnPanelActive = function(wnd)
                 local data = MY_MiddleMapMark.GetMapData(dwMapID)
                 local tNames = {}
                 for _, p in ipairs(data.Npc) do
-                    if not tNames[p.szName] and string.find(p.szName, v) then
-                        AddListItem('[' .. Table_GetMapName(dwMapID) .. '] ' .. p.szName, {
-                            dwMapID = dwMapID,
-                            szName  = p.szName ,
+                    if not tNames[p.szName]
+                    and (string.find(p.szName, v) or
+                    string.find(p.szTitle, v)) then
+                        AddListItem('[' .. Table_GetMapName(dwMapID) .. '] ' .. p.szName ..
+                        ((p.szTitle and #p.szTitle > 0 and '<' .. p.szTitle .. '>') or ''), {
+                            dwMapID = dwMapID ,
+                            szName  = p.szName,
                         })
+                        n = n + 1
                         tNames[p.szName] = true
+                    end
+                    if n > M then
+                        return 0
                     end
                 end
                 local tNames = {}
                 for _, p in ipairs(data.Doodad) do
                     if not tNames[p.szName] and string.find(p.szName, v) then
                         AddListItem('[' .. Table_GetMapName(dwMapID) .. '] ' .. p.szName, {
-                            dwMapID = dwMapID,
-                            szName  = p.szName ,
+                            dwMapID = dwMapID ,
+                            szName  = p.szName,
                         })
+                        n = n + 1
                         tNames[p.szName] = true
+                    end
+                    if n > M then
+                        return 0
                     end
                 end
                 muProgress:width((w - 32) * i / N)
