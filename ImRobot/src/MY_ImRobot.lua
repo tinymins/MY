@@ -97,7 +97,7 @@ _Cache.OnPanelActive = function(wnd)
       :click(function() MY.Game.SetHotKey() end)
 end
 
-MY.RegisterPanel( "ImRobot", _L["im robot"], _L['General'], "ui/Image/UICommon/PlugIn.UITex|6", {255,127,0,200}, {
+MY.RegisterPanel( "ImRobot", _L["im robot"], _L['Development'], "ui/Image/UICommon/PlugIn.UITex|6", {255,127,0,200}, {
     OnPanelActive = _Cache.OnPanelActive, OnPanelDeactive = nil
 })
 MY.Game.AddHotKey("MY_ImRobot_Reply", _L["ImRobot Reply"], function() MY_ImRobot.Reply() end, nil)
