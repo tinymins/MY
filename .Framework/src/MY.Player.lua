@@ -144,6 +144,22 @@ MY.Player.GetFriend = function(arg0)
         end
     end
 end
+
+--[[获取好友列表
+]]
+MY.Player.GetTongMemberList = function()
+    return GetTongClient().GetMemberList()
+end
+
+--[[ 获取帮会成员
+]]
+MY.Player.GetTongMember = function(arg0)
+    if not arg0 then
+        return
+    end
+    
+    return GetTongClient().GetMemberInfo(arg0)
+end
 --[[
 #######################################################################################################
                                   #                                                       #                   
