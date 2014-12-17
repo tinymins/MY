@@ -32,6 +32,7 @@ MY_Chat.bChatCopyAlwaysShowMask = false
 MY_Chat.bChatCopyAlwaysWhite = false
 MY_Chat.bChatCopyNoCopySysmsg = true
 MY_Chat.bReplaceIcon = false
+MY_Chat.bDisplayPanel = true    -- 是否显示面板
 
 MY_Chat.tChannel = {
     ["Radio_Say"] = true,
@@ -50,6 +51,7 @@ MY_Chat.tChannel = {
 }
 -- register settings
 RegisterCustomData("MY_Chat.anchor")
+RegisterCustomData("MY_Chat.bDisplayPanel")
 RegisterCustomData("Account\\MY_Chat.bLockPostion")
 RegisterCustomData("Account\\MY_Chat.bEnableBalloon")
 RegisterCustomData("Account\\MY_Chat.bChatCopy")
@@ -154,10 +156,185 @@ MY.RegisterEvent("PLAYER_SAY",function()
     end
 end)
 
+
+MY_Chat.GetMenu = function()
+    local t = {
+        szOption = _L["chat helper"],
+        {
+            szOption = _L["about..."],
+            fnAction = function()
+                local t = {
+                    szName = "MY_Chat_About",
+                    szMessage = _L["Mingyi Plugins - Chatpanel\nThis plugin is developed by Zhai YiMing @ derzh.com."],
+                    {szOption = g_tStrings.STR_HOTKEY_SURE,fnAction = function() end},
+                }
+                MessageBox(t)
+            end,
+        }, {
+            bDevide = true
+        }, {
+            szOption = _L["display panel"],
+            bCheck = true,
+            bChecked = MY_Chat.bDisplayPanel,
+            fnAction = function()
+                MY_Chat.bDisplayPanel = not MY_Chat.bDisplayPanel
+                MY.UI(MY_Chat.frame):toggle(MY_Chat.bDisplayPanel)
+            end,
+        }, {
+            szOption = _L["lock postion"],
+            bCheck = true,
+            bChecked = MY_Chat.bLockPostion,
+            fnAction = function()
+                MY_Chat.bLockPostion = not MY_Chat.bLockPostion
+                MY_Chat.frame:EnableDrag(not MY_Chat.bLockPostion)
+            end,
+            fnDisable = function()
+                return not MY_Chat.bDisplayPanel
+            end,
+        }, {
+            szOption = _L["team balloon"],
+            bCheck = true,
+            bChecked = MY_Chat.bEnableBalloon,
+            fnAction = function()
+                MY_Chat.bEnableBalloon = not MY_Chat.bEnableBalloon
+            end
+        }, {
+            szOption = _L["chat copy"],
+            bCheck = true,
+            bChecked = MY_Chat.bChatCopy,
+            fnAction = function()
+                MY_Chat.bChatCopy = not MY_Chat.bChatCopy
+            end,
+            {
+                szOption = _L['always show *'],
+                bCheck = true,
+                bChecked = MY_Chat.bChatCopyAlwaysShowMask,
+                fnAction = function()
+                    MY_Chat.bChatCopyAlwaysShowMask = not MY_Chat.bChatCopyAlwaysShowMask
+                end,
+                fnDisable = function()
+                    return not MY_Chat.bChatCopy
+                end,
+            }, {
+                szOption = _L['always be white'],
+                bCheck = true,
+                bChecked = MY_Chat.bChatCopyAlwaysWhite,
+                fnAction = function()
+                    MY_Chat.bChatCopyAlwaysWhite = not MY_Chat.bChatCopyAlwaysWhite
+                end,
+                fnDisable = function()
+                    return not MY_Chat.bChatCopy
+                end,
+            }, {
+                szOption = _L['hide system msg copy'],
+                bCheck = true,
+                bChecked = MY_Chat.bChatCopyNoCopySysmsg,
+                fnAction = function()
+                    MY_Chat.bChatCopyNoCopySysmsg = not MY_Chat.bChatCopyNoCopySysmsg
+                end,
+                fnDisable = function()
+                    return not MY_Chat.bChatCopy
+                end,
+            },
+        }, {
+            szOption = _L["chat filter"],
+            bCheck = true,
+            bChecked = MY_Chat.bBlockWords,
+            fnAction = function()
+                MY_Chat.bBlockWords = not MY_Chat.bBlockWords
+            end, {
+                szOption = _L['keyword manager'],
+                fnAction = function()
+                    MY.UI.OpenListEditor('MY_Chat_KeywordManager', MY_Chat.tBlockWords, function(szText)
+                        -- 去掉前后空格
+                        szText = (string.gsub(szText, "^%s*(.-)%s*$", "%1"))
+                        -- 验证是否为空
+                        if szText=="" then return nil end
+                        -- 验证是否重复
+                        for i, v in ipairs(MY_Chat.tBlockWords) do
+                            if v==szText then
+                                return false
+                            end
+                        end
+                        -- 加入表
+                        table.insert(MY_Chat.tBlockWords, szText)
+                    end, function(szText)
+                        for i=#MY_Chat.tBlockWords, 1, -1 do
+                            if MY_Chat.tBlockWords[i]==szText then
+                                table.remove(MY_Chat.tBlockWords, i)
+                            end
+                        end
+                    end)
+                    :text(_L["keyword manager"])
+                end,
+                fnDisable = function()
+                    return not MY_Chat.bBlockWords
+                end
+            },
+        },
+    }
+    if (MY_Farbnamen and MY_Farbnamen.GetMenu) then
+        table.insert(t, MY_Farbnamen.GetMenu())
+    end
+    table.insert(t, {
+        szOption = _L["chat time"],
+        bCheck = true,
+        bChecked = MY_Chat.bChatTime,
+        fnAction = function()
+            MY_Chat.bChatTime = not MY_Chat.bChatTime
+        end, {
+            szOption = _L['hh:mm'],
+            bMCheck = true,
+            bChecked = MY_Chat.nChatTime == CHAT_TIME.HOUR_MIN,
+            fnAction = function()
+                MY_Chat.nChatTime = CHAT_TIME.HOUR_MIN
+            end,
+            fnDisable = function()
+                return not MY_Chat.bChatTime
+            end,
+        },{
+            szOption = _L['hh:mm:ss'],
+            bMCheck = true,
+            bChecked = MY_Chat.nChatTime == CHAT_TIME.HOUR_MIN_SEC,
+            fnAction = function()
+                MY_Chat.nChatTime = CHAT_TIME.HOUR_MIN_SEC
+            end,
+            fnDisable = function()
+                return not MY_Chat.bChatTime
+            end,
+        }
+    })
+    table.insert(t, { bDevide = true })
+    local tChannel = {
+        szOption = _L['channel setting'],
+        fnDisable = function()
+            return not MY_Chat.bDisplayPanel
+        end,
+    }
+    for _, v in ipairs(_Cache.tChannels) do
+        table.insert(tChannel, {
+            szOption = v.title, bCheck = true, bChecked = MY_Chat.tChannel[v.name], rgb = v.color,
+            fnAction = function() MY_Chat.tChannel[v.name] = not MY_Chat.tChannel[v.name] MY_Chat.ReInitUI() end,
+        })
+    end
+    table.insert(tChannel, {
+        szOption = _L['AWAY'], bCheck = true, bChecked = MY_Chat.tChannel['Check_Away'],
+        fnAction = function() MY_Chat.tChannel['Check_Away'] = not MY_Chat.tChannel['Check_Away'] MY_Chat.ReInitUI() end,
+    })
+    table.insert(tChannel, {
+        szOption = _L['BUSY'], bCheck = true, bChecked = MY_Chat.tChannel['Check_Busy'],
+        fnAction = function() MY_Chat.tChannel['Check_Busy'] = not MY_Chat.tChannel['Check_Busy'] MY_Chat.ReInitUI() end,
+    })
+    table.insert(t, tChannel)
+    return t
+end
+MY.RegisterPlayerAddonMenu( 'MY_Chat', MY_Chat.GetMenu )
+MY.RegisterTraceButtonMenu( 'MY_Chat', MY_Chat.GetMenu )
 --------------------------------------------------------------
 -- reinit ui
 --------------------------------------------------------------
 MY_Chat.ReInitUI = function()
+    MY.UI(MY_Chat.frame):toggle(MY_Chat.bDisplayPanel)
     -- clear
     MY.UI(MY_Chat.frame):find(".WndCheckBox"):remove()
     MY.UI(MY_Chat.frame):find(".WndRadioBox"):remove()
@@ -206,160 +383,7 @@ end
 MY.RegisterInit(function()
     MY_Chat.ReInitUI()
     
-    MY.UI(MY_Chat.frame):children("#Btn_Option"):menu(function()
-        local t = {
-            {
-                szOption = _L["about..."],
-                fnAction = function()
-                    local t = {
-                        szName = "MY_Chat_About",
-                        szMessage = _L["Mingyi Plugins - Chatpanel\nThis plugin is developed by Zhai YiMing @ derzh.com."],
-                        {szOption = g_tStrings.STR_HOTKEY_SURE,fnAction = function() end},
-                    }
-                    MessageBox(t)
-                end,
-            }, {
-                bDevide = true
-            }, {
-                szOption = _L["lock postion"],
-                bCheck = true,
-                bChecked = MY_Chat.bLockPostion,
-                fnAction = function()
-                    MY_Chat.bLockPostion = not MY_Chat.bLockPostion
-                    MY_Chat.frame:EnableDrag(not MY_Chat.bLockPostion)
-                end
-            }, {
-                szOption = _L["team balloon"],
-                bCheck = true,
-                bChecked = MY_Chat.bEnableBalloon,
-                fnAction = function()
-                    MY_Chat.bEnableBalloon = not MY_Chat.bEnableBalloon
-                end
-            }, {
-                szOption = _L["chat copy"],
-                bCheck = true,
-                bChecked = MY_Chat.bChatCopy,
-                fnAction = function()
-                    MY_Chat.bChatCopy = not MY_Chat.bChatCopy
-                end,
-                {
-                    szOption = _L['always show *'],
-                    bCheck = true,
-                    bChecked = MY_Chat.bChatCopyAlwaysShowMask,
-                    fnAction = function()
-                        MY_Chat.bChatCopyAlwaysShowMask = not MY_Chat.bChatCopyAlwaysShowMask
-                    end,
-                    fnDisable = function()
-                        return not MY_Chat.bChatCopy
-                    end,
-                }, {
-                    szOption = _L['always be white'],
-                    bCheck = true,
-                    bChecked = MY_Chat.bChatCopyAlwaysWhite,
-                    fnAction = function()
-                        MY_Chat.bChatCopyAlwaysWhite = not MY_Chat.bChatCopyAlwaysWhite
-                    end,
-                    fnDisable = function()
-                        return not MY_Chat.bChatCopy
-                    end,
-                }, {
-                    szOption = _L['hide system msg copy'],
-                    bCheck = true,
-                    bChecked = MY_Chat.bChatCopyNoCopySysmsg,
-                    fnAction = function()
-                        MY_Chat.bChatCopyNoCopySysmsg = not MY_Chat.bChatCopyNoCopySysmsg
-                    end,
-                    fnDisable = function()
-                        return not MY_Chat.bChatCopy
-                    end,
-                },
-            }, {
-                szOption = _L["chat filter"],
-                bCheck = true,
-                bChecked = MY_Chat.bBlockWords,
-                fnAction = function()
-                    MY_Chat.bBlockWords = not MY_Chat.bBlockWords
-                end, {
-                    szOption = _L['keyword manager'],
-                    fnAction = function()
-                        MY.UI.OpenListEditor('MY_Chat_KeywordManager', MY_Chat.tBlockWords, function(szText)
-                            -- 去掉前后空格
-                            szText = (string.gsub(szText, "^%s*(.-)%s*$", "%1"))
-                            -- 验证是否为空
-                            if szText=="" then return nil end
-                            -- 验证是否重复
-                            for i, v in ipairs(MY_Chat.tBlockWords) do
-                                if v==szText then
-                                    return false
-                                end
-                            end
-                            -- 加入表
-                            table.insert(MY_Chat.tBlockWords, szText)
-                        end, function(szText)
-                            for i=#MY_Chat.tBlockWords, 1, -1 do
-                                if MY_Chat.tBlockWords[i]==szText then
-                                    table.remove(MY_Chat.tBlockWords, i)
-                                end
-                            end
-                        end)
-                        :text(_L["keyword manager"])
-                    end,
-                    fnDisable = function()
-                        return not MY_Chat.bBlockWords
-                    end
-                },
-            },
-        }
-        if (MY_Farbnamen and MY_Farbnamen.GetMenu) then
-            table.insert(t, MY_Farbnamen.GetMenu())
-        end
-        table.insert(t, {
-            szOption = _L["chat time"],
-            bCheck = true,
-            bChecked = MY_Chat.bChatTime,
-            fnAction = function()
-                MY_Chat.bChatTime = not MY_Chat.bChatTime
-            end, {
-                szOption = _L['hh:mm'],
-                bMCheck = true,
-                bChecked = MY_Chat.nChatTime == CHAT_TIME.HOUR_MIN,
-                fnAction = function()
-                    MY_Chat.nChatTime = CHAT_TIME.HOUR_MIN
-                end,
-                fnDisable = function()
-                    return not MY_Chat.bChatTime
-                end,
-            },{
-                szOption = _L['hh:mm:ss'],
-                bMCheck = true,
-                bChecked = MY_Chat.nChatTime == CHAT_TIME.HOUR_MIN_SEC,
-                fnAction = function()
-                    MY_Chat.nChatTime = CHAT_TIME.HOUR_MIN_SEC
-                end,
-                fnDisable = function()
-                    return not MY_Chat.bChatTime
-                end,
-            }
-        })
-        table.insert(t, { bDevide = true })
-        local tChannel = { szOption = _L['channel setting'] }
-        for _, v in ipairs(_Cache.tChannels) do
-            table.insert(tChannel, {
-                szOption = v.title, bCheck = true, bChecked = MY_Chat.tChannel[v.name], rgb = v.color,
-                fnAction = function() MY_Chat.tChannel[v.name] = not MY_Chat.tChannel[v.name] MY_Chat.ReInitUI() end,
-            })
-        end
-        table.insert(tChannel, {
-            szOption = _L['AWAY'], bCheck = true, bChecked = MY_Chat.tChannel['Check_Away'],
-            fnAction = function() MY_Chat.tChannel['Check_Away'] = not MY_Chat.tChannel['Check_Away'] MY_Chat.ReInitUI() end,
-        })
-        table.insert(tChannel, {
-            szOption = _L['BUSY'], bCheck = true, bChecked = MY_Chat.tChannel['Check_Busy'],
-            fnAction = function() MY_Chat.tChannel['Check_Busy'] = not MY_Chat.tChannel['Check_Busy'] MY_Chat.ReInitUI() end,
-        })
-        table.insert(t, tChannel)
-        return t
-    end)
+    MY.UI(MY_Chat.frame):children("#Btn_Option"):menu(MY_Chat.GetMenu)
     -- load settings
     MY_Chat.frame:EnableDrag(not MY_Chat.bLockPostion)
     -- init icon replace table

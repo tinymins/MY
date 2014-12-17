@@ -14,6 +14,8 @@ data = {
     ['AWAY']     = '离',
     ['BUSY']     = '扰',
     
+    ['chat helper'] = '聊天助手',
+    
     ['about...'] = '关于...',
     ['lock postion'] = '锁定位置',
     ['team balloon'] = '队伍泡泡',
@@ -24,6 +26,7 @@ data = {
     ['hh:mm'] = '时：分',
     ['hh:mm:ss'] = '时：分：秒',
     ['channel setting'] = '频道设置',
+    ['display panel'] = '显示面板',
     
     ['always show *'] = '总是显示※号',
     ['always be white'] = '永远显示为白色',
