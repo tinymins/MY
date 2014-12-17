@@ -7,7 +7,7 @@
 -- 
 
 MY_MiddleMapMark = {}
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_MiddleMapMark/lang/")
 local _Cache = { tMapDataChanged = {} }
 local Data = {}
 local SZ_CACHE_PATH = "cache/NPC_DOODAD_REC/"
