@@ -274,8 +274,8 @@ _Cache.OnPanelActive = function(wnd)
                 local tNames = {}
                 for _, p in ipairs(data.Npc) do
                     if not tNames[p.szName]
-                    and (string.find(p.szName, v) or
-                    string.find(p.szTitle, v)) then
+                    and (wstring.find(p.szName, v) or
+                    wstring.find(p.szTitle, v)) then
                         AddListItem('[' .. Table_GetMapName(dwMapID) .. '] ' .. p.szName ..
                         ((p.szTitle and #p.szTitle > 0 and '<' .. p.szTitle .. '>') or ''), {
                             dwMapID = dwMapID ,
@@ -290,7 +290,7 @@ _Cache.OnPanelActive = function(wnd)
                 end
                 local tNames = {}
                 for _, p in ipairs(data.Doodad) do
-                    if not tNames[p.szName] and string.find(p.szName, v) then
+                    if not tNames[p.szName] and wstring.find(p.szName, v) then
                         AddListItem('[' .. Table_GetMapName(dwMapID) .. '] ' .. p.szName, {
                             dwMapID = dwMapID ,
                             szName  = p.szName,
