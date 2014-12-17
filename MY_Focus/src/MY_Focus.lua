@@ -9,6 +9,8 @@ _Cache.tFocusList = {}
 _Cache.szIniFile = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
 _Cache.bMinimize = false
 MY_Focus = {}
+MY_Focus.bFocusFriend = false -- 自动焦点好友
+MY_Focus.bFocusTong = false -- 自动焦点帮会成员
 MY_Focus.bEnable    = true  -- 是否启用
 MY_Focus.bAutoHide  = true  -- 无焦点自动隐藏
 MY_Focus.nMaxDisplay= 5     -- 最大显示数量
@@ -24,6 +26,8 @@ MY_Focus.tFocusList = {     -- 永久焦点
 MY_Focus.anchor = { x=-300, y=220, s="TOPRIGHT", r="TOPRIGHT" } -- 默认坐标
 RegisterCustomData("MY_Focus.bEnable")
 RegisterCustomData("MY_Focus.bAutoHide")
+RegisterCustomData("MY_Focus.bFocusFriend")
+RegisterCustomData("MY_Focus.bFocusTong")
 RegisterCustomData("MY_Focus.nMaxDisplay")
 RegisterCustomData("MY_Focus.bAutoFocus")
 RegisterCustomData("MY_Focus.tAutoFocus")
@@ -190,6 +194,20 @@ MY_Focus.OnObjectEnterScene = function(dwType, dwID, nRetryCount)
                 end
             end
         end
+        -- 判断好友
+        if dwType == TARGET.PLAYER and
+        MY_Focus.bFocusFriend and
+        MY.Player.GetFriend(dwID) then
+            bFocus = true
+        end
+        -- 判断同帮会
+        if dwType == TARGET.PLAYER and
+        MY_Focus.bFocusTong and
+        dwID ~= UI_GetClientPlayerID() and
+        MY.Player.GetTongMember(dwID) then
+            bFocus = true
+        end
+        -- 加入焦点
         if bFocus then
             MY_Focus.AddFocus(dwType, dwID)
         end
@@ -552,6 +570,28 @@ MY_Focus.GetMenu = function()
             bChecked = MY_Focus.bAutoHide,
             fnAction = function()
                 MY_Focus.bAutoHide = not MY_Focus.bAutoHide
+            end,
+            fnDisable = function()
+                return not MY_Focus.bEnable
+            end,
+        }, {
+            szOption = _L['auto focus friend'],
+            bCheck = true,
+            bChecked = MY_Focus.bFocusFriend,
+            fnAction = function()
+                MY_Focus.bFocusFriend = not MY_Focus.bFocusFriend
+                MY_Focus.RescanNearby()
+            end,
+            fnDisable = function()
+                return not MY_Focus.bEnable
+            end,
+        }, {
+            szOption = _L['auto focus tong'],
+            bCheck = true,
+            bChecked = MY_Focus.bFocusTong,
+            fnAction = function()
+                MY_Focus.bFocusTong = not MY_Focus.bFocusTong
+                MY_Focus.RescanNearby()
             end,
             fnDisable = function()
                 return not MY_Focus.bEnable
