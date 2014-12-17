@@ -214,6 +214,76 @@ MY_MiddleMapMark.SaveMapData = function()
     end
 end
 
+_Cache.OnPanelActive = function(wnd)
+    local ui = MY.UI(wnd)
+    local x, y = ui:pos()
+    local w, h = ui:size()
+    
+    local muList = ui:append("WndScrollBox_ResultList", "WndScrollBox"):find("#WndScrollBox_ResultList")
+      :pos(20, 35)
+      :size(w - 32, h - 50)
+      :handleStyle(3)
+    
+    local AddListItem = function(szText, data)
+        local muItem = muList:append('<handle><image>w=300 h=25 eventid=371 name="Image_Bg" </image><text>name="Text_Default" </text></handle>'):hdl(1):children():last()
+        
+        local hText = muItem:children("#Text_Default")
+          :pos(10, 2)
+          :text(szText or "")
+          :raw(1)
+        
+        muItem:children("#Image_Bg"):image("UI/Image/Common/TextShadow.UITex",5):alpha(0)
+          :hover(function(bIn)
+            if bIn then
+                MY.UI(this):fadeIn(100)
+            else
+                MY.UI(this):fadeTo(500,0)
+            end
+          end)
+          :click(function(nButton)
+            if nButton == MY.Const.Event.Mouse.LBUTTON then
+                OpenMiddleMap(data.dwMapID, 0)
+                MY.UI('Topmost1/MiddleMap/Wnd_Tool/Edit_Search'):text(data.szName)
+                Station.SetFocusWindow('Topmost1/MiddleMap')
+            end
+          end)
+    end
+    
+    ui:append('WndEdit_Search', 'WndEditBox'):children('#WndEdit_Search')
+      :pos(20, 10)
+      :size(w - 30, 25)
+      :change(function(v)
+        if not (v and #v > 0) then
+            return
+        end
+        muList:clear()
+        for _, dwMapID in pairs(GetMapList()) do
+            local data = MY_MiddleMapMark.GetMapData(dwMapID)
+            local tNames = {}
+            for _, p in ipairs(data.Npc) do
+                if not tNames[p.szName] and string.find(p.szName, v) then
+                    AddListItem('[' .. Table_GetMapName(dwMapID) .. ']' .. p.szName, {
+                        dwMapID = dwMapID,
+                        szName  = p.szName ,
+                    })
+                    tNames[p.szName] = true
+                end
+            end
+            local tNames = {}
+            for _, p in ipairs(data.Doodad) do
+                if not tNames[p.szName] and string.find(p.szName, v) then
+                    AddListItem('[' .. Table_GetMapName(dwMapID) .. ']' .. p.szName, {
+                        dwMapID = dwMapID,
+                        szName  = p.szName ,
+                    })
+                    tNames[p.szName] = true
+                end
+            end
+        end
+      end)
+    
+end
+
 local m_nLastRedrawFrame = GetLogicFrameCount()
 local MARK_RENDER_INTERVAL = GLOBAL.GAME_FPS * 5
 MY.RegisterEvent("NPC_ENTER_SCENE",    "MY_MiddleMapMark", function()
@@ -306,3 +376,4 @@ MY.RegisterEvent("DOODAD_ENTER_SCENE", "MY_MiddleMapMark", function()
 end)
 MY.RegisterEvent('LOADING_END', MY_MiddleMapMark.SaveMapData)
 MY.RegisterEvent('PLAYER_EXIT_GAME', MY_MiddleMapMark.SaveMapData)
+MY.RegisterPanel( "MY_MiddleMapMark", _L["middle map mark"], _L['General'], "UI/Image/Common/Money.UITex|243", {255,255,0,200}, { OnPanelActive = _Cache.OnPanelActive } )

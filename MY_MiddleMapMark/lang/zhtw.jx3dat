@@ -1,4 +1,5 @@
 -- language data (zhcn) updated at 2014-4-10 03:38:11
 data = {
     ['Type to search, use comma to split.'] = '輸入文字進行搜索，半角逗號分隔多個搜索項。\n如：皇竹草,甜象草',
+    ['middle map mark'] = '地圖搜索',
 }
