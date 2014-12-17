@@ -234,7 +234,7 @@ _Cache.OnPanelActive = function(wnd)
         
         local hText = muItem:children("#Text_Default")
           :pos(10, 2)
-          :autoSize(true)
+          :autosize(true)
           :text(szText or "")
           :raw(1)
         
