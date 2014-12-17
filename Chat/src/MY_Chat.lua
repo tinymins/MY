@@ -197,6 +197,7 @@ MY_Chat.ReInitUI = function()
     end
     
     MY.UI(MY_Chat.frame):find('#Image_Bar'):width(i*30+35)
+    MY.UI(MY_Chat.frame):width(60 + i * 30)
 end
 
 --------------------------------------------------------------
