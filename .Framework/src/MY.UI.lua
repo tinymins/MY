@@ -1652,9 +1652,9 @@ function _MY.UI:size(nWidth, nHeight)
     end
 end
 
--- (self) Instance:autoSize() -- resize Text element by autosize
--- (self) Instance:autoSize(bool bAutoSize) -- set if Text ele autosize
-function _MY.UI:autoSize(bAutoSize)
+-- (self) Instance:autosize() -- resize Text element by autosize
+-- (self) Instance:autosize(bool bAutoSize) -- set if Text ele autosize
+function _MY.UI:autosize(bAutoSize)
     self:_checksum()
     if bAutoSize == nil then
         for _, ele in pairs(self.eles) do
