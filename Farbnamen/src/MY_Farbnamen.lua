@@ -356,6 +356,7 @@ MY_Farbnamen.GetMenu = function()
         szOption = _L['load default setting'],
         fnAction = function()
             Config.tForceColor = clone(Config_Default.tForceColor)
+            _MY_Farbnamen.SaveCustomData()
         end,
         fnDisable = function()
             return not MY_Farbnamen.bEnabled
