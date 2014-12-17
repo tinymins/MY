@@ -1,0 +1,4 @@
+-- language data (zhcn) updated at 2014-4-10 03:38:11
+data = {
+    ['Type to search, use comma to split.'] = '输入文字进行搜索，半角逗号分隔多个搜索项。\n如：皇竹草,甜象草',
+}
