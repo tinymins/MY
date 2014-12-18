@@ -114,24 +114,8 @@ MY_Farbnamen.Render = function(szMsg)
         local szName = string.gsub(namelink:GetText(), '[%[%]]', '')
         local tInfo = MY_Farbnamen.GetAusName(szName)
         if tInfo then
-            -- 名称 等级
-            local szTip = string.format('%s(%d)', tInfo.szName, tInfo.nLevel)
-            -- 称号
-            if tInfo.szTitle and #tInfo.szTitle > 0 then
-                szTip = string.format('%s\n%s', szTip, tInfo.szTitle)
-            end
-            -- 帮会
-            if tInfo.szTongID and #tInfo.szTongID > 0 then
-                szTip = string.format('%s\n[%s]', szTip, tInfo.szTongID)
-            end
-            -- 门派 体型 阵营
-            szTip = szTip .. '\n' ..
-                _MY_Farbnamen.tForceString[tInfo.dwForceID] .. g_tStrings.STR_SPLIT_DOT ..
-                _MY_Farbnamen.tRoleType[tInfo.nRoleType]    .. g_tStrings.STR_SPLIT_DOT ..
-                _MY_Farbnamen.tCampString[tInfo.nCamp]
-            
             -- 绑定tip提示
-            MY.UI(namelink):tip(szTip, MY.Const.UI.Tip.POS_TOP):color(tInfo.rgb)
+            MY.UI(namelink):hover(MY_Farbnamen.ShowTip, nil, true):color(tInfo.rgb)
         end
     end
     
