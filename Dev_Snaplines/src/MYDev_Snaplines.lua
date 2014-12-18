@@ -6,8 +6,8 @@
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Dev_Snaplines/lang/")
 local _Cache = {}
 MYDev_Snaplines = {}
-MYDev_Snaplines.bShowTreePath = false
-RegisterCustomData('MYDev_Snaplines.bShowTreePath')
+MYDev_Snaplines.bEnable = false
+RegisterCustomData('MYDev_Snaplines.bEnable')
 MYDev_Snaplines.bDetectBox = true
 RegisterCustomData('MYDev_Snaplines.bDetectBox')
 MYDev_Snaplines.bShowWndSnaplines = true
@@ -110,88 +110,93 @@ MYDev_Snaplines.GetElementTip = function(raw, tTip)
 end
 
 _Cache.OnFrameBreathe = function()
-    local ui = MY.UI(_Cache.frame)
-    if MYDev_Snaplines.bShowTreePath then
-        local wnd, item = Station.GetMouseOverWindow()
-        if wnd then
-            local W, H = Station.GetClientSize()
-            local xC, yC = Cursor.GetPos()
-            local xW, yW = wnd:GetAbsPos()
-            local wW, hW = wnd:GetSize()
-            local uiHdlTip = ui:hdl():children('#Handle_Tip'):show()
-            local uiTxtTip = uiHdlTip:item('#Text_HoverTip')
-            local tTip = {}
-            table.insert(tTip, _L('CursorX: %s', xC))
-            table.insert(tTip, _L('CursorY: %s', yC))
-            tTip = MYDev_Snaplines.GetElementTip(wnd, tTip)
-            ui:item("#Shadow_HoverWndLeft"):pos(xW - 2, 0):show()
-            ui:item("#Shadow_HoverWndRight"):pos(xW + wW, 0):show()
-            ui:item("#Shadow_HoverWndTop"):pos(0, yW - 2):show()
-            ui:item("#Shadow_HoverWndBottom"):pos(0, yW + hW):show()
-            if MYDev_Snaplines.bDetectBox and not (item and item:GetType() == 'Box') then
-                MY.UI(wnd):find('.Box'):each(function()
-                    if this:PtInItem(xC, yC) then
-                        table.insert(tTip, '---------------------')
-                        tTip = MYDev_Snaplines.GetElementTip(this, tTip)
-                    end
-                end)
-            end
-            if item then
-                local xI, yI = item:GetAbsPos()
-                local wI, hI = item:GetSize()
-                table.insert(tTip, _L['-------------------'])
-                tTip = MYDev_Snaplines.GetElementTip(item, tTip)
-                ui:item("#Shadow_HoverItemLeft"):pos(xI - 2, 0):show()
-                ui:item("#Shadow_HoverItemRight"):pos(xI + wI, 0):show()
-                ui:item("#Shadow_HoverItemTop"):pos(0, yI - 2):show()
-                ui:item("#Shadow_HoverItemBottom"):pos(0, yI + hI):show()
-            else
-                ui:item("#^Shadow_HoverItem"):hide()
-            end
-            uiTxtTip:text(table.concat(tTip, '\n'))
-            
-            local wT, hT = uiTxtTip:size()
-            local xT, yT
-            xT = xW + 5
-            if xT + wT > W then
-                xT = W - wT
-            elseif xT < 0 then
-                xT = 0
-            end
-            
-            local bReAdjustX
-            if yW >= hT then -- 顶部可以显示的下
-                yT = yW - hT
-            elseif yW + hW + 1 + hT <= H then -- 底部显示的下
-                yT = yW + hW + 1
-            elseif yW + hT <= H then -- 中间开始显示的下
-                yT = yW + 20
-                bReAdjustX = true
-            else
-                yT = 5
-                bReAdjustX = true
-            end
-            if bReAdjustX then
-                if xW >= wT + 5 then -- 左侧显示的下
-                    xT = xW - wT - 5
-                elseif xW + wW + wT + 5 <= W then -- 右侧显示的下
-                    xT = xW + wW + 5
+    local ui = _Cache.muFrm
+    
+    local wnd, item = Station.GetMouseOverWindow()
+    if wnd then
+        local W, H = Station.GetClientSize()
+        local xC, yC = Cursor.GetPos()
+        local xW, yW = wnd:GetAbsPos()
+        local wW, hW = wnd:GetSize()
+        local uiHdlTip = ui:hdl():children('#Handle_Tip'):show()
+        local uiTxtTip = uiHdlTip:item('#Text_HoverTip')
+        local tTip = {}
+        table.insert(tTip, _L('CursorX: %s', xC))
+        table.insert(tTip, _L('CursorY: %s', yC))
+        tTip = MYDev_Snaplines.GetElementTip(wnd, tTip)
+        ui:item("#Shadow_HoverWndLeft"):pos(xW - 2, 0):show()
+        ui:item("#Shadow_HoverWndRight"):pos(xW + wW, 0):show()
+        ui:item("#Shadow_HoverWndTop"):pos(0, yW - 2):show()
+        ui:item("#Shadow_HoverWndBottom"):pos(0, yW + hW):show()
+        if MYDev_Snaplines.bDetectBox and not (item and item:GetType() == 'Box') then
+            MY.UI(wnd):find('.Box'):each(function()
+                if this:PtInItem(xC, yC) then
+                    table.insert(tTip, '---------------------')
+                    tTip = MYDev_Snaplines.GetElementTip(this, tTip)
                 end
-            end
-            
-            uiHdlTip:pos(xT, yT)
+            end)
         end
-    else
-        ui:item("#^Shadow_HoverWnd"):hide()
-        ui:item("#^Shadow_HoverItem"):hide()
-        ui:hdl():children('#Handle_Tip'):hide()
+        if item then
+            local xI, yI = item:GetAbsPos()
+            local wI, hI = item:GetSize()
+            table.insert(tTip, _L['-------------------'])
+            tTip = MYDev_Snaplines.GetElementTip(item, tTip)
+            ui:item("#Shadow_HoverItemLeft"):pos(xI - 2, 0):show()
+            ui:item("#Shadow_HoverItemRight"):pos(xI + wI, 0):show()
+            ui:item("#Shadow_HoverItemTop"):pos(0, yI - 2):show()
+            ui:item("#Shadow_HoverItemBottom"):pos(0, yI + hI):show()
+        else
+            ui:item("#^Shadow_HoverItem"):hide()
+        end
+        uiTxtTip:text(table.concat(tTip, '\n'))
+        
+        local wT, hT = uiTxtTip:size()
+        local xT, yT
+        xT = xW + 5
+        if xT + wT > W then
+            xT = W - wT
+        elseif xT < 0 then
+            xT = 0
+        end
+        
+        local bReAdjustX
+        if yW >= hT then -- 顶部可以显示的下
+            yT = yW - hT
+        elseif yW + hW + 1 + hT <= H then -- 底部显示的下
+            yT = yW + hW + 1
+        elseif yW + hT <= H then -- 中间开始显示的下
+            yT = yW + 20
+            bReAdjustX = true
+        else
+            yT = 5
+            bReAdjustX = true
+        end
+        if bReAdjustX then
+            if xW >= wT + 5 then -- 左侧显示的下
+                xT = xW - wT - 5
+            elseif xW + wW + wT + 5 <= W then -- 右侧显示的下
+                xT = xW + wW + 5
+            end
+        end
+        
+        uiHdlTip:pos(xT, yT)
     end
+    
     ui:bringToTop()
 end
 
 MYDev_Snaplines.ReloadUI = function()
-    _Cache.frame = MY.UI.CreateFrame('MYDev_Snaplines', MY.Const.UI.Frame.TOPMOST2_EMPTY):raw(1)
-    local ui = MY.UI(_Cache.frame)
+    if _Cache.muFrm then
+        _Cache.muFrm:remove()
+        _Cache.muFrm = nil
+    end
+    
+    if not MYDev_Snaplines.bEnable then
+        return
+    end
+    
+    _Cache.muFrm = MY.UI.CreateFrame('MYDev_Snaplines', MY.Const.UI.Frame.TOPMOST2_EMPTY)
+    local ui = _Cache.muFrm
     local W, H = Station.GetClientSize()
     ui:size(W, H)
       :penetrable(true)
@@ -247,9 +252,10 @@ _Cache.OnPanelActive = function(wnd)
     
     ui:append("WndCheckBox_ShowTreePath", "WndCheckBox"):children("#WndCheckBox_ShowTreePath")
       :pos(x, y):width(300)
-      :text(_L['enable tree path view']):check(MYDev_Snaplines.bShowTreePath or false)
+      :text(_L['enable tree path view']):check(MYDev_Snaplines.bEnable or false)
       :check(function(bCheck)
-        MYDev_Snaplines.bShowTreePath = bCheck
+        MYDev_Snaplines.bEnable = bCheck
+        MYDev_Snaplines.ReloadUI()
     end)
     y = y + 40
     
