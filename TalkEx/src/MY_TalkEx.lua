@@ -65,7 +65,7 @@ _MY_TalkEx.tTrickChannels = {
 }
 _MY_TalkEx.Talk = function()
     if #MY_TalkEx.szTalk == 0 then MY.Sysmsg({_L["please input something."], r=255, g=0, b=0},nil) return end
-    -- ½üÁÄ²»·ÅÔÚµÚÒ»¸ö»áµ¼ÖÂ·¢²»³öÈ¥
+    -- è¿‘èŠä¸æ”¾åœ¨ç¬¬ä¸€ä¸ªä¼šå¯¼è‡´å‘ä¸å‡ºå»
     if MY_TalkEx.tTalkChannel['NEARBY'] then MY.Talk(PLAYER_TALK_CHANNEL['NEARBY'],MY_TalkEx.szTalk) end
     for szChannel, bSend in pairs(MY_TalkEx.tTalkChannel) do
         if szChannel~="NEARBY" and bSend then MY.Talk(PLAYER_TALK_CHANNEL[szChannel],MY_TalkEx.szTalk) end
@@ -75,14 +75,14 @@ _MY_TalkEx.OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
     local w, h = ui:size()
     -------------------------------------
-    -- º°»°²¿·Ö
+    -- å–Šè¯éƒ¨åˆ†
     -------------------------------------
-    -- º°»°ÊäÈë¿ò
+    -- å–Šè¯è¾“å…¥æ¡†
     ui:append('WndEdit_Talk','WndEditBox'):children('#WndEdit_Talk'):pos(25,15)
       :size(w-136,208):multiLine(true)
       :text(MY_TalkEx.szTalk)
       :change(function() MY_TalkEx.szTalk = this:GetText() end)
-    -- º°»°ÆµµÀ
+    -- å–Šè¯é¢‘é“
     local i = 12
     local nChannelCount = 0
     for _,_ in pairs(_MY_TalkEx.tChannels) do nChannelCount = nChannelCount + 1 end
@@ -93,7 +93,7 @@ _MY_TalkEx.OnPanelActive = function(wnd)
         ):check(MY_TalkEx.tTalkChannel[szChannel] or false)
         i = i + 180/nChannelCount
     end
-    -- º°»°°´Å¥
+    -- å–Šè¯æŒ‰é’®
     ui:append('WndButton_Talk','WndButton'):children('#WndButton_Talk')
       :pos(w-110,200):width(90)
       :text(_L['send'],{255,255,255})
@@ -104,15 +104,15 @@ _MY_TalkEx.OnPanelActive = function(wnd)
         _MY_TalkEx.Talk()
     end)
     -------------------------------------
-    -- µ÷Ù©²¿·Ö
+    -- è°ƒä¾ƒéƒ¨åˆ†
     -------------------------------------
     -- <hr />
     ui:append('Image_TalkEx_Spliter','Image'):find('#Image_TalkEx_Spliter')
       :pos(5, 235):size(w-10, 1):image('UI/Image/UICommon/ScienceTreeNode.UITex',62)
-    -- ÎÄ±¾±êÌâ
+    -- æ–‡æœ¬æ ‡é¢˜
     ui:append('Text_Trick_With','Text'):find("#Text_Trick_With")
       :pos(27, 240):text(_L['have a trick with'])
-    -- µ÷Ù©¶ÔÏó·¶Î§¹ıÂËÆ÷
+    -- è°ƒä¾ƒå¯¹è±¡èŒƒå›´è¿‡æ»¤å™¨
     ui:append('WndComboBox_Trick_Filter','WndComboBox'):find("#WndComboBox_Trick_Filter")
       :pos(95, 241):size(80,25):menu(function()
         local t = {}
@@ -127,7 +127,7 @@ _MY_TalkEx.OnPanelActive = function(wnd)
         end
         return t
     end):text(_MY_TalkEx.tFilter[MY_TalkEx.tTrickFilter] or '')
-    -- µ÷Ù©ÃÅÅÉ¹ıÂËÆ÷
+    -- è°ƒä¾ƒé—¨æ´¾è¿‡æ»¤å™¨
     ui:append("WndComboBox_Trick_Force",'WndComboBox'):children('#WndComboBox_Trick_Force')
       :pos(175, 241):size(80,25)
       :text(_MY_TalkEx.tForce[MY_TalkEx.tTrickFilterForce])
@@ -144,24 +144,24 @@ _MY_TalkEx.OnPanelActive = function(wnd)
         end
         return t
     end)
-    -- µ÷Ù©ÄÚÈİÊäÈë¿ò£ºµÚÒ»¾ä
+    -- è°ƒä¾ƒå†…å®¹è¾“å…¥æ¡†ï¼šç¬¬ä¸€å¥
     ui:append('WndEdit_TrickBegin','WndEditBox'):children('#WndEdit_TrickBegin')
       :pos(25, 269):size(w-136, 25):text(MY_TalkEx.szTrickTextBegin)
       :change(function() MY_TalkEx.szTrickTextBegin = this:GetText() end)
-    -- µ÷Ù©ÄÚÈİÊäÈë¿ò£ºµ÷Ù©ÄÚÈİ
+    -- è°ƒä¾ƒå†…å®¹è¾“å…¥æ¡†ï¼šè°ƒä¾ƒå†…å®¹
     ui:append('WndEdit_Trick','WndEditBox'):children('#WndEdit_Trick')
       :pos(25, 294):size(w-136, 55)
       :multiLine(true):text(MY_TalkEx.szTrickText)
       :change(function() MY_TalkEx.szTrickText = this:GetText() end)
-    -- µ÷Ù©ÄÚÈİÊäÈë¿ò£º×îºóÒ»¾ä
+    -- è°ƒä¾ƒå†…å®¹è¾“å…¥æ¡†ï¼šæœ€åä¸€å¥
     ui:append('WndEdit_TrickEnd','WndEditBox'):children('#WndEdit_TrickEnd')
       :pos(25, 349):size(w-136, 25)
       :text(MY_TalkEx.szTrickTextEnd)
       :change(function() MY_TalkEx.szTrickTextEnd = this:GetText() end)
-    -- µ÷Ù©·¢ËÍÆµµÀÌáÊ¾¿ò
+    -- è°ƒä¾ƒå‘é€é¢‘é“æç¤ºæ¡†
     ui:append("Text_Trick_Sendto",'Text'):find('#Text_Trick_Sendto')
       :pos(27, 379):size(100, 26):text(_L['send to'])
-    -- µ÷Ù©·¢ËÍÆµµÀ
+    -- è°ƒä¾ƒå‘é€é¢‘é“
     ui:append("WndComboBox_Trick_Sendto_Filter",'WndComboBox'):children('#WndComboBox_Trick_Sendto_Filter')
       :pos(80, 379):size(100, 25)
       :menu(function()
@@ -180,7 +180,7 @@ _MY_TalkEx.OnPanelActive = function(wnd)
       end)
       :text(_MY_TalkEx.tChannels[MY_TalkEx.tTrickChannel].szName or '')
       :color(_MY_TalkEx.tChannels[MY_TalkEx.tTrickChannel].tCol)
-    -- µ÷Ù©°´Å¥
+    -- è°ƒä¾ƒæŒ‰é’®
     ui:append('WndButton_Trick','WndButton'):children('#WndButton_Trick')
       :pos(435, 379):color({255,255,255})
       :text(_L['have a trick with'])
@@ -203,7 +203,7 @@ _MY_TalkEx.OnPanelActive = function(wnd)
                 end
             end
         end
-        -- È¥µô×Ô¼º _(:§Ù¡¹¡Ï)_µ÷Ù©×Ô¼ºÊÇÄÖÄÄÑù
+        -- å»æ‰è‡ªå·± _(:Ğ·ã€âˆ )_è°ƒä¾ƒè‡ªå·±æ˜¯é—¹å“ªæ ·
         if tPlayers[GetClientPlayer().dwID] then iPlayers=iPlayers-1 tPlayers[GetClientPlayer().dwID]=nil end
         -- none target
         if iPlayers == 0 then MY.Sysmsg({_L["no trick target found."], r=255, g=0, b=0},nil) return end

@@ -1,12 +1,12 @@
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."RollMonitor/lang/")
 MY_RollMonitor = { nMode = 1, nPublish = 0, nPublishChannel = PLAYER_TALK_CHANNEL.RAID, bPublishRestart = true }
 MY_RollMonitor.SortType = {
-    FIRST = 1,  -- Ö»¼ÇÂ¼µÚÒ»´Î
-    LAST  = 2,  -- Ö»¼ÇÂ¼×îºóÒ»´Î
-    MAX   = 3,  -- ¶à´ÎÒ¡µãÈ¡×î¸ßµã
-    MIN   = 4,  -- ¶à´ÎÒ¡µãÈ¡×îµÍµã
-    AVG   = 5,  -- ¶à´ÎÒ¡µãÈ¡Æ½¾ùÖµ
-    AVG2  = 6,  -- È¥µô×î¸ß×îµÍÈ¡Æ½¾ùÖµ
+    FIRST = 1,  -- åªè®°å½•ç¬¬ä¸€æ¬¡
+    LAST  = 2,  -- åªè®°å½•æœ€åä¸€æ¬¡
+    MAX   = 3,  -- å¤šæ¬¡æ‘‡ç‚¹å–æœ€é«˜ç‚¹
+    MIN   = 4,  -- å¤šæ¬¡æ‘‡ç‚¹å–æœ€ä½ç‚¹
+    AVG   = 5,  -- å¤šæ¬¡æ‘‡ç‚¹å–å¹³å‡å€¼
+    AVG2  = 6,  -- å»æ‰æœ€é«˜æœ€ä½å–å¹³å‡å€¼
 }
 RegisterCustomData('MY_RollMonitor.nMode')
 RegisterCustomData('MY_RollMonitor.nPublish')
@@ -16,12 +16,12 @@ local _MY_RollMonitor = {
     uiTextBoard = nil,
     aRecords = {},
     aMode = {
-        [1] = { szID = 'nFirst', szName = _L['only first score'           ] },    -- Ö»¼ÇÂ¼µÚÒ»´Î
-        [2] = { szID = 'nLast' , szName = _L['only last score'            ] },    -- Ö»¼ÇÂ¼×îºóÒ»´Î
-        [3] = { szID = 'nMax'  , szName = _L['highest score'              ] },    -- ¶à´ÎÒ¡µãÈ¡×î¸ßµã
-        [4] = { szID = 'nMin'  , szName = _L['lowest score'               ] },    -- ¶à´ÎÒ¡µãÈ¡×îµÍµã
-        [5] = { szID = 'nAvg'  , szName = _L['average score'              ] },    -- ¶à´ÎÒ¡µãÈ¡Æ½¾ùÖµ
-        [6] = { szID = 'nAvg2' , szName = _L['average score with out pole'] },    -- È¥µô×î¸ß×îµÍÈ¡Æ½¾ùÖµ
+        [1] = { szID = 'nFirst', szName = _L['only first score'           ] },    -- åªè®°å½•ç¬¬ä¸€æ¬¡
+        [2] = { szID = 'nLast' , szName = _L['only last score'            ] },    -- åªè®°å½•æœ€åä¸€æ¬¡
+        [3] = { szID = 'nMax'  , szName = _L['highest score'              ] },    -- å¤šæ¬¡æ‘‡ç‚¹å–æœ€é«˜ç‚¹
+        [4] = { szID = 'nMin'  , szName = _L['lowest score'               ] },    -- å¤šæ¬¡æ‘‡ç‚¹å–æœ€ä½ç‚¹
+        [5] = { szID = 'nAvg'  , szName = _L['average score'              ] },    -- å¤šæ¬¡æ‘‡ç‚¹å–å¹³å‡å€¼
+        [6] = { szID = 'nAvg2' , szName = _L['average score with out pole'] },    -- å»æ‰æœ€é«˜æœ€ä½å–å¹³å‡å€¼
     },
     tChannels = {
         { nChannel = PLAYER_TALK_CHANNEL.TEAM  , szName = _L['team channel']  , rgb = GetMsgFontColor("MSG_TEAM"  , true) },
@@ -29,19 +29,19 @@ local _MY_RollMonitor = {
         { nChannel = PLAYER_TALK_CHANNEL.TONG  , szName = _L['tong channel']  , rgb = GetMsgFontColor("MSG_GUILD" , true) },
     }
 }
--- ÊÂ¼şÏìÓ¦´¦Àí
---[[ ´ò¿ªÃæ°å
+-- äº‹ä»¶å“åº”å¤„ç†
+--[[ æ‰“å¼€é¢æ¿
     (void) MY_RollMonitor.OpenPanel()
 ]]
 MY_RollMonitor.OpenPanel = function()
     MY.OpenPanel()
     MY.SwitchTab('RollMonitor')
 end
---[[ Çå¿ÕROLLµã
+--[[ æ¸…ç©ºROLLç‚¹
      (void) MY_RollMonitor.Clear([settings])
-        (array) settings : ²ÎÊı¼üÖµ¶Ô£¬ËùÓĞ²ÎÊı¶¼ÊÇ¿ÉÑ¡µÄ£¬Ä¬ÈÏ¶ÁÈ¡ÓÃ»§ÉèÖÃ¡£
-          (boolean) echo       : ÊÇ·ñ·¢ËÍÖØĞÂ¿ªÊ¼ÁÄÌìÏûÏ¢
-          (number)  channel    : ·¢ËÍÆµµÀ
+        (array) settings : å‚æ•°é”®å€¼å¯¹ï¼Œæ‰€æœ‰å‚æ•°éƒ½æ˜¯å¯é€‰çš„ï¼Œé»˜è®¤è¯»å–ç”¨æˆ·è®¾ç½®ã€‚
+          (boolean) echo       : æ˜¯å¦å‘é€é‡æ–°å¼€å§‹èŠå¤©æ¶ˆæ¯
+          (number)  channel    : å‘é€é¢‘é“
 ]]
 MY_RollMonitor.Clear = function(param)
     param = param or {}
@@ -56,7 +56,7 @@ MY_RollMonitor.Clear = function(param)
         MY.Talk(param.channel, _L['----------- roll restart -----------']..'\n')
     end
 end
---[[ »ñµÃÅÅĞò½á¹û
+--[[ è·å¾—æ’åºç»“æœ
 ]]
 MY_RollMonitor.GetResult = function(sortType)
     sortType = sortType or MY_RollMonitor.nMode
@@ -67,13 +67,13 @@ MY_RollMonitor.GetResult = function(sortType)
     table.sort(t, function(v1, v2) return v1.nRoll > v2.nRoll end)
     return t
 end
---[[ ·¢²¼ROLLµã
+--[[ å‘å¸ƒROLLç‚¹
      (void) MY_RollMonitor.Echo([settings])
-        (array) settings : ²ÎÊı¼üÖµ¶Ô£¬ËùÓĞ²ÎÊı¶¼ÊÇ¿ÉÑ¡µÄ£¬Ä¬ÈÏ¶ÁÈ¡ÓÃ»§ÉèÖÃ¡£
-          (enum)    sortType   : ÅÅĞò·½Ê½ Ã¶¾Ù MY_RollMonitor.SortType
-          (number)  limit      : ×î´óÏÔÊ¾ÌõÊıÏŞÖÆ
-          (number)  channel    : ·¢ËÍÆµµÀ
-          (boolean) showUnroll : ÊÇ·ñÏÔÊ¾Î´ROLLµã
+        (array) settings : å‚æ•°é”®å€¼å¯¹ï¼Œæ‰€æœ‰å‚æ•°éƒ½æ˜¯å¯é€‰çš„ï¼Œé»˜è®¤è¯»å–ç”¨æˆ·è®¾ç½®ã€‚
+          (enum)    sortType   : æ’åºæ–¹å¼ æšä¸¾ MY_RollMonitor.SortType
+          (number)  limit      : æœ€å¤§æ˜¾ç¤ºæ¡æ•°é™åˆ¶
+          (number)  channel    : å‘é€é¢‘é“
+          (boolean) showUnroll : æ˜¯å¦æ˜¾ç¤ºæœªROLLç‚¹
 ]]
 MY_RollMonitor.Echo = function(param)
     param = param or {}
@@ -107,11 +107,11 @@ MY_RollMonitor.Echo = function(param)
     MY.Talk(param.channel, _L['-------------------------------']..'\n')
 end
 
--- ±êÇ©¼¤»îÏìÓ¦º¯Êı
+-- æ ‡ç­¾æ¿€æ´»å“åº”å‡½æ•°
 _MY_RollMonitor.OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
     local w, h = ui:size()
-    -- ¼ÇÂ¼Ä£Ê½
+    -- è®°å½•æ¨¡å¼
     ui:append('WndCombo_RecordType','WndComboBox'):children('#WndCombo_RecordType')
       :pos(20, 10):width(180):text(_MY_RollMonitor.aMode[MY_RollMonitor.nMode].szName)
       :menu(function()
@@ -129,7 +129,7 @@ _MY_RollMonitor.OnPanelActive = function(wnd)
         end
         return t
     end)
-    -- Çå¿Õ
+    -- æ¸…ç©º
     ui:append('WndButton_Clear','WndButton'):children('#WndButton_Clear')
       :pos(w-176, 10):width(90):text(_L['restart'])
       :lclick(function(nButton)
@@ -152,7 +152,7 @@ _MY_RollMonitor.OnPanelActive = function(wnd)
         end
         return t
     end):tip(_L['left click to restart, right click to open setting.'], MY.Const.UI.Tip.POS_TOP)
-    -- ·¢²¼
+    -- å‘å¸ƒ
     ui:append('WndButton_Publish','WndButton'):children('#WndButton_Publish')
       :pos(w-86, 10):width(80):text(_L['publish'])
       :rmenu(function()
@@ -193,11 +193,11 @@ _MY_RollMonitor.OnPanelActive = function(wnd)
     end):lclick(function()
         MY_RollMonitor.Echo()
     end):tip(_L['left click to publish, right click to open setting.'], MY.Const.UI.Tip.POS_TOP, { x = -80 })
-    -- Êä³ö°å
+    -- è¾“å‡ºæ¿
     _MY_RollMonitor.uiBoard = ui
       :append('WndScrollBox_Record','WndScrollBox'):children('#WndScrollBox_Record')
       :pos(20, 40):size(w-26, h-60):handleStyle(3)
-      :text(_L['È¥µô×î¸ß×îµÍÈ¡Æ½¾ùÖµ'])
+      :text(_L['å»æ‰æœ€é«˜æœ€ä½å–å¹³å‡å€¼'])
     
     _MY_RollMonitor.RedrawBoard()
 end
@@ -205,7 +205,7 @@ _MY_RollMonitor.OnPanelDeactive = function()
     MY.BreatheCall('MY_RollMonitorRedraw')
     _MY_RollMonitor.uiBoard = nil
 end
--- ÖØ»æ´°¿Ú
+-- é‡ç»˜çª—å£
 _MY_RollMonitor.RedrawBoard = function()
     if _MY_RollMonitor.uiBoard then
         local szHTML = ''
@@ -242,27 +242,27 @@ _MY_RollMonitor.RedrawBoard = function()
         _MY_RollMonitor.uiBoard:clear():append(szHTML)
     end
 end
--- ÏµÍ³ÆµµÀ¼à¿Ø´¦Àíº¯Êı
+-- ç³»ç»Ÿé¢‘é“ç›‘æ§å¤„ç†å‡½æ•°
 _MY_RollMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
     for szName, nRoll in string.gmatch(szMsg, _L['ROLL_MONITOR_EXP'] ) do
-        -- ÁÙÊ±±äÁ¿
+        -- ä¸´æ—¶å˜é‡
         nRoll = tonumber(nRoll)
         local nTotal, nAvg, nAvg2 = 0
-        -- µ±Ç°ÒªÉú³ÉµÄÒ»¸öÍæ¼ÒµÄ¼ÇÂ¼
+        -- å½“å‰è¦ç”Ÿæˆçš„ä¸€ä¸ªç©å®¶çš„è®°å½•
         local aRecord = {
             szName = szName,
             nFirst = nRoll,
             nMax =   nRoll,
             nMin =   nRoll,
         }
-        -- ÅĞ¶Ï»º´æÖĞ¸ÃÍæ¼ÒÊÇ·ñÒÑ´æÔÚ¼ÇÂ¼
+        -- åˆ¤æ–­ç¼“å­˜ä¸­è¯¥ç©å®¶æ˜¯å¦å·²å­˜åœ¨è®°å½•
         for i = 1, #_MY_RollMonitor.aRecords, 1 do
             if _MY_RollMonitor.aRecords[i].szName == szName then
                 aRecord = _MY_RollMonitor.aRecords[i]
                 break
             end
         end
-        -- ¸ñÊ½»¯Êı×é ¸üĞÂ¸÷ÊıÖµ
+        -- æ ¼å¼åŒ–æ•°ç»„ æ›´æ–°å„æ•°å€¼
         table.insert(aRecord, nRoll)
         table.sort(aRecord)
         local nTotal = 0
@@ -278,7 +278,7 @@ _MY_RollMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
         aRecord.nLast = nRoll
         if aRecord.nMax < nRoll then aRecord.nMax = nRoll end
         if aRecord.nMin > nRoll then aRecord.nMin = nRoll end
-        -- ½«Êı×éĞ´»Ø¼ÇÂ¼»º´æ
+        -- å°†æ•°ç»„å†™å›è®°å½•ç¼“å­˜
         for i = #_MY_RollMonitor.aRecords, 1, -1 do
             if _MY_RollMonitor.aRecords[i].szName == szName then
                 table.remove(_MY_RollMonitor.aRecords, i)
@@ -288,7 +288,7 @@ _MY_RollMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
         _MY_RollMonitor.RedrawBoard()
     end
 end
--- ×¢²áÏµÍ³ÆµµÀ¼à¿Ø
+-- æ³¨å†Œç³»ç»Ÿé¢‘é“ç›‘æ§
 _MY_RollMonitor.RegisterMsgMonitor = function()
     local t = {'MSG_SYS'}
     UnRegisterMsgMonitor(_MY_RollMonitor.OnMsgArrive)

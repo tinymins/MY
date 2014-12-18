@@ -1,7 +1,7 @@
 ----------------------------------------------------
--- ÜøÒÁ½ØÍ¼ÖúÊÖ ver 0.2 Build 20140717
--- Code by: µÔÒ»Ãùtinymins @ ZhaiYiMing.CoM
--- µçÎå¡¤Ë«ÃÎÕò¡¤ÜøÒÁ
+-- èŒ—ä¼Šæˆªå›¾åŠ©æ‰‹ ver 0.2 Build 20140717
+-- Code by: ç¿Ÿä¸€é¸£tinymins @ ZhaiYiMing.CoM
+-- ç”µäº”Â·åŒæ¢¦é•‡Â·èŒ—ä¼Š
 ---------------------------------------------------
 local _GLOBAL_CONFIG_ = "config/MY_SCREENSHOT"
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."ScreenShot/lang/")
@@ -28,7 +28,7 @@ RegisterCustomData("MY_ScreenShot.bUseGlobalConfig")
 for k, _ in pairs(MY_ScreenShot.privateConfig) do
     RegisterCustomData("MY_ScreenShot.privateConfig." .. k)
 end
--- È¡ÉèÖÃ
+-- å–è®¾ç½®
 MY_ScreenShot.SetConfig = function(szKey, oValue)
     if MY_ScreenShot.bUseGlobalConfig then
         MY_ScreenShot.globalConfig[szKey] = oValue
@@ -37,7 +37,7 @@ MY_ScreenShot.SetConfig = function(szKey, oValue)
         MY_ScreenShot.privateConfig[szKey] = oValue
     end
 end
--- ´æÉèÖÃ
+-- å­˜è®¾ç½®
 MY_ScreenShot.GetConfig = function(szKey)
     if MY_ScreenShot.bUseGlobalConfig then
         return MY_ScreenShot.globalConfig[szKey]
@@ -50,7 +50,7 @@ _MY_ScreenShot.ShotScreen = function(szFilePath, nQuality)
     MY.Sysmsg({_L("Shot screen succeed, file saved as %s .", szFullPath)})
 end
 MY_ScreenShot.ShotScreen = function(nShowUI)
-    -- Éú³É¿ÉÊ¹ÓÃµÄÍêÕû½ØÍ¼Ä¿Â¼
+    -- ç”Ÿæˆå¯ä½¿ç”¨çš„å®Œæ•´æˆªå›¾ç›®å½•
     local szFolderPath = MY_ScreenShot.GetConfig("szFilePath")
     if szFolderPath~="" and not (string.sub(szFolderPath,2,2)==":" and IsFileExist(szFolderPath)) then
         MY.Sysmsg({_L("Shotscreen destination folder error: %s not exist. File has been save to default folder.", szFolderPath)})
@@ -58,7 +58,7 @@ MY_ScreenShot.ShotScreen = function(nShowUI)
     end
     local szFilePath
     if szFolderPath~="" then
-        -- Éú³ÉÎÄ¼şÍêÕûÂ·¾¶Ãû³Æ
+        -- ç”Ÿæˆæ–‡ä»¶å®Œæ•´è·¯å¾„åç§°
         local tDateTime = TimeToDate(GetCurrentTime())
         local i = 0
         repeat
@@ -68,7 +68,7 @@ MY_ScreenShot.ShotScreen = function(nShowUI)
     else
         szFilePath = MY_ScreenShot.GetConfig("szFileExName")
     end
-    -- ¸ù¾İnShowUI²»Í¬·½Ê½ÊµÏÖ½ØÍ¼
+    -- æ ¹æ®nShowUIä¸åŒæ–¹å¼å®ç°æˆªå›¾
     local bStationVisible = Station.IsVisible()
     if nShowUI == MY_ScreenShot.Const.HIDE_UI and bStationVisible then
         Station.Hide()
@@ -90,7 +90,7 @@ MY_ScreenShot.ShotScreen = function(nShowUI)
         _MY_ScreenShot.ShotScreen(szFilePath, MY_ScreenShot.GetConfig('nQuality'))
     end
 end
--- ±êÇ©À¸¼¤»î
+-- æ ‡ç­¾æ æ¿€æ´»
 _MY_ScreenShot.OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
     local w, h = ui:size()
@@ -151,7 +151,7 @@ _MY_ScreenShot.OnPanelActive = function(wnd)
     
     fnRefreshPanel(ui)
     
-    -- ×¢²áÄ¬ÈÏ¹¤¾ß¼ì²é
+    -- æ³¨å†Œé»˜è®¤å·¥å…·æ£€æŸ¥
     MY.BreatheCall("MY_ScreenShot_Hotkey_Check", function(ui)
         local nKey, nShift, nCtrl, nAlt = MY.Game.GetHotKey("MY_ScreenShot_Hotkey")
         if type(nKey)=="nil" or nKey==0 then
@@ -164,7 +164,7 @@ end
 _MY_ScreenShot.OnPanelDeactive = function( ... )
     MY.BreatheCall("MY_ScreenShot_Hotkey_Check")
 end
--- ¿ì½İ¼ü°ó¶¨
+-- å¿«æ·é”®ç»‘å®š
 -----------------------------------------------
 MY.Game.AddHotKey("MY_ScreenShot_Hotkey", _L["shotscreen"], function() MY_ScreenShot.ShotScreen((MY_ScreenShot.GetConfig('bAutoHideUI') and MY_ScreenShot.Const.HIDE_UI) or nil) end, nil)
 MY.Game.AddHotKey("MY_ScreenShot_Hotkey_HideUI", _L["shotscreen without ui"], function() MY_ScreenShot.ShotScreen(MY_ScreenShot.Const.HIDE_UI) end, nil)

@@ -1,10 +1,10 @@
 ---------------------------------
--- ÜøÒÁ²å¼ş
--- by£ºÜøÒÁ@Ë«ÃÎÕò@×··çõæÓ°
--- ref: ½è¼ø´óÁ¿º£÷©Ô´Âë @haimanchajian.com
+-- èŒ—ä¼Šæ’ä»¶
+-- byï¼šèŒ—ä¼Š@åŒæ¢¦é•‡@è¿½é£è¹‘å½±
+-- ref: å€Ÿé‰´å¤§é‡æµ·é³—æºç  @haimanchajian.com
 ---------------------------------
 -----------------------------------------------
--- ±¾µØº¯ÊıºÍ±äÁ¿
+-- æœ¬åœ°å‡½æ•°å’Œå˜é‡
 -----------------------------------------------
 MY = MY or {}
 MY.Player = MY.Player or {}
@@ -25,11 +25,11 @@ local _Cache, _L = {}, MY.LoadLangPack()
   #         #     # #     #       # # # # # # #     #             # # #         # #         # #  
 #######################################################################################################
 ]]
-_Cache.tNearNpc = {}      -- ¸½½üµÄNPC
-_Cache.tNearPlayer = {}   -- ¸½½üµÄÎïÆ·
-_Cache.tNearDoodad = {}   -- ¸½½üµÄÍæ¼Ò
+_Cache.tNearNpc = {}      -- é™„è¿‘çš„NPC
+_Cache.tNearPlayer = {}   -- é™„è¿‘çš„ç‰©å“
+_Cache.tNearDoodad = {}   -- é™„è¿‘çš„ç©å®¶
 
---[[ »ñÈ¡¸½½üNPCÁĞ±í
+--[[ è·å–é™„è¿‘NPCåˆ—è¡¨
     (table) MY.GetNearNpc(void)
 ]]
 MY.Player.GetNearNpc = function(nLimit)
@@ -51,7 +51,7 @@ MY.Player.GetNearNpc = function(nLimit)
 end
 MY.GetNearNpc = MY.Player.GetNearNpc
 
---[[ »ñÈ¡¸½½üÍæ¼ÒÁĞ±í
+--[[ è·å–é™„è¿‘ç©å®¶åˆ—è¡¨
     (table) MY.GetNearPlayer(void)
 ]]
 MY.Player.GetNearPlayer = function(nLimit)
@@ -70,7 +70,7 @@ MY.Player.GetNearPlayer = function(nLimit)
 end
 MY.GetNearPlayer = MY.Player.GetNearPlayer
 
---[[ »ñÈ¡¸½½üÎïÆ·ÁĞ±í
+--[[ è·å–é™„è¿‘ç‰©å“åˆ—è¡¨
     (table) MY.GetNearPlayer(void)
 ]]
 MY.Player.GetNearDoodad = function(nLimit)
@@ -96,7 +96,7 @@ RegisterEvent("PLAYER_LEAVE_SCENE", function() _Cache.tNearPlayer[arg0] = nil  e
 RegisterEvent("DOODAD_ENTER_SCENE", function() _Cache.tNearDoodad[arg0] = true end)
 RegisterEvent("DOODAD_LEAVE_SCENE", function() _Cache.tNearDoodad[arg0] = nil  end)
 
---[[»ñÈ¡ºÃÓÑÁĞ±í
+--[[è·å–å¥½å‹åˆ—è¡¨
 ]]
 MY.Player.GetFriendList = function(arg0)
     local t = {}
@@ -129,7 +129,7 @@ MY.Player.GetFriendList = function(arg0)
     return t, n
 end
 
---[[»ñÈ¡ºÃÓÑ
+--[[è·å–å¥½å‹
 ]]
 MY.Player.GetFriend = function(arg0)
     if not arg0 then return nil end
@@ -145,13 +145,13 @@ MY.Player.GetFriend = function(arg0)
     end
 end
 
---[[»ñÈ¡ºÃÓÑÁĞ±í
+--[[è·å–å¥½å‹åˆ—è¡¨
 ]]
 MY.Player.GetTongMemberList = function()
     return GetTongClient().GetMemberList()
 end
 
---[[ »ñÈ¡°ï»á³ÉÔ±
+--[[ è·å–å¸®ä¼šæˆå‘˜
 ]]
 MY.Player.GetTongMember = function(arg0)
     if not arg0 then
@@ -176,9 +176,9 @@ end
     #                 #   #               # # #                 #               #         #       # #         
 #######################################################################################################
 ]]
---[[ È¡µÃÄ¿±êÀàĞÍºÍID
-    (dwType, dwID) MY.GetTarget()       -- È¡µÃ×Ô¼ºµ±Ç°µÄÄ¿±êÀàĞÍºÍID
-    (dwType, dwID) MY.GetTarget(object) -- È¡µÃÖ¸¶¨²Ù×÷¶ÔÏóµ±Ç°µÄÄ¿±êÀàĞÍºÍID
+--[[ å–å¾—ç›®æ ‡ç±»å‹å’ŒID
+    (dwType, dwID) MY.GetTarget()       -- å–å¾—è‡ªå·±å½“å‰çš„ç›®æ ‡ç±»å‹å’ŒID
+    (dwType, dwID) MY.GetTarget(object) -- å–å¾—æŒ‡å®šæ“ä½œå¯¹è±¡å½“å‰çš„ç›®æ ‡ç±»å‹å’ŒID
 ]]
 MY.Player.GetTarget = function(object)
     if not object then
@@ -191,12 +191,12 @@ MY.Player.GetTarget = function(object)
     end
 end
 MY.GetTarget = MY.Player.GetTarget
---[[ È¡µÃ²Ù×÷¶ÔÏó
+--[[ å–å¾—æ“ä½œå¯¹è±¡
     (KObject) MY.GetObject([number dwType, ]number dwID)
-    -- dwType: [¿ÉÑ¡]¶ÔÏóÀàĞÍÃ¶¾Ù TARGET.*
-    -- dwID  : ¶ÔÏóID
-    -- return: ¸ù¾İ dwType ÀàĞÍºÍ dwID È¡µÃ²Ù×÷¶ÔÏó
-    --         ²»´æÔÚÊ±·µ»Ønil
+    -- dwType: [å¯é€‰]å¯¹è±¡ç±»å‹æšä¸¾ TARGET.*
+    -- dwID  : å¯¹è±¡ID
+    -- return: æ ¹æ® dwType ç±»å‹å’Œ dwID å–å¾—æ“ä½œå¯¹è±¡
+    --         ä¸å­˜åœ¨æ—¶è¿”å›nil
 ]]
 MY.Player.GetObject = function(dwType, dwID)
     if not dwType then
@@ -224,10 +224,10 @@ MY.Player.GetObject = function(dwType, dwID)
 end
 MY.GetObject = MY.Player.GetObject
 
---[[ ¸ù¾İ dwType ÀàĞÍºÍ dwID ÉèÖÃÄ¿±ê
+--[[ æ ¹æ® dwType ç±»å‹å’Œ dwID è®¾ç½®ç›®æ ‡
 -- (void) MY.SetTarget([number dwType, ]number dwID)
--- dwType   -- *¿ÉÑ¡* Ä¿±êÀàĞÍ
--- dwID     -- Ä¿±ê ID]]
+-- dwType   -- *å¯é€‰* ç›®æ ‡ç±»å‹
+-- dwID     -- ç›®æ ‡ ID]]
 MY.Player.SetTarget = function(dwType, dwID)
     -- check dwType
     if type(dwType)=="userdata" then
@@ -260,7 +260,7 @@ MY.Player.SetTarget = function(dwType, dwID)
 end
 MY.SetTarget = MY.Player.SetTarget
 
---[[ ÉèÖÃ/È¡Ïû ÁÙÊ±Ä¿±ê
+--[[ è®¾ç½®/å–æ¶ˆ ä¸´æ—¶ç›®æ ‡
     -- MY.Player.SetTempTarget(dwType, dwID)
     -- MY.Player.ResumeTarget()
 ]]
@@ -274,7 +274,7 @@ end
 MY.SetTempTarget = MY.Player.SetTempTarget
 MY.Player.ResumeTarget = function()
     TargetPanel_SetOpenState(true)
-    -- µ±Ö®Ç°µÄÄ¿±ê²»´æÔÚÊ±£¬ÇĞµ½¿ÕÄ¿±ê
+    -- å½“ä¹‹å‰çš„ç›®æ ‡ä¸å­˜åœ¨æ—¶ï¼Œåˆ‡åˆ°ç©ºç›®æ ‡
     if _Cache.pTempTarget[1] ~= TARGET.NO_TARGET and not MY.GetObject(unpack(_Cache.pTempTarget)) then
         _Cache.pTempTarget = { TARGET.NO_TARGET, 0 }
     end
@@ -284,7 +284,7 @@ MY.Player.ResumeTarget = function()
 end
 MY.ResumeTarget = MY.Player.ResumeTarget
 
---[[ ÁÙÊ±ÉèÖÃÄ¿±êÎªÖ¸¶¨Ä¿±ê²¢Ö´ĞĞº¯Êı
+--[[ ä¸´æ—¶è®¾ç½®ç›®æ ‡ä¸ºæŒ‡å®šç›®æ ‡å¹¶æ‰§è¡Œå‡½æ•°
     (void) MY.Player.WithTarget(dwType, dwID, callback)
 ]]
 _Cache.tWithTarget = {}
@@ -309,7 +309,7 @@ _Cache.WithTargetHandle = function()
     _Cache.WithTargetHandle()
 end
 MY.Player.WithTarget = function(dwType, dwID, callback)
-    -- ÒòÎª¿Í»§¶Ë¶àÏß³Ì ËùÒÔ¼ÓÉÏ×ÊÔ´Ëø ·ÀÖ¹ÉèÖÃÁÙÊ±Ä¿±ê³åÍ»
+    -- å› ä¸ºå®¢æˆ·ç«¯å¤šçº¿ç¨‹ æ‰€ä»¥åŠ ä¸Šèµ„æºé” é˜²æ­¢è®¾ç½®ä¸´æ—¶ç›®æ ‡å†²çª
     table.insert(_Cache.tWithTarget, {
         dwType   = dwType  ,
         dwID     = dwID    ,
@@ -318,14 +318,14 @@ MY.Player.WithTarget = function(dwType, dwID, callback)
     _Cache.WithTargetHandle()
 end
 
---[[ ÇóN2ÔÚN1µÄÃæÏò½Ç  --  ÖØÔØ+2
-    -- ÊäÈëN1×ø±ê¡¢ÃæÏò¡¢N2×ø±ê
+--[[ æ±‚N2åœ¨N1çš„é¢å‘è§’  --  é‡è½½+2
+    -- è¾“å…¥N1åæ ‡ã€é¢å‘ã€N2åæ ‡
     (number) MY.GetFaceToTargetDegree(nX,nY,nFace,nTX,nTY)
-    -- ÊäÈëN1¡¢N2
+    -- è¾“å…¥N1ã€N2
     (number) MY.GetFaceToTargetDegree(oN1, oN2)
-    -- Êä³ö
-    nil -- ²ÎÊı´íÎó
-    number -- ÃæÏò½Ç(0-180)
+    -- è¾“å‡º
+    nil -- å‚æ•°é”™è¯¯
+    number -- é¢å‘è§’(0-180)
 ]]
 MY.Player.GetFaceDegree = function(nX,nY,nFace,nTX,nTY)
     if type(nY)=="userdata" and type(nX)=="userdata" then nTX=nY.nX nTY=nY.nY nY=nX.nY nFace=nX.nFaceDirection nX=nX.nX end
@@ -333,20 +333,20 @@ MY.Player.GetFaceDegree = function(nX,nY,nFace,nTX,nTY)
     local a = nFace * math.pi / 128
     return math.acos( ( (nTX-nX)*math.cos(a) + (nTY-nY)*math.sin(a) ) / ( (nTX-nX)^2 + (nTY-nY)^2) ^ 0.5 ) * 180 / math.pi
 end
---[[ ÇóoT2ÔÚoT1µÄÕıÃæ»¹ÊÇ±³Ãæ
+--[[ æ±‚oT2åœ¨oT1çš„æ­£é¢è¿˜æ˜¯èƒŒé¢
     (bool) MY.IsFaceToTarget(oT1,oT2)
-    -- ÕıÃæ·µ»Øtrue
-    -- ±³¶Ô·µ»Øfalse
-    -- ²ÎÊı²»ÕıÈ·Ê±·µ»Ønil
+    -- æ­£é¢è¿”å›true
+    -- èƒŒå¯¹è¿”å›false
+    -- å‚æ•°ä¸æ­£ç¡®æ—¶è¿”å›nil
 ]]
 MY.Player.IsFaceToTarget = function(oT1,oT2)
     if type(oT1)~="userdata" or type(oT2)~="userdata" then return nil end
     local a = oT1.nFaceDirection * math.pi / 128
     return (oT2.nX-oT1.nX)*math.cos(a) + (oT2.nY-oT1.nY)*math.sin(a) > 0
 end
---[[ ×°±¸ÃûÎªszNameµÄ×°±¸
+--[[ è£…å¤‡åä¸ºszNameçš„è£…å¤‡
     (void) MY.Equip(szName)
-    szName  ×°±¸Ãû³Æ
+    szName  è£…å¤‡åç§°
 ]]
 MY.Player.Equip = function(szName)
     local me = GetClientPlayer()
@@ -376,7 +376,7 @@ MY.Player.Equip = function(szName)
     end
 end
 
---[[ »ñÈ¡¶ÔÏóµÄbuffÁĞ±í
+--[[ è·å–å¯¹è±¡çš„buffåˆ—è¡¨
     (table) MY.GetBuffList(obj)
 ]]
 MY.Player.GetBuffList = function(obj)
@@ -392,9 +392,9 @@ MY.Player.GetBuffList = function(obj)
     return aBuffTable
 end
 
-_Cache.tPlayerSkills = {}   -- Íæ¼Ò¼¼ÄÜÁĞ±í[»º´æ]   -- ¼¼ÄÜÃû·´²éID
-_Cache.tSkillCache = {}     -- ¼¼ÄÜÁĞ±í»º´æ         -- ¼¼ÄÜID²é¼¼ÄÜÃû³ÆÍ¼±ê
---[[ Í¨¹ı¼¼ÄÜÃû³Æ»ñÈ¡¼¼ÄÜ¶ÔÏó
+_Cache.tPlayerSkills = {}   -- ç©å®¶æŠ€èƒ½åˆ—è¡¨[ç¼“å­˜]   -- æŠ€èƒ½ååæŸ¥ID
+_Cache.tSkillCache = {}     -- æŠ€èƒ½åˆ—è¡¨ç¼“å­˜         -- æŠ€èƒ½IDæŸ¥æŠ€èƒ½åç§°å›¾æ ‡
+--[[ é€šè¿‡æŠ€èƒ½åç§°è·å–æŠ€èƒ½å¯¹è±¡
     (table) MY.GetSkillByName(szName)
 ]]
 MY.Player.GetSkillByName = function(szName)
@@ -408,17 +408,17 @@ MY.Player.GetSkillByName = function(szName)
     end
     return _Cache.tPlayerSkills[szName]
 end
---[[ ÅĞ¶Ï¼¼ÄÜÃû³ÆÊÇ·ñÓĞĞ§
+--[[ åˆ¤æ–­æŠ€èƒ½åç§°æ˜¯å¦æœ‰æ•ˆ
     (bool) MY.IsValidSkill(szName)
 ]]
 MY.Player.IsValidSkill = function(szName)
     if MY.Player.GetSkillByName(szName)==nil then return false else return true end
 end
---[[ ÅĞ¶Ïµ±Ç°ÓÃ»§ÊÇ·ñ¿ÉÓÃÄ³¸ö¼¼ÄÜ
+--[[ åˆ¤æ–­å½“å‰ç”¨æˆ·æ˜¯å¦å¯ç”¨æŸä¸ªæŠ€èƒ½
     (bool) MY.CanUseSkill(number dwSkillID[, dwLevel])
 ]]
 MY.Player.CanUseSkill = function(dwSkillID, dwLevel)
-    -- ÅĞ¶Ï¼¼ÄÜÊÇ·ñÓĞĞ§ ²¢½«ÖĞÎÄÃû×ª»»Îª¼¼ÄÜID
+    -- åˆ¤æ–­æŠ€èƒ½æ˜¯å¦æœ‰æ•ˆ å¹¶å°†ä¸­æ–‡åè½¬æ¢ä¸ºæŠ€èƒ½ID
     if type(dwSkillID) == "string" then if MY.IsValidSkill(dwSkillID) then dwSkillID = MY.Player.GetSkillByName(dwSkillID).dwSkillID else return false end end
     local me, box = GetClientPlayer(), _Cache.hBox
     if me and box then
@@ -439,18 +439,18 @@ MY.Player.CanUseSkill = function(dwSkillID, dwLevel)
     end
     return false
 end
---[[ ÊÍ·Å¼¼ÄÜ,ÊÍ·Å³É¹¦·µ»Øtrue
+--[[ é‡Šæ”¾æŠ€èƒ½,é‡Šæ”¾æˆåŠŸè¿”å›true
     (bool)MY.UseSkill(dwSkillID, bForceStopCurrentAction, eTargetType, dwTargetID)
-    dwSkillID               ¼¼ÄÜID
-    bForceStopCurrentAction ÊÇ·ñ´ò¶Ïµ±Ç°ÔË¹¦
-    eTargetType             ÊÍ·ÅÄ¿±êÀàĞÍ
-    dwTargetID              ÊÍ·ÅÄ¿±êID
+    dwSkillID               æŠ€èƒ½ID
+    bForceStopCurrentAction æ˜¯å¦æ‰“æ–­å½“å‰è¿åŠŸ
+    eTargetType             é‡Šæ”¾ç›®æ ‡ç±»å‹
+    dwTargetID              é‡Šæ”¾ç›®æ ‡ID
 ]]
 MY.Player.UseSkill = function(dwSkillID, bForceStopCurrentAction, eTargetType, dwTargetID)
-    -- ÅĞ¶Ï¼¼ÄÜÊÇ·ñÓĞĞ§ ²¢½«ÖĞÎÄÃû×ª»»Îª¼¼ÄÜID
+    -- åˆ¤æ–­æŠ€èƒ½æ˜¯å¦æœ‰æ•ˆ å¹¶å°†ä¸­æ–‡åè½¬æ¢ä¸ºæŠ€èƒ½ID
     if type(dwSkillID) == "string" then if MY.Player.IsValidSkill(dwSkillID) then dwSkillID = MY.Player.GetSkillByName(dwSkillID).dwSkillID else return false end end
     local me = GetClientPlayer()
-    -- »ñÈ¡¼¼ÄÜCD
+    -- è·å–æŠ€èƒ½CD
     local bCool, nLeft, nTotal = me.GetSkillCDProgress( dwSkillID, me.GetSkillLevel(dwSkillID) ) local bIsPrepare ,dwPreSkillID ,dwPreSkillLevel , fPreProgress= me.GetSkillPrepareState()
     local oTTP, oTID = me.GetTarget()
     if dwTargetID~=nil then SetTarget(eTargetType, dwTargetID) end
@@ -463,7 +463,7 @@ MY.Player.UseSkill = function(dwSkillID, bForceStopCurrentAction, eTargetType, d
         return false
     end
 end
--- ¸ù¾İ¼¼ÄÜ ID ¼°µÈ¼¶»ñÈ¡¼¼ÄÜµÄÃû³Æ¼°Í¼±ê ID£¨ÄÚÖÃ»º´æ´¦Àí£©
+-- æ ¹æ®æŠ€èƒ½ ID åŠç­‰çº§è·å–æŠ€èƒ½çš„åç§°åŠå›¾æ ‡ IDï¼ˆå†…ç½®ç¼“å­˜å¤„ç†ï¼‰
 -- (string, number) MY.Player.GetSkillName(number dwSkillID[, number dwLevel])
 MY.Player.GetSkillName = function(dwSkillID, dwLevel)
     if not _Cache.tSkillCache[dwSkillID] then
@@ -483,9 +483,9 @@ MY.Player.GetSkillName = function(dwSkillID, dwLevel)
     return unpack(_Cache.tSkillCache[dwSkillID])
 end
 
---[[ µÇ³öÓÎÏ·
+--[[ ç™»å‡ºæ¸¸æˆ
     (void) MY.LogOff(bCompletely)
-    bCompletely Îªtrue·µ»ØµÇÂ½Ò³ Îªfalse·µ»Ø½ÇÉ«Ò³ Ä¬ÈÏÎªfalse
+    bCompletely ä¸ºtrueè¿”å›ç™»é™†é¡µ ä¸ºfalseè¿”å›è§’è‰²é¡µ é»˜è®¤ä¸ºfalse
 ]]
 MY.Player.LogOff = function(bCompletely)
     if bCompletely then
@@ -495,7 +495,7 @@ MY.Player.LogOff = function(bCompletely)
     end
 end
 
--- ¸ù¾İ¼¼ÄÜ ID »ñÈ¡Òıµ¼Ö¡Êı£¬·ÇÒıµ¼¼¼ÄÜ·µ»Ø nil
+-- æ ¹æ®æŠ€èƒ½ ID è·å–å¼•å¯¼å¸§æ•°ï¼Œéå¼•å¯¼æŠ€èƒ½è¿”å› nil
 -- (number) MY.Player.GetChannelSkillFrame(number dwSkillID)
 MY.Player.GetChannelSkillFrame = function(dwSkillID)
     local t = _Cache.tSkillEx[dwSkillID]

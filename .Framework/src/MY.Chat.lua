@@ -1,18 +1,18 @@
 ---------------------------------
--- ÜøÒÁ²å¼ş
--- by£ºÜøÒÁ@Ë«ÃÎÕò@×··çõæÓ°
--- ref: ½è¼ø´óÁ¿º£÷©Ô´Âë @haimanchajian.com
+-- èŒ—ä¼Šæ’ä»¶
+-- byï¼šèŒ—ä¼Š@åŒæ¢¦é•‡@è¿½é£è¹‘å½±
+-- ref: å€Ÿé‰´å¤§é‡æµ·é³—æºç  @haimanchajian.com
 ---------------------------------
 -----------------------------------------------
--- ±¾µØº¯ÊıºÍ±äÁ¿
+-- æœ¬åœ°å‡½æ•°å’Œå˜é‡
 -----------------------------------------------
 MY = MY or {}
 MY.Chat = MY.Chat or {}
 MY.Chat.bHookedAlready = false
 local _Cache, _L = {}, MY.LoadLangPack()
 
--- º£÷©ÀïÃæ¿Ù³öÀ´µÄ
--- ÁÄÌì¸´ÖÆ²¢·¢²¼
+-- æµ·é³—é‡Œé¢æŠ å‡ºæ¥çš„
+-- èŠå¤©å¤åˆ¶å¹¶å‘å¸ƒ
 MY.Chat.RepeatChatLine = function(hTime)
     local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
     if not edit then
@@ -30,7 +30,7 @@ MY.Chat.RepeatChatLine = function(hTime)
     end
 end
 
--- ÁÄÌì±íÇé³õÊ¼»¯
+-- èŠå¤©è¡¨æƒ…åˆå§‹åŒ–
 _Cache.InitEmotion = function()
     if not _Cache.tEmotion then
         local t = {}
@@ -50,11 +50,11 @@ _Cache.InitEmotion = function()
     end
 end
 
---[[ »ñÈ¡ÁÄÌì±íÇéÁĞ±í
+--[[ è·å–èŠå¤©è¡¨æƒ…åˆ—è¡¨
     typedef emo table
-    (emo[]) MY.Chat.GetEmotion()                             -- ·µ»ØËùÓĞ±íÇéÁĞ±í
-    (emo)   MY.Chat.GetEmotion(szCommand)                    -- ·µ»ØÖ¸¶¨CmdµÄ±íÇé
-    (emo)   MY.Chat.GetEmotion(szImageFile, nFrame, szType)  -- ·µ»ØÖ¸¶¨Í¼±êµÄ±íÇé
+    (emo[]) MY.Chat.GetEmotion()                             -- è¿”å›æ‰€æœ‰è¡¨æƒ…åˆ—è¡¨
+    (emo)   MY.Chat.GetEmotion(szCommand)                    -- è¿”å›æŒ‡å®šCmdçš„è¡¨æƒ…
+    (emo)   MY.Chat.GetEmotion(szImageFile, nFrame, szType)  -- è¿”å›æŒ‡å®šå›¾æ ‡çš„è¡¨æƒ…
 ]]
 MY.Chat.GetEmotion = function(arg0, arg1, arg2)
     _Cache.InitEmotion()
@@ -70,7 +70,7 @@ MY.Chat.GetEmotion = function(arg0, arg1, arg2)
     return clone(t)
 end
 
--- »ñÈ¡¸´ÖÆÁÄÌìĞĞText
+-- è·å–å¤åˆ¶èŠå¤©è¡ŒText
 MY.Chat.GetCopyLinkText = function(szText, rgbf)
     szText = szText or _L[' * ']
     rgbf   = rgbf   or { f = 10 }
@@ -80,7 +80,7 @@ MY.Chat.GetCopyLinkText = function(szText, rgbf)
         "copylink")
 end
 
--- »ñÈ¡¸´ÖÆÁÄÌìĞĞText
+-- è·å–å¤åˆ¶èŠå¤©è¡ŒText
 MY.Chat.GetTimeLinkText = function(rgbf)
     rgbf = rgbf or { f = 10 }
     
@@ -90,7 +90,7 @@ MY.Chat.GetTimeLinkText = function(rgbf)
         "timelink")
 end
 
--- ¸´ÖÆÁÄÌìĞĞ
+-- å¤åˆ¶èŠå¤©è¡Œ
 MY.Chat.CopyChatLine = function(hTime)
     local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
     if not edit then
@@ -139,7 +139,7 @@ MY.Chat.CopyChatLine = function(hTime)
                 elseif szName =="eventlink" then
                     edit:InsertObj(szText, { type = "eventlink", text = szText, name = p.szName, linkinfo = p.szLinkInfo })
                 else
-                    -- NPC º°»°ÌØÊâ´¦Àí
+                    -- NPC å–Šè¯ç‰¹æ®Šå¤„ç†
                     if bBegin == nil then
                         local r, g, b = p:GetFontColor()
                         if r == 255 and g == 150 and b == 0 then
@@ -238,9 +238,9 @@ MY.Chat.LinkEventHandler = {
         end
     end,
 }
---[[ °ó¶¨linkÊÂ¼şÏìÓ¦
-    (userdata) MY.Chat.RenderLink(userdata link)    ´¦ÀílinkµÄ¸÷ÖÖÊÂ¼ş°ó¶¨ namelinkÊÇÒ»¸ö³¬Á´½ÓTextÔªËØ
-    (string) MY.Chat.RenderLink(string szMsg)       ¸ñÊ½»¯szMsg ´¦ÀíÀïÃæµÄ³¬Á´½Ó Ìí¼ÓÊ±¼äÏàÓ¦
+--[[ ç»‘å®šlinkäº‹ä»¶å“åº”
+    (userdata) MY.Chat.RenderLink(userdata link)    å¤„ç†linkçš„å„ç§äº‹ä»¶ç»‘å®š namelinkæ˜¯ä¸€ä¸ªè¶…é“¾æ¥Textå…ƒç´ 
+    (string) MY.Chat.RenderLink(string szMsg)       æ ¼å¼åŒ–szMsg å¤„ç†é‡Œé¢çš„è¶…é“¾æ¥ æ·»åŠ æ—¶é—´ç›¸åº”
 ]]
 MY.Chat.RenderLink = function(argv)
     if type(argv) == 'string' then
@@ -294,7 +294,7 @@ MY.Chat.RenderLink = function(argv)
     return argv
 end
 
--- ¸´ÖÆItemµ½ÊäÈë¿ò
+-- å¤åˆ¶Itemåˆ°è¾“å…¥æ¡†
 MY.Chat.CopyChatItem = function(p)
     local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
     if not edit then
@@ -333,7 +333,7 @@ MY.Chat.CopyChatItem = function(p)
     end
 end
 
---½âÎöÏûÏ¢
+--è§£ææ¶ˆæ¯
 MY.Chat.FormatContent = function(szMsg)
     local t = {}
     for n, w in string.gfind(szMsg, "<(%w+)>(.-)</%1>") do
@@ -360,32 +360,32 @@ MY.Chat.FormatContent = function(szMsg)
                     table.insert(t2, {type = "emotion", text = emo.szCmd, innerText = emo.szCmd, id = emo.dwID})
                 end
             else
-                --ÆÕÍ¨ÎÄ×Ö
+                --æ™®é€šæ–‡å­—
                 local s = string.match(v, "\"(.*)\"")
                 table.insert(t2, {type= "text", text = s, innerText = s})
             end
         else
-            --ÎïÆ·Á´½Ó
+            --ç‰©å“é“¾æ¥
             if string.find(v, "name=\"itemlink\"") then
                 local name, userdata = string.match(v,"%[(.-)%].-userdata=(%d+)")
                 table.insert(t2, {type = "item", text = "["..name.."]", innerText = name, item = userdata})
-            --ÎïÆ·ĞÅÏ¢
+            --ç‰©å“ä¿¡æ¯
             elseif string.find(v, "name=\"iteminfolink\"") then
                 local name, version, tab, index = string.match(v,"%[(.-)%].-script=\"this.nVersion=(%d+)\\%s*this.dwTabType=(%d+)\\%s*this.dwIndex=(%d+)")
                 table.insert(t2, {type = "iteminfo", text = "["..name.."]", innerText = name, version = version, tabtype = tab, index = index})
-            --ĞÕÃû
+            --å§“å
             elseif string.find(v, "name=\"namelink_%d+\"") then
                 local name = string.match(v,"%[(.-)%]")
                 table.insert(t2, {type = "name", text = "["..name.."]", innerText = "["..name.."]", name = name})
-            --ÈÎÎñ
+            --ä»»åŠ¡
             elseif string.find(v, "name=\"questlink\"") then
                 local name, userdata = string.match(v,"%[(.-)%].-userdata=(%d+)")
                 table.insert(t2, {type = "quest", text = "["..name.."]", innerText = name, questid = userdata})
-            --Éú»î¼¼ÒÕ
+            --ç”Ÿæ´»æŠ€è‰º
             elseif string.find(v, "name=\"recipelink\"") then
                 local name, craft, recipe = string.match(v,"%[(.-)%].-script=\"this.dwCraftID=(%d+)\\%s*this.dwRecipeID=(%d+)")
                 table.insert(t2, {type = "recipe", text = "["..name.."]", innerText = name, craftid = craft, recipeid = recipe})
-            --¼¼ÄÜ
+            --æŠ€èƒ½
             elseif string.find(v, "name=\"skilllink\"") then
                 local name, skillinfo = string.match(v,"%[(.-)%].-script=\"this.skillKey=%{(.-)%}")
                 local skillKey = {}
@@ -396,27 +396,27 @@ MY.Chat.FormatContent = function(szMsg)
                 skillKey.text = "["..name.."]"
                 skillKey.innerText = "["..name.."]"
                 table.insert(t2, skillKey)
-            --³ÆºÅ
+            --ç§°å·
             elseif string.find(v, "name=\"designationlink\"") then
                 local name, id, fix = string.match(v,"%[(.-)%].-script=\"this.dwID=(%d+)\\%s*this.bPrefix=(.-)")
                 table.insert(t2, {type = "designation", text = "["..name.."]", innerText = name, id = id, prefix = fix})
-            --¼¼ÄÜÃØ¼®
+            --æŠ€èƒ½ç§˜ç±
             elseif string.find(v, "name=\"skillrecipelink\"") then
                 local name, id, level = string.match(v,"%[(.-)%].-script=\"this.dwID=(%d+)\\%s*this.dwLevel=(%d+)")
                 table.insert(t2, {type = "skillrecipe", text = "["..name.."]", innerText = name, id = id, level = level})
-            --Êé¼®
+            --ä¹¦ç±
             elseif string.find(v, "name=\"booklink\"") then
                 local name, version, tab, index, id = string.match(v,"%[(.-)%].-script=\"this.nVersion=(%d+)\\%s*this.dwTabType=(%d+)\\%s*this.dwIndex=(%d+)\\%s*this.nBookRecipeID=(%d+)")
                 table.insert(t2, {type = "book", text = "["..name.."]", innerText = name, version = version, tabtype = tab, index = index, bookinfo = id})
-            --³É¾Í
+            --æˆå°±
             elseif string.find(v, "name=\"achievementlink\"") then
                 local name, id = string.match(v,"%[(.-)%].-script=\"this.dwID=(%d+)")
                 table.insert(t2, {type = "achievement", text = "["..name.."]", innerText = name, id = id})
-            --Ç¿»¯
+            --å¼ºåŒ–
             elseif string.find(v, "name=\"enchantlink\"") then
                 local name, pro, craft, recipe = string.match(v,"%[(.-)%].-script=\"this.dwProID=(%d+)\\%s*this.dwCraftID=(%d+)\\%s*this.dwRecipeID=(%d+)")
                 table.insert(t2, {type = "enchant", text = "["..name.."]", innerText = name, proid = pro, craftid = craft, recipeid = recipe})
-            --ÊÂ¼ş
+            --äº‹ä»¶
             elseif string.find(v, "name=\"eventlink\"") then
                 local name, na, info = string.match(v,'text="(.-)".-script="this.szName=\\"(.-)\\"\\%s*this.szLinkInfo=\\"(.-)\\"')
                 table.insert(t2, {type = "eventlink", text = name, innerText = name, name = na, linkinfo = info or ""})
@@ -426,7 +426,7 @@ MY.Chat.FormatContent = function(szMsg)
     return t2
 end
 
---[[ ÅĞ¶ÏÄ³¸öÆµµÀÄÜ·ñ·¢ÑÔ
+--[[ åˆ¤æ–­æŸä¸ªé¢‘é“èƒ½å¦å‘è¨€
 -- (bool) MY.CanTalk(number nChannel)]]
 MY.Chat.CanTalk = function(nChannel)
     for _, v in ipairs({"WHISPER", "TEAM", "RAID", "BATTLE_FIELD", "NEARBY", "TONG", "TONG_ALLIANCE" }) do
@@ -452,7 +452,7 @@ _Cache.tTalkChannelHeader = {
     [PLAYER_TALK_CHANNEL.CAMP] = "/c ",
     [PLAYER_TALK_CHANNEL.WORLD] = "/h ",
 }
---[[ ÇĞ»»ÁÄÌìÆµµÀ
+--[[ åˆ‡æ¢èŠå¤©é¢‘é“
     (void) MY.SwitchChat(number nChannel)
     (void) MY.SwitchChat(string szHeader)
     (void) MY.SwitchChat(string szName)
@@ -547,15 +547,15 @@ MY.Chat.ParseName = function(t)
     end
     return t2
 end
---[[ ·¢²¼ÁÄÌìÄÚÈİ
+--[[ å‘å¸ƒèŠå¤©å†…å®¹
 -- (void) MY.Talk(string szTarget, string szText[, boolean bNoEscape])
 -- (void) MY.Talk([number nChannel, ] string szText[, boolean bNoEscape])
--- szTarget         -- ÃÜÁÄµÄÄ¿±ê½ÇÉ«Ãû
--- szText               -- ÁÄÌìÄÚÈİ£¬£¨Òà¿ÉÎª¼æÈİ KPlayer.Talk µÄ table£©
--- nChannel         -- *¿ÉÑ¡* ÁÄÌìÆµµÀ£¬PLAYER_TALK_CHANNLE.*£¬Ä¬ÈÏÎª½üÁÄ
--- bNoEscape    -- *¿ÉÑ¡* ²»½âÎöÁÄÌìÄÚÈİÖĞµÄ±íÇéÍ¼Æ¬ºÍÃû×Ö£¬Ä¬ÈÏÎª false
--- bSaveDeny    -- *¿ÉÑ¡* ÔÚÁÄÌìÊäÈëÀ¸±£Áô²»¿É·¢ÑÔµÄÆµµÀÄÚÈİ£¬Ä¬ÈÏÎª false
--- ÌØ±ğ×¢Òâ£ºnChannel, szText Á½ÕßµÄ²ÎÊıË³Ğò¿ÉÒÔµ÷»»£¬Õ½³¡/ÍÅ¶ÓÁÄÌìÆµµÀÖÇÄÜÇĞ»»]]
+-- szTarget         -- å¯†èŠçš„ç›®æ ‡è§’è‰²å
+-- szText               -- èŠå¤©å†…å®¹ï¼Œï¼ˆäº¦å¯ä¸ºå…¼å®¹ KPlayer.Talk çš„ tableï¼‰
+-- nChannel         -- *å¯é€‰* èŠå¤©é¢‘é“ï¼ŒPLAYER_TALK_CHANNLE.*ï¼Œé»˜è®¤ä¸ºè¿‘èŠ
+-- bNoEscape    -- *å¯é€‰* ä¸è§£æèŠå¤©å†…å®¹ä¸­çš„è¡¨æƒ…å›¾ç‰‡å’Œåå­—ï¼Œé»˜è®¤ä¸º false
+-- bSaveDeny    -- *å¯é€‰* åœ¨èŠå¤©è¾“å…¥æ ä¿ç•™ä¸å¯å‘è¨€çš„é¢‘é“å†…å®¹ï¼Œé»˜è®¤ä¸º false
+-- ç‰¹åˆ«æ³¨æ„ï¼šnChannel, szText ä¸¤è€…çš„å‚æ•°é¡ºåºå¯ä»¥è°ƒæ¢ï¼Œæˆ˜åœº/å›¢é˜ŸèŠå¤©é¢‘é“æ™ºèƒ½åˆ‡æ¢]]
 MY.Chat.Talk = function(nChannel, szText, bNoEscape, bSaveDeny)
     local szTarget, me = "", GetClientPlayer()
     -- channel
@@ -625,7 +625,7 @@ end
 MY.Talk = MY.Chat.Talk
 
 _Cache.tHookChatFun = {}
---[[ HOOKÁÄÌìÀ¸ ]]
+--[[ HOOKèŠå¤©æ  ]]
 MY.Chat.HookChatPanel = function(arg0, arg1, arg2)
     local fnBefore, fnAfter, id
     if type(arg0)=="string" then

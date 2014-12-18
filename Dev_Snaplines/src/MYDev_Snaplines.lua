@@ -1,6 +1,6 @@
 --
--- ©╙╥╒уъ╧╓╬ъ
--- by эЬра @ к╚цнуР @ щ╤╩╗╧╛
+-- Е╪─Е▐▒Х─┘Е╥╔Е┘╥
+-- by Х▄≈Д╪┼ @ Е▐▄Ф╒╕И∙┤ @ Х█╩Х┼╠Е╝╚
 -- Build 20140730
 -- 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Dev_Snaplines/lang/")
@@ -160,11 +160,11 @@ _Cache.OnFrameBreathe = function()
             end
             
             local bReAdjustX
-            if yW >= hT then -- ╤╔╡©©иртотй╬╣доб
+            if yW >= hT then -- И║╤И┐╗Е▐╞Д╩╔Ф≤╬Г╓╨Г └Д╦▀
                 yT = yW - hT
-            elseif yW + hW + 1 + hT <= H then -- ╣в╡©отй╬╣доб
+            elseif yW + hW + 1 + hT <= H then -- Е╨∙И┐╗Ф≤╬Г╓╨Г └Д╦▀
                 yT = yW + hW + 1
-            elseif yW + hT <= H then -- жп╪Д©╙й╪отй╬╣доб
+            elseif yW + hT <= H then -- Д╦╜И≈╢Е╪─Е╖▀Ф≤╬Г╓╨Г └Д╦▀
                 yT = yW + 20
                 bReAdjustX = true
             else
@@ -172,9 +172,9 @@ _Cache.OnFrameBreathe = function()
                 bReAdjustX = true
             end
             if bReAdjustX then
-                if xW >= wT + 5 then -- вС╡Юотй╬╣доб
+                if xW >= wT + 5 then -- Е╥╕Д╬╖Ф≤╬Г╓╨Г └Д╦▀
                     xT = xW - wT - 5
-                elseif xW + wW + wT + 5 <= W then -- ср╡Юотй╬╣доб
+                elseif xW + wW + wT + 5 <= W then -- Е▐ЁД╬╖Ф≤╬Г╓╨Г └Д╦▀
                     xT = xW + wW + 5
                 end
             end

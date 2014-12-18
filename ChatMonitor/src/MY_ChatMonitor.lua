@@ -1,9 +1,9 @@
 --
--- ÁÄÌì¼à¿Ø
--- by ÜøÒÁ @ Ë«ÃÎÕò @ Ý¶»¨¹¬
+-- èŠå¤©ç›‘æŽ§
+-- by èŒ—ä¼Š @ åŒæ¢¦é•‡ @ è»èŠ±å®«
 -- Build 20140411
 --
--- Ö÷Òª¹¦ÄÜ: °´¹Ø¼ü×Ö¹ýÂË»ñÈ¡ÁÄÌìÏûÏ¢
+-- ä¸»è¦åŠŸèƒ½: æŒ‰å…³é”®å­—è¿‡æ»¤èŽ·å–èŠå¤©æ¶ˆæ¯
 -- 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."ChatMonitor/lang/")
 local _SUB_ADDON_FOLDER_NAME_ = "ChatMonitor"
@@ -71,37 +71,37 @@ _MY_ChatMonitor.tChannelGroups = {
     }
 }
 
--- ²åÈëÁÄÌìÄÚÈÝÊ±¼à¿ØÁÄÌìÐÅÏ¢
+-- æ’å…¥èŠå¤©å†…å®¹æ—¶ç›‘æŽ§èŠå¤©ä¿¡æ¯
 _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
     -- filter
     if MY_ChatMonitor.bCapture and MY_ChatMonitor.szKeyWords and MY_ChatMonitor.szKeyWords~='' then
         local rec = {
-            text = '',    -- ¼ÆËãµ±Ç°ÏûÏ¢µÄ´¿ÎÄ×ÖÄÚÈÝ ÓÃÓÚÆ¥Åä
-            hash = '',    -- ¼ÆËãµ±Ç°ÏûÏ¢µÄ¹þÏ£ ÓÃÓÚ¹ýÂËÏàÍ¬
-            html = '',    -- ÏûÏ¢Ô´Êý¾ÝUI XML
+            text = '',    -- è®¡ç®—å½“å‰æ¶ˆæ¯çš„çº¯æ–‡å­—å†…å®¹ ç”¨äºŽåŒ¹é…
+            hash = '',    -- è®¡ç®—å½“å‰æ¶ˆæ¯çš„å“ˆå¸Œ ç”¨äºŽè¿‡æ»¤ç›¸åŒ
+            html = '',    -- æ¶ˆæ¯æºæ•°æ®UI XML
         }
-        -- ¼ÆËãÏµÍ³ÏûÏ¢ÑÕÉ«
+        -- è®¡ç®—ç³»ç»Ÿæ¶ˆæ¯é¢œè‰²
         local rgbSysMsg = GetMsgFontColor("MSG_SYS", true)
-        -- ¼ÆËãÏûÏ¢Ô´Êý¾ÝUI
+        -- è®¡ç®—æ¶ˆæ¯æºæ•°æ®UI
         if bRich then
             rec.html = szMsg
-            -- ¸ñÊ½»¯ÏûÏ¢
+            -- æ ¼å¼åŒ–æ¶ˆæ¯
             local tMsgContent = MY.Chat.FormatContent(szMsg)
-            -- ¼ì²âÏûÏ¢ÊÇ·ñÊÇ²å¼þ×Ô¼º²úÉúµÄ
+            -- æ£€æµ‹æ¶ˆæ¯æ˜¯å¦æ˜¯æ’ä»¶è‡ªå·±äº§ç”Ÿçš„
             if tMsgContent[1].type == "text" and tMsgContent[1].displayText == "" then
                 return
             end
-            -- Æ´½ÓÏûÏ¢
-            if r == rgbSysMsg[1] and g == rgbSysMsg[2] and b == rgbSysMsg[3] then -- ÏµÍ³ÏûÏ¢
+            -- æ‹¼æŽ¥æ¶ˆæ¯
+            if r == rgbSysMsg[1] and g == rgbSysMsg[2] and b == rgbSysMsg[3] then -- ç³»ç»Ÿæ¶ˆæ¯
                 for i, v in ipairs(tMsgContent) do
                     rec.text = rec.text .. v.text
                 end
-            else -- Èç¹û²»ÊÇÏµÍ³ÐÅÏ¢ÔòÉáÆúµÚÒ»¸öÃû×ÖÖ®Ç°µÄ¶«Î÷ ÀàËÆ¡°[ÕóÓª][ºÆÆøÃË][ÜøÒÁ]Ëµ£º¡±
-                -- STR_TALK_HEAD_WHISPER = "ÇÄÇÄµØËµ£º",
-                -- STR_TALK_HEAD_WHISPER_REPLY = "ÄãÇÄÇÄµØ¶Ô",
-                -- STR_TALK_HEAD_SAY = "Ëµ£º",
-                -- STR_TALK_HEAD_SAY1 = "£º",
-                -- STR_TALK_HEAD_SAY2 = "´óÉùº°£º",
+            else -- å¦‚æžœä¸æ˜¯ç³»ç»Ÿä¿¡æ¯åˆ™èˆå¼ƒç¬¬ä¸€ä¸ªåå­—ä¹‹å‰çš„ä¸œè¥¿ ç±»ä¼¼â€œ[é˜µè¥][æµ©æ°”ç›Ÿ][èŒ—ä¼Š]è¯´ï¼šâ€
+                -- STR_TALK_HEAD_WHISPER = "æ‚„æ‚„åœ°è¯´ï¼š",
+                -- STR_TALK_HEAD_WHISPER_REPLY = "ä½ æ‚„æ‚„åœ°å¯¹",
+                -- STR_TALK_HEAD_SAY = "è¯´ï¼š",
+                -- STR_TALK_HEAD_SAY1 = "ï¼š",
+                -- STR_TALK_HEAD_SAY2 = "å¤§å£°å–Šï¼š",
                 local bSkiped = false
                 for i, v in ipairs(tMsgContent) do
                     if (i < 4 and not bSkiped) and (
@@ -127,32 +127,32 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
         end
         rec.hash = string.gsub(rec.text, '[\n%s]+', '')
         --------------------------------------------------------------------------------------
-        -- ¿ªÊ¼¼ÆËãÊÇ·ñ·ûºÏ¹ýÂËÆ÷ÒªÇó
+        -- å¼€å§‹è®¡ç®—æ˜¯å¦ç¬¦åˆè¿‡æ»¤å™¨è¦æ±‚
         local bCatch = false
         if MY_ChatMonitor.bIsRegexp then    -- regexp
             if string.find(rec.text, MY_ChatMonitor.szKeyWords) then
                 bCatch = true
             end
         else        -- normal
-            -- 10|Ê®ÈË,ÑªÕ½Ìì²ß|XZTC,!Ð¡Ìú±»³ÔÁË,!¿ªÑçºÚÌú;´óÕ½
+            -- 10|åäºº,è¡€æˆ˜å¤©ç­–|XZTC,!å°é“è¢«åƒäº†,!å¼€å®´é»‘é“;å¤§æˆ˜
             local bKeyWordsLine = false
-            for _, szKeyWordsLine in ipairs( MY.String.Split(StringLowerW(MY_ChatMonitor.szKeyWords), ';') ) do -- ·ûºÏÒ»¸ö¼´¿É
+            for _, szKeyWordsLine in ipairs( MY.String.Split(StringLowerW(MY_ChatMonitor.szKeyWords), ';') ) do -- ç¬¦åˆä¸€ä¸ªå³å¯
                 if bKeyWordsLine then break end
-                -- 10|Ê®ÈË,ÑªÕ½Ìì²ß|XZTC,!Ð¡Ìú±»³ÔÁË,!¿ªÑçºÚÌú
+                -- 10|åäºº,è¡€æˆ˜å¤©ç­–|XZTC,!å°é“è¢«åƒäº†,!å¼€å®´é»‘é“
                 local bKeyWords = true
-                for _, szKeyWords in ipairs( MY.String.Split(szKeyWordsLine, ',') ) do            -- ±ØÐëÈ«²¿·ûºÏ
+                for _, szKeyWords in ipairs( MY.String.Split(szKeyWordsLine, ',') ) do            -- å¿…é¡»å…¨éƒ¨ç¬¦åˆ
                     if not bKeyWords then break end
-                    -- 10|Ê®ÈË
+                    -- 10|åäºº
                     local bKeyWord = false
-                    for _, szKeyWord in ipairs( MY.String.Split(szKeyWords, '|') ) do         -- ·ûºÏÒ»¸ö¼´¿É
+                    for _, szKeyWord in ipairs( MY.String.Split(szKeyWords, '|') ) do         -- ç¬¦åˆä¸€ä¸ªå³å¯
                         if bKeyWord then break end
                         szKeyWord = MY.String.PatternEscape(szKeyWord)
-                        if string.sub(szKeyWord, 1, 1)=="!" then    -- !Ð¡Ìú±»³ÔÁË
+                        if string.sub(szKeyWord, 1, 1)=="!" then    -- !å°é“è¢«åƒäº†
                             szKeyWord = string.sub(szKeyWord, 2)
                             if not string.find(rec.text, szKeyWord) then
                                 bKeyWord = true
                             end
-                        else                                        -- Ê®ÈË   -- 10
+                        else                                        -- åäºº   -- 10
                             if string.find(rec.text, szKeyWord) then
                                 bKeyWord = true
                             end
@@ -165,17 +165,17 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
             bCatch = bKeyWordsLine
         end
         --------------------------------------------------------------------------------------------
-        -- Èç¹û·ûºÏÒªÇó  -- ÑéÖ¤ÏûÏ¢¹þÏ£ Èç¹û´æÔÚÔòÌø¹ý¸ÃÏûÏ¢
+        -- å¦‚æžœç¬¦åˆè¦æ±‚  -- éªŒè¯æ¶ˆæ¯å“ˆå¸Œ å¦‚æžœå­˜åœ¨åˆ™è·³è¿‡è¯¥æ¶ˆæ¯
         if bCatch and (not (_tRecords[rec.hash] and MY_ChatMonitor.bIgnoreSame)) then
-            -- ÑéÖ¤¼ÇÂ¼ÊÇ·ñ³¬¹ýÏÞÖÆÌõÊý
+            -- éªŒè¯è®°å½•æ˜¯å¦è¶…è¿‡é™åˆ¶æ¡æ•°
             if #_tRecords >= MY_ChatMonitor.nMaxRecord then 
-                -- ´¦Àí¼ÇÂ¼ÁÐ±í
+                -- å¤„ç†è®°å½•åˆ—è¡¨
                 _tRecords[_tRecords[1].hash] = _tRecords[_tRecords[1].hash] - 1
                 if _tRecords[_tRecords[1].hash] <= 0 then
                     _tRecords[_tRecords[1].hash] = nil
                 end
                 table.remove(_tRecords, 1)
-                -- ´¦ÀíUI
+                -- å¤„ç†UI
                 if _MY_ChatMonitor.uiBoard then
                     local nCopyLinkCount = 0
                     _MY_ChatMonitor.uiBoard:hdl(1):children():each(function(ui)
@@ -195,7 +195,7 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
                 end
             end
             
-            -- ¿ªÊ¼×é×°Ò»Ìõ¼ÇÂ¼ rec
+            -- å¼€å§‹ç»„è£…ä¸€æ¡è®°å½• rec
             rec.html = MY.Chat.GetTimeLinkText({r=r, g=g, b=b, f=nFont}) .. rec.html
             -- save animiate group into name
             rec.html = string.gsub(rec.html, "group=(%d+) </a", "group=%1 name=\"%1\" </a")	
@@ -206,17 +206,17 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
                 rec.html = MY_Farbnamen.Render(rec.html)
             end
             
-            -- ·¢³öÌáÊ¾Òô
+            -- å‘å‡ºæç¤ºéŸ³
             if MY_ChatMonitor.bPlaySound then
                 MY.Sys.PlaySound(MY.GetAddonInfo().szRoot.."ChatMonitor\\audio\\MsgArrive.wav", "MsgArrive.wav")
             end
             
-            -- Èç¹ûÉèÖÃÖØ¶¨Ïòµ½ÏµÍ³ÏûÏ¢ÔòÊä³ö
+            -- å¦‚æžœè®¾ç½®é‡å®šå‘åˆ°ç³»ç»Ÿæ¶ˆæ¯åˆ™è¾“å‡º
             if MY_ChatMonitor.bRedirectSysChannel and not ( r==rgbSysMsg[1] and g==rgbSysMsg[2] and b==rgbSysMsg[3] ) then
                 OutputMessage("MSG_SYS", GetFormatText("",nil, 255,255,0)..szMsg, true)
             end
             
-            -- ¸üÐÂUI
+            -- æ›´æ–°UI
             if _MY_ChatMonitor.uiBoard then
                 _MY_ChatMonitor.uiBoard:append(rec.html)
             end
@@ -224,7 +224,7 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
                 _MY_ChatMonitor.ShowTip(rec.html)
             end
             
-            -- ¸üÐÂ»º´æÊý×é ¹þÏ£±í
+            -- æ›´æ–°ç¼“å­˜æ•°ç»„ å“ˆå¸Œè¡¨
             _tRecords[rec.hash] = (_tRecords[rec.hash] or 0) + 1
             table.insert(_tRecords, rec)
         end
@@ -444,7 +444,7 @@ _MY_ChatMonitor.Init = function()
     _MY_ChatMonitor.uiFrame = MY.UI.CreateFrame('MY_ChatMonitor', MY.Const.UI.Frame.TOPMOST_EMPTY)
       :size(250,150)
       :toggle(false)
-      :onevent("UI_SCALED", function() -- ÒÆ¶¯ÌáÊ¾´°Î»ÖÃ
+      :onevent("UI_SCALED", function() -- ç§»åŠ¨æç¤ºçª—ä½ç½®
         _MY_ChatMonitor.uiFrame:anchor(MY_ChatMonitor.anchor)
       end)
       :customMode(_L["chat monitor"], function()

@@ -1,6 +1,6 @@
 --
--- ±âÆ½ÑªÌõUI²Ù×÷Àà
--- Ö»×öUI²Ù×÷ ²»×öÈÎºÎÂß¼­ÅĞ¶Ï
+-- æ‰å¹³è¡€æ¡UIæ“ä½œç±»
+-- åªåšUIæ“ä½œ ä¸åšä»»ä½•é€»è¾‘åˆ¤æ–­
 --
 XLifeBar = XLifeBar or {}
 XLifeBar.HP = class()
@@ -12,7 +12,7 @@ function HP:ctor(dwID, frame, handle) -- KGobject
     self.handle = handle
     return self
 end
--- ´´½¨
+-- åˆ›å»º
 function HP:Create()
     -- Create handle
     local frame = self.frame
@@ -37,7 +37,7 @@ function HP:Create()
     return self
 end
 
--- É¾³ı
+-- åˆ é™¤
 function HP:Remove()
     local frame = self.frame
     if frame:Lookup("",tostring(self.dwID)) then
@@ -47,9 +47,9 @@ function HP:Remove()
     return self
 end
 
--- »æÖÆÃû×Ö/°ï»á/³ÆºÅ µÈµÈ ĞĞÎÄ×Ö
--- rgbaf: ºì,ÂÌ,À¶,Í¸Ã÷¶È,×ÖÌå
--- tWordlines: {[ÎÄ×Ö,¸ß¶ÈÆ«ÒÆ],...}
+-- ç»˜åˆ¶åå­—/å¸®ä¼š/ç§°å· ç­‰ç­‰ è¡Œæ–‡å­—
+-- rgbaf: çº¢,ç»¿,è“,é€æ˜åº¦,å­—ä½“
+-- tWordlines: {[æ–‡å­—,é«˜åº¦åç§»],...}
 function HP:DrawWordlines(tWordlines, rgbaf)
     if not self.handle then
         return
@@ -66,7 +66,7 @@ function HP:DrawWordlines(tWordlines, rgbaf)
     return self
 end
 
--- »æÖÆÑªÁ¿°Ù·Ö±ÈÎÄ×Ö£¨¼õÉÙÖØ»æ´ÎÊıËùÒÔºÍWordlines·ÖÀë£©
+-- ç»˜åˆ¶è¡€é‡ç™¾åˆ†æ¯”æ–‡å­—ï¼ˆå‡å°‘é‡ç»˜æ¬¡æ•°æ‰€ä»¥å’ŒWordlinesåˆ†ç¦»ï¼‰
 function HP:DrawLifePercentage(aWordline, rgbaf)
     if not self.handle then
         return
@@ -80,7 +80,7 @@ function HP:DrawLifePercentage(aWordline, rgbaf)
     sha:AppendCharacterID(self.dwID,true,r,g,b,a,{0,0,0,0,- aWordline[2]},f,aWordline[1],1,1)
 end
 
--- »æÖÆ¶ÁÌõÃû³Æ£¨¼õÉÙÖØ»æ´ÎÊıËùÒÔºÍWordlines·ÖÀë£©
+-- ç»˜åˆ¶è¯»æ¡åç§°ï¼ˆå‡å°‘é‡ç»˜æ¬¡æ•°æ‰€ä»¥å’ŒWordlinesåˆ†ç¦»ï¼‰
 function HP:DrawOTTitle(aWordline, rgbaf)
     if not self.handle then
         return
@@ -96,7 +96,7 @@ function HP:DrawOTTitle(aWordline, rgbaf)
     return self
 end
 
--- Ìî³ä±ß¿ò Ä¬ÈÏ200µÄnAlpha
+-- å¡«å……è¾¹æ¡† é»˜è®¤200çš„nAlpha
 function HP:DrawBorder(nWidth, nHeight, nOffsetY, nAlpha, szShadowName, szShadowName2)
     if not self.handle then
         return
@@ -104,7 +104,7 @@ function HP:DrawBorder(nWidth, nHeight, nOffsetY, nAlpha, szShadowName, szShadow
     nAlpha = nAlpha or 200
     local handle = self.handle
     
-    -- »æÖÆÍâ±ß¿ò
+    -- ç»˜åˆ¶å¤–è¾¹æ¡†
     local sha = handle:Lookup(string.format(szShadowName,self.dwID))
     sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
     sha:SetD3DPT(D3DPT.TRIANGLEFAN)
@@ -116,7 +116,7 @@ function HP:DrawBorder(nWidth, nHeight, nOffsetY, nAlpha, szShadowName, szShadow
     sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX+nWidth,bcY+nHeight})
     sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX,bcY+nHeight})
 
-    -- »æÖÆÄÚ±ß¿ò
+    -- ç»˜åˆ¶å†…è¾¹æ¡†
     local sha = handle:Lookup(string.format(szShadowName2,self.dwID))
     sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
     sha:SetD3DPT(D3DPT.TRIANGLEFAN)
@@ -131,17 +131,17 @@ function HP:DrawBorder(nWidth, nHeight, nOffsetY, nAlpha, szShadowName, szShadow
     return self
 end
 
--- Ìî³äÑªÌõ±ß¿ò Ä¬ÈÏ200µÄnAlpha
+-- å¡«å……è¡€æ¡è¾¹æ¡† é»˜è®¤200çš„nAlpha
 function HP:DrawLifeBorder(nWidth, nHeight, nOffsetY, nAlpha)
     return self:DrawBorder(nWidth, nHeight, nOffsetY, nAlpha, "hp_bg_%s", "hp_bg2_%s")
 end
--- Ìî³ä¶ÁÌõ±ß¿ò Ä¬ÈÏ200µÄnAlpha
+-- å¡«å……è¯»æ¡è¾¹æ¡† é»˜è®¤200çš„nAlpha
 function HP:DrawOTBarBorder(nWidth, nHeight, nOffsetY, nAlpha)
     return self:DrawBorder(nWidth, nHeight, nOffsetY, nAlpha, "ot_bg_%s", "ot_bg2_%s")
 end
 
--- Ìî³ä¾ØĞÎ£¨½ø¶ÈÌõ/ÑªÌõ£©
--- rgbap: ºì,ÂÌ,À¶,Í¸Ã÷¶È,½ø¶È
+-- å¡«å……çŸ©å½¢ï¼ˆè¿›åº¦æ¡/è¡€æ¡ï¼‰
+-- rgbap: çº¢,ç»¿,è“,é€æ˜åº¦,è¿›åº¦
 function HP:DrawRect(nWidth, nHeight, nOffsetY, rgbap, szShadowName)
     if not self.handle then
         return
@@ -155,7 +155,7 @@ function HP:DrawRect(nWidth, nHeight, nOffsetY, rgbap, szShadowName)
     sha:ClearTriangleFanPoint()
     
     local bcX,bcY = - (nWidth / 2 - 2),(- (nHeight - 2)) - nOffsetY
-    nWidth = (nWidth - 4) * p -- ¼ÆËãÊµ¼Ê»æÖÆ¿í¶È
+    nWidth = (nWidth - 4) * p -- è®¡ç®—å®é™…ç»˜åˆ¶å®½åº¦
     
     sha:AppendCharacterID(self.dwID,true,r,g,b,a,{0,0,0,bcX,bcY})
     sha:AppendCharacterID(self.dwID,true,r,g,b,a,{0,0,0,bcX+nWidth,bcY})
@@ -165,12 +165,12 @@ function HP:DrawRect(nWidth, nHeight, nOffsetY, rgbap, szShadowName)
     return self
 end
 
--- Ìî³äÑªÌõ
+-- å¡«å……è¡€æ¡
 function HP:DrawLifebar(nWidth, nHeight, nOffsetY, rgbap)
     return self:DrawRect(nWidth, nHeight, nOffsetY, rgbap, "hp_%s")
 end
 
--- Ìî³ä¶ÁÌõ
+-- å¡«å……è¯»æ¡
 function HP:DrawOTBar(nWidth, nHeight, nOffsetY, rgbap)
     return self:DrawRect(nWidth, nHeight, nOffsetY, rgbap, "ot_%s")
 end

@@ -7,17 +7,17 @@ local CHAT_TIME = {
 MY_Chat = MY_Chat or {}
 local _Cache = {
     ['tChannels'] = {
-        {name="Radio_Say",      title=_L["SAY"],      head={string=g_tStrings.HEADER_SHOW_SAY,          code="/s "}, channel=PLAYER_TALK_CHANNEL.NEARBY       , color={255, 255, 255}},--Àµ
-        {name="Radio_Map",      title=_L["MAP"],      head={string=g_tStrings.HEADER_SHOW_MAP,          code="/y "}, channel=PLAYER_TALK_CHANNEL.SENCE        , color={255, 126, 126}},--µÿ
-        {name="Radio_World",    title=_L["WORLD"],    head={string=g_tStrings.HEADER_SHOW_WORLD,        code="/h "}, channel=PLAYER_TALK_CHANNEL.WORLD        , color={252, 204, 204}},-- ¿
-        {name="Radio_Party",    title=_L["PARTY"],    head={string=g_tStrings.HEADER_SHOW_CHAT_PARTY,   code="/p "}, channel=PLAYER_TALK_CHANNEL.TEAM         , color={140, 178, 253}},--∂”
-        {name="Radio_Team",     title=_L["TEAM"],     head={string=g_tStrings.HEADER_SHOW_TEAM,         code="/t "}, channel=PLAYER_TALK_CHANNEL.RAID         , color={ 73, 168, 241}},--Õ≈
-        {name="Radio_Battle",   title=_L["BATTLE"],   head={string=g_tStrings.HEADER_SHOW_BATTLE_FIELD, code="/b "}, channel=PLAYER_TALK_CHANNEL.BATTLE_FIELD , color={255, 126, 126}},--’Ω
-        {name="Radio_Tong",     title=_L["FACTION"],  head={string=g_tStrings.HEADER_SHOW_CHAT_FACTION, code="/g "}, channel=PLAYER_TALK_CHANNEL.TONG         , color={  0, 200,  72}},--∞Ô
-        {name="Radio_School",   title=_L["SCHOOL"],   head={string=g_tStrings.HEADER_SHOW_SCHOOL,       code="/f "}, channel=PLAYER_TALK_CHANNEL.FORCE        , color={  0, 255, 255}},--≈…
-        {name="Radio_Camp",     title=_L["CAMP"],     head={string=g_tStrings.HEADER_SHOW_CAMP,         code="/c "}, channel=PLAYER_TALK_CHANNEL.CAMP         , color={155, 230,  58}},--’Û
-        {name="Radio_Friend",   title=_L["FRIEND"],   head={string=g_tStrings.HEADER_SHOW_FRIEND,       code="/o "}, channel=PLAYER_TALK_CHANNEL.FRIENDS      , color={241, 114, 183}},--”—
-        {name="Radio_Alliance", title=_L["ALLIANCE"], head={string=g_tStrings.HEADER_SHOW_CHAT_ALLIANCE,code="/a "}, channel=PLAYER_TALK_CHANNEL.TONG_ALLIANCE, color={178, 240, 164}},--√À
+        {name="Radio_Say",      title=_L["SAY"],      head={string=g_tStrings.HEADER_SHOW_SAY,          code="/s "}, channel=PLAYER_TALK_CHANNEL.NEARBY       , color={255, 255, 255}},--ËØ¥
+        {name="Radio_Map",      title=_L["MAP"],      head={string=g_tStrings.HEADER_SHOW_MAP,          code="/y "}, channel=PLAYER_TALK_CHANNEL.SENCE        , color={255, 126, 126}},--Âú∞
+        {name="Radio_World",    title=_L["WORLD"],    head={string=g_tStrings.HEADER_SHOW_WORLD,        code="/h "}, channel=PLAYER_TALK_CHANNEL.WORLD        , color={252, 204, 204}},--‰∏ñ
+        {name="Radio_Party",    title=_L["PARTY"],    head={string=g_tStrings.HEADER_SHOW_CHAT_PARTY,   code="/p "}, channel=PLAYER_TALK_CHANNEL.TEAM         , color={140, 178, 253}},--Èòü
+        {name="Radio_Team",     title=_L["TEAM"],     head={string=g_tStrings.HEADER_SHOW_TEAM,         code="/t "}, channel=PLAYER_TALK_CHANNEL.RAID         , color={ 73, 168, 241}},--Âõ¢
+        {name="Radio_Battle",   title=_L["BATTLE"],   head={string=g_tStrings.HEADER_SHOW_BATTLE_FIELD, code="/b "}, channel=PLAYER_TALK_CHANNEL.BATTLE_FIELD , color={255, 126, 126}},--Êàò
+        {name="Radio_Tong",     title=_L["FACTION"],  head={string=g_tStrings.HEADER_SHOW_CHAT_FACTION, code="/g "}, channel=PLAYER_TALK_CHANNEL.TONG         , color={  0, 200,  72}},--Â∏Æ
+        {name="Radio_School",   title=_L["SCHOOL"],   head={string=g_tStrings.HEADER_SHOW_SCHOOL,       code="/f "}, channel=PLAYER_TALK_CHANNEL.FORCE        , color={  0, 255, 255}},--Ê¥æ
+        {name="Radio_Camp",     title=_L["CAMP"],     head={string=g_tStrings.HEADER_SHOW_CAMP,         code="/c "}, channel=PLAYER_TALK_CHANNEL.CAMP         , color={155, 230,  58}},--Èòµ
+        {name="Radio_Friend",   title=_L["FRIEND"],   head={string=g_tStrings.HEADER_SHOW_FRIEND,       code="/o "}, channel=PLAYER_TALK_CHANNEL.FRIENDS      , color={241, 114, 183}},--Âèã
+        {name="Radio_Alliance", title=_L["ALLIANCE"], head={string=g_tStrings.HEADER_SHOW_CHAT_ALLIANCE,code="/a "}, channel=PLAYER_TALK_CHANNEL.TONG_ALLIANCE, color={178, 240, 164}},--Áõü
     },
 }
 MY_Chat.bLockPostion = false
@@ -32,7 +32,7 @@ MY_Chat.bChatCopyAlwaysShowMask = false
 MY_Chat.bChatCopyAlwaysWhite = false
 MY_Chat.bChatCopyNoCopySysmsg = true
 MY_Chat.bReplaceIcon = false
-MY_Chat.bDisplayPanel = true    --  «∑Òœ‘ æ√Ê∞Â
+MY_Chat.bDisplayPanel = true    -- ÊòØÂê¶ÊòæÁ§∫Èù¢Êùø
 
 MY_Chat.tChannel = {
     ["Radio_Say"] = true,
@@ -246,17 +246,17 @@ MY_Chat.GetMenu = function()
                 szOption = _L['keyword manager'],
                 fnAction = function()
                     MY.UI.OpenListEditor('MY_Chat_KeywordManager', MY_Chat.tBlockWords, function(szText)
-                        -- »•µÙ«∞∫Ûø’∏Ò
+                        -- ÂéªÊéâÂâçÂêéÁ©∫Ê†º
                         szText = (string.gsub(szText, "^%s*(.-)%s*$", "%1"))
-                        -- —È÷§ «∑ÒŒ™ø’
+                        -- È™åËØÅÊòØÂê¶‰∏∫Á©∫
                         if szText=="" then return nil end
-                        -- —È÷§ «∑Ò÷ÿ∏¥
+                        -- È™åËØÅÊòØÂê¶ÈáçÂ§ç
                         for i, v in ipairs(MY_Chat.tBlockWords) do
                             if v==szText then
                                 return false
                             end
                         end
-                        -- º”»Î±Ì
+                        -- Âä†ÂÖ•Ë°®
                         table.insert(MY_Chat.tBlockWords, szText)
                     end, function(szText)
                         for i=#MY_Chat.tBlockWords, 1, -1 do

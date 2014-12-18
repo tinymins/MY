@@ -1,16 +1,16 @@
 ---------------------------------
--- ÜøÒÁ²å¼ş
--- by£ºÜøÒÁ@Ë«ÃÎÕò@×··çõæÓ°
--- ref: ½è¼ø´óÁ¿º£÷©Ô´Âë @haimanchajian.com
+-- èŒ—ä¼Šæ’ä»¶
+-- byï¼šèŒ—ä¼Š@åŒæ¢¦é•‡@è¿½é£è¹‘å½±
+-- ref: å€Ÿé‰´å¤§é‡æµ·é³—æºç  @haimanchajian.com
 ---------------------------------
 -----------------------------------------------
--- ±¾µØº¯ÊıºÍ±äÁ¿
+-- æœ¬åœ°å‡½æ•°å’Œå˜é‡
 -----------------------------------------------
 MY = MY or {}
 MY.Sys = MY.Sys or {}
 local _Cache, _L = {}, MY.LoadLangPack()
 
---[[ »ñÈ¡ÓÎÏ·ÓïÑÔ
+--[[ è·å–æ¸¸æˆè¯­è¨€
 ]]
 MY.Sys.GetLang = function()
     local _, _, lang = GetVersion()
@@ -35,24 +35,24 @@ MY.GetLang = MY.Sys.GetLang
   # #     #   #       #     # # #     #       #       #       # #                 #   #       #  
 #######################################################################################################
 ]]
---[[ ±£´æÊı¾İÎÄ¼ş
+--[[ ä¿å­˜æ•°æ®æ–‡ä»¶
     MY.SaveLUAData( szFileUri, tData[, bNoDistinguishLang] )
-    szFileUri           Êı¾İÎÄ¼şÂ·¾¶(1)
-    tData               Òª±£´æµÄÊı¾İ
-    bNoDistinguishLang  ÊÇ·ñÈ¡Ïû×Ô¶¯Çø·Ö¿Í»§¶ËÓïÑÔ
-    (1)£º µ±Â·¾¶Îª¾ø¶ÔÂ·¾¶Ê±(ÒÔĞ±¸Ü¿ªÍ·)²»×÷´¦Àí
-          µ±Â·¾¶ÎªÏà¶ÔÂ·¾¶Ê± Ïà¶ÔÓÚ²å¼şÏÂ@DATAÄ¿Â¼
+    szFileUri           æ•°æ®æ–‡ä»¶è·¯å¾„(1)
+    tData               è¦ä¿å­˜çš„æ•°æ®
+    bNoDistinguishLang  æ˜¯å¦å–æ¶ˆè‡ªåŠ¨åŒºåˆ†å®¢æˆ·ç«¯è¯­è¨€
+    (1)ï¼š å½“è·¯å¾„ä¸ºç»å¯¹è·¯å¾„æ—¶(ä»¥æ–œæ å¼€å¤´)ä¸ä½œå¤„ç†
+          å½“è·¯å¾„ä¸ºç›¸å¯¹è·¯å¾„æ—¶ ç›¸å¯¹äºæ’ä»¶ä¸‹@DATAç›®å½•
 ]]
 MY.Sys.SaveLUAData = function(szFileUri, tData, bNoDistinguishLang)
-    -- Í³Ò»»¯Ä¿Â¼·Ö¸ô·û
+    -- ç»Ÿä¸€åŒ–ç›®å½•åˆ†éš”ç¬¦
     szFileUri = string.gsub(szFileUri, '\\', '/')
-    -- Èç¹ûÊÇÏà¶ÔÂ·¾¶Ôò´Ó/@DATA/²¹È«
+    -- å¦‚æœæ˜¯ç›¸å¯¹è·¯å¾„åˆ™ä»/@DATA/è¡¥å…¨
     if string.sub(szFileUri, 1, 1)~='/' then
         szFileUri = MY.GetAddonInfo().szRoot .. "@DATA/" .. szFileUri
     end
-    -- Í³Ò»ºó×º
+    -- ç»Ÿä¸€åç¼€
     szFileUri = szFileUri .. '.MYDATA'
-    -- Ìí¼ÓÓÎÏ·ÓïÑÔºó×º
+    -- æ·»åŠ æ¸¸æˆè¯­è¨€åç¼€
     if not bNoDistinguishLang then
         local _, _, lang = GetVersion()
         lang = string.upper(lang)
@@ -60,27 +60,27 @@ MY.Sys.SaveLUAData = function(szFileUri, tData, bNoDistinguishLang)
             szFileUri = szFileUri .. '_' .. lang
         end
     end
-    -- µ÷ÓÃÏµÍ³API
+    -- è°ƒç”¨ç³»ç»ŸAPI
     return SaveLUAData(szFileUri, tData)
 end
 MY.SaveLUAData = MY.Sys.SaveLUAData
---[[ ¼ÓÔØÊı¾İÎÄ¼ş£ºÏà¶ÔÓÚdataÎÄ¼ş¼Ğ
+--[[ åŠ è½½æ•°æ®æ–‡ä»¶ï¼šç›¸å¯¹äºdataæ–‡ä»¶å¤¹
     MY.LoadLUAData( szFileUri[, bNoDistinguishLang] )
-    szFileUri           Êı¾İÎÄ¼şÂ·¾¶(1)
-    bNoDistinguishLang  ÊÇ·ñÈ¡Ïû×Ô¶¯Çø·Ö¿Í»§¶ËÓïÑÔ
-    (1)£º µ±Â·¾¶Îª¾ø¶ÔÂ·¾¶Ê±(ÒÔĞ±¸Ü¿ªÍ·)²»×÷´¦Àí
-          µ±Â·¾¶ÎªÏà¶ÔÂ·¾¶Ê± Ïà¶ÔÓÚ²å¼şÏÂ@DATAÄ¿Â¼
+    szFileUri           æ•°æ®æ–‡ä»¶è·¯å¾„(1)
+    bNoDistinguishLang  æ˜¯å¦å–æ¶ˆè‡ªåŠ¨åŒºåˆ†å®¢æˆ·ç«¯è¯­è¨€
+    (1)ï¼š å½“è·¯å¾„ä¸ºç»å¯¹è·¯å¾„æ—¶(ä»¥æ–œæ å¼€å¤´)ä¸ä½œå¤„ç†
+          å½“è·¯å¾„ä¸ºç›¸å¯¹è·¯å¾„æ—¶ ç›¸å¯¹äºæ’ä»¶ä¸‹@DATAç›®å½•
 ]]
 MY.Sys.LoadLUAData = function(szFileUri, bNoDistinguishLang)
-    -- Í³Ò»»¯Ä¿Â¼·Ö¸ô·û
+    -- ç»Ÿä¸€åŒ–ç›®å½•åˆ†éš”ç¬¦
     szFileUri = string.gsub(szFileUri, '\\', '/')
-    -- Èç¹ûÊÇÏà¶ÔÂ·¾¶Ôò´Ó/@DATA/²¹È«
+    -- å¦‚æœæ˜¯ç›¸å¯¹è·¯å¾„åˆ™ä»/@DATA/è¡¥å…¨
     if string.sub(szFileUri, 1, 1)~='/' then
         szFileUri = MY.GetAddonInfo().szRoot .. "@DATA/" .. szFileUri
     end
-    -- Í³Ò»ºó×º
+    -- ç»Ÿä¸€åç¼€
     szFileUri = szFileUri .. '.MYDATA'
-    -- Ìí¼ÓÓÎÏ·ÓïÑÔºó×º
+    -- æ·»åŠ æ¸¸æˆè¯­è¨€åç¼€
     if not bNoDistinguishLang then
         local _, _, lang = GetVersion()
         lang = string.upper(lang)
@@ -88,19 +88,19 @@ MY.Sys.LoadLUAData = function(szFileUri, bNoDistinguishLang)
             szFileUri = szFileUri .. '_' .. lang
         end
     end
-    -- µ÷ÓÃÏµÍ³API
+    -- è°ƒç”¨ç³»ç»ŸAPI
     return LoadLUAData(szFileUri)
 end
 MY.LoadLUAData = MY.Sys.LoadLUAData
 
---[[ ±£´æÓÃ»§Êı¾İ ×¢ÒâÒªÔÚÓÎÏ·³õÊ¼»¯Ö®ºóÊ¹ÓÃ²»È»Ã»ÓĞClientPlayer¶ÔÏó
+--[[ ä¿å­˜ç”¨æˆ·æ•°æ® æ³¨æ„è¦åœ¨æ¸¸æˆåˆå§‹åŒ–ä¹‹åä½¿ç”¨ä¸ç„¶æ²¡æœ‰ClientPlayerå¯¹è±¡
     (data) MY.Sys.SaveUserData(szFileUri, tData)
 ]]
 MY.Sys.SaveUserData = function(szFileUri, tData)
     return MY.Sys.SaveLUAData(szFileUri.."_"..(MY.Game.GetServer()).."_"..UI_GetClientPlayerID(), tData)
 end
 
---[[ ¼ÓÔØÓÃ»§Êı¾İ ×¢ÒâÒªÔÚÓÎÏ·³õÊ¼»¯Ö®ºóÊ¹ÓÃ²»È»Ã»ÓĞClientPlayer¶ÔÏó
+--[[ åŠ è½½ç”¨æˆ·æ•°æ® æ³¨æ„è¦åœ¨æ¸¸æˆåˆå§‹åŒ–ä¹‹åä½¿ç”¨ä¸ç„¶æ²¡æœ‰ClientPlayerå¯¹è±¡
     (data) MY.Sys.LoadUserData(szFile [,szSubAddonName])
 ]]
 MY.Sys.LoadUserData = function(szFileUri)
@@ -112,29 +112,29 @@ MY.RegisterUserData = function(szName, szFileName)
     
 end
 
---[[ ²¥·ÅÉùÒô
+--[[ æ’­æ”¾å£°éŸ³
     MY.Sys.PlaySound(szFilePath[, szCustomPath])
-    szFilePath   ÒôÆµÎÄ¼şµØÖ·
-    szCustomPath ¸öĞÔ»¯ÒôÆµÎÄ¼şµØÖ·
-    ×¢£ºÓÅÏÈ²¥·ÅszCustomPath, szCustomPath²»´æÔÚ²Å»á²¥·ÅszFilePath
+    szFilePath   éŸ³é¢‘æ–‡ä»¶åœ°å€
+    szCustomPath ä¸ªæ€§åŒ–éŸ³é¢‘æ–‡ä»¶åœ°å€
+    æ³¨ï¼šä¼˜å…ˆæ’­æ”¾szCustomPath, szCustomPathä¸å­˜åœ¨æ‰ä¼šæ’­æ”¾szFilePath
 ]]
 MY.Sys.PlaySound = function(szFilePath, szCustomPath)
     szCustomPath = szCustomPath or szFilePath
-    -- Í³Ò»»¯Ä¿Â¼·Ö¸ô·û
+    -- ç»Ÿä¸€åŒ–ç›®å½•åˆ†éš”ç¬¦
     szCustomPath = string.gsub(szCustomPath, '\\', '/')
-    -- Èç¹ûÊÇÏà¶ÔÂ·¾¶Ôò´Ó/@Custom/²¹È«
+    -- å¦‚æœæ˜¯ç›¸å¯¹è·¯å¾„åˆ™ä»/@Custom/è¡¥å…¨
     if string.sub(szCustomPath, 1, 1)~='/' then szCustomPath = MY.GetAddonInfo().szRoot .. "@Custom/" .. szCustomPath end
     if IsFileExist(szCustomPath) then
         PlaySound(SOUND.UI_SOUND, szCustomPath)
     else
-        -- Í³Ò»»¯Ä¿Â¼·Ö¸ô·û
+        -- ç»Ÿä¸€åŒ–ç›®å½•åˆ†éš”ç¬¦
         szFilePath = string.gsub(szFilePath, '\\', '/')
-        -- Èç¹ûÊÇÏà¶ÔÂ·¾¶Ôò´Ó/@Custom/²¹È«
+        -- å¦‚æœæ˜¯ç›¸å¯¹è·¯å¾„åˆ™ä»/@Custom/è¡¥å…¨
         if string.sub(szFilePath, 1, 1)~='/' then szFilePath = MY.GetAddonInfo().szFrameworkRoot .. "audio/" .. szFilePath end
         PlaySound(SOUND.UI_SOUND, szFilePath)
     end
 end
--- ¼ÓÔØ×¢²áÊı¾İ
+-- åŠ è½½æ³¨å†Œæ•°æ®
 MY.RegisterInit(function()
     for v_name, v_data in pairs(MY.LoadLUAData('config/initalized_var') or {}) do
         local t = _G
@@ -165,27 +165,27 @@ end)
   #               # # #             #       #       #     #       # #             # #           
 --#######################################################################################################
 ]]
-_Cache.tRequest = {}      -- ÍøÂçÇëÇó¶ÓÁĞ
-_Cache.bRequest = false   -- ÍøÂçÇëÇó·±Ã¦ÖĞ
---[[ (void) MY.RemoteRequest(string szUrl, func fnAction)       -- ·¢ÆğÔ¶³Ì HTTP ÇëÇó
--- szUrl        -- ÇëÇóµÄÍêÕû URL£¨°üº¬ http:// »ò https://£©
--- fnAction     -- ÇëÇóÍê³ÉºóµÄ»Øµ÷º¯Êı£¬»Øµ÷Ô­ĞÍ£ºfunction(szTitle, szContent)]]
+_Cache.tRequest = {}      -- ç½‘ç»œè¯·æ±‚é˜Ÿåˆ—
+_Cache.bRequest = false   -- ç½‘ç»œè¯·æ±‚ç¹å¿™ä¸­
+--[[ (void) MY.RemoteRequest(string szUrl, func fnAction)       -- å‘èµ·è¿œç¨‹ HTTP è¯·æ±‚
+-- szUrl        -- è¯·æ±‚çš„å®Œæ•´ URLï¼ˆåŒ…å« http:// æˆ– https://ï¼‰
+-- fnAction     -- è¯·æ±‚å®Œæˆåçš„å›è°ƒå‡½æ•°ï¼Œå›è°ƒåŸå‹ï¼šfunction(szTitle, szContent)]]
 MY.RemoteRequest = function(szUrl, fnSuccess, fnError, nTimeout)
-    -- ¸ñÊ½»¯²ÎÊı
+    -- æ ¼å¼åŒ–å‚æ•°
     if type(szUrl)~="string" then return end
     if type(fnSuccess)~="function" then return end
     if type(fnError)~="function" then fnError = function(szUrl,errMsg) MY.Debug(szUrl..' - '..errMsg.."\n",'RemoteRequest',1) end end
     if type(nTimeout)~="number" then nTimeout = 10000 end
-    -- ÔÚÇëÇó¶ÓÁĞÎ²²¿²åÈëÇëÇó
+    -- åœ¨è¯·æ±‚é˜Ÿåˆ—å°¾éƒ¨æ’å…¥è¯·æ±‚
     table.insert(_Cache.tRequest,{ szUrl = szUrl, fnSuccess = fnSuccess, fnError = fnError, nTimeout = nTimeout })
-    -- ¿ªÊ¼´¦ÀíÇëÇó¶ÓÁĞ
+    -- å¼€å§‹å¤„ç†è¯·æ±‚é˜Ÿåˆ—
     _Cache.DoRemoteRequest()
 end
--- ´¦ÀíÔ¶³ÌÇëÇó¶ÓÁĞ
+-- å¤„ç†è¿œç¨‹è¯·æ±‚é˜Ÿåˆ—
 _Cache.DoRemoteRequest = function()
-    -- Èç¹û¶ÓÁĞÎª¿Õ ÔòÖÃ¶ÓÁĞ×´Ì¬Îª¿ÕÏĞ²¢·µ»Ø
+    -- å¦‚æœé˜Ÿåˆ—ä¸ºç©º åˆ™ç½®é˜Ÿåˆ—çŠ¶æ€ä¸ºç©ºé—²å¹¶è¿”å›
     if table.getn(_Cache.tRequest)==0 then _Cache.bRequest = false MY.Debug('Remote Request Queue Is Clear.\n','MYRR',0) return end
-    -- Èç¹ûµ±Ç°¶ÓÁĞÓĞÎ´´¦ÀíµÄÇëÇó ²¢ÇÒÔ¶³ÌÇëÇó¶ÓÁĞ´¦ÓÚ¿ÕÏĞ×´Ì¬
+    -- å¦‚æœå½“å‰é˜Ÿåˆ—æœ‰æœªå¤„ç†çš„è¯·æ±‚ å¹¶ä¸”è¿œç¨‹è¯·æ±‚é˜Ÿåˆ—å¤„äºç©ºé—²çŠ¶æ€
     if not _Cache.bRequest then
         -- check if network plugins inited
         if not _Cache.hRequest then
@@ -195,49 +195,49 @@ _Cache.DoRemoteRequest = function()
             if _Cache.hRequest then
                 -- web page complete
                 _Cache.hRequest.OnDocumentComplete = function()
-                    -- ÅĞ¶ÏÊÇ·ñÓĞÔ¶³ÌÇëÇóµÈ´ı»Øµ÷ Ã»ÓĞÔòÖ±½Ó·µ»Ø
+                    -- åˆ¤æ–­æ˜¯å¦æœ‰è¿œç¨‹è¯·æ±‚ç­‰å¾…å›è°ƒ æ²¡æœ‰åˆ™ç›´æ¥è¿”å›
                     if not _Cache.bRequest then return end
-                    -- ´¦Àí»Øµ÷
+                    -- å¤„ç†å›è°ƒ
                     local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
-                    -- »ñÈ¡ÇëÇó¶ÓÁĞÊ×²¿ÔªËØ
+                    -- è·å–è¯·æ±‚é˜Ÿåˆ—é¦–éƒ¨å…ƒç´ 
                     local rr = _Cache.tRequest[1]
-                    -- ÅĞ¶Ïµ±Ç°Ò³ÃæÊÇ·ñ·ûºÏÇëÇó
+                    -- åˆ¤æ–­å½“å‰é¡µé¢æ˜¯å¦ç¬¦åˆè¯·æ±‚
                     if szUrl ~= szTitle or szContent~="" then
-                        -- ´¦ÀíÇëÇó»Øµ÷
+                        -- å¤„ç†è¯·æ±‚å›è°ƒ
                         MY.Debug(string.format("\n [RemoteRequest - OnDocumentComplete]\n [U] %s\n [T] %s\n", szUrl, szTitle),'MYRR',0)
-                        -- ×¢Ïú³¬Ê±´¦ÀíÊ±ÖÓ
+                        -- æ³¨é”€è¶…æ—¶å¤„ç†æ—¶é’Ÿ
                         MY.DelayCall("MY_Remote_Request_Timeout")
-                        -- ³É¹¦»Øµ÷º¯Êı
+                        -- æˆåŠŸå›è°ƒå‡½æ•°
                         pcall(rr.fnSuccess, szTitle, szContent)
-                        -- ´ÓÇëÇóÁĞ±íÒÆ³ı
+                        -- ä»è¯·æ±‚åˆ—è¡¨ç§»é™¤
                         table.remove(_Cache.tRequest, 1)
-                        -- ÖØÖÃÇëÇó×´Ì¬Îª¿ÕÏĞ
+                        -- é‡ç½®è¯·æ±‚çŠ¶æ€ä¸ºç©ºé—²
                         _Cache.bRequest = false
-                        -- ´¦ÀíÏÂÒ»¸öÔ¶³ÌÇëÇó
+                        -- å¤„ç†ä¸‹ä¸€ä¸ªè¿œç¨‹è¯·æ±‚
                         _Cache.DoRemoteRequest()
                     end
                 end
             end
             return
         end
-        -- »ñÈ¡¶ÓÁĞµÚÒ»¸öÔªËØ
+        -- è·å–é˜Ÿåˆ—ç¬¬ä¸€ä¸ªå…ƒç´ 
         local rr = _Cache.tRequest[1]
-        -- ×¢²áÇëÇó³¬Ê±´¦Àíº¯ÊıµÄÊ±ÖÓ
+        -- æ³¨å†Œè¯·æ±‚è¶…æ—¶å¤„ç†å‡½æ•°çš„æ—¶é’Ÿ
         MY.DelayCall(function()
             -- debug
             MY.Debug('Remote Request Timeout.\n','MYRR',1)
-            -- ÇëÇó³¬Ê± »Øµ÷ÇëÇó³¬Ê±º¯Êı
+            -- è¯·æ±‚è¶…æ—¶ å›è°ƒè¯·æ±‚è¶…æ—¶å‡½æ•°
             pcall(rr.fnError, rr.szUrl, "timeout")
-            -- ´ÓÇëÇó¶ÓÁĞÒÆ³ıÊ×ÔªËØ
+            -- ä»è¯·æ±‚é˜Ÿåˆ—ç§»é™¤é¦–å…ƒç´ 
             table.remove(_Cache.tRequest, 1)
-            -- ÖØÖÃÇëÇó¶ÓÁĞ×´Ì¬Îª¿ÕÏĞ
+            -- é‡ç½®è¯·æ±‚é˜Ÿåˆ—çŠ¶æ€ä¸ºç©ºé—²
             _Cache.bRequest = false
-            -- ´¦ÀíÏÂÒ»¸öÔ¶³ÌÇëÇó
+            -- å¤„ç†ä¸‹ä¸€ä¸ªè¿œç¨‹è¯·æ±‚
             _Cache.DoRemoteRequest()
         end,rr.nTimeout,"MY_Remote_Request_Timeout")
-        -- ¿ªÊ¼ÇëÇóÍøÂç×ÊÔ´
+        -- å¼€å§‹è¯·æ±‚ç½‘ç»œèµ„æº
         _Cache.hRequest:Navigate(rr.szUrl)
-        -- ÖÃÇëÇó¶ÓÁĞ×´Ì¬Îª·±Ã¦ÖĞ
+        -- ç½®è¯·æ±‚é˜Ÿåˆ—çŠ¶æ€ä¸ºç¹å¿™ä¸­
         _Cache.bRequest = true
     end
 end
@@ -259,16 +259,16 @@ end
   #       # # # # # # #                 # # #     # # # # # # # # # # #   # #     #   #       #  
 --#######################################################################################################
 ]]
-_Cache.tDelayCall = {}    -- delay call ¶ÓÁĞ
-_Cache.tBreatheCall = {}  -- breathe call ¶ÓÁĞ
---[[ ÑÓ³Ùµ÷ÓÃ
+_Cache.tDelayCall = {}    -- delay call é˜Ÿåˆ—
+_Cache.tBreatheCall = {}  -- breathe call é˜Ÿåˆ—
+--[[ å»¶è¿Ÿè°ƒç”¨
     (void) MY.DelayCall(func fnAction, number nDelay, string szName)
-    fnAction    -- µ÷ÓÃº¯Êı
-    nTime       -- ÑÓ³Ùµ÷ÓÃÊ±¼ä£¬µ¥Î»£ººÁÃë£¬Êµ¼Êµ÷ÓÃÑÓ³ÙÑÓ³ÙÊÇ 62.5 µÄÕû±¶Êı
-    szName      -- ÑÓ³Ùµ÷ÓÃID ÓÃÓÚÈ¡Ïûµ÷ÓÃ
-    È¡Ïûµ÷ÓÃ
+    fnAction    -- è°ƒç”¨å‡½æ•°
+    nTime       -- å»¶è¿Ÿè°ƒç”¨æ—¶é—´ï¼Œå•ä½ï¼šæ¯«ç§’ï¼Œå®é™…è°ƒç”¨å»¶è¿Ÿå»¶è¿Ÿæ˜¯ 62.5 çš„æ•´å€æ•°
+    szName      -- å»¶è¿Ÿè°ƒç”¨ID ç”¨äºå–æ¶ˆè°ƒç”¨
+    å–æ¶ˆè°ƒç”¨
     (void) MY.DelayCall(string szName)
-    szName      -- ÑÓ³Ùµ÷ÓÃID
+    szName      -- å»¶è¿Ÿè°ƒç”¨ID
 ]]
 MY.DelayCall = function(arg0, arg1, arg2, arg3)
     local fnAction, nDelay, szName, param = nil, nil, nil, {}
@@ -290,13 +290,13 @@ MY.DelayCall = function(arg0, arg1, arg2, arg3)
     if type(arg3)=='table' then param = arg3 end
     if not fnAction and not szName then return nil end
     
-    if szName and nDelay and not fnAction then -- µ÷ÕûDelayCallÑÓ³ÙÊ±¼ä
+    if szName and nDelay and not fnAction then -- è°ƒæ•´DelayCallå»¶è¿Ÿæ—¶é—´
         for i = #_Cache.tDelayCall, 1, -1 do
             if _Cache.tDelayCall[i].szName == szName then
                 _Cache.tDelayCall[i].nTime = nDelay + GetTime()
             end
         end
-    else -- Ò»¸öĞÂµÄDelayCall£¨»òÕß¸²¸ÇÔ­À´µÄ£©
+    else -- ä¸€ä¸ªæ–°çš„DelayCallï¼ˆæˆ–è€…è¦†ç›–åŸæ¥çš„ï¼‰
         if szName then
             for i = #_Cache.tDelayCall, 1, -1 do
                 if _Cache.tDelayCall[i].szName == szName then
@@ -309,11 +309,11 @@ MY.DelayCall = function(arg0, arg1, arg2, arg3)
         end
     end
 end
---[[ ×¢²áºôÎüÑ­»·µ÷ÓÃº¯Êı
+--[[ æ³¨å†Œå‘¼å¸å¾ªç¯è°ƒç”¨å‡½æ•°
     (void) MY.BreatheCall(string szKey, func fnAction[, number nTime])
-    szKey       -- Ãû³Æ£¬±ØĞëÎ¨Ò»£¬ÖØ¸´Ôò¸²¸Ç
-    fnAction    -- Ñ­»·ºôÎüµ÷ÓÃº¯Êı£¬ÉèÎª nil Ôò±íÊ¾È¡ÏûÕâ¸ö key ÏÂµÄºôÎü´¦Àíº¯Êı
-    nTime       -- µ÷ÓÃ¼ä¸ô£¬µ¥Î»£ººÁÃë£¬Ä¬ÈÏÎª 62.5£¬¼´Ã¿Ãëµ÷ÓÃ 16´Î£¬ÆäÖµ×Ô¶¯±»´¦Àí³É 62.5 µÄÕû±¶Êı
+    szKey       -- åç§°ï¼Œå¿…é¡»å”¯ä¸€ï¼Œé‡å¤åˆ™è¦†ç›–
+    fnAction    -- å¾ªç¯å‘¼å¸è°ƒç”¨å‡½æ•°ï¼Œè®¾ä¸º nil åˆ™è¡¨ç¤ºå–æ¶ˆè¿™ä¸ª key ä¸‹çš„å‘¼å¸å¤„ç†å‡½æ•°
+    nTime       -- è°ƒç”¨é—´éš”ï¼Œå•ä½ï¼šæ¯«ç§’ï¼Œé»˜è®¤ä¸º 62.5ï¼Œå³æ¯ç§’è°ƒç”¨ 16æ¬¡ï¼Œå…¶å€¼è‡ªåŠ¨è¢«å¤„ç†æˆ 62.5 çš„æ•´å€æ•°
 ]]
 MY.BreatheCall = function(arg1, arg2, arg3, arg4)
     local fnAction, nInterval, szName, param = nil, nil, nil, {}
@@ -348,9 +348,9 @@ MY.BreatheCall = function(arg1, arg2, arg3, arg4)
         table.insert( _Cache.tBreatheCall, { szName = szName, fnAction = fnAction, nNext = GetLogicFrameCount() + 1, nFrame = nFrame, param = param } )
     end
 end
---[[ ¸Ä±äºôÎüµ÷ÓÃÆµÂÊ
+--[[ æ”¹å˜å‘¼å¸è°ƒç”¨é¢‘ç‡
     (void) MY.BreatheCallDelay(string szKey, nTime)
-    nTime       -- ÑÓ³ÙÊ±¼ä£¬Ã¿ 62.5 ÑÓ³ÙÒ»Ö¡
+    nTime       -- å»¶è¿Ÿæ—¶é—´ï¼Œæ¯ 62.5 å»¶è¿Ÿä¸€å¸§
 ]]
 MY.BreatheCallDelay = function(szKey, nTime)
     local t = _Cache.tBreatheCall[StringLowerW(szKey)]
@@ -359,9 +359,9 @@ MY.BreatheCallDelay = function(szKey, nTime)
         t.nNext = GetLogicFrameCount() + t.nFrame
     end
 end
---[[ ÑÓ³ÙÒ»´ÎºôÎüº¯ÊıµÄµ÷ÓÃÆµÂÊ
+--[[ å»¶è¿Ÿä¸€æ¬¡å‘¼å¸å‡½æ•°çš„è°ƒç”¨é¢‘ç‡
     (void) MY.BreatheCallDelayOnce(string szKey, nTime)
-    nTime       -- ÑÓ³ÙÊ±¼ä£¬Ã¿ 62.5 ÑÓ³ÙÒ»Ö¡
+    nTime       -- å»¶è¿Ÿæ—¶é—´ï¼Œæ¯ 62.5 å»¶è¿Ÿä¸€å¸§
 ]]
 MY.BreatheCallDelayOnce = function(szKey, nTime)
     local t = _Cache.tBreatheCall[StringLowerW(szKey)]
@@ -415,9 +415,9 @@ end)
   #       # #         #           #         # #   # #       #       # #             #         
 #######################################################################################################
 ]]
-_Cache.tPlayerMenu = {}   -- Íæ¼ÒÍ·Ïñ²Ëµ¥
-_Cache.tTargetMenu = {}   -- Ä¿±êÍ·Ïñ²Ëµ¥
-_Cache.tTraceMenu  = {}   -- ¹¤¾ßÀ¸²Ëµ¥
+_Cache.tPlayerMenu = {}   -- ç©å®¶å¤´åƒèœå•
+_Cache.tTargetMenu = {}   -- ç›®æ ‡å¤´åƒèœå•
+_Cache.tTraceMenu  = {}   -- å·¥å…·æ èœå•
 
 -- get plugin folder menu
 _Cache.GetMainMenu = function()
@@ -435,7 +435,7 @@ _Cache.GetMainMenu = function()
 end
 -- get player addon menu
 _Cache.GetPlayerAddonMenu = function()
-    -- ´´½¨²Ëµ¥
+    -- åˆ›å»ºèœå•
     local menu = _Cache.GetMainMenu()
     for i = 1, #_Cache.tPlayerMenu, 1 do
         local m = _Cache.tPlayerMenu[i].Menu
@@ -468,11 +468,11 @@ _Cache.GetTraceButtonMenu = function()
     end
     return {menu}
 end
---[[ ×¢²áÍæ¼ÒÍ·Ïñ²Ëµ¥
-    -- ×¢²á
+--[[ æ³¨å†Œç©å®¶å¤´åƒèœå•
+    -- æ³¨å†Œ
     (void) MY.RegisterPlayerAddonMenu(szName,Menu)
     (void) MY.RegisterPlayerAddonMenu(Menu)
-    -- ×¢Ïú
+    -- æ³¨é”€
     (void) MY.RegisterPlayerAddonMenu(szName)
 ]]
 MY.RegisterPlayerAddonMenu = function(arg1, arg2)
@@ -499,11 +499,11 @@ MY.RegisterPlayerAddonMenu = function(arg1, arg2)
         end
     end
 end
---[[ ×¢²áÄ¿±êÍ·Ïñ²Ëµ¥
-    -- ×¢²á
+--[[ æ³¨å†Œç›®æ ‡å¤´åƒèœå•
+    -- æ³¨å†Œ
     (void) MY.RegisterTargetAddonMenu(szName,Menu)
     (void) MY.RegisterTargetAddonMenu(Menu)
-    -- ×¢Ïú
+    -- æ³¨é”€
     (void) MY.RegisterTargetAddonMenu(szName)
 ]]
 MY.RegisterTargetAddonMenu = function(arg1, arg2)
@@ -530,11 +530,11 @@ MY.RegisterTargetAddonMenu = function(arg1, arg2)
         end
     end
 end
---[[ ×¢²á¹¤¾ßÀ¸²Ëµ¥
-    -- ×¢²á
+--[[ æ³¨å†Œå·¥å…·æ èœå•
+    -- æ³¨å†Œ
     (void) MY.RegisterTraceButtonMenu(szName,Menu)
     (void) MY.RegisterTraceButtonMenu(Menu)
-    -- ×¢Ïú
+    -- æ³¨é”€
     (void) MY.RegisterTraceButtonMenu(szName)
 ]]
 MY.RegisterTraceButtonMenu = function(arg1, arg2)
@@ -582,12 +582,12 @@ Target_AppendAddonMenu( { _Cache.GetTargetAddonMenu } )
   #       # #         #           #         # #       #   #   #     # #                       #   
 #######################################################################################################
 ]]
---[[ ÏÔÊ¾±¾µØĞÅÏ¢
+--[[ æ˜¾ç¤ºæœ¬åœ°ä¿¡æ¯
     MY.Sysmsg(oContent, oTitle)
-    szContent    ÒªÏÔÊ¾µÄÖ÷ÌåÏûÏ¢
-    szTitle      ÏûÏ¢Í·²¿
-    tContentRgbF Ö÷ÌåÏûÏ¢ÎÄ×ÖÑÕÉ«rgbf[¿ÉÑ¡£¬Îª¿ÕÊ¹ÓÃÄ¬ÈÏÑÕÉ«×ÖÌå¡£]
-    tTitleRgbF   ÏûÏ¢Í·²¿ÎÄ×ÖÑÕÉ«rgbf[¿ÉÑ¡£¬Îª¿ÕºÍÖ÷ÌåÏûÏ¢ÎÄ×ÖÑÕÉ«ÏàÍ¬¡£]
+    szContent    è¦æ˜¾ç¤ºçš„ä¸»ä½“æ¶ˆæ¯
+    szTitle      æ¶ˆæ¯å¤´éƒ¨
+    tContentRgbF ä¸»ä½“æ¶ˆæ¯æ–‡å­—é¢œè‰²rgbf[å¯é€‰ï¼Œä¸ºç©ºä½¿ç”¨é»˜è®¤é¢œè‰²å­—ä½“ã€‚]
+    tTitleRgbF   æ¶ˆæ¯å¤´éƒ¨æ–‡å­—é¢œè‰²rgbf[å¯é€‰ï¼Œä¸ºç©ºå’Œä¸»ä½“æ¶ˆæ¯æ–‡å­—é¢œè‰²ç›¸åŒã€‚]
 ]]
 MY.Sysmsg = function(oContent, oTitle)
     oTitle = oTitle or MY.GetAddonInfo().szShortName
@@ -620,11 +620,11 @@ MY.Sysmsg = function(oContent, oTitle)
     -- Output
     OutputMessage("MSG_SYS", szMsg, true)
 end
---[[ DebugÊä³ö
+--[[ Debugè¾“å‡º
     (void)MY.Debug(szText, szHead, nLevel)
-    szText  DebugĞÅÏ¢
-    szHead  DebugÍ·
-    nLevel  Debug¼¶±ğ[µÍÓÚµ±Ç°ÉèÖÃÖµ½«²»»áÊä³ö]
+    szText  Debugä¿¡æ¯
+    szHead  Debugå¤´
+    nLevel  Debugçº§åˆ«[ä½äºå½“å‰è®¾ç½®å€¼å°†ä¸ä¼šè¾“å‡º]
 ]]
 MY.Debug = function(szText, szHead, nLevel)
     if type(nLevel)~="number" then nLevel = 1 end

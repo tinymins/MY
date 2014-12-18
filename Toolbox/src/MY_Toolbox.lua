@@ -1,9 +1,9 @@
 --
--- ÆäËû¹¦ÄÜ
--- by ÜøÒÁ @ Ë«ÃÎÕò @ İ¶»¨¹¬
+-- å…¶ä»–åŠŸèƒ½
+-- by èŒ—ä¼Š @ åŒæ¢¦é•‡ @ è»èŠ±å®«
 -- Build 20140510
 --
--- Ö÷Òª¹¦ÄÜ: ¹²Õ¾¼ì²é ºÃÓÑÍ·¶¥
+-- ä¸»è¦åŠŸèƒ½: å…±ç«™æ£€æŸ¥ å¥½å‹å¤´é¡¶
 -- 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _MY_ToolBox = {
@@ -70,22 +70,22 @@ end
 MY_ToolBox.bAvoidBlackShenxingCD = true
 RegisterCustomData("MY_ToolBox.bAvoidBlackShenxingCD")
 MY_ToolBox.ApplyConfig = function()
-    -- ºÃÓÑ¸ßÁÁ
+    -- å¥½å‹é«˜äº®
     if MY_ToolBox.bFriendHeadTip then
         _MY_ToolBox.FriendHeadTip(true)
     end
     
-    -- ÊÔÁ¶Ö®µØ¾Å¹¬ÖúÊÖ
+    -- è¯•ç‚¼ä¹‹åœ°ä¹å®«åŠ©æ‰‹
     MY.RegisterEvent('OPEN_WINDOW', 'JiugongHelper', function(arg0, szText)
         if not MY_ToolBox.bJiugongHelper then
             return
         end
-        -- È·¶¨µ±Ç°¶Ô»°¶ÔÏóÊÇ×íåĞÒ££¨18707£©
+        -- ç¡®å®šå½“å‰å¯¹è¯å¯¹è±¡æ˜¯é†‰é€é¥ï¼ˆ18707ï¼‰
         local target = GetTargetHandle(GetClientPlayer().GetTarget())
         if target and target.dwTemplateID ~= 18707 then
             return
         end
-        -- Æ¥Åä×Ö·û´®
+        -- åŒ¹é…å­—ç¬¦ä¸²
         string.gsub(szText, "<T1916><(T%d+)><T1926><(T%d+)><T1928><(T%d+)><T1924>.+<T1918><(T%d+)><T1931><(T%d+)><T1933><(T%d+)><T1935>.+<T1920><(T%d+)><T1937><(T%d+)><T1938><(T%d+)><T1939>", function(n1,n2,n3,n4,n5,n6,n7,n8,n9)
             local tNumList = {
                 T1925 = 1, T1927 = 2, T1929 = 3,
@@ -135,7 +135,7 @@ MY_ToolBox.ApplyConfig = function()
         end)
     end)
     
-    -- ·ÀÖ¹ÉñĞĞCD±»³Ô
+    -- é˜²æ­¢ç¥è¡ŒCDè¢«åƒ
     if MY_ToolBox.bAvoidBlackShenxingCD then
         MY.RegisterEvent('DO_SKILL_CAST', 'MY_ToolBox_AvoidBlackShenxingCD', function()
             local dwID, dwSkillID, dwSkillLevel = arg0, arg1, arg2
@@ -176,7 +176,7 @@ MY.RegisterInit(MY_ToolBox.ApplyConfig)
           # #       # #   # # # # # # # # # # #     #                 #       # #     #       #   
 #######################################################################################################
 ]]
--- ±êÇ©À¸¼¤»î
+-- æ ‡ç­¾æ æ¿€æ´»
 _MY_ToolBox.OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
     local w, h = ui:size()
@@ -409,7 +409,7 @@ _MY_ToolBox.OnPanelActive = function(wnd)
         end
         return t
       end)
-    -- ËæÉí±ã¼ã
+    -- éšèº«ä¾¿ç¬º
     local x, y = 20, 300
     ui:append("Text_Anmerkungen", "Text"):item("#Text_Anmerkungen"):text(_L['* anmerkungen']):color(255,255,0):pos(x, y)
     y = y + 30

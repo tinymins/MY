@@ -1,6 +1,6 @@
 --
--- ¿ª·¢Õß¹¤¾ß
--- by ÜøÒÁ @ Ë«ÃÎÕò @ İ¶»¨¹¬
+-- å¼€å‘è€…å·¥å…·
+-- by èŒ—ä¼Š @ åŒæ¢¦é•‡ @ è»èŠ±å®«
 -- Build 20140730
 -- 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Dev_UITexViewer/lang/")
@@ -27,13 +27,13 @@ _Cache.OnPanelActive = function(wnd)
       :pos(x, y):size(w-20, 25):text(MYDev_UITexViewer.szUITexPath)
       :change(function(szText)
         local tInfo = KG_Table.Load(szText .. '.txt', {
-        -- Í¼Æ¬ÎÄ¼şÖ¡ĞÅÏ¢±íµÄ±íÍ·Ãû×Ö
-            {f = "i", t = "nFrame" },             -- Í¼Æ¬Ö¡ ID
-            {f = "i", t = "nLeft"  },             -- Ö¡Î»ÖÃ: ¾àÀë×ó²àÏñËØ(XÎ»ÖÃ)
-            {f = "i", t = "nTop"   },             -- Ö¡Î»ÖÃ: ¾àÀë¶¥¶ËÏñËØ(YÎ»ÖÃ)
-            {f = "i", t = "nWidth" },             -- Ö¡¿í¶È
-            {f = "i", t = "nHeight"},             -- Ö¡¸ß¶È
-            {f = "s", t = "szFile" },             -- Ö¡À´Ô´ÎÄ¼ş(ÎŞ×÷ÓÃ)
+        -- å›¾ç‰‡æ–‡ä»¶å¸§ä¿¡æ¯è¡¨çš„è¡¨å¤´åå­—
+            {f = "i", t = "nFrame" },             -- å›¾ç‰‡å¸§ ID
+            {f = "i", t = "nLeft"  },             -- å¸§ä½ç½®: è·ç¦»å·¦ä¾§åƒç´ (Xä½ç½®)
+            {f = "i", t = "nTop"   },             -- å¸§ä½ç½®: è·ç¦»é¡¶ç«¯åƒç´ (Yä½ç½®)
+            {f = "i", t = "nWidth" },             -- å¸§å®½åº¦
+            {f = "i", t = "nHeight"},             -- å¸§é«˜åº¦
+            {f = "s", t = "szFile" },             -- å¸§æ¥æºæ–‡ä»¶(æ— ä½œç”¨)
         }, FILE_OPEN_MODE.NORMAL)
         if not tInfo then
             return
