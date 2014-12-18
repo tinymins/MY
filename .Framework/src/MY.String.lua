@@ -1,15 +1,15 @@
 ---------------------------------
--- ÜøÒÁ²å¼ş
--- by£ºÜøÒÁ@Ë«ÃÎÕò@×··çõæÓ°
--- ref: ½è¼ø´óÁ¿º£÷©Ô´Âë @haimanchajian.com
+-- èŒ—ä¼Šæ’ä»¶
+-- byï¼šèŒ—ä¼Š@åŒæ¢¦é•‡@è¿½é£è¹‘å½±
+-- ref: å€Ÿé‰´å¤§é‡æµ·é³—æºç  @haimanchajian.com
 ---------------------------------
 -----------------------------------------------
--- ±¾µØº¯ÊıºÍ±äÁ¿
+-- æœ¬åœ°å‡½æ•°å’Œå˜é‡
 -----------------------------------------------
 MY = MY or {}
 MY.String = MY.String or {}
 
--- ·Ö¸ô×Ö·û´®
+-- åˆ†éš”å­—ç¬¦ä¸²
 -- (table) MY.String.Split(string szText, string szSpliter)
 MY.String.Split = function(s, p)
     local rt= {}
@@ -17,11 +17,11 @@ MY.String.Split = function(s, p)
     return rt
 end
 
--- ×ªÒåÕıÔò±í´ïÊ½ÌØÊâ×Ö·û
+-- è½¬ä¹‰æ­£åˆ™è¡¨è¾¾å¼ç‰¹æ®Šå­—ç¬¦
 -- (string) MY.String.PatternEscape(string szText)
 MY.String.PatternEscape = function(s) return (string.gsub(s, '([%(%)%.%%%+%-%*%?%[%^%$%]])', '%%%1')) end
 
--- Çå³ı×Ö·û´®Ê×Î²µÄ¿Õ°××Ö·û
+-- æ¸…é™¤å­—ç¬¦ä¸²é¦–å°¾çš„ç©ºç™½å­—ç¬¦
 -- (string) MY.String.Trim(string szText)
 MY.String.Trim = function(szText)
     if not szText or szText == "" then
@@ -30,7 +30,7 @@ MY.String.Trim = function(szText)
     return (string.gsub(szText, "^%s*(.-)%s*$", "%1"))
 end
 
--- ×ª»»Îª URL ±àÂë
+-- è½¬æ¢ä¸º URL ç¼–ç 
 -- (string) MY.String.UrlEncode(string szText)
 MY.String.UrlEncode = function(szText)
     local str = szText:gsub("([^0-9a-zA-Z ])", function (c) return string.format ("%%%02X", string.byte(c)) end)
@@ -38,7 +38,7 @@ MY.String.UrlEncode = function(szText)
     return str
 end
 
--- ½âÎö URL ±àÂë
+-- è§£æ URL ç¼–ç 
 -- (string) MY.String.UrlDecode(string szText)
 MY.String.UrlDecode = function(szText)
     return szText:gsub("+", " "):gsub("%%(%x%x)", function(h) return string.char(tonumber(h, 16)) end)

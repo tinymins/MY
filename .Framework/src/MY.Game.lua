@@ -1,10 +1,10 @@
 ---------------------------------
--- ÜøÒÁ²å¼ş
--- by£ºÜøÒÁ@Ë«ÃÎÕò@×··çõæÓ°
--- ref: ½è¼ø´óÁ¿º£÷©Ô´Âë @haimanchajian.com
+-- èŒ—ä¼Šæ’ä»¶
+-- byï¼šèŒ—ä¼Š@åŒæ¢¦é•‡@è¿½é£è¹‘å½±
+-- ref: å€Ÿé‰´å¤§é‡æµ·é³—æºç  @haimanchajian.com
 ---------------------------------
 -----------------------------------------------
--- ±¾µØº¯ÊıºÍ±äÁ¿
+-- æœ¬åœ°å‡½æ•°å’Œå˜é‡
 -----------------------------------------------
 MY = MY or {}
 MY.Game = MY.Game or {}
@@ -26,8 +26,8 @@ local _Cache, _L = {}, MY.LoadLangPack()
 #######################################################################################################
 ]]
 _Cache.tHotkey = {}
---[[ Ôö¼ÓÏµÍ³¿ì½İ¼ü
-    (void) MY.AddHotKey(string szName, string szTitle, func fnAction)   -- Ôö¼ÓÏµÍ³¿ì½İ¼ü
+--[[ å¢åŠ ç³»ç»Ÿå¿«æ·é”®
+    (void) MY.AddHotKey(string szName, string szTitle, func fnAction)   -- å¢åŠ ç³»ç»Ÿå¿«æ·é”®
 ]]
 MY.Game.AddHotKey = function(szName, szTitle, fnAction)
     if string.sub(szName, 1, 3) ~= "MY_" then
@@ -35,8 +35,8 @@ MY.Game.AddHotKey = function(szName, szTitle, fnAction)
     end
     table.insert(_Cache.tHotkey, { szName = szName, szTitle = szTitle, fnAction = fnAction })
 end
---[[ »ñÈ¡¿ì½İ¼üÃû³Æ
-    (string) MY.GetHotKeyName(string szName, boolean bBracket, boolean bShort)      -- È¡µÃ¿ì½İ¼üÃû³Æ
+--[[ è·å–å¿«æ·é”®åç§°
+    (string) MY.GetHotKeyName(string szName, boolean bBracket, boolean bShort)      -- å–å¾—å¿«æ·é”®åç§°
 ]]
 MY.Game.GetHotKeyName = function(szName, bBracket, bShort)
     if string.sub(szName, 1, 3) ~= "MY_" then
@@ -49,9 +49,9 @@ MY.Game.GetHotKeyName = function(szName, bBracket, bShort)
     end
     return szKey
 end
---[[ »ñÈ¡¿ì½İ¼ü
-    (table) MY.GetHotKey(string szName, true , true )       -- È¡µÃ¿ì½İ¼ü
-    (number nKey, boolean bShift, boolean bCtrl, boolean bAlt) MY.GetHotKey(string szName, true , fasle)        -- È¡µÃ¿ì½İ¼ü
+--[[ è·å–å¿«æ·é”®
+    (table) MY.GetHotKey(string szName, true , true )       -- å–å¾—å¿«æ·é”®
+    (number nKey, boolean bShift, boolean bCtrl, boolean bAlt) MY.GetHotKey(string szName, true , fasle)        -- å–å¾—å¿«æ·é”®
 ]]
 MY.Game.GetHotKey = function(szName, bBracket, bShort)
     if string.sub(szName, 1, 3) ~= "MY_" then
@@ -65,11 +65,11 @@ MY.Game.GetHotKey = function(szName, bBracket, bShort)
         return nKey, bShift, bCtrl, bAlt
     end
 end
---[[ ÉèÖÃ¿ì½İ¼ü/´ò¿ª¿ì½İ¼üÉèÖÃÃæ°å    -- HMÀïÃæ¿Ù³öÀ´µÄ
-    (void) MY.SetHotKey()                               -- ´ò¿ª¿ì½İ¼üÉèÖÃÃæ°å
-    (void) MY.SetHotKey(string szGroup)     -- ´ò¿ª¿ì½İ¼üÉèÖÃÃæ°å²¢¶¨Î»µ½ szGroup ·Ö×é£¨²»¿ÉÓÃ£©
-    (void) MY.SetHotKey(string szCommand, number nKey )     -- ÉèÖÃ¿ì½İ¼ü
-    (void) MY.SetHotKey(string szCommand, number nIndex, number nKey [, boolean bShift [, boolean bCtrl [, boolean bAlt] ] ])       -- ÉèÖÃ¿ì½İ¼ü
+--[[ è®¾ç½®å¿«æ·é”®/æ‰“å¼€å¿«æ·é”®è®¾ç½®é¢æ¿    -- HMé‡Œé¢æŠ å‡ºæ¥çš„
+    (void) MY.SetHotKey()                               -- æ‰“å¼€å¿«æ·é”®è®¾ç½®é¢æ¿
+    (void) MY.SetHotKey(string szGroup)     -- æ‰“å¼€å¿«æ·é”®è®¾ç½®é¢æ¿å¹¶å®šä½åˆ° szGroup åˆ†ç»„ï¼ˆä¸å¯ç”¨ï¼‰
+    (void) MY.SetHotKey(string szCommand, number nKey )     -- è®¾ç½®å¿«æ·é”®
+    (void) MY.SetHotKey(string szCommand, number nIndex, number nKey [, boolean bShift [, boolean bCtrl [, boolean bAlt] ] ])       -- è®¾ç½®å¿«æ·é”®
 ]]
 MY.Game.SetHotKey = function(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
     if nIndex then
@@ -231,13 +231,13 @@ end)
   #     # #   # #     #     #         # #           # # # #   # # # #     
 #######################################################################################################
 ]]
---[[ »ñÈ¡µ±Ç°·şÎñÆ÷
+--[[ è·å–å½“å‰æœåŠ¡å™¨
 ]]
 MY.Game.GetServer = function()
     return table.concat({GetUserServer()},'_'), {GetUserServer()}
 end
 
---[[ »ñÈ¡Ö¸¶¨¶ÔÏó
+--[[ è·å–æŒ‡å®šå¯¹è±¡
     (obj) MY.Game.GetObject([dwType,] dwID)
 ]]
 MY.Game.GetObject = function(dwType, dwID)
@@ -274,7 +274,7 @@ MY.Game.GetObject = function(dwType, dwID)
 end
 MY.GetObject = MY.Game.GetObject
 
---[[ »ñÈ¡Ö¸¶¨¶ÔÏóµÄÃû×Ö
+--[[ è·å–æŒ‡å®šå¯¹è±¡çš„åå­—
 ]]
 MY.Game.GetObjectName = function(tar)
     local szName = tar.szName
