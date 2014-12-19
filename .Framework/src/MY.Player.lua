@@ -96,6 +96,82 @@ RegisterEvent("PLAYER_LEAVE_SCENE", function() _Cache.tNearPlayer[arg0] = nil  e
 RegisterEvent("DOODAD_ENTER_SCENE", function() _Cache.tNearDoodad[arg0] = true end)
 RegisterEvent("DOODAD_LEAVE_SCENE", function() _Cache.tNearDoodad[arg0] = nil  end)
 
+--[[ 获取玩家自身信息（缓存）
+]]
+local m_ClientInfo
+MY.Player.GetClientInfo = function(bForceRefresh)
+    if bForceRefresh or not m_ClientInfo then
+        local me = GetClientPlayer()
+        if me then -- 确保获取到玩家
+            if IsRemotePlayer(me.dwID) then -- 确保不在战场
+                m_ClientInfo.dwID  = me.dwID
+            end
+            m_ClientInfo.nX                = me.nX
+            m_ClientInfo.nY                = me.nY
+            m_ClientInfo.nZ                = me.nZ
+            m_ClientInfo.nFaceDirection    = me.nFaceDirection
+            m_ClientInfo.szName            = me.szName
+            m_ClientInfo.szTitle           = me.szTitle
+            m_ClientInfo.dwForceID         = me.dwForceID
+            m_ClientInfo.nLevel            = me.nLevel
+            m_ClientInfo.nExperience       = me.nExperience
+            m_ClientInfo.nOnPracticeRoom   = me.nOnPracticeRoom
+            m_ClientInfo.nCurrentStamina   = me.nCurrentStamina
+            m_ClientInfo.nCurrentThew      = me.nCurrentThew
+            m_ClientInfo.nMaxStamina       = me.nMaxStamina
+            m_ClientInfo.nMaxThew          = me.nMaxThew
+            m_ClientInfo.nBattleFieldSide  = me.nBattleFieldSide
+            m_ClientInfo.dwSchoolID        = me.dwSchoolID
+            m_ClientInfo.nCurrentTrainValue= me.nCurrentTrainValue
+            m_ClientInfo.nMaxTrainValue    = me.nMaxTrainValue
+            m_ClientInfo.nUsedTrainValue   = me.nUsedTrainValue
+            m_ClientInfo.nDirectionXY      = me.nDirectionXY
+            m_ClientInfo.nCurrentLife      = me.nCurrentLife
+            m_ClientInfo.nMaxLife          = me.nMaxLife
+            m_ClientInfo.nMaxLifeBase      = me.nMaxLifeBase
+            m_ClientInfo.nCurrentMana      = me.nCurrentMana
+            m_ClientInfo.nMaxMana          = me.nMaxMana
+            m_ClientInfo.nMaxManaBase      = me.nMaxManaBase
+            m_ClientInfo.nCurrentEnergy    = me.nCurrentEnergy
+            m_ClientInfo.nMaxEnergy        = me.nMaxEnergy
+            m_ClientInfo.nEnergyReplenish  = me.nEnergyReplenish
+            m_ClientInfo.bCanUseBigSword   = me.bCanUseBigSword
+            m_ClientInfo.nAccumulateValue  = me.nAccumulateValue
+            m_ClientInfo.nCamp             = me.nCamp
+            m_ClientInfo.nCampFlag         = me.nCampFlag
+            m_ClientInfo.bOnHorse          = me.bOnHorse
+            m_ClientInfo.nMoveState        = me.nMoveState
+            m_ClientInfo.dwTongID          = me.dwTongID
+            m_ClientInfo.nGender           = me.nGender
+            m_ClientInfo.nCurrentRage      = me.nCurrentRage
+            m_ClientInfo.nMaxRage          = me.nMaxRage
+            m_ClientInfo.dwEmployer        = me.dwEmployer
+            m_ClientInfo.nCurrentPrestige  = me.nCurrentPrestige
+            m_ClientInfo.bFightState       = me.bFightState
+            m_ClientInfo.nRunSpeed         = me.nRunSpeed
+            m_ClientInfo.nRunSpeedBase     = me.nRunSpeedBase
+            m_ClientInfo.dwTeamID          = me.dwTeamID
+            m_ClientInfo.nRoleType         = me.nRoleType
+            m_ClientInfo.nContribution     = me.nContribution
+            m_ClientInfo.nCoin             = me.nCoin
+            m_ClientInfo.nJustice          = me.nJustice
+            m_ClientInfo.nExamPrint        = me.nExamPrint
+            m_ClientInfo.nArenaAward       = me.nArenaAward
+            m_ClientInfo.nActivityAward    = me.nActivityAward
+            m_ClientInfo.bHideHat          = me.bHideHat
+            m_ClientInfo.bRedName          = me.bRedName
+            m_ClientInfo.dwKillCount       = me.dwKillCount
+            m_ClientInfo.nRankPoint        = me.nRankPoint
+            m_ClientInfo.nTitle            = me.nTitle
+            m_ClientInfo.nTitlePoint       = me.nTitlePoint
+            m_ClientInfo.dwPetID           = me.dwPetID
+        end
+    end
+    
+    return m_ClientInfo or {}
+end
+MY.GetClientInfo = MY.Player.GetClientInfo
+
 --[[获取好友列表
 ]]
 MY.Player.GetFriendList = function(arg0)
