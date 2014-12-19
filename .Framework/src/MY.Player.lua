@@ -103,6 +103,7 @@ MY.Player.GetClientInfo = function(bForceRefresh)
     if bForceRefresh or not m_ClientInfo then
         local me = GetClientPlayer()
         if me then -- 确保获取到玩家
+            m_ClientInfo = {}
             if IsRemotePlayer(me.dwID) then -- 确保不在战场
                 m_ClientInfo.dwID  = me.dwID
             end
