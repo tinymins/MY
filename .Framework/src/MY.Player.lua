@@ -104,7 +104,7 @@ MY.Player.GetClientInfo = function(bForceRefresh)
         local me = GetClientPlayer()
         if me then -- 确保获取到玩家
             m_ClientInfo = {}
-            if IsRemotePlayer(me.dwID) then -- 确保不在战场
+            if not IsRemotePlayer(me.dwID) then -- 确保不在战场
                 m_ClientInfo.dwID  = me.dwID
             end
             m_ClientInfo.nX                = me.nX
@@ -172,6 +172,7 @@ MY.Player.GetClientInfo = function(bForceRefresh)
     return m_ClientInfo or {}
 end
 MY.GetClientInfo = MY.Player.GetClientInfo
+MY.RegisterEvent('LOADING_END', MY.Player.GetClientInfo)
 
 --[[获取好友列表
 ]]
