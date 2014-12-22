@@ -239,6 +239,97 @@ MY.Player.GetTongMember = function(arg0)
     return GetTongClient().GetMemberInfo(arg0)
 end
 --[[
+##################################################################################################
+      #         #   #                   #             #         #                   #             
+      #         #     #         #       #             #         #   #               #             
+      # # #     #                 #     #         #   #         #     #   # # # # # # # # # # #   
+      #         # # # #             #   #           # #         #                 #   #           
+      #     # # #           #           #             #   # # # # # # #         #       #         
+  # # # # #     #   #         #         #             #         #             #     #     #       
+  #       #     #   #           #       #             #       #   #       # #         #     # #   
+  #       #     #   #                   # # # #     # #       #   #                 #             
+  #       #       #       # # # # # # # #         #   #       #   #         #   #     #     #     
+  # # # # #     # #   #                 #             #     #       #       #   #     #       #   
+  #           #     # #                 #             #     #       #     #     #         #   #   
+            #         #                 #             #   #           #           # # # # #       
+##################################################################################################
+]]
+_Cache.nCurrentFightUUID        = nil
+_Cache.nCurrentFightBeginFrame  = 0
+_Cache.nCurrentFightEndingFrame = 0
+MY.BreatheCall(function()
+    local me = GetClientPlayer()
+    if not me then
+        return
+    end
+    -- 判定战斗边界
+    if me.bFightState then
+        -- 进入战斗判断
+        if not _Cache.bFighting then
+            _Cache.bFighting = true
+            -- 5秒脱战判定缓冲 防止明教隐身错误判定
+            if GetLogicFrameCount() - _Cache.nCurrentFightEndingFrame > GLOBAL.GAME_FPS * 5 then
+                -- 新的一轮战斗开始
+                _Cache.nCurrentFightBeginFrame = GetLogicFrameCount()
+                _Cache.nCurrentFightUUID = _Cache.nCurrentFightBeginFrame
+            end
+        end
+    else
+        -- 退出战斗判定
+        if _Cache.bFighting then
+            _Cache.bFighting = false
+            _Cache.nCurrentFightEndingFrame = GetLogicFrameCount()
+        end
+    end
+end)
+--[[ 获取当前战斗时间
+]]
+MY.Player.GetFightTime = function(szFormat)
+    local nFrame = 0
+    
+    local me = GetClientPlayer()
+    if me then
+        if me.bFightState then
+            nFrame = GetLogicFrameCount() - _Cache.nCurrentFightBeginFrame
+        else
+            nFrame = _Cache.nCurrentFightEndingFrame - _Cache.nCurrentFightBeginFrame
+        end
+    end
+    
+    if szFormat then
+        local nSeconds = math.floor(nFrame  / GLOBAL.GAME_FPS)
+        local nMinutes = math.floor(nSecond / 60)
+        local nHours   = math.floor(nMinute / 60)
+        local nMinute  = nMinutes % 60
+        local nSecond  = nSeconds % 60
+        szFormat = szFormat:gsub('f', nFrame)
+        szFormat = szFormat:gsub('H', nHours)
+        szFormat = szFormat:gsub('M', nMinutes)
+        szFormat = szFormat:gsub('S', nSeconds)
+        szFormat = szFormat:gsub('hh', string.format('%2d', nHours ))
+        szFormat = szFormat:gsub('mm', string.format('%2d', nMinute))
+        szFormat = szFormat:gsub('ss', string.format('%2d', nSecond))
+        szFormat = szFormat:gsub('h', nHours)
+        szFormat = szFormat:gsub('m', nMinute)
+        szFormat = szFormat:gsub('s', nSecond)
+        
+        if tonumber(szFormat) then
+            szFormat = tonumber(szFormat)
+        end
+    else
+        szFormat = nFrame
+    end
+    return szFormat
+end
+
+--[[ 获取当前战斗唯一标示符
+]]
+MY.Player.GetFightUUID = function()
+    return _Cache.nCurrentFightUUID
+end
+
+
+--[[
 #######################################################################################################
                                   #                                                       #                   
   # # # # # # # # # # #         #                               # # # # # # # # #         #     # # # # #     
