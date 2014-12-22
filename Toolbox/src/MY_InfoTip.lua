@@ -72,31 +72,9 @@ MY_InfoTip.Cache = {
     FightTime = { -- 战斗计时
         formatString = '', title = _L['fight clock'], prefix = _L['Fight Clock: '], content = _L['%d:%02d:%02d'],
         GetContent = function()
-            local s, nTotal = _L["Never Fight"], 0
-            -- 判定战斗边界
-            if GetClientPlayer().bFightState then
-                -- 进入战斗判断
-                if not _Cache.bFighting then
-                    _Cache.bFighting = true
-                    -- 5秒脱战判定缓冲 防止明教隐身错误判定
-                    if GetLogicFrameCount() - _Cache.nLastFightEndTimestarp > 16*5 then
-                        _Cache.nLastFightStartTimestarp = GetLogicFrameCount()
-                    end
-                end
-                nTotal = GetLogicFrameCount() - _Cache.nLastFightStartTimestarp
-            else
-                -- 退出战斗判定
-                if _Cache.bFighting then
-                    _Cache.bFighting = false
-                    _Cache.nLastFightEndTimestarp = GetLogicFrameCount()
-                end
-                if _Cache.nLastFightStartTimestarp > 0 then 
-                    nTotal = _Cache.nLastFightEndTimestarp - _Cache.nLastFightStartTimestarp
-                end
-            end
-            
-            if nTotal > 0 then
-                nTotal = nTotal/16
+            local s, nTotal = _L["Never Fight"], MY.Player.GetFightTime()
+            if MY.Player.GetFightUUID() then
+                nTotal = nTotal / 16
                 s = string.format(MY_InfoTip.Cache.FightTime.formatString, math.floor(nTotal/(60*60)), math.floor(nTotal/60%60), math.floor(nTotal%60))
             end
             return s
