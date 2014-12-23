@@ -375,6 +375,15 @@ MY.RegisterInit = function(arg1, arg2)
         end
     end
 end
+--[[ 注册游戏结束函数
+    RegisterExit(string szFunName, function fn) -- 注册
+    RegisterExit(function fn)                   -- 注册
+    RegisterExit(string szFunName)              -- 注销
+]]
+MY.RegisterExit = function(arg1, arg2)
+    MY.RegisterEvent('PLAYER_EXIT_GAME', arg1, arg2)
+    MY.RegisterEvent('GAME_EXIT', arg1, arg2)
+end
 --[[ 注册游戏事件监听
     -- 注册
     MY.RegisterEvent( szEventName, szListenerId, fnListener )
