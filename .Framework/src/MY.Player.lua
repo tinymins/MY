@@ -254,16 +254,20 @@ end
             #         #                 #             #   #           #           # # # # #       
 ##################################################################################################
 ]]
+_Cache.nLastFightUUID           = nil
 _Cache.nCurrentFightUUID        = nil
 _Cache.nCurrentFightBeginFrame  = 0
 _Cache.nCurrentFightEndingFrame = 0
-MY.BreatheCall(function()
-    local me = GetClientPlayer()
-    if not me then
-        return
+_Cache.OnFightStateChange = function(bFightState)
+    if bFightState == nil then
+        local me = GetClientPlayer()
+        if not me then
+            return
+        end
+        bFightState = me.bFightState
     end
     -- 判定战斗边界
-    if me.bFightState then
+    if bFightState then
         -- 进入战斗判断
         if not _Cache.bFighting then
             _Cache.bFighting = true
@@ -272,6 +276,7 @@ MY.BreatheCall(function()
                 -- 新的一轮战斗开始
                 _Cache.nCurrentFightBeginFrame = GetLogicFrameCount()
                 _Cache.nCurrentFightUUID = _Cache.nCurrentFightBeginFrame
+                FireUIEvent('MY_FIGHT_HINT', true)
             end
         end
     else
@@ -280,8 +285,15 @@ MY.BreatheCall(function()
             _Cache.bFighting = false
             _Cache.nCurrentFightEndingFrame = GetLogicFrameCount()
         end
+        if _Cache.nCurrentFightUUID and GetLogicFrameCount() - _Cache.nCurrentFightEndingFrame > GLOBAL.GAME_FPS * 5 then
+            _Cache.nLastFightUUID = _Cache.nCurrentFightUUID
+            _Cache.nCurrentFightUUID = nil
+            FireUIEvent('MY_FIGHT_HINT', false)
+        end
     end
-end)
+end
+MY.BreatheCall(_Cache.OnFightStateChange)
+MY.RegisterEvent('FIGHT_HINT', _Cache.OnFightStateChange)
 --[[ 获取当前战斗时间
 ]]
 MY.Player.GetFightTime = function(szFormat)
@@ -326,6 +338,12 @@ end
 ]]
 MY.Player.GetFightUUID = function()
     return _Cache.nCurrentFightUUID
+end
+
+--[[ 获取上次战斗唯一标示符
+]]
+MY.Player.GetLastFightUUID = function()
+    return _Cache.nLastFightUUID
 end
 
 

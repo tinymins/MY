@@ -73,7 +73,7 @@ MY_InfoTip.Cache = {
         formatString = '', title = _L['fight clock'], prefix = _L['Fight Clock: '], content = _L['%d:%02d:%02d'],
         GetContent = function()
             local s, nTotal = _L["Never Fight"], MY.Player.GetFightTime()
-            if MY.Player.GetFightUUID() then
+            if MY.Player.GetFightUUID() or MY.Player.GetLastFightUUID() then
                 nTotal = nTotal / 16
                 s = string.format(MY_InfoTip.Cache.FightTime.formatString, math.floor(nTotal/(60*60)), math.floor(nTotal/60%60), math.floor(nTotal%60))
             end
