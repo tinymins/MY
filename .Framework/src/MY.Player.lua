@@ -310,8 +310,8 @@ MY.Player.GetFightTime = function(szFormat)
     
     if szFormat then
         local nSeconds = math.floor(nFrame  / GLOBAL.GAME_FPS)
-        local nMinutes = math.floor(nSecond / 60)
-        local nHours   = math.floor(nMinute / 60)
+        local nMinutes = math.floor(nSeconds / 60)
+        local nHours   = math.floor(nMinutes / 60)
         local nMinute  = nMinutes % 60
         local nSecond  = nSeconds % 60
         szFormat = szFormat:gsub('f', nFrame)
@@ -325,7 +325,7 @@ MY.Player.GetFightTime = function(szFormat)
         szFormat = szFormat:gsub('m', nMinute)
         szFormat = szFormat:gsub('s', nSecond)
         
-        if tonumber(szFormat) then
+        if szFormat:sub(1, 1) ~= '0' and tonumber(szFormat) then
             szFormat = tonumber(szFormat)
         end
     else
