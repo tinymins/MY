@@ -62,7 +62,7 @@ MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
     local w, h = 300, 270
     local note = MY_Anmerkungen.GetPlayerNote(dwID) or {}
     -- frame
-    local ui = MY.UI.CreateFrame("MY_Anmerkungen_PlayerNoteEdit_"..(dwID or 0), true)
+    local ui = MY.UI.CreateFrame("MY_Anmerkungen_PlayerNoteEdit_"..(dwID or 0), MY.Const.UI.Frame.NORMAL_EMPTY)
     local CloseFrame = function(ui)
         PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
         ui:remove()
