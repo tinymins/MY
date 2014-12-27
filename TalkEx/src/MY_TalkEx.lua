@@ -46,7 +46,7 @@ MY.RegisterInit(function()
         _MY_TalkEx.tChannels = { 
             ['NEARBY'] = { szName = _L['nearby channel'], tCol = GetMsgFontColor("MSG_NORMAL", true) },
             ['FRIENDS'] = { szName = _L['friend channel'], tCol = GetMsgFontColor("MSG_FRIEND", true) },
-            ['TEAM'] = { szName = _L['team channel'], tCol = GetMsgFontColor("MSG_TEAM", true) },
+            ['TEAM'] = { szName = _L['team channel'], tCol = GetMsgFontColor("MSG_PARTY", true) },
             ['RAID'] = { szName = _L['raid channel'], tCol = GetMsgFontColor("MSG_TEAM", true) },
             ['TONG'] = { szName = _L['tong channel'], tCol = GetMsgFontColor("MSG_GUILD", true) },
             ['TONG_ALLIANCE'] = { szName = _L['tong alliance channel'], tCol = GetMsgFontColor("MSG_GUILD_ALLIANCE", true) },
