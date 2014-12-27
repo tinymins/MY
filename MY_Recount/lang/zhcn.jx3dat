@@ -1,0 +1,23 @@
+-- language data (zhcn) updated at 2014-12-27 22:15:14
+data = {
+    ['enable'] = '启用',
+    ['current fight'] = '返回当前统计',
+    ['recount'] = '战斗统计',
+    
+    ['filter short fight'] = '过滤短时战斗',
+    ['no time limit'] = '无时间限制',
+    ['less than %d second'] = '不足%d秒',
+    ['less than %d minute'] = '不足%d分钟',
+    
+    ['display only npc record'] = '只显示NPC记录',
+    ['display only player record'] = '只显示玩家记录',
+    ['display all record'] = '显示所有记录',
+    
+    ['display as per second'  ] = '显示每秒均值',
+    ['display effective value'] = '显示有效数值',
+    ['theme'] = '自定风格选择',
+    ['max history'] = '最大历史记录',
+    
+    ['publish limit'] = '发布数量',
+    ['top %d'] = '前%d名',
+}
