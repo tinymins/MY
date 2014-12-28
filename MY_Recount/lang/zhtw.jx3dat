@@ -1,7 +1,7 @@
 -- language data (zhtw) updated at 2014-12-27 22:15:14
 data = {
     ['enable'] = '啓用',
-    ['current fight'] = '返回當前統計',
+    ['current fight'] = '當前統計',
     ['recount'] = '戰鬥統計',
     
     ['filter short fight'] = '過濾短時戰鬥',

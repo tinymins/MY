@@ -1,7 +1,7 @@
 -- language data (zhcn) updated at 2014-12-27 22:15:14
 data = {
     ['enable'] = '启用',
-    ['current fight'] = '返回当前统计',
+    ['current fight'] = '当前统计',
     ['recount'] = '战斗统计',
     
     ['filter short fight'] = '过滤短时战斗',
