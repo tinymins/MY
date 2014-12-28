@@ -1118,6 +1118,7 @@ end
 MY_Recount.GetHistoryMenu = function()
     local t = {{
         szOption = _L["current fight"],
+        rgb = (Data == DataDisplay and {255, 255, 0}) or nil,
         fnAction = function()
             MY_Recount.DisplayData(0)
         end,
@@ -1127,6 +1128,7 @@ MY_Recount.GetHistoryMenu = function()
         if data.UUID and data.nTimeDuring then
             table.insert(t, {
                 szOption = (data.szBossName or '') .. ' (' .. data.nTimeDuring .. 's)',
+                rgb = (data == DataDisplay and {255, 255, 0}) or nil,
                 fnAction = function()
                     MY_Recount.DisplayData(data)
                 end,
