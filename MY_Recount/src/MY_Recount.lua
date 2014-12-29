@@ -387,7 +387,7 @@ _Cache.OnDetailFrameBreathe = function()
             hItem:Lookup('Text_DetailAverage'):SetText(p.nAvgEffect)
             hItem:Lookup('Text_DetailMax'):SetText(p.nMaxEffect)
             hItem:Lookup('Text_DetailCount'):SetText(p.nCount)
-            hItem:Lookup('Text_DetailPercent'):SetText((math.floor(p.nTotalEffect / nTotalEffect * 1000) / 10) .. '%')
+            hItem:Lookup('Text_DetailPercent'):SetText(nTotalEffect > 0 and ((math.floor(p.nTotalEffect / nTotalEffect * 1000) / 10) .. '%') or ' - ')
         end
         hList:FormatAllItemPos()
         
@@ -432,7 +432,7 @@ _Cache.OnDetailFrameBreathe = function()
             hItem:Lookup('Text_TargetHit'):SetText(p.nHitCount)
             hItem:Lookup('Text_TargetCritical'):SetText(p.nCriticalCount)
             hItem:Lookup('Text_TargetMiss'):SetText(p.nMissCount)
-            hItem:Lookup('Text_TargetPercent'):SetText((math.floor(p.nTotalEffect / nTotalEffect * 1000) / 10) .. '%')
+            hItem:Lookup('Text_TargetPercent'):SetText((nTotalEffect > 0 and ((math.floor(p.nTotalEffect / nTotalEffect * 1000) / 10) .. '%') or ' - '))
         end
         hList:FormatAllItemPos()
     else
