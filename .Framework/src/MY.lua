@@ -278,6 +278,7 @@ MY.ClosePanel = function(bRealClose)
             Wnd.CloseWindow(frame)
             _MY.frame = nil
         end
+        Wnd.CloseWindow("PopupMenuPanel")
         PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
     end
 end
