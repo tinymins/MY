@@ -142,6 +142,7 @@ local SKILL_RESULT = {
     MISS    = 3, -- 偏离
     DODGE   = 4, -- 闪避
     CRITICAL= 5, -- 会心
+    INSIGHT = 6, -- 识破
 }
 
 MY_Recount = MY_Recount or {}
@@ -346,6 +347,12 @@ MY_Recount.Data.OnSkillEffect = function(dwCaster, dwTarget, nEffectType, dwEffe
     nSkillResult == SKILL_RESULT.MISS         or  -- 偏离
     nSkillResult == SKILL_RESULT.DODGE      then  -- 闪避
         MY_Recount.Data.AddDamageRecord(hCaster, hTarget, szEffectName, 0, 0, nSkillResult)
+    end
+    
+    -- 识破
+    local nValue = tResult[SKILL_RESULT_TYPE.INSIGHT_DAMAGE]
+    if nValue and nValue > 0 then
+        MY_Recount.Data.AddDamageRecord(hCaster, hTarget, szEffectName, nDamage, nEffectDamage, SKILL_RESULT.INSIGHT)
     end
 end
 

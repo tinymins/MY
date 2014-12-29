@@ -33,14 +33,16 @@ local SKILL_RESULT = {
     MISS    = 3, -- 偏离
     DODGE   = 4, -- 闪避
     CRITICAL= 5, -- 会心
+    INSIGHT = 6, -- 识破
 }
 local SZ_SKILL_RESULT = {
     [SKILL_RESULT.HIT     ] = g_tStrings.STR_HIT_NAME     ,
     [SKILL_RESULT.BLOCK   ] = g_tStrings.STR_IMMUNITY_NAME,
     [SKILL_RESULT.SHIELD  ] = g_tStrings.STR_SHIELD_NAME  ,
-    [SKILL_RESULT.MISS    ] = g_tStrings.STR_MISS_NAME    ,
-    [SKILL_RESULT.DODGE   ] = g_tStrings.STR_DODGE_NAME   ,
+    [SKILL_RESULT.MISS    ] = g_tStrings.STR_MSG_MISS     ,
+    [SKILL_RESULT.DODGE   ] = g_tStrings.STR_MSG_DODGE    ,
     [SKILL_RESULT.CRITICAL] = g_tStrings.STR_CS_NAME      ,
+    [SKILL_RESULT.INSIGHT ] = g_tStrings.STR_MSG_INSIGHT  ,
 }
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Recount/lang/")
 local _Cache = {
