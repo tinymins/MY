@@ -9,6 +9,10 @@ data = {
     ['less than %d second'] = '不足%d秒',
     ['less than %d minute'] = '不足%d分钟',
     
+    ['redraw interval'] = '数值刷新周期',
+    ['realtime refresh'] = '实时刷新',
+    ['every %.1f second'] = '每隔%.1f秒',
+    
     ['display only npc record'] = '只显示NPC记录',
     ['display only player record'] = '只显示玩家记录',
     ['display all record'] = '显示所有记录',
