@@ -463,6 +463,7 @@ _Cache.OnDetailItemLButtonDown = function()
         else
             this:GetRoot().szSelectedTarget = this.szKey
         end
+        this:GetRoot().nLastRedrawFrame = 0
     end
 end
 
