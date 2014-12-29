@@ -341,7 +341,11 @@ _Cache.OnDetailFrameBreathe = function()
         return p1.nTotalEffect > p2.nTotalEffect
     end)
     -- 界面重绘
+    this:Lookup('WndScroll_Skill'):SetH(112)
+    this:Lookup('WndScroll_Skill', ''):SetH(112)
+    this:Lookup('WndScroll_Skill', ''):FormatAllItemPos()
     local hList = this:Lookup('WndScroll_Skill', 'Handle_SkillList')
+    hList:SetH(90)
     hList:Clear()
     for i, p in ipairs(tResult) do
         local hItem = hList:AppendItemFromIni(_Cache.szIniDetail, 'Handle_SkillItem')
@@ -360,6 +364,7 @@ _Cache.OnDetailFrameBreathe = function()
     hList:FormatAllItemPos()
     
     if szSelected and tData[szPrimarySort][szSelected] then
+        this:Lookup('', 'Handle_Spliter'):Show()
         --------------- 技能释放结果列表更新 -----------------
         -- 数据收集
         local tResult, nTotalEffect = {}, tData[szPrimarySort][szSelected].nTotalEffect
@@ -377,6 +382,7 @@ _Cache.OnDetailFrameBreathe = function()
             return p1.nAvgEffect > p2.nAvgEffect
         end)
         -- 界面重绘
+        this:Lookup('WndScroll_Detail'):Show()
         local hList = this:Lookup('WndScroll_Detail', 'Handle_DetailList')
         hList:Clear()
         for i, p in ipairs(tResult) do
@@ -421,6 +427,7 @@ _Cache.OnDetailFrameBreathe = function()
             return p1.nTotalEffect > p2.nTotalEffect
         end)
         -- 界面重绘
+        this:Lookup('WndScroll_Target'):Show()
         local hList = this:Lookup('WndScroll_Target', 'Handle_TargetList')
         hList:Clear()
         for i, p in ipairs(tResult) do
@@ -436,10 +443,14 @@ _Cache.OnDetailFrameBreathe = function()
         end
         hList:FormatAllItemPos()
     else
-        this:Lookup('WndScroll_Detail', 'Handle_DetailList'):Clear()
-        this:Lookup('WndScroll_Detail', 'Handle_DetailList'):FormatAllItemPos()
-        this:Lookup('WndScroll_Target', 'Handle_TargetList'):Clear()
-        this:Lookup('WndScroll_Target', 'Handle_TargetList'):FormatAllItemPos()
+        this:Lookup('WndScroll_Skill'):SetH(348)
+        this:Lookup('WndScroll_Skill', ''):SetH(348)
+        this:Lookup('WndScroll_Skill', 'Handle_SkillList'):SetH(332)
+        this:Lookup('WndScroll_Skill', 'Handle_SkillList'):FormatAllItemPos()
+        this:Lookup('WndScroll_Skill', ''):FormatAllItemPos()
+        this:Lookup('WndScroll_Detail'):Hide()
+        this:Lookup('WndScroll_Target'):Hide()
+        this:Lookup('', 'Handle_Spliter'):Hide()
     end
     
 end
@@ -453,6 +464,11 @@ _Cache.OnDetailLButtonClick = function()
         else
             this:GetRoot().szPrimarySort = 'Skill'
         end
+        this:GetRoot().nLastRedrawFrame = 0
+    elseif name == 'Btn_Unselect' then
+        this:GetRoot().szSelectedSkill  = nil
+        this:GetRoot().szSelectedTarget = nil
+        this:GetRoot().nLastRedrawFrame = 0
     end
 end
 _Cache.OnDetailItemLButtonDown = function()
