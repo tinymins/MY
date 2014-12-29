@@ -317,7 +317,7 @@ _Cache.OnDetailFrameBreathe = function()
         szSelected = this.szSelectedTarget
     end
     
-    --------------- 技能列表更新 -----------------
+    --------------- 一、技能列表更新 -----------------
     -- 数据收集
     local tResult, nTotalEffect = {}, tData.nTotalEffect
     if szPrimarySort == 'Skill' then
@@ -369,12 +369,12 @@ _Cache.OnDetailFrameBreathe = function()
     
     if szSelected and tData[szPrimarySort][szSelected] then
         this:Lookup('', 'Handle_Spliter'):Show()
-        --------------- 技能释放结果列表更新 -----------------
+        --------------- 二、技能释放结果列表更新 -----------------
         -- 数据收集
-        local tResult, nTotalEffect = {}, tData[szPrimarySort][szSelected].nTotalEffect
+        local tResult, nTotalEffect, nCount = {}, tData[szPrimarySort][szSelected].nTotalEffect, tData[szPrimarySort][szSelected].nCount
         for nSkillResult, p in pairs(tData[szPrimarySort][szSelected].Detail) do
             table.insert(tResult, {
-                nCount     = p.nCount,
+                nCount     = p.nCount    ,
                 nMinEffect = p.nMinEffect,
                 nAvgEffect = p.nAvgEffect,
                 nMaxEffect = p.nMaxEffect,
@@ -397,7 +397,7 @@ _Cache.OnDetailFrameBreathe = function()
             hItem:Lookup('Text_DetailAverage'):SetText(p.nAvgEffect)
             hItem:Lookup('Text_DetailMax'):SetText(p.nMaxEffect)
             hItem:Lookup('Text_DetailCount'):SetText(p.nCount)
-            hItem:Lookup('Text_DetailPercent'):SetText(nTotalEffect > 0 and ((math.floor(p.nTotalEffect / nTotalEffect * 1000) / 10) .. '%') or ' - ')
+            hItem:Lookup('Text_DetailPercent'):SetText(nCount > 0 and ((math.floor(p.nCount / nCount * 1000) / 10) .. '%') or ' - ')
         end
         hList:FormatAllItemPos()
         
@@ -408,7 +408,7 @@ _Cache.OnDetailFrameBreathe = function()
             hScroll:SetScrollPos(math.ceil(hScroll:GetStepCount() * hSelectedItem:GetIndex() / hSelectedItem:GetParent():GetItemCount()))
         end
         
-        --------------- 技能释放结果列表更新 -----------------
+        --------------- 三、技能释放结果列表更新 -----------------
         -- 数据收集
         local tResult, nTotalEffect = {}, tData[szPrimarySort][szSelected].nTotalEffect
         if szPrimarySort == 'Skill' then
