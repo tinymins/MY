@@ -627,7 +627,7 @@ end
 _MY.tItemXML = {
 	["Text"] = "<text>w=150 h=30 valign=1 font=162 eventid=371 </text>",
 	["Image"] = "<image>w=100 h=100 eventid=371 </image>",
-	["Box"] = "<box>w=48 h=48 eventid=525311 </text>",
+	["Box"] = "<box>w=48 h=48 eventid=525311 </box>",
 	["Shadow"] = "<shadow>w=15 h=15 eventid=277 </shadow>",
 	["Handle"] = "<handle>firstpostype=0 w=10 h=10</handle>",
 }
