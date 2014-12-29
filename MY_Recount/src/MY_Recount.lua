@@ -343,6 +343,7 @@ _Cache.OnDetailFrameBreathe = function()
         return p1.nTotalEffect > p2.nTotalEffect
     end)
     -- 界面重绘
+    local hSelectedItem
     this:Lookup('WndScroll_Skill'):SetH(112)
     this:Lookup('WndScroll_Skill', ''):SetH(112)
     this:Lookup('WndScroll_Skill', ''):FormatAllItemPos()
@@ -359,6 +360,7 @@ _Cache.OnDetailFrameBreathe = function()
         
         if szPrimarySort == 'Skill' and szSelectedSkill == p.szKey or
         szPrimarySort == 'Target' and szSelectedTarget == p.szKey then
+            hSelectedItem = hItem
             hItem:Lookup('Shadow_SkillEntry'):Show()
         end
         hItem.szKey = p.szKey
@@ -398,6 +400,13 @@ _Cache.OnDetailFrameBreathe = function()
             hItem:Lookup('Text_DetailPercent'):SetText(nTotalEffect > 0 and ((math.floor(p.nTotalEffect / nTotalEffect * 1000) / 10) .. '%') or ' - ')
         end
         hList:FormatAllItemPos()
+        
+        -- 调整滚动条 增强用户体验
+        if hSelectedItem and not this:Lookup('WndScroll_Target'):IsVisible() then
+            -- 说明是刚从未选择状态切换过来 滚动条滚动到选中项
+            local hScroll = this:Lookup('WndScroll_Skill/Scroll_Skill_List')
+            hScroll:SetScrollPos(math.ceil(hScroll:GetStepCount() * hSelectedItem:GetIndex() / hSelectedItem:GetParent():GetItemCount()))
+        end
         
         --------------- 技能释放结果列表更新 -----------------
         -- 数据收集
