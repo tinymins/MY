@@ -360,7 +360,7 @@ _Cache.OnDetailFrameBreathe = function()
         hItem:Lookup('Text_SkillName'):SetText(p.szName)
         hItem:Lookup('Text_SkillCount'):SetText(p.nCount)
         hItem:Lookup('Text_SkillTotal'):SetText(p.nTotalEffect)
-        hItem:Lookup('Text_SkillPercentage'):SetText((math.floor(p.nTotalEffect / nTotalEffect * 1000) / 10) .. '%')
+        hItem:Lookup('Text_SkillPercentage'):SetText(nTotalEffect > 0 and ((math.floor(p.nTotalEffect / nTotalEffect * 1000) / 10) .. '%') or ' - ')
         
         if szPrimarySort == 'Skill' and szSelectedSkill == p.szKey or
         szPrimarySort == 'Target' and szSelectedTarget == p.szKey then
