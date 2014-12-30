@@ -206,14 +206,23 @@ MY.RegisterEvent('MY_FIGHT_HINT', function(bEnterFight)
     else
         Data.nTimeDuring = MY.Player.GetFightTime() / GLOBAL.GAME_FPS
         -- 计算受伤最多的名字作为战斗名称
-        local nMaxValue, szBossName = 0, ''
+        local nMaxValue, szBossName = 0, nil
         for id, p in pairs(Data.BeDamage) do
             if nMaxValue < p.nTotalEffect and id ~= UI_GetClientPlayerID() then
                 nMaxValue  = p.nTotalEffect
                 szBossName = MY_Recount.Data.GetNameAusID(id, Data)
             end
         end
-        Data.szBossName = szBossName
+        -- 如果没有 则计算输出最多的NPC名字作为战斗名称
+        if not szBossName then
+            for id, p in pairs(Data.Damage) do
+                if nMaxValue < p.nTotalEffect and not tonumber(id) then
+                    nMaxValue  = p.nTotalEffect
+                    szBossName = MY_Recount.Data.GetNameAusID(id, Data)
+                end
+            end
+        end
+        Data.szBossName = szBossName or ''
         
         MY_Recount.Data.Push()
     end
