@@ -238,8 +238,10 @@ MY_Recount.UpdateUI = function(data)
             hItem:ExchangeIndex(i - 1)
         end
         
-        hItem:Lookup('Image_PerBack'):SetPercentage(p.nValue / nMaxValue)
-        hItem:Lookup('Image_PerFore'):SetPercentage(p.nEffectValue / nMaxValue)
+        if nMaxValue > 0 then
+            hItem:Lookup('Image_PerBack'):SetPercentage(p.nValue / nMaxValue)
+            hItem:Lookup('Image_PerFore'):SetPercentage(p.nEffectValue / nMaxValue)
+        end
         if MY_Recount.bShowEffect then
             if MY_Recount.bShowPerSec then
                 hItem:Lookup('Text_R'):SetText(math.floor(p.nEffectValue / nTimeCount) .. ' ' .. szUnit)
