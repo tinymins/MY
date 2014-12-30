@@ -257,7 +257,8 @@ MY_Recount.UpdateUI = function(data)
         end
         hItem.data = p
     end
-    hList.szUnit = szUnit
+    hList.szUnit     = szUnit
+    hList.nTimeCount = nTimeCount
     hList:FormatAllItemPos()
 end
 --[[
@@ -829,8 +830,9 @@ MY_Recount.GetPublishMenu = function()
                     true
                 )
                 MY.Talk(nChannel, '--------------------')
-                local hList  = frame:Lookup('Wnd_Main', 'Handle_List')
-                local szUnit = (' ' .. hList.szUnit) or ''
+                local hList      = frame:Lookup('Wnd_Main', 'Handle_List')
+                local szUnit     = (' ' .. hList.szUnit) or ''
+                local nTimeCount = hList.nTimeCount or 0
                 for i = 0, MY_Recount.nPublishLimit do
                     local hItem = hList:Lookup(i)
                     if not hItem then
@@ -838,7 +840,7 @@ MY_Recount.GetPublishMenu = function()
                     end
                     local p = hItem.data
                     local bNpc = p.id == p.szName
-                    MY.Talk(nChannel, i .. '.[' .. p.szName .. ']: ' .. p.nEffectValue .. '/' .. p.nValue .. szUnit, bNpc)
+                    MY.Talk(nChannel, i .. '.[' .. p.szName .. ']: ' .. math.ceil(p.nEffectValue / nTimeCount) .. '/' ..  math.ceil(p.nValue / nTimeCount) .. szUnit, bNpc)
                 end
                 MY.Talk(nChannel, '--------------------')
             end
