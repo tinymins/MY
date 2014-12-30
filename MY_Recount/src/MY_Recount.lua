@@ -253,7 +253,9 @@ MY_Recount.UpdateUI = function(data)
                 hItem:Lookup('Text_R'):SetText(p.nValue)
             end
         end
+        hItem.data = p
     end
+    hList.szUnit = szUnit
     hList:FormatAllItemPos()
 end
 --[[
@@ -824,20 +826,19 @@ MY_Recount.GetPublishMenu = function()
                     _L['recount'] .. ' - ' .. frame:Lookup('Wnd_Title', 'Text_Title'):GetText(),
                     true
                 )
-                local hList = frame:Lookup('Wnd_Main', 'Handle_List')
+                MY.Talk(nChannel, '--------------------')
+                local hList  = frame:Lookup('Wnd_Main', 'Handle_List')
+                local szUnit = (' ' .. hList.szUnit) or ''
                 for i = 0, MY_Recount.nPublishLimit do
                     local hItem = hList:Lookup(i)
                     if not hItem then
                         break
                     end
-                    local bNpc
-                    hItem:GetName():gsub('Handle_LI_(.+)', function(id)
-                        if not tonumber(id) then
-                            bNpc = true
-                        end
-                    end)
-                    MY.Talk(nChannel, i .. '.[' .. hItem:Lookup('Text_L'):GetText() .. ']: ' .. hItem:Lookup('Text_R'):GetText(), bNpc)
+                    local p = hItem.data
+                    local bNpc = p.id == p.szName
+                    MY.Talk(nChannel, i .. '.[' .. p.szName .. ']: ' .. p.nEffectValue .. '/' .. p.nValue .. szUnit, bNpc)
                 end
+                MY.Talk(nChannel, '--------------------')
             end
         })
     end
