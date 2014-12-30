@@ -147,7 +147,7 @@ local SKILL_RESULT = {
 
 MY_Recount = MY_Recount or {}
 MY_Recount.Data = {}
-MY_Recount.Data.nMaxHistory   = 20
+MY_Recount.Data.nMaxHistory   = 10
 MY_Recount.Data.nMinFightTime = 30
 
 local _Cache = {
@@ -176,7 +176,7 @@ local History       -- 历史战斗记录
 MY.RegisterInit(function()
     local data = MY.Sys.LoadUserData(_Cache.szRecFile) or {}
     History                       = data.History       or {}
-    MY_Recount.Data.nMaxHistory   = data.nMaxHistory   or 20
+    MY_Recount.Data.nMaxHistory   = data.nMaxHistory   or 10
     MY_Recount.Data.nMinFightTime = data.nMinFightTime or 30
     MY_Recount.Data.Init()
 end)
