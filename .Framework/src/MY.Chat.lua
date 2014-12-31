@@ -577,7 +577,7 @@ MY.Chat.ParseAntiSWS = function(t)
                     type = "text",
                     text = string.sub(szText, 1, nSensitiveWordEndPos - nSensitiveWordEndLen)
                 })
-                szText = string.sub(szText, nSensitiveWordEndPos + 1)
+                szText = string.sub(szText, nSensitiveWordEndPos + 1 - nSensitiveWordEndLen)
             end
         else
             table.insert(t2, v)
