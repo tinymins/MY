@@ -642,3 +642,26 @@ MY.Debug = function(szText, szHead, nLevel)
         MY.Sysmsg(oContent, szHead)
     end
 end
+
+--[[ 格式化计时时间
+    (string) MY.Sys.FormatTimeCount(szFormat, nTime)
+    szFormat  格式化字符串 可选项H,M,S,hh,mm,ss,h,m,s
+]]
+MY.Sys.FormatTimeCount = function(szFormat, nTime)
+    local nSeconds = math.floor(nTime)
+    local nMinutes = math.floor(nSeconds / 60)
+    local nHours   = math.floor(nMinutes / 60)
+    local nMinute  = nMinutes % 60
+    local nSecond  = nSeconds % 60
+    szFormat = szFormat:gsub('H', nHours)
+    szFormat = szFormat:gsub('M', nMinutes)
+    szFormat = szFormat:gsub('S', nSeconds)
+    szFormat = szFormat:gsub('hh', string.format('%02d', nHours ))
+    szFormat = szFormat:gsub('mm', string.format('%02d', nMinute))
+    szFormat = szFormat:gsub('ss', string.format('%02d', nSecond))
+    szFormat = szFormat:gsub('h', nHours)
+    szFormat = szFormat:gsub('m', nMinute)
+    szFormat = szFormat:gsub('s', nSecond)
+    return szFormat
+end
+MY.FormatTimeCount = MY.Sys.FormatTimeCount
