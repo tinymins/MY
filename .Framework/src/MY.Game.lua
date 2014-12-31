@@ -277,6 +277,10 @@ MY.GetObject = MY.Game.GetObject
 --[[ 获取指定对象的名字
 ]]
 MY.Game.GetObjectName = function(obj)
+    if not obj then
+        return nil
+    end
+
     local szName = obj.szName
     if IsPlayer(obj.dwID) then  -- PLAYER
         if szName == "" then
