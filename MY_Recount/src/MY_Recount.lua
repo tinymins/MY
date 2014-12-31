@@ -183,17 +183,13 @@ MY_Recount.UpdateUI = function(data)
     end
     
     -- 计算战斗时间
-    local nTimeCount, szTimeCount = 0, ''
+    local nTimeCount = 0
     if data.UUID == MY.Player.GetFightUUID() then
         nTimeCount = MY.Player.GetFightTime() / GLOBAL.GAME_FPS
     else
         nTimeCount = data.nTimeDuring
     end
-    local nHour, nMin, nSec = GetTimeToHourMinuteSecond(nTimeCount)
-    if nHour > 0 then
-        szTimeCount = szTimeCount .. nHour .. ':'
-    end
-    szTimeCount = szTimeCount .. nMin .. ':' .. nSec
+    local szTimeCount = MY.Sys.FormatTimeCount('h:mm:ss', nTimeCount)
     nTimeCount  = math.max(nTimeCount, 1) -- 防止计算DPS时除以0
     -- 自己的记录
     local tMyRec
@@ -819,7 +815,7 @@ MY_Recount.GetHistoryMenu = function()
     for _, data in ipairs(MY_Recount.Data.Get()) do
         if data.UUID and data.nTimeDuring then
             table.insert(t, {
-                szOption = (data.szBossName or '') .. ' (' .. data.nTimeDuring .. 's)',
+                szOption = (data.szBossName or '') .. ' (' .. MY.Sys.FormatTimeCount('M:ss', data.nTimeDuring) .. ')',
                 rgb = (data == DataDisplay and {255, 255, 0}) or nil,
                 fnAction = function()
                     MY_Recount.DisplayData(data)
