@@ -156,6 +156,7 @@ MY_Recount.DrawUI = function(data)
 
     m_frame:Lookup('Wnd_Title', 'Text_Title'):SetText(SZ_CHANNEL[MY_Recount.nChannel])
     m_frame:Lookup('Wnd_Main', 'Handle_List'):Clear()
+    m_frame:Lookup('Wnd_Main', 'Handle_Me').bInited = nil
 
     MY_Recount.UpdateUI(data)
 end
@@ -182,15 +183,20 @@ MY_Recount.UpdateUI = function(data)
     end
     
     -- 计算战斗时间
-    local nTimeCount
-    if not data.UUID then
-        nTimeCount = 0
-    elseif data.UUID == MY.Player.GetFightUUID() then
+    local nTimeCount, szTimeCount = 0, ''
+    if data.UUID == MY.Player.GetFightUUID() then
         nTimeCount = MY.Player.GetFightTime() / GLOBAL.GAME_FPS
     else
         nTimeCount = data.nTimeDuring
     end
-    nTimeCount = math.max(nTimeCount, 1) -- 防止计算DPS时除以0
+    local nHour, nMin, nSec = GetTimeToHourMinuteSecond(nTimeCount)
+    if nHour > 0 then
+        szTimeCount = szTimeCount .. nHour .. ':'
+    end
+    szTimeCount = szTimeCount .. nMin .. ':' .. nSec
+    nTimeCount  = math.max(nTimeCount, 1) -- 防止计算DPS时除以0
+    -- 自己的记录
+    local tMyRec
     
     -- 整理数据 生成要显示的列表
     local nMaxValue, tResult = 0, {}
@@ -207,6 +213,16 @@ MY_Recount.UpdateUI = function(data)
             }
             table.insert(tResult, tRec)
             nMaxValue = math.max(nMaxValue, tRec.nValue, tRec.nEffectValue)
+        end
+        -- 自己的记录
+        if id == UI_GetClientPlayerID() then
+            tMyRec = {
+                id           = id                                    ,
+                szName       = MY_Recount.Data.GetNameAusID(id, data),
+                dwForceID    = data.Forcelist[id] or -1              ,
+                nValue       = rec.nTotal         or  0              ,
+                nEffectValue = rec.nTotalEffect   or  0              ,
+            }
         end
     end
     
@@ -260,6 +276,44 @@ MY_Recount.UpdateUI = function(data)
     hList.szUnit     = szUnit
     hList.nTimeCount = nTimeCount
     hList:FormatAllItemPos()
+    
+    -- 渲染底部自己的统计
+    local hItem = m_frame:Lookup('Wnd_Main', 'Handle_Me')
+    -- 左侧战斗计时
+    hItem:Lookup('Text_Me_L'):SetText(szTimeCount)
+    if tMyRec then
+        -- 初始化颜色
+        if not hItem.bInited and _Cache.Css.Bar[tMyRec.dwForceID] then
+            hItem:Lookup('Image_Me_PerFore'):FromUITex(unpack(_Cache.Css.Bar[tMyRec.dwForceID]))
+            hItem:Lookup('Image_Me_PerBack'):FromUITex(unpack(_Cache.Css.Bar[tMyRec.dwForceID]))
+            hItem.bInited = true
+        end
+        if nMaxValue > 0 then
+            hItem:Lookup('Image_Me_PerBack'):SetPercentage(tMyRec.nValue / nMaxValue)
+            hItem:Lookup('Image_Me_PerFore'):SetPercentage(tMyRec.nEffectValue / nMaxValue)
+        else
+            hItem:Lookup('Image_Me_PerBack'):SetPercentage(1)
+            hItem:Lookup('Image_Me_PerFore'):SetPercentage(1)
+        end
+        -- 右侧文字
+        if MY_Recount.bShowEffect then
+            if MY_Recount.bShowPerSec then
+                hItem:Lookup('Text_Me_R'):SetText(math.floor(tMyRec.nEffectValue / nTimeCount) .. ' ' .. szUnit)
+            else
+                hItem:Lookup('Text_Me_R'):SetText(tMyRec.nEffectValue)
+            end
+        else
+            if MY_Recount.bShowPerSec then
+                hItem:Lookup('Text_Me_R'):SetText(math.floor(tMyRec.nValue / nTimeCount) .. ' ' .. szUnit)
+            else
+                hItem:Lookup('Text_Me_R'):SetText(tMyRec.nValue)
+            end
+        end
+    else
+        hItem:Lookup('Text_Me_R'):SetText('')
+        hItem:Lookup('Image_Me_PerBack'):SetPercentage(1)
+        hItem:Lookup('Image_Me_PerFore'):SetPercentage(0)
+    end
 end
 --[[
 ##########################################################################
@@ -512,6 +566,9 @@ end
 
 MY_Recount.OnItemLButtonClick = function()
     local name = this:GetName()
+    if name == 'Handle_Me' then
+        name = 'Handle_LI_' .. UI_GetClientPlayerID()
+    end
     name:gsub('Handle_LI_(.+)', function(id)
         local szChannel = SZ_CHANNEL_KEY[MY_Recount.nChannel]
         if not Station.Lookup('Normal/MY_Recount_' .. id .. '_' .. szChannel) then
@@ -575,6 +632,7 @@ MY_Recount.OnCheckBoxCheck = function()
     if name == 'CheckBox_Minimize' then
         this:GetRoot():Lookup('Wnd_Main'):Hide()
         this:GetRoot():SetSize(280, 30)
+        this:GetRoot():Lookup('Wnd_Title', 'Image_Bg'):Hide()
     end
 end
 
@@ -582,7 +640,8 @@ MY_Recount.OnCheckBoxUncheck = function()
     local name = this:GetName()
     if name == 'CheckBox_Minimize' then
         this:GetRoot():Lookup('Wnd_Main'):Show()
-        this:GetRoot():SetSize(280, 250)
+        this:GetRoot():SetSize(280, 274)
+        this:GetRoot():Lookup('Wnd_Title', 'Image_Bg'):Show()
     end
 end
 
