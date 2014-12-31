@@ -253,6 +253,9 @@ MY.RegisterInit(_XLifeBar.Reload)
 XLifeBar.X = class()
 -- 构造函数
 function XLifeBar.X:ctor(object)
+    if not object then
+        return
+    end
     _XLifeBar.tObject[object.dwID] = _XLifeBar.tObject[object.dwID] or {
         handle = nil,
         Name = '',
