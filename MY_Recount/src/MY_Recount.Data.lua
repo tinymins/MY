@@ -576,8 +576,8 @@ end
 -- 插入一条伤害记录
 MY_Recount.Data.AddDamageRecord = function(hCaster, hTarget, szEffectName, nDamage, nEffectDamage, nSkillResult)
     -- 获取索引ID
-    local idCaster = (IsPlayer(hCaster.dwID) and hCaster.dwID) or MY.GetObjectName(hCaster)
-    local idTarget = (IsPlayer(hTarget.dwID) and hTarget.dwID) or MY.GetObjectName(hTarget)
+    local idCaster = (IsPlayer(hCaster.dwID) and hCaster.dwID) or MY.GetObjectName(hCaster) or g_tStrings.STR_NAME_UNKNOWN
+    local idTarget = (IsPlayer(hTarget.dwID) and hTarget.dwID) or MY.GetObjectName(hTarget) or g_tStrings.STR_NAME_UNKNOWN
     
     -- 添加伤害记录
     _Cache.InitObjectData(Data, hCaster, 'Damage')
@@ -590,8 +590,8 @@ end
 -- 插入一条治疗记录
 MY_Recount.Data.AddHealRecord = function(hCaster, hTarget, szEffectName, nHeal, nEffectHeal, nSkillResult)
     -- 获取索引ID
-    local idCaster = (IsPlayer(hCaster.dwID) and hCaster.dwID) or MY.GetObjectName(hCaster)
-    local idTarget = (IsPlayer(hTarget.dwID) and hTarget.dwID) or MY.GetObjectName(hTarget)
+    local idCaster = (IsPlayer(hCaster.dwID) and hCaster.dwID) or MY.GetObjectName(hCaster) or g_tStrings.STR_NAME_UNKNOWN
+    local idTarget = (IsPlayer(hTarget.dwID) and hTarget.dwID) or MY.GetObjectName(hTarget) or g_tStrings.STR_NAME_UNKNOWN
     
     -- 添加伤害记录
     _Cache.InitObjectData(Data, hCaster, 'Heal')
@@ -603,7 +603,7 @@ end
 
 -- 确认对象数据已创建（未创建则创建）
 _Cache.InitObjectData = function(data, obj, szChannel)
-    local id = (IsPlayer(obj.dwID) and obj.dwID) or MY.GetObjectName(obj)
+    local id = (IsPlayer(obj.dwID) and obj.dwID) or MY.GetObjectName(obj) or g_tStrings.STR_NAME_UNKNOWN
     if IsPlayer(obj.dwID) and not data.Namelist[id] then
         data.Namelist[id]  = MY.Game.GetObjectName(obj) -- 名称缓存
         data.Forcelist[id] = obj.dwForceID or 0         -- 势力缓存
