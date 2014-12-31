@@ -175,11 +175,11 @@ MY_Focus.OnObjectEnterScene = function(dwType, dwID, nRetryCount)
 
     local szName = MY.Game.GetObjectName(obj)
     -- 解决玩家刚进入视野时名字为空的问题
-    if dwType == TARGET.PLAYER and szName == '' then
+    if dwType == TARGET.PLAYER and not szName then
         MY.DelayCall(function()
             MY_Focus.OnObjectEnterScene(dwType, dwID, (nRetryCount or 0) + 1)
         end, 300)
-    else -- 判断是否需要焦点
+    elseif szName then -- 判断是否需要焦点
         local bFocus = false
         -- 判断永久焦点
         if MY_Focus.tFocusList[dwType][dwID] then
@@ -311,7 +311,7 @@ MY_Focus.DrawFocus = function(dwType, dwID)
     end
     
     -- 名字
-    hItem:Lookup('Handle_Name/Text_Name'):SetText(MY.Game.GetObjectName(obj))
+    hItem:Lookup('Handle_Name/Text_Name'):SetText(MY.Game.GetObjectName(obj) or obj.dwID)
     -- 心法
     if dwType == TARGET.PLAYER then
         if info.dwMountKungfuID then
@@ -377,7 +377,7 @@ MY_Focus.DrawFocus = function(dwType, dwID)
         local tp, id = obj.GetTarget()
         local tar = MY.Game.GetObject(tp, id)
         if tar then
-            hItem:Lookup('Handle_Progress/Text_Target'):SetText(MY.Game.GetObjectName(tar, tp))
+            hItem:Lookup('Handle_Progress/Text_Target'):SetText(MY.Game.GetObjectName(tar) or tar.dwID)
         else
             hItem:Lookup('Handle_Progress/Text_Target'):SetText('')
         end

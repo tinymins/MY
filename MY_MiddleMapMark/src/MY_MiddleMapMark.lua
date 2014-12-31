@@ -329,7 +329,7 @@ MY.RegisterEvent("NPC_ENTER_SCENE",    "MY_MiddleMapMark", function()
     end
     -- avoid full number named npc
     local szName = MY.GetObjectName(npc)
-    if tonumber(szName) then
+    if not szName then
         return
     end
     -- switch map
@@ -351,7 +351,7 @@ MY.RegisterEvent("NPC_ENTER_SCENE",    "MY_MiddleMapMark", function()
         nY = npc.nY,
         dwID = npc.dwID,
         nLevel  = npc.nLevel,
-        szName  = MY.GetObjectName(npc),
+        szName  = szName,
         szTitle = npc.szTitle,
         dwTemplateID = npc.dwTemplateID,
     })
@@ -378,7 +378,7 @@ MY.RegisterEvent("DOODAD_ENTER_SCENE", "MY_MiddleMapMark", function()
     end
     -- avoid full number named doodad
     local szName = MY.GetObjectName(doodad)
-    if tonumber(szName) then
+    if not szName then
         return
     end
     -- switch map
@@ -399,7 +399,7 @@ MY.RegisterEvent("DOODAD_ENTER_SCENE", "MY_MiddleMapMark", function()
         nX = doodad.nX,
         nY = doodad.nY,
         dwID = doodad.dwID,
-        szName  = MY.GetObjectName(doodad),
+        szName  = szName,
         dwTemplateID = doodad.dwTemplateID,
     })
     -- redraw ui
