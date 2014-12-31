@@ -24,4 +24,6 @@ data = {
     
     ['publish limit'] = '发布数量',
     ['top %d'] = '前%d名',
+    
+    ['%7d%s(Effect) %7d%s(Total)'] = '%7d%s(有效) %7d%s(总)',
 }

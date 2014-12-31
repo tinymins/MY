@@ -896,20 +896,35 @@ MY_Recount.GetPublishMenu = function()
                     _L['recount'] .. ' - ' .. frame:Lookup('Wnd_Title', 'Text_Title'):GetText(),
                     true
                 )
-                MY.Talk(nChannel, '--------------------')
+                MY.Talk(nChannel, '------------------------')
                 local hList      = frame:Lookup('Wnd_Main', 'Handle_List')
                 local szUnit     = (' ' .. hList.szUnit) or ''
                 local nTimeCount = hList.nTimeCount or 0
+                local tResult = {} -- 收集数据
+                local nMaxNameLen = 0
                 for i = 0, MY_Recount.nPublishLimit do
                     local hItem = hList:Lookup(i)
                     if not hItem then
                         break
                     end
-                    local p = hItem.data
-                    local bNpc = p.id == p.szName
-                    MY.Talk(nChannel, i .. '.[' .. p.szName .. ']: ' .. math.ceil(p.nEffectValue / nTimeCount) .. '/' ..  math.ceil(p.nValue / nTimeCount) .. szUnit, bNpc)
+                    table.insert(tResult, hItem.data)
+                    nMaxNameLen = math.max(nMaxNameLen, wstring.len(hItem.data.szName))
                 end
-                MY.Talk(nChannel, '--------------------')
+                -- 发布数据
+                for i, p in ipairs(tResult) do
+                    local szText = string.format('%02d', i) .. '.[' .. p.szName .. ']'
+                    for i = wstring.len(p.szName), nMaxNameLen - 1 do
+                        szText = szText .. g_tStrings.STR_ONE_CHINESE_SPACE
+                    end
+                    szText = szText .. _L('%7d%s(Effect) %7d%s(Total)',
+                        p.nEffectValue / nTimeCount, szUnit,
+                        p.nValue / nTimeCount, szUnit
+                    )
+                    
+                    MY.Talk(nChannel, szText, p.id == p.szName)
+                end
+                
+                MY.Talk(nChannel, '------------------------')
             end
         })
     end
