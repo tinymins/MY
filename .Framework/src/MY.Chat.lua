@@ -547,6 +547,45 @@ MY.Chat.ParseName = function(t)
     end
     return t2
 end
+local m_tSensitiveWord = {
+    '   ',
+    ' '  .. g_tStrings.STR_ONE_CHINESE_SPACE .. g_tStrings.STR_ONE_CHINESE_SPACE,
+    '  ' .. g_tStrings.STR_ONE_CHINESE_SPACE,
+    g_tStrings.STR_ONE_CHINESE_SPACE .. g_tStrings.STR_ONE_CHINESE_SPACE .. g_tStrings.STR_ONE_CHINESE_SPACE,
+    g_tStrings.STR_ONE_CHINESE_SPACE .. g_tStrings.STR_ONE_CHINESE_SPACE .. ' ',
+    g_tStrings.STR_ONE_CHINESE_SPACE .. '  ',
+}
+-- anti sensitive word shielding in talking message
+MY.Chat.ParseAntiSWS = function(t)
+    local t2 = {}
+    for _, v in ipairs(t) do
+        if v.type == "text" then
+            local szText = v.text
+            while szText and #szText > 0 do
+                local nSensitiveWordEndLen = 1 -- 最后一个字符（要裁剪掉的字符）大小
+                local nSensitiveWordEndPos = #szText + 1
+                for _, szSensitiveWord in ipairs(m_tSensitiveWord) do
+                    local _, nEndPos = wstring.find(szText, szSensitiveWord)
+                    if nEndPos and nEndPos < nSensitiveWordEndPos then
+                        local nSensitiveWordLenW = wstring.len(szSensitiveWord)
+                        nSensitiveWordEndLen = string.len(wstring.sub(szSensitiveWord, nSensitiveWordLenW, nSensitiveWordLenW))
+                        nSensitiveWordEndPos = nEndPos
+                    end
+                end
+                
+                table.insert(t2, {
+                    type = "text",
+                    text = string.sub(szText, 1, nSensitiveWordEndPos - nSensitiveWordEndLen)
+                })
+                szText = string.sub(szText, nSensitiveWordEndPos + 1)
+            end
+        else
+            table.insert(t2, v)
+        end
+    end
+    return t2
+end
+
 --[[ 发布聊天内容
 -- (void) MY.Talk(string szTarget, string szText[, boolean bNoEscape])
 -- (void) MY.Talk([number nChannel, ] string szText[, boolean bNoEscape])
@@ -592,6 +631,7 @@ MY.Chat.Talk = function(nChannel, szText, bNoEscape, bSaveDeny)
         tSay = MY.Chat.ParseFaceIcon(tSay)
         tSay = MY.Chat.ParseName(tSay)
     end
+    tSay = MY.Chat.ParseAntiSWS(tSay)
     if not MY.Chat.bHookedAlready then
         local nLen = 0
         for i, v in ipairs(tSay) do
