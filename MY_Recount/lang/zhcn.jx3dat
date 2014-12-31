@@ -2,7 +2,7 @@
 data = {
     ['enable'] = '启用',
     ['current fight'] = '当前统计',
-    ['recount'] = '战斗统计',
+    ['fight recount'] = '战斗统计',
     
     ['filter short fight'] = '过滤短时战斗',
     ['no time limit'] = '无时间限制',

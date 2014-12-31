@@ -893,7 +893,7 @@ MY_Recount.GetPublishMenu = function()
                 MY.Talk(
                     nChannel,
                     '[' .. _L['mingyi plugin'] .. ']' ..
-                    _L['recount'] .. ' - ' .. frame:Lookup('Wnd_Title', 'Text_Title'):GetText(),
+                    _L['fight recount'] .. ' - ' .. frame:Lookup('Wnd_Title', 'Text_Title'):GetText(),
                     true
                 )
                 MY.Talk(nChannel, '------------------------')
