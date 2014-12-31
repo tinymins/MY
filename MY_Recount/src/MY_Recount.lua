@@ -300,10 +300,8 @@ _Cache.OnDetailFrameBreathe = function()
     end
     this.nLastRedrawFrame = GetLogicFrameCount()
     
-    local id = this.id
-    local szChannel    = this.szChannel
-    local szSelectedSkill  = this.szSelectedSkill
-    local szSelectedTarget = this.szSelectedTarget
+    local id        = this.id
+    local szChannel = this.szChannel
     if tonumber(id) then
         id = tonumber(id)
     end
@@ -315,12 +313,6 @@ _Cache.OnDetailFrameBreathe = function()
     
     local szPrimarySort   = this.szPrimarySort or 'Skill'
     local szSecondarySort = (szPrimarySort == 'Skill' and 'Target') or 'Skill'
-    local szSelected
-    if szPrimarySort == 'Skill' then
-        szSelected = this.szSelectedSkill
-    else
-        szSelected = this.szSelectedTarget
-    end
     
     --------------- 一、技能列表更新 -----------------
     -- 数据收集
@@ -347,6 +339,25 @@ _Cache.OnDetailFrameBreathe = function()
     table.sort(tResult, function(p1, p2)
         return p1.nTotalEffect > p2.nTotalEffect
     end)
+    -- 默认选中第一个
+    if this.bFirstRendering then
+        if tResult[1] then
+            if szPrimarySort == 'Skill' then
+                this.szSelectedSkill  = tResult[1].szKey
+            else
+                this.szSelectedTarget = tResult[1].szKey
+            end
+        end
+        this.bFirstRendering = nil
+    end
+    local szSelected
+    local szSelectedSkill  = this.szSelectedSkill
+    local szSelectedTarget = this.szSelectedTarget
+    if szPrimarySort == 'Skill' then
+        szSelected = this.szSelectedSkill
+    else
+        szSelected = this.szSelectedTarget
+    end
     -- 界面重绘
     local hSelectedItem
     this:Lookup('WndScroll_Skill'):SetH(112)
@@ -506,6 +517,7 @@ MY_Recount.OnItemLButtonClick = function()
         if not Station.Lookup('Normal/MY_Recount_' .. id .. '_' .. szChannel) then
             local frm = Wnd.OpenWindow(_Cache.szIniDetail, 'MY_Recount_' .. id .. '_' .. szChannel)
             frm.id = id
+            frm.bFirstRendering = true
             frm.szChannel = szChannel
             frm.szPrimarySort = ((MY_Recount.nChannel == CHANNEL.DPS or MY_Recount.nChannel == CHANNEL.HPS) and 'Skill') or 'Target'
             frm.szSecondarySort = ((MY_Recount.nChannel == CHANNEL.DPS or MY_Recount.nChannel == CHANNEL.HPS) and 'Target') or 'Skill'
