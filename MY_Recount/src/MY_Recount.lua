@@ -218,6 +218,7 @@ MY_Recount.UpdateUI = function(data)
                 dwForceID    = data.Forcelist[id] or -1              ,
                 nValue       = rec.nTotal         or  0              ,
                 nEffectValue = rec.nTotalEffect   or  0              ,
+                nRank        = #tResult                              ,
             }
         end
     end
@@ -240,7 +241,7 @@ MY_Recount.UpdateUI = function(data)
         if not hItem then
             hItem = hList:AppendItemFromIni(_Cache.szIniFile, 'Handle_Item')
             hItem:SetName('Handle_LI_' .. p.id)
-            hItem:Lookup('Text_L'):SetText(p.szName)
+            hItem:Lookup('Text_L'):SetText(string.format('%02d.%s', i, p.szName))
             if _Cache.Css.Bar[p.dwForceID] then
                 hItem:Lookup('Image_PerFore'):FromUITex(unpack(_Cache.Css.Bar[p.dwForceID]))
                 hItem:Lookup('Image_PerBack'):FromUITex(unpack(_Cache.Css.Bar[p.dwForceID]))
@@ -277,13 +278,13 @@ MY_Recount.UpdateUI = function(data)
     local hItem = m_frame:Lookup('Wnd_Main', 'Handle_Me')
     -- 左侧战斗计时
     hItem:Lookup('Text_Me_L'):SetText(szTimeCount)
+    -- 初始化颜色
+    if not hItem.bInited and _Cache.Css.Bar[tMyRec.dwForceID] then
+        hItem:Lookup('Image_Me_PerFore'):FromUITex(unpack(_Cache.Css.Bar[tMyRec.dwForceID]))
+        hItem:Lookup('Image_Me_PerBack'):FromUITex(unpack(_Cache.Css.Bar[tMyRec.dwForceID]))
+        hItem.bInited = true
+    end
     if tMyRec then
-        -- 初始化颜色
-        if not hItem.bInited and _Cache.Css.Bar[tMyRec.dwForceID] then
-            hItem:Lookup('Image_Me_PerFore'):FromUITex(unpack(_Cache.Css.Bar[tMyRec.dwForceID]))
-            hItem:Lookup('Image_Me_PerBack'):FromUITex(unpack(_Cache.Css.Bar[tMyRec.dwForceID]))
-            hItem.bInited = true
-        end
         if nMaxValue > 0 then
             hItem:Lookup('Image_Me_PerBack'):SetPercentage(tMyRec.nValue / nMaxValue)
             hItem:Lookup('Image_Me_PerFore'):SetPercentage(tMyRec.nEffectValue / nMaxValue)
@@ -334,6 +335,11 @@ MY_Recount.OnFrameBreathe = function()
         return
     end
     this.nLastRedrawFrame = GetLogicFrameCount()
+    
+    -- 不进战时不刷新UI
+    if not _Cache.bHistoryMode and not MY.Player.GetFightUUID() then
+        return
+    end
     
     MY_Recount.UpdateUI()
 end
@@ -636,7 +642,7 @@ MY_Recount.OnCheckBoxUncheck = function()
     local name = this:GetName()
     if name == 'CheckBox_Minimize' then
         this:GetRoot():Lookup('Wnd_Main'):Show()
-        this:GetRoot():SetSize(280, 274)
+        this:GetRoot():SetSize(280, 262)
         this:GetRoot():Lookup('Wnd_Title', 'Image_Bg'):Show()
     end
 end
