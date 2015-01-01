@@ -279,10 +279,15 @@ MY_Recount.UpdateUI = function(data)
     -- 左侧战斗计时
     hItem:Lookup('Text_Me_L'):SetText(szTimeCount)
     -- 初始化颜色
-    if not hItem.bInited and _Cache.Css.Bar[tMyRec.dwForceID] then
-        hItem:Lookup('Image_Me_PerFore'):FromUITex(unpack(_Cache.Css.Bar[tMyRec.dwForceID]))
-        hItem:Lookup('Image_Me_PerBack'):FromUITex(unpack(_Cache.Css.Bar[tMyRec.dwForceID]))
-        hItem.bInited = true
+    if not hItem.bInited then
+        local dwForceID = (MY.Player.GetClientInfo() or {}).dwForceID
+        if dwForceID then
+            if _Cache.Css.Bar[dwForceID] then
+                hItem:Lookup('Image_Me_PerFore'):FromUITex(unpack(_Cache.Css.Bar[dwForceID]))
+                hItem:Lookup('Image_Me_PerBack'):FromUITex(unpack(_Cache.Css.Bar[dwForceID]))
+            end
+            hItem.bInited = true
+        end
     end
     if tMyRec then
         if nMaxValue > 0 then
@@ -364,6 +369,9 @@ _Cache.OnDetailFrameBreathe = function()
     -- 获取数据
     local tData = DataDisplay[szChannel][id]
     if not tData then
+        this:Lookup('WndScroll_Detail', 'Handle_DetailList'):Clear()
+        this:Lookup('WndScroll_Skill' , 'Handle_SkillList' ):Clear()
+        this:Lookup('WndScroll_Target', 'Handle_TargetList'):Clear()
         return
     end
     
