@@ -78,39 +78,6 @@ local _XLifeBar = {
 }
 local HP = XLifeBar.HP
 
-_XLifeBar.GetName = function(tar)
-    local szName = tar.szName
-    if IsPlayer(tar.dwID) then
-        return szName
-    else
-        if szName == "" then
-            szName = string.gsub(Table_GetNpcTemplateName(tar.dwTemplateID), "^%s*(.-)%s*$", "%1")
-            if szName == "" then
-                szName = tar.dwID
-            end
-        end
-        if tar.dwEmployer and tar.dwEmployer ~= 0 and szName == Table_GetNpcTemplateName(tar.dwTemplateID) then
-            local emp = GetPlayer(tar.dwEmployer)
-            if not emp then
-                szName =  g_tStrings.STR_SOME_BODY .. g_tStrings.STR_PET_SKILL_LOG .. tar.szName
-            else
-                szName = emp.szName .. g_tStrings.STR_PET_SKILL_LOG .. tar.szName
-            end
-        end
-        return szName
-    end
-end
-
-
-_XLifeBar.GetObject = function(dwID)
-    local Object
-    if IsPlayer(dwID) then
-        Object = GetPlayer(dwID)
-    else
-        Object = GetNpc(dwID)
-    end
-    return Object
-end
 _XLifeBar.GetNz = function(nZ,nZ2)
     return math.floor(((nZ/8 - nZ2/8) ^ 2) ^ 0.5)/64
 end
@@ -253,9 +220,6 @@ MY.RegisterInit(_XLifeBar.Reload)
 XLifeBar.X = class()
 -- 构造函数
 function XLifeBar.X:ctor(object)
-    if not object then
-        return
-    end
     _XLifeBar.tObject[object.dwID] = _XLifeBar.tObject[object.dwID] or {
         handle = nil,
         Name = '',
@@ -379,9 +343,9 @@ function XLifeBar.X:DrawNames()
         i = i - 1
     end
     if cfgName then
-        local szName = _XLifeBar.GetName(self.self)
+        local szName = MY.Game.GetObjectName(self.self)
         if szName and not tonumber(szName) then
-            table.insert( tWordlines, {_XLifeBar.GetName(self.self), Config.nLineHeight[i]} )
+            table.insert( tWordlines, {MY.Game.GetObjectName(self.self), Config.nLineHeight[i]} )
             i = i - 1
         end
     end
@@ -540,7 +504,7 @@ local CheckInvalidRect = function(object, me)
             xlb:SetLife(object.nCurrentLife / object.nMaxLife)
                :SetTong(_XLifeBar.GetTongName(object.dwTongID, "[%s]"))
                :SetTitle(object.szTitle)
-               :SetName(_XLifeBar.GetName(object.szName))
+               :SetName(MY.Game.GetObjectName(object.szName))
             if me.bFightState ~= _XLifeBar.bFightState then
                 xlb:DrawLife()
             end
@@ -618,7 +582,7 @@ function XLifeBar.OnFrameBreathe()
     if _nFrameCount == 1 then
         _nFrameCount = 0
     else
-        _nFrameCount = _nFrameCount + 1
+        _nFrameCount = 1
         return
     end
     local me = GetClientPlayer()
@@ -653,14 +617,19 @@ MY.RegisterEvent("DO_SKILL_CAST", function()
     if skill.bIsChannelSkill then
         local tab = _XLifeBar.tObject[dwID]
         local nFrame = MY.Player.GetChannelSkillFrame(dwSkillID) or 0
-        XLifeBar(GetPlayer(dwID)):StartOTBar(skill.szSkillName, nFrame, true)
+        local object = MY.Game.GetObject(dwID)
+        if object then
+            XLifeBar(object):StartOTBar(skill.szSkillName, nFrame, true)
+        end
     end
 end)
 -- 读条打断事件响应
 MY.RegisterEvent("OT_ACTION_PROGRESS_BREAK", function()
     if _XLifeBar.tObject[arg0] then
-        local object = _XLifeBar.GetObject(arg0)
-        XLifeBar(object):SetOTState(OT_STATE.BREAK)
+        local object = MY.Game.GetObject(arg0)
+        if object then
+            XLifeBar(object):SetOTState(OT_STATE.BREAK)
+        end
     end
 end)
 -- MY.RegisterEvent("OT_ACTION_PROGRESS", function()Output("OT_ACTION_PROGRESS",arg0, arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13) end)
@@ -688,7 +657,9 @@ end)
 RegisterEvent("NPC_LEAVE_SCENE",function()
     _XLifeBar.tNpc[arg0] = nil
     local object = GetNpc(arg0)
-    XLifeBar(object):Remove()
+    if object then
+        XLifeBar(object):Remove()
+    end
 end)
 
 RegisterEvent("PLAYER_ENTER_SCENE",function()
@@ -698,7 +669,9 @@ end)
 RegisterEvent("PLAYER_LEAVE_SCENE",function()
     _XLifeBar.tPlayer[arg0] = nil
     local object = GetPlayer(arg0)
-    XLifeBar(object):Remove()
+    if object then
+        XLifeBar(object):Remove()
+    end
 end)
 
 RegisterEvent("UPDATE_SELECT_TARGET",function()
@@ -709,12 +682,16 @@ RegisterEvent("UPDATE_SELECT_TARGET",function()
     local dwOldTargetID = _XLifeBar.dwTargetID
     _XLifeBar.dwTargetID = dwID
     if _XLifeBar.tObject[dwOldTargetID] then
-        local object = _XLifeBar.GetObject(dwOldTargetID)
-        XLifeBar(object):DrawNames():DrawLife()
+        local object = MY.Game.GetObject(dwOldTargetID)
+        if object then
+            XLifeBar(object):DrawNames():DrawLife()
+        end
     end
     if _XLifeBar.tObject[dwID] then
-        local object = _XLifeBar.GetObject(dwID)
-        XLifeBar(object):DrawNames():DrawLife()
+        local object = MY.Game.GetObject(dwID)
+        if object then
+            XLifeBar(object):DrawNames():DrawLife()
+        end
     end
 end)
 
