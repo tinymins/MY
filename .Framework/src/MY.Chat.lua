@@ -539,7 +539,7 @@ MY.Chat.ParseName = function(t)
                     nOff = nPos1 + 1
                 end
                 if szName then
-                    table.insert(t2, { type = "name", name = szName })
+                    table.insert(t2, { type = "name", text = '[' .. szName .. ']', name = szName })
                     nOff = nPos2 + 1
                 end
             end
@@ -652,11 +652,7 @@ MY.Chat.Talk = function(nChannel, szText, bNoEscape, bSaveDeny, bPushToChatBox)
         local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
         edit:ClearText()
         for _, v in ipairs(tSay) do
-            if v.type == "text" then
-                edit:InsertText(v.text)
-            else
-                edit:InsertObj(v.text, v)
-            end
+            edit:InsertObj(v.text, v)
         end
         -- change to this channel
         MY.SwitchChat(nChannel)
