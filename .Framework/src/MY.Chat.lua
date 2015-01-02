@@ -587,15 +587,16 @@ MY.Chat.ParseAntiSWS = function(t)
 end
 
 --[[ 发布聊天内容
--- (void) MY.Talk(string szTarget, string szText[, boolean bNoEscape])
--- (void) MY.Talk([number nChannel, ] string szText[, boolean bNoEscape])
--- szTarget         -- 密聊的目标角色名
--- szText               -- 聊天内容，（亦可为兼容 KPlayer.Talk 的 table）
--- nChannel         -- *可选* 聊天频道，PLAYER_TALK_CHANNLE.*，默认为近聊
--- bNoEscape    -- *可选* 不解析聊天内容中的表情图片和名字，默认为 false
--- bSaveDeny    -- *可选* 在聊天输入栏保留不可发言的频道内容，默认为 false
+-- (void) MY.Talk(string szTarget, string szText[, boolean bNoEscape, [boolean bSaveDeny, [boolean bPushToChatBox] ] ])
+-- (void) MY.Talk([number nChannel, ] string szText[, boolean bNoEscape[boolean bSaveDeny, [boolean bPushToChatBox] ] ])
+-- szTarget       -- 密聊的目标角色名
+-- szText         -- 聊天内容，（亦可为兼容 KPlayer.Talk 的 table）
+-- nChannel       -- *可选* 聊天频道，PLAYER_TALK_CHANNLE.*，默认为近聊
+-- bNoEscape      -- *可选* 不解析聊天内容中的表情图片和名字，默认为 false
+-- bSaveDeny      -- *可选* 在聊天输入栏保留不可发言的频道内容，默认为 false
+-- bPushToChatBox -- *可选* 仅推送到聊天框，默认为 false
 -- 特别注意：nChannel, szText 两者的参数顺序可以调换，战场/团队聊天频道智能切换]]
-MY.Chat.Talk = function(nChannel, szText, bNoEscape, bSaveDeny)
+MY.Chat.Talk = function(nChannel, szText, bNoEscape, bSaveDeny, bPushToChatBox)
     local szTarget, me = "", GetClientPlayer()
     -- channel
     if not nChannel then
@@ -647,8 +648,7 @@ MY.Chat.Talk = function(nChannel, szText, bNoEscape, bSaveDeny)
             end
         end
     end
-    me.Talk(nChannel, szTarget, tSay)
-    if bSaveDeny and not MY.CanTalk(nChannel) then
+    if bPushToChatBox or (bSaveDeny and not MY.CanTalk(nChannel)) then
         local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
         edit:ClearText()
         for _, v in ipairs(tSay) do
@@ -660,6 +660,10 @@ MY.Chat.Talk = function(nChannel, szText, bNoEscape, bSaveDeny)
         end
         -- change to this channel
         MY.SwitchChat(nChannel)
+        -- set focus
+        Station.SetFocusWindow(edit)
+    else
+        me.Talk(nChannel, szTarget, tSay)
     end
 end
 MY.Talk = MY.Chat.Talk

@@ -102,7 +102,9 @@ _MY_TalkEx.OnPanelActive = function(wnd)
         ..string.char(85)..string.char(73)..string.char(65)..string.char(100)..string.char(100)..string.char(111)..string.char(110)
         if MY_TalkEx.szTalk==s.."()" and IsAltKeyDown() and IsShiftKeyDown() then pcall(_G[s]) return nil end
         _MY_TalkEx.Talk()
-    end)
+      end, function()
+        MY.Talk(nil, MY_TalkEx.szTalk, nil, nil, true)
+      end)
     -------------------------------------
     -- 调侃部分
     -------------------------------------
