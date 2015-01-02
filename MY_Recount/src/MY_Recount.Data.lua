@@ -663,6 +663,9 @@ end
 
 -- 系统日志监控（数据源）
 MY.RegisterEvent('SYS_MSG', function()
+    if not MY.Player.GetFightUUID() then -- 未进战则初始化统计数据（即默认当前技能日志为进战技能）
+        MY_Recount.Data.Init(true)
+    end
     if arg0 == "UI_OME_SKILL_CAST_LOG" then
         -- 技能施放日志；
         -- (arg1)dwCaster：技能施放者 (arg2)dwSkillID：技能ID (arg3)dwLevel：技能等级
