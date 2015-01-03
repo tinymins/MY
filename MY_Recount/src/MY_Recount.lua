@@ -197,7 +197,7 @@ MY_Recount.UpdateUI = function(data)
     else
         nTimeCount = data.nTimeDuring
     end
-    local szTimeCount = MY.Sys.FormatTimeCount('h:mm:ss', nTimeCount)
+    local szTimeCount = MY.Sys.FormatTimeCount('M:ss', nTimeCount)
     nTimeCount  = math.max(nTimeCount, 1) -- 防止计算DPS时除以0
     -- 自己的记录
     local tMyRec
