@@ -1,18 +1,7 @@
 MY_TalkEx = MY_TalkEx or {}
 local _MY_TalkEx = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."TalkEx/lang/")
-MY_TalkEx.tTalkChannel = {
-    ['NEARBY'] = false,
-    ['FRIEND'] = false,
-    ['TEAM'] = false,
-    ['RAID'] = false,
-    ['TONG'] = false,
-    ['TONG_ALLIANCE'] = false,
-    ['SENCE'] = false,
-    ['FORCE'] = false,
-    ['CAMP'] = false,
-    ['WORLD'] = false,
-}
+MY_TalkEx.tTalkChannels = {}
 MY_TalkEx.szTalk = ''
 MY_TalkEx.tTrickChannel = 'RAID'
 MY_TalkEx.tTrickFilter = 'RAID'
@@ -20,7 +9,7 @@ MY_TalkEx.tTrickFilterForce = 4
 MY_TalkEx.szTrickTextBegin = _L['$zj look around and have a little thought.']
 MY_TalkEx.szTrickText = _L['$zj epilate $mb\'s feather clearly.']
 MY_TalkEx.szTrickTextEnd = _L['$zj collected the feather epilated just now and wanted it sold well.']
-RegisterCustomData('MY_TalkEx.tTalkChannel')
+RegisterCustomData('MY_TalkEx.tTalkChannels')
 RegisterCustomData('MY_TalkEx.szTalk')
 RegisterCustomData('MY_TalkEx.tTrickChannel')
 RegisterCustomData('MY_TalkEx.tTrickFilter')
@@ -34,29 +23,13 @@ for i, v in pairs(g_tStrings.tForceTitle) do
     _MY_TalkEx.tForce[i] = v -- GetForceTitle(i)
 end
 _MY_TalkEx.tFilter = { ['NEARBY'] = _L['nearby players where'], ['RAID'] = _L['teammates where'], }
-_MY_TalkEx.tChannels = { 
-    ['NEARBY'] = { szName = _L['nearby channel'], tCol = GetMsgFontColor("MSG_NORMAL", true) },
-    ['TEAM'] = { szName = _L['team channel'], tCol = GetMsgFontColor("MSG_TEAM", true) },
-    ['RAID'] = { szName = _L['raid channel'], tCol = GetMsgFontColor("MSG_TEAM", true) },
-    ['TONG'] = { szName = _L['tong channel'], tCol = GetMsgFontColor("MSG_GUILD", true) },
-    ['TONG_ALLIANCE'] = { szName = _L['tong alliance channel'], tCol = GetMsgFontColor("MSG_GUILD_ALLIANCE", true) },
+_MY_TalkEx.tChannels = {
+    { nChannel = PLAYER_TALK_CHANNEL.NEARBY       , szID = "MSG_NORMAL"         },
+    { nChannel = PLAYER_TALK_CHANNEL.TEAM         , szID = "MSG_PARTY"          },
+    { nChannel = PLAYER_TALK_CHANNEL.RAID         , szID = "MSG_TEAM"           },
+    { nChannel = PLAYER_TALK_CHANNEL.TONG         , szID = "MSG_GUILD"          },
+    { nChannel = PLAYER_TALK_CHANNEL.TONG_ALLIANCE, szID = "MSG_GUILD_ALLIANCE" },
 }
-MY.RegisterInit(function()
-    if MY.Chat.bHookedAlready then
-        _MY_TalkEx.tChannels = { 
-            ['NEARBY'] = { szName = _L['nearby channel'], tCol = GetMsgFontColor("MSG_NORMAL", true) },
-            ['FRIENDS'] = { szName = _L['friend channel'], tCol = GetMsgFontColor("MSG_FRIEND", true) },
-            ['TEAM'] = { szName = _L['team channel'], tCol = GetMsgFontColor("MSG_PARTY", true) },
-            ['RAID'] = { szName = _L['raid channel'], tCol = GetMsgFontColor("MSG_TEAM", true) },
-            ['TONG'] = { szName = _L['tong channel'], tCol = GetMsgFontColor("MSG_GUILD", true) },
-            ['TONG_ALLIANCE'] = { szName = _L['tong alliance channel'], tCol = GetMsgFontColor("MSG_GUILD_ALLIANCE", true) },
-            ['SENCE'] = { szName = _L['map channel'], tCol = GetMsgFontColor("MSG_MAP", true) },
-            ['FORCE'] = { szName = _L['school channel'], tCol = GetMsgFontColor("MSG_SCHOOL", true) },
-            ['CAMP'] = { szName = _L['camp channel'], tCol = GetMsgFontColor("MSG_CAMP", true) },
-            ['WORLD'] = { szName = _L['world channel'], tCol = GetMsgFontColor("MSG_WORLD", true) },
-        }
-    end
-end)
 _MY_TalkEx.tTrickChannels = { 
     ['TEAM'] = { szName = _L['team channel'], tCol = GetMsgFontColor("MSG_TEAM", true) },
     ['RAID'] = { szName = _L['raid channel'], tCol = GetMsgFontColor("MSG_TEAM", true) },
@@ -66,9 +39,14 @@ _MY_TalkEx.tTrickChannels = {
 _MY_TalkEx.Talk = function()
     if #MY_TalkEx.szTalk == 0 then MY.Sysmsg({_L["please input something."], r=255, g=0, b=0},nil) return end
     -- 近聊不放在第一个会导致发不出去
-    if MY_TalkEx.tTalkChannel['NEARBY'] then MY.Talk(PLAYER_TALK_CHANNEL['NEARBY'],MY_TalkEx.szTalk) end
-    for szChannel, bSend in pairs(MY_TalkEx.tTalkChannel) do
-        if szChannel~="NEARBY" and bSend then MY.Talk(PLAYER_TALK_CHANNEL[szChannel],MY_TalkEx.szTalk) end
+    if MY_TalkEx.tTalkChannels[PLAYER_TALK_CHANNEL.NEARBY] then
+        MY.Talk(PLAYER_TALK_CHANNEL.NEARBY, MY_TalkEx.szTalk)
+    end
+    -- 遍历发送队列
+    for nChannel, _ in pairs(MY_TalkEx.tTalkChannels) do
+        if nChannel ~= PLAYER_TALK_CHANNEL.NEARBY then
+            MY.Talk(nChannel, MY_TalkEx.szTalk)
+        end
     end
 end
 _MY_TalkEx.OnPanelActive = function(wnd)
@@ -83,15 +61,17 @@ _MY_TalkEx.OnPanelActive = function(wnd)
       :text(MY_TalkEx.szTalk)
       :change(function() MY_TalkEx.szTalk = this:GetText() end)
     -- 喊话频道
-    local i = 12
-    local nChannelCount = 0
-    for _,_ in pairs(_MY_TalkEx.tChannels) do nChannelCount = nChannelCount + 1 end
-    for szChannel, tChannel in pairs(_MY_TalkEx.tChannels) do
-        ui:append('WndCheckBox_TalkEx_'..szChannel,'WndCheckBox'):children('#WndCheckBox_TalkEx_'..szChannel):pos(w-110,i):text(tChannel.szName):color(tChannel.tCol):check(
-            function() MY_TalkEx.tTalkChannel[szChannel] = true end,
-            function() MY_TalkEx.tTalkChannel[szChannel] = false end
-        ):check(MY_TalkEx.tTalkChannel[szChannel] or false)
-        i = i + 180/nChannelCount
+    local y = 12
+    local nChannelCount = #_MY_TalkEx.tChannels
+    for i, p in ipairs(_MY_TalkEx.tChannels) do
+        ui:append('WndCheckBox_TalkEx_' .. p.nChannel, 'WndCheckBox'):children('#WndCheckBox_TalkEx_' .. p.nChannel)
+          :pos(w - 110, y + (i - 1) * 180 / nChannelCount)
+          :text(g_tStrings.tChannelName[p.szID])
+          :color(GetMsgFontColor(p.szID, true))
+          :check(
+            function() MY_TalkEx.tTalkChannels[p.nChannel] = true end,
+            function() MY_TalkEx.tTalkChannels[p.nChannel] = nil  end)
+          :check(MY_TalkEx.tTalkChannels[p.nChannel] or false)
     end
     -- 喊话按钮
     ui:append('WndButton_Talk','WndButton'):children('#WndButton_Talk')
@@ -180,8 +160,8 @@ _MY_TalkEx.OnPanelActive = function(wnd)
         end
         return t
       end)
-      :text(_MY_TalkEx.tChannels[MY_TalkEx.tTrickChannel].szName or '')
-      :color(_MY_TalkEx.tChannels[MY_TalkEx.tTrickChannel].tCol)
+      :text(_MY_TalkEx.tTrickChannels[MY_TalkEx.tTrickChannel].szName or '')
+      :color(_MY_TalkEx.tTrickChannels[MY_TalkEx.tTrickChannel].tCol)
     -- 调侃按钮
     ui:append('WndButton_Trick','WndButton'):children('#WndButton_Trick')
       :pos(435, 379):color({255,255,255})
