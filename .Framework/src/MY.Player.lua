@@ -259,12 +259,9 @@ _Cache.nCurrentFightUUID        = nil
 _Cache.nCurrentFightBeginFrame  = 0
 _Cache.nCurrentFightEndingFrame = 0
 _Cache.OnFightStateChange = function(bFightState)
-    if bFightState == nil then
-        local me = GetClientPlayer()
-        if not me then
-            return
-        end
-        bFightState = me.bFightState
+    -- 当没有传bFightState或bFightState为否时 重新获取逻辑战斗状态
+    if not bFightState then
+        bFightState = MY.Player.IsFighting()
     end
     -- 判定战斗边界
     if bFightState then
@@ -299,13 +296,10 @@ MY.RegisterEvent('FIGHT_HINT', _Cache.OnFightStateChange)
 MY.Player.GetFightTime = function(szFormat)
     local nFrame = 0
     
-    local me = GetClientPlayer()
-    if me then
-        if me.bFightState then
-            nFrame = GetLogicFrameCount() - _Cache.nCurrentFightBeginFrame
-        else
-            nFrame = _Cache.nCurrentFightEndingFrame - _Cache.nCurrentFightBeginFrame
-        end
+    if MY.Player.IsFighting() then -- 战斗状态
+        nFrame = GetLogicFrameCount() - _Cache.nCurrentFightBeginFrame
+    else  -- 脱战状态
+        nFrame = _Cache.nCurrentFightEndingFrame - _Cache.nCurrentFightBeginFrame
     end
     
     if szFormat then
@@ -346,7 +340,27 @@ MY.Player.GetLastFightUUID = function()
     return _Cache.nLastFightUUID
 end
 
-
+--[[ 获取自身是否处于逻辑战斗状态
+    (bool) MY.Player.IsFighting()
+]]
+MY.Player.IsFighting = function()
+    local me = GetClientPlayer()
+    if not me then
+        return
+    end
+    local bFightState = me.bFightState
+    
+    -- 在副本且附近队友进战则判断处于战斗状态
+    if not bFightState and MY.Game.IsDungeonMap(me.GetMapID()) then
+        for dwID, p in pairs(MY.Player.GetNearPlayer()) do
+            if me.IsPlayerInMyParty(dwID) and p.bFightState then
+                bFightState = true
+                break
+            end
+        end
+    end
+    return bFightState
+end
 --[[
 #######################################################################################################
                                   #                                                       #                   
