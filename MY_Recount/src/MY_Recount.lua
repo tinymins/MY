@@ -249,7 +249,7 @@ MY_Recount.UpdateUI = function(data)
         if not hItem then
             hItem = hList:AppendItemFromIni(_Cache.szIniFile, 'Handle_Item')
             hItem:SetName('Handle_LI_' .. p.id)
-            hItem:Lookup('Text_L'):SetText(string.format('%02d.%s', i, p.szName))
+            hItem:Lookup('Text_L'):SetText(string.format('%d.%s', i, p.szName))
             if _Cache.Css.Bar[p.dwForceID] then
                 hItem:Lookup('Image_PerFore'):FromUITex(unpack(_Cache.Css.Bar[p.dwForceID]))
                 hItem:Lookup('Image_PerBack'):FromUITex(unpack(_Cache.Css.Bar[p.dwForceID]))
@@ -939,7 +939,9 @@ MY_Recount.GetPublishMenu = function()
                 MY.Talk(
                     nChannel,
                     '[' .. _L['mingyi plugin'] .. ']' ..
-                    _L['fight recount'] .. ' - ' .. frame:Lookup('Wnd_Title', 'Text_Title'):GetText(),
+                    _L['fight recount'] .. ' - ' ..
+                    frame:Lookup('Wnd_Title', 'Text_Title'):GetText() ..
+                    ((DataDisplay.szBossName and ' - ' .. DataDisplay.szBossName) or ''),
                     true
                 )
                 MY.Talk(nChannel, '------------------------')
