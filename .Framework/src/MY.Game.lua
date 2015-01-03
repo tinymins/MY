@@ -312,3 +312,30 @@ MY.Game.GetObjectName = function(obj)
     end
 end
 MY.GetObjectName = MY.Game.GetObjectName
+
+--[[ 判断一个地图是不是副本
+    (bool) MY.Game.IsDungeonMap(szMapName)
+    (bool) MY.Game.IsDungeonMap(dwMapID)
+]]
+MY.Game.IsDungeonMap = function(szMapNameOrdwID)
+    if not _Cache.tMapList then
+        _Cache.tMapList = {}
+        for dwMapID, v in ipairs(GetMapList()) do
+            local map          = { dwID = dwMapID }
+            local szName       = Table_GetMapName(dwMapID)
+            local tDungeonInfo = g_tTable.DungeonInfo:Search(dwMapID)
+            if tDungeonInfo and tDungeonInfo.dwClassID == 3 then
+                map.bDungeon = true
+            end
+            _Cache.tMapList[szName] = map
+            _Cache.tMapList[dwMapID] = map
+        end
+    end
+    
+    local map = _Cache.tMapList[szMapNameOrdwID]
+    if map and map.bDungeon then
+        return true
+    end
+    return false
+end
+MY.IsDungeonMap = MY.Game.IsDungeonMap
