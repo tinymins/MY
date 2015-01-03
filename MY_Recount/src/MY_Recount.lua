@@ -218,17 +218,6 @@ MY_Recount.UpdateUI = function(data)
             table.insert(tResult, tRec)
             nMaxValue = math.max(nMaxValue, tRec.nValue, tRec.nEffectValue)
         end
-        -- 自己的记录
-        if id == UI_GetClientPlayerID() then
-            tMyRec = {
-                id           = id                                    ,
-                szName       = MY_Recount.Data.GetNameAusID(id, data),
-                dwForceID    = data.Forcelist[id] or -1              ,
-                nValue       = rec.nTotal         or  0              ,
-                nEffectValue = rec.nTotalEffect   or  0              ,
-                nRank        = #tResult                              ,
-            }
-        end
     end
     
     -- 列表排序
@@ -245,6 +234,17 @@ MY_Recount.UpdateUI = function(data)
     -- 渲染列表
     local hList = m_frame:Lookup('Wnd_Main', 'Handle_List')
     for i, p in pairs(tResult) do
+        -- 自己的记录
+        if p.id == UI_GetClientPlayerID() then
+            tMyRec = {
+                id           = p.id          ,
+                szName       = p.szName      ,
+                dwForceID    = p.dwForceID   ,
+                nValue       = p.nValue      ,
+                nEffectValue = p.nEffectValue,
+                nRank        = i             ,
+            }
+        end
         local hItem = hList:Lookup('Handle_LI_' .. p.id)
         if not hItem then
             hItem = hList:AppendItemFromIni(_Cache.szIniFile, 'Handle_Item')
@@ -284,8 +284,6 @@ MY_Recount.UpdateUI = function(data)
     
     -- 渲染底部自己的统计
     local hItem = m_frame:Lookup('Wnd_Main', 'Handle_Me')
-    -- 左侧战斗计时
-    hItem:Lookup('Text_Me_L'):SetText(szTimeCount)
     -- 初始化颜色
     if not hItem.bInited then
         local dwForceID = (MY.Player.GetClientInfo() or {}).dwForceID
@@ -305,6 +303,8 @@ MY_Recount.UpdateUI = function(data)
             hItem:Lookup('Image_Me_PerBack'):SetPercentage(1)
             hItem:Lookup('Image_Me_PerFore'):SetPercentage(1)
         end
+        -- 左侧战斗计时
+        hItem:Lookup('Text_Me_L'):SetText('[' .. tMyRec.nRank .. '] ' .. szTimeCount)
         -- 右侧文字
         if MY_Recount.bShowEffect then
             if MY_Recount.bShowPerSec then
@@ -320,6 +320,7 @@ MY_Recount.UpdateUI = function(data)
             end
         end
     else
+        hItem:Lookup('Text_Me_L'):SetText(szTimeCount)
         hItem:Lookup('Text_Me_R'):SetText('')
         hItem:Lookup('Image_Me_PerBack'):SetPercentage(1)
         hItem:Lookup('Image_Me_PerFore'):SetPercentage(0)
