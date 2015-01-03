@@ -26,6 +26,11 @@ local DISPLAY_MODE = { -- 统计显示
     PLAYER = 2, -- 只显示玩家
     BOTH   = 3, -- 混合显示
 }
+local PUBLISH_MODE = {
+    EFFECT = 1, -- 只显示有效值
+    TOTAL  = 2, -- 只显示总数值
+    BOTH   = 3, -- 同时显示有效和总数
+}
 local SKILL_RESULT = {
     HIT     = 0, -- 命中
     BLOCK   = 1, -- 格挡
@@ -66,7 +71,8 @@ MY_Recount.nChannel      = CHANNEL.DPS          -- 当前显示的统计模式
 MY_Recount.bShowPerSec   = true                 -- 显示为每秒数据（反之显示总和）
 MY_Recount.bShowEffect   = true                 -- 显示有效伤害/治疗
 MY_Recount.nDisplayMode  = DISPLAY_MODE.BOTH    -- 统计显示模式（显示NPC/玩家数据）（默认混合显示）
-MY_Recount.nPublishLimit = 5                    -- 发布到聊天频道数量
+MY_Recount.nPublishLimit = 30                   -- 发布到聊天频道数量
+MY_Recount.nPublishMode  = PUBLISH_MODE.TOTAL   -- 发布模式
 MY_Recount.nDrawInterval = GLOBAL.GAME_FPS / 2  -- UI重绘周期（帧）
 MY_Recount.anchor = { x=0, y=-70, s="BOTTOMRIGHT", r="BOTTOMRIGHT" } -- 默认坐标
 RegisterCustomData("MY_Recount.bEnable")
@@ -76,6 +82,8 @@ RegisterCustomData("MY_Recount.bShowPerSec")
 RegisterCustomData("MY_Recount.bShowEffect")
 RegisterCustomData("MY_Recount.nDisplayMode")
 RegisterCustomData("MY_Recount.nPublishLimit")
+RegisterCustomData("MY_Recount.nPublishMode")
+RegisterCustomData("MY_Recount.nDrawInterval")
 RegisterCustomData("MY_Recount.anchor")
 
 local m_frame
@@ -626,8 +634,6 @@ MY_Recount.OnLButtonClick = function()
         PopupMenu(MY_Recount.GetMenu())
     elseif name == 'Btn_History' then
         PopupMenu(MY_Recount.GetHistoryMenu())
-    elseif name == 'Btn_Switch' then
-        PopupMenu(MY_Recount.GetDisplayModeMenu())
     elseif name == 'Btn_Empty' then
         MY_Recount.Data.Init(true)
         DataDisplay = MY_Recount.Data.Get(0)
@@ -707,6 +713,34 @@ MY_Recount.GetMenu = function()
             fnDisable = function()
                 return not MY_Recount.bEnable
             end,
+        },
+        {   -- 切换统计类型
+            szOption = _L['switch recount mode'],
+            {
+                szOption = _L['display only npc record'],
+                bCheck = true, bMCheck = true,
+                bChecked = MY_Recount.nDisplayMode == DISPLAY_MODE.NPC,
+                fnAction = function()
+                    MY_Recount.nDisplayMode = DISPLAY_MODE.NPC
+                    MY_Recount.DrawUI()
+                end,
+            }, {
+                szOption = _L['display only player record'],
+                bCheck = true, bMCheck = true,
+                bChecked = MY_Recount.nDisplayMode == DISPLAY_MODE.PLAYER,
+                fnAction = function()
+                    MY_Recount.nDisplayMode = DISPLAY_MODE.PLAYER
+                    MY_Recount.DrawUI()
+                end,
+            }, {
+                szOption = _L['display all record'],
+                bCheck = true, bMCheck = true,
+                bChecked = MY_Recount.nDisplayMode == DISPLAY_MODE.BOTH,
+                fnAction = function()
+                    MY_Recount.nDisplayMode = DISPLAY_MODE.BOTH
+                    MY_Recount.DrawUI()
+                end,
+            }
         }
     }
 
@@ -841,35 +875,6 @@ MY_Recount.GetHistoryMenu = function()
     return t
 end
 
--- 获取显示模式菜单
-MY_Recount.GetDisplayModeMenu = function()
-    return {{
-        szOption = _L['display only npc record'],
-        bCheck = true, bMCheck = true,
-        bChecked = MY_Recount.nDisplayMode == DISPLAY_MODE.NPC,
-        fnAction = function()
-            MY_Recount.nDisplayMode = DISPLAY_MODE.NPC
-            MY_Recount.DrawUI()
-        end,
-    }, {
-        szOption = _L['display only player record'],
-        bCheck = true, bMCheck = true,
-        bChecked = MY_Recount.nDisplayMode == DISPLAY_MODE.PLAYER,
-        fnAction = function()
-            MY_Recount.nDisplayMode = DISPLAY_MODE.PLAYER
-            MY_Recount.DrawUI()
-        end,
-    }, {
-        szOption = _L['display all record'],
-        bCheck = true, bMCheck = true,
-        bChecked = MY_Recount.nDisplayMode == DISPLAY_MODE.BOTH,
-        fnAction = function()
-            MY_Recount.nDisplayMode = DISPLAY_MODE.BOTH
-            MY_Recount.DrawUI()
-        end,
-    }}
-end
-
 -- 获取发布菜单
 MY_Recount.GetPublishMenu = function()
     local t = {}
@@ -890,6 +895,33 @@ MY_Recount.GetPublishMenu = function()
         })
     end
     table.insert(t, t1)
+    
+    -- 发布类型
+    table.insert(t, {
+        szOption = _L['publish mode'],
+        {
+            szOption = _L['only effect value'],
+            bCheck = true, bMCheck = true,
+            bChecked = MY_Recount.nPublishMode == PUBLISH_MODE.EFFECT,
+            fnAction = function()
+                MY_Recount.nPublishMode = PUBLISH_MODE.EFFECT
+            end,
+        }, {
+            szOption = _L['only total value'],
+            bCheck = true, bMCheck = true,
+            bChecked = MY_Recount.nPublishMode == PUBLISH_MODE.TOTAL,
+            fnAction = function()
+                MY_Recount.nPublishMode = PUBLISH_MODE.TOTAL
+            end,
+        }, {
+            szOption = _L['effect and total value'],
+            bCheck = true, bMCheck = true,
+            bChecked = MY_Recount.nPublishMode == PUBLISH_MODE.BOTH,
+            fnAction = function()
+                MY_Recount.nPublishMode = PUBLISH_MODE.BOTH
+            end,
+        }
+    })
     
     for nChannel, szChannel in pairs({
         [PLAYER_TALK_CHANNEL.RAID] = 'MSG_TEAM',
@@ -930,10 +962,20 @@ MY_Recount.GetPublishMenu = function()
                     for i = wstring.len(p.szName), nMaxNameLen - 1 do
                         szText = szText .. g_tStrings.STR_ONE_CHINESE_SPACE
                     end
-                    szText = szText .. _L('%7d%s(Effect) %7d%s(Total)',
-                        p.nEffectValue / nTimeCount, szUnit,
-                        p.nValue / nTimeCount, szUnit
-                    )
+                    if MY_Recount.nPublishMode == PUBLISH_MODE.BOTH then
+                        szText = szText .. _L('%7d%s(Effect) %7d%s(Total)',
+                            p.nEffectValue / nTimeCount, szUnit,
+                            p.nValue / nTimeCount, szUnit
+                        )
+                    elseif MY_Recount.nPublishMode == PUBLISH_MODE.EFFECT then
+                        szText = szText .. _L('%7d%s(Effect)',
+                            p.nEffectValue / nTimeCount, szUnit
+                        )
+                    elseif MY_Recount.nPublishMode == PUBLISH_MODE.TOTAL then
+                        szText = szText .. _L('%7d%s(Total)',
+                            p.nValue / nTimeCount, szUnit
+                        )
+                    end
                     
                     MY.Talk(nChannel, szText, p.id == p.szName)
                 end
