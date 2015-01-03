@@ -4,6 +4,7 @@ data = {
     ['current fight'] = '当前统计',
     ['fight recount'] = '战斗统计',
     
+    ['switch recount mode'] = '切换统计类型',
     ['filter short fight'] = '过滤短时战斗',
     ['no time limit'] = '无时间限制',
     ['less than %d second'] = '不足%d秒',
@@ -24,6 +25,12 @@ data = {
     
     ['publish limit'] = '发布数量',
     ['top %d'] = '前%d名',
+    ['publish mode'] = '发布模式',
+    ['only effect value'] = '仅发布有效值',
+    ['only total value'] = '仅发布总数值',
+    ['effect and total value'] = '发布有效和总数值',
     
     ['%7d%s(Effect) %7d%s(Total)'] = '%7d%s(有效) %7d%s(总)',
+    ['%7d%s(Effect)'] = '%7d%s(有效)',
+    ['%7d%s(Total)'] = '%7d%s(总)',
 }
