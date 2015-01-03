@@ -701,6 +701,7 @@ MY_Recount.GetMenu = function()
             bChecked = MY_Recount.bShowPerSec,
             fnAction = function()
                 MY_Recount.bShowPerSec = not MY_Recount.bShowPerSec
+                MY_Recount.DrawUI()
             end,
             fnDisable = function()
                 return not MY_Recount.bEnable
@@ -711,6 +712,7 @@ MY_Recount.GetMenu = function()
             bChecked = MY_Recount.bShowEffect,
             fnAction = function()
                 MY_Recount.bShowEffect = not MY_Recount.bShowEffect
+                MY_Recount.DrawUI()
             end,
             fnDisable = function()
                 return not MY_Recount.bEnable
