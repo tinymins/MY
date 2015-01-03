@@ -257,6 +257,7 @@ MY_Recount.UpdateUI = function(data)
         end
         if hItem:GetIndex() ~= i - 1 then
             hItem:ExchangeIndex(i - 1)
+            hItem:Lookup('Text_L'):SetText(string.format('%d.%s', i, p.szName))
         end
         
         if nMaxValue > 0 then
