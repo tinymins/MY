@@ -344,10 +344,6 @@ MY.RegisterEvent("DOODAD_ENTER_SCENE", "MY_MiddleMapMark", function()
     if doodad.dwTemplateID == 82 then -- 切磋用旗帜
         return
     end
-    -- avoid player's doodad
-    if doodad.dwEmployer and doodad.dwEmployer ~= 0 then
-        return
-    end
     -- avoid full number named doodad
     local szName = MY.GetObjectName(doodad)
     if not szName then
