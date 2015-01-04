@@ -322,7 +322,7 @@ MY_Focus.DrawFocus = function(dwType, dwID)
     hItem:Lookup('Handle_Name/Text_Name'):SetText(MY.Game.GetObjectName(obj) or obj.dwID)
     -- 心法
     if dwType == TARGET.PLAYER then
-        if info.dwMountKungfuID then
+        if type(info) == 'table' and info.dwMountKungfuID then
             hItem:Lookup('Handle_Name/Text_Kungfu'):SetText(MY_Focus.GetKungfuName(info.dwMountKungfuID))
         else
             local kungfu = obj.GetKungfuMount()
