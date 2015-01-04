@@ -289,7 +289,7 @@ end
 MY_Recount.Data.OnSkillEffect = function(dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nCount, tResult)
     -- 获取释放对象和承受对象
     local hCaster = MY.Game.GetObject(dwCaster)
-    if hCaster and hCaster.dwEmployer and hCaster.dwEmployer ~= 0 then -- 宠物的数据算在主人统计中
+    if (not IsPlayer(dwCaster)) and hCaster and hCaster.dwEmployer and hCaster.dwEmployer ~= 0 then -- 宠物的数据算在主人统计中
         hCaster = MY.Game.GetObject(hCaster.dwEmployer)
     end
     local hTarget = MY.Game.GetObject(dwTarget)
