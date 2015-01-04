@@ -54,6 +54,13 @@ MY_BuffMonitor.ReloadBuffMonitor = function()
     MY.UI("Normal/MY_BuffMonitor_Target"):remove()
     -- get kungfu id
     local dwKungFuID = GetClientPlayer().GetKungfuMount().dwSkillID
+    -- init data
+    if not MY_BuffMonitor.tBuffList[dwKungFuID] then
+        MY_BuffMonitor.tBuffList[dwKungFuID] = {
+            Self   = {},
+            Target = {},
+        }
+    end
     -- functions
     local refreshObjectBuff = function(target, tBuffMonList, handleBoxs)
         local me = GetClientPlayer()
