@@ -15,16 +15,10 @@ local MAX_DISTINCT_DISTANCE = 4 -- 最大独立距离4尺（低于该距离的�
 MAX_DISTINCT_DISTANCE = MAX_DISTINCT_DISTANCE * MAX_DISTINCT_DISTANCE * 64 * 64
 
 -- HOOK MAP SWITCH
-if not MiddleMap._MY_MMM_ShowMap then
-    MiddleMap._MY_MMM_ShowMap = MiddleMap.ShowMap
+if MiddleMap._MY_MMM_ShowMap == nil then
+    MiddleMap._MY_MMM_ShowMap = MiddleMap.ShowMap or false
 end
-local lockerOnShowMap
 MiddleMap.ShowMap = function(...)
-    if lockerOnShowMap then
-        return
-    end
-    lockerOnShowMap = true
-
     if MiddleMap._MY_MMM_ShowMap then
         MiddleMap._MY_MMM_ShowMap(...)
     end
@@ -36,40 +30,26 @@ MiddleMap.ShowMap = function(...)
             MY_MiddleMapMark.Search(_Cache.szKeyword)
         end
     end, 200)
-    lockerOnShowMap = false
 end
 
 -- HOOK OnEditChanged
-if not MiddleMap._MY_MMM_OnEditChanged then
-    MiddleMap._MY_MMM_OnEditChanged = MiddleMap.OnEditChanged
+if MiddleMap._MY_MMM_OnEditChanged == nil then
+    MiddleMap._MY_MMM_OnEditChanged = MiddleMap.OnEditChanged or false
 end
-local lockerOnEditChanged
 MiddleMap.OnEditChanged = function()
-    if lockerOnEditChanged then
-        return
-    end
-    lockerOnEditChanged = true
-
     if this:GetName() == 'Edit_Search' then
         MY_MiddleMapMark.Search(this:GetText())
     end
     if MiddleMap._MY_MMM_OnEditChanged then
         MiddleMap._MY_MMM_OnEditChanged()
     end
-    lockerOnEditChanged = false
 end
 
 -- HOOK OnMouseEnter
-if not MiddleMap._MY_MMM_OnMouseEnter then
-    MiddleMap._MY_MMM_OnMouseEnter = MiddleMap.OnMouseEnter
+if MiddleMap._MY_MMM_OnMouseEnter == nil then
+    MiddleMap._MY_MMM_OnMouseEnter = MiddleMap.OnMouseEnter or false
 end
-local lockerOnMouseEnter
 MiddleMap.OnMouseEnter = function()
-    if lockerOnMouseEnter then
-        return
-    end
-    lockerOnMouseEnter = true
-
     if this:GetName() == 'Edit_Search' then
         local x, y = this:GetAbsPos()
         local w, h = this:GetSize()
@@ -83,27 +63,19 @@ MiddleMap.OnMouseEnter = function()
     if MiddleMap._MY_MMM_OnMouseEnter then
         MiddleMap._MY_MMM_OnMouseEnter()
     end
-    lockerOnMouseEnter = false
 end
 
 -- HOOK OnMouseLeave
-if not MiddleMap._MY_MMM_OnMouseLeave then
-    MiddleMap._MY_MMM_OnMouseLeave = MiddleMap.OnMouseLeave
+if MiddleMap._MY_MMM_OnMouseLeave == nil then
+    MiddleMap._MY_MMM_OnMouseLeave = MiddleMap.OnMouseLeave or false
 end
-local lockerOnMouseLeave
 MiddleMap.OnMouseLeave = function()
-    if lockerOnMouseLeave then
-        return
-    end
-    lockerOnMouseLeave = true
-
     if this:GetName() == 'Edit_Search' then
         HideTip()
     end
     if MiddleMap._MY_MMM_OnMouseLeave then
         MiddleMap._MY_MMM_OnMouseLeave()
     end
-    lockerOnMouseLeave = false
 end
 
 -- start search
