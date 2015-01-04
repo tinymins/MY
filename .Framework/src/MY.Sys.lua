@@ -353,10 +353,11 @@ end
     nTime       -- 延迟时间，每 62.5 延迟一帧
 ]]
 MY.BreatheCallDelay = function(szKey, nTime)
-    local t = _Cache.tBreatheCall[StringLowerW(szKey)]
-    if t then
-        t.nFrame = math.ceil(nTime / 62.5)
-        t.nNext = GetLogicFrameCount() + t.nFrame
+    for _, t in ipairs(_Cache.tBreatheCall) do
+        if t.szName == StringLowerW(szKey) then
+            t.nFrame = math.ceil(nTime / 62.5)
+            t.nNext = GetLogicFrameCount() + t.nFrame
+        end
     end
 end
 --[[ 延迟一次呼吸函数的调用频率
@@ -364,9 +365,10 @@ end
     nTime       -- 延迟时间，每 62.5 延迟一帧
 ]]
 MY.BreatheCallDelayOnce = function(szKey, nTime)
-    local t = _Cache.tBreatheCall[StringLowerW(szKey)]
-    if t then
-        t.nNext = GetLogicFrameCount() + math.ceil(nTime / 62.5)
+    for _, t in ipairs(_Cache.tBreatheCall) do
+        if t.szName == StringLowerW(szKey) then
+            t.nNext = GetLogicFrameCount() + math.ceil(nTime / 62.5)
+        end
     end
 end
 -- breathe
