@@ -182,15 +182,14 @@ MY_ToolBox.ApplyConfig = function()
             MY.UI('Lowest1/ChatTitleBG'):fadeOut(500)
         end
         -- start hide panel clock
-        local fnStartHideChatPanelClock = function()print(0)
+        local fnStartHideChatPanelClock = function()
             -- hide after 5 sec
-            MY.BreatheCall('MY_ToolBox_AutoHideChatPanel', function()print(1)
+            MY.BreatheCall('MY_ToolBox_AutoHideChatPanel', function()
                 -- if mouse over chat panel then return
                 local hMouseOverWnd = Station.GetMouseOverWindow()
                 if hMouseOverWnd and hMouseOverWnd:GetRoot():GetName():sub(1, 9) == 'ChatPanel' then
                     return
                 end
-                print(2)
                 -- else hide it
                 fnHideChatPanel()
                 -- cancel breathe
