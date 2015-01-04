@@ -5,6 +5,7 @@ data = {
     ['hide when empty'] = '無焦點時隱藏',
     ['auto focus friend'] = '焦點附近好友',
     ['auto focus tong'] = '焦點幫會成員',
+    ['auto focus enemy'] = '焦點敵對玩家',
     ['traversal object'] = '遍歷焦點目標',
     ['show focus\'s target'] = '顯示目標目標',
     ['auto focus'] = '啓用默認焦點',

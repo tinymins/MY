@@ -11,6 +11,7 @@ _Cache.bMinimize = false
 MY_Focus = {}
 MY_Focus.bFocusFriend = false -- 自动焦点好友
 MY_Focus.bFocusTong = false -- 自动焦点帮会成员
+MY_Focus.bFocusEnemy= false -- 自动焦点敌对玩家
 MY_Focus.bEnable    = true  -- 是否启用
 MY_Focus.bAutoHide  = true  -- 无焦点自动隐藏
 MY_Focus.nMaxDisplay= 5     -- 最大显示数量
@@ -28,6 +29,7 @@ RegisterCustomData("MY_Focus.bEnable")
 RegisterCustomData("MY_Focus.bAutoHide")
 RegisterCustomData("MY_Focus.bFocusFriend")
 RegisterCustomData("MY_Focus.bFocusTong")
+RegisterCustomData("MY_Focus.bFocusEnemy")
 RegisterCustomData("MY_Focus.nMaxDisplay")
 RegisterCustomData("MY_Focus.bAutoFocus")
 RegisterCustomData("MY_Focus.tAutoFocus")
@@ -205,6 +207,12 @@ MY_Focus.OnObjectEnterScene = function(dwType, dwID, nRetryCount)
         MY_Focus.bFocusTong and
         dwID ~= UI_GetClientPlayerID() and
         MY.Player.GetTongMember(dwID) then
+            bFocus = true
+        end
+        -- 判断敌对玩家
+        if dwType == TARGET.PLAYER and
+        MY_Focus.bFocusEnemy and
+        IsEnemy(dwID, UI_GetClientPlayerID()) then
             bFocus = true
         end
         -- 加入焦点
@@ -591,6 +599,17 @@ MY_Focus.GetMenu = function()
             bChecked = MY_Focus.bFocusTong,
             fnAction = function()
                 MY_Focus.bFocusTong = not MY_Focus.bFocusTong
+                MY_Focus.RescanNearby()
+            end,
+            fnDisable = function()
+                return not MY_Focus.bEnable
+            end,
+        }, {
+            szOption = _L['auto focus enemy'],
+            bCheck = true,
+            bChecked = MY_Focus.bFocusEnemy,
+            fnAction = function()
+                MY_Focus.bFocusEnemy = not MY_Focus.bFocusEnemy
                 MY_Focus.RescanNearby()
             end,
             fnDisable = function()
