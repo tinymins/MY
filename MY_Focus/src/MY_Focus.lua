@@ -212,7 +212,7 @@ MY_Focus.OnObjectEnterScene = function(dwType, dwID, nRetryCount)
         -- 判断敌对玩家
         if dwType == TARGET.PLAYER and
         MY_Focus.bFocusEnemy and
-        IsEnemy(dwID, UI_GetClientPlayerID()) then
+        IsEnemy(UI_GetClientPlayerID(), dwID) then
             bFocus = true
         end
         -- 加入焦点
