@@ -45,7 +45,7 @@ MY_AutoHideChat.ShowChatPanel = function(nShowFrame, nDelayFrame, callback)
             end
         end
         Station.Lookup('Lowest1/ChatTitleBG'):SetAlpha(nAlpha)
-        Station.Lookup('Lowest1/ChatTitleBG', 'Image_BG'):SetAlpha(nAlpha)
+        Station.Lookup('Lowest1/ChatTitleBG', 'Image_BG'):SetAlpha(nAlpha * _Cache.fAhBgAlpha)
         if nAlpha == 255 then
             _Cache.bAhAnimate = false
             if callback then
