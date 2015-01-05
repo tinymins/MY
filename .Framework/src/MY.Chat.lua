@@ -177,21 +177,27 @@ MY.Chat.CopyChatLine = function(hTime)
 end
 
 MY.Chat.LinkEventHandler = {
-    OnNameLClick = function()
+    OnNameLClick = function(hT)
+        if not hT then
+            hT = this
+        end
         if IsCtrlKeyDown() then
-            MY.Chat.CopyChatItem(this)
+            MY.Chat.CopyChatItem(hT)
         else
-            MY.SwitchChat(MY.UI(this):text())
+            MY.SwitchChat(MY.UI(hT):text())
             local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
             if edit then
                 Station.SetFocusWindow(edit)
             end
         end
     end,
-    OnNameRClick = function()
+    OnNameRClick = function(hT)
+        if not hT then
+            hT = this
+        end
         PopupMenu((function()
             local t = {}
-            local szName = MY.UI(this):text():gsub('[%[%]]', '')
+            local szName = MY.UI(hT):text():gsub('[%[%]]', '')
             table.insert(t, {
                 szOption = _L['copy'],
                 fnAction = function()
@@ -223,18 +229,18 @@ MY.Chat.LinkEventHandler = {
             return t
         end)())
     end,
-    OnCopyLClick = function()
-        MY.Chat.CopyChatLine(this)
+    OnCopyLClick = function(hT)
+        MY.Chat.CopyChatLine(hT or this)
     end,
-    OnCopyRClick = function()
-        MY.Chat.RepeatChatLine(this)
+    OnCopyRClick = function(hT)
+        MY.Chat.RepeatChatLine(hT or this)
     end,
-    OnItemLClick = function()
-        OnItemLinkDown(this)
+    OnItemLClick = function(hT)
+        OnItemLinkDown(hT or this)
     end,
-    OnItemRClick = function()
+    OnItemRClick = function(hT)
         if IsCtrlKeyDown() then
-            MY.Chat.CopyChatItem(this)
+            MY.Chat.CopyChatItem(hT or this)
         end
     end,
 }
@@ -242,7 +248,7 @@ MY.Chat.LinkEventHandler = {
     (userdata) MY.Chat.RenderLink(userdata link)    处理link的各种事件绑定 namelink是一个超链接Text元素
     (string) MY.Chat.RenderLink(string szMsg)       格式化szMsg 处理里面的超链接 添加时间相应
 ]]
-MY.Chat.RenderLink = function(argv)
+MY.Chat.RenderLink = function(argv, argv2)
     if type(argv) == 'string' then
         local szMsg = argv
         szMsg = string.gsub(szMsg, "(<text>.-</text>)", function (html)
@@ -259,11 +265,11 @@ MY.Chat.RenderLink = function(argv)
             end
             
             if name:sub(1, 8) == 'namelink' then
-                script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.Chat.LinkEventHandler.OnNameLClick\nthis.OnItemRButtonDown=MY.Chat.LinkEventHandler.OnNameRClick'
+                script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.LinkEventHandler.OnNameLClick(this) end\nthis.OnItemRButtonDown=function() MY.Chat.LinkEventHandler.OnNameRClick(this) end'
             elseif name == 'copy' or name == 'copylink' or name == 'timelink' then
                 script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end'
             else
-                script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.LinkEventHandler.OnItemLClick(this) end\nthis.OnItemRButtonDown=MY.Chat.LinkEventHandler.OnItemRClick'
+                script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.LinkEventHandler.OnItemLClick(this) end\nthis.OnItemRButtonDown=function() MY.Chat.LinkEventHandler.OnItemRClick(this) end'
             end
             
             if #script > 0 then
@@ -282,11 +288,14 @@ MY.Chat.RenderLink = function(argv)
         local link = MY.UI(argv)
         local name = link:name()
         if name:sub(1, 8) == 'namelink' then
-            link:click(MY.Chat.LinkEventHandler.OnNameLClick, MY.Chat.LinkEventHandler.OnNameRClick)
+            link:click(function() MY.Chat.LinkEventHandler.OnNameLClick(argv2) end,
+                       function() MY.Chat.LinkEventHandler.OnNameRClick(argv2) end)
         elseif name == 'copy' or name == 'copylink' then
-            link:click(MY.Chat.LinkEventHandler.OnCopyLClick, MY.Chat.LinkEventHandler.OnCopyRClick)
+            link:click(function() MY.Chat.LinkEventHandler.OnCopyLClick(argv2) end,
+                       function() MY.Chat.LinkEventHandler.OnCopyRClick(argv2) end)
         else
-            link:click(MY.Chat.LinkEventHandler.OnItemLClick, MY.Chat.LinkEventHandler.OnItemRClick)
+            link:click(function() MY.Chat.LinkEventHandler.OnItemLClick(argv2) end,
+                       function() MY.Chat.LinkEventHandler.OnItemRClick(argv2) end)
         end
         argv.bMyChatRendered = true
     end
