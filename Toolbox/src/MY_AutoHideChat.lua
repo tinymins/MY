@@ -32,6 +32,13 @@ MY_AutoHideChat.ShowChatPanel = function(nShowFrame, nDelayFrame, callback)
     _Cache.bHide      = false
     -- unregister hide animate
     MY.BreatheCall('MY_AutoHideChat_Hide')
+    -- show each
+    for i = 1, 10 do
+        local hFrame = Station.Lookup('Lowest2/ChatPanel' .. i)
+        if hFrame then
+            hFrame:Show(true)
+        end
+    end
     -- register animate breathe call
     MY.BreatheCall('MY_AutoHideChat_Show', function()
         local nFrame = GetLogicFrameCount()
@@ -102,6 +109,10 @@ MY_AutoHideChat.HideChatPanel = function(nHideFrame, nDelayFrame, callback)
             if hFrame then
                 hFrame:SetAlpha(nAlpha)
                 hFrame:Lookup('Wnd_Message', 'Shadow_Back'):SetAlpha(nAlpha * _Cache.fAhBgAlpha)
+                -- hide if alpha turns to zero
+                if nAlpha == 0 then
+                    hFrame:Hide()
+                end
             end
         end
         Station.Lookup('Lowest1/ChatTitleBG'):SetAlpha(nAlpha)
