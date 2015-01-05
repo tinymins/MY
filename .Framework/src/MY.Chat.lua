@@ -245,8 +245,12 @@ MY.Chat.LinkEventHandler = {
     end,
 }
 --[[ 绑定link事件响应
-    (userdata) MY.Chat.RenderLink(userdata link)    处理link的各种事件绑定 namelink是一个超链接Text元素
-    (string) MY.Chat.RenderLink(string szMsg)       格式化szMsg 处理里面的超链接 添加时间相应
+    (userdata) MY.Chat.RenderLink(userdata link)                   处理link的各种事件绑定 namelink是一个超链接Text元素
+    (userdata) MY.Chat.RenderLink(userdata element, userdata link) 处理element的各种事件绑定 数据源是link
+    (string) MY.Chat.RenderLink(string szMsg)                      格式化szMsg 处理里面的超链接 添加时间相应
+    link   : 一个超链接Text元素
+    element: 一个可以挂鼠标消息响应的UI元素
+    szMsg  : 格式化的UIXML消息
 ]]
 MY.Chat.RenderLink = function(argv, argv2)
     if type(argv) == 'string' then
