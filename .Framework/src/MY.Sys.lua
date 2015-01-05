@@ -383,7 +383,11 @@ MY.RegisterUIEvent(MY, "OnFrameBreathe", function()
             if not res then
                 MY.Debug("BreatheCall#" .. (bc.szName or ('anonymous_'..i)) .." ERROR: " .. err)
             elseif err == 0 then    -- function return 0 means to stop its breathe
-                table.remove(_Cache.tBreatheCall, i)
+                for i = #_Cache.tBreatheCall, 1, -1 do
+                    if _Cache.tBreatheCall[i] == bc then
+                        table.remove(_Cache.tBreatheCall, i)
+                    end
+                end
             end
         end
     end
