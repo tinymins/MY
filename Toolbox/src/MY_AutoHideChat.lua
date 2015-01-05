@@ -3,6 +3,13 @@
 -- by 茗伊 @ 双梦镇 @ 荻花宫
 -- Build 20150105
 -- 
+local STATE = {
+    SHOW    = 1, -- 已显示
+    HIDE    = 2, -- 已隐藏
+    SHOWING = 3, -- 渐变显示中
+    HIDDING = 4, -- 渐变隐藏中
+}
+local m_nState = STATE.SHOW
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _Cache = {}
 MY_AutoHideChat = {}
@@ -18,27 +25,32 @@ end
 MY_AutoHideChat.ShowChatPanel = function(nShowFrame, nDelayFrame, callback)
     nShowFrame  = nShowFrame  or GLOBAL.GAME_FPS / 4  -- 渐变出现帧数
     nDelayFrame = nDelayFrame or GLOBAL.GAME_FPS * 5  -- 隐藏延迟帧数
-    -- return when chat panel is visible
-    if not _Cache.bHide then
+    -- switch case
+    if m_nState == STATE.SHOW then
+        -- return when chat panel is visible
         if callback then
             pcall(callback)
         end
         return
+    elseif m_nState == STATE.SHOWING then
+        return
+    elseif m_nState == STATE.HIDE then
+        -- show each
+        for i = 1, 10 do
+            local hFrame = Station.Lookup('Lowest2/ChatPanel' .. i)
+            if hFrame then
+                hFrame:Show(true)
+            end
+        end
+    elseif m_nState == STATE.HIDDING then
+        -- unregister hide animate
+        MY.BreatheCall('MY_AutoHideChat_Hide')
     end
+    m_nState = STATE.SHOWING
+    
     -- get start alpha
     local nStartAlpha = Station.Lookup('Lowest1/ChatTitleBG'):GetAlpha()
     local nStartFrame = GetLogicFrameCount()
-    _Cache.bAhAnimate = true
-    _Cache.bHide      = false
-    -- unregister hide animate
-    MY.BreatheCall('MY_AutoHideChat_Hide')
-    -- show each
-    for i = 1, 10 do
-        local hFrame = Station.Lookup('Lowest2/ChatPanel' .. i)
-        if hFrame then
-            hFrame:Show(true)
-        end
-    end
     -- register animate breathe call
     MY.BreatheCall('MY_AutoHideChat_Show', function()
         local nFrame = GetLogicFrameCount()
@@ -59,7 +71,7 @@ MY_AutoHideChat.ShowChatPanel = function(nShowFrame, nDelayFrame, callback)
         Station.Lookup('Lowest1/ChatTitleBG'):SetAlpha(nAlpha)
         Station.Lookup('Lowest1/ChatTitleBG', 'Image_BG'):SetAlpha(nAlpha * _Cache.fAhBgAlpha)
         if nAlpha == 255 then
-            _Cache.bAhAnimate = false
+            m_nState = STATE.SHOW
             if callback then
                 pcall(callback)
             end
@@ -72,16 +84,28 @@ end
 MY_AutoHideChat.HideChatPanel = function(nHideFrame, nDelayFrame, callback)
     nHideFrame  = nHideFrame  or GLOBAL.GAME_FPS / 2  -- 渐变消失帧数
     nDelayFrame = nDelayFrame or GLOBAL.GAME_FPS * 5  -- 隐藏延迟帧数
-    if not _Cache.bAhAnimate then
+    -- switch case
+    if m_nState == STATE.SHOW then
         -- get bg alpha
         _Cache.fAhBgAlpha = MY_AutoHideChat.GetBgAlpha()
+    elseif m_nState == STATE.SHOWING then
+        -- unregister show animate
+        MY.BreatheCall('MY_AutoHideChat_Show')
+    elseif m_nState == STATE.HIDE then
+        -- return when chat panel is not visible
+        if callback then
+            pcall(callback)
+        end
+        return
+    elseif m_nState == STATE.HIDDING then
+        -- unregister hide animate
+        MY.BreatheCall('MY_AutoHideChat_Hide')
     end
+    m_nState = STATE.HIDDING
+    
     -- get start alpha
     local nStartAlpha = Station.Lookup('Lowest1/ChatTitleBG'):GetAlpha()
     local nStartFrame = GetLogicFrameCount()
-    _Cache.bAhAnimate = true
-    -- unregister show animate
-    MY.BreatheCall('MY_AutoHideChat_Show')
     -- register animate breathe call
     MY.BreatheCall('MY_AutoHideChat_Hide', function()
         local nFrame = GetLogicFrameCount()
@@ -118,8 +142,7 @@ MY_AutoHideChat.HideChatPanel = function(nHideFrame, nDelayFrame, callback)
         Station.Lookup('Lowest1/ChatTitleBG'):SetAlpha(nAlpha)
         Station.Lookup('Lowest1/ChatTitleBG', 'Image_BG'):SetAlpha(nAlpha * _Cache.fAhBgAlpha)
         if nAlpha == 0 then
-            _Cache.bAhAnimate = false
-            _Cache.bHide      = true
+            m_nState = STATE.HIDE
             if callback then
                 pcall(callback)
             end
