@@ -41,11 +41,7 @@ MY_AutoHideChat.ShowChatPanel = function(nShowFrame, nDelayFrame, callback)
             local hFrame = Station.Lookup('Lowest2/ChatPanel' .. i)
             if hFrame then
                 hFrame:SetAlpha(nAlpha)
-                if hFrame:Lookup('CheckBox_Title'):IsCheckBoxChecked() then
-                    hFrame:Lookup('Wnd_Message', 'Shadow_Back'):SetAlpha(nAlpha * _Cache.fAhBgAlpha)
-                else
-                    hFrame:Lookup('Wnd_Message', 'Shadow_Back'):SetAlpha(0)
-                end
+                hFrame:Lookup('Wnd_Message', 'Shadow_Back'):SetAlpha(nAlpha * _Cache.fAhBgAlpha)
             end
         end
         Station.Lookup('Lowest1/ChatTitleBG'):SetAlpha(nAlpha)
