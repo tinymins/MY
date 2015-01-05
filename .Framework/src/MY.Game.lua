@@ -313,6 +313,48 @@ MY.Game.GetObjectName = function(obj)
 end
 MY.GetObjectName = MY.Game.GetObjectName
 
+--[[ 获取指定名字的右键菜单
+]]
+MY.Game.GetTargetContextMenu = function(dwType, szName, dwID)
+    local t = {}
+    if dwType == TARGET.PLAYER then
+        table.insert(t, {
+            szOption = _L['copy'],
+            fnAction = function()
+                MY.Talk(GetClientPlayer().szName, '[' .. szName .. ']')
+            end,
+        })
+        -- table.insert(t, {
+        --     szOption = _L['whisper'],
+        --     fnAction = function()
+        --         MY.SwitchChat(szName)
+        --     end,
+        -- })
+        pcall(InsertPlayerCommonMenu, t, nil, szName)
+        -- get dwID
+        if not dwID and MY_Farbnamen then
+            local tInfo = MY_Farbnamen.GetAusName(szName)
+            if tInfo then
+                dwID = tonumber(tInfo.dwID)
+            end
+        end
+        -- insert view equip
+        if dwID and UI_GetClientPlayerID() ~= dwID then
+            table.insert(t, {
+                szOption = _L['show equipment'],
+                fnAction = function()
+                    ViewInviteToPlayer(dwID)
+                end,
+            })
+        end
+        -- insert invite team
+        pcall(InsertInviteTeamMenu, t, szName)
+    end
+    
+    return t
+end
+MY.GetTargetContextMenu = MY.Game.GetTargetContextMenu
+
 --[[ 判断一个地图是不是副本
     (bool) MY.Game.IsDungeonMap(szMapName)
     (bool) MY.Game.IsDungeonMap(dwMapID)

@@ -196,37 +196,7 @@ MY.Chat.LinkEventHandler = {
             hT = this
         end
         PopupMenu((function()
-            local t = {}
-            local szName = MY.UI(hT):text():gsub('[%[%]]', '')
-            table.insert(t, {
-                szOption = _L['copy'],
-                fnAction = function()
-                    MY.Talk(GetClientPlayer().szName, '[' .. szName .. ']')
-                end,
-            })
-            -- table.insert(t, {
-            --     szOption = _L['whisper'],
-            --     fnAction = function()
-            --         MY.SwitchChat(szName)
-            --     end,
-            -- })
-            pcall(InsertPlayerCommonMenu, t, nil, szName)
-            if MY_Farbnamen then
-                local tInfo = MY_Farbnamen.GetAusName(szName)
-                if tInfo then
-                    local dwID = tonumber(tInfo.dwID)
-                    if GetClientPlayer().dwID ~= dwID then
-                        table.insert(t, {
-                            szOption = _L['show equipment'],
-                            fnAction = function()
-                                ViewInviteToPlayer(dwID)
-                            end,
-                        })
-                    end
-                end
-            end
-            pcall(InsertInviteTeamMenu, t, szName)
-            return t
+            return MY.Game.GetTargetContextMenu(TARGET.PLAYER, (MY.UI(hT):text():gsub('[%[%]]', '')))
         end)())
     end,
     OnCopyLClick = function(hT)
