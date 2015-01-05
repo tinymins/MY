@@ -24,7 +24,7 @@ end
 -- show panel
 MY_AutoHideChat.ShowChatPanel = function(nShowFrame, nDelayFrame, callback)
     nShowFrame  = nShowFrame  or GLOBAL.GAME_FPS / 4  -- 渐变出现帧数
-    nDelayFrame = nDelayFrame or GLOBAL.GAME_FPS * 5  -- 隐藏延迟帧数
+    nDelayFrame = nDelayFrame or 0                    -- 隐藏延迟帧数
     -- switch case
     if m_nState == STATE.SHOW then
         -- return when chat panel is visible
@@ -221,9 +221,6 @@ MY_AutoHideChat.ApplyConfig = function()
         end
         hEditInput._MY_T_AHCP_OnKillFocus = nil
         
-        MY.BreatheCall('MY_AutoHideChat_Hide')
-        MY.BreatheCall('MY_AutoHideChat_Show')
-        _Cache.bAhAnimate = false
         MY_AutoHideChat.ShowChatPanel()
     end
 end
