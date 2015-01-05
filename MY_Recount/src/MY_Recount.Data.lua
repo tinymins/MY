@@ -660,12 +660,8 @@ MY_Recount.Data.Push = function()
     MY_Recount.Data.Init(true)
 end
 
-
 -- 系统日志监控（数据源）
 MY.RegisterEvent('SYS_MSG', function()
-    if not MY.Player.GetFightUUID() then -- 未进战则初始化统计数据（即默认当前技能日志为进战技能）
-        MY_Recount.Data.Init(true)
-    end
     if arg0 == "UI_OME_SKILL_CAST_LOG" then
         -- 技能施放日志；
         -- (arg1)dwCaster：技能施放者 (arg2)dwSkillID：技能ID (arg3)dwLevel：技能等级
@@ -676,6 +672,12 @@ MY.RegisterEvent('SYS_MSG', function()
         -- (arg3)dwLevel：技能等级 (arg4)nRespond：见枚举型[[SKILL_RESULT_CODE]]
         -- MY_Recount.OnSkillCastRespond(arg1, arg2, arg3, arg4)
     elseif arg0 == "UI_OME_SKILL_EFFECT_LOG" then
+        -- 未进战则初始化统计数据（即默认当前帧所有的技能日志为进战技能）
+        if not MY.Player.GetFightUUID() and
+        _Cache.nLastAutoInitFrame ~= GetLogicFrameCount() then
+            _Cache.nLastAutoInitFrame = GetLogicFrameCount()
+            MY_Recount.Data.Init(true)
+        end
         -- 技能最终产生的效果（生命值的变化）；
         -- (arg1)dwCaster：施放者 (arg2)dwTarget：目标 (arg3)bReact：是否为反击 (arg4)nType：Effect类型 (arg5)dwID:Effect的ID 
         -- (arg6)dwLevel：Effect的等级 (arg7)bCriticalStrike：是否会心 (arg8)nCount：tResultCount数据表中元素个数 (arg9)tResultCount：数值集合
