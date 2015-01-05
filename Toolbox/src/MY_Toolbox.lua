@@ -67,10 +67,9 @@ _MY_ToolBox.FriendHeadTip = function(bEnable)
         MY.UI("Lowest/MY_Shadow"):remove()
     end
 end
+
 MY_ToolBox.bAvoidBlackShenxingCD = true
 RegisterCustomData("MY_ToolBox.bAvoidBlackShenxingCD")
-MY_ToolBox.bAutoHideChatPanel = false
-RegisterCustomData("MY_ToolBox.bAutoHideChatPanel")
 MY_ToolBox.ApplyConfig = function()
     -- 好友高亮
     if MY_ToolBox.bFriendHeadTip then
@@ -159,102 +158,6 @@ MY_ToolBox.ApplyConfig = function()
         end)
     else
         MY.RegisterEvent('DO_SKILL_CAST', 'MY_ToolBox_AvoidBlackShenxingCD')
-    end
-    
-    -- 自动隐藏聊天栏
-    if MY_ToolBox.bAutoHideChatPanel then
-        -- show panel
-        local fnShowChatPanel = function()
-            -- unregister hide delay call
-            MY.BreatheCall('MY_ToolBox_AutoHideChatPanel')
-            -- show each panel
-            for i = 1, 10 do
-                MY.UI('Lowest2/ChatPanel' .. i):fadeTo(300, 255)
-            end
-            MY.UI('Lowest1/ChatTitleBG'):fadeTo(300, 255)
-        end
-        -- hide panel
-        local fnHideChatPanel = function()
-            -- hide each panel
-            for i = 1, 10 do
-                MY.UI('Lowest2/ChatPanel' .. i):fadeOut(500)
-            end
-            MY.UI('Lowest1/ChatTitleBG'):fadeOut(500)
-        end
-        -- start hide panel clock
-        local fnStartHideChatPanelClock = function()
-            -- hide after 5 sec
-            MY.BreatheCall('MY_ToolBox_AutoHideChatPanel', function()
-                -- if mouse over chat panel then return
-                local hMouseOverWnd = Station.GetMouseOverWindow()
-                if hMouseOverWnd and hMouseOverWnd:GetRoot():GetName():sub(1, 9) == 'ChatPanel' then
-                    return
-                end
-                -- else hide it
-                fnHideChatPanel()
-                -- cancel breathe
-                return 0
-            end, 5000)
-            MY.BreatheCallDelayOnce('MY_ToolBox_AutoHideChatPanel', 5000)
-        end
-        -- hook chat panel as event listener
-        MY.Chat.HookChatPanel('MY_ToolBox_AutoHideChatPanel', function() end,function(h, szMsg)
-            -- if szMsg is empty (means nothing appended) then return
-            if not (szMsg and #szMsg > 0) then
-                return
-            end
-            -- if not active panel msg then return
-            if not h:GetRoot():Lookup('CheckBox_Title'):IsCheckBoxChecked() then
-                return
-            end
-            -- if input box get focus then return
-            local hFocus = Station.GetFocusWindow()
-            if hFocus and hFocus:GetTreePath() == 'Lowest2/EditBox/Edit_Input/' then
-                return
-            end
-            -- show when new msg
-            fnShowChatPanel()
-            -- hide after 5 sec
-            fnStartHideChatPanelClock()
-        end)
-        
-        -- hook chat edit box
-        local hEditInput = Station.Lookup('Lowest2/EditBox/Edit_Input')
-        -- save org
-        if hEditInput._MY_T_AHCP_OnSetFocus == nil then
-            hEditInput._MY_T_AHCP_OnSetFocus = hEditInput.OnSetFocus or false
-        end
-        -- show when chat panel get focus
-        hEditInput.OnSetFocus  = function()
-            fnShowChatPanel()
-            if this._MY_T_AHCP_OnSetFocus then
-                this._MY_T_AHCP_OnSetFocus()
-            end
-        end
-        -- save org
-        if hEditInput._MY_T_AHCP_OnKillFocus == nil then
-            hEditInput._MY_T_AHCP_OnKillFocus = hEditInput.OnKillFocus or false
-        end
-        -- hide after input box lost focus for 5 sec
-        hEditInput.OnKillFocus = function()
-            fnStartHideChatPanelClock()
-            if this._MY_T_AHCP_OnKillFocus then
-                this._MY_T_AHCP_OnKillFocus()
-            end
-        end
-    else
-        local hEditInput = Station.Lookup('Lowest2/EditBox/Edit_Input')
-        if hEditInput._MY_T_AHCP_OnSetFocus then
-            hEditInput.OnSetFocus  = hEditInput._MY_T_AHCP_OnSetFocus
-        end
-        hEditInput._MY_T_AHCP_OnSetFocus = nil
-        
-        if hEditInput._MY_T_AHCP_OnKillFocus then
-            hEditInput.OnKillFocus = hEditInput._MY_T_AHCP_OnKillFocus
-        end
-        hEditInput._MY_T_AHCP_OnKillFocus = nil
-        
-        MY.BreatheCall('MY_ToolBox_AutoHideChatPanel')
     end
 end
 MY.RegisterInit(MY_ToolBox.ApplyConfig)
@@ -401,6 +304,15 @@ _MY_ToolBox.OnPanelActive = function(wnd)
       :check(function(bChecked)
         MY_ToolBox.bAvoidBlackShenxingCD = bChecked
         MY_ToolBox.ApplyConfig()
+      end)
+    
+    local x, y = 380, 200
+    ui:append("WndCheckBox_AutoHideChatPanel", "WndCheckBox"):children("#WndCheckBox_AutoHideChatPanel")
+      :pos(x, y):width(150)
+      :text(_L['auto hide chat panel']):check(MY_AutoHideChat.bAutoHideChatPanel)
+      :check(function(bChecked)
+        MY_AutoHideChat.bAutoHideChatPanel = bChecked
+        MY_AutoHideChat.ApplyConfig()
       end)
     
     local x, y = 20, 200
