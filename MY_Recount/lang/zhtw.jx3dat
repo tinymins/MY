@@ -9,6 +9,7 @@ data = {
     ['no time limit'] = '無時間限制',
     ['less than %d second'] = '不足%d秒',
     ['less than %d minute'] = '不足%d分鍾',
+    ['less than %d minute and a half'] = '不足%d分半',
     
     ['redraw interval'] = '數值刷新周期',
     ['realtime refresh'] = '實時刷新',

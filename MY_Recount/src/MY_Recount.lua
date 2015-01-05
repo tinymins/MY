@@ -761,6 +761,8 @@ MY_Recount.GetMenu = function()
             szOption = _L['no time limit']
         elseif i < 60 then
             szOption = _L('less than %d second', i)
+        elseif i == 90 then
+            szOption = _L('less than %d minute and a half', i / 60)
         else
             szOption = _L('less than %d minute', i / 60)
         end
