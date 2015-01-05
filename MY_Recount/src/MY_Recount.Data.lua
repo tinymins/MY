@@ -259,6 +259,22 @@ MY_Recount.Data.Get = function(nIndex)
     end
 end
 
+--[[ 删除历史统计数据
+    (table) MY_Recount.Data.Del(nIndex) -- 删除指定序号的记录
+        (number)nIndex: 历史记录索引
+    (table) MY_Recount.Data.Del(data)   -- 删除指定记录
+]]
+MY_Recount.Data.Del = function(data)
+    if type(data) == 'number' then
+        table.remove(History, data)
+    else
+        for i = #History, 1, -1 do
+            if History[i] == data then
+                table.remove(History, i)
+            end
+        end
+    end
+end
 --[[
 ##################################################################################################
         #       #             #                     #     # # # # # # #       #     # # # # #     

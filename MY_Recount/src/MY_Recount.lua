@@ -873,6 +873,16 @@ MY_Recount.GetHistoryMenu = function()
                 fnAction = function()
                     MY_Recount.DisplayData(data)
                 end,
+                szIcon = "ui/Image/UICommon/CommonPanel2.UITex",
+                nFrame = 49,
+                nMouseOverFrame = 51,
+                nIconWidth = 17,
+                nIconHeight = 17,
+                szLayer = "ICON_RIGHTMOST",
+                fnClickIcon = function()
+                    MY_Recount.Data.Del(data)
+                    Wnd.CloseWindow('PopupMenuPanel')
+                end,
             })
         end
     end
