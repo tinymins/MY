@@ -20,6 +20,9 @@ MY_AutoHideChat.ShowChatPanel = function(nShowFrame, nDelayFrame, callback)
     nDelayFrame = nDelayFrame or GLOBAL.GAME_FPS * 5  -- 隐藏延迟帧数
     -- return when chat panel is visible
     if not _Cache.bHide then
+        if callback then
+            pcall(callback)
+        end
         return
     end
     -- get start alpha
@@ -91,6 +94,7 @@ MY_AutoHideChat.HideChatPanel = function(nHideFrame, nDelayFrame, callback)
         local hMouseOverWnd = Station.GetMouseOverWindow()
         if hMouseOverWnd and hMouseOverWnd:GetRoot():GetName():sub(1, 9) == 'ChatPanel' then
             nStartFrame = GetLogicFrameCount()
+            nAlpha = 255
         end
         -- alpha each panel
         for i = 1, 10 do
