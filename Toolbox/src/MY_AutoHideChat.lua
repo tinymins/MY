@@ -75,13 +75,19 @@ MY_AutoHideChat.HideChatPanel = function(nHideFrame, nDelayFrame, callback)
             _Cache.fAhBgAlpha = MY_AutoHideChat.GetBgAlpha()
             return
         end
+        -- calc new alpha
+        local nAlpha = math.max(math.ceil((1 - (nFrame - nDelayFrame - nStartFrame) / nHideFrame) * nStartAlpha), 0)
+        -- if panel setting panel is opened then delay again
+        local hPanelSettingFrame = Station.Lookup('Normal/ChatSettingPanel')
+        if hPanelSettingFrame and hPanelSettingFrame:IsVisible() then
+            nStartFrame = GetLogicFrameCount()
+            return
+        end
         -- if mouse over chat panel then delay again
         local hMouseOverWnd = Station.GetMouseOverWindow()
         if hMouseOverWnd and hMouseOverWnd:GetRoot():GetName():sub(1, 9) == 'ChatPanel' then
             nStartFrame = GetLogicFrameCount()
         end
-        -- calc new alpha
-        local nAlpha = math.max(math.ceil((1 - (nFrame - nDelayFrame - nStartFrame) / nHideFrame) * nStartAlpha), 0)
         -- alpha each panel
         for i = 1, 10 do
             local hFrame = Station.Lookup('Lowest2/ChatPanel' .. i)
