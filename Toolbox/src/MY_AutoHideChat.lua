@@ -27,8 +27,10 @@ MY_AutoHideChat.ShowChatPanel = function(nShowFrame, nDelayFrame, callback)
     local nStartFrame = GetLogicFrameCount()
     _Cache.bAhAnimate = true
     _Cache.bHide      = false
+    -- unregister hide animate
+    MY.BreatheCall('MY_AutoHideChat_Hide')
     -- register animate breathe call
-    MY.BreatheCall('MY_AutoHideChat', function()
+    MY.BreatheCall('MY_AutoHideChat_Show', function()
         local nFrame = GetLogicFrameCount()
         if nFrame - nDelayFrame < nStartFrame then
             _Cache.fAhBgAlpha = MY_AutoHideChat.GetBgAlpha()
@@ -68,8 +70,10 @@ MY_AutoHideChat.HideChatPanel = function(nHideFrame, nDelayFrame, callback)
     local nStartAlpha = Station.Lookup('Lowest1/ChatTitleBG'):GetAlpha()
     local nStartFrame = GetLogicFrameCount()
     _Cache.bAhAnimate = true
+    -- unregister show animate
+    MY.BreatheCall('MY_AutoHideChat_Show')
     -- register animate breathe call
-    MY.BreatheCall('MY_AutoHideChat', function()
+    MY.BreatheCall('MY_AutoHideChat_Hide', function()
         local nFrame = GetLogicFrameCount()
         if nFrame - nDelayFrame < nStartFrame then
             _Cache.fAhBgAlpha = MY_AutoHideChat.GetBgAlpha()
@@ -179,7 +183,8 @@ MY_AutoHideChat.ApplyConfig = function()
         end
         hEditInput._MY_T_AHCP_OnKillFocus = nil
         
-        MY.BreatheCall('MY_AutoHideChat')
+        MY.BreatheCall('MY_AutoHideChat_Hide')
+        MY.BreatheCall('MY_AutoHideChat_Show')
         _Cache.bAhAnimate = false
         MY_AutoHideChat.ShowChatPanel()
     end
