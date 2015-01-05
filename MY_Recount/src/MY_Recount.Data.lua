@@ -343,7 +343,11 @@ MY_Recount.Data.OnSkillEffect = function(dwCaster, dwTarget, nEffectType, dwEffe
                     (tResult[SKILL_RESULT_TYPE.REFLECTIED_DAMAGE   ] or 0)   -- 反弹伤害
     local nEffectDamage = tResult[SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE] or 0
 
-    if nSkillResult == SKILL_RESULT.HIT or
+    -- 识破
+    local nValue = tResult[SKILL_RESULT_TYPE.INSIGHT_DAMAGE]
+    if nValue and nValue > 0 then
+        MY_Recount.Data.AddDamageRecord(hCaster, hTarget, szEffectName, nDamage, nEffectDamage, SKILL_RESULT.INSIGHT)
+    elseif nSkillResult == SKILL_RESULT.HIT or
     nSkillResult == SKILL_RESULT.CRITICAL then -- 击中
         if nTherapy > 0 then -- 有治疗
             MY_Recount.Data.AddHealRecord(hCaster, hTarget, szEffectName, nTherapy, nEffectTherapy, nSkillResult)
@@ -358,11 +362,6 @@ MY_Recount.Data.OnSkillEffect = function(dwCaster, dwTarget, nEffectType, dwEffe
         MY_Recount.Data.AddDamageRecord(hCaster, hTarget, szEffectName, 0, 0, nSkillResult)
     end
     
-    -- 识破
-    local nValue = tResult[SKILL_RESULT_TYPE.INSIGHT_DAMAGE]
-    if nValue and nValue > 0 then
-        MY_Recount.Data.AddDamageRecord(hCaster, hTarget, szEffectName, nDamage, nEffectDamage, SKILL_RESULT.INSIGHT)
-    end
 end
 
 MY_Recount.Data.GetNameAusID = function(id, data)
