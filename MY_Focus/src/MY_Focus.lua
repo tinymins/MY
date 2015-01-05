@@ -524,12 +524,18 @@ end
 MY_Focus.OnItemRButtonClick = function()
     local name = this:GetName()
     name:gsub('Handle_Info_(%d+)_(%d+)', function(dwType, dwID)
-        PopupMenu({{
+        dwType, dwID = tonumber(dwType), tonumber(dwID)
+        local t = {}
+        if dwType == TARGET.PLAYER then
+            t = MY.Game.GetTargetContextMenu(dwType, this:Lookup('Handle_Name/Text_Name'):GetText(), dwID)
+        end
+        table.insert(t, 1, {
             szOption = _L['delete focus'],
             fnAction = function()
                 MY_Focus.DelStaticFocus(dwType, dwID)
             end
-        }})
+        })
+        PopupMenu(t)
     end)
 end
 
