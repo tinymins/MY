@@ -259,6 +259,7 @@ end
   #       # # # # # # #                 # # #     # # # # # # # # # # #   # #     #   #       #  
 --#######################################################################################################
 ]]
+_Cache.nFrameCount = GetLogicFrameCount()
 _Cache.tDelayCall = {}    -- delay call 队列
 _Cache.tBreatheCall = {}  -- breathe call 队列
 --[[ 延迟调用
@@ -373,8 +374,10 @@ MY.BreatheCallDelayOnce = function(szKey, nTime)
 end
 -- breathe
 MY.RegisterUIEvent(MY, "OnFrameBreathe", function()
+    -- add frame counter
+    _Cache.nFrameCount = GetLogicFrameCount()
     -- run breathe calls
-    local nFrame = GetLogicFrameCount()
+    local nFrame = _Cache.nFrameCount
     for i = #_Cache.tBreatheCall, 1, -1 do
         if nFrame >= _Cache.tBreatheCall[i].nNext then
             local bc = _Cache.tBreatheCall[i]
@@ -404,7 +407,14 @@ MY.RegisterUIEvent(MY, "OnFrameBreathe", function()
         end
     end
 end)
-
+-- GetLogicFrameCount()过图修正
+MY.RegisterEvent('LOADING_END', function()
+    local nFrameOffset = GetLogicFrameCount() - _Cache.nFrameCount
+    _Cache.nFrameCount = GetLogicFrameCount()
+    for _, bc in ipairs(_Cache.tBreatheCall) do
+        bc.nNext = bc.nNext + nFrameOffset
+    end
+end)
 --[[
 #######################################################################################################
               # # # #         #         #               #       #             #           #       
