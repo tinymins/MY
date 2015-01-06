@@ -468,10 +468,6 @@ _Cache.GetTargetAddonMenu = function()
         if type(m)=="function" then m = m() end
         table.insert(menu, m)
     end
-    if #menu>1 then
-        table.insert(menu, 1, { bDevide = true })
-        table.insert(menu, { bDevide = true })
-    end
     return menu
 end
 -- get trace button menu
