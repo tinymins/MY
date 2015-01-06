@@ -492,7 +492,8 @@ function XLifeBar.OnFrameCreate()
 end
 
 local _nDisX, _nDisY
-local CheckInvalidRect = function(object, me)
+local CheckInvalidRect
+CheckInvalidRect = function(object, me, bNoCreate)
     if not object then return end
     local dwID, bIsPlayer = object.dwID, IsPlayer(object.dwID)
     _nDisX, _nDisY = me.nX - object.nX, me.nY - object.nY
@@ -565,10 +566,12 @@ local CheckInvalidRect = function(object, me)
             local Force = _XLifeBar.GetForce(dwID)
             if Force ~= tab.Force then
                 XLifeBar(object):Remove():Create()
+                CheckInvalidRect(object, me, true)
             end
-        else
+        elseif not bNoCreate then
             if bIsPlayer or object.CanSeeName() or Config.bShowSpecialNpc then
                 XLifeBar(object):Create()
+                CheckInvalidRect(object, me, true)
             end
         end
     elseif _XLifeBar.tObject[dwID] then
