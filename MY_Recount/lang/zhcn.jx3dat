@@ -34,4 +34,7 @@ data = {
     ['%7d%s(Effect) %7d%s(Total)'] = '%7d%s(有效) %7d%s(总)',
     ['%7d%s(Effect)'] = '%7d%s(有效)',
     ['%7d%s(Total)'] = '%7d%s(总)',
+    
+    ['total: '] = '总：',
+    ['effect: '] = '有效：',
 }

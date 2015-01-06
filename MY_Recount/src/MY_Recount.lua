@@ -607,6 +607,44 @@ MY_Recount.OnItemLButtonClick = function()
     end)
 end
 
+MY_Recount.OnItemRefreshTip = function()
+    local name = this:GetName()
+    if name == 'Handle_Me' then
+        name = 'Handle_LI_' .. UI_GetClientPlayerID()
+    end
+    name:gsub('Handle_LI_(.+)', function(id)
+        if tonumber(id) then
+            id = tonumber(id)
+        end
+        local x, y = this:GetAbsPos()
+        local w, h = this:GetSize()
+        local tRec = DataDisplay[SZ_CHANNEL_KEY[MY_Recount.nChannel]][id]
+        if tRec then
+            local szXml = ''
+            local szColon = g_tStrings.STR_COLON
+            for szSkillName, p in pairs(tRec.Skill) do
+                szXml = szXml .. GetFormatText(szSkillName .. "\n", nil, 255, 150, 0)
+                szXml = szXml .. GetFormatText(_L['total: '] .. p.nTotal .. ' ' .. _L['effect: '] .. p.nTotalEffect .. "\n")
+                for _, nSkillResult in ipairs({
+                    SKILL_RESULT.HIT     ,
+                    SKILL_RESULT.INSIGHT ,
+                    SKILL_RESULT.CRITICAL,
+                    SKILL_RESULT.MISS    ,
+                }) do
+                    local nCount = 0
+                    if p.Detail[nSkillResult] then
+                        nCount = p.Detail[nSkillResult].nCount
+                    end
+                    szXml = szXml .. GetFormatText(SZ_SKILL_RESULT[nSkillResult] .. szColon, nil, 255, 202, 126)
+                    szXml = szXml .. GetFormatText(string.format('%2d', nCount) .. ' ')
+                end
+                szXml = szXml .. GetFormatText('\n')
+            end
+            OutputTip(szXml, 500, {x, y, w, h})
+        end
+    end)
+end
+
 MY_Recount.OnLButtonClick = function()
     local name = this:GetName()
     if name == 'Btn_Right' then
