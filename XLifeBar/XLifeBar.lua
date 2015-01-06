@@ -317,11 +317,13 @@ function XLifeBar.X:DrawNames()
     local cfgName, cfgTitle, cfgTong
     local tab = _XLifeBar.tObject[self.self.dwID]
     if IsPlayer(self.self.dwID) then
+        cfgLife  = Config.bShowLife.Player[self.force]
         cfgName  = Config.bShowName.Player[self.force]
         cfgTitle = Config.bShowTitle.Player[self.force]
         cfgTong  = Config.bShowTong.Player[self.force]
         r,g,b    = unpack(Config.Col.Player[self.force])
     else
+        cfgLife  = Config.bShowLife.Npc[self.force]
         cfgName  = Config.bShowName.Npc[self.force]
         cfgTitle = Config.bShowTitle.Npc[self.force]
         cfgTong  = false
@@ -354,6 +356,9 @@ function XLifeBar.X:DrawNames()
     if cfgName and #tWordlines == 0 then
         self.hp:DrawLifebar(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, {r,g,b,0,self.tab.Life})
         self.hp:DrawLifeBorder(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, 0)
+    elseif cfgLife then
+        self.hp:DrawLifebar(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, {r,g,b,a,self.tab.Life})
+        self.hp:DrawLifeBorder(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, a)
     end
     self.hp:DrawWordlines(tWordlines, {r,g,b,a,f})
     return self
