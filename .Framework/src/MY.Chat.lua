@@ -446,7 +446,14 @@ MY.Chat.SwitchChat = function(nChannel)
         SwitchChatChannel(szHeader)
     elseif type(nChannel) == "string" then
         if string.sub(nChannel, 1, 1) == "/" then
-            SwitchChatChannel(nChannel.." ")
+            if nChannel == '/cafk' or nChannel == '/catr' then
+                SwitchChatChannel(nChannel)
+                MY.Chat.Talk(nil, nChannel, nil, nil, true)
+                Station.Lookup("Lowest2/EditBox"):Show()
+                Station.SetFocusWindow("Lowest2/EditBox/Edit_Input")
+            else
+                SwitchChatChannel(nChannel.." ")
+            end
         else
             SwitchChatChannel("/w " .. string.gsub(nChannel,'[%[%]]','') .. " ")
         end
@@ -609,7 +616,7 @@ MY.Chat.Talk = function(nChannel, szText, bNoEscape, bSaveDeny, bPushToChatBox)
         if tar then
             szText = string.gsub(szText, "%$mb", '['..tar.szName..']')
         end
-        tSay = {{ type = "text", text = szText .. "\n"}}
+        tSay = {{ type = "text", text = szText}}
     end
     if not bNoEscape then
         tSay = MY.Chat.ParseFaceIcon(tSay)
