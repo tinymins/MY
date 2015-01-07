@@ -96,6 +96,7 @@ MY.Chat.CopyChatLine = function(hTime)
     if not edit then
         return
     end
+    Station.Lookup("Lowest2/EditBox"):Show()
     edit:ClearText()
     local h, i, bBegin = hTime:GetParent(), hTime:GetIndex(), nil
     -- loop
