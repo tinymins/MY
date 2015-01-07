@@ -373,7 +373,7 @@ MY.BreatheCallDelayOnce = function(szKey, nTime)
     end
 end
 -- breathe
-MY.RegisterUIEvent(MY, "OnFrameBreathe", function()
+MY.UI.RegisterUIEvent(MY, "OnFrameBreathe", function()
     -- add frame counter
     _Cache.nFrameCount = GetLogicFrameCount()
     -- run breathe calls
