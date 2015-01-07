@@ -1814,7 +1814,7 @@ end
 -- my ui events handle
 -----------------------------------------------------------
 
--- 绑定Frame的UI事件
+-- 绑定Frame的事件
 function _MY.UI:onevent(szEvent, fnEvent)
     self:_checksum()
     if type(szEvent)~="string" then return self end
@@ -1839,6 +1839,28 @@ function _MY.UI:onevent(szEvent, fnEvent)
             if ele.frm then
                 if ele.frm.tMyOnEvent then
                     ele.frm.tMyOnEvent[szEvent] = {}
+                end
+            end
+        end
+    end
+    return self
+end
+
+-- 绑定Frame的UI事件
+function _MY.UI:onuievent(szEvent, fnEvent)
+    self:_checksum()
+    if type(szEvent)~="string" then
+        return self
+    end
+    if type(fnEvent)=="function" then
+        for _, ele in pairs(self.eles) do
+            MY.UI.RegisterUIEvent(ele.raw, szEvent, fnEvent)
+        end
+    else
+        for _, ele in pairs(self.eles) do
+            if ele.frm then
+                if ele.frm['tMy' .. szEvent] then
+                    ele.frm['tMy' .. szEvent] = {}
                 end
             end
         end
@@ -2190,14 +2212,28 @@ MY.UI.Fetch = function(selector, tab) return _MY.UI.new(selector, tab) end
 -- 绑定UI事件
 MY.UI.RegisterUIEvent = function(raw, szEvent, fnEvent)
     if not raw['tMy'..szEvent] then
-        raw['tMy'..szEvent], raw[szEvent] = { raw[szEvent] }, function()
-            local _this = this
-            this = raw
-            for _, fn in ipairs(this['tMy'..szEvent]) do pcall(fn) end
-            this = _this
+        -- init onXXX table
+        raw['tMy'..szEvent] = { raw[szEvent] }
+        -- init onXXX function
+        raw[szEvent] = function(...)
+            for _, fn in ipairs(this['tMy'..szEvent]) do
+                local tReturn
+                for _, fn in ipairs(raw['tMy' .. szEvent] or {}) do 
+                    local t = {pcall(fn, ...)}
+                    if not tReturn and t[1] then
+                        table.remove(t, 1)
+                        tReturn = t
+                    end
+                end
+                if tReturn then
+                    return unpack(tReturn)
+                end
+             end
         end
     end
-    if fnEvent then table.insert(raw['tMy'..szEvent], fnEvent) end
+    if fnEvent then
+        table.insert(raw['tMy'..szEvent], fnEvent)
+    end
 end
 
 -- create new frame
