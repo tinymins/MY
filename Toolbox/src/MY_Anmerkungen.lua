@@ -65,16 +65,18 @@ MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
     local CloseFrame = function(ui)
         PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
         ui:remove()
+        return true
     end
-    MY.UI.RegisterUIEvent(ui:raw(1), "OnFrameKeyDown", function()
+    ui:onuievent("OnFrameKeyDown", function()
         if GetKeyName(Station.GetMessageKey()) == "Esc" then
             CloseFrame(MY.UI(this))
             return 1
         end
         return 0
-    end)
+      end)
+      :onuievent("OnCloseButtonClick", CloseFrame)
     
-    local w, h = 300, 230
+    local w, h = 300, 210
     local x, y = 20 , 0
     
     ui:size(w + 40, h + 90):anchor( { s = "CENTER", r = "CENTER", x = 0, y = 0 } )
