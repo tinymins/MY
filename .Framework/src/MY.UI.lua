@@ -386,7 +386,7 @@ function _MY.UI:children(filter)
     if type(filter)=="string" and string.sub(filter, 1, 1)=="#" and string.sub(filter, 2, 2)~="^" then
         filter = string.sub(filter, 2)
         for _, ele in pairs(self.eles) do
-            local c = ele.raw:Lookup(filter)
+            local c = (ele.wnd or ele.raw):Lookup(filter)
             if c then
                 table.insert(child, c)
                 childHash[table.concat({ table.concat({ c:GetTreePath() }), filter })] = true
@@ -400,22 +400,23 @@ function _MY.UI:children(filter)
         return self:clone(eles)
     else
         for _, ele in pairs(self.eles) do
-            if ele.raw:GetType() == "Handle" then
-                for i = 0, ele.raw:GetItemCount() - 1, 1 do
-                    if not childHash[table.concat({ ele.raw:Lookup(i):GetTreePath(), i })] then
-                        table.insert(child, ele.raw:Lookup(i))
-                        childHash[table.concat({ table.concat({ ele.raw:Lookup(i):GetTreePath() }), i })] = true
+            local raw = (ele.wnd or ele.raw)
+            if raw:GetType() == "Handle" then
+                for i = 0, raw:GetItemCount() - 1, 1 do
+                    if not childHash[table.concat({ raw:Lookup(i):GetTreePath(), i })] then
+                        table.insert(child, raw:Lookup(i))
+                        childHash[table.concat({ table.concat({ raw:Lookup(i):GetTreePath() }), i })] = true
                     end
                 end
             else
                 -- 子handle
-                local status, handle = pcall(function() return ele.raw:Lookup('','') end) -- raw可能没有Lookup方法 用pcall包裹
+                local status, handle = pcall(function() return raw:Lookup('','') end) -- raw可能没有Lookup方法 用pcall包裹
                 if status and handle and not childHash[table.concat{handle:GetTreePath(),'/Handle'}] then
                     table.insert(child, handle)
                     childHash[table.concat({handle:GetTreePath(),'/Handle'})] = true
                 end
                 -- 子窗体
-                local status, sub_raw = pcall(function() return ele.raw:GetFirstChild() end) -- raw可能没有GetFirstChild方法 用pcall包裹
+                local status, sub_raw = pcall(function() return raw:GetFirstChild() end) -- raw可能没有GetFirstChild方法 用pcall包裹
                 while status and sub_raw do
                     if not childHash[table.concat{sub_raw:GetTreePath()}] then
                         table.insert( child, sub_raw )
