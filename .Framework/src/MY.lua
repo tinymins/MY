@@ -719,19 +719,6 @@ end
     # # # # # # # # #                             # # # # # # # # # # #   # #     #   #       #   
 #######################################################################################################
 ]]
--- 绑定UI事件
-MY.RegisterUIEvent = function(raw, szEvent, fnEvent)
-    if not raw['tMy'..szEvent] then
-        raw['tMy'..szEvent] = { raw[szEvent] }
-        raw[szEvent] = function()
-            for _, fn in ipairs(raw['tMy'..szEvent]) do pcall(fn) end
-        end
-    end
-    if fnEvent then table.insert(raw['tMy'..szEvent], fnEvent) end
-end
--- create frame
-MY.OnFrameCreate = function()
-end
 MY.OnMouseWheel = function()
     MY.Debug(string.format('OnMouseWheel#%s.%s:%i\n',this:GetName(),this:GetType(),Station.GetMessageWheelDelta()),nil,0)
     return true
@@ -744,15 +731,12 @@ MY.OnFrameKeyDown = function()
 	end
 	return 0
 end
----------------------------------------------------
+
 ---------------------------------------------------
 -- 事件、快捷键、菜单注册
+---------------------------------------------------
+if _MY.nDebugLevel <3 then
+    RegisterEvent("CALL_LUA_ERROR", function() OutputMessage("MSG_SYS", arg0) end)
+end
 
-
-
-if _MY.nDebugLevel <3 then RegisterEvent("CALL_LUA_ERROR", function() OutputMessage("MSG_SYS", arg0) end) end
-
--- MY.RegisterEvent("CUSTOM_DATA_LOADED", _MY.Init)
-MY.RegisterEvent("LOADING_END", _MY.Init)
-
--- MY.RegisterEvent("PLAYER_ENTER_GAME", _MY.Init)
+MY.RegisterEvent("FIRST_LOADING_END", _MY.Init)

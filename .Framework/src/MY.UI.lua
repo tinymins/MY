@@ -2216,7 +2216,7 @@ MY.UI.RegisterUIEvent = function(raw, szEvent, fnEvent)
         raw['tMy'..szEvent] = { raw[szEvent] }
         -- init onXXX function
         raw[szEvent] = function(...)
-            for _, fn in ipairs(this['tMy'..szEvent]) do
+            for _, fn in ipairs(raw['tMy'..szEvent]) do
                 local tReturn
                 for _, fn in ipairs(raw['tMy' .. szEvent] or {}) do 
                     local t = {pcall(fn, ...)}
@@ -2327,11 +2327,13 @@ MY.UI.CreateFrame = function(szName, nStyle)
     nStyle == MY.Const.UI.Frame.TOPMOST then
         frm:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
         frm:Lookup("Btn_Close").OnLButtonClick = function()
-            if frm.bClose then
-                Wnd.CloseWindow(frm)
-            else
-                frm:Hide()
+            if frm.OnCloseButtonClick then
+                local status, res = pcall(frm.OnCloseButtonClick)
+                if status and res then
+                    return
+                end
             end
+            Wnd.CloseWindow(frm)
         end
         -- load bg uitex
         local szUITex = MY.GetAddonInfo().szFrameworkRoot .. 'image/WndFrame.UITex'
@@ -2533,5 +2535,3 @@ end
 MY.UI.Append = function(hParent, szName, szType, tArg)
     return MY.UI(hParent):append(szName, szType, tArg)
 end
-
-MY.Debug("ui plugins inited!\n",nil,0)
