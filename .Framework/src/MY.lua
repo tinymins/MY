@@ -564,6 +564,17 @@ MY.SwitchTab = function(szID)
     if szID then
         -- get tab window
         local hTab = frame:Lookup('Wnd_Total/WndScroll_Tabs', 'H_Tab_' .. szID)
+        if not hTab then
+            -- check if tab exist in other category
+            for _, ctg in ipairs(_MY.tTabs) do
+                for i, tab in ipairs(ctg) do
+                    if tab.szID == szID then
+                        MY.SwitchCategory(ctg.id)
+                    end
+                end
+            end
+            hTab = frame:Lookup('Wnd_Total/WndScroll_Tabs', 'H_Tab_' .. szID)
+        end
         if (not hTab) or hTab.bActived then
             return
         end
