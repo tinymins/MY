@@ -1,0 +1,5 @@
+Farme	Group	GroupIndex	GroupFrameDelay	Left	Top	Width	Height	Name
+0				0	0	16	64	面板左上.tga
+1				16	0	8	64	面板中上.tga
+2				24	0	16	64	面板右上.tga
+3				40	0	430	64	顶部花纹.tga
