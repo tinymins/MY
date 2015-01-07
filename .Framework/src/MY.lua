@@ -523,28 +523,34 @@ MY.RedrawTab = function(szCategory)
     end
     
     -- draw tabs
-    local wndTabs = frame:Lookup('Wnd_Total/WndScroll_Tabs/WndContainer_Tabs')
-    wndTabs:Clear()
+    local hTabs = frame:Lookup('Wnd_Total/WndScroll_Tabs', '')
+    hTabs:Clear()
     
     for _, ctg in ipairs(_MY.tTabs) do
         if ctg.id == szCategory then
             for i, tab in ipairs(ctg) do
-                local wndTab = wndTabs:AppendContentFromIni(_MY.szIniFile, "Wnd_TabT")
-                wndTab.szID = tab.szID
-                wndTab:SetName('Wnd_Tab_' .. tab.szID)
-                wndTab:Lookup('Btn_TabBg', ''):Lookup('Text_Tab'):SetText(tab.szTitle)
+                local hTab = hTabs:AppendItemFromIni(_MY.szIniFile, "Handle_Tab")
+                hTab.szID = tab.szID
+                hTab:SetName('H_Tab_' .. tab.szID)
+                hTab:Lookup('Text_Tab'):SetText(tab.szTitle)
                 if tab.dwIconFrame then
-                    wndTab:Lookup('Btn_TabBg', ''):Lookup('Image_TabIcon'):FromUITex(tab.szIconTex, tab.dwIconFrame)
+                    hTab:Lookup('Image_TabIcon'):FromUITex(tab.szIconTex, tab.dwIconFrame)
                 else
-                    wndTab:Lookup('Btn_TabBg', ''):Lookup('Image_TabIcon'):FromTextureFile(tab.szIconTex)
+                    hTab:Lookup('Image_TabIcon'):FromTextureFile(tab.szIconTex)
                 end
-                wndTab:Lookup('Btn_TabBg').OnLButtonClick = function()
-                    MY.SwitchTab(this:GetParent().szID)
+                hTab.OnItemLButtonClick = function()
+                    MY.SwitchTab(this.szID)
+                end
+                hTab.OnItemMouseEnter = function()
+                    this:Lookup('Image_Bg_Hover'):Show()
+                end
+                hTab.OnItemMouseLeave = function()
+                    this:Lookup('Image_Bg_Hover'):Hide()
                 end
             end
         end
     end
-    wndTabs:FormatAllContentPos()
+    hTabs:FormatAllItemPos()
     
     MY.SwitchTab()
 end
@@ -557,22 +563,20 @@ MY.SwitchTab = function(szID)
     
     if szID then
         -- get tab window
-        local wndTab = frame:Lookup('Wnd_Total/WndScroll_Tabs/WndContainer_Tabs/Wnd_Tab_' .. szID)
-        if (not wndTab) or wndTab.bActived then
+        local hTab = frame:Lookup('Wnd_Total/WndScroll_Tabs', 'H_Tab_' .. szID)
+        if (not hTab) or hTab.bActived then
             return
         end
-        -- deal with ui response
         PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
-        local p = wndTab:GetParent():GetFirstChild()
-        while p do
-            p.bActived = false
-            p:Lookup("Btn_TabBg"):SetAnimateGroupNormal(11)
-            p:Lookup("Btn_TabBg"):SetAnimateGroupMouseOver(9)
-            p = p:GetNext()
+        
+        -- deal with ui response
+        local hTabs = hTab:GetParent()
+        for i = 0, hTabs:GetItemCount() - 1 do
+            hTabs:Lookup(i).bActived = false
+            hTabs:Lookup(i):Lookup("Image_Bg_Active"):Hide()
         end
-        wndTab.bActived = true
-        wndTab:Lookup("Btn_TabBg"):SetAnimateGroupNormal(10)
-        wndTab:Lookup("Btn_TabBg"):SetAnimateGroupMouseOver(10)
+        hTab.bActived = true
+        hTab:Lookup("Image_Bg_Active"):Show()
     end
     
     -- get main panel
