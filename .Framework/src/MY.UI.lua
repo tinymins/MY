@@ -1555,37 +1555,20 @@ function _MY.UI:size(nWidth, nHeight)
                     ele.frm:SetSize(nWidth, nHeight)
                     ele.hdl:SetSize(nWidth, nHeight)
                 else
-                    -- 特别注意：窗体最小高度为 200，宽度自动按接近取  234/380/770 中的一个
                     -- fix size
-                    if nWidth > 400 then
-                        nWidth = 770
-                        hnd:Lookup("Image_CBg1"):SetSize(385, 70)
-                        hnd:Lookup("Image_CBg2"):SetSize(384, 70)
-                        hnd:Lookup("Image_CBg1"):SetFrame(2)
-                        hnd:Lookup("Image_CBg2"):SetFrame(2)
-                    elseif nWidth > 250 then
-                        nWidth = 380
-                        hnd:Lookup("Image_CBg1"):SetSize(190, 70)
-                        hnd:Lookup("Image_CBg2"):SetSize(189, 70)
-                        hnd:Lookup("Image_CBg1"):SetFrame(1)
-                        hnd:Lookup("Image_CBg2"):SetFrame(1)
-                    else
-                        nWidth = 234
-                        hnd:Lookup("Image_CBg1"):SetSize(117, 70)
-                        hnd:Lookup("Image_CBg2"):SetSize(117, 70)
-                        hnd:Lookup("Image_CBg1"):SetFrame(0)
-                        hnd:Lookup("Image_CBg2"):SetFrame(0)
-                    end
-                    if nHeight < 200 then nHeight = 200 end
+                    if nWidth  < 132 then nWidth  = 132 end
+                    if nHeight < 150 then nHeight = 150 end
                     -- set size
                     frm:SetSize(nWidth, nHeight)
                     frm:SetDragArea(0, 0, nWidth, 55)
                     hnd:SetSize(nWidth, nHeight)
-                    hnd:Lookup("Image_CBg3"):SetSize(8, nHeight - 160)
-                    hnd:Lookup("Image_CBg4"):SetSize(nWidth - 16, nHeight - 160)
-                    hnd:Lookup("Image_CBg5"):SetSize(8, nHeight - 160)
-                    hnd:Lookup("Image_CBg7"):SetSize(nWidth - 132, 85)
-                    hnd:Lookup("Text_Title"):SetSize(nWidth - 90, 30)
+                    hnd:Lookup("Image_BgT"):SetW(nWidth)
+                    hnd:Lookup("Image_BgCT"):SetW(nWidth - 32)
+                    hnd:Lookup("Image_BgLC"):SetH(nHeight - 149)
+                    hnd:Lookup("Image_BgCC"):SetSize(nWidth - 16, nHeight - 149)
+                    hnd:Lookup("Image_BgRC"):SetH(nHeight - 149)
+                    hnd:Lookup("Image_BgCB"):SetW(nWidth - 132)
+                    hnd:Lookup("Text_Title"):SetW(nWidth - 90)
                     hnd:FormatAllItemPos()
                     frm:Lookup("Btn_Close"):SetRelPos(nWidth - 35, 15)
                     ele.wnd:SetSize(nWidth - 40, nHeight - 90)
@@ -2313,6 +2296,13 @@ MY.UI.CreateFrame = function(szName, nStyle)
             else
                 frm:Hide()
             end
+        end
+        -- load bg uitex
+        local szUITex = MY.GetAddonInfo().szFrameworkRoot .. 'image/WndFrame.UITex'
+        for _, v in ipairs({ 'Image_BgLT', 'Image_BgCT', 'Image_BgRT', 'Image_BgT' }) do
+            local h = frm:Lookup('', v)
+            local n = h:GetFrame()
+            h:FromUITex(szUITex, n)
         end
     end
     return MY.UI(frm)
