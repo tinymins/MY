@@ -677,3 +677,24 @@ MY.Sys.FormatTimeCount = function(szFormat, nTime)
     return szFormat
 end
 MY.FormatTimeCount = MY.Sys.FormatTimeCount
+
+--[[ register global esc key down action
+    (void) MY.Sys.RegisterEsc(szID, fnCondition, fnAction, bTopmost) -- register global esc event handle
+    (void) MY.Sys.RegisterEsc(szID, nil, nil, bTopmost)              -- unregister global esc event handle
+    (string)szID        -- an UUID (if this UUID has been register before, the old will be recovered)
+    (function)fnCondition -- a function returns if fnAction will be execute
+    (function)fnAction    -- inf fnCondition() is true then fnAction will be called
+    (boolean)bTopmost    -- this param equals true will be called in high priority
+]]
+MY.Sys.RegisterEsc = function(szID, fnCondition, fnAction, bTopmost)
+    if fnCondition and fnAction then
+        if RegisterGlobalEsc then
+            RegisterGlobalEsc(szID, fnCondition, fnAction, bTopmost)
+        end
+    else
+        if UnRegisterGlobalEsc then
+            UnRegisterGlobalEsc(szID, bTopmost)
+        end
+    end
+end
+MY.RegisterEsc = MY.Sys.RegisterEsc
