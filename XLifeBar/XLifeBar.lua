@@ -176,22 +176,26 @@ _XLifeBar.Reset = function(bNoSave)
     MY.BreatheCall("XLifeBar_AdjustIndex")
     if Config.bAdjustIndex then
         MY.BreatheCall("XLifeBar_AdjustIndex", function()
+            local n = 0
+            local t = {}
             -- refresh current index data
             for dwID, tab in pairs(_XLifeBar.tObject) do
+                n = n + 1
+                if n > 200 then
+                    break
+                end
                 PostThreadCall(function(tab, xScreen, yScreen)
                     tab.nIndex = yScreen or 0
                 end, tab, "Scene_GetCharacterTopScreenPos", dwID)
-            end
-            -- sort
-            local t = {}
-            for dwID, tab in pairs(_XLifeBar.tObject) do
+                
                 table.insert(t, { handle = tab.handle, index = tab.nIndex })
             end
+            -- sort
             table.sort(t, function(a, b) return a.index < b.index end)
             -- adjust
-            for i = 1, #t do
-                if t[i].handle then
-                    t[i].handle:ExchangeIndex(i-1)
+            for i = #t, 1, -1 do
+                if t[i].handle and t[i].handle:GetIndex() ~= i - 1 then
+                    t[i].handle:ExchangeIndex(i - 1)
                 end
             end
         end, 500)
