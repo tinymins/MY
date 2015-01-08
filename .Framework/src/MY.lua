@@ -281,6 +281,7 @@ MY.ClosePanel = function(bRealClose)
         Wnd.CloseWindow("PopupMenuPanel")
         PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
     end
+    MY.RegisterEsc('MY')
 end
 -- open window
 MY.OpenPanel = function()
@@ -290,6 +291,9 @@ MY.OpenPanel = function()
         frame:BringToTop()
         Station.SetFocusWindow(frame)
     end
+    MY.RegisterEsc('MY', function()
+        return Station.Lookup('Normal/MY') and Station.Lookup('Normal/MY'):IsVisible()
+    end, MY.ClosePanel)
     PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 end
 -- toggle panel
