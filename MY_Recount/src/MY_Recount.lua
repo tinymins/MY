@@ -557,6 +557,7 @@ end
 _Cache.OnDetailLButtonClick = function()
     local name = this:GetName()
     if name == 'Btn_Close' then
+        MY.RegisterEsc(this:GetRoot():GetTreePath())
         Wnd.CloseWindow(this:GetRoot())
     elseif name == 'Btn_Switch' then
         if this:GetRoot().szPrimarySort == 'Skill' then
@@ -601,6 +602,21 @@ MY_Recount.OnItemLButtonClick = function()
             frm.OnFrameBreathe = _Cache.OnDetailFrameBreathe
             frm.OnItemLButtonDown = _Cache.OnDetailItemLButtonDown
             frm:Lookup('', 'Text_Default'):SetText(MY_Recount.Data.GetNameAusID(id, DataDisplay) .. ' ' .. SZ_CHANNEL[MY_Recount.nChannel])
+            MY.RegisterEsc(frm:GetTreePath(), function()
+                if Station.Lookup('Normal/MY_Recount_' .. id .. '_' .. szChannel) then
+                    return true
+                else
+                    MY.RegisterEsc('MY_Recount_' .. id .. '_' .. szChannel)
+                end
+            end, function()
+                if frm.szSelectedSkill or frm.szSelectedTarget then
+                    frm.szSelectedSkill  = nil
+                    frm.szSelectedTarget = nil
+                else
+                    MY.RegisterEsc(frm:GetTreePath())
+                    MY.UI(frm):remove()
+                end
+            end)
             
             MY.UI(frm):children('Btn_Close'):click(_Cache.OnDetailLButtonClick)
         end
