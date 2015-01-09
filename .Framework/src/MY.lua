@@ -740,7 +740,10 @@ end
 -- 事件、快捷键、菜单注册
 ---------------------------------------------------
 if _MY.nDebugLevel <3 then
-    RegisterEvent("CALL_LUA_ERROR", function() OutputMessage("MSG_SYS", arg0) end)
+    RegisterEvent("CALL_LUA_ERROR", function()
+        print(arg0)
+        OutputMessage("MSG_SYS", arg0)
+    end)
 end
 
 MY.RegisterEvent("LOADING_END", _MY.Init)

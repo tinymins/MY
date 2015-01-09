@@ -22,4 +22,14 @@ data = {
     ['force return to game login.'] = '强制返回账户登录页面。',
     ['return to role list while leaving fighting.'] = '在下一次脱离战斗的一瞬间返回角色选择页面。',
     ['return to game login while leaving fighting.'] = '在下一次脱离战斗的一瞬间返回账户登录页面。',
+    
+    ['Logoff is ready for your casting unfight skill.'] = '脱战登出已启动，请释放脱战技能，游戏将在脱战瞬间下线。',
+    ["Any condition matches, game will return to "] = '游戏将在符合以下条件之一时返回到',
+    ['login page'] = '账号登录界面',
+    ['character page'] = '角色选择界面',
+    ['* while time up to %04d-%02d-%02d %02d:%02d:%02d (%d seconds later)'] = '※当系统时间超过：%04d年%02d月%02d日 %02d:%02d:%02d (%d秒后)',
+    ['* while players below all disappeared:'] = '※当下列玩家全部消失于视野：',
+    ['* while self level up to %d.'] = '※当自身等级达到%d级时。',
+    ['* while [%s(%d)]\'s life below %d%%.'] = '※当[%s(%d)]血量低于%d%%时。',
+    ['while'] = '当',
 }
