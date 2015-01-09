@@ -1,4 +1,4 @@
-ï»¿MY = MY or {}
+MY = MY or {}
 local _MY = {
     szIniFileEditBox = "Interface\\MY\\.Framework\\ui\\WndEditBox.ini",
     szIniFileButton = "Interface\\MY\\.Framework\\ui\\WndButton.ini",
@@ -7,15 +7,15 @@ local _MY = {
 }
 local _L = MY.LoadLangPack()
 ---------------------------------------------------------------------
--- æœ¬åœ°çš„ UI ç»„ä»¶å¯¹è±¡
+-- ±¾µØµÄ UI ×é¼ş¶ÔÏó
 ---------------------------------------------------------------------
 -------------------------------------
 -- UI object class
 -------------------------------------
 _MY.UI = class()
 
--- ä¸ä¼šç©å…ƒè¡¨ (â•¯â€µâ–¡â€²)â•¯ï¸µâ”»â”â”»
--- -- è®¾ç½®å…ƒè¡¨ï¼Œè¿™æ ·å¯ä»¥å½“ä½œtableè°ƒç”¨ï¼Œå…¶æ•ˆæœç›¸å½“äº .eles[i].raw
+-- ²»»áÍæÔª±í (¨s¨F¡õ¡ä)¨s¦à©ß©¥©ß
+-- -- ÉèÖÃÔª±í£¬ÕâÑù¿ÉÒÔµ±×÷tableµ÷ÓÃ£¬ÆäĞ§¹ûÏàµ±ÓÚ .eles[i].raw
 -- setmetatable(_MY.UI, {  __call = function(me, ...) return me:ctor(...) end, __index = function(t, k) 
     -- if type(k) == "number" then
         -- return t.eles[k].raw
@@ -29,39 +29,39 @@ _MY.UI = class()
 -----------------------------------------------------------
 -- my ui common functions
 -----------------------------------------------------------
--- è·å–ä¸€ä¸ªçª—ä½“çš„æ‰€æœ‰å­å…ƒç´ 
+-- »ñÈ¡Ò»¸ö´°ÌåµÄËùÓĞ×ÓÔªËØ
 local GetChildren = function(root)
     if not root then return {} end
-    local stack = { root }  -- åˆå§‹æ ˆ
-    local children = {}     -- ä¿å­˜æ‰€æœ‰å­å…ƒç´  szTreePath => element é”®å€¼å¯¹
-    while #stack > 0 do     -- å¾ªç¯ç›´åˆ°æ ˆç©º
-        --### å¼¹æ ˆ: å¼¹å‡ºæ ˆé¡¶å…ƒç´ 
+    local stack = { root }  -- ³õÊ¼Õ»
+    local children = {}     -- ±£´æËùÓĞ×ÓÔªËØ szTreePath => element ¼üÖµ¶Ô
+    while #stack > 0 do     -- Ñ­»·Ö±µ½Õ»¿Õ
+        --### µ¯Õ»: µ¯³öÕ»¶¥ÔªËØ
         local raw = stack[#stack]
         table.remove(stack, #stack)
         if raw:GetType()=="Handle" then
-            -- å°†å½“å‰å¼¹å‡ºçš„HandleåŠ å…¥å­å…ƒç´ è¡¨
+            -- ½«µ±Ç°µ¯³öµÄHandle¼ÓÈë×ÓÔªËØ±í
             children[table.concat({ raw:GetTreePath(), '/Handle' })] = raw
             for i = 0, raw:GetItemCount() - 1, 1 do
-                -- å¦‚æœå­å…ƒç´ æ˜¯Handle/å°†ä»–å‹æ ˆ
+                -- Èç¹û×ÓÔªËØÊÇHandle/½«ËûÑ¹Õ»
                 if raw:Lookup(i):GetType()=='Handle' then table.insert(stack, raw:Lookup(i))
-                -- å¦åˆ™å‹å…¥ç»“æœé˜Ÿåˆ—
+                -- ·ñÔòÑ¹Èë½á¹û¶ÓÁĞ
                 else children[table.concat({table.concat({ raw:Lookup(i):GetTreePath() }), i})] = raw:Lookup(i) end
             end
         else
-            -- å¦‚æœæœ‰Handleåˆ™å°†æ‰€æœ‰Handleå‹æ ˆå¾…å¤„ç†
-            local status, handle = pcall(function() return raw:Lookup('','') end) -- rawå¯èƒ½æ²¡æœ‰Lookupæ–¹æ³• ç”¨pcallåŒ…è£¹
+            -- Èç¹ûÓĞHandleÔò½«ËùÓĞHandleÑ¹Õ»´ı´¦Àí
+            local status, handle = pcall(function() return raw:Lookup('','') end) -- raw¿ÉÄÜÃ»ÓĞLookup·½·¨ ÓÃpcall°ü¹ü
             if status and handle then table.insert(stack, handle) end
-            -- å°†å½“å‰å¼¹å‡ºçš„å…ƒç´ åŠ å…¥å­å…ƒç´ è¡¨
+            -- ½«µ±Ç°µ¯³öµÄÔªËØ¼ÓÈë×ÓÔªËØ±í
             children[table.concat({ raw:GetTreePath() })] = raw
-            --### å‹æ ˆ: å°†åˆšåˆšå¼¹æ ˆçš„å…ƒç´ çš„æ‰€æœ‰å­çª—ä½“å‹æ ˆ
-            local status, sub_raw = pcall(function() return raw:GetFirstChild() end) -- rawå¯èƒ½æ²¡æœ‰GetFirstChildæ–¹æ³• ç”¨pcallåŒ…è£¹
+            --### Ñ¹Õ»: ½«¸Õ¸Õµ¯Õ»µÄÔªËØµÄËùÓĞ×Ó´°ÌåÑ¹Õ»
+            local status, sub_raw = pcall(function() return raw:GetFirstChild() end) -- raw¿ÉÄÜÃ»ÓĞGetFirstChild·½·¨ ÓÃpcall°ü¹ü
             while status and sub_raw do
                 table.insert(stack, sub_raw)
                 sub_raw = sub_raw:GetNext()
             end
         end
     end
-    -- å› ä¸ºæ˜¯æ±‚å­å…ƒç´  æ‰€ä»¥ç§»é™¤ç¬¬ä¸€ä¸ªå‹æ ˆçš„å…ƒç´ ï¼ˆçˆ¶å…ƒç´ ï¼‰
+    -- ÒòÎªÊÇÇó×ÓÔªËØ ËùÒÔÒÆ³ıµÚÒ»¸öÑ¹Õ»µÄÔªËØ£¨¸¸ÔªËØ£©
     children[table.concat({ root:GetTreePath() })] = nil
     return children
 end
@@ -409,14 +409,14 @@ function _MY.UI:children(filter)
                     end
                 end
             else
-                -- å­handle
-                local status, handle = pcall(function() return raw:Lookup('','') end) -- rawå¯èƒ½æ²¡æœ‰Lookupæ–¹æ³• ç”¨pcallåŒ…è£¹
+                -- ×Óhandle
+                local status, handle = pcall(function() return raw:Lookup('','') end) -- raw¿ÉÄÜÃ»ÓĞLookup·½·¨ ÓÃpcall°ü¹ü
                 if status and handle and not childHash[table.concat{handle:GetTreePath(),'/Handle'}] then
                     table.insert(child, handle)
                     childHash[table.concat({handle:GetTreePath(),'/Handle'})] = true
                 end
-                -- å­çª—ä½“
-                local status, sub_raw = pcall(function() return raw:GetFirstChild() end) -- rawå¯èƒ½æ²¡æœ‰GetFirstChildæ–¹æ³• ç”¨pcallåŒ…è£¹
+                -- ×Ó´°Ìå
+                local status, sub_raw = pcall(function() return raw:GetFirstChild() end) -- raw¿ÉÄÜÃ»ÓĞGetFirstChild·½·¨ ÓÃpcall°ü¹ü
                 while status and sub_raw do
                     if not childHash[table.concat{sub_raw:GetTreePath()}] then
                         table.insert( child, sub_raw )
@@ -1302,7 +1302,7 @@ function _MY.UI:fadeTo(nTime, nOpacity, callback)
             local nStartAlpha = ele:alpha()
             local nStartTime = GetTime()
             local fnCurrent = function(nStart, nEnd, nTotalTime, nDuringTime)
-                return ( nEnd - nStart ) * nDuringTime / nTotalTime + nStart -- çº¿æ€§æ¨¡å‹
+                return ( nEnd - nStart ) * nDuringTime / nTotalTime + nStart -- ÏßĞÔÄ£ĞÍ
             end
             if not ele:visible() then ele:alpha(0):toggle(true) end
             MY.BreatheCall(function() 
@@ -1355,7 +1355,7 @@ function _MY.UI:slideTo(nTime, nHeight, callback)
             local nStartValue = ele:height()
             local nStartTime = GetTime()
             local fnCurrent = function(nStart, nEnd, nTotalTime, nDuringTime)
-                return ( nEnd - nStart ) * nDuringTime / nTotalTime + nStart -- çº¿æ€§æ¨¡å‹
+                return ( nEnd - nStart ) * nDuringTime / nTotalTime + nStart -- ÏßĞÔÄ£ĞÍ
             end
             if not ele:visible() then ele:height(0):toggle(true) end
             MY.BreatheCall(function() 
@@ -1814,7 +1814,7 @@ end
 -- my ui events handle
 -----------------------------------------------------------
 
--- ç»‘å®šFrameçš„äº‹ä»¶
+-- °ó¶¨FrameµÄÊÂ¼ş
 function _MY.UI:onevent(szEvent, fnEvent)
     self:_checksum()
     if type(szEvent)~="string" then return self end
@@ -1846,7 +1846,7 @@ function _MY.UI:onevent(szEvent, fnEvent)
     return self
 end
 
--- ç»‘å®šFrameçš„UIäº‹ä»¶
+-- °ó¶¨FrameµÄUIÊÂ¼ş
 function _MY.UI:onuievent(szEvent, fnEvent)
     self:_checksum()
     if type(szEvent)~="string" then
@@ -1868,7 +1868,7 @@ function _MY.UI:onuievent(szEvent, fnEvent)
     return self
 end
 
---[[ customMode è®¾ç½®Frameçš„CustomMode
+--[[ customMode ÉèÖÃFrameµÄCustomMode
     (self) Instance:customMode(string szTip, function fnOnEnterCustomMode, function fnOnLeaveCustomMode)
 ]]
 function _MY.UI:customMode(szTip, fnOnEnterCustomMode, fnOnLeaveCustomMode, szPoint)
@@ -1893,7 +1893,7 @@ function _MY.UI:customMode(szTip, fnOnEnterCustomMode, fnOnLeaveCustomMode, szPo
     return self
 end
 
---[[ breathe è®¾ç½®Frameçš„breathe
+--[[ breathe ÉèÖÃFrameµÄbreathe
     (self) Instance:breathe(function fnOnFrameBreathe)
 ]]
 function _MY.UI:breathe(fnOnFrameBreathe)
@@ -1906,9 +1906,9 @@ function _MY.UI:breathe(fnOnFrameBreathe)
     return self
 end
 
---[[ menu å¼¹å‡ºèœå•
-    :menu(table menu)  å¼¹å‡ºèœå•menu
-    :menu(functin fn)  å¼¹å‡ºèœå•functionè¿”å›å€¼table
+--[[ menu µ¯³ö²Ëµ¥
+    :menu(table menu)  µ¯³ö²Ëµ¥menu
+    :menu(functin fn)  µ¯³ö²Ëµ¥function·µ»ØÖµtable
 ]]
 function _MY.UI:menu(lmenu, rmenu, bNoAutoBind)
     self:_checksum()
@@ -1945,30 +1945,30 @@ function _MY.UI:menu(lmenu, rmenu, bNoAutoBind)
     return self
 end
 
---[[ lmenu å¼¹å‡ºå·¦é”®èœå•
-    :lmenu(table menu)  å¼¹å‡ºèœå•menu
-    :lmenu(functin fn)  å¼¹å‡ºèœå•functionè¿”å›å€¼table
+--[[ lmenu µ¯³ö×ó¼ü²Ëµ¥
+    :lmenu(table menu)  µ¯³ö²Ëµ¥menu
+    :lmenu(functin fn)  µ¯³ö²Ëµ¥function·µ»ØÖµtable
 ]]
 function _MY.UI:lmenu(menu)
     return self:menu(menu, nil, true)
 end
 
---[[ rmenu å¼¹å‡ºå³é”®èœå•
-    :lmenu(table menu)  å¼¹å‡ºèœå•menu
-    :lmenu(functin fn)  å¼¹å‡ºèœå•functionè¿”å›å€¼table
+--[[ rmenu µ¯³öÓÒ¼ü²Ëµ¥
+    :lmenu(table menu)  µ¯³ö²Ëµ¥menu
+    :lmenu(functin fn)  µ¯³ö²Ëµ¥function·µ»ØÖµtable
 ]]
 function _MY.UI:rmenu(menu)
     return self:menu(nil, menu, true)
 end
 
---[[ click é¼ æ ‡å•å‡»äº‹ä»¶
+--[[ click Êó±êµ¥»÷ÊÂ¼ş
     same as jQuery.click()
-    :click(fnAction) ç»‘å®š
-    :click()         è§¦å‘
-    :click(number n) è§¦å‘
-    n: 1    å·¦é”®
-       0    ä¸­é”®
-      -1    å³é”®
+    :click(fnAction) °ó¶¨
+    :click()         ´¥·¢
+    :click(number n) ´¥·¢
+    n: 1    ×ó¼ü
+       0    ÖĞ¼ü
+      -1    ÓÒ¼ü
 ]]
 function _MY.UI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
     self:_checksum()
@@ -2013,27 +2013,27 @@ function _MY.UI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
     return self
 end
 
---[[ lclick é¼ æ ‡å·¦é”®å•å‡»äº‹ä»¶
+--[[ lclick Êó±ê×ó¼üµ¥»÷ÊÂ¼ş
     same as jQuery.lclick()
-    :lclick(fnAction) ç»‘å®š
-    :lclick()         è§¦å‘
+    :lclick(fnAction) °ó¶¨
+    :lclick()         ´¥·¢
 ]]
 function _MY.UI:lclick(fnLClick)
     return self:click(fnLClick or MY.Const.Event.Mouse.LBUTTON, nil, nil, true)
 end
 
---[[ rclick é¼ æ ‡å³é”®å•å‡»äº‹ä»¶
+--[[ rclick Êó±êÓÒ¼üµ¥»÷ÊÂ¼ş
     same as jQuery.rclick()
-    :rclick(fnAction) ç»‘å®š
-    :rclick()         è§¦å‘
+    :rclick(fnAction) °ó¶¨
+    :rclick()         ´¥·¢
 ]]
 function _MY.UI:rclick(fnRClick)
     return self:click(nil, fnRClick or MY.Const.Event.Mouse.RBUTTON, nil, true)
 end
 
---[[ hover é¼ æ ‡æ‚¬åœäº‹ä»¶
+--[[ hover Êó±êĞüÍ£ÊÂ¼ş
     same as jQuery.hover()
-    :hover(fnHover[, fnLeave]) ç»‘å®š
+    :hover(fnHover[, fnLeave]) °ó¶¨
 ]]
 function _MY.UI:hover(fnHover, fnLeave, bNoAutoBind)
     self:_checksum()
@@ -2057,12 +2057,12 @@ function _MY.UI:hover(fnHover, fnLeave, bNoAutoBind)
     return self
 end
 
---[[ tip é¼ æ ‡æ‚¬åœæç¤º
-    (self) Instance:tip( szTip[, nPosType[, tOffset[, bNoEncode] ] ] ) ç»‘å®štipäº‹ä»¶
-    string szTip:       è¦æç¤ºçš„æ–‡å­—æ–‡æœ¬æˆ–åºåˆ—åŒ–çš„DOMæ–‡æœ¬
-    number nPosType:    æç¤ºä½ç½® æœ‰æ•ˆå€¼ä¸ºMY.Const.UI.Tip.æšä¸¾
-    table tOffset:      æç¤ºæ¡†åç§»é‡ç­‰é™„åŠ ä¿¡æ¯{ x = x, y = y, hide = MY.Const.UI.Tip.Hideæšä¸¾, nFont = å­—ä½“, r, g, b = å­—é¢œè‰² }
-    boolean bNoEncode:  å½“szTipä¸ºçº¯æ–‡æœ¬æ—¶ä¿æŒè¿™ä¸ªå‚æ•°ä¸ºfalse å½“szTipä¸ºæ ¼å¼åŒ–çš„DOMå­—ç¬¦ä¸²æ—¶è®¾ç½®è¯¥å‚æ•°ä¸ºtrue
+--[[ tip Êó±êĞüÍ£ÌáÊ¾
+    (self) Instance:tip( szTip[, nPosType[, tOffset[, bNoEncode] ] ] ) °ó¶¨tipÊÂ¼ş
+    string szTip:       ÒªÌáÊ¾µÄÎÄ×ÖÎÄ±¾»òĞòÁĞ»¯µÄDOMÎÄ±¾
+    number nPosType:    ÌáÊ¾Î»ÖÃ ÓĞĞ§ÖµÎªMY.Const.UI.Tip.Ã¶¾Ù
+    table tOffset:      ÌáÊ¾¿òÆ«ÒÆÁ¿µÈ¸½¼ÓĞÅÏ¢{ x = x, y = y, hide = MY.Const.UI.Tip.HideÃ¶¾Ù, nFont = ×ÖÌå, r, g, b = ×ÖÑÕÉ« }
+    boolean bNoEncode:  µ±szTipÎª´¿ÎÄ±¾Ê±±£³ÖÕâ¸ö²ÎÊıÎªfalse µ±szTipÎª¸ñÊ½»¯µÄDOM×Ö·û´®Ê±ÉèÖÃ¸Ã²ÎÊıÎªtrue
 ]]
 function _MY.UI:tip(szTip, nPosType, tOffset, bNoEncode)
     tOffset = tOffset or {}
@@ -2093,10 +2093,10 @@ function _MY.UI:tip(szTip, nPosType, tOffset, bNoEncode)
     end, true)
 end
 
---[[ check å¤é€‰æ¡†çŠ¶æ€å˜åŒ–
-    :check(fnOnCheckBoxCheck[, fnOnCheckBoxUncheck]) ç»‘å®š
-    :check()                è¿”å›æ˜¯å¦å·²å‹¾é€‰
-    :check(bool bChecked)   å‹¾é€‰/å–æ¶ˆå‹¾é€‰
+--[[ check ¸´Ñ¡¿ò×´Ì¬±ä»¯
+    :check(fnOnCheckBoxCheck[, fnOnCheckBoxUncheck]) °ó¶¨
+    :check()                ·µ»ØÊÇ·ñÒÑ¹´Ñ¡
+    :check(bool bChecked)   ¹´Ñ¡/È¡Ïû¹´Ñ¡
 ]]
 function _MY.UI:check(fnCheck, fnUncheck, bNoAutoBind)
     self:_checksum()
@@ -2128,9 +2128,9 @@ function _MY.UI:check(fnCheck, fnUncheck, bNoAutoBind)
     end
 end
 
---[[ change è¾“å…¥æ¡†æ–‡å­—å˜åŒ–
-    :change(fnOnChange) ç»‘å®š
-    :change()   è°ƒç”¨å¤„ç†å‡½æ•°
+--[[ change ÊäÈë¿òÎÄ×Ö±ä»¯
+    :change(fnOnChange) °ó¶¨
+    :change()   µ÷ÓÃ´¦Àíº¯Êı
 ]]
 function _MY.UI:change(fnOnChange)
     self:_checksum()
@@ -2155,7 +2155,7 @@ function _MY.UI:change(fnOnChange)
     end
 end
 
--- OnGetFocus è·å–ç„¦ç‚¹
+-- OnGetFocus »ñÈ¡½¹µã
 
 -----------------------------------------------------------
 -- MY.UI
@@ -2204,12 +2204,12 @@ MY.Const.UI.Frame.TOPMOST1_EMPTY= 16
 MY.Const.UI.Frame.TOPMOST2      = 17
 MY.Const.UI.Frame.TOPMOST2_EMPTY= 18
 
--- è®¾ç½®å…ƒè¡¨ï¼Œè¿™æ ·å¯ä»¥å½“ä½œå‡½æ•°è°ƒç”¨ï¼Œå…¶æ•ˆæœç›¸å½“äº MY.UI.Fetch
+-- ÉèÖÃÔª±í£¬ÕâÑù¿ÉÒÔµ±×÷º¯Êıµ÷ÓÃ£¬ÆäĞ§¹ûÏàµ±ÓÚ MY.UI.Fetch
 setmetatable(MY.UI, { __call = function(me, ...) return me.Fetch(...) end, __metatable = true })
 
---[[ æ„é€ å‡½æ•° ç±»ä¼¼jQuery: $(selector) ]]
+--[[ ¹¹Ôìº¯Êı ÀàËÆjQuery: $(selector) ]]
 MY.UI.Fetch = function(selector, tab) return _MY.UI.new(selector, tab) end
--- ç»‘å®šUIäº‹ä»¶
+-- °ó¶¨UIÊÂ¼ş
 MY.UI.RegisterUIEvent = function(raw, szEvent, fnEvent)
     if not raw['tMy'..szEvent] then
         -- init onXXX table
@@ -2238,7 +2238,7 @@ end
 
 -- create new frame
 MY.UI.CreateFrame = function(szName, nStyle)
-    -- åˆ¤æ–­æ˜¯ä¸æ˜¯ç©ºçª—ä½“
+    -- ÅĞ¶ÏÊÇ²»ÊÇ¿Õ´°Ìå
     local bEmpty
     nStyle = nStyle or MY.Const.UI.Frame.NORMAL
     if nStyle == MY.Const.UI.Frame.LOWEST or
@@ -2265,7 +2265,7 @@ MY.UI.CreateFrame = function(szName, nStyle)
         return
     end
     
-    -- åŠ è½½å¯¹åº”çª—ä½“æ–‡ä»¶
+    -- ¼ÓÔØ¶ÔÓ¦´°ÌåÎÄ¼ş
     local szIniFile
     if bEmpty then
         szIniFile = MY.GetAddonInfo().szFrameworkRoot.."ui\\WndFrameEmpty.ini"
@@ -2273,7 +2273,7 @@ MY.UI.CreateFrame = function(szName, nStyle)
         szIniFile = MY.GetAddonInfo().szFrameworkRoot.."ui\\WndFrame.ini"
     end
     
-    -- å…³é—­å·²æœ‰çª—å£
+    -- ¹Ø±ÕÒÑÓĞ´°¿Ú
     local frm
     if type(szName) == "string" then
         if nStyle == MY.Const.UI.Frame.LOWEST or nStyle == MY.Const.UI.Frame.LOWEST_EMPTY then
@@ -2345,7 +2345,7 @@ MY.UI.CreateFrame = function(szName, nStyle)
     end
     return MY.UI(frm)
 end
--- æ‰“å¼€å–è‰²æ¿
+-- ´ò¿ªÈ¡É«°å
 MY.UI.OpenColorPicker = function(callback, t)
     OpenColorTablePanel(callback,nil,nil,t)
     --  or {
@@ -2358,7 +2358,7 @@ MY.UI.OpenColorPicker = function(callback, t)
     --     { r = 170, g = 65 , b = 180},
     -- }
 end
--- æ‰“å¼€å­—ä½“é€‰æ‹©
+-- ´ò¿ª×ÖÌåÑ¡Ôñ
 MY.UI.OpenFontPicker = function(callback, t)
     local clientW, clientH = Station.GetClientSize()
     local w, h = 820, 650
@@ -2386,7 +2386,7 @@ MY.UI.OpenFontPicker = function(callback, t)
         if txt:font()~=i then txt:remove() end
     end
 end
--- æ‰“å¼€æ–‡æœ¬åˆ—è¡¨ç¼–è¾‘å™¨
+-- ´ò¿ªÎÄ±¾ÁĞ±í±à¼­Æ÷
 MY.UI.OpenListEditor = function(szFrameName, tTextList, OnAdd, OnDel)
     local muDel
     local AddListItem = function(muList, szText)
@@ -2428,7 +2428,7 @@ MY.UI.OpenListEditor = function(szFrameName, tTextList, OnAdd, OnDel)
     -- add
     ui:append("WndButton_Add", "WndButton"):find("#WndButton_Add"):pos(180,0):width(80):text(_L["add"]):click(function()
         local szText = muEditBox:text()
-        -- åŠ å…¥è¡¨
+        -- ¼ÓÈë±í
         if OnAdd then
             if OnAdd(szText) ~= false then
                 AddListItem(muList, szText)
@@ -2454,7 +2454,7 @@ MY.UI.OpenListEditor = function(szFrameName, tTextList, OnAdd, OnDel)
     end
     return ui
 end
--- æ‰“å¼€æµè§ˆå™¨
+-- ´ò¿ªä¯ÀÀÆ÷
 MY.UI.OpenInternetExplorer = function(szAddr, bDisableSound)
     local nIndex, nLast = nil, nil
     for i = 1, 10, 1 do
@@ -2494,7 +2494,7 @@ MY.UI.OpenInternetExplorer = function(szAddr, bDisableSound)
     end
     return webPage
 end
--- åˆ¤æ–­æµè§ˆå™¨æ˜¯å¦å·²å¼€å¯
+-- ÅĞ¶Ïä¯ÀÀÆ÷ÊÇ·ñÒÑ¿ªÆô
 _MY.IsInternetExplorerOpened = function(nIndex)
     local frame = Station.Lookup("Topmost/IE"..nIndex)
     if frame and frame:IsVisible() then
@@ -2502,7 +2502,7 @@ _MY.IsInternetExplorerOpened = function(nIndex)
     end
     return false
 end
--- è·å–æµè§ˆå™¨ç»å¯¹ä½ç½®
+-- »ñÈ¡ä¯ÀÀÆ÷¾ø¶ÔÎ»ÖÃ
 _MY.IE_GetNewIEFramePos = function()
     local nLastTime = 0
     local nLastIndex = nil

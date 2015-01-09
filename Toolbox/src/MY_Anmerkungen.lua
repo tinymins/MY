@@ -1,4 +1,4 @@
-ï»¿
+
 --[[
 #######################################################################################################
   * * *         *                 *                     *                   *           *         
@@ -22,15 +22,15 @@ MY_Anmerkungen.anchorNotePanel = { s = "TOPRIGHT", r = "TOPRIGHT", x = -310, y =
 MY_Anmerkungen.nNotePanelWidth = 200
 MY_Anmerkungen.nNotePanelHeight = 200
 MY_Anmerkungen.szNotePanelContent = ""
-MY_Anmerkungen.tPrivatePlayerNotes = {} -- ç§æœ‰ç©å®¶æè¿°
-MY_Anmerkungen.tPublicPlayerNotes = {} -- å…¬å…±ç©å®¶æè¿°
+MY_Anmerkungen.tPrivatePlayerNotes = {} -- Ë½ÓĞÍæ¼ÒÃèÊö
+MY_Anmerkungen.tPublicPlayerNotes = {} -- ¹«¹²Íæ¼ÒÃèÊö
 -- dwID : { dwID = dwID, szName = szName, szContent = szContent, bAlertWhenGroup, bTipWhenGroup }
 RegisterCustomData("MY_Anmerkungen.bNotePanelEnable")
 RegisterCustomData("MY_Anmerkungen.anchorNotePanel")
 RegisterCustomData("MY_Anmerkungen.nNotePanelWidth")
 RegisterCustomData("MY_Anmerkungen.nNotePanelHeight")
 RegisterCustomData("MY_Anmerkungen.szNotePanelContent")
--- é‡è½½ä¾¿ç¬º
+-- ÖØÔØ±ã¼ã
 MY_Anmerkungen.ReloadNotePanel = function()
     MY.UI("Normal/MY_Anmerkungen_NotePanel"):remove()
     if MY_Anmerkungen.bNotePanelEnable then
@@ -57,7 +57,7 @@ MY_Anmerkungen.ReloadNotePanel = function()
         end)
     end
 end
--- æ‰“å¼€ä¸€ä¸ªç©å®¶çš„è®°å½•ç¼–è¾‘å™¨
+-- ´ò¿ªÒ»¸öÍæ¼ÒµÄ¼ÇÂ¼±à¼­Æ÷
 MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
     local note = MY_Anmerkungen.GetPlayerNote(dwID) or {}
     -- frame
@@ -180,14 +180,14 @@ MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
       :click(function()
         MY_Anmerkungen.SetPlayerNote(ui:children("#WndEditBox_ID"):text())
         CloseFrame(ui)
-        -- åˆ é™¤
+        -- É¾³ı
       end)
       
     -- init data
     ui:children("#WndEditBox_ID"):change()
     PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 end
--- é‡è½½å³é”®èœå•
+-- ÖØÔØÓÒ¼ü²Ëµ¥
 MY.RegisterTargetAddonMenu("MY_Anmerkungen_PlayerNotes", function()
     local dwType, dwID = MY.GetTarget()
     if dwType == TARGET.PLAYER then
@@ -202,7 +202,7 @@ MY.RegisterTargetAddonMenu("MY_Anmerkungen_PlayerNotes", function()
         }
     end
 end)
--- è·å–ä¸€ä¸ªç©å®¶çš„è®°å½•
+-- »ñÈ¡Ò»¸öÍæ¼ÒµÄ¼ÇÂ¼
 MY_Anmerkungen.GetPlayerNote = function(dwID)
     -- { dwID, szName, szContent, bTipWhenGroup, bAlertWhenGroup, bPrivate }
     dwID = tostring(dwID)
@@ -228,7 +228,7 @@ MY_Anmerkungen.GetPlayerNote = function(dwID)
     end
     return t
 end
--- å½“æœ‰ç©å®¶è¿›é˜Ÿæ—¶
+-- µ±ÓĞÍæ¼Ò½ø¶ÓÊ±
 MY_Anmerkungen.OnPartyAddMember = function()
     MY_Anmerkungen.PartyAddMember(arg1)
 end
@@ -253,11 +253,11 @@ MY_Anmerkungen.PartyAddMember = function(dwID)
 end
 MY.RegisterEvent("PARTY_ADD_MEMBER", MY_Anmerkungen.OnPartyAddMember)
 MY.RegisterEvent("PARTY_SYNC_MEMBER_DATA", MY_Anmerkungen.OnPartyAddMember)
--- è®¾ç½®ä¸€ä¸ªç©å®¶çš„è®°å½•
+-- ÉèÖÃÒ»¸öÍæ¼ÒµÄ¼ÇÂ¼
 MY_Anmerkungen.SetPlayerNote = function(dwID, szName, szContent, bTipWhenGroup, bAlertWhenGroup, bPrivate)
     if not dwID then return nil end
     dwID = tostring(dwID)
-    if not szName then -- åˆ é™¤ä¸€ä¸ªç©å®¶çš„è®°å½•
+    if not szName then -- É¾³ıÒ»¸öÍæ¼ÒµÄ¼ÇÂ¼
         MY_Anmerkungen.LoadConfig()
         if MY_Anmerkungen.tPrivatePlayerNotes[dwID] then
             MY_Anmerkungen.tPrivatePlayerNotes[MY_Anmerkungen.tPrivatePlayerNotes[dwID].szName] = nil
@@ -288,12 +288,12 @@ MY_Anmerkungen.SetPlayerNote = function(dwID, szName, szContent, bTipWhenGroup, 
     end
     MY_Anmerkungen.SaveConfig()
 end
--- è¯»å–å…¬å…±æ•°æ®
+-- ¶ÁÈ¡¹«¹²Êı¾İ
 MY_Anmerkungen.LoadConfig = function()
     MY_Anmerkungen.tPublicPlayerNotes = MY.Json.Decode(MY.Sys.LoadLUAData("config/MY_Anmerkungen_PlayerNotes")) or {}
     MY_Anmerkungen.tPrivatePlayerNotes = MY.Json.Decode(MY.Sys.LoadUserData("config/MY_Anmerkungen_PlayerNotes")) or {}
 end
--- ä¿å­˜å…¬å…±æ•°æ®
+-- ±£´æ¹«¹²Êı¾İ
 MY_Anmerkungen.SaveConfig = function()
     MY.Sys.SaveLUAData("config/MY_Anmerkungen_PlayerNotes", MY.Json.Encode(MY_Anmerkungen.tPublicPlayerNotes))
     MY.Sys.SaveUserData("config/MY_Anmerkungen_PlayerNotes", MY.Json.Encode(MY_Anmerkungen.tPrivatePlayerNotes))

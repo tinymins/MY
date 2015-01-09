@@ -1,7 +1,7 @@
-ï»¿--
+--
 -- Simple XML decoding and encoding in pure Lua.
 --
--- @author ç¿Ÿä¸€é¸£ @tinymins, Gavin Kistner
+-- @author µÔÒ»Ãù @tinymins, Gavin Kistner
 -- @refer http://zhaiyiming.com/, http://phrogz.net/
 --
 -- local lua_value = MY.Xml.Decode(raw_xml_text)
@@ -376,7 +376,7 @@ local xmlDecode = function(myxml)
 				end
 				
 				local sz_escape = text:sub(pos,pos)
-				if sz_escape == '"' or sz_escape == "'" then	-- å­—ç¬¦ä¸²
+				if sz_escape == '"' or sz_escape == "'" then	-- ×Ö·û´®
 					pos = pos + 1
 					local value = ''
 					local escaping = false
@@ -444,19 +444,19 @@ end
 MY = MY or {}
 MY.Xml = MY.Xml or {}
 
--- è§£æ XML æ•°æ®ï¼ŒæˆåŠŸè¿”å›æ•°æ®ï¼Œå¤±è´¥è¿”å› nil åŠ é”™è¯¯ä¿¡æ¯
+-- ½âÎö XML Êı¾İ£¬³É¹¦·µ»ØÊı¾İ£¬Ê§°Ü·µ»Ø nil ¼Ó´íÎóĞÅÏ¢
 -- (mixed) MY.Xml.Decode(string szData)
 MY.Xml.Decode = xmlDecode
 
--- ç¼–ç  XML æ•°æ®ï¼ŒæˆåŠŸè¿”å› XML å­—ç¬¦ä¸²ï¼Œå¤±è´¥è¿”å› nil
+-- ±àÂë XML Êı¾İ£¬³É¹¦·µ»Ø XML ×Ö·û´®£¬Ê§°Ü·µ»Ø nil
 -- (string) MY.Xml.Encode(tData)
--- tData å˜é‡æ•°æ®ï¼ŒTableä¿å­˜çš„XMLæ•°æ®
+-- tData ±äÁ¿Êı¾İ£¬Table±£´æµÄXMLÊı¾İ
 MY.Xml.Encode = xmlEncode
 
--- è½¬ä¹‰ XML å­—ç¬¦ä¸²
+-- ×ªÒå XML ×Ö·û´®
 -- (string) MY.Xml.Escape(raw_str)
 MY.Xml.Escape = xmlEscape
 
--- åè½¬ä¹‰ XML å­—ç¬¦ä¸²
+-- ·´×ªÒå XML ×Ö·û´®
 -- (string) MY.Xml.Unescape(escaped_str)
 MY.Xml.Unescape = xmlUnescape

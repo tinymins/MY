@@ -1,4 +1,4 @@
-Ôªø--[[
+--[[
 #######################################################################################################
                                                           *     *           *         *           
                                                     *     *     *           *           *         
@@ -32,7 +32,7 @@ RegisterCustomData("MY_BuffMonitor.bDragable")
 RegisterCustomData("MY_BuffMonitor.anchorSelf")
 RegisterCustomData("MY_BuffMonitor.anchorTarget")
 RegisterCustomData("MY_BuffMonitor.tBuffList")
--- ÈáçÁΩÆÈªòËÆ§ËÆæÁΩÆ
+-- ÷ÿ÷√ƒ¨»œ…Ë÷√
 MY_BuffMonitor.ReloadDefaultConfig = function()
     MY_BuffMonitor.anchorSelf = { s = "LEFTCENTER", r = "LEFTCENTER", x = 320, y = 150 }
     MY_BuffMonitor.anchorTarget = { s = "LEFTCENTER", r = "LEFTCENTER", x = 320, y = 98 }
@@ -45,7 +45,7 @@ RegisterEvent("CUSTOM_UI_MODE_SET_DEFAULT", function()
     MY.UI("Normal/MY_BuffMonitor_Self"):anchor(MY_BuffMonitor.anchorSelf)
     MY.UI("Normal/MY_BuffMonitor_Target"):anchor(MY_BuffMonitor.anchorTarget)
 end)
--- ÂàùÂßãÂåñUI
+-- ≥ı ºªØUI
 MY_BuffMonitor.ReloadBuffMonitor = function()
     -- unregister render function
     MY.BreatheCall("MY_BuffMonitor_Render_Self")

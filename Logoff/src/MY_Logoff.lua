@@ -1,10 +1,10 @@
-ï»¿--
--- å¿«é€Ÿç™»å‡º
--- by èŒ—ä¼Š @ åŒæ¢¦é•‡ @ è»èŠ±å®«
+--
+-- ¿ìËÙµÇ³ö
+-- by ÜøÒÁ @ Ë«ÃÎÕò @ İ¶»¨¹¬
 -- Build 20140411
 --
--- ä¸»è¦åŠŸèƒ½:
--- 1.æŒ‡å®šæ¡ä»¶é€€é˜Ÿ/ä¸‹çº¿
+-- Ö÷Òª¹¦ÄÜ:
+-- 1.Ö¸¶¨Ìõ¼şÍË¶Ó/ÏÂÏß
 -- 
 MY_Logoff = {
     bLogOffCompletely = false,
@@ -43,10 +43,10 @@ end
 MY_Logoff.LogOffEx = function(bCompletely, bUnfight)
     if not bUnfight then MY.Player.LogOff(bCompletely) return nil end
     MY.Sysmsg({_L["Logoff is ready for your casting unfight skill."]})
-    -- æ·»åŠ å‘¼å¸å‡½æ•°ç­‰å¾…è„±æˆ˜ã€‚
+    -- Ìí¼ÓºôÎüº¯ÊıµÈ´ıÍÑÕ½¡£
     MY.BreatheCall("LOG_OFF",function()
         if not GetClientPlayer().bFightState then
-            MY.Player.LogOff(bCompletely)    -- å·²è„±æˆ˜ï¼Œä¸‹çº¿ã€‚
+            MY.Player.LogOff(bCompletely)    -- ÒÑÍÑÕ½£¬ÏÂÏß¡£
         end
     end)
 end
@@ -87,7 +87,7 @@ end
 MY_Logoff.ConditionLogOff = function()
     local bLogOff = false
     if MY_Logoff.bTimeOutLogOff and GetCurrentTime()>_MY_Logoff.nTimeOutUnixTime then bLogOff = true end
-    -- æŒ‡å®šç©å®¶æ¶ˆå¤±
+    -- Ö¸¶¨Íæ¼ÒÏûÊ§
     local bAllPlayerLeave = true
     if MY_Logoff.bPlayerLeaveLogOff and Count(MY_Logoff.aPlayerLeaveLogOff)>0 then
         local tNearPlayer = MY.GetNearPlayer()
@@ -99,14 +99,14 @@ MY_Logoff.ConditionLogOff = function()
     else bAllPlayerLeave = false
     end
     bLogOff = bLogOff or bAllPlayerLeave
-    -- å½“å‰è§’è‰²ç­‰çº§è¶…è¿‡
+    -- µ±Ç°½ÇÉ«µÈ¼¶³¬¹ı
     if MY_Logoff.bClientLevelOverLogOff and GetClientPlayer().nLevel>=MY_Logoff.nClientLevelOverLogOff then bLogOff=true end
-    --æŒ‡å®šç›®æ ‡è¡€é‡ä¸è¶³
+    --Ö¸¶¨Ä¿±êÑªÁ¿²»×ã
     local p = GetNpc(MY_Logoff.dwTargetBloodLessLogOff) or GetPlayer(MY_Logoff.dwTargetBloodLessLogOff)
     if MY_Logoff.bTargetBloodLessLogOff and p and (p.nCurrentLife / p.nMaxLife)*100<MY_Logoff.nTargetBloodLessLogOff then
         bLogOff = true
     end
-    -- ä¸‹çº¿åˆ¤å®š
+    -- ÏÂÏßÅĞ¶¨
     if bLogOff then
         MY.Player.LogOff(MY_Logoff.bLogOffCompletely)
     end
@@ -114,7 +114,7 @@ end
 --
 _MY_Logoff.OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
-    -- æ¡ä»¶ç™»å‡º
+    -- Ìõ¼şµÇ³ö
     local offset = { x = 10, y = 70 }
     
     ui:append('Label_ConditionLogoff','Text'):find('#Label_ConditionLogoff')
@@ -123,7 +123,7 @@ _MY_Logoff.OnPanelActive = function(wnd)
     ui:append('Image_ConditionLogoff_Spliter','Image'):find('#Image_ConditionLogoff_Spliter')
       :pos(5, 43):size(636, 2):image('UI/Image/UICommon/ScienceTreeNode.UITex', 62)
     
-    --æŒ‡å®šç›®æ ‡è¡€é‡ä½äºæŒ‡å®šç™¾åˆ†æ¯”ä¸‹çº¿
+    --Ö¸¶¨Ä¿±êÑªÁ¿µÍÓÚÖ¸¶¨°Ù·Ö±ÈÏÂÏß
     ui:append('WndCheckBox_TargetBloodLessLogOff','WndCheckBox'):children('#WndCheckBox_TargetBloodLessLogOff')
       :pos(offset.x+10, offset.y+120):text(_L['while'])
       :check(MY_Logoff.bTargetBloodLessLogOff or false)
@@ -168,7 +168,7 @@ _MY_Logoff.OnPanelActive = function(wnd)
       :text(MY_Logoff.nTargetBloodLessLogOff)
       :change(function(txt) MY_Logoff.nTargetBloodLessLogOff = tonumber(txt) or MY_Logoff.nTargetBloodLessLogOff end)
     
-    -- æŒ‡å®šç©å®¶æ¶ˆå¤±åä¸‹çº¿
+    -- Ö¸¶¨Íæ¼ÒÏûÊ§ºóÏÂÏß
     ui:append('WndCheckBox_PlayerLeaveLogOff','WndCheckBox'):children('#WndCheckBox_PlayerLeaveLogOff')
       :pos(offset.x+10,offset.y+80):text(_L['while'])
       :check(MY_Logoff.bPlayerLeaveLogOff or false)
@@ -226,7 +226,7 @@ _MY_Logoff.OnPanelActive = function(wnd)
     ui:append('Label_PlayerLeaveWhen','Text'):find('#Label_PlayerLeaveWhen')
       :pos(offset.x+360,offset.y+80):text(_L['all disappeared'])
 
-    -- è‡ªèº«ç­‰çº§åˆ°è¾¾æŒ‡å®šå€¼ä¸‹çº¿
+    -- ×ÔÉíµÈ¼¶µ½´ïÖ¸¶¨ÖµÏÂÏß
     ui:append('WndCheckBox_ClientLevelOverLogOff','WndCheckBox'):children('#WndCheckBox_ClientLevelOverLogOff')
       :pos(offset.x+10,offset.y+40)
       :text(_L['while client level exceeds'])
@@ -238,7 +238,7 @@ _MY_Logoff.OnPanelActive = function(wnd)
       :text(MY_Logoff.nClientLevelOverLogOff)
       :change(function(txt) MY_Logoff.nClientLevelOverLogOff = tonumber(txt) or MY_Logoff.nClientLevelOverLogOff end)
 
-    -- æŒ‡å®šæ—¶é—´åä¸‹çº¿
+    -- Ö¸¶¨Ê±¼äºóÏÂÏß
     ui:append('WndCheckBox_TimeOutLogOff','WndCheckBox'):children('#WndCheckBox_TimeOutLogOff')
       :pos(offset.x+10,offset.y):text('')
       :check(MY_Logoff.bTimeOutLogOff or false)
@@ -252,7 +252,7 @@ _MY_Logoff.OnPanelActive = function(wnd)
     ui:append('Label_TimeOutWhen','Text'):find('#Label_TimeOutWhen')
       :pos(offset.x+100,offset.y-3):text(_L['second(s) later'])
 
-    -- ç¬¦åˆæ¡ä»¶æ—¶
+    -- ·ûºÏÌõ¼şÊ±
     ui:append('Label_ReturnTo','Text'):find('#Label_ReturnTo')
       :pos(offset.x,offset.y+155):text(_L['While it meets any condition below'])
     
@@ -279,9 +279,9 @@ _MY_Logoff.OnPanelActive = function(wnd)
       :menu({
         --SYS
         {szOption = _L['system channel'], rgb = GetMsgFontColor("MSG_SYS", true), fnAction = function() MY_Logoff.PrintCurrentCondition(PLAYER_TALK_CHANNEL.LOCAL_SYS) end, fnAutoClose = function() return true end},
-        --è¿‘èŠé¢‘é“
+        --½üÁÄÆµµÀ
         {szOption = g_tStrings.tChannelName.MSG_NORMAL, rgb = GetMsgFontColor("MSG_NORMAL", true), fnAction = function() MY_Logoff.PrintCurrentCondition(PLAYER_TALK_CHANNEL.NEARBY) end, fnAutoClose = function() return true end},
-        --å›¢é˜Ÿé¢‘é“
+        --ÍÅ¶ÓÆµµÀ
         {szOption = g_tStrings.tChannelName.MSG_TEAM  , rgb = GetMsgFontColor("MSG_TEAM", true), fnAction = function() MY_Logoff.PrintCurrentCondition(PLAYER_TALK_CHANNEL.RAID) end, fnAutoClose = function() return true end},
       })
     
@@ -297,7 +297,7 @@ _MY_Logoff.OnPanelActive = function(wnd)
         MY.UI(this):text((_MY_Logoff.bStart and _L['cancel']) or _L['start'])
     end)
 
-    -- å¿«é€Ÿç™»å‡º
+    -- ¿ìËÙµÇ³ö
     ui:append('Label_ExpressLogoff','Text'):find('#Label_ExpressLogoff')
       :pos(30, 270):text(_L['# express logoff'])
     -- <hr />
@@ -328,10 +328,10 @@ MY.RegisterInit(function()
     end
 end)
 MY.RegisterInit(function()
-    -- åˆ›å»ºèœå•
+    -- ´´½¨²Ëµ¥
     local tMenu = function() return {
         szOption = _L["express logoff"],
-        {  -- è¿”å›è§’è‰²é€‰æ‹©
+        {  -- ·µ»Ø½ÇÉ«Ñ¡Ôñ
             szOption = _L['return to role list'],
             -- szIcon = "ui/Image/UICommon/Talk_Face.UITex";nFrame=119;szLayer = "ICON_RIGHT",
             bCheck = false,
@@ -340,7 +340,7 @@ MY.RegisterInit(function()
                 MY_Logoff.LogOffEx(false)
             end,
             fnAutoClose = function() return true end
-        }, {  -- è¿”å›ç”¨æˆ·ç™»å½•
+        }, {  -- ·µ»ØÓÃ»§µÇÂ¼
             szOption = _L['return to game login'],
             -- szIcon = "ui/Image/UICommon/Talk_Face.UITex";nFrame=119;szLayer = "ICON_RIGHT",
             bCheck = false,
@@ -349,7 +349,7 @@ MY.RegisterInit(function()
                 MY_Logoff.LogOffEx(true)
             end,
             fnAutoClose = function() return true end
-        }, {  -- è„±æˆ˜åè¿”å›è§’è‰²é€‰æ‹©
+        }, {  -- ÍÑÕ½ºó·µ»Ø½ÇÉ«Ñ¡Ôñ
             szOption = _L['return to role list while not fight'],
             -- szIcon = "ui/Image/UICommon/Talk_Face.UITex";nFrame=119;szLayer = "ICON_RIGHT",
             bCheck = false,
@@ -359,7 +359,7 @@ MY.RegisterInit(function()
             end,
             fnAutoClose = function() return true end
         },
-        {  -- è„±æˆ˜åè¿”å›ç”¨æˆ·ç™»å½•
+        {  -- ÍÑÕ½ºó·µ»ØÓÃ»§µÇÂ¼
             szOption = _L['return to game login while not fight'],
             -- szIcon = "ui/Image/UICommon/Talk_Face.UITex";nFrame=119;szLayer = "ICON_RIGHT",
             bCheck = false,
@@ -370,7 +370,7 @@ MY.RegisterInit(function()
             fnAutoClose = function() return true end
         }, {
             bDevide  = true,
-        },  {  -- è®¾ç½®å¿«æ·é”®
+        },  {  -- ÉèÖÃ¿ì½İ¼ü
             szOption = _L['set hotkey'],
             fnAction = function()
                 MY.Game.SetHotKey()
@@ -382,7 +382,7 @@ MY.RegisterInit(function()
     MY.RegisterTraceButtonMenu( 'MY_LOGOFF_MENU', tMenu)
 end)
 -----------------------------------------------
--- å¿«æ·é”®ç»‘å®š
+-- ¿ì½İ¼ü°ó¶¨
 -----------------------------------------------
 MY.Game.AddHotKey("LogOff_RUI", _L['return to role list'], function() MY_Logoff.LogOffEx(false) end, nil)
 MY.Game.AddHotKey("LogOff_RRL", _L['return to game login'], function() MY_Logoff.LogOffEx(true) end, nil)

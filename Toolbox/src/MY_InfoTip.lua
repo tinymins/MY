@@ -1,4 +1,4 @@
-ï»¿--[[
+--[[
 #######################################################################################################
       #       #                   #                     #                 
       #         #           # # # # # # # # #         # # # # # # #       
@@ -26,23 +26,23 @@ MY_InfoTip.Config = {
         bEnable = false, bShowBg = true, bShowTitle = true,
         anchor  = { x=-10, y=-220, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
     },
-    Distance  = { -- ç›®æ ‡è·ç¦»
+    Distance  = { -- Ä¿±ê¾àÀë
         bEnable = false, bShowBg = true, bShowTitle = true,
         anchor  = { x=-10, y=-190, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
     },
-    SysTime   = { -- ç³»ç»Ÿæ—¶é—´
+    SysTime   = { -- ÏµÍ³Ê±¼ä
         bEnable = false, bShowBg = true, bShowTitle = true,
         anchor  = { x=-10, y=-160, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
     },
-    FightTime = { -- æˆ˜æ–—è®¡æ—¶
+    FightTime = { -- Õ½¶·¼ÆÊ±
         bEnable = false, bShowBg = true, bShowTitle = true,
         anchor  = { x=-10, y=-130, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
     },
-    LotusTime = { -- è²èŠ±å’Œè—•å€’è®¡æ—¶
+    LotusTime = { -- Á«»¨ºÍÅºµ¹¼ÆÊ±
         bEnable = false, bShowBg = true, bShowTitle = true,
         anchor  = { x=-10, y=-100, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
     },
-    GPS = { -- è§’è‰²åæ ‡
+    GPS = { -- ½ÇÉ«×ø±ê
         bEnable = false, bShowBg = true, bShowTitle = false,
         anchor  = { x=-10, y=-70, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
     },
@@ -52,7 +52,7 @@ MY_InfoTip.Cache = {
         formatString = '', title = _L['fps monitor'], prefix = _L['FPS: '], content = _L['%d'],
         GetContent = function() return string.format(MY_InfoTip.Cache.FPS.formatString, GetFPS()) end
     },
-    Distance  = { -- ç›®æ ‡è·ç¦»
+    Distance  = { -- Ä¿±ê¾àÀë
         formatString = '', title = _L['target distance'], prefix = _L['Distance: '], content = _L['%.1f Foot'],
         GetContent = function()
             local p, s = MY.GetObject(MY.GetTarget()), _L["No Target"]
@@ -62,14 +62,14 @@ MY_InfoTip.Cache = {
             return s
         end
     },
-    SysTime   = { -- ç³»ç»Ÿæ—¶é—´
+    SysTime   = { -- ÏµÍ³Ê±¼ä
         formatString = '', title = _L['system time'], prefix = _L['Time: '], content = _L['%02d:%02d:%02d'],
         GetContent = function()
             local tDateTime = TimeToDate(GetCurrentTime())
             return string.format(MY_InfoTip.Cache.SysTime.formatString, tDateTime.hour, tDateTime.minute, tDateTime.second)
         end
     },
-    FightTime = { -- æˆ˜æ–—è®¡æ—¶
+    FightTime = { -- Õ½¶·¼ÆÊ±
         formatString = '', title = _L['fight clock'], prefix = _L['Fight Clock: '], content = _L['%d:%02d:%02d'],
         GetContent = function()
             local s, nTotal = _L["Never Fight"], MY.Player.GetFightTime()
@@ -80,14 +80,14 @@ MY_InfoTip.Cache = {
             return s
         end
     },
-    LotusTime = { -- è²èŠ±å’Œè—•å€’è®¡æ—¶
+    LotusTime = { -- Á«»¨ºÍÅºµ¹¼ÆÊ±
         formatString = '', title = _L['lotus clock'], prefix = _L['Lotus Clock: '], content = _L['%d:%d:%d'],
         GetContent = function()
             local nTotal = 6*60*60 - GetLogicFrameCount()/16%(6*60*60)
             return string.format(MY_InfoTip.Cache.LotusTime.formatString, math.floor(nTotal/(60*60)), math.floor(nTotal/60%60), math.floor(nTotal%60))
         end
     },
-    GPS = { -- è§’è‰²åæ ‡
+    GPS = { -- ½ÇÉ«×ø±ê
         formatString = '', title = _L['GPS'], prefix = _L['Location: '], content = _L['[%d]%d,%d,%d'],
         GetContent = function()
             local player = GetClientPlayer()
@@ -118,7 +118,7 @@ RegisterEvent("CUSTOM_UI_MODE_SET_DEFAULT", function()
     MY_InfoTip.Config.GPS.anchor       = { x=-10, y=-70 , s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
     MY_InfoTip.Reload()
 end)
--- æ³¨å†ŒUI
+-- ×¢²áUI
 MY.BreatheCall(function()
     local h = Station.Lookup("Topmost1/WorldMap/Wnd_All", "Handle_CopyBtn")
     if not h then return end
@@ -160,7 +160,7 @@ MY.BreatheCall(function()
         h[k1] = true
     end
 end, 130)
--- æ˜¾ç¤ºä¿¡æ¯æ¡
+-- ÏÔÊ¾ĞÅÏ¢Ìõ
 MY_InfoTip.Reload = function()
     for id, cache in pairs(MY_InfoTip.Cache) do
         local cfg = MY_InfoTip.Config[id]
@@ -200,7 +200,7 @@ MY_InfoTip.Reload = function()
     end
     SaveConfig()
 end
--- æ³¨å†ŒINITäº‹ä»¶
+-- ×¢²áINITÊÂ¼ş
 MY.RegisterInit(function()
     LoadConfig()
     MY_InfoTip.Reload()

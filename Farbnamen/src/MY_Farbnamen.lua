@@ -1,13 +1,13 @@
-ï»¿--
--- èŠå¤©çª—å£åç§°æŸ“è‰²æ’ä»¶
--- By èŒ—ä¼Š@åŒæ¢¦é•‡@è»èŠ±å®«
+--
+-- ÁÄÌì´°¿ÚÃû³ÆÈ¾É«²å¼ş
+-- By ÜøÒÁ@Ë«ÃÎÕò@İ¶»¨¹¬
 -- ZhaiYiMing.CoM
--- 2014å¹´5æœˆ19æ—¥05:07:02
+-- 2014Äê5ÔÂ19ÈÕ05:07:02
 --
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Farbnamen/lang/")
 local _SUB_ADDON_FOLDER_NAME_ = "Farbnamen"
 ---------------------------------------------------------------
--- è®¾ç½®å’Œæ•°æ®
+-- ÉèÖÃºÍÊı¾İ
 ---------------------------------------------------------------
 MY_Farbnamen = MY_Farbnamen or {
     bEnabled = true,
@@ -18,18 +18,18 @@ local SZ_CACHE_PATH = "cache/PLAYER_INFO/" .. (MY.Game.GetServer())
 local Config_Default = {
     nMaxCache= 200,
     tForceColor  = MY.LoadLUAData(SZ_CONFIG_PATH, true) or {
-        [0]  = { 255, 255, 255 },       --æ±Ÿæ¹–
-        [1]  = { 255, 178, 95  },       --å°‘æ—
-        [2]  = { 196, 152, 255 },       --ä¸‡èŠ±
-        [3]  = { 255, 111, 83  },       --å¤©ç­–
-        [4]  = { 89 , 224, 232 },       --çº¯é˜³
-        [5]  = { 255, 129, 176 },       --ä¸ƒç§€
-        [6]  = { 55 , 147, 255 },       --äº”æ¯’
-        [7]  = { 121, 183, 54  },       --å”é—¨
-        [8]  = { 214, 249, 93  },       --è—å‰‘
-        [9]  = { 205, 133, 63  },       --ä¸å¸®
-        [10] = { 240, 70 , 96  },       --æ˜æ•™
-        [21] = { 180, 60 , 0   },       --è‹äº‘
+        [0]  = { 255, 255, 255 },       --½­ºş
+        [1]  = { 255, 178, 95  },       --ÉÙÁÖ
+        [2]  = { 196, 152, 255 },       --Íò»¨
+        [3]  = { 255, 111, 83  },       --Ìì²ß
+        [4]  = { 89 , 224, 232 },       --´¿Ñô
+        [5]  = { 255, 129, 176 },       --ÆßĞã
+        [6]  = { 55 , 147, 255 },       --Îå¶¾
+        [7]  = { 121, 183, 54  },       --ÌÆÃÅ
+        [8]  = { 214, 249, 93  },       --²Ø½£
+        [9]  = { 205, 133, 63  },       --Ø¤°ï
+        [10] = { 240, 70 , 96  },       --Ã÷½Ì
+        [21] = { 180, 60 , 0   },       --²ÔÔÆ
     },
 }
 local Config = clone(Config_Default)
@@ -55,9 +55,9 @@ setmetatable(_MY_Farbnamen.tForceString, { __index = function(t, k) return k end
 setmetatable(_MY_Farbnamen.tRoleType,    { __index = function(t, k) return k end, __call = function(t, k, ...) return string.format(t[k], ...) end, })
 setmetatable(_MY_Farbnamen.tCampString,  { __index = function(t, k) return k end, __call = function(t, k, ...) return string.format(t[k], ...) end, })
 ---------------------------------------------------------------
--- èŠå¤©å¤åˆ¶å’Œæ—¶é—´æ˜¾ç¤ºç›¸å…³
+-- ÁÄÌì¸´ÖÆºÍÊ±¼äÏÔÊ¾Ïà¹Ø
 ---------------------------------------------------------------
--- æ’å…¥èŠå¤©å†…å®¹çš„ HOOK ï¼ˆè¿‡æ»¤ã€åŠ å…¥æ—¶é—´ ï¼‰
+-- ²åÈëÁÄÌìÄÚÈİµÄ HOOK £¨¹ıÂË¡¢¼ÓÈëÊ±¼ä £©
 MY.Chat.HookChatPanel(function(h, szMsg)
     if not MY_Farbnamen.bEnabled then
         return nil
@@ -66,13 +66,13 @@ MY.Chat.HookChatPanel(function(h, szMsg)
     
     return szMsg
 end)
---[[ å¼€æ”¾çš„åç§°æŸ“è‰²æ¥å£
-    (userdata) MY_Farbnamen.Render(userdata namelink)    å¤„ç†namelinkæŸ“è‰² namelinkæ˜¯ä¸€ä¸ªå§“åTextå…ƒç´ 
-    (string) MY_Farbnamen.Render(string szMsg)           æ ¼å¼åŒ–szMsg å¤„ç†é‡Œé¢çš„åå­—
+--[[ ¿ª·ÅµÄÃû³ÆÈ¾É«½Ó¿Ú
+    (userdata) MY_Farbnamen.Render(userdata namelink)    ´¦ÀínamelinkÈ¾É« namelinkÊÇÒ»¸öĞÕÃûTextÔªËØ
+    (string) MY_Farbnamen.Render(string szMsg)           ¸ñÊ½»¯szMsg ´¦ÀíÀïÃæµÄÃû×Ö
 ]]
 MY_Farbnamen.Render = function(szMsg)
     if type(szMsg) == 'string' then
-        -- <text>text="[å°±æ˜¯ä¸ªé˜µçœ¼]" font=10 r=255 g=255 b=255  name="namelink_4662931" eventid=515</text><text>text="è¯´ï¼š" font=10 r=255 g=255 b=255 </text><text>text="[èŒ—ä¼Š]" font=10 r=255 g=255 b=255  name="namelink_4662931" eventid=771</text><text>text="\n" font=10 r=255 g=255 b=255 </text>
+        -- <text>text="[¾ÍÊÇ¸öÕóÑÛ]" font=10 r=255 g=255 b=255  name="namelink_4662931" eventid=515</text><text>text="Ëµ£º" font=10 r=255 g=255 b=255 </text><text>text="[ÜøÒÁ]" font=10 r=255 g=255 b=255  name="namelink_4662931" eventid=771</text><text>text="\n" font=10 r=255 g=255 b=255 </text>
         local xml = MY.Xml.Decode(szMsg)
         if xml then
             for _, ele in ipairs(xml) do
@@ -114,14 +114,14 @@ MY_Farbnamen.Render = function(szMsg)
         local szName = string.gsub(namelink:GetText(), '[%[%]]', '')
         local tInfo = MY_Farbnamen.GetAusName(szName)
         if tInfo then
-            -- ç»‘å®štipæç¤º
+            -- °ó¶¨tipÌáÊ¾
             MY.UI(namelink):hover(MY_Farbnamen.ShowTip, nil, true):color(tInfo.rgb)
         end
     end
     
     return szMsg
 end
--- æ˜¾ç¤ºTip
+-- ÏÔÊ¾Tip
 MY_Farbnamen.ShowTip = function(namelink)
     local x, y, w, h = 0, 0, 0, 0
     namelink = namelink or this
@@ -135,17 +135,17 @@ MY_Farbnamen.ShowTip = function(namelink)
     local tInfo = MY_Farbnamen.GetAusName(szName)
     if tInfo then
         local tTip = {}
-        -- åç§° ç­‰çº§
+        -- Ãû³Æ µÈ¼¶
         table.insert(tTip, string.format('%s(%d)', tInfo.szName, tInfo.nLevel))
-        -- ç§°å·
+        -- ³ÆºÅ
         if tInfo.szTitle and #tInfo.szTitle > 0 then
             table.insert(tTip, tInfo.szTitle)
         end
-        -- å¸®ä¼š
+        -- °ï»á
         if tInfo.szTongID and #tInfo.szTongID > 0 then
             table.insert(tTip, '[' .. tInfo.szTongID .. ']')
         end
-        -- é—¨æ´¾ ä½“å‹ é˜µè¥
+        -- ÃÅÅÉ ÌåĞÍ ÕóÓª
         table.insert(tTip,
             _MY_Farbnamen.tForceString[tInfo.dwForceID] .. g_tStrings.STR_SPLIT_DOT ..
             _MY_Farbnamen.tRoleType[tInfo.nRoleType]    .. g_tStrings.STR_SPLIT_DOT ..
@@ -180,7 +180,7 @@ MY_Farbnamen.ShowTip = function(namelink)
         OutputTip(szTip, 450, {x, y, w, h}, MY.Const.UI.Tip.POS_TOP)
     end
 end
--- å¤„ç†æ’ä»¶å†²çª
+-- ´¦Àí²å¼ş³åÍ»
 function MY_Farbnamen.DoConflict()
     if MY_Farbnamen.bEnabled and Chat and Chat.bColor then
         Chat.bColor = false
@@ -188,13 +188,13 @@ function MY_Farbnamen.DoConflict()
     end
 end
 ---------------------------------------------------------------
--- æ•°æ®å­˜å‚¨
+-- Êı¾İ´æ´¢
 ---------------------------------------------------------------
--- é€šè¿‡szNameè·å–ä¿¡æ¯
+-- Í¨¹ıszName»ñÈ¡ĞÅÏ¢
 function MY_Farbnamen.GetAusName(szName)
     return MY_Farbnamen.GetAusID(_MY_Farbnamen.tPlayerCache[szName])
 end
--- é€šè¿‡dwIDè·å–ä¿¡æ¯
+-- Í¨¹ıdwID»ñÈ¡ĞÅÏ¢
 function MY_Farbnamen.GetAusID(dwID)
     MY_Farbnamen.AddAusID(dwID)
     -- deal with return data
@@ -204,7 +204,7 @@ function MY_Farbnamen.GetAusID(dwID)
     end
     return result
 end
--- ä¿å­˜æŒ‡å®šdwIDçš„ç©å®¶
+-- ±£´æÖ¸¶¨dwIDµÄÍæ¼Ò
 function MY_Farbnamen.AddAusID(dwID)
     local player = GetPlayer(dwID)
     if player and player.szName and player.szName~='' then
@@ -227,13 +227,13 @@ function MY_Farbnamen.AddAusID(dwID)
         return false
     end
 end
--- ä¿å­˜ç”¨æˆ·è®¾ç½®
+-- ±£´æÓÃ»§ÉèÖÃ
 function _MY_Farbnamen.SaveCustomData()
     local t = {}
     t.tForceColor = Config.tForceColor
     MY.Sys.SaveUserData(SZ_CONFIG_PATH, t)
 end
--- åŠ è½½ç”¨æˆ·é…ç½®
+-- ¼ÓÔØÓÃ»§ÅäÖÃ
 function _MY_Farbnamen.LoadCustomData()
     local t = MY.Sys.LoadUserData(SZ_CONFIG_PATH) or {}
     if t.tForceColor then
@@ -242,11 +242,11 @@ function _MY_Farbnamen.LoadCustomData()
         end
     end
 end
--- ä¿å­˜é…ç½®
+-- ±£´æÅäÖÃ
 function MY_Farbnamen.SaveData()
     local t = {
-        ['aCached']   = {}                      ,     -- ä¿å­˜çš„ç”¨æˆ·è¡¨
-        ['nMaxCache'] = Config.nMaxCache        ,     -- æœ€å¤§ç¼“å­˜æ•°é‡
+        ['aCached']   = {}                      ,     -- ±£´æµÄÓÃ»§±í
+        ['nMaxCache'] = Config.nMaxCache        ,     -- ×î´ó»º´æÊıÁ¿
     }
     for dwID, data in pairs(_MY_Farbnamen.tPlayerCache) do
         if type(dwID)=='number' then
@@ -261,43 +261,43 @@ function MY_Farbnamen.SaveData()
     end
     MY.SaveLUAData(SZ_CACHE_PATH, MY.Json.Encode(t))
 end
--- åŠ è½½é…ç½®
+-- ¼ÓÔØÅäÖÃ
 function MY_Farbnamen.LoadData()
-    -- è¯»å–æ•°æ®æ–‡ä»¶
+    -- ¶ÁÈ¡Êı¾İÎÄ¼ş
     local data = MY.LoadLUAData(SZ_CACHE_PATH) or {}
-    -- å¦‚æœæ˜¯Jsonæ ¼å¼çš„æ•°æ® åˆ™è§£ç 
+    -- Èç¹ûÊÇJson¸ñÊ½µÄÊı¾İ Ôò½âÂë
     if type(data)=="string" then
         data = MY.Json.Decode(data) or {}
     end
-    -- è§£ææ•°æ®
+    -- ½âÎöÊı¾İ
     local t = {
-        ['aCached']   = data.aCached   or {} ,    -- ä¿å­˜çš„ç”¨æˆ·è¡¨
-        ['nMaxCache'] = data.nMaxCache or 100,    -- æœ€å¤§ç¼“å­˜æ•°é‡
+        ['aCached']   = data.aCached   or {} ,    -- ±£´æµÄÓÃ»§±í
+        ['nMaxCache'] = data.nMaxCache or 100,    -- ×î´ó»º´æÊıÁ¿
     }
-    -- è½¬ç§»æ—§ç‰ˆæœ¬æ•°æ®
+    -- ×ªÒÆ¾É°æ±¾Êı¾İ
     for i=1, #data, 1 do
-        -- æ’å…¥ç¼“å­˜åˆ—è¡¨
+        -- ²åÈë»º´æÁĞ±í
         table.insert(t.aCached, data[i])
     end
     
-    -- æ·»åŠ åŠ è½½çš„æ•°æ®
+    -- Ìí¼Ó¼ÓÔØµÄÊı¾İ
     for _, p in ipairs(t.aCached) do
         _MY_Farbnamen.tPlayerCache[p.dwID] = p
     end
     Config.nMaxCache = t.nMaxCache or Config.nMaxCache
 end
 --------------------------------------------------------------
--- æ•°æ®ç»Ÿè®¡
+-- Êı¾İÍ³¼Æ
 --------------------------------------------------------------
 function MY_Farbnamen.AnalyseForceInfo()
 	local t = { }
-    -- ç»Ÿè®¡å„é—¨æ´¾äººæ•°
+    -- Í³¼Æ¸÷ÃÅÅÉÈËÊı
 	for k, v in pairs(_MY_Farbnamen.tPlayerCache) do
 		if type(v)=='table' and type(v.dwForceID)=='number' then
 			t[v.dwForceID] = ( t[v.dwForceID] or 0 ) + 1
 		end
 	end
-	-- å¯¹tableå€¼è¿›è¡Œæ’åº
+	-- ¶ÔtableÖµ½øĞĞÅÅĞò
 	local t2, nCount = {}, 0
 	for k, v in pairs(t) do
 		table.insert(t2, {K = k, V = v})
@@ -305,7 +305,7 @@ function MY_Farbnamen.AnalyseForceInfo()
 	end
 	table.sort (t2, function(a, b) return a.V > b.V end)
 
-    -- è¾“å‡º
+    -- Êä³ö
 	MY.Sysmsg({_L('%d player(s) data cached:', nCount)}, _L['Farbnamen'])
 	for k, v in pairs(t2) do
 		if type(v.K) == "number" then
@@ -315,7 +315,7 @@ function MY_Farbnamen.AnalyseForceInfo()
 end
 
 --------------------------------------------------------------
--- èœå•
+-- ²Ëµ¥
 --------------------------------------------------------------
 MY_Farbnamen.GetMenu = function()
     local t = {
@@ -402,7 +402,7 @@ end
 MY.RegisterPlayerAddonMenu( 'MY_Farbenamen', MY_Farbnamen.GetMenu )
 MY.RegisterTraceButtonMenu( 'MY_Farbenamen', MY_Farbnamen.GetMenu )
 --------------------------------------------------------------
--- æ³¨å†Œäº‹ä»¶
+-- ×¢²áÊÂ¼ş
 --------------------------------------------------------------
 -- MY.RegisterEvent('LOGIN_GAME', MY_Farbnamen.LoadData)
 -- MY.RegisterEvent('PLAYER_ENTER_GAME', MY_Farbnamen.LoadData)
