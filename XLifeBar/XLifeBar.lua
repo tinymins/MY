@@ -1,4 +1,4 @@
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."XLifeBar/lang/")
+﻿local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."XLifeBar/lang/")
 local _Cache = {}
 local OT_STATE = {
     START_SKILL   = 1,  -- 开始技能读条(显示边框)

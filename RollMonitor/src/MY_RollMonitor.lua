@@ -1,4 +1,4 @@
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."RollMonitor/lang/")
+﻿local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."RollMonitor/lang/")
 MY_RollMonitor = { nMode = 1, nPublish = 0, nPublishChannel = PLAYER_TALK_CHANNEL.RAID, bPublishRestart = true }
 MY_RollMonitor.SortType = {
     FIRST = 1,  -- 只记录第一次

@@ -1,4 +1,4 @@
-MY = MY or {}
+﻿MY = MY or {}
 local _MY = {
     szIniFileEditBox = "Interface\\MY\\.Framework\\ui\\WndEditBox.ini",
     szIniFileButton = "Interface\\MY\\.Framework\\ui\\WndButton.ini",
