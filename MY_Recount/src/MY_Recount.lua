@@ -1,44 +1,44 @@
-ï»¿--
--- æˆ˜æ–—ç»Ÿè®¡
--- by èŒ—ä¼Š @ åŒæ¢¦é•‡ @ è»èŠ±å®«
+--
+-- Õ½¶·Í³¼Æ
+-- by ÜøÒÁ @ Ë«ÃÎÕò @ İ¶»¨¹¬
 -- Build 20140730
 -- 
-local CHANNEL = { -- ç»Ÿè®¡ç±»å‹
-    DPS  = 1, -- è¾“å‡ºç»Ÿè®¡
-    HPS  = 2, -- æ²»ç–—ç»Ÿè®¡
-    BDPS = 3, -- æ‰¿ä¼¤ç»Ÿè®¡
-    BHPS = 4, -- æ‰¿ç–—ç»Ÿè®¡
+local CHANNEL = { -- Í³¼ÆÀàĞÍ
+    DPS  = 1, -- Êä³öÍ³¼Æ
+    HPS  = 2, -- ÖÎÁÆÍ³¼Æ
+    BDPS = 3, -- ³ĞÉËÍ³¼Æ
+    BHPS = 4, -- ³ĞÁÆÍ³¼Æ
 }
-local SZ_CHANNEL_KEY = { -- ç»Ÿè®¡ç±»å‹æ•°ç»„å
+local SZ_CHANNEL_KEY = { -- Í³¼ÆÀàĞÍÊı×éÃû
     [CHANNEL.DPS ] = 'Damage',
     [CHANNEL.HPS ] = 'Heal',
     [CHANNEL.BDPS] = 'BeDamage',
     [CHANNEL.BHPS] = 'BeHeal',
 }
 local SZ_CHANNEL = {
-    [CHANNEL.DPS ] = g_tStrings.STR_DAMAGE_STATISTIC    , -- ä¼¤å®³ç»Ÿè®¡
-    [CHANNEL.HPS ] = g_tStrings.STR_THERAPY_STATISTIC   , -- æ²»ç–—ç»Ÿè®¡
-    [CHANNEL.BDPS] = g_tStrings.STR_BE_DAMAGE_STATISTIC , -- æ‰¿ä¼¤ç»Ÿè®¡
-    [CHANNEL.BHPS] = g_tStrings.STR_BE_THERAPY_STATISTIC, -- æ‰¿ç–—ç»Ÿè®¡
+    [CHANNEL.DPS ] = g_tStrings.STR_DAMAGE_STATISTIC    , -- ÉËº¦Í³¼Æ
+    [CHANNEL.HPS ] = g_tStrings.STR_THERAPY_STATISTIC   , -- ÖÎÁÆÍ³¼Æ
+    [CHANNEL.BDPS] = g_tStrings.STR_BE_DAMAGE_STATISTIC , -- ³ĞÉËÍ³¼Æ
+    [CHANNEL.BHPS] = g_tStrings.STR_BE_THERAPY_STATISTIC, -- ³ĞÁÆÍ³¼Æ
 }
-local DISPLAY_MODE = { -- ç»Ÿè®¡æ˜¾ç¤º
-    NPC    = 1, -- åªæ˜¾ç¤ºNPC
-    PLAYER = 2, -- åªæ˜¾ç¤ºç©å®¶
-    BOTH   = 3, -- æ··åˆæ˜¾ç¤º
+local DISPLAY_MODE = { -- Í³¼ÆÏÔÊ¾
+    NPC    = 1, -- Ö»ÏÔÊ¾NPC
+    PLAYER = 2, -- Ö»ÏÔÊ¾Íæ¼Ò
+    BOTH   = 3, -- »ìºÏÏÔÊ¾
 }
 local PUBLISH_MODE = {
-    EFFECT = 1, -- åªæ˜¾ç¤ºæœ‰æ•ˆå€¼
-    TOTAL  = 2, -- åªæ˜¾ç¤ºæ€»æ•°å€¼
-    BOTH   = 3, -- åŒæ—¶æ˜¾ç¤ºæœ‰æ•ˆå’Œæ€»æ•°
+    EFFECT = 1, -- Ö»ÏÔÊ¾ÓĞĞ§Öµ
+    TOTAL  = 2, -- Ö»ÏÔÊ¾×ÜÊıÖµ
+    BOTH   = 3, -- Í¬Ê±ÏÔÊ¾ÓĞĞ§ºÍ×ÜÊı
 }
 local SKILL_RESULT = {
-    HIT     = 0, -- å‘½ä¸­
-    BLOCK   = 1, -- æ ¼æŒ¡
-    SHIELD  = 2, -- æ— æ•ˆ
-    MISS    = 3, -- åç¦»
-    DODGE   = 4, -- é—ªé¿
-    CRITICAL= 5, -- ä¼šå¿ƒ
-    INSIGHT = 6, -- è¯†ç ´
+    HIT     = 0, -- ÃüÖĞ
+    BLOCK   = 1, -- ¸ñµ²
+    SHIELD  = 2, -- ÎŞĞ§
+    MISS    = 3, -- Æ«Àë
+    DODGE   = 4, -- ÉÁ±Ü
+    CRITICAL= 5, -- »áĞÄ
+    INSIGHT = 6, -- Ê¶ÆÆ
 }
 local SZ_SKILL_RESULT = {
     [SKILL_RESULT.HIT     ] = g_tStrings.STR_HIT_NAME     ,
@@ -57,7 +57,7 @@ local _Cache = {
     szIniDetail = MY.GetAddonInfo().szRoot .. 'MY_Recount/ui/ShowDetail.ini',
 }
 
--- æ–°çš„æˆ˜æ–—æ•°æ®æ—¶
+-- ĞÂµÄÕ½¶·Êı¾İÊ±
 MY.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function()
     if not _Cache.bHistoryMode then
         MY_Recount.DisplayData(0)
@@ -65,16 +65,16 @@ MY.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function()
 end)
 
 MY_Recount = MY_Recount or {}
-MY_Recount.bEnable       = true                 -- æ˜¯å¦å¯ç”¨
-MY_Recount.nCss          = 1                    -- å½“å‰æ ·å¼è¡¨
-MY_Recount.nChannel      = CHANNEL.DPS          -- å½“å‰æ˜¾ç¤ºçš„ç»Ÿè®¡æ¨¡å¼
-MY_Recount.bShowPerSec   = true                 -- æ˜¾ç¤ºä¸ºæ¯ç§’æ•°æ®ï¼ˆåä¹‹æ˜¾ç¤ºæ€»å’Œï¼‰
-MY_Recount.bShowEffect   = true                 -- æ˜¾ç¤ºæœ‰æ•ˆä¼¤å®³/æ²»ç–—
-MY_Recount.nDisplayMode  = DISPLAY_MODE.BOTH    -- ç»Ÿè®¡æ˜¾ç¤ºæ¨¡å¼ï¼ˆæ˜¾ç¤ºNPC/ç©å®¶æ•°æ®ï¼‰ï¼ˆé»˜è®¤æ··åˆæ˜¾ç¤ºï¼‰
-MY_Recount.nPublishLimit = 30                   -- å‘å¸ƒåˆ°èŠå¤©é¢‘é“æ•°é‡
-MY_Recount.nPublishMode  = PUBLISH_MODE.TOTAL   -- å‘å¸ƒæ¨¡å¼
-MY_Recount.nDrawInterval = GLOBAL.GAME_FPS / 2  -- UIé‡ç»˜å‘¨æœŸï¼ˆå¸§ï¼‰
-MY_Recount.anchor = { x=0, y=-70, s="BOTTOMRIGHT", r="BOTTOMRIGHT" } -- é»˜è®¤åæ ‡
+MY_Recount.bEnable       = true                 -- ÊÇ·ñÆôÓÃ
+MY_Recount.nCss          = 1                    -- µ±Ç°ÑùÊ½±í
+MY_Recount.nChannel      = CHANNEL.DPS          -- µ±Ç°ÏÔÊ¾µÄÍ³¼ÆÄ£Ê½
+MY_Recount.bShowPerSec   = true                 -- ÏÔÊ¾ÎªÃ¿ÃëÊı¾İ£¨·´Ö®ÏÔÊ¾×ÜºÍ£©
+MY_Recount.bShowEffect   = true                 -- ÏÔÊ¾ÓĞĞ§ÉËº¦/ÖÎÁÆ
+MY_Recount.nDisplayMode  = DISPLAY_MODE.BOTH    -- Í³¼ÆÏÔÊ¾Ä£Ê½£¨ÏÔÊ¾NPC/Íæ¼ÒÊı¾İ£©£¨Ä¬ÈÏ»ìºÏÏÔÊ¾£©
+MY_Recount.nPublishLimit = 30                   -- ·¢²¼µ½ÁÄÌìÆµµÀÊıÁ¿
+MY_Recount.nPublishMode  = PUBLISH_MODE.TOTAL   -- ·¢²¼Ä£Ê½
+MY_Recount.nDrawInterval = GLOBAL.GAME_FPS / 2  -- UIÖØ»æÖÜÆÚ£¨Ö¡£©
+MY_Recount.anchor = { x=0, y=-70, s="BOTTOMRIGHT", r="BOTTOMRIGHT" } -- Ä¬ÈÏ×ø±ê
 RegisterCustomData("MY_Recount.bEnable")
 RegisterCustomData("MY_Recount.nCss")
 RegisterCustomData("MY_Recount.nChannel")
@@ -138,9 +138,9 @@ MY_Recount.LoadCustomCss = function(nCss)
     }
 end
 
---[[ åˆ‡æ¢ç»‘å®šæ˜¾ç¤ºè®°å½•
-    MY_Recount.DisplayData(number nHistory): æ˜¾ç¤ºç¬¬nHistoryæ¡å†å²è®°å½• å½“nHistoryç­‰äº0æ—¶æ˜¾ç¤ºå½“å‰è®°å½•
-    MY_Recount.DisplayData(table  data): æ˜¾ç¤ºæ•°æ®ä¸ºdataçš„å†å²è®°å½•
+--[[ ÇĞ»»°ó¶¨ÏÔÊ¾¼ÇÂ¼
+    MY_Recount.DisplayData(number nHistory): ÏÔÊ¾µÚnHistoryÌõÀúÊ·¼ÇÂ¼ µ±nHistoryµÈÓÚ0Ê±ÏÔÊ¾µ±Ç°¼ÇÂ¼
+    MY_Recount.DisplayData(table  data): ÏÔÊ¾Êı¾İÎªdataµÄÀúÊ·¼ÇÂ¼
 ]]
 MY_Recount.DisplayData = function(data)
     if type(data) == 'number' then
@@ -178,19 +178,19 @@ MY_Recount.UpdateUI = function(data)
         return
     end
 
-    -- è·å–ç»Ÿè®¡æ•°æ®
+    -- »ñÈ¡Í³¼ÆÊı¾İ
     local tRecord, szUnit
-    if MY_Recount.nChannel == CHANNEL.DPS then       -- ä¼¤å®³ç»Ÿè®¡
+    if MY_Recount.nChannel == CHANNEL.DPS then       -- ÉËº¦Í³¼Æ
         tRecord, szUnit = data.Damage  , 'DPS'
-    elseif MY_Recount.nChannel == CHANNEL.HPS then   -- æ²»ç–—ç»Ÿè®¡
+    elseif MY_Recount.nChannel == CHANNEL.HPS then   -- ÖÎÁÆÍ³¼Æ
         tRecord, szUnit = data.Heal    , 'HPS'
-    elseif MY_Recount.nChannel == CHANNEL.BDPS then  -- æ‰¿ä¼¤ç»Ÿè®¡
+    elseif MY_Recount.nChannel == CHANNEL.BDPS then  -- ³ĞÉËÍ³¼Æ
         tRecord, szUnit = data.BeDamage, 'DPS'
-    elseif MY_Recount.nChannel == CHANNEL.BHPS then  -- æ‰¿ç–—ç»Ÿè®¡
+    elseif MY_Recount.nChannel == CHANNEL.BHPS then  -- ³ĞÁÆÍ³¼Æ
         tRecord, szUnit = data.BeHeal  , 'HPS'
     end
     
-    -- è®¡ç®—æˆ˜æ–—æ—¶é—´
+    -- ¼ÆËãÕ½¶·Ê±¼ä
     local nTimeCount = 0
     if data.UUID == MY.Player.GetFightUUID() then
         nTimeCount = MY.Player.GetFightTime() / GLOBAL.GAME_FPS
@@ -198,14 +198,14 @@ MY_Recount.UpdateUI = function(data)
         nTimeCount = data.nTimeDuring
     end
     local szTimeCount = MY.Sys.FormatTimeCount('M:ss', nTimeCount)
-    nTimeCount  = math.max(nTimeCount, 1) -- é˜²æ­¢è®¡ç®—DPSæ—¶é™¤ä»¥0
-    -- è‡ªå·±çš„è®°å½•
+    nTimeCount  = math.max(nTimeCount, 1) -- ·ÀÖ¹¼ÆËãDPSÊ±³ıÒÔ0
+    -- ×Ô¼ºµÄ¼ÇÂ¼
     local tMyRec
     
-    -- æ•´ç†æ•°æ® ç”Ÿæˆè¦æ˜¾ç¤ºçš„åˆ—è¡¨
+    -- ÕûÀíÊı¾İ Éú³ÉÒªÏÔÊ¾µÄÁĞ±í
     local nMaxValue, tResult = 0, {}
     for id, rec in pairs(tRecord) do
-        if MY_Recount.nDisplayMode == DISPLAY_MODE.BOTH or  -- ç¡®å®šæ˜¾ç¤ºæ¨¡å¼ï¼ˆæ˜¾ç¤ºNPC/æ˜¾ç¤ºç©å®¶/å…¨éƒ¨æ˜¾ç¤ºï¼‰
+        if MY_Recount.nDisplayMode == DISPLAY_MODE.BOTH or  -- È·¶¨ÏÔÊ¾Ä£Ê½£¨ÏÔÊ¾NPC/ÏÔÊ¾Íæ¼Ò/È«²¿ÏÔÊ¾£©
         (MY_Recount.nDisplayMode == DISPLAY_MODE.NPC    and type(id) == 'string') or
         (MY_Recount.nDisplayMode == DISPLAY_MODE.PLAYER and type(id) == 'number') then
             tRec = {
@@ -220,7 +220,7 @@ MY_Recount.UpdateUI = function(data)
         end
     end
     
-    -- åˆ—è¡¨æ’åº
+    -- ÁĞ±íÅÅĞò
     if MY_Recount.bShowEffect then
         table.sort(tResult, function(p1, p2)
             return p1.nEffectValue > p2.nEffectValue
@@ -231,10 +231,10 @@ MY_Recount.UpdateUI = function(data)
         end)
     end
     
-    -- æ¸²æŸ“åˆ—è¡¨
+    -- äÖÈ¾ÁĞ±í
     local hList = m_frame:Lookup('Wnd_Main', 'Handle_List')
     for i, p in pairs(tResult) do
-        -- è‡ªå·±çš„è®°å½•
+        -- ×Ô¼ºµÄ¼ÇÂ¼
         if p.id == UI_GetClientPlayerID() then
             tMyRec = {
                 id           = p.id          ,
@@ -282,9 +282,9 @@ MY_Recount.UpdateUI = function(data)
     hList.nTimeCount = nTimeCount
     hList:FormatAllItemPos()
     
-    -- æ¸²æŸ“åº•éƒ¨è‡ªå·±çš„ç»Ÿè®¡
+    -- äÖÈ¾µ×²¿×Ô¼ºµÄÍ³¼Æ
     local hItem = m_frame:Lookup('Wnd_Main', 'Handle_Me')
-    -- åˆå§‹åŒ–é¢œè‰²
+    -- ³õÊ¼»¯ÑÕÉ«
     if not hItem.bInited then
         local dwForceID = (MY.Player.GetClientInfo() or {}).dwForceID
         if dwForceID then
@@ -303,9 +303,9 @@ MY_Recount.UpdateUI = function(data)
             hItem:Lookup('Image_Me_PerBack'):SetPercentage(1)
             hItem:Lookup('Image_Me_PerFore'):SetPercentage(1)
         end
-        -- å·¦ä¾§æˆ˜æ–—è®¡æ—¶
+        -- ×ó²àÕ½¶·¼ÆÊ±
         hItem:Lookup('Text_Me_L'):SetText('[' .. tMyRec.nRank .. '] ' .. szTimeCount)
-        -- å³ä¾§æ–‡å­—
+        -- ÓÒ²àÎÄ×Ö
         if MY_Recount.bShowEffect then
             if MY_Recount.bShowPerSec then
                 hItem:Lookup('Text_Me_R'):SetText(math.floor(tMyRec.nEffectValue / nTimeCount) .. ' ' .. szUnit)
@@ -343,14 +343,14 @@ end
 ##########################################################################
 ]]
 
--- å‘¨æœŸé‡ç»˜
+-- ÖÜÆÚÖØ»æ
 MY_Recount.OnFrameBreathe = function()
     if this.nLastRedrawFrame and GetLogicFrameCount() - this.nLastRedrawFrame < MY_Recount.nDrawInterval then
         return
     end
     this.nLastRedrawFrame = GetLogicFrameCount()
     
-    -- ä¸è¿›æˆ˜æ—¶ä¸åˆ·æ–°UI
+    -- ²»½øÕ½Ê±²»Ë¢ĞÂUI
     if not _Cache.bHistoryMode and not MY.Player.GetFightUUID() then
         return
     end
@@ -363,7 +363,7 @@ MY_Recount.OnFrameDragEnd = function()
     MY_Recount.anchor = MY.UI(this):anchor()
 end
 
--- ShowDetailç•Œé¢æ—¶é—´ç›¸åº”
+-- ShowDetail½çÃæÊ±¼äÏàÓ¦
 _Cache.OnDetailFrameBreathe = function()
     if this.nLastRedrawFrame and GetLogicFrameCount() - this.nLastRedrawFrame < MY_Recount.nDrawInterval then
         return
@@ -375,7 +375,7 @@ _Cache.OnDetailFrameBreathe = function()
     if tonumber(id) then
         id = tonumber(id)
     end
-    -- è·å–æ•°æ®
+    -- »ñÈ¡Êı¾İ
     local tData = DataDisplay[szChannel][id]
     if not tData then
         this:Lookup('WndScroll_Detail', 'Handle_DetailList'):Clear()
@@ -387,8 +387,8 @@ _Cache.OnDetailFrameBreathe = function()
     local szPrimarySort   = this.szPrimarySort or 'Skill'
     local szSecondarySort = (szPrimarySort == 'Skill' and 'Target') or 'Skill'
     
-    --------------- ä¸€ã€æŠ€èƒ½åˆ—è¡¨æ›´æ–° -----------------
-    -- æ•°æ®æ”¶é›†
+    --------------- Ò»¡¢¼¼ÄÜÁĞ±í¸üĞÂ -----------------
+    -- Êı¾İÊÕ¼¯
     local tResult, nTotalEffect = {}, tData.nTotalEffect
     if szPrimarySort == 'Skill' then
         for szSkillName, p in pairs(tData.Skill) do
@@ -412,7 +412,7 @@ _Cache.OnDetailFrameBreathe = function()
     table.sort(tResult, function(p1, p2)
         return p1.nTotalEffect > p2.nTotalEffect
     end)
-    -- é»˜è®¤é€‰ä¸­ç¬¬ä¸€ä¸ª
+    -- Ä¬ÈÏÑ¡ÖĞµÚÒ»¸ö
     if this.bFirstRendering then
         if tResult[1] then
             if szPrimarySort == 'Skill' then
@@ -431,7 +431,7 @@ _Cache.OnDetailFrameBreathe = function()
     else
         szSelected = this.szSelectedTarget
     end
-    -- ç•Œé¢é‡ç»˜
+    -- ½çÃæÖØ»æ
     local hSelectedItem
     this:Lookup('WndScroll_Skill'):SetH(112)
     this:Lookup('WndScroll_Skill', ''):SetH(112)
@@ -458,8 +458,8 @@ _Cache.OnDetailFrameBreathe = function()
     
     if szSelected and tData[szPrimarySort][szSelected] then
         this:Lookup('', 'Handle_Spliter'):Show()
-        --------------- äºŒã€æŠ€èƒ½é‡Šæ”¾ç»“æœåˆ—è¡¨æ›´æ–° -----------------
-        -- æ•°æ®æ”¶é›†
+        --------------- ¶ş¡¢¼¼ÄÜÊÍ·Å½á¹ûÁĞ±í¸üĞÂ -----------------
+        -- Êı¾İÊÕ¼¯
         local tResult, nTotalEffect, nCount = {}, tData[szPrimarySort][szSelected].nTotalEffect, tData[szPrimarySort][szSelected].nCount
         for nSkillResult, p in pairs(tData[szPrimarySort][szSelected].Detail) do
             table.insert(tResult, {
@@ -474,7 +474,7 @@ _Cache.OnDetailFrameBreathe = function()
         table.sort(tResult, function(p1, p2)
             return p1.nAvgEffect > p2.nAvgEffect
         end)
-        -- ç•Œé¢é‡ç»˜
+        -- ½çÃæÖØ»æ
         this:Lookup('WndScroll_Detail'):Show()
         local hList = this:Lookup('WndScroll_Detail', 'Handle_DetailList')
         hList:Clear()
@@ -490,15 +490,15 @@ _Cache.OnDetailFrameBreathe = function()
         end
         hList:FormatAllItemPos()
         
-        -- è°ƒæ•´æ»šåŠ¨æ¡ å¢å¼ºç”¨æˆ·ä½“éªŒ
+        -- µ÷Õû¹ö¶¯Ìõ ÔöÇ¿ÓÃ»§ÌåÑé
         if hSelectedItem and not this:Lookup('WndScroll_Target'):IsVisible() then
-            -- è¯´æ˜æ˜¯åˆšä»æœªé€‰æ‹©çŠ¶æ€åˆ‡æ¢è¿‡æ¥ æ»šåŠ¨æ¡æ»šåŠ¨åˆ°é€‰ä¸­é¡¹
+            -- ËµÃ÷ÊÇ¸Õ´ÓÎ´Ñ¡Ôñ×´Ì¬ÇĞ»»¹ıÀ´ ¹ö¶¯Ìõ¹ö¶¯µ½Ñ¡ÖĞÏî
             local hScroll = this:Lookup('WndScroll_Skill/Scroll_Skill_List')
             hScroll:SetScrollPos(math.ceil(hScroll:GetStepCount() * hSelectedItem:GetIndex() / hSelectedItem:GetParent():GetItemCount()))
         end
         
-        --------------- ä¸‰ã€æŠ€èƒ½é‡Šæ”¾ç»“æœåˆ—è¡¨æ›´æ–° -----------------
-        -- æ•°æ®æ”¶é›†
+        --------------- Èı¡¢¼¼ÄÜÊÍ·Å½á¹ûÁĞ±í¸üĞÂ -----------------
+        -- Êı¾İÊÕ¼¯
         local tResult, nTotalEffect = {}, tData[szPrimarySort][szSelected].nTotalEffect
         if szPrimarySort == 'Skill' then
             for id, p in pairs(tData.Skill[szSelectedSkill].Target) do
@@ -526,7 +526,7 @@ _Cache.OnDetailFrameBreathe = function()
         table.sort(tResult, function(p1, p2)
             return p1.nTotalEffect > p2.nTotalEffect
         end)
-        -- ç•Œé¢é‡ç»˜
+        -- ½çÃæÖØ»æ
         this:Lookup('WndScroll_Target'):Show()
         local hList = this:Lookup('WndScroll_Target', 'Handle_TargetList')
         hList:Clear()
@@ -732,7 +732,7 @@ end
   # #       #       # #             #             # # # # # # # # # # #   #       #           #   
 ##################################################################################################
 ]]
--- è·å–è®¾ç½®èœå•
+-- »ñÈ¡ÉèÖÃ²Ëµ¥
 MY_Recount.GetMenu = function()
     local t = {
         szOption = _L["fight recount"],
@@ -771,7 +771,7 @@ MY_Recount.GetMenu = function()
                 return not MY_Recount.bEnable
             end,
         },
-        {   -- åˆ‡æ¢ç»Ÿè®¡ç±»å‹
+        {   -- ÇĞ»»Í³¼ÆÀàĞÍ
             szOption = _L['switch recount mode'],
             {
                 szOption = _L['display only npc record'],
@@ -801,7 +801,7 @@ MY_Recount.GetMenu = function()
         }
     }
 
-    -- è¿‡æ»¤çŸ­æ—¶é—´è®°å½•
+    -- ¹ıÂË¶ÌÊ±¼ä¼ÇÂ¼
     local t1 = {
         szOption = _L['filter short fight'],
         fnDisable = function()
@@ -833,7 +833,7 @@ MY_Recount.GetMenu = function()
     end
     table.insert(t, t1)
 
-    -- é£æ ¼é€‰æ‹©
+    -- ·ç¸ñÑ¡Ôñ
     local t1 = {
         szOption = _L['theme'],
         fnDisable = function()
@@ -856,7 +856,7 @@ MY_Recount.GetMenu = function()
     end
     table.insert(t, t1)
 
-    -- æ•°å€¼åˆ·æ–°å‘¨æœŸ
+    -- ÊıÖµË¢ĞÂÖÜÆÚ
     local t1 = {
         szOption = _L['redraw interval'],
         fnDisable = function()
@@ -884,7 +884,7 @@ MY_Recount.GetMenu = function()
     end
     table.insert(t, t1)
 
-    -- æœ€å¤§å†å²è®°å½•
+    -- ×î´óÀúÊ·¼ÇÂ¼
     local t1 = {
         szOption = _L['max history'],
         fnDisable = function()
@@ -909,7 +909,7 @@ MY_Recount.GetMenu = function()
     return t
 end
 
--- è·å–å†å²è®°å½•èœå•
+-- »ñÈ¡ÀúÊ·¼ÇÂ¼²Ëµ¥
 MY_Recount.GetHistoryMenu = function()
     local t = {{
         szOption = _L["current fight"],
@@ -944,7 +944,7 @@ MY_Recount.GetHistoryMenu = function()
     return t
 end
 
--- è·å–å‘å¸ƒèœå•
+-- »ñÈ¡·¢²¼²Ëµ¥
 MY_Recount.GetPublishMenu = function()
     local t = {}
     
@@ -965,7 +965,7 @@ MY_Recount.GetPublishMenu = function()
     end
     table.insert(t, t1)
     
-    -- å‘å¸ƒç±»å‹
+    -- ·¢²¼ÀàĞÍ
     table.insert(t, {
         szOption = _L['publish mode'],
         {
@@ -1017,7 +1017,7 @@ MY_Recount.GetPublishMenu = function()
                 local hList      = frame:Lookup('Wnd_Main', 'Handle_List')
                 local szUnit     = (' ' .. hList.szUnit) or ''
                 local nTimeCount = hList.nTimeCount or 0
-                local tResult = {} -- æ”¶é›†æ•°æ®
+                local tResult = {} -- ÊÕ¼¯Êı¾İ
                 local nMaxNameLen = 0
                 for i = 0, MY_Recount.nPublishLimit do
                     local hItem = hList:Lookup(i)
@@ -1027,7 +1027,7 @@ MY_Recount.GetPublishMenu = function()
                     table.insert(tResult, hItem.data)
                     nMaxNameLen = math.max(nMaxNameLen, wstring.len(hItem.data.szName))
                 end
-                -- å‘å¸ƒæ•°æ®
+                -- ·¢²¼Êı¾İ
                 for i, p in ipairs(tResult) do
                     local szText = string.format('%02d', i) .. '.[' .. p.szName .. ']'
                     for i = wstring.len(p.szName), nMaxNameLen - 1 do

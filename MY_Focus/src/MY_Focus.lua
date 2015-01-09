@@ -1,6 +1,6 @@
-ï»¿--
--- ç„¦ç‚¹åˆ—è¡¨
--- by èŒ—ä¼Š @ åŒæ¢¦é•‡ @ è»èŠ±å®«
+--
+-- ½¹µãÁĞ±í
+-- by ÜøÒÁ @ Ë«ÃÎÕò @ İ¶»¨¹¬
 -- Build 20140730
 -- 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Focus/lang/")
@@ -9,22 +9,22 @@ _Cache.tFocusList = {}
 _Cache.szIniFile = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
 _Cache.bMinimize = false
 MY_Focus = {}
-MY_Focus.bFocusFriend = false -- è‡ªåŠ¨ç„¦ç‚¹å¥½å‹
-MY_Focus.bFocusTong = false -- è‡ªåŠ¨ç„¦ç‚¹å¸®ä¼šæˆå‘˜
-MY_Focus.bFocusEnemy= false -- è‡ªåŠ¨ç„¦ç‚¹æ•Œå¯¹ç©å®¶
-MY_Focus.bEnable    = true  -- æ˜¯å¦å¯ç”¨
-MY_Focus.bAutoHide  = true  -- æ— ç„¦ç‚¹è‡ªåŠ¨éšè—
-MY_Focus.nMaxDisplay= 5     -- æœ€å¤§æ˜¾ç¤ºæ•°é‡
-MY_Focus.bAutoFocus = true  -- å¯ç”¨é»˜è®¤ç„¦ç‚¹
-MY_Focus.bShowTarget= false -- æ˜¾ç¤ºç›®æ ‡çš„ç›®æ ‡
-MY_Focus.bTraversal = false -- éå†ç„¦ç‚¹åˆ—è¡¨
-MY_Focus.tAutoFocus = {}    -- é»˜è®¤ç„¦ç‚¹
-MY_Focus.tFocusList = {     -- æ°¸ä¹…ç„¦ç‚¹
+MY_Focus.bFocusFriend = false -- ×Ô¶¯½¹µãºÃÓÑ
+MY_Focus.bFocusTong = false -- ×Ô¶¯½¹µã°ï»á³ÉÔ±
+MY_Focus.bFocusEnemy= false -- ×Ô¶¯½¹µãµĞ¶ÔÍæ¼Ò
+MY_Focus.bEnable    = true  -- ÊÇ·ñÆôÓÃ
+MY_Focus.bAutoHide  = true  -- ÎŞ½¹µã×Ô¶¯Òş²Ø
+MY_Focus.nMaxDisplay= 5     -- ×î´óÏÔÊ¾ÊıÁ¿
+MY_Focus.bAutoFocus = true  -- ÆôÓÃÄ¬ÈÏ½¹µã
+MY_Focus.bShowTarget= false -- ÏÔÊ¾Ä¿±êµÄÄ¿±ê
+MY_Focus.bTraversal = false -- ±éÀú½¹µãÁĞ±í
+MY_Focus.tAutoFocus = {}    -- Ä¬ÈÏ½¹µã
+MY_Focus.tFocusList = {     -- ÓÀ¾Ã½¹µã
     [TARGET.NPC]    = {},
     [TARGET.PLAYER] = {},
     [TARGET.DOODAD] = {},
 }
-MY_Focus.anchor = { x=-300, y=220, s="TOPRIGHT", r="TOPRIGHT" } -- é»˜è®¤åæ ‡
+MY_Focus.anchor = { x=-300, y=220, s="TOPRIGHT", r="TOPRIGHT" } -- Ä¬ÈÏ×ø±ê
 RegisterCustomData("MY_Focus.bEnable")
 RegisterCustomData("MY_Focus.bAutoHide")
 RegisterCustomData("MY_Focus.bFocusFriend")
@@ -75,7 +75,7 @@ MY_Focus.Close = function()
     MY.RegisterEvent('DOODAD_LEAVE_SCENE', 'MY_Focus')
 end
 
--- è·å–å½“å‰æ˜¾ç¤ºçš„ç„¦ç‚¹åˆ—è¡¨
+-- »ñÈ¡µ±Ç°ÏÔÊ¾µÄ½¹µãÁĞ±í
 MY_Focus.GetDisplayList = function()
     local t = {}
     if _Cache.bMinimize then
@@ -90,12 +90,12 @@ MY_Focus.GetDisplayList = function()
     return t
 end
 
--- è·å–æŒ‡å®šç„¦ç‚¹çš„Handle æ²¡æœ‰è¿”å›nil
+-- »ñÈ¡Ö¸¶¨½¹µãµÄHandle Ã»ÓĞ·µ»Ønil
 MY_Focus.GetHandle = function(dwType, dwID)
     return Station.Lookup('Normal/MY_Focus', 'Handle_List/Handle_Info_'..dwType..'_'..dwID)
 end
 
--- æ·»åŠ é»˜è®¤ç„¦ç‚¹
+-- Ìí¼ÓÄ¬ÈÏ½¹µã
 MY_Focus.AddAutoFocus = function(szName)
     for _, v in ipairs(MY_Focus.tAutoFocus) do
         if v == szName then
@@ -103,23 +103,23 @@ MY_Focus.AddAutoFocus = function(szName)
         end
     end
     table.insert(MY_Focus.tAutoFocus, szName)
-    -- æ›´æ–°ç„¦ç‚¹åˆ—è¡¨
+    -- ¸üĞÂ½¹µãÁĞ±í
     MY_Focus.ScanNearby()
 end
 
--- åˆ é™¤é»˜è®¤ç„¦ç‚¹
+-- É¾³ıÄ¬ÈÏ½¹µã
 MY_Focus.DelAutoFocus = function(szName)
     for i = #MY_Focus.tAutoFocus, 1, -1 do
         if MY_Focus.tAutoFocus[i] == szName then
             table.remove(MY_Focus.tAutoFocus, i)
         end
     end
-    -- åˆ·æ–°UI
+    -- Ë¢ĞÂUI
     if szName:sub(1,1) == '^' then
-        -- æ­£åˆ™è¡¨è¾¾å¼æ¨¡å¼ï¼šé‡ç»˜ç„¦ç‚¹åˆ—è¡¨
+        -- ÕıÔò±í´ïÊ½Ä£Ê½£ºÖØ»æ½¹µãÁĞ±í
         MY_Focus.RescanNearby()
     else
-        -- å…¨å­—ç¬¦åŒ¹é…æ¨¡å¼ï¼šæ£€æŸ¥æ˜¯å¦åœ¨æ°¸ä¹…ç„¦ç‚¹ä¸­ æ²¡æœ‰åˆ™åˆ é™¤Handle
+        -- È«×Ö·ûÆ¥ÅäÄ£Ê½£º¼ì²éÊÇ·ñÔÚÓÀ¾Ã½¹µãÖĞ Ã»ÓĞÔòÉ¾³ıHandle
         for i = #_Cache.tFocusList, 1, -1 do
             local p = _Cache.tFocusList[i]
             local h = MY.Game.GetObject(p.dwType, p.dwID)
@@ -131,7 +131,7 @@ MY_Focus.DelAutoFocus = function(szName)
     end
 end
 
--- æ·»åŠ æ°¸ä¹…ç„¦ç‚¹
+-- Ìí¼ÓÓÀ¾Ã½¹µã
 MY_Focus.AddStaticFocus = function(dwType, dwID)
     dwType, dwID = tonumber(dwType), tonumber(dwID)
     for _dwType, tFocusList in pairs(MY_Focus.tFocusList) do
@@ -145,14 +145,14 @@ MY_Focus.AddStaticFocus = function(dwType, dwID)
     MY_Focus.OnObjectEnterScene(dwType, dwID)
 end
 
--- åˆ é™¤æ°¸ä¹…ç„¦ç‚¹
+-- É¾³ıÓÀ¾Ã½¹µã
 MY_Focus.DelStaticFocus = function(dwType, dwID)
     dwType, dwID = tonumber(dwType), tonumber(dwID)
     MY_Focus.tFocusList[dwType][dwID] = nil
     MY_Focus.OnObjectLeaveScene(dwType, dwID)
 end
 
--- é‡æ–°æ‰«æé™„è¿‘å¯¹è±¡æ›´æ–°ç„¦ç‚¹åˆ—è¡¨ï¼ˆåªå¢ä¸å‡ï¼‰
+-- ÖØĞÂÉ¨Ãè¸½½ü¶ÔÏó¸üĞÂ½¹µãÁĞ±í£¨Ö»Ôö²»¼õ£©
 MY_Focus.ScanNearby = function()
     for dwID, _ in pairs(MY.Player.GetNearPlayer()) do
         MY_Focus.OnObjectEnterScene(TARGET.PLAYER, dwID)
@@ -165,7 +165,7 @@ MY_Focus.ScanNearby = function()
     end
 end
 
--- å¯¹è±¡è¿›å…¥è§†é‡
+-- ¶ÔÏó½øÈëÊÓÒ°
 MY_Focus.OnObjectEnterScene = function(dwType, dwID, nRetryCount)
     if nRetryCount and nRetryCount >5 then
         return
@@ -176,18 +176,18 @@ MY_Focus.OnObjectEnterScene = function(dwType, dwID, nRetryCount)
     end
 
     local szName = MY.Game.GetObjectName(obj)
-    -- è§£å†³ç©å®¶åˆšè¿›å…¥è§†é‡æ—¶åå­—ä¸ºç©ºçš„é—®é¢˜
+    -- ½â¾öÍæ¼Ò¸Õ½øÈëÊÓÒ°Ê±Ãû×ÖÎª¿ÕµÄÎÊÌâ
     if dwType == TARGET.PLAYER and not szName then
         MY.DelayCall(function()
             MY_Focus.OnObjectEnterScene(dwType, dwID, (nRetryCount or 0) + 1)
         end, 300)
-    elseif szName then -- åˆ¤æ–­æ˜¯å¦éœ€è¦ç„¦ç‚¹
+    elseif szName then -- ÅĞ¶ÏÊÇ·ñĞèÒª½¹µã
         local bFocus = false
-        -- åˆ¤æ–­æ°¸ä¹…ç„¦ç‚¹
+        -- ÅĞ¶ÏÓÀ¾Ã½¹µã
         if MY_Focus.tFocusList[dwType][dwID] then
             bFocus = true
         end
-        -- åˆ¤æ–­é»˜è®¤ç„¦ç‚¹
+        -- ÅĞ¶ÏÄ¬ÈÏ½¹µã
         if MY_Focus.bAutoFocus and not bFocus then
             for _, v in ipairs(MY_Focus.tAutoFocus) do
                 if v == szName or
@@ -196,38 +196,38 @@ MY_Focus.OnObjectEnterScene = function(dwType, dwID, nRetryCount)
                 end
             end
         end
-        -- åˆ¤æ–­å¥½å‹
+        -- ÅĞ¶ÏºÃÓÑ
         if dwType == TARGET.PLAYER and
         MY_Focus.bFocusFriend and
         MY.Player.GetFriend(dwID) then
             bFocus = true
         end
-        -- åˆ¤æ–­åŒå¸®ä¼š
+        -- ÅĞ¶ÏÍ¬°ï»á
         if dwType == TARGET.PLAYER and
         MY_Focus.bFocusTong and
         dwID ~= UI_GetClientPlayerID() and
         MY.Player.GetTongMember(dwID) then
             bFocus = true
         end
-        -- åˆ¤æ–­æ•Œå¯¹ç©å®¶
+        -- ÅĞ¶ÏµĞ¶ÔÍæ¼Ò
         if dwType == TARGET.PLAYER and
         MY_Focus.bFocusEnemy and
         IsEnemy(UI_GetClientPlayerID(), dwID) then
             bFocus = true
         end
-        -- åŠ å…¥ç„¦ç‚¹
+        -- ¼ÓÈë½¹µã
         if bFocus then
             MY_Focus.AddFocus(dwType, dwID)
         end
     end
 end
 
--- å¯¹è±¡ç¦»å¼€è§†é‡
+-- ¶ÔÏóÀë¿ªÊÓÒ°
 MY_Focus.OnObjectLeaveScene = function(dwType, dwID)
     MY_Focus.DelFocus(dwType, dwID)
 end
 
--- ç›®æ ‡åŠ å…¥ç„¦ç‚¹åˆ—è¡¨
+-- Ä¿±ê¼ÓÈë½¹µãÁĞ±í
 MY_Focus.AddFocus = function(dwType, dwID, szName)
     local nIndex
     for i, p in ipairs(_Cache.tFocusList) do
@@ -246,9 +246,9 @@ MY_Focus.AddFocus = function(dwType, dwID, szName)
     end
 end
 
--- ç›®æ ‡ç§»é™¤ç„¦ç‚¹åˆ—è¡¨
+-- Ä¿±êÒÆ³ı½¹µãÁĞ±í
 MY_Focus.DelFocus = function(dwType, dwID)
-    -- ä»åˆ—è¡¨æ•°æ®ä¸­åˆ é™¤
+    -- ´ÓÁĞ±íÊı¾İÖĞÉ¾³ı
     for i = #_Cache.tFocusList, 1, -1 do
         local p = _Cache.tFocusList[i]
         if p.dwType == dwType and p.dwID == dwID then
@@ -256,11 +256,11 @@ MY_Focus.DelFocus = function(dwType, dwID)
             break
         end
     end
-    -- ä»UIä¸­åˆ é™¤
+    -- ´ÓUIÖĞÉ¾³ı
     local hItem = Station.Lookup('Normal/MY_Focus', 'Handle_List/Handle_Info_'..dwType..'_'..dwID)
     if hItem then
         MY.UI(hItem):remove()
-        -- è¡¥ä¸ŠUIï¼ˆè¶…è¿‡æ•°é‡é™åˆ¶æ—¶ï¼‰
+        -- ²¹ÉÏUI£¨³¬¹ıÊıÁ¿ÏŞÖÆÊ±£©
         local p = _Cache.tFocusList[MY_Focus.nMaxDisplay]
         if p then
             MY_Focus.DrawFocus(p.dwType, p.dwID)
@@ -268,7 +268,7 @@ MY_Focus.DelFocus = function(dwType, dwID)
     end
 end
 
--- æ¸…ç©ºç„¦ç‚¹åˆ—è¡¨
+-- Çå¿Õ½¹µãÁĞ±í
 MY_Focus.ClearFocus = function()
     _Cache.tFocusList = {}
     
@@ -279,13 +279,13 @@ MY_Focus.ClearFocus = function()
     hList:Clear()
 end
 
--- é‡æ–°æ‰«æé™„è¿‘ç„¦ç‚¹
+-- ÖØĞÂÉ¨Ãè¸½½ü½¹µã
 MY_Focus.RescanNearby = function()
     MY_Focus.ClearFocus()
     MY_Focus.ScanNearby()
 end
 
--- é‡ç»˜åˆ—è¡¨
+-- ÖØ»æÁĞ±í
 MY_Focus.RedrawList = function(hList)
     if not hList then
         hList = Station.Lookup('Normal/MY_Focus', 'Handle_List')
@@ -297,14 +297,14 @@ MY_Focus.RedrawList = function(hList)
     MY_Focus.UpdateList()
 end
 
--- æ›´æ–°åˆ—è¡¨
+-- ¸üĞÂÁĞ±í
 MY_Focus.UpdateList = function()
     for i, p in ipairs(MY_Focus.GetDisplayList()) do
         MY_Focus.DrawFocus(p.dwType, p.dwID)
     end
 end
 
--- ç»˜åˆ¶æŒ‡å®šçš„ç„¦ç‚¹Handleï¼ˆæ²¡æœ‰åˆ™æ·»åŠ åˆ›å»ºï¼‰
+-- »æÖÆÖ¸¶¨µÄ½¹µãHandle£¨Ã»ÓĞÔòÌí¼Ó´´½¨£©
 MY_Focus.DrawFocus = function(dwType, dwID)
     local obj, info = MY.Game.GetObject(dwType, dwID)
     local hList = Station.Lookup('Normal/MY_Focus', 'Handle_List')
@@ -318,9 +318,9 @@ MY_Focus.DrawFocus = function(dwType, dwID)
         hItem:SetName('Handle_Info_'..dwType..'_'..dwID)
     end
     
-    -- åå­—
+    -- Ãû×Ö
     hItem:Lookup('Handle_Name/Text_Name'):SetText(MY.Game.GetObjectName(obj) or obj.dwID)
-    -- å¿ƒæ³•
+    -- ĞÄ·¨
     if dwType == TARGET.PLAYER then
         if type(info) == 'table' and info.dwMountKungfuID then
             hItem:Lookup('Handle_Name/Text_Kungfu'):SetText(MY_Focus.GetKungfuName(info.dwMountKungfuID))
@@ -331,7 +331,7 @@ MY_Focus.DrawFocus = function(dwType, dwID)
             end
         end
     end
-    -- è¡€é‡
+    -- ÑªÁ¿
     if dwType ~= TARGET.DOODAD then
         local nCurrentLife, nMaxLife = info.nCurrentLife, info.nMaxLife
         local nCurrentMana, nMaxMana = info.nCurrentMana, info.nMaxMana
@@ -355,7 +355,7 @@ MY_Focus.DrawFocus = function(dwType, dwID)
             hItem:Lookup('Handle_LM/Text_Mana'):SetText(nCurrentMana .. '/' .. nMaxMana)
         end
     end
-    -- è¯»æ¡
+    -- ¶ÁÌõ
     if dwType ~= TARGET.DOODAD then
         local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = obj.GetSkillPrepareState()
         if MY_Focus.bTraversal and dwType == TARGET.PLAYER
@@ -380,7 +380,7 @@ MY_Focus.DrawFocus = function(dwType, dwID)
             end
         end
     end
-    -- ç›®æ ‡çš„ç›®æ ‡
+    -- Ä¿±êµÄÄ¿±ê
     if MY_Focus.bShowTarget and dwType ~= TARGET.DOODAD then
         local tp, id = obj.GetTarget()
         local tar = MY.Game.GetObject(tp, id)
@@ -390,7 +390,7 @@ MY_Focus.DrawFocus = function(dwType, dwID)
             hItem:Lookup('Handle_Progress/Text_Target'):SetText('')
         end
     end
-    -- é€‰ä¸­çŠ¶æ€
+    -- Ñ¡ÖĞ×´Ì¬
     hItem:Lookup('Image_Select'):Hide()
     local player = GetClientPlayer()
     if player then
@@ -399,15 +399,15 @@ MY_Focus.DrawFocus = function(dwType, dwID)
             hItem:Lookup('Image_Select'):Show()
         end
     end
-    -- ç›®æ ‡è·ç¦»
+    -- Ä¿±ê¾àÀë
     local nDistance = math.floor(math.sqrt(math.pow(player.nX - obj.nX, 2) + math.pow(player.nY - obj.nY, 2)) * 10 / 64) / 10
     hItem:Lookup('Handle_Compass/Compass_Distance'):SetText(nDistance)
-    -- è‡ªèº«é¢å‘
+    -- ×ÔÉíÃæÏò
     if player then
         hItem:Lookup('Handle_Compass/Image_Player'):Show()
         hItem:Lookup('Handle_Compass/Image_Player'):SetRotate( - player.nFaceDirection / 128 * math.pi)
     end
-    -- ç›¸å¯¹ä½ç½®
+    -- Ïà¶ÔÎ»ÖÃ
     hItem:Lookup('Handle_Compass/Image_PointRed'):Hide()
     hItem:Lookup('Handle_Compass/Image_PointGreen'):Hide()
     if player and nDistance > 0 then
@@ -419,7 +419,7 @@ MY_Focus.DrawFocus = function(dwType, dwID)
         end
         h:Show()
         local nRotate = 0
-        -- ç‰¹åˆ¤è§’åº¦
+        -- ÌØÅĞ½Ç¶È
         if player.nX == obj.nX then
             if player.nY > obj.nY then
                 nRotate = math.pi / 2
@@ -444,7 +444,7 @@ MY_Focus.DrawFocus = function(dwType, dwID)
     hList:FormatAllItemPos()
 end
 
--- è‡ªé€‚åº”è°ƒæ•´ç•Œé¢å¤§å°
+-- ×ÔÊÊÓ¦µ÷Õû½çÃæ´óĞ¡
 MY_Focus.AdjustUI = function()
     local hList = Station.Lookup('Normal/MY_Focus', 'Handle_List')
     if not hList then
@@ -461,7 +461,7 @@ MY_Focus.AdjustUI = function()
     end
 end
 
--- è·å–å†…åŠŸå¿ƒæ³•å­—ç¬¦ä¸²
+-- »ñÈ¡ÄÚ¹¦ĞÄ·¨×Ö·û´®
 local m_tKungfuName = {}
 MY_Focus.GetKungfuName = function(dwKungfuID)
     if not m_tKungfuName[dwKungfuID] then
@@ -470,7 +470,7 @@ MY_Focus.GetKungfuName = function(dwKungfuID)
     return m_tKungfuName[dwKungfuID]
 end
 
--- è·å–æŠ€èƒ½åç§°å­—ç¬¦ä¸²
+-- »ñÈ¡¼¼ÄÜÃû³Æ×Ö·û´®
 local m_tSkillName = {}
 MY_Focus.GetSkillName = function(dwSkillID, dwSkillLevel)
     if not m_tSkillName[dwSkillID] then
@@ -496,7 +496,7 @@ end
 ##########################################################################
 ]]
 
--- å‘¨æœŸé‡ç»˜
+-- ÖÜÆÚÖØ»æ
 -- local m_nTick = 0
 MY_Focus.OnFrameBreathe = function()
     -- if m_nTick == 0 then
@@ -562,7 +562,7 @@ MY_Focus.OnCheckBoxUncheck = function()
     end
 end
 
--- è·å–è®¾ç½®èœå•
+-- »ñÈ¡ÉèÖÃ²Ëµ¥
 MY_Focus.GetMenu = function()
     local t = {
         szOption = _L["focus list"],
@@ -656,17 +656,17 @@ MY_Focus.GetMenu = function()
                 szOption = _L['namelist manager'],
                 fnAction = function()
                     MY.UI.OpenListEditor('MY_Focus_NamelistManager', MY_Focus.tAutoFocus, function(szText)
-                        -- å»æ‰å‰åç©ºæ ¼
+                        -- È¥µôÇ°ºó¿Õ¸ñ
                         szText = (string.gsub(szText, "^%s*(.-)%s*$", "%1"))
-                        -- éªŒè¯æ˜¯å¦ä¸ºç©º
+                        -- ÑéÖ¤ÊÇ·ñÎª¿Õ
                         if szText=="" then return nil end
-                        -- éªŒè¯æ˜¯å¦é‡å¤
+                        -- ÑéÖ¤ÊÇ·ñÖØ¸´
                         for i, v in ipairs(MY_Focus.tAutoFocus) do
                             if v==szText then
                                 return false
                             end
                         end
-                        -- åŠ å…¥è¡¨
+                        -- ¼ÓÈë±í
                         MY_Focus.AddAutoFocus(szText)
                     end, function(szText)
                         MY_Focus.DelAutoFocus(szText)

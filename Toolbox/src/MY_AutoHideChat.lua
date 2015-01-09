@@ -1,13 +1,13 @@
-ï»¿--
--- è‡ªåŠ¨éšè—èŠå¤©æ 
--- by èŒ—ä¼Š @ åŒæ¢¦é•‡ @ è»èŠ±å®«
+--
+-- ×Ô¶¯Òş²ØÁÄÌìÀ¸
+-- by ÜøÒÁ @ Ë«ÃÎÕò @ İ¶»¨¹¬
 -- Build 20150105
 -- 
 local STATE = {
-    SHOW    = 1, -- å·²æ˜¾ç¤º
-    HIDE    = 2, -- å·²éšè—
-    SHOWING = 3, -- æ¸å˜æ˜¾ç¤ºä¸­
-    HIDDING = 4, -- æ¸å˜éšè—ä¸­
+    SHOW    = 1, -- ÒÑÏÔÊ¾
+    HIDE    = 2, -- ÒÑÒş²Ø
+    SHOWING = 3, -- ½¥±äÏÔÊ¾ÖĞ
+    HIDDING = 4, -- ½¥±äÒş²ØÖĞ
 }
 local m_nState = STATE.SHOW
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
@@ -23,8 +23,8 @@ end
 
 -- show panel
 MY_AutoHideChat.ShowChatPanel = function(nShowFrame, nDelayFrame, callback)
-    nShowFrame  = nShowFrame  or GLOBAL.GAME_FPS / 4  -- æ¸å˜å‡ºç°å¸§æ•°
-    nDelayFrame = nDelayFrame or 0                    -- éšè—å»¶è¿Ÿå¸§æ•°
+    nShowFrame  = nShowFrame  or GLOBAL.GAME_FPS / 4  -- ½¥±ä³öÏÖÖ¡Êı
+    nDelayFrame = nDelayFrame or 0                    -- Òş²ØÑÓ³ÙÖ¡Êı
     -- switch case
     if m_nState == STATE.SHOW then
         -- return when chat panel is visible
@@ -82,8 +82,8 @@ end
 
 -- hide panel
 MY_AutoHideChat.HideChatPanel = function(nHideFrame, nDelayFrame, callback)
-    nHideFrame  = nHideFrame  or GLOBAL.GAME_FPS / 2  -- æ¸å˜æ¶ˆå¤±å¸§æ•°
-    nDelayFrame = nDelayFrame or GLOBAL.GAME_FPS * 5  -- éšè—å»¶è¿Ÿå¸§æ•°
+    nHideFrame  = nHideFrame  or GLOBAL.GAME_FPS / 2  -- ½¥±äÏûÊ§Ö¡Êı
+    nDelayFrame = nDelayFrame or GLOBAL.GAME_FPS * 5  -- Òş²ØÑÓ³ÙÖ¡Êı
     -- switch case
     if m_nState == STATE.SHOW then
         -- get bg alpha
@@ -150,7 +150,7 @@ MY_AutoHideChat.HideChatPanel = function(nHideFrame, nDelayFrame, callback)
     end)
 end
 
--- åˆå§‹åŒ–/ç”Ÿæ•ˆ è®¾ç½®
+-- ³õÊ¼»¯/ÉúĞ§ ÉèÖÃ
 MY_AutoHideChat.ApplyConfig = function()
     if MY_AutoHideChat.bAutoHideChatPanel then
         -- get bg alpha

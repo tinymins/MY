@@ -1,9 +1,9 @@
-ï»¿--
--- ç§‘ä¸¾åŠ©æ‰‹
--- by èŒ—ä¼Š @ åŒæ¢¦é•‡ @ è»èŠ±å®«
+--
+-- ¿Æ¾ÙÖúÊÖ
+-- by ÜøÒÁ @ Ë«ÃÎÕò @ İ¶»¨¹¬
 -- Build 20140730
 --
--- ä¸»è¦åŠŸèƒ½: ç§‘ä¸¾åŠ©æ‰‹
+-- Ö÷Òª¹¦ÄÜ: ¿Æ¾ÙÖúÊÖ
 -- 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."ImRobot/lang/")
 local _Cache = {
@@ -15,7 +15,7 @@ MY_ImRobot = {}
 MY_ImRobot.bEnable = false
 -- RegisterCustomData('MY_ImRobot.bEnable')
 
--- è·å–é¢˜ç›®å’Œç­”æ¡ˆ
+-- »ñÈ¡ÌâÄ¿ºÍ´ğ°¸
 MY_ImRobot.OnWhisper = function(szName, szMsg)
     if szName == GetClientPlayer().szName then
         return
@@ -38,19 +38,19 @@ _Cache.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
     if not MY_ImRobot.bEnable then
         return
     end
-    -- å®¹é”™
+    -- Èİ´í
     if not bRich then
         return
     end
-    -- æ ¼å¼åŒ–æ¶ˆæ¯
+    -- ¸ñÊ½»¯ÏûÏ¢
     local tMsgContent = MY.Chat.FormatContent(szMsg)
-    -- æ£€æµ‹æ¶ˆæ¯æ˜¯å¦æ˜¯åˆ«äººå¯†èŠä½ çš„
+    -- ¼ì²âÏûÏ¢ÊÇ·ñÊÇ±ğÈËÃÜÁÄÄãµÄ
     if tMsgContent[1].type ~= "name" then
         return
     end
-    -- è·å–å¯†èŠä½ çš„äººçš„åå­—
+    -- »ñÈ¡ÃÜÁÄÄãµÄÈËµÄÃû×Ö
     local szName = tMsgContent[1].name
-    -- ç§»é™¤æ¶ˆæ¯å¤´éƒ¨å’Œå°¾éƒ¨æ¢è¡Œ
+    -- ÒÆ³ıÏûÏ¢Í·²¿ºÍÎ²²¿»»ĞĞ
     table.remove(tMsgContent, 1)
     table.remove(tMsgContent, 1)
     table.remove(tMsgContent)
@@ -62,7 +62,7 @@ _Cache.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
         end
     end
     
-    if szText == 'ç¦»å¼€ä¸€ä¼š,ç¨åå›æ¥!' then
+    if szText == 'Àë¿ªÒ»»á,ÉÔºó»ØÀ´!' then
         return
     end
     MY_ImRobot.OnWhisper(szName, szText)

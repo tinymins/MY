@@ -1,9 +1,9 @@
-ï»¿-- 
--- ä¸­åœ°å›¾æ ‡è®°
--- by èŒ—ä¼Š @ åŒæ¢¦é•‡ @ è»èŠ±å®«
+-- 
+-- ÖĞµØÍ¼±ê¼Ç
+-- by ÜøÒÁ @ Ë«ÃÎÕò @ İ¶»¨¹¬
 -- Build 20141204
 --
--- ä¸»è¦åŠŸèƒ½: è®°å½•æ‰€æœ‰NPCå’ŒDoodadä½ç½® æä¾›æœç´¢å’Œæ˜¾ç¤º
+-- Ö÷Òª¹¦ÄÜ: ¼ÇÂ¼ËùÓĞNPCºÍDoodadÎ»ÖÃ Ìá¹©ËÑË÷ºÍÏÔÊ¾
 -- 
 
 MY_MiddleMapMark = {}
@@ -11,7 +11,7 @@ local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_MiddleMapMark/lang/")
 local _Cache = { tMapDataChanged = {} }
 local Data = {}
 local SZ_CACHE_PATH = "cache/NPC_DOODAD_REC/"
-local MAX_DISTINCT_DISTANCE = 4 -- æœ€å¤§ç‹¬ç«‹è·ç¦»4å°ºï¼ˆä½äºè¯¥è·ç¦»çš„ä¸¤ä¸ªå®ä½“è§†ä¸ºåŒä¸€ä¸ªï¼‰
+local MAX_DISTINCT_DISTANCE = 4 -- ×î´ó¶ÀÁ¢¾àÀë4³ß£¨µÍÓÚ¸Ã¾àÀëµÄÁ½¸öÊµÌåÊÓÎªÍ¬Ò»¸ö£©
 MAX_DISTINCT_DISTANCE = MAX_DISTINCT_DISTANCE * MAX_DISTINCT_DISTANCE * 64 * 64
 
 -- HOOK MAP SWITCH
@@ -160,7 +160,7 @@ MY_MiddleMapMark.GetMapData = function(dwMapID)
     return Data[dwMapID]
 end
 
--- å¼€å§‹æŒ‡å®šåœ°å›¾çš„å»¶æ—¶æ•°æ®å¸è½½æ—¶é’Ÿ
+-- ¿ªÊ¼Ö¸¶¨µØÍ¼µÄÑÓÊ±Êı¾İĞ¶ÔØÊ±ÖÓ
 MY_MiddleMapMark.StartDelayUnloadMapData = function(dwMapID)
     -- breathe until unload data
     MY.BreatheCall('MY_MiddleMapMark_DataUnload_' .. dwMapID, function()
@@ -341,7 +341,7 @@ MY.RegisterEvent("DOODAD_ENTER_SCENE", "MY_MiddleMapMark", function()
         return
     end
     -- avoid special doodad
-    if doodad.dwTemplateID == 82 then -- åˆ‡ç£‹ç”¨æ——å¸œ
+    if doodad.dwTemplateID == 82 then -- ÇĞ´èÓÃÆìÖÄ
         return
     end
     -- avoid full number named doodad

@@ -1,9 +1,9 @@
-ï»¿--
--- ç§‘ä¸¾åŠ©æ‰‹
--- by èŒ—ä¼Š @ åŒæ¢¦é•‡ @ è»èŠ±å®«
+--
+-- ¿Æ¾ÙÖúÊÖ
+-- by ÜøÒÁ @ Ë«ÃÎÕò @ İ¶»¨¹¬
 -- Build 20140730
 --
--- ä¸»è¦åŠŸèƒ½: ç§‘ä¸¾åŠ©æ‰‹
+-- Ö÷Òª¹¦ÄÜ: ¿Æ¾ÙÖúÊÖ
 -- 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."ExamTip/lang/")
 local _Cache = {
@@ -14,7 +14,7 @@ local _Cache = {
 }
 MY_ExamTip = {}
 
--- è·å–é¢˜ç›®å’Œç­”æ¡ˆ
+-- »ñÈ¡ÌâÄ¿ºÍ´ğ°¸
 MY_ExamTip.QueryData = function(szQues)
     if _Cache.tLastQu == szQues then
         return nil
@@ -47,7 +47,7 @@ MY_ExamTip.QueryData = function(szQues)
         _Cache.tLastQu = ""
     end, 10000)
 end
--- æäº¤ç©å®¶æ­£ç¡®ç­”æ¡ˆ -- äº‘æ•°æ®æ¥æº
+-- Ìá½»Íæ¼ÒÕıÈ·´ğ°¸ -- ÔÆÊı¾İÀ´Ô´
 MY_ExamTip.SubmitData = function()
     local _, _, szLang, _ = GetVersion()
     local nCommited, nAccepted, nUnsubmit = 0, 0, 0
@@ -65,7 +65,7 @@ MY_ExamTip.SubmitData = function()
         end)
     end
 end
--- æ˜¾ç¤ºç»“æœ
+-- ÏÔÊ¾½á¹û
 MY_ExamTip.ShowResult = function(szQues, szAnsw, szTip)
     local hQues = Station.Lookup("Normal/ExaminationPanel/","Handle_ExamContents"):Lookup(0)
     local hTxt1 = Station.Lookup("Normal/ExaminationPanel/Wnd_Type1/CheckBox_T1No1",'Text_T1No1')
@@ -99,7 +99,7 @@ MY_ExamTip.ShowResult = function(szQues, szAnsw, szTip)
         hChk4:Check(true)
     end
 end
--- æ”¶é›†ç»“æœ
+-- ÊÕ¼¯½á¹û
 MY_ExamTip.CollectResult = function()
     local hQues = Station.Lookup("Normal/ExaminationPanel/","Handle_ExamContents"):Lookup(0)
     local hTxt1 = Station.Lookup("Normal/ExaminationPanel/Wnd_Type1/CheckBox_T1No1",'Text_T1No1')
@@ -128,7 +128,7 @@ MY_ExamTip.CollectResult = function()
         _Cache.tCached[szQues] = szAnsw
     end
 end
--- æ—¶é’Ÿç›‘æ§
+-- Ê±ÖÓ¼à¿Ø
 _Cache.OnFrameBreathe = function()
     local frame = Station.Lookup("Normal/ExaminationPanel")
     if not (frame and frame:IsVisible()) then
@@ -140,12 +140,12 @@ _Cache.OnFrameBreathe = function()
     MY_ExamTip.CollectResult(szQues)
     _Cache.nExamPrintRemainSpace = GetClientPlayer().GetExamPrintRemainSpace()
 end
--- æ³¨å†ŒINITäº‹ä»¶
+-- ×¢²áINITÊÂ¼ş
 MY.RegisterInit(function()
     MY.BreatheCall(_Cache.OnFrameBreathe)
     MY.RegisterEvent("BAG_ITEM_UPDATE", function()
         local item = GetClientPlayer().GetItem(arg0, arg1)
-        if item and item.szName == 'ä¼šè¯•è¡Œæ–‡' then
+        if item and item.szName == '»áÊÔĞĞÎÄ' then
             local nExamPrintRemainSpace = _Cache.nExamPrintRemainSpace
             MY.DelayCall(function()
                 if nExamPrintRemainSpace - GetClientPlayer().GetExamPrintRemainSpace() == 100  then

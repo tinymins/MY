@@ -1,4 +1,4 @@
-ï»¿--
+--
 -- Simple JSON encoding and decoding in pure Lua.
 --
 -- @author hightman, Jeffrey Friedl
@@ -437,16 +437,16 @@ end
 MY = MY or {}
 MY.Json = MY.Json or {}
 
--- è§£æ JSON æ•°æ®ï¼ŒæˆåŠŸè¿”å›æ•°æ®ï¼Œå¤±è´¥è¿”å› nil åŠ é”™è¯¯ä¿¡æ¯
+-- ½âÎö JSON Êı¾İ£¬³É¹¦·µ»ØÊı¾İ£¬Ê§°Ü·µ»Ø nil ¼Ó´íÎóĞÅÏ¢
 -- (mixed) MY.JsonDecode(string szData)
 function MY.Json.Decode(szData)
 	return decode_value(szData)
 end
 
--- ç¼–ç  JSON æ•°æ®ï¼ŒæˆåŠŸè¿”å› JSON å­—ç¬¦ä¸²ï¼Œå¤±è´¥è¿”å› nil
+-- ±àÂë JSON Êı¾İ£¬³É¹¦·µ»Ø JSON ×Ö·û´®£¬Ê§°Ü·µ»Ø nil
 -- (string) MY.JsonEncode(vData[, bPretty])
--- vData å˜é‡æ•°æ®ï¼Œæ”¯æŒå­—ç¬¦ä¸²ã€æ•°å­—ã€Table/Userdata
--- bPretty æ˜¯å¦å¢åŠ ç¼©è¿›ç¾åŒ–ï¼Œé»˜è®¤ä¸º false
+-- vData ±äÁ¿Êı¾İ£¬Ö§³Ö×Ö·û´®¡¢Êı×Ö¡¢Table/Userdata
+-- bPretty ÊÇ·ñÔö¼ÓËõ½øÃÀ»¯£¬Ä¬ÈÏÎª false
 function MY.Json.Encode(vData, bPretty)
 	return encode_value(vData, {}, bPretty and "")
 end

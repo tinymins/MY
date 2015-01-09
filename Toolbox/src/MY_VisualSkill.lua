@@ -1,4 +1,4 @@
-ï»¿
+
 --[[
 ##########################################################################################################################
       *         *   *                   *                                   *                           *     *           
@@ -24,7 +24,7 @@ MY_VisualSkill.nVisualSkillBoxCount = 5
 RegisterCustomData("MY_VisualSkill.bEnable")
 RegisterCustomData("MY_VisualSkill.anchorVisualSkill")
 RegisterCustomData("MY_VisualSkill.nVisualSkillBoxCount")
--- åŠ è½½ç•Œé¢
+-- ¼ÓÔØ½çÃæ
 MY_VisualSkill.Reload = function()
     -- distory ui
     MY.UI("Normal/MY_VisualSkill"):remove()
@@ -81,47 +81,47 @@ MY_VisualSkill.OnSkillCast = function(dwSkillID, dwSkillLevel)
     end
     -- get name
     local szSkillName, dwIconID = MY.Player.GetSkillName(dwSkillID, dwSkillLevel)
-    if dwSkillID == 4097 then -- éª‘ä¹˜
+    if dwSkillID == 4097 then -- Æï³Ë
         dwIconID = 1899
-    elseif Table_IsSkillFormation(dwSkillID, dwSkillLevel)        -- é˜µæ³•æŠ€èƒ½
-        or Table_IsSkillFormationCaster(dwSkillID, dwSkillLevel)  -- é˜µæ³•é‡Šæ”¾æŠ€èƒ½
-        -- or dwSkillID == 230     -- (230)  ä¸‡èŠ±ä¼¤å®³é˜µæ³•æ–½æ”¾  ä¸ƒç»é€é¥é˜µ
-        -- or dwSkillID == 347     -- (347)  çº¯é˜³æ°”å®—é˜µæ³•æ–½æ”¾  ä¹å®«å…«å¦é˜µ
-        -- or dwSkillID == 526     -- (526)  ä¸ƒç§€æ²»ç–—é˜µæ³•æ–½æ”¾  èŠ±æœˆå‡Œé£Žé˜µ
-        -- or dwSkillID == 662     -- (662)  å¤©ç­–é˜²å¾¡é˜µæ³•é‡Šæ”¾  ä¹è¥„åœ°çŽ„é˜µ
-        -- or dwSkillID == 740     -- (740)  å°‘æž—é˜²å¾¡é˜µæ³•æ–½æ”¾  é‡‘åˆšä¼é­”é˜µ
-        -- or dwSkillID == 745     -- (745)  å°‘æž—æ”»å‡»é˜µæ³•æ–½æ”¾  å¤©é¼“é›·éŸ³é˜µ
-        -- or dwSkillID == 754     -- (754)  å¤©ç­–æ”»å‡»é˜µæ³•é‡Šæ”¾  å«å…¬æŠ˜å†²é˜µ
-        -- or dwSkillID == 778     -- (778)  çº¯é˜³å‰‘å®—é˜µæ³•æ–½æ”¾  åŒ—æ–—ä¸ƒæ˜Ÿé˜µ
-        -- or dwSkillID == 781     -- (781)  ä¸ƒç§€ä¼¤å®³é˜µæ³•æ–½æ”¾  ä¹éŸ³æƒŠå¼¦é˜µ
-        -- or dwSkillID == 1020    -- (1020) ä¸‡èŠ±æ²»ç–—é˜µæ³•æ–½æ”¾  è½æ˜ŸæƒŠé¸¿é˜µ
-        -- or dwSkillID == 1866    -- (1866) è—å‰‘é˜µæ³•é‡Šæ”¾      ä¾å±±è§‚æ¾œé˜µ
-        -- or dwSkillID == 2481    -- (2481) äº”æ¯’æ²»ç–—é˜µæ³•æ–½æ”¾  å¦™æ‰‹ç»‡å¤©é˜µ
-        -- or dwSkillID == 2487    -- (2487) äº”æ¯’æ”»å‡»é˜µæ³•æ–½æ”¾  ä¸‡è›Šå™¬å¿ƒé˜µ
-        -- or dwSkillID == 3216    -- (3216) å”é—¨å¤–åŠŸé˜µæ³•æ–½æ”¾  æµæ˜Ÿèµ¶æœˆé˜µ
-        -- or dwSkillID == 3217    -- (3217) å”é—¨å†…åŠŸé˜µæ³•æ–½æ”¾  åƒæœºç™¾å˜é˜µ
-        -- or dwSkillID == 4674    -- (4674) æ˜Žæ•™æ”»å‡»é˜µæ³•æ–½æ”¾  ç‚Žå¨ç ´é­”é˜µ
-        -- or dwSkillID == 4687    -- (4687) æ˜Žæ•™é˜²å¾¡é˜µæ³•æ–½æ”¾  æ— é‡å…‰æ˜Žé˜µ
-        -- or dwSkillID == 5311    -- (5311) ä¸å¸®æ”»å‡»é˜µæ³•é‡Šæ”¾  é™é¾™ä¼è™Žé˜µ
-        -- or dwSkillID == 13228   -- (13228)  ä¸´å·åˆ—å±±é˜µé‡Šæ”¾  ä¸´å·åˆ—å±±é˜µ
-        -- or dwSkillID == 13275   -- (13275)  é”‹å‡Œæ¨ªç»é˜µæ–½æ”¾  é”‹å‡Œæ¨ªç»é˜µ
-        or dwSkillID == 10         -- (10)    æ¨ªæ‰«åƒå†›           æ¨ªæ‰«åƒå†›
-        or dwSkillID == 11         -- (11)    æ™®é€šæ”»å‡»-æ£æ”»å‡»    å…­åˆæ£
-        or dwSkillID == 12         -- (12)    æ™®é€šæ”»å‡»-æžªæ”»å‡»    æ¢…èŠ±æžªæ³•
-        or dwSkillID == 13         -- (13)    æ™®é€šæ”»å‡»-å‰‘æ”»å‡»    ä¸‰æŸ´å‰‘æ³•
-        or dwSkillID == 14         -- (14)    æ™®é€šæ”»å‡»-æ‹³å¥—æ”»å‡»  é•¿æ‹³
-        or dwSkillID == 15         -- (15)    æ™®é€šæ”»å‡»-åŒå…µæ”»å‡»  è¿žçŽ¯åŒåˆ€
-        or dwSkillID == 16         -- (16)    æ™®é€šæ”»å‡»-ç¬”æ”»å‡»    åˆ¤å®˜ç¬”æ³•
-        or dwSkillID == 1795       -- (1795)  æ™®é€šæ”»å‡»-é‡å‰‘æ”»å‡»  å››å­£å‰‘æ³•
-        or dwSkillID == 2183       -- (2183)  æ™®é€šæ”»å‡»-è™«ç¬›æ”»å‡»  å¤§è’ç¬›æ³•
-        or dwSkillID == 3121       -- (3121)  æ™®é€šæ”»å‡»-å¼“æ”»å‡»    ç½¡é£Žé•–æ³•
-        or dwSkillID == 4326       -- (4326)  æ™®é€šæ”»å‡»-åŒåˆ€æ”»å‡»  å¤§æ¼ åˆ€æ³•
-        or dwSkillID == 13039      -- (13039) æ™®é€šæ”»å‡»_ç›¾åˆ€æ”»å‡»  å·é›ªåˆ€
-        or dwSkillID == 17         -- (17)    æ±Ÿæ¹–-é˜²èº«æ­¦è‰º-æ‰“å æ‰“å
-        or dwSkillID == 18         -- (18)    è¸äº‘ è¸äº‘
-        or dwIconID  == 1817       -- é—­é˜µ
-        or dwIconID  == 533        -- æ‰“å
-        or dwIconID  == 13         -- å­æŠ€èƒ½
+    elseif Table_IsSkillFormation(dwSkillID, dwSkillLevel)        -- Õó·¨¼¼ÄÜ
+        or Table_IsSkillFormationCaster(dwSkillID, dwSkillLevel)  -- Õó·¨ÊÍ·Å¼¼ÄÜ
+        -- or dwSkillID == 230     -- (230)  Íò»¨ÉËº¦Õó·¨Ê©·Å  Æß¾øåÐÒ£Õó
+        -- or dwSkillID == 347     -- (347)  ´¿ÑôÆø×ÚÕó·¨Ê©·Å  ¾Å¹¬°ËØÔÕó
+        -- or dwSkillID == 526     -- (526)  ÆßÐãÖÎÁÆÕó·¨Ê©·Å  »¨ÔÂÁè·çÕó
+        -- or dwSkillID == 662     -- (662)  Ìì²ß·ÀÓùÕó·¨ÊÍ·Å  ¾ÅÏåµØÐþÕó
+        -- or dwSkillID == 740     -- (740)  ÉÙÁÖ·ÀÓùÕó·¨Ê©·Å  ½ð¸Õ·üÄ§Õó
+        -- or dwSkillID == 745     -- (745)  ÉÙÁÖ¹¥»÷Õó·¨Ê©·Å  Ìì¹ÄÀ×ÒôÕó
+        -- or dwSkillID == 754     -- (754)  Ìì²ß¹¥»÷Õó·¨ÊÍ·Å  ÎÀ¹«ÕÛ³åÕó
+        -- or dwSkillID == 778     -- (778)  ´¿Ñô½£×ÚÕó·¨Ê©·Å  ±±¶·ÆßÐÇÕó
+        -- or dwSkillID == 781     -- (781)  ÆßÐãÉËº¦Õó·¨Ê©·Å  ¾ÅÒô¾ªÏÒÕó
+        -- or dwSkillID == 1020    -- (1020) Íò»¨ÖÎÁÆÕó·¨Ê©·Å  ÂäÐÇ¾ªºèÕó
+        -- or dwSkillID == 1866    -- (1866) ²Ø½£Õó·¨ÊÍ·Å      ÒÀÉ½¹ÛÀ½Õó
+        -- or dwSkillID == 2481    -- (2481) Îå¶¾ÖÎÁÆÕó·¨Ê©·Å  ÃîÊÖÖ¯ÌìÕó
+        -- or dwSkillID == 2487    -- (2487) Îå¶¾¹¥»÷Õó·¨Ê©·Å  Íò¹ÆÊÉÐÄÕó
+        -- or dwSkillID == 3216    -- (3216) ÌÆÃÅÍâ¹¦Õó·¨Ê©·Å  Á÷ÐÇ¸ÏÔÂÕó
+        -- or dwSkillID == 3217    -- (3217) ÌÆÃÅÄÚ¹¦Õó·¨Ê©·Å  Ç§»ú°Ù±äÕó
+        -- or dwSkillID == 4674    -- (4674) Ã÷½Ì¹¥»÷Õó·¨Ê©·Å  Ñ×ÍþÆÆÄ§Õó
+        -- or dwSkillID == 4687    -- (4687) Ã÷½Ì·ÀÓùÕó·¨Ê©·Å  ÎÞÁ¿¹âÃ÷Õó
+        -- or dwSkillID == 5311    -- (5311) Ø¤°ï¹¥»÷Õó·¨ÊÍ·Å  ½µÁú·ü»¢Õó
+        -- or dwSkillID == 13228   -- (13228)  ÁÙ´¨ÁÐÉ½ÕóÊÍ·Å  ÁÙ´¨ÁÐÉ½Õó
+        -- or dwSkillID == 13275   -- (13275)  ·æÁèºá¾øÕóÊ©·Å  ·æÁèºá¾øÕó
+        or dwSkillID == 10         -- (10)    ºáÉ¨Ç§¾ü           ºáÉ¨Ç§¾ü
+        or dwSkillID == 11         -- (11)    ÆÕÍ¨¹¥»÷-¹÷¹¥»÷    ÁùºÏ¹÷
+        or dwSkillID == 12         -- (12)    ÆÕÍ¨¹¥»÷-Ç¹¹¥»÷    Ã·»¨Ç¹·¨
+        or dwSkillID == 13         -- (13)    ÆÕÍ¨¹¥»÷-½£¹¥»÷    Èý²ñ½£·¨
+        or dwSkillID == 14         -- (14)    ÆÕÍ¨¹¥»÷-È­Ì×¹¥»÷  ³¤È­
+        or dwSkillID == 15         -- (15)    ÆÕÍ¨¹¥»÷-Ë«±ø¹¥»÷  Á¬»·Ë«µ¶
+        or dwSkillID == 16         -- (16)    ÆÕÍ¨¹¥»÷-±Ê¹¥»÷    ÅÐ¹Ù±Ê·¨
+        or dwSkillID == 1795       -- (1795)  ÆÕÍ¨¹¥»÷-ÖØ½£¹¥»÷  ËÄ¼¾½£·¨
+        or dwSkillID == 2183       -- (2183)  ÆÕÍ¨¹¥»÷-³æµÑ¹¥»÷  ´ó»ÄµÑ·¨
+        or dwSkillID == 3121       -- (3121)  ÆÕÍ¨¹¥»÷-¹­¹¥»÷    î¸·çïÚ·¨
+        or dwSkillID == 4326       -- (4326)  ÆÕÍ¨¹¥»÷-Ë«µ¶¹¥»÷  ´óÄ®µ¶·¨
+        or dwSkillID == 13039      -- (13039) ÆÕÍ¨¹¥»÷_¶Üµ¶¹¥»÷  ¾íÑ©µ¶
+        or dwSkillID == 17         -- (17)    ½­ºþ-·ÀÉíÎäÒÕ-´ò×ø ´ò×ø
+        or dwSkillID == 18         -- (18)    Ì¤ÔÆ Ì¤ÔÆ
+        or dwIconID  == 1817       -- ±ÕÕó
+        or dwIconID  == 533        -- ´ò×ø
+        or dwIconID  == 13         -- ×Ó¼¼ÄÜ
         or not szSkillName
         or szSkillName == ""
     then

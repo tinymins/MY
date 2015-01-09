@@ -1,134 +1,134 @@
-ï»¿--
--- æˆ˜æ–—ç»Ÿè®¡ æ•°æ®æ”¶é›†å¤„ç†éƒ¨åˆ†
--- by èŒ—ä¼Š @ åŒæ¢¦é•‡ @ è»èŠ±å®«
+--
+-- Õ½¶·Í³¼Æ Êı¾İÊÕ¼¯´¦Àí²¿·Ö
+-- by ÜøÒÁ @ Ë«ÃÎÕò @ İ¶»¨¹¬
 -- Build 20140730
 -- 
 --[[
-[SKILL_RESULT_TYPE]æšä¸¾ï¼š
-SKILL_RESULT_TYPE.PHYSICS_DAMAGE       = 0  -- å¤–åŠŸä¼¤å®³
-SKILL_RESULT_TYPE.SOLAR_MAGIC_DAMAGE   = 1  -- é˜³æ€§å†…åŠŸä¼¤å®³
-SKILL_RESULT_TYPE.NEUTRAL_MAGIC_DAMAGE = 2  -- æ··å…ƒæ€§å†…åŠŸä¼¤å®³
-SKILL_RESULT_TYPE.LUNAR_MAGIC_DAMAGE   = 3  -- é˜´æ€§å†…åŠŸä¼¤å®³
-SKILL_RESULT_TYPE.POISON_DAMAGE        = 4  -- æ¯’æ€§ä¼¤å®³
-SKILL_RESULT_TYPE.REFLECTIED_DAMAGE    = 5  -- åå¼¹ä¼¤å®³
-SKILL_RESULT_TYPE.THERAPY              = 6  -- æ²»ç–—
-SKILL_RESULT_TYPE.STEAL_LIFE           = 7  -- ç”Ÿå‘½å·å–(<D0>ä»<D1>è·å¾—äº†<D2>ç‚¹æ°”è¡€ã€‚)
-SKILL_RESULT_TYPE.ABSORB_THERAPY       = 8  -- åŒ–è§£æ²»ç–—
-SKILL_RESULT_TYPE.ABSORB_DAMAGE        = 9  -- åŒ–è§£ä¼¤å®³
-SKILL_RESULT_TYPE.SHIELD_DAMAGE        = 10 -- æ— æ•ˆä¼¤å®³
-SKILL_RESULT_TYPE.PARRY_DAMAGE         = 11 -- æ‹†æ‹›
-SKILL_RESULT_TYPE.INSIGHT_DAMAGE       = 12 -- è¯†ç ´
-SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE     = 13 -- æœ‰æ•ˆä¼¤å®³
-SKILL_RESULT_TYPE.EFFECTIVE_THERAPY    = 14 -- æœ‰æ•ˆæ²»ç–—
-SKILL_RESULT_TYPE.TRANSFER_LIFE        = 15 -- å¸å–ç”Ÿå‘½
-SKILL_RESULT_TYPE.TRANSFER_MANA        = 16 -- å¸å–å†…åŠ›
+[SKILL_RESULT_TYPE]Ã¶¾Ù£º
+SKILL_RESULT_TYPE.PHYSICS_DAMAGE       = 0  -- Íâ¹¦ÉËº¦
+SKILL_RESULT_TYPE.SOLAR_MAGIC_DAMAGE   = 1  -- ÑôĞÔÄÚ¹¦ÉËº¦
+SKILL_RESULT_TYPE.NEUTRAL_MAGIC_DAMAGE = 2  -- »ìÔªĞÔÄÚ¹¦ÉËº¦
+SKILL_RESULT_TYPE.LUNAR_MAGIC_DAMAGE   = 3  -- ÒõĞÔÄÚ¹¦ÉËº¦
+SKILL_RESULT_TYPE.POISON_DAMAGE        = 4  -- ¶¾ĞÔÉËº¦
+SKILL_RESULT_TYPE.REFLECTIED_DAMAGE    = 5  -- ·´µ¯ÉËº¦
+SKILL_RESULT_TYPE.THERAPY              = 6  -- ÖÎÁÆ
+SKILL_RESULT_TYPE.STEAL_LIFE           = 7  -- ÉúÃüÍµÈ¡(<D0>´Ó<D1>»ñµÃÁË<D2>µãÆøÑª¡£)
+SKILL_RESULT_TYPE.ABSORB_THERAPY       = 8  -- »¯½âÖÎÁÆ
+SKILL_RESULT_TYPE.ABSORB_DAMAGE        = 9  -- »¯½âÉËº¦
+SKILL_RESULT_TYPE.SHIELD_DAMAGE        = 10 -- ÎŞĞ§ÉËº¦
+SKILL_RESULT_TYPE.PARRY_DAMAGE         = 11 -- ²ğÕĞ
+SKILL_RESULT_TYPE.INSIGHT_DAMAGE       = 12 -- Ê¶ÆÆ
+SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE     = 13 -- ÓĞĞ§ÉËº¦
+SKILL_RESULT_TYPE.EFFECTIVE_THERAPY    = 14 -- ÓĞĞ§ÖÎÁÆ
+SKILL_RESULT_TYPE.TRANSFER_LIFE        = 15 -- ÎüÈ¡ÉúÃü
+SKILL_RESULT_TYPE.TRANSFER_MANA        = 16 -- ÎüÈ¡ÄÚÁ¦
 
--- Data DataDisplay History[] æ•°æ®ç»“æ„
+-- Data DataDisplay History[] Êı¾İ½á¹¹
 Data = {
-    UUID = æˆ˜æ–—ç»Ÿä¸€æ ‡ç¤ºç¬¦,
-    nTimeBegin  = æˆ˜æ–—å¼€å§‹UNIXæ—¶é—´æˆ³,
-    nTimeDuring = æˆ˜æ–—æŒç»­ç§’æ•°,
-    Damage = {                                                -- è¾“å‡ºç»Ÿè®¡
-        ç©å®¶çš„dwID = {                                        -- è¯¥å¯¹è±¡çš„è¾“å‡ºç»Ÿè®¡
-            nTotal       = 2314214,                           -- æ€»è¾“å‡º
-            nTotalEffect = 132144 ,                           -- æœ‰æ•ˆè¾“å‡º
-            Detail = {                                        -- è¾“å‡ºç»“æœåˆ†ç±»ç»Ÿè®¡
+    UUID = Õ½¶·Í³Ò»±êÊ¾·û,
+    nTimeBegin  = Õ½¶·¿ªÊ¼UNIXÊ±¼ä´Á,
+    nTimeDuring = Õ½¶·³ÖĞøÃëÊı,
+    Damage = {                                                -- Êä³öÍ³¼Æ
+        Íæ¼ÒµÄdwID = {                                        -- ¸Ã¶ÔÏóµÄÊä³öÍ³¼Æ
+            nTotal       = 2314214,                           -- ×ÜÊä³ö
+            nTotalEffect = 132144 ,                           -- ÓĞĞ§Êä³ö
+            Detail = {                                        -- Êä³ö½á¹û·ÖÀàÍ³¼Æ
                 SKILL_RESULT.HIT = {
-                    nCount       = 10    ,                    -- å‘½ä¸­è®°å½•æ•°é‡
-                    nMax         = 34210 ,                    -- å•æ¬¡å‘½ä¸­æœ€å¤§å€¼
-                    nMaxEffect   = 29817 ,                    -- å•æ¬¡å‘½ä¸­æœ€å¤§æœ‰æ•ˆå€¼
-                    nMin         = 8790  ,                    -- å•æ¬¡å‘½ä¸­æœ€å°å€¼
-                    nMinEffect   = 7657  ,                    -- å•æ¬¡å‘½ä¸­æœ€å°æœ‰æ•ˆå€¼
-                    nAvg         = 27818 ,                    -- å•æ¬¡å‘½ä¸­å¹³å‡å€¼
-                    nAvgEffect   = 27818 ,                    -- å•æ¬¡å‘½ä¸­å¹³å‡æœ‰æ•ˆå€¼
-                    nTotal       = 278560,                    -- æ‰€ä»¥å‘½ä¸­æ€»ä¼¤å®³
-                    nTotalEffect = 224750,                    -- æ‰€æœ‰å‘½ä¸­æ€»æœ‰æ•ˆä¼¤å®³
+                    nCount       = 10    ,                    -- ÃüÖĞ¼ÇÂ¼ÊıÁ¿
+                    nMax         = 34210 ,                    -- µ¥´ÎÃüÖĞ×î´óÖµ
+                    nMaxEffect   = 29817 ,                    -- µ¥´ÎÃüÖĞ×î´óÓĞĞ§Öµ
+                    nMin         = 8790  ,                    -- µ¥´ÎÃüÖĞ×îĞ¡Öµ
+                    nMinEffect   = 7657  ,                    -- µ¥´ÎÃüÖĞ×îĞ¡ÓĞĞ§Öµ
+                    nAvg         = 27818 ,                    -- µ¥´ÎÃüÖĞÆ½¾ùÖµ
+                    nAvgEffect   = 27818 ,                    -- µ¥´ÎÃüÖĞÆ½¾ùÓĞĞ§Öµ
+                    nTotal       = 278560,                    -- ËùÒÔÃüÖĞ×ÜÉËº¦
+                    nTotalEffect = 224750,                    -- ËùÓĞÃüÖĞ×ÜÓĞĞ§ÉËº¦
                 },
                 SKILL_RESULT.MISS = { ... },
                 SKILL_RESULT.CRITICAL = { ... },
             },
-            Skill = {                                         -- è¯¥ç©å®¶å…·ä½“é€ æˆè¾“å‡ºçš„æŠ€èƒ½ç»Ÿè®¡
-                å››è±¡è½®å› = {                                  -- è¯¥ç©å®¶å››è±¡è½®å›é€ æˆçš„è¾“å‡ºç»Ÿè®¡
-                    nCount       = 2     ,                    -- è¯¥ç©å®¶å››è±¡è½®å›è¾“å‡ºæ¬¡æ•°
-                    nMax         = 13415 ,                    -- è¯¥ç©å®¶å››è±¡è½®å›æœ€å¤§è¾“å‡ºé‡
-                    nMaxEffect   = 9080  ,                    -- è¯¥ç©å®¶å››è±¡è½®å›æœ€å¤§æœ‰æ•ˆè¾“å‡ºé‡
-                    nTotal       = 23213 ,                    -- è¯¥ç©å®¶å››è±¡è½®å›è¾“å‡ºé‡æ€»å’Œ
-                    nTotalEffect = 321421,                    -- è¯¥ç©å®¶å››è±¡è½®å›æœ‰æ•ˆè¾“å‡ºé‡æ€»å’Œ
-                    Detail = {                                -- è¯¥ç©å®¶å››è±¡è½®å›è¾“å‡ºç»“æœåˆ†ç±»ç»Ÿè®¡
+            Skill = {                                         -- ¸ÃÍæ¼Ò¾ßÌåÔì³ÉÊä³öµÄ¼¼ÄÜÍ³¼Æ
+                ËÄÏóÂÖ»Ø = {                                  -- ¸ÃÍæ¼ÒËÄÏóÂÖ»ØÔì³ÉµÄÊä³öÍ³¼Æ
+                    nCount       = 2     ,                    -- ¸ÃÍæ¼ÒËÄÏóÂÖ»ØÊä³ö´ÎÊı
+                    nMax         = 13415 ,                    -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Ø×î´óÊä³öÁ¿
+                    nMaxEffect   = 9080  ,                    -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Ø×î´óÓĞĞ§Êä³öÁ¿
+                    nTotal       = 23213 ,                    -- ¸ÃÍæ¼ÒËÄÏóÂÖ»ØÊä³öÁ¿×ÜºÍ
+                    nTotalEffect = 321421,                    -- ¸ÃÍæ¼ÒËÄÏóÂÖ»ØÓĞĞ§Êä³öÁ¿×ÜºÍ
+                    Detail = {                                -- ¸ÃÍæ¼ÒËÄÏóÂÖ»ØÊä³ö½á¹û·ÖÀàÍ³¼Æ
                         SKILL_RESULT.HIT = {                    
-                            nCount       = 10    ,            -- è¯¥ç©å®¶å››è±¡è½®å›å‘½ä¸­è®°å½•æ•°é‡
-                            nMax         = 34210 ,            -- è¯¥ç©å®¶å››è±¡è½®å›å•æ¬¡å‘½ä¸­æœ€å¤§å€¼
-                            nMaxEffect   = 29817 ,            -- è¯¥ç©å®¶å››è±¡è½®å›å•æ¬¡å‘½ä¸­æœ€å¤§æœ‰æ•ˆå€¼
-                            nMin         = 8790  ,            -- è¯¥ç©å®¶å››è±¡è½®å›å•æ¬¡å‘½ä¸­æœ€å°å€¼
-                            nMinEffect   = 7657  ,            -- è¯¥ç©å®¶å››è±¡è½®å›å•æ¬¡å‘½ä¸­æœ€å°æœ‰æ•ˆå€¼
-                            nAvg         = 27818 ,            -- è¯¥ç©å®¶å››è±¡è½®å›å•æ¬¡å‘½ä¸­å¹³å‡å€¼
-                            nAvgEffect   = 27818 ,            -- è¯¥ç©å®¶å››è±¡è½®å›å•æ¬¡å‘½ä¸­å¹³å‡æœ‰æ•ˆå€¼
-                            nTotal       = 278560,            -- è¯¥ç©å®¶å››è±¡è½®å›æ‰€æœ‰å‘½ä¸­æ€»ä¼¤å®³
-                            nTotalEffect = 224750,            -- è¯¥ç©å®¶å››è±¡è½®å›æ‰€æœ‰å‘½ä¸­æ€»æœ‰æ•ˆä¼¤å®³
+                            nCount       = 10    ,            -- ¸ÃÍæ¼ÒËÄÏóÂÖ»ØÃüÖĞ¼ÇÂ¼ÊıÁ¿
+                            nMax         = 34210 ,            -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Øµ¥´ÎÃüÖĞ×î´óÖµ
+                            nMaxEffect   = 29817 ,            -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Øµ¥´ÎÃüÖĞ×î´óÓĞĞ§Öµ
+                            nMin         = 8790  ,            -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Øµ¥´ÎÃüÖĞ×îĞ¡Öµ
+                            nMinEffect   = 7657  ,            -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Øµ¥´ÎÃüÖĞ×îĞ¡ÓĞĞ§Öµ
+                            nAvg         = 27818 ,            -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Øµ¥´ÎÃüÖĞÆ½¾ùÖµ
+                            nAvgEffect   = 27818 ,            -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Øµ¥´ÎÃüÖĞÆ½¾ùÓĞĞ§Öµ
+                            nTotal       = 278560,            -- ¸ÃÍæ¼ÒËÄÏóÂÖ»ØËùÓĞÃüÖĞ×ÜÉËº¦
+                            nTotalEffect = 224750,            -- ¸ÃÍæ¼ÒËÄÏóÂÖ»ØËùÓĞÃüÖĞ×ÜÓĞĞ§ÉËº¦
                         },
                         SKILL_RESULT.MISS = { ... },
                         SKILL_RESULT.CRITICAL = { ... },
                     },
-                    Target = {                                -- è¯¥ç©å®¶å››è±¡è½®å›æ‰¿å—è€…ç»Ÿè®¡
-                        ç©å®¶dwID = {                          -- è¯¥ç©å®¶å››è±¡è½®å›å‡»ä¸­çš„è¿™ä¸ªç©å®¶æ•°æ®ç»Ÿè®¡
-                            nMax         = 13415 ,            -- è¯¥ç©å®¶å››è±¡è½®å›å‡»ä¸­çš„è¿™ä¸ªç©å®¶æœ€å¤§ä¼¤å®³
-                            nMaxEffect   = 9080  ,            -- è¯¥ç©å®¶å››è±¡è½®å›å‡»ä¸­çš„è¿™ä¸ªç©å®¶æœ€å¤§æœ‰æ•ˆä¼¤å®³
-                            nTotal       = 23213 ,            -- è¯¥ç©å®¶å››è±¡è½®å›å‡»ä¸­çš„è¿™ä¸ªç©å®¶ä¼¤å®³æ€»å’Œ
-                            nTotalEffect = 321421,            -- è¯¥ç©å®¶å››è±¡è½®å›å‡»ä¸­çš„è¿™ä¸ªç©å®¶æœ‰æ•ˆä¼¤å®³æ€»å’Œ
-                            Count = {                         -- è¯¥ç©å®¶å››è±¡è½®å›å‡»ä¸­çš„è¿™ä¸ªç©å®¶ç»“æœç»Ÿè®¡
+                    Target = {                                -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Ø³ĞÊÜÕßÍ³¼Æ
+                        Íæ¼ÒdwID = {                          -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Ø»÷ÖĞµÄÕâ¸öÍæ¼ÒÊı¾İÍ³¼Æ
+                            nMax         = 13415 ,            -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Ø»÷ÖĞµÄÕâ¸öÍæ¼Ò×î´óÉËº¦
+                            nMaxEffect   = 9080  ,            -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Ø»÷ÖĞµÄÕâ¸öÍæ¼Ò×î´óÓĞĞ§ÉËº¦
+                            nTotal       = 23213 ,            -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Ø»÷ÖĞµÄÕâ¸öÍæ¼ÒÉËº¦×ÜºÍ
+                            nTotalEffect = 321421,            -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Ø»÷ÖĞµÄÕâ¸öÍæ¼ÒÓĞĞ§ÉËº¦×ÜºÍ
+                            Count = {                         -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Ø»÷ÖĞµÄÕâ¸öÍæ¼Ò½á¹ûÍ³¼Æ
                                 SKILL_RESULT.HIT      = 5,
                                 SKILL_RESULT.MISS     = 3,
                                 SKILL_RESULT.CRITICAL = 3,
                             },
                         },
-                        Npcåå­— = { ... },
+                        NpcÃû×Ö = { ... },
                         ...
                     },
                 }, 
-                ä¸¤ä»ªåŒ–å½¢ = { ... },
+                Á½ÒÇ»¯ĞÎ = { ... },
                 ...
             },
-            Target = {                                        -- è¯¥ç©å®¶å…·ä½“é€ æˆè¾“å‡ºçš„å¯¹è±¡ç»Ÿè®¡
-                ç©å®¶dwID = {                                  -- è¯¥ç©å®¶å¯¹è¯¥dwIDçš„ç©å®¶é€ æˆçš„è¾“å‡ºç»Ÿè®¡
-                    nCount       = 2     ,                    -- è¯¥ç©å®¶å¯¹è¯¥dwIDçš„ç©å®¶è¾“å‡ºæ¬¡æ•°
-                    nMax         = 13415 ,                    -- è¯¥ç©å®¶å¯¹è¯¥dwIDçš„ç©å®¶å•æ¬¡æœ€å¤§è¾“å‡ºé‡
-                    nMaxEffect   = 9080  ,                    -- è¯¥ç©å®¶å¯¹è¯¥dwIDçš„ç©å®¶å•æ¬¡æœ€å¤§æœ‰æ•ˆè¾“å‡ºé‡
-                    nTotal       = 23213 ,                    -- è¯¥ç©å®¶å¯¹è¯¥dwIDçš„ç©å®¶è¾“å‡ºé‡æ€»å’Œ
-                    nTotalEffect = 321421,                    -- è¯¥ç©å®¶å¯¹è¯¥dwIDçš„ç©å®¶æœ‰æ•ˆè¾“å‡ºé‡æ€»å’Œ
-                    Detail = {                                -- è¯¥ç©å®¶å¯¹è¯¥dwIDçš„ç©å®¶è¾“å‡ºç»“æœåˆ†ç±»ç»Ÿè®¡
+            Target = {                                        -- ¸ÃÍæ¼Ò¾ßÌåÔì³ÉÊä³öµÄ¶ÔÏóÍ³¼Æ
+                Íæ¼ÒdwID = {                                  -- ¸ÃÍæ¼Ò¶Ô¸ÃdwIDµÄÍæ¼ÒÔì³ÉµÄÊä³öÍ³¼Æ
+                    nCount       = 2     ,                    -- ¸ÃÍæ¼Ò¶Ô¸ÃdwIDµÄÍæ¼ÒÊä³ö´ÎÊı
+                    nMax         = 13415 ,                    -- ¸ÃÍæ¼Ò¶Ô¸ÃdwIDµÄÍæ¼Òµ¥´Î×î´óÊä³öÁ¿
+                    nMaxEffect   = 9080  ,                    -- ¸ÃÍæ¼Ò¶Ô¸ÃdwIDµÄÍæ¼Òµ¥´Î×î´óÓĞĞ§Êä³öÁ¿
+                    nTotal       = 23213 ,                    -- ¸ÃÍæ¼Ò¶Ô¸ÃdwIDµÄÍæ¼ÒÊä³öÁ¿×ÜºÍ
+                    nTotalEffect = 321421,                    -- ¸ÃÍæ¼Ò¶Ô¸ÃdwIDµÄÍæ¼ÒÓĞĞ§Êä³öÁ¿×ÜºÍ
+                    Detail = {                                -- ¸ÃÍæ¼Ò¶Ô¸ÃdwIDµÄÍæ¼ÒÊä³ö½á¹û·ÖÀàÍ³¼Æ
                         SKILL_RESULT.HIT = {                    
-                            nCount       = 10    ,            -- è¯¥ç©å®¶å¯¹è¯¥dwIDçš„ç©å®¶å‘½ä¸­è®°å½•æ•°é‡
-                            nMax         = 34210 ,            -- è¯¥ç©å®¶å¯¹è¯¥dwIDçš„ç©å®¶å•æ¬¡å‘½ä¸­æœ€å¤§å€¼
-                            nMaxEffect   = 29817 ,            -- è¯¥ç©å®¶å¯¹è¯¥dwIDçš„ç©å®¶å•æ¬¡å‘½ä¸­æœ€å¤§æœ‰æ•ˆå€¼
-                            nMin         = 8790  ,            -- è¯¥ç©å®¶å¯¹è¯¥dwIDçš„ç©å®¶å•æ¬¡å‘½ä¸­æœ€å°å€¼
-                            nMinEffect   = 7657  ,            -- è¯¥ç©å®¶å¯¹è¯¥dwIDçš„ç©å®¶å•æ¬¡å‘½ä¸­æœ€å°æœ‰æ•ˆå€¼
-                            nAvg         = 27818 ,            -- è¯¥ç©å®¶å¯¹è¯¥dwIDçš„ç©å®¶å•æ¬¡å‘½ä¸­å¹³å‡å€¼
-                            nAvgEffect   = 27818 ,            -- è¯¥ç©å®¶å¯¹è¯¥dwIDçš„ç©å®¶å•æ¬¡å‘½ä¸­å¹³å‡æœ‰æ•ˆå€¼
-                            nTotal       = 278560,            -- è¯¥ç©å®¶å¯¹è¯¥dwIDçš„ç©å®¶æ‰€æœ‰å‘½ä¸­æ€»ä¼¤å®³
-                            nTotalEffect = 224750,            -- è¯¥ç©å®¶å¯¹è¯¥dwIDçš„ç©å®¶æ‰€æœ‰å‘½ä¸­æ€»æœ‰æ•ˆä¼¤å®³
+                            nCount       = 10    ,            -- ¸ÃÍæ¼Ò¶Ô¸ÃdwIDµÄÍæ¼ÒÃüÖĞ¼ÇÂ¼ÊıÁ¿
+                            nMax         = 34210 ,            -- ¸ÃÍæ¼Ò¶Ô¸ÃdwIDµÄÍæ¼Òµ¥´ÎÃüÖĞ×î´óÖµ
+                            nMaxEffect   = 29817 ,            -- ¸ÃÍæ¼Ò¶Ô¸ÃdwIDµÄÍæ¼Òµ¥´ÎÃüÖĞ×î´óÓĞĞ§Öµ
+                            nMin         = 8790  ,            -- ¸ÃÍæ¼Ò¶Ô¸ÃdwIDµÄÍæ¼Òµ¥´ÎÃüÖĞ×îĞ¡Öµ
+                            nMinEffect   = 7657  ,            -- ¸ÃÍæ¼Ò¶Ô¸ÃdwIDµÄÍæ¼Òµ¥´ÎÃüÖĞ×îĞ¡ÓĞĞ§Öµ
+                            nAvg         = 27818 ,            -- ¸ÃÍæ¼Ò¶Ô¸ÃdwIDµÄÍæ¼Òµ¥´ÎÃüÖĞÆ½¾ùÖµ
+                            nAvgEffect   = 27818 ,            -- ¸ÃÍæ¼Ò¶Ô¸ÃdwIDµÄÍæ¼Òµ¥´ÎÃüÖĞÆ½¾ùÓĞĞ§Öµ
+                            nTotal       = 278560,            -- ¸ÃÍæ¼Ò¶Ô¸ÃdwIDµÄÍæ¼ÒËùÓĞÃüÖĞ×ÜÉËº¦
+                            nTotalEffect = 224750,            -- ¸ÃÍæ¼Ò¶Ô¸ÃdwIDµÄÍæ¼ÒËùÓĞÃüÖĞ×ÜÓĞĞ§ÉËº¦
                         },
                         SKILL_RESULT.MISS = { ... },
                         SKILL_RESULT.CRITICAL = { ... },
                     },
-                    Skill = {                                 -- è¯¥ç©å®¶å››è±¡è½®å›æ‰¿å—è€…ç»Ÿè®¡
-                        ç©å®¶dwID = {                          -- è¯¥ç©å®¶å››è±¡è½®å›å‡»ä¸­çš„è¿™ä¸ªç©å®¶æ•°æ®ç»Ÿè®¡
-                            nMax         = 13415 ,            -- è¯¥ç©å®¶å››è±¡è½®å›å‡»ä¸­çš„è¿™ä¸ªç©å®¶æœ€å¤§ä¼¤å®³
-                            nMaxEffect   = 9080  ,            -- è¯¥ç©å®¶å››è±¡è½®å›å‡»ä¸­çš„è¿™ä¸ªç©å®¶æœ€å¤§æœ‰æ•ˆä¼¤å®³
-                            nTotal       = 23213 ,            -- è¯¥ç©å®¶å››è±¡è½®å›å‡»ä¸­çš„è¿™ä¸ªç©å®¶ä¼¤å®³æ€»å’Œ
-                            nTotalEffect = 321421,            -- è¯¥ç©å®¶å››è±¡è½®å›å‡»ä¸­çš„è¿™ä¸ªç©å®¶æœ‰æ•ˆä¼¤å®³æ€»å’Œ
-                            Count = {                         -- è¯¥ç©å®¶å››è±¡è½®å›å‡»ä¸­çš„è¿™ä¸ªç©å®¶ç»“æœç»Ÿè®¡
+                    Skill = {                                 -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Ø³ĞÊÜÕßÍ³¼Æ
+                        Íæ¼ÒdwID = {                          -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Ø»÷ÖĞµÄÕâ¸öÍæ¼ÒÊı¾İÍ³¼Æ
+                            nMax         = 13415 ,            -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Ø»÷ÖĞµÄÕâ¸öÍæ¼Ò×î´óÉËº¦
+                            nMaxEffect   = 9080  ,            -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Ø»÷ÖĞµÄÕâ¸öÍæ¼Ò×î´óÓĞĞ§ÉËº¦
+                            nTotal       = 23213 ,            -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Ø»÷ÖĞµÄÕâ¸öÍæ¼ÒÉËº¦×ÜºÍ
+                            nTotalEffect = 321421,            -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Ø»÷ÖĞµÄÕâ¸öÍæ¼ÒÓĞĞ§ÉËº¦×ÜºÍ
+                            Count = {                         -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Ø»÷ÖĞµÄÕâ¸öÍæ¼Ò½á¹ûÍ³¼Æ
                                 SKILL_RESULT.HIT      = 5,
                                 SKILL_RESULT.MISS     = 3,
                                 SKILL_RESULT.CRITICAL = 3,
                             },
                         },
-                        Npcåå­— = { ... },
+                        NpcÃû×Ö = { ... },
                         ...
                     },
                 },
             },
         },
-        NPCçš„åå­— = { ... },
+        NPCµÄÃû×Ö = { ... },
     },
     Heal = { ... },
     BeHeal = { ... },
@@ -136,13 +136,13 @@ Data = {
 }
 ]]
 local SKILL_RESULT = {
-    HIT     = 0, -- å‘½ä¸­
-    BLOCK   = 1, -- æ ¼æŒ¡
-    SHIELD  = 2, -- æ— æ•ˆ
-    MISS    = 3, -- åç¦»
-    DODGE   = 4, -- é—ªé¿
-    CRITICAL= 5, -- ä¼šå¿ƒ
-    INSIGHT = 6, -- è¯†ç ´
+    HIT     = 0, -- ÃüÖĞ
+    BLOCK   = 1, -- ¸ñµ²
+    SHIELD  = 2, -- ÎŞĞ§
+    MISS    = 3, -- Æ«Àë
+    DODGE   = 4, -- ÉÁ±Ü
+    CRITICAL= 5, -- »áĞÄ
+    INSIGHT = 6, -- Ê¶ÆÆ
 }
 
 MY_Recount = MY_Recount or {}
@@ -153,8 +153,8 @@ MY_Recount.Data.nMinFightTime = 30
 local _Cache = {
     szRecFile = 'cache/FIGHT_RECOUNT_LOG/data',
 }
-local Data          -- å½“å‰æˆ˜æ–—æ•°æ®è®°å½•
-local History       -- å†å²æˆ˜æ–—è®°å½•
+local Data          -- µ±Ç°Õ½¶·Êı¾İ¼ÇÂ¼
+local History       -- ÀúÊ·Õ½¶·¼ÇÂ¼
 
 --[[
 ##################################################################################################
@@ -172,7 +172,7 @@ local History       -- å†å²æˆ˜æ–—è®°å½•
           # #               #           #         #           # # # # #         # # # # # # # #   
 ##################################################################################################
 ]]
--- ç™»é™†æ¸¸æˆåŠ è½½ä¿å­˜çš„æ•°æ®
+-- µÇÂ½ÓÎÏ·¼ÓÔØ±£´æµÄÊı¾İ
 MY.RegisterInit(function()
     local data = MY.Sys.LoadUserData(_Cache.szRecFile) or {}
     History                       = data.History       or {}
@@ -181,7 +181,7 @@ MY.RegisterInit(function()
     MY_Recount.Data.Init()
 end)
 
--- é€€å‡ºæ¸¸æˆä¿å­˜æ•°æ®
+-- ÍË³öÓÎÏ·±£´æÊı¾İ
 MY.RegisterExit(function()
     local data = {
         History       = History,
@@ -191,21 +191,21 @@ MY.RegisterExit(function()
     MY.Sys.SaveUserData(_Cache.szRecFile, data)
 end)
 
--- è¿‡å›¾æ¸…é™¤å½“å‰æˆ˜æ–—æ•°æ®
+-- ¹ıÍ¼Çå³ıµ±Ç°Õ½¶·Êı¾İ
 MY.RegisterEvent('LOADING_END', function()
     MY_Recount.Data.Push()
     MY_Recount.Data.Init(true)
     FireUIEvent('MY_RECOUNT_NEW_FIGHT')
 end)
 
--- é€€å‡ºæˆ˜æ–— ä¿å­˜æ•°æ®
+-- ÍË³öÕ½¶· ±£´æÊı¾İ
 MY.RegisterEvent('MY_FIGHT_HINT', function(bEnterFight)
-    if bEnterFight and MY.Player.GetFightUUID() ~= Data.UUID then -- è¿›å…¥æ–°çš„æˆ˜æ–—
+    if bEnterFight and MY.Player.GetFightUUID() ~= Data.UUID then -- ½øÈëĞÂµÄÕ½¶·
         MY_Recount.Data.Init()
         FireUIEvent('MY_RECOUNT_NEW_FIGHT')
     else
         Data.nTimeDuring = MY.Player.GetFightTime() / GLOBAL.GAME_FPS
-        -- è®¡ç®—å—ä¼¤æœ€å¤šçš„åå­—ä½œä¸ºæˆ˜æ–—åç§°
+        -- ¼ÆËãÊÜÉË×î¶àµÄÃû×Ö×÷ÎªÕ½¶·Ãû³Æ
         local nMaxValue, szBossName = 0, nil
         for id, p in pairs(Data.BeDamage) do
             if nMaxValue < p.nTotalEffect and id ~= UI_GetClientPlayerID() then
@@ -213,7 +213,7 @@ MY.RegisterEvent('MY_FIGHT_HINT', function(bEnterFight)
                 szBossName = MY_Recount.Data.GetNameAusID(id, Data)
             end
         end
-        -- å¦‚æœæ²¡æœ‰ åˆ™è®¡ç®—è¾“å‡ºæœ€å¤šçš„NPCåå­—ä½œä¸ºæˆ˜æ–—åç§°
+        -- Èç¹ûÃ»ÓĞ Ôò¼ÆËãÊä³ö×î¶àµÄNPCÃû×Ö×÷ÎªÕ½¶·Ãû³Æ
         if not szBossName then
             for id, p in pairs(Data.Damage) do
                 if nMaxValue < p.nTotalEffect and not tonumber(id) then
@@ -244,10 +244,10 @@ end)
     #           #         #     # #   #       #     # #   # # #     # #                           
 ##################################################################################################
 ]]
---[[ è·å–ç»Ÿè®¡æ•°æ®
-    (table) MY_Recount.Data.Get(nIndex) -- è·å–æŒ‡å®šè®°å½•
-        (number)nIndex: å†å²è®°å½•ç´¢å¼• ä¸º0è¿”å›å½“å‰ç»Ÿè®¡
-    (table) MY_Recount.Data.Get()       -- è·å–æ‰€æœ‰å†å²è®°å½•åˆ—è¡¨
+--[[ »ñÈ¡Í³¼ÆÊı¾İ
+    (table) MY_Recount.Data.Get(nIndex) -- »ñÈ¡Ö¸¶¨¼ÇÂ¼
+        (number)nIndex: ÀúÊ·¼ÇÂ¼Ë÷Òı Îª0·µ»Øµ±Ç°Í³¼Æ
+    (table) MY_Recount.Data.Get()       -- »ñÈ¡ËùÓĞÀúÊ·¼ÇÂ¼ÁĞ±í
 ]]
 MY_Recount.Data.Get = function(nIndex)
     if not nIndex then
@@ -259,10 +259,10 @@ MY_Recount.Data.Get = function(nIndex)
     end
 end
 
---[[ åˆ é™¤å†å²ç»Ÿè®¡æ•°æ®
-    (table) MY_Recount.Data.Del(nIndex) -- åˆ é™¤æŒ‡å®šåºå·çš„è®°å½•
-        (number)nIndex: å†å²è®°å½•ç´¢å¼•
-    (table) MY_Recount.Data.Del(data)   -- åˆ é™¤æŒ‡å®šè®°å½•
+--[[ É¾³ıÀúÊ·Í³¼ÆÊı¾İ
+    (table) MY_Recount.Data.Del(nIndex) -- É¾³ıÖ¸¶¨ĞòºÅµÄ¼ÇÂ¼
+        (number)nIndex: ÀúÊ·¼ÇÂ¼Ë÷Òı
+    (table) MY_Recount.Data.Del(data)   -- É¾³ıÖ¸¶¨¼ÇÂ¼
 ]]
 MY_Recount.Data.Del = function(data)
     if type(data) == 'number' then
@@ -291,21 +291,21 @@ end
   # #     #   #       #     # # #     #       #   #       # # # # # # #       #             #     
 ##################################################################################################
 ]]
---[[ è®°å½•ä¸€æ¬¡LOG
+--[[ ¼ÇÂ¼Ò»´ÎLOG
     MY_Recount.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwID, dwLevel, nSkillResult, nCount, tResult)
-    (number) dwCaster    : é‡Šæ”¾è€…ID
-    (number) dwTarget    : æ‰¿å—è€…ID
-    (number) nEffectType : é€ æˆæ•ˆæœçš„åŸå› ï¼ˆSKILL_EFFECT_TYPEæšä¸¾ å¦‚SKILL,BUFFï¼‰
-    (number) dwID        : æŠ€èƒ½ID
-    (number) dwLevel     : æŠ€èƒ½ç­‰çº§
-    (number) nSkillResult: é€ æˆçš„æ•ˆæœç»“æœï¼ˆSKILL_RESULTæšä¸¾ å¦‚HIT,MISSï¼‰
-    (number) nCount      : é€ æˆæ•ˆæœçš„æ•°å€¼æ•°é‡ï¼ˆtResulté•¿åº¦ï¼‰
-    (table ) tResult     : æ‰€æœ‰æ•ˆæœæ•°å€¼é›†åˆ
+    (number) dwCaster    : ÊÍ·ÅÕßID
+    (number) dwTarget    : ³ĞÊÜÕßID
+    (number) nEffectType : Ôì³ÉĞ§¹ûµÄÔ­Òò£¨SKILL_EFFECT_TYPEÃ¶¾Ù ÈçSKILL,BUFF£©
+    (number) dwID        : ¼¼ÄÜID
+    (number) dwLevel     : ¼¼ÄÜµÈ¼¶
+    (number) nSkillResult: Ôì³ÉµÄĞ§¹û½á¹û£¨SKILL_RESULTÃ¶¾Ù ÈçHIT,MISS£©
+    (number) nCount      : Ôì³ÉĞ§¹ûµÄÊıÖµÊıÁ¿£¨tResult³¤¶È£©
+    (table ) tResult     : ËùÓĞĞ§¹ûÊıÖµ¼¯ºÏ
 ]]
 MY_Recount.Data.OnSkillEffect = function(dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nCount, tResult)
-    -- è·å–é‡Šæ”¾å¯¹è±¡å’Œæ‰¿å—å¯¹è±¡
+    -- »ñÈ¡ÊÍ·Å¶ÔÏóºÍ³ĞÊÜ¶ÔÏó
     local hCaster = MY.Game.GetObject(dwCaster)
-    if (not IsPlayer(dwCaster)) and hCaster and hCaster.dwEmployer and hCaster.dwEmployer ~= 0 then -- å® ç‰©çš„æ•°æ®ç®—åœ¨ä¸»äººç»Ÿè®¡ä¸­
+    if (not IsPlayer(dwCaster)) and hCaster and hCaster.dwEmployer and hCaster.dwEmployer ~= 0 then -- ³èÎïµÄÊı¾İËãÔÚÖ÷ÈËÍ³¼ÆÖĞ
         hCaster = MY.Game.GetObject(hCaster.dwEmployer)
     end
     local hTarget = MY.Game.GetObject(dwTarget)
@@ -315,7 +315,7 @@ MY_Recount.Data.OnSkillEffect = function(dwCaster, dwTarget, nEffectType, dwEffe
     dwCaster = hCaster.dwID
     dwTarget = hTarget.dwID
     
-    -- è·å–æ•ˆæœåç§°
+    -- »ñÈ¡Ğ§¹ûÃû³Æ
     local szEffectName
     if nEffectType == SKILL_EFFECT_TYPE.SKILL then
         szEffectName = Table_GetSkillName(dwEffectID, dwEffectLevel)
@@ -326,7 +326,7 @@ MY_Recount.Data.OnSkillEffect = function(dwCaster, dwTarget, nEffectType, dwEffe
         return
     end
     
-    -- è¿‡æ»¤æ‰æ— ä¼¤å®³æ— æ²»ç–—çš„å‘½ä¸­æ•ˆæœè®°å½•
+    -- ¹ıÂËµôÎŞÉËº¦ÎŞÖÎÁÆµÄÃüÖĞĞ§¹û¼ÇÂ¼
     if nSkillResult == SKILL_RESULT.HIT or nSkillResult == SKILL_RESULT.CRITICAL then
         local bRec
         for _, v in pairs(tResult) do
@@ -340,41 +340,41 @@ MY_Recount.Data.OnSkillEffect = function(dwCaster, dwTarget, nEffectType, dwEffe
         end
     end
     
-    -- è¿‡æ»¤æ‰ä¸æ˜¯é˜Ÿå‹çš„ä»¥åŠä¸æ˜¯BOSSçš„
+    -- ¹ıÂËµô²»ÊÇ¶ÓÓÑµÄÒÔ¼°²»ÊÇBOSSµÄ
     local me = GetClientPlayer()
     local team = GetClientTeam()
     if (IsPlayer(dwCaster) and not (me.IsPlayerInMyParty(dwCaster) or team.IsPlayerInTeam(dwCaster) or dwCaster == me.dwID)) then
-        -- é‡Šæ”¾è€…æ˜¯ç©å®¶ä¸”ä¸æ˜¯é˜Ÿå‹åˆ™å¿½è§†
+        -- ÊÍ·ÅÕßÊÇÍæ¼ÒÇÒ²»ÊÇ¶ÓÓÑÔòºöÊÓ
         return
     end
     
     
     local nTherapy = tResult[SKILL_RESULT_TYPE.THERAPY] or 0
     local nEffectTherapy = tResult[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] or 0
-    local nDamage = (tResult[SKILL_RESULT_TYPE.PHYSICS_DAMAGE      ] or 0) + -- å¤–åŠŸä¼¤å®³
-                    (tResult[SKILL_RESULT_TYPE.SOLAR_MAGIC_DAMAGE  ] or 0) + -- é˜³æ€§å†…åŠŸä¼¤å®³
-                    (tResult[SKILL_RESULT_TYPE.NEUTRAL_MAGIC_DAMAGE] or 0) + -- æ··å…ƒæ€§å†…åŠŸä¼¤å®³
-                    (tResult[SKILL_RESULT_TYPE.LUNAR_MAGIC_DAMAGE  ] or 0) + -- é˜´æ€§å†…åŠŸä¼¤å®³
-                    (tResult[SKILL_RESULT_TYPE.POISON_DAMAGE       ] or 0) + -- æ¯’æ€§ä¼¤å®³
-                    (tResult[SKILL_RESULT_TYPE.REFLECTIED_DAMAGE   ] or 0)   -- åå¼¹ä¼¤å®³
+    local nDamage = (tResult[SKILL_RESULT_TYPE.PHYSICS_DAMAGE      ] or 0) + -- Íâ¹¦ÉËº¦
+                    (tResult[SKILL_RESULT_TYPE.SOLAR_MAGIC_DAMAGE  ] or 0) + -- ÑôĞÔÄÚ¹¦ÉËº¦
+                    (tResult[SKILL_RESULT_TYPE.NEUTRAL_MAGIC_DAMAGE] or 0) + -- »ìÔªĞÔÄÚ¹¦ÉËº¦
+                    (tResult[SKILL_RESULT_TYPE.LUNAR_MAGIC_DAMAGE  ] or 0) + -- ÒõĞÔÄÚ¹¦ÉËº¦
+                    (tResult[SKILL_RESULT_TYPE.POISON_DAMAGE       ] or 0) + -- ¶¾ĞÔÉËº¦
+                    (tResult[SKILL_RESULT_TYPE.REFLECTIED_DAMAGE   ] or 0)   -- ·´µ¯ÉËº¦
     local nEffectDamage = tResult[SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE] or 0
 
-    -- è¯†ç ´
+    -- Ê¶ÆÆ
     local nValue = tResult[SKILL_RESULT_TYPE.INSIGHT_DAMAGE]
     if nValue and nValue > 0 then
         MY_Recount.Data.AddDamageRecord(hCaster, hTarget, szEffectName, nDamage, nEffectDamage, SKILL_RESULT.INSIGHT)
     elseif nSkillResult == SKILL_RESULT.HIT or
-    nSkillResult == SKILL_RESULT.CRITICAL then -- å‡»ä¸­
-        if nTherapy > 0 then -- æœ‰æ²»ç–—
+    nSkillResult == SKILL_RESULT.CRITICAL then -- »÷ÖĞ
+        if nTherapy > 0 then -- ÓĞÖÎÁÆ
             MY_Recount.Data.AddHealRecord(hCaster, hTarget, szEffectName, nTherapy, nEffectTherapy, nSkillResult)
         end
-        if nDamage > 0 then -- æœ‰ä¼¤å®³
+        if nDamage > 0 then -- ÓĞÉËº¦
             MY_Recount.Data.AddDamageRecord(hCaster, hTarget, szEffectName, nDamage, nEffectDamage, nSkillResult)
         end
-    elseif nSkillResult == SKILL_RESULT.BLOCK or  -- æ ¼æŒ¡
-    nSkillResult == SKILL_RESULT.SHIELD       or  -- æ— æ•ˆ
-    nSkillResult == SKILL_RESULT.MISS         or  -- åç¦»
-    nSkillResult == SKILL_RESULT.DODGE      then  -- é—ªé¿
+    elseif nSkillResult == SKILL_RESULT.BLOCK or  -- ¸ñµ²
+    nSkillResult == SKILL_RESULT.SHIELD       or  -- ÎŞĞ§
+    nSkillResult == SKILL_RESULT.MISS         or  -- Æ«Àë
+    nSkillResult == SKILL_RESULT.DODGE      then  -- ÉÁ±Ü
         MY_Recount.Data.AddDamageRecord(hCaster, hTarget, szEffectName, 0, 0, nSkillResult)
     end
     
@@ -402,52 +402,52 @@ MY_Recount.Data.GetNameAusID = function(id, data)
     return szName
 end
 
--- å°†ä¸€æ¡è®°å½•æ’å…¥æ•°ç»„
+-- ½«Ò»Ìõ¼ÇÂ¼²åÈëÊı×é
 _Cache.AddRecord = function(tRecord, idTarget, szEffectName, nValue, nEffectValue, nSkillResult)
     tRecord.nTotal              = tRecord.nTotal + nValue
     tRecord.nTotalEffect        = tRecord.nTotalEffect + nEffectValue
     
     ------------------------
-    -- # èŠ‚ï¼š tRecord.Detail
+    -- # ½Ú£º tRecord.Detail
     ------------------------
-    -- æ·»åŠ /æ›´æ–°ç»“æœåˆ†ç±»ç»Ÿè®¡
+    -- Ìí¼Ó/¸üĞÂ½á¹û·ÖÀàÍ³¼Æ
     if not tRecord.Detail[nSkillResult] then
         tRecord.Detail[nSkillResult] = {
-            nCount       =  0, -- å‘½ä¸­è®°å½•æ•°é‡
-            nMax         =  0, -- å•æ¬¡å‘½ä¸­æœ€å¤§å€¼
-            nMaxEffect   =  0, -- å•æ¬¡å‘½ä¸­æœ€å¤§æœ‰æ•ˆå€¼
-            nMin         = -1, -- å•æ¬¡å‘½ä¸­æœ€å°å€¼
-            nMinEffect   = -1, -- å•æ¬¡å‘½ä¸­æœ€å°æœ‰æ•ˆå€¼
-            nTotal       =  0, -- æ‰€ä»¥å‘½ä¸­æ€»ä¼¤å®³
-            nTotalEffect =  0, -- æ‰€æœ‰å‘½ä¸­æ€»æœ‰æ•ˆä¼¤å®³
-            nAvg         =  0, -- æ‰€æœ‰å‘½ä¸­å¹³å‡ä¼¤å®³
-            nAvgEffect   =  0, -- æ‰€æœ‰å‘½ä¸­å¹³å‡æœ‰æ•ˆä¼¤å®³
+            nCount       =  0, -- ÃüÖĞ¼ÇÂ¼ÊıÁ¿
+            nMax         =  0, -- µ¥´ÎÃüÖĞ×î´óÖµ
+            nMaxEffect   =  0, -- µ¥´ÎÃüÖĞ×î´óÓĞĞ§Öµ
+            nMin         = -1, -- µ¥´ÎÃüÖĞ×îĞ¡Öµ
+            nMinEffect   = -1, -- µ¥´ÎÃüÖĞ×îĞ¡ÓĞĞ§Öµ
+            nTotal       =  0, -- ËùÒÔÃüÖĞ×ÜÉËº¦
+            nTotalEffect =  0, -- ËùÓĞÃüÖĞ×ÜÓĞĞ§ÉËº¦
+            nAvg         =  0, -- ËùÓĞÃüÖĞÆ½¾ùÉËº¦
+            nAvgEffect   =  0, -- ËùÓĞÃüÖĞÆ½¾ùÓĞĞ§ÉËº¦
         }
     end
     local tResult = tRecord.Detail[nSkillResult]
-    tResult.nCount       = tResult.nCount + 1                                -- å‘½ä¸­æ¬¡æ•°ï¼ˆå‡è®¾nSkillResultæ˜¯å‘½ä¸­ï¼‰
-    tResult.nMax         = math.max(tResult.nMax, nValue)                    -- å•æ¬¡å‘½ä¸­æœ€å¤§å€¼
-    tResult.nMaxEffect   = math.max(tResult.nMaxEffect, nEffectValue)        -- å•æ¬¡å‘½ä¸­æœ€å¤§æœ‰æ•ˆå€¼
-    tResult.nMin         = (tResult.nMin ~= -1 and math.min(tResult.nMin, nValue)) or nValue                         -- å•æ¬¡å‘½ä¸­æœ€å°å€¼
-    tResult.nMinEffect   = (tResult.nMinEffect ~= -1 and math.min(tResult.nMinEffect, nEffectValue)) or nEffectValue -- å•æ¬¡å‘½ä¸­æœ€å°æœ‰æ•ˆå€¼
-    tResult.nTotal       = tResult.nTotal + nValue                           -- æ‰€ä»¥å‘½ä¸­æ€»ä¼¤å®³
-    tResult.nTotalEffect = tResult.nTotalEffect + nEffectValue               -- æ‰€æœ‰å‘½ä¸­æ€»æœ‰æ•ˆä¼¤å®³
-    tResult.nAvg         = math.floor(tResult.nTotal / tResult.nCount)       -- å•æ¬¡å‘½ä¸­å¹³å‡å€¼
-    tResult.nAvgEffect   = math.floor(tResult.nTotalEffect / tResult.nCount) -- å•æ¬¡å‘½ä¸­å¹³å‡æœ‰æ•ˆå€¼
+    tResult.nCount       = tResult.nCount + 1                                -- ÃüÖĞ´ÎÊı£¨¼ÙÉènSkillResultÊÇÃüÖĞ£©
+    tResult.nMax         = math.max(tResult.nMax, nValue)                    -- µ¥´ÎÃüÖĞ×î´óÖµ
+    tResult.nMaxEffect   = math.max(tResult.nMaxEffect, nEffectValue)        -- µ¥´ÎÃüÖĞ×î´óÓĞĞ§Öµ
+    tResult.nMin         = (tResult.nMin ~= -1 and math.min(tResult.nMin, nValue)) or nValue                         -- µ¥´ÎÃüÖĞ×îĞ¡Öµ
+    tResult.nMinEffect   = (tResult.nMinEffect ~= -1 and math.min(tResult.nMinEffect, nEffectValue)) or nEffectValue -- µ¥´ÎÃüÖĞ×îĞ¡ÓĞĞ§Öµ
+    tResult.nTotal       = tResult.nTotal + nValue                           -- ËùÒÔÃüÖĞ×ÜÉËº¦
+    tResult.nTotalEffect = tResult.nTotalEffect + nEffectValue               -- ËùÓĞÃüÖĞ×ÜÓĞĞ§ÉËº¦
+    tResult.nAvg         = math.floor(tResult.nTotal / tResult.nCount)       -- µ¥´ÎÃüÖĞÆ½¾ùÖµ
+    tResult.nAvgEffect   = math.floor(tResult.nTotalEffect / tResult.nCount) -- µ¥´ÎÃüÖĞÆ½¾ùÓĞĞ§Öµ
     
     ------------------------
-    -- # èŠ‚ï¼š tRecord.Skill
+    -- # ½Ú£º tRecord.Skill
     ------------------------
-    -- æ·»åŠ å…·ä½“æŠ€èƒ½è®°å½•
+    -- Ìí¼Ó¾ßÌå¼¼ÄÜ¼ÇÂ¼
     if not tRecord.Skill[szEffectName] then
         tRecord.Skill[szEffectName] = {
-            nCount       =  0, -- è¯¥ç©å®¶å››è±¡è½®å›é‡Šæ”¾æ¬¡æ•°
-            nMax         =  0, -- è¯¥ç©å®¶å››è±¡è½®å›æœ€å¤§è¾“å‡ºé‡
-            nMaxEffect   =  0, -- è¯¥ç©å®¶å››è±¡è½®å›æœ€å¤§æœ‰æ•ˆè¾“å‡ºé‡
-            nTotal       =  0, -- è¯¥ç©å®¶å››è±¡è½®å›è¾“å‡ºé‡æ€»å’Œ
-            nTotalEffect =  0, -- è¯¥ç©å®¶å››è±¡è½®å›æœ‰æ•ˆè¾“å‡ºé‡æ€»å’Œ
-            Detail       = {}, -- è¯¥ç©å®¶å››è±¡è½®å›è¾“å‡ºç»“æœåˆ†ç±»ç»Ÿè®¡
-            Target       = {}, -- è¯¥ç©å®¶å››è±¡è½®å›æ‰¿å—è€…ç»Ÿè®¡
+            nCount       =  0, -- ¸ÃÍæ¼ÒËÄÏóÂÖ»ØÊÍ·Å´ÎÊı
+            nMax         =  0, -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Ø×î´óÊä³öÁ¿
+            nMaxEffect   =  0, -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Ø×î´óÓĞĞ§Êä³öÁ¿
+            nTotal       =  0, -- ¸ÃÍæ¼ÒËÄÏóÂÖ»ØÊä³öÁ¿×ÜºÍ
+            nTotalEffect =  0, -- ¸ÃÍæ¼ÒËÄÏóÂÖ»ØÓĞĞ§Êä³öÁ¿×ÜºÍ
+            Detail       = {}, -- ¸ÃÍæ¼ÒËÄÏóÂÖ»ØÊä³ö½á¹û·ÖÀàÍ³¼Æ
+            Target       = {}, -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Ø³ĞÊÜÕßÍ³¼Æ
         }
     end
     local tSkillRecord = tRecord.Skill[szEffectName]
@@ -460,44 +460,44 @@ _Cache.AddRecord = function(tRecord, idTarget, szEffectName, nValue, nEffectValu
     tSkillRecord.nAvgEffect          = math.floor(tSkillRecord.nTotalEffect / tSkillRecord.nCount)
     
     ---------------------------------
-    -- # èŠ‚ï¼š tRecord.Skill[x].Detail
+    -- # ½Ú£º tRecord.Skill[x].Detail
     ---------------------------------
-    -- æ·»åŠ /æ›´æ–°å…·ä½“æŠ€èƒ½ç»“æœåˆ†ç±»ç»Ÿè®¡
+    -- Ìí¼Ó/¸üĞÂ¾ßÌå¼¼ÄÜ½á¹û·ÖÀàÍ³¼Æ
     if not tSkillRecord.Detail[nSkillResult] then
         tSkillRecord.Detail[nSkillResult] = {
-            nCount       =  0, -- å‘½ä¸­è®°å½•æ•°é‡
-            nMax         =  0, -- å•æ¬¡å‘½ä¸­æœ€å¤§å€¼
-            nMaxEffect   =  0, -- å•æ¬¡å‘½ä¸­æœ€å¤§æœ‰æ•ˆå€¼
-            nMin         = -1, -- å•æ¬¡å‘½ä¸­æœ€å°å€¼
-            nMinEffect   = -1, -- å•æ¬¡å‘½ä¸­æœ€å°æœ‰æ•ˆå€¼
-            nTotal       =  0, -- æ‰€ä»¥å‘½ä¸­æ€»ä¼¤å®³
-            nTotalEffect =  0, -- æ‰€æœ‰å‘½ä¸­æ€»æœ‰æ•ˆä¼¤å®³
-            nAvg         =  0, -- æ‰€æœ‰å‘½ä¸­å¹³å‡ä¼¤å®³
-            nAvgEffect   =  0, -- æ‰€æœ‰å‘½ä¸­å¹³å‡æœ‰æ•ˆä¼¤å®³
+            nCount       =  0, -- ÃüÖĞ¼ÇÂ¼ÊıÁ¿
+            nMax         =  0, -- µ¥´ÎÃüÖĞ×î´óÖµ
+            nMaxEffect   =  0, -- µ¥´ÎÃüÖĞ×î´óÓĞĞ§Öµ
+            nMin         = -1, -- µ¥´ÎÃüÖĞ×îĞ¡Öµ
+            nMinEffect   = -1, -- µ¥´ÎÃüÖĞ×îĞ¡ÓĞĞ§Öµ
+            nTotal       =  0, -- ËùÒÔÃüÖĞ×ÜÉËº¦
+            nTotalEffect =  0, -- ËùÓĞÃüÖĞ×ÜÓĞĞ§ÉËº¦
+            nAvg         =  0, -- ËùÓĞÃüÖĞÆ½¾ùÉËº¦
+            nAvgEffect   =  0, -- ËùÓĞÃüÖĞÆ½¾ùÓĞĞ§ÉËº¦
         }
     end
     local tResult = tSkillRecord.Detail[nSkillResult]
-    tResult.nCount       = tResult.nCount + 1                           -- å‘½ä¸­æ¬¡æ•°ï¼ˆå‡è®¾nSkillResultæ˜¯å‘½ä¸­ï¼‰
-    tResult.nMax         = math.max(tResult.nMax, nValue)               -- å•æ¬¡å‘½ä¸­æœ€å¤§å€¼
-    tResult.nMaxEffect   = math.max(tResult.nMaxEffect, nEffectValue)   -- å•æ¬¡å‘½ä¸­æœ€å¤§æœ‰æ•ˆå€¼
-    tResult.nMin         = (tResult.nMin ~= -1 and math.min(tResult.nMin, nValue)) or nValue                         -- å•æ¬¡å‘½ä¸­æœ€å°å€¼
-    tResult.nMinEffect   = (tResult.nMinEffect ~= -1 and math.min(tResult.nMinEffect, nEffectValue)) or nEffectValue -- å•æ¬¡å‘½ä¸­æœ€å°æœ‰æ•ˆå€¼
-    tResult.nTotal       = tResult.nTotal + nValue                      -- æ‰€ä»¥å‘½ä¸­æ€»ä¼¤å®³
-    tResult.nTotalEffect = tResult.nTotalEffect + nEffectValue          -- æ‰€æœ‰å‘½ä¸­æ€»æœ‰æ•ˆä¼¤å®³
+    tResult.nCount       = tResult.nCount + 1                           -- ÃüÖĞ´ÎÊı£¨¼ÙÉènSkillResultÊÇÃüÖĞ£©
+    tResult.nMax         = math.max(tResult.nMax, nValue)               -- µ¥´ÎÃüÖĞ×î´óÖµ
+    tResult.nMaxEffect   = math.max(tResult.nMaxEffect, nEffectValue)   -- µ¥´ÎÃüÖĞ×î´óÓĞĞ§Öµ
+    tResult.nMin         = (tResult.nMin ~= -1 and math.min(tResult.nMin, nValue)) or nValue                         -- µ¥´ÎÃüÖĞ×îĞ¡Öµ
+    tResult.nMinEffect   = (tResult.nMinEffect ~= -1 and math.min(tResult.nMinEffect, nEffectValue)) or nEffectValue -- µ¥´ÎÃüÖĞ×îĞ¡ÓĞĞ§Öµ
+    tResult.nTotal       = tResult.nTotal + nValue                      -- ËùÒÔÃüÖĞ×ÜÉËº¦
+    tResult.nTotalEffect = tResult.nTotalEffect + nEffectValue          -- ËùÓĞÃüÖĞ×ÜÓĞĞ§ÉËº¦
     tResult.nAvg         = math.floor(tResult.nTotal / tResult.nCount)
     tResult.nAvgEffect   = math.floor(tResult.nTotalEffect / tResult.nCount)
     
     ------------------------------
-    -- # èŠ‚ï¼š tRecord.Skill.Target
+    -- # ½Ú£º tRecord.Skill.Target
     ------------------------------
-    -- æ·»åŠ å…·ä½“æŠ€èƒ½æ‰¿å—è€…è®°å½•
+    -- Ìí¼Ó¾ßÌå¼¼ÄÜ³ĞÊÜÕß¼ÇÂ¼
     if not tSkillRecord.Target[idTarget] then
         tSkillRecord.Target[idTarget] = {
-            nMax         = 0,            -- è¯¥ç©å®¶å››è±¡è½®å›å‡»ä¸­çš„è¿™ä¸ªç©å®¶æœ€å¤§ä¼¤å®³
-            nMaxEffect   = 0,            -- è¯¥ç©å®¶å››è±¡è½®å›å‡»ä¸­çš„è¿™ä¸ªç©å®¶æœ€å¤§æœ‰æ•ˆä¼¤å®³
-            nTotal       = 0,            -- è¯¥ç©å®¶å››è±¡è½®å›å‡»ä¸­çš„è¿™ä¸ªç©å®¶ä¼¤å®³æ€»å’Œ
-            nTotalEffect = 0,            -- è¯¥ç©å®¶å››è±¡è½®å›å‡»ä¸­çš„è¿™ä¸ªç©å®¶æœ‰æ•ˆä¼¤å®³æ€»å’Œ
-            Count = {                    -- è¯¥ç©å®¶å››è±¡è½®å›å‡»ä¸­çš„è¿™ä¸ªç©å®¶ç»“æœç»Ÿè®¡
+            nMax         = 0,            -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Ø»÷ÖĞµÄÕâ¸öÍæ¼Ò×î´óÉËº¦
+            nMaxEffect   = 0,            -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Ø»÷ÖĞµÄÕâ¸öÍæ¼Ò×î´óÓĞĞ§ÉËº¦
+            nTotal       = 0,            -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Ø»÷ÖĞµÄÕâ¸öÍæ¼ÒÉËº¦×ÜºÍ
+            nTotalEffect = 0,            -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Ø»÷ÖĞµÄÕâ¸öÍæ¼ÒÓĞĞ§ÉËº¦×ÜºÍ
+            Count = {                    -- ¸ÃÍæ¼ÒËÄÏóÂÖ»Ø»÷ÖĞµÄÕâ¸öÍæ¼Ò½á¹ûÍ³¼Æ
                 -- SKILL_RESULT.HIT      = 5,
                 -- SKILL_RESULT.MISS     = 3,
                 -- SKILL_RESULT.CRITICAL = 3,
@@ -512,18 +512,18 @@ _Cache.AddRecord = function(tRecord, idTarget, szEffectName, nValue, nEffectValu
     tSkillTargetData.Count[nSkillResult] = (tSkillTargetData.Count[nSkillResult] or 0) + 1
     
     ------------------------
-    -- # èŠ‚ï¼š tRecord.Target
+    -- # ½Ú£º tRecord.Target
     ------------------------
-    -- æ·»åŠ å…·ä½“æ‰¿å—/é‡Šæ”¾è€…è®°å½•
+    -- Ìí¼Ó¾ßÌå³ĞÊÜ/ÊÍ·ÅÕß¼ÇÂ¼
     if not tRecord.Target[idTarget] then
         tRecord.Target[idTarget] = {
-            nCount       =  0, -- è¯¥ç©å®¶å¯¹idTargetçš„æŠ€èƒ½é‡Šæ”¾æ¬¡æ•°
-            nMax         =  0, -- è¯¥ç©å®¶å¯¹idTargetçš„æŠ€èƒ½æœ€å¤§è¾“å‡ºé‡
-            nMaxEffect   =  0, -- è¯¥ç©å®¶å¯¹idTargetçš„æŠ€èƒ½æœ€å¤§æœ‰æ•ˆè¾“å‡ºé‡
-            nTotal       =  0, -- è¯¥ç©å®¶å¯¹idTargetçš„æŠ€èƒ½è¾“å‡ºé‡æ€»å’Œ
-            nTotalEffect =  0, -- è¯¥ç©å®¶å¯¹idTargetçš„æŠ€èƒ½æœ‰æ•ˆè¾“å‡ºé‡æ€»å’Œ
-            Detail       = {}, -- è¯¥ç©å®¶å¯¹idTargetçš„æŠ€èƒ½è¾“å‡ºç»“æœåˆ†ç±»ç»Ÿè®¡
-            Skill        = {}, -- è¯¥ç©å®¶å¯¹idTargetçš„æŠ€èƒ½å…·ä½“åˆ†åˆ«ç»Ÿè®¡
+            nCount       =  0, -- ¸ÃÍæ¼Ò¶ÔidTargetµÄ¼¼ÄÜÊÍ·Å´ÎÊı
+            nMax         =  0, -- ¸ÃÍæ¼Ò¶ÔidTargetµÄ¼¼ÄÜ×î´óÊä³öÁ¿
+            nMaxEffect   =  0, -- ¸ÃÍæ¼Ò¶ÔidTargetµÄ¼¼ÄÜ×î´óÓĞĞ§Êä³öÁ¿
+            nTotal       =  0, -- ¸ÃÍæ¼Ò¶ÔidTargetµÄ¼¼ÄÜÊä³öÁ¿×ÜºÍ
+            nTotalEffect =  0, -- ¸ÃÍæ¼Ò¶ÔidTargetµÄ¼¼ÄÜÓĞĞ§Êä³öÁ¿×ÜºÍ
+            Detail       = {}, -- ¸ÃÍæ¼Ò¶ÔidTargetµÄ¼¼ÄÜÊä³ö½á¹û·ÖÀàÍ³¼Æ
+            Skill        = {}, -- ¸ÃÍæ¼Ò¶ÔidTargetµÄ¼¼ÄÜ¾ßÌå·Ö±ğÍ³¼Æ
         }
     end
     local tTargetRecord = tRecord.Target[idTarget]
@@ -536,44 +536,44 @@ _Cache.AddRecord = function(tRecord, idTarget, szEffectName, nValue, nEffectValu
     tTargetRecord.nAvgEffect          = math.floor(tTargetRecord.nTotalEffect / tTargetRecord.nCount)
     
     ----------------------------------
-    -- # èŠ‚ï¼š tRecord.Target[x].Detail
+    -- # ½Ú£º tRecord.Target[x].Detail
     ----------------------------------
-    -- æ·»åŠ /æ›´æ–°å…·ä½“æ‰¿å—/é‡Šæ”¾è€…ç»“æœåˆ†ç±»ç»Ÿè®¡
+    -- Ìí¼Ó/¸üĞÂ¾ßÌå³ĞÊÜ/ÊÍ·ÅÕß½á¹û·ÖÀàÍ³¼Æ
     if not tTargetRecord.Detail[nSkillResult] then
         tTargetRecord.Detail[nSkillResult] = {
-            nCount       =  0, -- å‘½ä¸­è®°å½•æ•°é‡ï¼ˆå‡è®¾nSkillResultæ˜¯å‘½ä¸­ï¼‰
-            nMax         =  0, -- å•æ¬¡å‘½ä¸­æœ€å¤§å€¼
-            nMaxEffect   =  0, -- å•æ¬¡å‘½ä¸­æœ€å¤§æœ‰æ•ˆå€¼
-            nMin         = -1, -- å•æ¬¡å‘½ä¸­æœ€å°å€¼
-            nMinEffect   = -1, -- å•æ¬¡å‘½ä¸­æœ€å°æœ‰æ•ˆå€¼
-            nTotal       =  0, -- æ‰€ä»¥å‘½ä¸­æ€»ä¼¤å®³
-            nTotalEffect =  0, -- æ‰€æœ‰å‘½ä¸­æ€»æœ‰æ•ˆä¼¤å®³
-            nAvg         =  0, -- æ‰€æœ‰å‘½ä¸­å¹³å‡ä¼¤å®³
-            nAvgEffect   =  0, -- æ‰€æœ‰å‘½ä¸­å¹³å‡æœ‰æ•ˆä¼¤å®³
+            nCount       =  0, -- ÃüÖĞ¼ÇÂ¼ÊıÁ¿£¨¼ÙÉènSkillResultÊÇÃüÖĞ£©
+            nMax         =  0, -- µ¥´ÎÃüÖĞ×î´óÖµ
+            nMaxEffect   =  0, -- µ¥´ÎÃüÖĞ×î´óÓĞĞ§Öµ
+            nMin         = -1, -- µ¥´ÎÃüÖĞ×îĞ¡Öµ
+            nMinEffect   = -1, -- µ¥´ÎÃüÖĞ×îĞ¡ÓĞĞ§Öµ
+            nTotal       =  0, -- ËùÒÔÃüÖĞ×ÜÉËº¦
+            nTotalEffect =  0, -- ËùÓĞÃüÖĞ×ÜÓĞĞ§ÉËº¦
+            nAvg         =  0, -- ËùÓĞÃüÖĞÆ½¾ùÉËº¦
+            nAvgEffect   =  0, -- ËùÓĞÃüÖĞÆ½¾ùÓĞĞ§ÉËº¦
         }
     end
     local tResult = tTargetRecord.Detail[nSkillResult]
-    tResult.nCount       = tResult.nCount + 1                           -- å‘½ä¸­æ¬¡æ•°ï¼ˆå‡è®¾nSkillResultæ˜¯å‘½ä¸­ï¼‰
-    tResult.nMax         = math.max(tResult.nMax, nValue)               -- å•æ¬¡å‘½ä¸­æœ€å¤§å€¼
-    tResult.nMaxEffect   = math.max(tResult.nMaxEffect, nEffectValue)   -- å•æ¬¡å‘½ä¸­æœ€å¤§æœ‰æ•ˆå€¼
-    tResult.nMin         = (tResult.nMin ~= -1 and math.min(tResult.nMin, nValue)) or nValue                         -- å•æ¬¡å‘½ä¸­æœ€å°å€¼
-    tResult.nMinEffect   = (tResult.nMinEffect ~= -1 and math.min(tResult.nMinEffect, nEffectValue)) or nEffectValue -- å•æ¬¡å‘½ä¸­æœ€å°æœ‰æ•ˆå€¼
-    tResult.nTotal       = tResult.nTotal + nValue                      -- æ‰€ä»¥å‘½ä¸­æ€»ä¼¤å®³
-    tResult.nTotalEffect = tResult.nTotalEffect + nEffectValue          -- æ‰€æœ‰å‘½ä¸­æ€»æœ‰æ•ˆä¼¤å®³
+    tResult.nCount       = tResult.nCount + 1                           -- ÃüÖĞ´ÎÊı£¨¼ÙÉènSkillResultÊÇÃüÖĞ£©
+    tResult.nMax         = math.max(tResult.nMax, nValue)               -- µ¥´ÎÃüÖĞ×î´óÖµ
+    tResult.nMaxEffect   = math.max(tResult.nMaxEffect, nEffectValue)   -- µ¥´ÎÃüÖĞ×î´óÓĞĞ§Öµ
+    tResult.nMin         = (tResult.nMin ~= -1 and math.min(tResult.nMin, nValue)) or nValue                         -- µ¥´ÎÃüÖĞ×îĞ¡Öµ
+    tResult.nMinEffect   = (tResult.nMinEffect ~= -1 and math.min(tResult.nMinEffect, nEffectValue)) or nEffectValue -- µ¥´ÎÃüÖĞ×îĞ¡ÓĞĞ§Öµ
+    tResult.nTotal       = tResult.nTotal + nValue                      -- ËùÒÔÃüÖĞ×ÜÉËº¦
+    tResult.nTotalEffect = tResult.nTotalEffect + nEffectValue          -- ËùÓĞÃüÖĞ×ÜÓĞĞ§ÉËº¦
     tResult.nAvg         = math.floor(tResult.nTotal / tResult.nCount)
     tResult.nAvgEffect   = math.floor(tResult.nTotalEffect / tResult.nCount)
     
     ---------------------------------
-    -- # èŠ‚ï¼š tRecord.Target[x].Skill
+    -- # ½Ú£º tRecord.Target[x].Skill
     ---------------------------------
-    -- æ·»åŠ æ‰¿å—è€…å…·ä½“æŠ€èƒ½è®°å½•
+    -- Ìí¼Ó³ĞÊÜÕß¾ßÌå¼¼ÄÜ¼ÇÂ¼
     if not tTargetRecord.Skill[szEffectName] then
         tTargetRecord.Skill[szEffectName] = {
-            nMax         = 0,            -- è¯¥ç©å®¶å‡»ä¸­è¿™ä¸ªç©å®¶çš„å››è±¡è½®å›æœ€å¤§ä¼¤å®³
-            nMaxEffect   = 0,            -- è¯¥ç©å®¶å‡»ä¸­è¿™ä¸ªç©å®¶çš„å››è±¡è½®å›æœ€å¤§æœ‰æ•ˆä¼¤å®³
-            nTotal       = 0,            -- è¯¥ç©å®¶å‡»ä¸­è¿™ä¸ªç©å®¶çš„å››è±¡è½®å›ä¼¤å®³æ€»å’Œ
-            nTotalEffect = 0,            -- è¯¥ç©å®¶å‡»ä¸­è¿™ä¸ªç©å®¶çš„å››è±¡è½®å›æœ‰æ•ˆä¼¤å®³æ€»å’Œ
-            Count = {                    -- è¯¥ç©å®¶å‡»ä¸­è¿™ä¸ªç©å®¶çš„å››è±¡è½®å›ç»“æœç»Ÿè®¡
+            nMax         = 0,            -- ¸ÃÍæ¼Ò»÷ÖĞÕâ¸öÍæ¼ÒµÄËÄÏóÂÖ»Ø×î´óÉËº¦
+            nMaxEffect   = 0,            -- ¸ÃÍæ¼Ò»÷ÖĞÕâ¸öÍæ¼ÒµÄËÄÏóÂÖ»Ø×î´óÓĞĞ§ÉËº¦
+            nTotal       = 0,            -- ¸ÃÍæ¼Ò»÷ÖĞÕâ¸öÍæ¼ÒµÄËÄÏóÂÖ»ØÉËº¦×ÜºÍ
+            nTotalEffect = 0,            -- ¸ÃÍæ¼Ò»÷ÖĞÕâ¸öÍæ¼ÒµÄËÄÏóÂÖ»ØÓĞĞ§ÉËº¦×ÜºÍ
+            Count = {                    -- ¸ÃÍæ¼Ò»÷ÖĞÕâ¸öÍæ¼ÒµÄËÄÏóÂÖ»Ø½á¹ûÍ³¼Æ
                 -- SKILL_RESULT.HIT      = 5,
                 -- SKILL_RESULT.MISS     = 3,
                 -- SKILL_RESULT.CRITICAL = 3,
@@ -588,68 +588,68 @@ _Cache.AddRecord = function(tRecord, idTarget, szEffectName, nValue, nEffectValu
     tTargetSkillData.Count[nSkillResult] = (tTargetSkillData.Count[nSkillResult] or 0) + 1
 end
 
--- æ’å…¥ä¸€æ¡ä¼¤å®³è®°å½•
+-- ²åÈëÒ»ÌõÉËº¦¼ÇÂ¼
 MY_Recount.Data.AddDamageRecord = function(hCaster, hTarget, szEffectName, nDamage, nEffectDamage, nSkillResult)
-    -- è·å–ç´¢å¼•ID
+    -- »ñÈ¡Ë÷ÒıID
     local idCaster = (IsPlayer(hCaster.dwID) and hCaster.dwID) or MY.GetObjectName(hCaster) or g_tStrings.STR_NAME_UNKNOWN
     local idTarget = (IsPlayer(hTarget.dwID) and hTarget.dwID) or MY.GetObjectName(hTarget) or g_tStrings.STR_NAME_UNKNOWN
     
-    -- æ·»åŠ ä¼¤å®³è®°å½•
+    -- Ìí¼ÓÉËº¦¼ÇÂ¼
     _Cache.InitObjectData(Data, hCaster, 'Damage')
     _Cache.AddRecord(Data.Damage[idCaster], idTarget, szEffectName, nDamage, nEffectDamage, nSkillResult)
-    -- æ·»åŠ æ‰¿ä¼¤è®°å½•
+    -- Ìí¼Ó³ĞÉË¼ÇÂ¼
     _Cache.InitObjectData(Data, hTarget, 'BeDamage')
     _Cache.AddRecord(Data.BeDamage[idTarget], idCaster, szEffectName, nDamage, nEffectDamage, nSkillResult)
 end
 
--- æ’å…¥ä¸€æ¡æ²»ç–—è®°å½•
+-- ²åÈëÒ»ÌõÖÎÁÆ¼ÇÂ¼
 MY_Recount.Data.AddHealRecord = function(hCaster, hTarget, szEffectName, nHeal, nEffectHeal, nSkillResult)
-    -- è·å–ç´¢å¼•ID
+    -- »ñÈ¡Ë÷ÒıID
     local idCaster = (IsPlayer(hCaster.dwID) and hCaster.dwID) or MY.GetObjectName(hCaster) or g_tStrings.STR_NAME_UNKNOWN
     local idTarget = (IsPlayer(hTarget.dwID) and hTarget.dwID) or MY.GetObjectName(hTarget) or g_tStrings.STR_NAME_UNKNOWN
     
-    -- æ·»åŠ ä¼¤å®³è®°å½•
+    -- Ìí¼ÓÉËº¦¼ÇÂ¼
     _Cache.InitObjectData(Data, hCaster, 'Heal')
     _Cache.AddRecord(Data.Heal[idCaster], idTarget, szEffectName, nHeal, nEffectHeal, nSkillResult)
-    -- æ·»åŠ æ‰¿ä¼¤è®°å½•
+    -- Ìí¼Ó³ĞÉË¼ÇÂ¼
     _Cache.InitObjectData(Data, hTarget, 'BeHeal')
     _Cache.AddRecord(Data.BeHeal[idTarget], idCaster, szEffectName, nHeal, nEffectHeal, nSkillResult)
 end
 
--- ç¡®è®¤å¯¹è±¡æ•°æ®å·²åˆ›å»ºï¼ˆæœªåˆ›å»ºåˆ™åˆ›å»ºï¼‰
+-- È·ÈÏ¶ÔÏóÊı¾İÒÑ´´½¨£¨Î´´´½¨Ôò´´½¨£©
 _Cache.InitObjectData = function(data, obj, szChannel)
     local id = (IsPlayer(obj.dwID) and obj.dwID) or MY.GetObjectName(obj) or g_tStrings.STR_NAME_UNKNOWN
     if IsPlayer(obj.dwID) and not data.Namelist[id] then
-        data.Namelist[id]  = MY.Game.GetObjectName(obj) -- åç§°ç¼“å­˜
-        data.Forcelist[id] = obj.dwForceID or 0         -- åŠ¿åŠ›ç¼“å­˜
+        data.Namelist[id]  = MY.Game.GetObjectName(obj) -- Ãû³Æ»º´æ
+        data.Forcelist[id] = obj.dwForceID or 0         -- ÊÆÁ¦»º´æ
     end
     
     if not data[szChannel][id] then
         data[szChannel][id] = {
-            nTotal       = 0 ,                    -- æ€»è¾“å‡º
-            nTotalEffect = 0 ,                    -- æœ‰æ•ˆè¾“å‡º
-            Detail       = {},                    -- è¾“å‡ºç»“æœæŒ‰æŠ€èƒ½ç»“æœåˆ†ç±»ç»Ÿè®¡
-            Skill        = {},                    -- è¯¥ç©å®¶å…·ä½“é€ æˆè¾“å‡ºçš„æŠ€èƒ½ç»Ÿè®¡
-            Target       = {},                    -- è¯¥ç©å®¶å…·ä½“å¯¹è°é€ æˆè¾“å‡ºçš„ç»Ÿè®¡
+            nTotal       = 0 ,                    -- ×ÜÊä³ö
+            nTotalEffect = 0 ,                    -- ÓĞĞ§Êä³ö
+            Detail       = {},                    -- Êä³ö½á¹û°´¼¼ÄÜ½á¹û·ÖÀàÍ³¼Æ
+            Skill        = {},                    -- ¸ÃÍæ¼Ò¾ßÌåÔì³ÉÊä³öµÄ¼¼ÄÜÍ³¼Æ
+            Target       = {},                    -- ¸ÃÍæ¼Ò¾ßÌå¶ÔË­Ôì³ÉÊä³öµÄÍ³¼Æ
         }
     end
 end
 
--- åˆå§‹åŒ–Data
+-- ³õÊ¼»¯Data
 MY_Recount.Data.Init = function(bForceInit)
     local bNew
     if bForceInit or (not Data) or
     (Data.UUID and MY.Player.GetFightUUID() ~= Data.UUID) then
         Data = {
-            UUID        = MY.Player.GetFightUUID(), -- æˆ˜æ–—å”¯ä¸€æ ‡è¯†
-            nTimeBegin  = GetCurrentTime(),         -- æˆ˜æ–—å¼€å§‹æ—¶é—´
-            nTimeDuring =  0,                       -- æˆ˜æ–—æŒç»­æ—¶é—´
-            Namelist    = {},                       -- åç§°ç¼“å­˜
-            Forcelist   = {},                       -- åŠ¿åŠ›ç¼“å­˜
-            Damage      = {},                       -- è¾“å‡ºç»Ÿè®¡
-            Heal        = {},                       -- æ²»ç–—ç»Ÿè®¡
-            BeHeal      = {},                       -- æ‰¿ç–—ç»Ÿè®¡
-            BeDamage    = {},                       -- æ‰¿ä¼¤ç»Ÿè®¡
+            UUID        = MY.Player.GetFightUUID(), -- Õ½¶·Î¨Ò»±êÊ¶
+            nTimeBegin  = GetCurrentTime(),         -- Õ½¶·¿ªÊ¼Ê±¼ä
+            nTimeDuring =  0,                       -- Õ½¶·³ÖĞøÊ±¼ä
+            Namelist    = {},                       -- Ãû³Æ»º´æ
+            Forcelist   = {},                       -- ÊÆÁ¦»º´æ
+            Damage      = {},                       -- Êä³öÍ³¼Æ
+            Heal        = {},                       -- ÖÎÁÆÍ³¼Æ
+            BeHeal      = {},                       -- ³ĞÁÆÍ³¼Æ
+            BeDamage    = {},                       -- ³ĞÉËÍ³¼Æ
         }
     end
     
@@ -659,7 +659,7 @@ MY_Recount.Data.Init = function(bForceInit)
     end
 end
 
--- Dataæ•°æ®å‹å…¥å†å²è®°å½• å¹¶é‡æ–°åˆå§‹åŒ–Data
+-- DataÊı¾İÑ¹ÈëÀúÊ·¼ÇÂ¼ ²¢ÖØĞÂ³õÊ¼»¯Data
 MY_Recount.Data.Push = function()
     if not (Data and Data.UUID) then
         return
@@ -675,27 +675,27 @@ MY_Recount.Data.Push = function()
     MY_Recount.Data.Init(true)
 end
 
--- ç³»ç»Ÿæ—¥å¿—ç›‘æ§ï¼ˆæ•°æ®æºï¼‰
+-- ÏµÍ³ÈÕÖ¾¼à¿Ø£¨Êı¾İÔ´£©
 MY.RegisterEvent('SYS_MSG', function()
     if arg0 == "UI_OME_SKILL_CAST_LOG" then
-        -- æŠ€èƒ½æ–½æ”¾æ—¥å¿—ï¼›
-        -- (arg1)dwCasterï¼šæŠ€èƒ½æ–½æ”¾è€… (arg2)dwSkillIDï¼šæŠ€èƒ½ID (arg3)dwLevelï¼šæŠ€èƒ½ç­‰çº§
+        -- ¼¼ÄÜÊ©·ÅÈÕÖ¾£»
+        -- (arg1)dwCaster£º¼¼ÄÜÊ©·ÅÕß (arg2)dwSkillID£º¼¼ÄÜID (arg3)dwLevel£º¼¼ÄÜµÈ¼¶
         -- MY_Recount.OnSkillCast(arg1, arg2, arg3)
     elseif arg0 == "UI_OME_SKILL_CAST_RESPOND_LOG" then
-        -- æŠ€èƒ½æ–½æ”¾ç»“æœæ—¥å¿—ï¼›
-        -- (arg1)dwCasterï¼šæŠ€èƒ½æ–½æ”¾è€… (arg2)dwSkillIDï¼šæŠ€èƒ½ID
-        -- (arg3)dwLevelï¼šæŠ€èƒ½ç­‰çº§ (arg4)nRespondï¼šè§æšä¸¾å‹[[SKILL_RESULT_CODE]]
+        -- ¼¼ÄÜÊ©·Å½á¹ûÈÕÖ¾£»
+        -- (arg1)dwCaster£º¼¼ÄÜÊ©·ÅÕß (arg2)dwSkillID£º¼¼ÄÜID
+        -- (arg3)dwLevel£º¼¼ÄÜµÈ¼¶ (arg4)nRespond£º¼ûÃ¶¾ÙĞÍ[[SKILL_RESULT_CODE]]
         -- MY_Recount.OnSkillCastRespond(arg1, arg2, arg3, arg4)
     elseif arg0 == "UI_OME_SKILL_EFFECT_LOG" then
-        -- æœªè¿›æˆ˜åˆ™åˆå§‹åŒ–ç»Ÿè®¡æ•°æ®ï¼ˆå³é»˜è®¤å½“å‰å¸§æ‰€æœ‰çš„æŠ€èƒ½æ—¥å¿—ä¸ºè¿›æˆ˜æŠ€èƒ½ï¼‰
+        -- Î´½øÕ½Ôò³õÊ¼»¯Í³¼ÆÊı¾İ£¨¼´Ä¬ÈÏµ±Ç°Ö¡ËùÓĞµÄ¼¼ÄÜÈÕÖ¾Îª½øÕ½¼¼ÄÜ£©
         if not MY.Player.GetFightUUID() and
         _Cache.nLastAutoInitFrame ~= GetLogicFrameCount() then
             _Cache.nLastAutoInitFrame = GetLogicFrameCount()
             MY_Recount.Data.Init(true)
         end
-        -- æŠ€èƒ½æœ€ç»ˆäº§ç”Ÿçš„æ•ˆæœï¼ˆç”Ÿå‘½å€¼çš„å˜åŒ–ï¼‰ï¼›
-        -- (arg1)dwCasterï¼šæ–½æ”¾è€… (arg2)dwTargetï¼šç›®æ ‡ (arg3)bReactï¼šæ˜¯å¦ä¸ºåå‡» (arg4)nTypeï¼šEffectç±»å‹ (arg5)dwID:Effectçš„ID 
-        -- (arg6)dwLevelï¼šEffectçš„ç­‰çº§ (arg7)bCriticalStrikeï¼šæ˜¯å¦ä¼šå¿ƒ (arg8)nCountï¼štResultCountæ•°æ®è¡¨ä¸­å…ƒç´ ä¸ªæ•° (arg9)tResultCountï¼šæ•°å€¼é›†åˆ
+        -- ¼¼ÄÜ×îÖÕ²úÉúµÄĞ§¹û£¨ÉúÃüÖµµÄ±ä»¯£©£»
+        -- (arg1)dwCaster£ºÊ©·ÅÕß (arg2)dwTarget£ºÄ¿±ê (arg3)bReact£ºÊÇ·ñÎª·´»÷ (arg4)nType£ºEffectÀàĞÍ (arg5)dwID:EffectµÄID 
+        -- (arg6)dwLevel£ºEffectµÄµÈ¼¶ (arg7)bCriticalStrike£ºÊÇ·ñ»áĞÄ (arg8)nCount£ºtResultCountÊı¾İ±íÖĞÔªËØ¸öÊı (arg9)tResultCount£ºÊıÖµ¼¯ºÏ
         -- MY_Recount.Data.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
         if arg7 and arg7 ~= 0 then -- bCriticalStrike
             MY_Recount.Data.OnSkillEffect(arg1, arg2, arg4, arg5, arg6, SKILL_RESULT.CRITICAL, arg8, arg9)
@@ -703,33 +703,33 @@ MY.RegisterEvent('SYS_MSG', function()
             MY_Recount.Data.OnSkillEffect(arg1, arg2, arg4, arg5, arg6, SKILL_RESULT.HIT, arg8, arg9)
         end
     elseif arg0 == "UI_OME_SKILL_BLOCK_LOG" then
-        -- æ ¼æŒ¡æ—¥å¿—ï¼›
-        -- (arg1)dwCasterï¼šæ–½æ”¾è€… (arg2)dwTargetï¼šç›®æ ‡ (arg3)nTypeï¼šEffectçš„ç±»å‹
-        -- (arg4)dwIDï¼šEffectçš„ID (arg5)dwLevelï¼šEffectçš„ç­‰çº§ (arg6)nDamageTypeï¼šä¼¤å®³ç±»å‹ï¼Œè§æšä¸¾å‹[[SKILL_RESULT_TYPE]]
+        -- ¸ñµ²ÈÕÖ¾£»
+        -- (arg1)dwCaster£ºÊ©·ÅÕß (arg2)dwTarget£ºÄ¿±ê (arg3)nType£ºEffectµÄÀàĞÍ
+        -- (arg4)dwID£ºEffectµÄID (arg5)dwLevel£ºEffectµÄµÈ¼¶ (arg6)nDamageType£ºÉËº¦ÀàĞÍ£¬¼ûÃ¶¾ÙĞÍ[[SKILL_RESULT_TYPE]]
         MY_Recount.Data.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, SKILL_RESULT.BLOCK, nil, {})
     elseif arg0 == "UI_OME_SKILL_SHIELD_LOG" then
-        -- æŠ€èƒ½è¢«å±è”½æ—¥å¿—ï¼›
-        -- (arg1)dwCasterï¼šæ–½æ”¾è€… (arg2)dwTargetï¼šç›®æ ‡
-        -- (arg3)nTypeï¼šEffectçš„ç±»å‹ (arg4)dwIDï¼šEffectçš„ID (arg5)dwLevelï¼šEffectçš„ç­‰çº§
+        -- ¼¼ÄÜ±»ÆÁ±ÎÈÕÖ¾£»
+        -- (arg1)dwCaster£ºÊ©·ÅÕß (arg2)dwTarget£ºÄ¿±ê
+        -- (arg3)nType£ºEffectµÄÀàĞÍ (arg4)dwID£ºEffectµÄID (arg5)dwLevel£ºEffectµÄµÈ¼¶
         MY_Recount.Data.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, SKILL_RESULT.SHIELD, nil, {})
     elseif arg0 == "UI_OME_SKILL_MISS_LOG" then
-        -- æŠ€èƒ½æœªå‘½ä¸­ç›®æ ‡æ—¥å¿—ï¼›
-        -- (arg1)dwCasterï¼šæ–½æ”¾è€… (arg2)dwTargetï¼šç›®æ ‡ 
-        -- (arg3)nTypeï¼šEffectçš„ç±»å‹ (arg4)dwIDï¼šEffectçš„ID (arg5)dwLevelï¼šEffectçš„ç­‰çº§
+        -- ¼¼ÄÜÎ´ÃüÖĞÄ¿±êÈÕÖ¾£»
+        -- (arg1)dwCaster£ºÊ©·ÅÕß (arg2)dwTarget£ºÄ¿±ê 
+        -- (arg3)nType£ºEffectµÄÀàĞÍ (arg4)dwID£ºEffectµÄID (arg5)dwLevel£ºEffectµÄµÈ¼¶
         MY_Recount.Data.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, SKILL_RESULT.MISS, nil, {})
     elseif arg0 == "UI_OME_SKILL_HIT_LOG" then
-        -- æŠ€èƒ½å‘½ä¸­ç›®æ ‡æ—¥å¿—ï¼›
-        -- (arg1)dwCasterï¼šæ–½æ”¾è€… (arg2)dwTargetï¼šç›®æ ‡
-        -- (arg3)nTypeï¼šEffectçš„ç±»å‹ (arg4)dwIDï¼šEffectçš„ID (arg5)dwLevelï¼šEffectçš„ç­‰çº§
+        -- ¼¼ÄÜÃüÖĞÄ¿±êÈÕÖ¾£»
+        -- (arg1)dwCaster£ºÊ©·ÅÕß (arg2)dwTarget£ºÄ¿±ê
+        -- (arg3)nType£ºEffectµÄÀàĞÍ (arg4)dwID£ºEffectµÄID (arg5)dwLevel£ºEffectµÄµÈ¼¶
         -- MY_Recount.Data.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, SKILL_RESULT.HIT, nil, {})
     elseif arg0 == "UI_OME_SKILL_DODGE_LOG" then
-        -- æŠ€èƒ½è¢«é—ªé¿æ—¥å¿—ï¼›
-        -- (arg1)dwCasterï¼šæ–½æ”¾è€… (arg2)dwTargetï¼šç›®æ ‡
-        -- (arg3)nTypeï¼šEffectçš„ç±»å‹ (arg4)dwIDï¼šEffectçš„ID (arg5)dwLevelï¼šEffectçš„ç­‰çº§
+        -- ¼¼ÄÜ±»ÉÁ±ÜÈÕÖ¾£»
+        -- (arg1)dwCaster£ºÊ©·ÅÕß (arg2)dwTarget£ºÄ¿±ê
+        -- (arg3)nType£ºEffectµÄÀàĞÍ (arg4)dwID£ºEffectµÄID (arg5)dwLevel£ºEffectµÄµÈ¼¶
         MY_Recount.Data.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, SKILL_RESULT.DODGE, nil, {})
     elseif arg0 == "UI_OME_COMMON_HEALTH_LOG" then
-        -- æ™®é€šæ²»ç–—æ—¥å¿—ï¼›
-        -- (arg1)dwCharacterIDï¼šæ‰¿ç–—ç©å®¶ID (arg2)nDeltaLifeï¼šå¢åŠ è¡€é‡å€¼
+        -- ÆÕÍ¨ÖÎÁÆÈÕÖ¾£»
+        -- (arg1)dwCharacterID£º³ĞÁÆÍæ¼ÒID (arg2)nDeltaLife£ºÔö¼ÓÑªÁ¿Öµ
         -- MY_Recount.OnCommonHealth(arg1, arg2)
     end
 end)

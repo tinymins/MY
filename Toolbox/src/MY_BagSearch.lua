@@ -1,4 +1,4 @@
-ï»¿--[[
+--[[
 #######################################################################################################
             #                         #             #               #                 # # # #     
           #   #             # # # # # # # # # #       #             #     #           #           
@@ -120,9 +120,9 @@ _Cache.OnBreathe = function()
         end
     end
 end
--- è¿‡æ»¤èƒŒåŒ…
+-- ¹ıÂË±³°ü
 _Cache.DoFilterBag = function()
-    -- ä¼˜åŒ–æ€§èƒ½ å½“è¿‡æ»¤å™¨ä¸ºç©ºæ—¶ä¸éå†ç­›é€‰
+    -- ÓÅ»¯ĞÔÄÜ µ±¹ıÂËÆ÷Îª¿ÕÊ±²»±éÀúÉ¸Ñ¡
     if _Cache.szBagFilter or _Cache.bBagTimeLtd then
         _Cache.FilterPackage("Normal/BigBagPanel/", _Cache.szBagFilter, _Cache.bBagTimeLtd)
         if _Cache.szBagFilter == "" then
@@ -130,9 +130,9 @@ _Cache.DoFilterBag = function()
         end
     end
 end
--- è¿‡æ»¤ä»“åº“
+-- ¹ıÂË²Ö¿â
 _Cache.DoFilterBank = function()
-    -- ä¼˜åŒ–æ€§èƒ½ å½“è¿‡æ»¤å™¨ä¸ºç©ºæ—¶ä¸éå†ç­›é€‰
+    -- ÓÅ»¯ĞÔÄÜ µ±¹ıÂËÆ÷Îª¿ÕÊ±²»±éÀúÉ¸Ñ¡
     if _Cache.szBankFilter or _Cache.bBankTimeLtd then
         _Cache.FilterPackage("Normal/BigBankPanel/", _Cache.szBankFilter, _Cache.bBankTimeLtd)
         if _Cache.szBankFilter == "" then
@@ -140,9 +140,9 @@ _Cache.DoFilterBank = function()
         end
     end
 end
--- è¿‡æ»¤å¸®ä¼šä»“åº“
+-- ¹ıÂË°ï»á²Ö¿â
 _Cache.DoFilterGuildBank = function()
-    -- ä¼˜åŒ–æ€§èƒ½ å½“è¿‡æ»¤å™¨ä¸ºç©ºæ—¶ä¸éå†ç­›é€‰
+    -- ÓÅ»¯ĞÔÄÜ µ±¹ıÂËÆ÷Îª¿ÕÊ±²»±éÀúÉ¸Ñ¡
     if _Cache.szGuildBankFilter then
         _Cache.FilterGuildPackage("Normal/GuildBankPanel/", _Cache.szGuildBankFilter)
         if _Cache.szGuildBankFilter == "" then
@@ -150,7 +150,7 @@ _Cache.DoFilterGuildBank = function()
         end
     end
 end
--- è¿‡æ»¤èƒŒåŒ…åŸå§‹å‡½æ•°
+-- ¹ıÂË±³°üÔ­Ê¼º¯Êı
 _Cache.FilterPackage = function(szTreePath, szFilter, bTimeLtd)
     szFilter = szFilter or ""
     local me = GetClientPlayer()
@@ -172,7 +172,7 @@ _Cache.FilterPackage = function(szTreePath, szFilter, bTimeLtd)
         end
     end)
 end
--- è¿‡æ»¤å¸®ä¼šä»“åº“åŸå§‹å‡½æ•°
+-- ¹ıÂË°ï»á²Ö¿âÔ­Ê¼º¯Êı
 _Cache.FilterGuildPackage = function(szTreePath, szFilter)
     szFilter = szFilter or ""
     local me = GetClientPlayer()
@@ -186,7 +186,7 @@ _Cache.FilterGuildPackage = function(szTreePath, szFilter)
         end
     end)
 end
--- äº‹ä»¶æ³¨å†Œ
+-- ÊÂ¼ş×¢²á
 MY.RegisterEvent("BAG_ITEM_UPDATE", _Cache.DoFilterBag)
 MY.RegisterEvent("BAG_ITEM_UPDATE", _Cache.DoFilterBank)
 MY.RegisterEvent("BAG_ITEM_UPDATE", _Cache.DoFilterGuildBank)
