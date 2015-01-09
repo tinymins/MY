@@ -1,4 +1,4 @@
-MY_TalkEx = MY_TalkEx or {}
+﻿MY_TalkEx = MY_TalkEx or {}
 local _MY_TalkEx = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."TalkEx/lang/")
 MY_TalkEx.tTalkChannels = {}

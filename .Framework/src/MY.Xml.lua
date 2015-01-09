@@ -1,4 +1,4 @@
---
+﻿--
 -- Simple XML decoding and encoding in pure Lua.
 --
 -- @author 翟一鸣 @tinymins, Gavin Kistner

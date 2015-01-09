@@ -1,4 +1,4 @@
---
+﻿--
 -- Simple JSON encoding and decoding in pure Lua.
 --
 -- @author hightman, Jeffrey Friedl
