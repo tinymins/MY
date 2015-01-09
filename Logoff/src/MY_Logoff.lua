@@ -42,7 +42,7 @@ end
 -- (void)MY_Logoff.LogOff(bCompletely, bUnfight)
 MY_Logoff.LogOffEx = function(bCompletely, bUnfight)
     if not bUnfight then MY.Player.LogOff(bCompletely) return nil end
-    MY.Sysmsg({"脱战登出已启动，请释放脱战技能，游戏将在脱战瞬间下线。"})
+    MY.Sysmsg({_L["Logoff is ready for your casting unfight skill."]})
     -- 添加呼吸函数等待脱战。
     MY.BreatheCall("LOG_OFF",function()
         if not GetClientPlayer().bFightState then
@@ -54,24 +54,32 @@ end
 MY_Logoff.PrintCurrentCondition = function(nChanel) 
     nChanel = nChanel or PLAYER_TALK_CHANNEL.LOCAL_SYS
     MY.Talk(nChanel, "--------------------------------------------------\n")
-    MY.Talk(nChanel, "[茗伊插件]游戏将在符合以下条件之一时返回到"..((MY_Logoff.bLogOffCompletely and "账号登录界面") or "角色选择界面").."：\n")
+    MY.Talk(nChanel, "[".._L['mingyi plugin'] .. "]" ..
+        _L["Any condition matches, game will return to "] ..
+        ((MY_Logoff.bLogOffCompletely and "login page") or "character page") ..
+        g_tStrings.STR_COLON .. "\n"
+    )
     if MY_Logoff.bTimeOutLogOff then
         local nTimeOutUnixTime = _MY_Logoff.nTimeOutUnixTime or MY_Logoff.nTimeOut+GetCurrentTime()
         local tDate = TimeToDate(nTimeOutUnixTime)
-        MY.Talk(nChanel,  string.format("※当系统时间超过：%04d年%02d月%02d日 %02d:%02d:%02d (%d秒后)\n", tDate.year, tDate.month, tDate.day, tDate.hour, tDate.minute, tDate.second, nTimeOutUnixTime-GetCurrentTime()) )
+        MY.Talk(nChanel,  _L('* while time up to %04d-%02d-%02d %02d:%02d:%02d (%d seconds later)',
+            tDate.year, tDate.month, tDate.day, tDate.hour, tDate.minute, tDate.second, nTimeOutUnixTime-GetCurrentTime()
+        ) .. '\n')
     end
     if MY_Logoff.bPlayerLeaveLogOff then
         local t = {}
         for dwID, szName in pairs(MY_Logoff.aPlayerLeaveLogOff) do
             table.insert(t, szName..'('..dwID..')')
         end
-        MY.Talk(nChanel, "※当下列玩家全部消失于视野：" .. table.concat(t, ',')..'\n' )
+        MY.Talk(nChanel, _L["* while players below all disappeared:"] .. table.concat(t, ',') .. '\n' )
     end
     if MY_Logoff.bClientLevelOverLogOff then
-        MY.Talk(nChanel, "※当自身等级达到" .. MY_Logoff.nClientLevelOverLogOff .. "级时。\n")
+        MY.Talk(nChanel, _L('* while self level up to %d.', MY_Logoff.nClientLevelOverLogOff) .. "\n")
     end
     if MY_Logoff.bTargetBloodLessLogOff and MY_Logoff.szTargetBloodLessLogOff then
-        MY.Talk(nChanel, string.format( '※当[%s(%d)]血量低于%d%%时。', MY_Logoff.szTargetBloodLessLogOff, MY_Logoff.dwTargetBloodLessLogOff, MY_Logoff.nTargetBloodLessLogOff )..'\n')
+        MY.Talk(nChanel, _L('* while [%s(%d)]\'s life below %d%%.',
+            MY_Logoff.szTargetBloodLessLogOff, MY_Logoff.dwTargetBloodLessLogOff, MY_Logoff.nTargetBloodLessLogOff
+        )..'\n')
     end
     MY.Talk(nChanel, "--------------------------------------------------\n")
 end
@@ -162,7 +170,7 @@ _MY_Logoff.OnPanelActive = function(wnd)
     
     -- 指定玩家消失后下线
     ui:append('WndCheckBox_PlayerLeaveLogOff','WndCheckBox'):children('#WndCheckBox_PlayerLeaveLogOff')
-      :pos(offset.x+10,offset.y+80):text('当')
+      :pos(offset.x+10,offset.y+80):text(_L['while'])
       :check(MY_Logoff.bPlayerLeaveLogOff or false)
       :check(function(b)MY_Logoff.bPlayerLeaveLogOff=b end)
     

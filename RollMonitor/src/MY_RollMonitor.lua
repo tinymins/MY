@@ -197,7 +197,7 @@ _MY_RollMonitor.OnPanelActive = function(wnd)
     _MY_RollMonitor.uiBoard = ui
       :append('WndScrollBox_Record','WndScrollBox'):children('#WndScrollBox_Record')
       :pos(20, 40):size(w-26, h-60):handleStyle(3)
-      :text(_L['去掉最高最低取平均值'])
+      :text(_L['average score with out pole'])
     
     _MY_RollMonitor.RedrawBoard()
 end
