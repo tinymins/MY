@@ -147,8 +147,8 @@ MY_Farbnamen.ShowTip = function(namelink)
         end
         -- 门派 体型 阵营
         table.insert(tTip,
-            _MY_Farbnamen.tForceString[tInfo.dwForceID] .. g_tStrings.STR_SPLIT_DOT ..
-            _MY_Farbnamen.tRoleType[tInfo.nRoleType]    .. g_tStrings.STR_SPLIT_DOT ..
+            _MY_Farbnamen.tForceString[tInfo.dwForceID] .. _L.STR_SPLIT_DOT ..
+            _MY_Farbnamen.tRoleType[tInfo.nRoleType]    .. _L.STR_SPLIT_DOT ..
             _MY_Farbnamen.tCampString[tInfo.nCamp]
         )
         

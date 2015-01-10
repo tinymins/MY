@@ -3,6 +3,7 @@ data = {
     -- common
     ['*'] = '※',
     [' * '] = ' ※ ',
+    STR_SPLIT_DOT = '·',
     
     ["General"] = "常用",
     ["Target"] = "目标",
