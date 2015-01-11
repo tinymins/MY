@@ -16,7 +16,7 @@ RegisterCustomData("Account\\MY_Farbnamen.bEnabled")
 local SZ_CONFIG_PATH = "config/PLAYER_FORCE_COLOR"
 local SZ_CACHE_PATH = "cache/PLAYER_INFO/" .. (MY.Game.GetServer())
 local Config_Default = {
-    nMaxCache= 200,
+    nMaxCache= 2000,
     tForceColor  = MY.LoadLUAData(SZ_CONFIG_PATH, true) or {
         [0]  = { 255, 255, 255 },       --江湖
         [1]  = { 255, 178, 95  },       --少林
@@ -271,8 +271,8 @@ function MY_Farbnamen.LoadData()
     end
     -- 解析数据
     local t = {
-        ['aCached']   = data.aCached   or {} ,    -- 保存的用户表
-        ['nMaxCache'] = data.nMaxCache or 100,    -- 最大缓存数量
+        ['aCached']   = data.aCached   or {}  ,    -- 保存的用户表
+        ['nMaxCache'] = data.nMaxCache or 2000,    -- 最大缓存数量
     }
     -- 转移旧版本数据
     for i=1, #data, 1 do
