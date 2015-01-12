@@ -188,9 +188,11 @@ local function grok_array(text, start)
 		return VALUE, i + 1
 	end
 	local text_len = text:len()
+	local nIndex = 1
 	while i <= text_len do
 		local val, new_i = grok_one(text, i)
-		table.insert(VALUE, val)
+		-- table.insert(VALUE, val) -- this will cause a bug: table.insert(VALUE, nil) -- [null,null,1] -> {1}
+		VALUE[nIndex] = val
 		i = skip_whitespace(text, new_i)
 		-- Expect now either ']' to end things, or a ',' to allow us to continue.
 		local c = text:sub(i,i)
@@ -201,6 +203,7 @@ local function grok_array(text, start)
 			decode_error("expected comma or '['", text, i)
 		end
 		i = skip_whitespace(text, i + 1)
+		nIndex = nIndex + 1
 	end
 	decode_error("unclosed '['", text, start)
 end
