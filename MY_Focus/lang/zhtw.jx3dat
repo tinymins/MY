@@ -1,4 +1,4 @@
--- language data (zhcn) updated at 2014-4-10 03:38:11
+-- language data (zhtw) updated at 2014-4-10 03:38:11
 data = {
     ['focus list'] = '焦點列表',
     ['enable'] = '啓用',
@@ -6,7 +6,7 @@ data = {
     ['auto focus friend'] = '焦點附近好友',
     ['auto focus tong'] = '焦點幫會成員',
     ['auto focus enemy'] = '焦點敵對玩家',
-    ['traversal object'] = '遍歷焦點目標',
+    ['traversal object'] = '遍曆焦點目標',
     ['show focus\'s target'] = '顯示目標目標',
     ['auto focus'] = '啓用默認焦點',
     ['namelist manager'] = '默認焦點管理',

@@ -1,4 +1,4 @@
--- language data (zhcn) updated at 2014-4-10 03:38:11
+-- language data (zhtw) updated at 2014-4-10 03:38:11
 data = {
     ['SAY']      = '說',
     ['MAP']      = '地',
@@ -14,7 +14,7 @@ data = {
     ['AWAY']     = '離',
     ['BUSY']     = '擾',
     
-    ['chat helper'] = '聊天監控',
+    ['chat helper'] = '聊天助手',
     
     ['about...'] = '關于...',
     ['lock postion'] = '鎖定位置',

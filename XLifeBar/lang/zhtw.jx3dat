@@ -1,4 +1,4 @@
--- language data (zhcn) updated at 2014-4-10 03:38:11
+-- language data (zhtw) updated at 2014-4-10 03:38:11
 data = {
     ['x lifebar'] = '扁平血條',
     
@@ -56,4 +56,5 @@ data = {
     
     ['hide when unfight'] = '脫戰時隱藏',
     ['hide decimal'] = '不顯示小數',
+    
 }
