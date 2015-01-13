@@ -18,6 +18,7 @@ MY_Focus.nMaxDisplay= 5     -- 最大显示数量
 MY_Focus.bAutoFocus = true  -- 启用默认焦点
 MY_Focus.bShowTarget= false -- 显示目标的目标
 MY_Focus.bTraversal = false -- 遍历焦点列表
+MY_Focus.bHideDeath = false -- 隐藏死亡目标
 MY_Focus.tAutoFocus = {}    -- 默认焦点
 MY_Focus.tFocusList = {     -- 永久焦点
     [TARGET.NPC]    = {},
@@ -36,6 +37,7 @@ RegisterCustomData("MY_Focus.tAutoFocus")
 RegisterCustomData("MY_Focus.tFocusList")
 RegisterCustomData("MY_Focus.bShowTarget")
 RegisterCustomData("MY_Focus.bTraversal")
+RegisterCustomData("MY_Focus.bHideDeath")
 RegisterCustomData("MY_Focus.anchor")
 
 local m_frame
@@ -268,6 +270,15 @@ MY_Focus.DelFocus = function(dwType, dwID)
     end
 end
 
+-- 获取焦点列表
+MY_Focus.GetFocusList = function()
+    local t = {}
+    for _, v in ipairs(_Cache.tFocusList) do
+        table.insert(t, v)
+    end
+    return t
+end
+
 -- 清空焦点列表
 MY_Focus.ClearFocus = function()
     _Cache.tFocusList = {}
@@ -497,16 +508,19 @@ end
 ]]
 
 -- 周期重绘
--- local m_nTick = 0
 MY_Focus.OnFrameBreathe = function()
-    -- if m_nTick == 0 then
-        MY_Focus.UpdateList()
-    -- end
+    if MY_Focus.bHideDeath then
+        for _, p in ipairs(MY_Focus.GetFocusList()) do
+            if p.dwType == TARGET.NPC or p.dwType == TARGET.PLAYER then
+                local tar = MY.GetObject(p.dwType, p.dwID)
+                if not tar or tar.nMoveState == MOVE_STATE.ON_DEATH then
+                    MY_Focus.DelFocus(p.dwType, p.dwID)
+                end
+            end
+        end
+    end
+    MY_Focus.UpdateList()
     MY_Focus.AdjustUI()
-    -- m_nTick = m_nTick + 1
-    -- if m_nTick > 1 then
-    --     m_nTick = 0
-    -- end
 end
 
 MY_Focus.OnFrameDragSetPosEnd = function()
@@ -638,6 +652,17 @@ MY_Focus.GetMenu = function()
             bChecked = MY_Focus.bTraversal,
             fnAction = function()
                 MY_Focus.bTraversal = not MY_Focus.bTraversal
+            end,
+            fnDisable = function()
+                return not MY_Focus.bEnable
+            end,
+        }, {
+            szOption = _L['hide dead object'],
+            bCheck = true,
+            bChecked = MY_Focus.bHideDeath,
+            fnAction = function()
+                MY_Focus.bHideDeath = not MY_Focus.bHideDeath
+                MY_Focus.RescanNearby()
             end,
             fnDisable = function()
                 return not MY_Focus.bEnable
