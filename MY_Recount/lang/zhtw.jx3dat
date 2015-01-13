@@ -24,7 +24,7 @@ data = {
     ['theme'] = '自定風格選擇',
     ['max history'] = '最大曆史記錄',
     
-    ['publish limit'] = '發布數量',
+    ['publish limit'] = '發佈數量',
     ['top %d'] = '前%d名',
     ['publish mode'] = '發佈模式',
     ['only effect value'] = '僅發佈有效值',

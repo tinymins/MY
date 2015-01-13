@@ -1,4 +1,4 @@
--- language data (zhcn) updated at 2014-4-10 03:38:11
+-- language data (zhtw) updated at 2014-4-10 03:38:11
 data = {
     -- MY_Toolbox.lua
     ['toolbox'] = '常用工具',
@@ -42,11 +42,11 @@ data = {
     ['Nearby GongZhan Total Count: %d.'] = '附近共戰數量：%d。',
     ['------------------------------------'] = '————————————————————————',
     
-    ['avoid blacking shenxing cd'] = '防止神行CD被吃',
-    ['Shenxing has been cancelled, cause you got the zhenyan.'] = '您獲取到陣眼，為防止神行千里CD被黑，讀條已自動打斷。',
-    
     ['visual skill'] = '技能可視化',
     ['display %d skills.'] = '顯示%d格。',
+    
+    ['avoid blacking shenxing cd'] = '防止神行CD被吃',
+    ['Shenxing has been cancelled, cause you got the zhenyan.'] = '您獲取到陣眼，爲防止神行千裏CD被黑，讀條已自動打斷。',
     
     ['* buff monitor'] = '※ BUFF監控',
     ['undragable'] = '禁止拖動',
@@ -66,7 +66,7 @@ data = {
     ['* anmerkungen'] = '※ 隨身便箋 記在小本子上',
     ['width: %dpx.'] = '寬度：%d像素。',
     ['height: %dpx.'] = '高度：%d像素。',
-    ['edit player note'] = '記到小本本里',
+    ['edit player note'] = '記到小本本裏',
     ['my anmerkungen - player note edit'] = '把TA記進小本本',
     ['Name:'] = '名稱：',
     ['Content:'] = '內容：',
