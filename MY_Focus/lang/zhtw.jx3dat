@@ -8,6 +8,7 @@ data = {
     ['auto focus enemy'] = '焦點敵對玩家',
     ['traversal object'] = '遍曆焦點目標',
     ['show focus\'s target'] = '顯示目標目標',
+    ['hide dead object'] = '隱藏重傷目標',
     ['auto focus'] = '啓用默認焦點',
     ['namelist manager'] = '默認焦點管理',
     ['delete focus'] = '刪除焦點',
