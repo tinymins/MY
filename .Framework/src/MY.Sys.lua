@@ -8,6 +8,7 @@
 -----------------------------------------------
 MY = MY or {}
 MY.Sys = MY.Sys or {}
+MY.Sys.bShieldedVersion = false -- 屏蔽被河蟹的功能（国服启用）
 local _Cache, _L = {}, MY.LoadLangPack()
 
 --[[ 获取游戏语言
@@ -17,6 +18,17 @@ MY.Sys.GetLang = function()
     return lang
 end
 MY.GetLang = MY.Sys.GetLang
+
+-- 获取功能屏蔽状态
+pcall(function()
+    if MY.Sys.GetLang() == 'zhcn' then
+        MY.Sys.bShieldedVersion = true
+    end
+end)
+MY.Sys.IsShieldedVersion = function()
+    return MY.Sys.bShieldedVersion
+end
+MY.IsShieldedVersion = MY.Sys.IsShieldedVersion
 
 --[[
 -- Save & Load Lua Data
