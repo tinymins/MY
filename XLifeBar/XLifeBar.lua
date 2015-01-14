@@ -202,17 +202,48 @@ _XLifeBar.Reset = function(bNoSave)
     end
     
     if XLifeBar.bEnabled then
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_NAME , false)
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_TITLE, false)
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_LEFE , false)
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_NAME , false)
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_TITLE, false)
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_LEFE , false)
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_NAME , false)
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_TITLE, false)
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_LEFE , false)
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_GUILD, false)
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_GUILD, false)
+        if Config.bShowName.Npc.Party or Config.bShowName.Npc.Neutrality
+        or Config.bShowName.Npc.Ally  or Config.bShowName.Npc.Enemy then
+            SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_NAME , false)
+        end
+        if Config.bShowTitle.Npc.Party or Config.bShowTitle.Npc.Neutrality
+        or Config.bShowTitle.Npc.Ally or Config.bShowTitle.Npc.Enemy then
+            SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_TITLE, false)
+        end
+        if Config.bShowLife.Npc.Party or Config.bShowLife.Npc.Neutrality
+        or Config.bShowLife.Npc.Ally or Config.bShowLife.Npc.Enemy then
+            SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_LEFE , false)
+        end
+        if Config.bShowName.Player.Party or Config.bShowName.Player.Neutrality
+        or Config.bShowName.Player.Ally or Config.bShowName.Player.Enemy then
+            SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_NAME , false)
+        end
+        if Config.bShowTitle.Player.Party or Config.bShowTitle.Player.Neutrality
+        or Config.bShowTitle.Player.Ally or Config.bShowTitle.Player.Enemy then
+            SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_TITLE, false)
+        end
+        if Config.bShowLife.Player.Party or Config.bShowLife.Player.Neutrality
+        or Config.bShowLife.Player.Ally or Config.bShowLife.Player.Enemy then
+            SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_LEFE , false)
+        end
+        if Config.bShowName.Player.Self then
+            SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_NAME , false)
+        end
+        if Config.bShowTitle.Player.Self then
+            SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_TITLE, false)
+        end
+        if Config.bShowLife.Player.Self then
+            SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_LEFE , false)
+        end
+        if Config.bShowTong.Player.Self then
+            SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_GUILD, false)
+        end
+        if Config.bShowTong.Player.Party or
+        Config.bShowTong.Player.Neutrality or
+        Config.bShowTong.Player.Ally or
+        Config.bShowTong.Player.Enemy then
+            SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_GUILD, false)
+        end
     else
         SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_NAME , true)
         SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_TITLE, true)
