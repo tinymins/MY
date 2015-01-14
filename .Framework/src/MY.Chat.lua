@@ -624,7 +624,7 @@ MY.Chat.Talk = function(nChannel, szText, bNoEscape, bSaveDeny, bPushToChatBox)
         tSay = MY.Chat.ParseName(tSay)
     end
     tSay = MY.Chat.ParseAntiSWS(tSay)
-    if not MY.Chat.bHookedAlready then
+    if MY.IsShieldedVersion() then
         local nLen = 0
         for i, v in ipairs(tSay) do
             if nLen <= 64 then
