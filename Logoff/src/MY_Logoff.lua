@@ -323,8 +323,12 @@ _MY_Logoff.OnPanelActive = function(wnd)
 end
 --
 MY.RegisterInit(function()
-    if MY.Chat.bHookedAlready then
-        MY.RegisterPanel( "Logoff", _L["express logoff"], _L['General'], "UI/Image/UICommon/LoginSchool.UITex|24", {255,0,0,200}, { OnPanelActive = _MY_Logoff.OnPanelActive } )
+    if not MY.IsShieldedVersion() then
+        MY.RegisterPanel(
+            "Logoff", _L["express logoff"], _L['General'],
+            "UI/Image/UICommon/LoginSchool.UITex|24", {255,0,0,200},
+            { OnPanelActive = _MY_Logoff.OnPanelActive }
+        )
     end
 end)
 MY.RegisterInit(function()
