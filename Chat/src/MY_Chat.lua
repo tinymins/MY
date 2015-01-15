@@ -344,13 +344,18 @@ MY_Chat.ReInitUI = function()
     for _, v in ipairs(_Cache.tChannels) do
         if MY_Chat.tChannel[v.name] then
             i = i + 1
-            MY.UI(MY_Chat.frame):append(v.name,"WndRadioBox"):children("#"..v.name):width(20):text(v.title):font(197):color(v.color):pos(i*30+15,25):check(function()
+            MY.UI(MY_Chat.frame):append(v.name,"WndRadioBox"):children("#"..v.name)
+              :pos(i * 30 + 15, 25):width(22)
+              :font(197):color(v.color)
+              :text(v.title)
+              :check(function()
                 -- Switch Chat Channel Here
                 MY.SwitchChat(v.channel)
                 Station.Lookup("Lowest2/EditBox"):Show()
                 Station.SetFocusWindow("Lowest2/EditBox/Edit_Input")
                 MY.UI(this):check(false)
-            end):find(".Text"):pos(4,-18):width(20)
+              end)
+              :find(".Text"):pos(4, -44):size(22, 66)
         end
     end
     
