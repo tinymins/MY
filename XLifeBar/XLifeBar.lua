@@ -65,8 +65,10 @@ XLifeBar = XLifeBar or {}
 setmetatable(XLifeBar, { __call = function(me, ...) return me.X.new(...) end, __metatable = true })
 XLifeBar.bEnabled = false
 XLifeBar.bUseGlobalConfig = false
+XLifeBar.tSysHeadTop      = false
 RegisterCustomData("XLifeBar.bEnabled")
 RegisterCustomData("XLifeBar.bUseGlobalConfig")
+RegisterCustomData("XLifeBar.tSysHeadTop")
 local _XLifeBar = {
     szConfig = "userdata/XLifeBar/CFG",
     tObject = {},
@@ -226,6 +228,10 @@ _XLifeBar.Reset = function(bNoSave)
         or Config.bShowLife.Player.Ally or Config.bShowLife.Player.Enemy then
             SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_LEFE , false)
         end
+        if Config.bShowTong.Player.Party or Config.bShowTong.Player.Neutrality
+        or Config.bShowTong.Player.Ally or Config.bShowTong.Player.Enemy then
+            SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_GUILD, false)
+        end
         if Config.bShowName.Player.Self then
             SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_NAME , false)
         end
@@ -238,24 +244,18 @@ _XLifeBar.Reset = function(bNoSave)
         if Config.bShowTong.Player.Self then
             SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_GUILD, false)
         end
-        if Config.bShowTong.Player.Party or
-        Config.bShowTong.Player.Neutrality or
-        Config.bShowTong.Player.Ally or
-        Config.bShowTong.Player.Enemy then
-            SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_GUILD, false)
-        end
-    else
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_NAME , true)
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_TITLE, true)
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_LEFE , true)
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_NAME , true)
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_TITLE, true)
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_LEFE , true)
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_NAME , true)
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_TITLE, true)
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_LEFE , true)
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_GUILD, true)
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_GUILD, true)
+    elseif XLifeBar.tSysHeadTop then
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_NAME , XLifeBar.tSysHeadTop['GLOBAL_HEAD_NPC_NAME'])
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_TITLE, XLifeBar.tSysHeadTop['GLOBAL_HEAD_NPC_TITLE'])
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_LEFE , XLifeBar.tSysHeadTop['GLOBAL_HEAD_NPC_LEFE'])
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_NAME , XLifeBar.tSysHeadTop['GLOBAL_HEAD_OTHERPLAYER_NAME'])
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_TITLE, XLifeBar.tSysHeadTop['GLOBAL_HEAD_OTHERPLAYER_TITLE'])
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_LEFE , XLifeBar.tSysHeadTop['GLOBAL_HEAD_OTHERPLAYER_LEFE'])
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_GUILD, XLifeBar.tSysHeadTop['GLOBAL_HEAD_OTHERPLAYER_GUILD'])
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_NAME , XLifeBar.tSysHeadTop['GLOBAL_HEAD_CLIENTPLAYER_NAME'])
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_TITLE, XLifeBar.tSysHeadTop['GLOBAL_HEAD_CLIENTPLAYER_TITLE'])
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_LEFE , XLifeBar.tSysHeadTop['GLOBAL_HEAD_CLIENTPLAYER_LEFE'])
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_GUILD, XLifeBar.tSysHeadTop['GLOBAL_HEAD_CLIENTPLAYER_GUILD'])
     end
 end
 -- 过图重新加载刷新界面
@@ -561,6 +561,37 @@ function XLifeBar.OnFrameCreate()
     _XLifeBar.Frame = this
 end
 
+local m_fnOnSystemHeadSettingSure = function()
+    -- 保存官方头顶设置
+    local hFrame = this:GetRoot()
+    local hWnd = hFrame:Lookup('Wnd_Display')
+    if hWnd then
+        local tSysHeadTop = {
+            ['GLOBAL_HEAD_NPC_NAME'          ] = hWnd:Lookup('CheckBox_NN'):IsCheckBoxChecked(),
+            ['GLOBAL_HEAD_NPC_TITLE'         ] = hWnd:Lookup('CheckBox_NT'):IsCheckBoxChecked(),
+            ['GLOBAL_HEAD_NPC_LEFE'          ] = hWnd:Lookup('CheckBox_NB'):IsCheckBoxChecked(),
+            ['GLOBAL_HEAD_OTHERPLAYER_NAME'  ] = hWnd:Lookup('CheckBox_PN'):IsCheckBoxChecked(),
+            ['GLOBAL_HEAD_OTHERPLAYER_TITLE' ] = hWnd:Lookup('CheckBox_PT'):IsCheckBoxChecked(),
+            ['GLOBAL_HEAD_OTHERPLAYER_LEFE'  ] = hWnd:Lookup('CheckBox_PB'):IsCheckBoxChecked(),
+            ['GLOBAL_HEAD_OTHERPLAYER_GUILD' ] = hWnd:Lookup('CheckBox_ShowOtherGuild'):IsCheckBoxChecked(),
+            ['GLOBAL_HEAD_CLIENTPLAYER_NAME' ] = hWnd:Lookup('CheckBox_SN'):IsCheckBoxChecked(),
+            ['GLOBAL_HEAD_CLIENTPLAYER_TITLE'] = hWnd:Lookup('CheckBox_ST'):IsCheckBoxChecked(),
+            ['GLOBAL_HEAD_CLIENTPLAYER_LEFE' ] = hWnd:Lookup('CheckBox_SB'):IsCheckBoxChecked(),
+            ['GLOBAL_HEAD_CLIENTPLAYER_GUILD'] = hWnd:Lookup('CheckBox_ShowSelfGuild'):IsCheckBoxChecked(),
+        }
+        local bSave
+        for _, bOn in pairs(tSysHeadTop) do
+            if bOn then
+                bSave = true
+                break
+            end
+        end
+        if bSave then
+            XLifeBar.tSysHeadTop = tSysHeadTop
+        end
+    end
+end
+
 local _nDisX, _nDisY
 local CheckInvalidRect
 CheckInvalidRect = function(object, me, bNoCreate)
@@ -651,15 +682,33 @@ end
 
 local _nFrameCount = 0
 function XLifeBar.OnFrameBreathe()
-    if not XLifeBar.bEnabled then return end
     if _nFrameCount == 1 then
         _nFrameCount = 0
     else
         _nFrameCount = 1
         return
     end
+    -- HOOK官方头顶设置面板确认按钮
+    local hFrame = Station.Lookup('Topmost/UISettingPanel')
+    if hFrame and not hFrame.bHookedByXLifeBar then
+        local hBtn = hFrame:Lookup('Btn_Sure')
+        if hBtn and not hBtn.OnLButtonDown then
+            hBtn.OnLButtonDown = m_fnOnSystemHeadSettingSure
+        end
+        local hBtn = hFrame:Lookup('Btn_Apply')
+        if hBtn and not hBtn.OnLButtonDown then
+            hBtn.OnLButtonDown = m_fnOnSystemHeadSettingSure
+        end
+        hFrame.bHookedByXLifeBar = true
+    end
+    
+    if not XLifeBar.bEnabled then
+        return
+    end
     local me = GetClientPlayer()
-    if not me then return end
+    if not me then
+        return
+    end
     
     -- local _, _, fPitch = Camera_GetRTParams()
     for k , v in pairs(_XLifeBar.tNpc) do
@@ -799,7 +848,7 @@ _Cache.OnPanelActive = function(wnd)
       :check(function(bChecked) XLifeBar.bEnabled = bChecked _XLifeBar.Reset(true) end)
     -- 使用所有角色公共设置
     ui:append("WndCheckBox_GlobalConfig", "WndCheckBox"):children("#WndCheckBox_GlobalConfig")
-      :width(200):pos(x+110,y):text(_L["use global config"])
+      :width(180):pos(x + 110, y):text(_L["use global config"])
       :check(XLifeBar.bEnabled or false)
       :check(function(bChecked)
         XLifeBar.bUseGlobalConfig = bChecked

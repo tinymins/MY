@@ -538,7 +538,7 @@ MY.Chat.ParseName = function(t)
     end
     return t2
 end
-local m_tSensitiveWord = {
+MY.Chat.tSensitiveWord = {
     '   ',
     ' '  .. g_tStrings.STR_ONE_CHINESE_SPACE .. g_tStrings.STR_ONE_CHINESE_SPACE,
     '  ' .. g_tStrings.STR_ONE_CHINESE_SPACE,
@@ -548,6 +548,7 @@ local m_tSensitiveWord = {
 }
 -- anti sensitive word shielding in talking message
 MY.Chat.ParseAntiSWS = function(t)
+    local tSensitiveWord = MY.Chat.tSensitiveWord
     local t2 = {}
     for _, v in ipairs(t) do
         if v.type == "text" then
@@ -555,7 +556,7 @@ MY.Chat.ParseAntiSWS = function(t)
             while szText and #szText > 0 do
                 local nSensitiveWordEndLen = 1 -- 最后一个字符（要裁剪掉的字符）大小
                 local nSensitiveWordEndPos = #szText + 1
-                for _, szSensitiveWord in ipairs(m_tSensitiveWord) do
+                for _, szSensitiveWord in ipairs(tSensitiveWord) do
                     local _, nEndPos = wstring.find(szText, szSensitiveWord)
                     if nEndPos and nEndPos < nSensitiveWordEndPos then
                         local nSensitiveWordLenW = wstring.len(szSensitiveWord)
