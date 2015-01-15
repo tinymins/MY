@@ -81,13 +81,14 @@ MY.Chat.GetCopyLinkText = function(szText, rgbf)
 end
 
 -- 获取复制聊天行Text
-MY.Chat.GetTimeLinkText = function(rgbf)
-    rgbf = rgbf or { f = 10 }
-    
-    local t =TimeToDate(GetCurrentTime())
-    return GetFormatText(string.format("[%02d:%02d.%02d]", t.hour, t.minute, t.second), rgbf.f, rgbf.r, rgbf.g, rgbf.b, 515,
+MY.Chat.GetTimeLinkText = function(rgbfs)
+    rgbfs = rgbfs or { f = 10 }
+    return GetFormatText(
+        MY.Sys.FormatTime(rgbfs.s or '[hh:mm.ss]', GetCurrentTime()),
+        rgbfs.f, rgbfs.r, rgbfs.g, rgbfs.b, 515,
         "this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end",
-        "timelink")
+        "timelink"
+    )
 end
 
 -- 复制聊天行
