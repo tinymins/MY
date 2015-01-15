@@ -15,6 +15,7 @@ data = {
     ['BUSY']     = '扰',
     
     ['chat helper'] = '聊天助手',
+    ['chat log'] = '聊天记录',
     
     ['about...'] = '关于...',
     ['lock postion'] = '锁定位置',
