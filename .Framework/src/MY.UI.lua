@@ -818,6 +818,19 @@ function _MY.UI:append(szName, szType, tArg)
                             maxOption    = 0    ,  -- the max number of displayed options (0 means no limitation)
                             source       = {}   ,  -- option list
                         }
+                    elseif szType == 'WndRadioBox' then
+                        MY.UI.RegisterUIEvent(wnd, 'OnLButtonUp', function()
+                            local p = wnd:GetParent():GetFirstChild()
+                            while p do
+                                if p ~= wnd and
+                                p.group == wnd.group and
+                                p:GetType() == 'WndCheckBox' and
+                                p:IsCheckBoxChecked() then
+                                    p:Check(false)
+                                end
+                                p = p:GetNext()
+                            end
+                        end)
                     end
                 end
                 Wnd.CloseWindow(frame)
@@ -1262,6 +1275,24 @@ function _MY.UI:name(szText)
     end
 end
 
+-- get/set ui object group
+function _MY.UI:group(szText)
+    self:_checksum()
+    if szText then -- set group
+        for _, ele in pairs(self.eles) do
+            pcall(function() ele.raw.group = szText end)
+        end
+        return self
+    else -- get
+        -- select the first item
+        local ele = self.eles[1]
+        -- try to get its group
+        local status, err = pcall(function() return ele.raw.group end)
+        -- if succeed then return its group
+        if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:group' ,3) return nil end
+    end
+end
+
 -- set ui penetrable
 function _MY.UI:penetrable(bPenetrable)
     self:_checksum()
@@ -1606,8 +1637,10 @@ function _MY.UI:size(nWidth, nHeight)
                     ele.edt:SetSize(nWidth-10-w, nHeight-4)
                     ele.cmb:SetRelPos(nWidth-w-5, (nHeight-h-1)/2+1)
                 elseif ele.type=="WndRadioBox" then
-                    local w, h= ele.txt:GetSize()
-                    ele.txt:SetRelPos(26, math.ceil((nHeight - h)/2))
+                    ele.wnd:SetSize(nHeight, nHeight)
+                    ele.txt:SetSize(nWidth - nHeight - 1, nHeight)
+                    ele.txt:SetRelPos(nHeight + 1, 0)
+                    ele.hdl:SetSize(nWidth, nHeight)
                     ele.hdl:FormatAllItemPos()
                 elseif ele.type=="WndEditBox" then
                 elseif ele.type=="Text" then
