@@ -15,7 +15,7 @@ function _C.OnMsg(szMsg, szChannel, nFont, bRich, r, g, b)
 		szMsg = GetFormatText(szMsg, nil, r, g, b)
 	end
 	-- generate rec
-	szMsg = MY.Chat.GetTimeLinkText({r=r, g=g, b=b, f=nFont, s='[MM/dd-hh:mm:ss] '}) .. szMsg
+	szMsg = MY.Chat.GetTimeLinkText({r=r, g=g, b=b, f=nFont, s='[MM/dd|hh:mm:ss]'}) .. szMsg
 	szMsg = MY.Chat.RenderLink(szMsg)
 	if MY_Farbnamen and MY_Farbnamen.Render then
 		szMsg = MY_Farbnamen.Render(szMsg)
