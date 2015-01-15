@@ -692,6 +692,30 @@ MY.Sys.FormatTimeCount = function(szFormat, nTime)
 end
 MY.FormatTimeCount = MY.Sys.FormatTimeCount
 
+--[[ 格式化时间
+    (string) MY.Sys.FormatTimeCount(szFormat, nTimestamp)
+    szFormat   格式化字符串 可选项yyyy,yy,MM,dd,y,m,d,hh,mm,ss,h,m,s
+    nTimestamp UNIX时间戳
+]]
+MY.Sys.FormatTime = function(szFormat, nTimestamp)
+    local t = TimeToDate(nTimestamp)
+    szFormat = szFormat:gsub('yyyy', string.format('%04d', t.year  ))
+    szFormat = szFormat:gsub('yy'  , string.format('%02d', t.year % 100))
+    szFormat = szFormat:gsub('MM'  , string.format('%02d', t.month ))
+    szFormat = szFormat:gsub('dd'  , string.format('%02d', t.day   ))
+    szFormat = szFormat:gsub('hh'  , string.format('%02d', t.hour  ))
+    szFormat = szFormat:gsub('mm'  , string.format('%02d', t.minute))
+    szFormat = szFormat:gsub('ss'  , string.format('%02d', t.second))
+    szFormat = szFormat:gsub('y', t.year  )
+    szFormat = szFormat:gsub('M', t.month )
+    szFormat = szFormat:gsub('d', t.day   )
+    szFormat = szFormat:gsub('h', t.hour  )
+    szFormat = szFormat:gsub('m', t.minute)
+    szFormat = szFormat:gsub('s', t.second)
+    return szFormat
+end
+MY.FormatTime = MY.Sys.FormatTime
+
 --[[ register global esc key down action
     (void) MY.Sys.RegisterEsc(szID, fnCondition, fnAction, bTopmost) -- register global esc event handle
     (void) MY.Sys.RegisterEsc(szID, nil, nil, bTopmost)              -- unregister global esc event handle
