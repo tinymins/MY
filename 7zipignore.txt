@@ -8,3 +8,5 @@
 Dev_*\
 ImRobot\
 ExamTip\
+*.py
+*.pyc

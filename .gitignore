@@ -8,3 +8,4 @@
 @DATA/cache/NPC_DOODAD_REC/*.jx3dat
 @DATA/cache/FIGHT_RECOUNT_LOG/*.jx3dat
 @DATA/cache/CHAT_LOG/*.jx3dat
+*.pyc
