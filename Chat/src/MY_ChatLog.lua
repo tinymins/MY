@@ -23,7 +23,7 @@ function _C.OnMsg(szMsg, szChannel, nFont, bRich, r, g, b)
 	end
 	-- save rec
 	tinsert(Log[szChannel], szMsg)
-	if #Log[szChannel] > Log.nMax then
+	while #Log[szChannel] > Log.nMax do
 		tremove(Log[szChannel], 1)
 	end
 	_C.DrawLog()
