@@ -16,6 +16,7 @@ data = {
     
     ['chat helper'] = '聊天助手',
     ['chat log'] = '聊天記錄',
+    ['Max log: %d'] = '最大記錄：%d',
     
     ['about...'] = '關于...',
     ['lock postion'] = '鎖定位置',
