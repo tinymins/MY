@@ -8,6 +8,7 @@ local _L  = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Chat/lang/")
 local _C  = {}
 local Log = {}
 local tinsert = table.insert
+local tremove = table.remove
 MY_ChatLog = MY_ChatLog or {}
 
 function _C.OnMsg(szMsg, szChannel, nFont, bRich, r, g, b)
