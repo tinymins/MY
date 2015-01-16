@@ -90,13 +90,30 @@ function _C.OnPanelActive(wnd)
 		  :pos(x + (i - 1) * 100, y):width(90)
 		  :text(g_tStrings.tChannelName[szChannel] or '')
 		  :check(function(bChecked)
-		  	if bChecked then
-		  		Log.Active = szChannel
-		  	end
-		  	_C.DrawLog()
+			if bChecked then
+				Log.Active = szChannel
+			end
+			_C.DrawLog()
 		  end)
 		  :check(Log.Active == szChannel)
 	end
+	
+	ui:append('WndButton_MaxLog', 'WndButton'):children('#WndButton_MaxLog')
+	  :pos(x + 400, y - 3):width(120)
+	  :text(_L('Max log: %d', Log.nMax))
+	  :click(function()
+	  	local me = this
+	  	GetUserInputNumber(
+	  		Log.nMax,
+	  		1000, nil,
+	  		function(num)
+  				Log.nMax = num
+	  			MY.UI(me):text(_L('Max log: %d', Log.nMax))
+	  		end,
+	  		function() end,
+	  		function() end
+	  	)
+	  end)
 end
 
 MY.RegisterPanel( "ChatLog", _L["chat log"], _L['General'], "ui/Image/button/SystemButton.UITex|43", {255,127,0,200}, {
