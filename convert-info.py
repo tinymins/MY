@@ -53,7 +53,7 @@ if __name__ == '__main__':
     rootdir = os.getcwd()                                   # 指明被遍历的文件夹
     for parent, dirnames, filenames in os.walk(rootdir):    # 三个参数：分别返回1.父目录 2.所有文件夹名字（不含路径） 3.所有文件名字
         for filename in filenames:                      #输出文件信息
-            if filename == "info.ini" or filename == "package.ini":
+            if filename.lower() == "info.ini" or filename.lower() == "package.ini":
                 print 'file loading: ' + os.path.join(parent,filename)
                 # all_the_text = "-- language data (zhtw) updated at " + time.strftime('%Y-%m-%d %H:%I:%M',time.localtime(time.time())) + "\r\n"
                 with codecs.open(os.path.join(parent,filename), 'r') as f:
