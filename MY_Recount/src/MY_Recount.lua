@@ -245,14 +245,15 @@ MY_Recount.UpdateUI = function(data)
                 nRank        = i             ,
             }
         end
-        local hItem = hList:Lookup('Handle_LI_' .. p.id)
+        local hItem = hList:Lookup('Handle_LI_' .. MY.MD5.Hex(tostring(p.id)):sub(1,8))
         if not hItem then
             hItem = hList:AppendItemFromIni(_Cache.szIniFile, 'Handle_Item')
-            hItem:SetName('Handle_LI_' .. p.id)
+            hItem:SetName('Handle_LI_' .. MY.MD5.Hex(tostring(p.id)):sub(1,8))
             if _Cache.Css.Bar[p.dwForceID] then
                 hItem:Lookup('Image_PerFore'):FromUITex(unpack(_Cache.Css.Bar[p.dwForceID]))
                 hItem:Lookup('Image_PerBack'):FromUITex(unpack(_Cache.Css.Bar[p.dwForceID]))
             end
+            hItem.id = p.id
         end
         if hItem:GetIndex() ~= i - 1 then
             hItem:ExchangeIndex(i - 1)
@@ -585,11 +586,13 @@ _Cache.OnDetailItemLButtonDown = function()
 end
 
 MY_Recount.OnItemLButtonClick = function()
+    local id = this.id
     local name = this:GetName()
     if name == 'Handle_Me' then
+        id = UI_GetClientPlayerID()
         name = 'Handle_LI_' .. UI_GetClientPlayerID()
     end
-    name:gsub('Handle_LI_(.+)', function(id)
+    name:gsub('Handle_LI_(.+)', function()
         local szChannel = SZ_CHANNEL_KEY[MY_Recount.nChannel]
         if not Station.Lookup('Normal/MY_Recount_' .. id .. '_' .. szChannel) then
             local frm = Wnd.OpenWindow(_Cache.szIniDetail, 'MY_Recount_' .. id .. '_' .. szChannel)
@@ -624,11 +627,13 @@ MY_Recount.OnItemLButtonClick = function()
 end
 
 MY_Recount.OnItemRefreshTip = function()
+    local id = this.id
     local name = this:GetName()
     if name == 'Handle_Me' then
+        id = UI_GetClientPlayerID()
         name = 'Handle_LI_' .. UI_GetClientPlayerID()
     end
-    name:gsub('Handle_LI_(.+)', function(id)
+    name:gsub('Handle_LI_(.+)', function()
         if tonumber(id) then
             id = tonumber(id)
         end
