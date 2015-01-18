@@ -632,7 +632,7 @@ CheckInvalidRect = function(object, me, bNoCreate)
             elseif nState == OT_STATE.START_PREPARE then                        -- 读条开始
                 xlb:DrawOTBarBorder(Config.nAlpha):SetOTPercentage(0):SetOTState(OT_STATE.ON_PREPARE):DrawOTTitle()
             elseif nState == OT_STATE.ON_PREPARE then                           -- 读条中
-                if object.GetOTActionState()==0 then    -- 为0 说明没有读条
+                if not object.GetOTActionState or object.GetOTActionState() == 0 then    -- 为0 说明没有读条
                     xlb:SetOTPercentage(1):SetOTState(OT_STATE.SUCCEED)
                 else
                     xlb:SetOTPercentage(( GetLogicFrameCount() - tab.OT.nStartFrame ) / tab.OT.nFrameCount)
@@ -641,7 +641,9 @@ CheckInvalidRect = function(object, me, bNoCreate)
                 xlb:DrawOTBarBorder(Config.nAlpha):SetOTPercentage(1):SetOTState(OT_STATE.ON_CHANNEL):DrawOTTitle()
             elseif nState == OT_STATE.ON_CHANNEL then                           -- 逆读条中
                 local nPercentage = 1 - ( GetLogicFrameCount() - tab.OT.nStartFrame ) / tab.OT.nFrameCount
-                if object.GetOTActionState()==2 and nPercentage >= 0 then    -- 为2 说明在读条引导保护 计算当前帧进度
+                if object.GetOTActionState and
+                object.GetOTActionState() == 2 and -- 为2 说明在读条引导保护 计算当前帧进度
+                nPercentage >= 0 then
                     xlb:SetOTPercentage(nPercentage):DrawOTTitle()
                 else
                     xlb:SetOTPercentage(0):SetOTState(OT_STATE.SUCCEED)
