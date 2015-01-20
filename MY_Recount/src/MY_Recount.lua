@@ -245,10 +245,10 @@ MY_Recount.UpdateUI = function(data)
                 nRank        = i             ,
             }
         end
-        local hItem = hList:Lookup('Handle_LI_' .. MY.MD5.Hex(tostring(p.id)):sub(1,8))
+        local hItem = hList:Lookup('Handle_LI_' .. (p.szMD5 or p.id))
         if not hItem then
             hItem = hList:AppendItemFromIni(_Cache.szIniFile, 'Handle_Item')
-            hItem:SetName('Handle_LI_' .. MY.MD5.Hex(tostring(p.id)):sub(1,8))
+            hItem:SetName('Handle_LI_' .. (p.szMD5 or p.id))
             if _Cache.Css.Bar[p.dwForceID] then
                 hItem:Lookup('Image_PerFore'):FromUITex(unpack(_Cache.Css.Bar[p.dwForceID]))
                 hItem:Lookup('Image_PerBack'):FromUITex(unpack(_Cache.Css.Bar[p.dwForceID]))
