@@ -626,6 +626,7 @@ _Cache.InitObjectData = function(data, obj, szChannel)
     
     if not data[szChannel][id] then
         data[szChannel][id] = {
+            szMD5        = MY.MD5.Hex(tostring(id)):sub(1, 8),
             nTotal       = 0 ,                    -- 总输出
             nTotalEffect = 0 ,                    -- 有效输出
             Detail       = {},                    -- 输出结果按技能结果分类统计
