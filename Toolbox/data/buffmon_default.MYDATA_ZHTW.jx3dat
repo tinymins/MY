@@ -5,7 +5,7 @@ data = {
         ['Target'] = {
             [1] = {szName = "蘭摧玉折", dwIconID =  390, bOn = true ,},
             [2] = {szName = "商陽指"  , dwIconID = 1514, bOn = true ,},
-            [3] = {szName = "鍾林毓秀", dwIconID =  404, bOn = true ,},
+            [3] = {szName = "鐘林毓秀", dwIconID =  404, bOn = true ,},
             [4] = {szName = "噬骨"    , dwIconID = 1672, bOn = true ,},
             [5] = {szName = "芙蓉並蒂", dwIconID = 1514, bOn = false,},
         },
