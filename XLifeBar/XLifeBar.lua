@@ -258,10 +258,6 @@ _XLifeBar.Reset = function(bNoSave)
         SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_GUILD, XLifeBar.tSysHeadTop['GLOBAL_HEAD_CLIENTPLAYER_GUILD'])
     end
 end
--- 过图重新加载刷新界面
-MY.RegisterEvent('LOADING_END', function()
-    _XLifeBar.Reset(true)
-end)
 -- 重载配置文件并重绘
 _XLifeBar.Reload = function()
     local _Config
@@ -281,6 +277,7 @@ _XLifeBar.Reload = function()
     end
 end
 MY.RegisterInit(_XLifeBar.Reload)
+MY.RegisterEvent('LOADING_END', _XLifeBar.Reload) -- 过图重新加载刷新界面
 
 XLifeBar.X = class()
 -- 构造函数
