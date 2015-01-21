@@ -594,16 +594,20 @@ end
 
 local _nDisX, _nDisY
 local CheckInvalidRect
-CheckInvalidRect = function(object, me, bNoCreate)
-    if not object then return end
-    local dwID, bIsPlayer = object.dwID, IsPlayer(object.dwID)
+CheckInvalidRect = function(dwType, dwID, me, bNoCreate)
+    local object, info = MY.GetObject(dwType, dwID)
+    if not object then
+        return
+    end
     _nDisX, _nDisY = me.nX - object.nX, me.nY - object.nY
-    if _nDisX * _nDisX + _nDisY * _nDisY < Config.nDistance --[[ 这是镜头补偿判断 但是不好用先不加 and (fPitch > -0.8 or _XLifeBar.GetNz(me.nZ,object.nZ) < Config.nDistance / 2.5)]] then
+    if _nDisX * _nDisX + _nDisY * _nDisY < Config.nDistance
+    --[[ 这是镜头补偿判断 但是不好用先不加 and (fPitch > -0.8 or _XLifeBar.GetNz(me.nZ,object.nZ) < Config.nDistance / 2.5)]]
+    then
         if _XLifeBar.tObject[dwID] and _XLifeBar.tObject[dwID].handle then
             local tab = _XLifeBar.tObject[dwID]
             local xlb = XLifeBar(object)
             -- 基本属性设置
-            xlb:SetLife(object.nCurrentLife / object.nMaxLife)
+            xlb:SetLife(info.nCurrentLife / info.nMaxLife)
                :SetTong(_XLifeBar.GetTongName(object.dwTongID, "[%s]"))
                :SetTitle(object.szTitle)
                :SetName(MY.Game.GetObjectName(object.szName))
@@ -669,12 +673,12 @@ CheckInvalidRect = function(object, me, bNoCreate)
             local Force = _XLifeBar.GetForce(dwID)
             if Force ~= tab.Force then
                 XLifeBar(object):Remove():Create()
-                CheckInvalidRect(object, me, true)
+                CheckInvalidRect(dwType, dwID, me, true)
             end
         elseif not bNoCreate then
-            if bIsPlayer or object.CanSeeName() or Config.bShowSpecialNpc then
+            if dwType == TARGET.PLAYER or object.CanSeeName() or Config.bShowSpecialNpc then
                 XLifeBar(object):Create()
-                CheckInvalidRect(object, me, true)
+                CheckInvalidRect(dwType, dwID, me, true)
             end
         end
     elseif _XLifeBar.tObject[dwID] then
@@ -714,11 +718,11 @@ function XLifeBar.OnFrameBreathe()
     
     -- local _, _, fPitch = Camera_GetRTParams()
     for k , v in pairs(_XLifeBar.tNpc) do
-        CheckInvalidRect(GetNpc(k), me)
+        CheckInvalidRect(TARGET.NPC, k, me)
     end
     
     for k , v in pairs(_XLifeBar.tPlayer) do
-        CheckInvalidRect(GetPlayer(k), me)
+        CheckInvalidRect(TARGET.PLAYER, k, me)
     end
     
     if me.bFightState ~= _XLifeBar.bFightState then
