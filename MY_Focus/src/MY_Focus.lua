@@ -317,7 +317,7 @@ end
 
 -- 绘制指定的焦点Handle（没有则添加创建）
 MY_Focus.DrawFocus = function(dwType, dwID)
-    local obj, info = MY.Game.GetObject(dwType, dwID)
+    local obj, info, bInfo = MY.Game.GetObject(dwType, dwID)
     local hList = Station.Lookup('Normal/MY_Focus', 'Handle_List')
     if not (obj and hList) then
         return
@@ -333,7 +333,7 @@ MY_Focus.DrawFocus = function(dwType, dwID)
     hItem:Lookup('Handle_Name/Text_Name'):SetText(MY.Game.GetObjectName(obj) or obj.dwID)
     -- 心法
     if dwType == TARGET.PLAYER then
-        if type(info) == 'table' and info.dwMountKungfuID then
+        if bInfo and info.dwMountKungfuID then
             hItem:Lookup('Handle_Name/Text_Kungfu'):SetText(MY_Focus.GetKungfuName(info.dwMountKungfuID))
         else
             local kungfu = obj.GetKungfuMount()
