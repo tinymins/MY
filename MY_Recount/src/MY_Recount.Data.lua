@@ -629,12 +629,12 @@ _Cache.InitObjectData = function(data, obj, szChannel)
     
     if not data[szChannel][id] then
         data[szChannel][id] = {
-            szMD5        = MY.MD5.Hex(tostring(id)):sub(1, 8),
-            nTotal       = 0 ,                    -- 总输出
-            nTotalEffect = 0 ,                    -- 有效输出
-            Detail       = {},                    -- 输出结果按技能结果分类统计
-            Skill        = {},                    -- 该玩家具体造成输出的技能统计
-            Target       = {},                    -- 该玩家具体对谁造成输出的统计
+            szMD5        = obj.dwID, -- 唯一标识
+            nTotal       = 0       , -- 总输出
+            nTotalEffect = 0       , -- 有效输出
+            Detail       = {}      , -- 输出结果按技能结果分类统计
+            Skill        = {}      , -- 该玩家具体造成输出的技能统计
+            Target       = {}      , -- 该玩家具体对谁造成输出的统计
         }
     end
 end
