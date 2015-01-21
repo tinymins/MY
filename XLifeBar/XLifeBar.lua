@@ -610,7 +610,7 @@ CheckInvalidRect = function(dwType, dwID, me, bNoCreate)
             xlb:SetLife(info.nCurrentLife / info.nMaxLife)
                :SetTong(_XLifeBar.GetTongName(object.dwTongID, "[%s]"))
                :SetTitle(object.szTitle)
-               :SetName(MY.Game.GetObjectName(object.szName))
+               :SetName(MY.Game.GetObjectName(object))
             if me.bFightState ~= _XLifeBar.bFightState then
                 xlb:DrawLife()
             end
