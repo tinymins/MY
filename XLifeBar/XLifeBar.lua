@@ -285,25 +285,27 @@ MY.RegisterInit(_XLifeBar.Reload)
 XLifeBar.X = class()
 -- 构造函数
 function XLifeBar.X:ctor(object)
-    _XLifeBar.tObject[object.dwID] = _XLifeBar.tObject[object.dwID] or {
-        handle = nil,
-        Name = '',
-        Tong = '',
-        Title = '',
-        Life = -1,
-        Force = _XLifeBar.GetForce(object.dwID),
-        OT = {
-            nState = OT_STATE.IDLE,
-            nPercentage = 0,
-            szTitle = "",
-            nStartFrame = 0,
-            nFrameCount = 0,
-        },
-        nIndex = 0,
-    }
+    if not _XLifeBar.tObject[object.dwID] then
+        _XLifeBar.tObject[object.dwID] = {
+            handle  = nil,
+            szName  = '' ,
+            szTong  = '' ,
+            szTitle = '' ,
+            fLife   = -1 ,
+            szForce = _XLifeBar.GetForce(object.dwID),
+            OT = {
+                nState      = OT_STATE.IDLE,
+                nPercentage = 0            ,
+                szTitle     = ""           ,
+                nStartFrame = 0            ,
+                nFrameCount = 0            ,
+            },
+            nIndex = 0,
+        }
+    end
     self.self = object
     self.tab = _XLifeBar.tObject[object.dwID]
-    self.force = self.tab.Force
+    self.force = self.tab.szForce
     self.hp = HP.new(object.dwID, _XLifeBar.Frame, _XLifeBar.tObject[object.dwID].handle)
     return self
 end
@@ -353,24 +355,24 @@ function XLifeBar.X:FxColor(r,g,b,a)
 end
 -- 设置名字
 function XLifeBar.X:SetName(szName)
-    if self.tab.Name ~= szName then
-        self.tab.Name = szName
+    if self.tab.szName ~= szName then
+        self.tab.szName = szName
         self:DrawNames()
     end
     return self
 end
 -- 设置称号
 function XLifeBar.X:SetTitle(szTitle)
-    if self.tab.Title ~= szTitle then
-        self.tab.Title = szTitle
+    if self.tab.szTitle ~= szTitle then
+        self.tab.szTitle = szTitle
         self:DrawNames()
     end
     return self
 end
 -- 设置帮会
 function XLifeBar.X:SetTong(szTongName)
-    if self.tab.Tong ~= szTongName then
-        self.tab.Tong = szTongName
+    if self.tab.szTong ~= szTongName then
+        self.tab.szTong = szTongName
         self:DrawNames()
     end
     return self
@@ -419,10 +421,10 @@ function XLifeBar.X:DrawNames()
     
     -- 没有名字的玩意隐藏血条
     if cfgName and #tWordlines == 0 then
-        self.hp:DrawLifebar(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, {r,g,b,0,self.tab.Life})
+        self.hp:DrawLifebar(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, {r,g,b,0,self.tab.fLife})
         self.hp:DrawLifeBorder(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, 0)
     elseif cfgLife then
-        self.hp:DrawLifebar(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, {r,g,b,a,self.tab.Life})
+        self.hp:DrawLifebar(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, {r,g,b,a,self.tab.fLife})
         self.hp:DrawLifeBorder(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, a)
     end
     self.hp:DrawWordlines(tWordlines, {r,g,b,a,f})
@@ -431,9 +433,9 @@ end
 -- 设置血量
 function XLifeBar.X:SetLife(dwLifePercentage)
     if dwLifePercentage < 0 or dwLifePercentage > 1 then dwLifePercentage = 1 end -- fix
-    if self.tab.Life ~= dwLifePercentage then
-        local dwLife = self.tab.Life
-        self.tab.Life = dwLifePercentage
+    if self.tab.fLife ~= dwLifePercentage then
+        local dwLife = self.tab.fLife
+        self.tab.fLife = dwLifePercentage
         if dwLife < 0.01 or dwLifePercentage < 0.01 then
             self:DrawNames()
         end
@@ -455,7 +457,7 @@ function XLifeBar.X:DrawLife()
     a, f = Config.nAlpha, Config.nFont
     r,g,b,a = self:FxColor(r,g,b,a)
     if cfgLife then
-        self.hp:DrawLifebar(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, {r,g,b,a,self.tab.Life})
+        self.hp:DrawLifebar(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, {r,g,b,a,self.tab.fLife})
     end
     if cfgLifePer then
         local szFormatString = '%.1f'
@@ -464,7 +466,7 @@ function XLifeBar.X:DrawLife()
         elseif Config.bHideLifePercentageDecimal then
             szFormatString = '%.0f'
         end
-        self.hp:DrawLifePercentage({string.format(szFormatString, 100 * self.tab.Life), Config.nPerHeight}, {r,g,b,a,f})
+        self.hp:DrawLifePercentage({string.format(szFormatString, 100 * self.tab.fLife), Config.nPerHeight}, {r,g,b,a,f})
     end
     return self
 end
@@ -670,8 +672,8 @@ CheckInvalidRect = function(dwType, dwID, me, bNoCreate)
             end
             
             -- 势力切换
-            local Force = _XLifeBar.GetForce(dwID)
-            if Force ~= tab.Force then
+            local szForce = _XLifeBar.GetForce(dwID)
+            if szForce ~= tab.szForce then
                 XLifeBar(object):Remove():Create()
                 CheckInvalidRect(dwType, dwID, me, true)
             end
