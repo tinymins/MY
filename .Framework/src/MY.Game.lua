@@ -238,7 +238,11 @@ MY.Game.GetServer = function()
 end
 
 --[[ 获取指定对象
-    (obj) MY.Game.GetObject([dwType,] dwID)
+    (KObject, info) MY.GetObject([number dwType, ]number dwID)
+    -- dwType: [可选]对象类型枚举 TARGET.*
+    -- dwID  : 对象ID
+    -- return: 根据 dwType 类型和 dwID 取得操作对象
+    --         不存在时返回nil, nil
 ]]
 MY.Game.GetObject = function(dwType, dwID)
     if not dwID then

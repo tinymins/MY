@@ -390,38 +390,6 @@ MY.Player.GetTarget = function(object)
     end
 end
 MY.GetTarget = MY.Player.GetTarget
---[[ 取得操作对象
-    (KObject) MY.GetObject([number dwType, ]number dwID)
-    -- dwType: [可选]对象类型枚举 TARGET.*
-    -- dwID  : 对象ID
-    -- return: 根据 dwType 类型和 dwID 取得操作对象
-    --         不存在时返回nil
-]]
-MY.Player.GetObject = function(dwType, dwID)
-    if not dwType then
-        local me = GetClientPlayer()
-        if me then
-            dwType, dwID = me.GetTarget()
-        else
-            dwType, dwID = TARGET.NO_TARGET, 0
-        end
-    elseif not dwID then
-        dwID, dwType = dwType, TARGET.NPC
-        if IsPlayer(dwID) then
-            dwType = TARGET.PLAYER
-        end
-    end
-    if dwID <= 0 or dwType == TARGET.NO_TARGET then
-        return nil
-    elseif dwType == TARGET.PLAYER then
-        return GetPlayer(dwID)
-    elseif dwType == TARGET.DOODAD then
-        return GetDoodad(dwID)
-    else
-        return GetNpc(dwID)
-    end
-end
-MY.GetObject = MY.Player.GetObject
 
 --[[ 根据 dwType 类型和 dwID 设置目标
 -- (void) MY.SetTarget([number dwType, ]number dwID)
