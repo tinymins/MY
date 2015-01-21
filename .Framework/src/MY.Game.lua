@@ -238,7 +238,7 @@ MY.Game.GetServer = function()
 end
 
 --[[ 获取指定对象
-    (KObject, info) MY.GetObject([number dwType, ]number dwID)
+    (KObject, info, bIsInfo) MY.GetObject([number dwType, ]number dwID)
     -- dwType: [可选]对象类型枚举 TARGET.*
     -- dwID  : 对象ID
     -- return: 根据 dwType 类型和 dwID 取得操作对象
@@ -248,7 +248,7 @@ MY.Game.GetObject = function(dwType, dwID)
     if not dwID then
         dwType, dwID = nil, dwType
     end
-    local p, info
+    local p, info, b
     
     if not dwType then
         if IsPlayer(dwID) then
@@ -263,18 +263,18 @@ MY.Game.GetObject = function(dwType, dwID)
     if dwType == TARGET.PLAYER then
         local me = GetClientPlayer()
         if dwID == me.dwID then
-            p, info = me, me
+            p, info, b = me, me, false
         elseif me.IsPlayerInMyParty(dwID) then
-            p, info = GetPlayer(dwID), GetClientTeam().GetMemberInfo(dwID)
+            p, info, b = GetPlayer(dwID), GetClientTeam().GetMemberInfo(dwID), true
         else
-            p, info = GetPlayer(dwID), GetPlayer(dwID)
+            p, info, b = GetPlayer(dwID), GetPlayer(dwID), false
         end
     elseif dwType == TARGET.NPC then
-        p, info = GetNpc(dwID), GetNpc(dwID)
+        p, info, b = GetNpc(dwID), GetNpc(dwID), false
     elseif dwType == TARGET.DOODAD then
-        p, info = GetDoodad(dwID), GetDoodad(dwID)
+        p, info, b = GetDoodad(dwID), GetDoodad(dwID), false
     end
-    return p, info
+    return p, info, b
 end
 MY.GetObject = MY.Game.GetObject
 
