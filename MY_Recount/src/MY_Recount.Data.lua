@@ -404,6 +404,9 @@ end
 
 -- 将一条记录插入数组
 _Cache.AddRecord = function(tRecord, idTarget, szEffectName, nValue, nEffectValue, nSkillResult)
+    if not szEffectName or szEffectName == "" then
+        return
+    end
     tRecord.nTotal              = tRecord.nTotal + nValue
     tRecord.nTotalEffect        = tRecord.nTotalEffect + nEffectValue
     
