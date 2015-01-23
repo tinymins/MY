@@ -26,7 +26,7 @@ function _C.OnMsg(szMsg, szChannel, nFont, bRich, r, g, b)
 	while #Log[szChannel] > Log.nMax do
 		tremove(Log[szChannel], 1)
 	end
-	_C.DrawLog()
+	_C.AppendLog(szMsg)
 end
 
 function _C.OnTongMsg(szMsg, nFont, bRich, r, g, b)
@@ -70,6 +70,13 @@ function _C.DrawLog()
 	for _, szMsg in ipairs(Log[Log.Active]) do
 		_C.uiLog:append(szMsg)
 	end
+end
+
+function _C.AppendLog(szMsg)
+	if not _C.uiLog then
+		return
+	end
+	_C.uiLog:append(szMsg)
 end
 
 function _C.OnPanelActive(wnd)
