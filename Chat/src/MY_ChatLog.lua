@@ -26,7 +26,7 @@ function _C.OnMsg(szMsg, szChannel, nFont, bRich, r, g, b)
 	while #Log[szChannel] > Log.nMax do
 		tremove(Log[szChannel], 1)
 	end
-	_C.AppendLog(szMsg)
+	_C.AppendLog(szChannel, szMsg)
 end
 
 function _C.OnTongMsg(szMsg, nFont, bRich, r, g, b)
@@ -72,8 +72,8 @@ function _C.DrawLog()
 	end
 end
 
-function _C.AppendLog(szMsg)
-	if not _C.uiLog then
+function _C.AppendLog(szChannel, szMsg)
+	if not (_C.uiLog and szChannel == Log.Active) then
 		return
 	end
 	_C.uiLog:append(szMsg)
@@ -115,7 +115,7 @@ function _C.OnPanelActive(wnd)
 	  		Log.nMax,
 	  		1000, nil,
 	  		function(num)
-  				Log.nMax = num
+	  			Log.nMax = num
 	  			MY.UI(me):text(_L('Max log: %d', Log.nMax))
 	  		end,
 	  		function() end,
