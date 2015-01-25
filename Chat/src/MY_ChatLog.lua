@@ -44,7 +44,7 @@ end
 
 MY.RegisterInit(function()
 	Log = MY.Json.Decode(MY.LoadUserData('cache/CHAT_LOG/')) or {
-		nMax       = 200,
+		nMax       = 100,
 		MSG_GUILD  = {},
 		MSG_WHISPER= {},
 		MSG_TEAM   = {},
