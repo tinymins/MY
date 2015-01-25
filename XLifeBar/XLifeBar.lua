@@ -685,14 +685,7 @@ CheckInvalidRect = function(dwType, dwID, me, bNoCreate)
     end
 end
 
-local _nFrameCount = 0
 function XLifeBar.OnFrameBreathe()
-    if _nFrameCount == 1 then
-        _nFrameCount = 0
-    else
-        _nFrameCount = 1
-        return
-    end
     -- HOOK官方头顶设置面板确认按钮
     local hFrame = Station.Lookup('Topmost/UISettingPanel')
     if hFrame and not hFrame.bHookedByXLifeBar then
