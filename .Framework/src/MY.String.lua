@@ -33,9 +33,7 @@ end
 -- ×ª»»Îª URL ±àÂë
 -- (string) MY.String.UrlEncode(string szText)
 MY.String.UrlEncode = function(szText)
-    local str = szText:gsub("([^0-9a-zA-Z ])", function (c) return string.format ("%%%02X", string.byte(c)) end)
-    str = str:gsub(" ", "+")
-    return str
+    return szText:gsub("([^0-9a-zA-Z ])", function (c) return string.format ("%%%02X", string.byte(c)) end):gsub(" ", "+")
 end
 
 -- ½âÎö URL ±àÂë
@@ -56,4 +54,8 @@ MY.String.SubW = function(str,s,e)
         e = wstring.len(str) + e
     end
     return wstring.sub(str, s, e)
+end
+
+MY.String.SimpleEcrypt = function(szText)
+    return szText:gsub('.', function (c) return string.format ("%02X", (string.byte(c) + 13) % 256) end):gsub(" ", "+")
 end
