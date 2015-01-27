@@ -14,7 +14,7 @@ _Cache.OnPanelActive = function(wnd)
     local w, h = ui:size()
     local x, y = 20, 20
     
-    _Cache.tUITexList = LoadLUAData(MY.GetAddonInfo().szRoot .. 'Dev_UITexViewer/data/data') or {}
+    _Cache.tUITexList = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'Dev_UITexViewer/data/data', true) or {}
     
     local uiBoard = ui:append('WndScrollBox_ImageList','WndScrollBox')
       :children('#WndScrollBox_ImageList')
