@@ -72,6 +72,9 @@ MY.Sys.SaveLUAData = function(szFileUri, tData, bNoDistinguishLang)
             szFileUri = szFileUri .. '_' .. lang
         end
     end
+    if MY.Sys.GetLang() == 'vivn' then
+        szFileUri = szFileUri .. '.jx3dat'
+    end
     -- 调用系统API
     return SaveLUAData(szFileUri, tData)
 end
@@ -99,6 +102,9 @@ MY.Sys.LoadLUAData = function(szFileUri, bNoDistinguishLang)
         if #lang>0 then
             szFileUri = szFileUri .. '_' .. lang
         end
+    end
+    if MY.Sys.GetLang() == 'vivn' then
+        szFileUri = szFileUri .. '.jx3dat'
     end
     -- 调用系统API
     return LoadLUAData(szFileUri)

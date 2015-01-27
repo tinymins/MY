@@ -633,7 +633,7 @@ MY.SwitchTab = function(szID)
                         local res, err = pcall(tab.fn.OnPanelActive, wndMainPanel)
                         if not res then
                             MY.Debug(err..'\n', 'MY#OnPanelActive', 1)
-                        else
+                        elseif MY.Sys.GetLang() ~= 'vivn' then
                             wndMainPanel:FormatAllContentPos()
                         end
                     end
