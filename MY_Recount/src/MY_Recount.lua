@@ -446,7 +446,7 @@ _Cache.OnDetailFrameBreathe = function()
         hItem:Lookup('Text_SkillName'):SetText(p.szName)
         hItem:Lookup('Text_SkillCount'):SetText(p.nCount)
         hItem:Lookup('Text_SkillTotal'):SetText(p.nTotalEffect)
-        hItem:Lookup('Text_SkillPercentage'):SetText(nTotalEffect > 0 and ((math.floor(p.nTotalEffect / nTotalEffect * 1000) / 10) .. '%') or ' - ')
+        hItem:Lookup('Text_SkillPercentage'):SetText(nTotalEffect > 0 and _L('%.1f%%', math.floor(p.nTotalEffect / nTotalEffect * 100)) or ' - ')
         
         if szPrimarySort == 'Skill' and szSelectedSkill == p.szKey or
         szPrimarySort == 'Target' and szSelectedTarget == p.szKey then
@@ -454,6 +454,7 @@ _Cache.OnDetailFrameBreathe = function()
             hItem:Lookup('Shadow_SkillEntry'):Show()
         end
         hItem.szKey = p.szKey
+        hItem.OnItemLButtonDown = _Cache.OnDetailItemLButtonDown
     end
     hList:FormatAllItemPos()
     
@@ -487,7 +488,7 @@ _Cache.OnDetailFrameBreathe = function()
             hItem:Lookup('Text_DetailAverage'):SetText(p.nAvgEffect)
             hItem:Lookup('Text_DetailMax'):SetText(p.nMaxEffect)
             hItem:Lookup('Text_DetailCount'):SetText(p.nCount)
-            hItem:Lookup('Text_DetailPercent'):SetText(nCount > 0 and ((math.floor(p.nCount / nCount * 1000) / 10) .. '%') or ' - ')
+            hItem:Lookup('Text_DetailPercent'):SetText(nCount > 0 and _L('%.1f%%', math.floor(p.nCount / nCount * 100)) or ' - ')
         end
         hList:FormatAllItemPos()
         
@@ -540,7 +541,7 @@ _Cache.OnDetailFrameBreathe = function()
             hItem:Lookup('Text_TargetHit'):SetText(p.nHitCount)
             hItem:Lookup('Text_TargetCritical'):SetText(p.nCriticalCount)
             hItem:Lookup('Text_TargetMiss'):SetText(p.nMissCount)
-            hItem:Lookup('Text_TargetPercent'):SetText((nTotalEffect > 0 and ((math.floor(p.nTotalEffect / nTotalEffect * 1000) / 10) .. '%') or ' - '))
+            hItem:Lookup('Text_TargetPercent'):SetText((nTotalEffect > 0 and _L('%.1f%%', math.floor(p.nTotalEffect / nTotalEffect * 100)) or ' - '))
         end
         hList:FormatAllItemPos()
     else
@@ -926,7 +927,7 @@ MY_Recount.GetHistoryMenu = function()
     
     for _, data in ipairs(MY_Recount.Data.Get()) do
         if data.UUID and data.nTimeDuring then
-            table.insert(t, {
+            local t1 = {
                 szOption = (data.szBossName or '') .. ' (' .. MY.Sys.FormatTimeCount('M:ss', data.nTimeDuring) .. ')',
                 rgb = (data == DataDisplay and {255, 255, 0}) or nil,
                 fnAction = function()
@@ -942,7 +943,11 @@ MY_Recount.GetHistoryMenu = function()
                     MY_Recount.Data.Del(data)
                     Wnd.CloseWindow('PopupMenuPanel')
                 end,
-            })
+            }
+            if MY.Sys.GetLang() == 'vivn' then
+                t1.szLayer = "ICON_RIGHT"
+            end
+            table.insert(t, t1)
         end
     end
     
