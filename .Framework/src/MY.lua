@@ -163,24 +163,25 @@ local _L = MY.LoadLangPack()
 -- 私有函数
 -----------------------------------------------
 local _MY = {
-    frame = nil,
-    hBox = nil,
-    hRequest = nil,
-    bLoaded = false,
-    dwVersion = _VERSION_,
-    nDebugLevel = _DEBUG_,
-    szBuildDate = _BUILD_,
-    szName = _L["mingyi plugins"],
-    szShortName = _L["mingyi plugin"],
-    szIniFile = _FRAMEWORK_ROOT_.."ui\\MY.ini",
-    szUITexPath = _FRAMEWORK_ROOT_.."image\\UIImage.UITex",
+    frame              = nil,
+    hBox               = nil,
+    hRequest           = nil,
+    bLoaded            = false,
+    dwVersion          = _VERSION_,
+    nDebugLevel        = _DEBUG_,
+    szBuildDate        = _BUILD_,
+    szName             = _L["mingyi plugins"],
+    szShortName        = _L["mingyi plugin"],
+    szIniFile          = _FRAMEWORK_ROOT_.."ui\\MY.ini",
+    szUITexCommon      = _FRAMEWORK_ROOT_.."image\\UICommon.UITex",
+    szUITexPoster      = _FRAMEWORK_ROOT_.."image\\Poster.UITex",
     szIniFileMainPanel = _FRAMEWORK_ROOT_.."ui\\MainPanel.ini",
     
     tTabs = {   -- 标签页
-        { id = _L["General"], }, 
-        { id = _L["Target"] , }, 
-        { id = _L["Battle"] , }, 
-        { id = _L["Others"]  , }, 
+        { id = _L["General"], },
+        { id = _L["Target"] , },
+        { id = _L["Battle"] , },
+        { id = _L["Others"] , },
     },
     --[[ tTabs: 
     {
@@ -200,16 +201,17 @@ local _MY = {
 }
 MY.GetAddonInfo = function()
     local t = {}
-    t.szName      = _MY.szName
-    t.szShortName = _MY.szShortName
-    t.szUITexPath = _MY.szUITexPath
-    t.dwVersion   = _VERSION_
-    t.szBuildDate = _BUILD_
-    t.nDebugLevel = _DEBUG_
-    t.szRoot      = _ADDON_ROOT_
+    t.szName          = _MY.szName
+    t.szShortName     = _MY.szShortName
+    t.szUITexCommon   = _MY.szUITexCommon
+    t.szUITexPoster   = _MY.szUITexPoster
+    t.dwVersion       = _VERSION_
+    t.szBuildDate     = _BUILD_
+    t.nDebugLevel     = _DEBUG_
+    t.szRoot          = _ADDON_ROOT_
     t.szFrameworkRoot = _FRAMEWORK_ROOT_
-    t.szAuthor = _L['MingYi @ Double Dream Town']
-    t.tAuthor = {
+    t.szAuthor        = _L['MingYi @ Double Dream Town']
+    t.tAuthor         = {
       [43567]   = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 体服
       [3007396] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 枫泾古镇
       [1600498] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 追风蹑影
@@ -542,6 +544,9 @@ MY.RedrawTab = function(szCategory)
                 else
                     hTab:Lookup('Image_TabIcon'):FromTextureFile(tab.szIconTex)
                 end
+                hTab:Lookup('Image_Bg'):FromUITex(_MY.szUITexCommon, 3)
+                hTab:Lookup('Image_Bg_Active'):FromUITex(_MY.szUITexCommon, 1)
+                hTab:Lookup('Image_Bg_Hover'):FromUITex(_MY.szUITexCommon, 2)
                 hTab.OnItemLButtonClick = function()
                     MY.SwitchTab(this.szID)
                 end
@@ -614,13 +619,13 @@ MY.SwitchTab = function(szID)
         -- 欢迎页
         local ui = MY.UI(wndMainPanel)
         ui:append('Image_Adv', 'Image'):item('#Image_Adv'):pos(0, 0):size(557, 278)
-          :image(MY.GetAddonInfo().szFrameworkRoot .. 'image/UIImage.UITex', 2)
+          :image(MY.GetAddonInfo().szUITexPoster, 0)
         
-        local txt = ui:append('Text_Adv', 'Text'):item('#Text_Adv'):pos(10, 300):width(250):font(200)
+        local txt = ui:append('Text_Adv', 'Text'):item('#Text_Adv'):pos(10, 300):width(557):font(200)
         MY.BreatheCall(function()
             local player = GetClientPlayer()
             if player then
-                txt:text(_L('%s, welcome to use mingyi plugins!', player.szName))
+                txt:text(_L('%s, welcome to use mingyi plugins!', player.szName) .. 'v' .. MY.GetVersion())
                 return 0
             end
         end, 500)
