@@ -68,7 +68,7 @@ for k, _ in pairs(MY_Chat.tChannel) do RegisterCustomData("Account\\MY_Chat.tCha
 MY_Chat.OnFrameDragEnd = function() this:CorrectPos() MY_Chat.anchor = GetFrameAnchor(this) end
 
 -- open window
-MY_Chat.frame = Wnd.OpenWindow("Interface\\MY\\Chat\\ui\\Chat.ini", "MY_Chat")
+MY_Chat.frame = Wnd.OpenWindow(MY.GetAddonInfo().szRoot .. "Chat\\ui\\Chat.ini", "MY_Chat")
 -- load settings
 MY_Chat.frame:EnableDrag(not MY_Chat.bLockPostion)
 MY_Chat.UpdateAnchor = function() MY_Chat.frame:SetPoint(MY_Chat.anchor.s, 0, 0, MY_Chat.anchor.r, MY_Chat.anchor.x, MY_Chat.anchor.y) MY_Chat.frame:CorrectPos() end
