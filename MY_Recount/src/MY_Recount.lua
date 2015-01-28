@@ -210,6 +210,7 @@ MY_Recount.UpdateUI = function(data)
         (MY_Recount.nDisplayMode == DISPLAY_MODE.PLAYER and type(id) == 'number') then
             tRec = {
                 id           = id                                    ,
+                szMD5        = rec.szMD5                             ,
                 szName       = MY_Recount.Data.GetNameAusID(id, data),
                 dwForceID    = data.Forcelist[id] or -1              ,
                 nValue       = rec.nTotal         or  0              ,
@@ -238,6 +239,7 @@ MY_Recount.UpdateUI = function(data)
         if p.id == UI_GetClientPlayerID() then
             tMyRec = {
                 id           = p.id          ,
+                szMD5        = p.szMD5       ,
                 szName       = p.szName      ,
                 dwForceID    = p.dwForceID   ,
                 nValue       = p.nValue      ,
