@@ -473,6 +473,7 @@ MY.SwitchChat = MY.Chat.SwitchChat
 
 -- parse faceicon in talking message
 MY.Chat.ParseFaceIcon = function(t)
+    _Cache.InitEmotion()
     local t2 = {}
     for _, v in ipairs(t) do
         if v.type ~= "text" then
@@ -501,7 +502,7 @@ MY.Chat.ParseFaceIcon = function(t)
                             break
                         end
                     end
-                    if szFace then
+                    if szFace then -- emotion cmd matched
                         if #szLeft > 0 then
                             table.insert(t2, { type = "text", text = szLeft })
                             szLeft = ''
@@ -511,12 +512,15 @@ MY.Chat.ParseFaceIcon = function(t)
                         else
                             table.insert(t2, { type = "text", text = szFace })
                         end
+                    elseif nPos then -- find '#' but not match emotion
+                        szLeft = szLeft .. szText:sub(1, 1)
+                        szText = szText:sub(2)
                     end
                 end
-                if #szLeft > 0 then
-                    table.insert(t2, { type = "text", text = szLeft })
-                    szLeft = ''
-                end
+            end
+            if #szLeft > 0 then
+                table.insert(t2, { type = "text", text = szLeft })
+                szLeft = ''
             end
         end
     end
