@@ -31,20 +31,23 @@ MY.Chat.RepeatChatLine = function(hTime)
 end
 
 -- 聊天表情初始化
+_Cache.nMaxEmotionLen = 0
 _Cache.InitEmotion = function()
     if not _Cache.tEmotion then
         local t = {}
         for i = 1, g_tTable.FaceIcon:GetRowCount() do
             local tLine = g_tTable.FaceIcon:GetRow(i)
-            t[tLine.dwID] = {
+            local t1 = {
                 nFrame = tLine.nFrame,
-                dwID   = tLine.dwID,
+                dwID   = tLine.dwID or (10000 + i),
                 szCmd  = tLine.szCommand,
                 szType = tLine.szType,
-                szImageFile = tLine.szImageFile
+                szImageFile = tLine.szImageFile or 'ui/Image/UICommon/Talk_face.UITex'
             }
-            t[tLine.szCommand] = t[tLine.dwID]
-            t[tLine.szImageFile..','..tLine.nFrame..','..tLine.szType] = t[tLine.dwID]
+            t[t1.dwID] = t1
+            t[t1.szCmd] = t1
+            t[t1.szImageFile..','..t1.nFrame..','..t1.szType] = t1
+            _Cache.nMaxEmotionLen = math.max(_Cache.nMaxEmotionLen, wstring.len(t1.szCmd))
         end
         _Cache.tEmotion = t
     end
@@ -170,7 +173,11 @@ MY.Chat.CopyChatLine = function(hTime)
             if dwID then
                 local emo = MY.Chat.GetEmotion(dwID)
                 if emo then
-                    edit:InsertObj(emo.szCmd, { type = "emotion", text = emo.szCmd, id = emo.dwID })
+                    if MY.Sys.GetLang() ~= 'vivn' then
+                        edit:InsertObj(emo.szCmd, { type = "emotion", text = emo.szCmd, id = emo.dwID })
+                    else
+                        edit:InsertObj(emo.szCmd, { type = "text", text = emo.szCmd })
+                    end
                 end
             end
         end
@@ -474,32 +481,41 @@ MY.Chat.ParseFaceIcon = function(t)
             end
             table.insert(t2, v)
         else
-            local nOff, nLen = 1, string.len(v.text)
-            while nOff <= nLen do
+            local szText = v.text
+            local szLeft = ''
+            while szText and #szText > 0 do
                 local szFace, dwFaceID = nil, nil
-                local nPos = StringFindW(v.text, "#", nOff)
+                local nPos = StringFindW(szText, "#")
                 if not nPos then
-                    nPos = nLen
+                    szLeft = szLeft .. szText
+                    szText = ''
                 else
-                    for i = nPos + 6, nPos + 2, -2 do
-                        if i <= nLen then
-                            local szTest = string.sub(v.text, nPos, i)
-                            local emo = MY.Chat.GetEmotion(szTest)
-                            if emo then
-                                szFace, dwFaceID = szTest, emo.dwID
-                                nPos = nPos - 1
-                                break
-                            end
+                    szLeft = szLeft .. string.sub(szText, 1, nPos - 1)
+                    szText = string.sub(szText, nPos)
+                    for i = math.min(_Cache.nMaxEmotionLen, wstring.len(szText)), 2, -1 do
+                        local szTest = wstring.sub(szText, 1, i)
+                        local emo = MY.Chat.GetEmotion(szTest)
+                        if emo then
+                            szFace, dwFaceID = szTest, emo.dwID
+                            szText = szText:sub(szFace:len() + 1)
+                            break
+                        end
+                    end
+                    if szFace then
+                        if #szLeft > 0 then
+                            table.insert(t2, { type = "text", text = szLeft })
+                            szLeft = ''
+                        end
+                        if MY.Sys.GetLang() ~= 'vivn' then
+                            table.insert(t2, { type = "emotion", text = szFace, id = dwFaceID })
+                        else
+                            table.insert(t2, { type = "text", text = szFace })
                         end
                     end
                 end
-                if nPos >= nOff then
-                    table.insert(t2, { type = "text", text = string.sub(v.text, nOff, nPos) })
-                    nOff = nPos + 1
-                end
-                if szFace then
-                    table.insert(t2, { type = "emotion", text = szFace, id = dwFaceID })
-                    nOff = nOff + string.len(szFace)
+                if #szLeft > 0 then
+                    table.insert(t2, { type = "text", text = szLeft })
+                    szLeft = ''
                 end
             end
         end
