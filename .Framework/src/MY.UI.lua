@@ -2369,11 +2369,15 @@ MY.UI.CreateFrame = function(szName, nStyle)
             Wnd.CloseWindow(frm)
         end
         -- load bg uitex
-        local szUITex = MY.GetAddonInfo().szFrameworkRoot .. 'image/WndFrame.UITex'
-        for _, v in ipairs({ 'Image_BgLT', 'Image_BgCT', 'Image_BgRT', 'Image_BgT' }) do
-            local h = frm:Lookup('', v)
-            local n = h:GetFrame()
-            h:FromUITex(szUITex, n)
+        local szUITexCommon = MY.GetAddonInfo().szUITexCommon
+        for k, v in pairs({
+            ['Image_BgLT'] = 9,
+            ['Image_BgCT'] = 8,
+            ['Image_BgRT'] = 7,
+            ['Image_BgT' ] = 6,
+        }) do
+            local h = frm:Lookup('', k)
+            h:FromUITex(szUITexCommon, v)
         end
     end
     return MY.UI(frm)
@@ -2397,7 +2401,7 @@ MY.UI.OpenFontPicker = function(callback, t)
     local w, h = 820, 650
     local ui = MY.UI.CreateFrame("_MY_Color_Picker", MY.Const.UI.Frame.NORMAL_EMPTY):size(w,h):pos((clientW-w)/2,(clientH-h)/2):drag(true):drag(0,0,w,h)
     PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
-    ui:append('Image_bg',"Image"):item('#Image_bg'):image(MY.GetAddonInfo().szUITexPath,1):size(w,h):alpha(150)
+    ui:append('Image_bg',"Image"):item('#Image_bg'):image(MY.GetAddonInfo().szUITexCommon, 5):size(w,h):alpha(150)
     ui:append("Text_Close", "WndButton"):children("#Text_Close"):pos((w-150)/2, h-30):width(150)
       :text(_L['close']):click(function() PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame);ui:remove() end)
     for i = 0, 255 do
