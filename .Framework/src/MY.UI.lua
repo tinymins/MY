@@ -1,9 +1,9 @@
 MY = MY or {}
 local _MY = {
-    szIniFileEditBox = "Interface\\MY\\.Framework\\ui\\WndEditBox.ini",
-    szIniFileButton = "Interface\\MY\\.Framework\\ui\\WndButton.ini",
-    szIniFileCheckBox = "Interface\\MY\\.Framework\\ui\\WndCheckBox.ini",
-    szIniFileMainPanel = "Interface\\MY\\.Framework\\ui\\MainPanel.ini",
+    szIniFileEditBox   = MY.GetAddonInfo().szFrameworkRoot .. "ui\\WndEditBox.ini",
+    szIniFileButton    = MY.GetAddonInfo().szFrameworkRoot .. "ui\\WndButton.ini",
+    szIniFileCheckBox  = MY.GetAddonInfo().szFrameworkRoot .. "ui\\WndCheckBox.ini",
+    szIniFileMainPanel = MY.GetAddonInfo().szFrameworkRoot .. "ui\\MainPanel.ini",
 }
 local _L = MY.LoadLangPack()
 ---------------------------------------------------------------------
@@ -647,7 +647,7 @@ function _MY.UI:append(szName, szType, tArg)
                     szType = string.gsub(szType,".*[/\\]","")
                     szType = string.sub(szType,0,-5)
                 else
-                    szFile = "interface\\MY\\.Framework\\ui\\" .. szFile .. ".ini"
+                    szFile = MY.GetAddonInfo().szFrameworkRoot .. "ui\\" .. szFile .. ".ini"
                 end
                 local frame = Wnd.OpenWindow(szFile, "MY_TempWnd")
                 if not frame then
