@@ -434,11 +434,11 @@ _Cache.OnDetailFrameBreathe = function()
     end
     -- ΩÁ√Ê÷ÿªÊ
     local hSelectedItem
-    this:Lookup('WndScroll_Skill'):SetH(112)
-    this:Lookup('WndScroll_Skill', ''):SetH(112)
+    this:Lookup('WndScroll_Skill'):SetSize(480, 112)
+    this:Lookup('WndScroll_Skill', ''):SetSize(480, 112)
     this:Lookup('WndScroll_Skill', ''):FormatAllItemPos()
     local hList = this:Lookup('WndScroll_Skill', 'Handle_SkillList')
-    hList:SetH(90)
+    hList:SetSize(480, 90)
     hList:Clear()
     for i, p in ipairs(tResult) do
         local hItem = hList:AppendItemFromIni(_Cache.szIniDetail, 'Handle_SkillItem')
@@ -544,9 +544,9 @@ _Cache.OnDetailFrameBreathe = function()
         end
         hList:FormatAllItemPos()
     else
-        this:Lookup('WndScroll_Skill'):SetH(348)
-        this:Lookup('WndScroll_Skill', ''):SetH(348)
-        this:Lookup('WndScroll_Skill', 'Handle_SkillList'):SetH(332)
+        this:Lookup('WndScroll_Skill'):SetSize(480, 348)
+        this:Lookup('WndScroll_Skill', ''):SetSize(480, 348)
+        this:Lookup('WndScroll_Skill', 'Handle_SkillList'):SetSize(480, 332)
         this:Lookup('WndScroll_Skill', 'Handle_SkillList'):FormatAllItemPos()
         this:Lookup('WndScroll_Skill', ''):FormatAllItemPos()
         this:Lookup('WndScroll_Detail'):Hide()
