@@ -177,42 +177,14 @@ MY.RegisterInit(MY_ToolBox.ApplyConfig)
           # #       # #   # # # # # # # # # # #     #                 #       # #     #       #   
 #######################################################################################################
 ]]
--- 标签栏激活
-_MY_ToolBox.OnPanelActive = function(wnd)
+MY.RegisterPanel( "MY_ToolBox", _L["toolbox"], _L['General'], "UI/Image/Common/Money.UITex|243", {255,255,0,200}, { OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
     local w, h = ui:size()
+    local x, y = 20, 30
     
-    ui:append("WndCheckBox_FriendHeadTip", "WndCheckBox"):children("#WndCheckBox_FriendHeadTip"):pos(20,20)
-      :text(_L['friend headtop tips']):check(MY_ToolBox.bFriendHeadTip)
-      :check(function(bCheck)
-        MY_ToolBox.bFriendHeadTip = not MY_ToolBox.bFriendHeadTip
-        _MY_ToolBox.FriendHeadTip(MY_ToolBox.bFriendHeadTip)
-    end)
-    
-    ui:append("WndCheckBox_BagSearch", "WndCheckBox"):children("#WndCheckBox_BagSearch"):pos(140,20)
-      :text(_L['package searcher']):check(MY_BagSearch.bEnable or false)
-      :check(function(bChecked)
-        MY_BagSearch.bEnable = bChecked
-    end)
-    
-    ui:append("WndCheckBox_VisualSkill", "WndCheckBox"):children("#WndCheckBox_VisualSkill"):pos(260,20)
-      :text(_L['visual skill']):check(MY_VisualSkill.bEnable or false)
-      :check(function(bChecked)
-        MY_VisualSkill.bEnable = bChecked
-        MY_VisualSkill.Reload()
-    end)
-    
-    ui:append("WndSliderBox_VisualSkillCast", "WndSliderBox"):children("#WndSliderBox_VisualSkillCast"):pos(370, 20)
-      :sliderStyle(false):range(1, 32):value(MY_VisualSkill.nVisualSkillBoxCount)
-      :text(_L("display %d skills.", MY_VisualSkill.nVisualSkillBoxCount))
-      :text(function(val) return _L("display %d skills.", val) end)
-      :change(function(val)
-        MY_VisualSkill.nVisualSkillBoxCount = val
-        MY_VisualSkill.Reload()
-      end)
-    
-    local x, y = 20, 60
-    ui:append('WndButton_GongzhanCheck', 'WndButton'):children('#WndButton_GongzhanCheck'):pos(256,y+2):width(120)
+    -- 检测附近共战
+    ui:append('WndButton_GongzhanCheck', 'WndButton'):children('#WndButton_GongzhanCheck')
+      :pos(w - 140, y):width(120)
       :text(_L['check nearby gongzhan'])
       :lclick(function()
         local tGongZhans = {}
@@ -232,7 +204,7 @@ _MY_ToolBox.OnPanelActive = function(wnd)
         end
         MY.Talk(nChannel, _L("Nearby GongZhan Total Count: %d.", #tGongZhans))
         MY.Talk(nChannel, _L["------------------------------------"])
-    end):rmenu(function()
+      end):rmenu(function()
         local t = { { szOption = _L['send to ...'], bDisable = true }, { bDevide = true } }
         for _, tChannel in ipairs(_MY_ToolBox.tChannels) do
             table.insert( t, { 
@@ -245,59 +217,52 @@ _MY_ToolBox.OnPanelActive = function(wnd)
             } )
         end
         return t
-    end)
+      end)
     
-    ui:append("Text_InfoTip", "Text"):find("#Text_InfoTip"):text(_L['* infomation tips']):color(255,255,0):pos(x, y)
+    -- 好友高亮
+    ui:append("WndCheckBox_FriendHeadTip", "WndCheckBox"):children("#WndCheckBox_FriendHeadTip")
+      :pos(x, y):width(180)
+      :text(_L['friend headtop tips'])
+      :check(MY_ToolBox.bFriendHeadTip)
+      :check(function(bCheck)
+        MY_ToolBox.bFriendHeadTip = not MY_ToolBox.bFriendHeadTip
+        _MY_ToolBox.FriendHeadTip(MY_ToolBox.bFriendHeadTip)
+      end)
     y = y + 30
-    for id, cache in pairs(MY_InfoTip.Cache) do
-        local cfg = MY_InfoTip.Config[id]
-        ui:append("WndCheckBox_InfoTip_"..id, "WndCheckBox"):children("#WndCheckBox_InfoTip_"..id):pos(x, y):width(100)
-          :text(cache.title):check(cfg.bEnable or false)
-          :check(function(bChecked)
-            cfg.bEnable = bChecked
-            MY_InfoTip.Reload()
-          end)
-        x = x + 90
-        ui:append("WndCheckBox_InfoTipTitle_"..id, "WndCheckBox"):children("#WndCheckBox_InfoTipTitle_"..id):pos(x, y):width(60)
-          :text(_L['title']):check(cfg.bShowTitle or false)
-          :check(function(bChecked)
-            cfg.bShowTitle = bChecked
-            MY_InfoTip.Reload()
-          end)
-        x = x + 40
-        ui:append("WndCheckBox_InfoTipBg_"..id, "WndCheckBox"):children("#WndCheckBox_InfoTipBg_"..id):pos(x, y):width(60)
-          :text(_L['background']):check(cfg.bShowBg or false)
-          :check(function(bChecked)
-            cfg.bShowBg = bChecked
-            MY_InfoTip.Reload()
-          end)
-        x = x + 45
-        ui:append("WndButton_InfoTipFont_"..id, "WndButton"):children("#WndButton_InfoTipFont_"..id):pos(x, y)
-          :width(50):text(_L['font'])
-          :click(function()
-            MY.UI.OpenFontPicker(function(f)
-                cfg.nFont = f
-                MY_InfoTip.Reload()
-            end)
-          end)
-        x = x + 60
-        ui:append("Shadow_InfoTipColor_"..id, "Shadow"):item("#Shadow_InfoTipColor_"..id):pos(x, y)
-          :size(20, 20):color(cfg.rgb or {255,255,255})
-          :click(function()
-            local me = this
-            MY.UI.OpenColorPicker(function(r, g, b)
-                MY.UI(me):color(r, g, b)
-                cfg.rgb = { r, g, b }
-                MY_InfoTip.Reload()
-            end)
-          end)
-        x = x + 30
-        if x + 150 > w then
-            x, y = 20, y + 30
-        end
-    end
     
-    local x, y = 220, 200
+    -- 背包搜索
+    ui:append("WndCheckBox_BagSearch", "WndCheckBox"):children("#WndCheckBox_BagSearch")
+      :pos(x, y)
+      :text(_L['package searcher'])
+      :check(MY_BagSearch.bEnable or false)
+      :check(function(bChecked)
+        MY_BagSearch.bEnable = bChecked
+      end)
+    y = y + 30
+    
+    -- 显示历史技能列表
+    ui:append("WndCheckBox_VisualSkill", "WndCheckBox"):children("#WndCheckBox_VisualSkill")
+      :pos(x, y)
+      :text(_L['visual skill'])
+      :check(MY_VisualSkill.bEnable or false)
+      :check(function(bChecked)
+        MY_VisualSkill.bEnable = bChecked
+        MY_VisualSkill.Reload()
+      end)
+    
+    ui:append("WndSliderBox_VisualSkillCast", "WndSliderBox"):children("#WndSliderBox_VisualSkillCast")
+      :pos(x + 160, y)
+      :sliderStyle(false):range(1, 32)
+      :value(MY_VisualSkill.nVisualSkillBoxCount)
+      :text(_L("display %d skills.", MY_VisualSkill.nVisualSkillBoxCount))
+      :text(function(val) return _L("display %d skills.", val) end)
+      :change(function(val)
+        MY_VisualSkill.nVisualSkillBoxCount = val
+        MY_VisualSkill.Reload()
+      end)
+    y = y + 30
+    
+    -- 防止神行CD被黑
     ui:append("WndCheckBox_AvoidBlackShenxingCD", "WndCheckBox"):children("#WndCheckBox_AvoidBlackShenxingCD")
       :pos(x, y):width(150)
       :text(_L['avoid blacking shenxing cd']):check(MY_ToolBox.bAvoidBlackShenxingCD or false)
@@ -305,8 +270,9 @@ _MY_ToolBox.OnPanelActive = function(wnd)
         MY_ToolBox.bAvoidBlackShenxingCD = bChecked
         MY_ToolBox.ApplyConfig()
       end)
+    y = y + 30
     
-    local x, y = 380, 200
+    -- 自动隐藏聊天栏
     ui:append("WndCheckBox_AutoHideChatPanel", "WndCheckBox"):children("#WndCheckBox_AutoHideChatPanel")
       :pos(x, y):width(150)
       :text(_L['auto hide chat panel']):check(MY_AutoHideChat.bAutoHideChatPanel)
@@ -314,27 +280,34 @@ _MY_ToolBox.OnPanelActive = function(wnd)
         MY_AutoHideChat.bAutoHideChatPanel = bChecked
         MY_AutoHideChat.ApplyConfig()
       end)
+    y = y + 30
     
-    local x, y = 20, 200
-    ui:append("Text_BuffMonitorTip", "Text"):item("#Text_BuffMonitorTip"):text(_L['* buff monitor']):color(255,255,0):pos(x, y)
-    x = x + 100
+    -- BUFF监控
+    ui:append("Text_BuffMonitorTip", "Text"):item("#Text_BuffMonitorTip")
+      :pos(x, y)
+      :color(255,255,0)
+      :text(_L['* buff monitor'])
+    
     ui:append("WndCheckBox_BuffMonitor_Undragable", "WndCheckBox"):children("#WndCheckBox_BuffMonitor_Undragable")
-      :pos(x, y):width(100)
+      :pos(x + 100, y):width(100)
       :text(_L['undragable']):check(not MY_BuffMonitor.bDragable)
       :check(function(bChecked)
         MY_BuffMonitor.bDragable = not bChecked
         MY_BuffMonitor.ReloadBuffMonitor()
       end)
-    
-    x = 20
     y = y + 30
-    ui:append("WndCheckBox_BuffMonitor_Self", "WndCheckBox"):children("#WndCheckBox_BuffMonitor_Self"):pos(x, y)
-      :text(_L['self buff monitor']):check(MY_BuffMonitor.bSelfOn)
+    
+    ui:append("WndCheckBox_BuffMonitor_Self", "WndCheckBox"):children("#WndCheckBox_BuffMonitor_Self")
+      :pos(x, y)
+      :text(_L['self buff monitor'])
+      :check(MY_BuffMonitor.bSelfOn)
       :check(function(bChecked)
         MY_BuffMonitor.bSelfOn = bChecked
         MY_BuffMonitor.ReloadBuffMonitor()
       end)
-    ui:append("WndComboBox_SelfBuffMonitor", "WndComboBox"):children("#WndComboBox_SelfBuffMonitor"):pos(x + 200, y)
+    
+    ui:append("WndComboBox_SelfBuffMonitor", "WndComboBox"):children("#WndComboBox_SelfBuffMonitor")
+      :pos(x + 200, y)
       :text(_L['set self buff monitor'])
       :menu(function()
         local dwKungFuID = GetClientPlayer().GetKungfuMount().dwSkillID
@@ -375,13 +348,18 @@ _MY_ToolBox.OnPanelActive = function(wnd)
         return t
       end)
     y = y + 30
-    ui:append("WndCheckBox_BuffMonitor_Target", "WndCheckBox"):children("#WndCheckBox_BuffMonitor_Target"):pos(x, y)
-      :text(_L['target buff monitor']):check(MY_BuffMonitor.bTargetOn)
+    
+    ui:append("WndCheckBox_BuffMonitor_Target", "WndCheckBox"):children("#WndCheckBox_BuffMonitor_Target")
+      :pos(x, y)
+      :text(_L['target buff monitor'])
+      :check(MY_BuffMonitor.bTargetOn)
       :check(function(bChecked)
         MY_BuffMonitor.bTargetOn = bChecked
         MY_BuffMonitor.ReloadBuffMonitor()
       end)
-    ui:append("WndComboBox_TargetBuffMonitor", "WndComboBox"):children("#WndComboBox_TargetBuffMonitor"):pos(x + 200, y)
+    
+    ui:append("WndComboBox_TargetBuffMonitor", "WndComboBox"):children("#WndComboBox_TargetBuffMonitor")
+      :pos(x + 200, y)
       :text(_L['set target buff monitor'])
       :menu(function()
         local dwKungFuID = GetClientPlayer().GetKungfuMount().dwSkillID
@@ -421,20 +399,25 @@ _MY_ToolBox.OnPanelActive = function(wnd)
         end
         return t
       end)
-    -- 随身便笺
-    local x, y = 20, 300
-    ui:append("Text_Anmerkungen", "Text"):item("#Text_Anmerkungen"):text(_L['* anmerkungen']):color(255,255,0):pos(x, y)
     y = y + 30
-    y = y + 10
-    ui:append("WndCheckBox_Anmerkungen_NotePanel", "WndCheckBox"):children("#WndCheckBox_Anmerkungen_NotePanel"):pos(x, y)
+    
+    -- 随身便笺
+    ui:append("Text_Anmerkungen", "Text"):item("#Text_Anmerkungen")
+      :pos(x, y)
+      :color(255,255,0)
+      :text(_L['* anmerkungen'])
+    y = y + 30
+    
+    ui:append("WndCheckBox_Anmerkungen_NotePanel", "WndCheckBox"):children("#WndCheckBox_Anmerkungen_NotePanel")
+      :pos(x, y + 10)
       :text(_L['my anmerkungen']):check(MY_Anmerkungen.bNotePanelEnable)
       :check(function(bChecked)
         MY_Anmerkungen.bNotePanelEnable = bChecked
         MY_Anmerkungen.ReloadNotePanel()
       end)
     
-    y = y - 10
-    ui:append("WndSliderBox_Anmerkungen_Width", "WndSliderBox"):children("#WndSliderBox_Anmerkungen_Width"):pos(x + 150, y)
+    ui:append("WndSliderBox_Anmerkungen_Width", "WndSliderBox"):children("#WndSliderBox_Anmerkungen_Width")
+      :pos(x + 150, y)
       :sliderStyle(false):range(25, 1000):value(MY_Anmerkungen.nNotePanelWidth)
       :text(_L("width: %dpx.", MY_Anmerkungen.nNotePanelWidth))
       :text(function(val) return _L("width: %dpx.", val) end)
@@ -442,8 +425,8 @@ _MY_ToolBox.OnPanelActive = function(wnd)
         MY_Anmerkungen.nNotePanelWidth = val
         MY_Anmerkungen.ReloadNotePanel()
       end)
-    
     y = y + 20
+    
     ui:append("WndSliderBox_Anmerkungen_Height", "WndSliderBox"):children("#WndSliderBox_Anmerkungen_Height"):pos(x + 150, y)
       :sliderStyle(false):range(50, 1000):value(MY_Anmerkungen.nNotePanelHeight)
       :text(_L("height: %dpx.", MY_Anmerkungen.nNotePanelHeight))
@@ -452,5 +435,4 @@ _MY_ToolBox.OnPanelActive = function(wnd)
         MY_Anmerkungen.nNotePanelHeight = val
         MY_Anmerkungen.ReloadNotePanel()
       end)
-end
-MY.RegisterPanel( "MY_ToolBox", _L["toolbox"], _L['General'], "UI/Image/Common/Money.UITex|243", {255,255,0,200}, { OnPanelActive = _MY_ToolBox.OnPanelActive } )
+end})
