@@ -49,7 +49,9 @@ _MY_TalkEx.Talk = function()
         end
     end
 end
-_MY_TalkEx.OnPanelActive = function(wnd)
+MY.Game.AddHotKey("MY_TalkEx_Talk", _L["TalkEx Talk"], function() _MY_TalkEx.Talk() end, nil)
+
+MY.RegisterPanel("TalkEx", _L["talk ex"], _L['Chat'], "UI/Image/UICommon/ScienceTreeNode.UITex|123", {255,255,0,200}, { OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
     local w, h = ui:size()
     -------------------------------------
@@ -197,6 +199,4 @@ _MY_TalkEx.OnPanelActive = function(wnd)
         end
         if #MY_TalkEx.szTrickTextEnd > 0 then MY.Talk(PLAYER_TALK_CHANNEL[MY_TalkEx.tTrickChannel], MY_TalkEx.szTrickTextEnd) end
     end)
-end
-MY.RegisterPanel("TalkEx", _L["talk ex"], _L['General'], "UI/Image/UICommon/ScienceTreeNode.UITex|123", {255,255,0,200}, {OnPanelActive = _MY_TalkEx.OnPanelActive} )
-MY.Game.AddHotKey("MY_TalkEx_Talk", _L["TalkEx Talk"], function() _MY_TalkEx.Talk() end, nil)
+end})

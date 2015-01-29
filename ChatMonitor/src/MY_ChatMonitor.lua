@@ -515,7 +515,7 @@ MY.Game.AddHotKey("MY_ChatMonitor_Hotkey", _L["chat monitor"],
     end
 , nil)
 
-MY.RegisterPanel( "ChatMonitor", _L["chat monitor"], _L['General'], "UI/Image/Minimap/Minimap.UITex|197", {255,127,0,200}, {
+MY.RegisterPanel( "ChatMonitor", _L["chat monitor"], _L['Chat'], "UI/Image/Minimap/Minimap.UITex|197", {255,127,0,200}, {
     OnPanelActive = _MY_ChatMonitor.OnPanelActive,
     OnPanelDeactive = function()
         _MY_ChatMonitor.uiBoard = nil

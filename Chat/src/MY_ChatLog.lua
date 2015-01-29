@@ -124,7 +124,7 @@ function _C.OnPanelActive(wnd)
 	  end)
 end
 
-MY.RegisterPanel( "ChatLog", _L["chat log"], _L['General'], "ui/Image/button/SystemButton.UITex|43", {255,127,0,200}, {
+MY.RegisterPanel( "ChatLog", _L["chat log"], _L['Chat'], "ui/Image/button/SystemButton.UITex|43", {255,127,0,200}, {
 	OnPanelActive = _C.OnPanelActive,
 	OnPanelDeactive = function()
 		_C.uiLog = nil
