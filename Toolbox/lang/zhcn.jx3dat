@@ -2,6 +2,7 @@
 data = {
     -- MY_Toolbox.lua
     ['toolbox'] = '常用工具',
+    ['infotip'] = '信息显示',
     ['friend headtop tips'] = '附近好友高亮',
     
     ['check nearby gongzhan'] = '检测附近共战',
@@ -15,8 +16,8 @@ data = {
     ['system time'] = '系统时间',
     ['fight clock'] = '战斗计时',
     ['lotus clock'] = '藕和桂花',
-    ['background'] = '图',
-    ['title'] = '标',
+    ['background'] = '背景',
+    ['title'] = '标题',
     ['font'] = '字体',
     
     ['Location: '] = '当前位置：',
@@ -42,7 +43,7 @@ data = {
     ['Nearby GongZhan Total Count: %d.'] = '附近共战数量：%d。',
     ['------------------------------------'] = '————————————————————————',
     
-    ['visual skill'] = '技能可视化',
+    ['visual skill'] = '显示历史技能列表',
     ['display %d skills.'] = '显示%d格。',
     
     ['avoid blacking shenxing cd'] = '防止神行CD被吃',
