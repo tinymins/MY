@@ -6,6 +6,7 @@ data = {
     STR_SPLIT_DOT = '·',
     
     ["General"] = "常用",
+    ["Chat"] = "聊天",
     ["Target"] = "目标",
     ["Battle"] = "战斗",
     ["Others"] = "其它",
