@@ -56,7 +56,7 @@ MY_Logoff.PrintCurrentCondition = function(nChanel)
     MY.Talk(nChanel, "--------------------------------------------------\n")
     MY.Talk(nChanel, "[".._L['mingyi plugin'] .. "]" ..
         _L["Any condition matches, game will return to "] ..
-        ((MY_Logoff.bLogOffCompletely and "login page") or "character page") ..
+        ((MY_Logoff.bLogOffCompletely and _L["login page"]) or _L["character page"]) ..
         g_tStrings.STR_COLON .. "\n"
     )
     if MY_Logoff.bTimeOutLogOff then
