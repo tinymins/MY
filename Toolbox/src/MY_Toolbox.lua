@@ -242,7 +242,7 @@ MY.RegisterPanel( "MY_ToolBox", _L["toolbox"], _L['General'], "UI/Image/Common/M
     
     -- 显示历史技能列表
     ui:append("WndCheckBox_VisualSkill", "WndCheckBox"):children("#WndCheckBox_VisualSkill")
-      :pos(x, y)
+      :pos(x, y):width(160)
       :text(_L['visual skill'])
       :check(MY_VisualSkill.bEnable or false)
       :check(function(bChecked)
