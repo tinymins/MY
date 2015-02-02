@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-02-02 20:25:01
+-- @Last Modified time: 2015-02-02 20:47:10
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -1411,6 +1411,19 @@ function _MY.UI:listbox(method, arg1, arg2, arg3)
 						hItem.OnItemLButtonClick = hScroll.OnListItemHandleLButtonClick
 						hItem.OnItemRButtonClick = hScroll.OnListItemHandleRButtonClick
 						hScroll:FormatAllItemPos()
+					end
+				end
+			end
+		elseif method == 'update' then
+			local text, id, data = arg1, arg2, arg3
+			for _, ele in pairs(self.eles) do
+				if ele.type == 'WndListBox' then
+					local hScroll = ele.raw:Lookup('', 'Handle_Scroll')
+					for i = hScroll:GetItemCount() - 1, 0, -1 do
+						if id and hScroll:Lookup(i).id == id then
+							hScroll:Lookup(i).data = data
+							hScroll:Lookup(i):Lookup('Text_Default'):SetText(text)
+						end
 					end
 				end
 			end
