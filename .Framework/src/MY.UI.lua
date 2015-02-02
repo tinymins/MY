@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-02-02 11:02:15
+-- @Last Modified time: 2015-02-02 17:08:58
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -839,6 +839,52 @@ function _MY.UI:append(szName, szType, tArg)
 								p = p:GetNext()
 							end
 						end)
+					elseif szType == 'WndListBox' then
+						local hScroll = wnd:Lookup('', 'Handle_Scroll')
+						hScroll.OnListItemHandleMouseEnter = function()
+							MY.UI(this:Lookup('Image_Bg')):fadeIn(100)
+						end
+						hScroll.OnListItemHandleMouseLeave = function()
+							MY.UI(this:Lookup('Image_Bg')):fadeTo(500,0)
+						end
+						hScroll.OnListItemHandleLButtonClick = function()
+							if not this.bSelected then
+								if not hScroll.tMyLbOption.multiSelect then
+									for i = hScroll:GetItemCount() - 1, 0, -1 do
+										local hItem = hScroll:Lookup(i)
+										if hItem.bSelected then
+											hItem.bSelected = false
+											hItem:Lookup('Image_Sel'):Hide()
+										end
+									end
+								end
+								this:Lookup('Image_Sel'):Show()
+							else
+								this:Lookup('Image_Sel'):Hide()
+							end
+							this.bSelected = not this.bSelected
+						end
+						hScroll.OnListItemHandleRButtonClick = function()
+							if not this.bSelected then
+								if not hScroll.tMyLbOption.multiSelect then
+									for i = hScroll:GetItemCount() - 1, 0, -1 do
+										local hItem = hScroll:Lookup(i)
+										if hItem.bSelected then
+											hItem.bSelected = false
+											hItem:Lookup('Image_Sel'):Hide()
+										end
+									end
+								end
+								this.bSelected = true
+								this:Lookup('Image_Sel'):Show()
+							end
+							if hScroll.GetListItemHandleMenu then
+								PopupMenu(hScroll.GetListItemHandleMenu(this.szText, this.szID))
+							end
+						end
+						hScroll.tMyLbOption = {
+							multiSelect = false,
+						}
 					end
 				end
 				Wnd.CloseWindow(frame)
@@ -1265,6 +1311,126 @@ function _MY.UI:autocomplete(method, arg1, arg2)
 	end
 end
 
+-- ui listbox interface
+function _MY.UI:listbox(method, arg1, arg2)
+	self:_checksum()
+	if method == 'option' and (type(arg1) == 'nil' or (type(arg1) == 'string' and type(arg2) == nil)) then -- get
+		-- select the first item
+		local ele = self.eles[1]
+		-- try to get its option
+		if ele then
+			return clone(ele.raw.tMyLbOption)
+		end
+	else -- set
+		if method == 'option' then
+			if type(arg1) == 'string' then
+				arg1 = {
+					[arg1] = arg2
+				}
+			end
+			if type(arg1) == 'table' then
+				for _, ele in pairs(self.eles) do
+					ele.raw.tMyLbOption = ele.raw.tMyLbOption or {}
+					for k, v in pairs(arg1) do
+						ele.raw.tMyLbOption[k] = v
+					end
+				end
+			end
+		elseif method == 'select' then
+			local tData = {}
+			if arg1 == 'all' then
+				for _, ele in pairs(self.eles) do
+					if ele.type == 'WndListBox' then
+						local hScroll = ele.raw:Lookup('', 'Handle_Scroll')
+						for i = 0, hScroll:GetItemCount() - 1, 1 do
+							local hItem = hScroll:Lookup(i)
+							table.insert(tData, { text = hItem.szText, id = hItem.szID, data = hItem.data, selected = hItem.bSelected })
+						end
+					end
+				end
+			elseif arg1 == 'unselected' then
+				for _, ele in pairs(self.eles) do
+					if ele.type == 'WndListBox' then
+						local hScroll = ele.raw:Lookup('', 'Handle_Scroll')
+						for i = 0, hScroll:GetItemCount() - 1, 1 do
+							local hItem = hScroll:Lookup(i)
+							if not hItem.bSelected then
+								table.insert(tData, { text = hItem.szText, id = hItem.szID, data = hItem.data, selected = hItem.bSelected })
+							end
+						end
+					end
+				end
+			else--if arg1 == 'selected' then
+				for _, ele in pairs(self.eles) do
+					if ele.type == 'WndListBox' then
+						local hScroll = ele.raw:Lookup('', 'Handle_Scroll')
+						for i = 0, hScroll:GetItemCount() - 1, 1 do
+							local hItem = hScroll:Lookup(i)
+							if hItem.bSelected then
+								table.insert(tData, { text = hItem.szText, id = hItem.szID, data = hItem.data, selected = hItem.bSelected })
+							end
+						end
+					end
+				end
+			end
+			return tData
+		elseif method == 'insert' then
+			local szText, szID = arg1, arg2
+			for _, ele in pairs(self.eles) do
+				if ele.type == 'WndListBox' then
+					local hScroll = ele.raw:Lookup('', 'Handle_Scroll')
+					local bExist
+					if szID then
+						for i = hScroll:GetItemCount() - 1, 0, -1 do
+							if hScroll:Lookup(i).szID == szID then
+								bExist = true
+							end
+						end
+					end
+					if not bExist then
+						local w, h = hScroll:GetSize()
+						hScroll:AppendItemFromString('<handle>eventid=371 <image>w='..w..' h=25 path="UI/Image/Common/TextShadow.UITex" frame=5 alpha=0 name="Image_Bg" </image><image>w='..w..' h=25 path="UI/Image/Common/TextShadow.UITex" lockshowhide=1 frame=2 name="Image_Sel" </image><text>w='..w..' h=25 valign=1 name="Text_Default" </text></handle>')
+						local hItem = hScroll:Lookup(hScroll:GetItemCount() - 1)
+						hItem.szID = szID
+						hItem.szText = szText
+						hItem:Lookup('Text_Default'):SetText(szText)
+						hItem.OnItemMouseEnter = hScroll.OnListItemHandleMouseEnter
+						hItem.OnItemMouseLeave = hScroll.OnListItemHandleMouseLeave
+						hItem.OnItemLButtonClick = hScroll.OnListItemHandleLButtonClick
+						hItem.OnItemRButtonClick = hScroll.OnListItemHandleRButtonClick
+						hScroll:FormatAllItemPos()
+					end
+				end
+			end
+		elseif method == 'delete' then
+			local szText, szID = arg1, arg2
+			for _, ele in pairs(self.eles) do
+				if ele.type == 'WndListBox' then
+					local hScroll = ele.raw:Lookup('', 'Handle_Scroll')
+					for i = hScroll:GetItemCount() - 1, 0, -1 do
+						if (szID and hScroll:Lookup(i).szID == szID) or
+						(not szID and szText and hScroll:Lookup(i).szText == szText) then
+							hScroll:RemoveItem(i)
+						end
+					end
+					hScroll:FormatAllItemPos()
+				end
+			end
+		elseif method == 'multiSelect' then
+			self:listbox('option', 'multiSelect', arg1)
+		elseif method == 'onmenu' then
+			if type(arg1) == 'function' then
+				for _, ele in pairs(self.eles) do
+					if ele.type == 'WndListBox' then
+						ele.raw:Lookup('', 'Handle_Scroll').GetListItemHandleMenu = arg1
+					end
+				end
+			end
+		end
+		return self
+	end
+end
+
 -- get/set ui object name
 function _MY.UI:name(szText)
 	self:_checksum()
@@ -1354,7 +1520,7 @@ function _MY.UI:fadeTo(nTime, nOpacity, callback)
 					pcall(callback, ele)
 					return 0
 				end
-			end, "MY_FADE_"..table.concat({ele:raw(1):GetTreePath()}))
+			end, "MY_FADE_" .. MY.UI.GetTreePath(ele:raw(1)))
 		end
 	end
 	return self
@@ -1628,33 +1794,46 @@ function _MY.UI:size(nWidth, nHeight)
 				pcall(function() (ele.itm or ele.raw):GetParent():FormatAllItemPos() end)
 				pcall(function() ele.hdl:FormatAllItemPos() end)
 			end
-			pcall(function()
-				if ele.type=="WndCheckBox" then
-					ele.wnd:SetSize(nHeight, nHeight)
-					ele.txt:SetSize(nWidth - nHeight - 1, nHeight)
-					ele.txt:SetRelPos(nHeight + 1, 0)
-					ele.hdl:SetSize(nWidth, nHeight)
-					ele.hdl:FormatAllItemPos()
-				elseif ele.type=="WndComboBox" then
-					local w, h= ele.cmb:GetSize()
-					ele.cmb:SetRelPos(nWidth-w-5, math.ceil((nHeight - h)/2))
-					ele.cmb:Lookup("", ""):SetAbsPos(ele.hdl:GetAbsPos())
-					ele.cmb:Lookup("", ""):SetSize(nWidth, nHeight)
-				elseif ele.type=="WndEditComboBox" or ele.type=="WndAutoComplete" then
-					local w, h= ele.cmb:GetSize()
-					ele.edt:SetSize(nWidth-10-w, nHeight-4)
-					ele.cmb:SetRelPos(nWidth-w-5, (nHeight-h-1)/2+1)
-				elseif ele.type=="WndRadioBox" then
-					ele.wnd:SetSize(nHeight, nHeight)
-					ele.txt:SetSize(nWidth - nHeight - 1, nHeight)
-					ele.txt:SetRelPos(nHeight + 1, 0)
-					ele.hdl:SetSize(nWidth, nHeight)
-					ele.hdl:FormatAllItemPos()
-				elseif ele.type=="WndEditBox" then
-				elseif ele.type=="Text" then
-					ele.raw.bAutoSize = false
+			if ele.type=="WndCheckBox" then
+				ele.wnd:SetSize(nHeight, nHeight)
+				ele.txt:SetSize(nWidth - nHeight - 1, nHeight)
+				ele.txt:SetRelPos(nHeight + 1, 0)
+				ele.hdl:SetSize(nWidth, nHeight)
+				ele.hdl:FormatAllItemPos()
+			elseif ele.type=="WndComboBox" then
+				local w, h= ele.cmb:GetSize()
+				ele.cmb:SetRelPos(nWidth-w-5, math.ceil((nHeight - h)/2))
+				ele.cmb:Lookup("", ""):SetAbsPos(ele.hdl:GetAbsPos())
+				ele.cmb:Lookup("", ""):SetSize(nWidth, nHeight)
+			elseif ele.type=="WndEditComboBox" or ele.type=="WndAutoComplete" then
+				local w, h= ele.cmb:GetSize()
+				ele.edt:SetSize(nWidth-10-w, nHeight-4)
+				ele.cmb:SetRelPos(nWidth-w-5, (nHeight-h-1)/2+1)
+			elseif ele.type=="WndRadioBox" then
+				ele.wnd:SetSize(nHeight, nHeight)
+				ele.txt:SetSize(nWidth - nHeight - 1, nHeight)
+				ele.txt:SetRelPos(nHeight + 1, 0)
+				ele.hdl:SetSize(nWidth, nHeight)
+				ele.hdl:FormatAllItemPos()
+			elseif ele.type=="WndEditBox" then
+			elseif ele.type=="Text" then
+				ele.raw.bAutoSize = false
+			elseif ele.type == "WndListBox" then
+				ele.raw:Lookup('Scroll_Default'):SetRelPos(nWidth - 15, 10)
+				ele.raw:Lookup('Scroll_Default'):SetSize(15, nHeight - 20)
+				ele.raw:Lookup('', ''):SetSize(nWidth, nHeight)
+				ele.raw:Lookup('', 'Image_Default'):SetSize(nWidth, nHeight)
+				local hScroll = ele.raw:Lookup('', 'Handle_Scroll')
+				hScroll:SetSize(nWidth - 20, nHeight - 20)
+				for i = hScroll:GetItemCount() - 1, 0, -1 do
+					local hItem = hScroll:Lookup(i)
+					hItem:Lookup('Image_Bg'):SetSize(nWidth - 20, 25)
+					hItem:Lookup('Image_Sel'):SetSize(nWidth - 20, 25)
+					hItem:Lookup('Text_Default'):SetSize(nWidth - 20, 25)
+					hItem:FormatAllItemPos()
 				end
-			end)
+				hScroll:FormatAllItemPos()
+			end
 			if ele.sbu then
 				ele.sbu:SetRelPos(nWidth-25, 10)
 				ele.sbd:SetRelPos(nWidth-25, nHeight-30)
@@ -2579,4 +2758,18 @@ end
 ]]
 MY.UI.Append = function(hParent, szName, szType, tArg)
 	return MY.UI(hParent):append(szName, szType, tArg)
+end
+
+MY.UI.GetTreePath = function(raw)
+	local tTreePath = { (raw:GetTreePath()):sub(1, -2) }
+	while(raw and raw:GetType():sub(1, 3) ~= 'Wnd') do
+		local szName = raw:GetName()
+		if not szName or szName == '' then
+			table.insert(tTreePath, raw:GetIndex())
+		else
+			table.insert(tTreePath, szName)
+		end
+		raw = raw:GetParent()
+	end
+	return table.concat(tTreePath, '/')
 end
