@@ -79,6 +79,7 @@ data = {
     
     ['close'] = '關閉',
     ['enable/disable'] = '開啓/關閉',
+    ['enable'] = '啓用',
     
     ['reset data'] = '重置數據',
     ['analyse data'] = '分析數據',
