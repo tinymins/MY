@@ -191,41 +191,22 @@ _Cache.OnPanelActive = function(wnd)
     local x, y = ui:pos()
     local w, h = ui:size()
     
-    local muList = ui:append("WndScrollBox_ResultList", "WndScrollBox"):find("#WndScrollBox_ResultList")
+    local list = ui:append('WndListBox_1', 'WndListBox'):children('#WndListBox_1')
       :pos(20, 35)
       :size(w - 32, h - 50)
-      :handleStyle(3)
+      :listbox('onlclick', function(text, id, data, selected)
+        OpenMiddleMap(data.dwMapID, 0)
+        MY.UI('Topmost1/MiddleMap/Wnd_Tool/Edit_Search'):text(MY.String.PatternEscape(data.szName))
+        Station.SetFocusWindow('Topmost1/MiddleMap')
+        if not selected then -- avoid unselect
+            return false
+        end
+      end)
     
     local muProgress = ui:append('Image_Progress', 'Image'):item('#Image_Progress')
       :pos(20, 31)
       :size(w - 30, 4)
       :image('ui/Image/UICommon/RaidTotal.UITex|45')
-    
-    local AddListItem = function(szText, data)
-        local muItem = muList:append('<handle><image>w=300 h=25 eventid=371 name="Image_Bg" </image><text>name="Text_Default" </text></handle>'):hdl(1):children():last()
-        
-        local hText = muItem:children("#Text_Default")
-          :pos(10, 2)
-          :autosize(true)
-          :text(szText or "")
-          :raw(1)
-        
-        muItem:children("#Image_Bg"):image("UI/Image/Common/TextShadow.UITex",5):alpha(0)
-          :hover(function(bIn)
-            if bIn then
-                MY.UI(this):fadeIn(100)
-            else
-                MY.UI(this):fadeTo(500,0)
-            end
-          end)
-          :click(function(nButton)
-            if nButton == MY.Const.Event.Mouse.LBUTTON then
-                OpenMiddleMap(data.dwMapID, 0)
-                MY.UI('Topmost1/MiddleMap/Wnd_Tool/Edit_Search'):text(MY.String.PatternEscape(data.szName))
-                Station.SetFocusWindow('Topmost1/MiddleMap')
-            end
-          end)
-    end
     
     ui:append('WndEdit_Search', 'WndEditBox'):children('#WndEdit_Search')
       :pos(18, 10)
@@ -234,7 +215,7 @@ _Cache.OnPanelActive = function(wnd)
         if not (v and #v > 0) then
             return
         end
-        muList:clear()
+        list:listbox('clear')
         local aMap = GetMapList()
         local i, N = 1, #aMap
         local n, M = 0, 200
@@ -248,8 +229,8 @@ _Cache.OnPanelActive = function(wnd)
                     if not tNames[p.szName]
                     and (wstring.find(p.szName, v) or
                     wstring.find(p.szTitle, v)) then
-                        AddListItem('[' .. Table_GetMapName(dwMapID) .. '] ' .. p.szName ..
-                        ((p.szTitle and #p.szTitle > 0 and '<' .. p.szTitle .. '>') or ''), {
+                        list:listbox('insert', '[' .. Table_GetMapName(dwMapID) .. '] ' .. p.szName ..
+                        ((p.szTitle and #p.szTitle > 0 and '<' .. p.szTitle .. '>') or ''), nil, {
                             dwMapID = dwMapID ,
                             szName  = p.szName,
                         })
@@ -263,7 +244,7 @@ _Cache.OnPanelActive = function(wnd)
                 local tNames = {}
                 for _, p in ipairs(data.Doodad) do
                     if not tNames[p.szName] and wstring.find(p.szName, v) then
-                        AddListItem('[' .. Table_GetMapName(dwMapID) .. '] ' .. p.szName, {
+                        list:listbox('insert', '[' .. Table_GetMapName(dwMapID) .. '] ' .. p.szName, nil, {
                             dwMapID = dwMapID ,
                             szName  = p.szName,
                         })
