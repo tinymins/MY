@@ -24,7 +24,7 @@ MY_Chat.bLockPostion = false
 MY_Chat.anchor = { x=10, y=-60, s="BOTTOMLEFT", r="BOTTOMLEFT" }
 MY_Chat.bEnableBalloon = true
 MY_Chat.bChatCopy = true
-MY_Chat.bBlockWords = false
+MY_Chat.bBlockWords = true
 MY_Chat.tBlockWords = {}
 MY_Chat.bChatTime = true
 MY_Chat.nChatTime = CHAT_TIME.HOUR_MIN_SEC
@@ -245,27 +245,8 @@ MY_Chat.GetMenu = function()
             end, {
                 szOption = _L['keyword manager'],
                 fnAction = function()
-                    MY.UI.OpenListEditor('MY_Chat_KeywordManager', MY_Chat.tBlockWords, function(szText)
-                        -- 去掉前后空格
-                        szText = (string.gsub(szText, "^%s*(.-)%s*$", "%1"))
-                        -- 验证是否为空
-                        if szText=="" then return nil end
-                        -- 验证是否重复
-                        for i, v in ipairs(MY_Chat.tBlockWords) do
-                            if v==szText then
-                                return false
-                            end
-                        end
-                        -- 加入表
-                        table.insert(MY_Chat.tBlockWords, szText)
-                    end, function(szText)
-                        for i=#MY_Chat.tBlockWords, 1, -1 do
-                            if MY_Chat.tBlockWords[i]==szText then
-                                table.remove(MY_Chat.tBlockWords, i)
-                            end
-                        end
-                    end)
-                    :text(_L["keyword manager"])
+                    MY.OpenPanel()
+                    MY.SwitchTab('MY_Chat_Filter')
                 end,
                 fnDisable = function()
                     return not MY_Chat.bBlockWords
@@ -502,3 +483,72 @@ end, function(h, szMsg, i)
         h:InsertItemFromString(i, false, szTime)
     end
 end)
+
+MY.RegisterPanel( "MY_Chat_Filter", _L["chat filter"], _L['Chat'], "UI/Image/Common/Money.UITex|243", {255,255,0,200}, { OnPanelActive = function(wnd)
+    local ui = MY.UI(wnd)
+    local w, h = ui:size()
+    local x, y = 0, 0
+    
+    ui:append("WndCheckBox_Enable", "WndCheckBox"):children("#WndCheckBox_Enable")
+      :pos(x, y):width(70)
+      :text(_L['enable'])
+      :check(MY_Chat.bBlockWords or false)
+      :check(function(bCheck)
+        MY_Chat.bBlockWords = bCheck
+      end)
+    x = x + 70
+    
+    local edit = ui:append("WndEditBox_Keyword", "WndEditBox"):children("#WndEditBox_Keyword"):pos(x, y):size(w - 160 - x, 25)
+    x, y = 0, y + 30
+    
+    local list = ui:append('WndListBox_1', 'WndListBox'):children('#WndListBox_1'):pos(x, y):size(w, h - 30)
+    -- 初始化list控件
+    for _, v in ipairs(MY_Chat.tBlockWords) do
+        list:listbox('insert', v, v)
+    end
+    list:listbox('onmenu', function(szText, szID)
+        return {{
+            szOption = _L['delete'],
+            fnAction = function()
+                list:listbox('delete', szText, szID)
+            end,
+        }}
+    end)
+    -- add
+    ui:append("WndButton_Add", "WndButton"):children("#WndButton_Add")
+      :pos(w - 160, 0):width(80)
+      :text(_L["add"])
+      :click(function()
+        local szText = edit:text()
+        -- 去掉前后空格
+        szText = (string.gsub(szText, "^%s*(.-)%s*$", "%1"))
+        -- 验证是否为空
+        if szText=="" then
+            return
+        end
+        -- 验证是否重复
+        for i, v in ipairs(MY_Chat.tBlockWords) do
+            if v == szText then
+                return
+            end
+        end
+        -- 加入表
+        table.insert(MY_Chat.tBlockWords, szText)
+        -- 更新UI
+        list:listbox('insert', szText, szText)
+      end)
+    -- del
+    ui:append("WndButton_Del", "WndButton"):children("#WndButton_Del")
+      :pos(w - 80, 0):width(80)
+      :text(_L["delete"])
+      :click(function()
+        for _, v in ipairs(list:listbox('select', 'selected')) do
+            list:listbox('delete', v.text, v.id)
+            for i = #MY_Chat.tBlockWords, 1, -1 do
+                if MY_Chat.tBlockWords[i] == v.text then
+                    table.remove(MY_Chat.tBlockWords, i)
+                end
+            end
+        end
+    end)
+end})
