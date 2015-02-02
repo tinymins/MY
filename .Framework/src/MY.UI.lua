@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-02-02 20:16:32
+-- @Last Modified time: 2015-02-02 20:25:01
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -851,7 +851,7 @@ function _MY.UI:append(szName, szType, tArg)
 							if this:GetParent().OnListItemHandleCustomLButtonClick then
 								local status, err = pcall(
 									this:GetParent().OnListItemHandleCustomLButtonClick,
-									this.szText, this.szID, this.data, not this.bSelected
+									this.text, this.id, this.data, not this.selected
 								)
 								if not status then
 									MY.Debug(err, 'WndListBox#CustomLButtonClick', 2)
@@ -859,12 +859,12 @@ function _MY.UI:append(szName, szType, tArg)
 									return
 								end
 							end
-							if not this.bSelected then
+							if not this.selected then
 								if not hScroll.tMyLbOption.multiSelect then
 									for i = hScroll:GetItemCount() - 1, 0, -1 do
 										local hItem = hScroll:Lookup(i)
-										if hItem.bSelected then
-											hItem.bSelected = false
+										if hItem.selected then
+											hItem.selected = false
 											hItem:Lookup('Image_Sel'):Hide()
 										end
 									end
@@ -873,24 +873,24 @@ function _MY.UI:append(szName, szType, tArg)
 							else
 								this:Lookup('Image_Sel'):Hide()
 							end
-							this.bSelected = not this.bSelected
+							this.selected = not this.selected
 						end
 						hScroll.OnListItemHandleRButtonClick = function()
-							if not this.bSelected then
+							if not this.selected then
 								if not hScroll.tMyLbOption.multiSelect then
 									for i = hScroll:GetItemCount() - 1, 0, -1 do
 										local hItem = hScroll:Lookup(i)
-										if hItem.bSelected then
-											hItem.bSelected = false
+										if hItem.selected then
+											hItem.selected = false
 											hItem:Lookup('Image_Sel'):Hide()
 										end
 									end
 								end
-								this.bSelected = true
+								this.selected = true
 								this:Lookup('Image_Sel'):Show()
 							end
 							if hScroll.GetListItemHandleMenu then
-								PopupMenu(hScroll.GetListItemHandleMenu(this.szText, this.szID, this.data))
+								PopupMenu(hScroll.GetListItemHandleMenu(this.text, this.id, this.data, this.selected))
 							end
 						end
 						hScroll.tMyLbOption = {
@@ -1355,7 +1355,7 @@ function _MY.UI:listbox(method, arg1, arg2, arg3)
 						local hScroll = ele.raw:Lookup('', 'Handle_Scroll')
 						for i = 0, hScroll:GetItemCount() - 1, 1 do
 							local hItem = hScroll:Lookup(i)
-							table.insert(tData, { text = hItem.szText, id = hItem.szID, data = hItem.data, selected = hItem.bSelected })
+							table.insert(tData, { text = hItem.text, id = hItem.id, data = hItem.data, selected = hItem.selected })
 						end
 					end
 				end
@@ -1365,8 +1365,8 @@ function _MY.UI:listbox(method, arg1, arg2, arg3)
 						local hScroll = ele.raw:Lookup('', 'Handle_Scroll')
 						for i = 0, hScroll:GetItemCount() - 1, 1 do
 							local hItem = hScroll:Lookup(i)
-							if not hItem.bSelected then
-								table.insert(tData, { text = hItem.szText, id = hItem.szID, data = hItem.data, selected = hItem.bSelected })
+							if not hItem.selected then
+								table.insert(tData, { text = hItem.text, id = hItem.id, data = hItem.data, selected = hItem.selected })
 							end
 						end
 					end
@@ -1377,8 +1377,8 @@ function _MY.UI:listbox(method, arg1, arg2, arg3)
 						local hScroll = ele.raw:Lookup('', 'Handle_Scroll')
 						for i = 0, hScroll:GetItemCount() - 1, 1 do
 							local hItem = hScroll:Lookup(i)
-							if hItem.bSelected then
-								table.insert(tData, { text = hItem.szText, id = hItem.szID, data = hItem.data, selected = hItem.bSelected })
+							if hItem.selected then
+								table.insert(tData, { text = hItem.text, id = hItem.id, data = hItem.data, selected = hItem.selected })
 							end
 						end
 					end
@@ -1386,14 +1386,14 @@ function _MY.UI:listbox(method, arg1, arg2, arg3)
 			end
 			return tData
 		elseif method == 'insert' then
-			local szText, szID, data = arg1, arg2, arg3
+			local text, id, data = arg1, arg2, arg3
 			for _, ele in pairs(self.eles) do
 				if ele.type == 'WndListBox' then
 					local hScroll = ele.raw:Lookup('', 'Handle_Scroll')
 					local bExist
-					if szID then
+					if id then
 						for i = hScroll:GetItemCount() - 1, 0, -1 do
-							if hScroll:Lookup(i).szID == szID then
+							if hScroll:Lookup(i).id == id then
 								bExist = true
 							end
 						end
@@ -1402,10 +1402,10 @@ function _MY.UI:listbox(method, arg1, arg2, arg3)
 						local w, h = hScroll:GetSize()
 						hScroll:AppendItemFromString('<handle>eventid=371 <image>w='..w..' h=25 path="UI/Image/Common/TextShadow.UITex" frame=5 alpha=0 name="Image_Bg" </image><image>w='..w..' h=25 path="UI/Image/Common/TextShadow.UITex" lockshowhide=1 frame=2 name="Image_Sel" </image><text>w='..w..' h=25 valign=1 name="Text_Default" </text></handle>')
 						local hItem = hScroll:Lookup(hScroll:GetItemCount() - 1)
-						hItem.szID = szID
-						hItem.szText = szText
+						hItem.id = id
+						hItem.text = text
 						hItem.data = data
-						hItem:Lookup('Text_Default'):SetText(szText)
+						hItem:Lookup('Text_Default'):SetText(text)
 						hItem.OnItemMouseEnter = hScroll.OnListItemHandleMouseEnter
 						hItem.OnItemMouseLeave = hScroll.OnListItemHandleMouseLeave
 						hItem.OnItemLButtonClick = hScroll.OnListItemHandleLButtonClick
@@ -1415,13 +1415,13 @@ function _MY.UI:listbox(method, arg1, arg2, arg3)
 				end
 			end
 		elseif method == 'delete' then
-			local szText, szID = arg1, arg2
+			local text, id = arg1, arg2
 			for _, ele in pairs(self.eles) do
 				if ele.type == 'WndListBox' then
 					local hScroll = ele.raw:Lookup('', 'Handle_Scroll')
 					for i = hScroll:GetItemCount() - 1, 0, -1 do
-						if (szID and hScroll:Lookup(i).szID == szID) or
-						(not szID and szText and hScroll:Lookup(i).szText == szText) then
+						if (id and hScroll:Lookup(i).id == id) or
+						(not id and text and hScroll:Lookup(i).text == text) then
 							hScroll:RemoveItem(i)
 						end
 					end
