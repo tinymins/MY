@@ -43,14 +43,19 @@ function _C.OnFriendMsg(szMsg, nFont, bRich, r, g, b)
 end
 
 MY.RegisterInit(function()
-	Log = MY.Json.Decode(MY.LoadUserData('cache/CHAT_LOG/log')) or {
+	Log = MY.Json.Decode(MY.LoadUserData('cache/CHAT_LOG/log')) or {}
+	for k, v in pairs({
 		nMax       = 50,
 		MSG_GUILD  = {},
 		MSG_WHISPER= {},
 		MSG_TEAM   = {},
 		MSG_FRIEND = {},
 		Active     = 'MSG_WHISPER',
-	}
+	}) do
+		if type(Log[k]) ~= type(v) then
+			Log[k] = v
+		end
+	end
 	RegisterMsgMonitor(_C.OnTongMsg  , { 'MSG_GUILD', 'MSG_GUILD_ALLIANCE' })
 	RegisterMsgMonitor(_C.OnWisperMsg, { 'MSG_WHISPER' })
 	RegisterMsgMonitor(_C.OnRaidMsg  , { 'MSG_TEAM', 'MSG_GROUP' })
