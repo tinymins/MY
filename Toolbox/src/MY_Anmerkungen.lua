@@ -16,6 +16,7 @@
 #######################################################################################################
 ]]
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
+local _C = {}
 MY_Anmerkungen = {}
 MY_Anmerkungen.bNotePanelEnable = false
 MY_Anmerkungen.anchorNotePanel = { s = "TOPRIGHT", r = "TOPRIGHT", x = -310, y = 135 }
@@ -185,6 +186,7 @@ MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
       
     -- init data
     ui:children("#WndEditBox_ID"):change()
+    Station.SetFocusWindow(ui:raw(1))
     PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 end
 -- 重载右键菜单
@@ -267,6 +269,9 @@ MY_Anmerkungen.SetPlayerNote = function(dwID, szName, szContent, bTipWhenGroup, 
             MY_Anmerkungen.tPublicPlayerNotes[MY_Anmerkungen.tPublicPlayerNotes[dwID].szName] = nil
             MY_Anmerkungen.tPublicPlayerNotes[dwID] = nil
         end
+        if _C.list then
+            _C.list:listbox('delete', nil, dwID)
+        end
         MY_Anmerkungen.SaveConfig()
         return nil
     end
@@ -286,6 +291,9 @@ MY_Anmerkungen.SetPlayerNote = function(dwID, szName, szContent, bTipWhenGroup, 
         MY_Anmerkungen.tPublicPlayerNotes[dwID] = t
         MY_Anmerkungen.tPublicPlayerNotes[szName] = dwID
     end
+    if _C.list then
+        _C.list:listbox('update', _L('[%s] %s', t.szName, t.szContent), dwID, t)
+    end
     MY_Anmerkungen.SaveConfig()
 end
 -- 读取公共数据
@@ -300,3 +308,24 @@ MY_Anmerkungen.SaveConfig = function()
 end
 MY.RegisterInit(MY_Anmerkungen.LoadConfig)
 MY.RegisterInit(MY_Anmerkungen.ReloadNotePanel)
+MY.RegisterPanel( "MY_Anmerkungen", _L["anmerkungen"], _L['Chat'], "ui/Image/button/ShopButton.UITex|12", {255,255,0,200}, { OnPanelActive = function(wnd)
+    local ui = MY.UI(wnd)
+    local w, h = ui:size()
+    local x, y = 0, 0
+
+    local list = ui:append('WndListBox_1', 'WndListBox'):children('#WndListBox_1')
+      :pos(x, y)
+      :size(w, h)
+      :listbox('onlclick', function(szText, szID, data, bSelected)
+        MY_Anmerkungen.OpenPlayerNoteEditPanel(data.dwID, data.szName)
+        return false
+      end)
+    for dwID, t in pairs(MY_Anmerkungen.tPublicPlayerNotes) do
+        if tonumber(dwID) then
+            list:listbox('insert', _L('[%s] %s', t.szName, t.szContent), t.dwID, t)
+        end
+    end
+    _C.list = list
+end, OnPanelDeactive = function()
+    _C.list = nil
+end})
