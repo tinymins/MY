@@ -510,6 +510,11 @@ MY.RegisterPanel( "MY_Chat_Filter", _L["chat filter"], _L['Chat'], "UI/Image/Com
 			szOption = _L['delete'],
 			fnAction = function()
 				list:listbox('delete', szText, szID)
+				for i = #MY_Chat.tBlockWords, 1, -1 do
+					if MY_Chat.tBlockWords[i] == szText then
+						table.remove(MY_Chat.tBlockWords, i)
+					end
+				end
 			end,
 		}}
 	end)
