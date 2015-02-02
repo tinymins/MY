@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-02-02 17:08:58
+-- @Last Modified time: 2015-02-02 20:16:32
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -848,6 +848,17 @@ function _MY.UI:append(szName, szType, tArg)
 							MY.UI(this:Lookup('Image_Bg')):fadeTo(500,0)
 						end
 						hScroll.OnListItemHandleLButtonClick = function()
+							if this:GetParent().OnListItemHandleCustomLButtonClick then
+								local status, err = pcall(
+									this:GetParent().OnListItemHandleCustomLButtonClick,
+									this.szText, this.szID, this.data, not this.bSelected
+								)
+								if not status then
+									MY.Debug(err, 'WndListBox#CustomLButtonClick', 2)
+								elseif err == false then
+									return
+								end
+							end
 							if not this.bSelected then
 								if not hScroll.tMyLbOption.multiSelect then
 									for i = hScroll:GetItemCount() - 1, 0, -1 do
@@ -879,7 +890,7 @@ function _MY.UI:append(szName, szType, tArg)
 								this:Lookup('Image_Sel'):Show()
 							end
 							if hScroll.GetListItemHandleMenu then
-								PopupMenu(hScroll.GetListItemHandleMenu(this.szText, this.szID))
+								PopupMenu(hScroll.GetListItemHandleMenu(this.szText, this.szID, this.data))
 							end
 						end
 						hScroll.tMyLbOption = {
@@ -1312,7 +1323,7 @@ function _MY.UI:autocomplete(method, arg1, arg2)
 end
 
 -- ui listbox interface
-function _MY.UI:listbox(method, arg1, arg2)
+function _MY.UI:listbox(method, arg1, arg2, arg3)
 	self:_checksum()
 	if method == 'option' and (type(arg1) == 'nil' or (type(arg1) == 'string' and type(arg2) == nil)) then -- get
 		-- select the first item
@@ -1375,7 +1386,7 @@ function _MY.UI:listbox(method, arg1, arg2)
 			end
 			return tData
 		elseif method == 'insert' then
-			local szText, szID = arg1, arg2
+			local szText, szID, data = arg1, arg2, arg3
 			for _, ele in pairs(self.eles) do
 				if ele.type == 'WndListBox' then
 					local hScroll = ele.raw:Lookup('', 'Handle_Scroll')
@@ -1393,6 +1404,7 @@ function _MY.UI:listbox(method, arg1, arg2)
 						local hItem = hScroll:Lookup(hScroll:GetItemCount() - 1)
 						hItem.szID = szID
 						hItem.szText = szText
+						hItem.data = data
 						hItem:Lookup('Text_Default'):SetText(szText)
 						hItem.OnItemMouseEnter = hScroll.OnListItemHandleMouseEnter
 						hItem.OnItemMouseLeave = hScroll.OnListItemHandleMouseLeave
@@ -1416,6 +1428,12 @@ function _MY.UI:listbox(method, arg1, arg2)
 					hScroll:FormatAllItemPos()
 				end
 			end
+		elseif method == 'clear' then
+			for _, ele in pairs(self.eles) do
+				if ele.type == 'WndListBox' then
+					ele.raw:Lookup('', 'Handle_Scroll'):Clear()
+				end
+			end
 		elseif method == 'multiSelect' then
 			self:listbox('option', 'multiSelect', arg1)
 		elseif method == 'onmenu' then
@@ -1423,6 +1441,14 @@ function _MY.UI:listbox(method, arg1, arg2)
 				for _, ele in pairs(self.eles) do
 					if ele.type == 'WndListBox' then
 						ele.raw:Lookup('', 'Handle_Scroll').GetListItemHandleMenu = arg1
+					end
+				end
+			end
+		elseif method == 'onlclick' then
+			if type(arg1) == 'function' then
+				for _, ele in pairs(self.eles) do
+					if ele.type == 'WndListBox' then
+						ele.raw:Lookup('', 'Handle_Scroll').OnListItemHandleCustomLButtonClick = arg1
 					end
 				end
 			end
