@@ -308,7 +308,7 @@ MY_Anmerkungen.SaveConfig = function()
 end
 MY.RegisterInit(MY_Anmerkungen.LoadConfig)
 MY.RegisterInit(MY_Anmerkungen.ReloadNotePanel)
-MY.RegisterPanel( "MY_Anmerkungen", _L["anmerkungen"], _L['Chat'], "ui/Image/button/ShopButton.UITex|12", {255,255,0,200}, { OnPanelActive = function(wnd)
+MY.RegisterPanel( "MY_Anmerkungen_Player_Note", _L["player note"], _L['Chat'], "ui/Image/button/ShopButton.UITex|12", {255,255,0,200}, { OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
     local w, h = ui:size()
     local x, y = 0, 0

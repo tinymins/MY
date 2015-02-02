@@ -64,7 +64,7 @@ data = {
     ['failed to calc.'] = '計算失敗。',
     
     ['my anmerkungen'] = '茗伊隨身便箋',
-    ['anmerkungen'] = '隨身便箋',
+    ['player note'] = '角色標簽',
     ['* anmerkungen'] = '※ 隨身便箋 記在小本子上',
     ['width: %dpx.'] = '寬度：%d像素。',
     ['height: %dpx.'] = '高度：%d像素。',
