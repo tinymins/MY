@@ -466,16 +466,15 @@ end, function(h, szMsg, i)
 			if MY_Chat.bChatCopyAlwaysWhite then
 				_r, _g, _b = 255, 255, 255
 			end
-			szTime = GetFormatText(_L[" * "], 10, _r, _g, _b, 515, "this.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end", "copylink")
+			szTime = MY.Chat.GetCopyLinkText(_L[" * "], { r = _r, g = _g, b = _b })
 		elseif MY_Chat.bChatCopyAlwaysWhite then
 			r, g, b = 255, 255, 255
 		end
 		if MY_Chat.bChatTime then
-			local t =TimeToDate(GetCurrentTime())
 			if MY_Chat.nChatTime == CHAT_TIME.HOUR_MIN_SEC then
-				szTime = szTime .. GetFormatText(string.format("[%02d:%02d:%02d]", t.hour, t.minute, t.second), 10, r, g, b, 515, "this.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end", "timelink")
+				szTime = szTime .. MY.Chat.GetTimeLinkText({ r = _r, g = _g, b = _b , f = 10, s = "[hh:mm:ss]"})
 			else
-				szTime = szTime .. GetFormatText(string.format("[%02d:%02d]", t.hour, t.minute), 10, r, g, b, 515, "this.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end", "timelink")
+				szTime = szTime .. MY.Chat.GetTimeLinkText({ r = _r, g = _g, b = _b , f = 10, s = "[hh:mm]"})
 			end
 		end
 		
