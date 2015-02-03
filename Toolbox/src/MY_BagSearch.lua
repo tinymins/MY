@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-25 10:40:14
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-02-03 11:35:21
+-- @Last Modified time: 2015-02-03 14:21:37
 -----------------------------------------------
 -- ##################################################################################################
 --             #                         #             #               #                 # # # #     
@@ -52,7 +52,7 @@ _Cache.OnBreathe = function()
             end
             chkLtd = MY.UI("Normal/BigBagPanel")
               :append("CheckBox_TimeLtd", "WndRadioBox"):children("#CheckBox_TimeLtd")
-              :text(_L['Time Limited']):size(w, h):pos(nX + w, nY)
+              :text(_L['Time Limited']):size(w + 10, h):pos(nX + w, nY)
               :check(function(bChecked)
                 if bChecked then
                     for _, chk in ipairs(chks) do
