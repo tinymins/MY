@@ -223,7 +223,9 @@ MY.GetAddonInfo = function()
     return t
 end
 _MY.Init = function()
-    if _MY.bLoaded then return end
+    if _MY.bLoaded then
+        return
+    end
     -- var
     _MY.bLoaded = true
     _MY.hBox = MY.GetFrame():Lookup("","Box_1")
@@ -475,7 +477,6 @@ MY.RedrawCategory = function(szCategory)
     for _, ctg in pairs(_MY.tTabs) do
         if #ctg > 0 then
             local chkCategory = wndCategoryList:AppendContentFromIni(_MY.szIniFile, "CheckBox_Category")
-            chkCategory:SetName('CheckBox_Category_' .. ctg.id)
             chkCategory.szCategory = ctg.id
             chkCategory:Lookup('', 'Text_Category'):SetText(ctg.id)
             chkCategory.OnCheckBoxCheck = function()
@@ -509,17 +510,18 @@ MY.SwitchCategory = function(szCategory)
         return
     end
     
-    local chkCategory
-    if szCategory then
-        chkCategory = frame:Lookup('Wnd_Total/WndContainer_Category/CheckBox_Category_' .. szCategory)
+    local hList = frame:Lookup('Wnd_Total/WndContainer_Category')
+    local chk = hList:GetFirstChild()
+    while(chk and chk.szCategory ~= szCategory) do
+        chk = chk:GetNext()
     end
-    if not chkCategory then
-        chkCategory = frame:Lookup('Wnd_Total/WndContainer_Category'):GetFirstChild()
-        if not chkCategory then
-            return
-        end
+    if not chk then
+        chk = hList:GetFirstChild()
     end
-    chkCategory:Check(true)
+    if chk then
+        hList.szCategory = chk.szCategory
+        chk:Check(true)
+    end
 end
 
 MY.RedrawTab = function(szCategory)
@@ -537,7 +539,6 @@ MY.RedrawTab = function(szCategory)
             for i, tab in ipairs(ctg) do
                 local hTab = hTabs:AppendItemFromIni(_MY.szIniFile, "Handle_Tab")
                 hTab.szID = tab.szID
-                hTab:SetName('H_Tab_' .. tab.szID)
                 hTab:Lookup('Text_Tab'):SetText(tab.szTitle)
                 if tab.dwIconFrame then
                     hTab:Lookup('Image_TabIcon'):FromUITex(tab.szIconTex, tab.dwIconFrame)
@@ -571,18 +572,25 @@ MY.SwitchTab = function(szID)
     end
     
     if szID then
-        -- get tab window
-        local hTab = frame:Lookup('Wnd_Total/WndScroll_Tabs', 'H_Tab_' .. szID)
-        if not hTab then
-            -- check if tab exist in other category
-            for _, ctg in ipairs(_MY.tTabs) do
-                for i, tab in ipairs(ctg) do
-                    if tab.szID == szID then
+        -- check if category is right
+        local szCategory = frame:Lookup('Wnd_Total/WndContainer_Category').szCategory
+        for _, ctg in ipairs(_MY.tTabs) do
+            for i, tab in ipairs(ctg) do
+                if tab.szID == szID then
+                    if ctg.id ~= szCategory then
                         MY.SwitchCategory(ctg.id)
                     end
                 end
             end
-            hTab = frame:Lookup('Wnd_Total/WndScroll_Tabs', 'H_Tab_' .. szID)
+        end
+        
+        -- get tab window
+        local hTab
+        local hTabs = frame:Lookup('Wnd_Total/WndScroll_Tabs', '')
+        for i = 0, hTabs:GetItemCount() - 1 do
+            if hTabs:Lookup(i).szID == szID then
+                hTab = hTabs:Lookup(i)
+            end
         end
         if (not hTab) or hTab.bActived then
             return
@@ -709,7 +717,9 @@ MY.RegisterPanel = function( szID, szTitle, szCategory, szIconTex, rgbaTitleColo
         alpha       = rgbaTitleColor[4],
     })
 
-    MY.RedrawCategory()
+    if _MY.bLoaded then
+        MY.RedrawCategory()
+    end
 end
 
 --[[
