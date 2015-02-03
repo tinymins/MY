@@ -332,7 +332,7 @@ end
 -- (string, number) MY.GetVersion()     -- HM的 获取字符串版本号 修改方便拿过来了
 MY.GetVersion = function()
 	local v = _MY.dwVersion
-	local szVersion = string.format("%d.%d.%d", v/0x1000000,
+	local szVersion = string.format("%X.%X.%02X", v/0x1000000,
 		math.floor(v/0x10000)%0x100, math.floor(v/0x100)%0x100)
 	if  v%0x100 ~= 0 then
 		szVersion = szVersion .. "b" .. tostring(v%0x100)
