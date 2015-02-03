@@ -1,19 +1,25 @@
---[[
-#######################################################################################################
-            #                         #             #               #                 # # # #     
-          #   #             # # # # # # # # # #       #             #     #           #           
-        #       #           #                                       #       #   # # # # # # # #   
-      #           #         #       #                     # # # # # # #         #     #       #   
-  # #               # #     # # # # # # # # # #   # # #             #           #     # # #       
-      # # # # # #           #     #                   #     #       #     #     # # # #       #   
-      #         #           #   #     #               #       #     #       #   #       # # # #   
-      #         #           #   # # # # # # #         #       #     #           #     #           
-      #         #           #         #               #             #           #       #         
-      #     # #     #       # # # # # # # # # #       #         # # #       #   #   #       #     
-      #             #       #         #             #   #                 #     # #   #   #   #   
-        # # # # # # #     #           #           #       # # # # # # #       #       # # #       
-#######################################################################################################
-]]
+-----------------------------------------------
+-- @Desc  : ²Ö¿â±³°üËÑË÷
+-- @Author: µÔÒ»Ãù @tinymins
+-- @Date  : 2014-11-25 10:40:14
+-- @Email : admin@derzh.com
+-- @Last Modified by:   µÔÒ»Ãù @tinymins
+-- @Last Modified time: 2015-02-03 11:35:21
+-----------------------------------------------
+-- ##################################################################################################
+--             #                         #             #               #                 # # # #     
+--           #   #             # # # # # # # # # #       #             #     #           #           
+--         #       #           #                                       #       #   # # # # # # # #   
+--       #           #         #       #                     # # # # # # #         #     #       #   
+--   # #               # #     # # # # # # # # # #   # # #             #           #     # # #       
+--       # # # # # #           #     #                   #     #       #     #     # # # #       #   
+--       #         #           #   #     #               #       #     #       #   #       # # # #   
+--       #         #           #   # # # # # # #         #       #     #           #     #           
+--       #         #           #         #               #             #           #       #         
+--       #     # #     #       # # # # # # # # # #       #         # # #       #   #   #       #     
+--       #             #       #         #             #   #                 #     # #   #   #   #   
+--         # # # # # # #     #           #           #       # # # # # # #       #       # # #       
+-- ##################################################################################################
 MY_BagSearch = {}
 MY_BagSearch.bEnable = true
 RegisterCustomData("MY_BagSearch.bEnable")
@@ -40,13 +46,13 @@ _Cache.OnBreathe = function()
     elseif chks[7] then
         if not chkLtd then
             local nX, nY = chks[7]:GetRelPos()
-            local w, h = chks[7]:GetSize()
+            local w, h = chks[7]:Lookup('', ''):GetSize()
             for _, chk in ipairs(chks) do
                 chk.OnCheckBoxUncheck = function() _Cache.bBagTimeLtd = false end
             end
             chkLtd = MY.UI("Normal/BigBagPanel")
               :append("CheckBox_TimeLtd", "WndRadioBox"):children("#CheckBox_TimeLtd")
-              :text(_L['Time Limited']):size(w,h):pos(nX + chks[7]:Lookup("",""):GetSize(), nY)
+              :text(_L['Time Limited']):size(w, h):pos(nX + w, nY)
               :check(function(bChecked)
                 if bChecked then
                     for _, chk in ipairs(chks) do
