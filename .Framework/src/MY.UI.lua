@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-02-02 20:47:10
+-- @Last Modified time: 2015-02-04 09:19:52
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -1125,10 +1125,14 @@ function _MY.UI:text(szText)
 	else
 		-- select the first item
 		local ele = self.eles[1]
-		-- try to get its name
-		local status, err = pcall(function() return (ele.txt or ele.edt or ele.raw):GetText() end)
-		-- if succeed then return its name
-		if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:text' ,3) return nil end
+		if ele then
+			-- try to get its name
+			local x = ele.txt or ele.edt or ele.raw
+			-- if succeed then return its name
+			if x and x.GetText then
+				return x:GetText()
+			end
+		end
 	end
 end
 
