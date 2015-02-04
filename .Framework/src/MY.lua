@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-03 11:06:38
+-- @Last Modified time: 2015-02-04 12:52:47
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -256,6 +256,10 @@ _MY.Init = function()
 	  :click(function()
 	  	MY.UI.OpenInternetExplorer("http://weibo.com/zymah")
 	  end)
+	-- 显示LOGO
+	MY.UI(MY.GetFrame()):item('#Image_Icon')
+	  :size(30, 30)
+	  :image(_MY.szUITexCommon, 0)
 end
 
 -- ##################################################################################################
