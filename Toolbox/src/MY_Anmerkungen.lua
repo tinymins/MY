@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-25 12:31:03
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-05 12:04:30
+-- @Last Modified time: 2015-02-05 12:34:41
 -----------------------------------------------
 -- #######################################################################################################
 --   * * *         *                 *                     *                   *           *         
@@ -309,7 +309,7 @@ end
 -- 保存公共数据
 MY_Anmerkungen.SaveConfig = function()
 	MY.Sys.SaveLUAData("config/PLAYER_NOTES/" .. MY.Game.GetServer(), MY.Json.Encode(MY_Anmerkungen.tPublicPlayerNotes))
-	MY.Sys.SaveUserData("config/PLAYER_NOTES/data", MY.Json.Encode(MY_Anmerkungen.tPrivatePlayerNotes))
+	MY.Sys.SaveUserData("config/PLAYER_NOTES/", MY.Json.Encode(MY_Anmerkungen.tPrivatePlayerNotes))
 end
 MY.RegisterInit(MY_Anmerkungen.LoadConfig)
 MY.RegisterInit(MY_Anmerkungen.ReloadNotePanel)

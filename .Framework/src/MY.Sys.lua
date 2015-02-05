@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-03 22:56:45
+-- @Last Modified time: 2015-02-05 12:40:32
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -117,7 +117,15 @@ MY.LoadLUAData = MY.Sys.LoadLUAData
 	(data) MY.Sys.SaveUserData(szFileUri, tData)
 ]]
 MY.Sys.SaveUserData = function(szFileUri, tData)
-	return MY.Sys.SaveLUAData(szFileUri.."_"..(MY.Game.GetServer()):gsub('[/\\|:%*%?"<>]', '').."_"..UI_GetClientPlayerID(), tData)
+	-- 统一化目录分隔符
+	szFileUri = string.gsub(szFileUri, '\\', '/')
+	if string.sub(szFileUri, -1) ~= '/' then
+		szFileUri = szFileUri .. "_"
+	end
+	-- 添加用户识别字符
+	szFileUri = szFileUri .. (MY.Game.GetServer()):gsub('[/\\|:%*%?"<>]', '') .. "_" .. MY.Player.GetClientInfo().dwID
+	-- 读取数据
+	return MY.Sys.SaveLUAData(szFileUri, tData)
 end
 MY.SaveUserData = MY.Sys.SaveUserData
 
@@ -125,7 +133,15 @@ MY.SaveUserData = MY.Sys.SaveUserData
 	(data) MY.Sys.LoadUserData(szFile [,szSubAddonName])
 ]]
 MY.Sys.LoadUserData = function(szFileUri)
-	return MY.Sys.LoadLUAData(szFileUri.."_"..(MY.Game.GetServer()):gsub('[/\\|:%*%?"<>]', '').."_"..UI_GetClientPlayerID())
+	-- 统一化目录分隔符
+	szFileUri = string.gsub(szFileUri, '\\', '/')
+	if string.sub(szFileUri, -1) ~= '/' then
+		szFileUri = szFileUri .. "_"
+	end
+	-- 添加用户识别字符
+	szFileUri = szFileUri .. (MY.Game.GetServer()):gsub('[/\\|:%*%?"<>]', '') .. "_" .. MY.Player.GetClientInfo().dwID
+	-- 读取数据
+	return MY.Sys.LoadLUAData(szFileUri)
 end
 MY.LoadUserData = MY.Sys.LoadUserData
 
