@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-03 23:00:17
+-- @Last Modified time: 2015-02-05 12:33:25
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -108,13 +108,13 @@ MY.Player.GetClientInfo = function(bForceRefresh)
 		if me then -- 确保获取到玩家
 			m_ClientInfo = {}
 			if not IsRemotePlayer(me.dwID) then -- 确保不在战场
-				m_ClientInfo.dwID  = me.dwID
+				m_ClientInfo.dwID   = me.dwID
+				m_ClientInfo.szName = me.szName
 			end
 			m_ClientInfo.nX                = me.nX
 			m_ClientInfo.nY                = me.nY
 			m_ClientInfo.nZ                = me.nZ
 			m_ClientInfo.nFaceDirection    = me.nFaceDirection
-			m_ClientInfo.szName            = me.szName
 			m_ClientInfo.szTitle           = me.szTitle
 			m_ClientInfo.dwForceID         = me.dwForceID
 			m_ClientInfo.nLevel            = me.nLevel
