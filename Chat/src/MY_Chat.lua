@@ -472,9 +472,9 @@ end, function(h, szMsg, i)
 		end
 		if MY_Chat.bChatTime then
 			if MY_Chat.nChatTime == CHAT_TIME.HOUR_MIN_SEC then
-				szTime = szTime .. MY.Chat.GetTimeLinkText({ r = _r, g = _g, b = _b , f = 10, s = "[hh:mm:ss]"})
+				szTime = szTime .. MY.Chat.GetTimeLinkText({ r = r, g = g, b = b , f = 10, s = "[hh:mm:ss]"})
 			else
-				szTime = szTime .. MY.Chat.GetTimeLinkText({ r = _r, g = _g, b = _b , f = 10, s = "[hh:mm]"})
+				szTime = szTime .. MY.Chat.GetTimeLinkText({ r = r, g = g, b = b , f = 10, s = "[hh:mm]"})
 			end
 		end
 		
