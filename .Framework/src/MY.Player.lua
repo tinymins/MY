@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-05 12:33:25
+-- @Last Modified time: 2015-02-05 16:31:19
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -103,10 +103,12 @@ RegisterEvent("DOODAD_LEAVE_SCENE", function() _Cache.tNearDoodad[arg0] = nil  e
 ]]
 local m_ClientInfo
 MY.Player.GetClientInfo = function(bForceRefresh)
-	if bForceRefresh or not m_ClientInfo then
+	if bForceRefresh or not (m_ClientInfo and m_ClientInfo.dwID) then
 		local me = GetClientPlayer()
 		if me then -- 确保获取到玩家
-			m_ClientInfo = {}
+			if not m_ClientInfo then
+				m_ClientInfo = {}
+			end
 			if not IsRemotePlayer(me.dwID) then -- 确保不在战场
 				m_ClientInfo.dwID   = me.dwID
 				m_ClientInfo.szName = me.szName
