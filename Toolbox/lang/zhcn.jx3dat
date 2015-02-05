@@ -49,6 +49,8 @@ data = {
     ['avoid blacking shenxing cd'] = '防止神行CD被吃',
     ['Shenxing has been cancelled, cause you got the zhenyan.'] = '您获取到阵眼，为防止神行千里CD被黑，读条已自动打断。',
     
+    ['auto switch talk channel when into battle field'] = '进出战场JJC时自动切换团队/战场频道',
+    
     ['* buff monitor'] = '※ BUFF监控',
     ['undragable'] = '禁止拖动',
     ['auto hide chat panel'] = '自动隐藏聊天栏',
