@@ -298,13 +298,13 @@ MY_Anmerkungen.SetPlayerNote = function(dwID, szName, szContent, bTipWhenGroup, 
 end
 -- 读取公共数据
 MY_Anmerkungen.LoadConfig = function()
-    MY_Anmerkungen.tPublicPlayerNotes = MY.Json.Decode(MY.Sys.LoadLUAData("config/MY_Anmerkungen_PlayerNotes")) or {}
-    MY_Anmerkungen.tPrivatePlayerNotes = MY.Json.Decode(MY.Sys.LoadUserData("config/MY_Anmerkungen_PlayerNotes")) or {}
+    MY_Anmerkungen.tPublicPlayerNotes = MY.Json.Decode(MY.Sys.LoadLUAData("config/PLAYER_NOTES/" .. MY.Game.GetServer())) or {}
+    MY_Anmerkungen.tPrivatePlayerNotes = MY.Json.Decode(MY.Sys.LoadUserData("config/PLAYER_NOTES/data")) or {}
 end
 -- 保存公共数据
 MY_Anmerkungen.SaveConfig = function()
-    MY.Sys.SaveLUAData("config/MY_Anmerkungen_PlayerNotes", MY.Json.Encode(MY_Anmerkungen.tPublicPlayerNotes))
-    MY.Sys.SaveUserData("config/MY_Anmerkungen_PlayerNotes", MY.Json.Encode(MY_Anmerkungen.tPrivatePlayerNotes))
+    MY.Sys.SaveLUAData("config/PLAYER_NOTES/" .. MY.Game.GetServer(), MY.Json.Encode(MY_Anmerkungen.tPublicPlayerNotes))
+    MY.Sys.SaveUserData("config/PLAYER_NOTES/data", MY.Json.Encode(MY_Anmerkungen.tPrivatePlayerNotes))
 end
 MY.RegisterInit(MY_Anmerkungen.LoadConfig)
 MY.RegisterInit(MY_Anmerkungen.ReloadNotePanel)
