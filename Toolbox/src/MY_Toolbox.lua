@@ -6,6 +6,7 @@
 -- 主要功能: 共站检查 好友头顶
 -- 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
+local _C = {}
 local _MY_ToolBox = {
     bFighting = false,
     nLastFightStartTimestarp = -1,
@@ -70,6 +71,8 @@ end
 
 MY_ToolBox.bAvoidBlackShenxingCD = true
 RegisterCustomData("MY_ToolBox.bAvoidBlackShenxingCD")
+MY_ToolBox.bJJCAutoSwitchTalkChannel = true
+RegisterCustomData("MY_ToolBox.bJJCAutoSwitchTalkChannel")
 MY_ToolBox.ApplyConfig = function()
     -- 好友高亮
     if MY_ToolBox.bFriendHeadTip then
@@ -158,6 +161,24 @@ MY_ToolBox.ApplyConfig = function()
         end)
     else
         MY.RegisterEvent('DO_SKILL_CAST', 'MY_ToolBox_AvoidBlackShenxingCD')
+    end
+    
+    if MY_ToolBox.bJJCAutoSwitchTalkChannel then
+        MY.RegisterEvent('LOADING_END', 'MY_ToolBox_JJCAutoSwitchTalkChannel', function()
+            local nChannel, szName = EditBox_GetChannel()
+            if nChannel == PLAYER_TALK_CHANNEL.RAID or
+            nChannel == PLAYER_TALK_CHANNEL.TEAM or
+            nChannel == PLAYER_TALK_CHANNEL.BATTLE_FIELD then
+                _C.JJCAutoSwitchTalkChannel_OrgChannel = nChannel
+                if GetClientPlayer().GetScene().nType == MAP_TYPE.BATTLE_FIELD then
+                    MY.Chat.SwitchChat(PLAYER_TALK_CHANNEL.BATTLE_FIELD)
+                else
+                    MY.Chat.SwitchChat(_C.JJCAutoSwitchTalkChannel_OrgChannel or PLAYER_TALK_CHANNEL.RAID)
+                end
+            end
+        end)
+    else
+        MY.RegisterEvent('LOADING_END', 'MY_ToolBox_JJCAutoSwitchTalkChannel')
     end
 end
 MY.RegisterInit(MY_ToolBox.ApplyConfig)
@@ -279,6 +300,16 @@ MY.RegisterPanel( "MY_ToolBox", _L["toolbox"], _L['General'], "UI/Image/Common/M
       :check(function(bChecked)
         MY_AutoHideChat.bAutoHideChatPanel = bChecked
         MY_AutoHideChat.ApplyConfig()
+      end)
+    y = y + 30
+    
+    -- 自动隐藏聊天栏
+    ui:append("WndCheckBox_AutoSwitchChannel", "WndCheckBox"):children("#WndCheckBox_AutoSwitchChannel")
+      :pos(x, y):width(200)
+      :text(_L['auto switch talk channel when into battle field']):check(MY_ToolBox.bJJCAutoSwitchTalkChannel)
+      :check(function(bChecked)
+        MY_ToolBox.bJJCAutoSwitchTalkChannel = bChecked
+        MY_ToolBox.ApplyConfig()
       end)
     y = y + 30
     
