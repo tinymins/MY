@@ -1,11 +1,12 @@
 ﻿
-@DATA/userdata/XLifeBar/*.jx3dat
-@DATA/cache/PLAYER_INFO/*.jx3dat
-@DATA/config/*.jx3dat
+*.pyc
 */manifest.dat
 */manifest.key
 */publisher.key
+@DATA/cache/PLAYER_INFO/*.jx3dat
 @DATA/cache/NPC_DOODAD_REC/*.jx3dat
 @DATA/cache/FIGHT_RECOUNT_LOG/*.jx3dat
 @DATA/cache/CHAT_LOG/*.jx3dat
-*.pyc
+@DATA/config/*.jx3dat
+@DATA/config/PLAYER_NOTES/*.jx3dat
+@DATA/userdata/XLifeBar/*.jx3dat
