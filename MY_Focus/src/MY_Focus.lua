@@ -179,7 +179,8 @@ MY_Focus.OnObjectEnterScene = function(dwType, dwID, nRetryCount)
 
     local szName = MY.Game.GetObjectName(obj)
     -- 解决玩家刚进入视野时名字为空的问题
-    if dwType == TARGET.PLAYER and not szName then
+    if (dwType == TARGET.PLAYER and not szName) or
+    not (GetClientPlayer()) then -- 解决自身刚进入场景的时候的问题
         MY.DelayCall(function()
             MY_Focus.OnObjectEnterScene(dwType, dwID, (nRetryCount or 0) + 1)
         end, 300)
@@ -198,18 +199,20 @@ MY_Focus.OnObjectEnterScene = function(dwType, dwID, nRetryCount)
                 end
             end
         end
-        -- 判断好友
-        if dwType == TARGET.PLAYER and
-        MY_Focus.bFocusFriend and
-        MY.Player.GetFriend(dwID) then
-            bFocus = true
-        end
-        -- 判断同帮会
-        if dwType == TARGET.PLAYER and
-        MY_Focus.bFocusTong and
-        dwID ~= UI_GetClientPlayerID() and
-        MY.Player.GetTongMember(dwID) then
-            bFocus = true
+        if not IsRemotePlayer(UI_GetClientPlayerID()) then
+            -- 判断好友
+            if dwType == TARGET.PLAYER and
+            MY_Focus.bFocusFriend and
+            MY.Player.GetFriend(dwID) then
+                bFocus = true
+            end
+            -- 判断同帮会
+            if dwType == TARGET.PLAYER and
+            MY_Focus.bFocusTong and
+            dwID ~= MY.GetClientInfo().dwID and
+            MY.Player.GetTongMember(dwID) then
+                bFocus = true
+            end
         end
         -- 判断敌对玩家
         if dwType == TARGET.PLAYER and
