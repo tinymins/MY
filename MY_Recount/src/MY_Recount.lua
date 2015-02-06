@@ -848,7 +848,7 @@ MY_Recount.GetMenu = function()
             return not MY_Recount.bEnable
         end,
     }
-    for i, _ in ipairs(MY.LoadLUAData(_Cache.szCssFile, true)) do
+    for i, _ in ipairs(MY.LoadLUAData(_Cache.szCssFile, true) or {}) do
         table.insert(t1, {
             szOption = i,
             bCheck = true, bMCheck = true,
