@@ -95,7 +95,7 @@ MY_InfoTip.Cache = {
         end
     },
 }
-local _SZ_CONFIG_FILE_ = 'config/MY_InfoTip'
+local _SZ_CONFIG_FILE_ = 'config/MY_INFO_TIP/'
 local _Cache = {}
 local SaveConfig = function() MY.Sys.SaveUserData(_SZ_CONFIG_FILE_, MY_InfoTip.Config) end
 local LoadConfig = function()
