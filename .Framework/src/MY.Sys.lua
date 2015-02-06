@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-05 12:40:32
+-- @Last Modified time: 2015-02-06 11:22:19
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -64,14 +64,14 @@ MY.Sys.SaveLUAData = function(szFileUri, tData, bNoDistinguishLang)
 	if string.sub(szFileUri, 1, 1)~='/' then
 		szFileUri = MY.GetAddonInfo().szRoot .. "@DATA/" .. szFileUri
 	end
-	-- 统一后缀
-	szFileUri = szFileUri .. '.MYDATA'
 	-- 添加游戏语言后缀
 	if not bNoDistinguishLang then
-		local _, _, lang = GetVersion()
-		lang = string.upper(lang)
-		if #lang>0 then
-			szFileUri = szFileUri .. '_' .. lang
+		local lang = string.lower(MY.Sys.GetLang())
+		if #lang > 0 then
+			if string.sub(szFileUri, -1) ~= '/' then
+				szFileUri = szFileUri .. "."
+			end
+			szFileUri = szFileUri .. lang
 		end
 	end
 	if MY.Sys.GetLang() == 'vivn' then
@@ -95,14 +95,14 @@ MY.Sys.LoadLUAData = function(szFileUri, bNoDistinguishLang)
 	if string.sub(szFileUri, 1, 1)~='/' then
 		szFileUri = MY.GetAddonInfo().szRoot .. "@DATA/" .. szFileUri
 	end
-	-- 统一后缀
-	szFileUri = szFileUri .. '.MYDATA'
 	-- 添加游戏语言后缀
 	if not bNoDistinguishLang then
-		local _, _, lang = GetVersion()
-		lang = string.upper(lang)
-		if #lang>0 then
-			szFileUri = szFileUri .. '_' .. lang
+		local lang = string.lower(MY.Sys.GetLang())
+		if #lang > 0 then
+			if string.sub(szFileUri, -1) ~= '/' then
+				szFileUri = szFileUri .. "."
+			end
+			szFileUri = szFileUri .. lang
 		end
 	end
 	if MY.Sys.GetLang() == 'vivn' then
