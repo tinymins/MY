@@ -9,6 +9,7 @@
 MY = MY or {}
 MY.Game = MY.Game or {}
 local _Cache, _L = {}, MY.LoadLangPack()
+local _C = {}
 --[[
 #######################################################################################################
       #       #               #         #           #           #         
@@ -385,3 +386,36 @@ MY.Game.IsDungeonMap = function(szMapNameOrdwID)
     return false
 end
 MY.IsDungeonMap = MY.Game.IsDungeonMap
+
+--[[ 获取地图BOSS列表
+    (table) MY.Game.GetBossList()
+    (table) MY.Game.GetBossList(dwMapID)
+]]
+MY.Game.GetBossList = function(dwMapID)
+    if not _C.tBossList then
+        _C.tBossList = MY.Sys.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/boss/') or { version = 0 }
+    end
+    
+    if dwMapID then
+        return clone(_C.tBossList[dwMapID])
+    else
+        return clone(_C.tBossList)
+    end
+end
+-- remote boss list online
+MY.RegisterInit(function()
+    -- start remote version check
+    MY.RemoteRequest('http://data.jx3.derzh.com/data/bosslist/' .. MY.Sys.GetLang() .. '.html', function(szTitle, szContent)
+        -- decode data
+        local data = MY.Json.Decode(szContent)
+        if not data then
+            MY.Debug(L["Bosslist update check failed, server respond unkown data."], 'MY::tBossList', 3)
+            return
+        end
+        
+        if data.version > _C.tBossList.version then
+            _C.tBossList = data
+            MY.Sys.SaveLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/boss/', _C.tBossList)
+        end
+    end)
+end)
