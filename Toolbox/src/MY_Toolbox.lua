@@ -302,7 +302,7 @@ MY.RegisterPanel( "MY_ToolBox", _L["toolbox"], _L['General'], "UI/Image/Common/M
     
     -- ×Ô¶¯Òþ²ØÁÄÌìÀ¸
     ui:append("WndCheckBox_AutoSwitchChannel", "WndCheckBox"):children("#WndCheckBox_AutoSwitchChannel")
-      :pos(x, y):width(200)
+      :pos(x, y):width(300)
       :text(_L['auto switch talk channel when into battle field']):check(MY_ToolBox.bJJCAutoSwitchTalkChannel)
       :check(function(bChecked)
         MY_ToolBox.bJJCAutoSwitchTalkChannel = bChecked
