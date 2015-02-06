@@ -70,7 +70,7 @@ RegisterCustomData("XLifeBar.bEnabled")
 RegisterCustomData("XLifeBar.bUseGlobalConfig")
 RegisterCustomData("XLifeBar.tSysHeadTop")
 local _XLifeBar = {
-    szConfig = "userdata/XLifeBar/CFG",
+    szConfig = "userdata/XLifeBar/cfg",
     tObject = {},
     tTongList = {},
     tNpc = {},
