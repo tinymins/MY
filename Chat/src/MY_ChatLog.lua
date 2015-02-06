@@ -43,7 +43,7 @@ function _C.OnFriendMsg(szMsg, nFont, bRich, r, g, b)
 end
 
 MY.RegisterInit(function()
-	Log = MY.Json.Decode(MY.LoadUserData('cache/CHAT_LOG/log')) or {}
+	Log = MY.Json.Decode(MY.LoadUserData('cache/CHAT_LOG/')) or {}
 	for k, v in pairs({
 		nMax       = 50,
 		MSG_GUILD  = {},
@@ -63,7 +63,7 @@ MY.RegisterInit(function()
 end)
 
 MY.RegisterExit(function()
-	MY.SaveUserData('cache/CHAT_LOG/log', MY.Json.Encode(Log))
+	MY.SaveUserData('cache/CHAT_LOG/', MY.Json.Encode(Log))
 end)
 
 function _C.DrawLog()
