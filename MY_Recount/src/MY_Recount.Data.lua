@@ -151,7 +151,7 @@ MY_Recount.Data.nMaxHistory   = 10
 MY_Recount.Data.nMinFightTime = 30
 
 local _Cache = {
-    szRecFile = 'cache/FIGHT_RECOUNT_LOG/data',
+    szRecFile = 'cache/FIGHT_RECOUNT_LOG/',
 }
 local Data          -- 当前战斗数据记录
 local History       -- 历史战斗记录
