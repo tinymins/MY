@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-06 15:04:08
+-- @Last Modified time: 2015-02-06 15:07:09
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -174,7 +174,7 @@ MY.Sys.PlaySound = function(szFilePath, szCustomPath)
 end
 -- 加载注册数据
 MY.RegisterInit(function()
-	for v_name, v_data in pairs(MY.LoadLUAData('config/initialize') or {}) do
+	for v_name, v_data in pairs(MY.LoadLUAData('config/initial') or {}) do
 		local t = _G
 		local k = MY.String.Split(v_name, '.')
 		for i=1, #k-1 do
