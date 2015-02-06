@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-04 09:19:52
+-- @Last Modified time: 2015-02-06 13:25:51
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -2321,22 +2321,19 @@ function _MY.UI:hover(fnHover, fnLeave, bNoAutoBind)
 end
 
 --[[ tip 鼠标悬停提示
-	(self) Instance:tip( szTip[, nPosType[, tOffset[, bNoEncode] ] ] ) 绑定tip事件
-	string szTip:       要提示的文字文本或序列化的DOM文本
+	(self) Instance:tip( tip[, nPosType[, tOffset[, bNoEncode] ] ] ) 绑定tip事件
+	string|function tip:要提示的文字文本或序列化的DOM文本或返回前述文本的函数
 	number nPosType:    提示位置 有效值为MY.Const.UI.Tip.枚举
 	table tOffset:      提示框偏移量等附加信息{ x = x, y = y, hide = MY.Const.UI.Tip.Hide枚举, nFont = 字体, r, g, b = 字颜色 }
 	boolean bNoEncode:  当szTip为纯文本时保持这个参数为false 当szTip为格式化的DOM字符串时设置该参数为true
 ]]
-function _MY.UI:tip(szTip, nPosType, tOffset, bNoEncode)
+function _MY.UI:tip(tip, nPosType, tOffset, bNoEncode)
 	tOffset = tOffset or {}
 	tOffset.x = tOffset.x or 0
 	tOffset.y = tOffset.y or 0
 	tOffset.w = tOffset.w or 450
 	tOffset.hide = tOffset.hide or MY.Const.UI.Tip.HIDE
 	tOffset.nFont = tOffset.nFont or 136
-	if not bNoEncode then
-		szTip = GetFormatText(szTip, tOffset.nFont, tOffset.r, tOffset.g, tOffset.b)
-	end
 	nPosType = nPosType or MY.Const.UI.Tip.POS_FOLLOW_MOUSE
 	return self:hover(function()
 		local x, y = this:GetAbsPos()
@@ -2346,6 +2343,13 @@ function _MY.UI:tip(szTip, nPosType, tOffset, bNoEncode)
 			x, y = x - 0, y - 40
 		end
 		x, y = x + tOffset.x, y + tOffset.y
+		local szTip = tip
+		if type(szTip) == 'function' then
+			szTip = szTip()
+		end
+		if not bNoEncode then
+			szTip = GetFormatText(szTip, tOffset.nFont, tOffset.r, tOffset.g, tOffset.b)
+		end
 		OutputTip(szTip, tOffset.w, {x, y, w, h}, nPosType)
 	end, function()
 		if tOffset.hide == MY.Const.UI.Tip.HIDE then
