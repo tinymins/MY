@@ -39,7 +39,7 @@ _MY_ChatMonitor.bInited = false
 _MY_ChatMonitor.ui = nil
 _MY_ChatMonitor.uiBoard = nil
 _MY_ChatMonitor.uiTipBoard = nil
-_MY_ChatMonitor.szLuaData = 'config/MY_CHATMONITOR'
+_MY_ChatMonitor.szLuaData = 'config/MY_CHATMONITOR/cfg'
 _MY_ChatMonitor.tChannelGroups = {
     {
         szCaption = g_tStrings.CHANNEL_CHANNEL,
