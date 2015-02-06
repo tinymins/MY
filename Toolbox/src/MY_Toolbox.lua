@@ -165,16 +165,13 @@ MY_ToolBox.ApplyConfig = function()
     
     if MY_ToolBox.bJJCAutoSwitchTalkChannel then
         MY.RegisterEvent('LOADING_END', 'MY_ToolBox_JJCAutoSwitchTalkChannel', function()
+            local bIsBattleField = (GetClientPlayer().GetScene().nType == MAP_TYPE.BATTLE_FIELD)
             local nChannel, szName = EditBox_GetChannel()
-            if nChannel == PLAYER_TALK_CHANNEL.RAID or
-            nChannel == PLAYER_TALK_CHANNEL.TEAM or
-            nChannel == PLAYER_TALK_CHANNEL.BATTLE_FIELD then
+            if bIsBattleField and (nChannel == PLAYER_TALK_CHANNEL.RAID or nChannel == PLAYER_TALK_CHANNEL.TEAM) then
                 _C.JJCAutoSwitchTalkChannel_OrgChannel = nChannel
-                if GetClientPlayer().GetScene().nType == MAP_TYPE.BATTLE_FIELD then
-                    MY.Chat.SwitchChat(PLAYER_TALK_CHANNEL.BATTLE_FIELD)
-                else
-                    MY.Chat.SwitchChat(_C.JJCAutoSwitchTalkChannel_OrgChannel or PLAYER_TALK_CHANNEL.RAID)
-                end
+                MY.Chat.SwitchChat(PLAYER_TALK_CHANNEL.BATTLE_FIELD)
+            elseif not bIsBattleField and nChannel == PLAYER_TALK_CHANNEL.BATTLE_FIELD then
+                MY.Chat.SwitchChat(_C.JJCAutoSwitchTalkChannel_OrgChannel or PLAYER_TALK_CHANNEL.RAID)
             end
         end)
     else
