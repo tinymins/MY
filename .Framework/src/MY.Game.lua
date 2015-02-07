@@ -367,7 +367,7 @@ MY.GetTargetContextMenu = MY.Game.GetTargetContextMenu
 MY.Game.IsDungeonMap = function(szMapNameOrdwID)
     if not _Cache.tMapList then
         _Cache.tMapList = {}
-        for dwMapID, v in ipairs(GetMapList()) do
+        for _, dwMapID in ipairs(GetMapList()) do
             local map          = { dwID = dwMapID }
             local szName       = Table_GetMapName(dwMapID)
             local tDungeonInfo = g_tTable.DungeonInfo:Search(dwMapID)
