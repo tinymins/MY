@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-25 12:31:03
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-02-05 12:34:41
+-- @Last Modified time: 2015-02-08 03:06:59
 -----------------------------------------------
 -- #######################################################################################################
 --   * * *         *                 *                     *                   *           *         
@@ -313,7 +313,7 @@ MY_Anmerkungen.SaveConfig = function()
 end
 MY.RegisterInit(MY_Anmerkungen.LoadConfig)
 MY.RegisterInit(MY_Anmerkungen.ReloadNotePanel)
-MY.RegisterPanel( "MY_Anmerkungen_Player_Note", _L["player note"], _L['Chat'], "ui/Image/button/ShopButton.UITex|12", {255,255,0,200}, { OnPanelActive = function(wnd)
+MY.RegisterPanel( "MY_Anmerkungen_Player_Note", _L["player note"], _L['Target'], "ui/Image/button/ShopButton.UITex|12", {255,255,0,200}, { OnPanelActive = function(wnd)
 	local ui = MY.UI(wnd)
 	local w, h = ui:size()
 	local x, y = 0, 0
