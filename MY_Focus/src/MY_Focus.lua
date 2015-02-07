@@ -9,16 +9,18 @@ _Cache.tFocusList = {}
 _Cache.szIniFile = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
 _Cache.bMinimize = false
 MY_Focus = {}
-MY_Focus.bFocusFriend = false -- 自动焦点好友
-MY_Focus.bFocusTong = false -- 自动焦点帮会成员
-MY_Focus.bFocusEnemy= false -- 自动焦点敌对玩家
-MY_Focus.bEnable    = true  -- 是否启用
-MY_Focus.bAutoHide  = true  -- 无焦点自动隐藏
-MY_Focus.nMaxDisplay= 5     -- 最大显示数量
-MY_Focus.bAutoFocus = true  -- 启用默认焦点
-MY_Focus.bShowTarget= false -- 显示目标的目标
-MY_Focus.bTraversal = false -- 遍历焦点列表
-MY_Focus.bHideDeath = false -- 隐藏死亡目标
+MY_Focus.bEnable        = true  -- 是否启用
+MY_Focus.bFocusFriend   = false -- 焦点附近好友
+MY_Focus.bFocusTong     = false -- 焦点帮会成员
+MY_Focus.bFocusEnemy    = false -- 焦点敌对玩家
+MY_Focus.bAutoHide      = true  -- 无焦点时隐藏
+MY_Focus.nMaxDisplay    = 5     -- 最大显示数量
+MY_Focus.bAutoFocus     = true  -- 启用默认焦点
+MY_Focus.bHideDeath     = false -- 隐藏死亡目标
+MY_Focus.bFocusJJCParty = false -- 焦竞技场队友
+MY_Focus.bFocusJJCEnemy = true  -- 焦竞技场敌队
+MY_Focus.bShowTarget    = false -- 显示目标目标
+MY_Focus.bTraversal     = false -- 遍历焦点列表
 MY_Focus.tAutoFocus = {}    -- 默认焦点
 MY_Focus.tFocusList = {     -- 永久焦点
 	[TARGET.NPC]    = {},
@@ -27,17 +29,19 @@ MY_Focus.tFocusList = {     -- 永久焦点
 }
 MY_Focus.anchor = { x=-300, y=220, s="TOPRIGHT", r="TOPRIGHT" } -- 默认坐标
 RegisterCustomData("MY_Focus.bEnable")
-RegisterCustomData("MY_Focus.bAutoHide")
 RegisterCustomData("MY_Focus.bFocusFriend")
 RegisterCustomData("MY_Focus.bFocusTong")
 RegisterCustomData("MY_Focus.bFocusEnemy")
+RegisterCustomData("MY_Focus.bAutoHide")
 RegisterCustomData("MY_Focus.nMaxDisplay")
 RegisterCustomData("MY_Focus.bAutoFocus")
-RegisterCustomData("MY_Focus.tAutoFocus")
-RegisterCustomData("MY_Focus.tFocusList")
+RegisterCustomData("MY_Focus.bHideDeath")
+RegisterCustomData("MY_Focus.bFocusJJCParty")
+RegisterCustomData("MY_Focus.bFocusJJCEnemy")
 RegisterCustomData("MY_Focus.bShowTarget")
 RegisterCustomData("MY_Focus.bTraversal")
-RegisterCustomData("MY_Focus.bHideDeath")
+RegisterCustomData("MY_Focus.tAutoFocus")
+RegisterCustomData("MY_Focus.tFocusList")
 RegisterCustomData("MY_Focus.anchor")
 
 local m_frame
@@ -199,27 +203,45 @@ MY_Focus.OnObjectEnterScene = function(dwType, dwID, nRetryCount)
 				end
 			end
 		end
-		if not IsRemotePlayer(UI_GetClientPlayerID()) then
-			-- 判断好友
-			if dwType == TARGET.PLAYER and
-			MY_Focus.bFocusFriend and
-			MY.Player.GetFriend(dwID) then
-				bFocus = true
+		-- 判断竞技场
+		if MY.Player.IsInArena() then
+			if dwType == TARGET.PLAYER then
+				if MY_Focus.bFocusJJCEnemy and MY_Focus.bFocusJJCParty then
+					bFocus = true
+				elseif MY_Focus.bFocusJJCParty then
+					if not IsEnemy(UI_GetClientPlayerID(), dwID) then
+						bFocus = true
+					end
+				elseif MY_Focus.bFocusJJCEnemy then
+					if IsEnemy(UI_GetClientPlayerID(), dwID) then
+						bFocus = true
+					end
+				end
 			end
-			-- 判断同帮会
+		else
+			if not MY.Player.IsInBattleField() then
+				-- 判断好友
+				if dwType == TARGET.PLAYER and
+				MY_Focus.bFocusFriend and
+				MY.Player.GetFriend(dwID) then
+					bFocus = true
+				end
+				-- 判断同帮会
+				if dwType == TARGET.PLAYER and
+				MY_Focus.bFocusTong and
+				dwID ~= MY.GetClientInfo().dwID and
+				MY.Player.GetTongMember(dwID) then
+					bFocus = true
+				end
+			end
+			-- 判断敌对玩家
 			if dwType == TARGET.PLAYER and
-			MY_Focus.bFocusTong and
-			dwID ~= MY.GetClientInfo().dwID and
-			MY.Player.GetTongMember(dwID) then
+			MY_Focus.bFocusEnemy and
+			IsEnemy(UI_GetClientPlayerID(), dwID) then
 				bFocus = true
 			end
 		end
-		-- 判断敌对玩家
-		if dwType == TARGET.PLAYER and
-		MY_Focus.bFocusEnemy and
-		IsEnemy(UI_GetClientPlayerID(), dwID) then
-			bFocus = true
-		end
+		
 		-- 加入焦点
 		if bFocus then
 			MY_Focus.AddFocus(dwType, dwID)
@@ -559,7 +581,8 @@ end
 MY_Focus.OnLButtonClick = function()
 	local name = this:GetName()
 	if name == 'Btn_Setting' then
-		PopupMenu(MY_Focus.GetMenu())
+		MY.OpenPanel()
+		MY.SwitchTab('MY_Focus')
 	end
 end
 
@@ -579,157 +602,6 @@ MY_Focus.OnCheckBoxUncheck = function()
 	end
 end
 
--- 获取设置菜单
-MY_Focus.GetMenu = function()
-	local t = {
-		szOption = _L["focus list"],
-		{
-			szOption = _L['enable'],
-			bCheck = true,
-			bChecked = MY_Focus.bEnable,
-			fnAction = function()
-				MY_Focus.bEnable = not MY_Focus.bEnable
-				if MY_Focus.bEnable then
-					MY_Focus.Open()
-				else
-					MY_Focus.Close()
-				end
-			end,
-		}, {
-			szOption = _L['hide when empty'],
-			bCheck = true,
-			bChecked = MY_Focus.bAutoHide,
-			fnAction = function()
-				MY_Focus.bAutoHide = not MY_Focus.bAutoHide
-			end,
-			fnDisable = function()
-				return not MY_Focus.bEnable
-			end,
-		}, {
-			szOption = _L['auto focus friend'],
-			bCheck = true,
-			bChecked = MY_Focus.bFocusFriend,
-			fnAction = function()
-				MY_Focus.bFocusFriend = not MY_Focus.bFocusFriend
-				MY_Focus.RescanNearby()
-			end,
-			fnDisable = function()
-				return not MY_Focus.bEnable
-			end,
-		}, {
-			szOption = _L['auto focus tong'],
-			bCheck = true,
-			bChecked = MY_Focus.bFocusTong,
-			fnAction = function()
-				MY_Focus.bFocusTong = not MY_Focus.bFocusTong
-				MY_Focus.RescanNearby()
-			end,
-			fnDisable = function()
-				return not MY_Focus.bEnable
-			end,
-		}, {
-			szOption = _L['auto focus enemy'],
-			bCheck = true,
-			bChecked = MY_Focus.bFocusEnemy,
-			fnAction = function()
-				MY_Focus.bFocusEnemy = not MY_Focus.bFocusEnemy
-				MY_Focus.RescanNearby()
-			end,
-			fnDisable = function()
-				return not MY_Focus.bEnable
-			end,
-		}, {
-			szOption = _L['show focus\'s target'],
-			bCheck = true,
-			bChecked = MY_Focus.bShowTarget,
-			fnAction = function()
-				MY_Focus.bShowTarget = not MY_Focus.bShowTarget
-				MY_Focus.RedrawList()
-			end,
-			fnDisable = function()
-				return not MY_Focus.bEnable
-			end,
-		}, {
-			szOption = _L['traversal object'],
-			bCheck = true,
-			bChecked = MY_Focus.bTraversal,
-			fnAction = function()
-				MY_Focus.bTraversal = not MY_Focus.bTraversal
-			end,
-			fnDisable = function()
-				return not MY_Focus.bEnable
-			end,
-		}, {
-			szOption = _L['hide dead object'],
-			bCheck = true,
-			bChecked = MY_Focus.bHideDeath,
-			fnAction = function()
-				MY_Focus.bHideDeath = not MY_Focus.bHideDeath
-				MY_Focus.RescanNearby()
-			end,
-			fnDisable = function()
-				return not MY_Focus.bEnable
-			end,
-		}, {
-			szOption = _L["auto focus"],
-			bCheck = true,
-			bChecked = MY_Focus.bAutoFocus,
-			fnAction = function()
-				MY_Focus.bAutoFocus = not MY_Focus.bAutoFocus
-				MY_Focus.RescanNearby()
-			end,
-			fnDisable = function()
-				return not MY_Focus.bEnable
-			end, {
-				szOption = _L['namelist manager'],
-				fnAction = function()
-					MY.UI.OpenListEditor('MY_Focus_NamelistManager', MY_Focus.tAutoFocus, function(szText)
-						-- 去掉前后空格
-						szText = (string.gsub(szText, "^%s*(.-)%s*$", "%1"))
-						-- 验证是否为空
-						if szText=="" then return nil end
-						-- 验证是否重复
-						for i, v in ipairs(MY_Focus.tAutoFocus) do
-							if v==szText then
-								return false
-							end
-						end
-						-- 加入表
-						MY_Focus.AddAutoFocus(szText)
-					end, function(szText)
-						MY_Focus.DelAutoFocus(szText)
-					end)
-					:text(_L["namelist manager"])
-				end,
-				fnDisable = function()
-					return not MY_Focus.bAutoFocus
-				end
-			},
-		}
-	}
-
-	local t1 = {
-		szOption = _L['max display length'],
-		fnDisable = function()
-			return not MY_Focus.bEnable
-		end,
-	}
-	for i = 1, 15 do
-		table.insert(t1, {
-			szOption = i,
-			bMCheck = true,
-			bChecked = MY_Focus.nMaxDisplay == i,
-			fnAction = function()
-				MY_Focus.nMaxDisplay = i
-				MY_Focus.RedrawList()
-			end,
-		})
-	end
-	table.insert(t, t1)
-
-	return t
-end
-
 MY.RegisterTargetAddonMenu('MY_Focus', function()
 	local dwType, dwID = GetClientPlayer().GetTarget()
 	return {
@@ -747,5 +619,182 @@ MY.RegisterInit(function()
 		MY_Focus.Close()
 	end
 end)
-MY.RegisterPlayerAddonMenu('MY_FOCUS_MENU', MY_Focus.GetMenu)
-MY.RegisterTraceButtonMenu('MY_FOCUS_MENU', MY_Focus.GetMenu)
+
+MY.RegisterPanel( "MY_Focus", _L["focus list"], _L['Target'], "UI/Image/Common/Money.UITex|243", {255,255,0,200}, { OnPanelActive = function(wnd)
+	local ui = MY.UI(wnd)
+	local w, h = ui:size()
+	local x, y = 20, 20
+	
+	ui:append("WndCheckBox_Enable", "WndCheckBox"):children("#WndCheckBox_Enable")
+	  :pos(x, y):width(250):text(_L['enable']):check(MY_Focus.bEnable)
+	  :check(function(bChecked)
+	  	MY_Focus.bEnable = bChecked
+	  	if MY_Focus.bEnable then
+	  		MY_Focus.Open()
+	  	else
+	  		MY_Focus.Close()
+	  	end
+	  end)
+	y = y + 40
+	
+	ui:append("WndCheckBox_Auto_Hide", "WndCheckBox"):children("#WndCheckBox_Auto_Hide")
+	  :pos(x, y):width(250):text(_L['hide when empty']):check(MY_Focus.bAutoHide)
+	  :check(function(bChecked)
+	  	MY_Focus.bAutoHide = bChecked
+	  end)
+	y = y + 30
+	
+	ui:append("WndCheckBox_AF_Friend", "WndCheckBox"):children("#WndCheckBox_AF_Friend")
+	  :pos(x, y):width(250):text(_L['auto focus friend']):check(MY_Focus.bFocusFriend)
+	  :check(function(bChecked)
+	  	MY_Focus.bFocusFriend = bChecked
+	  	MY_Focus.RescanNearby()
+	  end)
+	y = y + 30
+	
+	ui:append("WndCheckBox_AF_Tong", "WndCheckBox"):children("#WndCheckBox_AF_Tong")
+	  :pos(x, y):width(250):text(_L['auto focus tong']):check(MY_Focus.bFocusTong)
+	  :check(function(bChecked)
+	  	MY_Focus.bFocusTong = bChecked
+	  	MY_Focus.RescanNearby()
+	  end)
+	y = y + 30
+	
+	ui:append("WndCheckBox_AF_Enemy", "WndCheckBox"):children("#WndCheckBox_AF_Enemy")
+	  :pos(x, y):width(250):text(_L['auto focus enemy']):check(MY_Focus.bFocusEnemy)
+	  :check(function(bChecked)
+	  	MY_Focus.bFocusEnemy = bChecked
+	  	MY_Focus.RescanNearby()
+	  end)
+	y = y + 30
+	
+	ui:append("WndCheckBox_AF_JJCParty", "WndCheckBox"):children("#WndCheckBox_AF_JJCParty")
+	  :pos(x, y):width(250):text(_L['jjc auto focus party']):check(MY_Focus.bFocusJJCParty)
+	  :check(function(bChecked)
+	  	MY_Focus.bFocusJJCParty = bChecked
+	  	MY_Focus.RescanNearby()
+	  end)
+	y = y + 30
+	
+	ui:append("WndCheckBox_AF_JJCEnemy", "WndCheckBox"):children("#WndCheckBox_AF_JJCEnemy")
+	  :pos(x, y):width(250):text(_L['jjc auto focus enemy']):check(MY_Focus.bFocusJJCEnemy)
+	  :check(function(bChecked)
+	  	MY_Focus.bFocusJJCEnemy = bChecked
+	  	MY_Focus.RescanNearby()
+	  end)
+	y = y + 30
+	
+	ui:append("WndCheckBox_ShowTarget", "WndCheckBox"):children("#WndCheckBox_ShowTarget")
+	  :pos(x, y):width(250):text(_L['show focus\'s target']):check(MY_Focus.bShowTarget)
+	  :check(function(bChecked)
+	  	MY_Focus.bShowTarget = bChecked
+	  	MY_Focus.RescanNearby()
+	  end)
+	y = y + 30
+	
+	ui:append("WndCheckBox_Traversal", "WndCheckBox"):children("#WndCheckBox_Traversal")
+	  :pos(x, y):width(250):text(_L['traversal object']):tip(_L['may cause some problem in dungeon map'])
+	  :check(MY_Focus.bTraversal)
+	  :check(function(bChecked)
+	  	MY_Focus.bTraversal = bChecked
+	  end)
+	y = y + 30
+	
+	ui:append("WndCheckBox_HideDead", "WndCheckBox"):children("#WndCheckBox_HideDead")
+	  :pos(x, y):width(250):text(_L['hide dead object']):check(MY_Focus.bHideDeath)
+	  :check(function(bChecked)
+	  	MY_Focus.bHideDeath = bChecked
+	  	MY_Focus.RescanNearby()
+	  end)
+	y = y + 30
+	
+	ui:append("WndComboBox_MaxLength", "WndComboBox"):children("#WndComboBox_MaxLength")
+	  :pos(x, y)
+	  :text(_L['max display length'])
+	  :menu(function()
+	  	local t = {}
+	  	for i = 1, 15 do
+	  		table.insert(t, {
+	  			szOption = i,
+	  			bMCheck = true,
+	  			bChecked = MY_Focus.nMaxDisplay == i,
+	  			fnAction = function()
+	  				Wnd.CloseWindow('PopupMenuPanel')
+	  				MY_Focus.nMaxDisplay = i
+	  				MY_Focus.RedrawList()
+	  			end,
+	  		})
+	  	end
+	  	return t
+	  end)
+	y = y + 30
+	
+	local x, y = 270, 10
+	
+	ui:append("WndCheckBox_AutoFocus", "WndCheckBox"):children("#WndCheckBox_AutoFocus")
+	  :pos(x, y):text(_L['auto focus']):check(MY_Focus.bAutoFocus)
+	  :check(function(bChecked)
+	  	MY_Focus.bAutoFocus = bChecked
+	  	MY_Focus.RescanNearby()
+	  end)
+	
+	local list = ui:append('WndListBox_1', 'WndListBox'):children('#WndListBox_1'):pos(x, y + 30):size(w - x, h - y - 30)
+	-- 初始化list控件
+	for _, v in ipairs(MY_Focus.tAutoFocus) do
+		list:listbox('insert', v, v)
+	end
+	list:listbox('onmenu', function(szText, szID)
+		return {{
+			szOption = _L['delete'],
+			fnAction = function()
+				list:listbox('delete', szText, szID)
+				for i = #MY_Focus.tAutoFocus, 1, -1 do
+					if MY_Focus.tAutoFocus[i] == szText then
+						table.remove(MY_Focus.tAutoFocus, i)
+						MY_Focus.RescanNearby()
+					end
+				end
+			end,
+		}}
+	end)
+	-- add
+	ui:append("WndButton_Add", "WndButton"):children("#WndButton_Add")
+	  :pos(w - 160, y):width(80)
+	  :text(_L["add"])
+	  :click(function()
+	  	GetUserInput(_L['add auto focus'], function(szText)
+	  		-- 去掉前后空格
+	  		szText = (string.gsub(szText, "^%s*(.-)%s*$", "%1"))
+	  		-- 验证是否为空
+	  		if szText=="" then
+	  			return
+	  		end
+	  		-- 验证是否重复
+	  		for i, v in ipairs(MY_Focus.tAutoFocus) do
+	  			if v == szText then
+	  				return
+	  			end
+	  		end
+	  		-- 加入表
+	  		table.insert(MY_Focus.tAutoFocus, szText)
+	  		-- 更新UI
+	  		list:listbox('insert', szText, szText)
+	  		MY_Focus.RescanNearby()
+	  	end, function() end, function() end, nil, '')
+	  end)
+	-- del
+	ui:append("WndButton_Del", "WndButton"):children("#WndButton_Del")
+	  :pos(w - 80, y):width(80)
+	  :text(_L["delete"])
+	  :click(function()
+	  	for _, v in ipairs(list:listbox('select', 'selected')) do
+	  		list:listbox('delete', v.text, v.id)
+	  		for i = #MY_Focus.tAutoFocus, 1, -1 do
+	  			if MY_Focus.tAutoFocus[i] == v.text then
+	  				table.remove(MY_Focus.tAutoFocus, i)
+	  				MY_Focus.RescanNearby()
+	  			end
+	  		end
+	  	end
+	  end)
+end})
