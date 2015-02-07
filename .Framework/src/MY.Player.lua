@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-07 18:24:05
+-- @Last Modified time: 2015-02-08 01:46:34
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -353,7 +353,7 @@ MY.Player.IsFighting = function()
 	local bFightState = me.bFightState
 	
 	-- 在副本且附近队友进战则判断处于战斗状态
-	if not bFightState and MY.Game.IsDungeonMap(me.GetMapID()) then
+	if not bFightState and MY.Player.IsInDungeon() then
 		for dwID, p in pairs(MY.Player.GetNearPlayer()) do
 			if me.IsPlayerInMyParty(dwID) and p.bFightState then
 				bFightState = true
@@ -670,3 +670,12 @@ MY.Player.IsInBattleField = function()
 	return me and me.GetScene().nType == MAP_TYPE.BATTLE_FIELD and not MY.Player.IsInArena()
 end
 MY.IsInBattleField = MY.Player.IsInBattleField
+
+--[[ 判断当前地图是不是副本
+	(bool) MY.Player.IsInDungeon()
+]]
+MY.Player.IsInDungeon = function()
+	local me = GetClientPlayer()
+	return me and MY.Game.IsDungeonMap(me.GetMapID())
+end
+MY.IsInDungeon = MY.Player.IsInDungeon
