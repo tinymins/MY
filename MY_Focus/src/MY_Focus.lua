@@ -1,8 +1,11 @@
---
--- 焦点列表
--- by 茗伊 @ 双梦镇 @ 荻花宫
--- Build 20140730
--- 
+--------------------------------------------
+-- @Desc  : 焦点列表
+-- @Author: 茗伊 @ 双梦镇 @ 荻花宫
+-- @Date  : 2014-07-30 19:22:10
+-- @Email : admin@derzh.com
+-- @Last Modified by:   翟一鸣 @tinymins
+-- @Last Modified time: 2015-02-08 02:25:35
+--------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Focus/lang/")
 local _Cache = {}
 _Cache.tFocusList = {}
