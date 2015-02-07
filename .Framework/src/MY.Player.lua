@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-05 16:31:19
+-- @Last Modified time: 2015-02-07 18:10:39
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -609,30 +609,7 @@ MY.Player.CanUseSkill = function(dwSkillID, dwLevel)
 	end
 	return false
 end
---[[ 释放技能,释放成功返回true
-	(bool)MY.UseSkill(dwSkillID, bForceStopCurrentAction, eTargetType, dwTargetID)
-	dwSkillID               技能ID
-	bForceStopCurrentAction 是否打断当前运功
-	eTargetType             释放目标类型
-	dwTargetID              释放目标ID
-]]
-MY.Player.UseSkill = function(dwSkillID, bForceStopCurrentAction, eTargetType, dwTargetID)
-	-- 判断技能是否有效 并将中文名转换为技能ID
-	if type(dwSkillID) == "string" then if MY.Player.IsValidSkill(dwSkillID) then dwSkillID = MY.Player.GetSkillByName(dwSkillID).dwSkillID else return false end end
-	local me = GetClientPlayer()
-	-- 获取技能CD
-	local bCool, nLeft, nTotal = me.GetSkillCDProgress( dwSkillID, me.GetSkillLevel(dwSkillID) ) local bIsPrepare ,dwPreSkillID ,dwPreSkillLevel , fPreProgress= me.GetSkillPrepareState()
-	local oTTP, oTID = me.GetTarget()
-	if dwTargetID~=nil then SetTarget(eTargetType, dwTargetID) end
-	if ( not bCool or nLeft == 0 and nTotal == 0 ) and not ( not bForceStopCurrentAction and dwPreSkillID == dwSkillID ) then
-		me.StopCurrentAction() OnAddOnUseSkill( dwSkillID, me.GetSkillLevel(dwSkillID) )
-		if dwTargetID then SetTarget(oTTP, oTID) end
-		return true
-	else
-		if dwTargetID then SetTarget(oTTP, oTID) end
-		return false
-	end
-end
+
 -- 根据技能 ID 及等级获取技能的名称及图标 ID（内置缓存处理）
 -- (string, number) MY.Player.GetSkillName(number dwSkillID[, number dwLevel])
 MY.Player.GetSkillName = function(dwSkillID, dwLevel)
