@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-07 18:12:01
+-- @Last Modified time: 2015-02-07 18:24:05
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -652,3 +652,21 @@ MY.Player.GetChannelSkillFrame = function(dwSkillID)
 end
 -- Load skill extend data
 _Cache.tSkillEx = MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot.."data/skill_ex", true) or {}
+
+--[[ 判断当前地图是不是竞技场
+	(bool) MY.Player.IsInArena()
+]]
+MY.Player.IsInArena = function()
+	local me = GetClientPlayer()
+	return me and me.GetScene().bIsArenaMap
+end
+MY.IsInArena = MY.Player.IsInArena
+
+--[[ 判断当前地图是不是战场
+	(bool) MY.Player.IsInBattleField()
+]]
+MY.Player.IsInBattleField = function()
+	local me = GetClientPlayer()
+	return me and me.GetScene().nType == MAP_TYPE.BATTLE_FIELD and not MY.Player.IsInArena()
+end
+MY.IsInBattleField = MY.Player.IsInBattleField
