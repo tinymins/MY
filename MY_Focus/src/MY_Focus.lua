@@ -4,13 +4,13 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-08 02:25:35
+-- @Last Modified time: 2015-02-08 02:36:09
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Focus/lang/")
-local _Cache = {}
-_Cache.tFocusList = {}
-_Cache.szIniFile = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
-_Cache.bMinimize = false
+local _C = {}
+_C.tFocusList = {}
+_C.szIniFile = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
+_C.bMinimize = false
 MY_Focus = {}
 MY_Focus.bEnable        = true  -- 是否启用
 MY_Focus.bFocusFriend   = false -- 焦点附近好友
@@ -49,7 +49,7 @@ RegisterCustomData("MY_Focus.anchor")
 
 local m_frame
 MY_Focus.Open = function()
-	m_frame = Wnd.OpenWindow(_Cache.szIniFile, 'MY_Focus')
+	m_frame = Wnd.OpenWindow(_C.szIniFile, 'MY_Focus')
 	m_frame:Lookup('', 'Handle_List'):Clear()
 	MY.UI(m_frame):anchor(MY_Focus.anchor)
 	
@@ -87,10 +87,10 @@ end
 -- 获取当前显示的焦点列表
 MY_Focus.GetDisplayList = function()
 	local t = {}
-	if _Cache.bMinimize then
+	if _C.bMinimize then
 		return t
 	end
-	for i, v in ipairs(_Cache.tFocusList) do
+	for i, v in ipairs(_C.tFocusList) do
 		if i > MY_Focus.nMaxDisplay then
 			break
 		end
@@ -129,8 +129,8 @@ MY_Focus.DelAutoFocus = function(szName)
 		MY_Focus.RescanNearby()
 	else
 		-- 全字符匹配模式：检查是否在永久焦点中 没有则删除Handle
-		for i = #_Cache.tFocusList, 1, -1 do
-			local p = _Cache.tFocusList[i]
+		for i = #_C.tFocusList, 1, -1 do
+			local p = _C.tFocusList[i]
 			local h = MY.Game.GetObject(p.dwType, p.dwID)
 			if h and MY.Game.GetObjectName(h) == szName and
 			not MY_Focus.tFocusList[p.dwType][p.dwID] then
@@ -260,15 +260,15 @@ end
 -- 目标加入焦点列表
 MY_Focus.AddFocus = function(dwType, dwID, szName)
 	local nIndex
-	for i, p in ipairs(_Cache.tFocusList) do
+	for i, p in ipairs(_C.tFocusList) do
 		if p.dwType == dwType and p.dwID == dwID then
 			nIndex = i
 			break
 		end
 	end
 	if not nIndex then
-		table.insert(_Cache.tFocusList, {dwType = dwType, dwID = dwID, szName = szName})
-		nIndex = #_Cache.tFocusList
+		table.insert(_C.tFocusList, {dwType = dwType, dwID = dwID, szName = szName})
+		nIndex = #_C.tFocusList
 	end
 	if nIndex < MY_Focus.nMaxDisplay then
 		MY_Focus.DrawFocus(dwType, dwID)
@@ -279,10 +279,10 @@ end
 -- 目标移除焦点列表
 MY_Focus.DelFocus = function(dwType, dwID)
 	-- 从列表数据中删除
-	for i = #_Cache.tFocusList, 1, -1 do
-		local p = _Cache.tFocusList[i]
+	for i = #_C.tFocusList, 1, -1 do
+		local p = _C.tFocusList[i]
 		if p.dwType == dwType and p.dwID == dwID then
-			table.remove(_Cache.tFocusList, i)
+			table.remove(_C.tFocusList, i)
 			break
 		end
 	end
@@ -291,7 +291,7 @@ MY_Focus.DelFocus = function(dwType, dwID)
 	if hItem then
 		MY.UI(hItem):remove()
 		-- 补上UI（超过数量限制时）
-		local p = _Cache.tFocusList[MY_Focus.nMaxDisplay]
+		local p = _C.tFocusList[MY_Focus.nMaxDisplay]
 		if p then
 			MY_Focus.DrawFocus(p.dwType, p.dwID)
 		end
@@ -301,7 +301,7 @@ end
 -- 获取焦点列表
 MY_Focus.GetFocusList = function()
 	local t = {}
-	for _, v in ipairs(_Cache.tFocusList) do
+	for _, v in ipairs(_C.tFocusList) do
 		table.insert(t, v)
 	end
 	return t
@@ -309,7 +309,7 @@ end
 
 -- 清空焦点列表
 MY_Focus.ClearFocus = function()
-	_Cache.tFocusList = {}
+	_C.tFocusList = {}
 	
 	local hList = Station.Lookup('Normal/MY_Focus', 'Handle_List')
 	if not hList then
@@ -353,7 +353,7 @@ MY_Focus.DrawFocus = function(dwType, dwID)
 
 	local hItem = MY_Focus.GetHandle(dwType, dwID)
 	if not hItem then
-		hItem = hList:AppendItemFromIni(_Cache.szIniFile, 'Handle_Info')
+		hItem = hList:AppendItemFromIni(_C.szIniFile, 'Handle_Info')
 		hItem:SetName('Handle_Info_'..dwType..'_'..dwID)
 	end
 	
@@ -493,7 +493,7 @@ MY_Focus.AdjustUI = function()
 	local tList = MY_Focus.GetDisplayList()
 	hList:SetSize(240, 70 * #tList)
 	hList:GetRoot():SetSize(240, 70 * #tList + 32)
-	if #tList == 0 and MY_Focus.bAutoHide and not _Cache.bMinimize then
+	if #tList == 0 and MY_Focus.bAutoHide and not _C.bMinimize then
 		hList:GetRoot():Hide()
 	elseif (not MY_Focus.bAutoHide) or #tList ~= 0 then
 		hList:GetRoot():Show()
@@ -592,7 +592,7 @@ end
 MY_Focus.OnCheckBoxCheck = function()
 	local name = this:GetName()
 	if name == 'CheckBox_Minimize' then
-		_Cache.bMinimize = true
+		_C.bMinimize = true
 		this:GetRoot():Lookup('', 'Handle_List'):Hide()
 	end
 end
@@ -600,7 +600,7 @@ end
 MY_Focus.OnCheckBoxUncheck = function()
 	local name = this:GetName()
 	if name == 'CheckBox_Minimize' then
-		_Cache.bMinimize = false
+		_C.bMinimize = false
 		this:GetRoot():Lookup('', 'Handle_List'):Show()
 	end
 end
@@ -623,7 +623,7 @@ MY.RegisterInit(function()
 	end
 end)
 
-MY.RegisterPanel( "MY_Focus", _L["focus list"], _L['Target'], "UI/Image/Common/Money.UITex|243", {255,255,0,200}, { OnPanelActive = function(wnd)
+MY.RegisterPanel( "MY_Focus", _L["focus list"], _L['Target'], "ui/Image/button/SystemButton_1.UITex|9", {255,255,0,200}, { OnPanelActive = function(wnd)
 	local ui = MY.UI(wnd)
 	local w, h = ui:size()
 	local xr, yr, wr = w - 240, 40, 240
