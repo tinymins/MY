@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-08 01:46:34
+-- @Last Modified time: 2015-02-08 22:46:45
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -201,7 +201,7 @@ MY.Player.GetFriendList = function(arg0)
 	end
 	local n = 0
 	for _,group in ipairs(tGroup) do
-		for _,p in ipairs(me.GetFellowshipInfo(group.id)) do
+		for _, p in ipairs(me.GetFellowshipInfo(group.id) or {}) do
 			t[p.id] = p
 			n = n + 1
 		end
