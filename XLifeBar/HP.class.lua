@@ -147,7 +147,11 @@ function HP:DrawRect(nWidth, nHeight, nOffsetY, rgbap, szShadowName)
         return
     end
     local r,g,b,a,p = unpack(rgbap)
-    if p > 1 then p = 1 elseif p < 0 then p = 0 end -- fix
+    if not p or p > 1 then
+        p = 1
+    elseif p < 0 then
+        p = 0
+    end -- fix
     local sha = self.handle:Lookup(string.format(szShadowName,self.dwID))
     
     sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
