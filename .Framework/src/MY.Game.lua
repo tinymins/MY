@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-08 01:42:08
+-- @Last Modified time: 2015-02-09 00:00:48
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -----------------------------------------------
@@ -265,9 +265,9 @@ MY.Game.GetObject = function(dwType, dwID)
 	
 	if dwType == TARGET.PLAYER then
 		local me = GetClientPlayer()
-		if dwID == me.dwID then
+		if me and dwID == me.dwID then
 			p, info, b = me, me, false
-		elseif me.IsPlayerInMyParty(dwID) then
+		elseif me and me.IsPlayerInMyParty(dwID) then
 			p, info, b = GetPlayer(dwID), GetClientTeam().GetMemberInfo(dwID), true
 		else
 			p, info, b = GetPlayer(dwID), GetPlayer(dwID), false
