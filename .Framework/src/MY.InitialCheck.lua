@@ -123,6 +123,10 @@ MY.RegisterInit(function()
 					})
 				end
 			end
+			if data.shield then
+				MY.Sys.bShieldedVersion = false
+				MY.ReopenPanel()
+			end
 			MY.Debug("Latest version: " .. data.version .. ", local version: " .. nVersion .. ' (' .. szVersion .. ")\n", 'MYVC', 0)
 		end)
 		
