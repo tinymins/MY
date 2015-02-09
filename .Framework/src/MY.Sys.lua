@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-06 15:07:09
+-- @Last Modified time: 2015-02-09 17:42:40
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -245,7 +245,10 @@ _Cache.DoRemoteRequest = function()
 						-- 注销超时处理时钟
 						MY.DelayCall("MY_Remote_Request_Timeout")
 						-- 成功回调函数
-						pcall(rr.fnSuccess, szTitle, szContent)
+						local status, err = pcall(rr.fnSuccess, szTitle, szContent)
+						if not status then
+							MY.Debug(err .. '\n', 'MYRR::SUCCESS', 3)
+						end
 						-- 从请求列表移除
 						table.remove(_Cache.tRequest, 1)
 						-- 重置请求状态为空闲
@@ -264,7 +267,10 @@ _Cache.DoRemoteRequest = function()
 			-- debug
 			MY.Debug('Remote Request Timeout.\n','MYRR',1)
 			-- 请求超时 回调请求超时函数
-			pcall(rr.fnError, rr.szUrl, "timeout")
+			local status, err = pcall(rr.fnError, rr.szUrl, "timeout")
+			if not status then
+				MY.Debug(err .. '\n', 'MYRR::TIMEOUT', 3)
+			end
 			-- 从请求队列移除首元素
 			table.remove(_Cache.tRequest, 1)
 			-- 重置请求队列状态为空闲
