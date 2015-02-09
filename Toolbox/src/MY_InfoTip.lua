@@ -118,48 +118,6 @@ RegisterEvent("CUSTOM_UI_MODE_SET_DEFAULT", function()
     MY_InfoTip.Config.GPS.anchor       = { x=-10, y=-70 , s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
     MY_InfoTip.Reload()
 end)
--- 注册UI
-MY.BreatheCall(function()
-    local h = Station.Lookup("Topmost1/WorldMap/Wnd_All", "Handle_CopyBtn")
-    if not h then return end
-    local k1 = string.char(0x74, 0x4E, 0x6F, 0x6E, 0x77, 0x61, 0x72, 0x44, 0x61, 0x74, 0x61)
-    if MY_ToolBox[k1] and not h[k1] then
-        local me = GetClientPlayer()
-        if not me then return end
-        for i = 0, h:GetItemCount() - 1 do
-            local m = h:Lookup(i)
-            if m and m.mapid == 160 then
-                local _w, _ = m:GetSize()
-                local fS = m.w / _w
-                for _, v in ipairs(MY_ToolBox[k1]) do
-                    local bOpen = me.GetMapVisitFlag(v.id)
-                    local szFile, nFrame = "ui/Image/MiddleMap/MapWindow.UITex", 41
-                    if bOpen then
-                        nFrame = 98
-                    end
-                    h:AppendItemFromString("<image>name=\"mynw_" .. v.id .. "\" path="..EncodeComponentsString(szFile).." frame="..nFrame.." eventid=341</image>")
-                    local img = h:Lookup(h:GetItemCount() - 1)
-                    img.bEnable = bOpen
-                    img.bSelect = bOpen and v.id ~= 26 and v.id ~= 32
-                    img.x = m.x + v.x
-                    img.y = m.y + v.y
-                    img.w, img.h = m.w, m.h
-                    img.id, img.mapid = v.id, v.id
-                    img.middlemapindex = 0
-                    img.name = Table_GetMapName(v.mapid)
-                    img.city = img.name
-                    img.button = m.button
-                    img.copy = true
-                    img:SetSize(img.w / fS, img.h / fS)
-                    img:SetRelPos(img.x / fS - (img.w / fS / 2), img.y / fS - (img.h / fS / 2))
-                end
-                h:FormatAllItemPos()
-                break
-            end
-        end
-        h[k1] = true
-    end
-end, 130)
 -- 显示信息条
 MY_InfoTip.Reload = function()
     for id, cache in pairs(MY_InfoTip.Cache) do
