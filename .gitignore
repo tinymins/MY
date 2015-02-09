@@ -13,3 +13,4 @@
 @DATA/config/MY_SCREENSHOT/*.jx3dat
 @DATA/config/MY_CHATMONITOR/*.jx3dat
 @DATA/userdata/XLifeBar/*.jx3dat
+.Framework/data/bosslist.jx3dat
