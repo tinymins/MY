@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-08 22:46:45
+-- @Last Modified time: 2015-02-09 15:46:38
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -658,7 +658,11 @@ _Cache.tSkillEx = MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot.."data/skill_
 ]]
 MY.Player.IsInArena = function()
 	local me = GetClientPlayer()
-	return me and me.GetScene().bIsArenaMap
+	return me and (
+		me.GetScene().bIsArenaMap or -- JJC
+		me.GetMapID() == 173 or      -- 齐物阁
+		me.GetMapID() == 181         -- 狼影殿
+	)
 end
 MY.IsInArena = MY.Player.IsInArena
 
