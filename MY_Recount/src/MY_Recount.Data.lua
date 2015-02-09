@@ -154,7 +154,7 @@ local _Cache = {
     szRecFile = 'cache/FIGHT_RECOUNT_LOG/',
 }
 local Data          -- 当前战斗数据记录
-local History       -- 历史战斗记录
+local History = {}  -- 历史战斗记录
 
 --[[
 ##################################################################################################
@@ -173,23 +173,23 @@ local History       -- 历史战斗记录
 ##################################################################################################
 ]]
 -- 登陆游戏加载保存的数据
-MY.RegisterInit(function()
+MY_Recount.Data.LoadData = function()
     local data = MY.Sys.LoadUserData(_Cache.szRecFile) or {}
     History                       = data.History       or {}
     MY_Recount.Data.nMaxHistory   = data.nMaxHistory   or 10
     MY_Recount.Data.nMinFightTime = data.nMinFightTime or 30
     MY_Recount.Data.Init()
-end)
+end
 
 -- 退出游戏保存数据
-MY.RegisterExit(function()
+MY_Recount.Data.SaveData = function()
     local data = {
         History       = History,
         nMaxHistory   = MY_Recount.Data.nMaxHistory  ,
         nMinFightTime = MY_Recount.Data.nMinFightTime,
     }
     MY.Sys.SaveUserData(_Cache.szRecFile, data)
-end)
+end
 
 -- 过图清除当前战斗数据
 MY.RegisterEvent('LOADING_END', function()

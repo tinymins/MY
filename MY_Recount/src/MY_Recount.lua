@@ -70,6 +70,7 @@ MY_Recount.nCss          = 1                    -- 当前样式表
 MY_Recount.nChannel      = CHANNEL.DPS          -- 当前显示的统计模式
 MY_Recount.bShowPerSec   = true                 -- 显示为每秒数据（反之显示总和）
 MY_Recount.bShowEffect   = true                 -- 显示有效伤害/治疗
+MY_Recount.bSaveRecount  = false                -- 退出游戏时保存战斗记录
 MY_Recount.nDisplayMode  = DISPLAY_MODE.BOTH    -- 统计显示模式（显示NPC/玩家数据）（默认混合显示）
 MY_Recount.nPublishLimit = 30                   -- 发布到聊天频道数量
 MY_Recount.nPublishMode  = PUBLISH_MODE.TOTAL   -- 发布模式
@@ -80,6 +81,7 @@ RegisterCustomData("MY_Recount.nCss")
 RegisterCustomData("MY_Recount.nChannel")
 RegisterCustomData("MY_Recount.bShowPerSec")
 RegisterCustomData("MY_Recount.bShowEffect")
+RegisterCustomData("MY_Recount.bSaveRecount")
 RegisterCustomData("MY_Recount.nDisplayMode")
 RegisterCustomData("MY_Recount.nPublishLimit")
 RegisterCustomData("MY_Recount.nPublishMode")
@@ -101,6 +103,9 @@ MY_Recount.Close = function()
 end
 
 MY.RegisterInit(function()
+    if MY_Recount.bSaveRecount then
+        MY_Recount.Data.LoadData()
+    end
     MY_Recount.LoadCustomCss()
     if MY_Recount.bEnable then
         MY_Recount.Open()
@@ -109,6 +114,11 @@ MY.RegisterInit(function()
     end
 end)
 
+MY.RegisterExit(function()
+    if MY_Recount.bSaveRecount then
+        MY_Recount.Data.SaveData()
+    end
+end)
 --[[
 ##########################################################################
                               #         #               #             #   
@@ -952,6 +962,15 @@ MY_Recount.GetHistoryMenu = function()
             table.insert(t, t1)
         end
     end
+    
+    table.insert(t, { bDevide = true })
+    table.insert(t, {
+        szOption = _L['auto save data while exit game'],
+        bCheck = true, bChecked = MY_Recount.bSaveRecount,
+        fnAction = function()
+            MY_Recount.bSaveRecount = not MY_Recount.bSaveRecount
+        end,
+    })
     
     return t
 end
