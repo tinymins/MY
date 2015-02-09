@@ -8,8 +8,7 @@
 -----------------------------------------------
 MY = MY or {}
 MY.Chat = MY.Chat or {}
-MY.Chat.bHookedAlready = false
-local _Cache, _L = {}, MY.LoadLangPack()
+local _C, _L = {}, MY.LoadLangPack()
 
 -- 海鳗里面抠出来的
 -- 聊天复制并发布
@@ -31,9 +30,9 @@ MY.Chat.RepeatChatLine = function(hTime)
 end
 
 -- 聊天表情初始化
-_Cache.nMaxEmotionLen = 0
-_Cache.InitEmotion = function()
-    if not _Cache.tEmotion then
+_C.nMaxEmotionLen = 0
+_C.InitEmotion = function()
+    if not _C.tEmotion then
         local t = {}
         for i = 1, g_tTable.FaceIcon:GetRowCount() do
             local tLine = g_tTable.FaceIcon:GetRow(i)
@@ -47,9 +46,9 @@ _Cache.InitEmotion = function()
             t[t1.dwID] = t1
             t[t1.szCmd] = t1
             t[t1.szImageFile..','..t1.nFrame..','..t1.szType] = t1
-            _Cache.nMaxEmotionLen = math.max(_Cache.nMaxEmotionLen, wstring.len(t1.szCmd))
+            _C.nMaxEmotionLen = math.max(_C.nMaxEmotionLen, wstring.len(t1.szCmd))
         end
-        _Cache.tEmotion = t
+        _C.tEmotion = t
     end
 end
 
@@ -60,15 +59,15 @@ end
     (emo)   MY.Chat.GetEmotion(szImageFile, nFrame, szType)  -- 返回指定图标的表情
 ]]
 MY.Chat.GetEmotion = function(arg0, arg1, arg2)
-    _Cache.InitEmotion()
+    _C.InitEmotion()
     local t
     if not arg0 then
-        t = _Cache.tEmotion
+        t = _C.tEmotion
     elseif not arg1 then
-        t = _Cache.tEmotion[arg0]
+        t = _C.tEmotion[arg0]
     elseif arg2 then
         arg0 = string.gsub(arg0, '\\\\', '\\')
-        t = _Cache.tEmotion[arg0..','..arg1..','..arg2]
+        t = _C.tEmotion[arg0..','..arg1..','..arg2]
     end
     return clone(t)
 end
@@ -431,7 +430,7 @@ end
 MY.CanTalk = MY.Chat.CanTalk
 
 -- get channel header
-_Cache.tTalkChannelHeader = {
+_C.tTalkChannelHeader = {
     [PLAYER_TALK_CHANNEL.NEARBY] = "/s ",
     [PLAYER_TALK_CHANNEL.FRIENDS] = "/o ",
     [PLAYER_TALK_CHANNEL.TONG_ALLIANCE] = "/a ",
@@ -450,7 +449,7 @@ _Cache.tTalkChannelHeader = {
     (void) MY.SwitchChat(string szName)
 ]]
 MY.Chat.SwitchChat = function(nChannel)
-    local szHeader = _Cache.tTalkChannelHeader[nChannel]
+    local szHeader = _C.tTalkChannelHeader[nChannel]
     if szHeader then
         SwitchChatChannel(szHeader)
     elseif type(nChannel) == "string" then
@@ -473,7 +472,7 @@ MY.SwitchChat = MY.Chat.SwitchChat
 
 -- parse faceicon in talking message
 MY.Chat.ParseFaceIcon = function(t)
-    _Cache.InitEmotion()
+    _C.InitEmotion()
     local t2 = {}
     for _, v in ipairs(t) do
         if v.type ~= "text" then
@@ -493,7 +492,7 @@ MY.Chat.ParseFaceIcon = function(t)
                 else
                     szLeft = szLeft .. string.sub(szText, 1, nPos - 1)
                     szText = string.sub(szText, nPos)
-                    for i = math.min(_Cache.nMaxEmotionLen, wstring.len(szText)), 2, -1 do
+                    for i = math.min(_C.nMaxEmotionLen, wstring.len(szText)), 2, -1 do
                         local szTest = wstring.sub(szText, 1, i)
                         local emo = MY.Chat.GetEmotion(szTest)
                         if emo then
@@ -677,7 +676,7 @@ MY.Chat.Talk = function(nChannel, szText, bNoEscape, bSaveDeny, bPushToChatBox)
 end
 MY.Talk = MY.Chat.Talk
 
-_Cache.tHookChatFun = {}
+_C.tHookChatFun = {}
 --[[ HOOK聊天栏 ]]
 MY.Chat.HookChatPanel = function(arg0, arg1, arg2)
     local fnBefore, fnAfter, id
@@ -694,19 +693,19 @@ MY.Chat.HookChatPanel = function(arg0, arg1, arg2)
         return nil
     end
     if id then
-        for i=#_Cache.tHookChatFun, 1, -1 do
-            if _Cache.tHookChatFun[i].id == id then
-                table.remove(_Cache.tHookChatFun, i)
+        for i=#_C.tHookChatFun, 1, -1 do
+            if _C.tHookChatFun[i].id == id then
+                table.remove(_C.tHookChatFun, i)
             end
         end
     end
     if fnBefore then
-        table.insert(_Cache.tHookChatFun, {fnBefore = fnBefore, fnAfter = fnAfter, id = id})
+        table.insert(_C.tHookChatFun, {fnBefore = fnBefore, fnAfter = fnAfter, id = id})
     end
 end
 MY.HookChatPanel = MY.Chat.HookChatPanel
 
-_Cache.HookChatPanelHandle = function(h, szMsg)
+_C.HookChatPanelHandle = function(h, szMsg)
     -- add name to emotion icon
     szMsg = string.gsub(szMsg, "<animate>.-path=\"(.-)\"(.-)group=(%d+).-</animate>", function (szImagePath, szExtra, szGroup)
         local emo = MY.Chat.GetEmotion(szImagePath, szGroup, 'animate')
@@ -721,7 +720,7 @@ _Cache.HookChatPanelHandle = function(h, szMsg)
         end
     end)
     -- deal with fnBefore
-    for i,handle in ipairs(_Cache.tHookChatFun) do
+    for i,handle in ipairs(_C.tHookChatFun) do
         -- try to execute fnBefore and get return values
         local result = { pcall(handle.fnBefore, h, szMsg) }
         -- when fnBefore execute succeed
@@ -735,12 +734,12 @@ _Cache.HookChatPanelHandle = function(h, szMsg)
             table.remove(result, 1)
         end
         -- the rest is fnAfter param
-        _Cache.tHookChatFun[i].param = result
+        _C.tHookChatFun[i].param = result
     end
     -- call ori append
     h:_AppendItemFromString_MY(szMsg)
     -- deal with fnAfter
-    for i,handle in ipairs(_Cache.tHookChatFun) do
+    for i,handle in ipairs(_C.tHookChatFun) do
         pcall(handle.fnAfter, h, szMsg, unpack(handle.param))
     end
 end
@@ -750,15 +749,7 @@ MY.RegisterEvent("CHAT_PANEL_INIT", function ()
         local ttl = Station.Lookup("Lowest2/ChatPanel" .. i .. "/CheckBox_Title", "Text_TitleName")
         if h and (not ttl or ttl:GetText() ~= g_tStrings.CHANNEL_MENTOR) then
             h._AppendItemFromString_MY = h._AppendItemFromString_MY or h.AppendItemFromString
-            h.AppendItemFromString = _Cache.HookChatPanelHandle
+            h.AppendItemFromString = _C.HookChatPanelHandle
         end
     end
-end)
-MY.RegisterInit(function()
-    if Station.Lookup("Lowest2/ChatPanel1/Wnd_Message").bMyHooked then
-        MY.Chat.bHookedAlready = true
-    -- else
-    --     MY.Chat.bHookedAlready = false
-    end
-    Station.Lookup("Lowest2/ChatPanel1/Wnd_Message").bMyHooked = true
 end)
