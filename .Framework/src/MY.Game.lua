@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-09 00:00:48
+-- @Last Modified time: 2015-02-09 17:49:16
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -----------------------------------------------
@@ -394,8 +394,11 @@ MY.IsDungeonMap = MY.Game.IsDungeonMap
 	(table) MY.Game.GetBossList(dwMapID)
 ]]
 MY.Game.GetBossList = function(dwMapID)
+	if dwMapID then
+		dwMapID = tostring(dwMapID)
+	end
 	if not _C.tBossList then
-		_C.tBossList = MY.Sys.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/boss/') or { version = 0 }
+		_C.tBossList = MY.Sys.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/bosslist', true) or { version = 0 }
 	end
 	
 	if dwMapID then
@@ -404,10 +407,25 @@ MY.Game.GetBossList = function(dwMapID)
 		return clone(_C.tBossList)
 	end
 end
+
+--[[ 获取指定地图指定模板ID的NPC是不是BOSS
+	(boolean) MY.Game.IsBoss(dwMapID, dwTem)
+]]
+MY.Game.IsBoss = function(dwMapID, dwTemplateID)
+	dwMapID, dwTemplateID = tostring(dwMapID), tostring(dwTemplateID)
+	if _C.tBossList and _C.tBossList[dwMapID]
+	and _C.tBossList[dwMapID][dwTemplateID] then
+		return true
+	else
+		return false
+	end
+end
+MY.IsBoss = MY.Game.IsBoss
+
 -- remote boss list online
 MY.RegisterInit(function()
 	-- start remote version check
-	MY.RemoteRequest('http://data.jx3.derzh.com/data/bosslist/' .. MY.Sys.GetLang() .. '.html', function(szTitle, szContent)
+	MY.RemoteRequest('http://data.jx3.derzh.com/data/bosslist.html', function(szTitle, szContent)
 		-- decode data
 		local data = MY.Json.Decode(szContent)
 		if not data then
@@ -415,9 +433,13 @@ MY.RegisterInit(function()
 			return
 		end
 		
+		if not _C.tBossList then
+			MY.Game.GetBossList()
+		end
+		
 		if data.version > _C.tBossList.version then
 			_C.tBossList = data
-			MY.Sys.SaveLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/boss/', _C.tBossList)
+			MY.Sys.SaveLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/bosslist', _C.tBossList, true)
 		end
 	end)
 end)
