@@ -19,6 +19,8 @@ data = {
     ['display only player record'] = '只顯示玩家記錄',
     ['display all record'] = '顯示所有記錄',
     
+    ['auto save data while exit game'] = '退出遊戲時保存數據',
+    
     ['display as per second'  ] = '顯示每秒均值',
     ['display effective value'] = '顯示有效數值',
     ['theme'] = '自定風格選擇',
