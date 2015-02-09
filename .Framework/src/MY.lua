@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-04 12:52:47
+-- @Last Modified time: 2015-02-09 14:44:36
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -230,36 +230,16 @@ _MY.Init = function()
 	end
 	-- var
 	_MY.bLoaded = true
-	_MY.hBox = MY.GetFrame():Lookup("","Box_1")
-	_MY.hRequest = MY.GetFrame():Lookup("Page_1")
-	-- 窗口按钮
-	MY.UI(MY.GetFrame()):children("#Btn_Close"):click(function() MY.ClosePanel() end)
-	-- 重绘选项卡
-	MY.RedrawCategory()
 	-- init functions
 	for i = 1, #_MY.tInitFun, 1 do
 		local status, err = pcall(_MY.tInitFun[i].fn)
-		if not status then MY.Debug(err.."\n", "_MY.tInitFun#"..i) end
+		if not status then
+			MY.Debug(err.."\n", "_MY.tInitFun#"..i)
+		end
 	end
 
 	-- 显示欢迎信息
 	MY.Sysmsg({_L("%s, welcome to use mingyi plugins!", GetClientPlayer().szName) .. " v" .. MY.GetVersion() .. ' Build ' .. _MY.szBuildDate})
-	if _MY.nDebugLevel >=3 then
-		_MY.frame:Hide()
-	else
-		_MY.frame:Show()
-	end
-	
-	-- 显示作者信息
-	MY.UI(MY.GetFrame()):children("#Wnd_Total"):children("#Btn_Weibo")
-	  :text(_L['author\'s weibo'])
-	  :click(function()
-	  	MY.UI.OpenInternetExplorer("http://weibo.com/zymah")
-	  end)
-	-- 显示LOGO
-	MY.UI(MY.GetFrame()):item('#Image_Icon')
-	  :size(30, 30)
-	  :image(_MY.szUITexCommon, 0)
 end
 
 -- ##################################################################################################
@@ -277,7 +257,7 @@ end
 --     #           #           #                 #     #           #         # #               # #   
 -- ##################################################################################################
 -- close window
-MY.ClosePanel = function(bRealClose)
+MY.ClosePanel = function(bRealClose, bMute)
 	local frame = MY.GetFrame()
 	if frame then
 		if not bRealClose then
@@ -287,12 +267,14 @@ MY.ClosePanel = function(bRealClose)
 			_MY.frame = nil
 		end
 		Wnd.CloseWindow("PopupMenuPanel")
-		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
+		if not bMute then
+			PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
+		end
 	end
 	MY.RegisterEsc('MY')
 end
 -- open window
-MY.OpenPanel = function()
+MY.OpenPanel = function(bMute)
 	local frame = MY.GetFrame()
 	if frame then
 		frame:Show()
@@ -302,7 +284,9 @@ MY.OpenPanel = function()
 	MY.RegisterEsc('MY', function()
 		return Station.Lookup('Normal/MY') and Station.Lookup('Normal/MY'):IsVisible()
 	end, MY.ClosePanel)
-	PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
+	if not bMute then
+		PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
+	end
 end
 -- toggle panel
 MY.TogglePanel = function()
@@ -316,6 +300,19 @@ MY.TogglePanel = function()
 		MY.OpenPanel()
 	end
 end
+-- reopen panel
+MY.ReopenPanel = function()
+	local bVisible = MY.IsPanelVisible()
+	MY.ClosePanel(true, true)
+	MY.OpenPanel(true)
+	if not bVisible then
+		MY.ClosePanel()
+	end
+end
+-- if panel visible
+MY.IsPanelVisible = function()
+	return (_MY.frame and _MY.frame:IsVisible())
+end
 
 --[[ 获取主窗体句柄
 	(frame) MY.GetFrame()
@@ -323,12 +320,32 @@ end
 MY.GetFrame = function()
 	if not _MY.frame then
 		_MY.frame = Wnd.OpenWindow(_MY.szIniFile, "MY")
-		-- local W, H = Station.GetClientSize()
-		-- local w, h = _MY.frame:GetSize()
-		-- _MY.frame:SetRelPos((W-w)/2, (H-h)/2)
 		_MY.frame:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
 		_MY.frame:CorrectPos()
-		_MY.frame:Hide()
+		
+		-- update some ui handle
+		_MY.hBox = _MY.frame:Lookup("","Box_1")
+		_MY.hRequest = _MY.frame:Lookup("Page_1")
+		-- bind close button event
+		MY.UI(_MY.frame):children("#Btn_Close"):click(function() MY.ClosePanel() end)
+		-- update author infomation button
+		MY.UI(MY.GetFrame()):children("#Wnd_Total"):children("#Btn_Weibo")
+		  :text(_L['author\'s weibo'])
+		  :click(function()
+		  	MY.UI.OpenInternetExplorer("http://weibo.com/zymah")
+		  end)
+		-- updaet logo image
+		MY.UI(MY.GetFrame()):item('#Image_Icon')
+		  :size(30, 30)
+		  :image(_MY.szUITexCommon, 0)
+		-- update category
+		MY.RedrawCategory()
+		
+		if _MY.nDebugLevel >=3 then
+			_MY.frame:Hide()
+		else
+			_MY.frame:Show()
+		end
 	end
 	return _MY.frame
 end
@@ -475,7 +492,13 @@ MY.RedrawCategory = function(szCategory)
 	local wndCategoryList = frame:Lookup('Wnd_Total/WndContainer_Category')
 	wndCategoryList:Clear()
 	for _, ctg in pairs(_MY.tTabs) do
-		if #ctg > 0 then
+		local nCount = 0
+		for i, tab in ipairs(ctg) do
+			if not (tab.bShielded and MY.IsShieldedVersion()) then
+				nCount = nCount + 1
+			end
+		end
+		if nCount > 0 then
 			local chkCategory = wndCategoryList:AppendContentFromIni(_MY.szIniFile, "CheckBox_Category")
 			chkCategory.szCategory = ctg.id
 			chkCategory:Lookup('', 'Text_Category'):SetText(ctg.id)
@@ -537,25 +560,27 @@ MY.RedrawTab = function(szCategory)
 	for _, ctg in ipairs(_MY.tTabs) do
 		if ctg.id == szCategory then
 			for i, tab in ipairs(ctg) do
-				local hTab = hTabs:AppendItemFromIni(_MY.szIniFile, "Handle_Tab")
-				hTab.szID = tab.szID
-				hTab:Lookup('Text_Tab'):SetText(tab.szTitle)
-				if tab.dwIconFrame then
-					hTab:Lookup('Image_TabIcon'):FromUITex(tab.szIconTex, tab.dwIconFrame)
-				else
-					hTab:Lookup('Image_TabIcon'):FromTextureFile(tab.szIconTex)
-				end
-				hTab:Lookup('Image_Bg'):FromUITex(_MY.szUITexCommon, 3)
-				hTab:Lookup('Image_Bg_Active'):FromUITex(_MY.szUITexCommon, 1)
-				hTab:Lookup('Image_Bg_Hover'):FromUITex(_MY.szUITexCommon, 2)
-				hTab.OnItemLButtonClick = function()
-					MY.SwitchTab(this.szID)
-				end
-				hTab.OnItemMouseEnter = function()
-					this:Lookup('Image_Bg_Hover'):Show()
-				end
-				hTab.OnItemMouseLeave = function()
-					this:Lookup('Image_Bg_Hover'):Hide()
+				if not (tab.bShielded and MY.IsShieldedVersion()) then
+					local hTab = hTabs:AppendItemFromIni(_MY.szIniFile, "Handle_Tab")
+					hTab.szID = tab.szID
+					hTab:Lookup('Text_Tab'):SetText(tab.szTitle)
+					if tab.dwIconFrame then
+						hTab:Lookup('Image_TabIcon'):FromUITex(tab.szIconTex, tab.dwIconFrame)
+					else
+						hTab:Lookup('Image_TabIcon'):FromTextureFile(tab.szIconTex)
+					end
+					hTab:Lookup('Image_Bg'):FromUITex(_MY.szUITexCommon, 3)
+					hTab:Lookup('Image_Bg_Active'):FromUITex(_MY.szUITexCommon, 1)
+					hTab:Lookup('Image_Bg_Hover'):FromUITex(_MY.szUITexCommon, 2)
+					hTab.OnItemLButtonClick = function()
+						MY.SwitchTab(this.szID)
+					end
+					hTab.OnItemMouseEnter = function()
+						this:Lookup('Image_Bg_Hover'):Show()
+					end
+					hTab.OnItemMouseLeave = function()
+						this:Lookup('Image_Bg_Hover'):Hide()
+					end
 				end
 			end
 		end
@@ -659,19 +684,20 @@ MY.SwitchTab = function(szID)
 	wndMainPanel.szID = szID
 end
 --[[ 注册选项卡
-	(void) MY.RegisterPanel( szID, szTitle, szCategory, szIconTex, rgbaTitleColor, fn )
+	(void) MY.RegisterPanel( szID, szTitle, szCategory, szIconTex, rgbaTitleColor, options )
 	szID            选项卡唯一ID
 	szTitle         选项卡按钮标题
 	szCategory      选项卡所在分类
 	szIconTex       选项卡图标文件|图标帧
 	rgbaTitleColor  选项卡文字rgba
-	fn              选项卡各种响应函数 {
-		fn.OnPanelActive(wnd)      选项卡激活    wnd为当前MainPanel
-		fn.OnPanelDeactive(wnd)    选项卡取消激活
+	options         选项卡各种响应函数 {
+		options.OnPanelActive(wnd)      选项卡激活    wnd为当前MainPanel
+		options.OnPanelDeactive(wnd)    选项卡取消激活
+		options.bShielded               国服和谐的选项卡
 	}
 	Ex： MY.RegisterPanel( "Test", "测试标签", "测试", "UI/Image/UICommon/ScienceTreeNode.UITex|123", {255,255,0,200}, { OnPanelActive = function(wnd) end } )
  ]]
-MY.RegisterPanel = function( szID, szTitle, szCategory, szIconTex, rgbaTitleColor, fn )
+MY.RegisterPanel = function(szID, szTitle, szCategory, szIconTex, rgbaTitleColor, options)
 	local category
 	for _, ctg in ipairs(_MY.tTabs) do
 		for i = #ctg, 1, -1 do
@@ -700,21 +726,27 @@ MY.RegisterPanel = function( szID, szTitle, szCategory, szIconTex, rgbaTitleColo
 	szIconTex = string.gsub(szIconTex, '%|.*', '')
 
 	-- format other params
-	if type(fn)~="table" then fn = {} end
+	if type(options)~="table" then options = {} end
 	if type(rgbaTitleColor)~="table" then rgbaTitleColor = { 255, 255, 255, 255 } end
 	if type(rgbaTitleColor[1])~="number" then rgbaTitleColor[1] = 255 end
 	if type(rgbaTitleColor[2])~="number" then rgbaTitleColor[2] = 255 end
 	if type(rgbaTitleColor[3])~="number" then rgbaTitleColor[3] = 255 end
 	if type(rgbaTitleColor[4])~="number" then rgbaTitleColor[4] = 200 end
+	if type(options)~="table" then options = {} end
 	table.insert( category, {
 		szID        = szID       ,
 		szTitle     = szTitle    ,
 		szCategory  = szCategory ,
-		fn          = fn         ,
 		szIconTex   = szIconTex  ,
 		dwIconFrame = dwIconFrame,
-		rgbTitle    = {rgbaTitleColor[1],rgbaTitleColor[2],rgbaTitleColor[3]},
+		bShielded   = options.bShielded,
+		rgbTitle    = { rgbaTitleColor[1], rgbaTitleColor[2], rgbaTitleColor[3] },
 		alpha       = rgbaTitleColor[4],
+		fn          = {
+			OnPanelResize  = options.OnPanelResize ,
+			OnPanelActive  = options.OnPanelActive ,
+			OnPanelDeative = options.OnPanelDeative,
+		},
 	})
 
 	if _MY.bLoaded then

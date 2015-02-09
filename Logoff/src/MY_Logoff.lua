@@ -321,16 +321,7 @@ _MY_Logoff.OnPanelActive = function(wnd)
       :pos(20,360):color({255,255,0}):text(_L['* hotkey setting'])
       :click(function() MY.Game.SetHotKey() end)
 end
---
-MY.RegisterInit(function()
-    if not MY.IsShieldedVersion() then
-        MY.RegisterPanel(
-            "Logoff", _L["express logoff"], _L['General'],
-            "UI/Image/UICommon/LoginSchool.UITex|24", {255,0,0,200},
-            { OnPanelActive = _MY_Logoff.OnPanelActive }
-        )
-    end
-end)
+
 MY.RegisterInit(function()
     -- 创建菜单
     local tMenu = function() return {
@@ -385,6 +376,12 @@ MY.RegisterInit(function()
     MY.RegisterPlayerAddonMenu( 'MY_LOGOFF_MENU', tMenu)
     MY.RegisterTraceButtonMenu( 'MY_LOGOFF_MENU', tMenu)
 end)
+
+MY.RegisterPanel(
+    "Logoff", _L["express logoff"], _L['General'],
+    "UI/Image/UICommon/LoginSchool.UITex|24", {255,0,0,200},
+    { OnPanelActive = _MY_Logoff.OnPanelActive, bShielded = true }
+)
 -----------------------------------------------
 -- 快捷键绑定
 -----------------------------------------------
