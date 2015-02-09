@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-08 02:36:09
+-- @Last Modified time: 2015-02-09 17:54:18
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Focus/lang/")
 local _C = {}
@@ -13,6 +13,7 @@ _C.szIniFile = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
 _C.bMinimize = false
 MY_Focus = {}
 MY_Focus.bEnable        = true  -- 是否启用
+MY_Focus.bFocusBoss      = true  -- 焦点重要NPC
 MY_Focus.bFocusFriend   = false -- 焦点附近好友
 MY_Focus.bFocusTong     = false -- 焦点帮会成员
 MY_Focus.bFocusEnemy    = false -- 焦点敌对玩家
@@ -32,6 +33,7 @@ MY_Focus.tFocusList = {     -- 永久焦点
 }
 MY_Focus.anchor = { x=-300, y=220, s="TOPRIGHT", r="TOPRIGHT" } -- 默认坐标
 RegisterCustomData("MY_Focus.bEnable")
+RegisterCustomData("MY_Focus.bFocusBoss")
 RegisterCustomData("MY_Focus.bFocusFriend")
 RegisterCustomData("MY_Focus.bFocusTong")
 RegisterCustomData("MY_Focus.bFocusEnemy")
@@ -179,6 +181,7 @@ MY_Focus.OnObjectEnterScene = function(dwType, dwID, nRetryCount)
 	if nRetryCount and nRetryCount >5 then
 		return
 	end
+	local me = GetClientPlayer()
 	local obj = MY.Game.GetObject(dwType, dwID)
 	if not obj then
 		return
@@ -187,7 +190,7 @@ MY_Focus.OnObjectEnterScene = function(dwType, dwID, nRetryCount)
 	local szName = MY.Game.GetObjectName(obj)
 	-- 解决玩家刚进入视野时名字为空的问题
 	if (dwType == TARGET.PLAYER and not szName) or
-	not (GetClientPlayer()) then -- 解决自身刚进入场景的时候的问题
+	not me then -- 解决自身刚进入场景的时候的问题
 		MY.DelayCall(function()
 			MY_Focus.OnObjectEnterScene(dwType, dwID, (nRetryCount or 0) + 1)
 		end, 300)
@@ -243,6 +246,12 @@ MY_Focus.OnObjectEnterScene = function(dwType, dwID, nRetryCount)
 			IsEnemy(UI_GetClientPlayerID(), dwID) then
 				bFocus = true
 			end
+		end
+		
+		-- 判断重要NPC
+		if not bFocus and MY_Focus.bFocusBoss and
+		MY.Game.IsBoss(me.GetMapID(), obj.dwTemplateID) then
+			bFocus = true
 		end
 		
 		-- 加入焦点
@@ -724,6 +733,16 @@ MY.RegisterPanel( "MY_Focus", _L["focus list"], _L['Target'], "ui/Image/button/S
 	  end)
 	y = y + 30
 	
+	ui:append("WndCheckBox_AF_VIN", "WndCheckBox"):children("#WndCheckBox_AF_VIN")
+	  :pos(x, y):width(wr):text(_L['auto focus very important npc'])
+	  :tip(_L['boss list is always been collecting and updating'], MY.Const.UI.Tip.POS_TOP)
+	  :check(MY_Focus.bFocusBoss)
+	  :check(function(bChecked)
+	  	MY_Focus.bFocusBoss = bChecked
+	  	MY_Focus.RescanNearby()
+	  end)
+	y = y + 30
+	
 	ui:append("WndCheckBox_AF_Friend", "WndCheckBox"):children("#WndCheckBox_AF_Friend")
 	  :pos(x, y):width(wr):text(_L['auto focus friend']):check(MY_Focus.bFocusFriend)
 	  :check(function(bChecked)
@@ -773,7 +792,8 @@ MY.RegisterPanel( "MY_Focus", _L["focus list"], _L['Target'], "ui/Image/button/S
 	y = y + 30
 	
 	ui:append("WndCheckBox_Traversal", "WndCheckBox"):children("#WndCheckBox_Traversal")
-	  :pos(x, y):width(wr):text(_L['traversal object']):tip(_L['may cause some problem in dungeon map'])
+	  :pos(x, y):width(wr):text(_L['traversal object'])
+	  :tip(_L['may cause some problem in dungeon map'], MY.Const.UI.Tip.POS_BOTTOM)
 	  :check(MY_Focus.bTraversal)
 	  :check(function(bChecked)
 	  	MY_Focus.bTraversal = bChecked
