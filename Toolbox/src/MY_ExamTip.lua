@@ -1,11 +1,12 @@
---
--- 科举助手
--- by 茗伊 @ 双梦镇 @ 荻花宫
--- Build 20140730
---
--- 主要功能: 科举助手
--- 
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."ExamTip/lang/")
+-----------------------------------------------
+-- @Desc  : 科举助手 (台服用)
+-- @Author: 茗伊 @ 双梦镇 @ 荻花宫
+-- @Date  : 2014-07-30 09:21:13
+-- @Email : admin@derzh.com
+-- @Last Modified by:   翟一鸣 @tinymins
+-- @Last Modified time: 2015-02-10 13:38:03
+-----------------------------------------------
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _Cache = {
     szQueryUrl = "http://jx3.derzh.com/exam/?l=%s&q=%s",
     szSubmitUrl = "http://jx3.derzh.com/exam/submit.php?l=%s&d=%s",
@@ -59,7 +60,7 @@ MY_ExamTip.SubmitData = function()
             nUnsubmit = nUnsubmit - 1
             nCommited = nCommited + r.received
             nAccepted = nAccepted + r.accepted
-            if nUnsubmit == 0 then
+            if not MY.IsShieldedVersion() and nUnsubmit == 0 then
                 MY.Sysmsg({_L('%s record(s) commited, %s record(s) accepted!', nCommited, nAccepted)}, _L['exam tip'])
             end
         end)
@@ -132,20 +133,22 @@ end
 _Cache.OnFrameBreathe = function()
     local frame = Station.Lookup("Normal/ExaminationPanel")
     if not (frame and frame:IsVisible()) then
-        return nil
+        return
     end
+    local szQues = frame:Lookup("", "Handle_ExamContents"):Lookup(0):GetText()
     
-    local szQues = Station.Lookup("Normal/ExaminationPanel/","Handle_ExamContents"):Lookup(0):GetText()
-    MY_ExamTip.QueryData(szQues)
+    if not MY.IsShieldedVersion() then
+        MY_ExamTip.QueryData(szQues)
+    end
     MY_ExamTip.CollectResult(szQues)
     _Cache.nExamPrintRemainSpace = GetClientPlayer().GetExamPrintRemainSpace()
 end
 -- 注册INIT事件
 MY.RegisterInit(function()
     MY.BreatheCall(_Cache.OnFrameBreathe)
-    MY.RegisterEvent("BAG_ITEM_UPDATE", function()
-        local item = GetClientPlayer().GetItem(arg0, arg1)
-        if item and item.szName == '会试行文' then
+    MY.RegisterEvent("LOOT_ITEM", 'MY_ExamTip',function()
+        local item = GetItem(arg1)
+        if item and item.nUiId == 65814 then
             local nExamPrintRemainSpace = _Cache.nExamPrintRemainSpace
             MY.DelayCall(function()
                 if nExamPrintRemainSpace - GetClientPlayer().GetExamPrintRemainSpace() == 100  then
