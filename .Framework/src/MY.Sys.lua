@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-10 13:46:41
+-- @Last Modified time: 2015-02-10 14:42:29
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -713,6 +713,7 @@ MY.Debug = function(szText, szHead, nLevel)
 	table.insert(oContent, szText)
 	if nLevel >= MY.GetAddonInfo().nDebugLevel then
 		MY.Sysmsg(oContent, szHead)
+		Log('[MY_DEBUG][LEVEL_' .. nLevel .. ']' .. '[' .. szHead .. ']' .. szText)
 	end
 end
 
