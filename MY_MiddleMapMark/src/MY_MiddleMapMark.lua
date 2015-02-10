@@ -170,15 +170,17 @@ MY_MiddleMapMark.GetMapData = function(dwMapID)
             Doodad = {},
         }
         for i = #data.Npc, 1, -1 do
-            if data.Npc[i].dwTemplateID and
-            _C.NpcTpl[data.Npc[i].dwTemplateID] then
+            if ( data.Npc[i].dwTemplateID and
+                _C.NpcTpl[data.Npc[i].dwTemplateID]
+            ) or MY.String.Trim(data.Npc[i].szName) == '' then
                 table.remove(data.Npc, i)
                 _Cache.tMapDataChanged[dwMapID] = true
             end
         end
         for i = #data.Doodad, 1, -1 do
-            if data.Doodad[i].dwTemplateID and
-            _C.DoodadTpl[data.Doodad[i].dwTemplateID] then
+            if ( data.Doodad[i].dwTemplateID and
+                _C.DoodadTpl[data.Doodad[i].dwTemplateID]
+            ) or MY.String.Trim(data.Doodad[i].szName) == '' then
                 table.remove(data.Doodad, i)
                 _Cache.tMapDataChanged[dwMapID] = true
             end
@@ -323,6 +325,15 @@ _C.NpcTpl = {
     [15630] = true, -- ÔÂ°ë»Æ»è
     [16538] = true, -- ÁúÃÅ½ðµ°
     
+    [16594] = true, -- ÇàÁúÕóÑÛ
+    [16595] = true, -- °×»¢ÕóÑÛ
+    [16596] = true, -- ÖìÈ¸ÕóÑÛ
+    [16597] = true, -- ÐþÎäÕóÑÛ
+    [16598] = true, -- ÖØÓù
+    [16599] = true, -- Éý¾°
+    [16600] = true, -- ·âÃÅ
+    [16601] = true, -- Á¬»ª
+
     [24023] = true, -- µÁÄ¹Ôô
     [27447] = true, -- Ä¾ÎäÍ¯
     [36921] = true, -- ²Ø±¦¶´¿Ú
@@ -711,6 +722,7 @@ _C.DoodadTpl = {
     [2475 ] = true, -- ±Ìµû/ÌìÖé/Óñó¸
     [4719 ] = true, -- ÐÂÂñµÄÍÁ¶Ñ
     [4721 ] = true, -- ²»ÆðÑÛµÄÐ¡¿Ó
+    [4315 ] = true, -- Ü½ÈØ³öË®Ñç
 }
 local m_nLastRedrawFrame = GetLogicFrameCount()
 local MARK_RENDER_INTERVAL = GLOBAL.GAME_FPS * 5
@@ -730,7 +742,7 @@ MY.RegisterEvent("NPC_ENTER_SCENE",    "MY_MiddleMapMark", function()
     end
     -- avoid full number named npc
     local szName = MY.GetObjectName(npc)
-    if not szName then
+    if not szName or MY.String.Trim(szName) == '' then
         return
     end
     -- switch map
@@ -775,7 +787,7 @@ MY.RegisterEvent("DOODAD_ENTER_SCENE", "MY_MiddleMapMark", function()
     end
     -- avoid full number named doodad
     local szName = MY.GetObjectName(doodad)
-    if not szName then
+    if not szName or MY.String.Trim(szName) == '' then
         return
     end
     -- switch map
