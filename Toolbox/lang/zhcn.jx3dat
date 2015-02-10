@@ -80,4 +80,10 @@ data = {
     ['Tip: [%s] is in your team.\nNote: %s\n'] = '提示：[%s]进入你所在的队伍。\n备注：%s\n',
     
     ['Type to search, use comma to split.'] = '输入文字进行搜索，半角逗号分隔多个搜索项。\n如：皇竹草,甜象草',
+    
+    ['exam tip'] = '科举助手',
+    ['%s record(s) commited, %s record(s) accepted!'] = '已为您自动提交了%s条题库数据，其中%s条已被系统通过采纳！',
+    ["Querying, please wait..."] = '查询中，请稍后……',
+    ["No result found. Here's from open search engine:"] = '没有搜索到匹配的结果，以下数据来自开放搜索引擎：',
+    ['Loading failed.'] = '加载失败',
 }
