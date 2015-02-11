@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µ‘“ª√˘ @tinymins
--- @Last Modified time: 2015-02-09 17:54:18
+-- @Last Modified time: 2015-02-11 15:55:28
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Focus/lang/")
 local _C = {}
@@ -249,7 +249,9 @@ MY_Focus.OnObjectEnterScene = function(dwType, dwID, nRetryCount)
 		end
 		
 		-- ≈–∂œ÷ÿ“™NPC
-		if not bFocus and MY_Focus.bFocusBoss and
+		if not bFocus and
+		dwType == TARGET.NPC and
+		MY_Focus.bFocusBoss and
 		MY.Game.IsBoss(me.GetMapID(), obj.dwTemplateID) then
 			bFocus = true
 		end
