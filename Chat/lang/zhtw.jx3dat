@@ -18,6 +18,9 @@ data = {
     ['chat log'] = '聊天記錄',
     ['Max log: %d'] = '最大記錄：%d',
     
+    ['filter tong online message'] = '過濾幫會上線公告提示',
+    ['filter tong member log message'] = '過濾幫會成員上線提示',
+    
     ['about...'] = '關于...',
     ['lock postion'] = '鎖定位置',
     ['team balloon'] = '隊伍泡泡',
