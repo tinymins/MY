@@ -4,9 +4,16 @@ color 0A
 :: 读取MY.lua文件中的插件版本号
 set szVersion=0x0000000
 for /f "tokens=2,4 delims= " %%i in (.Framework/src/MY.lua) do (
-    if "%%i"=="_VERSION_" (
-        set szVersion=%%j
-    )
+	if "%%i"=="_VERSION_" (
+		set szVersion=%%j
+	)
+	if "%%i"=="_DEBUG_" (
+		if "%%j" NEQ "4" (
+			color 0C
+			echo Warning: Addon is still in debug mode! Release progress abended!
+			pause && exit
+		)
+	)
 )
 
 :: 获取并格式化当前时间字符串
