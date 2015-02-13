@@ -134,35 +134,7 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
                 bCatch = true
             end
         else        -- normal
-            -- 10|十人,血战天策|XZTC,!小铁被吃了,!开宴黑铁;大战
-            local bKeyWordsLine = false
-            for _, szKeyWordsLine in ipairs( MY.String.Split(StringLowerW(MY_ChatMonitor.szKeyWords), ';') ) do -- 符合一个即可
-                if bKeyWordsLine then break end
-                -- 10|十人,血战天策|XZTC,!小铁被吃了,!开宴黑铁
-                local bKeyWords = true
-                for _, szKeyWords in ipairs( MY.String.Split(szKeyWordsLine, ',') ) do            -- 必须全部符合
-                    if not bKeyWords then break end
-                    -- 10|十人
-                    local bKeyWord = false
-                    for _, szKeyWord in ipairs( MY.String.Split(szKeyWords, '|') ) do         -- 符合一个即可
-                        if bKeyWord then break end
-                        szKeyWord = MY.String.PatternEscape(szKeyWord)
-                        if string.sub(szKeyWord, 1, 1)=="!" then    -- !小铁被吃了
-                            szKeyWord = string.sub(szKeyWord, 2)
-                            if not string.find(rec.text, szKeyWord) then
-                                bKeyWord = true
-                            end
-                        else                                        -- 十人   -- 10
-                            if string.find(rec.text, szKeyWord) then
-                                bKeyWord = true
-                            end
-                        end
-                    end
-                    bKeyWords = bKeyWords and bKeyWord
-                end
-                bKeyWordsLine = bKeyWordsLine or bKeyWords
-            end
-            bCatch = bKeyWordsLine
+            bCatch = MY.String.SimpleMatch(rec.text, MY_ChatMonitor.szKeyWords)
         end
         --------------------------------------------------------------------------------------------
         -- 如果符合要求  -- 验证消息哈希 如果存在则跳过该消息
