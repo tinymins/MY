@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-09 15:37:11
+-- @Last Modified time: 2015-02-13 18:39:03
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -709,7 +709,7 @@ MY.Chat.HookChatPanel = function(arg0, arg1, arg2)
 end
 MY.HookChatPanel = MY.Chat.HookChatPanel
 
-_C.HookChatPanelHandle = function(h, szMsg)
+_C.HookChatPanelHandle = function(h, szMsg, szChannel)
 	-- add name to emotion icon
 	szMsg = string.gsub(szMsg, "<animate>.-path=\"(.-)\"(.-)group=(%d+).-</animate>", function (szImagePath, szExtra, szGroup)
 		local emo = MY.Chat.GetEmotion(szImagePath, szGroup, 'animate')
@@ -726,7 +726,7 @@ _C.HookChatPanelHandle = function(h, szMsg)
 	-- deal with fnBefore
 	for i,handle in ipairs(_C.tHookChatFun) do
 		-- try to execute fnBefore and get return values
-		local result = { pcall(handle.fnBefore, h, szMsg) }
+		local result = { pcall(handle.fnBefore, h, szMsg, szChannel) }
 		-- when fnBefore execute succeed
 		if result[1] then
 			-- remove execute status flag
@@ -741,10 +741,10 @@ _C.HookChatPanelHandle = function(h, szMsg)
 		_C.tHookChatFun[i].param = result
 	end
 	-- call ori append
-	h:_AppendItemFromString_MY(szMsg)
+	h:_AppendItemFromString_MY(szMsg, szChannel)
 	-- deal with fnAfter
 	for i,handle in ipairs(_C.tHookChatFun) do
-		pcall(handle.fnAfter, h, szMsg, unpack(handle.param))
+		pcall(handle.fnAfter, h, szMsg, szChannel, unpack(handle.param))
 	end
 end
 MY.RegisterEvent("CHAT_PANEL_INIT", function ()
