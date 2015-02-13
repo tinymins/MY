@@ -72,7 +72,7 @@ _MY_ChatMonitor.tChannelGroups = {
 }
 
 -- 插入聊天内容时监控聊天信息
-_MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b)
+_MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
     -- filter
     if MY_ChatMonitor.bCapture and MY_ChatMonitor.szKeyWords and MY_ChatMonitor.szKeyWords~='' then
         local rec = {

@@ -420,15 +420,16 @@ MY.HookChatPanel("MY_Chat", function(h, szMsg)
 	
 	-- chat filter
 	if MY_Chat.bBlockWords then
-		local t = MY.Chat.FormatContent(szMsg)
-		local szText = ""
-		for k, v in ipairs(t) do
-			if v.type == "text" then
-				szText = szText .. v.text
-			end
-		end
+		-- local t = MY.Chat.FormatContent(szMsg)
+		-- local szText = ""
+		-- for k, v in ipairs(t) do
+		-- 	if v.type == "text" then
+		-- 		szText = szText .. v.text
+		-- 	end
+		-- end
+		local szText = GetPureText(szMsg)
 		for _,szWord in ipairs(MY_Chat.tBlockWords) do
-			if string.find(szText, MY.String.PatternEscape(szWord)) then
+			if MY.String.SimpleMatch(szText, szWord) then
 				return ""
 			end
 		end
@@ -439,7 +440,7 @@ MY.HookChatPanel("MY_Chat", function(h, szMsg)
 	end
 	
 	return szMsg, h:GetItemCount()
-end, function(h, szMsg, i)
+end, function(h, szMsg, szChannel, i)
 	if (MY_Chat.bChatTime or MY_Chat.bChatCopy) and i then
 		-- chat time
 		-- get msg rgb
