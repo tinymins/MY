@@ -25,7 +25,7 @@ MY_BuffMonitor.bTargetOn = false
 MY_BuffMonitor.bDragable = false
 MY_BuffMonitor.anchorSelf = { s = "LEFTCENTER", r = "LEFTCENTER", x = 320, y = 150 }
 MY_BuffMonitor.anchorTarget = { s = "LEFTCENTER", r = "LEFTCENTER", x = 320, y = 98 }
-MY_BuffMonitor.tBuffList = MY.LoadLUAData(_DEFAULT_BUFFMONITOR_CONFIG_FILE_)
+MY_BuffMonitor.tBuffList = MY.LoadLUAData(_DEFAULT_BUFFMONITOR_CONFIG_FILE_) or {}
 RegisterCustomData("MY_BuffMonitor.bSelfOn")
 RegisterCustomData("MY_BuffMonitor.bTargetOn")
 RegisterCustomData("MY_BuffMonitor.bDragable")
@@ -36,7 +36,7 @@ RegisterCustomData("MY_BuffMonitor.tBuffList")
 MY_BuffMonitor.ReloadDefaultConfig = function()
     MY_BuffMonitor.anchorSelf = { s = "LEFTCENTER", r = "LEFTCENTER", x = 320, y = 150 }
     MY_BuffMonitor.anchorTarget = { s = "LEFTCENTER", r = "LEFTCENTER", x = 320, y = 98 }
-    MY_BuffMonitor.tBuffList = MY.LoadLUAData(_DEFAULT_BUFFMONITOR_CONFIG_FILE_)
+    MY_BuffMonitor.tBuffList = MY.LoadLUAData(_DEFAULT_BUFFMONITOR_CONFIG_FILE_) or {}
     MY_BuffMonitor.ReloadBuffMonitor()
 end
 RegisterEvent("CUSTOM_UI_MODE_SET_DEFAULT", function()
