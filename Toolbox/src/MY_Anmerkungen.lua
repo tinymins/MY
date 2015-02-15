@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-25 12:31:03
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-02-08 03:06:59
+-- @Last Modified time: 2015-02-15 17:06:41
 -----------------------------------------------
 -- #######################################################################################################
 --   * * *         *                 *                     *                   *           *         
@@ -41,24 +41,18 @@ MY_Anmerkungen.ReloadNotePanel = function()
 	MY.UI("Normal/MY_Anmerkungen_NotePanel"):remove()
 	if MY_Anmerkungen.bNotePanelEnable then
 		-- frame
-		local ui = MY.UI.CreateFrame("MY_Anmerkungen_NotePanel", MY.Const.UI.Frame.NORMAL_EMPTY)
+		local ui = MY.UI.CreateFrame("MY_Anmerkungen_NotePanel", { simple = true })
 		ui:size(MY_Anmerkungen.nNotePanelWidth, MY_Anmerkungen.nNotePanelHeight)
-		  :drag(true):drag(0,0,MY_Anmerkungen.nNotePanelWidth, 25)
-		  :anchor(MY_Anmerkungen.anchorNotePanel)
-		-- background
-		ui:append("Image_Bg", "Image"):item("#Image_Bg"):pos(0,0)
-		  :size(MY_Anmerkungen.nNotePanelWidth, MY_Anmerkungen.nNotePanelHeight)
-		  :image("UI/Image/Minimap/Mapmark.UITex", 77):raw(1):SetImageType(10)
-		-- title
-		ui:append("Text_Title", "Text"):item("#Text_Title"):pos(10,0):size(MY_Anmerkungen.nNotePanelWidth, 25)
+		  :drag(true):drag(0,0,MY_Anmerkungen.nNotePanelWidth, 30)
 		  :text(_L['my anmerkungen'])
+		  :anchor(MY_Anmerkungen.anchorNotePanel)
 		-- input box
 		ui:append("WndEditBox_Anmerkungen", "WndEditBox"):children("#WndEditBox_Anmerkungen")
-		  :pos(0, 25):size(MY_Anmerkungen.nNotePanelWidth, MY_Anmerkungen.nNotePanelHeight - 25)
+		  :pos(0, 0):size(MY_Anmerkungen.nNotePanelWidth, MY_Anmerkungen.nNotePanelHeight - 30)
 		  :multiLine(true):text(MY_Anmerkungen.szNotePanelContent)
 		  :change(function(txt) MY_Anmerkungen.szNotePanelContent = txt end)
 		  
-		MY.UI.RegisterUIEvent(ui:raw(1), "OnFrameDragEnd", function()
+		ui:onuievent("OnFrameDragEnd", function()
 			MY_Anmerkungen.anchorNotePanel = MY.UI("Normal/MY_Anmerkungen_NotePanel"):anchor()
 		end)
 	end
@@ -67,7 +61,7 @@ end
 MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
 	local note = MY_Anmerkungen.GetPlayerNote(dwID) or {}
 	-- frame
-	local ui = MY.UI.CreateFrame("MY_Anmerkungen_PlayerNoteEdit_"..(dwID or 0), MY.Const.UI.Frame.NORMAL)
+	local ui = MY.UI.CreateFrame("MY_Anmerkungen_PlayerNoteEdit_"..(dwID or 0))
 	local CloseFrame = function(ui)
 		MY.RegisterEsc('MY_Anmerkungen_PlayerNoteEditPanel')
 		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)

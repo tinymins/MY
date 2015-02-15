@@ -4,7 +4,7 @@
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-02-09 15:16:47
+-- @Last Modified time: 2015-02-15 17:08:07
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = {}
@@ -14,7 +14,7 @@ MY_ToolBox.bFriendHeadTip = false
 RegisterCustomData("MY_ToolBox.bFriendHeadTip")
 _C.FriendHeadTip = function(bEnable)
 	if bEnable then
-		local frm = MY.UI.CreateFrame("MY_Shadow", MY.Const.UI.Frame.LOWEST_EMPTY):show()
+		local frm = MY.UI.CreateFrame("MY_Shadow", {level = 'Lowest2', empty = true}):show()
 		local fnPlayerEnter = function(dwID)
 			local p = MY.Player.GetFriend(dwID)
 			if p then

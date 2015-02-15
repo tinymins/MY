@@ -125,7 +125,7 @@ MY_InfoTip.Reload = function()
         local frm = MY.UI('Normal/MY_InfoTip_'..id)
         if cfg.bEnable then
             if frm:count()==0 then
-                frm = MY.UI.CreateFrame('MY_InfoTip_'..id, MY.Const.UI.Frame.NORMAL_EMPTY):size(220,30):onevent("UI_SCALED", function()
+                frm = MY.UI.CreateFrame('MY_InfoTip_'..id, {empty = true}):size(220,30):onevent("UI_SCALED", function()
                     MY.UI(this):anchor(cfg.anchor)
                 end):customMode(cache.title, function(anchor)
                     MY.UI(this):bringToTop()
