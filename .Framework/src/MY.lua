@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-10 15:07:35
+-- @Last Modified time: 2015-02-15 15:50:50
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -789,6 +789,12 @@ if _MY.nDebugLevel <3 then
 		print(arg0)
 		OutputMessage("MSG_SYS", arg0)
 	end)
+	TraceButton_AppendAddonMenu({{
+		szOption = "ReloadUIAddon",
+		fnAction = function()
+			ReloadUIAddon()
+		end,
+	}})
 end
 
 MY.RegisterEvent("LOADING_END", _MY.Init)
