@@ -413,7 +413,7 @@ _MY_ChatMonitor.Init = function()
     _MY_ChatMonitor.RegisterMsgMonitor()
 
     -- create tip frame
-    _MY_ChatMonitor.uiFrame = MY.UI.CreateFrame('MY_ChatMonitor', MY.Const.UI.Frame.TOPMOST_EMPTY)
+    _MY_ChatMonitor.uiFrame = MY.UI.CreateFrame('MY_ChatMonitor', {level = 'Topmost', empty = true})
       :size(250,150)
       :toggle(false)
       :onevent("UI_SCALED", function() -- 移动提示窗位置
