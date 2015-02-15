@@ -195,7 +195,7 @@ MYDev_Snaplines.ReloadUI = function()
         return
     end
     
-    _Cache.muFrm = MY.UI.CreateFrame('MYDev_Snaplines', MY.Const.UI.Frame.TOPMOST2_EMPTY)
+    _Cache.muFrm = MY.UI.CreateFrame('MYDev_Snaplines', { level = 'Topmost2', empty = true })
     local ui = _Cache.muFrm
     local W, H = Station.GetClientSize()
     ui:size(W, H)

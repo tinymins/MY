@@ -137,7 +137,7 @@ MY_BuffMonitor.ReloadBuffMonitor = function()
     -- check if enable
     if MY_BuffMonitor.bSelfOn then
         -- create frame
-        local ui = MY.UI.CreateFrame("MY_BuffMonitor_Self", MY.Const.UI.Frame.NORMAL_EMPTY)
+        local ui = MY.UI.CreateFrame("MY_BuffMonitor_Self", {empty = true})
         -- draw boxes
         local nCount = 0
         for _, mon in ipairs(MY_BuffMonitor.tBuffList[dwKungFuID].Self) do
@@ -183,7 +183,7 @@ MY_BuffMonitor.ReloadBuffMonitor = function()
     end
     if MY_BuffMonitor.bTargetOn then
         -- create frame
-        local ui = MY.UI.CreateFrame("MY_BuffMonitor_Target", MY.Const.UI.Frame.NORMAL_EMPTY)
+        local ui = MY.UI.CreateFrame("MY_BuffMonitor_Target", {empty = true})
         -- draw boxes
         local nCount = 0
         for _, mon in ipairs(MY_BuffMonitor.tBuffList[dwKungFuID].Target) do

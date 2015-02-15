@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-15 15:57:51
+-- @Last Modified time: 2015-02-15 17:10:23
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -1799,6 +1799,14 @@ function _MY.UI:size(nWidth, nHeight)
 				local frm = ele.frm
 				local hnd = frm:Lookup("", "")
 				if frm.simple then
+					frm:Lookup('Btn_Close'):SetRelPos(nWidth - 25, 4)
+					frm:Lookup('', 'Text_Title'):SetSize(nWidth, 30)
+					frm:Lookup('', 'Image_Title'):SetSize(nWidth, 30)
+					frm:Lookup('', 'Image_Default'):SetSize(nWidth, nHeight)
+					frm:SetSize(nWidth, nHeight)
+					frm:SetDragArea(0, 0, nWidth, 30)
+					hnd:SetSize(nWidth, nHeight)
+					ele.wnd:SetSize(nWidth, nHeight - 30)
 				elseif frm.intact then
 					-- fix size
 					if nWidth  < 132 then nWidth  = 132 end
@@ -2466,26 +2474,6 @@ MY.Const.UI.Tip.NO_HIDE      = 100
 MY.Const.UI.Tip.HIDE         = 101
 MY.Const.UI.Tip.ANIMATE_HIDE = 102
 
-MY.Const.UI.Frame = MY.Const.UI.Frame or {}
-MY.Const.UI.Frame.LOWEST        = 1
-MY.Const.UI.Frame.LOWEST_EMPTY  = 2
-MY.Const.UI.Frame.LOWEST1       = 3
-MY.Const.UI.Frame.LOWEST1_EMPTY = 4
-MY.Const.UI.Frame.LOWEST2       = 5
-MY.Const.UI.Frame.LOWEST2_EMPTY = 6
-MY.Const.UI.Frame.NORMAL        = 7
-MY.Const.UI.Frame.NORMAL_EMPTY  = 8
-MY.Const.UI.Frame.NORMAL1       = 9
-MY.Const.UI.Frame.NORMAL1_EMPTY = 10
-MY.Const.UI.Frame.NORMAL2       = 11
-MY.Const.UI.Frame.NORMAL2_EMPTY = 12
-MY.Const.UI.Frame.TOPMOST       = 13
-MY.Const.UI.Frame.TOPMOST_EMPTY = 14
-MY.Const.UI.Frame.TOPMOST1      = 15
-MY.Const.UI.Frame.TOPMOST1_EMPTY= 16
-MY.Const.UI.Frame.TOPMOST2      = 17
-MY.Const.UI.Frame.TOPMOST2_EMPTY= 18
-
 -- 设置元表，这样可以当作函数调用，其效果相当于 MY.UI.Fetch
 setmetatable(MY.UI, { __call = function(me, ...) return me.Fetch(...) end, __metatable = true })
 
@@ -2518,95 +2506,48 @@ MY.UI.RegisterUIEvent = function(raw, szEvent, fnEvent)
 	end
 end
 
+---------------------------------------------------
 -- create new frame
-MY.UI.CreateFrame = function(szName, nStyle)
-	-- 判断是不是空窗体
-	local bEmpty
-	nStyle = nStyle or MY.Const.UI.Frame.NORMAL
-	if nStyle == MY.Const.UI.Frame.LOWEST or
-	nStyle == MY.Const.UI.Frame.LOWEST1 or
-	nStyle == MY.Const.UI.Frame.LOWEST2 or
-	nStyle == MY.Const.UI.Frame.NORMAL or
-	nStyle == MY.Const.UI.Frame.NORMAL1 or
-	nStyle == MY.Const.UI.Frame.NORMAL2 or
-	nStyle == MY.Const.UI.Frame.TOPMOST or
-	nStyle == MY.Const.UI.Frame.TOPMOST1 or
-	nStyle == MY.Const.UI.Frame.TOPMOST2 then
-		bEmpty = false
-	elseif nStyle == MY.Const.UI.Frame.LOWEST_EMPTY or
-	nStyle == MY.Const.UI.Frame.LOWEST1_EMPTY or
-	nStyle == MY.Const.UI.Frame.LOWEST2_EMPTY or
-	nStyle == MY.Const.UI.Frame.NORMAL_EMPTY or
-	nStyle == MY.Const.UI.Frame.NORMAL1_EMPTY or
-	nStyle == MY.Const.UI.Frame.NORMAL2_EMPTY or
-	nStyle == MY.Const.UI.Frame.TOPMOST_EMPTY or
-	nStyle == MY.Const.UI.Frame.TOPMOST1_EMPTY or
-	nStyle == MY.Const.UI.Frame.TOPMOST2_EMPTY then
-		bEmpty = true
-	else
-		return
+-- (ui) MY.UI.CreateFrame(string szName, table opt)
+-- @param string szName: the ID of frame
+-- @param table  opt   : options
+---------------------------------------------------
+MY.UI.CreateFrame = function(szName, opt)
+	if type(opt) ~= 'table' then
+		opt = {}
+	end
+	if not (
+		opt.level == 'Normal'  or opt.level == 'Lowest'  or opt.level == 'Topmost'  or
+		opt.level == 'Normal1' or opt.level == 'Lowest1' or opt.level == 'Topmost1' or
+		opt.level == 'Normal2' or opt.level == 'Lowest2' or opt.level == 'Topmost2'
+	) then
+		opt.level = "Normal"
+	end
+	-- calc ini file path
+	local szIniFile = MY.GetAddonInfo().szFrameworkRoot .. "ui\\WndFrame.ini"
+	if opt.simple then
+		szIniFile = MY.GetAddonInfo().szFrameworkRoot .. "ui\\WndFrameSimple.ini"
+	elseif opt.empty then
+		szIniFile = MY.GetAddonInfo().szFrameworkRoot .. "ui\\WndFrameEmpty.ini"
 	end
 	
-	-- 加载对应窗体文件
-	local szIniFile
-	if bEmpty then
-		szIniFile = MY.GetAddonInfo().szFrameworkRoot.."ui\\WndFrameEmpty.ini"
-	else
-		szIniFile = MY.GetAddonInfo().szFrameworkRoot.."ui\\WndFrame.ini"
+	-- close and reopen exist frame
+	local frm = Station.Lookup(opt.level .. '/' .. szName)
+	if frm then
+		Wnd.CloseWindow(frm)
 	end
-	
-	-- 关闭已有窗口
-	local frm
-	if type(szName) == "string" then
-		if nStyle == MY.Const.UI.Frame.LOWEST or nStyle == MY.Const.UI.Frame.LOWEST_EMPTY then
-			frm = Station.Lookup('Lowest/' .. szName)
-		elseif nStyle == MY.Const.UI.Frame.LOWEST1 or nStyle == MY.Const.UI.Frame.LOWEST1_EMPTY then
-			frm = Station.Lookup('Lowest1/' .. szName)
-		elseif nStyle == MY.Const.UI.Frame.LOWEST2 or nStyle == MY.Const.UI.Frame.LOWEST2_EMPTY then
-			frm = Station.Lookup('Lowest2/' .. szName)
-		elseif nStyle == MY.Const.UI.Frame.NORMAL or nStyle == MY.Const.UI.Frame.NORMAL_EMPTY then
-			frm = Station.Lookup('Normal/' .. szName)
-		elseif nStyle == MY.Const.UI.Frame.NORMAL1 or nStyle == MY.Const.UI.Frame.NORMAL1_EMPTY then
-			frm = Station.Lookup('Normal1/' .. szName)
-		elseif nStyle == MY.Const.UI.Frame.NORMAL2 or nStyle == MY.Const.UI.Frame.NORMAL2_EMPTY then
-			frm = Station.Lookup('Normal2/' .. szName)
-		elseif nStyle == MY.Const.UI.Frame.TOPMOST or nStyle == MY.Const.UI.Frame.TOPMOST_EMPTY then
-			frm = Station.Lookup('Topmost/' .. szName)
-		elseif nStyle == MY.Const.UI.Frame.TOPMOST1 or nStyle == MY.Const.UI.Frame.TOPMOST1_EMPTY then
-			frm = Station.Lookup('Topmost1/' .. szName)
-		elseif nStyle == MY.Const.UI.Frame.TOPMOST2 or nStyle == MY.Const.UI.Frame.TOPMOST2_EMPTY then
-			frm = Station.Lookup('Topmost2/' .. szName)
-		end
-		if frm then
-			Wnd.CloseWindow(frm)
-		end
-		frm = Wnd.OpenWindow(szIniFile, szName)
-	else
-		frm = Wnd.OpenWindow(szIniFile)
-	end
-	if nStyle == MY.Const.UI.Frame.LOWEST or nStyle == MY.Const.UI.Frame.LOWEST_EMPTY then
-		frm:ChangeRelation('Lowest')
-	elseif nStyle == MY.Const.UI.Frame.LOWEST1 or nStyle == MY.Const.UI.Frame.LOWEST1_EMPTY then
-		frm:ChangeRelation('Lowest1')
-	elseif nStyle == MY.Const.UI.Frame.LOWEST2 or nStyle == MY.Const.UI.Frame.LOWEST2_EMPTY then
-		frm:ChangeRelation('Lowest2')
-	elseif nStyle == MY.Const.UI.Frame.NORMAL or nStyle == MY.Const.UI.Frame.NORMAL_EMPTY then
-		frm:ChangeRelation('Normal')
-	elseif nStyle == MY.Const.UI.Frame.NORMAL1 or nStyle == MY.Const.UI.Frame.NORMAL1_EMPTY then
-		frm:ChangeRelation('Normal1')
-	elseif nStyle == MY.Const.UI.Frame.NORMAL2 or nStyle == MY.Const.UI.Frame.NORMAL2_EMPTY then
-		frm:ChangeRelation('Normal2')
-	elseif nStyle == MY.Const.UI.Frame.TOPMOST or nStyle == MY.Const.UI.Frame.TOPMOST_EMPTY then
-		frm:ChangeRelation('Topmost')
-	elseif nStyle == MY.Const.UI.Frame.TOPMOST1 or nStyle == MY.Const.UI.Frame.TOPMOST1_EMPTY then
-		frm:ChangeRelation('Topmost1')
-	elseif nStyle == MY.Const.UI.Frame.TOPMOST2 or nStyle == MY.Const.UI.Frame.TOPMOST2_EMPTY then
-		frm:ChangeRelation('Topmost2')
-	end
+	frm = Wnd.OpenWindow(szIniFile, szName)
+	frm:ChangeRelation(opt.level)
 	frm:Show()
-	if nStyle == MY.Const.UI.Frame.NORMAL or
-	nStyle == MY.Const.UI.Frame.LOWEST or
-	nStyle == MY.Const.UI.Frame.TOPMOST then
+	
+	-- init frame
+	if opt.simple then
+		frm.simple = true
+		if not opt.close then
+			frm:Lookup('Btn_Close'):Hide()
+		end
+	elseif not opt.empty then
+		frm.intact = true
 		frm:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
 		frm:Lookup("Btn_Close").OnLButtonClick = function()
 			if frm.OnCloseButtonClick then
@@ -2631,6 +2572,7 @@ MY.UI.CreateFrame = function(szName, nStyle)
 	end
 	return MY.UI(frm)
 end
+
 -- 打开取色板
 MY.UI.OpenColorPicker = function(callback, t)
 	OpenColorTablePanel(callback,nil,nil,t)
@@ -2648,7 +2590,7 @@ end
 MY.UI.OpenFontPicker = function(callback, t)
 	local clientW, clientH = Station.GetClientSize()
 	local w, h = 820, 650
-	local ui = MY.UI.CreateFrame("_MY_Color_Picker", MY.Const.UI.Frame.NORMAL_EMPTY):size(w,h):pos((clientW-w)/2,(clientH-h)/2):drag(true):drag(0,0,w,h)
+	local ui = MY.UI.CreateFrame("_MY_Color_Picker", {empty = true}):size(w,h):pos((clientW-w)/2,(clientH-h)/2):drag(true):drag(0,0,w,h)
 	PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 	ui:append('Image_bg',"Image"):item('#Image_bg'):image(MY.GetAddonInfo().szUITexCommon, 5):size(w,h):alpha(150)
 	ui:append("Text_Close", "WndButton"):children("#Text_Close"):pos((w-150)/2, h-30):width(150)
