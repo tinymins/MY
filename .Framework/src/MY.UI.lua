@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-02-06 13:25:51
+-- @Last Modified time: 2015-02-15 15:57:51
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -1795,14 +1795,11 @@ function _MY.UI:size(nWidth, nHeight)
 		for _, ele in pairs(self.eles) do
 			local _nWidth, _nHeight = ele.raw:GetSize()
 			nWidth, nHeight = nWidth or _nWidth, nHeight or _nHeight
-			if ele.frm then
+			if ele.type == 'WndFrame' then
 				local frm = ele.frm
 				local hnd = frm:Lookup("", "")
-				-- empty frame
-				if not ele.wnd then
-					ele.frm:SetSize(nWidth, nHeight)
-					ele.hdl:SetSize(nWidth, nHeight)
-				else
+				if frm.simple then
+				elseif frm.intact then
 					-- fix size
 					if nWidth  < 132 then nWidth  = 132 end
 					if nHeight < 150 then nHeight = 150 end
@@ -1824,42 +1821,49 @@ function _MY.UI:size(nWidth, nHeight)
 					-- reset position
 					local an = GetFrameAnchor(frm)
 					frm:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
+				else
+					ele.frm:SetSize(nWidth, nHeight)
+					ele.hdl:SetSize(nWidth, nHeight)
 				end
-			elseif ele.wnd then
-				pcall(function() ele.wnd:SetSize(nWidth, nHeight) end)
-				pcall(function() ele.hdl:SetSize(nWidth, nHeight) end)
-				pcall(function() ele.txt:SetSize(nWidth, nHeight) end)
-				pcall(function() ele.img:SetSize(nWidth, nHeight) end)
-				pcall(function() ele.edt:SetSize(nWidth-8, nHeight-4) end)
-				pcall(function() ele.hdl:FormatAllItemPos() end)
-			elseif ele.itm then
-				pcall(function() (ele.itm or ele.raw):SetSize(nWidth, nHeight) end)
-				pcall(function() (ele.itm or ele.raw):GetParent():FormatAllItemPos() end)
-				pcall(function() ele.hdl:FormatAllItemPos() end)
-			end
-			if ele.type=="WndCheckBox" then
+			elseif ele.type == "WndCheckBox" then
 				ele.wnd:SetSize(nHeight, nHeight)
 				ele.txt:SetSize(nWidth - nHeight - 1, nHeight)
 				ele.txt:SetRelPos(nHeight + 1, 0)
 				ele.hdl:SetSize(nWidth, nHeight)
 				ele.hdl:FormatAllItemPos()
-			elseif ele.type=="WndComboBox" then
+			elseif ele.type == "WndComboBox" then
 				local w, h= ele.cmb:GetSize()
 				ele.cmb:SetRelPos(nWidth-w-5, math.ceil((nHeight - h)/2))
 				ele.cmb:Lookup("", ""):SetAbsPos(ele.hdl:GetAbsPos())
 				ele.cmb:Lookup("", ""):SetSize(nWidth, nHeight)
-			elseif ele.type=="WndEditComboBox" or ele.type=="WndAutoComplete" then
+				ele.wnd:SetSize(nWidth, nHeight)
+				ele.hdl:SetSize(nWidth, nHeight)
+				ele.img:SetSize(nWidth, nHeight)
+				ele.hdl:FormatAllItemPos()
+			elseif ele.type == "WndEditComboBox" or ele.type == "WndAutoComplete" then
+				ele.wnd:SetSize(nWidth, nHeight)
+				ele.hdl:SetSize(nWidth, nHeight)
+				ele.phd:SetSize(nWidth, nHeight)
+				ele.img:SetSize(nWidth, nHeight)
+				ele.hdl:FormatAllItemPos()
 				local w, h= ele.cmb:GetSize()
 				ele.edt:SetSize(nWidth-10-w, nHeight-4)
 				ele.cmb:SetRelPos(nWidth-w-5, (nHeight-h-1)/2+1)
-			elseif ele.type=="WndRadioBox" then
+			elseif ele.type == "WndRadioBox" then
 				ele.wnd:SetSize(nHeight, nHeight)
 				ele.txt:SetSize(nWidth - nHeight - 1, nHeight)
 				ele.txt:SetRelPos(nHeight + 1, 0)
 				ele.hdl:SetSize(nWidth, nHeight)
 				ele.hdl:FormatAllItemPos()
-			elseif ele.type=="WndEditBox" then
-			elseif ele.type=="Text" then
+			elseif ele.type == "WndEditBox" then
+				ele.wnd:SetSize(nWidth, nHeight)
+				ele.hdl:SetSize(nWidth, nHeight)
+				ele.phd:SetSize(nWidth, nHeight)
+				ele.img:SetSize(nWidth, nHeight)
+				ele.edt:SetSize(nWidth-8, nHeight-4)
+				ele.hdl:FormatAllItemPos()
+			elseif ele.type == "Text" then
+				ele.txt:SetSize(nWidth, nHeight)
 				ele.raw.bAutoSize = false
 			elseif ele.type == "WndListBox" then
 				ele.raw:Lookup('Scroll_Default'):SetRelPos(nWidth - 15, 10)
@@ -1876,6 +1880,17 @@ function _MY.UI:size(nWidth, nHeight)
 					hItem:FormatAllItemPos()
 				end
 				hScroll:FormatAllItemPos()
+			elseif ele.wnd then
+				pcall(function() ele.wnd:SetSize(nWidth, nHeight) end)
+				pcall(function() ele.hdl:SetSize(nWidth, nHeight) end)
+				pcall(function() ele.txt:SetSize(nWidth, nHeight) end)
+				pcall(function() ele.img:SetSize(nWidth, nHeight) end)
+				pcall(function() ele.edt:SetSize(nWidth-8, nHeight-4) end)
+				pcall(function() ele.hdl:FormatAllItemPos() end)
+			elseif ele.itm then
+				pcall(function() (ele.itm or ele.raw):SetSize(nWidth, nHeight) end)
+				pcall(function() (ele.itm or ele.raw):GetParent():FormatAllItemPos() end)
+				pcall(function() ele.hdl:FormatAllItemPos() end)
 			end
 			if ele.sbu then
 				ele.sbu:SetRelPos(nWidth-25, 10)
