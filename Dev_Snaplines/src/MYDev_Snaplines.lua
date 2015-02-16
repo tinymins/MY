@@ -203,24 +203,24 @@ MYDev_Snaplines.ReloadUI = function()
       :breathe(_Cache.OnFrameBreathe)
     
     if MYDev_Snaplines.bShowWndSnaplines then
-        ui:append("Shadow_HoverWndLeft", "Shadow"):item("#Shadow_HoverWndLeft")
+        ui:append("Shadow", "Shadow_HoverWndLeft"):item("#Shadow_HoverWndLeft")
           :size(2, H):pos(0, 0):color(MYDev_Snaplines.rgbWndSnaplines)
-        ui:append("Shadow_HoverWndRight", "Shadow"):item("#Shadow_HoverWndRight")
+        ui:append("Shadow", "Shadow_HoverWndRight"):item("#Shadow_HoverWndRight")
           :size(2, H):pos(W, 0):color(MYDev_Snaplines.rgbWndSnaplines)
-        ui:append("Shadow_HoverWndTop", "Shadow"):item("#Shadow_HoverWndTop")
+        ui:append("Shadow", "Shadow_HoverWndTop"):item("#Shadow_HoverWndTop")
           :size(W, 2):pos(0, 0):color(MYDev_Snaplines.rgbWndSnaplines)
-        ui:append("Shadow_HoverWndBottom", "Shadow"):item("#Shadow_HoverWndBottom")
+        ui:append("Shadow", "Shadow_HoverWndBottom"):item("#Shadow_HoverWndBottom")
           :size(W, 2):pos(0, H):color(MYDev_Snaplines.rgbWndSnaplines)
     end
     
     if MYDev_Snaplines.bShowItemSnaplines then
-        ui:append("Shadow_HoverItemLeft", "Shadow"):item("#Shadow_HoverItemLeft")
+        ui:append("Shadow", "Shadow_HoverItemLeft"):item("#Shadow_HoverItemLeft")
           :size(2, H):pos(0, 0):color(MYDev_Snaplines.rgbItemSnaplines)
-        ui:append("Shadow_HoverItemRight", "Shadow"):item("#Shadow_HoverItemRight")
+        ui:append("Shadow", "Shadow_HoverItemRight"):item("#Shadow_HoverItemRight")
           :size(2, H):pos(W, 0):color(MYDev_Snaplines.rgbItemSnaplines)
-        ui:append("Shadow_HoverItemTop", "Shadow"):item("#Shadow_HoverItemTop")
+        ui:append("Shadow", "Shadow_HoverItemTop"):item("#Shadow_HoverItemTop")
           :size(W, 2):pos(0, 0):color(MYDev_Snaplines.rgbItemSnaplines)
-        ui:append("Shadow_HoverItemBottom", "Shadow"):item("#Shadow_HoverItemBottom")
+        ui:append("Shadow", "Shadow_HoverItemBottom"):item("#Shadow_HoverItemBottom")
           :size(W, 2):pos(0, H):color(MYDev_Snaplines.rgbItemSnaplines)
     end
     
@@ -250,7 +250,7 @@ _Cache.OnPanelActive = function(wnd)
     local w, h = ui:size()
     local x, y = 20, 20
     
-    ui:append("WndCheckBox_ShowTreePath", "WndCheckBox"):children("#WndCheckBox_ShowTreePath")
+    ui:append("WndCheckBox", "WndCheckBox_ShowTreePath"):children("#WndCheckBox_ShowTreePath")
       :pos(x, y):width(300)
       :text(_L['enable tree path view']):check(MYDev_Snaplines.bEnable or false)
       :check(function(bCheck)
@@ -259,7 +259,7 @@ _Cache.OnPanelActive = function(wnd)
     end)
     y = y + 40
     
-    ui:append("WndCheckBox_ShowTip", "WndCheckBox"):children("#WndCheckBox_ShowTip")
+    ui:append("WndCheckBox", "WndCheckBox_ShowTip"):children("#WndCheckBox_ShowTip")
       :pos(x, y):width(200)
       :text(_L['show tip']):check(MYDev_Snaplines.bShowTip or false)
       :check(function(bCheck)
@@ -267,7 +267,7 @@ _Cache.OnPanelActive = function(wnd)
         MYDev_Snaplines.ReloadUI()
     end)
     x = x + 200
-    ui:append("Shadow_TipColor", "Shadow"):item("#Shadow_TipColor"):pos(x, y)
+    ui:append("Shadow", "Shadow_TipColor"):item("#Shadow_TipColor"):pos(x, y)
       :size(20, 20):color(MYDev_Snaplines.rgbTip or {255,255,255})
       :click(function()
         local me = this
@@ -278,7 +278,7 @@ _Cache.OnPanelActive = function(wnd)
         end)
       end)
     x = x + 40
-    ui:append("WndButton_TipFont", "WndButton"):children("#WndButton_TipFont"):pos(x, y)
+    ui:append("WndButton", "WndButton_TipFont"):children("#WndButton_TipFont"):pos(x, y)
       :width(50):text(_L['font'])
       :click(function()
         MY.UI.OpenFontPicker(function(f)
@@ -289,7 +289,7 @@ _Cache.OnPanelActive = function(wnd)
     x = 20
     y = y + 40
     
-    ui:append("WndCheckBox_ShowWndSnaplines", "WndCheckBox"):children("#WndCheckBox_ShowWndSnaplines")
+    ui:append("WndCheckBox", "WndCheckBox_ShowWndSnaplines"):children("#WndCheckBox_ShowWndSnaplines")
       :pos(x, y):width(200)
       :text(_L['show wnd snaplines']):check(MYDev_Snaplines.bShowWndSnaplines or false)
       :check(function(bCheck)
@@ -297,7 +297,7 @@ _Cache.OnPanelActive = function(wnd)
         MYDev_Snaplines.ReloadUI()
     end)
     x = x + 200
-    ui:append("Shadow_WndSnaplinesColor", "Shadow"):item("#Shadow_WndSnaplinesColor"):pos(x, y)
+    ui:append("Shadow", "Shadow_WndSnaplinesColor"):item("#Shadow_WndSnaplinesColor"):pos(x, y)
       :size(20, 20):color(MYDev_Snaplines.rgbWndSnaplines or {255,255,255})
       :click(function()
         local me = this
@@ -310,7 +310,7 @@ _Cache.OnPanelActive = function(wnd)
     x = 20
     y = y + 40
     
-    ui:append("WndCheckBox_ShowItemSnaplines", "WndCheckBox"):children("#WndCheckBox_ShowItemSnaplines")
+    ui:append("WndCheckBox", "WndCheckBox_ShowItemSnaplines"):children("#WndCheckBox_ShowItemSnaplines")
       :pos(x, y):width(200)
       :text(_L['show item snaplines']):check(MYDev_Snaplines.bShowItemSnaplines or false)
       :check(function(bCheck)
@@ -318,7 +318,7 @@ _Cache.OnPanelActive = function(wnd)
         MYDev_Snaplines.ReloadUI()
     end)
     x = x + 200
-    ui:append("Shadow_ItemSnaplinesColor", "Shadow"):item("#Shadow_ItemSnaplinesColor"):pos(x, y)
+    ui:append("Shadow", "Shadow_ItemSnaplinesColor"):item("#Shadow_ItemSnaplinesColor"):pos(x, y)
       :size(20, 20):color(MYDev_Snaplines.rgbItemSnaplines or {255,255,255})
       :click(function()
         local me = this
@@ -331,7 +331,7 @@ _Cache.OnPanelActive = function(wnd)
     x = 20
     y = y + 40
     
-    ui:append("WndCheckBox_AutoDetectBox", "WndCheckBox"):children("#WndCheckBox_AutoDetectBox")
+    ui:append("WndCheckBox", "WndCheckBox_AutoDetectBox"):children("#WndCheckBox_AutoDetectBox")
       :pos(x, y):width(200)
       :text(_L['auto detect box']):check(MYDev_Snaplines.bDetectBox or false)
       :check(function(bCheck)
@@ -339,7 +339,7 @@ _Cache.OnPanelActive = function(wnd)
     end)
     y = y + 40
     
-    ui:append("Text_SetHotkey", "Text"):find("#Text_SetHotkey"):pos(w-140, 20):color(255,255,0)
+    ui:append("Text", "Text_SetHotkey"):find("#Text_SetHotkey"):pos(w-140, 20):color(255,255,0)
       :text(_L['>> set hotkey <<'])
       :click(function() MY.Game.SetHotKey() end)
 end

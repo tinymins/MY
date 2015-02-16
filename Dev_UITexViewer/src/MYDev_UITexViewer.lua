@@ -16,14 +16,14 @@ _Cache.OnPanelActive = function(wnd)
     
     _Cache.tUITexList = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'Dev_UITexViewer/data/data', true) or {}
     
-    local uiBoard = ui:append('WndScrollBox_ImageList','WndScrollBox')
+    local uiBoard = ui:append("WndScrollBox", "WndScrollBox_ImageList")
       :children('#WndScrollBox_ImageList')
       :handleStyle(3):pos(x, y+25):size(w-21, h - 70)
     
-    local uiEdit = ui:append('WndEdit_Copy', 'WndEditBox'):children('#WndEdit_Copy')
+    local uiEdit = ui:append("WndEditBox", "WndEdit_Copy"):children('#WndEdit_Copy')
       :pos(x, h-30):size(w-20, 25):multiLine(true)
     
-    ui:append('WndAutoComplete_UITexPath','WndAutoComplete'):children('#WndAutoComplete_UITexPath')
+    ui:append("WndAutoComplete", "WndAutoComplete_UITexPath"):children('#WndAutoComplete_UITexPath')
       :pos(x, y):size(w-20, 25):text(MYDev_UITexViewer.szUITexPath)
       :change(function(szText)
         local tInfo = KG_Table.Load(szText .. '.txt', {

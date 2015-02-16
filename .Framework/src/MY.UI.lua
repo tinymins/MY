@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-15 17:10:23
+-- @Last Modified time: 2015-02-16 09:22:38
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -643,11 +643,23 @@ _MY.tItemXML = {
 -- append
 -- similar as jQuery.append()
 -- Instance:append(szName, szType, tArg)
+-- Instance:append(szType, tArg)
 -- Instance:append(szItemString)
-function _MY.UI:append(szName, szType, tArg)
+function _MY.UI:append(arg0, arg1, arg2)
 	self:_checksum()
+	local szName, szType, tArg, szXml
+	if type(arg0) == 'string' then
+		if type(arg1) == 'string' then
+			szType, szName, tArg = arg0, arg1, arg2
+		elseif type(arg1) == 'table' then
+			szType, tArg = arg0, arg1
+		elseif #arg0 > 0 then
+			szXml = arg0
+		end
+	end
 	if szType then
 		for _, ele in pairs(self.eles) do
+			local ui
 			if ( (ele.wnd or ele.frm) and ( string.sub(szType, 1, 3) == "Wnd" or string.sub(szType, -4) == ".ini" ) ) then
 				-- append from ini file
 				local szFile = szType
@@ -666,7 +678,9 @@ function _MY.UI:append(szName, szType, tArg)
 					MY.Debug(_L("can not find wnd component [%s]", szType)..'\n', 'MY#UI#append', 2)
 				else
 					wnd.szMyuiType = szType
-					wnd:SetName(szName)
+					if szName then
+						wnd:SetName(szName)
+					end
 					wnd:ChangeRelation((ele.wnd or ele.frm), true, true)
 					if szType == "WndScrollBox" then
 						wnd:Lookup('WndButton_Up').OnLButtonHold = function()
@@ -897,6 +911,7 @@ function _MY.UI:append(szName, szType, tArg)
 							multiSelect = false,
 						}
 					end
+					ui = MY.UI(wnd)
 				end
 				Wnd.CloseWindow(frame)
 			elseif ( string.sub(szType, 1, 3) ~= "Wnd" and ele.hdl ) then
@@ -907,7 +922,9 @@ function _MY.UI:append(szName, szType, tArg)
 					local nCount = ele.hdl:GetItemCount()
 					ele.hdl:AppendItemFromString(szXml)
 					hnd = ele.hdl:Lookup(nCount)
-					if hnd then hnd:SetName(szName) end
+					if hnd and szName then
+						hnd:SetName(szName)
+					end
 				else
 					-- append from ini
 					hnd = ele.hdl:AppendItemFromIni("interface\\MY\\.Framework\\ui\\HandleItems.ini","Handle_" .. szType, szName)
@@ -915,15 +932,29 @@ function _MY.UI:append(szName, szType, tArg)
 				ele.hdl:FormatAllItemPos()
 				if not hnd then
 					return MY.Debug(_L("unable to append handle item [%s]", szType)..'\n','MY#UI:append',2)
+				else
+					ui = MY.UI(hnd)
 				end
 			end
+			if tArg and ui then
+				if tArg.w     then ui:width (tArg.w    ) end
+				if tArg.h     then ui:height(tArg.h    ) end
+				if tArg.x     then ui:left  (tArg.x    ) end
+				if tArg.y     then ui:top   (tArg.y    ) end
+				if tArg.hover then ui:hover (tArg.hover) end
+				if tArg.click then ui:click (tArg.click) end
+				if tArg.alpha then ui:alpha (tArg.alpha) end
+				if tArg.color then ui:color (tArg.color) end
+				if tArg.text  then ui:text  (tArg.text ) end
+				if tArg.tip   then ui:tip   (tArg.tip  ) end
+			end
 		end
-	elseif type(szName) == 'string' and #szName > 0 then
+	elseif szXml then
 		for _, ele in pairs(self.eles) do
 			if ele.hdl then
 				-- append from xml
 				local nCount = ele.hdl:GetItemCount()
-				pcall(function() ele.hdl:AppendItemFromString(szName) end)
+				pcall(function() ele.hdl:AppendItemFromString(szXml) end)
 				local hnd 
 				for i = nCount, ele.hdl:GetItemCount()-1, 1 do
 					hnd = ele.hdl:Lookup(i)
@@ -1802,7 +1833,7 @@ function _MY.UI:size(nWidth, nHeight)
 					frm:Lookup('Btn_Close'):SetRelPos(nWidth - 25, 4)
 					frm:Lookup('', 'Text_Title'):SetSize(nWidth, 30)
 					frm:Lookup('', 'Image_Title'):SetSize(nWidth, 30)
-					frm:Lookup('', 'Image_Default'):SetSize(nWidth, nHeight)
+					frm:Lookup('', 'Shadow_Bg'):SetSize(nWidth, nHeight)
 					frm:SetSize(nWidth, nHeight)
 					frm:SetDragArea(0, 0, nWidth, 30)
 					hnd:SetSize(nWidth, nHeight)
@@ -2543,8 +2574,19 @@ MY.UI.CreateFrame = function(szName, opt)
 	-- init frame
 	if opt.simple then
 		frm.simple = true
+		frm:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
 		if not opt.close then
 			frm:Lookup('Btn_Close'):Hide()
+		else
+			frm:Lookup("Btn_Close").OnLButtonClick = function()
+				if frm.OnCloseButtonClick then
+					local status, res = pcall(frm.OnCloseButtonClick)
+					if status and res then
+						return
+					end
+				end
+				Wnd.CloseWindow(frm)
+			end
 		end
 	elseif not opt.empty then
 		frm.intact = true
@@ -2575,7 +2617,65 @@ end
 
 -- 打开取色板
 MY.UI.OpenColorPicker = function(callback, t)
-	OpenColorTablePanel(callback,nil,nil,t)
+	if t then
+		return OpenColorTablePanel(callback,nil,nil,t)
+	end
+	local ui = MY.UI.CreateFrame("_MY_ColorTable", { simple = true, close = true })
+	  :size(900, 500):text(_L["Color Table Panel"]):anchor({s='CENTER', r='CENTER', x=0, y=0})
+	local fnHover = function(bHover, r, g, b)
+		if bHover then
+			this:SetAlpha(255)
+			ui:item("#Select"):color(r, g, b)
+			ui:item("#Select_Text"):text(string.format("r=%d, g=%d, b=%d", r, g, b))
+		else
+			this:SetAlpha(160)
+			ui:item("#Select"):color(255, 255, 255)
+			ui:item("#Select_Text"):text(g_tStrings.STR_NONE)
+		end
+	end
+	local fnClick = function( ... )
+		if callback then callback( ... ) end
+		if not IsCtrlKeyDown() then
+			ui:remove()
+		end
+	end
+	for nRed = 1, 8 do
+		for nGreen = 1, 8 do
+			for nBlue = 1, 8 do
+				local x = 20 + ((nRed - 1) % 4) * 220 + (nGreen - 1) * 25
+				local y = 10 + math.modf((nRed - 1) / 4) * 220 + (nBlue - 1) * 25
+				local r, g, b  = nRed * 32 - 1, nGreen * 32 - 1, nBlue * 32 - 1
+				ui:append("Shadow", {
+					w = 23, h = 23, x = x, y = y, color = { r, g, b }, alpha = 160,
+					hover = function(bHover)
+						fnHover(bHover, r, g, b)
+					end,
+					click = function()
+						fnClick(r, g, b)
+					end,
+				})
+			end
+		end
+	end
+	
+	for i = 1, 16 do
+		local x = 480 + (i - 1) * 25
+		local y = 435
+		local r, g, b  = i * 16 - 1, i * 16 - 1, i * 16 - 1
+		ui:append("Shadow", {
+			w = 23, h = 23, x = x, y = y, color = { r, g, b }, alpha = 160,
+			hover = function(bHover)
+				fnHover(bHover, r, g, b)
+			end,
+			click = function()
+				fnClick(r, g, b)
+			end,
+		})
+	end
+	ui:append("Select", "Shadow", { w = 25, h = 25, x = 20, y = 435 })
+	ui:append("Select_Text", "Text", { x = 65, y = 435 })
+
+	-- OpenColorTablePanel(callback,nil,nil,t)
 	--  or {
 	--     { r = 0,   g = 255, b = 0  },
 	--     { r = 0,   g = 255, b = 255},
@@ -2586,14 +2686,15 @@ MY.UI.OpenColorPicker = function(callback, t)
 	--     { r = 170, g = 65 , b = 180},
 	-- }
 end
+
 -- 打开字体选择
 MY.UI.OpenFontPicker = function(callback, t)
 	local clientW, clientH = Station.GetClientSize()
 	local w, h = 820, 650
 	local ui = MY.UI.CreateFrame("_MY_Color_Picker", {empty = true}):size(w,h):pos((clientW-w)/2,(clientH-h)/2):drag(true):drag(0,0,w,h)
 	PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
-	ui:append('Image_bg',"Image"):item('#Image_bg'):image(MY.GetAddonInfo().szUITexCommon, 5):size(w,h):alpha(150)
-	ui:append("Text_Close", "WndButton"):children("#Text_Close"):pos((w-150)/2, h-30):width(150)
+	ui:append("Image", "Image_bg"):item('#Image_bg'):image(MY.GetAddonInfo().szUITexCommon, 5):size(w,h):alpha(150)
+	ui:append("WndButton", "Text_Close"):children("#Text_Close"):pos((w-150)/2, h-30):width(150)
 	  :text(_L['close']):click(function() PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame);ui:remove() end)
 	for i = 0, 255 do
 		local txt = ui:append("Text_"..i, "Text"):item("#Text_"..i)
@@ -2650,11 +2751,11 @@ MY.UI.OpenListEditor = function(szFrameName, tTextList, OnAdd, OnDel)
 		end)
 	end
 	local ui = MY.UI.CreateFrame(szFrameName)
-	ui:append("Image_Spliter", "Image"):find("#Image_Spliter"):pos(-10,25):size(360, 10):image("UI/Image/UICommon/Commonpanel.UITex",42)
-	local muEditBox = ui:append("WndEditBox_Keyword", "WndEditBox"):find("#WndEditBox_Keyword"):pos(0,0):size(170, 25)
-	local muList = ui:append("WndScrollBox_KeywordList", "WndScrollBox"):find("#WndScrollBox_KeywordList"):handleStyle(3):pos(0,30):size(340, 380)
+	ui:append("Image", "Image_Spliter"):find("#Image_Spliter"):pos(-10,25):size(360, 10):image("UI/Image/UICommon/Commonpanel.UITex",42)
+	local muEditBox = ui:append("WndEditBox", "WndEditBox_Keyword"):find("#WndEditBox_Keyword"):pos(0,0):size(170, 25)
+	local muList = ui:append("WndScrollBox", "WndScrollBox_KeywordList"):find("#WndScrollBox_KeywordList"):handleStyle(3):pos(0,30):size(340, 380)
 	-- add
-	ui:append("WndButton_Add", "WndButton"):find("#WndButton_Add"):pos(180,0):width(80):text(_L["add"]):click(function()
+	ui:append("WndButton", "WndButton_Add"):find("#WndButton_Add"):pos(180,0):width(80):text(_L["add"]):click(function()
 		local szText = muEditBox:text()
 		-- 加入表
 		if OnAdd then
@@ -2666,7 +2767,7 @@ MY.UI.OpenListEditor = function(szFrameName, tTextList, OnAdd, OnDel)
 		end
 	end)
 	-- del
-	muDel = ui:append("WndButton_Del", "WndButton"):find("#WndButton_Del"):pos(260,0):width(80):text(_L["delete"]):click(function()
+	muDel = ui:append("WndButton", "WndButton_Del"):find("#WndButton_Del"):pos(260,0):width(80):text(_L["delete"]):click(function()
 		muList:hdl(1):children():each(function(ui)
 			if this.Selected then
 				if OnDel then

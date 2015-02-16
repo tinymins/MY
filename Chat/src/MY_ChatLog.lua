@@ -112,7 +112,7 @@ function _C.OnPanelActive(wnd)
 	local x, y = 20, 10
 	
 	_C.uiLog = ui
-	  :append('WndScrollBox_Log','WndScrollBox'):children('#WndScrollBox_Log')
+	  :append("WndScrollBox", "WndScrollBox_Log"):children('#WndScrollBox_Log')
 	  :pos(20, 35):size(w - 21, h - 40):handleStyle(3)
 	
 	for i, szChannel in ipairs({
@@ -121,7 +121,7 @@ function _C.OnPanelActive(wnd)
 		'MSG_TEAM'   ,
 		'MSG_FRIEND' ,
 	}) do
-		ui:append('RadioBox_' .. szChannel, 'WndRadioBox'):children('#RadioBox_' .. szChannel)
+		ui:append('WndRadioBox', 'RadioBox_' .. szChannel):children('#RadioBox_' .. szChannel)
 		  :pos(x + (i - 1) * 100, y):width(90)
 		  :text(g_tStrings.tChannelName[szChannel] or '')
 		  :check(function(bChecked)
@@ -133,7 +133,7 @@ function _C.OnPanelActive(wnd)
 		  :check(Log.Active == szChannel)
 	end
 	
-	ui:append('WndButton_MaxLog', 'WndButton'):children('#WndButton_MaxLog')
+	ui:append("WndButton", "WndButton_MaxLog"):children('#WndButton_MaxLog')
 	  :pos(w - 26 - 120, y - 3):width(120)
 	  :text(_L('Max log: %d', Log.nMax))
 	  :click(function()
@@ -150,7 +150,7 @@ function _C.OnPanelActive(wnd)
 	  	)
 	  end)
 	
-	ui:append('Image_Setting','Image'):item('#Image_Setting')
+	ui:append("Image", "Image_Setting"):item('#Image_Setting')
 	  :pos(w - 26, y - 6):size(30, 30):alpha(200)
 	  :image('UI/Image/UICommon/Commonpanel.UITex',18)
 	  :hover(function(bIn) this:SetAlpha((bIn and 255) or 200) end)
