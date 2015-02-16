@@ -325,7 +325,7 @@ MY_Chat.ReInitUI = function()
 	for _, v in ipairs(_Cache.tChannels) do
 		if MY_Chat.tChannel[v.name] then
 			i = i + 1
-			MY.UI(MY_Chat.frame):append(v.name,"WndRadioBox"):children("#"..v.name)
+			MY.UI(MY_Chat.frame):append("WndRadioBox", v.name):children("#"..v.name)
 			  :pos(i * 30 + 15, 25):width(22)
 			  :font(197):color(v.color)
 			  :text(v.title)
@@ -342,7 +342,7 @@ MY_Chat.ReInitUI = function()
 	
 	if MY_Chat.tChannel.Check_Away then
 		i = i + 1
-		MY.UI(MY_Chat.frame):append("Check_Away","WndCheckBox"):children("#Check_Away"):width(25):text(_L["AWAY"]):pos(i*30+15,25):check(function()
+		MY.UI(MY_Chat.frame):append("WndCheckBox", "Check_Away"):children("#Check_Away"):width(25):text(_L["AWAY"]):pos(i*30+15,25):check(function()
 			MY.SwitchChat("/afk")
 			Station.Lookup("Lowest2/EditBox"):Show()
 			Station.SetFocusWindow("Lowest2/EditBox/Edit_Input")
@@ -353,7 +353,7 @@ MY_Chat.ReInitUI = function()
 	
 	if MY_Chat.tChannel.Check_Busy then
 		i = i + 1
-		MY.UI(MY_Chat.frame):append("Check_Busy","WndCheckBox"):children("#Check_Busy"):width(25):text(_L["BUSY"]):pos(i*30+15,25):check(function()
+		MY.UI(MY_Chat.frame):append("WndCheckBox", "Check_Busy"):children("#Check_Busy"):width(25):text(_L["BUSY"]):pos(i*30+15,25):check(function()
 			MY.SwitchChat("/atr")
 			Station.Lookup("Lowest2/EditBox"):Show()
 			Station.SetFocusWindow("Lowest2/EditBox/Edit_Input")
@@ -489,7 +489,7 @@ MY.RegisterPanel( "MY_Chat_Filter", _L["chat filter"], _L['Chat'], "UI/Image/Com
 	local w, h = ui:size()
 	local x, y = 0, 0
 	
-	ui:append("WndCheckBox_Enable", "WndCheckBox"):children("#WndCheckBox_Enable")
+	ui:append("WndCheckBox", "WndCheckBox_Enable"):children("#WndCheckBox_Enable")
 	  :pos(x, y):width(70)
 	  :text(_L['enable'])
 	  :check(MY_Chat.bBlockWords or false)
@@ -498,10 +498,10 @@ MY.RegisterPanel( "MY_Chat_Filter", _L["chat filter"], _L['Chat'], "UI/Image/Com
 	  end)
 	x = x + 70
 	
-	local edit = ui:append("WndEditBox_Keyword", "WndEditBox"):children("#WndEditBox_Keyword"):pos(x, y):size(w - 160 - x, 25)
+	local edit = ui:append("WndEditBox", "WndEditBox_Keyword"):children("#WndEditBox_Keyword"):pos(x, y):size(w - 160 - x, 25)
 	x, y = 0, y + 30
 	
-	local list = ui:append('WndListBox_1', 'WndListBox'):children('#WndListBox_1'):pos(x, y):size(w, h - 30)
+	local list = ui:append("WndListBox", "WndListBox_1"):children('#WndListBox_1'):pos(x, y):size(w, h - 30)
 	-- ³õÊ¼»¯list¿Ø¼þ
 	for _, v in ipairs(MY_Chat.tBlockWords) do
 		list:listbox('insert', v, v)
@@ -520,7 +520,7 @@ MY.RegisterPanel( "MY_Chat_Filter", _L["chat filter"], _L['Chat'], "UI/Image/Com
 		}}
 	end)
 	-- add
-	ui:append("WndButton_Add", "WndButton"):children("#WndButton_Add")
+	ui:append("WndButton", "WndButton_Add"):children("#WndButton_Add")
 	  :pos(w - 160, 0):width(80)
 	  :text(_L["add"])
 	  :click(function()
@@ -543,7 +543,7 @@ MY.RegisterPanel( "MY_Chat_Filter", _L["chat filter"], _L['Chat'], "UI/Image/Com
 	  	list:listbox('insert', szText, szText)
 	  end)
 	-- del
-	ui:append("WndButton_Del", "WndButton"):children("#WndButton_Del")
+	ui:append("WndButton", "WndButton_Del"):children("#WndButton_Del")
 	  :pos(w - 80, 0):width(80)
 	  :text(_L["delete"])
 	  :click(function()

@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-25 12:31:03
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-02-15 17:06:41
+-- @Last Modified time: 2015-02-16 09:21:20
 -----------------------------------------------
 -- #######################################################################################################
 --   * * *         *                 *                     *                   *           *         
@@ -47,7 +47,7 @@ MY_Anmerkungen.ReloadNotePanel = function()
 		  :text(_L['my anmerkungen'])
 		  :anchor(MY_Anmerkungen.anchorNotePanel)
 		-- input box
-		ui:append("WndEditBox_Anmerkungen", "WndEditBox"):children("#WndEditBox_Anmerkungen")
+		ui:append("WndEditBox", "WndEditBox_Anmerkungen"):children("#WndEditBox_Anmerkungen")
 		  :pos(0, 0):size(MY_Anmerkungen.nNotePanelWidth, MY_Anmerkungen.nNotePanelHeight - 30)
 		  :multiLine(true):text(MY_Anmerkungen.szNotePanelContent)
 		  :change(function(txt) MY_Anmerkungen.szNotePanelContent = txt end)
@@ -90,10 +90,10 @@ MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
 	-- title
 	ui:text(_L['my anmerkungen - player note edit'])
 	-- id
-	ui:append("Label_ID", "Text"):item("#Label_ID"):pos(x, y)
+	ui:append("Text", "Label_ID"):item("#Label_ID"):pos(x, y)
 	  :text(_L['ID:'])
 	-- id input
-	ui:append("WndEditBox_ID", "WndEditBox"):children("#WndEditBox_ID"):pos(x + 60, y)
+	ui:append("WndEditBox", "WndEditBox_ID"):children("#WndEditBox_ID"):pos(x + 60, y)
 	  :size(200, 25):multiLine(false):enable(false):color(200,200,200)
 	  :text(dwID or note.dwID or "")
 	  -- :change(function(dwID)
@@ -111,10 +111,10 @@ MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
 	  --   end
 	  -- end)
 	-- name
-	ui:append("Label_Name", "Text"):item("#Label_Name"):pos(x, y + 30)
+	ui:append("Text", "Label_Name"):item("#Label_Name"):pos(x, y + 30)
 	  :text(_L['Name:'])
 	-- name input
-	ui:append("WndEditBox_Name", "WndEditBox"):children("#WndEditBox_Name"):pos(x + 60, y + 30)
+	ui:append("WndEditBox", "WndEditBox_Name"):children("#WndEditBox_Name"):pos(x + 60, y + 30)
 	  :size(200, 25):multiLine(false):text(szName or note.szName or "")
 	  :change(function(szName)
 	  	local rec = MY_Anmerkungen.GetPlayerNote(szName)
@@ -142,22 +142,22 @@ MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
 	  	end
 	  end)
 	-- content
-	ui:append("Label_Content", "Text"):item("#Label_Content"):pos(x, y + 60)
+	ui:append("Text", "Label_Content"):item("#Label_Content"):pos(x, y + 60)
 	  :text(_L['Content:'])
 	-- content input
-	ui:append("WndEditBox_Content", "WndEditBox"):children("#WndEditBox_Content")
+	ui:append("WndEditBox", "WndEditBox_Content"):children("#WndEditBox_Content")
 	  :pos(x + 60, y + 60):size(200, 80)
 	  :multiLine(true):text(note.szContent or "")
 	-- alert when group
-	ui:append("WndCheckBox_AlertWhenGroup", "WndCheckBox"):children("#WndCheckBox_AlertWhenGroup")
+	ui:append("WndCheckBox", "WndCheckBox_AlertWhenGroup"):children("#WndCheckBox_AlertWhenGroup")
 	  :pos(x + 58, y + 140):width(200)
 	  :text(_L['alert when group']):check(note.bAlertWhenGroup or false)
 	-- tip when group
-	ui:append("WndCheckBox_TipWhenGroup", "WndCheckBox"):children("#WndCheckBox_TipWhenGroup")
+	ui:append("WndCheckBox", "WndCheckBox_TipWhenGroup"):children("#WndCheckBox_TipWhenGroup")
 	  :pos(x + 58, y + 160):width(200)
 	  :text(_L['tip when group']):check(note.bTipWhenGroup or true)
 	-- submit button
-	ui:append("WndButton_Submit", "WndButton"):children("#WndButton_Submit")
+	ui:append("WndButton", "WndButton_Submit"):children("#WndButton_Submit")
 	  :pos(x + 58, y + 190):width(80)
 	  :text(_L['sure']):click(function()
 	  	MY_Anmerkungen.SetPlayerNote(
@@ -170,11 +170,11 @@ MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
 	  	CloseFrame(ui)
 	  end)
 	-- cancel button
-	ui:append("WndButton_Cancel", "WndButton"):children("#WndButton_Cancel")
+	ui:append("WndButton", "WndButton_Cancel"):children("#WndButton_Cancel")
 	  :pos(x + 143, y + 190):width(80)
 	  :text(_L['cancel']):click(function() CloseFrame(ui) end)
 	-- delete button
-	ui:append("Text_Delete", "Text"):item("#Text_Delete")
+	ui:append("Text", "Text_Delete"):item("#Text_Delete")
 	  :pos(x + 230, y + 188):width(80):alpha(200)
 	  :text(_L['delete']):color(255,0,0):hover(function(bIn) MY.UI(this):alpha((bIn and 255) or 200) end)
 	  :click(function()
@@ -312,7 +312,7 @@ MY.RegisterPanel( "MY_Anmerkungen_Player_Note", _L["player note"], _L['Target'],
 	local w, h = ui:size()
 	local x, y = 0, 0
 
-	local list = ui:append('WndListBox_1', 'WndListBox'):children('#WndListBox_1')
+	local list = ui:append("WndListBox", "WndListBox_1"):children('#WndListBox_1')
 	  :pos(x, y)
 	  :size(w, h)
 	  :listbox('onlclick', function(szText, szID, data, bSelected)

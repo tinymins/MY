@@ -207,10 +207,10 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
     local w, h = ui:size()
     
-    ui:append('Label_KeyWord','Text'):find('#Label_KeyWord')
+    ui:append("Text", "Label_KeyWord"):find('#Label_KeyWord')
       :pos(22,15):size(100,25):text(_L['key words:'])
     
-    ui:append('WndAutoComplete_KeyWord','WndAutoComplete'):children('#WndAutoComplete_KeyWord')
+    ui:append("WndAutoComplete", "WndAutoComplete_KeyWord"):children('#WndAutoComplete_KeyWord')
       :pos(80,15):size(w-226,25):text(MY_ChatMonitor.szKeyWords)
       :change(function(szText) MY_ChatMonitor.szKeyWords = szText end)
       :click(function(nButton, raw)
@@ -254,7 +254,7 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
         MY.SaveLUAData(_MY_ChatMonitor.szLuaData, t)
     end)
 
-    ui:append('Image_Help','Image'):find('#Image_Help')
+    ui:append("Image", "Image_Help"):find('#Image_Help')
       :image('UI/Image/UICommon/Commonpanel2.UITex',48)
       :pos(8,10):size(25,25)
       :hover(function(bIn) this:SetAlpha( (bIn and 255 ) or 180) end)
@@ -265,7 +265,7 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
         OutputTip(szText, 450, {x, y, w, h})
     end):alpha(180)
     
-    ui:append('Image_Setting','Image'):find('#Image_Setting'):pos(w-26,13):image('UI/Image/UICommon/Commonpanel.UITex',18):size(30,30):alpha(200):hover(function(bIn) this:SetAlpha((bIn and 255) or 200) end):click(function()
+    ui:append("Image", "Image_Setting"):find('#Image_Setting'):pos(w-26,13):image('UI/Image/UICommon/Commonpanel.UITex',18):size(30,30):alpha(200):hover(function(bIn) this:SetAlpha((bIn and 255) or 200) end):click(function()
         PopupMenu((function() 
             local t = {}
             for _, cg in ipairs(_MY_ChatMonitor.tChannelGroups) do
@@ -363,7 +363,7 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
         end)())
     end)
 
-    ui:append('Button_ChatMonitor_Switcher','WndButton'):find('#Button_ChatMonitor_Switcher'):pos(w-136,15):width(50):text((MY_ChatMonitor.bCapture and _L['stop']) or _L['start']):click(function()
+    ui:append("WndButton", "Button_ChatMonitor_Switcher"):find('#Button_ChatMonitor_Switcher'):pos(w-136,15):width(50):text((MY_ChatMonitor.bCapture and _L['stop']) or _L['start']):click(function()
         if MY_ChatMonitor.bCapture then
             MY.UI(this):text(_L['start'])
             MY_ChatMonitor.bCapture = false
@@ -373,13 +373,13 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
         end
     end)
     
-    ui:append('Button_Clear','WndButton'):find('#Button_Clear'):pos(w-81,15):width(50):text(_L['clear']):click(function()
+    ui:append("WndButton", "Button_Clear"):find('#Button_Clear'):pos(w-81,15):width(50):text(_L['clear']):click(function()
         _tRecords = {}
         _MY_ChatMonitor.uiBoard:clear()
     end)
     
     _MY_ChatMonitor.uiBoard = ui
-      :append('WndScrollBox_TalkList','WndScrollBox')
+      :append("WndScrollBox", "WndScrollBox_TalkList")
       :children('#WndScrollBox_TalkList')
       :handleStyle(3):pos(20,50):size(w-21, h - 70)
     
@@ -429,7 +429,7 @@ _MY_ChatMonitor.Init = function()
       :anchor(MY_ChatMonitor.anchor)
       
     -- bind animate function
-    _MY_ChatMonitor.uiFrame:append('Image_bg',"Image")
+    _MY_ChatMonitor.uiFrame:append("Image", "Image_bg")
       :find('#Image_bg'):size(250,150)
       :image('UI/Image/Minimap/Minimap2.UITex',8)
       :click(function()
@@ -456,10 +456,10 @@ _MY_ChatMonitor.Init = function()
     end, 10000, 'MY_ChatMonitor_Hide')
 
     -- init tip panel handle
-    _MY_ChatMonitor.uiTipBoard = _MY_ChatMonitor.uiFrame:append('Handle_Tip',"Handle")
+    _MY_ChatMonitor.uiTipBoard = _MY_ChatMonitor.uiFrame:append("Handle", "Handle_Tip")
       :find('#Handle_Tip'):handleStyle(3):pos(10,10):size(230,130)
     -- init welcome word
-    _MY_ChatMonitor.uiTipBoard:append('Text1','Text'):find('#Text1')
+    _MY_ChatMonitor.uiTipBoard:append("Text", "Text1"):find('#Text1')
       :text(_L['welcome to use mingyi chat monitor.'])
     -- show tip
     _MY_ChatMonitor.ShowTip()

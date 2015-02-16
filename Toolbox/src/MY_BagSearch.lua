@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-25 10:40:14
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-02-03 14:21:37
+-- @Last Modified time: 2015-02-16 09:21:21
 -----------------------------------------------
 -- ##################################################################################################
 --             #                         #             #               #                 # # # #     
@@ -51,7 +51,7 @@ _Cache.OnBreathe = function()
                 chk.OnCheckBoxUncheck = function() _Cache.bBagTimeLtd = false end
             end
             chkLtd = MY.UI("Normal/BigBagPanel")
-              :append("CheckBox_TimeLtd", "WndRadioBox"):children("#CheckBox_TimeLtd")
+              :append("WndRadioBox", "CheckBox_TimeLtd"):children("#CheckBox_TimeLtd")
               :text(_L['Time Limited']):size(w + 10, h):pos(nX + w, nY)
               :check(function(bChecked)
                 if bChecked then
@@ -67,7 +67,7 @@ _Cache.OnBreathe = function()
         end
         if not iptKwd then
             iptKwd = MY.UI("Normal/BigBagPanel")
-              :append("WndEditBox_KeyWord", "WndEditBox"):children("#WndEditBox_KeyWord")
+              :append("WndEditBox", "WndEditBox_KeyWord"):children("#WndEditBox_KeyWord")
               :text(_Cache.szBagFilter or ""):size(100,21):pos(60, 30):placeholder(_L['Search'])
               :change(function(txt)
                 _Cache.szBagFilter = txt
@@ -87,7 +87,7 @@ _Cache.OnBreathe = function()
     elseif frmBank then
         if not chkLtd then
             chkLtd = MY.UI("Normal/BigBankPanel")
-              :append("CheckBox_TimeLtd", "WndCheckBox"):children("#CheckBox_TimeLtd")
+              :append("WndCheckBox", "CheckBox_TimeLtd"):children("#CheckBox_TimeLtd")
               :text(_L['Time Limited']):pos(277, 56):check(_Cache.bBankTimeLtd or false)
               :check(function(bChecked)
                 _Cache.bBankTimeLtd = bChecked
@@ -97,7 +97,7 @@ _Cache.OnBreathe = function()
         end
         if not iptKwd then
             iptKwd = MY.UI("Normal/BigBankPanel")
-              :append("WndEditBox_KeyWord", "WndEditBox"):children("#WndEditBox_KeyWord")
+              :append("WndEditBox", "WndEditBox_KeyWord"):children("#WndEditBox_KeyWord")
               :text(_Cache.szBankFilter or ""):size(100,21):pos(280, 80):placeholder(_L['Search'])
               :change(function(txt)
                 _Cache.szBankFilter = txt
@@ -116,7 +116,7 @@ _Cache.OnBreathe = function()
     elseif frmBank then
         if not iptKwd then
             iptKwd = MY.UI("Normal/GuildBankPanel")
-              :append("WndEditBox_KeyWord", "WndEditBox"):children("#WndEditBox_KeyWord")
+              :append("WndEditBox", "WndEditBox_KeyWord"):children("#WndEditBox_KeyWord")
               :text(_Cache.szGuildBankFilter or ""):size(100,21):pos(60, 25):placeholder(_L['Search'])
               :change(function(txt)
                 _Cache.szGuildBankFilter = txt

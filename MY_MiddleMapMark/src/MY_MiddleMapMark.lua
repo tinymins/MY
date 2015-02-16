@@ -5,7 +5,7 @@
 -- @Date  : 2014-12-04 11:51:31
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-02-10 10:16:39
+-- @Last Modified time: 2015-02-16 09:21:19
 -----------------------------------------------
 MY_MiddleMapMark = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_MiddleMapMark/lang/")
@@ -90,7 +90,7 @@ MY_MiddleMapMark.Search = function(szKeyword)
 	
 	local uiHandle = ui:item("#Handle_MY_MMM")
 	if uiHandle:count() == 0 then
-		uiHandle = ui:append('Handle_MY_MMM', 'Handle'):item('#Handle_MY_MMM')
+		uiHandle = ui:append("Handle", "Handle_MY_MMM"):item('#Handle_MY_MMM')
 		  :pos(ui:item('#Handle_Map'):pos())
 	end
 	uiHandle:clear()
@@ -223,7 +223,7 @@ _Cache.OnPanelActive = function(wnd)
 	local x, y = ui:pos()
 	local w, h = ui:size()
 	
-	local list = ui:append('WndListBox_1', 'WndListBox'):children('#WndListBox_1')
+	local list = ui:append("WndListBox", "WndListBox_1"):children('#WndListBox_1')
 	  :pos(20, 35)
 	  :size(w - 32, h - 50)
 	  :listbox('onlclick', function(text, id, data, selected)
@@ -235,12 +235,12 @@ _Cache.OnPanelActive = function(wnd)
 	  	end
 	  end)
 	
-	local muProgress = ui:append('Image_Progress', 'Image'):item('#Image_Progress')
+	local muProgress = ui:append("Image", "Image_Progress"):item('#Image_Progress')
 	  :pos(20, 31)
 	  :size(w - 30, 4)
 	  :image('ui/Image/UICommon/RaidTotal.UITex|45')
 	
-	ui:append('WndEdit_Search', 'WndEditBox'):children('#WndEdit_Search')
+	ui:append("WndEditBox", "WndEdit_Search"):children('#WndEdit_Search')
 	  :pos(18, 10)
 	  :size(w - 26, 25)
 	  :change(function(v)
