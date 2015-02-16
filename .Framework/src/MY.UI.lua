@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-02-16 23:56:45
+-- @Last Modified time: 2015-02-16 23:57:32
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -2672,8 +2672,8 @@ MY.UI.OpenColorPicker = function(callback, t)
 			end,
 		})
 	end
-	ui:append("Shadow" "Select", { w = 25, h = 25, x = 20, y = 435 })
-	ui:append("Text" "Select_Text", { x = 65, y = 435 })
+	ui:append("Shadow", "Select", { w = 25, h = 25, x = 20, y = 435 })
+	ui:append("Text", "Select_Text", { x = 65, y = 435 })
 
 	-- OpenColorTablePanel(callback,nil,nil,t)
 	--  or {
