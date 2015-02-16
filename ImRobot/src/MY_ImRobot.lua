@@ -81,7 +81,7 @@ _Cache.OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
     local w, h = ui:size()
     
-    ui:append("WndCheckBox_EnableRobot", "WndCheckBox"):children("#WndCheckBox_EnableRobot"):pos(20,20)
+    ui:append("WndCheckBox", "WndCheckBox_EnableRobot"):children("#WndCheckBox_EnableRobot"):pos(20,20)
       :text(_L['enable im robot']):check(MY_ImRobot.bEnable or false)
       :check(function(bCheck)
         MY_ImRobot.bEnable = bCheck
@@ -92,7 +92,7 @@ _Cache.OnPanelActive = function(wnd)
         end
     end)
     
-    ui:append("Text_SetHotkey", "Text"):find("#Text_SetHotkey"):pos(w-140, 20):color(255,255,0)
+    ui:append("Text", "Text_SetHotkey"):find("#Text_SetHotkey"):pos(w-140, 20):color(255,255,0)
       :text(_L['>> set hotkey <<'])
       :click(function() MY.Game.SetHotKey() end)
 end

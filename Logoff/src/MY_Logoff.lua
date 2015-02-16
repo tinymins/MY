@@ -117,19 +117,19 @@ _MY_Logoff.OnPanelActive = function(wnd)
 	-- 条件登出
 	local offset = { x = 10, y = 70 }
 	
-	ui:append('Label_ConditionLogoff','Text'):find('#Label_ConditionLogoff')
+	ui:append("Text", "Label_ConditionLogoff"):find('#Label_ConditionLogoff')
 	  :pos(30, 20):text(_L['# condition logoff'])
 	-- <hr />
-	ui:append('Image_ConditionLogoff_Spliter','Image'):find('#Image_ConditionLogoff_Spliter')
+	ui:append("Image", "Image_ConditionLogoff_Spliter"):find('#Image_ConditionLogoff_Spliter')
 	  :pos(5, 43):size(636, 2):image('UI/Image/UICommon/ScienceTreeNode.UITex', 62)
 	
 	--指定目标血量低于指定百分比下线
-	ui:append('WndCheckBox_TargetBloodLessLogOff','WndCheckBox'):children('#WndCheckBox_TargetBloodLessLogOff')
+	ui:append("WndCheckBox", "WndCheckBox_TargetBloodLessLogOff"):children('#WndCheckBox_TargetBloodLessLogOff')
 	  :pos(offset.x+10, offset.y+120):text(_L['while'])
 	  :check(MY_Logoff.bTargetBloodLessLogOff or false)
 	  :check(function(b) MY_Logoff.bTargetBloodLessLogOff = b end)
 	
-	ui:append('WndComboBox_Target', 'WndComboBox'):children('#WndComboBox_Target')
+	ui:append("WndComboBox", "WndComboBox_Target"):children('#WndComboBox_Target')
 	  :pos(offset.x+60, offset.y+120):width(290)
 	  :text((MY_Logoff.dwTargetBloodLessLogOff and MY_Logoff.szTargetBloodLessLogOff..'('..MY_Logoff.dwTargetBloodLessLogOff..')') or _L['[ select a target ]'])
 	  :menu(function()
@@ -161,20 +161,20 @@ _MY_Logoff.OnPanelActive = function(wnd)
 	  	return t
 	  end)
 
-	ui:append('Label_LessThan','Text'):find('#Label_LessThan')
+	ui:append("Text", "Label_LessThan"):find('#Label_LessThan')
 	  :text(_L['life below       %']):pos(offset.x+360,offset.y+120)
-	ui:append('WndEditBox_TargetBloodLess','WndEditBox'):children('#WndEditBox_TargetBloodLess')
+	ui:append("WndEditBox", "WndEditBox_TargetBloodLess"):children('#WndEditBox_TargetBloodLess')
 	  :pos(offset.x+420,offset.y+123):size(30,22)
 	  :text(MY_Logoff.nTargetBloodLessLogOff)
 	  :change(function(txt) MY_Logoff.nTargetBloodLessLogOff = tonumber(txt) or MY_Logoff.nTargetBloodLessLogOff end)
 	
 	-- 指定玩家消失后下线
-	ui:append('WndCheckBox_PlayerLeaveLogOff','WndCheckBox'):children('#WndCheckBox_PlayerLeaveLogOff')
+	ui:append("WndCheckBox", "WndCheckBox_PlayerLeaveLogOff"):children('#WndCheckBox_PlayerLeaveLogOff')
 	  :pos(offset.x+10,offset.y+80):text(_L['while'])
 	  :check(MY_Logoff.bPlayerLeaveLogOff or false)
 	  :check(function(b)MY_Logoff.bPlayerLeaveLogOff=b end)
 	
-	ui:append('WndComboBox_PlayerLeave', 'WndComboBox'):children('#WndComboBox_PlayerLeave')
+	ui:append("WndComboBox", "WndComboBox_PlayerLeave"):children('#WndComboBox_PlayerLeave')
 	  :pos(offset.x+60,offset.y+80):width(290)
 	  :text(_L('%d player(s) selected',Count(MY_Logoff.aPlayerLeaveLogOff)))
 	  :menu(function() 
@@ -223,40 +223,40 @@ _MY_Logoff.OnPanelActive = function(wnd)
 	  	return t
 	end)
 
-	ui:append('Label_PlayerLeaveWhen','Text'):find('#Label_PlayerLeaveWhen')
+	ui:append("Text", "Label_PlayerLeaveWhen"):find('#Label_PlayerLeaveWhen')
 	  :pos(offset.x+360,offset.y+80):text(_L['all disappeared'])
 
 	-- 自身等级到达指定值下线
-	ui:append('WndCheckBox_ClientLevelOverLogOff','WndCheckBox'):children('#WndCheckBox_ClientLevelOverLogOff')
+	ui:append("WndCheckBox", "WndCheckBox_ClientLevelOverLogOff"):children('#WndCheckBox_ClientLevelOverLogOff')
 	  :pos(offset.x+10,offset.y+40)
 	  :text(_L['while client level exceeds'])
 	  :check(MY_Logoff.bClientLevelOverLogOff or false)
 	  :check(function(b)MY_Logoff.bClientLevelOverLogOff=b end)
 	
-	ui:append('WndEditBox_ClientLevelOverLogOff','WndEditBox'):children('#WndEditBox_ClientLevelOverLogOff')
+	ui:append("WndEditBox", "WndEditBox_ClientLevelOverLogOff"):children('#WndEditBox_ClientLevelOverLogOff')
 	  :pos(offset.x+140,offset.y+40):size(30,22)
 	  :text(MY_Logoff.nClientLevelOverLogOff)
 	  :change(function(txt) MY_Logoff.nClientLevelOverLogOff = tonumber(txt) or MY_Logoff.nClientLevelOverLogOff end)
 
 	-- 指定时间后下线
-	ui:append('WndCheckBox_TimeOutLogOff','WndCheckBox'):children('#WndCheckBox_TimeOutLogOff')
+	ui:append("WndCheckBox", "WndCheckBox_TimeOutLogOff"):children('#WndCheckBox_TimeOutLogOff')
 	  :pos(offset.x+10,offset.y):text('')
 	  :check(MY_Logoff.bTimeOutLogOff or false)
 	  :check(function(b)MY_Logoff.bTimeOutLogOff=b end)
 	
-	ui:append('WndEditBox_TimeOutLogOff','WndEditBox'):children('#WndEditBox_TimeOutLogOff')
+	ui:append("WndEditBox", "WndEditBox_TimeOutLogOff"):children('#WndEditBox_TimeOutLogOff')
 	  :pos(offset.x+35,offset.y):size(60,22)
 	  :text(MY_Logoff.nTimeOut)
 	  :change(function(txt) MY_Logoff.nTimeOut = tonumber(txt) or MY_Logoff.nTimeOut end)
 	
-	ui:append('Label_TimeOutWhen','Text'):find('#Label_TimeOutWhen')
+	ui:append("Text", "Label_TimeOutWhen"):find('#Label_TimeOutWhen')
 	  :pos(offset.x+100,offset.y-3):text(_L['second(s) later'])
 
 	-- 符合条件时
-	ui:append('Label_ReturnTo','Text'):find('#Label_ReturnTo')
+	ui:append("Text", "Label_ReturnTo"):find('#Label_ReturnTo')
 	  :pos(offset.x,offset.y+155):text(_L['While it meets any condition below'])
 	
-	ui:append('WndComboBox_ReturnTo', 'WndComboBox'):children('#WndComboBox_ReturnTo')
+	ui:append("WndComboBox", "WndComboBox_ReturnTo"):children('#WndComboBox_ReturnTo')
 	  :pos(offset.x+140,offset.y+160):width(130)
 	  :text(_L['return to role list'])
 	  :menu({{
@@ -273,7 +273,7 @@ _MY_Logoff.OnPanelActive = function(wnd)
 	  	end,
 	  }})
 	
-	ui:append('WndButton_Print','WndButton'):children('#WndButton_Print')
+	ui:append("WndButton", "WndButton_Print"):children('#WndButton_Print')
 	  :pos(offset.x+390,offset.y)
 	  :text(_L['send to ...'])
 	  :menu({
@@ -285,7 +285,7 @@ _MY_Logoff.OnPanelActive = function(wnd)
 	  	{szOption = g_tStrings.tChannelName.MSG_TEAM  , rgb = GetMsgFontColor("MSG_TEAM", true), fnAction = function() MY_Logoff.PrintCurrentCondition(PLAYER_TALK_CHANNEL.RAID) end, fnAutoClose = function() return true end},
 	  })
 	
-	ui:append('WndButton_Switcher','WndButton'):children('#WndButton_Switcher'):text((_MY_Logoff.bStart and _L['cancel']) or _L['start']):pos(offset.x+390,offset.y+165):click(function()
+	ui:append("WndButton", "WndButton_Switcher"):children('#WndButton_Switcher'):text((_MY_Logoff.bStart and _L['cancel']) or _L['start']):pos(offset.x+390,offset.y+165):click(function()
 	  	_MY_Logoff.bStart = not _MY_Logoff.bStart
 	  	if _MY_Logoff.bStart then
 	  		_MY_Logoff.nTimeOutUnixTime = MY_Logoff.nTimeOut + GetCurrentTime()
@@ -298,27 +298,27 @@ _MY_Logoff.OnPanelActive = function(wnd)
 	end)
 
 	-- 快速登出
-	ui:append('Label_ExpressLogoff','Text'):find('#Label_ExpressLogoff')
+	ui:append("Text", "Label_ExpressLogoff"):find('#Label_ExpressLogoff')
 	  :pos(30, 270):text(_L['# express logoff'])
 	-- <hr />
-	ui:append('Image_ExpressLogoff_Spliter','Image'):find('#Image_ExpressLogoff_Spliter')
+	ui:append("Image", "Image_ExpressLogoff_Spliter"):find('#Image_ExpressLogoff_Spliter')
 	  :pos(5, 293):size(636, 1):image('UI/Image/UICommon/ScienceTreeNode.UITex', 62)
 
-	ui:append('WndButton_ReturnToCha','WndButton'):children('#WndButton_ReturnToCha')
+	ui:append("WndButton", "WndButton_ReturnToCha"):children('#WndButton_ReturnToCha')
 	  :pos(20,310):width(120):text(_L['return to role list'])
 	  :click(function()MY_Logoff.LogOffEx(false)end)
-	ui:append('WndButton_ReturnToChaEx','WndButton'):children('#WndButton_ReturnToChaEx')
+	ui:append("WndButton", "WndButton_ReturnToChaEx"):children('#WndButton_ReturnToChaEx')
 	  :pos(145,310):width(170):text(_L['return to role list while not fight'])
 	  :click(function()MY_Logoff.LogOffEx(false,true)end)
 	
-	ui:append('WndButton_ReturnToLogin','WndButton'):children('#WndButton_ReturnToLogin')
+	ui:append("WndButton", "WndButton_ReturnToLogin"):children('#WndButton_ReturnToLogin')
 	  :pos(20,340):width(120):text(_L['return to game login'])
 	  :click(function()MY_Logoff.LogOffEx(true)end)
-	ui:append('WndButton_ReturnToLoginEx','WndButton'):children('#WndButton_ReturnToLoginEx')
+	ui:append("WndButton", "WndButton_ReturnToLoginEx"):children('#WndButton_ReturnToLoginEx')
 	  :pos(145,340):width(170):text(_L['return to game login while not fight'])
 	  :click(function()MY_Logoff.LogOffEx(true,true)end)
 	
-	ui:append('Text_HotKeySet','Text'):find('#Text_HotKeySet')
+	ui:append("Text", "Text_HotKeySet"):find('#Text_HotKeySet')
 	  :pos(330,310):color({255,255,0}):text(_L['* hotkey setting'])
 	  :click(function() MY.Game.SetHotKey() end)
 end

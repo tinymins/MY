@@ -112,7 +112,7 @@ _MY_RollMonitor.OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
     local w, h = ui:size()
     -- 记录模式
-    ui:append('WndCombo_RecordType','WndComboBox'):children('#WndCombo_RecordType')
+    ui:append("WndComboBox", "WndCombo_RecordType"):children('#WndCombo_RecordType')
       :pos(20, 10):width(180):text(_MY_RollMonitor.aMode[MY_RollMonitor.nMode].szName)
       :menu(function()
         local t = {}
@@ -130,7 +130,7 @@ _MY_RollMonitor.OnPanelActive = function(wnd)
         return t
     end)
     -- 清空
-    ui:append('WndButton_Clear','WndButton'):children('#WndButton_Clear')
+    ui:append("WndButton", "WndButton_Clear"):children('#WndButton_Clear')
       :pos(w-176, 10):width(90):text(_L['restart'])
       :lclick(function(nButton)
         MY_RollMonitor.Clear()
@@ -153,7 +153,7 @@ _MY_RollMonitor.OnPanelActive = function(wnd)
         return t
     end):tip(_L['left click to restart, right click to open setting.'], MY.Const.UI.Tip.POS_TOP)
     -- 发布
-    ui:append('WndButton_Publish','WndButton'):children('#WndButton_Publish')
+    ui:append("WndButton", "WndButton_Publish"):children('#WndButton_Publish')
       :pos(w-86, 10):width(80):text(_L['publish'])
       :rmenu(function()
         local t = { {
@@ -195,7 +195,7 @@ _MY_RollMonitor.OnPanelActive = function(wnd)
     end):tip(_L['left click to publish, right click to open setting.'], MY.Const.UI.Tip.POS_TOP, { x = -80 })
     -- 输出板
     _MY_RollMonitor.uiBoard = ui
-      :append('WndScrollBox_Record','WndScrollBox'):children('#WndScrollBox_Record')
+      :append("WndScrollBox", "WndScrollBox_Record"):children('#WndScrollBox_Record')
       :pos(20, 40):size(w-26, h-60):handleStyle(3)
       :text(_L['average score with out pole'])
     

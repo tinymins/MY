@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-02-15 15:50:50
+-- @Last Modified time: 2015-02-16 23:53:42
 -- @Ref: ½è¼ø´óÁ¿º£÷©Ô´Âë @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -651,10 +651,10 @@ MY.SwitchTab = function(szID)
 	if not szID then
 		-- »¶Ó­Ò³
 		local ui = MY.UI(wndMainPanel)
-		ui:append('Image_Adv', 'Image'):item('#Image_Adv'):pos(0, 0):size(557, 278)
+		ui:append("Image", "Image_Adv"):item('#Image_Adv'):pos(0, 0):size(557, 278)
 		  :image(MY.GetAddonInfo().szUITexPoster, 0)
 		
-		local txt = ui:append('Text_Adv', 'Text'):item('#Text_Adv'):pos(10, 300):width(557):font(200)
+		local txt = ui:append("Text", "Text_Adv"):item('#Text_Adv'):pos(10, 300):width(557):font(200)
 		MY.BreatheCall(function()
 			local player = GetClientPlayer()
 			if player then
