@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-17 13:01:59
+-- @Last Modified time: 2015-02-17 13:30:54
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -946,6 +946,7 @@ function _MY.UI:append(arg0, arg1, arg2)
 				if tArg.alpha then ui:alpha (tArg.alpha) end
 				if tArg.color then ui:color (tArg.color) end
 				if tArg.text  then ui:text  (tArg.text ) end
+				if tArg.font  then ui:font  (tArg.font ) end
 				if tArg.tip   then ui:tip   (tArg.tip  ) end
 			end
 		end
@@ -2690,30 +2691,29 @@ end
 
 -- 打开字体选择
 MY.UI.OpenFontPicker = function(callback, t)
-	local clientW, clientH = Station.GetClientSize()
-	local w, h = 820, 650
-	local ui = MY.UI.CreateFrame("_MY_Color_Picker", {empty = true}):size(w,h):pos((clientW-w)/2,(clientH-h)/2):drag(true):drag(0,0,w,h)
-	PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
-	ui:append("Image", "Image_bg"):item('#Image_bg'):image(MY.GetAddonInfo().szUITexCommon, 5):size(w,h):alpha(150)
-	ui:append("WndButton", "Text_Close"):children("#Text_Close"):pos((w-150)/2, h-30):width(150)
-	  :text(_L['close']):click(function() PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame);ui:remove() end)
+	local w, h = 820, 640
+	local ui = MY.UI.CreateFrame("_MY_Color_Picker", { simple = true, close = true })
+	  :size(w, h):text(_L["color picker"]):anchor({s='CENTER', r='CENTER', x=0, y=0})
+	
 	for i = 0, 255 do
-		local txt = ui:append("Text_"..i, "Text"):item("#Text_"..i)
-		  :width(70)
-		  :pos(i % 10 * 80+20, math.floor(i / 10) * 25+20)
-		  :text(_L("Font %d", i))
-		  :font(i):alpha(155)
+		local txt = ui:append("Text", "Text_"..i, {
+			w = 70, x = i % 10 * 80 + 20, y = math.floor(i / 10) * 25,
+			font = i, alpha = 200, text = _L("Font %d", i)
+		}):item("#Text_"..i)
 		  :click(function()
-			pcall(callback,i)
-			PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
-			ui:remove()
+		  	if callback then callback(i) end
+		  	PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
+		  	ui:remove()
 		  end)
 		  :hover(function()
-			MY.UI(this):alpha(255)
+		  	MY.UI(this):alpha(255)
 		  end,function()
-			MY.UI(this):alpha(155)
+		  	MY.UI(this):alpha(200)
 		  end)
-		if txt:font()~=i then txt:remove() end
+		-- remove unexist font
+		if txt:font() ~= i then
+			txt:remove()
+		end
 	end
 end
 -- 打开文本列表编辑器
