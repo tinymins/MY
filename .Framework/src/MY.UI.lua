@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-17 13:32:45
+-- @Last Modified time: 2015-02-17 13:56:00
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -2574,6 +2574,21 @@ MY.UI.CreateFrame = function(szName, opt)
 	frm:Show()
 	
 	-- init frame
+	if opt.esc then
+		MY.RegisterEsc('Frame_Close_' .. szName, function()
+			return true
+		end, function()
+			if frm.OnCloseButtonClick then
+				local status, res = pcall(frm.OnCloseButtonClick)
+				if status and res then
+					return
+				end
+			end
+			Wnd.CloseWindow(frm)
+			PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
+			MY.RegisterEsc('Frame_Close_' .. szName)
+		end)
+	end
 	if opt.simple then
 		frm.simple = true
 		frm:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
@@ -2623,7 +2638,7 @@ MY.UI.OpenColorPicker = function(callback, t)
 	if t then
 		return OpenColorTablePanel(callback,nil,nil,t)
 	end
-	local ui = MY.UI.CreateFrame("_MY_ColorTable", { simple = true, close = true })
+	local ui = MY.UI.CreateFrame("_MY_ColorTable", { simple = true, close = true, esc = true })
 	  :size(900, 500):text(_L["color picker"]):anchor({s='CENTER', r='CENTER', x=0, y=0})
 	local fnHover = function(bHover, r, g, b)
 		if bHover then
@@ -2677,7 +2692,7 @@ MY.UI.OpenColorPicker = function(callback, t)
 	end
 	ui:append("Shadow", "Select", { w = 25, h = 25, x = 20, y = 435 })
 	ui:append("Text", "Select_Text", { x = 65, y = 435 })
-
+	Station.SetFocusWindow(ui:raw(1))
 	-- OpenColorTablePanel(callback,nil,nil,t)
 	--  or {
 	--     { r = 0,   g = 255, b = 0  },
@@ -2693,7 +2708,7 @@ end
 -- 打开字体选择
 MY.UI.OpenFontPicker = function(callback, t)
 	local w, h = 820, 640
-	local ui = MY.UI.CreateFrame("_MY_Color_Picker", { simple = true, close = true })
+	local ui = MY.UI.CreateFrame("_MY_Color_Picker", { simple = true, close = true, esc = true })
 	  :size(w, h):text(_L["color picker"]):anchor({s='CENTER', r='CENTER', x=0, y=0})
 	
 	for i = 0, 255 do
@@ -2702,7 +2717,7 @@ MY.UI.OpenFontPicker = function(callback, t)
 			font = i, alpha = 200, text = _L("Font %d", i)
 		}):item("#Text_"..i)
 		  :click(function()
-		  	if callback then callback(i) end`
+		  	if callback then callback(i) end
 		  	ui:remove()
 		  end)
 		  :hover(function()
@@ -2715,6 +2730,7 @@ MY.UI.OpenFontPicker = function(callback, t)
 			txt:remove()
 		end
 	end
+	Station.SetFocusWindow(ui:raw(1))
 end
 -- 打开文本列表编辑器
 MY.UI.OpenListEditor = function(szFrameName, tTextList, OnAdd, OnDel)
