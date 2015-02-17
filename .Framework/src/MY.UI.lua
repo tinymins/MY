@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-02-17 12:45:19
+-- @Last Modified time: 2015-02-17 13:01:59
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -2622,14 +2622,14 @@ MY.UI.OpenColorPicker = function(callback, t)
 		return OpenColorTablePanel(callback,nil,nil,t)
 	end
 	local ui = MY.UI.CreateFrame("_MY_ColorTable", { simple = true, close = true })
-	  :size(900, 500):text(_L["Color Table Panel"]):anchor({s='CENTER', r='CENTER', x=0, y=0})
+	  :size(900, 500):text(_L["color picker"]):anchor({s='CENTER', r='CENTER', x=0, y=0})
 	local fnHover = function(bHover, r, g, b)
 		if bHover then
 			this:SetAlpha(255)
 			ui:item("#Select"):color(r, g, b)
 			ui:item("#Select_Text"):text(string.format("r=%d, g=%d, b=%d", r, g, b))
 		else
-			this:SetAlpha(160)
+			this:SetAlpha(200)
 			ui:item("#Select"):color(255, 255, 255)
 			ui:item("#Select_Text"):text(g_tStrings.STR_NONE)
 		end
@@ -2647,7 +2647,7 @@ MY.UI.OpenColorPicker = function(callback, t)
 				local y = 10 + math.modf((nRed - 1) / 4) * 220 + (nBlue - 1) * 25
 				local r, g, b  = nRed * 32 - 1, nGreen * 32 - 1, nBlue * 32 - 1
 				ui:append("Shadow", {
-					w = 23, h = 23, x = x, y = y, color = { r, g, b }, alpha = 160,
+					w = 23, h = 23, x = x, y = y, color = { r, g, b }, alpha = 200,
 					hover = function(bHover)
 						fnHover(bHover, r, g, b)
 					end,
@@ -2664,7 +2664,7 @@ MY.UI.OpenColorPicker = function(callback, t)
 		local y = 435
 		local r, g, b  = i * 16 - 1, i * 16 - 1, i * 16 - 1
 		ui:append("Shadow", {
-			w = 23, h = 23, x = x, y = y, color = { r, g, b }, alpha = 160,
+			w = 23, h = 23, x = x, y = y, color = { r, g, b }, alpha = 200,
 			hover = function(bHover)
 				fnHover(bHover, r, g, b)
 			end,
