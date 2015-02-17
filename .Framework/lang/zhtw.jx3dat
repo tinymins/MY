@@ -110,6 +110,7 @@ data = {
     ["can not find wnd component [%s]"] = "找不到窗體組件 [%s]",
     ["unable to append handle item [%s]"] = "無法追加容器組件 [%s]",
     ["unable to append handle item from string."] = "從字符串追加容器組件失敗。",
+    ['color picker'] = '顔色選擇器',
     ['Font %d'] = '字體 %d',
     
     ['author\'s weibo'] = '作者 @一名宅',
