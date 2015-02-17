@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-02-17 13:30:54
+-- @Last Modified time: 2015-02-17 13:32:45
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -2588,6 +2588,7 @@ MY.UI.CreateFrame = function(szName, opt)
 					end
 				end
 				Wnd.CloseWindow(frm)
+				PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 			end
 		end
 	elseif not opt.empty then
@@ -2701,8 +2702,7 @@ MY.UI.OpenFontPicker = function(callback, t)
 			font = i, alpha = 200, text = _L("Font %d", i)
 		}):item("#Text_"..i)
 		  :click(function()
-		  	if callback then callback(i) end
-		  	PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
+		  	if callback then callback(i) end`
 		  	ui:remove()
 		  end)
 		  :hover(function()
