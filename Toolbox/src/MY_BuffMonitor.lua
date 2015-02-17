@@ -142,8 +142,8 @@ MY_BuffMonitor.ReloadBuffMonitor = function()
         local nCount = 0
         for _, mon in ipairs(MY_BuffMonitor.tBuffList[dwKungFuID].Self) do
             if mon.bOn then
-                ui:append("Image_Mask_"..mon.szName, "Image"):item("#Image_Mask_"..mon.szName):pos(52 * nCount,0):size(50, 50):image("UI/Image/Common/Box.UITex", 43)
-                local box = ui:append("Box_"..mon.szName, "Box"):item("#Box_"..mon.szName):pos(52 * nCount + 3, 3):size(44,44):raw(1)
+                ui:append("Image", "Image_Mask_"..mon.szName):item("#Image_Mask_"..mon.szName):pos(52 * nCount,0):size(50, 50):image("UI/Image/Common/Box.UITex", 43)
+                local box = ui:append("Box", "Box_"..mon.szName):item("#Box_"..mon.szName):pos(52 * nCount + 3, 3):size(44,44):raw(1)
                 
                 box:SetObject(1,0)
                 box:SetObjectIcon(mon.dwIconID)
@@ -188,8 +188,8 @@ MY_BuffMonitor.ReloadBuffMonitor = function()
         local nCount = 0
         for _, mon in ipairs(MY_BuffMonitor.tBuffList[dwKungFuID].Target) do
             if mon.bOn then
-                ui:append("Image_Mask_"..mon.szName, "Image"):item("#Image_Mask_"..mon.szName):pos(52 * nCount,0):size(50, 50):image("UI/Image/Common/Box.UITex", 44)
-                local box = ui:append("Box_"..mon.szName, "Box"):item("#Box_"..mon.szName):pos(52 * nCount + 3, 3):size(44,44):raw(1)
+                ui:append("Image", "Image_Mask_"..mon.szName):item("#Image_Mask_"..mon.szName):pos(52 * nCount,0):size(50, 50):image("UI/Image/Common/Box.UITex", 44)
+                local box = ui:append("Box", "Box_"..mon.szName):item("#Box_"..mon.szName):pos(52 * nCount + 3, 3):size(44,44):raw(1)
                 
                 box:SetObject(1,0)
                 box:SetObjectIcon(mon.dwIconID)
