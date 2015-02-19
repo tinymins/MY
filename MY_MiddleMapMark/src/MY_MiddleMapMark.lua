@@ -5,7 +5,7 @@
 -- @Date  : 2014-12-04 11:51:31
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-02-16 09:21:19
+-- @Last Modified time: 2015-02-19 22:04:05
 -----------------------------------------------
 MY_MiddleMapMark = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_MiddleMapMark/lang/")
@@ -119,7 +119,7 @@ MY_MiddleMapMark.Search = function(szKeyword)
 			end
 		end
 		if bMatch then
-			uiHandle:append('Image_Npc_' .. npc.dwID, 'Image'):item('#Image_Npc_' .. npc.dwID)
+			uiHandle:append('Image', 'Image_Npc_' .. npc.dwID):item('#Image_Npc_' .. npc.dwID)
 			  :image('ui/Image/Minimap/MapMark.UITex|95')
 			  :size(13, 13)
 			  :pos(MiddleMap.LPosToHPos(npc.nX, npc.nY, 13, 13))
@@ -146,7 +146,7 @@ MY_MiddleMapMark.Search = function(szKeyword)
 			end
 		end
 		if bMatch then
-			uiHandle:append('Image_Doodad_' .. doodad.dwID, 'Image'):item('#Image_Doodad_' .. doodad.dwID)
+			uiHandle:append('Image', 'Image_Doodad_' .. doodad.dwID):item('#Image_Doodad_' .. doodad.dwID)
 			  :image('ui/Image/Minimap/MapMark.UITex|95')
 			  :size(13, 13)
 			  :pos(MiddleMap.LPosToHPos(doodad.nX, doodad.nY, 13, 13))
