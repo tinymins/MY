@@ -5,7 +5,7 @@
 -- @Date  : 2014-12-04 11:51:31
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-02-19 22:04:05
+-- @Last Modified time: 2015-02-20 12:51:23
 -----------------------------------------------
 MY_MiddleMapMark = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_MiddleMapMark/lang/")
@@ -817,8 +817,8 @@ MY.RegisterEvent("DOODAD_ENTER_SCENE", "MY_MiddleMapMark", function()
 	end
 	_Cache.tMapDataChanged[dwMapID] = true
 end)
+MY.RegisterExit(MY_MiddleMapMark.SaveMapData)
 MY.RegisterEvent('LOADING_END', MY_MiddleMapMark.SaveMapData)
-MY.RegisterEvent('PLAYER_EXIT_GAME', MY_MiddleMapMark.SaveMapData)
 MY.RegisterPanel( "MY_MiddleMapMark", _L["middle map mark"], _L['General'],
 	"ui/Image/MiddleMap/MapWindow2.UITex|4", {255,255,0,200}, {
 		OnPanelActive = _Cache.OnPanelActive
