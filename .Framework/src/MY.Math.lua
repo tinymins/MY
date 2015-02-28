@@ -4,7 +4,7 @@
 -- @Date  : 2015-02-15 09:36:13
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-15 16:01:08
+-- @Last Modified time: 2015-02-28 20:17:53
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 MY = MY or {}
@@ -33,8 +33,10 @@ MY.Math.Number2Bitmap = _C.Number2Bitmap
 -- 将一个Bit表转换成一个数值（低位在前 高位在后）
 _C.Bitmap2Number = function(t)
 	local n = 0
-	for i = 1, #t do
-		n = n + t[i] * (2 ^ (i - 1))
+	for i, v in pairs(t) do
+		if type(i) == 'number' and v and v ~= 0 then
+			n = n + 2 ^ (i - 1)
+		end
 	end
 	return n
 end
