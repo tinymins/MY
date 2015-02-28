@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-02-17 13:56:00
+-- @Last Modified time: 2015-02-28 20:26:04
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -2442,10 +2442,10 @@ function _MY.UI:check(fnCheck, fnUncheck, bNoAutoBind)
 	elseif not fnCheck then
 		-- select the first item
 		local ele = self.eles[1]
-		-- try to get its name
-		local status, err = pcall(function() return ele.chk:IsCheckBoxChecked() end)
-		-- if succeed then return its name
-		if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:check' ,1) return nil end
+		-- try to get its check status
+		if ele and ele.chk then
+			return ele.chk:IsCheckBoxChecked()
+		end
 	else
 		MY.Debug('fnCheck:'..type(fnCheck)..' fnUncheck:'..type(fnUncheck)..'\n', 'ERROR _MY.UI:check' ,1)
 	end
