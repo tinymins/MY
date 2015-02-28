@@ -4,73 +4,88 @@
 -- @Date  : 2015-02-28 17:37:53
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-02-28 18:34:18
+-- @Last Modified time: 2015-03-01 00:08:04
 --------------------------------------------
 local _C = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Dev_UIEventID/lang/")
-local tEventIndex = {
-	{ _L["OnKeyDown"        ], 13 },
-	{ _L["OnKeyUp"          ], 14 },
+_C.tEventIndex = {
+	{ text = _L["OnKeyDown"        ], bit = 13 },
+	{ text = _L["OnKeyUp"          ], bit = 14 },
 
-	{ _L["OnLButtonDown"    ], 1 },
-	{ _L["OnLButtonUp"      ], 3 },
-	{ _L["OnLButtonClick"   ], 5 },
-	{ _L["OnLButtonDbClick" ], 7 },
-	{ _L["OnLButtonDrag"    ], 20 },
+	{ text = _L["OnLButtonDown"    ], bit = 1  },
+	{ text = _L["OnLButtonUp"      ], bit = 3  },
+	{ text = _L["OnLButtonClick"   ], bit = 5  },
+	{ text = _L["OnLButtonDbClick" ], bit = 7  },
+	{ text = _L["OnLButtonDrag"    ], bit = 20 },
 
-	{ _L["OnRButtonDown"    ], 2 },
-	{ _L["OnRButtonUp"      ], 4 },
-	{ _L["OnRButtonClick"   ], 6 },
-	{ _L["OnRButtonDbClick" ], 8 },
-	{ _L["OnRButtonDrag"    ], 19 },
+	{ text = _L["OnRButtonDown"    ], bit = 2  },
+	{ text = _L["OnRButtonUp"      ], bit = 4  },
+	{ text = _L["OnRButtonClick"   ], bit = 6  },
+	{ text = _L["OnRButtonDbClick" ], bit = 8  },
+	{ text = _L["OnRButtonDrag"    ], bit = 19 },
 
-	{ _L["OnMButtonDown"    ], 15 },
-	{ _L["OnMButtonUp"      ], 16 },
-	{ _L["OnMButtonClick"   ], 17 },
-	{ _L["OnMButtonDbClick" ], 18 },
-	{ _L["OnMButtonDrag"    ], 21 },
+	{ text = _L["OnMButtonDown"    ], bit = 15 },
+	{ text = _L["OnMButtonUp"      ], bit = 16 },
+	{ text = _L["OnMButtonClick"   ], bit = 17 },
+	{ text = _L["OnMButtonDbClick" ], bit = 18 },
+	{ text = _L["OnMButtonDrag"    ], bit = 21 },
 
-	{ _L["OnMouseEnterLeave"], 9 },
-	{ _L["OnMouseArea"      ], 10 },
-	{ _L["OnMouseMove"      ], 11 },
-	{ _L["OnMouseHover"     ], 22 },
-	{ _L["OnScroll"         ], 12 },
+	{ text = _L["OnMouseEnterLeave"], bit = 9  },
+	{ text = _L["OnMouseArea"      ], bit = 10 },
+	{ text = _L["OnMouseMove"      ], bit = 11 },
+	{ text = _L["OnMouseHover"     ], bit = 22 },
+	{ text = _L["OnScroll"         ], bit = 12 },
 }
+_C.nEventID = 0
 
-MY.RegisterPanel( "Dev_UIEventID", _L["UIEventID"], _L['Development'], "ui/Image/UICommon/BattleFiled.UITex|7", {255,127,0,200}, {
+_C.GetEventID = function(ui)
+	local t = {}
+	for i, event in ipairs(_C.tEventIndex) do
+		if ui:children('#Event_' .. event.bit):check() then
+			t[event.bit] = 1
+		else
+			t[event.bit] = 0
+		end
+	end
+	return MY.Math.Bitmap2Number(t)
+end
+
+_C.SetEventID = function(ui, nEventID)
+	local t = MY.Math.Number2Bitmap(nEventID)
+	for i, event in ipairs(_C.tEventIndex) do
+		ui:children('#Event_' .. event.bit):check(t[event.bit] == 1)
+	end
+end
+
+MY.RegisterPanel(
+"Dev_UIEventID", _L["UIEventID"], _L['Development'],
+"ui/Image/UICommon/BattleFiled.UITex|7", {255,127,0,200}, {
 OnPanelActive = function(wnd)
 	local ui = MY.UI(wnd)
 	local x, y = 10, 30
 	
-	local function BitTable2UInt()
-		local tBitTab = {}
-		for k, v in ipairs(tEventIndex) do
-			if ui:children('#' .. v[1]) then
-				if ui:children('#' .. v[1]):check() then
-					tBitTab[v[2]] = 1
-				else
-					tBitTab[v[2]] = 0
-				end
-			end
-		end
-		local nUInt = 0
-		for i = 1, 24 do
-			nUInt = nUInt + (tBitTab[i] or 0) * (2 ^ (i - 1))
-		end
-		ui:children("#WndEdit"):text(nUInt)
-	end
-	ui:append("WndEditBox", "WndEdit", { text = '0', x = x, y = y, w = 150, h = 25, font = 201, color = { 255, 255, 255 }})
+	ui:append("WndEditBox", "WndEdit", {
+		text = '0', x = x, y = y, w = 150, h = 25, font = 201, color = { 255, 255, 255 }
+	}):children('#WndEdit'):change(function(text)
+	  	local nEventID = tonumber(text)
+	  	if nEventID and nEventID ~= _C.nEventID then
+	  		_C.SetEventID(ui, nEventID)
+	  	end
+	  end)
 	
 	x, y = 5, y + 35
-	for k, v in ipairs(tEventIndex) do
-		ui:append("WndCheckBox", v[1], { text = v[1], x = x, y = y, w = 120 }):children('#' .. v[1])
+	for k, event in ipairs(_C.tEventIndex) do
+		ui:append("WndCheckBox", 'Event_' .. event.bit, {
+			text = event.text, x = x, y = y, w = 120
+		}):children('#Event_' .. event.bit)
 		  :check(function(bCheck)
 		  	if bCheck then
-		  		ui:children('#' .. v[1]):color(255, 128, 0)
+		  		ui:children('#Event_' .. event.bit):color(255, 128, 0  )
 		  	else
-		  		ui:children('#' .. v[1]):color(255, 255, 255)
+		  		ui:children('#Event_' .. event.bit):color(255, 255, 255)
 		  	end
-		  	BitTable2UInt()
+		  	_C.nEventID = _C.GetEventID(ui)
+		  	ui:children("#WndEdit"):text(_C.nEventID)
 		  end)
 		x = x + 90
 		
@@ -78,4 +93,4 @@ OnPanelActive = function(wnd)
 			x, y = 5, y + 25
 		end
 	end
-end })
+end})
