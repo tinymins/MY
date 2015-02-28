@@ -4,7 +4,7 @@
 -- @Date  : 2015-02-28 17:37:53
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-01 00:08:04
+-- @Last Modified time: 2015-03-01 00:13:27
 --------------------------------------------
 local _C = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Dev_UIEventID/lang/")
@@ -65,7 +65,7 @@ OnPanelActive = function(wnd)
 	local x, y = 10, 30
 	
 	ui:append("WndEditBox", "WndEdit", {
-		text = '0', x = x, y = y, w = 150, h = 25, font = 201, color = { 255, 255, 255 }
+		text = _C.nEventID, x = x, y = y, w = 150, h = 25, font = 201, color = { 255, 255, 255 }
 	}):children('#WndEdit'):change(function(text)
 	  	local nEventID = tonumber(text)
 	  	if nEventID and nEventID ~= _C.nEventID then
@@ -93,4 +93,6 @@ OnPanelActive = function(wnd)
 			x, y = 5, y + 25
 		end
 	end
+	
+	_C.SetEventID(ui, _C.nEventID)
 end})
