@@ -386,9 +386,9 @@ function XLifeBar.X:SetTitle(szTitle)
     return self
 end
 -- …Ë÷√∞Ôª·
-function XLifeBar.X:SetTong(szTongName)
-    if self.tab.szTong ~= szTongName then
-        self.tab.szTong = szTongName
+function XLifeBar.X:SetTong(szTong)
+    if self.tab.szTong ~= szTong then
+        self.tab.szTong = szTong
         self:DrawNames()
     end
     return self
@@ -416,21 +416,24 @@ function XLifeBar.X:DrawNames()
     r,g,b,a = self:FxColor(r,g,b,a)
     
     local i = #Config.nLineHeight
-    if cfgTong and self.self.dwTongID and self.self.dwTongID ~= 0 then
-        local szTongName = _XLifeBar.GetTongName(self.self.dwTongID, "[%s]")
-        if szTongName then
-            table.insert( tWordlines, {szTongName, Config.nLineHeight[i]} )
+    if cfgTong then
+        local szTong = self.tab.szTong
+        if szTong and szTong ~= '' then
+            table.insert(tWordlines, { szTong, Config.nLineHeight[i] })
             i = i - 1
         end
     end
-    if cfgTitle and self.self.szTitle and self.self.szTitle~="" then
-        table.insert( tWordlines, {"<" .. self.self.szTitle .. ">", Config.nLineHeight[i]} )
-        i = i - 1
+    if cfgTitle then
+        local szTitle = self.tab.szTitle
+        if szTitle and szTitle ~= "" then
+            table.insert(tWordlines, { "<" .. self.tab.szTitle .. ">", Config.nLineHeight[i] })
+            i = i - 1
+        end
     end
     if cfgName then
-        local szName = MY.Game.GetObjectName(self.self)
+        local szName = self.tab.szName
         if szName and not tonumber(szName) then
-            table.insert( tWordlines, {MY.Game.GetObjectName(self.self), Config.nLineHeight[i]} )
+            table.insert(tWordlines, { szName, Config.nLineHeight[i] })
             i = i - 1
         end
     end
