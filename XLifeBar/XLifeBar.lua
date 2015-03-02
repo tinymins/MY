@@ -15,6 +15,7 @@ local OT_STATE = {
 
 -- 这个只是默认配置 改这里没用的 会修改的话 修改data文件
 local Config_Default = {
+    nCamp = -1,
     Col = {
         Player = {
             Self  = {30 ,140,220},      -- 自己
@@ -89,28 +90,44 @@ _XLifeBar.GetForce = function(dwID)
     if not me then
         return "Neutrality"
     end
-    if dwID == me.dwID then
-        return "Self"
-    end
-    if IsParty(me.dwID, dwID) then
-        return "Party"
-    end
-    if IsNeutrality(me.dwID,dwID) then
-        return "Neutrality"
-    end
-    if IsEnemy(me.dwID,dwID) then -- 敌对关系
-        local r,g,b = GetHeadTextForceFontColor(dwID,me.dwID)
-        if r == 255 and g == 255 and b == 0 then
+    if Config.nCamp == -1 or not IsPlayer(dwID) then
+        if dwID == me.dwID then
+            return "Self"
+        elseif IsParty(me.dwID, dwID) then
+            return "Party"
+        elseif IsNeutrality(me.dwID, dwID) then
+            return "Neutrality"
+        elseif IsEnemy(me.dwID, dwID) then -- 敌对关系
+            local r,g,b = GetHeadTextForceFontColor(dwID, me.dwID)
+            if r == 255 and g == 255 and b == 0 then
+                return "Neutrality"
+            else
+                return "Enemy"
+            end
+        elseif IsAlly(me.dwID, dwID) then -- 相同阵营
+            return "Ally"
+        else
+            return "Neutrality" -- "Other"
+        end
+    else
+        local tar = MY.GetObject(TARGET.PLAYER, dwID)
+        if not tar then
+            return "Neutrality"
+        elseif dwID == me.dwID then
+            return "Self"
+        elseif IsParty(me.dwID, dwID) then
+            return "Party"
+        elseif tar.nCamp == Config.nCamp then
+            return "Ally"
+        elseif not tar.bCampFlag or     -- 没开阵营
+        tar.nCamp == CAMP.NEUTRAL or    -- 目标中立
+        Config.nCamp == CAMP.NEUTRAL or -- 自己中立
+        me.GetScene().nCampType == MAP_CAMP_TYPE.ALL_PROTECT then -- 停战地图
             return "Neutrality"
         else
             return "Enemy"
         end
     end
-    if IsAlly(me.dwID, dwID) then -- 相同阵营
-        return "Ally"
-    end
-    
-    return "Neutrality" -- "Other"
 end
 
 _XLifeBar.GetTongName = function(dwTongID, szFormatString)
@@ -952,7 +969,7 @@ _Cache.OnPanelActive = function(wnd)
     
     -- 右半边
     x, y = 350, 60
-    offsety = 38
+    offsety = 34
     -- 显示名字
     ui:append("WndComboBox", "WndComboBox_Name"):children("#WndComboBox_Name")
       :pos(x,y):text(_L["name display config"])
@@ -1244,6 +1261,47 @@ _Cache.OnPanelActive = function(wnd)
         return t
       end)
     y = y + offsety
+    
+    -- 当前阵营
+    ui:append("WndComboBox", "WndComboBox_CampSwitch"):children("#WndComboBox_CampSwitch")
+      :pos(x,y):text(_L["set current camp"])
+      :menu(function()
+        return {{
+            szOption = _L['auto detect'],
+            bCheck = true, bMCheck = true,
+            bChecked = Config.nCamp == -1,
+            fnAction = function()
+                Config.nCamp = -1
+                _XLifeBar.Reset()
+            end,
+        }, {
+            szOption = g_tStrings.STR_CAMP_TITLE[CAMP.GOOD],
+            bCheck = true, bMCheck = true,
+            bChecked = Config.nCamp == CAMP.GOOD,
+            fnAction = function()
+                Config.nCamp = CAMP.GOOD
+                _XLifeBar.Reset()
+            end,
+        }, {
+            szOption = g_tStrings.STR_CAMP_TITLE[CAMP.EVIL],
+            bCheck = true, bMCheck = true,
+            bChecked = Config.nCamp == CAMP.EVIL,
+            fnAction = function()
+                Config.nCamp = CAMP.EVIL
+                _XLifeBar.Reset()
+            end,
+        }, {
+            szOption = g_tStrings.STR_CAMP_TITLE[CAMP.NEUTRAL],
+            bCheck = true, bMCheck = true,
+            bChecked = Config.nCamp == CAMP.NEUTRAL,
+            fnAction = function()
+                Config.nCamp = CAMP.NEUTRAL
+                _XLifeBar.Reset()
+            end,
+        }}
+      end)
+    y = y + offsety
+    offsety = 37
     
     ui:append("WndCheckBox", "WndCheckBox_ShowSpecialNpc"):children("#WndCheckBox_ShowSpecialNpc")
       :pos(x,y):text(_L['show special npc'])
