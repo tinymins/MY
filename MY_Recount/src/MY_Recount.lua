@@ -94,12 +94,17 @@ MY_Recount.Open = function()
     m_frame = Wnd.OpenWindow(_Cache.szIniFile, 'MY_Recount')
     -- pos
     MY.UI(m_frame):anchor(MY_Recount.anchor)
+    MY.RegisterEvent('UI_SCALED', 'MY_Recount', function()
+        MY.UI(m_frame):anchor(MY_Recount.anchor)
+    end)
     -- draw
     MY_Recount.DrawUI()
 end
 
+
 MY_Recount.Close = function()
     Wnd.CloseWindow(m_frame)
+    MY.RegisterEvent('UI_SCALED', 'MY_Recount')
 end
 
 MY.RegisterInit(function()
@@ -355,7 +360,6 @@ end
                                   # #               #           #         
 ##########################################################################
 ]]
-
 -- ÷‹∆⁄÷ÿªÊ
 MY_Recount.OnFrameBreathe = function()
     if this.nLastRedrawFrame and GetLogicFrameCount() - this.nLastRedrawFrame < MY_Recount.nDrawInterval then
