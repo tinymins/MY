@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-28 20:26:04
+-- @Last Modified time: 2015-03-02 12:06:42
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -2165,7 +2165,7 @@ function _MY.UI:onevent(szEvent, fnEvent)
 	return self
 end
 
--- 绑定Frame的UI事件
+-- 绑定ele的UI事件
 function _MY.UI:onuievent(szEvent, fnEvent)
 	self:_checksum()
 	if type(szEvent)~="string" then
@@ -2177,9 +2177,9 @@ function _MY.UI:onuievent(szEvent, fnEvent)
 		end
 	else
 		for _, ele in pairs(self.eles) do
-			if ele.frm then
-				if ele.frm['tMy' .. szEvent] then
-					ele.frm['tMy' .. szEvent] = {}
+			if ele.raw then
+				if ele.raw['tMy' .. szEvent] then
+					ele.raw['tMy' .. szEvent] = {}
 				end
 			end
 		end
