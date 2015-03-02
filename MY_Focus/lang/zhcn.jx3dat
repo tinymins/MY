@@ -14,6 +14,8 @@ data = {
     ['may cause some problem in dungeon map'] = '获取信息更加精准但是可能造成性能和其他问题（建议副本中不要开启）',
     ['show focus\'s target'] = '显示目标的目标',
     ['hide dead object'    ] = '隐藏重伤的目标',
+    ['display kungfu icon instead of location'] = '显示内功心法图标',
+    
     ['auto focus'          ] = '启用默认焦点',
     ['add auto focus'      ] = '添加默认焦点',
     ['namelist manager'    ] = '管理默认焦点',
