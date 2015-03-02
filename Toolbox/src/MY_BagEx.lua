@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-25 10:40:14
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-02 14:07:27
+-- @Last Modified time: 2015-03-02 14:22:39
 -----------------------------------------------
 MY_BagEx = {}
 MY_BagEx.bEnable = true
@@ -37,8 +37,11 @@ MY_BagEx.Enable = function(bEnable)
 		:remove()
 		
 		MY.UI("Normal/BigBagPanel")
-		local hFrame = Station.Lookup("Normal/BigBankPanel")
-		local hFrame = Station.Lookup("Normal/GuildBankPanel")
+		:add("Normal/BigBankPanel")
+		:add("Normal/GuildBankPanel")
+		:each(function()
+			this.bMYBagExHook = nil
+		end)
 	end
 end
 
