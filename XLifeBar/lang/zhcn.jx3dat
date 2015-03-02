@@ -48,6 +48,8 @@ data = {
     ['set current camp'] = '设置当前阵营',
     ['auto detect'] = '自动获取',
     
+    ['show distance'] = '显示距离',
+    
     ['Neutrality'] = "中立关系",
     ['Enemy'] = "敌对关系",
     ['Ally'] = "友好关系",
