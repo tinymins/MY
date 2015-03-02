@@ -6,26 +6,38 @@
 -- @Date  : 2015-03-02 10:08:35
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-02 19:05:14
+-- @Last Modified time: 2015-03-02 19:49:48
 --------------------------------------------
 XLifeBar = XLifeBar or {}
 XLifeBar.HP = class()
 local HP = XLifeBar.HP
+local _C = {}
 
-function HP:ctor(dwID, parent, handle) -- KGobject
+function XLifeBar.OnFrameCreate()
+	if JH and JH.GetShadowHandle then
+		_C.Handle = JH.GetShadowHandle("XLifeBar")
+	else
+		_C.Handle = this:Lookup('', '')
+	end
+end
+
+function XLifeBar.GetHandle()
+	return _C.Handle
+end
+
+function HP:ctor(dwID) -- KGobject
 	self.dwID = dwID
-	self.parent = parent
-	self.handle = handle
+	self.handle = _C.Handle:Lookup(tostring(self.dwID))
 	return self
 end
 -- ´´½¨
 function HP:Create()
 	-- Create handle
-	if not self.parent:Lookup(tostring(self.dwID)) then
-		self.parent:AppendItemFromString(FormatHandle( string.format("name=\"%s\"",self.dwID) ))
+	if not _C.Handle:Lookup(tostring(self.dwID)) then
+		_C.Handle:AppendItemFromString(FormatHandle( string.format("name=\"%s\"",self.dwID) ))
 	end
 	
-	local handle = self.parent:Lookup(tostring(self.dwID))
+	local handle = _C.Handle:Lookup(tostring(self.dwID))
 	if not handle:Lookup(string.format("hp_bg_%s",self.dwID)) then
 		handle:AppendItemFromString( string.format("<shadow>name=\"hp_bg_%s\"</shadow>",self.dwID) )
 		handle:AppendItemFromString( string.format("<shadow>name=\"hp_bg2_%s\"</shadow>",self.dwID) )
@@ -43,8 +55,8 @@ end
 
 -- É¾³ý
 function HP:Remove()
-	if self.parent:Lookup(tostring(self.dwID)) then
-		self.parent:RemoveItem(self.parent:Lookup(tostring(self.dwID)))
+	if _C.Handle:Lookup(tostring(self.dwID)) then
+		_C.Handle:RemoveItem(_C.Handle:Lookup(tostring(self.dwID)))
 	end
 	return self
 end
