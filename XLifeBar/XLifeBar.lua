@@ -183,7 +183,7 @@ end
 -- 重绘所有UI，并在bNoSave为假时保存配置文件
 _XLifeBar.Reset = function(bNoSave)
     _XLifeBar.tObject = {}
-    _XLifeBar.Handle:Clear()
+    XLifeBar.GetHandle():Clear()
     if not bNoSave then
         if XLifeBar.bUseGlobalConfig then
             MY.Sys.SaveLUAData(_XLifeBar.szConfig, Config)
@@ -294,10 +294,10 @@ _XLifeBar.Reload = function()
     end
 end
 MY.RegisterInit(function()
-    Wnd.OpenWindow("interface/MY/XLifeBar/XLifeBar.ini","XLifeBar")
+    MY.UI.CreateFrame("XLifeBar", { level = "Lowest", empty = true })
     _XLifeBar.Reload()
+    MY.RegisterEvent('LOADING_END', _XLifeBar.Reload) -- 过图重新加载刷新界面
 end)
-MY.RegisterEvent('LOADING_END', _XLifeBar.Reload) -- 过图重新加载刷新界面
 
 XLifeBar.X = class()
 -- 构造函数
@@ -323,7 +323,7 @@ function XLifeBar.X:ctor(object)
     self.self = object
     self.tab = _XLifeBar.tObject[object.dwID]
     self.force = self.tab.szForce
-    self.hp = HP.new(object.dwID, _XLifeBar.Handle, _XLifeBar.tObject[object.dwID].handle)
+    self.hp = HP.new(object.dwID)
     return self
 end
 -- 创建UI
@@ -576,13 +576,6 @@ function XLifeBar.X:StartOTBar(szOTTitle, nFrameCount, bIsChannelSkill)
     return self
 end
 
-function XLifeBar.OnFrameCreate()
-    if JH and JH.GetShadowHandle then
-        _XLifeBar.Handle = JH.GetShadowHandle("XLifeBar")
-    else
-        _XLifeBar.Handle = this
-    end
-end
 
 local m_fnOnSystemHeadSettingSure = function()
     -- 保存官方头顶设置
