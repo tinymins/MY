@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-16 09:21:19
+-- @Last Modified time: 2015-03-02 16:17:07
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Focus/lang/")
 local _C = {}
@@ -12,19 +12,20 @@ _C.tFocusList = {}
 _C.szIniFile = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
 _C.bMinimize = false
 MY_Focus = {}
-MY_Focus.bEnable        = true  -- 是否启用
-MY_Focus.bFocusBoss      = true  -- 焦点重要NPC
-MY_Focus.bFocusFriend   = false -- 焦点附近好友
-MY_Focus.bFocusTong     = false -- 焦点帮会成员
-MY_Focus.bFocusEnemy    = false -- 焦点敌对玩家
-MY_Focus.bAutoHide      = true  -- 无焦点时隐藏
-MY_Focus.nMaxDisplay    = 5     -- 最大显示数量
-MY_Focus.bAutoFocus     = true  -- 启用默认焦点
-MY_Focus.bHideDeath     = false -- 隐藏死亡目标
-MY_Focus.bFocusJJCParty = false -- 焦竞技场队友
-MY_Focus.bFocusJJCEnemy = true  -- 焦竞技场敌队
-MY_Focus.bShowTarget    = false -- 显示目标目标
-MY_Focus.bTraversal     = false -- 遍历焦点列表
+MY_Focus.bEnable            = true  -- 是否启用
+MY_Focus.bFocusBoss         = true  -- 焦点重要NPC
+MY_Focus.bFocusFriend       = false -- 焦点附近好友
+MY_Focus.bFocusTong         = false -- 焦点帮会成员
+MY_Focus.bFocusEnemy        = false -- 焦点敌对玩家
+MY_Focus.bAutoHide          = true  -- 无焦点时隐藏
+MY_Focus.nMaxDisplay        = 5     -- 最大显示数量
+MY_Focus.bAutoFocus         = true  -- 启用默认焦点
+MY_Focus.bHideDeath         = false -- 隐藏死亡目标
+MY_Focus.bDisplayKungfuIcon = false -- 显示心法图标
+MY_Focus.bFocusJJCParty     = false -- 焦竞技场队友
+MY_Focus.bFocusJJCEnemy     = true  -- 焦竞技场敌队
+MY_Focus.bShowTarget        = false -- 显示目标目标
+MY_Focus.bTraversal         = false -- 遍历焦点列表
 MY_Focus.tAutoFocus = {}    -- 默认焦点
 MY_Focus.tFocusList = {     -- 永久焦点
 	[TARGET.NPC]    = {},
@@ -41,6 +42,7 @@ RegisterCustomData("MY_Focus.bAutoHide")
 RegisterCustomData("MY_Focus.nMaxDisplay")
 RegisterCustomData("MY_Focus.bAutoFocus")
 RegisterCustomData("MY_Focus.bHideDeath")
+RegisterCustomData("MY_Focus.bDisplayKungfuIcon")
 RegisterCustomData("MY_Focus.bFocusJJCParty")
 RegisterCustomData("MY_Focus.bFocusJJCEnemy")
 RegisterCustomData("MY_Focus.bShowTarget")
@@ -358,6 +360,7 @@ end
 MY_Focus.DrawFocus = function(dwType, dwID)
 	local obj, info, bInfo = MY.Game.GetObject(dwType, dwID)
 	local hList = Station.Lookup('Normal/MY_Focus', 'Handle_List')
+	local player = GetClientPlayer()
 	if not (obj and hList) then
 		return
 	end
@@ -366,21 +369,100 @@ MY_Focus.DrawFocus = function(dwType, dwID)
 	if not hItem then
 		hItem = hList:AppendItemFromIni(_C.szIniFile, 'Handle_Info')
 		hItem:SetName('Handle_Info_'..dwType..'_'..dwID)
+		if dwType == TARGET.PLAYER then
+			hItem:Lookup('Image_Kungfu'):Show()
+		end
 	end
 	
-	-- 名字
-	hItem:Lookup('Handle_Name/Text_Name'):SetText(MY.Game.GetObjectName(obj) or obj.dwID)
+	---------- 左侧 ----------
 	-- 心法
 	if dwType == TARGET.PLAYER then
 		if bInfo and info.dwMountKungfuID then
 			hItem:Lookup('Handle_Name/Text_Kungfu'):SetText(MY_Focus.GetKungfuName(info.dwMountKungfuID))
+			hItem:Lookup('Image_Kungfu'):FromIconID(Table_GetSkillIconID(info.dwMountKungfuID, 1))
 		else
 			local kungfu = obj.GetKungfuMount()
 			if kungfu then
 				hItem:Lookup('Handle_Name/Text_Kungfu'):SetText(MY_Focus.GetKungfuName(kungfu.dwSkillID))
+				hItem:Lookup('Image_Kungfu'):FromIconID(Table_GetSkillIconID(kungfu.dwSkillID, 1))
+			else
+				hItem:Lookup('Handle_Name/Text_Kungfu'):SetText(g_tStrings.tForceTitle[obj.dwForceID])
+				hItem:Lookup('Image_Kungfu'):FromUITex(GetForceImage(obj.dwForceID))
 			end
 		end
 	end
+	-- 目标距离
+	local nDistance = math.floor(math.sqrt(math.pow(player.nX - obj.nX, 2) + math.pow(player.nY - obj.nY, 2)) * 10 / 64) / 10
+	hItem:Lookup('Handle_Compass/Compass_Distance'):SetText(nDistance)
+	hItem:Lookup('Handle_School/School_Distance'):SetText(nDistance)
+	-- 自身面向
+	if player then
+		hItem:Lookup('Handle_Compass/Image_Player'):Show()
+		hItem:Lookup('Handle_Compass/Image_Player'):SetRotate( - player.nFaceDirection / 128 * math.pi)
+	end
+	-- 阵营
+	if dwType == TARGET.PLAYER then
+		if obj.nCamp == CAMP.GOOD or obj.nCamp == CAMP.EVIL then
+			hItem:Lookup('Image_Camp'):Show()
+			hItem:Lookup('Image_Camp'):FromUITex(GetCampImage(obj.nCamp, obj.bCampFlag))
+		else
+			hItem:Lookup('Image_Camp'):Hide()
+		end
+	end
+	-- 左侧主要部分
+	if MY_Focus.bDisplayKungfuIcon and dwType == TARGET.PLAYER then
+		hItem:Lookup('Handle_Compass'):Hide()
+		hItem:Lookup('Handle_School'):Show()
+		-- 心法图标
+		if bInfo and info.dwMountKungfuID then
+			hItem:Lookup('Handle_School/Image_School'):FromIconID(Table_GetSkillIconID(info.dwMountKungfuID, 1))
+		else
+			local kungfu = obj.GetKungfuMount()
+			if kungfu then
+				hItem:Lookup('Handle_School/Image_School'):FromIconID(Table_GetSkillIconID(kungfu.dwSkillID, 1))
+			else
+				hItem:Lookup('Handle_School/Image_School'):FromUITex(GetForceImage(obj.dwForceID))
+			end
+		end
+	else
+		hItem:Lookup('Handle_School'):Hide()
+		hItem:Lookup('Handle_Compass'):Show()
+		-- 相对位置
+		hItem:Lookup('Handle_Compass/Image_PointRed'):Hide()
+		hItem:Lookup('Handle_Compass/Image_PointGreen'):Hide()
+		if player and nDistance > 0 then
+			local h
+			if IsEnemy(UI_GetClientPlayerID(), dwID) then
+				h = hItem:Lookup('Handle_Compass/Image_PointRed')
+			else
+				h = hItem:Lookup('Handle_Compass/Image_PointGreen')
+			end
+			h:Show()
+			local nRotate = 0
+			-- 特判角度
+			if player.nX == obj.nX then
+				if player.nY > obj.nY then
+					nRotate = math.pi / 2
+				else
+					nRotate = - math.pi / 2
+				end
+			else
+				nRotate = math.atan((player.nY - obj.nY) / (player.nX - obj.nX))
+			end
+			if nRotate < 0 then
+				nRotate = nRotate + math.pi
+			end
+			if obj.nY < player.nY then
+				nRotate = math.pi + nRotate
+			end
+			local nRadius = 13.5
+			h:SetRelPos(nRadius + nRadius * math.cos(nRotate) + 2, nRadius - 3 - 13.5 * math.sin(nRotate))
+			h:GetParent():FormatAllItemPos()
+		end
+	end
+	---------- 右侧 ----------
+	-- 名字
+	hItem:Lookup('Handle_Name/Text_Name'):SetText(MY.Game.GetObjectName(obj) or obj.dwID)
 	-- 血量
 	if dwType ~= TARGET.DOODAD then
 		local nCurrentLife, nMaxLife = info.nCurrentLife, info.nMaxLife
@@ -442,52 +524,11 @@ MY_Focus.DrawFocus = function(dwType, dwID)
 	end
 	-- 选中状态
 	hItem:Lookup('Image_Select'):Hide()
-	local player = GetClientPlayer()
 	if player then
 		local dwTargetType, dwTargetID = player.GetTarget()
 		if dwTargetType == dwType and dwTargetID == dwID then
 			hItem:Lookup('Image_Select'):Show()
 		end
-	end
-	-- 目标距离
-	local nDistance = math.floor(math.sqrt(math.pow(player.nX - obj.nX, 2) + math.pow(player.nY - obj.nY, 2)) * 10 / 64) / 10
-	hItem:Lookup('Handle_Compass/Compass_Distance'):SetText(nDistance)
-	-- 自身面向
-	if player then
-		hItem:Lookup('Handle_Compass/Image_Player'):Show()
-		hItem:Lookup('Handle_Compass/Image_Player'):SetRotate( - player.nFaceDirection / 128 * math.pi)
-	end
-	-- 相对位置
-	hItem:Lookup('Handle_Compass/Image_PointRed'):Hide()
-	hItem:Lookup('Handle_Compass/Image_PointGreen'):Hide()
-	if player and nDistance > 0 then
-		local h
-		if IsEnemy(UI_GetClientPlayerID(), dwID) then
-			h = hItem:Lookup('Handle_Compass/Image_PointRed')
-		else
-			h = hItem:Lookup('Handle_Compass/Image_PointGreen')
-		end
-		h:Show()
-		local nRotate = 0
-		-- 特判角度
-		if player.nX == obj.nX then
-			if player.nY > obj.nY then
-				nRotate = math.pi / 2
-			else
-				nRotate = - math.pi / 2
-			end
-		else
-			nRotate = math.atan((player.nY - obj.nY) / (player.nX - obj.nX))
-		end
-		if nRotate < 0 then
-			nRotate = nRotate + math.pi
-		end
-		if obj.nY < player.nY then
-			nRotate = math.pi + nRotate
-		end
-		local nRadius = 13.5
-		h:SetRelPos(nRadius + nRadius * math.cos(nRotate) + 2, nRadius - 3 - 13.5 * math.sin(nRotate))
-		h:GetParent():FormatAllItemPos()
 	end
 	
 	hItem:FormatAllItemPos()
@@ -807,6 +848,13 @@ MY.RegisterPanel( "MY_Focus", _L["focus list"], _L['Target'], "ui/Image/button/S
 	  :check(function(bChecked)
 	  	MY_Focus.bHideDeath = bChecked
 	  	MY_Focus.RescanNearby()
+	  end)
+	y = y + 30
+	
+	ui:append("WndCheckBox", "WndCheckBox_DisplayKungfu"):children("#WndCheckBox_DisplayKungfu")
+	  :pos(x, y):width(wr):text(_L['display kungfu icon instead of location']):check(MY_Focus.bDisplayKungfuIcon or false)
+	  :check(function(bChecked)
+	  	MY_Focus.bDisplayKungfuIcon = bChecked
 	  end)
 	y = y + 30
 	
