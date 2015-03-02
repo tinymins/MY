@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-25 10:40:14
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-02 14:22:39
+-- @Last Modified time: 2015-03-02 14:31:55
 -----------------------------------------------
 MY_BagEx = {}
 MY_BagEx.bEnable = true
@@ -33,7 +33,9 @@ MY_BagEx.Enable = function(bEnable)
 		:add("Normal/BigBagPanel/WndEditBox_KeyWord")
 		:add("Normal/BigBankPanel/CheckBox_TimeLtd")
 		:add("Normal/BigBankPanel/WndEditBox_KeyWord")
+		:add("Normal/BigBankPanel/WndCheckBox_Compare")
 		:add("Normal/GuildBankPanel/WndEditBox_KeyWord")
+		:add("Normal/GuildBankPanel/WndCheckBox_Compare")
 		:remove()
 		
 		MY.UI("Normal/BigBagPanel")
@@ -316,6 +318,9 @@ _C.OnBagItemUpdate = function()
 end
 -- ÊÂ¼þ×¢²á
 MY.RegisterEvent("BAG_ITEM_UPDATE", function()
+	if not MY_BagEx.bEnable then
+		return
+	end
 	_C.OnBagItemUpdate()
 	MY.DelayCall('MY_BagEx', _C.OnBagItemUpdate, 100)
 end)
