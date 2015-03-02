@@ -293,9 +293,8 @@ _XLifeBar.Reload = function()
         _XLifeBar.Reset(true)
     end
 end
-MY.RegisterInit(function()
+MY.RegisterEvent('LOGIN_GAME', function()
     MY.UI.CreateFrame("XLifeBar", { level = "Lowest", empty = true })
-    _XLifeBar.Reload()
     MY.RegisterEvent('LOADING_END', _XLifeBar.Reload) -- 过图重新加载刷新界面
 end)
 
