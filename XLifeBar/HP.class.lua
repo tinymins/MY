@@ -1,11 +1,12 @@
 --------------------------------------------
+--------------------------------------------
 -- @Desc  : 扁平血条UI操作类
 --          只做UI操作 不做任何逻辑判断
 -- @Author: 翟一鸣 @tinymins
 -- @Date  : 2015-03-02 10:08:35
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-03-02 18:56:38
+-- @Last Modified time: 2015-03-02 19:05:14
 --------------------------------------------
 XLifeBar = XLifeBar or {}
 XLifeBar.HP = class()
@@ -42,10 +43,8 @@ end
 
 -- 删除
 function HP:Remove()
-	local frame = self.frame
-	if frame:Lookup("",tostring(self.dwID)) then
-		local Total = frame:Lookup("","")
-		Total:RemoveItem(frame:Lookup("",tostring(self.dwID)))
+	if self.parent:Lookup(tostring(self.dwID)) then
+		self.parent:RemoveItem(self.parent:Lookup(tostring(self.dwID)))
 	end
 	return self
 end
