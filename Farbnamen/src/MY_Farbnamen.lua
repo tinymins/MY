@@ -406,10 +406,9 @@ MY.RegisterTraceButtonMenu( 'MY_Farbenamen', MY_Farbnamen.GetMenu )
 --------------------------------------------------------------
 -- MY.RegisterEvent('LOGIN_GAME', MY_Farbnamen.LoadData)
 -- MY.RegisterEvent('PLAYER_ENTER_GAME', MY_Farbnamen.LoadData)
-MY.RegisterEvent('FIRST_LOADING_END', MY_Farbnamen.LoadData)
-MY.RegisterEvent('FIRST_LOADING_END', _MY_Farbnamen.LoadCustomData)
-MY.RegisterEvent('GAME_EXIT', MY_Farbnamen.SaveData)
-MY.RegisterEvent('PLAYER_EXIT_GAME', MY_Farbnamen.SaveData)
+MY.RegisterInit(MY_Farbnamen.LoadData)
+MY.RegisterInit(_MY_Farbnamen.LoadCustomData)
+MY.RegisterExit(MY_Farbnamen.SaveData)
 -- MY.RegisterEvent("PLAYER_ENTER_SCENE", MY_Farbnamen.DoConflict)
 MY.RegisterEvent("PLAYER_ENTER_SCENE", function(...)
     if MY_Farbnamen.bEnabled then
