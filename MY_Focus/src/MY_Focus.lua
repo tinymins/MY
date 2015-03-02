@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-02 16:43:20
+-- @Last Modified time: 2015-03-02 21:18:50
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Focus/lang/")
 local _C = {}
@@ -57,6 +57,10 @@ MY_Focus.Open = function()
 	m_frame:Lookup('', 'Handle_List'):Clear()
 	MY.UI(m_frame):anchor(MY_Focus.anchor)
 	
+	MY.RegisterEvent('UI_SCALED', 'MY_Focus', function()
+		MY.UI(m_frame):anchor(MY_Focus.anchor)
+	end)
+	
 	MY.RegisterEvent('PLAYER_ENTER_SCENE', 'MY_Focus', function()
 		MY_Focus.OnObjectEnterScene(TARGET.PLAYER, arg0)
 	end)
@@ -80,6 +84,7 @@ end
 
 MY_Focus.Close = function()
 	Wnd.CloseWindow(m_frame)
+	MY.RegisterEvent('UI_SCALED', 'MY_Focus')
 	MY.RegisterEvent('PLAYER_ENTER_SCENE', 'MY_Focus')
 	MY.RegisterEvent('NPC_ENTER_SCENE'   , 'MY_Focus')
 	MY.RegisterEvent('DOODAD_ENTER_SCENE', 'MY_Focus')

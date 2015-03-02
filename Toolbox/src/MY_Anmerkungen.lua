@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-25 12:31:03
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-02-16 09:21:20
+-- @Last Modified time: 2015-03-02 20:56:59
 -----------------------------------------------
 -- #######################################################################################################
 --   * * *         *                 *                     *                   *           *         
@@ -54,6 +54,8 @@ MY_Anmerkungen.ReloadNotePanel = function()
 		  
 		ui:onuievent("OnFrameDragEnd", function()
 			MY_Anmerkungen.anchorNotePanel = MY.UI("Normal/MY_Anmerkungen_NotePanel"):anchor()
+		end):onevent("UI_SCALED", function()
+			MY.UI(this):anchor(MY_Anmerkungen.anchorNotePanel)
 		end)
 	end
 end
