@@ -69,7 +69,7 @@ MY.RegisterInit(function()
 			-- decode data
 			local data = MY.Json.Decode(szContent)
 			if not data then
-				MY.Debug(L["version check failed, sever resopnse unknow data.\n"],'MYVC',2)
+				MY.Debug(_L["version check failed, sever resopnse unknow data.\n"],'MYVC',2)
 				return
 			end
 			
