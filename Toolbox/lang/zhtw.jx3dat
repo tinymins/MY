@@ -37,6 +37,7 @@ data = {
     ['Time Limited'] = '限時',
     ['Search'] = '搜索',
     ['package searcher'] = '倉庫背包搜索',
+    ['compare with bag'] = '對比背包',
     
     ['GongZhan'] = '共戰',
     ['Detected [%s] has GongZhan buff for %d sec(s).'] = '檢測到[%s]共戰BUFF剩余%d秒。',
