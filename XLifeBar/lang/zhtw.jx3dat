@@ -45,6 +45,9 @@ data = {
     ['3rd line offset-y: %d px.'] = '第三行字高度偏移%spx。',
     ['alpha: %.0f%%.'] = '透明度%.0f%%。',
     
+    ['set current camp'] = '設置當前陣營',
+    ['auto detect'] = '自動獲取',
+    
     ['Neutrality'] = "中立關系",
     ['Enemy'] = "敵對關系",
     ['Ally'] = "友好關系",
