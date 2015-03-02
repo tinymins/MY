@@ -1,12 +1,11 @@
 --------------------------------------------
---------------------------------------------
 -- @Desc  : 扁平血条UI操作类
 --          只做UI操作 不做任何逻辑判断
 -- @Author: 翟一鸣 @tinymins
 -- @Date  : 2015-03-02 10:08:35
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-03-02 19:49:48
+-- @Last Modified time: 2015-03-02 20:14:06
 --------------------------------------------
 XLifeBar = XLifeBar or {}
 XLifeBar.HP = class()
