@@ -4,7 +4,7 @@
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-02-16 09:21:21
+-- @Last Modified time: 2015-02-28 20:55:28
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = {}
@@ -282,12 +282,12 @@ MY.RegisterPanel( "MY_ToolBox", _L["toolbox"], _L['General'], "UI/Image/Common/M
 	y = y + 30
 	
 	-- ±³°üËÑË÷
-	ui:append("WndCheckBox", "WndCheckBox_BagSearch"):children("#WndCheckBox_BagSearch")
+	ui:append("WndCheckBox", "WndCheckBox_BagEx"):children("#WndCheckBox_BagEx")
 	  :pos(x, y)
 	  :text(_L['package searcher'])
-	  :check(MY_BagSearch.bEnable or false)
+	  :check(MY_BagEx.bEnable or false)
 	  :check(function(bChecked)
-	  	MY_BagSearch.bEnable = bChecked
+	  	MY_BagEx.bEnable = bChecked
 	  end)
 	y = y + 30
 	
