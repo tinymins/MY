@@ -39,6 +39,7 @@ local Config_Default = {
     bShowOTBar   = { Player = { Self = true , Party = false, Neutrality = false, Enemy = true , Ally = false, }, Npc = { Party = false, Neutrality = false, Enemy = true , Ally = false, }, },
     nLineHeight = { 100, 80, 60},
     bShowSpecialNpc = false,
+    bShowDistance = false,
     
     nLifeWidth = 80,
     nLifeHeight = 8,
@@ -628,7 +629,18 @@ CheckInvalidRect = function(dwType, dwID, me, bNoCreate)
             xlb:SetLife(info.nCurrentLife / info.nMaxLife)
                :SetTong(_XLifeBar.GetTongName(object.dwTongID, "[%s]"))
                :SetTitle(object.szTitle)
-               :SetName(MY.Game.GetObjectName(object))
+            local szName = MY.Game.GetObjectName(object)
+            if szName then
+                if not Config.bShowDistance or dwID == me.dwID then
+                    xlb:SetName(szName)
+                else
+                    xlb:SetName(
+                        szName .. _L.STR_SPLIT_DOT
+                        .. math.floor(GetCharacterDistance(me.dwID, dwID) / 64)
+                        .. g_tStrings.STR_METER
+                    )
+                end
+            end
             if me.bFightState ~= _XLifeBar.bFightState then
                 xlb:DrawLife()
             end
@@ -969,7 +981,7 @@ _Cache.OnPanelActive = function(wnd)
     
     -- ”“∞Î±ﬂ
     x, y = 350, 60
-    offsety = 34
+    offsety = 33
     -- œ‘ æ√˚◊÷
     ui:append("WndComboBox", "WndComboBox_Name"):children("#WndComboBox_Name")
       :pos(x,y):text(_L["name display config"])
@@ -1301,18 +1313,24 @@ _Cache.OnPanelActive = function(wnd)
         }}
       end)
     y = y + offsety
-    offsety = 37
+    offsety = 32
     
     ui:append("WndCheckBox", "WndCheckBox_ShowSpecialNpc"):children("#WndCheckBox_ShowSpecialNpc")
       :pos(x,y):text(_L['show special npc'])
       :check(Config.bShowSpecialNpc or false)
       :check(function(bChecked) Config.bShowSpecialNpc = bChecked;_XLifeBar.Reset() end)
     y = y + offsety - 10
-      
+    
     ui:append("WndCheckBox", "WndCheckBox_AdjustIndex"):children("#WndCheckBox_AdjustIndex")
       :pos(x, y):text(_L['adjust index'])
       :check(Config.bAdjustIndex or false)
       :check(function(bChecked) Config.bAdjustIndex = bChecked;_XLifeBar.Reset() end)
+    y = y + offsety - 10
+    
+    ui:append("WndCheckBox", "WndCheckBox_ShowDistance"):children("#WndCheckBox_ShowDistance")
+      :pos(x, y):text(_L['show distance'])
+      :check(Config.bShowDistance or false)
+      :check(function(bChecked) Config.bShowDistance = bChecked;_XLifeBar.Reset() end)
     y = y + offsety
     
     ui:append("WndButton", "WndButton_Font"):children("#WndButton_Font")

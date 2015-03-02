@@ -48,6 +48,8 @@ data = {
     ['set current camp'] = '設置當前陣營',
     ['auto detect'] = '自動獲取',
     
+    ['show distance'] = '顯示距離',
+    
     ['Neutrality'] = "中立關系",
     ['Enemy'] = "敵對關系",
     ['Ally'] = "友好關系",
