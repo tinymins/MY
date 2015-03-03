@@ -66,11 +66,17 @@ local Config = clone(Config_Default)
 XLifeBar = XLifeBar or {}
 setmetatable(XLifeBar, { __call = function(me, ...) return me.X.new(...) end, __metatable = true })
 XLifeBar.bEnabled = false
-XLifeBar.bUseGlobalConfig = false
-XLifeBar.tSysHeadTop      = false
+XLifeBar.bUseGlobalConfig   = false
+XLifeBar.tSysHeadTop        = false
+XLifeBar.bOnlyInDungeon     = false
+XLifeBar.bOnlyInArena       = false
+XLifeBar.bOnlyInBattleField = false
 RegisterCustomData("XLifeBar.bEnabled")
 RegisterCustomData("XLifeBar.bUseGlobalConfig")
 RegisterCustomData("XLifeBar.tSysHeadTop")
+RegisterCustomData("XLifeBar.bOnlyInDungeon")
+RegisterCustomData("XLifeBar.bOnlyInArena")
+RegisterCustomData("XLifeBar.bOnlyInBattleField")
 local _XLifeBar = {
     szConfig = "userdata/XLifeBar/cfg",
     tObject = {},
@@ -221,7 +227,17 @@ _XLifeBar.Reset = function(bNoSave)
         end, 500)
     end
     
-    if XLifeBar.bEnabled then
+    if XLifeBar.bEnabled and (
+        not (
+            XLifeBar.bOnlyInDungeon or
+            XLifeBar.bOnlyInArena or
+            XLifeBar.bOnlyInBattleField
+        ) or (
+            (XLifeBar.bOnlyInDungeon     and MY.IsInDungeon()     ) or
+            (XLifeBar.bOnlyInArena       and MY.IsInArena()       ) or
+            (XLifeBar.bOnlyInBattleField and MY.IsInBattleField() )
+        )
+    ) then
         if Config.bShowName.Npc.Party or Config.bShowName.Npc.Neutrality
         or Config.bShowName.Npc.Ally  or Config.bShowName.Npc.Enemy then
             SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_NAME , false)
@@ -731,7 +747,17 @@ function XLifeBar.OnFrameBreathe()
         hFrame.bHookedByXLifeBar = true
     end
     
-    if not XLifeBar.bEnabled then
+    if not (XLifeBar.bEnabled and (
+        not (
+            XLifeBar.bOnlyInDungeon or
+            XLifeBar.bOnlyInArena or
+            XLifeBar.bOnlyInBattleField
+        ) or (
+            (XLifeBar.bOnlyInDungeon     and MY.IsInDungeon()     ) or
+            (XLifeBar.bOnlyInArena       and MY.IsInArena()       ) or
+            (XLifeBar.bOnlyInBattleField and MY.IsInBattleField() )
+        )
+    )) then
         return
     end
     local me = GetClientPlayer()
@@ -873,18 +899,50 @@ _Cache.OnPanelActive = function(wnd)
       :pos(x,y):text(_L["enable/disable"])
       :check(XLifeBar.bEnabled or false)
       :check(function(bChecked) XLifeBar.bEnabled = bChecked _XLifeBar.Reset(true) end)
+    x = x + 110
     -- 使用所有角色公共设置
     ui:append("WndCheckBox", "WndCheckBox_GlobalConfig"):children("#WndCheckBox_GlobalConfig")
-      :width(180):pos(x + 110, y):text(_L["use global config"])
+      :width(180):pos(x, y):text(_L["use global config"])
       :check(XLifeBar.bUseGlobalConfig or false)
       :check(function(bChecked)
         XLifeBar.bUseGlobalConfig = bChecked
         _XLifeBar.Reload()
         fnLoadUI(ui)
       end)
+    x = x + 180
+    ui:append("Text", {
+        x = x + 5, y = y - 15,
+        text = _L['only enable in those maps below'],
+    })
+    ui:append("WndCheckBox", {
+        x = x, y = y + 5, w = 80, text = _L['arena'],
+        checked = XLifeBar.bOnlyInArena,
+        oncheck = function(bChecked)
+            XLifeBar.bOnlyInArena = bChecked
+            _XLifeBar.Reset(true)
+        end,
+    })
+    x = x + 80
+    ui:append("WndCheckBox", {
+        x = x, y = y + 5, w = 80, text = _L['battlefield'],
+        checked = XLifeBar.bOnlyInBattleField,
+        oncheck = function(bChecked)
+            XLifeBar.bOnlyInBattleField = bChecked
+            _XLifeBar.Reset(true)
+        end,
+    })
+    x = x + 80
+    ui:append("WndCheckBox", {
+        x = x, y = y + 5, w = 80, text = _L['dungeon'],
+        checked = XLifeBar.bOnlyInDungeon,
+        oncheck = function(bChecked)
+            XLifeBar.bOnlyInDungeon = bChecked
+            _XLifeBar.Reset(true)
+        end,
+    })
     y = y + offsety
     -- <hr />
-    ui:append("Image", "Image_Spliter"):find('#Image_Spliter'):pos(x,y-7):size(w-x*2,2):image('UI/Image/UICommon/ScienceTreeNode.UITex',62)
+    ui:append("Image", "Image_Spliter"):find('#Image_Spliter'):pos(10, y-7):size(w - 20, 2):image('UI/Image/UICommon/ScienceTreeNode.UITex',62)
     
     x, y = 10, 60
     offsety = 27

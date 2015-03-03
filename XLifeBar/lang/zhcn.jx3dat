@@ -2,6 +2,11 @@
 data = {
     ['x lifebar'] = '扁平血条',
     
+    ['only enable in those maps below'] = '√ 仅在以下地图启用扁平血条',
+    ['arena'] = '搅基场',
+    ['battlefield'] = '战场中',
+    ['dungeon'] = '副本中',
+    
     ['name display config'] = '名字显示设置',
     ['player name display'] = '玩家名字显示',
     ['npc name display'] = 'Npc名字显示',
