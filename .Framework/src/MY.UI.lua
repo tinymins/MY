@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-02 12:06:42
+-- @Last Modified time: 2015-03-03 09:58:28
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -937,17 +937,19 @@ function _MY.UI:append(arg0, arg1, arg2)
 				end
 			end
 			if tArg and ui then
-				if tArg.w     then ui:width (tArg.w    ) end
-				if tArg.h     then ui:height(tArg.h    ) end
-				if tArg.x     then ui:left  (tArg.x    ) end
-				if tArg.y     then ui:top   (tArg.y    ) end
-				if tArg.hover then ui:hover (tArg.hover) end
-				if tArg.click then ui:click (tArg.click) end
-				if tArg.alpha then ui:alpha (tArg.alpha) end
-				if tArg.color then ui:color (tArg.color) end
-				if tArg.text  then ui:text  (tArg.text ) end
-				if tArg.font  then ui:font  (tArg.font ) end
-				if tArg.tip   then ui:tip   (tArg.tip  ) end
+				if tArg.w       then ui:width (tArg.w      ) end
+				if tArg.h       then ui:height(tArg.h      ) end
+				if tArg.x       then ui:left  (tArg.x      ) end
+				if tArg.y       then ui:top   (tArg.y      ) end
+				if tArg.alpha   then ui:alpha (tArg.alpha  ) end
+				if tArg.color   then ui:color (tArg.color  ) end
+				if tArg.text    then ui:text  (tArg.text   ) end
+				if tArg.font    then ui:font  (tArg.font   ) end
+				if tArg.tip     then ui:tip   (tArg.tip    ) end
+				if tArg.onhover then ui:hover (tArg.onhover) end
+				if tArg.onclick then ui:click (tArg.onclick) end
+				if tArg.checked then ui:check (tArg.checked) end
+				if tArg.oncheck then ui:check (tArg.oncheck) end
 			end
 		end
 	elseif szXml then
@@ -2665,10 +2667,10 @@ MY.UI.OpenColorPicker = function(callback, t)
 				local r, g, b  = nRed * 32 - 1, nGreen * 32 - 1, nBlue * 32 - 1
 				ui:append("Shadow", {
 					w = 23, h = 23, x = x, y = y, color = { r, g, b }, alpha = 200,
-					hover = function(bHover)
+					onhover = function(bHover)
 						fnHover(bHover, r, g, b)
 					end,
-					click = function()
+					onclick = function()
 						fnClick(r, g, b)
 					end,
 				})
@@ -2682,10 +2684,10 @@ MY.UI.OpenColorPicker = function(callback, t)
 		local r, g, b  = i * 16 - 1, i * 16 - 1, i * 16 - 1
 		ui:append("Shadow", {
 			w = 23, h = 23, x = x, y = y, color = { r, g, b }, alpha = 200,
-			hover = function(bHover)
+			onhover = function(bHover)
 				fnHover(bHover, r, g, b)
 			end,
-			click = function()
+			onclick = function()
 				fnClick(r, g, b)
 			end,
 		})
