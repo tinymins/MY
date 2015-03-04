@@ -54,7 +54,7 @@ _Cache.OnPanelActive = function(wnd)
                   :alpha(220)
                   :hover(function(bIn) MY.UI(this):alpha((bIn and 255) or 220) end)
                   :tip(szText .. '.UITex#' .. i .. '\n' .. tLine.nWidth .. 'x' .. tLine.nHeight .. '\n' .. _L['(left click to generate xml)'], MY.Const.UI.Tip.POS_TOP)
-                  :click(function() uiEdit:text('<image>width='..tLine.nWidth..' height='..tLine.nHeight..' path="' .. szText .. '.UITex" frame=' .. i ..'</image>') end)
+                  :click(function() uiEdit:text('<image>w='..tLine.nWidth..' h='..tLine.nHeight..' path="' .. szText .. '.UITex" frame=' .. i ..'</image>') end)
             end
         end
       end)
