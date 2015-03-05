@@ -1,20 +1,25 @@
-
---[[
-##########################################################################################################################
-      *         *   *                   *                                   *                           *     *           
-      *         *     *         *       *         * * * * * * * * * * *       *     * * * * *           *     *           
-      * * *     *                 *     *                           *     * * * *   *       *         *       *       *   
-      *         * * * *             *   *                           *           *   *   *   *         *       *     *     
-      *     * * *           *           *           * * * * * *     *         *     *   *   *       * *       *   *       
-  * * * * *     *   *         *         *           *         *     *         * *   *   *   *     *   *       * *         
-  *       *     *   *           *       *           *         *     *       * *   * *   *   *         *       *           
-  *       *     *   *                   * * * *     *         *     *     *   *     *   *   *         *     * *           
-  *       *       *       * * * * * * * *           * * * * * *     *         *       *   *           *   *   *           
-  * * * * *     * *   *                 *           *               *         *       *   *           *       *       *   
-  *           *     * *                 *                           *         *     *     *   *       *       *       *   
-            *         *                 *                       * * *         *   *         * *       *         * * * *   
-##########################################################################################################################
-]]
+--------------------------------------------
+-- @Desc  : 技能显示
+-- @Author: 翟一鸣 @tinymins
+-- @Date  : 2015-03-02 10:08:45
+-- @Email : admin@derzh.com
+-- @Last Modified by:   翟一鸣 @tinymins
+-- @Last Modified time: 2015-03-05 19:30:02
+--------------------------------------------
+-- ##########################################################################################################################
+--       *         *   *                   *                                   *                           *     *           
+--       *         *     *         *       *         * * * * * * * * * * *       *     * * * * *           *     *           
+--       * * *     *                 *     *                           *     * * * *   *       *         *       *       *   
+--       *         * * * *             *   *                           *           *   *   *   *         *       *     *     
+--       *     * * *           *           *           * * * * * *     *         *     *   *   *       * *       *   *       
+--   * * * * *     *   *         *         *           *         *     *         * *   *   *   *     *   *       * *         
+--   *       *     *   *           *       *           *         *     *       * *   * *   *   *         *       *           
+--   *       *     *   *                   * * * *     *         *     *     *   *     *   *   *         *     * *           
+--   *       *       *       * * * * * * * *           * * * * * *     *         *       *   *           *   *   *           
+--   * * * * *     * *   *                 *           *               *         *       *   *           *       *       *   
+--   *           *     * *                 *                           *         *     *     *   *       *       *       *   
+--             *         *                 *                       * * *         *   *         * *       *         * * * *   
+-- ##########################################################################################################################
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _Cache = {}
 MY_VisualSkill = {}
@@ -49,16 +54,16 @@ MY_VisualSkill.Reload = function()
         uiL:append("Image", "Image_Bg_12"):item("#Image_Bg_12"):pos(130 + 53 * MY_VisualSkill.nVisualSkillBoxCount - 32, 0):size(80, 52):image("ui/Image/UICommon/Skills.UITex", 29)
         -- create skill boxes
         local uiN = ui:append("WndWindow", "WndWindow_Normal"):children("#WndWindow_Normal"):size(130 + 53 * MY_VisualSkill.nVisualSkillBoxCount - 32 + 80, 52)
-        local y = 45
-        for i= 1, MY_VisualSkill.nVisualSkillBoxCount do
-            uiN:append("Box_1"..i, "Box"):item("#Box_1"..i):pos(y+i*53,3):alpha(0)
+        local x = 45
+        for i = 1, MY_VisualSkill.nVisualSkillBoxCount do
+            uiN:append("Box", "Box_1"..i):item("#Box_1"..i):pos(x+i*53,3):alpha(0)
         end
-        uiN:append("Box", "Box_10"):item("#Box_10"):pos(y+MY_VisualSkill.nVisualSkillBoxCount*53+300,3):alpha(0)
+        uiN:append("Box", "Box_10"):item("#Box_10"):pos(x+MY_VisualSkill.nVisualSkillBoxCount*53+300,3):alpha(0)
         -- draw front mask
         local uiT = ui:append("WndWindow", "WndWindow_Top"):children("#WndWindow_Top"):size(130 + 53 * MY_VisualSkill.nVisualSkillBoxCount - 32 + 80, 52)
-        local y = 42
+        local x = 42
         for i= 1, MY_VisualSkill.nVisualSkillBoxCount do
-            uiT:append("Image_1"..i, "Image"):item("#Image_1"..i):pos(y+i*53,0):size(55, 53):image("ui/Image/UICommon/Skills.UITex", 15)
+            uiT:append("Image_1"..i, "Image"):item("#Image_1"..i):pos(x+i*53,0):size(55, 53):image("ui/Image/UICommon/Skills.UITex", 15)
         end
         -- init data and bind event
         _Cache.nVisualSkillBoxIndex = 0
