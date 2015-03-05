@@ -4,7 +4,7 @@
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-02 14:20:55
+-- @Last Modified time: 2015-03-05 19:49:15
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = {}
@@ -18,7 +18,7 @@ _C.FriendHeadTip = function(bEnable)
 		local fnPlayerEnter = function(dwID)
 			local p = MY.Player.GetFriend(dwID)
 			if p then
-				local shadow = frm:append("MY_FRIEND_TIP"..dwID,"Shadow"):find("#MY_FRIEND_TIP"..dwID):raw(1)
+				local shadow = frm:append("Shadow", "MY_FRIEND_TIP"..dwID):find("#MY_FRIEND_TIP"..dwID):raw(1)
 				if shadow then
 					local r,g,b,a = 255,255,255,255
 					local szTip = ">> "..p.name.." <<"
