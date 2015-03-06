@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-25 12:31:03
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-02 20:56:59
+-- @Last Modified time: 2015-03-06 09:13:39
 -----------------------------------------------
 -- #######################################################################################################
 --   * * *         *                 *                     *                   *           *         
@@ -41,7 +41,7 @@ MY_Anmerkungen.ReloadNotePanel = function()
 	MY.UI("Normal/MY_Anmerkungen_NotePanel"):remove()
 	if MY_Anmerkungen.bNotePanelEnable then
 		-- frame
-		local ui = MY.UI.CreateFrame("MY_Anmerkungen_NotePanel", { simple = true })
+		local ui = MY.UI.CreateFrame("MY_Anmerkungen_NotePanel", { simple = true, alpha = 140 })
 		ui:size(MY_Anmerkungen.nNotePanelWidth, MY_Anmerkungen.nNotePanelHeight)
 		  :drag(true):drag(0,0,MY_Anmerkungen.nNotePanelWidth, 30)
 		  :text(_L['my anmerkungen'])
