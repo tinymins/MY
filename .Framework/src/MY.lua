@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-06 14:37:51
+-- @Last Modified time: 2015-03-06 15:29:55
 -- @Ref: ½è¼ø´óÁ¿º£÷©Ô´Âë @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -329,9 +329,10 @@ MY.ResizePanel = function(nWidth, nHeight)
 	hWnd:Lookup('WndScroll_Tabs'):SetSize(171, nHeight - 111)
 	hWnd:Lookup('WndScroll_Tabs', ''):FormatAllItemPos()
 	hWnd:Lookup('WndScroll_MainPanel'):SetSize(nWidth - 194, nHeight - 111)
-	hWnd:Lookup('WndScroll_MainPanel/ScrollBar_MainPanel'):SetRelPos(nWidth - 194, 21)
-	hWnd:Lookup('WndScroll_MainPanel/WndContainer_MainPanel'):SetSize(nWidth - 194, nHeight - 111)
-	hWnd:Lookup('WndScroll_MainPanel/WndContainer_MainPanel', ''):SetSize(nWidth - 194, nHeight - 111)
+	hWnd:Lookup('WndScroll_MainPanel/ScrollBar_MainPanel'):SetSize(nWidth - 214, nHeight - 121)
+	hWnd:Lookup('WndScroll_MainPanel/ScrollBar_MainPanel'):SetRelPos(nWidth - 214, 5)
+	hWnd:Lookup('WndScroll_MainPanel/WndContainer_MainPanel'):SetSize(nWidth - 214, nHeight - 100)
+	hWnd:Lookup('WndScroll_MainPanel/WndContainer_MainPanel', ''):SetSize(nWidth - 214, nHeight - 100)
 	local hWndMainPanel = frame:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel')
 	if hWndMainPanel.OnPanelResize then
 		local res, err = pcall(hWndMainPanel.OnPanelResize, hWndMainPanel)
@@ -725,17 +726,29 @@ MY.SwitchTab = function(szID)
 	wndMainPanel:Clear()
 	wndMainPanel:Lookup('', ''):Clear()
 	
+	wndMainPanel.OnPanelResize   = nil
+	wndMainPanel.OnPanelActive   = nil
+	wndMainPanel.OnPanelDeactive = nil
 	if not szID then
 		-- »¶Ó­Ò³
 		local ui = MY.UI(wndMainPanel)
-		ui:append("Image", "Image_Adv"):item('#Image_Adv'):pos(0, 0):size(557, 278)
-		  :image(MY.GetAddonInfo().szUITexPoster, 0)
-		
-		local txt = ui:append("Text", "Text_Adv"):item('#Text_Adv'):pos(10, 300):width(557):font(200)
+		local w, h = ui:size()
+		ui:append("Image", "Image_Adv", { x = 0, y = 0, image = { MY.GetAddonInfo().szUITexPoster, 0 } })
+		ui:append("Text", "Text_Adv", { x = 10, y = 300, w = 557, font = 200 })
+		wndMainPanel.OnPanelResize = function(wnd)
+			if w / 557 > (h - 50) / 278 then
+				ui:item('#Image_Adv'):size((h - 50) / 278 * 557, (h - 50))
+				ui:item('#Text_Adv'):pos(10, h - 40)
+			else
+				ui:item('#Image_Adv'):size(w, w / 557 * 278)
+				ui:item('#Text_Adv'):pos(10, w / 557 * 278 + 10)
+			end
+		end
+		wndMainPanel.OnPanelResize()
 		MY.BreatheCall(function()
 			local player = GetClientPlayer()
 			if player then
-				txt:text(_L('%s, welcome to use mingyi plugins!', player.szName) .. 'v' .. MY.GetVersion())
+				ui:item('#Text_Adv'):text(_L('%s, welcome to use mingyi plugins!', player.szName) .. 'v' .. MY.GetVersion())
 				return 0
 			end
 		end, 500)
