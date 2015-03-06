@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-03-04 10:58:17
+-- @Last Modified time: 2015-03-06 14:37:51
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -309,6 +309,51 @@ MY.ReopenPanel = function()
 		MY.ClosePanel()
 	end
 end
+-- resize panel
+MY.ResizePanel = function(nWidth, nHeight)
+	local frame = MY.GetFrame()
+	if not frame then
+		return
+	end
+	
+	local hWnd = frame:Lookup('Wnd_Total')
+	local hTotal = hWnd:Lookup('', '')
+	hTotal:SetSize(nWidth, nHeight)
+	hTotal:Lookup('Image_Breaker'):SetSize(6, nHeight - 340)
+	hTotal:Lookup('Image_TabBg'):SetSize(nWidth - 2, 33)
+	hTotal:Lookup('Handle_DBClick'):SetSize(nWidth, 54)
+	hWnd:SetSize(nWidth, nHeight)
+	hWnd:Lookup('WndContainer_Category'):SetSize(nWidth - 22, 32)
+	hWnd:Lookup('WndContainer_Category'):FormatAllContentPos()
+	hWnd:Lookup('Btn_Weibo'):SetRelPos(nWidth - 135, 55)
+	hWnd:Lookup('WndScroll_Tabs'):SetSize(171, nHeight - 111)
+	hWnd:Lookup('WndScroll_Tabs', ''):FormatAllItemPos()
+	hWnd:Lookup('WndScroll_MainPanel'):SetSize(nWidth - 194, nHeight - 111)
+	hWnd:Lookup('WndScroll_MainPanel/ScrollBar_MainPanel'):SetRelPos(nWidth - 194, 21)
+	hWnd:Lookup('WndScroll_MainPanel/WndContainer_MainPanel'):SetSize(nWidth - 194, nHeight - 111)
+	hWnd:Lookup('WndScroll_MainPanel/WndContainer_MainPanel', ''):SetSize(nWidth - 194, nHeight - 111)
+	local hWndMainPanel = frame:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel')
+	if hWndMainPanel.OnPanelResize then
+		local res, err = pcall(hWndMainPanel.OnPanelResize, hWndMainPanel)
+		if not res then
+			MY.Debug(err..'\n', 'MY#OnPanelResize', 1)
+		elseif MY.Sys.GetLang() ~= 'vivn' then
+			hWndMainPanel:FormatAllContentPos()
+		end
+	elseif hWndMainPanel.OnPanelActive then
+		hWndMainPanel:Clear()
+		hWndMainPanel:Lookup('', ''):Clear()
+		local res, err = pcall(hWndMainPanel.OnPanelActive, hWndMainPanel)
+		if not res then
+			MY.Debug(err..'\n', 'MY#OnPanelResize->OnPanelActive', 1)
+		elseif MY.Sys.GetLang() ~= 'vivn' then
+			hWndMainPanel:FormatAllContentPos()
+		end
+	end
+	hWndMainPanel:FormatAllContentPos()
+	hWndMainPanel:Lookup('', ''):FormatAllItemPos()
+	hTotal:FormatAllItemPos()
+end
 -- if panel visible
 MY.IsPanelVisible = function()
 	return (_MY.frame and _MY.frame:IsVisible())
@@ -320,14 +365,46 @@ end
 MY.GetFrame = function()
 	if not _MY.frame then
 		_MY.frame = Wnd.OpenWindow(_MY.szIniFile, "MY")
+		_MY.frame.intact = true
 		_MY.frame:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
 		_MY.frame:CorrectPos()
 		
 		-- update some ui handle
-		_MY.hBox = _MY.frame:Lookup("","Box_1")
+		_MY.hBox = _MY.frame:Lookup("", "Box_1")
 		_MY.hRequest = _MY.frame:Lookup("Page_1")
+		_MY.frame:Lookup("", "Text_Title"):SetText(_L['mingyi plugins'] .. " v" .. MY.GetVersion() .. ' Build ' .. _MY.szBuildDate)
+		_MY.frame:Lookup("Wnd_Total", "Handle_DBClick").OnItemLButtonDBClick = function()
+			_MY.frame:Lookup('CheckBox_Maximize'):ToggleCheck()
+		end
+		-- load bg uitex
+		local szUITexCommon = MY.GetAddonInfo().szUITexCommon
+		for k, v in pairs({
+			['Image_BgLT'] = 9,
+			['Image_BgCT'] = 8,
+			['Image_BgRT'] = 7,
+			['Image_BgT' ] = 6,
+		}) do
+			local h = _MY.frame:Lookup('', k)
+			h:FromUITex(szUITexCommon, v)
+		end
 		-- bind close button event
 		MY.UI(_MY.frame):children("#Btn_Close"):click(function() MY.ClosePanel() end)
+		MY.UI(_MY.frame):children("#CheckBox_Maximize"):check(function()
+			local ui = MY.UI(_MY.frame)
+			_MY.anchor = ui:anchor()
+			_MY.w, _MY.h = ui:size()
+			ui:pos(0, 0):onevent('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
+				ui:size(Station.GetClientSize())
+			end):drag(false):size(Station.GetClientSize())
+			MY.ResizePanel(Station.GetClientSize())
+		end, function()
+			MY.UI(_MY.frame)
+			  :onevent('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
+			  :drag(true)
+			  :size(_MY.w, _MY.h)
+			  :anchor(_MY.anchor)
+			MY.ResizePanel(_MY.w, _MY.h)
+		end)
 		-- update author infomation button
 		MY.UI(MY.GetFrame()):children("#Wnd_Total"):children("#Btn_Weibo")
 		  :text(_L['author\'s weibo'])
@@ -675,6 +752,8 @@ MY.SwitchTab = function(szID)
 							wndMainPanel:FormatAllContentPos()
 						end
 					end
+					wndMainPanel.OnPanelResize   = tab.fn.OnPanelResize
+					wndMainPanel.OnPanelActive   = tab.fn.OnPanelActive
 					wndMainPanel.OnPanelDeactive = tab.fn.OnPanelDeactive
 					break
 				end
@@ -683,6 +762,7 @@ MY.SwitchTab = function(szID)
 	end
 	wndMainPanel.szID = szID
 end
+
 --[[ 注册选项卡
 	(void) MY.RegisterPanel( szID, szTitle, szCategory, szIconTex, rgbaTitleColor, options )
 	szID            选项卡唯一ID
