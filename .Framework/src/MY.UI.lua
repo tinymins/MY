@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-06 15:30:49
+-- @Last Modified time: 2015-03-06 15:47:48
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -1926,6 +1926,7 @@ function _MY.UI:size(nWidth, nHeight)
 				ele.txt:GetParent():FormatAllItemPos()
 				ele.raw.bAutoSize = false
 			elseif ele.type == "WndListBox" then
+				ele.raw:SetSize(nWidth, nHeight)
 				ele.raw:Lookup('Scroll_Default'):SetRelPos(nWidth - 15, 10)
 				ele.raw:Lookup('Scroll_Default'):SetSize(15, nHeight - 20)
 				ele.raw:Lookup('', ''):SetSize(nWidth, nHeight)
