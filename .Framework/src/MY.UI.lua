@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-06 11:54:08
+-- @Last Modified time: 2015-03-06 12:08:09
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -2718,7 +2718,7 @@ MY.UI.CreateFrame = function(szName, opt)
 				  :size(frm.w, frm.h)
 				  :anchor(frm.anchor)
 				if frm.OnRestore then
-					local status, res = pcall(frm.OnRestore)
+					local status, res = pcall(frm.OnRestore, frm:Lookup('Window_Main'))
 					if status and res then
 						return
 					end
