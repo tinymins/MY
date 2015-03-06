@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-05 19:38:10
+-- @Last Modified time: 2015-03-06 09:15:13
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -2608,6 +2608,10 @@ MY.UI.CreateFrame = function(szName, opt)
 				Wnd.CloseWindow(frm)
 				PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 			end
+		end
+		if opt.alpha then
+			frm:Lookup('', 'Image_Title'):SetAlpha(opt.alpha * 1.4)
+			frm:Lookup('', 'Shadow_Bg'):SetAlpha(opt.alpha /255 * 200)
 		end
 	elseif not opt.empty then
 		frm.intact = true
