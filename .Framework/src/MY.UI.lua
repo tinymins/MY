@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-06 12:08:09
+-- @Last Modified time: 2015-03-06 13:36:53
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -1865,9 +1865,18 @@ function _MY.UI:size(nWidth, nHeight)
 					hnd:Lookup("Image_BgCB"):SetSize(nWidth - 132, 85)
 					hnd:Lookup("Text_Title"):SetSize(nWidth - 90, 30)
 					hnd:FormatAllItemPos()
-					frm:Lookup("Btn_Close"):SetRelPos(nWidth - 35, 15)
-					ele.wnd:SetSize(nWidth - 40, nHeight - 90)
-					ele.wnd:Lookup("", ""):SetSize(nWidth - 40, nHeight - 90)
+					local hClose = frm:Lookup("Btn_Close")
+					if hClose then
+						hClose:SetRelPos(nWidth - 35, 15)
+					end
+					local hMax = frm:Lookup("CheckBox_Maximize")
+					if hMax then
+						hMax:SetRelPos(nWidth - 63, 15)
+					end
+					if ele.wnd then
+						ele.wnd:SetSize(nWidth - 40, nHeight - 90)
+						ele.wnd:Lookup("", ""):SetSize(nWidth - 40, nHeight - 90)
+					end
 					-- reset position
 					local an = GetFrameAnchor(frm)
 					frm:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
@@ -2551,8 +2560,10 @@ MY.UI.RegisterUIEvent = function(raw, szEvent, fnEvent)
 			for _, fn in ipairs(raw['tMy'..szEvent]) do
 				local tReturn
 				for _, fn in ipairs(raw['tMy' .. szEvent] or {}) do 
-					local t = {pcall(fn, ...)}
-					if not tReturn and t[1] then
+					local t = { pcall(fn, ...) }
+					if not t[1] then
+						MY.Debug(t[2], MY.UI.GetTreePath(raw) .. '#' .. szEvent, 2)
+					elseif not tReturn then
 						table.remove(t, 1)
 						tReturn = t
 					end
