@@ -4,7 +4,7 @@
 -- @Date  : 2015-01-25 15:35:26
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-13 16:13:58
+-- @Last Modified time: 2015-03-06 22:53:27
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -64,10 +64,14 @@ MY.String.SimpleEcrypt = function(szText)
 	return szText:gsub('.', function (c) return string.format ("%02X", (string.byte(c) + 13) % 256) end):gsub(" ", "+")
 end
 
-MY.String.SimpleMatch = function(szText, szFind)
+MY.String.SimpleMatch = function(szText, szFind, bDistinctCase)
+	if not bDistinctCase then
+		szFind = StringLowerW(szFind)
+		szText = StringLowerW(szText)
+	end
 	-- 10|十人,血战天策|XZTC,!小铁被吃了,!开宴黑铁;大战
 	local bKeyWordsLine = false
-	for _, szKeyWordsLine in ipairs( MY.String.Split(StringLowerW(szFind), ';') ) do -- 符合一个即可
+	for _, szKeyWordsLine in ipairs( MY.String.Split(szFind, ';') ) do -- 符合一个即可
 		if bKeyWordsLine then break end
 		-- 10|十人,血战天策|XZTC,!小铁被吃了,!开宴黑铁
 		local bKeyWords = true
