@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-03-06 09:15:13
+-- @Last Modified time: 2015-03-06 11:33:36
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -1834,10 +1834,17 @@ function _MY.UI:size(nWidth, nHeight)
 				local frm = ele.frm
 				local hnd = frm:Lookup("", "")
 				if frm.simple then
-					frm:Lookup('Btn_Close'):SetRelPos(nWidth - 25, 4)
-					frm:Lookup('', 'Text_Title'):SetSize(nWidth, 30)
+					local nWidthTitleBtnR = 0
+					local p = frm:Lookup('WndContainer_TitleBtnR'):GetFirstChild()
+					while p do
+						nWidthTitleBtnR = nWidthTitleBtnR + (p:GetSize())
+						p = p:GetNext()
+					end
+					frm:Lookup('', 'Text_Title'):SetSize(nWidth - nWidthTitleBtnR, 30)
 					frm:Lookup('', 'Image_Title'):SetSize(nWidth, 30)
 					frm:Lookup('', 'Shadow_Bg'):SetSize(nWidth, nHeight)
+					frm:Lookup('WndContainer_TitleBtnR'):SetSize(nWidth, 30)
+					frm:Lookup('WndContainer_TitleBtnR'):FormatAllContentPos()
 					frm:SetSize(nWidth, nHeight)
 					frm:SetDragArea(0, 0, nWidth, 30)
 					hnd:SetSize(nWidth, nHeight)
@@ -2139,28 +2146,47 @@ end
 -- 绑定Frame的事件
 function _MY.UI:onevent(szEvent, fnEvent)
 	self:_checksum()
-	if type(szEvent)~="string" then return self end
-	if type(fnEvent)=="function" then
-		for _, ele in pairs(self.eles) do
-			if ele.frm then
-				if not ele.frm.tMyOnEvent then
-					ele.frm.tMyOnEvent = {}
-					ele.frm.OnEvent = function(event)
-						for _, fn in ipairs(ele.frm.tMyOnEvent[event] or {}) do pcall(fn) end
-					end
-				end
-				if not ele.frm.tMyOnEvent[szEvent] then
-					ele.frm:RegisterEvent(szEvent)
-					ele.frm.tMyOnEvent[szEvent] = {}
-				end
-				table.insert(ele.frm.tMyOnEvent[szEvent], fnEvent)
-			end
+	if type(szEvent) == "string" then
+		local nPos, szKey = (StringFindW(szEvent, "."))
+		if nPos then
+			szKey = string.sub(szEvent, nPos + 1)
+			szEvent = string.sub(szEvent, 1, nPos - 1)
 		end
-	else
-		for _, ele in pairs(self.eles) do
-			if ele.frm then
-				if ele.frm.tMyOnEvent then
-					ele.frm.tMyOnEvent[szEvent] = {}
+		if type(fnEvent)=="function" then
+			for _, ele in pairs(self.eles) do
+				if ele.frm then
+					if not ele.frm.tMyOnEvent then
+						ele.frm.tMyOnEvent = {}
+						ele.frm.OnEvent = function(event)
+							for _, p in ipairs(ele.frm.tMyOnEvent[event] or {}) do pcall(p.fn) end
+						end
+					end
+					if not ele.frm.tMyOnEvent[szEvent] then
+						ele.frm:RegisterEvent(szEvent)
+						ele.frm.tMyOnEvent[szEvent] = {}
+					end
+					if szKey then
+						for i = #ele.frm.tMyOnEvent[szEvent], 1, -1 do
+							if ele.frm.tMyOnEvent[szEvent][i].id == szKey then
+								table.remove(ele.frm.tMyOnEvent[szEvent], i)
+							end
+						end
+					end
+					table.insert(ele.frm.tMyOnEvent[szEvent], { id = szKey, fn = fnEvent })
+				end
+			end
+		else
+			for _, ele in pairs(self.eles) do
+				if ele.frm and ele.frm.tMyOnEvent and ele.frm.tMyOnEvent[szEvent] then
+					if szKey then
+						for i = #ele.frm.tMyOnEvent[szEvent], 1, -1 do
+							if ele.frm.tMyOnEvent[szEvent][i].id == szKey then
+								table.remove(ele.frm.tMyOnEvent[szEvent], i)
+							end
+						end
+					else
+						ele.frm.tMyOnEvent[szEvent] = {}
+					end
 				end
 			end
 		end
@@ -2595,10 +2621,11 @@ MY.UI.CreateFrame = function(szName, opt)
 	if opt.simple then
 		frm.simple = true
 		frm:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
+		-- top right buttons
 		if not opt.close then
-			frm:Lookup('Btn_Close'):Hide()
+			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close'):Destroy()
 		else
-			frm:Lookup("Btn_Close").OnLButtonClick = function()
+			frm:Lookup("WndContainer_TitleBtnR/Wnd_Close/Btn_Close").OnLButtonClick = function()
 				if frm.OnCloseButtonClick then
 					local status, res = pcall(frm.OnCloseButtonClick)
 					if status and res then
@@ -2609,6 +2636,88 @@ MY.UI.CreateFrame = function(szName, opt)
 				PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 			end
 		end
+		if not opt.minimize then
+			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize'):Destroy()
+		else
+			frm:Lookup("WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize").OnCheckBoxCheck = function()
+				if frm.OnMinimize then
+					local status, res = pcall(frm.OnMinimize)
+					if status and res then
+						return
+					end
+				end
+				if frm.bMaximize then
+					frm:Lookup("WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize"):Check(false)
+				else
+					frm.w, frm.h = frm:GetSize()
+				end
+				frm:Lookup('Window_Main'):Hide()
+				frm:Lookup('', 'Shadow_Bg'):Hide()
+				frm:SetSize(frm.w, 30)
+				local hMax = frm:Lookup("WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize")
+				if hMax then
+					hMax:Enable(false)
+				end
+				frm.bMinimize = true
+			end
+			frm:Lookup("WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize").OnCheckBoxUncheck = function()
+				if frm.OnRestore then
+					local status, res = pcall(frm.OnRestore)
+					if status and res then
+						return
+					end
+				end
+				frm.bMinimize = false
+				frm:Lookup('Window_Main'):Show()
+				frm:Lookup('', 'Shadow_Bg'):Show()
+				frm:SetSize(frm.w, frm.h)
+				local hMax = frm:Lookup("WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize")
+				if hMax then
+					hMax:Enable(true)
+				end
+			end
+		end
+		if not opt.maximize then
+			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize'):Destroy()
+		else
+			frm:Lookup('WndContainer_TitleBtnR').OnLButtonDBClick = function()
+				frm:Lookup("WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize"):ToggleCheck()
+			end
+			frm:Lookup("WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize").OnCheckBoxCheck = function()
+				if frm.OnMaximize then
+					local status, res = pcall(frm.OnMaximize)
+					if status and res then
+						return
+					end
+				end
+				if frm.bMinimize then
+					frm:Lookup("WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize"):Check(false)
+				else
+					frm.anchor = GetFrameAnchor(frm)
+					frm.w, frm.h = frm:GetSize()
+				end
+				local w, h = Station.GetClientSize()
+				MY.UI(frm):pos(0, 0):size(w, h):onevent('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
+					local w, h = Station.GetClientSize()
+					MY.UI(frm):pos(0, 0):size(w, h)
+				end)
+				frm.bMaximize = true
+			end
+			frm:Lookup("WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize").OnCheckBoxUncheck = function()
+				if frm.OnRestore then
+					local status, res = pcall(frm.OnRestore)
+					if status and res then
+						return
+					end
+				end
+				MY.UI(frm)
+				  :onevent('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
+				  :size(frm.w, frm.h)
+				  :anchor(frm.anchor)
+				frm.bMaximize = false
+			end
+		end
+		-- frame properties
 		if opt.alpha then
 			frm:Lookup('', 'Image_Title'):SetAlpha(opt.alpha * 1.4)
 			frm:Lookup('', 'Shadow_Bg'):SetAlpha(opt.alpha /255 * 200)
