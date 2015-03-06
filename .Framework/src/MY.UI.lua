@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-06 13:36:53
+-- @Last Modified time: 2015-03-06 15:30:49
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -2711,7 +2711,7 @@ MY.UI.CreateFrame = function(szName, opt)
 					frm.w, frm.h = frm:GetSize()
 				end
 				local w, h = Station.GetClientSize()
-				MY.UI(frm):pos(0, 0):size(w, h):onevent('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
+				MY.UI(frm):pos(0, 0):drag(false):size(w, h):onevent('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
 					local w, h = Station.GetClientSize()
 					MY.UI(frm):pos(0, 0):size(w, h)
 				end)
@@ -2728,6 +2728,7 @@ MY.UI.CreateFrame = function(szName, opt)
 				  :onevent('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
 				  :size(frm.w, frm.h)
 				  :anchor(frm.anchor)
+				  :drag(true)
 				if frm.OnRestore then
 					local status, res = pcall(frm.OnRestore, frm:Lookup('Window_Main'))
 					if status and res then
