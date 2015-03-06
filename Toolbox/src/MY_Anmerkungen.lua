@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-25 12:31:03
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-06 09:13:39
+-- @Last Modified time: 2015-03-06 11:56:20
 -----------------------------------------------
 -- #######################################################################################################
 --   * * *         *                 *                     *                   *           *         
@@ -41,7 +41,17 @@ MY_Anmerkungen.ReloadNotePanel = function()
 	MY.UI("Normal/MY_Anmerkungen_NotePanel"):remove()
 	if MY_Anmerkungen.bNotePanelEnable then
 		-- frame
-		local ui = MY.UI.CreateFrame("MY_Anmerkungen_NotePanel", { simple = true, alpha = 140 })
+		local ui = MY.UI.CreateFrame("MY_Anmerkungen_NotePanel", {
+			simple = true, alpha = 140, maximize = true, minimize = true,
+			onmaximize = function(wnd)
+				local ui = MY.UI(wnd)
+				ui:children("#WndEditBox_Anmerkungen"):size(ui:size())
+			end,
+			onrestore = function(wnd)
+				local ui = MY.UI(wnd)
+				ui:children("#WndEditBox_Anmerkungen"):size(ui:size())
+			end,
+		})
 		ui:size(MY_Anmerkungen.nNotePanelWidth, MY_Anmerkungen.nNotePanelHeight)
 		  :drag(true):drag(0,0,MY_Anmerkungen.nNotePanelWidth, 30)
 		  :text(_L['my anmerkungen'])
