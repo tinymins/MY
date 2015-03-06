@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-06 11:33:36
+-- @Last Modified time: 2015-03-06 11:54:08
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -2636,16 +2636,16 @@ MY.UI.CreateFrame = function(szName, opt)
 				PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 			end
 		end
+		if opt.onrestore then
+			MY.UI.RegisterUIEvent(frm, 'OnRestore', opt.onrestore)
+		end
 		if not opt.minimize then
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize'):Destroy()
 		else
+			if opt.onminimize then
+				MY.UI.RegisterUIEvent(frm, 'OnMinimize', opt.onminimize)
+			end
 			frm:Lookup("WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize").OnCheckBoxCheck = function()
-				if frm.OnMinimize then
-					local status, res = pcall(frm.OnMinimize)
-					if status and res then
-						return
-					end
-				end
 				if frm.bMaximize then
 					frm:Lookup("WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize"):Check(false)
 				else
@@ -2658,16 +2658,15 @@ MY.UI.CreateFrame = function(szName, opt)
 				if hMax then
 					hMax:Enable(false)
 				end
-				frm.bMinimize = true
-			end
-			frm:Lookup("WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize").OnCheckBoxUncheck = function()
-				if frm.OnRestore then
-					local status, res = pcall(frm.OnRestore)
+				if frm.OnMinimize then
+					local status, res = pcall(frm.OnMinimize, frm:Lookup('Window_Main'))
 					if status and res then
 						return
 					end
 				end
-				frm.bMinimize = false
+				frm.bMinimize = true
+			end
+			frm:Lookup("WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize").OnCheckBoxUncheck = function()
 				frm:Lookup('Window_Main'):Show()
 				frm:Lookup('', 'Shadow_Bg'):Show()
 				frm:SetSize(frm.w, frm.h)
@@ -2675,21 +2674,25 @@ MY.UI.CreateFrame = function(szName, opt)
 				if hMax then
 					hMax:Enable(true)
 				end
+				if frm.OnRestore then
+					local status, res = pcall(frm.OnRestore, frm:Lookup('Window_Main'))
+					if status and res then
+						return
+					end
+				end
+				frm.bMinimize = false
 			end
 		end
 		if not opt.maximize then
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize'):Destroy()
 		else
+			if opt.onmaximize then
+				MY.UI.RegisterUIEvent(frm, 'OnMaximize', opt.onmaximize)
+			end
 			frm:Lookup('WndContainer_TitleBtnR').OnLButtonDBClick = function()
 				frm:Lookup("WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize"):ToggleCheck()
 			end
 			frm:Lookup("WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize").OnCheckBoxCheck = function()
-				if frm.OnMaximize then
-					local status, res = pcall(frm.OnMaximize)
-					if status and res then
-						return
-					end
-				end
 				if frm.bMinimize then
 					frm:Lookup("WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize"):Check(false)
 				else
@@ -2701,19 +2704,25 @@ MY.UI.CreateFrame = function(szName, opt)
 					local w, h = Station.GetClientSize()
 					MY.UI(frm):pos(0, 0):size(w, h)
 				end)
+				if frm.OnMaximize then
+					local status, res = pcall(frm.OnMaximize, frm:Lookup('Window_Main'))
+					if status and res then
+						return
+					end
+				end
 				frm.bMaximize = true
 			end
 			frm:Lookup("WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize").OnCheckBoxUncheck = function()
+				MY.UI(frm)
+				  :onevent('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
+				  :size(frm.w, frm.h)
+				  :anchor(frm.anchor)
 				if frm.OnRestore then
 					local status, res = pcall(frm.OnRestore)
 					if status and res then
 						return
 					end
 				end
-				MY.UI(frm)
-				  :onevent('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
-				  :size(frm.w, frm.h)
-				  :anchor(frm.anchor)
 				frm.bMaximize = false
 			end
 		end
