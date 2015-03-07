@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-03-06 15:29:55
+-- @Last Modified time: 2015-03-08 01:37:35
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -342,6 +342,12 @@ MY.ResizePanel = function(nWidth, nHeight)
 			hWndMainPanel:FormatAllContentPos()
 		end
 	elseif hWndMainPanel.OnPanelActive then
+		if hWndMainPanel.OnPanelDeactive then
+			local res, err = pcall(hWndMainPanel.OnPanelDeactive, hWndMainPanel)
+			if not res then
+				MY.Debug(err..'\n', 'MY#OnPanelResize->OnPanelDeactive', 1)
+			end
+		end
 		hWndMainPanel:Clear()
 		hWndMainPanel:Lookup('', ''):Clear()
 		local res, err = pcall(hWndMainPanel.OnPanelActive, hWndMainPanel)
