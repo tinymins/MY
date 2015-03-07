@@ -4,7 +4,7 @@
 -- @Date  : 2015-01-25 15:35:26
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-03-06 22:53:27
+-- @Last Modified time: 2015-03-07 13:11:25
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -71,31 +71,37 @@ MY.String.SimpleMatch = function(szText, szFind, bDistinctCase)
 	end
 	-- 10|十人,血战天策|XZTC,!小铁被吃了,!开宴黑铁;大战
 	local bKeyWordsLine = false
-	for _, szKeyWordsLine in ipairs( MY.String.Split(szFind, ';') ) do -- 符合一个即可
-		if bKeyWordsLine then break end
+	for _, szKeyWordsLine in ipairs( MY.String.Split(szFind, ';') ) do         -- 符合一个即可
 		-- 10|十人,血战天策|XZTC,!小铁被吃了,!开宴黑铁
 		local bKeyWords = true
-		for _, szKeyWords in ipairs( MY.String.Split(szKeyWordsLine, ',') ) do            -- 必须全部符合
-			if not bKeyWords then break end
+		for _, szKeyWords in ipairs( MY.String.Split(szKeyWordsLine, ',') ) do -- 必须全部符合
 			-- 10|十人
 			local bKeyWord = false
-			for _, szKeyWord in ipairs( MY.String.Split(szKeyWords, '|') ) do         -- 符合一个即可
-				if bKeyWord then break end
+			for _, szKeyWord in ipairs( MY.String.Split(szKeyWords, '|') ) do  -- 符合一个即可
 				szKeyWord = MY.String.PatternEscape(szKeyWord)
-				if string.sub(szKeyWord, 1, 1)=="!" then    -- !小铁被吃了
+				if string.sub(szKeyWord, 1, 1) == "!" then                     -- !小铁被吃了
 					szKeyWord = string.sub(szKeyWord, 2)
-					if not string.find(szText, szKeyWord) then
+					if not wstring.find(szText, szKeyWord) then
 						bKeyWord = true
 					end
-				else                                        -- 十人   -- 10
-					if string.find(szText, szKeyWord) then
+				else                                                           -- 十人   -- 10
+					if wstring.find(szText, szKeyWord) then
 						bKeyWord = true
 					end
 				end
+				if bKeyWord then
+					break
+				end
 			end
 			bKeyWords = bKeyWords and bKeyWord
+			if not bKeyWords then
+				break
+			end
 		end
 		bKeyWordsLine = bKeyWordsLine or bKeyWords
+		if bKeyWordsLine then
+			break
+		end
 	end
 	return bKeyWordsLine
 end
