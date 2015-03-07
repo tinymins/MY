@@ -4,7 +4,7 @@
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-05 19:49:15
+-- @Last Modified time: 2015-03-07 17:54:06
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = {}
@@ -40,7 +40,7 @@ _C.FriendHeadTip = function(bEnable)
 	else
 		MY.RegisterEvent("PLAYER_ENTER_SCENE","MY_FRIEND_TIP")
 		MY.RegisterEvent("PLAYER_LEAVE_SCENE","MY_FRIEND_TIP")
-		MY.UI("Lowest/MY_Shadow"):remove()
+		MY.UI("Lowest2/MY_Shadow"):remove()
 	end
 end
 
