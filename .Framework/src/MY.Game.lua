@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-09 17:49:16
+-- @Last Modified time: 2015-03-07 22:14:17
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -----------------------------------------------
@@ -337,7 +337,7 @@ MY.Game.GetTargetContextMenu = function(dwType, szName, dwID)
 		--         MY.SwitchChat(szName)
 		--     end,
 		-- })
-		pcall(InsertPlayerCommonMenu, t, nil, szName)
+		pcall(InsertPlayerCommonMenu, t, dwID, szName)
 		-- get dwID
 		if not dwID and MY_Farbnamen then
 			local tInfo = MY_Farbnamen.GetAusName(szName)
@@ -354,8 +354,38 @@ MY.Game.GetTargetContextMenu = function(dwType, szName, dwID)
 				end,
 			})
 		end
+		-- insert view arena
+		table.insert(t, {
+			szOption = g_tStrings.LOOKUP_CORPS,
+			-- fnDisable = function() return not GetPlayer(dwID) end,
+			fnAction = function()
+				Wnd.CloseWindow("ArenaCorpsPanel")
+				OpenArenaCorpsPanel(true, dwID)
+			end,
+		})
+		-- view qixue
+		if dwID and InsertTargetMenu then
+			local tx = {}
+			local tTarget = { MY.GetTarget() }
+			MY.SetTarget(dwType, dwID)
+			InsertTargetMenu(tx, dwID) -- 这里煞笔的官方代码根本没第二参数直接取得当前目标FXCK等修复
+			MY.SetTarget(unpack(tTarget))
+			for _, v in ipairs(tx) do
+				if v.szOption == g_tStrings.LOOKUP_INFO then
+					for _, vv in ipairs(v) do
+						if vv.szOption == g_tStrings.LOOKUP_NEW_TANLENT then
+							table.insert(t, vv)
+							break
+						end
+					end
+					break
+				end
+			end
+		end
 		-- insert invite team
-		pcall(InsertInviteTeamMenu, t, szName)
+		if szName and InsertInviteTeamMenu then
+			InsertInviteTeamMenu(t, szName)
+		end
 	end
 	
 	return t
