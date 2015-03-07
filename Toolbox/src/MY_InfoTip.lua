@@ -90,8 +90,11 @@ MY_InfoTip.Cache = {
     GPS = { -- ½ÇÉ«×ø±ê
         formatString = '', title = _L['GPS'], prefix = _L['Location: '], content = _L['[%d]%d,%d,%d'],
         GetContent = function()
-            local player = GetClientPlayer()
-            return string.format(MY_InfoTip.Cache.GPS.formatString, player.GetMapID(), player.nX, player.nY, player.nZ)
+            local player, text = GetClientPlayer(), ''
+            if player then
+                text = string.format(MY_InfoTip.Cache.GPS.formatString, player.GetMapID(), player.nX, player.nY, player.nZ)
+            end
+            return text
         end
     },
 }
