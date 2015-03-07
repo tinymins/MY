@@ -441,7 +441,7 @@ MY.HookChatPanel("MY_Chat", function(h, szMsg)
 	
 	return szMsg, h:GetItemCount()
 end, function(h, szMsg, szChannel, i)
-	if (MY_Chat.bChatTime or MY_Chat.bChatCopy) and i then
+	if szMsg and #(GetPureText(szMsg)) > 0 and (MY_Chat.bChatTime or MY_Chat.bChatCopy) and i then
 		-- chat time
 		-- get msg rgb
 		local r, g, b = 255, 255, 0
