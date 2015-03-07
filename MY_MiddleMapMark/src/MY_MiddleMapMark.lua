@@ -5,7 +5,7 @@
 -- @Date  : 2014-12-04 11:51:31
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-02-20 12:51:23
+-- @Last Modified time: 2015-03-08 01:31:10
 -----------------------------------------------
 MY_MiddleMapMark = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_MiddleMapMark/lang/")
@@ -218,7 +218,9 @@ MY_MiddleMapMark.SaveMapData = function()
 	end
 end
 
-_Cache.OnPanelActive = function(wnd)
+_C.PS = {}
+
+_C.PS.OnPanelActive = function(wnd)
 	local ui = MY.UI(wnd)
 	local x, y = ui:pos()
 	local w, h = ui:size()
@@ -296,6 +298,16 @@ _Cache.OnPanelActive = function(wnd)
 	  		end
 	  	end)
 	  end)
+end
+
+_C.PS.OnPanelResize = function(wnd)
+	local ui = MY.UI(wnd)
+	local x, y = ui:pos()
+	local w, h = ui:size()
+	
+	ui:children('#WndListBox_1'):size(w - 32, h - 50)
+	ui:item('#Image_Progress'):size(w - 30, 4)
+	ui:children('#WndEdit_Search'):size(w - 26, 25)
 end
 
 _C.NpcTpl = {
@@ -820,7 +832,5 @@ end)
 MY.RegisterExit(MY_MiddleMapMark.SaveMapData)
 MY.RegisterEvent('LOADING_END', MY_MiddleMapMark.SaveMapData)
 MY.RegisterPanel( "MY_MiddleMapMark", _L["middle map mark"], _L['General'],
-	"ui/Image/MiddleMap/MapWindow2.UITex|4", {255,255,0,200}, {
-		OnPanelActive = _Cache.OnPanelActive
-	}
+	"ui/Image/MiddleMap/MapWindow2.UITex|4", {255,255,0,200}, _C.PS
 )
