@@ -8,6 +8,7 @@
 @DATA/cache/FIGHT_RECOUNT_LOG/*.jx3dat
 @DATA/cache/CHAT_LOG/*.jx3dat
 @DATA/config/*.jx3dat
+@DATA/config/MY_CHAT/*.jx3dat
 @DATA/config/PLAYER_NOTES/*.jx3dat
 @DATA/config/MY_INFO_TIP/*.jx3dat
 @DATA/config/MY_SCREENSHOT/*.jx3dat
