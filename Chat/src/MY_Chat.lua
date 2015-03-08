@@ -33,6 +33,8 @@ MY_Chat.bChatCopyAlwaysWhite = false
 MY_Chat.bChatCopyNoCopySysmsg = true
 MY_Chat.bReplaceIcon = false
 MY_Chat.bDisplayPanel = true    --  «∑Òœ‘ æ√Ê∞Â
+MY.RegisterInit(function() MY_Chat.tBlockWords = MY.LoadLUAData('config/MY_CHAT/blockwords') or MY_Chat.tBlockWords end)
+MY.RegisterExit(function() MY.SaveLUAData('config/MY_CHAT/blockwords', MY_Chat.tBlockWords) end)
 
 MY_Chat.tChannel = {
 	["Radio_Say"] = true,
@@ -56,7 +58,6 @@ RegisterCustomData("Account\\MY_Chat.bLockPostion")
 RegisterCustomData("Account\\MY_Chat.bEnableBalloon")
 RegisterCustomData("Account\\MY_Chat.bChatCopy")
 RegisterCustomData("Account\\MY_Chat.bBlockWords")
-RegisterCustomData("Account\\MY_Chat.tBlockWords")
 RegisterCustomData("Account\\MY_Chat.bChatTime")
 RegisterCustomData("Account\\MY_Chat.nChatTime")
 RegisterCustomData("Account\\MY_Chat.bChatCopyAlwaysShowMask")
