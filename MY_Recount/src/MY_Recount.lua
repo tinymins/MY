@@ -683,6 +683,10 @@ MY_Recount.OnItemRefreshTip = function()
     end)
 end
 
+MY_Recount.OnItemMouseLeave = function()
+    HideTip()
+end
+
 MY_Recount.OnLButtonClick = function()
     local name = this:GetName()
     if name == 'Btn_Right' then
