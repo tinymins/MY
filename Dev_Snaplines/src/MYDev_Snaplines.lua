@@ -201,6 +201,7 @@ MYDev_Snaplines.ReloadUI = function()
     ui:size(W, H)
       :penetrable(true)
       :breathe(_Cache.OnFrameBreathe)
+    ui:raw(1):ShowWhenUIHide()
     
     if MYDev_Snaplines.bShowWndSnaplines then
         ui:append("Shadow", "Shadow_HoverWndLeft"):item("#Shadow_HoverWndLeft")
