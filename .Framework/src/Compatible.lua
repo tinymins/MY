@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-03-02 15:26:32
+-- @Last Modified time: 2015-03-10 12:13:07
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 if not GetCampImageFrame then
@@ -32,6 +32,22 @@ if not GetCampImage then
 		local nFrame = GetCampImageFrame(eCamp, bFight)
 		if nFrame then
 			return 'ui\\Image\\UICommon\\CommonPanel2.UITex', nFrame
+		end
+	end
+end
+
+if not empty then
+	function empty(e)
+		local szType = type(e)
+		if szType == 'string' then
+			return #szType == 0
+		elseif szType == 'table' then
+			for _, _ in pairs(e) do
+				return false
+			end
+			return true
+		else
+			return e == nil
 		end
 	end
 end
