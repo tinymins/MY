@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-10 16:32:54
+-- @Last Modified time: 2015-03-10 19:37:14
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -3026,9 +3026,9 @@ MY.UI.GetTreePath = function(raw)
 	while(raw and raw:GetType():sub(1, 3) ~= 'Wnd') do
 		local szName = raw:GetName()
 		if not szName or szName == '' then
-			table.insert(tTreePath, raw:GetIndex())
+			table.insert(tTreePath, 2, raw:GetIndex())
 		else
-			table.insert(tTreePath, szName)
+			table.insert(tTreePath, 2, szName)
 		end
 		raw = raw:GetParent()
 	end
