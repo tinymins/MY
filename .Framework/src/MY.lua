@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-08 01:37:35
+-- @Last Modified time: 2015-03-10 16:37:36
 -- @Ref: ½è¼ø´óÁ¿º£÷©Ô´Âë @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -231,12 +231,17 @@ _MY.Init = function()
 	-- var
 	_MY.bLoaded = true
 	-- init functions
-	for i = 1, #_MY.tInitFun, 1 do
-		local status, err = pcall(_MY.tInitFun[i].fn)
+	for i, p in ipairs(_MY.tInitFun) do
+		local nStartTick = GetTickCount()
+		local status, err = pcall(p.fn)
 		if not status then
-			MY.Debug(err.."\n", "_MY.tInitFun#"..i)
+			MY.Debug({err}, "_MY.tInitFun#"..i)
 		end
+		-- performance monitor
+		MY.Debug({_L('%s initiated in %dms.', p.id or 'anonymous function', GetTickCount() - nStartTick)}, _L['PMTool'], 0)
 	end
+	-- ÊÍ·Å×ÊÔ´
+	_MY.tInitFun = {}
 
 	-- ÏÔÊ¾»¶Ó­ÐÅÏ¢
 	MY.Sysmsg({_L("%s, welcome to use mingyi plugins!", GetClientPlayer().szName) .. " v" .. MY.GetVersion() .. ' Build ' .. _MY.szBuildDate})
@@ -337,7 +342,7 @@ MY.ResizePanel = function(nWidth, nHeight)
 	if hWndMainPanel.OnPanelResize then
 		local res, err = pcall(hWndMainPanel.OnPanelResize, hWndMainPanel)
 		if not res then
-			MY.Debug(err..'\n', 'MY#OnPanelResize', 1)
+			MY.Debug({err}, 'MY#OnPanelResize', 1)
 		elseif MY.Sys.GetLang() ~= 'vivn' then
 			hWndMainPanel:FormatAllContentPos()
 		end
@@ -345,14 +350,14 @@ MY.ResizePanel = function(nWidth, nHeight)
 		if hWndMainPanel.OnPanelDeactive then
 			local res, err = pcall(hWndMainPanel.OnPanelDeactive, hWndMainPanel)
 			if not res then
-				MY.Debug(err..'\n', 'MY#OnPanelResize->OnPanelDeactive', 1)
+				MY.Debug({err}, 'MY#OnPanelResize->OnPanelDeactive', 1)
 			end
 		end
 		hWndMainPanel:Clear()
 		hWndMainPanel:Lookup('', ''):Clear()
 		local res, err = pcall(hWndMainPanel.OnPanelActive, hWndMainPanel)
 		if not res then
-			MY.Debug(err..'\n', 'MY#OnPanelResize->OnPanelActive', 1)
+			MY.Debug({err}, 'MY#OnPanelResize->OnPanelActive', 1)
 		elseif MY.Sys.GetLang() ~= 'vivn' then
 			hWndMainPanel:FormatAllContentPos()
 		end
@@ -459,38 +464,38 @@ end
 --           # #               #           #             # # # # # # # # #   #     # # #     # #     
 -- ##################################################################################################
 --[[ ×¢²á³õÊ¼»¯º¯Êý
-	RegisterInit(string szFunName, function fn) -- ×¢²á
-	RegisterInit(function fn)                   -- ×¢²á
-	RegisterInit(string szFunName)              -- ×¢Ïú
+	RegisterInit(string id, function fn) -- ×¢²á
+	RegisterInit(function fn)            -- ×¢²á
+	RegisterInit(string id)              -- ×¢Ïú
 ]]
 MY.RegisterInit = function(arg1, arg2)
-	local szFunName, fn
+	local id, fn
 	if type(arg1)=='function' then fn = arg1 end
-	if type(arg1)=='string'   then szFunName = arg1 end
+	if type(arg1)=='string'   then id = arg1 end
 	if type(arg2)=='function' then fn = arg1 end
-	if type(arg2)=='string'   then szFunName = arg1 end
+	if type(arg2)=='string'   then id = arg1 end
 	if fn then
-		if szFunName then
+		if id then
 			for i = #_MY.tInitFun, 1, -1 do
-				if _MY.tInitFun[i].szFunName == szFunName then
-					_MY.tInitFun[i] = { szFunName = szFunName, fn = fn }
+				if _MY.tInitFun[i].id == id then
+					_MY.tInitFun[i] = { id = id, fn = fn }
 					return nil
 				end
 			end
 		end
-		table.insert(_MY.tInitFun, { szFunName = szFunName, fn = fn })
-	elseif szFunName then
+		table.insert(_MY.tInitFun, { id = id, fn = fn })
+	elseif id then
 		for i = #_MY.tInitFun, 1, -1 do
-			if _MY.tInitFun[i].szFunName == szFunName then
+			if _MY.tInitFun[i].id == id then
 				table.remove(_MY.tInitFun, i)
 			end
 		end
 	end
 end
 --[[ ×¢²áÓÎÏ·½áÊøº¯Êý
-	RegisterExit(string szFunName, function fn) -- ×¢²á
-	RegisterExit(function fn)                   -- ×¢²á
-	RegisterExit(string szFunName)              -- ×¢Ïú
+	RegisterExit(string id, function fn) -- ×¢²á
+	RegisterExit(function fn)            -- ×¢²á
+	RegisterExit(string id)              -- ×¢Ïú
 ]]
 MY.RegisterExit = function(arg1, arg2)
 	MY.RegisterEvent('PLAYER_EXIT_GAME', arg1, arg2)
@@ -529,12 +534,12 @@ MY.RegisterEvent = function(szEventName, arg1, arg2)
 						-- try to run event function
 						local status, err = pcall(hEvent.fn, unpack(param))
 						-- error report
-						if not status then MY.Debug(err..'\n', 'OnEvent#'..szEventName, 2) end
+						if not status then MY.Debug({err}, 'OnEvent#'..szEventName, 2) end
 					else
 						-- remove none function event
 						table.remove(_MY.tEvent[szEventName], i)
 						-- report error
-						MY.Debug((hEvent.szName or 'id:anonymous')..' is not a function.\n', 'OnEvent#'..szEventName, 2)
+						MY.Debug({(hEvent.szName or 'id:anonymous')..' is not a function.'}, 'OnEvent#'..szEventName, 2)
 					end
 				end
 			end)
@@ -725,7 +730,7 @@ MY.SwitchTab = function(szID)
 	if wndMainPanel.OnPanelDeactive then
 		local res, err = pcall(wndMainPanel.OnPanelDeactive, wndMainPanel)
 		if not res then
-			MY.Debug(err..'\n', 'MY#OnPanelDeactive', 1)
+			MY.Debug({err}, 'MY#OnPanelDeactive', 1)
 		end
 	end
 	wndMainPanel.OnPanelDeactive = nil
@@ -766,7 +771,7 @@ MY.SwitchTab = function(szID)
 					if tab.fn.OnPanelActive then
 						local res, err = pcall(tab.fn.OnPanelActive, wndMainPanel)
 						if not res then
-							MY.Debug(err..'\n', 'MY#OnPanelActive', 1)
+							MY.Debug({err}, 'MY#OnPanelActive', 1)
 						elseif MY.Sys.GetLang() ~= 'vivn' then
 							wndMainPanel:FormatAllContentPos()
 						end
@@ -868,7 +873,6 @@ end
 --     # # # # # # # # #                             # # # # # # # # # # #   # #     #   #       #   
 -- ##################################################################################################
 MY.OnMouseWheel = function()
-	MY.Debug(string.format('OnMouseWheel#%s.%s:%i\n',this:GetName(),this:GetType(),Station.GetMessageWheelDelta()),nil,0)
 	return true
 end
 -- key down

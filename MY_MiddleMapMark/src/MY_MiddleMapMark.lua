@@ -5,7 +5,7 @@
 -- @Date  : 2014-12-04 11:51:31
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-08 01:31:10
+-- @Last Modified time: 2015-03-10 16:27:42
 -----------------------------------------------
 MY_MiddleMapMark = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_MiddleMapMark/lang/")
@@ -187,7 +187,7 @@ MY_MiddleMapMark.GetMapData = function(dwMapID)
 			end
 		end
 		Data[dwMapID] = data
-		MY.Debug(Table_GetMapName(dwMapID) .. '(' .. dwMapID .. ') map data loaded.', 'MY_MiddleMapMark', 0)
+		MY.Debug({Table_GetMapName(dwMapID) .. '(' .. dwMapID .. ') map data loaded.'}, 'MY_MiddleMapMark', 0)
 	end
 	return Data[dwMapID]
 end
@@ -205,7 +205,7 @@ MY_MiddleMapMark.StartDelayUnloadMapData = function(dwMapID)
 end
 
 MY_MiddleMapMark.UnloadMapData = function(dwMapID)
-	MY.Debug(Table_GetMapName(dwMapID) .. '(' .. dwMapID .. ') map data unloaded.', 'MY_MiddleMapMark', 0)
+	MY.Debug({Table_GetMapName(dwMapID) .. '(' .. dwMapID .. ') map data unloaded.'}, 'MY_MiddleMapMark', 0)
 	Data[dwMapID] = nil
 end
 

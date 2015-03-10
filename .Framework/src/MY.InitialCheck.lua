@@ -69,7 +69,7 @@ MY.RegisterInit(function()
 			-- decode data
 			local data = MY.Json.Decode(szContent)
 			if not data then
-				MY.Debug(_L["version check failed, sever resopnse unknow data.\n"],'MYVC',2)
+				MY.Debug({_L["version check failed, sever resopnse unknow data."]},'MYVC',2)
 				return
 			end
 			
@@ -127,12 +127,12 @@ MY.RegisterInit(function()
 				MY.Sys.bShieldedVersion = false
 				MY.ReopenPanel()
 			end
-			MY.Debug("Latest version: " .. data.version .. ", local version: " .. nVersion .. ' (' .. szVersion .. ")\n", 'MYVC', 0)
+			MY.Debug({"Latest version: " .. data.version .. ", local version: " .. nVersion .. ' (' .. szVersion .. ")"}, 'MYVC', 0)
 		end)
 		
 		-- cancel breathe call
-		MY.Debug('Start Version Check!\n', 'MYVC', 0)
+		MY.Debug({'Start Version Check!'}, 'MYVC', 0)
 		return 0
 	end, 3000)
 end)
-MY.Debug('Version Check Mod Loaded!\n', 'MYVC', 0)
+MY.Debug({'Version Check Mod Loaded!'}, 'MYVC', 0)
