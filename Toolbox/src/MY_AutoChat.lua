@@ -4,7 +4,7 @@
 -- @Date  : 2015-03-09 21:26:52
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-03-10 15:16:08
+-- @Last Modified time: 2015-03-10 22:26:49
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = { Data = {} }
@@ -102,6 +102,8 @@ _C.HookDialoguePanel = function()
 				if szName and szMap then
 					if frame.aInfo then
 						local t = { {szOption = szName, bDisable = true}, { bDevide = true } }
+						local tChat = {}
+						-- 面板上的对话
 						for i, v in ipairs(frame.aInfo) do
 							if v.name == "$" or v.name == 'W' then
 								local r, g, b = 255, 255, 255
@@ -121,12 +123,28 @@ _C.HookDialoguePanel = function()
 									r = r, g = g, b = b,
 									szOption = v.context,
 									fnAction = function() MY_AutoChat.AddData(szMap, szName, v.context) end,
-									szIcon = szIcon,
-									nFrame = nFrame,
-									nMouseOverFrame = nMouseOverFrame,
-									szLayer = szLayer,
-									fnClickIcon = fnClickIcon,
+									szIcon = szIcon, nFrame = nFrame, nMouseOverFrame = nMouseOverFrame,
+									szLayer = szLayer, fnClickIcon = fnClickIcon,
 								})
+								tChat[v.context] = true
+							end
+						end
+						-- 保存的自动对话
+						if _C.Data[szMap] and _C.Data[szMap][szName] then
+							for szKey, _ in pairs(_C.Data[szMap][szName]) do
+								if not tChat[szKey] then
+									table.insert(t, {
+										r = 255, g = 0, b = 255,
+										szOption = szKey,
+										fnAction = function() MY_AutoChat.AddData(szMap, szName, szKey) end,
+										szIcon = 'ui/Image/UICommon/Feedanimials.UITex', nFrame = 86, nMouseOverFrame = 87,
+										szLayer = "ICON_RIGHT", fnClickIcon = function()
+											MY_AutoChat.DelData(szMap, szName, szKey)
+											Wnd.CloseWindow('PopupMenuPanel')
+										end,
+									})
+									tChat[szKey] = true
+								end
 							end
 						end
 						return t
