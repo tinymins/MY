@@ -89,6 +89,7 @@ data = {
     ['Loading failed.'] = '加载失败',
     
     ['autochat'] = '自动对话',
+    ['Common'] = '通用',
     ['Auto interact disabled due to SHIFT key pressed.'] = '你按住了Shift键，自动对话被禁用。',
     ['Conversation with [%s] auto chose: %s'] = '对话[%s]自动选择了：%s',
     ['echo when autochat'] = '输出选择的选项',
