@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-10 14:42:29
+-- @Last Modified time: 2015-03-10 16:25:04
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -58,6 +58,7 @@ MY.IsShieldedVersion = MY.Sys.IsShieldedVersion
 		  当路径为相对路径时 相对于插件下@DATA目录
 ]]
 MY.Sys.SaveLUAData = function(szFileUri, tData, bNoDistinguishLang)
+	local nStartTick = GetTickCount()
 	-- 统一化目录分隔符
 	szFileUri = string.gsub(szFileUri, '\\', '/')
 	-- 如果是相对路径则从/@DATA/补全
@@ -78,7 +79,10 @@ MY.Sys.SaveLUAData = function(szFileUri, tData, bNoDistinguishLang)
 		szFileUri = szFileUri .. '.jx3dat'
 	end
 	-- 调用系统API
-	return SaveLUAData(szFileUri, tData)
+	local ret = SaveLUAData(szFileUri, tData)
+	-- performance monitor
+	MY.Debug({_L('%s saved during %dms.', szFileUri, GetTickCount() - nStartTick)}, 'PMTool', 0)
+	return ret
 end
 MY.SaveLUAData = MY.Sys.SaveLUAData
 --[[ 加载数据文件：相对于data文件夹
@@ -89,6 +93,7 @@ MY.SaveLUAData = MY.Sys.SaveLUAData
 		  当路径为相对路径时 相对于插件下@DATA目录
 ]]
 MY.Sys.LoadLUAData = function(szFileUri, bNoDistinguishLang)
+	local nStartTick = GetTickCount()
 	-- 统一化目录分隔符
 	szFileUri = string.gsub(szFileUri, '\\', '/')
 	-- 如果是相对路径则从/@DATA/补全
@@ -109,7 +114,10 @@ MY.Sys.LoadLUAData = function(szFileUri, bNoDistinguishLang)
 		szFileUri = szFileUri .. '.jx3dat'
 	end
 	-- 调用系统API
-	return LoadLUAData(szFileUri)
+	local ret = LoadLUAData(szFileUri)
+	-- performance monitor
+	MY.Debug({_L('%s loaded during %dms.', szFileUri, GetTickCount() - nStartTick)}, 'PMTool', 0)
+	return ret
 end
 MY.LoadLUAData = MY.Sys.LoadLUAData
 
@@ -211,8 +219,12 @@ MY.RemoteRequest = function(szUrl, fnSuccess, fnError, nTimeout)
 	-- 格式化参数
 	if type(szUrl)~="string" then return end
 	if type(fnSuccess)~="function" then return end
-	if type(fnError)~="function" then fnError = function(szUrl,errMsg) MY.Debug(szUrl..' - '..errMsg.."\n",'RemoteRequest',1) end end
 	if type(nTimeout)~="number" then nTimeout = 10000 end
+	if type(fnError)~="function" then
+		fnError = function(szUrl,errMsg)
+			MY.Debug({szUrl .. ' - ' .. errMsg}, 'RemoteRequest', 1)
+		end
+	end
 	-- 在请求队列尾部插入请求
 	table.insert(_Cache.tRequest,{ szUrl = szUrl, fnSuccess = fnSuccess, fnError = fnError, nTimeout = nTimeout })
 	-- 开始处理请求队列
@@ -227,7 +239,7 @@ _C.GetIE = function()
 	end
 	local ie = frame:Lookup("Page_1")
 	if not ie then
-		MY.Debug('Page_1 not found in Normal::MY', 'MYRR', 3)
+		MY.Debug({'Page_1 not found in Normal::MY'}, 'MYRR', 3)
 		return false
 	end
 	-- init ie
@@ -244,13 +256,13 @@ _C.GetIE = function()
 			-- 判断当前页面是否符合请求
 			if szUrl ~= szTitle or szContent ~= "" then
 				-- 处理请求回调
-				MY.Debug(string.format("%s\n%s\n", szUrl, szTitle), 'MYRR::OnDocumentComplete', 0)
+				MY.Debug({string.format("%s - %s", szTitle, szUrl)}, 'MYRR::OnDocumentComplete', 0)
 				-- 注销超时处理时钟
 				MY.DelayCall("MY_Remote_Request_Timeout")
 				-- 成功回调函数
 				local status, err = pcall(rr.fnSuccess, szTitle, szContent)
 				if not status then
-					MY.Debug(err .. '\n', 'MYRR::OnDocumentComplete::Callback', 3)
+					MY.Debug({err}, 'MYRR::OnDocumentComplete::Callback', 3)
 				end
 				-- 从请求列表移除
 				table.remove(_Cache.tRequest, 1)
@@ -269,7 +281,7 @@ _Cache.DoRemoteRequest = function()
 	-- check if request queue is clear
 	if #_Cache.tRequest == 0 then
 		_Cache.bRequest = false
-		MY.Debug('Remote Request Queue Is Clear.\n', 'MYRR', 0)
+		MY.Debug({'Remote Request Queue Is Clear.'}, 'MYRR', 0)
 		return
 	end
 	
@@ -279,20 +291,20 @@ _Cache.DoRemoteRequest = function()
 		local ie = _C.GetIE()
 		if not ie then
 			MY.DelayCall(_Cache.DoRemoteRequest, 3000)
-			MY.Debug('network plugin has not been initalized yet!\n', 'MYRR', 1)
+			MY.Debug({'network plugin has not been initalized yet!'}, 'MYRR', 1)
 			return
 		end
 		-- get the remote request which is going to process
 		local rr = _Cache.tRequest[1]
 		-- do with this remote request
-		MY.Debug(rr.szUrl .. '\n', 'MYRR', 0)
+		MY.Debug({rr.szUrl}, 'MYRR', 0)
 		-- register request timeout clock
 		MY.DelayCall(function()
-			MY.Debug(rr.szUrl .. '\n', 'MYRR::Timeout', 1) -- log
+			MY.Debug({rr.szUrl}, 'MYRR::Timeout', 1) -- log
 			-- request timeout, call timeout function.
 			local status, err = pcall(rr.fnError, rr.szUrl, "timeout")
 			if not status then
-				MY.Debug(err .. '\n', 'MYRR::TIMEOUT', 3)
+				MY.Debug({err}, 'MYRR::TIMEOUT', 3)
 			end
 			-- remove this request from queue
 			table.remove(_Cache.tRequest, 1)
@@ -448,7 +460,7 @@ MY.UI.RegisterUIEvent(MY, "OnFrameBreathe", function()
 			bc.nNext = nFrame + bc.nFrame
 			local res, err = pcall(bc.fnAction, unpack(bc.param))
 			if not res then
-				MY.Debug("BreatheCall#" .. (bc.szName or ('anonymous_'..i)) .." ERROR: " .. err)
+				MY.Debug({"BreatheCall#" .. (bc.szName or ('anonymous_'..i)) .." ERROR: " .. err})
 			elseif err == 0 then    -- function return 0 means to stop its breathe
 				for i = #_Cache.tBreatheCall, 1, -1 do
 					if _Cache.tBreatheCall[i] == bc then
@@ -465,7 +477,7 @@ MY.UI.RegisterUIEvent(MY, "OnFrameBreathe", function()
 		if dc.nTime <= nTime then
 			local res, err = pcall(dc.fnAction, unpack(dc.param))
 			if not res then
-				MY.Debug("DelayCall#" .. (dc.szName or 'anonymous') .." ERROR: " .. err)
+				MY.Debug({"DelayCall#" .. (dc.szName or 'anonymous') .." ERROR: " .. err})
 			end
 			table.remove(_Cache.tDelayCall, i)
 		end
@@ -693,27 +705,31 @@ MY.Sysmsg = function(oContent, oTitle)
 	-- Output
 	OutputMessage("MSG_SYS", szMsg, true)
 end
+
 --[[ Debug输出
-	(void)MY.Debug(szText, szHead, nLevel)
-	szText  Debug信息
-	szHead  Debug头
-	nLevel  Debug级别[低于当前设置值将不会输出]
+	(void)MY.Debug(oContent, szTitle, nLevel)
+	oContent Debug信息
+	szTitle  Debug头
+	nLevel   Debug级别[低于当前设置值将不会输出]
 ]]
-MY.Debug = function(szText, szHead, nLevel)
-	if type(nLevel)~="number" then nLevel = 1 end
-	if type(szHead)~="string" then szHead = 'MY DEBUG' end
-	local oContent = { r=255, g=255, b=0 }
-	if nLevel == 0 then
-		oContent = { r=0,   g=255, b=127 }
-	elseif nLevel == 1 then
-		oContent = { r=255, g=170, b=170 }
-	elseif nLevel == 2 then
-		oContent = { r=255, g=86,  b=86  }
+MY.Debug = function(oContent, szTitle, nLevel)
+	if type(nLevel)~="number"  then nLevel = 1 end
+	if type(szTitle)~="string" then szTitle = 'MY DEBUG' end
+	if type(oContent)~='table' then oContent = { oContent, bNoWrap = true } end
+	if not oContent.r then
+		if nLevel == 0 then
+			oContent.r, oContent.g, oContent.b =   0, 255, 127
+		elseif nLevel == 1 then
+			oContent.r, oContent.g, oContent.b = 255, 170, 170
+		elseif nLevel == 2 then
+			oContent.r, oContent.g, oContent.b = 255,  86,  86
+		else
+			oContent.r, oContent.g, oContent.b = 255, 255, 0
+		end
 	end
-	table.insert(oContent, szText)
 	if nLevel >= MY.GetAddonInfo().nDebugLevel then
-		MY.Sysmsg(oContent, szHead)
-		Log('[MY_DEBUG][LEVEL_' .. nLevel .. ']' .. '[' .. szHead .. ']' .. szText)
+		Log('[MY_DEBUG][LEVEL_' .. nLevel .. ']' .. '[' .. szTitle .. ']' .. table.concat(oContent, "\n"))
+		MY.Sysmsg(oContent, szTitle)
 	end
 end
 
