@@ -4,7 +4,7 @@
 -- @Date  : 2015-03-09 21:26:52
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-10 11:51:06
+-- @Last Modified time: 2015-03-10 13:14:43
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = { Data = {} }
@@ -15,7 +15,15 @@ RegisterCustomData("MY_AutoChat.bEnableShift")
 
 MY_AutoChat.LoadData = function() _C.Data = MY.LoadLUAData("config/AUTO_CHAT/data") or {} end
 MY_AutoChat.SaveData = function() MY.SaveLUAData("config/AUTO_CHAT/data", _C.Data) end
-MY_AutoChat.GetName  = function(dwType, dwID) return MY.GetObjectName(MY.GetObject(dwType, dwID)) or GetClientPlayer().GetMapID() end
+MY_AutoChat.GetName  = function(dwType, dwID)
+	local szMap  = Table_GetMapName(GetClientPlayer().GetMapID())
+	local szName = MY.GetObjectName(MY.GetObject(dwType, dwID))
+	if szName then
+		return szName, szMap
+	else
+		return _L['Common'], _L['Common']
+	end
+end
 
 MY_AutoChat.AddData = function(szMap, szName, szKey)
 	if not _C.Data[szMap] then
@@ -34,6 +42,12 @@ MY_AutoChat.DelData = function(szMap, szName, szKey)
 		return
 	else
 		_C.Data[szMap][szName][szKey] = nil
+		if empty(_C.Data[szMap][szName]) then
+			_C.Data[szMap][szName] = nil
+			if empty(_C.Data[szMap]) then
+				_C.Data[szMap] = nil
+			end
+		end
 	end
 	MY_AutoChat.SaveData()
 end
@@ -67,9 +81,9 @@ function MY_AutoChat.DoSomething()
 	local frame = Station.Lookup("Normal/DialoguePanel")
 	if frame and frame:IsVisible() then
 		local dwType, dwID, dwIndex, aInfo = frame.dwTargetType, frame.dwTargetId, frame.dwIndex, frame.aInfo
-		local szName = MY_AutoChat.GetName(dwType, dwID)
+		local szName, szMap = MY_AutoChat.GetName(dwType, dwID)
 		if szName and aInfo then
-			MY_AutoChat.Choose(Table_GetMapName(GetClientPlayer().GetMapID()), szName, dwIndex, aInfo)
+			MY_AutoChat.Choose(szMap, szName, dwIndex, aInfo)
 		end
 	end
 end
@@ -81,8 +95,7 @@ _C.HookDialoguePanel = function()
 			x = 50, y = 10, w = 80, text = _L['autochat'],
 			menu = function()
 				local dwType, dwID, dwIdx = frame.dwTargetType, frame.dwTargetId, frame.dwIndex
-				local szName = MY_AutoChat.GetName(dwType, dwID)
-				local szMap = Table_GetMapName(GetClientPlayer().GetScene().dwMapID)
+				local szName, szMap = MY_AutoChat.GetName(dwType, dwID)
 				if szName and szMap then
 					if frame.aInfo then
 						local t = { {szOption = szName, bDisable = true}, { bDevide = true } }
@@ -131,20 +144,20 @@ MY.RegisterPlayerAddonMenu('MY_AutoChat', function()
 		szOption = _L['autochat'], {
 			szOption = _L['enable'],
 			bCheck = true, bChecked = MY_AutoChat.bEnable,
-			fnAction = function(bChecked)
-				MY_AutoChat.bEnable = bChecked
+			fnAction = function()
+				MY_AutoChat.bEnable = not MY_AutoChat.bEnable
 			end
 		}, {
 			szOption = _L['echo when autochat'],
 			bCheck = true, bChecked = MY_AutoChat.bEchoOn,
-			fnAction = function(bChecked)
-				MY_AutoChat.bEchoOn = bChecked
+			fnAction = function()
+				MY_AutoChat.bEchoOn = not MY_AutoChat.bEchoOn
 			end
 		}, {
 			szOption = _L['disable when shift key pressed'],
 			bCheck = true, bChecked = MY_AutoChat.bEnableShift,
-			fnAction = function(bChecked)
-				MY_AutoChat.bEnableShift = bChecked
+			fnAction = function()
+				MY_AutoChat.bEnableShift = not MY_AutoChat.bEnableShift
 			end
 		},
 	}
