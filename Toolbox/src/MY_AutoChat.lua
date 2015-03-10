@@ -4,7 +4,7 @@
 -- @Date  : 2015-03-09 21:26:52
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-10 13:36:16
+-- @Last Modified time: 2015-03-10 15:02:21
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = { Data = {} }
@@ -13,7 +13,7 @@ RegisterCustomData("MY_AutoChat.bEnable")
 RegisterCustomData("MY_AutoChat.bEchoOn")
 RegisterCustomData("MY_AutoChat.bEnableShift")
 
-MY_AutoChat.LoadData = function() _C.Data = MY.LoadLUAData("config/AUTO_CHAT/data") or {} end
+MY_AutoChat.LoadData = function() _C.Data = MY.LoadLUAData("config/AUTO_CHAT/data") or MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "ToolBox/data/interact/") or _C.Data end
 MY_AutoChat.SaveData = function() MY.SaveLUAData("config/AUTO_CHAT/data", _C.Data) end
 MY_AutoChat.GetName  = function(dwType, dwID)
 	local szMap  = _L['Common']
