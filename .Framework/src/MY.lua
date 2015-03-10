@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-03-10 16:37:36
+-- @Last Modified time: 2015-03-10 16:39:39
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -129,8 +129,8 @@ MY = {}
 local _DEBUG_ = 4
 local _BUILD_ = "20150304"
 local _VERSION_ = 0x2002600
-local _ADDON_ROOT_ = '\\Interface\\MY\\'
-local _FRAMEWORK_ROOT_ = '\\Interface\\MY\\.Framework\\'
+local _ADDON_ROOT_ = '/Interface/MY/'
+local _FRAMEWORK_ROOT_ = '/Interface/MY/.Framework/'
 
 --[[ 多语言处理
 	(table) MY.LoadLangPack(void)
