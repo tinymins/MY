@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-03-10 12:13:07
+-- @Last Modified time: 2015-03-10 13:22:17
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 if not GetCampImageFrame then
@@ -50,4 +50,37 @@ if not empty then
 			return e == nil
 		end
 	end
+end
+
+-- get item name by item
+if not GetItemNameByItem then
+function GetItemNameByItem(item)
+	if item.nGenre == ITEM_GENRE.BOOK then
+		local nBookID, nSegID = GlobelRecipeID2BookID(item.nBookID)
+		return Table_GetSegmentName(nBookID, nSegID) or g_tStrings.BOOK
+	else
+		return Table_GetItemName(item.nUiId)
+	end
+end
+end
+
+if not GetItemNameByItemInfo then
+function GetItemNameByItemInfo(itemInfo, nBookInfo)
+	if itemInfo.nGenre == ITEM_GENRE.BOOK then
+		if nBookInfo then
+			local nBookID, nSegID = GlobelRecipeID2BookID(nBookInfo)
+			return Table_GetSegmentName(nBookID, nSegID) or g_tStrings.BOOK
+		else
+			return Table_GetItemName(itemInfo.nUiId)
+		end
+	else
+		return Table_GetItemName(itemInfo.nUiId)
+	end
+end
+end
+
+if not GetItemNameByUIID then
+function GetItemNameByUIID(nUiId)
+	return Table_GetItemName(nUiId)
+end
 end
