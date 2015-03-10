@@ -4,7 +4,7 @@
 -- @Date  : 2015-03-09 21:26:52
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-10 11:32:10
+-- @Last Modified time: 2015-03-10 11:51:06
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = { Data = {} }
@@ -46,7 +46,7 @@ MY_AutoChat.Choose = function(szMap, szName, dwIndex, aInfo)
 	local tChat = _C.Data[szMap][szName]
 	
 	for i, v in ipairs(aInfo) do
-		if v.name == '$' or v.name == "W" and tChat[v.context] and v.attribute.id then
+		if (v.name == '$' or v.name == "W") and tChat[v.context] and v.attribute.id then
 			for i = 1, tChat[v.context] do
 				GetClientPlayer().WindowSelect(dwIndex, v.attribute.id)
 			end
