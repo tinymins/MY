@@ -5,7 +5,7 @@
 -- @Date  : 2014-12-04 11:51:31
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-10 16:27:42
+-- @Last Modified time: 2015-03-10 16:46:45
 -----------------------------------------------
 MY_MiddleMapMark = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_MiddleMapMark/lang/")
@@ -289,7 +289,7 @@ _C.PS.OnPanelActive = function(wnd)
 	  					return 0
 	  				end
 	  			end
-	  			muProgress:width((w - 32) * i / N)
+	  			muProgress:width((ui:width() - 32) * i / N)
 
 	  			i = i + 1
 	  			if i > N then
