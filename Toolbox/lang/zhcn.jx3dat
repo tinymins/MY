@@ -87,4 +87,10 @@ data = {
     ["Querying, please wait..."] = '查询中，请稍后……',
     ["No result found. Here's from open search engine:"] = '没有搜索到匹配的结果，以下数据来自开放搜索引擎：',
     ['Loading failed.'] = '加载失败',
+    
+    ['autochat'] = '自动对话',
+    ['Auto interact disabled due to SHIFT key pressed.'] = '你按住了Shift键，自动对话被禁用。',
+    ['Conversation with [%s] auto chose: %s'] = '对话[%s]自动选择了：%s',
+    ['echo when autochat'] = '输出选择的选项',
+    ['disable when shift key pressed'] = '按住SHIFT时禁用自动对话',
 }
