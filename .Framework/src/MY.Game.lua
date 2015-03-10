@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-03-07 22:14:17
+-- @Last Modified time: 2015-03-10 13:27:35
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -----------------------------------------------
@@ -276,6 +276,8 @@ MY.Game.GetObject = function(dwType, dwID)
 		p, info, b = GetNpc(dwID), GetNpc(dwID), false
 	elseif dwType == TARGET.DOODAD then
 		p, info, b = GetDoodad(dwID), GetDoodad(dwID), false
+	elseif dwType == TARGET.ITEM then
+		p, info, b = GetItem(dwID), GetItem(dwID), GetItem(dwID)
 	end
 	return p, info, b
 end
@@ -309,13 +311,15 @@ MY.Game.GetObjectName = function(obj)
 			szName =  szEmpName .. g_tStrings.STR_PET_SKILL_LOG .. (szName or '')
 		end
 		return szName
-	else -- DOODAD
+	elseif obj.CanLoot then -- DOODAD
 		if szName == "" then
 			szName = string.gsub(Table_GetDoodadTemplateName(obj.dwTemplateID), "^%s*(.-)%s*$", "%1")
 			if szName == "" then
 				szName = nil
 			end
 		end
+	elseif obj.IsRepairable then -- ITEM
+		return GetItemNameByItem(obj)
 	end
 end
 MY.GetObjectName = MY.Game.GetObjectName
