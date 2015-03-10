@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-10 09:30:23
+-- @Last Modified time: 2015-03-10 16:32:54
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -671,11 +671,11 @@ function _MY.UI:append(arg0, arg1, arg2)
 				end
 				local frame = Wnd.OpenWindow(szFile, "MY_TempWnd")
 				if not frame then
-					return MY.Debug(_L("unable to open ini file [%s]", szFile)..'\n', 'MY#UI#append', 2)
+					return MY.Debug({_L("unable to open ini file [%s]", szFile)}, 'MY#UI#append', 2)
 				end
 				local wnd = frame:Lookup(szType)
 				if not wnd then
-					MY.Debug(_L("can not find wnd component [%s]", szType)..'\n', 'MY#UI#append', 2)
+					MY.Debug({_L("can not find wnd component [%s]", szType)}, 'MY#UI#append', 2)
 				else
 					wnd.szMyuiType = szType
 					if szName then
@@ -868,7 +868,7 @@ function _MY.UI:append(arg0, arg1, arg2)
 									this.text, this.id, this.data, not this.selected
 								)
 								if not status then
-									MY.Debug(err, 'WndListBox#CustomLButtonClick', 2)
+									MY.Debug({err}, 'WndListBox#CustomLButtonClick', 2)
 								elseif err == false then
 									return
 								end
@@ -931,7 +931,7 @@ function _MY.UI:append(arg0, arg1, arg2)
 				end
 				ele.hdl:FormatAllItemPos()
 				if not hnd then
-					return MY.Debug(_L("unable to append handle item [%s]", szType)..'\n','MY#UI:append',2)
+					return MY.Debug({_L("unable to append handle item [%s]", szType)},'MY#UI:append',2)
 				else
 					ui = MY.UI(hnd)
 				end
@@ -968,7 +968,7 @@ function _MY.UI:append(arg0, arg1, arg2)
 				ele.hdl:FormatAllItemPos()
 				pcall( ele.raw.UpdateScroll )
 				if nCount == ele.hdl:GetItemCount() then
-					return MY.Debug(_L("unable to append handle item from string.")..'\n','MY#UI:append',2)
+					return MY.Debug({_L("unable to append handle item from string.")},'MY#UI:append',2)
 				end
 			end
 		end
@@ -1010,7 +1010,7 @@ function _MY.UI:data(key, value)
 		-- try to get its name
 		local status, err = pcall(function() return ele.raw[key] end)
 		-- if succeed then return its name
-		if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:data' ,1) return nil end
+		if status then return err else MY.Debug({err},'ERROR _MY.UI:data' ,1) return nil end
 	else
 		return self
 	end
@@ -1047,7 +1047,7 @@ function _MY.UI:visible(bVisiable)
 		-- try to get its name
 		local status, err = pcall(function() return ele.raw:IsVisible() end)
 		-- if succeed then return its name
-		if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:visible' ,1) return nil end
+		if status then return err else MY.Debug({err},'ERROR _MY.UI:visible' ,1) return nil end
 	end
 end
 
@@ -1065,7 +1065,7 @@ function _MY.UI:enable(bEnable)
 		-- try to get its name
 		local status, err = pcall(function() return ele.raw:IsEnabled() end)
 		-- if succeed then return its name
-		if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:enable' ,1) return nil end
+		if status then return err else MY.Debug({err},'ERROR _MY.UI:enable' ,1) return nil end
 	end
 end
 
@@ -1128,7 +1128,7 @@ function _MY.UI:drag(x, y, w, h)
 		-- try to get its name
 		local status, err = pcall(function() return (ele.frm or ele.raw):IsDragable() end)
 		-- if succeed then return its name
-		if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:drag' ,1) return nil end
+		if status then return err else MY.Debug({err},'ERROR _MY.UI:drag' ,1) return nil end
 	end
 end
 
@@ -1186,7 +1186,7 @@ function _MY.UI:placeholder(szText)
 		-- try to get its name
 		local status, err = pcall(function() return ele.phd:GetText() end)
 		-- if succeed then return its name
-		if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:text' ,3) return nil end
+		if status then return err else MY.Debug({err},'ERROR _MY.UI:text' ,3) return nil end
 	end
 end
 
@@ -1524,7 +1524,7 @@ function _MY.UI:name(szText)
 		-- try to get its name
 		local status, err = pcall(function() return ele.raw:GetName() end)
 		-- if succeed then return its name
-		if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:name' ,3) return nil end
+		if status then return err else MY.Debug({err},'ERROR _MY.UI:name' ,3) return nil end
 	end
 end
 
@@ -1542,7 +1542,7 @@ function _MY.UI:group(szText)
 		-- try to get its group
 		local status, err = pcall(function() return ele.raw.group end)
 		-- if succeed then return its group
-		if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:group' ,3) return nil end
+		if status then return err else MY.Debug({err},'ERROR _MY.UI:group' ,3) return nil end
 	end
 end
 
@@ -1573,7 +1573,7 @@ function _MY.UI:alpha(nAlpha)
 		-- try to get its name
 		local status, err = pcall(function() return ele.raw:GetAlpha() end)
 		-- if succeed then return its name
-		if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:alpha' ,3) return nil end
+		if status then return err else MY.Debug({err},'ERROR _MY.UI:alpha' ,3) return nil end
 	end
 end
 
@@ -1695,7 +1695,7 @@ function _MY.UI:font(nFont)
 		-- try to get its name
 		local status, err = pcall(function() return ele.raw:GetFontScheme() end)
 		-- if succeed then return its name
-		if status then return err else MY.Debug(err..'\n','ERROR _MY.UI:font' ,3) return nil end
+		if status then return err else MY.Debug({err},'ERROR _MY.UI:font' ,3) return nil end
 	end
 end
 
@@ -1770,7 +1770,7 @@ function _MY.UI:pos(nLeft, nTop)
 		-- try to get its name
 		local status, l, t = pcall(function() return ele.raw:GetRelPos() end)
 		-- if succeed then return its name
-		if status then return l, t else MY.Debug(l..'\n','ERROR _MY.UI:left|top|pos' ,1) return nil end
+		if status then return l, t else MY.Debug({l},'ERROR _MY.UI:left|top|pos' ,1) return nil end
 	end
 end
 
@@ -1797,7 +1797,7 @@ function _MY.UI:anchor(anchor)
 			return GetFrameAnchor(ele.frm, anchor)
 		end)
 		-- if succeed then return its name
-		if status then return anchor else MY.Debug(anchor..'\n','ERROR _MY.UI:anchor' ,1) return nil end
+		if status then return anchor else MY.Debug({anchor},'ERROR _MY.UI:anchor' ,1) return nil end
 	end
 end
 
@@ -1971,7 +1971,7 @@ function _MY.UI:size(nWidth, nHeight)
 			-- try to get its name
 			local status, w, h = pcall(function() return ele.raw:GetSize() end)
 			-- if succeed then return its name
-			if status then return w, h else MY.Debug(w..'\n','ERROR _MY.UI:height|width|size' ,1) return nil end
+			if status then return w, h else MY.Debug({w},'ERROR _MY.UI:height|width|size' ,1) return nil end
 		end
 	end
 end
@@ -2058,7 +2058,7 @@ function _MY.UI:multiLine(bMultiLine)
 		-- try to get its name
 		local status, bMultiLine = pcall(function() return (ele.edt or ele.txt):IsMultiLine() end)
 		-- if succeed then return its name
-		if status then return bMultiLine else MY.Debug(bMultiLine..'\n','ERROR _MY.UI:multiLine' ,1) return nil end
+		if status then return bMultiLine else MY.Debug({bMultiLine},'ERROR _MY.UI:multiLine' ,1) return nil end
 	end
 end
 
@@ -2102,7 +2102,7 @@ function _MY.UI:frame(nFrame)
 			-- try to get its frame
 			local status, nFrame = pcall(function() return ele.raw:GetFrame() end)
 			-- if succeed then return its name
-			if status then return nFrame else MY.Debug(nFrame..'\n','ERROR _MY.UI:frame' ,1) return nil end
+			if status then return nFrame else MY.Debug({nFrame},'ERROR _MY.UI:frame' ,1) return nil end
 		end
 	end
 	return self
@@ -2487,7 +2487,7 @@ function _MY.UI:check(fnCheck, fnUncheck, bNoAutoBind)
 			return ele.chk:IsCheckBoxChecked()
 		end
 	else
-		MY.Debug('fnCheck:'..type(fnCheck)..' fnUncheck:'..type(fnUncheck)..'\n', 'ERROR _MY.UI:check' ,1)
+		MY.Debug({'fnCheck:'..type(fnCheck)..' fnUncheck:'..type(fnUncheck)}, 'ERROR _MY.UI:check' ,1)
 	end
 end
 
@@ -2564,7 +2564,7 @@ MY.UI.RegisterUIEvent = function(raw, szEvent, fnEvent)
 				for _, fn in ipairs(raw['tMy' .. szEvent] or {}) do 
 					local t = { pcall(fn, ...) }
 					if not t[1] then
-						MY.Debug(t[2], MY.UI.GetTreePath(raw) .. '#' .. szEvent, 2)
+						MY.Debug({t[2]}, MY.UI.GetTreePath(raw) .. '#' .. szEvent, 2)
 					elseif not tReturn then
 						table.remove(t, 1)
 						tReturn = t

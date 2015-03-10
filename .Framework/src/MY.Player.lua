@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-09 15:46:38
+-- @Last Modified time: 2015-03-10 16:35:17
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -471,7 +471,7 @@ _Cache.WithTargetHandle = function()
 	MY.Player.SetTempTarget(r.dwType, r.dwID)
 	local status, err = pcall(r.callback)
 	if not status then
-		MY.Debug(err, 'MY.Player.lua#WithTargetHandle', 2)
+		MY.Debug({err}, 'MY.Player.lua#WithTargetHandle', 2)
 	end
 	MY.Player.ResumeTarget()
 	
