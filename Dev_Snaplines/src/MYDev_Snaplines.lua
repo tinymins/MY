@@ -348,3 +348,7 @@ end
 MY.RegisterPanel( "Dev_Snaplines", _L["Snaplines"], _L['Development'], "ui/Image/UICommon/PlugIn.UITex|1", {255,127,0,200}, {
     OnPanelActive = _Cache.OnPanelActive, OnPanelDeactive = nil
 })
+MY.Game.AddHotKey("Dev_Snaplines", _L["Snaplines"], function()
+    MYDev_Snaplines.bEnable = not MYDev_Snaplines.bEnable
+    MYDev_Snaplines.ReloadUI()
+end, nil)
