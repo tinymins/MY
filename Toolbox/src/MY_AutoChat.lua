@@ -4,7 +4,7 @@
 -- @Date  : 2015-03-09 21:26:52
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-10 15:02:21
+-- @Last Modified time: 2015-03-10 15:16:08
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = { Data = {} }
@@ -170,9 +170,11 @@ RegisterEvent("OPEN_WINDOW", function()
 	if MY.IsShieldedVersion() or not MY_AutoChat.bEnable then
 		return
 	end
+	if empty(_C.Data) then
+		MY_AutoChat.LoadData()
+	end
 	_C.HookDialoguePanel()
 	MY_AutoChat.CurrentWindow = arg0
 	MY_AutoChat.Conents = arg1
 	MY_AutoChat.DoSomething()
 end)
-MY.RegisterInit(MY_AutoChat.LoadData)
