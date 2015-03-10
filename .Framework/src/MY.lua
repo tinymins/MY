@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-03-10 16:39:39
+-- @Last Modified time: 2015-03-10 17:04:05
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -321,6 +321,9 @@ MY.ResizePanel = function(nWidth, nHeight)
 		return
 	end
 	
+	frame:Lookup('', 'Text_Author'):SetRelPos(0, nHeight - 41)
+	frame:Lookup('', 'Text_Author'):SetSize(nWidth - 31, 20)
+	frame:Lookup('', ''):FormatAllItemPos()
 	local hWnd = frame:Lookup('Wnd_Total')
 	local hTotal = hWnd:Lookup('', '')
 	hTotal:SetSize(nWidth, nHeight)
