@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-03-10 17:04:05
+-- @Last Modified time: 2015-03-11 14:07:54
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -750,6 +750,7 @@ MY.SwitchTab = function(szID)
 		ui:append("Image", "Image_Adv", { x = 0, y = 0, image = { MY.GetAddonInfo().szUITexPoster, 0 } })
 		ui:append("Text", "Text_Adv", { x = 10, y = 300, w = 557, font = 200 })
 		wndMainPanel.OnPanelResize = function(wnd)
+			local w, h = MY.UI(wnd):size()
 			if w / 557 > (h - 50) / 278 then
 				ui:item('#Image_Adv'):size((h - 50) / 278 * 557, (h - 50))
 				ui:item('#Text_Adv'):pos(10, h - 40)
@@ -758,7 +759,7 @@ MY.SwitchTab = function(szID)
 				ui:item('#Text_Adv'):pos(10, w / 557 * 278 + 10)
 			end
 		end
-		wndMainPanel.OnPanelResize()
+		wndMainPanel.OnPanelResize(wndMainPanel)
 		MY.BreatheCall(function()
 			local player = GetClientPlayer()
 			if player then
