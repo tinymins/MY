@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-02-13 18:39:03
+-- @Last Modified time: 2015-03-22 18:14:29
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -692,9 +692,6 @@ MY.Chat.HookChatPanel = function(arg0, arg1, arg2)
 		id, fnBefore, fnAfter = arg2, arg0, arg1
 	else
 		id, fnBefore, fnAfter = nil, arg0, arg1
-	end
-	if type(fnBefore)~="function" and type(fnAfter)~="function" then
-		return nil
 	end
 	if id then
 		for i=#_C.tHookChatFun, 1, -1 do
