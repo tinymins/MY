@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-03-10 16:35:17
+-- @Last Modified time: 2015-03-22 17:51:18
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -271,9 +271,9 @@ _Cache.OnFightStateChange = function(bFightState)
 		if not _Cache.bFighting then
 			_Cache.bFighting = true
 			-- 5秒脱战判定缓冲 防止明教隐身错误判定
-			if GetLogicFrameCount() - _Cache.nCurrentFightEndingFrame > GLOBAL.GAME_FPS * 5 then
+			if MY.GetFrameCount() - _Cache.nCurrentFightEndingFrame > GLOBAL.GAME_FPS * 5 then
 				-- 新的一轮战斗开始
-				_Cache.nCurrentFightBeginFrame = GetLogicFrameCount()
+				_Cache.nCurrentFightBeginFrame = MY.GetFrameCount()
 				_Cache.nCurrentFightUUID = _Cache.nCurrentFightBeginFrame
 				FireUIEvent('MY_FIGHT_HINT', true)
 			end
@@ -282,9 +282,9 @@ _Cache.OnFightStateChange = function(bFightState)
 		-- 退出战斗判定
 		if _Cache.bFighting then
 			_Cache.bFighting = false
-			_Cache.nCurrentFightEndingFrame = GetLogicFrameCount()
+			_Cache.nCurrentFightEndingFrame = MY.GetFrameCount()
 		end
-		if _Cache.nCurrentFightUUID and GetLogicFrameCount() - _Cache.nCurrentFightEndingFrame > GLOBAL.GAME_FPS * 5 then
+		if _Cache.nCurrentFightUUID and MY.GetFrameCount() - _Cache.nCurrentFightEndingFrame > GLOBAL.GAME_FPS * 5 then
 			_Cache.nLastFightUUID = _Cache.nCurrentFightUUID
 			_Cache.nCurrentFightUUID = nil
 			FireUIEvent('MY_FIGHT_HINT', false)
@@ -299,7 +299,7 @@ MY.Player.GetFightTime = function(szFormat)
 	local nFrame = 0
 	
 	if MY.Player.IsFighting() then -- 战斗状态
-		nFrame = GetLogicFrameCount() - _Cache.nCurrentFightBeginFrame
+		nFrame = MY.GetFrameCount() - _Cache.nCurrentFightBeginFrame
 	else  -- 脱战状态
 		nFrame = _Cache.nCurrentFightEndingFrame - _Cache.nCurrentFightBeginFrame
 	end
@@ -352,8 +352,10 @@ MY.Player.IsFighting = function()
 	end
 	local bFightState = me.bFightState
 	
+	if not bFightState and MY.Player.IsInArena() then
+		bFightState = true
+	elseif not bFightState and MY.Player.IsInDungeon() then
 	-- 在副本且附近队友进战则判断处于战斗状态
-	if not bFightState and MY.Player.IsInDungeon() then
 		for dwID, p in pairs(MY.Player.GetNearPlayer()) do
 			if me.IsPlayerInMyParty(dwID) and p.bFightState then
 				bFightState = true
