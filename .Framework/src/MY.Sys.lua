@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-03-10 16:25:04
+-- @Last Modified time: 2015-03-22 17:50:48
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -34,6 +34,11 @@ MY.Sys.IsShieldedVersion = function()
 end
 MY.IsShieldedVersion = MY.Sys.IsShieldedVersion
 
+_C.nFrameCount = 0
+MY.Sys.GetFrameCount = function()
+	return _C.nFrameCount
+end
+MY.GetFrameCount = MY.Sys.GetFrameCount
 -- Save & Load Lua Data
 -- #######################################################################################################
 --         #       #             #                           #                                       
@@ -452,6 +457,7 @@ end
 MY.UI.RegisterUIEvent(MY, "OnFrameBreathe", function()
 	-- add frame counter
 	_Cache.nFrameCount = GetLogicFrameCount()
+	_C.nFrameCount = _C.nFrameCount + 1
 	-- run breathe calls
 	local nFrame = _Cache.nFrameCount
 	for i = #_Cache.tBreatheCall, 1, -1 do
