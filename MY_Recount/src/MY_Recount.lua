@@ -208,7 +208,7 @@ MY_Recount.UpdateUI = function(data)
     -- 计算战斗时间
     local nTimeCount = 0
     if data.UUID == MY.Player.GetFightUUID() then
-        nTimeCount = MY.Player.GetFightTime() / GLOBAL.GAME_FPS
+        nTimeCount = GetCurrentTime() - data.nTimeBegin
     else
         nTimeCount = data.nTimeDuring
     end
@@ -362,10 +362,10 @@ end
 ]]
 -- 周期重绘
 MY_Recount.OnFrameBreathe = function()
-    if this.nLastRedrawFrame and GetLogicFrameCount() - this.nLastRedrawFrame < MY_Recount.nDrawInterval then
+    if this.nLastRedrawFrame and MY.GetFrameCount() - this.nLastRedrawFrame < MY_Recount.nDrawInterval then
         return
     end
-    this.nLastRedrawFrame = GetLogicFrameCount()
+    this.nLastRedrawFrame = MY.GetFrameCount()
     
     -- 不进战时不刷新UI
     if not _Cache.bHistoryMode and not MY.Player.GetFightUUID() then
@@ -382,10 +382,10 @@ end
 
 -- ShowDetail界面时间相应
 _Cache.OnDetailFrameBreathe = function()
-    if this.nLastRedrawFrame and GetLogicFrameCount() - this.nLastRedrawFrame < MY_Recount.nDrawInterval then
+    if this.nLastRedrawFrame and MY.GetFrameCount() - this.nLastRedrawFrame < MY_Recount.nDrawInterval then
         return
     end
-    this.nLastRedrawFrame = GetLogicFrameCount()
+    this.nLastRedrawFrame = MY.GetFrameCount()
     
     local id        = this.id
     local szChannel = this.szChannel
