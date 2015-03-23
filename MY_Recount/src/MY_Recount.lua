@@ -357,10 +357,12 @@ end
 ]]
 -- 周期重绘
 MY_Recount.OnFrameBreathe = function()
-    if this.nLastRedrawFrame and MY.GetFrameCount() - this.nLastRedrawFrame < MY_Recount.nDrawInterval then
+    if this.nLastRedrawFrame and
+    GetLogicFrameCount() - this.nLastRedrawFrame > 0 and
+    GetLogicFrameCount() - this.nLastRedrawFrame < MY_Recount.nDrawInterval then
         return
     end
-    this.nLastRedrawFrame = MY.GetFrameCount()
+    this.nLastRedrawFrame = GetLogicFrameCount()
     
     -- 不进战时不刷新UI
     if not _Cache.bHistoryMode and not MY.Player.GetFightUUID() then
@@ -377,10 +379,12 @@ end
 
 -- ShowDetail界面时间相应
 _Cache.OnDetailFrameBreathe = function()
-    if this.nLastRedrawFrame and MY.GetFrameCount() - this.nLastRedrawFrame < MY_Recount.nDrawInterval then
+    if this.nLastRedrawFrame and
+    GetLogicFrameCount() - this.nLastRedrawFrame > 0 and
+    GetLogicFrameCount() - this.nLastRedrawFrame < MY_Recount.nDrawInterval then
         return
     end
-    this.nLastRedrawFrame = MY.GetFrameCount()
+    this.nLastRedrawFrame = GetLogicFrameCount()
     
     local id        = this.id
     local szChannel = this.szChannel
