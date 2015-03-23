@@ -204,7 +204,7 @@ MY.RegisterEvent('MY_FIGHT_HINT', function(bEnterFight)
         MY_Recount.Data.Init()
         FireUIEvent('MY_RECOUNT_NEW_FIGHT')
     else
-        Data.nTimeDuring = MY.Player.GetFightTime() / GLOBAL.GAME_FPS
+        Data.nTimeDuring = GetCurrentTime() - Data.nTimeBegin
         -- 计算受伤最多的名字作为战斗名称
         local nMaxValue, szBossName = 0, nil
         for id, p in pairs(Data.BeDamage) do
@@ -225,6 +225,11 @@ MY.RegisterEvent('MY_FIGHT_HINT', function(bEnterFight)
         Data.szBossName = szBossName or ''
         
         MY_Recount.Data.Push()
+    end
+end)
+MY.BreatheCall('MY_Recount_FightTime', function()
+    if MY.Player.IsFighting() then
+        Data.nTimeDuring = GetCurrentTime() - Data.nTimeBegin
     end
 end)
 
@@ -378,6 +383,7 @@ MY_Recount.Data.OnSkillEffect = function(dwCaster, dwTarget, nEffectType, dwEffe
         MY_Recount.Data.AddDamageRecord(hCaster, hTarget, szEffectName, 0, 0, nSkillResult)
     end
     
+    Data.nTimeDuring = GetCurrentTime() - Data.nTimeBegin
 end
 
 MY_Recount.Data.GetNameAusID = function(id, data)

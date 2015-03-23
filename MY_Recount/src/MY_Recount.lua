@@ -206,12 +206,7 @@ MY_Recount.UpdateUI = function(data)
     end
     
     -- 计算战斗时间
-    local nTimeCount = 0
-    if data.UUID == MY.Player.GetFightUUID() then
-        nTimeCount = GetCurrentTime() - data.nTimeBegin
-    else
-        nTimeCount = data.nTimeDuring
-    end
+    local nTimeCount = data.nTimeDuring
     local szTimeCount = MY.Sys.FormatTimeCount('M:ss', nTimeCount)
     nTimeCount  = math.max(nTimeCount, 1) -- 防止计算DPS时除以0
     -- 自己的记录
