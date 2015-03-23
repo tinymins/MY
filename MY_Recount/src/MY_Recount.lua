@@ -73,7 +73,7 @@ MY_Recount.bShowEffect   = true                 -- 显示有效伤害/治疗
 MY_Recount.bSaveRecount  = false                -- 退出游戏时保存战斗记录
 MY_Recount.nDisplayMode  = DISPLAY_MODE.BOTH    -- 统计显示模式（显示NPC/玩家数据）（默认混合显示）
 MY_Recount.nPublishLimit = 30                   -- 发布到聊天频道数量
-MY_Recount.nPublishMode  = PUBLISH_MODE.TOTAL   -- 发布模式
+MY_Recount.nPublishMode  = PUBLISH_MODE.EFFECT  -- 发布模式
 MY_Recount.nDrawInterval = GLOBAL.GAME_FPS / 2  -- UI重绘周期（帧）
 MY_Recount.anchor = { x=0, y=-70, s="BOTTOMRIGHT", r="BOTTOMRIGHT" } -- 默认坐标
 RegisterCustomData("MY_Recount.bEnable")
