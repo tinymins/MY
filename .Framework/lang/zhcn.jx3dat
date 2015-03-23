@@ -122,4 +122,5 @@ data = {
     ['download immediately'] = '立即下载',
     ['see new feature'] = '更新日志',
     
+    ['Important Npc list updated to v%d.'] = '重要NPC列表已成功更新至v%d。',
 }
