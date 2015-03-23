@@ -204,26 +204,6 @@ MY.RegisterEvent('MY_FIGHT_HINT', function(bEnterFight)
         MY_Recount.Data.Init()
         FireUIEvent('MY_RECOUNT_NEW_FIGHT')
     else
-        Data.nTimeDuring = GetCurrentTime() - Data.nTimeBegin
-        -- 计算受伤最多的名字作为战斗名称
-        local nMaxValue, szBossName = 0, nil
-        for id, p in pairs(Data.BeDamage) do
-            if nMaxValue < p.nTotalEffect and id ~= UI_GetClientPlayerID() then
-                nMaxValue  = p.nTotalEffect
-                szBossName = MY_Recount.Data.GetNameAusID(id, Data)
-            end
-        end
-        -- 如果没有 则计算输出最多的NPC名字作为战斗名称
-        if not szBossName then
-            for id, p in pairs(Data.Damage) do
-                if nMaxValue < p.nTotalEffect and not tonumber(id) then
-                    nMaxValue  = p.nTotalEffect
-                    szBossName = MY_Recount.Data.GetNameAusID(id, Data)
-                end
-            end
-        end
-        Data.szBossName = szBossName or ''
-        
         MY_Recount.Data.Push()
     end
 end)
@@ -674,6 +654,25 @@ MY_Recount.Data.Push = function()
     if not (Data and Data.UUID) then
         return
     end
+    
+    -- 计算受伤最多的名字作为战斗名称
+    local nMaxValue, szBossName = 0, nil
+    for id, p in pairs(Data.BeDamage) do
+        if nMaxValue < p.nTotalEffect and id ~= UI_GetClientPlayerID() then
+            nMaxValue  = p.nTotalEffect
+            szBossName = MY_Recount.Data.GetNameAusID(id, Data)
+        end
+    end
+    -- 如果没有 则计算输出最多的NPC名字作为战斗名称
+    if not szBossName then
+        for id, p in pairs(Data.Damage) do
+            if nMaxValue < p.nTotalEffect and not tonumber(id) then
+                nMaxValue  = p.nTotalEffect
+                szBossName = MY_Recount.Data.GetNameAusID(id, Data)
+            end
+        end
+    end
+    Data.szBossName = szBossName or ''
     
     if Data.nTimeDuring > MY_Recount.Data.nMinFightTime then
         table.insert(History, 1, Data)
