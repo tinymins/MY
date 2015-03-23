@@ -711,8 +711,8 @@ MY_Recount.OnLButtonClick = function()
     elseif name == 'Btn_History' then
         PopupMenu(MY_Recount.GetHistoryMenu())
     elseif name == 'Btn_Empty' then
-        MY_Recount.Data.Init(true)
-        DataDisplay = MY_Recount.Data.Get(0)
+        MY_Recount.Data.Push()
+        MY_Recount.DisplayData(0)
         MY_Recount.DrawUI()
     elseif name == 'Btn_Issuance' then
         PopupMenu(MY_Recount.GetPublishMenu())
