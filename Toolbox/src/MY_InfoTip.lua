@@ -20,8 +20,13 @@ local _Cache = {
     nLastFightStartTimestarp = 0,
     nLastFightEndTimestarp = 0,
 }
+local _C = {}
 MY_InfoTip = {}
 MY_InfoTip.Config = {
+    TimeMachine = { -- 倍速显示（显示服务器有多卡……）
+        bEnable = false, bShowBg = true, bShowTitle = true,
+        anchor  = { x=-10, y=-250, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    },
     FPS       = { -- FPS
         bEnable = false, bShowBg = true, bShowTitle = true,
         anchor  = { x=-10, y=-220, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
@@ -47,7 +52,26 @@ MY_InfoTip.Config = {
         anchor  = { x=-10, y=-70, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
     },
 }
+_C.tTm = {}
+_C.nTmFrameCount = GetLogicFrameCount()
 MY_InfoTip.Cache = {
+    TimeMachine  = { -- 目标距离
+        formatString = '', title = _L['time machine'], prefix = _L['Rate: '], content = 'x%.2f',
+        GetContent = function()
+            local s = 1
+            if _C.nTmFrameCount ~= GetLogicFrameCount() then
+                for i = GLOBAL.GAME_FPS, 1, -1 do
+                    _C.tTm[i] = _C.tTm[i - 1]
+                end
+                _C.tTm[1] = { frame = GetLogicFrameCount(), tick = GetTickCount() }
+                _C.nTmFrameCount = GetLogicFrameCount()
+            end
+            if _C.tTm[GLOBAL.GAME_FPS] then
+                s = 1000 * (GetLogicFrameCount() - _C.tTm[GLOBAL.GAME_FPS].frame) / GLOBAL.GAME_FPS / (GetTickCount() - _C.tTm[GLOBAL.GAME_FPS].tick)
+            end
+            return string.format(MY_InfoTip.Cache.TimeMachine.formatString, s)
+        end
+    },
     FPS       = { -- FPS
         formatString = '', title = _L['fps monitor'], prefix = _L['FPS: '], content = _L['%d'],
         GetContent = function() return string.format(MY_InfoTip.Cache.FPS.formatString, GetFPS()) end
