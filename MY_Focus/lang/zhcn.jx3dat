@@ -22,4 +22,5 @@ data = {
     ['delete focus'        ] = '删除焦点',
     ['add to focus list'   ] = '加入茗伊焦点',
     ['max display length'  ] = '最大显示数量',
+    ['sort by distance'    ] = '优先焦点近距离目标',
 }
