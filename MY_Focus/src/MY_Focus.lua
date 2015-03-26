@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-03-02 21:18:50
+-- @Last Modified time: 2015-03-26 16:11:28
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Focus/lang/")
 local _C = {}
@@ -16,6 +16,7 @@ MY_Focus.bEnable            = true  -- 是否启用
 MY_Focus.bFocusBoss         = true  -- 焦点重要NPC
 MY_Focus.bFocusFriend       = false -- 焦点附近好友
 MY_Focus.bFocusTong         = false -- 焦点帮会成员
+MY_Focus.bSortByDistance    = false -- 优先焦点近距离目标
 MY_Focus.bFocusEnemy        = false -- 焦点敌对玩家
 MY_Focus.bAutoHide          = true  -- 无焦点时隐藏
 MY_Focus.nMaxDisplay        = 5     -- 最大显示数量
@@ -106,6 +107,19 @@ MY_Focus.GetDisplayList = function()
 		table.insert(t, v)
 	end
 	return t
+end
+
+MY_Focus.SortFocus = function(fn)
+	local p = GetClientPlayer()
+	fn = fn or function(p1, p2)
+		p1 = MY.GetObject(p1.dwType, p1.dwID)
+		p2 = MY.GetObject(p2.dwType, p2.dwID)
+		if p1 and p2 then
+			return math.pow(p.nX - p1.nX, 2) + math.pow(p.nY - p1.nY, 2) < math.pow(p.nX - p2.nX, 2) + math.pow(p.nY - p2.nY, 2)
+		end
+		return true
+	end
+	table.sort(_C.tFocusList, fn)
 end
 
 -- 获取指定焦点的Handle 没有返回nil
@@ -356,8 +370,19 @@ end
 
 -- 更新列表
 MY_Focus.UpdateList = function()
+	local tNames = {}
 	for i, p in ipairs(MY_Focus.GetDisplayList()) do
 		MY_Focus.DrawFocus(p.dwType, p.dwID)
+		tNames['Handle_Info_' .. p.dwType .. '_' .. p.dwID] = true
+	end
+	local hList = Station.Lookup('Normal/MY_Focus', 'Handle_List')
+	if hList then
+		for i = hList:GetItemCount() - 1, 0, -1 do
+			if not tNames[hList:Lookup(i):GetName()] then
+				hList:RemoveItem(i)
+			end
+		end
+		hList:FormatAllItemPos()
 	end
 end
 
@@ -601,6 +626,9 @@ MY_Focus.OnFrameBreathe = function()
 			end
 		end
 	end
+	if MY_Focus.bSortByDistance then
+		MY_Focus.SortFocus()
+	end
 	MY_Focus.UpdateList()
 	MY_Focus.AdjustUI()
 end
@@ -771,12 +799,13 @@ MY.RegisterPanel( "MY_Focus", _L["focus list"], _L['Target'], "ui/Image/button/S
 	
 	-- 右侧
 	local x, y = xr, yr
+	local deltaX = 28
 	ui:append("WndCheckBox", "WndCheckBox_Auto_Hide"):children("#WndCheckBox_Auto_Hide")
 	  :pos(x, y):width(wr):text(_L['hide when empty']):check(MY_Focus.bAutoHide)
 	  :check(function(bChecked)
 	  	MY_Focus.bAutoHide = bChecked
 	  end)
-	y = y + 30
+	y = y + deltaX
 	
 	ui:append("WndCheckBox", "WndCheckBox_AF_VIN"):children("#WndCheckBox_AF_VIN")
 	  :pos(x, y):width(wr):text(_L['auto focus very important npc'])
@@ -786,7 +815,7 @@ MY.RegisterPanel( "MY_Focus", _L["focus list"], _L['Target'], "ui/Image/button/S
 	  	MY_Focus.bFocusBoss = bChecked
 	  	MY_Focus.RescanNearby()
 	  end)
-	y = y + 30
+	y = y + deltaX
 	
 	ui:append("WndCheckBox", "WndCheckBox_AF_Friend"):children("#WndCheckBox_AF_Friend")
 	  :pos(x, y):width(wr):text(_L['auto focus friend']):check(MY_Focus.bFocusFriend)
@@ -794,7 +823,7 @@ MY.RegisterPanel( "MY_Focus", _L["focus list"], _L['Target'], "ui/Image/button/S
 	  	MY_Focus.bFocusFriend = bChecked
 	  	MY_Focus.RescanNearby()
 	  end)
-	y = y + 30
+	y = y + deltaX
 	
 	ui:append("WndCheckBox", "WndCheckBox_AF_Tong"):children("#WndCheckBox_AF_Tong")
 	  :pos(x, y):width(wr):text(_L['auto focus tong']):check(MY_Focus.bFocusTong)
@@ -802,7 +831,7 @@ MY.RegisterPanel( "MY_Focus", _L["focus list"], _L['Target'], "ui/Image/button/S
 	  	MY_Focus.bFocusTong = bChecked
 	  	MY_Focus.RescanNearby()
 	  end)
-	y = y + 30
+	y = y + deltaX
 	
 	ui:append("WndCheckBox", "WndCheckBox_AF_Enemy"):children("#WndCheckBox_AF_Enemy")
 	  :pos(x, y):width(wr):text(_L['auto focus enemy']):check(MY_Focus.bFocusEnemy)
@@ -810,7 +839,7 @@ MY.RegisterPanel( "MY_Focus", _L["focus list"], _L['Target'], "ui/Image/button/S
 	  	MY_Focus.bFocusEnemy = bChecked
 	  	MY_Focus.RescanNearby()
 	  end)
-	y = y + 30
+	y = y + deltaX
 	
 	ui:append("WndCheckBox", "WndCheckBox_AF_JJCParty"):children("#WndCheckBox_AF_JJCParty")
 	  :pos(x, y):width(wr):text(_L['jjc auto focus party']):check(MY_Focus.bFocusJJCParty)
@@ -818,7 +847,7 @@ MY.RegisterPanel( "MY_Focus", _L["focus list"], _L['Target'], "ui/Image/button/S
 	  	MY_Focus.bFocusJJCParty = bChecked
 	  	MY_Focus.RescanNearby()
 	  end)
-	y = y + 30
+	y = y + deltaX
 	
 	ui:append("WndCheckBox", "WndCheckBox_AF_JJCEnemy"):children("#WndCheckBox_AF_JJCEnemy")
 	  :pos(x, y):width(wr):text(_L['jjc auto focus enemy']):check(MY_Focus.bFocusJJCEnemy)
@@ -826,7 +855,7 @@ MY.RegisterPanel( "MY_Focus", _L["focus list"], _L['Target'], "ui/Image/button/S
 	  	MY_Focus.bFocusJJCEnemy = bChecked
 	  	MY_Focus.RescanNearby()
 	  end)
-	y = y + 30
+	y = y + deltaX
 	
 	ui:append("WndCheckBox", "WndCheckBox_ShowTarget"):children("#WndCheckBox_ShowTarget")
 	  :pos(x, y):width(wr):text(_L['show focus\'s target']):check(MY_Focus.bShowTarget)
@@ -834,7 +863,7 @@ MY.RegisterPanel( "MY_Focus", _L["focus list"], _L['Target'], "ui/Image/button/S
 	  	MY_Focus.bShowTarget = bChecked
 	  	MY_Focus.RescanNearby()
 	  end)
-	y = y + 30
+	y = y + deltaX
 	
 	ui:append("WndCheckBox", "WndCheckBox_Traversal"):children("#WndCheckBox_Traversal")
 	  :pos(x, y):width(wr):text(_L['traversal object'])
@@ -843,7 +872,7 @@ MY.RegisterPanel( "MY_Focus", _L["focus list"], _L['Target'], "ui/Image/button/S
 	  :check(function(bChecked)
 	  	MY_Focus.bTraversal = bChecked
 	  end)
-	y = y + 30
+	y = y + deltaX
 	
 	ui:append("WndCheckBox", "WndCheckBox_HideDead"):children("#WndCheckBox_HideDead")
 	  :pos(x, y):width(wr):text(_L['hide dead object']):check(MY_Focus.bHideDeath)
@@ -851,14 +880,25 @@ MY.RegisterPanel( "MY_Focus", _L["focus list"], _L['Target'], "ui/Image/button/S
 	  	MY_Focus.bHideDeath = bChecked
 	  	MY_Focus.RescanNearby()
 	  end)
-	y = y + 30
+	y = y + deltaX
 	
 	ui:append("WndCheckBox", "WndCheckBox_DisplayKungfu"):children("#WndCheckBox_DisplayKungfu")
 	  :pos(x, y):width(wr):text(_L['display kungfu icon instead of location']):check(MY_Focus.bDisplayKungfuIcon or false)
 	  :check(function(bChecked)
 	  	MY_Focus.bDisplayKungfuIcon = bChecked
 	  end)
-	y = y + 30
+	y = y + deltaX
+	
+	ui:append("WndCheckBox", "WndCheckBox_SortByDistance", {
+		x = x, y = y, w = wr,
+		text = _L['sort by distance'],
+		checked = MY_Focus.bSortByDistance,
+		oncheck = function(bChecked)
+			MY_Focus.bSortByDistance = bChecked
+			MY_Focus.RedrawList()
+		end
+	})
+	y = y + deltaX
 	
 	ui:append("WndComboBox", "WndComboBox_MaxLength"):children("#WndComboBox_MaxLength")
 	  :pos(x, y):width(150)
@@ -879,5 +919,5 @@ MY.RegisterPanel( "MY_Focus", _L["focus list"], _L['Target'], "ui/Image/button/S
 	  	end
 	  	return t
 	  end)
-	y = y + 30
+	y = y + deltaX
 end})
