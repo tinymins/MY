@@ -78,10 +78,10 @@ MY.RegisterInit(function()
 			Log[k] = v
 		end
 	end
-	RegisterMsgMonitor(_C.OnTongMsg  , { 'MSG_GUILD', 'MSG_GUILD_ALLIANCE' })
-	RegisterMsgMonitor(_C.OnWisperMsg, { 'MSG_WHISPER' })
-	RegisterMsgMonitor(_C.OnRaidMsg  , { 'MSG_TEAM', 'MSG_GROUP' })
-	RegisterMsgMonitor(_C.OnFriendMsg, { 'MSG_FRIEND' })
+	MY.RegisterMsgMonitor('MY_ChatLog_Tong'  , _C.OnTongMsg  , { 'MSG_GUILD', 'MSG_GUILD_ALLIANCE' })
+	MY.RegisterMsgMonitor('MY_ChatLog_Wisper', _C.OnWisperMsg, { 'MSG_WHISPER' })
+	MY.RegisterMsgMonitor('MY_ChatLog_Raid'  , _C.OnRaidMsg  , { 'MSG_TEAM', 'MSG_GROUP' })
+	MY.RegisterMsgMonitor('MY_ChatLog_Friend', _C.OnFriendMsg, { 'MSG_FRIEND' })
 end)
 
 MY.RegisterExit(function()
