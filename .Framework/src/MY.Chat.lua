@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-03-22 18:14:29
+-- @Last Modified time: 2015-03-28 22:31:56
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -680,6 +680,38 @@ MY.Chat.Talk = function(nChannel, szText, bNoEscape, bSaveDeny, bPushToChatBox)
 end
 MY.Talk = MY.Chat.Talk
 
+_C.tMsgMonitorFun = {}
+-- Register:   MY.Chat.RegisterMsgMonitor(string szKey, function fnAction, table tChannels)
+--             MY.Chat.RegisterMsgMonitor(function fnAction, table tChannels)
+-- Unregister: MY.Chat.RegisterMsgMonitor(string szKey)
+MY.Chat.RegisterMsgMonitor = function(arg0, arg1, arg2)
+	local szKey, fnAction, tChannels
+	local tp0, tp1, tp2 = type(arg0), type(arg1), type(arg2)
+	if tp0 == 'string' and tp1 == 'function' and tp2 == 'table' then
+		szKey, fnAction, tChannels = arg0, arg1, arg2
+	elseif tp0 == 'function' and tp1 == 'table' then
+		fnAction, tChannels = arg0, arg1
+	elseif tp0 == 'string' and tp1 == 'nil' then
+		szKey = arg0
+	end
+	
+	if szKey and _C.tMsgMonitorFun[szKey] then
+		UnRegisterMsgMonitor(_C.tMsgMonitorFun[szKey].fn)
+		_C.tMsgMonitorFun[szKey] = nil
+	end
+	if fnAction and tChannels then
+		_C.tMsgMonitorFun[szKey] = { fn = function(szMsg, nFont, bRich, r, g, b, szChannel)
+			-- filter addon comm.
+			if StringFindW(szMsg, "eventlink") and StringFindW(szMsg, _L["Addon comm."]) then
+				return
+			end
+			fnAction(szMsg, nFont, bRich, r, g, b, szChannel)
+		end, ch = tChannels }
+		RegisterMsgMonitor(_C.tMsgMonitorFun[szKey].fn, _C.tMsgMonitorFun[szKey].ch)
+	end
+end
+MY.RegisterMsgMonitor = MY.Chat.RegisterMsgMonitor
+
 _C.tHookChatFun = {}
 --[[ HOOK聊天栏 ]]
 MY.Chat.HookChatPanel = function(arg0, arg1, arg2)
@@ -707,6 +739,10 @@ end
 MY.HookChatPanel = MY.Chat.HookChatPanel
 
 _C.HookChatPanelHandle = function(h, szMsg, szChannel)
+	-- filter addon comm.
+	if StringFindW(szMsg, "eventlink") and StringFindW(szMsg, _L["Addon comm."]) then
+		return h:_AppendItemFromString_MY(szMsg, szChannel)
+	end
 	-- add name to emotion icon
 	szMsg = string.gsub(szMsg, "<animate>.-path=\"(.-)\"(.-)group=(%d+).-</animate>", function (szImagePath, szExtra, szGroup)
 		local emo = MY.Chat.GetEmotion(szImagePath, szGroup, 'animate')
