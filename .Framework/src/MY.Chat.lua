@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-03-28 22:31:56
+-- @Last Modified time: 2015-03-30 14:05:10
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -56,12 +56,11 @@ _C.InitEmotion = function()
 	end
 end
 
---[[ 获取聊天表情列表
-	typedef emo table
-	(emo[]) MY.Chat.GetEmotion()                             -- 返回所有表情列表
-	(emo)   MY.Chat.GetEmotion(szCommand)                    -- 返回指定Cmd的表情
-	(emo)   MY.Chat.GetEmotion(szImageFile, nFrame, szType)  -- 返回指定图标的表情
-]]
+-- 获取聊天表情列表
+-- typedef emo table
+-- (emo[]) MY.Chat.GetEmotion()                             -- 返回所有表情列表
+-- (emo)   MY.Chat.GetEmotion(szCommand)                    -- 返回指定Cmd的表情
+-- (emo)   MY.Chat.GetEmotion(szImageFile, nFrame, szType)  -- 返回指定图标的表情
 MY.Chat.GetEmotion = function(arg0, arg1, arg2)
 	_C.InitEmotion()
 	local t
@@ -226,14 +225,13 @@ MY.Chat.LinkEventHandler = {
 		end
 	end,
 }
---[[ 绑定link事件响应
-	(userdata) MY.Chat.RenderLink(userdata link)                   处理link的各种事件绑定 namelink是一个超链接Text元素
-	(userdata) MY.Chat.RenderLink(userdata element, userdata link) 处理element的各种事件绑定 数据源是link
-	(string) MY.Chat.RenderLink(string szMsg)                      格式化szMsg 处理里面的超链接 添加时间相应
-	link   : 一个超链接Text元素
-	element: 一个可以挂鼠标消息响应的UI元素
-	szMsg  : 格式化的UIXML消息
-]]
+-- 绑定link事件响应
+-- (userdata) MY.Chat.RenderLink(userdata link)                   处理link的各种事件绑定 namelink是一个超链接Text元素
+-- (userdata) MY.Chat.RenderLink(userdata element, userdata link) 处理element的各种事件绑定 数据源是link
+-- (string) MY.Chat.RenderLink(string szMsg)                      格式化szMsg 处理里面的超链接 添加时间相应
+-- link   : 一个超链接Text元素
+-- element: 一个可以挂鼠标消息响应的UI元素
+-- szMsg  : 格式化的UIXML消息
 MY.Chat.RenderLink = function(argv, argv2)
 	if type(argv) == 'string' then
 		local szMsg = argv
@@ -421,8 +419,8 @@ MY.Chat.FormatContent = function(szMsg)
 	return t2
 end
 
---[[ 判断某个频道能否发言
--- (bool) MY.CanTalk(number nChannel)]]
+-- 判断某个频道能否发言
+-- (bool) MY.CanTalk(number nChannel)
 MY.Chat.CanTalk = function(nChannel)
 	for _, v in ipairs({"WHISPER", "TEAM", "RAID", "BATTLE_FIELD", "NEARBY", "TONG", "TONG_ALLIANCE" }) do
 		if nChannel == PLAYER_TALK_CHANNEL[v] then
@@ -447,11 +445,10 @@ _C.tTalkChannelHeader = {
 	[PLAYER_TALK_CHANNEL.CAMP] = "/c ",
 	[PLAYER_TALK_CHANNEL.WORLD] = "/h ",
 }
---[[ 切换聊天频道
-	(void) MY.SwitchChat(number nChannel)
-	(void) MY.SwitchChat(string szHeader)
-	(void) MY.SwitchChat(string szName)
-]]
+-- 切换聊天频道
+-- (void) MY.SwitchChat(number nChannel)
+-- (void) MY.SwitchChat(string szHeader)
+-- (void) MY.SwitchChat(string szName)
 MY.Chat.SwitchChat = function(nChannel)
 	local szHeader = _C.tTalkChannelHeader[nChannel]
 	if szHeader then
@@ -472,7 +469,6 @@ MY.Chat.SwitchChat = function(nChannel)
 	end
 end
 MY.SwitchChat = MY.Chat.SwitchChat
-
 
 -- parse faceicon in talking message
 MY.Chat.ParseFaceIcon = function(t)
@@ -602,7 +598,7 @@ MY.Chat.ParseAntiSWS = function(t)
 	return t2
 end
 
---[[ 发布聊天内容
+-- 发布聊天内容
 -- (void) MY.Talk(string szTarget, string szText[, boolean bNoEscape, [boolean bSaveDeny, [boolean bPushToChatBox] ] ])
 -- (void) MY.Talk([number nChannel, ] string szText[, boolean bNoEscape[boolean bSaveDeny, [boolean bPushToChatBox] ] ])
 -- szTarget       -- 密聊的目标角色名
@@ -611,7 +607,7 @@ end
 -- bNoEscape      -- *可选* 不解析聊天内容中的表情图片和名字，默认为 false
 -- bSaveDeny      -- *可选* 在聊天输入栏保留不可发言的频道内容，默认为 false
 -- bPushToChatBox -- *可选* 仅推送到聊天框，默认为 false
--- 特别注意：nChannel, szText 两者的参数顺序可以调换，战场/团队聊天频道智能切换]]
+-- 特别注意：nChannel, szText 两者的参数顺序可以调换，战场/团队聊天频道智能切换
 MY.Chat.Talk = function(nChannel, szText, bNoEscape, bSaveDeny, bPushToChatBox)
 	local szTarget, me = "", GetClientPlayer()
 	-- channel
@@ -713,7 +709,7 @@ end
 MY.RegisterMsgMonitor = MY.Chat.RegisterMsgMonitor
 
 _C.tHookChatFun = {}
---[[ HOOK聊天栏 ]]
+-- HOOK聊天栏
 MY.Chat.HookChatPanel = function(arg0, arg1, arg2)
 	local fnBefore, fnAfter, id
 	if type(arg0)=="string" then
@@ -776,7 +772,7 @@ _C.HookChatPanelHandle = function(h, szMsg, szChannel)
 	-- call ori append
 	h:_AppendItemFromString_MY(szMsg, szChannel)
 	-- deal with fnAfter
-	for i,handle in ipairs(_C.tHookChatFun) do
+	for i, handle in ipairs(_C.tHookChatFun) do
 		pcall(handle.fnAfter, h, szMsg, szChannel, unpack(handle.param))
 	end
 end
