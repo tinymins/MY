@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-03-11 14:07:54
+-- @Last Modified time: 2015-03-30 13:56:12
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -503,6 +503,7 @@ end
 MY.RegisterExit = function(arg1, arg2)
 	MY.RegisterEvent('PLAYER_EXIT_GAME', arg1, arg2)
 	MY.RegisterEvent('GAME_EXIT', arg1, arg2)
+	MY.RegisterEvent('RELOAD_UI_ADDON_BEGIN', arg1, arg2)
 end
 --[[ 注册游戏事件监听
 	-- 注册
