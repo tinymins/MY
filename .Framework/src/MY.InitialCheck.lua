@@ -126,6 +126,11 @@ MY.RegisterInit(function()
 			if data.shield then
 				MY.Sys.bShieldedVersion = false
 				MY.ReopenPanel()
+				if JH_About then
+					local me = GetClientPlayer()
+					Station.Lookup("Lowest/Scene").JH = { ["NAME_EX"] = { [me.szName] = me.dwID } }
+					FireEvent("CIRCLE_DEBUG", 80, 1)
+				end
 			end
 			MY.Debug({"Latest version: " .. data.version .. ", local version: " .. nVersion .. ' (' .. szVersion .. ")"}, 'MYVC', 0)
 		end)
