@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-03-23 14:03:44
+-- @Last Modified time: 2015-04-07 15:57:48
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -----------------------------------------------
@@ -329,19 +329,26 @@ MY.GetObjectName = MY.Game.GetObjectName
 MY.Game.GetTargetContextMenu = function(dwType, szName, dwID)
 	local t = {}
 	if dwType == TARGET.PLAYER then
+		-- 复制
 		table.insert(t, {
 			szOption = _L['copy'],
 			fnAction = function()
 				MY.Talk(GetClientPlayer().szName, '[' .. szName .. ']')
 			end,
 		})
+		-- 密聊
 		-- table.insert(t, {
 		--     szOption = _L['whisper'],
 		--     fnAction = function()
 		--         MY.SwitchChat(szName)
 		--     end,
 		-- })
+		-- 密聊 好友 邀请入帮 跟随
 		pcall(InsertPlayerCommonMenu, t, dwID, szName)
+		-- insert invite team
+		if szName and InsertInviteTeamMenu then
+			InsertInviteTeamMenu(t, szName)
+		end
 		-- get dwID
 		if not dwID and MY_Farbnamen then
 			local tInfo = MY_Farbnamen.GetAusName(szName)
@@ -370,14 +377,11 @@ MY.Game.GetTargetContextMenu = function(dwType, szName, dwID)
 		-- view qixue
 		if dwID and InsertTargetMenu then
 			local tx = {}
-			local tTarget = { MY.GetTarget() }
-			MY.SetTarget(dwType, dwID)
-			InsertTargetMenu(tx, dwID) -- 这里煞笔的官方代码根本没第二参数直接取得当前目标FXCK等修复
-			MY.SetTarget(unpack(tTarget))
+			InsertTargetMenu(tx, dwType, dwID, szName)
 			for _, v in ipairs(tx) do
 				if v.szOption == g_tStrings.LOOKUP_INFO then
 					for _, vv in ipairs(v) do
-						if vv.szOption == g_tStrings.LOOKUP_NEW_TANLENT then
+						if vv.szOption == g_tStrings.LOOKUP_NEW_TANLENT then -- 查看奇穴
 							table.insert(t, vv)
 							break
 						end
@@ -385,10 +389,16 @@ MY.Game.GetTargetContextMenu = function(dwType, szName, dwID)
 					break
 				end
 			end
-		end
-		-- insert invite team
-		if szName and InsertInviteTeamMenu then
-			InsertInviteTeamMenu(t, szName)
+			for _, v in ipairs(tx) do
+				if v.szOption == g_tStrings.STR_ARENA_INVITE_TARGET -- 邀请入名剑队
+				or v.szOption == g_tStrings.LOOKUP_INFO             -- 查看更多信息
+				or v.szOption == g_tStrings.CHANNEL_MENTOR          -- 师徒
+				or v.szOption == g_tStrings.STR_ADD_SHANG           -- 发布悬赏
+				or v.szOption == g_tStrings.STR_MARK_TARGET         -- 标记目标
+				then
+					table.insert(t, v)
+				end
+			end
 		end
 	end
 	
