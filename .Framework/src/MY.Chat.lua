@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-03-30 14:05:10
+-- @Last Modified time: 2015-04-08 10:46:26
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -776,13 +776,34 @@ _C.HookChatPanelHandle = function(h, szMsg, szChannel)
 		pcall(handle.fnAfter, h, szMsg, szChannel, unpack(handle.param))
 	end
 end
+
+_C.Hook = {}
+_C.Hook.Reg = function(i)
+	local h = Station.Lookup("Lowest2/ChatPanel" .. i .. "/Wnd_Message", "Handle_Message")
+	-- local ttl = Station.Lookup("Lowest2/ChatPanel" .. i .. "/CheckBox_Title", "Text_TitleName")
+	-- if h and (not ttl or ttl:GetText() ~= g_tStrings.CHANNEL_MENTOR) then
+	if h and not h._AppendItemFromString_MY then
+		h._AppendItemFromString_MY = h.AppendItemFromString
+		h.AppendItemFromString = _C.HookChatPanelHandle
+	end
+end
+_C.Hook.Unreg = function(i)
+	local h = Station.Lookup("Lowest2/ChatPanel" .. i .. "/Wnd_Message", "Handle_Message")
+	if h and h._AppendItemFromString_MY then
+		h.AppendItemFromString = _C._AppendItemFromString_MY
+		h._AppendItemFromString_MY = nil
+	end
+end
+
 MY.RegisterEvent("CHAT_PANEL_INIT", function ()
 	for i = 1, 10 do
-		local h = Station.Lookup("Lowest2/ChatPanel" .. i .. "/Wnd_Message", "Handle_Message")
-		local ttl = Station.Lookup("Lowest2/ChatPanel" .. i .. "/CheckBox_Title", "Text_TitleName")
-		if h and (not ttl or ttl:GetText() ~= g_tStrings.CHANNEL_MENTOR) then
-			h._AppendItemFromString_MY = h._AppendItemFromString_MY or h.AppendItemFromString
-			h.AppendItemFromString = _C.HookChatPanelHandle
-		end
+		_C.Hook.Reg(i)
+	end
+end)
+MY.RegisterEvent("CHAT_PANEL_OPEN", _C.Hook.Reg)
+
+MY.RegisterExit("ChatPanelUnhook", function ()
+	for i = 1, 10 do
+		_C.Hook.Unreg(i)
 	end
 end)
