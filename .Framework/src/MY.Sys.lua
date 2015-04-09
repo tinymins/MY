@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-03-22 17:50:48
+-- @Last Modified time: 2015-04-08 17:54:26
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -386,7 +386,10 @@ MY.DelayCall = function(arg0, arg1, arg2, arg3)
 				end
 			end
 		end
-		if fnAction and nDelay then
+		if fnAction then
+			if not nDelay then
+				nDelay = 1000 / GLOBAL.GAME_FPS
+			end
 			table.insert(_Cache.tDelayCall, { nTime = nDelay + GetTime(), fnAction = fnAction, szName = szName, param = {} })
 		end
 	end

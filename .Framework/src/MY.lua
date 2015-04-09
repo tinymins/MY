@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-04-08 14:36:22
+-- @Last Modified time: 2015-04-09 14:25:10
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -883,7 +883,11 @@ end
 -- key down
 MY.OnFrameKeyDown = function()
 	if GetKeyName(Station.GetMessageKey()) == "Esc" then
-		MY.ClosePanel()
+		if IsPopupMenuOpened() then
+			Wnd.CloseWindow("PopupMenuPanel")
+		else
+			MY.ClosePanel()
+		end
 		return 1
 	end
 	return 0
@@ -892,7 +896,7 @@ end
 ---------------------------------------------------
 -- 事件、快捷键、菜单注册
 ---------------------------------------------------
-if _MY.nDebugLevel <3 then
+if _MY.nDebugLevel < 3 then
 	RegisterEvent("CALL_LUA_ERROR", function()
 		print(arg0)
 		OutputMessage("MSG_SYS", arg0)

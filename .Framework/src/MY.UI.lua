@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-23 13:38:17
+-- @Last Modified time: 2015-04-08 17:53:07
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -821,9 +821,11 @@ function _MY.UI:append(arg0, arg1, arg2)
 								wnd:Lookup("", "Text_PlaceHolder"):Show()
 							end
 							
-							if Station.GetFocusWindow() and Station.GetFocusWindow():GetName() ~= 'PopupMenuPanel' then
-								Wnd.CloseWindow("PopupMenuPanel")
-							end
+							MY.DelayCall(function()
+								if not Station.GetFocusWindow() or Station.GetFocusWindow():GetName() ~= 'PopupMenuPanel' then
+									Wnd.CloseWindow("PopupMenuPanel")
+								end
+							end)
 						end
 						wnd.tMyAcOption = {
 							beforeSearch = nil  , -- @param: wnd, option
