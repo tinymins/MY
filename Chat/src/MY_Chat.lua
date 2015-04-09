@@ -83,7 +83,7 @@ function MY_Chat.AppendBalloon(dwID, szMsg)
 	local handle = MY_Chat.frame:Lookup("", "Handle_TotalBalloon")
 	local hBalloon = handle:Lookup("Balloon_" .. dwID)
 	if not hBalloon then
-		handle:AppendItemFromIni("Interface\\MY\\Chat\\ui\\Chat.ini", "Handle_Balloon", "Balloon_" .. dwID)
+		handle:AppendItemFromIni(MY.GetAddonInfo().szRoot .. "Chat\\ui\\Chat.ini", "Handle_Balloon", "Balloon_" .. dwID)
 		hBalloon = handle:Lookup(handle:GetItemCount() - 1)
 		hBalloon.dwID = dwID
 	end
@@ -103,20 +103,36 @@ function MY_Chat.AppendBalloon(dwID, szMsg)
 end
 
 function MY_Chat.ShowBalloon(dwID, hBalloon, hwnd)
-	local handle = Station.Lookup("Normal/Teammate", "")
-	local nCount = handle:GetItemCount()
-	for i = 0, nCount - 1 do
-		local hI = handle:Lookup(i)
-		if hI.dwID == dwID then
-			local x,y = hI:GetAbsPos()
-			local w, h = hwnd:GetSize()
-			hBalloon:SetAbsPos(x + 205, y - h - 2)
-			MY.UI(hBalloon):alpha(0):fadeIn(500)
-			MY.DelayCall("MY_Chat_Balloon_"..dwID, function()
-				MY.UI(hBalloon):fadeOut(500)
-			end, 5000)
+	local hWnd = Station.Lookup("Normal/Teammate")
+	local x, y, w, h, _
+	if hWnd and hWnd:IsVisible() then
+		local handle = hWnd:Lookup("", "")
+		local nCount = handle:GetItemCount()
+		for i = 0, nCount - 1 do
+			local hI = handle:Lookup(i)
+			if hI.dwID == dwID then
+				w, h = hwnd:GetSize()
+				x, y = hI:GetAbsPos()
+				x, y = x + 205, y - h - 2
+			end
+		end
+	elseif CTM_GetMemberHandle then
+		local handle = CTM_GetMemberHandle(dwID)
+		if handle then
+			_, h = hwnd:GetSize()
+			w, _ = handle:GetSize()
+			x, y = handle:GetAbsPos()
+			x, y = x + w, y - h - 2
 		end
 	end
+	if x and y then
+		hBalloon:SetAbsPos(x, y)
+		hBalloon:GetRoot():BringToTop()
+		MY.UI(hBalloon):alpha(0):fadeIn(500)
+	end
+	MY.DelayCall("MY_Chat_Balloon_"..dwID, function()
+		MY.UI(hBalloon):fadeOut(500)
+	end, 5000)
 end
 
 function MY_Chat.AdjustBalloonSize(hBalloon, hwnd)
@@ -126,7 +142,7 @@ function MY_Chat.AdjustBalloonSize(hBalloon, hwnd)
 	image1:SetSize(w, h)
 
 	local image2 = hBalloon:Lookup("Image_Bg2")
-	image2:SetRelPos(w * 0.8 - 16, h - 4)
+	image2:SetRelPos(math.min(w - 16 - 8, 32), h - 4)
 	hBalloon:SetSize(10000, 10000)
 	hBalloon:FormatAllItemPos()
 	hBalloon:SetSizeByAllItemSize()
@@ -134,10 +150,10 @@ end
 
 function MY_Chat.OnSay(szMsg, dwID, nChannel)
 	local player = GetClientPlayer()
-	if not player then return end
-	if dwID == player.dwID then return end
-	if nChannel ~= PLAYER_TALK_CHANNEL.TEAM and nChannel ~= PLAYER_TALK_CHANNEL.RAID then return end
-	if player.IsInParty() then
+	if player and player.dwID ~= dwID and (
+		nChannel == PLAYER_TALK_CHANNEL.TEAM or
+		nChannel == PLAYER_TALK_CHANNEL.RAID
+	) and player.IsInParty() then
 		local hTeam = GetClientTeam()
 		if not hTeam then return end
 		if hTeam.nGroupNum > 1 then
