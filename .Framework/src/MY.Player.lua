@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-04-09 18:43:21
+-- @Last Modified time: 2015-04-09 20:44:55
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -510,9 +510,8 @@ MY.Player.GetFaceAngel = function(nX, nY, nFace, nTX, nTY, bAbs)
 	if type(nX) == "number" and type(nY) == "number" and type(nFace) == "number"
 	and type(nTX) == "number" and type(nTY) == "number" then
 		local nFace = (nFace * 2 * math.pi / 255) - math.pi
-		local nSight = (nTX == nX and  - math.pi / 2) or math.atan((nTY - nY) / (nTX - nX))
+		local nSight = (nX == nTX and ((nY > nTY and math.pi / 2) or - math.pi / 2)) or math.atan((nTY - nY) / (nTX - nX))
 		local nAngel = ((nSight - nFace) % (math.pi * 2) - math.pi) / math.pi * 180
-		print(nAngel)
 		if bAbs then
 			nAngel = math.abs(nAngel)
 		end
