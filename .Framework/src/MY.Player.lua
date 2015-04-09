@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-03-22 17:51:18
+-- @Last Modified time: 2015-04-09 18:43:21
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -490,32 +490,37 @@ MY.Player.WithTarget = function(dwType, dwID, callback)
 	_Cache.WithTargetHandle()
 end
 
---[[ 求N2在N1的面向角  --  重载+2
-	-- 输入N1坐标、面向、N2坐标
-	(number) MY.GetFaceToTargetDegree(nX,nY,nFace,nTX,nTY)
-	-- 输入N1、N2
-	(number) MY.GetFaceToTargetDegree(oN1, oN2)
-	-- 输出
-	nil -- 参数错误
-	number -- 面向角(0-180)
-]]
-MY.Player.GetFaceDegree = function(nX,nY,nFace,nTX,nTY)
-	if type(nY)=="userdata" and type(nX)=="userdata" then nTX=nY.nX nTY=nY.nY nY=nX.nY nFace=nX.nFaceDirection nX=nX.nX end
-	if type(nX)~="number" or type(nY)~="number" or type(nFace)~="number" or type(nTX)~="number" or type(nTY)~="number" then return nil end
-	local a = nFace * math.pi / 128
-	return math.acos( ( (nTX-nX)*math.cos(a) + (nTY-nY)*math.sin(a) ) / ( (nTX-nX)^2 + (nTY-nY)^2) ^ 0.5 ) * 180 / math.pi
+-- 求N2在N1的面向角  --  重载+2
+-- (number) MY.GetFaceAngel(nX, nY, nFace, nTX, nTY, bAbs)
+-- (number) MY.GetFaceAngel(oN1, oN2, bAbs)
+-- @param nX    N1的X坐标
+-- @param nY    N1的Y坐标
+-- @param nFace N1的面向[0, 255]
+-- @param nTX   N2的X坐标
+-- @param nTY   N2的Y坐标
+-- @param bAbs  返回角度是否只允许正数
+-- @param oN1   N1对象
+-- @param oN2   N2对象
+-- @return nil    参数错误
+-- @return number 面向角(-180, 180]
+MY.Player.GetFaceAngel = function(nX, nY, nFace, nTX, nTY, bAbs)
+	if type(nY) == "userdata" and type(nX) == "userdata" then
+		nX, nY, nFace, nTX, nTY, bAbs = nX.nX, nX.nY, nX.nFaceDirection, nY.nX, nY.nY, nFace
+	end
+	if type(nX) == "number" and type(nY) == "number" and type(nFace) == "number"
+	and type(nTX) == "number" and type(nTY) == "number" then
+		local nFace = (nFace * 2 * math.pi / 255) - math.pi
+		local nSight = (nTX == nX and  - math.pi / 2) or math.atan((nTY - nY) / (nTX - nX))
+		local nAngel = ((nSight - nFace) % (math.pi * 2) - math.pi) / math.pi * 180
+		print(nAngel)
+		if bAbs then
+			nAngel = math.abs(nAngel)
+		end
+		return nAngel
+	end
 end
---[[ 求oT2在oT1的正面还是背面
-	(bool) MY.IsFaceToTarget(oT1,oT2)
-	-- 正面返回true
-	-- 背对返回false
-	-- 参数不正确时返回nil
-]]
-MY.Player.IsFaceToTarget = function(oT1,oT2)
-	if type(oT1)~="userdata" or type(oT2)~="userdata" then return nil end
-	local a = oT1.nFaceDirection * math.pi / 128
-	return (oT2.nX-oT1.nX)*math.cos(a) + (oT2.nY-oT1.nY)*math.sin(a) > 0
-end
+MY.GetFaceAngel = MY.Player.GetFaceAngel
+
 --[[ 装备名为szName的装备
 	(void) MY.Equip(szName)
 	szName  装备名称
