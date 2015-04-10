@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-04-09 19:51:29
+-- @Last Modified time: 2015-04-10 10:41:05
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -86,7 +86,7 @@ end
 -- ui object creator 
 -- same as jQuery.$()
 function _MY.UI:ctor(raw, tab)
-	self.eles = self.eles or setmetatable({}, { __mode = "v" })
+	self.eles = self.eles or {} -- setmetatable({}, { __mode = "v" })
 	if type(raw)=="table" and type(raw.eles)=="table" then
 		for i = 1, #raw.eles, 1 do
 			table.insert(self.eles, raw.eles[i])
