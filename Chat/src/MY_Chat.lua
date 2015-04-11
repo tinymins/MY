@@ -280,6 +280,9 @@ MY_Chat.GetMenu = function()
 		bChecked = MY_Chat.bChatTime,
 		fnAction = function()
 			MY_Chat.bChatTime = not MY_Chat.bChatTime
+			if MY_Chat.bChatTime and HM_ToolBox then
+				HM_ToolBox.bChatTime = false
+			end
 		end, {
 			szOption = _L['hh:mm'],
 			bMCheck = true,
