@@ -4,7 +4,7 @@
 -- @Date  : 2015-01-25 15:35:26
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-03-07 13:11:25
+-- @Last Modified time: 2015-04-14 21:37:23
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -78,7 +78,7 @@ MY.String.SimpleMatch = function(szText, szFind, bDistinctCase)
 			-- 10|十人
 			local bKeyWord = false
 			for _, szKeyWord in ipairs( MY.String.Split(szKeyWords, '|') ) do  -- 符合一个即可
-				szKeyWord = MY.String.PatternEscape(szKeyWord)
+				-- szKeyWord = MY.String.PatternEscape(szKeyWord) -- 用了wstring还Escape个捷豹
 				if string.sub(szKeyWord, 1, 1) == "!" then                     -- !小铁被吃了
 					szKeyWord = string.sub(szKeyWord, 2)
 					if not wstring.find(szText, szKeyWord) then
