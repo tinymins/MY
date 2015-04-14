@@ -1,0 +1,17 @@
+# export ignore
+\!src-dist           export-ignore
+Dev_BosslistGene     export-ignore
+Dev_Snaplines        export-ignore
+Dev_UIEventID        export-ignore
+Dev_UITexViewer      export-ignore
+ImRobot              export-ignore
+.gitignore           export-ignore
+.gitattributes       export-ignore
+7z.exe               export-ignore
+7zip.bat             export-ignore
+7zipignore.txt       export-ignore
+convert-info-zhcn.py export-ignore
+convert-info-zhtw.py export-ignore
+convert-info.py      export-ignore
+convert-lang.py      export-ignore
+lang_mapping.py      export-ignore
