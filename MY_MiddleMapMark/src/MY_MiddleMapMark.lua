@@ -5,7 +5,7 @@
 -- @Date  : 2014-12-04 11:51:31
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-10 16:46:45
+-- @Last Modified time: 2015-04-14 16:56:42
 -----------------------------------------------
 MY_MiddleMapMark = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_MiddleMapMark/lang/")
@@ -88,10 +88,22 @@ MY_MiddleMapMark.Search = function(szKeyword)
 		return
 	end
 	
-	local uiHandle = ui:item("#Handle_MY_MMM")
-	if uiHandle:count() == 0 then
-		uiHandle = ui:append("Handle", "Handle_MY_MMM"):item('#Handle_MY_MMM')
-		  :pos(ui:item('#Handle_Map'):pos())
+	local uiHandle
+	local uiInner = ui:item("#Handle_Inner")
+	if uiInner:count() == 0 then -- old version
+		uiHandle = ui:item("#Handle_MY_MMM")
+		if uiHandle:count() == 0 then
+			local x, y = ui:item('#Handle_Map'):pos()
+			local w, h = ui:item('#Handle_Map'):size()
+			uiHandle = ui:append("Handle", "Handle_MY_MMM", {
+				x = x, y = y, w = w, h = h,
+			}):item('#Handle_MY_MMM')
+		end
+	else
+		uiHandle = uiInner:item("#Handle_MY_MMM")
+		if uiHandle:count() == 0 then
+			uiHandle = uiInner:append("Handle", "Handle_MY_MMM"):item('#Handle_MY_MMM')
+		end
 	end
 	uiHandle:clear()
 	
