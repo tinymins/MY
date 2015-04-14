@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-04-08 10:46:26
+-- @Last Modified time: 2015-04-14 21:31:25
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -802,6 +802,11 @@ MY.RegisterEvent("CHAT_PANEL_INIT", function ()
 end)
 MY.RegisterEvent("CHAT_PANEL_OPEN", _C.Hook.Reg)
 
+MY.RegisterReload("ChatPanelHook", function ()
+	for i = 1, 10 do
+		_C.Hook.Reg(i)
+	end
+end)
 MY.RegisterExit("ChatPanelUnhook", function ()
 	for i = 1, 10 do
 		_C.Hook.Unreg(i)
