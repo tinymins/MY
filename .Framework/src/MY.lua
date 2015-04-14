@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-04-09 14:25:10
+-- @Last Modified time: 2015-04-14 21:50:45
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -505,6 +505,15 @@ MY.RegisterExit = function(arg1, arg2)
 	MY.RegisterEvent('GAME_EXIT', arg1, arg2)
 	MY.RegisterEvent('RELOAD_UI_ADDON_BEGIN', arg1, arg2)
 end
+
+-- 注册插件重载函数
+-- RegisterReload(string id, function fn) -- 注册
+-- RegisterReload(function fn)            -- 注册
+-- RegisterReload(string id)              -- 注销
+MY.RegisterReload = function(arg1, arg2)
+	MY.RegisterEvent('RELOAD_UI_ADDON_END', arg1, arg2)
+end
+
 --[[ 注册游戏事件监听
 	-- 注册
 	MY.RegisterEvent( szEventName, szListenerId, fnListener )
