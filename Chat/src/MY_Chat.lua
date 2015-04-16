@@ -538,6 +538,8 @@ MY.RegisterPanel( "MY_Chat_Filter", _L["chat filter"], _L['Chat'], "UI/Image/Com
 				end
 			end,
 		}}
+	end):listbox('onlclick', function(text, id, data, selected)
+		edit:text(text)
 	end)
 	-- add
 	ui:append("WndButton", "WndButton_Add"):children("#WndButton_Add")
