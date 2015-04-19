@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-04-08 17:54:26
+-- @Last Modified time: 2015-04-19 16:28:21
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -136,7 +136,7 @@ MY.Sys.SaveUserData = function(szFileUri, tData)
 		szFileUri = szFileUri .. "_"
 	end
 	-- 添加用户识别字符
-	szFileUri = szFileUri .. (MY.Game.GetServer()):gsub('[/\\|:%*%?"<>]', '') .. "_" .. MY.Player.GetClientInfo().dwID
+	szFileUri = szFileUri .. MY.Player.GetUUID()
 	-- 读取数据
 	return MY.Sys.SaveLUAData(szFileUri, tData)
 end
@@ -152,7 +152,7 @@ MY.Sys.LoadUserData = function(szFileUri)
 		szFileUri = szFileUri .. "_"
 	end
 	-- 添加用户识别字符
-	szFileUri = szFileUri .. (MY.Game.GetServer()):gsub('[/\\|:%*%?"<>]', '') .. "_" .. MY.Player.GetClientInfo().dwID
+	szFileUri = szFileUri .. MY.Player.GetUUID()
 	-- 读取数据
 	return MY.Sys.LoadLUAData(szFileUri)
 end
