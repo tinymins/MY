@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-03-10 13:22:17
+-- @Last Modified time: 2015-04-19 16:58:48
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 if not GetCampImageFrame then
@@ -84,3 +84,12 @@ function GetItemNameByUIID(nUiId)
 	return Table_GetItemName(nUiId)
 end
 end
+
+GLOBAL_HEAD_CLIENTPLAYER = GLOBAL_HEAD_CLIENTPLAYER or 0
+GLOBAL_HEAD_OTHERPLAYER  = GLOBAL_HEAD_OTHERPLAYER  or 1
+GLOBAL_HEAD_NPC          = GLOBAL_HEAD_NPC          or 2
+GLOBAL_HEAD_LIFE         = GLOBAL_HEAD_LIFE         or 0
+GLOBAL_HEAD_GUILD        = GLOBAL_HEAD_GUILD        or 1
+GLOBAL_HEAD_TITLE        = GLOBAL_HEAD_TITLE        or 2
+GLOBAL_HEAD_NAME         = GLOBAL_HEAD_NAME         or 3
+GLOBAL_HEAD_MARK         = GLOBAL_HEAD_MARK         or 4
