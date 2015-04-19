@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-04-09 20:44:55
+-- @Last Modified time: 2015-04-19 16:26:38
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -176,6 +176,16 @@ MY.Player.GetClientInfo = function(bForceRefresh)
 end
 MY.GetClientInfo = MY.Player.GetClientInfo
 MY.RegisterEvent('LOADING_END', MY.Player.GetClientInfo)
+
+-- 获取唯一标识符
+MY.Player.GetUUID = function()
+	local me = GetClientPlayer()
+	if me.GetGlobalID and me.GetGlobalID() ~= "0" then
+		return me.GetGlobalID()
+	else
+		return (MY.Game.GetServer()):gsub('[/\\|:%*%?"<>]', '') .. "_" .. MY.Player.GetClientInfo().dwID
+	end
+end
 
 --[[获取好友列表
 ]]

@@ -33,6 +33,7 @@ MY.RegisterInit(function()
 			bs = 0,  -- me.GetBaseEquipScore()
 			ts = 0,  -- me.GetTotalEquipScore()
 			t = '', -- tong.szTongName
+			g = me.GetGlobalID and me.GetGlobalID(),
 			_ = GetCurrentTime(),
 			vc = szClientVer,
 			ve = szExeVer,
