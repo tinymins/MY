@@ -248,7 +248,7 @@ _XLifeBar.Reset = function(bNoSave)
         end
         if Config.bShowLife.Npc.Party or Config.bShowLife.Npc.Neutrality
         or Config.bShowLife.Npc.Ally or Config.bShowLife.Npc.Enemy then
-            SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_LEFE , false)
+            SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_LIFE , false)
         end
         if Config.bShowName.Player.Party or Config.bShowName.Player.Neutrality
         or Config.bShowName.Player.Ally or Config.bShowName.Player.Enemy then
@@ -260,7 +260,7 @@ _XLifeBar.Reset = function(bNoSave)
         end
         if Config.bShowLife.Player.Party or Config.bShowLife.Player.Neutrality
         or Config.bShowLife.Player.Ally or Config.bShowLife.Player.Enemy then
-            SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_LEFE , false)
+            SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_LIFE , false)
         end
         if Config.bShowTong.Player.Party or Config.bShowTong.Player.Neutrality
         or Config.bShowTong.Player.Ally or Config.bShowTong.Player.Enemy then
@@ -273,7 +273,7 @@ _XLifeBar.Reset = function(bNoSave)
             SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_TITLE, false)
         end
         if Config.bShowLife.Player.Self then
-            SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_LEFE , false)
+            SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_LIFE , false)
         end
         if Config.bShowTong.Player.Self then
             SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_GUILD, false)
@@ -281,14 +281,14 @@ _XLifeBar.Reset = function(bNoSave)
     elseif XLifeBar.tSysHeadTop then
         SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_NAME , XLifeBar.tSysHeadTop['GLOBAL_HEAD_NPC_NAME'])
         SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_TITLE, XLifeBar.tSysHeadTop['GLOBAL_HEAD_NPC_TITLE'])
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_LEFE , XLifeBar.tSysHeadTop['GLOBAL_HEAD_NPC_LEFE'])
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_LIFE , XLifeBar.tSysHeadTop['GLOBAL_HEAD_NPC_LEFE'])
         SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_NAME , XLifeBar.tSysHeadTop['GLOBAL_HEAD_OTHERPLAYER_NAME'])
         SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_TITLE, XLifeBar.tSysHeadTop['GLOBAL_HEAD_OTHERPLAYER_TITLE'])
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_LEFE , XLifeBar.tSysHeadTop['GLOBAL_HEAD_OTHERPLAYER_LEFE'])
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_LIFE , XLifeBar.tSysHeadTop['GLOBAL_HEAD_OTHERPLAYER_LEFE'])
         SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_GUILD, XLifeBar.tSysHeadTop['GLOBAL_HEAD_OTHERPLAYER_GUILD'])
         SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_NAME , XLifeBar.tSysHeadTop['GLOBAL_HEAD_CLIENTPLAYER_NAME'])
         SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_TITLE, XLifeBar.tSysHeadTop['GLOBAL_HEAD_CLIENTPLAYER_TITLE'])
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_LEFE , XLifeBar.tSysHeadTop['GLOBAL_HEAD_CLIENTPLAYER_LEFE'])
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_LIFE , XLifeBar.tSysHeadTop['GLOBAL_HEAD_CLIENTPLAYER_LEFE'])
         SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_GUILD, XLifeBar.tSysHeadTop['GLOBAL_HEAD_CLIENTPLAYER_GUILD'])
     end
 end
