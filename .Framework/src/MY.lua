@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-04-16 14:30:58
+-- @Last Modified time: 2015-04-20 13:55:12
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -320,7 +320,10 @@ MY.ResizePanel = function(nWidth, nHeight)
 	if not frame then
 		return
 	end
+	local _w, _h = frame:GetSize()
+	nWidth, nHeight = nWidth or _w, nHeight or _h
 	
+	MY.UI(frame):size(nWidth, nHeight)
 	frame:Lookup('', 'Text_Author'):SetRelPos(0, nHeight - 41)
 	frame:Lookup('', 'Text_Author'):SetSize(nWidth - 31, 20)
 	frame:Lookup('', ''):FormatAllItemPos()
@@ -334,13 +337,17 @@ MY.ResizePanel = function(nWidth, nHeight)
 	hWnd:Lookup('WndContainer_Category'):SetSize(nWidth - 22, 32)
 	hWnd:Lookup('WndContainer_Category'):FormatAllContentPos()
 	hWnd:Lookup('Btn_Weibo'):SetRelPos(nWidth - 135, 55)
-	hWnd:Lookup('WndScroll_Tabs'):SetSize(171, nHeight - 111)
+	
+	hWnd:Lookup('WndScroll_Tabs'):SetSize(171, nHeight - 102)
+	hWnd:Lookup('WndScroll_Tabs', ''):SetSize(171, nHeight - 102)
 	hWnd:Lookup('WndScroll_Tabs', ''):FormatAllItemPos()
-	hWnd:Lookup('WndScroll_MainPanel'):SetSize(nWidth - 194, nHeight - 111)
-	hWnd:Lookup('WndScroll_MainPanel/ScrollBar_MainPanel'):SetSize(nWidth - 214, nHeight - 121)
-	hWnd:Lookup('WndScroll_MainPanel/ScrollBar_MainPanel'):SetRelPos(nWidth - 214, 5)
-	hWnd:Lookup('WndScroll_MainPanel/WndContainer_MainPanel'):SetSize(nWidth - 214, nHeight - 100)
-	hWnd:Lookup('WndScroll_MainPanel/WndContainer_MainPanel', ''):SetSize(nWidth - 214, nHeight - 100)
+	hWnd:Lookup('WndScroll_Tabs/ScrollBar_Tabs'):SetSize(16, nHeight - 111)
+	
+	hWnd:Lookup('WndScroll_MainPanel'):SetSize(nWidth - 191, nHeight - 100)
+	hWnd:Lookup('WndScroll_MainPanel/ScrollBar_MainPanel'):SetSize(20, nHeight - 110)
+	hWnd:Lookup('WndScroll_MainPanel/ScrollBar_MainPanel'):SetRelPos(nWidth - 23, 5)
+	hWnd:Lookup('WndScroll_MainPanel/WndContainer_MainPanel'):SetSize(nWidth - 201, nHeight - 100)
+	hWnd:Lookup('WndScroll_MainPanel/WndContainer_MainPanel', ''):SetSize(nWidth - 201, nHeight - 100)
 	local hWndMainPanel = frame:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel')
 	if hWndMainPanel.OnPanelResize then
 		local res, err = pcall(hWndMainPanel.OnPanelResize, hWndMainPanel)
@@ -378,7 +385,7 @@ end
 	(frame) MY.GetFrame()
 ]]
 MY.GetFrame = function()
-	if not _MY.frame then
+	if not (_MY.frame and _MY.frame:IsValid()) then
 		_MY.frame = Wnd.OpenWindow(_MY.szIniFile, "MY")
 		_MY.frame.intact = true
 		_MY.frame:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
@@ -410,15 +417,14 @@ MY.GetFrame = function()
 			_MY.w, _MY.h = ui:size()
 			ui:pos(0, 0):onevent('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
 				ui:size(Station.GetClientSize())
-			end):drag(false):size(Station.GetClientSize())
+			end):drag(false)
 			MY.ResizePanel(Station.GetClientSize())
 		end, function()
+			MY.ResizePanel(_MY.w, _MY.h)
 			MY.UI(_MY.frame)
 			  :onevent('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
 			  :drag(true)
-			  :size(_MY.w, _MY.h)
 			  :anchor(_MY.anchor)
-			MY.ResizePanel(_MY.w, _MY.h)
 		end)
 		-- update author infomation button
 		MY.UI(MY.GetFrame()):children("#Wnd_Total"):children("#Btn_Weibo")
