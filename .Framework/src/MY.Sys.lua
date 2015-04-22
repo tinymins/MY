@@ -4,19 +4,15 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-04-19 16:28:21
+-- @Last Modified time: 2015-04-22 13:43:50
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
---------------------------------------------
---------------------------------------------
--- 本地函数和变量
 --------------------------------------------
 MY = MY or {}
 MY.Sys = MY.Sys or {}
 MY.Sys.bShieldedVersion = false -- 屏蔽被河蟹的功能（国服启用）
-local _Cache, _L, _C = {}, MY.LoadLangPack(), {}
+local _L, _C = MY.LoadLangPack(), {}
 
---[[ 获取游戏语言
-]]
+-- 获取游戏语言
 MY.Sys.GetLang = function()
 	local _, _, lang = GetVersion()
 	return lang
@@ -39,8 +35,9 @@ MY.Sys.GetFrameCount = function()
 	return _C.nFrameCount
 end
 MY.GetFrameCount = MY.Sys.GetFrameCount
+
 -- Save & Load Lua Data
--- #######################################################################################################
+-- ##################################################################################################
 --         #       #             #                           #                                       
 --     #   #   #   #             #     # # # # # #           #               # # # # # #             
 --         #       #             #     #         #   # # # # # # # # # # #     #     #   # # # #     
@@ -52,16 +49,15 @@ MY.GetFrameCount = MY.Sys.GetFrameCount
 --   # # # # #     #   #         #     # #       #       #         #           #     # #     #       
 --     #     #       #           #   #   #       #       #         #         # # # # #       #       
 --       # #       #   #         #   #   # # # # #       #         #                 #     #   #     
---   # #     #   #       #     # # #     #       #       #       # #                 #   #       #  
--- #######################################################################################################
---[[ 保存数据文件
-	MY.SaveLUAData( szFileUri, tData[, bNoDistinguishLang] )
-	szFileUri           数据文件路径(1)
-	tData               要保存的数据
-	bNoDistinguishLang  是否取消自动区分客户端语言
-	(1)： 当路径为绝对路径时(以斜杠开头)不作处理
-		  当路径为相对路径时 相对于插件下@DATA目录
-]]
+--   # #     #   #       #     # # #     #       #       #       # #                 #   #       #   
+-- ##################################################################################################
+-- 保存数据文件
+-- MY.SaveLUAData( szFileUri, tData[, bNoDistinguishLang] )
+-- szFileUri           数据文件路径(1)
+-- tData               要保存的数据
+-- bNoDistinguishLang  是否取消自动区分客户端语言
+-- (1)： 当路径为绝对路径时(以斜杠开头)不作处理
+--       当路径为相对路径时 相对于插件下@DATA目录
 MY.Sys.SaveLUAData = function(szFileUri, tData, bNoDistinguishLang)
 	local nStartTick = GetTickCount()
 	-- 统一化目录分隔符
@@ -90,13 +86,13 @@ MY.Sys.SaveLUAData = function(szFileUri, tData, bNoDistinguishLang)
 	return ret
 end
 MY.SaveLUAData = MY.Sys.SaveLUAData
---[[ 加载数据文件：相对于data文件夹
-	MY.LoadLUAData( szFileUri[, bNoDistinguishLang] )
-	szFileUri           数据文件路径(1)
-	bNoDistinguishLang  是否取消自动区分客户端语言
-	(1)： 当路径为绝对路径时(以斜杠开头)不作处理
-		  当路径为相对路径时 相对于插件下@DATA目录
-]]
+
+-- 加载数据文件：相对于data文件夹
+-- MY.LoadLUAData( szFileUri[, bNoDistinguishLang] )
+-- szFileUri           数据文件路径(1)
+-- bNoDistinguishLang  是否取消自动区分客户端语言
+-- (1)： 当路径为绝对路径时(以斜杠开头)不作处理
+--       当路径为相对路径时 相对于插件下@DATA目录
 MY.Sys.LoadLUAData = function(szFileUri, bNoDistinguishLang)
 	local nStartTick = GetTickCount()
 	-- 统一化目录分隔符
@@ -126,9 +122,8 @@ MY.Sys.LoadLUAData = function(szFileUri, bNoDistinguishLang)
 end
 MY.LoadLUAData = MY.Sys.LoadLUAData
 
---[[ 保存用户数据 注意要在游戏初始化之后使用不然没有ClientPlayer对象
-	(data) MY.Sys.SaveUserData(szFileUri, tData)
-]]
+-- 保存用户数据 注意要在游戏初始化之后使用不然没有ClientPlayer对象
+-- (data) MY.Sys.SaveUserData(szFileUri, tData)
 MY.Sys.SaveUserData = function(szFileUri, tData)
 	-- 统一化目录分隔符
 	szFileUri = string.gsub(szFileUri, '\\', '/')
@@ -142,9 +137,8 @@ MY.Sys.SaveUserData = function(szFileUri, tData)
 end
 MY.SaveUserData = MY.Sys.SaveUserData
 
---[[ 加载用户数据 注意要在游戏初始化之后使用不然没有ClientPlayer对象
-	(data) MY.Sys.LoadUserData(szFile [,szSubAddonName])
-]]
+-- 加载用户数据 注意要在游戏初始化之后使用不然没有ClientPlayer对象
+-- (data) MY.Sys.LoadUserData(szFile [,szSubAddonName])
 MY.Sys.LoadUserData = function(szFileUri)
 	-- 统一化目录分隔符
 	szFileUri = string.gsub(szFileUri, '\\', '/')
@@ -163,12 +157,11 @@ MY.RegisterUserData = function(szName, szFileName)
 	
 end
 
---[[ 播放声音
-	MY.Sys.PlaySound(szFilePath[, szCustomPath])
-	szFilePath   音频文件地址
-	szCustomPath 个性化音频文件地址
-	注：优先播放szCustomPath, szCustomPath不存在才会播放szFilePath
-]]
+-- 播放声音
+-- MY.Sys.PlaySound(szFilePath[, szCustomPath])
+-- szFilePath   音频文件地址
+-- szCustomPath 个性化音频文件地址
+-- 注：优先播放szCustomPath, szCustomPath不存在才会播放szFilePath
 MY.Sys.PlaySound = function(szFilePath, szCustomPath)
 	szCustomPath = szCustomPath or szFilePath
 	-- 统一化目录分隔符
@@ -200,8 +193,7 @@ MY.RegisterInit(function()
 	end
 end)
 
--- Remote Request
--- #######################################################################################################
+-- ##################################################################################################
 --   # # # # # # # # # # #       #       #           #           #                     #     #       
 --   #                   #       #       # # # #       #   # # # # # # # #             #       #     
 --   #                   #     #       #       #                 #           # # # # # # # # # # #   
@@ -213,120 +205,66 @@ end)
 --   # #       #       # #             #       #       #     #         #         #     #     #       
 --   #                   #       # #   #       #       #     # # # # # #     # #       #       #     
 --   #                   #   # #       # # # # #       # #   #         #               #         #   
---   #               # # #             #       #       #     #       # #             # #           
--- --#######################################################################################################
-_Cache.tRequest = {}      -- 网络请求队列
-_Cache.bRequest = false   -- 网络请求繁忙中
---[[ (void) MY.RemoteRequest(string szUrl, func fnAction)       -- 发起远程 HTTP 请求
+--   #               # # #             #       #       #     #       # #             # #             
+-- ##################################################################################################
+-- (void) MY.RemoteRequest(string szUrl, func fnAction)       -- 发起远程 HTTP 请求
 -- szUrl        -- 请求的完整 URL（包含 http:// 或 https://）
 -- fnAction     -- 请求完成后的回调函数，回调原型：function(szTitle, szContent)]]
 MY.RemoteRequest = function(szUrl, fnSuccess, fnError, nTimeout)
-	-- 格式化参数
-	if type(szUrl)~="string" then return end
-	if type(fnSuccess)~="function" then return end
-	if type(nTimeout)~="number" then nTimeout = 10000 end
+	if not (type(szUrl) == "string" and type(fnSuccess) == "function") then
+		return
+	end
+	if type(nTimeout)~="number" then
+		nTimeout = 10000
+	end
 	if type(fnError)~="function" then
-		fnError = function(szUrl,errMsg)
+		fnError = function(szUrl, errMsg)
 			MY.Debug({szUrl .. ' - ' .. errMsg}, 'RemoteRequest', 1)
 		end
 	end
-	-- 在请求队列尾部插入请求
-	table.insert(_Cache.tRequest,{ szUrl = szUrl, fnSuccess = fnSuccess, fnError = fnError, nTimeout = nTimeout })
-	-- 开始处理请求队列
-	_Cache.DoRemoteRequest()
-end
-
--- get `ie` ui element
-_C.GetIE = function()
-	local frame = MY.GetFrame()
-	if not frame then
-		return false
-	end
-	local ie = frame:Lookup("Page_1")
-	if not ie then
-		MY.Debug({'Page_1 not found in Normal::MY'}, 'MYRR', 3)
-		return false
-	end
-	-- init ie
-	if not ie.OnDocumentComplete then
-		ie.OnDocumentComplete = function()
-			-- 判断是否有远程请求等待回调 没有则直接返回
-			if not _Cache.bRequest then
-				return
+	
+	-- append new page
+	local RequestID = ("%X_%X"):format(GetTickCount(), math.floor(math.random() * 65536))
+	local uiPages = MY.UI(MY.GetFrame()):children('#Wnd_Pages')
+	local hPage = uiPages:append('WndWebPage', 'WndWebPage_' .. RequestID):children('#' .. 'WndWebPage_' .. RequestID):raw(1)
+	
+	-- bind callback function
+	hPage.OnDocumentComplete = function()
+		local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
+		if szUrl ~= szTitle or szContent ~= "" then
+			MY.Debug({string.format("%s - %s", szTitle, szUrl)}, 'MYRR::OnDocumentComplete', 0)
+			-- 注销超时处理时钟
+			MY.DelayCall("MYRR_TO_" .. RequestID)
+			-- 成功回调函数
+			local status, err = pcall(fnSuccess, szTitle, szContent)
+			if not status then
+				MY.Debug({err}, 'MYRR::OnDocumentComplete::Callback', 3)
 			end
-			-- 处理回调
-			local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
-			-- 获取请求队列首部元素
-			local rr = _Cache.tRequest[1]
-			-- 判断当前页面是否符合请求
-			if szUrl ~= szTitle or szContent ~= "" then
-				-- 处理请求回调
-				MY.Debug({string.format("%s - %s", szTitle, szUrl)}, 'MYRR::OnDocumentComplete', 0)
-				-- 注销超时处理时钟
-				MY.DelayCall("MY_Remote_Request_Timeout")
-				-- 成功回调函数
-				local status, err = pcall(rr.fnSuccess, szTitle, szContent)
-				if not status then
-					MY.Debug({err}, 'MYRR::OnDocumentComplete::Callback', 3)
-				end
-				-- 从请求列表移除
-				table.remove(_Cache.tRequest, 1)
-				-- 重置请求状态为空闲
-				_Cache.bRequest = false
-				-- 处理下一个远程请求
-				_Cache.DoRemoteRequest()
-			end
+			hPage:Destroy()
 		end
-	end
-	return ie
-end
-
--- 处理远程请求队列
-_Cache.DoRemoteRequest = function()
-	-- check if request queue is clear
-	if #_Cache.tRequest == 0 then
-		_Cache.bRequest = false
-		MY.Debug({'Remote Request Queue Is Clear.'}, 'MYRR', 0)
-		return
 	end
 	
-	-- 如果当前队列有未处理的请求 并且远程请求队列处于空闲状态
-	if not _Cache.bRequest and #_Cache.tRequest > 0 then
-		-- get ie element
-		local ie = _C.GetIE()
-		if not ie then
-			MY.DelayCall(_Cache.DoRemoteRequest, 3000)
-			MY.Debug({'network plugin has not been initalized yet!'}, 'MYRR', 1)
-			return
+	-- do with this remote request
+	MY.Debug({szUrl}, 'MYRR', 0)
+	-- register request timeout clock
+	MY.DelayCall(function()
+		MY.Debug({szUrl}, 'MYRR::Timeout', 1) -- log
+		-- request timeout, call timeout function.
+		local status, err = pcall(fnError, szUrl, "timeout")
+		if not status then
+			MY.Debug({err}, 'MYRR::TIMEOUT', 3)
 		end
-		-- get the remote request which is going to process
-		local rr = _Cache.tRequest[1]
-		-- do with this remote request
-		MY.Debug({rr.szUrl}, 'MYRR', 0)
-		-- register request timeout clock
-		MY.DelayCall(function()
-			MY.Debug({rr.szUrl}, 'MYRR::Timeout', 1) -- log
-			-- request timeout, call timeout function.
-			local status, err = pcall(rr.fnError, rr.szUrl, "timeout")
-			if not status then
-				MY.Debug({err}, 'MYRR::TIMEOUT', 3)
-			end
-			-- remove this request from queue
-			table.remove(_Cache.tRequest, 1)
-			-- set requset queue state to idle
-			_Cache.bRequest = false
-			-- process next request
-			_Cache.DoRemoteRequest()
-		end, rr.nTimeout, "MY_Remote_Request_Timeout")
-		-- start ie navigate
-		ie:Navigate(rr.szUrl)
-		-- set ie status to busy
-		_Cache.bRequest = true
-	end
+		hPage:Destroy()
+	end, nTimeout, "MYRR_TO_" .. RequestID)
+	
+	-- start ie navigate
+	local WndFocus = Station.GetFocusWindow()
+	hPage:Navigate(szUrl)
+	Station.SetFocusWindow(WndFocus)
 end
 
 -- Breathe Call & Delay Call
--- #######################################################################################################
+-- ##################################################################################################
 --                     # #                     #       # # # # # # # #             #       #         
 --   # # # #   # # # #       # # # #           #                   #           #   #   #   #         
 --         #         #       #     #           #     #           #       #         #       #         
@@ -338,20 +276,20 @@ end
 --     #   #   #     #       #     #       #   #     #         #         #   # # # # #     #   #     
 --       #     # # # # # #   # # # #           #     #       # #         #     #     #       #       
 --     #   #                 #     #           #     #                   #       # #       #   #     
---   #       # # # # # # #                 # # #     # # # # # # # # # # #   # #     #   #       #  
--- --#######################################################################################################
-_Cache.nFrameCount = GetLogicFrameCount()
-_Cache.tDelayCall = {}    -- delay call 队列
-_Cache.tBreatheCall = {}  -- breathe call 队列
---[[ 延迟调用
-	(void) MY.DelayCall(func fnAction, number nDelay, string szName)
-	fnAction    -- 调用函数
-	nTime       -- 延迟调用时间，单位：毫秒，实际调用延迟延迟是 62.5 的整倍数
-	szName      -- 延迟调用ID 用于取消调用
-	取消调用
-	(void) MY.DelayCall(string szName)
-	szName      -- 延迟调用ID
-]]
+--   #       # # # # # # #                 # # #     # # # # # # # # # # #   # #     #   #       #   
+-- ##################################################################################################
+_C.nLogicFrameCount = GetLogicFrameCount()
+_C.tDelayCall = {}    -- delay call 队列
+_C.tBreatheCall = {}  -- breathe call 队列
+
+-- 延迟调用
+-- (void) MY.DelayCall(func fnAction, number nDelay, string szName)
+-- fnAction    -- 调用函数
+-- nTime       -- 延迟调用时间，单位：毫秒，实际调用延迟延迟是 62.5 的整倍数
+-- szName      -- 延迟调用ID 用于取消调用
+-- 取消调用
+-- (void) MY.DelayCall(string szName)
+-- szName      -- 延迟调用ID
 MY.DelayCall = function(arg0, arg1, arg2, arg3)
 	local fnAction, nDelay, szName, param = nil, nil, nil, {}
 	if type(arg0)=='function' then fnAction = arg0 end
@@ -373,16 +311,16 @@ MY.DelayCall = function(arg0, arg1, arg2, arg3)
 	if not fnAction and not szName then return nil end
 	
 	if szName and nDelay and not fnAction then -- 调整DelayCall延迟时间
-		for i = #_Cache.tDelayCall, 1, -1 do
-			if _Cache.tDelayCall[i].szName == szName then
-				_Cache.tDelayCall[i].nTime = nDelay + GetTime()
+		for i = #_C.tDelayCall, 1, -1 do
+			if _C.tDelayCall[i].szName == szName then
+				_C.tDelayCall[i].nTime = nDelay + GetTime()
 			end
 		end
 	else -- 一个新的DelayCall（或者覆盖原来的）
 		if szName then
-			for i = #_Cache.tDelayCall, 1, -1 do
-				if _Cache.tDelayCall[i].szName == szName then
-					table.remove(_Cache.tDelayCall, i)
+			for i = #_C.tDelayCall, 1, -1 do
+				if _C.tDelayCall[i].szName == szName then
+					table.remove(_C.tDelayCall, i)
 				end
 			end
 		end
@@ -390,16 +328,16 @@ MY.DelayCall = function(arg0, arg1, arg2, arg3)
 			if not nDelay then
 				nDelay = 1000 / GLOBAL.GAME_FPS
 			end
-			table.insert(_Cache.tDelayCall, { nTime = nDelay + GetTime(), fnAction = fnAction, szName = szName, param = {} })
+			table.insert(_C.tDelayCall, { nTime = nDelay + GetTime(), fnAction = fnAction, szName = szName, param = {} })
 		end
 	end
 end
---[[ 注册呼吸循环调用函数
-	(void) MY.BreatheCall(string szKey, func fnAction[, number nTime])
-	szKey       -- 名称，必须唯一，重复则覆盖
-	fnAction    -- 循环呼吸调用函数，设为 nil 则表示取消这个 key 下的呼吸处理函数
-	nTime       -- 调用间隔，单位：毫秒，默认为 62.5，即每秒调用 16次，其值自动被处理成 62.5 的整倍数
-]]
+
+-- 注册呼吸循环调用函数
+-- (void) MY.BreatheCall(string szKey, func fnAction[, number nTime])
+-- szKey       -- 名称，必须唯一，重复则覆盖
+-- fnAction    -- 循环呼吸调用函数，设为 nil 则表示取消这个 key 下的呼吸处理函数
+-- nTime       -- 调用间隔，单位：毫秒，默认为 62.5，即每秒调用 16次，其值自动被处理成 62.5 的整倍数
 MY.BreatheCall = function(arg1, arg2, arg3, arg4)
 	local fnAction, nInterval, szName, param = nil, nil, nil, {}
 	if type(arg1)=='string' then szName = StringLowerW(arg1) end
@@ -419,9 +357,9 @@ MY.BreatheCall = function(arg1, arg2, arg3, arg4)
 	if type(arg3)=='table' then param = arg3 end
 	if type(arg4)=='table' then param = arg4 end
 	if szName then
-		for i = #_Cache.tBreatheCall, 1, -1 do
-			if _Cache.tBreatheCall[i].szName == szName then
-				table.remove(_Cache.tBreatheCall, i)
+		for i = #_C.tBreatheCall, 1, -1 do
+			if _C.tBreatheCall[i].szName == szName then
+				table.remove(_C.tBreatheCall, i)
 			end
 		end
 	end
@@ -430,50 +368,51 @@ MY.BreatheCall = function(arg1, arg2, arg3, arg4)
 		if nInterval and nInterval > 0 then
 			nFrame = math.ceil(nInterval / 62.5)
 		end
-		table.insert( _Cache.tBreatheCall, { szName = szName, fnAction = fnAction, nNext = GetLogicFrameCount() + 1, nFrame = nFrame, param = param } )
+		table.insert( _C.tBreatheCall, { szName = szName, fnAction = fnAction, nNext = GetLogicFrameCount() + 1, nFrame = nFrame, param = param } )
 	end
 end
---[[ 改变呼吸调用频率
-	(void) MY.BreatheCallDelay(string szKey, nTime)
-	nTime       -- 延迟时间，每 62.5 延迟一帧
-]]
+
+-- 改变呼吸调用频率
+-- (void) MY.BreatheCallDelay(string szKey, nTime)
+-- nTime       -- 延迟时间，每 62.5 延迟一帧
 MY.BreatheCallDelay = function(szKey, nTime)
-	for _, t in ipairs(_Cache.tBreatheCall) do
+	for _, t in ipairs(_C.tBreatheCall) do
 		if t.szName == StringLowerW(szKey) then
 			t.nFrame = math.ceil(nTime / 62.5)
 			t.nNext = GetLogicFrameCount() + t.nFrame
 		end
 	end
 end
---[[ 延迟一次呼吸函数的调用频率
-	(void) MY.BreatheCallDelayOnce(string szKey, nTime)
-	nTime       -- 延迟时间，每 62.5 延迟一帧
-]]
+
+-- 延迟一次呼吸函数的调用频率
+-- (void) MY.BreatheCallDelayOnce(string szKey, nTime)
+-- nTime       -- 延迟时间，每 62.5 延迟一帧
 MY.BreatheCallDelayOnce = function(szKey, nTime)
-	for _, t in ipairs(_Cache.tBreatheCall) do
+	for _, t in ipairs(_C.tBreatheCall) do
 		if t.szName == StringLowerW(szKey) then
 			t.nNext = GetLogicFrameCount() + math.ceil(nTime / 62.5)
 		end
 	end
 end
+
 -- breathe
 MY.UI.RegisterUIEvent(MY, "OnFrameBreathe", function()
 	-- add frame counter
-	_Cache.nFrameCount = GetLogicFrameCount()
+	_C.nLogicFrameCount = GetLogicFrameCount()
 	_C.nFrameCount = _C.nFrameCount + 1
 	-- run breathe calls
-	local nFrame = _Cache.nFrameCount
-	for i = #_Cache.tBreatheCall, 1, -1 do
-		if nFrame >= _Cache.tBreatheCall[i].nNext then
-			local bc = _Cache.tBreatheCall[i]
+	local nFrame = _C.nLogicFrameCount
+	for i = #_C.tBreatheCall, 1, -1 do
+		if nFrame >= _C.tBreatheCall[i].nNext then
+			local bc = _C.tBreatheCall[i]
 			bc.nNext = nFrame + bc.nFrame
 			local res, err = pcall(bc.fnAction, unpack(bc.param))
 			if not res then
 				MY.Debug({"BreatheCall#" .. (bc.szName or ('anonymous_'..i)) .." ERROR: " .. err})
 			elseif err == 0 then    -- function return 0 means to stop its breathe
-				for i = #_Cache.tBreatheCall, 1, -1 do
-					if _Cache.tBreatheCall[i] == bc then
-						table.remove(_Cache.tBreatheCall, i)
+				for i = #_C.tBreatheCall, 1, -1 do
+					if _C.tBreatheCall[i] == bc then
+						table.remove(_C.tBreatheCall, i)
 					end
 				end
 			end
@@ -481,27 +420,28 @@ MY.UI.RegisterUIEvent(MY, "OnFrameBreathe", function()
 	end
 	-- run delay calls
 	local nTime = GetTime()
-	for i = #_Cache.tDelayCall, 1, -1 do
-		local dc = _Cache.tDelayCall[i]
+	for i = #_C.tDelayCall, 1, -1 do
+		local dc = _C.tDelayCall[i]
 		if dc.nTime <= nTime then
 			local res, err = pcall(dc.fnAction, unpack(dc.param))
 			if not res then
 				MY.Debug({"DelayCall#" .. (dc.szName or 'anonymous') .." ERROR: " .. err})
 			end
-			table.remove(_Cache.tDelayCall, i)
+			table.remove(_C.tDelayCall, i)
 		end
 	end
 end)
+
 -- GetLogicFrameCount()过图修正
 MY.RegisterEvent('LOADING_END', function()
-	local nFrameOffset = GetLogicFrameCount() - _Cache.nFrameCount
-	_Cache.nFrameCount = GetLogicFrameCount()
-	for _, bc in ipairs(_Cache.tBreatheCall) do
+	local nFrameOffset = GetLogicFrameCount() - _C.nLogicFrameCount
+	_C.nLogicFrameCount = GetLogicFrameCount()
+	for _, bc in ipairs(_C.tBreatheCall) do
 		bc.nNext = bc.nNext + nFrameOffset
 	end
 end)
 
--- #######################################################################################################
+-- ##################################################################################################
 --               # # # #         #         #               #       #             #           #       
 --     # # # # #                 #           #       # # # # # # # # # # #         #       #         
 --           #                 #       # # # # # #         #       #           # # # # # # # # #     
@@ -513,14 +453,14 @@ end)
 --             #         #               #   #       # # # # # # # # # # #   # # # # # # # # # # #   
 --       #     #     #           # #     #   #             #   #   #                   #             
 --     #       #       #     # #       #     #   #       #     #     #                 #             
---   #       # #         #           #         # #   # #       #       # #             #         
--- #######################################################################################################
-_Cache.tPlayerMenu = {}   -- 玩家头像菜单
-_Cache.tTargetMenu = {}   -- 目标头像菜单
-_Cache.tTraceMenu  = {}   -- 工具栏菜单
+--   #       # #         #           #         # #   # #       #       # #             #             
+-- ##################################################################################################
+_C.tPlayerMenu = {}   -- 玩家头像菜单
+_C.tTargetMenu = {}   -- 目标头像菜单
+_C.tTraceMenu  = {}   -- 工具栏菜单
 
 -- get plugin folder menu
-_Cache.GetMainMenu = function()
+_C.GetMainMenu = function()
 	return {
 		szOption = _L["mingyi plugins"],
 		fnAction = MY.TogglePanel,
@@ -534,43 +474,43 @@ _Cache.GetMainMenu = function()
 	}
 end
 -- get player addon menu
-_Cache.GetPlayerAddonMenu = function()
+_C.GetPlayerAddonMenu = function()
 	-- 创建菜单
-	local menu = _Cache.GetMainMenu()
-	for i = 1, #_Cache.tPlayerMenu, 1 do
-		local m = _Cache.tPlayerMenu[i].Menu
+	local menu = _C.GetMainMenu()
+	for i = 1, #_C.tPlayerMenu, 1 do
+		local m = _C.tPlayerMenu[i].Menu
 		if type(m)=="function" then m = m() end
 		table.insert(menu, m)
 	end
 	return {menu}
 end
 -- get target addon menu
-_Cache.GetTargetAddonMenu = function()
+_C.GetTargetAddonMenu = function()
 	local menu = {}
-	for i = 1, #_Cache.tTargetMenu, 1 do
-		local m = _Cache.tTargetMenu[i].Menu
+	for i = 1, #_C.tTargetMenu, 1 do
+		local m = _C.tTargetMenu[i].Menu
 		if type(m)=="function" then m = m() end
 		table.insert(menu, m)
 	end
 	return menu
 end
 -- get trace button menu
-_Cache.GetTraceButtonMenu = function()
-	local menu = _Cache.GetMainMenu()
-	for i = 1, #_Cache.tTraceMenu, 1 do
-		local m = _Cache.tTraceMenu[i].Menu
+_C.GetTraceButtonMenu = function()
+	local menu = _C.GetMainMenu()
+	for i = 1, #_C.tTraceMenu, 1 do
+		local m = _C.tTraceMenu[i].Menu
 		if type(m)=="function" then m = m() end
 		table.insert(menu, m)
 	end
 	return {menu}
 end
---[[ 注册玩家头像菜单
-	-- 注册
-	(void) MY.RegisterPlayerAddonMenu(szName,Menu)
-	(void) MY.RegisterPlayerAddonMenu(Menu)
-	-- 注销
-	(void) MY.RegisterPlayerAddonMenu(szName)
-]]
+
+-- 注册玩家头像菜单
+-- 注册
+-- (void) MY.RegisterPlayerAddonMenu(szName,Menu)
+-- (void) MY.RegisterPlayerAddonMenu(Menu)
+-- 注销
+-- (void) MY.RegisterPlayerAddonMenu(szName)
 MY.RegisterPlayerAddonMenu = function(arg1, arg2)
 	local szName, Menu
 	if type(arg1)=='string' then szName = arg1 end
@@ -580,28 +520,28 @@ MY.RegisterPlayerAddonMenu = function(arg1, arg2)
 	if type(arg2)=='table' then Menu = arg2 end
 	if type(arg2)=='function' then Menu = arg2 end
 	if Menu then
-		if szName then for i = #_Cache.tPlayerMenu, 1, -1 do
-			if _Cache.tPlayerMenu[i].szName == szName then
-				_Cache.tPlayerMenu[i] = {szName = szName, Menu = Menu}
+		if szName then for i = #_C.tPlayerMenu, 1, -1 do
+			if _C.tPlayerMenu[i].szName == szName then
+				_C.tPlayerMenu[i] = {szName = szName, Menu = Menu}
 				return nil
 			end
 		end end
-		table.insert(_Cache.tPlayerMenu, {szName = szName, Menu = Menu})
+		table.insert(_C.tPlayerMenu, {szName = szName, Menu = Menu})
 	elseif szName then
-		for i = #_Cache.tPlayerMenu, 1, -1 do
-			if _Cache.tPlayerMenu[i].szName == szName then
-				table.remove(_Cache.tPlayerMenu, i)
+		for i = #_C.tPlayerMenu, 1, -1 do
+			if _C.tPlayerMenu[i].szName == szName then
+				table.remove(_C.tPlayerMenu, i)
 			end
 		end
 	end
 end
---[[ 注册目标头像菜单
-	-- 注册
-	(void) MY.RegisterTargetAddonMenu(szName,Menu)
-	(void) MY.RegisterTargetAddonMenu(Menu)
-	-- 注销
-	(void) MY.RegisterTargetAddonMenu(szName)
-]]
+
+-- 注册目标头像菜单
+-- 注册
+-- (void) MY.RegisterTargetAddonMenu(szName,Menu)
+-- (void) MY.RegisterTargetAddonMenu(Menu)
+-- 注销
+-- (void) MY.RegisterTargetAddonMenu(szName)
 MY.RegisterTargetAddonMenu = function(arg1, arg2)
 	local szName, Menu
 	if type(arg1)=='string' then szName = arg1 end
@@ -611,28 +551,28 @@ MY.RegisterTargetAddonMenu = function(arg1, arg2)
 	if type(arg2)=='table' then Menu = arg2 end
 	if type(arg2)=='function' then Menu = arg2 end
 	if Menu then
-		if szName then for i = #_Cache.tTargetMenu, 1, -1 do
-			if _Cache.tTargetMenu[i].szName == szName then
-				_Cache.tTargetMenu[i] = {szName = szName, Menu = Menu}
+		if szName then for i = #_C.tTargetMenu, 1, -1 do
+			if _C.tTargetMenu[i].szName == szName then
+				_C.tTargetMenu[i] = {szName = szName, Menu = Menu}
 				return nil
 			end
 		end end
-		table.insert(_Cache.tTargetMenu, {szName = szName, Menu = Menu})
+		table.insert(_C.tTargetMenu, {szName = szName, Menu = Menu})
 	elseif szName then
-		for i = #_Cache.tTargetMenu, 1, -1 do
-			if _Cache.tTargetMenu[i].szName == szName then
-				table.remove(_Cache.tTargetMenu, i)
+		for i = #_C.tTargetMenu, 1, -1 do
+			if _C.tTargetMenu[i].szName == szName then
+				table.remove(_C.tTargetMenu, i)
 			end
 		end
 	end
 end
---[[ 注册工具栏菜单
-	-- 注册
-	(void) MY.RegisterTraceButtonMenu(szName,Menu)
-	(void) MY.RegisterTraceButtonMenu(Menu)
-	-- 注销
-	(void) MY.RegisterTraceButtonMenu(szName)
-]]
+
+-- 注册工具栏菜单
+-- 注册
+-- (void) MY.RegisterTraceButtonMenu(szName,Menu)
+-- (void) MY.RegisterTraceButtonMenu(Menu)
+-- 注销
+-- (void) MY.RegisterTraceButtonMenu(szName)
 MY.RegisterTraceButtonMenu = function(arg1, arg2)
 	local szName, Menu
 	if type(arg1)=='string' then szName = arg1 end
@@ -642,27 +582,27 @@ MY.RegisterTraceButtonMenu = function(arg1, arg2)
 	if type(arg2)=='table' then Menu = arg2 end
 	if type(arg2)=='function' then Menu = arg2 end
 	if Menu then
-		if szName then for i = #_Cache.tTraceMenu, 1, -1 do
-			if _Cache.tTraceMenu[i].szName == szName then
-				_Cache.tTraceMenu[i] = {szName = szName, Menu = Menu}
+		if szName then for i = #_C.tTraceMenu, 1, -1 do
+			if _C.tTraceMenu[i].szName == szName then
+				_C.tTraceMenu[i] = {szName = szName, Menu = Menu}
 				return nil
 			end
 		end end
-		table.insert(_Cache.tTraceMenu, {szName = szName, Menu = Menu})
+		table.insert(_C.tTraceMenu, {szName = szName, Menu = Menu})
 	elseif szName then
-		for i = #_Cache.tTraceMenu, 1, -1 do
-			if _Cache.tTraceMenu[i].szName == szName then
-				table.remove(_Cache.tTraceMenu, i)
+		for i = #_C.tTraceMenu, 1, -1 do
+			if _C.tTraceMenu[i].szName == szName then
+				table.remove(_C.tTraceMenu, i)
 			end
 		end
 	end
 end
 
-TraceButton_AppendAddonMenu( { _Cache.GetTraceButtonMenu } )
-Player_AppendAddonMenu( { _Cache.GetPlayerAddonMenu } )
-Target_AppendAddonMenu( { _Cache.GetTargetAddonMenu } )
+TraceButton_AppendAddonMenu( { _C.GetTraceButtonMenu } )
+Player_AppendAddonMenu( { _C.GetPlayerAddonMenu } )
+Target_AppendAddonMenu( { _C.GetTargetAddonMenu } )
 
--- #######################################################################################################
+-- ##################################################################################################
 --               # # # #         #         #             #         #                   #             
 --     # # # # #                 #           #           #       #   #         #       #       #     
 --           #                 #       # # # # # #   # # # #   #       #       #       #       #     
@@ -675,14 +615,13 @@ Target_AppendAddonMenu( { _Cache.GetTargetAddonMenu } )
 --       #     #     #           # #     #   #           #   # # #   #   #   #         #         #   
 --     #       #       #     # #       #     #   #       #   #   #       #   # # # # # # # # # # #   
 --   #       # #         #           #         # #       #   #   #     # #                       #   
--- #######################################################################################################
---[[ 显示本地信息
-	MY.Sysmsg(oContent, oTitle)
-	szContent    要显示的主体消息
-	szTitle      消息头部
-	tContentRgbF 主体消息文字颜色rgbf[可选，为空使用默认颜色字体。]
-	tTitleRgbF   消息头部文字颜色rgbf[可选，为空和主体消息文字颜色相同。]
-]]
+-- ##################################################################################################
+-- 显示本地信息
+-- MY.Sysmsg(oContent, oTitle)
+-- szContent    要显示的主体消息
+-- szTitle      消息头部
+-- tContentRgbF 主体消息文字颜色rgbf[可选，为空使用默认颜色字体。]
+-- tTitleRgbF   消息头部文字颜色rgbf[可选，为空和主体消息文字颜色相同。]
 MY.Sysmsg = function(oContent, oTitle)
 	oTitle = oTitle or MY.GetAddonInfo().szShortName
 	if type(oTitle)~='table' then oTitle = { oTitle, bNoWrap = true } end
@@ -715,12 +654,11 @@ MY.Sysmsg = function(oContent, oTitle)
 	OutputMessage("MSG_SYS", szMsg, true)
 end
 
---[[ Debug输出
-	(void)MY.Debug(oContent, szTitle, nLevel)
-	oContent Debug信息
-	szTitle  Debug头
-	nLevel   Debug级别[低于当前设置值将不会输出]
-]]
+-- Debug输出
+-- (void)MY.Debug(oContent, szTitle, nLevel)
+-- oContent Debug信息
+-- szTitle  Debug头
+-- nLevel   Debug级别[低于当前设置值将不会输出]
 MY.Debug = function(oContent, szTitle, nLevel)
 	if type(nLevel)~="number"  then nLevel = 1 end
 	if type(szTitle)~="string" then szTitle = 'MY DEBUG' end
@@ -742,10 +680,9 @@ MY.Debug = function(oContent, szTitle, nLevel)
 	end
 end
 
---[[ 格式化计时时间
-	(string) MY.Sys.FormatTimeCount(szFormat, nTime)
-	szFormat  格式化字符串 可选项H,M,S,hh,mm,ss,h,m,s
-]]
+-- 格式化计时时间
+-- (string) MY.Sys.FormatTimeCount(szFormat, nTime)
+-- szFormat  格式化字符串 可选项H,M,S,hh,mm,ss,h,m,s
 MY.Sys.FormatTimeCount = function(szFormat, nTime)
 	local nSeconds = math.floor(nTime)
 	local nMinutes = math.floor(nSeconds / 60)
@@ -765,11 +702,10 @@ MY.Sys.FormatTimeCount = function(szFormat, nTime)
 end
 MY.FormatTimeCount = MY.Sys.FormatTimeCount
 
---[[ 格式化时间
-	(string) MY.Sys.FormatTimeCount(szFormat, nTimestamp)
-	szFormat   格式化字符串 可选项yyyy,yy,MM,dd,y,m,d,hh,mm,ss,h,m,s
-	nTimestamp UNIX时间戳
-]]
+-- 格式化时间
+-- (string) MY.Sys.FormatTimeCount(szFormat, nTimestamp)
+-- szFormat   格式化字符串 可选项yyyy,yy,MM,dd,y,m,d,hh,mm,ss,h,m,s
+-- nTimestamp UNIX时间戳
 MY.Sys.FormatTime = function(szFormat, nTimestamp)
 	local t = TimeToDate(nTimestamp)
 	szFormat = szFormat:gsub('yyyy', string.format('%04d', t.year  ))
@@ -789,14 +725,13 @@ MY.Sys.FormatTime = function(szFormat, nTimestamp)
 end
 MY.FormatTime = MY.Sys.FormatTime
 
---[[ register global esc key down action
-	(void) MY.Sys.RegisterEsc(szID, fnCondition, fnAction, bTopmost) -- register global esc event handle
-	(void) MY.Sys.RegisterEsc(szID, nil, nil, bTopmost)              -- unregister global esc event handle
-	(string)szID        -- an UUID (if this UUID has been register before, the old will be recovered)
-	(function)fnCondition -- a function returns if fnAction will be execute
-	(function)fnAction    -- inf fnCondition() is true then fnAction will be called
-	(boolean)bTopmost    -- this param equals true will be called in high priority
-]]
+-- register global esc key down action
+-- (void) MY.Sys.RegisterEsc(szID, fnCondition, fnAction, bTopmost) -- register global esc event handle
+-- (void) MY.Sys.RegisterEsc(szID, nil, nil, bTopmost)              -- unregister global esc event handle
+-- (string)szID        -- an UUID (if this UUID has been register before, the old will be recovered)
+-- (function)fnCondition -- a function returns if fnAction will be execute
+-- (function)fnAction    -- inf fnCondition() is true then fnAction will be called
+-- (boolean)bTopmost    -- this param equals true will be called in high priority
 MY.Sys.RegisterEsc = function(szID, fnCondition, fnAction, bTopmost)
 	if fnCondition and fnAction then
 		if RegisterGlobalEsc then
