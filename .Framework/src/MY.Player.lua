@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-04-19 16:26:38
+-- @Last Modified time: 2015-04-24 11:09:34
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -32,9 +32,8 @@ _Cache.tNearNpc = {}      -- 附近的NPC
 _Cache.tNearPlayer = {}   -- 附近的物品
 _Cache.tNearDoodad = {}   -- 附近的玩家
 
---[[ 获取附近NPC列表
-	(table) MY.GetNearNpc(void)
-]]
+-- 获取附近NPC列表
+-- (table) MY.GetNearNpc(void)
 MY.Player.GetNearNpc = function(nLimit)
 	local tNpc, i = {}, 0
 	for dwID, _ in pairs(_Cache.tNearNpc) do
@@ -54,9 +53,8 @@ MY.Player.GetNearNpc = function(nLimit)
 end
 MY.GetNearNpc = MY.Player.GetNearNpc
 
---[[ 获取附近玩家列表
-	(table) MY.GetNearPlayer(void)
-]]
+-- 获取附近玩家列表
+-- (table) MY.GetNearPlayer(void)
 MY.Player.GetNearPlayer = function(nLimit)
 	local tPlayer, i = {}, 0
 	for dwID, _ in pairs(_Cache.tNearPlayer) do
@@ -73,9 +71,8 @@ MY.Player.GetNearPlayer = function(nLimit)
 end
 MY.GetNearPlayer = MY.Player.GetNearPlayer
 
---[[ 获取附近物品列表
-	(table) MY.GetNearPlayer(void)
-]]
+-- 获取附近物品列表
+-- (table) MY.GetNearPlayer(void)
 MY.Player.GetNearDoodad = function(nLimit)
 	local tDoodad, i = {}, 0
 	for dwID, _ in pairs(_Cache.tNearDoodad) do
@@ -99,8 +96,7 @@ RegisterEvent("PLAYER_LEAVE_SCENE", function() _Cache.tNearPlayer[arg0] = nil  e
 RegisterEvent("DOODAD_ENTER_SCENE", function() _Cache.tNearDoodad[arg0] = true end)
 RegisterEvent("DOODAD_LEAVE_SCENE", function() _Cache.tNearDoodad[arg0] = nil  end)
 
---[[ 获取玩家自身信息（缓存）
-]]
+-- 获取玩家自身信息（缓存）
 local m_ClientInfo
 MY.Player.GetClientInfo = function(bForceRefresh)
 	if bForceRefresh or not (m_ClientInfo and m_ClientInfo.dwID) then
@@ -187,8 +183,7 @@ MY.Player.GetUUID = function()
 	end
 end
 
---[[获取好友列表
-]]
+-- 获取好友列表
 MY.Player.GetFriendList = function(arg0)
 	local t = {}
 	local me = GetClientPlayer()
@@ -220,8 +215,7 @@ MY.Player.GetFriendList = function(arg0)
 	return t, n
 end
 
---[[获取好友
-]]
+-- 获取好友
 MY.Player.GetFriend = function(arg0)
 	if not arg0 then return nil end
 	local tFriend = MY.Player.GetFriendList()
@@ -236,14 +230,12 @@ MY.Player.GetFriend = function(arg0)
 	end
 end
 
---[[获取好友列表
-]]
+-- 获取好友列表
 MY.Player.GetTongMemberList = function()
 	return GetTongClient().GetMemberList()
 end
 
---[[ 获取帮会成员
-]]
+-- 获取帮会成员
 MY.Player.GetTongMember = function(arg0)
 	if not arg0 then
 		return
@@ -303,8 +295,7 @@ _Cache.OnFightStateChange = function(bFightState)
 end
 MY.BreatheCall(_Cache.OnFightStateChange)
 MY.RegisterEvent('FIGHT_HINT', _Cache.OnFightStateChange)
---[[ 获取当前战斗时间
-]]
+-- 获取当前战斗时间
 MY.Player.GetFightTime = function(szFormat)
 	local nFrame = 0
 	
@@ -340,21 +331,18 @@ MY.Player.GetFightTime = function(szFormat)
 	return szFormat
 end
 
---[[ 获取当前战斗唯一标示符
-]]
+-- 获取当前战斗唯一标示符
 MY.Player.GetFightUUID = function()
 	return _Cache.nCurrentFightUUID
 end
 
---[[ 获取上次战斗唯一标示符
-]]
+-- 获取上次战斗唯一标示符
 MY.Player.GetLastFightUUID = function()
 	return _Cache.nLastFightUUID
 end
 
---[[ 获取自身是否处于逻辑战斗状态
-	(bool) MY.Player.IsFighting()
-]]
+-- 获取自身是否处于逻辑战斗状态
+-- (bool) MY.Player.IsFighting()
 MY.Player.IsFighting = function()
 	local me = GetClientPlayer()
 	if not me then
@@ -390,10 +378,9 @@ end
 --     # # # # # # # # # #   #                   #                 # # # # # # # # #         #         #         
 --     #                 #   #               # # #                 #               #         #       # #         
 -- #######################################################################################################
---[[ 取得目标类型和ID
-	(dwType, dwID) MY.GetTarget()       -- 取得自己当前的目标类型和ID
-	(dwType, dwID) MY.GetTarget(object) -- 取得指定操作对象当前的目标类型和ID
-]]
+-- 取得目标类型和ID
+-- (dwType, dwID) MY.GetTarget()       -- 取得自己当前的目标类型和ID
+-- (dwType, dwID) MY.GetTarget(object) -- 取得指定操作对象当前的目标类型和ID
 MY.Player.GetTarget = function(object)
 	if not object then
 		object = GetClientPlayer()
@@ -406,10 +393,10 @@ MY.Player.GetTarget = function(object)
 end
 MY.GetTarget = MY.Player.GetTarget
 
---[[ 根据 dwType 类型和 dwID 设置目标
+-- 根据 dwType 类型和 dwID 设置目标
 -- (void) MY.SetTarget([number dwType, ]number dwID)
 -- dwType   -- *可选* 目标类型
--- dwID     -- 目标 ID]]
+-- dwID     -- 目标 ID
 MY.Player.SetTarget = function(dwType, dwID)
 	-- check dwType
 	if type(dwType)=="userdata" then
@@ -442,10 +429,9 @@ MY.Player.SetTarget = function(dwType, dwID)
 end
 MY.SetTarget = MY.Player.SetTarget
 
---[[ 设置/取消 临时目标
-	-- MY.Player.SetTempTarget(dwType, dwID)
-	-- MY.Player.ResumeTarget()
-]]
+-- 设置/取消 临时目标
+-- MY.Player.SetTempTarget(dwType, dwID)
+-- MY.Player.ResumeTarget()
 _Cache.pTempTarget = { TARGET.NO_TARGET, 0 }
 MY.Player.SetTempTarget = function(dwType, dwID)
 	TargetPanel_SetOpenState(true)
@@ -466,9 +452,8 @@ MY.Player.ResumeTarget = function()
 end
 MY.ResumeTarget = MY.Player.ResumeTarget
 
---[[ 临时设置目标为指定目标并执行函数
-	(void) MY.Player.WithTarget(dwType, dwID, callback)
-]]
+-- 临时设置目标为指定目标并执行函数
+-- (void) MY.Player.WithTarget(dwType, dwID, callback)
 _Cache.tWithTarget = {}
 _Cache.lockWithTarget = false
 _Cache.WithTargetHandle = function()
@@ -530,10 +515,9 @@ MY.Player.GetFaceAngel = function(nX, nY, nFace, nTX, nTY, bAbs)
 end
 MY.GetFaceAngel = MY.Player.GetFaceAngel
 
---[[ 装备名为szName的装备
-	(void) MY.Equip(szName)
-	szName  装备名称
-]]
+-- 装备名为szName的装备
+-- (void) MY.Equip(szName)
+-- szName  装备名称
 MY.Player.Equip = function(szName)
 	local me = GetClientPlayer()
 	for i=1,6 do
@@ -562,9 +546,8 @@ MY.Player.Equip = function(szName)
 	end
 end
 
---[[ 获取对象的buff列表
-	(table) MY.GetBuffList(obj)
-]]
+-- 获取对象的buff列表
+-- (table) MY.GetBuffList(obj)
 MY.Player.GetBuffList = function(obj)
 	obj = obj or GetClientPlayer()
 	local aBuffTable = {}
@@ -577,12 +560,51 @@ MY.Player.GetBuffList = function(obj)
 	end
 	return aBuffTable
 end
+MY.GetBuffList = MY.Player.GetBuffList
+
+-- 获取对象的buff
+-- (table) MY.GetBuff(obj)
+MY.Player.GetBuff = function(obj, dwID, nLevel)
+	if type(obj) == "number" then
+		obj, dwID, nLevel = GetClientPlayer(), obj, dwID
+	end
+	if not nLevel then
+		for _, buff in ipairs(MY.Player.GetBuffList(obj)) do
+			if buff.dwID == dwID then
+				return buff
+			end
+		end
+	else
+		for _, buff in ipairs(MY.Player.GetBuffList(obj)) do
+			if buff.dwID == dwID and buff.nLevel == nLevel then
+				return buff
+			end
+		end
+	end
+	return nil
+end
+MY.GetBuff = MY.Player.GetBuff
+
+-- 获取对象是否无敌
+-- (mixed) MY.Player.IsInvincible([object obj])
+-- @return <nil >: invalid obj
+-- @return <bool>: object invincible state
+MY.Player.IsInvincible = function(obj)
+	obj = obj or GetClientPlayer()
+	if not obj then
+		return nil
+	elseif MY.Player.GetBuff(obj, 961) then
+		return true
+	else
+		return false
+	end
+end
+MY.IsInvincible = MY.Player.IsInvincible
 
 _Cache.tPlayerSkills = {}   -- 玩家技能列表[缓存]   -- 技能名反查ID
 _Cache.tSkillCache = {}     -- 技能列表缓存         -- 技能ID查技能名称图标
---[[ 通过技能名称获取技能对象
-	(table) MY.GetSkillByName(szName)
-]]
+-- 通过技能名称获取技能对象
+-- (table) MY.GetSkillByName(szName)
 MY.Player.GetSkillByName = function(szName)
 	if table.getn(_Cache.tPlayerSkills)==0 then
 		for i = 1, g_tTable.Skill:GetRowCount() do
@@ -594,15 +616,15 @@ MY.Player.GetSkillByName = function(szName)
 	end
 	return _Cache.tPlayerSkills[szName]
 end
---[[ 判断技能名称是否有效
-	(bool) MY.IsValidSkill(szName)
-]]
+
+-- 判断技能名称是否有效
+-- (bool) MY.IsValidSkill(szName)
 MY.Player.IsValidSkill = function(szName)
 	if MY.Player.GetSkillByName(szName)==nil then return false else return true end
 end
---[[ 判断当前用户是否可用某个技能
-	(bool) MY.CanUseSkill(number dwSkillID[, dwLevel])
-]]
+
+-- 判断当前用户是否可用某个技能
+-- (bool) MY.CanUseSkill(number dwSkillID[, dwLevel])
 MY.Player.CanUseSkill = function(dwSkillID, dwLevel)
 	-- 判断技能是否有效 并将中文名转换为技能ID
 	if type(dwSkillID) == "string" then if MY.IsValidSkill(dwSkillID) then dwSkillID = MY.Player.GetSkillByName(dwSkillID).dwSkillID else return false end end
@@ -646,10 +668,9 @@ MY.Player.GetSkillName = function(dwSkillID, dwLevel)
 	return unpack(_Cache.tSkillCache[dwSkillID])
 end
 
---[[ 登出游戏
-	(void) MY.LogOff(bCompletely)
-	bCompletely 为true返回登陆页 为false返回角色页 默认为false
-]]
+-- 登出游戏
+-- (void) MY.LogOff(bCompletely)
+-- bCompletely 为true返回登陆页 为false返回角色页 默认为false
 MY.Player.LogOff = function(bCompletely)
 	if bCompletely then
 		ReInitUI(LOAD_LOGIN_REASON.RETURN_GAME_LOGIN)
@@ -669,9 +690,8 @@ end
 -- Load skill extend data
 _Cache.tSkillEx = MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot.."data/skill_ex", true) or {}
 
---[[ 判断当前地图是不是竞技场
-	(bool) MY.Player.IsInArena()
-]]
+-- 判断当前地图是不是竞技场
+-- (bool) MY.Player.IsInArena()
 MY.Player.IsInArena = function()
 	local me = GetClientPlayer()
 	return me and (
@@ -682,18 +702,16 @@ MY.Player.IsInArena = function()
 end
 MY.IsInArena = MY.Player.IsInArena
 
---[[ 判断当前地图是不是战场
-	(bool) MY.Player.IsInBattleField()
-]]
+-- 判断当前地图是不是战场
+-- (bool) MY.Player.IsInBattleField()
 MY.Player.IsInBattleField = function()
 	local me = GetClientPlayer()
 	return me and me.GetScene().nType == MAP_TYPE.BATTLE_FIELD and not MY.Player.IsInArena()
 end
 MY.IsInBattleField = MY.Player.IsInBattleField
 
---[[ 判断当前地图是不是副本
-	(bool) MY.Player.IsInDungeon()
-]]
+-- 判断当前地图是不是副本
+-- (bool) MY.Player.IsInDungeon()
 MY.Player.IsInDungeon = function()
 	local me = GetClientPlayer()
 	return me and MY.Game.IsDungeonMap(me.GetMapID())
