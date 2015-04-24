@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-04-24 11:11:30
+-- @Last Modified time: 2015-04-24 13:03:55
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -379,6 +379,10 @@ end
 -- if panel visible
 MY.IsPanelVisible = function()
 	return (_MY.frame and _MY.frame:IsVisible())
+end
+-- if panel visible
+MY.IsPanelOpened = function()
+	return Station.Lookup("Normal/MY")
 end
 
 --[[ 获取主窗体句柄

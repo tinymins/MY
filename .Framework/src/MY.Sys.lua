@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-04-22 13:43:50
+-- @Last Modified time: 2015-04-24 13:34:40
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 MY = MY or {}
@@ -20,15 +20,20 @@ end
 MY.GetLang = MY.Sys.GetLang
 
 -- 获取功能屏蔽状态
-pcall(function()
-	if MY.Sys.GetLang() == 'zhcn' then
-		MY.Sys.bShieldedVersion = true
+MY.Sys.IsShieldedVersion = function(bShieldedVersion)
+	if bShieldedVersion == nil then
+		return MY.Sys.bShieldedVersion
+	else
+		MY.Sys.bShieldedVersion = bShieldedVersion
+		if not bShieldedVersion and MY.IsPanelOpened() then
+			MY.ReopenPanel()
+		end
 	end
-end)
-MY.Sys.IsShieldedVersion = function()
-	return MY.Sys.bShieldedVersion
 end
 MY.IsShieldedVersion = MY.Sys.IsShieldedVersion
+pcall(function()
+	MY.Sys.bShieldedVersion = (MY.Sys.GetLang() == 'zhcn')
+end)
 
 _C.nFrameCount = 0
 MY.Sys.GetFrameCount = function()
@@ -677,6 +682,15 @@ MY.Debug = function(oContent, szTitle, nLevel)
 	if nLevel >= MY.GetAddonInfo().nDebugLevel then
 		Log('[MY_DEBUG][LEVEL_' .. nLevel .. ']' .. '[' .. szTitle .. ']' .. table.concat(oContent, "\n"))
 		MY.Sysmsg(oContent, szTitle)
+	end
+end
+
+MY.StartDebugMode = function()
+	MY.Sys.IsShieldedVersion(false)
+	local me = GetClientPlayer()
+	if me then
+		Station.Lookup("Lowest/Scene").JH = {["NAME_EX"] = { [me.szName] = me.dwID }}
+		FireEvent("CIRCLE_DEBUG", 80, 1)
 	end
 end
 
