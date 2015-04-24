@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-04-24 13:03:55
+-- @Last Modified time: 2015-04-24 13:59:23
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -279,12 +279,14 @@ MY.ClosePanel = function(bRealClose, bMute)
 	MY.RegisterEsc('MY')
 end
 -- open window
-MY.OpenPanel = function(bMute)
+MY.OpenPanel = function(bMute, bNoFocus)
 	local frame = MY.GetFrame()
 	if frame then
 		frame:Show()
-		frame:BringToTop()
-		Station.SetFocusWindow(frame)
+		if not bNoFocus then
+			frame:BringToTop()
+			Station.SetFocusWindow(frame)
+		end
 	end
 	MY.RegisterEsc('MY', function()
 		return Station.Lookup('Normal/MY') and Station.Lookup('Normal/MY'):IsVisible()
@@ -309,9 +311,9 @@ end
 MY.ReopenPanel = function()
 	local bVisible = MY.IsPanelVisible()
 	MY.ClosePanel(true, true)
-	MY.OpenPanel(true)
+	MY.OpenPanel(true, true)
 	if not bVisible then
-		MY.ClosePanel()
+		MY.ClosePanel(false, true)
 	end
 end
 -- resize panel
