@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-04-07 15:57:48
+-- @Last Modified time: 2015-05-04 20:18:37
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -----------------------------------------------
@@ -30,18 +30,16 @@ local _C = {}
 --       # #           # #     # #   #   # # # # #     #   #   # # # # # #   
 -- #######################################################################################################
 _Cache.tHotkey = {}
---[[ 增加系统快捷键
-	(void) MY.AddHotKey(string szName, string szTitle, func fnAction)   -- 增加系统快捷键
-]]
+-- 增加系统快捷键
+-- (void) MY.AddHotKey(string szName, string szTitle, func fnAction)   -- 增加系统快捷键
 MY.Game.AddHotKey = function(szName, szTitle, fnAction)
 	if string.sub(szName, 1, 3) ~= "MY_" then
 		szName = "MY_" .. szName
 	end
 	table.insert(_Cache.tHotkey, { szName = szName, szTitle = szTitle, fnAction = fnAction })
 end
---[[ 获取快捷键名称
-	(string) MY.GetHotKeyName(string szName, boolean bBracket, boolean bShort)      -- 取得快捷键名称
-]]
+-- 获取快捷键名称
+-- (string) MY.GetHotKeyName(string szName, boolean bBracket, boolean bShort)      -- 取得快捷键名称
 MY.Game.GetHotKeyName = function(szName, bBracket, bShort)
 	if string.sub(szName, 1, 3) ~= "MY_" then
 		szName = "MY_" .. szName
@@ -53,10 +51,9 @@ MY.Game.GetHotKeyName = function(szName, bBracket, bShort)
 	end
 	return szKey
 end
---[[ 获取快捷键
-	(table) MY.GetHotKey(string szName, true , true )       -- 取得快捷键
-	(number nKey, boolean bShift, boolean bCtrl, boolean bAlt) MY.GetHotKey(string szName, true , fasle)        -- 取得快捷键
-]]
+-- 获取快捷键
+-- (table) MY.GetHotKey(string szName, true , true )       -- 取得快捷键
+-- (number nKey, boolean bShift, boolean bCtrl, boolean bAlt) MY.GetHotKey(string szName, true , fasle)        -- 取得快捷键
 MY.Game.GetHotKey = function(szName, bBracket, bShort)
 	if string.sub(szName, 1, 3) ~= "MY_" then
 		szName = "MY_" .. szName
@@ -69,12 +66,11 @@ MY.Game.GetHotKey = function(szName, bBracket, bShort)
 		return nKey, bShift, bCtrl, bAlt
 	end
 end
---[[ 设置快捷键/打开快捷键设置面板    -- HM里面抠出来的
-	(void) MY.SetHotKey()                               -- 打开快捷键设置面板
-	(void) MY.SetHotKey(string szGroup)     -- 打开快捷键设置面板并定位到 szGroup 分组（不可用）
-	(void) MY.SetHotKey(string szCommand, number nKey )     -- 设置快捷键
-	(void) MY.SetHotKey(string szCommand, number nIndex, number nKey [, boolean bShift [, boolean bCtrl [, boolean bAlt] ] ])       -- 设置快捷键
-]]
+-- 设置快捷键/打开快捷键设置面板    -- HM里面抠出来的
+-- (void) MY.SetHotKey()                               -- 打开快捷键设置面板
+-- (void) MY.SetHotKey(string szGroup)     -- 打开快捷键设置面板并定位到 szGroup 分组（不可用）
+-- (void) MY.SetHotKey(string szCommand, number nKey )     -- 设置快捷键
+-- (void) MY.SetHotKey(string szCommand, number nIndex, number nKey [, boolean bShift [, boolean bCtrl [, boolean bAlt] ] ])       -- 设置快捷键
 MY.Game.SetHotKey = function(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
 	if nIndex then
 		if string.sub(szCommand, 1, 3) ~= "MY_" then
@@ -234,19 +230,17 @@ end)
 --     #     #   #   #   #       #           #         #     #   #     #     
 --   #     # #   # #     #     #         # #           # # # #   # # # #     
 -- #######################################################################################################
---[[ 获取当前服务器
-]]
+-- 获取当前服务器
 MY.Game.GetServer = function()
 	return table.concat({GetUserServer()},'_'), {GetUserServer()}
 end
 
---[[ 获取指定对象
-	(KObject, info, bIsInfo) MY.GetObject([number dwType, ]number dwID)
-	-- dwType: [可选]对象类型枚举 TARGET.*
-	-- dwID  : 对象ID
-	-- return: 根据 dwType 类型和 dwID 取得操作对象
-	--         不存在时返回nil, nil
-]]
+-- 获取指定对象
+-- (KObject, info, bIsInfo) MY.GetObject([number dwType, ]number dwID)
+-- dwType: [可选]对象类型枚举 TARGET.*
+-- dwID  : 对象ID
+-- return: 根据 dwType 类型和 dwID 取得操作对象
+--         不存在时返回nil, nil
 MY.Game.GetObject = function(dwType, dwID)
 	if not dwID then
 		dwType, dwID = nil, dwType
@@ -283,8 +277,7 @@ MY.Game.GetObject = function(dwType, dwID)
 end
 MY.GetObject = MY.Game.GetObject
 
---[[ 获取指定对象的名字
-]]
+-- 获取指定对象的名字
 MY.Game.GetObjectName = function(obj)
 	if not obj then
 		return nil
@@ -324,8 +317,7 @@ MY.Game.GetObjectName = function(obj)
 end
 MY.GetObjectName = MY.Game.GetObjectName
 
---[[ 获取指定名字的右键菜单
-]]
+-- 获取指定名字的右键菜单
 MY.Game.GetTargetContextMenu = function(dwType, szName, dwID)
 	local t = {}
 	if dwType == TARGET.PLAYER then
@@ -406,10 +398,9 @@ MY.Game.GetTargetContextMenu = function(dwType, szName, dwID)
 end
 MY.GetTargetContextMenu = MY.Game.GetTargetContextMenu
 
---[[ 判断一个地图是不是副本
-	(bool) MY.Game.IsDungeonMap(szMapName)
-	(bool) MY.Game.IsDungeonMap(dwMapID)
-]]
+-- 判断一个地图是不是副本
+-- (bool) MY.Game.IsDungeonMap(szMapName)
+-- (bool) MY.Game.IsDungeonMap(dwMapID)
 MY.Game.IsDungeonMap = function(szMapNameOrdwID)
 	if not _Cache.tMapList then
 		_Cache.tMapList = {}
@@ -433,10 +424,9 @@ MY.Game.IsDungeonMap = function(szMapNameOrdwID)
 end
 MY.IsDungeonMap = MY.Game.IsDungeonMap
 
---[[ 获取地图BOSS列表
-	(table) MY.Game.GetBossList()
-	(table) MY.Game.GetBossList(dwMapID)
-]]
+-- 获取地图BOSS列表
+-- (table) MY.Game.GetBossList()
+-- (table) MY.Game.GetBossList(dwMapID)
 MY.Game.GetBossList = function(dwMapID)
 	if dwMapID then
 		dwMapID = tostring(dwMapID)
@@ -452,9 +442,8 @@ MY.Game.GetBossList = function(dwMapID)
 	end
 end
 
---[[ 获取指定地图指定模板ID的NPC是不是BOSS
-	(boolean) MY.Game.IsBoss(dwMapID, dwTem)
-]]
+-- 获取指定地图指定模板ID的NPC是不是BOSS
+-- (boolean) MY.Game.IsBoss(dwMapID, dwTem)
 MY.Game.IsBoss = function(dwMapID, dwTemplateID)
 	dwMapID, dwTemplateID = tostring(dwMapID), tostring(dwTemplateID)
 	if _C.tBossList and _C.tBossList[dwMapID]
