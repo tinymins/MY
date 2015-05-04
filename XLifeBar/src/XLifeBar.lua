@@ -636,7 +636,7 @@ CheckInvalidRect = function(dwType, dwID, me, bNoCreate)
     end
     _nDisX, _nDisY = me.nX - object.nX, me.nY - object.nY
     if _nDisX * _nDisX + _nDisY * _nDisY < Config.nDistance
-    --[[ 这是镜头补偿判断 但是不好用先不加 and (fPitch > -0.8 or _XLifeBar.GetNz(me.nZ,object.nZ) < Config.nDistance / 2.5)]]
+    -- 这是镜头补偿判断 但是不好用先不加 and (fPitch > -0.8 or _XLifeBar.GetNz(me.nZ,object.nZ) < Config.nDistance / 2.5)
     then
         if _XLifeBar.tObject[dwID] and _XLifeBar.tObject[dwID].handle then
             local tab = _XLifeBar.tObject[dwID]

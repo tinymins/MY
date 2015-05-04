@@ -4,7 +4,7 @@
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-07 17:54:06
+-- @Last Modified time: 2015-05-04 20:29:44
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = {}
@@ -25,7 +25,7 @@ _C.FriendHeadTip = function(bEnable)
 					shadow:ClearTriangleFanPoint()
 					shadow:SetTriangleFan(GEOMETRY_TYPE.TEXT)
 					shadow:AppendCharacterID(dwID, false, r, g, b, a, 0, 40, szTip, 0, 1)
-					--shadow:AppendCharacterID(dwCharacterID, bCharacterTop, r, g, b, a [[,fTopDelta, dwFontSchemeID, szText, fSpace, fScale]])
+					--shadow:AppendCharacterID(dwCharacterID, bCharacterTop, r, g, b, a [,fTopDelta, dwFontSchemeID, szText, fSpace, fScale])
 					shadow:Show()
 				end
 			end
