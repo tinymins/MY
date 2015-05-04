@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-25 12:31:03
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-03-06 11:56:20
+-- @Last Modified time: 2015-04-29 16:41:30
 -----------------------------------------------
 -- #######################################################################################################
 --   * * *         *                 *                     *                   *           *         
@@ -309,13 +309,19 @@ MY_Anmerkungen.SetPlayerNote = function(dwID, szName, szContent, bTipWhenGroup, 
 end
 -- 读取公共数据
 MY_Anmerkungen.LoadConfig = function()
-	MY_Anmerkungen.tPublicPlayerNotes = MY.Json.Decode(MY.Sys.LoadLUAData("config/PLAYER_NOTES/" .. MY.Game.GetServer())) or {}
-	MY_Anmerkungen.tPrivatePlayerNotes = MY.Json.Decode(MY.Sys.LoadUserData("config/PLAYER_NOTES/data")) or {}
+	MY_Anmerkungen.tPublicPlayerNotes = MY.Sys.LoadLUAData("config/PLAYER_NOTES/" .. MY.Game.GetServer()) or {}
+	if type(MY_Anmerkungen.tPublicPlayerNotes) == 'string' then
+		MY_Anmerkungen.tPublicPlayerNotes = MY.Json.Decode(MY_Anmerkungen.tPublicPlayerNotes)
+	end
+	MY_Anmerkungen.tPrivatePlayerNotes = MY.Sys.LoadUserData("config/PLAYER_NOTES/data") or {}
+	if type(MY_Anmerkungen.tPrivatePlayerNotes) == 'string' then
+		MY_Anmerkungen.tPrivatePlayerNotes = MY.Json.Decode(MY_Anmerkungen.tPrivatePlayerNotes)
+	end
 end
 -- 保存公共数据
 MY_Anmerkungen.SaveConfig = function()
-	MY.Sys.SaveLUAData("config/PLAYER_NOTES/" .. MY.Game.GetServer(), MY.Json.Encode(MY_Anmerkungen.tPublicPlayerNotes))
-	MY.Sys.SaveUserData("config/PLAYER_NOTES/", MY.Json.Encode(MY_Anmerkungen.tPrivatePlayerNotes))
+	MY.Sys.SaveLUAData("config/PLAYER_NOTES/" .. MY.Game.GetServer(), MY_Anmerkungen.tPublicPlayerNotes)
+	MY.Sys.SaveUserData("config/PLAYER_NOTES/", MY_Anmerkungen.tPrivatePlayerNotes)
 end
 MY.RegisterInit(MY_Anmerkungen.LoadConfig)
 MY.RegisterInit(MY_Anmerkungen.ReloadNotePanel)
