@@ -5,7 +5,7 @@
 -- @Date  : 2014-12-04 11:51:31
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-04-14 16:56:42
+-- @Last Modified time: 2015-04-29 16:39:00
 -----------------------------------------------
 MY_MiddleMapMark = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_MiddleMapMark/lang/")
@@ -178,7 +178,11 @@ MY_MiddleMapMark.GetMapData = function(dwMapID)
 	-- if data not loaded, load it now
 	if not Data[dwMapID] then
 		MY_MiddleMapMark.StartDelayUnloadMapData(dwMapID)
-		local data = MY.Json.Decode(MY.LoadLUAData(SZ_CACHE_PATH .. dwMapID)) or {
+		local data = MY.LoadLUAData(SZ_CACHE_PATH .. dwMapID)
+		if type(data) == 'string' then
+			data = MY.Json.Decode(data)
+		end
+		data = data or {
 			Npc = {},
 			Doodad = {},
 		}
@@ -225,7 +229,7 @@ MY_MiddleMapMark.SaveMapData = function()
 	for dwMapID, data in pairs(Data) do
 		MY_MiddleMapMark.StartDelayUnloadMapData(dwMapID)
 		if _Cache.tMapDataChanged[dwMapID] then
-			MY.SaveLUAData(SZ_CACHE_PATH .. dwMapID, MY.Json.Encode(data))
+			MY.SaveLUAData(SZ_CACHE_PATH .. dwMapID, data)
 		end
 	end
 end

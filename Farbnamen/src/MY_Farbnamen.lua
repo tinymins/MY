@@ -259,14 +259,14 @@ function MY_Farbnamen.SaveData()
             table.remove(t.aCached)
         end
     end
-    MY.SaveLUAData(SZ_CACHE_PATH, MY.Json.Encode(t))
+    MY.SaveLUAData(SZ_CACHE_PATH, t)
 end
 -- 加载配置
 function MY_Farbnamen.LoadData()
     -- 读取数据文件
     local data = MY.LoadLUAData(SZ_CACHE_PATH) or {}
     -- 如果是Json格式的数据 则解码
-    if type(data)=="string" then
+    if type(data) == "string" then
         data = MY.Json.Decode(data) or {}
     end
     -- 解析数据
@@ -274,11 +274,6 @@ function MY_Farbnamen.LoadData()
         ['aCached']   = data.aCached   or {}  ,    -- 保存的用户表
         ['nMaxCache'] = data.nMaxCache or 2000,    -- 最大缓存数量
     }
-    -- 转移旧版本数据
-    for i=1, #data, 1 do
-        -- 插入缓存列表
-        table.insert(t.aCached, data[i])
-    end
     
     -- 添加加载的数据
     for _, p in ipairs(t.aCached) do
