@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-04-10 10:41:05
+-- @Last Modified time: 2015-05-04 20:22:16
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -2230,9 +2230,8 @@ function _MY.UI:onuievent(szEvent, fnEvent)
 	return self
 end
 
---[[ customMode 设置Frame的CustomMode
-	(self) Instance:customMode(string szTip, function fnOnEnterCustomMode, function fnOnLeaveCustomMode)
-]]
+-- customMode 设置Frame的CustomMode
+-- (self) Instance:customMode(string szTip, function fnOnEnterCustomMode, function fnOnLeaveCustomMode)
 function _MY.UI:customMode(szTip, fnOnEnterCustomMode, fnOnLeaveCustomMode, szPoint)
 	self:_checksum()
 	if type(szTip)=="string" then
@@ -2255,9 +2254,8 @@ function _MY.UI:customMode(szTip, fnOnEnterCustomMode, fnOnLeaveCustomMode, szPo
 	return self
 end
 
---[[ breathe 设置Frame的breathe
-	(self) Instance:breathe(function fnOnFrameBreathe)
-]]
+-- breathe 设置Frame的breathe
+-- (self) Instance:breathe(function fnOnFrameBreathe)
 function _MY.UI:breathe(fnOnFrameBreathe)
 	self:_checksum()
 	if type(fnOnFrameBreathe)=="function" then
@@ -2268,10 +2266,9 @@ function _MY.UI:breathe(fnOnFrameBreathe)
 	return self
 end
 
---[[ menu 弹出菜单
-	:menu(table menu)  弹出菜单menu
-	:menu(functin fn)  弹出菜单function返回值table
-]]
+-- menu 弹出菜单
+-- :menu(table menu)  弹出菜单menu
+-- :menu(functin fn)  弹出菜单function返回值table
 function _MY.UI:menu(lmenu, rmenu, bNoAutoBind)
 	self:_checksum()
 	if not bNoAutoBind then
@@ -2307,31 +2304,28 @@ function _MY.UI:menu(lmenu, rmenu, bNoAutoBind)
 	return self
 end
 
---[[ lmenu 弹出左键菜单
-	:lmenu(table menu)  弹出菜单menu
-	:lmenu(functin fn)  弹出菜单function返回值table
-]]
+-- lmenu 弹出左键菜单
+-- :lmenu(table menu)  弹出菜单menu
+-- :lmenu(functin fn)  弹出菜单function返回值table
 function _MY.UI:lmenu(menu)
 	return self:menu(menu, nil, true)
 end
 
---[[ rmenu 弹出右键菜单
-	:lmenu(table menu)  弹出菜单menu
-	:lmenu(functin fn)  弹出菜单function返回值table
-]]
+-- rmenu 弹出右键菜单
+-- :lmenu(table menu)  弹出菜单menu
+-- :lmenu(functin fn)  弹出菜单function返回值table
 function _MY.UI:rmenu(menu)
 	return self:menu(nil, menu, true)
 end
 
---[[ click 鼠标单击事件
-	same as jQuery.click()
-	:click(fnAction) 绑定
-	:click()         触发
-	:click(number n) 触发
-	n: 1    左键
-	   0    中键
-	  -1    右键
-]]
+-- click 鼠标单击事件
+-- same as jQuery.click()
+-- :click(fnAction) 绑定
+-- :click()         触发
+-- :click(number n) 触发
+-- n: 1    左键
+--    0    中键
+--   -1    右键
 function _MY.UI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 	self:_checksum()
 	if type(fnLClick)=="function" or type(fnMClick)=="function" or type(fnRClick)=="function" then
@@ -2375,28 +2369,25 @@ function _MY.UI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 	return self
 end
 
---[[ lclick 鼠标左键单击事件
-	same as jQuery.lclick()
-	:lclick(fnAction) 绑定
-	:lclick()         触发
-]]
+-- lclick 鼠标左键单击事件
+-- same as jQuery.lclick()
+-- :lclick(fnAction) 绑定
+-- :lclick()         触发
 function _MY.UI:lclick(fnLClick)
 	return self:click(fnLClick or MY.Const.Event.Mouse.LBUTTON, nil, nil, true)
 end
 
---[[ rclick 鼠标右键单击事件
-	same as jQuery.rclick()
-	:rclick(fnAction) 绑定
-	:rclick()         触发
-]]
+-- rclick 鼠标右键单击事件
+-- same as jQuery.rclick()
+-- :rclick(fnAction) 绑定
+-- :rclick()         触发
 function _MY.UI:rclick(fnRClick)
 	return self:click(nil, fnRClick or MY.Const.Event.Mouse.RBUTTON, nil, true)
 end
 
---[[ hover 鼠标悬停事件
-	same as jQuery.hover()
-	:hover(fnHover[, fnLeave]) 绑定
-]]
+-- hover 鼠标悬停事件
+-- same as jQuery.hover()
+-- :hover(fnHover[, fnLeave]) 绑定
 function _MY.UI:hover(fnHover, fnLeave, bNoAutoBind)
 	self:_checksum()
 	if not bNoAutoBind then fnLeave = fnLeave or fnHover end
@@ -2419,13 +2410,12 @@ function _MY.UI:hover(fnHover, fnLeave, bNoAutoBind)
 	return self
 end
 
---[[ tip 鼠标悬停提示
-	(self) Instance:tip( tip[, nPosType[, tOffset[, bNoEncode] ] ] ) 绑定tip事件
-	string|function tip:要提示的文字文本或序列化的DOM文本或返回前述文本的函数
-	number nPosType:    提示位置 有效值为MY.Const.UI.Tip.枚举
-	table tOffset:      提示框偏移量等附加信息{ x = x, y = y, hide = MY.Const.UI.Tip.Hide枚举, nFont = 字体, r, g, b = 字颜色 }
-	boolean bNoEncode:  当szTip为纯文本时保持这个参数为false 当szTip为格式化的DOM字符串时设置该参数为true
-]]
+-- tip 鼠标悬停提示
+-- (self) Instance:tip( tip[, nPosType[, tOffset[, bNoEncode] ] ] ) 绑定tip事件
+-- string|function tip:要提示的文字文本或序列化的DOM文本或返回前述文本的函数
+-- number nPosType:    提示位置 有效值为MY.Const.UI.Tip.枚举
+-- table tOffset:      提示框偏移量等附加信息{ x = x, y = y, hide = MY.Const.UI.Tip.Hide枚举, nFont = 字体, r, g, b = 字颜色 }
+-- boolean bNoEncode:  当szTip为纯文本时保持这个参数为false 当szTip为格式化的DOM字符串时设置该参数为true
 function _MY.UI:tip(tip, nPosType, tOffset, bNoEncode)
 	tOffset = tOffset or {}
 	tOffset.x = tOffset.x or 0
@@ -2459,11 +2449,10 @@ function _MY.UI:tip(tip, nPosType, tOffset, bNoEncode)
 	end, true)
 end
 
---[[ check 复选框状态变化
-	:check(fnOnCheckBoxCheck[, fnOnCheckBoxUncheck]) 绑定
-	:check()                返回是否已勾选
-	:check(bool bChecked)   勾选/取消勾选
-]]
+-- check 复选框状态变化
+-- :check(fnOnCheckBoxCheck[, fnOnCheckBoxUncheck]) 绑定
+-- :check()                返回是否已勾选
+-- :check(bool bChecked)   勾选/取消勾选
 function _MY.UI:check(fnCheck, fnUncheck, bNoAutoBind)
 	self:_checksum()
 	if not bNoAutoBind then
@@ -2494,10 +2483,9 @@ function _MY.UI:check(fnCheck, fnUncheck, bNoAutoBind)
 	end
 end
 
---[[ change 输入框文字变化
-	:change(fnOnChange) 绑定
-	:change()   调用处理函数
-]]
+-- change 输入框文字变化
+-- :change(fnOnChange) 绑定
+-- :change()   调用处理函数
 function _MY.UI:change(fnOnChange)
 	self:_checksum()
 	if fnOnChange then
@@ -2553,7 +2541,7 @@ MY.Const.UI.Tip.ANIMATE_HIDE = 102
 -- 设置元表，这样可以当作函数调用，其效果相当于 MY.UI.Fetch
 setmetatable(MY.UI, { __call = function(me, ...) return me.Fetch(...) end, __metatable = true })
 
---[[ 构造函数 类似jQuery: $(selector) ]]
+-- 构造函数 类似jQuery: $(selector)
 MY.UI.Fetch = function(selector, tab) return _MY.UI.new(selector, tab) end
 -- 绑定UI事件
 MY.UI.RegisterUIEvent = function(raw, szEvent, fnEvent)
@@ -3014,12 +3002,11 @@ _MY.IE_GetNewIEFramePos = function()
 	return 40, 40
 end
 
---[[ append an item to parent
-	MY.UI.Append(hParent, szName, szType, tArg)
-	hParent     -- an Window, Handle or MY.UI object
-	szName      -- name of the object inserted
-	tArg        -- param like width, height, left, right, etc.
-]]
+-- append an item to parent
+-- MY.UI.Append(hParent, szName, szType, tArg)
+-- hParent     -- an Window, Handle or MY.UI object
+-- szName      -- name of the object inserted
+-- tArg        -- param like width, height, left, right, etc.
 MY.UI.Append = function(hParent, szName, szType, tArg)
 	return MY.UI(hParent):append(szName, szType, tArg)
 end

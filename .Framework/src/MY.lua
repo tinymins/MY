@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-04-28 13:20:16
+-- @Last Modified time: 2015-05-04 20:16:46
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -132,9 +132,8 @@ local _VERSION_ = 0x2003200
 local _ADDON_ROOT_ = '/Interface/MY/'
 local _FRAMEWORK_ROOT_ = '/Interface/MY/.Framework/'
 
---[[ 多语言处理
-	(table) MY.LoadLangPack(void)
-]]
+-- 多语言处理
+-- (table) MY.LoadLangPack(void)
 MY.LoadLangPack = function(szLangFolder)
 	local _, _, szLang = GetVersion()
 	local t0 = LoadLUAData(_FRAMEWORK_ROOT_.."lang\\default") or {}
@@ -387,9 +386,8 @@ MY.IsPanelOpened = function()
 	return Station.Lookup("Normal/MY")
 end
 
---[[ 获取主窗体句柄
-	(frame) MY.GetFrame()
-]]
+-- 获取主窗体句柄
+-- (frame) MY.GetFrame()
 MY.GetFrame = function()
 	if not (_MY.frame and _MY.frame:IsValid()) then
 		_MY.frame = Wnd.OpenWindow(_MY.szIniFile, "MY")
@@ -478,11 +476,10 @@ end
 --             #               #           #         #           #             #     #   #     #     
 --           # #               #           #             # # # # # # # # #   #     # # #     # #     
 -- ##################################################################################################
---[[ 注册初始化函数
-	RegisterInit(string id, function fn) -- 注册
-	RegisterInit(function fn)            -- 注册
-	RegisterInit(string id)              -- 注销
-]]
+-- 注册初始化函数
+-- RegisterInit(string id, function fn) -- 注册
+-- RegisterInit(function fn)            -- 注册
+-- RegisterInit(string id)              -- 注销
 MY.RegisterInit = function(arg1, arg2)
 	local id, fn
 	if type(arg1)=='function' then fn = arg1 end
@@ -507,11 +504,11 @@ MY.RegisterInit = function(arg1, arg2)
 		end
 	end
 end
---[[ 注册游戏结束函数
-	RegisterExit(string id, function fn) -- 注册
-	RegisterExit(function fn)            -- 注册
-	RegisterExit(string id)              -- 注销
-]]
+
+-- 注册游戏结束函数
+-- RegisterExit(string id, function fn) -- 注册
+-- RegisterExit(function fn)            -- 注册
+-- RegisterExit(string id)              -- 注销
 MY.RegisterExit = function(arg1, arg2)
 	MY.RegisterEvent('PLAYER_EXIT_GAME', arg1, arg2)
 	MY.RegisterEvent('GAME_EXIT', arg1, arg2)
@@ -526,14 +523,13 @@ MY.RegisterReload = function(arg1, arg2)
 	MY.RegisterEvent('RELOAD_UI_ADDON_END', arg1, arg2)
 end
 
---[[ 注册游戏事件监听
-	-- 注册
-	MY.RegisterEvent( szEventName, szListenerId, fnListener )
-	MY.RegisterEvent( szEventName, fnListener )
-	-- 注销
-	MY.RegisterEvent( szEventName, szListenerId )
-	MY.RegisterEvent( szEventName )
- ]]
+-- 注册游戏事件监听
+-- -- 注册
+-- MY.RegisterEvent( szEventName, szListenerId, fnListener )
+-- MY.RegisterEvent( szEventName, fnListener )
+-- -- 注销
+-- MY.RegisterEvent( szEventName, szListenerId )
+-- MY.RegisterEvent( szEventName )
 MY.RegisterEvent = function(szEventName, arg1, arg2)
 	local szListenerId, fnListener
 	-- param check
@@ -813,20 +809,19 @@ MY.SwitchTab = function(szID)
 	wndMainPanel.szID = szID
 end
 
---[[ 注册选项卡
-	(void) MY.RegisterPanel( szID, szTitle, szCategory, szIconTex, rgbaTitleColor, options )
-	szID            选项卡唯一ID
-	szTitle         选项卡按钮标题
-	szCategory      选项卡所在分类
-	szIconTex       选项卡图标文件|图标帧
-	rgbaTitleColor  选项卡文字rgba
-	options         选项卡各种响应函数 {
-		options.OnPanelActive(wnd)      选项卡激活    wnd为当前MainPanel
-		options.OnPanelDeactive(wnd)    选项卡取消激活
-		options.bShielded               国服和谐的选项卡
-	}
-	Ex： MY.RegisterPanel( "Test", "测试标签", "测试", "UI/Image/UICommon/ScienceTreeNode.UITex|123", {255,255,0,200}, { OnPanelActive = function(wnd) end } )
- ]]
+-- 注册选项卡
+-- (void) MY.RegisterPanel( szID, szTitle, szCategory, szIconTex, rgbaTitleColor, options )
+-- szID            选项卡唯一ID
+-- szTitle         选项卡按钮标题
+-- szCategory      选项卡所在分类
+-- szIconTex       选项卡图标文件|图标帧
+-- rgbaTitleColor  选项卡文字rgba
+-- options         选项卡各种响应函数 {
+-- 	options.OnPanelActive(wnd)      选项卡激活    wnd为当前MainPanel
+-- 	options.OnPanelDeactive(wnd)    选项卡取消激活
+-- 	options.bShielded               国服和谐的选项卡
+-- }
+-- Ex： MY.RegisterPanel( "Test", "测试标签", "测试", "UI/Image/UICommon/ScienceTreeNode.UITex|123", {255,255,0,200}, { OnPanelActive = function(wnd) end } )
 MY.RegisterPanel = function(szID, szTitle, szCategory, szIconTex, rgbaTitleColor, options)
 	local category
 	for _, ctg in ipairs(_MY.tTabs) do

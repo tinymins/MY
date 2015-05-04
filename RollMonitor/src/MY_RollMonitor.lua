@@ -30,19 +30,17 @@ local _MY_RollMonitor = {
     }
 }
 -- 事件响应处理
---[[ 打开面板
-    (void) MY_RollMonitor.OpenPanel()
-]]
+-- 打开面板
+-- (void) MY_RollMonitor.OpenPanel()
 MY_RollMonitor.OpenPanel = function()
     MY.OpenPanel()
     MY.SwitchTab('RollMonitor')
 end
---[[ 清空ROLL点
-     (void) MY_RollMonitor.Clear([settings])
-        (array) settings : 参数键值对，所有参数都是可选的，默认读取用户设置。
-          (boolean) echo       : 是否发送重新开始聊天消息
-          (number)  channel    : 发送频道
-]]
+-- 清空ROLL点
+-- (void) MY_RollMonitor.Clear([settings])
+-- (array)   settings : 参数键值对，所有参数都是可选的，默认读取用户设置。
+-- + (boolean) echo   : 是否发送重新开始聊天消息
+-- + (number)  channel: 发送频道
 MY_RollMonitor.Clear = function(param)
     param = param or {}
     if type(param.echo) == 'nil' then
@@ -56,8 +54,7 @@ MY_RollMonitor.Clear = function(param)
         MY.Talk(param.channel, _L['----------- roll restart -----------']..'\n')
     end
 end
---[[ 获得排序结果
-]]
+-- 获得排序结果
 MY_RollMonitor.GetResult = function(sortType)
     sortType = sortType or MY_RollMonitor.nMode
     local t = {}
@@ -67,14 +64,13 @@ MY_RollMonitor.GetResult = function(sortType)
     table.sort(t, function(v1, v2) return v1.nRoll > v2.nRoll end)
     return t
 end
---[[ 发布ROLL点
-     (void) MY_RollMonitor.Echo([settings])
-        (array) settings : 参数键值对，所有参数都是可选的，默认读取用户设置。
-          (enum)    sortType   : 排序方式 枚举 MY_RollMonitor.SortType
-          (number)  limit      : 最大显示条数限制
-          (number)  channel    : 发送频道
-          (boolean) showUnroll : 是否显示未ROLL点
-]]
+-- 发布ROLL点
+-- (void) MY_RollMonitor.Echo([settings])
+--    (array) settings : 参数键值对，所有参数都是可选的，默认读取用户设置。
+--      (enum)    sortType   : 排序方式 枚举 MY_RollMonitor.SortType
+--      (number)  limit      : 最大显示条数限制
+--      (number)  channel    : 发送频道
+--      (boolean) showUnroll : 是否显示未ROLL点
 MY_RollMonitor.Echo = function(param)
     param = param or {}
     param.sortType = param.sortType or MY_RollMonitor.nMode
