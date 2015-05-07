@@ -335,7 +335,15 @@ MY_Recount.UpdateUI = function(data)
 		if hItem:GetIndex() ~= i - 1 then
 			hItem:ExchangeIndex(i - 1)
 		end
-		hItem:Lookup('Image_Digital'):SetFrame(_C.tRandFrame[i])
+		if _C.tRandFrame[i] then
+			hItem:Lookup('Text_Rank'):Hide()
+			hItem:Lookup('Image_Rank'):Show()
+			hItem:Lookup('Image_Rank'):SetFrame(_C.tRandFrame[i])
+		else
+			hItem:Lookup('Text_Rank'):SetText(i .. '.')
+			hItem:Lookup('Text_Rank'):Show()
+			hItem:Lookup('Image_Rank'):Hide()
+		end
 		
 		if nMaxValue > 0 then
 			hItem:Lookup('Image_PerBack'):SetPercentage(p.nValue / nMaxValue)
