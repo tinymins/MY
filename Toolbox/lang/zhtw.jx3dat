@@ -96,4 +96,5 @@ data = {
     ['Conversation with [%s] auto chose: %s'] = '對話[%s]自動選擇了：%s',
     ['echo when autochat'] = '輸出選擇的選項',
     ['disable when shift key pressed'] = '按住SHIFT時禁用自動對話',
+    ['close after auto chat'] = '自動對話後關閉窗口',
 }
