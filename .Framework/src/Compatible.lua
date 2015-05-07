@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-07 10:27:39
+-- @Last Modified time: 2015-05-07 14:29:33
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 if not GetCampImageFrame then
@@ -270,5 +270,38 @@ EQUIPMENT_INVENTORY = {
 	BANK_PACKAGE5 = 23, -- 仓库扩展背包5
 	ARROW         = 24, -- 暗器
 	TOTAL         = 25,
+}
+end
+
+if not FORCE_TYPE then
+FORCE_TYPE = {
+	JIANG_HU  = 0 , -- 江湖
+	SHAO_LIN  = 1 , -- 少林
+	WAN_HUA   = 2 , -- 万花
+	TIAN_CE   = 3 , -- 天策
+	CHUN_YANG = 4 , -- 纯阳
+	QI_XIU    = 5 , -- 七秀
+	WU_DU     = 6 , -- 五毒
+	TANG_MEN  = 7 , -- 唐门
+	CANG_JIAN = 8 , -- 藏剑
+	GAI_BANG  = 9 , -- 丐帮
+	MING_JIAO = 10, -- 明教
+	CANG_YUN  = 21, -- 苍云
+}
+end
+
+if not KUNGFU_TYPE then
+KUNGFU_TYPE = {
+	TIAN_CE     = 1,      -- 天策内功
+	WAN_HUA     = 2,      -- 万花内功
+	CHUN_YANG   = 3,      -- 纯阳内功
+	QI_XIU      = 4,      -- 七秀内功
+	SHAO_LIN    = 5,      -- 少林内功
+	CANG_JIAN   = 6,      -- 藏剑内功
+	GAI_BANG    = 7,      -- 丐帮内功
+	MING_JIAO   = 8,      -- 明教内功
+	WU_DU       = 9,      -- 五毒内功
+	TANG_MEN    = 10,     -- 唐门内功
+	CANG_YUN    = 18,     -- 苍云内功
 }
 end

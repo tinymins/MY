@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-04-24 13:34:40
+-- @Last Modified time: 2015-05-07 13:26:37
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 MY = MY or {}
@@ -61,9 +61,11 @@ MY.GetFrameCount = MY.Sys.GetFrameCount
 -- szFileUri           数据文件路径(1)
 -- tData               要保存的数据
 -- bNoDistinguishLang  是否取消自动区分客户端语言
+-- indent              数据文件缩进
+-- crc                 是否添加CRC校验头（默认true）
 -- (1)： 当路径为绝对路径时(以斜杠开头)不作处理
 --       当路径为相对路径时 相对于插件下@DATA目录
-MY.Sys.SaveLUAData = function(szFileUri, tData, bNoDistinguishLang)
+MY.Sys.SaveLUAData = function(szFileUri, tData, bNoDistinguishLang, indent, crc)
 	local nStartTick = GetTickCount()
 	-- 统一化目录分隔符
 	szFileUri = string.gsub(szFileUri, '\\', '/')
@@ -85,7 +87,7 @@ MY.Sys.SaveLUAData = function(szFileUri, tData, bNoDistinguishLang)
 		szFileUri = szFileUri .. '.jx3dat'
 	end
 	-- 调用系统API
-	local ret = SaveLUAData(szFileUri, tData)
+	local ret = SaveLUAData(szFileUri, tData, indent, crc)
 	-- performance monitor
 	MY.Debug({_L('%s saved during %dms.', szFileUri, GetTickCount() - nStartTick)}, 'PMTool', 0)
 	return ret
