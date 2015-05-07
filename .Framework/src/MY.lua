@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-06 20:38:09
+-- @Last Modified time: 2015-05-07 16:51:21
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -925,4 +925,4 @@ if _MY.nDebugLevel < 3 then
 	}})
 end
 
-MY.RegisterEvent("PLAYER_ENTER_GAME", _MY.Init)
+MY.RegisterEvent("LOADING_END", _MY.Init)
