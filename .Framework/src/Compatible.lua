@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-04-20 11:13:24
+-- @Last Modified time: 2015-05-07 10:27:39
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 if not GetCampImageFrame then
@@ -36,20 +36,136 @@ if not GetCampImage then
 	end
 end
 
-if not empty then
-	function empty(e)
-		local szType = type(e)
-		if szType == 'string' then
-			return #szType == 0
-		elseif szType == 'table' then
-			for _, _ in pairs(e) do
-				return false
-			end
-			return true
-		else
-			return e == nil
+if not clone then
+function clone(var)
+	local szType = type(var)
+	if szType == "nil"
+	or szType == "boolean"
+	or szType == "number"
+	or szType == "string" then
+		return var
+	elseif szType == "table" then
+		local t = {}
+		for key, val in pairs(var) do
+			key = clone(key)
+			val = clone(val)
+			t[key] = val
 		end
+		return t
+	elseif szType == "function"
+	or szType == "userdata" then
+		return nil
+	else
+		return nil
 	end
+end
+end
+
+if not empty then
+function empty(var)
+	local szType = type(var)
+	if szType == "nil" then
+		return true
+	elseif szType == "boolean" then
+		return var
+	elseif szType == "number" then
+		return var == 0
+	elseif szType == "string" then
+		return var == ""
+	elseif szType == "function" then
+		return false
+	elseif szType == "table" then
+		for _, _ in pairs(var) do
+			return false
+		end
+		return true
+	else
+		return false
+	end
+end
+end
+
+if not var2str then
+function var2str(var, indent, level)
+	local function table_r(var, level, indent)
+		local t = {}
+		local szType = type(var)
+		if szType == "nil" then
+			tinsert(t, "nil")
+		elseif szType == "number" then
+			tinsert(t, tostring(var))
+		elseif szType == "string" then
+			tinsert(t, string.format("%q", var))
+		elseif szType == "function" then
+			local s = string.dump(var)
+			tinsert(t, 'loadstring("')
+			-- "string slice too long"
+			for i = 1, #s, 2000 do
+				tinsert(t, tconcat({'', string2byte(s, i, i + 2000 - 1)}, "\\"))
+			end
+			tinsert(t, '")')
+		elseif szType == "boolean" then
+			tinsert(t, tostring(var))
+		elseif szType == "table" then
+			tinsert(t, "{")
+			local s_tab_equ = "]="
+			if indent then
+				s_tab_equ = "] = "
+				if not empty(var) then
+					tinsert(t, "\n")
+				end
+			end
+			for key, val in pairs(var) do
+				if indent then
+					tinsert(t, srep(indent, level + 1))
+				end
+				tinsert(t, "[")
+				tinsert(t, table_r(key, level + 1, indent))
+				tinsert(t, s_tab_equ) --"] = "
+				tinsert(t, table_r(val, level + 1, indent))
+				tinsert(t, ",")
+				if indent then
+					tinsert(t, "\n")
+				end
+			end
+			if indent and not empty(var) then
+				tinsert(t, srep(indent, level))
+			end
+			tinsert(t, "}")
+		else --if (szType == "userdata") then
+			tinsert(t, '"')
+			tinsert(t, tostring(var))
+			tinsert(t, '"')
+		end
+		return tconcat(t)
+	end
+	return table_r(var, level or 0, indent)
+end
+end
+
+local _RoleName
+if not GetUserRoleName then
+function GetUserRoleName()
+	if not _RoleName then
+		_RoleName = GetClientPlayer() and GetClientPlayer().szName
+	end
+	return _RoleName
+end
+end
+
+if not GetUserAccount then
+function GetUserAccount()
+	local szAccount
+	local hFrame = Wnd.OpenWindow("LoginPassword")
+	if hFrame then
+		local hEdit = hFrame:Lookup('WndPassword/Edit_Account')
+		if hEdit then
+			szAccount = hEdit:GetText()
+		end
+		Wnd.CloseWindow(hFrame)
+	end
+	return szAccount
+end
 end
 
 -- get item name by item
