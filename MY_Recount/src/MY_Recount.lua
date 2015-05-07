@@ -51,10 +51,61 @@ local SZ_SKILL_RESULT = {
 }
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Recount/lang/")
 local _C = {
+	szCssFile   = 'config/MY_RECOUNT/style',
 	szIniRoot   = MY.GetAddonInfo().szRoot .. 'MY_Recount/ui/',
-	szCssFile   = MY.GetAddonInfo().szRoot .. 'MY_Recount/ui/style',
 	szIniFile   = MY.GetAddonInfo().szRoot .. 'MY_Recount/ui/Recount.ini',
 	szIniDetail = MY.GetAddonInfo().szRoot .. 'MY_Recount/ui/ShowDetail.ini',
+	tDefaultCss = {
+		{
+			['Bar'] = {
+				[-1                  ] = { r = 159, g = 31 , b = 31 , a = 255 }, -- NPC
+				[FORCE_TYPE.JIANG_HU ] = { r = 255, g = 255, b = 255, a = 255 }, -- 江湖
+				[FORCE_TYPE.SHAO_LIN ] = { r = 210, g = 180, b = 0  , a = 144 }, -- 少林
+				[FORCE_TYPE.WAN_HUA  ] = { r = 100, g = 0  , b = 150, a = 96  }, -- 万花
+				[FORCE_TYPE.TIAN_CE  ] = { r = 0  , g = 128, b = 0  , a = 255 }, -- 天策
+				[FORCE_TYPE.CHUN_YANG] = { r = 0  , g = 175, b = 230, a = 112 }, -- 纯阳
+				[FORCE_TYPE.QI_XIU   ] = { r = 240, g = 80 , b = 240, a = 96  }, -- 七秀
+				[FORCE_TYPE.WU_DU    ] = { r = 0  , g = 128, b = 255, a = 144 }, -- 五毒
+				[FORCE_TYPE.TANG_MEN ] = { r = 121, g = 183, b = 54 , a = 144 }, -- 唐门
+				[FORCE_TYPE.CANG_JIAN] = { r = 215, g = 241, b = 74 , a = 144 }, -- 藏剑
+				[FORCE_TYPE.GAI_BANG ] = { r = 205, g = 133, b = 63 , a = 180 }, -- 丐帮
+				[FORCE_TYPE.MING_JIAO] = { r = 240, g = 70 , b = 96 , a = 180 }, -- 明教
+				[FORCE_TYPE.CANG_YUN ] = { r = 180, g = 60 , b = 0  , a = 255 }, -- 苍云
+			},
+		}, {
+			['Bar'] = {
+				[-1] = { image = "ui/Image/Common/Money.UITex", frame = 215 }, -- NPC
+				[FORCE_TYPE.JIANG_HU ] = { image = "ui/Image/Common/Money.UITex", frame = 210 }, -- 大侠
+				[FORCE_TYPE.SHAO_LIN ] = { image = "ui/Image/Common/Money.UITex", frame = 203 }, -- 少林
+				[FORCE_TYPE.WAN_HUA  ] = { image = "ui/Image/Common/Money.UITex", frame = 205 }, -- 万花
+				[FORCE_TYPE.TIAN_CE  ] = { image = "ui/Image/Common/Money.UITex", frame = 206 }, -- 天策
+				[FORCE_TYPE.CHUN_YANG] = { image = "ui/Image/Common/Money.UITex", frame = 209 }, -- 纯阳
+				[FORCE_TYPE.QI_XIU   ] = { image = "ui/Image/Common/Money.UITex", frame = 204 }, -- 七秀
+				[FORCE_TYPE.WU_DU    ] = { image = "ui/Image/Common/Money.UITex", frame = 208 }, -- 五毒
+				[FORCE_TYPE.TANG_MEN ] = { image = "ui/Image/Common/Money.UITex", frame = 207 }, -- 唐门
+				[FORCE_TYPE.CANG_JIAN] = { image = "ui/Image/Common/Money.UITex", frame = 168 }, -- 藏剑
+				[FORCE_TYPE.GAI_BANG ] = { image = "ui/Image/Common/Money.UITex", frame = 234 }, -- 丐帮
+				[FORCE_TYPE.MING_JIAO] = { image = "ui/Image/Common/Money.UITex", frame = 232 }, -- 明教
+				[FORCE_TYPE.CANG_YUN ] = { image = "ui/Image/Common/Money.UITex", frame = 26  }, -- 苍云
+			},
+		}, {
+			['Bar'] = {
+				[-1] = { image = "ui/Image/Common/Money.UITex", frame = 220 }, -- NPC
+				[FORCE_TYPE.JIANG_HU ] = { image = "ui/Image/Common/Money.UITex", frame = 220 }, -- 大侠
+				[FORCE_TYPE.SHAO_LIN ] = { image = "ui/Image/Common/Money.UITex", frame = 216 }, -- 少林
+				[FORCE_TYPE.WAN_HUA  ] = { image = "ui/Image/Common/Money.UITex", frame = 212 }, -- 万花
+				[FORCE_TYPE.TIAN_CE  ] = { image = "ui/Image/Common/Money.UITex", frame = 215 }, -- 天策
+				[FORCE_TYPE.CHUN_YANG] = { image = "ui/Image/Common/Money.UITex", frame = 218 }, -- 纯阳
+				[FORCE_TYPE.QI_XIU   ] = { image = "ui/Image/Common/Money.UITex", frame = 211 }, -- 七秀
+				[FORCE_TYPE.WU_DU    ] = { image = "ui/Image/Common/Money.UITex", frame = 213 }, -- 五毒
+				[FORCE_TYPE.TANG_MEN ] = { image = "ui/Image/Common/Money.UITex", frame = 214 }, -- 唐门
+				[FORCE_TYPE.CANG_JIAN] = { image = "ui/Image/Common/Money.UITex", frame = 217 }, -- 藏剑
+				[FORCE_TYPE.GAI_BANG ] = { image = "ui/Image/Common/Money.UITex", frame = 233 }, -- 丐帮
+				[FORCE_TYPE.MING_JIAO] = { image = "ui/Image/Common/Money.UITex", frame = 228 }, -- 明教
+				[FORCE_TYPE.CANG_YUN ] = { image = "ui/Image/Common/Money.UITex", frame = 219 }, -- 苍云
+			},
+		},
+	},
 }
 
 -- 新的战斗数据时
@@ -146,7 +197,7 @@ MY_Recount.LoadCustomCss = function(nCss)
 		MY_Recount.nCss = nCss
 	end
 	
-	_C.Css = (MY.LoadLUAData(_C.szCssFile, true) or {})[nCss] or {
+	_C.Css = (MY.LoadLUAData(_C.szCssFile) or _C.tDefaultCss)[nCss] or {
 		Bar = {}
 	}
 end
@@ -258,10 +309,22 @@ MY_Recount.UpdateUI = function(data)
 		if not hItem then
 			hItem = hList:AppendItemFromIni(_C.szIniFile, 'Handle_Item')
 			hItem:SetName('Handle_LI_' .. (p.szMD5 or p.id))
-			if _C.Css.Bar[p.dwForceID] then
-				hItem:Lookup('Image_PerFore'):FromUITex(unpack(_C.Css.Bar[p.dwForceID]))
-				hItem:Lookup('Image_PerBack'):FromUITex(unpack(_C.Css.Bar[p.dwForceID]))
+			local css = _C.Css.Bar[p.dwForceID] or {}
+			if css.image and css.frame then -- uitex, frame
+				hItem:Lookup('Image_PerFore'):FromUITex(css.image, css.frame)
+				hItem:Lookup('Image_PerBack'):FromUITex(css.image, css.frame)
+				hItem:Lookup('Shadow_PerFore'):Hide()
+				hItem:Lookup('Shadow_PerBack'):Hide()
+			else -- r, g, b
+				hItem:Lookup('Shadow_PerFore'):SetColorRGB(css.r or 0, css.g or 0, css.b or 0)
+				hItem:Lookup('Shadow_PerBack'):SetColorRGB(css.r or 0, css.g or 0, css.b or 0)
+				hItem:Lookup('Image_PerFore'):Hide()
+				hItem:Lookup('Image_PerBack'):Hide()
 			end
+			hItem:Lookup('Image_PerFore'):SetAlpha(css.a or 255)
+			hItem:Lookup('Image_PerBack'):SetAlpha((css.a or 255) / 255 * 100)
+			hItem:Lookup('Shadow_PerFore'):SetAlpha(css.a or 255)
+			hItem:Lookup('Shadow_PerBack'):SetAlpha((css.a or 255) / 255 * 100)
 			hItem.id = p.id
 		end
 		if hItem:GetIndex() ~= i - 1 then
@@ -272,6 +335,8 @@ MY_Recount.UpdateUI = function(data)
 		if nMaxValue > 0 then
 			hItem:Lookup('Image_PerBack'):SetPercentage(p.nValue / nMaxValue)
 			hItem:Lookup('Image_PerFore'):SetPercentage(p.nEffectValue / nMaxValue)
+			hItem:Lookup('Shadow_PerBack'):SetW(p.nValue / nMaxValue * hItem:GetW())
+			hItem:Lookup('Shadow_PerFore'):SetW(p.nEffectValue / nMaxValue * hItem:GetW())
 		end
 		if MY_Recount.bShowEffect then
 			if MY_Recount.bShowPerSec then
@@ -298,10 +363,22 @@ MY_Recount.UpdateUI = function(data)
 	if not hItem.bInited then
 		local dwForceID = (MY.Player.GetClientInfo() or {}).dwForceID
 		if dwForceID then
-			if _C.Css.Bar[dwForceID] then
-				hItem:Lookup('Image_Me_PerFore'):FromUITex(unpack(_C.Css.Bar[dwForceID]))
-				hItem:Lookup('Image_Me_PerBack'):FromUITex(unpack(_C.Css.Bar[dwForceID]))
+			local css = _C.Css.Bar[dwForceID] or {}
+			if css.image and css.frame then -- uitex, frame
+				hItem:Lookup('Image_Me_PerFore'):FromUITex(css.image, css.frame)
+				hItem:Lookup('Image_Me_PerBack'):FromUITex(css.image, css.frame)
+				hItem:Lookup('Shadow_Me_PerFore'):Hide()
+				hItem:Lookup('Shadow_Me_PerBack'):Hide()
+			else -- r, g, b
+				hItem:Lookup('Shadow_Me_PerFore'):SetColorRGB(css.r or 0, css.g or 0, css.b or 0)
+				hItem:Lookup('Shadow_Me_PerBack'):SetColorRGB(css.r or 0, css.g or 0, css.b or 0)
+				hItem:Lookup('Image_Me_PerFore'):Hide()
+				hItem:Lookup('Image_Me_PerBack'):Hide()
 			end
+			hItem:Lookup('Image_Me_PerFore'):SetAlpha(css.a or 255)
+			hItem:Lookup('Image_Me_PerBack'):SetAlpha((css.a or 255) / 255 * 100)
+			hItem:Lookup('Shadow_Me_PerFore'):SetAlpha(css.a or 255)
+			hItem:Lookup('Shadow_Me_PerBack'):SetAlpha((css.a or 255) / 255 * 100)
 			hItem.bInited = true
 		end
 	end
@@ -309,9 +386,13 @@ MY_Recount.UpdateUI = function(data)
 		if nMaxValue > 0 then
 			hItem:Lookup('Image_Me_PerBack'):SetPercentage(tMyRec.nValue / nMaxValue)
 			hItem:Lookup('Image_Me_PerFore'):SetPercentage(tMyRec.nEffectValue / nMaxValue)
+			hItem:Lookup('Shadow_Me_PerBack'):SetW(tMyRec.nValue / nMaxValue * hItem:GetW())
+			hItem:Lookup('Shadow_Me_PerFore'):SetW(tMyRec.nEffectValue / nMaxValue * hItem:GetW())
 		else
 			hItem:Lookup('Image_Me_PerBack'):SetPercentage(1)
 			hItem:Lookup('Image_Me_PerFore'):SetPercentage(1)
+			hItem:Lookup('Shadow_Me_PerBack'):SetW(hItem:GetW())
+			hItem:Lookup('Shadow_Me_PerFore'):SetW(hItem:GetW())
 		end
 		-- 左侧战斗计时
 		hItem:Lookup('Text_Me_L'):SetText('[' .. tMyRec.nRank .. '] ' .. szTimeCount)
@@ -334,6 +415,8 @@ MY_Recount.UpdateUI = function(data)
 		hItem:Lookup('Text_Me_R'):SetText('')
 		hItem:Lookup('Image_Me_PerBack'):SetPercentage(1)
 		hItem:Lookup('Image_Me_PerFore'):SetPercentage(0)
+		hItem:Lookup('Shadow_Me_PerBack'):SetW(hItem:GetW())
+		hItem:Lookup('Shadow_Me_PerFore'):SetW(0)
 	end
 end
 
@@ -860,7 +943,12 @@ MY_Recount.GetMenu = function()
 			return not MY_Recount.bEnable
 		end,
 	}
-	for i, _ in ipairs(MY.LoadLUAData(_C.szCssFile, true) or {}) do
+	local tCss = MY.LoadLUAData(_C.szCssFile, true)
+	if not tCss then
+		tCss = _C.tDefaultCss
+		MY.SaveLUAData(_C.szCssFile, tCss, nil, nil, false)
+	end
+	for i, _ in ipairs(tCss) do
 		table.insert(t1, {
 			szOption = i,
 			bCheck = true, bMCheck = true,
