@@ -55,6 +55,10 @@ local _C = {
 	szIniRoot   = MY.GetAddonInfo().szRoot .. 'MY_Recount/ui/',
 	szIniFile   = MY.GetAddonInfo().szRoot .. 'MY_Recount/ui/Recount.ini',
 	szIniDetail = MY.GetAddonInfo().szRoot .. 'MY_Recount/ui/ShowDetail.ini',
+	tRandFrame  = {
+		169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182,
+		183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193
+	},
 	tDefaultCss = {
 		{
 			['Bar'] = {
@@ -325,12 +329,13 @@ MY_Recount.UpdateUI = function(data)
 			hItem:Lookup('Image_PerBack'):SetAlpha((css.a or 255) / 255 * 100)
 			hItem:Lookup('Shadow_PerFore'):SetAlpha(css.a or 255)
 			hItem:Lookup('Shadow_PerBack'):SetAlpha((css.a or 255) / 255 * 100)
+			hItem:Lookup('Text_L'):SetText(p.szName)
 			hItem.id = p.id
 		end
 		if hItem:GetIndex() ~= i - 1 then
 			hItem:ExchangeIndex(i - 1)
 		end
-		hItem:Lookup('Text_L'):SetText(string.format('%d.%s', i, p.szName))
+		hItem:Lookup('Image_Digital'):SetFrame(_C.tRandFrame[i])
 		
 		if nMaxValue > 0 then
 			hItem:Lookup('Image_PerBack'):SetPercentage(p.nValue / nMaxValue)
