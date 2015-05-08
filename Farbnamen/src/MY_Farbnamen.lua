@@ -258,7 +258,7 @@ function MY_Farbnamen.SaveData()
             table.remove(t.aCached)
         end
     end
-    MY.SaveLUAData(SZ_CACHE_PATH, t)
+    MY.SaveLUAData(SZ_CACHE_PATH, t, nil, nil, false)
 end
 -- º”‘ÿ≈‰÷√
 function MY_Farbnamen.LoadData()
