@@ -314,6 +314,7 @@ MY_Recount.UpdateUI = function(data)
 		local hItem = hList:Lookup('Handle_LI_' .. (p.szMD5 or p.id))
 		if not hItem then
 			hItem = hList:AppendItemFromIni(_C.szIniFile, 'Handle_Item')
+			hItem.OnItemRefreshTip = MY_Recount.OnItemRefreshTip
 			hItem:SetName('Handle_LI_' .. (p.szMD5 or p.id))
 			local css = _C.Css.Bar[p.dwForceID] or {}
 			if css.image and css.frame then -- uitex, frame
@@ -376,6 +377,7 @@ MY_Recount.UpdateUI = function(data)
 	local hItem = m_frame:Lookup('Wnd_Main', 'Handle_Me')
 	-- ³õÊ¼»¯ÑÕÉ«
 	if not hItem.bInited then
+		hItem.OnItemRefreshTip = MY_Recount.OnItemRefreshTip
 		local dwForceID = (MY.Player.GetClientInfo() or {}).dwForceID
 		if dwForceID then
 			local css = _C.Css.Bar[dwForceID] or {}
