@@ -7,13 +7,13 @@ for /f "tokens=2,4 delims= " %%i in (.Framework/src/MY.lua) do (
 	if "%%i"=="_VERSION_" (
 		set szVersion=%%j
 	)
-	if "%%i"=="_DEBUG_" (
-		if "%%j" NEQ "4" (
-			color 0C
-			echo Warning: Addon is still in debug mode! Release progress abended!
-			pause && exit
-		)
-	)
+	REM if "%%i"=="_DEBUG_" (
+	REM 	if "%%j" NEQ "4" (
+	REM 		color 0C
+	REM 		echo Warning: Addon is still in debug mode! Release progress abended!
+	REM 		pause && exit
+	REM 	)
+	REM )
 )
 
 :: 获取并格式化当前时间字符串
