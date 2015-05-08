@@ -111,11 +111,7 @@ local _C = {
 		},
 	},
 }
-_C.tCustomCss = MY.LoadLUAData(_C.szCssFile, true)
-if not _C.tCustomCss then
-	_C.tCustomCss = _C.tDefaultCss
-	MY.SaveLUAData(_C.szCssFile, _C.tCustomCss, true, nil, false)
-end
+_C.tCustomCss = MY.LoadLUAData(_C.szCssFile, true) or _C.tDefaultCss
 
 -- 新的战斗数据时
 MY.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function()
