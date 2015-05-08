@@ -297,7 +297,7 @@ MY_Recount.Data.OnSkillEffect = function(dwCaster, dwTarget, nEffectType, dwEffe
     if nEffectType == SKILL_EFFECT_TYPE.SKILL then
         szEffectName = Table_GetSkillName(dwEffectID, dwEffectLevel)
     elseif nEffectType == SKILL_EFFECT_TYPE.BUFF then
-        szEffectName = Table_GetBuffName(dwEffectID, dwEffectLevel)
+        szEffectName = Table_GetBuffName(dwEffectID, dwEffectLevel) .. '(BUFF)'
     end
     if not szEffectName then
         return
