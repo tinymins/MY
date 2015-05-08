@@ -111,6 +111,11 @@ local _C = {
 		},
 	},
 }
+_C.tCustomCss = MY.LoadLUAData(_C.szCssFile, true)
+if not _C.tCustomCss then
+	_C.tCustomCss = _C.tDefaultCss
+	MY.SaveLUAData(_C.szCssFile, _C.tCustomCss, true, nil, false)
+end
 
 -- 新的战斗数据时
 MY.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function()
@@ -200,10 +205,7 @@ MY_Recount.LoadCustomCss = function(nCss)
 	else
 		MY_Recount.nCss = nCss
 	end
-	
-	_C.Css = (MY.LoadLUAData(_C.szCssFile) or _C.tDefaultCss)[nCss] or {
-		Bar = {}
-	}
+	_C.Css = _C.tCustomCss[nCss] or _C.tDefaultCss[1]
 end
 
 -- 切换绑定显示记录
@@ -956,12 +958,7 @@ MY_Recount.GetMenu = function()
 			return not MY_Recount.bEnable
 		end,
 	}
-	local tCss = MY.LoadLUAData(_C.szCssFile, true)
-	if not tCss then
-		tCss = _C.tDefaultCss
-		MY.SaveLUAData(_C.szCssFile, tCss, nil, nil, false)
-	end
-	for i, _ in ipairs(tCss) do
+	for i, _ in ipairs(_C.tCustomCss) do
 		table.insert(t1, {
 			szOption = i,
 			bCheck = true, bMCheck = true,
