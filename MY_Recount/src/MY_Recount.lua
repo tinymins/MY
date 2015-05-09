@@ -398,9 +398,13 @@ MY_Recount.UpdateUI = function(data)
 				hItem:Lookup('Image_Me_PerBack'):FromUITex(css.image, css.frame)
 				hItem:Lookup('Shadow_Me_PerFore'):Hide()
 				hItem:Lookup('Shadow_Me_PerBack'):Hide()
+				hItem:Lookup('Image_Me_PerFore'):Show()
+				hItem:Lookup('Image_Me_PerBack'):Show()
 			else -- r, g, b
 				hItem:Lookup('Shadow_Me_PerFore'):SetColorRGB(css.r or 0, css.g or 0, css.b or 0)
 				hItem:Lookup('Shadow_Me_PerBack'):SetColorRGB(css.r or 0, css.g or 0, css.b or 0)
+				hItem:Lookup('Shadow_Me_PerFore'):Show()
+				hItem:Lookup('Shadow_Me_PerBack'):Show()
 				hItem:Lookup('Image_Me_PerFore'):Hide()
 				hItem:Lookup('Image_Me_PerBack'):Hide()
 			end
