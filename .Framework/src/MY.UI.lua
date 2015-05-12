@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-04 20:22:16
+-- @Last Modified time: 2015-05-12 09:47:33
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -464,6 +464,20 @@ function _MY.UI:find(filter)
 		table.insert( eles, self:raw2ele(raw) )
 	end
 	return self:clone(eles):filter(filter)
+end
+
+-- filter mouse in ele
+function _MY.UI:ptIn()
+	self:_checksum()
+	local eles = {}
+	local xC, yC = Cursor.GetPos()
+	for _, ele in pairs(self.eles) do
+		if (ele.itm and ele.itm:PtInItem(xC, yC))
+		or (ele.wnd and ele.wnd:PtInWindow(xC, yC)) then
+			table.insert( eles, self:raw2ele(ele.raw) )
+		end
+	end
+	return self:clone(eles)
 end
 
 -- each
