@@ -32,13 +32,14 @@ MYDev_Snaplines.GetElementTip = function(raw, tTip)
         tTip = clone(tTip)
     end
     
-    local x, y = raw:GetAbsPos()
+    local X, Y = raw:GetAbsPos()
+    local x, y = raw:GetRelPos()
     local w, h = raw:GetSize()
     table.insert(tTip, _L('Name: %s', raw:GetName()))
     table.insert(tTip, _L('Type: %s', raw:GetType()))
     table.insert(tTip, _L('Path: %s', MY.UI.GetTreePath(raw)))
-    table.insert(tTip, _L('X: %s', x))
-    table.insert(tTip, _L('Y: %s', y))
+    table.insert(tTip, _L('X: %s, %s', x, X))
+    table.insert(tTip, _L('Y: %s, %s', y, Y))
     table.insert(tTip, _L('W: %s', w))
     table.insert(tTip, _L('H: %s', h))
     
