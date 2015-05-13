@@ -777,10 +777,14 @@ _Cache.OnTeammateStateChange = function(dwID, bLeave)
         end
     end
     -- 插入数据
-    if bLeave then
+    if bLeave then -- 有人暂离
         table.insert(rec, { GetCurrentTime() })
-    elseif #rec > 0 then
-        rec[#rec][2] = GetCurrentTime()
+    else -- 暂离回来
+        if #rec == 0 then -- 没记录到暂离开始 创建一个从本次战斗开始的暂离（俗称还没开打你就死了。。）
+            table.insert(rec, { Data.nTimeBegin, GetCurrentTime() })
+        elseif not rec[#rec][2] then -- 如果最后一次暂离还没回来 则完成最后一次暂离的记录
+            rec[#rec][2] = GetCurrentTime()
+        end
     end
 end
 MY.RegisterEvent('PARTY_UPDATE_MEMBER_INFO', function()
