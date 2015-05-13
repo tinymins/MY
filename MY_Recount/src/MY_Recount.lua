@@ -274,7 +274,6 @@ MY_Recount.UpdateUI = function(data)
 	-- 计算战斗时间
 	local nTimeCount = data.nTimeDuring
 	local szTimeCount = MY.Sys.FormatTimeCount('M:ss', nTimeCount)
-	nTimeCount  = math.max(nTimeCount, 1) -- 防止计算DPS时除以0
 	-- 自己的记录
 	local tMyRec
 	
@@ -291,6 +290,7 @@ MY_Recount.UpdateUI = function(data)
 				dwForceID    = data.Forcelist[id] or -1              ,
 				nValue       = rec.nTotal         or  0              ,
 				nEffectValue = rec.nTotalEffect   or  0              ,
+				nTimeCount   = math.max(MY_Recount.Data.GeneFightTime(data, id), 1), -- 删去死亡时间 && 防止计算DPS时除以0
 			}
 			table.insert(tResult, tRec)
 			nMaxValue = math.max(nMaxValue, tRec.nValue, tRec.nEffectValue)
@@ -320,6 +320,7 @@ MY_Recount.UpdateUI = function(data)
 				dwForceID    = p.dwForceID   ,
 				nValue       = p.nValue      ,
 				nEffectValue = p.nEffectValue,
+				nTimeCount   = p.nTimeCount  ,
 				nRank        = i             ,
 			}
 		end
@@ -350,6 +351,7 @@ MY_Recount.UpdateUI = function(data)
 		if hItem:GetIndex() ~= i - 1 then
 			hItem:ExchangeIndex(i - 1)
 		end
+		-- 排名
 		if _C.tRandFrame[i] then
 			hItem:Lookup('Text_Rank'):Hide()
 			hItem:Lookup('Image_Rank'):Show()
@@ -359,22 +361,35 @@ MY_Recount.UpdateUI = function(data)
 			hItem:Lookup('Text_Rank'):Show()
 			hItem:Lookup('Image_Rank'):Hide()
 		end
-		
+		-- 色块长度
 		if nMaxValue > 0 then
 			hItem:Lookup('Image_PerBack'):SetPercentage(p.nValue / nMaxValue)
 			hItem:Lookup('Image_PerFore'):SetPercentage(p.nEffectValue / nMaxValue)
 			hItem:Lookup('Shadow_PerBack'):SetW(p.nValue / nMaxValue * hItem:GetW())
 			hItem:Lookup('Shadow_PerFore'):SetW(p.nEffectValue / nMaxValue * hItem:GetW())
 		end
+		-- 死亡/离线 特殊颜色
+		local tAway = data.Awaytime[p.id]
+		local bAway = tAway and #tAway > 0 and not tAway[#tAway][2]
+		if hItem.bAway ~= bAway then
+			if bAway then
+				hItem:Lookup('Text_L'):SetFontColor(127, 127, 127)
+				hItem:Lookup('Text_R'):SetFontColor(127, 127, 127)
+			else
+				hItem:Lookup('Text_L'):SetFontColor(255, 255, 255)
+				hItem:Lookup('Text_R'):SetFontColor(255, 255, 255)
+			end
+		end
+		-- 数值显示
 		if MY_Recount.bShowEffect then
 			if MY_Recount.bShowPerSec then
-				hItem:Lookup('Text_R'):SetText(math.floor(p.nEffectValue / nTimeCount) .. ' ' .. szUnit)
+				hItem:Lookup('Text_R'):SetText(math.floor(p.nEffectValue / p.nTimeCount) .. ' ' .. szUnit)
 			else
 				hItem:Lookup('Text_R'):SetText(p.nEffectValue)
 			end
 		else
 			if MY_Recount.bShowPerSec then
-				hItem:Lookup('Text_R'):SetText(math.floor(p.nValue / nTimeCount) .. ' ' .. szUnit)
+				hItem:Lookup('Text_R'):SetText(math.floor(p.nValue / p.nTimeCount) .. ' ' .. szUnit)
 			else
 				hItem:Lookup('Text_R'):SetText(p.nValue)
 			end
@@ -432,13 +447,13 @@ MY_Recount.UpdateUI = function(data)
 		-- 右侧文字
 		if MY_Recount.bShowEffect then
 			if MY_Recount.bShowPerSec then
-				hItem:Lookup('Text_Me_R'):SetText(math.floor(tMyRec.nEffectValue / nTimeCount) .. ' ' .. szUnit)
+				hItem:Lookup('Text_Me_R'):SetText(math.floor(tMyRec.nEffectValue / tMyRec.nTimeCount) .. ' ' .. szUnit)
 			else
 				hItem:Lookup('Text_Me_R'):SetText(tMyRec.nEffectValue)
 			end
 		else
 			if MY_Recount.bShowPerSec then
-				hItem:Lookup('Text_Me_R'):SetText(math.floor(tMyRec.nValue / nTimeCount) .. ' ' .. szUnit)
+				hItem:Lookup('Text_Me_R'):SetText(math.floor(tMyRec.nValue / tMyRec.nTimeCount) .. ' ' .. szUnit)
 			else
 				hItem:Lookup('Text_Me_R'):SetText(tMyRec.nValue)
 			end
@@ -788,6 +803,13 @@ MY_Recount.OnItemRefreshTip = function()
 					szXml = szXml .. GetFormatText(string.format('%2d', nCount) .. ' ')
 				end
 				szXml = szXml .. GetFormatText('\n')
+			end
+			if DataDisplay.Awaytime[id] then
+				szXml = szXml .. GetFormatText(_L(
+					'away count: %d, away time: %ds',
+					#DataDisplay.Awaytime[id],
+					math.max(DataDisplay.nTimeDuring - MY_Recount.Data.GeneFightTime(DataDisplay, id), 0)
+				), nil, 255, 191, 255)
 			end
 			OutputTip(szXml, 500, {x, y, w, h})
 		end

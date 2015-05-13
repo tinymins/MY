@@ -40,5 +40,6 @@ data = {
     ['total: '] = '總：',
     ['effect: '] = '有效：',
     
-    ['fx'] = '對應關系',
+    ['template'] = '數據模板',
+    ['away count: %d, away time: %ds'] = '暫離次數：%d次 暫離時間：%d秒',
 }
