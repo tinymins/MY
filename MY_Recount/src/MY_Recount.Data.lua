@@ -255,6 +255,25 @@ MY_Recount.Data.Del = function(data)
     end
 end
 
+-- 计算战斗时间
+MY_Recount.Data.GeneFightTime = function(data, dwID)
+    local nTimeDuring = data.nTimeDuring
+    local nTimeBegin  = data.nTimeBegin
+    if dwID and data.Awaytime and data.Awaytime[dwID] then
+        for _, rec in ipairs(data.Awaytime[dwID]) do
+            local nAwayBegin = math.max(rec[1], nTimeBegin)
+            local nAwayEnd   = rec[2]
+            if nAwayEnd then -- 完整的离开记录
+                nTimeDuring = nTimeDuring - (nAwayEnd - nAwayBegin)
+            else -- 离开了至今没回来的记录
+                nTimeDuring = nTimeDuring - (data.nTimeBegin + data.nTimeDuring - nAwayBegin)
+                break
+            end
+        end
+    end
+    return nTimeDuring
+end
+
 -- ##################################################################################################
 --         #       #             #                     #     # # # # # # #       #     # # # # #     
 --     #   #   #   #             #     # # # # # #       #   #   #   #   #       #     #       #     
@@ -626,6 +645,7 @@ MY_Recount.Data.Init = function(bForceInit)
             UUID        = MY.Player.GetFightUUID(), -- 战斗唯一标识
             nTimeBegin  = GetCurrentTime(),         -- 战斗开始时间
             nTimeDuring =  0,                       -- 战斗持续时间
+            Awaytime    = {},                       -- 死亡/掉线时间节点
             Namelist    = {},                       -- 名称缓存
             Forcelist   = {},                       -- 势力缓存
             Damage      = {},                       -- 输出统计
@@ -733,4 +753,43 @@ MY.RegisterEvent('SYS_MSG', function()
         -- (arg1)dwCharacterID：承疗玩家ID (arg2)nDeltaLife：增加血量值
         -- MY_Recount.OnCommonHealth(arg1, arg2)
     end
+end)
+
+-- 有人死了活了做一下时间轴记录
+_Cache.OnTeammateStateChange = function(dwID, bLeave)
+    if not (Data and Data.Awaytime) then
+        return
+    end
+    if not Data.Awaytime[dwID] then
+        Data.Awaytime[dwID] = {}
+    end
+    local rec = Data.Awaytime[dwID]
+    -- 检查逻辑
+    if #rec > 0 then
+        if bLeave then -- 有人死了
+            if not rec[#rec][2] then -- 并且最后一条记录还是死的
+                return
+            end
+        else -- 有人活了
+            if rec[#rec][2] then -- 并且本来就是活的
+                return
+            end
+        end
+    end
+    -- 插入数据
+    if bLeave then
+        table.insert(rec, { GetCurrentTime() })
+    elseif #rec > 0 then
+        rec[#rec][2] = GetCurrentTime()
+    end
+end
+MY.RegisterEvent('PARTY_UPDATE_MEMBER_INFO', function()
+    local team = GetClientTeam()
+    local info = team.GetMemberInfo(arg1)
+    if info then
+        _Cache.OnTeammateStateChange(arg1, info.bDeathFlag)
+    end
+end)
+MY.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', function()
+    _Cache.OnTeammateStateChange(arg1, arg2 == 0)
 end)
