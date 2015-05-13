@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-04-24 11:09:34
+-- @Last Modified time: 2015-05-13 11:24:22
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -260,8 +260,8 @@ end
 -- ##################################################################################################
 _Cache.nLastFightUUID           = nil
 _Cache.nCurrentFightUUID        = nil
-_Cache.nCurrentFightBeginFrame  = 0
-_Cache.nCurrentFightEndingFrame = 0
+_Cache.nCurrentFightBeginFrame  = -1
+_Cache.nCurrentFightEndingFrame = -1
 _Cache.OnFightStateChange = function(bFightState)
 	-- 当没有传bFightState或bFightState为否时 重新获取逻辑战斗状态
 	if not bFightState then
@@ -273,7 +273,8 @@ _Cache.OnFightStateChange = function(bFightState)
 		if not _Cache.bFighting then
 			_Cache.bFighting = true
 			-- 5秒脱战判定缓冲 防止明教隐身错误判定
-			if MY.GetFrameCount() - _Cache.nCurrentFightEndingFrame > GLOBAL.GAME_FPS * 5 then
+			if _Cache.nCurrentFightBeginFrame < 0
+			or MY.GetFrameCount() - _Cache.nCurrentFightEndingFrame > GLOBAL.GAME_FPS * 5 then
 				-- 新的一轮战斗开始
 				_Cache.nCurrentFightBeginFrame = MY.GetFrameCount()
 				_Cache.nCurrentFightUUID = _Cache.nCurrentFightBeginFrame
