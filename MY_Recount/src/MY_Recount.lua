@@ -786,9 +786,16 @@ MY_Recount.OnItemRefreshTip = function()
 		if tRec then
 			local szXml = ''
 			local szColon = g_tStrings.STR_COLON
+			local t = {}
 			for szSkillName, p in pairs(tRec.Skill) do
-				szXml = szXml .. GetFormatText(szSkillName .. "\n", nil, 255, 150, 0)
-				szXml = szXml .. GetFormatText(_L['total: '] .. p.nTotal .. ' ' .. _L['effect: '] .. p.nTotalEffect .. "\n")
+				table.insert(t, { szName = szSkillName, rec = p })
+			end
+			table.sort(t, function(p1, p2)
+				return p1.rec.nTotal > p2.rec.nTotal
+			end)
+			for _, p in ipairs(t) do
+				szXml = szXml .. GetFormatText(p.szName .. "\n", nil, 255, 150, 0)
+				szXml = szXml .. GetFormatText(_L['total: '] .. p.rec.nTotal .. ' ' .. _L['effect: '] .. p.rec.nTotalEffect .. "\n")
 				for _, nSkillResult in ipairs({
 					SKILL_RESULT.HIT     ,
 					SKILL_RESULT.INSIGHT ,
@@ -796,8 +803,8 @@ MY_Recount.OnItemRefreshTip = function()
 					SKILL_RESULT.MISS    ,
 				}) do
 					local nCount = 0
-					if p.Detail[nSkillResult] then
-						nCount = p.Detail[nSkillResult].nCount
+					if p.rec.Detail[nSkillResult] then
+						nCount = p.rec.Detail[nSkillResult].nCount
 					end
 					szXml = szXml .. GetFormatText(SZ_SKILL_RESULT[nSkillResult] .. szColon, nil, 255, 202, 126)
 					szXml = szXml .. GetFormatText(string.format('%2d', nCount) .. ' ')
