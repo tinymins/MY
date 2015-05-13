@@ -292,37 +292,37 @@ MY_Recount.UpdateUI = function(data)
 				nEffectValue = rec.nTotalEffect   or  0              ,
 				nTimeCount   = math.max(MY_Recount.Data.GeneFightTime(data, id), 1), -- 删去死亡时间 && 防止计算DPS时除以0
 			}
+			if MY_Recount.bShowPerSec then
+				tRec.nValuePS       = tRec.nValue / tRec.nTimeCount
+				tRec.nEffectValuePS = tRec.nEffectValue / tRec.nTimeCount
+				nMaxValue = math.max(nMaxValue, tRec.nValuePS, tRec.nEffectValuePS)
+			else
+				nMaxValue = math.max(nMaxValue, tRec.nValue, tRec.nEffectValue)
+			end
 			table.insert(tResult, tRec)
-			nMaxValue = math.max(nMaxValue, tRec.nValue, tRec.nEffectValue)
 		end
 	end
 	
 	-- 列表排序
-	if MY_Recount.bShowEffect then
-		table.sort(tResult, function(p1, p2)
-			return p1.nEffectValue > p2.nEffectValue
-		end)
-	else
-		table.sort(tResult, function(p1, p2)
-			return p1.nValue > p2.nValue
-		end)
+	local szSortKey = 'nValue'
+	if MY_Recount.bShowEffect and MY_Recount.bShowPerSec then
+		szSortKey = 'nEffectValuePS'
+	elseif MY_Recount.bShowEffect then
+		szSortKey = 'nEffectValue'
+	elseif MY_Recount.bShowPerSec then
+		szSortKey = 'nValuePS'
 	end
+	table.sort(tResult, function(p1, p2)
+		return p1[szSortKey] > p2[szSortKey]
+	end)
 	
 	-- 渲染列表
 	local hList = m_frame:Lookup('Wnd_Main', 'Handle_List')
 	for i, p in pairs(tResult) do
 		-- 自己的记录
 		if p.id == UI_GetClientPlayerID() then
-			tMyRec = {
-				id           = p.id          ,
-				szMD5        = p.szMD5       ,
-				szName       = p.szName      ,
-				dwForceID    = p.dwForceID   ,
-				nValue       = p.nValue      ,
-				nEffectValue = p.nEffectValue,
-				nTimeCount   = p.nTimeCount  ,
-				nRank        = i             ,
-			}
+			tMyRec = p
+			tMyRec.nRank = i
 		end
 		local hItem = hList:Lookup('Handle_LI_' .. (p.szMD5 or p.id))
 		if not hItem then
@@ -362,11 +362,19 @@ MY_Recount.UpdateUI = function(data)
 			hItem:Lookup('Image_Rank'):Hide()
 		end
 		-- 色块长度
+		local fPerBack, fPerFore = 0, 0
 		if nMaxValue > 0 then
-			hItem:Lookup('Image_PerBack'):SetPercentage(p.nValue / nMaxValue)
-			hItem:Lookup('Image_PerFore'):SetPercentage(p.nEffectValue / nMaxValue)
-			hItem:Lookup('Shadow_PerBack'):SetW(p.nValue / nMaxValue * hItem:GetW())
-			hItem:Lookup('Shadow_PerFore'):SetW(p.nEffectValue / nMaxValue * hItem:GetW())
+			if MY_Recount.bShowPerSec then
+				fPerBack = p.nValuePS / nMaxValue
+				fPerFore = p.nEffectValuePS / nMaxValue
+			else
+				fPerBack = p.nValue / nMaxValue
+				fPerFore = p.nEffectValue / nMaxValue
+			end
+			hItem:Lookup('Image_PerBack'):SetPercentage(fPerBack)
+			hItem:Lookup('Image_PerFore'):SetPercentage(fPerFore)
+			hItem:Lookup('Shadow_PerBack'):SetW(fPerBack * hItem:GetW())
+			hItem:Lookup('Shadow_PerFore'):SetW(fPerFore * hItem:GetW())
 		end
 		-- 死亡/离线 特殊颜色
 		local tAway = data.Awaytime[p.id]
@@ -431,11 +439,19 @@ MY_Recount.UpdateUI = function(data)
 		end
 	end
 	if tMyRec then
+		local fPerBack, fPerFore = 0, 0
 		if nMaxValue > 0 then
-			hItem:Lookup('Image_Me_PerBack'):SetPercentage(tMyRec.nValue / nMaxValue)
-			hItem:Lookup('Image_Me_PerFore'):SetPercentage(tMyRec.nEffectValue / nMaxValue)
-			hItem:Lookup('Shadow_Me_PerBack'):SetW(tMyRec.nValue / nMaxValue * hItem:GetW())
-			hItem:Lookup('Shadow_Me_PerFore'):SetW(tMyRec.nEffectValue / nMaxValue * hItem:GetW())
+			if MY_Recount.bShowPerSec then
+				fPerBack = tMyRec.nValuePS / nMaxValue
+				fPerFore = tMyRec.nEffectValuePS / nMaxValue
+			else
+				fPerBack = tMyRec.nValue / nMaxValue
+				fPerFore = tMyRec.nEffectValue / nMaxValue
+			end
+			hItem:Lookup('Image_Me_PerBack'):SetPercentage(fPerBack)
+			hItem:Lookup('Image_Me_PerFore'):SetPercentage(fPerFore)
+			hItem:Lookup('Shadow_Me_PerBack'):SetW(fPerBack * hItem:GetW())
+			hItem:Lookup('Shadow_Me_PerFore'):SetW(fPerFore * hItem:GetW())
 		else
 			hItem:Lookup('Image_Me_PerBack'):SetPercentage(1)
 			hItem:Lookup('Image_Me_PerFore'):SetPercentage(1)
