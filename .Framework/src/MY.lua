@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-08 20:08:51
+-- @Last Modified time: 2015-05-13 16:44:52
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -127,8 +127,8 @@ MY = {}
 --             #                         # # # # #   # # # # # # # # # # #   # #     #   #       #   # #               # #   # # # # # # # # # # #   
 -- ##################################################################################################################################################
 local _DEBUG_ = tonumber(LoadLUAData('interface/my.debug.level') or nil) or 4
-local _BUILD_ = "20150506"
-local _VERSION_ = 0x2003300
+local _BUILD_ = "20150513"
+local _VERSION_ = 0x2003400
 local _ADDON_ROOT_ = '/Interface/MY/'
 local _FRAMEWORK_ROOT_ = '/Interface/MY/.Framework/'
 
