@@ -5,7 +5,7 @@
 -- @Date  : 2015-03-02 10:08:35
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-03-02 20:14:06
+-- @Last Modified time: 2015-05-14 10:27:36
 --------------------------------------------
 XLifeBar = XLifeBar or {}
 XLifeBar.HP = class()
@@ -64,17 +64,18 @@ end
 -- rgbaf: 红,绿,蓝,透明度,字体
 -- tWordlines: {[文字,高度偏移],...}
 function HP:DrawWordlines(tWordlines, rgbaf)
-	if not self.handle then
-		return
-	end
-	local r,g,b,a,f = unpack(rgbaf)
-	local sha = self.handle:Lookup(string.format("lines_%s",self.dwID))
-	
-	sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
-	sha:ClearTriangleFanPoint()
-	
-	for _, aWordline in ipairs(tWordlines) do
-		sha:AppendCharacterID(self.dwID,true,r,g,b,a,{0,0,0,0,- aWordline[2]},f,aWordline[1],1,1)
+	if self.handle then
+		local r,g,b,a,f = unpack(rgbaf)
+		local sha = self.handle:Lookup(string.format("lines_%s",self.dwID))
+		
+		sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
+		sha:ClearTriangleFanPoint()
+		
+		for _, aWordline in ipairs(tWordlines) do
+			if aWordline[1] and #aWordline[1] > 0 then
+				sha:AppendCharacterID(self.dwID,true,r,g,b,a,{0,0,0,0,- aWordline[2]},f,aWordline[1],1,1)
+			end
+		end
 	end
 	return self
 end
@@ -90,57 +91,58 @@ function HP:DrawLifePercentage(aWordline, rgbaf)
 	sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
 	sha:ClearTriangleFanPoint()
 	
-	sha:AppendCharacterID(self.dwID,true,r,g,b,a,{0,0,0,0,- aWordline[2]},f,aWordline[1],1,1)
+	if aWordline[1] and #aWordline[1] > 0 then
+		sha:AppendCharacterID(self.dwID,true,r,g,b,a,{0,0,0,0,- aWordline[2]},f,aWordline[1],1,1)
+	end
+	return self
 end
 
 -- 绘制读条名称（减少重绘次数所以和Wordlines分离）
 function HP:DrawOTTitle(aWordline, rgbaf)
-	if not self.handle then
-		return
+	if self.handle then
+		local r,g,b,a,f = unpack(rgbaf)
+		local sha = self.handle:Lookup(string.format("ot_title_%s",self.dwID))
+		
+		sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
+		sha:ClearTriangleFanPoint()
+		
+		if aWordline[1] and #aWordline[1] > 0 then
+			sha:AppendCharacterID(self.dwID,true,r,g,b,a,{0,0,0,0,- aWordline[2]},f,aWordline[1],1,1)
+		end
 	end
-	local r,g,b,a,f = unpack(rgbaf)
-	local sha = self.handle:Lookup(string.format("ot_title_%s",self.dwID))
-	
-	sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
-	sha:ClearTriangleFanPoint()
-	
-	sha:AppendCharacterID(self.dwID,true,r,g,b,a,{0,0,0,0,- aWordline[2]},f,aWordline[1],1,1)
-	
 	return self
 end
 
 -- 填充边框 默认200的nAlpha
 function HP:DrawBorder(nWidth, nHeight, nOffsetY, nAlpha, szShadowName, szShadowName2)
-	if not self.handle then
-		return
+	if self.handle then
+		nAlpha = nAlpha or 200
+		local handle = self.handle
+		
+		-- 绘制外边框
+		local sha = handle:Lookup(string.format(szShadowName,self.dwID))
+		sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
+		sha:SetD3DPT(D3DPT.TRIANGLEFAN)
+		sha:ClearTriangleFanPoint()
+		local bcX,bcY = - nWidth / 2 ,(- nHeight) - nOffsetY
+
+		sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX,bcY})
+		sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX+nWidth,bcY})
+		sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX+nWidth,bcY+nHeight})
+		sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX,bcY+nHeight})
+
+		-- 绘制内边框
+		local sha = handle:Lookup(string.format(szShadowName2,self.dwID))
+		sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
+		sha:SetD3DPT(D3DPT.TRIANGLEFAN)
+		sha:ClearTriangleFanPoint()
+		local bcX,bcY = - (nWidth / 2 - 1),(- (nHeight - 1)) - nOffsetY
+
+		sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX,bcY})
+		sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX+(nWidth - 2),bcY})
+		sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX+(nWidth - 2),bcY+(nHeight - 2)})
+		sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX,bcY+(nHeight - 2)})
 	end
-	nAlpha = nAlpha or 200
-	local handle = self.handle
-	
-	-- 绘制外边框
-	local sha = handle:Lookup(string.format(szShadowName,self.dwID))
-	sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
-	sha:SetD3DPT(D3DPT.TRIANGLEFAN)
-	sha:ClearTriangleFanPoint()
-	local bcX,bcY = - nWidth / 2 ,(- nHeight) - nOffsetY
-
-	sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX,bcY})
-	sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX+nWidth,bcY})
-	sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX+nWidth,bcY+nHeight})
-	sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX,bcY+nHeight})
-
-	-- 绘制内边框
-	local sha = handle:Lookup(string.format(szShadowName2,self.dwID))
-	sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
-	sha:SetD3DPT(D3DPT.TRIANGLEFAN)
-	sha:ClearTriangleFanPoint()
-	local bcX,bcY = - (nWidth / 2 - 1),(- (nHeight - 1)) - nOffsetY
-
-	sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX,bcY})
-	sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX+(nWidth - 2),bcY})
-	sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX+(nWidth - 2),bcY+(nHeight - 2)})
-	sha:AppendCharacterID(self.dwID,true,30,30,30,nAlpha,{0,0,0,bcX,bcY+(nHeight - 2)})
-
 	return self
 end
 
@@ -156,29 +158,27 @@ end
 -- 填充矩形（进度条/血条）
 -- rgbap: 红,绿,蓝,透明度,进度
 function HP:DrawRect(nWidth, nHeight, nOffsetY, rgbap, szShadowName)
-	if not self.handle then
-		return
+	if self.handle then
+		local r,g,b,a,p = unpack(rgbap)
+		if not p or p > 1 then
+			p = 1
+		elseif p < 0 then
+			p = 0
+		end -- fix
+		local sha = self.handle:Lookup(string.format(szShadowName,self.dwID))
+		
+		sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
+		sha:SetD3DPT(D3DPT.TRIANGLEFAN)
+		sha:ClearTriangleFanPoint()
+		
+		local bcX,bcY = - (nWidth / 2 - 2),(- (nHeight - 2)) - nOffsetY
+		nWidth = (nWidth - 4) * p -- 计算实际绘制宽度
+		
+		sha:AppendCharacterID(self.dwID,true,r,g,b,a,{0,0,0,bcX,bcY})
+		sha:AppendCharacterID(self.dwID,true,r,g,b,a,{0,0,0,bcX+nWidth,bcY})
+		sha:AppendCharacterID(self.dwID,true,r,g,b,a,{0,0,0,bcX+nWidth,bcY+(nHeight - 4)})
+		sha:AppendCharacterID(self.dwID,true,r,g,b,a,{0,0,0,bcX,bcY+(nHeight - 4)})
 	end
-	local r,g,b,a,p = unpack(rgbap)
-	if not p or p > 1 then
-		p = 1
-	elseif p < 0 then
-		p = 0
-	end -- fix
-	local sha = self.handle:Lookup(string.format(szShadowName,self.dwID))
-	
-	sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
-	sha:SetD3DPT(D3DPT.TRIANGLEFAN)
-	sha:ClearTriangleFanPoint()
-	
-	local bcX,bcY = - (nWidth / 2 - 2),(- (nHeight - 2)) - nOffsetY
-	nWidth = (nWidth - 4) * p -- 计算实际绘制宽度
-	
-	sha:AppendCharacterID(self.dwID,true,r,g,b,a,{0,0,0,bcX,bcY})
-	sha:AppendCharacterID(self.dwID,true,r,g,b,a,{0,0,0,bcX+nWidth,bcY})
-	sha:AppendCharacterID(self.dwID,true,r,g,b,a,{0,0,0,bcX+nWidth,bcY+(nHeight - 4)})
-	sha:AppendCharacterID(self.dwID,true,r,g,b,a,{0,0,0,bcX,bcY+(nHeight - 4)})
-	
 	return self
 end
 
