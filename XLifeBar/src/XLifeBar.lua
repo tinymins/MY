@@ -347,6 +347,12 @@ MY.RegisterEvent('FIRST_LOADING_END', function()
     MY.UI.CreateFrame("XLifeBar", { level = "Lowest", empty = true })
     _C.Reset()
 end)
+-- 过图可能切换开关状态
+MY.RegisterEvent('LOADING_END', function()
+    if not _C.IsEnabled() then
+        _C.ResumeSysHeadTop()
+    end
+end)
 
 XLifeBar.X = class()
 -- 构造函数
