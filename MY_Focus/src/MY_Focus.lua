@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-04-19 16:53:25
+-- @Last Modified time: 2015-05-14 17:02:26
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Focus/lang/")
 local _C = {}
@@ -100,11 +100,26 @@ MY_Focus.GetDisplayList = function()
 	if _C.bMinimize then
 		return t
 	end
-	for i, v in ipairs(_C.tFocusList) do
-		if i > MY_Focus.nMaxDisplay then
-			break
+	if MY_Focus.bHideDeath then
+		for _, p in ipairs(_C.tFocusList) do
+			if #t > MY_Focus.nMaxDisplay then
+				break
+			end
+			local tar = MY.GetObject(p.dwType, p.dwID)
+			if tar and not (
+				((p.dwType == TARGET.NPC or p.dwType == TARGET.PLAYER) and tar.nMoveState == MOVE_STATE.ON_DEATH)
+				or (p.dwType == TARGET.DOODAD and tar.nKind == DOODAD_KIND.CORPSE)
+			) then
+				table.insert(t, p)
+			end
 		end
-		table.insert(t, v)
+	else
+		for i, v in ipairs(_C.tFocusList) do
+			if i > MY_Focus.nMaxDisplay then
+				break
+			end
+			table.insert(t, v)
+		end
 	end
 	return t
 end
@@ -616,17 +631,6 @@ end
 -- ##########################################################################
 -- 周期重绘
 MY_Focus.OnFrameBreathe = function()
-	if MY_Focus.bHideDeath then
-		for _, p in ipairs(MY_Focus.GetFocusList()) do
-			local tar = MY.GetObject(p.dwType, p.dwID)
-			if not tar or (
-				((p.dwType == TARGET.NPC or p.dwType == TARGET.PLAYER) and tar.nMoveState == MOVE_STATE.ON_DEATH)
-				or (p.dwType == TARGET.DOODAD and tar.nKind == DOODAD_KIND.CORPSE)
-			) then
-				MY_Focus.DelFocus(p.dwType, p.dwID)
-			end
-		end
-	end
 	if MY_Focus.bSortByDistance then
 		MY_Focus.SortFocus()
 	end
