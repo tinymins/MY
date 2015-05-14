@@ -381,8 +381,8 @@ MY_Recount.UpdateUI = function(data)
 		local bAway = tAway and #tAway > 0 and not tAway[#tAway][2]
 		if hItem.bAway ~= bAway then
 			if bAway then
-				hItem:Lookup('Text_L'):SetFontColor(127, 127, 127)
-				hItem:Lookup('Text_R'):SetFontColor(127, 127, 127)
+				hItem:Lookup('Text_L'):SetFontColor(192, 192, 192)
+				hItem:Lookup('Text_R'):SetFontColor(192, 192, 192)
 			else
 				hItem:Lookup('Text_L'):SetFontColor(255, 255, 255)
 				hItem:Lookup('Text_R'):SetFontColor(255, 255, 255)
