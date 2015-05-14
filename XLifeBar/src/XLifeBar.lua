@@ -67,13 +67,11 @@ XLifeBar = XLifeBar or {}
 setmetatable(XLifeBar, { __call = function(me, ...) return me.X.new(...) end, __metatable = true })
 XLifeBar.bEnabled = false
 XLifeBar.bUseGlobalConfig   = false
-XLifeBar.tSysHeadTop        = false
 XLifeBar.bOnlyInDungeon     = false
 XLifeBar.bOnlyInArena       = false
 XLifeBar.bOnlyInBattleField = false
 RegisterCustomData("XLifeBar.bEnabled")
 RegisterCustomData("XLifeBar.bUseGlobalConfig")
-RegisterCustomData("XLifeBar.tSysHeadTop")
 RegisterCustomData("XLifeBar.bOnlyInDungeon")
 RegisterCustomData("XLifeBar.bOnlyInArena")
 RegisterCustomData("XLifeBar.bOnlyInBattleField")
