@@ -4,7 +4,7 @@
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-04 20:29:44
+-- @Last Modified time: 2015-05-15 18:19:17
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = {}
@@ -30,8 +30,8 @@ _C.FriendHeadTip = function(bEnable)
 				end
 			end
 		end
-		MY.RegisterEvent("PLAYER_ENTER_SCENE","MY_FRIEND_TIP",fnPlayerEnter)
-		MY.RegisterEvent("PLAYER_LEAVE_SCENE","MY_FRIEND_TIP",function(arg0)
+		MY.RegisterEvent("PLAYER_ENTER_SCENE","MY_FRIEND_TIP",function(event) fnPlayerEnter(arg0) end)
+		MY.RegisterEvent("PLAYER_LEAVE_SCENE","MY_FRIEND_TIP",function(event)
 			frm:find("#MY_FRIEND_TIP"..arg0):remove()
 		end)
 		for _, p in pairs(MY.Player.GetNearPlayer()) do
@@ -55,7 +55,7 @@ MY_ToolBox.ApplyConfig = function()
 	end
 	
 	-- ÊÔÁ¶Ö®µØ¾Å¹¬ÖúÊÖ
-	MY.RegisterEvent('OPEN_WINDOW', 'JiugongHelper', function(arg0, szText)
+	MY.RegisterEvent('OPEN_WINDOW', 'JiugongHelper', function(event)
 		if MY.IsShieldedVersion() then
 			return
 		end
@@ -64,6 +64,7 @@ MY_ToolBox.ApplyConfig = function()
 		if target and target.dwTemplateID ~= 18707 then
 			return
 		end
+		local szText = arg1
 		-- Æ¥Åä×Ö·û´®
 		string.gsub(szText, "<T1916><(T%d+)><T1926><(T%d+)><T1928><(T%d+)><T1924>.+<T1918><(T%d+)><T1931><(T%d+)><T1933><(T%d+)><T1935>.+<T1920><(T%d+)><T1937><(T%d+)><T1938><(T%d+)><T1939>", function(n1,n2,n3,n4,n5,n6,n7,n8,n9)
 			local tNumList = {

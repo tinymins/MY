@@ -197,8 +197,8 @@ MY.RegisterEvent('LOADING_END', function()
 end)
 
 -- 退出战斗 保存数据
-MY.RegisterEvent('MY_FIGHT_HINT', function(bEnterFight)
-    if bEnterFight and MY.Player.GetFightUUID() ~= Data.UUID then -- 进入新的战斗
+MY.RegisterEvent('MY_FIGHT_HINT', function(event)
+    if arg0 and MY.Player.GetFightUUID() ~= Data.UUID then -- 进入新的战斗
         MY_Recount.Data.Init()
         FireUIEvent('MY_RECOUNT_NEW_FIGHT')
     else
