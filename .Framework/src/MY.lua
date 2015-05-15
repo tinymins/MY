@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-13 16:44:52
+-- @Last Modified time: 2015-05-15 18:15:52
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -541,19 +541,11 @@ MY.RegisterEvent = function(szEventName, arg1, arg2)
 		if type(_MY.tEvent[szEventName])~="table" then
 			_MY.tEvent[szEventName] = {}
 			RegisterEvent(szEventName, function(...)
-				local param = {}
-				for i = 0, 100, 1 do
-					if _G['arg'..i] then
-						table.insert(param, _G['arg'..i])
-					else
-						break
-					end
-				end
 				for i = #_MY.tEvent[szEventName], 1, -1 do
 					local hEvent = _MY.tEvent[szEventName][i]
 					if type(hEvent.fn)=="function" then
 						-- try to run event function
-						local status, err = pcall(hEvent.fn, unpack(param))
+						local status, err = pcall(hEvent.fn, ...)
 						-- error report
 						if not status then MY.Debug({err}, 'OnEvent#'..szEventName, 2) end
 					else
