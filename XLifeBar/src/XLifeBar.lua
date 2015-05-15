@@ -225,6 +225,56 @@ _C.WithPrepareState = function(object, callback, param)
     end
 end
 
+_C.AutoSwitchSysHeadTop = function()
+    if _C.IsEnabled() then
+        _C.PushSysHeadTop()
+        _C.AutoHideSysHeadTop()
+    else
+        _C.ResumeSysHeadTop()
+    end
+end
+_C.AutoHideSysHeadTop = function()
+    if Config.bShowName.Npc.Party or Config.bShowName.Npc.Neutrality
+    or Config.bShowName.Npc.Ally  or Config.bShowName.Npc.Enemy then
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_NAME , false)
+    end
+    if Config.bShowTitle.Npc.Party or Config.bShowTitle.Npc.Neutrality
+    or Config.bShowTitle.Npc.Ally or Config.bShowTitle.Npc.Enemy then
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_TITLE, false)
+    end
+    if Config.bShowLife.Npc.Party or Config.bShowLife.Npc.Neutrality
+    or Config.bShowLife.Npc.Ally or Config.bShowLife.Npc.Enemy then
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_LIFE , false)
+    end
+    if Config.bShowName.Player.Party or Config.bShowName.Player.Neutrality
+    or Config.bShowName.Player.Ally or Config.bShowName.Player.Enemy then
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_NAME , false)
+    end
+    if Config.bShowTitle.Player.Party or Config.bShowTitle.Player.Neutrality
+    or Config.bShowTitle.Player.Ally or Config.bShowTitle.Player.Enemy then
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_TITLE, false)
+    end
+    if Config.bShowLife.Player.Party or Config.bShowLife.Player.Neutrality
+    or Config.bShowLife.Player.Ally or Config.bShowLife.Player.Enemy then
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_LIFE , false)
+    end
+    if Config.bShowTong.Player.Party or Config.bShowTong.Player.Neutrality
+    or Config.bShowTong.Player.Ally or Config.bShowTong.Player.Enemy then
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_GUILD, false)
+    end
+    if Config.bShowName.Player.Self then
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_NAME , false)
+    end
+    if Config.bShowTitle.Player.Self then
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_TITLE, false)
+    end
+    if Config.bShowLife.Player.Self then
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_LIFE , false)
+    end
+    if Config.bShowTong.Player.Self then
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_GUILD, false)
+    end
+end
 _C.PushSysHeadTop = function()
     if not _C.tSysHeadTop then
         _C.tSysHeadTop = {
@@ -293,51 +343,7 @@ _C.Reset = function()
         end, 500)
     end
     
-    if _C.IsEnabled() then
-        _C.PushSysHeadTop()
-        if Config.bShowName.Npc.Party or Config.bShowName.Npc.Neutrality
-        or Config.bShowName.Npc.Ally  or Config.bShowName.Npc.Enemy then
-            SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_NAME , false)
-        end
-        if Config.bShowTitle.Npc.Party or Config.bShowTitle.Npc.Neutrality
-        or Config.bShowTitle.Npc.Ally or Config.bShowTitle.Npc.Enemy then
-            SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_TITLE, false)
-        end
-        if Config.bShowLife.Npc.Party or Config.bShowLife.Npc.Neutrality
-        or Config.bShowLife.Npc.Ally or Config.bShowLife.Npc.Enemy then
-            SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_LIFE , false)
-        end
-        if Config.bShowName.Player.Party or Config.bShowName.Player.Neutrality
-        or Config.bShowName.Player.Ally or Config.bShowName.Player.Enemy then
-            SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_NAME , false)
-        end
-        if Config.bShowTitle.Player.Party or Config.bShowTitle.Player.Neutrality
-        or Config.bShowTitle.Player.Ally or Config.bShowTitle.Player.Enemy then
-            SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_TITLE, false)
-        end
-        if Config.bShowLife.Player.Party or Config.bShowLife.Player.Neutrality
-        or Config.bShowLife.Player.Ally or Config.bShowLife.Player.Enemy then
-            SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_LIFE , false)
-        end
-        if Config.bShowTong.Player.Party or Config.bShowTong.Player.Neutrality
-        or Config.bShowTong.Player.Ally or Config.bShowTong.Player.Enemy then
-            SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_GUILD, false)
-        end
-        if Config.bShowName.Player.Self then
-            SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_NAME , false)
-        end
-        if Config.bShowTitle.Player.Self then
-            SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_TITLE, false)
-        end
-        if Config.bShowLife.Player.Self then
-            SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_LIFE , false)
-        end
-        if Config.bShowTong.Player.Self then
-            SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_GUILD, false)
-        end
-    else
-        _C.ResumeSysHeadTop()
-    end
+    _C.AutoSwitchSysHeadTop()
 end
 -- 重载配置文件并重绘
 MY.RegisterEvent('FIRST_LOADING_END', function()
@@ -346,11 +352,7 @@ MY.RegisterEvent('FIRST_LOADING_END', function()
     _C.Reset()
 end)
 -- 过图可能切换开关状态
-MY.RegisterEvent('LOADING_END', function()
-    if not _C.IsEnabled() then
-        _C.ResumeSysHeadTop()
-    end
-end)
+MY.RegisterEvent('LOADING_END', _C.AutoSwitchSysHeadTop)
 
 XLifeBar.X = class()
 -- 构造函数
