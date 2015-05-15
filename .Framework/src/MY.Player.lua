@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-13 11:24:22
+-- @Last Modified time: 2015-05-15 18:16:50
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -295,7 +295,7 @@ _Cache.OnFightStateChange = function(bFightState)
 	end
 end
 MY.BreatheCall(_Cache.OnFightStateChange)
-MY.RegisterEvent('FIGHT_HINT', _Cache.OnFightStateChange)
+MY.RegisterEvent('FIGHT_HINT', function(event) _Cache.OnFightStateChange(arg0) end)
 -- 获取当前战斗时间
 MY.Player.GetFightTime = function(szFormat)
 	local nFrame = 0

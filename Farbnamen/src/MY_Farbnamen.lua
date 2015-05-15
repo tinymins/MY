@@ -404,7 +404,7 @@ MY.RegisterInit(MY_Farbnamen.LoadData)
 MY.RegisterInit(_MY_Farbnamen.LoadCustomData)
 MY.RegisterExit(MY_Farbnamen.SaveData)
 -- MY.RegisterEvent("PLAYER_ENTER_SCENE", MY_Farbnamen.DoConflict)
-MY.RegisterEvent("PLAYER_ENTER_SCENE", function(...)
+MY.RegisterEvent("PLAYER_ENTER_SCENE", function()
     if MY_Farbnamen.bEnabled then
         local dwID = arg0
         local nRetryCount = 0
