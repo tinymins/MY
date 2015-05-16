@@ -224,4 +224,4 @@ MY_AutoHideChat.ApplyConfig = function()
         MY_AutoHideChat.ShowChatPanel()
     end
 end
-MY.RegisterInit(MY_AutoHideChat.ApplyConfig)
+MY.RegisterInit('MY_AUTOHIDECHAT', MY_AutoHideChat.ApplyConfig)

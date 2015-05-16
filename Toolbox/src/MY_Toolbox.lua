@@ -4,7 +4,7 @@
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-16 20:40:04
+-- @Last Modified time: 2015-05-16 21:34:35
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = {}
@@ -154,7 +154,7 @@ MY_ToolBox.ApplyConfig = function()
 		MY.RegisterEvent('LOADING_END.MY_TOOLBOX_JJCAUTOSWITCHTALKCHANNEL')
 	end
 end
-MY.RegisterInit(MY_ToolBox.ApplyConfig)
+MY.RegisterInit('MY_TOOLBOX', MY_ToolBox.ApplyConfig)
 
 -- 【台服用】老地图神行
 _C.tNonwarData = {

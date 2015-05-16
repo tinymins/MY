@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-16 20:36:15
+-- @Last Modified time: 2015-05-16 21:31:52
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Focus/lang/")
 local _C = {}
@@ -702,7 +702,7 @@ MY.RegisterTargetAddonMenu('MY_Focus', function()
 	}
 end)
 
-MY.RegisterInit(function()
+MY.RegisterInit('MY_FOCUS', function()
 	if MY_Focus.bEnable then
 		MY_Focus.Open()
 	else

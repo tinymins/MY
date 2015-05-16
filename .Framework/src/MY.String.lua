@@ -4,7 +4,7 @@
 -- @Date  : 2015-01-25 15:35:26
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-04-14 21:37:23
+-- @Last Modified time: 2015-05-16 21:40:09
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -15,10 +15,19 @@ MY.String = MY.String or {}
 
 -- 分隔字符串
 -- (table) MY.String.Split(string szText, string szSpliter)
-MY.String.Split = function(s, p)
-	local rt= {}
-	string.gsub(s, '[^'..p..']+', function(w) table.insert(rt, w) end )
-	return rt
+MY.String.Split = function(szText, szSep)
+	local nOff, tResult = 1, {}
+	while true do
+		local nEnd = StringFindW(szText, szSep, nOff)
+		if not nEnd then
+			table.insert(tResult, string.sub(szText, nOff, string.len(szText)))
+			break
+		else
+			table.insert(tResult, string.sub(szText, nOff, nEnd - 1))
+			nOff = nEnd + string.len(szSep)
+		end
+	end
+	return tResult
 end
 
 -- 转义正则表达式特殊字符

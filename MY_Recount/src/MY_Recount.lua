@@ -181,7 +181,7 @@ MY_Recount.Close = function()
 	MY.RegisterEvent('UI_SCALED.MY_RECOUNT')
 end
 
-MY.RegisterInit(function()
+MY.RegisterInit('MY_RECOUNT', function()
 	if MY_Recount.bSaveRecount then
 		MY_Recount.Data.LoadData()
 	end

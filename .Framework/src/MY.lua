@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-16 21:04:30
+-- @Last Modified time: 2015-05-16 21:53:36
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -236,7 +236,7 @@ _MY.Init = function()
 			MY.Debug({err}, "_MY.tInitFun#" .. szKey)
 		end
 		-- performance monitor
-		MY.Debug({_L('Function %s initiated in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], 0)
+		MY.Debug({_L('Initial function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], 0)
 	end
 	_MY.tInitFun = nil
 	-- 显示欢迎信息

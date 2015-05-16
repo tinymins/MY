@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-04 20:18:37
+-- @Last Modified time: 2015-05-16 21:21:54
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -----------------------------------------------
@@ -205,7 +205,7 @@ MY.Game.SetHotKey = function(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
 	end
 end
 
-MY.RegisterInit(function()
+MY.RegisterInit('MYLIB#BIND_HOTKEY', function()
 	-- hotkey
 	Hotkey.AddBinding("MY_Total", _L["Open/Close main panel"], MY.GetAddonInfo().szName, MY.TogglePanel, nil)
 	for _, v in ipairs(_Cache.tHotkey) do
@@ -456,7 +456,7 @@ end
 MY.IsBoss = MY.Game.IsBoss
 
 -- remote boss list online
-MY.RegisterInit(function()
+MY.RegisterInit('MYLIB#UPDATE_BOSSLIST', function()
 	-- start remote version check
 	MY.RemoteRequest('http://data.jx3.derzh.com/data/bosslist.html', function(szTitle, szContent)
 		-- decode data

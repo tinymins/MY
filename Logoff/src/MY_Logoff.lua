@@ -323,7 +323,7 @@ _MY_Logoff.OnPanelActive = function(wnd)
 	  :click(function() MY.Game.SetHotKey() end)
 end
 
-MY.RegisterInit(function()
+MY.RegisterInit('MY_LOGOFF', function()
 	-- ´´½¨²Ëµ¥
 	local tMenu = function() return {
 		szOption = _L["express logoff"],

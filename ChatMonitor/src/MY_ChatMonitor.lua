@@ -464,7 +464,7 @@ _MY_ChatMonitor.Init = function()
     -- show tip
     _MY_ChatMonitor.ShowTip()
 end
-MY.RegisterInit(_MY_ChatMonitor.Init)
+MY.RegisterInit('MY_CHATMONITOR', _MY_ChatMonitor.Init)
 
 _MY_ChatMonitor.RegisterMsgMonitor = function()
     local t = {}
