@@ -33,8 +33,8 @@ MY_Chat.bChatCopyAlwaysWhite = false
 MY_Chat.bChatCopyNoCopySysmsg = true
 MY_Chat.bReplaceIcon = false
 MY_Chat.bDisplayPanel = true    --  «∑Òœ‘ æ√Ê∞Â
-MY.RegisterInit(function() MY_Chat.tBlockWords = MY.LoadLUAData('config/MY_CHAT/blockwords') or MY_Chat.tBlockWords end)
-MY.RegisterExit(function() MY.SaveLUAData('config/MY_CHAT/blockwords', MY_Chat.tBlockWords) end)
+MY.RegisterInit('MY_CHAT_BW', function() MY_Chat.tBlockWords = MY.LoadLUAData('config/MY_CHAT/blockwords') or MY_Chat.tBlockWords end)
+MY.RegisterExit('MY_CHAT_BW', function() MY.SaveLUAData('config/MY_CHAT/blockwords', MY_Chat.tBlockWords) end)
 
 MY_Chat.tChannel = {
 	["Radio_Say"] = true,
@@ -389,7 +389,7 @@ end
 --------------------------------------------------------------
 -- init
 --------------------------------------------------------------
-MY.RegisterInit(function()
+MY.RegisterInit('MY_CHAT', function()
 	MY_Chat.ReInitUI()
 	
 	MY.UI(MY_Chat.frame):children("#Btn_Option"):menu(MY_Chat.GetMenu)

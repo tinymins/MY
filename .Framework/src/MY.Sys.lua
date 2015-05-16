@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-07 13:26:37
+-- @Last Modified time: 2015-05-16 21:46:37
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 MY = MY or {}
@@ -164,6 +164,35 @@ MY.RegisterUserData = function(szName, szFileName)
 	
 end
 
+MY.Sys.SetGlobalValue = function(szVarPath, Val)
+	local t = MY.String.Split(szVarPath, ".")
+	local tab = _G
+	for k, v in ipairs(t) do
+		if type(tab[v]) == "nil" then
+			tab[v] = {}
+		end
+		if k == #t then
+			tab[v] = Val
+		end
+		tab = tab[v]
+	end
+end
+MY.SetGlobalValue = MY.Sys.SetGlobalValue
+
+MY.Sys.GetGlobalValue = function(szVarPath)
+	local tVariable = _G
+	for szIndex in string.gmatch(szVarPath, "[^%.]+") do
+		if tVariable and type(tVariable) == "table" then
+			tVariable = tVariable[szIndex]
+		else
+			tVariable = nil
+			break
+		end
+	end
+	return tVariable
+end
+MY.GetGlobalValue = MY.Sys.GetGlobalValue
+
 -- 播放声音
 -- MY.Sys.PlaySound(szFilePath[, szCustomPath])
 -- szFilePath   音频文件地址
@@ -186,17 +215,12 @@ MY.Sys.PlaySound = function(szFilePath, szCustomPath)
 	end
 end
 -- 加载注册数据
-MY.RegisterInit(function()
-	for v_name, v_data in pairs(MY.LoadLUAData('config/initial') or {}) do
-		local t = _G
-		local k = MY.String.Split(v_name, '.')
-		for i=1, #k-1 do
-			if type(t[k[i]])=='nil' then
-				t[k[i]] = {}
-			end
-			t = t[k[i]]
+MY.RegisterInit('MYLIB#INITDATA', function()
+	local t = MY.LoadLUAData('config/initial')
+	if t then
+		for v_name, v_data in pairs(t) do
+			MY.SetGlobalValue(v_name, v_data)
 		end
-		t[k[#k]] = v_data
 	end
 end)
 

@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 09:21:13
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-16 20:38:43
+-- @Last Modified time: 2015-05-16 21:34:05
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = {
@@ -147,7 +147,7 @@ _C.OnFrameBreathe = function()
 	_C.nExamPrintRemainSpace = GetClientPlayer().GetExamPrintRemainSpace()
 end
 -- ×¢²áINITÊÂ¼þ
-MY.RegisterInit(function()
+MY.RegisterInit('MY_EXAMTIP', function()
 	MY.BreatheCall(_C.OnFrameBreathe)
 	MY.RegisterEvent("LOOT_ITEM.MY_EXAMTIP",function()
 		local item = GetItem(arg1)

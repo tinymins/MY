@@ -224,5 +224,5 @@ MY_BuffMonitor.ReloadBuffMonitor = function()
         end
     end
 end
-MY.RegisterInit(MY_BuffMonitor.ReloadBuffMonitor)
+MY.RegisterInit('MY_BUFFMONITOR', MY_BuffMonitor.ReloadBuffMonitor)
 MY.RegisterEvent('SKILL_MOUNT_KUNG_FU', MY_BuffMonitor.ReloadBuffMonitor)

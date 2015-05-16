@@ -245,7 +245,7 @@ MYDev_Snaplines.ReloadUI = function()
         ui:item("#Shadow_HoverItemBottom"):size(W, 2)
     end)
 end
-MY.RegisterInit(MYDev_Snaplines.ReloadUI)
+MY.RegisterInit('MYDEV_SNAPLINES', MYDev_Snaplines.ReloadUI)
 
 _Cache.OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)

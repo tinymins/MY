@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-25 12:31:03
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-04-29 16:41:30
+-- @Last Modified time: 2015-05-16 21:32:38
 -----------------------------------------------
 -- #######################################################################################################
 --   * * *         *                 *                     *                   *           *         
@@ -323,8 +323,8 @@ MY_Anmerkungen.SaveConfig = function()
 	MY.Sys.SaveLUAData("config/PLAYER_NOTES/" .. MY.Game.GetServer(), MY_Anmerkungen.tPublicPlayerNotes)
 	MY.Sys.SaveUserData("config/PLAYER_NOTES/", MY_Anmerkungen.tPrivatePlayerNotes)
 end
-MY.RegisterInit(MY_Anmerkungen.LoadConfig)
-MY.RegisterInit(MY_Anmerkungen.ReloadNotePanel)
+MY.RegisterInit('MY_ANMERKUNGEN', MY_Anmerkungen.LoadConfig)
+MY.RegisterInit('MY_ANMERKUNGEN_PLAYERNOTE', MY_Anmerkungen.ReloadNotePanel)
 MY.RegisterPanel( "MY_Anmerkungen_Player_Note", _L["player note"], _L['Target'], "ui/Image/button/ShopButton.UITex|12", {255,255,0,200}, { OnPanelActive = function(wnd)
 	local ui = MY.UI(wnd)
 	local w, h = ui:size()
