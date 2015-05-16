@@ -241,7 +241,7 @@ MY_Recount.DrawUI = function(data)
 	if not data then
 		data = DataDisplay
 	end
-	if not m_frame then
+	if not (m_frame and data) then
 		return
 	end
 
