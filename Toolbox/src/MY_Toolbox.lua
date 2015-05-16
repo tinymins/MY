@@ -4,7 +4,7 @@
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-15 18:19:17
+-- @Last Modified time: 2015-05-16 20:40:04
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = {}
@@ -30,16 +30,16 @@ _C.FriendHeadTip = function(bEnable)
 				end
 			end
 		end
-		MY.RegisterEvent("PLAYER_ENTER_SCENE","MY_FRIEND_TIP",function(event) fnPlayerEnter(arg0) end)
-		MY.RegisterEvent("PLAYER_LEAVE_SCENE","MY_FRIEND_TIP",function(event)
+		MY.RegisterEvent("PLAYER_ENTER_SCENE.MY_FRIEND_TIP",function(event) fnPlayerEnter(arg0) end)
+		MY.RegisterEvent("PLAYER_LEAVE_SCENE.MY_FRIEND_TIP",function(event)
 			frm:find("#MY_FRIEND_TIP"..arg0):remove()
 		end)
 		for _, p in pairs(MY.Player.GetNearPlayer()) do
 			fnPlayerEnter(p.dwID)
 		end
 	else
-		MY.RegisterEvent("PLAYER_ENTER_SCENE","MY_FRIEND_TIP")
-		MY.RegisterEvent("PLAYER_LEAVE_SCENE","MY_FRIEND_TIP")
+		MY.RegisterEvent("PLAYER_ENTER_SCENE.MY_FRIEND_TIP")
+		MY.RegisterEvent("PLAYER_LEAVE_SCENE.MY_FRIEND_TIP")
 		MY.UI("Lowest2/MY_Shadow"):remove()
 	end
 end
@@ -55,7 +55,7 @@ MY_ToolBox.ApplyConfig = function()
 	end
 	
 	-- 试炼之地九宫助手
-	MY.RegisterEvent('OPEN_WINDOW', 'JiugongHelper', function(event)
+	MY.RegisterEvent('OPEN_WINDOW.JIUGONG_HELPER', function(event)
 		if MY.IsShieldedVersion() then
 			return
 		end
@@ -117,7 +117,7 @@ MY_ToolBox.ApplyConfig = function()
 	
 	-- 防止神行CD被吃
 	if MY_ToolBox.bAvoidBlackShenxingCD then
-		MY.RegisterEvent('DO_SKILL_CAST', 'MY_ToolBox_AvoidBlackShenxingCD', function()
+		MY.RegisterEvent('DO_SKILL_CAST.MY_TOOLBOX_AVOIDBLACKSHENXINGCD', function()
 			local dwID, dwSkillID, dwSkillLevel = arg0, arg1, arg2
 			if not(UI_GetClientPlayerID() == dwID and
 			Table_IsSkillFormationCaster(dwSkillID, dwSkillLevel)) then
@@ -136,11 +136,11 @@ MY_ToolBox.ApplyConfig = function()
 			player.StopCurrentAction()
 		end)
 	else
-		MY.RegisterEvent('DO_SKILL_CAST', 'MY_ToolBox_AvoidBlackShenxingCD')
+		MY.RegisterEvent('DO_SKILL_CAST.MY_TOOLBOX_AVOIDBLACKSHENXINGCD')
 	end
 	
 	if MY_ToolBox.bJJCAutoSwitchTalkChannel then
-		MY.RegisterEvent('LOADING_END', 'MY_ToolBox_JJCAutoSwitchTalkChannel', function()
+		MY.RegisterEvent('LOADING_END.MY_TOOLBOX_JJCAUTOSWITCHTALKCHANNEL', function()
 			local bIsBattleField = (GetClientPlayer().GetScene().nType == MAP_TYPE.BATTLE_FIELD)
 			local nChannel, szName = EditBox_GetChannel()
 			if bIsBattleField and (nChannel == PLAYER_TALK_CHANNEL.RAID or nChannel == PLAYER_TALK_CHANNEL.TEAM) then
@@ -151,7 +151,7 @@ MY_ToolBox.ApplyConfig = function()
 			end
 		end)
 	else
-		MY.RegisterEvent('LOADING_END', 'MY_ToolBox_JJCAutoSwitchTalkChannel')
+		MY.RegisterEvent('LOADING_END.MY_TOOLBOX_JJCAUTOSWITCHTALKCHANNEL')
 	end
 end
 MY.RegisterInit(MY_ToolBox.ApplyConfig)

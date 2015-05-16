@@ -232,7 +232,7 @@ MYDev_Snaplines.ReloadUI = function()
           :pos(0, 0):font(MYDev_Snaplines.nTipFont):color(MYDev_Snaplines.rgbTip):multiLine(true)
     end
 
-    MY.RegisterEvent('UI_SCALED', 'MYDev_Snaplines', function()
+    MY.RegisterEvent('UI_SCALED.MYDEV_SNAPLINES', function()
         local W, H = Station.GetClientSize()
         ui:size(W, H)
         ui:item("#Shadow_HoverWndLeft"):size(2, H)
