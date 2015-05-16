@@ -23,8 +23,9 @@ data = {
     
     ['display as per second'  ] = '显示每秒均值',
     ['display effective value'] = '显示有效数值',
-    ['theme'] = '自定风格选择',
-    ['max history'] = '最大历史记录',
+    ['uncount awaytime'       ] = '减掉暂离时间',
+    ['theme'                  ] = '自定风格选择',
+    ['max history'            ] = '最大历史记录',
     
     ['publish limit'] = '发布数量',
     ['top %d'] = '前%d名',
