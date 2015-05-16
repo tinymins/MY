@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-16 21:53:36
+-- @Last Modified time: 2015-05-16 22:30:34
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -165,7 +165,6 @@ local _L = MY.LoadLangPack()
 local _MY = {
 	frame              = nil,
 	hBox               = nil,
-	hRequest           = nil,
 	bLoaded            = false,
 	dwVersion          = _VERSION_,
 	nDebugLevel        = _DEBUG_,
@@ -239,6 +238,9 @@ _MY.Init = function()
 		MY.Debug({_L('Initial function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], 0)
 	end
 	_MY.tInitFun = nil
+	-- 加载主窗体
+	MY.OpenPanel(true, true)
+	MY.ClosePanel(true)
 	-- 显示欢迎信息
 	MY.Sysmsg({_L("%s, welcome to use mingyi plugins!", GetClientPlayer().szName) .. " v" .. MY.GetVersion() .. ' Build ' .. _MY.szBuildDate})
 end
@@ -258,14 +260,13 @@ end
 --     #           #           #                 #     #           #         # #               # #   
 -- ##################################################################################################
 -- close window
-MY.ClosePanel = function(bRealClose, bMute)
-	local frame = MY.GetFrame()
-	if frame then
+MY.ClosePanel = function(bMute, bRealClose)
+	local hFrame = MY.GetFrame()
+	if hFrame then
 		if not bRealClose then
-			frame:Hide()
+			hFrame:Hide()
 		else
-			Wnd.CloseWindow(frame)
-			_MY.frame = nil
+			Wnd.CloseWindow(hFrame)
 		end
 		Wnd.CloseWindow("PopupMenuPanel")
 		if not bMute then
@@ -274,58 +275,106 @@ MY.ClosePanel = function(bRealClose, bMute)
 	end
 	MY.RegisterEsc('MY')
 end
+
 -- open window
 MY.OpenPanel = function(bMute, bNoFocus)
-	local frame = MY.GetFrame()
-	if frame then
-		frame:Show()
-		if not bNoFocus then
-			frame:BringToTop()
-			Station.SetFocusWindow(frame)
+	local hFrame = MY.GetFrame()
+	if not hFrame then
+		hFrame = Wnd.OpenWindow(_MY.szIniFile, "MY")
+		hFrame.intact = true
+		hFrame:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
+		hFrame:CorrectPos()
+		
+		-- update some ui handle
+		_MY.hBox = hFrame:Lookup("", "Box_1")
+		hFrame:Lookup("", "Text_Title"):SetText(_L['mingyi plugins'] .. " v" .. MY.GetVersion() .. ' Build ' .. _MY.szBuildDate)
+		hFrame:Lookup("Wnd_Total", "Handle_DBClick").OnItemLButtonDBClick = function()
+			hFrame:Lookup('CheckBox_Maximize'):ToggleCheck()
 		end
+		-- load bg uitex
+		local szUITexCommon = MY.GetAddonInfo().szUITexCommon
+		for k, v in pairs({
+			['Image_BgLT'] = 9,
+			['Image_BgCT'] = 8,
+			['Image_BgRT'] = 7,
+			['Image_BgT' ] = 6,
+		}) do
+			hFrame:Lookup('', k):FromUITex(szUITexCommon, v)
+		end
+		-- bind close button event
+		MY.UI(hFrame):children("#Btn_Close"):click(function() MY.ClosePanel() end)
+		MY.UI(hFrame):children("#CheckBox_Maximize"):check(function()
+			local ui = MY.UI(hFrame)
+			_MY.anchor = ui:anchor()
+			_MY.w, _MY.h = ui:size()
+			ui:pos(0, 0):onevent('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
+				ui:size(Station.GetClientSize())
+			end):drag(false)
+			MY.ResizePanel(Station.GetClientSize())
+		end, function()
+			MY.ResizePanel(_MY.w, _MY.h)
+			MY.UI(hFrame)
+			  :onevent('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
+			  :drag(true)
+			  :anchor(_MY.anchor)
+		end)
+		-- update author infomation button
+		MY.UI(MY.GetFrame()):children("#Wnd_Total"):children("#Btn_Weibo")
+		  :text(_L['author\'s weibo'])
+		  :click(function()
+		  	MY.UI.OpenInternetExplorer("http://weibo.com/zymah")
+		  end)
+		-- updaet logo image
+		MY.UI(MY.GetFrame()):item('#Image_Icon')
+		  :size(30, 30)
+		  :image(_MY.szUITexCommon, 0)
+		-- update category
+		MY.RedrawCategory()
 	end
-	MY.RegisterEsc('MY', function()
-		return Station.Lookup('Normal/MY') and Station.Lookup('Normal/MY'):IsVisible()
-	end, MY.ClosePanel)
+	hFrame:Show()
+	if not bNoFocus then
+		hFrame:BringToTop()
+		Station.SetFocusWindow(hFrame)
+	end
 	if not bMute then
 		PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 	end
+	MY.RegisterEsc('MY', MY.IsPanelVisible, function() MY.ClosePanel() end)
 end
+
 -- toggle panel
 MY.TogglePanel = function()
-	local frame = MY.GetFrame()
-	if not frame then
-		return nil
-	end
-	if frame:IsVisible() then
+	if MY.IsPanelVisible() then
 		MY.ClosePanel()
 	else
 		MY.OpenPanel()
 	end
 end
+
 -- reopen panel
 MY.ReopenPanel = function()
 	local bVisible = MY.IsPanelVisible()
 	MY.ClosePanel(true, true)
 	MY.OpenPanel(true, true)
 	if not bVisible then
-		MY.ClosePanel(false, true)
+		MY.ClosePanel(true)
 	end
 end
+
 -- resize panel
 MY.ResizePanel = function(nWidth, nHeight)
-	local frame = MY.GetFrame()
-	if not frame then
+	local hFrame = MY.GetFrame()
+	if not hFrame then
 		return
 	end
-	local _w, _h = frame:GetSize()
+	local _w, _h = hFrame:GetSize()
 	nWidth, nHeight = nWidth or _w, nHeight or _h
 	
-	MY.UI(frame):size(nWidth, nHeight)
-	frame:Lookup('', 'Text_Author'):SetRelPos(0, nHeight - 41)
-	frame:Lookup('', 'Text_Author'):SetSize(nWidth - 31, 20)
-	frame:Lookup('', ''):FormatAllItemPos()
-	local hWnd = frame:Lookup('Wnd_Total')
+	MY.UI(hFrame):size(nWidth, nHeight)
+	hFrame:Lookup('', 'Text_Author'):SetRelPos(0, nHeight - 41)
+	hFrame:Lookup('', 'Text_Author'):SetSize(nWidth - 31, 20)
+	hFrame:Lookup('', ''):FormatAllItemPos()
+	local hWnd = hFrame:Lookup('Wnd_Total')
 	local hTotal = hWnd:Lookup('', '')
 	hTotal:SetSize(nWidth, nHeight)
 	hTotal:Lookup('Image_Breaker'):SetSize(6, nHeight - 340)
@@ -346,7 +395,7 @@ MY.ResizePanel = function(nWidth, nHeight)
 	hWnd:Lookup('WndScroll_MainPanel/ScrollBar_MainPanel'):SetRelPos(nWidth - 23, 5)
 	hWnd:Lookup('WndScroll_MainPanel/WndContainer_MainPanel'):SetSize(nWidth - 201, nHeight - 100)
 	hWnd:Lookup('WndScroll_MainPanel/WndContainer_MainPanel', ''):SetSize(nWidth - 201, nHeight - 100)
-	local hWndMainPanel = frame:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel')
+	local hWndMainPanel = hFrame:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel')
 	if hWndMainPanel.OnPanelResize then
 		local res, err = pcall(hWndMainPanel.OnPanelResize, hWndMainPanel)
 		if not res then
@@ -374,10 +423,12 @@ MY.ResizePanel = function(nWidth, nHeight)
 	hWndMainPanel:Lookup('', ''):FormatAllItemPos()
 	hTotal:FormatAllItemPos()
 end
+
 -- if panel visible
 MY.IsPanelVisible = function()
-	return (_MY.frame and _MY.frame:IsVisible())
+	return MY.GetFrame() and MY.GetFrame():IsVisible()
 end
+
 -- if panel visible
 MY.IsPanelOpened = function()
 	return Station.Lookup("Normal/MY")
@@ -386,67 +437,7 @@ end
 -- 获取主窗体句柄
 -- (frame) MY.GetFrame()
 MY.GetFrame = function()
-	if not (_MY.frame and _MY.frame:IsValid()) then
-		_MY.frame = Wnd.OpenWindow(_MY.szIniFile, "MY")
-		_MY.frame.intact = true
-		_MY.frame:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
-		_MY.frame:CorrectPos()
-		
-		-- update some ui handle
-		_MY.hBox = _MY.frame:Lookup("", "Box_1")
-		_MY.hRequest = _MY.frame:Lookup("Page_1")
-		_MY.frame:Lookup("", "Text_Title"):SetText(_L['mingyi plugins'] .. " v" .. MY.GetVersion() .. ' Build ' .. _MY.szBuildDate)
-		_MY.frame:Lookup("Wnd_Total", "Handle_DBClick").OnItemLButtonDBClick = function()
-			_MY.frame:Lookup('CheckBox_Maximize'):ToggleCheck()
-		end
-		-- load bg uitex
-		local szUITexCommon = MY.GetAddonInfo().szUITexCommon
-		for k, v in pairs({
-			['Image_BgLT'] = 9,
-			['Image_BgCT'] = 8,
-			['Image_BgRT'] = 7,
-			['Image_BgT' ] = 6,
-		}) do
-			local h = _MY.frame:Lookup('', k)
-			h:FromUITex(szUITexCommon, v)
-		end
-		-- bind close button event
-		MY.UI(_MY.frame):children("#Btn_Close"):click(function() MY.ClosePanel() end)
-		MY.UI(_MY.frame):children("#CheckBox_Maximize"):check(function()
-			local ui = MY.UI(_MY.frame)
-			_MY.anchor = ui:anchor()
-			_MY.w, _MY.h = ui:size()
-			ui:pos(0, 0):onevent('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
-				ui:size(Station.GetClientSize())
-			end):drag(false)
-			MY.ResizePanel(Station.GetClientSize())
-		end, function()
-			MY.ResizePanel(_MY.w, _MY.h)
-			MY.UI(_MY.frame)
-			  :onevent('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
-			  :drag(true)
-			  :anchor(_MY.anchor)
-		end)
-		-- update author infomation button
-		MY.UI(MY.GetFrame()):children("#Wnd_Total"):children("#Btn_Weibo")
-		  :text(_L['author\'s weibo'])
-		  :click(function()
-		  	MY.UI.OpenInternetExplorer("http://weibo.com/zymah")
-		  end)
-		-- updaet logo image
-		MY.UI(MY.GetFrame()):item('#Image_Icon')
-		  :size(30, 30)
-		  :image(_MY.szUITexCommon, 0)
-		-- update category
-		MY.RedrawCategory()
-		
-		if _MY.nDebugLevel >=3 then
-			_MY.frame:Hide()
-		else
-			_MY.frame:Show()
-		end
-	end
-	return _MY.frame
+	return Station.Lookup('Normal/MY')
 end
 
 -- (string, number) MY.GetVersion()     -- HM的 获取字符串版本号 修改方便拿过来了
