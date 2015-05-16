@@ -140,6 +140,7 @@ MY_Recount = MY_Recount or {}
 MY_Recount.bEnable       = true                 -- 是否启用
 MY_Recount.nCss          = 1                    -- 当前样式表
 MY_Recount.nChannel      = CHANNEL.DPS          -- 当前显示的统计模式
+MY_Recount.bAwayMode     = true                 -- 计算DPS时是否减去暂离时间
 MY_Recount.bShowPerSec   = true                 -- 显示为每秒数据（反之显示总和）
 MY_Recount.bShowEffect   = true                 -- 显示有效伤害/治疗
 MY_Recount.bSaveRecount  = false                -- 退出游戏时保存战斗记录
@@ -151,6 +152,7 @@ MY_Recount.anchor = { x=0, y=-70, s="BOTTOMRIGHT", r="BOTTOMRIGHT" } -- 默认坐标
 RegisterCustomData("MY_Recount.bEnable")
 RegisterCustomData("MY_Recount.nCss")
 RegisterCustomData("MY_Recount.nChannel")
+RegisterCustomData("MY_Recount.bAwayMode")
 RegisterCustomData("MY_Recount.bShowPerSec")
 RegisterCustomData("MY_Recount.bShowEffect")
 RegisterCustomData("MY_Recount.bSaveRecount")
@@ -290,8 +292,14 @@ MY_Recount.UpdateUI = function(data)
 				dwForceID    = data.Forcelist[id] or -1              ,
 				nValue       = rec.nTotal         or  0              ,
 				nEffectValue = rec.nTotalEffect   or  0              ,
-				nTimeCount   = math.max(MY_Recount.Data.GeneFightTime(data, id), 1), -- 删去死亡时间 && 防止计算DPS时除以0
 			}
+			-- 计算战斗时间
+			if MY_Recount.bAwayMode then -- 删去死亡时间 && 防止计算DPS时除以0
+				tRec.nTimeCount = math.max(MY_Recount.Data.GeneFightTime(data, id), 1)
+			else -- 不删去暂离时间
+				tRec.nTimeCount = math.max(nTimeCount, 1)
+			end
+			-- 计算每秒数据
 			if MY_Recount.bShowPerSec then
 				tRec.nValuePS       = tRec.nValue / tRec.nTimeCount
 				tRec.nEffectValuePS = tRec.nEffectValue / tRec.nTimeCount
@@ -946,6 +954,17 @@ MY_Recount.GetMenu = function()
 			bChecked = MY_Recount.bShowEffect,
 			fnAction = function()
 				MY_Recount.bShowEffect = not MY_Recount.bShowEffect
+				MY_Recount.DrawUI()
+			end,
+			fnDisable = function()
+				return not MY_Recount.bEnable
+			end,
+		}, {
+			szOption = _L['uncount awaytime'],
+			bCheck = true,
+			bChecked = MY_Recount.bAwayMode,
+			fnAction = function()
+				MY_Recount.bAwayMode = not MY_Recount.bAwayMode
 				MY_Recount.DrawUI()
 			end,
 			fnDisable = function()
