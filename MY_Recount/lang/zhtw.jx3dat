@@ -23,7 +23,7 @@ data = {
     
     ['display as per second'  ] = '顯示每秒均值',
     ['display effective value'] = '顯示有效數值',
-    ['uncount awaytime'       ] = '減掉暫離時間',
+    ['uncount awaytime'       ] = '除去暫離時間',
     ['theme'                  ] = '自定風格選擇',
     ['max history'            ] = '最大曆史記錄',
     
