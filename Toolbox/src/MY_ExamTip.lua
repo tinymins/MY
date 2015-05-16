@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 09:21:13
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-02-10 14:59:59
+-- @Last Modified time: 2015-05-16 20:38:43
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = {
@@ -149,7 +149,7 @@ end
 -- ×¢²áINITÊÂ¼þ
 MY.RegisterInit(function()
 	MY.BreatheCall(_C.OnFrameBreathe)
-	MY.RegisterEvent("LOOT_ITEM", 'MY_ExamTip',function()
+	MY.RegisterEvent("LOOT_ITEM.MY_EXAMTIP",function()
 		local item = GetItem(arg1)
 		if item and item.nUiId == 65814 then
 			local nExamPrintRemainSpace = _C.nExamPrintRemainSpace

@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-14 17:02:26
+-- @Last Modified time: 2015-05-16 20:36:15
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Focus/lang/")
 local _C = {}
@@ -58,26 +58,26 @@ MY_Focus.Open = function()
 	m_frame:Lookup('', 'Handle_List'):Clear()
 	MY.UI(m_frame):anchor(MY_Focus.anchor)
 	
-	MY.RegisterEvent('UI_SCALED', 'MY_Focus', function()
+	MY.RegisterEvent('UI_SCALED.MY_FOCUS', function()
 		MY.UI(m_frame):anchor(MY_Focus.anchor)
 	end)
 	
-	MY.RegisterEvent('PLAYER_ENTER_SCENE', 'MY_Focus', function()
+	MY.RegisterEvent('PLAYER_ENTER_SCENE.MY_FOCUS', function()
 		MY_Focus.OnObjectEnterScene(TARGET.PLAYER, arg0)
 	end)
-	MY.RegisterEvent('NPC_ENTER_SCENE', 'MY_Focus', function()
+	MY.RegisterEvent('NPC_ENTER_SCENE.MY_FOCUS', function()
 		MY_Focus.OnObjectEnterScene(TARGET.NPC, arg0)
 	end)
-	MY.RegisterEvent('DOODAD_ENTER_SCENE', 'MY_Focus', function()
+	MY.RegisterEvent('DOODAD_ENTER_SCENE.MY_FOCUS', function()
 		MY_Focus.OnObjectEnterScene(TARGET.DOODAD, arg0)
 	end)
-	MY.RegisterEvent('PLAYER_LEAVE_SCENE', 'MY_Focus', function()
+	MY.RegisterEvent('PLAYER_LEAVE_SCENE.MY_FOCUS', function()
 		MY_Focus.OnObjectLeaveScene(TARGET.PLAYER, arg0)
 	end)
-	MY.RegisterEvent('NPC_LEAVE_SCENE', 'MY_Focus', function()
+	MY.RegisterEvent('NPC_LEAVE_SCENE.MY_FOCUS', function()
 		MY_Focus.OnObjectLeaveScene(TARGET.NPC, arg0)
 	end)
-	MY.RegisterEvent('DOODAD_LEAVE_SCENE', 'MY_Focus', function()
+	MY.RegisterEvent('DOODAD_LEAVE_SCENE.MY_FOCUS', function()
 		MY_Focus.OnObjectLeaveScene(TARGET.DOODAD, arg0)
 	end)
 	MY_Focus.ScanNearby()
@@ -85,13 +85,13 @@ end
 
 MY_Focus.Close = function()
 	Wnd.CloseWindow(m_frame)
-	MY.RegisterEvent('UI_SCALED', 'MY_Focus')
-	MY.RegisterEvent('PLAYER_ENTER_SCENE', 'MY_Focus')
-	MY.RegisterEvent('NPC_ENTER_SCENE'   , 'MY_Focus')
-	MY.RegisterEvent('DOODAD_ENTER_SCENE', 'MY_Focus')
-	MY.RegisterEvent('PLAYER_LEAVE_SCENE', 'MY_Focus')
-	MY.RegisterEvent('NPC_LEAVE_SCENE'   , 'MY_Focus')
-	MY.RegisterEvent('DOODAD_LEAVE_SCENE', 'MY_Focus')
+	MY.RegisterEvent(         'UI_SCALED.MY_FOCUS')
+	MY.RegisterEvent('PLAYER_ENTER_SCENE.MY_FOCUS')
+	MY.RegisterEvent(   'NPC_ENTER_SCENE.MY_FOCUS')
+	MY.RegisterEvent('DOODAD_ENTER_SCENE.MY_FOCUS')
+	MY.RegisterEvent('PLAYER_LEAVE_SCENE.MY_FOCUS')
+	MY.RegisterEvent(   'NPC_LEAVE_SCENE.MY_FOCUS')
+	MY.RegisterEvent('DOODAD_LEAVE_SCENE.MY_FOCUS')
 end
 
 -- 获取当前显示的焦点列表
