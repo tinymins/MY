@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-16 21:46:37
+-- @Last Modified time: 2015-05-16 22:15:25
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 MY = MY or {}
@@ -245,10 +245,13 @@ MY.RemoteRequest = function(szUrl, fnSuccess, fnError, nTimeout)
 	if not (type(szUrl) == "string" and type(fnSuccess) == "function") then
 		return
 	end
-	if type(nTimeout)~="number" then
+	if not MY.GetFrame() then
+		MY.Debug({'MY main panel is not exist, remote call cannot start.'}, 'MYRR', 2)
+	end
+	if type(nTimeout) ~= "number" then
 		nTimeout = 10000
 	end
-	if type(fnError)~="function" then
+	if type(fnError) ~= "function" then
 		fnError = function(szUrl, errMsg)
 			MY.Debug({szUrl .. ' - ' .. errMsg}, 'RemoteRequest', 1)
 		end
@@ -496,7 +499,7 @@ _C.GetMainMenu = function()
 		szOption = _L["mingyi plugins"],
 		fnAction = MY.TogglePanel,
 		bCheck = true,
-		bChecked = MY.GetFrame():IsVisible(),
+		bChecked = MY.IsPanelVisible(),
 		
 		szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
 		nFrame = 105, nMouseOverFrame = 106,
