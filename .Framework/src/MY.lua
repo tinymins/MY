@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-15 18:15:52
+-- @Last Modified time: 2015-05-16 20:55:00
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -162,7 +162,8 @@ local _L = MY.LoadLangPack()
 -----------------------------------------------
 -- 私有函数
 -----------------------------------------------
-local _MY = {
+-- local
+ _MY = {
 	frame              = nil,
 	hBox               = nil,
 	hRequest           = nil,
@@ -510,9 +511,16 @@ end
 -- RegisterExit(function fn)            -- 注册
 -- RegisterExit(string id)              -- 注销
 MY.RegisterExit = function(arg1, arg2)
-	MY.RegisterEvent('PLAYER_EXIT_GAME', arg1, arg2)
-	MY.RegisterEvent('GAME_EXIT', arg1, arg2)
-	MY.RegisterEvent('RELOAD_UI_ADDON_BEGIN', arg1, arg2)
+	local szKey, fnAction = ''
+	if type(arg1) == 'string' then
+		szKey = '.' .. arg1
+		fnAction = arg2
+	elseif type(arg1) == 'function' then
+		fnAction = arg1
+	end
+	MY.RegisterEvent('PLAYER_EXIT_GAME' .. szKey, fnAction)
+	MY.RegisterEvent('GAME_EXIT' .. szKey, fnAction)
+	MY.RegisterEvent('RELOAD_UI_ADDON_BEGIN' .. szKey, fnAction)
 end
 
 -- 注册插件重载函数
@@ -520,56 +528,58 @@ end
 -- RegisterReload(function fn)            -- 注册
 -- RegisterReload(string id)              -- 注销
 MY.RegisterReload = function(arg1, arg2)
-	MY.RegisterEvent('RELOAD_UI_ADDON_END', arg1, arg2)
+	local szKey, fnAction = ''
+	if type(arg1) == 'string' then
+		szKey = '.' .. arg1
+		fnAction = arg2
+	elseif type(arg1) == 'function' then
+		fnAction = arg1
+	end
+	MY.RegisterEvent('RELOAD_UI_ADDON_END' .. szKey, fnAction)
 end
 
 -- 注册游戏事件监听
--- -- 注册
--- MY.RegisterEvent( szEventName, szListenerId, fnListener )
--- MY.RegisterEvent( szEventName, fnListener )
--- -- 注销
--- MY.RegisterEvent( szEventName, szListenerId )
--- MY.RegisterEvent( szEventName )
-MY.RegisterEvent = function(szEventName, arg1, arg2)
-	local szListenerId, fnListener
-	-- param check
-	if type(szEventName)~="string" then return end
-	if type(arg1)=="function" then fnListener=arg1 elseif type(arg1)=="string" then szListenerId=arg1 end
-	if type(arg2)=="function" then fnListener=arg2 elseif type(arg2)=="string" then szListenerId=arg2 end
-	if fnListener then -- register event
-		-- 第一次添加注册系统事件
-		if type(_MY.tEvent[szEventName])~="table" then
-			_MY.tEvent[szEventName] = {}
-			RegisterEvent(szEventName, function(...)
-				for i = #_MY.tEvent[szEventName], 1, -1 do
-					local hEvent = _MY.tEvent[szEventName][i]
-					if type(hEvent.fn)=="function" then
-						-- try to run event function
-						local status, err = pcall(hEvent.fn, ...)
-						-- error report
-						if not status then MY.Debug({err}, 'OnEvent#'..szEventName, 2) end
-					else
-						-- remove none function event
-						table.remove(_MY.tEvent[szEventName], i)
-						-- report error
-						MY.Debug({(hEvent.szName or 'id:anonymous')..' is not a function.'}, 'OnEvent#'..szEventName, 2)
-					end
-				end
-			end)
+-- MY.RegisterEvent(szEvent, fnAction) -- 注册
+-- MY.RegisterEvent(szEvent) -- 注销
+-- (string)  szEvent  事件，可在后面加一个点并紧跟一个标识字符串用于防止重复或取消绑定，如 LOADING_END.xxx
+-- (function)fnAction 事件处理函数，arg0 ~ arg9，传入 nil 相当于取消该事件
+--特别注意：当 fnAction 为 nil 并且 szKey 也为 nil 时会取消所有通过本函数注册的事件处理器
+MY.RegisterEvent = function(szEvent, fnAction)
+	local szKey = nil
+	local nPos = StringFindW(szEvent, ".")
+	if nPos then
+		szKey = string.sub(szEvent, nPos + 1)
+		szEvent = string.sub(szEvent, 1, nPos - 1)
+	end
+	if fnAction then
+		if not _MY.tEvent[szEvent] then
+			_MY.tEvent[szEvent] = {}
+			RegisterEvent(szEvent, _MY.EventHandler)
 		end
-		-- 往事件数组中添加
-		table.insert( _MY.tEvent[szEventName], { fn = fnListener, szName = szListenerId } )
-	elseif szListenerId and _MY.tEvent[szEventName] then -- unregister event handle by id
-		for i = #_MY.tEvent[szEventName], 1, -1 do
-			if _MY.tEvent[szEventName][i].szName == szListenerId then
-				table.remove(_MY.tEvent[szEventName], i)
-			end
+		if szKey then
+			_MY.tEvent[szEvent][szKey] = fnAction
+		else
+			table.insert(_MY.tEvent[szEvent], fnAction)
 		end
-	elseif szEventName and _MY.tEvent[szEventName] then -- unregister all event handle
-		_MY.tEvent[szEventName] = {}
+	else
+		if szKey then
+			_MY.tEvent[szEvent][szKey] = nil
+		else
+			_MY.tEvent[szEvent] = {}
+		end
 	end
 end
-
+_MY.EventHandler = function(szEvent, ...)
+	local tEvent = _MY.tEvent[szEvent]
+	if tEvent then
+		for k, v in pairs(tEvent) do
+			local res, err = pcall(v, szEvent, ...)
+			if not res then
+				MY.Debug({err}, 'OnEvent#' .. szEvent .. "." .. k, 2)
+			end
+		end
+	end
+end
 -- ##########################################################################
 --     #           #                 # # # # # # #           #               
 --       #     #   #         # # #         #                 #               

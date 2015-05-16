@@ -168,7 +168,7 @@ MY_Recount.Open = function()
 	m_frame = Wnd.OpenWindow(_C.szIniFile, 'MY_Recount')
 	-- pos
 	MY.UI(m_frame):anchor(MY_Recount.anchor)
-	MY.RegisterEvent('UI_SCALED', 'MY_Recount', function()
+	MY.RegisterEvent('UI_SCALED.MY_RECOUNT', function()
 		MY.UI(m_frame):anchor(MY_Recount.anchor)
 	end)
 	-- draw
@@ -178,7 +178,7 @@ end
 
 MY_Recount.Close = function()
 	Wnd.CloseWindow(m_frame)
-	MY.RegisterEvent('UI_SCALED', 'MY_Recount')
+	MY.RegisterEvent('UI_SCALED.MY_RECOUNT')
 end
 
 MY.RegisterInit(function()

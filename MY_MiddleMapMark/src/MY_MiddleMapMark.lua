@@ -5,7 +5,7 @@
 -- @Date  : 2014-12-04 11:51:31
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-04-29 16:39:00
+-- @Last Modified time: 2015-05-16 20:37:10
 -----------------------------------------------
 MY_MiddleMapMark = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_MiddleMapMark/lang/")
@@ -753,7 +753,7 @@ _C.DoodadTpl = {
 }
 local m_nLastRedrawFrame = GetLogicFrameCount()
 local MARK_RENDER_INTERVAL = GLOBAL.GAME_FPS * 5
-MY.RegisterEvent("NPC_ENTER_SCENE",    "MY_MiddleMapMark", function()
+MY.RegisterEvent("NPC_ENTER_SCENE.MY_MIDDLEMAPMARK", function()
 	local npc = GetNpc(arg0)
 	local player = GetClientPlayer()
 	if not (npc and player) then
@@ -802,7 +802,7 @@ MY.RegisterEvent("NPC_ENTER_SCENE",    "MY_MiddleMapMark", function()
 	end
 	_Cache.tMapDataChanged[dwMapID] = true
 end)
-MY.RegisterEvent("DOODAD_ENTER_SCENE", "MY_MiddleMapMark", function()
+MY.RegisterEvent("DOODAD_ENTER_SCENE.MY_MIDDLEMAPMARK", function()
 	local doodad = GetDoodad(arg0)
 	local player = GetClientPlayer()
 	if not (doodad and player) then

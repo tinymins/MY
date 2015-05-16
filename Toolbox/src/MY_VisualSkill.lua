@@ -4,7 +4,7 @@
 -- @Date  : 2015-03-02 10:08:45
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-05 19:47:01
+-- @Last Modified time: 2015-05-16 20:40:31
 --------------------------------------------
 -- ##########################################################################################################################
 --       *         *   *                   *                                   *                           *     *           
@@ -34,7 +34,7 @@ MY_VisualSkill.Reload = function()
 	-- distory ui
 	MY.UI("Normal/MY_VisualSkill"):remove()
 	-- unbind event
-	MY.RegisterEvent("DO_SKILL_CAST", "MY_VisualSkillCast")
+	MY.RegisterEvent("DO_SKILL_CAST.MY_VisualSkillCast")
 	-- create new   
 	if MY_VisualSkill.bEnable then
 		-- create ui
@@ -67,7 +67,7 @@ MY_VisualSkill.Reload = function()
 		end
 		-- init data and bind event
 		_C.nVisualSkillBoxIndex = 0
-		MY.RegisterEvent("DO_SKILL_CAST", "MY_VisualSkillCast", function()
+		MY.RegisterEvent("DO_SKILL_CAST.MY_VisualSkillCast", function()
 			local dwID, dwSkillID, dwSkillLevel = arg0, arg1, arg2
 			if dwID == GetClientPlayer().dwID then
 				MY_VisualSkill.OnSkillCast(dwSkillID, dwSkillLevel)
