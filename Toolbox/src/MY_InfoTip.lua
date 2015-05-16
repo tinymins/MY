@@ -184,7 +184,7 @@ MY_InfoTip.Reload = function()
     SaveConfig()
 end
 -- ×¢²áINITÊÂ¼þ
-MY.RegisterInit(function()
+MY.RegisterInit("MY_INFOTIP", function()
     LoadConfig()
     MY_InfoTip.Reload()
 end)

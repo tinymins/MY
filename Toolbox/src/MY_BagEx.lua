@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-25 10:40:14
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-02 14:31:55
+-- @Last Modified time: 2015-05-16 21:33:37
 -----------------------------------------------
 MY_BagEx = {}
 MY_BagEx.bEnable = true
@@ -324,4 +324,4 @@ MY.RegisterEvent("BAG_ITEM_UPDATE", function()
 	_C.OnBagItemUpdate()
 	MY.DelayCall('MY_BagEx', _C.OnBagItemUpdate, 100)
 end)
-MY.RegisterInit(function() MY.BreatheCall(_C.OnBreathe, 130) end)
+MY.RegisterInit('MY_BAGEX', function() MY.BreatheCall(_C.OnBreathe, 130) end)

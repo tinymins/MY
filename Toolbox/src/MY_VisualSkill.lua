@@ -4,7 +4,7 @@
 -- @Date  : 2015-03-02 10:08:45
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-16 20:40:31
+-- @Last Modified time: 2015-05-16 21:34:45
 --------------------------------------------
 -- ##########################################################################################################################
 --       *         *   *                   *                                   *                           *     *           
@@ -191,4 +191,4 @@ MY_VisualSkill.OnSkillCast = function(dwSkillID, dwSkillLevel)
 	-- update index
 	_C.nVisualSkillBoxIndex = ( _C.nVisualSkillBoxIndex + 1 ) % (MY_VisualSkill.nVisualSkillBoxCount + 1)
 end
-MY.RegisterInit(MY_VisualSkill.Reload)
+MY.RegisterInit('MY_VISUALSKILL', MY_VisualSkill.Reload)

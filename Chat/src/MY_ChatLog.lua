@@ -64,7 +64,7 @@ function _C.OnFriendMsg(szMsg, nFont, bRich, r, g, b)
 	_C.OnMsg(szMsg, 'MSG_FRIEND', nFont, bRich, r, g, b)
 end
 
-MY.RegisterInit(function()
+MY.RegisterInit('MY_CHATLOG', function()
 	Log = MY.LoadUserData('cache/CHAT_LOG/') or {}
 	if type(Log) == 'string' then
 		Log = MY.Json.Decode(Log) or {}
