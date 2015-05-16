@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-16 20:55:00
+-- @Last Modified time: 2015-05-16 21:04:30
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -162,8 +162,7 @@ local _L = MY.LoadLangPack()
 -----------------------------------------------
 -- 私有函数
 -----------------------------------------------
--- local
- _MY = {
+local _MY = {
 	frame              = nil,
 	hBox               = nil,
 	hRequest           = nil,
@@ -228,21 +227,18 @@ _MY.Init = function()
 	if _MY.bLoaded then
 		return
 	end
-	-- var
 	_MY.bLoaded = true
 	-- init functions
-	for i, p in ipairs(_MY.tInitFun) do
+	for szKey, fnAction in pairs(_MY.tInitFun) do
 		local nStartTick = GetTickCount()
-		local status, err = pcall(p.fn)
+		local status, err = pcall(fnAction)
 		if not status then
-			MY.Debug({err}, "_MY.tInitFun#"..i)
+			MY.Debug({err}, "_MY.tInitFun#" .. szKey)
 		end
 		-- performance monitor
-		MY.Debug({_L('%s initiated in %dms.', p.id or 'anonymous function', GetTickCount() - nStartTick)}, _L['PMTool'], 0)
+		MY.Debug({_L('Function %s initiated in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], 0)
 	end
-	-- 释放资源
-	_MY.tInitFun = {}
-
+	_MY.tInitFun = nil
 	-- 显示欢迎信息
 	MY.Sysmsg({_L("%s, welcome to use mingyi plugins!", GetClientPlayer().szName) .. " v" .. MY.GetVersion() .. ' Build ' .. _MY.szBuildDate})
 end
@@ -482,27 +478,21 @@ end
 -- RegisterInit(function fn)            -- 注册
 -- RegisterInit(string id)              -- 注销
 MY.RegisterInit = function(arg1, arg2)
-	local id, fn
-	if type(arg1)=='function' then fn = arg1 end
-	if type(arg1)=='string'   then id = arg1 end
-	if type(arg2)=='function' then fn = arg1 end
-	if type(arg2)=='string'   then id = arg1 end
-	if fn then
-		if id then
-			for i = #_MY.tInitFun, 1, -1 do
-				if _MY.tInitFun[i].id == id then
-					_MY.tInitFun[i] = { id = id, fn = fn }
-					return nil
-				end
-			end
+	local szKey, fnAction
+	if type(arg1) == 'string' then
+		szKey = arg1
+		fnAction = arg2
+	elseif type(arg1) == 'function' then
+		fnAction = arg1
+	end
+	if fnAction then
+		if szKey then
+			_MY.tInitFun[szKey] = fnAction
+		else
+			table.insert(_MY.tInitFun, fnAction)
 		end
-		table.insert(_MY.tInitFun, { id = id, fn = fn })
-	elseif id then
-		for i = #_MY.tInitFun, 1, -1 do
-			if _MY.tInitFun[i].id == id then
-				table.remove(_MY.tInitFun, i)
-			end
-		end
+	elseif szKey then
+		_MY.tInitFun[szKey] = nil
 	end
 end
 
