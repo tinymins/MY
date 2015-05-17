@@ -58,13 +58,10 @@ setmetatable(_MY_Farbnamen.tCampString,  { __index = function(t, k) return k end
 -- 聊天复制和时间显示相关
 ---------------------------------------------------------------
 -- 插入聊天内容的 HOOK （过滤、加入时间 ）
-MY.Chat.HookChatPanel(function(h, szMsg)
-    if not MY_Farbnamen.bEnabled then
-        return nil
+MY.HookChatPanel(function(h, szChannel, szMsg)
+    if MY_Farbnamen.bEnabled then
+        return MY_Farbnamen.Render(szMsg)
     end
-    szMsg = MY_Farbnamen.Render(szMsg)
-    
-    return szMsg
 end)
 -- 开放的名称染色接口
 -- (userdata) MY_Farbnamen.Render(userdata namelink)    处理namelink染色 namelink是一个姓名Text元素
