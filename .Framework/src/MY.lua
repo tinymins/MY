@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-16 22:30:34
+-- @Last Modified time: 2015-05-17 11:26:22
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -198,19 +198,18 @@ local _MY = {
 	tEvent = {},        -- 游戏事件绑定
 	tInitFun = {},      -- 初始化函数
 }
-MY.GetAddonInfo = function()
-	local t = {}
-	t.szName          = _MY.szName
-	t.szShortName     = _MY.szShortName
-	t.szUITexCommon   = _MY.szUITexCommon
-	t.szUITexPoster   = _MY.szUITexPoster
-	t.dwVersion       = _VERSION_
-	t.szBuildDate     = _BUILD_
-	t.nDebugLevel     = _DEBUG_
-	t.szRoot          = _ADDON_ROOT_
-	t.szFrameworkRoot = _FRAMEWORK_ROOT_
-	t.szAuthor        = _L['MingYi @ Double Dream Town']
-	t.tAuthor         = {
+_MY.tAddonInfo = SetmetaReadonly({
+	szName          = _MY.szName                      ,
+	szShortName     = _MY.szShortName                 ,
+	szUITexCommon   = _MY.szUITexCommon               ,
+	szUITexPoster   = _MY.szUITexPoster               ,
+	dwVersion       = _VERSION_                       ,
+	szBuildDate     = _BUILD_                         ,
+	nDebugLevel     = _DEBUG_                         ,
+	szRoot          = _ADDON_ROOT_                    ,
+	szFrameworkRoot = _FRAMEWORK_ROOT_                ,
+	szAuthor        = _L['MingYi @ Double Dream Town'],
+	tAuthor         = {
 		[43567  ] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 体服
 		[3007396] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 枫泾古镇
 		[1600498] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 追风蹑影
@@ -219,8 +218,10 @@ MY.GetAddonInfo = function()
 		[3627405] = string.char( 0xC1, 0xFA, 0xB5, 0xA8, 0xC9, 0xDF, 0x40, 0xDD, 0xB6, 0xBB, 0xA8, 0xB9, 0xAC ), -- 白帝
 		-- [4662931] = string.char( 0xBE, 0xCD, 0xCA, 0xC7, 0xB8, 0xF6, 0xD5, 0xF3, 0xD1, 0xDB ), -- 日月明尊
 		-- [3438030] = string.char( 0xB4, 0xE5, 0xBF, 0xDA, 0xB5, 0xC4, 0xCD, 0xF5, 0xCA, 0xA6, 0xB8, 0xB5 ), -- 枫泾古镇
-	}
-	return t
+	},
+})
+MY.GetAddonInfo = function()
+	return _MY.tAddonInfo
 end
 _MY.Init = function()
 	if _MY.bLoaded then

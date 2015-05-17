@@ -150,14 +150,6 @@ MY_Farbnamen.ShowTip = function(namelink)
             _MY_Farbnamen.tRoleType[tInfo.nRoleType]    .. _L.STR_SPLIT_DOT ..
             _MY_Farbnamen.tCampString[tInfo.nCamp]
         )
-        
-        local bAuthor = false
-        for i, v in pairs(MY.GetAddonInfo().tAuthor) do
-            if tInfo.dwID == i and tInfo.szName == v then
-                bAuthor = true
-                break
-            end
-        end
 
         if MY_Anmerkungen then
             local tPlayerNote = MY_Anmerkungen.GetPlayerNote(tInfo.dwID)
@@ -167,7 +159,7 @@ MY_Farbnamen.ShowTip = function(namelink)
         end
 
         local szTip
-        if bAuthor then
+        if tInfo.dwID and tInfo.szName and tInfo.szName == MY.GetAddonInfo().tAuthor[tInfo.dwID] then
             szTip = GetFormatText(_L['[mingyi plugins]'], 11, 0, 255, 0)
                  .. GetFormatText(' ', 136)
                  .. GetFormatText(_L['author']..'\n', 230, 0, 255, 0)
