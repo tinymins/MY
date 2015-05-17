@@ -85,7 +85,7 @@ MY.RegisterPanel("TalkEx", _L["talk ex"], _L['Chat'], "UI/Image/UICommon/Science
         if MY_TalkEx.szTalk==s.."()" and IsAltKeyDown() and IsShiftKeyDown() then pcall(_G[s]) return nil end
         _MY_TalkEx.Talk()
       end, function()
-        MY.Talk(nil, MY_TalkEx.szTalk, nil, nil, true)
+        MY.Talk(nil, MY_TalkEx.szTalk, nil, nil, nil, true)
       end)
     -------------------------------------
     -- µ÷Ù©²¿·Ö
