@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-17 22:03:24
+-- @Last Modified time: 2015-05-17 22:38:02
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -678,7 +678,10 @@ MY.Chat.Talk = function(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToC
 		or tSay[1].type ~= "eventlink" then
 			table.insert(tSay, 1, {
 				type = "eventlink", name = "",
-				linkinfo = MY.Json.Encode({uuid = tostring(szUUID)})
+				linkinfo = MY.Json.Encode({
+					via = "MY",
+					uuid = tostring(szUUID),
+				})
 			})
 		end
 		me.Talk(nChannel, szTarget, tSay)
