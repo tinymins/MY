@@ -32,7 +32,6 @@ MY.HookChatPanel("MY_ChatFilter", function(h, szChannel, szMsg)
 		else
 			for i, szRecord in ipairs(h.MY_tDuplicateLog) do
 				if szRecord == szText then
-					Log('szRecord' .. szRecord)
 					return ''
 				end
 			end
