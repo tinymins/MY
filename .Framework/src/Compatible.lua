@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-07 14:29:33
+-- @Last Modified time: 2015-05-17 10:34:19
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 if not GetCampImageFrame then
@@ -34,6 +34,20 @@ if not GetCampImage then
 			return 'ui\\Image\\UICommon\\CommonPanel2.UITex', nFrame
 		end
 	end
+end
+
+if not SetmetaReadonly then
+function SetmetaReadonly(t)
+	for k, v in pairs(t) do
+		if type(v) == 'table' then
+			t[k] = SetmetaReadonly(v)
+		end
+	end
+	return setmetatable({}, {
+		__index    = t,
+		__newindex = function() assert(false, 'table is readonly\n') end,
+	})
+end
 end
 
 if not clone then
