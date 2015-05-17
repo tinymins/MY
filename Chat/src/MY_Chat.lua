@@ -421,7 +421,7 @@ MY.RegisterInit('MY_CHAT', function()
 end)
 
 -- hook chat panel
-MY.HookChatPanel("MY_Chat", function(h, szMsg)
+MY.HookChatPanel("MY_Chat", function(h, szChannel, szMsg)
 	-- icon filter
 	if MY_Chat.bReplaceIcon then
 		szMsg = string.gsub(szMsg, '<animate>(.-)path="(.-)"(.-)group=(%d+)(.-)</animate>', function (e1, path, e2, group, e3)
@@ -460,7 +460,7 @@ MY.HookChatPanel("MY_Chat", function(h, szMsg)
 	end
 	
 	return szMsg, h:GetItemCount()
-end, function(h, szMsg, szChannel, i)
+end, function(h, szChannel, szMsg, i)
 	if szMsg and #(GetPureText(szMsg)) > 0 and (MY_Chat.bChatTime or MY_Chat.bChatCopy) and i then
 		-- chat time
 		-- get msg rgb
