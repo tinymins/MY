@@ -38,4 +38,9 @@ data = {
     ['hide system msg copy'] = '不複制系統消息',
     
     ['Mingyi Plugins - Chatpanel\nThis plugin is developed by Zhai YiMing @ derzh.com.'] = '[茗伊插件集] - 聊天輔助\n------------\n√該插件由翟一鳴小朋宇獨立開發完成。\n√有問題請聯系：茗伊@雙夢鎮@光明頂@荻花宮@體服',
+    
+    ['duplicate chat filter'                ] = '刷屏屏蔽',
+    ['filter duplicate chat'                ] = '開啓刷屏屏蔽（相同聊天內容只顯示第一條）',
+    ['filter duplicate chat ignore id'      ] = '刷屏屏蔽不同玩家發送的相同聊天內容也屏蔽',
+    ['only filter continuous duplicate chat'] = '刷屏屏蔽只屏蔽連續發送的刷屏聊天記錄',
 }
