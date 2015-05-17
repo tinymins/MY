@@ -159,7 +159,7 @@ MY_AutoHideChat.ApplyConfig = function()
             _Cache.bAhAnimate = _Cache.bAhAnimate or false
         end
         -- hook chat panel as event listener
-        MY.Chat.HookChatPanel('MY_AutoHideChat', function() end,function(h, szMsg)
+        MY.Chat.HookChatPanel('MY_AutoHideChat', function() end,function(h, szChannel, szMsg)
             -- if szMsg is empty (means nothing appended) then return
             if not (szMsg and #szMsg > 0) then
                 return
