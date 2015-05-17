@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-15 18:16:17
+-- @Last Modified time: 2015-05-17 18:22:29
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -755,7 +755,7 @@ _C.HookChatPanelHandle = function(h, szMsg, szChannel)
 	-- deal with fnBefore
 	for i,handle in ipairs(_C.tHookChatFun) do
 		-- try to execute fnBefore and get return values
-		local result = { pcall(handle.fnBefore, h, szMsg, szChannel) }
+		local result = { pcall(handle.fnBefore, h, szChannel, szMsg) }
 		-- when fnBefore execute succeed
 		if result[1] then
 			-- remove execute status flag
@@ -773,7 +773,7 @@ _C.HookChatPanelHandle = function(h, szMsg, szChannel)
 	h:_AppendItemFromString_MY(szMsg, szChannel)
 	-- deal with fnAfter
 	for i, handle in ipairs(_C.tHookChatFun) do
-		pcall(handle.fnAfter, h, szMsg, szChannel, unpack(handle.param))
+		pcall(handle.fnAfter, h, szChannel, szMsg, unpack(handle.param))
 	end
 end
 
