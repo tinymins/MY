@@ -1224,6 +1224,7 @@ MY_Recount.GetPublishMenu = function()
 					_L['fight recount'] .. ' - ' ..
 					frame:Lookup('Wnd_Title', 'Text_Title'):GetText() ..
 					((DataDisplay.szBossName and ' - ' .. DataDisplay.szBossName) or ''),
+					nil,
 					true
 				)
 				MY.Talk(nChannel, '------------------------')
@@ -1261,7 +1262,7 @@ MY_Recount.GetPublishMenu = function()
 						)
 					end
 					
-					MY.Talk(nChannel, szText, p.id == p.szName)
+					MY.Talk(nChannel, szText, nil, p.id == p.szName)
 				end
 				
 				MY.Talk(nChannel, '------------------------')

@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-17 18:22:29
+-- @Last Modified time: 2015-05-17 22:03:24
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -144,7 +144,9 @@ MY.Chat.CopyChatLine = function(hTime)
 				elseif szName =="designationlink" then
 					edit:InsertObj(szText, { type = "designation", text = szText, id = p.dwID, prefix = p.bPrefix })
 				elseif szName =="eventlink" then
-					edit:InsertObj(szText, { type = "eventlink", text = szText, name = p.szName, linkinfo = p.szLinkInfo })
+					if szText and #szText > 0 then -- 过滤插件消息
+						edit:InsertObj(szText, { type = "eventlink", text = szText, name = p.szName, linkinfo = p.szLinkInfo })
+					end
 				else
 					-- NPC 喊话特殊处理
 					if bBegin == nil then
@@ -608,7 +610,7 @@ end
 -- bSaveDeny      -- *可选* 在聊天输入栏保留不可发言的频道内容，默认为 false
 -- bPushToChatBox -- *可选* 仅推送到聊天框，默认为 false
 -- 特别注意：nChannel, szText 两者的参数顺序可以调换，战场/团队聊天频道智能切换
-MY.Chat.Talk = function(nChannel, szText, bNoEscape, bSaveDeny, bPushToChatBox)
+MY.Chat.Talk = function(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox)
 	local szTarget, me = "", GetClientPlayer()
 	-- channel
 	if not nChannel then
@@ -671,6 +673,14 @@ MY.Chat.Talk = function(nChannel, szText, bNoEscape, bSaveDeny, bPushToChatBox)
 		-- set focus
 		Station.SetFocusWindow(edit)
 	else
+		if not tSay[1]
+		or tSay[1].name ~= ""
+		or tSay[1].type ~= "eventlink" then
+			table.insert(tSay, 1, {
+				type = "eventlink", name = "",
+				linkinfo = MY.Json.Encode({uuid = tostring(szUUID)})
+			})
+		end
 		me.Talk(nChannel, szTarget, tSay)
 	end
 end
