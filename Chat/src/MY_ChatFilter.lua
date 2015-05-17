@@ -37,10 +37,12 @@ MY.HookChatPanel("MY_ChatFilter", function(h, szChannel, szMsg)
 				end
 			end
 			table.insert(h.MY_tDuplicateLog, 1, szText)
-		end
-		-- ²åÈë¼ÇÂ¼
-		for i = #h.MY_tDuplicateLog, MAX_CHAT_RECORD - 1 do
-			table.remove(h.MY_tDuplicateLog)
+			local nCount = #h.MY_tDuplicateLog - MAX_CHAT_RECORD
+			if nCount > 0 then
+				for i = nCount, 1, -1 do
+					table.remove(h.MY_tDuplicateLog)
+				end
+			end
 		end
 	end
 end)
