@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-16 22:15:25
+-- @Last Modified time: 2015-05-17 11:46:56
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 MY = MY or {}
@@ -245,9 +245,6 @@ MY.RemoteRequest = function(szUrl, fnSuccess, fnError, nTimeout)
 	if not (type(szUrl) == "string" and type(fnSuccess) == "function") then
 		return
 	end
-	if not MY.GetFrame() then
-		MY.Debug({'MY main panel is not exist, remote call cannot start.'}, 'MYRR', 2)
-	end
 	if type(nTimeout) ~= "number" then
 		nTimeout = 10000
 	end
@@ -257,10 +254,11 @@ MY.RemoteRequest = function(szUrl, fnSuccess, fnError, nTimeout)
 		end
 	end
 	
-	-- append new page
+	-- create page
 	local RequestID = ("%X_%X"):format(GetTickCount(), math.floor(math.random() * 65536))
-	local uiPages = MY.UI(MY.GetFrame()):children('#Wnd_Pages')
-	local hPage = uiPages:append('WndWebPage', 'WndWebPage_' .. RequestID):children('#' .. 'WndWebPage_' .. RequestID):raw(1)
+	local hFrame = Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. 'ui/WndWebPage.ini', "MYRR_" .. RequestID)
+	local hPage = hFrame:Lookup('WndWebPage')
+	hFrame:Hide()
 	
 	-- bind callback function
 	hPage.OnDocumentComplete = function()
@@ -274,7 +272,7 @@ MY.RemoteRequest = function(szUrl, fnSuccess, fnError, nTimeout)
 			if not status then
 				MY.Debug({err}, 'MYRR::OnDocumentComplete::Callback', 3)
 			end
-			hPage:Destroy()
+			Wnd.CloseWindow(hFrame)
 		end
 	end
 	
@@ -288,13 +286,11 @@ MY.RemoteRequest = function(szUrl, fnSuccess, fnError, nTimeout)
 		if not status then
 			MY.Debug({err}, 'MYRR::TIMEOUT', 3)
 		end
-		hPage:Destroy()
+		Wnd.CloseWindow(hFrame)
 	end, nTimeout, "MYRR_TO_" .. RequestID)
 	
 	-- start ie navigate
-	local WndFocus = Station.GetFocusWindow()
 	hPage:Navigate(szUrl)
-	Station.SetFocusWindow(WndFocus)
 end
 
 -- Breathe Call & Delay Call
