@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-17 22:38:02
+-- @Last Modified time: 2015-05-17 22:47:19
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -680,7 +680,7 @@ MY.Chat.Talk = function(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToC
 				type = "eventlink", name = "",
 				linkinfo = MY.Json.Encode({
 					via = "MY",
-					uuid = tostring(szUUID),
+					uuid = szUUID and tostring(szUUID),
 				})
 			})
 		end
