@@ -2,7 +2,7 @@ MY_ChatFilter = {}
 local _C = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Chat/lang/")
 local MY_ChatFilter = MY_ChatFilter
-local MAX_CHAT_RECORD = 20
+local MAX_CHAT_RECORD = 10
 MY_ChatFilter.bFilterDuplicate           = true   -- 屏蔽重复聊天
 MY_ChatFilter.bFilterDuplicateIgnoreID   = false  -- 不同玩家重复聊天也屏蔽
 MY_ChatFilter.bFilterDuplicateContinuous = true   -- 仅屏蔽连续的重复聊天
@@ -28,6 +28,7 @@ MY.HookChatPanel("MY_ChatFilter", function(h, szChannel, szMsg)
 			if h.MY_tDuplicateLog[1] == szText then
 				return ''
 			end
+			h.MY_tDuplicateLog[1] = szText
 		else
 			for i, szRecord in ipairs(h.MY_tDuplicateLog) do
 				if szRecord == szText then
@@ -35,12 +36,12 @@ MY.HookChatPanel("MY_ChatFilter", function(h, szChannel, szMsg)
 					return ''
 				end
 			end
+			table.insert(h.MY_tDuplicateLog, 1, szText)
 		end
 		-- 插入记录
-		for i = #h.MY_tDuplicateLog, MAX_CHAT_RECORD - 2 do
+		for i = #h.MY_tDuplicateLog, MAX_CHAT_RECORD - 1 do
 			table.remove(h.MY_tDuplicateLog)
 		end
-		table.insert(h.MY_tDuplicateLog, 1, szText)
 	end
 end)
 
