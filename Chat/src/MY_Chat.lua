@@ -54,17 +54,17 @@ MY_Chat.tChannel = {
 -- register settings
 RegisterCustomData("MY_Chat.anchor")
 RegisterCustomData("MY_Chat.bDisplayPanel")
-RegisterCustomData("Account\\MY_Chat.bLockPostion")
-RegisterCustomData("Account\\MY_Chat.bEnableBalloon")
-RegisterCustomData("Account\\MY_Chat.bChatCopy")
-RegisterCustomData("Account\\MY_Chat.bBlockWords")
-RegisterCustomData("Account\\MY_Chat.bChatTime")
-RegisterCustomData("Account\\MY_Chat.nChatTime")
-RegisterCustomData("Account\\MY_Chat.bChatCopyAlwaysShowMask")
-RegisterCustomData("Account\\MY_Chat.bChatCopyAlwaysWhite")
-RegisterCustomData("Account\\MY_Chat.bChatCopyNoCopySysmsg")
-RegisterCustomData("Account\\MY_Chat.bReplaceIcon")
-for k, _ in pairs(MY_Chat.tChannel) do RegisterCustomData("Account\\MY_Chat.tChannel."..k) end
+RegisterCustomData("MY_Chat.bLockPostion")
+RegisterCustomData("MY_Chat.bEnableBalloon")
+RegisterCustomData("MY_Chat.bChatCopy")
+RegisterCustomData("MY_Chat.bBlockWords")
+RegisterCustomData("MY_Chat.bChatTime")
+RegisterCustomData("MY_Chat.nChatTime")
+RegisterCustomData("MY_Chat.bChatCopyAlwaysShowMask")
+RegisterCustomData("MY_Chat.bChatCopyAlwaysWhite")
+RegisterCustomData("MY_Chat.bChatCopyNoCopySysmsg")
+RegisterCustomData("MY_Chat.bReplaceIcon")
+for k, _ in pairs(MY_Chat.tChannel) do RegisterCustomData("MY_Chat.tChannel."..k) end
 
 MY_Chat.OnFrameDragEnd = function() this:CorrectPos() MY_Chat.anchor = GetFrameAnchor(this) end
 
