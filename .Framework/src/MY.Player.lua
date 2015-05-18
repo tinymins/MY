@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-18 15:18:50
+-- @Last Modified time: 2015-05-18 15:40:10
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -12,7 +12,7 @@
 --------------------------------------------
 MY = MY or {}
 MY.Player = MY.Player or {}
-local _Cache, _L = {}, MY.LoadLangPack()
+local _C, _L = {}, MY.LoadLangPack()
 
 -- #######################################################################################################
 --               #     #       #             # #                         #             #             
@@ -28,18 +28,18 @@ local _Cache, _L = {}, MY.LoadLangPack()
 --   #         #       #       #   #                     #               #   # #   #   #     #       
 --   #         #     # #     #       # # # # # # #     #             # # #         # #         # #  
 -- #######################################################################################################
-_Cache.tNearNpc = {}      -- 附近的NPC
-_Cache.tNearPlayer = {}   -- 附近的物品
-_Cache.tNearDoodad = {}   -- 附近的玩家
+_C.tNearNpc = {}      -- 附近的NPC
+_C.tNearPlayer = {}   -- 附近的物品
+_C.tNearDoodad = {}   -- 附近的玩家
 
 -- 获取附近NPC列表
 -- (table) MY.GetNearNpc(void)
 MY.Player.GetNearNpc = function(nLimit)
 	local tNpc, i = {}, 0
-	for dwID, _ in pairs(_Cache.tNearNpc) do
+	for dwID, _ in pairs(_C.tNearNpc) do
 		local npc = GetNpc(dwID)
 		if not npc then
-			_Cache.tNearNpc[dwID] = nil
+			_C.tNearNpc[dwID] = nil
 		else
 			i = i + 1
 			if npc.szName=="" then
@@ -57,10 +57,10 @@ MY.GetNearNpc = MY.Player.GetNearNpc
 -- (table) MY.GetNearPlayer(void)
 MY.Player.GetNearPlayer = function(nLimit)
 	local tPlayer, i = {}, 0
-	for dwID, _ in pairs(_Cache.tNearPlayer) do
+	for dwID, _ in pairs(_C.tNearPlayer) do
 		local player = GetPlayer(dwID)
 		if not player then
-			_Cache.tNearPlayer[dwID] = nil
+			_C.tNearPlayer[dwID] = nil
 		else
 			i = i + 1
 			tPlayer[dwID] = player
@@ -75,10 +75,10 @@ MY.GetNearPlayer = MY.Player.GetNearPlayer
 -- (table) MY.GetNearPlayer(void)
 MY.Player.GetNearDoodad = function(nLimit)
 	local tDoodad, i = {}, 0
-	for dwID, _ in pairs(_Cache.tNearDoodad) do
+	for dwID, _ in pairs(_C.tNearDoodad) do
 		local dooded = GetDoodad(dwID)
 		if not dooded then
-			_Cache.tNearDoodad[dwID] = nil
+			_C.tNearDoodad[dwID] = nil
 		else
 			i = i + 1
 			tDoodad[dwID] = dooded
@@ -89,12 +89,12 @@ MY.Player.GetNearDoodad = function(nLimit)
 end
 MY.GetNearDoodad = MY.Player.GetNearDoodad
 
-RegisterEvent("NPC_ENTER_SCENE",    function() _Cache.tNearNpc[arg0]    = true end)
-RegisterEvent("NPC_LEAVE_SCENE",    function() _Cache.tNearNpc[arg0]    = nil  end)
-RegisterEvent("PLAYER_ENTER_SCENE", function() _Cache.tNearPlayer[arg0] = true end)
-RegisterEvent("PLAYER_LEAVE_SCENE", function() _Cache.tNearPlayer[arg0] = nil  end)
-RegisterEvent("DOODAD_ENTER_SCENE", function() _Cache.tNearDoodad[arg0] = true end)
-RegisterEvent("DOODAD_LEAVE_SCENE", function() _Cache.tNearDoodad[arg0] = nil  end)
+RegisterEvent("NPC_ENTER_SCENE",    function() _C.tNearNpc[arg0]    = true end)
+RegisterEvent("NPC_LEAVE_SCENE",    function() _C.tNearNpc[arg0]    = nil  end)
+RegisterEvent("PLAYER_ENTER_SCENE", function() _C.tNearPlayer[arg0] = true end)
+RegisterEvent("PLAYER_LEAVE_SCENE", function() _C.tNearPlayer[arg0] = nil  end)
+RegisterEvent("DOODAD_ENTER_SCENE", function() _C.tNearDoodad[arg0] = true end)
+RegisterEvent("DOODAD_LEAVE_SCENE", function() _C.tNearDoodad[arg0] = nil  end)
 
 -- 获取玩家自身信息（缓存）
 local m_ClientInfo
@@ -271,11 +271,11 @@ end
 --   #           #     # #                 #             #     #       #     #     #         #   #   
 --             #         #                 #             #   #           #           # # # # #       
 -- ##################################################################################################
-_Cache.nLastFightUUID           = nil
-_Cache.nCurrentFightUUID        = nil
-_Cache.nCurrentFightBeginFrame  = -1
-_Cache.nCurrentFightEndingFrame = -1
-_Cache.OnFightStateChange = function(bFightState)
+_C.nLastFightUUID           = nil
+_C.nCurrentFightUUID        = nil
+_C.nCurrentFightBeginFrame  = -1
+_C.nCurrentFightEndingFrame = -1
+_C.OnFightStateChange = function(bFightState)
 	-- 当没有传bFightState或bFightState为否时 重新获取逻辑战斗状态
 	if not bFightState then
 		bFightState = MY.Player.IsFighting()
@@ -283,40 +283,40 @@ _Cache.OnFightStateChange = function(bFightState)
 	-- 判定战斗边界
 	if bFightState then
 		-- 进入战斗判断
-		if not _Cache.bFighting then
-			_Cache.bFighting = true
+		if not _C.bFighting then
+			_C.bFighting = true
 			-- 5秒脱战判定缓冲 防止明教隐身错误判定
-			if _Cache.nCurrentFightBeginFrame < 0
-			or MY.GetFrameCount() - _Cache.nCurrentFightEndingFrame > GLOBAL.GAME_FPS * 5 then
+			if _C.nCurrentFightBeginFrame < 0
+			or MY.GetFrameCount() - _C.nCurrentFightEndingFrame > GLOBAL.GAME_FPS * 5 then
 				-- 新的一轮战斗开始
-				_Cache.nCurrentFightBeginFrame = MY.GetFrameCount()
-				_Cache.nCurrentFightUUID = _Cache.nCurrentFightBeginFrame
+				_C.nCurrentFightBeginFrame = MY.GetFrameCount()
+				_C.nCurrentFightUUID = _C.nCurrentFightBeginFrame
 				FireUIEvent('MY_FIGHT_HINT', true)
 			end
 		end
 	else
 		-- 退出战斗判定
-		if _Cache.bFighting then
-			_Cache.bFighting = false
-			_Cache.nCurrentFightEndingFrame = MY.GetFrameCount()
+		if _C.bFighting then
+			_C.bFighting = false
+			_C.nCurrentFightEndingFrame = MY.GetFrameCount()
 		end
-		if _Cache.nCurrentFightUUID and MY.GetFrameCount() - _Cache.nCurrentFightEndingFrame > GLOBAL.GAME_FPS * 5 then
-			_Cache.nLastFightUUID = _Cache.nCurrentFightUUID
-			_Cache.nCurrentFightUUID = nil
+		if _C.nCurrentFightUUID and MY.GetFrameCount() - _C.nCurrentFightEndingFrame > GLOBAL.GAME_FPS * 5 then
+			_C.nLastFightUUID = _C.nCurrentFightUUID
+			_C.nCurrentFightUUID = nil
 			FireUIEvent('MY_FIGHT_HINT', false)
 		end
 	end
 end
-MY.BreatheCall(_Cache.OnFightStateChange)
-MY.RegisterEvent('FIGHT_HINT', function(event) _Cache.OnFightStateChange(arg0) end)
+MY.BreatheCall(_C.OnFightStateChange)
+MY.RegisterEvent('FIGHT_HINT', function(event) _C.OnFightStateChange(arg0) end)
 -- 获取当前战斗时间
 MY.Player.GetFightTime = function(szFormat)
 	local nFrame = 0
 	
 	if MY.Player.IsFighting() then -- 战斗状态
-		nFrame = MY.GetFrameCount() - _Cache.nCurrentFightBeginFrame
+		nFrame = MY.GetFrameCount() - _C.nCurrentFightBeginFrame
 	else  -- 脱战状态
-		nFrame = _Cache.nCurrentFightEndingFrame - _Cache.nCurrentFightBeginFrame
+		nFrame = _C.nCurrentFightEndingFrame - _C.nCurrentFightBeginFrame
 	end
 	
 	if szFormat then
@@ -347,12 +347,12 @@ end
 
 -- 获取当前战斗唯一标示符
 MY.Player.GetFightUUID = function()
-	return _Cache.nCurrentFightUUID
+	return _C.nCurrentFightUUID
 end
 
 -- 获取上次战斗唯一标示符
 MY.Player.GetLastFightUUID = function()
-	return _Cache.nLastFightUUID
+	return _C.nLastFightUUID
 end
 
 -- 获取自身是否处于逻辑战斗状态
@@ -446,10 +446,10 @@ MY.SetTarget = MY.Player.SetTarget
 -- 设置/取消 临时目标
 -- MY.Player.SetTempTarget(dwType, dwID)
 -- MY.Player.ResumeTarget()
-_Cache.pTempTarget = { TARGET.NO_TARGET, 0 }
+_C.pTempTarget = { TARGET.NO_TARGET, 0 }
 MY.Player.SetTempTarget = function(dwType, dwID)
 	TargetPanel_SetOpenState(true)
-	_Cache.pTempTarget = { GetClientPlayer().GetTarget() }
+	_C.pTempTarget = { GetClientPlayer().GetTarget() }
 	MY.Player.SetTarget(dwType, dwID)
 	TargetPanel_SetOpenState(false)
 end
@@ -457,27 +457,27 @@ MY.SetTempTarget = MY.Player.SetTempTarget
 MY.Player.ResumeTarget = function()
 	TargetPanel_SetOpenState(true)
 	-- 当之前的目标不存在时，切到空目标
-	if _Cache.pTempTarget[1] ~= TARGET.NO_TARGET and not MY.GetObject(unpack(_Cache.pTempTarget)) then
-		_Cache.pTempTarget = { TARGET.NO_TARGET, 0 }
+	if _C.pTempTarget[1] ~= TARGET.NO_TARGET and not MY.GetObject(unpack(_C.pTempTarget)) then
+		_C.pTempTarget = { TARGET.NO_TARGET, 0 }
 	end
-	MY.Player.SetTarget(unpack(_Cache.pTempTarget))
-	_Cache.pTempTarget = { TARGET.NO_TARGET, 0 }
+	MY.Player.SetTarget(unpack(_C.pTempTarget))
+	_C.pTempTarget = { TARGET.NO_TARGET, 0 }
 	TargetPanel_SetOpenState(false)
 end
 MY.ResumeTarget = MY.Player.ResumeTarget
 
 -- 临时设置目标为指定目标并执行函数
 -- (void) MY.Player.WithTarget(dwType, dwID, callback)
-_Cache.tWithTarget = {}
-_Cache.lockWithTarget = false
-_Cache.WithTargetHandle = function()
-	if _Cache.lockWithTarget or
-	#_Cache.tWithTarget == 0 then
+_C.tWithTarget = {}
+_C.lockWithTarget = false
+_C.WithTargetHandle = function()
+	if _C.lockWithTarget or
+	#_C.tWithTarget == 0 then
 		return
 	end
 
-	_Cache.lockWithTarget = true
-	local r = table.remove(_Cache.tWithTarget, 1)
+	_C.lockWithTarget = true
+	local r = table.remove(_C.tWithTarget, 1)
 	
 	MY.Player.SetTempTarget(r.dwType, r.dwID)
 	local status, err = pcall(r.callback)
@@ -486,17 +486,17 @@ _Cache.WithTargetHandle = function()
 	end
 	MY.Player.ResumeTarget()
 	
-	_Cache.lockWithTarget = false
-	_Cache.WithTargetHandle()
+	_C.lockWithTarget = false
+	_C.WithTargetHandle()
 end
 MY.Player.WithTarget = function(dwType, dwID, callback)
 	-- 因为客户端多线程 所以加上资源锁 防止设置临时目标冲突
-	table.insert(_Cache.tWithTarget, {
+	table.insert(_C.tWithTarget, {
 		dwType   = dwType  ,
 		dwID     = dwID    ,
 		callback = callback,
 	})
-	_Cache.WithTargetHandle()
+	_C.WithTargetHandle()
 end
 
 -- 求N2在N1的面向角  --  重载+2
@@ -615,20 +615,20 @@ MY.Player.IsInvincible = function(obj)
 end
 MY.IsInvincible = MY.Player.IsInvincible
 
-_Cache.tPlayerSkills = {}   -- 玩家技能列表[缓存]   -- 技能名反查ID
-_Cache.tSkillCache = {}     -- 技能列表缓存         -- 技能ID查技能名称图标
+_C.tPlayerSkills = {}   -- 玩家技能列表[缓存]   -- 技能名反查ID
+_C.tSkillCache = {}     -- 技能列表缓存         -- 技能ID查技能名称图标
 -- 通过技能名称获取技能对象
 -- (table) MY.GetSkillByName(szName)
 MY.Player.GetSkillByName = function(szName)
-	if table.getn(_Cache.tPlayerSkills)==0 then
+	if table.getn(_C.tPlayerSkills)==0 then
 		for i = 1, g_tTable.Skill:GetRowCount() do
 			local tLine = g_tTable.Skill:GetRow(i)
-			if tLine~=nil and tLine.dwIconID~=nil and tLine.fSortOrder~=nil and tLine.szName~=nil and tLine.dwIconID~=13 and ( (not _Cache.tPlayerSkills[tLine.szName]) or tLine.fSortOrder>_Cache.tPlayerSkills[tLine.szName].fSortOrder) then
-				_Cache.tPlayerSkills[tLine.szName] = tLine
+			if tLine~=nil and tLine.dwIconID~=nil and tLine.fSortOrder~=nil and tLine.szName~=nil and tLine.dwIconID~=13 and ( (not _C.tPlayerSkills[tLine.szName]) or tLine.fSortOrder>_C.tPlayerSkills[tLine.szName].fSortOrder) then
+				_C.tPlayerSkills[tLine.szName] = tLine
 			end
 		end
 	end
-	return _Cache.tPlayerSkills[szName]
+	return _C.tPlayerSkills[szName]
 end
 
 -- 判断技能名称是否有效
@@ -642,7 +642,7 @@ end
 MY.Player.CanUseSkill = function(dwSkillID, dwLevel)
 	-- 判断技能是否有效 并将中文名转换为技能ID
 	if type(dwSkillID) == "string" then if MY.IsValidSkill(dwSkillID) then dwSkillID = MY.Player.GetSkillByName(dwSkillID).dwSkillID else return false end end
-	local me, box = GetClientPlayer(), _Cache.hBox
+	local me, box = GetClientPlayer(), _C.hBox
 	if me and box then
 		if not dwLevel then
 			if dwSkillID ~= 9007 then
@@ -665,21 +665,21 @@ end
 -- 根据技能 ID 及等级获取技能的名称及图标 ID（内置缓存处理）
 -- (string, number) MY.Player.GetSkillName(number dwSkillID[, number dwLevel])
 MY.Player.GetSkillName = function(dwSkillID, dwLevel)
-	if not _Cache.tSkillCache[dwSkillID] then
+	if not _C.tSkillCache[dwSkillID] then
 		local tLine = Table_GetSkill(dwSkillID, dwLevel)
 		if tLine and tLine.dwSkillID > 0 and tLine.bShow
 			and (StringFindW(tLine.szDesc, "_") == nil  or StringFindW(tLine.szDesc, "<") ~= nil)
 		then
-			_Cache.tSkillCache[dwSkillID] = { tLine.szName, tLine.dwIconID }
+			_C.tSkillCache[dwSkillID] = { tLine.szName, tLine.dwIconID }
 		else
 			local szName = "SKILL#" .. dwSkillID
 			if dwLevel then
 				szName = szName .. ":" .. dwLevel
 			end
-			_Cache.tSkillCache[dwSkillID] = { szName, 13 }
+			_C.tSkillCache[dwSkillID] = { szName, 13 }
 		end
 	end
-	return unpack(_Cache.tSkillCache[dwSkillID])
+	return unpack(_C.tSkillCache[dwSkillID])
 end
 
 -- 登出游戏
@@ -696,13 +696,13 @@ end
 -- 根据技能 ID 获取引导帧数，非引导技能返回 nil
 -- (number) MY.Player.GetChannelSkillFrame(number dwSkillID)
 MY.Player.GetChannelSkillFrame = function(dwSkillID)
-	local t = _Cache.tSkillEx[dwSkillID]
+	local t = _C.tSkillEx[dwSkillID]
 	if t then
 		return t.nChannelFrame
 	end
 end
 -- Load skill extend data
-_Cache.tSkillEx = MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot.."data/skill_ex", true) or {}
+_C.tSkillEx = MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot.."data/skill_ex", true) or {}
 
 -- 判断当前地图是不是竞技场
 -- (bool) MY.Player.IsInArena()
