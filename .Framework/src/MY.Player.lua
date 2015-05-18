@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-18 09:45:59
+-- @Last Modified time: 2015-05-18 15:18:50
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -184,28 +184,28 @@ MY.Player.GetUUID = function()
 end
 
 -- 获取好友列表
+-- MY.Player.GetFriendList()         获取所有好友列表
+-- MY.Player.GetFriendList(1)        获取第一个分组好友列表
+-- MY.Player.GetFriendList("挽月堂") 获取分组名称为挽月堂的好友列表
 MY.Player.GetFriendList = function(arg0)
 	local t = {}
 	local me = GetClientPlayer()
-	local tGroup = { { id = 0, name = "" } }
-	for _, group in ipairs(me.GetFellowshipGroupInfo() or {}) do
-		table.insert(tGroup, group)
-	end
-	if type(arg0)=="number" then
-		for i=#tGroup, 1, -1 do
-			if arg0~=tGroup[i].id then
+	local tGroup = me.GetFellowshipGroupInfo() or {}
+	if type(arg0) == "number" then
+		for i = #tGroup, 1, -1 do
+			if arg0 ~= tGroup[i].id then
 				table.remove(tGroup, i)
 			end
 		end
-	elseif type(arg0)=="string" then
-		for i=#tGroup, 1, -1 do
-			if arg0~=tGroup[i].name then
+	elseif type(arg0) == "string" then
+		for i = #tGroup, 1, -1 do
+			if arg0 ~= tGroup[i].name then
 				table.remove(tGroup, i)
 			end
 		end
 	end
 	local n = 0
-	for _,group in ipairs(tGroup) do
+	for _, group in ipairs(tGroup) do
 		for _, p in ipairs(me.GetFellowshipInfo(group.id) or {}) do
 			t[p.id] = p
 			n = n + 1
@@ -231,8 +231,21 @@ MY.Player.GetFriend = function(arg0)
 end
 
 -- 获取好友列表
-MY.Player.GetTongMemberList = function()
-	return GetTongClient().GetMemberList()
+MY.Player.GetTongMemberList = function(bShowOffLine, szSorter, bAsc)
+	if bShowOffLine == nil then bShowOffLine = false  end
+	if szSorter     == nil then szSorter     = 'name' end
+	if bAsc         == nil then bAsc         = true   end
+	local aSorter = {
+		["name"  ] = "name"                    ,
+		["level" ] = "group"                   ,
+		["school"] = "development_contribution",
+		["score" ] = "score"                   ,
+		["map"   ] = "join_time"               ,
+		["remark"] = "last_offline_time"       ,
+	}
+	szSorter = aSorter[szSorter]
+	-- GetMemberList(bShowOffLine, szSorter, bAsc, nGroupFilter, -1) -- 后面两个参数不知道什么鬼
+	return GetTongClient().GetMemberList(bShowOffLine, szSorter or 'name', bAsc, -1, -1)
 end
 
 -- 获取帮会成员
