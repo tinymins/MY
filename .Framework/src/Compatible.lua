@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-17 10:34:19
+-- @Last Modified time: 2015-05-18 09:47:01
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 if not GetCampImageFrame then
@@ -319,3 +319,10 @@ KUNGFU_TYPE = {
 	CANG_YUN    = 18,     -- 苍云内功
 }
 end
+
+MY_DEBUG = SetmetaReadonly({
+	LOG     = 0,
+	PMLOG   = 0,
+	WARNING = 1,
+	ERROR   = 2,
+})

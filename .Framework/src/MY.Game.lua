@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-16 21:21:54
+-- @Last Modified time: 2015-05-18 09:43:06
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -----------------------------------------------
@@ -462,7 +462,7 @@ MY.RegisterInit('MYLIB#UPDATE_BOSSLIST', function()
 		-- decode data
 		local data = MY.Json.Decode(szContent)
 		if not data then
-			MY.Debug(L["Bosslist update check failed, server respond unkown data."], 'MY::tBossList', 3)
+			MY.Debug(L["Bosslist update check failed, server respond unkown data."], 'MY::tBossList', MY_DEBUG.ERROR)
 			return
 		end
 		
