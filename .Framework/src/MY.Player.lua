@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-18 15:40:10
+-- @Last Modified time: 2015-05-18 16:56:25
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -183,49 +183,72 @@ MY.Player.GetUUID = function()
 	end
 end
 
+_C.GeneFriendListCache = function()
+	if not _C.tFriendListByGroup then
+		local me = GetClientPlayer()
+		_C.tFriendListByID = {}
+		_C.tFriendListByName = {}
+		_C.tFriendListByGroup = {{ id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND or "" }} -- 默认分组
+		for _, group in ipairs(me.GetFellowshipGroupInfo() or {}) do
+			table.insert(_C.tFriendListByGroup, group)
+		end
+		for _, group in ipairs(_C.tFriendListByGroup) do
+			for _, p in ipairs(me.GetFellowshipInfo(group.id) or {}) do
+				table.insert(group, p)
+				_C.tFriendListByID[p.id] = p
+				_C.tFriendListByName[p.name] = p
+			end
+		end
+	end
+end
+_C.OnFriendListChange = function()
+	_C.tFriendListByID = nil
+	_C.tFriendListByName = nil
+	_C.tFriendListByGroup = nil
+end
+MY.RegisterEvent("PLAYER_FELLOWSHIP_UPDATE"     , _C.OnFriendListChange)
+MY.RegisterEvent("PLAYER_FELLOWSHIP_CHANGE"     , _C.OnFriendListChange)
+MY.RegisterEvent("PLAYER_FELLOWSHIP_LOGIN"      , _C.OnFriendListChange)
+MY.RegisterEvent("PLAYER_FOE_UPDATE"            , _C.OnFriendListChange)
+MY.RegisterEvent("PLAYER_BLACK_LIST_UPDATE"     , _C.OnFriendListChange)
+MY.RegisterEvent("DELETE_FELLOWSHIP"            , _C.OnFriendListChange)
+MY.RegisterEvent("FELLOWSHIP_TWOWAY_FLAG_CHANGE", _C.OnFriendListChange)
 -- 获取好友列表
 -- MY.Player.GetFriendList()         获取所有好友列表
 -- MY.Player.GetFriendList(1)        获取第一个分组好友列表
 -- MY.Player.GetFriendList("挽月堂") 获取分组名称为挽月堂的好友列表
 MY.Player.GetFriendList = function(arg0)
+	_C.GeneFriendListCache()
 	local t = {}
-	local me = GetClientPlayer()
-	local tGroup = me.GetFellowshipGroupInfo() or {}
+	local tGroup = {}
 	if type(arg0) == "number" then
-		for i = #tGroup, 1, -1 do
-			if arg0 ~= tGroup[i].id then
-				table.remove(tGroup, i)
-			end
-		end
+		table.insert(tGroup, _C.tFriendListByGroup[arg0])
 	elseif type(arg0) == "string" then
-		for i = #tGroup, 1, -1 do
-			if arg0 ~= tGroup[i].name then
-				table.remove(tGroup, i)
+		for _, group in ipairs(_C.tFriendListByGroup) do
+			if group.name == arg0 then
+				table.insert(tGroup, clone(group))
 			end
 		end
+	else
+		tGroup = _C.tFriendListByGroup
 	end
 	local n = 0
 	for _, group in ipairs(tGroup) do
-		for _, p in ipairs(me.GetFellowshipInfo(group.id) or {}) do
-			t[p.id] = p
-			n = n + 1
+		for _, p in ipairs(group) do
+			t[p.id], n = clone(p), n + 1
 		end
 	end
-	
 	return t, n
 end
 
 -- 获取好友
 MY.Player.GetFriend = function(arg0)
-	if not arg0 then return nil end
-	local tFriend = MY.Player.GetFriendList()
-	if type(arg0) == "number" then
-		return tFriend[arg0]
-	elseif type(arg0) == "string" then
-		for id, p in pairs(tFriend) do
-			if p.name == arg0 then
-				return p
-			end
+	if arg0 then
+		_C.GeneFriendListCache()
+		if type(arg0) == "number" then
+			return clone(_C.tFriendListByID[arg0])
+		elseif type(arg0) == "string" then
+			return clone(_C.tFriendListByName[arg0])
 		end
 	end
 end
