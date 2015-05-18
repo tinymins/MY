@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-18 10:23:17
+-- @Last Modified time: 2015-05-18 11:26:18
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -629,17 +629,22 @@ end
 function _MY.UI:remove()
 	self:_checksum()
 	for _, ele in pairs(self.eles) do
-		pcall(function() ele.fnDestroy(ele.raw) end)
+		if ele.fnOnDestroy then
+			local status, err = pcall(function() ele.fnOnDestroy(ele.raw) end)
+			if not status then
+				MY.Debug({err}, "UI:remove#fnOnDestroy", MY_DEBUG.ERROR)
+			end
+		end
 		if ele.raw:GetType() == "WndFrame" then
 			Wnd.CloseWindow(ele.raw)
 		elseif string.sub(ele.raw:GetType(), 1, 3) == "Wnd" then
 			ele.raw:Destroy()
 		else
-			pcall(function()
-				local h = ele.raw:GetParent()
-				h:RemoveItem(ele.raw:GetIndex())
+			local h = ele.raw:GetParent()
+			if h:GetType() == "Handle" then
+				h:RemoveItem(ele.raw)
 				h:FormatAllItemPos()
-			end)
+			end
 		end
 	end
 	self.eles = {}
@@ -1000,7 +1005,7 @@ function _MY.UI:clear()
 	self:_checksum()
 	for _, ele in pairs(self.eles) do
 		if ele.hdl then
-			pcall(function() ele.hdl:Clear() end)
+			ele.hdl:Clear()
 		end
 		if ele.sbu then
 			ele.raw.UpdateScroll()
@@ -1018,7 +1023,7 @@ function _MY.UI:data(key, value)
 	self:_checksum()
 	if key and value then -- set name
 		for _, ele in pairs(self.eles) do
-			pcall(function() ele.raw[key] = value end)
+			ele.raw[key] = value
 		end
 		return self
 	elseif key then -- get
@@ -1045,8 +1050,10 @@ end
 function _MY.UI:hide()
 	self:_checksum()
 	for _, ele in pairs(self.eles) do
-		pcall(function() ele.raw:Hide() end)
-		pcall(function() ele.hdl:Hide() end)
+		ele.raw:Hide()
+		if ele.hdl then
+			ele.hdl:Hide()
+		end
 	end
 	return self
 end
@@ -1069,7 +1076,10 @@ function _MY.UI:enable(bEnable)
 	self:_checksum()
 	if type(bEnable)=='boolean' then
 		for _, ele in pairs(self.eles) do
-			pcall(function() (ele.chk or ele.wnd or ele.raw):Enable(bEnable) end)
+			local x = ele.chk or ele.wnd or ele.raw
+			if x and x.Enable then
+				x:Enable(bEnable)
+			end
 		end
 		return self
 	else -- get
@@ -1084,7 +1094,17 @@ end
 function _MY.UI:toggle(bShow)
 	self:_checksum()
 	for _, ele in pairs(self.eles) do
-		pcall(function() if bShow == false or (not bShow and ele.raw:IsVisible()) then ele.raw:Hide() ele.hdl:Hide() else ele.raw:Show() ele.hdl:Show() end end)
+		if bShow == false or (bShow == nil and ele.raw:IsVisible()) then
+			ele.raw:Hide()
+			if ele.hdl then
+				ele.hdl:Hide()
+			end
+		else
+			ele.raw:Show()
+			if ele.hdl then
+				ele.hdl:Show()
+			end
+		end
 	end
 	return self
 end
@@ -1097,7 +1117,10 @@ function _MY.UI:drag(x, y, w, h)
 	self:_checksum()
 	if type(x) == 'boolean' then
 		for _, ele in pairs(self.eles) do
-			pcall(function() (ele.frm or ele.raw):EnableDrag(x) end)
+			local x = ele.frm or ele.raw
+			if x and x.EnableDrag then
+				x:EnableDrag(x)
+			end
 		end
 		return self
 	elseif type(x) == 'number' or
@@ -1149,23 +1172,31 @@ function _MY.UI:text(szText)
 	self:_checksum()
 	if szText then
 		for _, ele in pairs(self.eles) do
-			if type(szText)~="function" then
-				pcall(function() (ele.txt or ele.edt or ele.raw):SetText(szText) end)
-				pcall(function() (ele.txt or ele.edt or ele.raw):GetParent():FormatAllItemPos() end)
-			end
 			if ele.type == "WndScrollBox" then
 				ele.raw.UpdateScroll()
 			elseif ele.type == "WndSliderBox" and type(szText)=="function" then
 				ele.sld.FormatText = szText
 			elseif ele.type == "WndEditBox" then
-				if szText=="" then
+				ele.edt:SetText(szText)
+				if szText == "" then
 					ele.phd:Show()
 				else
 					ele.phd:Hide()
 				end
 			elseif ele.type == "Text" then
+				ele.txt:SetText(szText)
+				ele.txt:GetParent():FormatAllItemPos()
 				if ele.raw.bAutoSize then
 					ele.raw:AutoSize()
+				end
+			elseif type(szText) ~= "function" then
+				local x = ele.txt or ele.edt or ele.raw
+				if x and x.SetText then
+					x:SetText(szText)
+					local x = x:GetParent()
+					if x and x.FormatAllItemPos then
+						x:FormatAllItemPos()
+					end
 				end
 			end
 		end
@@ -1522,7 +1553,7 @@ function _MY.UI:name(szText)
 	self:_checksum()
 	if szText then -- set name
 		for _, ele in pairs(self.eles) do
-			pcall(function() ele.raw:SetName(szText) end)
+			ele.raw:SetName(szText)
 		end
 		return self
 	else -- get
@@ -1538,7 +1569,7 @@ function _MY.UI:group(szText)
 	self:_checksum()
 	if szText then -- set group
 		for _, ele in pairs(self.eles) do
-			pcall(function() ele.raw.group = szText end)
+			ele.raw.group = szText
 		end
 		return self
 	else -- get
@@ -1554,9 +1585,13 @@ function _MY.UI:penetrable(bPenetrable)
 	self:_checksum()
 	if type(bPenetrable) == 'boolean' then -- set penetrable
 		for _, ele in pairs(self.eles) do
-			pcall(function() ele.raw.bPenetrable = bPenetrable end)
-			pcall(function() ele.raw:SetMousePenetrable(bPenetrable) end)
-			pcall(function() ele.wnd:SetMousePenetrable(bPenetrable) end)
+			ele.raw.bPenetrable = bPenetrable
+			if ele.raw.SetMousePenetrable then
+				ele.raw:SetMousePenetrable(bPenetrable)
+			end
+			if ele.wnd and ele.wnd.SetMousePenetrable then
+				ele.wnd:SetMousePenetrable(bPenetrable)
+			end
 		end
 	end
 	return self
@@ -1567,7 +1602,7 @@ function _MY.UI:alpha(nAlpha)
 	self:_checksum()
 	if nAlpha then -- set name
 		for _, ele in pairs(self.eles) do
-			pcall(function() ele.raw:SetAlpha(nAlpha) end)
+			ele.raw:SetAlpha(nAlpha)
 		end
 		return self
 	else -- get
@@ -1687,7 +1722,10 @@ function _MY.UI:font(nFont)
 	self:_checksum()
 	if nFont then-- set name
 		for _, ele in pairs(self.eles) do
-			pcall(function() (ele.txt or ele.edt or ele.raw):SetFontScheme(nFont) end)
+			local x = ele.txt or ele.edt or ele.raw
+			if x and x.SetFontScheme then
+				x:SetFontScheme(nFont)
+			end
 		end
 		return self
 	else -- get
@@ -1707,8 +1745,14 @@ function _MY.UI:color(r, g, b)
 	end
 	if b then
 		for _, ele in pairs(self.eles) do
-			pcall(function() ele.sdw:SetColorRGB(r, g, b) end)
-			pcall(function() (ele.edt or ele.txt):SetFontColor(r, g, b) end)
+			local x = ele.sdw
+			if x and x.SetColorRGB then
+				x:SetColorRGB(r, g, b)
+			end
+			local x = ele.edt or ele.txt
+			if x and x.SetFontColor then
+				x:SetFontColor(r, g, b)
+			end
 		end
 		return self
 	else -- get
@@ -1754,12 +1798,12 @@ function _MY.UI:pos(nLeft, nTop)
 			local _nLeft, _nTop = ele.raw:GetRelPos()
 			nLeft, nTop = nLeft or _nLeft, nTop or _nTop
 			if ele.frm then
-				pcall(function() (ele.frm or ele.raw):SetRelPos(nLeft, nTop) end)
+				ele.frm:SetRelPos(nLeft, nTop)
 			elseif ele.wnd then
-				pcall(function() (ele.wnd or ele.raw):SetRelPos(nLeft, nTop) end)
+				ele.wnd:SetRelPos(nLeft, nTop)
 			elseif ele.itm then
-				pcall(function() (ele.itm or ele.raw):SetRelPos(nLeft, nTop) end)
-				pcall(function() (ele.itm or ele.raw):GetParent():FormatAllItemPos() end)
+				ele.itm:SetRelPos(nLeft, nTop)
+				ele.itm:GetParent():FormatAllItemPos()
 			end
 		end
 		return self
@@ -1778,10 +1822,8 @@ function _MY.UI:anchor(anchor)
 	if type(anchor) == 'table' then
 		for _, ele in pairs(self.eles) do
 			if ele.frm then
-				pcall(function() 
-					ele.frm:SetPoint(anchor.s, 0, 0, anchor.r, anchor.x, anchor.y)
-					ele.frm:CorrectPos()
-				end)
+				ele.frm:SetPoint(anchor.s, 0, 0, anchor.r, anchor.x, anchor.y)
+				ele.frm:CorrectPos()
 			end
 		end
 		return self
@@ -1990,7 +2032,7 @@ function _MY.UI:range(nMin, nMax)
 	self:_checksum()
 	if type(nMin)=='number' and type(nMax)=='number' and nMax>nMin then
 		for _, ele in pairs(self.eles) do
-			if ele.type=="WndSliderBox" then
+			if ele.type == "WndSliderBox" then
 				ele.wnd.nOffset = nMin
 				ele.sld:SetStepCount(nMax - nMin)
 			end
@@ -2030,10 +2072,15 @@ function _MY.UI:multiLine(bMultiLine)
 	self:_checksum()
 	if type(bMultiLine)=='boolean' then
 		for _, ele in pairs(self.eles) do
-			pcall(function() ele.edt:SetMultiLine(bMultiLine) end)
-			pcall(function() ele.edt:GetParent():FormatAllItemPos() end)
-			pcall(function() ele.txt:SetMultiLine(bMultiLine) end)
-			pcall(function() ele.txt:GetParent():FormatAllItemPos() end)
+			local x = ele.edt
+			if x and x.SetMultiLine then
+				x:SetMultiLine(bMultiLine)
+			end
+			local x = ele.txt
+			if x and x.SetMultiLine then
+				x:SetMultiLine(bMultiLine)
+				x:GetParent():FormatAllItemPos()
+			end
 		end
 		return self
 	else -- get
@@ -2057,13 +2104,19 @@ function _MY.UI:image(szImage, nFrame)
 		if nFrame then
 			nFrame = tonumber(nFrame)
 			for _, ele in pairs(self.eles) do
-				pcall(function() ele.img:FromUITex(szImage, nFrame) end)
-				pcall(function() ele.img:GetParent():FormatAllItemPos() end)
+				local x = ele.img
+				if x and x.FromUITex then
+					x:FromUITex(szImage, nFrame)
+					x:GetParent():FormatAllItemPos()
+				end
 			end
 		else
 			for _, ele in pairs(self.eles) do
-				pcall(function() ele.img:FromTextureFile(szImage) end)
-				pcall(function() ele.img:GetParent():FormatAllItemPos() end)
+				local x = ele.img
+				if x and x.FromTextureFile then
+					x:FromTextureFile(szImage)
+					x:GetParent():FormatAllItemPos()
+				end
 			end
 		end
 	end
@@ -2077,8 +2130,11 @@ function _MY.UI:frame(nFrame)
 	if nFrame then
 		nFrame = tonumber(nFrame)
 		for _, ele in pairs(self.eles) do
-			pcall(function() ele.img:SetFrame(nFrame) end)
-			pcall(function() ele.img:GetParent():FormatAllItemPos() end)
+			local x = ele.img
+			if x and x.SetFrame then
+				x:SetFrame(nFrame)
+				x:GetParent():FormatAllItemPos()
+			end
 		end
 	else
 		local ele = self.eles[1]
@@ -2094,7 +2150,10 @@ function _MY.UI:handleStyle(dwStyle)
 	self:_checksum()
 	if dwStyle then
 		for _, ele in pairs(self.eles) do
-			pcall(function() ele.hdl:SetHandleStyle(dwStyle) end)
+			local x = ele.hdl
+			if x and x.SetHandleStyle then
+				x:SetHandleStyle(dwStyle)
+			end
 		end
 	end
 	return self
@@ -2115,7 +2174,10 @@ end
 function _MY.UI:bringToTop()
 	self:_checksum()
 	for _, ele in pairs(self.eles) do
-		pcall(function() ele.frm:BringToTop() end)
+		local x = ele.frm
+		if x and x.BringToTop then
+			x:BringToTop()
+		end
 	end
 	return self
 end
@@ -2218,14 +2280,14 @@ function _MY.UI:customMode(szTip, fnOnEnterCustomMode, fnOnLeaveCustomMode, szPo
 		end):onevent("ON_LEAVE_CUSTOM_UI_MODE", function()
 			UpdateCustomModeWindow(this, szTip, this.bPenetrable)
 		end)
-		if type(fnOnEnterCustomMode)=="function" then
+		if type(fnOnEnterCustomMode) == "function" then
 			self:onevent("ON_ENTER_CUSTOM_UI_MODE", function()
-				pcall(fnOnEnterCustomMode, GetFrameAnchor(this, szPoint))
+				fnOnEnterCustomMode(GetFrameAnchor(this, szPoint))
 			end)
 		end
-		if type(fnOnLeaveCustomMode)=="function" then
+		if type(fnOnLeaveCustomMode) == "function" then
 			self:onevent("ON_LEAVE_CUSTOM_UI_MODE", function()
-				pcall(fnOnLeaveCustomMode, GetFrameAnchor(this, szPoint))
+				fnOnLeaveCustomMode(GetFrameAnchor(this, szPoint))
 			end)
 		end
 	end
@@ -2238,7 +2300,9 @@ function _MY.UI:breathe(fnOnFrameBreathe)
 	self:_checksum()
 	if type(fnOnFrameBreathe)=="function" then
 		for _, ele in pairs(self.eles) do
-			if ele.frm then MY.UI.RegisterUIEvent(ele.frm, "OnFrameBreathe", fnOnFrameBreathe) end
+			if ele.frm then
+				MY.UI.RegisterUIEvent(ele.frm, "OnFrameBreathe", fnOnFrameBreathe)
+			end
 		end
 	end
 	return self
@@ -2373,16 +2437,22 @@ function _MY.UI:hover(fnHover, fnLeave, bNoAutoBind)
 		for _, ele in pairs(self.eles) do
 			local wnd = ele.edt or ele.wnd
 			local itm = ele.itm or ele.itm
-			if wnd then MY.UI.RegisterUIEvent(wnd, 'OnMouseEnter' , function() fnHover(true, this:PtInWindow(Cursor.GetPos())) end)
-			elseif itm then MY.UI.RegisterUIEvent(itm, 'OnItemMouseEnter', function() fnHover(true, this:PtInItem(Cursor.GetPos())) end) end
+			if wnd then
+				MY.UI.RegisterUIEvent(wnd, 'OnMouseEnter'    , function() fnHover(true, this:PtInWindow(Cursor.GetPos())) end)
+			elseif itm then
+				MY.UI.RegisterUIEvent(itm, 'OnItemMouseEnter', function() fnHover(true, this:PtInItem(Cursor.GetPos())) end)
+			end
 		end
 	end
 	if fnLeave then
 		for _, ele in pairs(self.eles) do
 			local wnd = ele.edt or ele.wnd
 			local itm = ele.itm or ele.itm
-			if wnd then MY.UI.RegisterUIEvent(wnd, 'OnMouseLeave' , function() fnLeave(false, this:PtInWindow(Cursor.GetPos())) end)
-			elseif itm then MY.UI.RegisterUIEvent(itm, 'OnItemMouseLeave', function() fnLeave(false, this:PtInItem(Cursor.GetPos())) end) end
+			if wnd then
+				MY.UI.RegisterUIEvent(wnd, 'OnMouseLeave'    , function() fnLeave(false, this:PtInWindow(Cursor.GetPos())) end)
+			elseif itm then
+				MY.UI.RegisterUIEvent(itm, 'OnItemMouseLeave', function() fnLeave(false, this:PtInItem(Cursor.GetPos())) end)
+			end
 		end
 	end
 	return self
@@ -2514,6 +2584,7 @@ MY.Const.UI.Tip.NO_HIDE      = 100
 MY.Const.UI.Tip.HIDE         = 101
 MY.Const.UI.Tip.ANIMATE_HIDE = 102
 
+MUI = MY.UI
 -- 设置元表，这样可以当作函数调用，其效果相当于 MY.UI.Fetch
 setmetatable(MY.UI, { __call = function(me, ...) return me.Fetch(...) end, __metatable = true })
 
