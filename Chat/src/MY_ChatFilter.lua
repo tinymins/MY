@@ -113,4 +113,14 @@ MY.RegisterPanel("MY_Duplicate_Chat_Filter", _L["duplicate chat filter"], _L['Ch
 		end,
 	})
 	y = y + 30
+
+	ui:append("WndCheckBox", {
+		text = _L['filter duplicate addon message'],
+		x = x, y = y, w = 400,
+		checked = MY_ChatFilter.bFilterDuplicateAddonTalk,
+		oncheck = function(bCheck)
+			MY_ChatFilter.bFilterDuplicateAddonTalk = bCheck
+		end,
+	})
+	y = y + 30
 end})
