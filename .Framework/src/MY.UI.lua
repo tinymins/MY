@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-12 09:47:33
+-- @Last Modified time: 2015-05-18 10:23:17
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -685,11 +685,11 @@ function _MY.UI:append(arg0, arg1, arg2)
 				end
 				local frame = Wnd.OpenWindow(szFile, "MY_TempWnd")
 				if not frame then
-					return MY.Debug({_L("unable to open ini file [%s]", szFile)}, 'MY#UI#append', 2)
+					return MY.Debug({_L("unable to open ini file [%s]", szFile)}, 'MY#UI#append', MY_DEBUG.ERROR)
 				end
 				local wnd = frame:Lookup(szType)
 				if not wnd then
-					MY.Debug({_L("can not find wnd component [%s]", szType)}, 'MY#UI#append', 2)
+					MY.Debug({_L("can not find wnd component [%s]", szType)}, 'MY#UI#append', MY_DEBUG.ERROR)
 				else
 					wnd.szMyuiType = szType
 					if szName then
@@ -884,7 +884,7 @@ function _MY.UI:append(arg0, arg1, arg2)
 									this.text, this.id, this.data, not this.selected
 								)
 								if not status then
-									MY.Debug({err}, 'WndListBox#CustomLButtonClick', 2)
+									MY.Debug({err}, 'WndListBox#CustomLButtonClick', MY_DEBUG.ERROR)
 								elseif err == false then
 									return
 								end
@@ -947,7 +947,7 @@ function _MY.UI:append(arg0, arg1, arg2)
 				end
 				ele.hdl:FormatAllItemPos()
 				if not hnd then
-					return MY.Debug({_L("unable to append handle item [%s]", szType)},'MY#UI:append',2)
+					return MY.Debug({_L("unable to append handle item [%s]", szType)},'MY#UI:append', MY_DEBUG.ERROR)
 				else
 					ui = MY.UI(hnd)
 				end
@@ -985,7 +985,7 @@ function _MY.UI:append(arg0, arg1, arg2)
 				ele.hdl:FormatAllItemPos()
 				pcall( ele.raw.UpdateScroll )
 				if nCount == ele.hdl:GetItemCount() then
-					return MY.Debug({_L("unable to append handle item from string.")},'MY#UI:append',2)
+					return MY.Debug({_L("unable to append handle item from string.")},'MY#UI:append', MY_DEBUG.ERROR)
 				end
 			end
 		end
@@ -1022,12 +1022,10 @@ function _MY.UI:data(key, value)
 		end
 		return self
 	elseif key then -- get
-		-- select the first item
 		local ele = self.eles[1]
-		-- try to get its name
-		local status, err = pcall(function() return ele.raw[key] end)
-		-- if succeed then return its name
-		if status then return err else MY.Debug({err},'ERROR _MY.UI:data' ,1) return nil end
+		if ele and ele.raw then
+			return ele.raw[key]
+		end
 	else
 		return self
 	end
@@ -1059,12 +1057,10 @@ function _MY.UI:visible(bVisiable)
 	if type(bVisiable)=='boolean' then
 		return self:toggle(bVisiable)
 	else -- get
-		-- select the first item
 		local ele = self.eles[1]
-		-- try to get its name
-		local status, err = pcall(function() return ele.raw:IsVisible() end)
-		-- if succeed then return its name
-		if status then return err else MY.Debug({err},'ERROR _MY.UI:visible' ,1) return nil end
+		if ele and ele.raw and ele.raw.IsVisible then
+			return ele.raw:IsVisible()
+		end
 	end
 end
 
@@ -1077,12 +1073,10 @@ function _MY.UI:enable(bEnable)
 		end
 		return self
 	else -- get
-		-- select the first item
 		local ele = self.eles[1]
-		-- try to get its name
-		local status, err = pcall(function() return ele.raw:IsEnabled() end)
-		-- if succeed then return its name
-		if status then return err else MY.Debug({err},'ERROR _MY.UI:enable' ,1) return nil end
+		if ele and ele.raw and ele.raw.IsEnabled then
+			return ele.raw:IsEnabled()
+		end
 	end
 end
 
@@ -1140,12 +1134,13 @@ function _MY.UI:drag(x, y, w, h)
 		end
 		return self
 	else
-		-- select the first item
 		local ele = self.eles[1]
-		-- try to get its name
-		local status, err = pcall(function() return (ele.frm or ele.raw):IsDragable() end)
-		-- if succeed then return its name
-		if status then return err else MY.Debug({err},'ERROR _MY.UI:drag' ,1) return nil end
+		if ele then
+			local x = ele.frm or ele.raw
+			if x and x.IsDragable then
+				return x:IsDragable()
+			end
+		end
 	end
 end
 
@@ -1176,12 +1171,9 @@ function _MY.UI:text(szText)
 		end
 		return self
 	else
-		-- select the first item
 		local ele = self.eles[1]
 		if ele then
-			-- try to get its name
 			local x = ele.txt or ele.edt or ele.raw
-			-- if succeed then return its name
 			if x and x.GetText then
 				return x:GetText()
 			end
@@ -1198,12 +1190,10 @@ function _MY.UI:placeholder(szText)
 		end
 		return self
 	else
-		-- select the first item
 		local ele = self.eles[1]
-		-- try to get its name
-		local status, err = pcall(function() return ele.phd:GetText() end)
-		-- if succeed then return its name
-		if status then return err else MY.Debug({err},'ERROR _MY.UI:text' ,3) return nil end
+		if ele and ele.phd and ele.phd.GetText then
+			return ele.phd:GetText()
+		end
 	end
 end
 
@@ -1536,12 +1526,10 @@ function _MY.UI:name(szText)
 		end
 		return self
 	else -- get
-		-- select the first item
 		local ele = self.eles[1]
-		-- try to get its name
-		local status, err = pcall(function() return ele.raw:GetName() end)
-		-- if succeed then return its name
-		if status then return err else MY.Debug({err},'ERROR _MY.UI:name' ,3) return nil end
+		if ele and ele.raw and ele.raw.GetName then
+			return ele.raw:GetName()
+		end
 	end
 end
 
@@ -1554,12 +1542,10 @@ function _MY.UI:group(szText)
 		end
 		return self
 	else -- get
-		-- select the first item
 		local ele = self.eles[1]
-		-- try to get its group
-		local status, err = pcall(function() return ele.raw.group end)
-		-- if succeed then return its group
-		if status then return err else MY.Debug({err},'ERROR _MY.UI:group' ,3) return nil end
+		if ele and ele.raw then
+			return ele.raw.group
+		end
 	end
 end
 
@@ -1585,12 +1571,10 @@ function _MY.UI:alpha(nAlpha)
 		end
 		return self
 	else -- get
-		-- select the first item
 		local ele = self.eles[1]
-		-- try to get its name
-		local status, err = pcall(function() return ele.raw:GetAlpha() end)
-		-- if succeed then return its name
-		if status then return err else MY.Debug({err},'ERROR _MY.UI:alpha' ,3) return nil end
+		if ele and ele.raw and ele.raw.GetAlpha then
+			return ele.raw:GetAlpha()
+		end
 	end
 end
 
@@ -1610,7 +1594,7 @@ function _MY.UI:fadeTo(nTime, nOpacity, callback)
 				ele:show()
 				local nCurrentAlpha = fnCurrent(nStartAlpha, nOpacity, nTime, GetTime()-nStartTime)
 				ele:alpha(nCurrentAlpha)
-				-- MY.Debug(string.format('%d %d %d %d\n', nStartAlpha, nOpacity, nCurrentAlpha, (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity)), 'fade', 0)
+				-- MY.Debug(string.format('%d %d %d %d\n', nStartAlpha, nOpacity, nCurrentAlpha, (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity)), 'fade', MY_DEBUG.LOG)
 				if (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity) <= 0 then
 					ele:alpha(nOpacity)
 					pcall(callback, ele)
@@ -1663,7 +1647,7 @@ function _MY.UI:slideTo(nTime, nHeight, callback)
 				ele:show()
 				local nCurrentValue = fnCurrent(nStartValue, nHeight, nTime, GetTime()-nStartTime)
 				ele:height(nCurrentValue)
-				-- MY.Debug(string.format('%d %d %d %d\n', nStartValue, nHeight, nCurrentValue, (nStartValue - nCurrentValue)*(nCurrentValue - nHeight)), 'slide', 0)
+				-- MY.Debug(string.format('%d %d %d %d\n', nStartValue, nHeight, nCurrentValue, (nStartValue - nCurrentValue)*(nCurrentValue - nHeight)), 'slide', MY_DEBUG.LOG)
 				if (nStartValue - nCurrentValue)*(nCurrentValue - nHeight) <= 0 then
 					ele:height(nHeight):toggle( nHeight ~= 0 )
 					pcall(callback)
@@ -1707,37 +1691,35 @@ function _MY.UI:font(nFont)
 		end
 		return self
 	else -- get
-		-- select the first item
 		local ele = self.eles[1]
-		-- try to get its name
-		local status, err = pcall(function() return ele.raw:GetFontScheme() end)
-		-- if succeed then return its name
-		if status then return err else MY.Debug({err},'ERROR _MY.UI:font' ,3) return nil end
+		if ele and ele.raw and ele.raw.GetFontScheme then
+			return ele.raw:GetFontScheme()
+		end
 	end
 end
 
 -- (number, number, number) Instance:color()
--- (self) Instance:color(number nRed, number nGreen, number nBlue)
-function _MY.UI:color(nRed, nGreen, nBlue)
+-- (self) Instance:color(number r, number g, number b)
+function _MY.UI:color(r, g, b)
 	self:_checksum()
-	if type(nRed) == "table" then
-		nBlue = nRed[3]
-		nGreen = nRed[2]
-		nRed = nRed[1]
+	if type(r) == "table" then
+		r, g, b = unpack(r)
 	end
-	if nBlue then
+	if b then
 		for _, ele in pairs(self.eles) do
-			pcall(function() ele.sdw:SetColorRGB(nRed, nGreen, nBlue) end)
-			pcall(function() (ele.edt or ele.txt):SetFontColor(nRed, nGreen, nBlue) end)
+			pcall(function() ele.sdw:SetColorRGB(r, g, b) end)
+			pcall(function() (ele.edt or ele.txt):SetFontColor(r, g, b) end)
 		end
 		return self
 	else -- get
-		-- select the first item
 		local ele = self.eles[1]
-		-- try to get its name
-		local status, r,g,b = pcall(function() if ele.sdw then return ele.sdw:GetColorRGB() else return (ele.edt or ele.txt):GetFontColor() end end)
-		-- if succeed then return its name
-		if status then return r,g,b else MY.Debug(r..'\n','ERROR _MY.UI:color' ,3) return nil end
+		if ele then
+			if ele.sdw then
+				return ele.sdw:GetColorRGB()
+			elseif ele.edt or ele.txt then
+				return (ele.edt or ele.txt):GetFontColor()
+			end
+		end
 	end
 end
 
@@ -1782,12 +1764,10 @@ function _MY.UI:pos(nLeft, nTop)
 		end
 		return self
 	else -- get
-		-- select the first item
 		local ele = self.eles[1]
-		-- try to get its name
-		local status, l, t = pcall(function() return ele.raw:GetRelPos() end)
-		-- if succeed then return its name
-		if status then return l, t else MY.Debug({l},'ERROR _MY.UI:left|top|pos' ,1) return nil end
+		if ele and ele.raw and ele.raw.GetRelPos then
+			return ele.raw:GetRelPos()
+		end
 	end
 end
 
@@ -1806,15 +1786,10 @@ function _MY.UI:anchor(anchor)
 		end
 		return self
 	else -- get
-		-- select the first item
 		local ele = self.eles[1]
-		-- try to get its name
-		local status, anchor = pcall(function()
-			ele.frm:CorrectPos()
+		if ele and ele.frm then
 			return GetFrameAnchor(ele.frm, anchor)
-		end)
-		-- if succeed then return its name
-		if status then return anchor else MY.Debug({anchor},'ERROR _MY.UI:anchor' ,1) return nil end
+		end
 	end
 end
 
@@ -1982,13 +1957,9 @@ function _MY.UI:size(nWidth, nHeight)
 		end
 		return self
 	else -- get
-		-- select the first item
 		local ele = self.eles[1]
-		if ele and ele.raw then
-			-- try to get its name
-			local status, w, h = pcall(function() return ele.raw:GetSize() end)
-			-- if succeed then return its name
-			if status then return w, h else MY.Debug({w},'ERROR _MY.UI:height|width|size' ,1) return nil end
+		if ele and ele.raw and ele.raw.GetSize then
+			return ele.raw:GetSize()
 		end
 	end
 end
@@ -2026,10 +1997,8 @@ function _MY.UI:range(nMin, nMax)
 		end
 		return self
 	else -- get
-		-- select the first item
 		local ele = self.eles[1]
-		-- try to get its name
-		if ele.type=="WndSliderBox" then
+		if ele and ele.type == "WndSliderBox" then
 			return ele.wnd.nOffset, ele.sld:GetStepCount()
 		end
 	end
@@ -2047,10 +2016,8 @@ function _MY.UI:value(nValue)
 		end
 		return self
 	else -- get
-		-- select the first item
 		local ele = self.eles[1]
-		-- try to get its name
-		if ele.type=="WndSliderBox" then
+		if ele and ele.type == "WndSliderBox" then
 			return ele.wnd.nOffset + ele.sld:GetScrollPos()
 		end
 	end
@@ -2070,12 +2037,13 @@ function _MY.UI:multiLine(bMultiLine)
 		end
 		return self
 	else -- get
-		-- select the first item
 		local ele = self.eles[1]
-		-- try to get its name
-		local status, bMultiLine = pcall(function() return (ele.edt or ele.txt):IsMultiLine() end)
-		-- if succeed then return its name
-		if status then return bMultiLine else MY.Debug({bMultiLine},'ERROR _MY.UI:multiLine' ,1) return nil end
+		if ele then
+			local x = ele.edt or ele.txt
+			if x and x.IsMultiLine then
+				return x:IsMultiLine()
+			end
+		end
 	end
 end
 
@@ -2113,13 +2081,9 @@ function _MY.UI:frame(nFrame)
 			pcall(function() ele.img:GetParent():FormatAllItemPos() end)
 		end
 	else
-		-- select the first item
 		local ele = self.eles[1]
 		if ele and ele.type == 'Image' then
-			-- try to get its frame
-			local status, nFrame = pcall(function() return ele.raw:GetFrame() end)
-			-- if succeed then return its name
-			if status then return nFrame else MY.Debug({nFrame},'ERROR _MY.UI:frame' ,1) return nil end
+			return ele.raw:GetFrame()
 		end
 	end
 	return self
@@ -2486,14 +2450,12 @@ function _MY.UI:check(fnCheck, fnUncheck, bNoAutoBind)
 		end
 		return self
 	elseif not fnCheck then
-		-- select the first item
 		local ele = self.eles[1]
-		-- try to get its check status
 		if ele and ele.chk then
 			return ele.chk:IsCheckBoxChecked()
 		end
 	else
-		MY.Debug({'fnCheck:'..type(fnCheck)..' fnUncheck:'..type(fnUncheck)}, 'ERROR _MY.UI:check' ,1)
+		MY.Debug({'fnCheck:'..type(fnCheck)..' fnUncheck:'..type(fnUncheck)}, 'ERROR _MY.UI:check', MY_DEBUG.ERROR)
 	end
 end
 
@@ -2569,7 +2531,7 @@ MY.UI.RegisterUIEvent = function(raw, szEvent, fnEvent)
 				for _, fn in ipairs(raw['tMy' .. szEvent] or {}) do 
 					local t = { pcall(fn, ...) }
 					if not t[1] then
-						MY.Debug({t[2]}, MY.UI.GetTreePath(raw) .. '#' .. szEvent, 2)
+						MY.Debug({t[2]}, MY.UI.GetTreePath(raw) .. '#' .. szEvent, MY_DEBUG.ERROR)
 					elseif not tReturn then
 						table.remove(t, 1)
 						tReturn = t

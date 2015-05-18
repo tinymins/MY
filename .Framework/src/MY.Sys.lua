@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-17 11:46:56
+-- @Last Modified time: 2015-05-18 09:50:58
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 MY = MY or {}
@@ -89,7 +89,7 @@ MY.Sys.SaveLUAData = function(szFileUri, tData, bNoDistinguishLang, indent, crc)
 	-- 调用系统API
 	local ret = SaveLUAData(szFileUri, tData, indent, crc)
 	-- performance monitor
-	MY.Debug({_L('%s saved during %dms.', szFileUri, GetTickCount() - nStartTick)}, 'PMTool', 0)
+	MY.Debug({_L('%s saved during %dms.', szFileUri, GetTickCount() - nStartTick)}, 'PMTool', MY_DEBUG.PMLOG)
 	return ret
 end
 MY.SaveLUAData = MY.Sys.SaveLUAData
@@ -124,7 +124,7 @@ MY.Sys.LoadLUAData = function(szFileUri, bNoDistinguishLang)
 	-- 调用系统API
 	local ret = LoadLUAData(szFileUri)
 	-- performance monitor
-	MY.Debug({_L('%s loaded during %dms.', szFileUri, GetTickCount() - nStartTick)}, 'PMTool', 0)
+	MY.Debug({_L('%s loaded during %dms.', szFileUri, GetTickCount() - nStartTick)}, 'PMTool', MY_DEBUG.PMLOG)
 	return ret
 end
 MY.LoadLUAData = MY.Sys.LoadLUAData
@@ -250,7 +250,7 @@ MY.RemoteRequest = function(szUrl, fnSuccess, fnError, nTimeout)
 	end
 	if type(fnError) ~= "function" then
 		fnError = function(szUrl, errMsg)
-			MY.Debug({szUrl .. ' - ' .. errMsg}, 'RemoteRequest', 1)
+			MY.Debug({szUrl .. ' - ' .. errMsg}, 'RemoteRequest', MY_DEBUG.WARNING)
 		end
 	end
 	
@@ -264,27 +264,27 @@ MY.RemoteRequest = function(szUrl, fnSuccess, fnError, nTimeout)
 	hPage.OnDocumentComplete = function()
 		local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
 		if szUrl ~= szTitle or szContent ~= "" then
-			MY.Debug({string.format("%s - %s", szTitle, szUrl)}, 'MYRR::OnDocumentComplete', 0)
+			MY.Debug({string.format("%s - %s", szTitle, szUrl)}, 'MYRR::OnDocumentComplete', MY_DEBUG.LOG)
 			-- 注销超时处理时钟
 			MY.DelayCall("MYRR_TO_" .. RequestID)
 			-- 成功回调函数
 			local status, err = pcall(fnSuccess, szTitle, szContent)
 			if not status then
-				MY.Debug({err}, 'MYRR::OnDocumentComplete::Callback', 3)
+				MY.Debug({err}, 'MYRR::OnDocumentComplete::Callback', MY_DEBUG.ERROR)
 			end
 			Wnd.CloseWindow(hFrame)
 		end
 	end
 	
 	-- do with this remote request
-	MY.Debug({szUrl}, 'MYRR', 0)
+	MY.Debug({szUrl}, 'MYRR', MY_DEBUG.LOG)
 	-- register request timeout clock
 	MY.DelayCall(function()
-		MY.Debug({szUrl}, 'MYRR::Timeout', 1) -- log
+		MY.Debug({szUrl}, 'MYRR::Timeout', MY_DEBUG.WARNING) -- log
 		-- request timeout, call timeout function.
 		local status, err = pcall(fnError, szUrl, "timeout")
 		if not status then
-			MY.Debug({err}, 'MYRR::TIMEOUT', 3)
+			MY.Debug({err}, 'MYRR::TIMEOUT', MY_DEBUG.ERROR)
 		end
 		Wnd.CloseWindow(hFrame)
 	end, nTimeout, "MYRR_TO_" .. RequestID)
@@ -438,7 +438,7 @@ MY.UI.RegisterUIEvent(MY, "OnFrameBreathe", function()
 			bc.nNext = nFrame + bc.nFrame
 			local res, err = pcall(bc.fnAction, unpack(bc.param))
 			if not res then
-				MY.Debug({"BreatheCall#" .. (bc.szName or ('anonymous_'..i)) .." ERROR: " .. err})
+				MY.Debug({err}, "BreatheCall#" .. (bc.szName or i), MY_DEBUG.ERROR)
 			elseif err == 0 then    -- function return 0 means to stop its breathe
 				for i = #_C.tBreatheCall, 1, -1 do
 					if _C.tBreatheCall[i] == bc then
@@ -455,7 +455,7 @@ MY.UI.RegisterUIEvent(MY, "OnFrameBreathe", function()
 		if dc.nTime <= nTime then
 			local res, err = pcall(dc.fnAction, unpack(dc.param))
 			if not res then
-				MY.Debug({"DelayCall#" .. (dc.szName or 'anonymous') .." ERROR: " .. err})
+				MY.Debug({err}, "DelayCall#" .. (dc.szName or i), MY_DEBUG.ERROR)
 			end
 			table.remove(_C.tDelayCall, i)
 		end
@@ -690,7 +690,7 @@ end
 -- szTitle  Debug头
 -- nLevel   Debug级别[低于当前设置值将不会输出]
 MY.Debug = function(oContent, szTitle, nLevel)
-	if type(nLevel)~="number"  then nLevel = 1 end
+	if type(nLevel)~="number"  then nLevel = MY_DEBUG.WARNING end
 	if type(szTitle)~="string" then szTitle = 'MY DEBUG' end
 	if type(oContent)~='table' then oContent = { oContent, bNoWrap = true } end
 	if not oContent.r then
@@ -711,12 +711,10 @@ MY.Debug = function(oContent, szTitle, nLevel)
 end
 
 MY.StartDebugMode = function()
-	MY.Sys.IsShieldedVersion(false)
-	local me = GetClientPlayer()
-	if me then
-		Station.Lookup("Lowest/Scene").JH = {["NAME_EX"] = { [me.szName] = me.dwID }}
-		FireEvent("CIRCLE_DEBUG", 80, 1)
+	if JH then
+		JH.bDebugClient = true
 	end
+	MY.Sys.IsShieldedVersion(false)
 end
 
 -- 格式化计时时间
