@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-17 11:26:22
+-- @Last Modified time: 2015-05-18 09:45:00
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -236,7 +236,7 @@ _MY.Init = function()
 			MY.Debug({err}, "_MY.tInitFun#" .. szKey)
 		end
 		-- performance monitor
-		MY.Debug({_L('Initial function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], 0)
+		MY.Debug({_L('Initial function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], MY_DEBUG.LOG)
 	end
 	_MY.tInitFun = nil
 	-- 加载主窗体
@@ -400,7 +400,7 @@ MY.ResizePanel = function(nWidth, nHeight)
 	if hWndMainPanel.OnPanelResize then
 		local res, err = pcall(hWndMainPanel.OnPanelResize, hWndMainPanel)
 		if not res then
-			MY.Debug({err}, 'MY#OnPanelResize', 1)
+			MY.Debug({err}, 'MY#OnPanelResize', MY_DEBUG.ERROR)
 		elseif MY.Sys.GetLang() ~= 'vivn' then
 			hWndMainPanel:FormatAllContentPos()
 		end
@@ -408,14 +408,14 @@ MY.ResizePanel = function(nWidth, nHeight)
 		if hWndMainPanel.OnPanelDeactive then
 			local res, err = pcall(hWndMainPanel.OnPanelDeactive, hWndMainPanel)
 			if not res then
-				MY.Debug({err}, 'MY#OnPanelResize->OnPanelDeactive', 1)
+				MY.Debug({err}, 'MY#OnPanelResize->OnPanelDeactive', MY_DEBUG.ERROR)
 			end
 		end
 		hWndMainPanel:Clear()
 		hWndMainPanel:Lookup('', ''):Clear()
 		local res, err = pcall(hWndMainPanel.OnPanelActive, hWndMainPanel)
 		if not res then
-			MY.Debug({err}, 'MY#OnPanelResize->OnPanelActive', 1)
+			MY.Debug({err}, 'MY#OnPanelResize->OnPanelActive', MY_DEBUG.ERROR)
 		elseif MY.Sys.GetLang() ~= 'vivn' then
 			hWndMainPanel:FormatAllContentPos()
 		end
@@ -557,7 +557,7 @@ _MY.EventHandler = function(szEvent, ...)
 		for k, v in pairs(tEvent) do
 			local res, err = pcall(v, szEvent, ...)
 			if not res then
-				MY.Debug({err}, 'OnEvent#' .. szEvent .. "." .. k, 2)
+				MY.Debug({err}, 'OnEvent#' .. szEvent .. "." .. k, MY_DEBUG.ERROR)
 			end
 		end
 	end
@@ -735,7 +735,7 @@ MY.SwitchTab = function(szID)
 	if wndMainPanel.OnPanelDeactive then
 		local res, err = pcall(wndMainPanel.OnPanelDeactive, wndMainPanel)
 		if not res then
-			MY.Debug({err}, 'MY#OnPanelDeactive', 1)
+			MY.Debug({err}, 'MY#OnPanelDeactive', MY_DEBUG.ERROR)
 		end
 	end
 	wndMainPanel.OnPanelDeactive = nil
@@ -777,7 +777,7 @@ MY.SwitchTab = function(szID)
 					if tab.fn.OnPanelActive then
 						local res, err = pcall(tab.fn.OnPanelActive, wndMainPanel)
 						if not res then
-							MY.Debug({err}, 'MY#OnPanelActive', 1)
+							MY.Debug({err}, 'MY#OnPanelActive', MY_DEBUG.ERROR)
 						elseif MY.Sys.GetLang() ~= 'vivn' then
 							wndMainPanel:FormatAllContentPos()
 						end
