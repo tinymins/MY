@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-18 09:47:01
+-- @Last Modified time: 2015-05-19 16:43:58
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 if not GetCampImageFrame then
@@ -36,6 +36,7 @@ if not GetCampImage then
 	end
 end
 
+-- 只读表创建
 if not SetmetaReadonly then
 function SetmetaReadonly(t)
 	for k, v in pairs(t) do
@@ -44,11 +45,40 @@ function SetmetaReadonly(t)
 		end
 	end
 	return setmetatable({}, {
-		__index    = t,
-		__newindex = function() assert(false, 'table is readonly\n') end,
+		__index     = t,
+		__newindex  = function() assert(false, 'table is readonly\n') end,
+		__metatable = {
+			const_table = t,
+		},
 	})
 end
 end
+
+-- -- 只读表字典枚举
+-- if not pairs_c then
+-- function pairs_c(t, ...)
+-- 	if type(t) == "table" then
+-- 		local metatable = getmetatable(t)
+-- 		if type(metatable) == "table" and metatable.const_table then
+-- 			return pairs(metatable.const_table, ...)
+-- 		end
+-- 	end
+-- 	return pairs(t, ...)
+-- end
+-- end
+
+-- -- 只读表数组枚举
+-- if not ipairs_c then
+-- function ipairs_c(t, ...)
+-- 	if type(t) == "table" then
+-- 		local metatable = getmetatable(t)
+-- 		if type(metatable) == "table" and metatable.const_table then
+-- 			return ipairs(metatable.const_table, ...)
+-- 		end
+-- 	end
+-- 	return ipairs(t, ...)
+-- end
+-- end
 
 if not clone then
 function clone(var)
