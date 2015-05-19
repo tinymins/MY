@@ -60,6 +60,7 @@ data = {
     ['Ally'] = "友好关系",
     ['Party'] = "队友关系",
     ['Self'] = "自己",
+    ['Foe'] = "仇人关系",
     
     ['enhanced mod'] = "增强模式",
     ['Check this option may cause target switch.'] = "勾选该选项可能导致目标切换的问题。",
