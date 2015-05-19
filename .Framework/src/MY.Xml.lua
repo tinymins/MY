@@ -50,7 +50,7 @@ function SLAXML:parse(xml,options)
 	if not options then options = { stripWhitespace=false } end
 
 	-- Cache references for maximum speed
-	local find, sub, gsub, char, push, pop, concat = string.find, string.sub, string.gsub, string.char, table.insert, table.remove, table.concat
+	local find, sub, gsub, char, byte, push, pop, concat = string.find, string.sub, string.gsub, string.char, string.byte, table.insert, table.remove, table.concat
 	local first, last, match1, match2, match3, pos2, nsURI
 	local unpack = unpack or table.unpack
 	local pos = 1
@@ -245,8 +245,34 @@ function SLAXML:parse(xml,options)
 				if startElement() then
 					state = "attributes"
 				else
-					first, last = find( xml, '^[^<]+', pos )
-					pos = (first and last or pos) + 1
+					local quoting = false
+					local escaping = false
+					local byte_quote1, byte_quote2 = (byte("'")) , (byte('"'))
+					local byte_escape, byte_lt     = (byte("\\")), (byte("<"))
+					local byte_i, byte_quote
+					for i = pos, xml:len() do
+						byte_i = byte(xml, i)
+						if not escaping then
+							if byte_i == byte_escape then
+								escaping = true
+							elseif quoting and byte_i == byte_quote then
+								quoting = false
+							elseif not quoting then
+								if byte_i == byte_quote1 or byte_i == byte_quote2 then
+									quoting = true
+									byte_quote = byte_i
+								elseif byte_i == byte_lt then
+									pos = i - 1
+									break
+								end
+							end
+						else
+							escaping = false
+						end
+					end
+					pos = pos + 1
+					-- first, last = find( xml, '^[^<]+', pos )
+					-- pos = (first and last or pos) + 1
 				end
 			end
 		elseif state=="attributes" then
