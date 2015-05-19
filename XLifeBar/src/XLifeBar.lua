@@ -18,25 +18,31 @@ local Config_Default = {
     nCamp = -1,
     Col = {
         Player = {
-            Self  = {30 ,140,220},      -- 自己
-            Party = {30 ,140,220},      -- 团队
-            Enemy = {255,30 ,30 },      -- 敌对
-            Neutrality = {255,255,0},   -- 中立
-            Ally  = {30 ,255,30 },      -- 相同阵营
+            Self       = {30 , 140 ,220}, -- 自己
+            Party      = {30 , 140 ,220}, -- 团队
+            Enemy      = {255, 30  ,30 }, -- 敌对
+            Neutrality = {255, 255 ,0  }, -- 中立
+            Ally       = {30 , 255 ,30 }, -- 相同阵营
+            Foe        = {255, 128 ,255}, -- 仇人
         },
         Npc = {
-            Party = {30 ,140,220},-- 团队
-            Enemy = {255,30 ,30 },-- 敌对
-            Neutrality = {255,255,0},-- 中立
-            Ally  = {30 ,255,30 },-- 相同阵营
+            Party      = {30 , 140, 220}, -- 团队
+            Enemy      = {255, 30 , 30 }, -- 敌对
+            Neutrality = {255, 255, 0  }, -- 中立
+            Ally       = {30 , 255, 30 }, -- 相同阵营
         }
-    },
-    bShowName    = { Player = { Self = true , Party = true , Neutrality = true , Enemy = true , Ally = true , }, Npc = { Party = true , Neutrality = true , Enemy = true , Ally = true , }, },
-    bShowTitle   = { Player = { Self = true , Party = true , Neutrality = true , Enemy = true , Ally = true , }, Npc = { Party = true , Neutrality = true , Enemy = true , Ally = true , }, },
-    bShowTong    = { Player = { Self = true , Party = true , Neutrality = true , Enemy = true , Ally = true , },},
-    bShowLife    = { Player = { Self = true , Party = true , Neutrality = true , Enemy = true , Ally = true , }, Npc = { Party = false, Neutrality = true , Enemy = true , Ally = true , }, },
-    bShowLifePer = { Player = { Self = false, Party = false, Neutrality = false, Enemy = false, Ally = false, }, Npc = { Party = false, Neutrality = false, Enemy = false, Ally = false, }, },
-    bShowOTBar   = { Player = { Self = true , Party = false, Neutrality = false, Enemy = true , Ally = false, }, Npc = { Party = false, Neutrality = false, Enemy = true , Ally = false, }, },
+    }, bShowName    = { Player = { Party = true , Neutrality = true , Enemy = true , Ally = true , Self = true , Foe = true , },
+                        Npc    = { Party = true , Neutrality = true , Enemy = true , Ally = true ,                            },
+    }, bShowTitle   = { Player = { Party = true , Neutrality = true , Enemy = true , Ally = true , Self = true , Foe = true , },
+                        Npc    = { Party = true , Neutrality = true , Enemy = true , Ally = true ,                            },
+    }, bShowLife    = { Player = { Party = true , Neutrality = true , Enemy = true , Ally = true , Self = true , Foe = true , },
+                        Npc    = { Party = false, Neutrality = true , Enemy = true , Ally = true ,                            },
+    }, bShowLifePer = { Player = { Party = false, Neutrality = false, Enemy = false, Ally = false, Self = false, Foe = false, },
+                        Npc    = { Party = false, Neutrality = false, Enemy = false, Ally = false,                            },
+    }, bShowOTBar   = { Player = { Party = false, Neutrality = false, Enemy = true , Ally = false, Self = true , Foe = true , },
+                        Npc    = { Party = false, Neutrality = false, Enemy = true , Ally = false,                            },
+    }, bShowTong    = { Player = { Party = true , Neutrality = true , Enemy = true , Ally = true , Self = true , Foe = true , }, },
+    
     nLineHeight = { 100, 80, 60},
     bShowSpecialNpc = false,
     bShowDistance = false,
@@ -129,8 +135,10 @@ _C.GetForce = function(dwID)
         elseif IsNeutrality(me.dwID, dwID) then
             return "Neutrality"
         elseif IsEnemy(me.dwID, dwID) then -- 敌对关系
-            local r,g,b = GetHeadTextForceFontColor(dwID, me.dwID)
-            if r == 255 and g == 255 and b == 0 then
+            local r, g, b = GetHeadTextForceFontColor(dwID, me.dwID) -- 我看他的颜色
+            if MY.Player.GetFoe(dwID) then
+                return "Foe"
+            elseif r == 255 and g == 255 and b == 0 then
                 return "Neutrality"
             else
                 return "Enemy"
@@ -148,6 +156,8 @@ _C.GetForce = function(dwID)
             return "Self"
         elseif IsParty(me.dwID, dwID) then
             return "Party"
+        elseif MY.Player.GetFoe(dwID) then
+            return "Foe"
         elseif tar.nCamp == Config.nCamp then
             return "Ally"
         elseif not tar.bCampFlag or     -- 没开阵营

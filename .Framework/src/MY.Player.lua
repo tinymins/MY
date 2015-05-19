@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-18 16:56:25
+-- @Last Modified time: 2015-05-19 17:27:25
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -249,6 +249,44 @@ MY.Player.GetFriend = function(arg0)
 			return clone(_C.tFriendListByID[arg0])
 		elseif type(arg0) == "string" then
 			return clone(_C.tFriendListByName[arg0])
+		end
+	end
+end
+
+_C.GeneFoeListCache = function()
+	if not _C.tFoeList then
+		local me = GetClientPlayer()
+		_C.tFoeList = {}
+		_C.tFoeListByID = {}
+		_C.tFoeListByName = {}
+		if me.GetFoeInfo then
+			for i, p in ipairs(me.GetFoeInfo()) do
+				_C.tFoeListByID[p.id] = p
+				_C.tFoeListByName[p.name] = p
+				table.insert(_C.tFoeList, p)
+			end
+		end
+	end
+end
+_C.OnFoeListChange = function()
+	_C.tFoeList = nil
+	_C.tFoeListByID = nil
+	_C.tFoeListByName = nil
+end
+MY.RegisterEvent("PLAYER_FOE_UPDATE", _C.OnFoeListChange)
+-- 获取仇人列表
+MY.Player.GetFoeList = function()
+	_C.GeneFoeListCache()
+	return clone(_C.tFoeList)
+end
+-- 获取仇人
+MY.Player.GetFoe = function(arg0)
+	if arg0 then
+		_C.GeneFoeListCache()
+		if type(arg0) == "number" then
+			return _C.tFoeListByID[arg0]
+		elseif type(arg0) == "string" then
+			return _C.tFoeListByName[arg0]
 		end
 	end
 end
