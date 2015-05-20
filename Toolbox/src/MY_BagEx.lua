@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-25 10:40:14
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-20 13:14:50
+-- @Last Modified time: 2015-05-20 13:31:29
 -----------------------------------------------
 MY_BagEx = {}
 MY_BagEx.bEnable = true
@@ -195,7 +195,7 @@ end
 _C.DoFilterBag = function(bForce)
 	-- 优化性能 当过滤器为空时不遍历筛选
 	if bForce or _C.szBagFilter or _C.bBagTimeLtd then
-		_C.FilterPackage("Normal/BigBagPanel/", _C.szBagFilter, _C.bBagTimeLtd)
+		_C.FilterBags("Normal/BigBagPanel", _C.szBagFilter, _C.bBagTimeLtd)
 		if _C.szBagFilter == "" then
 			_C.szBagFilter = nil
 		end
@@ -205,7 +205,7 @@ end
 _C.DoFilterBank = function(bForce)
 	-- 优化性能 当过滤器为空时不遍历筛选
 	if bForce or _C.szBankFilter or _C.bBankTimeLtd then
-		_C.FilterPackage("Normal/BigBankPanel/", _C.szBankFilter, _C.bBankTimeLtd)
+		_C.FilterBags("Normal/BigBankPanel", _C.szBankFilter, _C.bBankTimeLtd)
 		if _C.szBankFilter == "" then
 			_C.szBankFilter = nil
 		end
@@ -215,42 +215,20 @@ end
 _C.DoFilterGuildBank = function(bForce)
 	-- 优化性能 当过滤器为空时不遍历筛选
 	if bForce or _C.szGuildBankFilter then
-		_C.FilterGuildPackage("Normal/GuildBankPanel/", _C.szGuildBankFilter)
+		_C.FilterBags("Normal/GuildBankPanel", _C.szGuildBankFilter)
 		if _C.szGuildBankFilter == "" then
 			_C.szGuildBankFilter = nil
 		end
 	end
 end
--- 过滤背包原始函数
-_C.FilterPackage = function(szTreePath, szFilter, bTimeLtd)
+-- 过滤仓库原始函数
+_C.FilterBags = function(szTreePath, szFilter)
 	szFilter = (szFilter or ""):gsub('[%[%]]', '')
 	local me = GetClientPlayer()
 	MY.UI(szTreePath):find(".Box"):each(function(ui)
-		if this.bBag then return end
-		local dwBox, dwX, bMatch = this.dwBox, this.dwX, true
-		local item = me.GetItem(dwBox, dwX)
-		if not item then
+		if this.bBag then
 			return
 		end
-		local szText = _C.GetItemText(item)
-		if not wstring.find(szText, szFilter) then
-			bMatch = false
-		end
-		if bTimeLtd and item:GetLeftExistTime() == 0 then
-			bMatch = false
-		end
-		if bMatch then
-			this:SetAlpha(255)
-		else
-			this:SetAlpha(50)
-		end
-	end)
-end
--- 过滤帮会仓库原始函数
-_C.FilterGuildPackage = function(szTreePath, szFilter)
-	szFilter = (szFilter or ""):gsub('[%[%]]', '')
-	local me = GetClientPlayer()
-	MY.UI(szTreePath):find(".Box"):each(function(ui)
 		local _, nUiId, dwBox, dwX, suitIndex, dwTabType, dwIndex = this:GetObject()
 		local item = GetPlayerItem(GetClientPlayer(), dwBox, dwX)
 		if item then
