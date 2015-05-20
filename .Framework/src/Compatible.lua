@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-19 16:43:58
+-- @Last Modified time: 2015-05-20 13:08:38
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 if not GetCampImageFrame then
@@ -348,6 +348,14 @@ KUNGFU_TYPE = {
 	TANG_MEN    = 10,     -- 唐门内功
 	CANG_YUN    = 18,     -- 苍云内功
 }
+end
+
+INVENTORY_GUILD_BANK      = INVENTORY_GUILD_BANK or (INVENTORY_INDEX.TOTAL + 1) --帮会仓库界面虚拟一个背包位置
+INVENTORY_GUILD_PAGE_SIZE = INVENTORY_GUILD_PAGE_SIZE or 100
+if not GetGuildBankBagPos then
+function GetGuildBankBagPos(nPage, nIndex)
+	return INVENTORY_GUILD_BANK, nPage * INVENTORY_GUILD_PAGE_SIZE + nIndex
+end
 end
 
 MY_DEBUG = SetmetaReadonly({

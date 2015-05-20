@@ -4,12 +4,12 @@
 -- @Date  : 2014-11-25 10:40:14
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-16 21:33:37
+-- @Last Modified time: 2015-05-20 13:14:50
 -----------------------------------------------
 MY_BagEx = {}
 MY_BagEx.bEnable = true
 RegisterCustomData("MY_BagEx.bEnable")
-local _C = {}
+local _C = { tItemText = {} }
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 
 MY_BagEx.Enable = function(bEnable)
@@ -17,41 +17,41 @@ MY_BagEx.Enable = function(bEnable)
 	if bEnable then
 		_C.OnBreathe()
 	else
-		MY.UI("Normal/BigBagPanel/CheckBox_Totle")
-		:add("Normal/BigBagPanel/CheckBox_Task")
-		:add("Normal/BigBagPanel/CheckBox_Equipment")
-		:add("Normal/BigBagPanel/CheckBox_Drug")
-		:add("Normal/BigBagPanel/CheckBox_Material")
-		:add("Normal/BigBagPanel/CheckBox_Book")
-		:add("Normal/BigBagPanel/CheckBox_Grey")
-		:onuievent('OnLButtonUp')
-		
-		MY.UI("Normal/GuildBankPanel"):children('#^CheckBox_%d$')
-		:onuievent('OnLButtonUp')
-		
-		MY.UI("Normal/BigBagPanel/CheckBox_TimeLtd")
-		:add("Normal/BigBagPanel/WndEditBox_KeyWord")
-		:add("Normal/BigBankPanel/CheckBox_TimeLtd")
-		:add("Normal/BigBankPanel/WndEditBox_KeyWord")
-		:add("Normal/BigBankPanel/WndCheckBox_Compare")
-		:add("Normal/GuildBankPanel/WndEditBox_KeyWord")
-		:add("Normal/GuildBankPanel/WndCheckBox_Compare")
-		:remove()
-		
-		MY.UI("Normal/BigBagPanel")
-		:add("Normal/BigBankPanel")
-		:add("Normal/GuildBankPanel")
-		:each(function()
-			this.bMYBagExHook = nil
-		end)
+		_C.ClearHook()
 	end
 end
 
-_C.OnBreathe = function()
-	if not MY_BagEx.bEnable then
-		return
-	end
+_C.ClearHook = function()
+	MY.UI("Normal/BigBagPanel/CheckBox_Totle")
+	:add("Normal/BigBagPanel/CheckBox_Task")
+	:add("Normal/BigBagPanel/CheckBox_Equipment")
+	:add("Normal/BigBagPanel/CheckBox_Drug")
+	:add("Normal/BigBagPanel/CheckBox_Material")
+	:add("Normal/BigBagPanel/CheckBox_Book")
+	:add("Normal/BigBagPanel/CheckBox_Grey")
+	:onuievent('OnLButtonUp')
+	
+	MY.UI("Normal/GuildBankPanel"):children('#^CheckBox_%d$')
+	:onuievent('OnLButtonUp')
+	
+	MY.UI("Normal/BigBagPanel/CheckBox_TimeLtd")
+	:add("Normal/BigBagPanel/WndEditBox_KeyWord")
+	:add("Normal/BigBankPanel/CheckBox_TimeLtd")
+	:add("Normal/BigBankPanel/WndEditBox_KeyWord")
+	:add("Normal/BigBankPanel/WndCheckBox_Compare")
+	:add("Normal/GuildBankPanel/WndEditBox_KeyWord")
+	:add("Normal/GuildBankPanel/WndCheckBox_Compare")
+	:remove()
+	
+	MY.UI("Normal/BigBagPanel")
+	:add("Normal/BigBankPanel")
+	:add("Normal/GuildBankPanel")
+	:each(function()
+		this.bMYBagExHook = nil
+	end)
+end
 
+_C.Hook = function()
 	-- bag
 	local hFrame = Station.Lookup("Normal/BigBagPanel")
 	if hFrame and not hFrame.bMYBagExHook then
@@ -166,7 +166,28 @@ _C.OnBreathe = function()
 		  		_C.DoCompareGuildBank(true)
 		  	end, 100)
 		  end)
-		
+	end
+end
+
+_C.OnBreathe = function()
+	if MY_BagEx.bEnable then
+		_C.Hook()
+	end
+end
+
+_C.GetItemText = function(item)
+	if item then
+		if GetItemTip then
+			local szKey = item.dwTabType .. ',' .. item.dwIndex
+			if not _C.tItemText[szKey] then
+				_C.tItemText[szKey] = MY.Xml.GetPureText(GetItemTip(item))
+			end
+			return _C.tItemText[szKey]
+		else
+			return item.szName
+		end
+	else
+		return ''
 	end
 end
 
@@ -208,8 +229,11 @@ _C.FilterPackage = function(szTreePath, szFilter, bTimeLtd)
 		if this.bBag then return end
 		local dwBox, dwX, bMatch = this.dwBox, this.dwX, true
 		local item = me.GetItem(dwBox, dwX)
-		if not item then return end
-		if not wstring.find(item.szName, szFilter) then
+		if not item then
+			return
+		end
+		local szText = _C.GetItemText(item)
+		if not wstring.find(szText, szFilter) then
 			bMatch = false
 		end
 		if bTimeLtd and item:GetLeftExistTime() == 0 then
@@ -227,13 +251,15 @@ _C.FilterGuildPackage = function(szTreePath, szFilter)
 	szFilter = (szFilter or ""):gsub('[%[%]]', '')
 	local me = GetClientPlayer()
 	MY.UI(szTreePath):find(".Box"):each(function(ui)
-		local uIID, _, nPage, dwIndex = this:GetObjectData()
-		if uIID < 0 then return end
-		if not wstring.find(GetItemNameByUIID(uIID), szFilter) then
-			this:SetAlpha(50)
-		else
-			this:SetAlpha(255)
+		local _, nUiId, dwBox, dwX, suitIndex, dwTabType, dwIndex = this:GetObject()
+		local item = GetPlayerItem(GetClientPlayer(), dwBox, dwX)
+		if item then
+			if not wstring.find( _C.GetItemText(item), szFilter) then
+				this:SetAlpha(50)
+				return
+			end
 		end
+		this:SetAlpha(255)
 	end)
 end
 
@@ -325,3 +351,4 @@ MY.RegisterEvent("BAG_ITEM_UPDATE", function()
 	MY.DelayCall('MY_BagEx', _C.OnBagItemUpdate, 100)
 end)
 MY.RegisterInit('MY_BAGEX', function() MY.BreatheCall(_C.OnBreathe, 130) end)
+MY.RegisterReload("MY_BAGEX", _C.ClearHook)
