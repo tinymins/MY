@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-17 22:47:19
+-- @Last Modified time: 2015-05-20 10:51:05
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -235,38 +235,34 @@ MY.Chat.LinkEventHandler = {
 -- element: 一个可以挂鼠标消息响应的UI元素
 -- szMsg  : 格式化的UIXML消息
 MY.Chat.RenderLink = function(argv, argv2)
-	if type(argv) == 'string' then
-		local szMsg = argv
-		szMsg = string.gsub(szMsg, "(<text>.-</text>)", function (html)
-			local xml = MY.Xml.Decode(html)
-			if not (xml and xml[1] and xml[1][''] and xml[1][''].name) then
-				return
+	if type(argv) == 'string' then -- szMsg
+		local xmls = MY.Xml.Decode(argv)
+		if xmls then
+			for i, xml in ipairs(xmls) do
+				if xml and xml['.'] == "text" and xml[''] and xml[''].name then
+					local name, script = xml[''].name, xml[''].script
+					if script then
+						script = script .. '\n'
+					else
+						script = ''
+					end
+					
+					if name:sub(1, 8) == 'namelink' then
+						script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.LinkEventHandler.OnNameLClick(this) end\nthis.OnItemRButtonDown=function() MY.Chat.LinkEventHandler.OnNameRClick(this) end'
+					elseif name == 'copy' or name == 'copylink' or name == 'timelink' then
+						script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end'
+					else
+						script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.LinkEventHandler.OnItemLClick(this) end\nthis.OnItemRButtonDown=function() MY.Chat.LinkEventHandler.OnItemRClick(this) end'
+					end
+					
+					if #script > 0 then
+						xml[''].eventid = 883
+						xml[''].script = script
+					end
+				end
 			end
-			
-			local name, script = xml[1][''].name, xml[1][''].script
-			if script then
-				script = script .. '\n'
-			else
-				script = ''
-			end
-			
-			if name:sub(1, 8) == 'namelink' then
-				script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.LinkEventHandler.OnNameLClick(this) end\nthis.OnItemRButtonDown=function() MY.Chat.LinkEventHandler.OnNameRClick(this) end'
-			elseif name == 'copy' or name == 'copylink' or name == 'timelink' then
-				script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end'
-			else
-				script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.LinkEventHandler.OnItemLClick(this) end\nthis.OnItemRButtonDown=function() MY.Chat.LinkEventHandler.OnItemRClick(this) end'
-			end
-			
-			if #script > 0 then
-				xml[1][''].eventid = 883
-				xml[1][''].script = script
-			end
-			html = MY.Xml.Encode(xml)
-			
-			return html
-		end)
-		argv = szMsg
+			argv = MY.Xml.Encode(xmls)
+		end
 	elseif type(argv) == 'table' and type(argv.GetName) == 'function' then
 		if argv.bMyChatRendered then
 			return
