@@ -290,7 +290,7 @@ function SLAXML:parse(xml,options)
 end
 
 local xmlEscape = function(str)
-	return str:gsub('\\', '\\\\'):gsub('"', '\\"')
+	return (str:gsub('\\', '\\\\'):gsub('"', '\\"'))
 end
 
 local xmlUnescape = function(str)
@@ -316,47 +316,65 @@ end
 
 local xmlEncode
 xmlEncode = function(xml)
-	local html = ''
+	local t = {}
 	
+	-- head
+	if xml['.'] then
+		tinsert(t, '<')
+		tinsert(t, xml['.'])
+		
+		-- attributes
+		local attr = ''
+		for k, v in pairs(xml) do
+			if type(k) == 'string' and string.find(k, "^[a-zA-Z0-9_]+$") then
+				tinsert(t, ' ')
+				tinsert(t, k)
+				tinsert(t, '=')
+				if type(v) == 'string' then
+					tinsert(t, '"')
+					tinsert(t, xmlEscape(v))
+					tinsert(t, '"')
+				elseif type(v) == 'boolean' then
+					tinsert(t, (( v and 'true' ) or 'false'))
+				else
+					tinsert(t, tostring(v))
+				end
+			end
+		end
+		
+		tinsert(t, '>')
+	end
+	-- inner attritubes
 	local text = ''
 	if xml[''] then
 		for k, v in pairs(xml['']) do
-			text = text .. k .. '='
+			tinsert(t, ' ')
+			tinsert(t, k)
+			tinsert(t, '=')
 			if type(v) == 'string' then
-				text = text .. '"' .. xmlEscape(v) .. '"'
+				tinsert(t, '"')
+				tinsert(t, xmlEscape(v))
+				tinsert(t, '"')
 			elseif type(v) == 'boolean' then
-				text = text .. (( v and 'true' ) or 'false')
+				tinsert(t, (( v and 'true' ) or 'false'))
 			else
-				text = text .. v
+				tinsert(t, tostring(v))
 			end
-			text = text .. ' '
 		end
-	end
-	for _, v in ipairs(xml) do
-		text = text .. xmlEncode(v)
 	end
 	
-	local attr = ''
-	for k, v in pairs(xml) do
-		if type(k) == 'string' and string.find(k, "^[a-zA-Z0-9_]+$") then
-			attr = attr .. ' ' .. k .. '='
-			if type(v) == 'string' then
-				attr = attr .. '"' .. xmlEscape(v) .. '"'
-			elseif type(v) == 'boolean' then
-				attr = attr .. (( v and 'true' ) or 'false')
-			else
-				attr = attr .. v
-			end
-		end
+	-- children
+	for _, v in ipairs(xml) do
+		tinsert(t, xmlEncode(v))
 	end
 	
 	if xml['.'] then
-		html = html .. '<' .. xml['.'] .. attr .. '> ' .. text .. '</' .. xml['.'] .. '>'
-	else
-		html = html .. text
+		tinsert(t, '</')
+		tinsert(t, xml['.'])
+		tinsert(t, '>')
 	end
 	
-	return html
+	return (tconcat(t))
 end
 
 local xmlDecode = function(myxml)
