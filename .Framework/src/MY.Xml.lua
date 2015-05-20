@@ -41,6 +41,7 @@ local SLAXML = {
 		end,
 	}
 }
+local tinsert, tconcat = table.insert, table.concat
 
 function SLAXML:parser(callbacks)
 	return { _call=callbacks or self._call, parse=SLAXML.parse }
@@ -466,6 +467,19 @@ local xmlDecode = function(myxml)
 	return t
 end
 
+local xml2Text = function(xml)
+	local t = {}
+	local xmls = xmlDecode(xml)
+	if xmls then
+		for _, xml in ipairs(xmls) do
+			if xml[''] then
+				tinsert(t, xml[''].text)
+			end
+		end
+	end
+	return tconcat(t)
+end
+
 -- public API
 MY = MY or {}
 MY.Xml = MY.Xml or {}
@@ -486,3 +500,6 @@ MY.Xml.Escape = xmlEscape
 -- 反转义 XML 字符串
 -- (string) MY.Xml.Unescape(escaped_str)
 MY.Xml.Unescape = xmlUnescape
+
+-- xml转纯文字
+MY.Xml.GetPureText = xml2Text
