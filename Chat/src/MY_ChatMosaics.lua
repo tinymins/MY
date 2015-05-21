@@ -5,7 +5,7 @@
 -- @Date  : 2015-05-21 10:34:08
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-21 12:08:08
+-- @Last Modified time: 2015-05-21 14:48:59
 -- @Version: 1.0
 -- @ChangeLog:
 --  + v1.0 File founded. -- viaµÔÒ»Ãù
@@ -42,6 +42,10 @@ MY_ChatMosaics.ResetMosaics = function()
 	end
 end
 
+_C.NameLink_GetText = function(h)
+	return h.__MY_szText or h.__MY_GetText()
+end
+
 _C.Mosaics = function(h, nPos)
 	if h then
 		for i = h:GetItemCount() - 1, nPos or 0, -1 do
@@ -49,17 +53,21 @@ _C.Mosaics = function(h, nPos)
 			if hItem and (hItem:GetName():sub(0, 9)) == "namelink_" then
 				if MY_ChatMosaics.bEnabled then
 					-- re mosaics
-					if _C.bForceUpdate and hItem.MY_szOrgText then
-						hItem:SetText(hItem.MY_szOrgText)
-						hItem.MY_szOrgText = nil
+					if _C.bForceUpdate and hItem.__MY_szText then
+						hItem:SetText(hItem.__MY_szText)
+						hItem.__MY_szText = nil
 					end
 					-- mosaics
-					if not hItem.MY_szOrgText and (
+					if not hItem.__MY_szText and (
 						not MY_ChatMosaics.bIgnoreOwnName
 						or hItem:GetText() ~= '[' .. GetClientPlayer().szName .. ']'
 					) then
-						local szText = hItem.MY_szOrgText or hItem:GetText()
-						hItem.MY_szOrgText = szText
+						local szText = hItem.__MY_szText or hItem:GetText()
+						hItem.__MY_szText = szText
+						if not hItem.__MY_GetText then
+							hItem.__MY_GetText = hItem.GetText
+							hItem.GetText = _C.NameLink_GetText
+						end
 						szText = szText:sub(2, -2) -- È¥µô[]À¨ºÅ
 						local nLen = wstring.len(szText)
 						if MY_ChatMosaics.nMosaicsMode == 1 and nLen > 2 then
@@ -74,9 +82,9 @@ _C.Mosaics = function(h, nPos)
 						hItem:SetText('[' .. szText .. ']')
 						hItem:AutoSize()
 					end
-				elseif hItem.MY_szOrgText then
-					hItem:SetText(hItem.MY_szOrgText)
-					hItem.MY_szOrgText = nil
+				elseif hItem.__MY_szText then
+					hItem:SetText(hItem.__MY_szText)
+					hItem.__MY_szText = nil
 					hItem:AutoSize()
 				end
 			end
