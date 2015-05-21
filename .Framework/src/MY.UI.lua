@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-21 11:54:41
+-- @Last Modified time: 2015-05-21 16:34:24
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -2552,6 +2552,31 @@ function _MY.UI:change(fnOnChange)
 			if ele.edt then local _this = this this = ele.edt pcall(ele.edt.OnEditChanged) this = _this  end
 			if ele.type=="WndSliderBox" then
 				local _this = this this = ele.sld pcall(ele.sld.OnScrollBarPosChanged) this = _this
+			end
+		end
+		return self
+	end
+end
+
+-- focus （输入框）获得焦点 -- 好像只有输入框能获得焦点
+-- :focus(fnOnSetFocus, fnOnKillFocus) 绑定
+-- :focus()   使获得焦点
+function _MY.UI:focus(fnOnSetFocus, fnOnKillFocus)
+	self:_checksum()
+	if fnOnSetFocus then
+		fnOnKillFocus = fnOnKillFocus or fnOnSetFocus
+		for _, ele in pairs(self.eles) do
+			if ele.edt then
+				MY.UI.RegisterUIEvent(ele.edt, 'OnSetFocus' , function() pcall(fnOnSetFocus , ele.raw, true ) end)
+				MY.UI.RegisterUIEvent(ele.edt, 'OnKillFocus', function() pcall(fnOnKillFocus, ele.raw, false) end)
+			end
+		end
+		return self
+	else
+		for _, ele in pairs(self.eles) do
+			if ele.edt then
+				Station.SetFocusWindow(ele.edt)
+				break
 			end
 		end
 		return self
