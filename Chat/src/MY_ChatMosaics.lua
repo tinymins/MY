@@ -5,7 +5,7 @@
 -- @Date  : 2015-05-21 10:34:08
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-21 18:57:07
+-- @Last Modified time: 2015-05-21 20:38:38
 -- @Version: 1.0
 -- @ChangeLog:
 --  + v1.0 File founded. -- via翟一鸣
@@ -14,11 +14,11 @@ MY_ChatMosaics = {}
 local _C = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Chat/lang/")
 local MY_ChatMosaics = MY_ChatMosaics
-MY_ChatMosaics.bEnabled = false       -- 启用状态
-MY_ChatMosaics.szMosaics = "*"        -- 马赛克字符
-MY_ChatMosaics.tIgnoreNames = {}      -- 忽略名单
-MY_ChatMosaics.nMosaicsMode = 1       -- 局部打码模式
-MY_ChatMosaics.bIgnoreOwnName = false -- 不打码自己的名字
+MY_ChatMosaics.bEnabled = false            -- 启用状态
+MY_ChatMosaics.szMosaics = _L.MOSAICS_CHAR -- 马赛克字符
+MY_ChatMosaics.tIgnoreNames = {}           -- 忽略名单
+MY_ChatMosaics.nMosaicsMode = 1            -- 局部打码模式
+MY_ChatMosaics.bIgnoreOwnName = false      -- 不打码自己的名字
 RegisterCustomData("MY_ChatMosaics.tIgnoreNames")
 RegisterCustomData("MY_ChatMosaics.nMosaicsMode")
 RegisterCustomData("MY_ChatMosaics.bIgnoreOwnName")
@@ -187,7 +187,7 @@ OnPanelActive = function(wnd)
 		text = MY_ChatMosaics.szMosaics,
 		onchange = function(szText)
 			if szText == "" then
-				MY_ChatMosaics.szMosaics = "*"
+				MY_ChatMosaics.szMosaics = _L.MOSAICS_CHAR
 			else
 				MY_ChatMosaics.szMosaics = szText
 			end
