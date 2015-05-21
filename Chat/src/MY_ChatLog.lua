@@ -100,13 +100,28 @@ function _C.DrawLog()
 	for _, szMsg in ipairs(Log[Log.Active]) do
 		_C.uiLog:append(szMsg)
 	end
+	if MY_ChatMosaics then
+		MY_ChatMosaics.Mosaics(_C.uiLog:hdl(1):raw(1))
+	end
 end
 
 function _C.AppendLog(szChannel, szMsg)
 	if not (_C.uiLog and szChannel == Log.Active) then
 		return
 	end
-	_C.uiLog:append(szMsg)
+	if MY_ChatMosaics then
+		local h = _C.uiLog:hdl(1):raw(1)
+		local nCount
+		if h then
+			nCount = h:GetItemCount()
+		end
+		_C.uiLog:append(szMsg)
+		if nCount then
+			MY_ChatMosaics.Mosaics(h, nCount)
+		end
+	else
+		_C.uiLog:append(szMsg)
+	end
 end
 
 function _C.OnPanelActive(wnd)
