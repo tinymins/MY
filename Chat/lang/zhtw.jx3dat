@@ -45,6 +45,7 @@ data = {
     ['only filter continuous duplicate chat'] = '刷屏屏蔽只屏蔽連續發送的刷屏聊天記錄',
     ['filter duplicate addon message'       ] = '屏蔽相同內容的插件喊話（如海鳗BOSS倒計時）',
     
+    ['MOSAICS_CHAR'] = '…',
     ['chat mosaics'] = '聊天打碼',
     ['chat mosaics (mosaics names in chat panel)'] = '聊天打碼（聊天欄中名字打上馬賽克）',
     ['no mosaics on my own name'] = '自己的名字不打碼',
