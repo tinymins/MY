@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-18 11:26:18
+-- @Last Modified time: 2015-05-21 11:54:41
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -958,22 +958,25 @@ function _MY.UI:append(arg0, arg1, arg2)
 				end
 			end
 			if tArg and ui then
-				if tArg.w         then ui:width (tArg.w      ) end
-				if tArg.h         then ui:height(tArg.h      ) end
-				if tArg.x         then ui:left  (tArg.x      ) end
-				if tArg.y         then ui:top   (tArg.y      ) end
-				if tArg.alpha     then ui:alpha (tArg.alpha  ) end
-				if tArg.color     then ui:color (tArg.color  ) end
-				if tArg.text      then ui:text  (tArg.text   ) end
-				if tArg.font      then ui:font  (tArg.font   ) end
-				if tArg.tip       then ui:tip   (tArg.tip    ) end
-				if tArg.menu      then ui:menu  (tArg.menu   ) end
-				if tArg.image     then if type(tArg.image) == 'table' then ui:image (unpack(tArg.image)) else ui:image(tArg.image) end end
-				if tArg.onhover   then ui:hover (tArg.onhover) end
-				if tArg.onclick   then ui:click (tArg.onclick) end
-				if tArg.checked   then ui:check (tArg.checked) end
-				if tArg.oncheck   then ui:check (tArg.oncheck) end
-				if tArg.multiline then ui:multiLine(tArg.multiline) end
+				if tArg.w           then ui:width      (tArg.w          ) end
+				if tArg.h           then ui:height     (tArg.h          ) end
+				if tArg.x           then ui:left       (tArg.x          ) end
+				if tArg.y           then ui:top        (tArg.y          ) end
+				if tArg.alpha       then ui:alpha      (tArg.alpha      ) end
+				if tArg.color       then ui:color      (tArg.color      ) end
+				if tArg.text        then ui:text       (tArg.text       ) end
+				if tArg.placeholder then ui:placeholder(tArg.placeholder) end
+				if tArg.group       then ui:group      (tArg.group      ) end
+				if tArg.font        then ui:font       (tArg.font       ) end
+				if tArg.tip         then ui:tip        (tArg.tip        ) end
+				if tArg.menu        then ui:menu       (tArg.menu       ) end
+				if tArg.image       then if type(tArg.image) == 'table' then ui:image (unpack(tArg.image)) else ui:image(tArg.image) end end
+				if tArg.onhover     then ui:hover      (tArg.onhover    ) end
+				if tArg.onclick     then ui:click      (tArg.onclick    ) end
+				if tArg.checked     then ui:check      (tArg.checked    ) end
+				if tArg.oncheck     then ui:check      (tArg.oncheck    ) end
+				if tArg.onchange    then ui:change     (tArg.onchange   ) end
+				if tArg.multiline   then ui:multiLine  (tArg.multiline  ) end
 			end
 		end
 	elseif szXml then
