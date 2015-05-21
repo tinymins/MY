@@ -5,7 +5,7 @@
 -- @Date  : 2015-05-21 10:34:08
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-21 15:01:11
+-- @Last Modified time: 2015-05-21 15:05:20
 -- @Version: 1.0
 -- @ChangeLog:
 --  + v1.0 File founded. -- viaµÔÒ»Ãù
@@ -182,6 +182,7 @@ OnPanelActive = function(wnd)
 	ui:append("WndEditBox", {
 		placeholder = _L['mosaics character'],
 		x = x, y = y, w = w - 2 * x, h = 25,
+		text = MY_ChatMosaics.szMosaics,
 		onchange = function(szText)
 			if szText == "" then
 				MY_ChatMosaics.szMosaics = "*"
@@ -196,6 +197,7 @@ OnPanelActive = function(wnd)
 	ui:append("WndEditBox", {
 		placeholder = _L['unmosaics names (split by comma)'],
 		x = x, y = y, w = w - 2 * x, h = h - y - 50,
+		text = table.concat(MY_ChatMosaics.tIgnoreNames, ","),
 		onchange = function(szText)
 			MY_ChatMosaics.tIgnoreNames = MY.String.Split(szText, ",")
 			MY_ChatMosaics.ResetMosaics()
