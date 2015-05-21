@@ -4,9 +4,10 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-20 13:08:38
+-- @Last Modified time: 2015-05-21 18:22:29
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
+local tinsert, tconcat, tremove = table.insert, table.concat, table.remove
 if not GetCampImageFrame then
 	function GetCampImageFrame(eCamp, bFight)	-- ui\Image\UICommon\CommonPanel2.UITex
 		local nFrame = nil
@@ -364,3 +365,55 @@ MY_DEBUG = SetmetaReadonly({
 	WARNING = 1,
 	ERROR   = 2,
 })
+
+local XML_LINE_BREAKER = GetFormatText("\n")
+if not OutputBuffTipA then
+function OutputBuffTipA(dwID, nLevel, Rect, nTime)
+	local t = {}
+
+	tinsert(t, GetFormatText(Table_GetBuffName(dwID, nLevel) .. "\t", 65))
+	local buffInfo = GetBuffInfo(dwID, nLevel, {})
+	if buffInfo and buffInfo.nDetachType and g_tStrings.tBuffDetachType[buffInfo.nDetachType] then
+		tinsert(t, GetFormatText(g_tStrings.tBuffDetachType[buffInfo.nDetachType], 106))
+	end
+	tinsert(t, XML_LINE_BREAKER)
+
+	local szDesc = GetBuffDesc(dwID, nLevel, "desc")
+	if szDesc then
+		tinsert(t, GetFormatText(szDesc .. g_tStrings.STR_FULL_STOP, 106))
+	end
+
+	if nTime then
+		if nTime == 0 then
+			tinsert(t, GetFormatText(g_tStrings.STR_BUFF_H_TIME_ZERO, 102))
+		else
+			local H, M, S = "", "", ""
+			local h = math.floor(nTime / 3600)
+			local m = math.floor(nTime / 60) % 60
+			local s = math.floor(nTime % 60)
+			if h > 0 then
+				H = h .. g_tStrings.STR_BUFF_H_TIME_H .. " "
+			end
+			if h > 0 or m > 0 then
+				M = m .. g_tStrings.STR_BUFF_H_TIME_M_SHORT .. " "
+			end
+			S = s..g_tStrings.STR_BUFF_H_TIME_S
+			
+			tinsert(GetFormatText(FormatString(g_tStrings.STR_BUFF_H_LEFT_TIME_MSG, H, M, S), 102))
+		end
+	end
+
+	-- For test
+	if IsCtrlKeyDown() then
+		tinsert(t, XML_LINE_BREAKER)
+		tinsert(t, GetFormatText(g_tStrings.DEBUG_INFO_ITEM_TIP, 102))
+		tinsert(t, XML_LINE_BREAKER)
+		tinsert(t, GetFormatText("ID:     " .. dwID, 102))
+		tinsert(t, XML_LINE_BREAKER)
+		tinsert(t, GetFormatText("Level:  " .. nLevel, 102))
+		tinsert(t, XML_LINE_BREAKER)
+		tinsert(t, GetFormatText("IconID: " .. tostring(Table_GetBuffIconID(dwID, nLevel)), 102))
+	end
+	OutputTip(tconcat(t), 300, Rect)
+end
+end
