@@ -5,7 +5,7 @@
 -- @Date  : 2015-05-21 10:34:08
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-21 15:00:07
+-- @Last Modified time: 2015-05-21 15:01:11
 -- @Version: 1.0
 -- @ChangeLog:
 --  + v1.0 File founded. -- viaµÔÒ»Ãù
@@ -42,8 +42,8 @@ MY_ChatMosaics.ResetMosaics = function()
 	end
 end
 
-_C.NameLink_GetText = function(h)
-	return h.__MY_szText or h.__MY_GetText(h)
+_C.NameLink_GetText = function(h, ...)
+	return h.__MY_szText or h.__MY_GetText(h, ...)
 end
 
 _C.Mosaics = function(h, nPos)
