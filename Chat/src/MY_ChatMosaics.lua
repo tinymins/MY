@@ -5,7 +5,7 @@
 -- @Date  : 2015-05-21 10:34:08
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-21 15:05:20
+-- @Last Modified time: 2015-05-21 18:57:07
 -- @Version: 1.0
 -- @ChangeLog:
 --  + v1.0 File founded. -- viaµÔÒ»Ãù
@@ -76,8 +76,10 @@ _C.Mosaics = function(h, nPos)
 							szText = wstring.sub(szText, 1, 1) .. string.rep(MY_ChatMosaics.szMosaics, nLen - 1)
 						elseif MY_ChatMosaics.nMosaicsMode == 3 and nLen > 1 then
 							szText = string.rep(MY_ChatMosaics.szMosaics, nLen - 1) .. wstring.sub(szText, nLen, nLen)
-						else -- if MY_ChatMosaics.nMosaicsMode == 4 then
+						elseif MY_ChatMosaics.nMosaicsMode == 4 or nLen <= 1 then
 							szText = string.rep(MY_ChatMosaics.szMosaics, nLen)
+						else
+							szText = wstring.sub(szText, 1, 1) .. string.rep(MY_ChatMosaics.szMosaics, nLen - 1)
 						end
 						hItem:SetText('[' .. szText .. ']')
 						hItem:AutoSize()
