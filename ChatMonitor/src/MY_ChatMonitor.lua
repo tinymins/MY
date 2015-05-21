@@ -70,6 +70,7 @@ _MY_ChatMonitor.tChannelGroups = {
         }
     }
 }
+_MY_ChatMonitor.nLastLoadDataTime = -1000000
 
 -- 插入聊天内容时监控聊天信息
 _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
@@ -213,20 +214,26 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
     ui:append("WndAutoComplete", "WndAutoComplete_KeyWord"):children('#WndAutoComplete_KeyWord')
       :pos(80,15):size(w-226,25):text(MY_ChatMonitor.szKeyWords)
       :change(function(szText) MY_ChatMonitor.szKeyWords = szText end)
+      :focus(function(raw, bFocus)
+        if bFocus then
+            local source = {}
+            for _, szOpt in ipairs(MY.LoadLUAData(_MY_ChatMonitor.szLuaData) or {}) do
+                if type(szOpt) == "string" then
+                    table.insert(source, szOpt)
+                end
+            end
+            MY.UI(raw):autocomplete('option', 'source', source)
+        end
+      end)
       :click(function(nButton, raw)
         if IsPopupMenuOpened() then
             MY.UI(raw):autocomplete('close')
         else
             MY.UI(raw):autocomplete('search', '')
         end
-    end):autocomplete('option', 'beforeSearch', function(wnd, option)
-        option.source = {}
-        for _, szOpt in ipairs(MY.LoadLUAData(_MY_ChatMonitor.szLuaData) or {}) do
-            if type(szOpt)=="string" then
-                table.insert(option.source, szOpt)
-            end
-        end
-    end):autocomplete('option', 'beforePopup', function(menu, wnd, option)
+      end)
+      -- :autocomplete('option', 'beforeSearch', function(wnd, option) end)
+      :autocomplete('option', 'beforePopup', function(menu, wnd, option)
         if #menu > 0 then
             table.insert(menu, { bDevide = true })
         end
@@ -244,7 +251,8 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
                 end
             end, function() end, function() end, nil, edit:text() )
         end })
-    end):autocomplete('option', 'beforeDelete', function(szOption, fnDoDelete, option)
+      end)
+      :autocomplete('option', 'beforeDelete', function(szOption, fnDoDelete, option)
         local t = MY.LoadLUAData(_MY_ChatMonitor.szLuaData) or {}
         for i = #t, 1, -1 do 
             if t[i] == szOption then
@@ -252,7 +260,7 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
             end
         end
         MY.SaveLUAData(_MY_ChatMonitor.szLuaData, t)
-    end)
+      end)
 
     ui:append("Image", "Image_Help"):find('#Image_Help')
       :image('UI/Image/UICommon/Commonpanel2.UITex',48)
