@@ -4,7 +4,7 @@
 -- @Date  : 2015-01-25 15:35:26
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-20 23:44:59
+-- @Last Modified time: 2015-05-22 15:53:57
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -81,10 +81,12 @@ MY.String.SimpleMatch = function(szText, szFind, bDistinctCase)
 	local me = GetClientPlayer()
 	if me then
 		szFind = szFind:gsub("$zj", GetClientPlayer().szName)
+		local szTongName = ""
 		local tong = GetTongClient()
-		if tong then
-			szFind = szFind:gsub("$gh", tong.ApplyGetTongName(me.dwTongID) or "")
+		if tong and me.dwTongID ~= 0 then
+			szTongName = tong.ApplyGetTongName(me.dwTongID) or ""
 		end
+		szFind = szFind:gsub("$gh", szTongName)
 	end
 	-- 10|十人,血战天策|XZTC,!小铁被吃了,!开宴黑铁;大战
 	local bKeyWordsLine = false
