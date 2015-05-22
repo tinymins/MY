@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-21 16:34:24
+-- @Last Modified time: 2015-05-22 10:24:42
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -1862,9 +1862,14 @@ end
 
 -- (number, number) Instance:size()
 -- (self) Instance:size(nLeft, nTop)
+-- (self) Instance:size(OnSizeChanged)
 function _MY.UI:size(nWidth, nHeight)
 	self:_checksum()
-	if nWidth or nHeight then
+	if type(nWidth) == 'function' then
+		for _, ele in pairs(self.eles) do
+			MY.UI.RegisterUIEvent(ele.raw, "OnSizeChanged", nWidth)
+		end
+	elseif nWidth or nHeight then
 		for _, ele in pairs(self.eles) do
 			local _nWidth, _nHeight = ele.raw:GetSize()
 			nWidth, nHeight = nWidth or _nWidth, nHeight or _nHeight
@@ -1998,6 +2003,15 @@ function _MY.UI:size(nWidth, nHeight)
 				ele.sbn:SetSize(15, nHeight-60)
 				ele.shd:SetSize(nWidth-35, nHeight-20)
 				ele.raw.UpdateScroll()
+			end
+			if ele.raw.OnSizeChanged then
+				local _this = this
+				this = ele.raw
+				local status, err = pcall(ele.raw.OnSizeChanged)
+				if not status then
+					MY.Debug({err}, 'ERROR _MY.UI:OnSizeChanged', MY_DEBUG.ERROR)
+				end
+				this = _this
 			end
 		end
 		return self
