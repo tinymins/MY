@@ -4,7 +4,7 @@
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-16 21:34:35
+-- @Last Modified time: 2015-05-22 23:55:51
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = {}
@@ -155,6 +155,23 @@ MY_ToolBox.ApplyConfig = function()
 	end
 end
 MY.RegisterInit('MY_TOOLBOX', MY_ToolBox.ApplyConfig)
+-- 密码锁解锁提醒
+MY.RegisterInit('MY_LOCK_TIP', function()
+	-- 刚进游戏好像获取不到锁状态 20秒之后再说吧
+	MY.DelayCall("MY_LOCK_TIP_DELAY", function()
+		if not IsPhoneLock() then -- 手机密保还提示个鸡
+			local state, nResetTime = Lock_State()
+			if state == "PASSWORD_LOCK" then
+				MY.DelayCall("MY_LOCK_TIP", function()
+					local me = GetClientPlayer()
+					local szText = me and me.GetGlobalID and _L.LOCK_TIP[me.GetGlobalID()] or _L['You have been loged in for 2min, you can unlock bag locker now.']
+					MY.Sysmsg({szText})
+					OutputWarningMessage("MSG_REWARD_GREEN", szText, 10)
+				end, 100000)
+			end
+		end
+	end, 20000)
+end)
 
 -- 【台服用】老地图神行
 _C.tNonwarData = {

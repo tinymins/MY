@@ -1,4 +1,5 @@
 -- language data (zhcn) updated at 2014-4-10 03:38:11
+DEAR_S = '亲爱的诗诗，你已登入游戏两分钟～可以解除锁密保锁了爱你么么哒（づ￣３￣）づ～'
 data = {
     -- MY_Toolbox.lua
     ['toolbox'] = '常用工具',
@@ -97,4 +98,11 @@ data = {
     ['echo when autochat'] = '输出选择的选项',
     ['disable when shift key pressed'] = '按住SHIFT时禁用自动对话',
     ['close after auto chat'] = '自动对话后关闭窗口',
+    
+    ['You have been loged in for 2min, you can unlock bag locker now.'] = '你已登入游戏两分钟，可以愉快的解除密保锁啦！',
+    LOCK_TIP = {
+        ["198158383605035871"] = DEAR_S,
+        ["432345564233593240"] = DEAR_S,
+        ["342273571683338182"] = DEAR_S,
+    },
 }
