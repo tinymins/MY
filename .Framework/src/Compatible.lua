@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-21 18:22:29
+-- @Last Modified time: 2015-05-22 23:51:21
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 local tinsert, tconcat, tremove = table.insert, table.concat, table.remove
@@ -415,5 +415,20 @@ function OutputBuffTipA(dwID, nLevel, Rect, nTime)
 		tinsert(t, GetFormatText("IconID: " .. tostring(Table_GetBuffIconID(dwID, nLevel)), 102))
 	end
 	OutputTip(tconcat(t), 300, Rect)
+end
+end
+
+if not IsPhoneLock then
+function IsPhoneLock()
+	local bPhoneLock = false
+	local hFrame = Station.Lookup("Topmost/BankUnlock")
+	if hFrame then
+		bPhoneLock = not hFrame:Lookup("CheckBox_Keyboard"):IsVisible()
+	else
+		hFrame = Wnd.OpenWindow("BankUnlock")
+		bPhoneLock = not hFrame:Lookup("CheckBox_Keyboard"):IsVisible()
+		Wnd.CloseWindow(hFrame)
+	end
+	return bPhoneLock
 end
 end
