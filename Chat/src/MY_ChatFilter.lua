@@ -13,8 +13,25 @@ RegisterCustomData("MY_ChatFilter.bFilterDuplicateIgnoreID")
 RegisterCustomData("MY_ChatFilter.bFilterDuplicateContinuous")
 RegisterCustomData("MY_ChatFilter.bFilterDuplicateAddonTalk")
 
+_C.tApplyDuplicateChannels = {
+	["MSG_NORMAL"        ] = true,
+	["MSG_PARTY"         ] = true,
+	["MSG_MAP"           ] = true,
+	["MSG_BATTLE_FILED"  ] = true,
+	["MSG_GUILD"         ] = true,
+	["MSG_GUILD_ALLIANCE"] = true,
+	["MSG_SCHOOL"        ] = true,
+	["MSG_WORLD"         ] = true,
+	["MSG_TEAM"          ] = true,
+	["MSG_CAMP"          ] = true,
+	["MSG_GROUP"         ] = true,
+	["MSG_WHISPER"       ] = true,
+	["MSG_SEEK_MENTOR"   ] = true,
+	["MSG_FRIEND"        ] = true,
+}
+
 MY.HookChatPanel("MY_ChatFilter", function(h, szChannel, szMsg)
-	if szChannel ~= "MSG_SYS" then
+	if _C.tApplyDuplicateChannels[szChannel] then
 		-- 插件消息UUID过滤
 		if MY_ChatFilter.bFilterDuplicateAddonTalk then
 			local me = GetClientPlayer()
