@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-22 13:51:23
+-- @Last Modified time: 2015-05-22 14:52:43
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -745,8 +745,8 @@ MY.HookChatPanel = MY.Chat.HookChatPanel
 
 _C.HookChatPanelHandle = function(h, szMsg, szChannel, ...)
 	-- filter addon comm.
-	if StringFindW(szMsg, "eventlink") and StringFindW(szMsg, _L["Addon comm."]) then
-		return h:_AppendItemFromString_MY(szMsg, szChannel, ...)
+	if StringFindW(szMsg, "eventlink") and StringFindW(szMsg, 'text=""') and StringFindW(szMsg, _L["Addon comm."]) then
+		return
 	end
 	-- add name to emotion icon
 	szMsg = string.gsub(szMsg, "<animate>.-path=\"(.-)\"(.-)group=(%d+).-</animate>", function (szImagePath, szExtra, szGroup)
