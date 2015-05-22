@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-18 09:45:00
+-- @Last Modified time: 2015-05-22 11:06:35
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -241,6 +241,7 @@ _MY.Init = function()
 	_MY.tInitFun = nil
 	-- 加载主窗体
 	MY.OpenPanel(true, true)
+	MY.ResizePanel(780, 540)
 	MY.ClosePanel(true)
 	-- 显示欢迎信息
 	MY.Sysmsg({_L("%s, welcome to use mingyi plugins!", GetClientPlayer().szName) .. " v" .. MY.GetVersion() .. ' Build ' .. _MY.szBuildDate})
@@ -302,6 +303,7 @@ MY.OpenPanel = function(bMute, bNoFocus)
 		}) do
 			hFrame:Lookup('', k):FromUITex(szUITexCommon, v)
 		end
+		MY.UI(hFrame):size(_MY.OnSizeChanged)
 		-- bind close button event
 		MY.UI(hFrame):children("#Btn_Close"):click(function() MY.ClosePanel() end)
 		MY.UI(hFrame):children("#CheckBox_Maximize"):check(function()
@@ -368,61 +370,7 @@ MY.ResizePanel = function(nWidth, nHeight)
 	if not hFrame then
 		return
 	end
-	local _w, _h = hFrame:GetSize()
-	nWidth, nHeight = nWidth or _w, nHeight or _h
-	
 	MY.UI(hFrame):size(nWidth, nHeight)
-	hFrame:Lookup('', 'Text_Author'):SetRelPos(0, nHeight - 41)
-	hFrame:Lookup('', 'Text_Author'):SetSize(nWidth - 31, 20)
-	hFrame:Lookup('', ''):FormatAllItemPos()
-	local hWnd = hFrame:Lookup('Wnd_Total')
-	local hTotal = hWnd:Lookup('', '')
-	hTotal:SetSize(nWidth, nHeight)
-	hTotal:Lookup('Image_Breaker'):SetSize(6, nHeight - 340)
-	hTotal:Lookup('Image_TabBg'):SetSize(nWidth - 2, 33)
-	hTotal:Lookup('Handle_DBClick'):SetSize(nWidth, 54)
-	hWnd:SetSize(nWidth, nHeight)
-	hWnd:Lookup('WndContainer_Category'):SetSize(nWidth - 22, 32)
-	hWnd:Lookup('WndContainer_Category'):FormatAllContentPos()
-	hWnd:Lookup('Btn_Weibo'):SetRelPos(nWidth - 135, 55)
-	
-	hWnd:Lookup('WndScroll_Tabs'):SetSize(171, nHeight - 102)
-	hWnd:Lookup('WndScroll_Tabs', ''):SetSize(171, nHeight - 102)
-	hWnd:Lookup('WndScroll_Tabs', ''):FormatAllItemPos()
-	hWnd:Lookup('WndScroll_Tabs/ScrollBar_Tabs'):SetSize(16, nHeight - 111)
-	
-	hWnd:Lookup('WndScroll_MainPanel'):SetSize(nWidth - 191, nHeight - 100)
-	hWnd:Lookup('WndScroll_MainPanel/ScrollBar_MainPanel'):SetSize(20, nHeight - 110)
-	hWnd:Lookup('WndScroll_MainPanel/ScrollBar_MainPanel'):SetRelPos(nWidth - 23, 5)
-	hWnd:Lookup('WndScroll_MainPanel/WndContainer_MainPanel'):SetSize(nWidth - 201, nHeight - 100)
-	hWnd:Lookup('WndScroll_MainPanel/WndContainer_MainPanel', ''):SetSize(nWidth - 201, nHeight - 100)
-	local hWndMainPanel = hFrame:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel')
-	if hWndMainPanel.OnPanelResize then
-		local res, err = pcall(hWndMainPanel.OnPanelResize, hWndMainPanel)
-		if not res then
-			MY.Debug({err}, 'MY#OnPanelResize', MY_DEBUG.ERROR)
-		elseif MY.Sys.GetLang() ~= 'vivn' then
-			hWndMainPanel:FormatAllContentPos()
-		end
-	elseif hWndMainPanel.OnPanelActive then
-		if hWndMainPanel.OnPanelDeactive then
-			local res, err = pcall(hWndMainPanel.OnPanelDeactive, hWndMainPanel)
-			if not res then
-				MY.Debug({err}, 'MY#OnPanelResize->OnPanelDeactive', MY_DEBUG.ERROR)
-			end
-		end
-		hWndMainPanel:Clear()
-		hWndMainPanel:Lookup('', ''):Clear()
-		local res, err = pcall(hWndMainPanel.OnPanelActive, hWndMainPanel)
-		if not res then
-			MY.Debug({err}, 'MY#OnPanelResize->OnPanelActive', MY_DEBUG.ERROR)
-		elseif MY.Sys.GetLang() ~= 'vivn' then
-			hWndMainPanel:FormatAllContentPos()
-		end
-	end
-	hWndMainPanel:FormatAllContentPos()
-	hWndMainPanel:Lookup('', ''):FormatAllItemPos()
-	hTotal:FormatAllItemPos()
 end
 
 -- if panel visible
@@ -891,6 +839,65 @@ MY.OnFrameKeyDown = function()
 		return 1
 	end
 	return 0
+end
+
+_MY.OnSizeChanged = function()
+	local hFrame = this
+	if not hFrame then
+		return
+	end
+	local nWidth, nHeight = hFrame:GetSize()
+	hFrame:Lookup('', 'Text_Author'):SetRelPos(0, nHeight - 41)
+	hFrame:Lookup('', 'Text_Author'):SetSize(nWidth - 31, 20)
+	hFrame:Lookup('', ''):FormatAllItemPos()
+	local hWnd = hFrame:Lookup('Wnd_Total')
+	local hTotal = hWnd:Lookup('', '')
+	hTotal:SetSize(nWidth, nHeight)
+	hTotal:Lookup('Image_Breaker'):SetSize(6, nHeight - 340)
+	hTotal:Lookup('Image_TabBg'):SetSize(nWidth - 2, 33)
+	hTotal:Lookup('Handle_DBClick'):SetSize(nWidth, 54)
+	hWnd:SetSize(nWidth, nHeight)
+	hWnd:Lookup('WndContainer_Category'):SetSize(nWidth - 22, 32)
+	hWnd:Lookup('WndContainer_Category'):FormatAllContentPos()
+	hWnd:Lookup('Btn_Weibo'):SetRelPos(nWidth - 135, 55)
+	
+	hWnd:Lookup('WndScroll_Tabs'):SetSize(171, nHeight - 102)
+	hWnd:Lookup('WndScroll_Tabs', ''):SetSize(171, nHeight - 102)
+	hWnd:Lookup('WndScroll_Tabs', ''):FormatAllItemPos()
+	hWnd:Lookup('WndScroll_Tabs/ScrollBar_Tabs'):SetSize(16, nHeight - 111)
+	
+	hWnd:Lookup('WndScroll_MainPanel'):SetSize(nWidth - 191, nHeight - 100)
+	hWnd:Lookup('WndScroll_MainPanel/ScrollBar_MainPanel'):SetSize(20, nHeight - 110)
+	hWnd:Lookup('WndScroll_MainPanel/ScrollBar_MainPanel'):SetRelPos(nWidth - 23, 5)
+	hWnd:Lookup('WndScroll_MainPanel/WndContainer_MainPanel'):SetSize(nWidth - 201, nHeight - 100)
+	hWnd:Lookup('WndScroll_MainPanel/WndContainer_MainPanel', ''):SetSize(nWidth - 201, nHeight - 100)
+	local hWndMainPanel = hFrame:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel')
+	if hWndMainPanel.OnPanelResize then
+		local res, err = pcall(hWndMainPanel.OnPanelResize, hWndMainPanel)
+		if not res then
+			MY.Debug({err}, 'MY#OnPanelResize', MY_DEBUG.ERROR)
+		elseif MY.Sys.GetLang() ~= 'vivn' then
+			hWndMainPanel:FormatAllContentPos()
+		end
+	elseif hWndMainPanel.OnPanelActive then
+		if hWndMainPanel.OnPanelDeactive then
+			local res, err = pcall(hWndMainPanel.OnPanelDeactive, hWndMainPanel)
+			if not res then
+				MY.Debug({err}, 'MY#OnPanelResize->OnPanelDeactive', MY_DEBUG.ERROR)
+			end
+		end
+		hWndMainPanel:Clear()
+		hWndMainPanel:Lookup('', ''):Clear()
+		local res, err = pcall(hWndMainPanel.OnPanelActive, hWndMainPanel)
+		if not res then
+			MY.Debug({err}, 'MY#OnPanelResize->OnPanelActive', MY_DEBUG.ERROR)
+		elseif MY.Sys.GetLang() ~= 'vivn' then
+			hWndMainPanel:FormatAllContentPos()
+		end
+	end
+	hWndMainPanel:FormatAllContentPos()
+	hWndMainPanel:Lookup('', ''):FormatAllItemPos()
+	hTotal:FormatAllItemPos()
 end
 
 ---------------------------------------------------
