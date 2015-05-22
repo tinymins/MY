@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-22 11:06:35
+-- @Last Modified time: 2015-05-22 14:54:46
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -196,6 +196,7 @@ local _MY = {
 	}
 	]]
 	tEvent = {},        -- 游戏事件绑定
+	tBgEvent = {},      -- 背景频道事件绑定
 	tInitFun = {},      -- 初始化函数
 }
 _MY.tAddonInfo = SetmetaReadonly({
@@ -510,6 +511,94 @@ _MY.EventHandler = function(szEvent, ...)
 		end
 	end
 end
+
+-- MY.RegisterBgEvent("MY_CHECK_INSTALL", function(dwTalkerID, szTalkerName, nChannel, oData) MY.BgTalk(szTalkerName, "MY_CHECK_INSTALL_REPLY", oData) end) -- 注册
+-- MY.RegisterBgEvent("MY_CHECK_INSTALL") -- 注销
+-- MY.RegisterBgEvent("MY_CHECK_INSTALL.RECEIVER_01", function(dwTalkerID, szTalkerName, nChannel, oData) MY.BgTalk(szTalkerName, "MY_CHECK_INSTALL_REPLY", oData) end) -- 注册
+-- MY.RegisterBgEvent("MY_CHECK_INSTALL.RECEIVER_01") -- 注销
+MY.RegisterBgEvent = function(szEvent, fnAction)
+	local szKey = nil
+	local nPos = StringFindW(szEvent, ".")
+	if nPos then
+		szKey = string.sub(szEvent, nPos + 1)
+		szEvent = string.sub(szEvent, 1, nPos - 1)
+	end
+	if fnAction then
+		if not _MY.tBgEvent[szEvent] then
+			_MY.tBgEvent[szEvent] = {}
+		end
+		if szKey then
+			_MY.tBgEvent[szEvent][szKey] = fnAction
+		else
+			table.insert(_MY.tBgEvent[szEvent], fnAction)
+		end
+	else
+		if szKey then
+			_MY.tBgEvent[szEvent][szKey] = nil
+		else
+			_MY.tBgEvent[szEvent] = nil
+		end
+	end
+end
+MY.RegisterEvent("PLAYER_TALK", function()
+	local me = GetClientPlayer()
+	if me then
+		local t = me.GetTalkData()
+		local dwTalkerID, nChannel, bEcho, szTalkerName = arg0, arg1, arg2, arg3
+		if t and #t == 4 and dwTalkerID ~= me.dwID
+		and t[1].text == _L["Addon comm."]
+		and t[2].linkinfo == "MY_BG_CHANNEL_MSG" then
+			local szEvent = t[3].linkinfo               -- EventName（符合封装格式）
+			local oData = MY.Json.Decode(t[4].linkinfo) -- 数据段（符合封装格式）
+			if szEvent and _MY.tBgEvent[szEvent] then
+				for szKey, fnAction in pairs(_MY.tBgEvent[szEvent]) do
+					local status, err = pcall(fnAction, szEvent, dwTalkerID, szTalkerName, nChannel, oData)
+					if not status then
+						MY.Debug({err}, "BG_HEAR", MY_DEBUG.ERROR)
+					end
+				end
+			end
+		end
+	end
+end)
+
+-- MY.BgTalk(szName, szEvent, oData)
+-- MY.BgTalk(nChannel, szEvent, oData)
+MY.BgTalk = function(nChannel, szEvent, oData)
+	local szTarget, me = "", GetClientPlayer()
+	if not (me and nChannel) then
+		return
+	end
+	-- channel
+	if type(nChannel) == "string" then
+		szTarget = nChannel
+		nChannel = PLAYER_TALK_CHANNEL.WHISPER
+	end
+	-- auto switch battle field
+	if nChannel == PLAYER_TALK_CHANNEL.RAID
+	and me.GetScene().nType == MAP_TYPE.BATTLE_FIELD then
+		nChannel = PLAYER_TALK_CHANNEL.BATTLE_FIELD
+	end
+	-- talk
+	me.Talk(nChannel, szTarget, {
+		{ type = "text", text = _L["Addon comm."] },
+		{ type = "eventlink", name = "", linkinfo = "MY_BG_CHANNEL_MSG" },
+		{ type = "eventlink", name = "", linkinfo = szEvent },
+		{ type = "eventlink", name = "", linkinfo = MY.Json.Encode(oData) },
+	})
+end
+-- 测试用（请求共享位置）
+MY.RegisterBgEvent("ASK_CURRENT_LOC", function(szEvent, dwTalkerID, szTalkerName, nChannel)
+	MessageBox({
+		szName = "ASK_CURRENT_LOC" .. dwTalkerID,
+		szMessage = _L("[%s] wants to get your location, would you like to share?", szTalkerName), {
+			szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function()
+				local me = GetClientPlayer()
+				MY.BgTalk(szTalkerName, "REPLY_CURRENT_LOC", { me.GetMapID(), me.nX, me.nY, me.nZ })
+			end
+		}, { szOption = g_tStrings.STR_HOTKEY_CANCEL },
+	})
+end)
 -- ##########################################################################
 --     #           #                 # # # # # # #           #               
 --       #     #   #         # # #         #                 #               
