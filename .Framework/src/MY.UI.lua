@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-22 10:24:42
+-- @Last Modified time: 2015-05-22 11:10:45
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -1114,47 +1114,47 @@ end
 
 -- drag area
 -- (self) drag(boolean bEnableDrag) -- enable/disable drag
--- (self) drag(number x, number y, number w, number h) -- set drag positon and area
+-- (self) drag(number nX, number y, number w, number h) -- set drag positon and area
 -- (self) drag(function fnOnDrag, function fnOnDragEnd)-- bind frame/item frag event handle
-function _MY.UI:drag(x, y, w, h)
+function _MY.UI:drag(nX, nY, nW, nH)
 	self:_checksum()
-	if type(x) == 'boolean' then
+	if type(nX) == 'boolean' then
 		for _, ele in pairs(self.eles) do
 			local x = ele.frm or ele.raw
 			if x and x.EnableDrag then
-				x:EnableDrag(x)
+				x:EnableDrag(nX)
 			end
 		end
 		return self
-	elseif type(x) == 'number' or
-	type(y) == 'number' or
-	type(w) == 'number' or
-	type(h) == 'number' then
+	elseif type(nX) == 'number' or
+	type(nY) == 'number' or
+	type(nW) == 'number' or
+	type(nH) == 'number' then
 		for i = 1, #self.eles, 1 do
 			local s, err =pcall(function()
 				local _w, _h = self:eq(i):size()
-				x, y, w, h = x or 0, y or 0, w or _w, h or _h
-				self:frm(i):raw(1):SetDragArea(x, y, w, h)
+				nX, nY, nW, nH = nX or 0, nY or 0, nW or _w, nH or _h
+				self:frm(i):raw(1):SetDragArea(nX, nY, nW, nH)
 			end)
 		end
 		return self
-	elseif type(x) == 'function' or
-	type(y) == 'function' or
-	type(w) == 'function' then
+	elseif type(nX) == 'function' or
+	type(nY) == 'function' or
+	type(nW) == 'function' then
 		for _, ele in pairs(self.eles) do
 			if ele.frm then
-				if x then
-					MY.UI.RegisterUIEvent(ele.frm, 'OnFrameDragSetPosEnd', x)
+				if nX then
+					MY.UI.RegisterUIEvent(ele.frm, 'OnFrameDragSetPosEnd', nX)
 				end
-				if y then
-					MY.UI.RegisterUIEvent(ele.frm, 'OnFrameDragEnd', y)
+				if nY then
+					MY.UI.RegisterUIEvent(ele.frm, 'OnFrameDragEnd', nY)
 				end
 			elseif ele.itm then
-				if x then
-					MY.UI.RegisterUIEvent(ele.itm, 'OnItemLButtonDrag', x)
+				if nX then
+					MY.UI.RegisterUIEvent(ele.itm, 'OnItemLButtonDrag', nX)
 				end
-				if y then
-					MY.UI.RegisterUIEvent(ele.itm, 'OnItemLButtonDragEnd', y)
+				if nY then
+					MY.UI.RegisterUIEvent(ele.itm, 'OnItemLButtonDragEnd', nY)
 				end
 			end
 		end
