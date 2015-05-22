@@ -33,8 +33,9 @@ MY_Chat.bChatCopyAlwaysWhite = false
 MY_Chat.bChatCopyNoCopySysmsg = true
 MY_Chat.bReplaceIcon = false
 MY_Chat.bDisplayPanel = true    -- 是否显示面板
-MY.RegisterInit('MY_CHAT_BW', function() MY_Chat.tBlockWords = MY.LoadLUAData('config/MY_CHAT/blockwords') or MY_Chat.tBlockWords end)
-MY.RegisterExit('MY_CHAT_BW', function() MY.SaveLUAData('config/MY_CHAT/blockwords', MY_Chat.tBlockWords) end)
+_Cache.LoadBlockWords = function() MY_Chat.tBlockWords = MY.LoadLUAData('config/MY_CHAT/blockwords') or MY_Chat.tBlockWords end
+_Cache.SaveBlockWords = function() MY.SaveLUAData('config/MY_CHAT/blockwords', MY_Chat.tBlockWords) end
+MY.RegisterInit('MY_CHAT_BW', _Cache.LoadBlockWords)
 
 MY_Chat.tChannel = {
 	["Radio_Say"] = true,
@@ -504,10 +505,13 @@ end, function(h, szChannel, szMsg, i)
 	end
 end)
 
-MY.RegisterPanel( "MY_Chat_Filter", _L["chat filter"], _L['Chat'], "UI/Image/Common/Money.UITex|243", {255,255,0,200}, { OnPanelActive = function(wnd)
+MY.RegisterPanel( "MY_Chat_Filter", _L["chat filter"], _L['Chat'],
+"UI/Image/Common/Money.UITex|243", {255,255,0,200}, {
+OnPanelActive = function(wnd)
 	local ui = MY.UI(wnd)
 	local w, h = ui:size()
 	local x, y = 0, 0
+	_Cache.LoadBlockWords()
 	
 	ui:append("WndCheckBox", "WndCheckBox_Enable"):children("#WndCheckBox_Enable")
 	  :pos(x, y):width(70)
@@ -531,11 +535,13 @@ MY.RegisterPanel( "MY_Chat_Filter", _L["chat filter"], _L['Chat'], "UI/Image/Com
 			szOption = _L['delete'],
 			fnAction = function()
 				list:listbox('delete', szText, szID)
+				_Cache.LoadBlockWords()
 				for i = #MY_Chat.tBlockWords, 1, -1 do
 					if MY_Chat.tBlockWords[i] == szText then
 						table.remove(MY_Chat.tBlockWords, i)
 					end
 				end
+				_Cache.SaveBlockWords()
 			end,
 		}}
 	end):listbox('onlclick', function(text, id, data, selected)
@@ -553,6 +559,7 @@ MY.RegisterPanel( "MY_Chat_Filter", _L["chat filter"], _L['Chat'], "UI/Image/Com
 	  	if szText=="" then
 	  		return
 	  	end
+	  	_Cache.LoadBlockWords()
 	  	-- 验证是否重复
 	  	for i, v in ipairs(MY_Chat.tBlockWords) do
 	  		if v == szText then
@@ -561,6 +568,7 @@ MY.RegisterPanel( "MY_Chat_Filter", _L["chat filter"], _L['Chat'], "UI/Image/Com
 	  	end
 	  	-- 加入表
 	  	table.insert(MY_Chat.tBlockWords, szText)
+	  	_Cache.SaveBlockWords()
 	  	-- 更新UI
 	  	list:listbox('insert', szText, szText)
 	  end)
@@ -571,11 +579,13 @@ MY.RegisterPanel( "MY_Chat_Filter", _L["chat filter"], _L['Chat'], "UI/Image/Com
 	  :click(function()
 	  	for _, v in ipairs(list:listbox('select', 'selected')) do
 	  		list:listbox('delete', v.text, v.id)
+	  		_Cache.LoadBlockWords()
 	  		for i = #MY_Chat.tBlockWords, 1, -1 do
 	  			if MY_Chat.tBlockWords[i] == v.text then
 	  				table.remove(MY_Chat.tBlockWords, i)
 	  			end
 	  		end
+	  		_Cache.SaveBlockWords()
 	  	end
 	  end)
 end})
