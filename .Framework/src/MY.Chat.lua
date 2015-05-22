@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-20 10:51:05
+-- @Last Modified time: 2015-05-22 13:51:23
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -743,10 +743,10 @@ MY.Chat.HookChatPanel = function(arg0, arg1, arg2)
 end
 MY.HookChatPanel = MY.Chat.HookChatPanel
 
-_C.HookChatPanelHandle = function(h, szMsg, szChannel)
+_C.HookChatPanelHandle = function(h, szMsg, szChannel, ...)
 	-- filter addon comm.
 	if StringFindW(szMsg, "eventlink") and StringFindW(szMsg, _L["Addon comm."]) then
-		return h:_AppendItemFromString_MY(szMsg, szChannel)
+		return h:_AppendItemFromString_MY(szMsg, szChannel, ...)
 	end
 	-- add name to emotion icon
 	szMsg = string.gsub(szMsg, "<animate>.-path=\"(.-)\"(.-)group=(%d+).-</animate>", function (szImagePath, szExtra, szGroup)
@@ -779,7 +779,7 @@ _C.HookChatPanelHandle = function(h, szMsg, szChannel)
 		_C.tHookChatFun[i].param = result
 	end
 	-- call ori append
-	h:_AppendItemFromString_MY(szMsg, szChannel)
+	h:_AppendItemFromString_MY(szMsg, szChannel, ...)
 	-- deal with fnAfter
 	for i, handle in ipairs(_C.tHookChatFun) do
 		pcall(handle.fnAfter, h, szChannel, szMsg, unpack(handle.param))
