@@ -19,6 +19,7 @@ for /f "tokens=2,4 delims= " %%i in (.Framework/src/MY.lua) do (
 :: 获取并格式化当前时间字符串
 set szTime=%date:~0,10%%time:~0,8%
 set szTime=%szTime:/=%
+set szTime=%szTime: =0%
 set szTime=%szTime::=%
 
 :: 拼接字符串开始压缩文件
