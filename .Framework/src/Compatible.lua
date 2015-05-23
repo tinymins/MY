@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-23 10:18:20
+-- @Last Modified time: 2015-05-23 10:21:07
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 local tinsert, tconcat, tremove = table.insert, table.concat, table.remove
@@ -375,6 +375,8 @@ function OutputBuffTipA(dwID, nLevel, Rect, nTime)
 	local buffInfo = GetBuffInfo(dwID, nLevel, {})
 	if buffInfo and buffInfo.nDetachType and g_tStrings.tBuffDetachType[buffInfo.nDetachType] then
 		tinsert(t, GetFormatText(g_tStrings.tBuffDetachType[buffInfo.nDetachType] .. '\n', 106))
+	else
+		tinsert(t, XML_LINE_BREAKER)
 	end
 
 	local szDesc = GetBuffDesc(dwID, nLevel, "desc")
