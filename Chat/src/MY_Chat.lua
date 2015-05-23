@@ -30,7 +30,7 @@ MY_Chat.bChatTime = true
 MY_Chat.nChatTime = CHAT_TIME.HOUR_MIN_SEC
 MY_Chat.bChatCopyAlwaysShowMask = false
 MY_Chat.bChatCopyAlwaysWhite = false
-MY_Chat.bChatCopyNoCopySysmsg = true
+MY_Chat.bChatCopyNoCopySysmsg = false
 MY_Chat.bReplaceIcon = false
 MY_Chat.bDisplayPanel = true    --  «∑Òœ‘ æ√Ê∞Â
 _Cache.LoadBlockWords = function() MY_Chat.tBlockWords = MY.LoadLUAData('config/MY_CHAT/blockwords') or MY_Chat.tBlockWords end
