@@ -21,6 +21,10 @@ local _Cache = {
 local _C = {}
 MY_InfoTip = {}
 MY_InfoTip.Config = {
+    Ping = { -- 网络延迟
+        bEnable = false, bShowBg = true, bShowTitle = true,
+        anchor  = { x=-10, y=-280, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    },
     TimeMachine = { -- 倍速显示（显示服务器有多卡……）
         bEnable = false, bShowBg = true, bShowTitle = true,
         anchor  = { x=-10, y=-250, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
@@ -53,6 +57,10 @@ MY_InfoTip.Config = {
 _C.tTm = {}
 _C.nTmFrameCount = GetLogicFrameCount()
 MY_InfoTip.Cache = {
+    Ping         = { -- Ping
+        formatString = '', title = _L['ping monitor'], prefix = _L['Ping: '], content = _L['%d'],
+        GetContent = function() return string.format(MY_InfoTip.Cache.Ping.formatString, GetPingValue() / 2) end
+    },
     TimeMachine  = { -- 目标距离
         formatString = '', title = _L['time machine'], prefix = _L['Rate: '], content = 'x%.2f',
         GetContent = function()
@@ -69,10 +77,6 @@ MY_InfoTip.Cache = {
             end
             return string.format(MY_InfoTip.Cache.TimeMachine.formatString, s)
         end
-    },
-    FPS       = { -- FPS
-        formatString = '', title = _L['fps monitor'], prefix = _L['FPS: '], content = _L['%d'],
-        GetContent = function() return string.format(MY_InfoTip.Cache.FPS.formatString, GetFPS()) end
     },
     Distance  = { -- 目标距离
         formatString = '', title = _L['target distance'], prefix = _L['Distance: '], content = _L['%.1f Foot'],
@@ -135,12 +139,14 @@ local LoadConfig = function()
     end
 end
 RegisterEvent("CUSTOM_UI_MODE_SET_DEFAULT", function()
-    MY_InfoTip.Config.FPS.anchor       = { x=-10, y=-220, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
-    MY_InfoTip.Config.Distance.anchor  = { x=-10, y=-190, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
-    MY_InfoTip.Config.SysTime.anchor   = { x=-10, y=-160, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
-    MY_InfoTip.Config.FightTime.anchor = { x=-10, y=-130, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
-    MY_InfoTip.Config.LotusTime.anchor = { x=-10, y=-100, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
-    MY_InfoTip.Config.GPS.anchor       = { x=-10, y=-70 , s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    MY_InfoTip.Config.Ping.anchor        = { x=-10, y=-280, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    MY_InfoTip.Config.TimeMachine.anchor = { x=-10, y=-250, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    MY_InfoTip.Config.FPS.anchor         = { x=-10, y=-220, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    MY_InfoTip.Config.Distance.anchor    = { x=-10, y=-190, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    MY_InfoTip.Config.SysTime.anchor     = { x=-10, y=-160, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    MY_InfoTip.Config.FightTime.anchor   = { x=-10, y=-130, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    MY_InfoTip.Config.LotusTime.anchor   = { x=-10, y=-100, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    MY_InfoTip.Config.GPS.anchor         = { x=-10, y=-70 , s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
     MY_InfoTip.Reload()
 end)
 -- 显示信息条
