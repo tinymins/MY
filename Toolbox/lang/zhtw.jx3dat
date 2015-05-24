@@ -11,6 +11,7 @@ data = {
     
     ['* infomation tips'] = '※ 信息條（SHIFT+U移動位置）',
     
+    ['ping monitor'   ] = '網絡延遲',
     ['GPS'            ] = '當前位置',
     ['fps monitor'    ] = '遊戲幀數',
     ['target distance'] = '目標距離',
@@ -22,6 +23,7 @@ data = {
     ['title'          ] = '標題'    ,
     ['font'           ] = '字體'    ,
     
+    ['Ping: '        ] = '網絡延遲：',
     ['Location: '    ] = '當前位置：',
     ['FPS: '         ] = 'FPS：',
     ['Rate: '        ] = '服務器倍率：',
