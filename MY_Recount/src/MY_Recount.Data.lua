@@ -144,6 +144,11 @@ local SKILL_RESULT = {
     CRITICAL= 5, -- 会心
     INSIGHT = 6, -- 识破
 }
+local AWAYTIME_TYPE = {
+    DEATH          = 0,
+    OFFLINE        = 1,
+    HALFWAY_JOINED = 2,
+}
 
 MY_Recount = MY_Recount or {}
 MY_Recount.Data = {}
@@ -756,16 +761,19 @@ MY.RegisterEvent('SYS_MSG', function()
 end)
 
 -- 有人死了活了做一下时间轴记录
-_Cache.OnTeammateStateChange = function(dwID, bLeave)
+_Cache.OnTeammateStateChange = function(dwID, bLeave, nAwayType, bAddWhenRecEmpty)
     if not (Data and Data.Awaytime) then
         return
     end
-    if not Data.Awaytime[dwID] then
-        Data.Awaytime[dwID] = {}
-    end
+    -- 获得一个人的记录
     local rec = Data.Awaytime[dwID]
-    -- 检查逻辑
-    if #rec > 0 then
+    if not rec then -- 初始化一个记录
+        if not bLeave and not bAddWhenRecEmpty then
+            return -- 不是一次暂离的开始并且不强制记录则跳过
+        end
+        rec = {}
+        Data.Awaytime[dwID] = rec
+    elseif #rec > 0 then -- 检查逻辑
         if bLeave then -- 有人死了
             if not rec[#rec][2] then -- 并且最后一条记录还是死的
                 return
@@ -776,12 +784,12 @@ _Cache.OnTeammateStateChange = function(dwID, bLeave)
             end
         end
     end
-    -- 插入数据
-    if bLeave then -- 有人暂离
-        table.insert(rec, { GetCurrentTime() })
+    -- 插入数据到记录
+    if bLeave then -- 暂离开始
+        table.insert(rec, { GetCurrentTime(), nil, nAwayType })
     else -- 暂离回来
         if #rec == 0 then -- 没记录到暂离开始 创建一个从本次战斗开始的暂离（俗称还没开打你就死了。。）
-            table.insert(rec, { Data.nTimeBegin, GetCurrentTime() })
+            table.insert(rec, { Data.nTimeBegin, GetCurrentTime(), nAwayType })
         elseif not rec[#rec][2] then -- 如果最后一次暂离还没回来 则完成最后一次暂离的记录
             rec[#rec][2] = GetCurrentTime()
         end
@@ -791,9 +799,44 @@ MY.RegisterEvent('PARTY_UPDATE_MEMBER_INFO', function()
     local team = GetClientTeam()
     local info = team.GetMemberInfo(arg1)
     if info then
-        _Cache.OnTeammateStateChange(arg1, info.bDeathFlag)
+        _Cache.OnTeammateStateChange(arg1, info.bDeathFlag, AWAYTIME_TYPE.DEATH, false)
     end
 end)
 MY.RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG', function()
-    _Cache.OnTeammateStateChange(arg1, arg2 == 0)
+    if arg2 == 0 then -- 有人掉线
+        _Cache.OnTeammateStateChange(arg1, true, AWAYTIME_TYPE.OFFLINE, false)
+    else -- 有人上线
+        _Cache.OnTeammateStateChange(arg1, false, AWAYTIME_TYPE.OFFLINE, false)
+        local team = GetClientTeam()
+        local info = team.GetMemberInfo(arg1)
+        if info and info.bDeathFlag then -- 上线死着的 结束离线暂离 开始死亡暂离
+            _Cache.OnTeammateStateChange(arg1, true, AWAYTIME_TYPE.DEATH, false)
+        end
+    end
+end)
+MY.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function() -- 开战扫描队友 记录开战就死掉/掉线的人
+    local team = GetClientTeam()
+    local me = GetClientPlayer()
+    if team and me and (me.IsInParty() or me.IsInRaid()) then
+        for _, dwID in ipairs(team.GetTeamMemberList()) do
+            local info = team.GetMemberInfo(dwID)
+            if info then
+                if not info.bIsOnLine then
+                    _Cache.OnTeammateStateChange(dwID, true, AWAYTIME_TYPE.OFFLINE, true)
+                elseif info.bDeathFlag then
+                    _Cache.OnTeammateStateChange(dwID, true, AWAYTIME_TYPE.DEATH, true)
+                end
+            end
+        end
+    end
+end)
+MY.RegisterEvent('PARTY_ADD_MEMBER', function() -- 中途有人进队 补上暂离记录
+    local team = GetClientTeam()
+    local info = team.GetMemberInfo(arg1)
+    if info then
+        _Cache.OnTeammateStateChange(arg1, false, AWAYTIME_TYPE.HALFWAY_JOINED, true)
+        if info.bDeathFlag then
+            _Cache.OnTeammateStateChange(arg1, true, AWAYTIME_TYPE.DEATH, true)
+        end
+    end
 end)
