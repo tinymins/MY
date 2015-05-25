@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-22 11:10:45
+-- @Last Modified time: 2015-05-25 20:33:34
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -1888,6 +1888,7 @@ function _MY.UI:size(nWidth, nHeight)
 					frm:Lookup('', 'Shadow_Bg'):SetSize(nWidth, nHeight)
 					frm:Lookup('WndContainer_TitleBtnR'):SetSize(nWidth, 30)
 					frm:Lookup('WndContainer_TitleBtnR'):FormatAllContentPos()
+					frm:Lookup('Btn_Drag'):SetRelPos(nWidth - 16, nHeight - 16)
 					frm:SetSize(nWidth, nHeight)
 					frm:SetDragArea(0, 0, nWidth, 30)
 					hnd:SetSize(nWidth, nHeight)
@@ -2757,6 +2758,9 @@ MY.UI.CreateFrame = function(szName, opt)
 						return
 					end
 				end
+				if opt.dragresize then
+					frm:Lookup('Btn_Drag'):Hide()
+				end
 				frm.bMinimize = true
 			end
 			frm:Lookup("WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize").OnCheckBoxUncheck = function()
@@ -2772,6 +2776,9 @@ MY.UI.CreateFrame = function(szName, opt)
 					if status and res then
 						return
 					end
+				end
+				if opt.dragresize then
+					frm:Lookup('Btn_Drag'):Show()
 				end
 				frm.bMinimize = false
 			end
@@ -2803,6 +2810,9 @@ MY.UI.CreateFrame = function(szName, opt)
 						return
 					end
 				end
+				if opt.dragresize then
+					frm:Lookup('Btn_Drag'):Hide()
+				end
 				frm.bMaximize = true
 			end
 			frm:Lookup("WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize").OnCheckBoxUncheck = function()
@@ -2817,8 +2827,50 @@ MY.UI.CreateFrame = function(szName, opt)
 						return
 					end
 				end
+				if opt.dragresize then
+					frm:Lookup('Btn_Drag'):Show()
+				end
 				frm.bMaximize = false
 			end
+		end
+		-- drag resize button
+		opt.minwidth  = opt.minwidth or 100
+		opt.minheight = opt.minheight or 50
+		if not opt.dragresize then
+			frm:Lookup('Btn_Drag'):Hide()
+		else
+			if opt.ondragresize then
+				MY.UI.RegisterUIEvent(frm, 'OnDragResize', opt.ondragresize)
+			end
+			frm:Lookup('Btn_Drag').OnDragButton = function()
+				local x, y = Station.GetMessagePos()
+				local W, H = Station.GetClientSize()
+				local X, Y = frm:GetRelPos()
+				local w, h = x - X, y - Y
+				w = math.min(w, W - X) -- frame size should not larger than client size
+				h = math.min(h, H - Y)
+				w = math.max(w, opt.minwidth) -- frame size must larger than setted min size
+				h = math.max(h, opt.minheight)
+				frm:Lookup('Btn_Drag'):SetRelPos(w - 16, h - 16)
+				frm:Lookup('', 'Shadow_Bg'):SetSize(w, h)
+			end
+			frm:Lookup('Btn_Drag').OnDragButtonBegin = function()
+				frm:Lookup('Window_Main'):Hide()
+			end
+			frm:Lookup('Btn_Drag').OnDragButtonEnd = function()
+				frm:Lookup('Window_Main'):Show()
+				local w, h = this:GetRelPos()
+				w = math.max(w + 16, opt.minwidth)
+				h = math.max(h + 16, opt.minheight)
+				MY.UI(frm):size(w, h)
+				if frm.OnDragResize then
+					local status, res = pcall(frm.OnDragResize, frm:Lookup('Window_Main'))
+					if status and res then
+						return
+					end
+				end
+			end
+			frm:Lookup('Btn_Drag'):RegisterLButtonDrag()
 		end
 		-- frame properties
 		if opt.alpha then
