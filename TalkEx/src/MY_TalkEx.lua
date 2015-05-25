@@ -5,7 +5,7 @@
 -- @Date  : 2015-05-18 10:30:29
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-21 20:27:30
+-- @Last Modified time: 2015-05-25 12:02:47
 -- @Version: 1.0
 -- @ChangeLog:
 --  + v1.0 File founded. -- viaµÔÒ»Ãù
@@ -81,15 +81,10 @@ _C.Trick = function()
 		local team = GetClientTeam()
 		local me = GetClientPlayer()
 		if team and me and (me.IsInParty() or me.IsInRaid()) then
-			for i = 0, team.nGroupNum - 1 do
-				local tGroup = team.GetGroupInfo(i)
-				if tGroup and tGroup.MemberList then
-					for _, dwID in ipairs(tGroup.MemberList) do
-						local info = team.GetMemberInfo(dwID)
-						if info and (MY_TalkEx.nTrickForce == -1 or MY_TalkEx.nTrickForce == info.dwForceID) then
-							table.insert(t, info.szName)
-						end
-					end
+			for _, dwID in ipairs(team.GetTeamMemberList()) do
+				local info = team.GetMemberInfo(dwID)
+				if info and (MY_TalkEx.nTrickForce == -1 or MY_TalkEx.nTrickForce == info.dwForceID) then
+					table.insert(t, info.szName)
 				end
 			end
 		end
@@ -115,7 +110,7 @@ _C.Trick = function()
 		MY.Talk(MY_TalkEx.nTrickChannel, MY_TalkEx.szTrickTextBegin)
 	end
 	for _, szName in ipairs(t) do
-		MY.Talk(MY_TalkEx.nTrickChannel, MY_TalkEx.szTrickText:gsub("%$mb", '[' .. szName .. ']'))
+		MY.Talk(MY_TalkEx.nTrickChannel, (MY_TalkEx.szTrickText:gsub("%$mb", '[' .. szName .. ']')))
 	end
 	if #MY_TalkEx.szTrickTextEnd > 0 then
 		MY.Talk(MY_TalkEx.nTrickChannel, MY_TalkEx.szTrickTextEnd)
