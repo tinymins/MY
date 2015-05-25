@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-19 17:27:25
+-- @Last Modified time: 2015-05-25 09:22:14
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -260,10 +260,13 @@ _C.GeneFoeListCache = function()
 		_C.tFoeListByID = {}
 		_C.tFoeListByName = {}
 		if me.GetFoeInfo then
-			for i, p in ipairs(me.GetFoeInfo()) do
-				_C.tFoeListByID[p.id] = p
-				_C.tFoeListByName[p.name] = p
-				table.insert(_C.tFoeList, p)
+			local infos = me.GetFoeInfo()
+			if infos then
+				for i, p in ipairs(infos) do
+					_C.tFoeListByID[p.id] = p
+					_C.tFoeListByName[p.name] = p
+					table.insert(_C.tFoeList, p)
+				end
 			end
 		end
 	end
