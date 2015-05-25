@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-25 12:31:03
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-16 21:32:38
+-- @Last Modified time: 2015-05-25 20:29:10
 -----------------------------------------------
 -- #######################################################################################################
 --   * * *         *                 *                     *                   *           *         
@@ -42,12 +42,22 @@ MY_Anmerkungen.ReloadNotePanel = function()
 	if MY_Anmerkungen.bNotePanelEnable then
 		-- frame
 		local ui = MY.UI.CreateFrame("MY_Anmerkungen_NotePanel", {
-			simple = true, alpha = 140, maximize = true, minimize = true,
+			simple = true, alpha = 140,
+			maximize = true, minimize = true, dragresize = true,
+			minwidth = 180, minheight = 100,
 			onmaximize = function(wnd)
 				local ui = MY.UI(wnd)
 				ui:children("#WndEditBox_Anmerkungen"):size(ui:size())
 			end,
 			onrestore = function(wnd)
+				local ui = MY.UI(wnd)
+				ui:children("#WndEditBox_Anmerkungen"):size(ui:size())
+			end,
+			ondragresize = function(wnd)
+				local ui = MY.UI(wnd:GetRoot())
+				MY_Anmerkungen.nNotePanelWidth  = ui:width()
+				MY_Anmerkungen.anchorNotePanel  = ui:anchor()
+				MY_Anmerkungen.nNotePanelHeight = ui:height()
 				local ui = MY.UI(wnd)
 				ui:children("#WndEditBox_Anmerkungen"):size(ui:size())
 			end,

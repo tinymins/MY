@@ -4,7 +4,7 @@
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-22 23:55:51
+-- @Last Modified time: 2015-05-25 20:20:02
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = {}
@@ -488,30 +488,11 @@ MY.RegisterPanel( "MY_ToolBox", _L["toolbox"], _L['General'], "UI/Image/Common/M
 	y = y + 30
 	
 	ui:append("WndCheckBox", "WndCheckBox_Anmerkungen_NotePanel"):children("#WndCheckBox_Anmerkungen_NotePanel")
-	  :pos(x, y + 10)
-	  :text(_L['my anmerkungen']):check(MY_Anmerkungen.bNotePanelEnable)
+	  :pos(x, y)
+	  :text(_L['my anmerkungen'])
+	  :check(MY_Anmerkungen.bNotePanelEnable or false)
 	  :check(function(bChecked)
 	  	MY_Anmerkungen.bNotePanelEnable = bChecked
-	  	MY_Anmerkungen.ReloadNotePanel()
-	  end)
-	
-	ui:append("WndSliderBox", "WndSliderBox_Anmerkungen_Width"):children("#WndSliderBox_Anmerkungen_Width")
-	  :pos(x + 150, y)
-	  :sliderStyle(false):range(25, 1000):value(MY_Anmerkungen.nNotePanelWidth)
-	  :text(_L("width: %dpx.", MY_Anmerkungen.nNotePanelWidth))
-	  :text(function(val) return _L("width: %dpx.", val) end)
-	  :change(function(val)
-	  	MY_Anmerkungen.nNotePanelWidth = val
-	  	MY_Anmerkungen.ReloadNotePanel()
-	  end)
-	y = y + 20
-	
-	ui:append("WndSliderBox", "WndSliderBox_Anmerkungen_Height"):children("#WndSliderBox_Anmerkungen_Height"):pos(x + 150, y)
-	  :sliderStyle(false):range(50, 1000):value(MY_Anmerkungen.nNotePanelHeight)
-	  :text(_L("height: %dpx.", MY_Anmerkungen.nNotePanelHeight))
-	  :text(function(val) return _L("height: %dpx.", val) end)
-	  :change(function(val)
-	  	MY_Anmerkungen.nNotePanelHeight = val
 	  	MY_Anmerkungen.ReloadNotePanel()
 	  end)
 end})
