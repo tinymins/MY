@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-25 09:22:14
+-- @Last Modified time: 2015-05-25 13:52:08
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -186,20 +186,28 @@ end
 _C.GeneFriendListCache = function()
 	if not _C.tFriendListByGroup then
 		local me = GetClientPlayer()
-		_C.tFriendListByID = {}
-		_C.tFriendListByName = {}
-		_C.tFriendListByGroup = {{ id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND or "" }} -- 默认分组
-		for _, group in ipairs(me.GetFellowshipGroupInfo() or {}) do
-			table.insert(_C.tFriendListByGroup, group)
-		end
-		for _, group in ipairs(_C.tFriendListByGroup) do
-			for _, p in ipairs(me.GetFellowshipInfo(group.id) or {}) do
-				table.insert(group, p)
-				_C.tFriendListByID[p.id] = p
-				_C.tFriendListByName[p.name] = p
+		if me then
+			local infos = me.GetFellowshipGroupInfo()
+			if infos then
+				_C.tFriendListByID = {}
+				_C.tFriendListByName = {}
+				_C.tFriendListByGroup = {{ id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND or "" }} -- 默认分组
+				for _, group in ipairs(infos) do
+					table.insert(_C.tFriendListByGroup, group)
+				end
+				for _, group in ipairs(_C.tFriendListByGroup) do
+					for _, p in ipairs(me.GetFellowshipInfo(group.id) or {}) do
+						table.insert(group, p)
+						_C.tFriendListByID[p.id] = p
+						_C.tFriendListByName[p.name] = p
+					end
+				end
+				return true
 			end
 		end
+		return false
 	end
+	return true
 end
 _C.OnFriendListChange = function()
 	_C.tFriendListByID = nil
@@ -218,24 +226,25 @@ MY.RegisterEvent("FELLOWSHIP_TWOWAY_FLAG_CHANGE", _C.OnFriendListChange)
 -- MY.Player.GetFriendList(1)        获取第一个分组好友列表
 -- MY.Player.GetFriendList("挽月堂") 获取分组名称为挽月堂的好友列表
 MY.Player.GetFriendList = function(arg0)
-	_C.GeneFriendListCache()
 	local t = {}
 	local tGroup = {}
-	if type(arg0) == "number" then
-		table.insert(tGroup, _C.tFriendListByGroup[arg0])
-	elseif type(arg0) == "string" then
-		for _, group in ipairs(_C.tFriendListByGroup) do
-			if group.name == arg0 then
-				table.insert(tGroup, clone(group))
+	if _C.GeneFriendListCache() then
+		if type(arg0) == "number" then
+			table.insert(tGroup, _C.tFriendListByGroup[arg0])
+		elseif type(arg0) == "string" then
+			for _, group in ipairs(_C.tFriendListByGroup) do
+				if group.name == arg0 then
+					table.insert(tGroup, clone(group))
+				end
 			end
+		else
+			tGroup = _C.tFriendListByGroup
 		end
-	else
-		tGroup = _C.tFriendListByGroup
-	end
-	local n = 0
-	for _, group in ipairs(tGroup) do
-		for _, p in ipairs(group) do
-			t[p.id], n = clone(p), n + 1
+		local n = 0
+		for _, group in ipairs(tGroup) do
+			for _, p in ipairs(group) do
+				t[p.id], n = clone(p), n + 1
+			end
 		end
 	end
 	return t, n
@@ -243,8 +252,7 @@ end
 
 -- 获取好友
 MY.Player.GetFriend = function(arg0)
-	if arg0 then
-		_C.GeneFriendListCache()
+	if arg0 and _C.GeneFriendListCache() then
 		if type(arg0) == "number" then
 			return clone(_C.tFriendListByID[arg0])
 		elseif type(arg0) == "string" then
@@ -256,20 +264,25 @@ end
 _C.GeneFoeListCache = function()
 	if not _C.tFoeList then
 		local me = GetClientPlayer()
-		_C.tFoeList = {}
-		_C.tFoeListByID = {}
-		_C.tFoeListByName = {}
-		if me.GetFoeInfo then
-			local infos = me.GetFoeInfo()
-			if infos then
-				for i, p in ipairs(infos) do
-					_C.tFoeListByID[p.id] = p
-					_C.tFoeListByName[p.name] = p
-					table.insert(_C.tFoeList, p)
+		if me then
+			_C.tFoeList = {}
+			_C.tFoeListByID = {}
+			_C.tFoeListByName = {}
+			if me.GetFoeInfo then
+				local infos = me.GetFoeInfo()
+				if infos then
+					for i, p in ipairs(infos) do
+						_C.tFoeListByID[p.id] = p
+						_C.tFoeListByName[p.name] = p
+						table.insert(_C.tFoeList, p)
+					end
+					return true
 				end
 			end
 		end
+		return false
 	end
+	return true
 end
 _C.OnFoeListChange = function()
 	_C.tFoeList = nil
@@ -279,13 +292,13 @@ end
 MY.RegisterEvent("PLAYER_FOE_UPDATE", _C.OnFoeListChange)
 -- 获取仇人列表
 MY.Player.GetFoeList = function()
-	_C.GeneFoeListCache()
-	return clone(_C.tFoeList)
+	if _C.GeneFoeListCache() then
+		return clone(_C.tFoeList)
+	end
 end
 -- 获取仇人
 MY.Player.GetFoe = function(arg0)
-	if arg0 then
-		_C.GeneFoeListCache()
+	if arg0 and _C.GeneFoeListCache() then
 		if type(arg0) == "number" then
 			return _C.tFoeListByID[arg0]
 		elseif type(arg0) == "string" then
