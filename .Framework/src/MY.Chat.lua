@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-22 14:52:43
+-- @Last Modified time: 2015-05-26 13:54:06
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -455,7 +455,7 @@ MY.Chat.SwitchChat = function(nChannel)
 		if string.sub(nChannel, 1, 1) == "/" then
 			if nChannel == '/cafk' or nChannel == '/catr' then
 				SwitchChatChannel(nChannel)
-				MY.Chat.Talk(nil, nChannel, nil, nil, true)
+				MY.Chat.Talk(nil, nChannel, nil, nil, nil, true)
 				Station.Lookup("Lowest2/EditBox"):Show()
 				Station.SetFocusWindow("Lowest2/EditBox/Edit_Input")
 			else
