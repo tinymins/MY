@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-25 10:40:14
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-20 13:31:29
+-- @Last Modified time: 2015-05-27 17:24:40
 -----------------------------------------------
 MY_BagEx = {}
 MY_BagEx.bEnable = true
@@ -222,22 +222,29 @@ _C.DoFilterGuildBank = function(bForce)
 	end
 end
 -- 过滤仓库原始函数
-_C.FilterBags = function(szTreePath, szFilter)
+_C.FilterBags = function(szTreePath, szFilter, bTimeLtd)
 	szFilter = (szFilter or ""):gsub('[%[%]]', '')
 	local me = GetClientPlayer()
 	MY.UI(szTreePath):find(".Box"):each(function(ui)
 		if this.bBag then
 			return
 		end
+		local bMatch = true
 		local _, nUiId, dwBox, dwX, suitIndex, dwTabType, dwIndex = this:GetObject()
 		local item = GetPlayerItem(GetClientPlayer(), dwBox, dwX)
 		if item then
-			if not wstring.find( _C.GetItemText(item), szFilter) then
-				this:SetAlpha(50)
-				return
+			if bTimeLtd and item:GetLeftExistTime() == 0 then
+				bMatch = false
+			end
+			if not wstring.find(_C.GetItemText(item), szFilter) then
+				bMatch = false
 			end
 		end
-		this:SetAlpha(255)
+		if bMatch then
+			this:SetAlpha(255)
+		else
+			this:SetAlpha(50)
+		end
 	end)
 end
 
