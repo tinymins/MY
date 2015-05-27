@@ -13,25 +13,28 @@ RegisterCustomData("MY_ChatFilter.bFilterDuplicateIgnoreID")
 RegisterCustomData("MY_ChatFilter.bFilterDuplicateContinuous")
 RegisterCustomData("MY_ChatFilter.bFilterDuplicateAddonTalk")
 
-_C.tApplyDuplicateChannels = {
+MY_ChatFilter.tApplyDuplicateChannels = {
 	["MSG_NORMAL"        ] = true,
-	["MSG_PARTY"         ] = true,
+	["MSG_PARTY"         ] = false,
 	["MSG_MAP"           ] = true,
 	["MSG_BATTLE_FILED"  ] = true,
 	["MSG_GUILD"         ] = true,
 	["MSG_GUILD_ALLIANCE"] = true,
 	["MSG_SCHOOL"        ] = true,
 	["MSG_WORLD"         ] = true,
-	["MSG_TEAM"          ] = true,
+	["MSG_TEAM"          ] = false,
 	["MSG_CAMP"          ] = true,
 	["MSG_GROUP"         ] = true,
-	["MSG_WHISPER"       ] = true,
+	["MSG_WHISPER"       ] = false,
 	["MSG_SEEK_MENTOR"   ] = true,
-	["MSG_FRIEND"        ] = true,
+	["MSG_FRIEND"        ] = false,
 }
+for k, _ in pairs(MY_ChatFilter.tApplyDuplicateChannels) do
+	RegisterCustomData("MY_ChatFilter.tApplyDuplicateChannels." .. k)
+end
 
 MY.HookChatPanel("MY_ChatFilter", function(h, szChannel, szMsg)
-	if _C.tApplyDuplicateChannels[szChannel] then
+	if MY_ChatFilter.tApplyDuplicateChannels[szChannel] then
 		-- 插件消息UUID过滤
 		if MY_ChatFilter.bFilterDuplicateAddonTalk then
 			local me = GetClientPlayer()
@@ -130,6 +133,26 @@ MY.RegisterPanel("MY_Duplicate_Chat_Filter", _L["duplicate chat filter"], _L['Ch
 		end,
 	})
 	y = y + 30
+
+	ui:append("WndComboBox", {
+		x = x, y = y, w = 330, h = 25,
+		menu = function()
+			local t = {}
+			for szChannelID, bFilter in pairs(MY_ChatFilter.tApplyDuplicateChannels) do
+				table.insert(t, {
+					szOption = g_tStrings.tChannelName[szChannelID],
+					bCheck = true, bChecked = bFilter,
+					rgb = GetMsgFontColor(szChannelID, true),
+					fnAction = function()
+						MY_ChatFilter.tApplyDuplicateChannels[szChannelID] = not MY_ChatFilter.tApplyDuplicateChannels[szChannelID]
+					end,
+				})
+			end
+			return t
+		end,
+		text = _L['select duplicate channels'],
+	})
+	y = y + 50
 
 	ui:append("WndCheckBox", {
 		text = _L['filter duplicate addon message'],
