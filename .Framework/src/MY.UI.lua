@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-25 20:33:34
+-- @Last Modified time: 2015-05-27 12:14:39
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -970,6 +970,8 @@ function _MY.UI:append(arg0, arg1, arg2)
 				if tArg.font        then ui:font       (tArg.font       ) end
 				if tArg.tip         then ui:tip        (tArg.tip        ) end
 				if tArg.menu        then ui:menu       (tArg.menu       ) end
+				if tArg.limit       then ui:limit      (tArg.limit      ) end
+				if tArg.edittype    then ui:edittype   (tArg.edittype   ) end
 				if tArg.image       then if type(tArg.image) == 'table' then ui:image (unpack(tArg.image)) else ui:image(tArg.image) end end
 				if tArg.onhover     then ui:hover      (tArg.onhover    ) end
 				if tArg.onclick     then ui:click      (tArg.onclick    ) end
@@ -2177,6 +2179,42 @@ function _MY.UI:handleStyle(dwStyle)
 	return self
 end
 
+-- (self) Instance:edittype(dwType)
+function _MY.UI:edittype(dwType)
+	self:_checksum()
+	if dwType then
+		for _, ele in pairs(self.eles) do
+			local x = ele.edt
+			if x and x.SetType then
+				x:SetType(dwType)
+			end
+		end
+	end
+	return self
+end
+
+-- (self) _MY.UI:limit(nLimit)
+function _MY.UI:limit(nLimit)
+	self:_checksum()
+	if nLimit then
+		for _, ele in pairs(self.eles) do
+			local x = ele.edt
+			if x and x.SetLimit then
+				x:SetLimit(nLimit)
+			end
+		end
+		return self
+	else -- get
+		local ele = self.eles[1]
+		if ele then
+			local x = ele.edt
+			if x and x.GetLimit then
+				return x:GetLimit()
+			end
+		end
+	end
+end
+
 -- (self) _MY.UI:sliderStyle(bShowPercentage)
 function _MY.UI:sliderStyle(bShowPercentage)
 	self:_checksum()
@@ -2963,6 +3001,35 @@ MY.UI.OpenColorPicker = function(callback, t)
 	end
 	ui:append("Shadow", "Select", { w = 25, h = 25, x = 20, y = 435 })
 	ui:append("Text", "Select_Text", { x = 65, y = 435 })
+	local GetRGBValue = function()
+		local r, g, b  = tonumber(ui:children("#R"):text()), tonumber(ui:children("#G"):text()), tonumber(ui:children("#B"):text())
+		if r and g and b and r <= 255 and g <= 255 and b <= 255 then
+			return r, g, b
+		end
+	end
+	local onChange = function()
+		if GetRGBValue() then
+			local r, g, b = GetRGBValue()
+			fnHover(true, r, g, b)
+		end
+	end
+	local x, y = 240, 435
+	ui:append("Text", { text = "R", x = x, y = y })
+	ui:append("WndEditBox", "R", { x = x + 14, y = y + 4, w = 38, h = 25, limit = 3, edittype = 0, onchange = onChange })
+	x = x + 14 + 38
+	ui:append("Text", { text = "G", x = x, y = y })
+	ui:append("WndEditBox", "G", { x = x + 14, y = y + 4, w = 38, h = 25, limit = 3, edittype = 0, onchange = onChange })
+	x = x + 14 + 38
+	ui:append("Text", { text = "B", x = x, y = y })
+	ui:append("WndEditBox", "B", { x = x + 14, y = y + 4, w = 38, h = 25, limit = 3, edittype = 0, onchange = onChange })
+	x = x + 14 + 38
+	ui:append("WndButton", { text = g_tStrings.STR_HOTKEY_SURE, x = x + 5, y = y + 5, w = 60, h = 25, onclick = function()
+		if GetRGBValue() then
+			fnClick(GetRGBValue())
+		else
+			MY.Sysmsg({_L["RGB value error"]})
+		end
+	end})
 	Station.SetFocusWindow(ui:raw(1))
 	-- OpenColorTablePanel(callback,nil,nil,t)
 	--  or {
