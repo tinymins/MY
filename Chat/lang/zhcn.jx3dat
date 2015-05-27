@@ -43,6 +43,7 @@ data = {
     ['filter duplicate chat'                ] = '开启刷屏屏蔽（相同聊天内容只显示第一条）',
     ['filter duplicate chat ignore id'      ] = '刷屏屏蔽不同玩家发送的相同聊天内容也屏蔽',
     ['only filter continuous duplicate chat'] = '刷屏屏蔽只屏蔽连续发送的刷屏聊天记录',
+    ['select duplicate channels'            ] = '选择启用刷屏屏蔽的频道',
     ['filter duplicate addon message'       ] = '屏蔽相同内容的插件喊话（如海鳗BOSS倒计时）',
     
     ['MOSAICS_CHAR'] = '…',
