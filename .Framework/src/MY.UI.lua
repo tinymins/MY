@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-27 12:14:39
+-- @Last Modified time: 2015-05-27 16:35:47
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -1944,6 +1944,7 @@ function _MY.UI:size(nWidth, nHeight)
 				ele.wnd:SetSize(nWidth, nHeight)
 				ele.hdl:SetSize(nWidth, nHeight)
 				ele.img:SetSize(nWidth, nHeight)
+				ele.txt:SetSize(nWidth - 10, nHeight)
 				ele.hdl:FormatAllItemPos()
 			elseif ele.type == "WndEditComboBox" or ele.type == "WndAutoComplete" then
 				ele.wnd:SetSize(nWidth, nHeight)
@@ -3020,7 +3021,7 @@ MY.UI.OpenColorPicker = function(callback, t)
 	ui:append("Text", { text = "G", x = x, y = y })
 	ui:append("WndEditBox", "G", { x = x + 14, y = y + 4, w = 38, h = 25, limit = 3, edittype = 0, onchange = onChange })
 	x = x + 14 + 38
-	ui:append("Text", { text = "B", x = x, y = y })
+ui:append("Text", { text = "B", x = x, y = y })
 	ui:append("WndEditBox", "B", { x = x + 14, y = y + 4, w = 38, h = 25, limit = 3, edittype = 0, onchange = onChange })
 	x = x + 14 + 38
 	ui:append("WndButton", { text = g_tStrings.STR_HOTKEY_SURE, x = x + 5, y = y + 5, w = 60, h = 25, onclick = function()
