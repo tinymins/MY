@@ -4,7 +4,7 @@
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-25 20:20:02
+-- @Last Modified time: 2015-05-28 17:10:00
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = {}
@@ -163,10 +163,13 @@ MY.RegisterInit('MY_LOCK_TIP', function()
 			local state, nResetTime = Lock_State()
 			if state == "PASSWORD_LOCK" then
 				MY.DelayCall("MY_LOCK_TIP", function()
-					local me = GetClientPlayer()
-					local szText = me and me.GetGlobalID and _L.LOCK_TIP[me.GetGlobalID()] or _L['You have been loged in for 2min, you can unlock bag locker now.']
-					MY.Sysmsg({szText})
-					OutputWarningMessage("MSG_REWARD_GREEN", szText, 10)
+					local state, nResetTime = Lock_State()
+					if state == "PASSWORD_LOCK" then
+						local me = GetClientPlayer()
+						local szText = me and me.GetGlobalID and _L.LOCK_TIP[me.GetGlobalID()] or _L['You have been loged in for 2min, you can unlock bag locker now.']
+						MY.Sysmsg({szText})
+						OutputWarningMessage("MSG_REWARD_GREEN", szText, 10)
+					end
 				end, 100000)
 			end
 		end
