@@ -281,7 +281,7 @@ end
 MY_Recount.Data.GeneFightTime = function(data, dwID, bSysTimeMode)
     local nTimeDuring = data.nTimeDuring
     local nTimeBegin  = data.nTimeBegin
-    if bSysTimeMode then
+    if bSysTimeMode and data.nTimeLastRec then
         nTimeDuring = data.nTimeLastRec - nTimeBegin
     end
     if dwID and data.Awaytime and data.Awaytime[dwID] then
@@ -678,17 +678,18 @@ MY_Recount.Data.Init = function(bForceInit)
     if bForceInit or (not Data) or
     (Data.UUID and MY.Player.GetFightUUID() ~= Data.UUID) then
         Data = {
-            UUID        = MY.Player.GetFightUUID(), -- 战斗唯一标识
-            nTimeBegin  = GetCurrentTime(),         -- 战斗开始时间
-            nTimeDuring =  0,                       -- 战斗持续时间
-            Awaytime    = {},                       -- 死亡/掉线时间节点
-            Namelist    = {},                       -- 名称缓存
-            Forcelist   = {},                       -- 势力缓存
-            Damage      = {},                       -- 输出统计
-            Heal        = {},                       -- 治疗统计
-            BeHeal      = {},                       -- 承疗统计
-            BeDamage    = {},                       -- 承伤统计
-            Summary     = {                         -- 统计总和
+            UUID         = MY.Player.GetFightUUID(), -- 战斗唯一标识
+            nTimeBegin   = GetCurrentTime(),         -- 战斗开始时间
+            nTimeDuring  =  0,                       -- 战斗持续时间
+            nTimeLastRec = GetCurrentTime(),         -- 最后一次技能时间
+            Awaytime     = {},                       -- 死亡/掉线时间节点
+            Namelist     = {},                       -- 名称缓存
+            Forcelist    = {},                       -- 势力缓存
+            Damage       = {},                       -- 输出统计
+            Heal         = {},                       -- 治疗统计
+            BeHeal       = {},                       -- 承疗统计
+            BeDamage     = {},                       -- 承伤统计
+            Summary      = {                         -- 统计总和
                 nDamage   = 0, nEffectDamage   = 0,
                 nHeal     = 0, nEffectHeal     = 0,
                 nBeHeal   = 0, nEffectBeHeal   = 0,
