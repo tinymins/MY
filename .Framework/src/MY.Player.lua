@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-25 13:52:08
+-- @Last Modified time: 2015-05-28 21:19:27
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -444,13 +444,23 @@ MY.Player.IsFighting = function()
 	if not bFightState and MY.Player.IsInArena() then
 		bFightState = true
 	elseif not bFightState and MY.Player.IsInDungeon() then
-	-- 在副本且附近队友进战则判断处于战斗状态
+		-- 在副本且附近队友进战且附近敌对NPC进战则判断处于战斗状态
+		local bPlayerFighting, bNpcFighting
 		for dwID, p in pairs(MY.Player.GetNearPlayer()) do
 			if me.IsPlayerInMyParty(dwID) and p.bFightState then
-				bFightState = true
+				bPlayerFighting = true
 				break
 			end
 		end
+		if bPlayerFighting then
+			for dwID, p in pairs(MY.Player.GetNearNpc()) do
+				if IsEnemy(me.dwID, dwID) and p.bFightState then
+					bNpcFighting = true
+					break
+				end
+			end
+		end
+		bFightState = bPlayerFighting and bNpcFighting
 	end
 	return bFightState
 end
