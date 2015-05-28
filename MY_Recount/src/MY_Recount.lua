@@ -276,7 +276,7 @@ MY_Recount.UpdateUI = function(data)
 	end
 	
 	-- 计算战斗时间
-	local nTimeCount = MY_Recount.Data.GeneFightTime(data, nil, MY_Recount.bSysTimeMode)
+	local nTimeCount = MY_Recount.Data.GeneFightTime(data, nil, MY_Recount.bSysTimeMode and SZ_CHANNEL_KEY[MY_Recount.nChannel])
 	local szTimeCount = MY.Sys.FormatTimeCount('M:ss', nTimeCount)
 	-- 自己的记录
 	local tMyRec
@@ -297,7 +297,7 @@ MY_Recount.UpdateUI = function(data)
 			}
 			-- 计算战斗时间
 			if MY_Recount.bAwayMode then -- 删去死亡时间 && 防止计算DPS时除以0
-				tRec.nTimeCount = math.max(MY_Recount.Data.GeneFightTime(data, id, MY_Recount.bSysTimeMode), 1)
+				tRec.nTimeCount = math.max(MY_Recount.Data.GeneFightTime(data, id, MY_Recount.bSysTimeMode and SZ_CHANNEL_KEY[MY_Recount.nChannel]), 1)
 			else -- 不删去暂离时间
 				tRec.nTimeCount = math.max(nTimeCount, 1)
 			end
