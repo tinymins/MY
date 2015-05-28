@@ -28,7 +28,11 @@ Data = {
     UUID = 战斗统一标示符,
     nTimeBegin  = 战斗开始UNIX时间戳,
     nTimeDuring = 战斗持续秒数,
-    nTimeLastRec = 最后一次技能记录UNIX时间戳,
+    LastRecTime = {
+        Damage = 最后一次伤害技能记录UNIX时间戳,
+        Heal   = 最后一次治疗技能记录UNIX时间戳,
+        ...
+    },
     Damage = {                                                -- 输出统计
         玩家的dwID = {                                        -- 该对象的输出统计
             nTotal       = 2314214,                           -- 总输出
@@ -266,23 +270,34 @@ MY_Recount.Data.Del = function(data)
     end
 end
 
-MY_Recount.Data.GeneAwayTime = function(data, dwID, bSysTimeMode)
-    local nFightTime = MY_Recount.Data.GeneFightTime(data, dwID, bSysTimeMode)
-    local nAwatTime
-    if bSysTimeMode and data.nTimeLastRec then
-        nAwatTime = data.nTimeLastRec - data.nTimeBegin - nFightTime
+-- 计算暂离时间
+-- MY_Recount.Data.GeneAwayTime(data, dwID, szRecordType)
+-- data: 数据
+-- dwID: 计算暂离的角色ID 为空则计算团队的暂离时间（目前永远为0）
+-- szRecordType: 不同类型的数据在官方时间算法下计算结果可能不一样
+--               枚举暂时有 Heal Damage BeDamage BeHeal 四种
+MY_Recount.Data.GeneAwayTime = function(data, dwID, szRecordType)
+    local nFightTime = MY_Recount.Data.GeneFightTime(data, dwID, szRecordType)
+    local nAwayTime
+    if szRecordType and data.LastRecTime and data.LastRecTime[szRecordType] then
+        nAwayTime = data.LastRecTime[szRecordType] - data.nTimeBegin - nFightTime
     else
-        nAwatTime = data.nTimeDuring - nFightTime
+        nAwayTime = data.nTimeDuring - nFightTime
     end
-    return math.max(nAwatTime, 0)
+    return math.max(nAwayTime, 0)
 end
 
 -- 计算战斗时间
-MY_Recount.Data.GeneFightTime = function(data, dwID, bSysTimeMode)
+-- MY_Recount.Data.GeneFightTime(data, dwID, szRecordType)
+-- data: 数据
+-- dwID: 计算战斗时间的角色ID 为空则计算团队的战斗时间
+-- szRecordType: 不同类型的数据在官方时间算法下计算结果可能不一样
+--               枚举暂时有 Heal Damage BeDamage BeHeal 四种
+MY_Recount.Data.GeneFightTime = function(data, dwID, szRecordType)
     local nTimeDuring = data.nTimeDuring
     local nTimeBegin  = data.nTimeBegin
-    if bSysTimeMode and data.nTimeLastRec then
-        nTimeDuring = data.nTimeLastRec - nTimeBegin
+    if szRecordType and data.LastRecTime and data.LastRecTime[szRecordType] then
+        nTimeDuring = data.LastRecTime[szRecordType] - nTimeBegin
     end
     if dwID and data.Awaytime and data.Awaytime[dwID] then
         for _, rec in ipairs(data.Awaytime[dwID]) do
@@ -432,9 +447,7 @@ _Cache.AddRecord = function(data, szRecordType, idRecord, idTarget, szEffectName
     if not szEffectName or szEffectName == "" then
         return
     end
-    if szRecordType == 'Damage' then
-        data.nTimeLastRec = GetCurrentTime()
-    end
+    data.LastRecTime[szRecordType] = GetCurrentTime()
     ------------------------
     -- # 节： data.Summary
     ------------------------
@@ -683,7 +696,6 @@ MY_Recount.Data.Init = function(bForceInit)
             UUID         = MY.Player.GetFightUUID(), -- 战斗唯一标识
             nTimeBegin   = GetCurrentTime(),         -- 战斗开始时间
             nTimeDuring  =  0,                       -- 战斗持续时间
-            nTimeLastRec = GetCurrentTime(),         -- 最后一次技能时间
             Awaytime     = {},                       -- 死亡/掉线时间节点
             Namelist     = {},                       -- 名称缓存
             Forcelist    = {},                       -- 势力缓存
@@ -691,6 +703,7 @@ MY_Recount.Data.Init = function(bForceInit)
             Heal         = {},                       -- 治疗统计
             BeHeal       = {},                       -- 承疗统计
             BeDamage     = {},                       -- 承伤统计
+            LastRecTime  = {},                       -- 最后一次记录时间
             Summary      = {                         -- 统计总和
                 nDamage   = 0, nEffectDamage   = 0,
                 nHeal     = 0, nEffectHeal     = 0,
