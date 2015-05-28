@@ -291,7 +291,7 @@ MY_Recount.Data.GeneFightTime = function(data, dwID, bSysTimeMode)
             if nAwayEnd then -- 完整的离开记录
                 nTimeDuring = nTimeDuring - (nAwayEnd - nAwayBegin)
             else -- 离开了至今没回来的记录
-                nTimeDuring = nTimeDuring - (data.nTimeBegin + data.nTimeDuring - nAwayBegin)
+                nTimeDuring = nTimeDuring - (data.nTimeBegin + nTimeDuring - nAwayBegin)
                 break
             end
         end
@@ -432,7 +432,9 @@ _Cache.AddRecord = function(data, szRecordType, idRecord, idTarget, szEffectName
     if not szEffectName or szEffectName == "" then
         return
     end
-    data.nTimeLastRec = GetCurrentTime()
+    if szRecordType == 'Damage' then
+        data.nTimeLastRec = GetCurrentTime()
+    end
     ------------------------
     -- # 节： data.Summary
     ------------------------
