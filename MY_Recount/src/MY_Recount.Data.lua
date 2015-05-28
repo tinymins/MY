@@ -28,6 +28,7 @@ Data = {
     UUID = 战斗统一标示符,
     nTimeBegin  = 战斗开始UNIX时间戳,
     nTimeDuring = 战斗持续秒数,
+    nTimeLastRec = 最后一次技能记录UNIX时间戳,
     Damage = {                                                -- 输出统计
         玩家的dwID = {                                        -- 该对象的输出统计
             nTotal       = 2314214,                           -- 总输出
@@ -133,6 +134,11 @@ Data = {
     Heal = { ... },
     BeHeal = { ... },
     BeDamage = { ... },
+    Summary = {
+        nDamage = 全队的输出量,
+        nEffectDamage = 全队的有效输出量,
+        ...
+    },
 }
 ]]
 local SKILL_RESULT = {
@@ -260,10 +266,24 @@ MY_Recount.Data.Del = function(data)
     end
 end
 
+MY_Recount.Data.GeneAwayTime = function(data, dwID, bSysTimeMode)
+    local nFightTime = MY_Recount.Data.GeneFightTime(data, dwID, bSysTimeMode)
+    local nAwatTime
+    if bSysTimeMode and data.nTimeLastRec then
+        nAwatTime = data.nTimeLastRec - data.nTimeBegin - nFightTime
+    else
+        nAwatTime = data.nTimeDuring - nFightTime
+    end
+    return math.max(nAwatTime, 0)
+end
+
 -- 计算战斗时间
-MY_Recount.Data.GeneFightTime = function(data, dwID)
+MY_Recount.Data.GeneFightTime = function(data, dwID, bSysTimeMode)
     local nTimeDuring = data.nTimeDuring
     local nTimeBegin  = data.nTimeBegin
+    if bSysTimeMode then
+        nTimeDuring = data.nTimeLastRec - nTimeBegin
+    end
     if dwID and data.Awaytime and data.Awaytime[dwID] then
         for _, rec in ipairs(data.Awaytime[dwID]) do
             local nAwayBegin = math.max(rec[1], nTimeBegin)
@@ -276,7 +296,7 @@ MY_Recount.Data.GeneFightTime = function(data, dwID)
             end
         end
     end
-    return nTimeDuring
+    return math.max(nTimeDuring, 0)
 end
 
 -- ##################################################################################################
@@ -405,13 +425,24 @@ MY_Recount.Data.GetNameAusID = function(id, data)
 end
 
 -- 将一条记录插入数组
-_Cache.AddRecord = function(tRecord, idTarget, szEffectName, nValue, nEffectValue, nSkillResult)
+_Cache.AddRecord = function(data, szRecordType, idRecord, idTarget, szEffectName, nValue, nEffectValue, nSkillResult)
+    local tSummary = data.Summary
+    local tRecords = data[szRecordType]
+    local tRecord  = tRecords[idRecord]
     if not szEffectName or szEffectName == "" then
         return
     end
-    tRecord.nTotal              = tRecord.nTotal + nValue
-    tRecord.nTotalEffect        = tRecord.nTotalEffect + nEffectValue
-    
+    data.nTimeLastRec = GetCurrentTime()
+    ------------------------
+    -- # 节： data.Summary
+    ------------------------
+    tSummary['n'       .. szRecordType] = tSummary['n'       .. szRecordType] + nValue
+    tSummary['nEffect' .. szRecordType] = tSummary['nEffect' .. szRecordType] + nEffectValue
+    ------------------------
+    -- # 节： tRecord
+    ------------------------
+    tRecord.nTotal        = tRecord.nTotal + nValue
+    tRecord.nTotalEffect  = tRecord.nTotalEffect + nEffectValue
     ------------------------
     -- # 节： tRecord.Detail
     ------------------------
@@ -601,10 +632,10 @@ MY_Recount.Data.AddDamageRecord = function(hCaster, hTarget, szEffectName, nDama
     
     -- 添加伤害记录
     _Cache.InitObjectData(Data, hCaster, 'Damage')
-    _Cache.AddRecord(Data.Damage[idCaster], idTarget, szEffectName, nDamage, nEffectDamage, nSkillResult)
+    _Cache.AddRecord(Data, 'Damage'  , idCaster, idTarget, szEffectName, nDamage, nEffectDamage, nSkillResult)
     -- 添加承伤记录
     _Cache.InitObjectData(Data, hTarget, 'BeDamage')
-    _Cache.AddRecord(Data.BeDamage[idTarget], idCaster, szEffectName, nDamage, nEffectDamage, nSkillResult)
+    _Cache.AddRecord(Data, 'BeDamage', idTarget, idCaster, szEffectName, nDamage, nEffectDamage, nSkillResult)
 end
 
 -- 插入一条治疗记录
@@ -615,10 +646,10 @@ MY_Recount.Data.AddHealRecord = function(hCaster, hTarget, szEffectName, nHeal, 
     
     -- 添加伤害记录
     _Cache.InitObjectData(Data, hCaster, 'Heal')
-    _Cache.AddRecord(Data.Heal[idCaster], idTarget, szEffectName, nHeal, nEffectHeal, nSkillResult)
+    _Cache.AddRecord(Data, 'Heal'    , idCaster, idTarget, szEffectName, nHeal, nEffectHeal, nSkillResult)
     -- 添加承伤记录
     _Cache.InitObjectData(Data, hTarget, 'BeHeal')
-    _Cache.AddRecord(Data.BeHeal[idTarget], idCaster, szEffectName, nHeal, nEffectHeal, nSkillResult)
+    _Cache.AddRecord(Data, 'BeHeal'  , idTarget, idCaster, szEffectName, nHeal, nEffectHeal, nSkillResult)
 end
 
 -- 确认对象数据已创建（未创建则创建）
@@ -657,6 +688,12 @@ MY_Recount.Data.Init = function(bForceInit)
             Heal        = {},                       -- 治疗统计
             BeHeal      = {},                       -- 承疗统计
             BeDamage    = {},                       -- 承伤统计
+            Summary     = {                         -- 统计总和
+                nDamage   = 0, nEffectDamage   = 0,
+                nHeal     = 0, nEffectHeal     = 0,
+                nBeHeal   = 0, nEffectBeHeal   = 0,
+                nBeDamage = 0, nEffectBeDamage = 0,
+            },
         }
     end
     
