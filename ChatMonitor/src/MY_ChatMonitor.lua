@@ -128,7 +128,7 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
         end
     else
         rec.text = szMsg
-        rec.html = GetFormatText(szMsg, nil, rgbSysMsg[1], rgbSysMsg[2], rgbSysMsg[3])
+        rec.html = GetFormatText(szMsg, nil, GetMsgFontColor("MSG_SYS"))
     end
     
     if not MY_ChatMonitor.bIsRegexp then
