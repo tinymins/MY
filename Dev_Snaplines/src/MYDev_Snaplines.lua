@@ -80,7 +80,7 @@ MYDev_Snaplines.GetElementTip = function(raw, tTip)
         table.insert(tTip, _L('BoxIndex: %s', raw:GetBoxIndex()))
         -- table.insert(tTip, _L('Object: %s', raw:GetObject()))
         table.insert(tTip, _L('ObjectType: %s', raw:GetObjectType()))
-        table.insert(tTip, _L('ObjectData: %s', raw:GetObjectData()))
+        table.insert(tTip, _L('ObjectData: %s', table.concat({raw:GetObjectData()}, ", ")))
         table.insert(tTip, _L('IsEmpty: %s', tostring(raw:IsEmpty())))
         if not raw:IsEmpty() then
             table.insert(tTip, _L('IsObjectEnable: %s', tostring(raw:IsObjectEnable())))
