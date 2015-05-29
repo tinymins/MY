@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-29 11:20:33
+-- @Last Modified time: 2015-05-29 14:34:06
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -1409,7 +1409,7 @@ function _MY.UI:autocomplete(method, arg1, arg2)
 end
 
 -- ui listbox interface
-function _MY.UI:listbox(method, arg1, arg2, arg3)
+function _MY.UI:listbox(method, arg1, arg2, arg3, arg4)
 	self:_checksum()
 	if method == 'option' and (type(arg1) == 'nil' or (type(arg1) == 'string' and type(arg2) == nil)) then -- get
 		-- select the first item
@@ -1472,7 +1472,7 @@ function _MY.UI:listbox(method, arg1, arg2, arg3)
 			end
 			return tData
 		elseif method == 'insert' then
-			local text, id, data = arg1, arg2, arg3
+			local text, id, data, pos = arg1, arg2, arg3, tonumber(arg4)
 			for _, ele in pairs(self.eles) do
 				if ele.type == 'WndListBox' then
 					local hScroll = ele.raw:Lookup('', 'Handle_Scroll')
@@ -1486,8 +1486,16 @@ function _MY.UI:listbox(method, arg1, arg2, arg3)
 					end
 					if not bExist then
 						local w, h = hScroll:GetSize()
-						hScroll:AppendItemFromString('<handle>eventid=371 <image>w='..w..' h=25 path="UI/Image/Common/TextShadow.UITex" frame=5 alpha=0 name="Image_Bg" </image><image>w='..w..' h=25 path="UI/Image/Common/TextShadow.UITex" lockshowhide=1 frame=2 name="Image_Sel" </image><text>w='..w..' h=25 valign=1 name="Text_Default" </text></handle>')
-						local hItem = hScroll:Lookup(hScroll:GetItemCount() - 1)
+						local xml = '<handle>eventid=371 <image>w='..w..' h=25 path="UI/Image/Common/TextShadow.UITex" frame=5 alpha=0 name="Image_Bg" </image><image>w='..w..' h=25 path="UI/Image/Common/TextShadow.UITex" lockshowhide=1 frame=2 name="Image_Sel" </image><text>w='..w..' h=25 valign=1 name="Text_Default" </text></handle>'
+						local hItem
+						if pos then
+							pos = pos - 1 -- C++ count from zero but lua count from one.
+							hScroll:InsertItemFromString(pos, false, xml)
+							hItem = hScroll:Lookup(pos)
+						else
+							hScroll:AppendItemFromString(xml)
+							hItem = hScroll:Lookup(hScroll:GetItemCount() - 1)
+						end
 						hItem.id = id
 						hItem.text = text
 						hItem.data = data
