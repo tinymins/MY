@@ -4,7 +4,7 @@
 -- @Date  : 2015-01-25 15:35:26
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-22 15:53:57
+-- @Last Modified time: 2015-05-29 10:06:20
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -14,16 +14,25 @@ MY = MY or {}
 MY.String = MY.String or {}
 
 -- 分隔字符串
--- (table) MY.String.Split(string szText, string szSpliter)
-MY.String.Split = function(szText, szSep)
-	local nOff, tResult = 1, {}
+-- (table) MY.String.Split(string szText, string szSpliter, bool bIgnoreEmptyPart)
+-- szText           原始字符串
+-- szSpliter        分隔符
+-- bIgnoreEmptyPart 是否忽略空字符串，即"123;234;"被";"分成{"123","234"}还是{"123","234",""}
+MY.String.Split = function(szText, szSep, bIgnoreEmptyPart)
+	local nOff, tResult, szPart = 1, {}
 	while true do
 		local nEnd = StringFindW(szText, szSep, nOff)
 		if not nEnd then
-			table.insert(tResult, string.sub(szText, nOff, string.len(szText)))
+			szPart = string.sub(szText, nOff, string.len(szText))
+			if not bIgnoreEmptyPart or szPart ~= "" then
+				table.insert(tResult, szPart)
+			end
 			break
 		else
-			table.insert(tResult, string.sub(szText, nOff, nEnd - 1))
+			szPart = string.sub(szText, nOff, nEnd - 1)
+			if not bIgnoreEmptyPart or szPart ~= "" then
+				table.insert(tResult, szPart)
+			end
 			nOff = nEnd + string.len(szSep)
 		end
 	end
@@ -90,13 +99,13 @@ MY.String.SimpleMatch = function(szText, szFind, bDistinctCase)
 	end
 	-- 10|十人,血战天策|XZTC,!小铁被吃了,!开宴黑铁;大战
 	local bKeyWordsLine = false
-	for _, szKeyWordsLine in ipairs( MY.String.Split(szFind, ';') ) do         -- 符合一个即可
+	for _, szKeyWordsLine in ipairs( MY.String.Split(szFind, ';', true) ) do         -- 符合一个即可
 		-- 10|十人,血战天策|XZTC,!小铁被吃了,!开宴黑铁
 		local bKeyWords = true
-		for _, szKeyWords in ipairs( MY.String.Split(szKeyWordsLine, ',') ) do -- 必须全部符合
+		for _, szKeyWords in ipairs( MY.String.Split(szKeyWordsLine, ',', true) ) do -- 必须全部符合
 			-- 10|十人
 			local bKeyWord = false
-			for _, szKeyWord in ipairs( MY.String.Split(szKeyWords, '|') ) do  -- 符合一个即可
+			for _, szKeyWord in ipairs( MY.String.Split(szKeyWords, '|', true) ) do  -- 符合一个即可
 				-- szKeyWord = MY.String.PatternEscape(szKeyWord) -- 用了wstring还Escape个捷豹
 				if string.sub(szKeyWord, 1, 1) == "!" then                     -- !小铁被吃了
 					szKeyWord = string.sub(szKeyWord, 2)
