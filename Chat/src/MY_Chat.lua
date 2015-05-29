@@ -567,10 +567,10 @@ OnPanelActive = function(wnd)
 	  		end
 	  	end
 	  	-- 加入表
-	  	table.insert(MY_Chat.tBlockWords, szText)
+	  	table.insert(MY_Chat.tBlockWords, 1, szText)
 	  	_Cache.SaveBlockWords()
 	  	-- 更新UI
-	  	list:listbox('insert', szText, szText)
+	  	list:listbox('insert', szText, szText, nil, 1)
 	  end)
 	-- del
 	ui:append("WndButton", "WndButton_Del"):children("#WndButton_Del")
