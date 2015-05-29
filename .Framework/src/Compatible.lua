@@ -3,8 +3,8 @@
 -- @Author: 茗伊 @双梦镇 @追风蹑影
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
--- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-23 10:21:07
+-- @Last Modified by:   Webster
+-- @Last Modified time: 2015-05-29 03:36:23
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 local tinsert, tconcat, tremove = table.insert, table.concat, table.remove
@@ -284,7 +284,7 @@ EQUIPMENT_SUB = {
 	L_SHOULDER_EXTEND = 20, -- 左肩挂件
 	R_SHOULDER_EXTEND = 21, -- 右肩挂件
 	BACK_CLOAK_EXTEND = 22, -- 披风
-	TOTAL             = 23, -- 
+	TOTAL             = 23, --
 }
 end
 
@@ -375,8 +375,6 @@ function OutputBuffTipA(dwID, nLevel, Rect, nTime)
 	local buffInfo = GetBuffInfo(dwID, nLevel, {})
 	if buffInfo and buffInfo.nDetachType and g_tStrings.tBuffDetachType[buffInfo.nDetachType] then
 		tinsert(t, GetFormatText(g_tStrings.tBuffDetachType[buffInfo.nDetachType] .. '\n', 106))
-	else
-		tinsert(t, XML_LINE_BREAKER)
 	end
 
 	local szDesc = GetBuffDesc(dwID, nLevel, "desc")
@@ -386,6 +384,7 @@ function OutputBuffTipA(dwID, nLevel, Rect, nTime)
 
 	if nTime then
 		if nTime == 0 then
+			tinsert(t, XML_LINE_BREAKER)
 			tinsert(t, GetFormatText(g_tStrings.STR_BUFF_H_TIME_ZERO, 102))
 		else
 			local H, M, S = "", "", ""
@@ -399,8 +398,10 @@ function OutputBuffTipA(dwID, nLevel, Rect, nTime)
 				M = m .. g_tStrings.STR_BUFF_H_TIME_M_SHORT .. " "
 			end
 			S = s..g_tStrings.STR_BUFF_H_TIME_S
-			
-			tinsert(GetFormatText(FormatString(g_tStrings.STR_BUFF_H_LEFT_TIME_MSG, H, M, S), 102))
+			if h < 720 then
+				tinsert(t, XML_LINE_BREAKER)
+				tinsert(t, GetFormatText(FormatString(g_tStrings.STR_BUFF_H_LEFT_TIME_MSG, H, M, S), 102))
+			end
 		end
 	end
 
