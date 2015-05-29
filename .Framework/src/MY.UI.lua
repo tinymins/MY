@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-27 16:35:47
+-- @Last Modified time: 2015-05-29 11:20:33
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -494,8 +494,11 @@ function _MY.UI:each(fn)
 	for _, ele in pairs(eles) do
 		local _this = this
 		this = ele.raw
-		pcall(fn, self:clone({{raw = ele.raw}}))
+		local res, err = pcall(fn, self:clone({{raw = ele.raw}}))
 		this = _this
+		if res and err == 0 then
+			break
+		end
 	end
 	return self
 end
