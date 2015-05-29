@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-18 09:50:58
+-- @Last Modified time: 2015-05-29 20:51:07
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 MY = MY or {}
@@ -238,6 +238,7 @@ end)
 --   #                   #   # #       # # # # #       # #   #         #               #         #   
 --   #               # # #             #       #       #     #       # #             # #             
 -- ##################################################################################################
+_C.tFreeWebPages = {}
 -- (void) MY.RemoteRequest(string szUrl, func fnAction)       -- 发起远程 HTTP 请求
 -- szUrl        -- 请求的完整 URL（包含 http:// 或 https://）
 -- fnAction     -- 请求完成后的回调函数，回调原型：function(szTitle, szContent)]]
@@ -254,11 +255,20 @@ MY.RemoteRequest = function(szUrl, fnSuccess, fnError, nTimeout)
 		end
 	end
 	
+	local RequestID, hFrame
+	local nFreeWebPages = #_C.tFreeWebPages
+	if nFreeWebPages > 0 then
+		RequestID = _C.tFreeWebPages[nFreeWebPages]
+		hFrame = Station.Lookup('Lowest/MYRR_' .. RequestID)
+		table.remove(_C.tFreeWebPages)
+	end
 	-- create page
-	local RequestID = ("%X_%X"):format(GetTickCount(), math.floor(math.random() * 65536))
-	local hFrame = Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. 'ui/WndWebPage.ini', "MYRR_" .. RequestID)
+	if not hFrame then
+		RequestID = ("%X_%X"):format(GetTickCount(), math.floor(math.random() * 65536))
+		hFrame = Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. 'ui/WndWebPage.ini', "MYRR_" .. RequestID)
+		hFrame:Hide()
+	end
 	local hPage = hFrame:Lookup('WndWebPage')
-	hFrame:Hide()
 	
 	-- bind callback function
 	hPage.OnDocumentComplete = function()
@@ -272,7 +282,7 @@ MY.RemoteRequest = function(szUrl, fnSuccess, fnError, nTimeout)
 			if not status then
 				MY.Debug({err}, 'MYRR::OnDocumentComplete::Callback', MY_DEBUG.ERROR)
 			end
-			Wnd.CloseWindow(hFrame)
+			table.insert(_C.tFreeWebPages, RequestID)
 		end
 	end
 	
@@ -286,7 +296,7 @@ MY.RemoteRequest = function(szUrl, fnSuccess, fnError, nTimeout)
 		if not status then
 			MY.Debug({err}, 'MYRR::TIMEOUT', MY_DEBUG.ERROR)
 		end
-		Wnd.CloseWindow(hFrame)
+		table.insert(_C.tFreeWebPages, RequestID)
 	end, nTimeout, "MYRR_TO_" .. RequestID)
 	
 	-- start ie navigate
