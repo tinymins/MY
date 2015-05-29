@@ -5,6 +5,19 @@
 --
 -- 主要功能: 按关键字过滤获取聊天消息
 -- 
+--[[
+    MY_ChatMonitor.tRecords = {
+        -- （数组部分）监控记录
+        {
+            html = 消息A的UI序列化值(szMsg) 消息源数据UI XML,
+            hash = 消息A的HASH值 计算当前消息的哈希 用于过滤相同,
+            text = 消息A的纯文本 计算当前消息的纯文字内容 用于匹配,
+        }, ...
+        -- （哈希部分）记录数量
+        [消息A的HASH值] = 相同的消息A捕获的数量, -- 当为0时删除改HASH
+        ...
+    }
+]]
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."ChatMonitor/lang/")
 local _SUB_ADDON_FOLDER_NAME_ = "ChatMonitor"
 MY_ChatMonitor = {}
@@ -23,6 +36,7 @@ MY_ChatMonitor.anchor = {
     s = "BOTTOMRIGHT",
     r = "BOTTOMRIGHT",
 }
+MY_ChatMonitor.tRecords = {}
 RegisterCustomData('MY_ChatMonitor.szKeyWords')
 RegisterCustomData('MY_ChatMonitor.bIsRegexp')
 RegisterCustomData('MY_ChatMonitor.nMaxRecord')
@@ -33,7 +47,7 @@ RegisterCustomData('MY_ChatMonitor.bPlaySound')
 RegisterCustomData('MY_ChatMonitor.bRedirectSysChannel')
 RegisterCustomData('MY_ChatMonitor.anchor')
 RegisterCustomData('MY_ChatMonitor.bIgnoreSame')
-local _tRecords = {}
+RegisterCustomData('MY_ChatMonitor.tRecords')
 local _MY_ChatMonitor = { }
 _MY_ChatMonitor.bInited = false
 _MY_ChatMonitor.ui = nil
@@ -74,132 +88,137 @@ _MY_ChatMonitor.nLastLoadDataTime = -1000000
 
 -- 插入聊天内容时监控聊天信息
 _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
-    -- filter
-    if MY_ChatMonitor.bCapture and MY_ChatMonitor.szKeyWords and MY_ChatMonitor.szKeyWords~='' then
-        local rec = {
-            text = '',    -- 计算当前消息的纯文字内容 用于匹配
-            hash = '',    -- 计算当前消息的哈希 用于过滤相同
-            html = '',    -- 消息源数据UI XML
-        }
-        -- 计算系统消息颜色
-        local rgbSysMsg = GetMsgFontColor("MSG_SYS", true)
-        -- 计算消息源数据UI
-        if bRich then
-            rec.html = szMsg
-            -- 格式化消息
-            local tMsgContent = MY.Chat.FormatContent(szMsg)
-            -- 检测消息是否是插件自己产生的
-            if tMsgContent[1].type == "text" and tMsgContent[1].displayText == "" then
-                return
+    -- is enabled
+    if not MY_ChatMonitor.bCapture
+    or not MY_ChatMonitor.szKeyWords
+    or MY_ChatMonitor.szKeyWords == '' then
+        return
+    end
+    --------------------------------------------------------------------------------------
+    -- 开始生成一条记录
+    local rec = { text = '', hash = '', html = '' }
+    -- 计算消息源数据UI
+    if bRich then
+        rec.html = szMsg
+        -- 格式化消息
+        local tMsgContent = MY.Chat.FormatContent(szMsg)
+        -- 检测消息是否是插件自己产生的
+        if tMsgContent[1].type == "text" and tMsgContent[1].displayText == "" then
+            return
+        end
+        -- 拼接消息
+        if szChannel == "MSG_SYS" then -- 系统消息
+            for i, v in ipairs(tMsgContent) do
+                rec.text = rec.text .. v.text
             end
-            -- 拼接消息
-            if r == rgbSysMsg[1] and g == rgbSysMsg[2] and b == rgbSysMsg[3] then -- 系统消息
-                for i, v in ipairs(tMsgContent) do
+        else -- 如果不是系统信息则舍弃第一个名字之前的东西 类似“[阵营][浩气盟][茗伊]说：”
+            -- STR_TALK_HEAD_WHISPER = "悄悄地说：",
+            -- STR_TALK_HEAD_WHISPER_REPLY = "你悄悄地对",
+            -- STR_TALK_HEAD_SAY = "说：",
+            -- STR_TALK_HEAD_SAY1 = "：",
+            -- STR_TALK_HEAD_SAY2 = "大声喊：",
+            local bSkiped = false
+            for i, v in ipairs(tMsgContent) do
+                if (i < 4 and not bSkiped) and (
+                    v.text == g_tStrings.STR_TALK_HEAD_WHISPER or
+                    v.text == g_tStrings.STR_TALK_HEAD_SAY or
+                    v.text == g_tStrings.STR_TALK_HEAD_SAY1 or
+                    v.text == g_tStrings.STR_TALK_HEAD_SAY2
+                ) then
+                    bSkiped = true
+                    rec.text = ''
+                else
                     rec.text = rec.text .. v.text
                 end
-            else -- 如果不是系统信息则舍弃第一个名字之前的东西 类似“[阵营][浩气盟][茗伊]说：”
-                -- STR_TALK_HEAD_WHISPER = "悄悄地说：",
-                -- STR_TALK_HEAD_WHISPER_REPLY = "你悄悄地对",
-                -- STR_TALK_HEAD_SAY = "说：",
-                -- STR_TALK_HEAD_SAY1 = "：",
-                -- STR_TALK_HEAD_SAY2 = "大声喊：",
-                local bSkiped = false
-                for i, v in ipairs(tMsgContent) do
-                    if (i < 4 and not bSkiped) and (
-                        v.text == g_tStrings.STR_TALK_HEAD_WHISPER or
-                        v.text == g_tStrings.STR_TALK_HEAD_SAY or
-                        v.text == g_tStrings.STR_TALK_HEAD_SAY1 or
-                        v.text == g_tStrings.STR_TALK_HEAD_SAY2
-                    ) then
-                        bSkiped = true
-                        rec.text = ''
-                    else
-                        rec.text = rec.text .. v.text
-                    end
+            end
+        end
+    else
+        rec.text = szMsg
+        rec.html = GetFormatText(szMsg, nil, rgbSysMsg[1], rgbSysMsg[2], rgbSysMsg[3])
+    end
+    
+    if not MY_ChatMonitor.bIsRegexp then
+        rec.text = StringLowerW(rec.text)
+    end
+    rec.hash = string.gsub(rec.text, '[\n%s]+', '')
+    --------------------------------------------------------------------------------------
+    -- 开始计算是否符合过滤器要求
+    if MY_ChatMonitor.bIsRegexp then -- regexp
+        if not string.find(rec.text, MY_ChatMonitor.szKeyWords) then
+            return
+        end
+    else -- normal
+        if not MY.String.SimpleMatch(rec.text, MY_ChatMonitor.szKeyWords) then
+            return
+        end
+    end
+    local tRecords = MY_ChatMonitor.tRecords
+    -- 验证消息哈希 如果存在则跳过该消息
+    if MY_ChatMonitor.bIgnoreSame and tRecords[rec.hash] then
+        return
+    end
+    --------------------------------------------------------------------------------------
+    -- 如果符合要求  
+    -- 开始渲染一条记录的UIXML字符串
+    rec.html = MY.Chat.GetTimeLinkText({r=r, g=g, b=b, f=nFont}) .. rec.html
+    -- save animiate group into name
+    rec.html = string.gsub(rec.html, "group=(%d+) </a", "group=%1 name=\"%1\" </a")	
+    -- render link event
+    rec.html = MY.Chat.RenderLink(rec.html)
+    -- render player name color
+    if MY_Farbnamen and MY_Farbnamen.Render then
+        rec.html = MY_Farbnamen.Render(rec.html)
+    end
+    -- 发出提示音
+    if MY_ChatMonitor.bPlaySound then
+        MY.Sys.PlaySound(MY.GetAddonInfo().szRoot .. "ChatMonitor\\audio\\MsgArrive.wav", "MsgArrive.wav")
+    end
+    -- 如果设置重定向到系统消息则输出（输出时加个标记防止又被自己捕捉了死循环）
+    if MY_ChatMonitor.bRedirectSysChannel and szChannel ~= "MSG_SYS" then
+        OutputMessage("MSG_SYS", GetFormatText("", nil, 255,255,0) .. szMsg, true)
+    end
+    -- 更新UI
+    if _MY_ChatMonitor.uiBoard then
+        _MY_ChatMonitor.uiBoard:append(rec.html)
+    end
+    if MY_ChatMonitor.bShowPreview then
+        _MY_ChatMonitor.ShowTip(rec.html)
+    end
+    --------------------------------------------------------------------------------------
+    -- 开始处理记录的数据保存
+    -- 更新缓存数组 哈希表
+    table.insert(tRecords, rec)
+    tRecords[rec.hash] = (tRecords[rec.hash] or 0) + 1
+    -- 验证记录是否超过限制条数
+    local nOverflowed = #tRecords - MY_ChatMonitor.nMaxRecord
+    if nOverflowed > 0 then
+        -- 处理记录列表
+        for i = nOverflowed, 1, -1 do
+            local hash = tRecords[1].hash
+            if hash then
+                tRecords[hash] = tRecords[hash] - 1
+                if tRecords[hash] <= 0 then
+                    tRecords[hash] = nil
                 end
             end
-        else
-            rec.text = szMsg
-            rec.html = GetFormatText(szMsg, nil, rgbSysMsg[1], rgbSysMsg[2], rgbSysMsg[3])
+            table.remove(tRecords, 1)
         end
-        
-        if not MY_ChatMonitor.bIsRegexp then
-            rec.text = StringLowerW(rec.text)
-        end
-        rec.hash = string.gsub(rec.text, '[\n%s]+', '')
-        --------------------------------------------------------------------------------------
-        -- 开始计算是否符合过滤器要求
-        local bCatch = false
-        if MY_ChatMonitor.bIsRegexp then    -- regexp
-            if string.find(rec.text, MY_ChatMonitor.szKeyWords) then
-                bCatch = true
-            end
-        else        -- normal
-            bCatch = MY.String.SimpleMatch(rec.text, MY_ChatMonitor.szKeyWords)
-        end
-        --------------------------------------------------------------------------------------------
-        -- 如果符合要求  -- 验证消息哈希 如果存在则跳过该消息
-        if bCatch and (not (_tRecords[rec.hash] and MY_ChatMonitor.bIgnoreSame)) then
-            -- 验证记录是否超过限制条数
-            if #_tRecords >= MY_ChatMonitor.nMaxRecord then 
-                -- 处理记录列表
-                _tRecords[_tRecords[1].hash] = _tRecords[_tRecords[1].hash] - 1
-                if _tRecords[_tRecords[1].hash] <= 0 then
-                    _tRecords[_tRecords[1].hash] = nil
+        -- 处理UI
+        if _MY_ChatMonitor.uiBoard then
+            local nCopyLinkCount = 0
+            _MY_ChatMonitor.uiBoard:hdl(1):children():each(function(ui)
+                local name = ui:name()
+                if this:GetType() == "Text" and
+                (name == 'timelink' or
+                 name == 'copylink' or
+                 name == 'copy') then
+                    nCopyLinkCount = nCopyLinkCount + 1
                 end
-                table.remove(_tRecords, 1)
-                -- 处理UI
-                if _MY_ChatMonitor.uiBoard then
-                    local nCopyLinkCount = 0
-                    _MY_ChatMonitor.uiBoard:hdl(1):children():each(function(ui)
-                        if nCopyLinkCount <= 1 then
-                            local name = ui:name()
-                            if this:GetType() == "Text" and
-                            (name == 'timelink' or
-                             name == 'copylink' or
-                             name == 'copy') then
-                                nCopyLinkCount = nCopyLinkCount + 1
-                            end
-                        end
-                        if nCopyLinkCount <= 1 then
-                            ui:remove()
-                        end
-                    end)
+                if nCopyLinkCount > nOverflowed then
+                    return 0
                 end
-            end
-            
-            -- 开始组装一条记录 rec
-            rec.html = MY.Chat.GetTimeLinkText({r=r, g=g, b=b, f=nFont}) .. rec.html
-            -- save animiate group into name
-            rec.html = string.gsub(rec.html, "group=(%d+) </a", "group=%1 name=\"%1\" </a")	
-            -- render link event
-            rec.html = MY.Chat.RenderLink(rec.html)
-            -- render player name color
-            if MY_Farbnamen and MY_Farbnamen.Render then
-                rec.html = MY_Farbnamen.Render(rec.html)
-            end
-            
-            -- 发出提示音
-            if MY_ChatMonitor.bPlaySound then
-                MY.Sys.PlaySound(MY.GetAddonInfo().szRoot.."ChatMonitor\\audio\\MsgArrive.wav", "MsgArrive.wav")
-            end
-            
-            -- 如果设置重定向到系统消息则输出
-            if MY_ChatMonitor.bRedirectSysChannel and not ( r==rgbSysMsg[1] and g==rgbSysMsg[2] and b==rgbSysMsg[3] ) then
-                OutputMessage("MSG_SYS", GetFormatText("",nil, 255,255,0)..szMsg, true)
-            end
-            
-            -- 更新UI
-            if _MY_ChatMonitor.uiBoard then
-                _MY_ChatMonitor.uiBoard:append(rec.html)
-            end
-            if MY_ChatMonitor.bShowPreview then
-                _MY_ChatMonitor.ShowTip(rec.html)
-            end
-            
-            -- 更新缓存数组 哈希表
-            _tRecords[rec.hash] = (_tRecords[rec.hash] or 0) + 1
-            table.insert(_tRecords, rec)
+                ui:remove()
+            end)
         end
     end
 end
@@ -382,7 +401,7 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
     end)
     
     ui:append("WndButton", "Button_Clear"):find('#Button_Clear'):pos(w-81,15):width(50):text(_L['clear']):click(function()
-        _tRecords = {}
+        MY_ChatMonitor.tRecords = {}
         _MY_ChatMonitor.uiBoard:clear()
     end)
     
@@ -391,8 +410,9 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
       :children('#WndScrollBox_TalkList')
       :handleStyle(3):pos(20,50):size(w-21, h - 70)
     
-    for i = 1, #_tRecords, 1 do
-        _MY_ChatMonitor.uiBoard:append( _tRecords[i].html )
+    local tRecords = MY_ChatMonitor.tRecords
+    for i = 1, #tRecords, 1 do
+        _MY_ChatMonitor.uiBoard:append(tRecords[i].html)
     end
     _MY_ChatMonitor.ui = MY.UI(wnd)
     _MY_ChatMonitor.Init()
