@@ -18,25 +18,20 @@
         ...
     }
 ]]
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."ChatMonitor/lang/")
-local _SUB_ADDON_FOLDER_NAME_ = "ChatMonitor"
+local _C = {}
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "ChatMonitor/lang/")
 MY_ChatMonitor = {}
-MY_ChatMonitor.szKeyWords = _L['CHAT_MONITOR_KEYWORDS_SAMPLE']
-MY_ChatMonitor.bIsRegexp = false
-MY_ChatMonitor.nMaxRecord = 30
-MY_ChatMonitor.bShowPreview = true
-MY_ChatMonitor.bPlaySound = true
+MY_ChatMonitor.szKeyWords          = _L.CHAT_MONITOR_KEYWORDS_SAMPLE
+MY_ChatMonitor.bIsRegexp           = false
+MY_ChatMonitor.nMaxRecord          = 30
+MY_ChatMonitor.bShowPreview        = true
+MY_ChatMonitor.bPlaySound          = true
 MY_ChatMonitor.bRedirectSysChannel = false
-MY_ChatMonitor.bCapture = false
-MY_ChatMonitor.bIgnoreSame = true
-MY_ChatMonitor.tChannels = { ["MSG_NORMAL"] = true, ["MSG_CAMP"] = true, ["MSG_WORLD"] = true, ["MSG_MAP"] = true, ["MSG_SCHOOL"] = true, ["MSG_GUILD"] = true, ["MSG_FRIEND"] = true }
-MY_ChatMonitor.anchor = {
-    x = -100,
-    y = -150,
-    s = "BOTTOMRIGHT",
-    r = "BOTTOMRIGHT",
-}
-MY_ChatMonitor.tRecords = {}
+MY_ChatMonitor.bCapture            = false
+MY_ChatMonitor.bIgnoreSame         = true
+MY_ChatMonitor.tChannels           = { ["MSG_NORMAL"] = true, ["MSG_CAMP"] = true, ["MSG_WORLD"] = true, ["MSG_MAP"] = true, ["MSG_SCHOOL"] = true, ["MSG_GUILD"] = true, ["MSG_FRIEND"] = true }
+MY_ChatMonitor.anchor              = { x = -100, y = -150, s = "BOTTOMRIGHT", r = "BOTTOMRIGHT" }
+MY_ChatMonitor.tRecords            = {}
 RegisterCustomData('MY_ChatMonitor.szKeyWords')
 RegisterCustomData('MY_ChatMonitor.bIsRegexp')
 RegisterCustomData('MY_ChatMonitor.nMaxRecord')
@@ -48,13 +43,12 @@ RegisterCustomData('MY_ChatMonitor.bRedirectSysChannel')
 RegisterCustomData('MY_ChatMonitor.anchor')
 RegisterCustomData('MY_ChatMonitor.bIgnoreSame')
 RegisterCustomData('MY_ChatMonitor.tRecords')
-local _MY_ChatMonitor = { }
-_MY_ChatMonitor.bInited = false
-_MY_ChatMonitor.ui = nil
-_MY_ChatMonitor.uiBoard = nil
-_MY_ChatMonitor.uiTipBoard = nil
-_MY_ChatMonitor.szLuaData = 'config/MY_CHATMONITOR/cfg'
-_MY_ChatMonitor.tChannelGroups = {
+_C.bInited = false
+_C.ui = nil
+_C.uiBoard = nil
+_C.uiTipBoard = nil
+_C.szLuaData = 'config/MY_CHATMONITOR/cfg'
+_C.tChannelGroups = {
     {
         szCaption = g_tStrings.CHANNEL_CHANNEL,
         tChannels = {
@@ -84,10 +78,10 @@ _MY_ChatMonitor.tChannelGroups = {
         }
     }
 }
-_MY_ChatMonitor.nLastLoadDataTime = -1000000
+_C.nLastLoadDataTime = -1000000
 
 -- 插入聊天内容时监控聊天信息
-_MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
+_C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
     -- is enabled
     if not MY_ChatMonitor.bCapture
     or not MY_ChatMonitor.szKeyWords
@@ -178,11 +172,11 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
         OutputMessage("MSG_SYS", GetFormatText("", nil, 255,255,0) .. szMsg, true)
     end
     -- 更新UI
-    if _MY_ChatMonitor.uiBoard then
-        _MY_ChatMonitor.uiBoard:append(rec.html)
+    if _C.uiBoard then
+        _C.uiBoard:append(rec.html)
     end
     if MY_ChatMonitor.bShowPreview then
-        _MY_ChatMonitor.ShowTip(rec.html)
+        _C.ShowTip(rec.html)
     end
     --------------------------------------------------------------------------------------
     -- 开始处理记录的数据保存
@@ -204,9 +198,9 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
             table.remove(tRecords, 1)
         end
         -- 处理UI
-        if _MY_ChatMonitor.uiBoard then
+        if _C.uiBoard then
             local nCopyLinkCount = 0
-            _MY_ChatMonitor.uiBoard:hdl(1):children():each(function(ui)
+            _C.uiBoard:hdl(1):children():each(function(ui)
                 local name = ui:name()
                 if this:GetType() == "Text" and
                 (name == 'timelink' or
@@ -223,7 +217,7 @@ _MY_ChatMonitor.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
     end
 end
 
-_MY_ChatMonitor.OnPanelActive = function(wnd)
+_C.OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
     local w, h = ui:size()
     
@@ -236,7 +230,7 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
       :focus(function(raw, bFocus)
         if bFocus then
             local source = {}
-            for _, szOpt in ipairs(MY.LoadLUAData(_MY_ChatMonitor.szLuaData) or {}) do
+            for _, szOpt in ipairs(MY.LoadLUAData(_C.szLuaData) or {}) do
                 if type(szOpt) == "string" then
                     table.insert(source, szOpt)
                 end
@@ -261,24 +255,24 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
             GetUserInput("", function(szVal)
                 szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
                 if szVal~="" then
-                    local t = MY.LoadLUAData(_MY_ChatMonitor.szLuaData) or {}
+                    local t = MY.LoadLUAData(_C.szLuaData) or {}
                     for i = #t, 1, -1 do 
                         if t[i] == szVal then return end
                     end
                     table.insert(t, szVal)
-                    MY.SaveLUAData(_MY_ChatMonitor.szLuaData, t)
+                    MY.SaveLUAData(_C.szLuaData, t)
                 end
             end, function() end, function() end, nil, edit:text() )
         end })
       end)
       :autocomplete('option', 'beforeDelete', function(szOption, fnDoDelete, option)
-        local t = MY.LoadLUAData(_MY_ChatMonitor.szLuaData) or {}
+        local t = MY.LoadLUAData(_C.szLuaData) or {}
         for i = #t, 1, -1 do 
             if t[i] == szOption then
                 table.remove(t, i)
             end
         end
-        MY.SaveLUAData(_MY_ChatMonitor.szLuaData, t)
+        MY.SaveLUAData(_C.szLuaData, t)
       end)
 
     ui:append("Image", "Image_Help"):find('#Image_Help')
@@ -295,7 +289,7 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
     ui:append("Image", "Image_Setting"):find('#Image_Setting'):pos(w-26,13):image('UI/Image/UICommon/Commonpanel.UITex',18):size(30,30):alpha(200):hover(function(bIn) this:SetAlpha((bIn and 255) or 200) end):click(function()
         PopupMenu((function() 
             local t = {}
-            for _, cg in ipairs(_MY_ChatMonitor.tChannelGroups) do
+            for _, cg in ipairs(_C.tChannelGroups) do
                 local _t = { szOption = cg.szCaption }
                 if cg.tChannels[1] then
                     for _, szChannel in ipairs(cg.tChannels) do
@@ -304,7 +298,7 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
                             rgb = GetMsgFontColor(szChannel, true),
                             fnAction = function()
                                 MY_ChatMonitor.tChannels[szChannel] = not MY_ChatMonitor.tChannels[szChannel]
-                                _MY_ChatMonitor.RegisterMsgMonitor()
+                                _C.RegisterMsgMonitor()
                             end,
                             bCheck = true,
                             bChecked = MY_ChatMonitor.tChannels[szChannel]
@@ -325,7 +319,7 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
                                 rgb = GetMsgFontColor(szChannel, true),
                                 fnAction = function()
                                     MY_ChatMonitor.tChannels[szChannel] = not MY_ChatMonitor.tChannels[szChannel]
-                                    _MY_ChatMonitor.RegisterMsgMonitor()
+                                    _C.RegisterMsgMonitor()
                                 end,
                                 bCheck = true,
                                 bChecked = MY_ChatMonitor.tChannels[szChannel]
@@ -402,68 +396,68 @@ _MY_ChatMonitor.OnPanelActive = function(wnd)
     
     ui:append("WndButton", "Button_Clear"):find('#Button_Clear'):pos(w-81,15):width(50):text(_L['clear']):click(function()
         MY_ChatMonitor.tRecords = {}
-        _MY_ChatMonitor.uiBoard:clear()
+        _C.uiBoard:clear()
     end)
     
-    _MY_ChatMonitor.uiBoard = ui
+    _C.uiBoard = ui
       :append("WndScrollBox", "WndScrollBox_TalkList")
       :children('#WndScrollBox_TalkList')
       :handleStyle(3):pos(20,50):size(w-21, h - 70)
     
     local tRecords = MY_ChatMonitor.tRecords
     for i = 1, #tRecords, 1 do
-        _MY_ChatMonitor.uiBoard:append(tRecords[i].html)
+        _C.uiBoard:append(tRecords[i].html)
     end
-    _MY_ChatMonitor.ui = MY.UI(wnd)
-    _MY_ChatMonitor.Init()
+    _C.ui = MY.UI(wnd)
+    _C.Init()
 end
 
-_MY_ChatMonitor.ShowTip = function(szMsg)
+_C.ShowTip = function(szMsg)
     if szMsg then
-        _MY_ChatMonitor.uiTipBoard:clear():append(szMsg)
+        _C.uiTipBoard:clear():append(szMsg)
     end
-    _MY_ChatMonitor.uiFrame:fadeTo(500, 255)
+    _C.uiFrame:fadeTo(500, 255)
     if Station.GetMouseOverWindow() and
     Station.GetMouseOverWindow():GetRoot():GetName() == 'MY_ChatMonitor' then
         MY.DelayCall('MY_ChatMonitor_Hide', 5000)
     else
         MY.DelayCall('MY_ChatMonitor_Hide', function()
-            _MY_ChatMonitor.uiFrame:fadeOut(500)
+            _C.uiFrame:fadeOut(500)
         end, 5000)
     end
 end
 
-_MY_ChatMonitor.Init = function()
-    if _MY_ChatMonitor.bInited then
+_C.Init = function()
+    if _C.bInited then
         return
     end
-    _MY_ChatMonitor.bInited = true
-    _MY_ChatMonitor.RegisterMsgMonitor()
+    _C.bInited = true
+    _C.RegisterMsgMonitor()
 
     -- create tip frame
-    _MY_ChatMonitor.uiFrame = MY.UI.CreateFrame('MY_ChatMonitor', {level = 'Topmost', empty = true})
+    _C.uiFrame = MY.UI.CreateFrame('MY_ChatMonitor', {level = 'Topmost', empty = true})
       :size(250,150)
       :toggle(false)
       :onevent("UI_SCALED", function() -- 移动提示窗位置
-        _MY_ChatMonitor.uiFrame:anchor(MY_ChatMonitor.anchor)
+        _C.uiFrame:anchor(MY_ChatMonitor.anchor)
       end)
       :customMode(_L["chat monitor"], function()
         MY.DelayCall('MY_ChatMonitor_Hide')
-        _MY_ChatMonitor.uiFrame:show():alpha(255)
+        _C.uiFrame:show():alpha(255)
       end, function()
-        MY_ChatMonitor.anchor = _MY_ChatMonitor.uiFrame:anchor()
-        _MY_ChatMonitor.uiFrame:alpha(0):hide()
+        MY_ChatMonitor.anchor = _C.uiFrame:anchor()
+        _C.uiFrame:alpha(0):hide()
       end)
       :anchor(MY_ChatMonitor.anchor)
       
     -- bind animate function
-    _MY_ChatMonitor.uiFrame:append("Image", "Image_bg")
+    _C.uiFrame:append("Image", "Image_bg")
       :find('#Image_bg'):size(250,150)
       :image('UI/Image/Minimap/Minimap2.UITex',8)
       :click(function()
         MY.OpenPanel()
         MY.SwitchTab('ChatMonitor')
-        _MY_ChatMonitor.uiFrame:fadeOut(500)
+        _C.uiFrame:fadeOut(500)
       end)
       :hover(function(bIn, bCurIn)
         if bIn ~= bCurIn then
@@ -471,36 +465,36 @@ _MY_ChatMonitor.Init = function()
         end
         if bCurIn then
             MY.DelayCall('MY_ChatMonitor_Hide')
-            _MY_ChatMonitor.uiFrame:fadeIn(500)
+            _C.uiFrame:fadeIn(500)
         else
             MY.DelayCall(function()
-                _MY_ChatMonitor.uiFrame:fadeOut(500)
+                _C.uiFrame:fadeOut(500)
             end, 5000, 'MY_ChatMonitor_Hide')
         end
       end)
     -- init tip panel animate
     MY.DelayCall(function()
-        _MY_ChatMonitor.uiFrame:fadeOut(500)
+        _C.uiFrame:fadeOut(500)
     end, 10000, 'MY_ChatMonitor_Hide')
 
     -- init tip panel handle
-    _MY_ChatMonitor.uiTipBoard = _MY_ChatMonitor.uiFrame:append("Handle", "Handle_Tip")
+    _C.uiTipBoard = _C.uiFrame:append("Handle", "Handle_Tip")
       :find('#Handle_Tip'):handleStyle(3):pos(10,10):size(230,130)
     -- init welcome word
-    _MY_ChatMonitor.uiTipBoard:append("Text", "Text1"):find('#Text1')
+    _C.uiTipBoard:append("Text", "Text1"):find('#Text1')
       :text(_L['welcome to use mingyi chat monitor.'])
     -- show tip
-    _MY_ChatMonitor.ShowTip()
+    _C.ShowTip()
 end
-MY.RegisterInit('MY_CHATMONITOR', _MY_ChatMonitor.Init)
+MY.RegisterInit('MY_CHATMONITOR', _C.Init)
 
-_MY_ChatMonitor.RegisterMsgMonitor = function()
+_C.RegisterMsgMonitor = function()
     local t = {}
     for szChannel, bCapture in pairs(MY_ChatMonitor.tChannels) do
         if bCapture then table.insert(t, szChannel) end
     end
-    UnRegisterMsgMonitor(_MY_ChatMonitor.OnMsgArrive)
-    RegisterMsgMonitor(_MY_ChatMonitor.OnMsgArrive, t)
+    UnRegisterMsgMonitor(_C.OnMsgArrive)
+    RegisterMsgMonitor(_C.OnMsgArrive, t)
 end
 
 MY.Game.AddHotKey("MY_ChatMonitor_Hotkey", _L["chat monitor"],
@@ -516,8 +510,8 @@ MY.Game.AddHotKey("MY_ChatMonitor_Hotkey", _L["chat monitor"],
 , nil)
 
 MY.RegisterPanel( "ChatMonitor", _L["chat monitor"], _L['Chat'], "UI/Image/Minimap/Minimap.UITex|197", {255,127,0,200}, {
-    OnPanelActive = _MY_ChatMonitor.OnPanelActive,
+    OnPanelActive = _C.OnPanelActive,
     OnPanelDeactive = function()
-        _MY_ChatMonitor.uiBoard = nil
+        _C.uiBoard = nil
     end
 })
