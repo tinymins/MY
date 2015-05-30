@@ -97,20 +97,12 @@ _C.GetNz = function(nZ,nZ2)
 end
 
 _C.LoadConfig = function()
-    local config
     if XLifeBar.bUseGlobalConfig then
-        config = MY.Sys.LoadLUAData(_C.szConfig)
+        Config = MY.Sys.LoadLUAData(_C.szConfig)
     else
-        config = MY.Sys.LoadUserData(_C.szConfig)
+        Config = MY.Sys.LoadUserData(_C.szConfig)
     end
-    if config then
-        Config = config
-        for k, v in pairs(Config_Default) do
-            if type(Config[k]) ~= type(Config_Default[k]) then
-                Config[k] = clone(Config_Default[k])
-            end
-        end
-    end
+    Config = FormatDataStructure(Config, Config_Default)
 end
 
 _C.SaveConfig = function()
