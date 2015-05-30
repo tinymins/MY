@@ -3,8 +3,8 @@
 -- @Author: 茗伊 @双梦镇 @追风蹑影
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
--- @Last Modified by:   Webster
--- @Last Modified time: 2015-05-29 03:36:23
+-- @Last Modified by:   翟一鸣 @tinymins
+-- @Last Modified time: 2015-05-30 21:19:32
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 local tinsert, tconcat, tremove = table.insert, table.concat, table.remove
@@ -432,5 +432,23 @@ function IsPhoneLock()
 		Wnd.CloseWindow(hFrame)
 	end
 	return bPhoneLock
+end
+end
+
+if not FormatDataStructure then
+function FormatDataStructure(data, struct)
+	local szType = type(struct)
+	if szType == type(data) then
+		if szType == 'table' then
+			local t = {}
+			for k, v in pairs(struct) do
+				t[k] = FormatDataStructure(data[k], v)
+			end
+			return t
+		end
+	else
+		data = clone(struct)
+	end
+	return data
 end
 end
