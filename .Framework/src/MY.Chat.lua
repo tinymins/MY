@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-26 13:54:06
+-- @Last Modified time: 2015-05-30 10:56:31
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -31,6 +31,31 @@ MY.Chat.RepeatChatLine = function(hTime)
 		GetClientPlayer().Talk(nChannel, szName or "", tMsg)
 		edit:ClearText()
 	end
+end
+
+-- 聊天删除行
+MY.Chat.RemoveChatLine = function(hTime)
+	local nIndex   = hTime:GetIndex()
+	local hHandle  = hTime:GetParent()
+	local nCount   = hHandle:GetItemCount()
+	local bCurrent = true
+	for i = nIndex, nCount - 1 do
+		local hItem = hHandle:Lookup(nIndex)
+		if hItem:GetType() == "Text" and
+		(hItem:GetName() == 'timelink' or
+		 hItem:GetName() == 'copylink' or
+		 hItem:GetName() == 'copy') then
+		-- timestrap found
+			if not bCurrent then
+			-- is not current timestrap
+				break
+			end
+		else -- current timestrap ended
+			bCurrent = false
+		end -- remove until next timestrap
+		hHandle:RemoveItem(hItem)
+	end
+	hHandle:FormatAllItemPos()
 end
 
 -- 聊天表情初始化
@@ -80,8 +105,8 @@ MY.Chat.GetCopyLinkText = function(szText, rgbf)
 	szText = szText or _L[' * ']
 	rgbf   = rgbf   or { f = 10 }
 	
-	return GetFormatText(szText, rgbf.f, rgbf.r, rgbf.g, rgbf.b, 515,
-		"this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end",
+	return GetFormatText(szText, rgbf.f, rgbf.r, rgbf.g, rgbf.b, 82691,
+		"this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemMButtonDown=function() MY.Chat.RemoveChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end\nthis.OnItemMouseEnter=function() MY.Chat.LinkEventHandler.OnCopyMouseEnter(this) end\nthis.OnItemMouseLeave=function() MY.Chat.LinkEventHandler.OnCopyMouseLeave(this) end",
 		"copylink")
 end
 
@@ -90,8 +115,8 @@ MY.Chat.GetTimeLinkText = function(rgbfs)
 	rgbfs = rgbfs or { f = 10 }
 	return GetFormatText(
 		MY.Sys.FormatTime(rgbfs.s or '[hh:mm.ss]', GetCurrentTime()),
-		rgbfs.f, rgbfs.r, rgbfs.g, rgbfs.b, 515,
-		"this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end",
+		rgbfs.f, rgbfs.r, rgbfs.g, rgbfs.b, 82691,
+		"this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemMButtonDown=function() MY.Chat.RemoveChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end\nthis.OnItemMouseEnter=function() MY.Chat.LinkEventHandler.OnCopyMouseEnter(this) end\nthis.OnItemMouseLeave=function() MY.Chat.LinkEventHandler.OnCopyMouseLeave(this) end",
 		"timelink"
 	)
 end
@@ -218,6 +243,15 @@ MY.Chat.LinkEventHandler = {
 	OnCopyRClick = function(hT)
 		MY.Chat.RepeatChatLine(hT or this)
 	end,
+	OnCopyMouseEnter = function(hT)
+		local x, y = this:GetAbsPos()
+		local w, h = this:GetSize()
+		local szText = GetFormatText(_L['LClick to copy to editbox.\nMClick to remove this line.\nRClick to repeat this line.'], 136)
+		OutputTip(szText, 450, {x, y, w, h}, MY.Const.UI.Tip.POS_TOP)
+	end,
+	OnCopyMouseLeave = function(hT)
+		HideTip()
+	end,
 	OnItemLClick = function(hT)
 		OnItemLinkDown(hT or this)
 	end,
@@ -250,13 +284,13 @@ MY.Chat.RenderLink = function(argv, argv2)
 					if name:sub(1, 8) == 'namelink' then
 						script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.LinkEventHandler.OnNameLClick(this) end\nthis.OnItemRButtonDown=function() MY.Chat.LinkEventHandler.OnNameRClick(this) end'
 					elseif name == 'copy' or name == 'copylink' or name == 'timelink' then
-						script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end'
+						script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemMButtonDown=function() MY.Chat.RemoveChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end\nthis.OnItemMouseEnter=function() MY.Chat.LinkEventHandler.OnCopyMouseEnter(this) end\nthis.OnItemMouseLeave=function() MY.Chat.LinkEventHandler.OnCopyMouseLeave(this) end'
 					else
 						script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.LinkEventHandler.OnItemLClick(this) end\nthis.OnItemRButtonDown=function() MY.Chat.LinkEventHandler.OnItemRClick(this) end'
 					end
 					
 					if #script > 0 then
-						xml[''].eventid = 883
+						xml[''].eventid = 82803
 						xml[''].script = script
 					end
 				end
