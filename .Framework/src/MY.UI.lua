@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-31 22:03:59
+-- @Last Modified time: 2015-05-31 22:28:49
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -128,8 +128,8 @@ function _MY.UI:ctor(raw, tab)
 				_tab.phd = _tab.phd or raw:Lookup('','Text_PlaceHolder')
 			elseif _tab.type=="WndScrollBox" then
 				_tab.wnd = _tab.wnd or raw
-				_tab.hdl = _tab.hdl or raw:Lookup('','Handle_Scroll')
-				_tab.txt = _tab.txt or raw:Lookup('','Handle_Scroll'):Lookup('Text_Default')
+				_tab.hdl = _tab.hdl or raw:Lookup('','Handle_Padding/Handle_Scroll')
+				_tab.txt = _tab.txt or raw:Lookup('','Handle_Padding/Handle_Scroll/Text_Default')
 				_tab.img = _tab.img or raw:Lookup('','Image_Default')
 			elseif _tab.type=="WndFrame" then
 				_tab.frm = _tab.frm or raw
@@ -193,8 +193,8 @@ function _MY.UI:raw2ele(raw, tab)
 		_tab.phd = _tab.phd or raw:Lookup('','Text_PlaceHolder')
 	elseif _tab.type=="WndScrollBox" then
 		_tab.wnd = _tab.wnd or raw
-		_tab.hdl = _tab.hdl or raw:Lookup('','Handle_Scroll')
-		_tab.txt = _tab.txt or raw:Lookup('','Handle_Scroll'):Lookup('Text_Default')
+		_tab.hdl = _tab.hdl or raw:Lookup('','Handle_Padding/Handle_Scroll')
+		_tab.txt = _tab.txt or raw:Lookup('','Handle_Padding/Handle_Scroll/Text_Default')
 		_tab.img = _tab.img or raw:Lookup('','Image_Default')
 	elseif _tab.type=="WndFrame" then
 		_tab.frm = _tab.frm or raw
@@ -696,11 +696,7 @@ function _MY.UI:append(arg0, arg1, arg2)
 						wnd:SetName(szName)
 					end
 					wnd:ChangeRelation((ele.wnd or ele.frm), true, true)
-					if szType == "WndScrollBox" then
-						wnd.UpdateScroll = function()
-							wnd:Lookup("", "Handle_Scroll"):FormatAllItemPos()
-						end
-					elseif szType=='WndSliderBox' then
+					if szType=='WndSliderBox' then
 						wnd.bShowPercentage = true
 						wnd.nOffset = 0
 						wnd.tMyOnChange = {}
@@ -932,9 +928,6 @@ function _MY.UI:append(arg0, arg1, arg2)
 				-- append from xml
 				ele.hdl:AppendItemFromString(szXml)
 				ele.hdl:FormatAllItemPos()
-				if ele.type == "WndScrollBox" then
-					ele.raw.UpdateScroll()
-				end
 			end
 		end
 	end
@@ -949,9 +942,7 @@ function _MY.UI:clear()
 	for _, ele in pairs(self.eles) do
 		if ele.hdl then
 			ele.hdl:Clear()
-		end
-		if ele.type == "WndScrollBox" then
-			ele.raw.UpdateScroll()
+			ele.hdl:FormatAllItemPos()
 		end
 	end
 	return self
@@ -1116,7 +1107,9 @@ function _MY.UI:text(szText)
 	if szText then
 		for _, ele in pairs(self.eles) do
 			if ele.type == "WndScrollBox" then
-				ele.raw.UpdateScroll()
+				ele.hdl:Clear()
+				ele.hdl:AppendItemFromString(GetFormatText(szText))
+				ele.hdl:FormatAllItemPos()
 			elseif ele.type == "WndSliderBox" and type(szText)=="function" then
 				ele.sld.FormatText = szText
 			elseif ele.type == "WndEditBox" then
@@ -1936,11 +1929,13 @@ function _MY.UI:size(nWidth, nHeight)
 				hScroll:FormatAllItemPos()
 			elseif ele.type == "WndScrollBox" then
 				ele.raw:SetSize(nWidth, nHeight)
+				ele.raw:Lookup("", ""):SetSize(nWidth, nHeight)
 				ele.raw:Lookup("", "Image_Default"):SetSize(nWidth, nHeight)
-				ele.raw:Lookup("", "Handle_Scroll"):SetSize(nWidth - 30, nHeight - 20)
+				ele.raw:Lookup("", "Handle_Padding"):SetSize(nWidth - 30, nHeight - 20)
+				ele.raw:Lookup("", "Handle_Padding/Handle_Scroll"):SetSize(nWidth - 30, nHeight - 20)
+				ele.raw:Lookup("", "Handle_Padding/Handle_Scroll"):FormatAllItemPos()
 				ele.raw:Lookup("WndScrollBar"):SetRelX(nWidth - 20)
 				ele.raw:Lookup("WndScrollBar"):SetH(nHeight - 20)
-				ele.raw.UpdateScroll()
 			elseif ele.wnd then
 				pcall(function() ele.wnd:SetSize(nWidth, nHeight) end)
 				pcall(function() ele.hdl:SetSize(nWidth, nHeight) end)
@@ -2215,8 +2210,8 @@ end
 function _MY.UI:refresh()
 	self:_checksum()
 	for _, ele in pairs(self.eles) do
-		if ele.type == "WndScrollBox" then
-			ele.raw.UpdateScroll()
+		if ele.hdl then
+			ele.hdl:FormatAllItemPos()
 		end
 	end
 	return self
