@@ -18,7 +18,7 @@
         ...
     }
 ]]
-local _C = {}
+ _C = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "ChatMonitor/lang/")
 MY_ChatMonitor = {}
 MY_ChatMonitor.szKeyWords          = _L.CHAT_MONITOR_KEYWORDS_SAMPLE
@@ -173,7 +173,11 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
     end
     -- ¸üÐÂUI
     if _C.uiBoard then
+        local nPos = _C.uiBoard:scroll()
         _C.uiBoard:append(rec.html)
+        if nPos == 100 or nPos == -1 then
+            _C.uiBoard:scroll(100)
+        end
     end
     if MY_ChatMonitor.bShowPreview then
         _C.ShowTip(rec.html)
@@ -408,6 +412,7 @@ _C.OnPanelActive = function(wnd)
     for i = 1, #tRecords, 1 do
         _C.uiBoard:append(tRecords[i].html)
     end
+    _C.uiBoard:scroll(100)
     _C.ui = MY.UI(wnd)
     _C.Init()
 end
