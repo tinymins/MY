@@ -4,9 +4,11 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-30 21:19:32
+-- @Last Modified time: 2015-05-31 14:43:06
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
+XML_LINE_BREAKER = GetFormatText("\n")
+local XML_LINE_BREAKER = XML_LINE_BREAKER
 local tinsert, tconcat, tremove = table.insert, table.concat, table.remove
 if not GetCampImageFrame then
 	function GetCampImageFrame(eCamp, bFight)	-- ui\Image\UICommon\CommonPanel2.UITex
@@ -366,7 +368,6 @@ MY_DEBUG = SetmetaReadonly({
 	ERROR   = 2,
 })
 
-local XML_LINE_BREAKER = GetFormatText("\n")
 if not OutputBuffTipA then
 function OutputBuffTipA(dwID, nLevel, Rect, nTime)
 	local t = {}
