@@ -45,6 +45,7 @@ local _MY_Farbnamen = {
     },
     tCampString  = {},
     tPlayerCache = {},
+    tCrossServerPlayerCache = {},
     aPlayerQueu = {},
 }
 for k, v in pairs(g_tStrings.tForceTitle) do
@@ -183,13 +184,25 @@ end
 ---------------------------------------------------------------
 -- 通过szName获取信息
 function MY_Farbnamen.GetAusName(szName)
+    local dwID
+    if MY.IsInArena() or MY.IsInBattleField() then
+        dwID = _MY_Farbnamen.tCrossServerPlayerCache[szName]
+    end
+    if not dwID then
+        dwID = _MY_Farbnamen.tPlayerCache[szName]
+    end
     return MY_Farbnamen.GetAusID(_MY_Farbnamen.tPlayerCache[szName])
 end
 -- 通过dwID获取信息
 function MY_Farbnamen.GetAusID(dwID)
     MY_Farbnamen.AddAusID(dwID)
     -- deal with return data
-    local result =  clone(_MY_Farbnamen.tPlayerCache[dwID])
+    local result
+    if IsRemotePlayer(dwID) then
+        result = clone(_MY_Farbnamen.tCrossServerPlayerCache[dwID])
+    else
+        result = clone(_MY_Farbnamen.tPlayerCache[dwID])
+    end
     if result then
         result.rgb = Config.tForceColor[result.dwForceID] or {255, 255, 255}
     end
@@ -210,9 +223,13 @@ function MY_Farbnamen.AddAusID(dwID)
             szTongID  = GetTongClient().ApplyGetTongName(player.dwTongID),
             dwTime    = GetCurrentTime(),
         }
-        
-        _MY_Farbnamen.tPlayerCache[player.dwID  ] = tPlayer
-        _MY_Farbnamen.tPlayerCache[player.szName] = player.dwID
+        if IsRemotePlayer(player.dwID) then
+            _MY_Farbnamen.tCrossServerPlayerCache[player.dwID  ] = tPlayer
+            _MY_Farbnamen.tCrossServerPlayerCache[player.szName] = player.dwID
+        else
+            _MY_Farbnamen.tPlayerCache[player.dwID  ] = tPlayer
+            _MY_Farbnamen.tPlayerCache[player.szName] = player.dwID
+        end
         return true
     else
         return false
