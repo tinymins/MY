@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-29 14:34:06
+-- @Last Modified time: 2015-05-31 22:03:59
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -131,10 +131,6 @@ function _MY.UI:ctor(raw, tab)
 				_tab.hdl = _tab.hdl or raw:Lookup('','Handle_Scroll')
 				_tab.txt = _tab.txt or raw:Lookup('','Handle_Scroll'):Lookup('Text_Default')
 				_tab.img = _tab.img or raw:Lookup('','Image_Default')
-				_tab.sbu = _tab.sbu or raw:Lookup('WndButton_Up')
-				_tab.sbd = _tab.sbd or raw:Lookup('WndButton_Down')
-				_tab.sbn = _tab.sbn or raw:Lookup('WndNewScrollBar_Default')
-				_tab.shd = _tab.shd or raw:Lookup('','Handle_Scroll')
 			elseif _tab.type=="WndFrame" then
 				_tab.frm = _tab.frm or raw
 				_tab.wnd = _tab.wnd or raw:Lookup("Window_Main")
@@ -200,10 +196,6 @@ function _MY.UI:raw2ele(raw, tab)
 		_tab.hdl = _tab.hdl or raw:Lookup('','Handle_Scroll')
 		_tab.txt = _tab.txt or raw:Lookup('','Handle_Scroll'):Lookup('Text_Default')
 		_tab.img = _tab.img or raw:Lookup('','Image_Default')
-		_tab.sbu = _tab.sbu or raw:Lookup('WndButton_Up')
-		_tab.sbd = _tab.sbd or raw:Lookup('WndButton_Down')
-		_tab.sbn = _tab.sbn or raw:Lookup('WndNewScrollBar_Default')
-		_tab.shd = _tab.shd or raw:Lookup('','Handle_Scroll')
 	elseif _tab.type=="WndFrame" then
 		_tab.frm = _tab.frm or raw
 		_tab.wnd = _tab.wnd or raw:Lookup("Window_Main")
@@ -705,59 +697,9 @@ function _MY.UI:append(arg0, arg1, arg2)
 					end
 					wnd:ChangeRelation((ele.wnd or ele.frm), true, true)
 					if szType == "WndScrollBox" then
-						wnd:Lookup('WndButton_Up').OnLButtonHold = function()
-							wnd:Lookup("WndNewScrollBar_Default"):ScrollPrev(1)
-						end
-						wnd:Lookup('WndButton_Down').OnLButtonHold = function()
-							wnd:Lookup("WndNewScrollBar_Default"):ScrollNext(1)
-						end
-						wnd:Lookup('WndButton_Up').OnLButtonDown = function()
-							wnd:Lookup("WndNewScrollBar_Default"):ScrollPrev(1)
-						end
-						wnd:Lookup('WndButton_Down').OnLButtonDown = function()
-							wnd:Lookup("WndNewScrollBar_Default"):ScrollNext(1)
-						end
-						wnd.OnMouseWheel = function()                                   -- listening Mouse Wheel
-							local nDistance = Station.GetMessageWheelDelta()            -- get distance
-							wnd:Lookup("WndNewScrollBar_Default"):ScrollNext(nDistance) -- wheel scroll position
-							return 1
-						end
-						wnd:Lookup("WndNewScrollBar_Default").OnScrollBarPosChanged = function()
-							local nCurrentValue = this:GetScrollPos()
-							wnd:Lookup("WndButton_Up"):Enable( nCurrentValue ~= 0 )
-							wnd:Lookup("WndButton_Down"):Enable( nCurrentValue ~= this:GetStepCount() )
-							wnd:Lookup("", "Handle_Scroll"):SetItemStartRelPos(0, - nCurrentValue * 10)
-						end
 						wnd.UpdateScroll = function()
-							local hHandle     = wnd:Lookup("", "Handle_Scroll")
-							local hScrollBar  = wnd:Lookup("WndNewScrollBar_Default")
-							local hButtonUp   = wnd:Lookup("WndButton_Up")
-							local hButtonDown = wnd:Lookup("WndButton_Down")
-							local bBottom     = hScrollBar:GetStepCount() == hScrollBar:GetScrollPos()
-							hHandle:FormatAllItemPos()
-							local wA, hA = hHandle:GetAllItemSize()
-							local w, h = hHandle:GetSize()
-							local nStep = (hA - h) / 10
-							if nStep > 0 then
-								hScrollBar:Show()
-								hButtonUp:Show()
-								hButtonDown:Show()
-							else
-								hScrollBar:Hide()
-								hButtonUp:Hide()
-								hButtonDown:Hide()
-							end
-							local wb, hb = hScrollBar:GetSize()
-							local _max = ( 100 > (hb * 1 / 2) and (hb * 1 / 2) ) or 100
-							local _min = ( 50 > hb and (hb * 1 / 3) ) or 50
-							local hs = hb - nStep
-							local hs = ( hs > _max and _max ) or hs
-							local hs = ( hs < _min and _min ) or hs
-							hScrollBar:Lookup("WndButton_Scroll"):SetSize( 15, hs )
-							hScrollBar:SetStepCount(nStep)
-							if bBottom then hScrollBar:SetScrollPos(hScrollBar:GetStepCount()) end
+							wnd:Lookup("", "Handle_Scroll"):FormatAllItemPos()
 						end
-						pcall( wnd.UpdateScroll )
 					elseif szType=='WndSliderBox' then
 						wnd.bShowPercentage = true
 						wnd.nOffset = 0
@@ -988,17 +930,10 @@ function _MY.UI:append(arg0, arg1, arg2)
 		for _, ele in pairs(self.eles) do
 			if ele.hdl then
 				-- append from xml
-				local nCount = ele.hdl:GetItemCount()
-				pcall(function() ele.hdl:AppendItemFromString(szXml) end)
-				local hnd 
-				for i = nCount, ele.hdl:GetItemCount()-1, 1 do
-					hnd = ele.hdl:Lookup(i)
-					if hnd and hnd:GetName()=='' then hnd:SetName('Unnamed_Item'..i) end
-				end
+				ele.hdl:AppendItemFromString(szXml)
 				ele.hdl:FormatAllItemPos()
-				pcall( ele.raw.UpdateScroll )
-				if nCount == ele.hdl:GetItemCount() then
-					return MY.Debug({_L("unable to append handle item from string.")},'MY#UI:append', MY_DEBUG.ERROR)
+				if ele.type == "WndScrollBox" then
+					ele.raw.UpdateScroll()
 				end
 			end
 		end
@@ -1015,7 +950,7 @@ function _MY.UI:clear()
 		if ele.hdl then
 			ele.hdl:Clear()
 		end
-		if ele.sbu then
+		if ele.type == "WndScrollBox" then
 			ele.raw.UpdateScroll()
 		end
 	end
@@ -1999,6 +1934,13 @@ function _MY.UI:size(nWidth, nHeight)
 					hItem:FormatAllItemPos()
 				end
 				hScroll:FormatAllItemPos()
+			elseif ele.type == "WndScrollBox" then
+				ele.raw:SetSize(nWidth, nHeight)
+				ele.raw:Lookup("", "Image_Default"):SetSize(nWidth, nHeight)
+				ele.raw:Lookup("", "Handle_Scroll"):SetSize(nWidth - 30, nHeight - 20)
+				ele.raw:Lookup("WndScrollBar"):SetRelX(nWidth - 20)
+				ele.raw:Lookup("WndScrollBar"):SetH(nHeight - 20)
+				ele.raw.UpdateScroll()
 			elseif ele.wnd then
 				pcall(function() ele.wnd:SetSize(nWidth, nHeight) end)
 				pcall(function() ele.hdl:SetSize(nWidth, nHeight) end)
@@ -2010,14 +1952,6 @@ function _MY.UI:size(nWidth, nHeight)
 				pcall(function() (ele.itm or ele.raw):SetSize(nWidth, nHeight) end)
 				pcall(function() (ele.itm or ele.raw):GetParent():FormatAllItemPos() end)
 				pcall(function() ele.hdl:FormatAllItemPos() end)
-			end
-			if ele.sbu then
-				ele.sbu:SetRelPos(nWidth-25, 10)
-				ele.sbd:SetRelPos(nWidth-25, nHeight-30)
-				ele.sbn:SetRelPos(nWidth-21.5, 30)
-				ele.sbn:SetSize(15, nHeight-60)
-				ele.shd:SetSize(nWidth-35, nHeight-20)
-				ele.raw.UpdateScroll()
 			end
 			if ele.raw.OnSizeChanged then
 				local _this = this
@@ -2056,6 +1990,33 @@ function _MY.UI:autosize(bAutoSize)
 		end
 	end
 	return self
+end
+
+-- (number) Instance:scroll() -- get current scroll percentage (none scroll will return -1)
+-- (self) Instance:scroll(number nPercentage) -- set scroll percentage
+function _MY.UI:scroll(nPercentage)
+	self:_checksum()
+	if nPercentage then -- set
+		for _, ele in pairs(self.eles) do
+			local x = ele.raw:Lookup("WndScrollBar")
+			if x and x.GetStepCount and x.SetScrollPos then
+				x:SetScrollPos(x:GetStepCount() * nPercentage / 100)
+			end
+		end
+		return self
+	else -- get
+		local ele = self.eles[1]
+		if ele and ele.raw then
+			local x = ele.raw:Lookup("WndScrollBar")
+			if x and x.GetStepCount and x.GetScrollPos then
+				if x:GetStepCount() == 0 then
+					return -1
+				else
+					return x:GetScrollPos() * 100 / x:GetStepCount()
+				end
+			end
+		end
+	end
 end
 
 -- (number, number) Instance:range()
@@ -2254,7 +2215,7 @@ end
 function _MY.UI:refresh()
 	self:_checksum()
 	for _, ele in pairs(self.eles) do
-		if ele.sbu then
+		if ele.type == "WndScrollBox" then
 			ele.raw.UpdateScroll()
 		end
 	end
