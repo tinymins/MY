@@ -146,13 +146,13 @@ MY_Farbnamen.ShowTip = function(namelink)
         -- 称号
         if tInfo.szTitle and #tInfo.szTitle > 0 then
             tinsert(tTip, GetFormatText('<' .. tInfo.szTitle .. '>', 136))
+            tinsert(tTip, XML_LINE_BREAKER)
         end
-        tinsert(tTip, XML_LINE_BREAKER)
         -- 帮会
         if tInfo.szTongID and #tInfo.szTongID > 0 then
             tinsert(tTip, GetFormatText('[' .. tInfo.szTongID .. ']', 136))
+            tinsert(tTip, XML_LINE_BREAKER)
         end
-        tinsert(tTip, XML_LINE_BREAKER)
         -- 门派 体型 阵营
         tinsert(tTip, GetFormatText(
             _MY_Farbnamen.tForceString[tInfo.dwForceID] .. _L.STR_SPLIT_DOT ..
