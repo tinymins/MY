@@ -6,6 +6,8 @@
 --
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Farbnamen/lang/")
 local _SUB_ADDON_FOLDER_NAME_ = "Farbnamen"
+local XML_LINE_BREAKER = XML_LINE_BREAKER
+local tinsert, tconcat, tremove = table.insert, table.concat, table.remove
 ---------------------------------------------------------------
 -- 设置和数据
 ---------------------------------------------------------------
@@ -131,41 +133,47 @@ MY_Farbnamen.ShowTip = function(namelink)
     local tInfo = MY_Farbnamen.GetAusName(szName)
     if tInfo then
         local tTip = {}
+        -- author info
+        if tInfo.dwID and tInfo.szName and tInfo.szName == MY.GetAddonInfo().tAuthor[tInfo.dwID] then
+            tinsert(tTip, GetFormatText(_L['mingyi plugins'], 8, 255, 95, 159))
+            tinsert(tTip, GetFormatText(' ', 136, 255, 95, 159))
+            tinsert(tTip, GetFormatText(_L['[author]'], 8, 0, 255, 0))
+            tinsert(tTip, XML_LINE_BREAKER)
+        end
         -- 名称 等级
-        table.insert(tTip, string.format('%s(%d)', tInfo.szName, tInfo.nLevel))
+        tinsert(tTip, GetFormatText(('%s(%d)'):format(tInfo.szName, tInfo.nLevel), 136))
+        -- 是否同队伍
+        if IsParty(UI_GetClientPlayerID(), tInfo.dwID) then
+            tinsert(tTip, GetFormatText(_L['[teammate]'], nil, 0, 255, 0))
+        end
+        tinsert(tTip, XML_LINE_BREAKER)
         -- 称号
         if tInfo.szTitle and #tInfo.szTitle > 0 then
-            table.insert(tTip, tInfo.szTitle)
+            tinsert(tTip, GetFormatText('<' .. tInfo.szTitle .. '>', 136))
         end
+        tinsert(tTip, XML_LINE_BREAKER)
         -- 帮会
         if tInfo.szTongID and #tInfo.szTongID > 0 then
-            table.insert(tTip, '[' .. tInfo.szTongID .. ']')
+            tinsert(tTip, GetFormatText('[' .. tInfo.szTongID .. ']', 136))
         end
+        tinsert(tTip, XML_LINE_BREAKER)
         -- 门派 体型 阵营
-        table.insert(tTip,
+        tinsert(tTip, GetFormatText(
             _MY_Farbnamen.tForceString[tInfo.dwForceID] .. _L.STR_SPLIT_DOT ..
             _MY_Farbnamen.tRoleType[tInfo.nRoleType]    .. _L.STR_SPLIT_DOT ..
-            _MY_Farbnamen.tCampString[tInfo.nCamp]
-        )
-
+            _MY_Farbnamen.tCampString[tInfo.nCamp], 136
+        ))
+        tinsert(tTip, XML_LINE_BREAKER)
+        -- 随身便笺
         if MY_Anmerkungen then
             local tPlayerNote = MY_Anmerkungen.GetPlayerNote(tInfo.dwID)
             if tPlayerNote then
-                table.insert(tTip, tPlayerNote.szContent)
+                tinsert(tTip, GetFormatText(tPlayerNote.szContent, 136))
+                tinsert(tTip, XML_LINE_BREAKER)
             end
         end
-
-        local szTip
-        if tInfo.dwID and tInfo.szName and tInfo.szName == MY.GetAddonInfo().tAuthor[tInfo.dwID] then
-            szTip = GetFormatText(_L['[mingyi plugins]'], 11, 0, 255, 0)
-                 .. GetFormatText(' ', 136)
-                 .. GetFormatText(_L['author']..'\n', 230, 0, 255, 0)
-                 .. GetFormatText('     ' .. table.concat(tTip, '\n     '), 136)
-        else
-            szTip = GetFormatText(table.concat(tTip, '\n'), 136, nil, nil, nil)
-        end
-
-        OutputTip(szTip, 450, {x, y, w, h}, MY.Const.UI.Tip.POS_TOP)
+        -- 显示Tip
+        OutputTip(tconcat(tTip), 450, {x, y, w, h}, MY.Const.UI.Tip.POS_TOP)
     end
 end
 -- 处理插件冲突
