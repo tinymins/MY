@@ -18,7 +18,7 @@
         ...
     }
 ]]
- _C = {}
+local _C = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "ChatMonitor/lang/")
 MY_ChatMonitor = {}
 MY_ChatMonitor.szKeyWords          = _L.CHAT_MONITOR_KEYWORDS_SAMPLE
@@ -454,11 +454,12 @@ _C.Init = function()
         _C.uiFrame:alpha(0):hide()
       end)
       :anchor(MY_ChatMonitor.anchor)
-      
-    -- bind animate function
-    _C.uiFrame:append("Image", "Image_bg")
-      :find('#Image_bg'):size(250,150)
-      :image('UI/Image/Minimap/Minimap2.UITex',8)
+    -- init tip panel handle and bind animation function
+    _C.uiTipBoard = _C.uiFrame
+      :append("WndScrollBox", "WndScrollBox_TalkList")
+      :children('#WndScrollBox_TalkList')
+      :handleStyle(3):pos(0,0):size(250,150)
+      :text(_L['welcome to use mingyi chat monitor.'])
       :click(function()
         MY.OpenPanel()
         MY.SwitchTab('ChatMonitor')
@@ -481,13 +482,6 @@ _C.Init = function()
     MY.DelayCall(function()
         _C.uiFrame:fadeOut(500)
     end, 10000, 'MY_ChatMonitor_Hide')
-
-    -- init tip panel handle
-    _C.uiTipBoard = _C.uiFrame:append("Handle", "Handle_Tip")
-      :find('#Handle_Tip'):handleStyle(3):pos(10,10):size(230,130)
-    -- init welcome word
-    _C.uiTipBoard:append("Text", "Text1"):find('#Text1')
-      :text(_L['welcome to use mingyi chat monitor.'])
     -- show tip
     _C.ShowTip()
 end
