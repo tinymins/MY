@@ -81,14 +81,9 @@ MY_Farbnamen.Render = function(szMsg)
                         ele[''].r = tInfo.rgb[1]
                         ele[''].g = tInfo.rgb[2]
                         ele[''].b = tInfo.rgb[3]
-                        ele[''].eventid = 883
-                        if ele[''].script then
-                            ele[''].script = ele[''].script .. '\n'
-                        else
-                            ele[''].script = ''
-                        end
-                        ele[''].script = ele[''].script .. 'this.OnItemMouseEnter=function() MY_Farbnamen.ShowTip(this) end\nthis.OnItemMouseLeave=function() HideTip() end'
                     end
+                    ele[''].eventid = 82803
+                    ele[''].script = (ele[''].script or '') .. '\nthis.OnItemMouseEnter=function() MY_Farbnamen.ShowTip(this) end\nthis.OnItemMouseLeave=function() HideTip() end'
                 end
             end
             szMsg = MY.Xml.Encode(xml)
