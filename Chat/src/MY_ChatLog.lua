@@ -201,7 +201,7 @@ end
 
 -- 加载更多
 function _C.UiDrawPrev(nCount)
-	if not _C.uiLog then
+	if not _C.uiLog or _C.bUiDrawing == GetLogicFrameCount() then
 		return
 	end
 	local h = _C.uiLog:hdl(1):raw(1)
@@ -213,6 +213,8 @@ function _C.UiDrawPrev(nCount)
 	elseif not _C.nDrawDate then -- 还没有加载进度
 		_C.nDrawDate = DateList[#DateList]
 	end
+	-- 防止UI递归死循环 资源锁
+	_C.bUiDrawing = GetLogicFrameCount()
 	-- 保存当前滚动条位置
 	local _, nH = h:GetSize()
 	local _, nOrginScrollH = h:GetAllItemSize()
@@ -256,6 +258,8 @@ function _C.UiDrawPrev(nCount)
 		local nDeltaScrollH = nScrollH - nOrginScrollH
 		_C.uiLog:scroll((nDeltaScrollH + nOrginScrollY) / (nScrollH - nH) * 100)
 	end
+	-- 防止UI递归死循环 资源锁解除
+	_C.bUiDrawing = nil
 end
 
 function _C.UiAppendLog(szChannel, szMsg)
@@ -284,8 +288,9 @@ function _C.OnPanelActive(wnd)
 	
 	_C.uiLog = ui:append("WndScrollBox", "WndScrollBox_Log", {
 		x = 20, y = 35, w = w - 21, h = h - 40, handlestyle = 3,
-		onscroll = function(nScrollPercent)
-			if nScrollPercent == 0 then
+		onscroll = function(nScrollPercent, nScrollDistance)
+			if nScrollPercent == 0 -- 当前滚动条位置为0
+			or (nScrollPercent == -1 and nScrollDistance == -1) then -- 还没有滚动条但是鼠标往上滚了
 				_C.UiDrawPrev(20)
 			end
 		end,
