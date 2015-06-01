@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-29 20:51:07
+-- @Last Modified time: 2015-06-01 13:32:36
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 MY = MY or {}
@@ -134,11 +134,19 @@ MY.LoadLUAData = MY.Sys.LoadLUAData
 MY.Sys.SaveUserData = function(szFileUri, tData)
 	-- 统一化目录分隔符
 	szFileUri = string.gsub(szFileUri, '\\', '/')
-	if string.sub(szFileUri, -1) ~= '/' then
-		szFileUri = szFileUri .. "_"
+	if string.find(szFileUri, "$uid") then
+		if string.sub(szFileUri, -1) == '/' then
+			szFileUri = szFileUri .. "data"
+		end
+		-- 添加用户识别字符
+		szFileUri = szFileUri:gsub("$uid", MY.Player.GetUUID())
+	else
+		if string.sub(szFileUri, -1) ~= '/' then
+			szFileUri = szFileUri .. "_"
+		end
+		-- 添加用户识别字符
+		szFileUri = szFileUri .. MY.Player.GetUUID()
 	end
-	-- 添加用户识别字符
-	szFileUri = szFileUri .. MY.Player.GetUUID()
 	-- 读取数据
 	return MY.Sys.SaveLUAData(szFileUri, tData)
 end
@@ -149,11 +157,19 @@ MY.SaveUserData = MY.Sys.SaveUserData
 MY.Sys.LoadUserData = function(szFileUri)
 	-- 统一化目录分隔符
 	szFileUri = string.gsub(szFileUri, '\\', '/')
-	if string.sub(szFileUri, -1) ~= '/' then
-		szFileUri = szFileUri .. "_"
+	if string.find(szFileUri, "$uid") then
+		if string.sub(szFileUri, -1) == '/' then
+			szFileUri = szFileUri .. "data"
+		end
+		-- 添加用户识别字符
+		szFileUri = szFileUri:gsub("$uid", MY.Player.GetUUID())
+	else
+		if string.sub(szFileUri, -1) ~= '/' then
+			szFileUri = szFileUri .. "_"
+		end
+		-- 添加用户识别字符
+		szFileUri = szFileUri .. MY.Player.GetUUID()
 	end
-	-- 添加用户识别字符
-	szFileUri = szFileUri .. MY.Player.GetUUID()
 	-- 读取数据
 	return MY.Sys.LoadLUAData(szFileUri)
 end
