@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-01 14:51:43
+-- @Last Modified time: 2015-06-01 16:08:30
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -17,6 +17,35 @@ local _L = MY.LoadLangPack()
 ---------------------------------------------------------------------
 -- 本地的 UI 组件对象
 ---------------------------------------------------------------------
+_MY.ApplyUIArgument = function(ui, tArg)
+	if tArg and ui then
+		if tArg.w           then ui:width      (tArg.w          ) end
+		if tArg.h           then ui:height     (tArg.h          ) end
+		if tArg.x           then ui:left       (tArg.x          ) end
+		if tArg.y           then ui:top        (tArg.y          ) end
+		if tArg.anchor      then ui:anchor     (tArg.anchor     ) end
+		if tArg.alpha       then ui:alpha      (tArg.alpha      ) end
+		if tArg.color       then ui:color      (tArg.color      ) end
+		if tArg.text        then ui:text       (tArg.text       ) end
+		if tArg.placeholder then ui:placeholder(tArg.placeholder) end
+		if tArg.group       then ui:group      (tArg.group      ) end
+		if tArg.font        then ui:font       (tArg.font       ) end
+		if tArg.tip         then ui:tip        (tArg.tip        ) end
+		if tArg.menu        then ui:menu       (tArg.menu       ) end
+		if tArg.limit       then ui:limit      (tArg.limit      ) end
+		if tArg.scroll      then ui:scroll     (tArg.scroll     ) end
+		if tArg.handlestyle then ui:handleStyle(tArg.handlestyle) end
+		if tArg.edittype    then ui:edittype   (tArg.edittype   ) end
+		if tArg.image       then if type(tArg.image) == 'table' then ui:image (unpack(tArg.image)) else ui:image(tArg.image) end end
+		if tArg.onscroll    then ui:scroll     (tArg.onscroll   ) end
+		if tArg.onhover     then ui:hover      (tArg.onhover    ) end
+		if tArg.onclick     then ui:click      (tArg.onclick    ) end
+		if tArg.checked     then ui:check      (tArg.checked    ) end
+		if tArg.oncheck     then ui:check      (tArg.oncheck    ) end
+		if tArg.onchange    then ui:change     (tArg.onchange   ) end
+		if tArg.multiline   then ui:multiLine  (tArg.multiline  ) end
+	end
+end
 -------------------------------------
 -- UI object class
 -------------------------------------
@@ -898,32 +927,7 @@ function _MY.UI:append(arg0, arg1, arg2)
 					ui = MY.UI(hnd)
 				end
 			end
-			if tArg and ui then
-				if tArg.w           then ui:width      (tArg.w          ) end
-				if tArg.h           then ui:height     (tArg.h          ) end
-				if tArg.x           then ui:left       (tArg.x          ) end
-				if tArg.y           then ui:top        (tArg.y          ) end
-				if tArg.alpha       then ui:alpha      (tArg.alpha      ) end
-				if tArg.color       then ui:color      (tArg.color      ) end
-				if tArg.text        then ui:text       (tArg.text       ) end
-				if tArg.placeholder then ui:placeholder(tArg.placeholder) end
-				if tArg.group       then ui:group      (tArg.group      ) end
-				if tArg.font        then ui:font       (tArg.font       ) end
-				if tArg.tip         then ui:tip        (tArg.tip        ) end
-				if tArg.menu        then ui:menu       (tArg.menu       ) end
-				if tArg.limit       then ui:limit      (tArg.limit      ) end
-				if tArg.scroll      then ui:scroll     (tArg.scroll     ) end
-				if tArg.handlestyle then ui:handleStyle(tArg.handlestyle) end
-				if tArg.edittype    then ui:edittype   (tArg.edittype   ) end
-				if tArg.image       then if type(tArg.image) == 'table' then ui:image (unpack(tArg.image)) else ui:image(tArg.image) end end
-				if tArg.onscroll    then ui:scroll     (tArg.onscroll   ) end
-				if tArg.onhover     then ui:hover      (tArg.onhover    ) end
-				if tArg.onclick     then ui:click      (tArg.onclick    ) end
-				if tArg.checked     then ui:check      (tArg.checked    ) end
-				if tArg.oncheck     then ui:check      (tArg.oncheck    ) end
-				if tArg.onchange    then ui:change     (tArg.onchange   ) end
-				if tArg.multiline   then ui:multiLine  (tArg.multiline  ) end
-			end
+			_MY.ApplyUIArgument(ui, tArg)
 		end
 	elseif szXml then
 		for _, ele in pairs(self.eles) do
@@ -2731,7 +2735,7 @@ MY.UI.CreateFrame = function(szName, opt)
 	frm = Wnd.OpenWindow(szIniFile, szName)
 	frm:ChangeRelation(opt.level)
 	frm:Show()
-	
+	local ui = MY.UI(frm)
 	-- init frame
 	if opt.esc then
 		MY.RegisterEsc('Frame_Close_' .. szName, function()
@@ -2937,7 +2941,8 @@ MY.UI.CreateFrame = function(szName, opt)
 			h:FromUITex(szUITexCommon, v)
 		end
 	end
-	return MY.UI(frm)
+	_MY.ApplyUIArgument(ui, opt)
+	return ui
 end
 
 -- 打开取色板
@@ -3068,6 +3073,26 @@ MY.UI.OpenFontPicker = function(callback, t)
 	end
 	Station.SetFocusWindow(ui:raw(1))
 end
+
+-- 打开文本编辑器
+MY.UI.OpenTextEditor = function(szText, szFrameName)
+	if not szFrameName then
+		szFrameName = "MY_DefaultTextEditor"
+	end
+	local w, h, ui = 400, 300
+	local function OnResize()
+		ui:children('.WndEditBox'):size(ui:wnd(1):size())
+	end
+	ui = MY.UI.CreateFrame(szFrameName, {
+		w = w, h = h, text = _L["text editor"], alpha = 180,
+		anchor = { s='CENTER', r='CENTER', x=0, y=0 },
+		simple = true, close = true, esc = true,
+		dragresize = true, minimize = true, ondragresize = OnResize,
+	}):append("WndEditBox", { x = 0, y = 0, multiline = true, text = szText })
+	OnResize()
+	return ui
+end
+
 -- 打开文本列表编辑器
 MY.UI.OpenListEditor = function(szFrameName, tTextList, OnAdd, OnDel)
 	local muDel
