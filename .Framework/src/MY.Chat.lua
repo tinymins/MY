@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-30 10:56:31
+-- @Last Modified time: 2015-06-01 16:03:54
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -106,7 +106,7 @@ MY.Chat.GetCopyLinkText = function(szText, rgbf)
 	rgbf   = rgbf   or { f = 10 }
 	
 	return GetFormatText(szText, rgbf.f, rgbf.r, rgbf.g, rgbf.b, 82691,
-		"this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemMButtonDown=function() MY.Chat.RemoveChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end\nthis.OnItemMouseEnter=function() MY.Chat.LinkEventHandler.OnCopyMouseEnter(this) end\nthis.OnItemMouseLeave=function() MY.Chat.LinkEventHandler.OnCopyMouseLeave(this) end",
+		"this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.Chat.LinkEventHandler.OnCopyLClick\nthis.OnItemMButtonDown=MY.Chat.LinkEventHandler.OnCopyMClick\nthis.OnItemRButtonDown=MY.Chat.LinkEventHandler.OnCopyRClick\nthis.OnItemMouseEnter=MY.Chat.LinkEventHandler.OnCopyMouseEnter\nthis.OnItemMouseLeave=MY.Chat.LinkEventHandler.OnCopyMouseLeave",
 		"copylink")
 end
 
@@ -116,14 +116,17 @@ MY.Chat.GetTimeLinkText = function(rgbfs)
 	return GetFormatText(
 		MY.Sys.FormatTime(rgbfs.s or '[hh:mm.ss]', GetCurrentTime()),
 		rgbfs.f, rgbfs.r, rgbfs.g, rgbfs.b, 82691,
-		"this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemMButtonDown=function() MY.Chat.RemoveChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end\nthis.OnItemMouseEnter=function() MY.Chat.LinkEventHandler.OnCopyMouseEnter(this) end\nthis.OnItemMouseLeave=function() MY.Chat.LinkEventHandler.OnCopyMouseLeave(this) end",
+		"this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.Chat.LinkEventHandler.OnCopyLClick\nthis.OnItemMButtonDown=MY.Chat.LinkEventHandler.OnCopyMClick\nthis.OnItemRButtonDown=MY.Chat.LinkEventHandler.OnCopyRClick\nthis.OnItemMouseEnter=MY.Chat.LinkEventHandler.OnCopyMouseEnter\nthis.OnItemMouseLeave=MY.Chat.LinkEventHandler.OnCopyMouseLeave",
 		"timelink"
 	)
 end
 
 -- 复制聊天行
-MY.Chat.CopyChatLine = function(hTime)
+MY.Chat.CopyChatLine = function(hTime, bTextEditor)
 	local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
+	if bTextEditor then
+		edit = MY.UI.OpenTextEditor():find(".WndEdit"):raw(1)
+	end
 	if not edit then
 		return
 	end
@@ -238,7 +241,10 @@ MY.Chat.LinkEventHandler = {
 		end)())
 	end,
 	OnCopyLClick = function(hT)
-		MY.Chat.CopyChatLine(hT or this)
+		MY.Chat.CopyChatLine(hT or this, IsCtrlKeyDown())
+	end,
+	OnCopyMClick = function(hT)
+		MY.Chat.RemoveChatLine(hT or this)
 	end,
 	OnCopyRClick = function(hT)
 		MY.Chat.RepeatChatLine(hT or this)
@@ -282,11 +288,11 @@ MY.Chat.RenderLink = function(argv, argv2)
 					end
 					
 					if name:sub(1, 8) == 'namelink' then
-						script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.LinkEventHandler.OnNameLClick(this) end\nthis.OnItemRButtonDown=function() MY.Chat.LinkEventHandler.OnNameRClick(this) end'
+						script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.Chat.LinkEventHandler.OnNameLClick\nthis.OnItemRButtonDown=MY.Chat.LinkEventHandler.OnNameRClick'
 					elseif name == 'copy' or name == 'copylink' or name == 'timelink' then
-						script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.CopyChatLine(this) end\nthis.OnItemMButtonDown=function() MY.Chat.RemoveChatLine(this) end\nthis.OnItemRButtonDown=function() MY.Chat.RepeatChatLine(this) end\nthis.OnItemMouseEnter=function() MY.Chat.LinkEventHandler.OnCopyMouseEnter(this) end\nthis.OnItemMouseLeave=function() MY.Chat.LinkEventHandler.OnCopyMouseLeave(this) end'
+						script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.Chat.LinkEventHandler.OnCopyLClick\nthis.OnItemMButtonDown=MY.Chat.LinkEventHandler.OnCopyMClick\nthis.OnItemRButtonDown=MY.Chat.LinkEventHandler.OnCopyRClick\nthis.OnItemMouseEnter=MY.Chat.LinkEventHandler.OnCopyMouseEnter\nthis.OnItemMouseLeave=MY.Chat.LinkEventHandler.OnCopyMouseLeave'
 					else
-						script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=function() MY.Chat.LinkEventHandler.OnItemLClick(this) end\nthis.OnItemRButtonDown=function() MY.Chat.LinkEventHandler.OnItemRClick(this) end'
+						script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.Chat.LinkEventHandler.OnItemLClick\nthis.OnItemRButtonDown=MY.Chat.LinkEventHandler.OnItemRClick'
 					end
 					
 					if #script > 0 then
