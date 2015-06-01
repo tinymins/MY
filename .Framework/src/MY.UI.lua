@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-31 22:28:49
+-- @Last Modified time: 2015-06-01 11:17:25
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -912,6 +912,7 @@ function _MY.UI:append(arg0, arg1, arg2)
 				if tArg.tip         then ui:tip        (tArg.tip        ) end
 				if tArg.menu        then ui:menu       (tArg.menu       ) end
 				if tArg.limit       then ui:limit      (tArg.limit      ) end
+				if tArg.handlestyle then ui:handleStyle(tArg.handlestyle) end
 				if tArg.edittype    then ui:edittype   (tArg.edittype   ) end
 				if tArg.image       then if type(tArg.image) == 'table' then ui:image (unpack(tArg.image)) else ui:image(tArg.image) end end
 				if tArg.onhover     then ui:hover      (tArg.onhover    ) end
