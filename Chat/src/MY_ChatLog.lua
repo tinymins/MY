@@ -5,16 +5,32 @@
 -- 网站：ZhaiYiMing.CoM
 -- 
 local _L  = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Chat/lang/")
-local _C  = {}
+ _C  = {}
 local Log = {}
-local tinsert = table.insert
-local tremove = table.remove
+local XML_LINE_BREAKER = XML_LINE_BREAKER
+local tinsert, tconcat, tremove = table.insert, table.concat, table.remove
 MY_ChatLog = MY_ChatLog or {}
+MY_ChatLog.szActiveChannel         = "MSG_WHISPER" -- 当前激活的标签页
 MY_ChatLog.bIgnoreTongOnlineMsg    = true -- 帮会上线通知
 MY_ChatLog.bIgnoreTongMemberLogMsg = true -- 帮会成员上线下线提示
 RegisterCustomData('MY_ChatLog.bIgnoreTongOnlineMsg')
 RegisterCustomData('MY_ChatLog.bIgnoreTongMemberLogMsg')
 
+----------------------------------------------------------------------------------------------------
+--        #       #             #                               # # # #           #     #           
+--    #   #   #   #             #     # # # # # #     # # # # #                 # # # # # # # # #   
+--        #       #             #     #         #           #                 # #       #           
+--  # # # # # #   # # # #   # # # #   # # # # # #     #       #       #     #   # # # # # # # #     
+--      # #     #     #         #     #     #           #           #           #       #           
+--    #   # #     #   #         #     # # # # # #             #                 # # # # # # # #     
+--  #     #   #   #   #         # #   #     #       # # # # # # # # # # #       #       #           
+--      #         #   #     # # #     # # # # # #           # # #               # # # # # # # # #   
+--  # # # # #     #   #         #     # #       #         #   #   #                   #             
+--    #     #       #           #   #   #       #       #     #     #       # # # # # # # # # # #   
+--      # #       #   #         #   #   # # # # #   # #       #       # #       #     #     #       
+--  # #     #   #       #     # # #     #       #             #             # #       #       # #   
+----------------------------------------------------------------------------------------------------
+-- 数据采集 --
 _C.TongOnlineMsg       = '^' .. MY.String.PatternEscape(g_tStrings.STR_TALK_HEAD_TONG .. g_tStrings.STR_GUILD_ONLINE_MSG)
 _C.TongMemberLoginMsg  = '^' .. MY.String.PatternEscape(g_tStrings.STR_GUILD_MEMBER_LOGIN):gsub('<link 0>', '.-') .. '$'
 _C.TongMemberLogoutMsg = '^' .. MY.String.PatternEscape(g_tStrings.STR_GUILD_MEMBER_LOGOUT):gsub('<link 0>', '.-') .. '$'
@@ -38,17 +54,14 @@ function _C.OnMsg(szMsg, szChannel, nFont, bRich, r, g, b)
 		end
 	end
 	-- generate rec
-	szMsg = MY.Chat.GetTimeLinkText({r=r, g=g, b=b, f=nFont, s='[MM/dd|hh:mm:ss]'}) .. szMsg
+	szMsg = MY.Chat.GetTimeLinkText({r=r, g=g, b=b, f=nFont, s='[hh:mm:ss]'}) .. szMsg
 	szMsg = MY.Chat.RenderLink(szMsg)
 	if MY_Farbnamen and MY_Farbnamen.Render then
 		szMsg = MY_Farbnamen.Render(szMsg)
 	end
-	-- save rec
-	tinsert(Log[szChannel], szMsg)
-	while #Log[szChannel] > Log.nMax do
-		tremove(Log[szChannel], 1)
-	end
-	_C.AppendLog(szChannel, szMsg)
+	-- save and draw rec
+	_C.AppendLog(szChannel, _C.GetCurrentDate(), szMsg)
+	_C.UiAppendLog(szChannel, szMsg)
 end
 
 function _C.OnTongMsg(szMsg, nFont, bRich, r, g, b)
@@ -64,49 +77,189 @@ function _C.OnFriendMsg(szMsg, nFont, bRich, r, g, b)
 	_C.OnMsg(szMsg, 'MSG_FRIEND', nFont, bRich, r, g, b)
 end
 
-MY.RegisterInit('MY_CHATLOG', function()
-	Log = MY.LoadUserData('cache/CHAT_LOG/') or {}
-	if type(Log) == 'string' then
-		Log = MY.Json.Decode(Log) or {}
-	end
-	for k, v in pairs({
-		nMax       = 50,
-		MSG_GUILD  = {},
-		MSG_WHISPER= {},
-		MSG_TEAM   = {},
-		MSG_FRIEND = {},
-		Active     = 'MSG_WHISPER',
-	}) do
-		if type(Log[k]) ~= type(v) then
-			Log[k] = v
-		end
-	end
+MY.RegisterInit("MY_CHATLOG_REGMSG", function()
 	MY.RegisterMsgMonitor('MY_ChatLog_Tong'  , _C.OnTongMsg  , { 'MSG_GUILD', 'MSG_GUILD_ALLIANCE' })
 	MY.RegisterMsgMonitor('MY_ChatLog_Wisper', _C.OnWisperMsg, { 'MSG_WHISPER' })
 	MY.RegisterMsgMonitor('MY_ChatLog_Raid'  , _C.OnRaidMsg  , { 'MSG_TEAM', 'MSG_PARTY', 'MSG_GROUP' })
 	MY.RegisterMsgMonitor('MY_ChatLog_Friend', _C.OnFriendMsg, { 'MSG_FRIEND' })
 end)
+----------------------------------------------------------------------------------------------------
+--        #       #             #                           #                                       
+--    #   #   #   #             #     # # # # # #           #               # # # # # #             
+--        #       #             #     #         #   # # # # # # # # # # #     #     #   # # # #     
+--  # # # # # #   # # # #   # # # #   # # # # # #         #                   #     #     #   #     
+--      # #     #     #         #     #     #           #     # # # # #       # # # #     #   #     
+--    #   # #     #   #         #     # # # # # #       #           #         #     #     #   #     
+--  #     #   #   #   #         # #   #     #         # #         #           # # # #     #   #     
+--      #         #   #     # # #     # # # # # #   #   #   # # # # # # #     #     #     #   #     
+--  # # # # #     #   #         #     # #       #       #         #           #     # #     #       
+--    #     #       #           #   #   #       #       #         #         # # # # #       #       
+--      # #       #   #         #   #   # # # # #       #         #                 #     #   #     
+--  # #     #   #       #     # # #     #       #       #       # #                 #   #       #   
+----------------------------------------------------------------------------------------------------
+-- 数据存取 --
+--[[
+	Log = {
+		MSG_WHISPER = {
+			DateList = { 20150214, 20150215 }
+			DateIndex = { [20150214] = 1, [20150215] = 2 }
+			[20150214] = { <szMsg>, <szMsg>, ... },
+			[20150215] = { <szMsg>, <szMsg>, ... },
+			...
+		},
+		...
+	}
+]]
+_C.szDataPath = 'cache/CHAT_LOG/$uid/'
 
-MY.RegisterExit(function()
-	MY.SaveUserData('cache/CHAT_LOG/', Log)
-end)
+_C.tModifiedLog = {}
+function _C.GetCurrentDate()
+	return tonumber(MY.Sys.FormatTime("yyyyMMdd", GetCurrentTime()))
+end
 
-function _C.DrawLog()
+function _C.RebuildDateList(szChannel, nScanDays)
+	
+end
+
+function _C.GetDateList(szChannel)
+	if not Log[szChannel] then
+		Log[szChannel] = {}
+		Log[szChannel].DateList = MY.LoadUserData(_C.szDataPath .. szChannel .. '/DateList') or {}
+		Log[szChannel].DateIndex = {}
+		for i, dwDate in ipairs(Log[szChannel].DateList) do
+			Log[szChannel].DateIndex[dwDate] = i
+		end
+	end
+	return Log[szChannel].DateList, Log[szChannel].DateIndex
+end
+
+function _C.GetLog(szChannel, dwDate)
+	_C.GetDateList(szChannel)
+	if not Log[szChannel][dwDate] then
+		Log[szChannel][dwDate] = MY.LoadUserData(_C.szDataPath .. szChannel .. '/' .. dwDate) or {}
+	end
+	return Log[szChannel][dwDate]
+end
+
+function _C.AppendLog(szChannel, dwDate, szMsg)
+	local log = _C.GetLog(szChannel, dwDate)
+	tinsert(log, szMsg)
+	-- mark as modified
+	if not _C.tModifiedLog[szChannel] then
+		_C.tModifiedLog[szChannel] = {}
+	end
+	_C.tModifiedLog[szChannel][dwDate] = true
+	-- append datelist
+	local DateList, DateIndex = _C.GetDateList(szChannel)
+	if not DateIndex[dwDate] then
+		tinsert(DateList, dwDate)
+		DateIndex[dwDate] = #DateList
+		_C.tModifiedLog[szChannel]['DateList'] = true
+	end
+end
+
+function _C.UnloadLog()
+	for szChannel, tDate in pairs(_C.tModifiedLog) do
+		for dwDate, _ in pairs(tDate) do
+			if not empty(Log[szChannel][dwDate]) then
+				MY.SaveUserData(_C.szDataPath .. szChannel .. '/' .. dwDate, Log[szChannel][dwDate])
+			end
+		end
+	end
+	Log = {}
+end
+MY.RegisterExit(_C.UnloadLog)
+
+----------------------------------------------------------------------------------------------------
+--    # # # # # # # # #                                 #         #               #             #   
+--    #       #       #     # # # # # # # # # # #       #       #   #         #   #             #   
+--    # # # # # # # # #               #               #       #       #       # # # # #   #     #   
+--    #       #       #             #               #     # #           #   #     #       #     #   
+--    # # # # # # # # #       # # # # # # # # # #   # # #     # # # # #     # # # # # # # #     #   
+--            #               #     #     #     #       #                         #       #     #   
+--        # #   # #           #     # # # #     #     #                       # # # # #   #     #   
+--  # # #           # # #     #     #     #     #   # # #   # # # # # # #     #   #   #   #     #   
+--        #       #           #     # # # #     #               #             #   #   #   #     #   
+--        #       #           #     #     #     #       #     #       #       #   #   #         #   
+--      #         #           # # # # # # # # # #   # #     # # # # # # #     #   # # #         #   
+--    #           #           #                 #                       #         #         # # #   
+----------------------------------------------------------------------------------------------------
+-- 界面绘制 --
+function _C.UiRedrawLog()
 	if not _C.uiLog then
 		return
 	end
-	
 	_C.uiLog:clear()
-	for _, szMsg in ipairs(Log[Log.Active]) do
-		_C.uiLog:append(szMsg)
-	end
+	_C.nDrawDate  = nil
+	_C.nDrawIndex = nil
+	_C.UiDrawPrev(20)
+	_C.uiLog:scroll(100)
 	if MY_ChatMosaics then
 		MY_ChatMosaics.Mosaics(_C.uiLog:hdl(1):raw(1))
 	end
 end
 
-function _C.AppendLog(szChannel, szMsg)
-	if not (_C.uiLog and szChannel == Log.Active) then
+-- 加载更多
+function _C.UiDrawPrev(nCount)
+	if not _C.uiLog then
+		return
+	end
+	local h = _C.uiLog:hdl(1):raw(1)
+	local szChannel = MY_ChatLog.szActiveChannel
+	local DateList, DateIndex = _C.GetDateList(szChannel)
+	if #DateList == 0 or -- 没有记录可以加载
+	(_C.nDrawDate == DateList[1] and _C.nDrawIndex == 0) then -- 没有更多的记录可以加载
+		return
+	elseif not _C.nDrawDate then -- 还没有加载进度
+		_C.nDrawDate = DateList[#DateList]
+	end
+	-- 保存当前滚动条位置
+	local _, nH = h:GetSize()
+	local _, nOrginScrollH = h:GetAllItemSize()
+	local nOrginScrollY = (nOrginScrollH - nH) * _C.uiLog:scroll() / 100
+	-- 绘制聊天记录
+	while nCount > 0 do
+		-- 加载指定日期的记录
+		local log = _C.GetLog(szChannel, _C.nDrawDate)
+		-- nDrawIndex为空则从最后一条开始加载
+		if not _C.nDrawIndex then
+			_C.nDrawIndex = #log
+		end
+		-- 计算该日期的记录是否足够加载剩余待加载条数
+		if _C.nDrawIndex > nCount then -- 足够 则直接加载
+			h:InsertItemFromString(0, false, tconcat(log, "", _C.nDrawIndex - nCount + 1, _C.nDrawIndex))
+			_C.nDrawIndex = _C.nDrawIndex - nCount
+			nCount = 0
+		else -- 不足 则加载完后将加载进度指向上一个日期
+			h:InsertItemFromString(0, false, tconcat(log, "", 1, _C.nDrawIndex))
+			h:InsertItemFromString(0, false, GetFormatText("========== " .. _C.nDrawDate .. " ==========\n")) -- 跨日期输出日期戳
+			-- 判断还有没有记录可以加载
+			local nIndex = DateIndex[_C.nDrawDate]
+			if nIndex == 1 then -- 没有记录可以加载了
+				nCount = 0
+				_C.nDrawIndex = 0
+			else -- 还有记录
+				nCount = nCount - _C.nDrawIndex
+				_C.nDrawDate = DateList[nIndex - 1]
+				_C.nDrawIndex = nil
+			end
+		end
+	end
+	h:FormatAllItemPos()
+	-- 恢复之前滚动条位置
+	if nOrginScrollY < 0 then -- 之前没有滚动条
+		if _C.uiLog:scroll() >= 0 then -- 现在有滚动条
+			_C.uiLog:scroll(100)
+		end
+	else
+		local _, nScrollH = h:GetAllItemSize()
+		local nDeltaScrollH = nScrollH - nOrginScrollH
+		_C.uiLog:scroll((nDeltaScrollH + nOrginScrollY) / (nScrollH - nH) * 100)
+	end
+end
+
+function _C.UiAppendLog(szChannel, szMsg)
+	if not (_C.uiLog and szChannel == MY_ChatLog.szActiveChannel) then
 		return
 	end
 	if MY_ChatMosaics then
@@ -129,9 +282,14 @@ function _C.OnPanelActive(wnd)
 	local w, h = ui:size()
 	local x, y = 20, 10
 	
-	_C.uiLog = ui
-	  :append("WndScrollBox", "WndScrollBox_Log"):children('#WndScrollBox_Log')
-	  :pos(20, 35):size(w - 21, h - 40):handleStyle(3)
+	_C.uiLog = ui:append("WndScrollBox", "WndScrollBox_Log", {
+		x = 20, y = 35, w = w - 21, h = h - 40, handlestyle = 3,
+		onscroll = function(nScrollPercent)
+			if nScrollPercent == 0 then
+				_C.UiDrawPrev(20)
+			end
+		end,
+	}):children('#WndScrollBox_Log')
 	
 	for i, szChannel in ipairs({
 		'MSG_GUILD'  ,
@@ -143,30 +301,13 @@ function _C.OnPanelActive(wnd)
 		  :pos(x + (i - 1) * 100, y):width(90)
 		  :text(g_tStrings.tChannelName[szChannel] or '')
 		  :check(function(bChecked)
-			if bChecked then
-				Log.Active = szChannel
-			end
-			_C.DrawLog()
+		  	if bChecked then
+		  		MY_ChatLog.szActiveChannel = szChannel
+		  	end
+		  	_C.UiRedrawLog()
 		  end)
-		  :check(Log.Active == szChannel)
+		  :check(MY_ChatLog.szActiveChannel == szChannel)
 	end
-	
-	ui:append("WndButton", "WndButton_MaxLog"):children('#WndButton_MaxLog')
-	  :pos(w - 26 - 120, y - 3):width(120)
-	  :text(_L('Max log: %d', Log.nMax))
-	  :click(function()
-	  	local me = this
-	  	GetUserInputNumber(
-	  		Log.nMax,
-	  		1000, nil,
-	  		function(num)
-	  			Log.nMax = num
-	  			MY.UI(me):text(_L('Max log: %d', Log.nMax))
-	  		end,
-	  		function() end,
-	  		function() end
-	  	)
-	  end)
 	
 	ui:append("Image", "Image_Setting"):item('#Image_Setting')
 	  :pos(w - 26, y - 6):size(30, 30):alpha(200)
