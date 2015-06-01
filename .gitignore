@@ -19,3 +19,4 @@
 .Framework/data/bosslist.jx3dat
 \!src-dist/releases/
 @DATA/cache/CHAT_LOG/*/*/*.jx3dat
+@DATA/userdata/CHAT_LOG/*/*/*.jx3dat
