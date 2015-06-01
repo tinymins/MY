@@ -110,7 +110,7 @@ end)
 		...
 	}
 ]]
-_C.szDataPath = 'cache/CHAT_LOG/$uid/'
+_C.szDataPath = 'userdata/CHAT_LOG/$uid/'
 
 _C.tModifiedLog = {}
 function _C.GetCurrentDate()
