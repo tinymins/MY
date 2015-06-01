@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-01 11:17:25
+-- @Last Modified time: 2015-06-01 14:51:43
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -696,7 +696,7 @@ function _MY.UI:append(arg0, arg1, arg2)
 						wnd:SetName(szName)
 					end
 					wnd:ChangeRelation((ele.wnd or ele.frm), true, true)
-					if szType=='WndSliderBox' then
+					if szType == 'WndSliderBox' then
 						wnd.bShowPercentage = true
 						wnd.nOffset = 0
 						wnd.tMyOnChange = {}
@@ -912,9 +912,11 @@ function _MY.UI:append(arg0, arg1, arg2)
 				if tArg.tip         then ui:tip        (tArg.tip        ) end
 				if tArg.menu        then ui:menu       (tArg.menu       ) end
 				if tArg.limit       then ui:limit      (tArg.limit      ) end
+				if tArg.scroll      then ui:scroll     (tArg.scroll     ) end
 				if tArg.handlestyle then ui:handleStyle(tArg.handlestyle) end
 				if tArg.edittype    then ui:edittype   (tArg.edittype   ) end
 				if tArg.image       then if type(tArg.image) == 'table' then ui:image (unpack(tArg.image)) else ui:image(tArg.image) end end
+				if tArg.onscroll    then ui:scroll     (tArg.onscroll   ) end
 				if tArg.onhover     then ui:hover      (tArg.onhover    ) end
 				if tArg.onclick     then ui:click      (tArg.onclick    ) end
 				if tArg.checked     then ui:check      (tArg.checked    ) end
@@ -1990,13 +1992,40 @@ end
 
 -- (number) Instance:scroll() -- get current scroll percentage (none scroll will return -1)
 -- (self) Instance:scroll(number nPercentage) -- set scroll percentage
+-- (self) Instance:scroll(function OnScrollBarPosChanged) -- bind scroll event handle
 function _MY.UI:scroll(nPercentage)
 	self:_checksum()
 	if nPercentage then -- set
-		for _, ele in pairs(self.eles) do
-			local x = ele.raw:Lookup("WndScrollBar")
-			if x and x.GetStepCount and x.SetScrollPos then
-				x:SetScrollPos(x:GetStepCount() * nPercentage / 100)
+		if type(nPercentage) == "number" then
+			for _, ele in pairs(self.eles) do
+				local x = ele.raw:Lookup("WndScrollBar")
+				if x and x.GetStepCount and x.SetScrollPos then
+					x:SetScrollPos(x:GetStepCount() * nPercentage / 100)
+				end
+			end
+		elseif type(nPercentage) == "function" then
+			local fnOnChange = nPercentage
+			for _, ele in pairs(self.eles) do
+				local x = ele.raw:Lookup("WndScrollBar")
+				if x then
+					MY.UI.RegisterUIEvent(x, 'OnScrollBarPosChanged', function()
+						if not this.nLastScrollPos then
+							this.nLastScrollPos = 0
+						end
+						local nPercentage
+						local nScrollPos = x:GetScrollPos()
+						local nStepCount = x:GetStepCount()
+						if this.nLastScrollPos == nScrollPos then
+							return
+						end
+						this.nLastScrollPos = nScrollPos
+						if nStepCount == 0 then
+							fnOnChange(-1)
+						else
+							fnOnChange(nScrollPos * 100 / nStepCount)
+						end
+					end)
+				end
 			end
 		end
 		return self
