@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-01 16:08:30
+-- @Last Modified time: 2015-06-01 17:04:31
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -2016,17 +2016,17 @@ function _MY.UI:scroll(nPercentage)
 						if not this.nLastScrollPos then
 							this.nLastScrollPos = 0
 						end
-						local nPercentage
+						local nDistance = Station.GetMessageWheelDelta()
 						local nScrollPos = x:GetScrollPos()
 						local nStepCount = x:GetStepCount()
-						if this.nLastScrollPos == nScrollPos then
+						if this.nLastScrollPos == nScrollPos and nDistance == 0 then
 							return
 						end
 						this.nLastScrollPos = nScrollPos
 						if nStepCount == 0 then
-							fnOnChange(-1)
+							fnOnChange(-1, nDistance)
 						else
-							fnOnChange(nScrollPos * 100 / nStepCount)
+							fnOnChange(nScrollPos * 100 / nStepCount, nDistance)
 						end
 					end)
 				end
