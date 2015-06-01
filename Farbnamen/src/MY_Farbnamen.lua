@@ -191,7 +191,7 @@ function MY_Farbnamen.GetAusName(szName)
     if not dwID then
         dwID = _MY_Farbnamen.tPlayerCache[szName]
     end
-    return MY_Farbnamen.GetAusID(_MY_Farbnamen.tPlayerCache[szName])
+    return MY_Farbnamen.GetAusID(dwID)
 end
 -- 通过dwID获取信息
 function MY_Farbnamen.GetAusID(dwID)
