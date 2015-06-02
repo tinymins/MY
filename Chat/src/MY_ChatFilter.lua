@@ -34,64 +34,63 @@ for k, _ in pairs(MY_ChatFilter.tApplyDuplicateChannels) do
 end
 
 MY.HookChatPanel("MY_ChatFilter", function(h, szChannel, szMsg)
-	if MY_ChatFilter.tApplyDuplicateChannels[szChannel] then
-		-- 插件消息UUID过滤
-		if MY_ChatFilter.bFilterDuplicateAddonTalk then
-			local me = GetClientPlayer()
-			local tSay = me.GetTalkData()
-			if not h.MY_tDuplicateUUID then
-				h.MY_tDuplicateUUID = {}
-			elseif tSay[1] and tSay[1].type == "eventlink" then
-				local data = MY.Json.Decode(tSay[1].linkinfo)
-				if data and data.uuid then
-					local szUUID = data.uuid
-					if szUUID then
-						for k, uuid in pairs(h.MY_tDuplicateUUID) do
-							if uuid == szUUID then
-								return ''
-							end
+	-- 插件消息UUID过滤
+	if MY_ChatFilter.bFilterDuplicateAddonTalk then
+		local me = GetClientPlayer()
+		local tSay = me.GetTalkData()
+		if not h.MY_tDuplicateUUID then
+			h.MY_tDuplicateUUID = {}
+		elseif tSay[1] and tSay[1].type == "eventlink" then
+			local data = MY.Json.Decode(tSay[1].linkinfo)
+			if data and data.uuid then
+				local szUUID = data.uuid
+				if szUUID then
+					for k, uuid in pairs(h.MY_tDuplicateUUID) do
+						if uuid == szUUID then
+							return ''
 						end
-						table.insert(h.MY_tDuplicateUUID, 1, szUUID)
-						local nCount = #h.MY_tDuplicateUUID - MAX_UUID_RECORD
-						if nCount > 0 then
-							for i = nCount, 1, -1 do
-								table.remove(h.MY_tDuplicateUUID)
-							end
+					end
+					table.insert(h.MY_tDuplicateUUID, 1, szUUID)
+					local nCount = #h.MY_tDuplicateUUID - MAX_UUID_RECORD
+					if nCount > 0 then
+						for i = nCount, 1, -1 do
+							table.remove(h.MY_tDuplicateUUID)
 						end
 					end
 				end
 			end
 		end
-		-- 重复内容刷屏屏蔽（系统频道除外）
-		if MY_ChatFilter.bFilterDuplicate then
-			-- 计算过滤记录
-			local szText = GetPureText(szMsg)
-			if MY_ChatFilter.bFilterDuplicateIgnoreID then
-				local nCount = 1
-				while nCount > 0 do
-					szText, nCount = szText:gsub('^%[[^%[%]]+%]', '')
-				end
+	end
+	-- 重复内容刷屏屏蔽（系统频道除外）
+	if MY_ChatFilter.bFilterDuplicate
+	and MY_ChatFilter.tApplyDuplicateChannels[szChannel] then
+		-- 计算过滤记录
+		local szText = GetPureText(szMsg)
+		if MY_ChatFilter.bFilterDuplicateIgnoreID then
+			local nCount = 1
+			while nCount > 0 do
+				szText, nCount = szText:gsub('^%[[^%[%]]+%]', '')
 			end
-			-- 判断是否需要过滤
-			if not h.MY_tDuplicateLog then
-				h.MY_tDuplicateLog = {}
-			elseif MY_ChatFilter.bFilterDuplicateContinuous then
-				if h.MY_tDuplicateLog[1] == szText then
+		end
+		-- 判断是否需要过滤
+		if not h.MY_tDuplicateLog then
+			h.MY_tDuplicateLog = {}
+		elseif MY_ChatFilter.bFilterDuplicateContinuous then
+			if h.MY_tDuplicateLog[1] == szText then
+				return ''
+			end
+			h.MY_tDuplicateLog[1] = szText
+		else
+			for i, szRecord in ipairs(h.MY_tDuplicateLog) do
+				if szRecord == szText then
 					return ''
 				end
-				h.MY_tDuplicateLog[1] = szText
-			else
-				for i, szRecord in ipairs(h.MY_tDuplicateLog) do
-					if szRecord == szText then
-						return ''
-					end
-				end
-				table.insert(h.MY_tDuplicateLog, 1, szText)
-				local nCount = #h.MY_tDuplicateLog - MAX_CHAT_RECORD
-				if nCount > 0 then
-					for i = nCount, 1, -1 do
-						table.remove(h.MY_tDuplicateLog)
-					end
+			end
+			table.insert(h.MY_tDuplicateLog, 1, szText)
+			local nCount = #h.MY_tDuplicateLog - MAX_CHAT_RECORD
+			if nCount > 0 then
+				for i = nCount, 1, -1 do
+					table.remove(h.MY_tDuplicateLog)
 				end
 			end
 		end
