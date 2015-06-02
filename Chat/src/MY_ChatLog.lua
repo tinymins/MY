@@ -266,6 +266,7 @@ function _C.UiAppendLog(szChannel, szMsg)
 	if not (_C.uiLog and szChannel == MY_ChatLog.szActiveChannel) then
 		return
 	end
+	local bBottom = _C.uiLog:scroll() == 100
 	if MY_ChatMosaics then
 		local h = _C.uiLog:hdl(1):raw(1)
 		local nCount
@@ -278,6 +279,9 @@ function _C.UiAppendLog(szChannel, szMsg)
 		end
 	else
 		_C.uiLog:append(szMsg)
+	end
+	if bBottom then
+		_C.uiLog:scroll(100)
 	end
 end
 
