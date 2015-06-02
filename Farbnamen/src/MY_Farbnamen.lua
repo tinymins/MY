@@ -358,7 +358,7 @@ MY_Farbnamen.GetMenu = function()
         end,
     })
     table.insert(t, {
-        szOption = _L["set max cache count"],
+        szOption = _L["set max cache count"] .. '(' .. Config.nMaxCache .. ')',
         fnAction = function()
             GetUserInputNumber(
                 Config.nMaxCache,
