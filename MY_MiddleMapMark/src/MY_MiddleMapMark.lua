@@ -5,7 +5,7 @@
 -- @Date  : 2014-12-04 11:51:31
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-18 10:24:09
+-- @Last Modified time: 2015-06-04 17:56:10
 -----------------------------------------------
 MY_MiddleMapMark = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_MiddleMapMark/lang/")
@@ -269,9 +269,10 @@ _C.PS.OnPanelActive = function(wnd)
 	  	local aMap = GetMapList()
 	  	local i, N = 1, #aMap
 	  	local n, M = 0, 200
+	  	local S    = 2
 
 	  	MY.BreatheCall('MY_MiddleMapMark_Searching_Threading', function()
-	  		for _ = 1, 10 do
+	  		for _ = 1, S do
 	  			local dwMapID = aMap[i]
 	  			local data = MY_MiddleMapMark.GetMapData(dwMapID)
 	  			local tNames = {}
