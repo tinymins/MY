@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-01 17:04:31
+-- @Last Modified time: 2015-06-04 15:35:30
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -1674,8 +1674,13 @@ function _MY.UI:font(nFont)
 	if nFont then-- set name
 		for _, ele in pairs(self.eles) do
 			local x = ele.txt or ele.edt or ele.raw
-			if x and x.SetFontScheme then
-				x:SetFontScheme(nFont)
+			if x then
+				if x.SetFontScheme then
+					x:SetFontScheme(nFont)
+				end
+				if x.SetSelectFontScheme then
+					x:SetSelectFontScheme(nFont)
+				end
 			end
 		end
 		return self
