@@ -104,8 +104,14 @@ MYDev_Snaplines.GetElementTip = function(raw, tTip)
             table.insert(tTip, _L('OverTextPosition4: %s', raw:GetOverTextPosition(4)))
         end
         table.insert(tTip, _L('Index: %s', raw:GetIndex()))
-
     end
+    local data = {}
+    for k, v in pairs(raw) do
+        if type(v) ~= "function" then
+            data[k] = v
+        end
+    end
+    table.insert(tTip, _L('data: %s', var2str(data, "\t")))
     
     return tTip
 end
