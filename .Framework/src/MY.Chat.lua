@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-01 16:03:54
+-- @Last Modified time: 2015-06-06 20:43:01
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -224,6 +224,8 @@ MY.Chat.LinkEventHandler = {
 		end
 		if IsCtrlKeyDown() then
 			MY.Chat.CopyChatItem(hT)
+		elseif IsAltKeyDown() then
+			MY.SetTarget(MY.UI(hT):text())
 		else
 			MY.SwitchChat(MY.UI(hT):text())
 			local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
@@ -818,8 +820,25 @@ _C.HookChatPanelHandle = function(h, szMsg, szChannel, ...)
 		-- the rest is fnAfter param
 		_C.tHookChatFun[i].param = result
 	end
+	local nIndex = h:GetItemCount()
 	-- call ori append
 	h:_AppendItemFromString_MY(szMsg, szChannel, ...)
+	-- hook namelink lbutton down
+	for i = h:GetItemCount() - 1, nIndex, -1 do
+		local hItem = h:Lookup(i)
+		if hItem:GetName():find("^namelink_%d+$") then
+			hItem.bMyChatRendered = true
+			if hItem.OnItemLButtonDown then
+				hItem.__MY_OnItemLButtonDown = hItem.OnItemLButtonDown
+				hItem.OnItemLButtonDown = function(...)
+					hItem.__MY_OnItemLButtonDown(...)
+					MY.Chat.LinkEventHandler.OnNameLClick(...)
+				end
+			else
+				hItem.OnItemLButtonDown = MY.Chat.LinkEventHandler.OnNameLClick
+			end
+		end
+	end
 	-- deal with fnAfter
 	for i, handle in ipairs(_C.tHookChatFun) do
 		pcall(handle.fnAfter, h, szChannel, szMsg, unpack(handle.param))
