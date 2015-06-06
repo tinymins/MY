@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-28 21:19:27
+-- @Last Modified time: 2015-06-06 20:11:05
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -500,13 +500,13 @@ MY.GetTarget = MY.Player.GetTarget
 -- dwID     -- 目标 ID
 MY.Player.SetTarget = function(dwType, dwID)
 	-- check dwType
-	if type(dwType)=="userdata" then
+	if type(dwType) == "userdata" then
 		dwType, dwID = ( IsPlayer(dwType) and TARGET.PLAYER ) or TARGET.NPC, dwType.dwID
-	elseif type(dwType)=="string" then
-		dwType, dwID = 0, dwType
+	elseif type(dwType) == "string" then
+		dwType, dwID = 0, dwType:gsub('[%[%]]', '')
 	end
 	-- conv if dwID is string
-	if type(dwID)=="string" then
+	if type(dwID) == "string" then
 		for _, p in pairs(MY.GetNearNpc()) do
 			if p.szName == dwID then
 				dwType, dwID = TARGET.NPC, p.dwID
