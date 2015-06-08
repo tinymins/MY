@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-06 20:11:05
+-- @Last Modified time: 2015-06-08 10:24:30
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -648,15 +648,24 @@ MY.Player.Equip = function(szName)
 end
 
 -- 获取对象的buff列表
--- (table) MY.GetBuffList(obj)
-MY.Player.GetBuffList = function(obj)
-	obj = obj or GetClientPlayer()
+-- (table) MY.GetBuffList(KObject)
+MY.Player.GetBuffList = function(KObject)
+	KObject = KObject or GetClientPlayer()
 	local aBuffTable = {}
-	local nCount = obj.GetBuffCount() or 0
+	local nCount = KObject.GetBuffCount() or 0
 	for i=1,nCount,1 do
-		local dwID, nLevel, bCanCancel, nEndFrame, nIndex, nStackNum, dwSkillSrcID, bValid = obj.GetBuff(i - 1)
+		local dwID, nLevel, bCanCancel, nEndFrame, nIndex, nStackNum, dwSkillSrcID, bValid = KObject.GetBuff(i - 1)
 		if dwID then
-			table.insert(aBuffTable,{dwID = dwID, nLevel = nLevel, bCanCancel = bCanCancel, nEndFrame = nEndFrame, nIndex = nIndex, nStackNum = nStackNum, dwSkillSrcID = dwSkillSrcID, bValid = bValid})
+			table.insert(aBuffTable, {
+				dwID         = dwID        ,
+				nLevel       = nLevel      ,
+				bCanCancel   = bCanCancel  ,
+				nEndFrame    = nEndFrame   ,
+				nIndex       = nIndex      ,
+				nStackNum    = nStackNum   ,
+				dwSkillSrcID = dwSkillSrcID,
+				bValid       = bValid      ,
+			})
 		end
 	end
 	return aBuffTable
@@ -664,37 +673,42 @@ end
 MY.GetBuffList = MY.Player.GetBuffList
 
 -- 获取对象的buff
--- (table) MY.GetBuff(obj)
-MY.Player.GetBuff = function(obj, dwID, nLevel)
-	if type(obj) == "number" then
-		obj, dwID, nLevel = GetClientPlayer(), obj, dwID
+-- (table) MY.GetBuff([KObject, ]dwID[, nLevel])
+MY.Player.GetBuff = function(KObject, dwID, nLevel)
+	local tBuff = {}
+	if type(KObject) ~= "userdata" then
+		KObject, dwID, nLevel = GetClientPlayer(), KObject, dwID
 	end
-	if not nLevel then
-		for _, buff in ipairs(MY.Player.GetBuffList(obj)) do
-			if buff.dwID == dwID then
-				return buff
-			end
-		end
-	else
-		for _, buff in ipairs(MY.Player.GetBuffList(obj)) do
-			if buff.dwID == dwID and buff.nLevel == nLevel then
-				return buff
-			end
+	if type(dwID) == "table" then
+		tBuff = dwID
+	elseif type(dwID) == "number" then
+		if type(nLevel) == "number" then
+			tBuff[dwID] = nLevel
+		else
+			tBuff[dwID] = 0
 		end
 	end
-	return nil
+	if not KObject.GetBuff then
+		return MY.Debug({"KObject do not have a function named GetBuff."}, "MY.Player.GetBuff", MY_DEBUG.ERROR)
+	end
+	for k, v in pairs(tBuff) do
+		local KBuff = KObject.GetBuff(k, v)
+		if KBuff then
+			return KBuff
+		end
+	end
 end
 MY.GetBuff = MY.Player.GetBuff
 
 -- 获取对象是否无敌
--- (mixed) MY.Player.IsInvincible([object obj])
--- @return <nil >: invalid obj
+-- (mixed) MY.Player.IsInvincible([object KObject])
+-- @return <nil >: invalid KObject
 -- @return <bool>: object invincible state
-MY.Player.IsInvincible = function(obj)
-	obj = obj or GetClientPlayer()
-	if not obj then
+MY.Player.IsInvincible = function(KObject)
+	KObject = KObject or GetClientPlayer()
+	if not KObject then
 		return nil
-	elseif MY.Player.GetBuff(obj, 961) then
+	elseif MY.Player.GetBuff(KObject, 961) then
 		return true
 	else
 		return false
