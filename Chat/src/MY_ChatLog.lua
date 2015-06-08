@@ -213,6 +213,8 @@ function _C.UiDrawPrev(nCount)
 	elseif not _C.nDrawDate then -- 还没有加载进度
 		_C.nDrawDate = DateList[#DateList]
 	end
+	local nPos = 0
+	local nLen = h:GetItemCount()
 	-- 防止UI递归死循环 资源锁
 	_C.bUiDrawing = GetLogicFrameCount()
 	-- 保存当前滚动条位置
@@ -248,6 +250,8 @@ function _C.UiDrawPrev(nCount)
 		end
 	end
 	h:FormatAllItemPos()
+	nLen = h:GetItemCount() - nLen
+	MY_ChatMosaics.Mosaics(h, nPos, nLen)
 	-- 恢复之前滚动条位置
 	if nOrginScrollY < 0 then -- 之前没有滚动条
 		if _C.uiLog:scroll() >= 0 then -- 现在有滚动条

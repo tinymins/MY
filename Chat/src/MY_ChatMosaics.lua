@@ -5,7 +5,7 @@
 -- @Date  : 2015-05-21 10:34:08
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-21 20:38:38
+-- @Last Modified time: 2015-06-08 11:14:48
 -- @Version: 1.0
 -- @ChangeLog:
 --  + v1.0 File founded. -- viaµÔÒ»Ãù
@@ -46,9 +46,10 @@ _C.NameLink_GetText = function(h, ...)
 	return h.__MY_szText or h.__MY_GetText(h, ...)
 end
 
-_C.Mosaics = function(h, nPos)
+_C.Mosaics = function(h, nPos, nLen)
 	if h then
-		for i = h:GetItemCount() - 1, nPos or 0, -1 do
+		local nEndPos = (nLen and (nPos + nLen)) or (h:GetItemCount() - 1)
+		for i = nPos or 0, nEndPos do
 			local hItem = h:Lookup(i)
 			if hItem and (hItem:GetName():sub(0, 9)) == "namelink_" then
 				if MY_ChatMosaics.bEnabled then
