@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-09 11:59:42
+-- @Last Modified time: 2015-06-09 12:00:50
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 MY = MY or {}
@@ -339,9 +339,9 @@ _C.tDelayCall = {}    -- delay call 队列
 _C.tBreatheCall = {}  -- breathe call 队列
 
 -- 延迟调用
--- (void) MY.DelayCall([string szKey, ]function fnAction[, number nDelay]) -- 注册
--- (void) MY.DelayCall(string szKey, number nDelay) -- 改变Delay时间
--- (void) MY.DelayCall(string szKey) -- 注销
+-- (string szKey) MY.DelayCall([string szKey, ]function fnAction[, number nDelay]) -- 注册
+-- (string szKey) MY.DelayCall(string szKey, number nDelay) -- 改变Delay时间
+-- (string szKey) MY.DelayCall(string szKey) -- 注销
 -- szKey       -- 延迟调用ID 用于取消调用
 -- fnAction    -- 调用函数
 -- nDelay      -- 延迟调用时间，单位：毫秒，实际调用延迟延迟是 62.5 的整倍数
@@ -367,11 +367,12 @@ MY.DelayCall = function(szKey, fnAction, nDelay)
 	elseif szKey then -- unreg
 		_C.tDelayCall[szKey] = nil
 	end
+	return szKey
 end
 
 -- 注册呼吸循环调用函数
--- (void) MY.BreatheCall([string szKey, ]function fnAction[, number nInterval])
--- (void) MY.BreatheCallDelay(string szKey, nTime) -- 改变呼吸调用频率
+-- (string szKey) MY.BreatheCall([string szKey, ]function fnAction[, number nInterval])
+-- (string szKey) MY.BreatheCallDelay(string szKey, nTime) -- 改变呼吸调用频率
 -- szKey       -- 名称，必须唯一，重复则覆盖
 -- fnAction    -- 循环呼吸调用函数，设为 nil 则表示取消这个 key 下的呼吸处理函数
 -- nInterval   -- 调用间隔，单位：毫秒，默认为 62.5，即每秒调用 16次，其值自动被处理成 62.5 的整倍数
@@ -399,6 +400,7 @@ MY.BreatheCall = function(szKey, fnAction, nInterval)
 	elseif szKey then -- unreg
 		_C.tBreatheCall[szKey] = nil
 	end
+	return szKey
 end
 
 -- 延迟一次呼吸函数的调用频率
