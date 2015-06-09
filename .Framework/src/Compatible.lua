@@ -4,12 +4,14 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-02 10:55:53
+-- @Last Modified time: 2015-06-09 19:54:50
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 XML_LINE_BREAKER = GetFormatText("\n")
 local XML_LINE_BREAKER = XML_LINE_BREAKER
-local tinsert, tconcat, tremove = table.insert, table.concat, table.remove
+local srep, tostring, string2byte = string.rep, tostring, string.byte
+local tconcat, tinsert, tremove = table.concat, table.insert, table.remove
+local type, next, print, pairs, ipairs = type, next, print, pairs, ipairs
 if not GetCampImageFrame then
 	function GetCampImageFrame(eCamp, bFight)	-- ui\Image\UICommon\CommonPanel2.UITex
 		local nFrame = nil
