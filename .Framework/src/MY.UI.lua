@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-04 15:35:30
+-- @Last Modified time: 2015-06-09 09:51:00
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -815,6 +815,21 @@ function _MY.UI:append(arg0, arg1, arg2)
 									Wnd.CloseWindow("PopupMenuPanel")
 								end
 							end)
+						end
+						edt.OnEditSpecialKeyDown = function()
+							local szKey = GetKeyName(Station.GetMessageKey())
+							if IsPopupMenuOpened() and PopupMenu_ProcessHotkey then
+								if szKey == "Enter"
+								or szKey == "Up"
+								or szKey == "Down"
+								or szKey == "Left"
+								or szKey == "Right" then
+									return PopupMenu_ProcessHotkey()
+								end
+							elseif szKey == "Enter" then
+								Station.SetFocusWindow(MY.GetFrame())
+								return 1
+							end
 						end
 						wnd.tMyAcOption = {
 							beforeSearch = nil  , -- @param: wnd, option
