@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-09 12:00:50
+-- @Last Modified time: 2015-06-09 12:03:57
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 MY = MY or {}
@@ -305,7 +305,7 @@ MY.RemoteRequest = function(szUrl, fnSuccess, fnError, nTimeout)
 	-- do with this remote request
 	MY.Debug({szUrl}, 'MYRR', MY_DEBUG.LOG)
 	-- register request timeout clock
-	MY.DelayCall(function()
+	MY.DelayCall("MYRR_TO_" .. RequestID, function()
 		MY.Debug({szUrl}, 'MYRR::Timeout', MY_DEBUG.WARNING) -- log
 		-- request timeout, call timeout function.
 		local status, err = pcall(fnError, szUrl, "timeout")
@@ -313,7 +313,7 @@ MY.RemoteRequest = function(szUrl, fnSuccess, fnError, nTimeout)
 			MY.Debug({err}, 'MYRR::TIMEOUT', MY_DEBUG.ERROR)
 		end
 		table.insert(_C.tFreeWebPages, RequestID)
-	end, nTimeout, "MYRR_TO_" .. RequestID)
+	end, nTimeout)
 	
 	-- start ie navigate
 	hPage:Navigate(szUrl)
