@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-09 11:02:37
+-- @Last Modified time: 2015-06-09 11:33:26
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 MY = MY or {}
@@ -339,53 +339,32 @@ _C.tDelayCall = {}    -- delay call 队列
 _C.tBreatheCall = {}  -- breathe call 队列
 
 -- 延迟调用
--- (void) MY.DelayCall(func fnAction, number nDelay, string szName)
+-- (void) MY.DelayCall([string szKey, ]function fnAction[, number nDelay]) -- 注册
+-- (void) MY.DelayCall(string szKey, number nDelay) -- 改变Delay时间
+-- (void) MY.DelayCall(string szKey) -- 注销
+-- szKey       -- 延迟调用ID 用于取消调用
 -- fnAction    -- 调用函数
--- nTime       -- 延迟调用时间，单位：毫秒，实际调用延迟延迟是 62.5 的整倍数
--- szName      -- 延迟调用ID 用于取消调用
--- 取消调用
--- (void) MY.DelayCall(string szName)
--- szName      -- 延迟调用ID
-MY.DelayCall = function(arg0, arg1, arg2, arg3)
-	local fnAction, nDelay, szName, param = nil, nil, nil, {}
-	if type(arg0)=='function' then fnAction = arg0 end
-	if type(arg1)=='function' then fnAction = arg1 end
-	if type(arg2)=='function' then fnAction = arg2 end
-	if type(arg3)=='function' then fnAction = arg3 end
-	if type(arg0)=='string' then szName = arg0 end
-	if type(arg1)=='string' then szName = arg1 end
-	if type(arg2)=='string' then szName = arg2 end
-	if type(arg3)=='string' then szName = arg3 end
-	if type(arg0)=='number' then nDelay = arg0 end
-	if type(arg1)=='number' then nDelay = arg1 end
-	if type(arg2)=='number' then nDelay = arg2 end
-	if type(arg3)=='number' then nDelay = arg3 end
-	if type(arg0)=='table' then param = arg0 end
-	if type(arg1)=='table' then param = arg1 end
-	if type(arg2)=='table' then param = arg2 end
-	if type(arg3)=='table' then param = arg3 end
-	if not fnAction and not szName then return nil end
-	
-	if szName and nDelay and not fnAction then -- 调整DelayCall延迟时间
-		for i = #_C.tDelayCall, 1, -1 do
-			if _C.tDelayCall[i].szName == szName then
-				_C.tDelayCall[i].nTime = nDelay + GetTime()
-			end
+-- nDelay      -- 延迟调用时间，单位：毫秒，实际调用延迟延迟是 62.5 的整倍数
+MY.DelayCall = function(szKey, fnAction, nDelay)
+	if type(szKey) == "function" then
+		szKey, fnAction, nDelay = GetTickCount(), szKey, fnAction
+		while _C.tDelayCall[szKey] do
+			szKey = szKey + 0.1
 		end
-	else -- 一个新的DelayCall（或者覆盖原来的）
-		if szName then
-			for i = #_C.tDelayCall, 1, -1 do
-				if _C.tDelayCall[i].szName == szName then
-					table.remove(_C.tDelayCall, i)
-				end
-			end
+	elseif type(fnAction) == "number" then
+		nDelay, fnAction = fnAction
+	end
+	if fnAction then -- reg
+		if not nDelay then
+			nDelay = 1
 		end
-		if fnAction then
-			if not nDelay then
-				nDelay = 1000 / GLOBAL.GAME_FPS
-			end
-			table.insert(_C.tDelayCall, { nTime = nDelay + GetTime(), fnAction = fnAction, szName = szName, param = {} })
+		_C.tDelayCall[szKey] = { nTime = nDelay + GetTickCount(), fnAction = fnAction }
+	elseif nDelay then -- modify
+		if _C.tDelayCall[szKey] then
+			_C.tDelayCall[szKey].nTime = nDelay + GetTickCount()
 		end
+	elseif szKey then -- unreg
+		_C.tDelayCall[szKey] = nil
 	end
 end
 
@@ -452,15 +431,14 @@ MY.UI.RegisterUIEvent(MY, "OnFrameBreathe", function()
 		end
 	end
 	-- run delay calls
-	local nTime = GetTime()
-	for i = #_C.tDelayCall, 1, -1 do
-		local dc = _C.tDelayCall[i]
+	local nTime = GetTickCount()
+	for szKey, dc in pairs(_C.tDelayCall) do
 		if dc.nTime <= nTime then
-			local res, err = pcall(dc.fnAction, unpack(dc.param))
+			local res, err = pcall(dc.fnAction)
 			if not res then
-				MY.Debug({err}, "DelayCall#" .. (dc.szName or i), MY_DEBUG.ERROR)
+				MY.Debug({err}, "DelayCall#" .. szKey, MY_DEBUG.ERROR)
 			end
-			table.remove(_C.tDelayCall, i)
+			_C.tDelayCall[szKey] = nil
 		end
 	end
 end)
