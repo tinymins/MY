@@ -473,15 +473,15 @@ _C.Init = function()
             MY.DelayCall('MY_ChatMonitor_Hide')
             _C.uiFrame:fadeIn(500)
         else
-            MY.DelayCall(function()
+            MY.DelayCall('MY_ChatMonitor_Hide', function()
                 _C.uiFrame:fadeOut(500)
-            end, 5000, 'MY_ChatMonitor_Hide')
+            end, 5000)
         end
       end)
     -- init tip panel animate
-    MY.DelayCall(function()
+    MY.DelayCall('MY_ChatMonitor_Hide', function()
         _C.uiFrame:fadeOut(500)
-    end, 10000, 'MY_ChatMonitor_Hide')
+    end, 10000)
     -- show tip
     _C.ShowTip()
 end

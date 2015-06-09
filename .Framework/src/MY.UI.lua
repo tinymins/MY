@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-09 10:45:58
+-- @Last Modified time: 2015-06-09 11:05:32
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -796,11 +796,11 @@ function _MY.UI:append(arg0, arg1, arg2)
 							-- min search length
 							if len >= wnd.tMyAcOption.minLength then
 								-- delay search
-								MY.DelayCall(wnd.tMyAcOption.delay, function()
+								MY.DelayCall(function()
 									MY.UI(wnd):autocomplete('search')
 									-- for compatible
 									Station.SetFocusWindow(edt)
-								end)
+								end, wnd.tMyAcOption.delay)
 							else
 								MY.UI(wnd):autocomplete('close')
 							end
