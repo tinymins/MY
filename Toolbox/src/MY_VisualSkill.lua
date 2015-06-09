@@ -4,7 +4,7 @@
 -- @Date  : 2015-03-02 10:08:45
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-16 21:34:45
+-- @Last Modified time: 2015-06-09 10:50:16
 --------------------------------------------
 -- ##########################################################################################################################
 --       *         *   *                   *                                   *                           *     *           
@@ -141,7 +141,7 @@ MY_VisualSkill.OnSkillCast = function(dwSkillID, dwSkillLevel)
 	boxEnter:raw(1):SetObjectIcon(dwIconID)
 	local nEnterDesLeft = MY_VisualSkill.nVisualSkillBoxCount*53 + 45
 	boxEnter:fadeTo(nAnimateFrameCount * 75, 255)
-	MY.BreatheCall(function()
+	MY.BreatheCall("#Box_1"..i, function()
 		local nLeft = boxEnter:left()
 		local nSpentFrameCount = GetLogicFrameCount() - nStartFrame
 		if nSpentFrameCount < nAnimateFrameCount then
@@ -150,10 +150,10 @@ MY_VisualSkill.OnSkillCast = function(dwSkillID, dwSkillLevel)
 			boxEnter:left(nEnterDesLeft)
 			return 0
 		end
-	end, "#Box_1"..i)
-	MY.DelayCall(function()
+	end)
+	MY.DelayCall("#Box_1"..i, function()
 		boxEnter:fadeTo(nAnimateFrameCount * 75, 0)
-	end, "#Box_1"..i, 15000)
+	end, 15000)
 	
 	-- box leave
 	i = ( i + 1 ) % (MY_VisualSkill.nVisualSkillBoxCount + 1)
@@ -161,7 +161,7 @@ MY_VisualSkill.OnSkillCast = function(dwSkillID, dwSkillLevel)
 	boxLeave:raw(1):SetObjectCoolDown(0)
 	local nLeaveDesLeft = -200
 	boxLeave:fadeTo(nAnimateFrameCount * 75, 0)
-	MY.BreatheCall(function()
+	MY.BreatheCall("#Box_1"..i, function()
 		local nLeft = boxLeave:left()
 		local nSpentFrameCount = GetLogicFrameCount() - nStartFrame
 		if nSpentFrameCount < nAnimateFrameCount then
@@ -170,13 +170,13 @@ MY_VisualSkill.OnSkillCast = function(dwSkillID, dwSkillLevel)
 			boxLeave:left(45+MY_VisualSkill.nVisualSkillBoxCount*53+300)
 			return 0
 		end
-	end, "#Box_1"..i)
+	end)
 	
 	-- box middle
 	for j = 2, MY_VisualSkill.nVisualSkillBoxCount do
 		i = ( i + 1 ) % (MY_VisualSkill.nVisualSkillBoxCount + 1)
 		local box, nDesLeft = ui:item("#Box_1"..i), j*53-8
-		MY.BreatheCall(function()
+		MY.BreatheCall("#Box_1"..i, function()
 			local nLeft = box:left()
 			local nSpentFrameCount = GetLogicFrameCount() - nStartFrame
 			if nSpentFrameCount < nAnimateFrameCount then
@@ -185,7 +185,7 @@ MY_VisualSkill.OnSkillCast = function(dwSkillID, dwSkillLevel)
 				box:left(nDesLeft)
 				return 0
 			end
-		end, "#Box_1"..i)
+		end)
 	end
 	
 	-- update index

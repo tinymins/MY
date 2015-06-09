@@ -290,7 +290,7 @@ _MY_Logoff.OnPanelActive = function(wnd)
 	  	if _MY_Logoff.bStart then
 	  		_MY_Logoff.nTimeOutUnixTime = MY_Logoff.nTimeOut + GetCurrentTime()
 	  		MY_Logoff.PrintCurrentCondition(PLAYER_TALK_CHANNEL.LOCAL_SYS)
-	  		MY.BreatheCall(MY_Logoff.ConditionLogOff, 300, "MY_ConditionLogOff")
+	  		MY.BreatheCall("MY_ConditionLogOff", MY_Logoff.ConditionLogOff, 300)
 	  	else
 	  		MY.BreatheCall("MY_ConditionLogOff")
 	  	end
