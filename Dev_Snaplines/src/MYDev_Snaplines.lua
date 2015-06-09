@@ -2,7 +2,10 @@
 -- 开发者工具
 -- by 茗伊 @ 双梦镇 @ 荻花宫
 -- Build 20140730
--- 
+--
+local tostring, string2byte = tostring, string.byte
+local srep, tconcat, tinsert = string.rep, table.concat, table.insert
+local type, next, print, pairs, ipairs = type, next, print, pairs, ipairs
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Dev_Snaplines/lang/")
 local _Cache = {}
 MYDev_Snaplines = {}
@@ -24,6 +27,62 @@ MYDev_Snaplines.rgbTip = {255, 255, 0}
 RegisterCustomData('MYDev_Snaplines.rgbTip')
 MYDev_Snaplines.nTipFont = 40
 RegisterCustomData('MYDev_Snaplines.nTipFont')
+
+local function var2str(var, indent, level)
+    local function table_r(var, level, indent)
+        local t = {}
+        local szType = type(var)
+        if szType == "nil" then
+            tinsert(t, "nil")
+        elseif szType == "number" then
+            tinsert(t, tostring(var))
+        elseif szType == "string" then
+            tinsert(t, string.format("%q", var))
+        -- elseif szType == "function" then
+            -- local s = string.dump(var)
+            -- tinsert(t, 'loadstring("')
+            -- -- "string slice too long"
+            -- for i = 1, #s, 2000 do
+            --     tinsert(t, tconcat({'', string2byte(s, i, i + 2000 - 1)}, "\\"))
+            -- end
+            -- tinsert(t, '")')
+        elseif szType == "boolean" then
+            tinsert(t, tostring(var))
+        elseif szType == "table" then
+            tinsert(t, "{")
+            local s_tab_equ = "]="
+            if indent then
+                s_tab_equ = "] = "
+                if not empty(var) then
+                    tinsert(t, "\n")
+                end
+            end
+            for key, val in pairs(var) do
+                if indent then
+                    tinsert(t, srep(indent, level + 1))
+                end
+                tinsert(t, "[")
+                tinsert(t, table_r(key, level + 1, indent))
+                tinsert(t, s_tab_equ) --"] = "
+                tinsert(t, table_r(val, level + 1, indent))
+                tinsert(t, ",")
+                if indent then
+                    tinsert(t, "\n")
+                end
+            end
+            if indent and not empty(var) then
+                tinsert(t, srep(indent, level))
+            end
+            tinsert(t, "}")
+        else --if (szType == "userdata") then
+            tinsert(t, '"')
+            tinsert(t, tostring(var))
+            tinsert(t, '"')
+        end
+        return tconcat(t)
+    end
+    return table_r(var, level or 0, indent)
+end
 
 MYDev_Snaplines.GetElementTip = function(raw, tTip)
     if type(tTip) ~= 'table' then
