@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-09 09:51:00
+-- @Last Modified time: 2015-06-09 10:45:58
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -1591,7 +1591,7 @@ function _MY.UI:fadeTo(nTime, nOpacity, callback)
 				return ( nEnd - nStart ) * nDuringTime / nTotalTime + nStart -- 线性模型
 			end
 			if not ele:visible() then ele:alpha(0):toggle(true) end
-			MY.BreatheCall(function() 
+			MY.BreatheCall("MY_FADE_" .. MY.UI.GetTreePath(ele:raw(1)), function()
 				ele:show()
 				local nCurrentAlpha = fnCurrent(nStartAlpha, nOpacity, nTime, GetTime()-nStartTime)
 				ele:alpha(nCurrentAlpha)
@@ -1601,7 +1601,7 @@ function _MY.UI:fadeTo(nTime, nOpacity, callback)
 					pcall(callback, ele)
 					return 0
 				end
-			end, "MY_FADE_" .. MY.UI.GetTreePath(ele:raw(1)))
+			end)
 		end
 	end
 	return self

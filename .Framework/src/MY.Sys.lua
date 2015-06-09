@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-01 13:32:36
+-- @Last Modified time: 2015-06-09 11:02:37
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 MY = MY or {}
@@ -390,33 +390,15 @@ MY.DelayCall = function(arg0, arg1, arg2, arg3)
 end
 
 -- 注册呼吸循环调用函数
--- (void) MY.BreatheCall(string szKey, func fnAction[, number nTime])
+-- (void) MY.BreatheCall([string szKey, ]function fnAction[, number nInterval])
 -- szKey       -- 名称，必须唯一，重复则覆盖
 -- fnAction    -- 循环呼吸调用函数，设为 nil 则表示取消这个 key 下的呼吸处理函数
--- nTime       -- 调用间隔，单位：毫秒，默认为 62.5，即每秒调用 16次，其值自动被处理成 62.5 的整倍数
-MY.BreatheCall = function(arg1, arg2, arg3, arg4)
-	local fnAction, nInterval, szName, param = nil, nil, nil, {}
-	if type(arg1)=='string' then szName = StringLowerW(arg1) end
-	if type(arg2)=='string' then szName = StringLowerW(arg2) end
-	if type(arg3)=='string' then szName = StringLowerW(arg3) end
-	if type(arg4)=='string' then szName = StringLowerW(arg4) end
-	if type(arg1)=='number' then nInterval = arg1 end
-	if type(arg2)=='number' then nInterval = arg2 end
-	if type(arg3)=='number' then nInterval = arg3 end
-	if type(arg4)=='number' then nInterval = arg4 end
-	if type(arg1)=='function' then fnAction = arg1 end
-	if type(arg2)=='function' then fnAction = arg2 end
-	if type(arg3)=='function' then fnAction = arg3 end
-	if type(arg4)=='function' then fnAction = arg4 end
-	if type(arg1)=='table' then param = arg1 end
-	if type(arg2)=='table' then param = arg2 end
-	if type(arg3)=='table' then param = arg3 end
-	if type(arg4)=='table' then param = arg4 end
-	if szName then
-		for i = #_C.tBreatheCall, 1, -1 do
-			if _C.tBreatheCall[i].szName == szName then
-				table.remove(_C.tBreatheCall, i)
-			end
+-- nInterval   -- 调用间隔，单位：毫秒，默认为 62.5，即每秒调用 16次，其值自动被处理成 62.5 的整倍数
+MY.BreatheCall = function(szKey, fnAction, nInterval)
+	if type(szKey) == "function" then
+		szKey, fnAction, nInterval = GetTickCount(), szKey, fnAction
+		while _C.tBreatheCall[szKey] do
+			szKey = szKey + 0.1
 		end
 	end
 	if fnAction then
@@ -424,7 +406,9 @@ MY.BreatheCall = function(arg1, arg2, arg3, arg4)
 		if nInterval and nInterval > 0 then
 			nFrame = math.ceil(nInterval / 62.5)
 		end
-		table.insert( _C.tBreatheCall, { szName = szName, fnAction = fnAction, nNext = GetLogicFrameCount() + 1, nFrame = nFrame, param = param } )
+		_C.tBreatheCall[szKey] = { fnAction = fnAction, nNext = GetLogicFrameCount() + 1, nFrame = nFrame }
+	elseif szKey then
+		_C.tBreatheCall[szKey] = nil
 	end
 end
 
@@ -432,11 +416,10 @@ end
 -- (void) MY.BreatheCallDelay(string szKey, nTime)
 -- nTime       -- 延迟时间，每 62.5 延迟一帧
 MY.BreatheCallDelay = function(szKey, nTime)
-	for _, t in ipairs(_C.tBreatheCall) do
-		if t.szName == StringLowerW(szKey) then
-			t.nFrame = math.ceil(nTime / 62.5)
-			t.nNext = GetLogicFrameCount() + t.nFrame
-		end
+	local bc = _C.tBreatheCall[szKey]
+	if bc then
+		bc.nFrame = math.ceil(nTime / 62.5)
+		bc.nNext = GetLogicFrameCount() + bc.nFrame
 	end
 end
 
@@ -444,10 +427,9 @@ end
 -- (void) MY.BreatheCallDelayOnce(string szKey, nTime)
 -- nTime       -- 延迟时间，每 62.5 延迟一帧
 MY.BreatheCallDelayOnce = function(szKey, nTime)
-	for _, t in ipairs(_C.tBreatheCall) do
-		if t.szName == StringLowerW(szKey) then
-			t.nNext = GetLogicFrameCount() + math.ceil(nTime / 62.5)
-		end
+	local bc = _C.tBreatheCall[szKey]
+	if bc then
+		bc.nNext = GetLogicFrameCount() + math.ceil(nTime / 62.5)
 	end
 end
 
@@ -457,20 +439,15 @@ MY.UI.RegisterUIEvent(MY, "OnFrameBreathe", function()
 	_C.nLogicFrameCount = GetLogicFrameCount()
 	_C.nFrameCount = _C.nFrameCount + 1
 	-- run breathe calls
-	local nFrame = _C.nLogicFrameCount
-	for i = #_C.tBreatheCall, 1, -1 do
-		if nFrame >= _C.tBreatheCall[i].nNext then
-			local bc = _C.tBreatheCall[i]
+	local nFrame = GetLogicFrameCount()
+	for szKey, bc in pairs(_C.tBreatheCall) do
+		if nFrame >= bc.nNext then
 			bc.nNext = nFrame + bc.nFrame
-			local res, err = pcall(bc.fnAction, unpack(bc.param))
+			local res, err = pcall(bc.fnAction)
 			if not res then
-				MY.Debug({err}, "BreatheCall#" .. (bc.szName or i), MY_DEBUG.ERROR)
+				MY.Debug({err}, "BreatheCall#" .. szKey, MY_DEBUG.ERROR)
 			elseif err == 0 then    -- function return 0 means to stop its breathe
-				for i = #_C.tBreatheCall, 1, -1 do
-					if _C.tBreatheCall[i] == bc then
-						table.remove(_C.tBreatheCall, i)
-					end
-				end
+				_C.tBreatheCall[szKey] = nil
 			end
 		end
 	end
@@ -492,7 +469,7 @@ end)
 MY.RegisterEvent('LOADING_END', function()
 	local nFrameOffset = GetLogicFrameCount() - _C.nLogicFrameCount
 	_C.nLogicFrameCount = GetLogicFrameCount()
-	for _, bc in ipairs(_C.tBreatheCall) do
+	for _, bc in pairs(_C.tBreatheCall) do
 		bc.nNext = bc.nNext + nFrameOffset
 	end
 end)
