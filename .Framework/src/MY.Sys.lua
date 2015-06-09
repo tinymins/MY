@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-09 11:33:26
+-- @Last Modified time: 2015-06-09 11:59:42
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 MY = MY or {}
@@ -360,8 +360,9 @@ MY.DelayCall = function(szKey, fnAction, nDelay)
 		end
 		_C.tDelayCall[szKey] = { nTime = nDelay + GetTickCount(), fnAction = fnAction }
 	elseif nDelay then -- modify
-		if _C.tDelayCall[szKey] then
-			_C.tDelayCall[szKey].nTime = nDelay + GetTickCount()
+		local dc = _C.tDelayCall[szKey]
+		if dc then
+			bc.nTime = nDelay + GetTickCount()
 		end
 	elseif szKey then -- unreg
 		_C.tDelayCall[szKey] = nil
@@ -370,6 +371,7 @@ end
 
 -- 注册呼吸循环调用函数
 -- (void) MY.BreatheCall([string szKey, ]function fnAction[, number nInterval])
+-- (void) MY.BreatheCallDelay(string szKey, nTime) -- 改变呼吸调用频率
 -- szKey       -- 名称，必须唯一，重复则覆盖
 -- fnAction    -- 循环呼吸调用函数，设为 nil 则表示取消这个 key 下的呼吸处理函数
 -- nInterval   -- 调用间隔，单位：毫秒，默认为 62.5，即每秒调用 16次，其值自动被处理成 62.5 的整倍数
@@ -379,26 +381,23 @@ MY.BreatheCall = function(szKey, fnAction, nInterval)
 		while _C.tBreatheCall[szKey] do
 			szKey = szKey + 0.1
 		end
+	elseif type(fnAction) == "number" then
+		nInterval, fnAction = fnAction
 	end
-	if fnAction then
+	if fnAction then -- reg
 		local nFrame = 1
 		if nInterval and nInterval > 0 then
 			nFrame = math.ceil(nInterval / 62.5)
 		end
 		_C.tBreatheCall[szKey] = { fnAction = fnAction, nNext = GetLogicFrameCount() + 1, nFrame = nFrame }
-	elseif szKey then
+	elseif nInterval then -- modify
+		local bc = _C.tBreatheCall[szKey]
+		if bc then
+			bc.nFrame = math.ceil(nInterval / 62.5)
+			bc.nNext = GetLogicFrameCount() + bc.nFrame
+		end
+	elseif szKey then -- unreg
 		_C.tBreatheCall[szKey] = nil
-	end
-end
-
--- 改变呼吸调用频率
--- (void) MY.BreatheCallDelay(string szKey, nTime)
--- nTime       -- 延迟时间，每 62.5 延迟一帧
-MY.BreatheCallDelay = function(szKey, nTime)
-	local bc = _C.tBreatheCall[szKey]
-	if bc then
-		bc.nFrame = math.ceil(nTime / 62.5)
-		bc.nNext = GetLogicFrameCount() + bc.nFrame
 	end
 end
 
