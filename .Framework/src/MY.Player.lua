@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-08 10:24:30
+-- @Last Modified time: 2015-06-10 10:57:55
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -803,7 +803,7 @@ MY.Player.GetChannelSkillFrame = function(dwSkillID)
 	end
 end
 -- Load skill extend data
-_C.tSkillEx = MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot.."data/skill_ex", true) or {}
+_C.tSkillEx = MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. "data/skill_ex.jx3dat") or {}
 
 -- 判断当前地图是不是竞技场
 -- (bool) MY.Player.IsInArena()

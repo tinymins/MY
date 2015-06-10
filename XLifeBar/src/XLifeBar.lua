@@ -82,7 +82,8 @@ RegisterCustomData("XLifeBar.bOnlyInDungeon")
 RegisterCustomData("XLifeBar.bOnlyInArena")
 RegisterCustomData("XLifeBar.bOnlyInBattleField")
 local _C = {
-    szConfig = "userdata/XLifeBar/cfg",
+    szConfig = "userdata/XLifeBar/cfg.$lang.jx3dat",
+    szUserConfig = "userdata/XLifeBar/cfg_$uid.$lang.jx3dat",
     tObject = {},
     tTongList = {},
     tNpc = {},
@@ -100,7 +101,7 @@ _C.LoadConfig = function()
     if XLifeBar.bUseGlobalConfig then
         Config = MY.Sys.LoadLUAData(_C.szConfig)
     else
-        Config = MY.Sys.LoadUserData(_C.szConfig)
+        Config = MY.Sys.LoadLUAData(_C.szUserConfig)
     end
     Config = FormatDataStructure(Config, Config_Default)
 end
@@ -109,7 +110,7 @@ _C.SaveConfig = function()
     if XLifeBar.bUseGlobalConfig then
         MY.Sys.SaveLUAData(_C.szConfig, Config)
     else
-        MY.Sys.SaveUserData(_C.szConfig, Config)
+        MY.Sys.SaveLUAData(_C.szUserConfig, Config)
     end
 end
 MY.RegisterExit(_C.SaveConfig)

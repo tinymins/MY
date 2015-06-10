@@ -3,7 +3,7 @@
 -- Code by: 翟一鸣tinymins @ ZhaiYiMing.CoM
 -- 电五·双梦镇·茗伊
 ---------------------------------------------------
-local _GLOBAL_CONFIG_ = "config/MY_SCREENSHOT/cfg"
+local _GLOBAL_CONFIG_ = "config/MY_SCREENSHOT/cfg.$lang.jx3dat"
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."ScreenShot/lang/")
 local _MY_ScreenShot = {}
 MY_ScreenShot = MY_ScreenShot or {}

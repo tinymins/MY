@@ -51,7 +51,7 @@ local SZ_SKILL_RESULT = {
 }
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Recount/lang/")
 local _C = {
-	szCssFile   = 'config/MY_RECOUNT/style',
+	szCssFile   = 'config/MY_RECOUNT/style.jx3dat',
 	szIniRoot   = MY.GetAddonInfo().szRoot .. 'MY_Recount/ui/',
 	szIniFile   = MY.GetAddonInfo().szRoot .. 'MY_Recount/ui/Recount.ini',
 	szIniDetail = MY.GetAddonInfo().szRoot .. 'MY_Recount/ui/ShowDetail.ini',
@@ -127,7 +127,7 @@ local _C = {
 		},
 	},
 }
-_C.tCustomCss = MY.LoadLUAData(_C.szCssFile, true) or _C.tDefaultCss
+_C.tCustomCss = MY.LoadLUAData(_C.szCssFile) or _C.tDefaultCss
 
 -- 新的战斗数据时
 MY.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function()

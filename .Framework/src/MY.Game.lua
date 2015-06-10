@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-18 09:43:06
+-- @Last Modified time: 2015-06-10 11:11:21
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -----------------------------------------------
@@ -432,7 +432,7 @@ MY.Game.GetBossList = function(dwMapID)
 		dwMapID = tostring(dwMapID)
 	end
 	if not _C.tBossList then
-		_C.tBossList = MY.Sys.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/bosslist', true) or { version = 0 }
+		_C.tBossList = MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/bosslist.jx3dat') or { version = 0 }
 	end
 	
 	if dwMapID then
@@ -472,7 +472,7 @@ MY.RegisterInit('MYLIB#UPDATE_BOSSLIST', function()
 		
 		if data.version > _C.tBossList.version then
 			_C.tBossList = data
-			MY.Sys.SaveLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/bosslist', _C.tBossList, true)
+			MY.Sys.SaveLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/bosslist.jx3dat', _C.tBossList)
 			MY.Sysmsg({_L('Important Npc list updated to v%d.', data.version)})
 		end
 	end)

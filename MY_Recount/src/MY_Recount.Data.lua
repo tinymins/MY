@@ -166,7 +166,7 @@ MY_Recount.Data.nMaxHistory   = 10
 MY_Recount.Data.nMinFightTime = 30
 
 local _Cache = {
-    szRecFile = 'cache/FIGHT_RECOUNT_LOG/',
+    szRecFile = 'cache/FIGHT_RECOUNT_LOG/$uid.$lang.jx3dat',
 }
 local Data          -- 当前战斗数据记录
 local History = {}  -- 历史战斗记录
@@ -187,7 +187,7 @@ local History = {}  -- 历史战斗记录
 -- ##################################################################################################
 -- 登陆游戏加载保存的数据
 MY_Recount.Data.LoadData = function()
-    local data = MY.Sys.LoadUserData(_Cache.szRecFile) or {}
+    local data = MY.Sys.LoadLUAData(_Cache.szRecFile) or {}
     History                       = data.History       or {}
     MY_Recount.Data.nMaxHistory   = data.nMaxHistory   or 10
     MY_Recount.Data.nMinFightTime = data.nMinFightTime or 30
@@ -201,7 +201,7 @@ MY_Recount.Data.SaveData = function()
         nMaxHistory   = MY_Recount.Data.nMaxHistory  ,
         nMinFightTime = MY_Recount.Data.nMinFightTime,
     }
-    MY.Sys.SaveUserData(_Cache.szRecFile, data)
+    MY.Sys.SaveLUAData(_Cache.szRecFile, data)
 end
 
 -- 过图清除当前战斗数据
