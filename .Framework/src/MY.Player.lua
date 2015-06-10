@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-10 10:57:55
+-- @Last Modified time: 2015-06-10 14:32:14
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -333,6 +333,12 @@ MY.Player.GetTongMember = function(arg0)
 	
 	return GetTongClient().GetMemberInfo(arg0)
 end
+
+-- 判断是不是队友
+MY.Player.IsParty = function(dwID)
+	return GetClientPlayer().IsPlayerInMyParty(dwID)
+end
+MY.IsParty = MY.Player.IsParty
 
 -- ##################################################################################################
 --       #         #   #                   #             #         #                   #             
