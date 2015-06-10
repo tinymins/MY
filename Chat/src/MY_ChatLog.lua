@@ -5,7 +5,7 @@
 -- ÍøÕ¾£ºZhaiYiMing.CoM
 -- 
 local _L  = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Chat/lang/")
- _C  = {}
+local _C  = {}
 local Log = {}
 local XML_LINE_BREAKER = XML_LINE_BREAKER
 local tinsert, tconcat, tremove = table.insert, table.concat, table.remove
