@@ -139,7 +139,7 @@ MY_Farbnamen.ShowTip = function(namelink)
         -- 名称 等级
         tinsert(tTip, GetFormatText(('%s(%d)'):format(tInfo.szName, tInfo.nLevel), 136))
         -- 是否同队伍
-        if IsParty(UI_GetClientPlayerID(), tInfo.dwID) then
+        if IsParty(MY.IsParty(tInfo.dwID)) then
             tinsert(tTip, GetFormatText(_L['[teammate]'], nil, 0, 255, 0))
         end
         tinsert(tTip, XML_LINE_BREAKER)
