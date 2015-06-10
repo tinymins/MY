@@ -117,8 +117,21 @@ function _C.GetCurrentDate()
 	return tonumber(MY.Sys.FormatTime("yyyyMMdd", GetCurrentTime()))
 end
 
-function _C.RebuildDateList(szChannel, nScanDays)
-	
+function _C.RebuildDateList(tChannels, nScanDays)
+	_C.UnloadLog()
+	for _, szChannel in ipairs(tChannels) do
+		Log[szChannel] = { DateList = {} }
+		local nEndedDate = tonumber(MY.Sys.FormatTime("yyyyMMdd", GetCurrentTime()))
+		local nStartDate = nEndedDate - nScanDays
+		local tDateList  = Log[szChannel].DateList
+		for dwDate = nStartDate, nEndedDate do
+			if IsFileExist(MY.GetLUADataPath(DATA_PATH:format(szChannel, dwDate))) then
+				tinsert(tDateList, dwDate)
+				_C.tModifiedLog[szChannel] = { DateList = true }
+			end
+		end
+	end
+	_C.UnloadLog()
 end
 
 function _C.GetDateList(szChannel)
@@ -342,6 +355,15 @@ function _C.OnPanelActive(wnd)
 	  			bCheck = true, bChecked = MY_ChatLog.bIgnoreTongOnlineMsg,
 	  			fnAction = function()
 	  				MY_ChatLog.bIgnoreTongOnlineMsg = not MY_ChatLog.bIgnoreTongOnlineMsg
+	  			end,
+	  		})
+	  		table.insert(t, {
+	  			szOption = _L['rebuild date list'],
+	  			fnAction = function()
+	  				_C.RebuildDateList({
+	  					"MSG_GUILD", "MSG_WHISPER", "MSG_TEAM", "MSG_FRIEND"
+	  				}, 300)
+	  				_C.UiRedrawLog()
 	  			end,
 	  		})
 	  		return t
