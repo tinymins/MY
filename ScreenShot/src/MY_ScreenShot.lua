@@ -152,14 +152,14 @@ _MY_ScreenShot.OnPanelActive = function(wnd)
     fnRefreshPanel(ui)
     
     -- 注册默认工具检查
-    MY.BreatheCall("MY_ScreenShot_Hotkey_Check", function(ui)
+    MY.BreatheCall("MY_ScreenShot_Hotkey_Check", function()
         local nKey, nShift, nCtrl, nAlt = MY.Game.GetHotKey("MY_ScreenShot_Hotkey")
         if type(nKey)=="nil" or nKey==0 then
             ui:children("#WndButton_HotkeyCheck"):text(_L["set default screenshot tool"]):enable(true)
         else
             ui:children("#WndButton_HotkeyCheck"):text(_L["as default already"]):enable(false)
         end
-    end, 1000, {ui})
+    end, 1000)
 end
 _MY_ScreenShot.OnPanelDeactive = function( ... )
     MY.BreatheCall("MY_ScreenShot_Hotkey_Check")
