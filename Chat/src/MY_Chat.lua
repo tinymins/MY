@@ -33,8 +33,8 @@ MY_Chat.bChatCopyAlwaysWhite = false
 MY_Chat.bChatCopyNoCopySysmsg = false
 MY_Chat.bReplaceIcon = false
 MY_Chat.bDisplayPanel = true    --  «∑Òœ‘ æ√Ê∞Â
-_Cache.LoadBlockWords = function() MY_Chat.tBlockWords = MY.LoadLUAData('config/MY_CHAT/blockwords') or MY_Chat.tBlockWords end
-_Cache.SaveBlockWords = function() MY.SaveLUAData('config/MY_CHAT/blockwords', MY_Chat.tBlockWords) end
+_Cache.LoadBlockWords = function() MY_Chat.tBlockWords = MY.LoadLUAData('config/MY_CHAT/blockwords.$lang.jx3dat') or MY_Chat.tBlockWords end
+_Cache.SaveBlockWords = function() MY.SaveLUAData('config/MY_CHAT/blockwords.$lang.jx3dat', MY_Chat.tBlockWords) end
 MY.RegisterInit('MY_CHAT_BW', _Cache.LoadBlockWords)
 
 MY_Chat.tChannel = {

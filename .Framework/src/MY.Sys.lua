@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-09 12:03:57
+-- @Last Modified time: 2015-06-10 11:56:51
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 MY = MY or {}
@@ -56,124 +56,71 @@ MY.GetFrameCount = MY.Sys.GetFrameCount
 --       # #       #   #         #   #   # # # # #       #         #                 #     #   #     
 --   # #     #   #       #     # # #     #       #       #       # #                 #   #       #   
 -- ##################################################################################################
+-- 格式化数据文件路径（替换$uid、$lang、$server以及补全相对路径）
+-- (string) MY.Sys.GetLUADataPath(szFileUri)
+MY.Sys.GetLUADataPath = function(szFileUri)
+	-- Unified the directory separator
+	szFileUri = string.gsub(szFileUri, '\\', '/')
+	-- if exist $uid then add user role identity
+	if string.find(szFileUri, "%$uid") then
+		szFileUri = szFileUri:gsub("%$uid", MY.Player.GetUUID())
+	end
+	-- if exist $lang then add language identity
+	if string.find(szFileUri, "%$lang") then
+		szFileUri = szFileUri:gsub("%$lang", string.lower(MY.Sys.GetLang()))
+	end
+	-- if exist $server then add server identity
+	if string.find(szFileUri, "%$server") then
+		szFileUri = szFileUri:gsub("%$server", ((MY.Game.GetServer()):gsub('[/\\|:%*%?"<>]', '')))
+	end
+	-- ensure has file name
+	if string.sub(szFileUri, -1) == '/' then
+		szFileUri = szFileUri .. "data"
+	end
+	-- if it's relative path then complete path with "/@DATA/"
+	if string.sub(szFileUri, 1, 1) ~= '/' then
+		szFileUri = MY.GetAddonInfo().szRoot .. "@DATA/" .. szFileUri
+	end
+	return szFileUri
+end
+MY.GetLUADataPath = MY.Sys.GetLUADataPath
+
 -- 保存数据文件
--- MY.SaveLUAData( szFileUri, tData[, bNoDistinguishLang] )
+-- MY.SaveLUAData( szFileUri, tData, indent, crc)
 -- szFileUri           数据文件路径(1)
 -- tData               要保存的数据
--- bNoDistinguishLang  是否取消自动区分客户端语言
 -- indent              数据文件缩进
 -- crc                 是否添加CRC校验头（默认true）
 -- (1)： 当路径为绝对路径时(以斜杠开头)不作处理
 --       当路径为相对路径时 相对于插件下@DATA目录
-MY.Sys.SaveLUAData = function(szFileUri, tData, bNoDistinguishLang, indent, crc)
+MY.Sys.SaveLUAData = function(szFileUri, tData, indent, crc)
 	local nStartTick = GetTickCount()
-	-- 统一化目录分隔符
-	szFileUri = string.gsub(szFileUri, '\\', '/')
-	-- 如果是相对路径则从/@DATA/补全
-	if string.sub(szFileUri, 1, 1)~='/' then
-		szFileUri = MY.GetAddonInfo().szRoot .. "@DATA/" .. szFileUri
-	end
-	-- 添加游戏语言后缀
-	if not bNoDistinguishLang then
-		local lang = string.lower(MY.Sys.GetLang())
-		if #lang > 0 then
-			if string.sub(szFileUri, -1) ~= '/' then
-				szFileUri = szFileUri .. "."
-			end
-			szFileUri = szFileUri .. lang
-		end
-	end
-	if MY.Sys.GetLang() == 'vivn' then
-		szFileUri = szFileUri .. '.jx3dat'
-	end
-	-- 调用系统API
-	local ret = SaveLUAData(szFileUri, tData, indent, crc)
+	-- format uri
+	szFileUri = MY.GetLUADataPath(szFileUri)
+	-- save data
+	local data = SaveLUAData(szFileUri, tData, indent, crc)
 	-- performance monitor
 	MY.Debug({_L('%s saved during %dms.', szFileUri, GetTickCount() - nStartTick)}, 'PMTool', MY_DEBUG.PMLOG)
-	return ret
+	return data
 end
 MY.SaveLUAData = MY.Sys.SaveLUAData
 
 -- 加载数据文件：相对于data文件夹
--- MY.LoadLUAData( szFileUri[, bNoDistinguishLang] )
+-- MY.LoadLUAData( szFileUri)
 -- szFileUri           数据文件路径(1)
--- bNoDistinguishLang  是否取消自动区分客户端语言
 -- (1)： 当路径为绝对路径时(以斜杠开头)不作处理
 --       当路径为相对路径时 相对于插件下@DATA目录
-MY.Sys.LoadLUAData = function(szFileUri, bNoDistinguishLang)
+MY.Sys.LoadLUAData = function(szFileUri)
 	local nStartTick = GetTickCount()
-	-- 统一化目录分隔符
-	szFileUri = string.gsub(szFileUri, '\\', '/')
-	-- 如果是相对路径则从/@DATA/补全
-	if string.sub(szFileUri, 1, 1)~='/' then
-		szFileUri = MY.GetAddonInfo().szRoot .. "@DATA/" .. szFileUri
-	end
-	-- 添加游戏语言后缀
-	if not bNoDistinguishLang then
-		local lang = string.lower(MY.Sys.GetLang())
-		if #lang > 0 then
-			if string.sub(szFileUri, -1) ~= '/' then
-				szFileUri = szFileUri .. "."
-			end
-			szFileUri = szFileUri .. lang
-		end
-	end
-	if MY.Sys.GetLang() == 'vivn' then
-		szFileUri = szFileUri .. '.jx3dat'
-	end
-	-- 调用系统API
-	local ret = LoadLUAData(szFileUri)
+	-- format uri
+	szFileUri = MY.GetLUADataPath(szFileUri)
+	-- load data
+	local data = LoadLUAData(szFileUri)
 	-- performance monitor
 	MY.Debug({_L('%s loaded during %dms.', szFileUri, GetTickCount() - nStartTick)}, 'PMTool', MY_DEBUG.PMLOG)
-	return ret
+	return data
 end
 MY.LoadLUAData = MY.Sys.LoadLUAData
-
--- 保存用户数据 注意要在游戏初始化之后使用不然没有ClientPlayer对象
--- (data) MY.Sys.SaveUserData(szFileUri, tData)
-MY.Sys.SaveUserData = function(szFileUri, tData)
-	-- 统一化目录分隔符
-	szFileUri = string.gsub(szFileUri, '\\', '/')
-	if string.find(szFileUri, "$uid") then
-		if string.sub(szFileUri, -1) == '/' then
-			szFileUri = szFileUri .. "data"
-		end
-		-- 添加用户识别字符
-		szFileUri = szFileUri:gsub("$uid", MY.Player.GetUUID())
-	else
-		if string.sub(szFileUri, -1) ~= '/' then
-			szFileUri = szFileUri .. "_"
-		end
-		-- 添加用户识别字符
-		szFileUri = szFileUri .. MY.Player.GetUUID()
-	end
-	-- 读取数据
-	return MY.Sys.SaveLUAData(szFileUri, tData)
-end
-MY.SaveUserData = MY.Sys.SaveUserData
-
--- 加载用户数据 注意要在游戏初始化之后使用不然没有ClientPlayer对象
--- (data) MY.Sys.LoadUserData(szFile [,szSubAddonName])
-MY.Sys.LoadUserData = function(szFileUri)
-	-- 统一化目录分隔符
-	szFileUri = string.gsub(szFileUri, '\\', '/')
-	if string.find(szFileUri, "$uid") then
-		if string.sub(szFileUri, -1) == '/' then
-			szFileUri = szFileUri .. "data"
-		end
-		-- 添加用户识别字符
-		szFileUri = szFileUri:gsub("$uid", MY.Player.GetUUID())
-	else
-		if string.sub(szFileUri, -1) ~= '/' then
-			szFileUri = szFileUri .. "_"
-		end
-		-- 添加用户识别字符
-		szFileUri = szFileUri .. MY.Player.GetUUID()
-	end
-	-- 读取数据
-	return MY.Sys.LoadLUAData(szFileUri)
-end
-MY.LoadUserData = MY.Sys.LoadUserData
 
 --szName [, szDataFile]
 MY.RegisterUserData = function(szName, szFileName)
@@ -232,7 +179,7 @@ MY.Sys.PlaySound = function(szFilePath, szCustomPath)
 end
 -- 加载注册数据
 MY.RegisterInit('MYLIB#INITDATA', function()
-	local t = MY.LoadLUAData('config/initial')
+	local t = MY.LoadLUAData('config/initial.$lang.jx3dat')
 	if t then
 		for v_name, v_data in pairs(t) do
 			MY.SetGlobalValue(v_name, v_data)

@@ -20,6 +20,7 @@ data = {
     
     ['filter tong online message'] = '过滤帮会上线公告提示',
     ['filter tong member log message'] = '过滤帮会成员上线提示',
+    ['rebuild date list'] = '重建日期索引',
     
     ['about...'] = '关于...',
     ['lock postion'] = '锁定位置',

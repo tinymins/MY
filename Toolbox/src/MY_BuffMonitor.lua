@@ -13,7 +13,7 @@
 --                                                   * * * * * * * * * * *   * *     * * * * * * *   
 -- ##################################################################################################
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
-local _DEFAULT_BUFFMONITOR_CONFIG_FILE_ = MY.GetAddonInfo().szRoot .. "Toolbox/data/buffmon_default"
+local _DEFAULT_BUFFMONITOR_CONFIG_FILE_ = MY.GetAddonInfo().szRoot .. "Toolbox/data/buffmon_default.$lang.jx3dat"
 local _Cache = {}
 _Cache.handleBoxs = { Self = {}, Target = {} }
 MY_BuffMonitor = MY_BuffMonitor or {}

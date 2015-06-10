@@ -110,7 +110,7 @@ end)
 		...
 	}
 ]]
-_C.szDataPath = 'userdata/CHAT_LOG/$uid/'
+local DATA_PATH = 'userdata/CHAT_LOG/$uid/%s/%s.$lang.jx3dat'
 
 _C.tModifiedLog = {}
 function _C.GetCurrentDate()
@@ -124,7 +124,7 @@ end
 function _C.GetDateList(szChannel)
 	if not Log[szChannel] then
 		Log[szChannel] = {}
-		Log[szChannel].DateList = MY.LoadUserData(_C.szDataPath .. szChannel .. '/DateList') or {}
+		Log[szChannel].DateList = MY.LoadLUAData(DATA_PATH:format(szChannel, 'DateList')) or {}
 		Log[szChannel].DateIndex = {}
 		for i, dwDate in ipairs(Log[szChannel].DateList) do
 			Log[szChannel].DateIndex[dwDate] = i
@@ -136,7 +136,7 @@ end
 function _C.GetLog(szChannel, dwDate)
 	_C.GetDateList(szChannel)
 	if not Log[szChannel][dwDate] then
-		Log[szChannel][dwDate] = MY.LoadUserData(_C.szDataPath .. szChannel .. '/' .. dwDate) or {}
+		Log[szChannel][dwDate] = MY.LoadLUAData(DATA_PATH:format(szChannel, dwDate)) or {}
 	end
 	return Log[szChannel][dwDate]
 end
@@ -162,11 +162,12 @@ function _C.UnloadLog()
 	for szChannel, tDate in pairs(_C.tModifiedLog) do
 		for dwDate, _ in pairs(tDate) do
 			if not empty(Log[szChannel][dwDate]) then
-				MY.SaveUserData(_C.szDataPath .. szChannel .. '/' .. dwDate, Log[szChannel][dwDate])
+				MY.SaveLUAData(DATA_PATH:format(szChannel, dwDate), Log[szChannel][dwDate])
 			end
 		end
 	end
 	Log = {}
+	_C.tModifiedLog = {}
 end
 MY.RegisterExit(_C.UnloadLog)
 

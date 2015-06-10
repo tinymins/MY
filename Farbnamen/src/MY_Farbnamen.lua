@@ -15,11 +15,11 @@ MY_Farbnamen = MY_Farbnamen or {
     bEnabled = true,
 }
 RegisterCustomData("Account\\MY_Farbnamen.bEnabled")
-local SZ_CONFIG_PATH = "config/PLAYER_FORCE_COLOR"
-local SZ_CACHE_PATH = "cache/PLAYER_INFO/" .. (MY.Game.GetServer())
+local SZ_CONFIG_PATH = "config/PLAYER_FORCE_COLOR/$uid.$lang.jx3dat"
+local SZ_CACHE_PATH = "cache/PLAYER_INFO/$server.$lang.jx3dat"
 local Config_Default = {
     nMaxCache= 2000,
-    tForceColor  = MY.LoadLUAData(SZ_CONFIG_PATH, true) or {
+    tForceColor  = MY.LoadLUAData("config/PLAYER_FORCE_COLOR.jx3dat") or {
         [0]  = { 255, 255, 255 },       --江湖
         [1]  = { 255, 178, 95  },       --少林
         [2]  = { 196, 152, 255 },       --万花
@@ -239,11 +239,11 @@ end
 function _MY_Farbnamen.SaveCustomData()
     local t = {}
     t.tForceColor = Config.tForceColor
-    MY.Sys.SaveUserData(SZ_CONFIG_PATH, t)
+    MY.Sys.SaveLUAData(SZ_CONFIG_PATH, t)
 end
 -- 加载用户配置
 function _MY_Farbnamen.LoadCustomData()
-    local t = MY.Sys.LoadUserData(SZ_CONFIG_PATH) or {}
+    local t = MY.Sys.LoadLUAData(SZ_CONFIG_PATH) or {}
     if t.tForceColor then
         for k, v in pairs(t.tForceColor) do
             Config.tForceColor[k] = v
@@ -267,7 +267,7 @@ function MY_Farbnamen.SaveData()
             table.remove(t.aCached)
         end
     end
-    MY.SaveLUAData(SZ_CACHE_PATH, t, nil, nil, false)
+    MY.SaveLUAData(SZ_CACHE_PATH, t, nil, false)
 end
 -- 加载配置
 function MY_Farbnamen.LoadData()

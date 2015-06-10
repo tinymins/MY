@@ -47,7 +47,7 @@ _C.bInited = false
 _C.ui = nil
 _C.uiBoard = nil
 _C.uiTipBoard = nil
-_C.szLuaData = 'config/MY_CHATMONITOR/cfg'
+_C.szLuaData = 'config/MY_CHATMONITOR/cfg_$lang.jx3dat'
 _C.tChannelGroups = {
     {
         szCaption = g_tStrings.CHANNEL_CHANNEL,
