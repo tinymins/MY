@@ -278,6 +278,9 @@ MY_Recount.UpdateUI = function(data)
 	-- 计算战斗时间
 	local nTimeCount = MY_Recount.Data.GeneFightTime(data, nil, MY_Recount.bSysTimeMode and SZ_CHANNEL_KEY[MY_Recount.nChannel])
 	local szTimeCount = MY.Sys.FormatTimeCount('M:ss', nTimeCount)
+	if MY.IsInArena() then
+		szTimeCount = MY.GetFightTime("M:ss")
+	end
 	-- 自己的记录
 	local tMyRec
 	
