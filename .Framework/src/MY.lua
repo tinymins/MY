@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-27 12:44:52
+-- @Last Modified time: 2015-06-11 11:36:04
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -477,27 +477,33 @@ end
 -- (function)fnAction 事件处理函数，arg0 ~ arg9，传入 nil 相当于取消该事件
 --特别注意：当 fnAction 为 nil 并且 szKey 也为 nil 时会取消所有通过本函数注册的事件处理器
 MY.RegisterEvent = function(szEvent, fnAction)
-	local szKey = nil
-	local nPos = StringFindW(szEvent, ".")
-	if nPos then
-		szKey = string.sub(szEvent, nPos + 1)
-		szEvent = string.sub(szEvent, 1, nPos - 1)
-	end
-	if fnAction then
-		if not _MY.tEvent[szEvent] then
-			_MY.tEvent[szEvent] = {}
-			RegisterEvent(szEvent, _MY.EventHandler)
+	if type(szEvent) == "table" then
+		for _, szEvent in ipairs(szEvent) do
+			MY.RegisterEvent(szEvent, fnAction)
 		end
-		if szKey then
-			_MY.tEvent[szEvent][szKey] = fnAction
-		else
-			table.insert(_MY.tEvent[szEvent], fnAction)
+	elseif type(szEvent) == "string" then
+		local szKey = nil
+		local nPos = StringFindW(szEvent, ".")
+		if nPos then
+			szKey = string.sub(szEvent, nPos + 1)
+			szEvent = string.sub(szEvent, 1, nPos - 1)
 		end
-	else
-		if szKey then
-			_MY.tEvent[szEvent][szKey] = nil
+		if fnAction then
+			if not _MY.tEvent[szEvent] then
+				_MY.tEvent[szEvent] = {}
+				RegisterEvent(szEvent, _MY.EventHandler)
+			end
+			if szKey then
+				_MY.tEvent[szEvent][szKey] = fnAction
+			else
+				table.insert(_MY.tEvent[szEvent], fnAction)
+			end
 		else
-			_MY.tEvent[szEvent] = {}
+			if szKey then
+				_MY.tEvent[szEvent][szKey] = nil
+			else
+				_MY.tEvent[szEvent] = {}
+			end
 		end
 	end
 end
