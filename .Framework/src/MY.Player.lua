@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-11 20:43:13
+-- @Last Modified time: 2015-06-11 20:48:38
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -419,6 +419,7 @@ MY.Player.GetFightTime = function(szFormat)
 	end
 	return szFormat
 end
+MY.GetFightTime = MY.Player.GetFightTime
 
 -- 获取当前战斗唯一标示符
 MY.Player.GetFightUUID = function()
