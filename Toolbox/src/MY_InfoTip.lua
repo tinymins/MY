@@ -99,7 +99,7 @@ MY_InfoTip.Cache = {
         formatString = '', title = _L['fight clock'], prefix = _L['Fight Clock: '], content = "",
         GetContent = function()
             if MY.Player.GetFightUUID() or MY.Player.GetLastFightUUID() then
-                return MY_InfoTip.Cache.FightTime.formatString .. MY.Player.GetFightTime("H:mm:ss")
+                return MY_InfoTip.Cache.FightTime.formatString .. MY.GetFightTime("H:mm:ss")
             else
                 return _L["Never Fight"]
             end
