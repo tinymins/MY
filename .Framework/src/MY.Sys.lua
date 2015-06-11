@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-11 17:32:09
+-- @Last Modified time: 2015-06-11 17:34:43
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 MY = MY or {}
@@ -281,7 +281,6 @@ end
 --     #   #                 #     #           #     #                   #       # #       #   #     
 --   #       # # # # # # #                 # # #     # # # # # # # # # # #   # #     #   #       #   
 -- ##################################################################################################
-_C.nLogicFrameCount = GetLogicFrameCount()
 _C.tDelayCall = {}    -- delay call 队列
 _C.tBreatheCall = {}  -- breathe call 队列
 
@@ -337,12 +336,12 @@ MY.BreatheCall = function(szKey, fnAction, nInterval)
 		if nInterval and nInterval > 0 then
 			nFrame = math.ceil(nInterval / 62.5)
 		end
-		_C.tBreatheCall[szKey] = { fnAction = fnAction, nNext = GetLogicFrameCount() + 1, nFrame = nFrame }
+		_C.tBreatheCall[szKey] = { fnAction = fnAction, nNext = MY.GetFrameCount() + 1, nFrame = nFrame }
 	elseif nInterval then -- modify
 		local bc = _C.tBreatheCall[szKey]
 		if bc then
 			bc.nFrame = math.ceil(nInterval / 62.5)
-			bc.nNext = GetLogicFrameCount() + bc.nFrame
+			bc.nNext = MY.GetFrameCount() + bc.nFrame
 		end
 	elseif szKey then -- unreg
 		_C.tBreatheCall[szKey] = nil
@@ -356,24 +355,16 @@ end
 MY.BreatheCallDelayOnce = function(szKey, nTime)
 	local bc = _C.tBreatheCall[szKey]
 	if bc then
-		bc.nNext = GetLogicFrameCount() + math.ceil(nTime / 62.5)
+		bc.nNext = MY.GetFrameCount() + math.ceil(nTime / 62.5)
 	end
 end
 
 -- breathe
 MY.UI.RegisterUIEvent(MY, "OnFrameBreathe", function()
 	-- add frame counter
-	local nLogicFrameCount = GetLogicFrameCount()
-	if nLogicFrameCount > 0 then
-		if _C.bLogicFrameJump then
-			_C.FixLogicFrameJump(nLogicFrameCount - _C.nLogicFrameCount)
-			_C.bLogicFrameJump = nil
-		end
-		_C.nLogicFrameCount = nLogicFrameCount
-	end
 	_C.nFrameCount = _C.nFrameCount + 1
 	-- run breathe calls
-	local nFrame = GetLogicFrameCount()
+	local nFrame = MY.GetFrameCount()
 	for szKey, bc in pairs(_C.tBreatheCall) do
 		if nFrame >= bc.nNext then
 			bc.nNext = nFrame + bc.nFrame
@@ -396,17 +387,6 @@ MY.UI.RegisterUIEvent(MY, "OnFrameBreathe", function()
 			_C.tDelayCall[szKey] = nil
 		end
 	end
-end)
-
-_C.FixLogicFrameJump = function(nFrameOffset)
-	for _, bc in pairs(_C.tBreatheCall) do
-		bc.nNext = bc.nNext + nFrameOffset
-	end
-end
-
--- GetLogicFrameCount()跨GS修正
-MY.RegisterEvent('SWITCH_GS_NOTIFY', function()
-	_C.bLogicFrameJump = true
 end)
 
 -- ##################################################################################################
