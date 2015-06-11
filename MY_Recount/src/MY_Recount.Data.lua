@@ -733,6 +733,14 @@ MY_Recount.Data.Push = function()
         return
     end
     
+    -- 过滤空记录
+    if empty(Data.BeDamage)
+    and empty(Data.Damage)
+    and empty(Data.Heal)
+    and empty(Data.BeHeal) then
+        return
+    end
+    
     -- 计算受伤最多的名字作为战斗名称
     local nMaxValue, szBossName = 0, nil
     for id, p in pairs(Data.BeDamage) do
