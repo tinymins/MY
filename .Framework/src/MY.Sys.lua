@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-10 11:56:51
+-- @Last Modified time: 2015-06-11 17:32:09
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 MY = MY or {}
@@ -363,7 +363,14 @@ end
 -- breathe
 MY.UI.RegisterUIEvent(MY, "OnFrameBreathe", function()
 	-- add frame counter
-	_C.nLogicFrameCount = GetLogicFrameCount()
+	local nLogicFrameCount = GetLogicFrameCount()
+	if nLogicFrameCount > 0 then
+		if _C.bLogicFrameJump then
+			_C.FixLogicFrameJump(nLogicFrameCount - _C.nLogicFrameCount)
+			_C.bLogicFrameJump = nil
+		end
+		_C.nLogicFrameCount = nLogicFrameCount
+	end
 	_C.nFrameCount = _C.nFrameCount + 1
 	-- run breathe calls
 	local nFrame = GetLogicFrameCount()
@@ -391,13 +398,15 @@ MY.UI.RegisterUIEvent(MY, "OnFrameBreathe", function()
 	end
 end)
 
--- GetLogicFrameCount()过图修正
-MY.RegisterEvent('LOADING_END', function()
-	local nFrameOffset = GetLogicFrameCount() - _C.nLogicFrameCount
-	_C.nLogicFrameCount = GetLogicFrameCount()
+_C.FixLogicFrameJump = function(nFrameOffset)
 	for _, bc in pairs(_C.tBreatheCall) do
 		bc.nNext = bc.nNext + nFrameOffset
 	end
+end
+
+-- GetLogicFrameCount()跨GS修正
+MY.RegisterEvent('SWITCH_GS_NOTIFY', function()
+	_C.bLogicFrameJump = true
 end)
 
 -- ##################################################################################################
