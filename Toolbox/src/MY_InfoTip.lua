@@ -96,14 +96,13 @@ MY_InfoTip.Cache = {
         end
     },
     FightTime = { -- 战斗计时
-        formatString = '', title = _L['fight clock'], prefix = _L['Fight Clock: '], content = _L['%d:%02d:%02d'],
+        formatString = '', title = _L['fight clock'], prefix = _L['Fight Clock: '], content = "",
         GetContent = function()
-            local s, nTotal = _L["Never Fight"], MY.Player.GetFightTime()
             if MY.Player.GetFightUUID() or MY.Player.GetLastFightUUID() then
-                nTotal = nTotal / 16
-                s = string.format(MY_InfoTip.Cache.FightTime.formatString, math.floor(nTotal/(60*60)), math.floor(nTotal/60%60), math.floor(nTotal%60))
+                return MY_InfoTip.Cache.FightTime.formatString .. MY.Player.GetFightTime("H:mm:ss")
+            else
+                return _L["Never Fight"]
             end
-            return s
         end
     },
     LotusTime = { -- 莲花和藕倒计时

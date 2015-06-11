@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-10 14:32:14
+-- @Last Modified time: 2015-06-11 20:43:13
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -354,61 +354,53 @@ MY.IsParty = MY.Player.IsParty
 --   #           #     # #                 #             #     #       #     #     #         #   #   
 --             #         #                 #             #   #           #           # # # # #       
 -- ##################################################################################################
-_C.nLastFightUUID           = nil
-_C.nCurrentFightUUID        = nil
-_C.nCurrentFightBeginFrame  = -1
-_C.nCurrentFightEndingFrame = -1
-_C.OnFightStateChange = function(bFightState)
-	-- 当没有传bFightState或bFightState为否时 重新获取逻辑战斗状态
-	if not bFightState then
-		bFightState = MY.Player.IsFighting()
-	end
+_C.nLastFightUUID  = nil
+_C.nFightUUID      = nil
+_C.nFightBeginTick = -1
+_C.nFightEndTick   = -1
+_C.OnFightStateChange = function()
 	-- 判定战斗边界
-	if bFightState then
+	if MY.IsFighting() then
 		-- 进入战斗判断
 		if not _C.bFighting then
 			_C.bFighting = true
 			-- 5秒脱战判定缓冲 防止明教隐身错误判定
-			if _C.nCurrentFightBeginFrame < 0
-			or MY.GetFrameCount() - _C.nCurrentFightEndingFrame > GLOBAL.GAME_FPS * 5 then
+			if not _C.nFightUUID
+			or GetTickCount() - _C.nFightEndTick > 5000 then
 				-- 新的一轮战斗开始
-				_C.nCurrentFightBeginFrame = MY.GetFrameCount()
-				_C.nCurrentFightUUID = _C.nCurrentFightBeginFrame
+				_C.nFightBeginTick = GetTickCount()
+				_C.nFightUUID = _C.nFightBeginTick
 				FireUIEvent('MY_FIGHT_HINT', true)
 			end
 		end
 	else
 		-- 退出战斗判定
 		if _C.bFighting then
-			_C.bFighting = false
-			_C.nCurrentFightEndingFrame = MY.GetFrameCount()
-		end
-		if _C.nCurrentFightUUID and MY.GetFrameCount() - _C.nCurrentFightEndingFrame > GLOBAL.GAME_FPS * 5 then
-			_C.nLastFightUUID = _C.nCurrentFightUUID
-			_C.nCurrentFightUUID = nil
+			_C.nFightEndTick, _C.bFighting = GetTickCount(), false
+		elseif _C.nFightUUID and GetTickCount() - _C.nFightEndTick > 5000 then
+			_C.nLastFightUUID, _C.nFightUUID = _C.nFightUUID, nil
 			FireUIEvent('MY_FIGHT_HINT', false)
 		end
 	end
 end
 MY.BreatheCall(_C.OnFightStateChange)
-MY.RegisterEvent('FIGHT_HINT', function(event) _C.OnFightStateChange(arg0) end)
+
 -- 获取当前战斗时间
 MY.Player.GetFightTime = function(szFormat)
-	local nFrame = 0
-	
-	if MY.Player.IsFighting() then -- 战斗状态
-		nFrame = MY.GetFrameCount() - _C.nCurrentFightBeginFrame
+	local nTick = 0
+	if MY.IsFighting() then -- 战斗状态
+		nTick = GetTickCount() - _C.nFightBeginTick
 	else  -- 脱战状态
-		nFrame = _C.nCurrentFightEndingFrame - _C.nCurrentFightBeginFrame
+		nTick = _C.nFightEndTick - _C.nFightBeginTick
 	end
 	
 	if szFormat then
-		local nSeconds = math.floor(nFrame  / GLOBAL.GAME_FPS)
+		local nSeconds = math.floor(nTick / 1000)
 		local nMinutes = math.floor(nSeconds / 60)
 		local nHours   = math.floor(nMinutes / 60)
 		local nMinute  = nMinutes % 60
 		local nSecond  = nSeconds % 60
-		szFormat = szFormat:gsub('f', nFrame)
+		szFormat = szFormat:gsub('f', math.floor(nTick / 1000 * GLOBAL.GAME_FPS))
 		szFormat = szFormat:gsub('H', nHours)
 		szFormat = szFormat:gsub('M', nMinutes)
 		szFormat = szFormat:gsub('S', nSeconds)
@@ -423,14 +415,14 @@ MY.Player.GetFightTime = function(szFormat)
 			szFormat = tonumber(szFormat)
 		end
 	else
-		szFormat = nFrame
+		szFormat = nTick
 	end
 	return szFormat
 end
 
 -- 获取当前战斗唯一标示符
 MY.Player.GetFightUUID = function()
-	return _C.nCurrentFightUUID
+	return _C.nFightUUID
 end
 
 -- 获取上次战斗唯一标示符
@@ -470,6 +462,7 @@ MY.Player.IsFighting = function()
 	end
 	return bFightState
 end
+MY.IsFighting = MY.Player.IsFighting
 
 -- #######################################################################################################
 --                                   #                                                       #                   
