@@ -168,6 +168,12 @@ MY_Farbnamen.ShowTip = function(namelink)
                 tinsert(tTip, XML_LINE_BREAKER)
             end
         end
+        -- 调试信息
+        if IsCtrlKeyDown() then
+            tinsert(tTip, XML_LINE_BREAKER)
+            tinsert(tTip, GetFormatText(FormatString(g_tStrings.TIP_PLAYER_ID, tInfo.dwID), 102))
+            tinsert(tTip, GetFormatText(g_tStrings.TONG_ACTIVITY_TIME .. MY.FormatTime("yyyy-MM-dd hh:mm:ss", tInfo.dwTime), 102))
+        end
         -- 显示Tip
         OutputTip(tconcat(tTip), 450, {x, y, w, h}, MY.Const.UI.Tip.POS_TOP)
     end
