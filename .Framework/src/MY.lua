@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-11 11:36:04
+-- @Last Modified time: 2015-06-12 16:04:27
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -127,6 +127,7 @@ MY = {}
 --             #                         # # # # #   # # # # # # # # # # #   # #     #   #       #   # #               # #   # # # # # # # # # # #   
 -- ##################################################################################################################################################
 local _DEBUG_ = tonumber(LoadLUAData('interface/my.debug.level') or nil) or 4
+local _LOGLV_ = tonumber(LoadLUAData('interface/my.delog.level') or nil) or 4
 local _BUILD_ = "20150527"
 local _VERSION_ = 0x2003500
 local _ADDON_ROOT_ = '/Interface/MY/'
@@ -207,6 +208,7 @@ _MY.tAddonInfo = SetmetaReadonly({
 	dwVersion       = _VERSION_                       ,
 	szBuildDate     = _BUILD_                         ,
 	nDebugLevel     = _DEBUG_                         ,
+	nLogLevel       = _LOGLV_                         ,
 	szRoot          = _ADDON_ROOT_                    ,
 	szFrameworkRoot = _FRAMEWORK_ROOT_                ,
 	szAuthor        = _L['MingYi @ Double Dream Town'],
