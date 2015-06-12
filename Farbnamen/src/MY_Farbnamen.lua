@@ -35,6 +35,90 @@ local Config_Default = {
     },
 }
 local Config = clone(Config_Default)
+local InfoCache = (function()
+    local tInfos, tModified = {}, {}
+    local tCrossServerInfos = {}
+    local tName2ID, tName2IDModified = {}, {}
+    local SZ_DATA_PATH = "cache/PLAYER_INFO/$server/DATA/%d.$lang.jx3dat"
+    local SZ_N2ID_PATH = "cache/PLAYER_INFO/$server/N2ID/%d.$lang.jx3dat"
+    return setmetatable({}, {
+        __index = function(_, k)
+            if IsRemotePlayer(UI_GetClientPlayerID())
+            and tCrossServerInfos[k] then
+                return tCrossServerInfos[k]
+            end
+            if type(k) == "string" then -- szName
+                local nSegID = string.byte(k)
+                if not tName2ID[nSegID] then
+                    tName2ID[nSegID] = MY.LoadLUAData(SZ_N2ID_PATH:format(nSegID)) or {}
+                end
+                k = tName2ID[nSegID][k]
+            end
+            if type(k) == "number" then -- dwID
+                local nSegID = string.char(string.byte(k, 1, 2))
+                if not tInfos[nSegID] then
+                    tInfos[nSegID] = MY.LoadLUAData(SZ_DATA_PATH:format(nSegID)) or {}
+                end
+                return tInfos[nSegID][k]
+            end
+        end,
+        __newindex = function(_, k, v)
+            if type(k) == "number" then -- dwID, tInfo
+                if IsRemotePlayer(k) then
+                    tCrossServerInfos[k] = v
+                    tCrossServerInfos[v.n] = v
+                else
+                    -- save player info
+                    local nSegID = string.char(string.byte(k, 1, 2))
+                    if not tInfos[nSegID] then
+                        tInfos[nSegID] = MY.LoadLUAData(SZ_DATA_PATH:format(nSegID)) or {}
+                    end
+                    tInfos[nSegID][k] = v
+                    tModified[nSegID] = GetTime()
+                    -- save szName to dwID indexing
+                    local nSegID = string.byte(v.n)
+                    if not tName2ID[nSegID] then
+                        tName2ID[nSegID] = MY.LoadLUAData(SZ_N2ID_PATH:format(nSegID)) or {}
+                    end
+                    tName2ID[nSegID][v.n] = k
+                    tName2IDModified[nSegID] = GetTime()
+                end
+            end
+        end,
+        __call = function(_, cmd, arg0, ...)
+            if cmd == "clear" then
+                -- clear all data file
+                tInfos, tModified = {}, {}
+                tName2ID, tName2IDModified = {}, {}
+                for nSegID = 0, 99 do
+                    if IsFileExist(MY.GetLUADataPath(SZ_DATA_PATH:format(nSegID))) then
+                        MY.SaveLUAData(SZ_DATA_PATH:format(nSegID), nil)
+                    end
+                end
+                for nSegID = 0, 255 do
+                    if IsFileExist(MY.GetLUADataPath(SZ_N2ID_PATH:format(nSegID))) then
+                        MY.SaveLUAData(SZ_N2ID_PATH:format(nSegID), nil)
+                    end
+                end
+            elseif cmd == "save" then
+                -- save info data
+                for nSegID, dwModifyTime in pairs(tModified) do
+                    if not arg0 or arg0 > dwModifyTime then
+                        MY.SaveLUAData(SZ_DATA_PATH:format(nSegID), tInfos[nSegID])
+                        tModified[nSegID] = nil
+                    end
+                end
+                -- save name index
+                for nSegID, dwModifyTime in pairs(tName2IDModified) do
+                    if not arg0 or arg0 > dwModifyTime then
+                        MY.SaveLUAData(SZ_N2ID_PATH:format(nSegID), tName2ID[nSegID])
+                        tName2IDModified[nSegID] = nil
+                    end
+                end
+            end
+        end
+    })
+end)()
 local _MY_Farbnamen = {
     tForceString = {},
     tRoleType    = {
@@ -44,7 +128,6 @@ local _MY_Farbnamen = {
         [6] = _L['girl'],
     },
     tCampString  = {},
-    tPlayerCache = {},
     tCrossServerPlayerCache = {},
     aPlayerQueu = {},
 }
@@ -178,64 +261,50 @@ MY_Farbnamen.ShowTip = function(namelink)
         OutputTip(tconcat(tTip), 450, {x, y, w, h}, MY.Const.UI.Tip.POS_TOP)
     end
 end
--- 处理插件冲突
-function MY_Farbnamen.DoConflict()
-    if MY_Farbnamen.bEnabled and Chat and Chat.bColor then
-        Chat.bColor = false
-        MY.Sysmsg({_L['plugin conflict detected,duowan force color has been forced down.'], r=255, g=0, b=0},_L['MingYiPlugin - Farbnamen'])
-    end
-end
 ---------------------------------------------------------------
 -- 数据存储
 ---------------------------------------------------------------
 -- 通过szName获取信息
+function MY_Farbnamen.Get(szKey)
+    local info = InfoCache[szKey]
+    if info then
+        return {
+            dwID      = info.i,
+            dwForceID = info.f,
+            szName    = info.n,
+            nRoleType = info.r,
+            nLevel    = info.l,
+            szTitle   = info.t,
+            nCamp     = info.c,
+            szTongID  = info.g,
+            dwTime    = info._,
+            rgb       = Config.tForceColor[info.f] or {255, 255, 255}
+        }
+    end
+end
 function MY_Farbnamen.GetAusName(szName)
-    local dwID
-    if MY.IsInArena() or MY.IsInBattleField() then
-        dwID = _MY_Farbnamen.tCrossServerPlayerCache[szName]
-    end
-    if not dwID then
-        dwID = _MY_Farbnamen.tPlayerCache[szName]
-    end
-    return MY_Farbnamen.GetAusID(dwID)
+    return MY_Farbnamen.Get(szName)
 end
 -- 通过dwID获取信息
 function MY_Farbnamen.GetAusID(dwID)
     MY_Farbnamen.AddAusID(dwID)
-    -- deal with return data
-    local result
-    if IsRemotePlayer(dwID) then
-        result = clone(_MY_Farbnamen.tCrossServerPlayerCache[dwID])
-    else
-        result = clone(_MY_Farbnamen.tPlayerCache[dwID])
-    end
-    if result then
-        result.rgb = Config.tForceColor[result.dwForceID] or {255, 255, 255}
-    end
-    return result
+    return MY_Farbnamen.Get(dwID)
 end
 -- 保存指定dwID的玩家
 function MY_Farbnamen.AddAusID(dwID)
     local player = GetPlayer(dwID)
     if player and player.szName and player.szName~='' then
-        local tPlayer = {
-            dwID      = player.dwID,
-            dwForceID = player.dwForceID,
-            szName    = player.szName,
-            nRoleType = player.nRoleType,
-            nLevel    = player.nLevel,
-            szTitle   = player.szTitle,
-            nCamp     = player.nCamp,
-            szTongID  = GetTongClient().ApplyGetTongName(player.dwTongID),
-            dwTime    = GetCurrentTime(),
+        InfoCache[player.dwID] = {
+            i = player.dwID,
+            f = player.dwForceID,
+            n = player.szName,
+            r = player.nRoleType,
+            l = player.nLevel,
+            t = player.szTitle,
+            c = player.nCamp,
+            g = GetTongClient().ApplyGetTongName(player.dwTongID),
+            _ = GetCurrentTime(),
         }
-        if IsRemotePlayer(player.dwID) then
-            _MY_Farbnamen.tCrossServerPlayerCache[player.dwID  ] = tPlayer
-            _MY_Farbnamen.tCrossServerPlayerCache[player.szName] = player.dwID
-        else
-            _MY_Farbnamen.tPlayerCache[player.dwID  ] = tPlayer
-            _MY_Farbnamen.tPlayerCache[player.szName] = player.dwID
-        end
         return true
     else
         return false
@@ -256,71 +325,38 @@ function _MY_Farbnamen.LoadCustomData()
         end
     end
 end
--- 保存配置
-function MY_Farbnamen.SaveData()
-    local t = {
-        ['aCached']   = {}                      ,     -- 保存的用户表
-        ['nMaxCache'] = Config.nMaxCache        ,     -- 最大缓存数量
-    }
-    for dwID, data in pairs(_MY_Farbnamen.tPlayerCache) do
-        if type(dwID)=='number' then
-            table.insert(t.aCached, data)
-        end
-    end
-    if #t.aCached > t.nMaxCache then
-        table.sort(t.aCached, function(a, b) return a.dwTime < b.dwTime end)
-        for i=t.nMaxCache+1, #t.aCached, 1 do
-            table.remove(t.aCached)
-        end
-    end
-    MY.SaveLUAData(SZ_CACHE_PATH, t, nil, false)
-end
--- 加载配置
+
+-- 加载旧版本缓存数据
 function MY_Farbnamen.LoadData()
     -- 读取数据文件
-    local data = MY.LoadLUAData(SZ_CACHE_PATH) or {}
+    local data = MY.LoadLUAData(SZ_CACHE_PATH)
     -- 如果是Json格式的数据 则解码
     if type(data) == "string" then
         data = MY.Json.Decode(data) or {}
     end
     -- 解析数据
-    local t = {
-        ['aCached']   = data.aCached   or {}  ,    -- 保存的用户表
-        ['nMaxCache'] = data.nMaxCache or 2000,    -- 最大缓存数量
-    }
-    
-    -- 添加加载的数据
-    for _, p in ipairs(t.aCached) do
-        _MY_Farbnamen.tPlayerCache[p.dwID] = p
+    if data then
+        local nMaxCache = data.nMaxCache     -- 最大缓存数量
+        local aCached   = data.aCached       -- 兼容旧版数据
+        
+        -- 处理老版本数据
+        if aCached then
+            for _, p in ipairs(aCached) do
+                InfoCache[p.dwID] = {
+                    i = p.dwID     ,
+                    f = p.dwForceID,
+                    n = p.szName   ,
+                    r = p.nRoleType,
+                    l = p.nLevel   ,
+                    t = p.szTitle  ,
+                    c = p.nCamp    ,
+                    g = p.szTongID ,
+                    _ = p.dwTime   ,
+                }
+            end
+        end
+        MY.SaveLUAData(SZ_CACHE_PATH, nil)
     end
-    Config.nMaxCache = t.nMaxCache or Config.nMaxCache
-end
---------------------------------------------------------------
--- 数据统计
---------------------------------------------------------------
-function MY_Farbnamen.AnalyseForceInfo()
-	local t = { }
-    -- 统计各门派人数
-	for k, v in pairs(_MY_Farbnamen.tPlayerCache) do
-		if type(v)=='table' and type(v.dwForceID)=='number' then
-			t[v.dwForceID] = ( t[v.dwForceID] or 0 ) + 1
-		end
-	end
-	-- 对table值进行排序
-	local t2, nCount = {}, 0
-	for k, v in pairs(t) do
-		table.insert(t2, {K = k, V = v})
-        nCount = nCount + v
-	end
-	table.sort (t2, function(a, b) return a.V > b.V end)
-
-    -- 输出
-	MY.Sysmsg({_L('%d player(s) data cached:', nCount)}, _L['Farbnamen'])
-	for k, v in pairs(t2) do
-		if type(v.K) == "number" then
-			MY.Sysmsg({string.format("%s\t(%s)\t%d", GetForceTitle(v.K), string.format("%02d%%", 100 * (v.V / nCount)), v.V)}, '')
-		end
-	end
 end
 
 --------------------------------------------------------------
@@ -364,42 +400,9 @@ MY_Farbnamen.GetMenu = function()
         end,
     })
     table.insert(t, {
-        szOption = _L["set max cache count"] .. '(' .. Config.nMaxCache .. ')',
-        fnAction = function()
-            GetUserInputNumber(
-                Config.nMaxCache,
-                999999, nil,
-                function(num)
-                    if num > 5000 then
-                        MessageBox({
-                            szName = "MY_Farbnamen_HighCache",
-                            szMessage = _L("Are you sure you want to set cache limit to %d?\nThis may cause some performance problem, please make sure your computer is strong enough.", num),
-                            {szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function() Config.nMaxCache = num end},
-                            {szOption = g_tStrings.STR_HOTKEY_CANCEL, fnAction = function() end},
-                        })
-                    else
-                        Config.nMaxCache = num
-                    end
-                end,
-                function() end,
-                function() end
-            )
-        end,
-        fnDisable = function()
-            return not MY_Farbnamen.bEnabled
-        end,
-    })
-    table.insert(t, {
-        szOption = _L["analyse data"],
-        fnAction = MY_Farbnamen.AnalyseForceInfo,
-        fnDisable = function()
-            return not MY_Farbnamen.bEnabled
-        end,
-    })
-    table.insert(t, {
         szOption = _L["reset data"],
         fnAction = function()
-            _MY_Farbnamen.tPlayerCache = {}
+            InfoCache("clear")
             MY.Sysmsg({_L['cache data deleted.']}, _L['Farbnamen'])
         end,
         fnDisable = function()
@@ -408,26 +411,24 @@ MY_Farbnamen.GetMenu = function()
     })
     return t
 end
-MY.RegisterPlayerAddonMenu( 'MY_Farbenamen', MY_Farbnamen.GetMenu )
-MY.RegisterTraceButtonMenu( 'MY_Farbenamen', MY_Farbnamen.GetMenu )
+MY.RegisterPlayerAddonMenu('MY_Farbenamen', MY_Farbnamen.GetMenu)
+MY.RegisterTraceButtonMenu('MY_Farbenamen', MY_Farbnamen.GetMenu)
 --------------------------------------------------------------
 -- 注册事件
 --------------------------------------------------------------
--- MY.RegisterEvent('LOGIN_GAME', MY_Farbnamen.LoadData)
--- MY.RegisterEvent('PLAYER_ENTER_GAME', MY_Farbnamen.LoadData)
 MY.RegisterInit('MY_FARBNAMEN_DATA', MY_Farbnamen.LoadData)
 MY.RegisterInit('MY_FARBNAMEN_CUSTOMDATA', _MY_Farbnamen.LoadCustomData)
-MY.RegisterExit(MY_Farbnamen.SaveData)
--- MY.RegisterEvent("PLAYER_ENTER_SCENE", MY_Farbnamen.DoConflict)
+MY.RegisterExit('MY_FARBNAMEN_CACHE', function() InfoCache("save") end)
+MY.BreatheCall('MY_FARBNAMEN_CACHE', function() InfoCache("save", GetTime() - 60000) end, 2000)
 MY.RegisterEvent("PLAYER_ENTER_SCENE", function()
     if MY_Farbnamen.bEnabled then
         local dwID = arg0
         local nRetryCount = 0
-        MY.BreatheCall( function()
+        MY.BreatheCall(function()
             if MY_Farbnamen.AddAusID(dwID) or nRetryCount > 5 then
                 return 0
             end
             nRetryCount = nRetryCount + 1
-        end, 500 )
+        end, 500)
     end
 end)

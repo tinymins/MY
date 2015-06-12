@@ -4,10 +4,12 @@
 */manifest.key
 */publisher.key
 @DATA/cache/PLAYER_INFO/*.jx3dat
+@DATA/cache/PLAYER_INFO/*/*/*.jx3dat
 @DATA/cache/NPC_DOODAD_REC/*.jx3dat
 @DATA/cache/FIGHT_RECOUNT_LOG/*.jx3dat
 @DATA/cache/CHAT_LOG/*.jx3dat
 @DATA/config/*.jx3dat
+@DATA/config/PLAYER_FORCE_COLOR/*.jx3dat
 @DATA/config/MY_CHATMONITOR/*.jx3dat
 @DATA/config/MY_SCREENSHOT/*.jx3dat
 @DATA/config/PLAYER_NOTES/*.jx3dat

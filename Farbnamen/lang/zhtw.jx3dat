@@ -3,12 +3,10 @@ data = {
     -- MY_Farbnamen.lua
     ['Farbnamen'] = '職業染色',
     ['set max cache count'] = '最大緩存數量',
-    ['MingYiPlugin - Farbnamen'] = '茗伊插件·職業染色',
     ['[author]'] = '〔插件君〕',
     ['[teammate]'] = '〔隊友〕',
     ['cache data deleted.'] = '緩存已清除。',
     ['%d player(s) data cached:'] = '已緩存角色數據 %d 份：',
-    ['plugin conflict detected,duowan force color has been forced down.'] = '檢測到插件衝突，已關閉盒子職業染色。',
     ["Are you sure you want to set cache limit to %d?\nThis may cause some performance problem, please make sure your computer is strong enough."] = '你確定要將最大緩存數量設置爲%d？\n數值設置太大可能導致遊戲出現性能問題（掉幀卡頓等），如果你對你的電腦有信心，你可以忽略這段話，否則建議不要設置超過5000。',
     ['customize color'] = '自定義顔色',
     ['load default setting'] = '恢複默認設置',
