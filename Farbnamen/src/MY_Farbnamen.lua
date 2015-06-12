@@ -85,7 +85,7 @@ local InfoCache = (function()
                 end
             end
         end,
-        __call = function(_, cmd, arg0, ...)
+        __call = function(_, cmd, arg0, arg1, ...)
             if cmd == "clear" then
                 -- clear all data file
                 tInfos, tModified = {}, {}
@@ -101,16 +101,30 @@ local InfoCache = (function()
                     end
                 end
             elseif cmd == "save" then
+                local dwTime = arg0
+                local nCount = arg1
                 -- save info data
                 for nSegID, dwModifyTime in pairs(tModified) do
-                    if not arg0 or arg0 > dwModifyTime then
+                    if not dwTime or dwTime > dwModifyTime then
+                        if nCount then
+                            if nCount == 0 then
+                                return
+                            end
+                            nCount = nCount - 1
+                        end
                         MY.SaveLUAData(SZ_DATA_PATH:format(nSegID), tInfos[nSegID])
                         tModified[nSegID] = nil
                     end
                 end
                 -- save name index
                 for nSegID, dwModifyTime in pairs(tName2IDModified) do
-                    if not arg0 or arg0 > dwModifyTime then
+                    if not dwTime or dwTime > dwModifyTime then
+                        if nCount then
+                            if nCount == 0 then
+                                return
+                            end
+                            nCount = nCount - 1
+                        end
                         MY.SaveLUAData(SZ_N2ID_PATH:format(nSegID), tName2ID[nSegID])
                         tName2IDModified[nSegID] = nil
                     end
@@ -419,7 +433,7 @@ MY.RegisterTraceButtonMenu('MY_Farbenamen', MY_Farbnamen.GetMenu)
 MY.RegisterInit('MY_FARBNAMEN_DATA', MY_Farbnamen.LoadData)
 MY.RegisterInit('MY_FARBNAMEN_CUSTOMDATA', _MY_Farbnamen.LoadCustomData)
 MY.RegisterExit('MY_FARBNAMEN_CACHE', function() InfoCache("save") end)
-MY.BreatheCall('MY_FARBNAMEN_CACHE', function() InfoCache("save", GetTime() - 60000) end, 2000)
+MY.BreatheCall('MY_FARBNAMEN_CACHE', function() InfoCache("save", GetTime() - 60000, 1) end, 1000)
 MY.RegisterEvent("PLAYER_ENTER_SCENE", function()
     if MY_Farbnamen.bEnabled then
         local dwID = arg0
