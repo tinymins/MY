@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-12 15:56:28
+-- @Last Modified time: 2015-06-12 17:07:07
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 MY = MY or {}
@@ -92,7 +92,7 @@ MY.Sys.SaveLUAData = function(szFileUri, tData, indent, crc)
 	-- format uri
 	szFileUri = MY.GetLUADataPath(szFileUri)
 	-- save data
-	local data = SaveLUAData(szFileUri, tData, indent, crc)
+	local data = SaveLUAData(szFileUri, tData, indent, crc or false)
 	-- performance monitor
 	MY.Debug({_L('%s saved during %dms.', szFileUri, GetTickCount() - nStartTick)}, 'PMTool', MY_DEBUG.PMLOG)
 	return data
