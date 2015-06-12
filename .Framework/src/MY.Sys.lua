@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-11 20:46:51
+-- @Last Modified time: 2015-06-12 15:56:28
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 MY = MY or {}
@@ -607,6 +607,8 @@ MY.Debug = function(oContent, szTitle, nLevel)
 	if nLevel >= MY.GetAddonInfo().nDebugLevel then
 		Log('[MY_DEBUG][LEVEL_' .. nLevel .. ']' .. '[' .. szTitle .. ']' .. table.concat(oContent, "\n"))
 		MY.Sysmsg(oContent, szTitle)
+	elseif nLevel >= MY.GetAddonInfo().nLogLevel then
+		Log('[MY_DEBUG][LEVEL_' .. nLevel .. ']' .. '[' .. szTitle .. ']' .. table.concat(oContent, "\n"))
 	end
 end
 
