@@ -1404,4 +1404,10 @@ _C.OnPanelActive = function(wnd)
       end)
     y = y + offsety
 end
-MY.RegisterPanel( "XLifeBar", _L["x lifebar"], _L['General'], "UI/Image/LootPanel/LootPanel.UITex|74", {255,127,0,200}, { OnPanelActive = _C.OnPanelActive, OnPanelDeactive = nil } )
+MY.RegisterPanel("XLifeBar", _L["x lifebar"], _L['General'], "UI/Image/LootPanel/LootPanel.UITex|74", {255,127,0,200}, {
+    OnPanelActive = _C.OnPanelActive, OnPanelDeactive = nil
+})
+MY.Game.AddHotKey("XLifeBar_S", _L["x lifebar"], function()
+    XLifeBar.bEnabled = not XLifeBar.bEnabled
+    _C.Reset(true)
+end)
