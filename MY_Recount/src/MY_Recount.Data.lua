@@ -378,10 +378,13 @@ MY_Recount.Data.OnSkillEffect = function(dwCaster, dwTarget, nEffectType, dwEffe
     
     -- 过滤掉不是队友的以及不是BOSS的
     local me = GetClientPlayer()
-    if dwCaster ~= me.dwID -- 不是自己
-    and not MY.IsInArena() -- 不在JJC
-    and IsPlayer(dwCaster) -- 且释放者是玩家
-    and not me.IsPlayerInMyParty(dwCaster) -- 且不是队友
+    if dwCaster ~= me.dwID                 -- 释放者不是自己
+    and dwTarget ~= me.dwID                -- 承受者不是自己
+    and not MY.IsInArena()                 -- 不在竞技场
+    and not MY.IsInBattleField()           -- 不在战场
+    and IsPlayer(dwCaster)                 -- 释放者是玩家
+    and not me.IsPlayerInMyParty(dwCaster) -- 且释放者不是队友
+    and not me.IsPlayerInMyParty(dwTarget) -- 且承受者不是队友
     then -- 则忽视
         return
     end
@@ -782,17 +785,17 @@ MY.RegisterEvent('SYS_MSG', function()
         -- (arg3)dwLevel：技能等级 (arg4)nRespond：见枚举型[[SKILL_RESULT_CODE]]
         -- MY_Recount.OnSkillCastRespond(arg1, arg2, arg3, arg4)
     elseif arg0 == "UI_OME_SKILL_EFFECT_LOG" then
-        if not MY.IsInArena() then
-            -- 技能最终产生的效果（生命值的变化）；
-            -- (arg1)dwCaster：施放者 (arg2)dwTarget：目标 (arg3)bReact：是否为反击 (arg4)nType：Effect类型 (arg5)dwID:Effect的ID 
-            -- (arg6)dwLevel：Effect的等级 (arg7)bCriticalStrike：是否会心 (arg8)nCount：tResultCount数据表中元素个数 (arg9)tResultCount：数值集合
-            -- MY_Recount.Data.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-            if arg7 and arg7 ~= 0 then -- bCriticalStrike
-                MY_Recount.Data.OnSkillEffect(arg1, arg2, arg4, arg5, arg6, SKILL_RESULT.CRITICAL, arg8, arg9)
-            else
-                MY_Recount.Data.OnSkillEffect(arg1, arg2, arg4, arg5, arg6, SKILL_RESULT.HIT, arg8, arg9)
-            end
+        -- if not MY.IsInArena() then
+        -- 技能最终产生的效果（生命值的变化）；
+        -- (arg1)dwCaster：施放者 (arg2)dwTarget：目标 (arg3)bReact：是否为反击 (arg4)nType：Effect类型 (arg5)dwID:Effect的ID 
+        -- (arg6)dwLevel：Effect的等级 (arg7)bCriticalStrike：是否会心 (arg8)nCount：tResultCount数据表中元素个数 (arg9)tResultCount：数值集合
+        -- MY_Recount.Data.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
+        if arg7 and arg7 ~= 0 then -- bCriticalStrike
+            MY_Recount.Data.OnSkillEffect(arg1, arg2, arg4, arg5, arg6, SKILL_RESULT.CRITICAL, arg8, arg9)
+        else
+            MY_Recount.Data.OnSkillEffect(arg1, arg2, arg4, arg5, arg6, SKILL_RESULT.HIT, arg8, arg9)
         end
+        -- end
     elseif arg0 == "UI_OME_SKILL_BLOCK_LOG" then
         -- 格挡日志；
         -- (arg1)dwCaster：施放者 (arg2)dwTarget：目标 (arg3)nType：Effect的类型
@@ -826,57 +829,57 @@ MY.RegisterEvent('SYS_MSG', function()
 end)
 
 -- JJC中使用的数据源（不能记录溢出数据）
-MY.RegisterEvent("SKILL_EFFECT_TEXT", function(event)
-    if MY.IsInArena() then
-        local dwCasterID      = arg0
-        local dwTargetID      = arg1
-        local bCriticalStrike = arg2
-        local nType           = arg3
-        local nValue          = arg4
-        local dwSkillID       = arg5
-        local dwSkillLevel    = arg6
-        local nEffectType     = arg7
-        local nResultCount    = 1
-        local tResult         = { [nType] = nValue }
+-- MY.RegisterEvent("SKILL_EFFECT_TEXT", function(event)
+--     if MY.IsInArena() then
+--         local dwCasterID      = arg0
+--         local dwTargetID      = arg1
+--         local bCriticalStrike = arg2
+--         local nType           = arg3
+--         local nValue          = arg4
+--         local dwSkillID       = arg5
+--         local dwSkillLevel    = arg6
+--         local nEffectType     = arg7
+--         local nResultCount    = 1
+--         local tResult         = { [nType] = nValue }
         
-        if nType == SKILL_RESULT_TYPE.PHYSICS_DAMAGE -- 外功伤害
-        or nType == SKILL_RESULT_TYPE.SOLAR_MAGIC_DAMAGE -- 阳性内功伤害
-        or nType == SKILL_RESULT_TYPE.NEUTRAL_MAGIC_DAMAGE -- 中性内功伤害
-        or nType == SKILL_RESULT_TYPE.LUNAR_MAGIC_DAMAGE -- 阴性内功伤害
-        or nType == SKILL_RESULT_TYPE.POISON_DAMAGE then -- 毒性内功伤害
-        -- if nType == SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE then -- 有效伤害值
-            nResultCount = nResultCount + 1
-            tResult[SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE] = nValue
-        elseif nType == SKILL_RESULT_TYPE.REFLECTIED_DAMAGE then -- 反弹伤害
-            dwCasterID, dwTargetID = dwTargetID, dwCasterID
-        elseif nType == SKILL_RESULT_TYPE.THERAPY then -- 治疗
-        -- elseif nType == SKILL_RESULT_TYPE.EFFECTIVE_THERAPY then -- 有效治疗量
-            nResultCount = nResultCount + 1
-            tResult[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] = nValue
-        elseif nType == SKILL_RESULT_TYPE.STEAL_LIFE then -- 偷取生命值
-            dwTargetID = dwCasterID
-            nResultCount = nResultCount + 1
-            tResult[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] = nValue
-        elseif nType == SKILL_RESULT_TYPE.ABSORB_DAMAGE then -- 吸收伤害
-            nResultCount = nResultCount + 1
-            tResult[SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE] = 0
-        elseif nType == SKILL_RESULT_TYPE.SHIELD_DAMAGE then -- 内力抵消伤害
-            nResultCount = nResultCount + 1
-            tResult[SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE] = 0
-        elseif nType == SKILL_RESULT_TYPE.PARRY_DAMAGE then -- 闪避伤害
-            nResultCount = nResultCount + 1
-            tResult[SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE] = 0
-        elseif nType == SKILL_RESULT_TYPE.INSIGHT_DAMAGE then -- 识破伤害
-            nResultCount = nResultCount + 1
-            tResult[SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE] = 0
-        end
-        if bCriticalStrike then -- bCriticalStrike
-            MY_Recount.Data.OnSkillEffect(dwCasterID, dwTargetID, nEffectType, dwSkillID, dwSkillLevel, SKILL_RESULT.CRITICAL, nResultCount, tResult)
-        else
-            MY_Recount.Data.OnSkillEffect(dwCasterID, dwTargetID, nEffectType, dwSkillID, dwSkillLevel, SKILL_RESULT.HIT, nResultCount, tResult)
-        end
-    end
-end)
+--         if nType == SKILL_RESULT_TYPE.PHYSICS_DAMAGE -- 外功伤害
+--         or nType == SKILL_RESULT_TYPE.SOLAR_MAGIC_DAMAGE -- 阳性内功伤害
+--         or nType == SKILL_RESULT_TYPE.NEUTRAL_MAGIC_DAMAGE -- 中性内功伤害
+--         or nType == SKILL_RESULT_TYPE.LUNAR_MAGIC_DAMAGE -- 阴性内功伤害
+--         or nType == SKILL_RESULT_TYPE.POISON_DAMAGE then -- 毒性内功伤害
+--         -- if nType == SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE then -- 有效伤害值
+--             nResultCount = nResultCount + 1
+--             tResult[SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE] = nValue
+--         elseif nType == SKILL_RESULT_TYPE.REFLECTIED_DAMAGE then -- 反弹伤害
+--             dwCasterID, dwTargetID = dwTargetID, dwCasterID
+--         elseif nType == SKILL_RESULT_TYPE.THERAPY then -- 治疗
+--         -- elseif nType == SKILL_RESULT_TYPE.EFFECTIVE_THERAPY then -- 有效治疗量
+--             nResultCount = nResultCount + 1
+--             tResult[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] = nValue
+--         elseif nType == SKILL_RESULT_TYPE.STEAL_LIFE then -- 偷取生命值
+--             dwTargetID = dwCasterID
+--             nResultCount = nResultCount + 1
+--             tResult[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] = nValue
+--         elseif nType == SKILL_RESULT_TYPE.ABSORB_DAMAGE then -- 吸收伤害
+--             nResultCount = nResultCount + 1
+--             tResult[SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE] = 0
+--         elseif nType == SKILL_RESULT_TYPE.SHIELD_DAMAGE then -- 内力抵消伤害
+--             nResultCount = nResultCount + 1
+--             tResult[SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE] = 0
+--         elseif nType == SKILL_RESULT_TYPE.PARRY_DAMAGE then -- 闪避伤害
+--             nResultCount = nResultCount + 1
+--             tResult[SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE] = 0
+--         elseif nType == SKILL_RESULT_TYPE.INSIGHT_DAMAGE then -- 识破伤害
+--             nResultCount = nResultCount + 1
+--             tResult[SKILL_RESULT_TYPE.EFFECTIVE_DAMAGE] = 0
+--         end
+--         if bCriticalStrike then -- bCriticalStrike
+--             MY_Recount.Data.OnSkillEffect(dwCasterID, dwTargetID, nEffectType, dwSkillID, dwSkillLevel, SKILL_RESULT.CRITICAL, nResultCount, tResult)
+--         else
+--             MY_Recount.Data.OnSkillEffect(dwCasterID, dwTargetID, nEffectType, dwSkillID, dwSkillLevel, SKILL_RESULT.HIT, nResultCount, tResult)
+--         end
+--     end
+-- end)
 
 
 -- 有人死了活了做一下时间轴记录
