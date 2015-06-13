@@ -42,7 +42,7 @@ local InfoCache = (function()
     local SZ_DATA_PATH = "cache/PLAYER_INFO/$server/DATA/%d.$lang.jx3dat"
     local SZ_N2ID_PATH = "cache/PLAYER_INFO/$server/N2ID/%d.$lang.jx3dat"
     return setmetatable({}, {
-        __index = function(_, k)
+        __index = function(t, k)
             if IsRemotePlayer(UI_GetClientPlayerID())
             and tCrossServerInfos[k] then
                 return tCrossServerInfos[k]
@@ -55,37 +55,49 @@ local InfoCache = (function()
                 k = tName2ID[nSegID][k]
             end
             if type(k) == "number" then -- dwID
-                local nSegID = string.char(string.byte(k, 1, 2))
+                local nSegID = string.char(string.byte(k, 1, 3))
                 if not tInfos[nSegID] then
                     tInfos[nSegID] = MY.LoadLUAData(SZ_DATA_PATH:format(nSegID)) or {}
                 end
                 return tInfos[nSegID][k]
             end
         end,
-        __newindex = function(_, k, v)
+        __newindex = function(t, k, v)
             if type(k) == "number" then -- dwID, tInfo
                 if IsRemotePlayer(k) then
                     tCrossServerInfos[k] = v
                     tCrossServerInfos[v.n] = v
                 else
                     -- save player info
-                    local nSegID = string.char(string.byte(k, 1, 2))
+                    local nSegID = string.char(string.byte(k, 1, 3))
                     if not tInfos[nSegID] then
                         tInfos[nSegID] = MY.LoadLUAData(SZ_DATA_PATH:format(nSegID)) or {}
                     end
-                    tInfos[nSegID][k] = v
-                    tModified[nSegID] = GetTime()
+                    local tInfo = tInfos[nSegID][k]
+                    if tInfo then
+                        for _, k in ipairs({"i", "f", "n", "r", "l", "t", "c", "g"}) do
+                            if v[k] ~= tInfo[k] then
+                                tInfos[nSegID][k] = v
+                                tModified[nSegID] = GetTime()
+                            end
+                        end
+                    else
+                        tInfos[nSegID][k] = v
+                        tModified[nSegID] = GetTime()
+                    end
                     -- save szName to dwID indexing
                     local nSegID = string.byte(v.n)
                     if not tName2ID[nSegID] then
                         tName2ID[nSegID] = MY.LoadLUAData(SZ_N2ID_PATH:format(nSegID)) or {}
                     end
-                    tName2ID[nSegID][v.n] = k
-                    tName2IDModified[nSegID] = GetTime()
+                    if tName2ID[nSegID][v.n] ~= k then
+                        tName2ID[nSegID][v.n] = k
+                        tName2IDModified[nSegID] = GetTime()
+                    end
                 end
             end
         end,
-        __call = function(_, cmd, arg0, arg1, ...)
+        __call = function(t, cmd, arg0, arg1, ...)
             if cmd == "clear" then
                 -- clear all data file
                 tInfos, tModified = {}, {}
