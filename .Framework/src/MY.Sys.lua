@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-12 17:07:07
+-- @Last Modified time: 2015-06-14 22:19:49
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 MY = MY or {}
@@ -313,18 +313,19 @@ end
 
 -- 注册呼吸循环调用函数
 -- (string szKey) MY.BreatheCall([string szKey, ]function fnAction[, number nInterval])
--- (string szKey) MY.BreatheCallDelay(string szKey, nTime) -- 改变呼吸调用频率
+-- (string szKey) MY.BreatheCall(string szKey, number nTime[, bool bOnce]) -- 改变呼吸调用频率
 -- szKey       -- 名称，必须唯一，重复则覆盖
 -- fnAction    -- 循环呼吸调用函数，设为 nil 则表示取消这个 key 下的呼吸处理函数
 -- nInterval   -- 调用间隔，单位：毫秒
 MY.BreatheCall = function(szKey, fnAction, nInterval)
+	local bOnce
 	if type(szKey) == "function" then
 		szKey, fnAction, nInterval = GetTickCount(), szKey, fnAction
 		while _C.tBreatheCall[szKey] do
 			szKey = szKey + 0.1
 		end
 	elseif type(fnAction) == "number" then
-		nInterval, fnAction = fnAction
+		nInterval, bOnce, fnAction = fnAction, nInterval
 	end
 	if fnAction then -- reg
 		_C.tBreatheCall[szKey] = {
@@ -335,8 +336,10 @@ MY.BreatheCall = function(szKey, fnAction, nInterval)
 	elseif nInterval then -- modify
 		local bc = _C.tBreatheCall[szKey]
 		if bc then
-			bc.nInterval = nInterval
-			bc.nNext = GetTickCount() + bc.nInterval
+			if not bOnce then
+				bc.nInterval = nInterval
+			end
+			bc.nNext = GetTickCount() + nInterval
 		end
 	elseif szKey then -- unreg
 		_C.tBreatheCall[szKey] = nil
