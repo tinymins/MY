@@ -4,10 +4,13 @@
 -- @Date  : 2015-02-28 17:37:53
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-23 13:57:56
+-- @Last Modified time: 2015-06-14 12:30:32
 --------------------------------------------
 local _C = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Dev_BosslistGene/lang/")
+local tinsert, tconcat, tremove = table.insert, table.concat, table.remove
+local BOSS_ADD_PATH = MY.GetAddonInfo().szRoot .. "Dev_BosslistGene/data/add.jx3dat"
+local BOSS_DEL_PATH = MY.GetAddonInfo().szRoot .. "Dev_BosslistGene/data/del.jx3dat"
 
 _C.GetDungeonBoss = function()
 	local t = {}
@@ -27,23 +30,48 @@ _C.GetDungeonBoss = function()
 			end
 		end
 	end
+	
+	for dwMapID, tBoss in pairs(MY.LoadLUAData(BOSS_ADD_PATH) or {}) do
+		if not t[dwMapID] then
+			t[dwMapID] = {}
+		end
+		for dwNpcID, szName in pairs(tBoss) do
+			t[dwMapID][dwNpcID] = szName
+		end
+	end
+	for dwMapID, tBoss in pairs(MY.LoadLUAData(BOSS_DEL_PATH) or {}) do
+		if t[dwMapID] then
+			for dwNpcID, szName in pairs(tBoss) do
+				t[dwMapID][dwNpcID] = nil
+			end
+		end
+	end
 	return t
 end
 
 _C.GetDungeonBossFmt = function()
-	local t = _C.GetDungeonBoss()
-	local s = '{\n\t"version" : ' .. MY.Sys.FormatTime('yyyyMMdd', GetCurrentTime()) .. ',\n'
-	for dwMapID, tMap in pairs(t) do
-		s = s .. '\t"' .. dwMapID .. '" : {\n'
+	local t = { '{\n\t"version" : ', MY.Sys.FormatTime('yyyyMMdd', GetCurrentTime()), ',\n'}
+	for dwMapID, tMap in pairs(_C.GetDungeonBoss()) do
+		tinsert(t, '\t"')
+		tinsert(t, dwMapID)
+		tinsert(t, '" : {\n')
 		for dwNpcID, szName in pairs(tMap) do
-			s = s .. '\t\t"' .. dwNpcID .. '" : "' .. szName .. '",\n'
+			tinsert(t, '\t\t"')
+			tinsert(t, dwNpcID)
+			tinsert(t, '" : "')
+			tinsert(t, szName)
+			tinsert(t, '",\n')
 		end
-		s = s:sub(1, -3) .. '\n'
-		s = s .. '\t},\n'
+		if t[#t] == '",\n' then
+			t[#t] = '"\n'
+		end
+		tinsert(t, '\t},\n')
 	end
-	s = s:sub(1, -3) .. '\n'
-	s = s .. '}'
-	return s
+	if t[#t] == '\t},\n' then
+		t[#t] = '\t}\n'
+	end
+	tinsert(t, '}')
+	return tconcat(t)
 end
 
 MY.RegisterPanel(
