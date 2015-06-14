@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-09 11:05:32
+-- @Last Modified time: 2015-06-14 18:03:52
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -2516,8 +2516,10 @@ function _MY.UI:hover(fnHover, fnLeave, bNoAutoBind)
 			local wnd = ele.edt or ele.wnd
 			local itm = ele.itm or ele.itm
 			if wnd then
+				wnd:RegisterEvent(256)
 				MY.UI.RegisterUIEvent(wnd, 'OnMouseEnter'    , function() fnHover(true, this:PtInWindow(Cursor.GetPos())) end)
 			elseif itm then
+				itm:RegisterEvent(256)
 				MY.UI.RegisterUIEvent(itm, 'OnItemMouseEnter', function() fnHover(true, this:PtInItem(Cursor.GetPos())) end)
 			end
 		end
@@ -2527,8 +2529,10 @@ function _MY.UI:hover(fnHover, fnLeave, bNoAutoBind)
 			local wnd = ele.edt or ele.wnd
 			local itm = ele.itm or ele.itm
 			if wnd then
+				wnd:RegisterEvent(256)
 				MY.UI.RegisterUIEvent(wnd, 'OnMouseLeave'    , function() fnLeave(false, this:PtInWindow(Cursor.GetPos())) end)
 			elseif itm then
+				itm:RegisterEvent(256)
 				MY.UI.RegisterUIEvent(itm, 'OnItemMouseLeave', function() fnLeave(false, this:PtInItem(Cursor.GetPos())) end)
 			end
 		end
