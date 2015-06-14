@@ -193,9 +193,17 @@ setmetatable(_MY_Farbnamen.tCampString,  { __index = function(t, k) return k end
 -- 聊天复制和时间显示相关
 ---------------------------------------------------------------
 -- 插入聊天内容的 HOOK （过滤、加入时间 ）
-MY.HookChatPanel(function(h, szChannel, szMsg)
+MY.HookChatPanel("MY_FARBNAMEN", function(h, szChannel, szMsg)
+    return szMsg, h:GetItemCount()
+end, function(h, szChannel, szMsg, nIndex)
     if MY_Farbnamen.bEnabled then
-        return MY_Farbnamen.Render(szMsg)
+        for i = h:GetItemCount() - 1, nIndex or 0, -1 do
+            MY_Farbnamen.Render(h:Lookup(i))
+        end
+    end
+end, function(h)
+    for i = h:GetItemCount() - 1, 0, -1 do
+        MY_Farbnamen.Render(h:Lookup(i))
     end
 end)
 -- 开放的名称染色接口
@@ -241,16 +249,17 @@ MY_Farbnamen.Render = function(szMsg)
         local tInfo = MY_Farbnamen.GetAusName(szName)
         if tInfo then
             -- 绑定tip提示
-            MY.UI(namelink):hover(MY_Farbnamen.ShowTip, nil, true):color(tInfo.rgb)
+            MY.UI(namelink):hover(MY_Farbnamen.ShowTip, HideTip, true):color(tInfo.rgb)
         end
     end
-    
     return szMsg
 end
 -- 显示Tip
 MY_Farbnamen.ShowTip = function(namelink)
     local x, y, w, h = 0, 0, 0, 0
-    namelink = namelink or this
+    if type(namelink) ~= "table" then
+        namelink = this
+    end
     if not namelink then
         return
     end
@@ -293,7 +302,7 @@ MY_Farbnamen.ShowTip = function(namelink)
         ))
         tinsert(tTip, XML_LINE_BREAKER)
         -- 随身便笺
-        if MY_Anmerkungen then
+        if MY_Anmerkungen and MY_Anmerkungen.GetPlayerNote then
             local tPlayerNote = MY_Anmerkungen.GetPlayerNote(tInfo.dwID)
             if tPlayerNote then
                 tinsert(tTip, GetFormatText(tPlayerNote.szContent, 136))
