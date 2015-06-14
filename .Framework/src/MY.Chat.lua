@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-06 20:43:01
+-- @Last Modified time: 2015-06-14 17:37:00
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -759,33 +759,42 @@ MY.Chat.RegisterMsgMonitor = function(arg0, arg1, arg2)
 end
 MY.RegisterMsgMonitor = MY.Chat.RegisterMsgMonitor
 
-_C.tHookChatFun = {}
+_C.tHookChat = {}
 -- HOOK聊天栏
-MY.Chat.HookChatPanel = function(arg0, arg1, arg2)
-	local fnBefore, fnAfter, id
-	if type(arg0)=="string" then
-		id, fnBefore, fnAfter = arg0, arg1, arg2
-	elseif type(arg1)=="string" then
-		id, fnBefore, fnAfter = arg1, arg0, arg2
-	elseif type(arg2)=="string" then
-		id, fnBefore, fnAfter = arg2, arg0, arg1
-	else
-		id, fnBefore, fnAfter = nil, arg0, arg1
-	end
-	if id then
-		for i=#_C.tHookChatFun, 1, -1 do
-			if _C.tHookChatFun[i].id == id then
-				table.remove(_C.tHookChatFun, i)
-			end
+MY.Chat.HookChatPanel = function(szKey, fnBefore, fnAfter, fnOnActive)
+	if type(szKey) == "function" then
+		szKey, fnBefore, fnAfter, fnOnActive = GetTickCount(), szKey, fnBefore, fnAfter
+		while _C.tHookChat[szKey] do
+			szKey = szKey + 0.1
 		end
 	end
-	if fnBefore then
-		table.insert(_C.tHookChatFun, {fnBefore = fnBefore, fnAfter = fnAfter, id = id})
+	if fnBefore or fnAfter or fnOnActive then
+		_C.tHookChat[szKey] = {
+			fnBefore = fnBefore, fnAfter = fnAfter, fnOnActive = fnOnActive
+		}
+	else
+		_C.tHookChat[szKey] = nil
 	end
 end
 MY.HookChatPanel = MY.Chat.HookChatPanel
 
-_C.HookChatPanelHandle = function(h, szMsg, szChannel, ...)
+_C.OnChatPanelActive = function(h)
+	for szKey, hc in pairs(_C.tHookChat) do
+		if hc.fnOnActive then
+			local status, err = pcall(hc.fnOnActive, h)
+			if not status then
+				MY.Debug({err}, 'MY.Chat.lua#OnChatPanelActive', MY_DEBUG.ERROR)
+			end
+		end
+	end
+end
+
+_C.OnChatPanelNamelinkLButtonDown = function(...)
+	this.__MY_OnItemLButtonDown(...)
+	MY.Chat.LinkEventHandler.OnNameLClick(...)
+end
+
+_C.OnChatPanelAppendItemFromString = function(h, szMsg, szChannel, ...)
 	-- filter addon comm.
 	if StringFindW(szMsg, "eventlink") and StringFindW(szMsg, 'text=""') and StringFindW(szMsg, _L["Addon comm."]) then
 		return
@@ -803,22 +812,25 @@ _C.HookChatPanelHandle = function(h, szMsg, szChannel, ...)
 			return '<image>path="'..szImagePath..'"'..szExtra..'frame='..szFrame..' name="'..emo.dwID..'"</image>'
 		end
 	end)
+	local bActived = h:GetRoot():Lookup('CheckBox_Title'):IsCheckBoxChecked()
 	-- deal with fnBefore
-	for i,handle in ipairs(_C.tHookChatFun) do
-		-- try to execute fnBefore and get return values
-		local result = { pcall(handle.fnBefore, h, szChannel, szMsg) }
-		-- when fnBefore execute succeed
-		if result[1] then
-			-- remove execute status flag
-			table.remove(result, 1)
-			if type(result[1])=="string" then
-				szMsg = result[1]
+	for szKey, hc in pairs(_C.tHookChat) do
+		if hc.fnBefore and (bActived or not hc.fnOnActive) then
+			-- try to execute fnBefore and get return values
+			local result = { pcall(hc.fnBefore, h, szChannel, szMsg) }
+			-- when fnBefore execute succeed
+			if result[1] then
+				-- remove execute status flag
+				table.remove(result, 1)
+				if type(result[1]) == "string" then
+					szMsg = result[1]
+				end
+				-- remove returned szMsg
+				table.remove(result, 1)
 			end
-			-- remove returned szMsg
-			table.remove(result, 1)
+			-- the rest is fnAfter param
+			hc.param = result
 		end
-		-- the rest is fnAfter param
-		_C.tHookChatFun[i].param = result
 	end
 	local nIndex = h:GetItemCount()
 	-- call ori append
@@ -830,18 +842,17 @@ _C.HookChatPanelHandle = function(h, szMsg, szChannel, ...)
 			hItem.bMyChatRendered = true
 			if hItem.OnItemLButtonDown then
 				hItem.__MY_OnItemLButtonDown = hItem.OnItemLButtonDown
-				hItem.OnItemLButtonDown = function(...)
-					hItem.__MY_OnItemLButtonDown(...)
-					MY.Chat.LinkEventHandler.OnNameLClick(...)
-				end
+				hItem.OnItemLButtonDown = _C.OnChatPanelNamelinkLButtonDown
 			else
 				hItem.OnItemLButtonDown = MY.Chat.LinkEventHandler.OnNameLClick
 			end
 		end
 	end
 	-- deal with fnAfter
-	for i, handle in ipairs(_C.tHookChatFun) do
-		pcall(handle.fnAfter, h, szChannel, szMsg, unpack(handle.param))
+	for szKey, hc in pairs(_C.tHookChat) do
+		if hc.fnAfter then
+			pcall(hc.fnAfter, h, szChannel, szMsg, unpack(hc.param))
+		end
 	end
 end
 
@@ -851,8 +862,11 @@ _C.Hook.Reg = function(i)
 	-- local ttl = Station.Lookup("Lowest2/ChatPanel" .. i .. "/CheckBox_Title", "Text_TitleName")
 	-- if h and (not ttl or ttl:GetText() ~= g_tStrings.CHANNEL_MENTOR) then
 	if h and not h._AppendItemFromString_MY then
+		h:GetRoot():Lookup('CheckBox_Title').OnCheckBoxCheck = function()
+			_C.OnChatPanelActive(h)
+		end
 		h._AppendItemFromString_MY = h.AppendItemFromString
-		h.AppendItemFromString = _C.HookChatPanelHandle
+		h.AppendItemFromString = _C.OnChatPanelAppendItemFromString
 	end
 end
 _C.Hook.Unreg = function(i)
