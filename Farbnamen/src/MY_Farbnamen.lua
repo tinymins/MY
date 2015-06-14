@@ -137,7 +137,7 @@ local InfoCache = (function()
                     if not dwTime or dwTime > dwModifyTime then
                         if nCount then
                             if nCount == 0 then
-                                return
+                                return true
                             end
                             nCount = nCount - 1
                         end
@@ -153,7 +153,7 @@ local InfoCache = (function()
                     if not dwTime or dwTime > dwModifyTime then
                         if nCount then
                             if nCount == 0 then
-                                return
+                                return true
                             end
                             nCount = nCount - 1
                         end
@@ -477,7 +477,11 @@ MY.RegisterTraceButtonMenu('MY_Farbenamen', MY_Farbnamen.GetMenu)
 MY.RegisterInit('MY_FARBNAMEN_DATA', MY_Farbnamen.LoadData)
 MY.RegisterInit('MY_FARBNAMEN_CUSTOMDATA', _MY_Farbnamen.LoadCustomData)
 MY.RegisterExit('MY_FARBNAMEN_CACHE', function() InfoCache("save") end)
-MY.BreatheCall('MY_FARBNAMEN_CACHE', function() InfoCache("save", GetTime() - 60000, 1, true) end, 1000)
+MY.BreatheCall('MY_FARBNAMEN_CACHE', function()
+    if InfoCache("save", GetTime() - 60000, 1, true) then
+        MY.BreatheCall('MY_FARBNAMEN_CACHE', 60, true)
+    end
+end, 20000)
 MY.RegisterEvent("PLAYER_ENTER_SCENE", function()
     if MY_Farbnamen.bEnabled then
         local dwID = arg0
