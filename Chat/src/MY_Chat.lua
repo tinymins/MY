@@ -31,7 +31,6 @@ MY_Chat.nChatTime = CHAT_TIME.HOUR_MIN_SEC
 MY_Chat.bChatCopyAlwaysShowMask = false
 MY_Chat.bChatCopyAlwaysWhite = false
 MY_Chat.bChatCopyNoCopySysmsg = false
-MY_Chat.bReplaceIcon = false
 MY_Chat.bDisplayPanel = true    --  «∑Òœ‘ æ√Ê∞Â
 _Cache.LoadBlockWords = function() MY_Chat.tBlockWords = MY.LoadLUAData('config/MY_CHAT/blockwords.$lang.jx3dat') or MY_Chat.tBlockWords end
 _Cache.SaveBlockWords = function() MY.SaveLUAData('config/MY_CHAT/blockwords.$lang.jx3dat', MY_Chat.tBlockWords) end
@@ -64,7 +63,6 @@ RegisterCustomData("MY_Chat.nChatTime")
 RegisterCustomData("MY_Chat.bChatCopyAlwaysShowMask")
 RegisterCustomData("MY_Chat.bChatCopyAlwaysWhite")
 RegisterCustomData("MY_Chat.bChatCopyNoCopySysmsg")
-RegisterCustomData("MY_Chat.bReplaceIcon")
 for k, _ in pairs(MY_Chat.tChannel) do RegisterCustomData("MY_Chat.tChannel."..k) end
 
 MY_Chat.OnFrameDragEnd = function() this:CorrectPos() MY_Chat.anchor = GetFrameAnchor(this) end
@@ -392,53 +390,13 @@ end
 --------------------------------------------------------------
 MY.RegisterInit('MY_CHAT', function()
 	MY_Chat.ReInitUI()
-	
 	MY.UI(MY_Chat.frame):children("#Btn_Option"):menu(MY_Chat.GetMenu)
 	-- load settings
 	MY_Chat.frame:EnableDrag(not MY_Chat.bLockPostion)
-	-- init icon replace table
-	_Cache.tReplaceIcon = {}
-	local data = LoadLUAData('interface/MY/@DATA/config/replace_icon') or { bEnabled = false, data = {} }
-	if data.bEnabled then
-		for s1, s2 in pairs(data.data) do
-			local emo = MY.Chat.GetEmotion(s2)
-			if emo then
-				if emo.szType=="image" then
-					_Cache.tReplaceIcon[s1] = string.format(
-						'<image>path="%s" disablescale=1 frame=%d name="%d" </image>',
-						string.gsub(emo.szImageFile, '\\', '\\\\'), emo.nFrame, emo.dwID
-					)
-				else
-					_Cache.tReplaceIcon[s1] = string.format(
-						'<animate>path="%s" disablescale=1 group=%d name="%d" </animate>',
-						string.gsub(emo.szImageFile, '\\', '\\\\'), emo.nFrame, emo.dwID
-					)
-				end
-			else
-				_Cache.tReplaceIcon[s1] = string.format( '<text>text="%s"</text>', s2 )
-			end
-		end
-	end
 end)
 
 -- hook chat panel
 MY.HookChatPanel("MY_Chat", function(h, szChannel, szMsg)
-	-- icon filter
-	if MY_Chat.bReplaceIcon then
-		szMsg = string.gsub(szMsg, '<animate>(.-)path="(.-)"(.-)group=(%d+)(.-)</animate>', function (e1, path, e2, group, e3)
-			local emo = MY.Chat.GetEmotion(path, group, 'animate')
-			if emo then
-				return _Cache.tReplaceIcon[emo.szCmd]
-			end
-		end)
-		szMsg = string.gsub(szMsg, '<image>(.-)path="(.-)"(.-)frame=(%d+)(.-)</image>', function (e1, path, e2, frame, e3)
-			local emo = MY.Chat.GetEmotion(path, frame, 'image')
-			if emo then
-				return _Cache.tReplaceIcon[emo.szCmd]
-			end
-		end)
-	end
-	
 	-- chat filter
 	if MY_Chat.bBlockWords then
 		-- local t = MY.Chat.FormatContent(szMsg)

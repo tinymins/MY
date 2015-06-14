@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-14 17:37:00
+-- @Last Modified time: 2015-06-14 21:57:59
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -13,6 +13,7 @@
 MY = MY or {}
 MY.Chat = MY.Chat or {}
 local _C, _L = {}, MY.LoadLangPack()
+local EMPTY_TABLE = SetmetaReadonly({})
 
 -- 海鳗里面抠出来的
 -- 聊天复制并发布
@@ -761,6 +762,8 @@ MY.RegisterMsgMonitor = MY.Chat.RegisterMsgMonitor
 
 _C.tHookChat = {}
 -- HOOK聊天栏
+-- 注：如果fnOnActive存在则没有激活的聊天栏不会执行fnBefore、fnAfter
+--     同时在聊天栏切换时会触发fnOnActive
 MY.Chat.HookChatPanel = function(szKey, fnBefore, fnAfter, fnOnActive)
 	if type(szKey) == "function" then
 		szKey, fnBefore, fnAfter, fnOnActive = GetTickCount(), szKey, fnBefore, fnAfter
@@ -780,10 +783,10 @@ MY.HookChatPanel = MY.Chat.HookChatPanel
 
 _C.OnChatPanelActive = function(h)
 	for szKey, hc in pairs(_C.tHookChat) do
-		if hc.fnOnActive then
+		if type(hc.fnOnActive) == "function" then
 			local status, err = pcall(hc.fnOnActive, h)
 			if not status then
-				MY.Debug({err}, 'MY.Chat.lua#OnChatPanelActive', MY_DEBUG.ERROR)
+				MY.Debug({err}, 'HookChatPanelOnActive#' .. szKey, MY_DEBUG.ERROR)
 			end
 		end
 	end
@@ -815,7 +818,9 @@ _C.OnChatPanelAppendItemFromString = function(h, szMsg, szChannel, ...)
 	local bActived = h:GetRoot():Lookup('CheckBox_Title'):IsCheckBoxChecked()
 	-- deal with fnBefore
 	for szKey, hc in pairs(_C.tHookChat) do
-		if hc.fnBefore and (bActived or not hc.fnOnActive) then
+		hc.param = EMPTY_TABLE
+		-- if fnBefore exist and ChatPanel[i] actived or fnOnActive not defined
+		if type(hc.fnBefore) == "function" and (bActived or not hc.fnOnActive) then
 			-- try to execute fnBefore and get return values
 			local result = { pcall(hc.fnBefore, h, szChannel, szMsg) }
 			-- when fnBefore execute succeed
@@ -827,9 +832,9 @@ _C.OnChatPanelAppendItemFromString = function(h, szMsg, szChannel, ...)
 				end
 				-- remove returned szMsg
 				table.remove(result, 1)
+				-- the rest is fnAfter param
+				hc.param = result
 			end
-			-- the rest is fnAfter param
-			hc.param = result
 		end
 	end
 	local nIndex = h:GetItemCount()
@@ -850,8 +855,12 @@ _C.OnChatPanelAppendItemFromString = function(h, szMsg, szChannel, ...)
 	end
 	-- deal with fnAfter
 	for szKey, hc in pairs(_C.tHookChat) do
-		if hc.fnAfter then
-			pcall(hc.fnAfter, h, szChannel, szMsg, unpack(hc.param))
+		-- if fnAfter exist and ChatPanel[i] actived or fnOnActive not defined
+		if type(hc.fnAfter) == "function" and (bActived or not hc.fnOnActive) then
+			local status, err = pcall(hc.fnAfter, h, szChannel, szMsg, unpack(hc.param))
+			if not status then
+				MY.Debug({err}, 'HookChatPanel.After#' .. szKey, MY_DEBUG.ERROR)
+			end
 		end
 	end
 end

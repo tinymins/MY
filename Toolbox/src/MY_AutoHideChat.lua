@@ -159,13 +159,9 @@ MY_AutoHideChat.ApplyConfig = function()
             _Cache.bAhAnimate = _Cache.bAhAnimate or false
         end
         -- hook chat panel as event listener
-        MY.Chat.HookChatPanel('MY_AutoHideChat', function() end,function(h, szChannel, szMsg)
+        MY.Chat.HookChatPanel('MY_AutoHideChat', nil, function(h, szChannel, szMsg)
             -- if szMsg is empty (means nothing appended) then return
             if not (szMsg and #szMsg > 0) then
-                return
-            end
-            -- if not active panel msg then return
-            if not h:GetRoot():Lookup('CheckBox_Title'):IsCheckBoxChecked() then
                 return
             end
             -- if input box get focus then return
@@ -178,7 +174,7 @@ MY_AutoHideChat.ApplyConfig = function()
                 -- hide after 5 sec
                 MY_AutoHideChat.HideChatPanel(GLOBAL.GAME_FPS / 2, GLOBAL.GAME_FPS * 5)
             end)
-        end)
+        end, true)
         
         -- hook chat edit box
         local hEditInput = Station.Lookup('Lowest2/EditBox/Edit_Input')
