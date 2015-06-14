@@ -36,6 +36,7 @@ local Config_Default = {
 }
 local Config = clone(Config_Default)
 local InfoCache = (function()
+    local aCache, tCache = {}, setmetatable({}, { __mode = "v" }) -- high speed L1 CACHE
     local tInfos, tModified = {}, {}
     local tCrossServerInfos = {}
     local tName2ID, tName2IDModified = {}, {}
@@ -47,6 +48,12 @@ local InfoCache = (function()
             and tCrossServerInfos[k] then
                 return tCrossServerInfos[k]
             end
+            -- if hit in L1 CACHE
+            if tCache[k] then
+                -- Log("PLAYER INFO L1 HIT " .. k)
+                return tCache[k]
+            end
+            -- read player info from saved data
             if type(k) == "string" then -- szName
                 local nSegID = string.byte(k)
                 if not tName2ID[nSegID] then
@@ -68,6 +75,15 @@ local InfoCache = (function()
                     tCrossServerInfos[k] = v
                     tCrossServerInfos[v.n] = v
                 else
+                    -- add to L1 CACHE
+                    if not tCache[k] then
+                        if #aCache > 3000 then
+                            tremove(aCache, 1)
+                        end
+                        tinsert(aCache, v)
+                        tCache[k] = v
+                        tCache[v.n] = v
+                    end
                     -- save player info
                     local nSegID = string.char(string.byte(k, 1, 3))
                     if not tInfos[nSegID] then
@@ -115,6 +131,7 @@ local InfoCache = (function()
             elseif cmd == "save" then
                 local dwTime = arg0
                 local nCount = arg1
+                local bCollect = arg2
                 -- save info data
                 for nSegID, dwModifyTime in pairs(tModified) do
                     if not dwTime or dwTime > dwModifyTime then
@@ -125,6 +142,9 @@ local InfoCache = (function()
                             nCount = nCount - 1
                         end
                         MY.SaveLUAData(SZ_DATA_PATH:format(nSegID), tInfos[nSegID])
+                        if bCollect then
+                            tInfos[nSegID] = nil
+                        end
                         tModified[nSegID] = nil
                     end
                 end
@@ -138,6 +158,9 @@ local InfoCache = (function()
                             nCount = nCount - 1
                         end
                         MY.SaveLUAData(SZ_N2ID_PATH:format(nSegID), tName2ID[nSegID])
+                        if bCollect then
+                            tName2ID[nSegID] = nil
+                        end
                         tName2IDModified[nSegID] = nil
                     end
                 end
@@ -445,7 +468,7 @@ MY.RegisterTraceButtonMenu('MY_Farbenamen', MY_Farbnamen.GetMenu)
 MY.RegisterInit('MY_FARBNAMEN_DATA', MY_Farbnamen.LoadData)
 MY.RegisterInit('MY_FARBNAMEN_CUSTOMDATA', _MY_Farbnamen.LoadCustomData)
 MY.RegisterExit('MY_FARBNAMEN_CACHE', function() InfoCache("save") end)
-MY.BreatheCall('MY_FARBNAMEN_CACHE', function() InfoCache("save", GetTime() - 60000, 1) end, 1000)
+MY.BreatheCall('MY_FARBNAMEN_CACHE', function() InfoCache("save", GetTime() - 60000, 1, true) end, 1000)
 MY.RegisterEvent("PLAYER_ENTER_SCENE", function()
     if MY_Farbnamen.bEnabled then
         local dwID = arg0
