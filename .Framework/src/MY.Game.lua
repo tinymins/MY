@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-14 13:01:40
+-- @Last Modified time: 2015-06-14 16:57:12
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -----------------------------------------------
@@ -469,7 +469,6 @@ MY.RegisterInit('MYLIB#UPDATE_BOSSLIST', function()
 		if not _C.tBossList then
 			MY.Game.GetBossList()
 		end
-		Output(data.version, _C.tBossList.version)
 		if data.version > _C.tBossList.version then
 			_C.tBossList = data
 			MY.Sys.SaveLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/bosslist.jx3dat', _C.tBossList)
