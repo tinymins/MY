@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-25 10:40:14
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-15 14:43:07
+-- @Last Modified time: 2015-06-15 15:54:56
 -----------------------------------------------
 MY_BagEx = {}
 MY_BagEx.bEnable = true
@@ -230,14 +230,16 @@ _C.FilterBags = function(szTreePath, szFilter, bTimeLtd)
 			return
 		end
 		local bMatch = true
-		local _, nUiId, dwBox, dwX, suitIndex, dwTabType, dwIndex = this:GetObject()
-		local item = GetPlayerItem(GetClientPlayer(), dwBox, dwX)
-		if item then
-			if bTimeLtd and item:GetLeftExistTime() == 0 then
-				bMatch = false
-			end
-			if not wstring.find(_C.GetItemText(item), szFilter) then
-				bMatch = false
+		local szBoxType, nUiId, dwBox, dwX, suitIndex, dwTabType, dwIndex = this:GetObject()
+		if szBoxType == UI_OBJECT_ITEM then
+			local item = GetPlayerItem(GetClientPlayer(), dwBox, dwX)
+			if item then
+				if bTimeLtd and item:GetLeftExistTime() == 0 then
+					bMatch = false
+				end
+				if not wstring.find(_C.GetItemText(item), szFilter) then
+					bMatch = false
+				end
 			end
 		end
 		if bMatch then
