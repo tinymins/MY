@@ -95,6 +95,7 @@ local InfoCache = (function()
                             if v[k] ~= tInfo[k] then
                                 tInfos[nSegID][k] = v
                                 tModified[nSegID] = GetTime()
+                                break
                             end
                         end
                     else
