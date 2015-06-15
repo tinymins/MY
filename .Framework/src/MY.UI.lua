@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-14 18:17:09
+-- @Last Modified time: 2015-06-15 14:35:30
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -685,8 +685,7 @@ _MY.tItemXML = {
 }
 -- append
 -- similar as jQuery.append()
--- Instance:append(szName, szType, tArg)
--- Instance:append(szType, tArg)
+-- Instance:append(szType,[ szName,] tArg)
 -- Instance:append(szItemString)
 function _MY.UI:append(arg0, arg1, arg2)
 	self:_checksum()
@@ -3256,12 +3255,12 @@ _MY.IE_GetNewIEFramePos = function()
 end
 
 -- append an item to parent
--- MY.UI.Append(hParent, szName, szType, tArg)
+-- MY.UI.Append(hParent, szType,[ szName,] tArg)
 -- hParent     -- an Window, Handle or MY.UI object
 -- szName      -- name of the object inserted
 -- tArg        -- param like width, height, left, right, etc.
-MY.UI.Append = function(hParent, szName, szType, tArg)
-	return MY.UI(hParent):append(szName, szType, tArg)
+MY.UI.Append = function(hParent, szType, szName, tArg)
+	return MY.UI(hParent):append(szType, szName, tArg)
 end
 
 MY.UI.GetTreePath = function(raw)
