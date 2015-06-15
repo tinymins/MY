@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-14 16:57:12
+-- @Last Modified time: 2015-06-15 09:35:20
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -----------------------------------------------
@@ -458,7 +458,7 @@ MY.IsBoss = MY.Game.IsBoss
 -- remote boss list online
 MY.RegisterInit('MYLIB#UPDATE_BOSSLIST', function()
 	-- start remote version check
-	MY.RemoteRequest('http://data.jx3.derzh.com/data/bosslist.html?_=' .. GetCurrentTime(), function(szTitle, szContent)
+	MY.RemoteRequest('http://data.jx3.derzh.com/data/bosslist.html?_=' .. math.floor(GetCurrentTime() / 3600), function(szTitle, szContent)
 		-- decode data
 		local data = MY.Json.Decode(szContent)
 		if not data then
