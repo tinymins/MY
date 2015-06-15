@@ -393,6 +393,26 @@ MY.RegisterInit('MY_CHAT', function()
 	MY.UI(MY_Chat.frame):children("#Btn_Option"):menu(MY_Chat.GetMenu)
 	-- load settings
 	MY_Chat.frame:EnableDrag(not MY_Chat.bLockPostion)
+	-- 
+	local hFrame = Station.Lookup("Lowest2/EditBox")
+	if hFrame and not hFrame:Lookup("Btn_Cls") then
+		MUI.Append(hFrame, "WndButton5", "Btn_Cls", {
+			x = 397, y = 1,
+			w = 24, h = 24,
+			text = "X",
+			onclick = function()
+				for i = 1, 10 do
+					local h = Station.Lookup("Lowest2/ChatPanel" .. i .. "/Wnd_Message", "Handle_Message")
+					local hCheck = Station.Lookup("Lowest2/ChatPanel" .. i .. "/CheckBox_Title")
+					if h and hCheck and hCheck:IsCheckBoxChecked() then
+						h:Clear()
+						h:FormatAllItemPos()
+					end
+				end
+			end
+		})
+		hFrame:SetW(421)
+	end
 end)
 
 -- hook chat panel
