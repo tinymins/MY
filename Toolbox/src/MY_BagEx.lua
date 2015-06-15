@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-25 10:40:14
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-27 17:24:40
+-- @Last Modified time: 2015-06-15 14:43:07
 -----------------------------------------------
 MY_BagEx = {}
 MY_BagEx.bEnable = true
@@ -157,7 +157,7 @@ _C.Hook = function()
 		  	_C.bCompareGuild = bChecked
 		  	_C.DoCompareGuildBank(true)
 		  end)
-		_C.DoCompareBank()
+		_C.DoCompareGuildBank()
 		
 		MY.UI("Normal/GuildBankPanel"):children('#^CheckBox_%d$')
 		  :onuievent('OnLButtonUp')
