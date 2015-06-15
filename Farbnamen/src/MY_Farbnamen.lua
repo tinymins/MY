@@ -360,7 +360,7 @@ function MY_Farbnamen.AddAusID(dwID)
             l = player.nLevel,
             t = player.szTitle,
             c = player.nCamp,
-            g = GetTongClient().ApplyGetTongName(player.dwTongID),
+            g = player.dwTongID > 0 and GetTongClient().ApplyGetTongName(player.dwTongID) or "",
             _ = GetCurrentTime(),
         }
         return true
