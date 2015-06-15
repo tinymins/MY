@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-15 14:35:30
+-- @Last Modified time: 2015-06-15 16:51:16
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -26,6 +26,7 @@ _MY.ApplyUIArgument = function(ui, tArg)
 		if tArg.anchor      then ui:anchor     (tArg.anchor     ) end
 		if tArg.alpha       then ui:alpha      (tArg.alpha      ) end
 		if tArg.color       then ui:color      (tArg.color      ) end
+		if tArg.multiline   then ui:multiLine  (tArg.multiline  ) end -- must before :text()
 		if tArg.text        then ui:text       (tArg.text       ) end
 		if tArg.placeholder then ui:placeholder(tArg.placeholder) end
 		if tArg.group       then ui:group      (tArg.group      ) end
@@ -43,7 +44,6 @@ _MY.ApplyUIArgument = function(ui, tArg)
 		if tArg.checked     then ui:check      (tArg.checked    ) end
 		if tArg.oncheck     then ui:check      (tArg.oncheck    ) end
 		if tArg.onchange    then ui:change     (tArg.onchange   ) end
-		if tArg.multiline   then ui:multiLine  (tArg.multiline  ) end
 	end
 end
 -------------------------------------
