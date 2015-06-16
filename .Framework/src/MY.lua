@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-16 16:03:05
+-- @Last Modified time: 2015-06-16 16:34:38
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -271,6 +271,7 @@ MY.ClosePanel = function(bMute, bRealClose)
 		if not bRealClose then
 			hFrame:Hide()
 		else
+			MY.SwitchTab()
 			Wnd.CloseWindow(hFrame)
 		end
 		Wnd.CloseWindow("PopupMenuPanel")
