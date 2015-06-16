@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-16 09:26:00
+-- @Last Modified time: 2015-06-16 15:24:26
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -762,12 +762,22 @@ function _MY.UI:append(arg0, arg1, arg2)
 							return 1
 						end
 					elseif szType=='WndEditBox' then
-						wnd:Lookup("WndEdit_Default").OnSetFocus = function()
+						local edt = wnd:Lookup("WndEdit_Default")
+						edt.OnSetFocus = function()
 							wnd:Lookup("", "Text_PlaceHolder"):Hide()
 						end
-						wnd:Lookup("WndEdit_Default").OnKillFocus = function()
+						edt.OnKillFocus = function()
 							if wnd:Lookup("WndEdit_Default"):GetText() == "" then
 								wnd:Lookup("", "Text_PlaceHolder"):Show()
+							end
+						end
+						edt.OnEditSpecialKeyDown = function()
+							local szKey = GetKeyName(Station.GetMessageKey())
+							if szKey == "Esc" or (
+								szKey == "Enter" and not edt:IsMultiLine()
+							) then
+								Station.SetFocusWindow(edt:GetRoot())
+								return 1
 							end
 						end
 					elseif szType=='WndAutoComplete' then
@@ -825,8 +835,10 @@ function _MY.UI:append(arg0, arg1, arg2)
 								or szKey == "Right" then
 									return PopupMenu_ProcessHotkey()
 								end
-							elseif szKey == "Enter" then
-								Station.SetFocusWindow(MY.GetFrame())
+							elseif szKey == "Esc" or (
+								szKey == "Enter" and not edt:IsMultiLine()
+							) then
+								Station.SetFocusWindow(edt:GetRoot())
 								return 1
 							end
 						end
