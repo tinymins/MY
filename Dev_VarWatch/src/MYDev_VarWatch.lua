@@ -4,7 +4,7 @@
 -- @Date  : 2015-02-28 17:37:53
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-16 16:51:47
+-- @Last Modified time: 2015-06-16 18:05:52
 --------------------------------------------
 local _C = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Dev_VarWatch/lang/")
@@ -93,7 +93,6 @@ MY.RegisterPanel(
 		end
 		
 		MY.BreatheCall("DEV_VARWATCH", function()
-			Output(1)
 			for i = 1, nLimit do
 				local szKey = _C.tVarList[i]
 				local hFocus = Station.GetFocusWindow()
@@ -114,7 +113,7 @@ MY.RegisterPanel(
 			end
 		end)
 	end,
-	OnPanelDeactive = function()Output("BCCANCEL")
+	OnPanelDeactive = function()
 		MY.BreatheCall("DEV_VARWATCH")
 	end,
 })
