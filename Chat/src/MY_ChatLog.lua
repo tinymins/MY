@@ -55,10 +55,6 @@ function _C.OnMsg(szMsg, szChannel, nFont, bRich, r, g, b)
 	end
 	-- generate rec
 	szMsg = MY.Chat.GetTimeLinkText({r=r, g=g, b=b, f=nFont, s='[hh:mm:ss]'}) .. szMsg
-	szMsg = MY.Chat.RenderLink(szMsg)
-	if MY_Farbnamen and MY_Farbnamen.Render then
-		szMsg = MY_Farbnamen.Render(szMsg)
-	end
 	-- save and draw rec
 	_C.AppendLog(szChannel, _C.GetCurrentDate(), szMsg)
 	_C.UiAppendLog(szChannel, szMsg)
@@ -266,6 +262,13 @@ function _C.UiDrawPrev(nCount)
 	h:FormatAllItemPos()
 	nLen = h:GetItemCount() - nLen
 	MY_ChatMosaics.Mosaics(h, nPos, nLen)
+	for i = 0, nLen do
+		local hItem = h:Lookup(i)
+		MY.Chat.RenderLink(hItem)
+		if MY_Farbnamen and MY_Farbnamen.Render then
+			MY_Farbnamen.Render(hItem)
+		end
+	end
 	-- 恢复之前滚动条位置
 	if nOrginScrollY < 0 then -- 之前没有滚动条
 		if _C.uiLog:scroll() >= 0 then -- 现在有滚动条
@@ -294,6 +297,13 @@ function _C.UiAppendLog(szChannel, szMsg)
 		_C.uiLog:append(szMsg)
 		if nCount then
 			MY_ChatMosaics.Mosaics(h, nCount)
+			for i = nCount, h:GetItemCount() - 1 do
+				local hItem = h:Lookup(i)
+				MY.Chat.RenderLink(hItem)
+				if MY_Farbnamen and MY_Farbnamen.Render then
+					MY_Farbnamen.Render(hItem)
+				end
+			end
 		end
 	else
 		_C.uiLog:append(szMsg)
