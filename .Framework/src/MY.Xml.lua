@@ -263,7 +263,9 @@ function SLAXML:parse(xml,options)
 									quoting = true
 									byte_quote = byte_i
 								elseif byte_i == byte_lt then
-									pos = i - 1
+									if pos > i then
+										pos = i - 1
+									end
 									break
 								end
 							end
