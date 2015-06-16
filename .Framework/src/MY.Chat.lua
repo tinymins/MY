@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-14 21:57:59
+-- @Last Modified time: 2015-06-16 19:31:17
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -177,13 +177,6 @@ MY.Chat.CopyChatLine = function(hTime, bTextEditor)
 						edit:InsertObj(szText, { type = "eventlink", text = szText, name = p.szName, linkinfo = p.szLinkInfo })
 					end
 				else
-					-- NPC 喊话特殊处理
-					if bBegin == nil then
-						local r, g, b = p:GetFontColor()
-						if r == 255 and g == 150 and b == 0 then
-							bBegin = false
-						end
-					end
 					if bBegin == false then
 						for _, v in ipairs({g_tStrings.STR_TALK_HEAD_WHISPER, g_tStrings.STR_TALK_HEAD_SAY, g_tStrings.STR_TALK_HEAD_SAY1, g_tStrings.STR_TALK_HEAD_SAY2 }) do
 							local nB, nE = StringFindW(szText, v)
