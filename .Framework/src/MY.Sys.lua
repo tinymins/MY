@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-14 22:19:49
+-- @Last Modified time: 2015-06-16 14:12:30
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 MY = MY or {}
@@ -303,7 +303,7 @@ MY.DelayCall = function(szKey, fnAction, nDelay)
 	elseif nDelay then -- modify
 		local dc = _C.tDelayCall[szKey]
 		if dc then
-			bc.nTime = nDelay + GetTickCount()
+			dc.nTime = nDelay + GetTickCount()
 		end
 	elseif szKey then -- unreg
 		_C.tDelayCall[szKey] = nil
