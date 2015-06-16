@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-16 00:31:56
+-- @Last Modified time: 2015-06-14 21:57:59
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -133,7 +133,7 @@ MY.Chat.CopyChatLine = function(hTime, bTextEditor)
 	end
 	Station.Lookup("Lowest2/EditBox"):Show()
 	edit:ClearText()
-	local h, i = hTime:GetParent(), hTime:GetIndex()
+	local h, i, bBegin = hTime:GetParent(), hTime:GetIndex(), nil
 	-- loop
 	for i = i + 1, h:GetItemCount() - 1 do
 		local p = h:Lookup(i)
@@ -150,6 +150,9 @@ MY.Chat.CopyChatLine = function(hTime, bTextEditor)
 				elseif szName == "iteminfolink" then
 					edit:InsertObj(szText, { type = "iteminfo", text = szText, version = p.nVersion, tabtype = p.dwTabType, index = p.dwIndex })
 				elseif string.sub(szName, 1, 8) == "namelink" then
+					if bBegin == nil then
+						bBegin = false
+					end
 					edit:InsertObj(szText, { type = "name", text = szText, name = string.match(szText, "%[(.*)%]") })
 				elseif szName == "questlink" then
 					edit:InsertObj(szText, { type = "quest", text = szText, questid = p:GetUserData() })
@@ -174,6 +177,22 @@ MY.Chat.CopyChatLine = function(hTime, bTextEditor)
 						edit:InsertObj(szText, { type = "eventlink", text = szText, name = p.szName, linkinfo = p.szLinkInfo })
 					end
 				else
+					-- NPC 喊话特殊处理
+					if bBegin == nil then
+						local r, g, b = p:GetFontColor()
+						if r == 255 and g == 150 and b == 0 then
+							bBegin = false
+						end
+					end
+					if bBegin == false then
+						for _, v in ipairs({g_tStrings.STR_TALK_HEAD_WHISPER, g_tStrings.STR_TALK_HEAD_SAY, g_tStrings.STR_TALK_HEAD_SAY1, g_tStrings.STR_TALK_HEAD_SAY2 }) do
+							local nB, nE = StringFindW(szText, v)
+							if nB then
+								szText, bBegin = string.sub(szText, nB + nE), true
+								edit:ClearText()
+							end
+						end
+					end
 					if szText ~= "" and (table.getn(edit:GetTextStruct()) > 0 or szText ~= g_tStrings.STR_FACE) then
 						edit:InsertText(szText)
 					end
