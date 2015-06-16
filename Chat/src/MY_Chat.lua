@@ -400,6 +400,7 @@ MY.RegisterInit('MY_CHAT', function()
 			x = 397, y = 1,
 			w = 24, h = 24,
 			text = "X",
+			tip = _L['clear chat panel'],
 			onclick = function()
 				for i = 1, 10 do
 					local h = Station.Lookup("Lowest2/ChatPanel" .. i .. "/Wnd_Message", "Handle_Message")
@@ -409,7 +410,7 @@ MY.RegisterInit('MY_CHAT', function()
 						h:FormatAllItemPos()
 					end
 				end
-			end
+			end,
 		})
 		hFrame:SetW(421)
 	end

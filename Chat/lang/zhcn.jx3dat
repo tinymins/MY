@@ -18,6 +18,8 @@ data = {
     ['chat log'] = '聊天记录',
     ['Max log: %d'] = '最大记录：%d',
     
+    ['clear chat panel'] = '清空聊天栏',
+    
     ['filter tong online message'] = '过滤帮会上线公告提示',
     ['filter tong member log message'] = '过滤帮会成员上线提示',
     ['rebuild date list'] = '重建日期索引',
