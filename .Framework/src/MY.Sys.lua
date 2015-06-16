@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-16 14:12:30
+-- @Last Modified time: 2015-06-16 17:44:19
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 MY = MY or {}
@@ -686,3 +686,13 @@ MY.Sys.RegisterEsc = function(szID, fnCondition, fnAction, bTopmost)
 	end
 end
 MY.RegisterEsc = MY.Sys.RegisterEsc
+
+-- 测试用
+if loadstring then
+function MY.ProcessCommand(cmd)
+	local ls = loadstring("return " .. cmd)
+	if ls then
+		return ls()
+	end
+end
+end
