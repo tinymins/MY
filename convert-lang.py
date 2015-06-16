@@ -30,6 +30,7 @@ for parent, dirnames, filenames in os.walk(rootdir):    # 三个参数：分别�
 					#print "the full name of the file is:" + os.path.join(parent,filename) #输出文件路径信息
 					print 'file loading: ' + os.path.join(parent,filename)
 					# all_the_text = "-- language data (zhtw) updated at " + time.strftime('%Y-%m-%d %H:%I:%M',time.localtime(time.time())) + "\r\n"
+					all_the_text = ""
 					for count, line in enumerate(codecs.open(os.path.join(parent,filename),'r',encoding='gbk')):
 						if count == 0 and line.find('-- language data') == 0:
 							all_the_text = line.replace('zhcn', 'zhtw')
