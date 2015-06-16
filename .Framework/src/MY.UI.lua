@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-15 16:51:16
+-- @Last Modified time: 2015-06-16 09:26:00
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -31,7 +31,7 @@ _MY.ApplyUIArgument = function(ui, tArg)
 		if tArg.placeholder then ui:placeholder(tArg.placeholder) end
 		if tArg.group       then ui:group      (tArg.group      ) end
 		if tArg.font        then ui:font       (tArg.font       ) end
-		if tArg.tip         then ui:tip        (tArg.tip        ) end
+		if tArg.tip         then if type(tArg.tip) == 'table' then ui:tip(unpack(tArg.tip)) else ui:tip(tArg.tip) end end
 		if tArg.menu        then ui:menu       (tArg.menu       ) end
 		if tArg.limit       then ui:limit      (tArg.limit      ) end
 		if tArg.scroll      then ui:scroll     (tArg.scroll     ) end
