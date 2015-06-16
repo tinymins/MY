@@ -31,6 +31,7 @@ MY_Chat.nChatTime = CHAT_TIME.HOUR_MIN_SEC
 MY_Chat.bChatCopyAlwaysShowMask = false
 MY_Chat.bChatCopyAlwaysWhite = false
 MY_Chat.bChatCopyNoCopySysmsg = false
+MY_Chat.bAlertBeforeClear = true
 MY_Chat.bDisplayPanel = true    --  «∑Òœ‘ æ√Ê∞Â
 _Cache.LoadBlockWords = function() MY_Chat.tBlockWords = MY.LoadLUAData('config/MY_CHAT/blockwords.$lang.jx3dat') or MY_Chat.tBlockWords end
 _Cache.SaveBlockWords = function() MY.SaveLUAData('config/MY_CHAT/blockwords.$lang.jx3dat', MY_Chat.tBlockWords) end
@@ -63,6 +64,7 @@ RegisterCustomData("MY_Chat.nChatTime")
 RegisterCustomData("MY_Chat.bChatCopyAlwaysShowMask")
 RegisterCustomData("MY_Chat.bChatCopyAlwaysWhite")
 RegisterCustomData("MY_Chat.bChatCopyNoCopySysmsg")
+RegisterCustomData("MY_Chat.bAlertBeforeClear")
 for k, _ in pairs(MY_Chat.tChannel) do RegisterCustomData("MY_Chat.tChannel."..k) end
 
 MY_Chat.OnFrameDragEnd = function() this:CorrectPos() MY_Chat.anchor = GetFrameAnchor(this) end
@@ -396,20 +398,49 @@ MY.RegisterInit('MY_CHAT', function()
 	-- 
 	local hFrame = Station.Lookup("Lowest2/EditBox")
 	if hFrame and not hFrame:Lookup("Btn_Cls") then
+		local function Cls(bAll)
+			for i = 1, 10 do
+				local h = Station.Lookup("Lowest2/ChatPanel" .. i .. "/Wnd_Message", "Handle_Message")
+				local hCheck = Station.Lookup("Lowest2/ChatPanel" .. i .. "/CheckBox_Title")
+				if h and (bAll or (hCheck and hCheck:IsCheckBoxChecked())) then
+					h:Clear()
+					h:FormatAllItemPos()
+				end
+			end
+		end
 		MUI.Append(hFrame, "WndButton5", "Btn_Cls", {
 			x = 397, y = 1,
 			w = 24, h = 24,
 			text = "X",
 			tip = _L['clear chat panel'],
-			onclick = function()
-				for i = 1, 10 do
-					local h = Station.Lookup("Lowest2/ChatPanel" .. i .. "/Wnd_Message", "Handle_Message")
-					local hCheck = Station.Lookup("Lowest2/ChatPanel" .. i .. "/CheckBox_Title")
-					if h and hCheck and hCheck:IsCheckBoxChecked() then
-						h:Clear()
-						h:FormatAllItemPos()
-					end
+			onlclick = function()
+				if MY_Chat.bAlertBeforeClear then
+					MessageBox({
+						szName = "CLS_CHATPANEL",
+						szMessage = _L["Are you sure you want to clear current message panel?"], {
+							szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function()
+								Cls()
+							end
+						}, {
+							szOption = _L["Do not alert again"], fnAction = function()
+								Cls()
+								MY_Chat.bAlertBeforeClear = false
+							end
+						}, { szOption = g_tStrings.STR_HOTKEY_CANCEL },
+					})
+				else
+					Cls()
 				end
+			end,
+			onrclick = function()
+				MessageBox({
+					szName = "CLS_CHATPANEL_ALL",
+					szMessage = _L["Are you sure you want to clear all message panel?"], {
+						szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function()
+							Cls(true)
+						end
+					}, { szOption = g_tStrings.STR_HOTKEY_CANCEL },
+				})
 			end,
 		})
 		hFrame:SetW(421)

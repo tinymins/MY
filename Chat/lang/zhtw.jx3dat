@@ -19,6 +19,9 @@ data = {
     ['Max log: %d'] = '最大記錄：%d',
     
     ['clear chat panel'] = '清空聊天欄',
+    ["Are you sure you want to clear current message panel?"] = "你確定要清空當前聊天欄消息嗎？",
+    ["Do not alert again"] = "不再提示",
+    ["Are you sure you want to clear all message panel?"] = "你確定要清空所有聊天欄消息嗎？",
     
     ['filter tong online message'] = '過濾幫會上線公告提示',
     ['filter tong member log message'] = '過濾幫會成員上線提示',
