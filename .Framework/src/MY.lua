@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-12 16:04:27
+-- @Last Modified time: 2015-06-16 16:03:05
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -360,6 +360,7 @@ end
 -- reopen panel
 MY.ReopenPanel = function()
 	local bVisible = MY.IsPanelVisible()
+	MY.ClosePanel(true)
 	MY.ClosePanel(true, true)
 	MY.OpenPanel(true, true)
 	MY.ResizePanel(780, 540)
