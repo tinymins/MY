@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-16 15:25:16
+-- @Last Modified time: 2015-06-16 17:57:48
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -41,6 +41,8 @@ _MY.ApplyUIArgument = function(ui, tArg)
 		if tArg.onscroll    then ui:scroll     (tArg.onscroll   ) end
 		if tArg.onhover     then ui:hover      (tArg.onhover    ) end
 		if tArg.onclick     then ui:click      (tArg.onclick    ) end
+		if tArg.onlclick    then ui:lclick     (tArg.onlclick   ) end
+		if tArg.onrclick    then ui:rclick     (tArg.onrclick   ) end
 		if tArg.checked     then ui:check      (tArg.checked    ) end
 		if tArg.oncheck     then ui:check      (tArg.oncheck    ) end
 		if tArg.onchange    then ui:change     (tArg.onchange   ) end
