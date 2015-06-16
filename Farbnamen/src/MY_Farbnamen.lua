@@ -246,11 +246,11 @@ MY_Farbnamen.Render = function(szMsg)
         -- end)
     elseif type(szMsg) == 'table' and type(szMsg.GetName) == 'function' and szMsg:GetName():sub(1, 8) == 'namelink' then
         local namelink = szMsg
+        local ui = MY.UI(namelink):hover(MY_Farbnamen.ShowTip, HideTip, true)
         local szName = string.gsub(namelink:GetText(), '[%[%]]', '')
         local tInfo = MY_Farbnamen.GetAusName(szName)
         if tInfo then
-            -- ∞Û∂®tipÃ· æ
-            MY.UI(namelink):hover(MY_Farbnamen.ShowTip, HideTip, true):color(tInfo.rgb)
+            ui:color(tInfo.rgb)
         end
     end
     return szMsg
