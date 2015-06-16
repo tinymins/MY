@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-16 15:24:26
+-- @Last Modified time: 2015-06-16 15:25:16
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -774,7 +774,7 @@ function _MY.UI:append(arg0, arg1, arg2)
 						edt.OnEditSpecialKeyDown = function()
 							local szKey = GetKeyName(Station.GetMessageKey())
 							if szKey == "Esc" or (
-								szKey == "Enter" and not edt:IsMultiLine()
+								szKey == "Enter" and not edt:IsMultiLine(1)
 							) then
 								Station.SetFocusWindow(edt:GetRoot())
 								return 1
@@ -836,7 +836,7 @@ function _MY.UI:append(arg0, arg1, arg2)
 									return PopupMenu_ProcessHotkey()
 								end
 							elseif szKey == "Esc" or (
-								szKey == "Enter" and not edt:IsMultiLine()
+								szKey == "Enter" and not edt:IsMultiLine(1)
 							) then
 								Station.SetFocusWindow(edt:GetRoot())
 								return 1
@@ -2141,7 +2141,7 @@ function _MY.UI:multiLine(bMultiLine)
 		if ele then
 			local x = ele.edt or ele.txt
 			if x and x.IsMultiLine then
-				return x:IsMultiLine()
+				return x:IsMultiLine(1)
 			end
 		end
 	end
