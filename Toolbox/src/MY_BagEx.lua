@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-25 10:40:14
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-15 15:54:56
+-- @Last Modified time: 2015-06-16 14:45:20
 -----------------------------------------------
 MY_BagEx = {}
 MY_BagEx.bEnable = true
@@ -21,7 +21,24 @@ MY_BagEx.Enable = function(bEnable)
 	end
 end
 
+_C.OnFrameKeyDown = function()
+	local szKey = GetKeyName(Station.GetMessageKey())
+	if IsCtrlKeyDown() and szKey == "F" then
+		MY.UI(this):children("#WndEditBox_KeyWord"):focus()
+		if this.__MYBagEx_OnFrameKeyDown then
+			this.__MYBagEx_OnFrameKeyDown()
+		end
+		return 1
+	end
+	if this.__MYBagEx_OnFrameKeyDown then
+		return this.__MYBagEx_OnFrameKeyDown()
+	end
+	return 0
+end
+
 _C.ClearHook = function()
+	MY.RegisterEvent("EXECUTE_BINDING.MY_BAGEX")
+
 	MY.UI("Normal/BigBagPanel/CheckBox_Totle")
 	:add("Normal/BigBagPanel/CheckBox_Task")
 	:add("Normal/BigBagPanel/CheckBox_Equipment")
@@ -48,14 +65,31 @@ _C.ClearHook = function()
 	:add("Normal/GuildBankPanel")
 	:each(function()
 		this.bMYBagExHook = nil
+		if this.OnFrameKeyDown == _C.OnFrameKeyDown then
+			this.OnFrameKeyDown = this.__MYBagEx_OnFrameKeyDown
+			this.__MYBagEx_OnFrameKeyDown = nil
+		end
 	end)
 end
 
 _C.Hook = function()
+	MY.RegisterEvent("EXECUTE_BINDING.MY_BAGEX", function(e)
+		local szName, bDown = arg0, arg1
+		if szName == "OPENORCLOSEALLBAGS" and not bDown then
+			local hFrame = Station.Lookup("Normal/BigBagPanel")
+			if hFrame and hFrame:IsVisible() then
+				Station.SetFocusWindow(hFrame)
+			end
+		end
+	end)
 	-- bag
 	local hFrame = Station.Lookup("Normal/BigBagPanel")
 	if hFrame and not hFrame.bMYBagExHook then
 		hFrame.bMYBagExHook = true
+		if hFrame and hFrame.OnFrameKeyDown ~= _C.OnFrameKeyDown then
+			hFrame.__MYBagEx_OnFrameKeyDown = hFrame.OnFrameKeyDown
+			hFrame.OnFrameKeyDown = _C.OnFrameKeyDown
+		end
 		local x, y = Station.Lookup("Normal/BigBagPanel/CheckBox_Grey"):GetRelPos()
 		local w, h = Station.Lookup("Normal/BigBagPanel/CheckBox_Grey"):Lookup('', ''):GetSize()
 		MY.UI("Normal/BigBagPanel")
@@ -96,7 +130,10 @@ _C.Hook = function()
 	local hFrame = Station.Lookup("Normal/BigBankPanel")
 	if hFrame and not hFrame.bMYBagExHook then
 		hFrame.bMYBagExHook = true
-		
+		if hFrame and hFrame.OnFrameKeyDown ~= _C.OnFrameKeyDown then
+			hFrame.__MYBagEx_OnFrameKeyDown = hFrame.OnFrameKeyDown
+			hFrame.OnFrameKeyDown = _C.OnFrameKeyDown
+		end
 		MY.UI("Normal/BigBankPanel")
 		  :append("WndEditBox", "WndEditBox_KeyWord"):children("#WndEditBox_KeyWord")
 		  :text(_C.szBankFilter or ""):size(100,21):pos(280, 80):placeholder(_L['Search'])
@@ -139,6 +176,10 @@ _C.Hook = function()
 	local hFrame = Station.Lookup("Normal/GuildBankPanel")
 	if hFrame and not hFrame.bMYBagExHook then
 		hFrame.bMYBagExHook = true
+		if hFrame and hFrame.OnFrameKeyDown ~= _C.OnFrameKeyDown then
+			hFrame.__MYBagEx_OnFrameKeyDown = hFrame.OnFrameKeyDown
+			hFrame.OnFrameKeyDown = _C.OnFrameKeyDown
+		end
 		MY.UI("Normal/GuildBankPanel")
 		  :append("WndEditBox", "WndEditBox_KeyWord"):children("#WndEditBox_KeyWord")
 		  :text(_C.szGuildBankFilter or ""):size(100,21):pos(60, 25):placeholder(_L['Search'])
@@ -234,7 +275,7 @@ _C.FilterBags = function(szTreePath, szFilter, bTimeLtd)
 		if szBoxType == UI_OBJECT_ITEM then
 			local item = GetPlayerItem(GetClientPlayer(), dwBox, dwX)
 			if item then
-				if bTimeLtd and item:GetLeftExistTime() == 0 then
+				if bTimeLtd and item.GetLeftExistTime() == 0 then
 					bMatch = false
 				end
 				if not wstring.find(_C.GetItemText(item), szFilter) then
@@ -339,3 +380,4 @@ MY.RegisterEvent("BAG_ITEM_UPDATE", function()
 end)
 MY.RegisterInit('MY_BAGEX', function() MY.BreatheCall(_C.OnBreathe, 130) end)
 MY.RegisterReload("MY_BAGEX", _C.ClearHook)
+-- MY.RegisterEvent("SPECIAL_KEY_MSG", function(e)Output(e,arg0,arg1)end)
