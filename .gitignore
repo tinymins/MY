@@ -3,6 +3,7 @@
 */manifest.dat
 */manifest.key
 */publisher.key
+@DATA/cache/*.jx3dat
 @DATA/cache/PLAYER_INFO/*.jx3dat
 @DATA/cache/PLAYER_INFO/*/*/*.jx3dat
 @DATA/cache/NPC_DOODAD_REC/*.jx3dat
