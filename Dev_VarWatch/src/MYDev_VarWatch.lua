@@ -4,7 +4,7 @@
 -- @Date  : 2015-02-28 17:37:53
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-16 18:05:52
+-- @Last Modified time: 2015-06-16 18:45:27
 --------------------------------------------
 local _C = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Dev_VarWatch/lang/")
@@ -12,7 +12,8 @@ local XML_LINE_BREAKER = XML_LINE_BREAKER
 local srep, tostring, string2byte = string.rep, tostring, string.byte
 local tconcat, tinsert, tremove = table.concat, table.insert, table.remove
 local type, next, print, pairs, ipairs = type, next, print, pairs, ipairs
-_C.tVarList = {}
+local DATA_PATH = "cache/Dev_VarWatch.$lang.jx3dat"
+_C.tVarList = MY.LoadLUAData(DATA_PATH) or {}
 
 local function var2str_x(var, indent, level) -- 只解析一层table且不解析方法
 	local function table_r(var, level, indent)
@@ -67,9 +68,9 @@ MY.RegisterPanel(
 "ui/Image/UICommon/BattleFiled.UITex|7", {255,127,0,200}, {
 	OnPanelActive = function(wnd)
 		local ui = MY.UI(wnd)
-		local x, y = 10, 30
+		local x, y = 10, 10
 		local w, h = ui:size()
-		local nLimit = 10
+		local nLimit = 20
 		
 		local tWndEditK = {}
 		local tWndEditV = {}
@@ -82,6 +83,7 @@ MY.RegisterPanel(
 				color = {255, 255, 255},
 				onchange = function(text)
 					_C.tVarList[i] = MY.String.Trim(text)
+					MY.SaveLUAData(DATA_PATH, _C.tVarList)
 				end,
 			}):children("#WndEditBox_K" .. i)
 			
@@ -104,11 +106,14 @@ MY.RegisterPanel(
 					)
 				) then
 					if loadstring then
-						oValue = select(2, pcall(loadstring("return " .. szKey)))
+						local t = {select(2, pcall(loadstring("return " .. szKey)))}
+						for k, v in pairs(t) do
+							t[k] = tostring(v)
+						end
+						tWndEditV[i]:text(tconcat(t, ", "))
 					else
-						oValue = MY.GetGlobalValue(szKey)
+						tWndEditV[i]:text(var2str_x(MY.GetGlobalValue(szKey)))
 					end
-					tWndEditV[i]:text(var2str_x(oValue))
 				end
 			end
 		end)
