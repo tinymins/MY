@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-25 10:40:14
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-18 20:24:36
+-- @Last Modified time: 2015-06-18 21:53:43
 -----------------------------------------------
 MY_BagEx = {}
 MY_BagEx.bEnable = true
@@ -222,7 +222,7 @@ _C.GetItemText = function(item)
 		if GetItemTip then
 			local szKey = item.dwTabType .. ',' .. item.dwIndex
 			if not _C.tItemText[szKey] then
-				_C.tItemText[szKey] = MY.Xml.GetPureText(GetItemTip(item))
+				_C.tItemText[szKey] = MY.Xml.GetPureText(GetItemTip(item)) or ""
 			end
 			return _C.tItemText[szKey]
 		else
