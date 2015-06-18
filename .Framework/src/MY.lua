@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-16 18:57:02
+-- @Last Modified time: 2015-06-18 23:33:59
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- ####################################################################################################################################
@@ -339,7 +339,7 @@ MY.OpenPanel = function(bMute, bNoFocus)
 		MY.RedrawCategory()
 	end
 	hFrame:Show()
-	if not bNoFocus then
+	if not bNoFocus and Cursor.IsVisible() then
 		hFrame:BringToTop()
 		Station.SetFocusWindow(hFrame)
 	end
