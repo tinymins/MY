@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-25 10:40:14
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-16 14:45:20
+-- @Last Modified time: 2015-06-18 20:24:36
 -----------------------------------------------
 MY_BagEx = {}
 MY_BagEx.bEnable = true
@@ -75,7 +75,8 @@ end
 _C.Hook = function()
 	MY.RegisterEvent("EXECUTE_BINDING.MY_BAGEX", function(e)
 		local szName, bDown = arg0, arg1
-		if szName == "OPENORCLOSEALLBAGS" and not bDown then
+		if Cursor.IsVisible()
+		and szName == "OPENORCLOSEALLBAGS" and not bDown then
 			local hFrame = Station.Lookup("Normal/BigBagPanel")
 			if hFrame and hFrame:IsVisible() then
 				Station.SetFocusWindow(hFrame)
