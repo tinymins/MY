@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-25 10:40:14
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-18 22:15:10
+-- @Last Modified time: 2015-06-19 09:33:15
 -----------------------------------------------
 MY_BagEx = {}
 MY_BagEx.bEnable = true
@@ -236,6 +236,9 @@ end
 
 -- 过滤背包
 _C.DoFilterBag = function(bForce)
+	if IsBagInSort and IsBagInSort() then
+		return
+	end
 	-- 优化性能 当过滤器为空时不遍历筛选
 	if bForce or _C.szBagFilter or _C.bBagTimeLtd then
 		_C.FilterBags("Normal/BigBagPanel", _C.szBagFilter, _C.bBagTimeLtd)
@@ -246,6 +249,9 @@ _C.DoFilterBag = function(bForce)
 end
 -- 过滤仓库
 _C.DoFilterBank = function(bForce)
+	if IsBankInSort and IsBankInSort() then
+		return
+	end
 	-- 优化性能 当过滤器为空时不遍历筛选
 	if bForce or _C.szBankFilter or _C.bBankTimeLtd then
 		_C.FilterBags("Normal/BigBankPanel", _C.szBankFilter, _C.bBankTimeLtd)
