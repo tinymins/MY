@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-16 19:31:17
+-- @Last Modified time: 2015-06-22 14:50:29
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -219,7 +219,7 @@ MY.Chat.LinkEventHandler = {
 		if IsCtrlKeyDown() then
 			MY.Chat.CopyChatItem(hT)
 		elseif IsAltKeyDown() then
-			MY.SetTarget(MY.UI(hT):text())
+			MY.SetTarget(TARGET.PLAYER, MY.UI(hT):text())
 		else
 			MY.SwitchChat(MY.UI(hT):text())
 			local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")

@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-11 20:48:38
+-- @Last Modified time: 2015-06-22 14:49:29
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -503,18 +503,29 @@ MY.Player.SetTarget = function(dwType, dwID)
 	if type(dwType) == "userdata" then
 		dwType, dwID = ( IsPlayer(dwType) and TARGET.PLAYER ) or TARGET.NPC, dwType.dwID
 	elseif type(dwType) == "string" then
-		dwType, dwID = 0, dwType:gsub('[%[%]]', '')
+		dwType, dwID = nil, dwType:gsub('[%[%]]', '')
 	end
 	-- conv if dwID is string
 	if type(dwID) == "string" then
-		for _, p in pairs(MY.GetNearNpc()) do
-			if p.szName == dwID then
-				dwType, dwID = TARGET.NPC, p.dwID
+		local tTarget = {}
+		for _, szName in pairs(MY.String.Split(dwID, "|")) do
+			tTarget[szName] = true
+		end
+		dwID = nil
+		if not dwID and dwType ~= TARGET.PLAYER then
+			for _, p in pairs(MY.GetNearNpc()) do
+				if tTarget[p.szName] then
+					dwType, dwID = TARGET.NPC, p.dwID
+					break
+				end
 			end
 		end
-		for _, p in pairs(MY.GetNearPlayer()) do
-			if p.szName == dwID then
-				dwType, dwID = TARGET.PLAYER, p.dwID
+		if not dwID and dwType ~= TARGET.NPC then
+			for _, p in pairs(MY.GetNearPlayer()) do
+				if tTarget[p.szName] then
+					dwType, dwID = TARGET.PLAYER, p.dwID
+					break
+				end
 			end
 		end
 	end
