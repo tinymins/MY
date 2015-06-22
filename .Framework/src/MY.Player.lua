@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-22 14:49:29
+-- @Last Modified time: 2015-06-22 14:54:12
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -503,12 +503,12 @@ MY.Player.SetTarget = function(dwType, dwID)
 	if type(dwType) == "userdata" then
 		dwType, dwID = ( IsPlayer(dwType) and TARGET.PLAYER ) or TARGET.NPC, dwType.dwID
 	elseif type(dwType) == "string" then
-		dwType, dwID = nil, dwType:gsub('[%[%]]', '')
+		dwType, dwID = nil, dwType
 	end
 	-- conv if dwID is string
 	if type(dwID) == "string" then
 		local tTarget = {}
-		for _, szName in pairs(MY.String.Split(dwID, "|")) do
+		for _, szName in pairs(MY.String.Split(dwID:gsub('[%[%]]', ''), "|")) do
 			tTarget[szName] = true
 		end
 		dwID = nil
