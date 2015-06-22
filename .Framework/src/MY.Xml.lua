@@ -1,294 +1,166 @@
---
--- Simple XML decoding and encoding in pure Lua.
---
--- @author 翟一鸣 @tinymins, Gavin Kistner
--- @refer http://zhaiyiming.com/, http://phrogz.net/
---
+---------------------------------------------------------
+-- Simple JX3 XML decoding and encoding in pure Lua.
+---------------------------------------------------------
+-- @author 翟一鸣 @tinymins
+-- @refer http://zhaiyiming.com/
+---------------------------------------------------------
 -- local lua_value = MY.Xml.Decode(raw_xml_text)
 -- local raw_xml_text = MY.Xml.Encode(lua_table_or_value)
---[=====================================================================[
-v0.7 Copyright ? 2013-2014 Gavin Kistner <!@phrogz.net>; MIT Licensed
-See http://github.com/Phrogz/SLAXML for details.
---]=====================================================================]
-local SLAXML = {
-	VERSION = "0.7",
-	_call = {
-		pi = function(target,content)
-			print(string.format("<?%s %s?>",target,content))
-		end,
-		comment = function(content)
-			print(string.format("<!-- %s -->",content))
-		end,
-		startElement = function(name,nsURI,nsPrefix)
-			                 io.write("<")
-			if nsPrefix then io.write(nsPrefix,":") end
-			                 io.write(name)
-			if nsURI    then io.write(" (ns='",nsURI,"')") end
-			                 print(">")
-		end,
-		attribute = function(name,value,nsURI,nsPrefix)
-			                 io.write('  ')
-			if nsPrefix then io.write(nsPrefix,":") end
-			                 io.write(name,'=',string.format('%q',value))
-			if nsURI    then io.write(" (ns='",nsURI,"')") end
-			                 io.write("\n")
-		end,
-		text = function(text)
-			print(string.format("  text: %q",text))
-		end,
-		closeElement = function(name,nsURI,nsPrefix)
-			print(string.format("</%s>",name))
-		end,
-	}
-}
-local tinsert, tconcat = table.insert, table.concat
+---------------------------------------------------------
+local tinsert, tremove, tconcat = table.insert, table.remove, table.concat
 
-function SLAXML:parser(callbacks)
-	return { _call=callbacks or self._call, parse=SLAXML.parse }
-end
-
-function SLAXML:parse(xml,options)
-	if not options then options = { stripWhitespace=false } end
-
-	-- Cache references for maximum speed
+local function xmlDecode(xml)
+	local function str2var(str)
+		if str == "true" then
+			return true
+		elseif str == "false" then
+			return false
+		elseif tonumber(str) then
+			return tonumber(str)
+		end
+	end
 	local find, sub, gsub, char, byte, push, pop, concat = string.find, string.sub, string.gsub, string.char, string.byte, table.insert, table.remove, table.concat
 	local first, last, match1, match2, match3, pos2, nsURI
-	local unpack = unpack or table.unpack
-	local pos = 1
+	local t = {}
+	local p = t
+	local p1
+	local stack = {}
 	local state = "text"
-	local textStart = 1
-	local currentElement={}
-	local currentAttributes={}
-	local currentAttributeCt -- manually track length since the table is re-used
-	local nsStack = {}
-	local anyElement = false
-
-	local utf8markers = { {0x7FF,192}, {0xFFFF,224}, {0x1FFFFF,240} }
-	function utf8(decimal) -- convert unicode code point to utf-8 encoded character string
-		if decimal<128 then return char(decimal) end
-		local charbytes = {}
-		for bytes,vals in ipairs(utf8markers) do
-			if decimal<=vals[1] then
-				for b=bytes+1,2,-1 do
-					local mod = decimal%64
-					decimal = (decimal-mod)/64
-					charbytes[b] = char(128+mod)
-				end
-				charbytes[1] = char(vals[2]+decimal)
-				return concat(charbytes)
+	local unpack = unpack or table.unpack
+	local pos, len = 1, #xml
+	local byte_current
+	local byte_apos, byte_quot, byte_escape, byte_slash = (byte("'")) , (byte('"')), (byte("\\")), (byte("/"))
+	local byte_lt, byte_gt, byte_amp, byte_eq, byte_space = (byte("<")), (byte(">")), (byte("&")), (byte("=")), (byte(" "))
+	local pos1, pos2, byte_quote
+	local key
+	-- <        label         attribute_key=attribute_value>        text_key=text_value<        /     label         >       
+	-- label_lt label_opening attribute                    label_gt text               label_lt slash label_closing label_gt
+	while pos <= len do
+		byte_current = byte(xml, pos)
+		if state == "text" then
+			if byte_current == byte_lt then
+				state = "label_lt"
+			elseif byte_current ~= byte_space then
+				state = "text_key"
+				pos1 = pos
+			end
+		elseif state == "label_lt" then
+			if byte_current == byte_slash then
+				state = "label_closing"
+			elseif byte_current ~= byte_space then
+				state = "label_opening"
+				pos1 = pos
+			end
+		elseif state == "label_opening" then
+			if byte_current == byte_gt then
+				state = "text"
+				p1 = { ["."] = xml:sub(pos1, pos - 1), [''] = {} }
+				tinsert(stack, p1)
+				tinsert(p, p1)
+				p = p1
+			elseif byte_current == byte_space then
+				state = "attribute"
+				p1 = { ["."] = xml:sub(pos1, pos - 1), [''] = {} }
+				tinsert(stack, p1)
+				tinsert(p, p1)
+				p = p1
+			end
+		elseif state == "label_closing" then
+			if byte_current == byte_gt then
+				state = "text"
+				tremove(stack)
+				p = stack[#stack] or t
+			end
+		elseif state == "attribute" then
+			if byte_current == byte_gt then
+				state = "text"
+			elseif byte_current ~= byte_space then
+				state = "attribute_key"
+				pos1 = pos
+			end
+		elseif state == "attribute_key" then
+			if byte_current == byte_space then
+				key = xml:sub(pos1, pos - 1)
+				state = "attribute_key_end"
+			elseif byte_current == byte_eq then
+				key = xml:sub(pos1, pos - 1)
+				state = "attribute_eq"
+			end
+		elseif state == "attribute_key_end" then
+			if byte_current == byte_eq then
+				state = "attribute_eq"
+			elseif byte_current ~= byte_space then
+				state = "attribute"
+				p[key] = key
+				pos = pos - 1
+			end
+		elseif state == "attribute_eq" then
+			if byte_current == byte_apos
+			or byte_current == byte_quot then
+				byte_quote = byte_current
+				state = "attribute_value_string"
+				pos1 = pos + 1
+			elseif byte_current ~= byte_space then
+				state = "attribute_value"
+				pos1 = pos
+			end
+		elseif state == "attribute_value_string" then
+			if byte_current == byte_quote then
+				p[key] = xml:sub(pos1, pos - 1)
+				state = "attribute"
+			end
+		elseif state == "attribute_value" then
+			if byte_current == byte_space then
+				p[key] = str2var(xml:sub(pos1, pos))
+				state = "attribute"
+			elseif byte_current == byte_gt then
+				p[key] = str2var(xml:sub(pos1, pos - 1))
+				state = "text"
+			end
+		elseif state == "text_key" then
+			if byte_current == byte_space then
+				key = xml:sub(pos1, pos - 1)
+				state = "text_key_end"
+			elseif byte_current == byte_eq then
+				key = xml:sub(pos1, pos - 1)
+				state = "text_eq"
+			end
+		elseif state == "text_key_end" then
+			if byte_current == byte_eq then
+				state = "text_eq"
+			elseif byte_current ~= byte_space then
+				state = "text"
+				p[key][''] = key
+				pos = pos - 1
+			end
+		elseif state == "text_eq" then
+			if byte_current == byte_apos
+			or byte_current == byte_quot then
+				byte_quote = byte_current
+				state = "text_value_string"
+				pos1 = pos + 1
+			elseif byte_current ~= byte_space then
+				state = "text_value"
+				pos1 = pos
+			end
+		elseif state == "text_value_string" then
+			if byte_current == byte_quote then
+				p[''][key] = xml:sub(pos1, pos - 1)
+				state = "text"
+			end
+		elseif state == "text_value" then
+			if byte_current == byte_space then
+				p[''][key] = str2var(xml:sub(pos1, pos))
+				state = "text"
+			elseif byte_current == byte_gt then
+				p[''][key] = str2var(xml:sub(pos1, pos - 1))
+				state = "text"
 			end
 		end
+		pos = pos + 1
 	end
-	local entityMap  = { ["lt"]="<", ["gt"]=">", ["amp"]="&", ["quot"]='"', ["apos"]="'" }
-	local entitySwap = function(orig,n,s) return entityMap[s] or n=="#" and utf8(tonumber('0'..s)) or orig end  
-	local function unescape(str) return gsub( str, '(&(#?)([%d%a]+);)', entitySwap ) end
-
-	local function finishText()
-		if first>textStart and self._call.text then
-			local text = sub(xml,textStart,first-1)
-			if options.stripWhitespace then
-				text = gsub(text,'^%s+','')
-				text = gsub(text,'%s+$','')
-				if #text==0 then text=nil end
-			end
-			if text then self._call.text(unescape(text)) end
-		end
-	end
-
-	local function findPI()
-		first, last, match1, match2 = find( xml, '^<%?([:%a_][:%w_.-]*) ?(.-)%?>', pos )
-		if first then
-			finishText()
-			if self._call.pi then self._call.pi(match1,match2) end
-			pos = last+1
-			textStart = pos
-			return true
-		end
-	end
-
-	local function findComment()
-		first, last, match1 = find( xml, '^<!%-%-(.-)%-%->', pos )
-		if first then
-			finishText()
-			if self._call.comment then self._call.comment(match1) end
-			pos = last+1
-			textStart = pos
-			return true
-		end
-	end
-
-	local function nsForPrefix(prefix)
-		if prefix=='xml' then return 'http://www.w3.org/XML/1998/namespace' end -- http://www.w3.org/TR/xml-names/#ns-decl
-		for i=#nsStack,1,-1 do if nsStack[i][prefix] then return nsStack[i][prefix] end end
-		error(("Cannot find namespace for prefix %s"):format(prefix))
-	end
-
-	local function startElement()
-		anyElement = true
-		first, last, match1 = find( xml, '^<([%a_][%w_.-]*)', pos )
-		if first then
-			currentElement[2] = nil -- reset the nsURI, since this table is re-used
-			currentElement[3] = nil -- reset the nsPrefix, since this table is re-used
-			finishText()
-			pos = last+1
-			first,last,match2 = find(xml, '^:([%a_][%w_.-]*)', pos )
-			if first then
-				currentElement[1] = match2
-				currentElement[3] = match1 -- Save the prefix for later resolution
-				match1 = match2
-				pos = last+1
-			else
-				currentElement[1] = match1
-				for i=#nsStack,1,-1 do if nsStack[i]['!'] then currentElement[2] = nsStack[i]['!']; break end end
-			end
-			currentAttributeCt = 0
-			push(nsStack,{})
-			return true
-		end
-	end
-
-	local function findAttribute()
-		first, last, match1 = find( xml, '^%s+([:%a_][:%w_.-]*)%s*=%s*', pos )
-		if first then
-			pos2 = last+1
-			first, last, match2 = find( xml, '^"([^<"]*)"', pos2 ) -- FIXME: disallow non-entity ampersands
-			if first then
-				pos = last+1
-				match2 = unescape(match2)
-			else
-				first, last, match2 = find( xml, "^'([^<']*)'", pos2 ) -- FIXME: disallow non-entity ampersands
-				if first then
-					pos = last+1
-					match2 = unescape(match2)
-				end
-			end
-		end
-		if match1 and match2 then
-			local currentAttribute = {match1,match2}
-			local prefix,name = string.match(match1,'^([^:]+):([^:]+)$')
-			if prefix then
-				if prefix=='xmlns' then
-					nsStack[#nsStack][name] = match2
-				else
-					currentAttribute[1] = name
-					currentAttribute[4] = prefix
-				end
-			else
-				if match1=='xmlns' then
-					nsStack[#nsStack]['!'] = match2
-					currentElement[2]      = match2
-				end
-			end
-			currentAttributeCt = currentAttributeCt + 1
-			currentAttributes[currentAttributeCt] = currentAttribute
-			return true
-		end
-	end
-
-	local function findCDATA()
-		first, last, match1 = find( xml, '^<!%[CDATA%[(.-)%]%]>', pos )
-		if first then
-			finishText()
-			if self._call.text then self._call.text(match1) end
-			pos = last+1
-			textStart = pos
-			return true
-		end
-	end
-
-	local function closeElement()
-		first, last, match1 = find( xml, '^%s*(/?)>', pos )
-		if first then
-			state = "text"
-			pos = last+1
-			textStart = pos
-
-			-- Resolve namespace prefixes AFTER all new/redefined prefixes have been parsed
-			if currentElement[3] then currentElement[2] = nsForPrefix(currentElement[3])    end
-			if self._call.startElement then self._call.startElement(unpack(currentElement)) end
-			if self._call.attribute then
-				for i=1,currentAttributeCt do
-					if currentAttributes[i][4] then currentAttributes[i][3] = nsForPrefix(currentAttributes[i][4]) end
-					self._call.attribute(unpack(currentAttributes[i]))
-				end
-			end
-
-			if match1=="/" then
-				pop(nsStack)
-				if self._call.closeElement then self._call.closeElement(unpack(currentElement)) end
-			end
-			return true
-		end
-	end
-
-	local function findElementClose()
-		first, last, match1, match2 = find( xml, '^</([%a_][%w_.-]*)%s*>', pos )
-		if first then
-			nsURI = nil
-			for i=#nsStack,1,-1 do if nsStack[i]['!'] then nsURI = nsStack[i]['!']; break end end
-		else
-			first, last, match2, match1 = find( xml, '^</([%a_][%w_.-]*):([%a_][%w_.-]*)%s*>', pos )
-			if first then nsURI = nsForPrefix(match2) end
-		end
-		if first then
-			finishText()
-			if self._call.closeElement then self._call.closeElement(match1,nsURI) end
-			pos = last+1
-			textStart = pos
-			pop(nsStack)
-			return true
-		end
-	end
-
-	while pos<#xml do
-		if state=="text" then
-			if not (findPI() or findComment() or findCDATA() or findElementClose()) then		
-				if startElement() then
-					state = "attributes"
-				else
-					local quoting = false
-					local escaping = false
-					local byte_quote1, byte_quote2 = (byte("'")) , (byte('"'))
-					local byte_escape, byte_lt     = (byte("\\")), (byte("<"))
-					local byte_i, byte_quote
-					for i = pos, xml:len() do
-						byte_i = byte(xml, i)
-						if not escaping then
-							if byte_i == byte_escape then
-								escaping = true
-							elseif quoting and byte_i == byte_quote then
-								quoting = false
-							elseif not quoting then
-								if byte_i == byte_quote1 or byte_i == byte_quote2 then
-									quoting = true
-									byte_quote = byte_i
-								elseif byte_i == byte_lt then
-									if pos > i then
-										pos = i - 1
-									end
-									break
-								end
-							end
-						else
-							escaping = false
-						end
-					end
-					pos = pos + 1
-					-- first, last = find( xml, '^[^<]+', pos )
-					-- pos = (first and last or pos) + 1
-				end
-			end
-		elseif state=="attributes" then
-			if not findAttribute() then
-				if not closeElement() then
-					error("Was in an element and couldn't find attributes or the close.")
-				end
-			end
-		end
-	end
-
-	-- if not anyElement then error("Parsing did not discover any elements") end
-	if #nsStack > 0 then error("Parsing ended with unclosed elements") end
+	assert(#stack == 0, "XML decode error: unclosed elements detected.")
+	return t
 end
 
 local xmlEscape = function(str)
@@ -379,114 +251,6 @@ xmlEncode = function(xml)
 	return (tconcat(t))
 end
 
-local xmlDecode = function(myxml)
-	local t = {}
-	local stack = {}
-	local p = t
-	local push = function(p)
-		table.insert(stack, p)
-	end
-	local pop = function()
-		return table.remove(stack)
-	end
-
-	local parser = SLAXML:parser{
-		startElement = function(name,nsURI,nsPrefix)       -- When "<foo" or <x:foo is seen
-			-- Output('startElement',name,nsURI,nsPrefix)
-			table.insert(p, {})
-			push(p)
-			p = p[#p]
-			p['.'] = name
-		end,
-		attribute    = function(name,value,nsURI,nsPrefix) -- attribute found on current element
-			-- Output('attribute',name,value,nsURI,nsPrefix)
-			p[name] = value
-		end,
-		closeElement = function(name,nsURI)                -- When "</foo>" or </x:foo> or "/>" is seen
-			-- Output('closeElement',name,nsURI)
-			p = pop()
-		end,
-		text         = function(text)                      -- text and CDATA nodes
-			-- Output('text',text)
-			local pos = 1
-			local findKey = function()
-				local i, j, key = string.find(text, '%s-([a-zA-Z0-9_]-)%s-=', pos)
-				if key then
-					pos = j + 1
-				end
-				return key
-			end
-			local findValue
-			findValue = function()
-				if pos > #text then
-					return
-				end
-				
-				local sz_escape = text:sub(pos,pos)
-				if sz_escape == '"' or sz_escape == "'" then	-- 字符串
-					pos = pos + 1
-					local value = ''
-					local escaping = false
-					for i=pos, text:len() do
-						pos = i
-						local char = text:sub(i, i)
-						
-						if escaping then
-							
-							escaping = false
-						elseif char == '\\' then
-							escaping = true
-						elseif char == sz_escape then
-							break
-						end
-						
-						value = value .. char
-					end
-					return xmlUnescape(value)
-				elseif string.byte(sz_escape) >= 48 and string.byte(sz_escape) <= 57 then
-					local i, j, val = string.find(text, '%s-([0-9]*)%s-', pos)
-					pos = j + 1
-					return tonumber(val)
-				elseif text:sub(pos,pos+3) == 'true' then
-					pos = pos + 4
-					return true
-				elseif text:sub(pos,pos+4) == 'false' then
-					pos = pos + 5
-					return false
-				else
-					pos = pos + 1
-					return findValue()
-				end
-			end
-			
-			while pos<#text do
-				local key = findKey()
-				if not key then
-					break
-				end
-				
-				local val = findValue()
-				if val then
-					if not p[''] then
-						p[''] = {}
-					end
-					p[''][key] = val
-				end
-			end
-		end,
-		comment      = function(content)                   -- comments
-			-- Output('comment',content)
-		end,
-		pi           = function(target,content)            -- processing instructions e.g. "<?yes mon?>"
-			-- Output('pi',target,content)
-		end,
-	}
-	
-	parser:parse(myxml)
-	
-	return t
-end
-
 local xml2Text = function(xml)
 	local t = {}
 	local xmls = xmlDecode(xml)
@@ -523,3 +287,5 @@ MY.Xml.Unescape = xmlUnescape
 
 -- xml转纯文字
 MY.Xml.GetPureText = xml2Text
+local xml = "<text>text=\"<Shift+鼠标右键打开装备操作菜单>\" font=105 </text>"
+xml2Text(xml)
