@@ -19,6 +19,8 @@ MYDev_Snaplines.bShowItemSnaplines = true
 RegisterCustomData('MYDev_Snaplines.bShowItemSnaplines')
 MYDev_Snaplines.bShowTip = true
 RegisterCustomData('MYDev_Snaplines.bShowTip')
+MYDev_Snaplines.bShowData = true
+RegisterCustomData('MYDev_Snaplines.bShowData')
 MYDev_Snaplines.rgbWndSnaplines = {0, 0, 0}
 RegisterCustomData('MYDev_Snaplines.rgbWndSnaplines')
 MYDev_Snaplines.rgbItemSnaplines = {0, 255, 0}
@@ -84,16 +86,15 @@ local function var2str(var, indent, level)
     return table_r(var, level or 0, indent)
 end
 
-MYDev_Snaplines.GetElementTip = function(raw, tTip)
-    if type(tTip) ~= 'table' then
+MYDev_Snaplines.GetElementBasicTip = function(raw, tTip)
+    if not tTip then
         tTip = {}
-    else
-        tTip = clone(tTip)
     end
     
     local X, Y = raw:GetAbsPos()
     local x, y = raw:GetRelPos()
     local w, h = raw:GetSize()
+    
     table.insert(tTip, _L('Name: %s', raw:GetName()))
     table.insert(tTip, _L('Type: %s', raw:GetType()))
     table.insert(tTip, _L('Path: %s', MY.UI.GetTreePath(raw)))
@@ -101,6 +102,14 @@ MYDev_Snaplines.GetElementTip = function(raw, tTip)
     table.insert(tTip, _L('Y: %s, %s', y, Y))
     table.insert(tTip, _L('W: %s', w))
     table.insert(tTip, _L('H: %s', h))
+    return tTip
+end
+
+
+MYDev_Snaplines.GetElementDetailTip = function(raw, tTip)
+    if not tTip then
+        tTip = {}
+    end
     
     local szType = raw:GetType()
     if szType == 'Text' then
@@ -164,6 +173,14 @@ MYDev_Snaplines.GetElementTip = function(raw, tTip)
         end
         table.insert(tTip, _L('Index: %s', raw:GetIndex()))
     end
+    return tTip
+end
+
+MYDev_Snaplines.GetElementDataTip = function(raw, tTip)
+    if not tTip then
+        tTip = {}
+    end
+    
     local data = {}
     for k, v in pairs(raw) do
         if type(v) ~= "function" then
@@ -175,6 +192,18 @@ MYDev_Snaplines.GetElementTip = function(raw, tTip)
     return tTip
 end
 
+MYDev_Snaplines.GetElementTip = function(raw, tTip)
+    if MYDev_Snaplines.bShowTip or MYDev_Snaplines.bShowData then
+        MYDev_Snaplines.GetElementBasicTip(raw, tTip)
+    end
+    if MYDev_Snaplines.bShowTip then
+        MYDev_Snaplines.GetElementDetailTip(raw, tTip)
+    end
+    if MYDev_Snaplines.bShowData then
+        MYDev_Snaplines.GetElementDataTip(raw, tTip)
+    end
+    return tTip
+end
 _Cache.OnFrameBreathe = function()
     local ui = _Cache.muFrm
     
@@ -244,7 +273,6 @@ _Cache.OnFrameBreathe = function()
                 xT = xW + wW + 5
             end
         end
-        
         uiHdlTip:pos(xT, yT)
     end
     
@@ -291,11 +319,9 @@ MYDev_Snaplines.ReloadUI = function()
           :size(W, 2):pos(0, H):color(MYDev_Snaplines.rgbItemSnaplines)
     end
     
-    if MYDev_Snaplines.bShowTip then
-        ui:hdl():append('<handle>name="Handle_Tip" handletype=3</handle>'):children('#Handle_Tip')
-          :append("<text>name=\"Text_HoverTip\" </text>"):item("#Text_HoverTip")
-          :pos(0, 0):font(MYDev_Snaplines.nTipFont):color(MYDev_Snaplines.rgbTip):multiLine(true)
-    end
+    ui:hdl():append('<handle>name="Handle_Tip" handletype=3</handle>'):children('#Handle_Tip')
+      :append("<text>name=\"Text_HoverTip\" </text>"):item("#Text_HoverTip")
+      :pos(0, 0):font(MYDev_Snaplines.nTipFont):color(MYDev_Snaplines.rgbTip):multiLine(true)
 
     MY.RegisterEvent('UI_SCALED.MYDEV_SNAPLINES', function()
         local W, H = Station.GetClientSize()
@@ -354,6 +380,14 @@ _Cache.OnPanelActive = function(wnd)
         end)
       end)
     x = 20
+    y = y + 40
+    ui:append("WndCheckBox", "WndCheckBox_ShowData"):children("#WndCheckBox_ShowData")
+      :pos(x, y):width(200)
+      :text(_L['show data']):check(MYDev_Snaplines.bShowData or false)
+      :check(function(bCheck)
+        MYDev_Snaplines.bShowData = bCheck
+        MYDev_Snaplines.ReloadUI()
+    end)
     y = y + 40
     
     ui:append("WndCheckBox", "WndCheckBox_ShowWndSnaplines"):children("#WndCheckBox_ShowWndSnaplines")

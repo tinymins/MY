@@ -3,6 +3,7 @@ data = {
     ['Snaplines'] = '元素辅助',
     ['enable tree path view'] = '启用UI元素辅助线与信息显示',
     ['show tip'] = '显示信息',
+    ['show data'] = '显示数据',
     ['font'] = '字体',
     ['show wnd snaplines'] = '显示窗体辅助线',
     ['show item snaplines'] = '显示组件容器辅助线',
