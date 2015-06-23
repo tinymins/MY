@@ -99,6 +99,10 @@ data = {
     ['disable when shift key pressed'] = '按住SHIFT时禁用自动对话',
     ['close after auto chat'] = '自动对话后关闭窗口',
     
+    ['NAME_PATTERN_LIST'] = {
+        '它的主人是(.-)。',
+    },
+    
     ['You have been loged in for 2min, you can unlock bag locker now.'] = '你已登入游戏两分钟，可以愉快的解除密保锁啦！',
     LOCK_TIP = {
         ["198158383605035871"] = DEAR_S,
