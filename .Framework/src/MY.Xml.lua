@@ -9,7 +9,7 @@
 ---------------------------------------------------------
 local tinsert, tremove, tconcat = table.insert, table.remove, table.concat
 
-local function xmlDecode(xml)
+local xmlDecode = function(xml)
 	local function str2var(str)
 		if str == "true" then
 			return true
@@ -19,8 +19,21 @@ local function xmlDecode(xml)
 			return tonumber(str)
 		end
 	end
-	local find, sub, gsub, char, byte, push, pop, concat = string.find, string.sub, string.gsub, string.char, string.byte, table.insert, table.remove, table.concat
-	local first, last, match1, match2, match3, pos2, nsURI
+	local tinsert, tremove, tconcat = table.insert, table.remove, table.concat
+	local find, sub, gsub, char, byte = string.find, string.sub, string.gsub, string.char, string.byte
+	local function bytes2string(bytes)
+		local count = #bytes
+		if count > 100 then
+			local t, i = {}, 1
+			while i < count do
+				tinsert(char(unpack(bytes, i, i + 100)))
+				i = i + 100
+			end
+			return tconcat(t)
+		else
+			return char(unpack(bytes))
+		end
+	end
 	local t = {}
 	local p = t
 	local p1
@@ -31,8 +44,8 @@ local function xmlDecode(xml)
 	local byte_current
 	local byte_apos, byte_quot, byte_escape, byte_slash = (byte("'")) , (byte('"')), (byte("\\")), (byte("/"))
 	local byte_lt, byte_gt, byte_amp, byte_eq, byte_space = (byte("<")), (byte(">")), (byte("&")), (byte("=")), (byte(" "))
-	local pos1, pos2, byte_quote
-	local key
+	local byte_char_n, byte_char_t, byte_lf, byte_tab = (byte("n")), (byte("t")), (byte("\n")), (byte("\t"))
+	local pos1, pos2, byte_quote, key, b_escaping, bytes_string
 	-- <        label         attribute_key=attribute_value>        text_key=text_value<        /     label         >       
 	-- label_lt label_opening attribute                    label_gt text               label_lt slash label_closing label_gt
 	while pos <= len do
@@ -99,15 +112,28 @@ local function xmlDecode(xml)
 			or byte_current == byte_quot then
 				byte_quote = byte_current
 				state = "attribute_value_string"
+				bytes_string = {}
 				pos1 = pos + 1
 			elseif byte_current ~= byte_space then
 				state = "attribute_value"
 				pos1 = pos
 			end
 		elseif state == "attribute_value_string" then
-			if byte_current == byte_quote then
-				p[key] = xml:sub(pos1, pos - 1)
+			if b_escaping then
+				b_escaping = false
+				if byte_current == byte_char_n then
+					byte_current = byte_lf
+				elseif byte_current == byte_char_t then
+					byte_current = byte_tab
+				end
+				tinsert(bytes_string, byte_current)
+			elseif byte_current == byte_escape then
+				b_escaping = true
+			elseif byte_current == byte_quote then
+				p[key] = bytes2string(bytes_string)
 				state = "attribute"
+			else
+				tinsert(bytes_string, byte_current)
 			end
 		elseif state == "attribute_value" then
 			if byte_current == byte_space then
@@ -138,15 +164,28 @@ local function xmlDecode(xml)
 			or byte_current == byte_quot then
 				byte_quote = byte_current
 				state = "text_value_string"
+				bytes_string = {}
 				pos1 = pos + 1
 			elseif byte_current ~= byte_space then
 				state = "text_value"
 				pos1 = pos
 			end
 		elseif state == "text_value_string" then
-			if byte_current == byte_quote then
-				p[''][key] = xml:sub(pos1, pos - 1)
+			if b_escaping then
+				b_escaping = false
+				if byte_current == byte_char_n then
+					byte_current = byte_lf
+				elseif byte_current == byte_char_t then
+					byte_current = byte_tab
+				end
+				tinsert(bytes_string, byte_current)
+			elseif byte_current == byte_escape then
+				b_escaping = true
+			elseif byte_current == byte_quote then
+				p[''][key] = bytes2string(bytes_string)
 				state = "text"
+			else
+				tinsert(bytes_string, byte_current)
 			end
 		elseif state == "text_value" then
 			if byte_current == byte_space then
@@ -167,25 +206,42 @@ local xmlEscape = function(str)
 	return (str:gsub('\\', '\\\\'):gsub('"', '\\"'))
 end
 
+local bytes2string = function(bytes)
+	local char, tinsert, tconcat, unpack = string.char, tinsert, tconcat, unpack
+	local count = #bytes
+	if count > 100 then
+		local t, i = {}, 1
+		while i < count do
+			tinsert(char(unpack(bytes, i, i + 100)))
+			i = i + 100
+		end
+		return tconcat(t)
+	else
+		return char(unpack(bytes))
+	end
+end
+
 local xmlUnescape = function(str)
-	local res = ''
-	local escaping = false
-	local char
-	for i=1, #str do
-		char = str:sub(i, i)
-		if (not escaping) and char == '\\' then
-			escaping = true
-		else
-			if escaping then
-				if char == 'n' then
-					char = '\n'
-				end
-				escaping = false
+	local bytes2string, tinsert, byte = bytes2string, tinsert, string.byte
+	local bytes_string, b_escaping, len, byte_current = {}, false, #str
+	local byte_char_n, byte_char_t, byte_lf, byte_tab, byte_escape = (byte("n")), (byte("t")), (byte("\n")), (byte("\t")), (byte("\\"))
+	for i = 1, len do
+		byte_current = byte(str, i)
+		if b_escaping then
+			b_escaping = false
+			if byte_current == byte_char_n then
+				byte_current = byte_lf
+			elseif byte_current == byte_char_t then
+				byte_current = byte_tab
 			end
-			res = res .. char
+			tinsert(bytes_string, byte_current)
+		elseif byte_current == byte_escape then
+			b_escaping = true
+		else
+			tinsert(bytes_string, byte_current)
 		end
 	end
-	return res
+	return bytes2string(bytes_string)
 end
 
 local xmlEncode
@@ -287,5 +343,3 @@ MY.Xml.Unescape = xmlUnescape
 
 -- xml转纯文字
 MY.Xml.GetPureText = xml2Text
-local xml = "<text>text=\"<Shift+鼠标右键打开装备操作菜单>\" font=105 </text>"
-xml2Text(xml)
