@@ -60,6 +60,7 @@ local xmlDecode = function(xml)
 		elseif state == "label_lt" then
 			if byte_current == byte_slash then
 				state = "label_closing"
+				pos1 = pos + 1
 			elseif byte_current ~= byte_space then
 				state = "label_opening"
 				pos1 = pos
@@ -191,7 +192,7 @@ local xmlDecode = function(xml)
 			if byte_current == byte_space then
 				p[''][key] = str2var(xml:sub(pos1, pos))
 				state = "text"
-			elseif byte_current == byte_gt then
+			elseif byte_current == byte_lt then
 				p[''][key] = str2var(xml:sub(pos1, pos - 1))
 				state = "text"
 			end
