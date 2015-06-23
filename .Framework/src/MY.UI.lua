@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-16 17:57:48
+-- @Last Modified time: 2015-06-23 22:15:58
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -2468,19 +2468,21 @@ function _MY.UI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 		end
 		for _, ele in pairs(self.eles) do
 			if type(fnLClick)=="function" then
-				if ele.wnd then MY.UI.RegisterUIEvent(ele.wnd ,'OnLButtonClick'     , function() fnLClick(MY.Const.Event.Mouse.LBUTTON, ele.raw) end) end
-				if ele.itm then MY.UI.RegisterUIEvent(ele.itm ,'OnItemLButtonClick' , function() fnLClick(MY.Const.Event.Mouse.LBUTTON, ele.raw) end) end
-				if ele.hdl then MY.UI.RegisterUIEvent(ele.hdl ,'OnItemLButtonClick' , function() fnLClick(MY.Const.Event.Mouse.LBUTTON, ele.raw) end) end
-				if ele.cmb then MY.UI.RegisterUIEvent(ele.cmb ,'OnLButtonClick'     , function() fnLClick(MY.Const.Event.Mouse.LBUTTON, ele.raw) end) end
+				local fnAction = function() fnLClick(MY.Const.Event.Mouse.LBUTTON, ele.raw) end
+				if ele.wnd then MY.UI.RegisterUIEvent(ele.wnd ,'OnLButtonClick'     , fnAction) end
+				if ele.itm then MY.UI.RegisterUIEvent(ele.itm ,'OnItemLButtonClick' , fnAction) ele.itm:RegisterEvent(16) end
+				if ele.hdl then MY.UI.RegisterUIEvent(ele.hdl ,'OnItemLButtonClick' , fnAction) ele.hdl:RegisterEvent(16) end
+				if ele.cmb then MY.UI.RegisterUIEvent(ele.cmb ,'OnLButtonClick'     , fnAction) end
 			end
 			if type(fnMClick)=="function" then
 				
 			end
 			if type(fnRClick)=="function" then
-				if ele.wnd then MY.UI.RegisterUIEvent(ele.wnd ,'OnRButtonClick'     , function() fnRClick(MY.Const.Event.Mouse.RBUTTON, ele.raw) end) end
-				if ele.itm then MY.UI.RegisterUIEvent(ele.itm ,'OnItemRButtonClick' , function() fnRClick(MY.Const.Event.Mouse.RBUTTON, ele.raw) end) end
-				if ele.hdl then MY.UI.RegisterUIEvent(ele.hdl ,'OnItemRButtonClick' , function() fnRClick(MY.Const.Event.Mouse.RBUTTON, ele.raw) end) end
-				if ele.cmb then MY.UI.RegisterUIEvent(ele.cmb ,'OnRButtonClick'     , function() fnRClick(MY.Const.Event.Mouse.RBUTTON, ele.raw) end) end
+				local fnAction = function() fnRClick(MY.Const.Event.Mouse.RBUTTON, ele.raw) end
+				if ele.wnd then MY.UI.RegisterUIEvent(ele.wnd ,'OnRButtonClick'     , fnAction) end
+				if ele.itm then MY.UI.RegisterUIEvent(ele.itm ,'OnItemRButtonClick' , fnAction) ele.itm:RegisterEvent(32) end
+				if ele.hdl then MY.UI.RegisterUIEvent(ele.hdl ,'OnItemRButtonClick' , fnAction) ele.hdl:RegisterEvent(32) end
+				if ele.cmb then MY.UI.RegisterUIEvent(ele.cmb ,'OnRButtonClick'     , fnAction) end
 			end
 		end
 	else
