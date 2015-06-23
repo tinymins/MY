@@ -4,7 +4,7 @@
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-28 17:10:00
+-- @Last Modified time: 2015-06-23 22:10:08
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = {}
@@ -53,6 +53,33 @@ MY_ToolBox.ApplyConfig = function()
 	if MY_ToolBox.bFriendHeadTip then
 		_C.FriendHeadTip(true)
 	end
+	
+	-- 玩家名字变成link方便组队
+	MY.RegisterEvent('OPEN_WINDOW.NAMELINKER', function(event)
+		local h = Station.Lookup("Normal/DialoguePanel", "Handle_Message")
+		for i = 0, h:GetItemCount() - 1 do
+			local hItem = h:Lookup(i)
+			if hItem:GetType() == "Text" then
+				local szText = hItem:GetText()
+				for _, szPattern in ipairs(_L.NAME_PATTERN_LIST) do
+					local _, _, szName = szText:find(szPattern)
+					if szName then
+						local nPos1, nPos2 = szText:find(szName)
+						h:InsertItemFromString(i, true, GetFormatText(szText:sub(nPos2 + 1), hItem:GetFontScheme()))
+						h:InsertItemFromString(i, true, GetFormatText("[" .. szText:sub(nPos1, nPos2) .. "]", hItem:GetFontScheme(), nil, nil, nil, nil, nil, "namelink"))
+						MY.Chat.RenderLink(h:Lookup(i + 1))
+						if MY_Farbnamen and MY_Farbnamen.Render then
+							MY_Farbnamen.Render(h:Lookup(i + 1))
+						end
+						hItem:SetText(szText:sub(1, nPos1 - 1))
+						hItem:AutoSize()
+						break
+					end
+				end
+			end
+		end
+		h:FormatAllItemPos()
+	end)
 	
 	-- 试炼之地九宫助手
 	MY.RegisterEvent('OPEN_WINDOW.JIUGONG_HELPER', function(event)
