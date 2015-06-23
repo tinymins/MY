@@ -194,7 +194,7 @@ local xmlDecode = function(xml)
 				state = "text"
 			elseif byte_current == byte_lt then
 				p[''][key] = str2var(xml:sub(pos1, pos - 1))
-				state = "text"
+				state = "label_lt"
 			end
 		end
 		pos = pos + 1
