@@ -212,8 +212,8 @@ local bytes2string = function(bytes)
 	local count = #bytes
 	if count > 100 then
 		local t, i = {}, 1
-		while i < count do
-			tinsert(char(unpack(bytes, i, i + 100)))
+		while i <= count do
+			tinsert(t, char(unpack(bytes, i, math.min(i + 99, count))))
 			i = i + 100
 		end
 		return tconcat(t)
