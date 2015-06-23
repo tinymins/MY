@@ -4,7 +4,7 @@
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-23 22:10:08
+-- @Last Modified time: 2015-06-23 22:30:28
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = {}
@@ -66,7 +66,7 @@ MY_ToolBox.ApplyConfig = function()
 					if szName then
 						local nPos1, nPos2 = szText:find(szName)
 						h:InsertItemFromString(i, true, GetFormatText(szText:sub(nPos2 + 1), hItem:GetFontScheme()))
-						h:InsertItemFromString(i, true, GetFormatText("[" .. szText:sub(nPos1, nPos2) .. "]", hItem:GetFontScheme(), nil, nil, nil, nil, nil, "namelink"))
+						h:InsertItemFromString(i, true, GetFormatText("[" .. szText:sub(nPos1, nPos2) .. "]", nil, nil, nil, nil, nil, nil, "namelink"))
 						MY.Chat.RenderLink(h:Lookup(i + 1))
 						if MY_Farbnamen and MY_Farbnamen.Render then
 							MY_Farbnamen.Render(h:Lookup(i + 1))
