@@ -1,6 +1,8 @@
 -- language data (zhcn) updated at 2014-4-10 03:38:11
 data = {
     ['Snaplines'] = '元素辅助',
+    ['Snaplines - ShowTip'] = '元素辅助 - 显示信息',
+    ['Snaplines - ShowData'] = '元素辅助 - 显示数据',
     ['enable tree path view'] = '启用UI元素辅助线与信息显示',
     ['show tip'] = '显示信息',
     ['show data'] = '显示数据',
