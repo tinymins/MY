@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-23 22:15:58
+-- @Last Modified time: 2015-06-26 11:31:53
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -2143,7 +2143,7 @@ function _MY.UI:multiLine(bMultiLine)
 		if ele then
 			local x = ele.edt or ele.txt
 			if x and x.IsMultiLine then
-				return x:IsMultiLine(1)
+				return x:IsMultiLine(1) or x:IsMultiLine()
 			end
 		end
 	end
