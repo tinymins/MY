@@ -452,11 +452,11 @@ MY.Game.AddHotKey("Dev_Snaplines", _L["Snaplines"], function()
     MYDev_Snaplines.bEnable = not MYDev_Snaplines.bEnable
     MYDev_Snaplines.ReloadUI()
 end, nil)
-MY.Game.AddHotKey("Dev_Snaplines", _L["Snaplines - ShowTip"], function()
+MY.Game.AddHotKey("Dev_Snaplines_ShowTip", _L["Snaplines - ShowTip"], function()
     MYDev_Snaplines.bShowTip = not MYDev_Snaplines.bShowTip
     MYDev_Snaplines.ReloadUI()
 end, nil)
-MY.Game.AddHotKey("Dev_Snaplines", _L["Snaplines - ShowData"], function()
+MY.Game.AddHotKey("Dev_Snaplines_ShowData", _L["Snaplines - ShowData"], function()
     MYDev_Snaplines.bShowData = not MYDev_Snaplines.bShowData
     MYDev_Snaplines.ReloadUI()
 end, nil)
