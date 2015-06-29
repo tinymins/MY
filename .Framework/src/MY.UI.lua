@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-29 15:04:50
+-- @Last Modified time: 2015-06-29 15:15:24
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -2687,7 +2687,19 @@ setmetatable(MY.UI, { __call = function(me, ...) return me.Fetch(...) end, __met
 
 -- 构造函数 类似jQuery: $(selector)
 MY.UI.Fetch = function(selector, tab)
-	return XGUI.new(selector, tab)
+	local ui = XGUI.new(selector, tab)
+	return setmetatable({}, {
+		__index = function(t, k)
+			if type(k) == "number" then
+				return ui:raw(k)
+			else
+				return ui[k]
+			end
+		end,
+		__newindex = function(t, k, v)
+			assert("cannot modify!")
+		end,
+	})
 end
 -- 绑定UI事件
 MY.UI.RegisterUIEvent = function(raw, szEvent, fnEvent)
