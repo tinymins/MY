@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-26 11:31:53
+-- @Last Modified time: 2015-06-29 14:28:58
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -2409,6 +2409,7 @@ function _MY.UI:menu(lmenu, rmenu, bNoAutoBind)
 	end
 	-- pop menu function
 	local fnPopMenu = function(raw, menu)
+		raw = raw:Lookup("", "") or raw
 		local _menu = nil
 		local nX, nY = raw:GetAbsPos()
 		local nW, nH = raw:GetSize()
@@ -2469,20 +2470,34 @@ function _MY.UI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 		for _, ele in pairs(self.eles) do
 			if type(fnLClick)=="function" then
 				local fnAction = function() fnLClick(MY.Const.Event.Mouse.LBUTTON, ele.raw) end
-				if ele.wnd then MY.UI.RegisterUIEvent(ele.wnd ,'OnLButtonClick'     , fnAction) end
-				if ele.itm then MY.UI.RegisterUIEvent(ele.itm ,'OnItemLButtonClick' , fnAction) ele.itm:RegisterEvent(16) end
-				if ele.hdl then MY.UI.RegisterUIEvent(ele.hdl ,'OnItemLButtonClick' , fnAction) ele.hdl:RegisterEvent(16) end
-				if ele.cmb then MY.UI.RegisterUIEvent(ele.cmb ,'OnLButtonClick'     , fnAction) end
+				if ele.cmb then
+					MY.UI.RegisterUIEvent(ele.cmb ,'OnLButtonClick'     , fnAction)
+				elseif ele.wnd then
+					MY.UI.RegisterUIEvent(ele.wnd ,'OnLButtonClick'     , fnAction)
+				elseif ele.itm then
+					ele.itm:RegisterEvent(16)
+					MY.UI.RegisterUIEvent(ele.itm ,'OnItemLButtonClick' , fnAction)
+				elseif ele.hdl then
+					ele.hdl:RegisterEvent(16)
+					MY.UI.RegisterUIEvent(ele.hdl ,'OnItemLButtonClick' , fnAction)
+				end
 			end
 			if type(fnMClick)=="function" then
 				
 			end
 			if type(fnRClick)=="function" then
 				local fnAction = function() fnRClick(MY.Const.Event.Mouse.RBUTTON, ele.raw) end
-				if ele.wnd then MY.UI.RegisterUIEvent(ele.wnd ,'OnRButtonClick'     , fnAction) end
-				if ele.itm then MY.UI.RegisterUIEvent(ele.itm ,'OnItemRButtonClick' , fnAction) ele.itm:RegisterEvent(32) end
-				if ele.hdl then MY.UI.RegisterUIEvent(ele.hdl ,'OnItemRButtonClick' , fnAction) ele.hdl:RegisterEvent(32) end
-				if ele.cmb then MY.UI.RegisterUIEvent(ele.cmb ,'OnRButtonClick'     , fnAction) end
+				if ele.cmb then
+					MY.UI.RegisterUIEvent(ele.cmb ,'OnRButtonClick'     , fnAction)
+				elseif ele.wnd then
+					MY.UI.RegisterUIEvent(ele.wnd ,'OnRButtonClick'     , fnAction)
+				elseif ele.itm then
+					ele.itm:RegisterEvent(32)
+					MY.UI.RegisterUIEvent(ele.itm ,'OnItemRButtonClick' , fnAction)
+				elseif ele.hdl then
+					ele.hdl:RegisterEvent(32)
+					MY.UI.RegisterUIEvent(ele.hdl ,'OnItemRButtonClick' , fnAction)
+				end
 			end
 		end
 	else
