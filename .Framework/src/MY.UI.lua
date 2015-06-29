@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-29 14:35:34
+-- @Last Modified time: 2015-06-29 15:04:50
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -17,7 +17,7 @@ local _L = MY.LoadLangPack()
 ---------------------------------------------------------------------
 -- 本地的 UI 组件对象
 ---------------------------------------------------------------------
-_MY.ApplyUIArgument = function(ui, tArg)
+local function ApplyUIArgument(ui, tArg)
 	if tArg and ui then
 		if tArg.w           then ui:width      (tArg.w          ) end
 		if tArg.h           then ui:height     (tArg.h          ) end
@@ -106,11 +106,11 @@ end
 -------------------------------------
 -- UI object class
 -------------------------------------
-_MY.UI = class()
+local XGUI = class()
 
 -- 不会玩元表 (╯‵□′)╯︵┻━┻
 -- -- 设置元表，这样可以当作table调用，其效果相当于 .eles[i].raw
--- setmetatable(_MY.UI, {  __call = function(me, ...) return me:ctor(...) end, __index = function(t, k) 
+-- setmetatable(XGUI, {  __call = function(me, ...) return me:ctor(...) end, __index = function(t, k) 
 	-- if type(k) == "number" then
 		-- return t.eles[k].raw
 	-- elseif k=="new" then
@@ -171,7 +171,7 @@ end
 --
 -- ui object creator 
 -- same as jQuery.$()
-function _MY.UI:ctor(raw, tab)
+function XGUI:ctor(raw, tab)
 	self.eles = self.eles or {} -- setmetatable({}, { __mode = "v" })
 	if type(raw)=="table" and type(raw.eles)=="table" then
 		for i = 1, #raw.eles, 1 do
@@ -192,19 +192,19 @@ end
 
 -- clone
 -- clone and return a new class
-function _MY.UI:clone(eles)
+function XGUI:clone(eles)
 	self:_checksum()
 	eles = eles or self.eles
 	local _eles = {}
 	for i = 1, #eles, 1 do
 		if eles[i].raw then table.insert(_eles, raw2ele(eles[i].raw)) end
 	end
-	return _MY.UI.new({eles = _eles})
+	return XGUI.new({eles = _eles})
 end
 
 --  del bad eles
 -- (self) _checksum()
-function _MY.UI:_checksum()
+function XGUI:_checksum()
 	for i = #self.eles, 1, -1 do
 		local ele = self.eles[i]
 		local status, err = true, 'szType'
@@ -220,7 +220,7 @@ end
 
 -- add a ele to object
 -- same as jQuery.add()
-function _MY.UI:add(raw, tab)
+function XGUI:add(raw, tab)
 	self:_checksum()
 	local eles = {}
 	for i = 1, #self.eles, 1 do
@@ -239,7 +239,7 @@ end
 
 -- delete elements from object
 -- same as jQuery.not()
-function _MY.UI:del(raw)
+function XGUI:del(raw)
 	self:_checksum()
 	local eles = {}
 	for i = 1, #self.eles, 1 do
@@ -296,7 +296,7 @@ end
 
 -- filter elements from object
 -- same as jQuery.filter()
-function _MY.UI:filter(raw)
+function XGUI:filter(raw)
 	self:_checksum()
 	local eles = {}
 	for i = 1, #self.eles, 1 do
@@ -355,7 +355,7 @@ end
 
 -- get parent
 -- same as jQuery.parent()
-function _MY.UI:parent()
+function XGUI:parent()
 	self:_checksum()
 	local parent = {}
 	for _, ele in pairs(self.eles) do
@@ -371,7 +371,7 @@ end
 
 -- get children
 -- same as jQuery.children()
-function _MY.UI:children(filter)
+function XGUI:children(filter)
 	self:_checksum()
 	local child = {}
 	local childHash = {}
@@ -428,13 +428,13 @@ function _MY.UI:children(filter)
 end
 
 -- get child-item
-function _MY.UI:item(filter)
+function XGUI:item(filter)
 	return self:hdl():children(filter)
 end
 
 -- find ele
 -- same as jQuery.find()
-function _MY.UI:find(filter)
+function XGUI:find(filter)
 	self:_checksum()
 	local children = {}
 	for _, ele in pairs(self.eles) do
@@ -451,7 +451,7 @@ function _MY.UI:find(filter)
 end
 
 -- filter mouse in ele
-function _MY.UI:ptIn()
+function XGUI:ptIn()
 	self:_checksum()
 	local eles = {}
 	local xC, yC = Cursor.GetPos()
@@ -466,8 +466,8 @@ end
 
 -- each
 -- same as jQuery.each(function(){})
--- :each(_MY.UI each_self)  -- you can use 'this' to visit raw element likes jQuery
-function _MY.UI:each(fn)
+-- :each(XGUI each_self)  -- you can use 'this' to visit raw element likes jQuery
+function XGUI:each(fn)
 	self:_checksum()
 	local eles = {}
 	-- get a copy of ele list
@@ -489,7 +489,7 @@ end
 
 -- eq
 -- same as jQuery.eq(pos)
-function _MY.UI:eq(pos)
+function XGUI:eq(pos)
 	if pos then
 		return self:slice(pos,pos)
 	end
@@ -498,19 +498,19 @@ end
 
 -- first
 -- same as jQuery.first()
-function _MY.UI:first()
+function XGUI:first()
 	return self:slice(1,1)
 end
 
 -- last
 -- same as jQuery.last()
-function _MY.UI:last()
+function XGUI:last()
 	return self:slice(-1,-1)
 end
 
 -- slice -- index starts from 1
 -- same as jQuery.slice(selector, pos)
-function _MY.UI:slice(startpos, endpos)
+function XGUI:slice(startpos, endpos)
 	self:_checksum()
 	local eles = {}
 	for i = 1, #self.eles, 1 do
@@ -530,7 +530,7 @@ end
 
 -- get raw
 -- same as jQuery[index]
-function _MY.UI:raw(index, key)
+function XGUI:raw(index, key)
 	self:_checksum()
 	key = key or 'raw'
 	local eles = self.eles
@@ -539,7 +539,7 @@ function _MY.UI:raw(index, key)
 end
 
 -- get ele
-function _MY.UI:ele(index)
+function XGUI:ele(index)
 	self:_checksum()
 	local eles, ele = self.eles, {}
 	if index < 0 then index = #eles + index + 1 end
@@ -552,7 +552,7 @@ function _MY.UI:ele(index)
 end
 
 -- get frm
-function _MY.UI:frm(index)
+function XGUI:frm(index)
 	self:_checksum()
 	local eles = {}
 	if index < 0 then index = #self.eles + index + 1 end
@@ -563,7 +563,7 @@ function _MY.UI:frm(index)
 end
 
 -- get wnd
-function _MY.UI:wnd(index)
+function XGUI:wnd(index)
 	self:_checksum()
 	local eles = {}
 	if index < 0 then index = #self.eles + index + 1 end
@@ -574,7 +574,7 @@ function _MY.UI:wnd(index)
 end
 
 -- get item
-function _MY.UI:itm(index)
+function XGUI:itm(index)
 	self:_checksum()
 	local eles = {}
 	if index < 0 then index = #eles + index + 1 end
@@ -585,7 +585,7 @@ function _MY.UI:itm(index)
 end
 
 -- get handle
-function _MY.UI:hdl(index)
+function XGUI:hdl(index)
 	self:_checksum()
 	local eles = {}
 	if index then
@@ -602,7 +602,7 @@ function _MY.UI:hdl(index)
 end
 
 -- get count
-function _MY.UI:count()
+function XGUI:count()
 	self:_checksum()
 	return #self.eles
 end
@@ -613,7 +613,7 @@ end
 
 -- remove
 -- same as jQuery.remove()
-function _MY.UI:remove()
+function XGUI:remove()
 	self:_checksum()
 	for _, ele in pairs(self.eles) do
 		if ele.fnOnDestroy then
@@ -650,7 +650,7 @@ _MY.tItemXML = {
 -- similar as jQuery.append()
 -- Instance:append(szType,[ szName,] tArg)
 -- Instance:append(szItemString)
-function _MY.UI:append(arg0, arg1, arg2)
+function XGUI:append(arg0, arg1, arg2)
 	self:_checksum()
 	local szName, szType, tArg, szXml
 	if type(arg0) == 'string' then
@@ -916,7 +916,7 @@ function _MY.UI:append(arg0, arg1, arg2)
 					ui = MY.UI(hnd)
 				end
 			end
-			_MY.ApplyUIArgument(ui, tArg)
+			ApplyUIArgument(ui, tArg)
 		end
 	elseif szXml then
 		for _, ele in pairs(self.eles) do
@@ -933,7 +933,7 @@ end
 -- clear
 -- clear handle
 -- (self) Instance:clear()
-function _MY.UI:clear()
+function XGUI:clear()
 	self:_checksum()
 	for _, ele in pairs(self.eles) do
 		if ele.hdl then
@@ -949,7 +949,7 @@ end
 -----------------------------------------------------------
 
 -- data set/get
-function _MY.UI:data(key, value)
+function XGUI:data(key, value)
 	self:_checksum()
 	if key and value then -- set name
 		for _, ele in pairs(self.eles) do
@@ -967,7 +967,7 @@ function _MY.UI:data(key, value)
 end
 
 -- show
-function _MY.UI:show()
+function XGUI:show()
 	self:_checksum()
 	for _, ele in pairs(self.eles) do
 		pcall(function() ele.raw:Show() end)
@@ -977,7 +977,7 @@ function _MY.UI:show()
 end
 
 -- hide
-function _MY.UI:hide()
+function XGUI:hide()
 	self:_checksum()
 	for _, ele in pairs(self.eles) do
 		ele.raw:Hide()
@@ -989,7 +989,7 @@ function _MY.UI:hide()
 end
 
 -- visible
-function _MY.UI:visible(bVisiable)
+function XGUI:visible(bVisiable)
 	self:_checksum()
 	if type(bVisiable)=='boolean' then
 		return self:toggle(bVisiable)
@@ -1002,7 +1002,7 @@ function _MY.UI:visible(bVisiable)
 end
 
 -- enable or disable elements
-function _MY.UI:enable(bEnable)
+function XGUI:enable(bEnable)
 	self:_checksum()
 	if type(bEnable)=='boolean' then
 		for _, ele in pairs(self.eles) do
@@ -1021,7 +1021,7 @@ function _MY.UI:enable(bEnable)
 end
 
 -- show/hide eles
-function _MY.UI:toggle(bShow)
+function XGUI:toggle(bShow)
 	self:_checksum()
 	for _, ele in pairs(self.eles) do
 		if bShow == false or (bShow == nil and ele.raw:IsVisible()) then
@@ -1043,7 +1043,7 @@ end
 -- (self) drag(boolean bEnableDrag) -- enable/disable drag
 -- (self) drag(number nX, number y, number w, number h) -- set drag positon and area
 -- (self) drag(function fnOnDrag, function fnOnDragEnd)-- bind frame/item frag event handle
-function _MY.UI:drag(nX, nY, nW, nH)
+function XGUI:drag(nX, nY, nW, nH)
 	self:_checksum()
 	if type(nX) == 'boolean' then
 		for _, ele in pairs(self.eles) do
@@ -1098,7 +1098,7 @@ function _MY.UI:drag(nX, nY, nW, nH)
 end
 
 -- get/set ui object text
-function _MY.UI:text(szText)
+function XGUI:text(szText)
 	self:_checksum()
 	if szText then
 		for _, ele in pairs(self.eles) do
@@ -1145,7 +1145,7 @@ function _MY.UI:text(szText)
 end
 
 -- get/set ui object text
-function _MY.UI:placeholder(szText)
+function XGUI:placeholder(szText)
 	self:_checksum()
 	if szText then
 		for _, ele in pairs(self.eles) do
@@ -1161,7 +1161,7 @@ function _MY.UI:placeholder(szText)
 end
 
 -- ui autocomplete interface
-function _MY.UI:autocomplete(method, arg1, arg2)
+function XGUI:autocomplete(method, arg1, arg2)
 	self:_checksum()
 	if method == 'option' and (type(arg1) == 'nil' or (type(arg1) == 'string' and type(arg2) == nil)) then -- get
 		-- select the first item
@@ -1333,7 +1333,7 @@ function _MY.UI:autocomplete(method, arg1, arg2)
 end
 
 -- ui listbox interface
-function _MY.UI:listbox(method, arg1, arg2, arg3, arg4)
+function XGUI:listbox(method, arg1, arg2, arg3, arg4)
 	self:_checksum()
 	if method == 'option' and (type(arg1) == 'nil' or (type(arg1) == 'string' and type(arg2) == nil)) then -- get
 		-- select the first item
@@ -1489,7 +1489,7 @@ function _MY.UI:listbox(method, arg1, arg2, arg3, arg4)
 end
 
 -- get/set ui object name
-function _MY.UI:name(szText)
+function XGUI:name(szText)
 	self:_checksum()
 	if szText then -- set name
 		for _, ele in pairs(self.eles) do
@@ -1505,7 +1505,7 @@ function _MY.UI:name(szText)
 end
 
 -- get/set ui object group
-function _MY.UI:group(szText)
+function XGUI:group(szText)
 	self:_checksum()
 	if szText then -- set group
 		for _, ele in pairs(self.eles) do
@@ -1521,7 +1521,7 @@ function _MY.UI:group(szText)
 end
 
 -- set ui penetrable
-function _MY.UI:penetrable(bPenetrable)
+function XGUI:penetrable(bPenetrable)
 	self:_checksum()
 	if type(bPenetrable) == 'boolean' then -- set penetrable
 		for _, ele in pairs(self.eles) do
@@ -1538,7 +1538,7 @@ function _MY.UI:penetrable(bPenetrable)
 end
 
 -- get/set ui alpha
-function _MY.UI:alpha(nAlpha)
+function XGUI:alpha(nAlpha)
 	self:_checksum()
 	if nAlpha then -- set name
 		for _, ele in pairs(self.eles) do
@@ -1554,7 +1554,7 @@ function _MY.UI:alpha(nAlpha)
 end
 
 -- (self) Instance:fadeTo(nTime, nOpacity, callback)
-function _MY.UI:fadeTo(nTime, nOpacity, callback)
+function XGUI:fadeTo(nTime, nOpacity, callback)
 	self:_checksum()
 	if nTime and nOpacity then
 		for i = 1, #self.eles, 1 do
@@ -1582,7 +1582,7 @@ function _MY.UI:fadeTo(nTime, nOpacity, callback)
 end
 
 -- (self) Instance:fadeIn(nTime, callback)
-function _MY.UI:fadeIn(nTime, callback)
+function XGUI:fadeIn(nTime, callback)
 	self:_checksum()
 	nTime = nTime or 300
 	for i = 1, #self.eles, 1 do
@@ -1592,7 +1592,7 @@ function _MY.UI:fadeIn(nTime, callback)
 end
 
 -- (self) Instance:fadeOut(nTime, callback)
-function _MY.UI:fadeOut(nTime, callback)
+function XGUI:fadeOut(nTime, callback)
 	self:_checksum()
 	nTime = nTime or 300
 	for i = 1, #self.eles, 1 do
@@ -1607,7 +1607,7 @@ function _MY.UI:fadeOut(nTime, callback)
 end
 
 -- (self) Instance:slideTo(nTime, nHeight, callback)
-function _MY.UI:slideTo(nTime, nHeight, callback)
+function XGUI:slideTo(nTime, nHeight, callback)
 	self:_checksum()
 	if nTime and nHeight then
 		for i = 1, #self.eles, 1 do
@@ -1635,7 +1635,7 @@ function _MY.UI:slideTo(nTime, nHeight, callback)
 end
 
 -- (self) Instance:slideUp(nTime, callback)
-function _MY.UI:slideUp(nTime, callback)
+function XGUI:slideUp(nTime, callback)
 	self:_checksum()
 	nTime = nTime or 300
 	for i = 1, #self.eles, 1 do
@@ -1647,7 +1647,7 @@ function _MY.UI:slideUp(nTime, callback)
 end
 
 -- (self) Instance:slideDown(nTime, callback)
-function _MY.UI:slideDown(nTime, callback)
+function XGUI:slideDown(nTime, callback)
 	self:_checksum()
 	nTime = nTime or 300
 	for i = 1, #self.eles, 1 do
@@ -1658,7 +1658,7 @@ end
 
 -- (number) Instance:font()
 -- (self) Instance:font(number nFont)
-function _MY.UI:font(nFont)
+function XGUI:font(nFont)
 	self:_checksum()
 	if nFont then-- set name
 		for _, ele in pairs(self.eles) do
@@ -1683,7 +1683,7 @@ end
 
 -- (number, number, number) Instance:color()
 -- (self) Instance:color(number r, number g, number b)
-function _MY.UI:color(r, g, b)
+function XGUI:color(r, g, b)
 	self:_checksum()
 	if type(r) == "table" then
 		r, g, b = unpack(r)
@@ -1714,7 +1714,7 @@ end
 
 -- (number) Instance:left()
 -- (self) Instance:left(number)
-function _MY.UI:left(nLeft)
+function XGUI:left(nLeft)
 	if nLeft then
 		return self:pos(nLeft, nil)
 	else
@@ -1725,7 +1725,7 @@ end
 
 -- (number) Instance:top()
 -- (self) Instance:top(number)
-function _MY.UI:top(nTop)
+function XGUI:top(nTop)
 	if nTop then
 		return self:pos(nil, nTop)
 	else
@@ -1736,7 +1736,7 @@ end
 
 -- (number, number) Instance:pos()
 -- (self) Instance:pos(nLeft, nTop)
-function _MY.UI:pos(nLeft, nTop)
+function XGUI:pos(nLeft, nTop)
 	self:_checksum()
 	if nLeft or nTop then
 		for _, ele in pairs(self.eles) do
@@ -1762,7 +1762,7 @@ end
 
 -- (anchor) Instance:anchor()
 -- (self) Instance:anchor(anchor)
-function _MY.UI:anchor(anchor)
+function XGUI:anchor(anchor)
 	self:_checksum()
 	if type(anchor) == 'table' then
 		for _, ele in pairs(self.eles) do
@@ -1782,7 +1782,7 @@ end
 
 -- (number) Instance:width()
 -- (self) Instance:width(number)
-function _MY.UI:width(nWidth)
+function XGUI:width(nWidth)
 	if nWidth then
 		return self:size(nWidth, nil)
 	else
@@ -1793,7 +1793,7 @@ end
 
 -- (number) Instance:height()
 -- (self) Instance:height(number)
-function _MY.UI:height(nHeight)
+function XGUI:height(nHeight)
 	if nHeight then
 		return self:size(nil, nHeight)
 	else
@@ -1805,7 +1805,7 @@ end
 -- (number, number) Instance:size()
 -- (self) Instance:size(nLeft, nTop)
 -- (self) Instance:size(OnSizeChanged)
-function _MY.UI:size(nWidth, nHeight)
+function XGUI:size(nWidth, nHeight)
 	self:_checksum()
 	if type(nWidth) == 'function' then
 		for _, ele in pairs(self.eles) do
@@ -1954,7 +1954,7 @@ function _MY.UI:size(nWidth, nHeight)
 				this = ele.raw
 				local status, err = pcall(ele.raw.OnSizeChanged)
 				if not status then
-					MY.Debug({err}, 'ERROR _MY.UI:OnSizeChanged', MY_DEBUG.ERROR)
+					MY.Debug({err}, 'ERROR XGUI:OnSizeChanged', MY_DEBUG.ERROR)
 				end
 				this = _this
 			end
@@ -1970,7 +1970,7 @@ end
 
 -- (self) Instance:autosize() -- resize Text element by autosize
 -- (self) Instance:autosize(bool bAutoSize) -- set if Text ele autosize
-function _MY.UI:autosize(bAutoSize)
+function XGUI:autosize(bAutoSize)
 	self:_checksum()
 	if bAutoSize == nil then
 		for _, ele in pairs(self.eles) do
@@ -1991,7 +1991,7 @@ end
 -- (number) Instance:scroll() -- get current scroll percentage (none scroll will return -1)
 -- (self) Instance:scroll(number nPercentage) -- set scroll percentage
 -- (self) Instance:scroll(function OnScrollBarPosChanged) -- bind scroll event handle
-function _MY.UI:scroll(nPercentage)
+function XGUI:scroll(nPercentage)
 	self:_checksum()
 	if nPercentage then -- set
 		if type(nPercentage) == "number" then
@@ -2044,7 +2044,7 @@ end
 
 -- (number, number) Instance:range()
 -- (self) Instance:range(nMin, nMax)
-function _MY.UI:range(nMin, nMax)
+function XGUI:range(nMin, nMax)
 	self:_checksum()
 	if type(nMin)=='number' and type(nMax)=='number' and nMax>nMin then
 		for _, ele in pairs(self.eles) do
@@ -2064,7 +2064,7 @@ end
 
 -- (number, number) Instance:value()
 -- (self) Instance:value(nValue)
-function _MY.UI:value(nValue)
+function XGUI:value(nValue)
 	self:_checksum()
 	if nValue then
 		for _, ele in pairs(self.eles) do
@@ -2084,7 +2084,7 @@ end
 
 -- (boolean) Instance:multiLine()
 -- (self) Instance:multiLine(bMultiLine)
-function _MY.UI:multiLine(bMultiLine)
+function XGUI:multiLine(bMultiLine)
 	self:_checksum()
 	if type(bMultiLine)=='boolean' then
 		for _, ele in pairs(self.eles) do
@@ -2112,7 +2112,7 @@ end
 
 -- (self) Instance:image(szImageAndFrame)
 -- (self) Instance:image(szImage, nFrame)
-function _MY.UI:image(szImage, nFrame)
+function XGUI:image(szImage, nFrame)
 	self:_checksum()
 	if szImage then
 		nFrame = nFrame or string.gsub(szImage, '.*%|(%d+)', '%1')
@@ -2141,7 +2141,7 @@ end
 
 -- (self) Instance:frame(nFrame)
 -- (number) Instance:frame()
-function _MY.UI:frame(nFrame)
+function XGUI:frame(nFrame)
 	self:_checksum()
 	if nFrame then
 		nFrame = tonumber(nFrame)
@@ -2162,7 +2162,7 @@ function _MY.UI:frame(nFrame)
 end
 
 -- (self) Instance:handleStyle(dwStyle)
-function _MY.UI:handleStyle(dwStyle)
+function XGUI:handleStyle(dwStyle)
 	self:_checksum()
 	if dwStyle then
 		for _, ele in pairs(self.eles) do
@@ -2176,7 +2176,7 @@ function _MY.UI:handleStyle(dwStyle)
 end
 
 -- (self) Instance:edittype(dwType)
-function _MY.UI:edittype(dwType)
+function XGUI:edittype(dwType)
 	self:_checksum()
 	if dwType then
 		for _, ele in pairs(self.eles) do
@@ -2189,8 +2189,8 @@ function _MY.UI:edittype(dwType)
 	return self
 end
 
--- (self) _MY.UI:limit(nLimit)
-function _MY.UI:limit(nLimit)
+-- (self) XGUI:limit(nLimit)
+function XGUI:limit(nLimit)
 	self:_checksum()
 	if nLimit then
 		for _, ele in pairs(self.eles) do
@@ -2211,8 +2211,8 @@ function _MY.UI:limit(nLimit)
 	end
 end
 
--- (self) _MY.UI:sliderStyle(bShowPercentage)
-function _MY.UI:sliderStyle(bShowPercentage)
+-- (self) XGUI:sliderStyle(bShowPercentage)
+function XGUI:sliderStyle(bShowPercentage)
 	self:_checksum()
 	for _, ele in pairs(self.eles) do
 		if ele.type=="WndSliderBox" then
@@ -2223,7 +2223,7 @@ function _MY.UI:sliderStyle(bShowPercentage)
 end
 
 -- (self) Instance:bringToTop()
-function _MY.UI:bringToTop()
+function XGUI:bringToTop()
 	self:_checksum()
 	for _, ele in pairs(self.eles) do
 		local x = ele.frm
@@ -2235,7 +2235,7 @@ function _MY.UI:bringToTop()
 end
 
 -- (self) Instance:refresh()
-function _MY.UI:refresh()
+function XGUI:refresh()
 	self:_checksum()
 	for _, ele in pairs(self.eles) do
 		if ele.hdl then
@@ -2250,7 +2250,7 @@ end
 -----------------------------------------------------------
 
 -- 绑定Frame的事件
-function _MY.UI:onevent(szEvent, fnEvent)
+function XGUI:onevent(szEvent, fnEvent)
 	self:_checksum()
 	if type(szEvent) == "string" then
 		local nPos, szKey = (StringFindW(szEvent, "."))
@@ -2301,7 +2301,7 @@ function _MY.UI:onevent(szEvent, fnEvent)
 end
 
 -- 绑定ele的UI事件
-function _MY.UI:onuievent(szEvent, fnEvent)
+function XGUI:onuievent(szEvent, fnEvent)
 	self:_checksum()
 	if type(szEvent)~="string" then
 		return self
@@ -2324,7 +2324,7 @@ end
 
 -- customMode 设置Frame的CustomMode
 -- (self) Instance:customMode(string szTip, function fnOnEnterCustomMode, function fnOnLeaveCustomMode)
-function _MY.UI:customMode(szTip, fnOnEnterCustomMode, fnOnLeaveCustomMode, szPoint)
+function XGUI:customMode(szTip, fnOnEnterCustomMode, fnOnLeaveCustomMode, szPoint)
 	self:_checksum()
 	if type(szTip)=="string" then
 		self:onevent("ON_ENTER_CUSTOM_UI_MODE", function()
@@ -2348,7 +2348,7 @@ end
 
 -- breathe 设置Frame的breathe
 -- (self) Instance:breathe(function fnOnFrameBreathe)
-function _MY.UI:breathe(fnOnFrameBreathe)
+function XGUI:breathe(fnOnFrameBreathe)
 	self:_checksum()
 	if type(fnOnFrameBreathe)=="function" then
 		for _, ele in pairs(self.eles) do
@@ -2363,7 +2363,7 @@ end
 -- menu 弹出菜单
 -- :menu(table menu)  弹出菜单menu
 -- :menu(functin fn)  弹出菜单function返回值table
-function _MY.UI:menu(lmenu, rmenu, bNoAutoBind)
+function XGUI:menu(lmenu, rmenu, bNoAutoBind)
 	self:_checksum()
 	if not bNoAutoBind then
 		rmenu = rmenu or lmenu
@@ -2402,14 +2402,14 @@ end
 -- lmenu 弹出左键菜单
 -- :lmenu(table menu)  弹出菜单menu
 -- :lmenu(functin fn)  弹出菜单function返回值table
-function _MY.UI:lmenu(menu)
+function XGUI:lmenu(menu)
 	return self:menu(menu, nil, true)
 end
 
 -- rmenu 弹出右键菜单
 -- :lmenu(table menu)  弹出菜单menu
 -- :lmenu(functin fn)  弹出菜单function返回值table
-function _MY.UI:rmenu(menu)
+function XGUI:rmenu(menu)
 	return self:menu(nil, menu, true)
 end
 
@@ -2421,7 +2421,7 @@ end
 -- n: 1    左键
 --    0    中键
 --   -1    右键
-function _MY.UI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
+function XGUI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 	self:_checksum()
 	if type(fnLClick)=="function" or type(fnMClick)=="function" or type(fnRClick)=="function" then
 		if not bNoAutoBind then
@@ -2484,7 +2484,7 @@ end
 -- same as jQuery.lclick()
 -- :lclick(fnAction) 绑定
 -- :lclick()         触发
-function _MY.UI:lclick(fnLClick)
+function XGUI:lclick(fnLClick)
 	return self:click(fnLClick or MY.Const.Event.Mouse.LBUTTON, nil, nil, true)
 end
 
@@ -2492,14 +2492,14 @@ end
 -- same as jQuery.rclick()
 -- :rclick(fnAction) 绑定
 -- :rclick()         触发
-function _MY.UI:rclick(fnRClick)
+function XGUI:rclick(fnRClick)
 	return self:click(nil, fnRClick or MY.Const.Event.Mouse.RBUTTON, nil, true)
 end
 
 -- hover 鼠标悬停事件
 -- same as jQuery.hover()
 -- :hover(fnHover[, fnLeave]) 绑定
-function _MY.UI:hover(fnHover, fnLeave, bNoAutoBind)
+function XGUI:hover(fnHover, fnLeave, bNoAutoBind)
 	self:_checksum()
 	if not bNoAutoBind then fnLeave = fnLeave or fnHover end
 	if fnHover then
@@ -2535,7 +2535,7 @@ end
 -- number nPosType:    提示位置 有效值为MY.Const.UI.Tip.枚举
 -- table tOffset:      提示框偏移量等附加信息{ x = x, y = y, hide = MY.Const.UI.Tip.Hide枚举, nFont = 字体, r, g, b = 字颜色 }
 -- boolean bNoEncode:  当szTip为纯文本时保持这个参数为false 当szTip为格式化的DOM字符串时设置该参数为true
-function _MY.UI:tip(tip, nPosType, tOffset, bNoEncode)
+function XGUI:tip(tip, nPosType, tOffset, bNoEncode)
 	tOffset = tOffset or {}
 	tOffset.x = tOffset.x or 0
 	tOffset.y = tOffset.y or 0
@@ -2572,7 +2572,7 @@ end
 -- :check(fnOnCheckBoxCheck[, fnOnCheckBoxUncheck]) 绑定
 -- :check()                返回是否已勾选
 -- :check(bool bChecked)   勾选/取消勾选
-function _MY.UI:check(fnCheck, fnUncheck, bNoAutoBind)
+function XGUI:check(fnCheck, fnUncheck, bNoAutoBind)
 	self:_checksum()
 	if not bNoAutoBind then
 		fnUncheck = fnUncheck or fnCheck
@@ -2596,14 +2596,14 @@ function _MY.UI:check(fnCheck, fnUncheck, bNoAutoBind)
 			return ele.chk:IsCheckBoxChecked()
 		end
 	else
-		MY.Debug({'fnCheck:'..type(fnCheck)..' fnUncheck:'..type(fnUncheck)}, 'ERROR _MY.UI:check', MY_DEBUG.ERROR)
+		MY.Debug({'fnCheck:'..type(fnCheck)..' fnUncheck:'..type(fnUncheck)}, 'ERROR XGUI:check', MY_DEBUG.ERROR)
 	end
 end
 
 -- change 输入框文字变化
 -- :change(fnOnChange) 绑定
 -- :change()   调用处理函数
-function _MY.UI:change(fnOnChange)
+function XGUI:change(fnOnChange)
 	self:_checksum()
 	if fnOnChange then
 		for _, ele in pairs(self.eles) do
@@ -2629,7 +2629,7 @@ end
 -- focus （输入框）获得焦点 -- 好像只有输入框能获得焦点
 -- :focus(fnOnSetFocus, fnOnKillFocus) 绑定
 -- :focus()   使获得焦点
-function _MY.UI:focus(fnOnSetFocus, fnOnKillFocus)
+function XGUI:focus(fnOnSetFocus, fnOnKillFocus)
 	self:_checksum()
 	if fnOnSetFocus then
 		fnOnKillFocus = fnOnKillFocus or fnOnSetFocus
@@ -2684,8 +2684,11 @@ MUI = MY.UI
 -- 设置元表，这样可以当作函数调用，其效果相当于 MY.UI.Fetch
 setmetatable(MY.UI, { __call = function(me, ...) return me.Fetch(...) end, __metatable = true })
 
+
 -- 构造函数 类似jQuery: $(selector)
-MY.UI.Fetch = function(selector, tab) return _MY.UI.new(selector, tab) end
+MY.UI.Fetch = function(selector, tab)
+	return XGUI.new(selector, tab)
+end
 -- 绑定UI事件
 MY.UI.RegisterUIEvent = function(raw, szEvent, fnEvent)
 	if not raw['tMy'..szEvent] then
@@ -2954,7 +2957,7 @@ MY.UI.CreateFrame = function(szName, opt)
 			h:FromUITex(szUITexCommon, v)
 		end
 	end
-	_MY.ApplyUIArgument(ui, opt)
+	ApplyUIArgument(ui, opt)
 	return ui
 end
 
