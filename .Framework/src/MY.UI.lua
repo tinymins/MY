@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-29 14:28:58
+-- @Last Modified time: 2015-06-29 14:35:34
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -47,6 +47,61 @@ _MY.ApplyUIArgument = function(ui, tArg)
 		if tArg.oncheck     then ui:check      (tArg.oncheck    ) end
 		if tArg.onchange    then ui:change     (tArg.onchange   ) end
 	end
+end
+
+-- conv raw to eles array
+local function raw2ele(raw)
+	-- format tab
+	local _tab = { raw = raw }
+	if type(tab)=="table" then for k, v in pairs(tab) do _tab[k]=v end end
+	_tab.type = raw.szMyuiType or raw:GetType()
+	if not _tab.txt and _tab.type == "Text"        then _tab.txt = raw end
+	if not _tab.img and _tab.type == "Image"       then _tab.img = raw end
+	if not _tab.chk and _tab.type == "WndCheckBox" then _tab.chk = raw end
+	if not _tab.chk and _tab.type == "WndRadioBox" then _tab.chk = raw end
+	if not _tab.edt and _tab.type == "WndEdit"     then _tab.edt = raw end
+	if not _tab.sdw and _tab.type == "Shadow"      then _tab.sdw = raw end
+	if not _tab.hdl and _tab.type == "Handle"      then _tab.hdl = raw end
+	if _tab.type=="WndEditBox" then
+		_tab.wnd = _tab.wnd or raw
+		_tab.hdl = _tab.hdl or raw:Lookup('','')
+		_tab.edt = _tab.edt or raw:Lookup('WndEdit_Default')
+		_tab.img = _tab.img or raw:Lookup('','Image_Default')
+		_tab.phd = _tab.phd or raw:Lookup('','Text_PlaceHolder')
+	elseif _tab.type=="WndComboBox" then
+		_tab.wnd = _tab.wnd or raw
+		_tab.hdl = _tab.hdl or raw:Lookup('','')
+		_tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
+		_tab.txt = _tab.txt or raw:Lookup('','Text_Default')
+		_tab.img = _tab.img or raw:Lookup('','Image_Default')
+	elseif _tab.type=="WndEditComboBox" or _tab.type=="WndAutoComplete" then
+		_tab.wnd = _tab.wnd or raw
+		_tab.hdl = _tab.hdl or raw:Lookup('','')
+		_tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
+		_tab.edt = _tab.edt or raw:Lookup('WndEdit_Default')
+		_tab.img = _tab.img or raw:Lookup('','Image_Default')
+		_tab.phd = _tab.phd or raw:Lookup('','Text_PlaceHolder')
+	elseif _tab.type=="WndScrollBox" then
+		_tab.wnd = _tab.wnd or raw
+		_tab.hdl = _tab.hdl or raw:Lookup('','Handle_Padding/Handle_Scroll')
+		_tab.txt = _tab.txt or raw:Lookup('','Handle_Padding/Handle_Scroll/Text_Default')
+		_tab.img = _tab.img or raw:Lookup('','Image_Default')
+	elseif _tab.type=="WndFrame" then
+		_tab.frm = _tab.frm or raw
+		_tab.wnd = _tab.wnd or raw:Lookup("Window_Main")
+		_tab.hdl = _tab.hdl or (_tab.wnd or _tab.frm):Lookup("", "")
+		_tab.txt = _tab.txt or raw:Lookup("", "Text_Title")
+	elseif _tab.type=="WndSliderBox" then
+		_tab.wnd = _tab.wnd or raw
+		_tab.hdl = _tab.hdl or raw:Lookup('','')
+		_tab.sld = _tab.sld or raw:Lookup("WndNewScrollBar_Default")
+		_tab.txt = _tab.txt or raw:Lookup('','Text_Default')
+	elseif string.sub(_tab.type, 1, 3) == "Wnd" then
+		_tab.wnd = _tab.wnd or raw
+		_tab.hdl = _tab.hdl or raw:Lookup('','')
+		_tab.txt = _tab.txt or raw:Lookup('','Text_Default')
+	else _tab.itm = raw end
+	return _tab
 end
 -------------------------------------
 -- UI object class
@@ -125,54 +180,11 @@ function _MY.UI:ctor(raw, tab)
 		self.eles = raw.eles
 	else
 		-- farmat raw
-		if type(raw)=="string" then raw = Station.Lookup(raw) end
+		if type(raw)=="string" then
+			raw = Station.Lookup(raw)
+		end
 		if raw then
-			-- format tab
-			local _tab = { raw = raw }
-			if type(tab)=="table" then for k, v in pairs(tab) do _tab[k]=v end end
-			_tab.type = raw.szMyuiType or raw:GetType()
-			if not _tab.txt and _tab.type == "Text"        then _tab.txt = raw end
-			if not _tab.img and _tab.type == "Image"       then _tab.img = raw end
-			if not _tab.chk and _tab.type == "WndCheckBox" then _tab.chk = raw end
-			if not _tab.chk and _tab.type == "WndRadioBox" then _tab.chk = raw end
-			if not _tab.edt and _tab.type == "WndEdit"     then _tab.edt = raw end
-			if not _tab.sdw and _tab.type == "Shadow"      then _tab.sdw = raw end
-			if not _tab.hdl and _tab.type == "Handle"      then _tab.hdl = raw end
-			if _tab.type=="WndEditBox" then
-				_tab.wnd = _tab.wnd or raw
-				_tab.hdl = _tab.hdl or raw:Lookup('','')
-				_tab.edt = _tab.edt or raw:Lookup('WndEdit_Default')
-				_tab.img = _tab.img or raw:Lookup('','Image_Default')
-				_tab.phd = _tab.phd or raw:Lookup('','Text_PlaceHolder')
-			elseif _tab.type=="WndComboBox" then
-				_tab.wnd = _tab.wnd or raw
-				_tab.hdl = _tab.hdl or raw:Lookup('','')
-				_tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
-				_tab.txt = _tab.txt or raw:Lookup('','Text_Default')
-				_tab.img = _tab.img or raw:Lookup('','Image_Default')
-			elseif _tab.type=="WndEditComboBox" or _tab.type=="WndAutoComplete" then
-				_tab.wnd = _tab.wnd or raw
-				_tab.hdl = _tab.hdl or raw:Lookup('','')
-				_tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
-				_tab.edt = _tab.edt or raw:Lookup('WndEdit_Default')
-				_tab.img = _tab.img or raw:Lookup('','Image_Default')
-				_tab.phd = _tab.phd or raw:Lookup('','Text_PlaceHolder')
-			elseif _tab.type=="WndScrollBox" then
-				_tab.wnd = _tab.wnd or raw
-				_tab.hdl = _tab.hdl or raw:Lookup('','Handle_Padding/Handle_Scroll')
-				_tab.txt = _tab.txt or raw:Lookup('','Handle_Padding/Handle_Scroll/Text_Default')
-				_tab.img = _tab.img or raw:Lookup('','Image_Default')
-			elseif _tab.type=="WndFrame" then
-				_tab.frm = _tab.frm or raw
-				_tab.wnd = _tab.wnd or raw:Lookup("Window_Main")
-				_tab.hdl = _tab.hdl or (_tab.wnd or _tab.frm):Lookup("", "")
-				_tab.txt = _tab.txt or raw:Lookup("", "Text_Title")
-			elseif string.sub(_tab.type, 1, 3) == "Wnd" then
-				_tab.wnd = _tab.wnd or raw
-				_tab.hdl = _tab.hdl or raw:Lookup('','')
-				_tab.txt = _tab.txt or raw:Lookup('','Text_Default')
-			else _tab.itm = raw end
-			table.insert( self.eles, _tab )
+			table.insert( self.eles, raw2ele(raw) )
 		end
 	end
 	return self
@@ -185,64 +197,9 @@ function _MY.UI:clone(eles)
 	eles = eles or self.eles
 	local _eles = {}
 	for i = 1, #eles, 1 do
-		if eles[i].raw then table.insert(_eles, self:raw2ele(eles[i].raw)) end
+		if eles[i].raw then table.insert(_eles, raw2ele(eles[i].raw)) end
 	end
 	return _MY.UI.new({eles = _eles})
-end
-
--- conv raw to eles array
-function _MY.UI:raw2ele(raw, tab)
-	-- format tab
-	local _tab = { raw = raw }
-	if type(tab)=="table" then for k, v in pairs(tab) do _tab[k]=v end end
-	_tab.type = raw.szMyuiType or raw:GetType()
-	if not _tab.txt and _tab.type == "Text"        then _tab.txt = raw end
-	if not _tab.img and _tab.type == "Image"       then _tab.img = raw end
-	if not _tab.chk and _tab.type == "WndCheckBox" then _tab.chk = raw end
-	if not _tab.chk and _tab.type == "WndRadioBox" then _tab.chk = raw end
-	if not _tab.edt and _tab.type == "WndEdit"     then _tab.edt = raw end
-	if not _tab.sdw and _tab.type == "Shadow"      then _tab.sdw = raw end
-	if not _tab.hdl and _tab.type == "Handle"      then _tab.hdl = raw end
-	if _tab.type=="WndEditBox" then
-		_tab.wnd = _tab.wnd or raw
-		_tab.hdl = _tab.hdl or raw:Lookup('','')
-		_tab.edt = _tab.edt or raw:Lookup('WndEdit_Default')
-		_tab.img = _tab.img or raw:Lookup('','Image_Default')
-		_tab.phd = _tab.phd or raw:Lookup('','Text_PlaceHolder')
-	elseif _tab.type=="WndComboBox" then
-		_tab.wnd = _tab.wnd or raw
-		_tab.hdl = _tab.hdl or raw:Lookup('','')
-		_tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
-		_tab.txt = _tab.txt or raw:Lookup('','Text_Default')
-		_tab.img = _tab.img or raw:Lookup('','Image_Default')
-	elseif _tab.type=="WndEditComboBox" or _tab.type=="WndAutoComplete" then
-		_tab.wnd = _tab.wnd or raw
-		_tab.hdl = _tab.hdl or raw:Lookup('','')
-		_tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
-		_tab.edt = _tab.edt or raw:Lookup('WndEdit_Default')
-		_tab.img = _tab.img or raw:Lookup('','Image_Default')
-		_tab.phd = _tab.phd or raw:Lookup('','Text_PlaceHolder')
-	elseif _tab.type=="WndScrollBox" then
-		_tab.wnd = _tab.wnd or raw
-		_tab.hdl = _tab.hdl or raw:Lookup('','Handle_Padding/Handle_Scroll')
-		_tab.txt = _tab.txt or raw:Lookup('','Handle_Padding/Handle_Scroll/Text_Default')
-		_tab.img = _tab.img or raw:Lookup('','Image_Default')
-	elseif _tab.type=="WndFrame" then
-		_tab.frm = _tab.frm or raw
-		_tab.wnd = _tab.wnd or raw:Lookup("Window_Main")
-		_tab.hdl = _tab.hdl or (_tab.wnd or _tab.frm):Lookup("", "")
-		_tab.txt = _tab.txt or raw:Lookup("", "Text_Title")
-	elseif _tab.type=="WndSliderBox" then
-		_tab.wnd = _tab.wnd or raw
-		_tab.hdl = _tab.hdl or raw:Lookup('','')
-		_tab.sld = _tab.sld or raw:Lookup("WndNewScrollBar_Default")
-		_tab.txt = _tab.txt or raw:Lookup('','Text_Default')
-	elseif string.sub(_tab.type, 1, 3) == "Wnd" then
-		_tab.wnd = _tab.wnd or raw
-		_tab.hdl = _tab.hdl or raw:Lookup('','')
-		_tab.txt = _tab.txt or raw:Lookup('','Text_Default')
-	else _tab.itm = raw end
-	return _tab
 end
 
 --  del bad eles
@@ -270,9 +227,13 @@ function _MY.UI:add(raw, tab)
 		table.insert(eles, self.eles[i])
 	end
 	-- farmat raw
-	if type(raw)=="string" then raw = Station.Lookup(raw) end
+	if type(raw)=="string" then
+		raw = Station.Lookup(raw)
+	end
 	-- insert into eles
-	if raw then table.insert( eles, self:raw2ele(raw, tab) ) end
+	if raw then
+		table.insert(eles, raw2ele(raw, tab))
+	end
 	return self:clone(eles)
 end
 
@@ -403,7 +364,7 @@ function _MY.UI:parent()
 	local eles = {}
 	for _, raw in pairs(parent) do
 		-- insert into eles
-		table.insert( eles, self:raw2ele(raw) )
+		table.insert(eles, raw2ele(raw))
 	end
 	return self:clone(eles)
 end
@@ -426,7 +387,7 @@ function _MY.UI:children(filter)
 		local eles = {}
 		for _, raw in ipairs(child) do
 			-- insert into eles
-			table.insert( eles, self:raw2ele(raw) )
+			table.insert(eles, raw2ele(raw))
 		end
 		return self:clone(eles)
 	else
@@ -460,7 +421,7 @@ function _MY.UI:children(filter)
 		local eles = {}
 		for _, raw in ipairs(child) do
 			-- insert into eles
-			table.insert( eles, self:raw2ele(raw) )
+			table.insert(eles, raw2ele(raw))
 		end
 		return self:clone(eles):filter(filter)
 	end
@@ -484,7 +445,7 @@ function _MY.UI:find(filter)
 	local eles = {}
 	for _, raw in pairs(children) do
 		-- insert into eles
-		table.insert( eles, self:raw2ele(raw) )
+		table.insert(eles, raw2ele(raw))
 	end
 	return self:clone(eles):filter(filter)
 end
@@ -497,7 +458,7 @@ function _MY.UI:ptIn()
 	for _, ele in pairs(self.eles) do
 		if (ele.itm and ele.itm:PtInItem(xC, yC))
 		or (ele.wnd and ele.wnd:PtInWindow(xC, yC)) then
-			table.insert( eles, self:raw2ele(ele.raw) )
+			table.insert(eles, raw2ele(ele.raw))
 		end
 	end
 	return self:clone(eles)
