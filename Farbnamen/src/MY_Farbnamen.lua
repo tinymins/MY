@@ -37,9 +37,9 @@ local Config_Default = {
 local Config = clone(Config_Default)
 local InfoCache = (function()
     local aCache, tCache = {}, setmetatable({}, { __mode = "v" }) -- high speed L1 CACHE
-    local tInfos, tModified = {}, {}
+    local tInfos, tInfoVisit, tInfoModified = {}, {}, {}
     local tCrossServerInfos = {}
-    local tName2ID, tName2IDModified = {}, {}
+    local tName2ID, tName2IDVisit, tName2IDModified = {}, {}, {}
     local SZ_DATA_PATH = "cache/PLAYER_INFO/$server/DATA/%d.$lang.jx3dat"
     local SZ_N2ID_PATH = "cache/PLAYER_INFO/$server/N2ID/%d.$lang.jx3dat"
     return setmetatable({}, {
@@ -59,6 +59,7 @@ local InfoCache = (function()
                 if not tName2ID[nSegID] then
                     tName2ID[nSegID] = MY.LoadLUAData(SZ_N2ID_PATH:format(nSegID)) or {}
                 end
+                tName2IDVisit[nSegID] = GetTime()
                 k = tName2ID[nSegID][k]
             end
             if type(k) == "number" then -- dwID
@@ -66,6 +67,7 @@ local InfoCache = (function()
                 if not tInfos[nSegID] then
                     tInfos[nSegID] = MY.LoadLUAData(SZ_DATA_PATH:format(nSegID)) or {}
                 end
+                tInfoVisit[nSegID] = GetTime()
                 return tInfos[nSegID][k]
             end
         end,
@@ -94,14 +96,15 @@ local InfoCache = (function()
                         for _, k in ipairs({"i", "f", "n", "r", "l", "t", "c", "g"}) do
                             if v[k] ~= tInfo[k] then
                                 tInfos[nSegID][k] = v
-                                tModified[nSegID] = GetTime()
+                                tInfoModified[nSegID] = GetTime()
                                 break
                             end
                         end
                     else
                         tInfos[nSegID][k] = v
-                        tModified[nSegID] = GetTime()
+                        tInfoModified[nSegID] = GetTime()
                     end
+                    tInfoVisit[nSegID] = GetTime()
                     -- save szName to dwID indexing
                     local nSegID = string.byte(v.n)
                     if not tName2ID[nSegID] then
@@ -111,13 +114,14 @@ local InfoCache = (function()
                         tName2ID[nSegID][v.n] = k
                         tName2IDModified[nSegID] = GetTime()
                     end
+                    tName2IDVisit[nSegID] = GetTime()
                 end
             end
         end,
         __call = function(t, cmd, arg0, arg1, ...)
             if cmd == "clear" then
                 -- clear all data file
-                tInfos, tModified = {}, {}
+                tInfos, tInfoVisit, tInfoModified = {}, {}, {}
                 tName2ID, tName2IDModified = {}, {}
                 for nSegID = 0, 99 do
                     if IsFileExist(MY.GetLUADataPath(SZ_DATA_PATH:format(nSegID))) then
@@ -134,34 +138,44 @@ local InfoCache = (function()
                 local nCount = arg1
                 local bCollect = arg2
                 -- save info data
-                for nSegID, dwModifyTime in pairs(tModified) do
-                    if not dwTime or dwTime > dwModifyTime then
+                for nSegID, dwLastVisitTime in pairs(tInfoVisit) do
+                    if not dwTime or dwTime > dwLastVisitTime then
                         if nCount then
                             if nCount == 0 then
                                 return true
                             end
                             nCount = nCount - 1
                         end
-                        MY.SaveLUAData(SZ_DATA_PATH:format(nSegID), tInfos[nSegID])
+                        if tInfoModified[nSegID] then
+                            MY.SaveLUAData(SZ_DATA_PATH:format(nSegID), tInfos[nSegID])
+                        else
+                            MY.Debug({"INFO Unloaded: " .. nSegID}, "MY_FARBNAMEN", MY_DEBUG.LOG)
+                        end
                         if bCollect then
                             tInfos[nSegID] = nil
                         end
-                        tModified[nSegID] = nil
+                        tInfoVisit[nSegID] = nil
+                        tInfoModified[nSegID] = nil
                     end
                 end
                 -- save name index
-                for nSegID, dwModifyTime in pairs(tName2IDModified) do
-                    if not dwTime or dwTime > dwModifyTime then
+                for nSegID, dwLastVisitTime in pairs(tName2IDVisit) do
+                    if not dwTime or dwTime > dwLastVisitTime then
                         if nCount then
                             if nCount == 0 then
                                 return true
                             end
                             nCount = nCount - 1
                         end
-                        MY.SaveLUAData(SZ_N2ID_PATH:format(nSegID), tName2ID[nSegID])
+                        if tName2IDModified[nSegID] then
+                            MY.SaveLUAData(SZ_N2ID_PATH:format(nSegID), tName2ID[nSegID])
+                        else
+                            MY.Debug({"N2ID Unloaded: " .. nSegID}, "MY_FARBNAMEN", MY_DEBUG.LOG)
+                        end
                         if bCollect then
                             tName2ID[nSegID] = nil
                         end
+                        tName2IDVisit[nSegID] = nil
                         tName2IDModified[nSegID] = nil
                     end
                 end
