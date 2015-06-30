@@ -348,12 +348,10 @@ _C.Reset = function()
     
     _C.AutoSwitchSysHeadTop()
 end
+-- 加载界面
+MY.RegisterEvent('LOGIN_GAME', function() MY.UI.CreateFrame("XLifeBar", { level = "Lowest", empty = true }) end)
 -- 重载配置文件并重绘
-MY.RegisterEvent('FIRST_LOADING_END', function()
-    _C.LoadConfig()
-    MY.UI.CreateFrame("XLifeBar", { level = "Lowest2", empty = true })
-    _C.Reset()
-end)
+MY.RegisterEvent('FIRST_LOADING_END', function() _C.LoadConfig() _C.Reset() end)
 -- 过图可能切换开关状态
 MY.RegisterEvent('LOADING_END', _C.AutoSwitchSysHeadTop)
 
