@@ -351,7 +351,7 @@ end
 -- 重载配置文件并重绘
 MY.RegisterEvent('FIRST_LOADING_END', function()
     _C.LoadConfig()
-    MY.UI.CreateFrame("XLifeBar", { level = "Lowest", empty = true })
+    MY.UI.CreateFrame("XLifeBar", { level = "Lowest2", empty = true })
     _C.Reset()
 end)
 -- 过图可能切换开关状态
@@ -1035,10 +1035,10 @@ _C.OnPanelActive = function(wnd)
         table.insert(t,{    szOption = _L["player name display"] , bDisable = true} )
         for k,v in pairs(Config.bShowName.Player) do
             table.insert(t,{
-                szOption = _L[k], 
-                bCheck = true, 
+                szOption = _L[k],
+                bCheck = true,
                 bChecked = Config.bShowName.Player[k],
-                fnAction = function() 
+                fnAction = function()
                     Config.bShowName.Player[k] = not Config.bShowName.Player[k]
                     _C.Reset()
                 end,
@@ -1054,12 +1054,12 @@ _C.OnPanelActive = function(wnd)
         table.insert(t,{    szOption = _L["npc name display"] , bDisable = true} )
         for k,v in pairs(Config.bShowName.Npc) do
             table.insert(t,{
-                szOption = _L[k], 
-                bCheck = true, 
+                szOption = _L[k],
+                bCheck = true,
                 bChecked = Config.bShowName.Npc[k],
-                fnAction = function() 
+                fnAction = function()
                     Config.bShowName.Npc[k] = not Config.bShowName.Npc[k]
-                    _C.Reset() 
+                    _C.Reset()
                 end,
                 rgb = Config.Col.Npc[k],
                 bColorTable = true,
@@ -1081,12 +1081,12 @@ _C.OnPanelActive = function(wnd)
         table.insert(t,{    szOption = _L["player title display"] , bDisable = true} )
         for k,v in pairs(Config.bShowTitle.Player) do
             table.insert(t,{
-                szOption = _L[k], 
-                bCheck = true, 
+                szOption = _L[k],
+                bCheck = true,
                 bChecked = Config.bShowTitle.Player[k],
-                fnAction = function() 
+                fnAction = function()
                     Config.bShowTitle.Player[k] = not Config.bShowTitle.Player[k];
-                    _C.Reset() 
+                    _C.Reset()
                 end,
                 rgb = Config.Col.Player[k],
                 bColorTable = true,
@@ -1100,12 +1100,12 @@ _C.OnPanelActive = function(wnd)
         table.insert(t,{    szOption = _L["npc title display"] , bDisable = true} )
         for k,v in pairs(Config.bShowTitle.Npc) do
             table.insert(t,{
-                szOption = _L[k], 
-                bCheck = true, 
+                szOption = _L[k],
+                bCheck = true,
                 bChecked = Config.bShowTitle.Npc[k],
-                fnAction = function() 
+                fnAction = function()
                     Config.bShowTitle.Npc[k] = not Config.bShowTitle.Npc[k]
-                    _C.Reset() 
+                    _C.Reset()
                 end,
                 rgb = Config.Col.Npc[k],
                 bColorTable = true,
@@ -1127,12 +1127,12 @@ _C.OnPanelActive = function(wnd)
         table.insert(t,{    szOption = _L["player tong display"] , bDisable = true} )
         for k,v in pairs(Config.bShowTong.Player) do
             table.insert(t,{
-                szOption = _L[k], 
-                bCheck = true, 
+                szOption = _L[k],
+                bCheck = true,
                 bChecked = Config.bShowTong.Player[k],
-                fnAction = function() 
+                fnAction = function()
                     Config.bShowTong.Player[k] = not Config.bShowTong.Player[k];
-                    _C.Reset() 
+                    _C.Reset()
                 end,
                 rgb = Config.Col.Player[k],
                 bColorTable = true,
@@ -1154,12 +1154,12 @@ _C.OnPanelActive = function(wnd)
         table.insert(t,{    szOption = _L["player lifebar display"] , bDisable = true} )
         for k,v in pairs(Config.bShowLife.Player) do
             table.insert(t,{
-                szOption = _L[k], 
-                bCheck = true, 
+                szOption = _L[k],
+                bCheck = true,
                 bChecked = Config.bShowLife.Player[k],
-                fnAction = function() 
+                fnAction = function()
                     Config.bShowLife.Player[k] = not Config.bShowLife.Player[k]
-                    _C.Reset() 
+                    _C.Reset()
                 end,
                 rgb = Config.Col.Player[k],
                 bColorTable = true,
@@ -1173,12 +1173,12 @@ _C.OnPanelActive = function(wnd)
         table.insert(t,{    szOption = _L["npc lifebar display"] , bDisable = true} )
         for k,v in pairs(Config.bShowLife.Npc) do
             table.insert(t,{
-                szOption = _L[k], 
-                bCheck = true, 
+                szOption = _L[k],
+                bCheck = true,
                 bChecked = Config.bShowLife.Npc[k],
-                fnAction = function() 
+                fnAction = function()
                     Config.bShowLife.Npc[k] = not Config.bShowLife.Npc[k]
-                    _C.Reset() 
+                    _C.Reset()
                 end,
                 rgb = Config.Col.Npc[k],
                 bColorTable = true,
@@ -1200,12 +1200,12 @@ _C.OnPanelActive = function(wnd)
         table.insert(t,{    szOption = _L["player lifepercentage display"] , bDisable = true} )
         for k,v in pairs(Config.bShowLifePer.Player) do
             table.insert(t,{
-                szOption = _L[k], 
-                bCheck = true, 
+                szOption = _L[k],
+                bCheck = true,
                 bChecked = Config.bShowLifePer.Player[k],
-                fnAction = function() 
+                fnAction = function()
                     Config.bShowLifePer.Player[k] = not Config.bShowLifePer.Player[k]
-                    _C.Reset() 
+                    _C.Reset()
                 end,
                 rgb = Config.Col.Player[k],
                 bColorTable = true,
@@ -1219,12 +1219,12 @@ _C.OnPanelActive = function(wnd)
         table.insert(t,{    szOption = _L["npc lifepercentage display"] , bDisable = true} )
         for k,v in pairs(Config.bShowLifePer.Npc) do
             table.insert(t,{
-                szOption = _L[k], 
-                bCheck = true, 
+                szOption = _L[k],
+                bCheck = true,
                 bChecked = Config.bShowLifePer.Npc[k],
-                fnAction = function() 
+                fnAction = function()
                     Config.bShowLifePer.Npc[k] = not Config.bShowLifePer.Npc[k];
-                    _C.Reset() 
+                    _C.Reset()
                 end,
                 rgb = Config.Col.Npc[k],
                 bColorTable = true,
@@ -1236,21 +1236,21 @@ _C.OnPanelActive = function(wnd)
         end
         table.insert(t,{    bDevide = true} )
         table.insert(t,{
-            szOption = _L['hide when unfight'], 
-            bCheck = true, 
+            szOption = _L['hide when unfight'],
+            bCheck = true,
             bChecked = Config.bHideLifePercentageWhenFight,
-            fnAction = function() 
+            fnAction = function()
                 Config.bHideLifePercentageWhenFight = not Config.bHideLifePercentageWhenFight;
-                _C.Reset() 
+                _C.Reset()
             end,
         })
         table.insert(t,{
-            szOption = _L['hide decimal'], 
-            bCheck = true, 
+            szOption = _L['hide decimal'],
+            bCheck = true,
             bChecked = Config.bHideLifePercentageDecimal,
-            fnAction = function() 
+            fnAction = function()
                 Config.bHideLifePercentageDecimal = not Config.bHideLifePercentageDecimal;
-                _C.Reset() 
+                _C.Reset()
             end,
         })
         return t
@@ -1263,12 +1263,12 @@ _C.OnPanelActive = function(wnd)
       :menu(function()
         local t = {}
         table.insert(t,{
-            szOption = _L['enhanced mod'], 
-            bCheck = true, 
+            szOption = _L['enhanced mod'],
+            bCheck = true,
             bChecked = Config.bOTEnhancedMod,
-            fnAction = function() 
+            fnAction = function()
                 Config.bOTEnhancedMod = not Config.bOTEnhancedMod
-                _C.Reset() 
+                _C.Reset()
             end,
             fnMouseEnter = function()
                 local szText="<text>text=" .. EncodeComponentsString(_L['Check this option may cause target switch.']) .." font=16 </text>"
@@ -1281,12 +1281,12 @@ _C.OnPanelActive = function(wnd)
         table.insert(t,{    szOption = _L["player skillpercentage display"] , bDisable = true} )
         for k,v in pairs(Config.bShowOTBar.Player) do
             table.insert(t,{
-                szOption = _L[k], 
-                bCheck = true, 
+                szOption = _L[k],
+                bCheck = true,
                 bChecked = Config.bShowOTBar.Player[k],
-                fnAction = function() 
+                fnAction = function()
                     Config.bShowOTBar.Player[k] = not Config.bShowOTBar.Player[k]
-                    _C.Reset() 
+                    _C.Reset()
                 end,
                 rgb = Config.Col.Player[k],
                 bColorTable = true,
@@ -1300,12 +1300,12 @@ _C.OnPanelActive = function(wnd)
         table.insert(t,{    szOption = _L["npc skillpercentage display"] , bDisable = true} )
         for k,v in pairs(Config.bShowOTBar.Npc) do
             table.insert(t,{
-                szOption = _L[k], 
-                bCheck = true, 
+                szOption = _L[k],
+                bCheck = true,
                 bChecked = Config.bShowOTBar.Npc[k],
-                fnAction = function() 
+                fnAction = function()
                     Config.bShowOTBar.Npc[k] = not Config.bShowOTBar.Npc[k];
-                    _C.Reset() 
+                    _C.Reset()
                 end,
                 rgb = Config.Col.Npc[k],
                 bColorTable = true,
