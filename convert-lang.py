@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 from lang_mapping import map_zhcn2zhtw
-import os
+import sys, os
 import os.path # 遍历文件所需库
 import codecs  # 保存UTF-8编码所需库
 import re      # 正则匹配
@@ -17,7 +17,7 @@ def zhcn2zhtw(source):
 			dest = dest + result
 	return dest
 
-rootdir = os.getcwd()                                   # 指明被遍历的文件夹
+rootdir = os.path.dirname(os.path.abspath(__file__))    # 指明被遍历的文件夹
 for parent, dirnames, filenames in os.walk(rootdir):    # 三个参数：分别返回1.父目录 2.所有文件夹名字（不含路径） 3.所有文件名字
 			#for dirname in  dirnames:                      #输出文件夹信息
 			#    print "parent is:" + parent
