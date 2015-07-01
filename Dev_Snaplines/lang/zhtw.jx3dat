@@ -10,4 +10,5 @@ data = {
     ['show wnd snaplines'] = '顯示窗體輔助線',
     ['show item snaplines'] = '顯示組件容器輔助線',
     ['auto detect box'] = '自動查找鼠標滑過的Box',
+    ['auto scale'] = '自動縮放',
 }
