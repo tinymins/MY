@@ -178,7 +178,7 @@ local function InsertElementDataTip(hElem, tTip)
 			data[k] = v
 		end
 	end
-	tinsert(tTip, _L('data: %s', var2str(data, "\t")))
+	tinsert(tTip, _L('data: %s', var2str(data, "  ")))
 end
 
 local function InsertElementTip(hElem, tTip)
@@ -454,7 +454,7 @@ MY.RegisterPanel(
 		y = y + 40
 		
 		ui:append("WndCheckBox", {
-			x = x, y = y, w = 200, text = _L['auto scale'], check = MYDev_Snaplines.bAutoScale,
+			x = x, y = y, w = 200, text = _L['auto scale'], checked = MYDev_Snaplines.bAutoScale,
 			oncheck = function(bCheck) MYDev_Snaplines.bAutoScale = bCheck end
 		})
 		y = y + 40
