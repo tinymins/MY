@@ -453,6 +453,12 @@ MY.RegisterPanel(
 		end)
 		y = y + 40
 		
+		ui:append("WndCheckBox", {
+			x = x, y = y, w = 200, text = _L['auto scale'], check = MYDev_Snaplines.bAutoScale,
+			oncheck = function(bCheck) MYDev_Snaplines.bAutoScale = bCheck end
+		})
+		y = y + 40
+		
 		ui:append("Text", "Text_SetHotkey"):find("#Text_SetHotkey"):pos(w-140, 20):color(255,255,0)
 		  :text(_L['>> set hotkey <<'])
 		  :click(function() MY.Game.SetHotKey() end)
