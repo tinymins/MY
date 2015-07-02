@@ -49,6 +49,7 @@ MY_Chat.tChannel = {
 	["Radio_Camp"] = true,
 	["Radio_Friend"] = true,
 	["Radio_Alliance"] = true,
+	["Check_Cls"] = true,
 	["Check_Away"] = true,
 	["Check_Busy"] = true,
 }
@@ -320,6 +321,10 @@ MY_Chat.GetMenu = function()
 		})
 	end
 	table.insert(tChannel, {
+		szOption = _L['CLS'], bCheck = true, bChecked = MY_Chat.tChannel['Check_Cls'], rgb = {255, 0, 0},
+		fnAction = function() MY_Chat.tChannel['Check_Cls'] = not MY_Chat.tChannel['Check_Cls'] MY_Chat.ReInitUI() end,
+	})
+	table.insert(tChannel, {
 		szOption = _L['AWAY'], bCheck = true, bChecked = MY_Chat.tChannel['Check_Away'],
 		fnAction = function() MY_Chat.tChannel['Check_Away'] = not MY_Chat.tChannel['Check_Away'] MY_Chat.ReInitUI() end,
 	})
@@ -361,6 +366,50 @@ MY_Chat.ReInitUI = function()
 		end
 	end
 	
+	if MY_Chat.tChannel.Check_Cls then
+		i = i + 1
+		MY.UI(MY_Chat.frame):append("WndRadioBox", {
+			x = i * 30 + 15, y = 25, w = 22,
+			font = 197, color = {255, 0, 0},
+			text = _L['CLS'],
+			oncheck = function()
+				local function Cls(bAll)
+					for i = 1, 10 do
+						local h = Station.Lookup("Lowest2/ChatPanel" .. i .. "/Wnd_Message", "Handle_Message")
+						local hCheck = Station.Lookup("Lowest2/ChatPanel" .. i .. "/CheckBox_Title")
+						if h and (bAll or (hCheck and hCheck:IsCheckBoxChecked())) then
+							h:Clear()
+							h:FormatAllItemPos()
+						end
+					end
+				end
+				if IsCtrlKeyDown() then
+					Cls()
+				elseif IsAltKeyDown() then
+					MessageBox({
+						szName = "CLS_CHATPANEL_ALL",
+						szMessage = _L["Are you sure you want to clear all message panel?"], {
+							szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function()
+								Cls(true)
+							end
+						}, { szOption = g_tStrings.STR_HOTKEY_CANCEL },
+					})
+				else
+					MessageBox({
+						szName = "CLS_CHATPANEL",
+						szMessage = _L["Are you sure you want to clear current message panel?\nPress CTRL when click can clear without alert.\nPress ALT when click can clear all window."], {
+							szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function()
+								Cls()
+							end
+						}, { szOption = g_tStrings.STR_HOTKEY_CANCEL },
+					})
+				end
+				MY.UI(this):check(false)
+			end
+		})
+		:find(".Text"):pos(4, -44):size(22, 66)
+	end
+	
 	if MY_Chat.tChannel.Check_Away then
 		i = i + 1
 		MY.UI(MY_Chat.frame):append("WndCheckBox", "Check_Away"):children("#Check_Away"):width(25):text(_L["AWAY"]):pos(i*30+15,25):check(function()
@@ -395,56 +444,6 @@ MY.RegisterInit('MY_CHAT', function()
 	MY.UI(MY_Chat.frame):children("#Btn_Option"):menu(MY_Chat.GetMenu)
 	-- load settings
 	MY_Chat.frame:EnableDrag(not MY_Chat.bLockPostion)
-	--
-	local hFrame = Station.Lookup("Lowest2/EditBox")
-	if hFrame and not hFrame:Lookup("Btn_Cls") then
-		local function Cls(bAll)
-			for i = 1, 10 do
-				local h = Station.Lookup("Lowest2/ChatPanel" .. i .. "/Wnd_Message", "Handle_Message")
-				local hCheck = Station.Lookup("Lowest2/ChatPanel" .. i .. "/CheckBox_Title")
-				if h and (bAll or (hCheck and hCheck:IsCheckBoxChecked())) then
-					h:Clear()
-					h:FormatAllItemPos()
-				end
-			end
-		end
-		MUI.Append(hFrame, "WndButton5", "Btn_Cls", {
-			x = 397, y = 1,
-			w = 24, h = 24,
-			text = "X",
-			tip = _L['clear chat panel'],
-			onlclick = function()
-				if MY_Chat.bAlertBeforeClear then
-					MessageBox({
-						szName = "CLS_CHATPANEL",
-						szMessage = _L["Are you sure you want to clear current message panel?"], {
-							szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function()
-								Cls()
-							end
-						}, {
-							szOption = _L["Do not alert again"], fnAction = function()
-								Cls()
-								MY_Chat.bAlertBeforeClear = false
-							end
-						}, { szOption = g_tStrings.STR_HOTKEY_CANCEL },
-					})
-				else
-					Cls()
-				end
-			end,
-			onrclick = function()
-				MessageBox({
-					szName = "CLS_CHATPANEL_ALL",
-					szMessage = _L["Are you sure you want to clear all message panel?"], {
-						szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function()
-							Cls(true)
-						end
-					}, { szOption = g_tStrings.STR_HOTKEY_CANCEL },
-				})
-			end,
-		})
-		hFrame:SetW(421)
-	end
 end)
 
 MY.RegisterEvent("MY_PRIVATE_STORAGE_UPDATE", function()
