@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-15 09:35:20
+-- @Last Modified time: 2015-06-25 09:26:10
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -----------------------------------------------
@@ -16,18 +16,18 @@ local _Cache, _L = {}, MY.LoadLangPack()
 local _C = {}
 
 -- #######################################################################################################
---       #       #               #         #           #           #         
---       #       #               #     # # # # # #     # #       # # # #     
---       #   # # # # # #         #         #         #     # #     #   #     
---   #   # #     #     #     # # # #   # # # # #             # # # # # # #   
---   #   #       #     #         #         #   #     # # #   #     #   #     
---   #   #       #     #         #     # # # # # #     #   #     # # # #     
---   #   # # # # # # # # #       # #       #   #       #   # #     #         
---       #       #           # # #     # # # # #     # # #   # # # # # #     
---       #     #   #             #         #           #     #     #         
---       #     #   #             #     #   # # # #     #   # # # # # # # #   
---       #   #       #           #     #   #           # #   #     #         
---       # #           # #     # #   #   # # # # #     #   #   # # # # # #   
+--       #       #               #         #           #           #
+--       #       #               #     # # # # # #     # #       # # # #
+--       #   # # # # # #         #         #         #     # #     #   #
+--   #   # #     #     #     # # # #   # # # # #             # # # # # # #
+--   #   #       #     #         #         #   #     # # #   #     #   #
+--   #   #       #     #         #     # # # # # #     #   #     # # # #
+--   #   # # # # # # # # #       # #       #   #       #   # #     #
+--       #       #           # # #     # # # # #     # # #   # # # # # #
+--       #     #   #             #         #           #     #     #
+--       #     #   #             #     #   # # # #     #   # # # # # # # #
+--       #   #       #           #     #   #           # #   #     #
+--       # #           # #     # #   #   # # # # #     #   #   # # # # # #
 -- #######################################################################################################
 _Cache.tHotkey = {}
 -- 增加系统快捷键
@@ -217,23 +217,24 @@ MY.RegisterInit('MYLIB#BIND_HOTKEY', function()
 end)
 
 -- #######################################################################################################
---                                 #                   # # # #   # # # #     
---     # # # #   # # # # #       # # # # # # #         #     #   #     #     
---     #     #   #       #     #   #       #           # # # #   # # # #     
---     #     #   #       #           # # #                     #     #       
---     # # # #   #   # #         # #       # #                 #       #     
---     #     #   #           # #     #         # #   # # # # # # # # # # #   
---     #     #   # # # # #           #                       #   #           
---     # # # #   #   #   #     # # # # # # # #           # #       # #       
---     #     #   #   #   #         #         #       # #               # #   
---     #     #   #     #           #         #         # # # #   # # # #     
---     #     #   #   #   #       #           #         #     #   #     #     
---   #     # #   # #     #     #         # #           # # # #   # # # #     
+--                                 #                   # # # #   # # # #
+--     # # # #   # # # # #       # # # # # # #         #     #   #     #
+--     #     #   #       #     #   #       #           # # # #   # # # #
+--     #     #   #       #           # # #                     #     #
+--     # # # #   #   # #         # #       # #                 #       #
+--     #     #   #           # #     #         # #   # # # # # # # # # # #
+--     #     #   # # # # #           #                       #   #
+--     # # # #   #   #   #     # # # # # # # #           # #       # #
+--     #     #   #   #   #         #         #       # #               # #
+--     #     #   #     #           #         #         # # # #   # # # #
+--     #     #   #   #   #       #           #         #     #   #     #
+--   #     # #   # #     #     #         # #           # # # #   # # # #
 -- #######################################################################################################
 -- 获取当前服务器
 MY.Game.GetServer = function()
 	return table.concat({GetUserServer()},'_'), {GetUserServer()}
 end
+MY.GetServer = MY.Game.GetServer
 
 -- 获取指定对象
 -- (KObject, info, bIsInfo) MY.GetObject([number dwType, ]number dwID)
@@ -455,17 +456,10 @@ MY.Game.IsBoss = function(dwMapID, dwTemplateID)
 end
 MY.IsBoss = MY.Game.IsBoss
 
--- remote boss list online
-MY.RegisterInit('MYLIB#UPDATE_BOSSLIST', function()
-	-- start remote version check
-	MY.RemoteRequest('http://data.jx3.derzh.com/data/bosslist.html?_=' .. math.floor(GetCurrentTime() / 3600), function(szTitle, szContent)
-		-- decode data
-		local data = MY.Json.Decode(szContent)
-		if not data then
-			MY.Debug(L["Bosslist update check failed, server respond unkown data."], 'MY::tBossList', MY_DEBUG.ERROR)
-			return
-		end
-		
+-- online bosslist updated
+MY.RegisterEvent("MY_PUBLIC_STORAGE_UPDATE", function()
+	if arg0 == "bosslist" then
+		local data = arg1
 		if not _C.tBossList then
 			MY.Game.GetBossList()
 		end
@@ -474,5 +468,5 @@ MY.RegisterInit('MYLIB#UPDATE_BOSSLIST', function()
 			MY.Sys.SaveLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/bosslist.jx3dat', _C.tBossList)
 			MY.Sysmsg({_L('Important Npc list updated to v%d.', data.version)})
 		end
-	end)
+	end
 end)
