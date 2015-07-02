@@ -25,12 +25,12 @@ local function ApplyUIArgument(ui, tArg)
 		if tArg.y           then ui:top        (tArg.y          ) end
 		if tArg.anchor      then ui:anchor     (tArg.anchor     ) end
 		if tArg.alpha       then ui:alpha      (tArg.alpha      ) end
+		if tArg.font        then ui:font       (tArg.font       ) end -- must before color
 		if tArg.color       then ui:color      (tArg.color      ) end
 		if tArg.multiline   then ui:multiLine  (tArg.multiline  ) end -- must before :text()
 		if tArg.text        then ui:text       (tArg.text       ) end
 		if tArg.placeholder then ui:placeholder(tArg.placeholder) end
 		if tArg.group       then ui:group      (tArg.group      ) end
-		if tArg.font        then ui:font       (tArg.font       ) end
 		if tArg.tip         then if type(tArg.tip) == 'table' then ui:tip(unpack(tArg.tip)) else ui:tip(tArg.tip) end end
 		if tArg.menu        then ui:menu       (tArg.menu       ) end
 		if tArg.limit       then ui:limit      (tArg.limit      ) end
@@ -110,14 +110,14 @@ local XGUI = class()
 
 -- 不会玩元表 (╯‵□′)╯︵┻━┻
 -- -- 设置元表，这样可以当作table调用，其效果相当于 .eles[i].raw
--- setmetatable(XGUI, {  __call = function(me, ...) return me:ctor(...) end, __index = function(t, k) 
+-- setmetatable(XGUI, {  __call = function(me, ...) return me:ctor(...) end, __index = function(t, k)
 	-- if type(k) == "number" then
 		-- return t.eles[k].raw
 	-- elseif k=="new" then
 		-- return t['ctor']
 	-- end
 -- end
--- , __metatable = true 
+-- , __metatable = true
 -- })
 
 -----------------------------------------------------------
@@ -169,7 +169,7 @@ end
 -- self.ele[].txt : ui element text box  -- functions like Text() will do with this
 -- self.ele[].img : ui element image box -- functions like LoadImage() will do with this
 --
--- ui object creator 
+-- ui object creator
 -- same as jQuery.$()
 function XGUI:ctor(raw, tab)
 	self.eles = self.eles or {} -- setmetatable({}, { __mode = "v" })
@@ -543,7 +543,7 @@ function XGUI:ele(index)
 	self:_checksum()
 	local eles, ele = self.eles, {}
 	if index < 0 then index = #eles + index + 1 end
-	if index > 0 and index <= #eles then 
+	if index > 0 and index <= #eles then
 		for k, v in pairs(eles[index]) do
 			ele[k] = v
 		end
@@ -1618,7 +1618,7 @@ function XGUI:slideTo(nTime, nHeight, callback)
 				return ( nEnd - nStart ) * nDuringTime / nTotalTime + nStart -- 线性模型
 			end
 			if not ele:visible() then ele:height(0):toggle(true) end
-			MY.BreatheCall(function() 
+			MY.BreatheCall(function()
 				ele:show()
 				local nCurrentValue = fnCurrent(nStartValue, nHeight, nTime, GetTime()-nStartTime)
 				ele:height(nCurrentValue)
@@ -2385,13 +2385,13 @@ function XGUI:menu(lmenu, rmenu, bNoAutoBind)
 		PopupMenu(_menu)
 	end
 	-- bind left click
-	if lmenu then 
+	if lmenu then
 		self:each(function(eself)
 			eself:lclick(function() fnPopMenu(eself:raw(1), lmenu) end)
 		end)
 	end
 	-- bind right click
-	if rmenu then 
+	if rmenu then
 		self:each(function(eself)
 			eself:rclick(function() fnPopMenu(eself:raw(1), rmenu) end)
 		end)
@@ -2698,7 +2698,7 @@ MY.UI.RegisterUIEvent = function(raw, szEvent, fnEvent)
 		raw[szEvent] = function(...)
 			for _, fn in ipairs(raw['tMy'..szEvent]) do
 				local tReturn
-				for _, fn in ipairs(raw['tMy' .. szEvent] or {}) do 
+				for _, fn in ipairs(raw['tMy' .. szEvent] or {}) do
 					local t = { pcall(fn, ...) }
 					if not t[1] then
 						MY.Debug({t[2]}, MY.UI.GetTreePath(raw) .. '#' .. szEvent, MY_DEBUG.ERROR)
