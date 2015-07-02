@@ -34,7 +34,7 @@ MY_Chat.bChatCopyNoCopySysmsg = false
 MY_Chat.bAlertBeforeClear = true
 MY_Chat.bDisplayPanel = true    --  «∑Òœ‘ æ√Ê∞Â
 _Cache.LoadBlockWords = function() MY_Chat.tBlockWords = MY.LoadLUAData('config/MY_CHAT/blockwords.$lang.jx3dat') or MY_Chat.tBlockWords end
-_Cache.SaveBlockWords = function() MY.SaveLUAData('config/MY_CHAT/blockwords.$lang.jx3dat', MY_Chat.tBlockWords) end
+_Cache.SaveBlockWords = function() MY.SaveLUAData('config/MY_CHAT/blockwords.$lang.jx3dat', MY_Chat.tBlockWords) MY.StorageData("MY_CHAT_BLOCKWORD", MY_Chat.tBlockWords) end
 MY.RegisterInit('MY_CHAT_BW', _Cache.LoadBlockWords)
 
 MY_Chat.tChannel = {
@@ -395,7 +395,7 @@ MY.RegisterInit('MY_CHAT', function()
 	MY.UI(MY_Chat.frame):children("#Btn_Option"):menu(MY_Chat.GetMenu)
 	-- load settings
 	MY_Chat.frame:EnableDrag(not MY_Chat.bLockPostion)
-	-- 
+	--
 	local hFrame = Station.Lookup("Lowest2/EditBox")
 	if hFrame and not hFrame:Lookup("Btn_Cls") then
 		local function Cls(bAll)
@@ -444,6 +444,12 @@ MY.RegisterInit('MY_CHAT', function()
 			end,
 		})
 		hFrame:SetW(421)
+	end
+end)
+
+MY.RegisterEvent("MY_PRIVATE_STORAGE_UPDATE", function()
+	if arg0 == "MY_CHAT_BLOCKWORD" then
+		MY_Chat.tBlockWords = arg1
 	end
 end)
 
