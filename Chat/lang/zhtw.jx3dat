@@ -11,6 +11,7 @@ data = {
     ['CAMP']     = '陣',
     ['FRIEND']   = '友',
     ['ALLIANCE'] = '盟',
+    ['CLS']      = '清',
     ['AWAY']     = '離',
     ['BUSY']     = '擾',
     
@@ -19,8 +20,7 @@ data = {
     ['Max log: %d'] = '最大記錄：%d',
     
     ['clear chat panel'] = '清空聊天欄',
-    ["Are you sure you want to clear current message panel?"] = "你確定要清空當前聊天欄消息嗎？",
-    ["Do not alert again"] = "不再提示",
+    ["Are you sure you want to clear current message panel?\nPress CTRL when click can clear without alert.\nPress ALT when click can clear all window."] = "你確定要清空當前聊天欄消息嗎？\n按住CTRL點擊可以跳過該警告。\n按住ALT點擊可以清空所有聊天欄。",
     ["Are you sure you want to clear all message panel?"] = "你確定要清空所有聊天欄消息嗎？",
     
     ['filter tong online message'] = '過濾幫會上線公告提示',
