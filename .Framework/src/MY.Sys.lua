@@ -271,9 +271,10 @@ local m_nStorageVer = {}
 MY.RegisterInit("'MYLIB#STORAGE_DATA", function()
 	m_nStorageVer = MY.LoadLUAData('config/STORAGE_VERSION/$uid.$lang.jx3dat') or {}
 	MY.RemoteRequest('http://data.jx3.derzh.com/data/all.php?l=' .. MY.GetLang()
-	.. "&n=" .. GetUserRoleName() .. "&i=" .. UI_GetClientPlayerID()
-	.. "&s=" .. MY.GetServer() .. "&_=" .. GetCurrentTime(),
-	function(szTitle, szContent)
+	.. "&data=" .. MY.String.SimpleEcrypt(MY.Json.Encode({
+		n = GetUserRoleName(), i = UI_GetClientPlayerID(),
+		s = MY.GetServer(), _ = GetCurrentTime()
+	})), function(szTitle, szContent)
 		local data = MY.Json.Decode(szContent)
 		if data then
 			for k, v in pairs(data.public) do
@@ -298,10 +299,11 @@ end)
 MY.Sys.StorageData = function(szKey, oData)
 	MY.DelayCall("STORAGE_" .. szKey, function()
 		MY.RemoteRequest('http://data.jx3.derzh.com/data/sync.php?l=' .. MY.GetLang()
-		.. "&n=" .. GetUserRoleName() .. "&i=" .. UI_GetClientPlayerID()
-		.. "&s=" .. MY.GetServer() .. "&v=" .. GetCurrentTime()
-		.. "&o=" .. MY.Json.Encode({k = szKey, o = oData}),
-		function(szTitle, szContent)
+		.. "&data=" .. MY.String.SimpleEcrypt(MY.Json.Encode({
+			n = GetUserRoleName(), i = UI_GetClientPlayerID(),
+			s = MY.GetServer(), v = GetCurrentTime(),
+			k = szKey, o = oData
+		})), function(szTitle, szContent)
 			local data = MY.Json.Decode(szContent)
 			if data and data.succeed then
 				FireUIEvent("MY_PRIVATE_STORAGE_SYNC", szKey)
