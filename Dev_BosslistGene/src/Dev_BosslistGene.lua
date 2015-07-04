@@ -4,7 +4,7 @@
 -- @Date  : 2015-02-28 17:37:53
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-14 12:30:32
+-- @Last Modified time: 2015-07-04 23:02:25
 --------------------------------------------
 local _C = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Dev_BosslistGene/lang/")
@@ -74,6 +74,32 @@ _C.GetDungeonBossFmt = function()
 	return tconcat(t)
 end
 
+_C.GetDungeonBossFmt2 = function()
+	local nTime = MY.Sys.FormatTime('yyyyMMdd', GetCurrentTime())
+	local t = { '{"version":', nTime, "," }
+	for dwMapID, tMap in pairs(_C.GetDungeonBoss()) do
+		tinsert(t, '"')
+		tinsert(t, dwMapID)
+		tinsert(t, '":{')
+		for dwNpcID, szName in pairs(tMap) do
+			tinsert(t, '"')
+			tinsert(t, dwNpcID)
+			tinsert(t, '":"')
+			tinsert(t, "1")
+			tinsert(t, '",')
+		end
+		if t[#t] == '",' then
+			t[#t] = '"'
+		end
+		tinsert(t, '},')
+	end
+	if t[#t] == '},' then
+		t[#t] = '}'
+	end
+	tinsert(t, '}')
+	return tconcat(t)
+end
+
 MY.RegisterPanel(
 "Dev_BosslistGene", _L["BosslistGene"], _L['Development'],
 "ui/Image/UICommon/BattleFiled.UITex|7", {255,127,0,200}, {
@@ -84,7 +110,7 @@ OnPanelActive = function(wnd)
 	
 	ui:append('WndButton', {
 		text = _L['Gene'], x = x, y = y, w = 150, onclick = function()
-			ui:children("#WndEdit"):text(_C.GetDungeonBossFmt())
+			ui:children("#WndEdit"):text(_C.GetDungeonBossFmt2())
 		end,
 	})
 	y = y + 30
