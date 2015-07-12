@@ -183,7 +183,7 @@ local _MY = {
 		{ id = _L["Battle"] , },
 		{ id = _L["Others"] , },
 	},
-	--[[ tTabs: 
+	--[[ tTabs:
 	{
 		{
 			id = ,
@@ -551,31 +551,31 @@ MY.RegisterBgEvent = function(szEvent, fnAction)
 		end
 	end
 end
-MY.RegisterEvent("PLAYER_TALK", function()
-	local me = GetClientPlayer()
-	if me then
-		local t = me.GetTalkData()
-		local dwTalkerID, nChannel, bEcho, szTalkerName = arg0, arg1, arg2, arg3
-		if t and #t == 4 and dwTalkerID ~= me.dwID
-		and t[1].text == _L["Addon comm."]
-		and t[2].linkinfo == "MY_BG_CHANNEL_MSG" then
-			local szEvent = t[3].linkinfo               -- EventName（符合封装格式）
-			local oData = MY.Json.Decode(t[4].linkinfo) -- 数据段（符合封装格式）
-			if szEvent and _MY.tBgEvent[szEvent] then
-				for szKey, fnAction in pairs(_MY.tBgEvent[szEvent]) do
-					local status, err = pcall(fnAction, szEvent, dwTalkerID, szTalkerName, nChannel, oData)
-					if not status then
-						MY.Debug({err}, "BG_HEAR", MY_DEBUG.ERROR)
-					end
-				end
+------------------------------------
+--            背景通讯             --
+------------------------------------
+-- ON_BG_CHANNEL_MSG
+-- arg0: 消息szKey
+-- arg1: 消息来源频道
+-- arg2: 消息发布者ID
+-- arg3: 消息发布者名字
+-- arg4: 不定长参数数组数据
+------------------------------------
+MY.RegisterEvent("ON_BG_CHANNEL_MSG", function()
+	local szEvent, nChannel, dwID, szName, oData = arg0, arg1, arg2, arg3, arg4
+	if dwID ~= UI_GetClientPlayerID() and szEvent and _MY.tBgEvent[szEvent] then
+		for szKey, fnAction in pairs(_MY.tBgEvent[szEvent]) do
+			local status, err = pcall(fnAction, szEvent, dwID, szName, nChannel, unpack(oData))
+			if not status then
+				MY.Debug({err}, "BG_EVENT#" .. szEvent .. "." .. szKey, MY_DEBUG.ERROR)
 			end
 		end
 	end
 end)
 
--- MY.BgTalk(szName, szEvent, oData)
--- MY.BgTalk(nChannel, szEvent, oData)
-MY.BgTalk = function(nChannel, szEvent, oData)
+-- MY.BgTalk(szName, szEvent, ...)
+-- MY.BgTalk(nChannel, szEvent, ...)
+MY.BgTalk = function(nChannel, szEvent, ...)
 	local szTarget, me = "", GetClientPlayer()
 	if not (me and nChannel) then
 		return
@@ -591,12 +591,11 @@ MY.BgTalk = function(nChannel, szEvent, oData)
 		nChannel = PLAYER_TALK_CHANNEL.BATTLE_FIELD
 	end
 	-- talk
-	me.Talk(nChannel, szTarget, {
-		{ type = "text", text = _L["Addon comm."] },
-		{ type = "eventlink", name = "", linkinfo = "MY_BG_CHANNEL_MSG" },
-		{ type = "eventlink", name = "", linkinfo = szEvent },
-		{ type = "eventlink", name = "", linkinfo = MY.Json.Encode(oData) },
-	})
+	local tSay = {{ type = "eventlink", name = "BG_CHANNEL_MSG", linkinfo = szEvent }}
+	for _, v in ipairs({...}) do
+		table.insert(tSay, { type = "eventlink", name = "", linkinfo = var2str(v) })
+	end
+	me.Talk(nChannel, szTarget, tSay)
 end
 -- 测试用（请求共享位置）
 MY.RegisterBgEvent("ASK_CURRENT_LOC", function(szEvent, dwTalkerID, szTalkerName, nChannel)
