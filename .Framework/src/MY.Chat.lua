@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-22 14:50:29
+-- @Last Modified time: 2015-07-12 14:17:58
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -141,7 +141,7 @@ MY.Chat.CopyChatLine = function(hTime, bTextEditor)
 			local szName = p:GetName()
 			if szName ~= "timelink" and szName ~= "copylink" and szName ~= "msglink" and szName ~= "time" then
 				local szText, bEnd = p:GetText(), false
-				if StringFindW(szText, "\n") then
+				if not bTextEditor and StringFindW(szText, "\n") then
 					szText = StringReplaceW(szText, "\n", "")
 					bEnd = true
 				end
