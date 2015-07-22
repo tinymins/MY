@@ -75,6 +75,8 @@ MY.HookChatPanel("MY_ChatFilter", function(h, szChannel, szMsg)
 		-- 判断是否需要过滤
 		if not h.MY_tDuplicateLog then
 			h.MY_tDuplicateLog = {}
+		elseif szText == "" then
+			-- 纯表情纯链接就不屏蔽了
 		elseif MY_ChatFilter.bFilterDuplicateContinuous then
 			if h.MY_tDuplicateLog[1] == szText then
 				return ''
