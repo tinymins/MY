@@ -138,7 +138,11 @@ _C.OnFrameBreathe = function()
 	if not (frame and frame:IsVisible()) then
 		return
 	end
-	local szQues = frame:Lookup("", "Handle_ExamContents"):Lookup(0):GetText()
+	local hQues = frame:Lookup("", "Handle_ExamContents"):Lookup(0)
+	if not hQues then
+		return
+	end
+	local szQues = hQues:GetText()
 	
 	if not MY.IsShieldedVersion() then
 		MY_ExamTip.QueryData(szQues)
