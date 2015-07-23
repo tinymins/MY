@@ -791,19 +791,6 @@ _C.OnChatPanelAppendItemFromString = function(h, szMsg, szChannel, ...)
 	if StringFindW(szMsg, "eventlink") and StringFindW(szMsg, 'text=""') and StringFindW(szMsg, _L["Addon comm."]) then
 		return
 	end
-	-- add name to emotion icon
-	szMsg = string.gsub(szMsg, "<animate>.-path=\"(.-)\"(.-)group=(%d+).-</animate>", function (szImagePath, szExtra, szGroup)
-		local emo = MY.Chat.GetEmotion(szImagePath, szGroup, 'animate')
-		if emo then
-			return '<animate>path="'..szImagePath..'"'..szExtra..'group='..szGroup..' name="'..emo.dwID..'"</animate>'
-		end
-	end)
-	szMsg = string.gsub(szMsg, "<image>.-path=\"(.-)\"(.-)frame=(%d+).-</image>", function (szImagePath, szExtra, szFrame)
-		local emo = MY.Chat.GetEmotion(szImagePath, szFrame, 'image')
-		if emo then
-			return '<image>path="'..szImagePath..'"'..szExtra..'frame='..szFrame..' name="'..emo.dwID..'"</image>'
-		end
-	end)
 	local bActived = h:GetRoot():Lookup('CheckBox_Title'):IsCheckBoxChecked()
 	-- deal with fnBefore
 	for szKey, hc in pairs(_C.tHookChat) do
