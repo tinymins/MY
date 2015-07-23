@@ -2431,7 +2431,9 @@ function XGUI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 		for _, ele in pairs(self.eles) do
 			if type(fnLClick)=="function" then
 				local fnAction = function() fnLClick(MY.Const.Event.Mouse.LBUTTON, ele.raw) end
-				if ele.cmb then
+				if ele.type == "WndScrollBox" then
+					MY.UI.RegisterUIEvent(ele.hdl ,'OnItemLButtonClick' , fnAction)
+				elseif ele.cmb then
 					MY.UI.RegisterUIEvent(ele.cmb ,'OnLButtonClick'     , fnAction)
 				elseif ele.wnd then
 					MY.UI.RegisterUIEvent(ele.wnd ,'OnLButtonClick'     , fnAction)
@@ -2448,7 +2450,9 @@ function XGUI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 			end
 			if type(fnRClick)=="function" then
 				local fnAction = function() fnRClick(MY.Const.Event.Mouse.RBUTTON, ele.raw) end
-				if ele.cmb then
+				if ele.type == "WndScrollBox" then
+					MY.UI.RegisterUIEvent(ele.hdl ,'OnItemRButtonClick' , fnAction)
+				elseif ele.cmb then
 					MY.UI.RegisterUIEvent(ele.cmb ,'OnRButtonClick'     , fnAction)
 				elseif ele.wnd then
 					MY.UI.RegisterUIEvent(ele.wnd ,'OnRButtonClick'     , fnAction)
