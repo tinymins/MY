@@ -127,6 +127,7 @@ data = {
     ['Important Npc list updated to v%d.'] = '重要NPC列表已成功更新至v%d。',
     
     ["[%s] wants to get your location, would you like to share?"] = "[%s] 希望取得你当前所在地图位置，你是否愿意共享当前位置信息？",
+    ["I've installed MY plugins v%s"] = "我已安装茗伊插件集 v%s。"
     
     ['LClick to copy to editbox.\nMClick to remove this line.\nRClick to repeat this line.'] = '左键复制到聊天栏\n中键删除该行文本\n右键复制发布到当前聊天频道',
 }
