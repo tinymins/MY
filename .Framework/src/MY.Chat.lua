@@ -195,7 +195,7 @@ MY.Chat.CopyChatLine = function(hTime, bTextEditor)
 				end
 			end
 		elseif p:GetType() == "Image" or p:GetType() == "Animate" then
-			local dwID = tonumber(p:GetName())
+			local dwID = tonumber((p:GetName():gsub("^emotion_", "")))
 			if dwID then
 				local emo = MY.Chat.GetEmotion(dwID)
 				if emo then
