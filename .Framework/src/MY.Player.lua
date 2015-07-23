@@ -829,6 +829,14 @@ end
 -- Load skill extend data
 _C.tSkillEx = MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. "data/skill_ex.jx3dat") or {}
 
+-- 判断自己在不在队伍里
+-- (bool) MY.Player.IsInParty()
+MY.Player.IsInParty = function()
+	local me = GetClientPlayer()
+	return me and me.IsInParty()
+end
+MY.IsInParty = MY.Player.IsInParty
+
 -- 判断当前地图是不是竞技场
 -- (bool) MY.Player.IsInArena()
 MY.Player.IsInArena = function()
