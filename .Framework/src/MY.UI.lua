@@ -737,7 +737,7 @@ function XGUI:append(arg0, arg1, arg2)
 						edt.OnEditSpecialKeyDown = function()
 							local szKey = GetKeyName(Station.GetMessageKey())
 							if szKey == "Esc" or (
-								szKey == "Enter" and not edt:IsMultiLine(1)
+								szKey == "Enter" and not edt:IsMultiLine()
 							) then
 								Station.SetFocusWindow(edt:GetRoot())
 								return 1
@@ -799,7 +799,7 @@ function XGUI:append(arg0, arg1, arg2)
 									return PopupMenu_ProcessHotkey()
 								end
 							elseif szKey == "Esc" or (
-								szKey == "Enter" and not edt:IsMultiLine(1)
+								szKey == "Enter" and not edt:IsMultiLine()
 							) then
 								Station.SetFocusWindow(edt:GetRoot())
 								return 1
@@ -2104,7 +2104,7 @@ function XGUI:multiLine(bMultiLine)
 		if ele then
 			local x = ele.edt or ele.txt
 			if x and x.IsMultiLine then
-				return x:IsMultiLine(1) or x:IsMultiLine()
+				return x:IsMultiLine()
 			end
 		end
 	end
