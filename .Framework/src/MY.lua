@@ -609,6 +609,13 @@ MY.RegisterBgEvent("ASK_CURRENT_LOC", function(szEvent, dwTalkerID, szTalkerName
 		}, { szOption = g_tStrings.STR_HOTKEY_CANCEL },
 	})
 end)
+-- 测试用（查看版本信息）
+MY.RegisterBgEvent("MY_VERSION_CHECK", function(szEvent, dwTalkerID, szTalkerName, nChannel, bSilent)
+	if not bSilent and MY.IsInParty() then
+		MY.Talk(PLAYER_TALK_CHANNEL.RAID, _L("I've installed MY plugins v%s", MY.GetVersion()))
+	end
+	MY.BgTalk(szTalkerName, "MY_VERSION_REPLY", MY.GetVersion())
+end)
 -- ########################################################################## --
 --     #           #                 # # # # # # #           #                --
 --       #     #   #         # # #         #                 #                --
