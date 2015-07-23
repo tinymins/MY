@@ -4,7 +4,7 @@
 -- Build 20140411
 --
 -- 主要功能: 按关键字过滤获取聊天消息
--- 
+--
 --[[
     MY_ChatMonitor.tRecords = {
         -- （数组部分）监控记录
@@ -59,7 +59,7 @@ _C.tChannelGroups = {
         szCaption = g_tStrings.FIGHT_CHANNEL,
         tChannels = {
             [g_tStrings.STR_NAME_OWN] = {
-                "MSG_SKILL_SELF_SKILL", "MSG_SKILL_SELF_BUFF", "MSG_SKILL_SELF_DEBUFF", 
+                "MSG_SKILL_SELF_SKILL", "MSG_SKILL_SELF_BUFF", "MSG_SKILL_SELF_DEBUFF",
                 "MSG_SKILL_SELF_MISS", "MSG_SKILL_SELF_FAILED"
             },
             [g_tStrings.TEAMMATE] = {"MSG_SKILL_PARTY_SKILL", "MSG_SKILL_PARTY_BUFF", "MSG_SKILL_PARTY_DEBUFF", "MSG_SKILL_PARTY_MISS"},
@@ -152,11 +152,9 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
         return
     end
     --------------------------------------------------------------------------------------
-    -- 如果符合要求  
+    -- 如果符合要求
     -- 开始渲染一条记录的UIXML字符串
     rec.html = MY.Chat.GetTimeLinkText({r=r, g=g, b=b, f=nFont}) .. rec.html
-    -- save animiate group into name
-    rec.html = string.gsub(rec.html, "group=(%d+) </a", "group=%1 name=\"%1\" </a")	
     -- render link event
     rec.html = MY.Chat.RenderLink(rec.html)
     -- render player name color
@@ -260,7 +258,7 @@ _C.OnPanelActive = function(wnd)
                 szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
                 if szVal~="" then
                     local t = MY.LoadLUAData(_C.szLuaData) or {}
-                    for i = #t, 1, -1 do 
+                    for i = #t, 1, -1 do
                         if t[i] == szVal then return end
                     end
                     table.insert(t, szVal)
@@ -271,7 +269,7 @@ _C.OnPanelActive = function(wnd)
       end)
       :autocomplete('option', 'beforeDelete', function(szOption, fnDoDelete, option)
         local t = MY.LoadLUAData(_C.szLuaData) or {}
-        for i = #t, 1, -1 do 
+        for i = #t, 1, -1 do
             if t[i] == szOption then
                 table.remove(t, i)
             end
@@ -291,7 +289,7 @@ _C.OnPanelActive = function(wnd)
     end):alpha(180)
     
     ui:append("Image", "Image_Setting"):find('#Image_Setting'):pos(w-26,13):image('UI/Image/UICommon/Commonpanel.UITex',18):size(30,30):alpha(200):hover(function(bIn) this:SetAlpha((bIn and 255) or 200) end):click(function()
-        PopupMenu((function() 
+        PopupMenu((function()
             local t = {}
             for _, cg in ipairs(_C.tChannelGroups) do
                 local _t = { szOption = cg.szCaption }
