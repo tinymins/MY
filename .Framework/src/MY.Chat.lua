@@ -787,10 +787,6 @@ _C.OnChatPanelNamelinkLButtonDown = function(...)
 end
 
 _C.OnChatPanelAppendItemFromString = function(h, szMsg, szChannel, ...)
-	-- filter addon comm.
-	if StringFindW(szMsg, "eventlink") and StringFindW(szMsg, 'text=""') and StringFindW(szMsg, _L["Addon comm."]) then
-		return
-	end
 	local bActived = h:GetRoot():Lookup('CheckBox_Title'):IsCheckBoxChecked()
 	-- deal with fnBefore
 	for szKey, hc in pairs(_C.tHookChat) do
