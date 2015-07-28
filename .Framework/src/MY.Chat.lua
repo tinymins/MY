@@ -133,7 +133,7 @@ MY.Chat.CopyChatLine = function(hTime, bTextEditor)
 	end
 	Station.Lookup("Lowest2/EditBox"):Show()
 	edit:ClearText()
-	local h, i, bBegin = hTime:GetParent(), hTime:GetIndex(), nil
+	local h, i, bBegin, bContent = hTime:GetParent(), hTime:GetIndex(), nil, false
 	-- loop
 	for i = i + 1, h:GetItemCount() - 1 do
 		local p = h:Lookup(i)
@@ -145,6 +145,7 @@ MY.Chat.CopyChatLine = function(hTime, bTextEditor)
 					szText = StringReplaceW(szText, "\n", "")
 					bEnd = true
 				end
+				bContent = true
 				if szName == "itemlink" then
 					edit:InsertObj(szText, { type = "item", text = szText, item = p:GetUserData() })
 				elseif szName == "iteminfolink" then
@@ -193,6 +194,8 @@ MY.Chat.CopyChatLine = function(hTime, bTextEditor)
 				if bEnd then
 					break
 				end
+			elseif bTextEditor and bContent and (szName == "timelink" or szName == "copylink" or szName == "msglink" or szName == "time") then
+				break
 			end
 		elseif p:GetType() == "Image" or p:GetType() == "Animate" then
 			local dwID = tonumber((p:GetName():gsub("^emotion_", "")))
