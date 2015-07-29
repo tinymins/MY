@@ -5,6 +5,7 @@ data = {
     [' * '] = ' ※ ',
     STR_SPLIT_DOT = '·',
     ["Addon comm."] = "插件消息",
+    ["change log"] = "更新日志",
     
     ["General"] = "常用",
     ["Chat"] = "聊天",

@@ -805,14 +805,21 @@ MY.SwitchTab = function(szID)
 		local w, h = ui:size()
 		ui:append("Image", "Image_Adv", { x = 0, y = 0, image = { MY.GetAddonInfo().szUITexPoster, 0 } })
 		ui:append("Text", "Text_Adv", { x = 10, y = 300, w = 557, font = 200 })
+		ui:append("Text", "Text_ChangeLog", {
+			x = 10, y = 325, w = 557, font = 204, text = _L['change log'], alpha = 190,
+			onclick = function() OpenInternetExplorer("https://raw.githubusercontent.com/tinymins/MY/master/changelog.html") end,
+			onhover = function(bIn) this:SetAlpha(bIn and 255 or 190) end,
+		})
 		wndMainPanel.OnPanelResize = function(wnd)
 			local w, h = MY.UI(wnd):size()
 			if w / 557 > (h - 50) / 278 then
 				ui:item('#Image_Adv'):size((h - 50) / 278 * 557, (h - 50))
 				ui:item('#Text_Adv'):pos(10, h - 40)
+				ui:item('#Text_ChangeLog'):pos(10, h - 15)
 			else
 				ui:item('#Image_Adv'):size(w, w / 557 * 278)
 				ui:item('#Text_Adv'):pos(10, w / 557 * 278 + 10)
+				ui:item('#Text_ChangeLog'):pos(10, w / 557 * 278 + 35)
 			end
 		end
 		wndMainPanel.OnPanelResize(wndMainPanel)
