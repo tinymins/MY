@@ -807,7 +807,7 @@ MY.SwitchTab = function(szID)
 		ui:append("Text", "Text_Adv", { x = 10, y = 300, w = 557, font = 200 })
 		ui:append("Text", "Text_ChangeLog", {
 			x = 10, y = 325, w = 557, font = 204, text = _L['change log'], alpha = 190,
-			onclick = function() OpenInternetExplorer("https://raw.githubusercontent.com/tinymins/MY/master/changelog.html") end,
+			onclick = function() OpenInternetExplorer("https://raw.githubusercontent.com/tinymins/MY/master/changelog.html?_=" .. GetCurrentTime()) end,
 			onhover = function(bIn) this:SetAlpha(bIn and 255 or 190) end,
 		})
 		wndMainPanel.OnPanelResize = function(wnd)
