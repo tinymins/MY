@@ -174,13 +174,17 @@ MY.GetClientInfo = MY.Player.GetClientInfo
 MY.RegisterEvent('LOADING_END', MY.Player.GetClientInfo)
 
 -- 获取唯一标识符
+local m_szUUID
 MY.Player.GetUUID = function()
-	local me = GetClientPlayer()
-	if me.GetGlobalID and me.GetGlobalID() ~= "0" then
-		return me.GetGlobalID()
-	else
-		return (MY.Game.GetServer()):gsub('[/\\|:%*%?"<>]', '') .. "_" .. MY.Player.GetClientInfo().dwID
+	if not m_szUUID then
+		local me = GetClientPlayer()
+		if me.GetGlobalID and me.GetGlobalID() ~= "0" then
+			m_szUUID = me.GetGlobalID()
+		else
+			m_szUUID = (MY.Game.GetServer()):gsub('[/\\|:%*%?"<>]', '') .. "_" .. MY.Player.GetClientInfo().dwID
+		end
 	end
+	return m_szUUID
 end
 
 _C.GeneFriendListCache = function()
