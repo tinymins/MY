@@ -44,7 +44,7 @@ function OBJ.SetFont(dwID, szName, szPath, nSize, tStyle)
 	Station.SetUIScale(Station.GetUIScale(), true)
 	if dwID == Font.GetChatFontID() then
 		Wnd.OpenWindow("ChatSettingPanel")
-		OutputMessage("MSG_ANNOUNCE_YELLOW", _L['please click apply or sure button to save change!'])
+		OutputWarningMessage("MSG_REWARD_GREEN", _L['please click apply or sure button to save change!'], 10)
 	end
 end
 
