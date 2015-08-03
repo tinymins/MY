@@ -12,4 +12,6 @@ data = {
 	['content'] = '界面',
 	['chat'] = '聊天',
 	['fight'] = '伤害',
+	
+	['please click apply or sure button to save change!'] = '请点击确定或应用按钮保存设置，否则下次登录时聊天字体将恢复初始设置。',
 }
