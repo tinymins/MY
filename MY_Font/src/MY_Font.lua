@@ -42,6 +42,10 @@ function OBJ.SetFont(dwID, szName, szPath, nSize, tStyle)
 	-- Ex: SetFont(Font.GetChatFontID(), "黑体", "\\UI\\Font\\方正黑体_GBK.ttf", 16, {["shadow"] = true})
 	Font.SetFont(dwID, szName, szPath, nSize, tStyle)
 	Station.SetUIScale(Station.GetUIScale(), true)
+	if dwID == Font.GetChatFontID() then
+		Wnd.OpenWindow("ChatSettingPanel")
+		OutputMessage("MSG_ANNOUNCE_YELLOW", _L['please click apply or sure button to save change!'])
+	end
 end
 
 MY.RegisterPanel(
