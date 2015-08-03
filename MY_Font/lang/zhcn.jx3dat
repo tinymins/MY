@@ -1,2 +1,15 @@
 -- language data (zhcn) updated at 2014-4-10 03:38:11
-data = {}
+data = {
+	['MY_Font'] = '游戏字体',
+	
+	['shadow'] = '文字阴影',
+	['border'] = '文字描边',
+	['mono'  ] = 'mono',
+	['mipmap'] = '纹理映射',
+	['apply' ] = '应用',
+	
+	['title'] = '标题',
+	['content'] = '界面',
+	['chat'] = '聊天',
+	['fight'] = '伤害',
+}
