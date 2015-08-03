@@ -657,6 +657,8 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 		szName, tArg, bReturnNewItem = nil, szName, tArg
 	elseif szType:find("%<") then
 		szType, szXml, bReturnNewItem = nil, szType, szName
+	elseif #szType == 0 then
+		return
 	end
 	local ret
 	if bReturnNewItem then
