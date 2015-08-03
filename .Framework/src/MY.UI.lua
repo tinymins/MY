@@ -19,10 +19,8 @@ local _L = MY.LoadLangPack()
 ---------------------------------------------------------------------
 local function ApplyUIArgument(ui, tArg)
 	if tArg and ui then
-		if tArg.w           then ui:width      (tArg.w          ) end
-		if tArg.h           then ui:height     (tArg.h          ) end
-		if tArg.x           then ui:left       (tArg.x          ) end
-		if tArg.y           then ui:top        (tArg.y          ) end
+		if tArg.w or tArg.h then ui:size       (tArg.w, tArg.h  ) end
+		if tArg.x or tArg.y then ui:pos        (tArg.x, tArg.y  ) end
 		if tArg.anchor      then ui:anchor     (tArg.anchor     ) end
 		if tArg.alpha       then ui:alpha      (tArg.alpha      ) end
 		if tArg.font        then ui:font       (tArg.font       ) end -- must before color
@@ -46,6 +44,7 @@ local function ApplyUIArgument(ui, tArg)
 		if tArg.checked     then ui:check      (tArg.checked    ) end
 		if tArg.oncheck     then ui:check      (tArg.oncheck    ) end
 		if tArg.onchange    then ui:change     (tArg.onchange   ) end
+		if tArg.autocomplete then for _, v in ipairs(tArg.autocomplete) do ui:autocomplete(unpack(v)) end end
 	end
 end
 
@@ -650,17 +649,20 @@ _MY.tItemXML = {
 -- similar as jQuery.append()
 -- Instance:append(szType,[ szName,] tArg)
 -- Instance:append(szItemString)
-function XGUI:append(arg0, arg1, arg2)
+function XGUI:append(szType, szName, tArg, bReturnNewItem)
 	self:_checksum()
-	local szName, szType, tArg, szXml
-	if type(arg0) == 'string' then
-		if type(arg1) == 'string' then
-			szType, szName, tArg = arg0, arg1, arg2
-		elseif type(arg1) == 'table' then
-			szType, tArg = arg0, arg1
-		elseif #arg0 > 0 then
-			szXml = arg0
-		end
+	local szXml
+	assert(type(szType) == 'string')
+	if type(szName) == 'table' then
+		szName, tArg, bReturnNewItem = nil, szName, tArg
+	elseif szType:find("%<") then
+		szType, szXml, bReturnNewItem = nil, szType, szName
+	end
+	local ret
+	if bReturnNewItem then
+		ret = MY.UI()
+	else
+		ret = self
 	end
 	if szType then
 		for _, ele in pairs(self.eles) do
@@ -891,6 +893,9 @@ function XGUI:append(arg0, arg1, arg2)
 							multiSelect = false,
 						}
 					end
+					if bReturnNewItem then
+						ret = ret:add(wnd)
+					end
 					ui = MY.UI(wnd)
 				end
 				Wnd.CloseWindow(frame)
@@ -913,6 +918,9 @@ function XGUI:append(arg0, arg1, arg2)
 				if not hnd then
 					return MY.Debug({_L("unable to append handle item [%s]", szType)},'MY#UI:append', MY_DEBUG.ERROR)
 				else
+					if bReturnNewItem then
+						ret = ret:add(hnd)
+					end
 					ui = MY.UI(hnd)
 				end
 			end
@@ -922,12 +930,18 @@ function XGUI:append(arg0, arg1, arg2)
 		for _, ele in pairs(self.eles) do
 			if ele.hdl then
 				-- append from xml
+				local nCount = ele.hdl:GetItemCount()
 				ele.hdl:AppendItemFromString(szXml)
 				ele.hdl:FormatAllItemPos()
+				if bReturnNewItem then
+					for i = nCount - 1, ele.hdl:GetItemCount() - 1 do
+						ret = ret:add(ele.hdl:GetItem(i))
+					end
+				end
 			end
 		end
 	end
-	return self
+	return ret
 end
 
 -- clear
