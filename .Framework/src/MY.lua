@@ -939,6 +939,13 @@ end
 --     # # # # # # # # #                             # # # # # # # # # # #   # #     #   #       #    --
 -- ################################################################################################## --
 MY.OnMouseWheel = function()
+	local p = this
+	while p do
+		if p:GetType() == "WndContainer" then
+			return
+		end
+		p = p:GetParent()
+	end
 	return true
 end
 -- key down
