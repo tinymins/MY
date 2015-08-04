@@ -3,13 +3,18 @@ data = {
 	['MY_Font'] = '游戏字体',
 	
 	['shadow'] = '文字阴影',
+	['vertical'] = '竖直排列',
 	['border'] = '文字描边',
 	['mono'  ] = 'mono',
 	['mipmap'] = '纹理映射',
 	['apply' ] = '应用',
 	
 	['title'] = '标题',
-	['content'] = '界面',
+	['normal\ncontent'] = '界面\n普通',
+	['huge\ncontent'] = '界面\n特大',
+	['large\ncontent'] = '界面\n大字',
+	['small\ncontent'] = '界面\n小字',
+	['vertical\ncontent'] = '界面\n纵向',
 	['chat'] = '聊天',
 	['fight'] = '伤害',
 	
