@@ -12,9 +12,14 @@ local C = {
 	aFontPath = {},
 	tFontType = {
 		{ dwID = 0, szName = _L['title'] },
-		{ dwID = 1, szName = _L['content'] },
+		{ dwID = 1, szName = _L['normal\ncontent'] },
+		{ dwID = 3, szName = _L['small\ncontent'] },
+		{ dwID = 2, szName = _L['large\ncontent'] },
+		{ dwID = 4, szName = _L['huge\ncontent'] },
+		{ dwID = 6, szName = _L['vertical\ncontent'] },
 		{ dwID = 5, szName = _L['chat'] },
 		{ dwID = 7, szName = _L['fight'] },
+		-- { dwID = 8, szName = _L['8'] },
 		-- { dwID = Font.GetChatFontID(), szName = _L['chat'] },
 	},
 }
@@ -53,18 +58,29 @@ MY.RegisterPanel(
 "ui/Image/UICommon/CommonPanel7.UITex|36", {255,127,0,200}, {
 OnPanelActive = function(wnd)
 	local ui = MY.UI(wnd)
-	local x, y = 10, 20
+	local x, y = 10, 5
 	local w, h = ui:size()
 	
 	for _, p in ipairs(C.tFontType) do
 		local szName, szFile, nSize, tStyle = Font.GetFont(p.dwID)
 		if tStyle then
+			-- local ui = ui:append("WndWindow", { w = w, h = 60 }, true)
 			local autocomplete, editname, editsize, chkshadow, chkvertical, chkborder, chkmono, chkmipmap, btn
 			local function UpdateBtnEnable()
-				btn:enable(IsFileExist(autocomplete:text()) and not not tonumber(editsize:text()))
+				local nSize1 = tonumber(editsize:text())
+				btn:enable(IsFileExist(autocomplete:text()) and not not nSize1 and nSize1 > 0 and (
+					autocomplete:text() ~= szFile or
+					editname:text() ~= szName or
+					nSize1 ~= nSize or
+					not chkshadow:check()   ~= not tStyle.shadow   or
+					not chkvertical:check() ~= not tStyle.vertical or
+					not chkborder:check()   ~= not tStyle.border   or
+					not chkmono:check()     ~= not tStyle.mono     or
+					not chkmipmap:check()   ~= not tStyle.mipmap
+				))
 			end
 			x, y = 10, y + 10
-			ui:append("Text", { text = p.szName, x = x, y = y })
+			ui:append("Text", { text = p.szName, x = x, y = y, multiline = true })
 			x = x + 40
 			-- line 1
 			y = y - 10
@@ -91,29 +107,33 @@ OnPanelActive = function(wnd)
 				autocomplete = {{"option", "source", C.aFontPath}},
 			}, true)
 			x = w - 200 + x
-			editname  = ui:append("WndEditBox" , { w = 100, h = 25, x = x, y = y, text = szName, onchange = function() end }, true)
+			editname  = ui:append("WndEditBox" , { w = 100, h = 25, x = x, y = y, text = szName, onchange = function() UpdateBtnEnable() end }, true)
 			x = x + 100
 			editsize  = ui:append("WndEditBox" , { w = 50, h = 25, x = x, y = y, text = nSize, onchange = function() UpdateBtnEnable() end }, true)
 			-- line 2
 			x = 50
-			y = y + 30
-			chkshadow = ui:append("WndCheckBox", { w = 100, h = 25, x = x, y = y, text = _L['shadow'], checked = tStyle.shadow, oncheck = function() end }, true)
-			x = x + 100
-			chkborder = ui:append("WndCheckBox", { w = 100, h = 25, x = x, y = y, text = _L['border'], checked = tStyle.border, oncheck = function() end }, true)
-			x = x + 100
-			chkmono   = ui:append("WndCheckBox", { w = 100, h = 25, x = x, y = y, text = _L['mono'  ], checked = tStyle.mono  , oncheck = function() end }, true)
-			x = x + 100
-			chkmipmap = ui:append("WndCheckBox", { w = 100, h = 25, x = x, y = y, text = _L['mipmap'], checked = tStyle.mipmap, oncheck = function() end }, true)
+			y = y + 25
+			chkshadow   = ui:append("WndCheckBox", { w = 100, h = 25, x = x, y = y, text = _L['shadow'], checked = tStyle.shadow, oncheck = function() UpdateBtnEnable() end }, true)
+			x = x + 90
+			chkvertical = ui:append("WndCheckBox", { w = 100, h = 25, x = x, y = y, text = _L['vertical'], checked = tStyle.vertical, oncheck = function() UpdateBtnEnable() end }, true)
+			x = x + 90
+			chkborder   = ui:append("WndCheckBox", { w = 100, h = 25, x = x, y = y, text = _L['border'], checked = tStyle.border, oncheck = function() UpdateBtnEnable() end }, true)
+			x = x + 90
+			chkmono     = ui:append("WndCheckBox", { w = 100, h = 25, x = x, y = y, text = _L['mono'  ], checked = tStyle.mono  , oncheck = function() UpdateBtnEnable() end }, true)
+			x = x + 90
+			chkmipmap   = ui:append("WndCheckBox", { w = 100, h = 25, x = x, y = y, text = _L['mipmap'], checked = tStyle.mipmap, oncheck = function() UpdateBtnEnable() end }, true)
 			x = w - 60
-			btn       = ui:append("WndButton"  , { w = 60, h = 25, x = x, y = y, text = _L['apply' ], onclick = function()
+			btn         = ui:append("WndButton"  , { w = 60, h = 25, x = x, y = y, text = _L['apply' ], enable = false, onclick = function()
 				MY_Font.SetFont(p.dwID, editname:text(), autocomplete:text(), tonumber(editsize:text()), {
-					shadow = chkshadow:check(),
-					border = chkborder:check(),
-					mono   = chkmono:check(),
-					mipmap = chkmipmap:check(),
+					shadow   = chkshadow:check(),
+					vertical = chkvertical:check(),
+					border   = chkborder:check(),
+					mono     = chkmono:check(),
+					mipmap   = chkmipmap:check(),
 				})
+				szName, szFile, nSize, tStyle = Font.GetFont(p.dwID)
 			end }, true)
-			y = y + 60
+			y = y + 30
 		end
 	end
 end})
