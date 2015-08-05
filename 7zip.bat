@@ -1,5 +1,7 @@
 @echo off
 color 0A
+%~d0
+cd %~dp0
 
 :: 读取MY.lua文件中的插件版本号
 set szVersion=0x0000000
