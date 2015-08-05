@@ -1,8 +1,10 @@
 .git\
 .gitignore
+.gitattributes
 7z.exe
 7zip.bat
 7zipignore.txt
+changelog.html
 !src-dist\
 @Data\
 Dev_*\
