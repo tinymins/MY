@@ -202,7 +202,7 @@ MY.Chat.CopyChatLine = function(hTime, bTextEditor)
 			if dwID then
 				local emo = MY.Chat.GetEmotion(dwID)
 				if emo then
-					edit:InsertObj(emo.szCmd, { type = "text", text = emo.szCmd })
+					edit:InsertObj(emo.szCmd, { type = "emotion", text = emo.szCmd, id = emo.dwID })
 				end
 			end
 		end
