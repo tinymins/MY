@@ -12,25 +12,38 @@ local C = {
 	aFontPath = {},
 	aFontName = {},
 	tFontType = {
-		{ tIDs = {0, 1, 2, 3, 4, 6}, szName = _L['content'] },
-		{ tIDs = {Font.GetChatFontID()}, szName = _L['chat'] },
-		{ tIDs = {7}, szName = _L['fight'] },
+		{ tIDs = {0, 1, 2, 3, 4, 6    }, szName = _L['content'] },
+		{ tIDs = {Font.GetChatFontID()}, szName = _L['chat'   ] },
+		{ tIDs = {7                   }, szName = _L['fight'  ] },
 	},
 }
-local LUA_DATA_PATH = MY.GetAddonInfo().szRoot .. "MY_Font/font/$lang.jx3dat"
-for _, v in ipairs(MY.LoadLUAData(LUA_DATA_PATH) or {}) do
+local OBJ = {}
+-- 加载字体配置
+local CONFIG_PATH = "config/MY_FONT/$lang.jx3dat"
+C.tFontConfig = MY.LoadLUAData(CONFIG_PATH) or {}
+-- 加载字体列表
+local FONT_PATH = MY.GetAddonInfo().szRoot .. "MY_Font/font/$lang.jx3dat"
+for _, v in ipairs(MY.LoadLUAData(FONT_PATH) or {}) do
 	table.insert(C.tFontList, v)
 end
 for _, p in ipairs(C.tFontList) do
 	table.insert(C.aFontPath, p.szFile)
 	table.insert(C.aFontName, p.szName)
 end
-local OBJ = {}
 
-function OBJ.SetFont(tIDs, szName, szPath, nSize, tStyle)
+-- 初始化设置
+for dwID, tConfig in pairs(C.tFontConfig) do
+	local szName, szFile, nSize, tStyle  = unpack(tConfig)
+	local szName1, szFile1, nSize1, tStyle1 = Font.GetFont(dwID)
+	Font.SetFont(dwID, szName or szName1, szFile or szFile1, nSize or nSize1, tStyle or tStyle1)
+end
+Station.SetUIScale(Station.GetUIScale(), true)
+
+-- 设置字体函数
+function OBJ.SetFont(tIDs, szName, szFile, nSize, tStyle)
 	-- tIDs  : 要改变字体的类型组（标题/文本/姓名 等）
 	-- szName: 字体名称
-	-- szPath: 字体路径
+	-- szFile: 字体路径
 	-- nSize : 字体大小
 	-- tStyle: {
 	--     ["vertical"] = (bool),
@@ -42,13 +55,15 @@ function OBJ.SetFont(tIDs, szName, szPath, nSize, tStyle)
 	-- Ex: SetFont(Font.GetChatFontID(), "黑体", "\\UI\\Font\\方正黑体_GBK.ttf", 16, {["shadow"] = true})
 	for _, dwID in ipairs(tIDs) do
 		local szName1, szFile1, nSize1, tStyle1 = Font.GetFont(dwID)
-		Font.SetFont(dwID, szName or szName1, szPath or szPath1, nSize or nSize1, tStyle or tStyle1)
+		Font.SetFont(dwID, szName or szName1, szFile or szFile1, nSize or nSize1, tStyle or tStyle1)
 		Station.SetUIScale(Station.GetUIScale(), true)
 		if dwID == Font.GetChatFontID() then
 			Wnd.OpenWindow("ChatSettingPanel")
 			OutputWarningMessage("MSG_REWARD_GREEN", _L['please click apply or sure button to save change!'], 10)
 		end
+		C.tFontConfig[dwID] = {szName or szName1, szFile or szFile1, nSize or nSize1, tStyle or tStyle1}
 	end
+	MY.SaveLUAData(CONFIG_PATH, C.tFontConfig)
 end
 
 MY.RegisterPanel(
