@@ -2,21 +2,11 @@
 data = {
 	['MY_Font'] = '遊戲字體',
 	
-	['shadow'] = '文字陰影',
-	['vertical'] = '豎直排列',
-	['border'] = '文字描邊',
-	['mono'  ] = 'mono',
-	['mipmap'] = '紋理映射',
 	['apply' ] = '應用',
 	
-	['title'] = '標題',
-	['normal\ncontent'] = '界面\n普通',
-	['huge\ncontent'] = '界面\n特大',
-	['large\ncontent'] = '界面\n大字',
-	['small\ncontent'] = '界面\n小字',
-	['vertical\ncontent'] = '界面\n縱向',
-	['chat'] = '聊天',
-	['fight'] = '傷害',
+	['content'] = '通用界面文本',
+	['chat'] = '聊天框文本',
+	['fight'] = '戰鬥浮動傷害顯示文本',
 	
 	['please click apply or sure button to save change!'] = '請點擊確定或應用按鈕保存設置，否則下次登錄時聊天字體將恢複初始設置。',
 }
