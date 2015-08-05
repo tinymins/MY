@@ -24,3 +24,4 @@
 @DATA/cache/CHAT_LOG/*/*/*.jx3dat
 @DATA/userdata/CHAT_LOG/*/*/*.jx3dat
 @DATA/config/STORAGE_VERSION/*.jx3dat
+@DATA/config/MY_FONT/*.jx3dat
