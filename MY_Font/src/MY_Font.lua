@@ -10,6 +10,7 @@ local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Font/lang/")
 local C = {
 	tFontList = Font.GetFontPathList() or {},
 	aFontPath = {},
+	aFontName = {},
 	tFontType = {
 		{ tIDs = {0, 1, 2, 3, 4, 6}, szName = _L['content'] },
 		{ tIDs = {Font.GetChatFontID()}, szName = _L['chat'] },
@@ -22,6 +23,7 @@ for _, v in ipairs(MY.LoadLUAData(LUA_DATA_PATH) or {}) do
 end
 for _, p in ipairs(C.tFontList) do
 	table.insert(C.aFontPath, p.szFile)
+	table.insert(C.aFontName, p.szName)
 end
 local OBJ = {}
 
@@ -61,27 +63,31 @@ OnPanelActive = function(wnd)
 		local szName, szFile, nSize, tStyle = Font.GetFont(p.tIDs[1])
 		if tStyle then
 			-- local ui = ui:append("WndWindow", { w = w, h = 60 }, true)
-			local autocomplete, editname, btn
+			local acFile, acName, btnSure
 			local function UpdateBtnEnable()
-				btn:enable(IsFileExist(autocomplete:text()) and autocomplete:text() ~= szFile)
+				local szNewFile = acFile:text()
+				local bFileExist = IsFileExist(szNewFile)
+				acFile:color(bFileExist and {255, 255, 255} or {255, 0, 0})
+				btnSure:enable(bFileExist and szNewFile ~= szFile)
 			end
 			x = 10
 			ui:append("Text", { text = _L[" * "] .. p.szName, x = x, y = y })
-			x = 10
 			y = y + 40
-			-- line 1
-			autocomplete = ui:append("WndAutoComplete", {
+			
+			acFile = ui:append("WndAutoComplete", {
 				x = x, y = y, w = w - 180,
 				text = szFile,
 				onchange = function(szText)
 					UpdateBtnEnable()
+					szText = StringLowerW(szText)
 					for _, p in ipairs(C.tFontList) do
-						if p.szFile == szText then
-							editname:text(p.szName)
+						if StringLowerW(p.szFile) == szText
+						and acName:text() ~= p.szName then
+							acName:text(p.szName)
 							return
 						end
 					end
-					editname:text(g_tStrings.STR_CUSTOM_TEAM)
+					acName:text(g_tStrings.STR_CUSTOM_TEAM)
 				end,
 				onclick = function(nButton, raw)
 					if IsPopupMenuOpened() then
@@ -92,17 +98,40 @@ OnPanelActive = function(wnd)
 			  	end,
 				autocomplete = {{"option", "source", C.aFontPath}},
 			}, true)
-			x = w - 180 + x
-			editname  = ui:append("WndEditBox" , { w = 100, h = 25, x = x, y = y, text = szName, onchange = function() UpdateBtnEnable() end, enable = false }, true)
-			x = x + 100
-			-- line 2
-			x = 50
-			x = w - 60
-			btn         = ui:append("WndButton"  , { w = 60, h = 25, x = x, y = y, text = _L['apply' ], enable = false, onclick = function()
-				MY_Font.SetFont(p.tIDs, editname:text(), autocomplete:text())
-				szName, szFile, nSize, tStyle = Font.GetFont(p.tIDs[1])
-				UpdateBtnEnable()
-			end }, true)
+			
+			acName = ui:append("WndAutoComplete", {
+				w = 100, h = 25, x = w - 180 + x, y = y,
+				text = szName,
+				onchange = function(szText)
+					UpdateBtnEnable()
+					szText = StringLowerW(szText)
+					for _, p in ipairs(C.tFontList) do
+						if StringLowerW(p.szName) == szText
+						and acFile:text() ~= p.szFile then
+							acFile:text(p.szFile)
+							return
+						end
+					end
+				end,
+				onclick = function(nButton, raw)
+					if IsPopupMenuOpened() then
+						MY.UI(raw):autocomplete('close')
+					else
+						MY.UI(raw):autocomplete('search', '')
+					end
+			  	end,
+				autocomplete = {{"option", "source", C.aFontName}},
+			}, true)
+			
+			btnSure = ui:append("WndButton", {
+				w = 60, h = 25, x = w - 60, y = y,
+				text = _L['apply' ], enable = false,
+				onclick = function()
+					MY_Font.SetFont(p.tIDs, acName:text(), acFile:text())
+					szName, szFile, nSize, tStyle = Font.GetFont(p.tIDs[1])
+					UpdateBtnEnable()
+				end
+			}, true)
 			y = y + 60
 		end
 	end
