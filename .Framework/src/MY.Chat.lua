@@ -217,8 +217,15 @@ MY.Chat.LinkEventHandler = {
 		end
 		if IsCtrlKeyDown() then
 			MY.Chat.CopyChatItem(hT)
-		elseif IsAltKeyDown() then
+		elseif IsShiftKeyDown() then
 			MY.SetTarget(TARGET.PLAYER, MY.UI(hT):text())
+		elseif IsAltKeyDown() then
+			if MY_Farbnamen and MY_Farbnamen.Get then
+				local info = MY_Farbnamen.Get(MY.UI(hT):text():gsub("[%[%]]", ""))
+				if info then
+					ViewInviteToPlayer(info.dwID)
+				end
+			end
 		else
 			MY.SwitchChat(MY.UI(hT):text())
 			local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
