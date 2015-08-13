@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-25 10:40:14
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-19 09:33:15
+-- @Last Modified time: 2015-08-13 23:07:33
 -----------------------------------------------
 MY_BagEx = {}
 MY_BagEx.bEnable = true
@@ -200,14 +200,6 @@ _C.Hook = function()
 		  	_C.DoCompareGuildBank(true)
 		  end)
 		_C.DoCompareGuildBank()
-		
-		MY.UI("Normal/GuildBankPanel"):children('#^CheckBox_%d$')
-		  :onuievent('OnLButtonUp')
-		  :onuievent('OnLButtonUp', function()
-		  	MY.DelayCall(function()
-		  		_C.DoCompareGuildBank(true)
-		  	end, 100)
-		  end)
 	end
 end
 
@@ -385,6 +377,12 @@ MY.RegisterEvent("BAG_ITEM_UPDATE", function()
 	end
 	_C.OnBagItemUpdate()
 	MY.DelayCall('MY_BagEx', _C.OnBagItemUpdate, 100)
+end)
+MY.RegisterEvent("GUILD_BANK_PANEL_UPDATE", function()
+	if not MY_BagEx.bEnable then
+		return
+	end
+	_C.OnBagItemUpdate()
 end)
 MY.RegisterInit('MY_BAGEX', function() MY.BreatheCall(_C.OnBreathe, 130) end)
 MY.RegisterReload("MY_BAGEX", _C.ClearHook)
