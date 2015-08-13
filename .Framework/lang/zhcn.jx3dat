@@ -131,4 +131,10 @@ data = {
     ["I've installed MY plugins v%s"] = "我已安装茗伊插件集 v%s。",
     
     ['LClick to copy to editbox.\nMClick to remove this line.\nRClick to repeat this line.'] = '左键复制到聊天栏\n中键删除该行文本\n右键复制发布到当前聊天频道',
+    
+    
+    ['Invalid player ID!']           = '您要查看装备的玩家ID不合法！',
+    ['Peek other player failed!']    = '查看装备失败！',
+    ['Can not find player to peek!'] = '您要查看的玩家不存在！',
+    ['Player is too far to peek!']   = '距离太远查看装备失败！',
 }
