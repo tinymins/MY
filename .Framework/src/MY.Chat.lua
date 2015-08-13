@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-08-13 18:56:16
+-- @Last Modified time: 2015-08-13 22:25:44
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -283,6 +283,7 @@ MY.RegisterEvent("PEEK_OTHER_PLAYER", function()
 	elseif arg0 == PEEK_OTHER_PLAYER_RESPOND.TOO_FAR then
 		OutputMessage("MSG_ANNOUNCE_RED", _L['Player is too far to peek!'])
 	end
+	_C.tPeekPlayer[arg1] = nil
 end)
 -- 绑定link事件响应
 -- (userdata) MY.Chat.RenderLink(userdata link)                   处理link的各种事件绑定 namelink是一个超链接Text元素
