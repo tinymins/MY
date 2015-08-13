@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-09 19:54:50
+-- @Last Modified time: 2015-08-13 18:50:42
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 XML_LINE_BREAKER = GetFormatText("\n")
@@ -352,6 +352,16 @@ KUNGFU_TYPE = {
 	WU_DU       = 9,      -- 五毒内功
 	TANG_MEN    = 10,     -- 唐门内功
 	CANG_YUN    = 18,     -- 苍云内功
+}
+end
+
+if not PEEK_OTHER_PLAYER_RESPOND then
+PEEK_OTHER_PLAYER_RESPOND = {
+	INVALID             = 0,
+	SUCCESS             = 1,
+	FAILED              = 2,
+	CAN_NOT_FIND_PLAYER = 3,
+	TOO_FAR             = 4,
 }
 end
 

@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-07-12 14:17:58
+-- @Last Modified time: 2015-08-13 18:56:16
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -12,7 +12,7 @@
 -----------------------------------------------
 MY = MY or {}
 MY.Chat = MY.Chat or {}
-local _C, _L = {}, MY.LoadLangPack()
+local _C, _L = {tPeekPlayer = {}}, MY.LoadLangPack()
 local EMPTY_TABLE = SetmetaReadonly({})
 
 -- 海鳗里面抠出来的
@@ -223,6 +223,7 @@ MY.Chat.LinkEventHandler = {
 			if MY_Farbnamen and MY_Farbnamen.Get then
 				local info = MY_Farbnamen.Get(MY.UI(hT):text():gsub("[%[%]]", ""))
 				if info then
+					_C.tPeekPlayer[info.dwID] = true
 					ViewInviteToPlayer(info.dwID)
 				end
 			end
@@ -269,6 +270,20 @@ MY.Chat.LinkEventHandler = {
 		end
 	end,
 }
+MY.RegisterEvent("PEEK_OTHER_PLAYER", function()
+	if not _C.tPeekPlayer[arg1] then
+		return
+	end
+	if arg0 == PEEK_OTHER_PLAYER_RESPOND.INVALID then
+		OutputMessage("MSG_ANNOUNCE_RED", _L['Invalid player ID!'])
+	elseif arg0 == PEEK_OTHER_PLAYER_RESPOND.FAILED then
+		OutputMessage("MSG_ANNOUNCE_RED", _L['Peek other player failed!'])
+	elseif arg0 == PEEK_OTHER_PLAYER_RESPOND.CAN_NOT_FIND_PLAYER then
+		OutputMessage("MSG_ANNOUNCE_RED", _L['Can not find player to peek!'])
+	elseif arg0 == PEEK_OTHER_PLAYER_RESPOND.TOO_FAR then
+		OutputMessage("MSG_ANNOUNCE_RED", _L['Player is too far to peek!'])
+	end
+end)
 -- 绑定link事件响应
 -- (userdata) MY.Chat.RenderLink(userdata link)                   处理link的各种事件绑定 namelink是一个超链接Text元素
 -- (userdata) MY.Chat.RenderLink(userdata element, userdata link) 处理element的各种事件绑定 数据源是link
