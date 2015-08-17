@@ -215,7 +215,7 @@ MY.RegisterInit('MYLIB#BIND_HOTKEY', function()
 		Hotkey.AddBinding('MY_HotKey_Null_'..i, _L['none-function hotkey'], "", function() end, nil)
 	end
 end)
-
+MY.Game.AddHotKey("MY_STOP_CASTING", _L["Stop cast skill"], function() GetClientPlayer().StopCurrentAction() end)
 -- #######################################################################################################
 --                                 #                   # # # #   # # # #
 --     # # # #   # # # # #       # # # # # # #         #     #   #     #
