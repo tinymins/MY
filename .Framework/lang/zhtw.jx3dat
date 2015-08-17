@@ -137,4 +137,6 @@ data = {
     ['Peek other player failed!']    = '查看裝備失敗！',
     ['Can not find player to peek!'] = '您要查看的玩家不存在！',
     ['Player is too far to peek!']   = '距離太遠查看裝備失敗！',
+    
+    ["Stop cast skill"] = "打斷自身讀條",
 }
