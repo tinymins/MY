@@ -23,7 +23,7 @@ _Cache.OnPanelActive = function(wnd)
     local uiEdit = ui:append("WndEditBox", "WndEdit_Copy"):children('#WndEdit_Copy')
       :pos(x, h-30):size(w-20, 25):multiLine(true)
     
-    ui:append("WndAutoComplete", "WndAutoComplete_UITexPath"):children('#WndAutoComplete_UITexPath')
+    ui:append("WndAutocomplete", "WndAutocomplete_UITexPath"):children('#WndAutocomplete_UITexPath')
       :pos(x, y):size(w-20, 25):text(MYDev_UITexViewer.szUITexPath)
       :change(function(szText)
         local tInfo = KG_Table.Load(szText .. '.txt', {

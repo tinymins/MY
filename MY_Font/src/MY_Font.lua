@@ -4,7 +4,7 @@
 -- @Date  : 2015-02-28 17:37:53
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-01 00:13:27
+-- @Last Modified time: 2015-08-19 10:33:04
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Font/lang/")
 local C = {
@@ -89,7 +89,7 @@ OnPanelActive = function(wnd)
 			ui:append("Text", { text = _L[" * "] .. p.szName, x = x, y = y })
 			y = y + 40
 			
-			acFile = ui:append("WndAutoComplete", {
+			acFile = ui:append("WndAutocomplete", {
 				x = x, y = y, w = w - 180,
 				text = szFile,
 				onchange = function(szText)
@@ -114,7 +114,7 @@ OnPanelActive = function(wnd)
 				autocomplete = {{"option", "source", C.aFontPath}},
 			}, true)
 			
-			acName = ui:append("WndAutoComplete", {
+			acName = ui:append("WndAutocomplete", {
 				w = 100, h = 25, x = w - 180 + x, y = y,
 				text = szName,
 				onchange = function(szText)

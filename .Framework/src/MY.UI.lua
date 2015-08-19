@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-29 15:04:50
+-- @Last Modified time: 2015-08-19 10:33:59
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -19,8 +19,8 @@ local _L = MY.LoadLangPack()
 ---------------------------------------------------------------------
 local function ApplyUIArgument(ui, tArg)
 	if tArg and ui then
-		if tArg.w or tArg.h       then ui:size       (tArg.w, tArg.h  ) end
 		if tArg.x or tArg.y       then ui:pos        (tArg.x, tArg.y  ) end
+		if tArg.w or tArg.h       then ui:size       (tArg.w, tArg.h  ) end
 		if tArg.anchor            then ui:anchor     (tArg.anchor     ) end
 		if tArg.alpha             then ui:alpha      (tArg.alpha      ) end
 		if tArg.font              then ui:font       (tArg.font       ) end -- must before color
@@ -75,7 +75,7 @@ local function raw2ele(raw)
 		_tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
 		_tab.txt = _tab.txt or raw:Lookup('','Text_Default')
 		_tab.img = _tab.img or raw:Lookup('','Image_Default')
-	elseif _tab.type=="WndEditComboBox" or _tab.type=="WndAutoComplete" then
+	elseif _tab.type=="WndEditComboBox" or _tab.type=="WndAutocomplete" then
 		_tab.wnd = _tab.wnd or raw
 		_tab.hdl = _tab.hdl or raw:Lookup('','')
 		_tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
@@ -749,7 +749,7 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 								return 1
 							end
 						end
-					elseif szType=='WndAutoComplete' then
+					elseif szType=='WndAutocomplete' then
 						local edt = wnd:Lookup("WndEdit_Default")
 						edt.OnSetFocus = function()
 							wnd:Lookup("", "Text_PlaceHolder"):Hide()
@@ -1904,7 +1904,7 @@ function XGUI:size(nWidth, nHeight)
 				ele.img:SetSize(nWidth, nHeight)
 				ele.txt:SetSize(nWidth - 10, nHeight)
 				ele.hdl:FormatAllItemPos()
-			elseif ele.type == "WndEditComboBox" or ele.type == "WndAutoComplete" then
+			elseif ele.type == "WndEditComboBox" or ele.type == "WndAutocomplete" then
 				ele.wnd:SetSize(nWidth, nHeight)
 				ele.hdl:SetSize(nWidth, nHeight)
 				ele.phd:SetSize(nWidth, nHeight)
