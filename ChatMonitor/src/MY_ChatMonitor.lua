@@ -226,7 +226,7 @@ _C.OnPanelActive = function(wnd)
     ui:append("Text", "Label_KeyWord"):find('#Label_KeyWord')
       :pos(22,15):size(100,25):text(_L['key words:'])
     
-    ui:append("WndAutoComplete", "WndAutoComplete_KeyWord"):children('#WndAutoComplete_KeyWord')
+    ui:append("WndAutocomplete", "WndAutocomplete_KeyWord"):children('#WndAutocomplete_KeyWord')
       :pos(80,15):size(w-226,25):text(MY_ChatMonitor.szKeyWords)
       :change(function(szText) MY_ChatMonitor.szKeyWords = szText end)
       :focus(function(raw, bFocus)
@@ -253,7 +253,7 @@ _C.OnPanelActive = function(wnd)
             table.insert(menu, { bDevide = true })
         end
         table.insert(menu, { szOption = _L['add'], fnAction = function()
-            local edit = ui:children('#WndAutoComplete_KeyWord')
+            local edit = ui:children('#WndAutocomplete_KeyWord')
             GetUserInput("", function(szVal)
                 szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
                 if szVal~="" then
