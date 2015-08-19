@@ -418,11 +418,11 @@ MY.UI.RegisterUIEvent(MY, "OnFrameBreathe", function()
 	-- run delay calls
 	for szKey, dc in pairs(_C.tDelayCall) do
 		if dc.nTime <= nTime then
+			_C.tDelayCall[szKey] = nil -- must remove before execute, cause fnAction may reg delaycall again.
 			local res, err = pcall(dc.fnAction)
 			if not res then
 				MY.Debug({err}, "DelayCall#" .. szKey, MY_DEBUG.ERROR)
 			end
-			_C.tDelayCall[szKey] = nil
 		end
 	end
 end)
