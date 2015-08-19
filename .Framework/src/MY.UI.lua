@@ -1126,7 +1126,7 @@ function XGUI:text(szText)
 				ele.hdl:FormatAllItemPos()
 			elseif ele.type == "WndSliderBox" and type(szText)=="function" then
 				ele.sld.FormatText = szText
-			elseif ele.type == "WndEditBox" then
+			elseif ele.type == "WndEditBox" or ele.type == "WndAutocomplete" then
 				ele.edt:SetText(szText)
 				if szText == "" then
 					ele.phd:Show()
