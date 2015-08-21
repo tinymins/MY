@@ -3281,15 +3281,18 @@ MY.UI.Append = function(hParent, szType, szName, tArg)
 end
 
 MY.UI.GetTreePath = function(raw)
-	local tTreePath = { (raw:GetTreePath()):sub(1, -2) }
-	while(raw and raw:GetType():sub(1, 3) ~= 'Wnd') do
-		local szName = raw:GetName()
-		if not szName or szName == '' then
-			table.insert(tTreePath, 2, raw:GetIndex())
-		else
-			table.insert(tTreePath, 2, szName)
+	local tTreePath = {}
+	if raw and raw.GetTreePath then
+		table.insert(tTreePath, (raw:GetTreePath()):sub(1, -2))
+		while(raw and raw:GetType():sub(1, 3) ~= 'Wnd') do
+			local szName = raw:GetName()
+			if not szName or szName == '' then
+				table.insert(tTreePath, 2, raw:GetIndex())
+			else
+				table.insert(tTreePath, 2, szName)
+			end
+			raw = raw:GetParent()
 		end
-		raw = raw:GetParent()
-	end
+	 end
 	return table.concat(tTreePath, '/')
 end
