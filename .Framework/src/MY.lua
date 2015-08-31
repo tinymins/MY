@@ -562,10 +562,10 @@ end
 -- arg4: 不定长参数数组数据
 ------------------------------------
 MY.RegisterEvent("ON_BG_CHANNEL_MSG", function()
-	local szEvent, nChannel, dwID, szName, oData = arg0, arg1, arg2, arg3, arg4
+	local szEvent, nChannel, dwID, szName, aParam = arg0, arg1, arg2, arg3, arg4
 	if dwID ~= UI_GetClientPlayerID() and szEvent and _MY.tBgEvent[szEvent] then
 		for szKey, fnAction in pairs(_MY.tBgEvent[szEvent]) do
-			local status, err = pcall(fnAction, szEvent, dwID, szName, nChannel, unpack(oData))
+			local status, err = pcall(fnAction, szEvent, dwID, szName, nChannel, unpack(aParam))
 			if not status then
 				MY.Debug({err}, "BG_EVENT#" .. szEvent .. "." .. szKey, MY_DEBUG.ERROR)
 			end
@@ -592,8 +592,10 @@ MY.BgTalk = function(nChannel, szEvent, ...)
 	end
 	-- talk
 	local tSay = {{ type = "eventlink", name = "BG_CHANNEL_MSG", linkinfo = szEvent }}
-	for _, v in ipairs({...}) do
-		table.insert(tSay, { type = "eventlink", name = "", linkinfo = var2str(v) })
+	local tArg = {...}
+	local nCount = select("#", ...) -- 这里有个坑 如果直接ipairs({...})可能会掉进坑： for遇到nil就中断了导致后续参数丢失
+	for i = 1, nCount do
+		table.insert(tSay, { type = "eventlink", name = "", linkinfo = var2str(tArg[i]) })
 	end
 	me.Talk(nChannel, szTarget, tSay)
 end
