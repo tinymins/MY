@@ -72,6 +72,7 @@ MY_ToolBox.ApplyConfig = function()
 							MY_Farbnamen.Render(h:Lookup(i + 1))
 						end
 						hItem:SetText(szText:sub(1, nPos1 - 1))
+						hItem:SetFontColor(0, 0, 0)
 						hItem:AutoSize()
 						break
 					end
@@ -258,20 +259,20 @@ MY.BreatheCall(function()
 	h.tNonwarData = true
 end, 130)
 
--- #######################################################################################################
---     #       # # # #         # # # # # # # # #                                 #             # #   
---       #     #     #         #     #   #     #     # # # # # # # # # # #       #     # # # #       
---             #     #         # # # # # # # # #               #                 #     #             
---             #     #                 #                     #               # # # #   #             
---   # # #   #         # #   # # # # # # # # # # #     # # # # # # # # # #       #     # # # # # #   
---       #                             #               #     #     #     #     # # #   #   #     #   
---       #   # # # # # #         # # # # # # #         #     # # # #     #     # #   # #   #     #   
---       #     #       #         #           #         #     #     #     #   #   #     #   #   #     
---       #       #   #           #           #         #     # # # #     #       #     #   #   #     
---       # #       #             #     #     #         #     #     #     #       #     #     #       
---       #       #   #           #     #     #         # # # # # # # # # #       #   #     #   #     
---           # #       # #   # # # # # # # # # # #     #                 #       # #     #       #   
--- #######################################################################################################
+-- ################################################################################################ --
+--     #       # # # #         # # # # # # # # #                                 #             # #  --
+--       #     #     #         #     #   #     #     # # # # # # # # # # #       #     # # # #      --
+--             #     #         # # # # # # # # #               #                 #     #            --
+--             #     #                 #                     #               # # # #   #            --
+--   # # #   #         # #   # # # # # # # # # # #     # # # # # # # # # #       #     # # # # # #  --
+--       #                             #               #     #     #     #     # # #   #   #     #  --
+--       #   # # # # # #         # # # # # # #         #     # # # #     #     # #   # #   #     #  --
+--       #     #       #         #           #         #     #     #     #   #   #     #   #   #    --
+--       #       #   #           #           #         #     # # # #     #       #     #   #   #    --
+--       # #       #             #     #     #         #     #     #     #       #     #     #      --
+--       #       #   #           #     #     #         # # # # # # # # # #       #   #     #   #    --
+--           # #       # #   # # # # # # # # # # #     #                 #       # #     #       #  --
+-- ################################################################################################ --
 _C.tChannels = {
 	{ nChannel = PLAYER_TALK_CHANNEL.LOCAL_SYS, szName = _L['system channel'], rgb = GetMsgFontColor("MSG_SYS"  , true) },
 	{ nChannel = PLAYER_TALK_CHANNEL.TEAM     , szName = _L['team channel']  , rgb = GetMsgFontColor("MSG_TEAM"  , true) },
@@ -306,7 +307,7 @@ MY.RegisterPanel( "MY_ToolBox", _L["toolbox"], _L['General'], "UI/Image/Common/M
 	  end):rmenu(function()
 	  	local t = { { szOption = _L['send to ...'], bDisable = true }, { bDevide = true } }
 	  	for _, tChannel in ipairs(_C.tChannels) do
-	  		table.insert( t, { 
+	  		table.insert( t, {
 	  			szOption = tChannel.szName,
 	  			rgb = tChannel.rgb,
 	  			bCheck = true, bMCheck = true, bChecked = MY_ToolBox.nGongzhanPublishChannel == tChannel.nChannel,
@@ -428,7 +429,7 @@ MY.RegisterPanel( "MY_ToolBox", _L["toolbox"], _L['General'], "UI/Image/Common/M
 	  				GetUserInput(_L['please input buff name:'], function(szVal)
 	  					szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
 	  					if szVal~="" then
-	  						for i = #tBuffMonList, 1, -1 do 
+	  						for i = #tBuffMonList, 1, -1 do
 	  							if tBuffMonList[i].szName == szVal then return end
 	  						end
 	  						table.insert(tBuffMonList, {szName = szVal, bOn = true, dwIconID = 13})
@@ -480,7 +481,7 @@ MY.RegisterPanel( "MY_ToolBox", _L["toolbox"], _L['General'], "UI/Image/Common/M
 	  				GetUserInput(_L['please input buff name:'], function(szVal)
 	  					szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
 	  					if szVal~="" then
-	  						for i = #tBuffMonList, 1, -1 do 
+	  						for i = #tBuffMonList, 1, -1 do
 	  							if tBuffMonList[i].szName == szVal then return end
 	  						end
 	  						table.insert(tBuffMonList, {szName = szVal, bOn = true, dwIconID = 13})
