@@ -453,7 +453,7 @@ MY.RegisterEvent("MY_PRIVATE_STORAGE_UPDATE", function()
 end)
 
 -- hook chat panel
-MY.HookChatPanel("MY_Chat", function(h, szChannel, szMsg)
+MY.HookChatPanel("MY_Chat", function(h, szChannel, szMsg, dwTime)
 	-- chat filter
 	if MY_Chat.bBlockWords then
 		-- local t = MY.Chat.FormatContent(szMsg)
@@ -476,7 +476,7 @@ MY.HookChatPanel("MY_Chat", function(h, szChannel, szMsg)
 	end
 	
 	return szMsg, h:GetItemCount()
-end, function(h, szChannel, szMsg, i)
+end, function(h, szChannel, szMsg, dwTime, i)
 	if szMsg and #(GetPureText(szMsg)) > 0 and (MY_Chat.bChatTime or MY_Chat.bChatCopy) and i then
 		-- chat time
 		-- get msg rgb
@@ -509,9 +509,9 @@ end, function(h, szChannel, szMsg, i)
 		end
 		if MY_Chat.bChatTime then
 			if MY_Chat.nChatTime == CHAT_TIME.HOUR_MIN_SEC then
-				szTime = szTime .. MY.Chat.GetTimeLinkText({ r = r, g = g, b = b , f = 10, s = "[hh:mm:ss]"})
+				szTime = szTime .. MY.Chat.GetTimeLinkText({ r = r, g = g, b = b , f = 10, s = "[hh:mm:ss]"}, dwTime)
 			else
-				szTime = szTime .. MY.Chat.GetTimeLinkText({ r = r, g = g, b = b , f = 10, s = "[hh:mm]"})
+				szTime = szTime .. MY.Chat.GetTimeLinkText({ r = r, g = g, b = b , f = 10, s = "[hh:mm]"}, dwTime)
 			end
 		end
 		

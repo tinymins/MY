@@ -208,9 +208,9 @@ setmetatable(_MY_Farbnamen.tCampString,  { __index = function(t, k) return k end
 -- 聊天复制和时间显示相关
 ---------------------------------------------------------------
 -- 插入聊天内容的 HOOK （过滤、加入时间 ）
-MY.HookChatPanel("MY_FARBNAMEN", function(h, szChannel, szMsg)
+MY.HookChatPanel("MY_FARBNAMEN", function(h, szChannel, szMsg, dwTime)
     return szMsg, h:GetItemCount()
-end, function(h, szChannel, szMsg, nIndex)
+end, function(h, szChannel, szMsg, dwTime, nIndex)
     if MY_Farbnamen.bEnabled then
         for i = h:GetItemCount() - 1, nIndex or 0, -1 do
             MY_Farbnamen.Render(h:Lookup(i))

@@ -112,10 +112,13 @@ MY.Chat.GetCopyLinkText = function(szText, rgbf)
 end
 
 -- 获取复制聊天行Text
-MY.Chat.GetTimeLinkText = function(rgbfs)
+MY.Chat.GetTimeLinkText = function(rgbfs, dwTime)
+	if not dwTime then
+		dwTime = GetCurrentTime()
+	end
 	rgbfs = rgbfs or { f = 10 }
 	return GetFormatText(
-		MY.Sys.FormatTime(rgbfs.s or '[hh:mm.ss]', GetCurrentTime()),
+		MY.Sys.FormatTime(rgbfs.s or '[hh:mm.ss]', dwTime),
 		rgbfs.f, rgbfs.r, rgbfs.g, rgbfs.b, 82691,
 		"this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.Chat.LinkEventHandler.OnCopyLClick\nthis.OnItemMButtonDown=MY.Chat.LinkEventHandler.OnCopyMClick\nthis.OnItemRButtonDown=MY.Chat.LinkEventHandler.OnCopyRClick\nthis.OnItemMouseEnter=MY.Chat.LinkEventHandler.OnCopyMouseEnter\nthis.OnItemMouseLeave=MY.Chat.LinkEventHandler.OnCopyMouseLeave",
 		"timelink"
@@ -812,7 +815,7 @@ _C.OnChatPanelNamelinkLButtonDown = function(...)
 	MY.Chat.LinkEventHandler.OnNameLClick(...)
 end
 
-_C.OnChatPanelAppendItemFromString = function(h, szMsg, szChannel, ...)
+_C.OnChatPanelAppendItemFromString = function(h, szMsg, szChannel, dwTime, ...)
 	local bActived = h:GetRoot():Lookup('CheckBox_Title'):IsCheckBoxChecked()
 	-- deal with fnBefore
 	for szKey, hc in pairs(_C.tHookChat) do
@@ -820,7 +823,7 @@ _C.OnChatPanelAppendItemFromString = function(h, szMsg, szChannel, ...)
 		-- if fnBefore exist and ChatPanel[i] actived or fnOnActive not defined
 		if type(hc.fnBefore) == "function" and (bActived or not hc.fnOnActive) then
 			-- try to execute fnBefore and get return values
-			local result = { pcall(hc.fnBefore, h, szChannel, szMsg) }
+			local result = { pcall(hc.fnBefore, h, szChannel, szMsg, dwTime) }
 			-- when fnBefore execute succeed
 			if result[1] then
 				-- remove execute status flag
@@ -837,7 +840,7 @@ _C.OnChatPanelAppendItemFromString = function(h, szMsg, szChannel, ...)
 	end
 	local nIndex = h:GetItemCount()
 	-- call ori append
-	h:_AppendItemFromString_MY(szMsg, szChannel, ...)
+	h:_AppendItemFromString_MY(szMsg, szChannel, dwTime, ...)
 	-- hook namelink lbutton down
 	for i = h:GetItemCount() - 1, nIndex, -1 do
 		local hItem = h:Lookup(i)
@@ -855,7 +858,7 @@ _C.OnChatPanelAppendItemFromString = function(h, szMsg, szChannel, ...)
 	for szKey, hc in pairs(_C.tHookChat) do
 		-- if fnAfter exist and ChatPanel[i] actived or fnOnActive not defined
 		if type(hc.fnAfter) == "function" and (bActived or not hc.fnOnActive) then
-			local status, err = pcall(hc.fnAfter, h, szChannel, szMsg, unpack(hc.param))
+			local status, err = pcall(hc.fnAfter, h, szChannel, szMsg, dwTime, unpack(hc.param))
 			if not status then
 				MY.Debug({err}, 'HookChatPanel.After#' .. szKey, MY_DEBUG.ERROR)
 			end
