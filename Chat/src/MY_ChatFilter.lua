@@ -33,7 +33,7 @@ for k, _ in pairs(MY_ChatFilter.tApplyDuplicateChannels) do
 	RegisterCustomData("MY_ChatFilter.tApplyDuplicateChannels." .. k)
 end
 
-MY.HookChatPanel("MY_ChatFilter", function(h, szChannel, szMsg)
+MY.HookChatPanel("MY_ChatFilter", function(h, szChannel, szMsg, dwTime)
 	-- 插件消息UUID过滤
 	if MY_ChatFilter.bFilterDuplicateAddonTalk then
 		local me = GetClientPlayer()

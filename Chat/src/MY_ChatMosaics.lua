@@ -32,9 +32,9 @@ MY_ChatMosaics.ResetMosaics = function()
 	_C.bForceUpdate = nil
 	-- hook chat panel
 	if MY_ChatMosaics.bEnabled then
-		MY.HookChatPanel("MY_ChatMosaics", function(h, szChannel, szMsg)
+		MY.HookChatPanel("MY_ChatMosaics", function(h, szChannel, szMsg, dwTime)
 			return szMsg, h:GetItemCount()
-		end, function(h, szChannel, szMsg, i)
+		end, function(h, szChannel, szMsg, dwTime, i)
 			_C.Mosaics(h, i)
 		end)
 	else
