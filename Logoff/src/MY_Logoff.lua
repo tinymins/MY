@@ -5,7 +5,7 @@
 --
 -- 主要功能:
 -- 1.指定条件退队/下线
--- 
+--
 MY_Logoff = {
 	bLogOffCompletely = false,
 	bTargetBloodLessLogOff = true,
@@ -39,19 +39,28 @@ local Count = function(t)
 	end
 	return i
 end
+
+local m_bLogoff
 -- (void)MY_Logoff.LogOff(bCompletely, bUnfight)
 MY_Logoff.LogOffEx = function(bCompletely, bUnfight)
-	if not bUnfight then MY.Player.LogOff(bCompletely) return nil end
-	MY.Sysmsg({_L["Logoff is ready for your casting unfight skill."]})
-	-- 添加呼吸函数等待脱战。
-	MY.BreatheCall("LOG_OFF",function()
-		if not GetClientPlayer().bFightState then
-			MY.Player.LogOff(bCompletely)    -- 已脱战，下线。
-		end
-	end)
+	if m_bLogoff then -- cancel logoff
+		m_bLogoff = nil
+		MY.BreatheCall("LOG_OFF")
+		MY.Sysmsg({_L["Logoff has been cancelled."]})
+	elseif not bUnfight then -- logoff immediately
+		MY.Player.LogOff(bCompletely)
+	else -- logoff when unfight
+		MY.BreatheCall("LOG_OFF",function()
+			if not GetClientPlayer().bFightState then
+				MY.Player.LogOff(bCompletely)
+			end
+		end)
+		m_bLogoff = true
+		MY.Sysmsg({_L["Logoff is ready for your casting unfight skill."]})
+	end
 end
--- 
-MY_Logoff.PrintCurrentCondition = function(nChanel) 
+--
+MY_Logoff.PrintCurrentCondition = function(nChanel)
 	nChanel = nChanel or PLAYER_TALK_CHANNEL.LOCAL_SYS
 	MY.Talk(nChanel, "--------------------------------------------------\n")
 	MY.Talk(nChanel, "[".._L['mingyi plugin'] .. "]" ..
@@ -177,7 +186,7 @@ _MY_Logoff.OnPanelActive = function(wnd)
 	ui:append("WndComboBox", "WndComboBox_PlayerLeave"):children('#WndComboBox_PlayerLeave')
 	  :pos(offset.x+60,offset.y+80):width(290)
 	  :text(_L('%d player(s) selected',Count(MY_Logoff.aPlayerLeaveLogOff)))
-	  :menu(function() 
+	  :menu(function()
 	  	local t = {}
 	  	for dwID, szName in pairs(MY_Logoff.aPlayerLeaveLogOff) do
 	  		if szName and szName~='' then
