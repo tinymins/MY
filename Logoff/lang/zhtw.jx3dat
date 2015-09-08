@@ -24,6 +24,7 @@ data = {
     ['return to game login while leaving fighting.'] = '在下一次脫離戰鬥的一瞬間返回賬戶登錄頁面。',
     
     ['Logoff is ready for your casting unfight skill.'] = '脫戰登出已啓動，請釋放脫戰技能，遊戲將在脫戰瞬間下線。',
+    ['Logoff has been cancelled.'] = '脫戰登出已取消。',
     ["Any condition matches, game will return to "] = '遊戲將在符合以下條件之一時返回到',
     ['login page'] = '賬號登錄界面',
     ['character page'] = '角色選擇界面',
