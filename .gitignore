@@ -25,3 +25,4 @@
 @DATA/userdata/CHAT_LOG/*/*/*.jx3dat
 @DATA/config/STORAGE_VERSION/*.jx3dat
 @DATA/config/MY_FONT/*.jx3dat
+@DATA/config/EXAM_TIP/*.jx3dat

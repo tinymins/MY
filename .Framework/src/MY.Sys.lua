@@ -749,3 +749,29 @@ function MY.ProcessCommand(cmd)
 	end
 end
 end
+
+MY.Sys.DoMessageBox = function(szName, i)
+	local frame = Station.Lookup("Topmost2/MB_" .. szName) or Station.Lookup("Topmost/MB_" .. szName)
+	if frame then
+		i = i or 1
+		local btn = frame:Lookup("Wnd_All/Btn_Option" .. i)
+		if btn and btn:IsEnabled() then
+			if btn.fnAction then
+				if frame.args then
+					btn.fnAction(unpack(frame.args))
+				else
+					btn.fnAction()
+				end
+			elseif frame.fnAction then
+				if frame.args then
+					frame.fnAction(i, unpack(frame.args))
+				else
+					frame.fnAction(i)
+				end
+			end
+			frame.OnFrameDestroy = nil
+			CloseMessageBox(szName)
+		end
+	end
+end
+MY.DoMessageBox = MY.Sys.DoMessageBox

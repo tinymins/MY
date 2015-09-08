@@ -24,28 +24,35 @@ MY_ExamTip.QueryData = function(szQues)
 	
 	_C.tLastQu = szQues
 	MY_ExamTip.ShowResult(szQues, nil, _L["Querying, please wait..."])
-	local _, _, szLang, _ = GetVersion()
-	MY.RemoteRequest(string.format(_C.szQueryUrl, szLang, MY.String.UrlEncode(szQues)), function(szTitle, szContent)
-		local data = MY.Json.Decode(szContent)
-		if not data then
-			return nil
-		end
-		
-		local szTip = ''
-		for _, p in ipairs(data.result) do
-			szTip = szTip .. p.szQues .. '\n' .. p.szAnsw
-		end
-		
-		if #data.result == 0 then
-			szTip = _L["No result found. Here's from open search engine:"].."\n" .. szTip
-		else
-			_C.tAccept[data.question] = data.result[1].szAnsw
-			MY_ExamTip.ShowResult(data.question, data.result[1].szAnsw, szTip)
-		end
-	end, function()
-		MY_ExamTip.ShowResult(_C.tLastQu, nil, _L['Loading failed.'])
-		_C.tLastQu = ""
-	end, 10000)
+	if not _C.tLocalQaS then
+		_C.tLocalQaS = MY.LoadLUAData("config/EXAM_TIP/$lang.jx3dat") or {}
+	end
+	if _C.tLocalQaS[szQues] then
+		MY_ExamTip.ShowResult(szQues, _C.tLocalQaS[szQues], _C.tLocalQaS[szQues])
+	else
+		local _, _, szLang, _ = GetVersion()
+		MY.RemoteRequest(string.format(_C.szQueryUrl, szLang, MY.String.UrlEncode(szQues)), function(szTitle, szContent)
+			local data = MY.Json.Decode(szContent)
+			if not data then
+				return nil
+			end
+			
+			local szTip = ''
+			for _, p in ipairs(data.result) do
+				szTip = szTip .. p.szQues .. '\n' .. p.szAnsw
+			end
+			
+			if #data.result == 0 then
+				szTip = _L["No result found. Here's from open search engine:"].."\n" .. szTip
+			else
+				_C.tAccept[data.question] = data.result[1].szAnsw
+				MY_ExamTip.ShowResult(data.question, data.result[1].szAnsw, szTip)
+			end
+		end, function()
+			MY_ExamTip.ShowResult(_C.tLastQu, nil, _L['Loading failed.'])
+			_C.tLastQu = ""
+		end, 10000)
+	end
 end
 -- 提交玩家正确答案 -- 云数据来源
 MY_ExamTip.SubmitData = function()
@@ -71,6 +78,8 @@ MY_ExamTip.SubmitData = function()
 end
 -- 显示结果
 MY_ExamTip.ShowResult = function(szQues, szAnsw, szTip)
+	local hNext = Station.Lookup("Normal/ExaminationPanel/Btn_Next")
+	local hSbmt = Station.Lookup("Normal/ExaminationPanel/Btn_Submit")
 	local hQues = Station.Lookup("Normal/ExaminationPanel/","Handle_ExamContents"):Lookup(0)
 	local hTxt1 = Station.Lookup("Normal/ExaminationPanel/Wnd_Type1/CheckBox_T1No1",'Text_T1No1')
 	local hChk1 = Station.Lookup("Normal/ExaminationPanel/Wnd_Type1/CheckBox_T1No1")
@@ -101,6 +110,15 @@ MY_ExamTip.ShowResult = function(szQues, szAnsw, szTip)
 	elseif hTxt4:GetText() == szAnsw then
 		hTxt4:SetFontColor(255, 255, 0)
 		hChk4:Check(true)
+	else
+		return
+	end
+	if hNext:IsVisible() then
+		ExecuteWithThis(hNext, "OnLButtonClick")
+	elseif hSbmt:IsVisible() then
+		if ExecuteWithThis(hSbmt, "OnLButtonClick") then
+			MY.DoMessageBox("get_Exam_Submit")
+		end
 	end
 end
 -- 收集结果
