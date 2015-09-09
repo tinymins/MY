@@ -165,9 +165,10 @@ function _C.AppendLog(szChannel, dwDate, szMsg)
 		DateIndex[dwDate] = #DateList
 		_C.tModifiedLog[szChannel]['DateList'] = true
 	end
+	MY.DelayCall("MY_ChatLog",  _C.SaveLog, 30000)
 end
 
-function _C.UnloadLog()
+function _C.SaveLog()
 	for szChannel, tDate in pairs(_C.tModifiedLog) do
 		for dwDate, _ in pairs(tDate) do
 			if not empty(Log[szChannel][dwDate]) then
@@ -175,8 +176,12 @@ function _C.UnloadLog()
 			end
 		end
 	end
-	Log = {}
 	_C.tModifiedLog = {}
+end
+
+function _C.UnloadLog()
+	_C.SaveLog()
+	Log = {}
 end
 MY.RegisterExit(_C.UnloadLog)
 
