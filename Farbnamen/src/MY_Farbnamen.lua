@@ -101,15 +101,8 @@ local InfoCache = (function()
                         bUpdated = true
                     end
                     -- save player info
-                    if bUpdated then
-                        -- update DataBase
-                        if not tInfos[nSegID] then
-                            tInfos[nSegID] = MY.LoadLUAData(SZ_DATA_PATH:format(nSegID)) or {}
-                        end
-                        tInfos[nSegID][k] = v
-                        tInfoVisit[nSegID] = GetTime()
-                        tInfoModified[nSegID] = GetTime()
-                        -- update L1 CACHE
+                    -- update L1 CACHE
+                    if bUpdated or not tCache[k] then
                         if #aCache > 3000 then
                             tremove(aCache, 1)
                         end
@@ -117,16 +110,26 @@ local InfoCache = (function()
                         tCache[k] = v
                         tCache[v.n] = v
                     end
-                    -- save szName to dwID indexing
-                    local nSegID = string.byte(v.n)
-                    if not tName2ID[nSegID] then
-                        tName2ID[nSegID] = MY.LoadLUAData(SZ_N2ID_PATH:format(nSegID)) or {}
+                    -- update DataBase
+                    if bUpdated then
+                        -- save info to DataBase
+                        if not tInfos[nSegID] then
+                            tInfos[nSegID] = MY.LoadLUAData(SZ_DATA_PATH:format(nSegID)) or {}
+                        end
+                        tInfos[nSegID][k] = v
+                        tInfoVisit[nSegID] = GetTime()
+                        tInfoModified[nSegID] = GetTime()
+                        -- save szName to dwID indexing to DataBase
+                        local nSegID = string.byte(v.n)
+                        if not tName2ID[nSegID] then
+                            tName2ID[nSegID] = MY.LoadLUAData(SZ_N2ID_PATH:format(nSegID)) or {}
+                        end
+                        if tName2ID[nSegID][v.n] ~= k then
+                            tName2ID[nSegID][v.n] = k
+                            tName2IDModified[nSegID] = GetTime()
+                        end
+                        tName2IDVisit[nSegID] = GetTime()
                     end
-                    if tName2ID[nSegID][v.n] ~= k then
-                        tName2ID[nSegID][v.n] = k
-                        tName2IDModified[nSegID] = GetTime()
-                    end
-                    tName2IDVisit[nSegID] = GetTime()
                 end
             end
         end,
