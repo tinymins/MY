@@ -103,7 +103,11 @@ local InfoCache = (function()
                     -- save player info
                     if bUpdated then
                         -- update DataBase
+                        if not tInfos[nSegID] then
+                            tInfos[nSegID] = MY.LoadLUAData(SZ_DATA_PATH:format(nSegID)) or {}
+                        end
                         tInfos[nSegID][k] = v
+                        tInfoVisit[nSegID] = GetTime()
                         tInfoModified[nSegID] = GetTime()
                         -- update L1 CACHE
                         if #aCache > 3000 then
