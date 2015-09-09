@@ -3282,7 +3282,7 @@ end
 
 MY.UI.GetTreePath = function(raw)
 	local tTreePath = {}
-	if raw and raw.GetTreePath then
+	if type(raw) == "table" and raw.GetTreePath then
 		table.insert(tTreePath, (raw:GetTreePath()):sub(1, -2))
 		while(raw and raw:GetType():sub(1, 3) ~= 'Wnd') do
 			local szName = raw:GetName()
@@ -3293,6 +3293,8 @@ MY.UI.GetTreePath = function(raw)
 			end
 			raw = raw:GetParent()
 		end
-	 end
+	else
+		table.insert(tTreePath, tostring(raw))
+	end
 	return table.concat(tTreePath, '/')
 end
