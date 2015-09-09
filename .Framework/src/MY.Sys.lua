@@ -401,29 +401,40 @@ MY.BreatheCall = function(szKey, fnAction, nInterval)
 end
 
 -- breathe
+local _tCalls = {} -- avoid error: invalid key to 'next'
 MY.UI.RegisterUIEvent(MY, "OnFrameBreathe", function()
 	local nTime = GetTickCount()
-	-- run breathe calls
+	-- get breathe calls
 	for szKey, bc in pairs(_C.tBreatheCall) do
 		if bc.nNext <= nTime then
 			bc.nNext = nTime + bc.nInterval
-			local res, err = pcall(bc.fnAction)
-			if not res then
-				MY.Debug({err}, "BreatheCall#" .. szKey, MY_DEBUG.ERROR)
-			elseif err == 0 then    -- function return 0 means to stop its breathe
-				_C.tBreatheCall[szKey] = nil
-			end
+			_tCalls[szKey] = bc
+		end
+	end
+	-- run breathe calls
+	for szKey, bc in pairs(_tCalls) do
+		local res, err = pcall(bc.fnAction)
+		if not res then
+			MY.Debug({err}, "BreatheCall#" .. szKey, MY_DEBUG.ERROR)
+		elseif err == 0 then    -- function return 0 means to stop its breathe
+			_C.tBreatheCall[szKey] = nil
+		end
+		_tCalls[szKey] = nil
+	end
+	-- get delay calls
+	for szKey, dc in pairs(_C.tDelayCall) do
+		if dc.nTime <= nTime then
+			_C.tDelayCall[szKey] = nil
+			_tCalls[szKey] = dc
 		end
 	end
 	-- run delay calls
-	for szKey, dc in pairs(_C.tDelayCall) do
-		if dc.nTime <= nTime then
-			_C.tDelayCall[szKey] = nil -- must remove before execute, cause fnAction may reg delaycall again.
-			local res, err = pcall(dc.fnAction)
-			if not res then
-				MY.Debug({err}, "DelayCall#" .. szKey, MY_DEBUG.ERROR)
-			end
+	for szKey, dc in pairs(_tCalls) do
+		local res, err = pcall(dc.fnAction)
+		if not res then
+			MY.Debug({err}, "DelayCall#" .. szKey, MY_DEBUG.ERROR)
 		end
+		_tCalls[szKey] = nil
 	end
 end)
 
