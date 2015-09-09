@@ -1,17 +1,17 @@
--- ##########################################################################
---       #       #                   #                     #                 
---       #         #           # # # # # # # # #         # # # # # # #       
---     #   # # # # # # # #     #               #       #   #       #         
---     #                       # # # # # # # # #             # # #           
---   # #     # # # # # #       #               #         # #       # #       
---     #                       # # # # # # # # #     # #       #       # #   
---     #     # # # # # #       #               #               #             
---     #                       # # # # # # # # #       # # # # # # # # #     
---     #     # # # # # #               #                       #             
---     #     #         #       #   #     #     #         #     #     #       
---     #     # # # # # #       #   #         #   #     #       #       #     
---     #     #         #     #       # # # # #   #   #       # #         #   
--- ##########################################################################
+-- ########################################################################## --
+--       #       #                   #                     #                  --
+--       #         #           # # # # # # # # #         # # # # # # #        --
+--     #   # # # # # # # #     #               #       #   #       #          --
+--     #                       # # # # # # # # #             # # #            --
+--   # #     # # # # # #       #               #         # #       # #        --
+--     #                       # # # # # # # # #     # #       #       # #    --
+--     #     # # # # # #       #               #               #              --
+--     #                       # # # # # # # # #       # # # # # # # # #      --
+--     #     # # # # # #               #                       #              --
+--     #     #         #       #   #     #     #         #     #     #        --
+--     #     # # # # # #       #   #         #   #     #       #       #      --
+--     #     #         #     #       # # # # #   #   #       # #         #    --
+-- ########################################################################## --
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _Cache = {
     bFighting = false,
@@ -21,37 +21,37 @@ local _Cache = {
 local _C = {}
 MY_InfoTip = {}
 MY_InfoTip.Config = {
-    Ping = { -- 网络延迟
-        bEnable = false, bShowBg = true, bShowTitle = true,
-        anchor  = { x=-10, y=-280, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    Ping        = { -- 网络延迟
+    	bEnable = false, bShowBg = false, bShowTitle = false, rgb = { 95, 255, 95 },
+    	anchor = { x = -180, y = -210, s = "BOTTOMCENTER", r = "BOTTOMCENTER" }, nFont = 48,
     },
     TimeMachine = { -- 倍速显示（显示服务器有多卡……）
-        bEnable = false, bShowBg = true, bShowTitle = true,
-        anchor  = { x=-10, y=-250, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+        bEnable = false, bShowBg = false, bShowTitle = true, rgb = { 31, 255, 31 },
+        anchor  = { x = -272, y = -211, s = "BOTTOMCENTER", r = "BOTTOMCENTER" },
     },
-    FPS       = { -- FPS
+    FPS         = { -- FPS
         bEnable = false, bShowBg = true, bShowTitle = true,
-        anchor  = { x=-10, y=-220, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    	anchor  = { x = -10, y = -220, s = "BOTTOMRIGHT", r = "BOTTOMRIGHT" },
     },
-    Distance  = { -- 目标距离
+    Distance    = { -- 目标距离
+        bEnable = true, bShowBg = false, bShowTitle = false, rgb = { 255, 255, 0 },
+        anchor  = { x = 203, y = -106, s = "CENTER", r = "CENTER" }, nFont = 209,
+    },
+    SysTime     = { -- 系统时间
         bEnable = false, bShowBg = true, bShowTitle = true,
-        anchor  = { x=-10, y=-190, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    	anchor  = { x = -289, y = -12, s = "BOTTOMRIGHT", r = "BOTTOMRIGHT" },
     },
-    SysTime   = { -- 系统时间
+    FightTime   = { -- 战斗计时
+        bEnable = true, bShowBg = false, bShowTitle = false, rgb = { 255, 0, 128 },
+        anchor  = { x = 295, y = -214, s = "BOTTOMCENTER", r = "BOTTOMCENTER" }, nFont = 199,
+    },
+    LotusTime   = { -- 桂花和藕倒计时
         bEnable = false, bShowBg = true, bShowTitle = true,
-        anchor  = { x=-10, y=-160, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    	anchor  = { x = -290, y = -38, s = "BOTTOMRIGHT", r = "BOTTOMRIGHT" },
     },
-    FightTime = { -- 战斗计时
-        bEnable = false, bShowBg = true, bShowTitle = true,
-        anchor  = { x=-10, y=-130, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
-    },
-    LotusTime = { -- 莲花和藕倒计时
-        bEnable = false, bShowBg = true, bShowTitle = true,
-        anchor  = { x=-10, y=-100, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
-    },
-    GPS = { -- 角色坐标
-        bEnable = false, bShowBg = true, bShowTitle = false,
-        anchor  = { x=-10, y=-70, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    GPS         = { -- 角色坐标
+        bEnable = true, bShowBg = true, bShowTitle = false, rgb = { 255, 255, 255 },
+        anchor  = { x = -21, y = -243, s = "RIGHTCENTER", r = "RIGHTCENTER" }, nFont = 0,
     },
 }
 _C.tTm = {}
