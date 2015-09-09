@@ -77,8 +77,35 @@ local InfoCache = (function()
                     tCrossServerInfos[k] = v
                     tCrossServerInfos[v.n] = v
                 else
-                    -- add to L1 CACHE
-                    if not tCache[k] then
+                    local bUpdated
+                    -- read from L1 CACHE
+                    local tInfo = tCache[k]
+                    local nSegID = string.char(string.byte(k, 1, 3))
+                     -- read from DataBase if L1 CACHE not hit
+                    if not tInfo then
+                        if not tInfos[nSegID] then
+                            tInfos[nSegID] = MY.LoadLUAData(SZ_DATA_PATH:format(nSegID)) or {}
+                        end
+                        tInfo = tInfos[nSegID][k]
+                        tInfoVisit[nSegID] = GetTime()
+                    end
+                    -- judge if info has been updated and need to be saved
+                    if tInfo then
+                        for _, kk in ipairs({"i", "f", "n", "r", "l", "t", "c", "g"}) do
+                            if v[kk] ~= tInfo[kk] then
+                                bUpdated = true
+                                break
+                            end
+                        end
+                    else
+                        bUpdated = true
+                    end
+                    -- save player info
+                    if bUpdated then
+                        -- update DataBase
+                        tInfos[nSegID][k] = v
+                        tInfoModified[nSegID] = GetTime()
+                        -- update L1 CACHE
                         if #aCache > 3000 then
                             tremove(aCache, 1)
                         end
@@ -86,25 +113,6 @@ local InfoCache = (function()
                         tCache[k] = v
                         tCache[v.n] = v
                     end
-                    -- save player info
-                    local nSegID = string.char(string.byte(k, 1, 3))
-                    if not tInfos[nSegID] then
-                        tInfos[nSegID] = MY.LoadLUAData(SZ_DATA_PATH:format(nSegID)) or {}
-                    end
-                    local tInfo = tInfos[nSegID][k]
-                    if tInfo then
-                        for _, kk in ipairs({"i", "f", "n", "r", "l", "t", "c", "g"}) do
-                            if v[kk] ~= tInfo[kk] then
-                                tInfos[nSegID][k] = v
-                                tInfoModified[nSegID] = GetTime()
-                                break
-                            end
-                        end
-                    else
-                        tInfos[nSegID][k] = v
-                        tInfoModified[nSegID] = GetTime()
-                    end
-                    tInfoVisit[nSegID] = GetTime()
                     -- save szName to dwID indexing
                     local nSegID = string.byte(v.n)
                     if not tName2ID[nSegID] then
