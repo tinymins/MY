@@ -93,8 +93,8 @@ local InfoCache = (function()
                     end
                     local tInfo = tInfos[nSegID][k]
                     if tInfo then
-                        for _, k in ipairs({"i", "f", "n", "r", "l", "t", "c", "g"}) do
-                            if v[k] ~= tInfo[k] then
+                        for _, kk in ipairs({"i", "f", "n", "r", "l", "t", "c", "g"}) do
+                            if v[kk] ~= tInfo[kk] then
                                 tInfos[nSegID][k] = v
                                 tInfoModified[nSegID] = GetTime()
                                 break
@@ -366,7 +366,7 @@ end
 -- 保存指定dwID的玩家
 function MY_Farbnamen.AddAusID(dwID)
     local player = GetPlayer(dwID)
-    if player and player.szName and player.szName~='' then
+    if player and player.szName and player.szName ~= '' then
         InfoCache[player.dwID] = {
             i = player.dwID,
             f = player.dwForceID,
