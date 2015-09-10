@@ -400,13 +400,13 @@ end
 MY.GetTargetContextMenu = MY.Game.GetTargetContextMenu
 
 -- 判断一个地图是不是副本
--- (bool) MY.Game.IsDungeonMap(szMapName)
--- (bool) MY.Game.IsDungeonMap(dwMapID)
-MY.Game.IsDungeonMap = function(szMapNameOrdwID)
+-- (bool) MY.Game.IsDungeonMap(szMapName, bType)
+-- (bool) MY.Game.IsDungeonMap(dwMapID, bType)
+MY.Game.IsDungeonMap = function(dwMapID, bType)
 	if not _Cache.tMapList then
 		_Cache.tMapList = {}
 		for _, dwMapID in ipairs(GetMapList()) do
-			local map          = { dwID = dwMapID }
+			local map          = { dwMapID = dwMapID }
 			local szName       = Table_GetMapName(dwMapID)
 			local tDungeonInfo = g_tTable.DungeonInfo:Search(dwMapID)
 			if tDungeonInfo and tDungeonInfo.dwClassID == 3 then
@@ -416,12 +416,15 @@ MY.Game.IsDungeonMap = function(szMapNameOrdwID)
 			_Cache.tMapList[dwMapID] = map
 		end
 	end
-	
-	local map = _Cache.tMapList[szMapNameOrdwID]
-	if map and map.bDungeon then
-		return true
+	local map = _Cache.tMapList[dwMapID]
+	if map then
+		dwMapID = map.dwMapID
 	end
-	return false
+	if bType then -- 只判断地图的类型 而不是严格判断25人本
+		return select(2, GetMapParams(dwMapID)) == MAP_TYPE.DUNGEON
+	else
+		return map and map.bDungeon
+	end
 end
 MY.IsDungeonMap = MY.Game.IsDungeonMap
 
