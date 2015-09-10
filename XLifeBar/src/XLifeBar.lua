@@ -171,7 +171,7 @@ _C.IsEnabled = function()
             XLifeBar.bOnlyInArena or
             XLifeBar.bOnlyInBattleField
         ) or (
-            (XLifeBar.bOnlyInDungeon     and MY.IsInDungeon()     ) or
+            (XLifeBar.bOnlyInDungeon     and MY.IsInDungeon(true) ) or
             (XLifeBar.bOnlyInArena       and MY.IsInArena()       ) or
             (XLifeBar.bOnlyInBattleField and MY.IsInBattleField() )
         )

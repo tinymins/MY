@@ -862,9 +862,9 @@ end
 MY.IsInBattleField = MY.Player.IsInBattleField
 
 -- 判断当前地图是不是副本
--- (bool) MY.Player.IsInDungeon()
-MY.Player.IsInDungeon = function()
+-- (bool) MY.Player.IsInDungeon(bool bType)
+MY.Player.IsInDungeon = function(bType)
 	local me = GetClientPlayer()
-	return me and MY.Game.IsDungeonMap(me.GetMapID())
+	return me and MY.IsDungeonMap(me.GetMapID(), bType)
 end
 MY.IsInDungeon = MY.Player.IsInDungeon
