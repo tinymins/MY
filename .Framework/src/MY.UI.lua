@@ -3,8 +3,8 @@
 -- @Author: µÔÒ»Ãù @tinymins
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
--- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-08-19 10:33:59
+-- @Last Modified by:   Webster
+-- @Last Modified time: 2015-09-14 18:55:48
 -----------------------------------------------
 MY = MY or {}
 local _MY = {
@@ -787,7 +787,7 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 							if edt:GetText() == "" then
 								wnd:Lookup("", "Text_PlaceHolder"):Show()
 							end
-							
+
 							MY.DelayCall(function()
 								if not Station.GetFocusWindow() or Station.GetFocusWindow():GetName() ~= 'PopupMenuPanel' then
 									Wnd.CloseWindow("PopupMenuPanel")
@@ -802,7 +802,7 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 								or szKey == "Down"
 								or szKey == "Left"
 								or szKey == "Right" then
-									return PopupMenu_ProcessHotkey()
+									return PopupMenu_ProcessHotkey(szKey)
 								end
 							elseif szKey == "Esc" or (
 								szKey == "Enter" and not edt:IsMultiLine()
@@ -816,7 +816,7 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 							beforePopup  = nil  , -- @param: menu, wnd, option
 							beforeDelete = nil  , -- @param: szOption, fnDoDelete, option
 							afterDelete  = nil  , -- @param: szOption, option
-							
+
 							ignoreCase   = true ,  -- ignore case while matching
 							anyMatch     = true ,  -- match any part of option list
 							autoFill     = false,  -- auto fill edit with first match (conflict withanyMatch)
@@ -1241,7 +1241,7 @@ function XGUI:autocomplete(method, arg1, arg2)
 							table.insert(tOption, src)
 						end
 					end
-					
+
 					-- create menu
 					local menu = {}
 					for _, szOption in ipairs(tOption) do
@@ -1295,7 +1295,7 @@ function XGUI:autocomplete(method, arg1, arg2)
 					menu.x, menu.y = nX, nY + nH
 					menu.bDisableSound = true
 					menu.bShowKillFocus = true
-					
+
 					if type(option.beforePopup) == 'function' then
 						option.beforePopup(menu, ele.raw, option)
 					end
@@ -2464,7 +2464,7 @@ function XGUI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 				end
 			end
 			if type(fnMClick)=="function" then
-				
+
 			end
 			if type(fnRClick)=="function" then
 				local fnAction = function() fnRClick(MY.Const.Event.Mouse.RBUTTON, ele.raw) end
@@ -2491,7 +2491,7 @@ function XGUI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 				if ele.itm then local _this = this this = ele.itm pcall(ele.itm.OnItemLButtonClick) this = _this end
 			end
 		elseif nFlag==MY.Const.Event.Mouse.MBUTTON then
-			
+
 		elseif nFlag==MY.Const.Event.Mouse.RBUTTON then
 			for _, ele in pairs(self.eles) do
 				if ele.wnd then local _this = this this = ele.wnd pcall(ele.wnd.OnRButtonClick) this = _this end
@@ -2764,7 +2764,7 @@ MY.UI.CreateFrame = function(szName, opt)
 	elseif opt.empty then
 		szIniFile = MY.GetAddonInfo().szFrameworkRoot .. "ui\\WndFrameEmpty.ini"
 	end
-	
+
 	-- close and reopen exist frame
 	local frm = Station.Lookup(opt.level .. '/' .. szName)
 	if frm then
@@ -3025,7 +3025,7 @@ MY.UI.OpenColorPicker = function(callback, t)
 			end
 		end
 	end
-	
+
 	for i = 1, 16 do
 		local x = 480 + (i - 1) * 25
 		local y = 435
@@ -3089,7 +3089,7 @@ MY.UI.OpenFontPicker = function(callback, t)
 	local w, h = 820, 640
 	local ui = MY.UI.CreateFrame("_MY_Color_Picker", { simple = true, close = true, esc = true })
 	  :size(w, h):text(_L["color picker"]):anchor({s='CENTER', r='CENTER', x=0, y=0})
-	
+
 	for i = 0, 255 do
 		local txt = ui:append("Text", "Text_"..i, {
 			w = 70, x = i % 10 * 80 + 20, y = math.floor(i / 10) * 25,
