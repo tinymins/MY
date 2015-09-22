@@ -40,6 +40,8 @@ local function ApplyUIArgument(ui, tArg)
 		if tArg.image             then if type(tArg.image) == 'table' then ui:image (unpack(tArg.image)) else ui:image(tArg.image) end end
 		if tArg.onscroll          then ui:scroll     (tArg.onscroll   ) end
 		if tArg.onhover           then ui:hover      (tArg.onhover    ) end
+		if tArg.onfocus           then ui:focus      (tArg.onfocus    ) end
+		if tArg.onblur            then ui:blur       (tArg.onblur     ) end
 		if tArg.onclick           then ui:click      (tArg.onclick    ) end
 		if tArg.onlclick          then ui:lclick     (tArg.onlclick   ) end
 		if tArg.onrclick          then ui:rclick     (tArg.onrclick   ) end
@@ -2659,16 +2661,14 @@ function XGUI:change(fnOnChange)
 end
 
 -- focus （输入框）获得焦点 -- 好像只有输入框能获得焦点
--- :focus(fnOnSetFocus, fnOnKillFocus) 绑定
+-- :focus(fnOnSetFocus) 绑定
 -- :focus()   使获得焦点
-function XGUI:focus(fnOnSetFocus, fnOnKillFocus)
+function XGUI:focus(fnOnSetFocus)
 	self:_checksum()
 	if fnOnSetFocus then
-		fnOnKillFocus = fnOnKillFocus or fnOnSetFocus
 		for _, ele in pairs(self.eles) do
 			if ele.edt then
-				MY.UI.RegisterUIEvent(ele.edt, 'OnSetFocus' , function() pcall(fnOnSetFocus , ele.raw, true ) end)
-				MY.UI.RegisterUIEvent(ele.edt, 'OnKillFocus', function() pcall(fnOnKillFocus, ele.raw, false) end)
+				MY.UI.RegisterUIEvent(ele.edt, 'OnSetFocus', function() pcall(fnOnSetFocus, ele.raw) end)
 			end
 		end
 		return self
@@ -2676,6 +2676,29 @@ function XGUI:focus(fnOnSetFocus, fnOnKillFocus)
 		for _, ele in pairs(self.eles) do
 			if ele.edt then
 				Station.SetFocusWindow(ele.edt)
+				break
+			end
+		end
+		return self
+	end
+end
+
+-- blur （输入框）失去焦点
+-- :blur(fnOnKillFocus) 绑定
+-- :blur()   使获得焦点
+function XGUI:blur(fnOnKillFocus)
+	self:_checksum()
+	if fnOnKillFocus then
+		for _, ele in pairs(self.eles) do
+			if ele.edt then
+				MY.UI.RegisterUIEvent(ele.edt, 'OnKillFocus', function() pcall(fnOnKillFocus, ele.raw) end)
+			end
+		end
+		return self
+	else
+		for _, ele in pairs(self.eles) do
+			if ele.edt then
+				Station.SetFocusWindow()
 				break
 			end
 		end

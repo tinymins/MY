@@ -229,16 +229,14 @@ _C.OnPanelActive = function(wnd)
     ui:append("WndAutocomplete", "WndAutocomplete_KeyWord"):children('#WndAutocomplete_KeyWord')
       :pos(80,15):size(w-226,25):text(MY_ChatMonitor.szKeyWords)
       :change(function(szText) MY_ChatMonitor.szKeyWords = szText end)
-      :focus(function(raw, bFocus)
-        if bFocus then
-            local source = {}
-            for _, szOpt in ipairs(MY.LoadLUAData(_C.szLuaData) or {}) do
-                if type(szOpt) == "string" then
-                    table.insert(source, szOpt)
-                end
+      :focus(function(raw)
+        local source = {}
+        for _, szOpt in ipairs(MY.LoadLUAData(_C.szLuaData) or {}) do
+            if type(szOpt) == "string" then
+                table.insert(source, szOpt)
             end
-            MY.UI(raw):autocomplete('option', 'source', source)
         end
+        MY.UI(raw):autocomplete('option', 'source', source)
       end)
       :click(function(nButton, raw)
         if IsPopupMenuOpened() then
