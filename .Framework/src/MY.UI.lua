@@ -2668,7 +2668,7 @@ function XGUI:focus(fnOnSetFocus)
 	if fnOnSetFocus then
 		for _, ele in pairs(self.eles) do
 			if ele.edt then
-				MY.UI.RegisterUIEvent(ele.edt, 'OnSetFocus', function() pcall(fnOnSetFocus, ele.raw) end)
+				MY.UI.RegisterUIEvent(ele.edt, 'OnSetFocus', function() pcall(fnOnSetFocus, self) end)
 			end
 		end
 		return self
@@ -2691,7 +2691,7 @@ function XGUI:blur(fnOnKillFocus)
 	if fnOnKillFocus then
 		for _, ele in pairs(self.eles) do
 			if ele.edt then
-				MY.UI.RegisterUIEvent(ele.edt, 'OnKillFocus', function() pcall(fnOnKillFocus, ele.raw) end)
+				MY.UI.RegisterUIEvent(ele.edt, 'OnKillFocus', function() pcall(fnOnKillFocus, self) end)
 			end
 		end
 		return self
