@@ -1127,8 +1127,18 @@ function XGUI:text(szText)
 			elseif ele.type == "WndSliderBox" and type(szText)=="function" then
 				ele.sld.FormatText = szText
 			elseif ele.type == "WndEditBox" or ele.type == "WndAutocomplete" then
-				ele.edt:SetText(szText)
-				if szText == "" then
+				if type(szText) == "table" then
+					for k, v in ipairs(szText) do
+						if v.type == "text" then
+							ele.edt:InsertText(v.text)
+						else
+							ele.edt:InsertObj(v.text, v)
+						end
+					end
+				else
+					ele.edt:SetText(szText)
+				end
+				if ele.edt:GetText() == "" then
 					ele.phd:Show()
 				else
 					ele.phd:Hide()
