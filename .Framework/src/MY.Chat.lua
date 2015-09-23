@@ -586,6 +586,16 @@ MY.Chat.ParseFaceIcon = function(t)
 end
 -- parse name in talking message
 MY.Chat.ParseName = function(t)
+	local me = GetClientPlayer()
+	local tar = MY.GetObject(me.GetTarget())
+	for i, v in ipairs(t) do
+		if v.type == "text" then
+			v.text = string.gsub(v.text, "%$zj", '[' .. me.szName .. ']')
+			if tar then
+				v.text = string.gsub(v.text, "%$mb", '[' .. tar.szName .. ']')
+			end
+		end
+	end
 	local t2 = {}
 	for _, v in ipairs(t) do
 		if v.type ~= "text" then
@@ -692,11 +702,6 @@ MY.Chat.Talk = function(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToC
 	if type(szText) == "table" then
 		tSay = szText
 	else
-		local tar = MY.GetObject(me.GetTarget())
-		szText = string.gsub(szText, "%$zj", '['..me.szName..']')
-		if tar then
-			szText = string.gsub(szText, "%$mb", '['..tar.szName..']')
-		end
 		tSay = {{ type = "text", text = szText}}
 	end
 	if not bNoEscape then
