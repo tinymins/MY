@@ -28,7 +28,11 @@ MY_ExamTip.QueryData = function(szQues)
 		_C.tLocalQaS = MY.LoadLUAData("config/EXAM_TIP/$lang.jx3dat") or {}
 	end
 	if _C.tLocalQaS[szQues] then
-		MY_ExamTip.ShowResult(szQues, _C.tLocalQaS[szQues], _C.tLocalQaS[szQues])
+		for _, szAnsw in ipairs(_C.tLocalQaS[szQues]) do
+			if MY_ExamTip.ShowResult(szQues, szAnsw, szAnsw) then
+				break
+			end
+		end
 	else
 		local _, _, szLang, _ = GetVersion()
 		MY.RemoteRequest(string.format(_C.szQueryUrl, szLang, MY.String.UrlEncode(szQues)), function(szTitle, szContent)
@@ -45,8 +49,12 @@ MY_ExamTip.QueryData = function(szQues)
 			if #data.result == 0 then
 				szTip = _L["No result found. Here's from open search engine:"].."\n" .. szTip
 			else
-				_C.tAccept[data.question] = data.result[1].szAnsw
-				MY_ExamTip.ShowResult(data.question, data.result[1].szAnsw, szTip)
+				for _, p in ipairs(data.result) do
+					if MY_ExamTip.ShowResult(data.question, p.szAnsw, szTip) then
+						_C.tAccept[data.question] = p.szAnsw
+						break
+					end
+				end
 			end
 		end, function()
 			MY_ExamTip.ShowResult(_C.tLastQu, nil, _L['Loading failed.'])
@@ -111,7 +119,7 @@ MY_ExamTip.ShowResult = function(szQues, szAnsw, szTip)
 		hTxt4:SetFontColor(255, 255, 0)
 		hChk4:Check(true)
 	else
-		return
+		return false
 	end
 	if hNext:IsVisible() then
 		ExecuteWithThis(hNext, "OnLButtonClick")
@@ -120,6 +128,7 @@ MY_ExamTip.ShowResult = function(szQues, szAnsw, szTip)
 			MY.DoMessageBox("get_Exam_Submit")
 		end
 	end
+	return true
 end
 -- 收集结果
 MY_ExamTip.CollectResult = function()
