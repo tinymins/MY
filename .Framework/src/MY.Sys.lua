@@ -59,9 +59,17 @@ MY.Sys.GetLUADataPath = function(szFileUri)
 	if string.find(szFileUri, "%$uid") then
 		szFileUri = szFileUri:gsub("%$uid", MY.Player.GetUUID())
 	end
+	-- if exist $name then add user role identity
+	if string.find(szFileUri, "%$name") then
+		szFileUri = szFileUri:gsub("%$name", MY.GetClientInfo().szName or MY.Player.GetUUID())
+	end
 	-- if exist $lang then add language identity
 	if string.find(szFileUri, "%$lang") then
 		szFileUri = szFileUri:gsub("%$lang", string.lower(MY.Sys.GetLang()))
+	end
+	-- if exist $date then add date identity
+	if string.find(szFileUri, "%$date") then
+		szFileUri = szFileUri:gsub("%$date", MY.FormatTime("yyyyMMdd", GetCurrentTime()))
 	end
 	-- if exist $server then add server identity
 	if string.find(szFileUri, "%$server") then
