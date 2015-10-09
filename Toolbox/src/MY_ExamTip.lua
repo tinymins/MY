@@ -121,13 +121,6 @@ MY_ExamTip.ShowResult = function(szQues, szAnsw, szTip)
 	else
 		return false
 	end
-	if hNext:IsVisible() then
-		ExecuteWithThis(hNext, "OnLButtonClick")
-	elseif hSbmt:IsVisible() then
-		if ExecuteWithThis(hSbmt, "OnLButtonClick") then
-			MY.DoMessageBox("get_Exam_Submit")
-		end
-	end
 	return true
 end
 -- 收集结果
