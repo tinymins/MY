@@ -170,18 +170,8 @@ _C.OnFrameBreathe = function()
 	MY_ExamTip.CollectResult(szQues)
 	_C.nExamPrintRemainSpace = GetClientPlayer().GetExamPrintRemainSpace()
 end
--- ×¢²áINITÊÂ¼þ
-MY.RegisterInit('MY_EXAMTIP', function()
-	MY.BreatheCall(_C.OnFrameBreathe)
-	MY.RegisterEvent("LOOT_ITEM.MY_EXAMTIP",function()
-		local item = GetItem(arg1)
-		if item and item.nUiId == 65814 then
-			local nExamPrintRemainSpace = _C.nExamPrintRemainSpace
-			MY.DelayCall(function()
-				if nExamPrintRemainSpace - GetClientPlayer().GetExamPrintRemainSpace() == 100  then
-					MY_ExamTip.SubmitData()
-				end
-			end, 2000)
-		end
-	end)
+MY.RegisterEvent('ON_FRAME_CREATE.EXAM_TIP', function()
+	if arg0:GetName() == "ExaminationPanel" then
+		arg0.OnFrameBreathe = _C.OnFrameBreathe
+	end
 end)
