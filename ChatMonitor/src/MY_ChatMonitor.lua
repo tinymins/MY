@@ -29,6 +29,7 @@ MY_ChatMonitor.bPlaySound          = true
 MY_ChatMonitor.bRedirectSysChannel = false
 MY_ChatMonitor.bCapture            = false
 MY_ChatMonitor.bIgnoreSame         = true
+MY_ChatMonitor.szTimestrap         = "[hh:mm:ss]"
 MY_ChatMonitor.tChannels           = { ["MSG_NORMAL"] = true, ["MSG_CAMP"] = true, ["MSG_WORLD"] = true, ["MSG_MAP"] = true, ["MSG_SCHOOL"] = true, ["MSG_GUILD"] = true, ["MSG_FRIEND"] = true }
 MY_ChatMonitor.anchor              = { x = -100, y = -150, s = "BOTTOMRIGHT", r = "BOTTOMRIGHT" }
 MY_ChatMonitor.tRecords            = {}
@@ -42,6 +43,7 @@ RegisterCustomData('MY_ChatMonitor.bPlaySound')
 RegisterCustomData('MY_ChatMonitor.bRedirectSysChannel')
 RegisterCustomData('MY_ChatMonitor.anchor')
 RegisterCustomData('MY_ChatMonitor.bIgnoreSame')
+RegisterCustomData('MY_ChatMonitor.szTimestrap')
 RegisterCustomData('MY_ChatMonitor.tRecords')
 _C.bInited = false
 _C.ui = nil
@@ -154,7 +156,7 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
     --------------------------------------------------------------------------------------
     -- 如果符合要求
     -- 开始渲染一条记录的UIXML字符串
-    rec.html = MY.Chat.GetTimeLinkText({r=r, g=g, b=b, f=nFont}) .. rec.html
+    rec.html = MY.Chat.GetTimeLinkText({r=r, g=g, b=b, f=nFont, s=MY_ChatMonitor.szTimestrap}) .. rec.html
     -- render link event
     rec.html = MY.Chat.RenderLink(rec.html)
     -- render player name color
@@ -330,6 +332,30 @@ _C.OnPanelActive = function(wnd)
                 table.insert(t, _t)
             end
             table.insert(t, { bDevide = true })
+            table.insert(t,{
+                szOption = _L['timestrap format'], {
+                    szOption = "[hh:mm:ss]",
+                    fnAction = function()
+                        MY_ChatMonitor.szTimestrap = "[hh:mm:ss]"
+                    end,
+                    bCheck = true, bMCheck = true,
+                    bChecked = MY_ChatMonitor.szTimestrap == "[hh:mm:ss]"
+                }, {
+                    szOption = "[MM/dd hh:mm:ss]",
+                    fnAction = function()
+                        MY_ChatMonitor.szTimestrap = "[MM/dd hh:mm:ss]"
+                    end,
+                    bCheck = true, bMCheck = true,
+                    bChecked = MY_ChatMonitor.szTimestrap == "[MM/dd hh:mm:ss]"
+                }, {
+                    szOption = _L['custom'],
+                    fnAction = function()
+                        GetUserInput(_L["custom timestrap (eg:[yyyy/MM/dd_hh:mm:ss])"], function(szText)
+        					MY_ChatMonitor.szTimestrap = szText
+        				end, nil, nil, nil, MY_ChatMonitor.szTimestrap)
+                    end,
+                },
+            })
             table.insert(t,{
                 szOption = _L['show message preview box'],
                 fnAction = function()
