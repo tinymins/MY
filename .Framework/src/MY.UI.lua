@@ -2400,12 +2400,12 @@ function XGUI:menu(lmenu, rmenu, bNoAutoBind)
 	end
 	-- pop menu function
 	local fnPopMenu = function(raw, menu)
-		raw = raw:Lookup("", "") or raw
+		local h = raw:Lookup("", "") or raw
 		local _menu = nil
-		local nX, nY = raw:GetAbsPos()
-		local nW, nH = raw:GetSize()
+		local nX, nY = h:GetAbsPos()
+		local nW, nH = h:GetSize()
 		if type(menu) == "function" then
-			_menu = menu()
+			_menu = menu(raw)
 		else
 			_menu = menu
 		end
