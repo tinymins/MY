@@ -820,7 +820,7 @@ _C.OnChatPanelNamelinkLButtonDown = function(...)
 	MY.Chat.LinkEventHandler.OnNameLClick(...)
 end
 
-_C.OnChatPanelAppendItemFromString = function(h, szMsg, szChannel, dwTime, ...)
+_C.OnChatPanelAppendItemFromString = function(h, szMsg, szChannel, dwTime, nR, nG, nB, ...)
 	local bActived = h:GetRoot():Lookup('CheckBox_Title'):IsCheckBoxChecked()
 	-- deal with fnBefore
 	for szKey, hc in pairs(_C.tHookChat) do
@@ -828,7 +828,7 @@ _C.OnChatPanelAppendItemFromString = function(h, szMsg, szChannel, dwTime, ...)
 		-- if fnBefore exist and ChatPanel[i] actived or fnOnActive not defined
 		if type(hc.fnBefore) == "function" and (bActived or not hc.fnOnActive) then
 			-- try to execute fnBefore and get return values
-			local result = { pcall(hc.fnBefore, h, szChannel, szMsg, dwTime) }
+			local result = { pcall(hc.fnBefore, h, szChannel, szMsg, dwTime, nR, nG, nB, ...) }
 			-- when fnBefore execute succeed
 			if result[1] then
 				-- remove execute status flag
@@ -845,7 +845,7 @@ _C.OnChatPanelAppendItemFromString = function(h, szMsg, szChannel, dwTime, ...)
 	end
 	local nIndex = h:GetItemCount()
 	-- call ori append
-	h:_AppendItemFromString_MY(szMsg, szChannel, dwTime, ...)
+	h:_AppendItemFromString_MY(szMsg, szChannel, dwTime, nR, nG, nB, ...)
 	-- hook namelink lbutton down
 	for i = h:GetItemCount() - 1, nIndex, -1 do
 		local hItem = h:Lookup(i)
@@ -863,7 +863,7 @@ _C.OnChatPanelAppendItemFromString = function(h, szMsg, szChannel, dwTime, ...)
 	for szKey, hc in pairs(_C.tHookChat) do
 		-- if fnAfter exist and ChatPanel[i] actived or fnOnActive not defined
 		if type(hc.fnAfter) == "function" and (bActived or not hc.fnOnActive) then
-			local status, err = pcall(hc.fnAfter, h, szChannel, szMsg, dwTime, unpack(hc.param))
+			local status, err = pcall(hc.fnAfter, h, hc.param, szChannel, szMsg, dwTime, nR, nG, nB, ...)
 			if not status then
 				MY.Debug({err}, 'HookChatPanel.After#' .. szKey, MY_DEBUG.ERROR)
 			end
