@@ -34,8 +34,8 @@ MY_ChatMosaics.ResetMosaics = function()
 	if MY_ChatMosaics.bEnabled then
 		MY.HookChatPanel("MY_ChatMosaics", function(h, szChannel, szMsg, dwTime)
 			return szMsg, h:GetItemCount()
-		end, function(h, szChannel, szMsg, dwTime, i)
-			_C.Mosaics(h, i)
+		end, function(h, aParam, szChannel, szMsg, dwTime)
+			_C.Mosaics(h, aParam[1])
 		end)
 	else
 		MY.HookChatPanel("MY_ChatMosaics")

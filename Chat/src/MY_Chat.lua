@@ -453,68 +453,43 @@ MY.RegisterEvent("MY_PRIVATE_STORAGE_UPDATE", function()
 end)
 
 -- hook chat panel
-MY.HookChatPanel("MY_Chat", function(h, szChannel, szMsg, dwTime)
+MY.HookChatPanel("MY_Chat", function(h, szChannel, szMsg, dwTime, nR, nG, nB)
 	-- chat filter
 	if MY_Chat.bBlockWords then
-		-- local t = MY.Chat.FormatContent(szMsg)
-		-- local szText = ""
-		-- for k, v in ipairs(t) do
-		-- 	if v.type == "text" then
-		-- 		szText = szText .. v.text
-		-- 	end
-		-- end
 		local szText = GetPureText(szMsg)
-		for _,szWord in ipairs(MY_Chat.tBlockWords) do
+		for _, szWord in ipairs(MY_Chat.tBlockWords) do
 			if MY.String.SimpleMatch(szText, szWord) then
 				return ""
 			end
 		end
 	end
-	-- save animiate group into name
-	if MY_Chat.bChatTime or MY_Chat.bChatCopy then
-		szMsg = string.gsub(szMsg, "group=(%d+) </a", "group=%1 name=\"%1\" </a")
-	end
-	
 	return szMsg, h:GetItemCount()
-end, function(h, szChannel, szMsg, dwTime, i)
+end, function(h, aParam, szChannel, szMsg, dwTime, nR, nG, nB)
+	local i = aParam[1]
 	if szMsg and #(GetPureText(szMsg)) > 0 and (MY_Chat.bChatTime or MY_Chat.bChatCopy) and i then
 		-- chat time
-		-- get msg rgb
-		local r, g, b = 255, 255, 0
-		for j = i, h:GetItemCount() - 1 do
-			local h2 = h:Lookup(j)
-			if not h2 then
-				return
-			elseif h2:GetType() == "Text" and h2:GetName():sub(1, 8) ~= 'namelink' then
-				r, g, b = h2:GetFontColor()
-				break
-			end
-		end
-		
 		-- check if timestrap can insert
-		if r == 255 and g == 255 and b == 0 and MY_Chat.bChatCopyNoCopySysmsg then
+		if MY_Chat.bChatCopyNoCopySysmsg and szChannel == "SYS_MSG" then
 			return
 		end
-		
 		-- create timestrap text
 		local szTime = ""
 		if MY_Chat.bChatCopy and (MY_Chat.bChatCopyAlwaysShowMask or not MY_Chat.bChatTime) then
-			local _r, _g, _b = r, g, b
+			local _r, _g, _b = nR, nG, nB
 			if MY_Chat.bChatCopyAlwaysWhite then
 				_r, _g, _b = 255, 255, 255
 			end
 			szTime = MY.Chat.GetCopyLinkText(_L[" * "], { r = _r, g = _g, b = _b })
 		elseif MY_Chat.bChatCopyAlwaysWhite then
-			r, g, b = 255, 255, 255
+			nR, nG, nB = 255, 255, 255
 		end
 		if MY_Chat.bChatTime then
 			if MY_Chat.nChatTime == CHAT_TIME.HOUR_MIN_SEC then
-				szTime = szTime .. MY.Chat.GetTimeLinkText({ r = r, g = g, b = b , f = 10, s = "[hh:mm:ss]"}, dwTime)
+				szTime = szTime .. MY.Chat.GetTimeLinkText({ r = nR, g = nG, b = nB, f = 10, s = "[hh:mm:ss]"}, dwTime)
 			else
-				szTime = szTime .. MY.Chat.GetTimeLinkText({ r = r, g = g, b = b , f = 10, s = "[hh:mm]"}, dwTime)
+				szTime = szTime .. MY.Chat.GetTimeLinkText({ r = nR, g = nG, b = nB, f = 10, s = "[hh:mm]"}, dwTime)
 			end
 		end
-		
 		-- insert timestrap text
 		h:InsertItemFromString(i, false, szTime)
 	end
