@@ -835,7 +835,7 @@ RegisterEvent("PLAYER_LEAVE_SCENE",function()
 end)
 
 RegisterEvent("UPDATE_SELECT_TARGET",function()
-    local dwID, _ = Target_GetTargetData()
+    local _, dwID = MY.GetTarget()
     if _C.dwTargetID == dwID then
         return
     end
