@@ -990,8 +990,7 @@ end
 function XGUI:show()
 	self:_checksum()
 	for _, ele in pairs(self.eles) do
-		pcall(function() ele.raw:Show() end)
-		pcall(function() ele.hdl:Show() end)
+		ele.raw:Show()
 	end
 	return self
 end
@@ -1001,9 +1000,6 @@ function XGUI:hide()
 	self:_checksum()
 	for _, ele in pairs(self.eles) do
 		ele.raw:Hide()
-		if ele.hdl then
-			ele.hdl:Hide()
-		end
 	end
 	return self
 end
@@ -1011,7 +1007,7 @@ end
 -- visible
 function XGUI:visible(bVisiable)
 	self:_checksum()
-	if type(bVisiable)=='boolean' then
+	if type(bVisiable) == 'boolean' then
 		return self:toggle(bVisiable)
 	else -- get
 		local ele = self.eles[1]
@@ -1024,7 +1020,7 @@ end
 -- enable or disable elements
 function XGUI:enable(bEnable)
 	self:_checksum()
-	if type(bEnable)=='boolean' then
+	if type(bEnable) == 'boolean' then
 		for _, ele in pairs(self.eles) do
 			local x = ele.chk or ele.wnd or ele.raw
 			if x and x.Enable then
@@ -1046,14 +1042,8 @@ function XGUI:toggle(bShow)
 	for _, ele in pairs(self.eles) do
 		if bShow == false or (bShow == nil and ele.raw:IsVisible()) then
 			ele.raw:Hide()
-			if ele.hdl then
-				ele.hdl:Hide()
-			end
 		else
 			ele.raw:Show()
-			if ele.hdl then
-				ele.hdl:Show()
-			end
 		end
 	end
 	return self
