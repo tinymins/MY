@@ -52,6 +52,7 @@ MY_Chat.tChannel = {
 	["Check_Cls"] = true,
 	["Check_Away"] = true,
 	["Check_Busy"] = true,
+	["Check_Mosaics"] = true,
 }
 -- register settings
 RegisterCustomData("MY_Chat.anchor")
@@ -332,6 +333,12 @@ MY_Chat.GetMenu = function()
 		szOption = _L['BUSY'], bCheck = true, bChecked = MY_Chat.tChannel['Check_Busy'],
 		fnAction = function() MY_Chat.tChannel['Check_Busy'] = not MY_Chat.tChannel['Check_Busy'] MY_Chat.ReInitUI() end,
 	})
+	if MY_ChatMosaics and MY_ChatMosaics.Mosaics then
+		table.insert(tChannel, {
+			szOption = _L['MOSAICS'], bCheck = true, bChecked = MY_Chat.tChannel['Check_Mosaics'],
+			fnAction = function() MY_Chat.tChannel['Check_Mosaics'] = not MY_Chat.tChannel['Check_Mosaics'] MY_Chat.ReInitUI() end,
+		})
+	end
 	table.insert(t, tChannel)
 	return t
 end
@@ -429,6 +436,17 @@ MY_Chat.ReInitUI = function()
 			Station.SetFocusWindow("Lowest2/EditBox/Edit_Input")
 		end, function()
 			MY.SwitchChat("/catr")
+		end):find(".Text"):pos(5,-16):width(25):font(197)
+	end
+	
+	if MY_Chat.tChannel.Check_Mosaics then
+		i = i + 1
+		MY.UI(MY_Chat.frame):append("WndCheckBox", "Check_Mosaics"):children("#Check_Mosaics"):width(25):text(_L["MOSAICS"]):pos(i*30+15,25):check(function()
+			MY_ChatMosaics.bEnabled = true
+			MY_ChatMosaics.ResetMosaics()
+		end, function()
+			MY_ChatMosaics.bEnabled = false
+			MY_ChatMosaics.ResetMosaics()
 		end):find(".Text"):pos(5,-16):width(25):font(197)
 	end
 	

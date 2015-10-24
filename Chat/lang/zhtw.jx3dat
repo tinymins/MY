@@ -14,6 +14,7 @@ data = {
     ['CLS']      = '清',
     ['AWAY']     = '離',
     ['BUSY']     = '擾',
+    ['MOSAICS']  = '馬',
     
     ['chat helper'] = '聊天助手',
     ['chat log'] = '聊天記錄',
