@@ -466,7 +466,7 @@ MY.HookChatPanel("MY_Chat", function(h, szChannel, szMsg, dwTime, nR, nG, nB)
 	return szMsg, h:GetItemCount()
 end, function(h, aParam, szChannel, szMsg, dwTime, nR, nG, nB)
 	local i = aParam[1]
-	if szMsg and h:GetItemCount() > i and (MY_Chat.bChatTime or MY_Chat.bChatCopy) and i then
+	if szMsg and i and h:GetItemCount() > i and (MY_Chat.bChatTime or MY_Chat.bChatCopy) then
 		-- chat time
 		-- check if timestrap can insert
 		if MY_Chat.bChatCopyNoCopySysmsg and szChannel == "SYS_MSG" then
