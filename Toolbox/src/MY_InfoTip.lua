@@ -42,7 +42,7 @@ MY_InfoTip.Config = {
     	anchor  = { x = -289, y = -12, s = "BOTTOMRIGHT", r = "BOTTOMRIGHT" },
     },
     FightTime   = { -- 战斗计时
-        bEnable = true, bShowBg = false, bShowTitle = false, rgb = { 255, 0, 128 },
+        bEnable = false, bShowBg = false, bShowTitle = false, rgb = { 255, 0, 128 },
         anchor  = { x = 295, y = -214, s = "BOTTOMCENTER", r = "BOTTOMCENTER" }, nFont = 199,
     },
     LotusTime   = { -- 桂花和藕倒计时
@@ -50,7 +50,7 @@ MY_InfoTip.Config = {
     	anchor  = { x = -290, y = -38, s = "BOTTOMRIGHT", r = "BOTTOMRIGHT" },
     },
     GPS         = { -- 角色坐标
-        bEnable = true, bShowBg = true, bShowTitle = false, rgb = { 255, 255, 255 },
+        bEnable = false, bShowBg = true, bShowTitle = false, rgb = { 255, 255, 255 },
         anchor  = { x = -21, y = -243, s = "RIGHTCENTER", r = "RIGHTCENTER" }, nFont = 0,
     },
 }
