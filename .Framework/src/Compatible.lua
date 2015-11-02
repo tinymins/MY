@@ -7,6 +7,7 @@
 -- @Last Modified time: 2015-08-13 18:50:42
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
+EMPTY_TABLE = SetmetaReadonly({})
 XML_LINE_BREAKER = GetFormatText("\n")
 local XML_LINE_BREAKER = XML_LINE_BREAKER
 local srep, tostring, string2byte = string.rep, tostring, string.byte
