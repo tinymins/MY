@@ -8,11 +8,12 @@
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = { Data = {} }
-MY_AutoChat = { bEnable = true, bEchoOn = false, bAutoClose = true, bEnableShift = true, CurrentWindow = 0, Conents = nil }
+MY_AutoChat = { bEnable = true, bEchoOn = false, bAutoSelect1 = false, bAutoClose = true, bEnableShift = true, CurrentWindow = 0, Conents = nil }
 RegisterCustomData("MY_AutoChat.bEnable")
 RegisterCustomData("MY_AutoChat.bEchoOn")
 RegisterCustomData("MY_AutoChat.bAutoClose")
 RegisterCustomData("MY_AutoChat.bEnableShift")
+RegisterCustomData("MY_AutoChat.bAutoSelect1")
 
 MY_AutoChat.LoadData = function() _C.Data = MY.LoadLUAData("config/AUTO_CHAT/data.$lang.jx3dat") or MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "ToolBox/data/interact/$lang.jx3dat") or _C.Data end
 MY_AutoChat.SaveData = function() MY.SaveLUAData("config/AUTO_CHAT/data.$lang.jx3dat", _C.Data) end
@@ -56,22 +57,35 @@ MY_AutoChat.DelData = function(szMap, szName, szKey)
 	MY_AutoChat.SaveData()
 end
 
-MY_AutoChat.Choose = function(szMap, szName, dwIndex, aInfo)
+function MY_AutoChat.Choose(szMap, szName, dwIndex, aInfo)
 	if not (szMap and szName and dwIndex and aInfo
 	and _C.Data[szMap] and _C.Data[szMap][szName]) then
 		return
 	end
 	local tChat = _C.Data[szMap][szName]
 	
+	local nCount, szContext, dwID = 0
 	for i, v in ipairs(aInfo) do
-		if (v.name == '$' or v.name == "W") and tChat[v.context] and v.attribute.id then
-			for i = 1, tChat[v.context] do
-				GetClientPlayer().WindowSelect(dwIndex, v.attribute.id)
+		if (v.name == '$' or v.name == "W") and v.attribute.id then
+			if tChat[v.context] then
+				for i = 1, tChat[v.context] do
+					GetClientPlayer().WindowSelect(dwIndex, v.attribute.id)
+				end
+				if MY_AutoChat.bEchoOn then
+					MY.Sysmsg({_L("Conversation with [%s] auto chose: %s", szName, v.context)})
+				end
+				return true
+			else
+				nCount = nCount + 1
+				dwID = v.attribute.id
+				szContext = v.context
 			end
-			if MY_AutoChat.bEchoOn then
-				MY.Sysmsg({_L("Conversation with [%s] auto chose: %s", szName, v.context)})
-			end
-			return true
+		end
+	end
+	if MY_AutoChat.bAutoSelect1 and nCount == 1 then
+		GetClientPlayer().WindowSelect(dwIndex, dwID)
+		if MY_AutoChat.bEchoOn then
+			MY.Sysmsg({_L("Conversation with [%s] auto chose: %s", szName, szContext)})
 		end
 	end
 end
@@ -176,6 +190,12 @@ MY.RegisterPlayerAddonMenu('MY_AutoChat', function()
 			bCheck = true, bChecked = MY_AutoChat.bEchoOn,
 			fnAction = function()
 				MY_AutoChat.bEchoOn = not MY_AutoChat.bEchoOn
+			end
+		}, {
+			szOption = _L['auto chat when only one selection'],
+			bCheck = true, bChecked = MY_AutoChat.bAutoSelect1,
+			fnAction = function()
+				MY_AutoChat.bAutoSelect1 = not MY_AutoChat.bAutoSelect1
 			end
 		}, {
 			szOption = _L['disable when shift key pressed'],
