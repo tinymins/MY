@@ -93,7 +93,7 @@ function MY_AutoChat.Choose(szMap, szName, dwIndex, aInfo)
 		end
 	end
 	
-	if MY_AutoChat.bAutoSelect1 and nCount == 1 then
+	if MY_AutoChat.bAutoSelect1 and nCount == 1 and not MY.IsInDungeon(true) then
 		GetClientPlayer().WindowSelect(dwIndex, dwID)
 		if MY_AutoChat.bEchoOn then
 			MY.Sysmsg({_L("Conversation with [%s] auto chose: %s", szName, szContext)})
