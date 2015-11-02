@@ -8,7 +8,7 @@
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = { Data = {} }
-MY_AutoChat = { bEnable = true, bEchoOn = false, bAutoSelect1 = true, bAutoClose = true, bEnableShift = true, CurrentWindow = 0, Conents = nil }
+MY_AutoChat = { bEnable = false, bEchoOn = false, bAutoSelect1 = false, bAutoClose = false, bEnableShift = true, CurrentWindow = 0, Conents = nil }
 RegisterCustomData("MY_AutoChat.bEnable")
 RegisterCustomData("MY_AutoChat.bEchoOn")
 RegisterCustomData("MY_AutoChat.bAutoClose")
@@ -121,6 +121,52 @@ function MY_AutoChat.DoSomething()
 end
 
 ---------------------------------------------------------------------------
+-- 头像设置菜单
+---------------------------------------------------------------------------
+local function GetSettingMenu()
+	return {
+		szOption = _L['autochat'], {
+			szOption = _L['enable'],
+			bCheck = true, bChecked = MY_AutoChat.bEnable,
+			fnAction = function()
+				MY_AutoChat.bEnable = not MY_AutoChat.bEnable
+			end
+		}, {
+			szOption = _L['echo when autochat'],
+			bCheck = true, bChecked = MY_AutoChat.bEchoOn,
+			fnAction = function()
+				MY_AutoChat.bEchoOn = not MY_AutoChat.bEchoOn
+			end
+		}, {
+			szOption = _L['auto chat when only one selection'],
+			bCheck = true, bChecked = MY_AutoChat.bAutoSelect1,
+			fnAction = function()
+				MY_AutoChat.bAutoSelect1 = not MY_AutoChat.bAutoSelect1
+			end
+		}, {
+			szOption = _L['disable when shift key pressed'],
+			bCheck = true, bChecked = MY_AutoChat.bEnableShift,
+			fnAction = function()
+				MY_AutoChat.bEnableShift = not MY_AutoChat.bEnableShift
+			end
+		}, {
+			szOption = _L['close after auto chat'],
+			bCheck = true, bChecked = MY_AutoChat.bAutoClose,
+			fnAction = function()
+				MY_AutoChat.bAutoClose = not MY_AutoChat.bAutoClose
+			end
+		},
+	}
+end
+
+MY.RegisterPlayerAddonMenu('MY_AutoChat', function()
+	if MY.IsShieldedVersion() then
+		return
+	end
+	return GetSettingMenu()
+end)
+
+---------------------------------------------------------------------------
 -- 对话面板HOOK 添加自动对话设置按钮
 ---------------------------------------------------------------------------
 local function GetDialoguePanelMenuItem(szMap, szName, szContext)
@@ -191,54 +237,13 @@ local function HookDialoguePanel()
 	if frame and frame:IsVisible() and not frame.bMYHooked then
 		MY.UI(frame):append('WndButton', {
 			x = 50, y = 10, w = 80, text = _L['autochat'],
-			menu = GetDialoguePanelMenu,
+			tip = {_L['Left click to config autochat.\nRight click to edit global config.'], MY.Const.UI.Tip.POS_TOP},
+			lmenu = GetDialoguePanelMenu,
+			rmenu = GetSettingMenu,
 		})
 		frame.bMYHooked = true
 	end
 end
-
----------------------------------------------------------------------------
--- 头像设置菜单
----------------------------------------------------------------------------
-MY.RegisterPlayerAddonMenu('MY_AutoChat', function()
-	if MY.IsShieldedVersion() then
-		return
-	end
-	
-	return {
-		szOption = _L['autochat'], {
-			szOption = _L['enable'],
-			bCheck = true, bChecked = MY_AutoChat.bEnable,
-			fnAction = function()
-				MY_AutoChat.bEnable = not MY_AutoChat.bEnable
-			end
-		}, {
-			szOption = _L['echo when autochat'],
-			bCheck = true, bChecked = MY_AutoChat.bEchoOn,
-			fnAction = function()
-				MY_AutoChat.bEchoOn = not MY_AutoChat.bEchoOn
-			end
-		}, {
-			szOption = _L['auto chat when only one selection'],
-			bCheck = true, bChecked = MY_AutoChat.bAutoSelect1,
-			fnAction = function()
-				MY_AutoChat.bAutoSelect1 = not MY_AutoChat.bAutoSelect1
-			end
-		}, {
-			szOption = _L['disable when shift key pressed'],
-			bCheck = true, bChecked = MY_AutoChat.bEnableShift,
-			fnAction = function()
-				MY_AutoChat.bEnableShift = not MY_AutoChat.bEnableShift
-			end
-		}, {
-			szOption = _L['close after auto chat'],
-			bCheck = true, bChecked = MY_AutoChat.bAutoClose,
-			fnAction = function()
-				MY_AutoChat.bAutoClose = not MY_AutoChat.bAutoClose
-			end
-		},
-	}
-end)
 
 RegisterEvent("OPEN_WINDOW", function()
 	if MY.IsShieldedVersion() or not MY_AutoChat.bEnable then

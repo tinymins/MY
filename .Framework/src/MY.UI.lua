@@ -31,6 +31,8 @@ local function ApplyUIArgument(ui, tArg)
 		if tArg.group             then ui:group      (tArg.group      ) end
 		if tArg.tip               then if type(tArg.tip) == 'table' then ui:tip(unpack(tArg.tip)) else ui:tip(tArg.tip) end end
 		if tArg.menu              then ui:menu       (tArg.menu       ) end
+		if tArg.lmenu             then ui:lmenu      (tArg.lmenu      ) end
+		if tArg.rmenu             then ui:rmenu      (tArg.rmenu      ) end
 		if tArg.limit             then ui:limit      (tArg.limit      ) end
 		if tArg.scroll            then ui:scroll     (tArg.scroll     ) end
 		if tArg.handlestyle       then ui:handleStyle(tArg.handlestyle) end
