@@ -8,7 +8,7 @@
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = { Data = {} }
-MY_AutoChat = { bEnable = true, bEchoOn = false, bAutoSelect1 = false, bAutoClose = true, bEnableShift = true, CurrentWindow = 0, Conents = nil }
+MY_AutoChat = { bEnable = false, bEchoOn = false, bAutoSelect1 = false, bAutoClose = true, bEnableShift = true, CurrentWindow = 0, Conents = nil }
 RegisterCustomData("MY_AutoChat.bEnable")
 RegisterCustomData("MY_AutoChat.bEchoOn")
 RegisterCustomData("MY_AutoChat.bAutoClose")
