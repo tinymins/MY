@@ -91,13 +91,14 @@ data = {
     ["No result found. Here's from open search engine:"] = '沒有搜索到匹配的結果，以下數據來自開放搜索引擎：',
     ['Loading failed.'] = '加載失敗',
     
-    ['autochat'] = '自動對話',
-    ['Common'] = '通用',
+    ['autochat'                                        ] = '自動對話',
+    ['Common'                                          ] = '通用',
     ['Auto interact disabled due to SHIFT key pressed.'] = '你按住了Shift鍵，自動對話被禁用。',
-    ['Conversation with [%s] auto chose: %s'] = '對話[%s]自動選擇了：%s',
-    ['echo when autochat'] = '輸出選擇的選項',
-    ['disable when shift key pressed'] = '按住SHIFT時禁用自動對話',
-    ['close after auto chat'] = '自動對話後關閉窗口',
+    ['Conversation with [%s] auto chose: %s'           ] = '對話[%s]自動選擇了：%s',
+    ['echo when autochat'                              ] = '輸出選擇的選項',
+    ['auto chat when only one selection'               ] = '只有一個選項時自動選擇',
+    ['disable when shift key pressed'                  ] = '按住SHIFT時禁用自動對話',
+    ['close after auto chat'                           ] = '自動對話後關閉窗口',
     
     ['NAME_PATTERN_LIST'] = {
         '它的主人是(.-)。',
