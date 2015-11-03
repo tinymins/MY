@@ -291,12 +291,9 @@ end
 
 -- 检查是否需要重绘 如需重绘则重新绘制
 local function CheckBoardRedraw()
-	local nTime = GetCurrentTime()
-	for i = #m_aRecTime, 1, -1 do
-		if m_aRecTime[i] < nTime then
-			MY_RollMonitor.DrawBoard()
-			return
-		end
+	if m_aRecTime[1]
+	and m_aRecTime[1] < GetCurrentTime() then
+		MY_RollMonitor.DrawBoard()
 	end
 end
 
