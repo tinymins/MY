@@ -92,6 +92,9 @@ local InfoCache = (function()
                     end
                     -- judge if info has been updated and need to be saved
                     if tInfo then
+                        if v.t == nil then
+                            v.t = tInfo.t
+                        end
                         for _, kk in ipairs({"i", "f", "n", "r", "l", "t", "c", "g"}) do
                             if v[kk] ~= tInfo[kk] then
                                 bUpdated = true
@@ -391,7 +394,7 @@ function MY_Farbnamen.AddAusID(dwID)
             n = player.szName,
             r = player.nRoleType,
             l = player.nLevel,
-            t = player.szTitle,
+            t = player.nX ~= 0 and player.szTitle or nil,
             c = player.nCamp,
             g = player.dwTongID,
             _ = GetCurrentTime(),
