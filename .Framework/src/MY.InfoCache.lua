@@ -31,11 +31,12 @@ Sample:
 	print(IC["Test"])
 	-------------
 	-- Management
-	IC("save")            -- Save to DB
-	IC("save", 5)         -- Save to DB with a max saving len
-	IC("save", nil, true) -- Save to DB and release memory
-	IC("save", 5, true)   -- Save to DB with a max saving len and release memory
-	IC("clear")           -- Delete all data
+	IC("save")                 -- Save to DB
+	IC("save", 6000)           -- Save to DB with a max unvisited time
+	IC("save", nil, 5)         -- Save to DB with a max saving len
+	IC("save", nil, nil, true) -- Save to DB and release memory
+	IC("save", 6000, 5, true)  -- Save to DB with a max unvisited time and a max saving len and release memory
+	IC("clear")                -- Delete all data
 ]]
 function MY.InfoCache(SZ_DATA_PATH, SEG_LEN, L1_SIZE, ValueComparer)
 	if not ValueComparer then
