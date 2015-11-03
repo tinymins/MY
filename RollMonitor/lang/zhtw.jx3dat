@@ -22,4 +22,6 @@ data = {
     ['[%s] rolls for %d times, valid score is %s.'] = '[%s]擲了%d次骰子，有效點數爲%s。',
     [' rolls for %d times, valid score is %s.'] = '擲了%d次骰子，有效點數爲%s。',
     ['publish unroll'] = '發佈未擲骰名單',
+    ["last %d minute(s)"] = "最近%d分鍾",
+    ["unlimited time"] = "不限時間",
 }
