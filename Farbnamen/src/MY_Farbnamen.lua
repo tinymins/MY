@@ -102,6 +102,9 @@ local InfoCache = (function()
                             end
                         end
                     else
+                        if v.t == nil then
+                            v.t = ""
+                        end
                         bUpdated = true
                     end
                     -- save player info
