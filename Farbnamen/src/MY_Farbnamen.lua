@@ -504,17 +504,8 @@ MY.RegisterTraceButtonMenu('MY_Farbenamen', MY_Farbnamen.GetMenu)
 --------------------------------------------------------------
 -- ×¢²áÊÂ¼þ
 --------------------------------------------------------------
-MY.RegisterInit('MY_FARBNAMEN_DATA', MY_Farbnamen.LoadData)
-MY.RegisterInit('MY_FARBNAMEN_CUSTOMDATA', _MY_Farbnamen.LoadCustomData)
-MY.RegisterExit('MY_FARBNAMEN_CACHE', function() InfoCache("save") end)
-MY.BreatheCall('MY_FARBNAMEN_CACHE', function()
-    if InfoCache("save", GetTime() - 60000, 1, true) then
-        MY.BreatheCall('MY_FARBNAMEN_CACHE', 60, true)
-    end
-end, 20000)
-MY.RegisterEvent("PLAYER_ENTER_SCENE", function()
+local function OnPlayerEnter(dwID)
     if MY_Farbnamen.bEnabled then
-        local dwID = arg0
         local nRetryCount = 0
         MY.BreatheCall(function()
             if MY_Farbnamen.AddAusID(dwID) or nRetryCount > 5 then
@@ -523,4 +514,18 @@ MY.RegisterEvent("PLAYER_ENTER_SCENE", function()
             nRetryCount = nRetryCount + 1
         end, 500)
     end
+end
+MY.RegisterInit('MY_FARBNAMEN_DATA', MY_Farbnamen.LoadData)
+MY.RegisterInit('MY_FARBNAMEN_CUSTOMDATA', _MY_Farbnamen.LoadCustomData)
+MY.RegisterExit('MY_FARBNAMEN_CACHE', function() InfoCache("save") end)
+MY.BreatheCall('MY_FARBNAMEN_CACHE', function()
+    if InfoCache("save", GetTime() - 60000, 1, true) then
+        MY.BreatheCall('MY_FARBNAMEN_CACHE', 60, true)
+    end
+end, 20000)
+MY.RegisterEvent("PEEK_OTHER_PLAYER", function()
+    if arg0 == PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
+        OnPlayerEnter(arg1)
+    end
 end)
+MY.RegisterEvent("PLAYER_ENTER_SCENE", function() OnPlayerEnter(arg0) end)
