@@ -381,7 +381,16 @@ end
 -- 保存指定dwID的玩家
 function MY_Farbnamen.AddAusID(dwID)
     local player = GetPlayer(dwID)
-    if player and player.szName and player.szName ~= '' then
+    if not player or not player.szName or player.szName == "" then
+        return false
+    else
+        local szTongName = ""
+        if player.dwTongID ~= 0 then
+            szTongName = GetTongClient().ApplyGetTongName(player.dwTongID)
+            if not szTongName then
+                return false
+            end
+        end
         InfoCache[player.dwID] = {
             i = player.dwID,
             f = player.dwForceID,
@@ -390,12 +399,10 @@ function MY_Farbnamen.AddAusID(dwID)
             l = player.nLevel,
             t = player.szTitle,
             c = player.nCamp,
-            g = player.dwTongID > 0 and GetTongClient().ApplyGetTongName(player.dwTongID) or "",
+            g = szTongName,
             _ = GetCurrentTime(),
         }
         return true
-    else
-        return false
     end
 end
 -- 保存用户设置
