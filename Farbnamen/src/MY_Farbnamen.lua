@@ -35,6 +35,7 @@ local Config_Default = {
     },
 }
 local Config = clone(Config_Default)
+local TongCache = MY.InfoCache("cache/PLAYER_INFO/$server/TONG/<SEG>.$lang.jx3dat", 2, 3000)
 local InfoCache = (function()
     local aCache, tCache = {}, setmetatable({}, { __mode = "v" }) -- high speed L1 CACHE
     local tInfos, tInfoVisit, tInfoModified = {}, {}, {}
@@ -364,7 +365,7 @@ function MY_Farbnamen.Get(szKey)
             nLevel    = info.l,
             szTitle   = info.t,
             nCamp     = info.c,
-            szTongID  = info.g,
+            szTongID  = TongCache[info.g] or "",
             dwTime    = info._,
             rgb       = Config.tForceColor[info.f] or {255, 255, 255}
         }
@@ -384,13 +385,6 @@ function MY_Farbnamen.AddAusID(dwID)
     if not player or not player.szName or player.szName == "" then
         return false
     else
-        local szTongName = ""
-        if player.dwTongID ~= 0 then
-            szTongName = GetTongClient().ApplyGetTongName(player.dwTongID)
-            if not szTongName then
-                return false
-            end
-        end
         InfoCache[player.dwID] = {
             i = player.dwID,
             f = player.dwForceID,
@@ -399,9 +393,10 @@ function MY_Farbnamen.AddAusID(dwID)
             l = player.nLevel,
             t = player.szTitle,
             c = player.nCamp,
-            g = szTongName,
+            g = player.dwTongID,
             _ = GetCurrentTime(),
         }
+        GetTongClient().ApplyGetTongName(player.dwTongID, 254)
         return true
     end
 end
@@ -522,6 +517,12 @@ local function OnPlayerEnter(dwID)
         end, 500)
     end
 end
+MY.RegisterEvent("PEEK_OTHER_PLAYER", function()
+    if arg0 == PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
+        OnPlayerEnter(arg1)
+    end
+end)
+MY.RegisterEvent("PLAYER_ENTER_SCENE", function() OnPlayerEnter(arg0) end)
 MY.RegisterInit('MY_FARBNAMEN_DATA', MY_Farbnamen.LoadData)
 MY.RegisterInit('MY_FARBNAMEN_CUSTOMDATA', _MY_Farbnamen.LoadCustomData)
 MY.RegisterExit('MY_FARBNAMEN_CACHE', function() InfoCache("save") end)
@@ -530,9 +531,10 @@ MY.BreatheCall('MY_FARBNAMEN_CACHE', function()
         MY.BreatheCall('MY_FARBNAMEN_CACHE', 60, true)
     end
 end, 20000)
-MY.RegisterEvent("PEEK_OTHER_PLAYER", function()
-    if arg0 == PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
-        OnPlayerEnter(arg1)
+MY.RegisterExit('MY_FARBNAMEN_TONG_CACHE', function() TongCache("save") end)
+MY.BreatheCall('MY_FARBNAMEN_TONG_CACHE', function()
+    if TongCache("save", GetTime() - 60000, 1, true) then
+        MY.BreatheCall('MY_FARBNAMEN_TONG_CACHE', 60, true)
     end
-end)
-MY.RegisterEvent("PLAYER_ENTER_SCENE", function() OnPlayerEnter(arg0) end)
+end, 20000)
+MY.RegisterEvent("ON_GET_TONG_NAME_NOTIFY", function() TongCache[arg1] = arg2 end)
