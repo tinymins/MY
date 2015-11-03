@@ -112,8 +112,10 @@ function MY.InfoCache(SZ_DATA_PATH, SEG_LEN, L1_SIZE, ValueComparer)
 				end
 				while aSeg[SEG_LEN + 1] ~= 1 do
 					local szSegID = tconcat(aSeg, "-")
-					if IsFileExist(MY.GetLUADataPath((SZ_DATA_PATH:gsub("<SEG>", szSegID)))) then
-						MY.SaveLUAData(szSegID, nil)
+					local szPath = SZ_DATA_PATH:gsub("<SEG>", szSegID)
+					if IsFileExist(MY.GetLUADataPath(szPath)) then
+						MY.SaveLUAData(szPath, nil)
+						-- Log("INFO CACHE CLEAR @" .. szSegID)
 					end
 					-- bit add one
 					local i = 1
