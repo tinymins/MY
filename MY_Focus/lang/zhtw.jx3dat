@@ -23,4 +23,6 @@ data = {
     ['add to focus list'   ] = '加入茗伊焦點',
     ['max display length'  ] = '最大顯示數量',
     ['sort by distance'    ] = '優先焦點近距離目標',
+    ['current scale-x is %d%%.'] = '界面X軸縮放%d%%。',
+    ['current scale-y is %d%%.'] = '界面Y軸縮放%d%%。',
 }
