@@ -38,6 +38,7 @@ local function ApplyUIArgument(ui, tArg)
 		if tArg.rmenu             then ui:rmenu      (tArg.rmenu      ) end
 		if tArg.limit             then ui:limit      (tArg.limit      ) end
 		if tArg.scroll            then ui:scroll     (tArg.scroll     ) end
+		if tArg.sliderstyle       then ui:sliderStyle(tArg.sliderstyle) end
 		if tArg.handlestyle       then ui:handleStyle(tArg.handlestyle) end
 		if tArg.edittype          then ui:edittype   (tArg.edittype   ) end
 		if tArg.enable ~= nil     then ui:enable     (tArg.enable     ) end
