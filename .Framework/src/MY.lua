@@ -714,7 +714,9 @@ MY.RedrawTab = function(szCategory)
 					local hTab = hTabs:AppendItemFromIni(_MY.szIniFile, "Handle_Tab")
 					hTab.szID = tab.szID
 					hTab:Lookup('Text_Tab'):SetText(tab.szTitle)
-					if tab.dwIconFrame then
+					if tab.szIconTex == "FromIconID" then
+						hTab:Lookup('Image_TabIcon'):FromIconID(tab.dwIconFrame)
+					elseif tab.dwIconFrame then
 						hTab:Lookup('Image_TabIcon'):FromUITex(tab.szIconTex, tab.dwIconFrame)
 					else
 						hTab:Lookup('Image_TabIcon'):FromTextureFile(tab.szIconTex)
@@ -892,9 +894,15 @@ MY.RegisterPanel = function(szID, szTitle, szCategory, szIconTex, rgbaTitleColor
 		category = _MY.tTabs[#_MY.tTabs]
 	end
 	-- format szIconTex
-	if type(szIconTex)~="string" then szIconTex = 'UI/Image/Common/Logo.UITex|6' end
+	if type(szIconTex) == "number" then
+		szIconTex = "FromIconID|" .. szIconTex
+	elseif type(szIconTex) ~= "string" then
+		szIconTex = 'UI/Image/Common/Logo.UITex|6'
+	end
 	local dwIconFrame = string.gsub(szIconTex, '.*%|(%d+)', '%1')
-	if dwIconFrame then dwIconFrame = tonumber(dwIconFrame) end
+	if dwIconFrame then
+		dwIconFrame = tonumber(dwIconFrame)
+	end
 	szIconTex = string.gsub(szIconTex, '%|.*', '')
 
 	-- format other params
