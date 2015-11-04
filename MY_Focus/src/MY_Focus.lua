@@ -35,6 +35,10 @@ MY_Focus.tFocusList = {     -- 永久焦点
 	[TARGET.PLAYER] = {},
 	[TARGET.DOODAD] = {},
 }
+MY_Focus.tFocusTplList = {  -- 永久焦点(按照TemplateID)
+	[TARGET.NPC]    = {},
+	[TARGET.DOODAD] = {},
+}
 MY_Focus.anchor = { x=-300, y=220, s="TOPRIGHT", r="TOPRIGHT" } -- 默认坐标
 RegisterCustomData("MY_Focus.bEnable")
 RegisterCustomData("MY_Focus.bFocusBoss")
@@ -53,6 +57,7 @@ RegisterCustomData("MY_Focus.bShowTarget")
 RegisterCustomData("MY_Focus.bTraversal")
 RegisterCustomData("MY_Focus.tAutoFocus")
 RegisterCustomData("MY_Focus.tFocusList")
+RegisterCustomData("MY_Focus.tFocusTplList")
 RegisterCustomData("MY_Focus.anchor")
 RegisterCustomData("MY_Focus.fScaleX")
 RegisterCustomData("MY_Focus.fScaleY")
@@ -201,25 +206,42 @@ MY_Focus.DelAutoFocus = function(szName)
 end
 
 -- 添加永久焦点
-MY_Focus.AddStaticFocus = function(dwType, dwID)
+MY_Focus.AddStaticFocus = function(dwType, dwID, bDistinctTplID)
 	dwType, dwID = tonumber(dwType), tonumber(dwID)
-	local KObject = MY.GetObject(dwType, dwID)
-	for _dwID, tFocusList in pairs(MY_Focus.tFocusList) do
-		for _dwID, _ in pairs(tFocusList) do
-			if _dwType == dwType and _dwID == dwID then
-				return
-			end
+	if bDistinctTplID then
+		local KObject = MY.GetObject(dwType, dwID)
+		local dwTemplateID = KObject.dwTemplateID
+		if MY_Focus.tFocusTplList[dwType]
+		and MY_Focus.tFocusTplList[dwType][dwTemplateID] then
+			return
 		end
+		MY_Focus.tFocusTplList[dwType][dwTemplateID] = true
+		MY_Focus.RescanNearby()
+	else
+		if MY_Focus.tFocusList[dwType]
+		and MY_Focus.tFocusList[dwType][dwID] then
+			return
+		end
+		MY_Focus.tFocusList[dwType][dwID] = true
+		MY_Focus.OnObjectEnterScene(dwType, dwID)
 	end
-	MY_Focus.tFocusList[dwType][dwID] = true
-	MY_Focus.OnObjectEnterScene(dwType, dwID)
 end
 
 -- 删除永久焦点
 MY_Focus.DelStaticFocus = function(dwType, dwID)
 	dwType, dwID = tonumber(dwType), tonumber(dwID)
-	MY_Focus.tFocusList[dwType][dwID] = nil
-	MY_Focus.OnObjectLeaveScene(dwType, dwID)
+	if MY_Focus.tFocusList[dwType][dwID] then
+		MY_Focus.tFocusList[dwType][dwID] = nil
+		MY_Focus.OnObjectEnterScene(dwType, dwID)
+	else
+		local KObject = MY.GetObject(dwType, dwID)
+		local dwTemplateID = KObject.dwTemplateID
+		if MY_Focus.tFocusTplList[dwType]
+		and MY_Focus.tFocusTplList[dwType][dwTemplateID] then
+			MY_Focus.tFocusTplList[dwType][dwTemplateID] = nil
+		end
+		MY_Focus.RescanNearby()
+	end
 end
 
 -- 重新扫描附近对象更新焦点列表（只增不减）
@@ -256,12 +278,11 @@ MY_Focus.OnObjectEnterScene = function(dwType, dwID, nRetryCount)
 	elseif szName then -- 判断是否需要焦点
 		local bFocus = false
 		-- 判断永久焦点
-		if dwType == TARGET.PLAYER then
-			if MY_Focus.tFocusList[dwType][dwID] then
-				bFocus = true
-			end
-		else
-			if MY_Focus.tFocusList[dwType][obj.dwTemplateID] then
+		if MY_Focus.tFocusList[dwType][dwID] then
+			bFocus = true
+		end
+		if dwType ~= TARGET.PLAYER then
+			if MY_Focus.tFocusTplList[dwType][obj.dwTemplateID] then
 				bFocus = true
 			end
 		end
@@ -745,12 +766,26 @@ end
 
 MY.RegisterTargetAddonMenu('MY_Focus', function()
 	local dwType, dwID = GetClientPlayer().GetTarget()
-	return {
-		szOption = _L['add to focus list'],
-		fnAction = function()
-			MY_Focus.AddStaticFocus(dwType, dwID)
-		end,
-	}
+	if dwType == TARGET.PLAYER then
+		return {
+			szOption = _L['add to focus list'],
+			fnAction = function()
+				MY_Focus.AddStaticFocus(dwType, dwID)
+			end,
+		}
+	else
+		return {{
+			szOption = _L['add to focus list'],
+			fnAction = function()
+				MY_Focus.AddStaticFocus(dwType, dwID)
+			end,
+		}, {
+			szOption = _L['add to static focus list'],
+			fnAction = function()
+				MY_Focus.AddStaticFocus(dwType, dwID, true)
+			end,
+		}}
+	end
 end)
 
 MY.RegisterInit('MY_FOCUS', function()
