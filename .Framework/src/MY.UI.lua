@@ -19,6 +19,7 @@ local _L = MY.LoadLangPack()
 ---------------------------------------------------------------------
 local function ApplyUIArgument(ui, tArg)
 	if tArg and ui then
+		-- properties
 		if tArg.x ~= nil or tArg.y ~= nil then ui:pos        (tArg.x, tArg.y  ) end
 		if tArg.w ~= nil or tArg.h ~= nil then ui:size       (tArg.w, tArg.h  ) end
 		if tArg.anchor             ~= nil then ui:anchor     (tArg.anchor     ) end
@@ -26,7 +27,8 @@ local function ApplyUIArgument(ui, tArg)
 		if tArg.font               ~= nil then ui:font       (tArg.font       ) end -- must before color
 		if tArg.color              ~= nil then ui:color      (tArg.color      ) end
 		if tArg.multiline          ~= nil then ui:multiLine  (tArg.multiline  ) end -- must before :text()
-		if tArg.textfmt            ~= nil then ui:text       (tArg.textfmt    ) end
+		if tArg.sliderstyle        ~= nil then ui:sliderStyle(tArg.sliderstyle) end -- must before :text()
+		if tArg.textfmt            ~= nil then ui:text       (tArg.textfmt    ) end -- must before :text()
 		if tArg.text               ~= nil then ui:text       (tArg.text       ) end
 		if tArg.placeholder        ~= nil then ui:placeholder(tArg.placeholder) end
 		if tArg.group              ~= nil then ui:group      (tArg.group      ) end
@@ -38,12 +40,12 @@ local function ApplyUIArgument(ui, tArg)
 		if tArg.rmenu              ~= nil then ui:rmenu      (tArg.rmenu      ) end
 		if tArg.limit              ~= nil then ui:limit      (tArg.limit      ) end
 		if tArg.scroll             ~= nil then ui:scroll     (tArg.scroll     ) end
-		if tArg.sliderstyle        ~= nil then ui:sliderStyle(tArg.sliderstyle) end
 		if tArg.handlestyle        ~= nil then ui:handleStyle(tArg.handlestyle) end
 		if tArg.edittype           ~= nil then ui:edittype   (tArg.edittype   ) end
 		if tArg.enable             ~= nil then ui:enable     (tArg.enable     ) end
 		if tArg.visible            ~= nil then ui:visible    (tArg.visible    ) end
 		if tArg.image              ~= nil then if type(tArg.image) == 'table' then ui:image (unpack(tArg.image)) else ui:image(tArg.image) end end
+		-- event handlers
 		if tArg.onscroll           ~= nil then ui:scroll     (tArg.onscroll   ) end
 		if tArg.onhover            ~= nil then ui:hover      (tArg.onhover    ) end
 		if tArg.onfocus            ~= nil then ui:focus      (tArg.onfocus    ) end
@@ -2237,11 +2239,12 @@ function XGUI:limit(nLimit)
 	end
 end
 
--- (self) XGUI:sliderStyle(bShowPercentage)
-function XGUI:sliderStyle(bShowPercentage)
+-- (self) XGUI:sliderStyle(nSliderStyle)
+function XGUI:sliderStyle(nSliderStyle)
 	self:_checksum()
+	local bShowPercentage = nSliderStyle == MY.Const.UI.Slider.SHOW_PERCENT
 	for _, ele in pairs(self.eles) do
-		if ele.type=="WndSliderBox" then
+		if ele.type == "WndSliderBox" then
 			ele.wnd.bShowPercentage = bShowPercentage
 		end
 	end
