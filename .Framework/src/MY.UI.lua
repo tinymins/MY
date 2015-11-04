@@ -26,10 +26,13 @@ local function ApplyUIArgument(ui, tArg)
 		if tArg.font              then ui:font       (tArg.font       ) end -- must before color
 		if tArg.color             then ui:color      (tArg.color      ) end
 		if tArg.multiline         then ui:multiLine  (tArg.multiline  ) end -- must before :text()
+		if tArg.textfmt           then ui:text       (tArg.textfmt    ) end
 		if tArg.text              then ui:text       (tArg.text       ) end
 		if tArg.placeholder       then ui:placeholder(tArg.placeholder) end
 		if tArg.group             then ui:group      (tArg.group      ) end
 		if tArg.tip               then if type(tArg.tip) == 'table' then ui:tip(unpack(tArg.tip)) else ui:tip(tArg.tip) end end
+		if tArg.range             then ui:range      (unpack(tArg.range)) end
+		if tArg.value             then ui:value      (tArg.value      ) end
 		if tArg.menu              then ui:menu       (tArg.menu       ) end
 		if tArg.lmenu             then ui:lmenu      (tArg.lmenu      ) end
 		if tArg.rmenu             then ui:rmenu      (tArg.rmenu      ) end
