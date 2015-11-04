@@ -204,7 +204,7 @@ end
 MY_Focus.AddStaticFocus = function(dwType, dwID)
 	dwType, dwID = tonumber(dwType), tonumber(dwID)
 	local KObject = MY.GetObject(dwType, dwID)
-	for _dwID, _ in pairs(MY_Focus.tFocusList[dwType]) do
+	for _dwID, tFocusList in pairs(MY_Focus.tFocusList) do
 		for _dwID, _ in pairs(tFocusList) do
 			if _dwType == dwType and _dwID == dwID then
 				return
@@ -676,6 +676,22 @@ end
 MY_Focus.OnFrameDragSetPosEnd = function()
 	this:CorrectPos()
 	MY_Focus.anchor = MY.UI(this):anchor('TOPRIGHT')
+end
+
+MY_Focus.OnItemMouseEnter = function()
+	local name = this:GetName()
+	if name:find('Handle_Info_(%d+)_(%d+)') then
+		this:Lookup("Image_Hover"):Show()
+	end
+end
+
+MY_Focus.OnItemMouseLeave = function()
+	local name = this:GetName()
+	if name:find('Handle_Info_(%d+)_(%d+)') then
+		if this:Lookup("Image_Hover") then
+			this:Lookup("Image_Hover"):Hide()
+		end
+	end
 end
 
 MY_Focus.OnItemLButtonClick = function()
