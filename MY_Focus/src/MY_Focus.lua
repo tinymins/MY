@@ -27,6 +27,8 @@ MY_Focus.bFocusJJCParty     = false -- 焦竞技场队友
 MY_Focus.bFocusJJCEnemy     = true  -- 焦竞技场敌队
 MY_Focus.bShowTarget        = false -- 显示目标目标
 MY_Focus.bTraversal         = false -- 遍历焦点列表
+MY_Focus.fScaleX            = 1     -- 缩放比例
+MY_Focus.fScaleY            = 1     -- 缩放比例
 MY_Focus.tAutoFocus = {}    -- 默认焦点
 MY_Focus.tFocusList = {     -- 永久焦点
 	[TARGET.NPC]    = {},
@@ -52,6 +54,9 @@ RegisterCustomData("MY_Focus.bTraversal")
 RegisterCustomData("MY_Focus.tAutoFocus")
 RegisterCustomData("MY_Focus.tFocusList")
 RegisterCustomData("MY_Focus.anchor")
+RegisterCustomData("MY_Focus.fScaleX")
+RegisterCustomData("MY_Focus.fScaleY")
+
 
 local m_frame
 MY_Focus.Open = function()
@@ -93,6 +98,22 @@ MY_Focus.Close = function()
 	MY.RegisterEvent('PLAYER_LEAVE_SCENE.MY_FOCUS')
 	MY.RegisterEvent(   'NPC_LEAVE_SCENE.MY_FOCUS')
 	MY.RegisterEvent('DOODAD_LEAVE_SCENE.MY_FOCUS')
+end
+
+MY_Focus.SetScale = function(fScaleX, fScaleY)
+	MY_Focus.fScaleX = fScaleX
+	MY_Focus.fScaleY = fScaleY
+	if not m_frame then
+		return
+	end
+	if m_frame.fScaleX and m_frame.fScaleY then
+		-- m_frame:SetSize(m_frame:GetW() / m_frame.fScaleX, m_frame:GetH() / m_frame.fScaleY)
+		m_frame:Scale(1 / m_frame.fScaleX, 1 / m_frame.fScaleY)
+	end
+	m_frame.fScaleX = fScaleX
+	m_frame.fScaleY = fScaleY
+	-- m_frame:SetSize(m_frame:GetW() / m_frame.fScaleX, m_frame:GetH() / m_frame.fScaleY)
+	m_frame:Scale(fScaleX, fScaleY)
 end
 
 -- 获取当前显示的焦点列表
@@ -414,6 +435,7 @@ MY_Focus.DrawFocus = function(dwType, dwID)
 	local hItem = MY_Focus.GetHandle(dwType, dwID)
 	if not hItem then
 		hItem = hList:AppendItemFromIni(_C.szIniFile, 'Handle_Info')
+		hItem:Scale(MY_Focus.fScaleX, MY_Focus.fScaleY)
 		hItem:SetName('Handle_Info_'..dwType..'_'..dwID)
 		if dwType == TARGET.PLAYER then
 			hItem:Lookup('Image_Kungfu'):Show()
@@ -502,7 +524,7 @@ MY_Focus.DrawFocus = function(dwType, dwID)
 				nRotate = math.pi + nRotate
 			end
 			local nRadius = 13.5
-			h:SetRelPos(nRadius + nRadius * math.cos(nRotate) + 2, nRadius - 3 - 13.5 * math.sin(nRotate))
+			h:SetRelPos((nRadius + nRadius * math.cos(nRotate) + 2) * MY_Focus.fScaleX, (nRadius - 3 - 13.5 * math.sin(nRotate)) * MY_Focus.fScaleY)
 			h:GetParent():FormatAllItemPos()
 		end
 	end
@@ -589,8 +611,8 @@ MY_Focus.AdjustUI = function()
 	end
 	
 	local tList = MY_Focus.GetDisplayList()
-	hList:SetSize(240, 70 * #tList)
-	hList:GetRoot():SetSize(240, 70 * #tList + 32)
+	hList:SetH(70 * #tList * MY_Focus.fScaleY)
+	hList:GetRoot():SetH((70 * #tList + 32) * MY_Focus.fScaleY)
 	if #tList == 0 and MY_Focus.bAutoHide and not _C.bMinimize then
 		hList:GetRoot():Hide()
 	elseif (not MY_Focus.bAutoHide) or #tList ~= 0 then
@@ -637,6 +659,11 @@ MY_Focus.OnFrameBreathe = function()
 	end
 	MY_Focus.UpdateList()
 	MY_Focus.AdjustUI()
+end
+
+MY_Focus.OnFrameCreate = function()
+	m_frame = this
+	MY_Focus.SetScale(MY_Focus.fScaleX, MY_Focus.fScaleY)
 end
 
 MY_Focus.OnFrameDragSetPosEnd = function()
@@ -805,7 +832,7 @@ MY.RegisterPanel( "MY_Focus", _L["focus list"], _L['Target'], "ui/Image/button/S
 	
 	-- 右侧
 	local x, y = xr, yr
-	local deltaX = 28
+	local deltaX = 27
 	ui:append("WndCheckBox", "WndCheckBox_Auto_Hide"):children("#WndCheckBox_Auto_Hide")
 	  :pos(x, y):width(wr):text(_L['hide when empty']):check(MY_Focus.bAutoHide)
 	  :check(function(bChecked)
@@ -925,5 +952,29 @@ MY.RegisterPanel( "MY_Focus", _L["focus list"], _L['Target'], "ui/Image/button/S
 	  	end
 	  	return t
 	  end)
+	y = y + deltaX
+	
+	ui:append("WndSliderBox", {
+		x = x, y = y, w = 150,
+		textfmt = function(val) return _L("current scale-x is %d%%.", val) end,
+		range = {10, 300},
+		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		value = MY_Focus.fScaleX * 100,
+		onchange = function(val)
+			MY_Focus.SetScale(val / 100, MY_Focus.fScaleY)
+		end,
+	})
+	y = y + deltaX
+	
+	ui:append("WndSliderBox", {
+		x = x, y = y, w = 150,
+		textfmt = function(val) return _L("current scale-y is %d%%.", val) end,
+		range = {10, 300},
+		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		value = MY_Focus.fScaleY * 100,
+		onchange = function(val)
+			MY_Focus.SetScale(MY_Focus.fScaleX, val / 100)
+		end,
+	})
 	y = y + deltaX
 end})
