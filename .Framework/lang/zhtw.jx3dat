@@ -125,7 +125,7 @@ data = {
     ['download immediately'] = '立即下載',
     ['see new feature'] = '更新日志',
     
-    ['Important Npc list updated to v%d.'] = '重要NPC列表已成功更新至v%d。',
+    ['Important Npc list updated to v%s.'] = '重要NPC列表已成功更新至v%s。',
     
     ["[%s] wants to get your location, would you like to share?"] = "[%s] 希望取得你當前所在地圖位置，你是否願意共享當前位置信息？",
     ["I've installed MY plugins v%s"] = "我已安裝茗伊插件集 v%s。",

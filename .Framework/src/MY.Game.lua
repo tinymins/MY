@@ -428,15 +428,61 @@ MY.Game.IsDungeonMap = function(dwMapID, bType)
 end
 MY.IsDungeonMap = MY.Game.IsDungeonMap
 
+-- 生成地图BOSS列表
+local BOSS_ADD_PATH = MY.GetAddonInfo().szFrameworkRoot .. "data/bosslist/add/$lang.jx3dat"
+local BOSS_DEL_PATH = MY.GetAddonInfo().szFrameworkRoot .. "data/bosslist/del/$lang.jx3dat"
+_C.GetDungeonBoss = function()
+	local t = {}
+	local nCount = g_tTable.DungeonBoss:GetRowCount()
+	for i = 2, nCount do
+		local tLine = g_tTable.DungeonBoss:GetRow(i)
+		local dwMapID = tLine.dwMapID
+		local szNpcList = tLine.szNpcList
+		for szNpcIndex in string.gmatch(szNpcList, "(%d+)") do
+			local p = g_tTable.DungeonNpc:Search(tonumber(szNpcIndex))
+			if p then
+				if not t[dwMapID] then
+					t[dwMapID] = {}
+				end
+				t[dwMapID][p.dwNpcID] = p.szName
+			end
+		end
+	end
+	
+	for dwMapID, tBoss in pairs(MY.LoadLUAData(BOSS_ADD_PATH) or {}) do
+		if not t[dwMapID] then
+			t[dwMapID] = {}
+		end
+		for dwNpcID, szName in pairs(tBoss) do
+			t[dwMapID][dwNpcID] = szName
+		end
+	end
+	for dwMapID, tBoss in pairs(MY.LoadLUAData(BOSS_DEL_PATH) or {}) do
+		if t[dwMapID] then
+			for dwNpcID, szName in pairs(tBoss) do
+				t[dwMapID][dwNpcID] = nil
+			end
+		end
+	end
+	return t
+end
 -- 获取地图BOSS列表
 -- (table) MY.Game.GetBossList()
 -- (table) MY.Game.GetBossList(dwMapID)
 MY.Game.GetBossList = function(dwMapID)
 	if dwMapID then
-		dwMapID = tostring(dwMapID)
+		dwMapID = tonumber(dwMapID)
+		assert(dwMapID, "MY.Game.GetBossList: dwMapID is not a valid number")
 	end
 	if not _C.tBossList then
-		_C.tBossList = MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/bosslist.jx3dat') or { version = 0 }
+		local _, szVer = GetVersion()
+		local szDataPath = 'cache/BOSSLIST/' .. szVer .. '.$lang.jx3dat'
+		_C.tBossList = MY.LoadLUAData(szDataPath)
+		if not _C.tBossList then
+			_C.tBossList = _C.GetDungeonBoss()
+			MY.SaveLUAData(szDataPath, _C.tBossList)
+			MY.Sysmsg({_L('Important Npc list updated to v%s.', szVer)})
+		end
 	end
 	
 	if dwMapID then
@@ -458,18 +504,3 @@ MY.Game.IsBoss = function(dwMapID, dwTemplateID)
 	end
 end
 MY.IsBoss = MY.Game.IsBoss
-
--- online bosslist updated
-MY.RegisterEvent("MY_PUBLIC_STORAGE_UPDATE", function()
-	if arg0 == "bosslist" then
-		local data = arg1
-		if not _C.tBossList then
-			MY.Game.GetBossList()
-		end
-		if data.version > _C.tBossList.version then
-			_C.tBossList = data
-			MY.Sys.SaveLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/bosslist.jx3dat', _C.tBossList)
-			MY.Sysmsg({_L('Important Npc list updated to v%d.', data.version)})
-		end
-	end
-end)
