@@ -1,5 +1,0 @@
--- language data (zhtw) updated at 2014-4-10 03:38:11
-data = {
-	['Gene'        ] = '生成',
-	['BosslistGene'] = "重要NPC列表",
-}
