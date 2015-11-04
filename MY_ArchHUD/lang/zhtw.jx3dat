@@ -1,0 +1,17 @@
+data = {
+	['MY_ArchHUD'] = "弧形血條",
+	['hide when unfight'       ] = "僅戰鬥中顯示",
+	['display target casting'  ] = "顯示目標讀條",
+	['current alpha is %d%%.'  ] = "當前透明度%d%%",
+	['origin author: Sulian Yi'] = "原作者：翼宿憐",
+	["ChanNa:"] = "禅那:",
+	["Qi:"    ] = "氣:",
+	["Qu:"    ] = "曲:",
+	["JianWu:"] = "劍舞:",
+	["ManRi!" ] = "滿日！",
+	["ManYue!"] = "滿月！",
+	["Ri:"    ] = "日:",
+	["Yue:"   ] = "月:",
+	["Ten thousand"] = "萬",
+	["One hundred million"] = "億",
+}
