@@ -484,8 +484,11 @@ _C.GetPlayerAddonMenu = function()
 	local menu = _C.GetMainMenu()
 	for i = 1, #_C.tPlayerMenu, 1 do
 		local m = _C.tPlayerMenu[i].Menu
-		if type(m)=="function" then m = m() end
-		table.insert(menu, m)
+		if type(m) == "function" then m = m() end
+		if not m or m.szOption then m = {m} end
+		for _, v in ipairs(m) do
+			table.insert(menu, v)
+		end
 	end
 	return {menu}
 end
@@ -494,8 +497,11 @@ _C.GetTargetAddonMenu = function()
 	local menu = {}
 	for i = 1, #_C.tTargetMenu, 1 do
 		local m = _C.tTargetMenu[i].Menu
-		if type(m)=="function" then m = m() end
-		table.insert(menu, m)
+		if type(m) == "function" then m = m() end
+		if not m or m.szOption then m = {m} end
+		for _, v in ipairs(m) do
+			table.insert(menu, v)
+		end
 	end
 	return menu
 end
@@ -504,8 +510,11 @@ _C.GetTraceButtonMenu = function()
 	local menu = _C.GetMainMenu()
 	for i = 1, #_C.tTraceMenu, 1 do
 		local m = _C.tTraceMenu[i].Menu
-		if type(m)=="function" then m = m() end
-		table.insert(menu, m)
+		if type(m) == "function" then m = m() end
+		if not m or m.szOption then m = {m} end
+		for _, v in ipairs(m) do
+			table.insert(menu, v)
+		end
 	end
 	return {menu}
 end
