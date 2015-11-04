@@ -203,7 +203,8 @@ end
 -- ÃÌº””¿æ√Ωπµ„
 MY_Focus.AddStaticFocus = function(dwType, dwID)
 	dwType, dwID = tonumber(dwType), tonumber(dwID)
-	for _dwType, tFocusList in pairs(MY_Focus.tFocusList) do
+	local KObject = MY.GetObject(dwType, dwID)
+	for _dwID, _ in pairs(MY_Focus.tFocusList[dwType]) do
 		for _dwID, _ in pairs(tFocusList) do
 			if _dwType == dwType and _dwID == dwID then
 				return
@@ -255,8 +256,14 @@ MY_Focus.OnObjectEnterScene = function(dwType, dwID, nRetryCount)
 	elseif szName then -- ≈–∂œ «∑Ò–Ë“™Ωπµ„
 		local bFocus = false
 		-- ≈–∂œ”¿æ√Ωπµ„
-		if MY_Focus.tFocusList[dwType][dwID] then
-			bFocus = true
+		if dwType == TARGET.PLAYER then
+			if MY_Focus.tFocusList[dwType][dwID] then
+				bFocus = true
+			end
+		else
+			if MY_Focus.tFocusList[dwType][obj.dwTemplateID] then
+				bFocus = true
+			end
 		end
 		-- ≈–∂œƒ¨»œΩπµ„
 		if MY_Focus.bAutoFocus and not bFocus then
@@ -741,7 +748,7 @@ end)
 MY.RegisterPanel( "MY_Focus", _L["focus list"], _L['Target'], "ui/Image/button/SystemButton_1.UITex|9", {255,255,0,200}, { OnPanelActive = function(wnd)
 	local ui = MY.UI(wnd)
 	local w, h = ui:size()
-	local xr, yr, wr = w - 240, 40, 240
+	local xr, yr, wr = w - 260, 40, 260
 	local xl, yl, wl = 5,  5, w - wr -15
 	
 	-- ◊Û≤‡
