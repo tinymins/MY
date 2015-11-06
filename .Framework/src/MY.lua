@@ -958,18 +958,6 @@ MY.OnMouseWheel = function()
 	end
 	return true
 end
--- key down
-MY.OnFrameKeyDown = function()
-	if GetKeyName(Station.GetMessageKey()) == "Esc" then
-		if IsPopupMenuOpened() then
-			Wnd.CloseWindow("PopupMenuPanel")
-		else
-			MY.ClosePanel()
-		end
-		return 1
-	end
-	return 0
-end
 
 _MY.OnSizeChanged = function()
 	local hFrame = this
