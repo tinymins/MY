@@ -221,6 +221,12 @@ function MY_ArchHUD.UpdatePlayerData()
 			MY_ArchHUD.Myextra:SetPercentage(me.nCurrentSunEnergy/me.nMaxSunEnergy)
 			MY_ArchHUD.Text_My_Mana:SetText(_L["Ri:"]..tostring(me.nCurrentSunEnergy/100).." ".._L["Yue:"]..tostring(me.nCurrentMoonEnergy/100))
 		end
+	elseif me.dwForceID == FORCE_TYPE.CANG_YUN then
+		MY_ArchHUD.MyMana:FromUITex(IMG_DIR .. "rRing.UITex", 1)
+		MY_ArchHUD.Text_My_Acc:Hide()
+		MY_ArchHUD.Text_My_Mana:SetFontColor(191, 63, 31)
+		MY_ArchHUD.Text_My_Mana:SetText("      "..tostring(me.nCurrentRage).."/"..tostring(me.nMaxRage))
+		MY_ArchHUD.MyMana:SetPercentage(me.nCurrentRage/me.nMaxRage)
 	elseif me.dwForceID == FORCE_TYPE.CHANG_GE then
 		local nAccumulate = me.nAccumulateValue
 		if nAccumulate > 5 then
