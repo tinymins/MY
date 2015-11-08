@@ -34,7 +34,7 @@ MY_InfoTip.Config = {
     	anchor  = { x = -10, y = -220, s = "BOTTOMRIGHT", r = "BOTTOMRIGHT" },
     },
     Distance    = { -- 目标距离
-        bEnable = true, bShowBg = false, bShowTitle = false, rgb = { 255, 255, 0 },
+        bEnable = false, bShowBg = false, bShowTitle = false, rgb = { 255, 255, 0 },
         anchor  = { x = 203, y = -106, s = "CENTER", r = "CENTER" }, nFont = 209,
     },
     SysTime     = { -- 系统时间
