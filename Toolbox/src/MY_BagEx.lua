@@ -115,16 +115,22 @@ _C.Hook = function()
 		:add("Normal/BigBagPanel/CheckBox_TimeLtd")
 		:group("filter_check")
 		
-		MY.UI("Normal/BigBagPanel")
-		  :append("WndEditBox", "WndEditBox_KeyWord"):children("#WndEditBox_KeyWord")
-		  :text(_C.szBagFilter or ""):size(100,21):pos(60, 30):placeholder(_L['Search'])
-		  :change(function(raw, txt)
-		  	_C.szBagFilter = txt
-		  	if not _C.bBagTimeLtd then
-		  		MY.UI("Normal/BigBagPanel/CheckBox_Totle"):check(true)
-		  	end
-		  	_C.DoFilterBag()
-		  end)
+		MY.UI("Normal/BigBagPanel"):append("WndEditBox", "WndEditBox_KeyWord", {
+			w = 100, h = 21, x = 60, y = 30,
+			text = _C.szBagFilter,
+			placeholder = _L['Search'],
+			onchange = function(raw, txt)
+				local nLen = txt:len()
+				nLen = math.max(nLen, 10)
+				nLen = math.min(nLen, 20)
+				XGUI(raw):width(nLen * 10)
+				_C.szBagFilter = txt
+				if not _C.bBagTimeLtd then
+					MY.UI("Normal/BigBagPanel/CheckBox_Totle"):check(true)
+				end
+				_C.DoFilterBag()
+			end,
+		})
 	end
 
 	-- bank
@@ -135,18 +141,24 @@ _C.Hook = function()
 			hFrame.__MYBagEx_OnFrameKeyDown = hFrame.OnFrameKeyDown
 			hFrame.OnFrameKeyDown = _C.OnFrameKeyDown
 		end
-		MY.UI("Normal/BigBankPanel")
-		  :append("WndEditBox", "WndEditBox_KeyWord"):children("#WndEditBox_KeyWord")
-		  :text(_C.szBankFilter or ""):size(100,21):pos(280, 80):placeholder(_L['Search'])
-		  :change(function(raw, txt)
-		  	_C.szBankFilter = txt
-		  	_C.DoFilterBank(true)
-		  end)
+		MY.UI("Normal/BigBankPanel"):append("WndEditBox", "WndEditBox_KeyWord", {
+			w = 150, h = 21, x = 280, y = 80,
+			text = _C.szBankFilter,
+			placeholder = _L['Search'],
+			onchange = function(raw, txt)
+				local nLen = txt:len()
+				nLen = math.max(nLen, 15)
+				nLen = math.min(nLen, 25)
+				XGUI(raw):width(nLen * 10)
+				_C.szBankFilter = txt
+				_C.DoFilterBank(true)
+			end,
+		})
 		_C.DoFilterBank()
 		
 		MY.UI("Normal/BigBankPanel")
 		  :append("WndCheckBox", "WndCheckBox_Compare"):children("#WndCheckBox_Compare")
-		  :width(100):pos(380, 80)
+		  :width(100):pos(340, 56)
 		  :text(_L['compare with bag'])
 		  :check(_C.bCompareBank or false)
 		  :check(function(bChecked)
@@ -181,13 +193,19 @@ _C.Hook = function()
 			hFrame.__MYBagEx_OnFrameKeyDown = hFrame.OnFrameKeyDown
 			hFrame.OnFrameKeyDown = _C.OnFrameKeyDown
 		end
-		MY.UI("Normal/GuildBankPanel")
-		  :append("WndEditBox", "WndEditBox_KeyWord"):children("#WndEditBox_KeyWord")
-		  :text(_C.szGuildBankFilter or ""):size(100,21):pos(60, 25):placeholder(_L['Search'])
-		  :change(function(raw, txt)
-		  	_C.szGuildBankFilter = txt
-		  	_C.DoFilterGuildBank(true)
-		  end)
+		MY.UI("Normal/GuildBankPanel"):append("WndEditBox", "WndEditBox_KeyWord", {
+			w = 100, h = 21, x = 60, y = 25,
+			text = _C.szGuildBankFilter,
+			placeholder = _L['Search'],
+			onchange = function(raw, txt)
+				local nLen = txt:len()
+				nLen = math.max(nLen, 10)
+				nLen = math.min(nLen, 25)
+				XGUI(raw):width(nLen * 10)
+				_C.szGuildBankFilter = txt
+				_C.DoFilterGuildBank(true)
+			end,
+		})
 		_C.DoFilterGuildBank()
 		
 		MY.UI("Normal/GuildBankPanel")
