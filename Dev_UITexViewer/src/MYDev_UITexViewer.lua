@@ -2,7 +2,7 @@
 -- 开发者工具
 -- by 茗伊 @ 双梦镇 @ 荻花宫
 -- Build 20140730
--- 
+--
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Dev_UITexViewer/lang/")
 local _Cache = {}
 MYDev_UITexViewer = {}
@@ -25,7 +25,7 @@ _Cache.OnPanelActive = function(wnd)
     
     ui:append("WndAutocomplete", "WndAutocomplete_UITexPath"):children('#WndAutocomplete_UITexPath')
       :pos(x, y):size(w-20, 25):text(MYDev_UITexViewer.szUITexPath)
-      :change(function(szText)
+      :change(function(raw, szText)
         local tInfo = KG_Table.Load(szText .. '.txt', {
         -- 图片文件帧信息表的表头名字
             {f = "i", t = "nFrame" },             -- 图片帧 ID

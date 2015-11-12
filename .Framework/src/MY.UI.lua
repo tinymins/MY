@@ -720,13 +720,13 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 								local nCurrentPercentage = this:GetScrollPos() * 100 / this:GetStepCount()
 								wnd:Lookup("", "Text_Default"):SetText(fnFormat(nCurrentPercentage, true))
 								for _, fn in ipairs(wnd.tMyOnChange) do
-									pcall(fn, nCurrentPercentage)
+									pcall(fn, wnd, nCurrentPercentage)
 								end
 							else
 								local nCurrentValue = this:GetScrollPos() + wnd.nOffset
 								wnd:Lookup("", "Text_Default"):SetText(fnFormat(nCurrentValue, false))
 								for _, fn in ipairs(wnd.tMyOnChange) do
-									pcall(fn, nCurrentValue)
+									pcall(fn, wnd, nCurrentValue)
 								end
 							end
 						end
@@ -2650,7 +2650,7 @@ function XGUI:change(fnOnChange)
 	if fnOnChange then
 		for _, ele in pairs(self.eles) do
 			if ele.edt then
-				XGUI.RegisterUIEvent(ele.edt, 'OnEditChanged', function() pcall(fnOnChange,ele.edt:GetText()) end)
+				XGUI.RegisterUIEvent(ele.edt, 'OnEditChanged', function() pcall(fnOnChange, ele.raw, ele.edt:GetText()) end)
 			end
 			if ele.type=="WndSliderBox" then
 				table.insert(ele.wnd.tMyOnChange, fnOnChange)
@@ -2659,9 +2659,17 @@ function XGUI:change(fnOnChange)
 		return self
 	else
 		for _, ele in pairs(self.eles) do
-			if ele.edt then local _this = this this = ele.edt pcall(ele.edt.OnEditChanged) this = _this  end
-			if ele.type=="WndSliderBox" then
-				local _this = this this = ele.sld pcall(ele.sld.OnScrollBarPosChanged) this = _this
+			if ele.edt then
+				local _this = this
+				this = ele.edt
+				pcall(ele.edt.OnEditChanged, ele.raw)
+				this = _this
+			end
+			if ele.type == "WndSliderBox" then
+				local _this = this
+				this = ele.sld
+				pcall(ele.sld.OnScrollBarPosChanged, ele.raw)
+				this = _this
 			end
 		end
 		return self
@@ -3209,7 +3217,7 @@ function XGUI.OpenColorPickerEx(fnAction)
 		textfmt = function(val) return ("%d H"):format(val) end,
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		value = COLOR_HUE, range = {0, 360},
-		onchange = function(nVal)
+		onchange = function(raw, nVal)
 			COLOR_HUE = nVal
 			SetColor()
 		end,

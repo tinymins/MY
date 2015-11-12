@@ -7,18 +7,18 @@
 -- @Last Modified time: 2015-06-10 11:42:34
 -----------------------------------------------
 -- #######################################################################################################
---   * * *         *                 *                     *                   *           *         
---   *   *   * * * * * * *       * * * * * * *             * * * * * * * *     * * * *     * * * *   
---   *   *       *               *           *           *         *         *   *       *   *       
---   *   * *   * * * * *         * * * * * * *           *   * * * * * * *         *     *     *     
---   * *     *   *     *         *           *         * *   *     *     *           *     *         
---   * *         * * * *         * * * * * * *   *   *   *   * * * * * * *           * * * * * *     
---   *   * * *   *     *         *           * *         *   *     *     *     * * * *               
---   *   *   *   * * * *     * * * * * * * * *           *   * * * * * * *           *   * * * * *   
---   *   *   *   *     *               * *   *           *     *   *         * * * * * *     *       
---   * *     *   *   * *           * *       *           *       *                     *   *         
---   *       *               * * *           *           *     *   *                   * *       *   
---   *     *   * * * * * *               * * *           *   *       * * *     * * * *     * * * *  
+--   * * *         *                 *                     *                   *           *
+--   *   *   * * * * * * *       * * * * * * *             * * * * * * * *     * * * *     * * * *
+--   *   *       *               *           *           *         *         *   *       *   *
+--   *   * *   * * * * *         * * * * * * *           *   * * * * * * *         *     *     *
+--   * *     *   *     *         *           *         * *   *     *     *           *     *
+--   * *         * * * *         * * * * * * *   *   *   *   * * * * * * *           * * * * * *
+--   *   * * *   *     *         *           * *         *   *     *     *     * * * *
+--   *   *   *   * * * *     * * * * * * * * *           *   * * * * * * *           *   * * * * *
+--   *   *   *   *     *               * *   *           *     *   *         * * * * * *     *
+--   * *     *   *   * *           * *       *           *       *                     *   *
+--   *       *               * * *           *           *     *   *                   * *       *
+--   *     *   * * * * * *               * * *           *   *       * * *     * * * *     * * * *
 -- #######################################################################################################
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = {}
@@ -70,7 +70,7 @@ MY_Anmerkungen.ReloadNotePanel = function()
 		ui:append("WndEditBox", "WndEditBox_Anmerkungen"):children("#WndEditBox_Anmerkungen")
 		  :pos(0, 0):size(MY_Anmerkungen.nNotePanelWidth, MY_Anmerkungen.nNotePanelHeight - 30)
 		  :multiLine(true):text(MY_Anmerkungen.szNotePanelContent)
-		  :change(function(txt) MY_Anmerkungen.szNotePanelContent = txt end)
+		  :change(function(raw, txt) MY_Anmerkungen.szNotePanelContent = txt end)
 		  
 		ui:onuievent("OnFrameDragEnd", function()
 			MY_Anmerkungen.anchorNotePanel = MY.UI("Normal/MY_Anmerkungen_NotePanel"):anchor()
@@ -118,7 +118,7 @@ MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
 	ui:append("WndEditBox", "WndEditBox_ID"):children("#WndEditBox_ID"):pos(x + 60, y)
 	  :size(200, 25):multiLine(false):enable(false):color(200,200,200)
 	  :text(dwID or note.dwID or "")
-	  -- :change(function(dwID)
+	  -- :change(function(raw, dwID)
 	  --   if dwID == "" or string.find(dwID, "[^%d]") then
 	  --       ui:children("#WndButton_Submit"):enable(false)
 	  --   else
@@ -138,7 +138,7 @@ MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
 	-- name input
 	ui:append("WndEditBox", "WndEditBox_Name"):children("#WndEditBox_Name"):pos(x + 60, y + 30)
 	  :size(200, 25):multiLine(false):text(szName or note.szName or "")
-	  :change(function(szName)
+	  :change(function(raw, szName)
 	  	local rec = MY_Anmerkungen.GetPlayerNote(szName)
 	  	if rec then
 	  		ui:children("#WndButton_Submit"):enable(true)
@@ -215,7 +215,7 @@ MY.RegisterTargetAddonMenu("MY_Anmerkungen_PlayerNotes", function()
 	local dwType, dwID = MY.GetTarget()
 	if dwType == TARGET.PLAYER then
 		local p = MY.GetObject(dwType, dwID)
-		return { 
+		return {
 			szOption = _L['edit player note'],
 			fnAction = function()
 				MY.DelayCall(function()

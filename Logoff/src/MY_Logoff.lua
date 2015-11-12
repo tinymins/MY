@@ -175,7 +175,7 @@ _MY_Logoff.OnPanelActive = function(wnd)
 	ui:append("WndEditBox", "WndEditBox_TargetBloodLess"):children('#WndEditBox_TargetBloodLess')
 	  :pos(offset.x+420,offset.y+123):size(30,22)
 	  :text(MY_Logoff.nTargetBloodLessLogOff)
-	  :change(function(txt) MY_Logoff.nTargetBloodLessLogOff = tonumber(txt) or MY_Logoff.nTargetBloodLessLogOff end)
+	  :change(function(raw, txt) MY_Logoff.nTargetBloodLessLogOff = tonumber(txt) or MY_Logoff.nTargetBloodLessLogOff end)
 	
 	-- 指定玩家消失后下线
 	ui:append("WndCheckBox", "WndCheckBox_PlayerLeaveLogOff"):children('#WndCheckBox_PlayerLeaveLogOff')
@@ -245,7 +245,7 @@ _MY_Logoff.OnPanelActive = function(wnd)
 	ui:append("WndEditBox", "WndEditBox_ClientLevelOverLogOff"):children('#WndEditBox_ClientLevelOverLogOff')
 	  :pos(offset.x+140,offset.y+40):size(30,22)
 	  :text(MY_Logoff.nClientLevelOverLogOff)
-	  :change(function(txt) MY_Logoff.nClientLevelOverLogOff = tonumber(txt) or MY_Logoff.nClientLevelOverLogOff end)
+	  :change(function(raw, txt) MY_Logoff.nClientLevelOverLogOff = tonumber(txt) or MY_Logoff.nClientLevelOverLogOff end)
 
 	-- 指定时间后下线
 	ui:append("WndCheckBox", "WndCheckBox_TimeOutLogOff"):children('#WndCheckBox_TimeOutLogOff')
@@ -256,7 +256,7 @@ _MY_Logoff.OnPanelActive = function(wnd)
 	ui:append("WndEditBox", "WndEditBox_TimeOutLogOff"):children('#WndEditBox_TimeOutLogOff')
 	  :pos(offset.x+35,offset.y):size(60,22)
 	  :text(MY_Logoff.nTimeOut)
-	  :change(function(txt) MY_Logoff.nTimeOut = tonumber(txt) or MY_Logoff.nTimeOut end)
+	  :change(function(raw, txt) MY_Logoff.nTimeOut = tonumber(txt) or MY_Logoff.nTimeOut end)
 	
 	ui:append("Text", "Label_TimeOutWhen"):find('#Label_TimeOutWhen')
 	  :pos(offset.x+100,offset.y-3):text(_L['second(s) later'])
