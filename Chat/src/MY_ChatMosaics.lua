@@ -62,7 +62,7 @@ _C.Mosaics = function(h, nPos, nLen)
 					if not hItem.__MY_szText and (
 						not MY_ChatMosaics.bIgnoreOwnName
 						or hItem:GetText() ~= '[' .. GetClientPlayer().szName .. ']'
-					) then
+					) and not MY_ChatMosaics.tIgnoreNames[hItem:GetText():sub(2, -2)] then
 						local szText = hItem.__MY_szText or hItem:GetText()
 						hItem.__MY_szText = szText
 						if not hItem.__MY_GetText then
@@ -200,9 +200,18 @@ OnPanelActive = function(wnd)
 	ui:append("WndEditBox", {
 		placeholder = _L['unmosaics names (split by comma)'],
 		x = x, y = y, w = w - 2 * x, h = h - y - 50,
-		text = table.concat(MY_ChatMosaics.tIgnoreNames, ","),
+		text = (function()
+			local t = {}
+			for szName, _ in pairs(MY_ChatMosaics.tIgnoreNames) do
+				table.insert(t, szName)
+			end
+			table.concat(t, ",")
+		end)(),
 		onchange = function(raw, szText)
-			MY_ChatMosaics.tIgnoreNames = MY.String.Split(szText, ",")
+			MY_ChatMosaics.tIgnoreNames = {}
+			for _, szName in ipairs(MY.String.Split(szText, ",")) do
+				MY_ChatMosaics.tIgnoreNames[szName] = true
+			end
 			MY_ChatMosaics.ResetMosaics()
 		end,
 	})
