@@ -469,6 +469,21 @@ function FormatDataStructure(data, struct)
 end
 end
 
+if not IsSameData then
+function IsSameData(data1, data2)
+	if type(data1) == "table" and type(data2) == "table" then
+		for k, v in pairs(data1) do
+			if not IsSameData(data1[k], data2[k]) then
+				return false
+			end
+		end
+		return true
+	else
+		return data1 == data2
+	end
+end
+end
+
 ------------------------------------
 --            ±³¾°Í¨Ñ¶            --
 ------------------------------------
