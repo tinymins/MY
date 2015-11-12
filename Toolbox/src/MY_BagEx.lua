@@ -262,33 +262,39 @@ _C.DoFilterGuildBank = function(bForce)
 		end
 	end
 end
+
+local SimpleMatch = MY.String.SimpleMatch
 -- 过滤仓库原始函数
 _C.FilterBags = function(szTreePath, szFilter, bTimeLtd)
 	szFilter = (szFilter or ""):gsub('[%[%]]', '')
 	local me = GetClientPlayer()
-	MY.UI(szTreePath):find(".Box"):each(function(ui)
-		if this.bBag then
-			return
-		end
-		local bMatch = true
-		local szBoxType, nUiId, dwBox, dwX, suitIndex, dwTabType, dwIndex = this:GetObject()
-		if szBoxType == UI_OBJECT_ITEM then
-			local item = GetPlayerItem(GetClientPlayer(), dwBox, dwX)
-			if item then
-				if bTimeLtd and item.GetLeftExistTime() == 0 then
-					bMatch = false
-				end
-				if not wstring.find(_C.GetItemText(item), szFilter) then
-					bMatch = false
+	if empty(szFilter) and not bTimeLtd then
+		XGUI(szTreePath):find(".Box"):alpha(255)
+	else
+		XGUI(szTreePath):find(".Box"):each(function(ui)
+			if this.bBag then
+				return
+			end
+			local bMatch = true
+			local szBoxType, nUiId, dwBox, dwX, suitIndex, dwTabType, dwIndex = this:GetObject()
+			if szBoxType == UI_OBJECT_ITEM then
+				local item = GetPlayerItem(GetClientPlayer(), dwBox, dwX)
+				if item then
+					if bTimeLtd and item.GetLeftExistTime() == 0 then
+						bMatch = false
+					end
+					if not SimpleMatch(_C.GetItemText(item), szFilter) then
+						bMatch = false
+					end
 				end
 			end
-		end
-		if bMatch then
-			this:SetAlpha(255)
-		else
-			this:SetAlpha(50)
-		end
-	end)
+			if bMatch then
+				this:SetAlpha(255)
+			else
+				this:SetAlpha(50)
+			end
+		end)
+	end
 end
 
 _C.DoCompareBank = function(bForce)
