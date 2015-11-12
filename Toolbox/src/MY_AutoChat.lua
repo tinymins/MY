@@ -246,13 +246,16 @@ local function HookDialoguePanel()
 end
 
 RegisterEvent("OPEN_WINDOW", function()
-	if MY.IsShieldedVersion() or not MY_AutoChat.bEnable then
+	if MY.IsShieldedVersion() then
 		return
 	end
 	if empty(_C.Data) then
 		MY_AutoChat.LoadData()
 	end
 	HookDialoguePanel()
+	if not MY_AutoChat.bEnable then
+		return
+	end
 	MY_AutoChat.CurrentWindow = arg0
 	MY_AutoChat.Conents = arg1
 	MY_AutoChat.DoSomething()
