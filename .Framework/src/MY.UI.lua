@@ -6,6 +6,19 @@
 -- @Last Modified by:   Webster
 -- @Last Modified time: 2015-09-14 18:55:48
 -----------------------------------------------
+
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local tinsert, tremove, tconcat = table.insert, table.remove, table.concat
+local ssub, slen, schar, srep, sbyte, sformat, sgsub =
+      string.sub, string.len, string.char, string.rep, string.byte, string.format, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local floor, mmin, mmax, mceil = math.floor, math.min, math.max, math.ceil
+local GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID = GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID
+local setmetatable = setmetatable
+
 MY = MY or {}
 local _MY = {
 	szIniFileEditBox   = MY.GetAddonInfo().szFrameworkRoot .. "ui\\WndEditBox.ini",
@@ -20,8 +33,8 @@ local _L = MY.LoadLangPack()
 local function ApplyUIArgument(ui, tArg)
 	if tArg and ui then
 		-- properties
+		if tArg.w ~= nil or tArg.h ~= nil or tArg.rw ~= nil or tArg.rh ~= nil then ui:size(tArg.w, tArg.h, tArg.rw, tArg.rh) end
 		if tArg.x ~= nil or tArg.y ~= nil then ui:pos        (tArg.x, tArg.y  ) end
-		if tArg.w ~= nil or tArg.h ~= nil then ui:size       (tArg.w, tArg.h  ) end
 		if tArg.anchor             ~= nil then ui:anchor     (tArg.anchor     ) end
 		if tArg.alpha              ~= nil then ui:alpha      (tArg.alpha      ) end
 		if tArg.font               ~= nil then ui:font       (tArg.font       ) end -- must before color
@@ -652,7 +665,7 @@ end
 -- xml string
 _MY.tItemXML = {
 	["Text"] = "<text>w=150 h=30 valign=1 font=162 eventid=371 </text>",
-	["Image"] = "<image>w=100 h=100 eventid=371 </image>",
+	["Image"] = "<image>w=100 h=100 </image>",
 	["Box"] = "<box>w=48 h=48 eventid=525311 </box>",
 	["Shadow"] = "<shadow>w=15 h=15 eventid=277 </shadow>",
 	["Handle"] = "<handle>firstpostype=0 w=10 h=10</handle>",
@@ -1810,9 +1823,9 @@ end
 
 -- (number) Instance:width()
 -- (self) Instance:width(number)
-function XGUI:width(nWidth)
+function XGUI:width(nWidth, nRawWidth)
 	if nWidth then
-		return self:size(nWidth, nil)
+		return self:size(nWidth, nil, nRawWidth, nil)
 	else
 		local w, h = self:size()
 		return w
@@ -1821,9 +1834,9 @@ end
 
 -- (number) Instance:height()
 -- (self) Instance:height(number)
-function XGUI:height(nHeight)
+function XGUI:height(nHeight, nRawHeight)
 	if nHeight then
-		return self:size(nil, nHeight)
+		return self:size(nil, nHeight, nil, nRawHeight)
 	else
 		local w, h = self:size()
 		return h
@@ -1833,7 +1846,7 @@ end
 -- (number, number) Instance:size()
 -- (self) Instance:size(nLeft, nTop)
 -- (self) Instance:size(OnSizeChanged)
-function XGUI:size(nWidth, nHeight)
+function XGUI:size(nWidth, nHeight, nRawWidth, nRawHeight)
 	self:_checksum()
 	if type(nWidth) == 'function' then
 		for _, ele in pairs(self.eles) do
@@ -1965,6 +1978,15 @@ function XGUI:size(nWidth, nHeight)
 				ele.raw:Lookup("", "Handle_Padding/Handle_Scroll"):FormatAllItemPos()
 				ele.raw:Lookup("WndScrollBar"):SetRelX(nWidth - 20)
 				ele.raw:Lookup("WndScrollBar"):SetH(nHeight - 20)
+			elseif ele.type == "WndSliderBox" then
+				nRawWidth, nRawHeight = nRawWidth or 120, nRawHeight or 12
+				ele.hdl:Lookup("Image_BG"):SetSize(nRawWidth, nRawHeight - 2)
+				ele.sld:SetSize(nRawWidth, nRawHeight)
+				ele.wnd:SetSize(nWidth, nHeight)
+				ele.hdl:SetSize(nWidth, nHeight)
+				ele.txt:SetRelX(nRawWidth + 5)
+				ele.txt:SetSize(nWidth - nRawWidth - 5, nHeight)
+				ele.hdl:FormatAllItemPos()
 			elseif ele.wnd then
 				pcall(function() ele.wnd:SetSize(nWidth, nHeight) end)
 				pcall(function() ele.hdl:SetSize(nWidth, nHeight) end)
@@ -3114,6 +3136,95 @@ function MY.UI.OpenColorPicker(callback, t)
 	--     { r = 65,  g = 50 , b = 160},
 	--     { r = 170, g = 65 , b = 180},
 	-- }
+end
+
+-- 调色板
+local COLOR_HUE = 0
+function MY.UI.OpenColorPickerEx(fnAction)
+	local fX, fY = Cursor.GetPos(true)
+	local tUI = {}
+	local function hsv2rgb(h, s, v)
+		s = s / 100
+		v = v / 100
+		local r, g, b = 0, 0, 0
+		local h = h / 60
+		local i = floor(h)
+		local f = h - i
+		local p = v * (1 - s)
+		local q = v * (1 - s * f)
+		local t = v * (1 - s * (1 - f))
+		if i == 0 or i == 6 then
+			r, g, b = v, t, p
+		elseif i == 1 then
+			r, g, b = q, v, p
+		elseif i == 2 then
+			r, g, b = p, v, t
+		elseif i == 3 then
+			r, g, b = p, q, v
+		elseif i == 4 then
+			r, g, b = t, p, v
+		elseif i == 5 then
+			r, g, b = v, p, q
+		end
+		return floor(r * 255), floor(g * 255), floor(b * 255)
+	end
+
+	local wnd = MY.UI.CreateFrame("MY_ColorPickerEx", { w = 346, h = 430, text = _L["color picker"], simple = true, close = true, esc = true, x = fX + 15, y = fY + 15 }, true)
+	local fnHover = function(bHover, r, g, b)
+		if bHover then
+			wnd:item("#Select"):color(r, g, b)
+			wnd:item("#Select_Text"):text(sformat("r=%d, g=%d, b=%d", r, g, b))
+		else
+			wnd:item("#Select"):color(255, 255, 255)
+			wnd:item("#Select_Text"):text(g_tStrings.STR_NONE)
+		end
+	end
+	local fnClick = function( ... )
+		if fnAction then fnAction( ... ) end
+		if not IsCtrlKeyDown() then wnd:remove() end
+	end
+	local function SetColor()
+		for v = 100, 0, -3 do
+			tUI[v] = tUI[v] or {}
+			for s = 0, 100, 3 do
+				local x = 20 + s * 3
+				local y = 80 + (100 - v) * 3
+				local r, g, b = hsv2rgb(COLOR_HUE, s, v)
+				if tUI[v][s] then
+					tUI[v][s]:color(r, g, b)
+				else
+					tUI[v][s] = wnd:append("Shadow", {
+						w = 9, h = 9, x = x, y = y, color = { r, g, b },
+						onhover = function(bHover)
+							wnd:item("#Select_Image"):pos(this:GetRelPos()):toggle(bHover)
+							local r, g, b = this:GetColorRGB()
+							fnHover(bHover, r, g, b)
+						end,
+						onclick = function()
+							fnClick(this:GetColorRGB())
+						end,
+					}, true)
+				end
+			end
+		end
+	end
+	SetColor()
+	wnd:append("Image", "Select_Image", { w = 9, h = 9, x = 0, y = 0 }, true):image("ui/Image/Common/Box.Uitex", 9):toggle(false)
+	wnd:append("Shadow", "Select", { w = 25, h = 25, x = 20, y = 10, color = { 255, 255, 255 } })
+	wnd:append("Text", "Select_Text", { x = 50, y = 10, text = g_tStrings.STR_NONE })
+	wnd:append("WndSliderBox", {
+		x = 20, y = 35, h = 25, w = 306, rw = 272,
+		textfmt = function(val) return ("%d H"):format(val) end,
+		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		value = COLOR_HUE, range = {0, 360},
+		onchange = function(nVal)
+			COLOR_HUE = nVal
+			SetColor()
+		end,
+	})
+	for i = 0, 360, 8 do
+		wnd:append("Shadow", { x = 20 + (0.74 * i), y = 60, h = 10, w = 6, color = { hsv2rgb(i, 100, 100) } })
+	end
 end
 
 -- 打开字体选择
