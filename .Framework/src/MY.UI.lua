@@ -3,12 +3,22 @@
 -- @Author: 翟一鸣 @tinymins
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
--- @Last Modified by:   Webster
--- @Last Modified time: 2015-09-14 18:55:48
+-- @Last Modified by:   翟一鸣 @tinymins
+-- @Last Modified time: 2015-11-12 11:16:32
 -----------------------------------------------
 
+-------------------------------------
+-- UI object class
+-------------------------------------
+XGUI = class()
+MY.UI = XGUI
+local XGUI = XGUI
+local _L = MY.LoadLangPack()
+
+------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
+------------------------------------------------------------------------
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local tinsert, tremove, tconcat = table.insert, table.remove, table.concat
 local ssub, slen, schar, srep, sbyte, sformat, sgsub =
@@ -19,18 +29,10 @@ local floor, mmin, mmax, mceil = math.floor, math.min, math.max, math.ceil
 local GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID = GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID
 local setmetatable = setmetatable
 
-MY = MY or {}
-local _MY = {
-	szIniFileEditBox   = MY.GetAddonInfo().szFrameworkRoot .. "ui\\WndEditBox.ini",
-	szIniFileButton    = MY.GetAddonInfo().szFrameworkRoot .. "ui\\WndButton.ini",
-	szIniFileCheckBox  = MY.GetAddonInfo().szFrameworkRoot .. "ui\\WndCheckBox.ini",
-	szIniFileMainPanel = MY.GetAddonInfo().szFrameworkRoot .. "ui\\MainPanel.ini",
-}
-local _L = MY.LoadLangPack()
 ---------------------------------------------------------------------
 -- 本地的 UI 组件对象
 ---------------------------------------------------------------------
-local function ApplyUIArgument(ui, tArg)
+local function ApplyUIArguments(ui, tArg)
 	if tArg and ui then
 		-- properties
 		if tArg.w ~= nil or tArg.h ~= nil or tArg.rw ~= nil or tArg.rh ~= nil then ui:size(tArg.w, tArg.h, tArg.rw, tArg.rh) end
@@ -72,6 +74,7 @@ local function ApplyUIArgument(ui, tArg)
 		if tArg.autocomplete       ~= nil then for _, v in ipairs(tArg.autocomplete) do ui:autocomplete(unpack(v)) end end
 	end
 end
+XGUI.ApplyUIArguments = ApplyUIArguments
 
 -- conv raw to eles array
 local function raw2ele(raw)
@@ -127,22 +130,6 @@ local function raw2ele(raw)
 	else _tab.itm = raw end
 	return _tab
 end
--------------------------------------
--- UI object class
--------------------------------------
-local XGUI = class()
-
--- 不会玩元表 (╯‵□′)╯︵┻━┻
--- -- 设置元表，这样可以当作table调用，其效果相当于 .eles[i].raw
--- setmetatable(XGUI, {  __call = function(me, ...) return me:ctor(...) end, __index = function(t, k)
-	-- if type(k) == "number" then
-		-- return t.eles[k].raw
-	-- elseif k=="new" then
-		-- return t['ctor']
-	-- end
--- end
--- , __metatable = true
--- })
 
 -----------------------------------------------------------
 -- my ui common functions
@@ -663,7 +650,7 @@ function XGUI:remove()
 end
 
 -- xml string
-_MY.tItemXML = {
+local _tItemXML = {
 	["Text"] = "<text>w=150 h=30 valign=1 font=162 eventid=371 </text>",
 	["Image"] = "<image>w=100 h=100 </image>",
 	["Box"] = "<box>w=48 h=48 eventid=525311 </box>",
@@ -687,7 +674,7 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 	end
 	local ret
 	if bReturnNewItem then
-		ret = MY.UI()
+		ret = XGUI()
 	else
 		ret = self
 	end
@@ -780,7 +767,7 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 							if wnd.tMyAcOption.disabled or wnd.tMyAcOption.disabledTmp then
 								return
 							end
-							MY.UI(wnd):autocomplete('search')
+							XGUI(wnd):autocomplete('search')
 						end
 						edt.OnEditChanged = function()
 							-- disabled
@@ -798,12 +785,12 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 							if len >= wnd.tMyAcOption.minLength then
 								-- delay search
 								MY.DelayCall(function()
-									MY.UI(wnd):autocomplete('search')
+									XGUI(wnd):autocomplete('search')
 									-- for compatible
 									Station.SetFocusWindow(edt)
 								end, wnd.tMyAcOption.delay)
 							else
-								MY.UI(wnd):autocomplete('close')
+								XGUI(wnd):autocomplete('close')
 							end
 						end
 						edt.OnKillFocus = function()
@@ -850,7 +837,7 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 							source       = {}   ,  -- option list
 						}
 					elseif szType == 'WndRadioBox' then
-						MY.UI.RegisterUIEvent(wnd, 'OnLButtonUp', function()
+						XGUI.RegisterUIEvent(wnd, 'OnLButtonUp', function()
 							local p = wnd:GetParent():GetFirstChild()
 							while p do
 								if p ~= wnd and
@@ -865,10 +852,10 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 					elseif szType == 'WndListBox' then
 						local hScroll = wnd:Lookup('', 'Handle_Scroll')
 						hScroll.OnListItemHandleMouseEnter = function()
-							MY.UI(this:Lookup('Image_Bg')):fadeIn(100)
+							XGUI(this:Lookup('Image_Bg')):fadeIn(100)
 						end
 						hScroll.OnListItemHandleMouseLeave = function()
-							MY.UI(this:Lookup('Image_Bg')):fadeTo(500,0)
+							XGUI(this:Lookup('Image_Bg')):fadeTo(500,0)
 						end
 						hScroll.OnListItemHandleLButtonClick = function()
 							if this:GetParent().OnListItemHandleCustomLButtonClick then
@@ -923,11 +910,11 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 					if bReturnNewItem then
 						ret = ret:add(wnd)
 					end
-					ui = MY.UI(wnd)
+					ui = XGUI(wnd)
 				end
 				Wnd.CloseWindow(frame)
 			elseif ( string.sub(szType, 1, 3) ~= "Wnd" and ele.hdl ) then
-				local szXml = _MY.tItemXML[szType]
+				local szXml = _tItemXML[szType]
 				local hnd
 				if szXml then
 					-- append from xml
@@ -948,10 +935,10 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 					if bReturnNewItem then
 						ret = ret:add(hnd)
 					end
-					ui = MY.UI(hnd)
+					ui = XGUI(hnd)
 				end
 			end
-			ApplyUIArgument(ui, tArg)
+			ApplyUIArguments(ui, tArg)
 		end
 	elseif szXml then
 		for _, ele in pairs(self.eles) do
@@ -1102,17 +1089,17 @@ function XGUI:drag(nX, nY, nW, nH)
 		for _, ele in pairs(self.eles) do
 			if ele.frm then
 				if nX then
-					MY.UI.RegisterUIEvent(ele.frm, 'OnFrameDragSetPosEnd', nX)
+					XGUI.RegisterUIEvent(ele.frm, 'OnFrameDragSetPosEnd', nX)
 				end
 				if nY then
-					MY.UI.RegisterUIEvent(ele.frm, 'OnFrameDragEnd', nY)
+					XGUI.RegisterUIEvent(ele.frm, 'OnFrameDragEnd', nY)
 				end
 			elseif ele.itm then
 				if nX then
-					MY.UI.RegisterUIEvent(ele.itm, 'OnItemLButtonDrag', nX)
+					XGUI.RegisterUIEvent(ele.itm, 'OnItemLButtonDrag', nX)
 				end
 				if nY then
-					MY.UI.RegisterUIEvent(ele.itm, 'OnItemLButtonDragEnd', nY)
+					XGUI.RegisterUIEvent(ele.itm, 'OnItemLButtonDragEnd', nY)
 				end
 			end
 		end
@@ -1277,7 +1264,7 @@ function XGUI:autocomplete(method, arg1, arg2)
 							szOption = szOption,
 							fnAction = function()
 								option.disabledTmp = true
-								MY.UI(ele.raw):text(szOption)
+								XGUI(ele.raw):text(szOption)
 								option.disabledTmp = nil
 								Wnd.CloseWindow('PopupMenuPanel')
 							end,
@@ -1297,7 +1284,7 @@ function XGUI:autocomplete(method, arg1, arg2)
 											table.remove(option.source, i)
 										end
 									end
-									MY.UI(ele.raw):autocomplete('search')
+									XGUI(ele.raw):autocomplete('search')
 								end
 								if option.beforeDelete then
 									bSure = option.beforeDelete(szOption, fnDoDelete, option)
@@ -1606,7 +1593,7 @@ function XGUI:fadeTo(nTime, nOpacity, callback)
 				return ( nEnd - nStart ) * nDuringTime / nTotalTime + nStart -- 线性模型
 			end
 			if not ele:visible() then ele:alpha(0):toggle(true) end
-			MY.BreatheCall("MY_FADE_" .. MY.UI.GetTreePath(ele:raw(1)), function()
+			MY.BreatheCall("MY_FADE_" .. XGUI.GetTreePath(ele:raw(1)), function()
 				ele:show()
 				local nCurrentAlpha = fnCurrent(nStartAlpha, nOpacity, nTime, GetTime()-nStartTime)
 				ele:alpha(nCurrentAlpha)
@@ -1850,7 +1837,7 @@ function XGUI:size(nWidth, nHeight, nRawWidth, nRawHeight)
 	self:_checksum()
 	if type(nWidth) == 'function' then
 		for _, ele in pairs(self.eles) do
-			MY.UI.RegisterUIEvent(ele.raw, "OnSizeChanged", nWidth)
+			XGUI.RegisterUIEvent(ele.raw, "OnSizeChanged", nWidth)
 		end
 	elseif nWidth or nHeight then
 		for _, ele in pairs(self.eles) do
@@ -2056,7 +2043,7 @@ function XGUI:scroll(nPercentage)
 			for _, ele in pairs(self.eles) do
 				local x = ele.raw:Lookup("WndScrollBar")
 				if x then
-					MY.UI.RegisterUIEvent(x, 'OnScrollBarPosChanged', function()
+					XGUI.RegisterUIEvent(x, 'OnScrollBarPosChanged', function()
 						if not this.nLastScrollPos then
 							this.nLastScrollPos = 0
 						end
@@ -2359,7 +2346,7 @@ function XGUI:onuievent(szEvent, fnEvent)
 	end
 	if type(fnEvent)=="function" then
 		for _, ele in pairs(self.eles) do
-			MY.UI.RegisterUIEvent(ele.raw, szEvent, fnEvent)
+			XGUI.RegisterUIEvent(ele.raw, szEvent, fnEvent)
 		end
 	else
 		for _, ele in pairs(self.eles) do
@@ -2404,7 +2391,7 @@ function XGUI:breathe(fnOnFrameBreathe)
 	if type(fnOnFrameBreathe)=="function" then
 		for _, ele in pairs(self.eles) do
 			if ele.frm then
-				MY.UI.RegisterUIEvent(ele.frm, "OnFrameBreathe", fnOnFrameBreathe)
+				XGUI.RegisterUIEvent(ele.frm, "OnFrameBreathe", fnOnFrameBreathe)
 			end
 		end
 	end
@@ -2483,17 +2470,17 @@ function XGUI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 			if type(fnLClick)=="function" then
 				local fnAction = function() fnLClick(MY.Const.Event.Mouse.LBUTTON, ele.raw) end
 				if ele.type == "WndScrollBox" then
-					MY.UI.RegisterUIEvent(ele.hdl ,'OnItemLButtonClick' , fnAction)
+					XGUI.RegisterUIEvent(ele.hdl ,'OnItemLButtonClick' , fnAction)
 				elseif ele.cmb then
-					MY.UI.RegisterUIEvent(ele.cmb ,'OnLButtonClick'     , fnAction)
+					XGUI.RegisterUIEvent(ele.cmb ,'OnLButtonClick'     , fnAction)
 				elseif ele.wnd then
-					MY.UI.RegisterUIEvent(ele.wnd ,'OnLButtonClick'     , fnAction)
+					XGUI.RegisterUIEvent(ele.wnd ,'OnLButtonClick'     , fnAction)
 				elseif ele.itm then
 					ele.itm:RegisterEvent(16)
-					MY.UI.RegisterUIEvent(ele.itm ,'OnItemLButtonClick' , fnAction)
+					XGUI.RegisterUIEvent(ele.itm ,'OnItemLButtonClick' , fnAction)
 				elseif ele.hdl then
 					ele.hdl:RegisterEvent(16)
-					MY.UI.RegisterUIEvent(ele.hdl ,'OnItemLButtonClick' , fnAction)
+					XGUI.RegisterUIEvent(ele.hdl ,'OnItemLButtonClick' , fnAction)
 				end
 			end
 			if type(fnMClick)=="function" then
@@ -2502,17 +2489,17 @@ function XGUI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 			if type(fnRClick)=="function" then
 				local fnAction = function() fnRClick(MY.Const.Event.Mouse.RBUTTON, ele.raw) end
 				if ele.type == "WndScrollBox" then
-					MY.UI.RegisterUIEvent(ele.hdl ,'OnItemRButtonClick' , fnAction)
+					XGUI.RegisterUIEvent(ele.hdl ,'OnItemRButtonClick' , fnAction)
 				elseif ele.cmb then
-					MY.UI.RegisterUIEvent(ele.cmb ,'OnRButtonClick'     , fnAction)
+					XGUI.RegisterUIEvent(ele.cmb ,'OnRButtonClick'     , fnAction)
 				elseif ele.wnd then
-					MY.UI.RegisterUIEvent(ele.wnd ,'OnRButtonClick'     , fnAction)
+					XGUI.RegisterUIEvent(ele.wnd ,'OnRButtonClick'     , fnAction)
 				elseif ele.itm then
 					ele.itm:RegisterEvent(32)
-					MY.UI.RegisterUIEvent(ele.itm ,'OnItemRButtonClick' , fnAction)
+					XGUI.RegisterUIEvent(ele.itm ,'OnItemRButtonClick' , fnAction)
 				elseif ele.hdl then
 					ele.hdl:RegisterEvent(32)
-					MY.UI.RegisterUIEvent(ele.hdl ,'OnItemRButtonClick' , fnAction)
+					XGUI.RegisterUIEvent(ele.hdl ,'OnItemRButtonClick' , fnAction)
 				end
 			end
 		end
@@ -2562,10 +2549,10 @@ function XGUI:hover(fnHover, fnLeave, bNoAutoBind)
 			local wnd = ele.edt or ele.wnd
 			local itm = ele.itm or ele.itm
 			if wnd then
-				MY.UI.RegisterUIEvent(wnd, 'OnMouseEnter'    , function() fnHover(true, this:PtInWindow(Cursor.GetPos())) end)
+				XGUI.RegisterUIEvent(wnd, 'OnMouseEnter'    , function() fnHover(true, this:PtInWindow(Cursor.GetPos())) end)
 			elseif itm then
 				itm:RegisterEvent(256)
-				MY.UI.RegisterUIEvent(itm, 'OnItemMouseEnter', function() fnHover(true, this:PtInItem(Cursor.GetPos())) end)
+				XGUI.RegisterUIEvent(itm, 'OnItemMouseEnter', function() fnHover(true, this:PtInItem(Cursor.GetPos())) end)
 			end
 		end
 	end
@@ -2574,10 +2561,10 @@ function XGUI:hover(fnHover, fnLeave, bNoAutoBind)
 			local wnd = ele.edt or ele.wnd
 			local itm = ele.itm or ele.itm
 			if wnd then
-				MY.UI.RegisterUIEvent(wnd, 'OnMouseLeave'    , function() fnLeave(false, this:PtInWindow(Cursor.GetPos())) end)
+				XGUI.RegisterUIEvent(wnd, 'OnMouseLeave'    , function() fnLeave(false, this:PtInWindow(Cursor.GetPos())) end)
 			elseif itm then
 				itm:RegisterEvent(256)
-				MY.UI.RegisterUIEvent(itm, 'OnItemMouseLeave', function() fnLeave(false, this:PtInItem(Cursor.GetPos())) end)
+				XGUI.RegisterUIEvent(itm, 'OnItemMouseLeave', function() fnLeave(false, this:PtInItem(Cursor.GetPos())) end)
 			end
 		end
 	end
@@ -2635,8 +2622,8 @@ function XGUI:check(fnCheck, fnUncheck, bNoAutoBind)
 	if type(fnCheck)=="function" or type(fnUncheck)=="function" then
 		for _, ele in pairs(self.eles) do
 			if ele.chk then
-				if type(fnCheck)=="function" then MY.UI.RegisterUIEvent(ele.chk, 'OnCheckBoxCheck' , function() fnCheck(true) end) end
-				if type(fnUncheck)=="function" then MY.UI.RegisterUIEvent(ele.chk, 'OnCheckBoxUncheck' , function() fnUncheck(false) end) end
+				if type(fnCheck)=="function" then XGUI.RegisterUIEvent(ele.chk, 'OnCheckBoxCheck' , function() fnCheck(true) end) end
+				if type(fnUncheck)=="function" then XGUI.RegisterUIEvent(ele.chk, 'OnCheckBoxUncheck' , function() fnUncheck(false) end) end
 			end
 		end
 		return self
@@ -2663,7 +2650,7 @@ function XGUI:change(fnOnChange)
 	if fnOnChange then
 		for _, ele in pairs(self.eles) do
 			if ele.edt then
-				MY.UI.RegisterUIEvent(ele.edt, 'OnEditChanged', function() pcall(fnOnChange,ele.edt:GetText()) end)
+				XGUI.RegisterUIEvent(ele.edt, 'OnEditChanged', function() pcall(fnOnChange,ele.edt:GetText()) end)
 			end
 			if ele.type=="WndSliderBox" then
 				table.insert(ele.wnd.tMyOnChange, fnOnChange)
@@ -2689,7 +2676,7 @@ function XGUI:focus(fnOnSetFocus)
 	if fnOnSetFocus then
 		for _, ele in pairs(self.eles) do
 			if ele.edt then
-				MY.UI.RegisterUIEvent(ele.edt, 'OnSetFocus', function() pcall(fnOnSetFocus, self) end)
+				XGUI.RegisterUIEvent(ele.edt, 'OnSetFocus', function() pcall(fnOnSetFocus, self) end)
 			end
 		end
 		return self
@@ -2712,7 +2699,7 @@ function XGUI:blur(fnOnKillFocus)
 	if fnOnKillFocus then
 		for _, ele in pairs(self.eles) do
 			if ele.edt then
-				MY.UI.RegisterUIEvent(ele.edt, 'OnKillFocus', function() pcall(fnOnKillFocus, self) end)
+				XGUI.RegisterUIEvent(ele.edt, 'OnKillFocus', function() pcall(fnOnKillFocus, self) end)
 			end
 		end
 		return self
@@ -2730,10 +2717,10 @@ end
 -- OnGetFocus 获取焦点
 
 -----------------------------------------------------------
--- MY.UI
+-- XGUI
 -----------------------------------------------------------
 
-MY.UI = MY.UI or {}
+XGUI = XGUI or {}
 MY.Const = MY.Const or {}
 MY.Const.Event = MY.Const.Event or {}
 MY.Const.Event.Mouse = MY.Const.Event.Mouse or {}
@@ -2756,17 +2743,16 @@ MY.Const.UI.Tip.NO_HIDE      = 100
 MY.Const.UI.Tip.HIDE         = 101
 MY.Const.UI.Tip.ANIMATE_HIDE = 102
 
-MUI = MY.UI
--- 设置元表，这样可以当作函数调用，其效果相当于 MY.UI.Fetch
-setmetatable(MY.UI, { __call = function(me, ...) return me.Fetch(...) end, __metatable = true })
+-- 设置元表，这样可以当作函数调用，其效果相当于 XGUI.Fetch
+setmetatable(XGUI, { __call = function(me, ...) return me.Fetch(...) end, __metatable = true })
 
 
 -- 构造函数 类似jQuery: $(selector)
-function MY.UI.Fetch(selector, tab)
+function XGUI.Fetch(selector, tab)
 	return XGUI.new(selector, tab)
 end
 -- 绑定UI事件
-function MY.UI.RegisterUIEvent(raw, szEvent, fnEvent)
+function XGUI.RegisterUIEvent(raw, szEvent, fnEvent)
 	if not raw['tMy'..szEvent] then
 		-- init onXXX table
 		raw['tMy'..szEvent] = { raw[szEvent] }
@@ -2777,7 +2763,7 @@ function MY.UI.RegisterUIEvent(raw, szEvent, fnEvent)
 				for _, fn in ipairs(raw['tMy' .. szEvent] or {}) do
 					local t = { pcall(fn, ...) }
 					if not t[1] then
-						MY.Debug({t[2]}, MY.UI.GetTreePath(raw) .. '#' .. szEvent, MY_DEBUG.ERROR)
+						MY.Debug({t[2]}, XGUI.GetTreePath(raw) .. '#' .. szEvent, MY_DEBUG.ERROR)
 					elseif not tReturn then
 						table.remove(t, 1)
 						tReturn = t
@@ -2796,11 +2782,11 @@ end
 
 ---------------------------------------------------
 -- create new frame
--- (ui) MY.UI.CreateFrame(string szName, table opt)
+-- (ui) XGUI.CreateFrame(string szName, table opt)
 -- @param string szName: the ID of frame
 -- @param table  opt   : options
 ---------------------------------------------------
-function  MY.UI.CreateFrame(szName, opt)
+function  XGUI.CreateFrame(szName, opt)
 	if type(opt) ~= 'table' then
 		opt = {}
 	end
@@ -2827,7 +2813,7 @@ function  MY.UI.CreateFrame(szName, opt)
 	frm = Wnd.OpenWindow(szIniFile, szName)
 	frm:ChangeRelation(opt.level)
 	frm:Show()
-	local ui = MY.UI(frm)
+	local ui = XGUI(frm)
 	-- init frame
 	if opt.esc then
 		MY.RegisterEsc('Frame_Close_' .. szName, function()
@@ -2863,13 +2849,13 @@ function  MY.UI.CreateFrame(szName, opt)
 			end
 		end
 		if opt.onrestore then
-			MY.UI.RegisterUIEvent(frm, 'OnRestore', opt.onrestore)
+			XGUI.RegisterUIEvent(frm, 'OnRestore', opt.onrestore)
 		end
 		if not opt.minimize then
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize'):Destroy()
 		else
 			if opt.onminimize then
-				MY.UI.RegisterUIEvent(frm, 'OnMinimize', opt.onminimize)
+				XGUI.RegisterUIEvent(frm, 'OnMinimize', opt.onminimize)
 			end
 			frm:Lookup("WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize").OnCheckBoxCheck = function()
 				if frm.bMaximize then
@@ -2919,7 +2905,7 @@ function  MY.UI.CreateFrame(szName, opt)
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize'):Destroy()
 		else
 			if opt.onmaximize then
-				MY.UI.RegisterUIEvent(frm, 'OnMaximize', opt.onmaximize)
+				XGUI.RegisterUIEvent(frm, 'OnMaximize', opt.onmaximize)
 			end
 			frm:Lookup('WndContainer_TitleBtnR').OnLButtonDBClick = function()
 				frm:Lookup("WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize"):ToggleCheck()
@@ -2932,9 +2918,9 @@ function  MY.UI.CreateFrame(szName, opt)
 					frm.w, frm.h = frm:GetSize()
 				end
 				local w, h = Station.GetClientSize()
-				MY.UI(frm):pos(0, 0):drag(false):size(w, h):onevent('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
+				XGUI(frm):pos(0, 0):drag(false):size(w, h):onevent('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
 					local w, h = Station.GetClientSize()
-					MY.UI(frm):pos(0, 0):size(w, h)
+					XGUI(frm):pos(0, 0):size(w, h)
 				end)
 				if frm.OnMaximize then
 					local status, res = pcall(frm.OnMaximize, frm:Lookup('Window_Main'))
@@ -2948,7 +2934,7 @@ function  MY.UI.CreateFrame(szName, opt)
 				frm.bMaximize = true
 			end
 			frm:Lookup("WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize").OnCheckBoxUncheck = function()
-				MY.UI(frm)
+				XGUI(frm)
 				  :onevent('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
 				  :size(frm.w, frm.h)
 				  :anchor(frm.anchor)
@@ -2972,7 +2958,7 @@ function  MY.UI.CreateFrame(szName, opt)
 			frm:Lookup('Btn_Drag'):Hide()
 		else
 			if opt.ondragresize then
-				MY.UI.RegisterUIEvent(frm, 'OnDragResize', opt.ondragresize)
+				XGUI.RegisterUIEvent(frm, 'OnDragResize', opt.ondragresize)
 			end
 			frm:Lookup('Btn_Drag').OnDragButton = function()
 				local x, y = Station.GetMessagePos()
@@ -2994,7 +2980,7 @@ function  MY.UI.CreateFrame(szName, opt)
 				local w, h = this:GetRelPos()
 				w = math.max(w + 16, opt.minwidth)
 				h = math.max(h + 16, opt.minheight)
-				MY.UI(frm):size(w, h)
+				XGUI(frm):size(w, h)
 				if frm.OnDragResize then
 					local status, res = pcall(frm.OnDragResize, frm:Lookup('Window_Main'))
 					if status and res then
@@ -3033,16 +3019,16 @@ function  MY.UI.CreateFrame(szName, opt)
 			h:FromUITex(szUITexCommon, v)
 		end
 	end
-	ApplyUIArgument(ui, opt)
+	ApplyUIArguments(ui, opt)
 	return ui
 end
 
 -- 打开取色板
-function MY.UI.OpenColorPicker(callback, t)
+function XGUI.OpenColorPicker(callback, t)
 	if t then
 		return OpenColorTablePanel(callback,nil,nil,t)
 	end
-	local ui = MY.UI.CreateFrame("_MY_ColorTable", { simple = true, close = true, esc = true })
+	local ui = XGUI.CreateFrame("_MY_ColorTable", { simple = true, close = true, esc = true })
 	  :size(900, 500):text(_L["color picker"]):anchor({s='CENTER', r='CENTER', x=0, y=0})
 	local fnHover = function(bHover, r, g, b)
 		if bHover then
@@ -3127,7 +3113,7 @@ function MY.UI.OpenColorPicker(callback, t)
 	end})
 	x = x + 50
 	ui:append("WndButton", { text = _L['color picker ex'], x = x + 5, y = y + 3, w = 50, h = 30, onclick = function()
-		MY.UI.OpenColorPickerEx(callback):pos(ui:pos())
+		XGUI.OpenColorPickerEx(callback):pos(ui:pos())
 		ui:remove()
 	end})
 	Station.SetFocusWindow(ui:raw(1))
@@ -3146,7 +3132,7 @@ end
 
 -- 调色板
 local COLOR_HUE = 0
-function MY.UI.OpenColorPickerEx(fnAction)
+function XGUI.OpenColorPickerEx(fnAction)
 	local fX, fY = Cursor.GetPos(true)
 	local tUI = {}
 	local function hsv2rgb(h, s, v)
@@ -3175,7 +3161,7 @@ function MY.UI.OpenColorPickerEx(fnAction)
 		return floor(r * 255), floor(g * 255), floor(b * 255)
 	end
 
-	local wnd = MY.UI.CreateFrame("MY_ColorPickerEx", { w = 346, h = 430, text = _L["color picker ex"], simple = true, close = true, esc = true, x = fX + 15, y = fY + 15 }, true)
+	local wnd = XGUI.CreateFrame("MY_ColorPickerEx", { w = 346, h = 430, text = _L["color picker ex"], simple = true, close = true, esc = true, x = fX + 15, y = fY + 15 }, true)
 	local fnHover = function(bHover, r, g, b)
 		if bHover then
 			wnd:item("#Select"):color(r, g, b)
@@ -3235,9 +3221,9 @@ function MY.UI.OpenColorPickerEx(fnAction)
 end
 
 -- 打开字体选择
-function MY.UI.OpenFontPicker(callback, t)
+function XGUI.OpenFontPicker(callback, t)
 	local w, h = 820, 640
-	local ui = MY.UI.CreateFrame("_MY_Color_Picker", { simple = true, close = true, esc = true })
+	local ui = XGUI.CreateFrame("_MY_Color_Picker", { simple = true, close = true, esc = true })
 	  :size(w, h):text(_L["color picker"]):anchor({s='CENTER', r='CENTER', x=0, y=0})
 
 	for i = 0, 255 do
@@ -3250,9 +3236,9 @@ function MY.UI.OpenFontPicker(callback, t)
 		  	ui:remove()
 		  end)
 		  :hover(function()
-		  	MY.UI(this):alpha(255)
+		  	XGUI(this):alpha(255)
 		  end,function()
-		  	MY.UI(this):alpha(200)
+		  	XGUI(this):alpha(200)
 		  end)
 		-- remove unexist font
 		if txt:font() ~= i then
@@ -3263,7 +3249,7 @@ function MY.UI.OpenFontPicker(callback, t)
 end
 
 -- 打开文本编辑器
-function MY.UI.OpenTextEditor(szText, szFrameName)
+function XGUI.OpenTextEditor(szText, szFrameName)
 	if not szFrameName then
 		szFrameName = "MY_DefaultTextEditor"
 	end
@@ -3271,7 +3257,7 @@ function MY.UI.OpenTextEditor(szText, szFrameName)
 	local function OnResize()
 		ui:children('.WndEditBox'):size(ui:wnd(1):size())
 	end
-	ui = MY.UI.CreateFrame(szFrameName, {
+	ui = XGUI.CreateFrame(szFrameName, {
 		w = w, h = h, text = _L["text editor"], alpha = 180,
 		anchor = { s='CENTER', r='CENTER', x=0, y=0 },
 		simple = true, close = true, esc = true,
@@ -3282,7 +3268,7 @@ function MY.UI.OpenTextEditor(szText, szFrameName)
 end
 
 -- 打开文本列表编辑器
-function MY.UI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
+function XGUI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 	local muDel
 	local AddListItem = function(muList, szText)
 		local i = muList:hdl(1):children():count()
@@ -3293,9 +3279,9 @@ function MY.UI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 		muItem:children("#Image_Bg"):image("UI/Image/Common/TextShadow.UITex",5):alpha(0):hover(function(bIn)
 			if hHandle.Selected then return nil end
 			if bIn then
-				MY.UI(this):fadeIn(100)
+				XGUI(this):fadeIn(100)
 			else
-				MY.UI(this):fadeTo(500,0)
+				XGUI(this):fadeTo(500,0)
 			end
 		end):click(function(nButton)
 			if nButton == MY.Const.Event.Mouse.RBUTTON then
@@ -3310,13 +3296,13 @@ function MY.UI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 				hHandle.Selected = not hHandle.Selected
 			end
 			if hHandle.Selected then
-				MY.UI(this):image("UI/Image/Common/TextShadow.UITex",2)
+				XGUI(this):image("UI/Image/Common/TextShadow.UITex",2)
 			else
-				MY.UI(this):image("UI/Image/Common/TextShadow.UITex",5)
+				XGUI(this):image("UI/Image/Common/TextShadow.UITex",5)
 			end
 		end)
 	end
-	local ui = MY.UI.CreateFrame(szFrameName)
+	local ui = XGUI.CreateFrame(szFrameName)
 	ui:append("Image", "Image_Spliter"):find("#Image_Spliter"):pos(-10,25):size(360, 10):image("UI/Image/UICommon/Commonpanel.UITex",42)
 	local muEditBox = ui:append("WndEditBox", "WndEditBox_Keyword"):find("#WndEditBox_Keyword"):pos(0,0):size(170, 25)
 	local muList = ui:append("WndScrollBox", "WndScrollBox_KeywordList"):find("#WndScrollBox_KeywordList"):handleStyle(3):pos(0,30):size(340, 380)
@@ -3349,11 +3335,45 @@ function MY.UI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 	end
 	return ui
 end
+
+-- 判断浏览器是否已开启
+local function IsInternetExplorerOpened(nIndex)
+	local frame = Station.Lookup("Topmost/IE"..nIndex)
+	if frame and frame:IsVisible() then
+		return true
+	end
+	return false
+end
+
+-- 获取浏览器绝对位置
+local function IE_GetNewIEFramePos()
+	local nLastTime = 0
+	local nLastIndex = nil
+	for i = 1, 10, 1 do
+		local frame = Station.Lookup("Topmost/IE"..i)
+		if frame and frame:IsVisible() then
+			if frame.nOpenTime > nLastTime then
+				nLastTime = frame.nOpenTime
+				nLastIndex = i
+			end
+		end
+	end
+	if nLastIndex then
+		local frame = Station.Lookup("Topmost/IE"..nLastIndex)
+		x, y = frame:GetAbsPos()
+		local wC, hC = Station.GetClientSize()
+		if x + 890 <= wC and y + 630 <= hC then
+			return x + 30, y + 30
+		end
+	end
+	return 40, 40
+end
+
 -- 打开浏览器
-function MY.UI.OpenInternetExplorer(szAddr, bDisableSound)
+function XGUI.OpenInternetExplorer(szAddr, bDisableSound)
 	local nIndex, nLast = nil, nil
 	for i = 1, 10, 1 do
-		if not _MY.IsInternetExplorerOpened(i) then
+		if not IsInternetExplorerOpened(i) then
 			nIndex = i
 			break
 		elseif not nLast then
@@ -3364,7 +3384,7 @@ function MY.UI.OpenInternetExplorer(szAddr, bDisableSound)
 		OutputMessage("MSG_ANNOUNCE_RED", g_tStrings.MSG_OPEN_TOO_MANY)
 		return nil
 	end
-	local x, y = _MY.IE_GetNewIEFramePos()
+	local x, y = IE_GetNewIEFramePos()
 	local frame = Wnd.OpenWindow("InternetExplorer", "IE"..nIndex)
 	frame.bIE = true
 	frame.nIndex = nIndex
@@ -3389,48 +3409,17 @@ function MY.UI.OpenInternetExplorer(szAddr, bDisableSound)
 	end
 	return webPage
 end
--- 判断浏览器是否已开启
-function _MY.IsInternetExplorerOpened(nIndex)
-	local frame = Station.Lookup("Topmost/IE"..nIndex)
-	if frame and frame:IsVisible() then
-		return true
-	end
-	return false
-end
--- 获取浏览器绝对位置
-function _MY.IE_GetNewIEFramePos()
-	local nLastTime = 0
-	local nLastIndex = nil
-	for i = 1, 10, 1 do
-		local frame = Station.Lookup("Topmost/IE"..i)
-		if frame and frame:IsVisible() then
-			if frame.nOpenTime > nLastTime then
-				nLastTime = frame.nOpenTime
-				nLastIndex = i
-			end
-		end
-	end
-	if nLastIndex then
-		local frame = Station.Lookup("Topmost/IE"..nLastIndex)
-		x, y = frame:GetAbsPos()
-		local wC, hC = Station.GetClientSize()
-		if x + 890 <= wC and y + 630 <= hC then
-			return x + 30, y + 30
-		end
-	end
-	return 40, 40
-end
 
 -- append an item to parent
--- MY.UI.Append(hParent, szType,[ szName,] tArg)
--- hParent     -- an Window, Handle or MY.UI object
+-- XGUI.Append(hParent, szType,[ szName,] tArg)
+-- hParent     -- an Window, Handle or XGUI object
 -- szName      -- name of the object inserted
 -- tArg        -- param like width, height, left, right, etc.
-function MY.UI.Append(hParent, szType, szName, tArg)
-	return MY.UI(hParent):append(szType, szName, tArg)
+function XGUI.Append(hParent, szType, szName, tArg)
+	return XGUI(hParent):append(szType, szName, tArg)
 end
 
-function MY.UI.GetTreePath(raw)
+function XGUI.GetTreePath(raw)
 	local tTreePath = {}
 	if type(raw) == "table" and raw.GetTreePath then
 		table.insert(tTreePath, (raw:GetTreePath()):sub(1, -2))
