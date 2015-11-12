@@ -1018,7 +1018,7 @@ MY.RegisterPanel( "MY_Focus", _L["focus list"], _L['Target'], "ui/Image/button/S
 		range = {10, 300},
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		value = MY_Focus.fScaleX * 100,
-		onchange = function(val)
+		onchange = function(raw, val)
 			MY_Focus.SetScale(val / 100, MY_Focus.fScaleY)
 		end,
 	})
@@ -1030,7 +1030,7 @@ MY.RegisterPanel( "MY_Focus", _L["focus list"], _L['Target'], "ui/Image/button/S
 		range = {10, 300},
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		value = MY_Focus.fScaleY * 100,
-		onchange = function(val)
+		onchange = function(raw, val)
 			MY_Focus.SetScale(MY_Focus.fScaleX, val / 100)
 		end,
 	})

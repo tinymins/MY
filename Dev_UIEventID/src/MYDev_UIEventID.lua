@@ -66,7 +66,7 @@ OnPanelActive = function(wnd)
 	
 	ui:append("WndEditBox", "WndEdit", {
 		text = _C.nEventID, x = x, y = y, w = 150, h = 25, font = 201, color = { 255, 255, 255 }
-	}):children('#WndEdit'):change(function(text)
+	}):children('#WndEdit'):change(function(raw, text)
 	  	local nEventID = tonumber(text)
 	  	if nEventID and nEventID ~= _C.nEventID then
 	  		_C.SetEventID(ui, nEventID)

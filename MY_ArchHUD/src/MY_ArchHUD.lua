@@ -361,7 +361,7 @@ function PS.OnPanelActive(wnd)
 		textfmt = function(val) return _L("current alpha is %d%%.", val) end,
 		range = {0, 100},
 		value = MY_ArchHUD.nAlpha,
-		onchange = function(val)
+		onchange = function(raw, val)
 			MY_ArchHUD.nAlpha = val
 			local frame = Station.Lookup("Lowest/MY_ArchHUD")
 			if frame then

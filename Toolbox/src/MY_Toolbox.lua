@@ -356,7 +356,7 @@ MY.RegisterPanel( "MY_ToolBox", _L["toolbox"], _L['General'], "UI/Image/Common/M
 	  :value(MY_VisualSkill.nVisualSkillBoxCount)
 	  :text(_L("display %d skills.", MY_VisualSkill.nVisualSkillBoxCount))
 	  :text(function(val) return _L("display %d skills.", val) end)
-	  :change(function(val)
+	  :change(function(raw, val)
 	  	MY_VisualSkill.nVisualSkillBoxCount = val
 	  	MY_VisualSkill.Reload()
 	  end)
