@@ -3217,6 +3217,7 @@ function XGUI.OpenColorPickerEx(fnAction)
 	for i = 0, 360, 8 do
 		wnd:append("Shadow", { x = 20 + (0.74 * i), y = 60, h = 10, w = 6, color = { hsv2rgb(i, 100, 100) } })
 	end
+	Station.SetFocusWindow(wnd:raw(1))
 	return wnd
 end
 
@@ -3246,6 +3247,7 @@ function XGUI.OpenFontPicker(callback, t)
 		end
 	end
 	Station.SetFocusWindow(ui:raw(1))
+	return ui
 end
 
 -- 打开文本编辑器
@@ -3264,6 +3266,7 @@ function XGUI.OpenTextEditor(szText, szFrameName)
 		dragresize = true, minimize = true, ondragresize = OnResize,
 	}):append("WndEditBox", { x = 0, y = 0, multiline = true, text = szText })
 	OnResize()
+	Station.SetFocusWindow(ui:raw(1))
 	return ui
 end
 
@@ -3333,6 +3336,7 @@ function XGUI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 	for i, v in ipairs(tTextList) do
 		AddListItem(muList, v)
 	end
+	Station.SetFocusWindow(ui:raw(1))
 	return ui
 end
 
