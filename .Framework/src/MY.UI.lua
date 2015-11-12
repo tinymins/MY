@@ -3108,22 +3108,27 @@ function MY.UI.OpenColorPicker(callback, t)
 			fnHover(true, r, g, b)
 		end
 	end
-	local x, y = 240, 435
-	ui:append("Text", { text = "R", x = x, y = y })
-	ui:append("WndEditBox", "R", { x = x + 14, y = y + 4, w = 38, h = 25, limit = 3, edittype = 0, onchange = onChange })
-	x = x + 14 + 38
-	ui:append("Text", { text = "G", x = x, y = y })
-	ui:append("WndEditBox", "G", { x = x + 14, y = y + 4, w = 38, h = 25, limit = 3, edittype = 0, onchange = onChange })
-	x = x + 14 + 38
-	ui:append("Text", { text = "B", x = x, y = y })
-	ui:append("WndEditBox", "B", { x = x + 14, y = y + 4, w = 38, h = 25, limit = 3, edittype = 0, onchange = onChange })
-	x = x + 14 + 38
-	ui:append("WndButton", { text = g_tStrings.STR_HOTKEY_SURE, x = x + 5, y = y + 5, w = 60, h = 25, onclick = function()
+	local x, y = 220, 435
+	ui:append("Text", { text = "R", x = x, y = y, w = 10 })
+	ui:append("WndEditBox", "R", { x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, edittype = 0, onchange = onChange })
+	x = x + 14 + 34
+	ui:append("Text", { text = "G", x = x, y = y, w = 10 })
+	ui:append("WndEditBox", "G", { x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, edittype = 0, onchange = onChange })
+	x = x + 14 + 34
+	ui:append("Text", { text = "B", x = x, y = y, w = 10 })
+	ui:append("WndEditBox", "B", { x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, edittype = 0, onchange = onChange })
+	x = x + 14 + 34
+	ui:append("WndButton", { text = g_tStrings.STR_HOTKEY_SURE, x = x + 5, y = y + 3, w = 50, h = 30, onclick = function()
 		if GetRGBValue() then
 			fnClick(GetRGBValue())
 		else
 			MY.Sysmsg({_L["RGB value error"]})
 		end
+	end})
+	x = x + 50
+	ui:append("WndButton", { text = _L['color picker ex'], x = x + 5, y = y + 3, w = 50, h = 30, onclick = function()
+		MY.UI.OpenColorPickerEx(callback):pos(ui:pos())
+		ui:remove()
 	end})
 	Station.SetFocusWindow(ui:raw(1))
 	-- OpenColorTablePanel(callback,nil,nil,t)
@@ -3136,6 +3141,7 @@ function MY.UI.OpenColorPicker(callback, t)
 	--     { r = 65,  g = 50 , b = 160},
 	--     { r = 170, g = 65 , b = 180},
 	-- }
+	return ui
 end
 
 -- 调色板
@@ -3169,7 +3175,7 @@ function MY.UI.OpenColorPickerEx(fnAction)
 		return floor(r * 255), floor(g * 255), floor(b * 255)
 	end
 
-	local wnd = MY.UI.CreateFrame("MY_ColorPickerEx", { w = 346, h = 430, text = _L["color picker"], simple = true, close = true, esc = true, x = fX + 15, y = fY + 15 }, true)
+	local wnd = MY.UI.CreateFrame("MY_ColorPickerEx", { w = 346, h = 430, text = _L["color picker ex"], simple = true, close = true, esc = true, x = fX + 15, y = fY + 15 }, true)
 	local fnHover = function(bHover, r, g, b)
 		if bHover then
 			wnd:item("#Select"):color(r, g, b)
@@ -3225,6 +3231,7 @@ function MY.UI.OpenColorPickerEx(fnAction)
 	for i = 0, 360, 8 do
 		wnd:append("Shadow", { x = 20 + (0.74 * i), y = 60, h = 10, w = 6, color = { hsv2rgb(i, 100, 100) } })
 	end
+	return wnd
 end
 
 -- 打开字体选择
