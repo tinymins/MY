@@ -410,7 +410,12 @@ end
 -- 保存用户设置
 function _MY_Farbnamen.SaveCustomData()
     local t = {}
-    t.tForceColor = Config.tForceColor
+    t.tForceColor = {}
+    for dwForceID, tCol in pairs(Config.tForceColor) do
+        if not IsSameData(tCol, Config_Default[dwForceID]) then
+            t.tForceColor[dwForceID] = tCol
+        end
+    end
     MY.Sys.SaveLUAData(SZ_CONFIG_PATH, t)
 end
 -- 加载用户配置
