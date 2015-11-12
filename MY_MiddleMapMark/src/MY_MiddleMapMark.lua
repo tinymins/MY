@@ -189,7 +189,8 @@ MY_MiddleMapMark.GetMapData = function(dwMapID)
 		for i = #data.Npc, 1, -1 do
 			if ( data.Npc[i].dwTemplateID and
 				_C.NpcTpl[data.Npc[i].dwTemplateID]
-			) or MY.String.Trim(data.Npc[i].szName) == '' then
+			) or MY.String.Trim(data.Npc[i].szName) == ''
+			or data.Npc[i].dwTemplateID == 1 then
 				table.remove(data.Npc, i)
 				_Cache.tMapDataChanged[dwMapID] = true
 			end
@@ -197,7 +198,8 @@ MY_MiddleMapMark.GetMapData = function(dwMapID)
 		for i = #data.Doodad, 1, -1 do
 			if ( data.Doodad[i].dwTemplateID and
 				_C.DoodadTpl[data.Doodad[i].dwTemplateID]
-			) or MY.String.Trim(data.Doodad[i].szName) == '' then
+			) or MY.String.Trim(data.Doodad[i].szName) == ''
+			or data.Doodad[i].dwTemplateID == 1 then
 				table.remove(data.Doodad, i)
 				_Cache.tMapDataChanged[dwMapID] = true
 			end
@@ -388,7 +390,7 @@ _C.NpcTpl = {
 	[14471] = true, -- 牡丹（花盆内用）
 	[14472] = true, -- 蔷薇 （花盆内用）
 	[14473] = true, -- 黍米（花盆内用）
-	[14474] = true, -- 乌蕨（花盆内用） 
+	[14474] = true, -- 乌蕨（花盆内用）
 	[14475] = true, -- 仙客来（花盆内用）
 	[14476] = true, -- 香蕉（花盆内用）
 	[14477] = true, -- 香雪兰（花盆内用）
@@ -417,7 +419,7 @@ _C.NpcTpl = {
 	[14500] = true, -- 仙客来幼芽-雨洛玉盆
 	[14501] = true, -- 香蕉幼芽-雨洛玉盆
 	[14502] = true, -- 香雪兰幼芽-雨洛玉盆
-	[14503] = true, -- 萱草幼芽-雨洛玉盆 
+	[14503] = true, -- 萱草幼芽-雨洛玉盆
 	[14504] = true, -- 雁来红幼芽-雨洛玉盆
 	[14505] = true, -- 月季幼芽-雨洛玉盆
 	[14506] = true, -- 紫绒蒿幼芽-雨洛玉盆
@@ -436,7 +438,7 @@ _C.NpcTpl = {
 	[18809] = true, -- 防风（花盆内用）
 	[18810] = true, -- 甘草（花盆内用）
 	[18811] = true, -- 枸杞（花盆内用）
-	[18812] = true, -- 金创小草（花盆内用） 
+	[18812] = true, -- 金创小草（花盆内用）
 	[18813] = true, -- 金银花（花盆内用）
 	[18814] = true, -- 兰草（花盆内用）
 	[18815] = true, -- 麦冬（花盆内用）
@@ -462,7 +464,7 @@ _C.NpcTpl = {
 	[18836] = true, -- 金银花幼芽-雨洛玉盆
 	[18837] = true, -- 兰草幼芽-雨洛玉盆
 	[18838] = true, -- 麦冬幼芽-雨洛玉盆
-	[18839] = true, -- 千里香幼芽-雨洛玉盆 
+	[18839] = true, -- 千里香幼芽-雨洛玉盆
 	[18840] = true, -- 芍药幼芽-雨洛玉盆
 	[18841] = true, -- 天麻幼芽-雨洛玉盆
 	[18842] = true, -- 天名精幼芽-雨洛玉盆
@@ -481,7 +483,7 @@ _C.NpcTpl = {
 	[18855] = true, -- 金创小草幼苗-雨洛玉盆
 	[18856] = true, -- 金银花幼苗-雨洛玉盆
 	[18857] = true, -- 兰草幼苗-雨洛玉盆
-	[18858] = true, -- 麦冬幼苗-雨洛玉盆 
+	[18858] = true, -- 麦冬幼苗-雨洛玉盆
 	[18859] = true, -- 千里香幼苗-雨洛玉盆
 	[18860] = true, -- 芍药幼苗-雨洛玉盆
 	[18861] = true, -- 天麻幼苗-雨洛玉盆
@@ -502,7 +504,7 @@ _C.NpcTpl = {
 	[18876] = true, -- 金银花-雨洛玉盆
 	[18877] = true, -- 兰草-雨洛玉盆
 	[18878] = true, -- 麦冬-雨洛玉盆
-	[18879] = true, -- 千里香-雨洛玉盆 
+	[18879] = true, -- 千里香-雨洛玉盆
 	[18880] = true, -- 芍药-雨洛玉盆
 	[18881] = true, -- 天麻-雨洛玉盆
 	[18882] = true, -- 天名精-雨洛玉盆
@@ -807,6 +809,9 @@ MY.RegisterEvent("DOODAD_ENTER_SCENE.MY_MIDDLEMAPMARK", function()
 	local doodad = GetDoodad(arg0)
 	local player = GetClientPlayer()
 	if not (doodad and player) then
+		return
+	end
+	if doodad.nKind == DOODAD_KIND.CORPSE then
 		return
 	end
 	-- avoid special doodad
