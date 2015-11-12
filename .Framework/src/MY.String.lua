@@ -7,6 +7,19 @@
 -- @Last Modified time: 2015-05-29 10:06:20
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
+------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+------------------------------------------------------------------------
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local tinsert, tremove, tconcat = table.insert, table.remove, table.concat
+local ssub, slen, schar, srep, sbyte, sformat, sgsub =
+      string.sub, string.len, string.char, string.rep, string.byte, string.format, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local floor, mmin, mmax, mceil = math.floor, math.min, math.max, math.ceil
+local GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID = GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID
+local setmetatable = setmetatable
 --------------------------------------------
 -- 本地函数和变量
 --------------------------------------------
@@ -82,7 +95,24 @@ MY.String.SimpleEcrypt = function(szText)
 	return szText:gsub('.', function (c) return string.format ("%02X", (string.byte(c) + 13) % 256) end):gsub(" ", "+")
 end
 
-MY.String.SimpleMatch = function(szText, szFind, bDistinctCase)
+local m_simpleMatchCache = setmetatable({}, { __mode = "v" })
+function MY.String.SimpleMatch(szText, szFind, bDistinctCase)
+	local tFind = m_simpleMatchCache[szFind]
+	if not tFind then
+		tFind = {}
+		for _, szKeyWordsLine in ipairs(MY.String.Split(szFind, ';', true)) do
+			local tKeyWordsLine = {}
+			for _, szKeyWords in ipairs(MY.String.Split(szKeyWordsLine, ',', true)) do
+				local tKeyWords = {}
+				for _, szKeyWord in ipairs(MY.String.Split(szKeyWords, '|', true)) do
+					tinsert(tKeyWords, szKeyWord)
+				end
+				tinsert(tKeyWordsLine, tKeyWords)
+			end
+			tinsert(tFind, tKeyWordsLine)
+		end
+		m_simpleMatchCache[szFind] = tFind
+	end
 	if not bDistinctCase then
 		szFind = StringLowerW(szFind)
 		szText = StringLowerW(szText)
@@ -95,24 +125,25 @@ MY.String.SimpleMatch = function(szText, szFind, bDistinctCase)
 		if tong and me.dwTongID ~= 0 then
 			szTongName = tong.ApplyGetTongName(me.dwTongID) or ""
 		end
+		szFind = szFind:gsub("$bh", szTongName)
 		szFind = szFind:gsub("$gh", szTongName)
 	end
 	-- 10|十人,血战天策|XZTC,!小铁被吃了,!开宴黑铁;大战
 	local bKeyWordsLine = false
-	for _, szKeyWordsLine in ipairs( MY.String.Split(szFind, ';', true) ) do         -- 符合一个即可
+	for _, tKeyWordsLine in ipairs(tFind) do         -- 符合一个即可
 		-- 10|十人,血战天策|XZTC,!小铁被吃了,!开宴黑铁
 		local bKeyWords = true
-		for _, szKeyWords in ipairs( MY.String.Split(szKeyWordsLine, ',', true) ) do -- 必须全部符合
+		for _, tKeyWords in ipairs(tKeyWordsLine) do -- 必须全部符合
 			-- 10|十人
 			local bKeyWord = false
-			for _, szKeyWord in ipairs( MY.String.Split(szKeyWords, '|', true) ) do  -- 符合一个即可
+			for _, szKeyWord in ipairs(tKeyWords) do  -- 符合一个即可
 				-- szKeyWord = MY.String.PatternEscape(szKeyWord) -- 用了wstring还Escape个捷豹
-				if string.sub(szKeyWord, 1, 1) == "!" then                     -- !小铁被吃了
-					szKeyWord = string.sub(szKeyWord, 2)
+				if szKeyWord:sub(1, 1) == "!" then              -- !小铁被吃了
+					szKeyWord = szKeyWord:sub(2)
 					if not wstring.find(szText, szKeyWord) then
 						bKeyWord = true
 					end
-				else                                                           -- 十人   -- 10
+				else                                                    -- 十人   -- 10
 					if wstring.find(szText, szKeyWord) then
 						bKeyWord = true
 					end
