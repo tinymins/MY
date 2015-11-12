@@ -135,7 +135,7 @@ local XGUI = class()
 -- my ui common functions
 -----------------------------------------------------------
 -- 获取一个窗体的所有子元素
-local GetChildren = function(root)
+local function GetChildren(root)
 	if not root then return {} end
 	local stack = { root }  -- 初始栈
 	local children = {}     -- 保存所有子元素 szTreePath => element 键值对
@@ -2740,11 +2740,11 @@ setmetatable(MY.UI, { __call = function(me, ...) return me.Fetch(...) end, __met
 
 
 -- 构造函数 类似jQuery: $(selector)
-MY.UI.Fetch = function(selector, tab)
+function MY.UI.Fetch(selector, tab)
 	return XGUI.new(selector, tab)
 end
 -- 绑定UI事件
-MY.UI.RegisterUIEvent = function(raw, szEvent, fnEvent)
+function MY.UI.RegisterUIEvent(raw, szEvent, fnEvent)
 	if not raw['tMy'..szEvent] then
 		-- init onXXX table
 		raw['tMy'..szEvent] = { raw[szEvent] }
@@ -2778,7 +2778,7 @@ end
 -- @param string szName: the ID of frame
 -- @param table  opt   : options
 ---------------------------------------------------
-MY.UI.CreateFrame = function(szName, opt)
+function  MY.UI.CreateFrame(szName, opt)
 	if type(opt) ~= 'table' then
 		opt = {}
 	end
@@ -3016,7 +3016,7 @@ MY.UI.CreateFrame = function(szName, opt)
 end
 
 -- 打开取色板
-MY.UI.OpenColorPicker = function(callback, t)
+function MY.UI.OpenColorPicker(callback, t)
 	if t then
 		return OpenColorTablePanel(callback,nil,nil,t)
 	end
@@ -3093,7 +3093,7 @@ MY.UI.OpenColorPicker = function(callback, t)
 	ui:append("Text", { text = "G", x = x, y = y })
 	ui:append("WndEditBox", "G", { x = x + 14, y = y + 4, w = 38, h = 25, limit = 3, edittype = 0, onchange = onChange })
 	x = x + 14 + 38
-ui:append("Text", { text = "B", x = x, y = y })
+	ui:append("Text", { text = "B", x = x, y = y })
 	ui:append("WndEditBox", "B", { x = x + 14, y = y + 4, w = 38, h = 25, limit = 3, edittype = 0, onchange = onChange })
 	x = x + 14 + 38
 	ui:append("WndButton", { text = g_tStrings.STR_HOTKEY_SURE, x = x + 5, y = y + 5, w = 60, h = 25, onclick = function()
@@ -3117,7 +3117,7 @@ ui:append("Text", { text = "B", x = x, y = y })
 end
 
 -- 打开字体选择
-MY.UI.OpenFontPicker = function(callback, t)
+function MY.UI.OpenFontPicker(callback, t)
 	local w, h = 820, 640
 	local ui = MY.UI.CreateFrame("_MY_Color_Picker", { simple = true, close = true, esc = true })
 	  :size(w, h):text(_L["color picker"]):anchor({s='CENTER', r='CENTER', x=0, y=0})
@@ -3145,7 +3145,7 @@ MY.UI.OpenFontPicker = function(callback, t)
 end
 
 -- 打开文本编辑器
-MY.UI.OpenTextEditor = function(szText, szFrameName)
+function MY.UI.OpenTextEditor(szText, szFrameName)
 	if not szFrameName then
 		szFrameName = "MY_DefaultTextEditor"
 	end
@@ -3164,7 +3164,7 @@ MY.UI.OpenTextEditor = function(szText, szFrameName)
 end
 
 -- 打开文本列表编辑器
-MY.UI.OpenListEditor = function(szFrameName, tTextList, OnAdd, OnDel)
+function MY.UI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 	local muDel
 	local AddListItem = function(muList, szText)
 		local i = muList:hdl(1):children():count()
@@ -3232,7 +3232,7 @@ MY.UI.OpenListEditor = function(szFrameName, tTextList, OnAdd, OnDel)
 	return ui
 end
 -- 打开浏览器
-MY.UI.OpenInternetExplorer = function(szAddr, bDisableSound)
+function MY.UI.OpenInternetExplorer(szAddr, bDisableSound)
 	local nIndex, nLast = nil, nil
 	for i = 1, 10, 1 do
 		if not _MY.IsInternetExplorerOpened(i) then
@@ -3272,7 +3272,7 @@ MY.UI.OpenInternetExplorer = function(szAddr, bDisableSound)
 	return webPage
 end
 -- 判断浏览器是否已开启
-_MY.IsInternetExplorerOpened = function(nIndex)
+function _MY.IsInternetExplorerOpened(nIndex)
 	local frame = Station.Lookup("Topmost/IE"..nIndex)
 	if frame and frame:IsVisible() then
 		return true
@@ -3280,7 +3280,7 @@ _MY.IsInternetExplorerOpened = function(nIndex)
 	return false
 end
 -- 获取浏览器绝对位置
-_MY.IE_GetNewIEFramePos = function()
+function _MY.IE_GetNewIEFramePos()
 	local nLastTime = 0
 	local nLastIndex = nil
 	for i = 1, 10, 1 do
@@ -3308,11 +3308,11 @@ end
 -- hParent     -- an Window, Handle or MY.UI object
 -- szName      -- name of the object inserted
 -- tArg        -- param like width, height, left, right, etc.
-MY.UI.Append = function(hParent, szType, szName, tArg)
+function MY.UI.Append(hParent, szType, szName, tArg)
 	return MY.UI(hParent):append(szType, szName, tArg)
 end
 
-MY.UI.GetTreePath = function(raw)
+function MY.UI.GetTreePath(raw)
 	local tTreePath = {}
 	if type(raw) == "table" and raw.GetTreePath then
 		table.insert(tTreePath, (raw:GetTreePath()):sub(1, -2))
