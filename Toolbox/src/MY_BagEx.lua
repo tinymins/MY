@@ -172,7 +172,7 @@ _C.Hook = function()
 		
 		MY.UI("Normal/BigBankPanel")
 		  :append("WndCheckBox", "CheckBox_TimeLtd"):children("#CheckBox_TimeLtd")
-		  :width(100):pos(277, 56):alpha(200)
+		  :width(60):pos(277, 56):alpha(200)
 		  :text(_L['Time Limited'])
 		  :check(_C.bBankTimeLtd or false)
 		  :check(function(bChecked)
