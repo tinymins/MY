@@ -54,30 +54,36 @@ _C.tChannelGroups = {
     {
         szCaption = g_tStrings.CHANNEL_CHANNEL,
         tChannels = {
-            "MSG_NORMAL", "MSG_PARTY", "MSG_MAP", "MSG_BATTLE_FILED", "MSG_GUILD", "MSG_GUILD_ALLIANCE", "MSG_SCHOOL",
-            "MSG_WORLD", "MSG_TEAM", "MSG_CAMP", "MSG_GROUP", "MSG_WHISPER", "MSG_SEEK_MENTOR", "MSG_FRIEND", "MSG_SYS"
+            "MSG_NORMAL", "MSG_PARTY", "MSG_MAP", "MSG_BATTLE_FILED", "MSG_GUILD", "MSG_GUILD_ALLIANCE", "MSG_SCHOOL", "MSG_WORLD",
+            "MSG_TEAM", "MSG_CAMP", "MSG_GROUP", "MSG_WHISPER", "MSG_SEEK_MENTOR", "MSG_FRIEND", "MSG_SYS",
         },
     }, {
         szCaption = g_tStrings.FIGHT_CHANNEL,
         tChannels = {
             [g_tStrings.STR_NAME_OWN] = {
-                "MSG_SKILL_SELF_SKILL", "MSG_SKILL_SELF_BUFF", "MSG_SKILL_SELF_DEBUFF",
-                "MSG_SKILL_SELF_MISS", "MSG_SKILL_SELF_FAILED"
+                "MSG_SKILL_SELF_HARMFUL_SKILL", "MSG_SKILL_SELF_BENEFICIAL_SKILL", "MSG_SKILL_SELF_BUFF",
+                "MSG_SKILL_SELF_BE_HARMFUL_SKILL", "MSG_SKILL_SELF_BE_BENEFICIAL_SKILL", "MSG_SKILL_SELF_DEBUFF",
+                "MSG_SKILL_SELF_SKILL", "MSG_SKILL_SELF_MISS", "MSG_SKILL_SELF_FAILED", "MSG_SELF_DEATH",
             },
-            [g_tStrings.TEAMMATE] = {"MSG_SKILL_PARTY_SKILL", "MSG_SKILL_PARTY_BUFF", "MSG_SKILL_PARTY_DEBUFF", "MSG_SKILL_PARTY_MISS"},
-            [g_tStrings.OTHER_PLAYER] = {"MSG_SKILL_OTHERS_SKILL", "MSG_SKILL_OTHERS_MISS"},
-            ["NPC"] = {"MSG_SKILL_NPC_SKILL", "MSG_SKILL_NPC_MISS"},
-            [g_tStrings.OTHER] = {"MSG_OTHER_DEATH", "MSG_OTHER_ENCHANT", "MSG_OTHER_SCENE"},
-        }
+            [g_tStrings.TEAMMATE] = {
+                "MSG_SKILL_PARTY_HARMFUL_SKILL", "MSG_SKILL_PARTY_BENEFICIAL_SKILL", "MSG_SKILL_PARTY_BUFF",
+                "MSG_SKILL_PARTY_BE_HARMFUL_SKILL", "MSG_SKILL_PARTY_BE_BENEFICIAL_SKILL", "MSG_SKILL_PARTY_DEBUFF",
+                "MSG_SKILL_PARTY_SKILL", "MSG_SKILL_PARTY_MISS", "MSG_PARTY_DEATH",
+            },
+            [g_tStrings.OTHER_PLAYER] = {"MSG_SKILL_OTHERS_SKILL", "MSG_SKILL_OTHERS_MISS", "MSG_OTHERS_DEATH"},
+            ["NPC"] = {"MSG_SKILL_NPC_SKILL", "MSG_SKILL_NPC_MISS", "MSG_NPC_DEATH"},
+            [g_tStrings.OTHER] = {"MSG_OTHER_ENCHANT", "MSG_OTHER_SCENE"},
+        },
     }, {
         szCaption = g_tStrings.CHANNEL_COMMON,
         tChannels = {
             [g_tStrings.ENVIROMENT] = {"MSG_NPC_NEARBY", "MSG_NPC_YELL", "MSG_NPC_PARTY", "MSG_NPC_WHISPER"},
             [g_tStrings.EARN] = {
-                "MSG_MONEY", "MSG_EXP", "MSG_ITEM", "MSG_REPUTATION", "MSG_CONTRIBUTE", "MSG_ATTRACTION", "MSG_PRESTIGE",
-                "MSG_TRAIN", "MSG_DESGNATION", "MSG_ACHIEVEMENT", "MSG_MENTOR_VALUE", "MSG_THEW_STAMINA", "MSG_TONG_FUND"
+                "MSG_MONEY", "MSG_EXP", "MSG_ITEM", "MSG_REPUTATION", "MSG_CONTRIBUTE",
+                "MSG_ATTRACTION", "MSG_PRESTIGE", "MSG_TRAIN", "MSG_DESGNATION",
+                "MSG_ACHIEVEMENT", "MSG_MENTOR_VALUE", "MSG_THEW_STAMINA", "MSG_TONG_FUND"
             },
-        }
+        },
     }
 }
 _C.nLastLoadDataTime = -1000000
