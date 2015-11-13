@@ -263,7 +263,7 @@ _C.PS.OnPanelActive = function(wnd)
 	ui:append("WndEditBox", "WndEdit_Search"):children('#WndEdit_Search')
 	  :pos(18, 10)
 	  :size(w - 26, 25)
-	  :change(function(v)
+	  :change(function(raw, v)
 	  	if not (v and #v > 0) then
 	  		return
 	  	end
