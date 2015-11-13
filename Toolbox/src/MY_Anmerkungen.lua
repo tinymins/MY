@@ -84,26 +84,17 @@ MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
 	local note = MY_Anmerkungen.GetPlayerNote(dwID) or {}
 	-- frame
 	local ui = MY.UI.CreateFrame("MY_Anmerkungen_PlayerNoteEdit_"..(dwID or 0))
-	local CloseFrame = function(ui)
+	local CloseFrame = function()
 		MY.RegisterEsc('MY_Anmerkungen_PlayerNoteEditPanel')
 		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 		ui:remove()
 		return true
 	end
-	ui:onuievent("OnFrameKeyDown", function()
-	  	if GetKeyName(Station.GetMessageKey()) == "Esc" then
-	  		CloseFrame(MY.UI(this))
-	  		return 1
-	  	end
-	  	return 0
-	  end)
-	  :onuievent("OnCloseButtonClick", CloseFrame)
 	
 	MY.RegisterEsc('MY_Anmerkungen_PlayerNoteEditPanel', function()
 		return ui and ui:count() > 0
-	end, function()
-		CloseFrame(ui)
-	end)
+	end, CloseFrame)
+	ui:onuievent("OnCloseButtonClick", CloseFrame)
 	
 	local w, h = 300, 210
 	local x, y = 20 , 0
