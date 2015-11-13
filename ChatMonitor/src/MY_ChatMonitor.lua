@@ -236,7 +236,7 @@ _C.OnPanelActive = function(wnd)
     
     ui:append("WndAutocomplete", "WndAutocomplete_KeyWord"):children('#WndAutocomplete_KeyWord')
       :pos(80,15):size(w-226,25):text(MY_ChatMonitor.szKeyWords)
-      :change(function(szText) MY_ChatMonitor.szKeyWords = szText end)
+      :change(function(raw, szText) MY_ChatMonitor.szKeyWords = szText end)
       :focus(function(self)
         local source = {}
         for _, szOpt in ipairs(MY.LoadLUAData(_C.szLuaData) or {}) do
