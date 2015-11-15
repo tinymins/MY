@@ -18,8 +18,8 @@ RegisterCustomData("Account\\MY_Farbnamen.bEnabled")
 local SZ_CONFIG_PATH = "config/PLAYER_FORCE_COLOR/$uid.$lang.jx3dat"
 local SZ_CACHE_PATH = "cache/PLAYER_INFO/$server.$lang.jx3dat"
 local Config_Default = {
-    nMaxCache= 2000,
-    tForceColor  = MY.LoadLUAData("config/PLAYER_FORCE_COLOR.jx3dat") or {
+    nMaxCache = 2000,
+    tForceColor = MY.LoadLUAData("config/PLAYER_FORCE_COLOR.jx3dat") or {
         [FORCE_TYPE.JIANG_HU ] = {255, 255, 255}, -- 江湖
         [FORCE_TYPE.SHAO_LIN ] = {255, 178, 95 }, -- 少林
         [FORCE_TYPE.WAN_HUA  ] = {196, 152, 255}, -- 万花
@@ -403,7 +403,13 @@ function MY_Farbnamen.AddAusID(dwID)
             g = player.dwTongID,
             _ = GetCurrentTime(),
         }
-        GetTongClient().ApplyGetTongName(player.dwTongID, 254)
+        local dwTongID = player.dwTongID
+        if dwTongID and dwTongID ~= 0 then
+            local szTong = GetTongClient().ApplyGetTongName(dwTongID, 254)
+            if szTong and szTong ~= "" then
+                TongCache[dwTongID] = szTong
+            end
+        end
         return true
     end
 end
