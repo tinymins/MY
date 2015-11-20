@@ -444,7 +444,7 @@ MY.Player.IsFighting = function()
 	end
 	local bFightState = me.bFightState
 	
-	if not bFightState and MY.Player.IsInArena() then
+	if not bFightState and MY.Player.IsInArena() and _C.bJJCStart then
 		bFightState = true
 	elseif not bFightState and MY.Player.IsInDungeon() then
 		-- 在副本且附近队友进战且附近敌对NPC进战则判断处于战斗状态
@@ -468,6 +468,8 @@ MY.Player.IsFighting = function()
 	return bFightState
 end
 MY.IsFighting = MY.Player.IsFighting
+MY.RegisterEvent("LOADING_END", funtion() _C.bJJCStart = nil end)
+MY.RegisterEvent("OnArenaEventNotify", funtion() _C.bJJCStart = arg0 == "START_COUNT_DOWN" and arg1 == 0 end)
 
 -------------------------------------------------------------------------------------------------------------------
 --                                   #                                                       #                   --
