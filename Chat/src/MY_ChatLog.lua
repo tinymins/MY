@@ -284,7 +284,7 @@ function MY_ChatLog.Export(szExportFile, aChannels, nPerSec, onProgress)
 	if onProgress then
 		onProgress(_L["preparing"], 0)
 	end
-	local status =  Log(szExportFile, getHeader(), true)
+	local status =  Log(szExportFile, getHeader(), "clear")
 	if status ~= "SUCCEED" then
 		return MY.Sysmsg({_L("Error: open file error %s [%s]", szExportFile, status)})
 	end
@@ -295,7 +295,7 @@ function MY_ChatLog.Export(szExportFile, aChannels, nPerSec, onProgress)
 		local szChannel = aChannels[nChnIndex]
 		if not szChannel then
 			m_bExporting = false
-			Log(szExportFile, getFooter())
+			Log(szExportFile, getFooter(), "close")
 			if onProgress then
 				onProgress(_L['Export succeed'], 1)
 			end
@@ -539,7 +539,7 @@ function _C.OnPanelActive(wnd)
 	  			fnAction = function()
 	  				MY_ChatLog.Export(MY.GetLUADataPath("export/ChatLog/$name@$server.html"), {
 						"MSG_GUILD", "MSG_WHISPER", "MSG_TEAM", "MSG_FRIEND"
-					}, 5, function(szTitle, fProgress)
+					}, 10, function(szTitle, fProgress)
 						OutputMessage("MSG_ANNOUNCE_YELLOW", _L("Exporting chatlog: %s, %.2f%%.", szTitle, fProgress * 100))
 					end)
 	  			end,
