@@ -4,6 +4,19 @@
 -- ×÷Õß£ºµÔÒ»Ãù @ tinymins
 -- ÍøÕ¾£ºZhaiYiMing.CoM
 --
+
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local tinsert, tremove, tconcat = table.insert, table.remove, table.concat
+local ssub, slen, schar, srep, sbyte, sformat, sgsub =
+      string.sub, string.len, string.char, string.rep, string.byte, string.format, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local floor, mmin, mmax, mceil = math.floor, math.min, math.max, math.ceil
+local GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID = GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID
+local setmetatable = setmetatable
+
 local _L  = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Chat/lang/")
 local _C  = {}
 local Log = {}
@@ -185,6 +198,146 @@ function _C.UnloadLog()
 end
 MY.RegisterExit(_C.UnloadLog)
 
+local function getHeader()
+	local szHeader = [[<html>
+<head><meta http-equiv="Content-Type" content="text/html; charset=GBK" />
+<style>
+*{font-size: 8px}
+a{line-height: 16px}
+body{background-color: #000}
+.channel{color: #fff; font-weight: 800; font-size: 32px; padding: 0; margin: 30px 0 0 0}
+.date{color: #fff; font-weight: 800; font-size: 24px; padding: 0; margin: 0}
+]]
+	
+	if MY_Farbnamen and MY_Farbnamen.GetForceRgb then
+		for k, v in pairs(g_tStrings.tForceTitle) do
+			szHeader = szHeader .. (".force-%s{color:#%02X%02X%02X}"):format(k, unpack(MY_Farbnamen.GetForceRgb(k)))
+		end
+	end
+
+	szHeader = szHeader .. [[
+</style></head>
+<body><a style="color: #fff;margin: 0 10px">]] .. GetClientPlayer().szName .. " @ " .. MY.GetServer() ..
+" Exported at " .. MY.FormatTime("yyyyMMdd hh:mm:ss", GetCurrentTime()) .. "</a><hr />"
+
+	return szHeader
+end
+
+local function getFooter()
+	return [[
+</body>
+</html>]]
+end
+
+local function getChannelTitle(szChannel)
+	return [[<p class="channel">]] .. (g_tStrings.tChannelName[szChannel] or "") .. [[</p><hr />]]
+end
+
+local function getDateTitle(szDate)
+	return [[<p class="date">]] .. (szDate or "") .. [[</p>]]
+end
+
+local function convertXml2Html(szXml)
+	local aXml = MY.Xml.Decode(szXml)
+	local t = {}
+	if aXml then
+		local text, name
+		for _, xml in ipairs(aXml) do
+			text = xml[''].text
+			name = xml[''].name
+			if text then
+				local force
+				text = text:gsub("\n", "<br>")
+				tinsert(t, '<a')
+				if name and name:sub(1, 9) == "namelink_"
+				and MY_Farbnamen and MY_Farbnamen.Get then
+					local info = MY_Farbnamen.Get((text:gsub("[%[%]]", "")))
+					if info then
+						force = info.dwForceID
+						tinsert(t, ' class="force-')
+						tinsert(t, info.dwForceID)
+						tinsert(t, '"')
+					end
+				end
+				if not force and xml[''].r and xml[''].g and xml[''].b then
+					tinsert(t, (' style="color:#%02X%02X%02X"'):format(xml[''].r, xml[''].g, xml[''].b))
+				end
+				tinsert(t, '>')
+				tinsert(t, text)
+				tinsert(t, '</a>')
+			elseif name and name:sub(1, 8) == "emotion_" then
+				tinsert(t, '<a class="')
+				tinsert(t, name)
+				tinsert(t, '"></a>')
+			end
+		end
+	end
+	return tconcat(t)
+end
+
+local m_bExporting
+function MY_ChatLog.Export(szExportFile, aChannels, nPerSec, onProgress)
+	local Log = _G.Log
+	if m_bExporting then
+		return MY.Sysmsg({_L['Already exporting, please wait.']})
+	end
+	if onProgress then
+		onProgress(_L["preparing"], 0)
+	end
+	local status =  Log(szExportFile, getHeader(), true)
+	if status ~= "SUCCEED" then
+		return MY.Sysmsg({_L("Error: open file error %s [%s]", szExportFile, status)})
+	end
+	m_bExporting = true
+	local szLastChannel, szLastDate
+	local nChnIndex, nDateIndex, nOffset = 1, 1, 1
+	local function Export()
+		local szChannel = aChannels[nChnIndex]
+		if not szChannel then
+			m_bExporting = false
+			Log(szExportFile, getFooter())
+			if onProgress then
+				onProgress(_L['Export succeed'], 1)
+			end
+			MY.Sysmsg({_L('Chatlog export succeed, file saved as %s', szExportFile)})
+			return 0
+		end
+		if szChannel ~= szLastChannel then
+			szLastChannel = szChannel
+			Log(szExportFile, getChannelTitle(szChannel))
+		end
+		local DateList, DateIndex = _C.GetDateList(szChannel)
+		local szDate = DateList[nDateIndex]
+		if not szDate then
+			nDateIndex = 1
+			nChnIndex = nChnIndex + 1
+			return
+		end
+		if szDate ~= szLastDate then
+			szLastDate = szDate
+			Log(szExportFile, getDateTitle(szDate))
+		end
+		local aLog = _C.GetLog(szChannel, DateList[nDateIndex])
+		local nUIndex = nOffset + nPerSec
+		if nUIndex >= #aLog then
+			nUIndex = #aLog
+		end
+		for i = nOffset, nUIndex do
+			if onProgress then
+				onProgress(g_tStrings.tChannelName[szChannel] .. " - " .. DateList[nDateIndex],
+				(((i - 1) / #aLog + (nDateIndex - 1)) / #DateList + (nChnIndex - 1)) / #aChannels)
+			end
+			Log(szExportFile, convertXml2Html(aLog[i]))
+		end
+		if nUIndex >= #aLog then
+			nOffset = 1
+			nDateIndex = nDateIndex + 1
+		else
+			nOffset = nUIndex + 1
+		end
+	end
+	MY.BreatheCall("MY_ChatLog_Export", Export)
+end
 ------------------------------------------------------------------------------------------------------
 --    # # # # # # # # #                                 #         #               #             #   --
 --    #       #       #     # # # # # # # # # # #       #       #   #         #   #             #   --
@@ -379,6 +532,16 @@ function _C.OnPanelActive(wnd)
 	  					"MSG_GUILD", "MSG_WHISPER", "MSG_TEAM", "MSG_FRIEND"
 	  				}, 300)
 	  				_C.UiRedrawLog()
+	  			end,
+	  		})
+	  		table.insert(t, {
+	  			szOption = _L['export chatlog'],
+	  			fnAction = function()
+	  				MY_ChatLog.Export(MY.GetLUADataPath("export/ChatLog/$name@$server.html"), {
+						"MSG_GUILD", "MSG_WHISPER", "MSG_TEAM", "MSG_FRIEND"
+					}, 5, function(szTitle, fProgress)
+						OutputMessage("MSG_ANNOUNCE_YELLOW", _L("Exporting chatlog: %s, %.2f%%.", szTitle, fProgress * 100))
+					end)
 	  			end,
 	  		})
 	  		return t
