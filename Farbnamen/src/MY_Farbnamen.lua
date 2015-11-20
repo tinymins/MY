@@ -57,7 +57,7 @@ local InfoCache = (function()
             end
             -- read player info from saved data
             if type(k) == "string" then -- szName
-                local nSegID = string.byte(k)
+                local nSegID = string.byte(k) or 0
                 if not tName2ID[nSegID] then
                     tName2ID[nSegID] = MY.LoadLUAData(SZ_N2ID_PATH:format(nSegID)) or {}
                 end
@@ -128,7 +128,7 @@ local InfoCache = (function()
                         tInfoVisit[nSegID] = GetTime()
                         tInfoModified[nSegID] = GetTime()
                         -- save szName to dwID indexing to DataBase
-                        local nSegID = string.byte(v.n)
+                        local nSegID = string.byte(v.n) or 0
                         if not tName2ID[nSegID] then
                             tName2ID[nSegID] = MY.LoadLUAData(SZ_N2ID_PATH:format(nSegID)) or {}
                         end
@@ -465,6 +465,10 @@ function MY_Farbnamen.LoadData()
         end
         MY.SaveLUAData(SZ_CACHE_PATH, nil)
     end
+end
+
+function MY_Farbnamen.GetForceRgb(nForce)
+    return Config.tForceColor[nForce] or Config_Default.tForceColor[nForce] or {255, 255, 255}
 end
 
 --------------------------------------------------------------
