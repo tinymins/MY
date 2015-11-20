@@ -468,8 +468,8 @@ MY.Player.IsFighting = function()
 	return bFightState
 end
 MY.IsFighting = MY.Player.IsFighting
-MY.RegisterEvent("LOADING_END", funtion() _C.bJJCStart = nil end)
-MY.RegisterEvent("OnArenaEventNotify", funtion() _C.bJJCStart = arg0 == "START_COUNT_DOWN" and arg1 == 0 end)
+MY.RegisterEvent("LOADING_END.MY-PLAYER", function() _C.bJJCStart = nil end)
+MY.RegisterEvent("OnArenaEventNotify.MY-PLAYER", function() _C.bJJCStart = arg0 == "START_COUNT_DOWN" and arg1 == 0 end)
 
 -------------------------------------------------------------------------------------------------------------------
 --                                   #                                                       #                   --
