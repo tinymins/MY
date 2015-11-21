@@ -1,26 +1,13 @@
--- ########################################################################## --
---       #       #                   #                     #                  --
---       #         #           # # # # # # # # #         # # # # # # #        --
---     #   # # # # # # # #     #               #       #   #       #          --
---     #                       # # # # # # # # #             # # #            --
---   # #     # # # # # #       #               #         # #       # #        --
---     #                       # # # # # # # # #     # #       #       # #    --
---     #     # # # # # #       #               #               #              --
---     #                       # # # # # # # # #       # # # # # # # # #      --
---     #     # # # # # #               #                       #              --
---     #     #         #       #   #     #     #         #     #     #        --
---     #     # # # # # #       #   #         #   #     #       #       #      --
---     #     #         #     #       # # # # #   #   #       # #         #    --
--- ########################################################################## --
+------------------------------------------
+-- 信息条显示
+------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _Cache = {
     bFighting = false,
     nLastFightStartTimestarp = 0,
     nLastFightEndTimestarp = 0,
 }
-local _C = {}
-MY_InfoTip = {}
-MY_InfoTip.Config = {
+local Config_Default = {
     Ping        = { -- 网络延迟
     	bEnable = false, bShowBg = false, bShowTitle = false, rgb = { 95, 255, 95 },
     	anchor = { x = -180, y = -210, s = "BOTTOMCENTER", r = "BOTTOMCENTER" }, nFont = 48,
@@ -54,6 +41,9 @@ MY_InfoTip.Config = {
         anchor  = { x = -21, y = -243, s = "RIGHTCENTER", r = "RIGHTCENTER" }, nFont = 0,
     },
 }
+local _C = {}
+MY_InfoTip = {}
+MY_InfoTip.Config = clone(Config_Default)
 _C.tTm = {}
 _C.nTmFrameCount = GetLogicFrameCount()
 MY_InfoTip.Cache = {
@@ -138,14 +128,9 @@ local LoadConfig = function()
     end
 end
 RegisterEvent("CUSTOM_UI_MODE_SET_DEFAULT", function()
-    MY_InfoTip.Config.Ping.anchor        = { x=-10, y=-280, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
-    MY_InfoTip.Config.TimeMachine.anchor = { x=-10, y=-250, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
-    MY_InfoTip.Config.FPS.anchor         = { x=-10, y=-220, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
-    MY_InfoTip.Config.Distance.anchor    = { x=-10, y=-190, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
-    MY_InfoTip.Config.SysTime.anchor     = { x=-10, y=-160, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
-    MY_InfoTip.Config.FightTime.anchor   = { x=-10, y=-130, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
-    MY_InfoTip.Config.LotusTime.anchor   = { x=-10, y=-100, s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
-    MY_InfoTip.Config.GPS.anchor         = { x=-10, y=-70 , s="BOTTOMRIGHT", r="BOTTOMRIGHT" }
+    for k, v in pairs(Config_Default) do
+        MY_InfoTip.Config[k].anchor = v.anchor
+    end
     MY_InfoTip.Reload()
 end)
 -- 显示信息条
