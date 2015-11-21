@@ -26,11 +26,11 @@ local Config_Default = {
     },
     SysTime     = { -- 系统时间
         bEnable = false, bShowBg = true, bShowTitle = true,
-    	anchor  = { x = -289, y = -12, s = "BOTTOMRIGHT", r = "BOTTOMRIGHT" },
+    	anchor  = { x = 285, y = -18, s = "BOTTOMLEFT", r = "BOTTOMLEFT" },
     },
     FightTime   = { -- 战斗计时
         bEnable = false, bShowBg = false, bShowTitle = false, rgb = { 255, 0, 128 },
-        anchor  = { x = 295, y = -214, s = "BOTTOMCENTER", r = "BOTTOMCENTER" }, nFont = 199,
+        anchor  = { x = 340, y = -214, s = "BOTTOMCENTER", r = "BOTTOMCENTER" }, nFont = 199,
     },
     LotusTime   = { -- 桂花和藕倒计时
         bEnable = false, bShowBg = true, bShowTitle = true,
@@ -38,7 +38,7 @@ local Config_Default = {
     },
     GPS         = { -- 角色坐标
         bEnable = false, bShowBg = true, bShowTitle = false, rgb = { 255, 255, 255 },
-        anchor  = { x = -21, y = -243, s = "RIGHTCENTER", r = "RIGHTCENTER" }, nFont = 0,
+        anchor  = { x = -21, y = 250, s = "TOPRIGHT", r = "TOPRIGHT" }, nFont = 0,
     },
 }
 local _C = {}
