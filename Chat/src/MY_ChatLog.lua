@@ -181,9 +181,11 @@ local function getHeader()
 <style>
 *{font-size: 8px}
 a{line-height: 16px}
-body{background-color: #000}
+input, button, select, textarea {outline: none}
+body{background-color: #000; margin: 8px 8px 45px 8px}
 .channel{color: #fff; font-weight: 800; font-size: 32px; padding: 0; margin: 30px 0 0 0}
 .date{color: #fff; font-weight: 800; font-size: 24px; padding: 0; margin: 0}
+#controls{background-color: #fff; width: 100%; height: 25px; position: fixed; opacity: 0.92; bottom: 0;}
 ]]
 	
 	if MY_Farbnamen and MY_Farbnamen.GetForceRgb then
@@ -194,7 +196,9 @@ body{background-color: #000}
 
 	szHeader = szHeader .. [[
 </style></head>
-<body><a style="color: #fff;margin: 0 10px">]] .. GetClientPlayer().szName .. " @ " .. MY.GetServer() ..
+<body>
+<div>
+<a style="color: #fff;margin: 0 10px">]] .. GetClientPlayer().szName .. " @ " .. MY.GetServer() ..
 " Exported at " .. MY.FormatTime("yyyyMMdd hh:mm:ss", GetCurrentTime()) .. "</a><hr />"
 
 	return szHeader
@@ -202,6 +206,10 @@ end
 
 local function getFooter()
 	return [[
+</div>
+<div id="controls">
+  <input type="range" style="width: 200px;height: 20px;" min="5" max="25" value="5" oninput='var a=document.getElementsByClassName("namelink"); for(i = a.length - 1; i >= 0; i--){a[i].style["-webkit-filter"]="blur(" + (this.value / 10) + "px)";}'>
+</div>
 </body>
 </html>]]
 end
