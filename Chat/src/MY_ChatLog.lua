@@ -10,7 +10,7 @@
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local tinsert, tremove, tconcat = table.insert, table.remove, table.concat
 local ssub, slen, schar, srep, sbyte, sformat, sgsub =
-      string.sub, string.len, string.char, string.rep, string.byte, string.format, string.gsub
+	  string.sub, string.len, string.char, string.rep, string.byte, string.format, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local floor, mmin, mmax, mceil = math.floor, math.min, math.max, math.ceil
@@ -23,28 +23,16 @@ local Log = {}
 local XML_LINE_BREAKER = XML_LINE_BREAKER
 local tinsert, tconcat, tremove = table.insert, table.concat, table.remove
 MY_ChatLog = MY_ChatLog or {}
-MY_ChatLog.szActiveChannel         = "MSG_WHISPER" -- 当前激活的标签页
-MY_ChatLog.bIgnoreTongOnlineMsg    = true -- 帮会上线通知
+MY_ChatLog.szActiveChannel		 = "MSG_WHISPER" -- 当前激活的标签页
+MY_ChatLog.bIgnoreTongOnlineMsg	= true -- 帮会上线通知
 MY_ChatLog.bIgnoreTongMemberLogMsg = true -- 帮会成员上线下线提示
 RegisterCustomData('MY_ChatLog.bIgnoreTongOnlineMsg')
 RegisterCustomData('MY_ChatLog.bIgnoreTongMemberLogMsg')
 
 ------------------------------------------------------------------------------------------------------
---        #       #             #                               # # # #           #     #           --
---    #   #   #   #             #     # # # # # #     # # # # #                 # # # # # # # # #   --
---        #       #             #     #         #           #                 # #       #           --
---  # # # # # #   # # # #   # # # #   # # # # # #     #       #       #     #   # # # # # # # #     --
---      # #     #     #         #     #     #           #           #           #       #           --
---    #   # #     #   #         #     # # # # # #             #                 # # # # # # # #     --
---  #     #   #   #   #         # #   #     #       # # # # # # # # # # #       #       #           --
---      #         #   #     # # #     # # # # # #           # # #               # # # # # # # # #   --
---  # # # # #     #   #         #     # #       #         #   #   #                   #             --
---    #     #       #           #   #   #       #       #     #     #       # # # # # # # # # # #   --
---      # #       #   #         #   #   # # # # #   # #       #       # #       #     #     #       --
---  # #     #   #       #     # # #     #       #             #             # #       #       # #   --
+-- 数据采集
 ------------------------------------------------------------------------------------------------------
--- 数据采集 --
-_C.TongOnlineMsg       = '^' .. MY.String.PatternEscape(g_tStrings.STR_TALK_HEAD_TONG .. g_tStrings.STR_GUILD_ONLINE_MSG)
+_C.TongOnlineMsg	   = '^' .. MY.String.PatternEscape(g_tStrings.STR_TALK_HEAD_TONG .. g_tStrings.STR_GUILD_ONLINE_MSG)
 _C.TongMemberLoginMsg  = '^' .. MY.String.PatternEscape(g_tStrings.STR_GUILD_MEMBER_LOGIN):gsub('<link 0>', '.-') .. '$'
 _C.TongMemberLogoutMsg = '^' .. MY.String.PatternEscape(g_tStrings.STR_GUILD_MEMBER_LOGOUT):gsub('<link 0>', '.-') .. '$'
 
@@ -92,21 +80,10 @@ MY.RegisterInit("MY_CHATLOG_REGMSG", function()
 	MY.RegisterMsgMonitor('MY_ChatLog_Raid'  , _C.OnRaidMsg  , { 'MSG_TEAM', 'MSG_PARTY', 'MSG_GROUP' })
 	MY.RegisterMsgMonitor('MY_ChatLog_Friend', _C.OnFriendMsg, { 'MSG_FRIEND' })
 end)
+
 ------------------------------------------------------------------------------------------------------
---        #       #             #                           #                                       --
---    #   #   #   #             #     # # # # # #           #               # # # # # #             --
---        #       #             #     #         #   # # # # # # # # # # #     #     #   # # # #     --
---  # # # # # #   # # # #   # # # #   # # # # # #         #                   #     #     #   #     --
---      # #     #     #         #     #     #           #     # # # # #       # # # #     #   #     --
---    #   # #     #   #         #     # # # # # #       #           #         #     #     #   #     --
---  #     #   #   #   #         # #   #     #         # #         #           # # # #     #   #     --
---      #         #   #     # # #     # # # # # #   #   #   # # # # # # #     #     #     #   #     --
---  # # # # #     #   #         #     # #       #       #         #           #     # #     #       --
---    #     #       #           #   #   #       #       #         #         # # # # #       #       --
---      # #       #   #         #   #   # # # # #       #         #                 #     #   #     --
---  # #     #   #       #     # # #     #       #       #       # #                 #   #       #   --
+-- 数据存取
 ------------------------------------------------------------------------------------------------------
--- 数据存取 --
 --[[
 	Log = {
 		MSG_WHISPER = {
@@ -249,15 +226,17 @@ local function convertXml2Html(szXml)
 				local force
 				text = text:gsub("\n", "<br>")
 				tinsert(t, '<a')
-				if name and name:sub(1, 9) == "namelink_"
-				and MY_Farbnamen and MY_Farbnamen.Get then
-					local info = MY_Farbnamen.Get((text:gsub("[%[%]]", "")))
-					if info then
-						force = info.dwForceID
-						tinsert(t, ' class="force-')
-						tinsert(t, info.dwForceID)
-						tinsert(t, '"')
+				if name and name:sub(1, 9) == "namelink_" then
+					tinsert(t, ' class="namelink')
+					if MY_Farbnamen and MY_Farbnamen.Get then
+						local info = MY_Farbnamen.Get((text:gsub("[%[%]]", "")))
+						if info then
+							force = info.dwForceID
+							tinsert(t, ' force-')
+							tinsert(t, info.dwForceID)
+						end
 					end
+					tinsert(t, '"')
 				end
 				if not force and xml[''].r and xml[''].g and xml[''].b then
 					tinsert(t, (' style="color:#%02X%02X%02X"'):format(xml[''].r, xml[''].g, xml[''].b))
@@ -338,21 +317,10 @@ function MY_ChatLog.Export(szExportFile, aChannels, nPerSec, onProgress)
 	end
 	MY.BreatheCall("MY_ChatLog_Export", Export)
 end
+
 ------------------------------------------------------------------------------------------------------
---    # # # # # # # # #                                 #         #               #             #   --
---    #       #       #     # # # # # # # # # # #       #       #   #         #   #             #   --
---    # # # # # # # # #               #               #       #       #       # # # # #   #     #   --
---    #       #       #             #               #     # #           #   #     #       #     #   --
---    # # # # # # # # #       # # # # # # # # # #   # # #     # # # # #     # # # # # # # #     #   --
---            #               #     #     #     #       #                         #       #     #   --
---        # #   # #           #     # # # #     #     #                       # # # # #   #     #   --
---  # # #           # # #     #     #     #     #   # # #   # # # # # # #     #   #   #   #     #   --
---        #       #           #     # # # #     #               #             #   #   #   #     #   --
---        #       #           #     #     #     #       #     #       #       #   #   #         #   --
---      #         #           # # # # # # # # # #   # #     # # # # # # #     #   # # #         #   --
---    #           #           #                 #                       #         #         # # #   --
+-- 界面绘制
 ------------------------------------------------------------------------------------------------------
--- 界面绘制 --
 function _C.UiRedrawLog()
 	if not _C.uiLog then
 		return
