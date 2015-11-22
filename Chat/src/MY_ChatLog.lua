@@ -179,10 +179,11 @@ local function getHeader()
 	local szHeader = [[<html>
 <head><meta http-equiv="Content-Type" content="text/html; charset=GBK" />
 <style>
-*{font-size: 8px}
+*{font-size: 12px}
 a{line-height: 16px}
 input, button, select, textarea {outline: none}
 body{background-color: #000; margin: 8px 8px 45px 8px}
+#browserWarning{background-color: #f00; color:#fff; width: 100%; padding: 8px; position: fixed; opacity: 0.92; top: 0;}
 .channel{color: #fff; font-weight: 800; font-size: 32px; padding: 0; margin: 30px 0 0 0}
 .date{color: #fff; font-weight: 800; font-size: 24px; padding: 0; margin: 0}
 #controls{background-color: #fff; width: 100%; height: 25px; position: fixed; opacity: 0.92; bottom: 0;}
@@ -197,6 +198,31 @@ body{background-color: #000; margin: 8px 8px 45px 8px}
 	szHeader = szHeader .. [[
 </style></head>
 <body>
+<div id="browserWarning">Please allow running JavaScript on this page!</div>
+<script type="text/javascript">
+    (function () {
+        var Sys = {};
+        var ua = navigator.userAgent.toLowerCase();
+        var s;
+        (s = ua.match(/rv:([\d.]+)\) like gecko/)) ? Sys.ie = s[1] :
+        (s = ua.match(/msie ([\d.]+)/)) ? Sys.ie = s[1] :
+        (s = ua.match(/firefox\/([\d.]+)/)) ? Sys.firefox = s[1] :
+        (s = ua.match(/chrome\/([\d.]+)/)) ? Sys.chrome = s[1] :
+        (s = ua.match(/opera.([\d.]+)/)) ? Sys.opera = s[1] :
+        (s = ua.match(/version\/([\d.]+).*safari/)) ? Sys.safari = s[1] : 0;
+        
+        // if (Sys.ie) document.write('IE: ' + Sys.ie);
+        // if (Sys.firefox) document.write('Firefox: ' + Sys.firefox);
+        // if (Sys.chrome) document.write('Chrome: ' + Sys.chrome);
+        // if (Sys.opera) document.write('Opera: ' + Sys.opera);
+        // if (Sys.safari) document.write('Safari: ' + Sys.safari);
+        
+        if (!Sys.chrome)
+            document.getElementById("browserWarning").innerText = "Please use Chrome to browse this page!";
+        else
+            document.getElementById("browserWarning").style["display"] = "none";
+    })();
+</script>
 <div>
 <a style="color: #fff;margin: 0 10px">]] .. GetClientPlayer().szName .. " @ " .. MY.GetServer() ..
 " Exported at " .. MY.FormatTime("yyyyMMdd hh:mm:ss", GetCurrentTime()) .. "</a><hr />"
