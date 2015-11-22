@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-07-04 20:23:32
+-- @Last Modified time: 2015-11-22 13:47:44
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- #################################################################################################################################### --
@@ -112,20 +112,9 @@
 -- ###################################################################################################################################################### --
 
 MY = {}
--- ################################################################################################################################################## --
---             #                 #         #           # # # # # # # #             #       #                   #               # # # # # # # # #      --
---             #                 #         #                       #           #   #   #   #         # # # # # # # # # # #     #       #       #      --
---   # # # # # # # # # # #       #     #   #   # #   #           #       #         #       #               #       #           #         #     #      --
---             #                 #     #   # #   #   #   #     #     #   #   # # # # # #   # # # #     #   #       #   #     # # # # # # # # # # #    --
---           # # #           # # # #   # # #     #   #     #   #   #     #       # #     #     #     #     #       #     #     #       #       #      --
---         #   #   #             #   # #   #     #   #         #         #     #   # #     #   #                               # # # # # # # # #      --
---         #   #   #             #     #   #     #   #     #   #   #     #   #     #   #   #   #       # # # # # # # #         #       #       #      --
---       #     #     #           #     #   #   # #   #   #     #     #   #       #         #   #         #           #         # # # # # # # # #      --
---     #       #       #         #     #   #         #         #         #   # # # # #     #   #           #       #                   #              --
---   #   # # # # # # #   #       # #   #         #   #       # #         #     #     #       #               # # #             # # # # # # # # #      --
---             #             # #       #         #   #                   #       # #       #   #         # #       # #                 #              --
---             #                         # # # # #   # # # # # # # # # # #   # #     #   #       #   # #               # #   # # # # # # # # # # #    --
--- ################################################################################################################################################## --
+--------------------------------------------------------------------------------------------------------------------------------------------
+-- 本地函数变量
+--------------------------------------------------------------------------------------------------------------------------------------------
 local _DEBUG_ = tonumber(LoadLUAData('interface/my.debug.level') or nil) or 4
 local _LOGLV_ = tonumber(LoadLUAData('interface/my.delog.level') or nil) or 4
 local _BUILD_ = "20151113"
@@ -135,7 +124,7 @@ local _FRAMEWORK_ROOT_ = '/Interface/MY/.Framework/'
 
 -- 多语言处理
 -- (table) MY.LoadLangPack(void)
-MY.LoadLangPack = function(szLangFolder)
+function MY.LoadLangPack(szLangFolder)
 	local _, _, szLang = GetVersion()
 	local t0 = LoadLUAData(_FRAMEWORK_ROOT_.."lang\\default") or {}
 	local t1 = LoadLUAData(_FRAMEWORK_ROOT_.."lang\\" .. szLang) or {}
@@ -223,10 +212,10 @@ _MY.tAddonInfo = SetmetaReadonly({
 		-- [3438030] = string.char( 0xB4, 0xE5, 0xBF, 0xDA, 0xB5, 0xC4, 0xCD, 0xF5, 0xCA, 0xA6, 0xB8, 0xB5 ), -- 枫泾古镇
 	},
 })
-MY.GetAddonInfo = function()
+function MY.GetAddonInfo()
 	return _MY.tAddonInfo
 end
-_MY.Init = function()
+function _MY.Init()
 	if _MY.bLoaded then
 		return
 	end
@@ -250,22 +239,11 @@ _MY.Init = function()
 	MY.Sysmsg({_L("%s, welcome to use mingyi plugins!", GetClientPlayer().szName) .. " v" .. MY.GetVersion() .. ' Build ' .. _MY.szBuildDate})
 end
 
--- ################################################################################################## --
---     # # # # # # # # #                                                         #           #        --
---     #       #       #     # # # # # # # # # # #     # # # # # # # # #           #       #          --
---     # # # # # # # # #               #                   #       #                                  --
---     #       #       #             #                     #       #           # # # # # # # # #      --
---     # # # # # # # # #       # # # # # # # # # #         #       #                   #              --
---             #               #     #     #     #         #       #                   #              --
---         # #   # #           #     # # # #     #   # # # # # # # # # # #   # # # # # # # # # # #    --
---   # # #           # # #     #     #     #     #         #       #                   #              --
---         #       #           #     # # # #     #         #       #                 #   #            --
---         #       #           #     #     #     #       #         #               #       #          --
---       #         #           # # # # # # # # # #       #         #             #           #        --
---     #           #           #                 #     #           #         # #               # #    --
--- ################################################################################################## --
+--------------------------------------------------------------------------------------------------------------------------------------------
+-- 界面开关
+--------------------------------------------------------------------------------------------------------------------------------------------
 -- close window
-MY.ClosePanel = function(bMute, bRealClose)
+function MY.ClosePanel(bMute, bRealClose)
 	local hFrame = MY.GetFrame()
 	if hFrame then
 		if not bRealClose then
@@ -283,7 +261,7 @@ MY.ClosePanel = function(bMute, bRealClose)
 end
 
 -- open window
-MY.OpenPanel = function(bMute, bNoFocus)
+function MY.OpenPanel(bMute, bNoFocus)
 	local hFrame = MY.GetFrame()
 	if not hFrame then
 		hFrame = Wnd.OpenWindow(_MY.szIniFile, "MY")
@@ -350,7 +328,7 @@ MY.OpenPanel = function(bMute, bNoFocus)
 end
 
 -- toggle panel
-MY.TogglePanel = function()
+function MY.TogglePanel()
 	if MY.IsPanelVisible() then
 		MY.ClosePanel()
 	else
@@ -359,7 +337,7 @@ MY.TogglePanel = function()
 end
 
 -- reopen panel
-MY.ReopenPanel = function()
+function MY.ReopenPanel()
 	local bVisible = MY.IsPanelVisible()
 	MY.ClosePanel(true)
 	MY.ClosePanel(true, true)
@@ -371,7 +349,7 @@ MY.ReopenPanel = function()
 end
 
 -- resize panel
-MY.ResizePanel = function(nWidth, nHeight)
+function MY.ResizePanel(nWidth, nHeight)
 	local hFrame = MY.GetFrame()
 	if not hFrame then
 		return
@@ -380,23 +358,23 @@ MY.ResizePanel = function(nWidth, nHeight)
 end
 
 -- if panel visible
-MY.IsPanelVisible = function()
+function MY.IsPanelVisible()
 	return MY.GetFrame() and MY.GetFrame():IsVisible()
 end
 
 -- if panel visible
-MY.IsPanelOpened = function()
+function MY.IsPanelOpened()
 	return Station.Lookup("Normal/MY")
 end
 
 -- 获取主窗体句柄
 -- (frame) MY.GetFrame()
-MY.GetFrame = function()
+function MY.GetFrame()
 	return Station.Lookup('Normal/MY')
 end
 
 -- (string, number) MY.GetVersion()     -- HM的 获取字符串版本号 修改方便拿过来了
-MY.GetVersion = function()
+function MY.GetVersion()
 	local v = _MY.dwVersion
 	local szVersion = string.format("%X.%X.%02X", v/0x1000000,
 		math.floor(v/0x10000)%0x100, math.floor(v/0x100)%0x100)
@@ -405,25 +383,15 @@ MY.GetVersion = function()
 	end
 	return szVersion, v
 end
--- ################################################################################################## --
---             #                 #         #                   #                                      --
---   # # # # # # # # # # #       #   #     #         #           #             # # # #   # # # #      --
---       #     #     #         #     #     #           #                       #     #   #     #      --
---       # # # # # # #         #     # # # # # # #         # # # # # # #       #     #   #     #      --
---             #             # #   #       #                     #             #     #   #     #      --
---     # # # # # # # # #       #           #         #           #             #     #   #     #      --
---             #       #       #           #           #         #           # # # # # # # # # # #    --
---   # # # # # # # # # # #     #   # # # # # # # #         # # # # # # #       #     #   #     #      --
---             #       #       #           #                     #             #     #   #     #      --
---     # # # # # # # # #       #           #           #         #             #     #   #     #      --
---             #               #           #         #           #             #     #   #     #      --
---           # #               #           #             # # # # # # # # #   #     # # #     # #      --
--- ################################################################################################## --
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+-- 事件注册
+--------------------------------------------------------------------------------------------------------------------------------------------
 -- 注册初始化函数
 -- RegisterInit(string id, function fn) -- 注册
 -- RegisterInit(function fn)            -- 注册
 -- RegisterInit(string id)              -- 注销
-MY.RegisterInit = function(arg1, arg2)
+function MY.RegisterInit(arg1, arg2)
 	local szKey, fnAction
 	if type(arg1) == 'string' then
 		szKey = arg1
@@ -446,7 +414,7 @@ end
 -- RegisterExit(string id, function fn) -- 注册
 -- RegisterExit(function fn)            -- 注册
 -- RegisterExit(string id)              -- 注销
-MY.RegisterExit = function(arg1, arg2)
+function MY.RegisterExit(arg1, arg2)
 	local szKey, fnAction = ''
 	if type(arg1) == 'string' then
 		szKey = '.' .. arg1
@@ -463,7 +431,7 @@ end
 -- RegisterReload(string id, function fn) -- 注册
 -- RegisterReload(function fn)            -- 注册
 -- RegisterReload(string id)              -- 注销
-MY.RegisterReload = function(arg1, arg2)
+function MY.RegisterReload(arg1, arg2)
 	local szKey, fnAction = ''
 	if type(arg1) == 'string' then
 		szKey = '.' .. arg1
@@ -480,7 +448,7 @@ end
 -- (string)  szEvent  事件，可在后面加一个点并紧跟一个标识字符串用于防止重复或取消绑定，如 LOADING_END.xxx
 -- (function)fnAction 事件处理函数，arg0 ~ arg9，传入 nil 相当于取消该事件
 --特别注意：当 fnAction 为 nil 并且 szKey 也为 nil 时会取消所有通过本函数注册的事件处理器
-MY.RegisterEvent = function(szEvent, fnAction)
+function MY.RegisterEvent(szEvent, fnAction)
 	if type(szEvent) == "table" then
 		for _, szEvent in ipairs(szEvent) do
 			MY.RegisterEvent(szEvent, fnAction)
@@ -511,7 +479,7 @@ MY.RegisterEvent = function(szEvent, fnAction)
 		end
 	end
 end
-_MY.EventHandler = function(szEvent, ...)
+function _MY.EventHandler(szEvent, ...)
 	local tEvent = _MY.tEvent[szEvent]
 	if tEvent then
 		for k, v in pairs(tEvent) do
@@ -527,7 +495,7 @@ end
 -- MY.RegisterBgEvent("MY_CHECK_INSTALL") -- 注销
 -- MY.RegisterBgEvent("MY_CHECK_INSTALL.RECEIVER_01", function(dwTalkerID, szTalkerName, nChannel, oData) MY.BgTalk(szTalkerName, "MY_CHECK_INSTALL_REPLY", oData) end) -- 注册
 -- MY.RegisterBgEvent("MY_CHECK_INSTALL.RECEIVER_01") -- 注销
-MY.RegisterBgEvent = function(szEvent, fnAction)
+function MY.RegisterBgEvent(szEvent, fnAction)
 	local szKey = nil
 	local nPos = StringFindW(szEvent, ".")
 	if nPos then
@@ -575,7 +543,7 @@ end)
 
 -- MY.BgTalk(szName, szEvent, ...)
 -- MY.BgTalk(nChannel, szEvent, ...)
-MY.BgTalk = function(nChannel, szEvent, ...)
+function MY.BgTalk(nChannel, szEvent, ...)
 	local szTarget, me = "", GetClientPlayer()
 	if not (me and nChannel) then
 		return
@@ -618,21 +586,11 @@ MY.RegisterBgEvent("MY_VERSION_CHECK", function(szEvent, dwTalkerID, szTalkerNam
 	end
 	MY.BgTalk(szTalkerName, "MY_VERSION_REPLY", MY.GetVersion())
 end)
--- ########################################################################## --
---     #           #                 # # # # # # #           #                --
---       #     #   #         # # #         #                 #                --
---             # # # # #       #         #                   # # # # # #      --
---           #     #           #     # # # # # # #           #                --
---   # # #         #           #     #           #           #                --
---       #   # # # # # # #     #     #     #     #   # # # # # # # # # # #    --
---       #       #   #         #     #     #     #           #                --
---       #       #   #         #     #     #     #           # # #            --
---       #     #     #   #     # #   #     #     #           #     # #        --
---       #   #         # #   #           #   #               #         #      --
---     #   #                           #       #             #                --
---   #       # # # # # # #         # #           #           #                --
--- ########################################################################## --
-MY.RedrawCategory = function(szCategory)
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+-- 选项卡
+--------------------------------------------------------------------------------------------------------------------------------------------
+function MY.RedrawCategory(szCategory)
 	local frame = MY.GetFrame()
 	if not frame then
 		return
@@ -677,7 +635,7 @@ MY.RedrawCategory = function(szCategory)
 end
 
 -- MY.SwitchCategory(szCategory)
-MY.SwitchCategory = function(szCategory)
+function MY.SwitchCategory(szCategory)
 	local frame = MY.GetFrame()
 	if not frame then
 		return
@@ -697,7 +655,7 @@ MY.SwitchCategory = function(szCategory)
 	end
 end
 
-MY.RedrawTab = function(szCategory)
+function MY.RedrawTab(szCategory)
 	local frame = MY.GetFrame()
 	if not (frame and szCategory) then
 		return
@@ -742,7 +700,7 @@ MY.RedrawTab = function(szCategory)
 	MY.SwitchTab()
 end
 
-MY.SwitchTab = function(szID)
+function MY.SwitchTab(szID)
 	local frame = MY.GetFrame()
 	if not frame then
 		return
@@ -871,7 +829,7 @@ end
 -- 	options.bShielded               国服和谐的选项卡
 -- }
 -- Ex： MY.RegisterPanel( "Test", "测试标签", "测试", "UI/Image/UICommon/ScienceTreeNode.UITex|123", {255,255,0,200}, { OnPanelActive = function(wnd) end } )
-MY.RegisterPanel = function(szID, szTitle, szCategory, szIconTex, rgbaTitleColor, options)
+function MY.RegisterPanel(szID, szTitle, szCategory, szIconTex, rgbaTitleColor, options)
 	local category
 	for _, ctg in ipairs(_MY.tTabs) do
 		for i = #ctg, 1, -1 do
@@ -934,21 +892,10 @@ MY.RegisterPanel = function(szID, szTitle, szCategory, szIconTex, rgbaTitleColor
 	end
 end
 
--- ################################################################################################## --
---             #                                       # # # # # # # #             #       #          --
---   # # # # # # # # # # #     # # # # # # # # #                   #           #   #   #   #          --
---   #     #       #     #     #               #     #           #       #         #       #          --
---       #     #     #         #               #     #   #     #     #   #   # # # # # #   # # # #    --
---           #                 #               #     #     #   #   #     #       # #     #     #      --
---     # # # # # # # # #       #               #     #         #         #     #   # #     #   #      --
---     #     #         #       #               #     #     #   #   #     #   #     #   #   #   #      --
---     #   # # # # #   #       #               #     #   #     #     #   #       #         #   #      --
---     # # #     #     #       #               #     #         #         #   # # # # #     #   #      --
---     #     # #       #       # # # # # # # # #     #       # #         #     #     #       #        --
---     #   #     #     #       #               #     #                   #       # #       #   #      --
---     # # # # # # # # #                             # # # # # # # # # # #   # #     #   #       #    --
--- ################################################################################################## --
-MY.OnMouseWheel = function()
+--------------------------------------------------------------------------------------------------------------------------------------------
+-- 窗口函数
+--------------------------------------------------------------------------------------------------------------------------------------------
+function MY.OnMouseWheel()
 	local p = this
 	while p do
 		if p:GetType() == "WndContainer" then
@@ -959,7 +906,7 @@ MY.OnMouseWheel = function()
 	return true
 end
 
-_MY.OnSizeChanged = function()
+function _MY.OnSizeChanged()
 	local hFrame = this
 	if not hFrame then
 		return
