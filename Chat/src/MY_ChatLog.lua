@@ -175,6 +175,16 @@ function _C.UnloadLog()
 end
 MY.RegisterExit(_C.UnloadLog)
 
+local function htmlEncode(html)
+	return html
+	:gsub("&", "&amp;")
+	:gsub(" ", "&ensp;")
+	:gsub("<", "&lt;")
+	:gsub(">", "&gt;")
+	:gsub('"', "&quot;")
+	:gsub("\n", "<br>")
+end
+
 local function getHeader()
 	local szHeader = [[<!DOCTYPE html>
 <html>
@@ -188,6 +198,7 @@ body{background-color: #000; margin: 8px 8px 45px 8px}
 #browserWarning{background-color: #f00; font-weight: 800; color:#fff; padding: 8px; position: fixed; opacity: 0.92; top: 0; left: 0; right: 0}
 .channel{color: #fff; font-weight: 800; font-size: 32px; padding: 0; margin: 30px 0 0 0}
 .date{color: #fff; font-weight: 800; font-size: 24px; padding: 0; margin: 0}
+a.content{font-family: cursive}
 #controls{background-color: #fff; height: 25px; position: fixed; opacity: 0.92; bottom: 0; left: 0; right: 0}
 #mosaics{width: 200px;height: 20px}
 ]]
@@ -289,7 +300,7 @@ local function convertXml2Html(szXml)
 			name = xml[''].name
 			if text then
 				local force
-				text = text:gsub("\n", "<br>")
+				text = htmlEncode(text)
 				tinsert(t, '<a')
 				if name and name:sub(1, 9) == "namelink_" then
 					tinsert(t, ' class="namelink')
