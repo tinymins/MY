@@ -224,6 +224,9 @@ body{background-color: #000; margin: 8px 8px 45px 8px}
             document.getElementById("browserWarning").style["display"] = "none";
     })();
 </script>
+<div id="controls">
+  <input type="range" style="width: 200px;height: 20px;" min="5" max="25" value="5" oninput='var a=document.getElementsByClassName("namelink"); for(i = a.length - 1; i >= 0; i--){a[i].style["-webkit-filter"]="blur(" + (this.value / 10) + "px)";}'>
+</div>
 <div>
 <a style="color: #fff;margin: 0 10px">]] .. GetClientPlayer().szName .. " @ " .. MY.GetServer() ..
 " Exported at " .. MY.FormatTime("yyyyMMdd hh:mm:ss", GetCurrentTime()) .. "</a><hr />"
@@ -233,9 +236,6 @@ end
 
 local function getFooter()
 	return [[
-</div>
-<div id="controls">
-  <input type="range" style="width: 200px;height: 20px;" min="5" max="25" value="5" oninput='var a=document.getElementsByClassName("namelink"); for(i = a.length - 1; i >= 0; i--){a[i].style["-webkit-filter"]="blur(" + (this.value / 10) + "px)";}'>
 </div>
 </body>
 </html>]]
