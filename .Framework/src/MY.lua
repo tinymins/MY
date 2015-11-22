@@ -956,6 +956,17 @@ function _MY.OnSizeChanged()
 	hWnd:Lookup('WndScroll_Tabs', ''):FormatAllItemPos()
 	hWnd:Lookup('WndScroll_Tabs/ScrollBar_Tabs'):SetSize(16, nHeight - 111)
 	
+	local bHideTabs = nWidth < 550
+	hWnd:Lookup('WndScroll_Tabs'):SetVisible(not bHideTabs)
+	hTotal:Lookup('Image_Breaker'):SetVisible(not bHideTabs)
+	
+	if bHideTabs then
+		nWidth = nWidth + 181
+		hWnd:Lookup('WndScroll_MainPanel'):SetRelX(5)
+	else
+		hWnd:Lookup('WndScroll_MainPanel'):SetRelX(186)
+	end
+	
 	hWnd:Lookup('WndScroll_MainPanel'):SetSize(nWidth - 191, nHeight - 100)
 	hWnd:Lookup('WndScroll_MainPanel/ScrollBar_MainPanel'):SetSize(20, nHeight - 100)
 	hWnd:Lookup('WndScroll_MainPanel/ScrollBar_MainPanel'):SetRelPos(nWidth - 209, 0)
