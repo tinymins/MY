@@ -200,35 +200,35 @@ body{background-color: #000; margin: 8px 8px 45px 8px}
 </style></head>
 <body>
 <div id="browserWarning">Please allow running JavaScript on this page!</div>
-<script type="text/javascript">
-    (function () {
-        var Sys = {};
-        var ua = navigator.userAgent.toLowerCase();
-        var s;
-        (s = ua.match(/rv:([\d.]+)\) like gecko/)) ? Sys.ie = s[1] :
-        (s = ua.match(/msie ([\d.]+)/)) ? Sys.ie = s[1] :
-        (s = ua.match(/firefox\/([\d.]+)/)) ? Sys.firefox = s[1] :
-        (s = ua.match(/chrome\/([\d.]+)/)) ? Sys.chrome = s[1] :
-        (s = ua.match(/opera.([\d.]+)/)) ? Sys.opera = s[1] :
-        (s = ua.match(/version\/([\d.]+).*safari/)) ? Sys.safari = s[1] : 0;
-        
-        // if (Sys.ie) document.write('IE: ' + Sys.ie);
-        // if (Sys.firefox) document.write('Firefox: ' + Sys.firefox);
-        // if (Sys.chrome) document.write('Chrome: ' + Sys.chrome);
-        // if (Sys.opera) document.write('Opera: ' + Sys.opera);
-        // if (Sys.safari) document.write('Safari: ' + Sys.safari);
-        
-        if (!Sys.chrome) {
-            document.getElementById("browserWarning").innerText = "WARNING: Please use Chrome to browse this page!!!";
-        } else {
-            document.getElementById("controls").style["display"] = null;
-            document.getElementById("browserWarning").style["display"] = "none";
-        }
-    })();
-</script>
 <div id="controls" style="display:none">
   <input type="range" style="width: 200px;height: 20px;" min="5" max="25" value="5" oninput='var a=document.getElementsByClassName("namelink"); for(i = a.length - 1; i >= 0; i--){a[i].style["-webkit-filter"]="blur(" + (this.value / 10) + "px)";}'>
 </div>
+<script type="text/javascript">
+	(function () {
+		var Sys = {};
+		var ua = navigator.userAgent.toLowerCase();
+		var s;
+		(s = ua.match(/rv:([\d.]+)\) like gecko/)) ? Sys.ie = s[1] :
+		(s = ua.match(/msie ([\d.]+)/)) ? Sys.ie = s[1] :
+		(s = ua.match(/firefox\/([\d.]+)/)) ? Sys.firefox = s[1] :
+		(s = ua.match(/chrome\/([\d.]+)/)) ? Sys.chrome = s[1] :
+		(s = ua.match(/opera.([\d.]+)/)) ? Sys.opera = s[1] :
+		(s = ua.match(/version\/([\d.]+).*safari/)) ? Sys.safari = s[1] : 0;
+		
+		// if (Sys.ie) document.write('IE: ' + Sys.ie);
+		// if (Sys.firefox) document.write('Firefox: ' + Sys.firefox);
+		// if (Sys.chrome) document.write('Chrome: ' + Sys.chrome);
+		// if (Sys.opera) document.write('Opera: ' + Sys.opera);
+		// if (Sys.safari) document.write('Safari: ' + Sys.safari);
+		
+		if (!Sys.chrome) {
+			document.getElementById("browserWarning").innerText = "WARNING: Please use Chrome to browse this page!!!";
+		} else {
+			document.getElementById("controls").style["display"] = null;
+			document.getElementById("browserWarning").style["display"] = "none";
+		}
+	})();
+</script>
 <div>
 <a style="color: #fff;margin: 0 10px">]] .. GetClientPlayer().szName .. " @ " .. MY.GetServer() ..
 " Exported at " .. MY.FormatTime("yyyyMMdd hh:mm:ss", GetCurrentTime()) .. "</a><hr />"
