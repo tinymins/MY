@@ -177,7 +177,8 @@ MY.RegisterExit(_C.UnloadLog)
 
 local function getHeader()
 	local szHeader = [[<html>
-<head><meta http-equiv="Content-Type" content="text/html; charset=GBK" />
+<head><meta http-equiv="Content-Type" content="text/html; charset=]]
+	.. ((MY.GetLang() == "zhcn" and "GBK") or "UTF-8") .. [[" />
 <style>
 *{font-size: 12px}
 a{line-height: 16px}
