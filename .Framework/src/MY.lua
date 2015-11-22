@@ -906,12 +906,37 @@ function MY.OnMouseWheel()
 	return true
 end
 
+function MY.OnDragButtonBegin()
+	local name = this:GetName()
+	if name == "Btn_Drag" then
+		this.fDragX, this.fDragY = Station.GetMessagePos()
+		this.fDragW, this.fDragH = XGUI(this:GetRoot()):size()
+	end
+end
+
+function MY.OnDragButton()
+	local name = this:GetName()
+	if name == "Btn_Drag" then
+		HideTip()
+		local nX, nY = Station.GetMessagePos()
+		local nDeltaX, nDeltaY = nX - this.fDragX, nY - this.fDragY
+		local nW = math.max(this.fDragW + nDeltaX, 500)
+		local nH = math.max(this.fDragH + nDeltaY, 300)
+		MY.ResizePanel(nW, nH)
+	end
+end
+
+function MY.OnFrameCreate()
+	this:Lookup("Btn_Drag"):RegisterLButtonDrag()
+end
+
 function _MY.OnSizeChanged()
 	local hFrame = this
 	if not hFrame then
 		return
 	end
 	local nWidth, nHeight = hFrame:GetSize()
+	hFrame:Lookup("Btn_Drag"):SetRelPos(nWidth - 18, nHeight - 20)
 	hFrame:Lookup('', 'Text_Author'):SetRelPos(0, nHeight - 41)
 	hFrame:Lookup('', 'Text_Author'):SetSize(nWidth - 31, 20)
 	hFrame:Lookup('', ''):FormatAllItemPos()
