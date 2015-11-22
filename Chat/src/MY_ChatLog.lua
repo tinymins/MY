@@ -176,7 +176,8 @@ end
 MY.RegisterExit(_C.UnloadLog)
 
 local function getHeader()
-	local szHeader = [[<html>
+	local szHeader = [[<!DOCTYPE html>
+<html>
 <head><meta http-equiv="Content-Type" content="text/html; charset=]]
 	.. ((MY.GetLang() == "zhcn" and "GBK") or "UTF-8") .. [[" />
 <style>
@@ -202,25 +203,30 @@ body{background-color: #000; margin: 8px 8px 45px 8px}
 <body>
 <div id="browserWarning">Please allow running JavaScript on this page!</div>
 <div id="controls" style="display:none">
-	<input type="range" id="mosaics" min="50" max="250" value="50">
+	<input type="range" id="mosaics" min="0" max="200" value="0">
 	<script type="text/javascript">
 	(function() {
-		var timerid, filter;
-		var setMosaicHandle = function() {
+		var timerid, blurRadius;
+		var setMosaicHandler = function() {
+			var filter = "blur(" + blurRadius + ")";console.log(filter);
 			var eles = document.getElementsByClassName("namelink");
 			for(i = eles.length - 1; i >= 0; i--) {
+				eles[i].style["filter"] = filter;
+				eles[i].style["-o-filter"] = filter;
+				eles[i].style["-ms-filter"] = filter;
+				eles[i].style["-moz-filter"] = filter;
 				eles[i].style["-webkit-filter"] = filter;
 			}
 			timerid = null;
 		}
-		var setMosaic = function(val) {
+		var setMosaic = function(radius) {
 			if (timerid)
 				clearTimeout(timerid);
-			filter = val;
-			timerid = setTimeout(setMosaicHandle, 50);
+			blurRadius = radius;
+			timerid = setTimeout(setMosaicHandler, 50);
 		}
 		document.getElementById("mosaics").oninput = function() {
-			setMosaic("blur(" + (this.value / 100) + "px)");
+			setMosaic((this.value / 100 + 0.5) + "px");
 		}
 	})();
 	</script>
@@ -243,7 +249,7 @@ body{background-color: #000; margin: 8px 8px 45px 8px}
 		// if (Sys.opera) document.write('Opera: ' + Sys.opera);
 		// if (Sys.safari) document.write('Safari: ' + Sys.safari);
 		
-		if (!Sys.chrome) {
+		if (!Sys.chrome && !Sys.firefox) {
 			document.getElementById("browserWarning").innerHTML = "<a>WARNING: Please use </a><a href='http://www.google.cn/chrome/browser/desktop/index.html' style='color: yellow;'>Chrome</a></a> to browse this page!!!</a>";
 		} else {
 			document.getElementById("controls").style["display"] = null;
