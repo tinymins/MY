@@ -183,7 +183,7 @@ local function getHeader()
 a{line-height: 16px}
 input, button, select, textarea {outline: none}
 body{background-color: #000; margin: 8px 8px 45px 8px}
-#browserWarning{background-color: #f00; color:#fff; width: 100%; padding: 8px; position: fixed; opacity: 0.92; top: 0;}
+#browserWarning{background-color: #f00; font-weight: 800; color:#fff; width: 100%; padding: 8px; position: fixed; opacity: 0.92; top: 0;}
 .channel{color: #fff; font-weight: 800; font-size: 32px; padding: 0; margin: 30px 0 0 0}
 .date{color: #fff; font-weight: 800; font-size: 24px; padding: 0; margin: 0}
 #controls{background-color: #fff; width: 100%; height: 25px; position: fixed; opacity: 0.92; bottom: 0;}
@@ -218,7 +218,7 @@ body{background-color: #000; margin: 8px 8px 45px 8px}
         // if (Sys.safari) document.write('Safari: ' + Sys.safari);
         
         if (!Sys.chrome)
-            document.getElementById("browserWarning").innerText = "Please use Chrome to browse this page!";
+            document.getElementById("browserWarning").innerText = "WARNING: Please use Chrome to browse this page!!!";
         else
             document.getElementById("browserWarning").style["display"] = "none";
     })();
