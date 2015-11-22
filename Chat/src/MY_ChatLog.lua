@@ -184,10 +184,10 @@ local function getHeader()
 a{line-height: 16px}
 input, button, select, textarea {outline: none}
 body{background-color: #000; margin: 8px 8px 45px 8px}
-#browserWarning{background-color: #f00; font-weight: 800; color:#fff; width: 100%; padding: 8px; position: fixed; opacity: 0.92; top: 0;}
+#browserWarning{background-color: #f00; font-weight: 800; color:#fff; padding: 8px; position: fixed; opacity: 0.92; top: 0; left: 0; right: 0}
 .channel{color: #fff; font-weight: 800; font-size: 32px; padding: 0; margin: 30px 0 0 0}
 .date{color: #fff; font-weight: 800; font-size: 24px; padding: 0; margin: 0}
-#controls{background-color: #fff; width: 100%; height: 25px; position: fixed; opacity: 0.92; bottom: 0;}
+#controls{background-color: #fff; height: 25px; position: fixed; opacity: 0.92; bottom: 0; left: 0; right: 0}
 ]]
 	
 	if MY_Farbnamen and MY_Farbnamen.GetForceRgb then
