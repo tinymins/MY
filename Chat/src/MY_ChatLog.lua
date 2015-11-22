@@ -222,7 +222,7 @@ body{background-color: #000; margin: 8px 8px 45px 8px}
 		// if (Sys.safari) document.write('Safari: ' + Sys.safari);
 		
 		if (!Sys.chrome) {
-			document.getElementById("browserWarning").innerText = "WARNING: Please use Chrome to browse this page!!!";
+			document.getElementById("browserWarning").innerHTML = "<a>WARNING: Please use </a><a href='http://www.google.cn/chrome/browser/desktop/index.html' style='color: yellow;'>Chrome</a></a> to browse this page!!!</a>";
 		} else {
 			document.getElementById("controls").style["display"] = null;
 			document.getElementById("browserWarning").style["display"] = "none";
