@@ -218,13 +218,15 @@ body{background-color: #000; margin: 8px 8px 45px 8px}
         // if (Sys.opera) document.write('Opera: ' + Sys.opera);
         // if (Sys.safari) document.write('Safari: ' + Sys.safari);
         
-        if (!Sys.chrome)
+        if (!Sys.chrome) {
             document.getElementById("browserWarning").innerText = "WARNING: Please use Chrome to browse this page!!!";
-        else
+        } else {
+            document.getElementById("controls").style["display"] = null;
             document.getElementById("browserWarning").style["display"] = "none";
+        }
     })();
 </script>
-<div id="controls">
+<div id="controls" style="display:none">
   <input type="range" style="width: 200px;height: 20px;" min="5" max="25" value="5" oninput='var a=document.getElementsByClassName("namelink"); for(i = a.length - 1; i >= 0; i--){a[i].style["-webkit-filter"]="blur(" + (this.value / 10) + "px)";}'>
 </div>
 <div>
