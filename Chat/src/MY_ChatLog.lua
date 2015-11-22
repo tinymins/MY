@@ -188,6 +188,7 @@ body{background-color: #000; margin: 8px 8px 45px 8px}
 .channel{color: #fff; font-weight: 800; font-size: 32px; padding: 0; margin: 30px 0 0 0}
 .date{color: #fff; font-weight: 800; font-size: 24px; padding: 0; margin: 0}
 #controls{background-color: #fff; height: 25px; position: fixed; opacity: 0.92; bottom: 0; left: 0; right: 0}
+#mosaics{width: 200px;height: 20px}
 ]]
 	
 	if MY_Farbnamen and MY_Farbnamen.GetForceRgb then
@@ -201,7 +202,28 @@ body{background-color: #000; margin: 8px 8px 45px 8px}
 <body>
 <div id="browserWarning">Please allow running JavaScript on this page!</div>
 <div id="controls" style="display:none">
-  <input type="range" style="width: 200px;height: 20px;" min="5" max="25" value="5" oninput='var a=document.getElementsByClassName("namelink"); for(i = a.length - 1; i >= 0; i--){a[i].style["-webkit-filter"]="blur(" + (this.value / 10) + "px)";}'>
+	<input type="range" id="mosaics" min="50" max="250" value="50">
+	<script type="text/javascript">
+	(function() {
+		var timerid, filter;
+		var setMosaicHandle = function() {
+			var eles = document.getElementsByClassName("namelink");
+			for(i = eles.length - 1; i >= 0; i--) {
+				eles[i].style["-webkit-filter"] = filter;
+			}
+			timerid = null;
+		}
+		var setMosaic = function(val) {
+			if (timerid)
+				clearTimeout(timerid);
+			filter = val;
+			timerid = setTimeout(setMosaicHandle, 50);
+		}
+		document.getElementById("mosaics").oninput = function() {
+			setMosaic("blur(" + (this.value / 100) + "px)");
+		}
+	})();
+	</script>
 </div>
 <script type="text/javascript">
 	(function () {
