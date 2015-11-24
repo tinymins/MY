@@ -162,7 +162,7 @@ function _C.SaveLog()
 	for szChannel, tDate in pairs(_C.tModifiedLog) do
 		for dwDate, _ in pairs(tDate) do
 			if not empty(Log[szChannel][dwDate]) then
-				MY.SaveLUAData(DATA_PATH:format(szChannel, dwDate), Log[szChannel][dwDate])
+				MY.SaveLUAData(DATA_PATH:format(szChannel, dwDate), Log[szChannel][dwDate], nil, true)
 			end
 		end
 	end
