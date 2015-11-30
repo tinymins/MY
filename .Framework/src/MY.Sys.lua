@@ -93,14 +93,15 @@ MY.GetLUADataPath = MY.Sys.GetLUADataPath
 -- tData               要保存的数据
 -- indent              数据文件缩进
 -- crc                 是否添加CRC校验头（默认true）
+-- nohashlevels        纯LIST表所在层（优化大表读写效率）
 -- (1)： 当路径为绝对路径时(以斜杠开头)不作处理
 --       当路径为相对路径时 相对于插件下@DATA目录
-MY.Sys.SaveLUAData = function(szFileUri, tData, indent, crc)
+MY.Sys.SaveLUAData = function(szFileUri, tData, indent, crc, nohashlevels)
 	local nStartTick = GetTickCount()
 	-- format uri
 	szFileUri = MY.GetLUADataPath(szFileUri)
 	-- save data
-	local data = SaveLUAData(szFileUri, tData, indent, crc or false)
+	local data = SaveLUAData(szFileUri, tData, indent, crc or false, nohashlevels)
 	-- performance monitor
 	MY.Debug({_L('%s saved during %dms.', szFileUri, GetTickCount() - nStartTick)}, 'PMTool', MY_DEBUG.PMLOG)
 	return data

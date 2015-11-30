@@ -77,7 +77,7 @@ local InfoCache = (function()
             if type(k) == "number" then -- dwID, tInfo
                 if IsRemotePlayer(k) then
                     tCrossServerInfos[k] = v
-                    tCrossServerInfos[v.n] = v
+                    tCrossServerInfos[v[2]] = v
                 else
                     local bUpdated
                     -- read from L1 CACHE
@@ -93,18 +93,21 @@ local InfoCache = (function()
                     end
                     -- judge if info has been updated and need to be saved
                     if tInfo then
-                        if v.t == nil then
-                            v.t = tInfo.t
+                        -- dwForceID
+                        if v[6] == nil then
+                            v[6] = tInfo[6]
                         end
-                        for _, kk in ipairs({"i", "f", "n", "r", "l", "t", "c", "g"}) do
+                        -- check if cached value has changed
+                        for kk, _ in ipairs(tInfo) do
                             if v[kk] ~= tInfo[kk] then
                                 bUpdated = true
                                 break
                             end
                         end
                     else
-                        if v.t == nil then
-                            v.t = ""
+                        -- dwForceID
+                        if v[6] == nil then
+                            v[6] = ""
                         end
                         bUpdated = true
                     end
@@ -116,7 +119,7 @@ local InfoCache = (function()
                         end
                         tinsert(aCache, v)
                         tCache[k] = v
-                        tCache[v.n] = v
+                        tCache[v[2]] = v
                     end
                     -- update DataBase
                     if bUpdated then
@@ -128,12 +131,12 @@ local InfoCache = (function()
                         tInfoVisit[nSegID] = GetTime()
                         tInfoModified[nSegID] = GetTime()
                         -- save szName to dwID indexing to DataBase
-                        local nSegID = string.byte(v.n) or 0
+                        local nSegID = string.byte(v[2]) or 0
                         if not tName2ID[nSegID] then
                             tName2ID[nSegID] = MY.LoadLUAData(SZ_N2ID_PATH:format(nSegID)) or {}
                         end
-                        if tName2ID[nSegID][v.n] ~= k then
-                            tName2ID[nSegID][v.n] = k
+                        if tName2ID[nSegID][v[2]] ~= k then
+                            tName2ID[nSegID][v[2]] = k
                             tName2IDModified[nSegID] = GetTime()
                         end
                         tName2IDVisit[nSegID] = GetTime()
@@ -170,7 +173,7 @@ local InfoCache = (function()
                             nCount = nCount - 1
                         end
                         if tInfoModified[nSegID] then
-                            MY.SaveLUAData(SZ_DATA_PATH:format(nSegID), tInfos[nSegID])
+                            MY.SaveLUAData(SZ_DATA_PATH:format(nSegID), tInfos[nSegID], nil, false, "1")
                         else
                             MY.Debug({"INFO Unloaded: " .. nSegID}, "MY_FARBNAMEN", MY_DEBUG.LOG)
                         end
@@ -350,8 +353,7 @@ MY_Farbnamen.ShowTip = function(namelink)
         -- 调试信息
         if IsCtrlKeyDown() then
             tinsert(tTip, XML_LINE_BREAKER)
-            tinsert(tTip, GetFormatText(FormatString(g_tStrings.TIP_PLAYER_ID, tInfo.dwID), 102))
-            tinsert(tTip, GetFormatText(g_tStrings.TONG_ACTIVITY_TIME .. MY.FormatTime("yyyy-MM-dd hh:mm:ss", tInfo.dwTime), 102))
+            tinsert(tTip, GetFormatText(_L("Player ID: %d", tInfo.dwID), 102))
         end
         -- 显示Tip
         OutputTip(tconcat(tTip), 450, {x, y, w, h}, MY.Const.UI.Tip.POS_TOP)
@@ -365,16 +367,15 @@ function MY_Farbnamen.Get(szKey)
     local info = InfoCache[szKey]
     if info then
         return {
-            dwID      = info.i,
-            dwForceID = info.f,
-            szName    = info.n,
-            nRoleType = info.r,
-            nLevel    = info.l,
-            szTitle   = info.t,
-            nCamp     = info.c,
-            szTongID  = TongCache[info.g] or "",
-            dwTime    = info._,
-            rgb       = Config.tForceColor[info.f] or {255, 255, 255}
+            dwID      = info[1] or info.i,
+            szName    = info[2] or info.n,
+            dwForceID = info[3] or info.f,
+            nRoleType = info[4] or info.r,
+            nLevel    = info[5] or info.l,
+            szTitle   = info[6] or info.t,
+            nCamp     = info[7] or info.c,
+            szTongID  = TongCache[info[8] or info.g] or "",
+            rgb       = Config.tForceColor[info[3] or info.f] or {255, 255, 255}
         }
     end
 end
@@ -393,15 +394,14 @@ function MY_Farbnamen.AddAusID(dwID)
         return false
     else
         InfoCache[player.dwID] = {
-            i = player.dwID,
-            f = player.dwForceID,
-            n = player.szName,
-            r = player.nRoleType,
-            l = player.nLevel,
-            t = player.nX ~= 0 and player.szTitle or nil,
-            c = player.nCamp,
-            g = player.dwTongID,
-            _ = GetCurrentTime(),
+            player.dwID,
+            player.szName,
+            player.dwForceID or -1,
+            player.nRoleType or -1,
+            player.nLevel or -1,
+            player.nX ~= 0 and player.szTitle or nil,
+            player.nCamp or -1,
+            player.dwTongID or -1,
         }
         local dwTongID = player.dwTongID
         if dwTongID and dwTongID ~= 0 then
@@ -459,7 +459,6 @@ function MY_Farbnamen.LoadData()
                     t = p.szTitle  ,
                     c = p.nCamp    ,
                     g = p.szTongID ,
-                    _ = p.dwTime   ,
                 }
             end
         end

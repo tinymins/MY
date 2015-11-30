@@ -7,4 +7,5 @@ data = {
     ['cache data deleted.'] = '緩存已清除。',
     ['customize color'] = '自定義顔色',
     ['load default setting'] = '恢複默認設置',
+    ['Player ID: %d'] = '玩家ID：%d',
 }
