@@ -42,7 +42,7 @@ local InfoCache = (function()
     local tInfos, tInfoVisit, tInfoModified = {}, {}, {}
     local tCrossServerInfos = {}
     local tName2ID, tName2IDVisit, tName2IDModified = {}, {}, {}
-    local SZ_DATA_PATH = "cache/PLAYER_INFO/$server/DATA/%d.$lang.jx3dat"
+    local SZ_DATA_PATH = "cache/PLAYER_INFO/$server/DAT2/%d.$lang.jx3dat"
     local SZ_N2ID_PATH = "cache/PLAYER_INFO/$server/N2ID/%d.$lang.jx3dat"
     return setmetatable({}, {
         __index = function(t, k)
