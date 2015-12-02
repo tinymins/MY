@@ -21,8 +21,7 @@ local _L = MY.LoadLangPack()
 ------------------------------------------------------------------------
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local tinsert, tremove, tconcat = table.insert, table.remove, table.concat
-local ssub, slen, schar, srep, sbyte, sformat, sgsub =
-      string.sub, string.len, string.char, string.rep, string.byte, string.format, string.gsub
+local ssub, slen, schar, srep, sbyte, sformat, sgsub = string.sub, string.len, string.char, string.rep, string.byte, string.format, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local floor, mmin, mmax, mceil = math.floor, math.min, math.max, math.ceil
