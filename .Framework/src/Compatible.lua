@@ -9,6 +9,7 @@
 --------------------------------------------
 EMPTY_TABLE = SetmetaReadonly({})
 XML_LINE_BREAKER = GetFormatText("\n")
+MENU_DIVIDER = { bDevide = true }
 local XML_LINE_BREAKER = XML_LINE_BREAKER
 local srep, tostring, string2byte = string.rep, tostring, string.byte
 local tconcat, tinsert, tremove = table.concat, table.insert, table.remove
