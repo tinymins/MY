@@ -883,7 +883,7 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 							if this:GetParent().OnListItemHandleCustomLButtonClick then
 								local status, err = pcall(
 									this:GetParent().OnListItemHandleCustomLButtonClick,
-									this.text, this.id, this.data, not this.selected
+									this, this.text, this.id, this.data, not this.selected
 								)
 								if not status then
 									MY.Debug({err}, 'WndListBox#CustomLButtonClick', MY_DEBUG.ERROR)

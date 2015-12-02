@@ -614,7 +614,7 @@ OnPanelActive = function(wnd)
 				_Cache.SaveBlockWords()
 			end,
 		}, menu}
-	end):listbox('onlclick', function(text, id, data, selected)
+	end):listbox('onlclick', function(hItem, text, id, data, selected)
 		edit:text(id)
 	end)
 	-- add

@@ -334,7 +334,7 @@ MY.RegisterPanel( "MY_Anmerkungen_Player_Note", _L["player note"], _L['Target'],
 	local list = ui:append("WndListBox", "WndListBox_1"):children('#WndListBox_1')
 	  :pos(x, y)
 	  :size(w, h)
-	  :listbox('onlclick', function(szText, szID, data, bSelected)
+	  :listbox('onlclick', function(hItem, szText, szID, data, bSelected)
 	  	MY_Anmerkungen.OpenPlayerNoteEditPanel(data.dwID, data.szName)
 	  	return false
 	  end)
