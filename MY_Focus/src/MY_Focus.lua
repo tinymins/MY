@@ -833,7 +833,7 @@ MY.RegisterPanel( "MY_Focus", _L["focus list"], _L['Target'], "ui/Image/button/S
 	for _, v in ipairs(MY_Focus.tAutoFocus) do
 		list:listbox('insert', v, v)
 	end
-	list:listbox('onmenu', function(szText, szID)
+	list:listbox('onmenu', function(hItem, szText, szID)
 		return {{
 			szOption = _L['delete'],
 			fnAction = function()
