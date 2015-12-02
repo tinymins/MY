@@ -602,7 +602,8 @@ OnPanelActive = function(wnd)
 				end,
 			})
 		end
-		return {{
+		table.insert(menu, MENU_DIVIDER)
+		table.insert(menu, {
 			szOption = _L['delete'],
 			fnAction = function()
 				list:listbox('delete', text, id)
@@ -614,7 +615,8 @@ OnPanelActive = function(wnd)
 				end
 				_Cache.SaveBlockWords()
 			end,
-		}, menu}
+		})
+		return menu
 	end):listbox('onlclick', function(hItem, text, id, data, selected)
 		edit:text(id)
 	end)
