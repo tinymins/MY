@@ -36,42 +36,42 @@ local function ApplyUIArguments(ui, tArg)
 	if tArg and ui then
 		-- properties
 		if tArg.w ~= nil or tArg.h ~= nil or tArg.rw ~= nil or tArg.rh ~= nil then ui:size(tArg.w, tArg.h, tArg.rw, tArg.rh) end
-		if tArg.x ~= nil or tArg.y ~= nil then ui:pos        (tArg.x, tArg.y  ) end
-		if tArg.anchor             ~= nil then ui:anchor     (tArg.anchor     ) end
-		if tArg.alpha              ~= nil then ui:alpha      (tArg.alpha      ) end
-		if tArg.font               ~= nil then ui:font       (tArg.font       ) end -- must before color
-		if tArg.color              ~= nil then ui:color      (tArg.color      ) end
-		if tArg.multiline          ~= nil then ui:multiLine  (tArg.multiline  ) end -- must before :text()
-		if tArg.sliderstyle        ~= nil then ui:sliderStyle(tArg.sliderstyle) end -- must before :text()
-		if tArg.textfmt            ~= nil then ui:text       (tArg.textfmt    ) end -- must before :text()
-		if tArg.text               ~= nil then ui:text       (tArg.text       ) end
-		if tArg.placeholder        ~= nil then ui:placeholder(tArg.placeholder) end
-		if tArg.group              ~= nil then ui:group      (tArg.group      ) end
-		if tArg.tip                ~= nil then if type(tArg.tip) == 'table' then ui:tip(unpack(tArg.tip)) else ui:tip(tArg.tip) end end
-		if tArg.range              ~= nil then ui:range      (unpack(tArg.range)) end
-		if tArg.value              ~= nil then ui:value      (tArg.value      ) end
-		if tArg.menu               ~= nil then ui:menu       (tArg.menu       ) end
-		if tArg.lmenu              ~= nil then ui:lmenu      (tArg.lmenu      ) end
-		if tArg.rmenu              ~= nil then ui:rmenu      (tArg.rmenu      ) end
-		if tArg.limit              ~= nil then ui:limit      (tArg.limit      ) end
-		if tArg.scroll             ~= nil then ui:scroll     (tArg.scroll     ) end
-		if tArg.handlestyle        ~= nil then ui:handleStyle(tArg.handlestyle) end
-		if tArg.edittype           ~= nil then ui:edittype   (tArg.edittype   ) end
-		if tArg.enable             ~= nil then ui:enable     (tArg.enable     ) end
-		if tArg.visible            ~= nil then ui:visible    (tArg.visible    ) end
-		if tArg.image              ~= nil then if type(tArg.image) == 'table' then ui:image (unpack(tArg.image)) else ui:image(tArg.image) end end
+		if tArg.x ~= nil or tArg.y ~= nil then ui:pos		(tArg.x, tArg.y  ) end
+		if tArg.anchor			 ~= nil then ui:anchor	 (tArg.anchor	 ) end
+		if tArg.alpha			  ~= nil then ui:alpha	  (tArg.alpha	  ) end
+		if tArg.font			   ~= nil then ui:font	   (tArg.font	   ) end -- must before color
+		if tArg.color			  ~= nil then ui:color	  (tArg.color	  ) end
+		if tArg.multiline		  ~= nil then ui:multiLine  (tArg.multiline  ) end -- must before :text()
+		if tArg.sliderstyle		~= nil then ui:sliderStyle(tArg.sliderstyle) end -- must before :text()
+		if tArg.textfmt			~= nil then ui:text	   (tArg.textfmt	) end -- must before :text()
+		if tArg.text			   ~= nil then ui:text	   (tArg.text	   ) end
+		if tArg.placeholder		~= nil then ui:placeholder(tArg.placeholder) end
+		if tArg.group			  ~= nil then ui:group	  (tArg.group	  ) end
+		if tArg.tip				~= nil then if type(tArg.tip) == 'table' then ui:tip(unpack(tArg.tip)) else ui:tip(tArg.tip) end end
+		if tArg.range			  ~= nil then ui:range	  (unpack(tArg.range)) end
+		if tArg.value			  ~= nil then ui:value	  (tArg.value	  ) end
+		if tArg.menu			   ~= nil then ui:menu	   (tArg.menu	   ) end
+		if tArg.lmenu			  ~= nil then ui:lmenu	  (tArg.lmenu	  ) end
+		if tArg.rmenu			  ~= nil then ui:rmenu	  (tArg.rmenu	  ) end
+		if tArg.limit			  ~= nil then ui:limit	  (tArg.limit	  ) end
+		if tArg.scroll			 ~= nil then ui:scroll	 (tArg.scroll	 ) end
+		if tArg.handlestyle		~= nil then ui:handleStyle(tArg.handlestyle) end
+		if tArg.edittype		   ~= nil then ui:edittype   (tArg.edittype   ) end
+		if tArg.enable			 ~= nil then ui:enable	 (tArg.enable	 ) end
+		if tArg.visible			~= nil then ui:visible	(tArg.visible	) end
+		if tArg.image			  ~= nil then if type(tArg.image) == 'table' then ui:image (unpack(tArg.image)) else ui:image(tArg.image) end end
 		-- event handlers
-		if tArg.onscroll           ~= nil then ui:scroll     (tArg.onscroll   ) end
-		if tArg.onhover            ~= nil then ui:hover      (tArg.onhover    ) end
-		if tArg.onfocus            ~= nil then ui:focus      (tArg.onfocus    ) end
-		if tArg.onblur             ~= nil then ui:blur       (tArg.onblur     ) end
-		if tArg.onclick            ~= nil then ui:click      (tArg.onclick    ) end
-		if tArg.onlclick           ~= nil then ui:lclick     (tArg.onlclick   ) end
-		if tArg.onrclick           ~= nil then ui:rclick     (tArg.onrclick   ) end
-		if tArg.checked            ~= nil then ui:check      (tArg.checked    ) end
-		if tArg.oncheck            ~= nil then ui:check      (tArg.oncheck    ) end
-		if tArg.onchange           ~= nil then ui:change     (tArg.onchange   ) end
-		if tArg.autocomplete       ~= nil then for _, v in ipairs(tArg.autocomplete) do ui:autocomplete(unpack(v)) end end
+		if tArg.onscroll		   ~= nil then ui:scroll	 (tArg.onscroll   ) end
+		if tArg.onhover			~= nil then ui:hover	  (tArg.onhover	) end
+		if tArg.onfocus			~= nil then ui:focus	  (tArg.onfocus	) end
+		if tArg.onblur			 ~= nil then ui:blur	   (tArg.onblur	 ) end
+		if tArg.onclick			~= nil then ui:click	  (tArg.onclick	) end
+		if tArg.onlclick		   ~= nil then ui:lclick	 (tArg.onlclick   ) end
+		if tArg.onrclick		   ~= nil then ui:rclick	 (tArg.onrclick   ) end
+		if tArg.checked			~= nil then ui:check	  (tArg.checked	) end
+		if tArg.oncheck			~= nil then ui:check	  (tArg.oncheck	) end
+		if tArg.onchange		   ~= nil then ui:change	 (tArg.onchange   ) end
+		if tArg.autocomplete	   ~= nil then for _, v in ipairs(tArg.autocomplete) do ui:autocomplete(unpack(v)) end end
 	end
 end
 XGUI.ApplyUIArguments = ApplyUIArguments
@@ -79,56 +79,79 @@ XGUI.ApplyUIArguments = ApplyUIArguments
 -- conv raw to eles array
 local function raw2ele(raw)
 	-- format tab
-	local _tab = { raw = raw }
-	if type(tab)=="table" then for k, v in pairs(tab) do _tab[k]=v end end
-	_tab.type = raw.szMyuiType or raw:GetType()
-	if not _tab.txt and _tab.type == "Text"        then _tab.txt = raw end
-	if not _tab.img and _tab.type == "Image"       then _tab.img = raw end
-	if not _tab.chk and _tab.type == "WndCheckBox" then _tab.chk = raw end
-	if not _tab.chk and _tab.type == "WndRadioBox" then _tab.chk = raw end
-	if not _tab.edt and _tab.type == "WndEdit"     then _tab.edt = raw end
-	if not _tab.sdw and _tab.type == "Shadow"      then _tab.sdw = raw end
-	if not _tab.hdl and _tab.type == "Handle"      then _tab.hdl = raw end
-	if _tab.type=="WndEditBox" then
-		_tab.wnd = _tab.wnd or raw
-		_tab.hdl = _tab.hdl or raw:Lookup('','')
-		_tab.edt = _tab.edt or raw:Lookup('WndEdit_Default')
-		_tab.img = _tab.img or raw:Lookup('','Image_Default')
-		_tab.phd = _tab.phd or raw:Lookup('','Text_PlaceHolder')
-	elseif _tab.type=="WndComboBox" then
-		_tab.wnd = _tab.wnd or raw
-		_tab.hdl = _tab.hdl or raw:Lookup('','')
-		_tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
-		_tab.txt = _tab.txt or raw:Lookup('','Text_Default')
-		_tab.img = _tab.img or raw:Lookup('','Image_Default')
-	elseif _tab.type=="WndEditComboBox" or _tab.type=="WndAutocomplete" then
-		_tab.wnd = _tab.wnd or raw
-		_tab.hdl = _tab.hdl or raw:Lookup('','')
-		_tab.cmb = _tab.cmb or raw:Lookup('Btn_ComboBox')
-		_tab.edt = _tab.edt or raw:Lookup('WndEdit_Default')
-		_tab.img = _tab.img or raw:Lookup('','Image_Default')
-		_tab.phd = _tab.phd or raw:Lookup('','Text_PlaceHolder')
-	elseif _tab.type=="WndScrollBox" then
-		_tab.wnd = _tab.wnd or raw
-		_tab.hdl = _tab.hdl or raw:Lookup('','Handle_Padding/Handle_Scroll')
-		_tab.txt = _tab.txt or raw:Lookup('','Handle_Padding/Handle_Scroll/Text_Default')
-		_tab.img = _tab.img or raw:Lookup('','Image_Default')
-	elseif _tab.type=="WndFrame" then
-		_tab.frm = _tab.frm or raw
-		_tab.wnd = _tab.wnd or raw:Lookup("Window_Main")
-		_tab.hdl = _tab.hdl or (_tab.wnd or _tab.frm):Lookup("", "")
-		_tab.txt = _tab.txt or raw:Lookup("", "Text_Title")
-	elseif _tab.type=="WndSliderBox" then
-		_tab.wnd = _tab.wnd or raw
-		_tab.hdl = _tab.hdl or raw:Lookup('','')
-		_tab.sld = _tab.sld or raw:Lookup("WndNewScrollBar_Default")
-		_tab.txt = _tab.txt or raw:Lookup('','Text_Default')
-	elseif string.sub(_tab.type, 1, 3) == "Wnd" then
-		_tab.wnd = _tab.wnd or raw
-		_tab.hdl = _tab.hdl or raw:Lookup('','')
-		_tab.txt = _tab.txt or raw:Lookup('','Text_Default')
-	else _tab.itm = raw end
-	return _tab
+	local ele = { raw = raw }
+	ele.type = raw.szMyuiType or raw:GetType()
+	if ele.type == "WndCheckBox" then
+		ele.chk = raw
+		ele.wnd = ele.wnd or raw
+		ele.hdl = ele.hdl or raw:Lookup('','')
+		ele.txt = ele.txt or raw:Lookup('','Text_Default')
+	elseif ele.type == "WndRadioBox" then
+		ele.chk = raw
+		ele.wnd = ele.wnd or raw
+		ele.hdl = ele.hdl or raw:Lookup('','')
+		ele.txt = ele.txt or raw:Lookup('','Text_Default')
+	elseif ele.type == "WndEdit" then
+		ele.edt = raw
+		ele.wnd = ele.wnd or raw
+		ele.hdl = ele.hdl or raw:Lookup('','')
+		ele.txt = ele.txt or raw:Lookup('','Text_Default')
+	elseif ele.type == "WndEditBox" then
+		ele.wnd = ele.wnd or raw
+		ele.hdl = ele.hdl or raw:Lookup('','')
+		ele.edt = ele.edt or raw:Lookup('WndEdit_Default')
+		ele.img = ele.img or raw:Lookup('','Image_Default')
+		ele.phd = ele.phd or raw:Lookup('','Text_PlaceHolder')
+	elseif ele.type == "WndComboBox" then
+		ele.wnd = ele.wnd or raw
+		ele.hdl = ele.hdl or raw:Lookup('','')
+		ele.cmb = ele.cmb or raw:Lookup('Btn_ComboBox')
+		ele.txt = ele.txt or raw:Lookup('','Text_Default')
+		ele.img = ele.img or raw:Lookup('','Image_Default')
+	elseif ele.type == "WndEditComboBox" or ele.type == "WndAutocomplete" then
+		ele.wnd = ele.wnd or raw
+		ele.hdl = ele.hdl or raw:Lookup('','')
+		ele.cmb = ele.cmb or raw:Lookup('Btn_ComboBox')
+		ele.edt = ele.edt or raw:Lookup('WndEdit_Default')
+		ele.img = ele.img or raw:Lookup('','Image_Default')
+		ele.phd = ele.phd or raw:Lookup('','Text_PlaceHolder')
+	elseif ele.type == "WndScrollBox" then
+		ele.wnd = ele.wnd or raw
+		ele.hdl = ele.hdl or raw:Lookup('','Handle_Padding/Handle_Scroll')
+		ele.txt = ele.txt or raw:Lookup('','Handle_Padding/Handle_Scroll/Text_Default')
+		ele.img = ele.img or raw:Lookup('','Image_Default')
+	elseif ele.type == "WndFrame" then
+		ele.frm = ele.frm or raw
+		ele.wnd = ele.wnd or raw:Lookup("Window_Main")
+		ele.hdl = ele.hdl or (ele.wnd or ele.frm):Lookup("", "")
+		ele.txt = ele.txt or raw:Lookup("", "Text_Title")
+	elseif ele.type == "WndSliderBox" then
+		ele.wnd = ele.wnd or raw
+		ele.hdl = ele.hdl or raw:Lookup('','')
+		ele.sld = ele.sld or raw:Lookup("WndNewScrollBar_Default")
+		ele.txt = ele.txt or raw:Lookup('','Text_Default')
+	elseif ele.type == "Handle" then
+		ele.hdl = raw
+		ele.itm = raw
+		ele.txt = ele.txt or raw:Lookup("Text_Default")
+		ele.img = ele.img or raw:Lookup("Image_Default")
+	elseif ele.type == "Text" then
+		ele.txt = raw
+		ele.itm = raw
+	elseif ele.type == "Image" then
+		ele.img = raw
+		ele.itm = raw
+	elseif ele.type == "Shadow" then
+		ele.sdw = raw
+		ele.itm = raw
+	elseif string.sub(ele.type, 1, 3) == "Wnd" then
+		ele.wnd = ele.wnd or raw
+		ele.hdl = ele.hdl or raw:Lookup('','')
+		ele.txt = ele.txt or raw:Lookup('','Text_Default')
+	else
+		ele.itm = raw
+	end
+	return ele
 end
 
 -----------------------------------------------------------
@@ -900,7 +923,7 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 								this:Lookup('Image_Sel'):Show()
 							end
 							if hScroll.GetListItemHandleMenu then
-								PopupMenu(hScroll.GetListItemHandleMenu(this.text, this.id, this.data, this.selected))
+								PopupMenu(hScroll.GetListItemHandleMenu(this, this.text, this.id, this.data, this.selected))
 							end
 						end
 						hScroll.tMyLbOption = {
@@ -2105,7 +2128,7 @@ function XGUI:value(nValue)
 	self:_checksum()
 	if nValue then
 		for _, ele in pairs(self.eles) do
-			if ele.type=="WndSliderBox" then
+			if ele.type == "WndSliderBox" then
 				ele.sld:SetScrollPos(nValue - ele.wnd.nOffset)
 			end
 		end
