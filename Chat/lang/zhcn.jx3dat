@@ -47,6 +47,11 @@ data = {
     ['channel setting'] = '频道设置',
     ['display panel'] = '显示面板',
     
+    ['All channels'] = "所有频道",
+    ['disabled'] = "已禁用",
+    ['Channels'] = "频道设置",
+    [', except:'] = ", 除去:",
+    
     ['always show *'] = '总是显示※号',
     ['always be white'] = '永远显示为白色',
     ['hide system msg copy'] = '不复制系统消息',

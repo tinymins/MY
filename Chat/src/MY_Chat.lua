@@ -33,7 +33,14 @@ MY_Chat.bChatCopyAlwaysWhite = false
 MY_Chat.bChatCopyNoCopySysmsg = false
 MY_Chat.bAlertBeforeClear = true
 MY_Chat.bDisplayPanel = true    -- 是否显示面板
-_Cache.LoadBlockWords = function() MY_Chat.tBlockWords = MY.LoadLUAData('config/MY_CHAT/blockwords.$lang.jx3dat') or MY_Chat.tBlockWords end
+_Cache.LoadBlockWords = function()
+	MY_Chat.tBlockWords = MY.LoadLUAData('config/MY_CHAT/blockwords.$lang.jx3dat') or MY_Chat.tBlockWords
+	for i, bw in ipairs(MY_Chat.tBlockWords) do
+		if type(bw) == "string" then
+			MY_Chat.tBlockWords[i] = {bw, {ALL = true}}
+		end
+	end
+end
 _Cache.SaveBlockWords = function() MY.SaveLUAData('config/MY_CHAT/blockwords.$lang.jx3dat', MY_Chat.tBlockWords) MY.StorageData("MY_CHAT_BLOCKWORD", MY_Chat.tBlockWords) end
 MY.RegisterInit('MY_CHAT_BW', _Cache.LoadBlockWords)
 
@@ -474,9 +481,10 @@ end)
 MY.HookChatPanel("MY_Chat", function(h, szChannel, szMsg, dwTime, nR, nG, nB)
 	-- chat filter
 	if MY_Chat.bBlockWords then
-		local szText = GetPureText(szMsg)
-		for _, szWord in ipairs(MY_Chat.tBlockWords) do
-			if MY.String.SimpleMatch(szText, szWord) then
+		local szText = "[" .. g_tStrings.tChannelName[szChannel] .. "]" .. GetPureText(szMsg)
+		for _, bw in ipairs(MY_Chat.tBlockWords) do
+			if bw[2].ALL ~= bw[2][szChannel]
+			and MY.String.SimpleMatch(szText, bw[1]) then
 				return ""
 			end
 		end
@@ -513,6 +521,34 @@ end, function(h, aParam, szChannel, szMsg, dwTime, nR, nG, nB)
 	end
 end)
 
+local function Chn2Str(ch)
+	local szAllChannel
+	local aText = {}
+	for ch, enable in pairs(ch) do
+		if enable then
+			if ch == "ALL" then
+				szAllChannel = _L["All channels"]
+			else
+				table.insert(aText, g_tStrings.tChannelName[ch])
+			end
+		end
+	end
+	local szText = table.concat(aText, ",")
+	if szAllChannel then
+		if #szText > 0 then
+			szAllChannel = szAllChannel .. _L[', except:']
+		end
+		szText = szAllChannel .. szText
+	elseif #aText == 0 then
+		szText = _L['disabled']
+	end
+	return szText
+end
+
+local function ChatBlock2Text(szText, tChannel)
+	return szText .. " (" .. Chn2Str(tChannel) .. ")"
+end
+
 MY.RegisterPanel( "MY_Chat_Filter", _L["chat filter"], _L['Chat'],
 "UI/Image/Common/Money.UITex|243", {255,255,0,200}, {
 OnPanelActive = function(wnd)
@@ -536,24 +572,50 @@ OnPanelActive = function(wnd)
 	local list = ui:append("WndListBox", "WndListBox_1"):children('#WndListBox_1'):pos(x, y):size(w, h - 30)
 	-- 初始化list控件
 	for _, v in ipairs(MY_Chat.tBlockWords) do
-		list:listbox('insert', v, v)
+		list:listbox('insert', ChatBlock2Text(v[1], v[2]), v[1], v[2])
 	end
-	list:listbox('onmenu', function(szText, szID)
+	local aChannels = {
+		"MSG_NORMAL", "MSG_PARTY", "MSG_MAP", "MSG_BATTLE_FILED", "MSG_GUILD", "MSG_GUILD_ALLIANCE", "MSG_SCHOOL", "MSG_WORLD",
+		"MSG_TEAM", "MSG_CAMP", "MSG_GROUP", "MSG_WHISPER", "MSG_SEEK_MENTOR", "MSG_FRIEND", "MSG_SYS",
+	}
+	list:listbox('onmenu', function(hItem, text, id, data)
+		local menu = {
+			szOption = _L['Channels'], {
+				szOption = _L['All channels'],
+				bCheck = true, bChecked = data.ALL,
+				fnAction = function()
+					data.ALL = not data.ALL
+					XGUI(hItem):text(ChatBlock2Text(id, data))
+					_Cache.SaveBlockWords()
+				end,
+			}, MENU_DIVIDER,
+		}
+		for _, szChannel in ipairs(aChannels) do
+			table.insert(menu, {
+				szOption = g_tStrings.tChannelName[szChannel],
+				bCheck = true, bChecked = data[szChannel],
+				fnAction = function()
+					data[szChannel] = not data[szChannel]
+					XGUI(hItem):text(ChatBlock2Text(id, data))
+					_Cache.SaveBlockWords()
+				end,
+			})
+		end
 		return {{
 			szOption = _L['delete'],
 			fnAction = function()
-				list:listbox('delete', szText, szID)
+				list:listbox('delete', text, id)
 				_Cache.LoadBlockWords()
 				for i = #MY_Chat.tBlockWords, 1, -1 do
-					if MY_Chat.tBlockWords[i] == szText then
+					if MY_Chat.tBlockWords[i] == text then
 						table.remove(MY_Chat.tBlockWords, i)
 					end
 				end
 				_Cache.SaveBlockWords()
 			end,
-		}}
+		}, menu}
 	end):listbox('onlclick', function(text, id, data, selected)
-		edit:text(text)
+		edit:text(id)
 	end)
 	-- add
 	ui:append("WndButton", "WndButton_Add"):children("#WndButton_Add")
@@ -570,12 +632,12 @@ OnPanelActive = function(wnd)
 	  	_Cache.LoadBlockWords()
 	  	-- 验证是否重复
 	  	for i, v in ipairs(MY_Chat.tBlockWords) do
-	  		if v == szText then
+	  		if v[1] == szText then
 	  			return
 	  		end
 	  	end
 	  	-- 加入表
-	  	table.insert(MY_Chat.tBlockWords, 1, szText)
+	  	table.insert(MY_Chat.tBlockWords, 1, {szText, {ALL = true}})
 	  	_Cache.SaveBlockWords()
 	  	-- 更新UI
 	  	list:listbox('insert', szText, szText, nil, 1)
@@ -589,7 +651,7 @@ OnPanelActive = function(wnd)
 	  		list:listbox('delete', v.text, v.id)
 	  		_Cache.LoadBlockWords()
 	  		for i = #MY_Chat.tBlockWords, 1, -1 do
-	  			if MY_Chat.tBlockWords[i] == v.text then
+	  			if MY_Chat.tBlockWords[i][1] == v.text then
 	  				table.remove(MY_Chat.tBlockWords, i)
 	  			end
 	  		end
