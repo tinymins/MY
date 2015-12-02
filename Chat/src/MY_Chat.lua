@@ -593,6 +593,7 @@ OnPanelActive = function(wnd)
 		for _, szChannel in ipairs(aChannels) do
 			table.insert(menu, {
 				szOption = g_tStrings.tChannelName[szChannel],
+				rgb = GetMsgFontColor(szChannel, true),
 				bCheck = true, bChecked = data[szChannel],
 				fnAction = function()
 					data[szChannel] = not data[szChannel]
