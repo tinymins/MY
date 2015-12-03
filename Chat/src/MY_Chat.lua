@@ -639,7 +639,7 @@ OnPanelActive = function(wnd)
 	  		end
 	  	end
 	  	-- 加入表
-		local bw = {szText, {ALL = true}}
+		local bw = {szText, {ALL = true, MSG_WHISPER = true, MSG_TEAM = true, MSG_PARTY = true, MSG_GUILD = true, MSG_GUILD_ALLIANCE = true}}
 	  	table.insert(MY_Chat.tBlockWords, 1, bw)
 	  	_Cache.SaveBlockWords()
 	  	-- 更新UI
