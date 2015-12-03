@@ -609,7 +609,7 @@ OnPanelActive = function(wnd)
 				list:listbox('delete', text, id)
 				_Cache.LoadBlockWords()
 				for i = #MY_Chat.tBlockWords, 1, -1 do
-					if MY_Chat.tBlockWords[i] == text then
+					if MY_Chat.tBlockWords[i][1] == id then
 						table.remove(MY_Chat.tBlockWords, i)
 					end
 				end
@@ -640,10 +640,11 @@ OnPanelActive = function(wnd)
 	  		end
 	  	end
 	  	-- 加入表
-	  	table.insert(MY_Chat.tBlockWords, 1, {szText, {ALL = true}})
+		local bw = {szText, {ALL = true}}
+	  	table.insert(MY_Chat.tBlockWords, 1, bw)
 	  	_Cache.SaveBlockWords()
 	  	-- 更新UI
-	  	list:listbox('insert', szText, szText, nil, 1)
+	  	list:listbox('insert', ChatBlock2Text(bw[1], bw[2]), bw[1], bw[2], 1)
 	  end)
 	-- del
 	ui:append("WndButton", "WndButton_Del"):children("#WndButton_Del")
@@ -654,7 +655,7 @@ OnPanelActive = function(wnd)
 	  		list:listbox('delete', v.text, v.id)
 	  		_Cache.LoadBlockWords()
 	  		for i = #MY_Chat.tBlockWords, 1, -1 do
-	  			if MY_Chat.tBlockWords[i][1] == v.text then
+	  			if MY_Chat.tBlockWords[i][1] == v.id then
 	  				table.remove(MY_Chat.tBlockWords, i)
 	  			end
 	  		end
