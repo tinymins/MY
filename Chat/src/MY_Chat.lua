@@ -522,8 +522,9 @@ end, function(h, aParam, szChannel, szMsg, dwTime, nR, nG, nB)
 end)
 
 local m_aBlockWordsChannels = {
-	"MSG_NORMAL", "MSG_PARTY", "MSG_MAP", "MSG_BATTLE_FILED", "MSG_GUILD", "MSG_GUILD_ALLIANCE", "MSG_SCHOOL", "MSG_WORLD",
-	"MSG_TEAM", "MSG_CAMP", "MSG_GROUP", "MSG_WHISPER", "MSG_SEEK_MENTOR", "MSG_FRIEND", "MSG_SYS",
+	"MSG_SYS", "MSG_NORMAL", "MSG_PARTY", "MSG_TEAM", "MSG_BATTLE_FILED",
+	"MSG_FRIEND", "MSG_WHISPER", "MSG_GROUP", "MSG_GUILD", "MSG_GUILD_ALLIANCE",
+	"MSG_MAP", "MSG_SCHOOL", "MSG_WORLD", "MSG_CAMP", "MSG_SEEK_MENTOR",
 }
 local function Chn2Str(ch)
 	local szAllChannel
