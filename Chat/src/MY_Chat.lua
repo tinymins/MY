@@ -521,16 +521,19 @@ end, function(h, aParam, szChannel, szMsg, dwTime, nR, nG, nB)
 	end
 end)
 
+local m_aBlockWordsChannels = {
+	"MSG_NORMAL", "MSG_PARTY", "MSG_MAP", "MSG_BATTLE_FILED", "MSG_GUILD", "MSG_GUILD_ALLIANCE", "MSG_SCHOOL", "MSG_WORLD",
+	"MSG_TEAM", "MSG_CAMP", "MSG_GROUP", "MSG_WHISPER", "MSG_SEEK_MENTOR", "MSG_FRIEND", "MSG_SYS",
+}
 local function Chn2Str(ch)
 	local szAllChannel
+	if ch.ALL then
+		szAllChannel = _L["All channels"]
+	end
 	local aText = {}
-	for ch, enable in pairs(ch) do
-		if enable then
-			if ch == "ALL" then
-				szAllChannel = _L["All channels"]
-			else
-				table.insert(aText, g_tStrings.tChannelName[ch])
-			end
+	for _, szChannel in ipairs(m_aBlockWordsChannels) do
+		if ch[szChannel] then
+			table.insert(aText, g_tStrings.tChannelName[szChannel])
 		end
 	end
 	local szText = table.concat(aText, ",")
@@ -574,10 +577,6 @@ OnPanelActive = function(wnd)
 	for _, v in ipairs(MY_Chat.tBlockWords) do
 		list:listbox('insert', ChatBlock2Text(v[1], v[2]), v[1], v[2])
 	end
-	local aChannels = {
-		"MSG_NORMAL", "MSG_PARTY", "MSG_MAP", "MSG_BATTLE_FILED", "MSG_GUILD", "MSG_GUILD_ALLIANCE", "MSG_SCHOOL", "MSG_WORLD",
-		"MSG_TEAM", "MSG_CAMP", "MSG_GROUP", "MSG_WHISPER", "MSG_SEEK_MENTOR", "MSG_FRIEND", "MSG_SYS",
-	}
 	list:listbox('onmenu', function(hItem, text, id, data)
 		local menu = {
 			szOption = _L['Channels'], {
@@ -590,7 +589,7 @@ OnPanelActive = function(wnd)
 				end,
 			}, MENU_DIVIDER,
 		}
-		for _, szChannel in ipairs(aChannels) do
+		for _, szChannel in ipairs(m_aBlockWordsChannels) do
 			table.insert(menu, {
 				szOption = g_tStrings.tChannelName[szChannel],
 				rgb = GetMsgFontColor(szChannel, true),
