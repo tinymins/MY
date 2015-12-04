@@ -288,7 +288,10 @@ function MY_ArchHUD.UpdateCasting()
 	elseif dwType == TARGET.NPC then
 		target = GetNpc(dwID)
 	end
-	if target then
+	if target and (
+		MY_ArchHUD.bOn == false
+		or (MY_ArchHUD.bFightShow == true and hPlayer.bFightState == false)
+	) then
 		local bPrePare, dwSkillID, dwSkillLevel, fCastPercent = target.GetSkillPrepareState()
 		if bPrePare then
 			local szSkillName = Table_GetSkillName(dwSkillID, dwSkillLevel)
