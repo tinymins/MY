@@ -97,6 +97,10 @@ end
 
 local m_simpleMatchCache = setmetatable({}, { __mode = "v" })
 function MY.String.SimpleMatch(szText, szFind, bDistinctCase)
+    if not bDistinctCase then
+        szFind = StringLowerW(szFind)
+        szText = StringLowerW(szText)
+    end
 	local tFind = m_simpleMatchCache[szFind]
 	if not tFind then
 		tFind = {}
@@ -112,10 +116,6 @@ function MY.String.SimpleMatch(szText, szFind, bDistinctCase)
 			tinsert(tFind, tKeyWordsLine)
 		end
 		m_simpleMatchCache[szFind] = tFind
-	end
-	if not bDistinctCase then
-		szFind = StringLowerW(szFind)
-		szText = StringLowerW(szText)
 	end
 	local me = GetClientPlayer()
 	if me then
