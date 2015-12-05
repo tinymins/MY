@@ -7,8 +7,8 @@
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_ArchHUD/lang/")
 MY_ArchHUD = {}
 MY_ArchHUD.DefaultAnchor = {s = "CENTER", r = "CENTER",  x = 0, y = 0}
-MY_ArchHUD.bOn = true
-MY_ArchHUD.bFightShow = false
+MY_ArchHUD.bOn = false
+MY_ArchHUD.bFightShow = true
 MY_ArchHUD.bShowCastingBar = true
 MY_ArchHUD.nAlpha = 60
 
