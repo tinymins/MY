@@ -35,42 +35,43 @@ local function ApplyUIArguments(ui, tArg)
 	if tArg and ui then
 		-- properties
 		if tArg.w ~= nil or tArg.h ~= nil or tArg.rw ~= nil or tArg.rh ~= nil then ui:size(tArg.w, tArg.h, tArg.rw, tArg.rh) end
-		if tArg.x ~= nil or tArg.y ~= nil then ui:pos		(tArg.x, tArg.y  ) end
-		if tArg.anchor			 ~= nil then ui:anchor	 (tArg.anchor	 ) end
-		if tArg.alpha			  ~= nil then ui:alpha	  (tArg.alpha	  ) end
-		if tArg.font			   ~= nil then ui:font	   (tArg.font	   ) end -- must before color
-		if tArg.color			  ~= nil then ui:color	  (tArg.color	  ) end
-		if tArg.multiline		  ~= nil then ui:multiLine  (tArg.multiline  ) end -- must before :text()
-		if tArg.sliderstyle		~= nil then ui:sliderStyle(tArg.sliderstyle) end -- must before :text()
-		if tArg.textfmt			~= nil then ui:text	   (tArg.textfmt	) end -- must before :text()
-		if tArg.text			   ~= nil then ui:text	   (tArg.text	   ) end
-		if tArg.placeholder		~= nil then ui:placeholder(tArg.placeholder) end
-		if tArg.group			  ~= nil then ui:group	  (tArg.group	  ) end
-		if tArg.tip				~= nil then if type(tArg.tip) == 'table' then ui:tip(unpack(tArg.tip)) else ui:tip(tArg.tip) end end
-		if tArg.range			  ~= nil then ui:range	  (unpack(tArg.range)) end
-		if tArg.value			  ~= nil then ui:value	  (tArg.value	  ) end
-		if tArg.menu			   ~= nil then ui:menu	   (tArg.menu	   ) end
-		if tArg.lmenu			  ~= nil then ui:lmenu	  (tArg.lmenu	  ) end
-		if tArg.rmenu			  ~= nil then ui:rmenu	  (tArg.rmenu	  ) end
-		if tArg.limit			  ~= nil then ui:limit	  (tArg.limit	  ) end
-		if tArg.scroll			 ~= nil then ui:scroll	 (tArg.scroll	 ) end
-		if tArg.handlestyle		~= nil then ui:handleStyle(tArg.handlestyle) end
-		if tArg.edittype		   ~= nil then ui:edittype   (tArg.edittype   ) end
-		if tArg.enable			 ~= nil then ui:enable	 (tArg.enable	 ) end
-		if tArg.visible			~= nil then ui:visible	(tArg.visible	) end
-		if tArg.image			  ~= nil then if type(tArg.image) == 'table' then ui:image (unpack(tArg.image)) else ui:image(tArg.image) end end
+		if tArg.x ~= nil or tArg.y ~= nil then ui:pos        (tArg.x, tArg.y  ) end
+		if tArg.halign or tArg.valign     then ui:align      (tArg.halign, tArg.valign) end -- must after :size()
+		if tArg.anchor             ~= nil then ui:anchor     (tArg.anchor     ) end
+		if tArg.alpha              ~= nil then ui:alpha      (tArg.alpha      ) end
+		if tArg.font               ~= nil then ui:font       (tArg.font       ) end -- must before color
+		if tArg.color              ~= nil then ui:color      (tArg.color      ) end
+		if tArg.multiline          ~= nil then ui:multiLine  (tArg.multiline  ) end -- must before :text()
+		if tArg.sliderstyle        ~= nil then ui:sliderStyle(tArg.sliderstyle) end -- must before :text()
+		if tArg.textfmt            ~= nil then ui:text       (tArg.textfmt    ) end -- must before :text()
+		if tArg.text               ~= nil then ui:text       (tArg.text       ) end
+		if tArg.placeholder        ~= nil then ui:placeholder(tArg.placeholder) end
+		if tArg.group              ~= nil then ui:group      (tArg.group      ) end
+		if tArg.tip                ~= nil then if type(tArg.tip) == 'table' then ui:tip(unpack(tArg.tip)) else ui:tip(tArg.tip) end end
+		if tArg.range              ~= nil then ui:range      (unpack(tArg.range)) end
+		if tArg.value              ~= nil then ui:value      (tArg.value      ) end
+		if tArg.menu               ~= nil then ui:menu       (tArg.menu       ) end
+		if tArg.lmenu              ~= nil then ui:lmenu      (tArg.lmenu      ) end
+		if tArg.rmenu              ~= nil then ui:rmenu      (tArg.rmenu      ) end
+		if tArg.limit              ~= nil then ui:limit      (tArg.limit      ) end
+		if tArg.scroll             ~= nil then ui:scroll     (tArg.scroll     ) end
+		if tArg.handlestyle        ~= nil then ui:handleStyle(tArg.handlestyle) end
+		if tArg.edittype           ~= nil then ui:edittype   (tArg.edittype   ) end
+		if tArg.enable             ~= nil then ui:enable     (tArg.enable     ) end
+		if tArg.visible            ~= nil then ui:visible    (tArg.visible    ) end
+		if tArg.image              ~= nil then if type(tArg.image) == 'table' then ui:image (unpack(tArg.image)) else ui:image(tArg.image) end end
 		-- event handlers
-		if tArg.onscroll		   ~= nil then ui:scroll	 (tArg.onscroll   ) end
-		if tArg.onhover			~= nil then ui:hover	  (tArg.onhover	) end
-		if tArg.onfocus			~= nil then ui:focus	  (tArg.onfocus	) end
-		if tArg.onblur			 ~= nil then ui:blur	   (tArg.onblur	 ) end
-		if tArg.onclick			~= nil then ui:click	  (tArg.onclick	) end
-		if tArg.onlclick		   ~= nil then ui:lclick	 (tArg.onlclick   ) end
-		if tArg.onrclick		   ~= nil then ui:rclick	 (tArg.onrclick   ) end
-		if tArg.checked			~= nil then ui:check	  (tArg.checked	) end
-		if tArg.oncheck			~= nil then ui:check	  (tArg.oncheck	) end
-		if tArg.onchange		   ~= nil then ui:change	 (tArg.onchange   ) end
-		if tArg.autocomplete	   ~= nil then for _, v in ipairs(tArg.autocomplete) do ui:autocomplete(unpack(v)) end end
+		if tArg.onscroll           ~= nil then ui:scroll     (tArg.onscroll   ) end
+		if tArg.onhover            ~= nil then ui:hover      (tArg.onhover    ) end
+		if tArg.onfocus            ~= nil then ui:focus      (tArg.onfocus    ) end
+		if tArg.onblur             ~= nil then ui:blur       (tArg.onblur     ) end
+		if tArg.onclick            ~= nil then ui:click      (tArg.onclick    ) end
+		if tArg.onlclick           ~= nil then ui:lclick     (tArg.onlclick   ) end
+		if tArg.onrclick           ~= nil then ui:rclick     (tArg.onrclick   ) end
+		if tArg.checked            ~= nil then ui:check      (tArg.checked    ) end
+		if tArg.oncheck            ~= nil then ui:check      (tArg.oncheck    ) end
+		if tArg.onchange           ~= nil then ui:change     (tArg.onchange   ) end
+		if tArg.autocomplete       ~= nil then for _, v in ipairs(tArg.autocomplete) do ui:autocomplete(unpack(v)) end end
 	end
 end
 XGUI.ApplyUIArguments = ApplyUIArguments
@@ -2270,6 +2271,36 @@ function XGUI:limit(nLimit)
 	end
 end
 
+-- (self) XGUI:align(halign, valign)
+function XGUI:align(halign, valign)
+	self:_checksum()
+	if valign or halign then
+		for _, ele in pairs(self.eles) do
+			local x = ele.txt
+			if x then
+				if halign and x.SetHAlign then
+					x:SetHAlign(halign)
+				end
+				if valign and x.SetVAlign then
+					x:SetVAlign(valign)
+				end
+				if x.FormatTextForDraw then
+					x:FormatTextForDraw()
+				end
+			end
+		end
+		return self
+	else -- get
+		local ele = self.eles[1]
+		if ele then
+			local x = ele.txt
+			if x and x.GetVAlign and x.GetHAlign then
+				return x:GetVAlign(), x:GetHAlign()
+			end
+		end
+	end
+end
+
 -- (self) XGUI:sliderStyle(nSliderStyle)
 function XGUI:sliderStyle(nSliderStyle)
 	self:_checksum()
@@ -2422,7 +2453,7 @@ end
 
 -- menu 弹出菜单
 -- :menu(table menu)  弹出菜单menu
--- :menu(functin fn)  弹出菜单function返回值table
+-- :menu(function fn)  弹出菜单function返回值table
 function XGUI:menu(lmenu, rmenu, bNoAutoBind)
 	self:_checksum()
 	if not bNoAutoBind then
@@ -2461,14 +2492,14 @@ end
 
 -- lmenu 弹出左键菜单
 -- :lmenu(table menu)  弹出菜单menu
--- :lmenu(functin fn)  弹出菜单function返回值table
+-- :lmenu(function fn)  弹出菜单function返回值table
 function XGUI:lmenu(menu)
 	return self:menu(menu, nil, true)
 end
 
 -- rmenu 弹出右键菜单
 -- :lmenu(table menu)  弹出菜单menu
--- :lmenu(functin fn)  弹出菜单function返回值table
+-- :lmenu(function fn)  弹出菜单function返回值table
 function XGUI:rmenu(menu)
 	return self:menu(nil, menu, true)
 end
