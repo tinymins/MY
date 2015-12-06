@@ -111,4 +111,6 @@ data = {
         ["432345564233593240"] = DEAR_S,
         ["342273571683338182"] = DEAR_S,
     },
+    
+    ['Warning: Bigwar has been finished but not handed yet!'] = '茗伊提示：大戰還沒交！',
 }

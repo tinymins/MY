@@ -259,6 +259,23 @@ MY.BreatheCall(function()
 	h.tNonwarData = true
 end, 130)
 
+-- 大战没交
+local m_aBigWars = {14765, 14766, 14767, 14768, 14769}
+MY.RegisterEvent("ON_FRAME_CREATE.BIG_WAR_CHECK", function()
+	local me = GetClientPlayer()
+	if me and arg0:GetName() == "ExitPanel" then
+		for _, dwQuestID in ipairs(m_aBigWars) do
+			if me.GetQuestState(dwQuestID) == QUEST_STATE.FINISHED then
+				local ui = XGUI(arg0)
+				if ui:item("#Text_MY_Tip"):count() == 0 then
+					ui:append("Text", "Text_MY_Tip", {y = ui:height(), w = ui:width(), color = {255, 255, 0}, font = 199, halign = 1})
+				end
+				ui = ui:item("#Text_MY_Tip"):text(_L['Warning: Bigwar has been finished but not handed yet!'])
+				break
+			end
+		end
+	end
+end)
 -- ################################################################################################ --
 --     #       # # # #         # # # # # # # # #                                 #             # #  --
 --       #     #     #         #     #   #     #     # # # # # # # # # # #       #     # # # #      --
