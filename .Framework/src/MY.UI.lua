@@ -1811,6 +1811,56 @@ function XGUI:pos(nLeft, nTop)
 	end
 end
 
+-- (self) Instance:shake(xrange, yrange, maxspeed, time)
+function XGUI:shake(xrange, yrange, maxspeed, time)
+	self:_checksum()
+	if xrange and yrange and maxspeed and time then
+		local starttime = GetTime()
+		local xspeed, yspeed = maxspeed, - maxspeed
+		local xhalfrange, yhalfrange = xrange / 2, yrange / 2
+		for _, ele in pairs(self.eles) do
+			local ui = XGUI(ele.raw)
+			local xoffset, yoffset = 0, 0
+			MY.RenderCall(XGUI.GetTreePath(ele.raw) .. " shake", function()
+				if ui:count() == 0 then
+					return 0
+				elseif GetTime() - starttime < time then
+					local x, y = ui:pos()
+					x, y = x - xoffset, y - yoffset
+					
+					xoffset = xoffset + math.random(xspeed > 0 and 0 or xspeed, xspeed > 0 and xspeed or 0)
+					if xoffset < - xhalfrange then
+						xoffset = math.min(- xrange - xoffset, xhalfrange)
+						xspeed = - xspeed
+					elseif xoffset > xhalfrange then
+						xoffset = math.max(xrange - xoffset, - xhalfrange)
+						xspeed = - xspeed
+					end
+					
+					yoffset = yoffset + math.random(yspeed > 0 and 0 or yspeed, yspeed > 0 and yspeed or 0)
+					if yoffset < - yhalfrange then
+						yoffset =  math.min(- yrange - yoffset, yhalfrange)
+						yspeed = - yspeed
+					elseif yoffset > yhalfrange then
+						yoffset = math.max(yrange - yoffset, - yhalfrange)
+						yspeed = - yspeed
+					end
+					
+					ui:pos(x + xoffset, y + yoffset)
+				else
+					local x, y = ui:pos()
+					ui:pos(x - xoffset, y - yoffset)
+					return 0
+				end
+			end)
+		end
+	else
+		for _, ele in pairs(self.eles) do
+			MY.RenderCall(XGUI.GetTreePath(ele.raw) .. " shake", false)
+		end
+	end
+end
+
 -- (anchor) Instance:anchor()
 -- (self) Instance:anchor(anchor)
 function XGUI:anchor(anchor)
