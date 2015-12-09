@@ -1,25 +1,11 @@
 --------------------------------------------
--- @Desc  : 技能显示
+-- @Desc  : 技能显示 - 战斗可视化
 -- @Author: 翟一鸣 @tinymins
 -- @Date  : 2015-03-02 10:08:45
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
 -- @Last Modified time: 2015-06-09 10:50:16
 --------------------------------------------
--- ##########################################################################################################################
---       *         *   *                   *                                   *                           *     *           
---       *         *     *         *       *         * * * * * * * * * * *       *     * * * * *           *     *           
---       * * *     *                 *     *                           *     * * * *   *       *         *       *       *   
---       *         * * * *             *   *                           *           *   *   *   *         *       *     *     
---       *     * * *           *           *           * * * * * *     *         *     *   *   *       * *       *   *       
---   * * * * *     *   *         *         *           *         *     *         * *   *   *   *     *   *       * *         
---   *       *     *   *           *       *           *         *     *       * *   * *   *   *         *       *           
---   *       *     *   *                   * * * *     *         *     *     *   *     *   *   *         *     * *           
---   *       *       *       * * * * * * * *           * * * * * *     *         *       *   *           *   *   *           
---   * * * * *     * *   *                 *           *               *         *       *   *           *       *       *   
---   *           *     * *                 *                           *         *     *     *   *       *       *       *   
---             *         *                 *                       * * *         *   *         * *       *         * * * *   
--- ##########################################################################################################################
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = {}
 MY_VisualSkill = {}
@@ -35,7 +21,7 @@ MY_VisualSkill.Reload = function()
 	MY.UI("Normal/MY_VisualSkill"):remove()
 	-- unbind event
 	MY.RegisterEvent("DO_SKILL_CAST.MY_VisualSkillCast")
-	-- create new   
+	-- create new
 	if MY_VisualSkill.bEnable then
 		-- create ui
 		local ui = MY.UI.CreateFrame("MY_VisualSkill", {empty = true})
@@ -141,7 +127,7 @@ MY_VisualSkill.OnSkillCast = function(dwSkillID, dwSkillLevel)
 	boxEnter:raw(1):SetObjectIcon(dwIconID)
 	local nEnterDesLeft = MY_VisualSkill.nVisualSkillBoxCount*53 + 45
 	boxEnter:fadeTo(nAnimateFrameCount * 75, 255)
-	MY.BreatheCall("#Box_1"..i, function()
+	MY.BreatheCall("#Box_1" .. i, function()
 		local nLeft = boxEnter:left()
 		local nSpentFrameCount = GetLogicFrameCount() - nStartFrame
 		if nSpentFrameCount < nAnimateFrameCount then
@@ -151,9 +137,9 @@ MY_VisualSkill.OnSkillCast = function(dwSkillID, dwSkillLevel)
 			return 0
 		end
 	end)
-	MY.DelayCall("#Box_1"..i, function()
+	MY.DelayCall("#Box_1" .. i, 15000, function()
 		boxEnter:fadeTo(nAnimateFrameCount * 75, 0)
-	end, 15000)
+	end)
 	
 	-- box leave
 	i = ( i + 1 ) % (MY_VisualSkill.nVisualSkillBoxCount + 1)
@@ -161,7 +147,7 @@ MY_VisualSkill.OnSkillCast = function(dwSkillID, dwSkillLevel)
 	boxLeave:raw(1):SetObjectCoolDown(0)
 	local nLeaveDesLeft = -200
 	boxLeave:fadeTo(nAnimateFrameCount * 75, 0)
-	MY.BreatheCall("#Box_1"..i, function()
+	MY.BreatheCall("#Box_1" .. i, function()
 		local nLeft = boxLeave:left()
 		local nSpentFrameCount = GetLogicFrameCount() - nStartFrame
 		if nSpentFrameCount < nAnimateFrameCount then
@@ -176,7 +162,7 @@ MY_VisualSkill.OnSkillCast = function(dwSkillID, dwSkillLevel)
 	for j = 2, MY_VisualSkill.nVisualSkillBoxCount do
 		i = ( i + 1 ) % (MY_VisualSkill.nVisualSkillBoxCount + 1)
 		local box, nDesLeft = ui:item("#Box_1"..i), j*53-8
-		MY.BreatheCall("#Box_1"..i, function()
+		MY.BreatheCall("#Box_1" .. i, function()
 			local nLeft = box:left()
 			local nSpentFrameCount = GetLogicFrameCount() - nStartFrame
 			if nSpentFrameCount < nAnimateFrameCount then

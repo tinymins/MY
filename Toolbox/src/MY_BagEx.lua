@@ -400,7 +400,7 @@ MY.RegisterEvent("BAG_ITEM_UPDATE", function()
 		return
 	end
 	_C.OnBagItemUpdate()
-	MY.DelayCall('MY_BagEx', _C.OnBagItemUpdate, 100)
+	MY.DelayCall('MY_BagEx', 100, _C.OnBagItemUpdate)
 end)
 MY.RegisterEvent("GUILD_BANK_PANEL_UPDATE", function()
 	if not MY_BagEx.bEnable then
@@ -408,6 +408,6 @@ MY.RegisterEvent("GUILD_BANK_PANEL_UPDATE", function()
 	end
 	_C.OnBagItemUpdate()
 end)
-MY.RegisterInit('MY_BAGEX', function() MY.BreatheCall(_C.OnBreathe, 130) end)
+MY.RegisterInit('MY_BAGEX', function() MY.BreatheCall(130, _C.OnBreathe) end)
 MY.RegisterReload("MY_BAGEX", _C.ClearHook)
 -- MY.RegisterEvent("SPECIAL_KEY_MSG", function(e)Output(e,arg0,arg1)end)

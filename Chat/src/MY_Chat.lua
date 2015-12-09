@@ -140,9 +140,9 @@ function MY_Chat.ShowBalloon(dwID, hBalloon, hwnd)
 		hBalloon:GetRoot():BringToTop()
 		MY.UI(hBalloon):alpha(0):fadeIn(500)
 	end
-	MY.DelayCall("MY_Chat_Balloon_"..dwID, function()
+	MY.DelayCall("MY_Chat_Balloon_" .. dwID, 5000, function()
 		MY.UI(hBalloon):fadeOut(500)
-	end, 5000)
+	end)
 end
 
 function MY_Chat.AdjustBalloonSize(hBalloon, hwnd)

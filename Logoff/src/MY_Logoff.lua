@@ -45,12 +45,12 @@ local m_bLogoff
 MY_Logoff.LogOffEx = function(bCompletely, bUnfight)
 	if m_bLogoff then -- cancel logoff
 		m_bLogoff = nil
-		MY.BreatheCall("LOG_OFF")
+		MY.BreatheCall("LOG_OFF", false)
 		MY.Sysmsg({_L["Logoff has been cancelled."]})
 	elseif not bUnfight then -- logoff immediately
 		MY.Player.LogOff(bCompletely)
 	else -- logoff when unfight
-		MY.BreatheCall("LOG_OFF",function()
+		MY.BreatheCall("LOG_OFF", function()
 			if not GetClientPlayer().bFightState then
 				MY.Player.LogOff(bCompletely)
 			end
@@ -299,9 +299,9 @@ _MY_Logoff.OnPanelActive = function(wnd)
 	  	if _MY_Logoff.bStart then
 	  		_MY_Logoff.nTimeOutUnixTime = MY_Logoff.nTimeOut + GetCurrentTime()
 	  		MY_Logoff.PrintCurrentCondition(PLAYER_TALK_CHANNEL.LOCAL_SYS)
-	  		MY.BreatheCall("MY_ConditionLogOff", MY_Logoff.ConditionLogOff, 300)
+	  		MY.BreatheCall("MY_ConditionLogOff", 300, MY_Logoff.ConditionLogOff)
 	  	else
-	  		MY.BreatheCall("MY_ConditionLogOff")
+	  		MY.BreatheCall("MY_ConditionLogOff", false)
 	  	end
 	  	MY.UI(this):text((_MY_Logoff.bStart and _L['cancel']) or _L['start'])
 	end)

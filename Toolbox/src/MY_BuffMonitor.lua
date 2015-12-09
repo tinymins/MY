@@ -1,17 +1,6 @@
--- ##################################################################################################
---                                                           *     *           *         *           
---                                                     *     *     *           *           *         
---   * * * *     * *     * * * * * * *   * * * * *     *     *     * * * *     *     * * * * * * *   
---     *     *     *     *     *     *     *     *     *     *   *           * * *   *           *   
---     *     *     *     *     *   *       *   *       *     * *     *         *         *   *       
---     * * *       *     *     * * *       * * *             *         *       *       *       *     
---     *     *     *     *     *   *       *   *                               * *   *           *   
---     *     *     *     *     *           *           * * * * * * * * *     * *       * * * * *     
---     *     *     *     *     *           *           *     *   *     *       *           *         
---   * * * *         * *     * * *       * * *         *     *   *     *       *           *         
---                                                     *     *   *     *       *           *         
---                                                   * * * * * * * * * * *   * *     * * * * * * *   
--- ##################################################################################################
+---------------------------------------------------------------------
+-- BUFF¼à¿Ø
+---------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _DEFAULT_BUFFMONITOR_CONFIG_FILE_ = MY.GetAddonInfo().szRoot .. "Toolbox/data/buffmon_default.$lang.jx3dat"
 local _Cache = {}
@@ -46,8 +35,8 @@ end)
 -- ³õÊ¼»¯UI
 MY_BuffMonitor.ReloadBuffMonitor = function()
     -- unregister render function
-    MY.BreatheCall("MY_BuffMonitor_Render_Self")
-    MY.BreatheCall("MY_BuffMonitor_Render_Target")
+    MY.BreatheCall("MY_BuffMonitor_Render_Self", false)
+    MY.BreatheCall("MY_BuffMonitor_Render_Target", false)
     MY.UI("Normal/MY_BuffMonitor_Self"):remove()
     MY.UI("Normal/MY_BuffMonitor_Target"):remove()
     -- get kungfu id

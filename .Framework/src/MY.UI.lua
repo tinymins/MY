@@ -807,11 +807,11 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 							-- min search length
 							if len >= wnd.tMyAcOption.minLength then
 								-- delay search
-								MY.DelayCall(function()
+								MY.DelayCall(wnd.tMyAcOption.delay, function()
 									XGUI(wnd):autocomplete('search')
 									-- for compatible
 									Station.SetFocusWindow(edt)
-								end, wnd.tMyAcOption.delay)
+								end)
 							else
 								XGUI(wnd):autocomplete('close')
 							end

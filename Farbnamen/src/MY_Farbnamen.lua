@@ -530,12 +530,12 @@ MY.RegisterTraceButtonMenu('MY_Farbenamen', MY_Farbnamen.GetMenu)
 local function OnPlayerEnter(dwID)
     if MY_Farbnamen.bEnabled then
         local nRetryCount = 0
-        MY.BreatheCall(function()
+        MY.BreatheCall(500, function()
             if MY_Farbnamen.AddAusID(dwID) or nRetryCount > 5 then
                 return 0
             end
             nRetryCount = nRetryCount + 1
-        end, 500)
+        end)
     end
 end
 MY.RegisterEvent("PEEK_OTHER_PLAYER", function()
@@ -547,15 +547,15 @@ MY.RegisterEvent("PLAYER_ENTER_SCENE", function() OnPlayerEnter(arg0) end)
 MY.RegisterInit('MY_FARBNAMEN_DATA', MY_Farbnamen.LoadData)
 MY.RegisterInit('MY_FARBNAMEN_CUSTOMDATA', _MY_Farbnamen.LoadCustomData)
 MY.RegisterExit('MY_FARBNAMEN_CACHE', function() InfoCache("save") end)
-MY.BreatheCall('MY_FARBNAMEN_CACHE', function()
+MY.BreatheCall('MY_FARBNAMEN_CACHE', 20000, function()
     if InfoCache("save", GetTime() - 60000, 1, true) then
         MY.BreatheCall('MY_FARBNAMEN_CACHE', 60, true)
     end
-end, 20000)
+end)
 MY.RegisterExit('MY_FARBNAMEN_TONG_CACHE', function() TongCache("save") end)
-MY.BreatheCall('MY_FARBNAMEN_TONG_CACHE', function()
+MY.BreatheCall('MY_FARBNAMEN_TONG_CACHE', 20000, function()
     if TongCache("save", GetTime() - 60000, 1, true) then
         MY.BreatheCall('MY_FARBNAMEN_TONG_CACHE', 60, true)
     end
-end, 20000)
+end)
 MY.RegisterEvent("ON_GET_TONG_NAME_NOTIFY", function() TongCache[arg1] = arg2 end)
