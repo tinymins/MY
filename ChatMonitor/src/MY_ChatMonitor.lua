@@ -363,6 +363,14 @@ _C.OnPanelActive = function(wnd)
                 },
             })
             table.insert(t,{
+                szOption = _L['max record count'],
+                fnAction = function()
+                    GetUserInputNumber(MY_ChatMonitor.nMaxRecord, 1000, nil, function(val)
+                        MY_ChatMonitor.nMaxRecord = val or MY_ChatMonitor.nMaxRecord
+                    end, nil, function() return not MY.IsPanelVisible() end)
+                end,
+            })
+            table.insert(t,{
                 szOption = _L['show message preview box'],
                 fnAction = function()
                     MY_ChatMonitor.bShowPreview = not MY_ChatMonitor.bShowPreview

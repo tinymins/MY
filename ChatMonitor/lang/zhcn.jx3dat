@@ -11,6 +11,7 @@ data = {
     ['output to system channel'] = '输出聊天栏',
     ['timestrap format'] = '时间戳格式',
     ['custom'] = '自定义',
+    ['max record count'] = '最大记录量',
     ['custom timestrap (eg:[yyyy/MM/dd_hh:mm:ss])'] = '输入格式字符串 如：[yyyy/MM/dd_hh:mm:ss]',
     ['ignore same message'] = '不显示重复',
     ['welcome to use mingyi chat monitor.'] = '欢迎使用茗伊聊天监控。',
