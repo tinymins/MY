@@ -209,9 +209,9 @@ MY.RegisterTargetAddonMenu("MY_Anmerkungen_PlayerNotes", function()
 		return {
 			szOption = _L['edit player note'],
 			fnAction = function()
-				MY.DelayCall(function()
+				MY.DelayCall(1, function()
 					MY_Anmerkungen.OpenPlayerNoteEditPanel(p.dwID, p.szName)
-				end, 1)
+				end)
 			end
 		}
 	end

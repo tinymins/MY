@@ -272,9 +272,9 @@ MY_Focus.OnObjectEnterScene = function(dwType, dwID, nRetryCount)
 	-- 解决玩家刚进入视野时名字为空的问题
 	if (dwType == TARGET.PLAYER and not szName) or
 	not me then -- 解决自身刚进入场景的时候的问题
-		MY.DelayCall(function()
+		MY.DelayCall(300, function()
 			MY_Focus.OnObjectEnterScene(dwType, dwID, (nRetryCount or 0) + 1)
-		end, 300)
+		end)
 	elseif szName then -- 判断是否需要焦点
 		local bFocus = false
 		-- 判断永久焦点

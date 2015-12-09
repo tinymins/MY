@@ -242,7 +242,7 @@ MY.RemoteRequest = function(szUrl, fnSuccess, fnError, nTimeout)
 		if szUrl ~= szTitle or szContent ~= "" then
 			MY.Debug({string.format("%s - %s", szTitle, szUrl)}, 'MYRR::OnDocumentComplete', MY_DEBUG.LOG)
 			-- 注销超时处理时钟
-			MY.DelayCall("MYRR_TO_" .. RequestID)
+			MY.DelayCall("MYRR_TO_" .. RequestID, false)
 			-- 成功回调函数
 			local status, err = pcall(fnSuccess, szTitle, szContent)
 			if not status then
@@ -255,7 +255,7 @@ MY.RemoteRequest = function(szUrl, fnSuccess, fnError, nTimeout)
 	-- do with this remote request
 	MY.Debug({szUrl}, 'MYRR', MY_DEBUG.LOG)
 	-- register request timeout clock
-	MY.DelayCall("MYRR_TO_" .. RequestID, function()
+	MY.DelayCall("MYRR_TO_" .. RequestID, nTimeout, function()
 		MY.Debug({szUrl}, 'MYRR::Timeout', MY_DEBUG.WARNING) -- log
 		-- request timeout, call timeout function.
 		local status, err = pcall(fnError, szUrl, "timeout")
@@ -263,7 +263,7 @@ MY.RemoteRequest = function(szUrl, fnSuccess, fnError, nTimeout)
 			MY.Debug({err}, 'MYRR::TIMEOUT', MY_DEBUG.ERROR)
 		end
 		table.insert(_C.tFreeWebPages, RequestID)
-	end, nTimeout)
+	end)
 	
 	-- start ie navigate
 	hPage:Navigate(szUrl)
@@ -306,7 +306,7 @@ MY.RegisterExit("'MYLIB#STORAGE_DATA", function()
 end)
 -- 保存个人数据 方便网吧党和公司家里多电脑切换
 MY.Sys.StorageData = function(szKey, oData)
-	MY.DelayCall("STORAGE_" .. szKey, function()
+	MY.DelayCall("STORAGE_" .. szKey, 120000, function()
 		MY.RemoteRequest('http://data.jx3.derzh.com/data/sync.php?l=' .. MY.GetLang()
 		.. "&data=" .. MY.String.SimpleEcrypt(MY.Json.Encode({
 			n = GetUserRoleName(), i = UI_GetClientPlayerID(),
@@ -318,134 +318,10 @@ MY.Sys.StorageData = function(szKey, oData)
 				FireUIEvent("MY_PRIVATE_STORAGE_SYNC", szKey)
 			end
 		end)
-	end, 120000)
+	end)
 	m_nStorageVer[szKey] = GetCurrentTime()
 end
 MY.StorageData = MY.Sys.StorageData
--- Breathe Call & Delay Call
--- ##################################################################################################
---                     # #                     #       # # # # # # # #             #       #
---   # # # #   # # # #       # # # #           #                   #           #   #   #   #
---         #         #       #     #           #     #           #       #         #       #
---       #           #       #     #   # # # # # #   #   #     #     #   #   # # # # # #   # # # #
---     #       #     #       #     #           #     #     #   #   #     #       # #     #     #
---     # # #   #     # # #   # # # #           #     #         #         #     #   # #     #   #
---         #   #     #       #     #     #     #     #     #   #   #     #   #     #   #   #   #
---         #   #     #       #     #       #   #     #   #     #     #   #       #         #   #
---     #   #   #     #       #     #       #   #     #         #         #   # # # # #     #   #
---       #     # # # # # #   # # # #           #     #       # #         #     #     #       #
---     #   #                 #     #           #     #                   #       # #       #   #
---   #       # # # # # # #                 # # #     # # # # # # # # # # #   # #     #   #       #
--- ##################################################################################################
-_C.nLogicFrameCount = GetLogicFrameCount()
-_C.tDelayCall = {}    -- delay call 队列
-_C.tBreatheCall = {}  -- breathe call 队列
-
--- 延迟调用
--- (string szKey) MY.DelayCall([string szKey, ]function fnAction[, number nDelay]) -- 注册
--- (string szKey) MY.DelayCall(string szKey, number nDelay) -- 改变Delay时间
--- (string szKey) MY.DelayCall(string szKey) -- 注销
--- szKey       -- 延迟调用ID 用于取消调用
--- fnAction    -- 调用函数
--- nDelay      -- 延迟调用时间，单位：毫秒，实际调用延迟延迟是 62.5 的整倍数
-MY.DelayCall = function(szKey, fnAction, nDelay)
-	if type(szKey) == "function" then
-		szKey, fnAction, nDelay = GetTickCount(), szKey, fnAction
-		while _C.tDelayCall[szKey] do
-			szKey = szKey + 0.1
-		end
-	elseif type(fnAction) == "number" then
-		nDelay, fnAction = fnAction
-	end
-	if fnAction then -- reg
-		if not nDelay then
-			nDelay = 1
-		end
-		_C.tDelayCall[szKey] = { nTime = nDelay + GetTickCount(), fnAction = fnAction }
-	elseif nDelay then -- modify
-		local dc = _C.tDelayCall[szKey]
-		if dc then
-			dc.nTime = nDelay + GetTickCount()
-		end
-	elseif szKey then -- unreg
-		_C.tDelayCall[szKey] = nil
-	end
-	return szKey
-end
-
--- 注册呼吸循环调用函数
--- (string szKey) MY.BreatheCall([string szKey, ]function fnAction[, number nInterval])
--- (string szKey) MY.BreatheCall(string szKey, number nTime[, bool bOnce]) -- 改变呼吸调用频率
--- szKey       -- 名称，必须唯一，重复则覆盖
--- fnAction    -- 循环呼吸调用函数，设为 nil 则表示取消这个 key 下的呼吸处理函数
--- nInterval   -- 调用间隔，单位：毫秒
-MY.BreatheCall = function(szKey, fnAction, nInterval)
-	local bOnce
-	if type(szKey) == "function" then
-		szKey, fnAction, nInterval = GetTickCount(), szKey, fnAction
-		while _C.tBreatheCall[szKey] do
-			szKey = szKey + 0.1
-		end
-	elseif type(fnAction) == "number" then
-		nInterval, bOnce, fnAction = fnAction, nInterval
-	end
-	if fnAction then -- reg
-		_C.tBreatheCall[szKey] = {
-			fnAction = fnAction,
-			nNext = GetTickCount(),
-			nInterval = nInterval or 0,
-		}
-	elseif nInterval then -- modify
-		local bc = _C.tBreatheCall[szKey]
-		if bc then
-			if not bOnce then
-				bc.nInterval = nInterval
-			end
-			bc.nNext = GetTickCount() + nInterval
-		end
-	elseif szKey then -- unreg
-		_C.tBreatheCall[szKey] = nil
-	end
-	return szKey
-end
-
--- breathe
-local _tCalls = {} -- avoid error: invalid key to 'next'
-MY.UI.RegisterUIEvent(MY, "OnFrameBreathe", function()
-	local nTime = GetTickCount()
-	-- get breathe calls
-	for szKey, bc in pairs(_C.tBreatheCall) do
-		if bc.nNext <= nTime then
-			bc.nNext = nTime + bc.nInterval
-			_tCalls[szKey] = bc
-		end
-	end
-	-- run breathe calls
-	for szKey, bc in pairs(_tCalls) do
-		local res, err = pcall(bc.fnAction)
-		if not res then
-			MY.Debug({err}, "BreatheCall#" .. szKey, MY_DEBUG.ERROR)
-		elseif err == 0 then    -- function return 0 means to stop its breathe
-			_C.tBreatheCall[szKey] = nil
-		end
-		_tCalls[szKey] = nil
-	end
-	-- get delay calls
-	for szKey, dc in pairs(_C.tDelayCall) do
-		if dc.nTime <= nTime then
-			_C.tDelayCall[szKey] = nil
-			_tCalls[szKey] = dc
-		end
-	end
-	-- run delay calls
-	for szKey, dc in pairs(_tCalls) do
-		local res, err = pcall(dc.fnAction)
-		if not res then
-			MY.Debug({err}, "DelayCall#" .. szKey, MY_DEBUG.ERROR)
-		end
-		_tCalls[szKey] = nil
-	end
-end)
 
 -- ##################################################################################################
 --               # # # #         #         #               #       #             #           #

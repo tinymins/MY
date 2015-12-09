@@ -432,12 +432,12 @@ function PS.OnPanelActive(wnd)
 		handlestyle = 3, text = _L['average score with out pole']
 	}, true)
 	MY_RollMonitor.DrawBoard()
-	MY.BreatheCall('MY_RollMonitorRedraw', CheckBoardRedraw, 1000)
+	MY.BreatheCall('MY_RollMonitorRedraw', 1000, CheckBoardRedraw)
 end
 
 function PS.OnPanelDeactive()
 	m_uiBoard = nil
-	MY.BreatheCall('MY_RollMonitorRedraw')
+	MY.BreatheCall('MY_RollMonitorRedraw', false)
 end
 
 MY.RegisterPanel("RollMonitor", _L["roll monitor"], _L['General'], "UI/Image/UICommon/LoginCommon.UITex|30", {255,255,0,200}, PS)

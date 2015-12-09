@@ -72,20 +72,20 @@ MY_ScreenShot.ShotScreen = function(nShowUI)
     local bStationVisible = Station.IsVisible()
     if nShowUI == MY_ScreenShot.Const.HIDE_UI and bStationVisible then
         Station.Hide()
-        MY.DelayCall(function()
+        MY.DelayCall(100, function()
             _MY_ScreenShot.ShotScreen(szFilePath, MY_ScreenShot.GetConfig('nQuality'))
-            MY.DelayCall(function()
+            MY.DelayCall(300, function()
                 Station.Show()
-            end,300)
-        end,100)
+            end)
+        end)
     elseif nShowUI == MY_ScreenShot.Const.SHOW_UI and not bStationVisible then
         Station.Show()
-        MY.DelayCall(function()
+        MY.DelayCall(100, function()
             _MY_ScreenShot.ShotScreen(szFilePath, MY_ScreenShot.GetConfig('nQuality'))
-            MY.DelayCall(function()
+            MY.DelayCall(300, function()
                 Station.Hide()
-            end,300)
-        end,100)
+            end)
+        end)
     else
         _MY_ScreenShot.ShotScreen(szFilePath, MY_ScreenShot.GetConfig('nQuality'))
     end
@@ -152,17 +152,17 @@ _MY_ScreenShot.OnPanelActive = function(wnd)
     fnRefreshPanel(ui)
     
     -- 注册默认工具检查
-    MY.BreatheCall("MY_ScreenShot_Hotkey_Check", function()
+    MY.BreatheCall("MY_ScreenShot_Hotkey_Check", 1000, function()
         local nKey, nShift, nCtrl, nAlt = MY.Game.GetHotKey("MY_ScreenShot_Hotkey")
         if type(nKey)=="nil" or nKey==0 then
             ui:children("#WndButton_HotkeyCheck"):text(_L["set default screenshot tool"]):enable(true)
         else
             ui:children("#WndButton_HotkeyCheck"):text(_L["as default already"]):enable(false)
         end
-    end, 1000)
+    end)
 end
 _MY_ScreenShot.OnPanelDeactive = function( ... )
-    MY.BreatheCall("MY_ScreenShot_Hotkey_Check")
+    MY.BreatheCall("MY_ScreenShot_Hotkey_Check", false)
 end
 -- 快捷键绑定
 -----------------------------------------------

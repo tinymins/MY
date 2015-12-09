@@ -119,6 +119,6 @@ MY.RegisterPanel(
 		end)
 	end,
 	OnPanelDeactive = function()
-		MY.BreatheCall("DEV_VARWATCH")
+		MY.BreatheCall("DEV_VARWATCH", false)
 	end,
 })

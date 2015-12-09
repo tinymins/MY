@@ -785,13 +785,13 @@ function MY.SwitchTab(szID)
 			end
 		end
 		wndMainPanel.OnPanelResize(wndMainPanel)
-		MY.BreatheCall(function()
+		MY.BreatheCall(500, function()
 			local player = GetClientPlayer()
 			if player then
 				ui:item('#Text_Adv'):text(_L('%s, welcome to use mingyi plugins!', player.szName) .. 'v' .. MY.GetVersion())
 				return 0
 			end
-		end, 500)
+		end)
 		wndMainPanel:FormatAllContentPos()
 	else
 		for _, ctg in ipairs(_MY.tTabs) do
