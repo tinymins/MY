@@ -266,13 +266,26 @@ MY.RegisterEvent("ON_FRAME_CREATE.BIG_WAR_CHECK", function()
 	if me and arg0:GetName() == "ExitPanel" then
 		for _, dwQuestID in ipairs(m_aBigWars) do
 			local info = me.GetQuestTraceInfo(dwQuestID)
-			if info and info.finish then
-				local ui = XGUI(arg0)
-				if ui:item("#Text_MY_Tip"):count() == 0 then
-					ui:append("Text", "Text_MY_Tip", {y = ui:height(), w = ui:width(), color = {255, 255, 0}, font = 199, halign = 1})
+			if info then
+				local finished = false
+				if info.finish then
+					finished = true
+				elseif info.quest_state then
+					finished = true
+					for _, state in ipairs(info.quest_state) do
+						if state.need ~= state.have then
+							finished = false
+						end
+					end
 				end
-				ui = ui:item("#Text_MY_Tip"):text(_L['Warning: Bigwar has been finished but not handed yet!']):shake(10, 10, 10, 1000)
-				break
+				if finished then
+					local ui = XGUI(arg0)
+					if ui:item("#Text_MY_Tip"):count() == 0 then
+						ui:append("Text", "Text_MY_Tip", {y = ui:height(), w = ui:width(), color = {255, 255, 0}, font = 199, halign = 1})
+					end
+					ui = ui:item("#Text_MY_Tip"):text(_L['Warning: Bigwar has been finished but not handed yet!']):shake(10, 10, 10, 1000)
+					break
+				end
 			end
 		end
 	end
