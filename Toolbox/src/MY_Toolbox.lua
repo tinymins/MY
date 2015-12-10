@@ -265,7 +265,8 @@ MY.RegisterEvent("ON_FRAME_CREATE.BIG_WAR_CHECK", function()
 	local me = GetClientPlayer()
 	if me and arg0:GetName() == "ExitPanel" then
 		for _, dwQuestID in ipairs(m_aBigWars) do
-			if me.GetQuestState(dwQuestID) == QUEST_STATE.FINISHED then
+			local info = me.GetQuestTraceInfo(dwQuestID)
+			if info and info.finish then
 				local ui = XGUI(arg0)
 				if ui:item("#Text_MY_Tip"):count() == 0 then
 					ui:append("Text", "Text_MY_Tip", {y = ui:height(), w = ui:width(), color = {255, 255, 0}, font = 199, halign = 1})
