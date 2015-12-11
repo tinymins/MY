@@ -89,6 +89,7 @@ local function UpdatePlayerData(hFrame, KSelf)
 			nCurrentExtra, nMaxExtra = KSelf.nCurrentSunEnergy, KSelf.nMaxSunEnergy
 			szMana = _L["Ri:"] .. tostring(KSelf.nCurrentSunEnergy / 100) .. " " .. _L["Yue:"] .. tostring(KSelf.nCurrentMoonEnergy / 100)
 		end
+		szExtra = ""
 	elseif KSelf.dwForceID == FORCE_TYPE.CANG_YUN then
 		nManaR, nManaG, nManaB = 191, 63, 31
 		szManaImage, nManaFrame = "rRing.UITex", 1
