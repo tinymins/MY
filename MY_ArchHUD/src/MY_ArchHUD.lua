@@ -128,7 +128,7 @@ local function UpdatePlayerData(hFrame, KSelf)
 end
 
 local function UpdateTargetData(hFrame, KTarget)
-	if KTarget then
+	if KTarget and KTarget.dwID ~= UI_GetClientPlayerID() then
 		hFrame.hTargetHealth:Show()
 		hFrame.hImageTargetHealth:SetPercentage(KTarget.nCurrentLife / KTarget.nMaxLife)
 		local szLife = ""
@@ -196,13 +196,17 @@ function MY_ArchHUD.OnFrameCreate()
 	this.hImageTargetCasting = this.hTargetCasting:Lookup(1)
 	-- Init
 	MY_ArchHUD.UpdateAnchor(this)
-	this:SetAlpha(MY_ArchHUD.nAlpha * 2.55)
+	this.hSelfHealth:Hide()
+	this.hSelfMana:Hide()
+	this.hSelfExtra:Hide()
+	this.hTargetHealth:Hide()
+	this.hTargetCasting:Hide()
 	this.hTextSelfHealth:SetFontColor(0, 255, 0)
 	this.hTextSelfMana:SetFontColor(0, 200, 255)
 	this.hTextSelfExtra:SetFontColor(255, 255, 0)
 	this.hTextTargetHealth:SetFontColor(255, 255, 0)
 	this.hTextTargetCasting:SetFontColor(255, 255, 0)
-	MY_ArchHUD.OnFrameBreathe()
+	this:SetAlpha(MY_ArchHUD.nAlpha * 2.55)
 end
 
 function MY_ArchHUD.OnFrameBreathe()
