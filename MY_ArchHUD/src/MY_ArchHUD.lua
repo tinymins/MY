@@ -76,7 +76,7 @@ local function UpdatePlayerData(hFrame, KSelf)
 			szMana = _L["ManRi!"]
 			szManaImage, nManaFrame = "rRing.UITex", 1
 			szExtraImage, nExtraFrame = "rRing.UITex", 1
-			nCurrentMana, nMaxMana = KSelf.nCurrentSunEnergy, KSelf.nCurrentSunEnergy
+			nCurrentMana, nMaxMana = KSelf.nMaxSunEnergy, KSelf.nMaxSunEnergy
 		elseif KSelf.nMoonPowerValue == 1 then
 			szMana = _L["ManYue!"]
 			szManaImage, nManaFrame = "rRing.UITex", 3
