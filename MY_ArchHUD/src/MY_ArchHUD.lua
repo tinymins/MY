@@ -71,27 +71,23 @@ local function UpdatePlayerData(hFrame, KSelf)
 		szManaImage, nManaFrame = "rRing.UITex", 1
 		nCurrentMana, nMaxMana = KSelf.nCurrentRage, KSelf.nMaxRage
 	elseif KSelf.dwForceID == FORCE_TYPE.MING_JIAO then
-		szMana = ""
-		szExtra = ""
 		nManaR, nManaG, nManaB = 255, 255, 0
-		szManaImage, nManaFrame = "rRing.UITex", 3
-		szExtraImage, nExtraFrame = "rRing.UITex", 1
-		
 		if KSelf.nSunPowerValue == 1 then
 			szMana = _L["ManRi!"]
-			nCurrentMana, nMaxMana = KSelf.nMaxSunEnergy / 100, KSelf.nMaxSunEnergy / 100
+			szManaImage, nManaFrame = "rRing.UITex", 1
+			szExtraImage, nExtraFrame = "rRing.UITex", 1
+			nCurrentMana, nMaxMana = KSelf.nMaxSunEnergy, KSelf.nMaxSunEnergy
+		elseif KSelf.nMoonPowerValue == 1 then
+			szMana = _L["ManYue!"]
+			szManaImage, nManaFrame = "rRing.UITex", 3
+			szExtraImage, nExtraFrame = "rRing.UITex", 3
+			nCurrentMana, nMaxMana = KSelf.nMaxMoonEnergy, KSelf.nMaxMoonEnergy
 		else
-			szMana = _L["Ri:"] .. tostring(KSelf.nCurrentSunEnergy / 100)
-			nCurrentExtra, nMaxExtra = KSelf.nCurrentSunEnergy / 100, KSelf.nMaxSunEnergy / 100
-		end
-		szMana = szMana .. " "
-		
-		if KSelf.nMoonPowerValue == 1 then
-			szMana = szMana .. _L["ManYue!"]
-			nCurrentMana, nMaxMana = KSelf.nMaxMoonEnergy / 100, KSelf.nMaxMoonEnergy / 100
-		else
-			szMana = szMana .. _L["Yue:"] .. tostring(KSelf.nCurrentMoonEnergy / 100)
+			szManaImage, nManaFrame = "rRing.UITex", 3
+			szExtraImage, nExtraFrame = "rRing.UITex", 1
 			nCurrentMana, nMaxMana = KSelf.nCurrentMoonEnergy, KSelf.nMaxMoonEnergy
+			nCurrentExtra, nMaxExtra = KSelf.nCurrentSunEnergy, KSelf.nMaxSunEnergy
+			szMana = _L["Ri:"] .. tostring(KSelf.nCurrentSunEnergy / 100) .. " " .. _L["Yue:"] .. tostring(KSelf.nCurrentMoonEnergy / 100)
 		end
 	elseif KSelf.dwForceID == FORCE_TYPE.CANG_YUN then
 		nManaR, nManaG, nManaB = 191, 63, 31
