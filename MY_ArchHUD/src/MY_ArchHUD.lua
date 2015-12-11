@@ -115,7 +115,7 @@ local function UpdatePlayerData(hFrame, KSelf)
 		hFrame.hImageSelfMana:FromUITex(IMG_DIR .. szManaImage, nManaFrame)
 	end
 	if not szMana then
-		szMana = "(" .. KeepTwoByteFloat(nCurrentMana / nMaxMana * 100) .. "%)" .. KSelf.nCurrentMana
+		szMana = "(" .. KeepTwoByteFloat(nCurrentMana / nMaxMana * 100) .. "%)" .. nCurrentMana
 	end
 	hFrame.hTextSelfMana:SetText(szMana)
 	hFrame.hImageSelfMana:SetPercentage(nCurrentMana / nMaxMana)
@@ -126,7 +126,7 @@ local function UpdatePlayerData(hFrame, KSelf)
 			hFrame.hImageSelfExtra:FromUITex(IMG_DIR .. szExtraImage, nExtraFrame)
 		end
 		if not szExtra and nCurrentExtra then
-			szExtra = "(" .. KeepTwoByteFloat(nCurrentExtra / nMaxExtra * 100) .. "%)" .. KSelf.nCurrentExtra
+			szExtra = "(" .. KeepTwoByteFloat(nCurrentExtra / nMaxExtra * 100) .. "%)" .. nCurrentExtra
 		end
 		hFrame.hTextSelfExtra:SetText(szExtra or "")
 		hFrame.hImageSelfExtra:SetPercentage(nCurrentExtra / nMaxExtra)
