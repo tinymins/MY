@@ -98,7 +98,7 @@ local function UpdatePlayerData(hFrame, KSelf)
 		local nAccumulate = math.min(KSelf.nAccumulateValue, 5)
 		szExtra = _L["Qu:"] .. tostring(nAccumulate)
 		nCurrentExtra, nMaxExtra = nAccumulate, 5
-		szExtraImage, nExtraFrame = "rRing.UITex", 3
+		szExtraImage, nExtraFrame = "rRing.UITex", 2
 		nCurrentMana, nMaxMana = KSelf.nCurrentMana, KSelf.nMaxMana
 	else
 		nCurrentMana, nMaxMana = KSelf.nCurrentMana, KSelf.nMaxMana
