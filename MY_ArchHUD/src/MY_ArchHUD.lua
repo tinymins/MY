@@ -51,8 +51,8 @@ local function UpdatePlayerData(hFrame, KSelf)
 		szExtraImage, nExtraFrame = "rRing_T.UITex", 0
 		nCurrentMana, nMaxMana = KSelf.nCurrentMana, KSelf.nMaxMana
 	elseif KSelf.dwForceID == FORCE_TYPE.CHUN_YANG then
-		local nAccumulate = math.min(KSelf.nAccumulateValue, 10)
-		szExtra = _L["Qi:"] .. tostring(nAccumulate / 2)
+		local nAccumulate = math.min(KSelf.nAccumulateValue, 10) / 2
+		szExtra = _L["Qi:"] .. tostring(nAccumulate)
 		nCurrentExtra, nMaxExtra = nAccumulate, 5
 		szExtraImage, nExtraFrame = "rRing.UITex", 0
 		nCurrentMana, nMaxMana = KSelf.nCurrentMana, KSelf.nMaxMana
