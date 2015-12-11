@@ -112,7 +112,7 @@ local function UpdatePlayerData(hFrame, KSelf)
 		hFrame.hTextSelfMana:SetFontColor(nManaR, nManaG, nManaB)
 	end
 	if szManaImage and nManaFrame then
-		hFrame.hImageSelfMana:FromUITex(szManaImage, nManaFrame)
+		hFrame.hImageSelfMana:FromUITex(IMG_DIR .. szManaImage, nManaFrame)
 	end
 	if not szMana then
 		szMana = "(" .. KeepTwoByteFloat(nCurrentMana / nMaxMana * 100) .. "%)" .. KSelf.nCurrentMana
@@ -123,7 +123,7 @@ local function UpdatePlayerData(hFrame, KSelf)
 	if nCurrentExtra then
 		hFrame.hSelfExtra:Show()
 		if szExtraImage and nExtraFrame then
-			hFrame.hImageSelfExtra:FromUITex(szExtraImage, nExtraFrame)
+			hFrame.hImageSelfExtra:FromUITex(IMG_DIR .. szExtraImage, nExtraFrame)
 		end
 		if not szExtra and nCurrentExtra then
 			szExtra = "(" .. KeepTwoByteFloat(nCurrentExtra / nMaxExtra * 100) .. "%)" .. KSelf.nCurrentExtra
