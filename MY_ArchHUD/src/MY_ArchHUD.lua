@@ -207,6 +207,12 @@ function MY_ArchHUD.OnFrameCreate()
 	this.hTextTargetHealth:SetFontColor(255, 255, 0)
 	this.hTextTargetCasting:SetFontColor(255, 255, 0)
 	this:SetAlpha(MY_ArchHUD.nAlpha * 2.55)
+	local KSelf = GetClientPlayer()
+	if KSelf then
+		UpdatePlayerData(this, KSelf)
+		UpdateTargetCasting(this, GetTargetHandle(KSelf.GetTarget()))
+	end
+	MY_ArchHUD.OnFrameBreathe()
 end
 
 function MY_ArchHUD.OnFrameBreathe()
