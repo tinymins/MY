@@ -37,11 +37,6 @@ local function UpdatePlayerData(hFrame, KSelf)
 	if not KSelf then
 		return
 	end
-	hFrame.hSelfHealth:Show()
-	hFrame.hSelfMana:Show()
-	hFrame.hSelfExtra:Show()
-	hFrame.hTextSelfHealth:SetText(tostring(KSelf.nCurrentLife) .. "(" .. KeepTwoByteFloat(KSelf.nCurrentLife / KSelf.nMaxLife * 100) .. "%)")
-	hFrame.hImageSelfHealth:SetPercentage(KSelf.nCurrentLife / KSelf.nMaxLife)
 	
 	local nCurrentMana, nMaxMana
 	local nManaR, nManaG, nManaB
@@ -52,22 +47,28 @@ local function UpdatePlayerData(hFrame, KSelf)
 	if KSelf.dwForceID == FORCE_TYPE.SHAO_LIN then
 		local nAccumulate = math.min(KSelf.nAccumulateValue, 3)
 		szExtra = _L["ChanNa:"] .. tostring(nAccumulate)
+		nCurrentExtra, nMaxExtra = nAccumulate, 3
+		szExtraImage, nExtraFrame = "rRing_T.UITex", 0
 		nCurrentMana, nMaxMana = KSelf.nCurrentMana, KSelf.nMaxMana
 	elseif KSelf.dwForceID == FORCE_TYPE.CHUN_YANG then
 		local nAccumulate = math.min(KSelf.nAccumulateValue, 10)
 		szExtra = _L["Qi:"] .. tostring(nAccumulate / 2)
+		nCurrentExtra, nMaxExtra = nAccumulate, 5
+		szExtraImage, nExtraFrame = "rRing.UITex", 0
 		nCurrentMana, nMaxMana = KSelf.nCurrentMana, KSelf.nMaxMana
 	elseif KSelf.dwForceID == FORCE_TYPE.QI_XIU then
 		local nAccumulate = math.min(KSelf.nAccumulateValue, 10)
 		szExtra = _L["JianWu:"] .. tostring(nAccumulate)
+		nCurrentExtra, nMaxExtra = nAccumulate, 10
+		szExtraImage, nExtraFrame = "rRing.UITex", 2
 		nCurrentMana, nMaxMana = KSelf.nCurrentMana, KSelf.nMaxMana
 	elseif KSelf.dwForceID == FORCE_TYPE.TANG_MEN then
 		nManaR, nManaG, nManaB = 255, 255, 0
-		szExtraImage, nExtraFrame = "rRing.UITex", 2
+		szManaImage, nManaFrame = "rRing.UITex", 2
 		nCurrentMana, nMaxMana = KSelf.nCurrentEnergy, KSelf.nMaxEnergy
 	elseif KSelf.dwForceID == FORCE_TYPE.CANG_JIAN then
 		nManaR, nManaG, nManaB = 255, 150, 0
-		szExtraImage, nExtraFrame = "rRing.UITex", 1
+		szManaImage, nManaFrame = "rRing.UITex", 1
 		nCurrentMana, nMaxMana = KSelf.nCurrentRage, KSelf.nMaxRage
 	elseif KSelf.dwForceID == FORCE_TYPE.MING_JIAO then
 		nManaR, nManaG, nManaB = 255, 255, 0
@@ -95,11 +96,18 @@ local function UpdatePlayerData(hFrame, KSelf)
 	elseif KSelf.dwForceID == FORCE_TYPE.CHANG_GE then
 		local nAccumulate = math.min(KSelf.nAccumulateValue, 5)
 		szExtra = _L["Qu:"] .. tostring(nAccumulate)
+		nCurrentExtra, nMaxExtra = nAccumulate, 5
+		szExtraImage, nExtraFrame = "rRing.UITex", 3
 		nCurrentMana, nMaxMana = KSelf.nCurrentMana, KSelf.nMaxMana
 	else
 		nCurrentMana, nMaxMana = KSelf.nCurrentMana, KSelf.nMaxMana
 	end
 	
+	hFrame.hSelfHealth:Show()
+	hFrame.hTextSelfHealth:SetText(tostring(KSelf.nCurrentLife) .. "(" .. KeepTwoByteFloat(KSelf.nCurrentLife / KSelf.nMaxLife * 100) .. "%)")
+	hFrame.hImageSelfHealth:SetPercentage(KSelf.nCurrentLife / KSelf.nMaxLife)
+	
+	hFrame.hSelfMana:Show()
 	if nManaR and nManaG and nManaB then
 		hFrame.hTextSelfMana:SetFontColor(nManaR, nManaG, nManaB)
 	end
