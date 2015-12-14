@@ -471,22 +471,46 @@ MY_Focus.DrawFocus = function(dwType, dwID)
 	end
 	
 	---------- 左侧 ----------
+	-- 小图标列表
+	local hInfoList = hItem:Lookup("Handle_InfoList")
 	-- 心法
+	hInfoList:Lookup('Handle_Kungfu'):Hide()
 	if dwType == TARGET.PLAYER then
 		if bInfo and info.dwMountKungfuID then
 			hItem:Lookup('Handle_LMN/Text_Kungfu'):SetText(MY_Focus.GetKungfuName(info.dwMountKungfuID))
-			hItem:Lookup('Image_Kungfu'):FromIconID(Table_GetSkillIconID(info.dwMountKungfuID, 1))
+			hInfoList:Lookup('Handle_Kungfu'):Show()
+			hInfoList:Lookup('Handle_Kungfu/Image_Kungfu'):FromIconID(Table_GetSkillIconID(info.dwMountKungfuID, 1))
 		else
 			local kungfu = obj.GetKungfuMount()
 			if kungfu then
 				hItem:Lookup('Handle_LMN/Text_Kungfu'):SetText(MY_Focus.GetKungfuName(kungfu.dwSkillID))
-				hItem:Lookup('Image_Kungfu'):FromIconID(Table_GetSkillIconID(kungfu.dwSkillID, 1))
+				hInfoList:Lookup('Handle_Kungfu'):Show()
+				hInfoList:Lookup('Handle_Kungfu/Image_Kungfu'):FromIconID(Table_GetSkillIconID(kungfu.dwSkillID, 1))
 			else
 				hItem:Lookup('Handle_LMN/Text_Kungfu'):SetText(g_tStrings.tForceTitle[obj.dwForceID])
-				hItem:Lookup('Image_Kungfu'):FromUITex(GetForceImage(obj.dwForceID))
+				hInfoList:Lookup('Handle_Kungfu'):Show()
+				hInfoList:Lookup('Handle_Kungfu/Image_Kungfu'):FromUITex(GetForceImage(obj.dwForceID))
 			end
 		end
 	end
+	-- 阵营
+	hInfoList:Lookup('Handle_Camp'):Hide()
+	if dwType == TARGET.PLAYER
+	and obj.nCamp == CAMP.GOOD or obj.nCamp == CAMP.EVIL then
+		hInfoList:Lookup('Handle_Camp'):Show()
+		hInfoList:Lookup('Handle_Camp/Image_Camp'):FromUITex(GetCampImage(obj.nCamp, obj.bCampFlag))
+	end
+	-- 标记
+	local tMark = GetClientTeam().GetTeamMark()
+	local nMarkID = tMark[dwID]
+	if nMarkID then
+		hInfoList:Lookup('Handle_Mark'):Show()
+		hInfoList:Lookup('Handle_Mark/Image_Mark'):FromUITex(PARTY_MARK_ICON_PATH, PARTY_MARK_ICON_FRAME_LIST[nMarkID])
+	else
+		hInfoList:Lookup('Handle_Mark'):Hide()
+	end
+	hInfoList:FormatAllItemPos()
+	
 	-- 目标距离
 	local nDistance = math.floor(math.sqrt(math.pow(player.nX - obj.nX, 2) + math.pow(player.nY - obj.nY, 2)) * 10 / 64) / 10
 	hItem:Lookup('Handle_Compass/Compass_Distance'):SetText(nDistance)
@@ -495,15 +519,6 @@ MY_Focus.DrawFocus = function(dwType, dwID)
 	if player then
 		hItem:Lookup('Handle_Compass/Image_Player'):Show()
 		hItem:Lookup('Handle_Compass/Image_Player'):SetRotate( - player.nFaceDirection / 128 * math.pi)
-	end
-	-- 阵营
-	if dwType == TARGET.PLAYER then
-		if obj.nCamp == CAMP.GOOD or obj.nCamp == CAMP.EVIL then
-			hItem:Lookup('Image_Camp'):Show()
-			hItem:Lookup('Image_Camp'):FromUITex(GetCampImage(obj.nCamp, obj.bCampFlag))
-		else
-			hItem:Lookup('Image_Camp'):Hide()
-		end
 	end
 	-- 左侧主要部分
 	if MY_Focus.bDisplayKungfuIcon and dwType == TARGET.PLAYER then
@@ -691,7 +706,14 @@ end
 
 MY_Focus.OnFrameCreate = function()
 	m_frame = this
+	this:RegisterEvent("PARTY_SET_MARK")
 	MY_Focus.SetScale(MY_Focus.fScaleX, MY_Focus.fScaleY)
+end
+
+MY_Focus.OnEvent = function(event)
+	if event == "PARTY_SET_MARK" then
+		MY_Focus.UpdateList()
+	end
 end
 
 MY_Focus.OnFrameDragSetPosEnd = function()
@@ -726,10 +748,7 @@ MY_Focus.OnItemRButtonClick = function()
 	local name = this:GetName()
 	name:gsub('Handle_Info_(%d+)_(%d+)', function(dwType, dwID)
 		dwType, dwID = tonumber(dwType), tonumber(dwID)
-		local t = {}
-		if dwType == TARGET.PLAYER then
-			t = MY.Game.GetTargetContextMenu(dwType, this:Lookup('Handle_LMN/Text_Name'):GetText(), dwID)
-		end
+		local t = MY.Game.GetTargetContextMenu(dwType, this:Lookup('Handle_LMN/Text_Name'):GetText(), dwID)
 		table.insert(t, 1, {
 			szOption = _L['delete focus'],
 			fnAction = function()
