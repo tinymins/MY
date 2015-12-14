@@ -367,30 +367,30 @@ MY.Game.GetTargetContextMenu = function(dwType, szName, dwID)
 				OpenArenaCorpsPanel(true, dwID)
 			end,
 		})
-		-- view qixue
-		if dwID and InsertTargetMenu then
-			local tx = {}
-			InsertTargetMenu(tx, dwType, dwID, szName)
-			for _, v in ipairs(tx) do
-				if v.szOption == g_tStrings.LOOKUP_INFO then
-					for _, vv in ipairs(v) do
-						if vv.szOption == g_tStrings.LOOKUP_NEW_TANLENT then -- 查看奇穴
-							table.insert(t, vv)
-							break
-						end
+	end
+	-- view qixue -- mark target
+	if dwID and InsertTargetMenu then
+		local tx = {}
+		InsertTargetMenu(tx, dwType, dwID, szName)
+		for _, v in ipairs(tx) do
+			if v.szOption == g_tStrings.LOOKUP_INFO then
+				for _, vv in ipairs(v) do
+					if vv.szOption == g_tStrings.LOOKUP_NEW_TANLENT then -- 查看奇穴
+						table.insert(t, vv)
+						break
 					end
-					break
 				end
+				break
 			end
-			for _, v in ipairs(tx) do
-				if v.szOption == g_tStrings.STR_ARENA_INVITE_TARGET -- 邀请入名剑队
-				or v.szOption == g_tStrings.LOOKUP_INFO             -- 查看更多信息
-				or v.szOption == g_tStrings.CHANNEL_MENTOR          -- 师徒
-				or v.szOption == g_tStrings.STR_ADD_SHANG           -- 发布悬赏
-				or v.szOption == g_tStrings.STR_MARK_TARGET         -- 标记目标
-				then
-					table.insert(t, v)
-				end
+		end
+		for _, v in ipairs(tx) do
+			if v.szOption == g_tStrings.STR_ARENA_INVITE_TARGET -- 邀请入名剑队
+			or v.szOption == g_tStrings.LOOKUP_INFO             -- 查看更多信息
+			or v.szOption == g_tStrings.CHANNEL_MENTOR          -- 师徒
+			or v.szOption == g_tStrings.STR_ADD_SHANG           -- 发布悬赏
+			or v.szOption == g_tStrings.STR_MARK_TARGET         -- 标记目标
+			then
+				table.insert(t, v)
 			end
 		end
 	end
