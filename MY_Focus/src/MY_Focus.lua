@@ -474,15 +474,15 @@ MY_Focus.DrawFocus = function(dwType, dwID)
 	-- 心法
 	if dwType == TARGET.PLAYER then
 		if bInfo and info.dwMountKungfuID then
-			hItem:Lookup('Handle_Name/Text_Kungfu'):SetText(MY_Focus.GetKungfuName(info.dwMountKungfuID))
+			hItem:Lookup('Handle_LMN/Text_Kungfu'):SetText(MY_Focus.GetKungfuName(info.dwMountKungfuID))
 			hItem:Lookup('Image_Kungfu'):FromIconID(Table_GetSkillIconID(info.dwMountKungfuID, 1))
 		else
 			local kungfu = obj.GetKungfuMount()
 			if kungfu then
-				hItem:Lookup('Handle_Name/Text_Kungfu'):SetText(MY_Focus.GetKungfuName(kungfu.dwSkillID))
+				hItem:Lookup('Handle_LMN/Text_Kungfu'):SetText(MY_Focus.GetKungfuName(kungfu.dwSkillID))
 				hItem:Lookup('Image_Kungfu'):FromIconID(Table_GetSkillIconID(kungfu.dwSkillID, 1))
 			else
-				hItem:Lookup('Handle_Name/Text_Kungfu'):SetText(g_tStrings.tForceTitle[obj.dwForceID])
+				hItem:Lookup('Handle_LMN/Text_Kungfu'):SetText(g_tStrings.tForceTitle[obj.dwForceID])
 				hItem:Lookup('Image_Kungfu'):FromUITex(GetForceImage(obj.dwForceID))
 			end
 		end
@@ -558,7 +558,7 @@ MY_Focus.DrawFocus = function(dwType, dwID)
 	end
 	---------- 右侧 ----------
 	-- 名字
-	hItem:Lookup('Handle_Name/Text_Name'):SetText(MY.Game.GetObjectName(obj) or obj.dwID)
+	hItem:Lookup('Handle_LMN/Text_Name'):SetText(MY.Game.GetObjectName(obj) or obj.dwID)
 	-- 血量
 	if dwType ~= TARGET.DOODAD then
 		local nCurrentLife, nMaxLife = info.nCurrentLife, info.nMaxLife
@@ -575,12 +575,12 @@ MY_Focus.DrawFocus = function(dwType, dwID)
 				nPercent = 100
 			end
 			szLife = szLife .. '(' .. nPercent .. '%)'
-			hItem:Lookup('Handle_LM/Image_Health'):SetPercentage(nCurrentLife / nMaxLife)
-			hItem:Lookup('Handle_LM/Text_Health'):SetText(szLife)
+			hItem:Lookup('Handle_LMN/Image_Health'):SetPercentage(nCurrentLife / nMaxLife)
+			hItem:Lookup('Handle_LMN/Text_Health'):SetText(szLife)
 		end
 		if nMaxMana > 0 then
-			hItem:Lookup('Handle_LM/Image_Mana'):SetPercentage(nCurrentMana / nMaxMana)
-			hItem:Lookup('Handle_LM/Text_Mana'):SetText(nCurrentMana .. '/' .. nMaxMana)
+			hItem:Lookup('Handle_LMN/Image_Mana'):SetPercentage(nCurrentMana / nMaxMana)
+			hItem:Lookup('Handle_LMN/Text_Mana'):SetText(nCurrentMana .. '/' .. nMaxMana)
 		end
 	end
 	-- 读条
@@ -728,7 +728,7 @@ MY_Focus.OnItemRButtonClick = function()
 		dwType, dwID = tonumber(dwType), tonumber(dwID)
 		local t = {}
 		if dwType == TARGET.PLAYER then
-			t = MY.Game.GetTargetContextMenu(dwType, this:Lookup('Handle_Name/Text_Name'):GetText(), dwID)
+			t = MY.Game.GetTargetContextMenu(dwType, this:Lookup('Handle_LMN/Text_Name'):GetText(), dwID)
 		end
 		table.insert(t, 1, {
 			szOption = _L['delete focus'],
