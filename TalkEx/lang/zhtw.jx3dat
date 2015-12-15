@@ -7,6 +7,7 @@ data = {
     ['teammates where'] = '團隊中',
     ['nearby players where'] = '附近的',
     ['please input something.'] = '請先輸入一些內容。',
+    ['You are talking too quick!'] = '操作太過頻繁，靜待片刻方可！',
     ['no trick target found.'] = '找不到可以調侃的玩家，您可以嘗試更改篩選條件。',
     ['$zj look around and have a little thought.'] = '$zj斜眼看了身邊的羊群，冥想了一會。',
     ['$zj epilate $mb\'s feather clearly.'] = '$zj麻利的拔光了$mb的羊毛。',
