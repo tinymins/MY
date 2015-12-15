@@ -42,13 +42,14 @@ for i, v in pairs(g_tStrings.tForceTitle) do
 	_C.tForceTitle[i] = v -- GetForceTitle(i)
 end
 _C.tTrickFilter = { ['NEARBY'] = _L['nearby players where'], ['RAID'] = _L['teammates where'], }
-_C.tTrickChannels = { 
+_C.tTrickChannels = {
 	[PLAYER_TALK_CHANNEL.TEAM         ] = { szName = _L['team channel'         ], tCol = GetMsgFontColor("MSG_TEAM"          , true) },
 	[PLAYER_TALK_CHANNEL.RAID         ] = { szName = _L['raid channel'         ], tCol = GetMsgFontColor("MSG_TEAM"          , true) },
 	[PLAYER_TALK_CHANNEL.TONG         ] = { szName = _L['tong channel'         ], tCol = GetMsgFontColor("MSG_GUILD"         , true) },
 	[PLAYER_TALK_CHANNEL.TONG_ALLIANCE] = { szName = _L['tong alliance channel'], tCol = GetMsgFontColor("MSG_GUILD_ALLIANCE", true) },
 }
 
+local _dwTalkTick = 0
 _C.Talk = function()
 	if #MY_TalkEx.szTalk == 0 then
 		return MY.Sysmsg({_L["please input something."], r=255, g=0, b=0})
@@ -58,6 +59,11 @@ _C.Talk = function()
 	and MY_TalkEx.szTalk:sub(1, 8) == '/script ' then
 		MY.ProcessCommand(MY_TalkEx.szTalk:sub(9))
 	else
+		-- 防止刷屏
+		if GetTime() - _dwTalkTick < 1000 then
+			return OutputMessage("MSG_ANNOUNCE_YELLOW", _L['You are talking too quick!'])
+		end
+		_dwTalkTick = GetTime()
 		-- 近聊不放在第一个会导致发不出去
 		if MY_TalkEx.tTalkChannels[PLAYER_TALK_CHANNEL.NEARBY] then
 			MY.Talk(PLAYER_TALK_CHANNEL.NEARBY, MY_TalkEx.szTalk)
@@ -151,6 +157,11 @@ MY.RegisterPanel("TalkEx", _L["talk ex"], _L['Chat'], "UI/Image/UICommon/Science
 	  		MY.ProcessCommand(MY_TalkEx.szTalk:sub(9))
 	  	else
 	  		_C.Talk()
+	  		local ui = XGUI(this)
+			ui:enable(false)
+			MY.DelayCall(1000, function()
+				ui:enable(true)
+			end)
 	  	end
 	  end, function()
 	  	MY.Talk(nil, MY_TalkEx.szTalk, nil, nil, nil, true)
