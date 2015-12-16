@@ -42,7 +42,7 @@ end
 
 local m_bLogoff
 -- (void)MY_Logoff.LogOff(bCompletely, bUnfight)
-MY_Logoff.LogOffEx = function(bCompletely, bUnfight)
+MY_Logoff.LogOffEx = function(bCompletely, bUnfight, bNotDead)
 	if m_bLogoff then -- cancel logoff
 		m_bLogoff = nil
 		MY.BreatheCall("LOG_OFF", false)
@@ -50,11 +50,24 @@ MY_Logoff.LogOffEx = function(bCompletely, bUnfight)
 	elseif not bUnfight then -- logoff immediately
 		MY.Player.LogOff(bCompletely)
 	else -- logoff when unfight
-		MY.BreatheCall("LOG_OFF", function()
-			if not GetClientPlayer().bFightState then
-				MY.Player.LogOff(bCompletely)
-			end
-		end)
+		local me
+		if bNotDead then
+			MY.BreatheCall("LOG_OFF", function()
+				me = GetClientPlayer()
+				if me and me.nMoveState == MOVE_STATE.ON_DEATH then
+					MY_Logoff.LogOffEx()
+				elseif me and not me.bFightState then
+					MY.Player.LogOff(bCompletely)
+				end
+			end)
+		else
+			MY.BreatheCall("LOG_OFF", function()
+				me = GetClientPlayer()
+				if me and not me.bFightState then
+					MY.Player.LogOff(bCompletely)
+				end
+			end)
+		end
 		m_bLogoff = true
 		MY.Sysmsg({_L["Logoff is ready for your casting unfight skill."]})
 	end
@@ -399,3 +412,5 @@ MY.Game.AddHotKey("LogOff_RUI", _L['return to role list'], function() MY_Logoff.
 MY.Game.AddHotKey("LogOff_RRL", _L['return to game login'], function() MY_Logoff.LogOffEx(true) end, nil)
 MY.Game.AddHotKey("LogOff_RUI_UNFIGHT", _L['return to role list while not fight'], function() MY_Logoff.LogOffEx(false, true) end, nil)
 MY.Game.AddHotKey("LogOff_RRL_UNFIGHT", _L['return to game login while not fight'], function() MY_Logoff.LogOffEx(true, true) end, nil)
+MY.Game.AddHotKey("LogOff_RUI_UNFIGHT_ALIVE", _L['return to role list while not fight and not dead'], function() MY_Logoff.LogOffEx(false, true, true) end, nil)
+MY.Game.AddHotKey("LogOff_RRL_UNFIGHT_ALIVE", _L['return to game login while not fight and not dead'], function() MY_Logoff.LogOffEx(true, true, true) end, nil)
