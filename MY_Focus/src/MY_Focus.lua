@@ -166,7 +166,7 @@ end
 
 -- 获取指定焦点的Handle 没有返回nil
 MY_Focus.GetHandle = function(dwType, dwID)
-	return Station.Lookup('Normal/MY_Focus', 'Handle_List/Handle_Info_'..dwType..'_'..dwID)
+	return Station.Lookup('Normal/MY_Focus', 'Handle_List/HI_'..dwType..'_'..dwID)
 end
 
 -- 添加默认焦点
@@ -384,7 +384,7 @@ MY_Focus.DelFocus = function(dwType, dwID)
 		end
 	end
 	-- 从UI中删除
-	local hItem = Station.Lookup('Normal/MY_Focus', 'Handle_List/Handle_Info_'..dwType..'_'..dwID)
+	local hItem = Station.Lookup('Normal/MY_Focus', 'Handle_List/HI_'..dwType..'_'..dwID)
 	if hItem then
 		MY.UI(hItem):remove()
 		-- 补上UI（超过数量限制时）
@@ -438,7 +438,7 @@ MY_Focus.UpdateList = function()
 	local tNames = {}
 	for i, p in ipairs(MY_Focus.GetDisplayList()) do
 		MY_Focus.DrawFocus(p.dwType, p.dwID)
-		tNames['Handle_Info_' .. p.dwType .. '_' .. p.dwID] = true
+		tNames['HI_' .. p.dwType .. '_' .. p.dwID] = true
 	end
 	local hList = Station.Lookup('Normal/MY_Focus', 'Handle_List')
 	if hList then
@@ -464,10 +464,7 @@ MY_Focus.DrawFocus = function(dwType, dwID)
 	if not hItem then
 		hItem = hList:AppendItemFromIni(_C.szIniFile, 'Handle_Info')
 		hItem:Scale(MY_Focus.fScaleX, MY_Focus.fScaleY)
-		hItem:SetName('Handle_Info_'..dwType..'_'..dwID)
-		if dwType == TARGET.PLAYER then
-			hItem:Lookup('Image_Kungfu'):Show()
-		end
+		hItem:SetName('HI_'..dwType..'_'..dwID)
 	end
 	
 	---------- 左侧 ----------
@@ -723,14 +720,14 @@ end
 
 MY_Focus.OnItemMouseEnter = function()
 	local name = this:GetName()
-	if name:find('Handle_Info_(%d+)_(%d+)') then
+	if name:find('HI_(%d+)_(%d+)') then
 		this:Lookup("Image_Hover"):Show()
 	end
 end
 
 MY_Focus.OnItemMouseLeave = function()
 	local name = this:GetName()
-	if name:find('Handle_Info_(%d+)_(%d+)') then
+	if name:find('HI_(%d+)_(%d+)') then
 		if this:Lookup("Image_Hover") then
 			this:Lookup("Image_Hover"):Hide()
 		end
@@ -739,14 +736,14 @@ end
 
 MY_Focus.OnItemLButtonClick = function()
 	local name = this:GetName()
-	name:gsub('Handle_Info_(%d+)_(%d+)', function(dwType, dwID)
+	name:gsub('HI_(%d+)_(%d+)', function(dwType, dwID)
 		SetTarget(dwType, dwID)
 	end)
 end
 
 MY_Focus.OnItemRButtonClick = function()
 	local name = this:GetName()
-	name:gsub('Handle_Info_(%d+)_(%d+)', function(dwType, dwID)
+	name:gsub('HI_(%d+)_(%d+)', function(dwType, dwID)
 		dwType, dwID = tonumber(dwType), tonumber(dwID)
 		local t = MY.Game.GetTargetContextMenu(dwType, this:Lookup('Handle_LMN/Text_Name'):GetText(), dwID)
 		table.insert(t, 1, {
