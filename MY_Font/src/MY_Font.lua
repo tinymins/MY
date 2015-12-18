@@ -118,7 +118,7 @@ OnPanelActive = function(wnd)
 				x = w - 180 - x - 10, y = y, w = 25,
 				text = "...",
 				onclick = function()
-					local file = GetOpenFileName(_L['Please select your font file.'], "Font File(*.ttf;*.fon)|*.ttf;*.fon|")
+					local file = GetOpenFileName(_L['Please select your font file.'], "Font File(*.ttf;*.fon)\0*.ttf;*.fon\0All Files(*.*)\0*.*\0\0")
 					if not empty(file) then
 						local szRoot = GetRootPath()
 						if file:sub(1, #szRoot) == szRoot then
