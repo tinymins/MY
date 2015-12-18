@@ -7,6 +7,7 @@ data = {
 	['content'] = '通用界面文本',
 	['chat'] = '聊天框文本',
 	['fight'] = '戰鬥浮動傷害顯示文本',
+	['Please select your font file.'] = "請選擇字體文件",
 	
 	['please click apply or sure button to save change!'] = '請點擊確定或應用按鈕保存設置，否則下次登錄時聊天字體將恢複初始設置。',
 }

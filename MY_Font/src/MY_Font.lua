@@ -90,7 +90,7 @@ OnPanelActive = function(wnd)
 			y = y + 40
 			
 			acFile = ui:append("WndAutocomplete", {
-				x = x, y = y, w = w - 180,
+				x = x, y = y, w = w - 180 - 30,
 				text = szFile,
 				onchange = function(raw, szText)
 					UpdateBtnEnable()
@@ -113,6 +113,21 @@ OnPanelActive = function(wnd)
 			  	end,
 				autocomplete = {{"option", "source", C.aFontPath}},
 			}, true)
+			
+			ui:append("WndButton", {
+				x = w - 180 - x - 10, y = y, w = 25,
+				text = "...",
+				onclick = function()
+					local file = GetOpenFileName(_L['Please select your font file.'], "Font File(*.ttf;*.fon)|*.ttf;*.fon|")
+					if not empty(file) then
+						local szRoot = GetRootPath()
+						if file:sub(1, #szRoot) == szRoot then
+							file = file:sub(#szRoot + 1)
+						end
+						acFile:text(file)
+					end
+				end,
+			})
 			
 			acName = ui:append("WndAutocomplete", {
 				w = 100, h = 25, x = w - 180 + x, y = y,
