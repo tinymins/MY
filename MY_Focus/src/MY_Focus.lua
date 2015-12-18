@@ -232,7 +232,7 @@ MY_Focus.DelStaticFocus = function(dwType, dwID)
 	dwType, dwID = tonumber(dwType), tonumber(dwID)
 	if MY_Focus.tFocusList[dwType][dwID] then
 		MY_Focus.tFocusList[dwType][dwID] = nil
-		MY_Focus.OnObjectEnterScene(dwType, dwID)
+		MY_Focus.OnObjectLeaveScene(dwType, dwID)
 	else
 		local KObject = MY.GetObject(dwType, dwID)
 		local dwTemplateID = KObject.dwTemplateID
@@ -743,14 +743,14 @@ end
 
 MY_Focus.OnItemRButtonClick = function()
 	local name = this:GetName()
-	name:gsub('HI_(%d+)_(%d+)', function(dwType, dwID)
+	name:gsub('^HI_(%d+)_(%d+)$', function(dwType, dwID)
 		dwType, dwID = tonumber(dwType), tonumber(dwID)
 		local t = MY.Game.GetTargetContextMenu(dwType, this:Lookup('Handle_LMN/Text_Name'):GetText(), dwID)
 		table.insert(t, 1, {
 			szOption = _L['delete focus'],
 			fnAction = function()
 				MY_Focus.DelStaticFocus(dwType, dwID)
-			end
+			end,
 		})
 		PopupMenu(t)
 	end)
