@@ -498,13 +498,17 @@ MY_Focus.DrawFocus = function(dwType, dwID)
 		hInfoList:Lookup('Handle_Camp/Image_Camp'):FromUITex(GetCampImage(obj.nCamp, obj.bCampFlag))
 	end
 	-- ±ê¼Ç
-	local tMark = GetClientTeam().GetTeamMark()
-	local nMarkID = tMark[dwID]
-	if nMarkID then
-		hInfoList:Lookup('Handle_Mark'):Show()
-		hInfoList:Lookup('Handle_Mark/Image_Mark'):FromUITex(PARTY_MARK_ICON_PATH, PARTY_MARK_ICON_FRAME_LIST[nMarkID])
-	else
-		hInfoList:Lookup('Handle_Mark'):Hide()
+	hInfoList:Lookup('Handle_Mark'):Hide()
+	local KTeam = GetClientTeam()
+	if KTeam then
+		local tMark = KTeam.GetTeamMark()
+		if tMark then
+			local nMarkID = tMark[dwID]
+			if nMarkID then
+				hInfoList:Lookup('Handle_Mark'):Show()
+				hInfoList:Lookup('Handle_Mark/Image_Mark'):FromUITex(PARTY_MARK_ICON_PATH, PARTY_MARK_ICON_FRAME_LIST[nMarkID])
+			end
+		end
 	end
 	hInfoList:FormatAllItemPos()
 	
