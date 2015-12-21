@@ -284,9 +284,14 @@ end
 local SimpleMatch = MY.String.SimpleMatch
 -- 过滤仓库原始函数
 _C.FilterBags = function(szTreePath, szFilter, bTimeLtd)
-	szFilter = (szFilter or ""):gsub('[%[%]]', '')
+	if szFilter then
+		szFilter = szFilter:gsub('[%[%]]', '')
+		if szFilter == "" then
+			szFilter = nil
+		end
+	end
 	local me = GetClientPlayer()
-	if empty(szFilter) and not bTimeLtd then
+	if not szFilter and not bTimeLtd then
 		XGUI(szTreePath):find(".Box"):alpha(255)
 	else
 		XGUI(szTreePath):find(".Box"):each(function(ui)
@@ -301,7 +306,7 @@ _C.FilterBags = function(szTreePath, szFilter, bTimeLtd)
 					if bTimeLtd and item.GetLeftExistTime() == 0 then
 						bMatch = false
 					end
-					if not SimpleMatch(_C.GetItemText(item), szFilter) then
+					if szFilter and not SimpleMatch(_C.GetItemText(item), szFilter) then
 						bMatch = false
 					end
 				end
