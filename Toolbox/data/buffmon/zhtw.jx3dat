@@ -1,0 +1,177 @@
+data = {
+    --花間
+    [10021] = {
+        ['Self'] = { },
+        ['Target'] = {
+            {szName = "蘭摧玉折", dwIconID =  390, bOn = true ,},
+            {szName = "商陽指"  , dwIconID = 1514, bOn = true ,},
+            {szName = "鍾林毓秀", dwIconID =  404, bOn = true ,},
+            {szName = "噬骨"    , dwIconID = 1672, bOn = true ,},
+            {szName = "芙蓉並蒂", dwIconID = 1514, bOn = false,},
+        },
+    },
+    --毒經
+    [10175] = {
+        ['Self'] = { },
+        ['Target'] = {
+            {szName = "百足"    , dwIconID = 2786, bOn = true ,},
+            {szName = "蛇影"    , dwIconID = 2785, bOn = true ,},
+            {szName = "蟾嘯"    , dwIconID = 2784, bOn = true ,},
+            {szName = "蠍心枯殘", dwIconID = 2810, bOn = false,},
+            {szName = "蛇影枯殘", dwIconID = 2812, bOn = false,},
+            {szName = "奪命蠱"  , dwIconID = 2776, bOn = true ,},
+            {szName = "迷心蠱"  , dwIconID = 2777, bOn = false,},
+            {szName = "枯殘蠱"  , dwIconID = 2778, bOn = false,},
+        },
+    },
+    --冰心
+    [10081] = {
+        ['Self'] = { },
+        ['Target'] = {
+            {szName = "急曲"    , dwIconID = 2947, bOn = true},
+        },
+    },
+    --劍純
+    [10015] = {
+        ['Self'] = { },
+        ['Target'] = {
+            {szName = "疊刃"    , dwIconID = 617, bOn = true},
+        },
+    },
+    --雲裳
+    [10080] = {
+        ['Self'] = { },
+        ['Target'] = {
+            {szName = "翔舞"    , dwIconID =  897, bOn = false,},
+            {szName = "上元點鬟", dwIconID =  913, bOn = false,},
+            {szName = "天地低昂", dwIconID = 1498, bOn = false,},
+        },
+    },
+    --離經
+    [10028] = {
+        ['Self'] = { },
+        ['Target'] = {
+            {szName = "握針"    , dwIconID = 1519, bOn = false,},
+            {szName = "春泥護花", dwIconID =  413, bOn = false,},
+            {szName = "毫針"    , dwIconID = 1521, bOn = false,},
+        },
+    },
+    --補天
+    [10176] = {
+        ['Self'] = { },
+        ['Target'] = {
+            {szName = "枯殘蠱"  , dwIconID = 2778, bOn = false,},
+        },
+    },
+    --琉璃
+    [10243] = {
+        ['Self'] = { },
+        ['Target'] = {
+            {szName = "慈悲", dwIconID = 4174, bOn = true,},
+            {szName = "極樂", dwIconID = 4177, bOn = true,},
+            {szName = "朝聖", dwIconID = 3791, bOn = true,},
+            {szName = "烈日", dwIconID = 3796, bOn = true,},
+            {szName = "戒火", dwIconID = 3798, bOn = true,},
+            {szName = "暗霧", dwIconID = 3788, bOn = true,},
+        },
+    },
+    --明教
+    [10242] = {
+        ['Self'] = { },
+        ['Target'] = {
+            {szName = "烈日", dwIconID = 3796, bOn = false,},
+            {szName = "灼燒", dwIconID = 3843, bOn = false,},
+        },
+    },
+    --易筋經
+    [10003] = {
+        ['Self'] = { },
+        ['Target'] = {
+            {szName = "橫掃六合", dwIconID = 434, bOn = false,},
+            {szName = "恒河劫沙", dwIconID = 437, bOn = false,},
+            {szName = "五蘊皆空", dwIconID = 424, bOn = false,},
+        },
+    },
+    --洗髓
+    [10002] = {
+        ['Self'] = { },
+        ['Target'] = {
+            {szName = "立地成佛", dwIconID =  420, bOn = false,},
+            {szName = "衆佛"    , dwIconID =  433, bOn = false,},
+            {szName = "執迷"    , dwIconID =  423, bOn = false,},
+            {szName = "歸去來棍", dwIconID = 2962, bOn = false,},
+            {szName = "恒河劫沙", dwIconID =  437, bOn = false,},
+        },
+    },
+    --鐵牢
+    [10062] = {
+        ['Self'] = { },
+        ['Target'] = {
+            {szName = "破風", dwIconID = 647, bOn = false,},
+            {szName = "定軍", dwIconID = 646, bOn = false,},
+        },
+    },
+    --傲血
+    [10026] = {
+        ['Self'] = { },
+        ['Target'] = {
+            {szName = "破風", dwIconID = 647, bOn = false,},
+            {szName = "定軍", dwIconID = 646, bOn = false,},
+        },
+    },
+    --氣純
+    [10014] = {
+        ['Self'] = {
+            {szName = "太極"    , dwIconID = 2942, bOn = true },
+        },
+        ['Target'] = {
+            {szName = "氣竭"    , dwIconID = 4938, bOn = true },
+            {szName = "七星拱瑞", dwIconID = 1438, bOn = false},
+            {szName = "五方行盡", dwIconID = 1440, bOn = false},
+            {szName = "三才化生", dwIconID =  615, bOn = false},
+        },
+    },
+    --天羅
+    [10225] = {
+        ['Self'] = { },
+        ['Target'] = {
+            {szName = "化血镖", dwIconID = 3169, bOn = false},
+        },
+    },
+    --驚羽
+    [10224] = {
+        ['Self'] = { },
+        ['Target'] = {
+            {szName = "化血镖", dwIconID = 3169, bOn = false},
+        },
+    },
+    --藏劍
+    [10144] = {
+        ['Self'] = { },
+        ['Target'] = {
+            {szName = "醉月"  , dwIconID = 2366, bOn = false},
+        },
+    },
+    [10145] = {
+        ['Self'] = { },
+        ['Target'] = {
+            {szName = "醉月"  , dwIconID = 2366, bOn = false},
+        },
+    },
+    --丐幫
+    [10268] = {
+        ['Self'] = { },
+        ['Target'] = {
+            {szName = "龍躍于淵", dwIconID = 4900, bOn = false},
+        },
+    },
+    -- 長歌
+    [10447] = {
+        ['Self'] = {},
+        ['Target'] = {
+            {szName = "宮", dwIconID = 7178, bOn = true},
+            {szName = "商", dwIconID = 7177, bOn = true},
+            {szName = "角", dwIconID = 7181, bOn = true},
+        },
+    },
+}
