@@ -294,11 +294,15 @@ MY.Game.GetObjectName = function(obj)
 		if szName == "" then
 			szName = string.gsub(Table_GetNpcTemplateName(obj.dwTemplateID), "^%s*(.-)%s*$", "%1")
 			if szName == "" then
-				szName = nil
+				if obj.dwEmployer and obj.dwEmployer ~= 0 then
+					return MY.GetObjectName(GetPlayer(obj.dwEmployer)) -- ³¤¸èÓ°×Ó
+				else
+					szName = nil
+				end
 			end
 		end
 		if szName and obj.dwEmployer and obj.dwEmployer ~= 0 then
-			local szEmpName = MY.Game.GetObjectName(
+			local szEmpName = MY.GetObjectName(
 				(IsPlayer(obj.dwEmployer) and GetPlayer(obj.dwEmployer)) or GetNpc(obj.dwEmployer)
 			) or g_tStrings.STR_SOME_BODY
 			
