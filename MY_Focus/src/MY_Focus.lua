@@ -62,63 +62,45 @@ RegisterCustomData("MY_Focus.anchor")
 RegisterCustomData("MY_Focus.fScaleX")
 RegisterCustomData("MY_Focus.fScaleY")
 
-
-local m_frame
 function MY_Focus.Open()
-	m_frame = Wnd.OpenWindow(_C.szIniFile, 'MY_Focus')
-	m_frame:Lookup('', 'Handle_List'):Clear()
-	MY.UI(m_frame):anchor(MY_Focus.anchor)
-	
-	MY.RegisterEvent('UI_SCALED.MY_FOCUS', function()
-		MY.UI(m_frame):anchor(MY_Focus.anchor)
-	end)
-	
-	MY.RegisterEvent('PLAYER_ENTER_SCENE.MY_FOCUS', function()
-		MY_Focus.OnObjectEnterScene(TARGET.PLAYER, arg0)
-	end)
-	MY.RegisterEvent('NPC_ENTER_SCENE.MY_FOCUS', function()
-		MY_Focus.OnObjectEnterScene(TARGET.NPC, arg0)
-	end)
-	MY.RegisterEvent('DOODAD_ENTER_SCENE.MY_FOCUS', function()
-		MY_Focus.OnObjectEnterScene(TARGET.DOODAD, arg0)
-	end)
-	MY.RegisterEvent('PLAYER_LEAVE_SCENE.MY_FOCUS', function()
-		MY_Focus.OnObjectLeaveScene(TARGET.PLAYER, arg0)
-	end)
-	MY.RegisterEvent('NPC_LEAVE_SCENE.MY_FOCUS', function()
-		MY_Focus.OnObjectLeaveScene(TARGET.NPC, arg0)
-	end)
-	MY.RegisterEvent('DOODAD_LEAVE_SCENE.MY_FOCUS', function()
-		MY_Focus.OnObjectLeaveScene(TARGET.DOODAD, arg0)
-	end)
-	MY_Focus.ScanNearby()
+	Wnd.OpenWindow(_C.szIniFile, 'MY_Focus')
 end
 
 function MY_Focus.Close()
-	Wnd.CloseWindow(m_frame)
-	MY.RegisterEvent(         'UI_SCALED.MY_FOCUS')
-	MY.RegisterEvent('PLAYER_ENTER_SCENE.MY_FOCUS')
-	MY.RegisterEvent(   'NPC_ENTER_SCENE.MY_FOCUS')
-	MY.RegisterEvent('DOODAD_ENTER_SCENE.MY_FOCUS')
-	MY.RegisterEvent('PLAYER_LEAVE_SCENE.MY_FOCUS')
-	MY.RegisterEvent(   'NPC_LEAVE_SCENE.MY_FOCUS')
-	MY.RegisterEvent('DOODAD_LEAVE_SCENE.MY_FOCUS')
+	local hFrame = MY_Focus.GetFrame()
+	if hFrame then
+		Wnd.CloseWindow(hFrame)
+	end
+end
+
+function MY_Focus.GetFrame(szWnd, szItem)
+	if szWnd then
+		if szItem then
+			return Station.Lookup('Normal/MY_Focus/' .. szWnd, szItem)
+		else
+			return Station.Lookup('Normal/MY_Focus/' .. szWnd)
+		end
+	else
+		return Station.Lookup('Normal/MY_Focus')
+	end
 end
 
 function MY_Focus.SetScale(fScaleX, fScaleY)
 	MY_Focus.fScaleX = fScaleX
 	MY_Focus.fScaleY = fScaleY
-	if not m_frame then
+	
+	local hFrame = MY_Focus.GetFrame()
+	if not hFrame then
 		return
 	end
-	if m_frame.fScaleX and m_frame.fScaleY then
-		-- m_frame:SetSize(m_frame:GetW() / m_frame.fScaleX, m_frame:GetH() / m_frame.fScaleY)
-		m_frame:Scale(1 / m_frame.fScaleX, 1 / m_frame.fScaleY)
+	if hFrame.fScaleX and hFrame.fScaleY then
+		-- hFrame:SetSize(hFrame:GetW() / hFrame.fScaleX, hFrame:GetH() / hFrame.fScaleY)
+		hFrame:Scale(1 / hFrame.fScaleX, 1 / hFrame.fScaleY)
 	end
-	m_frame.fScaleX = fScaleX
-	m_frame.fScaleY = fScaleY
-	-- m_frame:SetSize(m_frame:GetW() / m_frame.fScaleX, m_frame:GetH() / m_frame.fScaleY)
-	m_frame:Scale(fScaleX, fScaleY)
+	hFrame.fScaleX = fScaleX
+	hFrame.fScaleY = fScaleY
+	-- hFrame:SetSize(hFrame:GetW() / hFrame.fScaleX, hFrame:GetH() / hFrame.fScaleY)
+	hFrame:Scale(fScaleX, fScaleY)
 end
 
 -- 获取当前显示的焦点列表
@@ -310,6 +292,13 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 						bFocus = true
 					end
 				end
+			elseif dwType == TARGET.NPC then
+				if MY_Focus.bFocusJJCParty
+				and not IsEnemy(UI_GetClientPlayerID(), dwID)
+				and obj.dwTemplateID == 46140 then -- 清绝歌影 的主体影子
+					MY_Focus.DelFocus(TARGET.PLAYER, obj.dwEmployer)
+					bFocus = true
+				end
 			end
 		else
 			if not MY.Player.IsInBattleField() then
@@ -352,6 +341,17 @@ end
 
 -- 对象离开视野
 function MY_Focus.OnObjectLeaveScene(dwType, dwID)
+	local KObject = MY.GetObject(dwType, dwID)
+	if KObject then
+		if dwType == TARGET.NPC then
+			if MY_Focus.bFocusJJCParty
+			and MY.IsInArena()
+			and not IsEnemy(UI_GetClientPlayerID(), dwID)
+			and KObject.dwTemplateID == 46140 then -- 清绝歌影 的主体影子
+				MY_Focus.AddFocus(TARGET.PLAYER, KObject.dwEmployer)
+			end
+		end
+	end
 	MY_Focus.DelFocus(dwType, dwID)
 end
 
@@ -494,14 +494,14 @@ function MY_Focus.DrawFocus(dwType, dwID)
 	-- 阵营
 	hInfoList:Lookup('Handle_Camp'):Hide()
 	if dwType == TARGET.PLAYER
-	and obj.nCamp == CAMP.GOOD or obj.nCamp == CAMP.EVIL then
+	and (obj.nCamp == CAMP.GOOD or obj.nCamp == CAMP.EVIL) then
 		hInfoList:Lookup('Handle_Camp'):Show()
 		hInfoList:Lookup('Handle_Camp/Image_Camp'):FromUITex(GetCampImage(obj.nCamp, obj.bCampFlag))
 	end
 	-- 标记
 	hInfoList:Lookup('Handle_Mark'):Hide()
 	local KTeam = GetClientTeam()
-	if KTeam then
+	if KTeam and MY.IsInParty() then
 		local tMark = KTeam.GetTeamMark()
 		if tMark then
 			local nMarkID = tMark[dwID]
@@ -707,14 +707,38 @@ function MY_Focus.OnFrameBreathe()
 end
 
 function MY_Focus.OnFrameCreate()
-	m_frame = this
 	this:RegisterEvent("PARTY_SET_MARK")
+	this:RegisterEvent("UI_SCALED")
+	this:RegisterEvent("PLAYER_ENTER_SCENE")
+	this:RegisterEvent("NPC_ENTER_SCENE")
+	this:RegisterEvent("DOODAD_ENTER_SCENE")
+	this:RegisterEvent("PLAYER_LEAVE_SCENE")
+	this:RegisterEvent("NPC_LEAVE_SCENE")
+	this:RegisterEvent("DOODAD_LEAVE_SCENE")
+	
+	this:Lookup('', 'Handle_List'):Clear()
+	XGUI(this):anchor(MY_Focus.anchor)
 	MY_Focus.SetScale(MY_Focus.fScaleX, MY_Focus.fScaleY)
+	MY_Focus.ScanNearby()
 end
 
 function MY_Focus.OnEvent(event)
 	if event == "PARTY_SET_MARK" then
 		MY_Focus.UpdateList()
+	elseif event == 'UI_SCALED' then
+		XGUI(this):anchor(MY_Focus.anchor)
+	elseif event == 'PLAYER_ENTER_SCENE' then
+		MY_Focus.OnObjectEnterScene(TARGET.PLAYER, arg0)
+	elseif event == 'NPC_ENTER_SCENE' then
+		MY_Focus.OnObjectEnterScene(TARGET.NPC, arg0)
+	elseif event == 'DOODAD_ENTER_SCENE' then
+		MY_Focus.OnObjectEnterScene(TARGET.DOODAD, arg0)
+	elseif event == 'PLAYER_LEAVE_SCENE' then
+		MY_Focus.OnObjectLeaveScene(TARGET.PLAYER, arg0)
+	elseif event == 'NPC_LEAVE_SCENE' then
+		MY_Focus.OnObjectLeaveScene(TARGET.NPC, arg0)
+	elseif event == 'DOODAD_LEAVE_SCENE' then
+		MY_Focus.OnObjectLeaveScene(TARGET.DOODAD, arg0)
 	end
 end
 
@@ -817,7 +841,8 @@ MY.RegisterInit('MY_FOCUS', function()
 	end
 end)
 
-MY.RegisterPanel( "MY_Focus", _L["focus list"], _L['Target'], "ui/Image/button/SystemButton_1.UITex|9", {255,255,0,200}, { OnPanelActive = function(wnd)
+local PS = {}
+function PS.OnPanelActive(wnd)
 	local ui = MY.UI(wnd)
 	local w, h = ui:size()
 	local xr, yr, wr = w - 260, 40, 260
@@ -1056,4 +1081,5 @@ MY.RegisterPanel( "MY_Focus", _L["focus list"], _L['Target'], "ui/Image/button/S
 		end,
 	})
 	y = y + deltaX
-end})
+end
+MY.RegisterPanel("MY_Focus", _L["focus list"], _L['Target'], "ui/Image/button/SystemButton_1.UITex|9", {255,255,0,200}, PS)
