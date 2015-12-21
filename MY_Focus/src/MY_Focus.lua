@@ -279,7 +279,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		end
 		
 		-- ÅÐ¶Ï¾º¼¼³¡
-		if MY.Player.IsInArena() then
+		if MY.IsInArena() then
 			if dwType == TARGET.PLAYER then
 				if MY_Focus.bFocusJJCEnemy and MY_Focus.bFocusJJCParty then
 					bFocus = true
