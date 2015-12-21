@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-16 21:31:52
+-- @Last Modified time: 2015-12-21 15:19:03
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Focus/lang/")
 local _C = {}
@@ -64,7 +64,7 @@ RegisterCustomData("MY_Focus.fScaleY")
 
 
 local m_frame
-MY_Focus.Open = function()
+function MY_Focus.Open()
 	m_frame = Wnd.OpenWindow(_C.szIniFile, 'MY_Focus')
 	m_frame:Lookup('', 'Handle_List'):Clear()
 	MY.UI(m_frame):anchor(MY_Focus.anchor)
@@ -94,7 +94,7 @@ MY_Focus.Open = function()
 	MY_Focus.ScanNearby()
 end
 
-MY_Focus.Close = function()
+function MY_Focus.Close()
 	Wnd.CloseWindow(m_frame)
 	MY.RegisterEvent(         'UI_SCALED.MY_FOCUS')
 	MY.RegisterEvent('PLAYER_ENTER_SCENE.MY_FOCUS')
@@ -105,7 +105,7 @@ MY_Focus.Close = function()
 	MY.RegisterEvent('DOODAD_LEAVE_SCENE.MY_FOCUS')
 end
 
-MY_Focus.SetScale = function(fScaleX, fScaleY)
+function MY_Focus.SetScale(fScaleX, fScaleY)
 	MY_Focus.fScaleX = fScaleX
 	MY_Focus.fScaleY = fScaleY
 	if not m_frame then
@@ -122,7 +122,7 @@ MY_Focus.SetScale = function(fScaleX, fScaleY)
 end
 
 -- 获取当前显示的焦点列表
-MY_Focus.GetDisplayList = function()
+function MY_Focus.GetDisplayList()
 	local t = {}
 	if _C.bMinimize then
 		return t
@@ -151,7 +151,7 @@ MY_Focus.GetDisplayList = function()
 	return t
 end
 
-MY_Focus.SortFocus = function(fn)
+function MY_Focus.SortFocus(fn)
 	local p = GetClientPlayer()
 	fn = fn or function(p1, p2)
 		p1 = MY.GetObject(p1.dwType, p1.dwID)
@@ -165,12 +165,12 @@ MY_Focus.SortFocus = function(fn)
 end
 
 -- 获取指定焦点的Handle 没有返回nil
-MY_Focus.GetHandle = function(dwType, dwID)
+function MY_Focus.GetHandle(dwType, dwID)
 	return Station.Lookup('Normal/MY_Focus', 'Handle_List/HI_'..dwType..'_'..dwID)
 end
 
 -- 添加默认焦点
-MY_Focus.AddAutoFocus = function(szName)
+function MY_Focus.AddAutoFocus(szName)
 	for _, v in ipairs(MY_Focus.tAutoFocus) do
 		if v == szName then
 			return
@@ -182,7 +182,7 @@ MY_Focus.AddAutoFocus = function(szName)
 end
 
 -- 删除默认焦点
-MY_Focus.DelAutoFocus = function(szName)
+function MY_Focus.DelAutoFocus(szName)
 	for i = #MY_Focus.tAutoFocus, 1, -1 do
 		if MY_Focus.tAutoFocus[i] == szName then
 			table.remove(MY_Focus.tAutoFocus, i)
@@ -206,7 +206,7 @@ MY_Focus.DelAutoFocus = function(szName)
 end
 
 -- 添加永久焦点
-MY_Focus.AddStaticFocus = function(dwType, dwID, bDistinctTplID)
+function MY_Focus.AddStaticFocus(dwType, dwID, bDistinctTplID)
 	dwType, dwID = tonumber(dwType), tonumber(dwID)
 	if bDistinctTplID then
 		local KObject = MY.GetObject(dwType, dwID)
@@ -228,7 +228,7 @@ MY_Focus.AddStaticFocus = function(dwType, dwID, bDistinctTplID)
 end
 
 -- 删除永久焦点
-MY_Focus.DelStaticFocus = function(dwType, dwID)
+function MY_Focus.DelStaticFocus(dwType, dwID)
 	dwType, dwID = tonumber(dwType), tonumber(dwID)
 	if MY_Focus.tFocusList[dwType][dwID] then
 		MY_Focus.tFocusList[dwType][dwID] = nil
@@ -245,7 +245,7 @@ MY_Focus.DelStaticFocus = function(dwType, dwID)
 end
 
 -- 重新扫描附近对象更新焦点列表（只增不减）
-MY_Focus.ScanNearby = function()
+function MY_Focus.ScanNearby()
 	for dwID, _ in pairs(MY.Player.GetNearPlayer()) do
 		MY_Focus.OnObjectEnterScene(TARGET.PLAYER, dwID)
 	end
@@ -258,8 +258,8 @@ MY_Focus.ScanNearby = function()
 end
 
 -- 对象进入视野
-MY_Focus.OnObjectEnterScene = function(dwType, dwID, nRetryCount)
-	if nRetryCount and nRetryCount >5 then
+function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
+	if nRetryCount and nRetryCount > 5 then
 		return
 	end
 	local me = GetClientPlayer()
@@ -295,6 +295,7 @@ MY_Focus.OnObjectEnterScene = function(dwType, dwID, nRetryCount)
 				end
 			end
 		end
+		
 		-- 判断竞技场
 		if MY.Player.IsInArena() then
 			if dwType == TARGET.PLAYER then
@@ -350,12 +351,12 @@ MY_Focus.OnObjectEnterScene = function(dwType, dwID, nRetryCount)
 end
 
 -- 对象离开视野
-MY_Focus.OnObjectLeaveScene = function(dwType, dwID)
+function MY_Focus.OnObjectLeaveScene(dwType, dwID)
 	MY_Focus.DelFocus(dwType, dwID)
 end
 
 -- 目标加入焦点列表
-MY_Focus.AddFocus = function(dwType, dwID, szName)
+function MY_Focus.AddFocus(dwType, dwID, szName)
 	local nIndex
 	for i, p in ipairs(_C.tFocusList) do
 		if p.dwType == dwType and p.dwID == dwID then
@@ -374,7 +375,7 @@ MY_Focus.AddFocus = function(dwType, dwID, szName)
 end
 
 -- 目标移除焦点列表
-MY_Focus.DelFocus = function(dwType, dwID)
+function MY_Focus.DelFocus(dwType, dwID)
 	-- 从列表数据中删除
 	for i = #_C.tFocusList, 1, -1 do
 		local p = _C.tFocusList[i]
@@ -396,7 +397,7 @@ MY_Focus.DelFocus = function(dwType, dwID)
 end
 
 -- 获取焦点列表
-MY_Focus.GetFocusList = function()
+function MY_Focus.GetFocusList()
 	local t = {}
 	for _, v in ipairs(_C.tFocusList) do
 		table.insert(t, v)
@@ -405,7 +406,7 @@ MY_Focus.GetFocusList = function()
 end
 
 -- 清空焦点列表
-MY_Focus.ClearFocus = function()
+function MY_Focus.ClearFocus()
 	_C.tFocusList = {}
 	
 	local hList = Station.Lookup('Normal/MY_Focus', 'Handle_List')
@@ -416,13 +417,13 @@ MY_Focus.ClearFocus = function()
 end
 
 -- 重新扫描附近焦点
-MY_Focus.RescanNearby = function()
+function MY_Focus.RescanNearby()
 	MY_Focus.ClearFocus()
 	MY_Focus.ScanNearby()
 end
 
 -- 重绘列表
-MY_Focus.RedrawList = function(hList)
+function MY_Focus.RedrawList(hList)
 	if not hList then
 		hList = Station.Lookup('Normal/MY_Focus', 'Handle_List')
 		if not hList then
@@ -434,7 +435,7 @@ MY_Focus.RedrawList = function(hList)
 end
 
 -- 更新列表
-MY_Focus.UpdateList = function()
+function MY_Focus.UpdateList()
 	local tNames = {}
 	for i, p in ipairs(MY_Focus.GetDisplayList()) do
 		MY_Focus.DrawFocus(p.dwType, p.dwID)
@@ -452,7 +453,7 @@ MY_Focus.UpdateList = function()
 end
 
 -- 绘制指定的焦点Handle（没有则添加创建）
-MY_Focus.DrawFocus = function(dwType, dwID)
+function MY_Focus.DrawFocus(dwType, dwID)
 	local obj, info, bInfo = MY.Game.GetObject(dwType, dwID)
 	local hList = Station.Lookup('Normal/MY_Focus', 'Handle_List')
 	local player = GetClientPlayer()
@@ -648,7 +649,7 @@ MY_Focus.DrawFocus = function(dwType, dwID)
 end
 
 -- 自适应调整界面大小
-MY_Focus.AdjustUI = function()
+function MY_Focus.AdjustUI()
 	local hList = Station.Lookup('Normal/MY_Focus', 'Handle_List')
 	if not hList then
 		return
@@ -666,7 +667,7 @@ end
 
 -- 获取内功心法字符串
 local m_tKungfuName = {}
-MY_Focus.GetKungfuName = function(dwKungfuID)
+function MY_Focus.GetKungfuName(dwKungfuID)
 	if not m_tKungfuName[dwKungfuID] then
 		m_tKungfuName[dwKungfuID] = Table_GetSkillName(dwKungfuID, 1)
 	end
@@ -675,7 +676,7 @@ end
 
 -- 获取技能名称字符串
 local m_tSkillName = {}
-MY_Focus.GetSkillName = function(dwSkillID, dwSkillLevel)
+function MY_Focus.GetSkillName(dwSkillID, dwSkillLevel)
 	if not m_tSkillName[dwSkillID] then
 		m_tSkillName[dwSkillID] = Table_GetSkillName(dwSkillID, dwSkillLevel)
 	end
@@ -697,7 +698,7 @@ end
 --                                   # #               #           #          --
 -- ########################################################################## --
 -- 周期重绘
-MY_Focus.OnFrameBreathe = function()
+function MY_Focus.OnFrameBreathe()
 	if MY_Focus.bSortByDistance then
 		MY_Focus.SortFocus()
 	end
@@ -705,31 +706,31 @@ MY_Focus.OnFrameBreathe = function()
 	MY_Focus.AdjustUI()
 end
 
-MY_Focus.OnFrameCreate = function()
+function MY_Focus.OnFrameCreate()
 	m_frame = this
 	this:RegisterEvent("PARTY_SET_MARK")
 	MY_Focus.SetScale(MY_Focus.fScaleX, MY_Focus.fScaleY)
 end
 
-MY_Focus.OnEvent = function(event)
+function MY_Focus.OnEvent(event)
 	if event == "PARTY_SET_MARK" then
 		MY_Focus.UpdateList()
 	end
 end
 
-MY_Focus.OnFrameDragSetPosEnd = function()
+function MY_Focus.OnFrameDragSetPosEnd()
 	this:CorrectPos()
 	MY_Focus.anchor = MY.UI(this):anchor('TOPRIGHT')
 end
 
-MY_Focus.OnItemMouseEnter = function()
+function MY_Focus.OnItemMouseEnter()
 	local name = this:GetName()
 	if name:find('HI_(%d+)_(%d+)') then
 		this:Lookup("Image_Hover"):Show()
 	end
 end
 
-MY_Focus.OnItemMouseLeave = function()
+function MY_Focus.OnItemMouseLeave()
 	local name = this:GetName()
 	if name:find('HI_(%d+)_(%d+)') then
 		if this:Lookup("Image_Hover") then
@@ -738,14 +739,14 @@ MY_Focus.OnItemMouseLeave = function()
 	end
 end
 
-MY_Focus.OnItemLButtonClick = function()
+function MY_Focus.OnItemLButtonClick()
 	local name = this:GetName()
 	name:gsub('HI_(%d+)_(%d+)', function(dwType, dwID)
 		SetTarget(dwType, dwID)
 	end)
 end
 
-MY_Focus.OnItemRButtonClick = function()
+function MY_Focus.OnItemRButtonClick()
 	local name = this:GetName()
 	name:gsub('^HI_(%d+)_(%d+)$', function(dwType, dwID)
 		dwType, dwID = tonumber(dwType), tonumber(dwID)
@@ -760,7 +761,7 @@ MY_Focus.OnItemRButtonClick = function()
 	end)
 end
 
-MY_Focus.OnLButtonClick = function()
+function MY_Focus.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Setting' then
 		MY.OpenPanel()
@@ -768,7 +769,7 @@ MY_Focus.OnLButtonClick = function()
 	end
 end
 
-MY_Focus.OnCheckBoxCheck = function()
+function MY_Focus.OnCheckBoxCheck()
 	local name = this:GetName()
 	if name == 'CheckBox_Minimize' then
 		_C.bMinimize = true
@@ -776,7 +777,7 @@ MY_Focus.OnCheckBoxCheck = function()
 	end
 end
 
-MY_Focus.OnCheckBoxUncheck = function()
+function MY_Focus.OnCheckBoxUncheck()
 	local name = this:GetName()
 	if name == 'CheckBox_Minimize' then
 		_C.bMinimize = false
