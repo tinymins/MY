@@ -729,7 +729,10 @@ local function CheckInvalidRect(dwType, dwID, me, bNoCreate)
                 CheckInvalidRect(dwType, dwID, me, true)
             end
         elseif not bNoCreate then
-            if dwType == TARGET.PLAYER or object.CanSeeName() or Config.bShowSpecialNpc then
+            if dwType == TARGET.PLAYER
+            or object.CanSeeName()
+            or object.dwTemplateID == 46140 -- Çå¾ø¸èÓ°
+            or Config.bShowSpecialNpc then
                 XLifeBar(object):Create()
                 CheckInvalidRect(dwType, dwID, me, true)
             end
