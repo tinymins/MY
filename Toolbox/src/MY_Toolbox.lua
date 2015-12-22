@@ -483,6 +483,7 @@ MY.RegisterPanel( "MY_ToolBox", _L["toolbox"], _L['General'], "UI/Image/Common/M
 						szLayer = "ICON_RIGHTMOST",
 						fnClickIcon = function()
 							MY_BuffMonS.DelBuff(dwKungFuID, mon[3])
+							Wnd.CloseWindow("PopupMenuPanel")
 						end,
 					})
 				end
@@ -548,6 +549,7 @@ MY.RegisterPanel( "MY_ToolBox", _L["toolbox"], _L['General'], "UI/Image/Common/M
 						szLayer = "ICON_RIGHTMOST",
 						fnClickIcon = function()
 							MY_BuffMonT.DelBuff(dwKungFuID, mon[3])
+							Wnd.CloseWindow("PopupMenuPanel")
 						end,
 					})
 				end
