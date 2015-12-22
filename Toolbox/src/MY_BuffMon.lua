@@ -8,11 +8,13 @@ local STYLE_COUNT = 2
 MY_BuffMonS = {}
 MY_BuffMonS.anchor = { y = 152, x = -343, s = "TOPLEFT", r = "CENTER" }
 MY_BuffMonS.nStyle = 1
+MY_BuffMonS.fScale = 0.8
 MY_BuffMonS.bEnable = false
 MY_BuffMonS.bDragable = false
 MY_BuffMonS.nMaxLineCount = 16
 RegisterCustomData("MY_BuffMonS.anchor")
 RegisterCustomData("MY_BuffMonS.nStyle")
+RegisterCustomData("MY_BuffMonS.fScale")
 RegisterCustomData("MY_BuffMonS.bEnable")
 RegisterCustomData("MY_BuffMonS.bDragable")
 RegisterCustomData("MY_BuffMonS.nMaxLineCount")
@@ -20,11 +22,13 @@ RegisterCustomData("MY_BuffMonS.tBuffList")
 MY_BuffMonT = {}
 MY_BuffMonT.anchor = { y = 102, x = -343, s = "TOPLEFT", r = "CENTER" }
 MY_BuffMonT.nStyle = 1
+MY_BuffMonT.fScale = 0.8
 MY_BuffMonT.bEnable = false
 MY_BuffMonT.bDragable = false
 MY_BuffMonT.nMaxLineCount = 16
 RegisterCustomData("MY_BuffMonT.anchor")
 RegisterCustomData("MY_BuffMonT.nStyle")
+RegisterCustomData("MY_BuffMonT.fScale")
 RegisterCustomData("MY_BuffMonT.bEnable")
 RegisterCustomData("MY_BuffMonT.bDragable")
 RegisterCustomData("MY_BuffMonT.nMaxLineCount")
@@ -67,15 +71,17 @@ local function RedrawBuffList(hFrame, aBuffMon, nBgFrame, nStyle)
 				hProcessImg:SetPercentage(0)
 			end
 			if nCount <= MY_BuffMonT.nMaxLineCount then
-				nWidth = nWidth + hItem:GetW()
+				nWidth = nWidth + hItem:GetW() * hFrame.fScale
 			end
+			hItem:Scale(hFrame.fScale, hFrame.fScale)
 		end
 	end
 	hList:SetW(nWidth)
 	hList:FormatAllItemPos()
 	hList:SetSizeByAllItemSize()
 	local nW, nH = hList:GetSize()
-	nW, nH = math.max(nW, 50), math.max(nH, 50)
+	nW = math.max(nW, 50 * hFrame.fScale)
+	nH = math.max(nH, 50 * hFrame.fScale)
 	hFrame:SetSize(nW, nH)
 	hFrame:SetDragArea(0, 0, nW, nH)
 end
@@ -117,7 +123,7 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged)
 				if hProcessTxt then
 					hProcessTxt:SetText(nTimeLeft .. "'")
 				end
-				hBox:SetOverText(1, " " .. nTimeLeft .. "'")
+				hBox:SetOverText(1, nTimeLeft .. "'")
 
 				if buff.nStackNum == 1 then
 					hBox:SetOverText(0, "")
@@ -259,6 +265,8 @@ function MY_BuffMonT.RedrawBuffList(hFrame)
 end
 
 function MY_BuffMonT.OnFrameCreate()
+	this.fScale = MY_BuffMonT.fScale
+	this:Scale(MY_BuffMonT.fScale, MY_BuffMonT.fScale)
 	this:RegisterEvent("SKILL_MOUNT_KUNG_FU")
 	this:RegisterEvent("ON_ENTER_CUSTOM_UI_MODE")
 	this:RegisterEvent("ON_LEAVE_CUSTOM_UI_MODE")
@@ -363,6 +371,8 @@ function MY_BuffMonS.RedrawBuffList(hFrame)
 end
 
 function MY_BuffMonS.OnFrameCreate()
+	this.fScale = MY_BuffMonS.fScale
+	this:Scale(MY_BuffMonS.fScale, MY_BuffMonS.fScale)
 	this:RegisterEvent("SKILL_MOUNT_KUNG_FU")
 	this:RegisterEvent("ON_ENTER_CUSTOM_UI_MODE")
 	this:RegisterEvent("ON_LEAVE_CUSTOM_UI_MODE")
@@ -525,6 +535,18 @@ function PS.OnPanelActive(wnd)
 			return t
 		end,
 	})
+	
+	ui:append("WndSliderBox", {
+		x = w - 250, y = y,
+		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		range = {1, 300},
+		value = MY_BuffMonS.fScale * 100,
+		textfmt = function(val) return _L("scale %d%%.", val) end,
+		onchange = function(raw, val)
+			MY_BuffMonS.fScale = val / 100
+			MY_BuffMonS.Reload()
+		end,
+	})
 	y = y + 30
 
 	y = y + 30
@@ -625,6 +647,18 @@ function PS.OnPanelActive(wnd)
 				})
 			end
 			return t
+		end,
+	})
+	
+	ui:append("WndSliderBox", {
+		x = w - 250, y = y,
+		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		range = {1, 300},
+		value = MY_BuffMonT.fScale * 100,
+		textfmt = function(val) return _L("scale %d%%.", val) end,
+		onchange = function(raw, val)
+			MY_BuffMonT.fScale = val / 100
+			MY_BuffMonT.Reload()
 		end,
 	})
 	y = y + 30
