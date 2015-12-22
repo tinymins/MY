@@ -94,6 +94,8 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged)
 			local hBox = hItem:Lookup("Box_Default")
 			hBox:SetCoolDownPercentage(0)
 			hBox:SetObjectStaring(false)
+			hBox:SetOverText(0, "")
+			hBox:SetOverText(1, "")
 			hBox:ClearExtentAnimate()
 			local hProcessTxt = hItem:Lookup("Text_Process")
 			if hProcessTxt then
@@ -160,7 +162,7 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged)
 			end
 		end
 		-- update disappeared buff info
-		if KTarget and bTargetNotChanged then
+		if bTargetNotChanged then
 			for i = 0, hList:GetItemCount() - 1 do
 				local hItem = hList:Lookup(i)
 				if hItem.nRenderFrame and hItem.nRenderFrame >= 0
