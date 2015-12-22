@@ -67,6 +67,7 @@ data = {
     ['mingyi self buff monitor'] = '茗伊自身BUFF監控',
     ['mingyi target buff monitor'] = '茗伊目標BUFF監控',
     ['please input buff name:'] = '請輸入BUFF名稱：',
+    ['display %d eachline.'] = '每行%d個',
     
     ['The kill sequence is: '] = '正確擊殺順序：',
     ['failed to calc.'] = '計算失敗。',
