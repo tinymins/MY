@@ -57,11 +57,11 @@ data = {
     
     ['auto switch talk channel when into battle field'] = '進出戰場JJC時自動切換團隊/戰場頻道',
     
-    ['* buff monitor'] = '※ BUFF監控',
+    ['buff monitor'] = 'BUFF監控',
     ['undragable'] = '禁止拖動',
     ['auto hide chat panel'] = '自動隱藏聊天欄',
-    ['self buff monitor'] = '自身BUFF監控',
-    ['target buff monitor'] = '目標BUFF監控',
+    ['* self buff monitor'] = '※ 自身BUFF監控',
+    ['* target buff monitor'] = '※ 目標BUFF監控',
     ['set self buff monitor'] = '設置自身BUFF監控',
     ['set target buff monitor'] = '設置目標BUFF監控',
     ['mingyi self buff monitor'] = '茗伊自身BUFF監控',
