@@ -252,6 +252,32 @@ function GetItemNameByUIID(nUiId)
 end
 end
 
+if not UI_OBJECT then
+UI_OBJECT = SetmetaReadonly({
+	NONE             = -1, -- 空Box
+	ITEM             = 0 , -- 身上有的物品。nUiId, dwBox, dwX, nItemVersion, nTabType, nIndex
+	SHOP_ITEM        = 1 , -- 商店里面出售的物品 nUiId, dwID, dwShopID, dwIndex
+	OTER_PLAYER_ITEM = 2 , -- 其他玩家身上的物品 nUiId, dwBox, dwX, dwPlayerID
+	ITEM_ONLY_ID     = 3 , -- 只有一个ID的物品。比如装备链接之类的。nUiId, dwID, nItemVersion, nTabType, nIndex
+	ITEM_INFO        = 4 , -- 类型物品 nUiId, nItemVersion, nTabType, nIndex, nCount(书nCount代表dwRecipeID)
+	SKILL            = 5 , -- 技能。dwSkillID, dwSkillLevel, dwOwnerID
+	CRAFT            = 6 , -- 技艺。dwProfessionID, dwBranchID, dwCraftID
+	SKILL_RECIPE     = 7 , -- 配方dwID, dwLevel
+	SYS_BTN          = 8 , -- 系统栏快捷方式dwID
+	MACRO            = 9 , -- 宏
+	MOUNT            = 10, -- 镶嵌
+	ENCHANT          = 11, -- 附魔
+	NOT_NEED_KNOWN   = 15, -- 不需要知道类型
+	PENDANT          = 16, -- 挂件
+	PET              = 17, -- 宠物
+	MEDAL            = 18, -- 宠物徽章
+	BUFF             = 19, -- BUFF
+	MONEY            = 20, -- 金钱
+	TRAIN            = 21, -- 修为
+	EMOTION_ACTION   = 22, -- 动作表情
+})
+end
+
 GLOBAL_HEAD_CLIENTPLAYER = GLOBAL_HEAD_CLIENTPLAYER or 0
 GLOBAL_HEAD_OTHERPLAYER  = GLOBAL_HEAD_OTHERPLAYER  or 1
 GLOBAL_HEAD_NPC          = GLOBAL_HEAD_NPC          or 2
@@ -381,61 +407,6 @@ MY_DEBUG = SetmetaReadonly({
 	WARNING = 1,
 	ERROR   = 2,
 })
-
-if not OutputBuffTipA then
-function OutputBuffTipA(dwID, nLevel, Rect, nTime)
-	local t = {}
-
-	tinsert(t, GetFormatText(Table_GetBuffName(dwID, nLevel) .. "\t", 65))
-	local buffInfo = GetBuffInfo(dwID, nLevel, {})
-	if buffInfo and buffInfo.nDetachType and g_tStrings.tBuffDetachType[buffInfo.nDetachType] then
-		tinsert(t, GetFormatText(g_tStrings.tBuffDetachType[buffInfo.nDetachType] .. '\n', 106))
-	else
-		tinsert(t, XML_LINE_BREAKER)
-	end
-
-	local szDesc = GetBuffDesc(dwID, nLevel, "desc")
-	if szDesc then
-		tinsert(t, GetFormatText(szDesc .. g_tStrings.STR_FULL_STOP, 106))
-	end
-
-	if nTime then
-		if nTime == 0 then
-			tinsert(t, XML_LINE_BREAKER)
-			tinsert(t, GetFormatText(g_tStrings.STR_BUFF_H_TIME_ZERO, 102))
-		else
-			local H, M, S = "", "", ""
-			local h = math.floor(nTime / 3600)
-			local m = math.floor(nTime / 60) % 60
-			local s = math.floor(nTime % 60)
-			if h > 0 then
-				H = h .. g_tStrings.STR_BUFF_H_TIME_H .. " "
-			end
-			if h > 0 or m > 0 then
-				M = m .. g_tStrings.STR_BUFF_H_TIME_M_SHORT .. " "
-			end
-			S = s..g_tStrings.STR_BUFF_H_TIME_S
-			if h < 720 then
-				tinsert(t, XML_LINE_BREAKER)
-				tinsert(t, GetFormatText(FormatString(g_tStrings.STR_BUFF_H_LEFT_TIME_MSG, H, M, S), 102))
-			end
-		end
-	end
-
-	-- For test
-	if IsCtrlKeyDown() then
-		tinsert(t, XML_LINE_BREAKER)
-		tinsert(t, GetFormatText(g_tStrings.DEBUG_INFO_ITEM_TIP, 102))
-		tinsert(t, XML_LINE_BREAKER)
-		tinsert(t, GetFormatText("ID:     " .. dwID, 102))
-		tinsert(t, XML_LINE_BREAKER)
-		tinsert(t, GetFormatText("Level:  " .. nLevel, 102))
-		tinsert(t, XML_LINE_BREAKER)
-		tinsert(t, GetFormatText("IconID: " .. tostring(Table_GetBuffIconID(dwID, nLevel)), 102))
-	end
-	OutputTip(tconcat(t), 300, Rect)
-end
-end
 
 if not IsPhoneLock then
 function IsPhoneLock()
