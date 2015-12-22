@@ -466,7 +466,7 @@ MY.RegisterPanel( "MY_ToolBox", _L["toolbox"], _L['General'], "UI/Image/Common/M
 				end,
 			}}
 			local tBuffMonList = MY_BuffMonS.GetBuffList(dwKungFuID)
-			if tBuffMonList then
+			if tBuffMonList and #tBuffMonList > 0 then
 				table.insert(t, { bDevide = true })
 				for i, mon in ipairs(tBuffMonList) do
 					table.insert(t, {
@@ -532,7 +532,7 @@ MY.RegisterPanel( "MY_ToolBox", _L["toolbox"], _L['General'], "UI/Image/Common/M
 				end,
 			}}
 			local tBuffMonList = MY_BuffMonT.GetBuffList(dwKungFuID)
-			if tBuffMonList then
+			if tBuffMonList and #tBuffMonList > 0 then
 				table.insert(t, { bDevide = true })
 				for i, mon in ipairs(tBuffMonList) do
 					table.insert(t, {
