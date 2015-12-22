@@ -10,6 +10,7 @@ data = {
     ["General"] = "常用",
     ["Chat"] = "聊天",
     ["Target"] = "目標",
+    ["System"] = "系統",
     ["Battle"] = "戰鬥",
     ["Others"] = "其它",
     ["Development"] = "開發",

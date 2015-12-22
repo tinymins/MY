@@ -67,7 +67,7 @@ function OBJ.SetFont(tIDs, szName, szFile, nSize, tStyle)
 end
 
 MY.RegisterPanel(
-"MY_Font", _L["MY_Font"], _L['General'],
+"MY_Font", _L["MY_Font"], _L['System'],
 "ui/Image/UICommon/CommonPanel7.UITex|36", {255,127,0,200}, {
 OnPanelActive = function(wnd)
 	local ui = MY.UI(wnd)
