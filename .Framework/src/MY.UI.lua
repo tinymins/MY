@@ -41,6 +41,7 @@ local function ApplyUIArguments(ui, tArg)
 		if tArg.alpha              ~= nil then ui:alpha      (tArg.alpha      ) end
 		if tArg.font               ~= nil then ui:font       (tArg.font       ) end -- must before color
 		if tArg.color              ~= nil then ui:color      (tArg.color      ) end
+		if tArg.r or tArg.g or tArg.b     then ui:color(tArg.r, tArg.g, tArg.b) end
 		if tArg.multiline          ~= nil then ui:multiLine  (tArg.multiline  ) end -- must before :text()
 		if tArg.sliderstyle        ~= nil then ui:sliderStyle(tArg.sliderstyle) end -- must before :text()
 		if tArg.textfmt            ~= nil then ui:text       (tArg.textfmt    ) end -- must before :text()
