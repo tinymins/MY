@@ -2,24 +2,29 @@
 -- BUFF¼à¿Ø
 ---------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Toolbox/lang/")
-local INI_PATH = MY.GetAddonInfo().szRoot .. "Toolbox/ui/MY_BuffMon.ini"
+local INI_PATH = MY.GetAddonInfo().szRoot .. "Toolbox/ui/MY_BuffMon.%d.ini"
 local DEFAULT_CONFIG_FILE = MY.GetAddonInfo().szRoot .. "Toolbox/data/buffmon/$lang.jx3dat"
+local STYLE_COUNT = 2
 MY_BuffMonS = {}
 MY_BuffMonS.anchor = { y = 152, x = -343, s = "TOPLEFT", r = "CENTER" }
+MY_BuffMonS.nStyle = 1
 MY_BuffMonS.bEnable = false
 MY_BuffMonS.bDragable = false
 MY_BuffMonS.nMaxLineCount = 16
 RegisterCustomData("MY_BuffMonS.anchor")
+RegisterCustomData("MY_BuffMonS.nStyle")
 RegisterCustomData("MY_BuffMonS.bEnable")
 RegisterCustomData("MY_BuffMonS.bDragable")
 RegisterCustomData("MY_BuffMonS.nMaxLineCount")
 RegisterCustomData("MY_BuffMonS.tBuffList")
 MY_BuffMonT = {}
 MY_BuffMonT.anchor = { y = 102, x = -343, s = "TOPLEFT", r = "CENTER" }
+MY_BuffMonT.nStyle = 1
 MY_BuffMonT.bEnable = false
 MY_BuffMonT.bDragable = false
 MY_BuffMonT.nMaxLineCount = 16
 RegisterCustomData("MY_BuffMonT.anchor")
+RegisterCustomData("MY_BuffMonT.nStyle")
 RegisterCustomData("MY_BuffMonT.bEnable")
 RegisterCustomData("MY_BuffMonT.bDragable")
 RegisterCustomData("MY_BuffMonT.nMaxLineCount")
@@ -28,7 +33,7 @@ RegisterCustomData("MY_BuffMonT.tBuffList")
 ----------------------------------------------------------------------------------------------
 -- Í¨ÓÃÂß¼­
 ----------------------------------------------------------------------------------------------
-local function RedrawBuffList(hFrame, aBuffMon, nBgFrame)
+local function RedrawBuffList(hFrame, aBuffMon, nBgFrame, nStyle)
 	hFrame.tItem = {}
 	local nWidth = 0
 	local hList = hFrame:Lookup("", "Handle_BuffList")
@@ -37,9 +42,11 @@ local function RedrawBuffList(hFrame, aBuffMon, nBgFrame)
 	for _, mon in ipairs(aBuffMon) do
 		if mon[1] then
 			nCount = nCount + 1
-			local hItem = hList:AppendItemFromIni(INI_PATH, "Handle_Item")
+			local hItem = hList:AppendItemFromIni(INI_PATH:format(nStyle), "Handle_Item")
 			hItem:Lookup("Image_BoxBg"):SetFrame(nBgFrame)
 			local hBox  = hItem:Lookup("Box_Default")
+			local hProcessTxt = hItem:Lookup("Text_Process")
+			local hProcessImg = hItem:Lookup("Image_Process")
 			hItem.mon = mon
 			hItem.dwIcon = mon[2]
 			hFrame.tItem[mon[3]] = hItem
@@ -53,6 +60,12 @@ local function RedrawBuffList(hFrame, aBuffMon, nBgFrame)
 			-- BUFF²ãÊý
 			hBox:SetOverTextPosition(0, ITEM_POSITION.RIGHT_BOTTOM)
 			hBox:SetOverTextFontScheme(0, 15)
+			if hProcessTxt then
+				hProcessTxt:SetText("")
+			end
+			if hProcessImg then
+				hProcessImg:SetPercentage(0)
+			end
 			if nCount <= MY_BuffMonT.nMaxLineCount then
 				nWidth = nWidth + hItem:GetW()
 			end
@@ -71,10 +84,19 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged)
 	local hList = hFrame:Lookup("", "Handle_BuffList")
 	if not KTarget then
 		for i = 0, hList:GetItemCount() - 1 do
-			local hBox = hList:Lookup(i):Lookup("Box_Default")
+			local hItem = hList:Lookup(i)
+			local hBox = hItem:Lookup("Box_Default")
 			hBox:SetCoolDownPercentage(0)
 			hBox:SetObjectStaring(false)
 			hBox:ClearExtentAnimate()
+			local hProcessTxt = hItem:Lookup("Text_Process")
+			if hProcessTxt then
+				hProcessTxt:SetText("")
+			end
+			local hProcessImg = hItem:Lookup("Image_Process")
+			if hProcessImg then
+				hProcessImg:SetPercentage(0)
+			end
 		end
 	else
 		local nCurrentFrame = GetLogicFrameCount()
@@ -83,12 +105,17 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged)
 			local hItem = hFrame.tItem[szName]
 			if hItem then
 				local hBox = hItem:Lookup("Box_Default")
+				local hProcessTxt = hItem:Lookup("Text_Process")
+				local hProcessImg = hItem:Lookup("Image_Process")
 				local nBuffTime, _ = GetBuffTime(buff.dwID, buff.nLevel)
 				local nTimeLeft = ("%.1f"):format(math.max(0, buff.nEndFrame - GetLogicFrameCount()) / 16)
 				if not hItem.dwIcon or hItem.dwIcon == 13 then
 					hItem.dwIcon = Table_GetBuffIconID(buff.dwID, buff.nLevel)
 					hBox:SetObjectIcon(hItem.dwIcon)
 					hItem.mon[2] = hItem.dwIcon
+				end
+				if hProcessTxt then
+					hProcessTxt:SetText(nTimeLeft .. "'")
 				end
 				hBox:SetOverText(1, " " .. nTimeLeft .. "'")
 
@@ -99,6 +126,9 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged)
 				end
 
 				local dwPercent = nTimeLeft / (nBuffTime / 16)
+				if hProcessImg then
+					hProcessImg:SetPercentage(dwPercent)
+				end
 				hBox:SetCoolDownPercentage(1 - dwPercent)
 
 				if dwPercent < 0.5 and dwPercent > 0.3 then
@@ -137,6 +167,14 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged)
 					hBox:SetObjectStaring(false)
 					hBox:ClearExtentAnimate()
 					hBox:SetObjectSparking(true)
+					local hProcessTxt = hItem:Lookup("Text_Process")
+					if hProcessTxt then
+						hProcessTxt:SetText("")
+					end
+					local hProcessImg = hItem:Lookup("Image_Process")
+					if hProcessImg then
+						hProcessImg:SetPercentage(0)
+					end
 					hItem.nRenderFrame = nil
 				end
 			end
@@ -152,6 +190,14 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged)
 					hBox:SetOverText(1, "")
 					hBox:SetObjectStaring(false)
 					hBox:ClearExtentAnimate()
+					local hProcessTxt = hItem:Lookup("Text_Process")
+					if hProcessTxt then
+						hProcessTxt:SetText("")
+					end
+					local hProcessImg = hItem:Lookup("Image_Process")
+					if hProcessImg then
+						hProcessImg:SetPercentage(0)
+					end
 					hItem.nRenderFrame = nil
 				end
 			end
@@ -207,7 +253,7 @@ end
 
 function MY_BuffMonT.RedrawBuffList(hFrame)
 	local dwKungFuID = GetClientPlayer().GetKungfuMount().dwSkillID
-	RedrawBuffList(hFrame, MY_BuffMonT.GetBuffList(dwKungFuID) or EMPTY_TABLE, 44)
+	RedrawBuffList(hFrame, MY_BuffMonT.GetBuffList(dwKungFuID) or EMPTY_TABLE, 44, MY_BuffMonT.nStyle)
 	this:SetPoint(MY_BuffMonT.anchor.s, 0, 0, MY_BuffMonT.anchor.r, MY_BuffMonT.anchor.x, MY_BuffMonT.anchor.y)
 	this:CorrectPos()
 end
@@ -249,7 +295,7 @@ function MY_BuffMonT.OnEvent(event)
 end
 
 function MY_BuffMonT.Open()
-	Wnd.OpenWindow(INI_PATH, "MY_BuffMonT")
+	Wnd.OpenWindow(INI_PATH:format(MY_BuffMonT.nStyle), "MY_BuffMonT")
 end
 
 function MY_BuffMonT.Close()
@@ -311,7 +357,7 @@ end
 
 function MY_BuffMonS.RedrawBuffList(hFrame)
 	local dwKungFuID = GetClientPlayer().GetKungfuMount().dwSkillID
-	RedrawBuffList(hFrame, MY_BuffMonS.GetBuffList(dwKungFuID) or EMPTY_TABLE, 43)
+	RedrawBuffList(hFrame, MY_BuffMonS.GetBuffList(dwKungFuID) or EMPTY_TABLE, 43, MY_BuffMonS.nStyle)
 	this:SetPoint(MY_BuffMonS.anchor.s, 0, 0, MY_BuffMonS.anchor.r, MY_BuffMonS.anchor.x, MY_BuffMonS.anchor.y)
 	this:CorrectPos()
 end
@@ -348,7 +394,7 @@ function MY_BuffMonS.OnEvent(event)
 end
 
 function MY_BuffMonS.Open()
-	Wnd.OpenWindow(INI_PATH, "MY_BuffMonS")
+	Wnd.OpenWindow(INI_PATH:format(MY_BuffMonS.nStyle), "MY_BuffMonS")
 end
 
 function MY_BuffMonS.Close()
@@ -460,6 +506,26 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + 30
+	
+	ui:append("WndComboBox", {
+		x = x + 20, y = y, w = 120,
+		text = _L['select style'],
+		menu = function()
+			local t = {}
+			for i = 1, STYLE_COUNT do
+				table.insert(t, {
+					szOption = i,
+					fnAction = function()
+						MY_BuffMonS.nStyle = i
+						MY_BuffMonS.Reload()
+					end,
+					rgb = MY_BuffMonS.nStyle == i and {0, 255, 0},
+				})
+			end
+			return t
+		end,
+	})
+	y = y + 30
 
 	y = y + 30
 	
@@ -539,6 +605,26 @@ function PS.OnPanelActive(wnd)
 		onchange = function(raw, val)
 			MY_BuffMonT.nMaxLineCount = val
 			MY_BuffMonT.Reload()
+		end,
+	})
+	y = y + 30
+	
+	ui:append("WndComboBox", {
+		x = x + 20, y = y, w = 120,
+		text = _L['select style'],
+		menu = function()
+			local t = {}
+			for i = 1, STYLE_COUNT do
+				table.insert(t, {
+					szOption = i,
+					fnAction = function()
+						MY_BuffMonT.nStyle = i
+						MY_BuffMonT.Reload()
+					end,
+					rgb = MY_BuffMonT.nStyle == i and {0, 255, 0},
+				})
+			end
+			return t
 		end,
 	})
 	y = y + 30
