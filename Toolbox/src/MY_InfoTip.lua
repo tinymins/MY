@@ -180,7 +180,7 @@ MY.RegisterInit("MY_INFOTIP", function()
 end)
 
 
-MY.RegisterPanel( "MY_InfoTip", _L["infotip"], _L['General'], "ui/Image/UICommon/ActivePopularize2.UITex|22", {255,255,0,200}, { OnPanelActive = function(wnd)
+MY.RegisterPanel( "MY_InfoTip", _L["infotip"], _L['System'], "ui/Image/UICommon/ActivePopularize2.UITex|22", {255,255,0,200}, { OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
     local w, h = ui:size()
     local x, y = 50, 20
