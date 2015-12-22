@@ -69,6 +69,7 @@ data = {
     ['please input buff name:'] = '请输入BUFF名称：',
     ['display %d eachline.'] = '每行%d个',
     ['select style'] = '选择风格',
+    ['scale %d%%.'] = '缩放%d%%',
     
     ['The kill sequence is: '] = '正确击杀顺序：',
     ['failed to calc.'] = '计算失败。',

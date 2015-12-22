@@ -69,6 +69,7 @@ data = {
     ['please input buff name:'] = '請輸入BUFF名稱：',
     ['display %d eachline.'] = '每行%d個',
     ['select style'] = '選擇風格',
+    ['scale %d%%.'] = '縮放%d%%',
     
     ['The kill sequence is: '] = '正確擊殺順序：',
     ['failed to calc.'] = '計算失敗。',
