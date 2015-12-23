@@ -492,4 +492,4 @@ function PS.OnPanelActive(wnd)
 	
 	x, y = GenePS(ui, MY_BuffMonT, x, y, w, h)
 end
-MY.RegisterPanel("MY_BuffMon", _L["buff monitor"], _L['General'], "ui/Image/ChannelsPanel/NewChannels.UITex|141", { 255, 255, 0, 200 }, PS)
+MY.RegisterPanel("MY_BuffMon", _L["buff monitor"], _L['Target'], "ui/Image/ChannelsPanel/NewChannels.UITex|141", { 255, 255, 0, 200 }, PS)
