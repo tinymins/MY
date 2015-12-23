@@ -3,7 +3,8 @@
 ---------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Toolbox/lang/")
 local INI_PATH = MY.GetAddonInfo().szRoot .. "Toolbox/ui/MY_BuffMon.%d.ini"
-local DEFAULT_CONFIG_FILE = MY.GetAddonInfo().szRoot .. "Toolbox/data/buffmon/$lang.jx3dat"
+local DEFAULT_S_CONFIG_FILE = MY.GetAddonInfo().szRoot .. "Toolbox/data/buffmon/self/$lang.jx3dat"
+local DEFAULT_T_CONFIG_FILE = MY.GetAddonInfo().szRoot .. "Toolbox/data/buffmon/target/$lang.jx3dat"
 local STYLE_COUNT = 2
 MY_BuffMonS = {}
 MY_BuffMonS.anchor = { y = 152, x = -343, s = "TOPLEFT", r = "CENTER" }
@@ -11,6 +12,7 @@ MY_BuffMonS.nStyle = 1
 MY_BuffMonS.fScale = 0.8
 MY_BuffMonS.bEnable = false
 MY_BuffMonS.bDragable = false
+MY_BuffMonS.nBoxBgFrame = 43
 MY_BuffMonS.bHideOthers = true
 MY_BuffMonS.nMaxLineCount = 16
 RegisterCustomData("MY_BuffMonS.anchor")
@@ -27,6 +29,7 @@ MY_BuffMonT.nStyle = 1
 MY_BuffMonT.fScale = 0.8
 MY_BuffMonT.bEnable = false
 MY_BuffMonT.bDragable = false
+MY_BuffMonT.nBoxBgFrame = 44
 MY_BuffMonT.bHideOthers = true
 MY_BuffMonT.nMaxLineCount = 16
 RegisterCustomData("MY_BuffMonT.anchor")
@@ -219,212 +222,122 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers)
 	end
 end
 
+local function GeneNameSpace(OBJ, NAMESPACE, DEFAULT_CONFIG_FILE, GetTarget, LANG)
+	function OBJ.AddBuff(dwKungFuID, szBuffName)
+		OBJ.GetBuffList(dwKungFuID)
+		if not OBJ.tBuffList[dwKungFuID] then
+			OBJ.tBuffList[dwKungFuID] = {}
+		end
+		for _, mon in ipairs(OBJ.tBuffList[dwKungFuID]) do
+			if mon[3] == szBuffName then
+				return
+			end
+		end
+		table.insert(OBJ.tBuffList[dwKungFuID], {true, 13, szBuffName})
+		OBJ.Reload()
+	end
+
+	function OBJ.DelBuff(dwKungFuID, szBuffName)
+		if OBJ.GetBuffList(dwKungFuID) then
+			for i, mon in ipairs(OBJ.tBuffList[dwKungFuID]) do
+				if mon[3] == szBuffName then
+					table.remove(OBJ.tBuffList[dwKungFuID], i)
+					return OBJ.Reload()
+				end
+			end
+		end
+	end
+
+	function OBJ.EnableBuff(dwKungFuID, szBuffName, bEnable)
+		if OBJ.GetBuffList(dwKungFuID) then
+			for i, mon in ipairs(OBJ.tBuffList[dwKungFuID]) do
+				if mon[3] == szBuffName then
+					mon[1] = bEnable
+					return OBJ.Reload()
+				end
+			end
+		end
+	end
+
+	function OBJ.GetBuffList(dwKungFuID)
+		if not OBJ.tBuffList then
+			OBJ.tBuffList = MY.LoadLUAData(DEFAULT_CONFIG_FILE)
+		end
+		return OBJ.tBuffList[dwKungFuID]
+	end
+
+	function OBJ.RedrawBuffList(hFrame)
+		local dwKungFuID = GetClientPlayer().GetKungfuMount().dwSkillID
+		RedrawBuffList(hFrame, OBJ.GetBuffList(dwKungFuID) or EMPTY_TABLE, OBJ.nBoxBgFrame, OBJ.nStyle)
+		this:SetPoint(OBJ.anchor.s, 0, 0, OBJ.anchor.r, OBJ.anchor.x, OBJ.anchor.y)
+		this:CorrectPos()
+	end
+
+	function OBJ.OnFrameCreate()
+		this.fScale = OBJ.fScale
+		this:Scale(OBJ.fScale, OBJ.fScale)
+		this:RegisterEvent("SKILL_MOUNT_KUNG_FU")
+		this:RegisterEvent("ON_ENTER_CUSTOM_UI_MODE")
+		this:RegisterEvent("ON_LEAVE_CUSTOM_UI_MODE")
+		this:EnableDrag(OBJ.bDragable)
+		this:SetMousePenetrable(not OBJ.bDragable)
+		OBJ.RedrawBuffList(this)
+	end
+
+	function OBJ.OnFrameBreathe()
+		local dwType, dwID = GetTarget()
+		if dwType ~= this.dwType or dwID ~= this.dwID
+		or dwType == TARGET.PLAYER or dwType == TARGET.NPC then
+			UpdateBuffList(this, MY.GetObject(dwType, dwID), dwType == this.dwType and dwID == this.dwID, OBJ.bHideOthers)
+			this.dwType, this.dwID = dwType, dwID
+		end
+	end
+
+	function OBJ.OnFrameDragEnd()
+		OBJ.anchor = GetFrameAnchor(this, "TOPLEFT")
+	end
+
+	function OBJ.OnEvent(event)
+		if event == "SKILL_MOUNT_KUNG_FU" then
+			OBJ.RedrawBuffList(this)
+		elseif event == "ON_ENTER_CUSTOM_UI_MODE" then
+			UpdateCustomModeWindow(this, LANG.CMTEXT, not OBJ.bDragable)
+		elseif event == "ON_LEAVE_CUSTOM_UI_MODE" then
+			UpdateCustomModeWindow(this, LANG.CMTEXT, not OBJ.bDragable)
+			if OBJ.bDragable then
+				this:EnableDrag(true)
+			end
+			OBJ.anchor = GetFrameAnchor(this, "TOPLEFT")
+		end
+	end
+
+	function OBJ.Open()
+		Wnd.OpenWindow(INI_PATH:format(OBJ.nStyle), NAMESPACE)
+	end
+
+	function OBJ.Close()
+		Wnd.CloseWindow(NAMESPACE)
+	end
+
+	function OBJ.Reload()
+		OBJ.Close()
+		if OBJ.bEnable then
+			OBJ.Open()
+		end
+	end
+end
+
 ----------------------------------------------------------------------------------------------
 -- 目标监控
 ----------------------------------------------------------------------------------------------
-function MY_BuffMonT.AddBuff(dwKungFuID, szBuffName)
-	MY_BuffMonT.GetBuffList(dwKungFuID)
-	if not MY_BuffMonT.tBuffList[dwKungFuID] then
-		MY_BuffMonT.tBuffList[dwKungFuID] = {}
-	end
-	for _, mon in ipairs(MY_BuffMonT.tBuffList[dwKungFuID]) do
-		if mon[3] == szBuffName then
-			return
-		end
-	end
-	table.insert(MY_BuffMonT.tBuffList[dwKungFuID], {true, 13, szBuffName})
-	MY_BuffMonT.Reload()
-end
-
-function MY_BuffMonT.DelBuff(dwKungFuID, szBuffName)
-	if MY_BuffMonT.GetBuffList(dwKungFuID) then
-		for i, mon in ipairs(MY_BuffMonT.tBuffList[dwKungFuID]) do
-			if mon[3] == szBuffName then
-				table.remove(MY_BuffMonT.tBuffList[dwKungFuID], i)
-				return MY_BuffMonT.Reload()
-			end
-		end
-	end
-end
-
-function MY_BuffMonT.EnableBuff(dwKungFuID, szBuffName, bEnable)
-	if MY_BuffMonT.GetBuffList(dwKungFuID) then
-		for i, mon in ipairs(MY_BuffMonT.tBuffList[dwKungFuID]) do
-			if mon[3] == szBuffName then
-				mon[1] = bEnable
-				return MY_BuffMonT.Reload()
-			end
-		end
-	end
-end
-
-function MY_BuffMonT.GetBuffList(dwKungFuID)
-	if not MY_BuffMonT.tBuffList then
-		MY_BuffMonT.tBuffList = MY.LoadLUAData(DEFAULT_CONFIG_FILE)[2]
-	end
-	return MY_BuffMonT.tBuffList[dwKungFuID]
-end
-
-function MY_BuffMonT.RedrawBuffList(hFrame)
-	local dwKungFuID = GetClientPlayer().GetKungfuMount().dwSkillID
-	RedrawBuffList(hFrame, MY_BuffMonT.GetBuffList(dwKungFuID) or EMPTY_TABLE, 44, MY_BuffMonT.nStyle)
-	this:SetPoint(MY_BuffMonT.anchor.s, 0, 0, MY_BuffMonT.anchor.r, MY_BuffMonT.anchor.x, MY_BuffMonT.anchor.y)
-	this:CorrectPos()
-end
-
-function MY_BuffMonT.OnFrameCreate()
-	this.fScale = MY_BuffMonT.fScale
-	this:Scale(MY_BuffMonT.fScale, MY_BuffMonT.fScale)
-	this:RegisterEvent("SKILL_MOUNT_KUNG_FU")
-	this:RegisterEvent("ON_ENTER_CUSTOM_UI_MODE")
-	this:RegisterEvent("ON_LEAVE_CUSTOM_UI_MODE")
-	this:EnableDrag(MY_BuffMonT.bDragable)
-	this:SetMousePenetrable(not MY_BuffMonT.bDragable)
-	MY_BuffMonT.RedrawBuffList(this)
-end
-
-function MY_BuffMonT.OnFrameBreathe()
-	local dwType, dwID = MY.GetTarget()
-	if dwType ~= this.dwType or dwID ~= this.dwID
-	or dwType == TARGET.PLAYER or dwType == TARGET.NPC then
-		UpdateBuffList(this, MY.GetObject(dwType, dwID), dwType == this.dwType and dwID == this.dwID, MY_BuffMonT.bHideOthers)
-		this.dwType, this.dwID = dwType, dwID
-	end
-end
-
-function MY_BuffMonT.OnFrameDragEnd()
-	MY_BuffMonT.anchor = GetFrameAnchor(this, "TOPLEFT")
-end
-
-function MY_BuffMonT.OnEvent(event)
-	if event == "SKILL_MOUNT_KUNG_FU" then
-		MY_BuffMonT.RedrawBuffList(this)
-	elseif event == "ON_ENTER_CUSTOM_UI_MODE" then
-		UpdateCustomModeWindow(this, _L["mingyi self buff monitor"], not MY_BuffMonT.bDragable)
-	elseif event == "ON_LEAVE_CUSTOM_UI_MODE" then
-		UpdateCustomModeWindow(this, _L["mingyi self buff monitor"], not MY_BuffMonT.bDragable)
-		if MY_BuffMonT.bDragable then
-			this:EnableDrag(true)
-		end
-		MY_BuffMonT.anchor = GetFrameAnchor(this, "TOPLEFT")
-	end
-end
-
-function MY_BuffMonT.Open()
-	Wnd.OpenWindow(INI_PATH:format(MY_BuffMonT.nStyle), "MY_BuffMonT")
-end
-
-function MY_BuffMonT.Close()
-	Wnd.CloseWindow("MY_BuffMonT")
-end
-
-function MY_BuffMonT.Reload()
-	MY_BuffMonT.Close()
-	if MY_BuffMonT.bEnable then
-		MY_BuffMonT.Open()
-	end
-end
+GeneNameSpace(MY_BuffMonT, "MY_BuffMonT", DEFAULT_T_CONFIG_FILE,
+function() return MY.GetTarget() end, {CMTEXT = _L["mingyi self buff monitor"]})
 
 ----------------------------------------------------------------------------------------------
 -- 自身监控
 ----------------------------------------------------------------------------------------------
-function MY_BuffMonS.AddBuff(dwKungFuID, szBuffName)
-	MY_BuffMonS.GetBuffList(dwKungFuID)
-	if not MY_BuffMonS.tBuffList[dwKungFuID] then
-		MY_BuffMonS.tBuffList[dwKungFuID] = {}
-	end
-	for _, mon in ipairs(MY_BuffMonS.tBuffList[dwKungFuID]) do
-		if mon[3] == szBuffName then
-			return
-		end
-	end
-	table.insert(MY_BuffMonS.tBuffList[dwKungFuID], {true, 13, szBuffName})
-	MY_BuffMonS.Reload()
-end
-
-function MY_BuffMonS.DelBuff(dwKungFuID, szBuffName)
-	if MY_BuffMonS.GetBuffList(dwKungFuID) then
-		for i, mon in ipairs(MY_BuffMonS.tBuffList[dwKungFuID]) do
-			if mon[3] == szBuffName then
-				table.remove(MY_BuffMonS.tBuffList[dwKungFuID], i)
-				return MY_BuffMonS.Reload()
-			end
-		end
-	end
-end
-
-function MY_BuffMonS.EnableBuff(dwKungFuID, szBuffName, bEnable)
-	if MY_BuffMonS.GetBuffList(dwKungFuID) then
-		for i, mon in ipairs(MY_BuffMonS.tBuffList[dwKungFuID]) do
-			if mon[3] == szBuffName then
-				mon[1] = bEnable
-				return MY_BuffMonS.Reload()
-			end
-		end
-	end
-end
-
-function MY_BuffMonS.GetBuffList(dwKungFuID)
-	if not MY_BuffMonS.tBuffList then
-		MY_BuffMonS.tBuffList = MY.LoadLUAData(DEFAULT_CONFIG_FILE)[1]
-	end
-	return MY_BuffMonS.tBuffList[dwKungFuID]
-end
-
-function MY_BuffMonS.RedrawBuffList(hFrame)
-	local dwKungFuID = GetClientPlayer().GetKungfuMount().dwSkillID
-	RedrawBuffList(hFrame, MY_BuffMonS.GetBuffList(dwKungFuID) or EMPTY_TABLE, 43, MY_BuffMonS.nStyle)
-	this:SetPoint(MY_BuffMonS.anchor.s, 0, 0, MY_BuffMonS.anchor.r, MY_BuffMonS.anchor.x, MY_BuffMonS.anchor.y)
-	this:CorrectPos()
-end
-
-function MY_BuffMonS.OnFrameCreate()
-	this.fScale = MY_BuffMonS.fScale
-	this:Scale(MY_BuffMonS.fScale, MY_BuffMonS.fScale)
-	this:RegisterEvent("SKILL_MOUNT_KUNG_FU")
-	this:RegisterEvent("ON_ENTER_CUSTOM_UI_MODE")
-	this:RegisterEvent("ON_LEAVE_CUSTOM_UI_MODE")
-	this:EnableDrag(MY_BuffMonS.bDragable)
-	this:SetMousePenetrable(not MY_BuffMonS.bDragable)
-	MY_BuffMonS.RedrawBuffList(this)
-end
-
-function MY_BuffMonS.OnFrameBreathe()
-	UpdateBuffList(this, GetClientPlayer(), true, MY_BuffMonS.bHideOthers)
-end
-
-function MY_BuffMonS.OnFrameDragEnd()
-	MY_BuffMonS.anchor = GetFrameAnchor(this, "TOPLEFT")
-end
-
-function MY_BuffMonS.OnEvent(event)
-	if event == "SKILL_MOUNT_KUNG_FU" then
-		MY_BuffMonS.RedrawBuffList(this)
-	elseif event == "ON_ENTER_CUSTOM_UI_MODE" then
-		UpdateCustomModeWindow(this, _L["mingyi self buff monitor"], not MY_BuffMonS.bDragable)
-	elseif event == "ON_LEAVE_CUSTOM_UI_MODE" then
-		UpdateCustomModeWindow(this, _L["mingyi self buff monitor"], not MY_BuffMonS.bDragable)
-		if MY_BuffMonS.bDragable then
-			this:EnableDrag(true)
-		end
-		MY_BuffMonS.anchor = GetFrameAnchor(this, "TOPLEFT")
-	end
-end
-
-function MY_BuffMonS.Open()
-	Wnd.OpenWindow(INI_PATH:format(MY_BuffMonS.nStyle), "MY_BuffMonS")
-end
-
-function MY_BuffMonS.Close()
-	Wnd.CloseWindow("MY_BuffMonS")
-end
-
-function MY_BuffMonS.Reload()
-	MY_BuffMonS.Close()
-	if MY_BuffMonS.bEnable then
-		MY_BuffMonS.Open()
-	end
-end
+GeneNameSpace(MY_BuffMonS, "MY_BuffMonS", DEFAULT_S_CONFIG_FILE,
+function() return TARGET.PLAYER, UI_GetClientPlayerID() end, {CMTEXT = _L["mingyi target buff monitor"]})
 
 ----------------------------------------------------------------------------------------------
 -- 初始化
