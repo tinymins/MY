@@ -11,12 +11,14 @@ MY_BuffMonS.nStyle = 1
 MY_BuffMonS.fScale = 0.8
 MY_BuffMonS.bEnable = false
 MY_BuffMonS.bDragable = false
+MY_BuffMonS.bHideOthers = true
 MY_BuffMonS.nMaxLineCount = 16
 RegisterCustomData("MY_BuffMonS.anchor")
 RegisterCustomData("MY_BuffMonS.nStyle")
 RegisterCustomData("MY_BuffMonS.fScale")
 RegisterCustomData("MY_BuffMonS.bEnable")
 RegisterCustomData("MY_BuffMonS.bDragable")
+RegisterCustomData("MY_BuffMonS.bHideOthers")
 RegisterCustomData("MY_BuffMonS.nMaxLineCount")
 RegisterCustomData("MY_BuffMonS.tBuffList")
 MY_BuffMonT = {}
@@ -25,12 +27,14 @@ MY_BuffMonT.nStyle = 1
 MY_BuffMonT.fScale = 0.8
 MY_BuffMonT.bEnable = false
 MY_BuffMonT.bDragable = false
+MY_BuffMonT.bHideOthers = true
 MY_BuffMonT.nMaxLineCount = 16
 RegisterCustomData("MY_BuffMonT.anchor")
 RegisterCustomData("MY_BuffMonT.nStyle")
 RegisterCustomData("MY_BuffMonT.fScale")
 RegisterCustomData("MY_BuffMonT.bEnable")
 RegisterCustomData("MY_BuffMonT.bDragable")
+RegisterCustomData("MY_BuffMonT.bHideOthers")
 RegisterCustomData("MY_BuffMonT.nMaxLineCount")
 RegisterCustomData("MY_BuffMonT.tBuffList")
 
@@ -86,7 +90,7 @@ local function RedrawBuffList(hFrame, aBuffMon, nBgFrame, nStyle)
 	hFrame:SetDragArea(0, 0, nW, nH)
 end
 
-local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged)
+local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers)
 	local hList = hFrame:Lookup("", "Handle_BuffList")
 	if not KTarget then
 		for i = 0, hList:GetItemCount() - 1 do
@@ -109,56 +113,58 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged)
 	else
 		local nCurrentFrame = GetLogicFrameCount()
 		for _, buff in ipairs(MY.Player.GetBuffList(KTarget)) do
-			local szName = Table_GetBuffName(buff.dwID, buff.nLevel)
-			local hItem = hFrame.tItem[szName]
-			if hItem then
-				local hBox = hItem:Lookup("Box_Default")
-				local hProcessTxt = hItem:Lookup("Text_Process")
-				local hProcessImg = hItem:Lookup("Image_Process")
-				local nBuffTime, _ = GetBuffTime(buff.dwID, buff.nLevel)
-				local nTimeLeft = ("%.1f"):format(math.max(0, buff.nEndFrame - GetLogicFrameCount()) / 16)
-				if not hItem.dwIcon or hItem.dwIcon == 13 then
-					hItem.dwIcon = Table_GetBuffIconID(buff.dwID, buff.nLevel)
-					hBox:SetObjectIcon(hItem.dwIcon)
-					hItem.mon[2] = hItem.dwIcon
-				end
-				if hProcessTxt then
-					hProcessTxt:SetText(nTimeLeft .. "'")
-				end
-				hBox:SetOverText(1, nTimeLeft .. "'")
-
-				if buff.nStackNum == 1 then
-					hBox:SetOverText(0, "")
-				else
-					hBox:SetOverText(0, buff.nStackNum)
-				end
-
-				local dwPercent = nTimeLeft / (nBuffTime / 16)
-				if hProcessImg then
-					hProcessImg:SetPercentage(dwPercent)
-				end
-				hBox:SetCoolDownPercentage(1 - dwPercent)
-
-				if dwPercent < 0.5 and dwPercent > 0.3 then
-					if hBox.dwPercent ~= 0.5 then
-						hBox.dwPercent = 0.5
-						hBox:SetObjectStaring(true)
+			if not bHideOthers or buff.dwSkillSrcID == UI_GetClientPlayerID() then
+				local szName = Table_GetBuffName(buff.dwID, buff.nLevel)
+				local hItem = hFrame.tItem[szName]
+				if hItem then
+					local hBox = hItem:Lookup("Box_Default")
+					local hProcessTxt = hItem:Lookup("Text_Process")
+					local hProcessImg = hItem:Lookup("Image_Process")
+					local nBuffTime, _ = GetBuffTime(buff.dwID, buff.nLevel)
+					local nTimeLeft = ("%.1f"):format(math.max(0, buff.nEndFrame - GetLogicFrameCount()) / 16)
+					if not hItem.dwIcon or hItem.dwIcon == 13 then
+						hItem.dwIcon = Table_GetBuffIconID(buff.dwID, buff.nLevel)
+						hBox:SetObjectIcon(hItem.dwIcon)
+						hItem.mon[2] = hItem.dwIcon
 					end
-				elseif dwPercent < 0.3 and dwPercent > 0.1 then
-					if hBox.dwPercent ~= 0.3 then
-						hBox.dwPercent = 0.3
-						hBox:SetExtentAnimate("ui\\Image\\Common\\Box.UITex", 17)
+					if hProcessTxt then
+						hProcessTxt:SetText(nTimeLeft .. "'")
 					end
-				elseif dwPercent < 0.1 then
-					if hBox.dwPercent ~= 0.1 then
-						hBox.dwPercent = 0.1
-						hBox:SetExtentAnimate("ui\\Image\\Common\\Box.UITex", 20)
+					hBox:SetOverText(1, nTimeLeft .. "'")
+
+					if buff.nStackNum == 1 then
+						hBox:SetOverText(0, "")
+					else
+						hBox:SetOverText(0, buff.nStackNum)
 					end
-				else
-					hBox:SetObjectStaring(false)
-					hBox:ClearExtentAnimate()
+
+					local dwPercent = nTimeLeft / (nBuffTime / 16)
+					if hProcessImg then
+						hProcessImg:SetPercentage(dwPercent)
+					end
+					hBox:SetCoolDownPercentage(1 - dwPercent)
+
+					if dwPercent < 0.5 and dwPercent > 0.3 then
+						if hBox.dwPercent ~= 0.5 then
+							hBox.dwPercent = 0.5
+							hBox:SetObjectStaring(true)
+						end
+					elseif dwPercent < 0.3 and dwPercent > 0.1 then
+						if hBox.dwPercent ~= 0.3 then
+							hBox.dwPercent = 0.3
+							hBox:SetExtentAnimate("ui\\Image\\Common\\Box.UITex", 17)
+						end
+					elseif dwPercent < 0.1 then
+						if hBox.dwPercent ~= 0.1 then
+							hBox.dwPercent = 0.1
+							hBox:SetExtentAnimate("ui\\Image\\Common\\Box.UITex", 20)
+						end
+					else
+						hBox:SetObjectStaring(false)
+						hBox:ClearExtentAnimate()
+					end
+					hItem.nRenderFrame = nCurrentFrame
 				end
-				hItem.nRenderFrame = nCurrentFrame
 			end
 		end
 		-- update disappeared buff info
@@ -281,7 +287,7 @@ function MY_BuffMonT.OnFrameBreathe()
 	local dwType, dwID = MY.GetTarget()
 	if dwType ~= this.dwType or dwID ~= this.dwID
 	or dwType == TARGET.PLAYER or dwType == TARGET.NPC then
-		UpdateBuffList(this, MY.GetObject(dwType, dwID), dwType == this.dwType and dwID == this.dwID)
+		UpdateBuffList(this, MY.GetObject(dwType, dwID), dwType == this.dwType and dwID == this.dwID, MY_BuffMonT.bHideOthers)
 		this.dwType, this.dwID = dwType, dwID
 	end
 end
@@ -384,7 +390,7 @@ function MY_BuffMonS.OnFrameCreate()
 end
 
 function MY_BuffMonS.OnFrameBreathe()
-	UpdateBuffList(this, GetClientPlayer(), true)
+	UpdateBuffList(this, GetClientPlayer(), true, MY_BuffMonS.bHideOthers)
 end
 
 function MY_BuffMonS.OnFrameDragEnd()
@@ -443,6 +449,16 @@ local function GenePS(ui, OBJ, x, y, w, h)
 			OBJ.Reload()
 		end,
 	})
+	
+	ui:append("WndCheckBox", {
+		x = x + 150, y = y, w = 100,
+		text = _L['undragable'],
+		checked = not OBJ.bDragable,
+		oncheck = function(bChecked)
+			OBJ.bDragable = not bChecked
+			OBJ.Reload()
+		end,
+	})
 
 	ui:append("WndComboBox", {
 		x = w - 250, y = y, w = 160,
@@ -489,11 +505,11 @@ local function GenePS(ui, OBJ, x, y, w, h)
 	y = y + 30
 	
 	ui:append("WndCheckBox", {
-		x = x + 20, y = y, w = 100,
-		text = _L['undragable'],
-		checked = not OBJ.bDragable,
+		x = x + 20, y = y, w = 200,
+		text = _L['hide others buff'],
+		checked = OBJ.bHideOthers,
 		oncheck = function(bChecked)
-			OBJ.bDragable = not bChecked
+			OBJ.bHideOthers = bChecked
 			OBJ.Reload()
 		end,
 	})
