@@ -433,6 +433,119 @@ MY.RegisterInit("MY_BuffMon", function()
 end)
 
 
+local function GenePS(ui, OBJ, x, y, w, h)
+	ui:append("WndCheckBox", {
+		x = x + 20, y = y,
+		text = _L['enable'],
+		checked = OBJ.bEnable,
+		oncheck = function(bChecked)
+			OBJ.bEnable = bChecked
+			OBJ.Reload()
+		end,
+	})
+
+	ui:append("WndComboBox", {
+		x = w - 250, y = y, w = 160,
+		text = _L['set buff monitor'],
+		menu = function()
+			local dwKungFuID = GetClientPlayer().GetKungfuMount().dwSkillID
+			local t = {{
+				szOption = _L['add'],
+				fnAction = function()
+					GetUserInput(_L['please input buff name:'], function(szVal)
+						szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
+						if szVal ~= "" then
+							OBJ.AddBuff(dwKungFuID, szVal)
+						end
+					end, function() end, function() end, nil, "" )
+				end,
+			}}
+			local tBuffMonList = OBJ.GetBuffList(dwKungFuID)
+			if tBuffMonList and #tBuffMonList > 0 then
+				table.insert(t, { bDevide = true })
+				for i, mon in ipairs(tBuffMonList) do
+					table.insert(t, {
+						szOption = mon[3],
+						bCheck = true, bChecked = mon[1],
+						fnAction = function(bChecked)
+							OBJ.EnableBuff(dwKungFuID, mon[3], not mon[1])
+						end,
+						szIcon = "ui/Image/UICommon/CommonPanel2.UITex",
+						nFrame = 49,
+						nMouseOverFrame = 51,
+						nIconWidth = 17,
+						nIconHeight = 17,
+						szLayer = "ICON_RIGHTMOST",
+						fnClickIcon = function()
+							OBJ.DelBuff(dwKungFuID, mon[3])
+							Wnd.CloseWindow("PopupMenuPanel")
+						end,
+					})
+				end
+			end
+			return t
+		end,
+	})
+	y = y + 30
+	
+	ui:append("WndCheckBox", {
+		x = x + 20, y = y, w = 100,
+		text = _L['undragable'],
+		checked = not OBJ.bDragable,
+		oncheck = function(bChecked)
+			OBJ.bDragable = not bChecked
+			OBJ.Reload()
+		end,
+	})
+	
+	ui:append("WndSliderBox", {
+		x = w - 250, y = y,
+		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		range = {1, 32},
+		value = OBJ.nMaxLineCount,
+		textfmt = function(val) return _L("display %d eachline.", val) end,
+		onchange = function(raw, val)
+			OBJ.nMaxLineCount = val
+			OBJ.Reload()
+		end,
+	})
+	y = y + 30
+	
+	ui:append("WndComboBox", {
+		x = x + 20, y = y, w = 120,
+		text = _L['select style'],
+		menu = function()
+			local t = {}
+			for i = 1, STYLE_COUNT do
+				table.insert(t, {
+					szOption = i,
+					fnAction = function()
+						OBJ.nStyle = i
+						OBJ.Reload()
+					end,
+					rgb = OBJ.nStyle == i and {0, 255, 0},
+				})
+			end
+			return t
+		end,
+	})
+	
+	ui:append("WndSliderBox", {
+		x = w - 250, y = y,
+		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		range = {1, 300},
+		value = OBJ.fScale * 100,
+		textfmt = function(val) return _L("scale %d%%.", val) end,
+		onchange = function(raw, val)
+			OBJ.fScale = val / 100
+			OBJ.Reload()
+		end,
+	})
+	y = y + 30
+	
+	return x, y
+end
+
 local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = MY.UI(wnd)
@@ -442,227 +555,12 @@ function PS.OnPanelActive(wnd)
 	ui:append("Text", { x = x, y = y, r = 255, g = 255, b = 0, text = _L['* self buff monitor'] })
 	y = y + 30
 
-	ui:append("WndCheckBox", {
-		x = x + 20, y = y,
-		text = _L['enable'],
-		checked = MY_BuffMonS.bEnable,
-		oncheck = function(bChecked)
-			MY_BuffMonS.bEnable = bChecked
-			MY_BuffMonS.Reload()
-		end,
-	})
-
-	ui:append("WndComboBox", {
-		x = w - 250, y = y,
-		text = _L['set self buff monitor'],
-		menu = function()
-			local dwKungFuID = GetClientPlayer().GetKungfuMount().dwSkillID
-			local t = {{
-				szOption = _L['add'],
-				fnAction = function()
-					GetUserInput(_L['please input buff name:'], function(szVal)
-						szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
-						if szVal ~= "" then
-							MY_BuffMonS.AddBuff(dwKungFuID, szVal)
-						end
-					end, function() end, function() end, nil, "" )
-				end,
-			}}
-			local tBuffMonList = MY_BuffMonS.GetBuffList(dwKungFuID)
-			if tBuffMonList and #tBuffMonList > 0 then
-				table.insert(t, { bDevide = true })
-				for i, mon in ipairs(tBuffMonList) do
-					table.insert(t, {
-						szOption = mon[3],
-						bCheck = true, bChecked = mon[1],
-						fnAction = function(bChecked)
-							MY_BuffMonS.EnableBuff(dwKungFuID, mon[3], not mon[1])
-						end,
-						szIcon = "ui/Image/UICommon/CommonPanel2.UITex",
-						nFrame = 49,
-						nMouseOverFrame = 51,
-						nIconWidth = 17,
-						nIconHeight = 17,
-						szLayer = "ICON_RIGHTMOST",
-						fnClickIcon = function()
-							MY_BuffMonS.DelBuff(dwKungFuID, mon[3])
-							Wnd.CloseWindow("PopupMenuPanel")
-						end,
-					})
-				end
-			end
-			return t
-		end,
-	})
-	y = y + 30
-	
-	ui:append("WndCheckBox", {
-		x = x + 20, y = y, w = 100,
-		text = _L['undragable'],
-		checked = not MY_BuffMonS.bDragable,
-		oncheck = function(bChecked)
-			MY_BuffMonS.bDragable = not bChecked
-			MY_BuffMonS.Reload()
-		end,
-	})
-	
-	ui:append("WndSliderBox", {
-		x = w - 250, y = y,
-		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
-		range = {1, 32},
-		value = MY_BuffMonS.nMaxLineCount,
-		textfmt = function(val) return _L("display %d eachline.", val) end,
-		onchange = function(raw, val)
-			MY_BuffMonS.nMaxLineCount = val
-			MY_BuffMonS.Reload()
-		end,
-	})
-	y = y + 30
-	
-	ui:append("WndComboBox", {
-		x = x + 20, y = y, w = 120,
-		text = _L['select style'],
-		menu = function()
-			local t = {}
-			for i = 1, STYLE_COUNT do
-				table.insert(t, {
-					szOption = i,
-					fnAction = function()
-						MY_BuffMonS.nStyle = i
-						MY_BuffMonS.Reload()
-					end,
-					rgb = MY_BuffMonS.nStyle == i and {0, 255, 0},
-				})
-			end
-			return t
-		end,
-	})
-	
-	ui:append("WndSliderBox", {
-		x = w - 250, y = y,
-		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
-		range = {1, 300},
-		value = MY_BuffMonS.fScale * 100,
-		textfmt = function(val) return _L("scale %d%%.", val) end,
-		onchange = function(raw, val)
-			MY_BuffMonS.fScale = val / 100
-			MY_BuffMonS.Reload()
-		end,
-	})
-	y = y + 30
-
+	x, y = GenePS(ui, MY_BuffMonS, x, y, w, h)
 	y = y + 30
 	
 	ui:append("Text", { x = x, y = y, r = 255, g = 255, b = 0, text = _L['* target buff monitor'] })
 	y = y + 30
 	
-	ui:append("WndCheckBox", {
-		x = x + 20, y = y,
-		text = _L['enable'],
-		checked = MY_BuffMonT.bEnable,
-		oncheck = function(bChecked)
-			MY_BuffMonT.bEnable = bChecked
-			MY_BuffMonT.Reload()
-		end,
-	})
-
-	ui:append("WndComboBox", {
-		x = w - 250, y = y,
-		text = _L['set target buff monitor'],
-		menu = function()
-			local dwKungFuID = GetClientPlayer().GetKungfuMount().dwSkillID
-			local t = {{
-				szOption = _L['add'],
-				fnAction = function()
-					GetUserInput(_L['please input buff name:'], function(szVal)
-						szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
-						if szVal ~= "" then
-							MY_BuffMonT.AddBuff(dwKungFuID, szVal)
-						end
-					end, function() end, function() end, nil, "" )
-				end,
-			}}
-			local tBuffMonList = MY_BuffMonT.GetBuffList(dwKungFuID)
-			if tBuffMonList and #tBuffMonList > 0 then
-				table.insert(t, { bDevide = true })
-				for i, mon in ipairs(tBuffMonList) do
-					table.insert(t, {
-						szOption = mon[3],
-						bCheck = true, bChecked = mon[1],
-						fnAction = function(bChecked)
-							MY_BuffMonT.EnableBuff(dwKungFuID, mon[3], not mon[1])
-						end,
-						szIcon = "ui/Image/UICommon/CommonPanel2.UITex",
-						nFrame = 49,
-						nMouseOverFrame = 51,
-						nIconWidth = 17,
-						nIconHeight = 17,
-						szLayer = "ICON_RIGHTMOST",
-						fnClickIcon = function()
-							MY_BuffMonT.DelBuff(dwKungFuID, mon[3])
-							Wnd.CloseWindow("PopupMenuPanel")
-						end,
-					})
-				end
-			end
-			return t
-		end,
-	})
-	y = y + 30
-	
-	ui:append("WndCheckBox", {
-		x = x + 20, y = y, w = 100,
-		text = _L['undragable'],
-		checked = not MY_BuffMonS.bDragable,
-		oncheck = function(bChecked)
-			MY_BuffMonT.bDragable = not bChecked
-			MY_BuffMonT.Reload()
-		end,
-	})
-	
-	ui:append("WndSliderBox", {
-		x = w - 250, y = y,
-		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
-		range = {1, 32},
-		value = MY_BuffMonT.nMaxLineCount,
-		textfmt = function(val) return _L("display %d eachline.", val) end,
-		onchange = function(raw, val)
-			MY_BuffMonT.nMaxLineCount = val
-			MY_BuffMonT.Reload()
-		end,
-	})
-	y = y + 30
-	
-	ui:append("WndComboBox", {
-		x = x + 20, y = y, w = 120,
-		text = _L['select style'],
-		menu = function()
-			local t = {}
-			for i = 1, STYLE_COUNT do
-				table.insert(t, {
-					szOption = i,
-					fnAction = function()
-						MY_BuffMonT.nStyle = i
-						MY_BuffMonT.Reload()
-					end,
-					rgb = MY_BuffMonT.nStyle == i and {0, 255, 0},
-				})
-			end
-			return t
-		end,
-	})
-	
-	ui:append("WndSliderBox", {
-		x = w - 250, y = y,
-		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
-		range = {1, 300},
-		value = MY_BuffMonT.fScale * 100,
-		textfmt = function(val) return _L("scale %d%%.", val) end,
-		onchange = function(raw, val)
-			MY_BuffMonT.fScale = val / 100
-			MY_BuffMonT.Reload()
-		end,
-	})
-	y = y + 30
+	x, y = GenePS(ui, MY_BuffMonT, x, y, w, h)
 end
 MY.RegisterPanel("MY_BuffMon", _L["buff monitor"], _L['General'], "ui/Image/ChannelsPanel/NewChannels.UITex|141", { 255, 255, 0, 200 }, PS)
