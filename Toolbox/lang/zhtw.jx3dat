@@ -116,4 +116,6 @@ data = {
     },
     
     ['Warning: Bigwar has been finished but not handed yet!'] = '茗伊提示：大戰還沒交！',
+    
+    ['show origin name in social panel'] = '好友面板中顯示玩家原名（備注將挪至詳情面板中）',
 }
