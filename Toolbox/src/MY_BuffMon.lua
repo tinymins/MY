@@ -145,7 +145,7 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers)
 					if hProcessImg then
 						hProcessImg:SetPercentage(dwPercent)
 					end
-					hBox:SetCoolDownPercentage(1 - dwPercent)
+					hBox:SetCoolDownPercentage(dwPercent)
 
 					if dwPercent < 0.5 and dwPercent > 0.3 then
 						if hBox.dwPercent ~= 0.5 then
