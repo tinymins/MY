@@ -290,6 +290,86 @@ MY.RegisterEvent("ON_FRAME_CREATE.BIG_WAR_CHECK", function()
 		end
 	end
 end)
+
+---------------------------------------------------------------
+-- 好友列表优先显示昵称
+---------------------------------------------------------------
+MY_ToolBox.bPreferNickname = true
+RegisterCustomData("MY_ToolBox.bPreferNickname")
+local m_tFriendNote = {}
+-- HOOK好友面板名字SetText
+local function fnSocialPanelSetText(this, text, ...)
+	if MY_ToolBox.bPreferNickname then
+		local szName = this:GetParent().card.szName
+		if szName ~= text then
+			m_tFriendNote[szName] = text
+		end
+		return this:__MYHook_SetText(szName)
+	else
+		return this:__MYHook_SetText(text, ...)
+	end
+end
+local function HookSocialPanelItem(hItem)
+	local hText = hItem:Lookup("Text_N")
+	if hText and not hText.__MYHook_SetText then
+		hText.__MYHook_SetText = hText.SetText
+		hText.SetText = fnSocialPanelSetText
+	end
+	return hItem
+end
+-- HOOK好友面板ItemAppend
+local function fnSocialPanelAppendItemFromData(this, ...)
+	local hItem = this:__MYHook_AppendItemFromData(...)
+	return HookSocialPanelItem(hItem)
+end
+-- HOOK好友信息名字SetText显示备注
+local function fnFriendTipSetText(this, text, ...)
+	local hTotal = this:GetParent()
+	if m_tFriendNote[text] then
+		this:SetRelY(7)
+		hTotal:Lookup("Handle_2"):SetRelY(55)
+		hTotal:Lookup("Text_MYNote"):SetText(m_tFriendNote[text])
+		hTotal:FormatAllItemPos()
+	else
+		this:SetRelY(17)
+		hTotal:Lookup("Handle_2"):SetRelY(49)
+		hTotal:Lookup("Text_MYNote"):SetText("")
+		hTotal:FormatAllItemPos()
+	end
+	return this:__MYHook_SetText(text)
+end
+-- HOOK
+MY.RegisterEvent("ON_FRAME_CREATE.SOCIALPANEL", function()
+	local name = arg0 and arg0:GetName()
+	if name == "SocialPanel" then
+		local hList = arg0:Lookup("PageSet_Company/Page_Friend/WndScroll_Friend", "")
+		if not hList then
+			return MY.Debug({"Error when hook social panel!"}, MY_DEBUG.ERROR)
+		end
+		if not hList.__MYHook_AppendItemFromData then
+			hList.__MYHook_AppendItemFromData = hList.AppendItemFromData
+			hList.AppendItemFromData = fnSocialPanelAppendItemFromData
+		end
+		for i = 0, hList:GetItemCount() - 1 do
+			local hItem = hList:Lookup(i)
+			if hItem:Lookup("Text_N") then
+				HookSocialPanelItem(hItem)
+				hItem:Lookup("Text_N"):SetText(hItem:Lookup("Text_N"):GetText())
+			end
+		end
+	elseif name == "FriendTip" then
+		if MY_ToolBox.bPreferNickname then
+			local hText = arg0:Lookup("", "Text_Name")
+			if not hText.__MYHook_SetText then
+				arg0:Lookup("", ""):AppendItemFromString("<text>name=\"Text_MYNote\" x=104 y=32 w=230 h=25 multiline=1 valign=1 font=212</text>")
+				hText.__MYHook_SetText = hText.SetText
+				hText.SetText = fnFriendTipSetText
+			end
+		end
+	end
+end)
+MY.RegisterExit("SOCIALPANEL", function() Wnd.CloseWindow("SocialPanel") Wnd.CloseWindow("FriendTip") end)
+
 -- ################################################################################################ --
 --     #       # # # #         # # # # # # # # #                                 #             # #  --
 --       #     #     #         #     #   #     #     # # # # # # # # # # #       #     # # # #      --
@@ -310,7 +390,8 @@ _C.tChannels = {
 	{ nChannel = PLAYER_TALK_CHANNEL.RAID     , szName = _L['raid channel']  , rgb = GetMsgFontColor("MSG_TEAM"  , true) },
 	{ nChannel = PLAYER_TALK_CHANNEL.TONG     , szName = _L['tong channel']  , rgb = GetMsgFontColor("MSG_GUILD" , true) },
 }
-MY.RegisterPanel( "MY_ToolBox", _L["toolbox"], _L['General'], "UI/Image/Common/Money.UITex|243", { 255, 255, 0, 200 }, { OnPanelActive = function(wnd)
+local PS = {}
+function PS.OnPanelActive(wnd)
 	local ui = MY.UI(wnd)
 	local w, h = ui:size()
 	local x, y = 20, 30
@@ -423,6 +504,21 @@ MY.RegisterPanel( "MY_ToolBox", _L["toolbox"], _L['General'], "UI/Image/Common/M
 	  end)
 	y = y + 30
 	
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = 400,
+		text = _L['show origin name in social panel'],
+		checked = MY_ToolBox.bPreferNickname,
+		oncheck = function(bChecked)
+			MY_ToolBox.bPreferNickname = bChecked
+			if Station.Lookup("Normal/SocialPanel") then
+				Wnd.CloseWindow("SocialPanel")
+				Wnd.OpenWindow("SocialPanel")
+			end
+			Wnd.CloseWindow("FriendTip")
+		end
+	})
+	y = y + 30
+	
 	-- 随身便笺
 	ui:append("Text", "Text_Anmerkungen"):item("#Text_Anmerkungen")
 	  :pos(x, y)
@@ -438,4 +534,6 @@ MY.RegisterPanel( "MY_ToolBox", _L["toolbox"], _L['General'], "UI/Image/Common/M
 	  	MY_Anmerkungen.bNotePanelEnable = bChecked
 	  	MY_Anmerkungen.ReloadNotePanel()
 	  end)
-end})
+	y = y + 30
+end
+MY.RegisterPanel( "MY_ToolBox", _L["toolbox"], _L['General'], "UI/Image/Common/Money.UITex|243", { 255, 255, 0, 200 }, PS)
