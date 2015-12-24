@@ -294,7 +294,7 @@ end)
 ---------------------------------------------------------------
 -- 好友列表优先显示昵称
 ---------------------------------------------------------------
-MY_ToolBox.bPreferNickname = true
+MY_ToolBox.bPreferNickname = false
 RegisterCustomData("MY_ToolBox.bPreferNickname")
 local m_tFriendNote = {}
 -- HOOK好友面板名字SetText
