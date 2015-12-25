@@ -339,7 +339,7 @@ local function fnFriendTipSetText(this, text, ...)
 	return this:__MYHook_SetText(text)
 end
 -- HOOK
-MY.RegisterEvent("ON_FRAME_CREATE.SOCIALPANEL", function()
+local function onSocialPanelCreate()
 	local name = arg0 and arg0:GetName()
 	if name == "SocialPanel" then
 		local hList = arg0:Lookup("PageSet_Company/Page_Friend/WndScroll_Friend", "")
@@ -367,7 +367,15 @@ MY.RegisterEvent("ON_FRAME_CREATE.SOCIALPANEL", function()
 			end
 		end
 	end
-end)
+end
+local function ReloadPerferNickname()
+	if MY_ToolBox.bPreferNickname then
+		MY.RegisterEvent("ON_FRAME_CREATE.SOCIALPANEL", onSocialPanelCreate)
+	else
+		MY.RegisterEvent("ON_FRAME_CREATE.SOCIALPANEL")
+	end
+end
+MY.RegisterInit("SOCIALPANEL", ReloadPerferNickname)
 MY.RegisterExit("SOCIALPANEL", function() Wnd.CloseWindow("SocialPanel") Wnd.CloseWindow("FriendTip") end)
 
 -- ################################################################################################ --
@@ -510,6 +518,7 @@ function PS.OnPanelActive(wnd)
 		checked = MY_ToolBox.bPreferNickname,
 		oncheck = function(bChecked)
 			MY_ToolBox.bPreferNickname = bChecked
+			ReloadPerferNickname()
 			if Station.Lookup("Normal/SocialPanel") then
 				Wnd.CloseWindow("SocialPanel")
 				Wnd.OpenWindow("SocialPanel")
