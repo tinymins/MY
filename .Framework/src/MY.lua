@@ -117,8 +117,8 @@ MY = {}
 --------------------------------------------------------------------------------------------------------------------------------------------
 local _DEBUG_ = tonumber(LoadLUAData('interface/my.debug.level') or nil) or 4
 local _LOGLV_ = tonumber(LoadLUAData('interface/my.delog.level') or nil) or 4
-local _BUILD_ = "20151222"
-local _VERSION_ = 0x2004600
+local _BUILD_ = "(2015) Merry Christmas!"
+local _VERSION_ = 0x2004700
 local _ADDON_ROOT_ = '/Interface/MY/'
 local _FRAMEWORK_ROOT_ = '/Interface/MY/.Framework/'
 
