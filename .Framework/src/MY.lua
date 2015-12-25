@@ -472,7 +472,9 @@ function MY.RegisterEvent(szEvent, fnAction)
 			end
 		else
 			if szKey then
-				_MY.tEvent[szEvent][szKey] = nil
+				if _MY.tEvent[szEvent] then
+					_MY.tEvent[szEvent][szKey] = nil
+				end
 			else
 				_MY.tEvent[szEvent] = {}
 			end
