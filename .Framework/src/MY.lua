@@ -164,6 +164,8 @@ local _MY = {
 	szIniFile          = _FRAMEWORK_ROOT_.."ui\\MY.ini",
 	szUITexCommon      = _FRAMEWORK_ROOT_.."image\\UICommon.UITex",
 	szUITexPoster      = _FRAMEWORK_ROOT_.."image\\Poster.UITex",
+	szUITexST          = _FRAMEWORK_ROOT_.."image\\ST_UI.UITex",
+	szPssST            = _FRAMEWORK_ROOT_.."image\\ST.pss",
 	szIniFileMainPanel = _FRAMEWORK_ROOT_.."ui\\MainPanel.ini",
 	
 	tTabs = {   -- ±Í«©“≥
@@ -194,6 +196,7 @@ _MY.tAddonInfo = SetmetaReadonly({
 	szShortName     = _MY.szShortName                 ,
 	szUITexCommon   = _MY.szUITexCommon               ,
 	szUITexPoster   = _MY.szUITexPoster               ,
+	szUITexST       = _MY.szUITexST                   ,
 	dwVersion       = _VERSION_                       ,
 	szBuildDate     = _BUILD_                         ,
 	nDebugLevel     = _DEBUG_                         ,
