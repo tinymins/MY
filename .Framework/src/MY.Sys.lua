@@ -737,3 +737,33 @@ function MY.Sys.OutputBuffTip(dwID, nLevel, Rect, nTime)
 	OutputTip(tconcat(t), 300, Rect)
 end
 MY.OutputBuffTip = MY.Sys.OutputBuffTip
+
+
+function MY.Sys.Alert(szMsg, fnAction, szSure)
+	local nW, nH = Station.GetClientSize()
+	local tMsg = {
+		x = nW / 2, y = nH / 3, szMessage = szMsg, szName = "MY_Alert", szAlignment = "CENTER",
+		{
+			szOption = szSure or g_tStrings.STR_HOTKEY_SURE,
+			fnAction = fnAction,
+		},
+	}
+	MessageBox(tMsg)
+end
+MY.Alert = MY.Sys.Alert
+
+function MY.Sys.Confirm(szMsg, fnAction, fnCancel, szSure, szCancel)
+	local nW, nH = Station.GetClientSize()
+	local tMsg = {
+		x = nW / 2, y = nH / 3, szMessage = szMsg, szName = "MY_Confirm", szAlignment = "CENTER",
+		{
+			szOption = szSure or g_tStrings.STR_HOTKEY_SURE,
+			fnAction = fnAction,
+		}, {
+			szOption = szCancel or g_tStrings.STR_HOTKEY_CANCEL,
+			fnAction = fnCancel,
+		},
+	}
+	MessageBox(tMsg)
+end
+MY.Confirm = MY.Sys.Confirm
