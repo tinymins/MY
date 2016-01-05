@@ -354,7 +354,9 @@ function MY_ChatLog.Export(szExportFile, aChannels, nPerSec, onProgress)
 			if onProgress then
 				onProgress(_L['Export succeed'], 1)
 			end
-			MY.Sysmsg({_L('Chatlog export succeed, file saved as %s', szExportFile)})
+			local szFile = GetRootPath() .. szExportFile:gsub("/", "\\")
+			MY.Alert(_L('Chatlog export succeed, file saved as %s', szFile))
+			MY.Sysmsg({_L('Chatlog export succeed, file saved as %s', szFile)})
 			return 0
 		end
 		if szChannel ~= szLastChannel then
