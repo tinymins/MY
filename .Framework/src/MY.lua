@@ -777,16 +777,21 @@ function MY.SwitchTab(szID)
 			onclick = function() OpenInternetExplorer("https://cdn.rawgit.com/tinymins/MY/master/changelog.html?_=" .. GetCurrentTime()) end,
 			onhover = function(bIn) this:SetAlpha(bIn and 255 or 190) end,
 		})
+		ui:append("Text", "Text_Svr", { x = 10, y = 345, w = 557, font = 204, text = MY.GetServer(), alpha = 220 })
 		wndMainPanel.OnPanelResize = function(wnd)
 			local w, h = MY.UI(wnd):size()
-			if w / 557 > (h - 50) / 278 then
-				ui:item('#Image_Adv'):size((h - 50) / 278 * 557, (h - 50))
-				ui:item('#Text_Adv'):pos(10, h - 40)
-				ui:item('#Text_ChangeLog'):pos(10, h - 15)
+			local scaleH = w / 557 * 278
+			local bottomH = 90
+			if scaleH > h - bottomH then
+				ui:item('#Image_Adv'):size((h - bottomH) / 278 * 557, (h - bottomH))
+				ui:item('#Text_Adv'):pos(10, h - bottomH + 10)
+				ui:item('#Text_Svr'):pos(10, h - bottomH + 35)
+				ui:item('#Text_ChangeLog'):pos(10, h - bottomH + 60)
 			else
-				ui:item('#Image_Adv'):size(w, w / 557 * 278)
-				ui:item('#Text_Adv'):pos(10, w / 557 * 278 + 10)
-				ui:item('#Text_ChangeLog'):pos(10, w / 557 * 278 + 35)
+				ui:item('#Image_Adv'):size(w, scaleH)
+				ui:item('#Text_Adv'):pos(10, scaleH + 10)
+				ui:item('#Text_Svr'):pos(10, scaleH + 35)
+				ui:item('#Text_ChangeLog'):pos(10, scaleH + 60)
 			end
 		end
 		wndMainPanel.OnPanelResize(wndMainPanel)
