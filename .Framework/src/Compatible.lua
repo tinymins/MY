@@ -527,7 +527,7 @@ end
 
 if not ExecuteWithThis then
 function ExecuteWithThis(element, fnAction, ...)
-	if not element and element:IsValid() then
+	if not (element and element:IsValid()) then
 		Log("[UI ERROR]Invalid element on executing ui event!")
 		return false
 	end
