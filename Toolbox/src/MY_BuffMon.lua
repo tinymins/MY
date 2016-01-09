@@ -5,6 +5,40 @@ local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Toolbox/lang/")
 local INI_PATH = MY.GetAddonInfo().szRoot .. "Toolbox/ui/MY_BuffMon.%d.ini"
 local DEFAULT_S_CONFIG_FILE = MY.GetAddonInfo().szRoot .. "Toolbox/data/buffmon/self/$lang.jx3dat"
 local DEFAULT_T_CONFIG_FILE = MY.GetAddonInfo().szRoot .. "Toolbox/data/buffmon/target/$lang.jx3dat"
+local CUSTOM_STYLES = {
+	MY.GetAddonInfo().szUITexST .. "|" .. 0,
+	MY.GetAddonInfo().szUITexST .. "|" .. 1,
+	MY.GetAddonInfo().szUITexST .. "|" .. 2,
+	MY.GetAddonInfo().szUITexST .. "|" .. 3,
+	MY.GetAddonInfo().szUITexST .. "|" .. 4,
+	MY.GetAddonInfo().szUITexST .. "|" .. 5,
+	MY.GetAddonInfo().szUITexST .. "|" .. 6,
+	MY.GetAddonInfo().szUITexST .. "|" .. 7,
+	MY.GetAddonInfo().szUITexST .. "|" .. 8,
+	"/ui/Image/Common/Money.UITex|168",
+	"/ui/Image/Common/Money.UITex|203",
+	"/ui/Image/Common/Money.UITex|204",
+	"/ui/Image/Common/Money.UITex|205",
+	"/ui/Image/Common/Money.UITex|206",
+	"/ui/Image/Common/Money.UITex|207",
+	"/ui/Image/Common/Money.UITex|208",
+	"/ui/Image/Common/Money.UITex|209",
+	"/ui/Image/Common/Money.UITex|210",
+	"/ui/Image/Common/Money.UITex|211",
+	"/ui/Image/Common/Money.UITex|212",
+	"/ui/Image/Common/Money.UITex|213",
+	"/ui/Image/Common/Money.UITex|214",
+	"/ui/Image/Common/Money.UITex|215",
+	"/ui/Image/Common/Money.UITex|216",
+	"/ui/Image/Common/Money.UITex|217",
+	"/ui/Image/Common/Money.UITex|218",
+	"/ui/Image/Common/Money.UITex|219",
+	"/ui/Image/Common/Money.UITex|220",
+	"/ui/Image/Common/Money.UITex|228",
+	"/ui/Image/Common/Money.UITex|232",
+	"/ui/Image/Common/Money.UITex|233",
+	"/ui/Image/Common/Money.UITex|234",
+}
 local STYLE_COUNT = 2
 MY_BuffMonS = {}
 MY_BuffMonS.anchor = { y = 152, x = -343, s = "TOPLEFT", r = "CENTER" }
@@ -15,6 +49,8 @@ MY_BuffMonS.bDragable = false
 MY_BuffMonS.nBoxBgFrame = 43
 MY_BuffMonS.bHideOthers = true
 MY_BuffMonS.nMaxLineCount = 16
+MY_BuffMonS.szCDUITex = MY.GetAddonInfo().szUITexST .. "|7"
+MY_BuffMonS.nCDWidth = 240
 RegisterCustomData("MY_BuffMonS.anchor")
 RegisterCustomData("MY_BuffMonS.nStyle")
 RegisterCustomData("MY_BuffMonS.fScale")
@@ -23,6 +59,8 @@ RegisterCustomData("MY_BuffMonS.bDragable")
 RegisterCustomData("MY_BuffMonS.bHideOthers")
 RegisterCustomData("MY_BuffMonS.nMaxLineCount")
 RegisterCustomData("MY_BuffMonS.tBuffList")
+RegisterCustomData("MY_BuffMonS.szCDUITex")
+RegisterCustomData("MY_BuffMonS.nCDWidth")
 MY_BuffMonT = {}
 MY_BuffMonT.anchor = { y = 102, x = -343, s = "TOPLEFT", r = "CENTER" }
 MY_BuffMonT.nStyle = 1
@@ -32,6 +70,8 @@ MY_BuffMonT.bDragable = false
 MY_BuffMonT.nBoxBgFrame = 44
 MY_BuffMonT.bHideOthers = true
 MY_BuffMonT.nMaxLineCount = 16
+MY_BuffMonT.szCDUITex = MY.GetAddonInfo().szUITexST .. "|7"
+MY_BuffMonT.nCDWidth = 240
 RegisterCustomData("MY_BuffMonT.anchor")
 RegisterCustomData("MY_BuffMonT.nStyle")
 RegisterCustomData("MY_BuffMonT.fScale")
@@ -40,11 +80,14 @@ RegisterCustomData("MY_BuffMonT.bDragable")
 RegisterCustomData("MY_BuffMonT.bHideOthers")
 RegisterCustomData("MY_BuffMonT.nMaxLineCount")
 RegisterCustomData("MY_BuffMonT.tBuffList")
+RegisterCustomData("MY_BuffMonS.szCDUITex")
+RegisterCustomData("MY_BuffMonS.nCDWidth")
 
 ----------------------------------------------------------------------------------------------
 -- Í¨ÓÃÂß¼­
 ----------------------------------------------------------------------------------------------
-local function RedrawBuffList(hFrame, aBuffMon, nBgFrame, nStyle)
+local function RedrawBuffList(hFrame, aBuffMon, OBJ)
+	local nBgFrame, nStyle = OBJ.nBgFrame, OBJ.nStyle
 	hFrame.tItem = {}
 	local nWidth = 0
 	local hList = hFrame:Lookup("", "Handle_BuffList")
@@ -72,12 +115,16 @@ local function RedrawBuffList(hFrame, aBuffMon, nBgFrame, nStyle)
 			hBox:SetOverTextPosition(0, ITEM_POSITION.RIGHT_BOTTOM)
 			hBox:SetOverTextFontScheme(0, 15)
 			if hProcessTxt then
+				hProcessTxt:SetW(OBJ.nCDWidth - 10)
 				hProcessTxt:SetText("")
 			end
 			if hProcessImg then
+				XGUI(hProcessImg):image(OBJ.szCDUITex)
+				hProcessImg:SetW(OBJ.nCDWidth)
 				hProcessImg:SetPercentage(0)
 			end
-			if nCount <= MY_BuffMonT.nMaxLineCount then
+			hItem:SetSizeByAllItemSize()
+			if nCount <= OBJ.nMaxLineCount then
 				nWidth = nWidth + hItem:GetW() * hFrame.fScale
 			end
 			hItem:Scale(hFrame.fScale, hFrame.fScale)
@@ -268,7 +315,7 @@ local function GeneNameSpace(OBJ, NAMESPACE, DEFAULT_CONFIG_FILE, GetTarget, LAN
 
 	function OBJ.RedrawBuffList(hFrame)
 		local dwKungFuID = GetClientPlayer().GetKungfuMount().dwSkillID
-		RedrawBuffList(hFrame, OBJ.GetBuffList(dwKungFuID) or EMPTY_TABLE, OBJ.nBoxBgFrame, OBJ.nStyle)
+		RedrawBuffList(hFrame, OBJ.GetBuffList(dwKungFuID) or EMPTY_TABLE, OBJ)
 		this:SetPoint(OBJ.anchor.s, 0, 0, OBJ.anchor.r, OBJ.anchor.x, OBJ.anchor.y)
 		this:CorrectPos()
 	end
@@ -467,6 +514,41 @@ local function GenePS(ui, OBJ, x, y, w, h)
 		textfmt = function(val) return _L("scale %d%%.", val) end,
 		onchange = function(raw, val)
 			OBJ.fScale = val / 100
+			OBJ.Reload()
+		end,
+	})
+	y = y + 30
+	
+	ui:append("WndComboBox", {
+		x = 40, y = y, w = w - 250 - 30 - 30,
+		text = _L['Select countdown style'],
+		menu = function()
+			local t, subt = {}
+			for _, text in ipairs(CUSTOM_STYLES) do
+				subt = {
+					szOption = text,
+					fnAction = function()
+						OBJ.szCDUITex = text
+						OBJ.Reload()
+					end,
+				}
+				if text == OBJ.szCDUITex then
+					subt.rgb = {255, 255, 0}
+				end
+				table.insert(t, subt)
+			end
+			return t
+		end,
+	})
+	
+	ui:append("WndSliderBox", {
+		x = w - 250, y = y,
+		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		range = {50, 1000},
+		value = OBJ.nCDWidth,
+		textfmt = function(val) return _L("CD width %dpx.", val) end,
+		onchange = function(raw, val)
+			OBJ.nCDWidth = val
 			OBJ.Reload()
 		end,
 	})
