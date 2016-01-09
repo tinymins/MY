@@ -70,6 +70,8 @@ data = {
     ['display %d eachline.'] = '每行%d个',
     ['select style'] = '选择风格',
     ['scale %d%%.'] = '缩放%d%%',
+    ['CD width %dpx.'] = '倒计时宽%dpx',
+    ['Select countdown style'] = '设置倒计时条风格（如果存在）',
     
     ['The kill sequence is: '] = '正确击杀顺序：',
     ['failed to calc.'] = '计算失败。',
