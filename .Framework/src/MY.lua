@@ -126,18 +126,18 @@ local _FRAMEWORK_ROOT_ = '/Interface/MY/.Framework/'
 -- (table) MY.LoadLangPack(void)
 function MY.LoadLangPack(szLangFolder)
 	local _, _, szLang = GetVersion()
-	local t0 = LoadLUAData(_FRAMEWORK_ROOT_.."lang\\default") or {}
-	local t1 = LoadLUAData(_FRAMEWORK_ROOT_.."lang\\" .. szLang) or {}
+	local t0 = LoadLUAData(_FRAMEWORK_ROOT_.."lang/default") or {}
+	local t1 = LoadLUAData(_FRAMEWORK_ROOT_.."lang/" .. szLang) or {}
 	for k, v in pairs(t1) do
 		t0[k] = v
 	end
 	if type(szLangFolder)=="string" then
 		szLangFolder = string.gsub(szLangFolder,"[/\\]+$","")
-		local t2 = LoadLUAData(szLangFolder.."\\default") or {}
+		local t2 = LoadLUAData(szLangFolder.."/default") or {}
 		for k, v in pairs(t2) do
 			t0[k] = v
 		end
-		local t3 = LoadLUAData(szLangFolder.."\\" .. szLang) or {}
+		local t3 = LoadLUAData(szLangFolder.."/" .. szLang) or {}
 		for k, v in pairs(t3) do
 			t0[k] = v
 		end
@@ -161,12 +161,12 @@ local _MY = {
 	szBuildDate        = _BUILD_,
 	szName             = _L["mingyi plugins"],
 	szShortName        = _L["mingyi plugin"],
-	szIniFile          = _FRAMEWORK_ROOT_.."ui\\MY.ini",
-	szUITexCommon      = _FRAMEWORK_ROOT_.."image\\UICommon.UITex",
-	szUITexPoster      = _FRAMEWORK_ROOT_.."image\\Poster.UITex",
-	szUITexST          = _FRAMEWORK_ROOT_.."image\\ST_UI.UITex",
-	szPssST            = _FRAMEWORK_ROOT_.."image\\ST.pss",
-	szIniFileMainPanel = _FRAMEWORK_ROOT_.."ui\\MainPanel.ini",
+	szIniFile          = _FRAMEWORK_ROOT_.."ui/MY.ini",
+	szUITexCommon      = _FRAMEWORK_ROOT_.."image/UICommon.UITex",
+	szUITexPoster      = _FRAMEWORK_ROOT_.."image/Poster.UITex",
+	szUITexST          = _FRAMEWORK_ROOT_.."image/ST_UI.UITex",
+	szPssST            = _FRAMEWORK_ROOT_.."image/ST.pss",
+	szIniFileMainPanel = _FRAMEWORK_ROOT_.."ui/MainPanel.ini",
 	
 	tTabs = {   -- ±Í«©“≥
 		{ id = _L["General"], },
