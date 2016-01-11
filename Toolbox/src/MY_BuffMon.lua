@@ -2,7 +2,7 @@
 -- BUFF监控
 ---------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Toolbox/lang/")
-local INI_PATH = MY.GetAddonInfo().szRoot .. "Toolbox/ui/MY_BuffMon.%d.ini"
+local INI_PATH = MY.GetAddonInfo().szRoot .. "Toolbox/ui/MY_BuffMon.ini"
 local DEFAULT_S_CONFIG_FILE = MY.GetAddonInfo().szRoot .. "Toolbox/data/buffmon/self/$lang.jx3dat"
 local DEFAULT_T_CONFIG_FILE = MY.GetAddonInfo().szRoot .. "Toolbox/data/buffmon/target/$lang.jx3dat"
 local CUSTOM_STYLES = {
@@ -40,54 +40,12 @@ local CUSTOM_STYLES = {
 	"/ui/Image/Common/Money.UITex|234",
 }
 local STYLE_COUNT = 2
-MY_BuffMonS = {}
-MY_BuffMonS.anchor = { y = 152, x = -343, s = "TOPLEFT", r = "CENTER" }
-MY_BuffMonS.nStyle = 1
-MY_BuffMonS.fScale = 0.8
-MY_BuffMonS.bEnable = false
-MY_BuffMonS.bDragable = false
-MY_BuffMonS.nBoxBgFrame = 43
-MY_BuffMonS.bHideOthers = true
-MY_BuffMonS.nMaxLineCount = 16
-MY_BuffMonS.szCDUITex = MY.GetAddonInfo().szUITexST .. "|7"
-MY_BuffMonS.nCDWidth = 240
-RegisterCustomData("MY_BuffMonS.anchor")
-RegisterCustomData("MY_BuffMonS.nStyle")
-RegisterCustomData("MY_BuffMonS.fScale")
-RegisterCustomData("MY_BuffMonS.bEnable")
-RegisterCustomData("MY_BuffMonS.bDragable")
-RegisterCustomData("MY_BuffMonS.bHideOthers")
-RegisterCustomData("MY_BuffMonS.nMaxLineCount")
-RegisterCustomData("MY_BuffMonS.tBuffList")
-RegisterCustomData("MY_BuffMonS.szCDUITex")
-RegisterCustomData("MY_BuffMonS.nCDWidth")
-MY_BuffMonT = {}
-MY_BuffMonT.anchor = { y = 102, x = -343, s = "TOPLEFT", r = "CENTER" }
-MY_BuffMonT.nStyle = 1
-MY_BuffMonT.fScale = 0.8
-MY_BuffMonT.bEnable = false
-MY_BuffMonT.bDragable = false
-MY_BuffMonT.nBoxBgFrame = 44
-MY_BuffMonT.bHideOthers = true
-MY_BuffMonT.nMaxLineCount = 16
-MY_BuffMonT.szCDUITex = MY.GetAddonInfo().szUITexST .. "|7"
-MY_BuffMonT.nCDWidth = 240
-RegisterCustomData("MY_BuffMonT.anchor")
-RegisterCustomData("MY_BuffMonT.nStyle")
-RegisterCustomData("MY_BuffMonT.fScale")
-RegisterCustomData("MY_BuffMonT.bEnable")
-RegisterCustomData("MY_BuffMonT.bDragable")
-RegisterCustomData("MY_BuffMonT.bHideOthers")
-RegisterCustomData("MY_BuffMonT.nMaxLineCount")
-RegisterCustomData("MY_BuffMonT.tBuffList")
-RegisterCustomData("MY_BuffMonS.szCDUITex")
-RegisterCustomData("MY_BuffMonS.nCDWidth")
 
 ----------------------------------------------------------------------------------------------
 -- 通用逻辑
 ----------------------------------------------------------------------------------------------
 local function RedrawBuffList(hFrame, aBuffMon, OBJ)
-	local nBgFrame, nStyle = OBJ.nBgFrame, OBJ.nStyle
+	local nBgFrame = OBJ.nBgFrame
 	hFrame.tItem = {}
 	local nWidth = 0
 	local hList = hFrame:Lookup("", "Handle_BuffList")
@@ -96,11 +54,17 @@ local function RedrawBuffList(hFrame, aBuffMon, OBJ)
 	for _, mon in ipairs(aBuffMon) do
 		if mon[1] then
 			nCount = nCount + 1
-			local hItem = hList:AppendItemFromIni(INI_PATH:format(nStyle), "Handle_Item")
-			hItem:Lookup("Image_BoxBg"):SetFrame(nBgFrame)
-			local hBox  = hItem:Lookup("Box_Default")
-			local hProcessTxt = hItem:Lookup("Text_Process")
-			local hProcessImg = hItem:Lookup("Image_Process")
+			local hItem = hList:AppendItemFromIni(INI_PATH, "Handle_Item")
+			local hdlBox = hItem:Lookup("Handle_Box")
+			local hdlBar = hItem:Lookup("Handle_Bar")
+			local hBox = hdlBox:Lookup("Box_Default")
+			local hBoxBg = hdlBox:Lookup("Image_BoxBg")
+			local hSkillName = hdlBar:Lookup("Text_Name")
+			local hProcessTxt = hdlBar:Lookup("Text_Process")
+			local hProcessImg = hdlBar:Lookup("Image_Process")
+			
+			-- Box部分
+			hItem.hBox = hBox
 			hItem.mon = mon
 			hItem.dwIcon = mon[2]
 			hFrame.tItem[mon[3]] = hItem
@@ -108,22 +72,39 @@ local function RedrawBuffList(hFrame, aBuffMon, OBJ)
 			hBox:SetObjectIcon(hItem.dwIcon or -1)
 			hBox:SetObjectCoolDown(true)
 			hBox:SetCoolDownPercentage(0)
+			hBoxBg:SetFrame(nBgFrame)
 			-- BUFF时间
 			hBox:SetOverTextPosition(1, ITEM_POSITION.LEFT_TOP)
 			hBox:SetOverTextFontScheme(1, 15)
 			-- BUFF层数
 			hBox:SetOverTextPosition(0, ITEM_POSITION.RIGHT_BOTTOM)
 			hBox:SetOverTextFontScheme(0, 15)
-			if hProcessTxt then
+			
+			-- 倒计时条
+			if OBJ.bCDBar then
 				hProcessTxt:SetW(OBJ.nCDWidth - 10)
 				hProcessTxt:SetText("")
-			end
-			if hProcessImg then
+				hItem.hProcessTxt = hProcessTxt
+				
+				hSkillName:SetVisible(OBJ.bSkillName)
+				hSkillName:SetW(OBJ.nCDWidth - 10)
+				hSkillName:SetText(mon[3])
+				hItem.hSkillName = hSkillName
+				
 				XGUI(hProcessImg):image(OBJ.szCDUITex)
 				hProcessImg:SetW(OBJ.nCDWidth)
 				hProcessImg:SetPercentage(0)
+				hItem.hProcessImg = hProcessImg
+				
+				hdlBar:Show()
+				hdlBar:SetW(OBJ.nCDWidth)
+				hItem.hdlBar = hdlBar
+				hItem:SetW(hdlBox:GetW() + OBJ.nCDWidth)
+			else
+				hdlBar:Hide()
+				hItem:SetW(hdlBox:GetW())
 			end
-			hItem:SetSizeByAllItemSize()
+				
 			if nCount <= OBJ.nMaxLineCount then
 				nWidth = nWidth + hItem:GetW() * hFrame.fScale
 			end
@@ -145,20 +126,14 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers)
 	if not KTarget then
 		for i = 0, hList:GetItemCount() - 1 do
 			local hItem = hList:Lookup(i)
-			local hBox = hItem:Lookup("Box_Default")
+			local hBox = hItem:Lookup("Handle_Box/Box_Default")
 			hBox:SetCoolDownPercentage(0)
 			hBox:SetObjectStaring(false)
 			hBox:SetOverText(0, "")
 			hBox:SetOverText(1, "")
 			hBox:ClearExtentAnimate()
-			local hProcessTxt = hItem:Lookup("Text_Process")
-			if hProcessTxt then
-				hProcessTxt:SetText("")
-			end
-			local hProcessImg = hItem:Lookup("Image_Process")
-			if hProcessImg then
-				hProcessImg:SetPercentage(0)
-			end
+			hItem:Lookup("Handle_Bar/Text_Process"):SetText("")
+			hItem:Lookup("Handle_Bar/Image_Process"):SetPercentage(0)
 		end
 	else
 		local nCurrentFrame = GetLogicFrameCount()
@@ -167,9 +142,7 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers)
 				local szName = Table_GetBuffName(buff.dwID, buff.nLevel)
 				local hItem = hFrame.tItem[szName]
 				if hItem then
-					local hBox = hItem:Lookup("Box_Default")
-					local hProcessTxt = hItem:Lookup("Text_Process")
-					local hProcessImg = hItem:Lookup("Image_Process")
+					local hBox = hItem.hBox
 					local nBuffTime, _ = GetBuffTime(buff.dwID, buff.nLevel)
 					local nTimeLeft = ("%.1f"):format(math.max(0, buff.nEndFrame - GetLogicFrameCount()) / 16)
 					if not hItem.dwIcon or hItem.dwIcon == 13 then
@@ -177,11 +150,12 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers)
 						hBox:SetObjectIcon(hItem.dwIcon)
 						hItem.mon[2] = hItem.dwIcon
 					end
-					if hProcessTxt then
-						hProcessTxt:SetText(nTimeLeft .. "'")
+					
+					if hItem.hProcessTxt then
+						hItem.hProcessTxt:SetText(nTimeLeft .. "'")
 					end
 					hBox:SetOverText(1, nTimeLeft .. "'")
-
+					
 					if buff.nStackNum == 1 then
 						hBox:SetOverText(0, "")
 					else
@@ -189,8 +163,8 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers)
 					end
 
 					local dwPercent = nTimeLeft / (nBuffTime / 16)
-					if hProcessImg then
-						hProcessImg:SetPercentage(dwPercent)
+					if hItem.hProcessImg then
+						hItem.hProcessImg:SetPercentage(dwPercent)
 					end
 					hBox:SetCoolDownPercentage(dwPercent)
 
@@ -223,7 +197,7 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers)
 				local hItem = hList:Lookup(i)
 				if hItem.nRenderFrame and hItem.nRenderFrame >= 0
 				and hItem.nRenderFrame ~= nCurrentFrame then
-					local hBox = hItem:Lookup("Box_Default")
+					local hBox = hItem.hBox
 					hBox.dwPercent = 0
 					hBox:SetCoolDownPercentage(0)
 					hBox:SetOverText(0, "")
@@ -231,13 +205,11 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers)
 					hBox:SetObjectStaring(false)
 					hBox:ClearExtentAnimate()
 					hBox:SetObjectSparking(true)
-					local hProcessTxt = hItem:Lookup("Text_Process")
-					if hProcessTxt then
-						hProcessTxt:SetText("")
+					if hItem.hProcessTxt then
+						hItem.hProcessTxt:SetText("")
 					end
-					local hProcessImg = hItem:Lookup("Image_Process")
-					if hProcessImg then
-						hProcessImg:SetPercentage(0)
+					if hItem.hProcessImg then
+						hItem.hProcessImg:SetPercentage(0)
 					end
 					hItem.nRenderFrame = nil
 				end
@@ -247,20 +219,18 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers)
 				local hItem = hList:Lookup(i)
 				if hItem.nRenderFrame and hItem.nRenderFrame >= 0
 				and hItem.nRenderFrame ~= nCurrentFrame then
-					local hBox = hItem:Lookup("Box_Default")
+					local hBox = hItem.hBox
 					hBox.dwPercent = 0
 					hBox:SetCoolDownPercentage(0)
 					hBox:SetOverText(0, "")
 					hBox:SetOverText(1, "")
 					hBox:SetObjectStaring(false)
 					hBox:ClearExtentAnimate()
-					local hProcessTxt = hItem:Lookup("Text_Process")
-					if hProcessTxt then
-						hProcessTxt:SetText("")
+					if hItem.hProcessTxt then
+						hItem.hProcessTxt:SetText("")
 					end
-					local hProcessImg = hItem:Lookup("Image_Process")
-					if hProcessImg then
-						hProcessImg:SetPercentage(0)
+					if hItem.hProcessImg then
+						hItem.hProcessImg:SetPercentage(0)
 					end
 					hItem.nRenderFrame = nil
 				end
@@ -270,6 +240,27 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers)
 end
 
 local function GeneNameSpace(OBJ, NAMESPACE, DEFAULT_CONFIG_FILE, GetTarget, LANG)
+	OBJ.fScale = 0.8
+	OBJ.bEnable = false
+	OBJ.bDragable = false
+	OBJ.nBoxBgFrame = 43
+	OBJ.bHideOthers = true
+	OBJ.nMaxLineCount = 16
+	OBJ.bCDBar = false
+	OBJ.nCDWidth = 240
+	OBJ.szCDUITex = MY.GetAddonInfo().szUITexST .. "|7"
+	OBJ.bSkillName = true
+	RegisterCustomData(NAMESPACE .. ".fScale")
+	RegisterCustomData(NAMESPACE .. ".bEnable")
+	RegisterCustomData(NAMESPACE .. ".bDragable")
+	RegisterCustomData(NAMESPACE .. ".bHideOthers")
+	RegisterCustomData(NAMESPACE .. ".nMaxLineCount")
+	RegisterCustomData(NAMESPACE .. ".tBuffList")
+	RegisterCustomData(NAMESPACE .. ".bCDBar")
+	RegisterCustomData(NAMESPACE .. ".nCDWidth")
+	RegisterCustomData(NAMESPACE .. ".szCDUITex")
+	RegisterCustomData(NAMESPACE .. ".bSkillName")
+
 	function OBJ.AddBuff(dwKungFuID, szBuffName)
 		OBJ.GetBuffList(dwKungFuID)
 		if not OBJ.tBuffList[dwKungFuID] then
@@ -359,7 +350,7 @@ local function GeneNameSpace(OBJ, NAMESPACE, DEFAULT_CONFIG_FILE, GetTarget, LAN
 	end
 
 	function OBJ.Open()
-		Wnd.OpenWindow(INI_PATH:format(OBJ.nStyle), NAMESPACE)
+		Wnd.OpenWindow(INI_PATH, NAMESPACE)
 	end
 
 	function OBJ.Close()
@@ -377,12 +368,18 @@ end
 ----------------------------------------------------------------------------------------------
 -- 目标监控
 ----------------------------------------------------------------------------------------------
+MY_BuffMonT = {}
+MY_BuffMonT.anchor = { y = 102, x = -343, s = "TOPLEFT", r = "CENTER" }
+RegisterCustomData("MY_BuffMonT.anchor")
 GeneNameSpace(MY_BuffMonT, "MY_BuffMonT", DEFAULT_T_CONFIG_FILE,
 function() return MY.GetTarget() end, {CMTEXT = _L["mingyi self buff monitor"]})
 
 ----------------------------------------------------------------------------------------------
 -- 自身监控
 ----------------------------------------------------------------------------------------------
+MY_BuffMonS = {}
+MY_BuffMonS.anchor = { y = 152, x = -343, s = "TOPLEFT", r = "CENTER" }
+RegisterCustomData("MY_BuffMonS.anchor")
 GeneNameSpace(MY_BuffMonS, "MY_BuffMonS", DEFAULT_S_CONFIG_FILE,
 function() return TARGET.PLAYER, UI_GetClientPlayerID() end, {CMTEXT = _L["mingyi target buff monitor"]})
 
@@ -487,22 +484,23 @@ local function GenePS(ui, OBJ, x, y, w, h)
 	})
 	y = y + 30
 	
-	ui:append("WndComboBox", {
+	ui:append("WndCheckBox", {
 		x = x + 20, y = y, w = 120,
-		text = _L['select style'],
-		menu = function()
-			local t = {}
-			for i = 1, STYLE_COUNT do
-				table.insert(t, {
-					szOption = i,
-					fnAction = function()
-						OBJ.nStyle = i
-						OBJ.Reload()
-					end,
-					rgb = OBJ.nStyle == i and {0, 255, 0},
-				})
-			end
-			return t
+		text = _L['show cd bar'],
+		checked = OBJ.bCDBar,
+		oncheck = function(bCheck)
+			OBJ.bCDBar = bCheck
+			OBJ.Reload()
+		end,
+	})
+	
+	ui:append("WndCheckBox", {
+		x = x + 150, y = y, w = 120,
+		text = _L['show buff name'],
+		checked = OBJ.bSkillName,
+		oncheck = function(bCheck)
+			OBJ.bSkillName = bCheck
+			OBJ.Reload()
 		end,
 	})
 	
