@@ -1,10 +1,10 @@
 ---------------------------------------------------------------------
 -- BUFF监控
 ---------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Toolbox/lang/")
-local INI_PATH = MY.GetAddonInfo().szRoot .. "Toolbox/ui/MY_BuffMon.ini"
-local DEFAULT_S_CONFIG_FILE = MY.GetAddonInfo().szRoot .. "Toolbox/data/buffmon/self/$lang.jx3dat"
-local DEFAULT_T_CONFIG_FILE = MY.GetAddonInfo().szRoot .. "Toolbox/data/buffmon/target/$lang.jx3dat"
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_BuffMon/lang/")
+local INI_PATH = MY.GetAddonInfo().szRoot .. "MY_BuffMon/ui/MY_BuffMon.ini"
+local DEFAULT_S_CONFIG_FILE = MY.GetAddonInfo().szRoot .. "MY_BuffMon/data/self/$lang.jx3dat"
+local DEFAULT_T_CONFIG_FILE = MY.GetAddonInfo().szRoot .. "MY_BuffMon/data/target/$lang.jx3dat"
 local CUSTOM_STYLES = {
 	MY.GetAddonInfo().szUITexST .. "|" .. 0,
 	MY.GetAddonInfo().szUITexST .. "|" .. 1,
@@ -400,7 +400,7 @@ MY_BuffMonT = {}
 MY_BuffMonT.anchor = { y = 102, x = -343, s = "TOPLEFT", r = "CENTER" }
 RegisterCustomData("MY_BuffMonT.anchor")
 GeneNameSpace(MY_BuffMonT, "MY_BuffMonT", DEFAULT_T_CONFIG_FILE,
-function() return MY.GetTarget() end, {CMTEXT = _L["mingyi self buff monitor"]})
+function() return MY.GetTarget() end, {CMTEXT = _L["mingyi target buff monitor"]})
 
 ----------------------------------------------------------------------------------------------
 -- 自身监控
@@ -409,7 +409,7 @@ MY_BuffMonS = {}
 MY_BuffMonS.anchor = { y = 152, x = -343, s = "TOPLEFT", r = "CENTER" }
 RegisterCustomData("MY_BuffMonS.anchor")
 GeneNameSpace(MY_BuffMonS, "MY_BuffMonS", DEFAULT_S_CONFIG_FILE,
-function() return TARGET.PLAYER, UI_GetClientPlayerID() end, {CMTEXT = _L["mingyi target buff monitor"]})
+function() return TARGET.PLAYER, UI_GetClientPlayerID() end, {CMTEXT = _L["mingyi self buff monitor"]})
 
 ----------------------------------------------------------------------------------------------
 -- 初始化

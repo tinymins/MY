@@ -1,0 +1,21 @@
+-- language data (zhcn) updated at 2014-4-10 03:38:11
+data = {
+    ['buff monitor'] = 'BUFF监控',
+    ['undragable'] = '禁止拖动',
+    ['auto hide chat panel'] = '自动隐藏聊天栏',
+    ['* self buff monitor'] = '※ 自身BUFF监控',
+    ['* target buff monitor'] = '※ 目标BUFF监控',
+    ['set buff monitor'] = '设置BUFF监控',
+    ['hide others buff'] = '只显示属于自己的BUFF',
+    ['mingyi self buff monitor'] = '茗伊自身BUFF监控',
+    ['mingyi target buff monitor'] = '茗伊目标BUFF监控',
+    ['please input buff name:'] = '请输入BUFF名称：',
+    ['display %d eachline.'] = '每行%d个',
+    ['select style'] = '选择风格',
+    ['scale %d%%.'] = '缩放%d%%',
+    ['CD width %dpx.'] = '倒计时宽%dpx',
+    ['Select countdown style'] = '设置倒计时条风格（如果存在）',
+    ['show cd bar'] = '倒计时条',
+    ['show buff name'] = 'BUFF名称',
+    ['hide void buff'] = '隐藏已消失BUFF',
+}
