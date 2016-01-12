@@ -161,6 +161,7 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers, b
 					local nTimeLeft = ("%.1f"):format(math.max(0, buff.nEndFrame - GetLogicFrameCount()) / 16)
 					if not _tBuffTime[KTarget.dwID] then
 						_tBuffTime[KTarget.dwID] = {}
+						hFrame.tBuffTime = _tBuffTime[KTarget.dwID] -- 防止CD过程中table被GC回收
 					end
 					nBuffTime = math.max(nBuffTime, nTimeLeft)
 					if _tBuffTime[KTarget.dwID][buff.dwID] then
@@ -245,6 +246,7 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers, b
 				end
 			end
 		else
+			hFrame.tBuffTime = _tBuffTime[KTarget.dwID] -- 防止CD过程中table被GC回收
 			for i = 0, hList:GetItemCount() - 1 do
 				local hItem = hList:Lookup(i)
 				if hItem.nRenderFrame and hItem.nRenderFrame >= 0
