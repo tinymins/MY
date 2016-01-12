@@ -124,6 +124,7 @@ local function RedrawBuffList(hFrame, aBuffMon, OBJ)
 	hFrame:SetDragArea(0, 0, nW, nH)
 end
 
+local _tBuffTime = setmetatable({}, { __mode = "v" })
 local _needFormatItemPos
 local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers, bHideVoidBuff)
 	local hList = hFrame:Lookup("", "Handle_BuffList")
@@ -155,8 +156,18 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers, b
 						hItem:Show()
 					end
 					local hBox = hItem.hBox
-					local nBuffTime, _ = GetBuffTime(buff.dwID, buff.nLevel)
+					-- º∆À„BUFF ±º‰
+					local nBuffTime = GetBuffTime(buff.dwID, buff.nLevel) / 16
 					local nTimeLeft = ("%.1f"):format(math.max(0, buff.nEndFrame - GetLogicFrameCount()) / 16)
+					if not _tBuffTime[KTarget.dwID] then
+						_tBuffTime[KTarget.dwID] = {}
+					end
+					nBuffTime = math.max(nBuffTime, nTimeLeft)
+					if _tBuffTime[KTarget.dwID][buff.dwID] then
+						nBuffTime = math.max(_tBuffTime[KTarget.dwID][buff.dwID], nBuffTime)
+					end
+					_tBuffTime[KTarget.dwID][buff.dwID] = nBuffTime
+					
 					if not hItem.dwIcon or hItem.dwIcon == 13 then
 						hItem.dwIcon = Table_GetBuffIconID(buff.dwID, buff.nLevel)
 						hBox:SetObjectIcon(hItem.dwIcon)
@@ -174,7 +185,7 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers, b
 						hBox:SetOverText(0, buff.nStackNum)
 					end
 
-					local dwPercent = nTimeLeft / (nBuffTime / 16)
+					local dwPercent = nTimeLeft / nBuffTime
 					if hItem.hProcessImg then
 						hItem.hProcessImg:SetPercentage(dwPercent)
 					end
