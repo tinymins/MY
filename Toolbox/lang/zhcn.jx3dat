@@ -74,6 +74,7 @@ data = {
     ['Select countdown style'] = '设置倒计时条风格（如果存在）',
     ['show cd bar'] = '倒计时条',
     ['show buff name'] = 'BUFF名称',
+    ['hide void buff'] = '隐藏已消失BUFF',
     
     ['The kill sequence is: '] = '正确击杀顺序：',
     ['failed to calc.'] = '计算失败。',

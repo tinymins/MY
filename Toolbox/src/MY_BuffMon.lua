@@ -39,7 +39,7 @@ local CUSTOM_STYLES = {
 	"/ui/Image/Common/Money.UITex|233",
 	"/ui/Image/Common/Money.UITex|234",
 }
-local STYLE_COUNT = 2
+local BOX_SPARKING_FRAME = GLOBAL.GAME_FPS
 
 ----------------------------------------------------------------------------------------------
 -- 通用逻辑
@@ -104,16 +104,19 @@ local function RedrawBuffList(hFrame, aBuffMon, OBJ)
 				hdlBar:Hide()
 				hItem:SetW(hdlBox:GetW())
 			end
-				
+			
 			if nCount <= OBJ.nMaxLineCount then
 				nWidth = nWidth + hItem:GetW() * hFrame.fScale
 			end
 			hItem:Scale(hFrame.fScale, hFrame.fScale)
+			hItem:SetVisible(not OBJ.bHideVoidBuff)
 		end
 	end
 	hList:SetW(nWidth)
 	hList:FormatAllItemPos()
 	hList:SetSizeByAllItemSize()
+	hList:SetIgnoreInvisibleChild(true)
+	hList:FormatAllItemPos()
 	local nW, nH = hList:GetSize()
 	nW = math.max(nW, 50 * hFrame.fScale)
 	nH = math.max(nH, 50 * hFrame.fScale)
@@ -121,7 +124,8 @@ local function RedrawBuffList(hFrame, aBuffMon, OBJ)
 	hFrame:SetDragArea(0, 0, nW, nH)
 end
 
-local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers)
+local _needFormatItemPos
+local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers, bHideVoidBuff)
 	local hList = hFrame:Lookup("", "Handle_BuffList")
 	if not KTarget then
 		for i = 0, hList:GetItemCount() - 1 do
@@ -134,6 +138,10 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers)
 			hBox:ClearExtentAnimate()
 			hItem:Lookup("Handle_Bar/Text_Process"):SetText("")
 			hItem:Lookup("Handle_Bar/Image_Process"):SetPercentage(0)
+			if bHideVoidBuff and hItem:IsVisible() then
+				_needFormatItemPos = true
+				hItem:Hide()
+			end
 		end
 	else
 		local nCurrentFrame = GetLogicFrameCount()
@@ -142,6 +150,10 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers)
 				local szName = Table_GetBuffName(buff.dwID, buff.nLevel)
 				local hItem = hFrame.tItem[szName]
 				if hItem then
+					if bHideVoidBuff and not hItem:IsVisible() then
+						_needFormatItemPos = true
+						hItem:Show()
+					end
 					local hBox = hItem.hBox
 					local nBuffTime, _ = GetBuffTime(buff.dwID, buff.nLevel)
 					local nTimeLeft = ("%.1f"):format(math.max(0, buff.nEndFrame - GetLogicFrameCount()) / 16)
@@ -212,6 +224,13 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers)
 						hItem.hProcessImg:SetPercentage(0)
 					end
 					hItem.nRenderFrame = nil
+					hItem.nSparkingFrame = nCurrentFrame
+				elseif bHideVoidBuff and hItem:IsVisible()
+				and hItem.nSparkingFrame
+				and nCurrentFrame - hItem.nSparkingFrame > BOX_SPARKING_FRAME then
+					hItem.nSparkingFrame = nil
+					_needFormatItemPos = true
+					hItem:Hide()
 				end
 			end
 		else
@@ -232,30 +251,39 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers)
 					if hItem.hProcessImg then
 						hItem.hProcessImg:SetPercentage(0)
 					end
+					if bHideVoidBuff and hItem:IsVisible() then
+						_needFormatItemPos = true
+						hItem:Hide()
+					end
 					hItem.nRenderFrame = nil
 				end
 			end
+		end
+		if _needFormatItemPos then
+			hList:FormatAllItemPos()
 		end
 	end
 end
 
 local function GeneNameSpace(OBJ, NAMESPACE, DEFAULT_CONFIG_FILE, GetTarget, LANG)
-	OBJ.fScale = 0.8
-	OBJ.bEnable = false
-	OBJ.bDragable = false
-	OBJ.nBoxBgFrame = 43
-	OBJ.bHideOthers = true
-	OBJ.nMaxLineCount = 16
-	OBJ.bCDBar = false
-	OBJ.nCDWidth = 240
-	OBJ.szCDUITex = MY.GetAddonInfo().szUITexST .. "|7"
-	OBJ.bSkillName = true
+	OBJ.fScale        = 0.8    -- 缩放比
+	OBJ.bEnable       = false  -- 启用标记
+	OBJ.bDragable     = false  -- 是否可拖拽
+	OBJ.nBoxBgFrame   = 43     -- Box背景帧
+	OBJ.bHideOthers   = true   -- 只显示自己的BUFF
+	OBJ.nMaxLineCount = 16     -- 单行最大数量
+	OBJ.bHideVoidBuff = false  -- 隐藏消失的BUFF
+	OBJ.bCDBar        = false  -- 显示倒计时条
+	OBJ.nCDWidth      = 240    -- 倒计时条宽度
+	OBJ.szCDUITex     = MY.GetAddonInfo().szUITexST .. "|7"
+	OBJ.bSkillName    = true   -- 显示技能名字
 	RegisterCustomData(NAMESPACE .. ".fScale")
 	RegisterCustomData(NAMESPACE .. ".bEnable")
 	RegisterCustomData(NAMESPACE .. ".bDragable")
 	RegisterCustomData(NAMESPACE .. ".bHideOthers")
 	RegisterCustomData(NAMESPACE .. ".nMaxLineCount")
 	RegisterCustomData(NAMESPACE .. ".tBuffList")
+	RegisterCustomData(NAMESPACE .. ".bHideVoidBuff")
 	RegisterCustomData(NAMESPACE .. ".bCDBar")
 	RegisterCustomData(NAMESPACE .. ".nCDWidth")
 	RegisterCustomData(NAMESPACE .. ".szCDUITex")
@@ -326,7 +354,7 @@ local function GeneNameSpace(OBJ, NAMESPACE, DEFAULT_CONFIG_FILE, GetTarget, LAN
 		local dwType, dwID = GetTarget()
 		if dwType ~= this.dwType or dwID ~= this.dwID
 		or dwType == TARGET.PLAYER or dwType == TARGET.NPC then
-			UpdateBuffList(this, MY.GetObject(dwType, dwID), dwType == this.dwType and dwID == this.dwID, OBJ.bHideOthers)
+			UpdateBuffList(this, MY.GetObject(dwType, dwID), dwType == this.dwType and dwID == this.dwID, OBJ.bHideOthers, OBJ.bHideVoidBuff)
 			this.dwType, this.dwID = dwType, dwID
 		end
 	end
@@ -408,11 +436,11 @@ local function GenePS(ui, OBJ, x, y, w, h)
 	})
 	
 	ui:append("WndCheckBox", {
-		x = x + 150, y = y, w = 100,
-		text = _L['undragable'],
-		checked = not OBJ.bDragable,
+		x = x + 120, y = y, w = 200,
+		text = _L['hide others buff'],
+		checked = OBJ.bHideOthers,
 		oncheck = function(bChecked)
-			OBJ.bDragable = not bChecked
+			OBJ.bHideOthers = bChecked
 			OBJ.Reload()
 		end,
 	})
@@ -462,11 +490,21 @@ local function GenePS(ui, OBJ, x, y, w, h)
 	y = y + 30
 	
 	ui:append("WndCheckBox", {
-		x = x + 20, y = y, w = 200,
-		text = _L['hide others buff'],
-		checked = OBJ.bHideOthers,
+		x = x + 20, y = y, w = 100,
+		text = _L['undragable'],
+		checked = not OBJ.bDragable,
 		oncheck = function(bChecked)
-			OBJ.bHideOthers = bChecked
+			OBJ.bDragable = not bChecked
+			OBJ.Reload()
+		end,
+	})
+	
+	ui:append("WndCheckBox", {
+		x = x + 120, y = y, w = 200,
+		text = _L['hide void buff'],
+		checked = OBJ.bHideVoidBuff,
+		oncheck = function(bChecked)
+			OBJ.bHideVoidBuff = bChecked
 			OBJ.Reload()
 		end,
 	})
@@ -495,7 +533,7 @@ local function GenePS(ui, OBJ, x, y, w, h)
 	})
 	
 	ui:append("WndCheckBox", {
-		x = x + 150, y = y, w = 120,
+		x = x + 120, y = y, w = 120,
 		text = _L['show buff name'],
 		checked = OBJ.bSkillName,
 		oncheck = function(bCheck)
