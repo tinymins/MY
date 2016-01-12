@@ -57,25 +57,6 @@ data = {
     
     ['auto switch talk channel when into battle field'] = '進出戰場JJC時自動切換團隊/戰場頻道',
     
-    ['buff monitor'] = 'BUFF監控',
-    ['undragable'] = '禁止拖動',
-    ['auto hide chat panel'] = '自動隱藏聊天欄',
-    ['* self buff monitor'] = '※ 自身BUFF監控',
-    ['* target buff monitor'] = '※ 目標BUFF監控',
-    ['set buff monitor'] = '設置BUFF監控',
-    ['hide others buff'] = '只顯示屬于自己的BUFF',
-    ['mingyi self buff monitor'] = '茗伊自身BUFF監控',
-    ['mingyi target buff monitor'] = '茗伊目標BUFF監控',
-    ['please input buff name:'] = '請輸入BUFF名稱：',
-    ['display %d eachline.'] = '每行%d個',
-    ['select style'] = '選擇風格',
-    ['scale %d%%.'] = '縮放%d%%',
-    ['CD width %dpx.'] = '倒計時寬%dpx',
-    ['Select countdown style'] = '設置倒計時條風格（如果存在）',
-    ['show cd bar'] = '倒計時條',
-    ['show buff name'] = 'BUFF名稱',
-    ['hide void buff'] = '隱藏已消失BUFF',
-    
     ['The kill sequence is: '] = '正確擊殺順序：',
     ['failed to calc.'] = '計算失敗。',
     
