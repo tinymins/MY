@@ -14,6 +14,7 @@ RegisterCustomData("MY_ChatFilter.bFilterDuplicateContinuous")
 RegisterCustomData("MY_ChatFilter.bFilterDuplicateAddonTalk")
 
 MY_ChatFilter.tApplyDuplicateChannels = {
+	["MSG_SYS"           ] = false,
 	["MSG_NORMAL"        ] = true,
 	["MSG_PARTY"         ] = false,
 	["MSG_MAP"           ] = true,
