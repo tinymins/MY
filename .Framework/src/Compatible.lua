@@ -1,11 +1,11 @@
 --------------------------------------------
--- @Desc  : ÜøÒÁ²å¼þ¼æÈÝÐÔÈ«¾Öº¯Êý
--- @Author: ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
+-- @Desc  : èŒ—ä¼Šæ’ä»¶å…¼å®¹æ€§å…¨å±€å‡½æ•°
+-- @Author: èŒ—ä¼Š @åŒæ¢¦é•‡ @è¿½é£Žè¹‘å½±
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
--- @Last Modified by:   µÔÒ»Ãù @tinymins
+-- @Last Modified by:   ç¿Ÿä¸€é¸£ @tinymins
 -- @Last Modified time: 2015-08-13 18:50:42
--- @Ref: ½è¼ø´óÁ¿º£÷©Ô´Âë @haimanchajian.com
+-- @Ref: å€Ÿé‰´å¤§é‡æµ·é³—æºç  @haimanchajian.com
 --------------------------------------------
 EMPTY_TABLE = SetmetaReadonly({})
 XML_LINE_BREAKER = GetFormatText("\n")
@@ -43,7 +43,7 @@ if not GetCampImage then
 	end
 end
 
--- Ö»¶Á±í´´½¨
+-- åªè¯»è¡¨åˆ›å»º
 if not SetmetaReadonly then
 function SetmetaReadonly(t)
 	for k, v in pairs(t) do
@@ -61,7 +61,7 @@ function SetmetaReadonly(t)
 end
 end
 
--- -- Ö»¶Á±í×ÖµäÃ¶¾Ù
+-- -- åªè¯»è¡¨å­—å…¸æžšä¸¾
 -- if not pairs_c then
 -- function pairs_c(t, ...)
 -- 	if type(t) == "table" then
@@ -74,7 +74,7 @@ end
 -- end
 -- end
 
--- -- Ö»¶Á±íÊý×éÃ¶¾Ù
+-- -- åªè¯»è¡¨æ•°ç»„æžšä¸¾
 -- if not ipairs_c then
 -- function ipairs_c(t, ...)
 -- 	if type(t) == "table" then
@@ -254,27 +254,27 @@ end
 
 if not UI_OBJECT then
 UI_OBJECT = SetmetaReadonly({
-	NONE             = -1, -- ¿ÕBox
-	ITEM             = 0 , -- ÉíÉÏÓÐµÄÎïÆ·¡£nUiId, dwBox, dwX, nItemVersion, nTabType, nIndex
-	SHOP_ITEM        = 1 , -- ÉÌµêÀïÃæ³öÊÛµÄÎïÆ· nUiId, dwID, dwShopID, dwIndex
-	OTER_PLAYER_ITEM = 2 , -- ÆäËûÍæ¼ÒÉíÉÏµÄÎïÆ· nUiId, dwBox, dwX, dwPlayerID
-	ITEM_ONLY_ID     = 3 , -- Ö»ÓÐÒ»¸öIDµÄÎïÆ·¡£±ÈÈç×°±¸Á´½ÓÖ®ÀàµÄ¡£nUiId, dwID, nItemVersion, nTabType, nIndex
-	ITEM_INFO        = 4 , -- ÀàÐÍÎïÆ· nUiId, nItemVersion, nTabType, nIndex, nCount(ÊénCount´ú±ídwRecipeID)
-	SKILL            = 5 , -- ¼¼ÄÜ¡£dwSkillID, dwSkillLevel, dwOwnerID
-	CRAFT            = 6 , -- ¼¼ÒÕ¡£dwProfessionID, dwBranchID, dwCraftID
-	SKILL_RECIPE     = 7 , -- Åä·½dwID, dwLevel
-	SYS_BTN          = 8 , -- ÏµÍ³À¸¿ì½Ý·½Ê½dwID
-	MACRO            = 9 , -- ºê
-	MOUNT            = 10, -- ÏâÇ¶
-	ENCHANT          = 11, -- ¸½Ä§
-	NOT_NEED_KNOWN   = 15, -- ²»ÐèÒªÖªµÀÀàÐÍ
-	PENDANT          = 16, -- ¹Ò¼þ
-	PET              = 17, -- ³èÎï
-	MEDAL            = 18, -- ³èÎï»ÕÕÂ
+	NONE             = -1, -- ç©ºBox
+	ITEM             = 0 , -- èº«ä¸Šæœ‰çš„ç‰©å“ã€‚nUiId, dwBox, dwX, nItemVersion, nTabType, nIndex
+	SHOP_ITEM        = 1 , -- å•†åº—é‡Œé¢å‡ºå”®çš„ç‰©å“ nUiId, dwID, dwShopID, dwIndex
+	OTER_PLAYER_ITEM = 2 , -- å…¶ä»–çŽ©å®¶èº«ä¸Šçš„ç‰©å“ nUiId, dwBox, dwX, dwPlayerID
+	ITEM_ONLY_ID     = 3 , -- åªæœ‰ä¸€ä¸ªIDçš„ç‰©å“ã€‚æ¯”å¦‚è£…å¤‡é“¾æŽ¥ä¹‹ç±»çš„ã€‚nUiId, dwID, nItemVersion, nTabType, nIndex
+	ITEM_INFO        = 4 , -- ç±»åž‹ç‰©å“ nUiId, nItemVersion, nTabType, nIndex, nCount(ä¹¦nCountä»£è¡¨dwRecipeID)
+	SKILL            = 5 , -- æŠ€èƒ½ã€‚dwSkillID, dwSkillLevel, dwOwnerID
+	CRAFT            = 6 , -- æŠ€è‰ºã€‚dwProfessionID, dwBranchID, dwCraftID
+	SKILL_RECIPE     = 7 , -- é…æ–¹dwID, dwLevel
+	SYS_BTN          = 8 , -- ç³»ç»Ÿæ å¿«æ·æ–¹å¼dwID
+	MACRO            = 9 , -- å®
+	MOUNT            = 10, -- é•¶åµŒ
+	ENCHANT          = 11, -- é™„é­”
+	NOT_NEED_KNOWN   = 15, -- ä¸éœ€è¦çŸ¥é“ç±»åž‹
+	PENDANT          = 16, -- æŒ‚ä»¶
+	PET              = 17, -- å® ç‰©
+	MEDAL            = 18, -- å® ç‰©å¾½ç« 
 	BUFF             = 19, -- BUFF
-	MONEY            = 20, -- ½ðÇ®
-	TRAIN            = 21, -- ÐÞÎª
-	EMOTION_ACTION   = 22, -- ¶¯×÷±íÇé
+	MONEY            = 20, -- é‡‘é’±
+	TRAIN            = 21, -- ä¿®ä¸º
+	EMOTION_ACTION   = 22, -- åŠ¨ä½œè¡¨æƒ…
 })
 end
 
@@ -293,93 +293,94 @@ PET_MAX_COUNT        = 64
 
 if not EQUIPMENT_SUB then
 EQUIPMENT_SUB = {
-	MELEE_WEAPON      = 0 , -- ½üÕ½ÎäÆ÷
-	RANGE_WEAPON      = 1 , -- Ô¶³ÌÎäÆ÷
-	CHEST             = 2 , -- ÉÏÒÂ
-	HELM              = 3 , -- Í·²¿
-	AMULET            = 4 , -- ÏîÁ´
-	RING              = 5 , -- ½äÖ¸
-	WAIST             = 6 , -- Ñü´ø
-	PENDANT           = 7 , -- Ñü×º
-	PANTS             = 8 , -- ¿ã×Ó
-	BOOTS             = 9 , -- Ð¬×Ó
-	BANGLE            = 10, -- »¤±Û
-	WAIST_EXTEND      = 11, -- Ñü²¿¹Ò¼þ
-	PACKAGE           = 12, -- °ü¹ü
-	ARROW             = 13, -- °µÆ÷
-	BACK_EXTEND       = 14, -- ±³²¿¹Ò¼þ
-	HORSE             = 15, -- ×øÆï
-	BULLET            = 16, -- åó»òÏÝÚå
-	FACE_EXTEND       = 17, -- Á³²¿¹Ò¼þ
-	MINI_AVATAR       = 18, -- Ð¡Í·Ïñ
-	PET               = 19, -- ¸ú³è
-	L_SHOULDER_EXTEND = 20, -- ×ó¼ç¹Ò¼þ
-	R_SHOULDER_EXTEND = 21, -- ÓÒ¼ç¹Ò¼þ
-	BACK_CLOAK_EXTEND = 22, -- Åû·ç
+	MELEE_WEAPON      = 0 , -- è¿‘æˆ˜æ­¦å™¨
+	RANGE_WEAPON      = 1 , -- è¿œç¨‹æ­¦å™¨
+	CHEST             = 2 , -- ä¸Šè¡£
+	HELM              = 3 , -- å¤´éƒ¨
+	AMULET            = 4 , -- é¡¹é“¾
+	RING              = 5 , -- æˆ’æŒ‡
+	WAIST             = 6 , -- è…°å¸¦
+	PENDANT           = 7 , -- è…°ç¼€
+	PANTS             = 8 , -- è£¤å­
+	BOOTS             = 9 , -- éž‹å­
+	BANGLE            = 10, -- æŠ¤è‡‚
+	WAIST_EXTEND      = 11, -- è…°éƒ¨æŒ‚ä»¶
+	PACKAGE           = 12, -- åŒ…è£¹
+	ARROW             = 13, -- æš—å™¨
+	BACK_EXTEND       = 14, -- èƒŒéƒ¨æŒ‚ä»¶
+	HORSE             = 15, -- åéª‘
+	BULLET            = 16, -- å¼©æˆ–é™·é˜±
+	FACE_EXTEND       = 17, -- è„¸éƒ¨æŒ‚ä»¶
+	MINI_AVATAR       = 18, -- å°å¤´åƒ
+	PET               = 19, -- è·Ÿå® 
+	L_SHOULDER_EXTEND = 20, -- å·¦è‚©æŒ‚ä»¶
+	R_SHOULDER_EXTEND = 21, -- å³è‚©æŒ‚ä»¶
+	BACK_CLOAK_EXTEND = 22, -- æŠ«é£Ž
 	TOTAL             = 23, --
 }
 end
 
 if not EQUIPMENT_INVENTORY then
 EQUIPMENT_INVENTORY = {
-	MELEE_WEAPON  = 1 , -- ÆÕÍ¨½üÕ½ÎäÆ÷
-	BIG_SWORD     = 2 , -- ÖØ½£
-	RANGE_WEAPON  = 3 , -- Ô¶³ÌÎäÆ÷
-	CHEST         = 4 , -- ÉÏÒÂ
-	HELM          = 5 , -- Í·²¿
-	AMULET        = 6 , -- ÏîÁ´
-	LEFT_RING     = 7 , -- ×óÊÖ½äÖ¸
-	RIGHT_RING    = 8 , -- ÓÒÊÖ½äÖ¸
-	WAIST         = 9 , -- Ñü´ø
-	PENDANT       = 10, -- Ñü×º
-	PANTS         = 11, -- ¿ã×Ó
-	BOOTS         = 12, -- Ð¬×Ó
-	BANGLE        = 13, -- »¤±Û
-	PACKAGE1      = 14, -- À©Õ¹±³°ü1
-	PACKAGE2      = 15, -- À©Õ¹±³°ü2
-	PACKAGE3      = 16, -- À©Õ¹±³°ü3
-	PACKAGE4      = 17, -- À©Õ¹±³°ü4
-	PACKAGE_MIBAO = 18, -- °ó¶¨°²È«²úÆ·×´Ì¬ÏÂÔùËÍµÄ¶îÍâ±³°ü¸ñ £¨ItemList V9ÐÂÔö£©
-	BANK_PACKAGE1 = 19, -- ²Ö¿âÀ©Õ¹±³°ü1
-	BANK_PACKAGE2 = 20, -- ²Ö¿âÀ©Õ¹±³°ü2
-	BANK_PACKAGE3 = 21, -- ²Ö¿âÀ©Õ¹±³°ü3
-	BANK_PACKAGE4 = 22, -- ²Ö¿âÀ©Õ¹±³°ü4
-	BANK_PACKAGE5 = 23, -- ²Ö¿âÀ©Õ¹±³°ü5
-	ARROW         = 24, -- °µÆ÷
+	MELEE_WEAPON  = 1 , -- æ™®é€šè¿‘æˆ˜æ­¦å™¨
+	BIG_SWORD     = 2 , -- é‡å‰‘
+	RANGE_WEAPON  = 3 , -- è¿œç¨‹æ­¦å™¨
+	CHEST         = 4 , -- ä¸Šè¡£
+	HELM          = 5 , -- å¤´éƒ¨
+	AMULET        = 6 , -- é¡¹é“¾
+	LEFT_RING     = 7 , -- å·¦æ‰‹æˆ’æŒ‡
+	RIGHT_RING    = 8 , -- å³æ‰‹æˆ’æŒ‡
+	WAIST         = 9 , -- è…°å¸¦
+	PENDANT       = 10, -- è…°ç¼€
+	PANTS         = 11, -- è£¤å­
+	BOOTS         = 12, -- éž‹å­
+	BANGLE        = 13, -- æŠ¤è‡‚
+	PACKAGE1      = 14, -- æ‰©å±•èƒŒåŒ…1
+	PACKAGE2      = 15, -- æ‰©å±•èƒŒåŒ…2
+	PACKAGE3      = 16, -- æ‰©å±•èƒŒåŒ…3
+	PACKAGE4      = 17, -- æ‰©å±•èƒŒåŒ…4
+	PACKAGE_MIBAO = 18, -- ç»‘å®šå®‰å…¨äº§å“çŠ¶æ€ä¸‹èµ é€çš„é¢å¤–èƒŒåŒ…æ ¼ ï¼ˆItemList V9æ–°å¢žï¼‰
+	BANK_PACKAGE1 = 19, -- ä»“åº“æ‰©å±•èƒŒåŒ…1
+	BANK_PACKAGE2 = 20, -- ä»“åº“æ‰©å±•èƒŒåŒ…2
+	BANK_PACKAGE3 = 21, -- ä»“åº“æ‰©å±•èƒŒåŒ…3
+	BANK_PACKAGE4 = 22, -- ä»“åº“æ‰©å±•èƒŒåŒ…4
+	BANK_PACKAGE5 = 23, -- ä»“åº“æ‰©å±•èƒŒåŒ…5
+	ARROW         = 24, -- æš—å™¨
 	TOTAL         = 25,
 }
 end
 
 if not FORCE_TYPE then
 FORCE_TYPE = {
-	JIANG_HU  = 0 , -- ½­ºþ
-	SHAO_LIN  = 1 , -- ÉÙÁÖ
-	WAN_HUA   = 2 , -- Íò»¨
-	TIAN_CE   = 3 , -- Ìì²ß
-	CHUN_YANG = 4 , -- ´¿Ñô
-	QI_XIU    = 5 , -- ÆßÐã
-	WU_DU     = 6 , -- Îå¶¾
-	TANG_MEN  = 7 , -- ÌÆÃÅ
-	CANG_JIAN = 8 , -- ²Ø½£
-	GAI_BANG  = 9 , -- Ø¤°ï
-	MING_JIAO = 10, -- Ã÷½Ì
-	CANG_YUN  = 21, -- ²ÔÔÆ
+	JIANG_HU  = 0 , -- æ±Ÿæ¹–
+	SHAO_LIN  = 1 , -- å°‘æž—
+	WAN_HUA   = 2 , -- ä¸‡èŠ±
+	TIAN_CE   = 3 , -- å¤©ç­–
+	CHUN_YANG = 4 , -- çº¯é˜³
+	QI_XIU    = 5 , -- ä¸ƒç§€
+	WU_DU     = 6 , -- äº”æ¯’
+	TANG_MEN  = 7 , -- å”é—¨
+	CANG_JIAN = 8 , -- è—å‰‘
+	GAI_BANG  = 9 , -- ä¸å¸®
+	MING_JIAO = 10, -- æ˜Žæ•™
+	CANG_YUN  = 21, -- è‹äº‘
+	CHANG_GE  = 22ï¼Œ-- é•¿æ­Œ
 }
 end
 
 if not KUNGFU_TYPE then
 KUNGFU_TYPE = {
-	TIAN_CE     = 1,      -- Ìì²ßÄÚ¹¦
-	WAN_HUA     = 2,      -- Íò»¨ÄÚ¹¦
-	CHUN_YANG   = 3,      -- ´¿ÑôÄÚ¹¦
-	QI_XIU      = 4,      -- ÆßÐãÄÚ¹¦
-	SHAO_LIN    = 5,      -- ÉÙÁÖÄÚ¹¦
-	CANG_JIAN   = 6,      -- ²Ø½£ÄÚ¹¦
-	GAI_BANG    = 7,      -- Ø¤°ïÄÚ¹¦
-	MING_JIAO   = 8,      -- Ã÷½ÌÄÚ¹¦
-	WU_DU       = 9,      -- Îå¶¾ÄÚ¹¦
-	TANG_MEN    = 10,     -- ÌÆÃÅÄÚ¹¦
-	CANG_YUN    = 18,     -- ²ÔÔÆÄÚ¹¦
+	TIAN_CE     = 1,      -- å¤©ç­–å†…åŠŸ
+	WAN_HUA     = 2,      -- ä¸‡èŠ±å†…åŠŸ
+	CHUN_YANG   = 3,      -- çº¯é˜³å†…åŠŸ
+	QI_XIU      = 4,      -- ä¸ƒç§€å†…åŠŸ
+	SHAO_LIN    = 5,      -- å°‘æž—å†…åŠŸ
+	CANG_JIAN   = 6,      -- è—å‰‘å†…åŠŸ
+	GAI_BANG    = 7,      -- ä¸å¸®å†…åŠŸ
+	MING_JIAO   = 8,      -- æ˜Žæ•™å†…åŠŸ
+	WU_DU       = 9,      -- äº”æ¯’å†…åŠŸ
+	TANG_MEN    = 10,     -- å”é—¨å†…åŠŸ
+	CANG_YUN    = 18,     -- è‹äº‘å†…åŠŸ
 }
 end
 
@@ -393,7 +394,7 @@ PEEK_OTHER_PLAYER_RESPOND = {
 }
 end
 
-INVENTORY_GUILD_BANK      = INVENTORY_GUILD_BANK or (INVENTORY_INDEX.TOTAL + 1) --°ï»á²Ö¿â½çÃæÐéÄâÒ»¸ö±³°üÎ»ÖÃ
+INVENTORY_GUILD_BANK      = INVENTORY_GUILD_BANK or (INVENTORY_INDEX.TOTAL + 1) --å¸®ä¼šä»“åº“ç•Œé¢è™šæ‹Ÿä¸€ä¸ªèƒŒåŒ…ä½ç½®
 INVENTORY_GUILD_PAGE_SIZE = INVENTORY_GUILD_PAGE_SIZE or 100
 if not GetGuildBankBagPos then
 function GetGuildBankBagPos(nPage, nIndex)
@@ -457,23 +458,23 @@ end
 end
 
 ------------------------------------
---            ±³¾°Í¨Ñ¶            --
+--            èƒŒæ™¯é€šè®¯            --
 ------------------------------------
 -- ON_BG_CHANNEL_MSG
--- arg0: ÏûÏ¢szKey
--- arg1: ÏûÏ¢À´Ô´ÆµµÀ
--- arg2: ÏûÏ¢·¢²¼ÕßID
--- arg3: ÏûÏ¢·¢²¼ÕßÃû×Ö
--- arg4: ²»¶¨³¤²ÎÊýÊý×éÊý¾Ý
+-- arg0: æ¶ˆæ¯szKey
+-- arg1: æ¶ˆæ¯æ¥æºé¢‘é“
+-- arg2: æ¶ˆæ¯å‘å¸ƒè€…ID
+-- arg3: æ¶ˆæ¯å‘å¸ƒè€…åå­—
+-- arg4: ä¸å®šé•¿å‚æ•°æ•°ç»„æ•°æ®
 ------------------------------------
--- ÅÐ¶ÏÒ»¸ötSay½á¹¹ÊÇ²»ÊÇ±³¾°Í¨Ñ¶
+-- åˆ¤æ–­ä¸€ä¸ªtSayç»“æž„æ˜¯ä¸æ˜¯èƒŒæ™¯é€šè®¯
 if not IsBgMsg then
 function IsBgMsg(t)
 	return type(t) == "table" and t[1] and t[1].type == "eventlink" and t[1].name == "BG_CHANNEL_MSG"
 end
 end
 
--- ´¦Àí±³¾°Í¨Ñ¶
+-- å¤„ç†èƒŒæ™¯é€šè®¯
 -- if not ProcessBgMsg then
 -- function ProcessBgMsg(t, nChannel, dwTalkerID, szName, bEcho)
 -- 	if IsBgMsg(t) and not bEcho and not (
@@ -499,9 +500,9 @@ end
 -- end
 -- end
 
--- ·¢ËÍ±³¾°Í¨Ñ¶
--- SendBgMsg("ÜøÒÁ", "RAID_READY_CONFIRM") -- µ¥ÈË±³¾°Í¨Ñ¶
--- SendBgMsg(PLAYER_TALK_CHANNEL.RAID, "RAID_READY_CONFIRM") -- ÆµµÀ±³¾°Í¨Ñ¶
+-- å‘é€èƒŒæ™¯é€šè®¯
+-- SendBgMsg("èŒ—ä¼Š", "RAID_READY_CONFIRM") -- å•äººèƒŒæ™¯é€šè®¯
+-- SendBgMsg(PLAYER_TALK_CHANNEL.RAID, "RAID_READY_CONFIRM") -- é¢‘é“èƒŒæ™¯é€šè®¯
 if not SendBgMsg then
 function SendBgMsg(nChannel, szKey, ...)
 	local tSay ={{ type = "eventlink", name = "BG_CHANNEL_MSG", linkinfo = szKey }}
@@ -517,12 +518,12 @@ function SendBgMsg(nChannel, szKey, ...)
 end
 end
 ------------------------------------
--- ÓÐÖÖ¿ÉÄÜ±³¾°Í¨Ñ¶Êý¾ÝÌ«´ó ÐèÒª·Ö´Î·¢ËÍ
--- ÀÁµÃÐ´ÁËÏÈÂí¿ËÔÚÕâÀï ÒÔºóÓÐÊ±¼äÔÙËµ°É
--- ÔÚ_SendBgMsgºÍProcessBgMsg×ö²ð·ÖÖØ×é¾ÍºÃ
--- ¼ÇµÃÃ¿´ÎÖØ×éÊý¾ÝÊ±·¢ËÍ½ÓÊÕÊý¾Ý°Ù·Ö±ÈµÄÊÂ¼þ
+-- æœ‰ç§å¯èƒ½èƒŒæ™¯é€šè®¯æ•°æ®å¤ªå¤§ éœ€è¦åˆ†æ¬¡å‘é€
+-- æ‡’å¾—å†™äº†å…ˆé©¬å…‹åœ¨è¿™é‡Œ ä»¥åŽæœ‰æ—¶é—´å†è¯´å§
+-- åœ¨_SendBgMsgå’ŒProcessBgMsgåšæ‹†åˆ†é‡ç»„å°±å¥½
+-- è®°å¾—æ¯æ¬¡é‡ç»„æ•°æ®æ—¶å‘é€æŽ¥æ”¶æ•°æ®ç™¾åˆ†æ¯”çš„äº‹ä»¶
 ------------------------------------
---           ±³¾°Í¨Ñ¶END           --
+--           èƒŒæ™¯é€šè®¯END           --
 ------------------------------------
 
 if not ExecuteWithThis then
