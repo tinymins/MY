@@ -572,14 +572,20 @@ local function GenePS(ui, OBJ, x, y, w, h)
 		x = 40, y = y, w = w - 250 - 30 - 30,
 		text = _L['Select countdown style'],
 		menu = function()
-			local t, subt = {}
+			local t, subt, szIcon, nFrame = {}
 			for _, text in ipairs(CUSTOM_STYLES) do
+				szIcon, nFrame = unpack(text:split("|"))
 				subt = {
 					szOption = text,
 					fnAction = function()
 						OBJ.szCDUITex = text
 						OBJ.Reload()
 					end,
+					szIcon = szIcon,
+					nFrame = nFrame,
+					nIconMarginLeft = -3,
+					nIconMarginRight = -3,
+					szLayer = "ICON_FILL",
 				}
 				if text == OBJ.szCDUITex then
 					subt.rgb = {255, 255, 0}
