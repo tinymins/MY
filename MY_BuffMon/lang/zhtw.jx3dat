@@ -2,7 +2,6 @@
 data = {
     ['buff monitor'] = 'BUFF監控',
     ['undragable'] = '禁止拖動',
-    ['auto hide chat panel'] = '自動隱藏聊天欄',
     ['* self buff monitor'] = '※ 自身BUFF監控',
     ['* target buff monitor'] = '※ 目標BUFF監控',
     ['set buff monitor'] = '設置BUFF監控',

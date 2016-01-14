@@ -48,6 +48,7 @@ data = {
     ['Detected [%s] has GongZhan buff for %d sec(s).'] = '检测到[%s]共战BUFF剩余%d秒。',
     ['Nearby GongZhan Total Count: %d.'] = '附近共战数量：%d。',
     ['------------------------------------'] = '————————————————————————',
+    ['auto hide chat panel'] = '自动隐藏聊天栏',
     
     ['visual skill'] = '显示历史技能列表',
     ['display %d skills.'] = '显示%d格。',
