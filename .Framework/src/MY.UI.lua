@@ -681,6 +681,31 @@ local _tItemXML = {
 	["Shadow"] = "<shadow>w=15 h=15 eventid=277 </shadow>",
 	["Handle"] = "<handle>firstpostype=0 w=10 h=10</handle>",
 }
+local function OnCommonComponentMouseEnter()
+	local hText = XGUI(this):raw(1, 'txt')
+	if not hText then
+		return
+	end
+	
+	local szText = hText:GetText()
+	if empty(szText) then
+		return
+	end
+	
+	local nDisLen = hText:GetTextPosExtent()
+	local nLen = wstring.len(hText:GetText())
+	if nDisLen == nLen then
+		return
+	end
+	
+	local nW = hText:GetW()
+	local x, y = this:GetAbsPos()
+	local w, h = this:GetSize()
+	OutputTip(GetFormatText(szText), 400, {x, y, w, h}, ALW.TOP_BOTTOM)
+end
+local function OnCommonComponentMouseLeave()
+	HideTip()
+end
 -- append
 -- similar as jQuery.append()
 -- Instance:append(szType,[ szName,] tArg)
@@ -934,7 +959,7 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 					if bReturnNewItem then
 						ret = ret:add(wnd)
 					end
-					ui = XGUI(wnd)
+					ui = XGUI(wnd):hover(OnCommonComponentMouseEnter, OnCommonComponentMouseLeave)
 				end
 				Wnd.CloseWindow(frame)
 			elseif ( string.sub(szType, 1, 3) ~= "Wnd" and ele.hdl ) then
