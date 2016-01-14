@@ -844,7 +844,8 @@ end)
 local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = MY.UI(wnd)
-	local w, h = ui:size()
+	local w  = ui:width()
+	local h  = math.max(ui:height(), 450)
 	local xr, yr, wr = w - 260, 40, 260
 	local xl, yl, wl = 5,  5, w - wr -15
 	
