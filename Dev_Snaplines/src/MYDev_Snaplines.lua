@@ -17,6 +17,10 @@ MYDev_Snaplines.bDetectBox = true
 RegisterCustomData('MYDev_Snaplines.bDetectBox')
 MYDev_Snaplines.bShowWndSnaplines = true
 RegisterCustomData('MYDev_Snaplines.bShowWndSnaplines')
+MYDev_Snaplines.bShowWndTip = true
+RegisterCustomData('MYDev_Snaplines.bShowWndTip')
+MYDev_Snaplines.bShowItemTip = true
+RegisterCustomData('MYDev_Snaplines.bShowItemTip')
 MYDev_Snaplines.bShowItemSnaplines = true
 RegisterCustomData('MYDev_Snaplines.bShowItemSnaplines')
 MYDev_Snaplines.bShowTip = true
@@ -230,7 +234,9 @@ function MYDev_Snaplines.OnFrameBreathe()
 		local tTip = {}
 		tinsert(tTip, _L('CursorX: %s', nCursorX))
 		tinsert(tTip, _L('CursorY: %s', nCursorY))
-		InsertElementTip(hWnd, tTip)
+		if MYDev_Snaplines.bShowWndTip then
+			InsertElementTip(hWnd, tTip)
+		end
 		-- Wnd辅助线位置
 		if MYDev_Snaplines.bShowWndSnaplines then
 			this:Lookup("", "Handle_Snaplines_Wnd/Shadow_HoverWndLeft"  ):SetAbsPos(nWndX - 2    , 0)
@@ -253,7 +259,9 @@ function MYDev_Snaplines.OnFrameBreathe()
 			local nItemX, nItemY = hItem:GetAbsPos()
 			local nItemW, nItemH = hItem:GetSize()
 			tinsert(tTip, _L['-------------------'])
-			InsertElementTip(hItem, tTip)
+			if MYDev_Snaplines.bShowItemTip then
+				InsertElementTip(hItem, tTip)
+			end
 			-- Item辅助线位置
 			if MYDev_Snaplines.bShowItemSnaplines then
 				this:Lookup("", "Handle_Snaplines_Item"):Show()
@@ -392,6 +400,23 @@ MY.RegisterPanel(
 		  :text(_L['show data']):check(MYDev_Snaplines.bShowData or false)
 		  :check(function(bCheck)
 			MYDev_Snaplines.bShowData = bCheck
+			MYDev_Snaplines.ReloadUI()
+		end)
+		y = y + 40
+		
+		ui:append("WndCheckBox", "WndCheckBox_ShowWndTip"):children("#WndCheckBox_ShowWndTip")
+		  :pos(x, y):width(200)
+		  :text(_L['show wnd tip']):check(MYDev_Snaplines.bShowWndTip or false)
+		  :check(function(bCheck)
+			MYDev_Snaplines.bShowWndTip = bCheck
+			MYDev_Snaplines.ReloadUI()
+		end)
+		y = y + 40
+		ui:append("WndCheckBox", "WndCheckBox_ShowItemTip"):children("#WndCheckBox_ShowItemTip")
+		  :pos(x, y):width(200)
+		  :text(_L['show item tip']):check(MYDev_Snaplines.bShowItemTip or false)
+		  :check(function(bCheck)
+			MYDev_Snaplines.bShowItemTip = bCheck
 			MYDev_Snaplines.ReloadUI()
 		end)
 		y = y + 40
