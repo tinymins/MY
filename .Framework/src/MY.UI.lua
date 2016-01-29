@@ -890,6 +890,7 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 							local p = wnd:GetParent():GetFirstChild()
 							while p do
 								if p ~= wnd and
+								p.group and
 								p.group == wnd.group and
 								p:GetType() == 'WndCheckBox' and
 								p:IsCheckBoxChecked() then
