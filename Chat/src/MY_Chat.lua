@@ -429,6 +429,10 @@ MY_Chat.ReInitUI = function()
 		MY.UI(MY_Chat.frame):append("WndCheckBox", "Check_Away"):children("#Check_Away"):width(25):text(_L["AWAY"]):pos(i*30+15,25):check(function()
 			MY.SwitchChat("/afk")
 			Station.Lookup("Lowest2/EditBox"):Show()
+			if Station.Lookup("Lowest2/EditBox/Edit_Input"):GetText() == "" then
+				Station.Lookup("Lowest2/EditBox/Edit_Input"):InsertText(g_tStrings.STR_AUTO_REPLAY_LEAVE)
+				Station.Lookup("Lowest2/EditBox/Edit_Input"):SelectAll()
+			end
 			Station.SetFocusWindow("Lowest2/EditBox/Edit_Input")
 		end, function()
 			MY.SwitchChat("/cafk")
@@ -440,6 +444,10 @@ MY_Chat.ReInitUI = function()
 		MY.UI(MY_Chat.frame):append("WndCheckBox", "Check_Busy"):children("#Check_Busy"):width(25):text(_L["BUSY"]):pos(i*30+15,25):check(function()
 			MY.SwitchChat("/atr")
 			Station.Lookup("Lowest2/EditBox"):Show()
+			if Station.Lookup("Lowest2/EditBox/Edit_Input"):GetText() == "" then
+				Station.Lookup("Lowest2/EditBox/Edit_Input"):InsertText(g_tStrings.STR_AUTO_REPLAY_LEAVE)
+				Station.Lookup("Lowest2/EditBox/Edit_Input"):SelectAll()
+			end
 			Station.SetFocusWindow("Lowest2/EditBox/Edit_Input")
 		end, function()
 			MY.SwitchChat("/catr")
