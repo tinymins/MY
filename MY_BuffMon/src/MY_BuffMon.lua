@@ -506,6 +506,7 @@ local function GenePS(ui, OBJ, x, y, w, h)
 							OBJ.DelBuff(dwKungFuID, mon[3])
 							Wnd.CloseWindow("PopupMenuPanel")
 						end,
+						nMiniWidth = 120,
 					}
 					if mon[5] then
 						for dwID, dwIcon in pairs(mon[5]) do
