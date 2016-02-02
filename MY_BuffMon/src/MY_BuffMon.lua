@@ -72,12 +72,11 @@ local function RedrawBuffList(hFrame, aBuffMon, OBJ)
 					hFrame.tItem[mon[3] .. mon[4]] = {}
 				end
 				hFrame.tItem[mon[3] .. mon[4]][hItem] = true
-			else
-				if not hFrame.tItem[mon[3]] then
-					hFrame.tItem[mon[3]] = {}
-				end
-				hFrame.tItem[mon[3]][hItem] = true
 			end
+			if not hFrame.tItem[mon[3]] then
+				hFrame.tItem[mon[3]] = {}
+			end
+			hFrame.tItem[mon[3]][hItem] = true
 			hBox:SetObject(UI_OBJECT.BUFF, mon[2], 1, 1)
 			hBox:SetObjectIcon(hItem.dwIcon or -1)
 			hBox:SetObjectCoolDown(true)
@@ -182,9 +181,6 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers, b
 							_tBuffTime[KTarget.dwID][buff.dwID] = nBuffTime
 							
 							if not hItem.dwIcon or hItem.dwIcon == 13 then
-								if hFrame.tItem[szName] then
-									hFrame.tItem[szName][hItem] = nil
-								end
 								if not hFrame.tItem[szName .. buff.dwID] then
 									hFrame.tItem[szName .. buff.dwID] = {}
 								end
