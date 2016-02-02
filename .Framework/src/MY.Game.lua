@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-25 09:26:10
+-- @Last Modified time: 2016-02-02 16:46:58
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -----------------------------------------------
@@ -32,7 +32,7 @@ local _C = {}
 _Cache.tHotkey = {}
 -- 增加系统快捷键
 -- (void) MY.AddHotKey(string szName, string szTitle, func fnAction)   -- 增加系统快捷键
-MY.Game.AddHotKey = function(szName, szTitle, fnAction)
+function MY.Game.AddHotKey(szName, szTitle, fnAction)
 	if string.sub(szName, 1, 3) ~= "MY_" then
 		szName = "MY_" .. szName
 	end
@@ -40,7 +40,7 @@ MY.Game.AddHotKey = function(szName, szTitle, fnAction)
 end
 -- 获取快捷键名称
 -- (string) MY.GetHotKeyName(string szName, boolean bBracket, boolean bShort)      -- 取得快捷键名称
-MY.Game.GetHotKeyName = function(szName, bBracket, bShort)
+function MY.Game.GetHotKeyName(szName, bBracket, bShort)
 	if string.sub(szName, 1, 3) ~= "MY_" then
 		szName = "MY_" .. szName
 	end
@@ -54,7 +54,7 @@ end
 -- 获取快捷键
 -- (table) MY.GetHotKey(string szName, true , true )       -- 取得快捷键
 -- (number nKey, boolean bShift, boolean bCtrl, boolean bAlt) MY.GetHotKey(string szName, true , fasle)        -- 取得快捷键
-MY.Game.GetHotKey = function(szName, bBracket, bShort)
+function MY.Game.GetHotKey(szName, bBracket, bShort)
 	if string.sub(szName, 1, 3) ~= "MY_" then
 		szName = "MY_" .. szName
 	end
@@ -71,7 +71,7 @@ end
 -- (void) MY.SetHotKey(string szGroup)     -- 打开快捷键设置面板并定位到 szGroup 分组（不可用）
 -- (void) MY.SetHotKey(string szCommand, number nKey )     -- 设置快捷键
 -- (void) MY.SetHotKey(string szCommand, number nIndex, number nKey [, boolean bShift [, boolean bCtrl [, boolean bAlt] ] ])       -- 设置快捷键
-MY.Game.SetHotKey = function(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
+function MY.Game.SetHotKey(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
 	if nIndex then
 		if string.sub(szCommand, 1, 3) ~= "MY_" then
 			szCommand = "MY_" .. szCommand
@@ -231,7 +231,7 @@ MY.Game.AddHotKey("MY_STOP_CASTING", _L["Stop cast skill"], function() GetClient
 --   #     # #   # #     #     #         # #           # # # #   # # # #
 -- #######################################################################################################
 -- 获取当前服务器
-MY.Game.GetServer = function()
+function MY.Game.GetServer()
 	return table.concat({GetUserServer()},'_'), {GetUserServer()}
 end
 MY.GetServer = MY.Game.GetServer
@@ -242,7 +242,7 @@ MY.GetServer = MY.Game.GetServer
 -- dwID  : 对象ID
 -- return: 根据 dwType 类型和 dwID 取得操作对象
 --         不存在时返回nil, nil
-MY.Game.GetObject = function(dwType, dwID)
+function MY.Game.GetObject(dwType, dwID)
 	if not dwID then
 		dwType, dwID = nil, dwType
 	end
@@ -279,7 +279,7 @@ end
 MY.GetObject = MY.Game.GetObject
 
 -- 获取指定对象的名字
-MY.Game.GetObjectName = function(obj)
+function MY.Game.GetObjectName(obj)
 	if not obj then
 		return nil
 	end
@@ -323,7 +323,7 @@ end
 MY.GetObjectName = MY.Game.GetObjectName
 
 -- 获取指定名字的右键菜单
-MY.Game.GetTargetContextMenu = function(dwType, szName, dwID)
+function MY.Game.GetTargetContextMenu(dwType, szName, dwID)
 	local t = {}
 	if dwType == TARGET.PLAYER then
 		-- 复制
@@ -406,7 +406,7 @@ MY.GetTargetContextMenu = MY.Game.GetTargetContextMenu
 -- 判断一个地图是不是副本
 -- (bool) MY.Game.IsDungeonMap(szMapName, bType)
 -- (bool) MY.Game.IsDungeonMap(dwMapID, bType)
-MY.Game.IsDungeonMap = function(dwMapID, bType)
+function MY.Game.IsDungeonMap(dwMapID, bType)
 	if not _Cache.tMapList then
 		_Cache.tMapList = {}
 		for _, dwMapID in ipairs(GetMapList()) do
@@ -435,7 +435,7 @@ MY.IsDungeonMap = MY.Game.IsDungeonMap
 -- 生成地图BOSS列表
 local BOSS_ADD_PATH = MY.GetAddonInfo().szFrameworkRoot .. "data/bosslist/add/$lang.jx3dat"
 local BOSS_DEL_PATH = MY.GetAddonInfo().szFrameworkRoot .. "data/bosslist/del/$lang.jx3dat"
-_C.GetDungeonBoss = function()
+function _C.GetDungeonBoss()
 	local t = {}
 	local nCount = g_tTable.DungeonBoss:GetRowCount()
 	for i = 2, nCount do
@@ -473,7 +473,7 @@ end
 -- 获取地图BOSS列表
 -- (table) MY.Game.GetBossList()
 -- (table) MY.Game.GetBossList(dwMapID)
-MY.Game.GetBossList = function(dwMapID)
+function MY.Game.GetBossList(dwMapID)
 	if dwMapID then
 		dwMapID = tonumber(dwMapID)
 		assert(dwMapID, "MY.Game.GetBossList: dwMapID is not a valid number")
@@ -498,7 +498,7 @@ end
 
 -- 获取指定地图指定模板ID的NPC是不是BOSS
 -- (boolean) MY.Game.IsBoss(dwMapID, dwTem)
-MY.Game.IsBoss = function(dwMapID, dwTemplateID)
+function MY.Game.IsBoss(dwMapID, dwTemplateID)
 	dwMapID, dwTemplateID = tostring(dwMapID), tostring(dwTemplateID)
 	if _C.tBossList and _C.tBossList[dwMapID]
 	and _C.tBossList[dwMapID][dwTemplateID] then

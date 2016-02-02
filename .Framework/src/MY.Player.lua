@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-22 14:54:12
+-- @Last Modified time: 2016-02-02 16:47:34
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -34,7 +34,7 @@ _C.tNearDoodad = {}   -- 附近的玩家
 
 -- 获取附近NPC列表
 -- (table) MY.GetNearNpc(void)
-MY.Player.GetNearNpc = function(nLimit)
+function MY.Player.GetNearNpc(nLimit)
 	local tNpc, i = {}, 0
 	for dwID, _ in pairs(_C.tNearNpc) do
 		local npc = GetNpc(dwID)
@@ -55,7 +55,7 @@ MY.GetNearNpc = MY.Player.GetNearNpc
 
 -- 获取附近玩家列表
 -- (table) MY.GetNearPlayer(void)
-MY.Player.GetNearPlayer = function(nLimit)
+function MY.Player.GetNearPlayer(nLimit)
 	local tPlayer, i = {}, 0
 	for dwID, _ in pairs(_C.tNearPlayer) do
 		local player = GetPlayer(dwID)
@@ -73,7 +73,7 @@ MY.GetNearPlayer = MY.Player.GetNearPlayer
 
 -- 获取附近物品列表
 -- (table) MY.GetNearPlayer(void)
-MY.Player.GetNearDoodad = function(nLimit)
+function MY.Player.GetNearDoodad(nLimit)
 	local tDoodad, i = {}, 0
 	for dwID, _ in pairs(_C.tNearDoodad) do
 		local dooded = GetDoodad(dwID)
@@ -98,7 +98,7 @@ RegisterEvent("DOODAD_LEAVE_SCENE", function() _C.tNearDoodad[arg0] = nil  end)
 
 -- 获取玩家自身信息（缓存）
 local m_ClientInfo
-MY.Player.GetClientInfo = function(bForceRefresh)
+function MY.Player.GetClientInfo(bForceRefresh)
 	if bForceRefresh or not (m_ClientInfo and m_ClientInfo.dwID) then
 		local me = GetClientPlayer()
 		if me then -- 确保获取到玩家
@@ -175,7 +175,7 @@ MY.RegisterEvent('LOADING_END', MY.Player.GetClientInfo)
 
 -- 获取唯一标识符
 local m_szUUID
-MY.Player.GetUUID = function()
+function MY.Player.GetUUID()
 	if not m_szUUID then
 		local me = GetClientPlayer()
 		if me.GetGlobalID and me.GetGlobalID() ~= "0" then
@@ -187,7 +187,7 @@ MY.Player.GetUUID = function()
 	return m_szUUID
 end
 
-_C.GeneFriendListCache = function()
+function _C.GeneFriendListCache()
 	if not _C.tFriendListByGroup then
 		local me = GetClientPlayer()
 		if me then
@@ -213,7 +213,7 @@ _C.GeneFriendListCache = function()
 	end
 	return true
 end
-_C.OnFriendListChange = function()
+function _C.OnFriendListChange()
 	_C.tFriendListByID = nil
 	_C.tFriendListByName = nil
 	_C.tFriendListByGroup = nil
@@ -229,7 +229,7 @@ MY.RegisterEvent("FELLOWSHIP_TWOWAY_FLAG_CHANGE", _C.OnFriendListChange)
 -- MY.Player.GetFriendList()         获取所有好友列表
 -- MY.Player.GetFriendList(1)        获取第一个分组好友列表
 -- MY.Player.GetFriendList("挽月堂") 获取分组名称为挽月堂的好友列表
-MY.Player.GetFriendList = function(arg0)
+function MY.Player.GetFriendList(arg0)
 	local t = {}
 	local tGroup = {}
 	if _C.GeneFriendListCache() then
@@ -255,7 +255,7 @@ MY.Player.GetFriendList = function(arg0)
 end
 
 -- 获取好友
-MY.Player.GetFriend = function(arg0)
+function MY.Player.GetFriend(arg0)
 	if arg0 and _C.GeneFriendListCache() then
 		if type(arg0) == "number" then
 			return clone(_C.tFriendListByID[arg0])
@@ -265,7 +265,7 @@ MY.Player.GetFriend = function(arg0)
 	end
 end
 
-_C.GeneFoeListCache = function()
+function _C.GeneFoeListCache()
 	if not _C.tFoeList then
 		local me = GetClientPlayer()
 		if me then
@@ -288,20 +288,20 @@ _C.GeneFoeListCache = function()
 	end
 	return true
 end
-_C.OnFoeListChange = function()
+function _C.OnFoeListChange()
 	_C.tFoeList = nil
 	_C.tFoeListByID = nil
 	_C.tFoeListByName = nil
 end
 MY.RegisterEvent("PLAYER_FOE_UPDATE", _C.OnFoeListChange)
 -- 获取仇人列表
-MY.Player.GetFoeList = function()
+function MY.Player.GetFoeList()
 	if _C.GeneFoeListCache() then
 		return clone(_C.tFoeList)
 	end
 end
 -- 获取仇人
-MY.Player.GetFoe = function(arg0)
+function MY.Player.GetFoe(arg0)
 	if arg0 and _C.GeneFoeListCache() then
 		if type(arg0) == "number" then
 			return _C.tFoeListByID[arg0]
@@ -312,7 +312,7 @@ MY.Player.GetFoe = function(arg0)
 end
 
 -- 获取好友列表
-MY.Player.GetTongMemberList = function(bShowOffLine, szSorter, bAsc)
+function MY.Player.GetTongMemberList(bShowOffLine, szSorter, bAsc)
 	if bShowOffLine == nil then bShowOffLine = false  end
 	if szSorter     == nil then szSorter     = 'name' end
 	if bAsc         == nil then bAsc         = true   end
@@ -330,7 +330,7 @@ MY.Player.GetTongMemberList = function(bShowOffLine, szSorter, bAsc)
 end
 
 -- 获取帮会成员
-MY.Player.GetTongMember = function(arg0)
+function MY.Player.GetTongMember(arg0)
 	if not arg0 then
 		return
 	end
@@ -339,7 +339,7 @@ MY.Player.GetTongMember = function(arg0)
 end
 
 -- 判断是不是队友
-MY.Player.IsParty = function(dwID)
+function MY.Player.IsParty(dwID)
 	return GetClientPlayer().IsPlayerInMyParty(dwID)
 end
 MY.IsParty = MY.Player.IsParty
@@ -362,7 +362,7 @@ _C.nLastFightUUID  = nil
 _C.nFightUUID      = nil
 _C.nFightBeginTick = -1
 _C.nFightEndTick   = -1
-_C.OnFightStateChange = function()
+function _C.OnFightStateChange()
 	-- 判定战斗边界
 	if MY.IsFighting() then
 		-- 进入战斗判断
@@ -390,7 +390,7 @@ end
 MY.BreatheCall(_C.OnFightStateChange)
 
 -- 获取当前战斗时间
-MY.Player.GetFightTime = function(szFormat)
+function MY.Player.GetFightTime(szFormat)
 	local nTick = 0
 	if MY.IsFighting() then -- 战斗状态
 		nTick = GetTickCount() - _C.nFightBeginTick
@@ -426,18 +426,18 @@ end
 MY.GetFightTime = MY.Player.GetFightTime
 
 -- 获取当前战斗唯一标示符
-MY.Player.GetFightUUID = function()
+function MY.Player.GetFightUUID()
 	return _C.nFightUUID
 end
 
 -- 获取上次战斗唯一标示符
-MY.Player.GetLastFightUUID = function()
+function MY.Player.GetLastFightUUID()
 	return _C.nLastFightUUID
 end
 
 -- 获取自身是否处于逻辑战斗状态
 -- (bool) MY.Player.IsFighting()
-MY.Player.IsFighting = function()
+function MY.Player.IsFighting()
 	local me = GetClientPlayer()
 	if not me then
 		return
@@ -488,7 +488,7 @@ MY.RegisterEvent("ARENA_START.MY-PLAYER", function() _C.bJJCStart = true end)
 -- 取得目标类型和ID
 -- (dwType, dwID) MY.GetTarget()       -- 取得自己当前的目标类型和ID
 -- (dwType, dwID) MY.GetTarget(object) -- 取得指定操作对象当前的目标类型和ID
-MY.Player.GetTarget = function(object)
+function MY.Player.GetTarget(object)
 	if not object then
 		object = GetClientPlayer()
 	end
@@ -504,7 +504,7 @@ MY.GetTarget = MY.Player.GetTarget
 -- (void) MY.SetTarget([number dwType, ]number dwID)
 -- dwType   -- *可选* 目标类型
 -- dwID     -- 目标 ID
-MY.Player.SetTarget = function(dwType, dwID)
+function MY.Player.SetTarget(dwType, dwID)
 	-- check dwType
 	if type(dwType) == "userdata" then
 		dwType, dwID = ( IsPlayer(dwType) and TARGET.PLAYER ) or TARGET.NPC, dwType.dwID
@@ -551,14 +551,14 @@ MY.SetTarget = MY.Player.SetTarget
 -- MY.Player.SetTempTarget(dwType, dwID)
 -- MY.Player.ResumeTarget()
 _C.pTempTarget = { TARGET.NO_TARGET, 0 }
-MY.Player.SetTempTarget = function(dwType, dwID)
+function MY.Player.SetTempTarget(dwType, dwID)
 	TargetPanel_SetOpenState(true)
 	_C.pTempTarget = { GetClientPlayer().GetTarget() }
 	MY.Player.SetTarget(dwType, dwID)
 	TargetPanel_SetOpenState(false)
 end
 MY.SetTempTarget = MY.Player.SetTempTarget
-MY.Player.ResumeTarget = function()
+function MY.Player.ResumeTarget()
 	TargetPanel_SetOpenState(true)
 	-- 当之前的目标不存在时，切到空目标
 	if _C.pTempTarget[1] ~= TARGET.NO_TARGET and not MY.GetObject(unpack(_C.pTempTarget)) then
@@ -574,7 +574,7 @@ MY.ResumeTarget = MY.Player.ResumeTarget
 -- (void) MY.Player.WithTarget(dwType, dwID, callback)
 _C.tWithTarget = {}
 _C.lockWithTarget = false
-_C.WithTargetHandle = function()
+function _C.WithTargetHandle()
 	if _C.lockWithTarget or
 	#_C.tWithTarget == 0 then
 		return
@@ -593,7 +593,7 @@ _C.WithTargetHandle = function()
 	_C.lockWithTarget = false
 	_C.WithTargetHandle()
 end
-MY.Player.WithTarget = function(dwType, dwID, callback)
+function MY.Player.WithTarget(dwType, dwID, callback)
 	-- 因为客户端多线程 所以加上资源锁 防止设置临时目标冲突
 	table.insert(_C.tWithTarget, {
 		dwType   = dwType  ,
@@ -616,7 +616,7 @@ end
 -- @param oN2   N2对象
 -- @return nil    参数错误
 -- @return number 面向角(-180, 180]
-MY.Player.GetFaceAngel = function(nX, nY, nFace, nTX, nTY, bAbs)
+function MY.Player.GetFaceAngel(nX, nY, nFace, nTX, nTY, bAbs)
 	if type(nY) == "userdata" and type(nX) == "userdata" then
 		nX, nY, nFace, nTX, nTY, bAbs = nX.nX, nX.nY, nX.nFaceDirection, nY.nX, nY.nY, nFace
 	end
@@ -636,7 +636,7 @@ MY.GetFaceAngel = MY.Player.GetFaceAngel
 -- 装备名为szName的装备
 -- (void) MY.Equip(szName)
 -- szName  装备名称
-MY.Player.Equip = function(szName)
+function MY.Player.Equip(szName)
 	local me = GetClientPlayer()
 	for i=1,6 do
 		if me.GetBoxSize(i)>0 then
@@ -666,7 +666,7 @@ end
 
 -- 获取对象的buff列表
 -- (table) MY.GetBuffList(KObject)
-MY.Player.GetBuffList = function(KObject)
+function MY.Player.GetBuffList(KObject)
 	KObject = KObject or GetClientPlayer()
 	local aBuffTable = {}
 	local nCount = KObject.GetBuffCount() or 0
@@ -691,7 +691,7 @@ MY.GetBuffList = MY.Player.GetBuffList
 
 -- 获取对象的buff
 -- (table) MY.GetBuff([KObject, ]dwID[, nLevel])
-MY.Player.GetBuff = function(KObject, dwID, nLevel)
+function MY.Player.GetBuff(KObject, dwID, nLevel)
 	local tBuff = {}
 	if type(KObject) ~= "userdata" then
 		KObject, dwID, nLevel = GetClientPlayer(), KObject, dwID
@@ -719,7 +719,7 @@ MY.GetBuff = MY.Player.GetBuff
 
 -- 点到自己的buff
 -- (table) MY.CancelBuff(dwID[, nLevel])
-MY.Player.CancelBuff = function(dwID, nLevel)
+function MY.Player.CancelBuff(dwID, nLevel)
 	local tBuffs = MY.Player.GetBuffList(GetClientPlayer())
 	for _, buff in ipairs(tBuffs) do
 		if buff.dwID == dwID
@@ -734,7 +734,7 @@ MY.CancelBuff = MY.Player.CancelBuff
 -- (mixed) MY.Player.IsInvincible([object KObject])
 -- @return <nil >: invalid KObject
 -- @return <bool>: object invincible state
-MY.Player.IsInvincible = function(KObject)
+function MY.Player.IsInvincible(KObject)
 	KObject = KObject or GetClientPlayer()
 	if not KObject then
 		return nil
@@ -750,7 +750,7 @@ _C.tPlayerSkills = {}   -- 玩家技能列表[缓存]   -- 技能名反查ID
 _C.tSkillCache = {}     -- 技能列表缓存         -- 技能ID查技能名称图标
 -- 通过技能名称获取技能对象
 -- (table) MY.GetSkillByName(szName)
-MY.Player.GetSkillByName = function(szName)
+function MY.Player.GetSkillByName(szName)
 	if table.getn(_C.tPlayerSkills)==0 then
 		for i = 1, g_tTable.Skill:GetRowCount() do
 			local tLine = g_tTable.Skill:GetRow(i)
@@ -764,13 +764,13 @@ end
 
 -- 判断技能名称是否有效
 -- (bool) MY.IsValidSkill(szName)
-MY.Player.IsValidSkill = function(szName)
+function MY.Player.IsValidSkill(szName)
 	if MY.Player.GetSkillByName(szName)==nil then return false else return true end
 end
 
 -- 判断当前用户是否可用某个技能
 -- (bool) MY.CanUseSkill(number dwSkillID[, dwLevel])
-MY.Player.CanUseSkill = function(dwSkillID, dwLevel)
+function MY.Player.CanUseSkill(dwSkillID, dwLevel)
 	-- 判断技能是否有效 并将中文名转换为技能ID
 	if type(dwSkillID) == "string" then if MY.IsValidSkill(dwSkillID) then dwSkillID = MY.Player.GetSkillByName(dwSkillID).dwSkillID else return false end end
 	local me, box = GetClientPlayer(), _C.hBox
@@ -795,7 +795,7 @@ end
 
 -- 根据技能 ID 及等级获取技能的名称及图标 ID（内置缓存处理）
 -- (string, number) MY.Player.GetSkillName(number dwSkillID[, number dwLevel])
-MY.Player.GetSkillName = function(dwSkillID, dwLevel)
+function MY.Player.GetSkillName(dwSkillID, dwLevel)
 	if not _C.tSkillCache[dwSkillID] then
 		local tLine = Table_GetSkill(dwSkillID, dwLevel)
 		if tLine and tLine.dwSkillID > 0 and tLine.bShow
@@ -816,7 +816,7 @@ end
 -- 登出游戏
 -- (void) MY.LogOff(bCompletely)
 -- bCompletely 为true返回登陆页 为false返回角色页 默认为false
-MY.Player.LogOff = function(bCompletely)
+function MY.Player.LogOff(bCompletely)
 	if bCompletely then
 		ReInitUI(LOAD_LOGIN_REASON.RETURN_GAME_LOGIN)
 	else
@@ -826,7 +826,7 @@ end
 
 -- 根据技能 ID 获取引导帧数，非引导技能返回 nil
 -- (number) MY.Player.GetChannelSkillFrame(number dwSkillID)
-MY.Player.GetChannelSkillFrame = function(dwSkillID)
+function MY.Player.GetChannelSkillFrame(dwSkillID)
 	local t = _C.tSkillEx[dwSkillID]
 	if t then
 		return t.nChannelFrame
@@ -837,7 +837,7 @@ _C.tSkillEx = MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. "data/skill_ex
 
 -- 判断自己在不在队伍里
 -- (bool) MY.Player.IsInParty()
-MY.Player.IsInParty = function()
+function MY.Player.IsInParty()
 	local me = GetClientPlayer()
 	return me and me.IsInParty()
 end
@@ -845,7 +845,7 @@ MY.IsInParty = MY.Player.IsInParty
 
 -- 判断当前地图是不是竞技场
 -- (bool) MY.Player.IsInArena()
-MY.Player.IsInArena = function()
+function MY.Player.IsInArena()
 	local me = GetClientPlayer()
 	return me and (
 		me.GetScene().bIsArenaMap or -- JJC
@@ -857,7 +857,7 @@ MY.IsInArena = MY.Player.IsInArena
 
 -- 判断当前地图是不是战场
 -- (bool) MY.Player.IsInBattleField()
-MY.Player.IsInBattleField = function()
+function MY.Player.IsInBattleField()
 	local me = GetClientPlayer()
 	return me and me.GetScene().nType == MAP_TYPE.BATTLE_FIELD and not MY.Player.IsInArena()
 end
@@ -865,7 +865,7 @@ MY.IsInBattleField = MY.Player.IsInBattleField
 
 -- 判断当前地图是不是副本
 -- (bool) MY.Player.IsInDungeon(bool bType)
-MY.Player.IsInDungeon = function(bType)
+function MY.Player.IsInDungeon(bType)
 	local me = GetClientPlayer()
 	return me and MY.IsDungeonMap(me.GetMapID(), bType)
 end

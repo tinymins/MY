@@ -4,7 +4,7 @@
 -- @Date  : 2015-01-25 15:35:26
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-05-29 10:06:20
+-- @Last Modified time: 2016-02-02 16:47:40
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 ------------------------------------------------------------------------
@@ -31,7 +31,7 @@ MY.String = MY.String or {}
 -- szText           原始字符串
 -- szSpliter        分隔符
 -- bIgnoreEmptyPart 是否忽略空字符串，即"123;234;"被";"分成{"123","234"}还是{"123","234",""}
-MY.String.Split = function(szText, szSep, bIgnoreEmptyPart)
+function MY.String.Split(szText, szSep, bIgnoreEmptyPart)
 	local nOff, tResult, szPart = 1, {}
 	while true do
 		local nEnd = StringFindW(szText, szSep, nOff)
@@ -54,11 +54,11 @@ end
 
 -- 转义正则表达式特殊字符
 -- (string) MY.String.PatternEscape(string szText)
-MY.String.PatternEscape = function(s) return (string.gsub(s, '([%(%)%.%%%+%-%*%?%[%^%$%]])', '%%%1')) end
+function MY.String.PatternEscape(s) return (string.gsub(s, '([%(%)%.%%%+%-%*%?%[%^%$%]])', '%%%1')) end
 
 -- 清除字符串首尾的空白字符
 -- (string) MY.String.Trim(string szText)
-MY.String.Trim = function(szText)
+function MY.String.Trim(szText)
 	if not szText or szText == "" then
 		return ""
 	end
@@ -67,21 +67,21 @@ end
 
 -- 转换为 URL 编码
 -- (string) MY.String.UrlEncode(string szText)
-MY.String.UrlEncode = function(szText)
+function MY.String.UrlEncode(szText)
 	return szText:gsub("([^0-9a-zA-Z ])", function (c) return string.format ("%%%02X", string.byte(c)) end):gsub(" ", "+")
 end
 
 -- 解析 URL 编码
 -- (string) MY.String.UrlDecode(string szText)
-MY.String.UrlDecode = function(szText)
+function MY.String.UrlDecode(szText)
 	return szText:gsub("+", " "):gsub("%%(%x%x)", function(h) return string.char(tonumber(h, 16)) end)
 end
 
-MY.String.LenW = function(str)
+function MY.String.LenW(str)
 	return wstring.len(str)
 end
 
-MY.String.SubW = function(str,s,e)
+function MY.String.SubW(str,s,e)
 	if s < 0 then
 		s = wstring.len(str) + s
 	end
@@ -91,7 +91,7 @@ MY.String.SubW = function(str,s,e)
 	return wstring.sub(str, s, e)
 end
 
-MY.String.SimpleEcrypt = function(szText)
+function MY.String.SimpleEcrypt(szText)
 	return szText:gsub('.', function (c) return string.format ("%02X", (string.byte(c) + 13) % 256) end):gsub(" ", "+")
 end
 
