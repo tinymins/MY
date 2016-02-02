@@ -478,6 +478,15 @@ MY.Chat.FormatContent = function(szMsg)
 	return t2
 end
 
+-- 字符串化一个聊天table结构体
+MY.Chat.StringfyContent = function(t)
+	local t1 = {}
+	for _, v in ipairs(t) do
+		table.insert(t1, v.text)
+	end
+	return table.concat(t1)
+end
+
 -- 判断某个频道能否发言
 -- (bool) MY.CanTalk(number nChannel)
 MY.Chat.CanTalk = function(nChannel)
