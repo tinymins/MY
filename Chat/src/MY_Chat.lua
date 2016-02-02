@@ -436,7 +436,9 @@ MY_Chat.ReInitUI = function()
 			Station.SetFocusWindow("Lowest2/EditBox/Edit_Input")
 		end, function()
 			MY.SwitchChat("/cafk")
-		end):find(".Text"):pos(5,-16):width(25):font(197)
+		end)
+		:tip(function() return _Cache.szAfk or g_tStrings.STR_AUTO_REPLAY_LEAVE end)
+		:find(".Text"):pos(5,-16):width(25):font(197)
 	end
 	
 	if MY_Chat.tChannel.Check_Busy then
@@ -451,7 +453,9 @@ MY_Chat.ReInitUI = function()
 			Station.SetFocusWindow("Lowest2/EditBox/Edit_Input")
 		end, function()
 			MY.SwitchChat("/catr")
-		end):find(".Text"):pos(5,-16):width(25):font(197)
+		end)
+		:tip(function() return _Cache.szAtr end)
+		:find(".Text"):pos(5,-16):width(25):font(197)
 	end
 	
 	if MY_Chat.tChannel.Check_Mosaics then
@@ -482,6 +486,22 @@ end)
 MY.RegisterEvent("MY_PRIVATE_STORAGE_UPDATE", function()
 	if arg0 == "MY_CHAT_BLOCKWORD" then
 		MY_Chat.tBlockWords = arg1
+	end
+end)
+
+MY.RegisterEvent("ON_CHAT_SET_AFK", function()
+	if type(arg0) == "table" then
+		_Cache.szAfk = MY.Chat.StringfyContent(arg0)
+	else
+		_Cache.szAfk = arg0 and tostring(arg0)
+	end
+end)
+
+MY.RegisterEvent("ON_CHAT_SET_ATR", function()
+	if type(arg0) == "table" then
+		_Cache.szAtr = MY.Chat.StringfyContent(arg0)
+	else
+		_Cache.szAtr = arg0 and tostring(arg0)
 	end
 end)
 
