@@ -2727,6 +2727,9 @@ function XGUI:tip(tip, nPosType, tOffset, bNoEncode)
 		if type(szTip) == 'function' then
 			szTip = szTip()
 		end
+		if empty(szTip) then
+			return
+		end
 		if not bNoEncode then
 			szTip = GetFormatText(szTip, tOffset.nFont, tOffset.r, tOffset.g, tOffset.b)
 		end
