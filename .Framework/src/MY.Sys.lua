@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-06-26 11:38:05
+-- @Last Modified time: 2016-02-02 16:47:46
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 local srep, tostring, string2byte = string.rep, tostring, string.byte
@@ -16,14 +16,14 @@ MY.Sys.bShieldedVersion = false -- 屏蔽被河蟹的功能（国服启用）
 local _L, _C = MY.LoadLangPack(), {}
 
 -- 获取游戏语言
-MY.Sys.GetLang = function()
+function MY.Sys.GetLang()
 	local _, _, lang = GetVersion()
 	return lang
 end
 MY.GetLang = MY.Sys.GetLang
 
 -- 获取功能屏蔽状态
-MY.Sys.IsShieldedVersion = function(bShieldedVersion)
+function MY.Sys.IsShieldedVersion(bShieldedVersion)
 	if bShieldedVersion == nil then
 		return MY.Sys.bShieldedVersion
 	else
@@ -55,7 +55,7 @@ end)
 -- ##################################################################################################
 -- 格式化数据文件路径（替换$uid、$lang、$server以及补全相对路径）
 -- (string) MY.Sys.GetLUADataPath(szFileUri)
-MY.Sys.GetLUADataPath = function(szFileUri)
+function MY.Sys.GetLUADataPath(szFileUri)
 	-- Unified the directory separator
 	szFileUri = string.gsub(szFileUri, '\\', '/')
 	-- if exist $uid then add user role identity
@@ -99,7 +99,7 @@ MY.GetLUADataPath = MY.Sys.GetLUADataPath
 -- nohashlevels        纯LIST表所在层（优化大表读写效率）
 -- (1)： 当路径为绝对路径时(以斜杠开头)不作处理
 --       当路径为相对路径时 相对于插件下@DATA目录
-MY.Sys.SaveLUAData = function(szFileUri, tData, indent, crc, nohashlevels)
+function MY.Sys.SaveLUAData(szFileUri, tData, indent, crc, nohashlevels)
 	local nStartTick = GetTickCount()
 	-- format uri
 	szFileUri = MY.GetLUADataPath(szFileUri)
@@ -116,7 +116,7 @@ MY.SaveLUAData = MY.Sys.SaveLUAData
 -- szFileUri           数据文件路径(1)
 -- (1)： 当路径为绝对路径时(以斜杠开头)不作处理
 --       当路径为相对路径时 相对于插件下@DATA目录
-MY.Sys.LoadLUAData = function(szFileUri)
+function MY.Sys.LoadLUAData(szFileUri)
 	local nStartTick = GetTickCount()
 	-- format uri
 	szFileUri = MY.GetLUADataPath(szFileUri)
@@ -129,11 +129,11 @@ end
 MY.LoadLUAData = MY.Sys.LoadLUAData
 
 --szName [, szDataFile]
-MY.RegisterUserData = function(szName, szFileName)
+function MY.RegisterUserData(szName, szFileName)
 	
 end
 
-MY.Sys.SetGlobalValue = function(szVarPath, Val)
+function MY.Sys.SetGlobalValue(szVarPath, Val)
 	local t = MY.String.Split(szVarPath, ".")
 	local tab = _G
 	for k, v in ipairs(t) do
@@ -148,7 +148,7 @@ MY.Sys.SetGlobalValue = function(szVarPath, Val)
 end
 MY.SetGlobalValue = MY.Sys.SetGlobalValue
 
-MY.Sys.GetGlobalValue = function(szVarPath)
+function MY.Sys.GetGlobalValue(szVarPath)
 	local tVariable = _G
 	for szIndex in string.gmatch(szVarPath, "[^%.]+") do
 		if tVariable and type(tVariable) == "table" then
@@ -167,7 +167,7 @@ MY.GetGlobalValue = MY.Sys.GetGlobalValue
 -- szFilePath   音频文件地址
 -- szCustomPath 个性化音频文件地址
 -- 注：优先播放szCustomPath, szCustomPath不存在才会播放szFilePath
-MY.Sys.PlaySound = function(szFilePath, szCustomPath)
+function MY.Sys.PlaySound(szFilePath, szCustomPath)
 	szCustomPath = szCustomPath or szFilePath
 	-- 统一化目录分隔符
 	szCustomPath = string.gsub(szCustomPath, '\\', '/')
@@ -211,7 +211,7 @@ _C.tFreeWebPages = {}
 -- (void) MY.RemoteRequest(string szUrl, func fnAction)       -- 发起远程 HTTP 请求
 -- szUrl        -- 请求的完整 URL（包含 http:// 或 https://）
 -- fnAction     -- 请求完成后的回调函数，回调原型：function(szTitle, szContent)]]
-MY.RemoteRequest = function(szUrl, fnSuccess, fnError, nTimeout)
+function MY.RemoteRequest(szUrl, fnSuccess, fnError, nTimeout)
 	if not (type(szUrl) == "string" and type(fnSuccess) == "function") then
 		return
 	end
@@ -308,7 +308,7 @@ MY.RegisterExit("'MYLIB#STORAGE_DATA", function()
 	MY.SaveLUAData('config/STORAGE_VERSION/$uid.$lang.jx3dat', m_nStorageVer)
 end)
 -- 保存个人数据 方便网吧党和公司家里多电脑切换
-MY.Sys.StorageData = function(szKey, oData)
+function MY.Sys.StorageData(szKey, oData)
 	MY.DelayCall("STORAGE_" .. szKey, 120000, function()
 		MY.RemoteRequest('http://data.jx3.derzh.com/data/sync.php?l=' .. MY.GetLang()
 		.. "&data=" .. MY.String.SimpleEcrypt(MY.Json.Encode({
@@ -345,7 +345,7 @@ _C.tTargetMenu = {}   -- 目标头像菜单
 _C.tTraceMenu  = {}   -- 工具栏菜单
 
 -- get plugin folder menu
-_C.GetMainMenu = function()
+function _C.GetMainMenu()
 	return {
 		szOption = _L["mingyi plugins"],
 		fnAction = MY.TogglePanel,
@@ -359,7 +359,7 @@ _C.GetMainMenu = function()
 	}
 end
 -- get player addon menu
-_C.GetPlayerAddonMenu = function()
+function _C.GetPlayerAddonMenu()
 	-- 创建菜单
 	local menu = _C.GetMainMenu()
 	for i = 1, #_C.tPlayerMenu, 1 do
@@ -373,7 +373,7 @@ _C.GetPlayerAddonMenu = function()
 	return {menu}
 end
 -- get target addon menu
-_C.GetTargetAddonMenu = function()
+function _C.GetTargetAddonMenu()
 	local menu = {}
 	for i = 1, #_C.tTargetMenu, 1 do
 		local m = _C.tTargetMenu[i].Menu
@@ -386,7 +386,7 @@ _C.GetTargetAddonMenu = function()
 	return menu
 end
 -- get trace button menu
-_C.GetTraceButtonMenu = function()
+function _C.GetTraceButtonMenu()
 	local menu = _C.GetMainMenu()
 	for i = 1, #_C.tTraceMenu, 1 do
 		local m = _C.tTraceMenu[i].Menu
@@ -405,7 +405,7 @@ end
 -- (void) MY.RegisterPlayerAddonMenu(Menu)
 -- 注销
 -- (void) MY.RegisterPlayerAddonMenu(szName)
-MY.RegisterPlayerAddonMenu = function(arg1, arg2)
+function MY.RegisterPlayerAddonMenu(arg1, arg2)
 	local szName, Menu
 	if type(arg1)=='string' then szName = arg1 end
 	if type(arg2)=='string' then szName = arg2 end
@@ -436,7 +436,7 @@ end
 -- (void) MY.RegisterTargetAddonMenu(Menu)
 -- 注销
 -- (void) MY.RegisterTargetAddonMenu(szName)
-MY.RegisterTargetAddonMenu = function(arg1, arg2)
+function MY.RegisterTargetAddonMenu(arg1, arg2)
 	local szName, Menu
 	if type(arg1)=='string' then szName = arg1 end
 	if type(arg2)=='string' then szName = arg2 end
@@ -467,7 +467,7 @@ end
 -- (void) MY.RegisterTraceButtonMenu(Menu)
 -- 注销
 -- (void) MY.RegisterTraceButtonMenu(szName)
-MY.RegisterTraceButtonMenu = function(arg1, arg2)
+function MY.RegisterTraceButtonMenu(arg1, arg2)
 	local szName, Menu
 	if type(arg1)=='string' then szName = arg1 end
 	if type(arg2)=='string' then szName = arg2 end
@@ -516,7 +516,7 @@ Target_AppendAddonMenu( { _C.GetTargetAddonMenu } )
 -- szTitle      消息头部
 -- tContentRgbF 主体消息文字颜色rgbf[可选，为空使用默认颜色字体。]
 -- tTitleRgbF   消息头部文字颜色rgbf[可选，为空和主体消息文字颜色相同。]
-MY.Sysmsg = function(oContent, oTitle)
+function MY.Sysmsg(oContent, oTitle)
 	oTitle = oTitle or MY.GetAddonInfo().szShortName
 	if type(oTitle)~='table' then oTitle = { oTitle, bNoWrap = true } end
 	if type(oContent)~='table' then oContent = { oContent, bNoWrap = true } end
@@ -553,7 +553,7 @@ end
 -- oContent Debug信息
 -- szTitle  Debug头
 -- nLevel   Debug级别[低于当前设置值将不会输出]
-MY.Debug = function(oContent, szTitle, nLevel)
+function MY.Debug(oContent, szTitle, nLevel)
 	if type(nLevel)~="number"  then nLevel = MY_DEBUG.WARNING end
 	if type(szTitle)~="string" then szTitle = 'MY DEBUG' end
 	if type(oContent)~='table' then oContent = { oContent, bNoWrap = true } end
@@ -576,7 +576,7 @@ MY.Debug = function(oContent, szTitle, nLevel)
 	end
 end
 
-MY.StartDebugMode = function()
+function MY.StartDebugMode()
 	if JH then
 		JH.bDebugClient = true
 	end
@@ -586,7 +586,7 @@ end
 -- 格式化计时时间
 -- (string) MY.Sys.FormatTimeCount(szFormat, nTime)
 -- szFormat  格式化字符串 可选项H,M,S,hh,mm,ss,h,m,s
-MY.Sys.FormatTimeCount = function(szFormat, nTime)
+function MY.Sys.FormatTimeCount(szFormat, nTime)
 	local nSeconds = math.floor(nTime)
 	local nMinutes = math.floor(nSeconds / 60)
 	local nHours   = math.floor(nMinutes / 60)
@@ -609,7 +609,7 @@ MY.FormatTimeCount = MY.Sys.FormatTimeCount
 -- (string) MY.Sys.FormatTimeCount(szFormat, nTimestamp)
 -- szFormat   格式化字符串 可选项yyyy,yy,MM,dd,y,m,d,hh,mm,ss,h,m,s
 -- nTimestamp UNIX时间戳
-MY.Sys.FormatTime = function(szFormat, nTimestamp)
+function MY.Sys.FormatTime(szFormat, nTimestamp)
 	local t = TimeToDate(nTimestamp)
 	szFormat = szFormat:gsub('yyyy', string.format('%04d', t.year  ))
 	szFormat = szFormat:gsub('yy'  , string.format('%02d', t.year % 100))
@@ -635,7 +635,7 @@ MY.FormatTime = MY.Sys.FormatTime
 -- (function)fnCondition -- a function returns if fnAction will be execute
 -- (function)fnAction    -- inf fnCondition() is true then fnAction will be called
 -- (boolean)bTopmost    -- this param equals true will be called in high priority
-MY.Sys.RegisterEsc = function(szID, fnCondition, fnAction, bTopmost)
+function MY.Sys.RegisterEsc(szID, fnCondition, fnAction, bTopmost)
 	if fnCondition and fnAction then
 		if RegisterGlobalEsc then
 			RegisterGlobalEsc(szID, fnCondition, fnAction, bTopmost)
@@ -658,7 +658,7 @@ function MY.ProcessCommand(cmd)
 end
 end
 
-MY.Sys.DoMessageBox = function(szName, i)
+function MY.Sys.DoMessageBox(szName, i)
 	local frame = Station.Lookup("Topmost2/MB_" .. szName) or Station.Lookup("Topmost/MB_" .. szName)
 	if frame then
 		i = i or 1
