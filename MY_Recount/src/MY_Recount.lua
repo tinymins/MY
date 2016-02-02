@@ -1,44 +1,44 @@
 --
--- Õ½¶·Í³¼Æ
--- by ÜøÒÁ @ Ë«ÃÎÕò @ İ¶»¨¹¬
+-- æˆ˜æ–—ç»Ÿè®¡
+-- by èŒ—ä¼Š @ åŒæ¢¦é•‡ @ è»èŠ±å®«
 -- Build 20140730
 --
-local CHANNEL = { -- Í³¼ÆÀàĞÍ
-	DPS  = 1, -- Êä³öÍ³¼Æ
-	HPS  = 2, -- ÖÎÁÆÍ³¼Æ
-	BDPS = 3, -- ³ĞÉËÍ³¼Æ
-	BHPS = 4, -- ³ĞÁÆÍ³¼Æ
+local CHANNEL = { -- ç»Ÿè®¡ç±»å‹
+	DPS  = 1, -- è¾“å‡ºç»Ÿè®¡
+	HPS  = 2, -- æ²»ç–—ç»Ÿè®¡
+	BDPS = 3, -- æ‰¿ä¼¤ç»Ÿè®¡
+	BHPS = 4, -- æ‰¿ç–—ç»Ÿè®¡
 }
-local SZ_CHANNEL_KEY = { -- Í³¼ÆÀàĞÍÊı×éÃû
+local SZ_CHANNEL_KEY = { -- ç»Ÿè®¡ç±»å‹æ•°ç»„å
 	[CHANNEL.DPS ] = 'Damage',
 	[CHANNEL.HPS ] = 'Heal',
 	[CHANNEL.BDPS] = 'BeDamage',
 	[CHANNEL.BHPS] = 'BeHeal',
 }
 local SZ_CHANNEL = {
-	[CHANNEL.DPS ] = g_tStrings.STR_DAMAGE_STATISTIC    , -- ÉËº¦Í³¼Æ
-	[CHANNEL.HPS ] = g_tStrings.STR_THERAPY_STATISTIC   , -- ÖÎÁÆÍ³¼Æ
-	[CHANNEL.BDPS] = g_tStrings.STR_BE_DAMAGE_STATISTIC , -- ³ĞÉËÍ³¼Æ
-	[CHANNEL.BHPS] = g_tStrings.STR_BE_THERAPY_STATISTIC, -- ³ĞÁÆÍ³¼Æ
+	[CHANNEL.DPS ] = g_tStrings.STR_DAMAGE_STATISTIC    , -- ä¼¤å®³ç»Ÿè®¡
+	[CHANNEL.HPS ] = g_tStrings.STR_THERAPY_STATISTIC   , -- æ²»ç–—ç»Ÿè®¡
+	[CHANNEL.BDPS] = g_tStrings.STR_BE_DAMAGE_STATISTIC , -- æ‰¿ä¼¤ç»Ÿè®¡
+	[CHANNEL.BHPS] = g_tStrings.STR_BE_THERAPY_STATISTIC, -- æ‰¿ç–—ç»Ÿè®¡
 }
-local DISPLAY_MODE = { -- Í³¼ÆÏÔÊ¾
-	NPC    = 1, -- Ö»ÏÔÊ¾NPC
-	PLAYER = 2, -- Ö»ÏÔÊ¾Íæ¼Ò
-	BOTH   = 3, -- »ìºÏÏÔÊ¾
+local DISPLAY_MODE = { -- ç»Ÿè®¡æ˜¾ç¤º
+	NPC    = 1, -- åªæ˜¾ç¤ºNPC
+	PLAYER = 2, -- åªæ˜¾ç¤ºç©å®¶
+	BOTH   = 3, -- æ··åˆæ˜¾ç¤º
 }
 local PUBLISH_MODE = {
-	EFFECT = 1, -- Ö»ÏÔÊ¾ÓĞĞ§Öµ
-	TOTAL  = 2, -- Ö»ÏÔÊ¾×ÜÊıÖµ
-	BOTH   = 3, -- Í¬Ê±ÏÔÊ¾ÓĞĞ§ºÍ×ÜÊı
+	EFFECT = 1, -- åªæ˜¾ç¤ºæœ‰æ•ˆå€¼
+	TOTAL  = 2, -- åªæ˜¾ç¤ºæ€»æ•°å€¼
+	BOTH   = 3, -- åŒæ—¶æ˜¾ç¤ºæœ‰æ•ˆå’Œæ€»æ•°
 }
 local SKILL_RESULT = {
-	HIT     = 0, -- ÃüÖĞ
-	BLOCK   = 1, -- ¸ñµ²
-	SHIELD  = 2, -- ÎŞĞ§
-	MISS    = 3, -- Æ«Àë
-	DODGE   = 4, -- ÉÁ±Ü
-	CRITICAL= 5, -- »áĞÄ
-	INSIGHT = 6, -- Ê¶ÆÆ
+	HIT     = 0, -- å‘½ä¸­
+	BLOCK   = 1, -- æ ¼æŒ¡
+	SHIELD  = 2, -- æ— æ•ˆ
+	MISS    = 3, -- åç¦»
+	DODGE   = 4, -- é—ªé¿
+	CRITICAL= 5, -- ä¼šå¿ƒ
+	INSIGHT = 6, -- è¯†ç ´
 }
 local SZ_SKILL_RESULT = {
 	[SKILL_RESULT.HIT     ] = g_tStrings.STR_HIT_NAME     ,
@@ -63,77 +63,77 @@ local _C = {
 		{
 			['Bar'] = {
 				[-1                  ] = { r = 255, g = 255, b = 255, a = 150 }, -- NPC
-				[FORCE_TYPE.JIANG_HU ] = { r = 255, g = 255, b = 255, a = 255 }, -- ½­ºş
-				[FORCE_TYPE.SHAO_LIN ] = { r = 210, g = 180, b = 0  , a = 144 }, -- ÉÙÁÖ
-				[FORCE_TYPE.WAN_HUA  ] = { r = 127, g = 31 , b = 223, a = 180 }, -- Íò»¨
-				[FORCE_TYPE.TIAN_CE  ] = { r = 160, g = 0  , b = 0  , a = 200 }, -- Ìì²ß
-				[FORCE_TYPE.CHUN_YANG] = { r = 56 , g = 175, b = 255, a = 144 }, -- ´¿Ñô 56,175,255,232
-				[FORCE_TYPE.QI_XIU   ] = { r = 255, g = 127, b = 255, a = 128 }, -- ÆßĞã
-				[FORCE_TYPE.WU_DU    ] = { r = 63 , g = 31 , b = 159, a = 128 }, -- Îå¶¾
-				[FORCE_TYPE.TANG_MEN ] = { r = 0  , g = 133, b = 144, a = 180 }, -- ÌÆÃÅ
-				[FORCE_TYPE.CANG_JIAN] = { r = 255, g = 255, b = 0  , a = 144 }, -- ²Ø½£
-				[FORCE_TYPE.GAI_BANG ] = { r = 205, g = 133, b = 63 , a = 180 }, -- Ø¤°ï
-				[FORCE_TYPE.MING_JIAO] = { r = 253, g = 84 , b = 0  , a = 144 }, -- Ã÷½Ì
-				[FORCE_TYPE.CANG_YUN ] = { r = 180, g = 60 , b = 0  , a = 255 }, -- ²ÔÔÆ
-				[FORCE_TYPE.CHANG_GE ] = { r = 100, g = 250, b = 180, a = 100 }, -- ³¤¸è
+				[FORCE_TYPE.JIANG_HU ] = { r = 255, g = 255, b = 255, a = 255 }, -- æ±Ÿæ¹–
+				[FORCE_TYPE.SHAO_LIN ] = { r = 255, g = 178, b = 95 , a = 144 }, -- å°‘æ—
+				[FORCE_TYPE.WAN_HUA  ] = { r = 196, g = 152, b = 255, a = 180 }, -- ä¸‡èŠ±
+				[FORCE_TYPE.TIAN_CE  ] = { r = 255, g = 111, b = 83 , a = 200 }, -- å¤©ç­–
+				[FORCE_TYPE.CHUN_YANG] = { r = 89 , g = 224, b = 232, a = 144 }, -- çº¯é˜³ 56,175,255,232
+				[FORCE_TYPE.QI_XIU   ] = { r = 255, g = 129, b = 176, a = 128 }, -- ä¸ƒç§€
+				[FORCE_TYPE.WU_DU    ] = { r = 55 , g = 147, b = 255, a = 128 }, -- äº”æ¯’
+				[FORCE_TYPE.TANG_MEN ] = { r = 121, g = 183, b = 54 , a = 180 }, -- å”é—¨
+				[FORCE_TYPE.CANG_JIAN] = { r = 214, g = 249, b = 93 , a = 144 }, -- è—å‰‘
+				[FORCE_TYPE.GAI_BANG ] = { r = 205, g = 133, b = 63 , a = 180 }, -- ä¸å¸®
+				[FORCE_TYPE.MING_JIAO] = { r = 240, g = 70 , b = 96 , a = 144 }, -- æ˜æ•™
+				[FORCE_TYPE.CANG_YUN ] = { r = 180, g = 60 , b = 0  , a = 255 }, -- è‹äº‘
+				[FORCE_TYPE.CHANG_GE ] = { r = 100, g = 250, b = 180, a = 100 }, -- é•¿æ­Œ
 			},
 		}, {
 			['Bar'] = {
 				[-1                  ] = { r = 255, g = 255, b = 255, a = 150 }, -- NPC
-				[FORCE_TYPE.JIANG_HU ] = { r = 255, g = 255, b = 255, a = 255 }, -- ½­ºş
-				[FORCE_TYPE.SHAO_LIN ] = { r = 210, g = 180, b = 0  , a = 144 }, -- ÉÙÁÖ
-				[FORCE_TYPE.WAN_HUA  ] = { r = 100, g = 0  , b = 150, a = 96  }, -- Íò»¨
-				[FORCE_TYPE.TIAN_CE  ] = { r = 0  , g = 128, b = 0  , a = 255 }, -- Ìì²ß
-				[FORCE_TYPE.CHUN_YANG] = { r = 0  , g = 175, b = 230, a = 112 }, -- ´¿Ñô
-				[FORCE_TYPE.QI_XIU   ] = { r = 240, g = 80 , b = 240, a = 96  }, -- ÆßĞã
-				[FORCE_TYPE.WU_DU    ] = { r = 0  , g = 128, b = 255, a = 144 }, -- Îå¶¾
-				[FORCE_TYPE.TANG_MEN ] = { r = 121, g = 183, b = 54 , a = 144 }, -- ÌÆÃÅ
-				[FORCE_TYPE.CANG_JIAN] = { r = 215, g = 241, b = 74 , a = 144 }, -- ²Ø½£
-				[FORCE_TYPE.GAI_BANG ] = { r = 205, g = 133, b = 63 , a = 180 }, -- Ø¤°ï
-				[FORCE_TYPE.MING_JIAO] = { r = 240, g = 70 , b = 96 , a = 180 }, -- Ã÷½Ì
-				[FORCE_TYPE.CANG_YUN ] = { r = 180, g = 60 , b = 0  , a = 255 }, -- ²ÔÔÆ
-				[FORCE_TYPE.CHANG_GE ] = { r = 100, g = 250, b = 180, a = 150 }, -- ³¤¸è
+				[FORCE_TYPE.JIANG_HU ] = { r = 255, g = 255, b = 255, a = 255 }, -- æ±Ÿæ¹–
+				[FORCE_TYPE.SHAO_LIN ] = { r = 210, g = 180, b = 0  , a = 144 }, -- å°‘æ—
+				[FORCE_TYPE.WAN_HUA  ] = { r = 100, g = 0  , b = 150, a = 96  }, -- ä¸‡èŠ±
+				[FORCE_TYPE.TIAN_CE  ] = { r = 0  , g = 128, b = 0  , a = 255 }, -- å¤©ç­–
+				[FORCE_TYPE.CHUN_YANG] = { r = 0  , g = 175, b = 230, a = 112 }, -- çº¯é˜³
+				[FORCE_TYPE.QI_XIU   ] = { r = 240, g = 80 , b = 240, a = 96  }, -- ä¸ƒç§€
+				[FORCE_TYPE.WU_DU    ] = { r = 0  , g = 128, b = 255, a = 144 }, -- äº”æ¯’
+				[FORCE_TYPE.TANG_MEN ] = { r = 121, g = 183, b = 54 , a = 144 }, -- å”é—¨
+				[FORCE_TYPE.CANG_JIAN] = { r = 215, g = 241, b = 74 , a = 144 }, -- è—å‰‘
+				[FORCE_TYPE.GAI_BANG ] = { r = 205, g = 133, b = 63 , a = 180 }, -- ä¸å¸®
+				[FORCE_TYPE.MING_JIAO] = { r = 240, g = 70 , b = 96 , a = 180 }, -- æ˜æ•™
+				[FORCE_TYPE.CANG_YUN ] = { r = 180, g = 60 , b = 0  , a = 255 }, -- è‹äº‘
+				[FORCE_TYPE.CHANG_GE ] = { r = 100, g = 250, b = 180, a = 150 }, -- é•¿æ­Œ
 			},
 		}, {
 			['Bar'] = {
 				[-1                  ] = { image = "ui/Image/Common/Money.UITex", frame = 215 }, -- NPC
-				[FORCE_TYPE.JIANG_HU ] = { image = "ui/Image/Common/Money.UITex", frame = 210 }, -- ´óÏÀ
-				[FORCE_TYPE.SHAO_LIN ] = { image = "ui/Image/Common/Money.UITex", frame = 203 }, -- ÉÙÁÖ
-				[FORCE_TYPE.WAN_HUA  ] = { image = "ui/Image/Common/Money.UITex", frame = 205 }, -- Íò»¨
-				[FORCE_TYPE.TIAN_CE  ] = { image = "ui/Image/Common/Money.UITex", frame = 206 }, -- Ìì²ß
-				[FORCE_TYPE.CHUN_YANG] = { image = "ui/Image/Common/Money.UITex", frame = 209 }, -- ´¿Ñô
-				[FORCE_TYPE.QI_XIU   ] = { image = "ui/Image/Common/Money.UITex", frame = 204 }, -- ÆßĞã
-				[FORCE_TYPE.WU_DU    ] = { image = "ui/Image/Common/Money.UITex", frame = 208 }, -- Îå¶¾
-				[FORCE_TYPE.TANG_MEN ] = { image = "ui/Image/Common/Money.UITex", frame = 207 }, -- ÌÆÃÅ
-				[FORCE_TYPE.CANG_JIAN] = { image = "ui/Image/Common/Money.UITex", frame = 168 }, -- ²Ø½£
-				[FORCE_TYPE.GAI_BANG ] = { image = "ui/Image/Common/Money.UITex", frame = 234 }, -- Ø¤°ï
-				[FORCE_TYPE.MING_JIAO] = { image = "ui/Image/Common/Money.UITex", frame = 232 }, -- Ã÷½Ì
-				[FORCE_TYPE.CANG_YUN ] = { image = "ui/Image/Common/Money.UITex", frame = 26  }, -- ²ÔÔÆ
-				[FORCE_TYPE.CHANG_GE ] = { image = "ui/Image/Common/Money.UITex", frame = 30  }, -- ³¤¸è
+				[FORCE_TYPE.JIANG_HU ] = { image = "ui/Image/Common/Money.UITex", frame = 210 }, -- å¤§ä¾ 
+				[FORCE_TYPE.SHAO_LIN ] = { image = "ui/Image/Common/Money.UITex", frame = 203 }, -- å°‘æ—
+				[FORCE_TYPE.WAN_HUA  ] = { image = "ui/Image/Common/Money.UITex", frame = 205 }, -- ä¸‡èŠ±
+				[FORCE_TYPE.TIAN_CE  ] = { image = "ui/Image/Common/Money.UITex", frame = 206 }, -- å¤©ç­–
+				[FORCE_TYPE.CHUN_YANG] = { image = "ui/Image/Common/Money.UITex", frame = 209 }, -- çº¯é˜³
+				[FORCE_TYPE.QI_XIU   ] = { image = "ui/Image/Common/Money.UITex", frame = 204 }, -- ä¸ƒç§€
+				[FORCE_TYPE.WU_DU    ] = { image = "ui/Image/Common/Money.UITex", frame = 208 }, -- äº”æ¯’
+				[FORCE_TYPE.TANG_MEN ] = { image = "ui/Image/Common/Money.UITex", frame = 207 }, -- å”é—¨
+				[FORCE_TYPE.CANG_JIAN] = { image = "ui/Image/Common/Money.UITex", frame = 168 }, -- è—å‰‘
+				[FORCE_TYPE.GAI_BANG ] = { image = "ui/Image/Common/Money.UITex", frame = 234 }, -- ä¸å¸®
+				[FORCE_TYPE.MING_JIAO] = { image = "ui/Image/Common/Money.UITex", frame = 232 }, -- æ˜æ•™
+				[FORCE_TYPE.CANG_YUN ] = { image = "ui/Image/Common/Money.UITex", frame = 26  }, -- è‹äº‘
+				[FORCE_TYPE.CHANG_GE ] = { image = "ui/Image/Common/Money.UITex", frame = 30  }, -- é•¿æ­Œ
 			},
 		}, {
 			['Bar'] = {
 				[-1                  ] = { image = "ui/Image/Common/Money.UITex", frame = 220 }, -- NPC
-				[FORCE_TYPE.JIANG_HU ] = { image = "ui/Image/Common/Money.UITex", frame = 220 }, -- ´óÏÀ
-				[FORCE_TYPE.SHAO_LIN ] = { image = "ui/Image/Common/Money.UITex", frame = 216 }, -- ÉÙÁÖ
-				[FORCE_TYPE.WAN_HUA  ] = { image = "ui/Image/Common/Money.UITex", frame = 212 }, -- Íò»¨
-				[FORCE_TYPE.TIAN_CE  ] = { image = "ui/Image/Common/Money.UITex", frame = 215 }, -- Ìì²ß
-				[FORCE_TYPE.CHUN_YANG] = { image = "ui/Image/Common/Money.UITex", frame = 218 }, -- ´¿Ñô
-				[FORCE_TYPE.QI_XIU   ] = { image = "ui/Image/Common/Money.UITex", frame = 211 }, -- ÆßĞã
-				[FORCE_TYPE.WU_DU    ] = { image = "ui/Image/Common/Money.UITex", frame = 213 }, -- Îå¶¾
-				[FORCE_TYPE.TANG_MEN ] = { image = "ui/Image/Common/Money.UITex", frame = 214 }, -- ÌÆÃÅ
-				[FORCE_TYPE.CANG_JIAN] = { image = "ui/Image/Common/Money.UITex", frame = 217 }, -- ²Ø½£
-				[FORCE_TYPE.GAI_BANG ] = { image = "ui/Image/Common/Money.UITex", frame = 233 }, -- Ø¤°ï
-				[FORCE_TYPE.MING_JIAO] = { image = "ui/Image/Common/Money.UITex", frame = 228 }, -- Ã÷½Ì
-				[FORCE_TYPE.CANG_YUN ] = { image = "ui/Image/Common/Money.UITex", frame = 219 }, -- ²ÔÔÆ
-				[FORCE_TYPE.CHANG_GE ] = { image = "ui/Image/Common/Money.UITex", frame = 30  }, -- ³¤¸è
+				[FORCE_TYPE.JIANG_HU ] = { image = "ui/Image/Common/Money.UITex", frame = 220 }, -- å¤§ä¾ 
+				[FORCE_TYPE.SHAO_LIN ] = { image = "ui/Image/Common/Money.UITex", frame = 216 }, -- å°‘æ—
+				[FORCE_TYPE.WAN_HUA  ] = { image = "ui/Image/Common/Money.UITex", frame = 212 }, -- ä¸‡èŠ±
+				[FORCE_TYPE.TIAN_CE  ] = { image = "ui/Image/Common/Money.UITex", frame = 215 }, -- å¤©ç­–
+				[FORCE_TYPE.CHUN_YANG] = { image = "ui/Image/Common/Money.UITex", frame = 218 }, -- çº¯é˜³
+				[FORCE_TYPE.QI_XIU   ] = { image = "ui/Image/Common/Money.UITex", frame = 211 }, -- ä¸ƒç§€
+				[FORCE_TYPE.WU_DU    ] = { image = "ui/Image/Common/Money.UITex", frame = 213 }, -- äº”æ¯’
+				[FORCE_TYPE.TANG_MEN ] = { image = "ui/Image/Common/Money.UITex", frame = 214 }, -- å”é—¨
+				[FORCE_TYPE.CANG_JIAN] = { image = "ui/Image/Common/Money.UITex", frame = 217 }, -- è—å‰‘
+				[FORCE_TYPE.GAI_BANG ] = { image = "ui/Image/Common/Money.UITex", frame = 233 }, -- ä¸å¸®
+				[FORCE_TYPE.MING_JIAO] = { image = "ui/Image/Common/Money.UITex", frame = 228 }, -- æ˜æ•™
+				[FORCE_TYPE.CANG_YUN ] = { image = "ui/Image/Common/Money.UITex", frame = 219 }, -- è‹äº‘
+				[FORCE_TYPE.CHANG_GE ] = { image = "ui/Image/Common/Money.UITex", frame = 30  }, -- é•¿æ­Œ
 			},
 		},
 	},
 }
 _C.tCustomCss = MY.LoadLUAData(_C.szCssFile) or _C.tDefaultCss
 
--- ĞÂµÄÕ½¶·Êı¾İÊ±
+-- æ–°çš„æˆ˜æ–—æ•°æ®æ—¶
 MY.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function()
 	if not _C.bHistoryMode then
 		MY_Recount.DisplayData(0)
@@ -141,19 +141,19 @@ MY.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function()
 end)
 
 MY_Recount = MY_Recount or {}
-MY_Recount.bEnable       = true                 -- ÊÇ·ñÆôÓÃ
-MY_Recount.nCss          = 1                    -- µ±Ç°ÑùÊ½±í
-MY_Recount.nChannel      = CHANNEL.DPS          -- µ±Ç°ÏÔÊ¾µÄÍ³¼ÆÄ£Ê½
-MY_Recount.bAwayMode     = true                 -- ¼ÆËãDPSÊ±ÊÇ·ñ¼õÈ¥ÔİÀëÊ±¼ä
-MY_Recount.bSysTimeMode  = false                -- Ê¹ÓÃ¹Ù·½Õ½¶·Í³¼Æ¼ÆÊ±·½Ê½
-MY_Recount.bShowPerSec   = true                 -- ÏÔÊ¾ÎªÃ¿ÃëÊı¾İ£¨·´Ö®ÏÔÊ¾×ÜºÍ£©
-MY_Recount.bShowEffect   = true                 -- ÏÔÊ¾ÓĞĞ§ÉËº¦/ÖÎÁÆ
-MY_Recount.bSaveRecount  = false                -- ÍË³öÓÎÏ·Ê±±£´æÕ½¶·¼ÇÂ¼
-MY_Recount.nDisplayMode  = DISPLAY_MODE.BOTH    -- Í³¼ÆÏÔÊ¾Ä£Ê½£¨ÏÔÊ¾NPC/Íæ¼ÒÊı¾İ£©£¨Ä¬ÈÏ»ìºÏÏÔÊ¾£©
-MY_Recount.nPublishLimit = 30                   -- ·¢²¼µ½ÁÄÌìÆµµÀÊıÁ¿
-MY_Recount.nPublishMode  = PUBLISH_MODE.EFFECT  -- ·¢²¼Ä£Ê½
-MY_Recount.nDrawInterval = GLOBAL.GAME_FPS / 2  -- UIÖØ»æÖÜÆÚ£¨Ö¡£©
-MY_Recount.anchor = { x=0, y=-70, s="BOTTOMRIGHT", r="BOTTOMRIGHT" } -- Ä¬ÈÏ×ø±ê
+MY_Recount.bEnable       = true                 -- æ˜¯å¦å¯ç”¨
+MY_Recount.nCss          = 1                    -- å½“å‰æ ·å¼è¡¨
+MY_Recount.nChannel      = CHANNEL.DPS          -- å½“å‰æ˜¾ç¤ºçš„ç»Ÿè®¡æ¨¡å¼
+MY_Recount.bAwayMode     = true                 -- è®¡ç®—DPSæ—¶æ˜¯å¦å‡å»æš‚ç¦»æ—¶é—´
+MY_Recount.bSysTimeMode  = false                -- ä½¿ç”¨å®˜æ–¹æˆ˜æ–—ç»Ÿè®¡è®¡æ—¶æ–¹å¼
+MY_Recount.bShowPerSec   = true                 -- æ˜¾ç¤ºä¸ºæ¯ç§’æ•°æ®ï¼ˆåä¹‹æ˜¾ç¤ºæ€»å’Œï¼‰
+MY_Recount.bShowEffect   = true                 -- æ˜¾ç¤ºæœ‰æ•ˆä¼¤å®³/æ²»ç–—
+MY_Recount.bSaveRecount  = false                -- é€€å‡ºæ¸¸æˆæ—¶ä¿å­˜æˆ˜æ–—è®°å½•
+MY_Recount.nDisplayMode  = DISPLAY_MODE.BOTH    -- ç»Ÿè®¡æ˜¾ç¤ºæ¨¡å¼ï¼ˆæ˜¾ç¤ºNPC/ç©å®¶æ•°æ®ï¼‰ï¼ˆé»˜è®¤æ··åˆæ˜¾ç¤ºï¼‰
+MY_Recount.nPublishLimit = 30                   -- å‘å¸ƒåˆ°èŠå¤©é¢‘é“æ•°é‡
+MY_Recount.nPublishMode  = PUBLISH_MODE.EFFECT  -- å‘å¸ƒæ¨¡å¼
+MY_Recount.nDrawInterval = GLOBAL.GAME_FPS / 2  -- UIé‡ç»˜å‘¨æœŸï¼ˆå¸§ï¼‰
+MY_Recount.anchor = { x=0, y=-70, s="BOTTOMRIGHT", r="BOTTOMRIGHT" } -- é»˜è®¤åæ ‡
 RegisterCustomData("MY_Recount.bEnable")
 RegisterCustomData("MY_Recount.nCss")
 RegisterCustomData("MY_Recount.nChannel")
@@ -228,9 +228,9 @@ MY_Recount.LoadCustomCss = function(nCss)
 	_C.Css = _C.tCustomCss[nCss] or _C.tDefaultCss[1]
 end
 
--- ÇĞ»»°ó¶¨ÏÔÊ¾¼ÇÂ¼
--- MY_Recount.DisplayData(number nHistory): ÏÔÊ¾µÚnHistoryÌõÀúÊ·¼ÇÂ¼ µ±nHistoryµÈÓÚ0Ê±ÏÔÊ¾µ±Ç°¼ÇÂ¼
--- MY_Recount.DisplayData(table  data): ÏÔÊ¾Êı¾İÎªdataµÄÀúÊ·¼ÇÂ¼
+-- åˆ‡æ¢ç»‘å®šæ˜¾ç¤ºè®°å½•
+-- MY_Recount.DisplayData(number nHistory): æ˜¾ç¤ºç¬¬nHistoryæ¡å†å²è®°å½• å½“nHistoryç­‰äº0æ—¶æ˜¾ç¤ºå½“å‰è®°å½•
+-- MY_Recount.DisplayData(table  data): æ˜¾ç¤ºæ•°æ®ä¸ºdataçš„å†å²è®°å½•
 MY_Recount.DisplayData = function(data)
 	if type(data) == 'number' then
 		data = MY_Recount.Data.Get(data)
@@ -267,31 +267,31 @@ MY_Recount.UpdateUI = function(data)
 		return
 	end
 
-	-- »ñÈ¡Í³¼ÆÊı¾İ
+	-- è·å–ç»Ÿè®¡æ•°æ®
 	local tRecord, szUnit
-	if MY_Recount.nChannel == CHANNEL.DPS then       -- ÉËº¦Í³¼Æ
+	if MY_Recount.nChannel == CHANNEL.DPS then       -- ä¼¤å®³ç»Ÿè®¡
 		tRecord, szUnit = data.Damage  , 'DPS'
-	elseif MY_Recount.nChannel == CHANNEL.HPS then   -- ÖÎÁÆÍ³¼Æ
+	elseif MY_Recount.nChannel == CHANNEL.HPS then   -- æ²»ç–—ç»Ÿè®¡
 		tRecord, szUnit = data.Heal    , 'HPS'
-	elseif MY_Recount.nChannel == CHANNEL.BDPS then  -- ³ĞÉËÍ³¼Æ
+	elseif MY_Recount.nChannel == CHANNEL.BDPS then  -- æ‰¿ä¼¤ç»Ÿè®¡
 		tRecord, szUnit = data.BeDamage, 'DPS'
-	elseif MY_Recount.nChannel == CHANNEL.BHPS then  -- ³ĞÁÆÍ³¼Æ
+	elseif MY_Recount.nChannel == CHANNEL.BHPS then  -- æ‰¿ç–—ç»Ÿè®¡
 		tRecord, szUnit = data.BeHeal  , 'HPS'
 	end
 	
-	-- ¼ÆËãÕ½¶·Ê±¼ä
+	-- è®¡ç®—æˆ˜æ–—æ—¶é—´
 	local nTimeCount = MY_Recount.Data.GeneFightTime(data, nil, MY_Recount.bSysTimeMode and SZ_CHANNEL_KEY[MY_Recount.nChannel])
 	local szTimeCount = MY.Sys.FormatTimeCount('M:ss', nTimeCount)
 	if MY.IsInArena() then
 		szTimeCount = MY.GetFightTime("M:ss")
 	end
-	-- ×Ô¼ºµÄ¼ÇÂ¼
+	-- è‡ªå·±çš„è®°å½•
 	local tMyRec
 	
-	-- ÕûÀíÊı¾İ Éú³ÉÒªÏÔÊ¾µÄÁĞ±í
+	-- æ•´ç†æ•°æ® ç”Ÿæˆè¦æ˜¾ç¤ºçš„åˆ—è¡¨
 	local nMaxValue, tResult = 0, {}
 	for id, rec in pairs(tRecord) do
-		if MY_Recount.nDisplayMode == DISPLAY_MODE.BOTH or  -- È·¶¨ÏÔÊ¾Ä£Ê½£¨ÏÔÊ¾NPC/ÏÔÊ¾Íæ¼Ò/È«²¿ÏÔÊ¾£©
+		if MY_Recount.nDisplayMode == DISPLAY_MODE.BOTH or  -- ç¡®å®šæ˜¾ç¤ºæ¨¡å¼ï¼ˆæ˜¾ç¤ºNPC/æ˜¾ç¤ºç©å®¶/å…¨éƒ¨æ˜¾ç¤ºï¼‰
 		(MY_Recount.nDisplayMode == DISPLAY_MODE.NPC    and type(id) == 'string') or
 		(MY_Recount.nDisplayMode == DISPLAY_MODE.PLAYER and type(id) == 'number') then
 			tRec = {
@@ -302,13 +302,13 @@ MY_Recount.UpdateUI = function(data)
 				nValue       = rec.nTotal         or  0              ,
 				nEffectValue = rec.nTotalEffect   or  0              ,
 			}
-			-- ¼ÆËãÕ½¶·Ê±¼ä
-			if MY_Recount.bAwayMode then -- É¾È¥ËÀÍöÊ±¼ä && ·ÀÖ¹¼ÆËãDPSÊ±³ıÒÔ0
+			-- è®¡ç®—æˆ˜æ–—æ—¶é—´
+			if MY_Recount.bAwayMode then -- åˆ å»æ­»äº¡æ—¶é—´ && é˜²æ­¢è®¡ç®—DPSæ—¶é™¤ä»¥0
 				tRec.nTimeCount = math.max(MY_Recount.Data.GeneFightTime(data, id, MY_Recount.bSysTimeMode and SZ_CHANNEL_KEY[MY_Recount.nChannel]), 1)
-			else -- ²»É¾È¥ÔİÀëÊ±¼ä
+			else -- ä¸åˆ å»æš‚ç¦»æ—¶é—´
 				tRec.nTimeCount = math.max(nTimeCount, 1)
 			end
-			-- ¼ÆËãÃ¿ÃëÊı¾İ
+			-- è®¡ç®—æ¯ç§’æ•°æ®
 			if MY_Recount.bShowPerSec then
 				tRec.nValuePS       = tRec.nValue / tRec.nTimeCount
 				tRec.nEffectValuePS = tRec.nEffectValue / tRec.nTimeCount
@@ -320,7 +320,7 @@ MY_Recount.UpdateUI = function(data)
 		end
 	end
 	
-	-- ÁĞ±íÅÅĞò
+	-- åˆ—è¡¨æ’åº
 	local szSortKey = 'nValue'
 	if MY_Recount.bShowEffect and MY_Recount.bShowPerSec then
 		szSortKey = 'nEffectValuePS'
@@ -333,10 +333,10 @@ MY_Recount.UpdateUI = function(data)
 		return p1[szSortKey] > p2[szSortKey]
 	end)
 	
-	-- äÖÈ¾ÁĞ±í
+	-- æ¸²æŸ“åˆ—è¡¨
 	local hList = m_frame:Lookup('Wnd_Main', 'Handle_List')
 	for i, p in pairs(tResult) do
-		-- ×Ô¼ºµÄ¼ÇÂ¼
+		-- è‡ªå·±çš„è®°å½•
 		if p.id == UI_GetClientPlayerID() then
 			tMyRec = p
 			tMyRec.nRank = i
@@ -368,7 +368,7 @@ MY_Recount.UpdateUI = function(data)
 		if hItem:GetIndex() ~= i - 1 then
 			hItem:ExchangeIndex(i - 1)
 		end
-		-- ÅÅÃû
+		-- æ’å
 		if _C.tRandFrame[i] then
 			hItem:Lookup('Text_Rank'):Hide()
 			hItem:Lookup('Image_Rank'):Show()
@@ -378,7 +378,7 @@ MY_Recount.UpdateUI = function(data)
 			hItem:Lookup('Text_Rank'):Show()
 			hItem:Lookup('Image_Rank'):Hide()
 		end
-		-- É«¿é³¤¶È
+		-- è‰²å—é•¿åº¦
 		local fPerBack, fPerFore = 0, 0
 		if nMaxValue > 0 then
 			if MY_Recount.bShowPerSec then
@@ -393,7 +393,7 @@ MY_Recount.UpdateUI = function(data)
 			hItem:Lookup('Shadow_PerBack'):SetW(fPerBack * hItem:GetW())
 			hItem:Lookup('Shadow_PerFore'):SetW(fPerFore * hItem:GetW())
 		end
-		-- ËÀÍö/ÀëÏß ÌØÊâÑÕÉ«
+		-- æ­»äº¡/ç¦»çº¿ ç‰¹æ®Šé¢œè‰²
 		local tAway = data.Awaytime[p.id]
 		local bAway = tAway and #tAway > 0 and not tAway[#tAway][2]
 		if hItem.bAway ~= bAway then
@@ -405,7 +405,7 @@ MY_Recount.UpdateUI = function(data)
 				hItem:Lookup('Text_R'):SetFontColor(255, 255, 255)
 			end
 		end
-		-- ÊıÖµÏÔÊ¾
+		-- æ•°å€¼æ˜¾ç¤º
 		if MY_Recount.bShowEffect then
 			if MY_Recount.bShowPerSec then
 				hItem:Lookup('Text_R'):SetText(math.floor(p.nEffectValue / p.nTimeCount) .. ' ' .. szUnit)
@@ -425,9 +425,9 @@ MY_Recount.UpdateUI = function(data)
 	hList.nTimeCount = nTimeCount
 	hList:FormatAllItemPos()
 	
-	-- äÖÈ¾µ×²¿×Ô¼ºµÄÍ³¼Æ
+	-- æ¸²æŸ“åº•éƒ¨è‡ªå·±çš„ç»Ÿè®¡
 	local hItem = m_frame:Lookup('Wnd_Main', 'Handle_Me')
-	-- ³õÊ¼»¯ÑÕÉ«
+	-- åˆå§‹åŒ–é¢œè‰²
 	if not hItem.bInited then
 		hItem.OnItemRefreshTip = MY_Recount.OnItemRefreshTip
 		local dwForceID = (MY.Player.GetClientInfo() or {}).dwForceID
@@ -475,9 +475,9 @@ MY_Recount.UpdateUI = function(data)
 			hItem:Lookup('Shadow_Me_PerBack'):SetW(hItem:GetW())
 			hItem:Lookup('Shadow_Me_PerFore'):SetW(hItem:GetW())
 		end
-		-- ×ó²àÕ½¶·¼ÆÊ±
+		-- å·¦ä¾§æˆ˜æ–—è®¡æ—¶
 		hItem:Lookup('Text_Me_L'):SetText('[' .. tMyRec.nRank .. '] ' .. szTimeCount)
-		-- ÓÒ²àÎÄ×Ö
+		-- å³ä¾§æ–‡å­—
 		if MY_Recount.bShowEffect then
 			if MY_Recount.bShowPerSec then
 				hItem:Lookup('Text_Me_R'):SetText(math.floor(tMyRec.nEffectValue / tMyRec.nTimeCount) .. ' ' .. szUnit)
@@ -515,7 +515,7 @@ end
 --                                     #               #           #          --
 --                                   # #               #           #          --
 -- ########################################################################## --
--- ÖÜÆÚÖØ»æ
+-- å‘¨æœŸé‡ç»˜
 MY_Recount.OnFrameBreathe = function()
 	if this.nLastRedrawFrame and
 	GetLogicFrameCount() - this.nLastRedrawFrame > 0 and
@@ -524,7 +524,7 @@ MY_Recount.OnFrameBreathe = function()
 	end
 	this.nLastRedrawFrame = GetLogicFrameCount()
 	
-	-- ²»½øÕ½Ê±²»Ë¢ĞÂUI
+	-- ä¸è¿›æˆ˜æ—¶ä¸åˆ·æ–°UI
 	if not _C.bHistoryMode and not MY.Player.GetFightUUID() then
 		return
 	end
@@ -537,7 +537,7 @@ MY_Recount.OnFrameDragEnd = function()
 	MY_Recount.anchor = MY.UI(this):anchor()
 end
 
--- ShowDetail½çÃæÊ±¼äÏàÓ¦
+-- ShowDetailç•Œé¢æ—¶é—´ç›¸åº”
 _C.OnDetailFrameBreathe = function()
 	if this.nLastRedrawFrame and
 	GetLogicFrameCount() - this.nLastRedrawFrame > 0 and
@@ -551,7 +551,7 @@ _C.OnDetailFrameBreathe = function()
 	if tonumber(id) then
 		id = tonumber(id)
 	end
-	-- »ñÈ¡Êı¾İ
+	-- è·å–æ•°æ®
 	local tData = DataDisplay[szChannel][id]
 	if not tData then
 		this:Lookup('WndScroll_Detail', 'Handle_DetailList'):Clear()
@@ -563,8 +563,8 @@ _C.OnDetailFrameBreathe = function()
 	local szPrimarySort   = this.szPrimarySort or 'Skill'
 	local szSecondarySort = (szPrimarySort == 'Skill' and 'Target') or 'Skill'
 	
-	--------------- Ò»¡¢¼¼ÄÜÁĞ±í¸üĞÂ -----------------
-	-- Êı¾İÊÕ¼¯
+	--------------- ä¸€ã€æŠ€èƒ½åˆ—è¡¨æ›´æ–° -----------------
+	-- æ•°æ®æ”¶é›†
 	local tResult, nTotalEffect = {}, tData.nTotalEffect
 	if szPrimarySort == 'Skill' then
 		for szSkillName, p in pairs(tData.Skill) do
@@ -588,7 +588,7 @@ _C.OnDetailFrameBreathe = function()
 	table.sort(tResult, function(p1, p2)
 		return p1.nTotalEffect > p2.nTotalEffect
 	end)
-	-- Ä¬ÈÏÑ¡ÖĞµÚÒ»¸ö
+	-- é»˜è®¤é€‰ä¸­ç¬¬ä¸€ä¸ª
 	if this.bFirstRendering then
 		if tResult[1] then
 			if szPrimarySort == 'Skill' then
@@ -607,7 +607,7 @@ _C.OnDetailFrameBreathe = function()
 	else
 		szSelected = this.szSelectedTarget
 	end
-	-- ½çÃæÖØ»æ
+	-- ç•Œé¢é‡ç»˜
 	local hSelectedItem
 	this:Lookup('WndScroll_Skill'):SetSize(480, 112)
 	this:Lookup('WndScroll_Skill', ''):SetSize(480, 112)
@@ -635,8 +635,8 @@ _C.OnDetailFrameBreathe = function()
 	
 	if szSelected and tData[szPrimarySort][szSelected] then
 		this:Lookup('', 'Handle_Spliter'):Show()
-		--------------- ¶ş¡¢¼¼ÄÜÊÍ·Å½á¹ûÁĞ±í¸üĞÂ -----------------
-		-- Êı¾İÊÕ¼¯
+		--------------- äºŒã€æŠ€èƒ½é‡Šæ”¾ç»“æœåˆ—è¡¨æ›´æ–° -----------------
+		-- æ•°æ®æ”¶é›†
 		local tResult, nTotalEffect, nCount = {}, tData[szPrimarySort][szSelected].nTotalEffect, tData[szPrimarySort][szSelected].nCount
 		for nSkillResult, p in pairs(tData[szPrimarySort][szSelected].Detail) do
 			table.insert(tResult, {
@@ -651,7 +651,7 @@ _C.OnDetailFrameBreathe = function()
 		table.sort(tResult, function(p1, p2)
 			return p1.nAvgEffect > p2.nAvgEffect
 		end)
-		-- ½çÃæÖØ»æ
+		-- ç•Œé¢é‡ç»˜
 		this:Lookup('WndScroll_Detail'):Show()
 		local hList = this:Lookup('WndScroll_Detail', 'Handle_DetailList')
 		hList:Clear()
@@ -667,15 +667,15 @@ _C.OnDetailFrameBreathe = function()
 		end
 		hList:FormatAllItemPos()
 		
-		-- µ÷Õû¹ö¶¯Ìõ ÔöÇ¿ÓÃ»§ÌåÑé
+		-- è°ƒæ•´æ»šåŠ¨æ¡ å¢å¼ºç”¨æˆ·ä½“éªŒ
 		if hSelectedItem and not this:Lookup('WndScroll_Target'):IsVisible() then
-			-- ËµÃ÷ÊÇ¸Õ´ÓÎ´Ñ¡Ôñ×´Ì¬ÇĞ»»¹ıÀ´ ¹ö¶¯Ìõ¹ö¶¯µ½Ñ¡ÖĞÏî
+			-- è¯´æ˜æ˜¯åˆšä»æœªé€‰æ‹©çŠ¶æ€åˆ‡æ¢è¿‡æ¥ æ»šåŠ¨æ¡æ»šåŠ¨åˆ°é€‰ä¸­é¡¹
 			local hScroll = this:Lookup('WndScroll_Skill/Scroll_Skill_List')
 			hScroll:SetScrollPos(math.ceil(hScroll:GetStepCount() * hSelectedItem:GetIndex() / hSelectedItem:GetParent():GetItemCount()))
 		end
 		
-		--------------- Èı¡¢¼¼ÄÜÊÍ·Å½á¹ûÁĞ±í¸üĞÂ -----------------
-		-- Êı¾İÊÕ¼¯
+		--------------- ä¸‰ã€æŠ€èƒ½é‡Šæ”¾ç»“æœåˆ—è¡¨æ›´æ–° -----------------
+		-- æ•°æ®æ”¶é›†
 		local tResult, nTotalEffect = {}, tData[szPrimarySort][szSelected].nTotalEffect
 		if szPrimarySort == 'Skill' then
 			for id, p in pairs(tData.Skill[szSelectedSkill].Target) do
@@ -703,7 +703,7 @@ _C.OnDetailFrameBreathe = function()
 		table.sort(tResult, function(p1, p2)
 			return p1.nTotalEffect > p2.nTotalEffect
 		end)
-		-- ½çÃæÖØ»æ
+		-- ç•Œé¢é‡ç»˜
 		this:Lookup('WndScroll_Target'):Show()
 		local hList = this:Lookup('WndScroll_Target', 'Handle_TargetList')
 		hList:Clear()
@@ -930,7 +930,7 @@ end
 --       #     #     #                 #                       #               #       #       # #    --
 --   # #       #       # #             #             # # # # # # # # # # #   #       #           #    --
 -- ################################################################################################## --
--- »ñÈ¡ÉèÖÃ²Ëµ¥
+-- è·å–è®¾ç½®èœå•
 MY_Recount.GetMenu = function()
 	local t = {
 		szOption = _L["fight recount"],
@@ -991,7 +991,7 @@ MY_Recount.GetMenu = function()
 				return not MY_Recount.bEnable
 			end,
 		},
-		{   -- ÇĞ»»Í³¼ÆÀàĞÍ
+		{   -- åˆ‡æ¢ç»Ÿè®¡ç±»å‹
 			szOption = _L['switch recount mode'],
 			{
 				szOption = _L['display only npc record'],
@@ -1021,7 +1021,7 @@ MY_Recount.GetMenu = function()
 		}
 	}
 
-	-- ¹ıÂË¶ÌÊ±¼ä¼ÇÂ¼
+	-- è¿‡æ»¤çŸ­æ—¶é—´è®°å½•
 	local t1 = {
 		szOption = _L['filter short fight'],
 		fnDisable = function()
@@ -1053,7 +1053,7 @@ MY_Recount.GetMenu = function()
 	end
 	table.insert(t, t1)
 
-	-- ·ç¸ñÑ¡Ôñ
+	-- é£æ ¼é€‰æ‹©
 	local t1 = {
 		szOption = _L['theme'],
 		fnDisable = function()
@@ -1076,7 +1076,7 @@ MY_Recount.GetMenu = function()
 	end
 	table.insert(t, t1)
 
-	-- ÊıÖµË¢ĞÂÖÜÆÚ
+	-- æ•°å€¼åˆ·æ–°å‘¨æœŸ
 	local t1 = {
 		szOption = _L['redraw interval'],
 		fnDisable = function()
@@ -1104,7 +1104,7 @@ MY_Recount.GetMenu = function()
 	end
 	table.insert(t, t1)
 
-	-- ×î´óÀúÊ·¼ÇÂ¼
+	-- æœ€å¤§å†å²è®°å½•
 	local t1 = {
 		szOption = _L['max history'],
 		fnDisable = function()
@@ -1129,7 +1129,7 @@ MY_Recount.GetMenu = function()
 	return t
 end
 
--- »ñÈ¡ÀúÊ·¼ÇÂ¼²Ëµ¥
+-- è·å–å†å²è®°å½•èœå•
 MY_Recount.GetHistoryMenu = function()
 	local t = {{
 		szOption = _L["current fight"],
@@ -1177,7 +1177,7 @@ MY_Recount.GetHistoryMenu = function()
 	return t
 end
 
--- »ñÈ¡·¢²¼²Ëµ¥
+-- è·å–å‘å¸ƒèœå•
 MY_Recount.GetPublishMenu = function()
 	local t = {}
 	
@@ -1198,7 +1198,7 @@ MY_Recount.GetPublishMenu = function()
 	end
 	table.insert(t, t1)
 	
-	-- ·¢²¼ÀàĞÍ
+	-- å‘å¸ƒç±»å‹
 	table.insert(t, {
 		szOption = _L['publish mode'],
 		{
@@ -1251,7 +1251,7 @@ MY_Recount.GetPublishMenu = function()
 				local hList      = frame:Lookup('Wnd_Main', 'Handle_List')
 				local szUnit     = (' ' .. hList.szUnit) or ''
 				local nTimeCount = hList.nTimeCount or 0
-				local tResult = {} -- ÊÕ¼¯Êı¾İ
+				local tResult = {} -- æ”¶é›†æ•°æ®
 				local nMaxNameLen = 0
 				for i = 0, MY_Recount.nPublishLimit do
 					local hItem = hList:Lookup(i)
@@ -1261,7 +1261,7 @@ MY_Recount.GetPublishMenu = function()
 					table.insert(tResult, hItem.data)
 					nMaxNameLen = math.max(nMaxNameLen, wstring.len(hItem.data.szName))
 				end
-				-- ·¢²¼Êı¾İ
+				-- å‘å¸ƒæ•°æ®
 				for i, p in ipairs(tResult) do
 					local szText = string.format('%02d', i) .. '.[' .. p.szName .. ']'
 					for i = wstring.len(p.szName), nMaxNameLen - 1 do
