@@ -67,7 +67,11 @@ local function RedrawBuffList(hFrame, aBuffMon, OBJ)
 			hItem.hBox = hBox
 			hItem.mon = mon
 			hItem.dwIcon = mon[2]
-			hFrame.tItem[mon[3]] = hItem
+			if mon[4] then
+				hFrame.tItem[mon[3] .. mon[4]] = hItem
+			else
+				hFrame.tItem[mon[3]] = hItem
+			end
 			hBox:SetObject(UI_OBJECT.BUFF, mon[2], 1, 1)
 			hBox:SetObjectIcon(hItem.dwIcon or -1)
 			hBox:SetObjectCoolDown(true)
@@ -149,69 +153,82 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers, b
 		for _, buff in ipairs(MY.Player.GetBuffList(KTarget)) do
 			if not bHideOthers or buff.dwSkillSrcID == UI_GetClientPlayerID() then
 				local szName = Table_GetBuffName(buff.dwID, buff.nLevel)
-				local hItem = hFrame.tItem[szName]
+				local hItem = hFrame.tItem[szName .. buff.dwID] or hFrame.tItem[szName]
 				if hItem then
-					if bHideVoidBuff and not hItem:IsVisible() then
-						_needFormatItemPos = true
-						hItem:Show()
-					end
-					local hBox = hItem.hBox
-					-- 计算BUFF时间
-					local nBuffTime = GetBuffTime(buff.dwID, buff.nLevel) / 16
-					local nTimeLeft = ("%.1f"):format(math.max(0, buff.nEndFrame - GetLogicFrameCount()) / 16)
-					if not _tBuffTime[KTarget.dwID] then
-						_tBuffTime[KTarget.dwID] = {}
-						hFrame.tBuffTime = _tBuffTime[KTarget.dwID] -- 防止CD过程中table被GC回收
-					end
-					nBuffTime = math.max(nBuffTime, nTimeLeft)
-					if _tBuffTime[KTarget.dwID][buff.dwID] then
-						nBuffTime = math.max(_tBuffTime[KTarget.dwID][buff.dwID], nBuffTime)
-					end
-					_tBuffTime[KTarget.dwID][buff.dwID] = nBuffTime
-					
-					if not hItem.dwIcon or hItem.dwIcon == 13 then
-						hItem.dwIcon = Table_GetBuffIconID(buff.dwID, buff.nLevel)
-						hBox:SetObjectIcon(hItem.dwIcon)
-						hItem.mon[2] = hItem.dwIcon
-					end
-					
-					if hItem.hProcessTxt then
-						hItem.hProcessTxt:SetText(nTimeLeft .. "'")
-					end
-					hBox:SetOverText(1, nTimeLeft .. "'")
-					
-					if buff.nStackNum == 1 then
-						hBox:SetOverText(0, "")
-					else
-						hBox:SetOverText(0, buff.nStackNum)
-					end
+					if not (hItem.mon[4] and hItem.mon[4] ~= buff.dwID) then
+						if bHideVoidBuff and not hItem:IsVisible() then
+							_needFormatItemPos = true
+							hItem:Show()
+						end
+						local hBox = hItem.hBox
+						-- 计算BUFF时间
+						local nBuffTime = GetBuffTime(buff.dwID, buff.nLevel) / 16
+						local nTimeLeft = ("%.1f"):format(math.max(0, buff.nEndFrame - GetLogicFrameCount()) / 16)
+						if not _tBuffTime[KTarget.dwID] then
+							_tBuffTime[KTarget.dwID] = {}
+							hFrame.tBuffTime = _tBuffTime[KTarget.dwID] -- 防止CD过程中table被GC回收
+						end
+						nBuffTime = math.max(nBuffTime, nTimeLeft)
+						if _tBuffTime[KTarget.dwID][buff.dwID] then
+							nBuffTime = math.max(_tBuffTime[KTarget.dwID][buff.dwID], nBuffTime)
+						end
+						_tBuffTime[KTarget.dwID][buff.dwID] = nBuffTime
+						
+						if not hItem.dwIcon or hItem.dwIcon == 13 then
+							if hFrame.tItem[szName .. buff.dwID] == hFrame.tItem[szName] then
+								hFrame.tItem[szName] = nil
+							end
+							hFrame.tItem[szName .. buff.dwID] = hItem
+							hItem.dwIcon = Table_GetBuffIconID(buff.dwID, buff.nLevel)
+							hBox:SetObjectIcon(hItem.dwIcon)
+							hItem.mon[2] = hItem.dwIcon
+							hItem.mon[4] = buff.dwID
+						end
+						
+						if hItem.hProcessTxt then
+							hItem.hProcessTxt:SetText(nTimeLeft .. "'")
+						end
+						hBox:SetOverText(1, nTimeLeft .. "'")
+						
+						if buff.nStackNum == 1 then
+							hBox:SetOverText(0, "")
+						else
+							hBox:SetOverText(0, buff.nStackNum)
+						end
 
-					local dwPercent = nTimeLeft / nBuffTime
-					if hItem.hProcessImg then
-						hItem.hProcessImg:SetPercentage(dwPercent)
-					end
-					hBox:SetCoolDownPercentage(dwPercent)
+						local dwPercent = nTimeLeft / nBuffTime
+						if hItem.hProcessImg then
+							hItem.hProcessImg:SetPercentage(dwPercent)
+						end
+						hBox:SetCoolDownPercentage(dwPercent)
 
-					if dwPercent < 0.5 and dwPercent > 0.3 then
-						if hBox.dwPercent ~= 0.5 then
-							hBox.dwPercent = 0.5
-							hBox:SetObjectStaring(true)
+						if dwPercent < 0.5 and dwPercent > 0.3 then
+							if hBox.dwPercent ~= 0.5 then
+								hBox.dwPercent = 0.5
+								hBox:SetObjectStaring(true)
+							end
+						elseif dwPercent < 0.3 and dwPercent > 0.1 then
+							if hBox.dwPercent ~= 0.3 then
+								hBox.dwPercent = 0.3
+								hBox:SetExtentAnimate("ui\\Image\\Common\\Box.UITex", 17)
+							end
+						elseif dwPercent < 0.1 then
+							if hBox.dwPercent ~= 0.1 then
+								hBox.dwPercent = 0.1
+								hBox:SetExtentAnimate("ui\\Image\\Common\\Box.UITex", 20)
+							end
+						else
+							hBox:SetObjectStaring(false)
+							hBox:ClearExtentAnimate()
 						end
-					elseif dwPercent < 0.3 and dwPercent > 0.1 then
-						if hBox.dwPercent ~= 0.3 then
-							hBox.dwPercent = 0.3
-							hBox:SetExtentAnimate("ui\\Image\\Common\\Box.UITex", 17)
-						end
-					elseif dwPercent < 0.1 then
-						if hBox.dwPercent ~= 0.1 then
-							hBox.dwPercent = 0.1
-							hBox:SetExtentAnimate("ui\\Image\\Common\\Box.UITex", 20)
-						end
-					else
-						hBox:SetObjectStaring(false)
-						hBox:ClearExtentAnimate()
+						hItem.nRenderFrame = nCurrentFrame
 					end
-					hItem.nRenderFrame = nCurrentFrame
+					if not hItem.mon[5] then
+						hItem.mon[5] = {}
+					end
+					if not hItem.mon[5][buff.dwID] then
+						hItem.mon[5][buff.dwID] = Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13
+					end
 				end
 			end
 		end
@@ -306,11 +323,6 @@ local function GeneNameSpace(OBJ, NAMESPACE, DEFAULT_CONFIG_FILE, GetTarget, LAN
 		OBJ.GetBuffList(dwKungFuID)
 		if not OBJ.tBuffList[dwKungFuID] then
 			OBJ.tBuffList[dwKungFuID] = {}
-		end
-		for _, mon in ipairs(OBJ.tBuffList[dwKungFuID]) do
-			if mon[3] == szBuffName then
-				return
-			end
 		end
 		table.insert(OBJ.tBuffList[dwKungFuID], {true, 13, szBuffName})
 		OBJ.Reload()
@@ -478,7 +490,7 @@ local function GenePS(ui, OBJ, x, y, w, h)
 			if tBuffMonList and #tBuffMonList > 0 then
 				table.insert(t, { bDevide = true })
 				for i, mon in ipairs(tBuffMonList) do
-					table.insert(t, {
+					local t1 = {
 						szOption = mon[3],
 						bCheck = true, bChecked = mon[1],
 						fnAction = function(bChecked)
@@ -494,7 +506,27 @@ local function GenePS(ui, OBJ, x, y, w, h)
 							OBJ.DelBuff(dwKungFuID, mon[3])
 							Wnd.CloseWindow("PopupMenuPanel")
 						end,
-					})
+					}
+					if mon[5] then
+						for dwID, dwIcon in pairs(mon[5]) do
+							table.insert(t1, {
+								szOption = dwID,
+								bCheck = true, bMCheck = true,
+								bChecked = dwID == mon[4],
+								fnAction = function()
+									mon[2] = dwIcon or 13
+									mon[4] = dwID
+									OBJ.Reload()
+								end,
+								szIcon = "fromiconid",
+								nFrame = dwIcon or 13,
+								nIconWidth = 17,
+								nIconHeight = 17,
+								szLayer = "ICON_RIGHTMOST",
+							})
+						end
+					end
+					table.insert(t, t1)
 				end
 			end
 			return t
