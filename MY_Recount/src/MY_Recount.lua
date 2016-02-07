@@ -1261,6 +1261,10 @@ MY_Recount.GetPublishMenu = function()
 					table.insert(tResult, hItem.data)
 					nMaxNameLen = math.max(nMaxNameLen, wstring.len(hItem.data.szName))
 				end
+				if not MY_Recount.bShowPerSec then
+					nTimeCount = 1
+					szUnit = ""
+				end
 				-- 发布数据
 				for i, p in ipairs(tResult) do
 					local szText = string.format('%02d', i) .. '.[' .. p.szName .. ']'
