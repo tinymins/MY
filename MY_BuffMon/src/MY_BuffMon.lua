@@ -528,8 +528,8 @@ local function GenePS(ui, OBJ, x, y, w, h)
 								end,
 								szIcon = "fromiconid",
 								nFrame = dwIcon or 13,
-								nIconWidth = 17,
-								nIconHeight = 17,
+								nIconWidth = 22,
+								nIconHeight = 22,
 								szLayer = "ICON_RIGHTMOST",
 							})
 						end
