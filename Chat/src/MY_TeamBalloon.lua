@@ -117,4 +117,23 @@ function MY_TeamBalloon.OnFrameBreathe()
 		end
 	end
 end
-Wnd.OpenWindow(INI_PATH, "MY_TeamBalloon")
+
+function MY_TeamBalloon.Enable(...)
+	if select("#", ...) == 1 then
+		MY_TeamBalloon.bEnable = not not ...
+		if MY_TeamBalloon.bEnable then
+			Wnd.OpenWindow(INI_PATH, "MY_TeamBalloon")
+		else
+			Wnd.CloseWindow("MY_TeamBalloon")
+		end
+	else
+		return MY_TeamBalloon.bEnable
+	end
+end
+
+MY.RegisterEvent("CUSTOM_DATA_LOADED.MY_TeamBalloon", function()
+	if arg0 == "Role" then
+		MY_TeamBalloon.Enable(MY_TeamBalloon.Enable())
+		MY.RegisterEvent("CUSTOM_DATA_LOADED.MY_TeamBalloon")
+	end
+end)
