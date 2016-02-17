@@ -272,7 +272,8 @@ function PS.OnPanelActive(wnd)
 	local w , h  = ui:size()
 	local x0, y0 = 30, 30
 	local x , y  = x0, y0
-	local deltaY = 40
+	local deltaX = 25
+	local deltaY = 33
 	
 	ui:append("WndButton", {
 		x = w - x - 80, y = y,
@@ -293,7 +294,7 @@ function PS.OnPanelActive(wnd)
 	y = y + deltaY
 	
 	ui:append("WndCheckBox", {
-		x = x, y = y, w = 250,
+		x = x + deltaX, y = y, w = 250,
 		text = _L["lock postion"],
 		checked = MY_ChatSwitch.bLockPostion,
 		oncheck = function(bChecked)
@@ -306,18 +307,8 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 	
-	ui:append("WndCheckBox", {
-		x = x, y = y, w = 250,
-		text = _L["team balloon"],
-		checked = MY_TeamBalloon.Enable(),
-		oncheck = function(bChecked)
-			MY_TeamBalloon.Enable(bChecked)
-		end,
-	})
-	y = y + deltaY
-	
 	ui:append("WndComboBox", {
-		x = x, y = y, w = 150, h = 25,
+		x = x + deltaX, y = y, w = 150, h = 25,
 		text = _L['channel setting'],
 		menu = function()
 			local t = {
@@ -343,5 +334,115 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + deltaY
+	
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = 250,
+		text = _L["team balloon"],
+		checked = MY_TeamBalloon.Enable(),
+		oncheck = function(bChecked)
+			MY_TeamBalloon.Enable(bChecked)
+		end,
+	})
+	y = y + deltaY
+	
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = 250,
+		text = _L["chat time"],
+		checked = MY_Chat.bChatTime,
+		oncheck = function(bChecked)
+			if bChecked and HM_ToolBox then
+				HM_ToolBox.bChatTime = false
+			end
+			MY_Chat.bChatTime = bChecked
+		end,
+	})
+	y = y + deltaY
+	
+	ui:append("WndComboBox", {
+		x = x + deltaX, y = y, w = 150,
+		text = _L['chat time format'],
+		menu = function()
+			return {{
+				szOption = _L['hh:mm'],
+				bMCheck = true,
+				bChecked = MY_Chat.eChatTime == "HOUR_MIN",
+				fnAction = function()
+					MY_Chat.eChatTime = "HOUR_MIN"
+				end,
+				fnDisable = function()
+					return not MY_Chat.bChatTime
+				end,
+			},{
+				szOption = _L['hh:mm:ss'],
+				bMCheck = true,
+				bChecked = MY_Chat.eChatTime == "HOUR_MIN_SEC",
+				fnAction = function()
+					MY_Chat.eChatTime = "HOUR_MIN_SEC"
+				end,
+				fnDisable = function()
+					return not MY_Chat.bChatTime
+				end,
+			}}
+		end,
+	})
+	y = y + deltaY
+	
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = 250,
+		text = _L["chat copy"],
+		checked = MY_Chat.bChatCopy,
+		oncheck = function(bChecked)
+			MY_Chat.bChatCopy = bChecked
+		end,
+	})
+	y = y + deltaY
+	
+	ui:append("WndCheckBox", {
+		x = x + deltaX, y = y, w = 250,
+		text = _L["always show *"],
+		checked = MY_Chat.bChatCopyAlwaysShowMask,
+		oncheck = function(bChecked)
+			MY_Chat.bChatCopyAlwaysShowMask = bChecked
+		end,
+		isdisable = function()
+			return not MY_Chat.bChatCopy
+		end,
+	})
+	y = y + deltaY
+	
+	ui:append("WndCheckBox", {
+		x = x + deltaX, y = y, w = 250,
+		text = _L["always be white"],
+		checked = MY_Chat.bChatCopyAlwaysWhite,
+		oncheck = function(bChecked)
+			MY_Chat.bChatCopyAlwaysWhite = bChecked
+		end,
+		isdisable = function()
+			return not MY_Chat.bChatCopy
+		end,
+	})
+	y = y + deltaY
+	
+	ui:append("WndCheckBox", {
+		x = x + deltaX, y = y, w = 250,
+		text = _L["hide system msg copy"],
+		checked = MY_Chat.bChatCopyNoCopySysmsg,
+		oncheck = function(bChecked)
+			MY_Chat.bChatCopyNoCopySysmsg = bChecked
+		end,
+		isdisable = function()
+			return not MY_Chat.bChatCopy
+		end,
+	})
+	y = y + deltaY
+	
+	if (MY_Farbnamen and MY_Farbnamen.GetMenu) then
+		ui:append("WndComboBox", {
+			x = x, y = y, w = 150,
+			text = _L['farbnamen'],
+			menu = MY_Farbnamen.GetMenu,
+		})
+		y = y + deltaY
+	end
 end
-MY.RegisterPanel("MY_ChatSwitch", _L["chat switch"], _L['Chat'], "UI/Image/UICommon/ActivePopularize2.UITex|20", {255,255,0,200}, PS)
+MY.RegisterPanel("MY_ChatSwitch", _L["chat helper"], _L['Chat'], "UI/Image/UICommon/ActivePopularize2.UITex|20", {255,255,0,200}, PS)

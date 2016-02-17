@@ -56,6 +56,8 @@ data = {
     ['always show *'] = '總是顯示※號',
     ['always be white'] = '永遠顯示爲白色',
     ['hide system msg copy'] = '不複制系統消息',
+    ['farbnamen'] = '職業染色',
+    ['chat time format'] = '聊天時間格式',
     
     ['Mingyi Plugins - Chatpanel\nThis plugin is developed by Zhai YiMing @ derzh.com.'] = '[茗伊插件集] - 聊天輔助\n------------\n√該插件由翟一鳴小朋宇獨立開發完成。\n√有問題請聯系：茗伊@雙夢鎮@光明頂@荻花宮@體服',
     
