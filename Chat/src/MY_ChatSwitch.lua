@@ -91,24 +91,30 @@ local function OnMosaicsUncheck()
 end
 
 local CHANNEL_LIST = {
-	{id = "NEAR", title = _L["SAY"     ], head = "/s ", channel = PLAYER_TALK_CHANNEL.NEARBY       , cd = 0  , color = {255, 255, 255}}, --说
-	{id = "SENC", title = _L["MAP"     ], head = "/y ", channel = PLAYER_TALK_CHANNEL.SENCE        , cd = 30 , color = {255, 126, 126}}, --地
-	{id = "WORL", title = _L["WORLD"   ], head = "/h ", channel = PLAYER_TALK_CHANNEL.WORLD        , cd = 180, color = {252, 204, 204}}, --世
-	{id = "TEAM", title = _L["PARTY"   ], head = "/p ", channel = PLAYER_TALK_CHANNEL.TEAM         , cd = 0  , color = {140, 178, 253}}, --队
-	{id = "RAID", title = _L["TEAM"    ], head = "/t ", channel = PLAYER_TALK_CHANNEL.RAID         , cd = 0  , color = { 73, 168, 241}}, --团
-	{id = "BATT", title = _L["BATTLE"  ], head = "/b ", channel = PLAYER_TALK_CHANNEL.BATTLE_FIELD , cd = 0  , color = {255, 126, 126}}, --战
-	{id = "TONG", title = _L["FACTION" ], head = "/g ", channel = PLAYER_TALK_CHANNEL.TONG         , cd = 0  , color = {  0, 200,  72}}, --帮
-	{id = "FORC", title = _L["SCHOOL"  ], head = "/f ", channel = PLAYER_TALK_CHANNEL.FORCE        , cd = 60 , color = {  0, 255, 255}}, --派
-	{id = "CAMP", title = _L["CAMP"    ], head = "/c ", channel = PLAYER_TALK_CHANNEL.CAMP         , cd = 0  , color = {155, 230,  58}}, --阵
-	{id = "FRIE", title = _L["FRIEND"  ], head = "/o ", channel = PLAYER_TALK_CHANNEL.FRIENDS      , cd = 0  , color = {241, 114, 183}}, --友
-	{id = "TONG", title = _L["ALLIANCE"], head = "/a ", channel = PLAYER_TALK_CHANNEL.TONG_ALLIANCE, cd = 0  , color = {178, 240, 164}}, --盟
+	{id = "NEAR", title = _L["SAY"     ], head = "/s ", channel = PLAYER_TALK_CHANNEL.NEARBY       , cd = 0 , color = {255, 255, 255}}, --说
+	{id = "SENC", title = _L["MAP"     ], head = "/y ", channel = PLAYER_TALK_CHANNEL.SENCE        , cd = 10, color = {255, 126, 126}}, --地
+	{id = "WORL", title = _L["WORLD"   ], head = "/h ", channel = PLAYER_TALK_CHANNEL.WORLD        , cd = 60, color = {252, 204, 204}}, --世
+	{id = "TEAM", title = _L["PARTY"   ], head = "/p ", channel = PLAYER_TALK_CHANNEL.TEAM         , cd = 0 , color = {140, 178, 253}}, --队
+	{id = "RAID", title = _L["TEAM"    ], head = "/t ", channel = PLAYER_TALK_CHANNEL.RAID         , cd = 0 , color = { 73, 168, 241}}, --团
+	{id = "BATT", title = _L["BATTLE"  ], head = "/b ", channel = PLAYER_TALK_CHANNEL.BATTLE_FIELD , cd = 0 , color = {255, 126, 126}}, --战
+	{id = "TONG", title = _L["FACTION" ], head = "/g ", channel = PLAYER_TALK_CHANNEL.TONG         , cd = 0 , color = {  0, 200,  72}}, --帮
+	{id = "FORC", title = _L["SCHOOL"  ], head = "/f ", channel = PLAYER_TALK_CHANNEL.FORCE        , cd = 20, color = {  0, 255, 255}}, --派
+	{id = "CAMP", title = _L["CAMP"    ], head = "/c ", channel = PLAYER_TALK_CHANNEL.CAMP         , cd = 30, color = {155, 230,  58}}, --阵
+	{id = "FRIE", title = _L["FRIEND"  ], head = "/o ", channel = PLAYER_TALK_CHANNEL.FRIENDS      , cd = 10, color = {241, 114, 183}}, --友
+	{id = "TONG", title = _L["ALLIANCE"], head = "/a ", channel = PLAYER_TALK_CHANNEL.TONG_ALLIANCE, cd = 0 , color = {178, 240, 164}}, --盟
 	{id = "CLSC", title = _L['CLS'     ], onclick = OnClsCheck, color = {255, 0, 0}}, --清
 	{id = "AWAY", title = _L["AWAY"    ], oncheck = OnAwayCheck, onuncheck = OnAwayUncheck, tip = OnAwayTip, color = {255, 255, 255}}, --离
 	{id = "BUSY", title = _L["BUSY"    ], oncheck = OnBusyCheck, onuncheck = OnBusyUncheck, tip = OnBusyTip, color = {255, 255, 255}}, --扰
 	{id = "MOSA", title = _L["MOSAICS" ], oncheck = OnMosaicsCheck, onuncheck = OnMosaicsUncheck, color = {255, 255, 255}}, --马
 }
 local CHANNEL_DICT = {}
+local CHANNEL_TITLE = {}
+local CHANNEL_CD_TIME = {}
 for i, v in ipairs(CHANNEL_LIST) do
+	if v.channel then
+		CHANNEL_TITLE[v.channel] = v.title
+		CHANNEL_CD_TIME[v.channel] = v.cd
+	end
 	CHANNEL_DICT[v.id] = v
 	MY_ChatSwitch.tChannel[v.id] = true
 end
@@ -133,7 +139,7 @@ end
 
 function MY_ChatSwitch.OnFrameCreate()
 	this.tRadios = {}
-	this:RegisterEvent("PLAYER_SAY")
+	this:RegisterEvent("PLAYER_TALK")
 	this:EnableDrag(not MY_ChatSwitch.bLockPostion)
 	
 	local hContainer = this:Lookup("WndContainer_Radios")
@@ -160,6 +166,8 @@ function MY_ChatSwitch.OnFrameCreate()
 				hCheck.OnCheckBoxCheck = v.oncheck
 				hCheck.OnCheckBoxUncheck = v.onuncheck
 			end
+			hCheck.hTitle = hTitle
+			hCheck.hCooldown = hCooldown
 			if v.channel then
 				this.tRadios[v.channel] = hCheck
 			end
@@ -188,13 +196,13 @@ function MY_ChatSwitch.OnFrameCreate()
 end
 
 function MY_ChatSwitch.OnEvent(event)
-	if event == "PLAYER_SAY" then
-		if arg1 ~= UI_GetClientPlayerID() then
+	if event == "PLAYER_TALK" then
+		if arg0 ~= UI_GetClientPlayerID() then
 			return
 		end
-		local hRadio = this.tRadios[arg2]
+		local hRadio = this.tRadios[arg1]
 		if hRadio then
-			m_tChannelTime[arg2] = GetCurrentTime()
+			m_tChannelTime[arg1] = GetCurrentTime()
 		end
 	elseif event == "UI_SCALED" then
 		MY_ChatSwitch.UpdateAnchor(this)
@@ -203,14 +211,16 @@ end
 
 function MY_ChatSwitch.OnFrameBreathe()
 	for nChannel, nTime in pairs(m_tChannelTime) do
-		local nCD = CHANNEL_CD_TIME[nChannel] - (GetCurrentTime() - nTime)
-		if nCD > 0 then
-			XGUI(this.tRadios[nChannel]):text(nCD .. "\n" .. CHANNEL_TITLE[nChannel])
-		else
+		local nCooldown = (CHANNEL_CD_TIME[nChannel] or 0) - (GetCurrentTime() - nTime)
+		if nCooldown <= 0 then
 			m_tChannelTime[nChannel] = nil
-			XGUI(this.tRadios[nChannel]):text(CHANNEL_TITLE[nChannel])
 		end
-		XGUI(this.tRadios[nChannel]):find(".Text"):autosize()
+		
+		local hCheck = this.tRadios[nChannel]
+		local hCooldown = hCheck and hCheck.hCooldown
+		if hCooldown then
+			hCooldown:SetText(nCooldown > 0 and nCooldown or "")
+		end
 	end
 end
 
