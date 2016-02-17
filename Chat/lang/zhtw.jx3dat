@@ -17,6 +17,7 @@ data = {
     ['MOSAICS']  = '馬',
     
     ['chat helper'] = '聊天助手',
+    ['chat switch'] = '頻道切換',
     ['chat log'] = '聊天記錄',
     ['Max log: %d'] = '最大記錄：%d',
     
@@ -35,9 +36,10 @@ data = {
     ['Chatlog export succeed, file saved as %s'] = '聊天記錄導出成功：%s',
     ['Exporting chatlog: %s, %.2f%%.'] = '聊天記錄導出 - %s - %.2f%%',
     
-    ['about...'] = '關于...',
-    ['lock postion'] = '鎖定位置',
-    ['team balloon'] = '隊伍泡泡',
+    ['about...'] = '關于',
+    ['display panel'] = '顯示聊天頻道快速切換面板',
+    ['lock postion'] = '鎖定聊天頻道快速切換面板位置',
+    ['team balloon'] = '顯示隊伍聊天泡泡',
     ['chat copy'] = '聊天複制',
     ['chat filter'] = '聊天過濾',
     ['keyword manager'] = '關鍵字管理',
@@ -45,7 +47,6 @@ data = {
     ['hh:mm'] = '時：分',
     ['hh:mm:ss'] = '時：分：秒',
     ['channel setting'] = '頻道設置',
-    ['display panel'] = '顯示面板',
     
     ['All channels'] = "所有頻道",
     ['disabled'] = "已禁用",
