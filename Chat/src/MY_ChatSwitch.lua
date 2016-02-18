@@ -139,6 +139,7 @@ end
 
 function MY_ChatSwitch.OnFrameCreate()
 	this.tRadios = {}
+	this:RegisterEvent("UI_SCALED")
 	this:RegisterEvent("PLAYER_TALK")
 	this:EnableDrag(not MY_ChatSwitch.bLockPostion)
 	
