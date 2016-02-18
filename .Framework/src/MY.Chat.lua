@@ -760,6 +760,99 @@ function MY.Chat.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToCha
 end
 MY.Talk = MY.Chat.Talk
 
+local function GetRegisterChannelLimitTable()
+	if not IsUITableRegister("LevelUpData") then
+		local me = GetClientPlayer()
+		if not me then
+			return false
+		end
+		local path = ("settings\\LevelUpData\\%s.tab"):format(({
+			[ROLE_TYPE.STANDARD_MALE  ] = "StandardMale"  ,
+			[ROLE_TYPE.STANDARD_FEMALE] = "StandardFemale",
+			[ROLE_TYPE.STRONG_MALE    ] = "StrongMale"    ,
+			[ROLE_TYPE.SEXY_FEMALE    ] = "SexyFemale"    ,
+			[ROLE_TYPE.LITTLE_BOY     ] = "LittleBoy"     ,
+			[ROLE_TYPE.LITTLE_GIRL    ] = "LittleGirl"    ,
+		})[me.nRoleType])
+		local tTitle = {
+			{f = "i", t = "Level"},
+			{f = "i", t = "Experience"},
+			{f = "i", t = "Strength"},
+			{f = "i", t = "Agility"},
+			{f = "i", t = "Vigor"},
+			{f = "i", t = "Spirit"},
+			{f = "i", t = "Spunk"},
+			{f = "i", t = "MaxLife"},
+			{f = "i", t = "MaxMana"},
+			{f = "i", t = "MaxStamina"},
+			{f = "i", t = "MaxThew"},
+			{f = "i", t = "MaxAssistExp"},
+			{f = "i", t = "MaxAssistTimes"},
+			{f = "i", t = "RunSpeed"},
+			{f = "i", t = "JumpSpeed"},
+			{f = "i", t = "Height"},
+			{f = "i", t = "LifeReplenish"},
+			{f = "i", t = "LifeReplenishPercent"},
+			{f = "i", t = "LifeReplenishExt"},
+			{f = "i", t = "ManaReplenish"},
+			{f = "i", t = "ManaReplenishPercent"},
+			{f = "i", t = "ManaReplenishExt"},
+			{f = "i", t = "HitBase"},
+			{f = "i", t = "ParryBaseRate"},
+			{f = "i", t = "PhysicsCriticalStrike"},
+			{f = "i", t = "SolarCriticalStrike"},
+			{f = "i", t = "NeutralCriticalStrike"},
+			{f = "i", t = "LunarCriticalStrike"},
+			{f = "i", t = "PoisonCriticalStrike"},
+			{f = "i", t = "NoneWeaponAttackSpeedBase"},
+			{f = "i", t = "MaxPhysicsDefence"},
+			{f = "i", t = "WorldChannelDailyLimit"},
+			{f = "i", t = "ForceChannelDailyLimit"},
+			{f = "i", t = "CampChannelDailyLimit"},
+			{f = "i", t = "MaxContribution"},
+			{f = "i", t = "WhisperDailyLimit"},
+			{f = "i", t = "SprintPowerMax"},
+			{f = "i", t = "SprintPowerCost"},
+			{f = "i", t = "SprintPowerRevive"},
+			{f = "i", t = "SprintPowerCostOnWall"},
+			{f = "i", t = "SprintPowerCostStandOnWall"},
+			{f = "i", t = "SprintPowerCostRunOnWallExtra"},
+			{f = "i", t = "HorseSprintPowerMax"},
+			{f = "i", t = "HorseSprintPowerCost"},
+			{f = "i", t = "HorseSprintPowerRevive"},
+			{f = "i", t = "SceneChannelDailyLimit"},
+			{f = "i", t = "NearbyChannelDailyLimit"},
+			{f = "i", t = "WorldChannelDailyLimitByVIP"},
+			{f = "i", t = "WorldChannelDailyLimitBySuperVIP"},
+		}
+		RegisterUITable("LevelUpData", path, tTitle)
+	end
+	return g_tTable.LevelUpData
+end
+local DAILY_LIMIT_TABLE_KEY = {
+	[PLAYER_TALK_CHANNEL.WORLD ] = "WorldChannelDailyLimit",
+	[PLAYER_TALK_CHANNEL.FORCE ] = "ForceChannelDailyLimit",
+	[PLAYER_TALK_CHANNEL.CAMP  ] = "CampChannelDailyLimit",
+	[PLAYER_TALK_CHANNEL.SENCE ] = "SceneChannelDailyLimit",
+	[PLAYER_TALK_CHANNEL.NEARBY] = "NearbyChannelDailyLimit",
+}
+function MY.Chat.GetChannelDailyLimit(nLevel, nChannel)
+	local LevelUpData = GetRegisterChannelLimitTable()
+	if not LevelUpData then
+		return false
+	end
+	local szKey = DAILY_LIMIT_TABLE_KEY[nChannel]
+	if not szKey then
+		return -1
+	end
+	local tUpData = LevelUpData:Search(nLevel)
+	if not tUpData then
+		return false
+	end
+	return tUpData[szKey] or -1
+end
+MY.GetChannelDailyLimit = MY.Chat.GetChannelDailyLimit
+
 _C.tMsgMonitorFun = {}
 -- Register:   MY.Chat.RegisterMsgMonitor(string szKey, function fnAction, table tChannels)
 --             MY.Chat.RegisterMsgMonitor(function fnAction, table tChannels)
