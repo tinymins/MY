@@ -1790,9 +1790,9 @@ function XGUI:color(r, g, b)
 	end
 end
 
--- (self) Instance:drawEclipse(number)
+-- (self) Instance:drawEclipse(numbers nX, nY, nMajorAxis, nMinorAxis, dwRotate, dwPitch, dwRad, nR, nG, nB, nA, nAccuracy)
 function XGUI:drawEclipse(nX, nY, nMajorAxis, nMinorAxis, dwRotate, dwPitch, dwRad, nR, nG, nB, nA, nAccuracy)
-	local sha
+	local sha, nDis
 	local dwRad1 = dwPitch
 	local dwRad2 = dwPitch + dwRad
 	nAccuracy = nAccuracy or 16
@@ -1805,11 +1805,17 @@ function XGUI:drawEclipse(nX, nY, nMajorAxis, nMinorAxis, dwRotate, dwPitch, dwR
 			sha:AppendTriangleFanPoint(nX ,nY, nR, nG, nB, nA)
 			sha:Show()
 			repeat
+				nDis = nMajorAxis * nMinorAxis / math.sqrt(math.pow(nMinorAxis * math.cos(dwRad1 - dwRotate), 2) + math.pow(nMajorAxis * math.sin(dwRad1 - dwRotate), 2))
 				sha:AppendTriangleFanPoint(
-					nX + (nMajorAxis * math.cos(dwRotate) * math.cos(dwRad1 - dwRotate) - nMinorAxis * math.sin(dwRotate) * math.sin(dwRad1 - dwRotate)),
-					nY - (nMinorAxis * math.cos(dwRotate) * math.sin(dwRad1 - dwRotate) + nMajorAxis * math.sin(dwRotate) * math.cos(dwRad1 - dwRotate)),
+					nX + nDis * math.cos(dwRad1),
+					nY - nDis * math.sin(dwRad1),
 					nR, nG, nB, nA
 				)
+				-- sha:AppendTriangleFanPoint(
+				-- 	nX + (nMajorAxis * math.cos(dwRotate) * math.cos(dwRad1 - dwRotate) - nMinorAxis * math.sin(dwRotate) * math.sin(dwRad1 - dwRotate)),
+				-- 	nY - (nMinorAxis * math.cos(dwRotate) * math.sin(dwRad1 - dwRotate) + nMajorAxis * math.sin(dwRotate) * math.cos(dwRad1 - dwRotate)),
+				-- 	nR, nG, nB, nA
+				-- )
 				dwRad1 = dwRad1 + math.pi / nAccuracy
 			until dwRad1 > dwRad2
 		end
@@ -1817,6 +1823,7 @@ function XGUI:drawEclipse(nX, nY, nMajorAxis, nMinorAxis, dwRotate, dwPitch, dwR
 	return self
 end
 
+-- (self) Instance:drawCircle(numbers nX, nY, nRadius, dwPitch, dwRad, nR, nG, nB, nA, nAccuracy)
 function XGUI:drawCircle(nX, nY, nRadius, dwPitch, dwRad, nR, nG, nB, nA, nAccuracy)
 	local sha
 	local dwRad1 = dwPitch
