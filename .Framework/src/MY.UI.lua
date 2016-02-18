@@ -1790,12 +1790,13 @@ function XGUI:color(r, g, b)
 	end
 end
 
--- (self) Instance:drawEclipse(numbers nX, nY, nMajorAxis, nMinorAxis, dwRotate, dwPitch, dwRad, nR, nG, nB, nA, nAccuracy)
-function XGUI:drawEclipse(nX, nY, nMajorAxis, nMinorAxis, dwRotate, dwPitch, dwRad, nR, nG, nB, nA, nAccuracy)
+function XGUI:drawEclipse(nX, nY, nMajorAxis, nMinorAxis, nR, nG, nB, nA, dwRotate, dwPitch, dwRad, nAccuracy)
+	nR, nG, nB, nA = nR or 255, nG or 255, nB or 255, nA or 255
+	dwRotate, dwPitch, dwRad = dwRotate or 0, dwPitch or 0, dwRad or (2 * math.pi)
+	nAccuracy = nAccuracy or 16
 	local sha, nDis
 	local dwRad1 = dwPitch
 	local dwRad2 = dwPitch + dwRad
-	nAccuracy = nAccuracy or 16
 	for _, ele in pairs(self.eles) do
 		sha = ele.sdw
 		if sha then
@@ -1823,12 +1824,13 @@ function XGUI:drawEclipse(nX, nY, nMajorAxis, nMinorAxis, dwRotate, dwPitch, dwR
 	return self
 end
 
--- (self) Instance:drawCircle(numbers nX, nY, nRadius, dwPitch, dwRad, nR, nG, nB, nA, nAccuracy)
-function XGUI:drawCircle(nX, nY, nRadius, dwPitch, dwRad, nR, nG, nB, nA, nAccuracy)
+function XGUI:drawCircle(nX, nY, nRadius, nR, nG, nB, nA, dwPitch, dwRad, nAccuracy)
+	nR, nG, nB, nA = nR or 255, nG or 255, nB or 255, nA or 255
+	dwPitch, dwRad = dwPitch or 0, dwRad or (2 * math.pi)
+	nAccuracy = nAccuracy or 16
 	local sha
 	local dwRad1 = dwPitch
 	local dwRad2 = dwPitch + dwRad
-	nAccuracy = nAccuracy or 16
 	for _, ele in pairs(self.eles) do
 		sha = ele.sdw
 		if sha then
