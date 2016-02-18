@@ -210,7 +210,7 @@ function MY_ChatSwitch.OnFrameCreate()
 				this.tRadios[v.channel] = chk
 			end
 			if v.tip then
-				XGUI(chk):tip(v.tip)
+				XGUI(chk):tip(v.tip, MY.Const.UI.Tip.CENTER)
 			end
 			if txtTitle then
 				txtTitle:SetText(v.title)
@@ -277,7 +277,7 @@ function MY_ChatSwitch.OnMouseEnter()
 	if this.szTip then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
-		OutputTip(this.szTip, 450, {x, y, w, h}, MY.Const.UI.Tip.POS_FOLLOW_MOUSE)
+		OutputTip(this.szTip, 450, {x, y, w, h}, ALW.RIGHT_LEFT_AND_BOTTOM_TOP)
 	end
 end
 
