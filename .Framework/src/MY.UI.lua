@@ -1790,6 +1790,55 @@ function XGUI:color(r, g, b)
 	end
 end
 
+-- (self) Instance:drawEclipse(number)
+function XGUI:drawEclipse(nX, nY, nMajorAxis, nMinorAxis, dwRotate, dwPitch, dwRad, nR, nG, nB, nA, nAccuracy)
+	local sha
+	local dwRad1 = dwPitch
+	local dwRad2 = dwPitch + dwRad
+	nAccuracy = nAccuracy or 16
+	for _, ele in pairs(self.eles) do
+		sha = ele.sdw
+		if sha then
+			sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
+			sha:SetD3DPT(D3DPT.TRIANGLEFAN)
+			sha:ClearTriangleFanPoint()
+			sha:AppendTriangleFanPoint(nX ,nY, nR, nG, nB, nA)
+			sha:Show()
+			repeat
+				sha:AppendTriangleFanPoint(
+					nX + (nMajorAxis * math.cos(dwRotate) * math.cos(dwRad1 - dwRotate) - nMinorAxis * math.sin(dwRotate) * math.sin(dwRad1 - dwRotate)),
+					nY - (nMinorAxis * math.cos(dwRotate) * math.sin(dwRad1 - dwRotate) + nMajorAxis * math.sin(dwRotate) * math.cos(dwRad1 - dwRotate)),
+					nR, nG, nB, nA
+				)
+				dwRad1 = dwRad1 + math.pi / nAccuracy
+			until dwRad1 > dwRad2
+		end
+	end
+	return self
+end
+
+function XGUI:drawCircle(nX, nY, nRadius, dwPitch, dwRad, nR, nG, nB, nA, nAccuracy)
+	local sha
+	local dwRad1 = dwPitch
+	local dwRad2 = dwPitch + dwRad
+	nAccuracy = nAccuracy or 16
+	for _, ele in pairs(self.eles) do
+		sha = ele.sdw
+		if sha then
+			sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
+			sha:SetD3DPT(D3DPT.TRIANGLEFAN)
+			sha:ClearTriangleFanPoint()
+			sha:AppendTriangleFanPoint(nX ,nY, nR, nG, nB, nA)
+			sha:Show()
+			repeat
+				sha:AppendTriangleFanPoint(nX + math.cos(dwRad1) * nRadius, nY - math.sin(dwRad1) * nRadius, nR, nG, nB, nA)
+				dwRad1 = dwRad1 + math.pi / nAccuracy
+			until dwRad1 > dwRad2
+		end
+	end
+	return self
+end
+
 -- (number) Instance:left()
 -- (self) Instance:left(number)
 function XGUI:left(nLeft)
