@@ -15,7 +15,7 @@ data = {
     ['AWAY']     = '离',
     ['BUSY']     = '扰',
     ['MOSAICS']  = '马',
-    ['Today: %d\nDaily limit: %d'] = '当日已发：%d\n每日上线：%d',
+    ['Today: %d\nDaily limit: %d'] = '当日已发：%d\n每日上限：%d',
     ['Today: %d\nDaily limit: no limitation'] = '当日已发：%d\n每日上限：无限制',
     
     ['chat helper'] = '聊天助手',
