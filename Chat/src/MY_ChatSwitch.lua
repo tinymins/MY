@@ -11,6 +11,37 @@ local INI_PATH = MY.GetAddonInfo().szRoot .. "Chat/ui/MY_ChatSwitch.ini"
 MY_ChatSwitch = {}
 MY_ChatSwitch.tChannel = {}
 
+local function UpdateChannelDailyLimit(hRadio, bPlus)
+	local me = GetClientPlayer()
+	local shaCount = hRadio and hRadio.shaCount
+	if not (me and shaCount) then
+		return
+	end
+	
+	local dwPercent = 1
+	local info = hRadio.info
+	local nChannel = info.channel
+	if nChannel then
+		local szDate = MY.FormatTime("yyyyMMdd", GetCurrentTime())
+		if MY_ChatSwitch.tChannelCount.szDate ~= szDate then
+			MY_ChatSwitch.tChannelCount = {szDate = szDate}
+		end
+		MY_ChatSwitch.tChannelCount[nChannel] = (MY_ChatSwitch.tChannelCount[nChannel] or 0) + (bPlus and 1 or 0)
+		
+		local nDailyCount = MY_ChatSwitch.tChannelCount[nChannel]
+		local nDailyLimit = MY.GetChannelDailyLimit(me.nLevel, nChannel)
+		if nDailyLimit then
+			if nDailyLimit > 0 then
+				dwPercent = (nDailyLimit - nDailyCount) / nDailyLimit
+				hRadio.szTip = GetFormatText(_L("Today: %d\nDaily limit: %d", nDailyCount, nDailyLimit), nil, 255, 255, 0)
+			else
+				hRadio.szTip = GetFormatText(_L("Today: %d\nDaily limit: no limitation", nDailyCount), nil, 255, 255, 0)
+			end
+		end
+	end
+	XGUI(shaCount):drawCircle(nil, nil, nil, info.color[1], info.color[2], info.color[3], 100, math.pi / 2, math.pi * 2 * dwPercent)
+end
+
 local function OnClsCheck()
 	local function Cls(bAll)
 		for i = 1, 10 do
@@ -121,10 +152,12 @@ end
 local m_tChannelTime = {}
 
 MY_ChatSwitch.anchor = { x=10, y=-60, s="BOTTOMLEFT", r="BOTTOMLEFT" }
+MY_ChatSwitch.tChannelCount = {}
 MY_ChatSwitch.bDisplayPanel = true
 MY_ChatSwitch.bLockPostion = false
 MY_ChatSwitch.bAlertBeforeClear = true
 RegisterCustomData("MY_ChatSwitch.anchor")
+RegisterCustomData("MY_ChatSwitch.tChannelCount")
 RegisterCustomData("MY_ChatSwitch.bDisplayPanel")
 RegisterCustomData("MY_ChatSwitch.bLockPostion")
 RegisterCustomData("MY_ChatSwitch.bAlertBeforeClear")
@@ -141,6 +174,7 @@ function MY_ChatSwitch.OnFrameCreate()
 	this.tRadios = {}
 	this:RegisterEvent("UI_SCALED")
 	this:RegisterEvent("PLAYER_TALK")
+	this:RegisterEvent("CUSTOM_DATA_LOADED")
 	this:EnableDrag(not MY_ChatSwitch.bLockPostion)
 	
 	local hContainer = this:Lookup("WndContainer_Radios")
@@ -150,42 +184,49 @@ function MY_ChatSwitch.OnFrameCreate()
 	for _, v in ipairs(CHANNEL_LIST) do
 		if MY_ChatSwitch.tChannel[v.id] then
 			i = i + 1
-			local hCheck, hTitle, hCooldown
+			local chk, txtTitle, txtCooldown, shaCount
 			if v.head then
-				hCheck = hContainer:AppendContentFromIni(INI_PATH, "Wnd_Channel"):Lookup("WndRadioChannel")
-				hTitle = hCheck:Lookup("", "Text_Channel")
-				hCooldown = hCheck:Lookup("", "Text_CD")
-				hCheck.OnCheckBoxCheck = OnChannelCheck
+				chk = hContainer:AppendContentFromIni(INI_PATH, "Wnd_Channel"):Lookup("WndRadioChannel")
+				txtTitle = chk:Lookup("", "Text_Channel")
+				txtCooldown = chk:Lookup("", "Text_CD")
+				shaCount = chk:Lookup("", "Shadow_Count")
+				chk.OnCheckBoxCheck = OnChannelCheck
 			elseif v.onclick then
-				hCheck = hContainer:AppendContentFromIni(INI_PATH, "Wnd_Channel"):Lookup("WndRadioChannel")
-				hTitle = hCheck:Lookup("", "Text_Channel")
-				hCooldown = hCheck:Lookup("", "Text_CD")
-				hCheck.OnCheckBoxCheck = v.onclick
+				chk = hContainer:AppendContentFromIni(INI_PATH, "Wnd_Channel"):Lookup("WndRadioChannel")
+				txtTitle = chk:Lookup("", "Text_Channel")
+				txtCooldown = chk:Lookup("", "Text_CD")
+				shaCount = chk:Lookup("", "Shadow_Count")
+				chk.OnCheckBoxCheck = v.onclick
 			else
-				hCheck = hContainer:AppendContentFromIni(INI_PATH, "Wnd_CheckBox"):Lookup("WndCheckBox")
-				hTitle = hCheck:Lookup("", "Text_CheckBox")
-				hCheck.OnCheckBoxCheck = v.oncheck
-				hCheck.OnCheckBoxUncheck = v.onuncheck
+				chk = hContainer:AppendContentFromIni(INI_PATH, "Wnd_CheckBox"):Lookup("WndCheckBox")
+				txtTitle = chk:Lookup("", "Text_CheckBox")
+				chk.OnCheckBoxCheck = v.oncheck
+				chk.OnCheckBoxUncheck = v.onuncheck
 			end
-			hCheck.hTitle = hTitle
-			hCheck.hCooldown = hCooldown
+			chk.txtTitle = txtTitle
+			chk.txtCooldown = txtCooldown
+			chk.shaCount = shaCount
 			if v.channel then
-				this.tRadios[v.channel] = hCheck
+				this.tRadios[v.channel] = chk
 			end
 			if v.tip then
-				XGUI(hCheck):tip(v.tip)
+				XGUI(chk):tip(v.tip)
 			end
-			if hTitle then
-				hTitle:SetText(v.title)
-				hTitle:SetFontScheme(197)
-				hTitle:SetFontColor(unpack(v.color or {255, 255, 255}))
+			if txtTitle then
+				txtTitle:SetText(v.title)
+				txtTitle:SetFontScheme(197)
+				txtTitle:SetFontColor(unpack(v.color or {255, 255, 255}))
 			end
-			if hCooldown then
-				hCooldown:SetText("")
-				hCooldown:SetFontScheme(197)
-				hCooldown:SetFontColor(unpack(v.color or {255, 255, 255}))
+			if txtCooldown then
+				txtCooldown:SetText("")
+				txtCooldown:SetFontScheme(197)
+				txtCooldown:SetFontColor(unpack(v.color or {255, 255, 255}))
 			end
-			hCheck.info = v
+			if shaCount then
+				XGUI(shaCount):drawCircle(0, 0, 0)
+			end
+			chk.info = v
+			UpdateChannelDailyLimit(chk)
 		end
 	end
 	hContainer:FormatAllContentPos()
@@ -203,10 +244,17 @@ function MY_ChatSwitch.OnEvent(event)
 		end
 		local hRadio = this.tRadios[arg1]
 		if hRadio then
+			UpdateChannelDailyLimit(hRadio, true)
 			m_tChannelTime[arg1] = GetCurrentTime()
 		end
 	elseif event == "UI_SCALED" then
 		MY_ChatSwitch.UpdateAnchor(this)
+	elseif event == "CUSTOM_DATA_LOADED" then
+		if arg0 == "Role" then
+			for nChannel, hRadio in pairs(this.tRadios) do
+				UpdateChannelDailyLimit(hRadio)
+			end
+		end
 	end
 end
 
@@ -218,11 +266,23 @@ function MY_ChatSwitch.OnFrameBreathe()
 		end
 		
 		local hCheck = this.tRadios[nChannel]
-		local hCooldown = hCheck and hCheck.hCooldown
-		if hCooldown then
-			hCooldown:SetText(nCooldown > 0 and nCooldown or "")
+		local txtCooldown = hCheck and hCheck.txtCooldown
+		if txtCooldown then
+			txtCooldown:SetText(nCooldown > 0 and nCooldown or "")
 		end
 	end
+end
+
+function MY_ChatSwitch.OnMouseEnter()
+	if this.szTip then
+		local x, y = this:GetAbsPos()
+		local w, h = this:GetSize()
+		OutputTip(this.szTip, 450, {x, y, w, h}, MY.Const.UI.Tip.POS_FOLLOW_MOUSE)
+	end
+end
+
+function MY_ChatSwitch.OnMouseLeave()
+	HideTip()
 end
 
 function MY_ChatSwitch.OnLButtonClick()
