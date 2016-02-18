@@ -1828,19 +1828,22 @@ function XGUI:drawCircle(nX, nY, nRadius, nR, nG, nB, nA, dwPitch, dwRad, nAccur
 	nR, nG, nB, nA = nR or 255, nG or 255, nB or 255, nA or 255
 	dwPitch, dwRad = dwPitch or 0, dwRad or (2 * math.pi)
 	nAccuracy = nAccuracy or 16
-	local sha
+	local sha, nX1, nY1, nRadius1
 	local dwRad1 = dwPitch
 	local dwRad2 = dwPitch + dwRad
 	for _, ele in pairs(self.eles) do
 		sha = ele.sdw
 		if sha then
+			nX1 = nX or (sha:GetW() / 2)
+			nY1 = nY or (sha:GetH() / 2)
+			nRadius1 = nRadius1 or math.min(nX1, nY1)
 			sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
 			sha:SetD3DPT(D3DPT.TRIANGLEFAN)
 			sha:ClearTriangleFanPoint()
-			sha:AppendTriangleFanPoint(nX ,nY, nR, nG, nB, nA)
+			sha:AppendTriangleFanPoint(nX1, nY1, nR, nG, nB, nA)
 			sha:Show()
 			repeat
-				sha:AppendTriangleFanPoint(nX + math.cos(dwRad1) * nRadius, nY - math.sin(dwRad1) * nRadius, nR, nG, nB, nA)
+				sha:AppendTriangleFanPoint(nX1 + math.cos(dwRad1) * nRadius1, nY1 - math.sin(dwRad1) * nRadius1, nR, nG, nB, nA)
 				dwRad1 = dwRad1 + math.pi / nAccuracy
 			until dwRad1 > dwRad2
 		end
