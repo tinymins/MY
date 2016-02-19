@@ -760,8 +760,9 @@ function MY.Chat.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToCha
 end
 MY.Talk = MY.Chat.Talk
 
+local m_LevelUpData
 local function GetRegisterChannelLimitTable()
-	if not IsUITableRegister("LevelUpData") then
+	if not m_LevelUpData then
 		local me = GetClientPlayer()
 		if not me then
 			return false
@@ -825,9 +826,9 @@ local function GetRegisterChannelLimitTable()
 			{f = "i", t = "WorldChannelDailyLimitByVIP"},
 			{f = "i", t = "WorldChannelDailyLimitBySuperVIP"},
 		}
-		RegisterUITable("LevelUpData", path, tTitle)
+		m_LevelUpData = KG_Table.Load(path, tTitle, FILE_OPEN_MODE.NORMAL)
 	end
-	return g_tTable.LevelUpData
+	return m_LevelUpData
 end
 local DAILY_LIMIT_TABLE_KEY = {
 	[PLAYER_TALK_CHANNEL.WORLD ] = "WorldChannelDailyLimit",
