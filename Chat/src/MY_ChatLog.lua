@@ -540,6 +540,7 @@ function _C.OnPanelActive(wnd)
 	}) do
 		ui:append('WndRadioBox', 'RadioBox_' .. szChannel):children('#RadioBox_' .. szChannel)
 		  :pos(x + (i - 1) * 100, y):width(90)
+		  :group("default")
 		  :text(g_tStrings.tChannelName[szChannel] or '')
 		  :check(function(bChecked)
 		  	if bChecked then
