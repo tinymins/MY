@@ -107,13 +107,15 @@ function MY_TeamBalloon.OnFrameBreathe()
 	local hTotal = this:Lookup("", "")
 	for i = 0, hTotal:GetItemCount() - 1 do
 		local hBalloon = hTotal:Lookup(i)
-		local nTick = GetTime() - hBalloon.nTime
-		if nTick <= ANIMATE_SHOW_TIME then
-			hBalloon:SetAlpha(nTick / ANIMATE_SHOW_TIME * 255)
-		elseif nTick >= ANIMATE_SHOW_TIME + DISPLAY_TIME + ANIMATE_HIDE_TIME then
-			hTotal:RemoveItem(hBalloon)
-		elseif nTick >= ANIMATE_SHOW_TIME + DISPLAY_TIME then
-			hBalloon:SetAlpha((1 - (nTick - ANIMATE_SHOW_TIME - DISPLAY_TIME) / ANIMATE_HIDE_TIME) * 255)
+		if hBalloon and hBalloon.nTime then
+			local nTick = GetTime() - hBalloon.nTime
+			if nTick <= ANIMATE_SHOW_TIME then
+				hBalloon:SetAlpha(nTick / ANIMATE_SHOW_TIME * 255)
+			elseif nTick >= ANIMATE_SHOW_TIME + DISPLAY_TIME + ANIMATE_HIDE_TIME then
+				hTotal:RemoveItem(hBalloon)
+			elseif nTick >= ANIMATE_SHOW_TIME + DISPLAY_TIME then
+				hBalloon:SetAlpha((1 - (nTick - ANIMATE_SHOW_TIME - DISPLAY_TIME) / ANIMATE_HIDE_TIME) * 255)
+			end
 		end
 	end
 end
