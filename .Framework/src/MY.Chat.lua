@@ -521,6 +521,10 @@ function MY.Chat.SwitchChat(nChannel)
 	local szHeader = _C.tTalkChannelHeader[nChannel]
 	if szHeader then
 		SwitchChatChannel(szHeader)
+	elseif nChannel == PLAYER_TALK_CHANNEL.WHISPER then
+		MY.Chat.Talk(nil, "/w ", nil, nil, nil, true)
+		Station.Lookup("Lowest2/EditBox"):Show()
+		Station.SetFocusWindow("Lowest2/EditBox/Edit_Input")
 	elseif type(nChannel) == "string" then
 		if string.sub(nChannel, 1, 1) == "/" then
 			if nChannel == '/cafk' or nChannel == '/catr' then
@@ -831,11 +835,12 @@ local function GetRegisterChannelLimitTable()
 	return m_LevelUpData
 end
 local DAILY_LIMIT_TABLE_KEY = {
-	[PLAYER_TALK_CHANNEL.WORLD ] = "WorldChannelDailyLimit",
-	[PLAYER_TALK_CHANNEL.FORCE ] = "ForceChannelDailyLimit",
-	[PLAYER_TALK_CHANNEL.CAMP  ] = "CampChannelDailyLimit",
-	[PLAYER_TALK_CHANNEL.SENCE ] = "SceneChannelDailyLimit",
-	[PLAYER_TALK_CHANNEL.NEARBY] = "NearbyChannelDailyLimit",
+	[PLAYER_TALK_CHANNEL.WORLD  ] = "WorldChannelDailyLimit",
+	[PLAYER_TALK_CHANNEL.FORCE  ] = "ForceChannelDailyLimit",
+	[PLAYER_TALK_CHANNEL.CAMP   ] = "CampChannelDailyLimit",
+	[PLAYER_TALK_CHANNEL.SENCE  ] = "SceneChannelDailyLimit",
+	[PLAYER_TALK_CHANNEL.NEARBY ] = "NearbyChannelDailyLimit",
+	[PLAYER_TALK_CHANNEL.WHISPER] = "WhisperDailyLimit",
 }
 function MY.Chat.GetChannelDailyLimit(nLevel, nChannel)
 	local LevelUpData = GetRegisterChannelLimitTable()
