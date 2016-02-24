@@ -270,16 +270,16 @@ end
 
 function MY_ChatSwitch.OnEvent(event)
 	if event == "PLAYER_TALK" then
-		if arg0 == PLAYER_TALK_CHANNEL.WHISPER then
+		if arg1 == PLAYER_TALK_CHANNEL.WHISPER then
 			for i = #MY_ChatSwitch.aWhisper, 0, -1 do
-				if MY_ChatSwitch.aWhisper[i] == arg2 then
+				if MY_ChatSwitch.aWhisper[i] == arg3 then
 					table.remove(MY_ChatSwitch.aWhisper, i)
 				end
 			end
 			while #MY_ChatSwitch.aWhisper > 20 do
 				table.remove(MY_ChatSwitch.aWhisper, 1)
 			end
-			table.insert(MY_ChatSwitch.aWhisper, arg2)
+			table.insert(MY_ChatSwitch.aWhisper, arg3)
 		end
 		if arg0 ~= UI_GetClientPlayerID() then
 			return
