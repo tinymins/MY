@@ -129,16 +129,32 @@ local function OnWhisperCheck()
 			szOption = szName,
 			rgb = {202, 126, 255},
 			fnAction = function()
-				MY.SwitchChat("/w " .. szName .. " ")
+				MY.SwitchChat(szName)
+			end,
+			szIcon = "ui/Image/UICommon/CommonPanel2.UITex",
+			nFrame = 49,
+			nMouseOverFrame = 51,
+			nIconWidth = 17,
+			nIconHeight = 17,
+			szLayer = "ICON_RIGHTMOST",
+			fnClickIcon = function()
+				for i = #MY_ChatSwitch.aWhisper, 1, -1 do
+					if MY_ChatSwitch.aWhisper[i] == szName then
+						table.remove(MY_ChatSwitch.aWhisper, i)
+						Wnd.CloseWindow("PopupMenuPanel")
+					end
+				end
 			end,
 		})
 	end
 	local x, y = this:GetAbsPos()
 	t.x = x
-	t.y = y - #MY_ChatSwitch.aWhisper * 24 - 20
+	t.y = y - #MY_ChatSwitch.aWhisper * 24 - 24 - 20 - 8
 	if #t > 0 then
+		table.insert(t, 1, MENU_DIVIDER)
 		table.insert(t, 1, {
 			szOption = g_tStrings.CHANNEL_WHISPER_SIGN,
+			rgb = {202, 126, 255},
 			fnAction = function()
 				MY.SwitchChat(PLAYER_TALK_CHANNEL.WHISPER)
 			end,
