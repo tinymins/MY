@@ -11,6 +11,7 @@ data = {
     ['CAMP']     = '陣',
     ['FRIEND']   = '友',
     ['ALLIANCE'] = '盟',
+    ['WHISPER' ] = '密',
     ['CLS']      = '清',
     ['AWAY']     = '離',
     ['BUSY']     = '擾',
