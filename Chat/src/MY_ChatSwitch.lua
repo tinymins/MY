@@ -10,6 +10,7 @@ local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Chat/lang/")
 local INI_PATH = MY.GetAddonInfo().szRoot .. "Chat/ui/MY_ChatSwitch.ini"
 MY_ChatSwitch = {}
 MY_ChatSwitch.tChannel = {}
+MY_ChatSwitch.aWhisper = {}
 
 local function UpdateChannelDailyLimit(hRadio, bPlus)
 	local me = GetClientPlayer()
@@ -121,6 +122,34 @@ local function OnMosaicsUncheck()
 	MY_ChatMosaics.ResetMosaics()
 end
 
+local function OnWhisperCheck()
+	local t = {}
+	for i, szName in ipairs(MY_ChatSwitch.aWhisper) do
+		table.insert(t, {
+			szOption = szName,
+			rgb = {202, 126, 255},
+			fnAction = function()
+				MY.SwitchChat("/w " .. szName .. " ")
+			end,
+		})
+	end
+	local x, y = this:GetAbsPos()
+	t.x = x
+	t.y = y - #MY_ChatSwitch.aWhisper * 24 - 20
+	if #t > 0 then
+		table.insert(t, 1, {
+			szOption = g_tStrings.CHANNEL_WHISPER_SIGN,
+			fnAction = function()
+				MY.SwitchChat(PLAYER_TALK_CHANNEL.WHISPER)
+			end,
+		})
+		PopupMenu(t)
+	else
+		MY.SwitchChat(PLAYER_TALK_CHANNEL.WHISPER)
+	end
+	this:Check(false)
+end
+
 local CHANNEL_LIST = {
 	{id = "NEAR", title = _L["SAY"     ], head = "/s ", channel = PLAYER_TALK_CHANNEL.NEARBY       , cd = 0 , color = {255, 255, 255}}, --Ëµ
 	{id = "SENC", title = _L["MAP"     ], head = "/y ", channel = PLAYER_TALK_CHANNEL.SENCE        , cd = 10, color = {255, 126, 126}}, --µØ
@@ -133,6 +162,7 @@ local CHANNEL_LIST = {
 	{id = "CAMP", title = _L["CAMP"    ], head = "/c ", channel = PLAYER_TALK_CHANNEL.CAMP         , cd = 30, color = {155, 230,  58}}, --Õó
 	{id = "FRIE", title = _L["FRIEND"  ], head = "/o ", channel = PLAYER_TALK_CHANNEL.FRIENDS      , cd = 10, color = {241, 114, 183}}, --ÓÑ
 	{id = "TONG", title = _L["ALLIANCE"], head = "/a ", channel = PLAYER_TALK_CHANNEL.TONG_ALLIANCE, cd = 0 , color = {178, 240, 164}}, --ÃË
+	{id = "WHIS", title = _L['WHISPER' ], channel = PLAYER_TALK_CHANNEL.WHISPER, cd = 0, onclick = OnWhisperCheck, color = {202, 126, 255}}, --ÃÜ
 	{id = "CLSC", title = _L['CLS'     ], onclick = OnClsCheck, color = {255, 0, 0}}, --Çå
 	{id = "AWAY", title = _L["AWAY"    ], oncheck = OnAwayCheck, onuncheck = OnAwayUncheck, tip = OnAwayTip, color = {255, 255, 255}}, --Àë
 	{id = "BUSY", title = _L["BUSY"    ], oncheck = OnBusyCheck, onuncheck = OnBusyUncheck, tip = OnBusyTip, color = {255, 255, 255}}, --ÈÅ
@@ -157,6 +187,7 @@ MY_ChatSwitch.bDisplayPanel = true
 MY_ChatSwitch.bLockPostion = false
 MY_ChatSwitch.bAlertBeforeClear = true
 RegisterCustomData("MY_ChatSwitch.anchor")
+RegisterCustomData("MY_ChatSwitch.aWhisper")
 RegisterCustomData("MY_ChatSwitch.tChannelCount")
 RegisterCustomData("MY_ChatSwitch.bDisplayPanel")
 RegisterCustomData("MY_ChatSwitch.bLockPostion")
@@ -239,6 +270,17 @@ end
 
 function MY_ChatSwitch.OnEvent(event)
 	if event == "PLAYER_TALK" then
+		if arg0 == PLAYER_TALK_CHANNEL.WHISPER then
+			for i = #MY_ChatSwitch.aWhisper, 0, -1 do
+				if MY_ChatSwitch.aWhisper[i] == arg2 then
+					table.remove(MY_ChatSwitch.aWhisper, i)
+				end
+			end
+			while #MY_ChatSwitch.aWhisper > 20 do
+				table.remove(MY_ChatSwitch.aWhisper, 1)
+			end
+			table.insert(MY_ChatSwitch.aWhisper, arg2)
+		end
 		if arg0 ~= UI_GetClientPlayerID() then
 			return
 		end
