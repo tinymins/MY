@@ -1793,13 +1793,18 @@ end
 function XGUI:drawEclipse(nX, nY, nMajorAxis, nMinorAxis, nR, nG, nB, nA, dwRotate, dwPitch, dwRad, nAccuracy)
 	nR, nG, nB, nA = nR or 255, nG or 255, nB or 255, nA or 255
 	dwRotate, dwPitch, dwRad = dwRotate or 0, dwPitch or 0, dwRad or (2 * math.pi)
-	nAccuracy = nAccuracy or 16
-	local sha, nDis
-	local dwRad1 = dwPitch
-	local dwRad2 = dwPitch + dwRad
+	nAccuracy = nAccuracy or 32
+	local deltaRad = (2 * math.pi) / nAccuracy
+	local sha, nX1, nY1, nMajorAxis1, nMinorAxis1, dwRad1, dwRad2, nDis
 	for _, ele in pairs(self.eles) do
 		sha = ele.sdw
 		if sha then
+			dwRad1 = dwPitch
+			dwRad2 = dwPitch + dwRad
+			nX1 = nX or (sha:GetW() / 2)
+			nY1 = nY or (sha:GetH() / 2)
+			nMajorAxis1 = nMajorAxis or nX1
+			nMinorAxis1 = nMinorAxis or nY1
 			sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
 			sha:SetD3DPT(D3DPT.TRIANGLEFAN)
 			sha:ClearTriangleFanPoint()
@@ -1817,7 +1822,7 @@ function XGUI:drawEclipse(nX, nY, nMajorAxis, nMinorAxis, nR, nG, nB, nA, dwRota
 				-- 	nY - (nMinorAxis * math.cos(dwRotate) * math.sin(dwRad1 - dwRotate) + nMajorAxis * math.sin(dwRotate) * math.cos(dwRad1 - dwRotate)),
 				-- 	nR, nG, nB, nA
 				-- )
-				dwRad1 = dwRad1 + math.pi / nAccuracy
+				dwRad1 = (dwRad1 < dwRad2 and dwRad1 + deltaRad > dwRad2) and dwRad2 or (dwRad1 + deltaRad)
 			until dwRad1 > dwRad2
 		end
 	end
@@ -1827,16 +1832,17 @@ end
 function XGUI:drawCircle(nX, nY, nRadius, nR, nG, nB, nA, dwPitch, dwRad, nAccuracy)
 	nR, nG, nB, nA = nR or 255, nG or 255, nB or 255, nA or 255
 	dwPitch, dwRad = dwPitch or 0, dwRad or (2 * math.pi)
-	nAccuracy = nAccuracy or 16
-	local sha, nX1, nY1, nRadius1
-	local dwRad1 = dwPitch
-	local dwRad2 = dwPitch + dwRad
+	nAccuracy = nAccuracy or 32
+	local deltaRad = (2 * math.pi) / nAccuracy
+	local sha, nX1, nY1, nRadius1, dwRad1, dwRad2
 	for _, ele in pairs(self.eles) do
 		sha = ele.sdw
 		if sha then
+			dwRad1 = dwPitch
+			dwRad2 = dwPitch + dwRad
 			nX1 = nX or (sha:GetW() / 2)
 			nY1 = nY or (sha:GetH() / 2)
-			nRadius1 = nRadius1 or math.min(nX1, nY1)
+			nRadius1 = nRadius or math.min(nX1, nY1)
 			sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
 			sha:SetD3DPT(D3DPT.TRIANGLEFAN)
 			sha:ClearTriangleFanPoint()
@@ -1844,7 +1850,7 @@ function XGUI:drawCircle(nX, nY, nRadius, nR, nG, nB, nA, dwPitch, dwRad, nAccur
 			sha:Show()
 			repeat
 				sha:AppendTriangleFanPoint(nX1 + math.cos(dwRad1) * nRadius1, nY1 - math.sin(dwRad1) * nRadius1, nR, nG, nB, nA)
-				dwRad1 = dwRad1 + math.pi / nAccuracy
+				dwRad1 = (dwRad1 < dwRad2 and dwRad1 + deltaRad > dwRad2) and dwRad2 or (dwRad1 + deltaRad)
 			until dwRad1 > dwRad2
 		end
 	end
