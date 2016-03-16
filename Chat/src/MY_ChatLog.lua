@@ -338,7 +338,7 @@ function MY_ChatLog.ExportConfirm()
 	end
 	local ui = XGUI.CreateFrame("MY_ChatLog_Export", {
 		simple = true, esc = true, close = true, w = 180,
-		level = "Normal1", text = _L['export chatlog'],
+		level = "Normal1", text = _L['export chatlog'], alpha = 200,
 	})
 	local btnSure
 	local aChannels = {"MSG_GUILD", "MSG_WHISPER", "MSG_TEAM", "MSG_FRIEND"}
