@@ -606,11 +606,11 @@ end
 MY.FormatTimeCount = MY.Sys.FormatTimeCount
 
 -- 格式化时间
--- (string) MY.Sys.FormatTimeCount(szFormat, nTimestamp)
+-- (string) MY.Sys.FormatTimeCount(szFormat[, nTimestamp])
 -- szFormat   格式化字符串 可选项yyyy,yy,MM,dd,y,m,d,hh,mm,ss,h,m,s
 -- nTimestamp UNIX时间戳
 function MY.Sys.FormatTime(szFormat, nTimestamp)
-	local t = TimeToDate(nTimestamp)
+	local t = TimeToDate(nTimestamp or GetCurrentTime())
 	szFormat = szFormat:gsub('yyyy', string.format('%04d', t.year  ))
 	szFormat = szFormat:gsub('yy'  , string.format('%02d', t.year % 100))
 	szFormat = szFormat:gsub('MM'  , string.format('%02d', t.month ))
