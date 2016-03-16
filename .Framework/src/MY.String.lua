@@ -14,7 +14,7 @@
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local tinsert, tremove, tconcat = table.insert, table.remove, table.concat
 local ssub, slen, schar, srep, sbyte, sformat, sgsub =
-      string.sub, string.len, string.char, string.rep, string.byte, string.format, string.gsub
+	  string.sub, string.len, string.char, string.rep, string.byte, string.format, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local floor, mmin, mmax, mceil = math.floor, math.min, math.max, math.ceil
@@ -97,10 +97,21 @@ end
 
 local m_simpleMatchCache = setmetatable({}, { __mode = "v" })
 function MY.String.SimpleMatch(szText, szFind, bDistinctCase)
-    if not bDistinctCase then
-        szFind = StringLowerW(szFind)
-        szText = StringLowerW(szText)
-    end
+	if not bDistinctCase then
+		szFind = StringLowerW(szFind)
+		szText = StringLowerW(szText)
+	end
+	local me = GetClientPlayer()
+	if me then
+		szFind = szFind:gsub("$zj", me.szName)
+		local szTongName = ""
+		local tong = GetTongClient()
+		if tong and me.dwTongID ~= 0 then
+			szTongName = tong.ApplyGetTongName(me.dwTongID) or ""
+		end
+		szFind = szFind:gsub("$bh", szTongName)
+		szFind = szFind:gsub("$gh", szTongName)
+	end
 	local tFind = m_simpleMatchCache[szFind]
 	if not tFind then
 		tFind = {}
@@ -116,17 +127,6 @@ function MY.String.SimpleMatch(szText, szFind, bDistinctCase)
 			tinsert(tFind, tKeyWordsLine)
 		end
 		m_simpleMatchCache[szFind] = tFind
-	end
-	local me = GetClientPlayer()
-	if me then
-		szFind = szFind:gsub("$zj", GetClientPlayer().szName)
-		local szTongName = ""
-		local tong = GetTongClient()
-		if tong and me.dwTongID ~= 0 then
-			szTongName = tong.ApplyGetTongName(me.dwTongID) or ""
-		end
-		szFind = szFind:gsub("$bh", szTongName)
-		szFind = szFind:gsub("$gh", szTongName)
 	end
 	-- 10|十人,血战天策|XZTC,!小铁被吃了,!开宴黑铁;大战
 	local bKeyWordsLine = false
