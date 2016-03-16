@@ -331,6 +331,67 @@ local function convertXml2Html(szXml)
 end
 
 local m_bExporting
+function MY_ChatLog.ExportConfirm()
+	if m_bExporting then
+		return MY.Sysmsg({_L['Already exporting, please wait.']})
+	end
+	local ui = XGUI.CreateFrame("MY_ChatLog_Export", {
+		simple = true, esc = true, close = true, w = 180,
+		level = "Normal1", text = _L['export chatlog'],
+	})
+	local btnSure
+	local aChannels = {"MSG_GUILD", "MSG_WHISPER", "MSG_TEAM", "MSG_FRIEND"}
+	local tChannels = {}
+	local x, y = 10, 10
+	for i, v in ipairs(aChannels) do
+		ui:append("WndCheckBox", {
+			x = x, y = y, w = 100,
+			text = g_tStrings.tChannelName[v],
+			checked = true,
+			oncheck = function(checked)
+				tChannels[v] = checked
+				if checked then
+					btnSure:enable(true)
+				else
+					btnSure:enable(false)
+					for i,v in ipairs(aChannels) do
+						if tChannels[v] then
+							btnSure:enable(true)
+							break
+						end
+					end
+				end
+			end,
+		})
+		y = y + 30
+		tChannels[v] = true
+	end
+	y = y + 10
+	
+	btnSure = ui:append("WndButton", {
+		x = x, y = y, w = 100,
+		text = _L['export chatlog'],
+		onclick = function()
+			local chns = {}
+			for i, v in ipairs(aChannels) do
+				if tChannels[v] then
+					table.insert(chns, v)
+				end
+			end
+			MY_ChatLog.Export(
+				MY.GetLUADataPath("export/ChatLog/$name@$server@" .. MY.FormatTime("yyyyMMddhhmmss") .. ".html"),
+				chns, 10,
+				function(title, progress)
+					OutputMessage("MSG_ANNOUNCE_YELLOW", _L("Exporting chatlog: %s, %.2f%%.", title, progress * 100))
+				end
+			)
+			ui:remove()
+		end,
+	}, true)
+	y = y + 30
+	ui:height(y + 50)
+end
+
 function MY_ChatLog.Export(szExportFile, aChannels, nPerSec, onProgress)
 	local Log = _G.Log
 	if m_bExporting then
@@ -584,11 +645,7 @@ function _C.OnPanelActive(wnd)
 	  		table.insert(t, {
 	  			szOption = _L['export chatlog'],
 	  			fnAction = function()
-	  				MY_ChatLog.Export(MY.GetLUADataPath("export/ChatLog/$name@$server.html"), {
-						"MSG_GUILD", "MSG_WHISPER", "MSG_TEAM", "MSG_FRIEND"
-					}, 10, function(szTitle, fProgress)
-						OutputMessage("MSG_ANNOUNCE_YELLOW", _L("Exporting chatlog: %s, %.2f%%.", szTitle, fProgress * 100))
-					end)
+					MY_ChatLog.ExportConfirm()
 	  			end,
 	  		})
 	  		return t
