@@ -474,14 +474,15 @@ end
 -- ²Ëµ¥
 --------------------------------------------------------------
 MY_Farbnamen.GetMenu = function()
-    local t = {
-        szOption = _L["Farbnamen"],
+    local t = {}
+    table.insert(t, {
+        szOption = _L["enable"],
         fnAction = function()
             MY_Farbnamen.bEnabled = not MY_Farbnamen.bEnabled
         end,
         bCheck = true,
         bChecked = MY_Farbnamen.bEnabled
-    }
+    })
     table.insert(t, {
         szOption = _L['customize color'],
         fnDisable = function()
