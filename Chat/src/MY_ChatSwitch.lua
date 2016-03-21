@@ -125,9 +125,10 @@ end
 local function OnWhisperCheck()
 	local t = {}
 	for i, szName in ipairs(MY_ChatSwitch.aWhisper) do
+		local info = MY_Farbnamen.Get(szName)
 		table.insert(t, {
 			szOption = szName,
-			rgb = {202, 126, 255},
+			rgb = info and info.rgb or {202, 126, 255},
 			fnAction = function()
 				MY.SwitchChat(szName)
 			end,
