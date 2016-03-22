@@ -26,4 +26,7 @@ data = {
     ['sort by distance'        ] = '优先焦点近距离目标',
     ['current scale-x is %d%%.'] = '界面X轴缩放%d%%。',
     ['current scale-y is %d%%.'] = '界面Y轴缩放%d%%。',
+    
+    ['lock focus'] = '锁定目标',
+    ['unlock focus'] = '取消锁定目标',
 }
