@@ -522,8 +522,8 @@ function MY.Chat.SwitchChat(nChannel)
 	if szHeader then
 		SwitchChatChannel(szHeader)
 	elseif nChannel == PLAYER_TALK_CHANNEL.WHISPER then
-		MY.Chat.Talk(nil, "/w ", nil, nil, nil, true)
 		Station.Lookup("Lowest2/EditBox"):Show()
+		Station.Lookup("Lowest2/EditBox/Edit_Input"):SetText("/w ")
 		Station.SetFocusWindow("Lowest2/EditBox/Edit_Input")
 	elseif type(nChannel) == "string" then
 		if string.sub(nChannel, 1, 1) == "/" then
@@ -531,7 +531,6 @@ function MY.Chat.SwitchChat(nChannel)
 				SwitchChatChannel(nChannel)
 				MY.Chat.Talk(nil, nChannel, nil, nil, nil, true)
 				Station.Lookup("Lowest2/EditBox"):Show()
-				Station.SetFocusWindow("Lowest2/EditBox/Edit_Input")
 			else
 				SwitchChatChannel(nChannel.." ")
 			end
@@ -541,6 +540,12 @@ function MY.Chat.SwitchChat(nChannel)
 	end
 end
 MY.SwitchChat = MY.Chat.SwitchChat
+
+-- 将焦点设置到聊天栏
+function MY.Chat.FocusChatBox()
+	Station.SetFocusWindow("Lowest2/EditBox/Edit_Input")
+end
+MY.FocusChatBox = MY.Chat.FocusChatBox
 
 -- parse faceicon in talking message
 function MY.Chat.ParseFaceIcon(t)
