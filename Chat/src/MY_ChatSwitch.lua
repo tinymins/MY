@@ -124,13 +124,13 @@ end
 
 local function OnWhisperCheck()
 	local t = {}
-	for i, szName in ipairs(MY_ChatSwitch.aWhisper) do
-		local info = MY_Farbnamen.Get(szName)
+	for i, whisper in ipairs(MY_ChatSwitch.aWhisper) do
+		local info = MY_Farbnamen.Get(whisper[1])
 		table.insert(t, {
-			szOption = szName,
+			szOption = whisper[1],
 			rgb = info and info.rgb or {202, 126, 255},
 			fnAction = function()
-				MY.SwitchChat(szName)
+				MY.SwitchChat(whisper[1])
 			end,
 			szIcon = "ui/Image/UICommon/CommonPanel2.UITex",
 			nFrame = 49,
@@ -140,11 +140,18 @@ local function OnWhisperCheck()
 			szLayer = "ICON_RIGHTMOST",
 			fnClickIcon = function()
 				for i = #MY_ChatSwitch.aWhisper, 1, -1 do
-					if MY_ChatSwitch.aWhisper[i] == szName then
+					if MY_ChatSwitch.aWhisper[i][1] == whisper[1] then
 						table.remove(MY_ChatSwitch.aWhisper, i)
 						Wnd.CloseWindow("PopupMenuPanel")
 					end
 				end
+			end,
+			fnMouseEnter = function()
+				local szMsg = table.concat(whisper[2], "")
+				if MY_Farbnamen then
+					szMsg = MY_Farbnamen.Render(szMsg)
+				end
+				OutputTip(szMsg, 1200, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
 			end,
 		})
 	end
@@ -204,7 +211,7 @@ MY_ChatSwitch.bDisplayPanel = true
 MY_ChatSwitch.bLockPostion = false
 MY_ChatSwitch.bAlertBeforeClear = true
 RegisterCustomData("MY_ChatSwitch.anchor")
-RegisterCustomData("MY_ChatSwitch.aWhisper")
+RegisterCustomData("MY_ChatSwitch.aWhisper", 1)
 RegisterCustomData("MY_ChatSwitch.tChannelCount")
 RegisterCustomData("MY_ChatSwitch.bDisplayPanel")
 RegisterCustomData("MY_ChatSwitch.bLockPostion")
@@ -221,7 +228,7 @@ end
 function MY_ChatSwitch.OnFrameCreate()
 	this.tRadios = {}
 	this:RegisterEvent("UI_SCALED")
-	this:RegisterEvent("PLAYER_TALK")
+	this:RegisterEvent("PLAYER_SAY")
 	this:RegisterEvent("CUSTOM_DATA_LOADED")
 	this:EnableDrag(not MY_ChatSwitch.bLockPostion)
 	
@@ -286,25 +293,35 @@ function MY_ChatSwitch.OnFrameCreate()
 end
 
 function MY_ChatSwitch.OnEvent(event)
-	if event == "PLAYER_TALK" then
-		if arg1 == PLAYER_TALK_CHANNEL.WHISPER then
-			for i = #MY_ChatSwitch.aWhisper, 0, -1 do
-				if MY_ChatSwitch.aWhisper[i] == arg3 then
-					table.remove(MY_ChatSwitch.aWhisper, i)
+	if event == "PLAYER_SAY" then
+		local szContent, dwTalkerID, nChannel, szName, szMsg = arg0, arg1, arg2, arg3, arg11
+		if nChannel == PLAYER_TALK_CHANNEL.WHISPER then
+			local t
+			for i = #MY_ChatSwitch.aWhisper, 1, -1 do
+				if MY_ChatSwitch.aWhisper[i][1] == szName then
+					t = table.remove(MY_ChatSwitch.aWhisper, i)
 				end
 			end
 			while #MY_ChatSwitch.aWhisper > 20 do
 				table.remove(MY_ChatSwitch.aWhisper, 1)
 			end
-			table.insert(MY_ChatSwitch.aWhisper, arg3)
+			if not t then
+				t = {szName, {}}
+			end
+			while #t[2] > 20 do
+				table.remove(t[2], 1)
+			end
+			local r, g, b = GetMsgFontColor("MSG_WHISPER")
+			table.insert(t[2], MY.Chat.GetTimeLinkText({r = r, g = g, b = b}) .. szMsg)
+			table.insert(MY_ChatSwitch.aWhisper, t)
 		end
 		if arg0 ~= UI_GetClientPlayerID() then
 			return
 		end
-		local hRadio = this.tRadios[arg1]
+		local hRadio = this.tRadios[nChannel]
 		if hRadio then
 			UpdateChannelDailyLimit(hRadio, true)
-			m_tChannelTime[arg1] = GetCurrentTime()
+			m_tChannelTime[nChannel] = GetCurrentTime()
 		end
 	elseif event == "UI_SCALED" then
 		MY_ChatSwitch.UpdateAnchor(this)
