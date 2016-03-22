@@ -450,6 +450,19 @@ function MY_Recount.Data.GetNameAusID(id, data)
 	return szName
 end
 
+function MY_Recount.Data.IsParty(id, data)
+	local dwID = tonumber(id)
+	if dwID then
+		if dwID == UI_GetClientPlayerID() then
+			return true
+		else
+			return IsParty(dwID, UI_GetClientPlayerID())
+		end
+	else
+		return false
+	end
+end
+
 -- 将一条记录插入数组
 function _Cache.AddRecord(data, szRecordType, idRecord, idTarget, szEffectName, nValue, nEffectValue, nSkillResult)
 	local tSummary = data.Summary
@@ -746,22 +759,31 @@ function MY_Recount.Data.Push()
 	
 	-- 计算受伤最多的名字作为战斗名称
 	local nMaxValue, szBossName = 0, nil
+	local nEnemyMaxValue, szEnemyBossName = 0, nil
 	for id, p in pairs(Data.BeDamage) do
+		if nEnemyMaxValue < p.nTotalEffect and not MY_Recount.Data.IsParty(id, Data) then
+			nEnemyMaxValue  = p.nTotalEffect
+			szEnemyBossName = MY_Recount.Data.GetNameAusID(id, Data)
+		end
 		if nMaxValue < p.nTotalEffect and id ~= UI_GetClientPlayerID() then
 			nMaxValue  = p.nTotalEffect
 			szBossName = MY_Recount.Data.GetNameAusID(id, Data)
 		end
 	end
 	-- 如果没有 则计算输出最多的NPC名字作为战斗名称
-	if not szBossName then
+	if not szBossName or not szEnemyBossName then
 		for id, p in pairs(Data.Damage) do
+			if nEnemyMaxValue < p.nTotalEffect and not MY_Recount.Data.IsParty(id, Data) then
+				nEnemyMaxValue  = p.nTotalEffect
+				szEnemyBossName = MY_Recount.Data.GetNameAusID(id, Data)
+			end
 			if nMaxValue < p.nTotalEffect and not tonumber(id) then
 				nMaxValue  = p.nTotalEffect
 				szBossName = MY_Recount.Data.GetNameAusID(id, Data)
 			end
 		end
 	end
-	Data.szBossName = szBossName or ''
+	Data.szBossName = szEnemyBossName or szBossName or ''
 	
 	if Data.nTimeDuring > MY_Recount.Data.nMinFightTime then
 		table.insert(History, 1, Data)
