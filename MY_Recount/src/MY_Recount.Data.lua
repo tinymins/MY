@@ -186,7 +186,7 @@ local History = {}  -- 历史战斗记录
 --           # #               #           #         #           # # # # #         # # # # # # # #
 -- ##################################################################################################
 -- 登陆游戏加载保存的数据
-MY_Recount.Data.LoadData = function()
+function MY_Recount.Data.LoadData()
     local data = MY.Sys.LoadLUAData(_Cache.szRecFile) or {}
     History                       = data.History       or {}
     MY_Recount.Data.nMaxHistory   = data.nMaxHistory   or 10
@@ -195,7 +195,7 @@ MY_Recount.Data.LoadData = function()
 end
 
 -- 退出游戏保存数据
-MY_Recount.Data.SaveData = function()
+function MY_Recount.Data.SaveData()
     local data = {
         History       = History,
         nMaxHistory   = MY_Recount.Data.nMaxHistory  ,
@@ -244,7 +244,7 @@ end)
 -- (table) MY_Recount.Data.Get(nIndex) -- 获取指定记录
 --     (number)nIndex: 历史记录索引 为0返回当前统计
 -- (table) MY_Recount.Data.Get()       -- 获取所有历史记录列表
-MY_Recount.Data.Get = function(nIndex)
+function MY_Recount.Data.Get(nIndex)
     if not nIndex then
         return History
     elseif nIndex == 0 then
@@ -258,7 +258,7 @@ end
 -- (table) MY_Recount.Data.Del(nIndex) -- 删除指定序号的记录
 --     (number)nIndex: 历史记录索引
 -- (table) MY_Recount.Data.Del(data)   -- 删除指定记录
-MY_Recount.Data.Del = function(data)
+function MY_Recount.Data.Del(data)
     if type(data) == 'number' then
         table.remove(History, data)
     else
@@ -276,7 +276,7 @@ end
 -- dwID: 计算暂离的角色ID 为空则计算团队的暂离时间（目前永远为0）
 -- szRecordType: 不同类型的数据在官方时间算法下计算结果可能不一样
 --               枚举暂时有 Heal Damage BeDamage BeHeal 四种
-MY_Recount.Data.GeneAwayTime = function(data, dwID, szRecordType)
+function MY_Recount.Data.GeneAwayTime(data, dwID, szRecordType)
     local nFightTime = MY_Recount.Data.GeneFightTime(data, dwID, szRecordType)
     local nAwayTime
     if szRecordType and data.LastRecTime and data.LastRecTime[szRecordType] then
@@ -293,7 +293,7 @@ end
 -- dwID: 计算战斗时间的角色ID 为空则计算团队的战斗时间
 -- szRecordType: 不同类型的数据在官方时间算法下计算结果可能不一样
 --               枚举暂时有 Heal Damage BeDamage BeHeal 四种
-MY_Recount.Data.GeneFightTime = function(data, dwID, szRecordType)
+function MY_Recount.Data.GeneFightTime(data, dwID, szRecordType)
     local nTimeDuring = data.nTimeDuring
     local nTimeBegin  = data.nTimeBegin
     if szRecordType and data.LastRecTime and data.LastRecTime[szRecordType] then
@@ -338,7 +338,7 @@ end
 -- (number) nSkillResult: 造成的效果结果（SKILL_RESULT枚举 如HIT,MISS）
 -- (number) nResultCount      : 造成效果的数值数量（tResult长度）
 -- (table ) tResult     : 所有效果数值集合
-MY_Recount.Data.OnSkillEffect = function(dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
+function MY_Recount.Data.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
     -- 获取释放对象和承受对象
     local hCaster = MY.Game.GetObject(dwCaster)
     if (not IsPlayer(dwCaster)) and hCaster and hCaster.dwEmployer and hCaster.dwEmployer ~= 0 then -- 宠物的数据算在主人统计中
@@ -428,7 +428,7 @@ MY_Recount.Data.OnSkillEffect = function(dwCaster, dwTarget, nEffectType, dwEffe
     Data.nTimeDuring = GetCurrentTime() - Data.nTimeBegin
 end
 
-MY_Recount.Data.GetNameAusID = function(id, data)
+function MY_Recount.Data.GetNameAusID(id, data)
     if not id then
         return
     end
@@ -451,7 +451,7 @@ MY_Recount.Data.GetNameAusID = function(id, data)
 end
 
 -- 将一条记录插入数组
-_Cache.AddRecord = function(data, szRecordType, idRecord, idTarget, szEffectName, nValue, nEffectValue, nSkillResult)
+function _Cache.AddRecord(data, szRecordType, idRecord, idTarget, szEffectName, nValue, nEffectValue, nSkillResult)
     local tSummary = data.Summary
     local tRecords = data[szRecordType]
     local tRecord  = tRecords[idRecord]
@@ -651,7 +651,7 @@ _Cache.AddRecord = function(data, szRecordType, idRecord, idTarget, szEffectName
 end
 
 -- 插入一条伤害记录
-MY_Recount.Data.AddDamageRecord = function(hCaster, hTarget, szEffectName, nDamage, nEffectDamage, nSkillResult)
+function MY_Recount.Data.AddDamageRecord(hCaster, hTarget, szEffectName, nDamage, nEffectDamage, nSkillResult)
     -- 获取索引ID
     local idCaster = (IsPlayer(hCaster.dwID) and hCaster.dwID) or MY.GetObjectName(hCaster) or g_tStrings.STR_NAME_UNKNOWN
     local idTarget = (IsPlayer(hTarget.dwID) and hTarget.dwID) or MY.GetObjectName(hTarget) or g_tStrings.STR_NAME_UNKNOWN
@@ -665,7 +665,7 @@ MY_Recount.Data.AddDamageRecord = function(hCaster, hTarget, szEffectName, nDama
 end
 
 -- 插入一条治疗记录
-MY_Recount.Data.AddHealRecord = function(hCaster, hTarget, szEffectName, nHeal, nEffectHeal, nSkillResult)
+function MY_Recount.Data.AddHealRecord(hCaster, hTarget, szEffectName, nHeal, nEffectHeal, nSkillResult)
     -- 获取索引ID
     local idCaster = (IsPlayer(hCaster.dwID) and hCaster.dwID) or MY.GetObjectName(hCaster) or g_tStrings.STR_NAME_UNKNOWN
     local idTarget = (IsPlayer(hTarget.dwID) and hTarget.dwID) or MY.GetObjectName(hTarget) or g_tStrings.STR_NAME_UNKNOWN
@@ -679,7 +679,7 @@ MY_Recount.Data.AddHealRecord = function(hCaster, hTarget, szEffectName, nHeal, 
 end
 
 -- 确认对象数据已创建（未创建则创建）
-_Cache.InitObjectData = function(data, obj, szChannel)
+function _Cache.InitObjectData(data, obj, szChannel)
     local id = (IsPlayer(obj.dwID) and obj.dwID) or MY.GetObjectName(obj) or g_tStrings.STR_NAME_UNKNOWN
     if IsPlayer(obj.dwID) and not data.Namelist[id] then
         data.Namelist[id]  = MY.Game.GetObjectName(obj) -- 名称缓存
@@ -699,7 +699,7 @@ _Cache.InitObjectData = function(data, obj, szChannel)
 end
 
 -- 初始化Data
-MY_Recount.Data.Init = function(bForceInit)
+function MY_Recount.Data.Init(bForceInit)
     local bNew
     if bForceInit or (not Data) or
     (Data.UUID and MY.Player.GetFightUUID() ~= Data.UUID) then
@@ -731,7 +731,7 @@ MY_Recount.Data.Init = function(bForceInit)
 end
 
 -- Data数据压入历史记录 并重新初始化Data
-MY_Recount.Data.Push = function()
+function MY_Recount.Data.Push()
     if not (Data and Data.UUID) then
         return
     end
@@ -883,7 +883,7 @@ end)
 
 
 -- 有人死了活了做一下时间轴记录
-_Cache.OnTeammateStateChange = function(dwID, bLeave, nAwayType, bAddWhenRecEmpty)
+function _Cache.OnTeammateStateChange(dwID, bLeave, nAwayType, bAddWhenRecEmpty)
     if not (Data and Data.Awaytime) then
         return
     end
