@@ -34,6 +34,23 @@ for k, _ in pairs(MY_ChatFilter.tApplyDuplicateChannels) do
 	RegisterCustomData("MY_ChatFilter.tApplyDuplicateChannels." .. k)
 end
 
+local l_tChannelHeader = {
+	["MSG_WHISPER"] = g_tStrings.STR_TALK_HEAD_SAY,
+	["MSG_NORMAL"] = g_tStrings.STR_TALK_HEAD_SAY,
+	["MSG_NPC_NEARBY"] = g_tStrings.STR_TALK_HEAD_SAY,
+	["MSG_PARTY"] = g_tStrings.STR_TALK_HEAD_SAY1,
+	["MSG_GUILD"] = g_tStrings.STR_TALK_HEAD_SAY1,
+	["MSG_GUILD_ALLIANCE"] = g_tStrings.STR_TALK_HEAD_SAY1,
+	["MSG_WORLD"] = g_tStrings.STR_TALK_HEAD_SAY1,
+	["MSG_SCHOOL"] = g_tStrings.STR_TALK_HEAD_SAY1,
+	["MSG_CAMP"] = g_tStrings.STR_TALK_HEAD_SAY1,
+	["MSG_FRIEND"] = g_tStrings.STR_TALK_HEAD_SAY1,
+	["MSG_TEAM"] = g_tStrings.STR_TALK_HEAD_SAY1,
+	["MSG_MAP"] = g_tStrings.STR_TALK_HEAD_SAY1,
+	["MSG_BATTLE_FILED"] = g_tStrings.STR_TALK_HEAD_SAY1,
+	["MSG_NPC_PARTY"] = g_tStrings.STR_TALK_HEAD_SAY1,
+}
+
 MY.HookChatPanel("MY_ChatFilter", function(h, szChannel, szMsg, dwTime)
 	-- 插件消息UUID过滤
 	if MY_ChatFilter.bFilterDuplicateAddonTalk then
@@ -67,6 +84,10 @@ MY.HookChatPanel("MY_ChatFilter", function(h, szChannel, szMsg, dwTime)
 	and MY_ChatFilter.tApplyDuplicateChannels[szChannel] then
 		-- 计算过滤记录
 		local szText = GetPureText(szMsg)
+		if l_tChannelHeader[szChannel] then
+			szText = szText:gsub("^.-" .. l_tChannelHeader[szChannel], "")
+		end
+		szText = szText:gsub("[ \n]", "")
 		if MY_ChatFilter.bFilterDuplicateIgnoreID then
 			local nCount = 1
 			while nCount > 0 do
