@@ -1024,6 +1024,9 @@ MY.RegisterExit("ChatPanelUnhook", function ()
 end)
 
 MY.RegisterMsgMonitor("QIYU", function(szMsg, nFont, bRich, r, g, b, szChannel)
+	if IsRemotePlayer(UI_GetClientPlayerID()) then
+		return
+	end
 	-- “醉戈止战”侠士福缘非浅，触发奇遇【阴阳两界】，此千古奇缘将开启怎样的奇妙际遇，令人神往！
 	if bRich then
 		szMsg = GetPureText(szMsg)
