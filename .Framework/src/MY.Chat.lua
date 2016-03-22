@@ -870,7 +870,7 @@ function MY.Chat.RegisterMsgMonitor(arg0, arg1, arg2)
 		szKey, fnAction, tChannels = arg0, arg1, arg2
 	elseif tp0 == 'function' and tp1 == 'table' then
 		fnAction, tChannels = arg0, arg1
-	elseif tp0 == 'string' and tp1 == 'nil' then
+	elseif tp0 == 'string' and not arg1 then
 		szKey = arg0
 	end
 	
