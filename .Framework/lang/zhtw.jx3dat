@@ -141,4 +141,6 @@ data = {
     ['Player is too far to peek!']   = '距離太遠查看裝備失敗！',
     
     ["Stop cast skill"] = "打斷自身讀條",
+    
+    ["ADVENTURE_PATT"] = "“(.-)”俠士.-觸發奇遇【(.-)】",
 }

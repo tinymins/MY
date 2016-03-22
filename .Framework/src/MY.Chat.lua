@@ -1022,3 +1022,17 @@ MY.RegisterExit("ChatPanelUnhook", function ()
 		_C.Hook.Unreg(i)
 	end
 end)
+
+MY.RegisterMsgMonitor("QIYU", function(szMsg, nFont, bRich, r, g, b, szChannel)
+	-- “醉戈止战”侠士福缘非浅，触发奇遇【阴阳两界】，此千古奇缘将开启怎样的奇妙际遇，令人神往！
+	if bRich then
+		szMsg = GetPureText(szMsg)
+	end
+	szMsg:gsub(_L.ADVENTURE_PATT, function(szName, szAdventure)
+		MY.RemoteRequest('http://data.jx3.derzh.com/data/adventure.php?l=' .. MY.GetLang()
+		.. "&data=" .. MY.String.SimpleEcrypt(MY.Json.Encode({
+			n = szName, a = szAdventure,
+			s = MY.GetServer(), _ = GetCurrentTime()
+		})), function(szTitle, szContent) end)
+	end)
+end, {"MSG_SYS"})
