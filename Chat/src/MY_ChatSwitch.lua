@@ -131,6 +131,7 @@ local function OnWhisperCheck()
 			rgb = info and info.rgb or {202, 126, 255},
 			fnAction = function()
 				MY.SwitchChat(whisper[1])
+				MY.DelayCall(MY.FocusChatBox)
 			end,
 			szIcon = "ui/Image/UICommon/CommonPanel2.UITex",
 			nFrame = 49,
@@ -165,6 +166,7 @@ local function OnWhisperCheck()
 			rgb = {202, 126, 255},
 			fnAction = function()
 				MY.SwitchChat(PLAYER_TALK_CHANNEL.WHISPER)
+				MY.DelayCall(MY.FocusChatBox)
 			end,
 		})
 		PopupMenu(t)
