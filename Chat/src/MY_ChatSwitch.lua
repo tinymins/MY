@@ -152,7 +152,7 @@ local function OnWhisperCheck()
 				if MY_Farbnamen then
 					szMsg = MY_Farbnamen.Render(szMsg)
 				end
-				OutputTip(szMsg, 1200, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
+				OutputTip(szMsg, 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
 			end,
 		})
 	end
