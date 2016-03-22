@@ -394,6 +394,11 @@ function MY_Focus.DelFocus(dwType, dwID)
 			MY_Focus.DrawFocus(p.dwType, p.dwID)
 		end
 	end
+	-- 删除锁定
+	if _C.dwLockType == dwType and _C.dwLockID == dwID then
+		_C.dwLockType = nil
+		_C.dwLockID = nil
+	end
 end
 
 -- 获取焦点列表
@@ -471,6 +476,11 @@ function MY_Focus.DrawFocus(dwType, dwID)
 	---------- 左侧 ----------
 	-- 小图标列表
 	local hInfoList = hItem:Lookup("Handle_InfoList")
+	-- 锁定
+	hInfoList:Lookup('Handle_Lock'):Hide()
+	if dwType == _C.dwLockType and dwID == _C.dwLockID then
+		hInfoList:Lookup('Handle_Lock'):Show()
+	end
 	-- 心法
 	hInfoList:Lookup('Handle_Kungfu'):Hide()
 	if dwType == TARGET.PLAYER then
@@ -699,6 +709,12 @@ end
 -- ########################################################################## --
 -- 周期重绘
 function MY_Focus.OnFrameBreathe()
+	if _C.dwLockType and _C.dwLockID then
+		local dwType, dwID = MY.GetTarget()
+		if dwType ~= _C.dwLockType or dwID ~= _C.dwLockID then
+			MY.SetTarget(_C.dwLockType, _C.dwLockID)
+		end
+	end
 	if MY_Focus.bSortByDistance then
 		MY_Focus.SortFocus()
 	end
@@ -779,6 +795,21 @@ function MY_Focus.OnItemRButtonClick()
 			szOption = _L['delete focus'],
 			fnAction = function()
 				MY_Focus.DelStaticFocus(dwType, dwID)
+			end,
+		})
+		local bLock = dwType == _C.dwLockType and dwID == _C.dwLockID
+		table.insert(t, {
+			szOption = bLock and _L['unlock focus'] or _L['lock focus'],
+			fnAction = function()
+				if bLock then
+					_C.dwLockID = nil
+					_C.dwLockType = nil
+				else
+					_C.dwLockID = dwID
+					_C.dwLockType = dwType
+					MY.SetTarget(dwType, dwID)
+				end
+				MY_Focus.UpdateList()
 			end,
 		})
 		PopupMenu(t)
