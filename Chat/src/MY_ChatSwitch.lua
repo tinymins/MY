@@ -314,7 +314,7 @@ function MY_ChatSwitch.OnEvent(event)
 				table.remove(t[2], 1)
 			end
 			local r, g, b = GetMsgFontColor("MSG_WHISPER")
-			table.insert(t[2], MY.Chat.GetTimeLinkText({r = r, g = g, b = b}) .. szMsg)
+			table.insert(t[2], MY.Chat.GetTimeLinkText({r = r, g = g, b = b, s = "yyyyMMdd-hh:mm:ss"}) .. szMsg)
 			table.insert(MY_ChatSwitch.aWhisper, t)
 		end
 		if arg0 ~= UI_GetClientPlayerID() then
