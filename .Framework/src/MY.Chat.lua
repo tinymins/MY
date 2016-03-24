@@ -1024,7 +1024,25 @@ MY.RegisterExit("ChatPanelUnhook", function ()
 end)
 
 MY.RegisterMsgMonitor("QIYU", function(szMsg, nFont, bRich, r, g, b, szChannel)
-	if IsRemotePlayer(UI_GetClientPlayerID()) then
+	local me = GetClientPlayer()
+	if not me or me.bFightState
+	or (
+		me.nMoveState ~= MOVE_STATE.ON_STAND    and
+		me.nMoveState ~= MOVE_STATE.ON_FLOAT    and
+		me.nMoveState ~= MOVE_STATE.ON_SIT      and
+		me.nMoveState ~= MOVE_STATE.ON_FREEZE   and
+		me.nMoveState ~= MOVE_STATE.ON_ENTRAP   and
+		me.nMoveState ~= MOVE_STATE.ON_DEATH    and
+		me.nMoveState ~= MOVE_STATE.ON_AUTO_FLY and
+		me.nMoveState ~= MOVE_STATE.ON_START_AUTO_FLY
+	) then
+		return
+	end
+	local hWnd = Station.GetFocusWindow()
+	if hWnd and hWnd:GetType() == "WndEdit" then
+		return
+	end
+	if IsRemotePlayer(me.dwID) then
 		return
 	end
 	-- “醉戈止战”侠士福缘非浅，触发奇遇【阴阳两界】，此千古奇缘将开启怎样的奇妙际遇，令人神往！
