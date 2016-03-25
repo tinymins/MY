@@ -21,12 +21,13 @@ data = {
     
     ['auto save data while exit game'] = '退出游戏时保存数据',
     
-    ['display as per second'  ] = '显示每秒均值',
-    ['display effective value'] = '显示有效数值',
-    ['uncount awaytime'       ] = '除去暂离时间',
-    ['use system time count'  ] = '官方时间算法',
-    ['theme'                  ] = '自定风格选择',
-    ['max history'            ] = '最大历史记录',
+    ['display as per second'  ] = '显示每秒平均数值',
+    ['display effective value'] = '显示战斗有效数值',
+    ['uncount awaytime'       ] = '除去玩家暂离时间',
+    ['show nodata teammate'   ] = '显示无数据的队友',
+    ['use system time count'  ] = '使用官方时间算法',
+    ['theme'                  ] = '自定界面风格选择',
+    ['max history'            ] = '最大历史记录设置',
     
     ['publish limit'] = '发布数量',
     ['top %d'] = '前%d名',
