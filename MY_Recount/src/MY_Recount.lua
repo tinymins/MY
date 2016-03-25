@@ -153,6 +153,7 @@ MY_Recount.nDisplayMode  = DISPLAY_MODE.BOTH    -- Í³¼ÆÏÔÊ¾Ä£Ê½£¨ÏÔÊ¾NPC/Íæ¼ÒÊý¾
 MY_Recount.nPublishLimit = 30                   -- ·¢²¼µ½ÁÄÌìÆµµÀÊýÁ¿
 MY_Recount.nPublishMode  = PUBLISH_MODE.EFFECT  -- ·¢²¼Ä£Ê½
 MY_Recount.nDrawInterval = GLOBAL.GAME_FPS / 2  -- UIÖØ»æÖÜÆÚ£¨Ö¡£©
+MY_Recount.bShowNodataTeammate = false  -- ÏÔÊ¾Ã»ÓÐÊý¾ÝµÄ¶ÓÓÑ
 MY_Recount.anchor = { x=0, y=-70, s="BOTTOMRIGHT", r="BOTTOMRIGHT" } -- Ä¬ÈÏ×ø±ê
 RegisterCustomData("MY_Recount.bEnable")
 RegisterCustomData("MY_Recount.nCss")
@@ -166,6 +167,7 @@ RegisterCustomData("MY_Recount.nDisplayMode")
 RegisterCustomData("MY_Recount.nPublishLimit")
 RegisterCustomData("MY_Recount.nPublishMode")
 RegisterCustomData("MY_Recount.nDrawInterval")
+RegisterCustomData("MY_Recount.bShowNodataTeammate")
 RegisterCustomData("MY_Recount.anchor")
 
 local m_frame
@@ -289,7 +291,7 @@ MY_Recount.UpdateUI = function(data)
 	local tMyRec
 	
 	-- ÕûÀíÊý¾Ý Éú³ÉÒªÏÔÊ¾µÄÁÐ±í
-	local nMaxValue, tResult = 0, {}
+	local nMaxValue, aResult, tIDs = 0, {}, {}
 	for id, rec in pairs(tRecord) do
 		if MY_Recount.nDisplayMode == DISPLAY_MODE.BOTH or  -- È·¶¨ÏÔÊ¾Ä£Ê½£¨ÏÔÊ¾NPC/ÏÔÊ¾Íæ¼Ò/È«²¿ÏÔÊ¾£©
 		(MY_Recount.nDisplayMode == DISPLAY_MODE.NPC    and type(id) == 'string') or
@@ -302,6 +304,7 @@ MY_Recount.UpdateUI = function(data)
 				nValue       = rec.nTotal         or  0              ,
 				nEffectValue = rec.nTotalEffect   or  0              ,
 			}
+			tIDs[id] = true
 			-- ¼ÆËãÕ½¶·Ê±¼ä
 			if MY_Recount.bAwayMode then -- É¾È¥ËÀÍöÊ±¼ä && ·ÀÖ¹¼ÆËãDPSÊ±³ýÒÔ0
 				tRec.nTimeCount = math.max(MY_Recount.Data.GeneFightTime(data, id, MY_Recount.bSysTimeMode and SZ_CHANNEL_KEY[MY_Recount.nChannel]), 1)
@@ -316,7 +319,28 @@ MY_Recount.UpdateUI = function(data)
 			else
 				nMaxValue = math.max(nMaxValue, tRec.nValue, tRec.nEffectValue)
 			end
-			table.insert(tResult, tRec)
+			table.insert(aResult, tRec)
+		end
+	end
+	-- È«³ÌÃ»Êý¾ÝµÄ¶ÓÓÑ
+	if MY.IsInParty() and MY_Recount.bShowNodataTeammate then
+		local list = GetClientTeam().GetTeamMemberList()
+		for _, dwID in ipairs(list) do
+			local info = GetClientTeam().GetMemberInfo(dwID)
+			if not tIDs[dwID] then
+				table.insert(aResult, {
+					id             = dwID                   ,
+					-- szMD5          = info.szMD5             ,
+					szName         = info.szName            ,
+					dwForceID      = info.dwForceID         ,
+					nValue         = 0                      ,
+					nEffectValue   = 0                      ,
+					nTimeCount     = math.max(nTimeCount, 1),
+					nValuePS       = 0                      ,
+					nEffectValuePS = 0                      ,
+				})
+				tIDs[dwID] = true
+			end
 		end
 	end
 	
@@ -329,13 +353,13 @@ MY_Recount.UpdateUI = function(data)
 	elseif MY_Recount.bShowPerSec then
 		szSortKey = 'nValuePS'
 	end
-	table.sort(tResult, function(p1, p2)
+	table.sort(aResult, function(p1, p2)
 		return p1[szSortKey] > p2[szSortKey]
 	end)
 	
 	-- äÖÈ¾ÁÐ±í
 	local hList = m_frame:Lookup('Wnd_Main', 'Handle_List')
-	for i, p in pairs(tResult) do
+	for i, p in pairs(aResult) do
 		-- ×Ô¼ºµÄ¼ÇÂ¼
 		if p.id == UI_GetClientPlayerID() then
 			tMyRec = p
@@ -565,10 +589,10 @@ _C.OnDetailFrameBreathe = function()
 	
 	--------------- Ò»¡¢¼¼ÄÜÁÐ±í¸üÐÂ -----------------
 	-- Êý¾ÝÊÕ¼¯
-	local tResult, nTotalEffect = {}, tData.nTotalEffect
+	local aResult, nTotalEffect = {}, tData.nTotalEffect
 	if szPrimarySort == 'Skill' then
 		for szSkillName, p in pairs(tData.Skill) do
-			table.insert(tResult, {
+			table.insert(aResult, {
 				szKey        = szSkillName   ,
 				szName       = szSkillName   ,
 				nCount       = p.nCount      ,
@@ -577,7 +601,7 @@ _C.OnDetailFrameBreathe = function()
 		end
 	else
 		for id, p in pairs(tData.Target) do
-			table.insert(tResult, {
+			table.insert(aResult, {
 				szKey        = id                              ,
 				szName       = MY_Recount.Data.GetNameAusID(id),
 				nCount       = p.nCount                        ,
@@ -585,16 +609,16 @@ _C.OnDetailFrameBreathe = function()
 			})
 		end
 	end
-	table.sort(tResult, function(p1, p2)
+	table.sort(aResult, function(p1, p2)
 		return p1.nTotalEffect > p2.nTotalEffect
 	end)
 	-- Ä¬ÈÏÑ¡ÖÐµÚÒ»¸ö
 	if this.bFirstRendering then
-		if tResult[1] then
+		if aResult[1] then
 			if szPrimarySort == 'Skill' then
-				this.szSelectedSkill  = tResult[1].szKey
+				this.szSelectedSkill  = aResult[1].szKey
 			else
-				this.szSelectedTarget = tResult[1].szKey
+				this.szSelectedTarget = aResult[1].szKey
 			end
 		end
 		this.bFirstRendering = nil
@@ -615,7 +639,7 @@ _C.OnDetailFrameBreathe = function()
 	local hList = this:Lookup('WndScroll_Skill', 'Handle_SkillList')
 	hList:SetSize(480, 90)
 	hList:Clear()
-	for i, p in ipairs(tResult) do
+	for i, p in ipairs(aResult) do
 		local hItem = hList:AppendItemFromIni(_C.szIniDetail, 'Handle_SkillItem')
 		hItem:Lookup('Text_SkillNo'):SetText(i)
 		hItem:Lookup('Text_SkillName'):SetText(p.szName)
@@ -637,9 +661,9 @@ _C.OnDetailFrameBreathe = function()
 		this:Lookup('', 'Handle_Spliter'):Show()
 		--------------- ¶þ¡¢¼¼ÄÜÊÍ·Å½á¹ûÁÐ±í¸üÐÂ -----------------
 		-- Êý¾ÝÊÕ¼¯
-		local tResult, nTotalEffect, nCount = {}, tData[szPrimarySort][szSelected].nTotalEffect, tData[szPrimarySort][szSelected].nCount
+		local aResult, nTotalEffect, nCount = {}, tData[szPrimarySort][szSelected].nTotalEffect, tData[szPrimarySort][szSelected].nCount
 		for nSkillResult, p in pairs(tData[szPrimarySort][szSelected].Detail) do
-			table.insert(tResult, {
+			table.insert(aResult, {
 				nCount     = p.nCount    ,
 				nMinEffect = p.nMinEffect,
 				nAvgEffect = p.nAvgEffect,
@@ -648,14 +672,14 @@ _C.OnDetailFrameBreathe = function()
 				szSkillResult = SZ_SKILL_RESULT[nSkillResult],
 			})
 		end
-		table.sort(tResult, function(p1, p2)
+		table.sort(aResult, function(p1, p2)
 			return p1.nAvgEffect > p2.nAvgEffect
 		end)
 		-- ½çÃæÖØ»æ
 		this:Lookup('WndScroll_Detail'):Show()
 		local hList = this:Lookup('WndScroll_Detail', 'Handle_DetailList')
 		hList:Clear()
-		for i, p in ipairs(tResult) do
+		for i, p in ipairs(aResult) do
 			local hItem = hList:AppendItemFromIni(_C.szIniDetail, 'Handle_DetailItem')
 			hItem:Lookup('Text_DetailNo'):SetText(i)
 			hItem:Lookup('Text_DetailType'):SetText(p.szSkillResult)
@@ -676,10 +700,10 @@ _C.OnDetailFrameBreathe = function()
 		
 		--------------- Èý¡¢¼¼ÄÜÊÍ·Å½á¹ûÁÐ±í¸üÐÂ -----------------
 		-- Êý¾ÝÊÕ¼¯
-		local tResult, nTotalEffect = {}, tData[szPrimarySort][szSelected].nTotalEffect
+		local aResult, nTotalEffect = {}, tData[szPrimarySort][szSelected].nTotalEffect
 		if szPrimarySort == 'Skill' then
 			for id, p in pairs(tData.Skill[szSelectedSkill].Target) do
-				table.insert(tResult, {
+				table.insert(aResult, {
 					nHitCount      = p.Count[SKILL_RESULT.HIT] or 0,
 					nMissCount     = p.Count[SKILL_RESULT.MISS] or 0,
 					nCriticalCount = p.Count[SKILL_RESULT.CRITICAL] or 0,
@@ -690,7 +714,7 @@ _C.OnDetailFrameBreathe = function()
 			end
 		else
 			for szSkillName, p in pairs(tData.Target[szSelectedTarget].Skill) do
-				table.insert(tResult, {
+				table.insert(aResult, {
 					nHitCount      = p.Count[SKILL_RESULT.HIT] or 0,
 					nMissCount     = p.Count[SKILL_RESULT.MISS] or 0,
 					nCriticalCount = p.Count[SKILL_RESULT.CRITICAL] or 0,
@@ -700,14 +724,14 @@ _C.OnDetailFrameBreathe = function()
 				})
 			end
 		end
-		table.sort(tResult, function(p1, p2)
+		table.sort(aResult, function(p1, p2)
 			return p1.nTotalEffect > p2.nTotalEffect
 		end)
 		-- ½çÃæÖØ»æ
 		this:Lookup('WndScroll_Target'):Show()
 		local hList = this:Lookup('WndScroll_Target', 'Handle_TargetList')
 		hList:Clear()
-		for i, p in ipairs(tResult) do
+		for i, p in ipairs(aResult) do
 			local hItem = hList:AppendItemFromIni(_C.szIniDetail, 'Handle_TargetItem')
 			hItem:Lookup('Text_TargetNo'):SetText(i)
 			hItem:Lookup('Text_TargetName'):SetText(p.szName)
@@ -974,6 +998,17 @@ MY_Recount.GetMenu = function()
 			bChecked = MY_Recount.bAwayMode,
 			fnAction = function()
 				MY_Recount.bAwayMode = not MY_Recount.bAwayMode
+				MY_Recount.DrawUI()
+			end,
+			fnDisable = function()
+				return not MY_Recount.bEnable
+			end,
+		}, {
+			szOption = _L['show nodata teammate'],
+			bCheck = true,
+			bChecked = MY_Recount.bShowNodataTeammate,
+			fnAction = function()
+				MY_Recount.bShowNodataTeammate = not MY_Recount.bShowNodataTeammate
 				MY_Recount.DrawUI()
 			end,
 			fnDisable = function()
@@ -1251,14 +1286,14 @@ MY_Recount.GetPublishMenu = function()
 				local hList      = frame:Lookup('Wnd_Main', 'Handle_List')
 				local szUnit     = (' ' .. hList.szUnit) or ''
 				local nTimeCount = hList.nTimeCount or 0
-				local tResult = {} -- ÊÕ¼¯Êý¾Ý
+				local aResult = {} -- ÊÕ¼¯Êý¾Ý
 				local nMaxNameLen = 0
 				for i = 0, MY_Recount.nPublishLimit do
 					local hItem = hList:Lookup(i)
 					if not hItem then
 						break
 					end
-					table.insert(tResult, hItem.data)
+					table.insert(aResult, hItem.data)
 					nMaxNameLen = math.max(nMaxNameLen, wstring.len(hItem.data.szName))
 				end
 				if not MY_Recount.bShowPerSec then
@@ -1266,7 +1301,7 @@ MY_Recount.GetPublishMenu = function()
 					szUnit = ""
 				end
 				-- ·¢²¼Êý¾Ý
-				for i, p in ipairs(tResult) do
+				for i, p in ipairs(aResult) do
 					local szText = string.format('%02d', i) .. '.[' .. p.szName .. ']'
 					for i = wstring.len(p.szName), nMaxNameLen - 1 do
 						szText = szText .. g_tStrings.STR_ONE_CHINESE_SPACE
