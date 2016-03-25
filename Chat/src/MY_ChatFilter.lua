@@ -88,7 +88,7 @@ MY.HookChatPanel("MY_ChatFilter", function(h, szChannel, szMsg, dwTime)
 			local nS, nE = wstring.find(szText, l_tChannelHeader[szChannel])
 			if nS and nE then
 				szName = ""
-				szText:sub(1, nE):gsub("(%[[^%[%]%])", function(s)
+				szText:sub(1, nE):gsub("(%[[^%[%]]-%])", function(s)
 					szName = szName .. s
 				end)
 				szText = szText:sub(nE + 1)
@@ -96,7 +96,7 @@ MY.HookChatPanel("MY_ChatFilter", function(h, szChannel, szMsg, dwTime)
 		end
 		szText = szText:gsub("[ \n]", "")
 		if not MY_ChatFilter.bFilterDuplicateIgnoreID then
-			szText = szText .. szName
+			szText = szName .. ":" .. szText
 		end
 		-- 判断是否需要过滤
 		if not h.MY_tDuplicateLog then
