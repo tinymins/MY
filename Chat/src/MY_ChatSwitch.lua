@@ -317,7 +317,7 @@ function MY_ChatSwitch.OnEvent(event)
 			table.insert(t[2], MY.Chat.GetTimeLinkText({r = r, g = g, b = b, s = "[M.dd.hh:mm:ss]"}) .. szMsg)
 			table.insert(MY_ChatSwitch.aWhisper, t)
 		end
-		if arg0 ~= UI_GetClientPlayerID() then
+		if dwTalkerID ~= UI_GetClientPlayerID() then
 			return
 		end
 		local hRadio = this.tRadios[nChannel]
