@@ -148,7 +148,21 @@ local function OnWhisperCheck()
 				end
 			end,
 			fnMouseEnter = function()
-				local szMsg = table.concat(whisper[2], "")
+				local t = {}
+				local today = MY.FormatTime("yyyyMMdd")
+				local r, g, b = GetMsgFontColor("MSG_WHISPER")
+				for _, v in ipairs(whisper[2]) do
+					if type(v) == "string" then
+						table.insert(t, v)
+					elseif type(v) == "table" then
+						if today == MY.FormatTime("yyyyMMdd", v[2]) then
+							table.insert(t, MY.GetTimeLinkText({r = r, g = g, b = b, s = "[hh:mm:ss]"}, v[2]) .. v[1])
+						else
+							table.insert(t, MY.GetTimeLinkText({r = r, g = g, b = b, s = "[M.dd.hh:mm:ss]"}, v[2]) .. v[1])
+						end
+					end
+				end
+				local szMsg = table.concat(t, "")
 				if MY_Farbnamen then
 					szMsg = MY_Farbnamen.Render(szMsg)
 				end
@@ -313,8 +327,7 @@ function MY_ChatSwitch.OnEvent(event)
 			while #t[2] > 20 do
 				table.remove(t[2], 1)
 			end
-			local r, g, b = GetMsgFontColor("MSG_WHISPER")
-			table.insert(t[2], MY.Chat.GetTimeLinkText({r = r, g = g, b = b, s = "[M.dd.hh:mm:ss]"}) .. szMsg)
+			table.insert(t[2], {szMsg, GetCurrentTime()})
 			table.insert(MY_ChatSwitch.aWhisper, t)
 		end
 		if dwTalkerID ~= UI_GetClientPlayerID() then
