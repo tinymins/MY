@@ -33,6 +33,7 @@ function MY.Chat.RepeatChatLine(hTime)
 		edit:ClearText()
 	end
 end
+MY.RepeatChatLine = MY.Chat.RepeatChatLine
 
 -- 聊天删除行
 function MY.Chat.RemoveChatLine(hTime)
@@ -58,6 +59,7 @@ function MY.Chat.RemoveChatLine(hTime)
 	end
 	hHandle:FormatAllItemPos()
 end
+MY.RemoveChatLine = MY.Chat.RemoveChatLine
 
 -- 聊天表情初始化
 _C.nMaxEmotionLen = 0
@@ -100,6 +102,7 @@ function MY.Chat.GetEmotion(arg0, arg1, arg2)
 	end
 	return clone(t)
 end
+MY.GetEmotion = MY.Chat.GetEmotion
 
 -- 获取复制聊天行Text
 function MY.Chat.GetCopyLinkText(szText, rgbf)
@@ -110,6 +113,7 @@ function MY.Chat.GetCopyLinkText(szText, rgbf)
 		"this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.Chat.LinkEventHandler.OnCopyLClick\nthis.OnItemMButtonDown=MY.Chat.LinkEventHandler.OnCopyMClick\nthis.OnItemRButtonDown=MY.Chat.LinkEventHandler.OnCopyRClick\nthis.OnItemMouseEnter=MY.Chat.LinkEventHandler.OnCopyMouseEnter\nthis.OnItemMouseLeave=MY.Chat.LinkEventHandler.OnCopyMouseLeave",
 		"copylink")
 end
+MY.GetCopyLinkText = MY.Chat.GetCopyLinkText
 
 -- 获取复制聊天行Text
 function MY.Chat.GetTimeLinkText(rgbfs, dwTime)
@@ -124,6 +128,7 @@ function MY.Chat.GetTimeLinkText(rgbfs, dwTime)
 		"timelink"
 	)
 end
+MY.GetTimeLinkText = MY.Chat.GetTimeLinkText
 
 -- 复制聊天行
 function MY.Chat.CopyChatLine(hTime, bTextEditor)
@@ -212,6 +217,7 @@ function MY.Chat.CopyChatLine(hTime, bTextEditor)
 	end
 	Station.SetFocusWindow(edit)
 end
+MY.CopyChatLine = MY.Chat.CopyChatLine
 
 MY.Chat.LinkEventHandler = {
 	OnNameLClick = function(hT)
@@ -345,6 +351,7 @@ function MY.Chat.RenderLink(argv, argv2)
 	
 	return argv
 end
+MY.RenderChatLink = MY.Chat.RenderLink
 
 -- 复制Item到输入框
 function MY.Chat.CopyChatItem(p)
@@ -384,6 +391,7 @@ function MY.Chat.CopyChatItem(p)
 		Station.SetFocusWindow(edit)
 	end
 end
+MY.CopyChatItem = MY.Chat.CopyChatItem
 
 --解析消息
 function MY.Chat.FormatContent(szMsg)
@@ -477,6 +485,7 @@ function MY.Chat.FormatContent(szMsg)
 	end
 	return t2
 end
+MY.FormatChatContent = MY.Chat.FormatContent
 
 -- 字符串化一个聊天table结构体
 function MY.Chat.StringfyContent(t)
@@ -486,6 +495,7 @@ function MY.Chat.StringfyContent(t)
 	end
 	return table.concat(t1)
 end
+MY.StringfyChatContent = MY.Chat.StringfyContent
 
 -- 判断某个频道能否发言
 -- (bool) MY.CanTalk(number nChannel)
@@ -1050,7 +1060,7 @@ MY.RegisterMsgMonitor("QIYU", function(szMsg, nFont, bRich, r, g, b, szChannel)
 		szMsg = GetPureText(szMsg)
 	end
 	szMsg:gsub(_L.ADVENTURE_PATT, function(szName, szAdventure)
-		MY.RemoteRequest('http://data.jx3.derzh.com/data/adventure.php?l=' .. MY.GetLang()
+		MY.RemoteRequest('http://data.jx3.derzh.com/adventure/?l=' .. MY.GetLang()
 		.. "&data=" .. MY.String.SimpleEcrypt(MY.Json.Encode({
 			n = szName, a = szAdventure,
 			s = MY.GetServer(), _ = GetCurrentTime()
