@@ -2,7 +2,7 @@
 -- ×Ô¶¯Òþ²ØÁÄÌìÀ¸
 -- by ÜøÒÁ @ Ë«ÃÎÕò @ Ý¶»¨¹¬
 -- Build 20150105
--- 
+--
 local STATE = {
     SHOW    = 1, -- ÒÑÏÔÊ¾
     HIDE    = 2, -- ÒÑÒþ²Ø
@@ -39,7 +39,7 @@ MY_AutoHideChat.ShowChatPanel = function(nShowFrame, nDelayFrame, callback)
         for i = 1, 10 do
             local hFrame = Station.Lookup('Lowest2/ChatPanel' .. i)
             if hFrame then
-                hFrame:Show(true)
+                hFrame:SetMousePenetrable(false)
             end
         end
     elseif m_nState == STATE.HIDDING then
@@ -134,7 +134,7 @@ MY_AutoHideChat.HideChatPanel = function(nHideFrame, nDelayFrame, callback)
                 hFrame:Lookup('Wnd_Message', 'Shadow_Back'):SetAlpha(nAlpha * _Cache.fAhBgAlpha)
                 -- hide if alpha turns to zero
                 if nAlpha == 0 then
-                    hFrame:Hide()
+                    hFrame:SetMousePenetrable(true)
                 end
             end
         end
@@ -159,14 +159,14 @@ MY_AutoHideChat.ApplyConfig = function()
             _Cache.bAhAnimate = _Cache.bAhAnimate or false
         end
         -- hook chat panel as event listener
-        MY.Chat.HookChatPanel('MY_AutoHideChat', nil, function(h, szChannel, szMsg)
-            -- if szMsg is empty (means nothing appended) then return
-            if not (szMsg and #szMsg > 0) then
+        MY.HookChatPanel('MY_AutoHideChat', nil, function(h, channel, param, msg)
+            -- if msg is empty (means nothing appended) then return
+            if not (msg and #msg > 0) then
                 return
             end
             -- if input box get focus then return
-            local hFocus = Station.GetFocusWindow()
-            if hFocus and hFocus:GetTreePath() == 'Lowest2/EditBox/Edit_Input/' then
+            local focus = Station.GetFocusWindow()
+            if focus and focus:GetTreePath() == 'Lowest2/EditBox/Edit_Input/' then
                 return
             end
             -- show when new msg
@@ -174,7 +174,7 @@ MY_AutoHideChat.ApplyConfig = function()
                 -- hide after 5 sec
                 MY_AutoHideChat.HideChatPanel(GLOBAL.GAME_FPS / 2, GLOBAL.GAME_FPS * 5)
             end)
-        end, true)
+        end)
         
         -- hook chat edit box
         local hEditInput = Station.Lookup('Lowest2/EditBox/Edit_Input')
