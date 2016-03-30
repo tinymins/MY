@@ -777,7 +777,7 @@ function MY.SwitchTab(szID)
 			onclick = function() OpenInternetExplorer("https://cdn.rawgit.com/tinymins/MY/master/changelog.html?_=" .. GetCurrentTime()) end,
 			onhover = function(bIn) this:SetAlpha(bIn and 255 or 190) end,
 		})
-		ui:append("Text", "Text_Svr", { x = 10, y = 345, w = 557, font = 204, text = MY.GetServer(), alpha = 220 })
+		ui:append("Text", "Text_Svr", { x = 10, y = 345, w = 557, font = 204, text = MY.GetServer() .. " (" .. MY.GetRealServer() .. ")", alpha = 220 })
 		wndMainPanel.OnPanelResize = function(wnd)
 			local w, h = MY.UI(wnd):size()
 			local scaleH = w / 557 * 278

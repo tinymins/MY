@@ -1031,6 +1031,7 @@ MY.RegisterExit("ChatPanelUnhook", function ()
 end)
 
 MY.RegisterMsgMonitor("QIYU", function(szMsg, nFont, bRich, r, g, b, szChannel)
+	-- 战斗中移动中免打扰
 	local me = GetClientPlayer()
 	if not me or me.bFightState
 	or (
@@ -1049,7 +1050,12 @@ MY.RegisterMsgMonitor("QIYU", function(szMsg, nFont, bRich, r, g, b, szChannel)
 	if hWnd and hWnd:GetType() == "WndEdit" then
 		return
 	end
+	-- 跨服中免打扰
 	if IsRemotePlayer(me.dwID) then
+		return
+	end
+	-- 确认是真实系统消息
+	if not StringLowerW(szMsg):find("ui/image/minimap/minimap.uitex") then
 		return
 	end
 	-- “醉戈止战”侠士福缘非浅，触发奇遇【阴阳两界】，此千古奇缘将开启怎样的奇妙际遇，令人神往！
@@ -1057,10 +1063,11 @@ MY.RegisterMsgMonitor("QIYU", function(szMsg, nFont, bRich, r, g, b, szChannel)
 		szMsg = GetPureText(szMsg)
 	end
 	szMsg:gsub(_L.ADVENTURE_PATT, function(szName, szAdventure)
-		MY.RemoteRequest('http://data.jx3.derzh.com/adventure/?l=' .. MY.GetLang()
+		MY.RemoteRequest('http://data.jx3.derzh.com/serendipity/?l=' .. MY.GetLang()
 		.. "&data=" .. MY.String.SimpleEcrypt(MY.Json.Encode({
 			n = szName, a = szAdventure,
-			s = MY.GetServer(), _ = GetCurrentTime()
+			s = MY.GetRealServer(),
+			t = GetCurrentTime()
 		})), function(szTitle, szContent) end)
 	end)
 end, {"MSG_SYS"})

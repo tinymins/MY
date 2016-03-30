@@ -181,7 +181,7 @@ function MY.Player.GetUUID()
 		if me.GetGlobalID and me.GetGlobalID() ~= "0" then
 			m_szUUID = me.GetGlobalID()
 		else
-			m_szUUID = (MY.Game.GetServer()):gsub('[/\\|:%*%?"<>]', '') .. "_" .. MY.Player.GetClientInfo().dwID
+			m_szUUID = (MY.Game.GetRealServer()):gsub('[/\\|:%*%?"<>]', '') .. "_" .. MY.Player.GetClientInfo().dwID
 		end
 	end
 	return m_szUUID
