@@ -232,26 +232,26 @@ MY.Game.AddHotKey("MY_STOP_CASTING", _L["Stop cast skill"], function() GetClient
 -- #######################################################################################################
 -- 获取当前服务器名称
 function MY.Game.GetServer()
-	local region, server, _, _, _ = GetUserServer()
+	local display_region, display_server, region, server = GetUserServer()
+	region = region or display_region
+	server = server or display_server
 	return region .. "_" .. server, {region, server}
 end
 MY.GetServer = MY.Game.GetServer
 
 -- 获取当前服务器显示名称
 function MY.Game.GetDisplayServer()
-	local region, server, _, _, display_region, display_server = GetUserServer()
-	display_region = display_region or region
-	display_server = display_server or server
+	local display_region, display_server = GetUserServer()
 	return display_region .. "_" .. display_server, {display_region, display_server}
 end
 MY.GetDisplayServer = MY.Game.GetDisplayServer
 
 -- 获取数据互通主服务器名称
 function MY.Game.GetRealServer()
-	local region, server, rel_region, rel_server, _, _ = GetUserServer()
-	rel_region = rel_region or region
-	rel_server = rel_server or server
-	return rel_region .. "_" .. rel_server, {rel_region, rel_server}
+	local display_region, display_server, _, _, real_region, real_server = GetUserServer()
+	real_region = real_region or display_region
+	real_server = real_server or display_server
+	return real_region .. "_" .. real_server, {real_region, real_server}
 end
 MY.GetRealServer = MY.Game.GetRealServer
 
