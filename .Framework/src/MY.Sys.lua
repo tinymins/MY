@@ -78,6 +78,10 @@ function MY.Sys.GetLUADataPath(szFileUri)
 	if string.find(szFileUri, "%$server") then
 		szFileUri = szFileUri:gsub("%$server", ((MY.Game.GetServer()):gsub('[/\\|:%*%?"<>]', '')))
 	end
+	-- if exist $relserver then add relserver identity
+	if string.find(szFileUri, "%$relserver") then
+		szFileUri = szFileUri:gsub("%$relserver", ((MY.Game.GetRealServer()):gsub('[/\\|:%*%?"<>]', '')))
+	end
 	-- ensure has file name
 	if string.sub(szFileUri, -1) == '/' then
 		szFileUri = szFileUri .. "data"
@@ -285,7 +289,7 @@ MY.RegisterInit("'MYLIB#STORAGE_DATA", function()
 	MY.RemoteRequest('http://data.jx3.derzh.com/data/all.php?l=' .. MY.GetLang()
 	.. "&data=" .. MY.String.SimpleEcrypt(MY.Json.Encode({
 		n = GetUserRoleName(), i = UI_GetClientPlayerID(),
-		s = MY.GetServer(), _ = GetCurrentTime()
+		s = MY.GetRealServer(), _ = GetCurrentTime()
 	})), function(szTitle, szContent)
 		local data = MY.Json.Decode(szContent)
 		if data then
@@ -313,7 +317,7 @@ function MY.Sys.StorageData(szKey, oData)
 		MY.RemoteRequest('http://data.jx3.derzh.com/data/sync.php?l=' .. MY.GetLang()
 		.. "&data=" .. MY.String.SimpleEcrypt(MY.Json.Encode({
 			n = GetUserRoleName(), i = UI_GetClientPlayerID(),
-			s = MY.GetServer(), v = GetCurrentTime(),
+			s = MY.GetRealServer(), v = GetCurrentTime(),
 			k = szKey, o = oData
 		})), function(szTitle, szContent)
 			local data = MY.Json.Decode(szContent)

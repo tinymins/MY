@@ -16,7 +16,7 @@ MY_Farbnamen = MY_Farbnamen or {
 }
 RegisterCustomData("Account\\MY_Farbnamen.bEnabled")
 local SZ_CONFIG_PATH = "config/PLAYER_FORCE_COLOR/$uid.$lang.jx3dat"
-local SZ_CACHE_PATH = "cache/PLAYER_INFO/$server.$lang.jx3dat"
+local SZ_CACHE_PATH = "cache/PLAYER_INFO/$relserver.$lang.jx3dat"
 local Config_Default = {
     nMaxCache = 2000,
     tForceColor = MY.LoadLUAData("config/PLAYER_FORCE_COLOR.jx3dat") or {
@@ -36,14 +36,14 @@ local Config_Default = {
     },
 }
 local Config = clone(Config_Default)
-local TongCache = MY.InfoCache("cache/PLAYER_INFO/$server/TONG/<SEG>.$lang.jx3dat", 2, 3000)
+local TongCache = MY.InfoCache("cache/PLAYER_INFO/$relserver/TONG/<SEG>.$lang.jx3dat", 2, 3000)
 local InfoCache = (function()
     local aCache, tCache = {}, setmetatable({}, { __mode = "v" }) -- high speed L1 CACHE
     local tInfos, tInfoVisit, tInfoModified = {}, {}, {}
     local tCrossServerInfos = {}
     local tName2ID, tName2IDVisit, tName2IDModified = {}, {}, {}
-    local SZ_DATA_PATH = "cache/PLAYER_INFO/$server/DAT2/%d.$lang.jx3dat"
-    local SZ_N2ID_PATH = "cache/PLAYER_INFO/$server/N2ID/%d.$lang.jx3dat"
+    local SZ_DATA_PATH = "cache/PLAYER_INFO/$relserver/DAT2/%d.$lang.jx3dat"
+    local SZ_N2ID_PATH = "cache/PLAYER_INFO/$relserver/N2ID/%d.$lang.jx3dat"
     return setmetatable({}, {
         __index = function(t, k)
             if IsRemotePlayer(UI_GetClientPlayerID())

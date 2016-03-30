@@ -310,7 +310,7 @@ MY_Anmerkungen.SetPlayerNote = function(dwID, szName, szContent, bTipWhenGroup, 
 end
 -- 读取公共数据
 MY_Anmerkungen.LoadConfig = function()
-	MY_Anmerkungen.tPublicPlayerNotes = MY.Sys.LoadLUAData("config/PLAYER_NOTES/$server.$lang.jx3dat") or {}
+	MY_Anmerkungen.tPublicPlayerNotes = MY.Sys.LoadLUAData("config/PLAYER_NOTES/$relserver.$lang.jx3dat") or {}
 	if type(MY_Anmerkungen.tPublicPlayerNotes) == 'string' then
 		MY_Anmerkungen.tPublicPlayerNotes = MY.Json.Decode(MY_Anmerkungen.tPublicPlayerNotes)
 	end
@@ -321,7 +321,7 @@ MY_Anmerkungen.LoadConfig = function()
 end
 -- 保存公共数据
 MY_Anmerkungen.SaveConfig = function()
-	MY.Sys.SaveLUAData("config/PLAYER_NOTES/$server.$lang.jx3dat", MY_Anmerkungen.tPublicPlayerNotes)
+	MY.Sys.SaveLUAData("config/PLAYER_NOTES/$relserver.$lang.jx3dat", MY_Anmerkungen.tPublicPlayerNotes)
 	MY.Sys.SaveLUAData("config/PLAYER_NOTES/$uid.$lang.jx3dat", MY_Anmerkungen.tPrivatePlayerNotes)
 end
 MY.RegisterInit('MY_ANMERKUNGEN', MY_Anmerkungen.LoadConfig)
