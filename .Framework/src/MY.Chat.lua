@@ -951,18 +951,15 @@ function _C.OnChatPanelAppendItemFromString(h, szMsg, szChannel, dwTime, nR, nG,
 		-- if fnBefore exist and ChatPanel[i] actived or fnOnActive not defined
 		if type(hc.fnBefore) == "function" and (bActived or not hc.fnOnActive) then
 			-- try to execute fnBefore and get return values
-			local result = { pcall(hc.fnBefore, h, szChannel, szMsg, dwTime, nR, nG, nB, ...) }
+			local res, msg, ret = pcall(hc.fnBefore, h, szChannel, szMsg, dwTime, nR, nG, nB, ...)
 			-- when fnBefore execute succeed
-			if result[1] then
-				-- remove execute status flag
-				table.remove(result, 1)
-				if type(result[1]) == "string" then
-					szMsg = result[1]
+			if res then
+				-- set msg if returned string
+				if type(msg) == "string" then
+					szMsg = msg
 				end
-				-- remove returned szMsg
-				table.remove(result, 1)
-				-- the rest is fnAfter param
-				hc.param = result
+				-- save fnAfter's param
+				hc.param = ret
 			end
 		end
 	end
