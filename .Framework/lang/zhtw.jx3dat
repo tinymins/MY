@@ -142,5 +142,5 @@ data = {
     
     ["Stop cast skill"] = "打斷自身讀條",
     
-    ["ADVENTURE_PATT"] = "“(.-)”俠士.-觸發奇遇【(.-)】",
+    ["ADVENTURE_PATT"] = "“(.-)”俠.-觸發奇遇【(.-)】",
 }
