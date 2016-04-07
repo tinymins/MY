@@ -639,7 +639,7 @@ function _C.OnPanelActive(wnd)
 	  			fnAction = function()
 	  				_C.RebuildDateList({
 	  					"MSG_GUILD", "MSG_WHISPER", "MSG_TEAM", "MSG_FRIEND"
-	  				}, 300)
+	  				}, (GetCurrentTime() - 1388505600) / 60 / 60 / 24)
 	  				_C.UiRedrawLog()
 	  			end,
 	  		})
