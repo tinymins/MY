@@ -105,14 +105,16 @@ end
 
 function _C.RebuildDateList(tChannels, nScanDays)
 	_C.UnloadLog()
+	local nDailySec = 24 * 3600
 	for _, szChannel in ipairs(tChannels) do
 		Log[szChannel] = { DateList = {} }
-		local nEndedDate = tonumber(MY.Sys.FormatTime("yyyyMMdd", GetCurrentTime()))
-		local nStartDate = nEndedDate - nScanDays
+		local dwEndedTime = GetCurrentTime()
+		local dwStartTime = GetCurrentTime() - nScanDays * nDailySec
 		local tDateList  = Log[szChannel].DateList
-		for dwDate = nStartDate, nEndedDate do
-			if IsFileExist(MY.GetLUADataPath(DATA_PATH:format(szChannel, dwDate))) then
-				tinsert(tDateList, dwDate)
+		for dwTime = dwStartTime, dwEndedTime, nDailySec do
+			local szDate = MY.Sys.FormatTime("yyyyMMdd", dwTime)
+			if IsFileExist(MY.GetLUADataPath(DATA_PATH:format(szChannel, szDate))) then
+				tinsert(tDateList, szDate)
 				_C.tModifiedLog[szChannel] = { DateList = true }
 			end
 		end
