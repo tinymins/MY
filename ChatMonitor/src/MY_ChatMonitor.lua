@@ -28,6 +28,7 @@ MY_ChatMonitor.bShowPreview        = true
 MY_ChatMonitor.bPlaySound          = true
 MY_ChatMonitor.bRedirectSysChannel = false
 MY_ChatMonitor.bCapture            = false
+MY_ChatMonitor.bBlockWords         = true
 MY_ChatMonitor.bIgnoreSame         = true
 MY_ChatMonitor.szTimestrap         = "[hh:mm:ss]"
 MY_ChatMonitor.tChannels           = { ["MSG_NORMAL"] = true, ["MSG_CAMP"] = true, ["MSG_WORLD"] = true, ["MSG_MAP"] = true, ["MSG_SCHOOL"] = true, ["MSG_GUILD"] = true, ["MSG_FRIEND"] = true }
@@ -38,6 +39,7 @@ RegisterCustomData('MY_ChatMonitor.bIsRegexp')
 RegisterCustomData('MY_ChatMonitor.nMaxRecord')
 RegisterCustomData('MY_ChatMonitor.bShowPreview')
 RegisterCustomData('MY_ChatMonitor.bCapture')
+RegisterCustomData('MY_ChatMonitor.bBlockWords')
 RegisterCustomData('MY_ChatMonitor.tChannels')
 RegisterCustomData('MY_ChatMonitor.bPlaySound')
 RegisterCustomData('MY_ChatMonitor.bRedirectSysChannel')
@@ -94,6 +96,11 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
     if not MY_ChatMonitor.bCapture
     or not MY_ChatMonitor.szKeyWords
     or MY_ChatMonitor.szKeyWords == '' then
+        return
+    end
+    if MY_ChatMonitor.bBlockWords
+    and MY_Chat and MY_Chat.MatchBlockWord
+    and MY_Chat.MatchBlockWord(szMsg, szChannel, bRich) then
         return
     end
     --------------------------------------------------------------------------------------
@@ -402,6 +409,21 @@ _C.OnPanelActive = function(wnd)
                 bCheck = true,
                 bChecked = MY_ChatMonitor.bIgnoreSame
             })
+            if MY_Chat then
+                table.insert(t,{
+                    szOption = _L['hide blockwords'],
+                    fnAction = function()
+                        MY_ChatMonitor.bBlockWords = not MY_ChatMonitor.bBlockWords
+                    end,
+                    bCheck = true,
+                    bChecked = MY_ChatMonitor.bBlockWords, {
+                        szOption = _L['edit'],
+                        fnAction = function()
+                            MY.SwitchTab("MY_Chat_Filter")
+                        end,
+                    }
+                })
+            end
             table.insert(t, { bDevide = true })
             table.insert(t,{
                 szOption = _L['regular expression'],

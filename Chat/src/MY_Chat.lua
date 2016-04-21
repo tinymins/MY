@@ -46,17 +46,26 @@ MY.RegisterEvent("MY_PRIVATE_STORAGE_UPDATE", function()
 end)
 MY.RegisterInit('MY_CHAT_BW', LoadBlockWords)
 
+function MY_Chat.MatchBlockWord(szMsg, szChannel, bRichText)
+	if bRichText then
+		szMsg = GetPureText(szMsg)
+	end
+	if szChannel then
+		szMsg = "[" .. g_tStrings.tChannelName[szChannel] .. "]" .. szMsg
+	end
+	for _, bw in ipairs(MY_Chat.tBlockWords) do
+		if bw[2].ALL ~= bw[2][szChannel]
+		and MY.String.SimpleMatch(szMsg, bw[1]) then
+			return true
+		end
+	end
+end
+
 -- hook chat panel
 MY.HookChatPanel("MY_Chat", function(h, szChannel, szMsg, dwTime, nR, nG, nB)
 	-- chat filter
-	if MY_Chat.bBlockWords then
-		local szText = "[" .. g_tStrings.tChannelName[szChannel] .. "]" .. GetPureText(szMsg)
-		for _, bw in ipairs(MY_Chat.tBlockWords) do
-			if bw[2].ALL ~= bw[2][szChannel]
-			and MY.String.SimpleMatch(szText, bw[1]) then
-				return ""
-			end
-		end
+	if MY_Chat.bBlockWords and MY_Chat.MatchBlockWord(szMsg, szChannel, true) then
+		return ""
 	end
 	return szMsg, h:GetItemCount()
 end, function(h, i, szChannel, szMsg, dwTime, nR, nG, nB)
