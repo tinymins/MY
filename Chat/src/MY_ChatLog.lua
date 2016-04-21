@@ -23,9 +23,11 @@ local Log = {}
 local XML_LINE_BREAKER = XML_LINE_BREAKER
 local tinsert, tconcat, tremove = table.insert, table.concat, table.remove
 MY_ChatLog = MY_ChatLog or {}
-MY_ChatLog.szActiveChannel		 = "MSG_WHISPER" -- 当前激活的标签页
-MY_ChatLog.bIgnoreTongOnlineMsg	= true -- 帮会上线通知
+MY_ChatLog.szActiveChannel         = "MSG_WHISPER" -- 当前激活的标签页
+MY_ChatLog.bIgnoreTongOnlineMsg    = true -- 帮会上线通知
 MY_ChatLog.bIgnoreTongMemberLogMsg = true -- 帮会成员上线下线提示
+MY_ChatLog.bBlockWords             = true -- 不记录屏蔽关键字
+RegisterCustomData('MY_ChatLog.bBlockWords')
 RegisterCustomData('MY_ChatLog.bIgnoreTongOnlineMsg')
 RegisterCustomData('MY_ChatLog.bIgnoreTongMemberLogMsg')
 
@@ -42,6 +44,11 @@ function _C.OnMsg(szMsg, szChannel, nFont, bRich, r, g, b)
 		szText = GetPureText(szMsg)
 	else
 		szMsg = GetFormatText(szMsg, nil, r, g, b)
+	end
+	if MY_ChatLog.bBlockWords
+	and MY_Chat and MY_Chat.MatchBlockWord
+	and MY_Chat.MatchBlockWord(szText, szChannel, false) then
+		return
 	end
 	-- filters
 	if szChannel == "MSG_GUILD" then
@@ -651,6 +658,21 @@ function _C.OnPanelActive(wnd)
 					MY_ChatLog.ExportConfirm()
 	  			end,
 	  		})
+            if MY_Chat then
+                table.insert(t,{
+                    szOption = _L['hide blockwords'],
+                    fnAction = function()
+                        MY_ChatLog.bBlockWords = not MY_ChatLog.bBlockWords
+                    end,
+                    bCheck = true,
+                    bChecked = MY_ChatLog.bBlockWords, {
+                        szOption = _L['edit'],
+                        fnAction = function()
+                            MY.SwitchTab("MY_Chat_Filter")
+                        end,
+                    }
+                })
+            end
 	  		return t
 	  	end)())
 	end)
