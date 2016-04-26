@@ -231,27 +231,45 @@ MY.Game.AddHotKey("MY_STOP_CASTING", _L["Stop cast skill"], function() GetClient
 --   #     # #   # #     #     #         # #           # # # #   # # # #
 -- #######################################################################################################
 -- 获取当前服务器名称
-function MY.Game.GetServer()
+function MY.Game.GetServer(nIndex)
 	local display_region, display_server, region, server = GetUserServer()
 	region = region or display_region
 	server = server or display_server
-	return region .. "_" .. server, {region, server}
+	if nIndex == 1 then
+		return region
+	elseif nIndex == 2 then
+		return server
+	else
+		return region .. "_" .. server, {region, server}
+	end
 end
 MY.GetServer = MY.Game.GetServer
 
 -- 获取当前服务器显示名称
-function MY.Game.GetDisplayServer()
+function MY.Game.GetDisplayServer(nIndex)
 	local display_region, display_server = GetUserServer()
-	return display_region .. "_" .. display_server, {display_region, display_server}
+	if nIndex == 1 then
+		return display_region
+	elseif nIndex == 2 then
+		return display_server
+	else
+		return display_region .. "_" .. display_server, {display_region, display_server}
+	end
 end
 MY.GetDisplayServer = MY.Game.GetDisplayServer
 
 -- 获取数据互通主服务器名称
-function MY.Game.GetRealServer()
+function MY.Game.GetRealServer(nIndex)
 	local display_region, display_server, _, _, real_region, real_server = GetUserServer()
 	real_region = real_region or display_region
 	real_server = real_server or display_server
-	return real_region .. "_" .. real_server, {real_region, real_server}
+	if nIndex == 1 then
+		return real_region
+	elseif nIndex == 2 then
+		return real_server
+	else
+		return real_region .. "_" .. real_server, {real_region, real_server}
+	end
 end
 MY.GetRealServer = MY.Game.GetRealServer
 
