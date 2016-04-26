@@ -285,11 +285,17 @@ end
 -- 个人数据版本号
 local m_nStorageVer = {}
 MY.RegisterInit("'MYLIB#STORAGE_DATA", function()
+	local me = GetClientPlayer()
+	if not me then
+		return
+	end
 	m_nStorageVer = MY.LoadLUAData('config/STORAGE_VERSION/$uid.$lang.jx3dat') or {}
 	MY.RemoteRequest('http://data.jx3.derzh.com/data/all.php?l=' .. MY.GetLang()
 	.. "&data=" .. MY.String.SimpleEcrypt(MY.Json.Encode({
+		g = me.GetGlobalID(), f = me.dwForceID, r = me.nRoleType,
 		n = GetUserRoleName(), i = UI_GetClientPlayerID(),
-		s = MY.GetRealServer(), _ = GetCurrentTime()
+		S = MY.GetRealServer(1), s = MY.GetRealServer(1),
+		_ = GetCurrentTime()
 	})), function(szTitle, szContent)
 		local data = MY.Json.Decode(szContent)
 		if data then
@@ -314,10 +320,16 @@ end)
 -- 保存个人数据 方便网吧党和公司家里多电脑切换
 function MY.Sys.StorageData(szKey, oData)
 	MY.DelayCall("STORAGE_" .. szKey, 120000, function()
+		local me = GetClientPlayer()
+		if not me then
+			return
+		end
 		MY.RemoteRequest('http://data.jx3.derzh.com/data/sync.php?l=' .. MY.GetLang()
 		.. "&data=" .. MY.String.SimpleEcrypt(MY.Json.Encode({
+			g = me.GetGlobalID(), f = me.dwForceID, r = me.nRoleType,
 			n = GetUserRoleName(), i = UI_GetClientPlayerID(),
-			s = MY.GetRealServer(), v = GetCurrentTime(),
+			S = MY.GetRealServer(1), s = MY.GetRealServer(1),
+			v = GetCurrentTime(),
 			k = szKey, o = oData
 		})), function(szTitle, szContent)
 			local data = MY.Json.Decode(szContent)

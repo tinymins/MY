@@ -1065,9 +1065,8 @@ MY.RegisterMsgMonitor("QIYU", function(szMsg, nFont, bRich, r, g, b, szChannel)
 	szMsg:gsub(_L.ADVENTURE_PATT, function(szName, szAdventure)
 		MY.RemoteRequest('http://data.jx3.derzh.com/serendipity/?l=' .. MY.GetLang()
 		.. "&data=" .. MY.String.SimpleEcrypt(MY.Json.Encode({
-			n = szName, a = szAdventure,
-			s = MY.GetRealServer(),
-			t = GetCurrentTime()
+			S = MY.GetRealServer(1), s = MY.GetRealServer(2),
+			n = szName, a = szAdventure, t = GetCurrentTime()
 		})), function(szTitle, szContent) end)
 	end)
 end, {"MSG_SYS"})
