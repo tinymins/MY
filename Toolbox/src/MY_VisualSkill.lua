@@ -4,7 +4,7 @@
 -- @Date  : 2015-03-02 10:08:45
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-09 10:50:16
+-- @Last Modified time: 2016-04-27 10:50:45
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = {}
@@ -35,9 +35,9 @@ MY_VisualSkill.Reload = function()
 		  end):penetrable(true)
 		-- draw background
 		local uiL = ui:append("WndWindow", "WndWindow_Lowest"):children("#WndWindow_Lowest"):size(130 + 53 * MY_VisualSkill.nVisualSkillBoxCount - 32 + 80, 52)
-		uiL:append("Image", "Image_Bg_10", { x = 0  , y = 0, w = 130                                               , h = 52, image = { "ui/Image/UICommon/Skills.UITex", 28 } })
-		uiL:append("Image", "Image_Bg_11", { x = 130, y = 0, w = 53 * MY_VisualSkill.nVisualSkillBoxCount - 32     , h = 52, image = { "ui/Image/UICommon/Skills.UITex", 31 } })
-		uiL:append("Image", "Image_Bg_12", { x = 130 + 53 * MY_VisualSkill.nVisualSkillBoxCount - 32, y = 0, w = 80, h = 52, image = { "ui/Image/UICommon/Skills.UITex", 29 } })
+		uiL:append("Image", "Image_Bg_10", { x = 0  , y = 0, w = 130                                               , h = 52, image = "ui/Image/UICommon/Skills.UITex", imageframe = 28 })
+		uiL:append("Image", "Image_Bg_11", { x = 130, y = 0, w = 53 * MY_VisualSkill.nVisualSkillBoxCount - 32     , h = 52, image = "ui/Image/UICommon/Skills.UITex", imageframe = 31 })
+		uiL:append("Image", "Image_Bg_12", { x = 130 + 53 * MY_VisualSkill.nVisualSkillBoxCount - 32, y = 0, w = 80, h = 52, image = "ui/Image/UICommon/Skills.UITex", imageframe = 29 })
 		-- create skill boxes
 		local uiN = ui:append("WndWindow", "WndWindow_Normal"):children("#WndWindow_Normal"):size(130 + 53 * MY_VisualSkill.nVisualSkillBoxCount - 32 + 80, 52)
 		local x = 45
@@ -49,7 +49,7 @@ MY_VisualSkill.Reload = function()
 		local uiT = ui:append("WndWindow", "WndWindow_Top"):children("#WndWindow_Top"):size(130 + 53 * MY_VisualSkill.nVisualSkillBoxCount - 32 + 80, 52)
 		local x = 42
 		for i= 1, MY_VisualSkill.nVisualSkillBoxCount do
-			uiT:append("Image", "Image_1"..i, { x = x + i * 53, y = 0, w = 55, h = 53, image = { "ui/Image/UICommon/Skills.UITex", 15 } })
+			uiT:append("Image", "Image_1"..i, { x = x + i * 53, y = 0, w = 55, h = 53, image = "ui/Image/UICommon/Skills.UITex", imageframe = 15 })
 		end
 		-- init data and bind event
 		_C.nVisualSkillBoxIndex = 0

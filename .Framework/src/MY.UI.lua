@@ -31,49 +31,49 @@ local setmetatable = setmetatable
 ---------------------------------------------------------------------
 -- 本地的 UI 组件对象
 ---------------------------------------------------------------------
-local function ApplyUIArguments(ui, tArg)
-	if tArg and ui then
+local function ApplyUIArguments(ui, arg)
+	if ui and arg then
 		-- properties
-		if tArg.w ~= nil or tArg.h ~= nil or tArg.rw ~= nil or tArg.rh ~= nil then ui:size(tArg.w, tArg.h, tArg.rw, tArg.rh) end
-		if tArg.x ~= nil or tArg.y ~= nil then ui:pos        (tArg.x, tArg.y  ) end
-		if tArg.halign or tArg.valign     then ui:align      (tArg.halign, tArg.valign) end -- must after :size()
-		if tArg.anchor             ~= nil then ui:anchor     (tArg.anchor     ) end
-		if tArg.alpha              ~= nil then ui:alpha      (tArg.alpha      ) end
-		if tArg.font               ~= nil then ui:font       (tArg.font       ) end -- must before color
-		if tArg.color              ~= nil then ui:color      (tArg.color      ) end
-		if tArg.r or tArg.g or tArg.b     then ui:color(tArg.r, tArg.g, tArg.b) end
-		if tArg.multiline          ~= nil then ui:multiLine  (tArg.multiline  ) end -- must before :text()
-		if tArg.sliderstyle        ~= nil then ui:sliderStyle(tArg.sliderstyle) end -- must before :text()
-		if tArg.textfmt            ~= nil then ui:text       (tArg.textfmt    ) end -- must before :text()
-		if tArg.text               ~= nil then ui:text       (tArg.text       ) end
-		if tArg.placeholder        ~= nil then ui:placeholder(tArg.placeholder) end
-		if tArg.group              ~= nil then ui:group      (tArg.group      ) end
-		if tArg.tip                ~= nil then if type(tArg.tip) == 'table' then ui:tip(unpack(tArg.tip)) else ui:tip(tArg.tip) end end
-		if tArg.range              ~= nil then ui:range      (unpack(tArg.range)) end
-		if tArg.value              ~= nil then ui:value      (tArg.value      ) end
-		if tArg.menu               ~= nil then ui:menu       (tArg.menu       ) end
-		if tArg.lmenu              ~= nil then ui:lmenu      (tArg.lmenu      ) end
-		if tArg.rmenu              ~= nil then ui:rmenu      (tArg.rmenu      ) end
-		if tArg.limit              ~= nil then ui:limit      (tArg.limit      ) end
-		if tArg.scroll             ~= nil then ui:scroll     (tArg.scroll     ) end
-		if tArg.handlestyle        ~= nil then ui:handleStyle(tArg.handlestyle) end
-		if tArg.edittype           ~= nil then ui:edittype   (tArg.edittype   ) end
-		if tArg.visible            ~= nil then ui:visible    (tArg.visible    ) end
-		if tArg.enable             ~= nil then ui:enable     (tArg.enable     ) end
-		if tArg.autoenable         ~= nil then ui:enable     (tArg.autoenable ) end
-		if tArg.image              ~= nil then if type(tArg.image) == 'table' then ui:image (unpack(tArg.image)) else ui:image(tArg.image) end end
+		if arg.w ~= nil or arg.h ~= nil or arg.rw ~= nil or arg.rh ~= nil then ui:size(arg.w, arg.h, arg.rw, arg.rh) end
+		if arg.x ~= nil or arg.y ~= nil  then ui:pos        (arg.x, arg.y  ) end
+		if arg.halign or arg.valign      then ui:align      (arg.halign, arg.valign) end -- must after :size()
+		if arg.anchor             ~= nil then ui:anchor     (arg.anchor     ) end
+		if arg.alpha              ~= nil then ui:alpha      (arg.alpha      ) end
+		if arg.font               ~= nil then ui:font       (arg.font       ) end -- must before color
+		if arg.color              ~= nil then ui:color      (arg.color      ) end
+		if arg.r or arg.g or arg.b       then ui:color(arg.r, arg.g, arg.b) end
+		if arg.multiline          ~= nil then ui:multiLine  (arg.multiline  ) end -- must before :text()
+		if arg.sliderstyle        ~= nil then ui:sliderStyle(arg.sliderstyle) end -- must before :text()
+		if arg.textfmt            ~= nil then ui:text       (arg.textfmt    ) end -- must before :text()
+		if arg.text               ~= nil then ui:text       (arg.text       ) end
+		if arg.placeholder        ~= nil then ui:placeholder(arg.placeholder) end
+		if arg.group              ~= nil then ui:group      (arg.group      ) end
+		if arg.tip                ~= nil then ui:tip(arg.tip, arg.tippostype, arg.tipoffset, arg.tiprichtext) end
+		if arg.range              ~= nil then ui:range      (unpack(arg.range)) end
+		if arg.value              ~= nil then ui:value      (arg.value      ) end
+		if arg.menu               ~= nil then ui:menu       (arg.menu       ) end
+		if arg.lmenu              ~= nil then ui:lmenu      (arg.lmenu      ) end
+		if arg.rmenu              ~= nil then ui:rmenu      (arg.rmenu      ) end
+		if arg.limit              ~= nil then ui:limit      (arg.limit      ) end
+		if arg.scroll             ~= nil then ui:scroll     (arg.scroll     ) end
+		if arg.handlestyle        ~= nil then ui:handleStyle(arg.handlestyle) end
+		if arg.edittype           ~= nil then ui:edittype   (arg.edittype   ) end
+		if arg.visible            ~= nil then ui:visible    (arg.visible    ) end
+		if arg.enable             ~= nil then ui:enable     (arg.enable     ) end
+		if arg.autoenable         ~= nil then ui:enable     (arg.autoenable ) end
+		if arg.image              ~= nil then ui:image(arg.image, arg.imageframe) end
 		-- event handlers
-		if tArg.onscroll           ~= nil then ui:scroll     (tArg.onscroll   ) end
-		if tArg.onhover            ~= nil then ui:hover      (tArg.onhover    ) end
-		if tArg.onfocus            ~= nil then ui:focus      (tArg.onfocus    ) end
-		if tArg.onblur             ~= nil then ui:blur       (tArg.onblur     ) end
-		if tArg.onclick            ~= nil then ui:click      (tArg.onclick    ) end
-		if tArg.onlclick           ~= nil then ui:lclick     (tArg.onlclick   ) end
-		if tArg.onrclick           ~= nil then ui:rclick     (tArg.onrclick   ) end
-		if tArg.checked            ~= nil then ui:check      (tArg.checked    ) end
-		if tArg.oncheck            ~= nil then ui:check      (tArg.oncheck    ) end
-		if tArg.onchange           ~= nil then ui:change     (tArg.onchange   ) end
-		if tArg.autocomplete       ~= nil then for _, v in ipairs(tArg.autocomplete) do ui:autocomplete(unpack(v)) end end
+		if arg.onscroll           ~= nil then ui:scroll     (arg.onscroll   ) end
+		if arg.onhover            ~= nil then ui:hover      (arg.onhover    ) end
+		if arg.onfocus            ~= nil then ui:focus      (arg.onfocus    ) end
+		if arg.onblur             ~= nil then ui:blur       (arg.onblur     ) end
+		if arg.onclick            ~= nil then ui:click      (arg.onclick    ) end
+		if arg.onlclick           ~= nil then ui:lclick     (arg.onlclick   ) end
+		if arg.onrclick           ~= nil then ui:rclick     (arg.onrclick   ) end
+		if arg.checked            ~= nil then ui:check      (arg.checked    ) end
+		if arg.oncheck            ~= nil then ui:check      (arg.oncheck    ) end
+		if arg.onchange           ~= nil then ui:change     (arg.onchange   ) end
+		if arg.autocomplete       ~= nil then for _, v in ipairs(arg.autocomplete) do ui:autocomplete(unpack(v)) end end
 	end
 end
 XGUI.ApplyUIArguments = ApplyUIArguments
