@@ -54,14 +54,23 @@ MY_ToolBox.ApplyConfig = function()
 				table.insert(hShaList.freeShadows, sha)
 			end
 		end
-		for _, p in pairs(MY.Player.GetNearPlayer()) do
-			OnPlayerEnter(p.dwID)
+		local function RescanNearby()
+			for _, p in pairs(MY.Player.GetNearPlayer()) do
+				OnPlayerEnter(p.dwID)
+			end
 		end
+		RescanNearby()
 		MY.RegisterEvent("PLAYER_ENTER_SCENE.MY_FRIEND_TIP", function(event) OnPlayerEnter(arg0) end)
 		MY.RegisterEvent("PLAYER_LEAVE_SCENE.MY_FRIEND_TIP", function(event) OnPlayerLeave(arg0) end)
+		MY.RegisterEvent("DELETE_FELLOWSHIP.MY_FRIEND_TIP", function(event) RescanNearby() end)
+		MY.RegisterEvent("PLAYER_FELLOWSHIP_UPDATE.MY_FRIEND_TIP", function(event) RescanNearby() end)
+		MY.RegisterEvent("PLAYER_FELLOWSHIP_CHANGE.MY_FRIEND_TIP", function(event) RescanNearby() end)
 	else
 		MY.RegisterEvent("PLAYER_ENTER_SCENE.MY_FRIEND_TIP")
 		MY.RegisterEvent("PLAYER_LEAVE_SCENE.MY_FRIEND_TIP")
+		MY.RegisterEvent("DELETE_FELLOWSHIP.MY_FRIEND_TIP")
+		MY.RegisterEvent("PLAYER_FELLOWSHIP_UPDATE.MY_FRIEND_TIP")
+		MY.RegisterEvent("PLAYER_FELLOWSHIP_CHANGE.MY_FRIEND_TIP")
 		XGUI.GetShadowHandle("MY_FriendHeadTip"):Hide()
 	end
 	
