@@ -12,38 +12,6 @@ MY_ToolBox = {}
 
 MY_ToolBox.bFriendHeadTip = false
 RegisterCustomData("MY_ToolBox.bFriendHeadTip")
-_C.FriendHeadTip = function(bEnable)
-	if bEnable then
-		local frm = MY.UI.CreateFrame("MY_Shadow", {level = 'Lowest2', empty = true}):show()
-		local fnPlayerEnter = function(dwID)
-			local p = MY.Player.GetFriend(dwID)
-			if p then
-				local shadow = frm:append("Shadow", "MY_FRIEND_TIP"..dwID):find("#MY_FRIEND_TIP"..dwID):raw(1)
-				if shadow then
-					local r,g,b,a = 255,255,255,255
-					local szTip = ">> "..p.name.." <<"
-					shadow:ClearTriangleFanPoint()
-					shadow:SetTriangleFan(GEOMETRY_TYPE.TEXT)
-					shadow:AppendCharacterID(dwID, false, r, g, b, a, 0, 40, szTip, 0, 1)
-					--shadow:AppendCharacterID(dwCharacterID, bCharacterTop, r, g, b, a [,fTopDelta, dwFontSchemeID, szText, fSpace, fScale])
-					shadow:Show()
-				end
-			end
-		end
-		MY.RegisterEvent("PLAYER_ENTER_SCENE.MY_FRIEND_TIP",function(event) fnPlayerEnter(arg0) end)
-		MY.RegisterEvent("PLAYER_LEAVE_SCENE.MY_FRIEND_TIP",function(event)
-			frm:find("#MY_FRIEND_TIP"..arg0):remove()
-		end)
-		for _, p in pairs(MY.Player.GetNearPlayer()) do
-			fnPlayerEnter(p.dwID)
-		end
-	else
-		MY.RegisterEvent("PLAYER_ENTER_SCENE.MY_FRIEND_TIP")
-		MY.RegisterEvent("PLAYER_LEAVE_SCENE.MY_FRIEND_TIP")
-		MY.UI("Lowest2/MY_Shadow"):remove()
-	end
-end
-
 MY_ToolBox.bAvoidBlackShenxingCD = true
 RegisterCustomData("MY_ToolBox.bAvoidBlackShenxingCD")
 MY_ToolBox.bJJCAutoSwitchTalkChannel = true
@@ -53,7 +21,42 @@ RegisterCustomData("MY_ToolBox.bChangGeShadow")
 MY_ToolBox.ApplyConfig = function()
 	-- 好友高亮
 	if MY_ToolBox.bFriendHeadTip then
-		_C.FriendHeadTip(true)
+		local hShaList = XGUI.GetShadowHandle("MY_FriendHeadTip")
+		if not hShaList.freeShadows then
+			hShaList.freeShadows = {}
+		end
+		hShaList:Show()
+		local function OnPlayerEnter(dwID)
+			local p = MY.Player.GetFriend(dwID)
+			if p then
+				local sha = hShaList:Lookup(tostring(dwID))
+				if not sha then
+					hShaList:AppendItemFromString('<shadow>name="' .. dwID .. '"</shadow>')
+					sha = hShaList:Lookup(tostring(dwID))
+				end
+				local r, g, b, a = 255,255,255,255
+				local szTip = ">> " .. p.name .. " <<"
+				sha:ClearTriangleFanPoint()
+				sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
+				sha:AppendCharacterID(dwID, false, r, g, b, a, 0, 40, szTip, 0, 1)
+				sha:Show()
+			end
+		end
+		local function OnPlayerLeave(dwID)
+			local sha = hShaList:Lookup(tostring(dwID))
+			if sha then
+				table.insert(hShaList.freeShadows, sha)
+			end
+		end
+		for _, p in pairs(MY.Player.GetNearPlayer()) do
+			OnPlayerEnter(p.dwID)
+		end
+		MY.RegisterEvent("PLAYER_ENTER_SCENE.MY_FRIEND_TIP", function(event) OnPlayerEnter(arg0) end)
+		MY.RegisterEvent("PLAYER_LEAVE_SCENE.MY_FRIEND_TIP", function(event) OnPlayerLeave(arg0) end)
+	else
+		MY.RegisterEvent("PLAYER_ENTER_SCENE.MY_FRIEND_TIP")
+		MY.RegisterEvent("PLAYER_LEAVE_SCENE.MY_FRIEND_TIP")
+		XGUI.GetShadowHandle("MY_FriendHeadTip"):Hide()
 	end
 	
 	-- 玩家名字变成link方便组队
@@ -184,9 +187,10 @@ MY_ToolBox.ApplyConfig = function()
 		MY.RegisterEvent('LOADING_END.MY_TOOLBOX_JJCAUTOSWITCHTALKCHANNEL')
 	end
 	
+	-- 长歌影子头顶次序
 	if MY_ToolBox.bChangGeShadow then
 		local hList, hItem, nCount, sha, r, g, b
-		local hShaList = XGUI.GetShadowHandle("ChangGeSHadow")
+		local hShaList = XGUI.GetShadowHandle("MY_ChangGeShadow")
 		local MAX_SHADOW_COUNT = 10
 		MY.BreatheCall("CHANGGE_SHADOW", 500, function()
 			local frame = Station.Lookup("Lowest1/ChangGeShadow")
@@ -222,7 +226,7 @@ MY_ToolBox.ApplyConfig = function()
 		hShaList:Show()
 	else
 		MY.BreatheCall("CHANGGE_SHADOW", false)
-		XGUI.GetShadowHandle("ChangGeSHadow"):Hide()
+		XGUI.GetShadowHandle("MY_ChangGeShadow"):Hide()
 	end
 end
 MY.RegisterInit('MY_TOOLBOX', MY_ToolBox.ApplyConfig)
@@ -402,7 +406,7 @@ function PS.OnPanelActive(wnd)
 	  :check(MY_ToolBox.bFriendHeadTip)
 	  :check(function(bCheck)
 	  	MY_ToolBox.bFriendHeadTip = not MY_ToolBox.bFriendHeadTip
-	  	_C.FriendHeadTip(MY_ToolBox.bFriendHeadTip)
+		MY_ToolBox.ApplyConfig()
 	  end)
 	y = y + 30
 	
