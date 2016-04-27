@@ -193,41 +193,6 @@ _C.GetTongName = function(dwTongID, szFormatString)
     end
 end
 
--- 获取读条状态
-_C.bLock = false
-_C.aCallback = {}
-_C.WithPrepareStateHandle = function()
-    if _C.bLock then return end
-    if #_C.aCallback > 0 then
-        _C.bLock = true
-        local r = table.remove(_C.aCallback, 1)
-        local object, callback = r.object, r.callback
-        
-        local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = object.GetSkillPrepareState()
-        if (not bIsPrepare) and object.GetOTActionState then   -- 如果没读条 判断一下如果是玩家(有object.GetOTActionState方法)的话 判断OTActionState是否为0
-            if object.GetOTActionState()==1 then    -- 为1 说明在副本外不能获取 设置一下临时目标再试一次
-                MY.Player.SetTempTarget(TARGET.PLAYER, object.dwID)
-                bIsPrepare, dwSkillID, dwSkillLevel, fProgress = object.GetSkillPrepareState()
-                MY.Player.ResumeTarget()
-            end
-        end
-        
-        pcall(callback, bIsPrepare, dwSkillID, dwSkillLevel, fProgress, r.param)
-        _C.bLock = false
-        _C.WithPrepareStateHandle()
-    end
-end
-_C.WithPrepareState = function(object, callback, param)
-    if Config.bOTEnhancedMod then   -- 增强模式（切换目标）
-        -- 因为客户端多线程 所以加上资源锁 防止设置临时目标冲突
-        table.insert(_C.aCallback, {object = object, callback = callback, param = param})
-        _C.WithPrepareStateHandle()
-    else
-        local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = object.GetSkillPrepareState()
-        pcall(callback, bIsPrepare, dwSkillID, dwSkillLevel, fProgress, param)
-    end
-end
-
 _C.AutoSwitchSysHeadTop = function()
     if _C.IsEnabled() then
         _C.PushSysHeadTop()
@@ -670,22 +635,20 @@ local function CheckInvalidRect(dwType, dwID, me, bNoCreate)
             -- 读条判定
             local nState = xlb:GetOTState()
             if nState ~= OT_STATE.ON_SKILL then
-                _C.WithPrepareState(object, function(bIsPrepare, dwSkillID, dwSkillLevel, fProgress, xlb)
-                    if bIsPrepare then
-                        xlb:SetOTTitle(Table_GetSkillName(dwSkillID, dwSkillLevel)):DrawOTTitle():SetOTPercentage(fProgress):SetOTState(OT_STATE.START_SKILL)
-                    end
-                end, xlb)
+                local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = object.GetSkillPrepareState()
+                if bIsPrepare then
+                    xlb:SetOTTitle(Table_GetSkillName(dwSkillID, dwSkillLevel)):DrawOTTitle():SetOTPercentage(fProgress):SetOTState(OT_STATE.START_SKILL)
+                end
             end
             if nState == OT_STATE.START_SKILL then                              -- 技能读条开始
                 xlb:DrawOTBarBorder(Config.nAlpha):SetOTPercentage(0):SetOTState(OT_STATE.ON_SKILL)
             elseif nState == OT_STATE.ON_SKILL then                             -- 技能读条中
-                _C.WithPrepareState(object, function(bIsPrepare, dwSkillID, dwSkillLevel, fProgress, xlb)
-                    if bIsPrepare then
-                        xlb:SetOTPercentage(fProgress):SetOTTitle(Table_GetSkillName(dwSkillID, dwSkillLevel))
-                    else
-                        xlb:SetOTPercentage(1):SetOTState(OT_STATE.SUCCEED)
-                    end
-                end, xlb)
+                local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = object.GetSkillPrepareState()
+                if bIsPrepare then
+                    xlb:SetOTPercentage(fProgress):SetOTTitle(Table_GetSkillName(dwSkillID, dwSkillLevel))
+                else
+                    xlb:SetOTPercentage(1):SetOTState(OT_STATE.SUCCEED)
+                end
             elseif nState == OT_STATE.START_PREPARE then                        -- 读条开始
                 xlb:DrawOTBarBorder(Config.nAlpha):SetOTPercentage(0):SetOTState(OT_STATE.ON_PREPARE):DrawOTTitle()
             elseif nState == OT_STATE.ON_PREPARE then                           -- 读条中
@@ -1263,23 +1226,7 @@ _C.OnPanelActive = function(wnd)
       :pos(x,y):text(_L["skillpercentage display config"])
       :menu(function()
         local t = {}
-        table.insert(t,{
-            szOption = _L['enhanced mod'],
-            bCheck = true,
-            bChecked = Config.bOTEnhancedMod,
-            fnAction = function()
-                Config.bOTEnhancedMod = not Config.bOTEnhancedMod
-                _C.Reset()
-            end,
-            fnMouseEnter = function()
-                local szText="<text>text=" .. EncodeComponentsString(_L['Check this option may cause target switch.']) .." font=16 </text>"
-                local x, y = this:GetAbsPos()
-                local w, h = this:GetSize()
-                OutputTip(szText, 100, {x, y, w, h}, MY.Const.UI.Tip.POS_RIGHT)
-            end,
-        })
-        table.insert(t,{    bDevide = true} )
-        table.insert(t,{    szOption = _L["player skillpercentage display"] , bDisable = true} )
+        table.insert(t, {szOption = _L["player skillpercentage display"] , bDisable = true})
         for k,v in pairs(Config.bShowOTBar.Player) do
             table.insert(t,{
                 szOption = _L[k],
@@ -1318,6 +1265,7 @@ _C.OnPanelActive = function(wnd)
         end
         return t
       end)
+      :tip(_L['only can see otaction of target and target\'s target'], ALW.TOP_BOTTOM)
     y = y + offsety
     
     -- 当前阵营
