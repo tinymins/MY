@@ -8,6 +8,7 @@
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Chat/lang/")
 local INI_PATH = MY.GetAddonInfo().szRoot .. "Chat/ui/MY_ChatSwitch.ini"
+local CD_REFRESH_OFFSET = 7 * 60 * 60 -- 7µã¸üÐÂCD
 MY_ChatSwitch = {}
 MY_ChatSwitch.tChannel = {}
 MY_ChatSwitch.aWhisper = {}
@@ -23,7 +24,7 @@ local function UpdateChannelDailyLimit(hRadio, bPlus)
 	local info = hRadio.info
 	local nChannel = info.channel
 	if nChannel then
-		local szDate = MY.FormatTime("yyyyMMdd", GetCurrentTime())
+		local szDate = MY.FormatTime("yyyyMMdd", GetCurrentTime() + CD_REFRESH_OFFSET)
 		if MY_ChatSwitch.tChannelCount.szDate ~= szDate then
 			MY_ChatSwitch.tChannelCount = {szDate = szDate}
 		end
