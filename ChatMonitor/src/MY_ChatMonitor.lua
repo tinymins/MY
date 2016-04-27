@@ -523,11 +523,8 @@ _C.Init = function()
         MY.SwitchTab('ChatMonitor')
         _C.uiFrame:fadeOut(500)
       end)
-      :hover(function(bIn, bCurIn)
-        if bIn ~= bCurIn then
-            return
-        end
-        if bCurIn then
+      :hover(function(bIn)
+        if bIn then
             MY.DelayCall('MY_ChatMonitor_Hide')
             _C.uiFrame:fadeIn(500)
         else
