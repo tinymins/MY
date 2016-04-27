@@ -382,7 +382,8 @@ function PS.OnPanelActive(wnd)
 			end
 			return t
 		end,
-		tip = {_L['left click to restart, right click to open setting.'], MY.Const.UI.Tip.POS_TOP}
+		tip = _L['left click to restart, right click to open setting.'],
+		tippostype = MY.Const.UI.Tip.POS_TOP,
 	})
 	-- ·¢²¼
 	ui:append("WndButton", {
@@ -424,7 +425,9 @@ function PS.OnPanelActive(wnd)
 			end
 			return t
 		end,
-		tip = {_L['left click to publish, right click to open setting.'], MY.Const.UI.Tip.POS_TOP, { x = -80 }}
+		tip = _L['left click to publish, right click to open setting.'],
+		tippostype = MY.Const.UI.Tip.POS_TOP,
+		tipoffset = { x = -80 },
 	})
 	-- Êä³ö°å
 	m_uiBoard = ui:append("WndScrollBox",{

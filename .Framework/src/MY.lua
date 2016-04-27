@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-11-22 13:47:44
+-- @Last Modified time: 2016-04-27 10:50:11
 -- @Ref: ½è¼ø´óÁ¿º£÷©Ô´Âë @haimanchajian.com
 --------------------------------------------
 -- #################################################################################################################################### --
@@ -770,7 +770,7 @@ function MY.SwitchTab(szID)
 		-- »¶Ó­Ò³
 		local ui = MY.UI(wndMainPanel)
 		local w, h = ui:size()
-		ui:append("Image", "Image_Adv", { x = 0, y = 0, image = { MY.GetAddonInfo().szUITexPoster, 0 } })
+		ui:append("Image", "Image_Adv", { x = 0, y = 0, image = MY.GetAddonInfo().szUITexPoster, imageframe = 0 })
 		ui:append("Text", "Text_Adv", { x = 10, y = 300, w = 557, font = 200 })
 		ui:append("Text", "Text_ChangeLog", {
 			x = 10, y = 325, w = 557, font = 204, text = _L['change log'], alpha = 190,
