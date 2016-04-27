@@ -48,6 +48,8 @@ MY_ToolBox.bAvoidBlackShenxingCD = true
 RegisterCustomData("MY_ToolBox.bAvoidBlackShenxingCD")
 MY_ToolBox.bJJCAutoSwitchTalkChannel = true
 RegisterCustomData("MY_ToolBox.bJJCAutoSwitchTalkChannel")
+MY_ToolBox.bChangGeShadow = false
+RegisterCustomData("MY_ToolBox.bChangGeShadow")
 MY_ToolBox.ApplyConfig = function()
 	-- 好友高亮
 	if MY_ToolBox.bFriendHeadTip then
@@ -180,6 +182,47 @@ MY_ToolBox.ApplyConfig = function()
 		end)
 	else
 		MY.RegisterEvent('LOADING_END.MY_TOOLBOX_JJCAUTOSWITCHTALKCHANNEL')
+	end
+	
+	if MY_ToolBox.bChangGeShadow then
+		local hList, hItem, nCount, sha, r, g, b
+		local hShaList = XGUI.GetShadowHandle("ChangGeSHadow")
+		local MAX_SHADOW_COUNT = 10
+		MY.BreatheCall("CHANGGE_SHADOW", 500, function()
+			local frame = Station.Lookup("Lowest1/ChangGeShadow")
+			if not frame then
+				return
+			end
+			hList = frame:Lookup("Wnd_Bar", "Handle_Skill")
+			nCount = hList:GetItemCount()
+			for i = 0, nCount - 1 do
+				hItem = hList:Lookup(i)
+				sha = hShaList:Lookup(i)
+				if not sha then
+					hShaList:AppendItemFromString("<shadow></shadow>")
+					sha = hShaList:Lookup(i)
+				end
+				if hItem.szState == "disable" then
+					r, g, b = 191, 31, 31
+				else
+					r, g, b = 63, 255, 31
+				end
+				sha:Show()
+				sha:ClearTriangleFanPoint()
+				sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
+				sha:AppendCharacterID(hItem.nNpcID, true, r, g, b, 200, 0, 40, tostring(i + 1), 0, 1.5)
+			end
+			for i = nCount, MAX_SHADOW_COUNT do
+				sha = hShaList:Lookup(i)
+				if sha then
+					sha:Hide()
+				end
+			end
+		end)
+		hShaList:Show()
+	else
+		MY.BreatheCall("CHANGGE_SHADOW", false)
+		XGUI.GetShadowHandle("ChangGeSHadow"):Hide()
 	end
 end
 MY.RegisterInit('MY_TOOLBOX', MY_ToolBox.ApplyConfig)
@@ -423,6 +466,28 @@ function PS.OnPanelActive(wnd)
 	  	MY_ToolBox.bJJCAutoSwitchTalkChannel = bChecked
 	  	MY_ToolBox.ApplyConfig()
 	  end)
+	y = y + 30
+	
+	-- 长歌影子顺序
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = 300,
+		text = _L['show changge shadow headtop index'],
+		checked = MY_ToolBox.bChangGeShadow,
+		oncheck = function(bChecked)
+			MY_ToolBox.bChangGeShadow = bChecked
+			MY_ToolBox.ApplyConfig()
+		end,
+		tip = function(self)
+			if not self:enable() then
+				return _L['changge force only']
+			end
+		end,
+		tippos = ALW.TOP_BOTTOM,
+		autoenable = function()
+			local me = GetClientPlayer()
+			return me and me.dwForceID == FORCE_TYPE.CHANG_GE
+		end,
+	})
 	y = y + 30
 	
 	-- 随身便笺
