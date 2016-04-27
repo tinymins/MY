@@ -400,18 +400,13 @@ _C.OnBagItemUpdate = function()
 	end
 end
 -- ÊÂ¼þ×¢²á
-MY.RegisterEvent("BAG_ITEM_UPDATE", function()
+MY.RegisterEvent({
+	"BAG_ITEM_UPDATE", "GUILD_BANK_PANEL_UPDATE"
+}, function()
 	if not MY_BagEx.bEnable then
 		return
 	end
-	_C.OnBagItemUpdate()
 	MY.DelayCall('MY_BagEx', 100, _C.OnBagItemUpdate)
-end)
-MY.RegisterEvent("GUILD_BANK_PANEL_UPDATE", function()
-	if not MY_BagEx.bEnable then
-		return
-	end
-	_C.OnBagItemUpdate()
 end)
 MY.RegisterInit('MY_BAGEX', function() MY.BreatheCall(130, _C.OnBreathe) end)
 MY.RegisterReload("MY_BAGEX", _C.ClearHook)
