@@ -12,6 +12,8 @@ MY_ToolBox = {}
 
 MY_ToolBox.bFriendHeadTip = false
 RegisterCustomData("MY_ToolBox.bFriendHeadTip")
+MY_ToolBox.bTongMemberHeadTip = false
+RegisterCustomData("MY_ToolBox.bTongMemberHeadTip")
 MY_ToolBox.bAvoidBlackShenxingCD = true
 RegisterCustomData("MY_ToolBox.bAvoidBlackShenxingCD")
 MY_ToolBox.bJJCAutoSwitchTalkChannel = true
@@ -57,6 +59,49 @@ MY_ToolBox.ApplyConfig = function()
 		MY.RegisterEvent("PLAYER_ENTER_SCENE.MY_FRIEND_TIP")
 		MY.RegisterEvent("PLAYER_LEAVE_SCENE.MY_FRIEND_TIP")
 		XGUI.GetShadowHandle("MY_FriendHeadTip"):Hide()
+	end
+	
+	-- 帮会成员高亮
+	if MY_ToolBox.bTongMemberHeadTip then
+		local hShaList = XGUI.GetShadowHandle("MY_TongMemberHeadTip")
+		if not hShaList.freeShadows then
+			hShaList.freeShadows = {}
+		end
+		hShaList:Show()
+		local function OnPlayerEnter(dwID)
+			local tar = GetPlayer(dwID)
+			local me = GetClientPlayer()
+			if not tar or not me or me.dwTongID == 0
+			or me.dwID == tar.dwID or tar.dwTongID ~= me.dwTongID then
+				return
+			end
+			local sha = hShaList:Lookup(tostring(dwID))
+			if not sha then
+				hShaList:AppendItemFromString('<shadow>name="' .. dwID .. '"</shadow>')
+				sha = hShaList:Lookup(tostring(dwID))
+			end
+			local r, g, b, a = 255,255,255,255
+			local szTip = "> " .. tar.szName .. " <"
+			sha:ClearTriangleFanPoint()
+			sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
+			sha:AppendCharacterID(dwID, false, r, g, b, a, 0, 40, szTip, 0, 1)
+			sha:Show()
+		end
+		local function OnPlayerLeave(dwID)
+			local sha = hShaList:Lookup(tostring(dwID))
+			if sha then
+				table.insert(hShaList.freeShadows, sha)
+			end
+		end
+		for _, p in pairs(MY.Player.GetNearPlayer()) do
+			OnPlayerEnter(p.dwID)
+		end
+		MY.RegisterEvent("PLAYER_ENTER_SCENE.MY_FRIEND_TIP", function(event) OnPlayerEnter(arg0) end)
+		MY.RegisterEvent("PLAYER_LEAVE_SCENE.MY_FRIEND_TIP", function(event) OnPlayerLeave(arg0) end)
+	else
+		MY.RegisterEvent("PLAYER_ENTER_SCENE.MY_FRIEND_TIP")
+		MY.RegisterEvent("PLAYER_LEAVE_SCENE.MY_FRIEND_TIP")
+		XGUI.GetShadowHandle("MY_TongMemberHeadTip"):Hide()
 	end
 	
 	-- 玩家名字变成link方便组队
@@ -400,14 +445,27 @@ function PS.OnPanelActive(wnd)
 	  end)
 	
 	-- 好友高亮
-	ui:append("WndCheckBox", "WndCheckBox_FriendHeadTip"):children("#WndCheckBox_FriendHeadTip")
-	  :pos(x, y):width(180)
-	  :text(_L['friend headtop tips'])
-	  :check(MY_ToolBox.bFriendHeadTip)
-	  :check(function(bCheck)
-	  	MY_ToolBox.bFriendHeadTip = not MY_ToolBox.bFriendHeadTip
-		MY_ToolBox.ApplyConfig()
-	  end)
+  	ui:append("WndCheckBox", {
+  		x = x, y = y, w = 180,
+  		text = _L['friend headtop tips'],
+  		checked = MY_ToolBox.bFriendHeadTip,
+  		oncheck = function(bCheck)
+  			MY_ToolBox.bFriendHeadTip = not MY_ToolBox.bFriendHeadTip
+  			MY_ToolBox.ApplyConfig()
+  		end,
+  	})
+  	y = y + 30
+	
+	-- 好友高亮
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = 180,
+		text = _L['tong member headtop tips'],
+		checked = MY_ToolBox.bTongMemberHeadTip,
+		oncheck = function(bCheck)
+			MY_ToolBox.bTongMemberHeadTip = not MY_ToolBox.bTongMemberHeadTip
+			MY_ToolBox.ApplyConfig()
+		end,
+	})
 	y = y + 30
 	
 	-- 背包搜索
