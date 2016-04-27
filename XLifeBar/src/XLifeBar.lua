@@ -316,7 +316,7 @@ MY.RegisterExit(_C.ResumeSysHeadTop)
 -- ÷ÿªÊÀ˘”–UI
 _C.Reset = function()
     _C.tObject = {}
-    XLifeBar.GetHandle():Clear()
+    XGUI.GetShadowHandle("XLifeBar"):Clear()
     -- auto adjust index
     MY.BreatheCall("XLifeBar_AdjustIndex")
     if Config.bAdjustIndex then
