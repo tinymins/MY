@@ -1082,7 +1082,17 @@ function XGUI:enable(bEnable)
 		for _, ele in pairs(self.eles) do
 			local x = ele.chk or ele.wnd or ele.raw
 			if x and x.Enable then
-				x:Enable(bEnable)
+				if type(bEnable) == "function" then
+					MY.BreatheCall("XGUI_ENABLE_CHECK#" .. XGUI.GetTreePath(x), function()
+						if x and x.IsValid and x:IsValid() then
+							x:Enable(bEnable() or false)
+						else
+							return 0
+						end
+					end)
+				else
+					x:Enable(bEnable)
+				end
 			end
 		end
 		return self
@@ -2792,7 +2802,7 @@ function XGUI:tip(tip, nPosType, tOffset, bNoEncode)
 		x, y = x + tOffset.x, y + tOffset.y
 		local szTip = tip
 		if type(szTip) == 'function' then
-			szTip = szTip()
+			szTip = szTip(self)
 		end
 		if empty(szTip) then
 			return
