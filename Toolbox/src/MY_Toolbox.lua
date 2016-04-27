@@ -28,17 +28,9 @@ MY_ToolBox.ApplyConfig = function()
 			hShaList.freeShadows = {}
 		end
 		hShaList:Show()
-		local function OnPlayerEnter(dwID, nRetryCount)
-			nRetryCount = nRetryCount or 0
-			if nRetryCount > 5 then
-				return
-			end
+		local function OnPlayerEnter(dwID)
 			local tar = GetPlayer(dwID)
 			if not tar then
-				return
-			end
-			if tar.szName == "" then
-				MY.DelayCall(500, function() OnPlayerEnter(dwID, nRetryCount + 1) end)
 				return
 			end
 			local p = MY.Player.GetFriend(dwID)
