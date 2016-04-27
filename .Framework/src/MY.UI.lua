@@ -58,10 +58,9 @@ local function ApplyUIArguments(ui, tArg)
 		if tArg.scroll             ~= nil then ui:scroll     (tArg.scroll     ) end
 		if tArg.handlestyle        ~= nil then ui:handleStyle(tArg.handlestyle) end
 		if tArg.edittype           ~= nil then ui:edittype   (tArg.edittype   ) end
-		if tArg.enable             ~= nil then ui:enable     (tArg.enable     ) end
 		if tArg.visible            ~= nil then ui:visible    (tArg.visible    ) end
-		if tArg.isenable           ~= nil then ui:enable     (tArg.isenable   ) end
-		if tArg.enabled            ~= nil then ui:enable     (tArg.enabled    ) end
+		if tArg.enable             ~= nil then ui:enable     (tArg.enable     ) end
+		if tArg.autoenable         ~= nil then ui:enable     (tArg.autoenable ) end
 		if tArg.image              ~= nil then if type(tArg.image) == 'table' then ui:image (unpack(tArg.image)) else ui:image(tArg.image) end end
 		-- event handlers
 		if tArg.onscroll           ~= nil then ui:scroll     (tArg.onscroll   ) end
@@ -1078,10 +1077,12 @@ function XGUI:visible(bVisiable)
 end
 
 -- enable or disable elements
-function XGUI:enable(bEnable)
+function XGUI:enable(...)
 	self:_checksum()
-	if type(bEnable) == 'boolean' then
+	local argc = select("#", ...)
+	if argc == 1 then
 		for _, ele in pairs(self.eles) do
+			local bEnable = select(1, ...)
 			local x = ele.chk or ele.wnd or ele.raw
 			if x and x.Enable then
 				if type(bEnable) == "function" then
@@ -1093,7 +1094,7 @@ function XGUI:enable(bEnable)
 						end
 					end)
 				else
-					x:Enable(bEnable)
+					x:Enable(bEnable and true or false)
 				end
 			end
 		end
