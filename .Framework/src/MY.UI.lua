@@ -1087,7 +1087,7 @@ function XGUI:enable(bEnable)
 				if type(bEnable) == "function" then
 					MY.BreatheCall("XGUI_ENABLE_CHECK#" .. XGUI.GetTreePath(x), function()
 						if x and x.IsValid and x:IsValid() then
-							x:Enable(bEnable() or false)
+							x:Enable(bEnable() and true or false)
 						else
 							return 0
 						end
