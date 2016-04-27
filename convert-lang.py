@@ -1,10 +1,10 @@
-# -*- coding: UTF-8 -*-
+# -*- coding: GBK -*-
 from lang_mapping import map_zhcn2zhtw
 import sys, os
-import os.path # éå†æ–‡ä»¶æ‰€éœ€åº“
-import codecs  # ä¿å­˜UTF-8ç¼–ç æ‰€éœ€åº“
-import re      # æ­£åˆ™åŒ¹é…
-import time    # è·å–æ—¶é—´
+import os.path # ±éÀúÎÄ¼şËùĞè¿â
+import codecs  # ±£´æUTF-8±àÂëËùĞè¿â
+import re      # ÕıÔòÆ¥Åä
+import time    # »ñÈ¡Ê±¼ä
 
 def zhcn2zhtw(source):
 	dest = ""
@@ -17,19 +17,19 @@ def zhcn2zhtw(source):
 			dest = dest + result
 	return dest
 
-rootdir = os.path.dirname(os.path.abspath(__file__))    # æŒ‡æ˜è¢«éå†çš„æ–‡ä»¶å¤¹
-for parent, dirnames, filenames in os.walk(rootdir):    # ä¸‰ä¸ªå‚æ•°ï¼šåˆ†åˆ«è¿”å›1.çˆ¶ç›®å½• 2.æ‰€æœ‰æ–‡ä»¶å¤¹åå­—ï¼ˆä¸å«è·¯å¾„ï¼‰ 3.æ‰€æœ‰æ–‡ä»¶åå­—
+rootdir = os.path.dirname(os.path.abspath(__file__))    # Ö¸Ã÷±»±éÀúµÄÎÄ¼ş¼Ğ
+for parent, dirnames, filenames in os.walk(rootdir):    # Èı¸ö²ÎÊı£º·Ö±ğ·µ»Ø1.¸¸Ä¿Â¼ 2.ËùÓĞÎÄ¼ş¼ĞÃû×Ö£¨²»º¬Â·¾¶£© 3.ËùÓĞÎÄ¼şÃû×Ö
 	if parent == "@DATA" or parent == ".git":
 		continue
-	#for dirname in  dirnames:                      #è¾“å‡ºæ–‡ä»¶å¤¹ä¿¡æ¯
+	#for dirname in  dirnames:                      #Êä³öÎÄ¼ş¼ĞĞÅÏ¢
 	#    print "parent is:" + parent
 	#    print  "dirname is" + dirname
 
-	for filename in filenames:                      #è¾“å‡ºæ–‡ä»¶ä¿¡æ¯
+	for filename in filenames:                      #Êä³öÎÄ¼şĞÅÏ¢
 		if filename == "zhcn.jx3dat":
 			#print "parent is:" + parent
 			#print "filename is:" + filename
-			#print "the full name of the file is:" + os.path.join(parent,filename) #è¾“å‡ºæ–‡ä»¶è·¯å¾„ä¿¡æ¯
+			#print "the full name of the file is:" + os.path.join(parent,filename) #Êä³öÎÄ¼şÂ·¾¶ĞÅÏ¢
 			print 'file loading: ' + os.path.join(parent,filename)
 			# all_the_text = "-- language data (zhtw) updated at " + time.strftime('%Y-%m-%d %H:%I:%M',time.localtime(time.time())) + "\r\n"
 			all_the_text = ""
