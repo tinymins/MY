@@ -60,6 +60,8 @@ local function ApplyUIArguments(ui, tArg)
 		if tArg.edittype           ~= nil then ui:edittype   (tArg.edittype   ) end
 		if tArg.enable             ~= nil then ui:enable     (tArg.enable     ) end
 		if tArg.visible            ~= nil then ui:visible    (tArg.visible    ) end
+		if tArg.isenable           ~= nil then ui:enable     (tArg.isenable   ) end
+		if tArg.enabled            ~= nil then ui:enable     (tArg.enabled    ) end
 		if tArg.image              ~= nil then if type(tArg.image) == 'table' then ui:image (unpack(tArg.image)) else ui:image(tArg.image) end end
 		-- event handlers
 		if tArg.onscroll           ~= nil then ui:scroll     (tArg.onscroll   ) end
