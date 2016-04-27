@@ -28,7 +28,19 @@ MY_ToolBox.ApplyConfig = function()
 			hShaList.freeShadows = {}
 		end
 		hShaList:Show()
-		local function OnPlayerEnter(dwID)
+		local function OnPlayerEnter(dwID, nRetryCount)
+			nRetryCount = nRetryCount or 0
+			if nRetryCount > 5 then
+				return
+			end
+			local tar = GetPlayer(dwID)
+			if not tar then
+				return
+			end
+			if tar.szName == "" then
+				MY.DelayCall(500, function() OnPlayerEnter(dwID, nRetryCount + 1) end)
+				return
+			end
 			local p = MY.Player.GetFriend(dwID)
 			if p then
 				local sha = hShaList:Lookup(tostring(dwID))
@@ -68,11 +80,19 @@ MY_ToolBox.ApplyConfig = function()
 			hShaList.freeShadows = {}
 		end
 		hShaList:Show()
-		local function OnPlayerEnter(dwID)
+		local function OnPlayerEnter(dwID, nRetryCount)
+			nRetryCount = nRetryCount or 0
+			if nRetryCount > 5 then
+				return
+			end
 			local tar = GetPlayer(dwID)
 			local me = GetClientPlayer()
 			if not tar or not me or me.dwTongID == 0
 			or me.dwID == tar.dwID or tar.dwTongID ~= me.dwTongID then
+				return
+			end
+			if tar.szName == "" then
+				MY.DelayCall(500, function() OnPlayerEnter(dwID, nRetryCount + 1) end)
 				return
 			end
 			local sha = hShaList:Lookup(tostring(dwID))
