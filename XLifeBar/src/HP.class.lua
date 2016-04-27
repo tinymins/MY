@@ -7,36 +7,27 @@
 -- @Last Modified by:   翟一鸣 @tinymins
 -- @Last Modified time: 2015-05-14 10:27:36
 --------------------------------------------
+local l_handle
 XLifeBar = XLifeBar or {}
 XLifeBar.HP = class()
 local HP = XLifeBar.HP
-local _C = {}
-
-function XLifeBar.OnFrameCreate()
-	if JH and JH.GetShadowHandle then
-		_C.Handle = JH.GetShadowHandle("XLifeBar")
-	else
-		_C.Handle = this:Lookup('', '')
-	end
-end
-
-function XLifeBar.GetHandle()
-	return _C.Handle
-end
 
 function HP:ctor(dwID) -- KGobject
+	if not l_handle then
+		l_handle = XGUI.GetShadowHandle("XLifeBar")
+	end
 	self.dwID = dwID
-	self.handle = _C.Handle:Lookup(tostring(self.dwID))
+	self.handle = l_handle:Lookup(tostring(self.dwID))
 	return self
 end
 -- 创建
 function HP:Create()
 	-- Create handle
-	if not _C.Handle:Lookup(tostring(self.dwID)) then
-		_C.Handle:AppendItemFromString(FormatHandle( string.format("name=\"%s\"",self.dwID) ))
+	if not l_handle:Lookup(tostring(self.dwID)) then
+		l_handle:AppendItemFromString(FormatHandle( string.format("name=\"%s\"",self.dwID) ))
 	end
 	
-	local handle = _C.Handle:Lookup(tostring(self.dwID))
+	local handle = l_handle:Lookup(tostring(self.dwID))
 	if not handle:Lookup(string.format("hp_bg_%s",self.dwID)) then
 		handle:AppendItemFromString( string.format("<shadow>name=\"hp_bg_%s\"</shadow>",self.dwID) )
 		handle:AppendItemFromString( string.format("<shadow>name=\"hp_bg2_%s\"</shadow>",self.dwID) )
@@ -54,8 +45,8 @@ end
 
 -- 删除
 function HP:Remove()
-	if _C.Handle:Lookup(tostring(self.dwID)) then
-		_C.Handle:RemoveItem(_C.Handle:Lookup(tostring(self.dwID)))
+	if l_handle:Lookup(tostring(self.dwID)) then
+		l_handle:RemoveItem(l_handle:Lookup(tostring(self.dwID)))
 	end
 	return self
 end
@@ -117,6 +108,9 @@ end
 function HP:DrawBorder(nWidth, nHeight, nOffsetY, nAlpha, szShadowName, szShadowName2)
 	if self.handle then
 		nAlpha = nAlpha or 200
+		nWidth   = nWidth * Station.GetUIScale()
+		nHeight  = nHeight * Station.GetUIScale()
+		nOffsetY = nOffsetY * Station.GetUIScale()
 		local handle = self.handle
 		
 		-- 绘制外边框
@@ -160,6 +154,9 @@ end
 function HP:DrawRect(nWidth, nHeight, nOffsetY, rgbap, szShadowName)
 	if self.handle then
 		local r,g,b,a,p = unpack(rgbap)
+		nWidth   = nWidth * Station.GetUIScale()
+		nHeight  = nHeight * Station.GetUIScale()
+		nOffsetY = nOffsetY * Station.GetUIScale()
 		if not p or p > 1 then
 			p = 1
 		elseif p < 0 then
