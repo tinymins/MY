@@ -2759,10 +2759,10 @@ function XGUI:hover(fnHover, fnLeave, bNoAutoBind)
 			local wnd = ele.edt or ele.wnd
 			local itm = ele.itm or ele.itm
 			if wnd then
-				XGUI.RegisterUIEvent(wnd, 'OnMouseEnter'    , function() fnHover(true, this:PtInWindow(Cursor.GetPos())) end)
+				XGUI.RegisterUIEvent(wnd, 'OnMouseIn'    , function() fnHover(true, this:PtInWindow(Cursor.GetPos())) end)
 			elseif itm then
 				itm:RegisterEvent(256)
-				XGUI.RegisterUIEvent(itm, 'OnItemMouseEnter', function() fnHover(true, this:PtInItem(Cursor.GetPos())) end)
+				XGUI.RegisterUIEvent(itm, 'OnItemMouseIn', function() fnHover(true, this:PtInItem(Cursor.GetPos())) end)
 			end
 		end
 	end
@@ -2771,10 +2771,10 @@ function XGUI:hover(fnHover, fnLeave, bNoAutoBind)
 			local wnd = ele.edt or ele.wnd
 			local itm = ele.itm or ele.itm
 			if wnd then
-				XGUI.RegisterUIEvent(wnd, 'OnMouseLeave'    , function() fnLeave(false, this:PtInWindow(Cursor.GetPos())) end)
+				XGUI.RegisterUIEvent(wnd, 'OnMouseOut'    , function() fnLeave(false, this:PtInWindow(Cursor.GetPos())) end)
 			elseif itm then
 				itm:RegisterEvent(256)
-				XGUI.RegisterUIEvent(itm, 'OnItemMouseLeave', function() fnLeave(false, this:PtInItem(Cursor.GetPos())) end)
+				XGUI.RegisterUIEvent(itm, 'OnItemMouseOut', function() fnLeave(false, this:PtInItem(Cursor.GetPos())) end)
 			end
 		end
 	end
