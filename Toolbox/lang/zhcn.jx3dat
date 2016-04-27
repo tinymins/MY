@@ -104,5 +104,6 @@ data = {
     
     ['Warning: Bigwar has been finished but not handed yet!'] = '茗伊提示：大战还没交！',
     
-    ['show origin name in social panel'] = '好友面板中显示玩家原名（备注将挪至详情面板中）',
+    ['show changge shadow headtop index'] = '显示长歌影子头顶释放次序',
+    ['changge force only'] = '仅长歌可用',
 }
