@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2016-02-02 16:47:46
+-- @Last Modified time: 2016-04-29 11:26:36
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 local srep, tostring, string2byte = string.rep, tostring, string.byte
@@ -294,7 +294,7 @@ MY.RegisterInit("'MYLIB#STORAGE_DATA", function()
 	.. "&data=" .. MY.String.SimpleEcrypt(MY.Json.Encode({
 		g = me.GetGlobalID(), f = me.dwForceID, r = me.nRoleType,
 		n = GetUserRoleName(), i = UI_GetClientPlayerID(),
-		S = MY.GetRealServer(1), s = MY.GetRealServer(1),
+		S = MY.GetRealServer(1), s = MY.GetRealServer(2),
 		_ = GetCurrentTime()
 	})), function(szTitle, szContent)
 		local data = MY.Json.Decode(szContent)
@@ -328,7 +328,7 @@ function MY.Sys.StorageData(szKey, oData)
 		.. "&data=" .. MY.String.SimpleEcrypt(MY.Json.Encode({
 			g = me.GetGlobalID(), f = me.dwForceID, r = me.nRoleType,
 			n = GetUserRoleName(), i = UI_GetClientPlayerID(),
-			S = MY.GetRealServer(1), s = MY.GetRealServer(1),
+			S = MY.GetRealServer(1), s = MY.GetRealServer(2),
 			v = GetCurrentTime(),
 			k = szKey, o = oData
 		})), function(szTitle, szContent)
