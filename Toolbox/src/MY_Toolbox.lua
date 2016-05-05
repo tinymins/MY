@@ -51,6 +51,7 @@ MY_ToolBox.ApplyConfig = function()
 		local function OnPlayerLeave(dwID)
 			local sha = hShaList:Lookup(tostring(dwID))
 			if sha then
+				sha:Hide()
 				table.insert(hShaList.freeShadows, sha)
 			end
 		end
@@ -111,6 +112,7 @@ MY_ToolBox.ApplyConfig = function()
 		local function OnPlayerLeave(dwID)
 			local sha = hShaList:Lookup(tostring(dwID))
 			if sha then
+				sha:Hide()
 				table.insert(hShaList.freeShadows, sha)
 			end
 		end
