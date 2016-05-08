@@ -3,8 +3,8 @@
 -- @Author: ÜøÒÁ @ Ë«ÃÎÕò @ Ý¶»¨¹¬
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
--- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-23 22:30:28
+-- @Last modified by:   tinymins
+-- @Last modified time: 2016-05-08 16:02:30
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = {}
@@ -263,6 +263,15 @@ MY_ToolBox.ApplyConfig = function()
 		MY.BreatheCall("CHANGGE_SHADOW", 500, function()
 			local frame = Station.Lookup("Lowest1/ChangGeShadow")
 			if not frame then
+				if nCount and nCount > 0 then
+					for i = 0, nCount - 1 do
+						sha = hShaList:Lookup(i)
+						if sha then
+							sha:Hide()
+						end
+					end
+					nCount = 0
+				end
 				return
 			end
 			hList = frame:Lookup("Wnd_Bar", "Handle_Skill")
