@@ -3,8 +3,8 @@
 -- @Author: 茗伊 @双梦镇 @追风蹑影
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
--- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2016-04-27 10:50:11
+-- @Last modified by:   tinymins
+-- @Last modified time: 2016-05-11 14:43:36
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- #################################################################################################################################### --
@@ -117,8 +117,8 @@ MY = {}
 --------------------------------------------------------------------------------------------------------------------------------------------
 local _DEBUG_ = tonumber(LoadLUAData('interface/my.debug.level') or nil) or 4
 local _LOGLV_ = tonumber(LoadLUAData('interface/my.delog.level') or nil) or 4
-local _BUILD_ = "20160429"
-local _VERSION_ = 0x2005700
+local _BUILD_ = "20160511"
+local _VERSION_ = 0x2005800
 local _ADDON_ROOT_ = '/Interface/MY/'
 local _FRAMEWORK_ROOT_ = '/Interface/MY/.Framework/'
 
