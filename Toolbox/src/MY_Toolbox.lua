@@ -4,7 +4,7 @@
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   tinymins
--- @Last modified time: 2016-05-08 16:02:30
+-- @Last modified time: 2016-05-13 11:24:54
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = {}
@@ -119,11 +119,11 @@ MY_ToolBox.ApplyConfig = function()
 		for _, p in pairs(MY.Player.GetNearPlayer()) do
 			OnPlayerEnter(p.dwID)
 		end
-		MY.RegisterEvent("PLAYER_ENTER_SCENE.MY_FRIEND_TIP", function(event) OnPlayerEnter(arg0) end)
-		MY.RegisterEvent("PLAYER_LEAVE_SCENE.MY_FRIEND_TIP", function(event) OnPlayerLeave(arg0) end)
+		MY.RegisterEvent("PLAYER_ENTER_SCENE.MY_GUILDMEMBER_TIP", function(event) OnPlayerEnter(arg0) end)
+		MY.RegisterEvent("PLAYER_LEAVE_SCENE.MY_GUILDMEMBER_TIP", function(event) OnPlayerLeave(arg0) end)
 	else
-		MY.RegisterEvent("PLAYER_ENTER_SCENE.MY_FRIEND_TIP")
-		MY.RegisterEvent("PLAYER_LEAVE_SCENE.MY_FRIEND_TIP")
+		MY.RegisterEvent("PLAYER_ENTER_SCENE.MY_GUILDMEMBER_TIP")
+		MY.RegisterEvent("PLAYER_LEAVE_SCENE.MY_GUILDMEMBER_TIP")
 		XGUI.GetShadowHandle("MY_TongMemberHeadTip"):Hide()
 	end
 	
