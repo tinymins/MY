@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 09:21:13
 -- @Email : admin@derzh.com
 -- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-16 21:34:05
+-- @Last Modified time: 2016-05-16 18:37:44
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = {
@@ -35,7 +35,7 @@ MY_ExamTip.QueryData = function(szQues)
 		end
 	else
 		local _, _, szLang, _ = GetVersion()
-		MY.RemoteRequest(string.format(_C.szQueryUrl, szLang, MY.String.UrlEncode(szQues)), function(szTitle, szContent)
+		MY.RemoteRequest(string.format(_C.szQueryUrl, szLang, MY.UrlEncode(szQues)), function(szTitle, szContent)
 			local data = MY.Json.Decode(szContent)
 			if not data then
 				return nil
@@ -66,11 +66,11 @@ end
 MY_ExamTip.SubmitData = function()
 	local _, _, szLang, _ = GetVersion()
 	local nCommited, nAccepted, nUnsubmit = 0, 0, 0
-	-- MY_Anmerkungen.szNotePanelContent = string.format(_C.szSubmitUrl, szLang, MY.String.UrlEncode(MY.Json.Encode(_C.tCached)))
+	-- MY_Anmerkungen.szNotePanelContent = string.format(_C.szSubmitUrl, szLang, MY.UrlEncode(MY.Json.Encode(_C.tCached)))
 	for szQues, szAnsw in pairs(_C.tCached) do
 		if not _C.tAccept[szQues] then
 			nUnsubmit = nUnsubmit + 1
-			MY.RemoteRequest(string.format(_C.szSubmitUrl, szLang, MY.String.UrlEncode(MY.Json.Encode({[szQues] = szAnsw}))), function(szTitle, szContent)
+			MY.RemoteRequest(string.format(_C.szSubmitUrl, szLang, MY.UrlEncode(MY.Json.Encode({[szQues] = szAnsw}))), function(szTitle, szContent)
 				local r = MY.Json.Decode(szContent)
 				if r then
 					nUnsubmit = nUnsubmit - 1
