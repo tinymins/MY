@@ -3,8 +3,8 @@
 -- @Author: 茗伊 @双梦镇 @追风蹑影
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
--- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2016-04-29 11:26:36
+-- @Last modified by:   tinymins
+-- @Last modified time: 2016-05-16 21:26:44
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 local srep, tostring, string2byte = string.rep, tostring, string.byte
@@ -34,9 +34,7 @@ function MY.Sys.IsShieldedVersion(bShieldedVersion)
 	end
 end
 MY.IsShieldedVersion = MY.Sys.IsShieldedVersion
-pcall(function()
-	MY.Sys.bShieldedVersion = (MY.Sys.GetLang() == 'zhcn')
-end)
+MY.Sys.bShieldedVersion = MY.GetLang() == 'zhcn'
 
 -- Save & Load Lua Data
 -- ##################################################################################################
@@ -216,65 +214,160 @@ _C.tFreeWebPages = {}
 -- szUrl        -- 请求的完整 URL（包含 http:// 或 https://）
 -- fnAction     -- 请求完成后的回调函数，回调原型：function(szTitle, szContent)]]
 function MY.RemoteRequest(szUrl, fnSuccess, fnError, nTimeout)
-	if not (type(szUrl) == "string" and type(fnSuccess) == "function") then
-		return
+	local settings = {
+		url     = szUrl,
+		success = fnSuccess,
+		error   = fnError,
+		timeout = nTimeout,
+	}
+	return MY.Ajax(settings)
+end
+
+local function pcall_this(context, fn, ...)
+	local _this
+	if context then
+		_this, this = this, context
 	end
-	if type(nTimeout) ~= "number" then
-		nTimeout = 10000
+	local rtc = {pcall(fn, ...)}
+	if context then
+		this = _this
 	end
-	if type(fnError) ~= "function" then
-		fnError = function(szUrl, errMsg)
-			MY.Debug({szUrl .. ' - ' .. errMsg}, 'RemoteRequest', MY_DEBUG.WARNING)
+	return unpack(rtc)
+end
+
+local l_tAjax = {}
+function MY.Ajax(settings)
+	assert(settings and settings.url)
+	
+	if type(settings.ssl) ~= "boolean" then
+		settings.ssl = false
+	end
+	if type(settings.timeout) ~= "number" then
+		settings.timeout = 10000
+	end
+	if type(settings.success) ~= "function" then
+		settings.success = function(settings, html)
+			MY.Debug({settings.url .. ' - SUCCESS'}, 'RemoteRequest', MY_DEBUG.LOG)
 		end
 	end
-	
-	local RequestID, hFrame
-	local nFreeWebPages = #_C.tFreeWebPages
-	if nFreeWebPages > 0 then
-		RequestID = _C.tFreeWebPages[nFreeWebPages]
-		hFrame = Station.Lookup('Lowest/MYRR_' .. RequestID)
-		table.remove(_C.tFreeWebPages)
+	if type(settings.error) ~= "function" then
+		settings.error = function(settings, errMsg)
+			MY.Debug({settings.url .. ' - ' .. errMsg}, 'RemoteRequest', MY_DEBUG.WARNING)
+		end
 	end
-	-- create page
-	if not hFrame then
-		RequestID = ("%X_%X"):format(GetTickCount(), math.floor(math.random() * 65536))
-		hFrame = Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. 'ui/WndWebPage.ini', "MYRR_" .. RequestID)
-		hFrame:Hide()
-	end
-	local hPage = hFrame:Lookup('WndWebPage')
+	settings.charset = settings.charset or "utf8"
 	
-	-- bind callback function
-	hPage.OnDocumentComplete = function()
-		local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
-		if szUrl ~= szTitle or szContent ~= "" then
-			MY.Debug({string.format("%s - %s", szTitle, szUrl)}, 'MYRR::OnDocumentComplete', MY_DEBUG.LOG)
-			-- 注销超时处理时钟
-			MY.DelayCall("MYRR_TO_" .. RequestID, false)
-			-- 成功回调函数
-			local status, err = pcall(fnSuccess, szTitle, szContent)
-			if not status then
-				MY.Debug({err}, 'MYRR::OnDocumentComplete::Callback', MY_DEBUG.ERROR)
+	local szKey = GetTickCount() * 100
+	while l_tAjax["MYAJAX" .. szKey] do
+		szKey = szKey + 1
+	end
+	szKey = "MYAJAX" .. szKey
+	l_tAjax[szKey] = settings
+	
+	local url, data = settings.url, settings.data
+	if settings.charset == "utf8" then
+		url  = MY.ConvertToUTF8(url)
+		data = MY.ConvertToUTF8(data)
+	end
+	data = MY.EncodePostData(data)
+	
+	if settings.type == "post" then
+		CURL_HttpPost(szKey, url, data, settings.ssl, settings.timeout)
+	elseif settings.type == "get" then
+		if not url:find("?") then
+			url = url .. "?"
+		elseif url:sub(-1) ~= "&" then
+			url = url .. "&"
+		end
+		url = url .. data
+		
+		CURL_HttpRqst(szKey, url, settings.ssl, settings.timeout)
+	else--if settings.type == "webbrowser" then
+		if not url:find("?") then
+			url = url .. "?"
+		elseif url:sub(-1) ~= "&" then
+			url = url .. "&"
+		end
+		url = url .. data
+		
+		local RequestID, hFrame
+		local nFreeWebPages = #_C.tFreeWebPages
+		if nFreeWebPages > 0 then
+			RequestID = _C.tFreeWebPages[nFreeWebPages]
+			hFrame = Station.Lookup('Lowest/MYRR_' .. RequestID)
+			table.remove(_C.tFreeWebPages)
+		end
+		-- create page
+		if not hFrame then
+			RequestID = ("%X_%X"):format(GetTickCount(), math.floor(math.random() * 65536))
+			hFrame = Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. 'ui/WndWebPage.ini', "MYRR_" .. RequestID)
+			hFrame:Hide()
+		end
+		local wWebPage = hFrame:Lookup('WndWebPage')
+		
+		-- bind callback function
+		wWebPage.OnDocumentComplete = function()
+			local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
+			if szUrl ~= szTitle or szContent ~= "" then
+				MY.Debug({string.format("%s - %s", szTitle, szUrl)}, 'MYRR::OnDocumentComplete', MY_DEBUG.LOG)
+				-- 注销超时处理时钟
+				MY.DelayCall("MYRR_TO_" .. RequestID, false)
+				-- 成功回调函数
+				if settings.success then
+					local status, err = pcall_this(settings.context, settings.success, settings, szContent)
+					if not status then
+						MY.Debug({err}, 'MYRR::OnDocumentComplete::Callback', MY_DEBUG.ERROR)
+					end
+				end
+				table.insert(_C.tFreeWebPages, RequestID)
+			end
+		end
+		
+		-- do with this remote request
+		MY.Debug({settings.url}, 'MYRR', MY_DEBUG.LOG)
+		-- register request timeout clock
+		MY.DelayCall("MYRR_TO_" .. RequestID, settings.timeout, function()
+			MY.Debug({settings.url}, 'MYRR::Timeout', MY_DEBUG.WARNING) -- log
+			-- request timeout, call timeout function.
+			if settings.error then
+				local status, err = pcall_this(settings.context, settings.error, settings, "timeout")
+				if not status then
+					MY.Debug({err}, 'MYRR::TIMEOUT', MY_DEBUG.ERROR)
+				end
 			end
 			table.insert(_C.tFreeWebPages, RequestID)
-		end
+		end)
+		
+		-- start ie navigate
+		wWebPage:Navigate(url)
 	end
-	
-	-- do with this remote request
-	MY.Debug({szUrl}, 'MYRR', MY_DEBUG.LOG)
-	-- register request timeout clock
-	MY.DelayCall("MYRR_TO_" .. RequestID, nTimeout, function()
-		MY.Debug({szUrl}, 'MYRR::Timeout', MY_DEBUG.WARNING) -- log
-		-- request timeout, call timeout function.
-		local status, err = pcall(fnError, szUrl, "timeout")
-		if not status then
-			MY.Debug({err}, 'MYRR::TIMEOUT', MY_DEBUG.ERROR)
-		end
-		table.insert(_C.tFreeWebPages, RequestID)
-	end)
-	
-	-- start ie navigate
-	hPage:Navigate(szUrl)
 end
+
+MY.RegisterEvent("CURL_REQUEST_RESULT.AJAX", function()
+	local szKey        = arg0
+	local bSuccess     = arg1
+	local szContent    = arg2
+	local dwBufferSize = arg3
+	if l_tAjax[szKey] then
+		local settings = l_tAjax[szKey]
+		if bSuccess then
+			if settings.success then
+				local status, err = pcall_this(settings.context, settings.success, settings, szContent)
+				if not status then
+					MY.Debug({err}, 'MYRR::AjaxSuccess::Callback', MY_DEBUG.ERROR)
+				end
+			end
+		else
+			if settings.error then
+				local status, err = pcall_this(settings.context, settings.error, settings, "failed")
+				if not status then
+					MY.Debug({err}, 'MYRR::TIMEOUT', MY_DEBUG.ERROR)
+				end
+			end
+		end
+		l_tAjax[szKey] = nil
+	end
+end)
 
 -------------------------------
 -- remote data storage online
@@ -296,7 +389,7 @@ MY.RegisterInit("'MYLIB#STORAGE_DATA", function()
 		n = GetUserRoleName(), i = UI_GetClientPlayerID(),
 		S = MY.GetRealServer(1), s = MY.GetRealServer(2),
 		_ = GetCurrentTime()
-	})), function(szTitle, szContent)
+	})), function(settings, szContent)
 		local data = MY.Json.Decode(szContent)
 		if data then
 			for k, v in pairs(data.public) do
@@ -331,7 +424,7 @@ function MY.Sys.StorageData(szKey, oData)
 			S = MY.GetRealServer(1), s = MY.GetRealServer(2),
 			v = GetCurrentTime(),
 			k = szKey, o = oData
-		})), function(szTitle, szContent)
+		})), function(settings, szContent)
 			local data = MY.Json.Decode(szContent)
 			if data and data.succeed then
 				FireUIEvent("MY_PRIVATE_STORAGE_SYNC", szKey)
