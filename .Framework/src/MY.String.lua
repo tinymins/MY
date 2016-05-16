@@ -3,8 +3,8 @@
 -- @Author: 茗伊 @双梦镇 @追风蹑影
 -- @Date  : 2015-01-25 15:35:26
 -- @Email : admin@derzh.com
--- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2016-02-02 16:47:40
+-- @Last modified by:   tinymins
+-- @Last modified time: 2016-05-16 18:39:18
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 ------------------------------------------------------------------------
@@ -19,6 +19,8 @@ local type, tonumber, tostring = type, tonumber, tostring
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local floor, mmin, mmax, mceil = math.floor, math.min, math.max, math.ceil
 local GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID = GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID
+local UrlEncodeString, UrlDecodeString = UrlEncode, UrlDecode
+local AnsiToUTF8 = AnsiToUTF8 or ansi_to_utf8
 local setmetatable = setmetatable
 --------------------------------------------
 -- 本地函数和变量
@@ -65,18 +67,6 @@ function MY.String.Trim(szText)
 	return (string.gsub(szText, "^%s*(.-)%s*$", "%1"))
 end
 
--- 转换为 URL 编码
--- (string) MY.String.UrlEncode(string szText)
-function MY.String.UrlEncode(szText)
-	return szText:gsub("([^0-9a-zA-Z ])", function (c) return string.format ("%%%02X", string.byte(c)) end):gsub(" ", "+")
-end
-
--- 解析 URL 编码
--- (string) MY.String.UrlDecode(string szText)
-function MY.String.UrlDecode(szText)
-	return szText:gsub("+", " "):gsub("%%(%x%x)", function(h) return string.char(tonumber(h, 16)) end)
-end
-
 function MY.String.LenW(str)
 	return wstring.len(str)
 end
@@ -94,6 +84,107 @@ end
 function MY.String.SimpleEcrypt(szText)
 	return szText:gsub('.', function (c) return string.format ("%02X", (string.byte(c) + 13) % 256) end):gsub(" ", "+")
 end
+
+local function EncodePostData(data, t, prefix)
+	if type(data) == "table" then
+		local first = true
+		for k, v in pairs(data) do
+			if first then
+				first = false
+			else
+				tinsert(t, "&")
+			end
+			if prefix == "" then
+				EncodePostData(v, t, k)
+			else
+				EncodePostData(v, t, prefix .. "[" .. k .. "]")
+			end
+		end
+	else
+		if prefix ~= "" then
+			tinsert(t, prefix)
+			tinsert(t, "=")
+		end
+		tinsert(t, data)
+	end
+end
+
+function MY.EncodePostData(data)
+	local t = {}
+	EncodePostData(data, t, "")
+	local text = table.concat(t)
+	return text
+end
+
+local function ConvertToUTF8(data)
+	if type(data) == "table" then
+		local t = {}
+		for k, v in pairs(data) do
+			if type(k) == "string" then
+				t[ConvertToUTF8(k)] = ConvertToUTF8(v)
+			else
+				t[k] = ConvertToUTF8(v)
+			end
+		end
+		return t
+	elseif type(data) == "string" then
+		return AnsiToUTF8(data)
+	else
+		return data
+	end
+end
+MY.ConvertToUTF8 = ConvertToUTF8
+
+if not UrlEncodeString then
+function UrlEncodeString(szText)
+	return szText:gsub("([^0-9a-zA-Z ])", function (c) return string.format ("%%%02X", string.byte(c)) end):gsub(" ", "+")
+end
+end
+
+if not UrlDecodeString then
+function UrlDecodeString(szText)
+	return szText:gsub("+", " "):gsub("%%(%x%x)", function(h) return string.char(tonumber(h, 16)) end)
+end
+end
+
+local function UrlEncode(data)
+	if type(data) == "table" then
+		local t = {}
+		for k, v in pairs(data) do
+			if type(k == "string") then
+				t[UrlEncodeString(k)] = UrlEncode(v)
+			else
+				t[k] = UrlEncode(v)
+			end
+		end
+		return t
+	elseif type(data) == "string" then
+		return UrlEncodeString(data)
+	else
+		return data
+	end
+end
+MY.UrlEncode = UrlEncode
+
+local function UrlDecode(data)
+	if type(data) == "table" then
+		local t = {}
+		for k, v in pairs(data) do
+			if type(k == "string") then
+				t[UrlDecodeString(k)] = UrlDecode(v)
+			else
+				t[k] = UrlDecode(v)
+			end
+		end
+		return t
+	elseif type(data) == "string" then
+		return UrlDecodeString(data)
+	else
+		return data
+	end
+end
+MY.UrlDecode = UrlDecode
+
 
 local m_simpleMatchCache = setmetatable({}, { __mode = "v" })
 function MY.String.SimpleMatch(szText, szFind, bDistinctCase)
