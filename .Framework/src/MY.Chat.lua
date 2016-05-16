@@ -3,8 +3,8 @@
 -- @Author: 茗伊 @双梦镇 @追风蹑影
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
--- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2016-02-02 16:46:25
+-- @Last modified by:   tinymins
+-- @Last modified time: 2016-05-16 21:22:11
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -1033,23 +1033,26 @@ end)
 MY.RegisterMsgMonitor("QIYU", function(szMsg, nFont, bRich, r, g, b, szChannel)
 	-- 战斗中移动中免打扰
 	local me = GetClientPlayer()
-	if not me or me.bFightState
-	or (
-		me.nMoveState ~= MOVE_STATE.ON_STAND    and
-		me.nMoveState ~= MOVE_STATE.ON_FLOAT    and
-		me.nMoveState ~= MOVE_STATE.ON_SIT      and
-		me.nMoveState ~= MOVE_STATE.ON_FREEZE   and
-		me.nMoveState ~= MOVE_STATE.ON_ENTRAP   and
-		me.nMoveState ~= MOVE_STATE.ON_DEATH    and
-		me.nMoveState ~= MOVE_STATE.ON_AUTO_FLY and
-		me.nMoveState ~= MOVE_STATE.ON_START_AUTO_FLY
-	) then
+	if not me then
 		return
 	end
-	local hWnd = Station.GetFocusWindow()
-	if hWnd and hWnd:GetType() == "WndEdit" then
-		return
-	end
+	-- if not me or me.bFightState
+	-- or (
+	-- 	me.nMoveState ~= MOVE_STATE.ON_STAND    and
+	-- 	me.nMoveState ~= MOVE_STATE.ON_FLOAT    and
+	-- 	me.nMoveState ~= MOVE_STATE.ON_SIT      and
+	-- 	me.nMoveState ~= MOVE_STATE.ON_FREEZE   and
+	-- 	me.nMoveState ~= MOVE_STATE.ON_ENTRAP   and
+	-- 	me.nMoveState ~= MOVE_STATE.ON_DEATH    and
+	-- 	me.nMoveState ~= MOVE_STATE.ON_AUTO_FLY and
+	-- 	me.nMoveState ~= MOVE_STATE.ON_START_AUTO_FLY
+	-- ) then
+	-- 	return
+	-- end
+	-- local hWnd = Station.GetFocusWindow()
+	-- if hWnd and hWnd:GetType() == "WndEdit" then
+	-- 	return
+	-- end
 	-- 跨服中免打扰
 	if IsRemotePlayer(me.dwID) then
 		return
@@ -1063,10 +1066,14 @@ MY.RegisterMsgMonitor("QIYU", function(szMsg, nFont, bRich, r, g, b, szChannel)
 		szMsg = GetPureText(szMsg)
 	end
 	szMsg:gsub(_L.ADVENTURE_PATT, function(szName, szAdventure)
-		MY.RemoteRequest('http://data.jx3.derzh.com/serendipity/?l=' .. MY.GetLang()
-		.. "&data=" .. MY.String.SimpleEcrypt(MY.Json.Encode({
-			S = MY.GetRealServer(1), s = MY.GetRealServer(2),
-			n = szName, a = szAdventure, t = GetCurrentTime()
-		})), function(szTitle, szContent) end)
+		MY.Ajax({
+			type = "get",
+			url = 'http://data.jx3.derzh.com/serendipity/?l=' .. MY.GetLang()
+			.. "&data=" .. MY.String.SimpleEcrypt(MY.Json.Encode({
+				S = MY.GetRealServer(1), s = MY.GetRealServer(2),
+				n = szName, a = szAdventure, t = GetCurrentTime()
+			})),
+			success = function(settings, content) end,
+		})
 	end)
 end, {"MSG_SYS"})
