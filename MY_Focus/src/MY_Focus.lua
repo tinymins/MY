@@ -3,8 +3,8 @@
 -- @Author: 茗伊 @ 双梦镇 @ 荻花宫
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
--- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-12-21 15:19:03
+-- @Last modified by:   tinymins
+-- @Last modified time: 2016-05-30 18:56:48
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Focus/lang/")
 local _C = {}
@@ -524,7 +524,7 @@ function MY_Focus.DrawFocus(dwType, dwID)
 	hInfoList:FormatAllItemPos()
 	
 	-- 目标距离
-	local nDistance = math.floor(math.sqrt(math.pow(player.nX - obj.nX, 2) + math.pow(player.nY - obj.nY, 2)) * 10 / 64) / 10
+	local nDistance = math.floor(math.sqrt(math.pow(player.nX - obj.nX, 2) + math.pow(player.nY - obj.nY, 2) + math.pow((player.nZ - obj.nZ) / 8, 2)) * 10 / 64) / 10
 	hItem:Lookup('Handle_Compass/Compass_Distance'):SetText(nDistance)
 	hItem:Lookup('Handle_School/School_Distance'):SetText(nDistance)
 	-- 自身面向
