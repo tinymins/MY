@@ -3,8 +3,8 @@
 -- @Author: 茗伊 @双梦镇 @追风蹑影
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
--- @Last modified by:   tinymins
--- @Last modified time: 2016-05-14 18:09:24
+-- @Last modified by:   Zhai Yiming
+-- @Last modified time: 2016-06-04 17:56:59
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- #################################################################################################################################### --
@@ -235,9 +235,9 @@ function _MY.Init()
 	end
 	_MY.tInitFun = nil
 	-- 加载主窗体
-	MY.OpenPanel(true, true)
+	MY.OpenPanel(true, true, true)
 	MY.ResizePanel(780, 540)
-	MY.ClosePanel(true)
+	MY.ClosePanel(true, false, true)
 	-- 显示欢迎信息
 	MY.Sysmsg({_L("%s, welcome to use mingyi plugins!", GetClientPlayer().szName) .. " v" .. MY.GetVersion() .. ' Build ' .. _MY.szBuildDate})
 end
@@ -246,11 +246,25 @@ end
 -- 界面开关
 --------------------------------------------------------------------------------------------------------------------------------------------
 -- close window
-function MY.ClosePanel(bMute, bRealClose)
+function MY.ClosePanel(bMute, bRealClose, bNoAnimate)
 	local hFrame = MY.GetFrame()
 	if hFrame then
 		if not bRealClose then
-			hFrame:Hide()
+			if not hFrame.bToggling then
+				if bNoAnimate then
+					hFrame:Hide()
+				else
+					local nY = hFrame:GetRelY()
+					local nAlpha = hFrame:GetAlpha()
+					tweenlite.to(300, hFrame, {relY = nY + 10, alpha = 0, complete = function()
+						hFrame:SetRelY(nY)
+						hFrame:SetAlpha(nAlpha)
+						hFrame:Hide()
+						hFrame.bToggling = false
+					end})
+					hFrame.bToggling = true
+				end
+			end
 		else
 			MY.SwitchTab()
 			Wnd.CloseWindow(hFrame)
@@ -264,7 +278,7 @@ function MY.ClosePanel(bMute, bRealClose)
 end
 
 -- open window
-function MY.OpenPanel(bMute, bNoFocus)
+function MY.OpenPanel(bMute, bNoFocus, bNoAnimate)
 	local hFrame = MY.GetFrame()
 	if not hFrame then
 		hFrame = Wnd.OpenWindow(_MY.szIniFile, "MY")
@@ -323,6 +337,12 @@ function MY.OpenPanel(bMute, bNoFocus)
 	if not bNoFocus and Cursor.IsVisible() then
 		hFrame:BringToTop()
 		Station.SetFocusWindow(hFrame)
+	end
+	if not bNoAnimate then
+		hFrame.bToggling = true
+		tweenlite.from(300, hFrame, {relY = hFrame:GetRelY() - 10, alpha = 0, complete = function()
+			hFrame.bToggling = false
+		end})
 	end
 	if not bMute then
 		PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
