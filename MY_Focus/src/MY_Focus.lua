@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-06-06 21:16:42
+-- @Last modified time: 2016-06-06 21:35:27
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Focus/lang/")
 local _C = {}
@@ -421,7 +421,7 @@ end
 -- 清空焦点列表
 function MY_Focus.ClearFocus()
 	_C.tFocusList = {}
-	if MY_Focus.bEnableSceneNavi and Navigator_Remove then
+	if Navigator_Remove then
 		Navigator_Remove("MY_FOCUS")
 	end
 	
