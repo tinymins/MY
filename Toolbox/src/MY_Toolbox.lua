@@ -4,7 +4,7 @@
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-06-06 20:02:41
+-- @Last modified time: 2016-06-06 20:49:40
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = {}
@@ -36,7 +36,7 @@ MY_ToolBox.ApplyConfig = function()
 			local p = MY.Player.GetFriend(dwID)
 			if p then
 				if Navigator_SetID then
-					Navigator_SetID("MY_FRIEND_TIP." .. dwID, dwID, p.name)
+					Navigator_SetID("MY_FRIEND_TIP." .. dwID, TARGET.PLAYER, dwID, p.name)
 				else
 					local sha = hShaList:Lookup(tostring(dwID))
 					if not sha then
@@ -109,7 +109,7 @@ MY_ToolBox.ApplyConfig = function()
 				return
 			end
 			if Navigator_SetID then
-				Navigator_SetID("MY_GUILDMEMBER_TIP." .. dwID, dwID, tar.szName)
+				Navigator_SetID("MY_GUILDMEMBER_TIP." .. dwID, TARGET.PLAYER, dwID, tar.szName)
 			else
 				local sha = hShaList:Lookup(tostring(dwID))
 				if not sha then
