@@ -5,7 +5,9 @@ data = {
     ['toolbox'] = '常用工具',
     ['infotip'] = '信息顯示',
     ['friend headtop tips'] = '附近好友高亮',
+    ['friend headtop tips nav'] = '啓用場景追蹤點',
     ['tong member headtop tips'] = '附近幫會成員高亮',
+    ['tong member headtop tips nav'] = '啓用場景追蹤點',
     
     ['check nearby gongzhan'] = '檢測附近共戰',
     ['Detected [%s] has Gongzhan BUFF for %d second(s).'] = "檢測到[%s]共戰BUFF剩余%d秒。",
