@@ -3,8 +3,8 @@
 -- @Author: ‹¯“¡ @ À´√Œ’Ú @ ›∂ª®π¨
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
--- @Last modified by:   tinymins
--- @Last modified time: 2016-05-13 11:24:54
+-- @Last modified by:   Zhai Yiming
+-- @Last modified time: 2016-06-06 20:02:41
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = {}
@@ -35,24 +35,32 @@ MY_ToolBox.ApplyConfig = function()
 			end
 			local p = MY.Player.GetFriend(dwID)
 			if p then
-				local sha = hShaList:Lookup(tostring(dwID))
-				if not sha then
-					hShaList:AppendItemFromString('<shadow>name="' .. dwID .. '"</shadow>')
-					sha = hShaList:Lookup(tostring(dwID))
+				if Navigator_SetID then
+					Navigator_SetID("MY_FRIEND_TIP." .. dwID, dwID, p.name)
+				else
+					local sha = hShaList:Lookup(tostring(dwID))
+					if not sha then
+						hShaList:AppendItemFromString('<shadow>name="' .. dwID .. '"</shadow>')
+						sha = hShaList:Lookup(tostring(dwID))
+					end
+					local r, g, b, a = 255,255,255,255
+					local szTip = ">> " .. p.name .. " <<"
+					sha:ClearTriangleFanPoint()
+					sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
+					sha:AppendCharacterID(dwID, false, r, g, b, a, 0, 40, szTip, 0, 1)
+					sha:Show()
 				end
-				local r, g, b, a = 255,255,255,255
-				local szTip = ">> " .. p.name .. " <<"
-				sha:ClearTriangleFanPoint()
-				sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
-				sha:AppendCharacterID(dwID, false, r, g, b, a, 0, 40, szTip, 0, 1)
-				sha:Show()
 			end
 		end
 		local function OnPlayerLeave(dwID)
-			local sha = hShaList:Lookup(tostring(dwID))
-			if sha then
-				sha:Hide()
-				table.insert(hShaList.freeShadows, sha)
+			if Navigator_Remove then
+				Navigator_Remove("MY_FRIEND_TIP." .. dwID)
+			else
+				local sha = hShaList:Lookup(tostring(dwID))
+				if sha then
+					sha:Hide()
+					table.insert(hShaList.freeShadows, sha)
+				end
 			end
 		end
 		local function RescanNearby()
@@ -72,6 +80,9 @@ MY_ToolBox.ApplyConfig = function()
 		MY.RegisterEvent("DELETE_FELLOWSHIP.MY_FRIEND_TIP")
 		MY.RegisterEvent("PLAYER_FELLOWSHIP_UPDATE.MY_FRIEND_TIP")
 		MY.RegisterEvent("PLAYER_FELLOWSHIP_CHANGE.MY_FRIEND_TIP")
+		if Navigator_Remove then
+			Navigator_Remove("MY_FRIEND_TIP")
+		end
 		XGUI.GetShadowHandle("MY_FriendHeadTip"):Hide()
 	end
 	
@@ -97,23 +108,31 @@ MY_ToolBox.ApplyConfig = function()
 				MY.DelayCall(500, function() OnPlayerEnter(dwID, nRetryCount + 1) end)
 				return
 			end
-			local sha = hShaList:Lookup(tostring(dwID))
-			if not sha then
-				hShaList:AppendItemFromString('<shadow>name="' .. dwID .. '"</shadow>')
-				sha = hShaList:Lookup(tostring(dwID))
+			if Navigator_SetID then
+				Navigator_SetID("MY_GUILDMEMBER_TIP." .. dwID, dwID, tar.szName)
+			else
+				local sha = hShaList:Lookup(tostring(dwID))
+				if not sha then
+					hShaList:AppendItemFromString('<shadow>name="' .. dwID .. '"</shadow>')
+					sha = hShaList:Lookup(tostring(dwID))
+				end
+				local r, g, b, a = 255,255,255,255
+				local szTip = "> " .. tar.szName .. " <"
+				sha:ClearTriangleFanPoint()
+				sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
+				sha:AppendCharacterID(dwID, false, r, g, b, a, 0, 40, szTip, 0, 1)
+				sha:Show()
 			end
-			local r, g, b, a = 255,255,255,255
-			local szTip = "> " .. tar.szName .. " <"
-			sha:ClearTriangleFanPoint()
-			sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
-			sha:AppendCharacterID(dwID, false, r, g, b, a, 0, 40, szTip, 0, 1)
-			sha:Show()
 		end
 		local function OnPlayerLeave(dwID)
-			local sha = hShaList:Lookup(tostring(dwID))
-			if sha then
-				sha:Hide()
-				table.insert(hShaList.freeShadows, sha)
+			if Navigator_Remove then
+				Navigator_Remove("MY_GUILDMEMBER_TIP." .. dwID)
+			else
+				local sha = hShaList:Lookup(tostring(dwID))
+				if sha then
+					sha:Hide()
+					table.insert(hShaList.freeShadows, sha)
+				end
 			end
 		end
 		for _, p in pairs(MY.Player.GetNearPlayer()) do
@@ -124,6 +143,9 @@ MY_ToolBox.ApplyConfig = function()
 	else
 		MY.RegisterEvent("PLAYER_ENTER_SCENE.MY_GUILDMEMBER_TIP")
 		MY.RegisterEvent("PLAYER_LEAVE_SCENE.MY_GUILDMEMBER_TIP")
+		if Navigator_Remove then
+			Navigator_Remove("MY_GUILDMEMBER_TIP")
+		end
 		XGUI.GetShadowHandle("MY_TongMemberHeadTip"):Hide()
 	end
 	
