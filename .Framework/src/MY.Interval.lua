@@ -7,6 +7,13 @@
 -- FrameCall   按帧调用   每帧调用       呼吸帧     1 / GLOBAL.GAME_FPS
 -- RenderCall  渲染调用   每次渲染调用   毫秒       1 / 每秒渲染次数
 ---------------------------------------------------------------------
+if DelayCall and BreatheCall and FrameCall and RenderCall then
+	MY.DelayCall   = DelayCall
+	MY.BreatheCall = BreatheCall
+	MY.FrameCall   = FrameCall
+	MY.RenderCall  = RenderCall
+else
+	
 local _time      -- current time
 local _count = 0 -- the count of onactive
 local _no_active
@@ -446,3 +453,5 @@ end
 MY.UI.RegisterUIEvent(MY, "OnFrameBreathe", __OnActive)
 
 LuaActive_Enable(false)
+
+end
