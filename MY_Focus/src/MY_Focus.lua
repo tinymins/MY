@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-06-06 20:58:46
+-- @Last modified time: 2016-06-06 21:16:42
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Focus/lang/")
 local _C = {}
@@ -27,6 +27,7 @@ MY_Focus.bFocusJJCParty     = false -- 焦竞技场队友
 MY_Focus.bFocusJJCEnemy     = true  -- 焦竞技场敌队
 MY_Focus.bShowTarget        = false -- 显示目标目标
 MY_Focus.bTraversal         = false -- 遍历焦点列表
+MY_Focus.bEnableSceneNavi   = false -- 场景追踪点
 MY_Focus.fScaleX            = 1     -- 缩放比例
 MY_Focus.fScaleY            = 1     -- 缩放比例
 MY_Focus.tAutoFocus = {}    -- 默认焦点
@@ -55,6 +56,7 @@ RegisterCustomData("MY_Focus.bFocusJJCParty")
 RegisterCustomData("MY_Focus.bFocusJJCEnemy")
 RegisterCustomData("MY_Focus.bShowTarget")
 RegisterCustomData("MY_Focus.bTraversal")
+RegisterCustomData("MY_Focus.bEnableSceneNavi")
 RegisterCustomData("MY_Focus.tAutoFocus")
 RegisterCustomData("MY_Focus.tFocusList")
 RegisterCustomData("MY_Focus.tFocusTplList")
@@ -334,7 +336,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		
 		-- 加入焦点
 		if bFocus then
-			MY_Focus.AddFocus(dwType, dwID)
+			MY_Focus.AddFocus(dwType, dwID, szName)
 		end
 	end
 end
@@ -348,7 +350,7 @@ function MY_Focus.OnObjectLeaveScene(dwType, dwID)
 			and MY.IsInArena()
 			and not IsEnemy(UI_GetClientPlayerID(), dwID)
 			and KObject.dwTemplateID == 46140 then -- 清绝歌影 的主体影子
-				MY_Focus.AddFocus(TARGET.PLAYER, KObject.dwEmployer)
+				MY_Focus.AddFocus(TARGET.PLAYER, KObject.dwEmployer, MY.GetObjectName(KObject))
 			end
 		end
 	end
@@ -365,7 +367,7 @@ function MY_Focus.AddFocus(dwType, dwID, szName)
 		end
 	end
 	if not nIndex then
-		if Navigator_SetID then
+		if MY_Focus.bEnableSceneNavi and Navigator_SetID then
 			Navigator_SetID("MY_FOCUS." .. dwType .. "_" .. dwID, dwType, dwID, szName)
 		end
 		table.insert(_C.tFocusList, {dwType = dwType, dwID = dwID, szName = szName})
@@ -397,7 +399,7 @@ function MY_Focus.DelFocus(dwType, dwID)
 			MY_Focus.DrawFocus(p.dwType, p.dwID)
 		end
 	end
-	if Navigator_Remove then
+	if MY_Focus.bEnableSceneNavi and Navigator_Remove then
 		Navigator_Remove("MY_FOCUS." .. dwType .. "_" .. dwID)
 	end
 	-- 删除锁定
@@ -419,7 +421,7 @@ end
 -- 清空焦点列表
 function MY_Focus.ClearFocus()
 	_C.tFocusList = {}
-	if Navigator_Remove then
+	if MY_Focus.bEnableSceneNavi and Navigator_Remove then
 		Navigator_Remove("MY_FOCUS")
 	end
 	
@@ -977,7 +979,7 @@ function PS.OnPanelActive(wnd)
 	
 	-- 右侧
 	local x, y = xr, yr
-	local deltaX = 27
+	local deltaX = 25
 	ui:append("WndCheckBox", "WndCheckBox_Auto_Hide"):children("#WndCheckBox_Auto_Hide")
 	  :pos(x, y):width(wr):text(_L['hide when empty']):check(MY_Focus.bAutoHide)
 	  :check(function(bChecked)
@@ -1074,6 +1076,17 @@ function PS.OnPanelActive(wnd)
 		oncheck = function(bChecked)
 			MY_Focus.bSortByDistance = bChecked
 			MY_Focus.RedrawList()
+		end
+	})
+	y = y + deltaX
+	
+	ui:append("WndCheckBox", "WndCheckBox_EnableSceneNavi", {
+		x = x, y = y, w = wr,
+		text = _L['enable scene navi'],
+		checked = MY_Focus.bEnableSceneNavi,
+		oncheck = function(bChecked)
+			MY_Focus.bEnableSceneNavi = bChecked
+			MY_Focus.RescanNearby()
 		end
 	})
 	y = y + deltaX
