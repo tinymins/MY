@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-06-06 20:51:46
+-- @Last modified time: 2016-06-06 20:58:46
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Focus/lang/")
 local _C = {}
@@ -366,7 +366,7 @@ function MY_Focus.AddFocus(dwType, dwID, szName)
 	end
 	if not nIndex then
 		if Navigator_SetID then
-			Navigator_SetID("MY_FOCUS." .. dwType .. "_" .. dwID, dwType, dwID)
+			Navigator_SetID("MY_FOCUS." .. dwType .. "_" .. dwID, dwType, dwID, szName)
 		end
 		table.insert(_C.tFocusList, {dwType = dwType, dwID = dwID, szName = szName})
 		nIndex = #_C.tFocusList
@@ -419,6 +419,9 @@ end
 -- 清空焦点列表
 function MY_Focus.ClearFocus()
 	_C.tFocusList = {}
+	if Navigator_Remove then
+		Navigator_Remove("MY_FOCUS")
+	end
 	
 	local hList = Station.Lookup('Normal/MY_Focus', 'Handle_List')
 	if not hList then
