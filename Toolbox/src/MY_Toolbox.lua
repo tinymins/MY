@@ -4,7 +4,7 @@
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-06-06 20:49:40
+-- @Last modified time: 2016-06-06 21:29:37
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = {}
@@ -12,8 +12,12 @@ MY_ToolBox = {}
 
 MY_ToolBox.bFriendHeadTip = false
 RegisterCustomData("MY_ToolBox.bFriendHeadTip")
+MY_ToolBox.bFriendHeadTipNav = false
+RegisterCustomData("MY_ToolBox.bFriendHeadTipNav")
 MY_ToolBox.bTongMemberHeadTip = false
 RegisterCustomData("MY_ToolBox.bTongMemberHeadTip")
+MY_ToolBox.bTongMemberHeadTipNav = false
+RegisterCustomData("MY_ToolBox.bTongMemberHeadTipNav")
 MY_ToolBox.bAvoidBlackShenxingCD = true
 RegisterCustomData("MY_ToolBox.bAvoidBlackShenxingCD")
 MY_ToolBox.bJJCAutoSwitchTalkChannel = true
@@ -22,6 +26,9 @@ MY_ToolBox.bChangGeShadow = false
 RegisterCustomData("MY_ToolBox.bChangGeShadow")
 MY_ToolBox.ApplyConfig = function()
 	-- 好友高亮
+	if Navigator_Remove then
+		Navigator_Remove("MY_FRIEND_TIP")
+	end
 	if MY_ToolBox.bFriendHeadTip then
 		local hShaList = XGUI.GetShadowHandle("MY_FriendHeadTip")
 		if not hShaList.freeShadows then
@@ -35,7 +42,7 @@ MY_ToolBox.ApplyConfig = function()
 			end
 			local p = MY.Player.GetFriend(dwID)
 			if p then
-				if Navigator_SetID then
+				if MY_ToolBox.bFriendHeadTipNav and Navigator_SetID then
 					Navigator_SetID("MY_FRIEND_TIP." .. dwID, TARGET.PLAYER, dwID, p.name)
 				else
 					local sha = hShaList:Lookup(tostring(dwID))
@@ -53,7 +60,7 @@ MY_ToolBox.ApplyConfig = function()
 			end
 		end
 		local function OnPlayerLeave(dwID)
-			if Navigator_Remove then
+			if MY_ToolBox.bFriendHeadTipNav and Navigator_Remove then
 				Navigator_Remove("MY_FRIEND_TIP." .. dwID)
 			else
 				local sha = hShaList:Lookup(tostring(dwID))
@@ -80,13 +87,13 @@ MY_ToolBox.ApplyConfig = function()
 		MY.RegisterEvent("DELETE_FELLOWSHIP.MY_FRIEND_TIP")
 		MY.RegisterEvent("PLAYER_FELLOWSHIP_UPDATE.MY_FRIEND_TIP")
 		MY.RegisterEvent("PLAYER_FELLOWSHIP_CHANGE.MY_FRIEND_TIP")
-		if Navigator_Remove then
-			Navigator_Remove("MY_FRIEND_TIP")
-		end
 		XGUI.GetShadowHandle("MY_FriendHeadTip"):Hide()
 	end
 	
 	-- 帮会成员高亮
+	if Navigator_Remove then
+		Navigator_Remove("MY_GUILDMEMBER_TIP")
+	end
 	if MY_ToolBox.bTongMemberHeadTip then
 		local hShaList = XGUI.GetShadowHandle("MY_TongMemberHeadTip")
 		if not hShaList.freeShadows then
@@ -108,7 +115,7 @@ MY_ToolBox.ApplyConfig = function()
 				MY.DelayCall(500, function() OnPlayerEnter(dwID, nRetryCount + 1) end)
 				return
 			end
-			if Navigator_SetID then
+			if MY_ToolBox.bTongMemberHeadTipNav and Navigator_SetID then
 				Navigator_SetID("MY_GUILDMEMBER_TIP." .. dwID, TARGET.PLAYER, dwID, tar.szName)
 			else
 				local sha = hShaList:Lookup(tostring(dwID))
@@ -125,7 +132,7 @@ MY_ToolBox.ApplyConfig = function()
 			end
 		end
 		local function OnPlayerLeave(dwID)
-			if Navigator_Remove then
+			if MY_ToolBox.bTongMemberHeadTipNav and Navigator_Remove then
 				Navigator_Remove("MY_GUILDMEMBER_TIP." .. dwID)
 			else
 				local sha = hShaList:Lookup(tostring(dwID))
@@ -143,9 +150,6 @@ MY_ToolBox.ApplyConfig = function()
 	else
 		MY.RegisterEvent("PLAYER_ENTER_SCENE.MY_GUILDMEMBER_TIP")
 		MY.RegisterEvent("PLAYER_LEAVE_SCENE.MY_GUILDMEMBER_TIP")
-		if Navigator_Remove then
-			Navigator_Remove("MY_GUILDMEMBER_TIP")
-		end
 		XGUI.GetShadowHandle("MY_TongMemberHeadTip"):Hide()
 	end
 	
@@ -508,15 +512,33 @@ function PS.OnPanelActive(wnd)
   			MY_ToolBox.ApplyConfig()
   		end,
   	})
+  	ui:append("WndCheckBox", {
+  		x = x + 180, y = y, w = 180,
+  		text = _L['friend headtop tips nav'],
+  		checked = MY_ToolBox.bFriendHeadTipNav,
+  		oncheck = function(bCheck)
+  			MY_ToolBox.bFriendHeadTipNav = not MY_ToolBox.bFriendHeadTipNav
+  			MY_ToolBox.ApplyConfig()
+  		end,
+  	})
   	y = y + 30
 	
-	-- 好友高亮
+	-- 帮会高亮
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = 180,
 		text = _L['tong member headtop tips'],
 		checked = MY_ToolBox.bTongMemberHeadTip,
 		oncheck = function(bCheck)
 			MY_ToolBox.bTongMemberHeadTip = not MY_ToolBox.bTongMemberHeadTip
+			MY_ToolBox.ApplyConfig()
+		end,
+	})
+	ui:append("WndCheckBox", {
+		x = x + 180, y = y, w = 180,
+		text = _L['tong member headtop tips nav'],
+		checked = MY_ToolBox.bTongMemberHeadTipNav,
+		oncheck = function(bCheck)
+			MY_ToolBox.bTongMemberHeadTipNav = not MY_ToolBox.bTongMemberHeadTipNav
 			MY_ToolBox.ApplyConfig()
 		end,
 	})
