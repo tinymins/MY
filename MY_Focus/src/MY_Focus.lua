@@ -3,8 +3,8 @@
 -- @Author: ÜøÒÁ @ Ë«ÃÎÕò @ Ý¶»¨¹¬
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
--- @Last modified by:   tinymins
--- @Last modified time: 2016-05-30 18:56:48
+-- @Last modified by:   Zhai Yiming
+-- @Last modified time: 2016-06-06 20:51:46
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Focus/lang/")
 local _C = {}
@@ -365,6 +365,9 @@ function MY_Focus.AddFocus(dwType, dwID, szName)
 		end
 	end
 	if not nIndex then
+		if Navigator_SetID then
+			Navigator_SetID("MY_FOCUS." .. dwType .. "_" .. dwID, dwType, dwID)
+		end
 		table.insert(_C.tFocusList, {dwType = dwType, dwID = dwID, szName = szName})
 		nIndex = #_C.tFocusList
 	end
@@ -393,6 +396,9 @@ function MY_Focus.DelFocus(dwType, dwID)
 		if p then
 			MY_Focus.DrawFocus(p.dwType, p.dwID)
 		end
+	end
+	if Navigator_Remove then
+		Navigator_Remove("MY_FOCUS." .. dwType .. "_" .. dwID)
 	end
 	-- É¾³ýËø¶¨
 	if _C.dwLockType == dwType and _C.dwLockID == dwID then
