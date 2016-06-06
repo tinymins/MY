@@ -15,6 +15,7 @@ data = {
     ['show focus\'s target'] = '顯示目標的目標',
     ['hide dead object'    ] = '隱藏重傷的目標',
     ['display kungfu icon instead of location'] = '顯示內功心法圖標',
+    ['enable scene navi'] = '啓用場景目標追蹤',
     
     ['auto focus'              ] = '啓用默認焦點',
     ['add auto focus'          ] = '添加默認焦點',
