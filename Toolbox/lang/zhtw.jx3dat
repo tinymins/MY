@@ -1,5 +1,4 @@
 -- language data (zhtw) updated at 2014-4-10 03:38:11
-DEAR_S = '親愛的詩詩，你已登入遊戲兩分鍾～可以解除鎖密保鎖了愛你麽麽哒（づ￣３￣）づ～'
 data = {
     -- MY_Toolbox.lua
     ['toolbox'] = '常用工具',
@@ -99,14 +98,12 @@ data = {
     },
     
     ['You have been loged in for 2min, you can unlock bag locker now.'] = '你已登入遊戲兩分鍾，可以愉快的解除密保鎖啦！',
-    LOCK_TIP = {
-        ["198158383605035871"] = DEAR_S,
-        ["432345564233593240"] = DEAR_S,
-        ["342273571683338182"] = DEAR_S,
-    },
+    LOCK_TIP = {},
     
     ['Warning: Bigwar has been finished but not handed yet!'] = '茗伊提示：大戰還沒交！',
     
     ['show changge shadow headtop index'] = '顯示長歌影子頭頂釋放次序',
+    ['show distance'] = '顯示距離',
+    ['scale: %d%%.'] = '縮放: %d%%',
     ['changge force only'] = '僅長歌可用',
 }
