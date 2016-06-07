@@ -102,8 +102,9 @@ data = {
     
     ['Warning: Bigwar has been finished but not handed yet!'] = '茗伊提示：大战还没交！',
     
-    ['show changge shadow headtop index'] = '显示长歌影子头顶释放次序',
+    ['show changge shadow index'] = '显示长歌影子次序',
     ['show distance'] = '显示距离',
+    ['show countdown'] = '显示时间',
     ['scale: %d%%.'] = '缩放: %d%%',
     ['changge force only'] = '仅长歌可用',
 }

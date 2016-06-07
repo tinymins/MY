@@ -4,7 +4,7 @@
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-06-07 17:17:43
+-- @Last modified time: 2016-06-07 17:35:35
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = {}
@@ -26,6 +26,8 @@ MY_ToolBox.bChangGeShadow = false
 RegisterCustomData("MY_ToolBox.bChangGeShadow")
 MY_ToolBox.bChangGeShadowDis = false
 RegisterCustomData("MY_ToolBox.bChangGeShadowDis")
+MY_ToolBox.bChangGeShadowCD = false
+RegisterCustomData("MY_ToolBox.bChangGeShadowCD")
 MY_ToolBox.fChangeGeShadowScale = 1.5
 RegisterCustomData("MY_ToolBox.fChangeGeShadowScale")
 MY_ToolBox.ApplyConfig = function()
@@ -287,10 +289,12 @@ MY_ToolBox.ApplyConfig = function()
 	
 	-- 长歌影子头顶次序
 	if MY_ToolBox.bChangGeShadow then
-		local hList, hItem, nCount, sha, r, g, b, nDis, szText
+		local MAX_LIMIT_TIME = 25
+		local hList, hItem, nCount, sha, r, g, b, nDis, szText, fPer
 		local hShaList = XGUI.GetShadowHandle("MY_ChangGeShadow")
 		local MAX_SHADOW_COUNT = 10
-		MY.BreatheCall("CHANGGE_SHADOW", MY_ToolBox.bChangGeShadowDis and 50 or 400, function()
+		local nInterval = (MY_ToolBox.bChangGeShadowDis or MY_ToolBox.bChangGeShadowCD) and 50 or 400
+		MY.BreatheCall("CHANGGE_SHADOW", nInterval, function()
 			local frame = Station.Lookup("Lowest1/ChangGeShadow")
 			if not frame then
 				if nCount and nCount > 0 then
@@ -323,9 +327,13 @@ MY_ToolBox.ApplyConfig = function()
 						r, g, b = 63, 255, 31
 					end
 				end
+				fPer = hItem:Lookup("Image_CD"):GetPercentage()
 				szText = tostring(i + 1)
 				if MY_ToolBox.bChangGeShadowDis and nDis >= 0 then
 					szText = szText .. g_tStrings.STR_CONNECT .. KeepOneByteFloat(nDis) .. g_tStrings.STR_METER
+				end
+				if MY_ToolBox.bChangGeShadowCD then
+					szText = szText .. g_tStrings.STR_CONNECT .. math.floor(fPer * MAX_LIMIT_TIME) .. "'"
 				end
 				sha:Show()
 				sha:ClearTriangleFanPoint()
@@ -621,8 +629,8 @@ function PS.OnPanelActive(wnd)
 	
 	-- 长歌影子顺序
 	ui:append("WndCheckBox", {
-		x = x, y = y, w = 200,
-		text = _L['show changge shadow headtop index'],
+		x = x, y = y, w = 150,
+		text = _L['show changge shadow index'],
 		checked = MY_ToolBox.bChangGeShadow,
 		oncheck = function(bChecked)
 			MY_ToolBox.bChangGeShadow = bChecked
@@ -640,7 +648,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	ui:append("WndCheckBox", {
-		x = x + 200, y = y, w = 100,
+		x = x + 150, y = y, w = 100,
 		text = _L['show distance'],
 		checked = MY_ToolBox.bChangGeShadowDis,
 		oncheck = function(bChecked)
@@ -658,8 +666,27 @@ function PS.OnPanelActive(wnd)
 			return me and me.dwForceID == FORCE_TYPE.CHANG_GE
 		end,
 	})
+	ui:append("WndCheckBox", {
+		x = x + 250, y = y, w = 100,
+		text = _L['show countdown'],
+		checked = MY_ToolBox.bChangGeShadowCD,
+		oncheck = function(bChecked)
+			MY_ToolBox.bChangGeShadowCD = bChecked
+			MY_ToolBox.ApplyConfig()
+		end,
+		tip = function(self)
+			if not self:enable() then
+				return _L['changge force only']
+			end
+		end,
+		tippos = ALW.TOP_BOTTOM,
+		autoenable = function()
+			local me = GetClientPlayer()
+			return me and me.dwForceID == FORCE_TYPE.CHANG_GE
+		end,
+	})
 	ui:append("WndSliderBox", {
-		x = x + 300, y = y, w = 150,
+		x = x + 350, y = y, w = 150,
 		textfmt = function(val) return _L("scale: %d%%.", val) end,
 		range = {10, 800},
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
