@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-06-07 18:07:28
+-- @Last modified time: 2016-06-07 18:14:05
 -----------------------------------------------
 
 -------------------------------------
@@ -1100,7 +1100,7 @@ function XGUI:enable(...)
 			local x = ele.chk or ele.wnd or ele.raw
 			if x and x.Enable then
 				if type(bEnable) == "function" then
-					MY.BreatheCall("XGUI_ENABLE_CHECK#" .. XGUI.GetTreePath(x), function()
+					MY.BreatheCall("XGUI_ENABLE_CHECK#" .. tostring(x), function()
 						if x and x.IsValid and x:IsValid() then
 							SetEleEnable(x, ele, bEnable())
 						else
@@ -1671,7 +1671,7 @@ function XGUI:fadeTo(nTime, nOpacity, callback)
 				return ( nEnd - nStart ) * nDuringTime / nTotalTime + nStart -- 线性模型
 			end
 			if not ele:visible() then ele:alpha(0):toggle(true) end
-			MY.BreatheCall("MY_FADE_" .. XGUI.GetTreePath(ele:raw(1)), function()
+			MY.BreatheCall("MY_FADE_" .. tostring(ele:raw(1)), function()
 				ele:show()
 				local nCurrentAlpha = fnCurrent(nStartAlpha, nOpacity, nTime, GetTime()-nStartTime)
 				ele:alpha(nCurrentAlpha)
@@ -1943,7 +1943,7 @@ function XGUI:shake(xrange, yrange, maxspeed, time)
 		for _, ele in pairs(self.eles) do
 			local ui = XGUI(ele.raw)
 			local xoffset, yoffset = 0, 0
-			MY.RenderCall(XGUI.GetTreePath(ele.raw) .. " shake", function()
+			MY.RenderCall(tostring(ele.raw) .. " shake", function()
 				if ui:count() == 0 then
 					return 0
 				elseif GetTime() - starttime < time then
@@ -1978,7 +1978,7 @@ function XGUI:shake(xrange, yrange, maxspeed, time)
 		end
 	else
 		for _, ele in pairs(self.eles) do
-			MY.RenderCall(XGUI.GetTreePath(ele.raw) .. " shake", false)
+			MY.RenderCall(tostring(ele.raw) .. " shake", false)
 		end
 	end
 end
