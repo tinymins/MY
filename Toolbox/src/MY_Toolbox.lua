@@ -4,7 +4,7 @@
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-06-06 21:29:37
+-- @Last modified time: 2016-06-07 17:17:43
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = {}
@@ -24,6 +24,10 @@ MY_ToolBox.bJJCAutoSwitchTalkChannel = true
 RegisterCustomData("MY_ToolBox.bJJCAutoSwitchTalkChannel")
 MY_ToolBox.bChangGeShadow = false
 RegisterCustomData("MY_ToolBox.bChangGeShadow")
+MY_ToolBox.bChangGeShadowDis = false
+RegisterCustomData("MY_ToolBox.bChangGeShadowDis")
+MY_ToolBox.fChangeGeShadowScale = 1.5
+RegisterCustomData("MY_ToolBox.fChangeGeShadowScale")
 MY_ToolBox.ApplyConfig = function()
 	-- 好友高亮
 	if Navigator_Remove then
@@ -283,10 +287,10 @@ MY_ToolBox.ApplyConfig = function()
 	
 	-- 长歌影子头顶次序
 	if MY_ToolBox.bChangGeShadow then
-		local hList, hItem, nCount, sha, r, g, b
+		local hList, hItem, nCount, sha, r, g, b, nDis, szText
 		local hShaList = XGUI.GetShadowHandle("MY_ChangGeShadow")
 		local MAX_SHADOW_COUNT = 10
-		MY.BreatheCall("CHANGGE_SHADOW", 500, function()
+		MY.BreatheCall("CHANGGE_SHADOW", MY_ToolBox.bChangGeShadowDis and 50 or 400, function()
 			local frame = Station.Lookup("Lowest1/ChangGeShadow")
 			if not frame then
 				if nCount and nCount > 0 then
@@ -309,15 +313,24 @@ MY_ToolBox.ApplyConfig = function()
 					hShaList:AppendItemFromString("<shadow></shadow>")
 					sha = hShaList:Lookup(i)
 				end
+				nDis = GetCharacterDistance(UI_GetClientPlayerID(), hItem.nNpcID) / 64
 				if hItem.szState == "disable" then
 					r, g, b = 191, 31, 31
 				else
-					r, g, b = 63, 255, 31
+					if nDis > 25 then
+						r, g, b = 255, 255, 31
+					else
+						r, g, b = 63, 255, 31
+					end
+				end
+				szText = tostring(i + 1)
+				if MY_ToolBox.bChangGeShadowDis and nDis >= 0 then
+					szText = szText .. g_tStrings.STR_CONNECT .. KeepOneByteFloat(nDis) .. g_tStrings.STR_METER
 				end
 				sha:Show()
 				sha:ClearTriangleFanPoint()
 				sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
-				sha:AppendCharacterID(hItem.nNpcID, true, r, g, b, 200, 0, 40, tostring(i + 1), 0, 1.5)
+				sha:AppendCharacterID(hItem.nNpcID, true, r, g, b, 200, 0, 40, szText, 0, MY_ToolBox.fChangeGeShadowScale)
 			end
 			for i = nCount, MAX_SHADOW_COUNT do
 				sha = hShaList:Lookup(i)
@@ -608,7 +621,7 @@ function PS.OnPanelActive(wnd)
 	
 	-- 长歌影子顺序
 	ui:append("WndCheckBox", {
-		x = x, y = y, w = 300,
+		x = x, y = y, w = 200,
 		text = _L['show changge shadow headtop index'],
 		checked = MY_ToolBox.bChangGeShadow,
 		oncheck = function(bChecked)
@@ -621,6 +634,39 @@ function PS.OnPanelActive(wnd)
 			end
 		end,
 		tippos = ALW.TOP_BOTTOM,
+		autoenable = function()
+			local me = GetClientPlayer()
+			return me and me.dwForceID == FORCE_TYPE.CHANG_GE
+		end,
+	})
+	ui:append("WndCheckBox", {
+		x = x + 200, y = y, w = 100,
+		text = _L['show distance'],
+		checked = MY_ToolBox.bChangGeShadowDis,
+		oncheck = function(bChecked)
+			MY_ToolBox.bChangGeShadowDis = bChecked
+			MY_ToolBox.ApplyConfig()
+		end,
+		tip = function(self)
+			if not self:enable() then
+				return _L['changge force only']
+			end
+		end,
+		tippos = ALW.TOP_BOTTOM,
+		autoenable = function()
+			local me = GetClientPlayer()
+			return me and me.dwForceID == FORCE_TYPE.CHANG_GE
+		end,
+	})
+	ui:append("WndSliderBox", {
+		x = x + 300, y = y, w = 150,
+		textfmt = function(val) return _L("scale: %d%%.", val) end,
+		range = {10, 800},
+		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		value = MY_ToolBox.fChangeGeShadowScale * 100,
+		onchange = function(raw, val)
+			MY_ToolBox.fChangeGeShadowScale = val / 100
+		end,
 		autoenable = function()
 			local me = GetClientPlayer()
 			return me and me.dwForceID == FORCE_TYPE.CHANG_GE
