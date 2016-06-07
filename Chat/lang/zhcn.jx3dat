@@ -21,23 +21,11 @@ data = {
     
     ['chat helper'] = '聊天助手',
     ['chat switch'] = '频道切换',
-    ['chat log'] = '聊天记录',
     ['Max log: %d'] = '最大记录：%d',
     
     ['clear chat panel'] = '清空聊天栏',
     ["Are you sure you want to clear current message panel?\nPress CTRL when click can clear without alert.\nPress ALT when click can clear all window."] = "你确定要清空当前聊天栏消息吗？\n按住CTRL点击可以跳过该警告。\n按住ALT点击可以清空所有聊天栏。",
     ["Are you sure you want to clear all message panel?"] = "你确定要清空所有聊天栏消息吗？",
-    
-    ['filter tong online message'] = '过滤帮会上线公告提示',
-    ['filter tong member log message'] = '过滤帮会成员上线提示',
-    ['rebuild date list'] = '重建日期索引',
-    ['export chatlog'] = '导出聊天记录',
-    ['preparing'] = '准备中',
-    ['Export succeed'] = '导出完成！',
-    ['Already exporting, please wait.'] = '聊天记录正在导出中，请稍后。',
-    ['Error: open file error %s [%s]'] = '打开文件%s失败：[%s]',
-    ['Chatlog export succeed, file saved as %s'] = '聊天记录导出成功：%s',
-    ['Exporting chatlog: %s, %.2f%%.'] = '聊天记录导出 - %s - %.2f%%',
     
     ['about...'] = '关于',
     ['display panel'] = '显示聊天频道快速切换面板',

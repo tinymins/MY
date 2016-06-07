@@ -1,0 +1,16 @@
+-- language data (zhtw) updated at 2014-4-10 03:38:11
+data = {
+    ['chat log'] = '聊天記錄',
+    ['filter tong online message'] = '過濾幫會上線公告提示',
+    ['filter tong member log message'] = '過濾幫會成員上線提示',
+    ['rebuild date list'] = '重建日期索引',
+    ['export chatlog'] = '導出聊天記錄',
+    ['preparing'] = '准備中',
+    ['Export succeed'] = '導出完成！',
+    ['Already exporting, please wait.'] = '聊天記錄正在導出中，請稍後。',
+    ['Error: open file error %s [%s]'] = '打開文件%s失敗：[%s]',
+    ['Chatlog export succeed, file saved as %s'] = '聊天記錄導出成功：%s',
+    ['Exporting chatlog: %s, %.2f%%.'] = '聊天記錄導出 - %s - %.2f%%',
+    ['hide blockwords'] = '關鍵字屏蔽',
+    ['edit'] = '編輯',
+}

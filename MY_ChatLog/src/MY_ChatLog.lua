@@ -17,7 +17,7 @@ local floor, mmin, mmax, mceil = math.floor, math.min, math.max, math.ceil
 local GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID = GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID
 local setmetatable = setmetatable
 
-local _L  = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Chat/lang/")
+local _L  = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_ChatLog/lang/")
 local _C  = {}
 local Log = {}
 local XML_LINE_BREAKER = XML_LINE_BREAKER
