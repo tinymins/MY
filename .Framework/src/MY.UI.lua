@@ -3,8 +3,8 @@
 -- @Author: µÔÒ»Ãù @tinymins
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
--- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-11-12 11:16:32
+-- @Last modified by:   Zhai Yiming
+-- @Last modified time: 2016-06-07 18:07:28
 -----------------------------------------------
 
 -------------------------------------
@@ -1077,6 +1077,20 @@ function XGUI:visible(bVisiable)
 end
 
 -- enable or disable elements
+do
+local function SetEleEnable(x, ele, bEnable)
+	if x.IsEnabled and (not x:IsEnabled()) ~= (not bEnable) then
+		if ele.txt then
+			local r, g, b = ele.txt:GetFontColor()
+			if bEnable then
+				ele.txt:SetFontColor(mmin(mceil(r * 2.2), 255), mmin(mceil(g * 2.2), 255), mmin(mceil(b * 2.2), 255))
+			else
+				ele.txt:SetFontColor(mmin(mceil(r / 2.2), 255), mmin(mceil(g / 2.2), 255), mmin(mceil(b / 2.2), 255))
+			end
+		end
+	end
+	x:Enable(bEnable and true or false)
+end
 function XGUI:enable(...)
 	self:_checksum()
 	local argc = select("#", ...)
@@ -1088,13 +1102,13 @@ function XGUI:enable(...)
 				if type(bEnable) == "function" then
 					MY.BreatheCall("XGUI_ENABLE_CHECK#" .. XGUI.GetTreePath(x), function()
 						if x and x.IsValid and x:IsValid() then
-							x:Enable(bEnable() and true or false)
+							SetEleEnable(x, ele, bEnable())
 						else
 							return 0
 						end
 					end)
 				else
-					x:Enable(bEnable and true or false)
+					SetEleEnable(x, ele, bEnable)
 				end
 			end
 		end
@@ -1105,6 +1119,7 @@ function XGUI:enable(...)
 			return ele.raw:IsEnabled()
 		end
 	end
+end
 end
 
 -- show/hide eles
