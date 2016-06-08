@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-06-07 18:14:05
+-- @Last modified time: 2016-06-08 10:23:24
 -----------------------------------------------
 
 -------------------------------------
@@ -1802,7 +1802,11 @@ function XGUI:color(r, g, b)
 			end
 			local x = ele.edt or ele.txt
 			if x and x.SetFontColor then
-				x:SetFontColor(r, g, b)
+				if x.IsEnabled and not x:IsEnabled() then
+					x:SetFontColor(r / 2.2, g / 2.2, b / 2.2)
+				else
+					x:SetFontColor(r, g, b)
+				end
 			end
 		end
 		return self
