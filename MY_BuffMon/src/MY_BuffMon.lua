@@ -161,7 +161,7 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers, b
 				local tItems = hFrame.tItem[szName .. buff.dwID] or hFrame.tItem[szName]
 				if tItems then
 					for hItem, _ in pairs(tItems) do
-						if not (hItem.mon[4] and hItem.mon[4] ~= buff.dwID) then
+						if not hItem.mon[4] or hItem.mon[4] == -1 or hItem.mon[4] == buff.dwID then
 							if bHideVoidBuff and not hItem:IsVisible() then
 								_needFormatItemPos = true
 								hItem:Show()
@@ -188,7 +188,9 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers, b
 								hItem.dwIcon = Table_GetBuffIconID(buff.dwID, buff.nLevel)
 								hBox:SetObjectIcon(hItem.dwIcon)
 								hItem.mon[2] = hItem.dwIcon
-								hItem.mon[4] = buff.dwID
+								if hItem.mon[4] ~= -1 then
+									hItem.mon[4] = buff.dwID
+								end
 							end
 							
 							if hItem.hProcessTxt then
@@ -231,6 +233,9 @@ local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers, b
 						end
 						if not hItem.mon[5] then
 							hItem.mon[5] = {}
+						end
+						if not hItem.mon[5][-1] then
+							hItem.mon[5][-1] = Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13
 						end
 						if not hItem.mon[5][buff.dwID] then
 							hItem.mon[5][buff.dwID] = Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13
@@ -516,13 +521,14 @@ local function GenePS(ui, OBJ, x, y, w, h)
 						nMiniWidth = 120,
 					}
 					if mon[5] then
-						for dwID, dwIcon in pairs(mon[5]) do
+						do
+							local dwID, dwIcon = -1, mon[5][-1] or 13
 							table.insert(t1, {
-								szOption = dwID,
+								szOption = _L['all buffid'],
 								bCheck = true, bMCheck = true,
 								bChecked = dwID == mon[4],
 								fnAction = function()
-									mon[2] = dwIcon or 13
+									mon[2] = dwIcon
 									mon[4] = dwID
 									OBJ.Reload()
 								end,
@@ -532,6 +538,25 @@ local function GenePS(ui, OBJ, x, y, w, h)
 								nIconHeight = 22,
 								szLayer = "ICON_RIGHTMOST",
 							})
+						end
+						for dwID, dwIcon in pairs(mon[5]) do
+							if dwID ~= -1 then
+								table.insert(t1, {
+									szOption = dwID,
+									bCheck = true, bMCheck = true,
+									bChecked = dwID == mon[4],
+									fnAction = function()
+										mon[2] = dwIcon or 13
+										mon[4] = dwID
+										OBJ.Reload()
+									end,
+									szIcon = "fromiconid",
+									nFrame = dwIcon or 13,
+									nIconWidth = 22,
+									nIconHeight = 22,
+									szLayer = "ICON_RIGHTMOST",
+								})
+							end
 						end
 					end
 					table.insert(t, t1)
