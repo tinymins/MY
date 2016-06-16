@@ -17,4 +17,5 @@ data = {
     ['show cd bar'] = '倒计时条',
     ['show buff name'] = 'BUFF名称',
     ['hide void buff'] = '隐藏已消失BUFF',
+    ['all buffid'] = '监控全部',
 }
