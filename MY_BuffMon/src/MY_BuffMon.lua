@@ -526,7 +526,7 @@ local function GenePS(ui, OBJ, x, y, w, h)
 							table.insert(t1, {
 								szOption = _L['all buffid'],
 								bCheck = true, bMCheck = true,
-								bChecked = dwID == mon[4],
+								bChecked = mon[4] == nil or dwID == mon[4],
 								fnAction = function()
 									mon[2] = dwIcon
 									mon[4] = dwID
