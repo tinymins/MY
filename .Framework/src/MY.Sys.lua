@@ -3,8 +3,8 @@
 -- @Author: 茗伊 @双梦镇 @追风蹑影
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
--- @Last modified by:   tinymins
--- @Last modified time: 2016-05-16 21:26:44
+-- @Last modified by:   Zhai Yiming
+-- @Last modified time: 2016-05-28 21:56:16
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 local srep, tostring, string2byte = string.rep, tostring, string.byte
@@ -236,26 +236,22 @@ local function pcall_this(context, fn, ...)
 end
 
 local l_tAjax = {}
+local l_ajaxsettingsmeta = {
+	__index = {
+		ssl = false,
+		timeout = 10000,
+		success = function(settings, html)
+			MY.Debug({settings.url .. ' - SUCCESS'}, 'RemoteRequest', MY_DEBUG.LOG)
+		end,
+		error = function(settings, errMsg)
+			MY.Debug({settings.url .. ' - ' .. errMsg}, 'RemoteRequest', MY_DEBUG.WARNING)
+		end,
+		charset = "utf8",
+	}
+}
 function MY.Ajax(settings)
 	assert(settings and settings.url)
-	
-	if type(settings.ssl) ~= "boolean" then
-		settings.ssl = false
-	end
-	if type(settings.timeout) ~= "number" then
-		settings.timeout = 10000
-	end
-	if type(settings.success) ~= "function" then
-		settings.success = function(settings, html)
-			MY.Debug({settings.url .. ' - SUCCESS'}, 'RemoteRequest', MY_DEBUG.LOG)
-		end
-	end
-	if type(settings.error) ~= "function" then
-		settings.error = function(settings, errMsg)
-			MY.Debug({settings.url .. ' - ' .. errMsg}, 'RemoteRequest', MY_DEBUG.WARNING)
-		end
-	end
-	settings.charset = settings.charset or "utf8"
+	setmetatable(settings, l_ajaxsettingsmeta)
 	
 	local szKey = GetTickCount() * 100
 	while l_tAjax["MYAJAX" .. szKey] do
