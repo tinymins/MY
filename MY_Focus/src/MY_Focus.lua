@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-06-06 21:35:27
+-- @Last modified time: 2016-07-12 19:37:18
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Focus/lang/")
 local _C = {}
@@ -367,9 +367,6 @@ function MY_Focus.AddFocus(dwType, dwID, szName)
 		end
 	end
 	if not nIndex then
-		if MY_Focus.bEnableSceneNavi and Navigator_SetID then
-			Navigator_SetID("MY_FOCUS." .. dwType .. "_" .. dwID, dwType, dwID, szName)
-		end
 		table.insert(_C.tFocusList, {dwType = dwType, dwID = dwID, szName = szName})
 		nIndex = #_C.tFocusList
 	end
@@ -398,9 +395,6 @@ function MY_Focus.DelFocus(dwType, dwID)
 		if p then
 			MY_Focus.DrawFocus(p.dwType, p.dwID)
 		end
-	end
-	if MY_Focus.bEnableSceneNavi and Navigator_Remove then
-		Navigator_Remove("MY_FOCUS." .. dwType .. "_" .. dwID)
 	end
 	-- 删除锁定
 	if _C.dwLockType == dwType and _C.dwLockID == dwID then
@@ -460,7 +454,11 @@ function MY_Focus.UpdateList()
 	local hList = Station.Lookup('Normal/MY_Focus', 'Handle_List')
 	if hList then
 		for i = hList:GetItemCount() - 1, 0, -1 do
-			if not tNames[hList:Lookup(i):GetName()] then
+			local szKey = hList:Lookup(i):GetName()
+			if not tNames[szKey] then
+				if MY_Focus.bEnableSceneNavi and Navigator_Remove then
+					Navigator_Remove("MY_FOCUS." .. szKey:sub(3))
+				end
 				hList:RemoveItem(i)
 			end
 		end
@@ -471,6 +469,7 @@ end
 -- 绘制指定的焦点Handle（没有则添加创建）
 function MY_Focus.DrawFocus(dwType, dwID)
 	local obj, info, bInfo = MY.Game.GetObject(dwType, dwID)
+	local szName = MY.Game.GetObjectName(obj)
 	local hList = Station.Lookup('Normal/MY_Focus', 'Handle_List')
 	local player = GetClientPlayer()
 	if not (obj and hList) then
@@ -479,6 +478,9 @@ function MY_Focus.DrawFocus(dwType, dwID)
 
 	local hItem = MY_Focus.GetHandle(dwType, dwID)
 	if not hItem then
+		if MY_Focus.bEnableSceneNavi and Navigator_SetID then
+			Navigator_SetID("MY_FOCUS." .. dwType .. "_" .. dwID, dwType, dwID, szName)
+		end
 		hItem = hList:AppendItemFromIni(_C.szIniFile, 'Handle_Info')
 		hItem:Scale(MY_Focus.fScaleX, MY_Focus.fScaleY)
 		hItem:SetName('HI_'..dwType..'_'..dwID)
@@ -596,7 +598,7 @@ function MY_Focus.DrawFocus(dwType, dwID)
 	end
 	---------- 右侧 ----------
 	-- 名字
-	hItem:Lookup('Handle_LMN/Text_Name'):SetText(MY.Game.GetObjectName(obj) or obj.dwID)
+	hItem:Lookup('Handle_LMN/Text_Name'):SetText(szName or obj.dwID)
 	-- 血量
 	if dwType ~= TARGET.DOODAD then
 		local nCurrentLife, nMaxLife = info.nCurrentLife, info.nMaxLife
