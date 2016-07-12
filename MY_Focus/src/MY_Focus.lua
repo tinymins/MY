@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-07-12 19:37:18
+-- @Last modified time: 2016-07-12 20:00:56
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Focus/lang/")
 local _C = {}
@@ -457,7 +457,7 @@ function MY_Focus.UpdateList()
 			local szKey = hList:Lookup(i):GetName()
 			if not tNames[szKey] then
 				if MY_Focus.bEnableSceneNavi and Navigator_Remove then
-					Navigator_Remove("MY_FOCUS." .. szKey:sub(3))
+					Navigator_Remove("MY_FOCUS." .. szKey:sub(4))
 				end
 				hList:RemoveItem(i)
 			end
