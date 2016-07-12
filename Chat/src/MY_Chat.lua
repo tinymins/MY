@@ -3,8 +3,8 @@
 -- @Author: 翟一鸣 @tinymins
 -- @Date  : 2016-02-5 11:35:53
 -- @Email : admin@derzh.com
--- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-08-19 10:33:04
+-- @Last modified by:   Zhai Yiming
+-- @Last modified time: 2016-07-12 16:37:10
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Chat/lang/")
 MY_Chat = {}
@@ -29,7 +29,7 @@ local function LoadBlockWords()
 	MY_Chat.tBlockWords = MY.LoadLUAData('config/MY_CHAT/blockwords.$lang.jx3dat') or MY_Chat.tBlockWords
 	for i, bw in ipairs(MY_Chat.tBlockWords) do
 		if type(bw) == "string" then
-			MY_Chat.tBlockWords[i] = {bw, {ALL = true}}
+			MY_Chat.tBlockWords[i] = {bw, {ALL = true}, true}
 		end
 	end
 end
@@ -46,6 +46,7 @@ MY.RegisterEvent("MY_PRIVATE_STORAGE_UPDATE", function()
 end)
 MY.RegisterInit('MY_CHAT_BW', LoadBlockWords)
 
+local tNoneSpaceBlockWords = {}
 function MY_Chat.MatchBlockWord(szMsg, szChannel, bRichText)
 	if bRichText then
 		szMsg = GetPureText(szMsg)
@@ -53,10 +54,21 @@ function MY_Chat.MatchBlockWord(szMsg, szChannel, bRichText)
 	if szChannel then
 		szMsg = "[" .. g_tStrings.tChannelName[szChannel] .. "]" .. szMsg
 	end
+	local szNoneSpaceMsg = StringReplaceW(StringReplaceW(szMsg, " ", ""), g_tStrings.STR_ONE_CHINESE_SPACE, "")
 	for _, bw in ipairs(MY_Chat.tBlockWords) do
-		if bw[2].ALL ~= bw[2][szChannel]
-		and MY.String.SimpleMatch(szMsg, bw[1]) then
-			return true
+		if bw[2].ALL ~= bw[2][szChannel] then
+			if bw[3] then
+				if not tNoneSpaceBlockWords[bw[1]] then
+					tNoneSpaceBlockWords[bw[1]] = StringReplaceW(StringReplaceW(bw[1], " ", ""), g_tStrings.STR_ONE_CHINESE_SPACE, "")
+				end
+				if MY.String.SimpleMatch(szNoneSpaceMsg, tNoneSpaceBlockWords[bw[1]]) then
+					return true
+				end
+			else
+				if MY.String.SimpleMatch(szMsg, bw[1]) then
+					return true
+				end
+			end
 		end
 	end
 end
@@ -152,16 +164,17 @@ function PS.OnPanelActive(wnd)
 	local list = ui:append("WndListBox", "WndListBox_1"):children('#WndListBox_1'):pos(x, y):size(w, h - 30)
 	-- 初始化list控件
 	for _, v in ipairs(MY_Chat.tBlockWords) do
-		list:listbox('insert', ChatBlock2Text(v[1], v[2]), v[1], v[2])
+		list:listbox('insert', ChatBlock2Text(v[1], v[2]), v[1], v)
 	end
 	list:listbox('onmenu', function(hItem, text, id, data)
+		local chns = data[2]
 		local menu = {
 			szOption = _L['Channels'], {
 				szOption = _L['All channels'],
-				bCheck = true, bChecked = data.ALL,
+				bCheck = true, bChecked = chns.ALL,
 				fnAction = function()
-					data.ALL = not data.ALL
-					XGUI(hItem):text(ChatBlock2Text(id, data))
+					chns.ALL = not chns.ALL
+					XGUI(hItem):text(ChatBlock2Text(id, chns))
 					SaveBlockWords()
 				end,
 			}, MENU_DIVIDER,
@@ -170,14 +183,23 @@ function PS.OnPanelActive(wnd)
 			table.insert(menu, {
 				szOption = g_tStrings.tChannelName[szChannel],
 				rgb = GetMsgFontColor(szChannel, true),
-				bCheck = true, bChecked = data[szChannel],
+				bCheck = true, bChecked = chns[szChannel],
 				fnAction = function()
-					data[szChannel] = not data[szChannel]
-					XGUI(hItem):text(ChatBlock2Text(id, data))
+					chns[szChannel] = not chns[szChannel]
+					XGUI(hItem):text(ChatBlock2Text(id, chns))
 					SaveBlockWords()
 				end,
 			})
 		end
+		table.insert(menu, MENU_DIVIDER)
+		table.insert(menu, {
+			szOption = _L['ignore spaces'],
+			bCheck = true, bChecked = data[3],
+			fnAction = function()
+				data[3] = not data[3]
+				SaveBlockWords()
+			end,
+		})
 		table.insert(menu, MENU_DIVIDER)
 		table.insert(menu, {
 			szOption = _L['delete'],
@@ -220,7 +242,7 @@ function PS.OnPanelActive(wnd)
 	  	table.insert(MY_Chat.tBlockWords, 1, bw)
 	  	SaveBlockWords()
 	  	-- 更新UI
-	  	list:listbox('insert', ChatBlock2Text(bw[1], bw[2]), bw[1], bw[2], 1)
+	  	list:listbox('insert', ChatBlock2Text(bw[1], bw[2]), bw[1], bw, 1)
 	  end)
 	-- del
 	ui:append("WndButton", "WndButton_Del"):children("#WndButton_Del")

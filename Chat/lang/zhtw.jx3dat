@@ -43,6 +43,7 @@ data = {
     ['disabled'] = "已禁用",
     ['Channels'] = "頻道設置",
     [', except:'] = ", 除去:",
+    ['ignore spaces'] = "忽略空格",
     
     ['always show *'] = '總是顯示※號',
     ['always be white'] = '永遠顯示爲白色',
