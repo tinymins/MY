@@ -4,7 +4,7 @@
 -- @Date  : 2015-01-25 15:35:26
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-07-13 10:20:26
+-- @Last modified time: 2016-07-13 14:36:54
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 ------------------------------------------------------------------------
@@ -135,6 +135,25 @@ local function ConvertToUTF8(data)
 	end
 end
 MY.ConvertToUTF8 = ConvertToUTF8
+
+local function ConvertToAnsi(data)
+	if type(data) == "table" then
+		local t = {}
+		for k, v in pairs(data) do
+			if type(k) == "string" then
+				t[ConvertToAnsi(k)] = ConvertToAnsi(v)
+			else
+				t[k] = ConvertToAnsi(v)
+			end
+		end
+		return t
+	elseif type(data) == "string" then
+		return UTF8ToAnsi(data)
+	else
+		return data
+	end
+end
+MY.ConvertToAnsi = ConvertToAnsi
 
 if not UrlEncodeString then
 function UrlEncodeString(szText)
