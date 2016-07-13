@@ -3,8 +3,8 @@
 -- @Author: 茗伊 @双梦镇 @追风蹑影
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
--- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2016-02-02 16:47:34
+-- @Last modified by:   Zhai Yiming
+-- @Last modified time: 2016-07-13 14:32:16
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -329,6 +329,19 @@ function MY.Player.GetTongMemberList(bShowOffLine, szSorter, bAsc)
 	return GetTongClient().GetMemberList(bShowOffLine, szSorter or 'name', bAsc, -1, -1)
 end
 
+function MY.GetTongName(dwTongID)
+	local szTongName
+	if not dwTongID then
+		dwTongID = (GetClientPlayer() or EMPTY_TABLE).dwTongID
+	end
+	if dwTongID and dwTongID ~= 0 then
+		szTongName = GetTongClient().ApplyGetTongName(dwTongID, 253)
+	else
+		szTongName = ""
+	end
+	return szTongName
+end
+
 -- 获取帮会成员
 function MY.Player.GetTongMember(arg0)
 	if not arg0 then
@@ -443,7 +456,6 @@ function MY.Player.IsFighting()
 		return
 	end
 	local bFightState = me.bFightState
-	
 	if not bFightState and MY.Player.IsInArena() and _C.bJJCStart then
 		bFightState = true
 	elseif not bFightState and MY.Player.IsInDungeon() then

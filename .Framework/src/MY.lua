@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-06-04 17:56:59
+-- @Last modified time: 2016-07-13 10:29:18
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- #################################################################################################################################### --
@@ -405,6 +405,10 @@ function MY.GetVersion()
 		szVersion = szVersion .. "b" .. tostring(v%0x100)
 	end
 	return szVersion, v
+end
+
+function MY.IsInitialized()
+	return _MY.bLoaded
 end
 
 --------------------------------------------------------------------------------------------------------------------------------------------

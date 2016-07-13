@@ -3,8 +3,8 @@
 -- @Author: 茗伊 @双梦镇 @追风蹑影
 -- @Date  : 2015-01-25 15:35:26
 -- @Email : admin@derzh.com
--- @Last modified by:   tinymins
--- @Last modified time: 2016-05-16 18:39:18
+-- @Last modified by:   Zhai Yiming
+-- @Last modified time: 2016-07-13 10:20:26
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 ------------------------------------------------------------------------
@@ -84,6 +84,7 @@ end
 function MY.String.SimpleEcrypt(szText)
 	return szText:gsub('.', function (c) return string.format ("%02X", (string.byte(c) + 13) % 256) end):gsub(" ", "+")
 end
+MY.SimpleEcrypt = MY.String.SimpleEcrypt
 
 local function EncodePostData(data, t, prefix)
 	if type(data) == "table" then

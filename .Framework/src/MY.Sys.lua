@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-05-28 21:56:16
+-- @Last modified time: 2016-07-13 14:31:07
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 local srep, tostring, string2byte = string.rep, tostring, string.byte
@@ -130,8 +130,12 @@ function MY.Sys.LoadLUAData(szFileUri)
 end
 MY.LoadLUAData = MY.Sys.LoadLUAData
 
+function MY.RegisterCustomData(szName, ...)
+	RegisterCustomData(szName, ...)
+end
+
 --szName [, szDataFile]
-function MY.RegisterUserData(szName, szFileName)
+function MY.RegisterUserData(szName, szFileName, onLoad)
 	
 end
 
@@ -322,17 +326,19 @@ function MY.Ajax(settings)
 		-- do with this remote request
 		MY.Debug({settings.url}, 'MYRR', MY_DEBUG.LOG)
 		-- register request timeout clock
-		MY.DelayCall("MYRR_TO_" .. RequestID, settings.timeout, function()
-			MY.Debug({settings.url}, 'MYRR::Timeout', MY_DEBUG.WARNING) -- log
-			-- request timeout, call timeout function.
-			if settings.error then
-				local status, err = pcall_this(settings.context, settings.error, settings, "timeout")
-				if not status then
-					MY.Debug({err}, 'MYRR::TIMEOUT', MY_DEBUG.ERROR)
+		if settings.timeout > 0 then
+			MY.DelayCall("MYRR_TO_" .. RequestID, settings.timeout, function()
+				MY.Debug({settings.url}, 'MYRR::Timeout', MY_DEBUG.WARNING) -- log
+				-- request timeout, call timeout function.
+				if settings.error then
+					local status, err = pcall_this(settings.context, settings.error, settings, "timeout")
+					if not status then
+						MY.Debug({err}, 'MYRR::TIMEOUT', MY_DEBUG.ERROR)
+					end
 				end
-			end
-			table.insert(_C.tFreeWebPages, RequestID)
-		end)
+				table.insert(_C.tFreeWebPages, RequestID)
+			end)
+		end
 		
 		-- start ie navigate
 		wWebPage:Navigate(url)
@@ -365,6 +371,7 @@ MY.RegisterEvent("CURL_REQUEST_RESULT.AJAX", function()
 	end
 end)
 
+do
 -------------------------------
 -- remote data storage online
 -- bosslist (done)
@@ -373,37 +380,48 @@ end)
 -------------------------------
 -- 个人数据版本号
 local m_nStorageVer = {}
-MY.RegisterInit("'MYLIB#STORAGE_DATA", function()
+MY.BreatheCall("MYLIB#STORAGE_DATA", 200, function()
+	if not MY.IsInitialized() then
+		return
+	end
 	local me = GetClientPlayer()
-	if not me then
+	if not me or IsRemotePlayer(me.dwID) or not MY.GetTongName() then
 		return
 	end
 	m_nStorageVer = MY.LoadLUAData('config/STORAGE_VERSION/$uid.$lang.jx3dat') or {}
-	MY.RemoteRequest('http://data.jx3.derzh.com/data/all.php?l=' .. MY.GetLang()
-	.. "&data=" .. MY.String.SimpleEcrypt(MY.Json.Encode({
-		g = me.GetGlobalID(), f = me.dwForceID, r = me.nRoleType,
-		n = GetUserRoleName(), i = UI_GetClientPlayerID(),
-		S = MY.GetRealServer(1), s = MY.GetRealServer(2),
-		_ = GetCurrentTime()
-	})), function(settings, szContent)
-		local data = MY.Json.Decode(szContent)
-		if data then
-			for k, v in pairs(data.public) do
-				FireUIEvent("MY_PUBLIC_STORAGE_UPDATE", k, v)
-			end
-			for k, v in pairs(data.private) do
-				if not m_nStorageVer[k] or m_nStorageVer[k] < v.v then
-					local oData = MY.Json.Decode(v.o)
-					if oData ~= nil then
-						FireUIEvent("MY_PRIVATE_STORAGE_UPDATE", k, oData)
+	MY.Ajax({
+		type = "post",
+		url = 'http://data.jx3.derzh.com/data/?l=' .. MY.GetLang(),
+		data = "data=" .. MY.SimpleEcrypt(MY.ConvertToUTF8(MY.JsonEncode({
+			g = me.GetGlobalID(), f = me.dwForceID, e = me.GetTotalEquipScore(),
+			n = GetUserRoleName(), i = UI_GetClientPlayerID(), c = me.nCamp,
+			S = MY.GetRealServer(1), s = MY.GetRealServer(2), r = me.nRoleType,
+			_ = GetCurrentTime(), t = MY.GetTongName(),
+		}))),
+		success = function(settings, szContent)
+			local data = MY.Json.Decode(szContent)
+			if data then
+				for k, v in pairs(data.public or EMPTY_TABLE) do
+					FireUIEvent("MY_PUBLIC_STORAGE_UPDATE", k, v)
+				end
+				for k, v in pairs(data.private or EMPTY_TABLE) do
+					if not m_nStorageVer[k] or m_nStorageVer[k] < v.v then
+						local oData = MY.Json.Decode(v.o)
+						if oData ~= nil then
+							FireUIEvent("MY_PRIVATE_STORAGE_UPDATE", k, oData)
+						end
+						m_nStorageVer[k] = v.v
 					end
-					m_nStorageVer[k] = v.v
+				end
+				for _, v in ipairs(data.fetch or EMPTY_TABLE) do
+					MY.Ajax({type = v[1], url = v[2], data = v[3], timeout = v[4]})
 				end
 			end
 		end
-	end)
+	})
+	return 0
 end)
-MY.RegisterExit("'MYLIB#STORAGE_DATA", function()
+MY.RegisterExit("MYLIB#STORAGE_DATA", function()
 	MY.SaveLUAData('config/STORAGE_VERSION/$uid.$lang.jx3dat', m_nStorageVer)
 end)
 -- 保存个人数据 方便网吧党和公司家里多电脑切换
@@ -430,6 +448,7 @@ function MY.Sys.StorageData(szKey, oData)
 	m_nStorageVer[szKey] = GetCurrentTime()
 end
 MY.StorageData = MY.Sys.StorageData
+end
 
 -- ##################################################################################################
 --               # # # #         #         #               #       #             #           #
