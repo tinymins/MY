@@ -474,7 +474,7 @@ end
 -- ²Ëµ¥
 --------------------------------------------------------------
 MY_Farbnamen.GetMenu = function()
-    local t = {}
+    local t = {szOption = _L['Farbnamen']}
     table.insert(t, {
         szOption = _L["enable"],
         fnAction = function()
