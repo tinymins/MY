@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-07-13 10:29:18
+-- @Last modified time: 2016-07-13 15:38:52
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- #################################################################################################################################### --
@@ -117,8 +117,8 @@ MY = {}
 --------------------------------------------------------------------------------------------------------------------------------------------
 local _DEBUG_ = tonumber(LoadLUAData('interface/my.debug.level') or nil) or 4
 local _LOGLV_ = tonumber(LoadLUAData('interface/my.delog.level') or nil) or 4
-local _BUILD_ = "20160514"
-local _VERSION_ = 0x2005900
+local _BUILD_ = "20160713"
+local _VERSION_ = 0x2006000
 local _ADDON_ROOT_ = '/Interface/MY/'
 local _FRAMEWORK_ROOT_ = '/Interface/MY/.Framework/'
 
