@@ -4,8 +4,8 @@
 -- @Author: µÔÒ»Ãù (tinymins) @ derzh.com
 -- @Date  : 2015-05-21 10:34:08
 -- @Email : admin@derzh.com
--- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-08 11:14:48
+-- @Last modified by:   Zhai Yiming
+-- @Last modified time: 2016-07-13 17:19:36
 -- @Version: 1.0
 -- @ChangeLog:
 --  + v1.0 File founded. -- viaµÔÒ»Ãù
@@ -98,7 +98,7 @@ end
 MY_ChatMosaics.Mosaics = _C.Mosaics
 
 MY.RegisterPanel("MY_Chat_ChatMosaics", _L["chat mosaics"], _L['Chat'],
-"ui/Image/UICommon/yirong3.UITex|63", {255,255,0,200}, {
+"ui/Image/UICommon/yirong3.UITex|50", {255,255,0,200}, {
 OnPanelActive = function(wnd)
 	local ui = MY.UI(wnd)
 	local w, h = ui:size()
