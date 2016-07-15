@@ -3,8 +3,8 @@
 -- @Author: µÔÒ»Ãù @tinymins
 -- @Date  : 2015-03-09 21:26:52
 -- @Email : admin@derzh.com
--- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-10 11:07:06
+-- @Last modified by:   Zhai Yiming
+-- @Last modified time: 2016-07-15 15:38:28
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = { Data = {} }
@@ -68,6 +68,11 @@ function MY_AutoChat.DelData(szMap, szName, szKey)
 	MY_AutoChat.SaveData()
 end
 
+local function WindowSelect(dwIndex, dwID)
+	MY.Debug({"WindowSelect " .. dwIndex .. "," .. dwID}, "AUTO_CHAT", MY_DEBUG.LOG)
+	return GetClientPlayer().WindowSelect(dwIndex, dwID)
+end
+
 function MY_AutoChat.Choose(szMap, szName, dwIndex, aInfo)
 	if not (szMap and szName and dwIndex and aInfo) then
 		return
@@ -79,7 +84,7 @@ function MY_AutoChat.Choose(szMap, szName, dwIndex, aInfo)
 		if (v.name == '$' or v.name == "W") and v.attribute.id then
 			if tChat[v.context] and tChat[v.context] > 0 then
 				for i = 1, tChat[v.context] do
-					GetClientPlayer().WindowSelect(dwIndex, v.attribute.id)
+					WindowSelect(dwIndex, v.attribute.id)
 				end
 				if MY_AutoChat.bEchoOn then
 					MY.Sysmsg({_L("Conversation with [%s] auto chose: %s", szName, v.context)})
@@ -94,7 +99,7 @@ function MY_AutoChat.Choose(szMap, szName, dwIndex, aInfo)
 	end
 	
 	if MY_AutoChat.bAutoSelect1 and nCount == 1 and not MY.IsInDungeon(true) then
-		GetClientPlayer().WindowSelect(dwIndex, dwID)
+		WindowSelect(dwIndex, dwID)
 		if MY_AutoChat.bEchoOn then
 			MY.Sysmsg({_L("Conversation with [%s] auto chose: %s", szName, szContext)})
 		end
