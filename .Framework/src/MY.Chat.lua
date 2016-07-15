@@ -831,6 +831,7 @@ local function GetRegisterChannelLimitTable()
 			{f = "i", t = "CampChannelDailyLimit"},
 			{f = "i", t = "MaxContribution"},
 			{f = "i", t = "WhisperDailyLimit"},
+			{f = "i", t = "IdentityChannelDailyLimit"},
 			{f = "i", t = "SprintPowerMax"},
 			{f = "i", t = "SprintPowerCost"},
 			{f = "i", t = "SprintPowerRevive"},
