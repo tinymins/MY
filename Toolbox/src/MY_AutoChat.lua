@@ -4,7 +4,7 @@
 -- @Date  : 2015-03-09 21:26:52
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-07-15 15:38:28
+-- @Last modified time: 2016-07-19 16:12:23
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
 local _C = { Data = {} }
@@ -174,7 +174,7 @@ end)
 ---------------------------------------------------------------------------
 -- 对话面板HOOK 添加自动对话设置按钮
 ---------------------------------------------------------------------------
-local function GetDialoguePanelMenuItem(szMap, szName, szContext)
+local function GetDialoguePanelMenuItem(szMap, szName, szType, szContext, dwID)
 	local r, g, b = 255, 255, 255
 	local szIcon, nFrame, nMouseOverFrame, szLayer, fnClickIcon, fnAction
 	if _C.Data[szMap] and _C.Data[szMap][szName] and _C.Data[szMap][szName][szContext] then
@@ -196,9 +196,16 @@ local function GetDialoguePanelMenuItem(szMap, szName, szContext)
 	else
 		fnAction = function() MY_AutoChat.AddData(szMap, szName, szContext) end
 	end
+	if szType == "T" then
+		for szIconID in string.gmatch(szContext, "%$ (%d+)") do
+			szIcon = "fromiconid"
+			nFrame = szIconID
+			szLayer = "ICON_RIGHT"
+		end
+	end
 	return {
 		r = r, g = g, b = b,
-		szOption = szContext,
+		szOption =  (IsCtrlKeyDown() and dwID and ("(" .. dwID .. ") ") or "") .. szContext,
 		fnAction = fnAction,
 		szIcon = szIcon, nFrame = nFrame, nMouseOverFrame = nMouseOverFrame,
 		szLayer = szLayer, fnClickIcon = fnClickIcon,
@@ -214,12 +221,12 @@ local function GetDialoguePanelMenu()
 	local szName, szMap = MY_AutoChat.GetName(dwType, dwID)
 	if szName and szMap then
 		if frame.aInfo then
-			local t = { {szOption = szName, bDisable = true}, { bDevide = true } }
+			local t = { {szOption = szName .. (IsCtrlKeyDown() and (" (" .. dwIdx .. ")") or ""), bDisable = true}, { bDevide = true } }
 			local tChat = {}
 			-- 面板上的对话
 			for i, v in ipairs(frame.aInfo) do
-				if v.name == "$" or v.name == 'W' then
-					table.insert(t, GetDialoguePanelMenuItem(szMap, szName, v.context))
+				if v.name == "$" or v.name == 'W' or v.name == "T" then
+					table.insert(t, GetDialoguePanelMenuItem(szMap, szName, v.name, v.context, v.attribute.id))
 					tChat[v.context] = true
 				end
 			end
@@ -227,7 +234,7 @@ local function GetDialoguePanelMenu()
 			if _C.Data[szMap] and _C.Data[szMap][szName] then
 				for szKey, nCount in pairs(_C.Data[szMap][szName]) do
 					if not tChat[szKey] then
-						table.insert(t, GetDialoguePanelMenuItem(szMap, szName, szKey))
+						table.insert(t, GetDialoguePanelMenuItem(szMap, "$", szName, szKey))
 						tChat[szKey] = true
 					end
 				end
