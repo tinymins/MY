@@ -234,7 +234,7 @@ local function GetDialoguePanelMenu()
 			if _C.Data[szMap] and _C.Data[szMap][szName] then
 				for szKey, nCount in pairs(_C.Data[szMap][szName]) do
 					if not tChat[szKey] then
-						table.insert(t, GetDialoguePanelMenuItem(szMap, "$", szName, szKey))
+						table.insert(t, GetDialoguePanelMenuItem(szMap, szName, "$", szKey))
 						tChat[szKey] = true
 					end
 				end
