@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-06-08 10:23:24
+-- @Last modified time: 2016-07-29 10:29:34
 -----------------------------------------------
 
 -------------------------------------
@@ -3615,7 +3615,7 @@ local function IE_GetNewIEFramePos()
 end
 
 -- ´ò¿ªä¯ÀÀÆ÷
-function XGUI.OpenInternetExplorer(szAddr, bDisableSound)
+function XGUI.OpenIE(szAddr, bDisableSound, w, h)
 	local nIndex, nLast = nil, nil
 	for i = 1, 10, 1 do
 		if not IsInternetExplorerOpened(i) then
@@ -3633,7 +3633,10 @@ function XGUI.OpenInternetExplorer(szAddr, bDisableSound)
 	local frame = Wnd.OpenWindow("InternetExplorer", "IE"..nIndex)
 	frame.bIE = true
 	frame.nIndex = nIndex
-
+	
+	if w and h then
+		XGUI.ResizeIE(frame, w, h)
+	end
 	frame:BringToTop()
 	if nLast then
 		frame:SetAbsPos(x, y)
@@ -3653,6 +3656,45 @@ function XGUI.OpenInternetExplorer(szAddr, bDisableSound)
 		PlaySound(SOUND.UI_SOUND,g_sound.OpenFrame)
 	end
 	return webPage
+end
+
+function XGUI.ResizeIE(frame, w, h)
+	if w < 400 then w = 400 end
+	if h < 200 then h = 200 end
+	local handle = frame:Lookup("", "")
+	handle:SetSize(w, h)
+	handle:Lookup("Image_Bg"):SetSize(w, h)
+	handle:Lookup("Image_BgT"):SetSize(w - 6, 64)
+	if not frame.bQuestionnaire then
+		handle:Lookup("Image_Edit"):SetSize(w - 300, 25)
+	end
+	handle:Lookup("Text_Title"):SetSize(w - 168, 30)
+	handle:FormatAllItemPos()
+
+	local webPage = frame:Lookup("WebPage_Page")
+	if frame.bQuestionnaire then
+		webPage:SetSize(w - 20, h - 140)
+	else
+		webPage:SetSize(w - 12, h - 76)
+		frame:Lookup("Edit_Input"):SetSize(w - 306, 20)
+		frame:Lookup("Btn_GoTo"):SetRelPos(w - 110, 38)
+	end
+
+	frame:Lookup("Btn_Close"):SetRelPos(w - 40, 10)
+	frame:Lookup("CheckBox_MaxSize"):SetRelPos(w - 70, 10)
+
+	frame:Lookup("Btn_DL"):SetSize(10, h - 20)
+	frame:Lookup("Btn_DT"):SetSize(w - 20, 10)
+	frame:Lookup("Btn_DTR"):SetRelPos(w - 10, 0)
+	frame:Lookup("Btn_DR"):SetRelPos(w - 10, 10)
+	frame:Lookup("Btn_DR"):SetSize(10, h - 20)
+	frame:Lookup("Btn_DRB"):SetRelPos(w - 10, h - 10)
+	frame:Lookup("Btn_DB"):SetRelPos(10, h - 10)
+	frame:Lookup("Btn_DB"):SetSize(w - 20, 10)
+	frame:Lookup("Btn_DLB"):SetRelPos(0, h - 10)
+
+	frame:SetSize(w, h)
+	frame:SetDragArea(0, 0, w, 30)
 end
 
 -- append an item to parent
