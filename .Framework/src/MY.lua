@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-07-13 15:38:52
+-- @Last modified time: 2016-07-29 10:32:44
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- #################################################################################################################################### --
@@ -797,8 +797,18 @@ function MY.SwitchTab(szID)
 		ui:append("Image", "Image_Adv", { x = 0, y = 0, image = MY.GetAddonInfo().szUITexPoster, imageframe = 0 })
 		ui:append("Text", "Text_Adv", { x = 10, y = 300, w = 557, font = 200 })
 		ui:append("Text", "Text_ChangeLog", {
-			x = 10, y = 325, w = 557, font = 204, text = _L['change log'], alpha = 190,
-			onclick = function() OpenInternetExplorer("https://cdn.rawgit.com/tinymins/MY/master/changelog.html?_=" .. GetCurrentTime()) end,
+			x = 10, y = 325, w = 80, font = 204, text = _L['change log'], alpha = 190,
+			onclick = function() XGUI.OpenIE("https://cdn.rawgit.com/tinymins/MY/master/changelog.html?_=" .. GetCurrentTime(), false, 600, 800) end,
+			onhover = function(bIn) this:SetAlpha(bIn and 255 or 190) end,
+		})
+		ui:append("Text", "Text_Serendipity", {
+			x = 90, y = 325, w = 80, font = 204, text = _L['serendipity'], alpha = 190,
+			onclick = function() XGUI.OpenIE("http://jx3.derzh.com/serendipity/", false, 500, 800) end,
+			onhover = function(bIn) this:SetAlpha(bIn and 255 or 190) end,
+		})
+		ui:append("Text", "Text_Zhezhi", {
+			x = 90, y = 325, w = 80, font = 204, text = _L['online time'], alpha = 190,
+			onclick = function() XGUI.OpenIE("http://jx3.derzh.com/zhezhi/", false, 500, 800) end,
 			onhover = function(bIn) this:SetAlpha(bIn and 255 or 190) end,
 		})
 		ui:append("Text", "Text_Svr", { x = 10, y = 345, w = 557, font = 204, text = MY.GetServer() .. " (" .. MY.GetRealServer() .. ")", alpha = 220 })
@@ -811,11 +821,15 @@ function MY.SwitchTab(szID)
 				ui:item('#Text_Adv'):pos(10, h - bottomH + 10)
 				ui:item('#Text_Svr'):pos(10, h - bottomH + 35)
 				ui:item('#Text_ChangeLog'):pos(10, h - bottomH + 60)
+				ui:item('#Text_Serendipity'):pos(90, h - bottomH + 60)
+				ui:item('#Text_Zhezhi'):pos(170, h - bottomH + 60)
 			else
 				ui:item('#Image_Adv'):size(w, scaleH)
 				ui:item('#Text_Adv'):pos(10, scaleH + 10)
 				ui:item('#Text_Svr'):pos(10, scaleH + 35)
 				ui:item('#Text_ChangeLog'):pos(10, scaleH + 60)
+				ui:item('#Text_Serendipity'):pos(90, scaleH + 60)
+				ui:item('#Text_Zhezhi'):pos(170, scaleH + 60)
 			end
 		end
 		wndMainPanel.OnPanelResize(wndMainPanel)
