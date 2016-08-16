@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-07-29 15:28:24
+-- @Last modified time: 2016-08-16 15:38:50
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- #################################################################################################################################### --
@@ -808,7 +808,7 @@ function MY.SwitchTab(szID)
 		})
 		ui:append("Text", "Text_Zhezhi", {
 			x = 90, y = 325, w = 80, font = 204, text = _L['online time'], alpha = 190,
-			onclick = function() XGUI.OpenIE("http://jx3.derzh.com/zhezhi/", false, 500, 800) end,
+			onclick = function() XGUI.OpenIE("http://jx3.derzh.com/onlinetime/", false, 500, 800) end,
 			onhover = function(bIn) this:SetAlpha(bIn and 255 or 190) end,
 		})
 		ui:append("Text", "Text_Svr", { x = 10, y = 345, w = 557, font = 204, text = MY.GetServer() .. " (" .. MY.GetRealServer() .. ")", alpha = 220 })
