@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-07-13 14:31:07
+-- @Last modified time: 2016-09-01 15:45:20
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 local srep, tostring, string2byte = string.rep, tostring, string.byte
@@ -780,6 +780,15 @@ function MY.ProcessCommand(cmd)
 		return ls()
 	end
 end
+end
+
+do
+local bCustomMode = false
+function MY.IsInCustomUIMode()
+	return bCustomMode
+end
+RegisterEvent("ON_ENTER_CUSTOM_UI_MODE", function() bCustomMode = true  end)
+RegisterEvent("ON_LEAVE_CUSTOM_UI_MODE", function() bCustomMode = false end)
 end
 
 function MY.Sys.DoMessageBox(szName, i)
