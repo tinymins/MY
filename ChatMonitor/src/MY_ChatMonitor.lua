@@ -519,11 +519,17 @@ _C.Init = function()
       :handleStyle(3):pos(0,0):size(250,150)
       :text(_L['welcome to use mingyi chat monitor.'])
       :click(function()
+        if MY.IsInCustomUIMode() then
+            return
+        end
         MY.OpenPanel()
         MY.SwitchTab('ChatMonitor')
         _C.uiFrame:fadeOut(500)
       end)
       :hover(function(bIn)
+        if MY.IsInCustomUIMode() then
+            return
+        end
         if bIn then
             MY.DelayCall('MY_ChatMonitor_Hide')
             _C.uiFrame:fadeIn(500)
