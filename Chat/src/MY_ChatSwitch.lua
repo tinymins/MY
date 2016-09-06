@@ -3,8 +3,8 @@
 -- @Author: 翟一鸣 @tinymins
 -- @Date  : 2016-02-5 11:35:53
 -- @Email : admin@derzh.com
--- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-08-19 10:33:04
+-- @Last modified by:   Zhai Yiming
+-- @Last modified time: 2016-09-06 13:05:42
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Chat/lang/")
 local INI_PATH = MY.GetAddonInfo().szRoot .. "Chat/ui/MY_ChatSwitch.ini"
@@ -12,6 +12,10 @@ local CD_REFRESH_OFFSET = 7 * 60 * 60 -- 7点更新CD
 MY_ChatSwitch = {}
 MY_ChatSwitch.tChannel = {}
 MY_ChatSwitch.aWhisper = {}
+MY_ChatSwitch.szAway = nil
+MY_ChatSwitch.szBusy = nil
+RegisterCustomData("MY_ChatSwitch.szAway")
+RegisterCustomData("MY_ChatSwitch.szBusy")
 
 local function UpdateChannelDailyLimit(hRadio, bPlus)
 	local me = GetClientPlayer()
@@ -83,7 +87,7 @@ local function OnAwayCheck()
 	MY.SwitchChat("/afk")
 	Station.Lookup("Lowest2/EditBox"):Show()
 	if Station.Lookup("Lowest2/EditBox/Edit_Input"):GetText() == "" then
-		Station.Lookup("Lowest2/EditBox/Edit_Input"):InsertText(g_tStrings.STR_AUTO_REPLAY_LEAVE)
+		Station.Lookup("Lowest2/EditBox/Edit_Input"):InsertText(MY_ChatSwitch.szAway or g_tStrings.STR_AUTO_REPLAY_LEAVE)
 		Station.Lookup("Lowest2/EditBox/Edit_Input"):SelectAll()
 	end
 	Station.SetFocusWindow("Lowest2/EditBox/Edit_Input")
@@ -93,14 +97,13 @@ local function OnAwayUncheck()
 	MY.SwitchChat("/cafk")
 end
 
-local m_szAfk
-local function OnAwayTip() return m_szAfk or g_tStrings.STR_AUTO_REPLAY_LEAVE end
+local function OnAwayTip() return MY_ChatSwitch.szAway or g_tStrings.STR_AUTO_REPLAY_LEAVE end
 
 local function OnBusyCheck()
 	MY.SwitchChat("/atr")
 	Station.Lookup("Lowest2/EditBox"):Show()
 	if Station.Lookup("Lowest2/EditBox/Edit_Input"):GetText() == "" then
-		Station.Lookup("Lowest2/EditBox/Edit_Input"):InsertText(g_tStrings.STR_AUTO_REPLAY_LEAVE)
+		Station.Lookup("Lowest2/EditBox/Edit_Input"):InsertText(MY_ChatSwitch.szBusy or g_tStrings.STR_AUTO_REPLAY_LEAVE)
 		Station.Lookup("Lowest2/EditBox/Edit_Input"):SelectAll()
 	end
 	Station.SetFocusWindow("Lowest2/EditBox/Edit_Input")
@@ -110,8 +113,7 @@ local function OnBusyUncheck()
 	MY.SwitchChat("/catr")
 end
 
-local m_szAtr
-local function OnBusyTip() return m_szAtr end
+local function OnBusyTip() return MY_ChatSwitch.szBusy end
 
 local function OnMosaicsCheck()
 	MY_ChatMosaics.bEnabled = true
@@ -395,21 +397,23 @@ function MY_ChatSwitch.UpdateAnchor(this)
 	this:CorrectPos()
 end
 
-MY.RegisterEvent("ON_CHAT_SET_AFK", function()
+local function OnChatSetAFK()
 	if type(arg0) == "table" then
-		m_szAfk = MY.Chat.StringfyContent(arg0)
+		MY_ChatSwitch.szAway = MY.Chat.StringfyContent(arg0)
 	else
-		m_szAfk = arg0 and tostring(arg0)
+		MY_ChatSwitch.szAway = arg0 and tostring(arg0)
 	end
-end)
+end
+MY.RegisterEvent("ON_CHAT_SET_AFK", OnChatSetAFK)
 
-MY.RegisterEvent("ON_CHAT_SET_ATR", function()
+local function OnChatSetATR()
 	if type(arg0) == "table" then
-		m_szAtr = MY.Chat.StringfyContent(arg0)
+		MY_ChatSwitch.szBusy = MY.Chat.StringfyContent(arg0)
 	else
-		m_szAtr = arg0 and tostring(arg0)
+		MY_ChatSwitch.szBusy = arg0 and tostring(arg0)
 	end
-end)
+end
+MY.RegisterEvent("ON_CHAT_SET_ATR", OnChatSetATR)
 
 function MY_ChatSwitch.ReInitUI()
 	Wnd.CloseWindow("MY_ChatSwitch")
