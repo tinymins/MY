@@ -4,7 +4,7 @@
 -- @Date  : 2016-02-5 11:35:53
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-07-12 16:37:10
+-- @Last modified time: 2016-09-21 15:55:42
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Chat/lang/")
 MY_Chat = {}
@@ -24,17 +24,23 @@ RegisterCustomData("MY_Chat.eChatTime")
 RegisterCustomData("MY_Chat.bChatCopyAlwaysShowMask")
 RegisterCustomData("MY_Chat.bChatCopyAlwaysWhite")
 RegisterCustomData("MY_Chat.bChatCopyNoCopySysmsg")
+RegisterCustomData("MY_Chat.nVersion")
 
 local function LoadBlockWords()
+	local nVersion = MY.LoadLUAData('config/MY_CHAT/blockwords.$lang.ver.jx3dat') or 0
 	MY_Chat.tBlockWords = MY.LoadLUAData('config/MY_CHAT/blockwords.$lang.jx3dat') or MY_Chat.tBlockWords
 	for i, bw in ipairs(MY_Chat.tBlockWords) do
 		if type(bw) == "string" then
 			MY_Chat.tBlockWords[i] = {bw, {ALL = true}, true}
 		end
 	end
+	if nVersion == 0 then
+		table.insert(MY_Chat.tBlockWords, {"166121867", {ALL = true}, true})
+	end
 end
 
 local function SaveBlockWords()
+	MY.SaveLUAData('config/MY_CHAT/blockwords.$lang.ver.jx3dat', 1)
 	MY.SaveLUAData('config/MY_CHAT/blockwords.$lang.jx3dat', MY_Chat.tBlockWords)
 	MY.StorageData("MY_CHAT_BLOCKWORD", MY_Chat.tBlockWords)
 end
@@ -54,12 +60,17 @@ function MY_Chat.MatchBlockWord(szMsg, szChannel, bRichText)
 	if szChannel then
 		szMsg = "[" .. g_tStrings.tChannelName[szChannel] .. "]" .. szMsg
 	end
-	local szNoneSpaceMsg = StringReplaceW(StringReplaceW(szMsg, " ", ""), g_tStrings.STR_ONE_CHINESE_SPACE, "")
+	local szNoneSpaceMsg
 	for _, bw in ipairs(MY_Chat.tBlockWords) do
 		if bw[2].ALL ~= bw[2][szChannel] then
 			if bw[3] then
 				if not tNoneSpaceBlockWords[bw[1]] then
-					tNoneSpaceBlockWords[bw[1]] = StringReplaceW(StringReplaceW(bw[1], " ", ""), g_tStrings.STR_ONE_CHINESE_SPACE, "")
+					tNoneSpaceBlockWords[bw[1]] = StringEnerW(tNoneSpaceBlockWords[bw[1]])
+					tNoneSpaceBlockWords[bw[1]] = StringReplaceW(bw[1], " ", "")
+					tNoneSpaceBlockWords[bw[1]] = StringReplaceW(bw[1], g_tStrings.STR_ONE_CHINESE_SPACE, "")
+				end
+				if not szNoneSpaceMsg then
+					szNoneSpaceMsg = StringReplaceW(StringReplaceW(szMsg, " ", ""), g_tStrings.STR_ONE_CHINESE_SPACE, "")
 				end
 				if MY.String.SimpleMatch(szNoneSpaceMsg, tNoneSpaceBlockWords[bw[1]]) then
 					return true
