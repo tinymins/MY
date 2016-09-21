@@ -4,7 +4,7 @@
 -- @Date  : 2016-02-5 11:35:53
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-09-21 15:55:42
+-- @Last modified time: 2016-09-21 16:50:59
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Chat/lang/")
 MY_Chat = {}
@@ -31,11 +31,11 @@ local function LoadBlockWords()
 	MY_Chat.tBlockWords = MY.LoadLUAData('config/MY_CHAT/blockwords.$lang.jx3dat') or MY_Chat.tBlockWords
 	for i, bw in ipairs(MY_Chat.tBlockWords) do
 		if type(bw) == "string" then
-			MY_Chat.tBlockWords[i] = {bw, {ALL = true}, true}
+			MY_Chat.tBlockWords[i] = {bw, {ALL = true}, true, true}
 		end
 	end
 	if nVersion == 0 then
-		table.insert(MY_Chat.tBlockWords, {"166121867", {ALL = true}, true})
+		table.insert(MY_Chat.tBlockWords, {"166121867", {ALL = true}, false, false})
 	end
 end
 
@@ -60,26 +60,10 @@ function MY_Chat.MatchBlockWord(szMsg, szChannel, bRichText)
 	if szChannel then
 		szMsg = "[" .. g_tStrings.tChannelName[szChannel] .. "]" .. szMsg
 	end
-	local szNoneSpaceMsg
 	for _, bw in ipairs(MY_Chat.tBlockWords) do
-		if bw[2].ALL ~= bw[2][szChannel] then
-			if bw[3] then
-				if not tNoneSpaceBlockWords[bw[1]] then
-					tNoneSpaceBlockWords[bw[1]] = StringEnerW(tNoneSpaceBlockWords[bw[1]])
-					tNoneSpaceBlockWords[bw[1]] = StringReplaceW(bw[1], " ", "")
-					tNoneSpaceBlockWords[bw[1]] = StringReplaceW(bw[1], g_tStrings.STR_ONE_CHINESE_SPACE, "")
-				end
-				if not szNoneSpaceMsg then
-					szNoneSpaceMsg = StringReplaceW(StringReplaceW(szMsg, " ", ""), g_tStrings.STR_ONE_CHINESE_SPACE, "")
-				end
-				if MY.String.SimpleMatch(szNoneSpaceMsg, tNoneSpaceBlockWords[bw[1]]) then
-					return true
-				end
-			else
-				if MY.String.SimpleMatch(szMsg, bw[1]) then
-					return true
-				end
-			end
+		if bw[2].ALL ~= bw[2][szChannel]
+		and MY.String.SimpleMatch(szMsg, bw[1], not bw[3], not bw[4]) then
+			return true
 		end
 	end
 end
@@ -211,6 +195,14 @@ function PS.OnPanelActive(wnd)
 				SaveBlockWords()
 			end,
 		})
+		table.insert(menu, {
+			szOption = _L['ignore enem'],
+			bCheck = true, bChecked = data[4],
+			fnAction = function()
+				data[4] = not data[4]
+				SaveBlockWords()
+			end,
+		})
 		table.insert(menu, MENU_DIVIDER)
 		table.insert(menu, {
 			szOption = _L['delete'],
@@ -249,7 +241,7 @@ function PS.OnPanelActive(wnd)
 	  		end
 	  	end
 	  	-- 加入表
-		local bw = {szText, {ALL = true, MSG_WHISPER = true, MSG_TEAM = true, MSG_PARTY = true, MSG_GUILD = true, MSG_GUILD_ALLIANCE = true}}
+		local bw = {szText, {ALL = true, MSG_WHISPER = true, MSG_TEAM = true, MSG_PARTY = true, MSG_GUILD = true, MSG_GUILD_ALLIANCE = true}, false, false}
 	  	table.insert(MY_Chat.tBlockWords, 1, bw)
 	  	SaveBlockWords()
 	  	-- 更新UI
