@@ -3,8 +3,8 @@
 -- @Author: 茗伊 @双梦镇 @追风蹑影
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
--- @Last modified by:   tinymins
--- @Last modified time: 2016-05-16 21:22:11
+-- @Last modified by:   Zhai Yiming
+-- @Last modified time: 2016-09-19 11:03:43
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -1078,3 +1078,33 @@ MY.RegisterMsgMonitor("QIYU", function(szMsg, nFont, bRich, r, g, b, szChannel)
 		})
 	end)
 end, {"MSG_SYS"})
+
+do
+local function GetAdventureName(nID)
+	for i = 2, g_tTable.Adventure:GetRowCount() do
+		local tLine = g_tTable.Adventure:GetRow(i)
+		if tLine.dwID == nID then
+			return tLine.szName
+		end
+	end
+end
+
+MY.RegisterEvent("ON_SERENDIPITY_TRIGGER.QIYU", function()
+	local me = GetClientPlayer()
+	if not me then
+		return
+	end
+	local szName = me.szName
+	local nAdvID, bFinish = arg0, arg1
+	local szAdventure = GetAdventureName(nAdvID)
+	MY.Ajax({
+		type = "get",
+		url = 'http://data.jx3.derzh.com/serendipity/?l=' .. MY.GetLang() .. "&m=2"
+		.. "&data=" .. MY.String.SimpleEcrypt(MY.Json.Encode({
+			n = szName, S = MY.GetRealServer(1), s = MY.GetRealServer(2),
+			a = szAdventure, f = bFinish, t = GetCurrentTime()
+		})),
+		success = function(settings, content) end,
+	})
+end)
+end
