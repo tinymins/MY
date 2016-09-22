@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-09-21 16:59:19
+-- @Last modified time: 2016-09-22 14:52:24
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- #################################################################################################################################### --
@@ -1054,10 +1054,12 @@ end
 -- 事件、快捷键、菜单注册
 ---------------------------------------------------
 if _MY.nDebugLevel < 3 then
-	RegisterEvent("CALL_LUA_ERROR", function()
-		print(arg0)
-		OutputMessage("MSG_SYS", arg0)
-	end)
+	if not (IsDebugClient and IsDebugClient()) then
+		RegisterEvent("CALL_LUA_ERROR", function()
+			print(arg0)
+			OutputMessage("MSG_SYS", arg0)
+		end)
+	end
 	TraceButton_AppendAddonMenu({{
 		szOption = "ReloadUIAddon",
 		fnAction = function()
