@@ -4,7 +4,7 @@
 -- @Date  : 2016-02-5 11:35:53
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-09-21 17:16:12
+-- @Last modified time: 2016-09-22 12:55:45
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Chat/lang/")
 MY_Chat = {}
@@ -62,7 +62,7 @@ function MY_Chat.MatchBlockWord(szMsg, szChannel, bRichText)
 	end
 	for _, bw in ipairs(MY_Chat.tBlockWords) do
 		if bw[2].ALL ~= bw[2][szChannel]
-		and MY.String.SimpleMatch(szMsg, bw[1], not bw[3], not bw[4]) then
+		and MY.String.SimpleMatch(szMsg, bw[1], false, not bw[4], bw[3]) then
 			return true
 		end
 	end
