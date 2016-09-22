@@ -4,7 +4,7 @@
 -- @Date  : 2015-01-25 15:35:26
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-07-13 14:36:54
+-- @Last modified time: 2016-09-22 11:58:22
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 ------------------------------------------------------------------------
@@ -207,10 +207,20 @@ MY.UrlDecode = UrlDecode
 
 
 local m_simpleMatchCache = setmetatable({}, { __mode = "v" })
-function MY.String.SimpleMatch(szText, szFind, bDistinctCase)
+function MY.String.SimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIgnoreSpace)
 	if not bDistinctCase then
 		szFind = StringLowerW(szFind)
 		szText = StringLowerW(szText)
+	end
+	if not bDistinctEnEm then
+		szFind = StringEnerW(szFind)
+		szText = StringEnerW(szText)
+	end
+	if bIgnoreSpace then
+		szFind = StringReplaceW(szFind, " ", "")
+		szFind = StringReplaceW(szFind, g_tStrings.STR_ONE_CHINESE_SPACE, "")
+		szText = StringReplaceW(szText, " ", "")
+		szText = StringReplaceW(szText, g_tStrings.STR_ONE_CHINESE_SPACE, "")
 	end
 	local me = GetClientPlayer()
 	if me then
