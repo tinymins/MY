@@ -88,7 +88,7 @@ MY_MiddleMapMark.Search = function(szKeyword)
 		return
 	end
 	
-	local uiHandle
+	local uiHandle, nW, nH
 	local uiInner = ui:item("#Handle_Inner")
 	if uiInner:count() == 0 then -- old version
 		uiHandle = ui:item("#Handle_MY_MMM")
@@ -99,11 +99,13 @@ MY_MiddleMapMark.Search = function(szKeyword)
 				x = x, y = y, w = w, h = h,
 			}):item('#Handle_MY_MMM')
 		end
+		nW, nH = uiHandle:size()
 	else
 		uiHandle = uiInner:item("#Handle_MY_MMM")
 		if uiHandle:count() == 0 then
 			uiHandle = uiInner:append("Handle", "Handle_MY_MMM"):item('#Handle_MY_MMM')
 		end
+		nW, nH = uiInner:size()
 	end
 	uiHandle:clear()
 	
@@ -124,27 +126,31 @@ MY_MiddleMapMark.Search = function(szKeyword)
 	for _, npc in ipairs(data.Npc) do
 		local bMatch = false
 		for _, kw in ipairs(tKeyword) do
-			if string.find(npc.szName, kw) or
-			string.find(npc.szTitle, kw) then
+			if string.find(npc.szName, kw)
+			or string.find(npc.szTitle, kw)
+			or npc.dwTemplateID == tonumber(kw) then
 				bMatch = true
 				break
 			end
 		end
 		if bMatch then
-			uiHandle:append('Image', 'Image_Npc_' .. npc.dwID):item('#Image_Npc_' .. npc.dwID)
-			  :image('ui/Image/Minimap/MapMark.UITex|95')
-			  :size(13, 13)
-			  :pos(MiddleMap.LPosToHPos(npc.nX, npc.nY, 13, 13))
-			  :tip(function()
-			  	local szTip = npc.szName ..
-			  	((npc.nLevel and npc.nLevel > 0 and ' lv.' .. npc.nLevel) or '') ..
-			  	((npc.szTitle ~= '' and '\n<' .. npc.szTitle .. '>') or '')
-			  	if IsCtrlKeyDown() then
-			  		szTip = szTip .. ((npc.dwTemplateID and '\nNpc Template ID: ' .. npc.dwTemplateID))
-			  	end
-			  	return szTip
-			  end,
-			  MY.Const.UI.Tip.POS_TOP)
+			local x, y = MiddleMap.LPosToHPos(npc.nX, npc.nY, 13, 13)
+			if x > 0 and y > 0 and x < nW and y < nH then
+				uiHandle:append('Image', 'Image_Npc_' .. npc.dwID, {
+					image = 'ui/Image/Minimap/MapMark.UITex|95',
+					w = 13, h = 13, x = x, y = y,
+					tip = function()
+						local szTip = npc.szName ..
+						((npc.nLevel and npc.nLevel > 0 and ' lv.' .. npc.nLevel) or '') ..
+						((npc.szTitle ~= '' and '\n<' .. npc.szTitle .. '>') or '')
+						if IsCtrlKeyDown() then
+							szTip = szTip .. ((npc.dwTemplateID and '\nNpc Template ID: ' .. npc.dwTemplateID))
+						end
+						return szTip
+					end,
+					tippostype = MY.Const.UI.Tip.POS_TOP,
+				})
+			end
 		end
 	end
 	
@@ -152,24 +158,28 @@ MY_MiddleMapMark.Search = function(szKeyword)
 	for _, doodad in ipairs(data.Doodad) do
 		local bMatch = false
 		for _, kw in ipairs(tKeyword) do
-		if string.find(doodad.szName, kw) then
+		if string.find(doodad.szName, kw)
+		or doodad.dwTemplateID == tonumber(kw) then
 				bMatch = true
 				break
 			end
 		end
 		if bMatch then
-			uiHandle:append('Image', 'Image_Doodad_' .. doodad.dwID):item('#Image_Doodad_' .. doodad.dwID)
-			  :image('ui/Image/Minimap/MapMark.UITex|95')
-			  :size(13, 13)
-			  :pos(MiddleMap.LPosToHPos(doodad.nX, doodad.nY, 13, 13))
-			  :tip(function()
-			  	local szTip = doodad.szName
-			  	if IsCtrlKeyDown() then
-			  		szTip = szTip .. ((doodad.dwTemplateID and '\nDoodad Template ID: ' .. doodad.dwTemplateID))
-			  	end
-			  	return szTip
-			  end,
-			  MY.Const.UI.Tip.POS_TOP)
+			local x, y = MiddleMap.LPosToHPos(doodad.nX, doodad.nY, 13, 13)
+			if x > 0 and y > 0 and x < nW and y < nH then
+				uiHandle:append('Image', 'Image_Doodad_' .. doodad.dwID, {
+					image = 'ui/Image/Minimap/MapMark.UITex|95',
+					w = 13, h = 13, x = x, y = y,
+					tip = function()
+						local szTip = doodad.szName
+						if IsCtrlKeyDown() then
+							szTip = szTip .. ((doodad.dwTemplateID and '\nDoodad Template ID: ' .. doodad.dwTemplateID))
+						end
+						return szTip
+					end,
+					tippostype = MY.Const.UI.Tip.POS_TOP,
+				})
+			end
 		end
 	end
 end
