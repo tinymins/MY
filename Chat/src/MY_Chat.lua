@@ -4,7 +4,7 @@
 -- @Date  : 2016-02-5 11:35:53
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-10-14 11:39:37
+-- @Last modified time: 2016-10-14 12:08:58
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Chat/lang/")
 MY_Chat = {}
@@ -117,7 +117,7 @@ local function OnPlayerSay()
 end
 MY.RegisterEvent("PLAYER_SAY.MY_Chat_Sound", OnPlayerSay)
 
-local function OnSoundWhisper()Output(bShield)
+local function OnSoundWhisper()
 	if bShield then
 		bShield = false
 		return true
