@@ -4,7 +4,7 @@
 -- @Date  : 2016-02-5 11:35:53
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-10-14 10:44:49
+-- @Last modified time: 2016-10-14 11:39:37
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Chat/lang/")
 MY_Chat = {}
@@ -72,10 +72,14 @@ function MY_Chat.MatchBlockWord(szMsg, szChannel, bRichText, dwTalkerID)
 	end
 end
 
+do local nShieldFC = 0
 -- hook chat panel
 MY.HookChatPanel("MY_Chat", function(h, szChannel, szMsg, dwTime, nR, nG, nB, dwTime, dwTalkerID, szName)
 	-- chat filter
 	if MY_Chat.bBlockWords and MY_Chat.MatchBlockWord(szMsg, szChannel, true, dwTalkerID) then
+		if szChannel == "MSG_WHISPER" then
+			nShieldFC = GetLogicFrameCount()
+		end
 		return ""
 	end
 	return szMsg, h:GetItemCount()
@@ -108,6 +112,14 @@ end, function(h, i, szChannel, szMsg, dwTime, nR, nG, nB)
 		h:InsertItemFromString(i, false, szTime)
 	end
 end)
+
+local function OnSoundWhisper()
+	if nShieldFC == GetLogicFrameCount() then
+		return true
+	end
+end
+HookSound("Whisper", "MY_Chat", OnSoundWhisper)
+end
 
 local m_aBlockWordsChannels = {
 	"MSG_SYS", "MSG_NORMAL", "MSG_PARTY", "MSG_TEAM", "MSG_BATTLE_FILED",

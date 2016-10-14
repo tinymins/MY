@@ -3,8 +3,8 @@
 -- @Author: 茗伊 @双梦镇 @追风蹑影
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
--- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-08-13 18:50:42
+-- @Last modified by:   Zhai Yiming
+-- @Last modified time: 2016-10-14 11:30:13
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 EMPTY_TABLE = SetmetaReadonly({})
@@ -551,4 +551,42 @@ function ExecuteWithThis(element, fnAction, ...)
 	this = _this
 	return true
 end
+end
+
+if not HookSound then
+local hook = {}
+function HookSound(szSound, szKey, fnCondition)
+	if not hook[szSound] then
+		hook[szSound] = {}
+	end
+	hook[szSound][szKey] = fnCondition
+end
+local sounds = {}
+for k, v in pairs(g_sound) do
+	sounds[k], g_sound[k] = g_sound[k], nil
+end
+local function getsound(t, k)
+	if hook[k] then
+		for szKey, fnCondition in pairs(hook[k]) do
+			if fnCondition() then
+				return
+			end
+		end
+	end
+	return sounds[k]
+end
+local function setsound(t, k, v)
+	sounds[k] = v
+end
+setmetatable(g_sound, {__index = getsound, __newindex = setsound})
+
+local function resumegsound()
+	setmetatable(g_sound, nil)
+	for k, v in pairs(sounds) do
+		g_sound[k] = v
+	end
+end
+RegisterEvent('GAME_EXIT', resumegsound)
+RegisterEvent('PLAYER_EXIT_GAME', resumegsound)
+RegisterEvent('RELOAD_UI_ADDON_BEGIN', resumegsound)
 end
