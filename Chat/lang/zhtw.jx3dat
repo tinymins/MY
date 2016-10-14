@@ -74,4 +74,6 @@ data = {
     
     ['hide blockwords'] = '關鍵字屏蔽',
     ['edit'] = '編輯',
+    
+    ["MSG_STRANGER_WHISPER"] = "陌生密聊",
 }
