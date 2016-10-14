@@ -4,7 +4,7 @@
 -- @Date  : 2016-02-5 11:35:53
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-09-22 12:55:45
+-- @Last modified time: 2016-10-14 10:44:49
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Chat/lang/")
 MY_Chat = {}
@@ -53,12 +53,16 @@ end)
 MY.RegisterInit('MY_CHAT_BW', LoadBlockWords)
 
 local tNoneSpaceBlockWords = {}
-function MY_Chat.MatchBlockWord(szMsg, szChannel, bRichText)
+function MY_Chat.MatchBlockWord(szMsg, szChannel, bRichText, dwTalkerID)
 	if bRichText then
 		szMsg = GetPureText(szMsg)
 	end
 	if szChannel then
 		szMsg = "[" .. g_tStrings.tChannelName[szChannel] .. "]" .. szMsg
+	end
+	if dwTalkerID and szChannel == "MSG_WHISPER"
+	and not (MY.GetFriend(dwTalkerID) or MY.GetFoe(dwTalkerID) or MY.GetTongMember(dwTalkerID)) then
+		szChannel = "MSG_STRANGER_WHISPER"
 	end
 	for _, bw in ipairs(MY_Chat.tBlockWords) do
 		if bw[2].ALL ~= bw[2][szChannel]
@@ -69,9 +73,9 @@ function MY_Chat.MatchBlockWord(szMsg, szChannel, bRichText)
 end
 
 -- hook chat panel
-MY.HookChatPanel("MY_Chat", function(h, szChannel, szMsg, dwTime, nR, nG, nB)
+MY.HookChatPanel("MY_Chat", function(h, szChannel, szMsg, dwTime, nR, nG, nB, dwTime, dwTalkerID, szName)
 	-- chat filter
-	if MY_Chat.bBlockWords and MY_Chat.MatchBlockWord(szMsg, szChannel, true) then
+	if MY_Chat.bBlockWords and MY_Chat.MatchBlockWord(szMsg, szChannel, true, dwTalkerID) then
 		return ""
 	end
 	return szMsg, h:GetItemCount()
@@ -107,7 +111,7 @@ end)
 
 local m_aBlockWordsChannels = {
 	"MSG_SYS", "MSG_NORMAL", "MSG_PARTY", "MSG_TEAM", "MSG_BATTLE_FILED",
-	"MSG_FRIEND", "MSG_WHISPER", "MSG_GROUP", "MSG_GUILD", "MSG_GUILD_ALLIANCE",
+	"MSG_FRIEND", "MSG_WHISPER", "MSG_STRANGER_WHISPER", "MSG_GROUP", "MSG_GUILD", "MSG_GUILD_ALLIANCE",
 	"MSG_MAP", "MSG_SCHOOL", "MSG_WORLD", "MSG_CAMP", "MSG_SEEK_MENTOR",
 }
 local function Chn2Str(ch)
@@ -161,6 +165,15 @@ function PS.OnPanelActive(wnd)
 	for _, v in ipairs(MY_Chat.tBlockWords) do
 		list:listbox('insert', ChatBlock2Text(v[1], v[2]), v[1], v)
 	end
+	local tChannelName = setmetatable({
+		["MSG_STRANGER_WHISPER"] = _L["MSG_STRANGER_WHISPER"],
+	}, {__index = g_tStrings.tChannelName})
+	local function GetMsgFontColor(szChannel, ...)
+		if szChannel == "MSG_STRANGER_WHISPER" then
+			szChannel = "MSG_WHISPER"
+		end
+		return _G.GetMsgFontColor(szChannel, ...)
+	end
 	list:listbox('onmenu', function(hItem, text, id, data)
 		local chns = data[2]
 		local menu = {
@@ -176,7 +189,7 @@ function PS.OnPanelActive(wnd)
 		}
 		for _, szChannel in ipairs(m_aBlockWordsChannels) do
 			table.insert(menu, {
-				szOption = g_tStrings.tChannelName[szChannel],
+				szOption = tChannelName[szChannel],
 				rgb = GetMsgFontColor(szChannel, true),
 				bCheck = true, bChecked = chns[szChannel],
 				fnAction = function()

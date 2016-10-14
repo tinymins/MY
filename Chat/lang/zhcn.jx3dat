@@ -74,4 +74,6 @@ data = {
     
     ['hide blockwords'] = '¹Ø¼ü×ÖÆÁ±Î',
     ['edit'] = '±à¼­',
+    
+    ["MSG_STRANGER_WHISPER"] = "Ä°ÉúÃÜÁÄ",
 }

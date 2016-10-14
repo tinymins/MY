@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-07-13 14:32:16
+-- @Last modified time: 2016-10-14 10:18:30
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -264,6 +264,7 @@ function MY.Player.GetFriend(arg0)
 		end
 	end
 end
+MY.GetFriend = MY.Player.GetFriend
 
 function _C.GeneFoeListCache()
 	if not _C.tFoeList then
@@ -310,6 +311,7 @@ function MY.Player.GetFoe(arg0)
 		end
 	end
 end
+MY.GetFoe = MY.Player.GetFoe
 
 -- 获取好友列表
 function MY.Player.GetTongMemberList(bShowOffLine, szSorter, bAsc)
@@ -350,6 +352,7 @@ function MY.Player.GetTongMember(arg0)
 	
 	return GetTongClient().GetMemberInfo(arg0)
 end
+MY.GetTongMember = MY.Player.GetTongMember
 
 -- 判断是不是队友
 function MY.Player.IsParty(dwID)
