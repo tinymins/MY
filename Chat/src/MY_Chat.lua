@@ -72,14 +72,10 @@ function MY_Chat.MatchBlockWord(szMsg, szChannel, bRichText, dwTalkerID)
 	end
 end
 
-do local nShieldFC = 0
 -- hook chat panel
 MY.HookChatPanel("MY_Chat", function(h, szChannel, szMsg, dwTime, nR, nG, nB, dwTime, dwTalkerID, szName)
 	-- chat filter
 	if MY_Chat.bBlockWords and MY_Chat.MatchBlockWord(szMsg, szChannel, true, dwTalkerID) then
-		if szChannel == "MSG_WHISPER" then
-			nShieldFC = GetLogicFrameCount()
-		end
 		return ""
 	end
 	return szMsg, h:GetItemCount()
@@ -113,8 +109,17 @@ end, function(h, i, szChannel, szMsg, dwTime, nR, nG, nB)
 	end
 end)
 
-local function OnSoundWhisper()
-	if nShieldFC == GetLogicFrameCount() then
+do local bShield = false
+local function OnPlayerSay()
+	if arg2 == PLAYER_TALK_CHANNEL.WHISPER then
+		bShield = MY_Chat.bBlockWords and MY_Chat.MatchBlockWord(arg11, "MSG_WHISPER", true, arg1)
+	end
+end
+MY.RegisterEvent("PLAYER_SAY.MY_Chat_Sound", OnPlayerSay)
+
+local function OnSoundWhisper()Output(bShield)
+	if bShield then
+		bShield = false
 		return true
 	end
 end
