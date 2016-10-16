@@ -4,7 +4,7 @@
 -- @Date  : 2016-02-5 11:35:53
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-10-14 12:08:58
+-- @Last modified time: 2016-10-16 17:00:45
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Chat/lang/")
 MY_Chat = {}
@@ -219,7 +219,7 @@ function PS.OnPanelActive(wnd)
 		table.insert(menu, MENU_DIVIDER)
 		table.insert(menu, {
 			szOption = _L['ignore spaces'],
-			bCheck = true, bChecked = not data[3],
+			bCheck = true, bChecked = data[3],
 			fnAction = function()
 				data[3] = not data[3]
 				SaveBlockWords()
