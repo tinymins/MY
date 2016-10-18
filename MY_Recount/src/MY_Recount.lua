@@ -76,6 +76,7 @@ local _C = {
 				[FORCE_TYPE.MING_JIAO] = { r = 253, g = 84 , b = 0  , a = 144 }, -- Ã÷½Ì
 				[FORCE_TYPE.CANG_YUN ] = { r = 180, g = 60 , b = 0  , a = 255 }, -- ²ÔÔÆ
 				[FORCE_TYPE.CHANG_GE ] = { r = 100, g = 250, b = 180, a = 100 }, -- ³¤¸è
+				[FORCE_TYPE.BA_DAO   ] = { r = 71 , g = 73 , b = 166, a = 128 }, -- °Ôµ¶
 			},
 		}, {
 			['Bar'] = {
@@ -93,6 +94,7 @@ local _C = {
 				[FORCE_TYPE.MING_JIAO] = { r = 240, g = 70 , b = 96 , a = 180 }, -- Ã÷½Ì
 				[FORCE_TYPE.CANG_YUN ] = { r = 180, g = 60 , b = 0  , a = 255 }, -- ²ÔÔÆ
 				[FORCE_TYPE.CHANG_GE ] = { r = 100, g = 250, b = 180, a = 150 }, -- ³¤¸è
+				[FORCE_TYPE.BA_DAO   ] = { r = 71 , g = 73 , b = 166, a = 128 }, -- °Ôµ¶
 			},
 		}, {
 			['Bar'] = {
@@ -110,6 +112,7 @@ local _C = {
 				[FORCE_TYPE.MING_JIAO] = { image = "ui/Image/Common/Money.UITex", frame = 232 }, -- Ã÷½Ì
 				[FORCE_TYPE.CANG_YUN ] = { image = "ui/Image/Common/Money.UITex", frame = 26  }, -- ²ÔÔÆ
 				[FORCE_TYPE.CHANG_GE ] = { image = "ui/Image/Common/Money.UITex", frame = 30  }, -- ³¤¸è
+				[FORCE_TYPE.CHANG_GE ] = { image = "ui/Image/Common/Money.UITex", frame = 35  }, -- °Ôµ¶
 			},
 		}, {
 			['Bar'] = {
@@ -127,6 +130,7 @@ local _C = {
 				[FORCE_TYPE.MING_JIAO] = { image = "ui/Image/Common/Money.UITex", frame = 228 }, -- Ã÷½Ì
 				[FORCE_TYPE.CANG_YUN ] = { image = "ui/Image/Common/Money.UITex", frame = 219 }, -- ²ÔÔÆ
 				[FORCE_TYPE.CHANG_GE ] = { image = "ui/Image/Common/Money.UITex", frame = 30  }, -- ³¤¸è
+				[FORCE_TYPE.CHANG_GE ] = { image = "ui/Image/Common/Money.UITex", frame = 35  }, -- °Ôµ¶
 			},
 		},
 	},

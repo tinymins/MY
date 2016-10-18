@@ -33,6 +33,7 @@ local Config_Default = {
         [FORCE_TYPE.MING_JIAO] = {240, 70 , 96 }, -- Ã÷½Ì
         [FORCE_TYPE.CANG_YUN ] = {180, 60 , 0  }, -- ²ÔÔÆ
         [FORCE_TYPE.CHANG_GE ] = {100, 250, 180}, -- ³¤¸è
+        [FORCE_TYPE.BA_DAO   ] = {106 ,108, 189}, -- °Ôµ¶
     },
 }
 local Config = clone(Config_Default)
