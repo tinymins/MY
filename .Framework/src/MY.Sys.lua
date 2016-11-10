@@ -53,7 +53,7 @@ MY.Sys.bShieldedVersion = MY.GetLang() == 'zhcn'
 -- ##################################################################################################
 -- 格式化数据文件路径（替换$uid、$lang、$server以及补全相对路径）
 -- (string) MY.Sys.GetLUADataPath(szFileUri)
-function MY.Sys.GetLUADataPath(szFileUri)
+function MY.FormatPath(szFileUri)
 	-- Unified the directory separator
 	szFileUri = string.gsub(szFileUri, '\\', '/')
 	-- if exist $uid then add user role identity
@@ -80,13 +80,18 @@ function MY.Sys.GetLUADataPath(szFileUri)
 	if string.find(szFileUri, "%$relserver") then
 		szFileUri = szFileUri:gsub("%$relserver", ((MY.Game.GetRealServer()):gsub('[/\\|:%*%?"<>]', '')))
 	end
+	-- if it's relative path then complete path with "/@DATA/"
+	if string.sub(szFileUri, 1, 2) ~= './' then
+		szFileUri = MY.GetAddonInfo().szRoot .. "@DATA/" .. szFileUri
+	end
+	return szFileUri
+end
+
+function MY.Sys.GetLUADataPath(szFileUri)
+	szFileUri = MY.FormatPath(szFileUri)
 	-- ensure has file name
 	if string.sub(szFileUri, -1) == '/' then
 		szFileUri = szFileUri .. "data"
-	end
-	-- if it's relative path then complete path with "/@DATA/"
-	if string.sub(szFileUri, 1, 1) ~= '/' then
-		szFileUri = MY.GetAddonInfo().szRoot .. "@DATA/" .. szFileUri
 	end
 	return szFileUri
 end
