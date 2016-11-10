@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-10-14 18:08:07
+-- @Last modified time: 2016-11-08 20:32:50
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- #################################################################################################################################### --
@@ -919,7 +919,6 @@ function MY.RegisterPanel(szID, szTitle, szCategory, szIconTex, rgbaTitleColor, 
 	if type(rgbaTitleColor[2])~="number" then rgbaTitleColor[2] = 255 end
 	if type(rgbaTitleColor[3])~="number" then rgbaTitleColor[3] = 255 end
 	if type(rgbaTitleColor[4])~="number" then rgbaTitleColor[4] = 200 end
-	if type(options)~="table" then options = {} end
 	table.insert( category, {
 		szID        = szID       ,
 		szTitle     = szTitle    ,
