@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-07-29 10:29:34
+-- @Last modified time: 2016-11-10 20:19:08
 -----------------------------------------------
 
 -------------------------------------
@@ -3475,7 +3475,9 @@ function XGUI.OpenFontPicker(callback, t)
 		}):item("#Text_"..i)
 		  :click(function()
 		  	if callback then callback(i) end
-		  	ui:remove()
+			if not IsCtrlKeyDown() then
+		  		ui:remove()
+			end
 		  end)
 		  :hover(function()
 		  	XGUI(this):alpha(255)
