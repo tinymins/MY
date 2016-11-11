@@ -4,7 +4,7 @@
 -- µÁŒÂ°§À´√Œ’Ú°§‹¯“¡
 ---------------------------------------------------
 local _GLOBAL_CONFIG_ = "config/MY_SCREENSHOT/cfg.$lang.jx3dat"
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."ScreenShot/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_ScreenShot/lang/")
 local _MY_ScreenShot = {}
 MY_ScreenShot = MY_ScreenShot or {}
 MY_ScreenShot.Const = {}
