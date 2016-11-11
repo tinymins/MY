@@ -4,15 +4,15 @@
 -- @Author: µÔÒ»Ãù (tinymins) @ derzh.com
 -- @Date  : 2015-05-18 10:30:29
 -- @Email : admin@derzh.com
--- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-05-25 12:02:47
+-- @Last modified by:   Zhai Yiming
+-- @Last modified time: 2016-11-11 10:06:00
 -- @Version: 1.0
 -- @ChangeLog:
 --  + v1.0 File founded. -- viaµÔÒ»Ãù
 --------------------------------------------
 MY_TalkEx = MY_TalkEx or {}
 local _C = {}
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "TalkEx/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_TalkEx/lang/")
 MY_TalkEx.tTalkChannels     = {}
 MY_TalkEx.szTalk            = ''
 MY_TalkEx.szTrickFilter     = 'RAID'
