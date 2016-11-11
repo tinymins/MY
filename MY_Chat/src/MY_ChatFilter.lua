@@ -1,6 +1,6 @@
 MY_ChatFilter = {}
 local _C = {}
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Chat/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Chat/lang/")
 local MY_ChatFilter = MY_ChatFilter
 local MAX_CHAT_RECORD = 10
 local MAX_UUID_RECORD = 10
