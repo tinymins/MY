@@ -1,7 +1,7 @@
 -------------------------------------------
 -- ROLL点监控
 -------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "RollMonitor/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_RollMonitor/lang/")
 local SORT_TYPE = {
 	FIRST = 1,  -- 只记录第一次
 	LAST  = 2,  -- 只记录最后一次
