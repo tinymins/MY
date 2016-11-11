@@ -3,10 +3,10 @@
 -- @Author: ‹¯“¡ @ À´√Œ’Ú @ ›∂ª®π¨
 -- @Date  : 2014-07-30 09:21:13
 -- @Email : admin@derzh.com
--- @Last Modified by:   µ‘“ª√˘ @tinymins
--- @Last Modified time: 2016-05-16 18:53:07
+-- @Last modified by:   Zhai Yiming
+-- @Last modified time: 2016-11-11 10:10:05
 -----------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
 local _C = {
 	szQueryUrl = "http://jx3.derzh.com/exam/?l=%s&q=%s",
 	szSubmitUrl = "http://jx3.derzh.com/exam/submit.php?l=%s&d=%s",

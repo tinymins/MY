@@ -10,7 +10,7 @@ local STATE = {
     HIDDING = 4, -- ½¥±äÒþ²ØÖÐ
 }
 local m_nState = STATE.SHOW
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
 local _Cache = {}
 MY_AutoHideChat = {}
 MY_AutoHideChat.bAutoHideChatPanel = false

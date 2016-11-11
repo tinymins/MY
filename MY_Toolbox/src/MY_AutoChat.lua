@@ -4,9 +4,9 @@
 -- @Date  : 2015-03-09 21:26:52
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-07-19 16:12:23
+-- @Last modified time: 2016-11-11 10:09:35
 --------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
 local _C = { Data = {} }
 MY_AutoChat = { bEnable = false, bEchoOn = false, bAutoSelect1 = false, bAutoClose = false, bEnableShift = true, CurrentWindow = 0, Conents = nil }
 RegisterCustomData("MY_AutoChat.bEnable")
@@ -15,7 +15,7 @@ RegisterCustomData("MY_AutoChat.bAutoClose")
 RegisterCustomData("MY_AutoChat.bEnableShift")
 RegisterCustomData("MY_AutoChat.bAutoSelect1")
 
-function MY_AutoChat.LoadData() _C.Data = MY.LoadLUAData("config/AUTO_CHAT/data.$lang.jx3dat") or MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "ToolBox/data/interact/$lang.jx3dat") or _C.Data end
+function MY_AutoChat.LoadData() _C.Data = MY.LoadLUAData("config/AUTO_CHAT/data.$lang.jx3dat") or MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_ToolBox/data/interact/$lang.jx3dat") or _C.Data end
 function MY_AutoChat.SaveData() MY.SaveLUAData("config/AUTO_CHAT/data.$lang.jx3dat", _C.Data) end
 function MY_AutoChat.GetName(dwType, dwID)
 	if dwID == UI_GetClientPlayerID() then

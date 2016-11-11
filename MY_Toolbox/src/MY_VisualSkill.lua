@@ -3,10 +3,10 @@
 -- @Author: µÔÒ»Ãù @tinymins
 -- @Date  : 2015-03-02 10:08:45
 -- @Email : admin@derzh.com
--- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2016-04-27 10:50:45
+-- @Last modified by:   Zhai Yiming
+-- @Last modified time: 2016-11-11 10:09:54
 --------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
 local _C = {}
 MY_VisualSkill = {}
 MY_VisualSkill.bEnable = false

@@ -4,9 +4,9 @@
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-06-07 17:35:35
+-- @Last modified time: 2016-11-11 10:09:59
 -----------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
 local _C = {}
 MY_ToolBox = {}
 

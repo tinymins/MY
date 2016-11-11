@@ -3,8 +3,8 @@
 -- @Author: µÔÒ»Ãù @tinymins
 -- @Date  : 2014-11-25 12:31:03
 -- @Email : admin@derzh.com
--- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-10 11:42:34
+-- @Last modified by:   Zhai Yiming
+-- @Last modified time: 2016-11-11 10:09:46
 -----------------------------------------------
 -- #######################################################################################################
 --   * * *         *                 *                     *                   *           *
@@ -20,7 +20,7 @@
 --   *       *               * * *           *           *     *   *                   * *       *
 --   *     *   * * * * * *               * * *           *   *       * * *     * * * *     * * * *
 -- #######################################################################################################
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
 local _C = {}
 MY_Anmerkungen = {}
 MY_Anmerkungen.bNotePanelEnable = false

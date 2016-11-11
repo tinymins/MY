@@ -1,7 +1,7 @@
 ------------------------------------------
 -- 信息条显示
 ------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
 local _Cache = {
     bFighting = false,
     nLastFightStartTimestarp = 0,

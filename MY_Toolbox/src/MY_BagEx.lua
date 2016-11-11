@@ -3,14 +3,14 @@
 -- @Author: µÔÒ»Ãù @tinymins
 -- @Date  : 2014-11-25 10:40:14
 -- @Email : admin@derzh.com
--- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-08-13 23:07:33
+-- @Last modified by:   Zhai Yiming
+-- @Last modified time: 2016-11-11 10:09:22
 -----------------------------------------------
 MY_BagEx = {}
 MY_BagEx.bEnable = true
 RegisterCustomData("MY_BagEx.bEnable")
 local _C = { tItemText = {} }
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Toolbox/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
 
 MY_BagEx.Enable = function(bEnable)
 	MY_BagEx.bEnable = bEnable
