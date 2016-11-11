@@ -4,9 +4,9 @@
 -- @Date  : 2016-02-5 11:35:53
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-10-16 17:00:45
+-- @Last modified time: 2016-11-11 10:04:13
 --------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Chat/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Chat/lang/")
 MY_Chat = {}
 MY_Chat.bChatCopy = true
 MY_Chat.bBlockWords = true

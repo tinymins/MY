@@ -3,10 +3,10 @@
 -- @Author: µÔÒ»Ãù @tinymins
 -- @Date  : 2016-02-5 11:35:53
 -- @Email : admin@derzh.com
--- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-08-19 10:33:04
+-- @Last modified by:   Zhai Yiming
+-- @Last modified time: 2016-11-11 10:04:55
 --------------------------------------------
-local INI_PATH = MY.GetAddonInfo().szRoot .. "Chat/ui/MY_TeamBalloon.ini"
+local INI_PATH = MY.GetAddonInfo().szRoot .. "MY_Chat/ui/MY_TeamBalloon.ini"
 local DISPLAY_TIME = 5000
 local ANIMATE_SHOW_TIME = 500
 local ANIMATE_HIDE_TIME = 500

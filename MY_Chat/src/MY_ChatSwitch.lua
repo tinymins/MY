@@ -4,10 +4,10 @@
 -- @Date  : 2016-02-5 11:35:53
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-09-06 13:05:42
+-- @Last modified time: 2016-11-11 10:04:44
 --------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Chat/lang/")
-local INI_PATH = MY.GetAddonInfo().szRoot .. "Chat/ui/MY_ChatSwitch.ini"
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Chat/lang/")
+local INI_PATH = MY.GetAddonInfo().szRoot .. "MY_Chat/ui/MY_ChatSwitch.ini"
 local CD_REFRESH_OFFSET = 7 * 60 * 60 -- 7µã¸üÐÂCD
 MY_ChatSwitch = {}
 MY_ChatSwitch.tChannel = {}

@@ -5,14 +5,14 @@
 -- @Date  : 2015-05-21 10:34:08
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-07-13 17:19:36
+-- @Last modified time: 2016-11-11 10:04:36
 -- @Version: 1.0
 -- @ChangeLog:
 --  + v1.0 File founded. -- via翟一鸣
 --------------------------------------------
 MY_ChatMosaics = {}
 local _C = {}
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Chat/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Chat/lang/")
 local MY_ChatMosaics = MY_ChatMosaics
 MY_ChatMosaics.bEnabled = false            -- 启用状态
 MY_ChatMosaics.szMosaics = _L.MOSAICS_CHAR -- 马赛克字符
