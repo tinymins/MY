@@ -19,7 +19,7 @@
     }
 ]]
 local _C = {}
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "ChatMonitor/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_ChatMonitor/lang/")
 MY_ChatMonitor = {}
 MY_ChatMonitor.szKeyWords          = _L.CHAT_MONITOR_KEYWORDS_SAMPLE
 MY_ChatMonitor.bIsRegexp           = false
