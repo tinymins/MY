@@ -27,7 +27,7 @@ MY_Logoff.Const = {
 	RETURN_LOGIN = 1,
 	RETURN_LIST = 2,
 }
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot..'Logoff/lang/')
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot..'MY_Logoff/lang/')
 local _MY_Logoff = {
 	bStart = false,
 	nTimeOutUnixTime = nil,
