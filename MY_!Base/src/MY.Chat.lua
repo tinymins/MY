@@ -895,12 +895,12 @@ function MY.Chat.RegisterMsgMonitor(arg0, arg1, arg2)
 		_C.tMsgMonitorFun[szKey] = nil
 	end
 	if fnAction and tChannels then
-		_C.tMsgMonitorFun[szKey] = { fn = function(szMsg, nFont, bRich, r, g, b, szChannel)
+		_C.tMsgMonitorFun[szKey] = { fn = function(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szName)
 			-- filter addon comm.
 			if StringFindW(szMsg, "eventlink") and StringFindW(szMsg, _L["Addon comm."]) then
 				return
 			end
-			fnAction(szMsg, nFont, bRich, r, g, b, szChannel)
+			fnAction(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szName)
 		end, ch = tChannels }
 		RegisterMsgMonitor(_C.tMsgMonitorFun[szKey].fn, _C.tMsgMonitorFun[szKey].ch)
 	end
