@@ -3,7 +3,6 @@ data = {
     ['chat log'] = '聊天記錄',
     ['filter tong online message'] = '過濾幫會上線公告提示',
     ['filter tong member log message'] = '過濾幫會成員上線提示',
-    ['rebuild date list'] = '重建日期索引',
     ['export chatlog'] = '導出聊天記錄',
     ['preparing'] = '准備中',
     ['Export succeed'] = '導出完成！',
@@ -18,4 +17,6 @@ data = {
     ['delete record'] = '刪除該條記錄',
     ['copy this record'] = '複制該條消息',
     ['open chatlog'] = '打開聊天記錄',
+    ['MY - MY_ChatLog'] = '茗伊插件集 - 聊天記錄',
+    ['press enter to search ...'] = '輸入回車鍵搜索...',
 }
