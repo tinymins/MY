@@ -7,6 +7,7 @@
 
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
+local XML_LINE_BREAKER = XML_LINE_BREAKER
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local tinsert, tremove, tconcat = table.insert, table.remove, table.concat
 local ssub, slen, schar, srep, sbyte, sformat, sgsub =
@@ -18,12 +19,7 @@ local GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID = 
 local setmetatable = setmetatable
 
 local _L  = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_ChatLog/lang/")
-local _C  = {}
-local Log = {}
-local XML_LINE_BREAKER = XML_LINE_BREAKER
-local tinsert, tconcat, tremove = table.insert, table.concat, table.remove
 MY_ChatLog = MY_ChatLog or {}
-MY_ChatLog.szActiveChannel         = "MSG_WHISPER" -- 当前激活的标签页
 MY_ChatLog.bIgnoreTongOnlineMsg    = true -- 帮会上线通知
 MY_ChatLog.bIgnoreTongMemberLogMsg = true -- 帮会成员上线下线提示
 MY_ChatLog.bBlockWords             = true -- 不记录屏蔽关键字
@@ -34,156 +30,349 @@ RegisterCustomData('MY_ChatLog.bIgnoreTongMemberLogMsg')
 ------------------------------------------------------------------------------------------------------
 -- 数据采集
 ------------------------------------------------------------------------------------------------------
-_C.TongOnlineMsg	   = '^' .. MY.String.PatternEscape(g_tStrings.STR_TALK_HEAD_TONG .. g_tStrings.STR_GUILD_ONLINE_MSG)
-_C.TongMemberLoginMsg  = '^' .. MY.String.PatternEscape(g_tStrings.STR_GUILD_MEMBER_LOGIN):gsub('<link 0>', '.-') .. '$'
-_C.TongMemberLogoutMsg = '^' .. MY.String.PatternEscape(g_tStrings.STR_GUILD_MEMBER_LOGOUT):gsub('<link 0>', '.-') .. '$'
+local TONG_ONLINE_MSG        = '^' .. MY.String.PatternEscape(g_tStrings.STR_TALK_HEAD_TONG .. g_tStrings.STR_GUILD_ONLINE_MSG)
+local TONG_MEMBER_LOGIN_MSG  = '^' .. MY.String.PatternEscape(g_tStrings.STR_GUILD_MEMBER_LOGIN):gsub('<link 0>', '.-') .. '$'
+local TONG_MEMBER_LOGOUT_MSG = '^' .. MY.String.PatternEscape(g_tStrings.STR_GUILD_MEMBER_LOGOUT):gsub('<link 0>', '.-') .. '$'
 
-function _C.OnMsg(szMsg, szChannel, nFont, bRich, r, g, b)
-	local szText = szMsg
-	if bRich then
-		szText = GetPureText(szMsg)
+------------------------------------------------------------------------------------------------------
+-- 数据库核心
+------------------------------------------------------------------------------------------------------
+local PAGE_AMOUNT = 150
+local EXPORT_SLICE = 100
+local PAGE_DISPLAY = 17
+local SZ_INI = MY.GetAddonInfo().szRoot .. "MY_ChatLog/ui/MY_ChatLog.ini"
+local CHANNELS = {[1] = "MSG_WHISPER", [2] = "MSG_PARTY", [3] = "MSG_TEAM", [4] = "MSG_FRIEND", [5] = "MSG_GUILD", [6] = "MSG_GUILD_ALLIANCE"}
+local CHANNELS_R = (function() local t = {} for k, v in pairs(CHANNELS) do t[v] = k end return t end)()
+local DB, DB_W, DB_D
+local function InitDB()
+	DB = SQLite3_Open(MY.FormatPath('userdata/CHAT_LOG/$uid.db'))
+	DB:Execute("CREATE TABLE IF NOT EXISTS ChatLog (hash integer, channel integer, time integer, talker nvarchar(20), text nvarchar(400), msg nvarchar(4000), primary key (hash, time))")
+	DB:Execute("CREATE INDEX IF NOT EXISTS chatlog_channel_idx ON ChatLog(channel)")
+	DB:Execute("CREATE INDEX IF NOT EXISTS chatlog_text_idx ON ChatLog(text)")
+	DB_W = DB:Prepare("REPLACE INTO ChatLog (hash, channel, time, talker, text, msg) VALUES (?, ?, ?, ?, ?, ?)")
+	DB_D = DB:Prepare("DELETE FROM ChatLog WHERE hash = ? AND time = ?")
+	
+	local SZ_OLD_PATH = MY.FormatPath('userdata/CHAT_LOG/$uid/') -- %s/%s.$lang.jx3dat
+	if IsLocalFileExist(SZ_OLD_PATH) then
+		local nScanDays = 365 * 3
+		local nDailySec = 24 * 3600
+		local date = TimeToDate(GetCurrentTime())
+		local dwEndedTime = GetCurrentTime() - date.hour * 3600 - date.minute * 60 - date.second
+		local dwStartTime = dwEndedTime - nScanDays * nDailySec
+		local nHour, nMin, nSec
+		local function regexp(...)
+			nHour, nMin, nSec = ...
+			return ""
+		end
+		local szTalker
+		local function regexpN(...)
+			szTalker = ...
+		end
+		local hash, time, talker, text, msg
+		DB:Execute("BEGIN TRANSACTION")
+		for nChannel, szChannel in pairs(CHANNELS) do
+			local SZ_CHANNEL_PATH = SZ_OLD_PATH .. szChannel .. "/"
+			if IsLocalFileExist(SZ_CHANNEL_PATH) then
+				for dwTime = dwStartTime, dwEndedTime, nDailySec do
+					local szDate = MY.Sys.FormatTime("yyyyMMdd", dwTime)
+					local data = MY.LoadLUAData(SZ_CHANNEL_PATH .. szDate .. '.$lang.jx3dat')
+					if data then
+						for _, szMsg in ipairs(data) do
+							nHour, nMin, nSec, szTalker = nil
+							szMsg = szMsg:gsub('<text>text="%[(%d+):(%d+):(%d+)%]".-</text>', regexp)
+							szMsg:gsub('text="%[([^"<>]-)%]"[^<>]-name="namelink_', regexpN)
+							if nHour and nMin and nSec and szTalker then
+								msg    = AnsiToUTF8(szMsg)
+								text   = AnsiToUTF8(GetPureText(szMsg))
+								hash   = GetStringCRC(msg)
+								talker = AnsiToUTF8(szTalker)
+								time   = dwTime + nHour * 3600 + nMin * 60 + nSec
+								DB_W:ClearBindings()
+								DB_W:BindAll(hash, nChannel, time, talker, text, msg)
+								DB_W:Execute()
+							end
+						end
+					end
+				end
+			end
+		end
+		DB:Execute("END TRANSACTION")
+		CPath.DelDir(SZ_OLD_PATH)
+	end
+	
+	do
+		local t = {}
+		for nChannel, szChannel in pairs(CHANNELS) do
+			tinsert(t, szChannel)
+		end
+		local function OnMsg(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szTalker)
+			local szText = szMsg
+			if bRich then
+				szText = GetPureText(szMsg)
+			else
+				szMsg = GetFormatText(szMsg, nFont, r, g, b)
+			end
+			if MY_ChatLog.bBlockWords
+			and MY_Chat and MY_Chat.MatchBlockWord
+			and MY_Chat.MatchBlockWord(szText, szChannel, false) then
+				return
+			end
+			-- filters
+			if szChannel == "MSG_GUILD" then
+				if MY_ChatLog.bIgnoreTongOnlineMsg and szText:find(TONG_ONLINE_MSG) then
+					return
+				end
+				if MY_ChatLog.bIgnoreTongMemberLogMsg and (
+					szText:find(TONG_MEMBER_LOGIN_MSG) or szText:find(TONG_MEMBER_LOGOUT_MSG)
+				) then
+					return
+				end
+			end
+			-- generate rec
+			local hash, time, talker, text, msg
+			time   = GetCurrentTime()
+			msg    = AnsiToUTF8(szMsg)
+			text   = AnsiToUTF8(szText)
+			hash   = GetStringCRC(msg)
+			talker = AnsiToUTF8(szTalker)
+			DB_W:ClearBindings()
+			DB_W:BindAll(hash, CHANNELS_R[szChannel], time, talker, text, msg)
+			DB_W:Execute()
+		end
+		MY.RegisterMsgMonitor('MY_ChatLog', OnMsg, t)
+	end
+end
+MY.RegisterInit("MY_ChatLog_Init", InitDB)
+
+function MY_ChatLog.Open()
+	Wnd.OpenWindow(SZ_INI, "MY_ChatLog"):BringToTop()
+end
+
+function MY_ChatLog.Close()
+	Wnd.CloseWindow("MY_ChatLog")
+end
+
+function MY_ChatLog.OnFrameCreate()
+	local container = this:Lookup("Window_Main/WndScroll_ChatChanel/WndContainer_ChatChanel")
+	container:Clear()
+	for nChannel, szChannel in pairs(CHANNELS) do
+		local wnd = container:AppendContentFromIni(SZ_INI, "Wnd_ChatChannel")
+		wnd.nChannel = nChannel
+		wnd:Lookup("CheckBox_ChatChannel"):Check(true, WNDEVENT_FIRETYPE.PREVENT)
+		wnd:Lookup("CheckBox_ChatChannel", "Text_ChatChannel"):SetText(g_tStrings.tChannelName[szChannel])
+		wnd:Lookup("CheckBox_ChatChannel", "Text_ChatChannel"):SetFontColor(GetMsgFontColor(szChannel))
+	end
+	container:FormatAllContentPos()
+	
+	local handle = this:Lookup("Window_Main/Wnd_Index", "Handle_IndexesOuter/Handle_Indexes")
+	handle:Clear()
+	for i = 1, PAGE_DISPLAY do
+		handle:AppendItemFromIni(SZ_INI, "Handle_Index")
+	end
+	handle:FormatAllItemPos()
+	
+	local handle = this:Lookup("Window_Main/WndScroll_ChatLog", "Handle_ChatLogs")
+	handle:Clear()
+	for i = 1, PAGE_AMOUNT do
+		handle:AppendItemFromIni(SZ_INI, "Handle_ChatLog")
+	end
+	handle:FormatAllItemPos()
+	
+	this.nCurrentPage = 1
+	MY_ChatLog.UpdatePage(this)
+	this:RegisterEvent("ON_MY_MOSAICS_RESET")
+end
+
+function MY_ChatLog.OnEvent(event)
+	if event == "ON_MY_MOSAICS_RESET" then
+		MY_ChatLog.UpdatePage(this)
+	end
+end
+
+function MY_ChatLog.OnLButtonClick()
+	local name = this:GetName()
+	if name == "Btn_Close" then
+		MY_ChatLog.Close()
+	end
+end
+
+function MY_ChatLog.OnCheckBoxCheck()
+	MY_ChatLog.UpdatePage(this:GetRoot())
+end
+
+function MY_ChatLog.OnCheckBoxUncheck()
+	MY_ChatLog.UpdatePage(this:GetRoot())
+end
+
+function MY_ChatLog.OnItemLButtonClick()
+	local name = this:GetName()
+	if name == "Handle_Index" then
+		this:GetRoot().nCurrentPage = this.nPage
+		MY_ChatLog.UpdatePage(this:GetRoot())
+	end
+end
+
+function MY_ChatLog.OnEditSpecialKeyDown()
+	local name = this:GetName()
+	local frame = this:GetRoot()
+	local szKey = GetKeyName(Station.GetMessageKey())
+	if szKey == "Enter" then
+		if name == "WndEdit_Index" then
+			frame.nCurrentPage = tonumber(this:GetText()) or frame.nCurrentPage
+		end
+		MY_ChatLog.UpdatePage(this:GetRoot())
+		return 1
+	end
+end
+
+function MY_ChatLog.OnItemRButtonClick()
+	local this = this
+	local name = this:GetName()
+	if name == "Handle_ChatLog" then
+		local menu = {
+			{
+				szOption = _L["delete record"],
+				fnAction = function()
+					DB_D:ClearBindings()
+					DB_D:BindAll(this.hash, this.time)
+					DB_D:Execute()
+					MY_ChatLog.UpdatePage(this:GetRoot())
+				end,
+			}, {
+				szOption = _L["copy this record"],
+				fnAction = function()
+					XGUI.OpenTextEditor(UTF8ToAnsi(this.text))
+				end,
+			}
+		}
+		PopupMenu(menu)
+	end
+end
+
+function MY_ChatLog.UpdatePage(frame)
+	local container = frame:Lookup("Window_Main/WndScroll_ChatChanel/WndContainer_ChatChanel")
+	local wheres = {}
+	local values = {}
+	for i = 0, container:GetAllContentCount() - 1 do
+		local wnd = container:LookupContent(i)
+		if wnd:Lookup("CheckBox_ChatChannel"):IsCheckBoxChecked() then
+			tinsert(wheres, "channel = ?")
+			tinsert(values, wnd.nChannel)
+		end
+	end
+	local sql  = "SELECT * FROM ChatLog"
+	local where = ""
+	local sqlc = "SELECT count(*) AS count FROM ChatLog"
+	if #wheres > 0 then
+		where = where .. " (" .. tconcat(wheres, " OR ") .. ")"
 	else
-		szMsg = GetFormatText(szMsg, nil, r, g, b)
+		where = " 1 = 0"
 	end
-	if MY_ChatLog.bBlockWords
-	and MY_Chat and MY_Chat.MatchBlockWord
-	and MY_Chat.MatchBlockWord(szText, szChannel, false) then
-		return
-	end
-	-- filters
-	if szChannel == "MSG_GUILD" then
-		if MY_ChatLog.bIgnoreTongOnlineMsg and szText:find(_C.TongOnlineMsg) then
-			return
+	local search = frame:Lookup("Window_Main/Wnd_Search/Edit_Search"):GetText()
+	if search ~= "" then
+		if #where > 0 then
+			where = where .. " AND"
 		end
-		if MY_ChatLog.bIgnoreTongMemberLogMsg and (
-			szText:find(_C.TongMemberLoginMsg) or szText:find(_C.TongMemberLogoutMsg)
-		) then
-			return
+		where = where .. " (talker LIKE ? OR text LIKE ?)"
+		tinsert(values, AnsiToUTF8("%" .. search .. "%"))
+		tinsert(values, AnsiToUTF8("%" .. search .. "%"))
+	end
+	if #where > 0 then
+		sql  = sql  .. " WHERE" .. where
+		sqlc = sqlc .. " WHERE" .. where
+	end
+	sql  = sql  .. " ORDER BY time ASC"
+	sqlc = sqlc .. " ORDER BY time ASC"
+	
+	local DB_RC = DB:Prepare(sqlc)
+	DB_RC:BindAll(unpack(values))
+	local data = DB_RC:GetNext()
+	local nPageCount = mceil(data.count / PAGE_AMOUNT)
+	frame.nCurrentPage = mmin(frame.nCurrentPage, nPageCount)
+	frame:Lookup("Window_Main/Wnd_Index/Wnd_IndexEdit/WndEdit_Index"):SetText(frame.nCurrentPage)
+	frame:Lookup("Window_Main/Wnd_Index", "Handle_IndexCount/Text_IndexCount"):SprintfText(_L["total %d pages"], nPageCount)
+	
+	local hOuter = frame:Lookup("Window_Main/Wnd_Index", "Handle_IndexesOuter")
+	local handle = hOuter:Lookup("Handle_Indexes")
+	if nPageCount <= PAGE_DISPLAY then
+		for i = 0, PAGE_DISPLAY - 1 do
+			local hItem = handle:Lookup(i)
+			hItem.nPage = i + 1
+			hItem:Lookup("Text_Index"):SetText(i + 1)
+			hItem:Lookup("Text_IndexUnderline"):SetVisible(i + 1 == frame.nCurrentPage)
+			hItem:SetVisible(i < nPageCount)
+		end
+	else
+		local hItem = handle:Lookup(0)
+		hItem.nPage = 1
+		hItem:Lookup("Text_Index"):SetText(1)
+		hItem:Lookup("Text_IndexUnderline"):SetVisible(1 == frame.nCurrentPage)
+		hItem:Show()
+		
+		local hItem = handle:Lookup(PAGE_DISPLAY - 1)
+		hItem.nPage = nPageCount
+		hItem:Lookup("Text_Index"):SetText(nPageCount)
+		hItem:Lookup("Text_IndexUnderline"):SetVisible(nPageCount == frame.nCurrentPage)
+		hItem:Show()
+		
+		local nStartPage
+		if frame.nCurrentPage + mceil((PAGE_DISPLAY - 2) / 2) > nPageCount then
+			nStartPage = nPageCount - (PAGE_DISPLAY - 2)
+		elseif frame.nCurrentPage - mceil((PAGE_DISPLAY - 2) / 2) < 2 then
+			nStartPage = 2
+		else
+			nStartPage = frame.nCurrentPage - mceil((PAGE_DISPLAY - 2) / 2)
+		end
+		for i = 1, PAGE_DISPLAY - 2 do
+			local hItem = handle:Lookup(i)
+			hItem.nPage = nStartPage + i - 1
+			hItem:Lookup("Text_Index"):SetText(nStartPage + i - 1)
+			hItem:Lookup("Text_IndexUnderline"):SetVisible(nStartPage + i - 1 == frame.nCurrentPage)
+			hItem:SetVisible(true)
 		end
 	end
-	-- generate rec
-	szMsg = MY.Chat.GetTimeLinkText({r=r, g=g, b=b, f=nFont, s='[hh:mm:ss]'}) .. szMsg
-	-- save and draw rec
-	_C.AppendLog(szChannel, _C.GetCurrentDate(), szMsg)
-	_C.UiAppendLog(szChannel, szMsg)
+	handle:SetSize(hOuter:GetSize())
+	handle:FormatAllItemPos()
+	handle:SetSizeByAllItemSize()
+	hOuter:FormatAllItemPos()
+	
+	sql = sql .. " LIMIT " .. PAGE_AMOUNT .. " OFFSET " .. ((frame.nCurrentPage - 1) * PAGE_AMOUNT)
+	local DB_R = DB:Prepare(sql)
+	DB_R:BindAll(unpack(values))
+	local data = DB_R:GetAll()
+	local handle = frame:Lookup("Window_Main/WndScroll_ChatLog", "Handle_ChatLogs")
+	for i = 1, PAGE_AMOUNT do
+		local rec = data[i]
+		local hItem = handle:Lookup(i - 1)
+		if rec then
+			local f = GetMsgFont(CHANNELS[rec.channel])
+			local r, g, b = GetMsgFontColor(CHANNELS[rec.channel])
+			local h = hItem:Lookup("Handle_ChatLog_Msg")
+			h:Clear()
+			h:AppendItemFromString(MY.GetTimeLinkText({r=r, g=g, b=b, f=f, s='[yyyy/MM/dd][hh:mm:ss]'}, rec.time))
+			h:AppendItemFromString(UTF8ToAnsi(rec.msg))
+			if MY_ChatMosaics and MY_ChatMosaics.Mosaics then
+				MY_ChatMosaics.Mosaics(h)
+			end
+			h:FormatAllItemPos()
+			local nW, nH = h:GetAllItemSize()
+			h:SetH(nH)
+			hItem:Lookup("Shadow_ChatLogBg"):SetH(nH + 3)
+			hItem:SetH(nH + 3)
+			hItem.hash = rec.hash
+			hItem.time = rec.time
+			hItem.text = rec.text
+			hItem:Show()
+		else
+			hItem:Hide()
+		end
+	end
+	handle:FormatAllItemPos()
 end
-
-function _C.OnTongMsg(szMsg, nFont, bRich, r, g, b)
-	_C.OnMsg(szMsg, 'MSG_GUILD', nFont, bRich, r, g, b)
-end
-function _C.OnWisperMsg(szMsg, nFont, bRich, r, g, b)
-	_C.OnMsg(szMsg, 'MSG_WHISPER', nFont, bRich, r, g, b)
-end
-function _C.OnRaidMsg(szMsg, nFont, bRich, r, g, b)
-	_C.OnMsg(szMsg, 'MSG_TEAM', nFont, bRich, r, g, b)
-end
-function _C.OnFriendMsg(szMsg, nFont, bRich, r, g, b)
-	_C.OnMsg(szMsg, 'MSG_FRIEND', nFont, bRich, r, g, b)
-end
-
-MY.RegisterInit("MY_CHATLOG_REGMSG", function()
-	MY.RegisterMsgMonitor('MY_ChatLog_Tong'  , _C.OnTongMsg  , { 'MSG_GUILD', 'MSG_GUILD_ALLIANCE' })
-	MY.RegisterMsgMonitor('MY_ChatLog_Wisper', _C.OnWisperMsg, { 'MSG_WHISPER' })
-	MY.RegisterMsgMonitor('MY_ChatLog_Raid'  , _C.OnRaidMsg  , { 'MSG_TEAM', 'MSG_PARTY', 'MSG_GROUP' })
-	MY.RegisterMsgMonitor('MY_ChatLog_Friend', _C.OnFriendMsg, { 'MSG_FRIEND' })
-end)
 
 ------------------------------------------------------------------------------------------------------
--- 数据存取
+-- 数据导出
 ------------------------------------------------------------------------------------------------------
---[[
-	Log = {
-		MSG_WHISPER = {
-			DateList = { 20150214, 20150215 }
-			DateIndex = { [20150214] = 1, [20150215] = 2 }
-			[20150214] = { <szMsg>, <szMsg>, ... },
-			[20150215] = { <szMsg>, <szMsg>, ... },
-			...
-		},
-		...
-	}
-]]
-local DATA_PATH = 'userdata/CHAT_LOG/$uid/%s/%s.$lang.jx3dat'
-
-_C.tModifiedLog = {}
-function _C.GetCurrentDate()
-	return tonumber(MY.Sys.FormatTime("yyyyMMdd", GetCurrentTime()))
-end
-
-function _C.RebuildDateList(tChannels, nScanDays)
-	_C.UnloadLog()
-	local nDailySec = 24 * 3600
-	for _, szChannel in ipairs(tChannels) do
-		Log[szChannel] = { DateList = {} }
-		local dwEndedTime = GetCurrentTime()
-		local dwStartTime = GetCurrentTime() - nScanDays * nDailySec
-		local tDateList  = Log[szChannel].DateList
-		for dwTime = dwStartTime, dwEndedTime, nDailySec do
-			local szDate = MY.Sys.FormatTime("yyyyMMdd", dwTime)
-			if IsFileExist(MY.GetLUADataPath(DATA_PATH:format(szChannel, szDate))) then
-				tinsert(tDateList, szDate)
-				_C.tModifiedLog[szChannel] = { DateList = true }
-			end
-		end
-	end
-	_C.UnloadLog()
-end
-
-function _C.GetDateList(szChannel)
-	if not Log[szChannel] then
-		Log[szChannel] = {}
-		Log[szChannel].DateList = MY.LoadLUAData(DATA_PATH:format(szChannel, 'DateList')) or {}
-		Log[szChannel].DateIndex = {}
-		for i, dwDate in ipairs(Log[szChannel].DateList) do
-			Log[szChannel].DateIndex[dwDate] = i
-		end
-	end
-	return Log[szChannel].DateList, Log[szChannel].DateIndex
-end
-
-function _C.GetLog(szChannel, dwDate)
-	_C.GetDateList(szChannel)
-	if not Log[szChannel][dwDate] then
-		Log[szChannel][dwDate] = MY.LoadLUAData(DATA_PATH:format(szChannel, dwDate)) or {}
-	end
-	return Log[szChannel][dwDate]
-end
-
-function _C.AppendLog(szChannel, dwDate, szMsg)
-	local log = _C.GetLog(szChannel, dwDate)
-	tinsert(log, szMsg)
-	-- mark as modified
-	if not _C.tModifiedLog[szChannel] then
-		_C.tModifiedLog[szChannel] = {}
-	end
-	_C.tModifiedLog[szChannel][dwDate] = true
-	-- append datelist
-	local DateList, DateIndex = _C.GetDateList(szChannel)
-	if not DateIndex[dwDate] then
-		tinsert(DateList, dwDate)
-		DateIndex[dwDate] = #DateList
-		_C.tModifiedLog[szChannel]['DateList'] = true
-	end
-	MY.DelayCall("MY_ChatLog",  _C.SaveLog, 30000)
-end
-
-function _C.SaveLog()
-	for szChannel, tDate in pairs(_C.tModifiedLog) do
-		for dwDate, _ in pairs(tDate) do
-			if not empty(Log[szChannel][dwDate]) then
-				MY.SaveLUAData(DATA_PATH:format(szChannel, dwDate), Log[szChannel][dwDate], nil, true)
-			end
-		end
-	end
-	_C.tModifiedLog = {}
-end
-
-function _C.UnloadLog()
-	_C.SaveLog()
-	Log = {}
-end
-MY.RegisterExit(_C.UnloadLog)
-
 local function htmlEncode(html)
 	return html
 	:gsub("&", "&amp;")
@@ -340,32 +529,31 @@ local function convertXml2Html(szXml)
 	return tconcat(t)
 end
 
-local m_bExporting
+local l_bExporting
 function MY_ChatLog.ExportConfirm()
-	if m_bExporting then
+	if l_bExporting then
 		return MY.Sysmsg({_L['Already exporting, please wait.']})
 	end
 	local ui = XGUI.CreateFrame("MY_ChatLog_Export", {
-		simple = true, esc = true, close = true, w = 180,
-		level = "Normal1", text = _L['export chatlog'], alpha = 200,
+		simple = true, esc = true, close = true, w = 140,
+		level = "Normal1", text = _L['export chatlog'], alpha = 233,
 	})
 	local btnSure
-	local aChannels = {"MSG_GUILD", "MSG_WHISPER", "MSG_TEAM", "MSG_FRIEND"}
 	local tChannels = {}
 	local x, y = 10, 10
-	for i, v in ipairs(aChannels) do
+	for nChannel, szChannel in pairs(CHANNELS) do
 		ui:append("WndCheckBox", {
 			x = x, y = y, w = 100,
-			text = g_tStrings.tChannelName[v],
+			text = g_tStrings.tChannelName[szChannel],
 			checked = true,
 			oncheck = function(checked)
-				tChannels[v] = checked
+				tChannels[nChannel] = checked
 				if checked then
 					btnSure:enable(true)
 				else
 					btnSure:enable(false)
-					for i,v in ipairs(aChannels) do
-						if tChannels[v] then
+					for nChannel, szChannel in pairs(CHANNELS) do
+						if tChannels[nChannel] then
 							btnSure:enable(true)
 							break
 						end
@@ -374,23 +562,23 @@ function MY_ChatLog.ExportConfirm()
 			end,
 		})
 		y = y + 30
-		tChannels[v] = true
+		tChannels[nChannel] = true
 	end
 	y = y + 10
 	
 	btnSure = ui:append("WndButton", {
-		x = x, y = y, w = 100,
+		x = x, y = y, w = 120,
 		text = _L['export chatlog'],
 		onclick = function()
-			local chns = {}
-			for i, v in ipairs(aChannels) do
-				if tChannels[v] then
-					table.insert(chns, v)
+			local aChannels = {}
+			for nChannel, szChannel in pairs(CHANNELS) do
+				if tChannels[nChannel] then
+					table.insert(aChannels, nChannel)
 				end
 			end
 			MY_ChatLog.Export(
 				MY.GetLUADataPath("export/ChatLog/$name@$server@" .. MY.FormatTime("yyyyMMddhhmmss") .. ".html"),
-				chns, 10,
+				aChannels, 10,
 				function(title, progress)
 					OutputMessage("MSG_ANNOUNCE_YELLOW", _L("Exporting chatlog: %s, %.2f%%.", title, progress * 100))
 				end
@@ -400,11 +588,11 @@ function MY_ChatLog.ExportConfirm()
 	}, true)
 	y = y + 30
 	ui:height(y + 50)
+	ui:anchor({s = "CENTER", r = "CENTER", x = 0, y = 0})
 end
 
 function MY_ChatLog.Export(szExportFile, aChannels, nPerSec, onProgress)
-	local Log = _G.Log
-	if m_bExporting then
+	if l_bExporting then
 		return MY.Sysmsg({_L['Already exporting, please wait.']})
 	end
 	if onProgress then
@@ -414,13 +602,34 @@ function MY_ChatLog.Export(szExportFile, aChannels, nPerSec, onProgress)
 	if status ~= "SUCCEED" then
 		return MY.Sysmsg({_L("Error: open file error %s [%s]", szExportFile, status)})
 	end
-	m_bExporting = true
-	local szLastChannel, szLastDate
-	local nChnIndex, nDateIndex, nOffset = 1, 1, 1
+	l_bExporting = true
+	
+	local sql  = "SELECT * FROM ChatLog"
+	local sqlc = "SELECT count(*) AS count FROM ChatLog"
+	local wheres = {}
+	local values = {}
+	for _, nChannel in ipairs(aChannels) do
+		tinsert(wheres, "channel = ?")
+		tinsert(values, nChannel)
+	end
+	if #wheres > 0 then
+		sql  = sql  .. " WHERE (" .. tconcat(wheres, " OR ") .. ")"
+		sqlc = sqlc .. " WHERE (" .. tconcat(wheres, " OR ") .. ")"
+	end
+	sql  = sql  .. " ORDER BY time ASC"
+	sqlc = sqlc .. " ORDER BY time ASC"
+	local DB_RC = DB:Prepare(sqlc)
+	DB_RC:BindAll(unpack(values))
+	local data = DB_RC:GetNext()
+	local nPageCount = mceil(data.count / EXPORT_SLICE)
+	
+	sql = sql .. " LIMIT " .. EXPORT_SLICE .. " OFFSET ?"
+	local nIndex = #values + 1
+	local DB_R = DB:Prepare(sql)
+	local i = 0
 	local function Export()
-		local szChannel = aChannels[nChnIndex]
-		if not szChannel then
-			m_bExporting = false
+		if i > nPageCount then
+			l_bExporting = false
 			Log(szExportFile, getFooter(), "close")
 			if onProgress then
 				onProgress(_L['Export succeed'], 1)
@@ -430,258 +639,90 @@ function MY_ChatLog.Export(szExportFile, aChannels, nPerSec, onProgress)
 			MY.Sysmsg({_L('Chatlog export succeed, file saved as %s', szFile)})
 			return 0
 		end
-		if szChannel ~= szLastChannel then
-			szLastChannel = szChannel
-			Log(szExportFile, getChannelTitle(szChannel))
+		values[nIndex] = i * EXPORT_SLICE
+		DB_R:ClearBindings()
+		DB_R:BindAll(unpack(values))
+		local data = DB_R:GetAll()
+		for i, rec in ipairs(data) do
+			local f = GetMsgFont(CHANNELS[rec.channel])
+			local r, g, b = GetMsgFontColor(CHANNELS[rec.channel])
+			Log(szExportFile, convertXml2Html(MY.GetTimeLinkText({r=r, g=g, b=b, f=f, s='[yyyy/MM/dd][hh:mm:ss]'}, rec.time)))
+			Log(szExportFile, convertXml2Html(UTF8ToAnsi(rec.msg)))
 		end
-		local DateList, DateIndex = _C.GetDateList(szChannel)
-		local szDate = DateList[nDateIndex]
-		if not szDate then
-			nDateIndex = 1
-			nChnIndex = nChnIndex + 1
-			return
+		if onProgress then
+			onProgress(_L['exporting'], i / nPageCount)
 		end
-		if szDate ~= szLastDate then
-			szLastDate = szDate
-			Log(szExportFile, getDateTitle(szDate))
-		end
-		local aLog = _C.GetLog(szChannel, DateList[nDateIndex])
-		local nUIndex = nOffset + nPerSec
-		if nUIndex >= #aLog then
-			nUIndex = #aLog
-		end
-		for i = nOffset, nUIndex do
-			if onProgress then
-				onProgress(g_tStrings.tChannelName[szChannel] .. " - " .. DateList[nDateIndex],
-				(((i - 1) / #aLog + (nDateIndex - 1)) / #DateList + (nChnIndex - 1)) / #aChannels)
-			end
-			Log(szExportFile, convertXml2Html(aLog[i]))
-		end
-		if nUIndex >= #aLog then
-			nOffset = 1
-			nDateIndex = nDateIndex + 1
-		else
-			nOffset = nUIndex + 1
-		end
+		i = i + 1
 	end
 	MY.BreatheCall("MY_ChatLog_Export", Export)
 end
 
 ------------------------------------------------------------------------------------------------------
--- 界面绘制
+-- 设置界面绘制
 ------------------------------------------------------------------------------------------------------
-function _C.UiRedrawLog()
-	if not _C.uiLog then
-		return
-	end
-	_C.uiLog:clear()
-	_C.nDrawDate  = nil
-	_C.nDrawIndex = nil
-	_C.UiDrawPrev(20)
-	_C.uiLog:scroll(100)
-	if MY_ChatMosaics and MY_ChatMosaics.Mosaics then
-		MY_ChatMosaics.Mosaics(_C.uiLog:hdl(1):raw(1))
-	end
-end
-
--- 加载更多
-function _C.UiDrawPrev(nCount)
-	if not _C.uiLog or _C.bUiDrawing == GetLogicFrameCount() then
-		return
-	end
-	local h = _C.uiLog:hdl(1):raw(1)
-	local szChannel = MY_ChatLog.szActiveChannel
-	local DateList, DateIndex = _C.GetDateList(szChannel)
-	if #DateList == 0 or -- 没有记录可以加载
-	(_C.nDrawDate == DateList[1] and _C.nDrawIndex == 0) then -- 没有更多的记录可以加载
-		return
-	elseif not _C.nDrawDate then -- 还没有加载进度
-		_C.nDrawDate = DateList[#DateList]
-	end
-	local nPos = 0
-	local nLen = h:GetItemCount()
-	-- 防止UI递归死循环 资源锁
-	_C.bUiDrawing = GetLogicFrameCount()
-	-- 保存当前滚动条位置
-	local _, nH = h:GetSize()
-	local _, nOrginScrollH = h:GetAllItemSize()
-	local nOrginScrollY = (nOrginScrollH - nH) * _C.uiLog:scroll() / 100
-	-- 绘制聊天记录
-	while nCount > 0 do
-		-- 加载指定日期的记录
-		local log = _C.GetLog(szChannel, _C.nDrawDate)
-		-- nDrawIndex为空则从最后一条开始加载
-		if not _C.nDrawIndex then
-			_C.nDrawIndex = #log
-		end
-		-- 计算该日期的记录是否足够加载剩余待加载条数
-		if _C.nDrawIndex > nCount then -- 足够 则直接加载
-			h:InsertItemFromString(0, false, tconcat(log, "", _C.nDrawIndex - nCount + 1, _C.nDrawIndex))
-			_C.nDrawIndex = _C.nDrawIndex - nCount
-			nCount = 0
-		else -- 不足 则加载完后将加载进度指向上一个日期
-			h:InsertItemFromString(0, false, tconcat(log, "", 1, _C.nDrawIndex))
-			h:InsertItemFromString(0, false, GetFormatText("========== " .. _C.nDrawDate .. " ==========\n")) -- 跨日期输出日期戳
-			-- 判断还有没有记录可以加载
-			local nIndex = DateIndex[_C.nDrawDate]
-			if nIndex == 1 then -- 没有记录可以加载了
-				nCount = 0
-				_C.nDrawIndex = 0
-			else -- 还有记录
-				nCount = nCount - _C.nDrawIndex
-				_C.nDrawDate = DateList[nIndex - 1]
-				_C.nDrawIndex = nil
-			end
-		end
-	end
-	h:FormatAllItemPos()
-	nLen = h:GetItemCount() - nLen
-	MY_ChatMosaics.Mosaics(h, nPos, nLen)
-	for i = 0, nLen do
-		local hItem = h:Lookup(i)
-		MY.Chat.RenderLink(hItem)
-		if MY_Farbnamen and MY_Farbnamen.Render then
-			MY_Farbnamen.Render(hItem)
-		end
-	end
-	-- 恢复之前滚动条位置
-	if nOrginScrollY < 0 then -- 之前没有滚动条
-		if _C.uiLog:scroll() >= 0 then -- 现在有滚动条
-			_C.uiLog:scroll(100)
-		end
-	else
-		local _, nScrollH = h:GetAllItemSize()
-		local nDeltaScrollH = nScrollH - nOrginScrollH
-		_C.uiLog:scroll((nDeltaScrollH + nOrginScrollY) / (nScrollH - nH) * 100)
-	end
-	-- 防止UI递归死循环 资源锁解除
-	_C.bUiDrawing = nil
-end
-
-function _C.UiAppendLog(szChannel, szMsg)
-	if not (_C.uiLog and szChannel == MY_ChatLog.szActiveChannel) then
-		return
-	end
-	local bBottom = _C.uiLog:scroll() == 100
-	if MY_ChatMosaics then
-		local h = _C.uiLog:hdl(1):raw(1)
-		local nCount
-		if h then
-			nCount = h:GetItemCount()
-		end
-		_C.uiLog:append(szMsg)
-		if nCount then
-			MY_ChatMosaics.Mosaics(h, nCount)
-			for i = nCount, h:GetItemCount() - 1 do
-				local hItem = h:Lookup(i)
-				MY.Chat.RenderLink(hItem)
-				if MY_Farbnamen and MY_Farbnamen.Render then
-					MY_Farbnamen.Render(hItem)
-				end
-			end
-		end
-	else
-		_C.uiLog:append(szMsg)
-	end
-	if bBottom then
-		_C.uiLog:scroll(100)
-	end
-end
-
-function _C.OnPanelActive(wnd)
+local PS = {}
+function PS.OnPanelActive(wnd)
 	local ui = MY.UI(wnd)
 	local w, h = ui:size()
-	local x, y = 20, 10
+	local x, y = 50, 50
+	local dy = 40
+	local wr = 200
 	
-	_C.uiLog = ui:append("WndScrollBox", "WndScrollBox_Log", {
-		x = 20, y = 35, w = w - 21, h = h - 40, handlestyle = 3,
-		onscroll = function(nScrollPercent, nScrollDistance)
-			if nScrollPercent == 0 -- 当前滚动条位置为0
-			or (nScrollPercent == -1 and nScrollDistance == -1) then -- 还没有滚动条但是鼠标往上滚了
-				_C.UiDrawPrev(20)
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = wr,
+		text = _L['filter tong member log message'],
+		checked = MY_ChatLog.bIgnoreTongMemberLogMsg,
+		oncheck = function(bChecked)
+			MY_ChatLog.bIgnoreTongMemberLogMsg = bChecked
+		end
+	})
+	y = y + dy
+	
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = wr,
+		text = _L['filter tong online message'],
+		checked = MY_ChatLog.bIgnoreTongOnlineMsg,
+		oncheck = function(bChecked)
+			MY_ChatLog.bIgnoreTongOnlineMsg = bChecked
+		end
+	})
+	y = y + dy
+	
+	if MY_Chat then
+		ui:append("WndCheckBox", {
+			x = x, y = y, w = wr,
+			text = _L['hide blockwords'],
+			checked = MY_ChatLog.bBlockWords,
+			oncheck = function(bChecked)
+				MY_ChatLog.bBlockWords = bChecked
 			end
+		})
+		ui:append("WndButton", {
+			x = x + 200, y = y, w = 80,
+			text = _L["edit"],
+			onclick = function()
+				MY.SwitchTab("MY_Chat_Filter")
+			end,
+		})
+		y = y + dy
+	end
+	
+	ui:append("WndButton", {
+		x = x, y = y, w = 150,
+		text = _L["export chatlog"],
+		onclick = function()
+			MY_ChatLog.ExportConfirm()
 		end,
-	}):children('#WndScrollBox_Log')
+	})
+	y = y + dy
 	
-	for i, szChannel in ipairs({
-		'MSG_GUILD'  ,
-		'MSG_WHISPER',
-		'MSG_TEAM'   ,
-		'MSG_FRIEND' ,
-	}) do
-		ui:append('WndRadioBox', 'RadioBox_' .. szChannel):children('#RadioBox_' .. szChannel)
-		  :pos(x + (i - 1) * 100, y):width(90)
-		  :group("default")
-		  :text(g_tStrings.tChannelName[szChannel] or '')
-		  :check(function(bChecked)
-		  	if bChecked then
-		  		MY_ChatLog.szActiveChannel = szChannel
-		  	end
-		  	_C.UiRedrawLog()
-		  end)
-		  :check(MY_ChatLog.szActiveChannel == szChannel)
-	end
-	
-	ui:append("Image", "Image_Setting"):item('#Image_Setting')
-	  :pos(w - 26, y - 6):size(30, 30):alpha(200)
-	  :image('UI/Image/UICommon/Commonpanel.UITex',18)
-	  :hover(function(bIn) this:SetAlpha((bIn and 255) or 200) end)
-	  :click(function()
-	  	PopupMenu((function()
-	  		local t = {}
-	  		table.insert(t, {
-	  			szOption = _L['filter tong member log message'],
-	  			bCheck = true, bChecked = MY_ChatLog.bIgnoreTongMemberLogMsg,
-	  			fnAction = function()
-	  				MY_ChatLog.bIgnoreTongMemberLogMsg = not MY_ChatLog.bIgnoreTongMemberLogMsg
-	  			end,
-	  		})
-	  		table.insert(t, {
-	  			szOption = _L['filter tong online message'],
-	  			bCheck = true, bChecked = MY_ChatLog.bIgnoreTongOnlineMsg,
-	  			fnAction = function()
-	  				MY_ChatLog.bIgnoreTongOnlineMsg = not MY_ChatLog.bIgnoreTongOnlineMsg
-	  			end,
-	  		})
-	  		table.insert(t, {
-	  			szOption = _L['rebuild date list'],
-	  			fnAction = function()
-	  				_C.RebuildDateList({
-	  					"MSG_GUILD", "MSG_WHISPER", "MSG_TEAM", "MSG_FRIEND"
-	  				}, (GetCurrentTime() - 1388505600) / 60 / 60 / 24)
-	  				_C.UiRedrawLog()
-	  			end,
-	  		})
-	  		table.insert(t, {
-	  			szOption = _L['export chatlog'],
-	  			fnAction = function()
-					MY_ChatLog.ExportConfirm()
-	  			end,
-	  		})
-            if MY_Chat then
-                table.insert(t,{
-                    szOption = _L['hide blockwords'],
-                    fnAction = function()
-                        MY_ChatLog.bBlockWords = not MY_ChatLog.bBlockWords
-                    end,
-                    bCheck = true,
-                    bChecked = MY_ChatLog.bBlockWords, {
-                        szOption = _L['edit'],
-                        fnAction = function()
-                            MY.SwitchTab("MY_Chat_Filter")
-                        end,
-                    }
-                })
-            end
-	  		return t
-	  	end)())
-	end)
-
+	ui:append("WndButton", {
+		x = x, y = y, w = 150,
+		text = _L["open chatlog"],
+		onclick = function()
+			MY_ChatLog.Open()
+		end,
+	})
+	y = y + dy
 end
-
-MY.RegisterPanel( "ChatLog", _L["chat log"], _L['Chat'], "ui/Image/button/SystemButton.UITex|43", {255,127,0,200}, {
-	OnPanelActive = _C.OnPanelActive,
-	OnPanelDeactive = function()
-		_C.uiLog = nil
-	end
-})
+MY.RegisterPanel( "ChatLog", _L["chat log"], _L['Chat'], "ui/Image/button/SystemButton.UITex|43", {255,127,0,200}, PS)
