@@ -13,4 +13,9 @@ data = {
     ['Exporting chatlog: %s, %.2f%%.'] = '聊天記錄導出 - %s - %.2f%%',
     ['hide blockwords'] = '關鍵字屏蔽',
     ['edit'] = '編輯',
+    
+    ['total %d pages'] = '共%d頁',
+    ['delete record'] = '刪除該條記錄',
+    ['copy this record'] = '複制該條消息',
+    ['open chatlog'] = '打開聊天記錄',
 }
