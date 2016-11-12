@@ -97,7 +97,7 @@ local function InitDB()
 			end
 		end
 		DB:Execute("END TRANSACTION")
-		CPath.DelDir(SZ_OLD_PATH)
+		-- CPath.DelDir(SZ_OLD_PATH)
 	end
 	
 	do
@@ -177,6 +177,9 @@ function MY_ChatLog.OnFrameCreate()
 		handle:AppendItemFromIni(SZ_INI, "Handle_ChatLog")
 	end
 	handle:FormatAllItemPos()
+	
+	this:Lookup("", "Text_Title"):SetText(_L['MY - MY_ChatLog'])
+	this:Lookup("Window_Main/Wnd_Search/Edit_Search"):SetPlaceholderText(_L['press enter to search ...'])
 	
 	this.nCurrentPage = 1
 	MY_ChatLog.UpdatePage(this)
