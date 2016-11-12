@@ -40,6 +40,7 @@ MY_ChatMosaics.ResetMosaics = function()
 	else
 		MY.HookChatPanel("MY_ChatMosaics")
 	end
+	FireUIEvent("ON_MY_MOSAICS_RESET")
 end
 
 _C.NameLink_GetText = function(h, ...)
