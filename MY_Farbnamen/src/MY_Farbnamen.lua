@@ -36,12 +36,12 @@ local Config_Default = {
 	},
 }
 local DB = SQLite3_Open(SZ_DB_PATH)
-DB:Execute("CREATE TABLE IF NOT EXISTS InfoCache (id integer primary key, name varchar(20), force integer, role integer, level integer, title varchar(20), camp integer, tong integer)")
+DB:Execute("CREATE TABLE IF NOT EXISTS InfoCache (id INTEGER PRIMARY KEY, name VARCHAR(20) NOT NULL, force INTEGER, role INTEGER, level INTEGER, title VARCHAR(20), camp INTEGER, tong INTEGER)")
 DB:Execute("CREATE INDEX IF NOT EXISTS info_cache_name_idx ON InfoCache(name)")
 local DBI_W  = DB:Prepare("REPLACE INTO InfoCache (id, name, force, role, level, title, camp, tong) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
 local DBI_RI = DB:Prepare("SELECT id, name, force, role, level, title, camp, tong FROM InfoCache WHERE id = ?")
 local DBI_RN = DB:Prepare("SELECT id, name, force, role, level, title, camp, tong FROM InfoCache WHERE name = ?")
-DB:Execute("CREATE TABLE IF NOT EXISTS TongCache (id integer primary key, name varchar(20))")
+DB:Execute("CREATE TABLE IF NOT EXISTS TongCache (id INTEGER PRIMARY KEY, name VARCHAR(20))")
 local DBT_W  = DB:Prepare("REPLACE INTO TongCache (id, name) VALUES (?, ?)")
 local DBT_RI = DB:Prepare("SELECT id, name FROM InfoCache WHERE id = ?")
 
