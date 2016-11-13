@@ -97,7 +97,7 @@ local function InitDB()
 			end
 		end
 		DB:Execute("END TRANSACTION")
-		-- CPath.DelDir(SZ_OLD_PATH)
+		CPath.DelDir(SZ_OLD_PATH)
 	end
 	
 	do
@@ -353,7 +353,13 @@ function MY_ChatLog.UpdatePage(frame)
 			local h = hItem:Lookup("Handle_ChatLog_Msg")
 			h:Clear()
 			h:AppendItemFromString(MY.GetTimeLinkText({r=r, g=g, b=b, f=f, s='[yyyy/MM/dd][hh:mm:ss]'}, rec.time))
+			local nCount = h:GetItemCount()
 			h:AppendItemFromString(UTF8ToAnsi(rec.msg))
+			if MY_Farbnamen.Render then
+				for i = nCount, h:GetItemCount() - 1 do
+					MY_Farbnamen.Render(h:Lookup(i))
+				end
+			end
 			if MY_ChatMosaics and MY_ChatMosaics.Mosaics then
 				MY_ChatMosaics.Mosaics(h)
 			end
