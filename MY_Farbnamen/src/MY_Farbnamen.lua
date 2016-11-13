@@ -4,8 +4,8 @@
 -- ZhaiYiMing.CoM
 -- 2014Äê5ÔÂ19ÈÕ05:07:02
 --
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Farbnamen/lang/")
-local _SUB_ADDON_FOLDER_NAME_ = "Farbnamen"
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Farbnamen/lang/")
+local _SUB_ADDON_FOLDER_NAME_ = "MY_Farbnamen"
 local XML_LINE_BREAKER = XML_LINE_BREAKER
 local tinsert, tconcat, tremove = table.insert, table.concat, table.remove
 ---------------------------------------------------------------
