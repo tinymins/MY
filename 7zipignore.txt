@@ -8,7 +8,5 @@ changelog.html
 !src-dist\
 @Data\
 Dev_*\
-ImRobot\
-ExamTip\
 *.py
 *.pyc
