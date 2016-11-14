@@ -4,7 +4,7 @@
 -- @Date  : 2015-03-02 10:08:45
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-11-11 10:09:54
+-- @Last modified time: 2016-11-11 20:21:39
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
 local _C = {}
@@ -108,6 +108,7 @@ MY_VisualSkill.OnSkillCast = function(dwSkillID, dwSkillLevel)
 		or dwSkillID == 3121       -- (3121)  ÆÕÍ¨¹¥»÷-¹­¹¥»÷    î¸·çïÚ·¨
 		or dwSkillID == 4326       -- (4326)  ÆÕÍ¨¹¥»÷-Ë«µ¶¹¥»÷  ´óÄ®µ¶·¨
 		or dwSkillID == 13039      -- (13039) ÆÕÍ¨¹¥»÷_¶Üµ¶¹¥»÷  ¾íÑ©µ¶
+		or dwSkillID == 16010      -- (16010) ÆÕÍ¨¹¥»÷_°ÁËªµ¶¹¥»÷  Ëª·çµ¶·¨
 		or dwSkillID == 17         -- (17)    ½­ºþ-·ÀÉíÎäÒÕ-´ò×ø ´ò×ø
 		or dwSkillID == 18         -- (18)    Ì¤ÔÆ Ì¤ÔÆ
 		or dwIconID  == 1817       -- ±ÕÕó
