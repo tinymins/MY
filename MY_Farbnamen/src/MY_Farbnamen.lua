@@ -256,7 +256,7 @@ local function OnExit()
 	DB:Execute("BEGIN TRANSACTION")
 	for i, p in pairs(l_infocache_w) do
 		DBI_W:ClearBindings()
-		DBI_W:BindAll(p.id, p.name, p.force, p.role, p.level, p.title, p.camp, info.tong)
+		DBI_W:BindAll(p.id, p.name, p.force, p.role, p.level, p.title, p.camp, p.tong)
 		DBI_W:Execute()
 	end
 	DB:Execute("END TRANSACTION")
