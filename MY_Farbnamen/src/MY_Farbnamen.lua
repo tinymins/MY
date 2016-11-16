@@ -16,6 +16,7 @@ MY_Farbnamen = MY_Farbnamen or {
 }
 RegisterCustomData("Account\\MY_Farbnamen.bEnabled")
 local SZ_CONFIG_PATH = "config/PLAYER_FORCE_COLOR/$uid.$lang.jx3dat"
+local SZ_DB_DIR = MY.GetLUADataPath("cache/PLAYER_INFO/")
 local SZ_DB_PATH = MY.GetLUADataPath("cache/PLAYER_INFO/$relserver.$lang.db")
 local Config_Default = {
 	tForceColor = MY.LoadLUAData("config/PLAYER_FORCE_COLOR.jx3dat") or {
@@ -35,6 +36,7 @@ local Config_Default = {
 		[FORCE_TYPE.BA_DAO   ] = {106 ,108, 189}, -- °Ôµ¶
 	},
 }
+CPath.MakeDir(SZ_DB_DIR)
 local DB = SQLite3_Open(SZ_DB_PATH)
 DB:Execute("CREATE TABLE IF NOT EXISTS InfoCache (id INTEGER PRIMARY KEY, name VARCHAR(20) NOT NULL, force INTEGER, role INTEGER, level INTEGER, title VARCHAR(20), camp INTEGER, tong INTEGER)")
 DB:Execute("CREATE INDEX IF NOT EXISTS info_cache_name_idx ON InfoCache(name)")
