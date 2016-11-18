@@ -187,8 +187,6 @@ local _MY = {
 		}, {...}
 	}
 	]]
-	tBgEvent = {},      -- 背景频道事件绑定
-	tInitFun = {},      -- 初始化函数
 }
 
 do local AddonInfo = SetmetaReadonly({
@@ -569,6 +567,30 @@ function MY.RegisterEvent(szEvent, fnAction)
 end
 end
 
+do local BG_EVENT_LIST = {}
+------------------------------------
+--            背景通讯             --
+------------------------------------
+-- ON_BG_CHANNEL_MSG
+-- arg0: 消息szKey
+-- arg1: 消息来源频道
+-- arg2: 消息发布者ID
+-- arg3: 消息发布者名字
+-- arg4: 不定长参数数组数据
+------------------------------------
+local function OnBgEvent()
+	local szEvent, nChannel, dwID, szName, aParam = arg0, arg1, arg2, arg3, arg4
+	if dwID ~= UI_GetClientPlayerID() and szEvent and BG_EVENT_LIST[szEvent] then
+		for szKey, fnAction in pairs(BG_EVENT_LIST[szEvent]) do
+			local status, err = pcall(fnAction, szEvent, dwID, szName, nChannel, unpack(aParam))
+			if not status then
+				MY.Debug({err}, "BG_EVENT#" .. szEvent .. "." .. szKey, MY_DEBUG.ERROR)
+			end
+		end
+	end
+end
+RegisterEvent("ON_BG_CHANNEL_MSG", OnBgEvent)
+
 -- MY.RegisterBgEvent("MY_CHECK_INSTALL", function(dwTalkerID, szTalkerName, nChannel, oData) MY.BgTalk(szTalkerName, "MY_CHECK_INSTALL_REPLY", oData) end) -- 注册
 -- MY.RegisterBgEvent("MY_CHECK_INSTALL") -- 注销
 -- MY.RegisterBgEvent("MY_CHECK_INSTALL.RECEIVER_01", function(dwTalkerID, szTalkerName, nChannel, oData) MY.BgTalk(szTalkerName, "MY_CHECK_INSTALL_REPLY", oData) end) -- 注册
@@ -581,43 +603,23 @@ function MY.RegisterBgEvent(szEvent, fnAction)
 		szEvent = string.sub(szEvent, 1, nPos - 1)
 	end
 	if fnAction then
-		if not _MY.tBgEvent[szEvent] then
-			_MY.tBgEvent[szEvent] = {}
+		if not BG_EVENT_LIST[szEvent] then
+			BG_EVENT_LIST[szEvent] = {}
 		end
 		if szKey then
-			_MY.tBgEvent[szEvent][szKey] = fnAction
+			BG_EVENT_LIST[szEvent][szKey] = fnAction
 		else
-			table.insert(_MY.tBgEvent[szEvent], fnAction)
+			table.insert(BG_EVENT_LIST[szEvent], fnAction)
 		end
 	else
 		if szKey then
-			_MY.tBgEvent[szEvent][szKey] = nil
+			BG_EVENT_LIST[szEvent][szKey] = nil
 		else
-			_MY.tBgEvent[szEvent] = nil
+			BG_EVENT_LIST[szEvent] = nil
 		end
 	end
 end
-------------------------------------
---            背景通讯             --
-------------------------------------
--- ON_BG_CHANNEL_MSG
--- arg0: 消息szKey
--- arg1: 消息来源频道
--- arg2: 消息发布者ID
--- arg3: 消息发布者名字
--- arg4: 不定长参数数组数据
-------------------------------------
-MY.RegisterEvent("ON_BG_CHANNEL_MSG", function()
-	local szEvent, nChannel, dwID, szName, aParam = arg0, arg1, arg2, arg3, arg4
-	if dwID ~= UI_GetClientPlayerID() and szEvent and _MY.tBgEvent[szEvent] then
-		for szKey, fnAction in pairs(_MY.tBgEvent[szEvent]) do
-			local status, err = pcall(fnAction, szEvent, dwID, szName, nChannel, unpack(aParam))
-			if not status then
-				MY.Debug({err}, "BG_EVENT#" .. szEvent .. "." .. szKey, MY_DEBUG.ERROR)
-			end
-		end
-	end
-end)
+end
 
 -- MY.BgTalk(szName, szEvent, ...)
 -- MY.BgTalk(nChannel, szEvent, ...)
