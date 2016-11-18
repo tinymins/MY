@@ -187,7 +187,6 @@ local _MY = {
 		}, {...}
 	}
 	]]
-	tEvent = {},        -- 游戏事件绑定
 	tBgEvent = {},      -- 背景频道事件绑定
 	tInitFun = {},      -- 初始化函数
 }
@@ -476,6 +475,19 @@ end
 -- (string)  szEvent  事件，可在后面加一个点并紧跟一个标识字符串用于防止重复或取消绑定，如 LOADING_END.xxx
 -- (function)fnAction 事件处理函数，arg0 ~ arg9，传入 nil 相当于取消该事件
 --特别注意：当 fnAction 为 nil 并且 szKey 也为 nil 时会取消所有通过本函数注册的事件处理器
+do local EVENT_LIST = {}
+local function EventHandler(szEvent, ...)
+	local tEvent = EVENT_LIST[szEvent]
+	if tEvent then
+		for k, v in pairs(tEvent) do
+			local res, err = pcall(v, szEvent, ...)
+			if not res then
+				MY.Debug({err}, 'OnEvent#' .. szEvent .. "." .. k, MY_DEBUG.ERROR)
+			end
+		end
+	end
+end
+
 function MY.RegisterEvent(szEvent, fnAction)
 	if type(szEvent) == "table" then
 		for _, szEvent in ipairs(szEvent) do
@@ -489,36 +501,26 @@ function MY.RegisterEvent(szEvent, fnAction)
 			szEvent = string.sub(szEvent, 1, nPos - 1)
 		end
 		if fnAction then
-			if not _MY.tEvent[szEvent] then
-				_MY.tEvent[szEvent] = {}
-				RegisterEvent(szEvent, _MY.EventHandler)
+			if not EVENT_LIST[szEvent] then
+				EVENT_LIST[szEvent] = {}
+				RegisterEvent(szEvent, EventHandler)
 			end
 			if szKey then
-				_MY.tEvent[szEvent][szKey] = fnAction
+				EVENT_LIST[szEvent][szKey] = fnAction
 			else
-				table.insert(_MY.tEvent[szEvent], fnAction)
+				table.insert(EVENT_LIST[szEvent], fnAction)
 			end
 		else
 			if szKey then
-				if _MY.tEvent[szEvent] then
-					_MY.tEvent[szEvent][szKey] = nil
+				if EVENT_LIST[szEvent] then
+					EVENT_LIST[szEvent][szKey] = nil
 				end
 			else
-				_MY.tEvent[szEvent] = {}
+				EVENT_LIST[szEvent] = {}
 			end
 		end
 	end
 end
-function _MY.EventHandler(szEvent, ...)
-	local tEvent = _MY.tEvent[szEvent]
-	if tEvent then
-		for k, v in pairs(tEvent) do
-			local res, err = pcall(v, szEvent, ...)
-			if not res then
-				MY.Debug({err}, 'OnEvent#' .. szEvent .. "." .. k, MY_DEBUG.ERROR)
-			end
-		end
-	end
 end
 
 -- MY.RegisterBgEvent("MY_CHECK_INSTALL", function(dwTalkerID, szTalkerName, nChannel, oData) MY.BgTalk(szTalkerName, "MY_CHECK_INSTALL_REPLY", oData) end) -- 注册
