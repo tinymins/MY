@@ -146,6 +146,11 @@ local function InitDB()
 end
 MY.RegisterInit("MY_ChatLog_Init", InitDB)
 
+local function ReleaseDB()
+	DB:Release()
+end
+MY.RegisterExit("MY_Chat_Release", ReleaseDB)
+
 function MY_ChatLog.Open()
 	Wnd.OpenWindow(SZ_INI, "MY_ChatLog"):BringToTop()
 end

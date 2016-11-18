@@ -270,6 +270,8 @@ local function OnExit()
 		DBT_W:Execute()
 	end
 	DB:Execute("END TRANSACTION")
+	
+	DB:Release()
 end
 MY.RegisterExit("MY_Farbnamen_Save", OnExit)
 
