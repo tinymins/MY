@@ -190,7 +190,8 @@ local _MY = {
 	tBgEvent = {},      -- 背景频道事件绑定
 	tInitFun = {},      -- 初始化函数
 }
-_MY.tAddonInfo = SetmetaReadonly({
+
+do local AddonInfo = SetmetaReadonly({
 	szName          = _MY.szName                      ,
 	szShortName     = _MY.szShortName                 ,
 	szUITexCommon   = _MY.szUITexCommon               ,
@@ -216,8 +217,10 @@ _MY.tAddonInfo = SetmetaReadonly({
 	},
 })
 function MY.GetAddonInfo()
-	return _MY.tAddonInfo
+	return AddonInfo
 end
+end
+
 function _MY.Init()
 	if _MY.bLoaded then
 		return
