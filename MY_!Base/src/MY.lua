@@ -221,30 +221,6 @@ function MY.GetAddonInfo()
 end
 end
 
-function _MY.Init()
-	if _MY.bLoaded then
-		return
-	end
-	_MY.bLoaded = true
-	-- init functions
-	for szKey, fnAction in pairs(_MY.tInitFun) do
-		local nStartTick = GetTickCount()
-		local status, err = pcall(fnAction)
-		if not status then
-			MY.Debug({err}, "_MY.tInitFun#" .. szKey)
-		end
-		-- performance monitor
-		MY.Debug({_L('Initial function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], MY_DEBUG.LOG)
-	end
-	_MY.tInitFun = nil
-	-- 加载主窗体
-	MY.OpenPanel(true, true, true)
-	MY.ResizePanel(780, 540)
-	MY.ClosePanel(true, false, true)
-	-- 显示欢迎信息
-	MY.Sysmsg({_L("%s, welcome to use mingyi plugins!", GetClientPlayer().szName) .. " v" .. MY.GetVersion() .. ' Build ' .. _MY.szBuildDate})
-end
-
 --------------------------------------------------------------------------------------------------------------------------------------------
 -- 界面开关
 --------------------------------------------------------------------------------------------------------------------------------------------
@@ -410,13 +386,29 @@ function MY.GetVersion()
 	return szVersion, v
 end
 
-function MY.IsInitialized()
-	return _MY.bLoaded
-end
-
 --------------------------------------------------------------------------------------------------------------------------------------------
 -- 事件注册
 --------------------------------------------------------------------------------------------------------------------------------------------
+do local INIT_FUNC_LIST = {}
+local function OnInit()
+	for szKey, fnAction in pairs(INIT_FUNC_LIST) do
+		local nStartTick = GetTickCount()
+		local status, err = pcall(fnAction)
+		if not status then
+			MY.Debug({err}, "INIT_FUNC_LIST#" .. szKey)
+		end
+		MY.Debug({_L('Initial function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], MY_DEBUG.LOG)
+	end
+	INIT_FUNC_LIST = nil
+	-- 加载主窗体
+	MY.OpenPanel(true, true, true)
+	MY.ResizePanel(780, 540)
+	MY.ClosePanel(true, false, true)
+	-- 显示欢迎信息
+	MY.Sysmsg({_L("%s, welcome to use mingyi plugins!", GetClientPlayer().szName) .. " v" .. MY.GetVersion() .. ' Build ' .. _MY.szBuildDate})
+end
+RegisterEvent("FIRST_LOADING_END", OnInit)
+
 -- 注册初始化函数
 -- RegisterInit(string id, function fn) -- 注册
 -- RegisterInit(function fn)            -- 注册
@@ -431,45 +423,96 @@ function MY.RegisterInit(arg1, arg2)
 	end
 	if fnAction then
 		if szKey then
-			_MY.tInitFun[szKey] = fnAction
+			INIT_FUNC_LIST[szKey] = fnAction
 		else
-			table.insert(_MY.tInitFun, fnAction)
+			table.insert(INIT_FUNC_LIST, fnAction)
 		end
 	elseif szKey then
-		_MY.tInitFun[szKey] = nil
+		INIT_FUNC_LIST[szKey] = nil
 	end
 end
+
+function MY.IsInitialized()
+	return not INIT_FUNC_LIST
+end
+end
+
+do local EXIT_FUNC_LIST = {}
+local function OnExit()
+	for szKey, fnAction in pairs(EXIT_FUNC_LIST) do
+		local nStartTick = GetTickCount()
+		local status, err = pcall(fnAction)
+		if not status then
+			MY.Debug({err}, "EXIT_FUNC_LIST#" .. szKey)
+		end
+		MY.Debug({_L('Exit function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], MY_DEBUG.LOG)
+	end
+	EXIT_FUNC_LIST = nil
+end
+RegisterEvent('GAME_EXIT', OnExit)
+RegisterEvent('PLAYER_EXIT_GAME', OnExit)
+RegisterEvent('RELOAD_UI_ADDON_BEGIN', OnExit)
 
 -- 注册游戏结束函数
 -- RegisterExit(string id, function fn) -- 注册
 -- RegisterExit(function fn)            -- 注册
 -- RegisterExit(string id)              -- 注销
 function MY.RegisterExit(arg1, arg2)
-	local szKey, fnAction = ''
+	local szKey, fnAction
 	if type(arg1) == 'string' then
-		szKey = '.' .. arg1
+		szKey = arg1
 		fnAction = arg2
 	elseif type(arg1) == 'function' then
 		fnAction = arg1
 	end
-	MY.RegisterEvent('PLAYER_EXIT_GAME' .. szKey, fnAction)
-	MY.RegisterEvent('GAME_EXIT' .. szKey, fnAction)
-	MY.RegisterEvent('RELOAD_UI_ADDON_BEGIN' .. szKey, fnAction)
+	if fnAction then
+		if szKey then
+			EXIT_FUNC_LIST[szKey] = fnAction
+		else
+			table.insert(EXIT_FUNC_LIST, fnAction)
+		end
+	elseif szKey then
+		EXIT_FUNC_LIST[szKey] = nil
+	end
 end
+end
+
+do local RELOAD_FUNC_LIST = {}
+local function OnReload()
+	for szKey, fnAction in pairs(RELOAD_FUNC_LIST) do
+		local nStartTick = GetTickCount()
+		local status, err = pcall(fnAction)
+		if not status then
+			MY.Debug({err}, "RELOAD_FUNC_LIST#" .. szKey)
+		end
+		MY.Debug({_L('Reload function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], MY_DEBUG.LOG)
+	end
+	RELOAD_FUNC_LIST = nil
+end
+RegisterEvent('RELOAD_UI_ADDON_END', OnReload)
 
 -- 注册插件重载函数
 -- RegisterReload(string id, function fn) -- 注册
 -- RegisterReload(function fn)            -- 注册
 -- RegisterReload(string id)              -- 注销
 function MY.RegisterReload(arg1, arg2)
-	local szKey, fnAction = ''
+	local szKey, fnAction
 	if type(arg1) == 'string' then
-		szKey = '.' .. arg1
+		szKey = arg1
 		fnAction = arg2
 	elseif type(arg1) == 'function' then
 		fnAction = arg1
 	end
-	MY.RegisterEvent('RELOAD_UI_ADDON_END' .. szKey, fnAction)
+	if fnAction then
+		if szKey then
+			RELOAD_FUNC_LIST[szKey] = fnAction
+		else
+			table.insert(RELOAD_FUNC_LIST, fnAction)
+		end
+	elseif szKey then
+		RELOAD_FUNC_LIST[szKey] = nil
+	end
+end
 end
 
 -- 注册游戏事件监听
@@ -1071,5 +1114,3 @@ if _MY.nDebugLevel < 3 then
 		end,
 	}})
 end
-
-MY.RegisterEvent("LOADING_END", _MY.Init)
