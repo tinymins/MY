@@ -115,12 +115,16 @@ MY = {}
 --------------------------------------------------------------------------------------------------------------------------------------------
 -- 本地函数变量
 --------------------------------------------------------------------------------------------------------------------------------------------
-local _DEBUG_ = tonumber(LoadLUAData('interface/my.debug.level') or nil) or 4
-local _LOGLV_ = tonumber(LoadLUAData('interface/my.delog.level') or nil) or 4
 local _BUILD_ = "20161016"
 local _VERSION_ = 0x2006300
+local _DEBUGLV_ = tonumber(LoadLUAData('interface/my.debug.level') or nil) or 4
+local _DELOGLV_ = tonumber(LoadLUAData('interface/my.delog.level') or nil) or 4
 local _ADDON_ROOT_ = './Interface/MY/'
 local _FRAMEWORK_ROOT_ = './Interface/MY/MY_!Base/'
+local _PSS_ST_         = _FRAMEWORK_ROOT_ .. "image/ST.pss"
+local _UITEX_ST_       = _FRAMEWORK_ROOT_ .. "image/ST_UI.UITex"
+local _UITEX_POSTER_   = _FRAMEWORK_ROOT_ .. "image/Poster.UITex"
+local _UITEX_COMMON_   = _FRAMEWORK_ROOT_ .. "image/UICommon.UITex"
 
 -- 多语言处理
 -- (table) MY.LoadLangPack(void)
@@ -149,59 +153,28 @@ function MY.LoadLangPack(szLangFolder)
 	return t0
 end
 local _L = MY.LoadLangPack()
+local _NAME_       = _L["mingyi plugins"]
+local _SHORT_NAME_ = _L["mingyi plugin"]
+local _AUTHOR_     = _L['MingYi @ Double Dream Town']
 -----------------------------------------------
 -- 私有函数
 -----------------------------------------------
-local _MY = {
-	frame              = nil,
-	hBox               = nil,
-	bLoaded            = false,
-	dwVersion          = _VERSION_,
-	nDebugLevel        = _DEBUG_,
-	szBuildDate        = _BUILD_,
-	szName             = _L["mingyi plugins"],
-	szShortName        = _L["mingyi plugin"],
-	szIniFile          = _FRAMEWORK_ROOT_.."ui/MY.ini",
-	szUITexCommon      = _FRAMEWORK_ROOT_.."image/UICommon.UITex",
-	szUITexPoster      = _FRAMEWORK_ROOT_.."image/Poster.UITex",
-	szUITexST          = _FRAMEWORK_ROOT_.."image/ST_UI.UITex",
-	szPssST            = _FRAMEWORK_ROOT_.."image/ST.pss",
-	szIniFileMainPanel = _FRAMEWORK_ROOT_.."ui/MainPanel.ini",
-	
-	tTabs = {   -- 标签页
-		{ id = _L["General"], },
-		{ id = _L["Target"] , },
-		{ id = _L["Battle"] , },
-		{ id = _L["Others"] , },
-	},
-	--[[ tTabs:
-	{
-		{
-			id = ,
-			{
-				[tab]
-			}, {...}
-		},
-		{
-			[category]
-		}, {...}
-	}
-	]]
-}
+local INI_PATH = _FRAMEWORK_ROOT_.."ui/MY.ini"
+local _MY = {}
 
 do local AddonInfo = SetmetaReadonly({
-	szName          = _MY.szName                      ,
-	szShortName     = _MY.szShortName                 ,
-	szUITexCommon   = _MY.szUITexCommon               ,
-	szUITexPoster   = _MY.szUITexPoster               ,
-	szUITexST       = _MY.szUITexST                   ,
-	dwVersion       = _VERSION_                       ,
-	szBuildDate     = _BUILD_                         ,
-	nDebugLevel     = _DEBUG_                         ,
-	nLogLevel       = _LOGLV_                         ,
-	szRoot          = _ADDON_ROOT_                    ,
-	szFrameworkRoot = _FRAMEWORK_ROOT_                ,
-	szAuthor        = _L['MingYi @ Double Dream Town'],
+	szName          = _NAME_          ,
+	szShortName     = _SHORT_NAME_    ,
+	szUITexCommon   = _UITEX_COMMON_  ,
+	szUITexPoster   = _UITEX_POSTER_  ,
+	szUITexST       = _UITEX_ST_      ,
+	dwVersion       = _VERSION_       ,
+	szBuildDate     = _BUILD_         ,
+	nDebugLevel     = _DEBUGLV_       ,
+	nLogLevel       = _DELOGLV_       ,
+	szRoot          = _ADDON_ROOT_    ,
+	szFrameworkRoot = _FRAMEWORK_ROOT_,
+	szAuthor        = _AUTHOR_        ,
 	tAuthor         = {
 		[43567  ] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 体服
 		[3007396] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 枫泾古镇
@@ -258,26 +231,24 @@ end
 function MY.OpenPanel(bMute, bNoFocus, bNoAnimate)
 	local hFrame = MY.GetFrame()
 	if not hFrame then
-		hFrame = Wnd.OpenWindow(_MY.szIniFile, "MY")
+		hFrame = Wnd.OpenWindow(INI_PATH, "MY")
 		hFrame.intact = true
 		hFrame:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
 		hFrame:CorrectPos()
 		
 		-- update some ui handle
-		_MY.hBox = hFrame:Lookup("", "Box_1")
-		hFrame:Lookup("", "Text_Title"):SetText(_L['mingyi plugins'] .. " v" .. MY.GetVersion() .. ' Build ' .. _MY.szBuildDate)
+		hFrame:Lookup("", "Text_Title"):SetText(_L['mingyi plugins'] .. " v" .. MY.GetVersion() .. ' Build ' .. _BUILD_)
 		hFrame:Lookup("Wnd_Total", "Handle_DBClick").OnItemLButtonDBClick = function()
 			hFrame:Lookup('CheckBox_Maximize'):ToggleCheck()
 		end
 		-- load bg uitex
-		local szUITexCommon = MY.GetAddonInfo().szUITexCommon
 		for k, v in pairs({
 			['Image_BgLT'] = 9,
 			['Image_BgCT'] = 8,
 			['Image_BgRT'] = 7,
 			['Image_BgT' ] = 6,
 		}) do
-			hFrame:Lookup('', k):FromUITex(szUITexCommon, v)
+			hFrame:Lookup('', k):FromUITex(_UITEX_COMMON_, v)
 		end
 		MY.UI(hFrame):size(_MY.OnSizeChanged)
 		-- bind close button event
@@ -306,7 +277,7 @@ function MY.OpenPanel(bMute, bNoFocus, bNoAnimate)
 		-- updaet logo image
 		MY.UI(MY.GetFrame()):item('#Image_Icon')
 		  :size(30, 30)
-		  :image(_MY.szUITexCommon, 0)
+		  :image(_UITEX_COMMON_, 0)
 		-- update category
 		MY.RedrawCategory()
 	end
@@ -373,15 +344,14 @@ function MY.GetFrame()
 	return Station.Lookup('Normal/MY')
 end
 
--- (string, number) MY.GetVersion()     -- HM的 获取字符串版本号 修改方便拿过来了
+-- (string, number) MY.GetVersion()
 function MY.GetVersion()
-	local v = _MY.dwVersion
-	local szVersion = string.format("%X.%X.%02X", v/0x1000000,
-		math.floor(v/0x10000)%0x100, math.floor(v/0x100)%0x100)
-	if  v%0x100 ~= 0 then
-		szVersion = szVersion .. "b" .. tostring(v%0x100)
+	local szVersion = string.format("%X.%X.%02X", _VERSION_ / 0x1000000,
+		math.floor(_VERSION_ / 0x10000) % 0x100, math.floor(_VERSION_ / 0x100) % 0x100)
+	if  _VERSION_ % 0x100 ~= 0 then
+		szVersion = szVersion .. "b" .. tostring(_VERSION_ % 0x100)
 	end
-	return szVersion, v
+	return szVersion, _VERSION_
 end
 
 --------------------------------------------------------------------------------------------------------------------------------------------
@@ -403,7 +373,7 @@ local function OnInit()
 	MY.ResizePanel(780, 540)
 	MY.ClosePanel(true, false, true)
 	-- 显示欢迎信息
-	MY.Sysmsg({_L("%s, welcome to use mingyi plugins!", GetClientPlayer().szName) .. " v" .. MY.GetVersion() .. ' Build ' .. _MY.szBuildDate})
+	MY.Sysmsg({_L("%s, welcome to use mingyi plugins!", GetClientPlayer().szName) .. " v" .. MY.GetVersion() .. ' Build ' .. _BUILD_})
 end
 RegisterEvent("FIRST_LOADING_END", OnInit)
 
@@ -670,6 +640,25 @@ end)
 --------------------------------------------------------------------------------------------------------------------------------------------
 -- 选项卡
 --------------------------------------------------------------------------------------------------------------------------------------------
+do local TABS_LIST = {
+	{ id = _L["General"], },
+	{ id = _L["Target"] , },
+	{ id = _L["Battle"] , },
+	{ id = _L["Others"] , },
+}
+--[[ tTabs:
+	{
+		{
+			id = ,
+			{
+				[tab]
+			}, {...}
+		},
+		{
+			[category]
+		}, {...}
+	}
+]]
 function MY.RedrawCategory(szCategory)
 	local frame = MY.GetFrame()
 	if not frame then
@@ -679,7 +668,7 @@ function MY.RedrawCategory(szCategory)
 	-- draw category
 	local wndCategoryList = frame:Lookup('Wnd_Total/WndContainer_Category')
 	wndCategoryList:Clear()
-	for _, ctg in pairs(_MY.tTabs) do
+	for _, ctg in pairs(TABS_LIST) do
 		local nCount = 0
 		for i, tab in ipairs(ctg) do
 			if not (tab.bShielded and MY.IsShieldedVersion()) then
@@ -687,7 +676,7 @@ function MY.RedrawCategory(szCategory)
 			end
 		end
 		if nCount > 0 then
-			local chkCategory = wndCategoryList:AppendContentFromIni(_MY.szIniFile, "CheckBox_Category")
+			local chkCategory = wndCategoryList:AppendContentFromIni(INI_PATH, "CheckBox_Category")
 			chkCategory.szCategory = ctg.id
 			chkCategory:Lookup('', 'Text_Category'):SetText(ctg.id)
 			chkCategory.OnCheckBoxCheck = function()
@@ -745,11 +734,11 @@ function MY.RedrawTab(szCategory)
 	local hTabs = frame:Lookup('Wnd_Total/WndScroll_Tabs', '')
 	hTabs:Clear()
 	
-	for _, ctg in ipairs(_MY.tTabs) do
+	for _, ctg in ipairs(TABS_LIST) do
 		if ctg.id == szCategory then
 			for i, tab in ipairs(ctg) do
 				if not (tab.bShielded and MY.IsShieldedVersion()) then
-					local hTab = hTabs:AppendItemFromIni(_MY.szIniFile, "Handle_Tab")
+					local hTab = hTabs:AppendItemFromIni(INI_PATH, "Handle_Tab")
 					hTab.szID = tab.szID
 					hTab:Lookup('Text_Tab'):SetText(tab.szTitle)
 					if tab.szIconTex == "FromIconID" then
@@ -759,9 +748,9 @@ function MY.RedrawTab(szCategory)
 					else
 						hTab:Lookup('Image_TabIcon'):FromTextureFile(tab.szIconTex)
 					end
-					hTab:Lookup('Image_Bg'):FromUITex(_MY.szUITexCommon, 3)
-					hTab:Lookup('Image_Bg_Active'):FromUITex(_MY.szUITexCommon, 1)
-					hTab:Lookup('Image_Bg_Hover'):FromUITex(_MY.szUITexCommon, 2)
+					hTab:Lookup('Image_Bg'):FromUITex(_UITEX_COMMON_, 3)
+					hTab:Lookup('Image_Bg_Active'):FromUITex(_UITEX_COMMON_, 1)
+					hTab:Lookup('Image_Bg_Hover'):FromUITex(_UITEX_COMMON_, 2)
 					hTab.OnItemLButtonClick = function()
 						MY.SwitchTab(this.szID)
 					end
@@ -789,7 +778,7 @@ function MY.SwitchTab(szID)
 	if szID then
 		-- check if category is right
 		local szCategory = frame:Lookup('Wnd_Total/WndContainer_Category').szCategory
-		for _, ctg in ipairs(_MY.tTabs) do
+		for _, ctg in ipairs(TABS_LIST) do
 			for i, tab in ipairs(ctg) do
 				if tab.szID == szID then
 					if ctg.id ~= szCategory then
@@ -845,7 +834,7 @@ function MY.SwitchTab(szID)
 		-- 欢迎页
 		local ui = MY.UI(wndMainPanel)
 		local w, h = ui:size()
-		ui:append("Image", "Image_Adv", { x = 0, y = 0, image = MY.GetAddonInfo().szUITexPoster, imageframe = 0 })
+		ui:append("Image", "Image_Adv", { x = 0, y = 0, image = _UITEX_POSTER_, imageframe = 0 })
 		ui:append("Text", "Text_Adv", { x = 10, y = 300, w = 557, font = 200 })
 		ui:append("Text", "Text_ChangeLog", {
 			x = 10, y = 325, w = 80, font = 204, text = _L['change log'], alpha = 190,
@@ -893,7 +882,7 @@ function MY.SwitchTab(szID)
 		end)
 		wndMainPanel:FormatAllContentPos()
 	else
-		for _, ctg in ipairs(_MY.tTabs) do
+		for _, ctg in ipairs(TABS_LIST) do
 			for _, tab in ipairs(ctg) do
 				if tab.szID == szID then
 					if tab.fn.OnPanelActive then
@@ -930,7 +919,7 @@ end
 -- Ex： MY.RegisterPanel( "Test", "测试标签", "测试", "UI/Image/UICommon/ScienceTreeNode.UITex|123", {255,255,0,200}, { OnPanelActive = function(wnd) end } )
 function MY.RegisterPanel(szID, szTitle, szCategory, szIconTex, rgbaTitleColor, options)
 	local category
-	for _, ctg in ipairs(_MY.tTabs) do
+	for _, ctg in ipairs(TABS_LIST) do
 		for i = #ctg, 1, -1 do
 			if ctg[i].szID == szID then
 				table.remove(ctg, i)
@@ -945,10 +934,10 @@ function MY.RegisterPanel(szID, szTitle, szCategory, szIconTex, rgbaTitleColor, 
 	end
 	
 	if not category then
-		table.insert(_MY.tTabs, {
+		table.insert(TABS_LIST, {
 			id = szCategory,
 		})
-		category = _MY.tTabs[#_MY.tTabs]
+		category = TABS_LIST[#TABS_LIST]
 	end
 	-- format szIconTex
 	if type(szIconTex) == "number" then
@@ -985,9 +974,10 @@ function MY.RegisterPanel(szID, szTitle, szCategory, szIconTex, rgbaTitleColor, 
 		},
 	})
 
-	if _MY.bLoaded then
+	if MY.IsInitialized() then
 		MY.RedrawCategory()
 	end
+end
 end
 
 --------------------------------------------------------------------------------------------------------------------------------------------
@@ -1102,7 +1092,7 @@ end
 ---------------------------------------------------
 -- 事件、快捷键、菜单注册
 ---------------------------------------------------
-if _MY.nDebugLevel < 3 then
+if _DEBUGLV_ < 3 then
 	if not (IsDebugClient and IsDebugClient()) then
 		RegisterEvent("CALL_LUA_ERROR", function()
 			print(arg0)
