@@ -1,5 +1,5 @@
 -- language data (zhtw) updated at 2014-4-10 03:38:11
-data = {
+data =
     -- common
     ['*'] = '※',
     [' * '] = ' ※ ',
@@ -145,4 +145,27 @@ data = {
     ["Stop cast skill"] = "打斷自身讀條",
     
     ["ADVENTURE_PATT"] = "“(.-)”[女俠].-觸發奇遇【(.-)】",
+    
+    ["Cloud"] = "白雲",
+    ["Sword"] = "小劍",
+    ["Ax"   ] = "斧頭",
+    ["Hook" ] = "鈎子",
+    ["Drum" ] = "紅鼓",
+    ["Shear"] = "剪刀",
+    ["Stick"] = "棒槌",
+    ["Jade" ] = "如意",
+    ["Dart" ] = "飛镖",
+    ["Fan"  ] = "扇子",
+    
+    ["restore formation of %d group: %s"         ] = "恢複第%d小隊陣眼[%s]。",
+    ["restore player marked as [%s]: %s"         ] = "恢複標記%s爲[%s]。",
+    ["You are not team leader, permission denied"] = "你不是隊長，無權操作隊伍。",
+    ["unable get player of %d group: #%d"        ] = "無法獲取第%d小隊成員名字#%d。",
+    ["unknown status: %s"                        ] = "成員未知狀態：[%s]。",
+    ["need not adjust: %s"                       ] = "[%s]無需調整。",
+    ["restore distributor: %s"                   ] = "恢複分配者爲[%s]。",
+    ["change group of [%s] to %d"                ] = "調整[%s]到第%d小隊。",
+    ["restore team leader: %s"                   ] = "恢複隊長爲[%s]。",
+    ["restore team marker: %s"                   ] = "恢複標記者爲[%s]。",
+    ["Team list restored"                        ] = "小隊狀態已恢複。",
 }

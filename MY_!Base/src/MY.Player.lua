@@ -885,3 +885,152 @@ function MY.Player.IsInDungeon(bType)
 	return me and MY.IsDungeonMap(me.GetMapID(), bType)
 end
 MY.IsInDungeon = MY.Player.IsInDungeon
+
+do local MARK_NAME = { _L["Cloud"], _L["Sword"], _L["Ax"], _L["Hook"], _L["Drum"], _L["Shear"], _L["Stick"], _L["Jade"], _L["Dart"], _L["Fan"] }
+-- 保存当前团队信息
+-- (table) MY.GetTeamInfo([table tTeamInfo])
+function MY.GetTeamInfo(tTeamInfo)
+	local tList, me, team = {}, GetClientPlayer(), GetClientTeam()
+	if not me or not me.IsInParty() then
+		return false
+	end
+	tTeamInfo = tTeamInfo or {}
+	tTeamInfo.szLeader = team.GetClientTeamMemberName(team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER))
+	tTeamInfo.szMark = team.GetClientTeamMemberName(team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK))
+	tTeamInfo.szDistribute = team.GetClientTeamMemberName(team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE))
+	tTeamInfo.nLootMode = team.nLootMode
+	
+	local tMark = team.GetTeamMark()
+	for nGroup = 0, team.nGroupNum - 1 do
+		local tGroupInfo = team.GetGroupInfo(nGroup)
+		for _, dwID in ipairs(tGroupInfo.MemberList) do
+			local szName = team.GetClientTeamMemberName(dwID)
+			local info = team.GetMemberInfo(dwID)
+			if szName then
+				local item = {}
+				item.nGroup = nGroup
+				item.nMark = tMark[dwID]
+				item.bForm = dwID == tGroupInfo.dwFormationLeader
+				tList[szName] = item
+			end
+		end
+	end
+	tTeamInfo.tList = tList
+	return tTeamInfo
+end
+
+local function GetWrongIndex(tWrong, bState)
+	for k, v in ipairs(tWrong) do
+		if not bState or v.state then
+			return k
+		end
+	end
+end
+local function SyncMember(team, dwID, szName, state)
+	if state.bForm then --如果这货之前有阵眼
+		team.SetTeamFormationLeader(dwID, state.nGroup) -- 阵眼给他
+		MY.Sysmsg({_L("restore formation of %d group: %s", state.nGroup + 1, szName)})
+	end
+	if state.nMark then -- 如果这货之前有标记
+		team.SetTeamMark(state.nMark, dwID) -- 标记给他
+		MY.Sysmsg({_L("restore player marked as [%s]: %s", MARK_NAME[state.nMark], szName)})
+	end
+end
+-- 恢复团队信息
+-- (bool) MY.SetTeamInfo(table tTeamInfo)
+function MY.SetTeamInfo(tTeamInfo)
+	local me, team = GetClientPlayer(), GetClientTeam()
+	if not me or not me.IsInParty() then
+		return false
+	elseif not tTeamInfo then
+		return false
+	end
+	-- get perm
+	if team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER) ~= me.dwID then
+		local nGroup = team.GetMemberGroupIndex(me.dwID) + 1
+		local szLeader = team.GetClientTeamMemberName(team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER))
+		return MY.Sysmsg({_L["You are not team leader, permission denied"]})
+	end
+
+	if team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK) ~= me.dwID then
+		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK, me.dwID)
+	end
+
+	--parse wrong member
+	local tSaved, tWrong, dwLeader, dwMark = tTeamInfo.tList, {}, 0, 0
+	for nGroup = 0, team.nGroupNum - 1 do
+		tWrong[nGroup] = {}
+		local tGroupInfo = team.GetGroupInfo(nGroup)
+		for _, dwID in pairs(tGroupInfo.MemberList) do
+			local szName = team.GetClientTeamMemberName(dwID)
+			if not szName then
+				MY.Sysmsg({_L("unable get player of %d group: #%d", nGroup + 1, dwID)})
+			else
+				if not tSaved[szName] then
+					szName = string.gsub(szName, "@.*", "")
+				end
+				local state = tSaved[szName]
+				if not state then
+					table.insert(tWrong[nGroup], { dwID = dwID, szName = szName, state = nil })
+					MY.Sysmsg({_L("unknown status: %s", szName)})
+				elseif state.nGroup == nGroup then
+					SyncMember(team, dwID, szName, state)
+					MY.Sysmsg({_L("need not adjust: %s", szName)})
+				else
+					table.insert(tWrong[nGroup], { dwID = dwID, szName = szName, state = state })
+				end
+				if szName == tTeamInfo.szLeader then
+					dwLeader = dwID
+				end
+				if szName == tTeamInfo.szMark then
+					dwMark = dwID
+				end
+				if szName == tTeamInfo.szDistribute and dwID ~= team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE) then
+					team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE, dwID)
+					MY.Sysmsg({_L("restore distributor: %s", szName)})
+				end
+			end
+		end
+	end
+	-- loop to restore
+	for nGroup = 0, team.nGroupNum - 1 do
+		local nIndex = GetWrongIndex(tWrong[nGroup], true)
+		while nIndex do
+			-- wrong user to be adjusted
+			local src = tWrong[nGroup][nIndex]
+			local dIndex = GetWrongIndex(tWrong[src.state.nGroup], false)
+			table.remove(tWrong[nGroup], nIndex)
+			-- do adjust
+			if not dIndex then
+				team.ChangeMemberGroup(src.dwID, src.state.nGroup, 0) -- 直接丢过去
+			else
+				local dst = tWrong[src.state.nGroup][dIndex]
+				table.remove(tWrong[src.state.nGroup], dIndex)
+				team.ChangeMemberGroup(src.dwID, src.state.nGroup, dst.dwID)
+				if not dst.state or dst.state.nGroup ~= nGroup then
+					table.insert(tWrong[nGroup], dst)
+				else -- bingo
+					MY.Sysmsg({_L("change group of [%s] to %d", dst.szName, nGroup + 1)})
+					SyncMember(team, dst.dwID, dst.szName, dst.state)
+				end
+			end
+			MY.Sysmsg({_L("change group of [%s] to %d", src.szName, src.state.nGroup + 1)})
+			SyncMember(team, src.dwID, src.szName, src.state)
+			nIndex = GetWrongIndex(tWrong[nGroup], true) -- update nIndex
+		end
+	end
+	-- restore others
+	if team.nLootMode ~= tTeamInfo.nLootMode then
+		team.SetTeamLootMode(tTeamInfo.nLootMode)
+	end
+	if dwLeader ~= 0 and dwLeader ~= me.dwID then
+		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER, dwLeader)
+		MY.Sysmsg({_L("restore team leader: %s", tTeamInfo.szLeader)})
+	end
+	if dwMark  ~= 0 and dwMark ~= me.dwID then
+		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK, dwMark)
+		MY.Sysmsg({_L("restore team marker: %s", tTeamInfo.szMark)})
+	end
+	MY.Sysmsg({_L["Team list restored"]})
+end
+end
