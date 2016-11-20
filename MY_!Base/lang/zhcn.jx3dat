@@ -1,5 +1,5 @@
 -- language data (zhcn) updated at 2014-4-10 03:38:11
-data = {
+data =
     -- common
     ['*'] = '※',
     [' * '] = ' ※ ',
@@ -145,4 +145,27 @@ data = {
     ["Stop cast skill"] = "打断自身读条",
     
     ["ADVENTURE_PATT"] = "“(.-)”[女侠].-触发奇遇【(.-)】",
+    
+    ["Cloud"] = "白云",
+    ["Sword"] = "小剑",
+    ["Ax"   ] = "斧头",
+    ["Hook" ] = "钩子",
+    ["Drum" ] = "红鼓",
+    ["Shear"] = "剪刀",
+    ["Stick"] = "棒槌",
+    ["Jade" ] = "如意",
+    ["Dart" ] = "飞镖",
+    ["Fan"  ] = "扇子",
+    
+    ["restore formation of %d group: %s"         ] = "恢复第%d小队阵眼[%s]。",
+    ["restore player marked as [%s]: %s"         ] = "恢复标记%s为[%s]。",
+    ["You are not team leader, permission denied"] = "你不是队长，无权操作队伍。",
+    ["unable get player of %d group: #%d"        ] = "无法获取第%d小队成员名字#%d。",
+    ["unknown status: %s"                        ] = "成员未知状态：[%s]。",
+    ["need not adjust: %s"                       ] = "[%s]无需调整。",
+    ["restore distributor: %s"                   ] = "恢复分配者为[%s]。",
+    ["change group of [%s] to %d"                ] = "调整[%s]到第%d小队。",
+    ["restore team leader: %s"                   ] = "恢复队长为[%s]。",
+    ["restore team marker: %s"                   ] = "恢复标记者为[%s]。",
+    ["Team list restored"                        ] = "小队状态已恢复。",
 }
