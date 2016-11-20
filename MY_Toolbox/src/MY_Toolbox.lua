@@ -30,6 +30,8 @@ MY_ToolBox.bChangGeShadowCD = false
 RegisterCustomData("MY_ToolBox.bChangGeShadowCD")
 MY_ToolBox.fChangeGeShadowScale = 1.5
 RegisterCustomData("MY_ToolBox.fChangeGeShadowScale")
+MY_ToolBox.bRestoreAuthorityInfo = true
+RegisterCustomData("MY_ToolBox.bRestoreAuthorityInfo")
 MY_ToolBox.ApplyConfig = function()
 	-- 好友高亮
 	if Navigator_Remove then
@@ -462,6 +464,35 @@ MY.RegisterEvent("ON_FRAME_CREATE.BIG_WAR_CHECK", function()
 	end
 end)
 
+-- auto restore team authourity info in arena
+do local l_tTeamInfo, l_bConfigEnd
+MY.RegisterEvent("LOADING_END", function() l_bConfigEnd = false end)
+MY.RegisterEvent("ARENA_START", function() l_bConfigEnd, l_tTeamInfo = true, MY.GetTeamInfo() end)
+MY.RegisterEvent("PARTY_ADD_MEMBER", function()
+	local me, team = GetClientPlayer(), GetClientTeam()
+	if not l_tTeamInfo
+	or not MY_ToolBox.bRestoreAuthorityInfo
+	or not me.IsInParty() or not MY.IsInArena() then
+		return
+	end
+	MY.SetTeamInfo(l_tTeamInfo)
+end)
+MY.RegisterEvent("TEAM_AUTHORITY_CHANGED", function()
+	local me, team = GetClientPlayer(), GetClientTeam()
+	if not me.IsInParty() or not MY.IsInArena() or not l_bConfigEnd then
+		return
+	end
+	l_tTeamInfo = MY.GetTeamInfo()
+end)
+MY.RegisterEvent("PARTY_SET_FORMATION_LEADER", function()
+	local me, team = GetClientPlayer(), GetClientTeam()
+	if not me.IsInParty() or not MY.IsInArena() or not l_bConfigEnd then
+		return
+	end
+	l_tTeamInfo = MY.GetTeamInfo()
+end)
+end
+
 -- ################################################################################################ --
 --     #       # # # #         # # # # # # # # #                                 #             # #  --
 --       #     #     #         #     #   #     #     # # # # # # # # # # #       #     # # # #      --
@@ -617,13 +648,22 @@ function PS.OnPanelActive(wnd)
 	  end)
 	y = y + 30
 	
-	-- 自动隐藏聊天栏
+	-- 竞技场频道切换
 	ui:append("WndCheckBox", "WndCheckBox_AutoSwitchChannel"):children("#WndCheckBox_AutoSwitchChannel")
 	  :pos(x, y):width(300)
 	  :text(_L['auto switch talk channel when into battle field']):check(MY_ToolBox.bJJCAutoSwitchTalkChannel)
 	  :check(function(bChecked)
 	  	MY_ToolBox.bJJCAutoSwitchTalkChannel = bChecked
 	  	MY_ToolBox.ApplyConfig()
+	  end)
+	y = y + 30
+	
+	-- 竞技场频道切换
+	ui:append("WndCheckBox", "WndCheckBox_AutoSwitchChannel"):children("#WndCheckBox_AutoSwitchChannel")
+	  :pos(x, y):width(300)
+	  :text(_L['auto restore team info in arena']):check(MY_ToolBox.bRestoreAuthorityInfo)
+	  :check(function(bChecked)
+	  	MY_ToolBox.bRestoreAuthorityInfo = bChecked
 	  end)
 	y = y + 30
 	
