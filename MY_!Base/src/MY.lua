@@ -119,6 +119,7 @@ local _BUILD_ = "20161016"
 local _VERSION_ = 0x2006300
 local _DEBUGLV_ = tonumber(LoadLUAData('interface/my.debug.level') or nil) or 4
 local _DELOGLV_ = tonumber(LoadLUAData('interface/my.delog.level') or nil) or 4
+local _NORESTM_ = tonumber(LoadLUAData('interface/my.nrtim.level') or nil) or 0
 local _ADDON_ROOT_ = './Interface/MY/'
 local _FRAMEWORK_ROOT_ = './Interface/MY/MY_!Base/'
 local _PSS_ST_         = _FRAMEWORK_ROOT_ .. "image/ST.pss"
@@ -1105,4 +1106,27 @@ if _DEBUGLV_ < 3 then
 			ReloadUIAddon()
 		end,
 	}})
+end
+
+if _NORESTM_ > 0 then
+	local time = GetTime()
+	
+	local function OnExit()
+		debug.sethook()
+	end
+	MY.RegisterExit("_NORESTM_", OnExit)
+	
+	local function OnBreathe()
+		time = GetTime()
+	end
+	BreatheCall("_NORESTM_", OnBreathe)
+	
+	local function trace_line(event, line)
+		local delay = GetTime() - time
+		if delay < _NORESTM_ then
+			return
+		end
+		Log("Response over " .. delay .. ", " .. debug.getinfo(2).short_src .. ":" .. line)
+	end
+	debug.sethook(trace_line, "l")
 end
