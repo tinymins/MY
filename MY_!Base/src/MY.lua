@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-11-21 12:19:09
+-- @Last modified time: 2016-11-21 18:01:17
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- #################################################################################################################################### --
@@ -360,6 +360,9 @@ end
 --------------------------------------------------------------------------------------------------------------------------------------------
 do local INIT_FUNC_LIST = {}
 local function OnInit()
+	if not INIT_FUNC_LIST then
+		return
+	end
 	for szKey, fnAction in pairs(INIT_FUNC_LIST) do
 		local nStartTick = GetTickCount()
 		local status, err = pcall(fnAction)
@@ -376,7 +379,7 @@ local function OnInit()
 	-- 显示欢迎信息
 	MY.Sysmsg({_L("%s, welcome to use mingyi plugins!", GetClientPlayer().szName) .. " v" .. MY.GetVersion() .. ' Build ' .. _BUILD_})
 end
-RegisterEvent("FIRST_LOADING_END", OnInit)
+RegisterEvent("LOADING_END", OnInit) -- 不能用FIRST_LOADING_END 不然注册快捷键就全跪了
 
 -- 注册初始化函数
 -- RegisterInit(string id, function fn) -- 注册
