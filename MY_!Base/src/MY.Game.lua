@@ -3,8 +3,8 @@
 -- @Author: 茗伊 @双梦镇 @追风蹑影
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
--- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2016-02-02 16:46:58
+-- @Last modified by:   Zhai Yiming
+-- @Last modified time: 2016-11-29 12:23:14
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -----------------------------------------------
@@ -469,11 +469,20 @@ function MY.Game.IsDungeonMap(dwMapID, bType)
 end
 MY.IsDungeonMap = MY.Game.IsDungeonMap
 
--- 生成地图BOSS列表
-local BOSS_ADD_PATH = MY.GetAddonInfo().szFrameworkRoot .. "data/bosslist/add/$lang.jx3dat"
-local BOSS_DEL_PATH = MY.GetAddonInfo().szFrameworkRoot .. "data/bosslist/del/$lang.jx3dat"
-function _C.GetDungeonBoss()
-	local t = {}
+-- 地图BOSS列表
+do local l_tBossList
+local function GeneDungeonBoss()
+	if l_tBossList then
+		return
+	end
+	local VERSION = select(2, GetVersion())
+	local CACHE_PATH = 'cache/BOSSLIST/' .. VERSION .. '.$lang.jx3dat'
+	l_tBossList = MY.LoadLUAData(CACHE_PATH)
+	if l_tBossList then
+		return
+	end
+	
+	l_tBossList = {}
 	local nCount = g_tTable.DungeonBoss:GetRowCount()
 	for i = 2, nCount do
 		local tLine = g_tTable.DungeonBoss:GetRow(i)
@@ -482,66 +491,49 @@ function _C.GetDungeonBoss()
 		for szNpcIndex in string.gmatch(szNpcList, "(%d+)") do
 			local p = g_tTable.DungeonNpc:Search(tonumber(szNpcIndex))
 			if p then
-				if not t[dwMapID] then
-					t[dwMapID] = {}
+				if not l_tBossList[dwMapID] then
+					l_tBossList[dwMapID] = {}
 				end
-				t[dwMapID][p.dwNpcID] = p.szName
+				l_tBossList[dwMapID][p.dwNpcID] = p.szName
 			end
 		end
 	end
 	
-	for dwMapID, tBoss in pairs(MY.LoadLUAData(BOSS_ADD_PATH) or {}) do
-		if not t[dwMapID] then
-			t[dwMapID] = {}
+	for dwMapID, tBoss in pairs(MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. "data/bosslist/add/$lang.jx3dat") or {}) do
+		if not l_tBossList[dwMapID] then
+			l_tBossList[dwMapID] = {}
 		end
 		for dwNpcID, szName in pairs(tBoss) do
-			t[dwMapID][dwNpcID] = szName
+			l_tBossList[dwMapID][dwNpcID] = szName
 		end
 	end
-	for dwMapID, tBoss in pairs(MY.LoadLUAData(BOSS_DEL_PATH) or {}) do
-		if t[dwMapID] then
+	for dwMapID, tBoss in pairs(MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. "data/bosslist/del/$lang.jx3dat") or {}) do
+		if l_tBossList[dwMapID] then
 			for dwNpcID, szName in pairs(tBoss) do
-				t[dwMapID][dwNpcID] = nil
+				l_tBossList[dwMapID][dwNpcID] = nil
 			end
 		end
 	end
-	return t
+	MY.SaveLUAData(CACHE_PATH, l_tBossList)
+	MY.Sysmsg({_L('Important Npc list updated to v%s.', VERSION)})
 end
+
 -- 获取地图BOSS列表
--- (table) MY.Game.GetBossList()
--- (table) MY.Game.GetBossList(dwMapID)
-function MY.Game.GetBossList(dwMapID)
+-- (table) MY.GetBossList()
+-- (table) MY.GetBossList(dwMapID)
+function MY.GetBossList(dwMapID)
+	GeneDungeonBoss()
 	if dwMapID then
-		dwMapID = tonumber(dwMapID)
-		assert(dwMapID, "MY.Game.GetBossList: dwMapID is not a valid number")
-	end
-	if not _C.tBossList then
-		local _, szVer = GetVersion()
-		local szDataPath = 'cache/BOSSLIST/' .. szVer .. '.$lang.jx3dat'
-		_C.tBossList = MY.LoadLUAData(szDataPath)
-		if not _C.tBossList then
-			_C.tBossList = _C.GetDungeonBoss()
-			MY.SaveLUAData(szDataPath, _C.tBossList)
-			MY.Sysmsg({_L('Important Npc list updated to v%s.', szVer)})
-		end
-	end
-	
-	if dwMapID then
-		return clone(_C.tBossList[dwMapID])
+		return clone(l_tBossList[dwMapID])
 	else
-		return clone(_C.tBossList)
+		return clone(l_tBossList)
 	end
 end
 
 -- 获取指定地图指定模板ID的NPC是不是BOSS
--- (boolean) MY.Game.IsBoss(dwMapID, dwTem)
-function MY.Game.IsBoss(dwMapID, dwTemplateID)
-	dwMapID, dwTemplateID = tostring(dwMapID), tostring(dwTemplateID)
-	if _C.tBossList and _C.tBossList[dwMapID]
-	and _C.tBossList[dwMapID][dwTemplateID] then
-		return true
-	else
-		return false
-	end
+-- (boolean) MY.IsBoss(dwMapID, dwTem)
+function MY.IsBoss(dwMapID, dwTemplateID)
+	GeneDungeonBoss()
+	return l_tBossList[dwMapID] and l_tBossList[dwMapID][dwTemplateID] and true or false
 end
-MY.IsBoss = MY.Game.IsBoss
+end

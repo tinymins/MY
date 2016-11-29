@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-11-29 11:47:57
+-- @Last modified time: 2016-11-29 12:04:10
 --------------------------------------------
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Focus/lang/")
@@ -330,7 +330,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		if not bFocus and
 		dwType == TARGET.NPC and
 		MY_Focus.bFocusBoss and
-		MY.Game.IsBoss(me.GetMapID(), obj.dwTemplateID) then
+		MY.IsBoss(me.GetMapID(), obj.dwTemplateID) then
 			bFocus = true
 		end
 		
