@@ -47,6 +47,9 @@ local DB, DB_W, DB_D
 local function InitDB()
 	CPath.MakeDir(MY.FormatPath('userdata/CHAT_LOG/'))
 	DB = SQLite3_Open(MY.FormatPath('userdata/CHAT_LOG/$uid.db'))
+	if not DB then
+		return MY.Debug({"Cannot connect to database!!!"}, "MY_ChatLog", MY_DEBUG.ERROR)
+	end
 	DB:Execute("CREATE TABLE IF NOT EXISTS ChatLog (hash INTEGER, channel INTEGER, time INTEGER, talker NVARCHAR(20), text NVARCHAR(400) NOT NULL, msg NVARCHAR(4000) NOT NULL, PRIMARY KEY (hash, time))")
 	DB:Execute("CREATE INDEX IF NOT EXISTS chatlog_channel_idx ON ChatLog(channel)")
 	DB:Execute("CREATE INDEX IF NOT EXISTS chatlog_time_idx ON ChatLog(time)")
@@ -147,11 +150,17 @@ end
 MY.RegisterInit("MY_ChatLog_Init", InitDB)
 
 local function ReleaseDB()
+	if not DB then
+		return
+	end
 	DB:Release()
 end
 MY.RegisterExit("MY_Chat_Release", ReleaseDB)
 
 function MY_ChatLog.Open()
+	if not DB then
+		return MY.Sysmsg({_L['Cannot connect to database!!!']})
+	end
 	Wnd.OpenWindow(SZ_INI, "MY_ChatLog"):BringToTop()
 end
 
@@ -610,6 +619,9 @@ end
 function MY_ChatLog.Export(szExportFile, aChannels, nPerSec, onProgress)
 	if l_bExporting then
 		return MY.Sysmsg({_L['Already exporting, please wait.']})
+	end
+	if not DB then
+		return MY.Sysmsg({_L['Cannot connect to database!!!']})
 	end
 	if onProgress then
 		onProgress(_L["preparing"], 0)
