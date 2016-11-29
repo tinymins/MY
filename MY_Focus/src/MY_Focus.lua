@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-11-29 12:04:10
+-- @Last modified time: 2016-11-29 12:35:03
 --------------------------------------------
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Focus/lang/")
@@ -27,6 +27,7 @@ MY_Focus.bFocusJJCParty     = false -- 焦竞技场队友
 MY_Focus.bFocusJJCEnemy     = true  -- 焦竞技场敌队
 MY_Focus.bShowTarget        = false -- 显示目标目标
 MY_Focus.bTraversal         = false -- 遍历焦点列表
+MY_Focus.bHealHelper        = false -- 辅助治疗模式
 MY_Focus.bEnableSceneNavi   = false -- 场景追踪点
 MY_Focus.fScaleX            = 1     -- 缩放比例
 MY_Focus.fScaleY            = 1     -- 缩放比例
@@ -56,6 +57,7 @@ RegisterCustomData("MY_Focus.bFocusJJCParty")
 RegisterCustomData("MY_Focus.bFocusJJCEnemy")
 RegisterCustomData("MY_Focus.bShowTarget")
 RegisterCustomData("MY_Focus.bTraversal")
+RegisterCustomData("MY_Focus.bHealHelper")
 RegisterCustomData("MY_Focus.bEnableSceneNavi")
 RegisterCustomData("MY_Focus.tAutoFocus")
 RegisterCustomData("MY_Focus.tFocusList")
@@ -780,6 +782,10 @@ function MY_Focus.OnItemMouseEnter()
 	local name = this:GetName()
 	if name:find('HI_(%d+)_(%d+)') then
 		this:Lookup("Image_Hover"):Show()
+		if MY_Focus.bHealHelper then
+			this.dwLastType, this.dwLastID = MY.GetTarget()
+			MY_Focus.OnItemLButtonClick()
+		end
 	end
 end
 
@@ -788,6 +794,9 @@ function MY_Focus.OnItemMouseLeave()
 	if name:find('HI_(%d+)_(%d+)') then
 		if this:Lookup("Image_Hover") then
 			this:Lookup("Image_Hover"):Hide()
+			if MY_Focus.bHealHelper then
+				MY.SetTarget(this.dwLastType, this.dwLastID)
+			end
 		end
 	end
 end
@@ -795,6 +804,9 @@ end
 function MY_Focus.OnItemLButtonClick()
 	local name = this:GetName()
 	name:gsub('HI_(%d+)_(%d+)', function(dwType, dwID)
+		if MY_Focus.bHealHelper then
+			this.dwLastType, this.dwLastID = dwType, dwID
+		end
 		SetTarget(dwType, dwID)
 	end)
 end
@@ -981,7 +993,7 @@ function PS.OnPanelActive(wnd)
 	
 	-- 右侧
 	local x, y = xr, yr
-	local deltaX = 25
+	local deltaX = 23
 	ui:append("WndCheckBox", "WndCheckBox_Auto_Hide"):children("#WndCheckBox_Auto_Hide")
 	  :pos(x, y):width(wr):text(_L['hide when empty']):check(MY_Focus.bAutoHide)
 	  :check(function(bChecked)
@@ -1091,6 +1103,15 @@ function PS.OnPanelActive(wnd)
 			MY_Focus.RescanNearby()
 		end
 	})
+	y = y + deltaX
+	
+	ui:append("WndCheckBox", "WndCheckBox_HealHelper"):children("#WndCheckBox_HealHelper")
+	  :pos(x, y):width(wr):text(_L['heal healper'])
+	  :tip(_L['select target when mouse enter'], MY.Const.UI.Tip.POS_BOTTOM)
+	  :check(MY_Focus.bHealHelper)
+	  :check(function(bChecked)
+	  	MY_Focus.bHealHelper = bChecked
+	  end)
 	y = y + deltaX
 	
 	ui:append("WndComboBox", "WndComboBox_MaxLength"):children("#WndComboBox_MaxLength")
