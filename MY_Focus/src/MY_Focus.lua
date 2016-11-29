@@ -4,13 +4,13 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-07-12 20:00:56
+-- @Last modified time: 2016-11-29 11:47:57
 --------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Focus/lang/")
-local _C = {}
-_C.tFocusList = {}
-_C.szIniFile = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
-_C.bMinimize = false
+local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Focus/lang/")
+local l_tFocusList = {}
+local l_bMinimize = false
+local l_dwLockType, l_dwLockID
 MY_Focus = {}
 MY_Focus.bEnable            = true  -- 是否启用
 MY_Focus.bFocusBoss         = true  -- 焦点重要NPC
@@ -65,7 +65,7 @@ RegisterCustomData("MY_Focus.fScaleX")
 RegisterCustomData("MY_Focus.fScaleY")
 
 function MY_Focus.Open()
-	Wnd.OpenWindow(_C.szIniFile, 'MY_Focus')
+	Wnd.OpenWindow(INI_PATH, 'MY_Focus')
 end
 
 function MY_Focus.Close()
@@ -108,11 +108,11 @@ end
 -- 获取当前显示的焦点列表
 function MY_Focus.GetDisplayList()
 	local t = {}
-	if _C.bMinimize then
+	if l_bMinimize then
 		return t
 	end
 	if MY_Focus.bHideDeath then
-		for _, p in ipairs(_C.tFocusList) do
+		for _, p in ipairs(l_tFocusList) do
 			if #t >= MY_Focus.nMaxDisplay then
 				break
 			end
@@ -125,7 +125,7 @@ function MY_Focus.GetDisplayList()
 			end
 		end
 	else
-		for i, v in ipairs(_C.tFocusList) do
+		for i, v in ipairs(l_tFocusList) do
 			if i > MY_Focus.nMaxDisplay then
 				break
 			end
@@ -145,7 +145,7 @@ function MY_Focus.SortFocus(fn)
 		end
 		return true
 	end
-	table.sort(_C.tFocusList, fn)
+	table.sort(l_tFocusList, fn)
 end
 
 -- 获取指定焦点的Handle 没有返回nil
@@ -178,8 +178,8 @@ function MY_Focus.DelAutoFocus(szName)
 		MY_Focus.RescanNearby()
 	else
 		-- 全字符匹配模式：检查是否在永久焦点中 没有则删除Handle
-		for i = #_C.tFocusList, 1, -1 do
-			local p = _C.tFocusList[i]
+		for i = #l_tFocusList, 1, -1 do
+			local p = l_tFocusList[i]
 			local h = MY.Game.GetObject(p.dwType, p.dwID)
 			if h and MY.Game.GetObjectName(h) == szName and
 			not MY_Focus.tFocusList[p.dwType][p.dwID] then
@@ -360,15 +360,15 @@ end
 -- 目标加入焦点列表
 function MY_Focus.AddFocus(dwType, dwID, szName)
 	local nIndex
-	for i, p in ipairs(_C.tFocusList) do
+	for i, p in ipairs(l_tFocusList) do
 		if p.dwType == dwType and p.dwID == dwID then
 			nIndex = i
 			break
 		end
 	end
 	if not nIndex then
-		table.insert(_C.tFocusList, {dwType = dwType, dwID = dwID, szName = szName})
-		nIndex = #_C.tFocusList
+		table.insert(l_tFocusList, {dwType = dwType, dwID = dwID, szName = szName})
+		nIndex = #l_tFocusList
 	end
 	if nIndex < MY_Focus.nMaxDisplay then
 		MY_Focus.DrawFocus(dwType, dwID)
@@ -379,10 +379,10 @@ end
 -- 目标移除焦点列表
 function MY_Focus.DelFocus(dwType, dwID)
 	-- 从列表数据中删除
-	for i = #_C.tFocusList, 1, -1 do
-		local p = _C.tFocusList[i]
+	for i = #l_tFocusList, 1, -1 do
+		local p = l_tFocusList[i]
 		if p.dwType == dwType and p.dwID == dwID then
-			table.remove(_C.tFocusList, i)
+			table.remove(l_tFocusList, i)
 			break
 		end
 	end
@@ -391,22 +391,22 @@ function MY_Focus.DelFocus(dwType, dwID)
 	if hItem then
 		MY.UI(hItem):remove()
 		-- 补上UI（超过数量限制时）
-		local p = _C.tFocusList[MY_Focus.nMaxDisplay]
+		local p = l_tFocusList[MY_Focus.nMaxDisplay]
 		if p then
 			MY_Focus.DrawFocus(p.dwType, p.dwID)
 		end
 	end
 	-- 删除锁定
-	if _C.dwLockType == dwType and _C.dwLockID == dwID then
-		_C.dwLockType = nil
-		_C.dwLockID = nil
+	if l_dwLockType == dwType and l_dwLockID == dwID then
+		l_dwLockType = nil
+		l_dwLockID = nil
 	end
 end
 
 -- 获取焦点列表
 function MY_Focus.GetFocusList()
 	local t = {}
-	for _, v in ipairs(_C.tFocusList) do
+	for _, v in ipairs(l_tFocusList) do
 		table.insert(t, v)
 	end
 	return t
@@ -414,7 +414,7 @@ end
 
 -- 清空焦点列表
 function MY_Focus.ClearFocus()
-	_C.tFocusList = {}
+	l_tFocusList = {}
 	if Navigator_Remove then
 		Navigator_Remove("MY_FOCUS")
 	end
@@ -481,7 +481,7 @@ function MY_Focus.DrawFocus(dwType, dwID)
 		if MY_Focus.bEnableSceneNavi and Navigator_SetID then
 			Navigator_SetID("MY_FOCUS." .. dwType .. "_" .. dwID, dwType, dwID, szName)
 		end
-		hItem = hList:AppendItemFromIni(_C.szIniFile, 'Handle_Info')
+		hItem = hList:AppendItemFromIni(INI_PATH, 'Handle_Info')
 		hItem:Scale(MY_Focus.fScaleX, MY_Focus.fScaleY)
 		hItem:SetName('HI_'..dwType..'_'..dwID)
 	end
@@ -491,7 +491,7 @@ function MY_Focus.DrawFocus(dwType, dwID)
 	local hInfoList = hItem:Lookup("Handle_InfoList")
 	-- 锁定
 	hInfoList:Lookup('Handle_Lock'):Hide()
-	if dwType == _C.dwLockType and dwID == _C.dwLockID then
+	if dwType == l_dwLockType and dwID == l_dwLockID then
 		hInfoList:Lookup('Handle_Lock'):Show()
 	end
 	-- 心法
@@ -681,7 +681,7 @@ function MY_Focus.AdjustUI()
 	local tList = MY_Focus.GetDisplayList()
 	hList:SetH(70 * #tList * MY_Focus.fScaleY)
 	hList:GetRoot():SetH((70 * #tList + 32) * MY_Focus.fScaleY)
-	if #tList == 0 and MY_Focus.bAutoHide and not _C.bMinimize then
+	if #tList == 0 and MY_Focus.bAutoHide and not l_bMinimize then
 		hList:GetRoot():Hide()
 	elseif (not MY_Focus.bAutoHide) or #tList ~= 0 then
 		hList:GetRoot():Show()
@@ -722,10 +722,10 @@ end
 -- ########################################################################## --
 -- 周期重绘
 function MY_Focus.OnFrameBreathe()
-	if _C.dwLockType and _C.dwLockID then
+	if l_dwLockType and l_dwLockID then
 		local dwType, dwID = MY.GetTarget()
-		if dwType ~= _C.dwLockType or dwID ~= _C.dwLockID then
-			MY.SetTarget(_C.dwLockType, _C.dwLockID)
+		if dwType ~= l_dwLockType or dwID ~= l_dwLockID then
+			MY.SetTarget(l_dwLockType, l_dwLockID)
 		end
 	end
 	if MY_Focus.bSortByDistance then
@@ -810,16 +810,16 @@ function MY_Focus.OnItemRButtonClick()
 				MY_Focus.DelStaticFocus(dwType, dwID)
 			end,
 		})
-		local bLock = dwType == _C.dwLockType and dwID == _C.dwLockID
+		local bLock = dwType == l_dwLockType and dwID == l_dwLockID
 		table.insert(t, {
 			szOption = bLock and _L['unlock focus'] or _L['lock focus'],
 			fnAction = function()
 				if bLock then
-					_C.dwLockID = nil
-					_C.dwLockType = nil
+					l_dwLockID = nil
+					l_dwLockType = nil
 				else
-					_C.dwLockID = dwID
-					_C.dwLockType = dwType
+					l_dwLockID = dwID
+					l_dwLockType = dwType
 					MY.SetTarget(dwType, dwID)
 				end
 				MY_Focus.UpdateList()
@@ -840,7 +840,7 @@ end
 function MY_Focus.OnCheckBoxCheck()
 	local name = this:GetName()
 	if name == 'CheckBox_Minimize' then
-		_C.bMinimize = true
+		l_bMinimize = true
 		this:GetRoot():Lookup('', 'Handle_List'):Hide()
 	end
 end
@@ -848,7 +848,7 @@ end
 function MY_Focus.OnCheckBoxUncheck()
 	local name = this:GetName()
 	if name == 'CheckBox_Minimize' then
-		_C.bMinimize = false
+		l_bMinimize = false
 		this:GetRoot():Lookup('', 'Handle_List'):Show()
 	end
 end
