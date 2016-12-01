@@ -45,11 +45,19 @@ local CHANNELS = {[1] = "MSG_WHISPER", [2] = "MSG_PARTY", [3] = "MSG_TEAM", [4] 
 local CHANNELS_R = (function() local t = {} for k, v in pairs(CHANNELS) do t[v] = k end return t end)()
 local DB, DB_W, DB_D
 local function InitDB()
-	CPath.MakeDir(MY.FormatPath('userdata/CHAT_LOG/'))
-	DB = SQLite3_Open(MY.FormatPath('userdata/CHAT_LOG/$uid.db'))
+	local DB_PATH = MY.FormatPath('$uid/userdata/chat_log.db')
+	local SZ_OLD_PATH = MY.FormatPath('userdata/CHAT_LOG/$uid.db')
+	if IsLocalFileExist(SZ_OLD_PATH) then
+		CPath.Move(SZ_OLD_PATH, DB_PATH)
+	end
+	DB = SQLite3_Open(DB_PATH)
 	if not DB then
 		return MY.Debug({"Cannot connect to database!!!"}, "MY_ChatLog", MY_DEBUG.ERROR)
 	end
+	local me = GetClientPlayer()
+	DB:Execute("CREATE TABLE IF NOT EXISTS ChatLogUser (userguid INTEGER, PRIMARY KEY (userguid))")
+	DB:Execute("REPLACE INTO ChatLogUser (userguid) VALUES (" .. me.GetGlobalID() .. ")")
+	
 	DB:Execute("CREATE TABLE IF NOT EXISTS ChatLog (hash INTEGER, channel INTEGER, time INTEGER, talker NVARCHAR(20), text NVARCHAR(400) NOT NULL, msg NVARCHAR(4000) NOT NULL, PRIMARY KEY (hash, time))")
 	DB:Execute("CREATE INDEX IF NOT EXISTS chatlog_channel_idx ON ChatLog(channel)")
 	DB:Execute("CREATE INDEX IF NOT EXISTS chatlog_time_idx ON ChatLog(time)")
