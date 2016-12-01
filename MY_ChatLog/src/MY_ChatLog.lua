@@ -45,7 +45,7 @@ local CHANNELS = {[1] = "MSG_WHISPER", [2] = "MSG_PARTY", [3] = "MSG_TEAM", [4] 
 local CHANNELS_R = (function() local t = {} for k, v in pairs(CHANNELS) do t[v] = k end return t end)()
 local DB, DB_W, DB_D
 local function InitDB()
-	local DB_PATH = MY.FormatPath('$uid/userdata/chat_log.db')
+	local DB_PATH = MY.FormatPath('$uid@$lang/userdata/chat_log.db')
 	local SZ_OLD_PATH = MY.FormatPath('userdata/CHAT_LOG/$uid.db')
 	if IsLocalFileExist(SZ_OLD_PATH) then
 		CPath.Move(SZ_OLD_PATH, DB_PATH)
