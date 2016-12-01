@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-12-01 10:40:13
+-- @Last modified time: 2016-12-01 10:58:51
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- #################################################################################################################################### --
@@ -363,10 +363,10 @@ local function OnInit()
 	if not INIT_FUNC_LIST then
 		return
 	end
-	CPath.MakeDir(MY.FormatPath('!common-users/cache/'))
-	CPath.MakeDir(MY.FormatPath('!common-users/config/'))
-	CPath.MakeDir(MY.FormatPath('!common-users/export/'))
-	CPath.MakeDir(MY.FormatPath('!common-users/userdata/'))
+	CPath.MakeDir(MY.FormatPath('!all-users/cache/'))
+	CPath.MakeDir(MY.FormatPath('!all-users/config/'))
+	CPath.MakeDir(MY.FormatPath('!all-users/export/'))
+	CPath.MakeDir(MY.FormatPath('!all-users/userdata/'))
 	
 	CPath.MakeDir(MY.FormatPath('$uid/$name/'))
 	CPath.MakeDir(MY.FormatPath('$uid/cache/'))
