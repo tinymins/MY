@@ -6,7 +6,7 @@
 local tostring, string2byte = tostring, string.byte
 local srep, tconcat, tinsert = string.rep, table.concat, table.insert
 local type, next, print, pairs, ipairs = type, next, print, pairs, ipairs
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Dev_Snaplines/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MYDev_Snaplines/lang/")
 --------------------------------------------------------------------------
 -- Êý¾Ý´æ´¢
 --------------------------------------------------------------------------

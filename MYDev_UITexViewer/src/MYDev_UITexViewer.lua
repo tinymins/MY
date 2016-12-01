@@ -3,7 +3,7 @@
 -- by ‹¯“¡ @ À´√Œ’Ú @ ›∂ª®π¨
 -- Build 20140730
 --
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."Dev_UITexViewer/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MYDev_UITexViewer/lang/")
 local _Cache = {}
 MYDev_UITexViewer = {}
 MYDev_UITexViewer.szUITexPath = ''
@@ -14,7 +14,7 @@ _Cache.OnPanelActive = function(wnd)
     local w, h = ui:size()
     local x, y = 20, 20
     
-    _Cache.tUITexList = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'Dev_UITexViewer/data/data.jx3dat') or {}
+    _Cache.tUITexList = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MYDev_UITexViewer/data/data.jx3dat') or {}
     
     local uiBoard = ui:append("WndScrollBox", "WndScrollBox_ImageList")
       :children('#WndScrollBox_ImageList')

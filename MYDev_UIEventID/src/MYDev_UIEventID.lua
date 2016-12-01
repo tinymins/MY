@@ -3,11 +3,11 @@
 -- @Author: µÔÒ»Ãù @tinymins
 -- @Date  : 2015-02-28 17:37:53
 -- @Email : admin@derzh.com
--- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-03-01 00:13:27
+-- @Last modified by:   Zhai Yiming
+-- @Last modified time: 2016-12-01 10:10:13
 --------------------------------------------
 local _C = {}
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Dev_UIEventID/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MYDev_UIEventID/lang/")
 _C.tEventIndex = {
 	{ text = _L["OnKeyDown"        ], bit = 13 },
 	{ text = _L["OnKeyUp"          ], bit = 14 },

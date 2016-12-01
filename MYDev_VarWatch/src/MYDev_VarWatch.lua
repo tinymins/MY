@@ -3,11 +3,11 @@
 -- @Author: µÔÒ»Ãù @tinymins
 -- @Date  : 2015-02-28 17:37:53
 -- @Email : admin@derzh.com
--- @Last Modified by:   µÔÒ»Ãù @tinymins
--- @Last Modified time: 2015-06-16 18:45:27
+-- @Last modified by:   Zhai Yiming
+-- @Last modified time: 2016-12-01 10:10:57
 --------------------------------------------
 local _C = {}
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "Dev_VarWatch/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MYDev_VarWatch/lang/")
 local XML_LINE_BREAKER = XML_LINE_BREAKER
 local srep, tostring, string2byte = string.rep, tostring, string.byte
 local tconcat, tinsert, tremove = table.concat, table.insert, table.remove
