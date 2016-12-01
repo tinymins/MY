@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-11-29 12:23:14
+-- @Last modified time: 2016-12-01 11:02:20
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -----------------------------------------------
@@ -476,7 +476,7 @@ local function GeneDungeonBoss()
 		return
 	end
 	local VERSION = select(2, GetVersion())
-	local CACHE_PATH = 'cache/BOSSLIST/' .. VERSION .. '.$lang.jx3dat'
+	local CACHE_PATH = '!all-users/cache/bosslist/' .. VERSION .. '.$lang.jx3dat'
 	l_tBossList = MY.LoadLUAData(CACHE_PATH)
 	if l_tBossList then
 		return
