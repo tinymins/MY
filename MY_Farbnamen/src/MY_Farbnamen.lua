@@ -14,12 +14,12 @@ local tinsert, tconcat, tremove = table.insert, table.concat, table.remove
 MY_Farbnamen = MY_Farbnamen or {
 	bEnabled = true,
 }
-RegisterCustomData("Account\\MY_Farbnamen.bEnabled")
-local SZ_CONFIG_PATH = "config/PLAYER_FORCE_COLOR/$uid.$lang.jx3dat"
-local SZ_DB_DIR = MY.GetLUADataPath("cache/PLAYER_INFO/")
-local SZ_DB_PATH = MY.GetLUADataPath("cache/PLAYER_INFO/$relserver.$lang.db")
+RegisterCustomData("MY_Farbnamen.bEnabled")
+local SZ_CONFIG_PATH = "$uid/config/player_force_color.$lang.jx3dat"
+local SZ_DB_DIR = MY.FormatPath("!common-users/cache/player_info/")
+local SZ_DB_PATH = MY.FormatPath("!common-users/cache/player_info/$relserver.$lang.db")
 local Config_Default = {
-	tForceColor = MY.LoadLUAData("config/PLAYER_FORCE_COLOR.jx3dat") or {
+	tForceColor = MY.LoadLUAData("!common-users/config/player_force_color.$lang.jx3dat") or {
 		[FORCE_TYPE.JIANG_HU ] = {255, 255, 255}, -- 江湖
 		[FORCE_TYPE.SHAO_LIN ] = {255, 178, 95 }, -- 少林
 		[FORCE_TYPE.WAN_HUA  ] = {196, 152, 255}, -- 万花
