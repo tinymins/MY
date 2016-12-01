@@ -168,7 +168,7 @@ MY_Recount.Data.nMinFightTime = 30
 local _Cache = {}
 local Data          -- 当前战斗数据记录
 local History = {}  -- 历史战斗记录
-local SZ_REC_FILE = '$uid/cache/fight_recount_log.$lang.jx3dat'
+local SZ_REC_FILE = '$uid@$lang/cache/fight_recount_log.db'
 
 -- ##################################################################################################
 --             #                 #         #             #         #                 # # # # # # #
@@ -186,21 +186,21 @@ local SZ_REC_FILE = '$uid/cache/fight_recount_log.$lang.jx3dat'
 -- ##################################################################################################
 -- 登陆游戏加载保存的数据
 function MY_Recount.Data.LoadData()
-	local data = MY.Sys.LoadLUAData(SZ_REC_FILE) or {}
-	History                       = data.History       or {}
-	MY_Recount.Data.nMaxHistory   = data.nMaxHistory   or 10
-	MY_Recount.Data.nMinFightTime = data.nMinFightTime or 30
+	local DB = UnQLite_Open(MY.FormatPath(SZ_REC_FILE))
+	History                       = DB:Get("History")       or {}
+	MY_Recount.Data.nMaxHistory   = DB:Get("nMaxHistory")   or 10
+	MY_Recount.Data.nMinFightTime = DB:Get("nMinFightTime") or 30
+	DB:Release()
 	MY_Recount.Data.Init()
 end
 
 -- 退出游戏保存数据
 function MY_Recount.Data.SaveData()
-	local data = {
-		History       = History,
-		nMaxHistory   = MY_Recount.Data.nMaxHistory  ,
-		nMinFightTime = MY_Recount.Data.nMinFightTime,
-	}
-	MY.Sys.SaveLUAData(SZ_REC_FILE, data)
+	local DB = UnQLite_Open(MY.FormatPath(SZ_REC_FILE))
+	DB:Set("History"      , History                      )
+	DB:Set("nMaxHistory"  , MY_Recount.Data.nMaxHistory  )
+	DB:Set("nMinFightTime", MY_Recount.Data.nMinFightTime)
+	DB:Release()
 end
 
 -- 过图清除当前战斗数据
