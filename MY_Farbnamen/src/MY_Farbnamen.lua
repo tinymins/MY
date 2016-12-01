@@ -38,6 +38,9 @@ local Config_Default = {
 }
 CPath.MakeDir(SZ_DB_DIR)
 local DB = SQLite3_Open(SZ_DB_PATH)
+if not DB then
+	return MY.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L["MY_Farbnamen"])
+end
 DB:Execute("CREATE TABLE IF NOT EXISTS InfoCache (id INTEGER PRIMARY KEY, name VARCHAR(20) NOT NULL, force INTEGER, role INTEGER, level INTEGER, title VARCHAR(20), camp INTEGER, tong INTEGER)")
 DB:Execute("CREATE INDEX IF NOT EXISTS info_cache_name_idx ON InfoCache(name)")
 local DBI_W  = DB:Prepare("REPLACE INTO InfoCache (id, name, force, role, level, title, camp, tong) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")

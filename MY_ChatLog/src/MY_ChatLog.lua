@@ -159,7 +159,7 @@ MY.RegisterExit("MY_Chat_Release", ReleaseDB)
 
 function MY_ChatLog.Open()
 	if not DB then
-		return MY.Sysmsg({_L['Cannot connect to database!!!']})
+		return MY.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L['MY_ChatLog'])
 	end
 	Wnd.OpenWindow(SZ_INI, "MY_ChatLog"):BringToTop()
 end
