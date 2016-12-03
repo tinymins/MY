@@ -20,15 +20,15 @@ DB:Execute("CREATE INDEX IF NOT EXISTS mmm_name_idx ON NpcInfo(name, mapid)")
 DB:Execute("CREATE INDEX IF NOT EXISTS mmm_title_idx ON NpcInfo(title, mapid)")
 DB:Execute("CREATE INDEX IF NOT EXISTS mmm_template_idx ON NpcInfo(templateid, mapid)")
 local DBN_W  = DB:Prepare("REPLACE INTO NpcInfo (templateid, poskey, mapid, x, y, name, title, level) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
-local DBN_RI = DB:Prepare("SELECT name, title, templateid, level, mapid, x, y FROM NpcInfo WHERE templateid = ?")
-local DBN_RN = DB:Prepare("SELECT name, title, templateid, level, mapid, x, y FROM NpcInfo WHERE name LIKE ? OR title LIKE ?")
-local DBN_RNM = DB:Prepare("SELECT name, title, templateid, level, mapid, x, y FROM NpcInfo WHERE (name LIKE ? AND mapid = ?) OR (title LIKE ? AND mapid = ?)")
+local DBN_RI = DB:Prepare("SELECT templateid, poskey, mapid, x, y, name, title, level FROM NpcInfo WHERE templateid = ?")
+local DBN_RN = DB:Prepare("SELECT templateid, poskey, mapid, x, y, name, title, level FROM NpcInfo WHERE name LIKE ? OR title LIKE ?")
+local DBN_RNM = DB:Prepare("SELECT templateid, poskey, mapid, x, y, name, title, level FROM NpcInfo WHERE (name LIKE ? AND mapid = ?) OR (title LIKE ? AND mapid = ?)")
 DB:Execute("CREATE TABLE IF NOT EXISTS DoodadInfo (templateid INTEGER, poskey INTEGER, mapid INTEGER, x INTEGER, y INTEGER, name VARCHAR(20) NOT NULL, PRIMARY KEY (templateid, poskey))")
 DB:Execute("CREATE INDEX IF NOT EXISTS mmm_name_idx ON DoodadInfo(name, mapid)")
 local DBD_W  = DB:Prepare("REPLACE INTO DoodadInfo (templateid, poskey, mapid, x, y, name) VALUES (?, ?, ?, ?, ?, ?)")
-local DBD_RI = DB:Prepare("SELECT name, templateid, mapid, x, y FROM DoodadInfo WHERE templateid = ?")
-local DBD_RN = DB:Prepare("SELECT name, templateid, mapid, x, y FROM DoodadInfo WHERE name LIKE ?")
-local DBD_RNM = DB:Prepare("SELECT name, templateid, mapid, x, y FROM DoodadInfo WHERE name LIKE ? AND mapid = ?")
+local DBD_RI = DB:Prepare("SELECT templateid, poskey, mapid, x, y, name FROM DoodadInfo WHERE templateid = ?")
+local DBD_RN = DB:Prepare("SELECT templateid, poskey, mapid, x, y, name FROM DoodadInfo WHERE name LIKE ?")
+local DBD_RNM = DB:Prepare("SELECT templateid, poskey, mapid, x, y, name FROM DoodadInfo WHERE name LIKE ? AND mapid = ?")
 
 do
 ---------------------------------------------------------------
@@ -79,18 +79,20 @@ local function OnLoadingEnd()
 	DB:Execute("BEGIN TRANSACTION")
 	for i, p in pairs(l_npc) do
 		DBN_W:ClearBindings()
-		DBN_W:BindAll(p.templateid, GeneInfoPosKey(p.mapid, p.x, p.y), p.mapid, p.x, p.y, AnsiToUTF8(p.name), AnsiToUTF8(p.title), p.level)
+		DBN_W:BindAll(p.templateid, p.poskey, p.mapid, p.x, p.y, AnsiToUTF8(p.name), AnsiToUTF8(p.title), p.level)
 		DBN_W:Execute()
 	end
 	DB:Execute("END TRANSACTION")
+	l_npc = {}
 	
 	DB:Execute("BEGIN TRANSACTION")
 	for i, p in pairs(l_doodad) do
 		DBD_W:ClearBindings()
-		DBD_W:BindAll(p.templateid, GeneInfoPosKey(p.mapid, p.x, p.y), p.mapid, p.x, p.y, AnsiToUTF8(p.name))
+		DBD_W:BindAll(p.templateid, p.poskey, p.mapid, p.x, p.y, AnsiToUTF8(p.name))
 		DBD_W:Execute()
 	end
 	DB:Execute("END TRANSACTION")
+	l_doodad = {}
 end
 MY.RegisterEvent('LOADING_END.MY_MiddleMapMark', OnLoadingEnd)
 
@@ -125,18 +127,10 @@ local function OnNpcEnterScene()
 	end
 	-- switch map
 	local dwMapID = player.GetMapID()
+	local dwPosKey = GeneInfoPosKey(dwMapID, npc.nX, npc.nY)
 	
-	-- keep data distinct
-	for i = #l_npc, 1, -1 do
-		local p = l_npc[i]
-		if p.dwTemplateID == npc.dwTemplateID
-		and math.abs(npc.nX - p.nX) <= MAX_DISTINCT_DISTANCE
-		and math.abs(npc.nY - p.nY) <= MAX_DISTINCT_DISTANCE then
-			table.remove(l_npc, i)
-		end
-	end
 	-- add rec
-	table.insert(l_npc, {
+	l_npc[npc.dwTemplateID .. "," .. dwPosKey] = {
 		decoded = true,
 		x = npc.nX,
 		y = npc.nY,
@@ -144,8 +138,9 @@ local function OnNpcEnterScene()
 		level = npc.nLevel,
 		name  = szName,
 		title = npc.szTitle,
+		poskey = dwPosKey,
 		templateid = npc.dwTemplateID,
-	})
+	}
 	-- redraw ui
 	-- if GetLogicFrameCount() - m_nLastRedrawFrame > MARK_RENDER_INTERVAL then
 	-- 	m_nLastRedrawFrame = GetLogicFrameCount()
@@ -174,25 +169,18 @@ local function OnDoodadEnterScene()
 	end
 	-- switch map
 	local dwMapID = player.GetMapID()
+	local dwPosKey = GeneInfoPosKey(dwMapID, doodad.nX, doodad.nY)
 	
-	-- keep data distinct
-	for i = #l_doodad, 1, -1 do
-		local p = l_doodad[i]
-		if p.dwTemplateID == doodad.dwTemplateID
-		and math.abs(doodad.nX - p.nX) <= MAX_DISTINCT_DISTANCE
-		and math.abs(doodad.nY - p.nY) <= MAX_DISTINCT_DISTANCE then
-			table.remove(l_doodad, i)
-		end
-	end
 	-- add rec
-	table.insert(l_doodad, {
+	l_doodad[doodad.dwTemplateID .. "," .. dwPosKey] = {
 		decoded = true,
 		x = doodad.nX,
 		y = doodad.nY,
 		name = szName,
 		mapid = dwMapID,
+		poskey = dwPosKey,
 		templateid = doodad.dwTemplateID,
-	})
+	}
 	-- redraw ui
 	-- if GetLogicFrameCount() - m_nLastRedrawFrame > MARK_RENDER_INTERVAL then
 	-- 	m_nLastRedrawFrame = GetLogicFrameCount()
@@ -213,7 +201,13 @@ function MY_MiddleMapMark.SearchNpc(szText, dwMapID)
 		DBN_RN:BindAll(szSearch, szSearch)
 		aInfos = DBN_RN:GetAll()
 	end
-	for _, info in ipairs(l_npc) do
+	for i = #aInfos, 1, -1 do
+		local p = aInfos[i]
+		if l_npc[p.templateid .. "," .. p.poskey] then
+			table.remove(aInfos, i)
+		end
+	end
+	for _, info in pairs(l_npc) do
 		if wstring.find(info.name, szText)
 		or wstring.find(info.title, szText) then
 			table.insert(aInfos, 1, info)
@@ -234,7 +228,13 @@ function MY_MiddleMapMark.SearchDoodad(szText, dwMapID)
 		DBD_RN:BindAll(szSearch)
 		return DBD_RN:GetAll()
 	end
-	for _, info in ipairs(l_doodad) do
+	for i = #aInfos, 1, -1 do
+		local p = aInfos[i]
+		if l_doodad[p.templateid .. "," .. p.poskey] then
+			table.remove(aInfos, i)
+		end
+	end
+	for _, info in pairs(l_doodad) do
 		if wstring.find(info.name, szText) then
 			table.insert(aInfos, 1, info)
 		end
