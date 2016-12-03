@@ -479,14 +479,14 @@ MY.RegisterEvent("PARTY_ADD_MEMBER", function()
 end)
 MY.RegisterEvent("TEAM_AUTHORITY_CHANGED", function()
 	local me, team = GetClientPlayer(), GetClientTeam()
-	if not me.IsInParty() or not MY.IsInArena() or not l_bConfigEnd then
+	if not me.IsInParty() or not MY.IsInArena() or l_bConfigEnd then
 		return
 	end
 	l_tTeamInfo = MY.GetTeamInfo()
 end)
 MY.RegisterEvent("PARTY_SET_FORMATION_LEADER", function()
 	local me, team = GetClientPlayer(), GetClientTeam()
-	if not me.IsInParty() or not MY.IsInArena() or not l_bConfigEnd then
+	if not me.IsInParty() or not MY.IsInArena() or l_bConfigEnd then
 		return
 	end
 	l_tTeamInfo = MY.GetTeamInfo()
