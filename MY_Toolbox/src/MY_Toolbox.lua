@@ -467,8 +467,8 @@ end)
 -- auto restore team authourity info in arena
 do local l_tTeamInfo, l_bConfigEnd
 MY.RegisterEvent("LOADING_END", function() l_bConfigEnd = false end)
-MY.RegisterEvent("ARENA_START", function() l_bConfigEnd, l_tTeamInfo = true, MY.GetTeamInfo() end)
-MY.RegisterEvent("PARTY_ADD_MEMBER", function()
+MY.RegisterEvent("ARENA_START", function() l_bConfigEnd = true  end)
+local function RestoreTeam()
 	local me, team = GetClientPlayer(), GetClientTeam()
 	if not l_tTeamInfo
 	or not MY_ToolBox.bRestoreAuthorityInfo
@@ -476,21 +476,17 @@ MY.RegisterEvent("PARTY_ADD_MEMBER", function()
 		return
 	end
 	MY.SetTeamInfo(l_tTeamInfo)
-end)
-MY.RegisterEvent("TEAM_AUTHORITY_CHANGED", function()
+end
+MY.RegisterEvent("PARTY_ADD_MEMBER", RestoreTeam)
+
+local function SaveTeam()
 	local me, team = GetClientPlayer(), GetClientTeam()
 	if not me.IsInParty() or not MY.IsInArena() or l_bConfigEnd then
 		return
 	end
 	l_tTeamInfo = MY.GetTeamInfo()
-end)
-MY.RegisterEvent("PARTY_SET_FORMATION_LEADER", function()
-	local me, team = GetClientPlayer(), GetClientTeam()
-	if not me.IsInParty() or not MY.IsInArena() or l_bConfigEnd then
-		return
-	end
-	l_tTeamInfo = MY.GetTeamInfo()
-end)
+end
+MY.RegisterEvent({"TEAM_AUTHORITY_CHANGED", "PARTY_SET_FORMATION_LEADER", "TEAM_CHANGE_MEMBER_GROUP"}, SaveTeam)
 end
 
 -- ################################################################################################ --
