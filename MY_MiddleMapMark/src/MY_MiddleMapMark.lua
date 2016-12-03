@@ -8,14 +8,244 @@
 -- @Last Modified time: 2015-06-10 11:03:48
 -----------------------------------------------
 MY_MiddleMapMark = {}
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_MiddleMapMark/lang/")
-local _C = {}
-local _Cache = { tMapDataChanged = {} }
-local Data = {}
-local SZ_CACHE_PATH = "cache/NPC_DOODAD_REC/"
-local MAX_DISTINCT_DISTANCE = 4 -- 最大独立距离4尺（低于该距离的两个实体视为同一个）
-MAX_DISTINCT_DISTANCE = MAX_DISTINCT_DISTANCE * MAX_DISTINCT_DISTANCE * 64 * 64
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_MiddleMapMark/lang/")
+local l_szKeyword = ""
+local SZ_DB_PATH = MY.FormatPath("!all-users@$lang/cache/npc_doodad_rec.db")
+local DB = SQLite3_Open(SZ_DB_PATH)
+if not DB then
+	return MY.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L["MY_MiddleMapMark"])
+end
+DB:Execute("CREATE TABLE IF NOT EXISTS NpcInfo (templateid INTEGER, poskey INTEGER, mapid INTEGER, x INTEGER, y INTEGER, name VARCHAR(20) NOT NULL, title VARCHAR(20) NOT NULL, level INTEGER, PRIMARY KEY(templateid, poskey))")
+DB:Execute("CREATE INDEX IF NOT EXISTS mmm_name_idx ON NpcInfo(name, mapid)")
+DB:Execute("CREATE INDEX IF NOT EXISTS mmm_title_idx ON NpcInfo(title, mapid)")
+DB:Execute("CREATE INDEX IF NOT EXISTS mmm_template_idx ON NpcInfo(templateid, mapid)")
+local DBN_W  = DB:Prepare("REPLACE INTO NpcInfo (templateid, poskey, mapid, x, y, name, title, level) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+local DBN_RI = DB:Prepare("SELECT name, title, templateid, level, mapid, x, y FROM NpcInfo WHERE templateid = ?")
+local DBN_RN = DB:Prepare("SELECT name, title, templateid, level, mapid, x, y FROM NpcInfo WHERE name LIKE ? OR title LIKE ?")
+local DBN_RNM = DB:Prepare("SELECT name, title, templateid, level, mapid, x, y FROM NpcInfo WHERE (name LIKE ? AND mapid = ?) OR (title LIKE ? AND mapid = ?)")
+DB:Execute("CREATE TABLE IF NOT EXISTS DoodadInfo (templateid INTEGER, poskey INTEGER, mapid INTEGER, x INTEGER, y INTEGER, name VARCHAR(20) NOT NULL, PRIMARY KEY (templateid, poskey))")
+DB:Execute("CREATE INDEX IF NOT EXISTS mmm_name_idx ON DoodadInfo(name, mapid)")
+local DBD_W  = DB:Prepare("REPLACE INTO DoodadInfo (templateid, poskey, mapid, x, y, name) VALUES (?, ?, ?, ?, ?, ?)")
+local DBD_RI = DB:Prepare("SELECT name, templateid, mapid, x, y FROM DoodadInfo WHERE templateid = ?")
+local DBD_RN = DB:Prepare("SELECT name, templateid, mapid, x, y FROM DoodadInfo WHERE name LIKE ?")
+local DBD_RNM = DB:Prepare("SELECT name, templateid, mapid, x, y FROM DoodadInfo WHERE name LIKE ? AND mapid = ?")
 
+do
+---------------------------------------------------------------
+-- 数据存储
+---------------------------------------------------------------
+local L16 = 0x10000
+local L32 = 0x100000000
+local MAX_DISTINCT_DISTANCE = 2 * 64 -- 最大独立距离2尺（低于该距离的两个实体视为同一个）-- 不可随意更改，更改需要清空数据库重新建立key索引
+local function GeneInfoPosKey(mapid, x, y)
+	-- 47 - 32 位 mapid
+	-- 31 - 16 位 x
+	-- 15 -  0 位 y
+	return mapid * L32 + math.floor(x / MAX_DISTINCT_DISTANCE) * L16 + math.floor(y / MAX_DISTINCT_DISTANCE)
+end
+	
+local SZ_CACHE_PATH = "cache/NPC_DOODAD_REC/"
+if IsLocalFileExist(MY.FormatPath(SZ_CACHE_PATH)) then
+	DB:Execute("BEGIN TRANSACTION")
+	for _, dwMapID in ipairs(GetMapList()) do
+		local data = MY.LoadLUAData(SZ_CACHE_PATH .. dwMapID .. ".$lang.jx3dat")
+		if type(data) == 'string' then
+			data = MY.JsonDecode(data)
+		end
+		if data then
+			for _, p in ipairs(data.Npc) do
+				DBN_W:ClearBindings()
+				DBN_W:BindAll(p.dwTemplateID, GeneInfoPosKey(dwMapID, p.nX, p.nY), dwMapID, p.nX, p.nY, AnsiToUTF8(p.szName), AnsiToUTF8(p.szTitle), p.nLevel)
+				DBN_W:Execute()
+			end
+			for _, p in ipairs(data.Doodad) do
+				DBD_W:ClearBindings()
+				DBD_W:BindAll(p.dwTemplateID, GeneInfoPosKey(dwMapID, p.nX, p.nY), dwMapID, p.nX, p.nY, AnsiToUTF8(p.szName))
+				DBD_W:Execute()
+			end
+			MY.Debug({"MiddleMapMark cache trans from file to sqlite finished!"}, "MY_MiddleMapMark", MY_DEBUG.LOG)
+		end
+	end
+	DB:Execute("END TRANSACTION")
+	-- CPath.DelDir(SZ_CACHE_PATH)
+end
+
+---------------------------------------------------------------
+-- 数据采集
+---------------------------------------------------------------
+local l_npc = {}
+local l_doodad = {}
+local function OnLoadingEnd()
+	DB:Execute("BEGIN TRANSACTION")
+	for i, p in pairs(l_npc) do
+		DBN_W:ClearBindings()
+		DBN_W:BindAll(p.templateid, GeneInfoPosKey(p.mapid, p.x, p.y), p.mapid, p.x, p.y, AnsiToUTF8(p.name), AnsiToUTF8(p.title), p.level)
+		DBN_W:Execute()
+	end
+	DB:Execute("END TRANSACTION")
+	
+	DB:Execute("BEGIN TRANSACTION")
+	for i, p in pairs(l_doodad) do
+		DBD_W:ClearBindings()
+		DBD_W:BindAll(p.templateid, GeneInfoPosKey(p.mapid, p.x, p.y), p.mapid, p.x, p.y, AnsiToUTF8(p.name))
+		DBD_W:Execute()
+	end
+	DB:Execute("END TRANSACTION")
+end
+MY.RegisterEvent('LOADING_END.MY_MiddleMapMark', OnLoadingEnd)
+
+local function OnExit()
+	OnLoadingEnd()
+	DB:Release()
+end
+MY.RegisterExit("MY_MiddleMapMark_Save", OnExit)
+
+NpcTpl = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_MiddleMapMark/data/npc/$lang.jx3dat")
+DoodadTpl = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_MiddleMapMark/data/doodad/$lang.jx3dat")
+local m_nLastRedrawFrame = GetLogicFrameCount()
+local MARK_RENDER_INTERVAL = GLOBAL.GAME_FPS * 5
+local function OnNpcEnterScene()
+	local npc = GetNpc(arg0)
+	local player = GetClientPlayer()
+	if not (npc and player) then
+		return
+	end
+	-- avoid special npc
+	if NpcTpl[npc.dwTemplateID] then
+		return
+	end
+	-- avoid player's pets
+	if npc.dwEmployer and npc.dwEmployer ~= 0 then
+		return
+	end
+	-- avoid full number named npc
+	local szName = MY.GetObjectName(npc)
+	if not szName or MY.String.Trim(szName) == '' then
+		return
+	end
+	-- switch map
+	local dwMapID = player.GetMapID()
+	
+	-- keep data distinct
+	for i = #l_npc, 1, -1 do
+		local p = l_npc[i]
+		if p.dwTemplateID == npc.dwTemplateID
+		and math.abs(npc.nX - p.nX) <= MAX_DISTINCT_DISTANCE
+		and math.abs(npc.nY - p.nY) <= MAX_DISTINCT_DISTANCE then
+			table.remove(l_npc, i)
+		end
+	end
+	-- add rec
+	table.insert(l_npc, {
+		decoded = true,
+		x = npc.nX,
+		y = npc.nY,
+		mapid = dwMapID,
+		level = npc.nLevel,
+		name  = szName,
+		title = npc.szTitle,
+		templateid = npc.dwTemplateID,
+	})
+	-- redraw ui
+	-- if GetLogicFrameCount() - m_nLastRedrawFrame > MARK_RENDER_INTERVAL then
+	-- 	m_nLastRedrawFrame = GetLogicFrameCount()
+	-- 	MY_MiddleMapMark.Search(_Cache.szKeyword)
+	-- end
+end
+MY.RegisterEvent("NPC_ENTER_SCENE.MY_MIDDLEMAPMARK", OnNpcEnterScene)
+
+local function OnDoodadEnterScene()
+	local doodad = GetDoodad(arg0)
+	local player = GetClientPlayer()
+	if not (doodad and player) then
+		return
+	end
+	if doodad.nKind == DOODAD_KIND.CORPSE then
+		return
+	end
+	-- avoid special doodad
+	if DoodadTpl[doodad.dwTemplateID] then
+		return
+	end
+	-- avoid full number named doodad
+	local szName = MY.GetObjectName(doodad)
+	if not szName or MY.String.Trim(szName) == '' then
+		return
+	end
+	-- switch map
+	local dwMapID = player.GetMapID()
+	
+	-- keep data distinct
+	for i = #l_doodad, 1, -1 do
+		local p = l_doodad[i]
+		if p.dwTemplateID == doodad.dwTemplateID
+		and math.abs(doodad.nX - p.nX) <= MAX_DISTINCT_DISTANCE
+		and math.abs(doodad.nY - p.nY) <= MAX_DISTINCT_DISTANCE then
+			table.remove(l_doodad, i)
+		end
+	end
+	-- add rec
+	table.insert(l_doodad, {
+		decoded = true,
+		x = doodad.nX,
+		y = doodad.nY,
+		name = szName,
+		mapid = dwMapID,
+		templateid = doodad.dwTemplateID,
+	})
+	-- redraw ui
+	-- if GetLogicFrameCount() - m_nLastRedrawFrame > MARK_RENDER_INTERVAL then
+	-- 	m_nLastRedrawFrame = GetLogicFrameCount()
+	-- 	MY_MiddleMapMark.Search(_Cache.szKeyword)
+	-- end
+end
+MY.RegisterEvent("DOODAD_ENTER_SCENE.MY_MIDDLEMAPMARK", OnDoodadEnterScene)
+
+function MY_MiddleMapMark.SearchNpc(szText, dwMapID)
+	local aInfos
+	local szSearch = AnsiToUTF8("%" .. szText .. "%")
+	if dwMapID then
+		DBN_RNM:ClearBindings()
+		DBN_RNM:BindAll(szSearch, dwMapID, szSearch, dwMapID)
+		aInfos = DBN_RNM:GetAll()
+	else
+		DBN_RN:ClearBindings()
+		DBN_RN:BindAll(szSearch, szSearch)
+		aInfos = DBN_RN:GetAll()
+	end
+	for _, info in ipairs(l_npc) do
+		if wstring.find(info.name, szText)
+		or wstring.find(info.title, szText) then
+			table.insert(aInfos, 1, info)
+		end
+	end
+	return aInfos
+end
+
+function MY_MiddleMapMark.SearchDoodad(szText, dwMapID)
+	local aInfos
+	local szSearch = AnsiToUTF8("%" .. szText .. "%")
+	if dwMapID then
+		DBD_RNM:ClearBindings()
+		DBD_RNM:BindAll(szSearch, dwMapID)
+		return DBD_RNM:GetAll()
+	else
+		DBD_RN:ClearBindings()
+		DBD_RN:BindAll(szSearch)
+		return DBD_RN:GetAll()
+	end
+	for _, info in ipairs(l_doodad) do
+		if wstring.find(info.name, szText) then
+			table.insert(aInfos, 1, info)
+		end
+	end
+	return aInfos
+end
+end
+
+---------------------------------------------------------------
+-- 中地图HOOK
+---------------------------------------------------------------
 -- HOOK MAP SWITCH
 if MiddleMap._MY_MMM_ShowMap == nil then
 	MiddleMap._MY_MMM_ShowMap = MiddleMap.ShowMap or false
@@ -24,12 +254,12 @@ MiddleMap.ShowMap = function(...)
 	if MiddleMap._MY_MMM_ShowMap then
 		MiddleMap._MY_MMM_ShowMap(...)
 	end
-	MY_MiddleMapMark.Search(_Cache.szKeyword)
+	MY_MiddleMapMark.Search(l_szKeyword)
 	-- for mapid changing
 	local dwMapID = MiddleMap.dwMapID
 	MY.DelayCall(function()
 		if dwMapID ~= MiddleMap.dwMapID then
-			MY_MiddleMapMark.Search(_Cache.szKeyword)
+			MY_MiddleMapMark.Search(l_szKeyword)
 		end
 	end, 200)
 end
@@ -81,174 +311,122 @@ MiddleMap.OnMouseLeave = function()
 end
 
 -- start search
-MY_MiddleMapMark.Search = function(szKeyword)
-	local ui = MY.UI("Topmost1/MiddleMap")
+local MAX_DISPLAY_COUNT = 1000
+local function OnMMMItemMouseEnter()
+	local x, y = this:GetAbsPos()
+	local w, h = this:GetSize()
+	local szTip = this.decoded and this.name or UTF8ToAnsi(this.name) ..
+	((this.level and this.level > 0 and ' lv.' .. this.level) or '') ..
+	((this.title and this.title ~= '' and '\n<' .. (this.decoded and this.title or UTF8ToAnsi(this.title)) .. '>') or '')
+	if IsCtrlKeyDown() then
+		szTip = szTip .. ((this.templateid and '\nNpc Template ID: ' .. this.templateid))
+	end
+	OutputTip(GetFormatText(szTip, 136), 450, {x, y, w, h}, ALW.TOP_BOTTOM)
+end
+local function OnMMMItemMouseLeave()
+	HideTip()
+end
+function MY_MiddleMapMark.Search(szKeyword)
+	local frame = Station.Lookup("Topmost1/MiddleMap")
 	local player = GetClientPlayer()
-	if ui:count() == 0 or not ui:visible() or not player then
+	if not player or not frame or not frame:IsVisible() then
 		return
 	end
 	
-	local uiHandle, nW, nH
-	local uiInner = ui:item("#Handle_Inner")
-	if uiInner:count() == 0 then -- old version
-		uiHandle = ui:item("#Handle_MY_MMM")
-		if uiHandle:count() == 0 then
-			local x, y = ui:item('#Handle_Map'):pos()
-			local w, h = ui:item('#Handle_Map'):size()
-			uiHandle = ui:append("Handle", "Handle_MY_MMM", {
-				x = x, y = y, w = w, h = h,
-			}):item('#Handle_MY_MMM')
-		end
-		nW, nH = uiHandle:size()
-	else
-		uiHandle = uiInner:item("#Handle_MY_MMM")
-		if uiHandle:count() == 0 then
-			uiHandle = uiInner:append("Handle", "Handle_MY_MMM"):item('#Handle_MY_MMM')
-		end
-		nW, nH = uiInner:size()
+	local hInner = frame:Lookup("", "Handle_Inner")
+	local nW, nH = hInner:GetSize()
+	local hMMM = hInner:Lookup("Handle_MY_MMM")
+	if not hMMM then
+		hInner:AppendItemFromString('<handle>firstpostype=0 name="Handle_MY_MMM" w=' .. nW .. ' h=' .. nH .. '</handle>')
+		hMMM = hInner:Lookup("Handle_MY_MMM")
+		hInner:FormatAllItemPos()
 	end
-	uiHandle:clear()
+	local nCount = 0
+	local nItemCount = hMMM:GetItemCount()
 	
-	_Cache.szKeyword = szKeyword
-	if not szKeyword or szKeyword == '' then
+	if l_szKeyword == szKeyword then
 		return
 	end
-
+	l_szKeyword = szKeyword
+	
+	local infos
 	local dwMapID = MiddleMap.dwMapID or player.GetMapID()
-	local tKeyword = MY.String.Split(szKeyword, ',')
-	-- check if data exist
-	local data = MY_MiddleMapMark.GetMapData(dwMapID)
-	if not data then
-		return
+	local aKeywords = {}
+	do
+		local i = 1
+		for _, szSearch in ipairs(MY.String.Split(szKeyword, ',')) do
+			szSearch = MY.String.Trim(szSearch)
+			if szSearch ~= "" then
+				aKeywords[i] = szSearch
+				i = i + 1
+			end
+		end
+	end
+	local nX, nY
+	
+	for i, szSearch in ipairs(aKeywords) do
+		infos = MY_MiddleMapMark.SearchNpc(szSearch, dwMapID)
+		for _, info in ipairs(infos) do
+			if nCount < MAX_DISPLAY_COUNT then
+				nX, nY = MiddleMap.LPosToHPos(info.x, info.y, 13, 13)
+				if nX > 0 and nY > 0 and nX < nW and nY < nH then
+					nCount = nCount + 1
+					if nCount > nItemCount then
+						hMMM:AppendItemFromString('<image>w=13 h=13 path="ui/Image/Minimap/MapMark.UITex" frame=95 eventid=784</image>')
+						nItemCount = nItemCount + 1
+					end
+					item = hMMM:Lookup(nCount - 1)
+					item:Show()
+					item:SetRelPos(nX, nY)
+					item.decoded = info.decoded
+					item.name = info.name
+					item.title = info.title
+					item.level = info.level
+					item.templateid = info.templateid
+					item.OnItemMouseEnter = OnMMMItemMouseEnter
+					item.OnItemMouseLeave = OnMMMItemMouseLeave
+				end
+			end
+		end
 	end
 	
-	-- render npc mark
-	for _, npc in ipairs(data.Npc) do
-		local bMatch = false
-		for _, kw in ipairs(tKeyword) do
-			if string.find(npc.szName, kw)
-			or string.find(npc.szTitle, kw)
-			or npc.dwTemplateID == tonumber(kw) then
-				bMatch = true
-				break
-			end
-		end
-		if bMatch then
-			local x, y = MiddleMap.LPosToHPos(npc.nX, npc.nY, 13, 13)
-			if x > 0 and y > 0 and x < nW and y < nH then
-				uiHandle:append('Image', 'Image_Npc_' .. npc.dwID, {
-					image = 'ui/Image/Minimap/MapMark.UITex|95',
-					w = 13, h = 13, x = x, y = y,
-					tip = function()
-						local szTip = npc.szName ..
-						((npc.nLevel and npc.nLevel > 0 and ' lv.' .. npc.nLevel) or '') ..
-						((npc.szTitle ~= '' and '\n<' .. npc.szTitle .. '>') or '')
-						if IsCtrlKeyDown() then
-							szTip = szTip .. ((npc.dwTemplateID and '\nNpc Template ID: ' .. npc.dwTemplateID))
-						end
-						return szTip
-					end,
-					tippostype = MY.Const.UI.Tip.POS_TOP,
-				})
+	for i, szSearch in ipairs(aKeywords) do
+		infos = MY_MiddleMapMark.SearchDoodad(szSearch, dwMapID)
+		for _, info in ipairs(infos) do
+			if nCount < MAX_DISPLAY_COUNT then
+				nX, nY = MiddleMap.LPosToHPos(info.x, info.y, 13, 13)
+				if nX > 0 and nY > 0 and nX < nW and nY < nH then
+					nCount = nCount + 1
+					if nCount > nItemCount then
+						hMMM:AppendItemFromString("<image>w=13 h=13</image>")
+						nItemCount = nItemCount + 1
+					end
+					item = hMMM:Lookup(nCount - 1)
+					item:Show()
+					item:SetRelPos(nX, nY)
+					item.decoded = info.decoded
+					item.name = info.name
+					item.title = info.title
+					item.level = info.level
+					item.templateid = info.templateid
+					item.OnItemMouseEnter = OnMMMItemMouseEnter
+					item.OnItemMouseLeave = OnMMMItemMouseLeave
+				end
 			end
 		end
 	end
 	
-	-- render doodad mark
-	for _, doodad in ipairs(data.Doodad) do
-		local bMatch = false
-		for _, kw in ipairs(tKeyword) do
-		if string.find(doodad.szName, kw)
-		or doodad.dwTemplateID == tonumber(kw) then
-				bMatch = true
-				break
-			end
-		end
-		if bMatch then
-			local x, y = MiddleMap.LPosToHPos(doodad.nX, doodad.nY, 13, 13)
-			if x > 0 and y > 0 and x < nW and y < nH then
-				uiHandle:append('Image', 'Image_Doodad_' .. doodad.dwID, {
-					image = 'ui/Image/Minimap/MapMark.UITex|95',
-					w = 13, h = 13, x = x, y = y,
-					tip = function()
-						local szTip = doodad.szName
-						if IsCtrlKeyDown() then
-							szTip = szTip .. ((doodad.dwTemplateID and '\nDoodad Template ID: ' .. doodad.dwTemplateID))
-						end
-						return szTip
-					end,
-					tippostype = MY.Const.UI.Tip.POS_TOP,
-				})
-			end
-		end
+	for i = nCount, nItemCount - 1 do
+		hMMM:Lookup(i):Hide()
 	end
+	hMMM:FormatAllItemPos()
 end
 
-MY_MiddleMapMark.GetMapData = function(dwMapID)
-	-- if data not loaded, load it now
-	if not Data[dwMapID] then
-		MY_MiddleMapMark.StartDelayUnloadMapData(dwMapID)
-		local data = MY.LoadLUAData(SZ_CACHE_PATH .. dwMapID .. ".$lang.jx3dat")
-		if type(data) == 'string' then
-			data = MY.Json.Decode(data)
-		end
-		data = data or {
-			Npc = {},
-			Doodad = {},
-		}
-		for i = #data.Npc, 1, -1 do
-			if ( data.Npc[i].dwTemplateID and
-				_C.NpcTpl[data.Npc[i].dwTemplateID]
-			) or MY.String.Trim(data.Npc[i].szName) == ''
-			or data.Npc[i].dwTemplateID == 1 then
-				table.remove(data.Npc, i)
-				_Cache.tMapDataChanged[dwMapID] = true
-			end
-		end
-		for i = #data.Doodad, 1, -1 do
-			if ( data.Doodad[i].dwTemplateID and
-				_C.DoodadTpl[data.Doodad[i].dwTemplateID]
-			) or MY.String.Trim(data.Doodad[i].szName) == ''
-			or data.Doodad[i].dwTemplateID == 1 then
-				table.remove(data.Doodad, i)
-				_Cache.tMapDataChanged[dwMapID] = true
-			end
-		end
-		Data[dwMapID] = data
-		MY.Debug({Table_GetMapName(dwMapID) .. '(' .. dwMapID .. ') map data loaded.'}, 'MY_MiddleMapMark', MY_DEBUG.LOG)
-	end
-	return Data[dwMapID]
-end
-
--- 开始指定地图的延时数据卸载时钟
-MY_MiddleMapMark.StartDelayUnloadMapData = function(dwMapID)
-	-- breathe until unload data
-	MY.BreatheCall('MY_MiddleMapMark_DataUnload_' .. dwMapID, function()
-		local player = GetClientPlayer()
-		if player and player.GetMapID() ~= dwMapID and MiddleMap.dwMapID ~= dwMapID then
-			MY_MiddleMapMark.UnloadMapData(dwMapID)
-			return 0
-		end
-	end, 60000)
-end
-
-MY_MiddleMapMark.UnloadMapData = function(dwMapID)
-	MY.Debug({Table_GetMapName(dwMapID) .. '(' .. dwMapID .. ') map data unloaded.'}, 'MY_MiddleMapMark', MY_DEBUG.LOG)
-	Data[dwMapID] = nil
-end
-
-MY_MiddleMapMark.SaveMapData = function()
-	for dwMapID, data in pairs(Data) do
-		MY_MiddleMapMark.StartDelayUnloadMapData(dwMapID)
-		if _Cache.tMapDataChanged[dwMapID] then
-			MY.SaveLUAData(SZ_CACHE_PATH .. dwMapID .. ".$lang.jx3dat", data)
-		end
-	end
-end
-
-_C.PS = {}
-
-_C.PS.OnPanelActive = function(wnd)
+---------------------------------------------------------------
+-- 主面板搜索
+---------------------------------------------------------------
+local PS = {}
+function PS.OnPanelActive(wnd)
 	local ui = MY.UI(wnd)
 	local x, y = ui:pos()
 	local w, h = ui:size()
@@ -270,66 +448,60 @@ _C.PS.OnPanelActive = function(wnd)
 	  :size(w - 30, 4)
 	  :image('ui/Image/UICommon/RaidTotal.UITex|45')
 	
-	ui:append("WndEditBox", "WndEdit_Search"):children('#WndEdit_Search')
-	  :pos(18, 10)
-	  :size(w - 26, 25)
-	  :change(function(raw, v)
-	  	if not (v and #v > 0) then
-	  		return
-	  	end
-	  	list:listbox('clear')
-	  	local aMap = GetMapList()
-	  	local i, N = 1, #aMap
-	  	local n, M = 0, 200
-	  	local S    = 2
-
-	  	MY.BreatheCall('MY_MiddleMapMark_Searching_Threading', function()
-	  		for _ = 1, S do
-	  			local dwMapID = aMap[i]
-	  			local data = MY_MiddleMapMark.GetMapData(dwMapID)
-	  			local tNames = {}
-	  			for _, p in ipairs(data.Npc) do
-	  				if not tNames[p.szName]
-	  				and (wstring.find(p.szName, v) or
-	  				wstring.find(p.szTitle, v)) then
-	  					list:listbox('insert', '[' .. Table_GetMapName(dwMapID) .. '] ' .. p.szName ..
-	  					((p.szTitle and #p.szTitle > 0 and '<' .. p.szTitle .. '>') or ''), nil, {
-	  						dwMapID = dwMapID ,
-	  						szName  = p.szName,
-	  					})
-	  					n = n + 1
-	  					tNames[p.szName] = true
-	  				end
-	  				if n > M then
-	  					return 0
-	  				end
-	  			end
-	  			local tNames = {}
-	  			for _, p in ipairs(data.Doodad) do
-	  				if not tNames[p.szName] and wstring.find(p.szName, v) then
-	  					list:listbox('insert', '[' .. Table_GetMapName(dwMapID) .. '] ' .. p.szName, nil, {
-	  						dwMapID = dwMapID ,
-	  						szName  = p.szName,
-	  					})
-	  					n = n + 1
-	  					tNames[p.szName] = true
-	  				end
-	  				if n > M then
-	  					return 0
-	  				end
-	  			end
-	  			muProgress:width((ui:width() - 32) * i / N)
-
-	  			i = i + 1
-	  			if i > N then
-	  				return 0
-	  			end
-	  		end
-	  	end)
-	  end)
+	ui:append("WndEditBox", "WndEdit_Search", {
+		x = 18, y = 10,
+		w = w - 26, h = 25,
+		onchange = function(raw, szText)
+			if not (szText and #szText > 0) then
+				return
+			end
+			local nMaxDisp = 0, 200
+			local nDisp = 0
+			local nCount = 0
+			local tNames = {}
+			local infos, szName, szTitle
+			list:listbox('clear')
+			
+			infos = MY_MiddleMapMark.SearchNpc(szText)
+			nCount = nCount + #infos
+			for _, info in ipairs(infos) do
+				szName  = info.decoded and info.name  or UTF8ToAnsi(info.name)
+				szTitle = info.decoded and info.title or UTF8ToAnsi(info.title)
+				if not tNames[info.mapid .. szName] then
+					list:listbox('insert', '[' .. Table_GetMapName(info.mapid) .. '] ' .. szName ..
+					((szTitle and #szTitle > 0 and '<' .. szTitle .. '>') or ''), nil, {
+						szName  = szName,
+						dwMapID = info.mapid,
+					})
+					nDisp = nDisp + 1
+					if nDisp > nMaxDisp then
+						return
+					end
+					tNames[info.mapid .. szName] = true
+				end
+			end
+			
+			infos = MY_MiddleMapMark.SearchDoodad(szText)
+			nCount = nCount + #infos
+			for _, info in ipairs(infos) do
+				szName = info.decoded and info.name or UTF8ToAnsi(info.name)
+				if not tNames[info.mapid .. szName] then
+					list:listbox('insert', '[' .. Table_GetMapName(info.mapid) .. '] ' .. szName, nil, {
+						szName  = szName,
+						dwMapID = info.mapid,
+					})
+					nDisp = nDisp + 1
+					if nDisp > nMaxDisp then
+						return
+					end
+					tNames[info.mapid .. szName] = true
+				end
+			end
+		end,
+	})
 end
 
-_C.PS.OnPanelResize = function(wnd)
+function PS.OnPanelResize(wnd)
 	local ui = MY.UI(wnd)
 	local x, y = ui:pos()
 	local w, h = ui:size()
@@ -339,107 +511,4 @@ _C.PS.OnPanelResize = function(wnd)
 	ui:children('#WndEdit_Search'):size(w - 26, 25)
 end
 
-_C.NpcTpl = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_MiddleMapMark/data/npc/$lang.jx3dat")
-_C.DoodadTpl = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_MiddleMapMark/data/doodad/$lang.jx3dat")
-local m_nLastRedrawFrame = GetLogicFrameCount()
-local MARK_RENDER_INTERVAL = GLOBAL.GAME_FPS * 5
-MY.RegisterEvent("NPC_ENTER_SCENE.MY_MIDDLEMAPMARK", function()
-	local npc = GetNpc(arg0)
-	local player = GetClientPlayer()
-	if not (npc and player) then
-		return
-	end
-	-- avoid special npc
-	if _C.NpcTpl[npc.dwTemplateID] then
-		return
-	end
-	-- avoid player's pets
-	if npc.dwEmployer and npc.dwEmployer ~= 0 then
-		return
-	end
-	-- avoid full number named npc
-	local szName = MY.GetObjectName(npc)
-	if not szName or MY.String.Trim(szName) == '' then
-		return
-	end
-	-- switch map
-	local dwMapID = player.GetMapID()
-	local data = MY_MiddleMapMark.GetMapData(dwMapID)
-	
-	-- keep data distinct
-	for i = #data.Npc, 1, -1 do
-		local p = data.Npc[i]
-		if p.dwID == npc.dwID or
-		p.dwTemplateID == npc.dwTemplateID and
-		math.pow(npc.nX - p.nX, 2) + math.pow(npc.nY - p.nY, 2) <= MAX_DISTINCT_DISTANCE then
-			table.remove(data.Npc, i)
-		end
-	end
-	-- add rec
-	table.insert(data.Npc, {
-		nX = npc.nX,
-		nY = npc.nY,
-		dwID = npc.dwID,
-		nLevel  = npc.nLevel,
-		szName  = szName,
-		szTitle = npc.szTitle,
-		dwTemplateID = npc.dwTemplateID,
-	})
-	-- redraw ui
-	if GetLogicFrameCount() - m_nLastRedrawFrame > MARK_RENDER_INTERVAL then
-		m_nLastRedrawFrame = GetLogicFrameCount()
-		MY_MiddleMapMark.Search(_Cache.szKeyword)
-	end
-	_Cache.tMapDataChanged[dwMapID] = true
-end)
-MY.RegisterEvent("DOODAD_ENTER_SCENE.MY_MIDDLEMAPMARK", function()
-	local doodad = GetDoodad(arg0)
-	local player = GetClientPlayer()
-	if not (doodad and player) then
-		return
-	end
-	if doodad.nKind == DOODAD_KIND.CORPSE then
-		return
-	end
-	-- avoid special doodad
-	if _C.DoodadTpl[doodad.dwTemplateID] then
-		return
-	end
-	-- avoid full number named doodad
-	local szName = MY.GetObjectName(doodad)
-	if not szName or MY.String.Trim(szName) == '' then
-		return
-	end
-	-- switch map
-	local dwMapID = player.GetMapID()
-	local data = MY_MiddleMapMark.GetMapData(dwMapID)
-	
-	-- keep data distinct
-	for i = #data.Doodad, 1, -1 do
-		local p = data.Doodad[i]
-		if p.dwID == doodad.dwID or
-		p.dwTemplateID == doodad.dwTemplateID and
-		math.pow(doodad.nX - p.nX, 2) + math.pow(doodad.nY - p.nY, 2) <= MAX_DISTINCT_DISTANCE then
-			table.remove(data.Doodad, i)
-		end
-	end
-	-- add rec
-	table.insert(data.Doodad, {
-		nX = doodad.nX,
-		nY = doodad.nY,
-		dwID = doodad.dwID,
-		szName  = szName,
-		dwTemplateID = doodad.dwTemplateID,
-	})
-	-- redraw ui
-	if GetLogicFrameCount() - m_nLastRedrawFrame > MARK_RENDER_INTERVAL then
-		m_nLastRedrawFrame = GetLogicFrameCount()
-		MY_MiddleMapMark.Search(_Cache.szKeyword)
-	end
-	_Cache.tMapDataChanged[dwMapID] = true
-end)
-MY.RegisterExit(MY_MiddleMapMark.SaveMapData)
-MY.RegisterEvent('LOADING_END', MY_MiddleMapMark.SaveMapData)
-MY.RegisterPanel( "MY_MiddleMapMark", _L["middle map mark"], _L['General'],
-	"ui/Image/MiddleMap/MapWindow2.UITex|4", {255,255,0,200}, _C.PS
-)
+MY.RegisterPanel("MY_MiddleMapMark", _L["middle map mark"], _L['General'], "ui/Image/MiddleMap/MapWindow2.UITex|4", {255,255,0,200}, PS)
