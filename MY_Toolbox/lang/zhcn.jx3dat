@@ -107,4 +107,6 @@ data = {
     ['show countdown'] = '显示时间',
     ['scale: %d%%.'] = '缩放: %d%%',
     ['changge force only'] = '仅长歌可用',
+    
+    ['auto restore team info in arena'] = '竞技场中自动恢复上次组队信息',
 }

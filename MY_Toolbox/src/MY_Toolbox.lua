@@ -658,8 +658,8 @@ function PS.OnPanelActive(wnd)
 	  end)
 	y = y + 30
 	
-	-- 竞技场频道切换
-	ui:append("WndCheckBox", "WndCheckBox_AutoSwitchChannel"):children("#WndCheckBox_AutoSwitchChannel")
+	-- 竞技场自动恢复队伍信息
+	ui:append("WndCheckBox", "WndCheckBox_RestoreAuthorityInfo"):children("#WndCheckBox_RestoreAuthorityInfo")
 	  :pos(x, y):width(300)
 	  :text(_L['auto restore team info in arena']):check(MY_ToolBox.bRestoreAuthorityInfo)
 	  :check(function(bChecked)
