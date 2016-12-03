@@ -455,7 +455,7 @@ function PS.OnPanelActive(wnd)
 			if not (szText and #szText > 0) then
 				return
 			end
-			local nMaxDisp = 0, 200
+			local nMaxDisp = 500
 			local nDisp = 0
 			local nCount = 0
 			local tNames = {}
@@ -474,7 +474,7 @@ function PS.OnPanelActive(wnd)
 						dwMapID = info.mapid,
 					})
 					nDisp = nDisp + 1
-					if nDisp > nMaxDisp then
+					if nDisp >= nMaxDisp then
 						return
 					end
 					tNames[info.mapid .. szName] = true
@@ -491,7 +491,7 @@ function PS.OnPanelActive(wnd)
 						dwMapID = info.mapid,
 					})
 					nDisp = nDisp + 1
-					if nDisp > nMaxDisp then
+					if nDisp >= nMaxDisp then
 						return
 					end
 					tNames[info.mapid .. szName] = true
