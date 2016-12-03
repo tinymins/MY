@@ -67,7 +67,7 @@ if IsLocalFileExist(MY.FormatPath(SZ_CACHE_PATH)) then
 		end
 	end
 	DB:Execute("END TRANSACTION")
-	CPath.DelDir(SZ_CACHE_PATH)
+	CPath.DelDir(MY.FormatPath(SZ_CACHE_PATH))
 end
 
 ---------------------------------------------------------------
