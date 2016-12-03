@@ -319,7 +319,7 @@ local function OnMMMItemMouseEnter()
 	((this.level and this.level > 0 and ' lv.' .. this.level) or '') ..
 	((this.title and this.title ~= '' and '\n<' .. (this.decoded and this.title or UTF8ToAnsi(this.title)) .. '>') or '')
 	if IsCtrlKeyDown() then
-		szTip = szTip .. ((this.templateid and '\nNpc Template ID: ' .. this.templateid))
+		szTip = szTip .. ((this.templateid and '\n' .. this.type .. ' Template ID: ' .. this.templateid))
 	end
 	OutputTip(GetFormatText(szTip, 136), 450, {x, y, w, h}, ALW.TOP_BOTTOM)
 end
@@ -379,6 +379,7 @@ function MY_MiddleMapMark.Search(szKeyword)
 					item:Show()
 					item:SetRelPos(nX, nY)
 					item.decoded = info.decoded
+					item.type = "Npc"
 					item.name = info.name
 					item.title = info.title
 					item.level = info.level
@@ -405,6 +406,7 @@ function MY_MiddleMapMark.Search(szKeyword)
 					item:Show()
 					item:SetRelPos(nX, nY)
 					item.decoded = info.decoded
+					item.type = "Doodad"
 					item.name = info.name
 					item.title = info.title
 					item.level = info.level
