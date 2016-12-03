@@ -398,7 +398,7 @@ function MY_MiddleMapMark.Search(szKeyword)
 				if nX > 0 and nY > 0 and nX < nW and nY < nH then
 					nCount = nCount + 1
 					if nCount > nItemCount then
-						hMMM:AppendItemFromString("<image>w=13 h=13</image>")
+						hMMM:AppendItemFromString('<image>w=13 h=13 path="ui/Image/Minimap/MapMark.UITex" frame=95 eventid=784</image>')
 						nItemCount = nItemCount + 1
 					end
 					item = hMMM:Lookup(nCount - 1)
