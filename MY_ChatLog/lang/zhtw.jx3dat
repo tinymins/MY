@@ -19,4 +19,6 @@ data = {
     ['open chatlog'] = '打開聊天記錄',
     ['MY - MY_ChatLog'] = '茗伊插件集 - 聊天記錄',
     ['press enter to search ...'] = '輸入回車鍵搜索...',
+    
+    ['Death Log'] = '重傷記錄',
 }
