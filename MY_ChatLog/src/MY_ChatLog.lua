@@ -48,7 +48,7 @@ local LOG_TYPE = {
 	{title = g_tStrings.tChannelName["MSG_FRIEND"        ], channels = {"MSG_FRIEND"        }},
 	{title = g_tStrings.tChannelName["MSG_GUILD"         ], channels = {"MSG_GUILD"         }},
 	{title = g_tStrings.tChannelName["MSG_GUILD_ALLIANCE"], channels = {"MSG_GUILD_ALLIANCE"}},
-	{title = _L["Death Log"], channels = {"MSG_SELF_DEATH", "MSG_PARTY_DEATH", "MSG_ENEMY_DEATH", "MSG_OTHERS_DEATH", "MSG_NPC_DEATH"}},
+	{title = _L["Death Log"], channels = {"MSG_SELF_DEATH", "MSG_SELF_KILL", "MSG_PARTY_DEATH", "MSG_PARTY_KILL"}},
 }
 local CHANNELS = {
 	[1] = "MSG_WHISPER",
