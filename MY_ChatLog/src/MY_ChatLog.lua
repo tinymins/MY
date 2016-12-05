@@ -597,7 +597,7 @@ function MY_ChatLog.ExportConfirm()
 	local btnSure
 	local tChannels = {}
 	local x, y = 10, 10
-	for nGroup, info in pairs(LOG_TYPE) do
+	for nGroup, info in ipairs(LOG_TYPE) do
 		ui:append("WndCheckBox", {
 			x = x, y = y, w = 100,
 			text = info.title,
@@ -608,8 +608,8 @@ function MY_ChatLog.ExportConfirm()
 					btnSure:enable(true)
 				else
 					btnSure:enable(false)
-					for nChannel, szChannel in pairs(CHANNELS) do
-						if tChannels[nChannel] then
+					for nGroup, info in ipairs(LOG_TYPE) do
+						if tChannels[nGroup] then
 							btnSure:enable(true)
 							break
 						end
@@ -627,15 +627,15 @@ function MY_ChatLog.ExportConfirm()
 		text = _L['export chatlog'],
 		onclick = function()
 			local aChannels = {}
-			for nGroup, info in pairs(LOG_TYPE) do
+			for nGroup, info in ipairs(LOG_TYPE) do
 				if tChannels[nGroup] then
 					for _, szChannel in ipairs(info.channels) do
-						table.insert(aChannels, CHANNELS_R[nChannel])
+						table.insert(aChannels, CHANNELS_R[szChannel])
 					end
 				end
 			end
 			MY_ChatLog.Export(
-				MY.GetLUADataPath("export/ChatLog/$name@$server@" .. MY.FormatTime("yyyyMMddhhmmss") .. ".html"),
+				MY.FormatPath("export/ChatLog/$name@$server@" .. MY.FormatTime("yyyyMMddhhmmss") .. ".html", false),
 				aChannels, 10,
 				function(title, progress)
 					OutputMessage("MSG_ANNOUNCE_YELLOW", _L("Exporting chatlog: %s, %.2f%%.", title, progress * 100))

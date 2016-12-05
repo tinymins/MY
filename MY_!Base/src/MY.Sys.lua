@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-09-01 15:45:20
+-- @Last modified time: 2016-12-05 11:16:40
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 local srep, tostring, string2byte = string.rep, tostring, string.byte
@@ -53,7 +53,16 @@ MY.Sys.bShieldedVersion = MY.GetLang() == 'zhcn'
 -- ##################################################################################################
 -- 格式化数据文件路径（替换$uid、$lang、$server以及补全相对路径）
 -- (string) MY.Sys.GetLUADataPath(szFileUri)
-function MY.FormatPath(szFileUri)
+function MY.FormatPath(szFileUri, bPublic)
+	-- if it's relative path then complete path with "/@DATA/"
+	if string.sub(szFileUri, 1, 2) ~= './' then
+		if bPublic == true then
+			szFileUri = "!all-users@$lang/" .. szFileUri
+		elseif bPublic == false then
+			szFileUri = "$uid@$lang/" .. szFileUri
+		end
+		szFileUri = MY.GetAddonInfo().szRoot .. "@DATA/" .. szFileUri
+	end
 	-- Unified the directory separator
 	szFileUri = string.gsub(szFileUri, '\\', '/')
 	-- if exist $uid then add user role identity
@@ -80,15 +89,11 @@ function MY.FormatPath(szFileUri)
 	if string.find(szFileUri, "%$relserver") then
 		szFileUri = szFileUri:gsub("%$relserver", ((MY.Game.GetRealServer()):gsub('[/\\|:%*%?"<>]', '')))
 	end
-	-- if it's relative path then complete path with "/@DATA/"
-	if string.sub(szFileUri, 1, 2) ~= './' then
-		szFileUri = MY.GetAddonInfo().szRoot .. "@DATA/" .. szFileUri
-	end
 	return szFileUri
 end
 
-function MY.Sys.GetLUADataPath(szFileUri)
-	szFileUri = MY.FormatPath(szFileUri)
+function MY.Sys.GetLUADataPath(szFileUri, bPublic)
+	szFileUri = MY.FormatPath(szFileUri, bPublic)
 	-- ensure has file name
 	if string.sub(szFileUri, -1) == '/' then
 		szFileUri = szFileUri .. "data"
