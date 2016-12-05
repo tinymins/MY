@@ -41,7 +41,28 @@ local PAGE_AMOUNT = 150
 local EXPORT_SLICE = 100
 local PAGE_DISPLAY = 17
 local SZ_INI = MY.GetAddonInfo().szRoot .. "MY_ChatLog/ui/MY_ChatLog.ini"
-local CHANNELS = {[1] = "MSG_WHISPER", [2] = "MSG_PARTY", [3] = "MSG_TEAM", [4] = "MSG_FRIEND", [5] = "MSG_GUILD", [6] = "MSG_GUILD_ALLIANCE"}
+local LOG_TYPE = {
+	{title = g_tStrings.tChannelName["MSG_WHISPER"       ], channels = {"MSG_WHISPER"       }},
+	{title = g_tStrings.tChannelName["MSG_PARTY"         ], channels = {"MSG_PARTY"         }},
+	{title = g_tStrings.tChannelName["MSG_TEAM"          ], channels = {"MSG_TEAM"          }},
+	{title = g_tStrings.tChannelName["MSG_FRIEND"        ], channels = {"MSG_FRIEND"        }},
+	{title = g_tStrings.tChannelName["MSG_GUILD"         ], channels = {"MSG_GUILD"         }},
+	{title = g_tStrings.tChannelName["MSG_GUILD_ALLIANCE"], channels = {"MSG_GUILD_ALLIANCE"}},
+	{title = _L["Death Log"], channels = {"MSG_SELF_DEATH", "MSG_PARTY_DEATH", "MSG_ENEMY_DEATH", "MSG_OTHERS_DEATH", "MSG_NPC_DEATH"}},
+}
+local CHANNELS = {
+	[1] = "MSG_WHISPER",
+	[2] = "MSG_PARTY",
+	[3] = "MSG_TEAM",
+	[4] = "MSG_FRIEND",
+	[5] = "MSG_GUILD",
+	[6] = "MSG_GUILD_ALLIANCE",
+	[7] = "MSG_SELF_DEATH",
+	[8] = "MSG_PARTY_DEATH",
+	[9] = "MSG_ENEMY_DEATH",
+	[10] = "MSG_OTHERS_DEATH",
+	[11] = "MSG_NPC_DEATH",
+}
 local CHANNELS_R = (function() local t = {} for k, v in pairs(CHANNELS) do t[v] = k end return t end)()
 local DB, DB_W, DB_D
 local function InitDB()
@@ -83,7 +104,7 @@ local function InitDB()
 		end
 		local hash, time, talker, text, msg
 		DB:Execute("BEGIN TRANSACTION")
-		for nChannel, szChannel in pairs(CHANNELS) do
+		for nChannel, szChannel in pairs({"MSG_WHISPER", "MSG_PARTY", "MSG_TEAM", "MSG_FRIEND", "MSG_GUILD", "MSG_GUILD_ALLIANCE"}) do
 			local SZ_CHANNEL_PATH = SZ_OLD_PATH .. szChannel .. "/"
 			if IsLocalFileExist(SZ_CHANNEL_PATH) then
 				for dwTime = dwStartTime, dwEndedTime, nDailySec do
@@ -147,7 +168,7 @@ local function InitDB()
 			msg    = AnsiToUTF8(szMsg)
 			text   = AnsiToUTF8(szText)
 			hash   = GetStringCRC(msg)
-			talker = AnsiToUTF8(szTalker)
+			talker = szTalker and AnsiToUTF8(szTalker) or ""
 			DB_W:ClearBindings()
 			DB_W:BindAll(hash, CHANNELS_R[szChannel], time, talker, text, msg)
 			DB_W:Execute()
@@ -179,12 +200,12 @@ end
 function MY_ChatLog.OnFrameCreate()
 	local container = this:Lookup("Window_Main/WndScroll_ChatChanel/WndContainer_ChatChanel")
 	container:Clear()
-	for nChannel, szChannel in pairs(CHANNELS) do
+	for _, info in pairs(LOG_TYPE) do
 		local wnd = container:AppendContentFromIni(SZ_INI, "Wnd_ChatChannel")
-		wnd.nChannel = nChannel
+		wnd.aChannels = info.channels
 		wnd:Lookup("CheckBox_ChatChannel"):Check(true, WNDEVENT_FIRETYPE.PREVENT)
-		wnd:Lookup("CheckBox_ChatChannel", "Text_ChatChannel"):SetText(g_tStrings.tChannelName[szChannel])
-		wnd:Lookup("CheckBox_ChatChannel", "Text_ChatChannel"):SetFontColor(GetMsgFontColor(szChannel))
+		wnd:Lookup("CheckBox_ChatChannel", "Text_ChatChannel"):SetText(info.title)
+		wnd:Lookup("CheckBox_ChatChannel", "Text_ChatChannel"):SetFontColor(GetMsgFontColor(info.channels[1]))
 	end
 	container:FormatAllContentPos()
 	
@@ -283,8 +304,10 @@ function MY_ChatLog.UpdatePage(frame)
 	for i = 0, container:GetAllContentCount() - 1 do
 		local wnd = container:LookupContent(i)
 		if wnd:Lookup("CheckBox_ChatChannel"):IsCheckBoxChecked() then
-			tinsert(wheres, "channel = ?")
-			tinsert(values, wnd.nChannel)
+			for _, szChannel in ipairs(wnd.aChannels) do
+				tinsert(wheres, "channel = ?")
+				tinsert(values, CHANNELS_R[szChannel])
+			end
 		end
 	end
 	local sql  = "SELECT * FROM ChatLog"
@@ -574,13 +597,13 @@ function MY_ChatLog.ExportConfirm()
 	local btnSure
 	local tChannels = {}
 	local x, y = 10, 10
-	for nChannel, szChannel in pairs(CHANNELS) do
+	for nGroup, info in pairs(LOG_TYPE) do
 		ui:append("WndCheckBox", {
 			x = x, y = y, w = 100,
-			text = g_tStrings.tChannelName[szChannel],
+			text = info.title,
 			checked = true,
 			oncheck = function(checked)
-				tChannels[nChannel] = checked
+				tChannels[nGroup] = checked
 				if checked then
 					btnSure:enable(true)
 				else
@@ -595,7 +618,7 @@ function MY_ChatLog.ExportConfirm()
 			end,
 		})
 		y = y + 30
-		tChannels[nChannel] = true
+		tChannels[nGroup] = true
 	end
 	y = y + 10
 	
@@ -604,9 +627,11 @@ function MY_ChatLog.ExportConfirm()
 		text = _L['export chatlog'],
 		onclick = function()
 			local aChannels = {}
-			for nChannel, szChannel in pairs(CHANNELS) do
-				if tChannels[nChannel] then
-					table.insert(aChannels, nChannel)
+			for nGroup, info in pairs(LOG_TYPE) do
+				if tChannels[nGroup] then
+					for _, szChannel in ipairs(info.channels) do
+						table.insert(aChannels, CHANNELS_R[nChannel])
+					end
 				end
 			end
 			MY_ChatLog.Export(
