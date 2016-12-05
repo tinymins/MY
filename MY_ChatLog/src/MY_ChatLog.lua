@@ -58,10 +58,9 @@ local CHANNELS = {
 	[5] = "MSG_GUILD",
 	[6] = "MSG_GUILD_ALLIANCE",
 	[7] = "MSG_SELF_DEATH",
-	[8] = "MSG_PARTY_DEATH",
-	[9] = "MSG_ENEMY_DEATH",
-	[10] = "MSG_OTHERS_DEATH",
-	[11] = "MSG_NPC_DEATH",
+	[8] = "MSG_SELF_KILL",
+	[9] = "MSG_PARTY_DEATH",
+	[10] = "MSG_PARTY_KILL",
 }
 local CHANNELS_R = (function() local t = {} for k, v in pairs(CHANNELS) do t[v] = k end return t end)()
 local DB, DB_W, DB_D
