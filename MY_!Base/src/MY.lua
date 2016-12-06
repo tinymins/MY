@@ -904,9 +904,8 @@ function MY.SwitchTab(szID)
 						local res, err = pcall(tab.fn.OnPanelActive, wndMainPanel)
 						if not res then
 							MY.Debug({err}, 'MY#OnPanelActive', MY_DEBUG.ERROR)
-						elseif MY.GetLang() ~= 'vivn' then
-							wndMainPanel:FormatAllContentPos()
 						end
+						wndMainPanel:FormatAllContentPos()
 					end
 					wndMainPanel.OnPanelResize   = tab.fn.OnPanelResize
 					wndMainPanel.OnPanelActive   = tab.fn.OnPanelActive
@@ -1080,9 +1079,8 @@ function _MY.OnSizeChanged()
 		local res, err = pcall(hWndMainPanel.OnPanelResize, hWndMainPanel)
 		if not res then
 			MY.Debug({err}, 'MY#OnPanelResize', MY_DEBUG.ERROR)
-		elseif MY.GetLang() ~= 'vivn' then
-			hWndMainPanel:FormatAllContentPos()
 		end
+		hWndMainPanel:FormatAllContentPos()
 	elseif hWndMainPanel.OnPanelActive then
 		if hWndMainPanel.OnPanelDeactive then
 			local res, err = pcall(hWndMainPanel.OnPanelDeactive, hWndMainPanel)
@@ -1095,9 +1093,8 @@ function _MY.OnSizeChanged()
 		local res, err = pcall(hWndMainPanel.OnPanelActive, hWndMainPanel)
 		if not res then
 			MY.Debug({err}, 'MY#OnPanelResize->OnPanelActive', MY_DEBUG.ERROR)
-		elseif MY.GetLang() ~= 'vivn' then
-			hWndMainPanel:FormatAllContentPos()
 		end
+		hWndMainPanel:FormatAllContentPos()
 	end
 	hWndMainPanel:FormatAllContentPos()
 	hWndMainPanel:Lookup('', ''):FormatAllItemPos()

@@ -1197,9 +1197,6 @@ MY_Recount.GetHistoryMenu = function()
 					Wnd.CloseWindow('PopupMenuPanel')
 				end,
 			}
-			if MY.GetLang() == 'vivn' then
-				t1.szLayer = "ICON_RIGHT"
-			end
 			table.insert(t, t1)
 		end
 	end

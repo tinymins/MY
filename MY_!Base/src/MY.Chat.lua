@@ -593,11 +593,7 @@ function MY.Chat.ParseFaceIcon(t)
 							table.insert(t2, { type = "text", text = szLeft })
 							szLeft = ''
 						end
-						if MY.GetLang() ~= 'vivn' then
-							table.insert(t2, { type = "emotion", text = szFace, id = dwFaceID })
-						else
-							table.insert(t2, { type = "text", text = szFace })
-						end
+						table.insert(t2, { type = "emotion", text = szFace, id = dwFaceID })
 					elseif nPos then -- find '#' but not match emotion
 						szLeft = szLeft .. szText:sub(1, 1)
 						szText = szText:sub(2)
