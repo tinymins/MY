@@ -51,7 +51,12 @@ _C.bInited = false
 _C.ui = nil
 _C.uiBoard = nil
 _C.uiTipBoard = nil
-_C.szLuaData = 'config/MY_CHATMONITOR/cfg_$lang.jx3dat'
+_C.szLuaData = 'config/my_chatmonitor.jx3dat'
+do local SZ_OLD_PATH = MY.FormatPath('config/MY_CHATMONITOR/cfg_$lang.jx3dat')
+    if IsLocalFileExist(SZ_OLD_PATH) then
+        CPath.Move(SZ_OLD_PATH, MY.FormatPath(_C.szLuaData, MY_DATA_PATH.GLOBAL))
+    end
+end
 _C.tChannelGroups = {
     {
         szCaption = g_tStrings.CHANNEL_CHANNEL,
@@ -246,7 +251,7 @@ _C.OnPanelActive = function(wnd)
       :change(function(raw, szText) MY_ChatMonitor.szKeyWords = szText end)
       :focus(function(self)
         local source = {}
-        for _, szOpt in ipairs(MY.LoadLUAData(_C.szLuaData) or {}) do
+        for _, szOpt in ipairs(MY.LoadLUAData(_C.szLuaData, MY_DATA_PATH.GLOBAL) or {}) do
             if type(szOpt) == "string" then
                 table.insert(source, szOpt)
             end
@@ -270,24 +275,24 @@ _C.OnPanelActive = function(wnd)
             GetUserInput("", function(szVal)
                 szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
                 if szVal~="" then
-                    local t = MY.LoadLUAData(_C.szLuaData) or {}
+                    local t = MY.LoadLUAData(_C.szLuaData, MY_DATA_PATH.GLOBAL) or {}
                     for i = #t, 1, -1 do
                         if t[i] == szVal then return end
                     end
                     table.insert(t, szVal)
-                    MY.SaveLUAData(_C.szLuaData, t)
+                    MY.SaveLUAData(_C.szLuaData, t, MY_DATA_PATH.GLOBAL)
                 end
             end, function() end, function() end, nil, edit:text() )
         end })
       end)
       :autocomplete('option', 'beforeDelete', function(szOption, fnDoDelete, option)
-        local t = MY.LoadLUAData(_C.szLuaData) or {}
+        local t = MY.LoadLUAData(_C.szLuaData, MY_DATA_PATH.GLOBAL) or {}
         for i = #t, 1, -1 do
             if t[i] == szOption then
                 table.remove(t, i)
             end
         end
-        MY.SaveLUAData(_C.szLuaData, t)
+        MY.SaveLUAData(_C.szLuaData, t, MY_DATA_PATH.GLOBAL)
       end)
 
     ui:append("Image", "Image_Help"):find('#Image_Help')
