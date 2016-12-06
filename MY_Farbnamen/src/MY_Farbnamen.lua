@@ -362,11 +362,11 @@ function _MY_Farbnamen.SaveCustomData()
 			t.tForceColor[dwForceID] = tCol
 		end
 	end
-	MY.Sys.SaveLUAData(SZ_CONFIG_PATH, t)
+	MY.SaveLUAData(SZ_CONFIG_PATH, t)
 end
 -- º”‘ÿ”√ªß≈‰÷√
 function _MY_Farbnamen.LoadCustomData()
-	local t = MY.Sys.LoadLUAData(SZ_CONFIG_PATH) or {}
+	local t = MY.LoadLUAData(SZ_CONFIG_PATH) or {}
 	if t.tForceColor then
 		for k, v in pairs(t.tForceColor) do
 			Config.tForceColor[k] = v

@@ -99,18 +99,18 @@ end
 
 _C.LoadConfig = function()
     if XLifeBar.bUseGlobalConfig then
-        Config = MY.Sys.LoadLUAData(_C.szConfig)
+        Config = MY.LoadLUAData(_C.szConfig)
     else
-        Config = MY.Sys.LoadLUAData(_C.szUserConfig)
+        Config = MY.LoadLUAData(_C.szUserConfig)
     end
     Config = FormatDataStructure(Config, Config_Default)
 end
 
 _C.SaveConfig = function()
     if XLifeBar.bUseGlobalConfig then
-        MY.Sys.SaveLUAData(_C.szConfig, Config)
+        MY.SaveLUAData(_C.szConfig, Config)
     else
-        MY.Sys.SaveLUAData(_C.szUserConfig, Config)
+        MY.SaveLUAData(_C.szUserConfig, Config)
     end
 end
 MY.RegisterExit(_C.SaveConfig)
