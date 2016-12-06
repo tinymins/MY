@@ -115,9 +115,9 @@ MY_InfoTip.Cache = {
 }
 local _SZ_CONFIG_FILE_ = 'config/MY_INFO_TIP/$uid.$lang.jx3dat'
 local _Cache = {}
-local SaveConfig = function() MY.Sys.SaveLUAData(_SZ_CONFIG_FILE_, MY_InfoTip.Config) end
+local SaveConfig = function() MY.SaveLUAData(_SZ_CONFIG_FILE_, MY_InfoTip.Config) end
 local LoadConfig = function()
-    local config = MY.Sys.LoadLUAData(_SZ_CONFIG_FILE_)
+    local config = MY.LoadLUAData(_SZ_CONFIG_FILE_)
     if config then
         if not MY_InfoTip.Config then
             MY_InfoTip.Config = {}

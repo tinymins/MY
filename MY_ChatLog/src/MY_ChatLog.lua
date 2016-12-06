@@ -107,7 +107,7 @@ local function InitDB()
 			local SZ_CHANNEL_PATH = SZ_OLD_PATH .. szChannel .. "/"
 			if IsLocalFileExist(SZ_CHANNEL_PATH) then
 				for dwTime = dwStartTime, dwEndedTime, nDailySec do
-					local szDate = MY.Sys.FormatTime("yyyyMMdd", dwTime)
+					local szDate = MY.FormatTime("yyyyMMdd", dwTime)
 					local data = MY.LoadLUAData(SZ_CHANNEL_PATH .. szDate .. '.$lang.jx3dat')
 					if data then
 						for _, szMsg in ipairs(data) do

@@ -904,7 +904,7 @@ function MY.SwitchTab(szID)
 						local res, err = pcall(tab.fn.OnPanelActive, wndMainPanel)
 						if not res then
 							MY.Debug({err}, 'MY#OnPanelActive', MY_DEBUG.ERROR)
-						elseif MY.Sys.GetLang() ~= 'vivn' then
+						elseif MY.GetLang() ~= 'vivn' then
 							wndMainPanel:FormatAllContentPos()
 						end
 					end
@@ -1080,7 +1080,7 @@ function _MY.OnSizeChanged()
 		local res, err = pcall(hWndMainPanel.OnPanelResize, hWndMainPanel)
 		if not res then
 			MY.Debug({err}, 'MY#OnPanelResize', MY_DEBUG.ERROR)
-		elseif MY.Sys.GetLang() ~= 'vivn' then
+		elseif MY.GetLang() ~= 'vivn' then
 			hWndMainPanel:FormatAllContentPos()
 		end
 	elseif hWndMainPanel.OnPanelActive then
@@ -1095,7 +1095,7 @@ function _MY.OnSizeChanged()
 		local res, err = pcall(hWndMainPanel.OnPanelActive, hWndMainPanel)
 		if not res then
 			MY.Debug({err}, 'MY#OnPanelResize->OnPanelActive', MY_DEBUG.ERROR)
-		elseif MY.Sys.GetLang() ~= 'vivn' then
+		elseif MY.GetLang() ~= 'vivn' then
 			hWndMainPanel:FormatAllContentPos()
 		end
 	end

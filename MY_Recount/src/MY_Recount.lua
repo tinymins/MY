@@ -287,7 +287,7 @@ MY_Recount.UpdateUI = function(data)
 	
 	-- 计算战斗时间
 	local nTimeCount = MY_Recount.Data.GeneFightTime(data, nil, MY_Recount.bSysTimeMode and SZ_CHANNEL_KEY[MY_Recount.nChannel])
-	local szTimeCount = MY.Sys.FormatTimeCount('M:ss', nTimeCount)
+	local szTimeCount = MY.FormatTimeCount('M:ss', nTimeCount)
 	if MY.IsInArena() then
 		szTimeCount = MY.GetFightTime("M:ss")
 	end
@@ -1181,7 +1181,7 @@ MY_Recount.GetHistoryMenu = function()
 	for _, data in ipairs(MY_Recount.Data.Get()) do
 		if data.UUID and data.nTimeDuring then
 			local t1 = {
-				szOption = (data.szBossName or '') .. ' (' .. MY.Sys.FormatTimeCount('M:ss', data.nTimeDuring) .. ')',
+				szOption = (data.szBossName or '') .. ' (' .. MY.FormatTimeCount('M:ss', data.nTimeDuring) .. ')',
 				rgb = (data == DataDisplay and {255, 255, 0}) or nil,
 				fnAction = function()
 					MY_Recount.DisplayData(data)
@@ -1197,7 +1197,7 @@ MY_Recount.GetHistoryMenu = function()
 					Wnd.CloseWindow('PopupMenuPanel')
 				end,
 			}
-			if MY.Sys.GetLang() == 'vivn' then
+			if MY.GetLang() == 'vivn' then
 				t1.szLayer = "ICON_RIGHT"
 			end
 			table.insert(t, t1)

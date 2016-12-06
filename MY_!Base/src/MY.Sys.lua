@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-12-06 10:40:16
+-- @Last modified time: 2016-12-06 14:56:29
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 local srep, tostring, string2byte = string.rep, tostring, string.byte
@@ -16,14 +16,13 @@ MY.Sys.bShieldedVersion = false -- 屏蔽被河蟹的功能（国服启用）
 local _L, _C = MY.LoadLangPack(), {}
 
 -- 获取游戏语言
-function MY.Sys.GetLang()
+function MY.GetLang()
 	local _, _, lang = GetVersion()
 	return lang
 end
-MY.GetLang = MY.Sys.GetLang
 
 -- 获取功能屏蔽状态
-function MY.Sys.IsShieldedVersion(bShieldedVersion)
+function MY.IsShieldedVersion(bShieldedVersion)
 	if bShieldedVersion == nil then
 		return MY.Sys.bShieldedVersion
 	else
@@ -33,7 +32,6 @@ function MY.Sys.IsShieldedVersion(bShieldedVersion)
 		end
 	end
 end
-MY.IsShieldedVersion = MY.Sys.IsShieldedVersion
 MY.Sys.bShieldedVersion = MY.GetLang() == 'zhcn'
 
 -- Save & Load Lua Data
@@ -56,7 +54,7 @@ MY_DATA_PATH = SetmetaReadonly({
 	GLOBAL = 2,
 })
 -- 格式化数据文件路径（替换$uid、$lang、$server以及补全相对路径）
--- (string) MY.Sys.GetLUADataPath(szFileUri)
+-- (string) MY.GetLUADataPath(szFileUri)
 function MY.FormatPath(szFileUri, ePathType)
 	-- if it's relative path then complete path with "/@DATA/"
 	if string.sub(szFileUri, 1, 2) ~= './' then
@@ -79,7 +77,7 @@ function MY.FormatPath(szFileUri, ePathType)
 	end
 	-- if exist $lang then add language identity
 	if string.find(szFileUri, "%$lang") then
-		szFileUri = szFileUri:gsub("%$lang", string.lower(MY.Sys.GetLang()))
+		szFileUri = szFileUri:gsub("%$lang", string.lower(MY.GetLang()))
 	end
 	-- if exist $date then add date identity
 	if string.find(szFileUri, "%$date") then
@@ -96,7 +94,7 @@ function MY.FormatPath(szFileUri, ePathType)
 	return szFileUri
 end
 
-function MY.Sys.GetLUADataPath(szFileUri, ePathType)
+function MY.GetLUADataPath(szFileUri, ePathType)
 	szFileUri = MY.FormatPath(szFileUri, ePathType)
 	-- ensure has file name
 	if string.sub(szFileUri, -1) == '/' then
@@ -104,10 +102,9 @@ function MY.Sys.GetLUADataPath(szFileUri, ePathType)
 	end
 	return szFileUri
 end
-MY.GetLUADataPath = MY.Sys.GetLUADataPath
 
 -- 保存数据文件
--- MY.SaveLUAData( szFileUri, tData, indent, crc)
+-- MY.SaveLUAData(szFileUri, tData, ePathType, indent, crc)
 -- szFileUri           数据文件路径(1)
 -- tData               要保存的数据
 -- indent              数据文件缩进
@@ -115,7 +112,7 @@ MY.GetLUADataPath = MY.Sys.GetLUADataPath
 -- nohashlevels        纯LIST表所在层（优化大表读写效率）
 -- (1)： 当路径为绝对路径时(以斜杠开头)不作处理
 --       当路径为相对路径时 相对于插件下@DATA目录
-function MY.Sys.SaveLUAData(szFileUri, tData, ePathType, indent, crc, nohashlevels)
+function MY.SaveLUAData(szFileUri, tData, ePathType, indent, crc, nohashlevels)
 	local nStartTick = GetTickCount()
 	-- format uri
 	szFileUri = MY.GetLUADataPath(szFileUri, ePathType)
@@ -125,14 +122,14 @@ function MY.Sys.SaveLUAData(szFileUri, tData, ePathType, indent, crc, nohashleve
 	MY.Debug({_L('%s saved during %dms.', szFileUri, GetTickCount() - nStartTick)}, 'PMTool', MY_DEBUG.PMLOG)
 	return data
 end
-MY.SaveLUAData = MY.Sys.SaveLUAData
 
--- 加载数据文件：相对于data文件夹
+-- 加载数据文件：
 -- MY.LoadLUAData( szFileUri)
 -- szFileUri           数据文件路径(1)
--- (1)： 当路径为绝对路径时(以斜杠开头)不作处理
---       当路径为相对路径时 相对于插件下@DATA目录
-function MY.Sys.LoadLUAData(szFileUri, ePathType)
+-- ePathType           数据文件所属(相对于data文件夹)
+-- (1)： 当路径为./开头时不作处理
+--       当路径为其他时 相对于插件下@DATA目录
+function MY.LoadLUAData(szFileUri, ePathType)
 	local nStartTick = GetTickCount()
 	-- format uri
 	szFileUri = MY.GetLUADataPath(szFileUri, ePathType)
@@ -142,7 +139,6 @@ function MY.Sys.LoadLUAData(szFileUri, ePathType)
 	MY.Debug({_L('%s loaded during %dms.', szFileUri, GetTickCount() - nStartTick)}, 'PMTool', MY_DEBUG.PMLOG)
 	return data
 end
-MY.LoadLUAData = MY.Sys.LoadLUAData
 
 function MY.RegisterCustomData(szName, ...)
 	RegisterCustomData(szName, ...)
@@ -153,7 +149,7 @@ function MY.RegisterUserData(szName, szFileName, onLoad)
 	
 end
 
-function MY.Sys.SetGlobalValue(szVarPath, Val)
+function MY.SetGlobalValue(szVarPath, Val)
 	local t = MY.String.Split(szVarPath, ".")
 	local tab = _G
 	for k, v in ipairs(t) do
@@ -166,9 +162,8 @@ function MY.Sys.SetGlobalValue(szVarPath, Val)
 		tab = tab[v]
 	end
 end
-MY.SetGlobalValue = MY.Sys.SetGlobalValue
 
-function MY.Sys.GetGlobalValue(szVarPath)
+function MY.GetGlobalValue(szVarPath)
 	local tVariable = _G
 	for szIndex in string.gmatch(szVarPath, "[^%.]+") do
 		if tVariable and type(tVariable) == "table" then
@@ -180,14 +175,13 @@ function MY.Sys.GetGlobalValue(szVarPath)
 	end
 	return tVariable
 end
-MY.GetGlobalValue = MY.Sys.GetGlobalValue
 
 -- 播放声音
--- MY.Sys.PlaySound(szFilePath[, szCustomPath])
+-- MY.PlaySound(szFilePath[, szCustomPath])
 -- szFilePath   音频文件地址
 -- szCustomPath 个性化音频文件地址
 -- 注：优先播放szCustomPath, szCustomPath不存在才会播放szFilePath
-function MY.Sys.PlaySound(szFilePath, szCustomPath)
+function MY.PlaySound(szFilePath, szCustomPath)
 	szCustomPath = szCustomPath or szFilePath
 	-- 统一化目录分隔符
 	szCustomPath = string.gsub(szCustomPath, '\\', '/')
@@ -439,7 +433,7 @@ MY.RegisterExit("MYLIB#STORAGE_DATA", function()
 	MY.SaveLUAData('config/STORAGE_VERSION/$uid.$lang.jx3dat', m_nStorageVer)
 end)
 -- 保存个人数据 方便网吧党和公司家里多电脑切换
-function MY.Sys.StorageData(szKey, oData)
+function MY.StorageData(szKey, oData)
 	MY.DelayCall("STORAGE_" .. szKey, 120000, function()
 		local me = GetClientPlayer()
 		if not me then
@@ -461,7 +455,6 @@ function MY.Sys.StorageData(szKey, oData)
 	end)
 	m_nStorageVer[szKey] = GetCurrentTime()
 end
-MY.StorageData = MY.Sys.StorageData
 end
 
 -- ##################################################################################################
@@ -722,9 +715,9 @@ function MY.StartDebugMode()
 end
 
 -- 格式化计时时间
--- (string) MY.Sys.FormatTimeCount(szFormat, nTime)
+-- (string) MY.FormatTimeCount(szFormat, nTime)
 -- szFormat  格式化字符串 可选项H,M,S,hh,mm,ss,h,m,s
-function MY.Sys.FormatTimeCount(szFormat, nTime)
+function MY.FormatTimeCount(szFormat, nTime)
 	local nSeconds = math.floor(nTime)
 	local nMinutes = math.floor(nSeconds / 60)
 	local nHours   = math.floor(nMinutes / 60)
@@ -741,13 +734,12 @@ function MY.Sys.FormatTimeCount(szFormat, nTime)
 	szFormat = szFormat:gsub('s', nSecond)
 	return szFormat
 end
-MY.FormatTimeCount = MY.Sys.FormatTimeCount
 
 -- 格式化时间
--- (string) MY.Sys.FormatTimeCount(szFormat[, nTimestamp])
+-- (string) MY.FormatTimeCount(szFormat[, nTimestamp])
 -- szFormat   格式化字符串 可选项yyyy,yy,MM,dd,y,m,d,hh,mm,ss,h,m,s
 -- nTimestamp UNIX时间戳
-function MY.Sys.FormatTime(szFormat, nTimestamp)
+function MY.FormatTime(szFormat, nTimestamp)
 	local t = TimeToDate(nTimestamp or GetCurrentTime())
 	szFormat = szFormat:gsub('yyyy', string.format('%04d', t.year  ))
 	szFormat = szFormat:gsub('yy'  , string.format('%02d', t.year % 100))
@@ -764,16 +756,15 @@ function MY.Sys.FormatTime(szFormat, nTimestamp)
 	szFormat = szFormat:gsub('s', t.second)
 	return szFormat
 end
-MY.FormatTime = MY.Sys.FormatTime
 
 -- register global esc key down action
--- (void) MY.Sys.RegisterEsc(szID, fnCondition, fnAction, bTopmost) -- register global esc event handle
--- (void) MY.Sys.RegisterEsc(szID, nil, nil, bTopmost)              -- unregister global esc event handle
+-- (void) MY.RegisterEsc(szID, fnCondition, fnAction, bTopmost) -- register global esc event handle
+-- (void) MY.RegisterEsc(szID, nil, nil, bTopmost)              -- unregister global esc event handle
 -- (string)szID        -- an UUID (if this UUID has been register before, the old will be recovered)
 -- (function)fnCondition -- a function returns if fnAction will be execute
 -- (function)fnAction    -- inf fnCondition() is true then fnAction will be called
 -- (boolean)bTopmost    -- this param equals true will be called in high priority
-function MY.Sys.RegisterEsc(szID, fnCondition, fnAction, bTopmost)
+function MY.RegisterEsc(szID, fnCondition, fnAction, bTopmost)
 	if fnCondition and fnAction then
 		if RegisterGlobalEsc then
 			RegisterGlobalEsc(szID, fnCondition, fnAction, bTopmost)
@@ -784,7 +775,6 @@ function MY.Sys.RegisterEsc(szID, fnCondition, fnAction, bTopmost)
 		end
 	end
 end
-MY.RegisterEsc = MY.Sys.RegisterEsc
 
 -- 测试用
 if loadstring then
@@ -805,7 +795,7 @@ RegisterEvent("ON_ENTER_CUSTOM_UI_MODE", function() bCustomMode = true  end)
 RegisterEvent("ON_LEAVE_CUSTOM_UI_MODE", function() bCustomMode = false end)
 end
 
-function MY.Sys.DoMessageBox(szName, i)
+function MY.DoMessageBox(szName, i)
 	local frame = Station.Lookup("Topmost2/MB_" .. szName) or Station.Lookup("Topmost/MB_" .. szName)
 	if frame then
 		i = i or 1
@@ -829,9 +819,8 @@ function MY.Sys.DoMessageBox(szName, i)
 		end
 	end
 end
-MY.DoMessageBox = MY.Sys.DoMessageBox
 
-function MY.Sys.OutputBuffTip(dwID, nLevel, Rect, nTime)
+function MY.OutputBuffTip(dwID, nLevel, Rect, nTime)
 	local t = {}
 
 	tinsert(t, GetFormatText(Table_GetBuffName(dwID, nLevel) .. "\t", 65))
@@ -883,10 +872,9 @@ function MY.Sys.OutputBuffTip(dwID, nLevel, Rect, nTime)
 	end
 	OutputTip(tconcat(t), 300, Rect)
 end
-MY.OutputBuffTip = MY.Sys.OutputBuffTip
 
 
-function MY.Sys.Alert(szMsg, fnAction, szSure)
+function MY.Alert(szMsg, fnAction, szSure)
 	local nW, nH = Station.GetClientSize()
 	local tMsg = {
 		x = nW / 2, y = nH / 3, szMessage = szMsg, szName = "MY_Alert", szAlignment = "CENTER",
@@ -897,9 +885,8 @@ function MY.Sys.Alert(szMsg, fnAction, szSure)
 	}
 	MessageBox(tMsg)
 end
-MY.Alert = MY.Sys.Alert
 
-function MY.Sys.Confirm(szMsg, fnAction, fnCancel, szSure, szCancel)
+function MY.Confirm(szMsg, fnAction, fnCancel, szSure, szCancel)
 	local nW, nH = Station.GetClientSize()
 	local tMsg = {
 		x = nW / 2, y = nH / 3, szMessage = szMsg, szName = "MY_Confirm", szAlignment = "CENTER",
@@ -913,4 +900,3 @@ function MY.Sys.Confirm(szMsg, fnAction, fnCancel, szSure, szCancel)
 	}
 	MessageBox(tMsg)
 end
-MY.Confirm = MY.Sys.Confirm

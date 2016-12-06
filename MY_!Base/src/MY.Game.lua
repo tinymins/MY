@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-12-01 11:18:44
+-- @Last modified time: 2016-12-06 14:49:07
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -----------------------------------------------
@@ -476,8 +476,8 @@ local function GeneDungeonBoss()
 		return
 	end
 	local VERSION = select(2, GetVersion())
-	local CACHE_PATH = '!all-users@$lang/cache/bosslist/' .. VERSION .. '.jx3dat'
-	l_tBossList = MY.LoadLUAData(CACHE_PATH)
+	local CACHE_PATH = 'cache/bosslist/' .. VERSION .. '.jx3dat'
+	l_tBossList = MY.LoadLUAData(CACHE_PATH, MY_DATA_PATH.GLOBAL)
 	if l_tBossList then
 		return
 	end
@@ -514,7 +514,7 @@ local function GeneDungeonBoss()
 			end
 		end
 	end
-	MY.SaveLUAData(CACHE_PATH, l_tBossList)
+	MY.SaveLUAData(CACHE_PATH, l_tBossList, MY_DATA_PATH.GLOBAL)
 	MY.Sysmsg({_L('Important Npc list updated to v%s.', VERSION)})
 end
 

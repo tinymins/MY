@@ -122,7 +122,7 @@ function MY.Chat.GetTimeLinkText(rgbfs, dwTime)
 	end
 	rgbfs = rgbfs or { f = 10 }
 	return GetFormatText(
-		MY.Sys.FormatTime(rgbfs.s or '[hh:mm.ss]', dwTime),
+		MY.FormatTime(rgbfs.s or '[hh:mm.ss]', dwTime),
 		rgbfs.f, rgbfs.r, rgbfs.g, rgbfs.b, 82691,
 		"this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.Chat.LinkEventHandler.OnCopyLClick\nthis.OnItemMButtonDown=MY.Chat.LinkEventHandler.OnCopyMClick\nthis.OnItemRButtonDown=MY.Chat.LinkEventHandler.OnCopyRClick\nthis.OnItemMouseEnter=MY.Chat.LinkEventHandler.OnCopyMouseEnter\nthis.OnItemMouseLeave=MY.Chat.LinkEventHandler.OnCopyMouseLeave",
 		"timelink"
@@ -593,7 +593,7 @@ function MY.Chat.ParseFaceIcon(t)
 							table.insert(t2, { type = "text", text = szLeft })
 							szLeft = ''
 						end
-						if MY.Sys.GetLang() ~= 'vivn' then
+						if MY.GetLang() ~= 'vivn' then
 							table.insert(t2, { type = "emotion", text = szFace, id = dwFaceID })
 						else
 							table.insert(t2, { type = "text", text = szFace })
