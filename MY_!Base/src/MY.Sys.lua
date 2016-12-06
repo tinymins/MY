@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-12-05 11:16:40
+-- @Last modified time: 2016-12-06 10:40:16
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 local srep, tostring, string2byte = string.rep, tostring, string.byte
@@ -51,14 +51,18 @@ MY.Sys.bShieldedVersion = MY.GetLang() == 'zhcn'
 --       # #       #   #         #   #   # # # # #       #         #                 #     #   #
 --   # #     #   #       #     # # #     #       #       #       # #                 #   #       #
 -- ##################################################################################################
+MY_DATA_PATH = SetmetaReadonly({
+	ROLE = 1,
+	GLOBAL = 2,
+})
 -- 格式化数据文件路径（替换$uid、$lang、$server以及补全相对路径）
 -- (string) MY.Sys.GetLUADataPath(szFileUri)
-function MY.FormatPath(szFileUri, bPublic)
+function MY.FormatPath(szFileUri, ePathType)
 	-- if it's relative path then complete path with "/@DATA/"
 	if string.sub(szFileUri, 1, 2) ~= './' then
-		if bPublic == true then
+		if ePathType == MY_DATA_PATH.GLOBAL then
 			szFileUri = "!all-users@$lang/" .. szFileUri
-		elseif bPublic == false then
+		elseif ePathType == MY_DATA_PATH.ROLE then
 			szFileUri = "$uid@$lang/" .. szFileUri
 		end
 		szFileUri = MY.GetAddonInfo().szRoot .. "@DATA/" .. szFileUri
@@ -92,8 +96,8 @@ function MY.FormatPath(szFileUri, bPublic)
 	return szFileUri
 end
 
-function MY.Sys.GetLUADataPath(szFileUri, bPublic)
-	szFileUri = MY.FormatPath(szFileUri, bPublic)
+function MY.Sys.GetLUADataPath(szFileUri, ePathType)
+	szFileUri = MY.FormatPath(szFileUri, ePathType)
 	-- ensure has file name
 	if string.sub(szFileUri, -1) == '/' then
 		szFileUri = szFileUri .. "data"
@@ -111,10 +115,10 @@ MY.GetLUADataPath = MY.Sys.GetLUADataPath
 -- nohashlevels        纯LIST表所在层（优化大表读写效率）
 -- (1)： 当路径为绝对路径时(以斜杠开头)不作处理
 --       当路径为相对路径时 相对于插件下@DATA目录
-function MY.Sys.SaveLUAData(szFileUri, tData, indent, crc, nohashlevels)
+function MY.Sys.SaveLUAData(szFileUri, tData, ePathType, indent, crc, nohashlevels)
 	local nStartTick = GetTickCount()
 	-- format uri
-	szFileUri = MY.GetLUADataPath(szFileUri)
+	szFileUri = MY.GetLUADataPath(szFileUri, ePathType)
 	-- save data
 	local data = SaveLUAData(szFileUri, tData, indent, crc or false, nohashlevels)
 	-- performance monitor
@@ -128,10 +132,10 @@ MY.SaveLUAData = MY.Sys.SaveLUAData
 -- szFileUri           数据文件路径(1)
 -- (1)： 当路径为绝对路径时(以斜杠开头)不作处理
 --       当路径为相对路径时 相对于插件下@DATA目录
-function MY.Sys.LoadLUAData(szFileUri)
+function MY.Sys.LoadLUAData(szFileUri, ePathType)
 	local nStartTick = GetTickCount()
 	-- format uri
-	szFileUri = MY.GetLUADataPath(szFileUri)
+	szFileUri = MY.GetLUADataPath(szFileUri, ePathType)
 	-- load data
 	local data = LoadLUAData(szFileUri)
 	-- performance monitor
