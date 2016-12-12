@@ -472,7 +472,7 @@ local function OnReload()
 	end
 	RELOAD_FUNC_LIST = nil
 end
-RegisterEvent('RELOAD_UI_ADDON_END', OnReload)
+RegisterEvent('RELOAD_UI_ADDON_BEGIN', OnReload)
 
 -- ×¢²á²å¼þÖØÔØº¯Êý
 -- RegisterReload(string id, function fn) -- ×¢²á
