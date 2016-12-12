@@ -64,7 +64,7 @@ local function FilterBags(szTreePath, szFilter, bTimeLtd)
 					if bTimeLtd and item.GetLeftExistTime() == 0 then
 						bMatch = false
 					end
-					if szFilter and not SimpleMatch(_C.GetItemText(item), szFilter) then
+					if szFilter and not SimpleMatch(GetItemText(item), szFilter) then
 						bMatch = false
 					end
 				end
@@ -336,6 +336,7 @@ local function Apply(bEnable)
 	if bEnable == nil then
 		bEnable = MY_BagEx.bEnable
 	end
+	Output(bEnable, debug.traceback())
 	if bEnable then
 		Hook()
 		MY.RegisterEvent("ON_FRAME_CREATE.MY_BAGEX", Hook)
