@@ -4,238 +4,34 @@
 -- @Date  : 2014-11-25 10:40:14
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-11-11 10:09:22
+-- @Last modified time: 2016-12-12 21:12:29
 -----------------------------------------------
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Toolbox/lang/")
+
 MY_BagEx = {}
 MY_BagEx.bEnable = true
 RegisterCustomData("MY_BagEx.bEnable")
-local _C = { tItemText = {} }
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
 
-MY_BagEx.Enable = function(bEnable)
-	MY_BagEx.bEnable = bEnable
-	if bEnable then
-		_C.OnBreathe()
-	else
-		_C.ClearHook()
-	end
-end
+local l_tItemText = {}
 
-_C.OnFrameKeyDown = function()
-	local szKey = GetKeyName(Station.GetMessageKey())
-	if IsCtrlKeyDown() and szKey == "F" then
-		MY.UI(this):children("#WndEditBox_KeyWord"):focus()
-		if this.__MYBagEx_OnFrameKeyDown then
-			this.__MYBagEx_OnFrameKeyDown()
-		end
-		return 1
-	end
-	if this.__MYBagEx_OnFrameKeyDown then
-		return this.__MYBagEx_OnFrameKeyDown()
-	end
-	return 0
-end
+local l_szBagFilter = ""
 
-_C.ClearHook = function()
-	MY.RegisterEvent("EXECUTE_BINDING.MY_BAGEX")
+local l_szBankFilter = ""
+local l_bCompareBank = false
+local l_bBankTimeLtd = false
 
-	MY.UI("Normal/BigBagPanel/CheckBox_Totle")
-	:add("Normal/BigBagPanel/CheckBox_Task")
-	:add("Normal/BigBagPanel/CheckBox_Equipment")
-	:add("Normal/BigBagPanel/CheckBox_Drug")
-	:add("Normal/BigBagPanel/CheckBox_Material")
-	:add("Normal/BigBagPanel/CheckBox_Book")
-	:add("Normal/BigBagPanel/CheckBox_Grey")
-	:onuievent('OnLButtonUp')
-	
-	MY.UI("Normal/GuildBankPanel"):children('#^CheckBox_%d$')
-	:onuievent('OnLButtonUp')
-	
-	MY.UI("Normal/BigBagPanel/CheckBox_TimeLtd")
-	:add("Normal/BigBagPanel/WndEditBox_KeyWord")
-	:add("Normal/BigBankPanel/CheckBox_TimeLtd")
-	:add("Normal/BigBankPanel/WndEditBox_KeyWord")
-	:add("Normal/BigBankPanel/WndCheckBox_Compare")
-	:add("Normal/GuildBankPanel/WndEditBox_KeyWord")
-	:add("Normal/GuildBankPanel/WndCheckBox_Compare")
-	:remove()
-	
-	MY.UI("Normal/BigBagPanel")
-	:add("Normal/BigBankPanel")
-	:add("Normal/GuildBankPanel")
-	:each(function()
-		this.bMYBagExHook = nil
-		if this.OnFrameKeyDown == _C.OnFrameKeyDown then
-			this.OnFrameKeyDown = this.__MYBagEx_OnFrameKeyDown
-			this.__MYBagEx_OnFrameKeyDown = nil
-		end
-	end)
-end
+local l_szGuildBankFilter = ""
+local l_bCompareGuild = false
 
-_C.Hook = function()
-	MY.RegisterEvent("EXECUTE_BINDING.MY_BAGEX", function(e)
-		local szName, bDown = arg0, arg1
-		if Cursor.IsVisible()
-		and szName == "OPENORCLOSEALLBAGS" and not bDown then
-			local hFrame = Station.Lookup("Normal/BigBagPanel")
-			if hFrame and hFrame:IsVisible() then
-				Station.SetFocusWindow(hFrame)
-			end
-		end
-	end)
-	-- bag
-	local hFrame = Station.Lookup("Normal/BigBagPanel")
-	if hFrame and not hFrame.bMYBagExHook then
-		hFrame.bMYBagExHook = true
-		if hFrame and hFrame.OnFrameKeyDown ~= _C.OnFrameKeyDown then
-			hFrame.__MYBagEx_OnFrameKeyDown = hFrame.OnFrameKeyDown
-			hFrame.OnFrameKeyDown = _C.OnFrameKeyDown
-		end
-		local x, y = Station.Lookup("Normal/BigBagPanel/CheckBox_Grey"):GetRelPos()
-		local w, h = Station.Lookup("Normal/BigBagPanel/CheckBox_Grey"):Lookup('', ''):GetSize()
-		MY.UI("Normal/BigBagPanel")
-		  :append("WndRadioBox", "CheckBox_TimeLtd"):children("#CheckBox_TimeLtd")
-		  :text(_L['Time Limited']):size(w + 10, h):pos(x + w, y)
-		  :check(function(bChecked)
-		  	_C.bBagTimeLtd = bChecked
-		  	_C.DoFilterBag()
-		  end):item("#Text_Default"):left(20)
-		
-		MY.UI("Normal/BigBagPanel/CheckBox_Totle")
-		:add("Normal/BigBagPanel/CheckBox_Task")
-		:add("Normal/BigBagPanel/CheckBox_Equipment")
-		:add("Normal/BigBagPanel/CheckBox_Drug")
-		:add("Normal/BigBagPanel/CheckBox_Material")
-		:add("Normal/BigBagPanel/CheckBox_Book")
-		:add("Normal/BigBagPanel/CheckBox_Grey")
-		:onuievent('OnLButtonUp')
-		:onuievent('OnLButtonUp', function()
-			MY.UI("Normal/BigBagPanel/CheckBox_TimeLtd"):check(false)
-		end)
-		:add("Normal/BigBagPanel/CheckBox_TimeLtd")
-		:group("filter_check")
-		
-		MY.UI("Normal/BigBagPanel"):append("WndEditBox", "WndEditBox_KeyWord", {
-			w = 100, h = 21, x = 60, y = 30,
-			text = _C.szBagFilter,
-			placeholder = _L['Search'],
-			onchange = function(raw, txt)
-				local nLen = txt:len()
-				nLen = math.max(nLen, 10)
-				nLen = math.min(nLen, 20)
-				XGUI(raw):width(nLen * 10)
-				_C.szBagFilter = txt
-				if not _C.bBagTimeLtd then
-					MY.UI("Normal/BigBagPanel/CheckBox_Totle"):check(true)
-				end
-				_C.DoFilterBag()
-			end,
-		})
-	end
-
-	-- bank
-	local hFrame = Station.Lookup("Normal/BigBankPanel")
-	if hFrame and not hFrame.bMYBagExHook then
-		hFrame.bMYBagExHook = true
-		if hFrame and hFrame.OnFrameKeyDown ~= _C.OnFrameKeyDown then
-			hFrame.__MYBagEx_OnFrameKeyDown = hFrame.OnFrameKeyDown
-			hFrame.OnFrameKeyDown = _C.OnFrameKeyDown
-		end
-		MY.UI("Normal/BigBankPanel"):append("WndEditBox", "WndEditBox_KeyWord", {
-			w = 150, h = 21, x = 280, y = 80,
-			text = _C.szBankFilter,
-			placeholder = _L['Search'],
-			onchange = function(raw, txt)
-				local nLen = txt:len()
-				nLen = math.max(nLen, 15)
-				nLen = math.min(nLen, 25)
-				XGUI(raw):width(nLen * 10)
-				_C.szBankFilter = txt
-				_C.DoFilterBank(true)
-			end,
-		})
-		_C.DoFilterBank()
-		
-		MY.UI("Normal/BigBankPanel")
-		  :append("WndCheckBox", "WndCheckBox_Compare"):children("#WndCheckBox_Compare")
-		  :width(100):pos(340, 56)
-		  :text(_L['compare with bag'])
-		  :check(_C.bCompareBank or false)
-		  :check(function(bChecked)
-		  	if bChecked then
-		  		MY.UI("Normal/BigBankPanel/CheckBox_TimeLtd"):check(false)
-		  	end
-		  	_C.bCompareBank = bChecked
-		  	_C.DoCompareBank(true)
-		  end)
-		_C.DoCompareBank()
-		
-		MY.UI("Normal/BigBankPanel")
-		  :append("WndCheckBox", "CheckBox_TimeLtd"):children("#CheckBox_TimeLtd")
-		  :width(60):pos(277, 56):alpha(200)
-		  :text(_L['Time Limited'])
-		  :check(_C.bBankTimeLtd or false)
-		  :check(function(bChecked)
-		  	if bChecked then
-		  		MY.UI("Normal/BigBankPanel/WndCheckBox_Compare"):check(false)
-		  	end
-		  	_C.bBankTimeLtd = bChecked
-		  	_C.DoFilterBank(true)
-		  end)
-		_C.DoFilterBank()
-	end
-
-	-- guild bank
-	local hFrame = Station.Lookup("Normal/GuildBankPanel")
-	if hFrame and not hFrame.bMYBagExHook then
-		hFrame.bMYBagExHook = true
-		if hFrame and hFrame.OnFrameKeyDown ~= _C.OnFrameKeyDown then
-			hFrame.__MYBagEx_OnFrameKeyDown = hFrame.OnFrameKeyDown
-			hFrame.OnFrameKeyDown = _C.OnFrameKeyDown
-		end
-		MY.UI("Normal/GuildBankPanel"):append("WndEditBox", "WndEditBox_KeyWord", {
-			w = 100, h = 21, x = 60, y = 25,
-			text = _C.szGuildBankFilter,
-			placeholder = _L['Search'],
-			onchange = function(raw, txt)
-				local nLen = txt:len()
-				nLen = math.max(nLen, 10)
-				nLen = math.min(nLen, 25)
-				XGUI(raw):width(nLen * 10)
-				_C.szGuildBankFilter = txt
-				_C.DoFilterGuildBank(true)
-			end,
-		})
-		_C.DoFilterGuildBank()
-		
-		MY.UI("Normal/GuildBankPanel")
-		  :append("WndCheckBox", "WndCheckBox_Compare"):children("#WndCheckBox_Compare")
-		  :width(100):pos(20, 475)
-		  :text(_L['compare with bag'])
-		  :check(_C.bCompareGuild or false)
-		  :check(function(bChecked)
-		  	_C.bCompareGuild = bChecked
-		  	_C.DoCompareGuildBank(true)
-		  end)
-		_C.DoCompareGuildBank()
-	end
-end
-
-_C.OnBreathe = function()
-	if MY_BagEx.bEnable then
-		_C.Hook()
-	end
-end
-
-_C.GetItemText = function(item)
+local function GetItemText(item)
 	if item then
 		if GetItemTip then
 			local szKey = item.dwTabType .. ',' .. item.dwIndex
-			if not _C.tItemText[szKey] then
-				_C.tItemText[szKey] = ""
-				_C.tItemText[szKey] = MY.Xml.GetPureText(GetItemTip(item))
+			if not l_tItemText[szKey] then
+				l_tItemText[szKey] = ""
+				l_tItemText[szKey] = MY.Xml.GetPureText(GetItemTip(item))
 			end
-			return _C.tItemText[szKey]
+			return l_tItemText[szKey]
 		else
 			return item.szName
 		end
@@ -244,46 +40,8 @@ _C.GetItemText = function(item)
 	end
 end
 
--- 过滤背包
-_C.DoFilterBag = function(bForce)
-	if IsBagInSort and IsBagInSort() then
-		return
-	end
-	-- 优化性能 当过滤器为空时不遍历筛选
-	if bForce or _C.szBagFilter or _C.bBagTimeLtd then
-		_C.FilterBags("Normal/BigBagPanel", _C.szBagFilter, _C.bBagTimeLtd)
-		if _C.szBagFilter == "" then
-			_C.szBagFilter = nil
-		end
-	end
-end
--- 过滤仓库
-_C.DoFilterBank = function(bForce)
-	if IsBankInSort and IsBankInSort() then
-		return
-	end
-	-- 优化性能 当过滤器为空时不遍历筛选
-	if bForce or _C.szBankFilter or _C.bBankTimeLtd then
-		_C.FilterBags("Normal/BigBankPanel", _C.szBankFilter, _C.bBankTimeLtd)
-		if _C.szBankFilter == "" then
-			_C.szBankFilter = nil
-		end
-	end
-end
--- 过滤帮会仓库
-_C.DoFilterGuildBank = function(bForce)
-	-- 优化性能 当过滤器为空时不遍历筛选
-	if bForce or _C.szGuildBankFilter then
-		_C.FilterBags("Normal/GuildBankPanel", _C.szGuildBankFilter)
-		if _C.szGuildBankFilter == "" then
-			_C.szGuildBankFilter = nil
-		end
-	end
-end
-
 local SimpleMatch = MY.String.SimpleMatch
--- 过滤仓库原始函数
-_C.FilterBags = function(szTreePath, szFilter, bTimeLtd)
+local function FilterBags(szTreePath, szFilter, bTimeLtd)
 	if szFilter then
 		szFilter = szFilter:gsub('[%[%]]', '')
 		if szFilter == "" then
@@ -320,38 +78,43 @@ _C.FilterBags = function(szTreePath, szFilter, bTimeLtd)
 	end
 end
 
-_C.DoCompareBank = function(bForce)
-	if _C.bCompareBank then
-		local frmBag = Station.Lookup("Normal/BigBagPanel")
-		local frmBank = Station.Lookup("Normal/BigBankPanel")
-		
-		if frmBag and frmBank and frmBank:IsVisible() then
-			MY.UI("Normal/BigBagPanel/CheckBox_Totle"):check(true):check(false)
-			_C.DoCompare(MY.UI(frmBag), MY.UI(frmBank))
+local function DoFilterBag(bForce)
+	if IsBagInSort and IsBagInSort() then
+		return
+	end
+	-- 优化性能 当过滤器为空时不遍历筛选
+	if bForce or l_szBagFilter or l_bBagTimeLtd then
+		FilterBags("Normal/BigBagPanel", l_szBagFilter, l_bBagTimeLtd)
+		if l_szBagFilter == "" then
+			l_szBagFilter = nil
 		end
-	else
-		_C.DoFilterBag(bForce)
-		_C.DoFilterBank(bForce)
 	end
 end
 
-_C.DoCompareGuildBank = function(bForce)
-	if _C.bCompareGuild then
-		local frmBag = Station.Lookup("Normal/BigBagPanel")
-		local frmGuildBank = Station.Lookup("Normal/GuildBankPanel")
-		
-		if frmBag and frmGuildBank and frmGuildBank:IsVisible() then
-			MY.UI("Normal/BigBagPanel/CheckBox_Totle"):check(true):check(false)
-			_C.DoCompare(MY.UI(frmBag), MY.UI(frmGuildBank))
+local function DoFilterBank(bForce)
+	if IsBankInSort and IsBankInSort() then
+		return
+	end
+	-- 优化性能 当过滤器为空时不遍历筛选
+	if bForce or l_szBankFilter or l_bBankTimeLtd then
+		FilterBags("Normal/BigBankPanel", l_szBankFilter, l_bBankTimeLtd)
+		if l_szBankFilter == "" then
+			l_szBankFilter = nil
 		end
-	else
-		_C.DoFilterBag(bForce)
-		_C.DoFilterGuildBank(bForce)
 	end
 end
 
--- 过滤背包
-_C.DoCompare = function(ui1, ui2)
+local function DoFilterGuildBank(bForce)
+	-- 优化性能 当过滤器为空时不遍历筛选
+	if bForce or l_szGuildBankFilter then
+		FilterBags("Normal/GuildBankPanel", l_szGuildBankFilter)
+		if l_szGuildBankFilter == "" then
+			l_szGuildBankFilter = nil
+		end
+	end
+end
+
+local function DoCompare(ui1, ui2)
 	local itemlist1 = {}
 	local itemlist2 = {}
 	
@@ -388,26 +151,224 @@ _C.DoCompare = function(ui1, ui2)
 	end)
 end
 
-_C.OnBagItemUpdate = function()
-	if _C.bCompareBank then
-		_C.DoCompareBank()
-	elseif _C.bCompareGuild then
-		_C.DoCompareGuildBank()
+local function DoCompareBank(bForce)
+	if l_bCompareBank then
+		local frmBag = Station.Lookup("Normal/BigBagPanel")
+		local frmBank = Station.Lookup("Normal/BigBankPanel")
+		
+		if frmBag and frmBank and frmBank:IsVisible() then
+			MY.UI("Normal/BigBagPanel/CheckBox_Totle"):check(true):check(false)
+			DoCompare(MY.UI(frmBag), MY.UI(frmBank))
+		end
 	else
-		_C.DoFilterBag()
-		_C.DoFilterBank()
-		_C.DoFilterGuildBank()
+		DoFilterBag(bForce)
+		DoFilterBank(bForce)
 	end
 end
--- 事件注册
-MY.RegisterEvent({
-	"BAG_ITEM_UPDATE", "GUILD_BANK_PANEL_UPDATE"
-}, function()
+
+local function DoCompareGuildBank(bForce)
+	if l_bCompareGuild then
+		local frmBag = Station.Lookup("Normal/BigBagPanel")
+		local frmGuildBank = Station.Lookup("Normal/GuildBankPanel")
+		
+		if frmBag and frmGuildBank and frmGuildBank:IsVisible() then
+			MY.UI("Normal/BigBagPanel/CheckBox_Totle"):check(true):check(false)
+			DoCompare(MY.UI(frmBag), MY.UI(frmGuildBank))
+		end
+	else
+		DoFilterBag(bForce)
+		DoFilterGuildBank(bForce)
+	end
+end
+
+local function OnFrameKeyDown()
+	local szKey = GetKeyName(Station.GetMessageKey())
+	if IsCtrlKeyDown() and szKey == "F" then
+		Station.SetFocusWindow(this:Lookup("WndEditBox_KeyWord"))
+		return 1
+	end
+	return 0
+end
+
+local function Hook()
+	local frame = Station.Lookup("Normal/BigBagPanel")
+	if frame and not frame.bMYBagExHook then
+		frame.bMYBagExHook = true
+		MY.UI(frame):append("WndEditBox", "WndEditBox_KeyWord", {
+			w = 100, h = 21, x = 60, y = 30,
+			text = l_szBagFilter,
+			placeholder = _L['Search'],
+			onchange = function(raw, txt)
+				local nLen = txt:len()
+				nLen = math.max(nLen, 10)
+				nLen = math.min(nLen, 20)
+				XGUI(raw):width(nLen * 10)
+				l_szBagFilter = txt
+				DoFilterBag()
+			end,
+		})
+		
+		HookTableFunc(frame, "OnFrameKeyDown", OnFrameKeyDown, false, true)
+	end
+	
+	local frame = Station.Lookup("Normal/BigBankPanel")
+	if frame and not frame.bMYBagExHook then
+		frame.bMYBagExHook = true
+		MY.UI(frame):append("WndEditBox", "WndEditBox_KeyWord", {
+			w = 150, h = 21, x = 280, y = 80,
+			text = l_szBankFilter,
+			placeholder = _L['Search'],
+			onchange = function(raw, txt)
+				local nLen = txt:len()
+				nLen = math.max(nLen, 15)
+				nLen = math.min(nLen, 25)
+				XGUI(raw):width(nLen * 10)
+				l_szBankFilter = txt
+				DoFilterBank(true)
+			end,
+		})
+		
+		MY.UI(frame):append("WndCheckBox", "WndCheckBox_Compare", {
+			w = 100, x = 340, y = 56,
+			text = _L['compare with bag'],
+			checked = l_bCompareBank,
+			oncheck = function(bChecked)
+				if bChecked then
+					MY.UI("Normal/BigBankPanel/CheckBox_TimeLtd"):check(false)
+				end
+				l_bCompareBank = bChecked
+				DoCompareBank(true)
+			end
+		})
+		
+		MY.UI(frame):append("WndCheckBox", "CheckBox_TimeLtd", {
+			w = 60, x = 277, y = 56, alpha = 200,
+			text = _L['Time Limited'],
+			checked = l_bBankTimeLtd,
+			oncheck = function(bChecked)
+				if bChecked then
+					MY.UI("Normal/BigBankPanel/WndCheckBox_Compare"):check(false)
+				end
+				l_bBankTimeLtd = bChecked
+				DoFilterBank(true)
+			end
+		})
+		
+		HookTableFunc(frame, "OnFrameKeyDown", OnFrameKeyDown, false, true)
+	end
+	
+	local frame = Station.Lookup("Normal/GuildBankPanel")
+	if frame and not frame.bMYBagExHook then
+		frame.bMYBagExHook = true
+		MY.UI("Normal/GuildBankPanel"):append("WndEditBox", "WndEditBox_KeyWord", {
+			w = 100, h = 21, x = 60, y = 25,
+			text = l_szGuildBankFilter,
+			placeholder = _L['Search'],
+			onchange = function(raw, txt)
+				local nLen = txt:len()
+				nLen = math.max(nLen, 10)
+				nLen = math.min(nLen, 25)
+				XGUI(raw):width(nLen * 10)
+				l_szGuildBankFilter = txt
+				DoFilterGuildBank(true)
+			end,
+		})
+		
+		MY.UI("Normal/GuildBankPanel"):append("WndCheckBox", "WndCheckBox_Compare", {
+			w = 100, x = 20, y = 475,
+			text = _L['compare with bag'],
+			checked = l_bCompareGuild,
+			oncheck = function(bChecked)
+				l_bCompareGuild = bChecked
+				DoCompareGuildBank(true)
+			end
+		})
+		
+		HookTableFunc(frame, "OnFrameKeyDown", OnFrameKeyDown, false, true)
+	end
+	
+	MY.RegisterEvent("EXECUTE_BINDING.MY_BAGEX", function(e)
+		local szName, bDown = arg0, arg1
+		if Cursor.IsVisible()
+		and szName == "OPENORCLOSEALLBAGS" and not bDown then
+			local hFrame = Station.Lookup("Normal/BigBagPanel")
+			if hFrame and hFrame:IsVisible() then
+				Station.SetFocusWindow(hFrame)
+			end
+		end
+	end)
+	
+	DoFilterBank()
+	DoCompareBank()
+	DoFilterGuildBank()
+	DoCompareGuildBank()
+end
+
+local function Unhook()
+	local frame = Station.Lookup("Normal/BigBagPanel")
+	if frame and frame.bMYBagExHook then
+		frame.bMYBagExHook = nil
+		frame:Lookup("WndEditBox_KeyWord"):Destroy()
+		UnhookTableFunc(frame, "OnFrameKeyDown", OnFrameKeyDown)
+	end
+	
+	local frame = Station.Lookup("Normal/BigBankPanel")
+	if frame and frame.bMYBagExHook then
+		frame.bMYBagExHook = nil
+		frame:Lookup("CheckBox_TimeLtd"):Destroy()
+		frame:Lookup("WndEditBox_KeyWord"):Destroy()
+		frame:Lookup("WndCheckBox_Compare"):Destroy()
+		UnhookTableFunc(frame, "OnFrameKeyDown", OnFrameKeyDown)
+	end
+	
+	local frame = Station.Lookup("Normal/GuildBankPanel")
+	if frame and frame.bMYBagExHook then
+		frame.bMYBagExHook = nil
+		frame:Lookup("WndEditBox_KeyWord"):Destroy()
+		frame:Lookup("WndCheckBox_Compare"):Destroy()
+		UnhookTableFunc(frame, "OnFrameKeyDown", OnFrameKeyDown)
+	end
+	
+	MY.RegisterEvent("EXECUTE_BINDING.MY_BAGEX")
+end
+
+local function Apply(bEnable)
+	if bEnable == nil then
+		bEnable = MY_BagEx.bEnable
+	end
+	if bEnable then
+		Hook()
+		MY.RegisterEvent("ON_FRAME_CREATE.MY_BAGEX", Hook)
+	else
+		Unhook()
+		MY.RegisterEvent("ON_FRAME_CREATE.MY_BAGEX")
+	end
+end
+
+function MY_BagEx.Enable(bEnable)
+	MY_BagEx.bEnable = bEnable
+	Apply()
+end
+
+do
+local function OnBagItemUpdate()
+	if l_bCompareBank then
+		DoCompareBank()
+	elseif l_bCompareGuild then
+		DoCompareGuildBank()
+	else
+		DoFilterBag()
+		DoFilterBank()
+		DoFilterGuildBank()
+	end
+end
+MY.RegisterEvent({"BAG_ITEM_UPDATE", "GUILD_BANK_PANEL_UPDATE"}, function()
 	if not MY_BagEx.bEnable then
 		return
 	end
-	MY.DelayCall('MY_BagEx', 100, _C.OnBagItemUpdate)
+	MY.DelayCall('MY_BagEx', 100, OnBagItemUpdate)
 end)
-MY.RegisterInit('MY_BAGEX', function() MY.BreatheCall(130, _C.OnBreathe) end)
-MY.RegisterReload("MY_BAGEX", _C.ClearHook)
--- MY.RegisterEvent("SPECIAL_KEY_MSG", function(e)Output(e,arg0,arg1)end)
+end
+
+MY.RegisterInit("MY_BAGEX", function() Apply() end)
+MY.RegisterReload("MY_BAGEX", function() Apply(false) end)
