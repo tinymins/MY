@@ -184,7 +184,7 @@ end
 local function OnFrameKeyDown()
 	local szKey = GetKeyName(Station.GetMessageKey())
 	if IsCtrlKeyDown() and szKey == "F" then
-		Station.SetFocusWindow(this:Lookup("WndEditBox_KeyWord"))
+		Station.SetFocusWindow("Normal/BigBagPanel/WndEditBox_KeyWord/WndEdit_Default")
 		return 1
 	end
 	return 0
