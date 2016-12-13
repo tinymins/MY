@@ -4,7 +4,7 @@
 -- @Date  : 2016-02-5 11:35:53
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-12-13 13:34:11
+-- @Last modified time: 2016-12-13 13:48:59
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_ChatFilter/lang/")
 local CHANNEL_LIST = {
@@ -189,7 +189,10 @@ function PS.OnPanelActive(wnd)
 	  end)
 	x = x + 70
 	
-	local edit = ui:append("WndEditBox", "WndEditBox_Keyword"):children("#WndEditBox_Keyword"):pos(x, y):size(w - 160 - x, 25)
+	local edit = ui:append("WndEditBox", "WndEditBox_Keyword", {
+		x = x, y = y, w = w - 160 - x, h = 25,
+		placeholder = _L['Type keyword, right click list to config.'],
+	})
 	x, y = 0, y + 30
 	
 	local list = ui:append("WndListBox", "WndListBox_1"):children('#WndListBox_1'):pos(x, y):size(w, h - 30)
