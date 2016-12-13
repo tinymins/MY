@@ -51,7 +51,7 @@ _C.bInited = false
 _C.ui = nil
 _C.uiBoard = nil
 _C.uiTipBoard = nil
-_C.szLuaData = 'config/my_chatmonitor.jx3dat'
+_C.szLuaData = 'config/chatmonitor.jx3dat'
 do local SZ_OLD_PATH = MY.FormatPath('config/MY_CHATMONITOR/cfg_$lang.jx3dat')
     if IsLocalFileExist(SZ_OLD_PATH) then
         CPath.Move(SZ_OLD_PATH, MY.FormatPath({_C.szLuaData, MY_DATA_PATH.GLOBAL}))
@@ -101,11 +101,6 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
     if not MY_ChatMonitor.bCapture
     or not MY_ChatMonitor.szKeyWords
     or MY_ChatMonitor.szKeyWords == '' then
-        return
-    end
-    if MY_ChatMonitor.bBlockWords
-    and MY_Chat and MY_Chat.MatchBlockWord
-    and MY_Chat.MatchBlockWord(szMsg, szChannel, bRich) then
         return
     end
     --------------------------------------------------------------------------------------

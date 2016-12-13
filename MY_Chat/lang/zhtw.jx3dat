@@ -32,20 +32,11 @@ data = {
     ['lock postion'] = '鎖定聊天頻道快速切換面板位置',
     ['team balloon'] = '顯示隊伍聊天泡泡',
     ['chat copy'] = '聊天複制',
-    ['chat filter'] = '聊天過濾',
-    ['keyword manager'] = '關鍵字管理',
     ['chat time'] = '聊天時間',
     ['hh:mm'] = '時：分',
     ['hh:mm:ss'] = '時：分：秒',
     ['channel setting'] = '頻道設置',
-    
-    ['All channels'] = "所有頻道",
-    ['disabled'] = "已禁用",
-    ['Channels'] = "頻道設置",
-    [', except:'] = ", 除去:",
-    ['ignore spaces'] = "忽略空格",
-    ['ignore enem'] = "忽略全角",
-    
+        
     ['always show *'] = '總是顯示※號',
     ['always be white'] = '永遠顯示爲白色',
     ['hide system msg copy'] = '不複制系統消息',
@@ -53,13 +44,6 @@ data = {
     ['chat time format'] = '聊天時間格式',
     
     ['Mingyi Plugins - Chatpanel\nThis plugin is developed by Zhai YiMing @ derzh.com.'] = '[茗伊插件集] - 聊天輔助\n------------\n√該插件由翟一鳴小朋宇獨立開發完成。\n√有問題請聯系：茗伊@雙夢鎮@光明頂@荻花宮@體服',
-    
-    ['duplicate chat filter'                ] = '刷屏屏蔽',
-    ['filter duplicate chat'                ] = '開啓刷屏屏蔽（相同聊天內容只顯示第一條）',
-    ['filter duplicate chat ignore id'      ] = '刷屏屏蔽不同玩家發送的相同聊天內容也屏蔽',
-    ['only filter continuous duplicate chat'] = '刷屏屏蔽只屏蔽連續發送的刷屏聊天記錄',
-    ['select duplicate channels'            ] = '選擇啓用刷屏屏蔽的頻道',
-    ['filter duplicate addon message'       ] = '屏蔽相同內容的插件喊話（如海鳗BOSS倒計時）',
     
     ['MOSAICS_CHAR'] = '…',
     ['chat mosaics'] = '聊天打碼',
@@ -71,9 +55,4 @@ data = {
     ['part mosaics D (mosaics all character)'                ] = '打碼模式D（所有字打碼）',
     ['mosaics character'] = '輸入馬賽克字符',
     ['unmosaics names (split by comma)'] = '不打碼的名字（英文半角逗號","分隔多個名字）',
-    
-    ['hide blockwords'] = '關鍵字屏蔽',
-    ['edit'] = '編輯',
-    
-    ["MSG_STRANGER_WHISPER"] = "陌生密聊",
 }

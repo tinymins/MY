@@ -1,0 +1,46 @@
+-- language data (zhcn) updated at 2014-4-10 03:38:11
+data = {
+    ['chat filter'] = '聊天过滤',
+    ['All channels'] = "所有频道",
+    ['Disabled'] = "已禁用",
+    ['Channels'] = "频道设置",
+    
+    ['ignore spaces'] = "忽略空格",
+    ['ignore case'] = "忽略大写小写",
+    ['ignore enem'] = "忽略全角半角",
+    ['ignore acquaintance'] = "忽略认识的人",
+    
+    ["nearby"     ] = "近聊",
+    ["map"        ] = "地图",
+    ["world"      ] = "世界",
+    ["team"       ] = "小队",
+    ["raid"       ] = "团队",
+    ["battlefield"] = "战场",
+    ["tong"       ] = "帮会",
+    ["force"      ] = "门派",
+    ["camp"       ] = "阵营",
+    ["firend"     ] = "好友",
+    ["alliance"   ] = "同盟",
+    ["%s channel" ] = "%s频道",
+    
+    ['duplicate chat filter'                ] = '刷屏屏蔽',
+    ['filter duplicate chat'                ] = '开启刷屏屏蔽（相同聊天内容只显示第一条）',
+    ['filter duplicate chat ignore id'      ] = '刷屏屏蔽不同玩家发送的相同聊天内容也屏蔽',
+    ['only filter continuous duplicate chat'] = '刷屏屏蔽只屏蔽连续发送的刷屏聊天记录',
+    ['select duplicate channels'            ] = '选择启用刷屏屏蔽的频道',
+    ['filter duplicate addon message'       ] = '屏蔽相同内容的插件喊话（如海鳗BOSS倒计时）',
+    
+    ['MOSAICS_CHAR'] = '…',
+    ['chat mosaics'] = '聊天打码',
+    ['chat mosaics (mosaics names in chat panel)'] = '聊天打码（聊天栏中名字打上马赛克）',
+    ['no mosaics on my own name'] = '自己的名字不打码',
+    ['part mosaics A (mosaics except 1st and last character)'] = '打码模式A（第一个字和最后一个字不打码）',
+    ['part mosaics B (mosaics except 1st character)'         ] = '打码模式B（第一个字不打码）',
+    ['part mosaics C (mosaics except last character)'        ] = '打码模式C（最后一个字不打码）',
+    ['part mosaics D (mosaics all character)'                ] = '打码模式D（所有字打码）',
+    ['mosaics character'] = '输入马赛克字符',
+    ['unmosaics names (split by comma)'] = '不打码的名字（英文半角逗号","分隔多个名字）',
+    
+    ['hide blockwords'] = '关键字屏蔽',
+    ['edit'] = '编辑',
+}

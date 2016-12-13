@@ -4,7 +4,7 @@
 -- @Date  : 2016-02-5 11:35:53
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-11-11 10:04:44
+-- @Last modified time: 2016-12-13 13:35:21
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Chat/lang/")
 local INI_PATH = MY.GetAddonInfo().szRoot .. "MY_Chat/ui/MY_ChatSwitch.ini"
@@ -505,12 +505,12 @@ function PS.OnPanelActive(wnd)
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = 250,
 		text = _L["chat time"],
-		checked = MY_Chat.bChatTime,
+		checked = MY_ChatCopy.bChatTime,
 		oncheck = function(bChecked)
 			if bChecked and HM_ToolBox then
 				HM_ToolBox.bChatTime = false
 			end
-			MY_Chat.bChatTime = bChecked
+			MY_ChatCopy.bChatTime = bChecked
 		end,
 	})
 	y = y + deltaY
@@ -522,22 +522,22 @@ function PS.OnPanelActive(wnd)
 			return {{
 				szOption = _L['hh:mm'],
 				bMCheck = true,
-				bChecked = MY_Chat.eChatTime == "HOUR_MIN",
+				bChecked = MY_ChatCopy.eChatTime == "HOUR_MIN",
 				fnAction = function()
-					MY_Chat.eChatTime = "HOUR_MIN"
+					MY_ChatCopy.eChatTime = "HOUR_MIN"
 				end,
 				fnDisable = function()
-					return not MY_Chat.bChatTime
+					return not MY_ChatCopy.bChatTime
 				end,
 			},{
 				szOption = _L['hh:mm:ss'],
 				bMCheck = true,
-				bChecked = MY_Chat.eChatTime == "HOUR_MIN_SEC",
+				bChecked = MY_ChatCopy.eChatTime == "HOUR_MIN_SEC",
 				fnAction = function()
-					MY_Chat.eChatTime = "HOUR_MIN_SEC"
+					MY_ChatCopy.eChatTime = "HOUR_MIN_SEC"
 				end,
 				fnDisable = function()
-					return not MY_Chat.bChatTime
+					return not MY_ChatCopy.bChatTime
 				end,
 			}}
 		end,
@@ -547,9 +547,9 @@ function PS.OnPanelActive(wnd)
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = 250,
 		text = _L["chat copy"],
-		checked = MY_Chat.bChatCopy,
+		checked = MY_ChatCopy.bChatCopy,
 		oncheck = function(bChecked)
-			MY_Chat.bChatCopy = bChecked
+			MY_ChatCopy.bChatCopy = bChecked
 		end,
 	})
 	y = y + deltaY
@@ -557,12 +557,12 @@ function PS.OnPanelActive(wnd)
 	ui:append("WndCheckBox", {
 		x = x + deltaX, y = y, w = 250,
 		text = _L["always show *"],
-		checked = MY_Chat.bChatCopyAlwaysShowMask,
+		checked = MY_ChatCopy.bChatCopyAlwaysShowMask,
 		oncheck = function(bChecked)
-			MY_Chat.bChatCopyAlwaysShowMask = bChecked
+			MY_ChatCopy.bChatCopyAlwaysShowMask = bChecked
 		end,
 		isdisable = function()
-			return not MY_Chat.bChatCopy
+			return not MY_ChatCopy.bChatCopy
 		end,
 	})
 	y = y + deltaY
@@ -570,12 +570,12 @@ function PS.OnPanelActive(wnd)
 	ui:append("WndCheckBox", {
 		x = x + deltaX, y = y, w = 250,
 		text = _L["always be white"],
-		checked = MY_Chat.bChatCopyAlwaysWhite,
+		checked = MY_ChatCopy.bChatCopyAlwaysWhite,
 		oncheck = function(bChecked)
-			MY_Chat.bChatCopyAlwaysWhite = bChecked
+			MY_ChatCopy.bChatCopyAlwaysWhite = bChecked
 		end,
 		isdisable = function()
-			return not MY_Chat.bChatCopy
+			return not MY_ChatCopy.bChatCopy
 		end,
 	})
 	y = y + deltaY
@@ -583,12 +583,12 @@ function PS.OnPanelActive(wnd)
 	ui:append("WndCheckBox", {
 		x = x + deltaX, y = y, w = 250,
 		text = _L["hide system msg copy"],
-		checked = MY_Chat.bChatCopyNoCopySysmsg,
+		checked = MY_ChatCopy.bChatCopyNoCopySysmsg,
 		oncheck = function(bChecked)
-			MY_Chat.bChatCopyNoCopySysmsg = bChecked
+			MY_ChatCopy.bChatCopyNoCopySysmsg = bChecked
 		end,
 		isdisable = function()
-			return not MY_Chat.bChatCopy
+			return not MY_ChatCopy.bChatCopy
 		end,
 	})
 	y = y + deltaY
