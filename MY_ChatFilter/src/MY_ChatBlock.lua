@@ -17,6 +17,7 @@ local CHANNEL_LIST = {
 	PLAYER_TALK_CHANNEL.TONG,
 	PLAYER_TALK_CHANNEL.FORCE,
 	PLAYER_TALK_CHANNEL.CAMP,
+	PLAYER_TALK_CHANNEL.WHISPER,
 	PLAYER_TALK_CHANNEL.FRIENDS,
 	PLAYER_TALK_CHANNEL.TONG_ALLIANCE,
 }
@@ -30,6 +31,7 @@ local CHANNEL_COLOR = setmetatable({
 	[PLAYER_TALK_CHANNEL.TONG         ] = {  0, 200,  72},
 	[PLAYER_TALK_CHANNEL.FORCE        ] = {  0, 255, 255},
 	[PLAYER_TALK_CHANNEL.CAMP         ] = {155, 230,  58},
+	[PLAYER_TALK_CHANNEL.WHISPER      ] = {202, 126, 255},
 	[PLAYER_TALK_CHANNEL.FRIENDS      ] = {241, 114, 183},
 	[PLAYER_TALK_CHANNEL.TONG_ALLIANCE] = {178, 240, 164},
 }, {__index = function(t, k) return {255, 255, 255} end})
@@ -43,7 +45,8 @@ local CHANNEL_TITLE = setmetatable({
 	[PLAYER_TALK_CHANNEL.TONG         ] = _L["tong"       ],
 	[PLAYER_TALK_CHANNEL.FORCE        ] = _L["force"      ],
 	[PLAYER_TALK_CHANNEL.CAMP         ] = _L["camp"       ],
-	[PLAYER_TALK_CHANNEL.FRIENDS      ] = _L["firend"     ],
+	[PLAYER_TALK_CHANNEL.WHISPER      ] = _L["whisper"    ],
+	[PLAYER_TALK_CHANNEL.FRIENDS      ] = _L["firends"    ],
 	[PLAYER_TALK_CHANNEL.TONG_ALLIANCE] = _L["alliance"   ],
 }, {__index = function(t, k) return k end})
 
@@ -59,6 +62,7 @@ local DEFAULT_KW_CONFIG = {
 		[PLAYER_TALK_CHANNEL.TONG         ] = false,
 		[PLAYER_TALK_CHANNEL.FORCE        ] = true ,
 		[PLAYER_TALK_CHANNEL.CAMP         ] = true ,
+		[PLAYER_TALK_CHANNEL.WHISPER      ] = true ,
 		[PLAYER_TALK_CHANNEL.FRIENDS      ] = false,
 		[PLAYER_TALK_CHANNEL.TONG_ALLIANCE] = false,
 	},

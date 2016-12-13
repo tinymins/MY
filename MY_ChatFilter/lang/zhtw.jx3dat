@@ -20,7 +20,8 @@ data = {
     ["tong"       ] = "幫會",
     ["force"      ] = "門派",
     ["camp"       ] = "陣營",
-    ["firend"     ] = "好友",
+    ["whisper"    ] = "密聊",
+    ["firends"    ] = "好友",
     ["alliance"   ] = "同盟",
     ["%s channel" ] = "%s頻道",
     
