@@ -40,30 +40,40 @@ local Config_Default = {
         bEnable = false, bShowBg = true, bShowTitle = false, rgb = { 255, 255, 255 },
         anchor  = { x = -21, y = 250, s = "TOPRIGHT", r = "TOPRIGHT" }, nFont = 0,
     },
+    Speedometer = { -- 角色速度
+        bEnable = false, bShowBg = false, bShowTitle = false, rgb = { 255, 255, 255 },
+        anchor  = { x = -21, y = 210, s = "TOPRIGHT", r = "TOPRIGHT" }, nFont = 0,
+    },
 }
 local _C = {}
 MY_InfoTip = {}
 MY_InfoTip.Config = clone(Config_Default)
 _C.tTm = {}
 _C.nTmFrameCount = GetLogicFrameCount()
+_C.tSm = {}
+_C.nSmFrameCount = GetLogicFrameCount()
 MY_InfoTip.Cache = {
     Ping         = { -- Ping
         formatString = '', title = _L['ping monitor'], prefix = _L['Ping: '], content = _L['%d'],
         GetContent = function() return string.format(MY_InfoTip.Cache.Ping.formatString, GetPingValue() / 2) end
     },
-    TimeMachine  = { -- 目标距离
+    TimeMachine  = { -- 倍速显示
         formatString = '', title = _L['time machine'], prefix = _L['Rate: '], content = 'x%.2f',
         GetContent = function()
             local s = 1
             if _C.nTmFrameCount ~= GetLogicFrameCount() then
+                local tm = _C.tTm[GLOBAL.GAME_FPS] or {}
+                tm.frame = GetLogicFrameCount()
+                tm.tick  = GetTickCount()
                 for i = GLOBAL.GAME_FPS, 1, -1 do
                     _C.tTm[i] = _C.tTm[i - 1]
                 end
-                _C.tTm[1] = { frame = GetLogicFrameCount(), tick = GetTickCount() }
+                _C.tTm[1] = tm
                 _C.nTmFrameCount = GetLogicFrameCount()
             end
-            if _C.tTm[GLOBAL.GAME_FPS] then
-                s = 1000 * (GetLogicFrameCount() - _C.tTm[GLOBAL.GAME_FPS].frame) / GLOBAL.GAME_FPS / (GetTickCount() - _C.tTm[GLOBAL.GAME_FPS].tick)
+            local tm = _C.tTm[GLOBAL.GAME_FPS] or {}
+            if tm then
+                s = 1000 * (GetLogicFrameCount() - tm.frame) / GLOBAL.GAME_FPS / (GetTickCount() - tm.tick)
             end
             return string.format(MY_InfoTip.Cache.TimeMachine.formatString, s)
         end
@@ -110,6 +120,29 @@ MY_InfoTip.Cache = {
                 text = string.format(MY_InfoTip.Cache.GPS.formatString, player.GetMapID(), player.nX, player.nY, player.nZ)
             end
             return text
+        end
+    },
+    Speedometer = { -- 角色速度
+        formatString = '', title = _L['speedometer'], prefix = _L['Speed: '], content = _L['%.2f f/s'],
+        GetContent = function()
+            local s = 0
+            local me = GetClientPlayer()
+            if me and _C.nSmFrameCount ~= GetLogicFrameCount() then
+                local sm = _C.tSm[GLOBAL.GAME_FPS] or {}
+                sm.framecount = GetLogicFrameCount()
+                sm.x, sm.y, sm.z = me.nX, me.nY, me.nZ
+                for i = GLOBAL.GAME_FPS, 1, -1 do
+                    _C.tSm[i] = _C.tSm[i - 1]
+                end
+                _C.tSm[1] = sm
+                _C.nSmFrameCount = GetLogicFrameCount()
+            end
+            local sm = _C.tSm[GLOBAL.GAME_FPS]
+            if sm then
+                s = math.sqrt(math.pow(me.nX - sm.x, 2) + math.pow(me.nY - sm.y, 2) + math.pow((me.nZ - sm.z) / 8, 2)) / 64
+                    / (GetLogicFrameCount() - sm.framecount) * GLOBAL.GAME_FPS
+            end
+            return string.format(MY_InfoTip.Cache.Speedometer.formatString, s)
         end
     },
 }
