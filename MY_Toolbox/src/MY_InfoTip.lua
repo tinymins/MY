@@ -1,7 +1,7 @@
 ------------------------------------------
 -- 信息条显示
 ------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Toolbox/lang/")
 local _Cache = {
     bFighting = false,
     nLastFightStartTimestarp = 0,
@@ -42,7 +42,7 @@ local Config_Default = {
     },
     Speedometer = { -- 角色速度
         bEnable = false, bShowBg = false, bShowTitle = false, rgb = { 255, 255, 255 },
-        anchor  = { x = -21, y = 210, s = "TOPRIGHT", r = "TOPRIGHT" }, nFont = 0,
+        anchor  = { x = -10, y = 210, s = "TOPRIGHT", r = "TOPRIGHT" }, nFont = 0,
     },
 }
 local _C = {}
@@ -146,11 +146,16 @@ MY_InfoTip.Cache = {
         end
     },
 }
-local _SZ_CONFIG_FILE_ = 'config/MY_INFO_TIP/$uid.$lang.jx3dat'
+local _SZ_CONFIG_FILE_ = {'config/infotip.jx3dat', MY_DATA_PATH.ROLE}
 local _Cache = {}
 local SaveConfig = function() MY.SaveLUAData(_SZ_CONFIG_FILE_, MY_InfoTip.Config) end
 local LoadConfig = function()
-    local config = MY.LoadLUAData(_SZ_CONFIG_FILE_)
+    local szOrgFile = MY.GetLUADataPath('config/MY_INFO_TIP/$uid.$lang.jx3dat')
+    local szFilePath = MY.GetLUADataPath(_SZ_CONFIG_FILE_)
+    if IsLocalFileExist(szOrgFile) then
+        CPath.Move(szOrgFile, szFilePath)
+    end
+    local config = MY.LoadLUAData(szFilePath)
     if config then
         if not MY_InfoTip.Config then
             MY_InfoTip.Config = {}
