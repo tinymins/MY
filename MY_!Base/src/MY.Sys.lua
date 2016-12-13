@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-12-13 09:33:05
+-- @Last modified time: 2016-12-13 15:29:54
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 local srep, tostring, string2byte = string.rep, tostring, string.byte
@@ -53,6 +53,7 @@ MY_DATA_PATH = SetmetaReadonly({
 	NORMAL = 0,
 	ROLE   = 1,
 	GLOBAL = 2,
+	SERVER = 3,
 })
 -- 格式化数据文件路径（替换$uid、$lang、$server以及补全相对路径）
 -- (string) MY.GetLUADataPath(oFilePath)
@@ -69,6 +70,8 @@ function MY.FormatPath(oFilePath, ePathType)
 			szFilePath = "!all-users@$lang/" .. szFilePath
 		elseif ePathType == MY_DATA_PATH.ROLE then
 			szFilePath = "$uid@$lang/" .. szFilePath
+		elseif ePathType == MY_DATA_PATH.SERVER then
+			szFilePath = "#$relserver@$lang/" .. szFilePath
 		end
 		szFilePath = MY.GetAddonInfo().szRoot .. "@DATA/" .. szFilePath
 	end
@@ -207,7 +210,7 @@ function MY.PlaySound(szFilePath, szCustomPath)
 end
 -- 加载注册数据
 MY.RegisterInit('MYLIB#INITDATA', function()
-	local t = MY.LoadLUAData('config/initial.$lang.jx3dat')
+	local t = MY.LoadLUAData({'config/initial.jx3dat', MY_DATA_PATH.GLOBAL})
 	if t then
 		for v_name, v_data in pairs(t) do
 			MY.SetGlobalValue(v_name, v_data)
@@ -404,7 +407,7 @@ MY.BreatheCall("MYLIB#STORAGE_DATA", 200, function()
 	if not me or IsRemotePlayer(me.dwID) or not MY.GetTongName() then
 		return
 	end
-	m_nStorageVer = MY.LoadLUAData('config/STORAGE_VERSION/$uid.$lang.jx3dat') or {}
+	m_nStorageVer = MY.LoadLUAData({'config/storageversion.jx3dat', MY_DATA_PATH.ROLE}) or {}
 	MY.Ajax({
 		type = "post",
 		url = 'http://data.jx3.derzh.com/data/?l=' .. MY.GetLang(),
@@ -438,7 +441,7 @@ MY.BreatheCall("MYLIB#STORAGE_DATA", 200, function()
 	return 0
 end)
 MY.RegisterExit("MYLIB#STORAGE_DATA", function()
-	MY.SaveLUAData('config/STORAGE_VERSION/$uid.$lang.jx3dat', m_nStorageVer)
+	MY.SaveLUAData({'config/storageversion.jx3dat', MY_DATA_PATH.ROLE}, m_nStorageVer)
 end)
 -- 保存个人数据 方便网吧党和公司家里多电脑切换
 function MY.StorageData(szKey, oData)

@@ -82,8 +82,8 @@ RegisterCustomData("XLifeBar.bOnlyInDungeon")
 RegisterCustomData("XLifeBar.bOnlyInArena")
 RegisterCustomData("XLifeBar.bOnlyInBattleField")
 local _C = {
-    szConfig = "userdata/XLifeBar/cfg.$lang.jx3dat",
-    szUserConfig = "userdata/XLifeBar/cfg_$uid.$lang.jx3dat",
+    szConfig = {"config/xlifebar.jx3dat", MY_DATA_PATH.GLOBAL},
+    szUserConfig = {"config/xlifebar.jx3dat", MY_DATA_PATH.ROLE},
     tObject = {},
     tTongList = {},
     tNpc = {},
@@ -99,9 +99,19 @@ end
 
 _C.LoadConfig = function()
     if XLifeBar.bUseGlobalConfig then
-        Config = MY.LoadLUAData(_C.szConfig)
+    	local szOrgFile = MY.GetLUADataPath("userdata/XLifeBar/cfg.$lang.jx3dat")
+    	local szFilePath = MY.GetLUADataPath(_C.szConfig)
+    	if IsLocalFileExist(szOrgFile) then
+    		CPath.Move(szOrgFile, szFilePath)
+    	end
+        Config = MY.LoadLUAData(szFilePath)
     else
-        Config = MY.LoadLUAData(_C.szUserConfig)
+    	local szOrgFile = MY.GetLUADataPath("userdata/XLifeBar/cfg_$uid.$lang.jx3dat")
+    	local szFilePath = MY.GetLUADataPath(_C.szUserConfig)
+    	if IsLocalFileExist(szOrgFile) then
+    		CPath.Move(szOrgFile, szFilePath)
+    	end
+        Config = MY.LoadLUAData(szFilePath)
     end
     Config = FormatDataStructure(Config, Config_Default)
 end

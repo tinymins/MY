@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-12-01 11:19:47
+-- @Last modified time: 2016-12-13 15:32:43
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- #################################################################################################################################### --
@@ -363,16 +363,17 @@ local function OnInit()
 	if not INIT_FUNC_LIST then
 		return
 	end
-	CPath.MakeDir(MY.FormatPath('!all-users@$lang/cache/'))
-	CPath.MakeDir(MY.FormatPath('!all-users@$lang/config/'))
-	CPath.MakeDir(MY.FormatPath('!all-users@$lang/export/'))
-	CPath.MakeDir(MY.FormatPath('!all-users@$lang/userdata/'))
-	
-	CPath.MakeDir(MY.FormatPath('$uid@$lang/$name/'))
-	CPath.MakeDir(MY.FormatPath('$uid@$lang/cache/'))
-	CPath.MakeDir(MY.FormatPath('$uid@$lang/config/'))
-	CPath.MakeDir(MY.FormatPath('$uid@$lang/export/'))
-	CPath.MakeDir(MY.FormatPath('$uid@$lang/userdata/'))
+	for _, ePathType in ipairs({
+		MY_DATA_PATH.GLOBAL,
+		MY_DATA_PATH.ROLE,
+		MY_DATA_PATH.SERVER,
+	}) do
+		CPath.MakeDir(MY.FormatPath({'cache/', ePathType}))
+		CPath.MakeDir(MY.FormatPath({'config/', ePathType}))
+		CPath.MakeDir(MY.FormatPath({'export/', ePathType}))
+		CPath.MakeDir(MY.FormatPath({'userdata/', ePathType}))
+	end
+	CPath.MakeDir(MY.FormatPath({'$name/', MY_DATA_PATH.ROLE}))
 	
 	for szKey, fnAction in pairs(INIT_FUNC_LIST) do
 		local nStartTick = GetTickCount()

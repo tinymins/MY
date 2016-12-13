@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 09:21:13
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-11-11 10:10:05
+-- @Last modified time: 2016-12-13 14:49:52
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
 local _C = {
@@ -25,7 +25,7 @@ MY_ExamTip.QueryData = function(szQues)
 	_C.tLastQu = szQues
 	MY_ExamTip.ShowResult(szQues, nil, _L["Querying, please wait..."])
 	if not _C.tLocalQaS then
-		_C.tLocalQaS = MY.LoadLUAData("config/EXAM_TIP/$lang.jx3dat") or {}
+		_C.tLocalQaS = MY.LoadLUAData({"config/examtip.jx3dat", MY_DATA_PATH.GLOBAL}) or {}
 	end
 	if _C.tLocalQaS[szQues] then
 		for _, szAnsw in ipairs(_C.tLocalQaS[szQues]) do

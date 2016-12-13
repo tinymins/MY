@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-25 12:31:03
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-12-06 14:50:57
+-- @Last modified time: 2016-12-13 15:23:48
 -----------------------------------------------
 -- #######################################################################################################
 --   * * *         *                 *                     *                   *           *
@@ -310,19 +310,30 @@ MY_Anmerkungen.SetPlayerNote = function(dwID, szName, szContent, bTipWhenGroup, 
 end
 -- 读取公共数据
 MY_Anmerkungen.LoadConfig = function()
-	MY_Anmerkungen.tPublicPlayerNotes = MY.LoadLUAData("config/PLAYER_NOTES/$relserver.$lang.jx3dat") or {}
+	local szOrgFile = MY.GetLUADataPath("config/PLAYER_NOTES/$relserver.$lang.jx3dat")
+	local szFilePath = MY.GetLUADataPath({"config/playernotes.jx3dat", MY_DATA_PATH.SERVER})
+	if IsLocalFileExist(szOrgFile) then
+		CPath.Move(szOrgFile, szFilePath)
+	end
+	MY_Anmerkungen.tPublicPlayerNotes = MY.LoadLUAData(szFilePath) or {}
 	if type(MY_Anmerkungen.tPublicPlayerNotes) == 'string' then
 		MY_Anmerkungen.tPublicPlayerNotes = MY.Json.Decode(MY_Anmerkungen.tPublicPlayerNotes)
 	end
-	MY_Anmerkungen.tPrivatePlayerNotes = MY.LoadLUAData("config/PLAYER_NOTES/$uid.$lang.jx3dat") or {}
+	
+	local szOrgFile = MY.GetLUADataPath("config/PLAYER_NOTES/$uid.$lang.jx3dat")
+	local szFilePath = MY.GetLUADataPath({"config/playernotes.jx3dat", MY_DATA_PATH.ROLE})
+	if IsLocalFileExist(szOrgFile) then
+		CPath.Move(szOrgFile, szFilePath)
+	end
+	MY_Anmerkungen.tPrivatePlayerNotes = MY.LoadLUAData(szFilePath) or {}
 	if type(MY_Anmerkungen.tPrivatePlayerNotes) == 'string' then
 		MY_Anmerkungen.tPrivatePlayerNotes = MY.Json.Decode(MY_Anmerkungen.tPrivatePlayerNotes)
 	end
 end
 -- 保存公共数据
 MY_Anmerkungen.SaveConfig = function()
-	MY.SaveLUAData("config/PLAYER_NOTES/$relserver.$lang.jx3dat", MY_Anmerkungen.tPublicPlayerNotes)
-	MY.SaveLUAData("config/PLAYER_NOTES/$uid.$lang.jx3dat", MY_Anmerkungen.tPrivatePlayerNotes)
+	MY.SaveLUAData({"config/playernotes.jx3dat", MY_DATA_PATH.SERVER}, MY_Anmerkungen.tPublicPlayerNotes)
+	MY.SaveLUAData({"config/playernotes.jx3dat", MY_DATA_PATH.ROLE}, MY_Anmerkungen.tPrivatePlayerNotes)
 end
 MY.RegisterInit('MY_ANMERKUNGEN', MY_Anmerkungen.LoadConfig)
 MY.RegisterInit('MY_ANMERKUNGEN_PLAYERNOTE', MY_Anmerkungen.ReloadNotePanel)

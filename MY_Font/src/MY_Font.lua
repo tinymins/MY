@@ -3,8 +3,8 @@
 -- @Author: 翟一鸣 @tinymins
 -- @Date  : 2015-02-28 17:37:53
 -- @Email : admin@derzh.com
--- @Last Modified by:   翟一鸣 @tinymins
--- @Last Modified time: 2015-08-19 10:33:04
+-- @Last modified by:   Zhai Yiming
+-- @Last modified time: 2016-12-13 14:56:23
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Font/lang/")
 local C = {
@@ -19,8 +19,15 @@ local C = {
 }
 local OBJ = {}
 -- 加载字体配置
-local CONFIG_PATH = "config/MY_FONT/$lang.jx3dat"
-C.tFontConfig = MY.LoadLUAData(CONFIG_PATH) or {}
+local CONFIG_PATH = {"config/fontconfig.jx3dat", MY_DATA_PATH.GLOBAL}
+do
+	local szOrgFile = MY.GetLUADataPath("config/MY_FONT/$lang.jx3dat")
+	local szFilePath = MY.GetLUADataPath(CONFIG_PATH)
+	if IsLocalFileExist(szOrgFile) then
+		CPath.Move(szOrgFile, szFilePath)
+	end
+	C.tFontConfig = MY.LoadLUAData(szFilePath) or {}
+end
 -- 加载字体列表
 local FONT_PATH = MY.GetAddonInfo().szRoot .. "MY_Font/font/$lang.jx3dat"
 for _, v in ipairs(MY.LoadLUAData(FONT_PATH) or {}) do
