@@ -9,6 +9,7 @@ data = {
     ['ignore case'] = "忽略大写小写",
     ['ignore enem'] = "忽略全角半角",
     ['ignore acquaintance'] = "忽略认识的人",
+    ['Type keyword, right click list to config.'] = "输入关键字添加 右键列表可配置详情",
     
     ["nearby"     ] = "近聊",
     ["map"        ] = "地图",
