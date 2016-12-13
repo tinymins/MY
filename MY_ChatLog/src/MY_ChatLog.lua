@@ -22,8 +22,6 @@ local _L  = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_ChatLog/lang/")
 MY_ChatLog = MY_ChatLog or {}
 MY_ChatLog.bIgnoreTongOnlineMsg    = true -- 帮会上线通知
 MY_ChatLog.bIgnoreTongMemberLogMsg = true -- 帮会成员上线下线提示
-MY_ChatLog.bBlockWords             = true -- 不记录屏蔽关键字
-RegisterCustomData('MY_ChatLog.bBlockWords')
 RegisterCustomData('MY_ChatLog.bIgnoreTongOnlineMsg')
 RegisterCustomData('MY_ChatLog.bIgnoreTongMemberLogMsg')
 
@@ -144,11 +142,6 @@ local function InitDB()
 				szText = GetPureText(szMsg)
 			else
 				szMsg = GetFormatText(szMsg, nFont, r, g, b)
-			end
-			if MY_ChatLog.bBlockWords
-			and MY_Chat and MY_Chat.MatchBlockWord
-			and MY_Chat.MatchBlockWord(szText, szChannel, false) then
-				return
 			end
 			-- filters
 			if szChannel == "MSG_GUILD" then
@@ -747,25 +740,6 @@ function PS.OnPanelActive(wnd)
 		end
 	})
 	y = y + dy
-	
-	if MY_Chat then
-		ui:append("WndCheckBox", {
-			x = x, y = y, w = wr,
-			text = _L['hide blockwords'],
-			checked = MY_ChatLog.bBlockWords,
-			oncheck = function(bChecked)
-				MY_ChatLog.bBlockWords = bChecked
-			end
-		})
-		ui:append("WndButton", {
-			x = x + 200, y = y, w = 80,
-			text = _L["edit"],
-			onclick = function()
-				MY.SwitchTab("MY_Chat_Filter")
-			end,
-		})
-		y = y + dy
-	end
 	
 	ui:append("WndButton", {
 		x = x, y = y, w = 150,

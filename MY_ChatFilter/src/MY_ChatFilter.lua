@@ -1,6 +1,6 @@
 MY_ChatFilter = {}
 local _C = {}
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Chat/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_ChatFilter/lang/")
 local MY_ChatFilter = MY_ChatFilter
 local MAX_CHAT_RECORD = 10
 local MAX_UUID_RECORD = 10
@@ -126,7 +126,7 @@ MY.HookChatPanel("MY_ChatFilter", function(h, szChannel, szMsg, dwTime)
 	end
 end)
 
-MY.RegisterPanel("MY_Duplicate_Chat_Filter", _L["duplicate chat filter"], _L['Chat'],
+MY.RegisterPanel("MY_DuplicateChatFilter", _L["duplicate chat filter"], _L['Chat'],
 "ui/Image/UICommon/yirong3.UITex|104", {255,255,0,200}, {OnPanelActive = function(wnd)
 	local ui = MY.UI(wnd)
 	local w, h = ui:size()
