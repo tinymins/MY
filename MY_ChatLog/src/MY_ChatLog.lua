@@ -634,7 +634,7 @@ function MY_ChatLog.ExportConfirm()
 				end
 			end
 			MY_ChatLog.Export(
-				MY.FormatPath("export/ChatLog/$name@$server@" .. MY.FormatTime("yyyyMMddhhmmss") .. ".html", MY_DATA_PATH.ROLE),
+				MY.FormatPath({"export/ChatLog/$name@$server@" .. MY.FormatTime("yyyyMMddhhmmss") .. ".html", MY_DATA_PATH.ROLE}),
 				aChannels, 10,
 				function(title, progress)
 					OutputMessage("MSG_ANNOUNCE_YELLOW", _L("Exporting chatlog: %s, %.2f%%.", title, progress * 100))

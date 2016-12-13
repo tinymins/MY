@@ -477,7 +477,7 @@ local function GeneDungeonBoss()
 	end
 	local VERSION = select(2, GetVersion())
 	local CACHE_PATH = 'cache/bosslist/' .. VERSION .. '.jx3dat'
-	l_tBossList = MY.LoadLUAData(CACHE_PATH, MY_DATA_PATH.GLOBAL)
+	l_tBossList = MY.LoadLUAData({CACHE_PATH, MY_DATA_PATH.GLOBAL})
 	if l_tBossList then
 		return
 	end

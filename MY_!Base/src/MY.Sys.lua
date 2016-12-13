@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-12-06 14:56:29
+-- @Last modified time: 2016-12-13 09:33:05
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 local srep, tostring, string2byte = string.rep, tostring, string.byte
@@ -50,93 +50,101 @@ MY.Sys.bShieldedVersion = MY.GetLang() == 'zhcn'
 --   # #     #   #       #     # # #     #       #       #       # #                 #   #       #
 -- ##################################################################################################
 MY_DATA_PATH = SetmetaReadonly({
-	ROLE = 1,
+	NORMAL = 0,
+	ROLE   = 1,
 	GLOBAL = 2,
 })
 -- 格式化数据文件路径（替换$uid、$lang、$server以及补全相对路径）
--- (string) MY.GetLUADataPath(szFileUri)
-function MY.FormatPath(szFileUri, ePathType)
+-- (string) MY.GetLUADataPath(oFilePath)
+function MY.FormatPath(oFilePath, ePathType)
+	local szFilePath, ePathType
+	if type(oFilePath) == "table" then
+		szFilePath, ePathType = unpack(oFilePath)
+	else
+		szFilePath, ePathType = oFilePath, MY_DATA_PATH.NORMAL
+	end
 	-- if it's relative path then complete path with "/@DATA/"
-	if string.sub(szFileUri, 1, 2) ~= './' then
+	if string.sub(szFilePath, 1, 2) ~= './' then
 		if ePathType == MY_DATA_PATH.GLOBAL then
-			szFileUri = "!all-users@$lang/" .. szFileUri
+			szFilePath = "!all-users@$lang/" .. szFilePath
 		elseif ePathType == MY_DATA_PATH.ROLE then
-			szFileUri = "$uid@$lang/" .. szFileUri
+			szFilePath = "$uid@$lang/" .. szFilePath
 		end
-		szFileUri = MY.GetAddonInfo().szRoot .. "@DATA/" .. szFileUri
+		szFilePath = MY.GetAddonInfo().szRoot .. "@DATA/" .. szFilePath
 	end
 	-- Unified the directory separator
-	szFileUri = string.gsub(szFileUri, '\\', '/')
+	szFilePath = string.gsub(szFilePath, '\\', '/')
 	-- if exist $uid then add user role identity
-	if string.find(szFileUri, "%$uid") then
-		szFileUri = szFileUri:gsub("%$uid", MY.Player.GetUUID())
+	if string.find(szFilePath, "%$uid") then
+		szFilePath = szFilePath:gsub("%$uid", MY.Player.GetUUID())
 	end
 	-- if exist $name then add user role identity
-	if string.find(szFileUri, "%$name") then
-		szFileUri = szFileUri:gsub("%$name", MY.GetClientInfo().szName or MY.Player.GetUUID())
+	if string.find(szFilePath, "%$name") then
+		szFilePath = szFilePath:gsub("%$name", MY.GetClientInfo().szName or MY.Player.GetUUID())
 	end
 	-- if exist $lang then add language identity
-	if string.find(szFileUri, "%$lang") then
-		szFileUri = szFileUri:gsub("%$lang", string.lower(MY.GetLang()))
+	if string.find(szFilePath, "%$lang") then
+		szFilePath = szFilePath:gsub("%$lang", string.lower(MY.GetLang()))
 	end
 	-- if exist $date then add date identity
-	if string.find(szFileUri, "%$date") then
-		szFileUri = szFileUri:gsub("%$date", MY.FormatTime("yyyyMMdd", GetCurrentTime()))
+	if string.find(szFilePath, "%$date") then
+		szFilePath = szFilePath:gsub("%$date", MY.FormatTime("yyyyMMdd", GetCurrentTime()))
 	end
 	-- if exist $server then add server identity
-	if string.find(szFileUri, "%$server") then
-		szFileUri = szFileUri:gsub("%$server", ((MY.Game.GetServer()):gsub('[/\\|:%*%?"<>]', '')))
+	if string.find(szFilePath, "%$server") then
+		szFilePath = szFilePath:gsub("%$server", ((MY.Game.GetServer()):gsub('[/\\|:%*%?"<>]', '')))
 	end
 	-- if exist $relserver then add relserver identity
-	if string.find(szFileUri, "%$relserver") then
-		szFileUri = szFileUri:gsub("%$relserver", ((MY.Game.GetRealServer()):gsub('[/\\|:%*%?"<>]', '')))
+	if string.find(szFilePath, "%$relserver") then
+		szFilePath = szFilePath:gsub("%$relserver", ((MY.Game.GetRealServer()):gsub('[/\\|:%*%?"<>]', '')))
 	end
-	return szFileUri
+	return szFilePath
 end
 
-function MY.GetLUADataPath(szFileUri, ePathType)
-	szFileUri = MY.FormatPath(szFileUri, ePathType)
+function MY.GetLUADataPath(oFilePath)
+	local szFilePath = MY.FormatPath(oFilePath)
 	-- ensure has file name
-	if string.sub(szFileUri, -1) == '/' then
-		szFileUri = szFileUri .. "data"
+	if string.sub(szFilePath, -1) == '/' then
+		szFilePath = szFilePath .. "data"
 	end
-	return szFileUri
+	return szFilePath
 end
 
 -- 保存数据文件
--- MY.SaveLUAData(szFileUri, tData, ePathType, indent, crc)
--- szFileUri           数据文件路径(1)
+-- MY.SaveLUAData(oFilePath, tData, ePathType, indent, crc)
+-- oFilePath           数据文件路径(1)
 -- tData               要保存的数据
 -- indent              数据文件缩进
 -- crc                 是否添加CRC校验头（默认true）
 -- nohashlevels        纯LIST表所在层（优化大表读写效率）
 -- (1)： 当路径为绝对路径时(以斜杠开头)不作处理
 --       当路径为相对路径时 相对于插件下@DATA目录
-function MY.SaveLUAData(szFileUri, tData, ePathType, indent, crc, nohashlevels)
+--       可以传入表{szPath, ePathType}
+function MY.SaveLUAData(oFilePath, tData, indent, crc, nohashlevels)
 	local nStartTick = GetTickCount()
 	-- format uri
-	szFileUri = MY.GetLUADataPath(szFileUri, ePathType)
+	local szFilePath = MY.GetLUADataPath(oFilePath)
 	-- save data
-	local data = SaveLUAData(szFileUri, tData, indent, crc or false, nohashlevels)
+	local data = SaveLUAData(szFilePath, tData, indent, crc or false, nohashlevels)
 	-- performance monitor
-	MY.Debug({_L('%s saved during %dms.', szFileUri, GetTickCount() - nStartTick)}, 'PMTool', MY_DEBUG.PMLOG)
+	MY.Debug({_L('%s saved during %dms.', szFilePath, GetTickCount() - nStartTick)}, 'PMTool', MY_DEBUG.PMLOG)
 	return data
 end
 
 -- 加载数据文件：
--- MY.LoadLUAData( szFileUri)
--- szFileUri           数据文件路径(1)
--- ePathType           数据文件所属(相对于data文件夹)
+-- MY.LoadLUAData(oFilePath)
+-- oFilePath           数据文件路径(1)
 -- (1)： 当路径为./开头时不作处理
 --       当路径为其他时 相对于插件下@DATA目录
-function MY.LoadLUAData(szFileUri, ePathType)
+--       可以传入表{szPath, ePathType}
+function MY.LoadLUAData(oFilePath)
 	local nStartTick = GetTickCount()
 	-- format uri
-	szFileUri = MY.GetLUADataPath(szFileUri, ePathType)
+	local szFilePath = MY.GetLUADataPath(oFilePath)
 	-- load data
-	local data = LoadLUAData(szFileUri)
+	local data = LoadLUAData(szFilePath)
 	-- performance monitor
-	MY.Debug({_L('%s loaded during %dms.', szFileUri, GetTickCount() - nStartTick)}, 'PMTool', MY_DEBUG.PMLOG)
+	MY.Debug({_L('%s loaded during %dms.', szFilePath, GetTickCount() - nStartTick)}, 'PMTool', MY_DEBUG.PMLOG)
 	return data
 end
 

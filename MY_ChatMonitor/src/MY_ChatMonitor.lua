@@ -54,7 +54,7 @@ _C.uiTipBoard = nil
 _C.szLuaData = 'config/my_chatmonitor.jx3dat'
 do local SZ_OLD_PATH = MY.FormatPath('config/MY_CHATMONITOR/cfg_$lang.jx3dat')
     if IsLocalFileExist(SZ_OLD_PATH) then
-        CPath.Move(SZ_OLD_PATH, MY.FormatPath(_C.szLuaData, MY_DATA_PATH.GLOBAL))
+        CPath.Move(SZ_OLD_PATH, MY.FormatPath({_C.szLuaData, MY_DATA_PATH.GLOBAL}))
     end
 end
 _C.tChannelGroups = {
@@ -251,7 +251,7 @@ _C.OnPanelActive = function(wnd)
       :change(function(raw, szText) MY_ChatMonitor.szKeyWords = szText end)
       :focus(function(self)
         local source = {}
-        for _, szOpt in ipairs(MY.LoadLUAData(_C.szLuaData, MY_DATA_PATH.GLOBAL) or {}) do
+        for _, szOpt in ipairs(MY.LoadLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}) or {}) do
             if type(szOpt) == "string" then
                 table.insert(source, szOpt)
             end
@@ -275,7 +275,7 @@ _C.OnPanelActive = function(wnd)
             GetUserInput("", function(szVal)
                 szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
                 if szVal~="" then
-                    local t = MY.LoadLUAData(_C.szLuaData, MY_DATA_PATH.GLOBAL) or {}
+                    local t = MY.LoadLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}) or {}
                     for i = #t, 1, -1 do
                         if t[i] == szVal then return end
                     end
@@ -286,7 +286,7 @@ _C.OnPanelActive = function(wnd)
         end })
       end)
       :autocomplete('option', 'beforeDelete', function(szOption, fnDoDelete, option)
-        local t = MY.LoadLUAData(_C.szLuaData, MY_DATA_PATH.GLOBAL) or {}
+        local t = MY.LoadLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}) or {}
         for i = #t, 1, -1 do
             if t[i] == szOption then
                 table.remove(t, i)
