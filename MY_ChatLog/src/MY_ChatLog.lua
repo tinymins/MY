@@ -47,7 +47,12 @@ local LOG_TYPE = {
 	{title = g_tStrings.tChannelName["MSG_GUILD"         ], channels = {"MSG_GUILD"         }},
 	{title = g_tStrings.tChannelName["MSG_GUILD_ALLIANCE"], channels = {"MSG_GUILD_ALLIANCE"}},
 	{title = _L["Death Log"], channels = {"MSG_SELF_DEATH", "MSG_SELF_KILL", "MSG_PARTY_DEATH", "MSG_PARTY_KILL"}},
+	{title = _L["Journal Log"], channels = {
+		"MSG_MONEY", "MSG_EXP", "MSG_ITEM", "MSG_REPUTATION", "MSG_CONTRIBUTE", "MSG_ATTRACTION", "MSG_PRESTIGE",
+		"MSG_TRAIN", "MSG_MENTOR_VALUE", "MSG_THEW_STAMINA", "MSG_TONG_FUND"
+	}},
 }
+-- 频道对应数据库中数值 可添加 但不可随意修改
 local CHANNELS = {
 	[1] = "MSG_WHISPER",
 	[2] = "MSG_PARTY",
@@ -59,6 +64,17 @@ local CHANNELS = {
 	[8] = "MSG_SELF_KILL",
 	[9] = "MSG_PARTY_DEATH",
 	[10] = "MSG_PARTY_KILL",
+	[11] = "MSG_MONEY",
+	[12] = "MSG_EXP",
+	[13] = "MSG_ITEM",
+	[14] = "MSG_REPUTATION",
+	[15] = "MSG_CONTRIBUTE",
+	[16] = "MSG_ATTRACTION",
+	[17] = "MSG_PRESTIGE",
+	[18] = "MSG_TRAIN",
+	[19] = "MSG_MENTOR_VALUE",
+	[20] = "MSG_THEW_STAMINA",
+	[21] = "MSG_TONG_FUND",
 }
 local CHANNELS_R = (function() local t = {} for k, v in pairs(CHANNELS) do t[v] = k end return t end)()
 local DB, DB_W, DB_D

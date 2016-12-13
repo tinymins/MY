@@ -21,4 +21,5 @@ data = {
     ['press enter to search ...'] = '輸入回車鍵搜索...',
     
     ['Death Log'] = '重傷記錄',
+    ['Journal Log'] = '交易流水',
 }
