@@ -138,7 +138,7 @@ MY_InfoTip.Cache = {
                 _C.nSmFrameCount = GetLogicFrameCount()
             end
             local sm = _C.tSm[GLOBAL.GAME_FPS]
-            if sm then
+            if sm and me then
                 s = math.sqrt(math.pow(me.nX - sm.x, 2) + math.pow(me.nY - sm.y, 2) + math.pow((me.nZ - sm.z) / 8, 2)) / 64
                     / (GetLogicFrameCount() - sm.framecount) * GLOBAL.GAME_FPS
             end
