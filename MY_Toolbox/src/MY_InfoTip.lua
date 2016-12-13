@@ -71,7 +71,7 @@ MY_InfoTip.Cache = {
                 _C.tTm[1] = tm
                 _C.nTmFrameCount = GetLogicFrameCount()
             end
-            local tm = _C.tTm[GLOBAL.GAME_FPS] or {}
+            local tm = _C.tTm[GLOBAL.GAME_FPS]
             if tm then
                 s = 1000 * (GetLogicFrameCount() - tm.frame) / GLOBAL.GAME_FPS / (GetTickCount() - tm.tick)
             end
