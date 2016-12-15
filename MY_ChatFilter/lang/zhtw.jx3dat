@@ -23,6 +23,7 @@ data = {
     ["whisper"    ] = "密聊",
     ["firends"    ] = "好友",
     ["alliance"   ] = "同盟",
+    ["system"     ] = "系統",
     ["%s channel" ] = "%s頻道",
     
     ['duplicate chat filter'                ] = '刷屏屏蔽',
