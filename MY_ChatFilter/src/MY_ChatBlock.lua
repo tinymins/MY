@@ -4,9 +4,19 @@
 -- @Date  : 2016-02-5 11:35:53
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-12-13 18:20:42
+-- @Last modified time: 2016-12-15 20:52:09
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_ChatFilter/lang/")
+local MSGTYPE_LIST = {
+	"MSG_SYS",
+}
+local MSGTYPE_COLOR = setmetatable({
+	["MSG_SYS"] = {255, 255, 0},
+}, {__index = function(t, k) return {255, 255, 255} end})
+local MSGTYPE_TITLE = setmetatable({
+	["MSG_SYS"] = _L["system"],
+}, {__index = function(t, k) return k end})
+
 local CHANNEL_LIST = {
 	PLAYER_TALK_CHANNEL.NEARBY,
 	PLAYER_TALK_CHANNEL.SENCE,
@@ -65,6 +75,7 @@ local DEFAULT_KW_CONFIG = {
 		[PLAYER_TALK_CHANNEL.WHISPER      ] = true ,
 		[PLAYER_TALK_CHANNEL.FRIENDS      ] = false,
 		[PLAYER_TALK_CHANNEL.TONG_ALLIANCE] = false,
+		["MSG_SYS"                        ] = false,
 	},
 	ignoreAcquaintance = true,
 	ignoreCase = true, ignoreEnEm = true, ignoreSpace = true,
@@ -128,17 +139,21 @@ end)
 MY.RegisterInit('MY_CHAT_BW', LoadBlockWords)
 
 local tNoneSpaceBlockWords = {}
-function MY_ChatBlock.MatchBlockWord(tTalkData, nChannel, dwTalkerID)
+function MY_ChatBlock.MatchBlockWord(talkData, talkType, dwTalkerID)
 	local szText = ""
-	for _, v in ipairs(tTalkData) do
-		if v.text then
-			szText = szText .. v.text
+	if type(talkData) == "table" then
+		for _, v in ipairs(talkData) do
+			if v.text then
+				szText = szText .. v.text
+			end
 		end
+	elseif type(talkData) == "string" then
+		szText = talkData
 	end
 	local bAcquaintance = dwTalkerID and (MY.GetFriend(dwTalkerID) or MY.GetFoe(dwTalkerID) or MY.GetTongMember(dwTalkerID))
 	
 	for _, bw in ipairs(MY_ChatBlock.tBlockWords) do
-		if bw.channel[nChannel] and not (bw.ignoreAcquaintance and bAcquaintance)
+		if bw.channel[talkType] and not (bw.ignoreAcquaintance and bAcquaintance)
 		and MY.String.SimpleMatch(szText, bw.keyword, not bw.ignoreCase, not bw.ignoreEnEm, bw.ignoreSpace) then
 			return true
 		end
@@ -151,21 +166,28 @@ RegisterTalkFilter(function(nChannel, t, dwTalkerID, szName, bEcho, bOnlyShowBal
 	end
 end, CHANNEL_LIST)
 
-local function Chn2Str(ch)
-	local szAllChannel
-	if ch.ALL then
-		szAllChannel = _L["All channels"]
+RegisterMsgFilter(function(szMsg, nFont, bRich, r, g, b, szType, dwTalkerID, szName)
+	if MY_ChatBlock.bBlockWords and MY_ChatBlock.MatchBlockWord(bRich and GetPureText(szMsg) or szMsg, szType, dwTalkerID) then
+		return true
 	end
+end, MSGTYPE_LIST)
+
+local function Chn2Str(ch)
 	local aText = {}
 	for _, nChannel in ipairs(CHANNEL_LIST) do
 		if ch[nChannel] then
 			table.insert(aText, CHANNEL_TITLE[nChannel])
 		end
 	end
+	for _, szType in ipairs(MSGTYPE_LIST) do
+		if ch[szType] then
+			table.insert(aText, MSGTYPE_TITLE[szType])
+		end
+	end
 	local szText
 	if #aText == 0 then
 		szText = _L['Disabled']
-	elseif #aText == #CHANNEL_LIST then
+	elseif #aText == #CHANNEL_LIST + #MSGTYPE_LIST then
 		szText = _L["All channels"]
 	else
 		szText = table.concat(aText, ",")
@@ -216,6 +238,18 @@ function PS.OnPanelActive(wnd)
 				bCheck = true, bChecked = chns[nChannel],
 				fnAction = function()
 					chns[nChannel] = not chns[nChannel]
+					XGUI(hItem):text(ChatBlock2Text(id, chns))
+					SaveBlockWords()
+				end,
+			})
+		end
+		for _, szType in ipairs(MSGTYPE_LIST) do
+			table.insert(menu, {
+				szOption = _L("%s channel", MSGTYPE_TITLE[szType]),
+				rgb = MSGTYPE_COLOR[szType],
+				bCheck = true, bChecked = chns[szType],
+				fnAction = function()
+					chns[szType] = not chns[szType]
 					XGUI(hItem):text(ChatBlock2Text(id, chns))
 					SaveBlockWords()
 				end,
