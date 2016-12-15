@@ -237,6 +237,8 @@ function MY_ChatLog.OnFrameCreate()
 	this.nCurrentPage = 1
 	MY_ChatLog.UpdatePage(this)
 	this:RegisterEvent("ON_MY_MOSAICS_RESET")
+	
+	this:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
 end
 
 function MY_ChatLog.OnEvent(event)
