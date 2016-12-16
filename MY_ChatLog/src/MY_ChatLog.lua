@@ -412,7 +412,7 @@ function MY_ChatLog.UpdatePage(frame)
 			h:AppendItemFromString(MY.GetTimeLinkText({r=r, g=g, b=b, f=f, s='[yyyy/MM/dd][hh:mm:ss]'}, rec.time))
 			local nCount = h:GetItemCount()
 			h:AppendItemFromString(UTF8ToAnsi(rec.msg))
-			if MY_Farbnamen.Render then
+			if MY_Farbnamen and MY_Farbnamen.Render then
 				for i = nCount, h:GetItemCount() - 1 do
 					MY_Farbnamen.Render(h:Lookup(i))
 				end
