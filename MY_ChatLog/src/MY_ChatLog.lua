@@ -247,10 +247,32 @@ function MY_ChatLog.OnEvent(event)
 	end
 end
 
+function MY_ChatLog.OnMouseIn()
+	local name = this:GetName()
+	if name == "Wnd_ChatChannel" then
+		this:Lookup("Btn_Only"):Show()
+	end
+end
+
+function MY_ChatLog.OnMouseOut()
+	local name = this:GetName()
+	if name == "Wnd_ChatChannel" then
+		this:Lookup("Btn_Only"):Hide()
+	end
+end
+
 function MY_ChatLog.OnLButtonClick()
 	local name = this:GetName()
 	if name == "Btn_Close" then
 		MY_ChatLog.Close()
+	elseif name == "Btn_Only" then
+		local wnd = this:GetParent()
+		local parent = wnd:GetParent()
+		for i = 0, parent:GetAllContentCount() - 1 do
+			local wnd = parent:LookupContent(i)
+			wnd:Lookup("CheckBox_ChatChannel"):Check(false, WNDEVENT_FIRETYPE.PREVENT)
+		end
+		wnd:Lookup("CheckBox_ChatChannel"):Check(true)
 	end
 end
 
