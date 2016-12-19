@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-12-13 15:29:54
+-- @Last modified time: 2016-12-19 16:13:13
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 local srep, tostring, string2byte = string.rep, tostring, string.byte
@@ -197,14 +197,18 @@ function MY.PlaySound(szFilePath, szCustomPath)
 	-- 统一化目录分隔符
 	szCustomPath = string.gsub(szCustomPath, '\\', '/')
 	-- 如果是相对路径则从/@Custom/补全
-	if string.sub(szCustomPath, 1, 1)~='/' then szCustomPath = MY.GetAddonInfo().szRoot .. "@Custom/" .. szCustomPath end
+	if string.sub(szCustomPath, 1, 2) ~= './' then
+		szCustomPath = MY.GetAddonInfo().szRoot .. "@Custom/" .. szCustomPath
+	end
 	if IsFileExist(szCustomPath) then
 		PlaySound(SOUND.UI_SOUND, szCustomPath)
 	else
 		-- 统一化目录分隔符
 		szFilePath = string.gsub(szFilePath, '\\', '/')
 		-- 如果是相对路径则从/@Custom/补全
-		if string.sub(szFilePath, 1, 1)~='/' then szFilePath = MY.GetAddonInfo().szFrameworkRoot .. "audio/" .. szFilePath end
+		if string.sub(szFilePath, 1, 2) ~= './' then
+			szFilePath = MY.GetAddonInfo().szFrameworkRoot .. "audio/" .. szFilePath
+		end
 		PlaySound(SOUND.UI_SOUND, szFilePath)
 	end
 end
