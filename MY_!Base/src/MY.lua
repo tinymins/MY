@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-12-19 20:31:11
+-- @Last modified time: 2016-12-19 16:23:46
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- #################################################################################################################################### --
@@ -359,23 +359,14 @@ end
 -- 事件注册
 --------------------------------------------------------------------------------------------------------------------------------------------
 do local INIT_FUNC_LIST = {}
--- 可以在 LOADING_END 之前的初始化
-for _, ePathType in ipairs({
-	MY_DATA_PATH.GLOBAL,
-	MY_DATA_PATH.SERVER,
-}) do
-	CPath.MakeDir(MY.FormatPath({'cache/', ePathType}))
-	CPath.MakeDir(MY.FormatPath({'config/', ePathType}))
-	CPath.MakeDir(MY.FormatPath({'export/', ePathType}))
-	CPath.MakeDir(MY.FormatPath({'userdata/', ePathType}))
-end
--- 可以在 LOADING_END 时的初始化
 local function OnInit()
 	if not INIT_FUNC_LIST then
 		return
 	end
 	for _, ePathType in ipairs({
+		MY_DATA_PATH.GLOBAL,
 		MY_DATA_PATH.ROLE,
+		MY_DATA_PATH.SERVER,
 	}) do
 		CPath.MakeDir(MY.FormatPath({'cache/', ePathType}))
 		CPath.MakeDir(MY.FormatPath({'config/', ePathType}))
