@@ -100,6 +100,14 @@ local function UpdatePlayerData(hFrame, KSelf)
 		nCurrentExtra, nMaxExtra = nAccumulate, 5
 		szExtraImage, nExtraFrame = "rRing.UITex", 2
 		nCurrentMana, nMaxMana = KSelf.nCurrentMana, KSelf.nMaxMana
+	elseif KSelf.dwForceID == FORCE_TYPE.BA_DAO then
+		if KSelf.nPoseState == POSE_TYPE.BROADSWORD then
+			nCurrentMana, nMaxMana = KSelf.nCurrentRage, KSelf.nMaxRage
+		elseif KSelf.nPoseState == POSE_TYPE.DOUBLE_BLADE then
+			nCurrentMana, nMaxMana = KSelf.nCurrentEnergy, KSelf.nMaxEnergy
+		elseif KSelf.nPoseState == POSE_TYPE.SHEATH_KNIFE then
+			nCurrentMana, nMaxMana = KSelf.nCurrentSunEnergy, KSelf.nMaxSunEnergy
+		end
 	else
 		nCurrentMana, nMaxMana = KSelf.nCurrentMana, KSelf.nMaxMana
 	end
