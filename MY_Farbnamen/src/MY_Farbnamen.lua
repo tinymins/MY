@@ -15,11 +15,10 @@ MY_Farbnamen = MY_Farbnamen or {
 	bEnabled = true,
 }
 RegisterCustomData("MY_Farbnamen.bEnabled")
-local SZ_CONFIG_PATH = "$uid@$lang/config/player_force_color.$lang.jx3dat"
-local SZ_DB_DIR = MY.FormatPath("!all-users@$lang/cache/player_info/")
-local SZ_DB_PATH = MY.FormatPath("!all-users@$lang/cache/player_info/$relserver.db")
+local SZ_CONFIG_PATH = "config/player_force_color.jx3dat"
+local SZ_DB_PATH = MY.FormatPath({"cache/player_info.db", MY_DATA_PATH.SERVER})
 local Config_Default = {
-	tForceColor = MY.LoadLUAData("!all-users@$lang/config/player_force_color.jx3dat") or {
+	tForceColor = MY.LoadLUAData({SZ_CONFIG_PATH, MY_DATA_PATH.GLOBAL}) or {
 		[FORCE_TYPE.JIANG_HU ] = {255, 255, 255}, -- 江湖
 		[FORCE_TYPE.SHAO_LIN ] = {255, 178, 95 }, -- 少林
 		[FORCE_TYPE.WAN_HUA  ] = {196, 152, 255}, -- 万花
@@ -36,7 +35,6 @@ local Config_Default = {
 		[FORCE_TYPE.BA_DAO   ] = {106 ,108, 189}, -- 霸刀
 	},
 }
-CPath.MakeDir(SZ_DB_DIR)
 local DB = SQLite3_Open(SZ_DB_PATH)
 if not DB then
 	return MY.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L["MY_Farbnamen"])
@@ -362,11 +360,11 @@ function _MY_Farbnamen.SaveCustomData()
 			t.tForceColor[dwForceID] = tCol
 		end
 	end
-	MY.SaveLUAData(SZ_CONFIG_PATH, t)
+	MY.SaveLUAData({SZ_CONFIG_PATH, MY_DATA_PATH.ROLE}, t)
 end
 -- 加载用户配置
 function _MY_Farbnamen.LoadCustomData()
-	local t = MY.LoadLUAData(SZ_CONFIG_PATH) or {}
+	local t = MY.LoadLUAData({SZ_CONFIG_PATH, MY_DATA_PATH.ROLE}) or {}
 	if t.tForceColor then
 		for k, v in pairs(t.tForceColor) do
 			Config.tForceColor[k] = v
