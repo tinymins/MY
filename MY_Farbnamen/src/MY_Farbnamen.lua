@@ -422,7 +422,7 @@ MY_Farbnamen.GetMenu = function()
 	table.insert(t, {
 		szOption = _L["reset data"],
 		fnAction = function()
-			InfoCache("clear")
+			DB:Execute("DELETE FROM InfoCache")
 			MY.Sysmsg({_L['cache data deleted.']}, _L['Farbnamen'])
 		end,
 		fnDisable = function()
