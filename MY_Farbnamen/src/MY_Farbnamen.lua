@@ -48,7 +48,7 @@ DB:Execute("CREATE TABLE IF NOT EXISTS TongCache (id INTEGER PRIMARY KEY, name V
 local DBT_W  = DB:Prepare("REPLACE INTO TongCache (id, name) VALUES (?, ?)")
 local DBT_RI = DB:Prepare("SELECT id, name FROM InfoCache WHERE id = ?")
 
-do if IsDebugClient() -- ¾É°æ»º´æ×ª»»
+do if IsDebugClient() then -- ¾É°æ»º´æ×ª»»
 	local SZ_IC_PATH = MY.FormatPath("cache/PLAYER_INFO/$relserver/")
 	if IsLocalFileExist(SZ_IC_PATH) then
 		MY.Debug({"Farbnamen info cache trans from file to sqlite start!"}, "MY_Farbnamen", MY_DEBUG.LOG)
