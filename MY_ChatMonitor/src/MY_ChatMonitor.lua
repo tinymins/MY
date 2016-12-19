@@ -178,7 +178,7 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
     end
     -- 发出提示音
     if MY_ChatMonitor.bPlaySound then
-        MY.PlaySound(MY.GetAddonInfo().szRoot .. "ChatMonitor/audio/MsgArrive.wav", "MsgArrive.wav")
+        MY.PlaySound(MY.GetAddonInfo().szRoot .. "MY_ChatMonitor/audio/MsgArrive.wav", "MsgArrive.wav")
     end
     -- 如果设置重定向到系统消息则输出（输出时加个标记防止又被自己捕捉了死循环）
     if MY_ChatMonitor.bRedirectSysChannel and szChannel ~= "MSG_SYS" then
