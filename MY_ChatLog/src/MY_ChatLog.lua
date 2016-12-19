@@ -46,11 +46,11 @@ local LOG_TYPE = {
 	{title = g_tStrings.tChannelName["MSG_FRIEND"        ], channels = {"MSG_FRIEND"        }},
 	{title = g_tStrings.tChannelName["MSG_GUILD"         ], channels = {"MSG_GUILD"         }},
 	{title = g_tStrings.tChannelName["MSG_GUILD_ALLIANCE"], channels = {"MSG_GUILD_ALLIANCE"}},
-	{title = _L["Death Log"], channels = {"MSG_SELF_DEATH", "MSG_SELF_KILL", "MSG_PARTY_DEATH", "MSG_PARTY_KILL"}},
-	{title = _L["Journal Log"], channels = {
-		"MSG_MONEY", "MSG_EXP", "MSG_ITEM", "MSG_REPUTATION", "MSG_CONTRIBUTE", "MSG_ATTRACTION", "MSG_PRESTIGE",
-		"MSG_TRAIN", "MSG_MENTOR_VALUE", "MSG_THEW_STAMINA", "MSG_TONG_FUND"
-	}},
+	-- {title = _L["Death Log"], channels = {"MSG_SELF_DEATH", "MSG_SELF_KILL", "MSG_PARTY_DEATH", "MSG_PARTY_KILL"}},
+	-- {title = _L["Journal Log"], channels = {
+	-- 	"MSG_MONEY", "MSG_EXP", "MSG_ITEM", "MSG_REPUTATION", "MSG_CONTRIBUTE", "MSG_ATTRACTION", "MSG_PRESTIGE",
+	-- 	"MSG_TRAIN", "MSG_MENTOR_VALUE", "MSG_THEW_STAMINA", "MSG_TONG_FUND"
+	-- }},
 }
 -- 频道对应数据库中数值 可添加 但不可随意修改
 local CHANNELS = {
