@@ -16,6 +16,7 @@ MY_Farbnamen = MY_Farbnamen or {
 }
 RegisterCustomData("MY_Farbnamen.bEnabled")
 local SZ_CONFIG_PATH = "config/player_force_color.jx3dat"
+local SZ_DB_ROOT = MY.FormatPath({"cache/", MY_DATA_PATH.SERVER})
 local SZ_DB_PATH = MY.FormatPath({"cache/player_info.db", MY_DATA_PATH.SERVER})
 local Config_Default = {
 	tForceColor = MY.LoadLUAData({SZ_CONFIG_PATH, MY_DATA_PATH.GLOBAL}) or {
@@ -35,6 +36,7 @@ local Config_Default = {
 		[FORCE_TYPE.BA_DAO   ] = {106 ,108, 189}, -- °Ôµ¶
 	},
 }
+CPath.MakeDir(SZ_DB_ROOT)
 local DB = SQLite3_Open(SZ_DB_PATH)
 if not DB then
 	return MY.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L["MY_Farbnamen"])
