@@ -388,7 +388,7 @@ function MY_ChatLog.UpdatePage(frame)
 	if bInit then
 		frame.nCurrentPage = nPageCount
 	else
-		frame.nCurrentPage = mmin(frame.nCurrentPage, nPageCount)
+		frame.nCurrentPage = mmin(mmax(frame.nCurrentPage, 1), nPageCount)
 	end
 	frame:Lookup("Window_Main/Wnd_Index/Wnd_IndexEdit/WndEdit_Index"):SetText(frame.nCurrentPage)
 	frame:Lookup("Window_Main/Wnd_Index", "Handle_IndexCount/Text_IndexCount"):SprintfText(_L["total %d pages"], nPageCount)
