@@ -289,10 +289,12 @@ function MY_ChatLog.OnLButtonClick()
 end
 
 function MY_ChatLog.OnCheckBoxCheck()
+	this:GetRoot().nCurrentPage = nil
 	MY_ChatLog.UpdatePage(this:GetRoot())
 end
 
 function MY_ChatLog.OnCheckBoxUncheck()
+	this:GetRoot().nCurrentPage = nil
 	MY_ChatLog.UpdatePage(this:GetRoot())
 end
 
