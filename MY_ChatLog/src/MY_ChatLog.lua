@@ -18,7 +18,7 @@ local floor, mmin, mmax, mceil = math.floor, math.min, math.max, math.ceil
 local GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID = GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID
 local setmetatable = setmetatable
 
-local _L  = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_ChatLog/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_ChatLog/lang/")
 MY_ChatLog = MY_ChatLog or {}
 MY_ChatLog.bIgnoreTongOnlineMsg    = true -- 帮会上线通知
 MY_ChatLog.bIgnoreTongMemberLogMsg = true -- 帮会成员上线下线提示
@@ -46,11 +46,11 @@ local LOG_TYPE = {
 	{title = g_tStrings.tChannelName["MSG_FRIEND"        ], channels = {"MSG_FRIEND"        }},
 	{title = g_tStrings.tChannelName["MSG_GUILD"         ], channels = {"MSG_GUILD"         }},
 	{title = g_tStrings.tChannelName["MSG_GUILD_ALLIANCE"], channels = {"MSG_GUILD_ALLIANCE"}},
-	-- {title = _L["Death Log"], channels = {"MSG_SELF_DEATH", "MSG_SELF_KILL", "MSG_PARTY_DEATH", "MSG_PARTY_KILL"}},
-	-- {title = _L["Journal Log"], channels = {
-	-- 	"MSG_MONEY", "MSG_EXP", "MSG_ITEM", "MSG_REPUTATION", "MSG_CONTRIBUTE", "MSG_ATTRACTION", "MSG_PRESTIGE",
-	-- 	"MSG_TRAIN", "MSG_MENTOR_VALUE", "MSG_THEW_STAMINA", "MSG_TONG_FUND"
-	-- }},
+	{title = _L["Death Log"], channels = {"MSG_SELF_DEATH", "MSG_SELF_KILL", "MSG_PARTY_DEATH", "MSG_PARTY_KILL"}},
+	{title = _L["Journal Log"], channels = {
+		"MSG_MONEY", "MSG_ITEM", --"MSG_EXP", "MSG_REPUTATION", "MSG_CONTRIBUTE", "MSG_ATTRACTION", "MSG_PRESTIGE",
+		-- "MSG_TRAIN", "MSG_MENTOR_VALUE", "MSG_THEW_STAMINA", "MSG_TONG_FUND"
+	}},
 }
 -- 频道对应数据库中数值 可添加 但不可随意修改
 local CHANNELS = {
@@ -77,7 +77,37 @@ local CHANNELS = {
 	[21] = "MSG_TONG_FUND",
 }
 local CHANNELS_R = (function() local t = {} for k, v in pairs(CHANNELS) do t[v] = k end return t end)()
-local DB, DB_W, DB_D
+local DB, DB_W, DB_D, SaveMsg
+
+do local aMsgQueue = {}
+local function InsertMsg(channel, text, msg, talker, time)
+	local hash
+	msg    = AnsiToUTF8(msg)
+	text   = AnsiToUTF8(szText) or ""
+	hash   = GetStringCRC(msg)
+	talker = talker and AnsiToUTF8(talker) or ""
+	if not channel or not time or empty(msg) or not text or empty(hash) then
+		return
+	end
+	table.insert(aMsgQueue, {hash, channel, time, talker, text, msg})
+end
+
+function SaveMsg()
+	if #aMsgQueue == 0 then
+		return
+	elseif not (DB and DB_W) then
+		return MY.Debug({"Database has not been initialized yet, SaveMsg failed."}, "MY_ChatLog", MY_DEBUG.ERROR)
+	end
+	DB:Execute("BEGIN TRANSACTION")
+	for _, data in ipairs(aMsgQueue) do
+		DB_W:ClearBindings()
+		DB_W:BindAll(unpack(data))
+		DB_W:Execute()
+	end
+	DB:Execute("END TRANSACTION")
+	aMsgQueue = {}
+end
+
 local function InitDB()
 	local DB_PATH = MY.FormatPath('$uid@$lang/userdata/chat_log.db')
 	local SZ_OLD_PATH = MY.FormatPath('userdata/CHAT_LOG/$uid.db')
@@ -115,9 +145,7 @@ local function InitDB()
 		local function regexpN(...)
 			szTalker = ...
 		end
-		local hash, time, talker, text, msg
-		DB:Execute("BEGIN TRANSACTION")
-		for nChannel, szChannel in pairs({"MSG_WHISPER", "MSG_PARTY", "MSG_TEAM", "MSG_FRIEND", "MSG_GUILD", "MSG_GUILD_ALLIANCE"}) do
+		for _, szChannel in ipairs({"MSG_WHISPER", "MSG_PARTY", "MSG_TEAM", "MSG_FRIEND", "MSG_GUILD", "MSG_GUILD_ALLIANCE"}) do
 			local SZ_CHANNEL_PATH = SZ_OLD_PATH .. szChannel .. "/"
 			if IsLocalFileExist(SZ_CHANNEL_PATH) then
 				for dwTime = dwStartTime, dwEndedTime, nDailySec do
@@ -129,21 +157,14 @@ local function InitDB()
 							szMsg = szMsg:gsub('<text>text="%[(%d+):(%d+):(%d+)%]".-</text>', regexp)
 							szMsg:gsub('text="%[([^"<>]-)%]"[^<>]-name="namelink_', regexpN)
 							if nHour and nMin and nSec and szTalker then
-								msg    = AnsiToUTF8(szMsg)
-								text   = AnsiToUTF8(GetPureText(szMsg))
-								hash   = GetStringCRC(msg)
-								talker = AnsiToUTF8(szTalker)
-								time   = dwTime + nHour * 3600 + nMin * 60 + nSec
-								DB_W:ClearBindings()
-								DB_W:BindAll(hash, nChannel, time, talker, text, msg)
-								DB_W:Execute()
+								InsertMsg(CHANNELS_R[szChannel], GetPureText(szMsg), szMsg, szTalker, dwTime + nHour * 3600 + nMin * 60 + nSec)
 							end
 						end
 					end
 				end
 			end
 		end
-		DB:Execute("END TRANSACTION")
+		SaveMsg()
 		CPath.DelDir(SZ_OLD_PATH)
 	end
 	
@@ -170,19 +191,11 @@ local function InitDB()
 					return
 				end
 			end
-			-- generate rec
-			local hash, time, talker, text, msg
-			time   = GetCurrentTime()
-			msg    = AnsiToUTF8(szMsg)
-			text   = AnsiToUTF8(szText)
-			hash   = GetStringCRC(msg)
-			talker = szTalker and AnsiToUTF8(szTalker) or ""
-			DB_W:ClearBindings()
-			DB_W:BindAll(hash, CHANNELS_R[szChannel], time, talker, text, msg)
-			DB_W:Execute()
+			InsertMsg(CHANNELS_R[szChannel], szText, szMsg, szTalker, GetCurrentTime())
 		end
 		MY.RegisterMsgMonitor('MY_ChatLog', OnMsg, t)
 	end
+	MY.RegisterEvent("LOADING_END.MY_ChatLog_Save", SaveMsg)
 end
 MY.RegisterInit("MY_ChatLog_Init", InitDB)
 
@@ -193,6 +206,7 @@ local function ReleaseDB()
 	DB:Release()
 end
 MY.RegisterExit("MY_Chat_Release", ReleaseDB)
+end
 
 function MY_ChatLog.Open()
 	if not DB then
@@ -330,6 +344,8 @@ function MY_ChatLog.OnItemRButtonClick()
 end
 
 function MY_ChatLog.UpdatePage(frame)
+	SaveMsg()
+	
 	local container = frame:Lookup("Window_Main/WndScroll_ChatChanel/WndContainer_ChatChanel")
 	local wheres = {}
 	local values = {}
