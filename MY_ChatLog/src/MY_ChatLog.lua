@@ -22,8 +22,10 @@ local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_ChatLog/lang/")
 MY_ChatLog = MY_ChatLog or {}
 MY_ChatLog.bIgnoreTongOnlineMsg    = true -- 帮会上线通知
 MY_ChatLog.bIgnoreTongMemberLogMsg = true -- 帮会成员上线下线提示
+MY_ChatLog.tUncheckedChannel = {}
 RegisterCustomData('MY_ChatLog.bIgnoreTongOnlineMsg')
 RegisterCustomData('MY_ChatLog.bIgnoreTongMemberLogMsg')
+RegisterCustomData('MY_ChatLog.tUncheckedChannel')
 
 ------------------------------------------------------------------------------------------------------
 -- 数据采集
@@ -40,14 +42,14 @@ local EXPORT_SLICE = 100
 local PAGE_DISPLAY = 14
 local SZ_INI = MY.GetAddonInfo().szRoot .. "MY_ChatLog/ui/MY_ChatLog.ini"
 local LOG_TYPE = {
-	{title = g_tStrings.tChannelName["MSG_WHISPER"       ], channels = {"MSG_WHISPER"       }},
-	{title = g_tStrings.tChannelName["MSG_PARTY"         ], channels = {"MSG_PARTY"         }},
-	{title = g_tStrings.tChannelName["MSG_TEAM"          ], channels = {"MSG_TEAM"          }},
-	{title = g_tStrings.tChannelName["MSG_FRIEND"        ], channels = {"MSG_FRIEND"        }},
-	{title = g_tStrings.tChannelName["MSG_GUILD"         ], channels = {"MSG_GUILD"         }},
-	{title = g_tStrings.tChannelName["MSG_GUILD_ALLIANCE"], channels = {"MSG_GUILD_ALLIANCE"}},
-	{title = _L["Death Log"], channels = {"MSG_SELF_DEATH", "MSG_SELF_KILL", "MSG_PARTY_DEATH", "MSG_PARTY_KILL"}},
-	{title = _L["Journal Log"], channels = {
+	{id = "whisper", title = g_tStrings.tChannelName["MSG_WHISPER"       ], channels = {"MSG_WHISPER"       }},
+	{id = "party"  , title = g_tStrings.tChannelName["MSG_PARTY"         ], channels = {"MSG_PARTY"         }},
+	{id = "team"   , title = g_tStrings.tChannelName["MSG_TEAM"          ], channels = {"MSG_TEAM"          }},
+	{id = "friend" , title = g_tStrings.tChannelName["MSG_FRIEND"        ], channels = {"MSG_FRIEND"        }},
+	{id = "guild"  , title = g_tStrings.tChannelName["MSG_GUILD"         ], channels = {"MSG_GUILD"         }},
+	{id = "guild_a", title = g_tStrings.tChannelName["MSG_GUILD_ALLIANCE"], channels = {"MSG_GUILD_ALLIANCE"}},
+	{id = "death"  , title = _L["Death Log"], channels = {"MSG_SELF_DEATH", "MSG_SELF_KILL", "MSG_PARTY_DEATH", "MSG_PARTY_KILL"}},
+	{id = "journal", title = _L["Journal Log"], channels = {
 		"MSG_MONEY", "MSG_ITEM", --"MSG_EXP", "MSG_REPUTATION", "MSG_CONTRIBUTE", "MSG_ATTRACTION", "MSG_PRESTIGE",
 		-- "MSG_TRAIN", "MSG_MENTOR_VALUE", "MSG_THEW_STAMINA", "MSG_TONG_FUND"
 	}},
@@ -233,12 +235,16 @@ function MY_ChatLog.Toggle()
 end
 
 function MY_ChatLog.OnFrameCreate()
+	if type(MY_ChatLog.tUncheckedChannel) ~= "table" then
+		MY_ChatLog.tUncheckedChannel = {}
+	end
 	local container = this:Lookup("Window_Main/WndScroll_ChatChanel/WndContainer_ChatChanel")
 	container:Clear()
 	for _, info in pairs(LOG_TYPE) do
 		local wnd = container:AppendContentFromIni(SZ_INI, "Wnd_ChatChannel")
+		wnd.id = info.id
 		wnd.aChannels = info.channels
-		wnd:Lookup("CheckBox_ChatChannel"):Check(true, WNDEVENT_FIRETYPE.PREVENT)
+		wnd:Lookup("CheckBox_ChatChannel"):Check(not MY_ChatLog.tUncheckedChannel[info.id], WNDEVENT_FIRETYPE.PREVENT)
 		wnd:Lookup("CheckBox_ChatChannel", "Text_ChatChannel"):SetText(info.title)
 		wnd:Lookup("CheckBox_ChatChannel", "Text_ChatChannel"):SetFontColor(GetMsgFontColor(info.channels[1]))
 	end
@@ -289,11 +295,13 @@ function MY_ChatLog.OnLButtonClick()
 end
 
 function MY_ChatLog.OnCheckBoxCheck()
+	MY_ChatLog.tUncheckedChannel[this:GetParent().id] = nil
 	this:GetRoot().nCurrentPage = nil
 	MY_ChatLog.UpdatePage(this:GetRoot())
 end
 
 function MY_ChatLog.OnCheckBoxUncheck()
+	MY_ChatLog.tUncheckedChannel[this:GetParent().id] = true
 	this:GetRoot().nCurrentPage = nil
 	MY_ChatLog.UpdatePage(this:GetRoot())
 end
