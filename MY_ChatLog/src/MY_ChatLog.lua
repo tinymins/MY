@@ -203,6 +203,7 @@ local function ReleaseDB()
 	if not DB then
 		return
 	end
+	SaveMsg()
 	DB:Release()
 end
 MY.RegisterExit("MY_Chat_Release", ReleaseDB)
