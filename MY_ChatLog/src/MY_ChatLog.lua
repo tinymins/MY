@@ -37,7 +37,7 @@ local TONG_MEMBER_LOGOUT_MSG = '^' .. MY.String.PatternEscape(g_tStrings.STR_GUI
 ------------------------------------------------------------------------------------------------------
 local PAGE_AMOUNT = 150
 local EXPORT_SLICE = 100
-local PAGE_DISPLAY = 17
+local PAGE_DISPLAY = 14
 local SZ_INI = MY.GetAddonInfo().szRoot .. "MY_ChatLog/ui/MY_ChatLog.ini"
 local LOG_TYPE = {
 	{title = g_tStrings.tChannelName["MSG_WHISPER"       ], channels = {"MSG_WHISPER"       }},
