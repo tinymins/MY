@@ -273,20 +273,6 @@ function MY_ChatLog.OnEvent(event)
 	end
 end
 
-function MY_ChatLog.OnMouseIn()
-	local name = this:GetName()
-	if name == "Wnd_ChatChannel" then
-		this:Lookup("Btn_Only"):Show()
-	end
-end
-
-function MY_ChatLog.OnMouseOut()
-	local name = this:GetName()
-	if name == "Wnd_ChatChannel" then
-		this:Lookup("Btn_Only"):Hide()
-	end
-end
-
 function MY_ChatLog.OnLButtonClick()
 	local name = this:GetName()
 	if name == "Btn_Close" then
@@ -798,6 +784,7 @@ local menu = {
 }
 MY.RegisterPlayerAddonMenu('MY_CHATLOG_MENU', menu)
 MY.RegisterTraceButtonMenu('MY_CHATLOG_MENU', menu)
+MY.Game.AddHotKey("MY_ChatLog", _L['chat log'], MY_ChatLog.Toggle, nil)
 end
 
 local PS = {}
