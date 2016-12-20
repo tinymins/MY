@@ -261,7 +261,6 @@ function MY_ChatLog.OnFrameCreate()
 	this:Lookup("", "Text_Title"):SetText(_L['MY - MY_ChatLog'])
 	this:Lookup("Window_Main/Wnd_Search/Edit_Search"):SetPlaceholderText(_L['press enter to search ...'])
 	
-	this.nCurrentPage = 1
 	MY_ChatLog.UpdatePage(this)
 	this:RegisterEvent("ON_MY_MOSAICS_RESET")
 	
@@ -399,7 +398,12 @@ function MY_ChatLog.UpdatePage(frame)
 	DB_RC:BindAll(unpack(values))
 	local data = DB_RC:GetNext()
 	local nPageCount = mceil(data.count / PAGE_AMOUNT)
-	frame.nCurrentPage = mmin(frame.nCurrentPage, nPageCount)
+	local bInit = not frame.nCurrentPage
+	if bInit then
+		frame.nCurrentPage = nPageCount
+	else
+		frame.nCurrentPage = mmin(frame.nCurrentPage, nPageCount)
+	end
 	frame:Lookup("Window_Main/Wnd_Index/Wnd_IndexEdit/WndEdit_Index"):SetText(frame.nCurrentPage)
 	frame:Lookup("Window_Main/Wnd_Index", "Handle_IndexCount/Text_IndexCount"):SprintfText(_L["total %d pages"], nPageCount)
 	
@@ -451,6 +455,7 @@ function MY_ChatLog.UpdatePage(frame)
 	local DB_R = DB:Prepare(sql)
 	DB_R:BindAll(unpack(values))
 	local data = DB_R:GetAll()
+	local scroll = frame:Lookup("Window_Main/WndScroll_ChatLog/Scroll_ChatLog")
 	local handle = frame:Lookup("Window_Main/WndScroll_ChatLog", "Handle_ChatLogs")
 	for i = 1, PAGE_AMOUNT do
 		local rec = data[i]
@@ -485,6 +490,7 @@ function MY_ChatLog.UpdatePage(frame)
 		end
 	end
 	handle:FormatAllItemPos()
+	scroll:SetScrollPos(bInit and scroll:GetStepCount() or 0)
 end
 
 ------------------------------------------------------------------------------------------------------
