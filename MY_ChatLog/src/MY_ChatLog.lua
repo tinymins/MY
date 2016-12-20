@@ -220,6 +220,18 @@ function MY_ChatLog.Close()
 	Wnd.CloseWindow("MY_ChatLog")
 end
 
+function MY_ChatLog.IsOpened()
+	return Station.Lookup("Normal/MY_ChatLog")
+end
+
+function MY_ChatLog.Toggle()
+	if MY_ChatLog.IsOpened() then
+		MY_ChatLog.Close()
+	else
+		MY_ChatLog.Open()
+	end
+end
+
 function MY_ChatLog.OnFrameCreate()
 	local container = this:Lookup("Window_Main/WndScroll_ChatChanel/WndContainer_ChatChanel")
 	container:Clear()
@@ -770,6 +782,15 @@ end
 ------------------------------------------------------------------------------------------------------
 -- 设置界面绘制
 ------------------------------------------------------------------------------------------------------
+do
+local menu = {
+	szOption = _L["chat log"],
+	fnAction = function() MY_ChatLog.Toggle() end,
+}
+MY.RegisterPlayerAddonMenu('MY_CHATLOG_MENU', menu)
+MY.RegisterTraceButtonMenu('MY_CHATLOG_MENU', menu)
+end
+
 local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = MY.UI(wnd)
