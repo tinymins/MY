@@ -514,7 +514,7 @@ local function GeneDungeonBoss()
 			end
 		end
 	end
-	MY.SaveLUAData(CACHE_PATH, l_tBossList, MY_DATA_PATH.GLOBAL)
+	MY.SaveLUAData({CACHE_PATH, MY_DATA_PATH.GLOBAL}, l_tBossList)
 	MY.Sysmsg({_L('Important Npc list updated to v%s.', VERSION)})
 end
 
