@@ -295,13 +295,11 @@ function MY_ChatLog.OnLButtonClick()
 end
 
 function MY_ChatLog.OnCheckBoxCheck()
-	MY_ChatLog.tUncheckedChannel[this:GetParent().id] = nil
 	this:GetRoot().nCurrentPage = nil
 	MY_ChatLog.UpdatePage(this:GetRoot())
 end
 
 function MY_ChatLog.OnCheckBoxUncheck()
-	MY_ChatLog.tUncheckedChannel[this:GetParent().id] = true
 	this:GetRoot().nCurrentPage = nil
 	MY_ChatLog.UpdatePage(this:GetRoot())
 end
@@ -364,6 +362,9 @@ function MY_ChatLog.UpdatePage(frame)
 				tinsert(wheres, "channel = ?")
 				tinsert(values, CHANNELS_R[szChannel])
 			end
+			MY_ChatLog.tUncheckedChannel[wnd.id] = nil
+		else
+			MY_ChatLog.tUncheckedChannel[wnd.id] = true
 		end
 	end
 	local sql  = "SELECT * FROM ChatLog"
