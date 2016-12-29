@@ -4,78 +4,80 @@
 -- @Date  : 2016-02-5 11:35:53
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-12-15 20:52:09
+-- @Last modified time: 2016-12-29 11:24:55
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_ChatFilter/lang/")
-local MSGTYPE_LIST = {
-	"MSG_SYS",
+local TYPE_LIST = {
+	"NEARBY", "SENCE", "WORLD", "TEAM", "RAID", "BATTLE_FIELD", "TONG",
+	"FORCE", "CAMP", "WHISPER", "FRIENDS", "TONG_ALLIANCE", "SYSTEM",
 }
-local MSGTYPE_COLOR = setmetatable({
-	["MSG_SYS"] = {255, 255, 0},
-}, {__index = function(t, k) return {255, 255, 255} end})
-local MSGTYPE_TITLE = setmetatable({
-	["MSG_SYS"] = _L["system"],
-}, {__index = function(t, k) return k end})
 
-local CHANNEL_LIST = {
-	PLAYER_TALK_CHANNEL.NEARBY,
-	PLAYER_TALK_CHANNEL.SENCE,
-	PLAYER_TALK_CHANNEL.WORLD,
-	PLAYER_TALK_CHANNEL.TEAM,
-	PLAYER_TALK_CHANNEL.RAID,
-	PLAYER_TALK_CHANNEL.BATTLE_FIELD,
-	PLAYER_TALK_CHANNEL.TONG,
-	PLAYER_TALK_CHANNEL.FORCE,
-	PLAYER_TALK_CHANNEL.CAMP,
-	PLAYER_TALK_CHANNEL.WHISPER,
-	PLAYER_TALK_CHANNEL.FRIENDS,
-	PLAYER_TALK_CHANNEL.TONG_ALLIANCE,
-}
-local CHANNEL_COLOR = setmetatable({
-	[PLAYER_TALK_CHANNEL.NEARBY       ] = {255, 255, 255},
-	[PLAYER_TALK_CHANNEL.SENCE        ] = {255, 126, 126},
-	[PLAYER_TALK_CHANNEL.WORLD        ] = {252, 204, 204},
-	[PLAYER_TALK_CHANNEL.TEAM         ] = {140, 178, 253},
-	[PLAYER_TALK_CHANNEL.RAID         ] = { 73, 168, 241},
-	[PLAYER_TALK_CHANNEL.BATTLE_FIELD ] = {255, 126, 126},
-	[PLAYER_TALK_CHANNEL.TONG         ] = {  0, 200,  72},
-	[PLAYER_TALK_CHANNEL.FORCE        ] = {  0, 255, 255},
-	[PLAYER_TALK_CHANNEL.CAMP         ] = {155, 230,  58},
-	[PLAYER_TALK_CHANNEL.WHISPER      ] = {202, 126, 255},
-	[PLAYER_TALK_CHANNEL.FRIENDS      ] = {241, 114, 183},
-	[PLAYER_TALK_CHANNEL.TONG_ALLIANCE] = {178, 240, 164},
+local TYPE_CHANNELS = setmetatable({
+	["NEARBY"       ] = {PLAYER_TALK_CHANNEL.NEARBY       },
+	["SENCE"        ] = {PLAYER_TALK_CHANNEL.SENCE        },
+	["WORLD"        ] = {PLAYER_TALK_CHANNEL.WORLD        },
+	["TEAM"         ] = {PLAYER_TALK_CHANNEL.TEAM         },
+	["RAID"         ] = {PLAYER_TALK_CHANNEL.RAID         },
+	["BATTLE_FIELD" ] = {PLAYER_TALK_CHANNEL.BATTLE_FIELD },
+	["TONG"         ] = {PLAYER_TALK_CHANNEL.TONG         },
+	["FORCE"        ] = {PLAYER_TALK_CHANNEL.FORCE        },
+	["CAMP"         ] = {PLAYER_TALK_CHANNEL.CAMP         },
+	["WHISPER"      ] = {PLAYER_TALK_CHANNEL.WHISPER      },
+	["FRIENDS"      ] = {PLAYER_TALK_CHANNEL.FRIENDS      },
+	["TONG_ALLIANCE"] = {PLAYER_TALK_CHANNEL.TONG_ALLIANCE},
+}, {__index = function(t, k) return EMPTY_TABLE end})
+local TYPE_MSGS = setmetatable({
+	["SYSTEM"       ] = {"MSG_SYS"    },
+	["WHISPER"      ] = {"MSG_WHISPER"},
+}, {__index = function(t, k) return EMPTY_TABLE end})
+
+local TYPE_COLOR = setmetatable({
+	["NEARBY"       ] = {255, 255, 255},
+	["SENCE"        ] = {255, 126, 126},
+	["WORLD"        ] = {252, 204, 204},
+	["TEAM"         ] = {140, 178, 253},
+	["RAID"         ] = { 73, 168, 241},
+	["BATTLE_FIELD" ] = {255, 126, 126},
+	["TONG"         ] = {  0, 200,  72},
+	["FORCE"        ] = {  0, 255, 255},
+	["CAMP"         ] = {155, 230,  58},
+	["WHISPER"      ] = {202, 126, 255},
+	["FRIENDS"      ] = {241, 114, 183},
+	["TONG_ALLIANCE"] = {178, 240, 164},
+	["SYSTEM"       ] = {255, 255, 0  },
 }, {__index = function(t, k) return {255, 255, 255} end})
-local CHANNEL_TITLE = setmetatable({
-	[PLAYER_TALK_CHANNEL.NEARBY       ] = _L["nearby"     ],
-	[PLAYER_TALK_CHANNEL.SENCE        ] = _L["map"        ],
-	[PLAYER_TALK_CHANNEL.WORLD        ] = _L["world"      ],
-	[PLAYER_TALK_CHANNEL.TEAM         ] = _L["team"       ],
-	[PLAYER_TALK_CHANNEL.RAID         ] = _L["raid"       ],
-	[PLAYER_TALK_CHANNEL.BATTLE_FIELD ] = _L["battlefield"],
-	[PLAYER_TALK_CHANNEL.TONG         ] = _L["tong"       ],
-	[PLAYER_TALK_CHANNEL.FORCE        ] = _L["force"      ],
-	[PLAYER_TALK_CHANNEL.CAMP         ] = _L["camp"       ],
-	[PLAYER_TALK_CHANNEL.WHISPER      ] = _L["whisper"    ],
-	[PLAYER_TALK_CHANNEL.FRIENDS      ] = _L["firends"    ],
-	[PLAYER_TALK_CHANNEL.TONG_ALLIANCE] = _L["alliance"   ],
+local TYPE_TITLE = setmetatable({
+	["NEARBY"       ] = _L["nearby"     ],
+	["SENCE"        ] = _L["map"        ],
+	["WORLD"        ] = _L["world"      ],
+	["TEAM"         ] = _L["team"       ],
+	["RAID"         ] = _L["raid"       ],
+	["BATTLE_FIELD" ] = _L["battlefield"],
+	["TONG"         ] = _L["tong"       ],
+	["FORCE"        ] = _L["force"      ],
+	["CAMP"         ] = _L["camp"       ],
+	["WHISPER"      ] = _L["whisper"    ],
+	["FRIENDS"      ] = _L["firends"    ],
+	["TONG_ALLIANCE"] = _L["alliance"   ],
+	["SYSTEM"       ] = _L["system"     ],
 }, {__index = function(t, k) return k end})
 
 local DEFAULT_KW_CONFIG = {
 	keyword = "",
 	channel = {
-		[PLAYER_TALK_CHANNEL.NEARBY       ] = true ,
-		[PLAYER_TALK_CHANNEL.SENCE        ] = true ,
-		[PLAYER_TALK_CHANNEL.WORLD        ] = true ,
-		[PLAYER_TALK_CHANNEL.TEAM         ] = false,
-		[PLAYER_TALK_CHANNEL.RAID         ] = false,
-		[PLAYER_TALK_CHANNEL.BATTLE_FIELD ] = false,
-		[PLAYER_TALK_CHANNEL.TONG         ] = false,
-		[PLAYER_TALK_CHANNEL.FORCE        ] = true ,
-		[PLAYER_TALK_CHANNEL.CAMP         ] = true ,
-		[PLAYER_TALK_CHANNEL.WHISPER      ] = true ,
-		[PLAYER_TALK_CHANNEL.FRIENDS      ] = false,
-		[PLAYER_TALK_CHANNEL.TONG_ALLIANCE] = false,
-		["MSG_SYS"                        ] = false,
+		["NEARBY"       ] = true ,
+		["SENCE"        ] = true ,
+		["WORLD"        ] = true ,
+		["TEAM"         ] = false,
+		["RAID"         ] = false,
+		["BATTLE_FIELD" ] = false,
+		["TONG"         ] = false,
+		["FORCE"        ] = true ,
+		["CAMP"         ] = true ,
+		["WHISPER"      ] = true ,
+		["FRIENDS"      ] = false,
+		["TONG_ALLIANCE"] = false,
+		["SYSTEM"       ] = false,
 	},
 	ignoreAcquaintance = true,
 	ignoreCase = true, ignoreEnEm = true, ignoreSpace = true,
@@ -84,6 +86,27 @@ MY_ChatBlock = {}
 MY_ChatBlock.bBlockWords = true
 MY_ChatBlock.tBlockWords = {}
 RegisterCustomData("MY_ChatBlock.bBlockWords")
+
+local TYPE_CHANNELMSGS_R = (function()
+	local t = {}
+	for eType, aChannel in pairs(TYPE_CHANNELS) do
+		for _, nChannel in ipairs(aChannel) do
+			if not t[nChannel] then
+				t[nChannel] = {}
+			end
+			table.insert(t[nChannel], eType)
+		end
+	end
+	for eType, aMsgType in pairs(TYPE_MSGS) do
+		for _, szMsgType in ipairs(aMsgType) do
+			if not t[szMsgType] then
+				t[szMsgType] = {}
+			end
+			table.insert(t[szMsgType], eType)
+		end
+	end
+	return t
+end)()
 
 local function SaveBlockWords()
 	MY.SaveLUAData({'config/chatblockwords.jx3dat', MY_DATA_PATH.GLOBAL}, {blockwords = MY_ChatBlock.tBlockWords})
@@ -152,42 +175,74 @@ function MY_ChatBlock.MatchBlockWord(talkData, talkType, dwTalkerID)
 	end
 	local bAcquaintance = dwTalkerID and (MY.GetFriend(dwTalkerID) or MY.GetFoe(dwTalkerID) or MY.GetTongMember(dwTalkerID))
 	
+	
 	for _, bw in ipairs(MY_ChatBlock.tBlockWords) do
-		if bw.channel[talkType] and not (bw.ignoreAcquaintance and bAcquaintance)
+		local hasfilter = false
+		for _, eType in ipairs(TYPE_CHANNELMSGS_R[talkType] or EMPTY_TABLE) do
+			if bw.channel[eType] then
+				hasfilter = true
+				break
+			end
+		end
+		if hasfilter and not (bw.ignoreAcquaintance and bAcquaintance)
 		and MY.String.SimpleMatch(szText, bw.keyword, not bw.ignoreCase, not bw.ignoreEnEm, bw.ignoreSpace) then
 			return true
 		end
 	end
 end
 
+do
+local aChannel, aMsgType = {}, {}
+for _, eType in ipairs(TYPE_LIST) do
+	for _, nChannel in ipairs(TYPE_CHANNELS[eType]) do
+		local exist = false
+		for _, ch in ipairs(aChannel) do
+			if ch == nChannel then
+				exist = true
+				break
+			end
+		end
+		if not exist then
+			table.insert(aChannel, nChannel)
+		end
+	end
+	for _, szMsgType in ipairs(TYPE_MSGS[eType]) do
+		local exist = false
+		for _, ch in ipairs(aMsgType) do
+			if ch == szMsgType then
+				exist = true
+				break
+			end
+		end
+		if not exist then
+			table.insert(aMsgType, szMsgType)
+		end
+	end
+end
 RegisterTalkFilter(function(nChannel, t, dwTalkerID, szName, bEcho, bOnlyShowBallon, bSecurity, bGMAccount, bCheater, dwTitleID, dwIdePetTemplateID)
 	if MY_ChatBlock.bBlockWords and MY_ChatBlock.MatchBlockWord(t, nChannel, dwTalkerID) then
 		return true
 	end
-end, CHANNEL_LIST)
+end, aChannel)
 
 RegisterMsgFilter(function(szMsg, nFont, bRich, r, g, b, szType, dwTalkerID, szName)
 	if MY_ChatBlock.bBlockWords and MY_ChatBlock.MatchBlockWord(bRich and GetPureText(szMsg) or szMsg, szType, dwTalkerID) then
 		return true
 	end
-end, MSGTYPE_LIST)
+end, aMsgType)
+end
 
 local function Chn2Str(ch)
 	local aText = {}
-	for _, nChannel in ipairs(CHANNEL_LIST) do
-		if ch[nChannel] then
-			table.insert(aText, CHANNEL_TITLE[nChannel])
-		end
-	end
-	for _, szType in ipairs(MSGTYPE_LIST) do
-		if ch[szType] then
-			table.insert(aText, MSGTYPE_TITLE[szType])
+	for _, eType in ipairs(TYPE_LIST) do
+		if ch[eType] then
+			table.insert(aText, TYPE_TITLE[eType])
 		end
 	end
 	local szText
 	if #aText == 0 then
 		szText = _L['Disabled']
-	elseif #aText == #CHANNEL_LIST + #MSGTYPE_LIST then
+	elseif #aText == #TYPE_LIST then
 		szText = _L["All channels"]
 	else
 		szText = table.concat(aText, ",")
@@ -231,25 +286,13 @@ function PS.OnPanelActive(wnd)
 		local menu = {
 			szOption = _L['Channels'],
 		}
-		for _, nChannel in ipairs(CHANNEL_LIST) do
+		for _, eType in ipairs(TYPE_LIST) do
 			table.insert(menu, {
-				szOption = _L("%s channel", CHANNEL_TITLE[nChannel]),
-				rgb = CHANNEL_COLOR[nChannel],
-				bCheck = true, bChecked = chns[nChannel],
+				szOption = _L("%s channel", TYPE_TITLE[eType]),
+				rgb = TYPE_COLOR[eType],
+				bCheck = true, bChecked = chns[eType],
 				fnAction = function()
-					chns[nChannel] = not chns[nChannel]
-					XGUI(hItem):text(ChatBlock2Text(id, chns))
-					SaveBlockWords()
-				end,
-			})
-		end
-		for _, szType in ipairs(MSGTYPE_LIST) do
-			table.insert(menu, {
-				szOption = _L("%s channel", MSGTYPE_TITLE[szType]),
-				rgb = MSGTYPE_COLOR[szType],
-				bCheck = true, bChecked = chns[szType],
-				fnAction = function()
-					chns[szType] = not chns[szType]
+					chns[eType] = not chns[eType]
 					XGUI(hItem):text(ChatBlock2Text(id, chns))
 					SaveBlockWords()
 				end,
