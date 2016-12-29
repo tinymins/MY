@@ -4,7 +4,7 @@
 -- @Date  : 2016-02-5 11:35:53
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-12-29 11:24:55
+-- @Last modified time: 2016-12-29 14:24:10
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_ChatFilter/lang/")
 local TYPE_LIST = {
@@ -27,8 +27,19 @@ local TYPE_CHANNELS = setmetatable({
 	["TONG_ALLIANCE"] = {PLAYER_TALK_CHANNEL.TONG_ALLIANCE},
 }, {__index = function(t, k) return EMPTY_TABLE end})
 local TYPE_MSGS = setmetatable({
-	["SYSTEM"       ] = {"MSG_SYS"    },
-	["WHISPER"      ] = {"MSG_WHISPER"},
+	["NEARBY"       ] = {"MSG_NORMAL"        },
+	["SENCE"        ] = {"MSG_MAP"           },
+	["WORLD"        ] = {"MSG_WORLD"         },
+	["TEAM"         ] = {"MSG_PARTY"         },
+	["RAID"         ] = {"MSG_TEAM"          },
+	["BATTLE_FIELD" ] = {"MSG_BATTLE_FILED"  },
+	["TONG"         ] = {"MSG_GUILD"         },
+	["FORCE"        ] = {"MSG_SCHOOL"        },
+	["CAMP"         ] = {"MSG_CAMP"          },
+	["WHISPER"      ] = {"MSG_WHISPER"       },
+	["FRIENDS"      ] = {"MSG_FRIEND"        },
+	["TONG_ALLIANCE"] = {"MSG_GUILD_ALLIANCE"},
+	["SYSTEM"       ] = {"MSG_SYS"           },
 }, {__index = function(t, k) return EMPTY_TABLE end})
 
 local TYPE_COLOR = setmetatable({
