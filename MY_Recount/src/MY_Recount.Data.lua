@@ -204,7 +204,7 @@ function MY_Recount.Data.SaveData()
 end
 
 -- 过图清除当前战斗数据
-MY.RegisterEvent('LOADING_END', function()
+MY.RegisterEvent('LOADING_ENDING', function()
 	MY_Recount.Data.Push()
 	MY_Recount.Data.Init(true)
 	FireUIEvent('MY_RECOUNT_NEW_FIGHT')

@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-10-14 10:18:30
+-- @Last modified time: 2016-12-30 10:47:43
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 --------------------------------------------
@@ -171,7 +171,7 @@ function MY.Player.GetClientInfo(bForceRefresh)
 	return m_ClientInfo or {}
 end
 MY.GetClientInfo = MY.Player.GetClientInfo
-MY.RegisterEvent('LOADING_END', MY.Player.GetClientInfo)
+MY.RegisterEvent('LOADING_ENDING', MY.Player.GetClientInfo)
 
 -- 获取唯一标识符
 local m_szUUID
@@ -483,7 +483,7 @@ function MY.Player.IsFighting()
 	return bFightState
 end
 MY.IsFighting = MY.Player.IsFighting
-MY.RegisterEvent("LOADING_END.MY-PLAYER", function() _C.bJJCStart = nil end)
+MY.RegisterEvent("LOADING_ENDING.MY-PLAYER", function() _C.bJJCStart = nil end)
 MY.RegisterEvent("ARENA_START.MY-PLAYER", function() _C.bJJCStart = true end)
 
 -------------------------------------------------------------------------------------------------------------------

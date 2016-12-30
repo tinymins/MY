@@ -4,7 +4,7 @@
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-11-11 10:09:59
+-- @Last modified time: 2016-12-30 10:49:02
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
 local _C = {}
@@ -275,7 +275,7 @@ MY_ToolBox.ApplyConfig = function()
 	end
 	
 	if MY_ToolBox.bJJCAutoSwitchTalkChannel then
-		MY.RegisterEvent('LOADING_END.MY_TOOLBOX_JJCAUTOSWITCHTALKCHANNEL', function()
+		MY.RegisterEvent('LOADING_ENDING.MY_TOOLBOX_JJCAUTOSWITCHTALKCHANNEL', function()
 			local bIsBattleField = (GetClientPlayer().GetScene().nType == MAP_TYPE.BATTLE_FIELD)
 			local nChannel, szName = EditBox_GetChannel()
 			if bIsBattleField and (nChannel == PLAYER_TALK_CHANNEL.RAID or nChannel == PLAYER_TALK_CHANNEL.TEAM) then
@@ -286,7 +286,7 @@ MY_ToolBox.ApplyConfig = function()
 			end
 		end)
 	else
-		MY.RegisterEvent('LOADING_END.MY_TOOLBOX_JJCAUTOSWITCHTALKCHANNEL')
+		MY.RegisterEvent('LOADING_ENDING.MY_TOOLBOX_JJCAUTOSWITCHTALKCHANNEL')
 	end
 	
 	-- 长歌影子头顶次序
@@ -466,7 +466,7 @@ end)
 
 -- auto restore team authourity info in arena
 do local l_tTeamInfo, l_bConfigEnd
-MY.RegisterEvent("LOADING_END", function() l_bConfigEnd = false end)
+MY.RegisterEvent("LOADING_ENDING", function() l_bConfigEnd = false end)
 MY.RegisterEvent("ARENA_START", function() l_bConfigEnd = true  end)
 local function RestoreTeam()
 	local me, team = GetClientPlayer(), GetClientTeam()

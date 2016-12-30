@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-12-23 15:58:28
+-- @Last modified time: 2016-12-30 10:45:10
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- #################################################################################################################################### --
@@ -391,7 +391,7 @@ local function OnInit()
 	-- 显示欢迎信息
 	MY.Sysmsg({_L("%s, welcome to use mingyi plugins!", GetClientPlayer().szName) .. " v" .. MY.GetVersion() .. ' Build ' .. _BUILD_})
 end
-RegisterEvent("LOADING_END", OnInit) -- 不能用FIRST_LOADING_END 不然注册快捷键就全跪了
+RegisterEvent("LOADING_ENDING", OnInit) -- 不能用FIRST_LOADING_END 不然注册快捷键就全跪了
 
 -- 注册初始化函数
 -- RegisterInit(string id, function fn) -- 注册
