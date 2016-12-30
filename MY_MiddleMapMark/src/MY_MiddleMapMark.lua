@@ -94,7 +94,7 @@ local function OnLoadingEnd()
 	DB:Execute("END TRANSACTION")
 	l_doodad = {}
 end
-MY.RegisterEvent('LOADING_END.MY_MiddleMapMark', OnLoadingEnd)
+MY.RegisterEvent('LOADING_ENDING.MY_MiddleMapMark', OnLoadingEnd)
 
 local function OnExit()
 	OnLoadingEnd()

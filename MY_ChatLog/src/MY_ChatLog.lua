@@ -197,7 +197,7 @@ local function InitDB()
 		end
 		MY.RegisterMsgMonitor('MY_ChatLog', OnMsg, t)
 	end
-	MY.RegisterEvent("LOADING_END.MY_ChatLog_Save", SaveMsg)
+	MY.RegisterEvent("LOADING_ENDING.MY_ChatLog_Save", SaveMsg)
 end
 MY.RegisterInit("MY_ChatLog_Init", InitDB)
 
