@@ -4,7 +4,7 @@
 -- @Date  : 2015-02-28 17:37:53
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-12-01 10:10:57
+-- @Last modified time: 2017-01-05 18:25:03
 --------------------------------------------
 local _C = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MYDev_VarWatch/lang/")
@@ -12,7 +12,7 @@ local XML_LINE_BREAKER = XML_LINE_BREAKER
 local srep, tostring, string2byte = string.rep, tostring, string.byte
 local tconcat, tinsert, tremove = table.concat, table.insert, table.remove
 local type, next, print, pairs, ipairs = type, next, print, pairs, ipairs
-local DATA_PATH = "cache/Dev_VarWatch.$lang.jx3dat"
+local DATA_PATH = {"config/dev_varwatch.jx3dat", MY_DATA_PATH.GLOBAL}
 _C.tVarList = MY.LoadLUAData(DATA_PATH) or {}
 
 local function var2str_x(var, indent, level) -- 只解析一层table且不解析方法
