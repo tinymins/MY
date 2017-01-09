@@ -79,10 +79,22 @@ local CHANNELS = {
 	[21] = "MSG_TONG_FUND",
 }
 local CHANNELS_R = (function() local t = {} for k, v in pairs(CHANNELS) do t[v] = k end return t end)()
-local DB, DB_W, DB_D, SaveMsg
+local DB, InsertMsg, DeleteMsg, PushDB
 
-do local aMsgQueue = {}
-local function InsertMsg(channel, text, msg, talker, time)
+do
+local DB_W, DB_D
+local aInsQueue = {}
+local aDelQueue = {}
+-- ===== –‘ƒ‹≤‚ ‘ =====
+-- local msg  = AnsiToUTF8(g_tStrings.STR_TONG_BAO_DESC)
+-- local text = AnsiToUTF8(GetPureText(g_tStrings.STR_TONG_BAO_DESC))
+-- local hash = GetStringCRC(msg)
+-- local channel = CHANNELS_R["MSG_WORLD"]
+-- for i = 1, 60000 do
+-- 	table.insert(aInsQueue, {hash, channel, GetCurrentTime() - i * 30, "tester", text, msg})
+-- end
+
+function InsertMsg(channel, text, msg, talker, time)
 	local hash
 	msg    = AnsiToUTF8(msg)
 	text   = AnsiToUTF8(szText) or ""
@@ -91,23 +103,35 @@ local function InsertMsg(channel, text, msg, talker, time)
 	if not channel or not time or empty(msg) or not text or empty(hash) then
 		return
 	end
-	table.insert(aMsgQueue, {hash, channel, time, talker, text, msg})
+	table.insert(aInsQueue, {hash, channel, time, talker, text, msg})
 end
 
-function SaveMsg()
-	if #aMsgQueue == 0 then
+function DeleteMsg(hash, time)
+	if not time or empty(hash) then
+		return
+	end
+	table.insert(aDelQueue, {hash, time})
+end
+
+function PushDB()
+	if #aInsQueue == 0 then
 		return
 	elseif not (DB and DB_W) then
-		return MY.Debug({"Database has not been initialized yet, SaveMsg failed."}, "MY_ChatLog", MY_DEBUG.ERROR)
+		return MY.Debug({"Database has not been initialized yet, PushDB failed."}, "MY_ChatLog", MY_DEBUG.ERROR)
 	end
 	DB:Execute("BEGIN TRANSACTION")
-	for _, data in ipairs(aMsgQueue) do
+	for _, data in ipairs(aInsQueue) do
 		DB_W:ClearBindings()
 		DB_W:BindAll(unpack(data))
 		DB_W:Execute()
 	end
+	for _, data in ipairs(aDelQueue) do
+		DB_D:ClearBindings()
+		DB_D:BindAll(unpack(data))
+		DB_D:Execute()
+	end
 	DB:Execute("END TRANSACTION")
-	aMsgQueue = {}
+	aInsQueue = {}
 end
 
 local function InitDB()
@@ -126,7 +150,7 @@ local function InitDB()
 	
 	DB:Execute("CREATE TABLE IF NOT EXISTS ChatLog (hash INTEGER, channel INTEGER, time INTEGER, talker NVARCHAR(20), text NVARCHAR(400) NOT NULL, msg NVARCHAR(4000) NOT NULL, PRIMARY KEY (hash, time))")
 	DB:Execute("CREATE INDEX IF NOT EXISTS chatlog_channel_idx ON ChatLog(channel)")
-	DB:Execute("CREATE INDEX IF NOT EXISTS chatlog_time_idx ON ChatLog(time)")
+	DB:Execute("DROP INDEX IF EXISTS chatlog_time_idx ON ChatLog(time)")
 	DB:Execute("CREATE INDEX IF NOT EXISTS chatlog_text_idx ON ChatLog(text)")
 	DB_W = DB:Prepare("REPLACE INTO ChatLog (hash, channel, time, talker, text, msg) VALUES (?, ?, ?, ?, ?, ?)")
 	DB_D = DB:Prepare("DELETE FROM ChatLog WHERE hash = ? AND time = ?")
@@ -166,7 +190,7 @@ local function InitDB()
 				end
 			end
 		end
-		SaveMsg()
+		PushDB()
 		CPath.DelDir(SZ_OLD_PATH)
 	end
 	
@@ -197,7 +221,7 @@ local function InitDB()
 		end
 		MY.RegisterMsgMonitor('MY_ChatLog', OnMsg, t)
 	end
-	MY.RegisterEvent("LOADING_ENDING.MY_ChatLog_Save", SaveMsg)
+	MY.RegisterEvent("LOADING_ENDING.MY_ChatLog_Save", PushDB)
 end
 MY.RegisterInit("MY_ChatLog_Init", InitDB)
 
@@ -205,7 +229,7 @@ local function ReleaseDB()
 	if not DB then
 		return
 	end
-	SaveMsg()
+	PushDB()
 	DB:Release()
 end
 MY.RegisterExit("MY_Chat_Release", ReleaseDB)
@@ -275,7 +299,7 @@ end
 
 function MY_ChatLog.OnEvent(event)
 	if event == "ON_MY_MOSAICS_RESET" then
-		MY_ChatLog.UpdatePage(this)
+		MY_ChatLog.UpdatePage(this, true)
 	end
 end
 
@@ -333,10 +357,8 @@ function MY_ChatLog.OnItemRButtonClick()
 			{
 				szOption = _L["delete record"],
 				fnAction = function()
-					DB_D:ClearBindings()
-					DB_D:BindAll(this.hash, this.time)
-					DB_D:Execute()
-					MY_ChatLog.UpdatePage(this:GetRoot())
+					DeleteMsg(this.hash, this.time)
+					MY_ChatLog.UpdatePage(this:GetRoot(), true)
 				end,
 			}, {
 				szOption = _L["copy this record"],
@@ -349,8 +371,8 @@ function MY_ChatLog.OnItemRButtonClick()
 	end
 end
 
-function MY_ChatLog.UpdatePage(frame)
-	SaveMsg()
+function MY_ChatLog.UpdatePage(frame, noscroll)
+	PushDB()
 	
 	local container = frame:Lookup("Window_Main/WndScroll_ChatChanel/WndContainer_ChatChanel")
 	local wheres = {}
@@ -490,7 +512,10 @@ function MY_ChatLog.UpdatePage(frame)
 		end
 	end
 	handle:FormatAllItemPos()
-	scroll:SetScrollPos(bInit and scroll:GetStepCount() or 0)
+	
+	if not noscroll then
+		scroll:SetScrollPos(bInit and scroll:GetStepCount() or 0)
+	end
 end
 
 ------------------------------------------------------------------------------------------------------
