@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-10-14 11:30:13
+-- @Last modified time: 2017-01-11 17:09:26
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 EMPTY_TABLE = SetmetaReadonly({})
@@ -589,4 +589,18 @@ end
 RegisterEvent('GAME_EXIT', resumegsound)
 RegisterEvent('PLAYER_EXIT_GAME', resumegsound)
 RegisterEvent('RELOAD_UI_ADDON_BEGIN', resumegsound)
+end
+
+-- 选代器 倒序
+if not ipairs_r then
+local function fnBpairs(tab, nIndex)
+	nIndex = nIndex - 1
+	if nIndex > 0 then
+		return nIndex, tab[nIndex]
+	end
+end
+
+function ipairs_r(tab)
+	return fnBpairs, tab, #tab + 1
+end
 end
