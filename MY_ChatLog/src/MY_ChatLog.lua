@@ -173,7 +173,7 @@ end
 function InsertMsg(channel, text, msg, talker, time)
 	local hash
 	msg    = AnsiToUTF8(msg)
-	text   = AnsiToUTF8(szText) or ""
+	text   = AnsiToUTF8(text) or ""
 	hash   = GetStringCRC(msg)
 	talker = talker and AnsiToUTF8(talker) or ""
 	if not channel or not time or empty(msg) or not text or empty(hash) then
