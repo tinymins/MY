@@ -4,6 +4,7 @@ data = {
     ['filter tong online message'] = '过滤帮会上线公告提示',
     ['filter tong member log message'] = '过滤帮会成员上线提示',
     ['export chatlog'] = '导出聊天记录',
+    ['optimize/compress datebase'] = '压缩优化数据库',
     ['preparing'] = '准备中',
     ['Export succeed'] = '导出完成！',
     ['Already exporting, please wait.'] = '聊天记录正在导出中，请稍后。',
