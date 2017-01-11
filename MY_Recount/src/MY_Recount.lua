@@ -145,7 +145,7 @@ MY.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function()
 end)
 
 MY_Recount = MY_Recount or {}
-MY_Recount.bEnable       = true                 -- 是否启用
+MY_Recount.bEnable       = false                -- 是否启用
 MY_Recount.nCss          = 1                    -- 当前样式表
 MY_Recount.nChannel      = CHANNEL.DPS          -- 当前显示的统计模式
 MY_Recount.bAwayMode     = true                 -- 计算DPS时是否减去暂离时间
@@ -159,7 +159,7 @@ MY_Recount.nPublishMode  = PUBLISH_MODE.EFFECT  -- 发布模式
 MY_Recount.nDrawInterval = GLOBAL.GAME_FPS / 2  -- UI重绘周期（帧）
 MY_Recount.bShowNodataTeammate = false  -- 显示没有数据的队友
 MY_Recount.anchor = { x=0, y=-70, s="BOTTOMRIGHT", r="BOTTOMRIGHT" } -- 默认坐标
-RegisterCustomData("MY_Recount.bEnable")
+RegisterCustomData("MY_Recount.bEnable", 1)
 RegisterCustomData("MY_Recount.nCss")
 RegisterCustomData("MY_Recount.nChannel")
 RegisterCustomData("MY_Recount.bAwayMode")

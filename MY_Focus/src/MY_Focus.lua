@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-11-29 12:35:03
+-- @Last modified time: 2017-01-11 18:29:13
 --------------------------------------------
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Focus/lang/")
@@ -12,7 +12,7 @@ local l_tFocusList = {}
 local l_bMinimize = false
 local l_dwLockType, l_dwLockID
 MY_Focus = {}
-MY_Focus.bEnable            = true  -- 是否启用
+MY_Focus.bEnable            = false -- 是否启用
 MY_Focus.bFocusBoss         = true  -- 焦点重要NPC
 MY_Focus.bFocusFriend       = false -- 焦点附近好友
 MY_Focus.bFocusTong         = false -- 焦点帮会成员
@@ -42,7 +42,7 @@ MY_Focus.tFocusTplList = {  -- 永久焦点(按照TemplateID)
 	[TARGET.DOODAD] = {},
 }
 MY_Focus.anchor = { x=-300, y=220, s="TOPRIGHT", r="TOPRIGHT" } -- 默认坐标
-RegisterCustomData("MY_Focus.bEnable")
+RegisterCustomData("MY_Focus.bEnable", 1)
 RegisterCustomData("MY_Focus.bFocusBoss")
 RegisterCustomData("MY_Focus.bFocusFriend")
 RegisterCustomData("MY_Focus.bFocusTong")

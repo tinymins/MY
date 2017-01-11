@@ -4,7 +4,7 @@
 -- @Date  : 2016-02-5 11:35:53
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-12-13 13:35:21
+-- @Last modified time: 2017-01-11 18:25:58
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Chat/lang/")
 local INI_PATH = MY.GetAddonInfo().szRoot .. "MY_Chat/ui/MY_ChatSwitch.ini"
@@ -226,13 +226,13 @@ local m_tChannelTime = {}
 
 MY_ChatSwitch.anchor = { x=10, y=-60, s="BOTTOMLEFT", r="BOTTOMLEFT" }
 MY_ChatSwitch.tChannelCount = {}
-MY_ChatSwitch.bDisplayPanel = true
+MY_ChatSwitch.bDisplayPanel = false
 MY_ChatSwitch.bLockPostion = false
 MY_ChatSwitch.bAlertBeforeClear = true
 RegisterCustomData("MY_ChatSwitch.anchor")
 RegisterCustomData("MY_ChatSwitch.aWhisper", 1)
 RegisterCustomData("MY_ChatSwitch.tChannelCount")
-RegisterCustomData("MY_ChatSwitch.bDisplayPanel")
+RegisterCustomData("MY_ChatSwitch.bDisplayPanel", 1)
 RegisterCustomData("MY_ChatSwitch.bLockPostion")
 RegisterCustomData("MY_ChatSwitch.bAlertBeforeClear")
 for k, _ in pairs(MY_ChatSwitch.tChannel) do RegisterCustomData("MY_ChatSwitch.tChannel."..k) end
