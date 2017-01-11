@@ -1067,7 +1067,12 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = 150,
 		text = _L["optimize/compress datebase"],
 		onclick = function()
-			OptimizeDB(true)
+			MY.Confirm(_L['optimize/compress datebase will take a long time and may cause a disconnection, are you sure to continue?'], function()
+				MY.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
+					OptimizeDB(true)
+					MY.Alert(_L["Optimize finished!"])
+				end)
+			end)
 		end,
 	})
 	y = y + dy
