@@ -81,7 +81,7 @@ local CHANNELS = {
 	[21] = "MSG_TONG_FUND",
 }
 local CHANNELS_R = (function() local t = {} for k, v in pairs(CHANNELS) do t[v] = k end return t end)()
-local DB, InsertMsg, DeleteMsg, PushDB, GetChatLogCount, GetChatLog
+local DB, InsertMsg, DeleteMsg, PushDB, GetChatLogCount, GetChatLog, OptimizeDB
 
 do
 local STMT = {}
@@ -189,7 +189,7 @@ function DeleteMsg(hash, time)
 	table.insert(aDelQueue, {hash, time})
 end
 
-local function OptimizeDB(deep)
+function OptimizeDB(deep)
 	if not DB then
 		return
 	end
