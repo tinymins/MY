@@ -288,15 +288,15 @@ function PushDB()
 	OptimizeDB(false)
 end
 
-function GetChatLogCount(channels, keyword)
+function GetChatLogCount(channels, search)
 	local count = 0
 	for _, stmt in ipairs(STMT) do
-		if not stmt.count.filter[keyword] then
-			UpdateSTMTCountCache(stmt, keyword)
+		if not stmt.count.filter[search] then
+			UpdateSTMTCountCache(stmt, search)
 		end
 		for _, channel in ipairs(channels) do
-			if stmt.count.filter[keyword][channel] then
-				count = count + stmt.count.filter[keyword][channel]
+			if stmt.count.filter[search][channel] then
+				count = count + stmt.count.filter[search][channel]
 			end
 		end
 	end
@@ -945,37 +945,15 @@ function MY_ChatLog.Export(szExportFile, aChannels, nPerSec, onProgress)
 	if onProgress then
 		onProgress(_L["preparing"], 0)
 	end
-	local status =  Log(szExportFile, getHeader(), "clear")
+	local status = Log(szExportFile, getHeader(), "clear")
 	if status ~= "SUCCEED" then
 		return MY.Sysmsg({_L("Error: open file error %s [%s]", szExportFile, status)})
 	end
 	l_bExporting = true
 	
-	local sql  = "SELECT * FROM ChatLog"
-	local sqlc = "SELECT count(*) AS count FROM ChatLog"
-	local wheres = {}
-	local values = {}
-	for _, nChannel in ipairs(aChannels) do
-		tinsert(wheres, "channel = ?")
-		tinsert(values, nChannel)
-	end
-	if #wheres > 0 then
-		sql  = sql  .. " WHERE (" .. tconcat(wheres, " OR ") .. ")"
-		sqlc = sqlc .. " WHERE (" .. tconcat(wheres, " OR ") .. ")"
-	end
-	sql  = sql  .. " ORDER BY time ASC"
-	sqlc = sqlc .. " ORDER BY time ASC"
-	local DB_RC = DB:Prepare(sqlc)
-	DB_RC:BindAll(unpack(values))
-	local data = DB_RC:GetNext()
-	local nPageCount = mceil(data.count / EXPORT_SLICE)
-	
-	sql = sql .. " LIMIT " .. EXPORT_SLICE .. " OFFSET ?"
-	local nIndex = #values + 1
-	local DB_R = DB:Prepare(sql)
-	local i = 0
+	local nPage, nPageCount = 0, mceil(GetChatLogCount(aChannels, "") / EXPORT_SLICE)
 	local function Export()
-		if i > nPageCount then
+		if nPage > nPageCount then
 			l_bExporting = false
 			Log(szExportFile, getFooter(), "close")
 			if onProgress then
@@ -986,10 +964,7 @@ function MY_ChatLog.Export(szExportFile, aChannels, nPerSec, onProgress)
 			MY.Sysmsg({_L('Chatlog export succeed, file saved as %s', szFile)})
 			return 0
 		end
-		values[nIndex] = i * EXPORT_SLICE
-		DB_R:ClearBindings()
-		DB_R:BindAll(unpack(values))
-		local data = DB_R:GetAll()
+		local data = GetChatLog(aChannels, "", nPage * EXPORT_SLICE, EXPORT_SLICE)
 		for i, rec in ipairs(data) do
 			local f = GetMsgFont(CHANNELS[rec.channel])
 			local r, g, b = GetMsgFontColor(CHANNELS[rec.channel])
@@ -997,9 +972,9 @@ function MY_ChatLog.Export(szExportFile, aChannels, nPerSec, onProgress)
 			Log(szExportFile, convertXml2Html(UTF8ToAnsi(rec.msg)))
 		end
 		if onProgress then
-			onProgress(_L['exporting'], i / nPageCount)
+			onProgress(_L['exporting'], nPage / nPageCount)
 		end
-		i = i + 1
+		nPage = nPage + 1
 	end
 	MY.BreatheCall("MY_ChatLog_Export", Export)
 end
