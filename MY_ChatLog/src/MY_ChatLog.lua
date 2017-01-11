@@ -40,6 +40,7 @@ local TONG_MEMBER_LOGOUT_MSG = '^' .. MY.String.PatternEscape(g_tStrings.STR_GUI
 local PAGE_AMOUNT = 150
 local EXPORT_SLICE = 100
 local PAGE_DISPLAY = 14
+local AUTO_DIVIDE_TABLE_AMOUNT = 30000
 local SZ_INI = MY.GetAddonInfo().szRoot .. "MY_ChatLog/ui/MY_ChatLog.ini"
 local LOG_TYPE = {
 	{id = "whisper", title = g_tStrings.tChannelName["MSG_WHISPER"       ], channels = {"MSG_WHISPER"       }},
@@ -79,9 +80,10 @@ local CHANNELS = {
 	[21] = "MSG_TONG_FUND",
 }
 local CHANNELS_R = (function() local t = {} for k, v in pairs(CHANNELS) do t[v] = k end return t end)()
-local DB, InsertMsg, DeleteMsg, PushDB
+local DB, InsertMsg, DeleteMsg, PushDB, GetChatLogCount, GetChatLog
 
 do
+local STMT = {}
 local DB_W, DB_D
 local aInsQueue = {}
 local aDelQueue = {}
@@ -93,6 +95,87 @@ local aDelQueue = {}
 -- for i = 1, 60000 do
 -- 	table.insert(aInsQueue, {hash, channel, GetCurrentTime() - i * 30, "tester", text, msg})
 -- end
+
+local function CreateTable(name)
+	DB:Execute("CREATE TABLE IF NOT EXISTS " .. name .. " (hash INTEGER, channel INTEGER, time INTEGER, talker NVARCHAR(20), text NVARCHAR(400) NOT NULL, msg NVARCHAR(4000) NOT NULL, PRIMARY KEY (hash, time))")
+	DB:Execute("CREATE INDEX IF NOT EXISTS " .. name .. "_channel_idx ON " .. name .. "(channel)")
+	DB:Execute("CREATE INDEX IF NOT EXISTS " .. name .. "_text_idx ON " .. name .. "(text)")
+end
+
+local function UpdateSTMTCountCache(stmt, filter)
+	if not filter then
+		filter = ""
+	end
+	if filter == "" then
+		stmt.count.all = 0
+	end
+	local utf8filter = AnsiToUTF8("%" .. filter .. "%")
+	stmt.count.filter[filter] = {}
+	stmt.Q:ClearBindings()
+	stmt.Q:BindAll(utf8filter, utf8filter)
+	for _, rec in ipairs(stmt.Q:GetAll()) do
+		if filter == "" then
+			stmt.count.all = stmt.count.all + rec.count
+		end
+		stmt.count.filter[filter][rec.channel] = rec.count
+	end
+	return stmt
+end
+
+local function CreateSTMT(name)
+	local stmt = {
+		name  = name,
+		count = {all = 0, filter = {[""] = {}}},
+		stime = name == "ChatLog" and  0 or tonumber((name:sub(9):gsub("_.*", ""))),
+		etime = name == "ChatLog" and -1 or tonumber((name:sub(9):gsub(".*_", ""))),
+		Q = DB:Prepare("SELECT channel, count(*) AS count FROM " .. name .. " WHERE talker LIKE ? OR text LIKE ? GROUP BY channel"),
+		W = DB:Prepare("REPLACE INTO " .. name .. " (hash, channel, time, talker, text, msg) VALUES (?, ?, ?, ?, ?, ?)"),
+		D = DB:Prepare("DELETE FROM " .. name .. " WHERE hash = ? AND time = ?"),
+	}
+	UpdateSTMTCountCache(stmt, "")
+	if not (stmt.Q and stmt.D and stmt.W and stmt.stime and stmt.etime) then
+		return MY.Debug({"Wrong table detected on CreateSTMT: " .. name}, "MY_ChatLog", MY_DEBUG.WARNING) and nil
+	end
+	return stmt
+end
+
+local function UpdateSTMTs()
+	if not DB then
+		return
+	end
+	STMT = {}
+	
+	local result = DB:Execute("SELECT name FROM sqlite_master WHERE type = 'table' AND name LIKE 'ChatLog/_%/_%' ESCAPE '/' ORDER BY name")
+	for _, rec in ipairs(result) do
+		local stmt = CreateSTMT(rec.name)
+		if stmt then
+			table.insert(STMT, stmt)
+		end
+	end
+	table.sort(STMT, function(a, b) return a.stime < b.stime end)
+	
+	CreateTable("ChatLog")
+	local activestmt = CreateSTMT("ChatLog")
+	
+	if activestmt.count.all > AUTO_DIVIDE_TABLE_AMOUNT then -- 自动分表策略
+		DB:Execute("BEGIN TRANSACTION")
+		while activestmt.count.all > AUTO_DIVIDE_TABLE_AMOUNT do
+			local etime = DB:Execute("SELECT time FROM ChatLog ORDER BY time ASC LIMIT 1 OFFSET " .. (AUTO_DIVIDE_TABLE_AMOUNT - 1))[1].time
+			local tname = "ChatLog_" .. activestmt.stime .. "_" .. etime
+			CreateTable(tname)
+			DB:Execute("REPLACE INTO " .. tname .. " SELECT * FROM ChatLog WHERE time <= " .. etime)
+			DB:Execute("DELETE FROM ChatLog WHERE time <= " .. etime)
+			local stmt = CreateSTMT(tname)
+			if stmt then
+				table.insert(STMT, stmt)
+			end
+			activestmt.stime = etime + 1
+			UpdateSTMTCountCache(activestmt, "")
+		end
+		DB:Execute("END TRANSACTION")
+	end
+	STMT[#STMT + 1] = activestmt
+end
 
 function InsertMsg(channel, text, msg, talker, time)
 	local hash
@@ -116,22 +199,110 @@ end
 function PushDB()
 	if #aInsQueue == 0 then
 		return
-	elseif not (DB and DB_W) then
+	elseif not DB then
 		return MY.Debug({"Database has not been initialized yet, PushDB failed."}, "MY_ChatLog", MY_DEBUG.ERROR)
 	end
 	DB:Execute("BEGIN TRANSACTION")
 	for _, data in ipairs(aInsQueue) do
-		DB_W:ClearBindings()
-		DB_W:BindAll(unpack(data))
-		DB_W:Execute()
+		for _, stmt in ipairs_r(STMT) do
+			if data[3] >= stmt.stime then
+				stmt.W:ClearBindings()
+				stmt.W:BindAll(unpack(data))
+				stmt.W:Execute()
+				break
+			end
+		end
 	end
-	for _, data in ipairs(aDelQueue) do
-		DB_D:ClearBindings()
-		DB_D:BindAll(unpack(data))
-		DB_D:Execute()
-	end
-	DB:Execute("END TRANSACTION")
 	aInsQueue = {}
+	for _, data in ipairs(aDelQueue) do
+		for _, stmt in ipairs_r(STMT) do
+			if data[2] >= stmt.stime then
+				stmt.D:ClearBindings()
+				stmt.D:BindAll(unpack(data))
+				stmt.D:Execute()
+				break
+			end
+		end
+	end
+	aDelQueue = {}
+	DB:Execute("END TRANSACTION")
+	
+	UpdateSTMTs()
+end
+
+function GetChatLogCount(channels, keyword)
+	local count = 0
+	for _, stmt in ipairs(STMT) do
+		if not stmt.count.filter[keyword] then
+			UpdateSTMTCountCache(stmt, keyword)
+		end
+		for _, channel in ipairs(channels) do
+			if stmt.count.filter[keyword][channel] then
+				count = count + stmt.count.filter[keyword][channel]
+			end
+		end
+	end
+	return count
+end
+
+function GetChatLog(channels, search, offset, limit)
+	local DB_R, wheres, values = nil, {}, {}
+	for _, channel in ipairs(channels) do
+		tinsert(wheres, "channel = ?")
+		tinsert(values, channel)
+	end
+	local sql  = ""
+	local where = ""
+	if #wheres > 0 then
+		where = where .. " (" .. tconcat(wheres, " OR ") .. ")"
+	else
+		where = " 1 = 0"
+	end
+	if search ~= "" then
+		if #where > 0 then
+			where = where .. " AND"
+		end
+		where = where .. " (talker LIKE ? OR text LIKE ?)"
+		tinsert(values, AnsiToUTF8("%" .. search .. "%"))
+		tinsert(values, AnsiToUTF8("%" .. search .. "%"))
+	end
+	if #where > 0 then
+		sql  = sql .. " WHERE" .. where
+	end
+	tinsert(values, limit)
+	tinsert(values, offset)
+	sql = sql .. " ORDER BY time ASC LIMIT ? OFFSET ?"
+	
+	local index, count, result, data = 0, 0, {}, nil
+	for _, stmt in ipairs(STMT) do
+		if limit == 0 then
+			break
+		end
+		if not stmt.count.filter[search] then
+			UpdateSTMTCountCache(stmt, search)
+		end
+		count = 0
+		for _, channel in ipairs(channels) do
+			if stmt.count.filter[search][channel] then
+				count = count + stmt.count.filter[search][channel]
+			end
+		end
+		if index <= offset and index + count > offset then
+			DB_R = DB:Prepare("SELECT * FROM " .. stmt.name .. sql)
+			DB_R:ClearBindings()
+			values[#values - 1] = limit
+			values[#values] = mmax(offset - index, 0)
+			DB_R:BindAll(unpack(values))
+			data = DB_R:GetAll()
+			for _, rec in ipairs(data) do
+				tinsert(result, rec)
+			end
+			limit = limit - #data
+		end
+		index = index + count
+	end
+	
+	return result
 end
 
 local function InitDB()
@@ -144,16 +315,10 @@ local function InitDB()
 	if not DB then
 		return MY.Debug({"Cannot connect to database!!!"}, "MY_ChatLog", MY_DEBUG.ERROR)
 	end
+	UpdateSTMTs()
 	local me = GetClientPlayer()
 	DB:Execute("CREATE TABLE IF NOT EXISTS ChatLogUser (userguid INTEGER, PRIMARY KEY (userguid))")
 	DB:Execute("REPLACE INTO ChatLogUser (userguid) VALUES (" .. me.GetGlobalID() .. ")")
-	
-	DB:Execute("CREATE TABLE IF NOT EXISTS ChatLog (hash INTEGER, channel INTEGER, time INTEGER, talker NVARCHAR(20), text NVARCHAR(400) NOT NULL, msg NVARCHAR(4000) NOT NULL, PRIMARY KEY (hash, time))")
-	DB:Execute("CREATE INDEX IF NOT EXISTS chatlog_channel_idx ON ChatLog(channel)")
-	DB:Execute("DROP INDEX IF EXISTS chatlog_time_idx ON ChatLog(time)")
-	DB:Execute("CREATE INDEX IF NOT EXISTS chatlog_text_idx ON ChatLog(text)")
-	DB_W = DB:Prepare("REPLACE INTO ChatLog (hash, channel, time, talker, text, msg) VALUES (?, ?, ?, ?, ?, ?)")
-	DB_D = DB:Prepare("DELETE FROM ChatLog WHERE hash = ? AND time = ?")
 	
 	local SZ_OLD_PATH = MY.FormatPath('userdata/CHAT_LOG/$uid/') -- %s/%s.$lang.jx3dat
 	if IsLocalFileExist(SZ_OLD_PATH) then
@@ -375,48 +540,22 @@ function MY_ChatLog.UpdatePage(frame, noscroll)
 	PushDB()
 	
 	local container = frame:Lookup("Window_Main/WndScroll_ChatChanel/WndContainer_ChatChanel")
-	local wheres = {}
-	local values = {}
+	local channels = {}
 	for i = 0, container:GetAllContentCount() - 1 do
 		local wnd = container:LookupContent(i)
 		if wnd:Lookup("CheckBox_ChatChannel"):IsCheckBoxChecked() then
 			for _, szChannel in ipairs(wnd.aChannels) do
-				tinsert(wheres, "channel = ?")
-				tinsert(values, CHANNELS_R[szChannel])
+				tinsert(channels, CHANNELS_R[szChannel])
 			end
 			MY_ChatLog.tUncheckedChannel[wnd.id] = nil
 		else
 			MY_ChatLog.tUncheckedChannel[wnd.id] = true
 		end
 	end
-	local sql  = "SELECT * FROM ChatLog"
-	local where = ""
-	local sqlc = "SELECT count(*) AS count FROM ChatLog"
-	if #wheres > 0 then
-		where = where .. " (" .. tconcat(wheres, " OR ") .. ")"
-	else
-		where = " 1 = 0"
-	end
 	local search = frame:Lookup("Window_Main/Wnd_Search/Edit_Search"):GetText()
-	if search ~= "" then
-		if #where > 0 then
-			where = where .. " AND"
-		end
-		where = where .. " (talker LIKE ? OR text LIKE ?)"
-		tinsert(values, AnsiToUTF8("%" .. search .. "%"))
-		tinsert(values, AnsiToUTF8("%" .. search .. "%"))
-	end
-	if #where > 0 then
-		sql  = sql  .. " WHERE" .. where
-		sqlc = sqlc .. " WHERE" .. where
-	end
-	sql  = sql  .. " ORDER BY time ASC"
-	sqlc = sqlc .. " ORDER BY time ASC"
 	
-	local DB_RC = DB:Prepare(sqlc)
-	DB_RC:BindAll(unpack(values))
-	local data = DB_RC:GetNext()
-	local nPageCount = mceil(data.count / PAGE_AMOUNT)
+	local nCount = GetChatLogCount(channels, search)
+	local nPageCount = mceil(nCount / PAGE_AMOUNT)
 	local bInit = not frame.nCurrentPage
 	if bInit then
 		frame.nCurrentPage = nPageCount
@@ -470,10 +609,7 @@ function MY_ChatLog.UpdatePage(frame, noscroll)
 	handle:SetSizeByAllItemSize()
 	hOuter:FormatAllItemPos()
 	
-	sql = sql .. " LIMIT " .. PAGE_AMOUNT .. " OFFSET " .. ((frame.nCurrentPage - 1) * PAGE_AMOUNT)
-	local DB_R = DB:Prepare(sql)
-	DB_R:BindAll(unpack(values))
-	local data = DB_R:GetAll()
+	local data = GetChatLog(channels, search, (frame.nCurrentPage - 1) * PAGE_AMOUNT, PAGE_AMOUNT)
 	local scroll = frame:Lookup("Window_Main/WndScroll_ChatLog/Scroll_ChatLog")
 	local handle = frame:Lookup("Window_Main/WndScroll_ChatLog", "Handle_ChatLogs")
 	for i = 1, PAGE_AMOUNT do
@@ -484,7 +620,7 @@ function MY_ChatLog.UpdatePage(frame, noscroll)
 			local r, g, b = GetMsgFontColor(CHANNELS[rec.channel])
 			local h = hItem:Lookup("Handle_ChatLog_Msg")
 			h:Clear()
-			h:AppendItemFromString(MY.GetTimeLinkText({r=r, g=g, b=b, f=f, s='[yyyy/MM/dd][hh:mm:ss]'}, rec.time))
+			h:AppendItemFromString(MY.GetTimeLinkText({r=r, g=g, b=b, f=f, s=rec.time..'[yyyy/MM/dd][hh:mm:ss]'}, rec.time))
 			local nCount = h:GetItemCount()
 			h:AppendItemFromString(UTF8ToAnsi(rec.msg))
 			for i = nCount, h:GetItemCount() - 1 do
