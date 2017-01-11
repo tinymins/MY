@@ -246,11 +246,11 @@ function OptimizeDB(deep)
 		end
 		DB:Execute("DELETE FROM ChatLog WHERE time <= " .. etime)
 	end
+	DB:Execute("END TRANSACTION")
+	
 	if deep then
 		DB:Execute("VACUUM")
 	end
-	DB:Execute("END TRANSACTION")
-	
 	UpdateSTMTs()
 end
 
