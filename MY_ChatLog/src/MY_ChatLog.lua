@@ -40,7 +40,8 @@ local TONG_MEMBER_LOGOUT_MSG = '^' .. MY.String.PatternEscape(g_tStrings.STR_GUI
 local PAGE_AMOUNT = 150
 local EXPORT_SLICE = 100
 local PAGE_DISPLAY = 14
-local AUTO_DIVIDE_TABLE_AMOUNT = 30000
+local DIVIDE_TABLE_AMOUNT = 30000 -- 如果某张表大小超过30000
+local SINGLE_TABLE_AMOUNT = 20000 -- 则将最久远的20000条消息独立成表
 local SZ_INI = MY.GetAddonInfo().szRoot .. "MY_ChatLog/ui/MY_ChatLog.ini"
 local LOG_TYPE = {
 	{id = "whisper", title = g_tStrings.tChannelName["MSG_WHISPER"       ], channels = {"MSG_WHISPER"       }},
@@ -84,7 +85,6 @@ local DB, InsertMsg, DeleteMsg, PushDB, GetChatLogCount, GetChatLog
 
 do
 local STMT = {}
-local DB_W, DB_D
 local aInsQueue = {}
 local aDelQueue = {}
 -- ===== 性能测试 =====
@@ -95,6 +95,14 @@ local aDelQueue = {}
 -- for i = 1, 60000 do
 -- 	table.insert(aInsQueue, {hash, channel, GetCurrentTime() - i * 30, "tester", text, msg})
 -- end
+
+local function RenameTable(oldname, newname)Output(oldname, newname)
+	DB:Execute("DROP INDEX IF EXISTS " .. oldname .. "_channel_idx")
+	DB:Execute("DROP INDEX IF EXISTS " .. oldname .. "_text_idx")
+	DB:Execute("ALTER TABLE " .. oldname .. " RENAME TO " .. newname)
+	DB:Execute("CREATE INDEX IF NOT EXISTS " .. newname .. "_channel_idx ON " .. newname .. "(channel)")
+	DB:Execute("CREATE INDEX IF NOT EXISTS " .. newname .. "_text_idx ON " .. newname .. "(text)")
+end
 
 local function CreateTable(name)
 	DB:Execute("CREATE TABLE IF NOT EXISTS " .. name .. " (hash INTEGER, channel INTEGER, time INTEGER, talker NVARCHAR(20), text NVARCHAR(400) NOT NULL, msg NVARCHAR(4000) NOT NULL, PRIMARY KEY (hash, time))")
@@ -149,32 +157,17 @@ local function UpdateSTMTs()
 	for _, rec in ipairs(result) do
 		local stmt = CreateSTMT(rec.name)
 		if stmt then
-			table.insert(STMT, stmt)
+			tinsert(STMT, stmt)
 		end
 	end
 	table.sort(STMT, function(a, b) return a.stime < b.stime end)
 	
 	CreateTable("ChatLog")
-	local activestmt = CreateSTMT("ChatLog")
-	
-	if activestmt.count.all > AUTO_DIVIDE_TABLE_AMOUNT then -- 自动分表策略
-		DB:Execute("BEGIN TRANSACTION")
-		while activestmt.count.all > AUTO_DIVIDE_TABLE_AMOUNT do
-			local etime = DB:Execute("SELECT time FROM ChatLog ORDER BY time ASC LIMIT 1 OFFSET " .. (AUTO_DIVIDE_TABLE_AMOUNT - 1))[1].time
-			local tname = "ChatLog_" .. activestmt.stime .. "_" .. etime
-			CreateTable(tname)
-			DB:Execute("REPLACE INTO " .. tname .. " SELECT * FROM ChatLog WHERE time <= " .. etime)
-			DB:Execute("DELETE FROM ChatLog WHERE time <= " .. etime)
-			local stmt = CreateSTMT(tname)
-			if stmt then
-				table.insert(STMT, stmt)
-			end
-			activestmt.stime = etime + 1
-			UpdateSTMTCountCache(activestmt, "")
-		end
-		DB:Execute("END TRANSACTION")
+	local stmt = CreateSTMT("ChatLog")
+	if #STMT > 0 then
+		stmt.stime = STMT[#STMT].etime + 1
 	end
-	STMT[#STMT + 1] = activestmt
+	tinsert(STMT, stmt)
 end
 
 function InsertMsg(channel, text, msg, talker, time)
@@ -194,6 +187,71 @@ function DeleteMsg(hash, time)
 		return
 	end
 	table.insert(aDelQueue, {hash, time})
+end
+
+local function OptimizeDB(deep)
+	if not DB then
+		return
+	end
+	local tables = {}
+	local result = DB:Execute("SELECT name FROM sqlite_master WHERE type = 'table' AND name LIKE 'ChatLog/_%/_%' ESCAPE '/' ORDER BY name")
+	for _, rec in ipairs(result) do
+		tinsert(tables, {
+			name  = rec.name,
+			stime = tonumber((rec.name:sub(9):gsub("_.*", ""))),
+ 			etime = tonumber((rec.name:sub(9):gsub(".*_", ""))),
+			count = DB:Execute("SELECT count(*) AS count FROM " .. rec.name)[1].count,
+		})
+	end
+	table.sort(tables, function(a, b) return a.stime < b.stime end)
+	
+	DB:Execute("BEGIN TRANSACTION")
+	-- 拆历史记录中的大表（如果存在）
+	if deep then
+		for i, info in ipairs(tables) do
+			if info.count > DIVIDE_TABLE_AMOUNT then Output(info)
+				local etime = DB:Execute("SELECT time FROM " .. info.name .. " ORDER BY time ASC LIMIT 1 OFFSET " .. (SINGLE_TABLE_AMOUNT - 1))[1].time
+				local newinfo = {
+					name  = "ChatLog_" .. info.stime .. "_" .. etime,
+					stime = info.stime,
+		 			etime = etime,
+				}
+				tinsert(tables, i, newinfo)
+				CreateTable(newinfo.name)
+				DB:Execute("REPLACE INTO " .. newinfo.name .. " SELECT * FROM " .. info.name .. " WHERE time <= " .. etime)
+				DB:Execute("DELETE FROM " .. info.name .. " WHERE time <= " .. etime)
+				newinfo.count = DB:Execute("SELECT count(*) AS count FROM " .. newinfo.name)[1].count
+				info.count = DB:Execute("SELECT count(*) AS count FROM " .. info.name)[1].count
+				
+				local oldname = info.name
+				info.name = "ChatLog_" .. (etime + 1) .. "_" .. info.etime
+				RenameTable(oldname, info.name)Output(info, newinfo)
+			end
+		end
+	end
+	
+	-- 拆当前记录的ChatLog表（如果超长）
+	local count = DB:Execute("SELECT count(*) AS count FROM ChatLog")[1].count
+	if count > DIVIDE_TABLE_AMOUNT then
+		local stime, etime = #tables > 0 and (tables[#tables].etime + 1) or 0, 0
+		local index = SINGLE_TABLE_AMOUNT
+		while index < count do
+			etime = DB:Execute("SELECT time FROM ChatLog ORDER BY time ASC LIMIT 1 OFFSET " .. (index - 1))[1].time
+			local name = "ChatLog_" .. stime .. "_" .. etime
+			CreateTable(name)
+			DB:Execute("REPLACE INTO " .. name .. " SELECT * FROM ChatLog WHERE time <= " .. etime .. " AND time >= " .. stime)
+			
+			stime = etime + 1
+			index = index + SINGLE_TABLE_AMOUNT
+		end
+		DB:Execute("DELETE FROM ChatLog WHERE time <= " .. etime)
+	end
+	if deep then
+		DB:Execute("VACUUM")
+	end
+	DB:Execute("END TRANSACTION")
+	
+	UpdateSTMTs()
 end
 
 function PushDB()
@@ -227,7 +285,7 @@ function PushDB()
 	aDelQueue = {}
 	DB:Execute("END TRANSACTION")
 	
-	UpdateSTMTs()
+	OptimizeDB(false)
 end
 
 function GetChatLogCount(channels, keyword)
@@ -620,7 +678,7 @@ function MY_ChatLog.UpdatePage(frame, noscroll)
 			local r, g, b = GetMsgFontColor(CHANNELS[rec.channel])
 			local h = hItem:Lookup("Handle_ChatLog_Msg")
 			h:Clear()
-			h:AppendItemFromString(MY.GetTimeLinkText({r=r, g=g, b=b, f=f, s=rec.time..'[yyyy/MM/dd][hh:mm:ss]'}, rec.time))
+			h:AppendItemFromString(MY.GetTimeLinkText({r=r, g=g, b=b, f=f, s='[yyyy/MM/dd][hh:mm:ss]'}, rec.time))
 			local nCount = h:GetItemCount()
 			h:AppendItemFromString(UTF8ToAnsi(rec.msg))
 			for i = nCount, h:GetItemCount() - 1 do
@@ -1001,6 +1059,15 @@ function PS.OnPanelActive(wnd)
 		text = _L["open chatlog"],
 		onclick = function()
 			MY_ChatLog.Open()
+		end,
+	})
+	y = y + dy
+	
+	ui:append("WndButton", {
+		x = x, y = y, w = 150,
+		text = _L["optimize/compress datebase"],
+		onclick = function()
+			OptimizeDB(true)
 		end,
 	})
 	y = y + dy
