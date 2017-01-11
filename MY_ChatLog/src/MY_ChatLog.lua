@@ -96,7 +96,7 @@ local aDelQueue = {}
 -- 	table.insert(aInsQueue, {hash, channel, GetCurrentTime() - i * 30, "tester", text, msg})
 -- end
 
-local function RenameTable(oldname, newname)Output(oldname, newname)
+local function RenameTable(oldname, newname)
 	DB:Execute("DROP INDEX IF EXISTS " .. oldname .. "_channel_idx")
 	DB:Execute("DROP INDEX IF EXISTS " .. oldname .. "_text_idx")
 	DB:Execute("ALTER TABLE " .. oldname .. " RENAME TO " .. newname)
@@ -209,7 +209,7 @@ local function OptimizeDB(deep)
 	-- 拆历史记录中的大表（如果存在）
 	if deep then
 		for i, info in ipairs(tables) do
-			if info.count > DIVIDE_TABLE_AMOUNT then Output(info)
+			if info.count > DIVIDE_TABLE_AMOUNT then
 				local etime = DB:Execute("SELECT time FROM " .. info.name .. " ORDER BY time ASC LIMIT 1 OFFSET " .. (SINGLE_TABLE_AMOUNT - 1))[1].time
 				local newinfo = {
 					name  = "ChatLog_" .. info.stime .. "_" .. etime,
@@ -225,7 +225,7 @@ local function OptimizeDB(deep)
 				
 				local oldname = info.name
 				info.name = "ChatLog_" .. (etime + 1) .. "_" .. info.etime
-				RenameTable(oldname, info.name)Output(info, newinfo)
+				RenameTable(oldname, info.name)
 			end
 		end
 	end
@@ -255,7 +255,7 @@ local function OptimizeDB(deep)
 end
 
 function PushDB()
-	if #aInsQueue == 0 then
+	if #aInsQueue == 0 and #aDelQueue == 0 then
 		return
 	elseif not DB then
 		return MY.Debug({"Database has not been initialized yet, PushDB failed."}, "MY_ChatLog", MY_DEBUG.ERROR)
@@ -284,7 +284,7 @@ function PushDB()
 	end
 	aDelQueue = {}
 	DB:Execute("END TRANSACTION")
-	
+	-- 重建缓存记录 自动分表
 	OptimizeDB(false)
 end
 
