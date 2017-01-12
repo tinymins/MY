@@ -81,7 +81,7 @@ local CHANNELS = {
 	[21] = "MSG_TONG_FUND",
 }
 local CHANNELS_R = (function() local t = {} for k, v in pairs(CHANNELS) do t[v] = k end return t end)()
-local DB, InsertMsg, DeleteMsg, PushDB, GetChatLogCount, GetChatLog, OptimizeDB
+local DB, InsertMsg, DeleteMsg, PushDB, GetChatLogCount, GetChatLog, OptimizeDB, FixSearchDB
 
 do
 local STMT = {}
@@ -252,6 +252,26 @@ function OptimizeDB(deep)
 		DB:Execute("VACUUM")
 	end
 	UpdateSTMTs()
+end
+
+function FixSearchDB()
+	if not DB then
+		return
+	end
+	local count = 0
+	DB:Execute("BEGIN TRANSACTION")
+	for _, stmt in ipairs(STMT) do
+		local DB_W = DB:Prepare("UPDATE " .. stmt.name .. " SET text = ? WHERE hash = ? and time = ?")
+		local result = DB:Execute("SELECT hash, time, msg FROM " .. stmt.name .. " WHERE text = ''")
+		for _, rec in ipairs(result) do
+			DB_W:ClearBindings()
+			DB_W:BindAll(GetPureText(rec.msg) or "", rec.hash, rec.time)
+			DB_W:Execute()
+		end
+		count = count + #result
+	end
+	DB:Execute("END TRANSACTION")
+	return count
 end
 
 function PushDB()
@@ -1046,6 +1066,19 @@ function PS.OnPanelActive(wnd)
 				MY.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
 					OptimizeDB(true)
 					MY.Alert(_L["Optimize finished!"])
+				end)
+			end)
+		end,
+	})
+	y = y + dy
+	
+	ui:append("WndButton", {
+		x = x, y = y, w = 150,
+		text = _L["fix search datebase"],
+		onclick = function()
+			MY.Confirm(_L['fix search datebase may take a long time and cause a disconnection, are you sure to continue?'], function()
+				MY.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
+					MY.Alert(_L("%d chatlogs fixed!", FixSearchDB()))
 				end)
 			end)
 		end,
