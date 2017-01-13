@@ -99,10 +99,10 @@ local aDelQueue = {}
 
 function InsertMsg(channel, text, msg, talker, time)
 	local hash
-	msg    = AnsiToUTF8(msg)
-	text   = AnsiToUTF8(text) or ""
+	msg    = AnsiToUTF8(msg or "") or ""
+	text   = AnsiToUTF8(text or "") or ""
 	hash   = GetStringCRC(msg)
-	talker = talker and AnsiToUTF8(talker) or ""
+	talker = talker and AnsiToUTF8(talker or "") or ""
 	if not channel or not time or empty(msg) or not text or empty(hash) then
 		return
 	end
@@ -216,7 +216,7 @@ function InitDB()
 	return true
 end
 
-function FixSearchDB()
+function FixSearchDB(deep)
 	if not InitDB() then
 		return
 	end
@@ -226,10 +226,10 @@ function FixSearchDB()
 	local tables = DB:Execute("SELECT * FROM ChatLogIndex ORDER BY stime ASC")
 	for _, info in ipairs(tables) do
 		local DB_W = DB:Prepare("UPDATE " .. info.name .. " SET text = ? WHERE hash = ? and time = ?")
-		local result = DB:Execute("SELECT hash, time, msg FROM " .. info.name .. " WHERE text = ''")
+		local result = DB:Execute("SELECT hash, time, msg FROM " .. info.name .. (deep and "" or " WHERE text = ''"))
 		for _, rec in ipairs(result) do
 			DB_W:ClearBindings()
-			DB_W:BindAll(GetPureText(UTF8ToAnsi(rec.msg)) or "", rec.hash, rec.time)
+			DB_W:BindAll(AnsiToUTF8(GetPureText(UTF8ToAnsi(rec.msg) or "") or "") or "", rec.hash, rec.time)
 			DB_W:Execute()
 		end
 		count = count + #result
@@ -1153,18 +1153,18 @@ function PS.OnPanelActive(wnd)
 	
 	ui:append("WndButton", {
 		x = x, y = y, w = 150,
-		text = _L["export chatlog"],
+		text = _L["open chatlog"],
 		onclick = function()
-			MY_ChatLog.ExportConfirm()
+			MY_ChatLog.Open()
 		end,
 	})
 	y = y + dy
 	
 	ui:append("WndButton", {
 		x = x, y = y, w = 150,
-		text = _L["open chatlog"],
+		text = _L["export chatlog"],
 		onclick = function()
-			MY_ChatLog.Open()
+			MY_ChatLog.ExportConfirm()
 		end,
 	})
 	y = y + dy
@@ -1190,6 +1190,19 @@ function PS.OnPanelActive(wnd)
 			MY.Confirm(_L['fix search datebase may take a long time and cause a disconnection, are you sure to continue?'], function()
 				MY.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
 					MY.Alert(_L("%d chatlogs fixed!", FixSearchDB()))
+				end)
+			end)
+		end,
+	})
+	y = y + dy
+	
+	ui:append("WndButton", {
+		x = x, y = y, w = 150,
+		text = _L["reindex search datebase"],
+		onclick = function()
+			MY.Confirm(_L['reindex search datebase may take a long time and cause a disconnection, are you sure to continue?'], function()
+				MY.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
+					MY.Alert(_L("%d chatlogs reindexed!", FixSearchDB(true)))
 				end)
 			end)
 		end,
