@@ -229,7 +229,7 @@ function FixSearchDB()
 		local result = DB:Execute("SELECT hash, time, msg FROM " .. info.name .. " WHERE text = ''")
 		for _, rec in ipairs(result) do
 			DB_W:ClearBindings()
-			DB_W:BindAll(GetPureText(rec.msg) or "", rec.hash, rec.time)
+			DB_W:BindAll(GetPureText(UTF8ToAnsi(rec.msg)) or "", rec.hash, rec.time)
 			DB_W:Execute()
 		end
 		count = count + #result
