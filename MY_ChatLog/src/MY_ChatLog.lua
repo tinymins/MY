@@ -265,7 +265,7 @@ function OptimizeDB(deep)
 		end
 		for i, info in ipairs(tables) do
 			DB:Execute("DELETE FROM " .. info.name .. where)
-			DB:Execute("UPDATE ChatLogIndex SET count = (SELECT count(*) FROM " .. info.name .. "), detailcount = '' WHERE name = " .. info.name)
+			DB:Execute("UPDATE ChatLogIndex SET count = (SELECT count(*) FROM " .. info.name .. "), detailcount = '' WHERE name = '" .. info.name .. "'")
 		end
 		MY.Debug({"Deleting unwatched channels finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
 	end
@@ -308,8 +308,8 @@ function OptimizeDB(deep)
 				MY.Debug({"Merging small chatlog table: " .. info.name .. ", " .. nextinfo.name}, "MY_ChatLog", MY_DEBUG.LOG)
 				DB:Execute("REPLACE INTO " .. info.name .. " SELECT * FROM " .. nextinfo.name)
 				DB:Execute("DROP TABLE " .. nextinfo.name)
-				DB:Execute("UPDATE ChatLogIndex SET count = (SELECT count(*) FROM " .. info.name .. "), detailcount = '', etime = " .. nextinfo.etime .. " WHERE name = " .. info.name)
-				DB:Execute("DELETE FROM ChatLogIndex WHERE name = " .. nextinfo.name)
+				DB:Execute("UPDATE ChatLogIndex SET count = (SELECT count(*) FROM " .. info.name .. "), detailcount = '', etime = " .. nextinfo.etime .. " WHERE name = '" .. info.name .. "'")
+				DB:Execute("DELETE FROM ChatLogIndex WHERE name = '" .. nextinfo.name .. "'")
 				tremove(tables, i + 1)
 				MY.Debug({"Merging small chatlog table (" .. info.name .. ", " .. nextinfo.name .. ") finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
 			end
