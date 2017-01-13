@@ -608,11 +608,13 @@ end
 
 function MY_ChatLog.OnCheckBoxCheck()
 	this:GetRoot().nCurrentPage = nil
+	this:GetRoot().nLastClickIndex = nil
 	MY_ChatLog.UpdatePage(this:GetRoot())
 end
 
 function MY_ChatLog.OnCheckBoxUncheck()
 	this:GetRoot().nCurrentPage = nil
+	this:GetRoot().nLastClickIndex = nil
 	MY_ChatLog.UpdatePage(this:GetRoot())
 end
 
@@ -621,6 +623,31 @@ function MY_ChatLog.OnItemLButtonClick()
 	if name == "Handle_Index" then
 		this:GetRoot().nCurrentPage = this.nPage
 		MY_ChatLog.UpdatePage(this:GetRoot())
+	elseif name == "Handle_ChatLog" then
+		local nLastClickIndex = this:GetRoot().nLastClickIndex
+		if IsCtrlKeyDown() then
+			this:Lookup("Shadow_ChatLogSelect"):SetVisible(not this:Lookup("Shadow_ChatLogSelect"):IsVisible())
+		elseif IsShiftKeyDown() then
+			if nLastClickIndex then
+				local hList, hItem = this:GetParent()
+				for i = nLastClickIndex, this:GetIndex(), (nLastClickIndex - this:GetIndex() > 0 and -1 or 1) do
+					hItem = hList:Lookup(i)
+					if hItem:IsVisible() then
+						hItem:Lookup("Shadow_ChatLogSelect"):Show()
+					end
+				end
+			end
+		else
+			local hList, hItem = this:GetParent()
+			for i = 0, hList:GetItemCount() - 1 do
+				hItem = hList:Lookup(i)
+				if hItem:IsVisible() then
+					hItem:Lookup("Shadow_ChatLogSelect"):Hide()
+				end
+			end
+			this:Lookup("Shadow_ChatLogSelect"):Show()
+		end
+		this:GetRoot().nLastClickIndex = this:GetIndex()
 	end
 end
 
@@ -641,11 +668,43 @@ function MY_ChatLog.OnItemRButtonClick()
 	local this = this
 	local name = this:GetName()
 	if name == "Handle_ChatLog" then
+		local nLastClickIndex = this:GetRoot().nLastClickIndex
+		if IsCtrlKeyDown() then
+			this:Lookup("Shadow_ChatLogSelect"):SetVisible(not this:Lookup("Shadow_ChatLogSelect"):IsVisible())
+		elseif IsShiftKeyDown() then
+			if nLastClickIndex then
+				local hList, hItem = this:GetParent()
+				for i = nLastClickIndex, this:GetIndex(), (nLastClickIndex - this:GetIndex() > 0 and -1 or 1) do
+					hItem = hList:Lookup(i)
+					if hItem:IsVisible() then
+						hItem:Lookup("Shadow_ChatLogSelect"):Show()
+					end
+				end
+			end
+		elseif not this:Lookup("Shadow_ChatLogSelect"):IsVisible() then
+			local hList, hItem = this:GetParent()
+			for i = 0, hList:GetItemCount() - 1 do
+				hItem = hList:Lookup(i)
+				if hItem:IsVisible() then
+					hItem:Lookup("Shadow_ChatLogSelect"):Hide()
+				end
+			end
+			this:Lookup("Shadow_ChatLogSelect"):Show()
+		end
+		this:GetRoot().nLastClickIndex = this:GetIndex()
+		
 		local menu = {
 			{
 				szOption = _L["delete record"],
 				fnAction = function()
-					DeleteMsg(this.hash, this.time)
+					local hList, hItem = this:GetParent()
+					for i = 0, hList:GetItemCount() - 1 do
+						hItem = hList:Lookup(i)
+						if hItem:IsVisible() and hItem:Lookup("Shadow_ChatLogSelect"):IsVisible() then
+							DeleteMsg(hItem.hash, hItem.time)
+						end
+					end
+					this:GetRoot().nLastClickIndex = nil
 					MY_ChatLog.UpdatePage(this:GetRoot(), true)
 				end,
 			}, {
@@ -760,11 +819,15 @@ function MY_ChatLog.UpdatePage(frame, noscroll)
 			h:FormatAllItemPos()
 			local nW, nH = h:GetAllItemSize()
 			h:SetH(nH)
-			hItem:Lookup("Shadow_ChatLogBg"):SetH(nH + 3)
+			hItem:Lookup("Shadow_ChatLogHover"):SetH(nH + 3)
+			hItem:Lookup("Shadow_ChatLogSelect"):SetH(nH + 3)
 			hItem:SetH(nH + 3)
 			hItem.hash = rec.hash
 			hItem.time = rec.time
 			hItem.text = rec.text
+			if not frame.nLastClickIndex then
+				hItem:Lookup("Shadow_ChatLogSelect"):Hide()
+			end
 			hItem:Show()
 		else
 			hItem:Hide()
