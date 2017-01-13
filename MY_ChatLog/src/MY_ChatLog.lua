@@ -257,7 +257,7 @@ function OptimizeDB(deep)
 				tChannels[szChannel] = true
 			end
 		end
-		for nChannel, szChannel in pairs(tChannels) do
+		for szChannel, _ in pairs(tChannels) do
 			tinsert(aWheres, "channel <> " .. CHANNELS_R[szChannel])
 		end
 		if #aWheres > 0 then
