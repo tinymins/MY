@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-01-11 18:29:13
+-- @Last modified time: 2017-01-13 15:26:24
 --------------------------------------------
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Focus/lang/")
@@ -871,6 +871,10 @@ MY.RegisterTargetAddonMenu('MY_Focus', function()
 		return {
 			szOption = _L['add to focus list'],
 			fnAction = function()
+				if not MY_Focus.bEnable then
+					MY_Focus.bEnable = true
+					MY_Focus.Open()
+				end
 				MY_Focus.AddStaticFocus(dwType, dwID)
 			end,
 		}
@@ -878,11 +882,19 @@ MY.RegisterTargetAddonMenu('MY_Focus', function()
 		return {{
 			szOption = _L['add to focus list'],
 			fnAction = function()
+				if not MY_Focus.bEnable then
+					MY_Focus.bEnable = true
+					MY_Focus.Open()
+				end
 				MY_Focus.AddStaticFocus(dwType, dwID)
 			end,
 		}, {
 			szOption = _L['add to static focus list'],
 			fnAction = function()
+				if not MY_Focus.bEnable then
+					MY_Focus.bEnable = true
+					MY_Focus.Open()
+				end
 				MY_Focus.AddStaticFocus(dwType, dwID, true)
 			end,
 		}}
