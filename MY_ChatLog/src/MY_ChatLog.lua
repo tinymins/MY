@@ -467,7 +467,9 @@ function GetChatLog(channels, search, offset, limit)
 			DB_R:BindAll(unpack(values))
 			data = DB_R:GetAll()
 			for _, rec in ipairs(data) do
-				tinsert(result, rec)
+				if rec.hash == GetStringCRC(rec.msg) then
+					tinsert(result, rec)
+				end
 			end
 			limit = limit - #data
 		end
