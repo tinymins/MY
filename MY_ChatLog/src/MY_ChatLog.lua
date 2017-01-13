@@ -81,10 +81,11 @@ local CHANNELS = {
 	[21] = "MSG_TONG_FUND",
 }
 local CHANNELS_R = (function() local t = {} for k, v in pairs(CHANNELS) do t[v] = k end return t end)()
-local DB, InsertMsg, DeleteMsg, PushDB, GetChatLogCount, GetChatLog, OptimizeDB, FixSearchDB
+local DB, InitDB, InsertMsg, DeleteMsg, PushDB, GetChatLogCount, GetChatLog, OptimizeDB, FixSearchDB
 
 do
 local STMT = {}
+local DB_CR, DB_CW
 local aInsQueue = {}
 local aDelQueue = {}
 -- ===== 性能测试 =====
@@ -96,80 +97,6 @@ local aDelQueue = {}
 -- 	table.insert(aInsQueue, {hash, channel, GetCurrentTime() - i * 30, "tester", text, msg})
 -- end
 
-local function RenameTable(oldname, newname)
-	DB:Execute("DROP INDEX IF EXISTS " .. oldname .. "_channel_idx")
-	DB:Execute("DROP INDEX IF EXISTS " .. oldname .. "_text_idx")
-	DB:Execute("ALTER TABLE " .. oldname .. " RENAME TO " .. newname)
-	DB:Execute("CREATE INDEX IF NOT EXISTS " .. newname .. "_channel_idx ON " .. newname .. "(channel)")
-	DB:Execute("CREATE INDEX IF NOT EXISTS " .. newname .. "_text_idx ON " .. newname .. "(text)")
-end
-
-local function CreateTable(name)
-	DB:Execute("CREATE TABLE IF NOT EXISTS " .. name .. " (hash INTEGER, channel INTEGER, time INTEGER, talker NVARCHAR(20), text NVARCHAR(400) NOT NULL, msg NVARCHAR(4000) NOT NULL, PRIMARY KEY (hash, time))")
-	DB:Execute("CREATE INDEX IF NOT EXISTS " .. name .. "_channel_idx ON " .. name .. "(channel)")
-	DB:Execute("CREATE INDEX IF NOT EXISTS " .. name .. "_text_idx ON " .. name .. "(text)")
-end
-
-local function UpdateSTMTCountCache(stmt, filter)
-	if not filter then
-		filter = ""
-	end
-	if filter == "" then
-		stmt.count.all = 0
-	end
-	local utf8filter = AnsiToUTF8("%" .. filter .. "%")
-	stmt.count.filter[filter] = {}
-	stmt.Q:ClearBindings()
-	stmt.Q:BindAll(utf8filter, utf8filter)
-	for _, rec in ipairs(stmt.Q:GetAll()) do
-		if filter == "" then
-			stmt.count.all = stmt.count.all + rec.count
-		end
-		stmt.count.filter[filter][rec.channel] = rec.count
-	end
-	return stmt
-end
-
-local function CreateSTMT(name)
-	local stmt = {
-		name  = name,
-		count = {all = 0, filter = {[""] = {}}},
-		stime = name == "ChatLog" and  0 or tonumber((name:sub(9):gsub("_.*", ""))),
-		etime = name == "ChatLog" and -1 or tonumber((name:sub(9):gsub(".*_", ""))),
-		Q = DB:Prepare("SELECT channel, count(*) AS count FROM " .. name .. " WHERE talker LIKE ? OR text LIKE ? GROUP BY channel"),
-		W = DB:Prepare("REPLACE INTO " .. name .. " (hash, channel, time, talker, text, msg) VALUES (?, ?, ?, ?, ?, ?)"),
-		D = DB:Prepare("DELETE FROM " .. name .. " WHERE hash = ? AND time = ?"),
-	}
-	UpdateSTMTCountCache(stmt, "")
-	if not (stmt.Q and stmt.D and stmt.W and stmt.stime and stmt.etime) then
-		return MY.Debug({"Wrong table detected on CreateSTMT: " .. name}, "MY_ChatLog", MY_DEBUG.WARNING) and nil
-	end
-	return stmt
-end
-
-local function UpdateSTMTs()
-	if not DB then
-		return
-	end
-	STMT = {}
-	
-	local result = DB:Execute("SELECT name FROM sqlite_master WHERE type = 'table' AND name LIKE 'ChatLog/_%/_%' ESCAPE '/' ORDER BY name")
-	for _, rec in ipairs(result) do
-		local stmt = CreateSTMT(rec.name)
-		if stmt then
-			tinsert(STMT, stmt)
-		end
-	end
-	table.sort(STMT, function(a, b) return a.stime < b.stime end)
-	
-	CreateTable("ChatLog")
-	local stmt = CreateSTMT("ChatLog")
-	if #STMT > 0 then
-		stmt.stime = STMT[#STMT].etime + 1
-	end
-	tinsert(STMT, stmt)
-end
-
 function InsertMsg(channel, text, msg, talker, time)
 	local hash
 	msg    = AnsiToUTF8(msg)
@@ -179,7 +106,7 @@ function InsertMsg(channel, text, msg, talker, time)
 	if not channel or not time or empty(msg) or not text or empty(hash) then
 		return
 	end
-	table.insert(aInsQueue, {hash, channel, time, talker, text, msg})
+	tinsert(aInsQueue, {hash, channel, time, talker, text, msg})
 end
 
 function DeleteMsg(hash, time)
@@ -189,80 +116,117 @@ function DeleteMsg(hash, time)
 	table.insert(aDelQueue, {hash, time})
 end
 
-function OptimizeDB(deep)
+local function CreateTable()
+	local name
+	repeat
+		name = ("ChatLog_%x"):format(math.random(0x100000, 0xFFFFFF))
+	until DB:Execute("SELECT count(*) AS count FROM sqlite_master WHERE type = 'table' AND name = '" .. name .. "'")[1].count == 0
+	DB:Execute("CREATE TABLE IF NOT EXISTS " .. name .. " (hash INTEGER, channel INTEGER, time INTEGER, talker NVARCHAR(20), text NVARCHAR(400) NOT NULL, msg NVARCHAR(4000) NOT NULL, PRIMARY KEY (time, hash))")
+	DB:Execute("CREATE INDEX IF NOT EXISTS " .. name .. "_channel_idx ON " .. name .. "(channel)")
+	DB:Execute("CREATE INDEX IF NOT EXISTS " .. name .. "_talker_idx ON " .. name .. "(talker)")
+	DB:Execute("CREATE INDEX IF NOT EXISTS " .. name .. "_text_idx ON " .. name .. "(text)")
+	return name
+end
+
+function InitDB()
 	if not DB then
-		return
-	end
-	local tables = {}
-	local result = DB:Execute("SELECT name FROM sqlite_master WHERE type = 'table' AND name LIKE 'ChatLog/_%/_%' ESCAPE '/' ORDER BY name")
-	for _, rec in ipairs(result) do
-		tinsert(tables, {
-			name  = rec.name,
-			stime = tonumber((rec.name:sub(9):gsub("_.*", ""))),
- 			etime = tonumber((rec.name:sub(9):gsub(".*_", ""))),
-			count = DB:Execute("SELECT count(*) AS count FROM " .. rec.name)[1].count,
-		})
-	end
-	table.sort(tables, function(a, b) return a.stime < b.stime end)
-	
-	DB:Execute("BEGIN TRANSACTION")
-	-- 拆历史记录中的大表（如果存在）
-	if deep then
-		for i, info in ipairs(tables) do
-			if info.count > DIVIDE_TABLE_AMOUNT then
-				local etime = DB:Execute("SELECT time FROM " .. info.name .. " ORDER BY time ASC LIMIT 1 OFFSET " .. (SINGLE_TABLE_AMOUNT - 1))[1].time
-				local newinfo = {
-					name  = "ChatLog_" .. info.stime .. "_" .. etime,
-					stime = info.stime,
-		 			etime = etime,
-				}
-				tinsert(tables, i, newinfo)
-				CreateTable(newinfo.name)
-				DB:Execute("REPLACE INTO " .. newinfo.name .. " SELECT * FROM " .. info.name .. " WHERE time <= " .. etime)
-				DB:Execute("DELETE FROM " .. info.name .. " WHERE time <= " .. etime)
-				newinfo.count = DB:Execute("SELECT count(*) AS count FROM " .. newinfo.name)[1].count
-				info.count = DB:Execute("SELECT count(*) AS count FROM " .. info.name)[1].count
-				
-				local oldname = info.name
-				info.name = "ChatLog_" .. (etime + 1) .. "_" .. info.etime
-				RenameTable(oldname, info.name)
+		local DB_PATH = MY.FormatPath('$uid@$lang/userdata/chat_log.db')
+		local SZ_OLD_PATH = MY.FormatPath('userdata/CHAT_LOG/$uid.db')
+		if IsLocalFileExist(SZ_OLD_PATH) then
+			CPath.Move(SZ_OLD_PATH, DB_PATH)
+		end
+		DB = SQLite3_Open(DB_PATH)
+		if not DB then
+			return MY.Debug({"Cannot connect to database!!!"}, "MY_ChatLog", MY_DEBUG.ERROR) and false
+		end
+		MY.Debug({"Initializing database..."}, "MY_ChatLog", MY_DEBUG.LOG)
+		
+		-- 数据库写入基本信息
+		local me = GetClientPlayer()
+		DB:Execute("CREATE TABLE IF NOT EXISTS ChatLogInfo (key NVARCHAR(128), value NVARCHAR(4096), PRIMARY KEY (key))")
+		DB:Execute("REPLACE INTO ChatLogInfo (key, value) VALUES ('userguid', '" .. me.GetGlobalID() .. "')")
+		
+		-- 初始化聊天记录索引表
+		if DB:Execute("SELECT count(*) AS count FROM sqlite_master WHERE type = 'table' AND name = 'ChatLogIndex'")[1].count == 0 then
+			MY.Debug({"Creating database..."}, "MY_ChatLog", MY_DEBUG.LOG)
+			DB:Execute("BEGIN TRANSACTION")
+			DB:Execute("DROP TABLE IF EXISTS ChatLogUser")
+			-- 创建索引表
+			DB:Execute("CREATE TABLE IF NOT EXISTS ChatLogIndex (name NVARCHAR(100), stime INTEGER, etime INTEGER, count INTEGER, detailcount NVARCHAR(4000), PRIMARY KEY (name))")
+			DB:Execute("CREATE INDEX IF NOT EXISTS ChatLogIndex_stime_idx ON ChatLogIndex(stime)")
+			-- 创建第一张记录表 并迁徙历史记录
+			local name = CreateTable()
+			MY.Debug({"Importing chatlog from v1 version..."}, "MY_ChatLog", MY_DEBUG.LOG)
+			local result = DB:Execute("SELECT name FROM sqlite_master WHERE type = 'table' AND (name = 'ChatLog' OR name LIKE 'ChatLog/_%/_%' ESCAPE '/') ORDER BY name")
+			for _, rec in ipairs(result) do
+				DB:Execute("REPLACE INTO " .. name .. " SELECT * FROM " .. rec.name)
+				DB:Execute("DROP TABLE " .. rec.name)
 			end
-		end
-	end
-	
-	-- 拆当前记录的ChatLog表（如果超长）
-	local count = DB:Execute("SELECT count(*) AS count FROM ChatLog")[1].count
-	if count > DIVIDE_TABLE_AMOUNT then
-		local stime, etime = #tables > 0 and (tables[#tables].etime + 1) or 0, 0
-		local index = SINGLE_TABLE_AMOUNT
-		while index < count do
-			etime = DB:Execute("SELECT time FROM ChatLog ORDER BY time ASC LIMIT 1 OFFSET " .. (index - 1))[1].time
-			local name = "ChatLog_" .. stime .. "_" .. etime
-			CreateTable(name)
-			DB:Execute("REPLACE INTO " .. name .. " SELECT * FROM ChatLog WHERE time <= " .. etime .. " AND time >= " .. stime)
+			DB:Execute("REPLACE INTO ChatLogIndex (name, stime, etime, count, detailcount) VALUES ('" .. name .. "', 0, -1, (SELECT count(*) FROM " .. name .. "), '')")
+			MY.Debug({"Importing chatlog from v1 version finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
 			
-			stime = etime + 1
-			index = index + SINGLE_TABLE_AMOUNT
+			DB:Execute("END TRANSACTION")
+			MY.Debug({"Creating database finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
 		end
-		DB:Execute("DELETE FROM ChatLog WHERE time <= " .. etime)
+		
+		-- 导入旧版数据
+		local SZ_OLD_PATH = MY.FormatPath('userdata/CHAT_LOG/$uid/') -- %s/%s.$lang.jx3dat
+		if IsLocalFileExist(SZ_OLD_PATH) then
+			MY.Debug({"Importing old data..."}, "MY_ChatLog", MY_DEBUG.LOG)
+			local nScanDays = 365 * 3
+			local nDailySec = 24 * 3600
+			local date = TimeToDate(GetCurrentTime())
+			local dwEndedTime = GetCurrentTime() - date.hour * 3600 - date.minute * 60 - date.second
+			local dwStartTime = dwEndedTime - nScanDays * nDailySec
+			local nHour, nMin, nSec
+			local function regexp(...)
+				nHour, nMin, nSec = ...
+				return ""
+			end
+			local szTalker
+			local function regexpN(...)
+				szTalker = ...
+			end
+			for _, szChannel in ipairs({"MSG_WHISPER", "MSG_PARTY", "MSG_TEAM", "MSG_FRIEND", "MSG_GUILD", "MSG_GUILD_ALLIANCE"}) do
+				local SZ_CHANNEL_PATH = SZ_OLD_PATH .. szChannel .. "/"
+				if IsLocalFileExist(SZ_CHANNEL_PATH) then
+					for dwTime = dwStartTime, dwEndedTime, nDailySec do
+						local szDate = MY.FormatTime("yyyyMMdd", dwTime)
+						local data = MY.LoadLUAData(SZ_CHANNEL_PATH .. szDate .. '.$lang.jx3dat')
+						if data then
+							for _, szMsg in ipairs(data) do
+								nHour, nMin, nSec, szTalker = nil
+								szMsg = szMsg:gsub('<text>text="%[(%d+):(%d+):(%d+)%]".-</text>', regexp)
+								szMsg:gsub('text="%[([^"<>]-)%]"[^<>]-name="namelink_', regexpN)
+								if nHour and nMin and nSec and szTalker then
+									InsertMsg(CHANNELS_R[szChannel], GetPureText(szMsg), szMsg, szTalker, dwTime + nHour * 3600 + nMin * 60 + nSec)
+								end
+							end
+						end
+					end
+				end
+			end
+			PushDB()
+			CPath.DelDir(SZ_OLD_PATH)
+			MY.Debug({"Importing old data finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
+		end
 	end
-	DB:Execute("END TRANSACTION")
 	
-	if deep then
-		DB:Execute("VACUUM")
-	end
-	UpdateSTMTs()
+	MY.Debug({"Initializing database finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
+	return true
 end
 
 function FixSearchDB()
-	if not DB then
+	if not InitDB() then
 		return
 	end
+	MY.Debug({"Fixing chatlog search indexes..."}, "MY_ChatLog", MY_DEBUG.LOG)
 	local count = 0
 	DB:Execute("BEGIN TRANSACTION")
-	for _, stmt in ipairs(STMT) do
-		local DB_W = DB:Prepare("UPDATE " .. stmt.name .. " SET text = ? WHERE hash = ? and time = ?")
-		local result = DB:Execute("SELECT hash, time, msg FROM " .. stmt.name .. " WHERE text = ''")
+	local tables = DB:Execute("SELECT * FROM ChatLogIndex ORDER BY stime ASC")
+	for _, info in ipairs(tables) do
+		local DB_W = DB:Prepare("UPDATE " .. info.name .. " SET text = ? WHERE hash = ? and time = ?")
+		local result = DB:Execute("SELECT hash, time, msg FROM " .. info.name .. " WHERE text = ''")
 		for _, rec in ipairs(result) do
 			DB_W:ClearBindings()
 			DB_W:BindAll(GetPureText(rec.msg) or "", rec.hash, rec.time)
@@ -271,52 +235,183 @@ function FixSearchDB()
 		count = count + #result
 	end
 	DB:Execute("END TRANSACTION")
+	MY.Debug({"Fixing chatlog search indexes finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
 	return count
+end
+
+function OptimizeDB(deep)
+	if not InitDB() then
+		return
+	end
+	DB:Execute("BEGIN TRANSACTION")
+	
+	-- 删除不在监控的频道
+	if deep then
+		MY.Debug({"Deleting unwatched channels..."}, "MY_ChatLog", MY_DEBUG.LOG)
+		local tables = DB:Execute("SELECT * FROM ChatLogIndex ORDER BY stime ASC")
+		-- 枚举所有监控的频道
+		local where = ""
+		local tChannels, aWheres = {}, {}
+		for _, info in ipairs(LOG_TYPE) do
+			for _, szChannel in ipairs(info.channels) do
+				tChannels[szChannel] = true
+			end
+		end
+		for nChannel, szChannel in pairs(tChannels) do
+			tinsert(aWheres, "channel <> " .. CHANNELS_R[szChannel])
+		end
+		if #aWheres > 0 then
+			where = " WHERE " .. tconcat(aWheres, " AND ")
+		end
+		for i, info in ipairs(tables) do
+			DB:Execute("DELETE FROM " .. info.name .. where)
+			DB:Execute("UPDATE ChatLogIndex SET count = (SELECT count(*) FROM " .. info.name .. "), detailcount = '' WHERE name = " .. info.name)
+		end
+		MY.Debug({"Deleting unwatched channels finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
+	end
+	
+	-- 拆记录中的大表
+	local tables = DB:Execute("SELECT * FROM ChatLogIndex ORDER BY stime ASC")
+	for i, info in ipairs(tables) do
+		if info.count > DIVIDE_TABLE_AMOUNT then
+			MY.Debug({"Dividing large chatlog table: " .. info.name}, "MY_ChatLog", MY_DEBUG.LOG)
+			-- 确定分割点
+			local etime = DB:Execute("SELECT time FROM " .. info.name .. " ORDER BY time ASC LIMIT 1 OFFSET " .. (SINGLE_TABLE_AMOUNT - 1))[1].time
+			-- 创建新表/调整旧表
+			local newinfo = {
+				name  = CreateTable(),
+				stime = info.stime,
+	 			etime = etime,
+			}
+			tinsert(tables, i, newinfo)
+			info.stime = newinfo.etime + 1
+			-- 转移数据
+			DB:Execute("REPLACE INTO " .. newinfo.name .. " SELECT * FROM " .. info.name .. " WHERE time <= " .. etime)
+			DB:Execute("DELETE FROM " .. info.name .. " WHERE time <= " .. etime)
+			-- 更新数量索引
+			info.count = DB:Execute("SELECT count(*) AS count FROM " .. info.name)[1].count
+			DB:Execute("REPLACE INTO ChatLogIndex (name, stime, etime, count, detailcount) VALUES ('"
+				.. info.name .. "', " .. info.stime .. ", " .. info.etime .. ", " .. info.count .. ", '')")
+			newinfo.count = DB:Execute("SELECT count(*) AS count FROM " .. newinfo.name)[1].count
+			DB:Execute("REPLACE INTO ChatLogIndex (name, stime, etime, count, detailcount) VALUES ('"
+			 	.. newinfo.name .. "', " .. newinfo.stime .. ", " .. newinfo.etime .. ", " .. newinfo.count .. ", '')")
+			MY.Debug({"Dividing large chatlog table " .. info.name .. " -> " .. newinfo.name .. " finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
+		end
+	end
+	
+	-- 合并记录中的小表
+	if deep then
+		local tables = DB:Execute("SELECT * FROM ChatLogIndex ORDER BY stime ASC")
+		for i, info in ipairs(tables) do
+			local nextinfo = tables[i + 1]
+			if nextinfo and (info.count + nextinfo.count) <= DIVIDE_TABLE_AMOUNT then
+				MY.Debug({"Merging small chatlog table: " .. info.name .. ", " .. nextinfo.name}, "MY_ChatLog", MY_DEBUG.LOG)
+				DB:Execute("REPLACE INTO " .. info.name .. " SELECT * FROM " .. nextinfo.name)
+				DB:Execute("DROP TABLE " .. nextinfo.name)
+				DB:Execute("UPDATE ChatLogIndex SET count = (SELECT count(*) FROM " .. info.name .. "), detailcount = '', etime = " .. nextinfo.etime .. " WHERE name = " .. info.name)
+				DB:Execute("DELETE FROM ChatLogIndex WHERE name = " .. nextinfo.name)
+				tremove(tables, i + 1)
+				MY.Debug({"Merging small chatlog table (" .. info.name .. ", " .. nextinfo.name .. ") finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
+			end
+		end
+	end
+	
+	DB:Execute("END TRANSACTION")
+	if deep then
+		MY.Debug({"Compressing database..."}, "MY_ChatLog", MY_DEBUG.LOG)
+		DB:Execute("VACUUM")
+		MY.Debug({"Compressing database finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
+	end
 end
 
 function PushDB()
 	if #aInsQueue == 0 and #aDelQueue == 0 then
 		return
-	elseif not DB then
+	elseif not InitDB() then
 		return MY.Debug({"Database has not been initialized yet, PushDB failed."}, "MY_ChatLog", MY_DEBUG.ERROR)
 	end
+	local stmts  = {}
+	local tables = DB:Execute("SELECT * FROM ChatLogIndex ORDER BY stime DESC")
 	DB:Execute("BEGIN TRANSACTION")
+	-- 插入记录
 	for _, data in ipairs(aInsQueue) do
-		for _, stmt in ipairs_r(STMT) do
-			if data[3] >= stmt.stime then
-				stmt.W:ClearBindings()
-				stmt.W:BindAll(unpack(data))
-				stmt.W:Execute()
+		for _, info in ipairs(tables) do
+			if data[3] >= info.stime and (info.etime == -1 or data[3] <= info.etime) then
+				if not info.stmtIns then
+					info.stmtIns = DB:Prepare("REPLACE INTO " .. info.name .. " (hash, channel, time, talker, text, msg) VALUES (?, ?, ?, ?, ?, ?)")
+				end
+				info.stmtIns:ClearBindings()
+				info.stmtIns:BindAll(unpack(data))
+				info.stmtIns:Execute()
 				break
 			end
 		end
 	end
 	aInsQueue = {}
+	-- 删除记录
 	for _, data in ipairs(aDelQueue) do
-		for _, stmt in ipairs_r(STMT) do
-			if data[2] >= stmt.stime then
-				stmt.D:ClearBindings()
-				stmt.D:BindAll(unpack(data))
-				stmt.D:Execute()
+		for _, info in ipairs(tables) do
+			if data[2] >= info.stime and (info.etime == -1 or data[2] <= info.etime) then
+				if not info.stmtDel then
+					info.stmtDel = DB:Prepare("DELETE FROM " .. info.name .. " WHERE hash = ? AND time = ?")
+				end
+				info.stmtDel:ClearBindings()
+				info.stmtDel:BindAll(unpack(data))
+				info.stmtDel:Execute()
 				break
 			end
 		end
 	end
 	aDelQueue = {}
+	-- 更新记录索引
+	local stmtUpd = DB:Execute("UPDATE ChatLogIndex SET count = ?, detailcount = '' WHERE name = ?")
+	for _, info in ipairs(tables) do
+		if info.stmtIns or info.stmtDel then
+			DB:Execute("UPDATE ChatLogIndex SET count = (SELECT count(*) FROM " .. info.name .. "), detailcount = '' WHERE name = '" .. info.name .. "'")
+		end
+	end
 	DB:Execute("END TRANSACTION")
-	-- 重建缓存记录 自动分表
-	OptimizeDB(false)
+end
+
+local function GetChatLogTableCount(channels, search)
+	local stmtUpd
+	local usearch = AnsiToUTF8("%" .. search .. "%")
+	local tables  = DB:Execute("SELECT * FROM ChatLogIndex ORDER BY stime ASC")
+	for _, info in ipairs(tables) do
+		if search == "" then
+			info.detailcountcache = info.detailcount and JsonDecode(info.detailcount)
+			if not info.detailcountcache then
+				info.detailcountcache = {[search] = {}}
+				for _, rec in ipairs(DB:Execute("SELECT channel, count(*) AS count FROM " .. info.name .. " GROUP BY channel")) do
+					info.detailcountcache[search][rec.channel] = rec.count
+				end
+				if not stmtUpd then
+					stmtUpd = DB:Prepare("UPDATE ChatLogIndex SET detailcount = ? WHERE name = ?")
+				end
+				stmtUpd:ClearBindings()
+				stmtUpd:BindAll(JsonEncode(info.detailcountcache), info.name)
+				stmtUpd:Execute()
+			end
+		else
+			local stmtSel = DB:Prepare("SELECT channel, count(*) AS count FROM " .. info.name .. " WHERE talker LIKE ? OR text LIKE ? GROUP BY channel")
+			stmtSel:ClearBindings()
+			stmtSel:BindAll(usearch, usearch)
+			info.detailcountcache = {[search] = {}}
+			for _, rec in ipairs(stmtSel:GetAll()) do
+				info.detailcountcache[search][rec.channel] = rec.count
+			end
+		end
+	end
+	return tables
 end
 
 function GetChatLogCount(channels, search)
-	local count = 0
-	for _, stmt in ipairs(STMT) do
-		if not stmt.count.filter[search] then
-			UpdateSTMTCountCache(stmt, search)
-		end
+	local count   = 0
+	local tables  = GetChatLogTableCount(channels, search)
+	for _, info in ipairs(tables) do
 		for _, channel in ipairs(channels) do
-			if stmt.count.filter[search][channel] then
-				count = count + stmt.count.filter[search][channel]
+			if info.detailcountcache[search][channel] then
+				count = count + info.detailcountcache[search][channel]
 			end
 		end
 	end
@@ -352,21 +447,19 @@ function GetChatLog(channels, search, offset, limit)
 	sql = sql .. " ORDER BY time ASC LIMIT ? OFFSET ?"
 	
 	local index, count, result, data = 0, 0, {}, nil
-	for _, stmt in ipairs(STMT) do
+	local tables  = GetChatLogTableCount(channels, search)
+	for _, info in ipairs(tables) do
 		if limit == 0 then
 			break
 		end
-		if not stmt.count.filter[search] then
-			UpdateSTMTCountCache(stmt, search)
-		end
 		count = 0
 		for _, channel in ipairs(channels) do
-			if stmt.count.filter[search][channel] then
-				count = count + stmt.count.filter[search][channel]
+			if info.detailcountcache[search][channel] then
+				count = count + info.detailcountcache[search][channel]
 			end
 		end
 		if index <= offset and index + count > offset then
-			DB_R = DB:Prepare("SELECT * FROM " .. stmt.name .. sql)
+			DB_R = DB:Prepare("SELECT * FROM " .. info.name .. sql)
 			DB_R:ClearBindings()
 			values[#values - 1] = limit
 			values[#values] = mmax(offset - index, 0)
@@ -382,104 +475,54 @@ function GetChatLog(channels, search, offset, limit)
 	
 	return result
 end
-
-local function InitDB()
-	local DB_PATH = MY.FormatPath('$uid@$lang/userdata/chat_log.db')
-	local SZ_OLD_PATH = MY.FormatPath('userdata/CHAT_LOG/$uid.db')
-	if IsLocalFileExist(SZ_OLD_PATH) then
-		CPath.Move(SZ_OLD_PATH, DB_PATH)
-	end
-	DB = SQLite3_Open(DB_PATH)
-	if not DB then
-		return MY.Debug({"Cannot connect to database!!!"}, "MY_ChatLog", MY_DEBUG.ERROR)
-	end
-	UpdateSTMTs()
-	local me = GetClientPlayer()
-	DB:Execute("CREATE TABLE IF NOT EXISTS ChatLogUser (userguid INTEGER, PRIMARY KEY (userguid))")
-	DB:Execute("REPLACE INTO ChatLogUser (userguid) VALUES (" .. me.GetGlobalID() .. ")")
 	
-	local SZ_OLD_PATH = MY.FormatPath('userdata/CHAT_LOG/$uid/') -- %s/%s.$lang.jx3dat
-	if IsLocalFileExist(SZ_OLD_PATH) then
-		local nScanDays = 365 * 3
-		local nDailySec = 24 * 3600
-		local date = TimeToDate(GetCurrentTime())
-		local dwEndedTime = GetCurrentTime() - date.hour * 3600 - date.minute * 60 - date.second
-		local dwStartTime = dwEndedTime - nScanDays * nDailySec
-		local nHour, nMin, nSec
-		local function regexp(...)
-			nHour, nMin, nSec = ...
-			return ""
+local function InitMsgMon()
+	local tChannels, aChannels = {}, {}
+	for _, info in ipairs(LOG_TYPE) do
+		for _, szChannel in ipairs(info.channels) do
+			tChannels[szChannel] = true
 		end
-		local szTalker
-		local function regexpN(...)
-			szTalker = ...
-		end
-		for _, szChannel in ipairs({"MSG_WHISPER", "MSG_PARTY", "MSG_TEAM", "MSG_FRIEND", "MSG_GUILD", "MSG_GUILD_ALLIANCE"}) do
-			local SZ_CHANNEL_PATH = SZ_OLD_PATH .. szChannel .. "/"
-			if IsLocalFileExist(SZ_CHANNEL_PATH) then
-				for dwTime = dwStartTime, dwEndedTime, nDailySec do
-					local szDate = MY.FormatTime("yyyyMMdd", dwTime)
-					local data = MY.LoadLUAData(SZ_CHANNEL_PATH .. szDate .. '.$lang.jx3dat')
-					if data then
-						for _, szMsg in ipairs(data) do
-							nHour, nMin, nSec, szTalker = nil
-							szMsg = szMsg:gsub('<text>text="%[(%d+):(%d+):(%d+)%]".-</text>', regexp)
-							szMsg:gsub('text="%[([^"<>]-)%]"[^<>]-name="namelink_', regexpN)
-							if nHour and nMin and nSec and szTalker then
-								InsertMsg(CHANNELS_R[szChannel], GetPureText(szMsg), szMsg, szTalker, dwTime + nHour * 3600 + nMin * 60 + nSec)
-							end
-						end
-					end
-				end
-			end
-		end
-		PushDB()
-		CPath.DelDir(SZ_OLD_PATH)
 	end
-	
-	do
-		local t = {}
-		for nChannel, szChannel in pairs(CHANNELS) do
-			tinsert(t, szChannel)
-		end
-		local function OnMsg(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szTalker)
-			local szText = szMsg
-			if bRich then
-				szText = GetPureText(szMsg)
-			else
-				szMsg = GetFormatText(szMsg, nFont, r, g, b)
-			end
-			-- filters
-			if szChannel == "MSG_GUILD" then
-				if MY_ChatLog.bIgnoreTongOnlineMsg and szText:find(TONG_ONLINE_MSG) then
-					return
-				end
-				if MY_ChatLog.bIgnoreTongMemberLogMsg and (
-					szText:find(TONG_MEMBER_LOGIN_MSG) or szText:find(TONG_MEMBER_LOGOUT_MSG)
-				) then
-					return
-				end
-			end
-			InsertMsg(CHANNELS_R[szChannel], szText, szMsg, szTalker, GetCurrentTime())
-		end
-		MY.RegisterMsgMonitor('MY_ChatLog', OnMsg, t)
+	for nChannel, szChannel in pairs(tChannels) do
+		tinsert(aChannels, szChannel)
 	end
+	local function OnMsg(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szTalker)
+		local szText = szMsg
+		if bRich then
+			szText = GetPureText(szMsg)
+		else
+			szMsg = GetFormatText(szMsg, nFont, r, g, b)
+		end
+		-- filters
+		if szChannel == "MSG_GUILD" then
+			if MY_ChatLog.bIgnoreTongOnlineMsg and szText:find(TONG_ONLINE_MSG) then
+				return
+			end
+			if MY_ChatLog.bIgnoreTongMemberLogMsg and (
+				szText:find(TONG_MEMBER_LOGIN_MSG) or szText:find(TONG_MEMBER_LOGOUT_MSG)
+			) then
+				return
+			end
+		end
+		InsertMsg(CHANNELS_R[szChannel], szText, szMsg, szTalker, GetCurrentTime())
+	end
+	MY.RegisterMsgMonitor('MY_ChatLog', OnMsg, aChannels)
 	MY.RegisterEvent("LOADING_ENDING.MY_ChatLog_Save", PushDB)
 end
-MY.RegisterInit("MY_ChatLog_Init", InitDB)
 
 local function ReleaseDB()
 	if not DB then
 		return
 	end
 	PushDB()
+	OptimizeDB(false)
 	DB:Release()
 end
 MY.RegisterExit("MY_Chat_Release", ReleaseDB)
 end
 
 function MY_ChatLog.Open()
-	if not DB then
+	if not InitDB() then
 		return MY.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L['MY_ChatLog'])
 	end
 	Wnd.OpenWindow(SZ_INI, "MY_ChatLog"):BringToTop()
