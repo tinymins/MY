@@ -326,11 +326,11 @@ end
 
 function PushDB()
 	if #aInsQueue == 0 and #aDelQueue == 0 then
-		return
+		return MY.Debug({"Pushing to database skipped due to empty queue..."}, "MY_ChatLog", MY_DEBUG.LOG)
 	elseif not InitDB() then
 		return MY.Debug({"Database has not been initialized yet, PushDB failed."}, "MY_ChatLog", MY_DEBUG.ERROR)
 	end
-	local stmts  = {}
+	MY.Debug({"Pushing to database..."}, "MY_ChatLog", MY_DEBUG.LOG)
 	local tables = DB:Execute("SELECT * FROM ChatLogIndex ORDER BY stime DESC")
 	DB:Execute("BEGIN TRANSACTION")
 	-- ²åÈë¼ÇÂ¼
@@ -371,6 +371,7 @@ function PushDB()
 		end
 	end
 	DB:Execute("END TRANSACTION")
+	MY.Debug({"Pushing to database finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
 end
 
 local function GetChatLogTableCount(channels, search)
@@ -509,6 +510,7 @@ local function InitMsgMon()
 	MY.RegisterMsgMonitor('MY_ChatLog', OnMsg, aChannels)
 	MY.RegisterEvent("LOADING_ENDING.MY_ChatLog_Save", PushDB)
 end
+MY.RegisterInit("MY_ChatLog_InitMon", InitMsgMon)
 
 local function ReleaseDB()
 	if not InitDB() then
