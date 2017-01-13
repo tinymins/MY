@@ -379,28 +379,39 @@ local function GetChatLogTableCount(channels, search)
 	local usearch = AnsiToUTF8("%" .. search .. "%")
 	local tables  = DB:Execute("SELECT * FROM ChatLogIndex ORDER BY stime ASC")
 	for _, info in ipairs(tables) do
-		if search == "" then
-			info.detailcountcache = info.detailcount and JsonDecode(info.detailcount)
-			if not info.detailcountcache then
-				info.detailcountcache = {[search] = {}}
-				for _, rec in ipairs(DB:Execute("SELECT channel, count(*) AS count FROM " .. info.name .. " GROUP BY channel")) do
-					info.detailcountcache[search][rec.channel] = rec.count
-				end
-				if not stmtUpd then
-					stmtUpd = DB:Prepare("UPDATE ChatLogIndex SET detailcount = ? WHERE name = ?")
-				end
-				stmtUpd:ClearBindings()
-				stmtUpd:BindAll(JsonEncode(info.detailcountcache), info.name)
-				stmtUpd:Execute()
+		info.detailcountcache = info.detailcount and MY.JsonDecode(info.detailcount)
+		if not info.detailcountcache then
+			info.detailcountcache = {list = {}, cache = {}}
+		end
+		if not info.detailcountcache.cache[search] then
+			-- 创建缓存
+			tinsert(info.detailcountcache.list, 1, search)
+			info.detailcountcache.cache[search] = {}
+			local result
+			if search == "" then
+				result = DB:Execute("SELECT channel, count(*) AS count FROM " .. info.name .. " GROUP BY channel")
+			else
+				local stmtSel = DB:Prepare("SELECT channel, count(*) AS count FROM " .. info.name .. " WHERE talker LIKE ? OR text LIKE ? GROUP BY channel")
+				stmtSel:ClearBindings()
+				stmtSel:BindAll(usearch, usearch)
+				result = stmtSel:GetAll()
 			end
-		else
-			local stmtSel = DB:Prepare("SELECT channel, count(*) AS count FROM " .. info.name .. " WHERE talker LIKE ? OR text LIKE ? GROUP BY channel")
-			stmtSel:ClearBindings()
-			stmtSel:BindAll(usearch, usearch)
-			info.detailcountcache = {[search] = {}}
-			for _, rec in ipairs(stmtSel:GetAll()) do
-				info.detailcountcache[search][rec.channel] = rec.count
+			for _, rec in ipairs(result) do
+				info.detailcountcache.cache[search][rec.channel] = rec.count
 			end
+			-- 缓存最大5个
+			while info.detailcountcache.list[6] do
+				local index = info.detailcountcache.list[6] == "" and 5 or 6
+				info.detailcountcache.cache[info.detailcountcache.list[index]] = nil
+				tremove(info.detailcountcache.list, index)
+			end
+			-- 保存缓存
+			if not stmtUpd then
+				stmtUpd = DB:Prepare("UPDATE ChatLogIndex SET detailcount = ? WHERE name = ?")
+			end
+			stmtUpd:ClearBindings()
+			stmtUpd:BindAll(JsonEncode(info.detailcountcache), info.name)
+			stmtUpd:Execute()
 		end
 	end
 	return tables
@@ -411,8 +422,8 @@ function GetChatLogCount(channels, search)
 	local tables  = GetChatLogTableCount(channels, search)
 	for _, info in ipairs(tables) do
 		for _, channel in ipairs(channels) do
-			if info.detailcountcache[search][channel] then
-				count = count + info.detailcountcache[search][channel]
+			if info.detailcountcache.cache[search][channel] then
+				count = count + info.detailcountcache.cache[search][channel]
 			end
 		end
 	end
@@ -455,8 +466,8 @@ function GetChatLog(channels, search, offset, limit)
 		end
 		count = 0
 		for _, channel in ipairs(channels) do
-			if info.detailcountcache[search][channel] then
-				count = count + info.detailcountcache[search][channel]
+			if info.detailcountcache.cache[search][channel] then
+				count = count + info.detailcountcache.cache[search][channel]
 			end
 		end
 		if index <= offset and index + count > offset then
