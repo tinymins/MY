@@ -484,7 +484,7 @@ local function InitMsgMon()
 			tChannels[szChannel] = true
 		end
 	end
-	for nChannel, szChannel in pairs(tChannels) do
+	for szChannel, _ in pairs(tChannels) do
 		tinsert(aChannels, szChannel)
 	end
 	local function OnMsg(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szTalker)
@@ -521,6 +521,7 @@ local function ReleaseDB()
 	DB:Release()
 end
 MY.RegisterExit("MY_Chat_Release", ReleaseDB)
+MY.RegisterEvent("DISCONNECT.MY_Chat_Release", ReleaseDB)
 end
 
 function MY_ChatLog.Open()
