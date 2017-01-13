@@ -511,7 +511,7 @@ local function InitMsgMon()
 end
 
 local function ReleaseDB()
-	if not DB then
+	if not InitDB() then
 		return
 	end
 	PushDB()
