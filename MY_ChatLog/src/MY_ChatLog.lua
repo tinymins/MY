@@ -410,7 +410,7 @@ local function GetChatLogTableCount(channels, search)
 				stmtUpd = DB:Prepare("UPDATE ChatLogIndex SET detailcount = ? WHERE name = ?")
 			end
 			stmtUpd:ClearBindings()
-			stmtUpd:BindAll(JsonEncode(info.detailcountcache), info.name)
+			stmtUpd:BindAll(MY.JsonEncode(info.detailcountcache), info.name)
 			stmtUpd:Execute()
 		end
 	end
