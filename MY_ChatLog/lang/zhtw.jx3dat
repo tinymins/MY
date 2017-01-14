@@ -32,4 +32,5 @@ data = {
     
     ['Death Log'] = '重傷記錄',
     ['Journal Log'] = '交易流水',
+    ['MY Monitor'] = '聊天監控',
 }

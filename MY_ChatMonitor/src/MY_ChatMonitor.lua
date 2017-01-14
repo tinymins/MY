@@ -187,6 +187,8 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
     if MY_ChatMonitor.bRedirectSysChannel and szChannel ~= "MSG_SYS" then
         OutputMessage("MSG_SYS", GetFormatText("", nil, 255,255,0) .. szMsg, true)
     end
+    -- 广播消息
+    OutputMessage("MSG_MY_MONITOR", szMsg, true)
     -- 更新UI
     if _C.uiBoard then
         local nPos = _C.uiBoard:scroll()
