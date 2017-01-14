@@ -31,9 +31,12 @@ MY_ChatMonitor.bCapture            = false
 MY_ChatMonitor.bBlockWords         = true
 MY_ChatMonitor.bIgnoreSame         = true
 MY_ChatMonitor.szTimestrap         = "[hh:mm:ss]"
-MY_ChatMonitor.tChannels           = { ["MSG_NORMAL"] = true, ["MSG_CAMP"] = true, ["MSG_WORLD"] = true, ["MSG_MAP"] = true, ["MSG_SCHOOL"] = true, ["MSG_GUILD"] = true, ["MSG_FRIEND"] = true }
 MY_ChatMonitor.anchor              = { x = -100, y = -150, s = "BOTTOMRIGHT", r = "BOTTOMRIGHT" }
 MY_ChatMonitor.tRecords            = {}
+MY_ChatMonitor.tChannels           = {
+    ["MSG_NORMAL"] = true, ["MSG_CAMP" ] = true, ["MSG_WORLD" ] = true, ["MSG_MAP"     ] = true,
+    ["MSG_SCHOOL"] = true, ["MSG_GUILD"] = true, ["MSG_FRIEND"] = true, ["MSG_IDENTITY"] = true,
+}
 RegisterCustomData('MY_ChatMonitor.szKeyWords')
 RegisterCustomData('MY_ChatMonitor.bIsRegexp')
 RegisterCustomData('MY_ChatMonitor.nMaxRecord')
@@ -62,7 +65,7 @@ _C.tChannelGroups = {
         szCaption = g_tStrings.CHANNEL_CHANNEL,
         tChannels = {
             "MSG_NORMAL", "MSG_PARTY", "MSG_MAP", "MSG_BATTLE_FILED", "MSG_GUILD", "MSG_GUILD_ALLIANCE", "MSG_SCHOOL", "MSG_WORLD",
-            "MSG_TEAM", "MSG_CAMP", "MSG_GROUP", "MSG_WHISPER", "MSG_SEEK_MENTOR", "MSG_FRIEND", "MSG_SYS",
+            "MSG_TEAM", "MSG_CAMP", "MSG_GROUP", "MSG_WHISPER", "MSG_SEEK_MENTOR", "MSG_FRIEND", "MSG_IDENTITY", "MSG_SYS",
         },
     }, {
         szCaption = g_tStrings.FIGHT_CHANNEL,
