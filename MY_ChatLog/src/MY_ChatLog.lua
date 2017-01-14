@@ -55,6 +55,7 @@ local LOG_TYPE = {
 		"MSG_MONEY", "MSG_ITEM", --"MSG_EXP", "MSG_REPUTATION", "MSG_CONTRIBUTE", "MSG_ATTRACTION", "MSG_PRESTIGE",
 		-- "MSG_TRAIN", "MSG_MENTOR_VALUE", "MSG_THEW_STAMINA", "MSG_TONG_FUND"
 	}},
+	{id = "monitor", title = _L["MY Monitor"], channels = {"MSG_MY_MONITOR"}},
 }
 -- 频道对应数据库中数值 可添加 但不可随意修改
 local CHANNELS = {
@@ -79,10 +80,14 @@ local CHANNELS = {
 	[19] = "MSG_MENTOR_VALUE",
 	[20] = "MSG_THEW_STAMINA",
 	[21] = "MSG_TONG_FUND",
+	[22] = "MSG_MY_MONITOR",
 }
 local CHANNELS_R = (function() local t = {} for k, v in pairs(CHANNELS) do t[v] = k end return t end)()
-local DB, InitDB, InsertMsg, DeleteMsg, PushDB, GetChatLogCount, GetChatLog, OptimizeDB, FixSearchDB
+local MSGTYPE_COLOR = setmetatable({
+	["MSG_MY_MONITOR"] = {255, 255, 0},
+}, {__index = function(t, k) return GetMsgFontColor(k, true) end})
 
+local DB, InitDB, InsertMsg, DeleteMsg, PushDB, GetChatLogCount, GetChatLog, OptimizeDB, FixSearchDB
 do
 local STMT = {}
 local DB_CR, DB_CW
@@ -572,7 +577,7 @@ function MY_ChatLog.OnFrameCreate()
 		wnd.aChannels = info.channels
 		wnd:Lookup("CheckBox_ChatChannel"):Check(not MY_ChatLog.tUncheckedChannel[info.id], WNDEVENT_FIRETYPE.PREVENT)
 		wnd:Lookup("CheckBox_ChatChannel", "Text_ChatChannel"):SetText(info.title)
-		wnd:Lookup("CheckBox_ChatChannel", "Text_ChatChannel"):SetFontColor(GetMsgFontColor(info.channels[1]))
+		wnd:Lookup("CheckBox_ChatChannel", "Text_ChatChannel"):SetFontColor(unpack(MSGTYPE_COLOR[info.channels[1]]))
 	end
 	container:FormatAllContentPos()
 	
@@ -813,7 +818,7 @@ function MY_ChatLog.UpdatePage(frame, noscroll)
 		local hItem = handle:Lookup(i - 1)
 		if rec then
 			local f = GetMsgFont(CHANNELS[rec.channel])
-			local r, g, b = GetMsgFontColor(CHANNELS[rec.channel])
+			local r, g, b = unpack(MSGTYPE_COLOR[CHANNELS[rec.channel]])
 			local h = hItem:Lookup("Handle_ChatLog_Msg")
 			h:Clear()
 			h:AppendItemFromString(MY.GetTimeLinkText({r=r, g=g, b=b, f=f, s='[yyyy/MM/dd][hh:mm:ss]'}, rec.time))
@@ -1109,7 +1114,7 @@ function MY_ChatLog.Export(szExportFile, aChannels, nPerSec, onProgress)
 		local data = GetChatLog(aChannels, "", nPage * EXPORT_SLICE, EXPORT_SLICE)
 		for i, rec in ipairs(data) do
 			local f = GetMsgFont(CHANNELS[rec.channel])
-			local r, g, b = GetMsgFontColor(CHANNELS[rec.channel])
+			local r, g, b = unpack(MSGTYPE_COLOR[CHANNELS[rec.channel]])
 			Log(szExportFile, convertXml2Html(MY.GetTimeLinkText({r=r, g=g, b=b, f=f, s='[yyyy/MM/dd][hh:mm:ss]'}, rec.time)))
 			Log(szExportFile, convertXml2Html(UTF8ToAnsi(rec.msg)))
 		end
