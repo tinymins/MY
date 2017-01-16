@@ -87,7 +87,7 @@ local MSGTYPE_COLOR = setmetatable({
 	["MSG_MY_MONITOR"] = {255, 255, 0},
 }, {__index = function(t, k) return GetMsgFontColor(k, true) end})
 
-local DB, InitDB, InsertMsg, DeleteMsg, PushDB, GetChatLogCount, GetChatLog, OptimizeDB, FixSearchDB
+local DB, InitDB, InsertMsg, DeleteMsg, PushDB, GetChatLogCount, GetChatLog, OptimizeDB, FixSearchDB, ImportDB
 do
 local STMT = {}
 local l_initialized
@@ -244,6 +244,28 @@ function InitDB(force)
 	
 	MY.Debug({"Initializing database finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
 	return true
+end
+
+function ImportDB(file)
+	if not InitDB() then
+		return
+	end
+	local amount, count = 0
+	local DBI = SQLite3_Open(file)
+	local tables = DB:Execute("SELECT name FROM sqlite_master WHERE type = 'table' AND (name = 'ChatLog' OR name LIKE 'ChatLog/_%/_%' ESCAPE '/') ORDER BY name")
+	for _, rec in ipairs(tables) do
+		count = DB:Execute("SELECT count(*) AS count FROM " .. rec.name)[1].count
+		for index = 0, count, 20000 do
+			local result = DB:Execute("SELECT * FROM " .. rec.name .. " ORDER BY time ASC LIMIT 20000 OFFSET " .. index)
+			for _, rec in ipairs(result) do
+				tinsert(aInsQueue, {rec.hash, rec.channel, rec.time, rec.talker, rec.text, rec.msg})
+			end
+			amount = amount + #result
+			PushDB()
+			OptimizeDB(false)
+		end
+	end
+	return amount
 end
 
 function FixSearchDB(deep)
