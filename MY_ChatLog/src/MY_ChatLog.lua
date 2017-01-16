@@ -1313,5 +1313,19 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + dy
+	
+	ui:append("WndButton", {
+		x = x, y = y, w = 150,
+		text = _L["import chatlog"],
+		onclick = function()
+			local file = GetOpenFileName(_L['Please select your chatlog database file.'], "Database File(*.db)\0*.db\0All Files(*.*)\0*.*\0\0", MY.FormatPath('$uid@$lang/userdata/'))
+			if not empty(file) then
+				MY.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
+						MY.Alert(_L("%d chatlogs imported!", ImportDB(file)))
+				end)
+			end
+		end,
+	})
+	y = y + dy
 end
 MY.RegisterPanel( "ChatLog", _L["chat log"], _L['Chat'], "ui/Image/button/SystemButton.UITex|43", {255,127,0,200}, PS)
