@@ -20,6 +20,7 @@ data = {
     ['Database file locked, repair database failed! : %s -> %s'] = '数据库文件被占用，修复失败！',
     ['Please select your chatlog database file.'] = '请选择需要导入的聊天记录文件',
     ['%d chatlogs imported!'] = '成功导入%d条聊天记录',
+    ['import chatlog'] = '导入聊天记录',
     ['Fix finished!'] = '修复完成！',
     ['preparing'] = '准备中',
     ['Export succeed'] = '导出完成！',
