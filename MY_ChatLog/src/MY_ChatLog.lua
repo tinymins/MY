@@ -294,8 +294,8 @@ function ImportDB(file)
 	local tables = DBI:Execute("SELECT name FROM sqlite_master WHERE type = 'table' AND (name = 'ChatLog' OR name LIKE 'ChatLog/_%/_%' ESCAPE '/') ORDER BY name")
 	for _, rec in ipairs(tables) do
 		count = DBI:Execute("SELECT count(*) AS count FROM " .. rec.name)[1].count
-		for index = 0, count, 20000 do
-			local result = DBI:Execute("SELECT * FROM " .. rec.name .. " ORDER BY time ASC LIMIT 20000 OFFSET " .. index)
+		for index = 0, count, 100000 do
+			local result = DBI:Execute("SELECT * FROM " .. rec.name .. " ORDER BY time ASC LIMIT 100000 OFFSET " .. index)
 			for _, rec in ipairs(result) do
 				tinsert(aInsQueue, {rec.hash, rec.channel, rec.time, rec.talker, rec.text, rec.msg})
 			end
