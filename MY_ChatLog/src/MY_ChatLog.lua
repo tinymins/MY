@@ -90,6 +90,7 @@ local MSGTYPE_COLOR = setmetatable({
 local DB, InitDB, InsertMsg, DeleteMsg, PushDB, GetChatLogCount, GetChatLog, OptimizeDB, FixSearchDB, ImportDB
 do
 local STMT = {}
+local l_globalid
 local l_initialized
 local aInsQueue = {}
 local aDelQueue = {}
@@ -151,9 +152,8 @@ function InitDB(force)
 	MY.Debug({"Initializing database..."}, "MY_ChatLog", MY_DEBUG.LOG)
 	
 	-- 数据库写入基本信息
-	local me = GetClientPlayer()
 	DB:Execute("CREATE TABLE IF NOT EXISTS ChatLogInfo (key NVARCHAR(128), value NVARCHAR(4096), PRIMARY KEY (key))")
-	DB:Execute("REPLACE INTO ChatLogInfo (key, value) VALUES ('userguid', '" .. me.GetGlobalID() .. "')")
+	DB:Execute("REPLACE INTO ChatLogInfo (key, value) VALUES ('userguid', '" .. l_globalid .. "')")
 	
 	-- 初始化聊天记录索引表
 	if DB:Execute("SELECT count(*) AS count FROM sqlite_master WHERE type = 'table' AND name = 'ChatLogIndex'")[1].count == 0 then
@@ -543,6 +543,9 @@ function GetChatLog(channels, search, offset, limit)
 end
 	
 local function InitMsgMon()
+	local me = GetClientPlayer()
+	l_globalid = me.GetGlobalID()
+	
 	local tChannels, aChannels = {}, {}
 	for _, info in ipairs(LOG_TYPE) do
 		for _, szChannel in ipairs(info.channels) do
