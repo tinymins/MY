@@ -188,6 +188,7 @@ function InitDB(force)
 				end
 				local ret = InitDB(true)
 				ImportDB(MALFORMED_DB_PATH)
+				CPath.DelFile(MALFORMED_DB_PATH)
 				MY.Debug({"Fixing malformed database finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
 				return ret
 			end
