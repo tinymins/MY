@@ -90,7 +90,7 @@ local MSGTYPE_COLOR = setmetatable({
 local DB, InitDB, InsertMsg, DeleteMsg, PushDB, GetChatLogCount, GetChatLog, OptimizeDB, FixSearchDB
 do
 local STMT = {}
-local DB_CR, DB_CW
+local l_initialized
 local aInsQueue = {}
 local aDelQueue = {}
 -- ===== 性能测试 =====
@@ -133,96 +133,121 @@ local function CreateTable()
 	return name
 end
 
-function InitDB()
+function InitDB(force)
+	if DB and l_initialized then
+		return true
+	end
+	local DB_PATH = MY.FormatPath('$uid@$lang/userdata/chat_log.db')
+	local SZ_OLD_PATH = MY.FormatPath('userdata/CHAT_LOG/$uid.db')
+	if IsLocalFileExist(SZ_OLD_PATH) then
+		CPath.Move(SZ_OLD_PATH, DB_PATH)
+	end
 	if not DB then
-		local DB_PATH = MY.FormatPath('$uid@$lang/userdata/chat_log.db')
-		local SZ_OLD_PATH = MY.FormatPath('userdata/CHAT_LOG/$uid.db')
-		if IsLocalFileExist(SZ_OLD_PATH) then
-			CPath.Move(SZ_OLD_PATH, DB_PATH)
-		end
 		DB = SQLite3_Open(DB_PATH)
-		if not DB then
-			return MY.Debug({"Cannot connect to database!!!"}, "MY_ChatLog", MY_DEBUG.ERROR) and false
+	end
+	if not DB then
+		return MY.Debug({"Cannot connect to database!!!"}, "MY_ChatLog", MY_DEBUG.ERROR) and false
+	end
+	MY.Debug({"Initializing database..."}, "MY_ChatLog", MY_DEBUG.LOG)
+	
+	-- 数据库写入基本信息
+	local me = GetClientPlayer()
+	DB:Execute("CREATE TABLE IF NOT EXISTS ChatLogInfo (key NVARCHAR(128), value NVARCHAR(4096), PRIMARY KEY (key))")
+	DB:Execute("REPLACE INTO ChatLogInfo (key, value) VALUES ('userguid', '" .. me.GetGlobalID() .. "')")
+	
+	-- 初始化聊天记录索引表
+	if DB:Execute("SELECT count(*) AS count FROM sqlite_master WHERE type = 'table' AND name = 'ChatLogIndex'")[1].count == 0 then
+		-- 判断是否会卡 给予提示
+		if not force then
+			local confirmtext
+			local result = DB:Execute("SELECT * FROM ChatLog LIMIT 1 OFFSET 50000")
+			if result and result[1] then
+				confirmtext = _L('You have over %d chatlogs requires to be transformed before use ChatLog, this may take a few minutes and may cause a disconnection, continue?', 50000)
+			else
+				local result = DB:Execute("SELECT count(*) AS count FROM ChatLog")
+				if result and result[1] and result[1].count then
+					_L('You have %d chatlogs requires to be transformed before use ChatLog, this may take a few minutes and may cause a disconnection, continue?', result[1].count)
+				end
+			end
+			if confirmtext then
+				MY.Confirm(confirmtext, function()
+					OptimizeDB(true)
+				end)
+				MY.Debug({"Initializing database performance alert..."}, "MY_ChatLog", MY_DEBUG.LOG)
+				return false
+			end
 		end
-		MY.Debug({"Initializing database..."}, "MY_ChatLog", MY_DEBUG.LOG)
-		
-		-- 数据库写入基本信息
-		local me = GetClientPlayer()
-		DB:Execute("CREATE TABLE IF NOT EXISTS ChatLogInfo (key NVARCHAR(128), value NVARCHAR(4096), PRIMARY KEY (key))")
-		DB:Execute("REPLACE INTO ChatLogInfo (key, value) VALUES ('userguid', '" .. me.GetGlobalID() .. "')")
-		
-		-- 初始化聊天记录索引表
-		if DB:Execute("SELECT count(*) AS count FROM sqlite_master WHERE type = 'table' AND name = 'ChatLogIndex'")[1].count == 0 then
-			MY.Debug({"Creating database..."}, "MY_ChatLog", MY_DEBUG.LOG)
-			DB:Execute("BEGIN TRANSACTION")
-			DB:Execute("DROP TABLE IF EXISTS ChatLogUser")
-			-- 创建索引表
-			DB:Execute("CREATE TABLE IF NOT EXISTS ChatLogIndex (name NVARCHAR(100), stime INTEGER, etime INTEGER, count INTEGER, detailcount NVARCHAR(4000), PRIMARY KEY (name))")
-			DB:Execute("CREATE INDEX IF NOT EXISTS ChatLogIndex_stime_idx ON ChatLogIndex(stime)")
-			-- 创建第一张记录表 并迁徙历史记录
-			local name = CreateTable()
-			MY.Debug({"Importing chatlog from v1 version..."}, "MY_ChatLog", MY_DEBUG.LOG)
-			local result = DB:Execute("SELECT name FROM sqlite_master WHERE type = 'table' AND (name = 'ChatLog' OR name LIKE 'ChatLog/_%/_%' ESCAPE '/') ORDER BY name")
-			for _, rec in ipairs(result) do
-				DB:Execute("REPLACE INTO " .. name .. " SELECT * FROM " .. rec.name)
-				DB:Execute("DROP TABLE " .. rec.name)
-			end
-			DB:Execute("REPLACE INTO ChatLogIndex (name, stime, etime, count, detailcount) VALUES ('" .. name .. "', 0, -1, (SELECT count(*) FROM " .. name .. "), '')")
-			MY.Debug({"Importing chatlog from v1 version finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
-			
-			DB:Execute("END TRANSACTION")
-			MY.Debug({"Creating database finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
+		-- 开始初始化
+		MY.Debug({"Creating database..."}, "MY_ChatLog", MY_DEBUG.LOG)
+		DB:Execute("BEGIN TRANSACTION")
+		DB:Execute("DROP TABLE IF EXISTS ChatLogUser")
+		-- 创建索引表
+		DB:Execute("CREATE TABLE IF NOT EXISTS ChatLogIndex (name NVARCHAR(100), stime INTEGER, etime INTEGER, count INTEGER, detailcount NVARCHAR(4000), PRIMARY KEY (name))")
+		DB:Execute("CREATE INDEX IF NOT EXISTS ChatLogIndex_stime_idx ON ChatLogIndex(stime)")
+		-- 创建第一张记录表 并迁徙历史记录
+		local name = CreateTable()
+		MY.Debug({"Importing chatlog from v1 version..."}, "MY_ChatLog", MY_DEBUG.LOG)
+		local result = DB:Execute("SELECT name FROM sqlite_master WHERE type = 'table' AND (name = 'ChatLog' OR name LIKE 'ChatLog/_%/_%' ESCAPE '/') ORDER BY name")
+		for _, rec in ipairs(result) do
+			DB:Execute("REPLACE INTO " .. name .. " SELECT * FROM " .. rec.name)
+			DB:Execute("DROP TABLE " .. rec.name)
 		end
+		DB:Execute("REPLACE INTO ChatLogIndex (name, stime, etime, count, detailcount) VALUES ('" .. name .. "', 0, -1, (SELECT count(*) FROM " .. name .. "), '')")
+		MY.Debug({"Importing chatlog from v1 version finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
 		
-		-- 导入旧版数据
-		local SZ_OLD_PATH = MY.FormatPath('userdata/CHAT_LOG/$uid/') -- %s/%s.$lang.jx3dat
-		if IsLocalFileExist(SZ_OLD_PATH) then
-			MY.Debug({"Importing old data..."}, "MY_ChatLog", MY_DEBUG.LOG)
-			local nScanDays = 365 * 3
-			local nDailySec = 24 * 3600
-			local date = TimeToDate(GetCurrentTime())
-			local dwEndedTime = GetCurrentTime() - date.hour * 3600 - date.minute * 60 - date.second
-			local dwStartTime = dwEndedTime - nScanDays * nDailySec
-			local nHour, nMin, nSec
-			local function regexp(...)
-				nHour, nMin, nSec = ...
-				return ""
-			end
-			local szTalker
-			local function regexpN(...)
-				szTalker = ...
-			end
-			for _, szChannel in ipairs({"MSG_WHISPER", "MSG_PARTY", "MSG_TEAM", "MSG_FRIEND", "MSG_GUILD", "MSG_GUILD_ALLIANCE"}) do
-				local SZ_CHANNEL_PATH = SZ_OLD_PATH .. szChannel .. "/"
-				if IsLocalFileExist(SZ_CHANNEL_PATH) then
-					for dwTime = dwStartTime, dwEndedTime, nDailySec do
-						local szDate = MY.FormatTime("yyyyMMdd", dwTime)
-						local data = MY.LoadLUAData(SZ_CHANNEL_PATH .. szDate .. '.$lang.jx3dat')
-						if data then
-							for _, szMsg in ipairs(data) do
-								nHour, nMin, nSec, szTalker = nil
-								szMsg = szMsg:gsub('<text>text="%[(%d+):(%d+):(%d+)%]".-</text>', regexp)
-								szMsg:gsub('text="%[([^"<>]-)%]"[^<>]-name="namelink_', regexpN)
-								if nHour and nMin and nSec and szTalker then
-									InsertMsg(CHANNELS_R[szChannel], GetPureText(szMsg), szMsg, szTalker, dwTime + nHour * 3600 + nMin * 60 + nSec)
-								end
+		DB:Execute("END TRANSACTION")
+		MY.Debug({"Creating database finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
+	end
+	
+	-- 导入旧版数据
+	local SZ_OLD_PATH = MY.FormatPath('userdata/CHAT_LOG/$uid/') -- %s/%s.$lang.jx3dat
+	if IsLocalFileExist(SZ_OLD_PATH) then
+		MY.Debug({"Importing old data..."}, "MY_ChatLog", MY_DEBUG.LOG)
+		local nScanDays = 365 * 3
+		local nDailySec = 24 * 3600
+		local date = TimeToDate(GetCurrentTime())
+		local dwEndedTime = GetCurrentTime() - date.hour * 3600 - date.minute * 60 - date.second
+		local dwStartTime = dwEndedTime - nScanDays * nDailySec
+		local nHour, nMin, nSec
+		local function regexp(...)
+			nHour, nMin, nSec = ...
+			return ""
+		end
+		local szTalker
+		local function regexpN(...)
+			szTalker = ...
+		end
+		for _, szChannel in ipairs({"MSG_WHISPER", "MSG_PARTY", "MSG_TEAM", "MSG_FRIEND", "MSG_GUILD", "MSG_GUILD_ALLIANCE"}) do
+			local SZ_CHANNEL_PATH = SZ_OLD_PATH .. szChannel .. "/"
+			if IsLocalFileExist(SZ_CHANNEL_PATH) then
+				for dwTime = dwStartTime, dwEndedTime, nDailySec do
+					local szDate = MY.FormatTime("yyyyMMdd", dwTime)
+					local data = MY.LoadLUAData(SZ_CHANNEL_PATH .. szDate .. '.$lang.jx3dat')
+					if data then
+						for _, szMsg in ipairs(data) do
+							nHour, nMin, nSec, szTalker = nil
+							szMsg = szMsg:gsub('<text>text="%[(%d+):(%d+):(%d+)%]".-</text>', regexp)
+							szMsg:gsub('text="%[([^"<>]-)%]"[^<>]-name="namelink_', regexpN)
+							if nHour and nMin and nSec and szTalker then
+								InsertMsg(CHANNELS_R[szChannel], GetPureText(szMsg), szMsg, szTalker, dwTime + nHour * 3600 + nMin * 60 + nSec)
 							end
 						end
 					end
 				end
 			end
-			PushDB()
-			CPath.DelDir(SZ_OLD_PATH)
-			MY.Debug({"Importing old data finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
 		end
+		PushDB()
+		CPath.DelDir(SZ_OLD_PATH)
+		MY.Debug({"Importing old data finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
 	end
+	l_initialized = true
 	
 	MY.Debug({"Initializing database finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
 	return true
 end
 
 function FixSearchDB(deep)
-	if not InitDB() then
+	if not InitDB(true) then
 		return
 	end
 	MY.Debug({"Fixing chatlog search indexes..."}, "MY_ChatLog", MY_DEBUG.LOG)
@@ -245,7 +270,7 @@ function FixSearchDB(deep)
 end
 
 function OptimizeDB(deep)
-	if not InitDB() then
+	if not InitDB(true) then
 		return
 	end
 	DB:Execute("BEGIN TRANSACTION")
@@ -531,7 +556,7 @@ end
 MY.RegisterInit("MY_ChatLog_InitMon", InitMsgMon)
 
 local function ReleaseDB()
-	if not InitDB() then
+	if not InitDB(true) then
 		return
 	end
 	PushDB()
@@ -544,7 +569,7 @@ end
 
 function MY_ChatLog.Open()
 	if not InitDB() then
-		return MY.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L['MY_ChatLog'])
+		return
 	end
 	Wnd.OpenWindow(SZ_INI, "MY_ChatLog"):BringToTop()
 end
@@ -1086,8 +1111,8 @@ function MY_ChatLog.Export(szExportFile, aChannels, nPerSec, onProgress)
 	if l_bExporting then
 		return MY.Sysmsg({_L['Already exporting, please wait.']})
 	end
-	if not DB then
-		return MY.Sysmsg({_L['Cannot connect to database!!!']})
+	if not InitDB(true) then
+		return
 	end
 	if onProgress then
 		onProgress(_L["preparing"], 0)
