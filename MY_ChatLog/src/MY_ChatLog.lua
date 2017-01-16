@@ -155,6 +155,45 @@ function InitDB(force)
 	DB:Execute("CREATE TABLE IF NOT EXISTS ChatLogInfo (key NVARCHAR(128), value NVARCHAR(4096), PRIMARY KEY (key))")
 	DB:Execute("REPLACE INTO ChatLogInfo (key, value) VALUES ('userguid', '" .. l_globalid .. "')")
 	
+	-- 测试数据库完整性
+	do local testvalue = "testmalformed_" .. GetCurrentTime()
+		DB:Execute("CREATE TABLE " .. testvalue .. "(a)")
+		local result = DB:Execute("SELECT * FROM " .. testvalue .. " LIMIT 1")
+		DB:Execute("DROP TABLE IF EXISTS " .. testvalue)
+		if not result then
+			MY.Debug({"Malformed database detected..."}, "MY_ChatLog", MY_DEBUG.LOG)
+			if not force then
+				MY.Confirm(_L['Database is malformed, do you want to repair database now? Repair database may take a long time and cause a disconnection.'], function()
+					MY.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
+						InitDB(true)
+						MY.Alert(_L["Fix finished!"])
+					end)
+				end)
+				return false
+			else
+				MY.Debug({"Fixing malformed database..."}, "MY_ChatLog", MY_DEBUG.LOG)
+				DB:Release()
+				DB = nil
+				local i = 0
+				local MALFORMED_DB_PATH
+				repeat
+					MALFORMED_DB_PATH = DB_PATH .. "." .. i ..  ".malformed"
+					i = i + 1
+				until not IsLocalFileExist(MALFORMED_DB_PATH)
+				CPath.Move(DB_PATH, MALFORMED_DB_PATH)
+				if not IsLocalFileExist(MALFORMED_DB_PATH) then
+					MY.Debug({"Fixing malformed database failed... Move file failed..."}, "MY_ChatLog", MY_DEBUG.LOG)
+					MY.Alert(_L('Database file locked, repair database failed! : %s -> %s', DB_PATH, MALFORMED_DB_PATH))
+					return false
+				end
+				local ret = InitDB(true)
+				ImportDB(MALFORMED_DB_PATH)
+				MY.Debug({"Fixing malformed database finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
+				return ret
+			end
+		end
+	end
+	
 	-- 初始化聊天记录索引表
 	if DB:Execute("SELECT count(*) AS count FROM sqlite_master WHERE type = 'table' AND name = 'ChatLogIndex'")[1].count == 0 then
 		-- 判断是否会卡 给予提示
@@ -247,16 +286,16 @@ function InitDB(force)
 end
 
 function ImportDB(file)
-	if not InitDB() then
+	if not (IsLocalFileExist(file) and InitDB(true)) then
 		return
 	end
 	local amount, count = 0
 	local DBI = SQLite3_Open(file)
-	local tables = DB:Execute("SELECT name FROM sqlite_master WHERE type = 'table' AND (name = 'ChatLog' OR name LIKE 'ChatLog/_%/_%' ESCAPE '/') ORDER BY name")
+	local tables = DBI:Execute("SELECT name FROM sqlite_master WHERE type = 'table' AND (name = 'ChatLog' OR name LIKE 'ChatLog/_%/_%' ESCAPE '/') ORDER BY name")
 	for _, rec in ipairs(tables) do
-		count = DB:Execute("SELECT count(*) AS count FROM " .. rec.name)[1].count
+		count = DBI:Execute("SELECT count(*) AS count FROM " .. rec.name)[1].count
 		for index = 0, count, 20000 do
-			local result = DB:Execute("SELECT * FROM " .. rec.name .. " ORDER BY time ASC LIMIT 20000 OFFSET " .. index)
+			local result = DBI:Execute("SELECT * FROM " .. rec.name .. " ORDER BY time ASC LIMIT 20000 OFFSET " .. index)
 			for _, rec in ipairs(result) do
 				tinsert(aInsQueue, {rec.hash, rec.channel, rec.time, rec.talker, rec.text, rec.msg})
 			end
