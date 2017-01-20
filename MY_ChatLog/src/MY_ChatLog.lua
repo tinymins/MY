@@ -22,9 +22,11 @@ local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_ChatLog/lang/")
 MY_ChatLog = MY_ChatLog or {}
 MY_ChatLog.bIgnoreTongOnlineMsg    = true -- 帮会上线通知
 MY_ChatLog.bIgnoreTongMemberLogMsg = true -- 帮会成员上线下线提示
+MY_ChatLog.bRealtimeCommit         = false-- 实时写入数据库
 MY_ChatLog.tUncheckedChannel = {}
 RegisterCustomData('MY_ChatLog.bIgnoreTongOnlineMsg')
 RegisterCustomData('MY_ChatLog.bIgnoreTongMemberLogMsg')
+RegisterCustomData('MY_ChatLog.bRealtimeCommit')
 RegisterCustomData('MY_ChatLog.tUncheckedChannel')
 
 ------------------------------------------------------------------------------------------------------
@@ -138,7 +140,7 @@ function InitDB(force)
 	if DB and l_initialized then
 		return true
 	end
-	local DB_PATH = MY.FormatPath('$uid@$lang/userdata/chat_log.db')
+	local DB_PATH = MY.FormatPath({'userdata/chat_log.db', MY_DATA_PATH.ROLE})
 	local SZ_OLD_PATH = MY.FormatPath('userdata/CHAT_LOG/$uid.db')
 	if IsLocalFileExist(SZ_OLD_PATH) then
 		CPath.Move(SZ_OLD_PATH, DB_PATH)
@@ -614,6 +616,10 @@ local function InitMsgMon()
 			end
 		end
 		InsertMsg(CHANNELS_R[szChannel], szText, szMsg, szTalker, GetCurrentTime())
+		
+		if MY_ChatLog.bRealtimeCommit then
+			PushDB()
+		end
 	end
 	MY.RegisterMsgMonitor('MY_ChatLog', OnMsg, aChannels)
 	MY.RegisterEvent("LOADING_ENDING.MY_ChatLog_Save", PushDB)
@@ -1257,6 +1263,16 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + dy
 	
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = wr,
+		text = _L['realtime database commit'],
+		checked = MY_ChatLog.bRealtimeCommit,
+		oncheck = function(bChecked)
+			MY_ChatLog.bRealtimeCommit = bChecked
+		end
+	})
+	y = y + dy
+	
 	ui:append("WndButton", {
 		x = x, y = y, w = 150,
 		text = _L["open chatlog"],
@@ -1319,7 +1335,7 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = 150,
 		text = _L["import chatlog"],
 		onclick = function()
-			local file = GetOpenFileName(_L['Please select your chatlog database file.'], "Database File(*.db)\0*.db\0All Files(*.*)\0*.*\0\0", MY.FormatPath('$uid@$lang/userdata/'))
+			local file = GetOpenFileName(_L['Please select your chatlog database file.'], "Database File(*.db)\0*.db\0All Files(*.*)\0*.*\0\0", MY.FormatPath({'userdata/', MY_DATA_PATH.ROLE}))
 			if not empty(file) then
 				MY.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
 						MY.Alert(_L("%d chatlogs imported!", ImportDB(file)))
