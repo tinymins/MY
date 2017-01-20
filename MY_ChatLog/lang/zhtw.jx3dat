@@ -3,6 +3,7 @@ data = {
     ['chat log'] = '聊天記錄',
     ['filter tong online message'] = '過濾幫會上線公告提示',
     ['filter tong member log message'] = '過濾幫會成員上線提示',
+    ['realtime database commit'] = '聊天記錄實時寫入數據庫',
     ['export chatlog'] = '導出聊天記錄',
     ['optimize/compress datebase'] = '壓縮優化數據庫',
     ['optimize/compress datebase will take a long time and may cause a disconnection, are you sure to continue?'] = '壓縮優化數據庫可以加快查詢速度解決部分頓卡問題，但如果本地聊天記錄較多操作可能會造成臨時頓卡掉線，是否繼續？',
