@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-01-04 16:37:42
+-- @Last modified time: 2017-01-20 15:02:13
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- #################################################################################################################################### --
@@ -115,8 +115,8 @@ MY = {}
 --------------------------------------------------------------------------------------------------------------------------------------------
 -- 本地函数变量
 --------------------------------------------------------------------------------------------------------------------------------------------
-local _BUILD_ = "20170104"
-local _VERSION_ = 0x2006800
+local _BUILD_ = "20170120"
+local _VERSION_ = 0x2006900
 local _DEBUGLV_ = tonumber(LoadLUAData('interface/my.debug.level') or nil) or 4
 local _DELOGLV_ = tonumber(LoadLUAData('interface/my.delog.level') or nil) or 4
 local _NORESTM_ = tonumber(LoadLUAData('interface/my.nrtim.level') or nil) or -1
