@@ -4,13 +4,13 @@
 -- @Author: ‹¯“¡ @ À´√Œ’Ú @ ›∂ª®π¨
 -- @Date  : 2014-12-04 11:51:31
 -- @Email : admin@derzh.com
--- @Last Modified by:   µ‘“ª√˘ @tinymins
--- @Last Modified time: 2015-06-10 11:03:48
+-- @Last modified by:   Zhai Yiming
+-- @Last modified time: 2017-01-17 10:16:27
 -----------------------------------------------
 MY_MiddleMapMark = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_MiddleMapMark/lang/")
 local l_szKeyword = ""
-local SZ_DB_PATH = MY.FormatPath("!all-users@$lang/cache/npc_doodad_rec.db")
+local SZ_DB_PATH = MY.FormatPath({"cache/npc_doodad_rec.db", MY_DATA_PATH.GLOBAL})
 local DB = SQLite3_Open(SZ_DB_PATH)
 if not DB then
 	return MY.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L["MY_MiddleMapMark"])
@@ -75,35 +75,38 @@ end
 ---------------------------------------------------------------
 local l_npc = {}
 local l_doodad = {}
-local function OnLoadingEnd()
+local function PushDB()
+	if empty(l_npc) and empty(l_doodad) then
+		return
+	end
 	DB:Execute("BEGIN TRANSACTION")
+	
 	for i, p in pairs(l_npc) do
 		DBN_W:ClearBindings()
 		DBN_W:BindAll(p.templateid, p.poskey, p.mapid, p.x, p.y, AnsiToUTF8(p.name), AnsiToUTF8(p.title), p.level)
 		DBN_W:Execute()
 	end
-	DB:Execute("END TRANSACTION")
 	l_npc = {}
 	
-	DB:Execute("BEGIN TRANSACTION")
 	for i, p in pairs(l_doodad) do
 		DBD_W:ClearBindings()
 		DBD_W:BindAll(p.templateid, p.poskey, p.mapid, p.x, p.y, AnsiToUTF8(p.name))
 		DBD_W:Execute()
 	end
-	DB:Execute("END TRANSACTION")
 	l_doodad = {}
+	
+	DB:Execute("END TRANSACTION")
 end
-MY.RegisterEvent('LOADING_ENDING.MY_MiddleMapMark', OnLoadingEnd)
+MY.RegisterEvent('LOADING_ENDING.MY_MiddleMapMark', PushDB)
 
 local function OnExit()
-	OnLoadingEnd()
+	PushDB()
 	DB:Release()
 end
 MY.RegisterExit("MY_MiddleMapMark_Save", OnExit)
 
-NpcTpl = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_MiddleMapMark/data/npc/$lang.jx3dat")
-DoodadTpl = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_MiddleMapMark/data/doodad/$lang.jx3dat")
+local NpcTpl = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_MiddleMapMark/data/npc/$lang.jx3dat")
+local DoodadTpl = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_MiddleMapMark/data/doodad/$lang.jx3dat")
 local m_nLastRedrawFrame = GetLogicFrameCount()
 local MARK_RENDER_INTERVAL = GLOBAL.GAME_FPS * 5
 local function OnNpcEnterScene()
