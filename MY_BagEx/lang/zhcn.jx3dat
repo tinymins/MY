@@ -1,0 +1,7 @@
+-- language data (zhcn) updated at 2014-4-10 03:38:11
+data = {
+    ['Search'] = '搜索',
+    ['Time Limited'] = '限时',
+    ['package searcher'] = '仓库背包搜索',
+    ['compare with bag'] = '对比背包',
+}

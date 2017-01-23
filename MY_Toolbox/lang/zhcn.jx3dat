@@ -44,11 +44,6 @@ data = {
     ['Lotus Clock: ' ] = '藕和桂花：',
     ['%d:%d:%d'      ] = '%d:%d:%d',
     
-    ['Time Limited'] = '限时',
-    ['Search'] = '搜索',
-    ['package searcher'] = '仓库背包搜索',
-    ['compare with bag'] = '对比背包',
-    
     ['GongZhan'] = '共战',
     ['Detected [%s] has GongZhan buff for %d sec(s).'] = '检测到[%s]共战BUFF剩余%d秒。',
     ['Nearby GongZhan Total Count: %d.'] = '附近共战数量：%d。',
