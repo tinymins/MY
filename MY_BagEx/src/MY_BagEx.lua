@@ -4,9 +4,9 @@
 -- @Date  : 2014-11-25 10:40:14
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-12-13 09:49:04
+-- @Last modified time: 2017-01-23 11:18:00
 -----------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Toolbox/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_BagEx/lang/")
 
 MY_BagEx = {}
 MY_BagEx.bEnable = true

@@ -4,7 +4,7 @@
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-12-30 10:49:02
+-- @Last modified time: 2017-01-23 11:18:36
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
 local _C = {}
@@ -593,14 +593,16 @@ function PS.OnPanelActive(wnd)
 	y = y + 30
 	
 	-- 背包搜索
-	ui:append("WndCheckBox", "WndCheckBox_BagEx"):children("#WndCheckBox_BagEx")
-	  :pos(x, y)
-	  :text(_L['package searcher'])
-	  :check(MY_BagEx.bEnable or false)
-	  :check(function(bChecked)
-	  	MY_BagEx.Enable(bChecked)
-	  end)
-	y = y + 30
+	if MY_BagEx then
+		ui:append("WndCheckBox", "WndCheckBox_BagEx"):children("#WndCheckBox_BagEx")
+		  :pos(x, y)
+		  :text(_L['package searcher'])
+		  :check(MY_BagEx.bEnable or false)
+		  :check(function(bChecked)
+		  	MY_BagEx.Enable(bChecked)
+		  end)
+		y = y + 30
+	end
 	
 	-- 显示历史技能列表
 	ui:append("WndCheckBox", "WndCheckBox_VisualSkill"):children("#WndCheckBox_VisualSkill")
