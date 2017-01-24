@@ -4,14 +4,30 @@
 -- @Email:  root@derzh.com
 -- @Project: JX3 UI
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-01-24 15:55:23
+-- @Last modified time: 2017-01-24 17:43:04
 --
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+local XML_LINE_BREAKER = XML_LINE_BREAKER
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local tinsert, tremove, tconcat = table.insert, table.remove, table.concat
+local ssub, slen, schar, srep, sbyte, sformat, sgsub =
+	  string.sub, string.len, string.char, string.rep, string.byte, string.format, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local floor, mmin, mmax, mceil = math.floor, math.min, math.max, math.ceil
+local GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID = GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID
+local setmetatable = setmetatable
+
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_BagEx/lang/")
  DB = SQLite3_Open(MY.FormatPath({"userdata/bagstatistics.db", MY_DATA_PATH.GLOBAL}))
 if not DB then
 	return MY.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L["MY_BagStatistics"])
 end
 local SZ_INI = MY.GetAddonInfo().szRoot .. "MY_BagEx/ui/MY_BagStatistics.ini"
+local PAGE_DISPLAY = 8
+local NORMAL_MODE_PAGE_SIZE = 50
+local COMPACT_MODE_PAGE_SIZE = 200
 DB:Execute("CREATE TABLE IF NOT EXISTS BagItems (ownerkey NVARCHAR(20), boxtype INTEGER, boxindex INTEGER, tabtype INTEGER, tabindex INTEGER, tabsubindex INTEGER, bagcount INTEGER, bankcount INTEGER, time INTEGER, PRIMARY KEY(ownerkey, boxtype, boxindex))")
 DB:Execute("CREATE INDEX IF NOT EXISTS BagItems_tab_idx ON BagItems(tabtype, tabindex, tabsubindex)")
 local DB_ItemsW = DB:Prepare("REPLACE INTO BagItems (ownerkey, boxtype, boxindex, tabtype, tabindex, tabsubindex, bagcount, bankcount, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")
@@ -188,39 +204,98 @@ function MY_BagStatistics.UpdateNames(frame)
 		wnd:Lookup("CheckBox_Name"):Check(not MY_BagStatistics.tUncheckedNames[wnd.ownerkey], WNDEVENT_FIRETYPE.PREVENT)
 	end
 	container:FormatAllContentPos()
+	frame.nCurrentPage = 1
 	MY_BagStatistics.UpdateItems(frame)
 end
 
 function MY_BagStatistics.UpdateItems(frame)
 	local searchitem = frame:Lookup("Window_Main/Wnd_SearchItem/Edit_SearchItem"):GetText():gsub("%s+", "%%")
-	local sql = "SELECT C.ownerkey AS ownerkey, C.boxtype AS boxtype, C.boxindex AS boxindex, C.tabtype AS tabtype, C.tabindex AS tabindex, C.tabsubindex AS tabsubindex, SUM(C.bagcount) AS bagcount, SUM(C.bankcount) AS bankcount, C.time AS time, O.ownername AS ownername, O.servername AS servername FROM(SELECT B.ownerkey, B.boxtype, B.boxindex, B.tabtype, B.tabindex, B.tabsubindex, B.bagcount, B.bankcount, B.time FROM BagItems AS B LEFT JOIN ItemInfo AS I ON B.tabtype = I.tabtype AND B.tabindex = I.tabindex WHERE B.tabtype != -1 AND B.tabindex != -1 AND (I.name LIKE ? OR I.desc LIKE ?)) AS C LEFT JOIN OwnerInfo AS O ON C.ownerkey = O.ownerkey WHERE "
+	local sqlfrom = "(SELECT B.ownerkey, B.boxtype, B.boxindex, B.tabtype, B.tabindex, B.tabsubindex, B.bagcount, B.bankcount, B.time FROM BagItems AS B LEFT JOIN ItemInfo AS I ON B.tabtype = I.tabtype AND B.tabindex = I.tabindex WHERE B.tabtype != -1 AND B.tabindex != -1 AND (I.name LIKE ? OR I.desc LIKE ?)) AS C LEFT JOIN OwnerInfo AS O ON C.ownerkey = O.ownerkey WHERE "
+	local sql  = "SELECT C.ownerkey AS ownerkey, C.boxtype AS boxtype, C.boxindex AS boxindex, C.tabtype AS tabtype, C.tabindex AS tabindex, C.tabsubindex AS tabsubindex, SUM(C.bagcount) AS bagcount, SUM(C.bankcount) AS bankcount, C.time AS time, O.ownername AS ownername, O.servername AS servername FROM" .. sqlfrom
+	local sqlc = "SELECT COUNT(*) AS count FROM" .. sqlfrom
+	local nPageSize = NORMAL_MODE_PAGE_SIZE
 	local wheres = {}
 	local ownerkeys = {}
 	local container = frame:Lookup("Window_Main/WndScroll_Name/WndContainer_Name")
 	for i = 0, container:GetAllContentCount() - 1 do
 		local wnd = container:LookupContent(i)
 		if wnd:Lookup("CheckBox_Name"):IsCheckBoxChecked() then
-			table.insert(wheres, "O.ownerkey = ?")
-			table.insert(ownerkeys, wnd.ownerkey)
+			tinsert(wheres, "O.ownerkey = ?")
+			tinsert(ownerkeys, wnd.ownerkey)
 		end
 	end
-	sql = sql .. ((#wheres == 0 and " 1 = 0 ") or ("(" .. table.concat(wheres, " OR ") .. ")")) .. " GROUP BY C.tabtype, C.tabindex"
+	local sqlwhere = ((#wheres == 0 and " 1 = 0 ") or ("(" .. tconcat(wheres, " OR ") .. ")"))
+	local sqlgroup = " GROUP BY C.tabtype, C.tabindex"
+	sql  = sql  .. sqlwhere .. sqlgroup .. " LIMIT " .. nPageSize .. " OFFSET " .. ((frame.nCurrentPage - 1) * nPageSize)
+	sqlc = sqlc .. sqlwhere .. sqlgroup
 	
-	local sqlc = "SELECT * FROM (SELECT ownerkey, SUM(bagcount) AS bagcount, SUM(bankcount) AS bankcount FROM BagItems WHERE tabtype = ? AND tabindex = ? AND tabsubindex = ? GROUP BY ownerkey) AS B LEFT JOIN OwnerInfo AS O ON B.ownerkey = O.ownerkey WHERE "
-	sqlc = sqlc .. ((#wheres == 0 and " 1 = 0 ") or ("(" .. table.concat(wheres, " OR ") .. ")"))
+	-- 绘制页码
 	local DB_CountR = DB:Prepare(sqlc)
+	DB_CountR:ClearBindings()
+	DB_CountR:BindAll(AnsiToUTF8("%" .. searchitem .. "%"), AnsiToUTF8("%" .. searchitem .. "%"), unpack(ownerkeys))
+	local nCount = #DB_CountR:GetAll()
+	local nPageCount = floor(nCount / nPageSize) + 1
+	frame:Lookup("Window_Main/Wnd_Index/Wnd_IndexEdit/WndEdit_Index"):SetText(frame.nCurrentPage)
+	frame:Lookup("Window_Main/Wnd_Index", "Handle_IndexCount/Text_IndexCount"):SprintfText(_L['%d pages'], nPageCount)
 	
+	local hOuter = frame:Lookup("Window_Main/Wnd_Index", "Handle_IndexesOuter")
+	local handle = hOuter:Lookup("Handle_Indexes")
+	handle:Clear()
+	if nPageCount <= PAGE_DISPLAY then
+		for i = 0, nPageCount - 1 do
+			local hItem = handle:AppendItemFromIni(SZ_INI, "Handle_Index")
+			hItem.nPage = i + 1
+			hItem:Lookup("Text_Index"):SetText(i + 1)
+			hItem:Lookup("Text_IndexUnderline"):SetVisible(i + 1 == frame.nCurrentPage)
+		end
+	else
+		local hItem = handle:AppendItemFromIni(SZ_INI, "Handle_Index")
+		hItem.nPage = 1
+		hItem:Lookup("Text_Index"):SetText(1)
+		hItem:Lookup("Text_IndexUnderline"):SetVisible(1 == frame.nCurrentPage)
+		
+		local nStartPage
+		if frame.nCurrentPage + mceil((PAGE_DISPLAY - 2) / 2) > nPageCount then
+			nStartPage = nPageCount - (PAGE_DISPLAY - 2)
+		elseif frame.nCurrentPage - mceil((PAGE_DISPLAY - 2) / 2) < 2 then
+			nStartPage = 2
+		else
+			nStartPage = frame.nCurrentPage - mceil((PAGE_DISPLAY - 2) / 2)
+		end
+		for i = 1, PAGE_DISPLAY - 2 do
+			local hItem = handle:AppendItemFromIni(SZ_INI, "Handle_Index")
+			hItem.nPage = nStartPage + i - 1
+			hItem:Lookup("Text_Index"):SetText(nStartPage + i - 1)
+			hItem:Lookup("Text_IndexUnderline"):SetVisible(nStartPage + i - 1 == frame.nCurrentPage)
+		end
+		
+		local hItem = handle:AppendItemFromIni(SZ_INI, "Handle_Index")
+		hItem.nPage = nPageCount
+		hItem:Lookup("Text_Index"):SetText(nPageCount)
+		hItem:Lookup("Text_IndexUnderline"):SetVisible(nPageCount == frame.nCurrentPage)
+	end
+	handle:SetSize(hOuter:GetSize())
+	handle:FormatAllItemPos()
+	handle:SetSizeByAllItemSize()
+	hOuter:FormatAllItemPos()
+	
+	-- 绘制列表
 	local DB_ItemInfoR = DB:Prepare(sql)
 	DB_ItemInfoR:ClearBindings()
 	DB_ItemInfoR:BindAll(AnsiToUTF8("%" .. searchitem .. "%"), AnsiToUTF8("%" .. searchitem .. "%"), unpack(ownerkeys))
 	local result = DB_ItemInfoR:GetAll()
 	
-	local hList = frame:Lookup("Window_Main/WndScroll_Item", "Handle_Items")
-	hList:Clear()
+	local sqlbelongs = "SELECT * FROM (SELECT ownerkey, SUM(bagcount) AS bagcount, SUM(bankcount) AS bankcount FROM BagItems WHERE tabtype = ? AND tabindex = ? AND tabsubindex = ? GROUP BY ownerkey) AS B LEFT JOIN OwnerInfo AS O ON B.ownerkey = O.ownerkey WHERE "
+	sqlbelongs = sqlbelongs .. ((#wheres == 0 and " 1 = 0 ") or ("(" .. tconcat(wheres, " OR ") .. ")"))
+	local DB_BelongsR = DB:Prepare(sqlbelongs)
+	
+	local handle = frame:Lookup("Window_Main/WndScroll_Item", "Handle_Items")
+	local scroll = frame:Lookup("Window_Main/WndScroll_Item/Scroll_Item")
+	handle:Clear()
 	for _, rec in ipairs(result) do
 		local KItemInfo = GetItemInfo(rec.tabtype, rec.tabindex)
 		if KItemInfo then
-			local hItem = hList:AppendItemFromIni(SZ_INI, "Handle_Item")
+			local hItem = handle:AppendItemFromIni(SZ_INI, "Handle_Item")
 			UpdateItemInfoBoxObject(hItem:Lookup("Box_Item"), nil, rec.tabtype, rec.tabindex, 1, rec.tabsubindex)
 			UpdateItemInfoBoxObject(hItem:Lookup("Handle_ItemInfo/Text_ItemName"), nil, rec.tabtype, rec.tabindex, 1, rec.tabsubindex)
 			hItem:Lookup("Text_ItemStatistics"):SprintfText(_L["Bankx%d Bagx%d Totalx%d"], rec.bankcount, rec.bagcount, rec.bankcount + rec.bagcount)
@@ -235,9 +310,9 @@ function MY_BagStatistics.UpdateItems(frame)
 			end
 			hItem:Lookup("Handle_ItemInfo"):FormatAllItemPos()
 			
-			DB_CountR:ClearBindings()
-			DB_CountR:BindAll(rec.tabtype, rec.tabindex, rec.tabsubindex, unpack(ownerkeys))
-			local result = DB_CountR:GetAll()
+			DB_BelongsR:ClearBindings()
+			DB_BelongsR:BindAll(rec.tabtype, rec.tabindex, rec.tabsubindex, unpack(ownerkeys))
+			local result = DB_BelongsR:GetAll()
 			local hBelongsList = hItem:Lookup("Handle_ItemBelongs")
 			hBelongsList:Clear()
 			for _, rec in ipairs(result) do
@@ -253,7 +328,8 @@ function MY_BagStatistics.UpdateItems(frame)
 			MY.Debug({"KItemInfo not found: " .. rec.tabtype .. ", " .. rec.tabindex}, "MY_BagStatistics", MY_DEBUG.WARNING)
 		end
 	end
-	hList:FormatAllItemPos()
+	handle:FormatAllItemPos()
+	scroll:SetScrollPos(0)
 end
 
 function MY_BagStatistics.OnFrameCreate()
@@ -299,6 +375,14 @@ function MY_BagStatistics.OnLButtonClick()
 			wnd:Lookup("CheckBox_Name"):Check(false, WNDEVENT_FIRETYPE.PREVENT)
 		end
 		wnd:Lookup("CheckBox_Name"):Check(true)
+	end
+end
+
+function MY_BagStatistics.OnItemLButtonClick()
+	local name = this:GetName()
+	if name == "Handle_Index" then
+		this:GetRoot().nCurrentPage = this.nPage
+		MY_BagStatistics.UpdateItems(this:GetRoot())
 	end
 end
 
