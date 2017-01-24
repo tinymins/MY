@@ -4,7 +4,7 @@
 -- @Email:  root@derzh.com
 -- @Project: JX3 UI
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-01-24 17:43:04
+-- @Last modified time: 2017-01-24 17:47:06
 --
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
@@ -338,6 +338,7 @@ function MY_BagStatistics.OnFrameCreate()
 	MY_BagStatistics.UpdateNames(this)
 	this:BringToTop()
 	this:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
+	this:Lookup("", "Text_Title"):SetText(_L['mingyi plugins'] .. " - " .. _L['MY_BagStatistics'])
 end
 
 function MY_BagStatistics.OnEditSpecialKeyDown()
