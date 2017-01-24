@@ -4,7 +4,7 @@
 -- @Email:  root@derzh.com
 -- @Project: JX3 UI
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-01-24 14:50:15
+-- @Last modified time: 2017-01-24 15:55:23
 --
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_BagEx/lang/")
  DB = SQLite3_Open(MY.FormatPath({"userdata/bagstatistics.db", MY_DATA_PATH.GLOBAL}))
@@ -32,26 +32,6 @@ RegisterCustomData("Global/MY_BagStatistics.tUncheckedNames")
 
 local PushDB
 do
-local l_guildcache = {}
-local function UpdateTongRepertoryPage()
-	local nPage = arg0
-	local offset = nPage * INVENTORY_GUILD_PAGE_SIZE
-	local boxtype = INVENTORY_GUILD_BANK
-	for boxindex = offset, offset + 7 * 14 - 1 do
-		local tabtype, tabindex, tabsubindex, name, desc = -1, -1, -1, "", ""
-		local KItem = GetPlayerItem(me, boxtype, boxindex)
-		if KItem then
-			tabtype = KItem.dwTabType
-			tabindex = KItem.dwIndex
-			name = KItem.szName
-			desc = GetItemText(KItem)
-			tabsubindex = KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1
-		end
-		l_guildcache[boxindex] = {boxtype = boxtype, boxindex = boxindex, tabtype = tabtype, tabindex = tabindex, name = name, desc = desc, time = GetCurrentTime()}
-	end
-end
-MY.RegisterEvent("UPDATE_TONG_REPERTORY_PAGE.MY_BagStatistics", UpdateTongRepertoryPage)
-
 local GetItemText
 do
 local l_tItemText = {}
@@ -72,6 +52,27 @@ function GetItemText(KItem)
 	end
 end
 end
+
+local l_guildcache = {}
+local function UpdateTongRepertoryPage()
+	local nPage = arg0
+	local offset = nPage * INVENTORY_GUILD_PAGE_SIZE
+	local boxtype = INVENTORY_GUILD_BANK
+	for boxindex = offset, offset + 7 * 14 - 1 do
+		local tabtype, tabindex, tabsubindex, name, desc, count = -1, -1, -1, "", "", 0
+		local KItem = GetPlayerItem(me, boxtype, boxindex)
+		if KItem then
+			tabtype = KItem.dwTabType
+			tabindex = KItem.dwIndex
+			name = KItem.szName
+			desc = GetItemText(KItem)
+			tabsubindex = KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1
+			count = KItem.nStackNum
+		end
+		l_guildcache[boxindex] = {boxtype = boxtype, boxindex = boxindex, tabtype = tabtype, tabindex = tabindex, tabsubindex = tabsubindex, name = name, desc = desc, count = count, time = GetCurrentTime()}
+	end
+end
+MY.RegisterEvent("UPDATE_TONG_REPERTORY_PAGE.MY_BagStatistics", UpdateTongRepertoryPage)
 
 function PushDB()
 	MY.Debug({"Pushing to database..."}, "MY_BagStatistics", MY_DEBUG.LOG)
@@ -130,13 +131,13 @@ function PushDB()
 	-- 帮会仓库
 	if not empty(l_guildcache) then
 		local ownerkey = "tong" .. me.dwTongID
-		local ownername = AnsiToUTF8(MY.GetTongName(me.dwTongID))
+		local ownername = AnsiToUTF8("[" .. MY.GetTongName(me.dwTongID) .. "]")
 		for _, info in pairs(l_guildcache) do
 			DB_ItemInfoW:ClearBindings()
 			DB_ItemInfoW:BindAll(info.tabtype, info.tabindex, info.tabsubindex, AnsiToUTF8(info.name), AnsiToUTF8(info.desc))
 			DB_ItemInfoW:Execute()
 			DB_ItemsW:ClearBindings()
-			DB_ItemsW:BindAll(ownerkey, info.boxtype, info.boxindex, info.tabtype, info.tabindex, info.tabsubindex, 0, KItem.nStackNum, time)
+			DB_ItemsW:BindAll(ownerkey, info.boxtype, info.boxindex, info.tabtype, info.tabindex, info.tabsubindex, 0, info.count, time)
 			DB_ItemsW:Execute()
 		end
 		DB_OwnerInfoW:ClearBindings()
@@ -156,6 +157,18 @@ end
 
 function MY_BagStatistics.Close()
 	Wnd.CloseWindow("MY_BagStatistics")
+end
+
+function MY_BagStatistics.IsOpened()
+	return Station.Lookup("Normal/MY_BagStatistics")
+end
+
+function MY_BagStatistics.Toggle()
+	if MY_BagStatistics.IsOpened() then
+		MY_BagStatistics.Close()
+	else
+		MY_BagStatistics.Open()
+	end
 end
 
 function MY_BagStatistics.UpdateNames(frame)
@@ -180,7 +193,7 @@ end
 
 function MY_BagStatistics.UpdateItems(frame)
 	local searchitem = frame:Lookup("Window_Main/Wnd_SearchItem/Edit_SearchItem"):GetText():gsub("%s+", "%%")
-	local sql = "SELECT C.ownerkey AS ownerkey, C.boxtype AS boxtype, C.boxindex AS boxindex, C.tabtype AS tabtype, C.tabindex AS tabindex, C.tabsubindex AS tabsubindex, SUM(C.bagcount) AS bagcount, SUM(C.bankcount) AS bankcount, C.time AS time, O.ownername AS ownername, O.servername AS servername FROM(SELECT B.ownerkey, B.boxtype, B.boxindex, B.tabtype, B.tabindex, B.tabsubindex, B.bagcount, B.bankcount, B.time FROM BagItems AS B LEFT JOIN ItemInfo AS I ON B.tabtype = I.tabtype AND B.tabindex = I.tabindex WHERE I.name LIKE ? OR I.desc LIKE ?) AS C LEFT JOIN OwnerInfo AS O ON C.ownerkey = O.ownerkey WHERE "
+	local sql = "SELECT C.ownerkey AS ownerkey, C.boxtype AS boxtype, C.boxindex AS boxindex, C.tabtype AS tabtype, C.tabindex AS tabindex, C.tabsubindex AS tabsubindex, SUM(C.bagcount) AS bagcount, SUM(C.bankcount) AS bankcount, C.time AS time, O.ownername AS ownername, O.servername AS servername FROM(SELECT B.ownerkey, B.boxtype, B.boxindex, B.tabtype, B.tabindex, B.tabsubindex, B.bagcount, B.bankcount, B.time FROM BagItems AS B LEFT JOIN ItemInfo AS I ON B.tabtype = I.tabtype AND B.tabindex = I.tabindex WHERE B.tabtype != -1 AND B.tabindex != -1 AND (I.name LIKE ? OR I.desc LIKE ?)) AS C LEFT JOIN OwnerInfo AS O ON C.ownerkey = O.ownerkey WHERE "
 	local wheres = {}
 	local ownerkeys = {}
 	local container = frame:Lookup("Window_Main/WndScroll_Name/WndContainer_Name")
@@ -206,35 +219,39 @@ function MY_BagStatistics.UpdateItems(frame)
 	hList:Clear()
 	for _, rec in ipairs(result) do
 		local KItemInfo = GetItemInfo(rec.tabtype, rec.tabindex)
-		local hItem = hList:AppendItemFromIni(SZ_INI, "Handle_Item")
-		UpdateItemInfoBoxObject(hItem:Lookup("Box_Item"), nil, rec.tabtype, rec.tabindex, 1, rec.tabsubindex)
-		UpdateItemInfoBoxObject(hItem:Lookup("Handle_ItemInfo/Text_ItemName"), nil, rec.tabtype, rec.tabindex, 1, rec.tabsubindex)
-		hItem:Lookup("Text_ItemStatistics"):SprintfText(_L["Bankx%d Bagx%d Totalx%d"], rec.bankcount, rec.bagcount, rec.bankcount + rec.bagcount)
-		if KItemInfo.nGenre == ITEM_GENRE.TASK_ITEM then
-			hItem:Lookup("Handle_ItemInfo/Text_ItemDesc"):SetText(g_tStrings.STR_ITEM_H_QUEST_ITEM)
-		elseif KItemInfo.nBindType == ITEM_BIND.BIND_ON_PICKED then
-			hItem:Lookup("Handle_ItemInfo/Text_ItemDesc"):SetText(g_tStrings.STR_ITEM_H_BIND_AFTER_PICK)
-		elseif KItemInfo.nBindType == ITEM_BIND.BIND_ON_TIME_LIMITATION then
-			hItem:Lookup("Handle_ItemInfo/Text_ItemDesc"):SetText(g_tStrings.STR_ITEM_H_BIND_TIME_LIMITATION1)
+		if KItemInfo then
+			local hItem = hList:AppendItemFromIni(SZ_INI, "Handle_Item")
+			UpdateItemInfoBoxObject(hItem:Lookup("Box_Item"), nil, rec.tabtype, rec.tabindex, 1, rec.tabsubindex)
+			UpdateItemInfoBoxObject(hItem:Lookup("Handle_ItemInfo/Text_ItemName"), nil, rec.tabtype, rec.tabindex, 1, rec.tabsubindex)
+			hItem:Lookup("Text_ItemStatistics"):SprintfText(_L["Bankx%d Bagx%d Totalx%d"], rec.bankcount, rec.bagcount, rec.bankcount + rec.bagcount)
+			if KItemInfo.nGenre == ITEM_GENRE.TASK_ITEM then
+				hItem:Lookup("Handle_ItemInfo/Text_ItemDesc"):SetText(g_tStrings.STR_ITEM_H_QUEST_ITEM)
+			elseif KItemInfo.nBindType == ITEM_BIND.BIND_ON_PICKED then
+				hItem:Lookup("Handle_ItemInfo/Text_ItemDesc"):SetText(g_tStrings.STR_ITEM_H_BIND_AFTER_PICK)
+			elseif KItemInfo.nBindType == ITEM_BIND.BIND_ON_TIME_LIMITATION then
+				hItem:Lookup("Handle_ItemInfo/Text_ItemDesc"):SetText(g_tStrings.STR_ITEM_H_BIND_TIME_LIMITATION1)
+			else
+				hItem:Lookup("Handle_ItemInfo/Text_ItemDesc"):SetText("")
+			end
+			hItem:Lookup("Handle_ItemInfo"):FormatAllItemPos()
+			
+			DB_CountR:ClearBindings()
+			DB_CountR:BindAll(rec.tabtype, rec.tabindex, rec.tabsubindex, unpack(ownerkeys))
+			local result = DB_CountR:GetAll()
+			local hBelongsList = hItem:Lookup("Handle_ItemBelongs")
+			hBelongsList:Clear()
+			for _, rec in ipairs(result) do
+				hBelongsList:AppendItemFromIni(SZ_INI, "Text_ItemBelongs"):SprintfText(_L['%s (%s)\tBankx%d Bagx%d Totalx%d\n'], UTF8ToAnsi(rec.ownername), UTF8ToAnsi(rec.servername), rec.bankcount, rec.bagcount, rec.bankcount + rec.bagcount)
+			end
+			hBelongsList:FormatAllItemPos()
+			hBelongsList:SetSizeByAllItemSize()
+			hItem:Lookup("Shadow_ItemHover"):SetH(0)
+			hItem:SetSizeByAllItemSize()
+			hItem:SetH(hItem:GetH() + 7)
+			hItem:Lookup("Shadow_ItemHover"):SetH(hItem:GetH())
 		else
-			hItem:Lookup("Handle_ItemInfo/Text_ItemDesc"):SetText("")
+			MY.Debug({"KItemInfo not found: " .. rec.tabtype .. ", " .. rec.tabindex}, "MY_BagStatistics", MY_DEBUG.WARNING)
 		end
-		hItem:Lookup("Handle_ItemInfo"):FormatAllItemPos()
-		
-		DB_CountR:ClearBindings()
-		DB_CountR:BindAll(rec.tabtype, rec.tabindex, rec.tabsubindex, unpack(ownerkeys))
-		local result = DB_CountR:GetAll()
-		local hBelongsList = hItem:Lookup("Handle_ItemBelongs")
-		hBelongsList:Clear()
-		for _, rec in ipairs(result) do
-			hBelongsList:AppendItemFromIni(SZ_INI, "Text_ItemBelongs"):SprintfText(_L['%s (%s)\tBankx%d Bagx%d Totalx%d\n'], UTF8ToAnsi(rec.ownername), UTF8ToAnsi(rec.servername), rec.bankcount, rec.bagcount, rec.bankcount + rec.bagcount)
-		end
-		hBelongsList:FormatAllItemPos()
-		hBelongsList:SetSizeByAllItemSize()
-		hItem:Lookup("Shadow_ItemHover"):SetH(0)
-		hItem:SetSizeByAllItemSize()
-		hItem:SetH(hItem:GetH() + 7)
-		hItem:Lookup("Shadow_ItemHover"):SetH(hItem:GetH())
 	end
 	hList:FormatAllItemPos()
 end
@@ -283,4 +300,14 @@ function MY_BagStatistics.OnLButtonClick()
 		end
 		wnd:Lookup("CheckBox_Name"):Check(true)
 	end
+end
+
+do
+local menu = {
+	szOption = _L["MY_BagStatistics"],
+	fnAction = function() MY_BagStatistics.Toggle() end,
+}
+MY.RegisterPlayerAddonMenu('MY_BAGSTATISTICS_MENU', menu)
+MY.RegisterTraceButtonMenu('MY_BAGSTATISTICS_MENU', menu)
+MY.Game.AddHotKey("MY_BagStatistics", _L['MY_BagStatistics'], MY_BagStatistics.Toggle, nil)
 end
