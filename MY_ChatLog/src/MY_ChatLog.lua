@@ -240,6 +240,8 @@ function InitDB(force)
 		DB:Execute("END TRANSACTION")
 		MY.Debug({"Creating database finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
 	end
+	l_initialized = true
+	MY.Debug({"Initializing database finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
 	
 	-- 导入旧版数据
 	local SZ_OLD_PATH = MY.FormatPath('userdata/CHAT_LOG/$uid/') -- %s/%s.$lang.jx3dat
@@ -282,9 +284,6 @@ function InitDB(force)
 		CPath.DelDir(SZ_OLD_PATH)
 		MY.Debug({"Importing old data finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
 	end
-	l_initialized = true
-	
-	MY.Debug({"Initializing database finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
 	return true
 end
 
