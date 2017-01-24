@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-01-11 17:09:26
+-- @Last modified time: 2017-01-24 15:44:51
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 EMPTY_TABLE = SetmetaReadonly({})
@@ -604,3 +604,5 @@ function ipairs_r(tab)
 	return fnBpairs, tab, #tab + 1
 end
 end
+
+UpdateItemInfoBoxObject = UpdataItemInfoBoxObject
