@@ -343,7 +343,7 @@ end
 MYDev_Snaplines.ReloadUI = function()
 	Wnd.CloseWindow("MYDev_Snaplines")
 	if MYDev_Snaplines.bEnable then
-		Wnd.OpenWindow(MY.GetAddonInfo().szRoot .. "Dev_Snaplines/ui/MYDev_Snaplines.ini", "MYDev_Snaplines")
+		Wnd.OpenWindow(MY.GetAddonInfo().szRoot .. "MYDev_Snaplines/ui/MYDev_Snaplines.ini", "MYDev_Snaplines")
 	end
 end
 MY.RegisterInit('MYDEV_SNAPLINES', MYDev_Snaplines.ReloadUI)
