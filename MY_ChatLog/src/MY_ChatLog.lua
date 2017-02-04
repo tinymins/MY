@@ -465,6 +465,7 @@ function PushDB()
 	end
 	DB:Execute("END TRANSACTION")
 	MY.Debug({"Pushing to database finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
+	FireUIEvent("ON_MY_CHATLOG_PUSHDB")
 end
 
 local function GetChatLogTableCount(channels, search)
@@ -695,6 +696,7 @@ function MY_ChatLog.OnFrameCreate()
 	
 	MY_ChatLog.UpdatePage(this)
 	this:RegisterEvent("ON_MY_MOSAICS_RESET")
+	this:RegisterEvent("ON_MY_CHATLOG_PUSHDB")
 	
 	this:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
 end
@@ -702,6 +704,8 @@ end
 function MY_ChatLog.OnEvent(event)
 	if event == "ON_MY_MOSAICS_RESET" then
 		MY_ChatLog.UpdatePage(this, true)
+	elseif event == "ON_MY_CHATLOG_PUSHDB" then
+		MY_ChatLog.UpdatePage(this, true, true)
 	end
 end
 
@@ -832,9 +836,10 @@ function MY_ChatLog.OnItemRButtonClick()
 	end
 end
 
-function MY_ChatLog.UpdatePage(frame, noscroll)
-	PushDB()
-	
+function MY_ChatLog.UpdatePage(frame, noscroll, nopushdb)
+	if not nopushdb then
+		PushDB()
+	end
 	local container = frame:Lookup("Window_Main/WndScroll_ChatChanel/WndContainer_ChatChanel")
 	local channels = {}
 	for i = 0, container:GetAllContentCount() - 1 do
