@@ -4,7 +4,7 @@
 -- @Email:  root@derzh.com
 -- @Project: JX3 UI
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-02-05 11:31:14
+-- @Last modified time: 2017-02-05 11:51:40
 --
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
@@ -45,6 +45,7 @@ local DB_ItemInfoW = DB:Prepare("REPLACE INTO ItemInfo (tabtype, tabindex, tabsu
 MY_BagStatistics = {}
 MY_BagStatistics.bCompactMode = false
 MY_BagStatistics.tUncheckedNames = {}
+RegisterCustomData("Global/MY_BagStatistics.bCompactMode")
 RegisterCustomData("Global/MY_BagStatistics.tUncheckedNames")
 
 local PushDB
