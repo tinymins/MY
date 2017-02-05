@@ -4,7 +4,7 @@
 -- @Email:  root@derzh.com
 -- @Project: JX3 UI
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-01-24 17:47:06
+-- @Last modified time: 2017-02-05 11:01:38
 --
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
@@ -43,6 +43,7 @@ DB:Execute("CREATE INDEX IF NOT EXISTS ItemInfo_desc_idx ON ItemInfo(desc)")
 local DB_ItemInfoW = DB:Prepare("REPLACE INTO ItemInfo (tabtype, tabindex, tabsubindex, name, desc) VALUES (?, ?, ?, ?, ?)")
 
 MY_BagStatistics = {}
+MY_BagStatistics.bCompactMode = false
 MY_BagStatistics.tUncheckedNames = {}
 RegisterCustomData("Global/MY_BagStatistics.tUncheckedNames")
 
@@ -213,7 +214,7 @@ function MY_BagStatistics.UpdateItems(frame)
 	local sqlfrom = "(SELECT B.ownerkey, B.boxtype, B.boxindex, B.tabtype, B.tabindex, B.tabsubindex, B.bagcount, B.bankcount, B.time FROM BagItems AS B LEFT JOIN ItemInfo AS I ON B.tabtype = I.tabtype AND B.tabindex = I.tabindex WHERE B.tabtype != -1 AND B.tabindex != -1 AND (I.name LIKE ? OR I.desc LIKE ?)) AS C LEFT JOIN OwnerInfo AS O ON C.ownerkey = O.ownerkey WHERE "
 	local sql  = "SELECT C.ownerkey AS ownerkey, C.boxtype AS boxtype, C.boxindex AS boxindex, C.tabtype AS tabtype, C.tabindex AS tabindex, C.tabsubindex AS tabsubindex, SUM(C.bagcount) AS bagcount, SUM(C.bankcount) AS bankcount, C.time AS time, O.ownername AS ownername, O.servername AS servername FROM" .. sqlfrom
 	local sqlc = "SELECT COUNT(*) AS count FROM" .. sqlfrom
-	local nPageSize = NORMAL_MODE_PAGE_SIZE
+	local nPageSize = MY_BagStatistics.bCompactMode and COMPACT_MODE_PAGE_SIZE or NORMAL_MODE_PAGE_SIZE
 	local wheres = {}
 	local ownerkeys = {}
 	local container = frame:Lookup("Window_Main/WndScroll_Name/WndContainer_Name")
@@ -295,35 +296,52 @@ function MY_BagStatistics.UpdateItems(frame)
 	for _, rec in ipairs(result) do
 		local KItemInfo = GetItemInfo(rec.tabtype, rec.tabindex)
 		if KItemInfo then
-			local hItem = handle:AppendItemFromIni(SZ_INI, "Handle_Item")
-			UpdateItemInfoBoxObject(hItem:Lookup("Box_Item"), nil, rec.tabtype, rec.tabindex, 1, rec.tabsubindex)
-			UpdateItemInfoBoxObject(hItem:Lookup("Handle_ItemInfo/Text_ItemName"), nil, rec.tabtype, rec.tabindex, 1, rec.tabsubindex)
-			hItem:Lookup("Text_ItemStatistics"):SprintfText(_L["Bankx%d Bagx%d Totalx%d"], rec.bankcount, rec.bagcount, rec.bankcount + rec.bagcount)
-			if KItemInfo.nGenre == ITEM_GENRE.TASK_ITEM then
-				hItem:Lookup("Handle_ItemInfo/Text_ItemDesc"):SetText(g_tStrings.STR_ITEM_H_QUEST_ITEM)
-			elseif KItemInfo.nBindType == ITEM_BIND.BIND_ON_PICKED then
-				hItem:Lookup("Handle_ItemInfo/Text_ItemDesc"):SetText(g_tStrings.STR_ITEM_H_BIND_AFTER_PICK)
-			elseif KItemInfo.nBindType == ITEM_BIND.BIND_ON_TIME_LIMITATION then
-				hItem:Lookup("Handle_ItemInfo/Text_ItemDesc"):SetText(g_tStrings.STR_ITEM_H_BIND_TIME_LIMITATION1)
+			if MY_BagStatistics.bCompactMode then
+				local count = 0
+				local hItem = handle:AppendItemFromIni(SZ_INI, "Handle_ItemCompact")
+				local box = hItem:Lookup("Box_ItemCompact")
+				
+				DB_BelongsR:ClearBindings()
+				DB_BelongsR:BindAll(rec.tabtype, rec.tabindex, rec.tabsubindex, unpack(ownerkeys))
+				local result = DB_BelongsR:GetAll()
+				local aTip = {}
+				for _, rec in ipairs(result) do
+					count = count + rec.bankcount + rec.bagcount
+					tinsert(aTip, _L('%s (%s)\tBankx%d Bagx%d Totalx%d\n', UTF8ToAnsi(rec.ownername), UTF8ToAnsi(rec.servername), rec.bankcount, rec.bagcount, rec.bankcount + rec.bagcount))
+				end
+				UpdateItemInfoBoxObject(box, nil, rec.tabtype, rec.tabindex, count, rec.tabsubindex)
+				box.tip = GetItemInfoTip(nil, rec.tabtype, rec.tabindex, nil, nil, rec.tabsubindex) .. GetFormatText(tconcat(aTip))
 			else
-				hItem:Lookup("Handle_ItemInfo/Text_ItemDesc"):SetText("")
+				local hItem = handle:AppendItemFromIni(SZ_INI, "Handle_Item")
+				hItem:Lookup("Text_ItemStatistics"):SprintfText(_L["Bankx%d Bagx%d Totalx%d"], rec.bankcount, rec.bagcount, rec.bankcount + rec.bagcount)
+				if KItemInfo.nGenre == ITEM_GENRE.TASK_ITEM then
+					hItem:Lookup("Handle_ItemInfo/Text_ItemDesc"):SetText(g_tStrings.STR_ITEM_H_QUEST_ITEM)
+				elseif KItemInfo.nBindType == ITEM_BIND.BIND_ON_PICKED then
+					hItem:Lookup("Handle_ItemInfo/Text_ItemDesc"):SetText(g_tStrings.STR_ITEM_H_BIND_AFTER_PICK)
+				elseif KItemInfo.nBindType == ITEM_BIND.BIND_ON_TIME_LIMITATION then
+					hItem:Lookup("Handle_ItemInfo/Text_ItemDesc"):SetText(g_tStrings.STR_ITEM_H_BIND_TIME_LIMITATION1)
+				else
+					hItem:Lookup("Handle_ItemInfo/Text_ItemDesc"):SetText("")
+				end
+				hItem:Lookup("Handle_ItemInfo"):FormatAllItemPos()
+				
+				DB_BelongsR:ClearBindings()
+				DB_BelongsR:BindAll(rec.tabtype, rec.tabindex, rec.tabsubindex, unpack(ownerkeys))
+				local result = DB_BelongsR:GetAll()
+				local hBelongsList = hItem:Lookup("Handle_ItemBelongs")
+				hBelongsList:Clear()
+				for _, rec in ipairs(result) do
+					hBelongsList:AppendItemFromIni(SZ_INI, "Text_ItemBelongs"):SprintfText(_L['%s (%s)\tBankx%d Bagx%d Totalx%d\n'], UTF8ToAnsi(rec.ownername), UTF8ToAnsi(rec.servername), rec.bankcount, rec.bagcount, rec.bankcount + rec.bagcount)
+				end
+				hBelongsList:FormatAllItemPos()
+				hBelongsList:SetSizeByAllItemSize()
+				hItem:Lookup("Shadow_ItemHover"):SetH(0)
+				hItem:SetSizeByAllItemSize()
+				hItem:SetH(hItem:GetH() + 7)
+				hItem:Lookup("Shadow_ItemHover"):SetH(hItem:GetH())
+				UpdateItemInfoBoxObject(hItem:Lookup("Box_Item"), nil, rec.tabtype, rec.tabindex, 1, rec.tabsubindex)
+				UpdateItemInfoBoxObject(hItem:Lookup("Handle_ItemInfo/Text_ItemName"), nil, rec.tabtype, rec.tabindex, 1, rec.tabsubindex)
 			end
-			hItem:Lookup("Handle_ItemInfo"):FormatAllItemPos()
-			
-			DB_BelongsR:ClearBindings()
-			DB_BelongsR:BindAll(rec.tabtype, rec.tabindex, rec.tabsubindex, unpack(ownerkeys))
-			local result = DB_BelongsR:GetAll()
-			local hBelongsList = hItem:Lookup("Handle_ItemBelongs")
-			hBelongsList:Clear()
-			for _, rec in ipairs(result) do
-				hBelongsList:AppendItemFromIni(SZ_INI, "Text_ItemBelongs"):SprintfText(_L['%s (%s)\tBankx%d Bagx%d Totalx%d\n'], UTF8ToAnsi(rec.ownername), UTF8ToAnsi(rec.servername), rec.bankcount, rec.bagcount, rec.bankcount + rec.bagcount)
-			end
-			hBelongsList:FormatAllItemPos()
-			hBelongsList:SetSizeByAllItemSize()
-			hItem:Lookup("Shadow_ItemHover"):SetH(0)
-			hItem:SetSizeByAllItemSize()
-			hItem:SetH(hItem:GetH() + 7)
-			hItem:Lookup("Shadow_ItemHover"):SetH(hItem:GetH())
 		else
 			MY.Debug({"KItemInfo not found: " .. rec.tabtype .. ", " .. rec.tabindex}, "MY_BagStatistics", MY_DEBUG.WARNING)
 		end
@@ -339,6 +357,13 @@ function MY_BagStatistics.OnFrameCreate()
 	this:BringToTop()
 	this:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
 	this:Lookup("", "Text_Title"):SetText(_L['mingyi plugins'] .. " - " .. _L['MY_BagStatistics'])
+	this:RegisterEvent("MY_BAGSTATISTICS_MODE_CHANGE")
+end
+
+function MY_BagStatistics.OnEvent(event)
+	if event == "MY_BAGSTATISTICS_MODE_CHANGE" then
+		MY_BagStatistics.UpdateItems(this)
+	end
 end
 
 function MY_BagStatistics.OnEditSpecialKeyDown()
@@ -376,6 +401,9 @@ function MY_BagStatistics.OnLButtonClick()
 			wnd:Lookup("CheckBox_Name"):Check(false, WNDEVENT_FIRETYPE.PREVENT)
 		end
 		wnd:Lookup("CheckBox_Name"):Check(true)
+	elseif name == "Btn_SwitchMode" then
+		MY_BagStatistics.bCompactMode = not MY_BagStatistics.bCompactMode
+		FireUIEvent("MY_BAGSTATISTICS_MODE_CHANGE")
 	end
 end
 
@@ -385,6 +413,19 @@ function MY_BagStatistics.OnItemLButtonClick()
 		this:GetRoot().nCurrentPage = this.nPage
 		MY_BagStatistics.UpdateItems(this:GetRoot())
 	end
+end
+
+function MY_BagStatistics.OnItemMouseEnter()
+	if this.tip then
+		local x, y = this:GetAbsPos()
+		local w, h = this:GetSize()
+		OutputTip(this.tip, 400, {x, y, w, h, false}, nil, false)
+	end
+end
+MY_BagStatistics.OnItemRefreshTip = MY_BagStatistics.OnItemMouseEnter
+
+function MY_BagStatistics.OnItemMouseLeave()
+	HideTip()
 end
 
 do
