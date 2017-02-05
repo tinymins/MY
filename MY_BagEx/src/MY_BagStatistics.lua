@@ -4,7 +4,7 @@
 -- @Email:  root@derzh.com
 -- @Project: JX3 UI
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-02-05 11:01:38
+-- @Last modified time: 2017-02-05 11:31:14
 --
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
@@ -404,6 +404,13 @@ function MY_BagStatistics.OnLButtonClick()
 	elseif name == "Btn_SwitchMode" then
 		MY_BagStatistics.bCompactMode = not MY_BagStatistics.bCompactMode
 		FireUIEvent("MY_BAGSTATISTICS_MODE_CHANGE")
+	elseif name == "Btn_NameAll" then
+		local parent = this:GetParent():Lookup("WndContainer_Name")
+		for i = 0, parent:GetAllContentCount() - 1 do
+			local wnd = parent:LookupContent(i)
+			wnd:Lookup("CheckBox_Name"):Check(true, WNDEVENT_FIRETYPE.PREVENT)
+		end
+		MY_BagStatistics.UpdateItems(this:GetRoot())
 	end
 end
 
