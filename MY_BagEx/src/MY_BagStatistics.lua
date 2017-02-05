@@ -4,7 +4,7 @@
 -- @Email:  root@derzh.com
 -- @Project: JX3 UI
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-02-05 17:44:33
+-- @Last modified time: 2017-02-05 17:45:30
 --
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
@@ -313,10 +313,9 @@ function MY_BagStatistics.UpdateItems(frame)
 				UpdateItemInfoBoxObject(box, nil, rec.tabtype, rec.tabindex, count, rec.tabsubindex)
 				box.tip = GetItemInfoTip(nil, rec.tabtype, rec.tabindex, nil, nil, rec.tabsubindex) .. GetFormatText(tconcat(aTip))
 			else
+				local hItem = handle:AppendItemFromIni(SZ_INI, "Handle_Item")
 				UpdateItemInfoBoxObject(hItem:Lookup("Box_Item"), nil, rec.tabtype, rec.tabindex, 1, rec.tabsubindex)
 				UpdateItemInfoBoxObject(hItem:Lookup("Handle_ItemInfo/Text_ItemName"), nil, rec.tabtype, rec.tabindex, 1, rec.tabsubindex)
-				
-				local hItem = handle:AppendItemFromIni(SZ_INI, "Handle_Item")
 				hItem:Lookup("Text_ItemStatistics"):SprintfText(_L["Bankx%d Bagx%d Totalx%d"], rec.bankcount, rec.bagcount, rec.bankcount + rec.bagcount)
 				if KItemInfo.nGenre == ITEM_GENRE.TASK_ITEM then
 					hItem:Lookup("Handle_ItemInfo/Text_ItemDesc"):SetText(g_tStrings.STR_ITEM_H_QUEST_ITEM)
