@@ -4,7 +4,7 @@
 -- @Email:  root@derzh.com
 -- @Project: JX3 UI
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-02-05 17:45:30
+-- @Last modified time: 2017-02-06 14:59:18
 --
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
@@ -85,7 +85,7 @@ local function UpdateTongRepertoryPage()
 			name = KItem.szName
 			desc = GetItemText(KItem)
 			tabsubindex = KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1
-			count = KItem.nStackNum
+			count = KItem.bCanStack and KItem.nStackNum or 1
 		end
 		l_guildcache[boxindex] = {boxtype = boxtype, boxindex = boxindex, tabtype = tabtype, tabindex = tabindex, tabsubindex = tabsubindex, name = name, desc = desc, count = count, time = GetCurrentTime()}
 	end
@@ -111,7 +111,7 @@ function PushDB()
 				DB_ItemInfoW:ClearBindings()
 				DB_ItemInfoW:BindAll(KItem.dwTabType, KItem.dwIndex, KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1, AnsiToUTF8(KItem.szName), AnsiToUTF8(GetItemText(KItem)))
 				DB_ItemInfoW:Execute()
-				DB_ItemsW:BindAll(ownerkey, boxtype, boxindex, KItem.dwTabType, KItem.dwIndex, KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1, KItem.nStackNum, 0, time)
+				DB_ItemsW:BindAll(ownerkey, boxtype, boxindex, KItem.dwTabType, KItem.dwIndex, KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1, KItem.bCanStack and KItem.nStackNum or 1, 0, time)
 			else
 				DB_ItemsW:BindAll(ownerkey, boxtype, boxindex, -1, -1, -1, 0, 0, time)
 			end
@@ -135,7 +135,7 @@ function PushDB()
 				DB_ItemInfoW:ClearBindings()
 				DB_ItemInfoW:BindAll(KItem.dwTabType, KItem.dwIndex, KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1, AnsiToUTF8(KItem.szName), AnsiToUTF8(GetItemText(KItem)))
 				DB_ItemInfoW:Execute()
-				DB_ItemsW:BindAll(ownerkey, boxtype, boxindex, KItem.dwTabType, KItem.dwIndex, KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1, 0, KItem.nStackNum, time)
+				DB_ItemsW:BindAll(ownerkey, boxtype, boxindex, KItem.dwTabType, KItem.dwIndex, KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1, 0, KItem.bCanStack and KItem.nStackNum or 1, time)
 			else
 				DB_ItemsW:BindAll(ownerkey, boxtype, boxindex, -1, -1, -1, 0, 0, time)
 			end
