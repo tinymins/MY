@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-01-20 15:02:13
+-- @Last modified time: 2017-02-06 10:38:19
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- #################################################################################################################################### --
@@ -126,6 +126,7 @@ local _PSS_ST_         = _FRAMEWORK_ROOT_ .. "image/ST.pss"
 local _UITEX_ST_       = _FRAMEWORK_ROOT_ .. "image/ST_UI.UITex"
 local _UITEX_POSTER_   = _FRAMEWORK_ROOT_ .. "image/Poster.UITex"
 local _UITEX_COMMON_   = _FRAMEWORK_ROOT_ .. "image/UICommon.UITex"
+Log("[MY] Debug level " .. _DEBUGLV_ .. " / delog level " .. _DELOGLV_)
 
 -- 多语言处理
 -- (table) MY.LoadLangPack(void)
