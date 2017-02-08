@@ -3,6 +3,7 @@ data = {
     -- MY_Toolbox.lua
     ['toolbox'] = '常用工具',
     ['infotip'] = '信息显示',
+    ['package searcher'] = '背包搜索',
     ['friend headtop tips'] = '附近好友高亮',
     ['friend headtop tips nav'] = '启用场景追踪点',
     ['tong member headtop tips'] = '附近帮会成员高亮',
