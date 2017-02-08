@@ -5,9 +5,9 @@
 -- @Date  : 2014-12-04 11:51:31
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-01-17 10:16:27
+-- @Last modified time: 2017-02-08 17:59:40
 -----------------------------------------------
-MY_MiddleMapMark = {}
+MY.CreateDataRoot(MY_DATA_PATH.GLOBAL)
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_MiddleMapMark/lang/")
 local l_szKeyword = ""
 local SZ_DB_PATH = MY.FormatPath({"cache/npc_doodad_rec.db", MY_DATA_PATH.GLOBAL})
@@ -30,6 +30,7 @@ local DBD_RI = DB:Prepare("SELECT templateid, poskey, mapid, x, y, name FROM Doo
 local DBD_RN = DB:Prepare("SELECT templateid, poskey, mapid, x, y, name FROM DoodadInfo WHERE name LIKE ?")
 local DBD_RNM = DB:Prepare("SELECT templateid, poskey, mapid, x, y, name FROM DoodadInfo WHERE name LIKE ? AND mapid = ?")
 
+MY_MiddleMapMark = {}
 do
 ---------------------------------------------------------------
 -- Êý¾Ý´æ´¢

@@ -4,10 +4,11 @@
 -- @Email:  root@derzh.com
 -- @Project: JX3 UI
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-02-06 14:59:18
+-- @Last modified time: 2017-02-08 17:58:05
 --
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
+MY.CreateDataRoot(MY_DATA_PATH.GLOBAL)
 local XML_LINE_BREAKER = XML_LINE_BREAKER
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local tinsert, tremove, tconcat = table.insert, table.remove, table.concat
@@ -20,7 +21,7 @@ local GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID = 
 local setmetatable = setmetatable
 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_BagEx/lang/")
- DB = SQLite3_Open(MY.FormatPath({"userdata/bagstatistics.db", MY_DATA_PATH.GLOBAL}))
+local DB = SQLite3_Open(MY.FormatPath({"userdata/bagstatistics.db", MY_DATA_PATH.GLOBAL}))
 if not DB then
 	return MY.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L["MY_BagStatistics"])
 end

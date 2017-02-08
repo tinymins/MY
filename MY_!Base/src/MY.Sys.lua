@@ -4,7 +4,7 @@
 -- @Date  : 2014-12-17 17:24:48
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-12-19 16:13:13
+-- @Last modified time: 2017-02-08 17:56:29
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 local srep, tostring, string2byte = string.rep, tostring, string.byte
@@ -185,6 +185,16 @@ function MY.GetGlobalValue(szVarPath)
 		end
 	end
 	return tVariable
+end
+
+function MY.CreateDataRoot(ePathType)
+	if ePathType == MY_DATA_PATH.ROLE then
+		CPath.MakeDir(MY.FormatPath({'$name/', MY_DATA_PATH.ROLE}))
+	end
+	CPath.MakeDir(MY.FormatPath({'cache/', ePathType}))
+	CPath.MakeDir(MY.FormatPath({'config/', ePathType}))
+	CPath.MakeDir(MY.FormatPath({'export/', ePathType}))
+	CPath.MakeDir(MY.FormatPath({'userdata/', ePathType}))
 end
 
 -- 播放声音

@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-02-06 10:38:19
+-- @Last modified time: 2017-02-08 17:56:35
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- #################################################################################################################################### --
@@ -364,17 +364,9 @@ local function OnInit()
 	if not INIT_FUNC_LIST then
 		return
 	end
-	for _, ePathType in ipairs({
-		MY_DATA_PATH.GLOBAL,
-		MY_DATA_PATH.ROLE,
-		MY_DATA_PATH.SERVER,
-	}) do
-		CPath.MakeDir(MY.FormatPath({'cache/', ePathType}))
-		CPath.MakeDir(MY.FormatPath({'config/', ePathType}))
-		CPath.MakeDir(MY.FormatPath({'export/', ePathType}))
-		CPath.MakeDir(MY.FormatPath({'userdata/', ePathType}))
-	end
-	CPath.MakeDir(MY.FormatPath({'$name/', MY_DATA_PATH.ROLE}))
+	MY.CreateDataRoot(MY_DATA_PATH.ROLE)
+	MY.CreateDataRoot(MY_DATA_PATH.GLOBAL)
+	MY.CreateDataRoot(MY_DATA_PATH.SERVER)
 	
 	for szKey, fnAction in pairs(INIT_FUNC_LIST) do
 		local nStartTick = GetTickCount()
