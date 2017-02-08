@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-11-10 20:19:08
+-- @Last modified time: 2017-02-08 20:46:39
 -----------------------------------------------
 
 -------------------------------------
@@ -103,7 +103,6 @@ local function raw2ele(raw)
 		ele.hdl = ele.hdl or raw:Lookup('','')
 		ele.edt = ele.edt or raw:Lookup('WndEdit_Default')
 		ele.img = ele.img or raw:Lookup('','Image_Default')
-		ele.phd = ele.phd or raw:Lookup('','Text_PlaceHolder')
 	elseif ele.type == "WndComboBox" then
 		ele.wnd = ele.wnd or raw
 		ele.hdl = ele.hdl or raw:Lookup('','')
@@ -116,7 +115,6 @@ local function raw2ele(raw)
 		ele.cmb = ele.cmb or raw:Lookup('Btn_ComboBox')
 		ele.edt = ele.edt or raw:Lookup('WndEdit_Default')
 		ele.img = ele.img or raw:Lookup('','Image_Default')
-		ele.phd = ele.phd or raw:Lookup('','Text_PlaceHolder')
 	elseif ele.type == "WndScrollBox" then
 		ele.wnd = ele.wnd or raw
 		ele.hdl = ele.hdl or raw:Lookup('','Handle_Padding/Handle_Scroll')
@@ -792,14 +790,6 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 						end
 					elseif szType=='WndEditBox' then
 						local edt = wnd:Lookup("WndEdit_Default")
-						edt.OnSetFocus = function()
-							wnd:Lookup("", "Text_PlaceHolder"):Hide()
-						end
-						edt.OnKillFocus = function()
-							if wnd:Lookup("WndEdit_Default"):GetText() == "" then
-								wnd:Lookup("", "Text_PlaceHolder"):Show()
-							end
-						end
 						edt.OnEditSpecialKeyDown = function()
 							local szKey = GetKeyName(Station.GetMessageKey())
 							if szKey == "Esc" or (
@@ -812,7 +802,6 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 					elseif szType=='WndAutocomplete' then
 						local edt = wnd:Lookup("WndEdit_Default")
 						edt.OnSetFocus = function()
-							wnd:Lookup("", "Text_PlaceHolder"):Hide()
 							-- check disabled
 							if wnd.tMyAcOption.disabled or wnd.tMyAcOption.disabledTmp then
 								return
@@ -826,11 +815,6 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 							end
 							-- placeholder
 							local len = this:GetText():len()
-							if len == 0 then
-								wnd:Lookup("", "Text_PlaceHolder"):Show()
-							else
-								wnd:Lookup("", "Text_PlaceHolder"):Hide()
-							end
 							-- min search length
 							if len >= wnd.tMyAcOption.minLength then
 								-- delay search
@@ -844,10 +828,6 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 							end
 						end
 						edt.OnKillFocus = function()
-							if edt:GetText() == "" then
-								wnd:Lookup("", "Text_PlaceHolder"):Show()
-							end
-
 							MY.DelayCall(function()
 								if not Station.GetFocusWindow() or Station.GetFocusWindow():GetName() ~= 'PopupMenuPanel' then
 									Wnd.CloseWindow("PopupMenuPanel")
@@ -1216,11 +1196,6 @@ function XGUI:text(szText)
 				else
 					ele.edt:SetText(szText)
 				end
-				if ele.edt:GetText() == "" then
-					ele.phd:Show()
-				else
-					ele.phd:Hide()
-				end
 			elseif ele.type == "Text" then
 				ele.txt:SetText(szText)
 				ele.txt:GetParent():FormatAllItemPos()
@@ -1255,13 +1230,13 @@ function XGUI:placeholder(szText)
 	self:_checksum()
 	if szText then
 		for _, ele in pairs(self.eles) do
-			if ele.phd then ele.phd:SetText(szText) end
+			if ele.edt then ele.edt:SetPlaceholderText(szText) end
 		end
 		return self
 	else
 		local ele = self.eles[1]
-		if ele and ele.phd and ele.phd.GetText then
-			return ele.phd:GetText()
+		if ele and ele.edt then
+			return ele.edt:GetPlaceholderText()
 		end
 	end
 end
@@ -1297,7 +1272,6 @@ function XGUI:autocomplete(method, arg1, arg2)
 			for _, ele in pairs(self.eles) do
 				ele.raw:Lookup("WndEdit_Default").OnSetFocus = nil
 				ele.raw:Lookup("WndEdit_Default").OnKillFocus = nil
-				ele.raw:Lookup("", "Text_PlaceHolder"):Hide()
 			end
 		elseif method == 'disable' then
 			self:autocomplete('option', 'disable', true)
@@ -2116,7 +2090,6 @@ function XGUI:size(nWidth, nHeight, nRawWidth, nRawHeight)
 			elseif ele.type == "WndEditComboBox" or ele.type == "WndAutocomplete" then
 				ele.wnd:SetSize(nWidth, nHeight)
 				ele.hdl:SetSize(nWidth, nHeight)
-				ele.phd:SetSize(nWidth, nHeight)
 				ele.img:SetSize(nWidth, nHeight)
 				ele.hdl:FormatAllItemPos()
 				local w, h= ele.cmb:GetSize()
@@ -2131,7 +2104,6 @@ function XGUI:size(nWidth, nHeight, nRawWidth, nRawHeight)
 			elseif ele.type == "WndEditBox" then
 				ele.wnd:SetSize(nWidth, nHeight)
 				ele.hdl:SetSize(nWidth, nHeight)
-				ele.phd:SetSize(nWidth, nHeight)
 				ele.img:SetSize(nWidth, nHeight)
 				ele.edt:SetSize(nWidth-8, nHeight-4)
 				ele.hdl:FormatAllItemPos()
