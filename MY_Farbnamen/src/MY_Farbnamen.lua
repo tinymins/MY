@@ -11,12 +11,8 @@ local tinsert, tconcat, tremove = table.insert, table.concat, table.remove
 ---------------------------------------------------------------
 -- 设置和数据
 ---------------------------------------------------------------
-MY_Farbnamen = MY_Farbnamen or {
-	bEnabled = true,
-}
-RegisterCustomData("MY_Farbnamen.bEnabled")
+MY.CreateDataRoot(MY_DATA_PATH.SERVER)
 local SZ_CONFIG_PATH = "config/player_force_color.jx3dat"
-local SZ_DB_ROOT = MY.FormatPath({"cache/", MY_DATA_PATH.SERVER})
 local SZ_DB_PATH = MY.FormatPath({"cache/player_info.db", MY_DATA_PATH.SERVER})
 local Config_Default = {
 	tForceColor = MY.LoadLUAData({SZ_CONFIG_PATH, MY_DATA_PATH.GLOBAL}) or {
@@ -36,7 +32,6 @@ local Config_Default = {
 		[FORCE_TYPE.BA_DAO   ] = {106 ,108, 189}, -- 霸刀
 	},
 }
-CPath.MakeDir(SZ_DB_ROOT)
 local DB = SQLite3_Open(SZ_DB_PATH)
 if not DB then
 	return MY.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L["MY_Farbnamen"])
@@ -49,6 +44,11 @@ local DBI_RN = DB:Prepare("SELECT id, name, force, role, level, title, camp, ton
 DB:Execute("CREATE TABLE IF NOT EXISTS TongCache (id INTEGER PRIMARY KEY, name VARCHAR(20))")
 local DBT_W  = DB:Prepare("REPLACE INTO TongCache (id, name) VALUES (?, ?)")
 local DBT_RI = DB:Prepare("SELECT id, name FROM InfoCache WHERE id = ?")
+
+MY_Farbnamen = MY_Farbnamen or {
+	bEnabled = true,
+}
+RegisterCustomData("MY_Farbnamen.bEnabled")
 
 do if IsDebugClient() then -- 旧版缓存转换
 	local SZ_IC_PATH = MY.FormatPath("cache/PLAYER_INFO/$relserver/")
