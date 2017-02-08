@@ -4,7 +4,7 @@
 -- @Date  : 2016-02-5 11:35:53
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-01-11 18:25:58
+-- @Last modified time: 2017-02-08 20:25:53
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Chat/lang/")
 local INI_PATH = MY.GetAddonInfo().szRoot .. "MY_Chat/ui/MY_ChatSwitch.ini"
@@ -408,7 +408,7 @@ MY.RegisterEvent("ON_CHAT_SET_AFK", OnChatSetAFK)
 
 local function OnChatSetATR()
 	if type(arg0) == "table" then
-		MY_ChatSwitch.szBusy = MY.Chat.StringfyContent(arg0)
+		MY_ChatSwitch.szBusy = MY.Chat.StringfyContent(arg0):sub(4)
 	else
 		MY_ChatSwitch.szBusy = arg0 and tostring(arg0)
 	end
