@@ -132,7 +132,11 @@ local function InsertElementDetailTip(hElem, tTip)
 		tinsert(tTip, _L('TextPosExtent: %s', hElem:GetTextPosExtent()))
 		tinsert(tTip, _L('Index: %s', hElem:GetIndex()))
 	elseif szType == 'Image' then
-		tinsert(tTip, _L('Frame: %s', hElem:GetFrame()))
+		local szPath, nFrame = hElem:GetImagePath()
+		tinsert(tTip, _L('Image: %s', szPath or ""))
+		if nFrame then
+			tinsert(tTip, _L('Frame: %s', nFrame))
+		end
 		tinsert(tTip, _L('ImageType: %s', hElem:GetImageType()))
 		tinsert(tTip, _L('ImageID: %s', hElem:GetImageID()))
 		tinsert(tTip, _L('Index: %s', hElem:GetIndex()))
@@ -165,6 +169,12 @@ local function InsertElementDetailTip(hElem, tTip)
 			tinsert(tTip, _L('OverText%s: [Font]%s [Pos]%s [Text]%s', 4, hElem:GetOverTextFontScheme(4), hElem:GetOverTextPosition(4), hElem:GetOverText(4)))
 		end
 		tinsert(tTip, _L('Index: %s', hElem:GetIndex()))
+	elseif szType == "WndButton" then
+		tinsert(tTip, _L('ImagePath: %s', hElem:GetAnimatePath()))
+		tinsert(tTip, _L('Normal: %d', hElem:GetAnimateGroupNormal()))
+		tinsert(tTip, _L('Over: %d', hElem:GetAnimateGroupMouseOver()))
+		tinsert(tTip, _L('Down: %d', hElem:GetAnimateGroupMouseDown()))
+		tinsert(tTip, _L('Disable: %d', hElem:GetAnimateGroupDisable()))
 	end
 end
 
