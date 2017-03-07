@@ -280,7 +280,7 @@ _C.OnPanelActive = function(wnd)
                         if t[i] == szVal then return end
                     end
                     table.insert(t, szVal)
-                    MY.SaveLUAData(_C.szLuaData, t, MY_DATA_PATH.GLOBAL)
+                    MY.SaveLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}, t)
                 end
             end, function() end, function() end, nil, edit:text() )
         end })
@@ -292,7 +292,7 @@ _C.OnPanelActive = function(wnd)
                 table.remove(t, i)
             end
         end
-        MY.SaveLUAData(_C.szLuaData, t, MY_DATA_PATH.GLOBAL)
+        MY.SaveLUAData({_C.szLuaData, t, MY_DATA_PATH.GLOBAL})
       end)
 
     ui:append("Image", "Image_Help"):find('#Image_Help')
