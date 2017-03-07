@@ -262,6 +262,13 @@ _C.OnPanelActive = function(wnd)
         if IsPopupMenuOpened() then
             MY.UI(raw):autocomplete('close')
         else
+            local source = {}
+            for _, szOpt in ipairs(MY.LoadLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}) or {}) do
+                if type(szOpt) == "string" then
+                    table.insert(source, szOpt)
+                end
+            end
+            MY.UI(raw):autocomplete('option', 'source', source)
             MY.UI(raw):autocomplete('search', '')
         end
       end)
