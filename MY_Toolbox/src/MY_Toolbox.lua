@@ -4,7 +4,7 @@
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-01-23 11:18:36
+-- @Last modified time: 2017-04-19 12:21:52
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
 local _C = {}
@@ -551,25 +551,25 @@ function PS.OnPanelActive(wnd)
 	  end)
 	
 	-- 好友高亮
-  	ui:append("WndCheckBox", {
-  		x = x, y = y, w = 180,
-  		text = _L['friend headtop tips'],
-  		checked = MY_ToolBox.bFriendHeadTip,
-  		oncheck = function(bCheck)
-  			MY_ToolBox.bFriendHeadTip = not MY_ToolBox.bFriendHeadTip
-  			MY_ToolBox.ApplyConfig()
-  		end,
-  	})
-  	ui:append("WndCheckBox", {
-  		x = x + 180, y = y, w = 180,
-  		text = _L['friend headtop tips nav'],
-  		checked = MY_ToolBox.bFriendHeadTipNav,
-  		oncheck = function(bCheck)
-  			MY_ToolBox.bFriendHeadTipNav = not MY_ToolBox.bFriendHeadTipNav
-  			MY_ToolBox.ApplyConfig()
-  		end,
-  	})
-  	y = y + 30
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = 180,
+		text = _L['friend headtop tips'],
+		checked = MY_ToolBox.bFriendHeadTip,
+		oncheck = function(bCheck)
+			MY_ToolBox.bFriendHeadTip = not MY_ToolBox.bFriendHeadTip
+			MY_ToolBox.ApplyConfig()
+		end,
+	})
+	ui:append("WndCheckBox", {
+		x = x + 180, y = y, w = 180,
+		text = _L['friend headtop tips nav'],
+		checked = MY_ToolBox.bFriendHeadTipNav,
+		oncheck = function(bCheck)
+			MY_ToolBox.bFriendHeadTipNav = not MY_ToolBox.bFriendHeadTipNav
+			MY_ToolBox.ApplyConfig()
+		end,
+	})
+	y = y + 30
 	
 	-- 帮会高亮
 	ui:append("WndCheckBox", {
@@ -594,75 +594,86 @@ function PS.OnPanelActive(wnd)
 	
 	-- 背包搜索
 	if MY_BagEx then
-		ui:append("WndCheckBox", "WndCheckBox_BagEx"):children("#WndCheckBox_BagEx")
-		  :pos(x, y)
-		  :text(_L['package searcher'])
-		  :check(MY_BagEx.bEnable or false)
-		  :check(function(bChecked)
-		  	MY_BagEx.Enable(bChecked)
-		  end)
+		ui:append("WndCheckBox", {
+			x = x, y = y,
+			text = _L['package searcher'],
+			checked = MY_BagEx.bEnable,
+			oncheck = function(bChecked)
+				MY_BagEx.Enable(bChecked)
+			end,
+		})
 		y = y + 30
 	end
 	
 	-- 显示历史技能列表
-	ui:append("WndCheckBox", "WndCheckBox_VisualSkill"):children("#WndCheckBox_VisualSkill")
-	  :pos(x, y):width(160)
-	  :text(_L['visual skill'])
-	  :check(MY_VisualSkill.bEnable or false)
-	  :check(function(bChecked)
-	  	MY_VisualSkill.bEnable = bChecked
-	  	MY_VisualSkill.Reload()
-	  end)
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = 160,
+		text = _L['visual skill'],
+		checked = MY_VisualSkill.bEnable,
+		oncheck = function(bChecked)
+			MY_VisualSkill.bEnable = bChecked
+			MY_VisualSkill.Reload()
+		end,
+	})
 	
-	ui:append("WndSliderBox", "WndSliderBox_VisualSkillCast"):children("#WndSliderBox_VisualSkillCast")
-	  :pos(x + 160, y)
-	  :sliderStyle(false):range(1, 32)
-	  :value(MY_VisualSkill.nVisualSkillBoxCount)
-	  :text(_L("display %d skills.", MY_VisualSkill.nVisualSkillBoxCount))
-	  :text(function(val) return _L("display %d skills.", val) end)
-	  :change(function(raw, val)
-	  	MY_VisualSkill.nVisualSkillBoxCount = val
-	  	MY_VisualSkill.Reload()
-	  end)
+	ui:append("WndSliderBox", {
+		x = x + 160, y = y,
+		sliderStyle = false, range = {1, 32},
+		value = MY_VisualSkill.nVisualSkillBoxCount,
+		text = _L("display %d skills.", MY_VisualSkill.nVisualSkillBoxCount),
+		textfmt = function(val) return _L("display %d skills.", val) end,
+		onchange = function(raw, val)
+			MY_VisualSkill.nVisualSkillBoxCount = val
+			MY_VisualSkill.Reload()
+		end,
+	})
 	y = y + 30
 	
 	-- 防止神行CD被黑
-	ui:append("WndCheckBox", "WndCheckBox_AvoidBlackShenxingCD"):children("#WndCheckBox_AvoidBlackShenxingCD")
-	  :pos(x, y):width(150)
-	  :text(_L['avoid blacking shenxing cd']):check(MY_ToolBox.bAvoidBlackShenxingCD or false)
-	  :check(function(bChecked)
-	  	MY_ToolBox.bAvoidBlackShenxingCD = bChecked
-	  	MY_ToolBox.ApplyConfig()
-	  end)
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = 150,
+		text = _L['avoid blacking shenxing cd'],
+		checked = MY_ToolBox.bAvoidBlackShenxingCD,
+		oncheck = function(bChecked)
+			MY_ToolBox.bAvoidBlackShenxingCD = bChecked
+			MY_ToolBox.ApplyConfig()
+		end,
+	})
 	y = y + 30
 	
 	-- 自动隐藏聊天栏
-	ui:append("WndCheckBox", "WndCheckBox_AutoHideChatPanel"):children("#WndCheckBox_AutoHideChatPanel")
-	  :pos(x, y):width(150)
-	  :text(_L['auto hide chat panel']):check(MY_AutoHideChat.bAutoHideChatPanel)
-	  :check(function(bChecked)
-	  	MY_AutoHideChat.bAutoHideChatPanel = bChecked
-	  	MY_AutoHideChat.ApplyConfig()
-	  end)
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = 150,
+		text = _L['auto hide chat panel'],
+		checked = MY_AutoHideChat.bAutoHideChatPanel,
+		oncheck = function(bChecked)
+			MY_AutoHideChat.bAutoHideChatPanel = bChecked
+			MY_AutoHideChat.ApplyConfig()
+		end,
+	})
 	y = y + 30
 	
 	-- 竞技场频道切换
-	ui:append("WndCheckBox", "WndCheckBox_AutoSwitchChannel"):children("#WndCheckBox_AutoSwitchChannel")
-	  :pos(x, y):width(300)
-	  :text(_L['auto switch talk channel when into battle field']):check(MY_ToolBox.bJJCAutoSwitchTalkChannel)
-	  :check(function(bChecked)
-	  	MY_ToolBox.bJJCAutoSwitchTalkChannel = bChecked
-	  	MY_ToolBox.ApplyConfig()
-	  end)
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = 300,
+		text = _L['auto switch talk channel when into battle field'],
+		checked = MY_ToolBox.bJJCAutoSwitchTalkChannel,
+		oncheck = function(bChecked)
+			MY_ToolBox.bJJCAutoSwitchTalkChannel = bChecked
+			MY_ToolBox.ApplyConfig()
+		end,
+	})
 	y = y + 30
 	
 	-- 竞技场自动恢复队伍信息
-	ui:append("WndCheckBox", "WndCheckBox_RestoreAuthorityInfo"):children("#WndCheckBox_RestoreAuthorityInfo")
-	  :pos(x, y):width(300)
-	  :text(_L['auto restore team info in arena']):check(MY_ToolBox.bRestoreAuthorityInfo)
-	  :check(function(bChecked)
-	  	MY_ToolBox.bRestoreAuthorityInfo = bChecked
-	  end)
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = 300,
+		text = _L['auto restore team info in arena'],
+		checked = MY_ToolBox.bRestoreAuthorityInfo,
+		oncheck = function(bChecked)
+			MY_ToolBox.bRestoreAuthorityInfo = bChecked
+		end,
+	})
 	y = y + 30
 	
 	-- 长歌影子顺序
@@ -740,20 +751,22 @@ function PS.OnPanelActive(wnd)
 	y = y + 30
 	
 	-- 随身便笺
-	ui:append("Text", "Text_Anmerkungen"):item("#Text_Anmerkungen")
-	  :pos(x, y)
-	  :color(255,255,0)
-	  :text(_L['* anmerkungen'])
+	ui:append("Text", {
+		x = x, y = y,
+		r = 255, g = 255, b = 0,
+		text = _L['* anmerkungen'],
+	})
 	y = y + 30
 	
-	ui:append("WndCheckBox", "WndCheckBox_Anmerkungen_NotePanel"):children("#WndCheckBox_Anmerkungen_NotePanel")
-	  :pos(x, y)
-	  :text(_L['my anmerkungen'])
-	  :check(MY_Anmerkungen.bNotePanelEnable or false)
-	  :check(function(bChecked)
-	  	MY_Anmerkungen.bNotePanelEnable = bChecked
-	  	MY_Anmerkungen.ReloadNotePanel()
-	  end)
+	ui:append("WndCheckBox", {
+		x = x, y = y,
+		text = _L['my anmerkungen'],
+		checked = MY_Anmerkungen.bNotePanelEnable,
+		oncheck = function(bChecked)
+			MY_Anmerkungen.bNotePanelEnable = bChecked
+			MY_Anmerkungen.ReloadNotePanel()
+		end,
+	})
 	y = y + 30
 end
 MY.RegisterPanel( "MY_ToolBox", _L["toolbox"], _L['General'], "UI/Image/Common/Money.UITex|243", { 255, 255, 0, 200 }, PS)
