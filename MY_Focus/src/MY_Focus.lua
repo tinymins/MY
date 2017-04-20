@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-01-13 15:26:24
+-- @Last modified time: 2017-04-20 15:13:53
 --------------------------------------------
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Focus/lang/")
@@ -738,6 +738,7 @@ function MY_Focus.OnFrameBreathe()
 end
 
 function MY_Focus.OnFrameCreate()
+	this:RegisterEvent("LOADING_END")
 	this:RegisterEvent("PARTY_SET_MARK")
 	this:RegisterEvent("UI_SCALED")
 	this:RegisterEvent("PLAYER_ENTER_SCENE")
@@ -754,7 +755,13 @@ function MY_Focus.OnFrameCreate()
 end
 
 function MY_Focus.OnEvent(event)
-	if event == "PARTY_SET_MARK" then
+	if event == "LOADING_END" then
+		for _, dwType in ipairs({TARGET.PLAYER, TARGET.NPC, TARGET.DOODAD}) do
+			if not MY_Focus.tFocusList[dwType] then
+				MY_Focus.tFocusList[dwType] = {}
+			end
+		end
+	elseif event == "PARTY_SET_MARK" then
 		MY_Focus.UpdateList()
 	elseif event == 'UI_SCALED' then
 		XGUI(this):anchor(MY_Focus.anchor)
