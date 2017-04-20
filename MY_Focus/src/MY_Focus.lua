@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-04-20 15:13:53
+-- @Last modified time: 2017-04-20 16:34:30
 --------------------------------------------
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Focus/lang/")
@@ -756,6 +756,9 @@ end
 
 function MY_Focus.OnEvent(event)
 	if event == "LOADING_END" then
+		if not MY_Focus.tFocusList then
+			MY_Focus.tFocusList = {}
+		end
 		for _, dwType in ipairs({TARGET.PLAYER, TARGET.NPC, TARGET.DOODAD}) do
 			if not MY_Focus.tFocusList[dwType] then
 				MY_Focus.tFocusList[dwType] = {}
