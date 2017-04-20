@@ -144,7 +144,7 @@ data = {
     
     ["Stop cast skill"] = "打斷自身讀條",
     
-    ["ADVENTURE_PATT"] = "“(.-)”[女俠].-觸發奇遇【(.-)】",
+    ["ADVENTURE_PATT"] = "“(.-)”[女俠在].-觸發奇遇【(.-)】",
     
     ["Cloud"] = "白雲",
     ["Sword"] = "小劍",
