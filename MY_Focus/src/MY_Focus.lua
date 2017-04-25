@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-04-20 16:34:30
+-- @Last modified time: 2017-04-25 11:00:18
 --------------------------------------------
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Focus/lang/")
@@ -748,10 +748,10 @@ function MY_Focus.OnFrameCreate()
 	this:RegisterEvent("NPC_LEAVE_SCENE")
 	this:RegisterEvent("DOODAD_LEAVE_SCENE")
 	
-	this:Lookup('', 'Handle_List'):Clear()
-	XGUI(this):anchor(MY_Focus.anchor)
 	MY_Focus.SetScale(MY_Focus.fScaleX, MY_Focus.fScaleY)
-	MY_Focus.ScanNearby()
+	MY_Focus.OnEvent("UI_SCALED")
+	MY_Focus.OnEvent("LOADING_END")
+	MY_Focus.RescanNearby()
 end
 
 function MY_Focus.OnEvent(event)
