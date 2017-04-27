@@ -108,4 +108,5 @@ data = {
     ['changge force only'] = '仅长歌可用',
     
     ['auto restore team info in arena'] = '竞技场中自动恢复上次组队信息',
+    ['auto cancel hide player in arena and battlefield'] = '竞技场与战场中自动取消屏蔽玩家与NPC',
 }
