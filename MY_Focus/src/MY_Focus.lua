@@ -747,6 +747,7 @@ function MY_Focus.OnFrameCreate()
 	this:RegisterEvent("PLAYER_LEAVE_SCENE")
 	this:RegisterEvent("NPC_LEAVE_SCENE")
 	this:RegisterEvent("DOODAD_LEAVE_SCENE")
+	this:RegisterEvent("CUSTOM_DATA_LOADED")
 	
 	MY_Focus.SetScale(MY_Focus.fScaleX, MY_Focus.fScaleY)
 	MY_Focus.OnEvent("UI_SCALED")
@@ -755,13 +756,21 @@ function MY_Focus.OnFrameCreate()
 end
 
 function MY_Focus.OnEvent(event)
-	if event == "LOADING_END" then
+	if event == "LOADING_END" or event == "CUSTOM_DATA_LOADED" then
 		if not MY_Focus.tFocusList then
 			MY_Focus.tFocusList = {}
 		end
 		for _, dwType in ipairs({TARGET.PLAYER, TARGET.NPC, TARGET.DOODAD}) do
 			if not MY_Focus.tFocusList[dwType] then
 				MY_Focus.tFocusList[dwType] = {}
+			end
+		end
+		if not MY_Focus.tFocusTplList then
+			MY_Focus.tFocusTplList = {}
+		end
+		for _, dwType in ipairs({TARGET.NPC, TARGET.DOODAD}) do
+			if not MY_Focus.tFocusTplList[dwType] then
+				MY_Focus.tFocusTplList[dwType] = {}
 			end
 		end
 	elseif event == "PARTY_SET_MARK" then
