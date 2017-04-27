@@ -4,7 +4,7 @@
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-04-19 12:21:52
+-- @Last modified time: 2017-04-27 17:23:43
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
 local _C = {}
@@ -32,6 +32,8 @@ MY_ToolBox.fChangeGeShadowScale = 1.5
 RegisterCustomData("MY_ToolBox.fChangeGeShadowScale")
 MY_ToolBox.bRestoreAuthorityInfo = true
 RegisterCustomData("MY_ToolBox.bRestoreAuthorityInfo")
+MY_ToolBox.bAutoShowInArena = true
+RegisterCustomData("MY_ToolBox.bAutoShowInArena")
 MY_ToolBox.ApplyConfig = function()
 	-- 好友高亮
 	if Navigator_Remove then
@@ -489,6 +491,45 @@ end
 MY.RegisterEvent({"TEAM_AUTHORITY_CHANGED", "PARTY_SET_FORMATION_LEADER", "TEAM_CHANGE_MEMBER_GROUP"}, SaveTeam)
 end
 
+-- 进入JJC自动显示所有人物
+do local l_bHideNpc, l_bHidePlayer, l_lock
+MY.RegisterEvent("TOGGLE_NPC", function()
+	if l_lock then
+		return
+	end
+	l_bHideNpc = not arg0
+end)
+MY.RegisterEvent("TOGGLE_PLAYER", function()
+	if l_lock then
+		return
+	end
+	l_bHidePlayer = not arg0
+end)
+MY.RegisterEvent("LOADING_END", function()
+	if not MY_ToolBox.bAutoShowInArena then
+		return
+	end
+	if MY.IsInArena() or MY.IsInBattleField() then
+		l_lock = true
+		rlcmd("show npc")
+		rlcmd("show player")
+	else
+		l_lock = true
+		if l_bHideNpc then
+			rlcmd("hide npc")
+		else
+			rlcmd("show npc")
+		end
+		if l_bHidePlayer then
+			rlcmd("hide player")
+		else
+			rlcmd("show player")
+		end
+		l_lock = false
+	end
+end)
+end
+
 -- ################################################################################################ --
 --     #       # # # #         # # # # # # # # #                                 #             # #  --
 --       #     #     #         #     #   #     #     # # # # # # # # # # #       #     # # # #      --
@@ -672,6 +713,17 @@ function PS.OnPanelActive(wnd)
 		checked = MY_ToolBox.bRestoreAuthorityInfo,
 		oncheck = function(bChecked)
 			MY_ToolBox.bRestoreAuthorityInfo = bChecked
+		end,
+	})
+	y = y + 30
+	
+	-- 竞技场自动恢复队伍信息
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = 300,
+		text = _L['auto cancel hide player in arena and battlefield'],
+		checked = MY_ToolBox.bAutoShowInArena,
+		oncheck = function(bChecked)
+			MY_ToolBox.bAutoShowInArena = bChecked
 		end,
 	})
 	y = y + 30
