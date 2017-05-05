@@ -81,11 +81,14 @@ local function DrawUI(frame)
 	elseif nOffset > 0 then
 		for i = 1, nOffset do
 			hList:AppendItemFromIni(INI_PATH, "Handle_Box"):Lookup("Box_Skill"):Hide()
+			for i = hList:GetItemCount() - 1, frame.nIndexBase + 1 do
+				hList:ExchangeItemIndex(i, i - 1)
+			end
 		end
 	elseif nOffset < 0 then
 		for i = nOffset, -1 do
-			hList:RemoveItem(frame.nIndexBase)
-			frame.nIndexBase = (frame.nIndexBase + 1) % hList:GetItemCount()
+			hList:RemoveItem(GetRealIndex(0, frame.nIndexBase, hList:GetItemCount()))
+			frame.nIndexBase = frame.nIndexBase % hList:GetItemCount()
 		end
 	end
 	local nBoxesW = BOX_W * MY_VisualSkill.nVisualSkillBoxCount
