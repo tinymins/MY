@@ -4,7 +4,7 @@
 -- @Date  : 2015-03-02 10:08:45
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-05-05 18:15:10
+-- @Last modified time: 2017-05-05 18:17:16
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
 local _C = {}
@@ -16,11 +16,11 @@ local defaultAnchor = {x = 0, y = -220, s = "BOTTOMCENTER", r = "BOTTOMCENTER"}
 MY_VisualSkill = {}
 MY_VisualSkill.bEnable = false
 MY_VisualSkill.bPenetrable = true
-MY_VisualSkill.anchorVisualSkill = defaultAnchor
+MY_VisualSkill.anchor = defaultAnchor
 MY_VisualSkill.nVisualSkillBoxCount = 5
 RegisterCustomData("MY_VisualSkill.bEnable")
 RegisterCustomData("MY_VisualSkill.bPenetrable")
-RegisterCustomData("MY_VisualSkill.anchorVisualSkill")
+RegisterCustomData("MY_VisualSkill.anchor")
 RegisterCustomData("MY_VisualSkill.nVisualSkillBoxCount")
 
 local function ApplyAnchor(frame)
@@ -176,8 +176,9 @@ function MY_VisualSkill.OnEvent(event)
 		UpdateCustomModeWindow(this, szTip, MY_VisualSkill.bPenetrable)
 	elseif event == "ON_LEAVE_CUSTOM_UI_MODE" then
 		UpdateCustomModeWindow(this, szTip, MY_VisualSkill.bPenetrable)
+		MY_VisualSkill.anchor = GetFrameAnchor(this)
 	elseif event == "CUSTOM_UI_MODE_SET_DEFAULT" then
-		MY_VisualSkill.anchorVisualSkill = defaultAnchor
+		MY_VisualSkill.anchor = defaultAnchor
 		ApplyAnchor(this)
 	end
 end
