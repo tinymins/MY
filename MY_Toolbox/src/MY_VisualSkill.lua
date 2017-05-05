@@ -4,7 +4,7 @@
 -- @Date  : 2015-03-02 10:08:45
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-05-05 18:00:56
+-- @Last modified time: 2017-05-05 18:15:10
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
 local _C = {}
@@ -152,6 +152,7 @@ function MY_VisualSkill.OnFrameCreate()
 	this:RegisterEvent("ON_ENTER_CUSTOM_UI_MODE")
 	this:RegisterEvent("ON_LEAVE_CUSTOM_UI_MODE")
 	this:RegisterEvent("CUSTOM_UI_MODE_SET_DEFAULT")
+	MY_VisualSkill.OnEvent("UI_SCALED")
 end
 
 function MY_VisualSkill.OnEvent(event)
