@@ -4,7 +4,7 @@
 -- @Date  : 2015-03-02 10:08:45
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-05-05 18:19:26
+-- @Last modified time: 2017-05-06 02:52:18
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
 local _C = {}
@@ -38,23 +38,39 @@ local function UpdateUI(frame, during)
 	local hList = frame:Lookup("", "Handle_Boxes")
 	local nCount = hList:GetItemCount()
 	
-	local nFirstIndex = GetRealIndex(0, frame.nIndexBase, nCount)
-	hList:Lookup(nFirstIndex):SetAlpha((1 - percentage) * 255)
-	hList:Lookup(nFirstIndex):SetRelX(-OUT_DISTANCE * percentage)
+	local hItem = hList:Lookup(GetRealIndex(0, frame.nIndexBase, nCount))
+	if not hItem.nStartX then
+		hItem.nStartX = hItem:GetRelX()
+	end
+	hItem:SetAlpha((1 - percentage) * 255)
+	hItem:SetRelX(hItem.nStartX - (hItem.nStartX + OUT_DISTANCE) * percentage)
 	
-	local nLeftW = 0
+	local nRelX = 0
 	for i = 1, nCount - 2 do
 		local hItem = hList:Lookup(GetRealIndex(i, frame.nIndexBase, nCount))
+		if not hItem.nStartX then
+			hItem.nStartX = hItem:GetRelX()
+		end
 		hItem:SetAlpha(255)
-		hItem:SetRelX(nLeftW + BOX_W * (1 - percentage))
-		nLeftW = nLeftW + hItem:GetW()
+		hItem:SetRelX(nRelX + (hItem.nStartX - nRelX) * (1 - percentage))
+		nRelX = nRelX + hItem:GetW()
 	end
 	
-	local nLastIndex = GetRealIndex(nCount - 1, frame.nIndexBase, nCount)
-	hList:Lookup(nLastIndex):SetAlpha(percentage * 255)
-	hList:Lookup(nLastIndex):SetRelX(nLeftW + OUT_DISTANCE * (1 - percentage))
+	local hItem = hList:Lookup(GetRealIndex(nCount - 1, frame.nIndexBase, nCount))
+	hItem:SetAlpha(percentage * 255)
+	hItem:SetRelX(nRelX + OUT_DISTANCE * (1 - percentage))
 	
 	hList:FormatAllItemPos()
+end
+
+local function StartAnimation(frame)
+	local hList = frame:Lookup("", "Handle_Boxes")
+	local nCount = hList:GetItemCount()
+	for i = 0, nCount - 1 do
+		local hItem = hList:Lookup(i)
+		hItem.nStartX = hItem:GetRelX()
+	end
+	frame.nTickStart = GetTickCount()
 end
 
 local function DrawUI(frame)
@@ -141,7 +157,7 @@ local function OnSkillCast(frame, dwSkillID, dwSkillLevel)
 	box:SetObjectIcon(dwIconID)
 	box:Show()
 	
-	frame.nTickStart = GetTickCount()
+	StartAnimation(frame)
 end
 
 function MY_VisualSkill.OnFrameCreate()
