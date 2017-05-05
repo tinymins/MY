@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-04-25 11:00:18
+-- @Last modified time: 2017-05-05 18:12:42
 --------------------------------------------
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Focus/lang/")
@@ -397,11 +397,6 @@ function MY_Focus.DelFocus(dwType, dwID)
 		if p then
 			MY_Focus.DrawFocus(p.dwType, p.dwID)
 		end
-	end
-	-- É¾³ýËø¶¨
-	if l_dwLockType == dwType and l_dwLockID == dwID then
-		l_dwLockType = nil
-		l_dwLockID = nil
 	end
 end
 
@@ -838,6 +833,10 @@ function MY_Focus.OnItemRButtonClick()
 		table.insert(t, 1, {
 			szOption = _L['delete focus'],
 			fnAction = function()
+				if l_dwLockType == dwType and l_dwLockID == dwID then
+					l_dwLockType = nil
+					l_dwLockID = nil
+				end
 				MY_Focus.DelStaticFocus(dwType, dwID)
 			end,
 		})
