@@ -4,7 +4,7 @@
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-04-27 17:23:43
+-- @Last modified time: 2017-05-05 17:56:46
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
 local _C = {}
@@ -659,7 +659,7 @@ function PS.OnPanelActive(wnd)
 	
 	ui:append("WndSliderBox", {
 		x = x + 160, y = y,
-		sliderStyle = false, range = {1, 32},
+		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = {1, 32},
 		value = MY_VisualSkill.nVisualSkillBoxCount,
 		text = _L("display %d skills.", MY_VisualSkill.nVisualSkillBoxCount),
 		textfmt = function(val) return _L("display %d skills.", val) end,
