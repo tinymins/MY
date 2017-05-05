@@ -4,7 +4,7 @@
 -- @Date  : 2015-03-02 10:08:45
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-05-05 18:17:16
+-- @Last modified time: 2017-05-05 18:19:26
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
 local _C = {}
@@ -24,7 +24,8 @@ RegisterCustomData("MY_VisualSkill.anchor")
 RegisterCustomData("MY_VisualSkill.nVisualSkillBoxCount")
 
 local function ApplyAnchor(frame)
-	frame:SetPoint(defaultAnchor.s, 0, 0, defaultAnchor.r, defaultAnchor.x, defaultAnchor.y)
+	local anchor = MY_VisualSkill.anchor
+	frame:SetPoint(anchor.s, 0, 0, anchor.r, anchor.x, anchor.y)
 	frame:CorrectPos()
 end
 
