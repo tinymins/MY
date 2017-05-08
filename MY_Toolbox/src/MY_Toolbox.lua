@@ -4,7 +4,7 @@
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-05-05 17:56:46
+-- @Last modified time: 2017-05-08 17:30:11
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
 local _C = {}
@@ -493,17 +493,15 @@ end
 
 -- 进入JJC自动显示所有人物
 do local l_bHideNpc, l_bHidePlayer, l_lock
-MY.RegisterEvent("TOGGLE_NPC", function()
+MY.RegisterEvent("ON_REPRESENT_CMD", function()
 	if l_lock then
 		return
 	end
-	l_bHideNpc = not arg0
-end)
-MY.RegisterEvent("TOGGLE_PLAYER", function()
-	if l_lock then
-		return
+	if arg0 == "show npc" or arg0 == "hide npc" then
+		l_bHideNpc = arg0 == "hide npc"
+	elseif arg0 == "show player" or arg0 == "hide player" then
+		l_bHidePlayer = arg0 == "hide player"
 	end
-	l_bHidePlayer = not arg0
 end)
 MY.RegisterEvent("LOADING_END", function()
 	if not MY_ToolBox.bAutoShowInArena then
