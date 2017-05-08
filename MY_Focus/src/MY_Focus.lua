@@ -4,13 +4,13 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-05-05 18:12:42
+-- @Last modified time: 2017-05-08 17:40:40
 --------------------------------------------
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Focus/lang/")
 local l_tFocusList = {}
 local l_bMinimize = false
-local l_dwLockType, l_dwLockID
+local l_dwLockType, l_dwLockID, l_lockInDisplay
 MY_Focus = {}
 MY_Focus.bEnable            = false -- 是否启用
 MY_Focus.bFocusBoss         = true  -- 焦点重要NPC
@@ -443,6 +443,7 @@ end
 
 -- 更新列表
 function MY_Focus.UpdateList()
+	l_lockInDisplay = false
 	local tNames = {}
 	for i, p in ipairs(MY_Focus.GetDisplayList()) do
 		MY_Focus.DrawFocus(p.dwType, p.dwID)
@@ -489,6 +490,7 @@ function MY_Focus.DrawFocus(dwType, dwID)
 	-- 锁定
 	hInfoList:Lookup('Handle_Lock'):Hide()
 	if dwType == l_dwLockType and dwID == l_dwLockID then
+		l_lockInDisplay = true
 		hInfoList:Lookup('Handle_Lock'):Show()
 	end
 	-- 心法
@@ -719,7 +721,7 @@ end
 -- ########################################################################## --
 -- 周期重绘
 function MY_Focus.OnFrameBreathe()
-	if l_dwLockType and l_dwLockID then
+	if l_dwLockType and l_dwLockID and l_lockInDisplay then
 		local dwType, dwID = MY.GetTarget()
 		if dwType ~= l_dwLockType or dwID ~= l_dwLockID then
 			MY.SetTarget(l_dwLockType, l_dwLockID)
