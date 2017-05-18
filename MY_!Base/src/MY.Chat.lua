@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2016-09-19 11:03:43
+-- @Last modified time: 2017-05-18 15:12:39
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -1063,15 +1063,17 @@ MY.RegisterMsgMonitor("QIYU", function(szMsg, nFont, bRich, r, g, b, szChannel)
 		szMsg = GetPureText(szMsg)
 	end
 	szMsg:gsub(_L.ADVENTURE_PATT, function(szName, szAdventure)
-		MY.Ajax({
-			type = "get",
-			url = 'http://data.jx3.derzh.com/serendipity/?l=' .. MY.GetLang()
-			.. "&data=" .. MY.String.SimpleEcrypt(MY.Json.Encode({
-				S = MY.GetRealServer(1), s = MY.GetRealServer(2),
-				n = szName, a = szAdventure, t = GetCurrentTime()
-			})),
-			success = function(settings, content) end,
-		})
+		MY.DelayCall(math.random(0, 10000), function()
+			MY.Ajax({
+				type = "get",
+				url = 'http://data.jx3.derzh.com/serendipity/?l=' .. MY.GetLang()
+				.. "&data=" .. MY.String.SimpleEcrypt(MY.Json.Encode({
+					S = MY.GetRealServer(1), s = MY.GetRealServer(2),
+					n = szName, a = szAdventure, t = GetCurrentTime()
+				})),
+				success = function(settings, content) end,
+			})
+		end)
 	end)
 end, {"MSG_SYS"})
 
