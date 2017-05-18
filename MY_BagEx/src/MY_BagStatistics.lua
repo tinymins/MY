@@ -4,7 +4,7 @@
 -- @Email:  root@derzh.com
 -- @Project: JX3 UI
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-02-08 17:58:05
+-- @Last modified time: 2017-05-18 15:27:52
 --
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
@@ -33,11 +33,13 @@ DB:Execute("CREATE TABLE IF NOT EXISTS BagItems (ownerkey NVARCHAR(20), boxtype 
 DB:Execute("CREATE INDEX IF NOT EXISTS BagItems_tab_idx ON BagItems(tabtype, tabindex, tabsubindex)")
 local DB_ItemsW = DB:Prepare("REPLACE INTO BagItems (ownerkey, boxtype, boxindex, tabtype, tabindex, tabsubindex, bagcount, bankcount, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")
 local DB_ItemsDL = DB:Prepare("DELETE FROM BagItems WHERE ownerkey = ? AND boxtype = ? AND boxindex >= ?")
+local DB_ItemsDA = DB:Prepare("DELETE FROM BagItems WHERE ownerkey = ?")
 DB:Execute("CREATE TABLE IF NOT EXISTS OwnerInfo (ownerkey NVARCHAR(20), ownername NVARCHAR(20), servername NVARCHAR(20), time INTEGER, PRIMARY KEY(ownerkey))")
 DB:Execute("CREATE INDEX IF NOT EXISTS OwnerInfo_ownername_idx ON OwnerInfo(ownername)")
 DB:Execute("CREATE INDEX IF NOT EXISTS OwnerInfo_servername_idx ON OwnerInfo(servername)")
 local DB_OwnerInfoW = DB:Prepare("REPLACE INTO OwnerInfo (ownerkey, ownername, servername, time) VALUES (?, ?, ?, ?)")
 local DB_OwnerInfoR = DB:Prepare("SELECT * FROM OwnerInfo WHERE ownername LIKE ? OR servername LIKE ? ORDER BY time DESC")
+local DB_OwnerInfoD = DB:Prepare("DELETE FROM OwnerInfo WHERE ownerkey = ?")
 DB:Execute("CREATE TABLE IF NOT EXISTS ItemInfo (tabtype INTEGER, tabindex INTEGER, tabsubindex INTEGER, name NVARCHAR(20), desc NVARCHAR(800), PRIMARY KEY(tabtype, tabindex, tabsubindex))")
 DB:Execute("CREATE INDEX IF NOT EXISTS ItemInfo_name_idx ON ItemInfo(name)")
 DB:Execute("CREATE INDEX IF NOT EXISTS ItemInfo_desc_idx ON ItemInfo(desc)")
@@ -403,6 +405,15 @@ function MY_BagStatistics.OnLButtonClick()
 			wnd:Lookup("CheckBox_Name"):Check(false, WNDEVENT_FIRETYPE.PREVENT)
 		end
 		wnd:Lookup("CheckBox_Name"):Check(true)
+	elseif name == "Btn_Delete" then
+		local wnd = this:GetParent()
+		MY.Confirm(_L("Are you sure to delete item record of %s?", wnd.ownername), function()
+			DB_ItemsDA:BindAll(wnd.ownerkey)
+			DB_ItemsDA:Execute()
+			DB_OwnerInfoD:BindAll(wnd.ownerkey)
+			DB_OwnerInfoD:Execute()
+			MY_BagStatistics.UpdateNames(wnd:GetRoot())
+		end)
 	elseif name == "Btn_SwitchMode" then
 		MY_BagStatistics.bCompactMode = not MY_BagStatistics.bCompactMode
 		FireUIEvent("MY_BAGSTATISTICS_MODE_CHANGE")

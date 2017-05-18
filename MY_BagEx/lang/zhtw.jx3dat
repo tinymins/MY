@@ -11,4 +11,5 @@ data = {
     
     ['Bankx%d Bagx%d Totalx%d'] = '倉庫x%d 背包x%d 總x%d',
     ['%s (%s)\tBankx%d Bagx%d Totalx%d\n'] = '%s (%s)\t倉庫x%d 背包x%d 總x%d\n',
+    ["Are you sure to delete item record of %s?"] = "確定要清空[%s]的背包物品記錄嗎？",
 }
