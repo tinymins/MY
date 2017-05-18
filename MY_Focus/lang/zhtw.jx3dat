@@ -7,6 +7,7 @@ data = {
     ['boss list is always been collecting and updating'] = '重要NPC列表不定時更新',
     ['auto focus friend'   ] = '焦點附近好友',
     ['auto focus tong'     ] = '焦點附近幫會成員',
+    ['auto focus only in public map'] = '僅在公共地圖自動焦點',
     ['auto focus enemy'    ] = '焦點附近敵對玩家',
     ['jjc auto focus party'] = '焦點競技場友方隊員',
     ['jjc auto focus enemy'] = '焦點競技場敵方隊員',

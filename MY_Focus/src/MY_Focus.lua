@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-05-08 17:40:40
+-- @Last modified time: 2017-05-18 16:26:57
 --------------------------------------------
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Focus/lang/")
@@ -16,6 +16,7 @@ MY_Focus.bEnable            = false -- 是否启用
 MY_Focus.bFocusBoss         = true  -- 焦点重要NPC
 MY_Focus.bFocusFriend       = false -- 焦点附近好友
 MY_Focus.bFocusTong         = false -- 焦点帮会成员
+MY_Focus.bOnlyPublicMap     = true  -- 仅在公共地图焦点好友帮会成员
 MY_Focus.bSortByDistance    = false -- 优先焦点近距离目标
 MY_Focus.bFocusEnemy        = false -- 焦点敌对玩家
 MY_Focus.bAutoHide          = true  -- 无焦点时隐藏
@@ -46,6 +47,7 @@ RegisterCustomData("MY_Focus.bEnable", 1)
 RegisterCustomData("MY_Focus.bFocusBoss")
 RegisterCustomData("MY_Focus.bFocusFriend")
 RegisterCustomData("MY_Focus.bFocusTong")
+RegisterCustomData("MY_Focus.bOnlyPublicMap")
 RegisterCustomData("MY_Focus.bSortByDistance")
 RegisterCustomData("MY_Focus.bFocusEnemy")
 RegisterCustomData("MY_Focus.bAutoHide")
@@ -305,18 +307,18 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 				end
 			end
 		else
-			if not MY.Player.IsInBattleField() then
+			if not MY_Focus.bOnlyPublicMap or (not MY.IsInBattleField() and not MY.IsInDungeon() and not MY.IsInArena()) then
 				-- 判断好友
 				if dwType == TARGET.PLAYER and
 				MY_Focus.bFocusFriend and
-				MY.Player.GetFriend(dwID) then
+				MY.GetFriend(dwID) then
 					bFocus = true
 				end
 				-- 判断同帮会
 				if dwType == TARGET.PLAYER and
 				MY_Focus.bFocusTong and
 				dwID ~= MY.GetClientInfo().dwID and
-				MY.Player.GetTongMember(dwID) then
+				MY.GetTongMember(dwID) then
 					bFocus = true
 				end
 			end
@@ -933,37 +935,39 @@ local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = MY.UI(wnd)
 	local w  = ui:width()
-	local h  = math.max(ui:height(), 450)
+	local h  = math.max(ui:height(), 440)
 	local xr, yr, wr = w - 260, 40, 260
 	local xl, yl, wl = 5,  5, w - wr -15
 	
 	-- 左侧
 	local x, y = xl, yl
-	ui:append("WndCheckBox", "WndCheckBox_Enable"):children("#WndCheckBox_Enable")
-	  :pos(x, y):width(250):text(_L['enable']):color(255, 255, 0):check(MY_Focus.bEnable)
-	  :check(function(bChecked)
-	  	MY_Focus.bEnable = bChecked
-	  	if MY_Focus.bEnable then
-	  		MY_Focus.Open()
-	  	else
-	  		MY_Focus.Close()
-	  	end
-	  end)
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = 250, text = _L['enable'],
+		r = 255, g = 255, b = 0, checked = MY_Focus.bEnable,
+		oncheck = function(bChecked)
+			MY_Focus.bEnable = bChecked
+			if MY_Focus.bEnable then
+				MY_Focus.Open()
+			else
+				MY_Focus.Close()
+			end
+		end,
+	})
 	y = y + 25
 	
 	-- <hr />
-	ui:append("Image", "Image_Spliter"):item('#Image_Spliter')
-	  :pos(x, y):size(w - x, 1):image('UI/Image/UICommon/ScienceTreeNode.UITex', 62)
+	ui:append("Image", {x = x, y = y, w = w - x, h = 1, image = 'UI/Image/UICommon/ScienceTreeNode.UITex', imageframe = 62})
 	y = y + 5
 	
-	ui:append("WndCheckBox", "WndCheckBox_AutoFocus"):children("#WndCheckBox_AutoFocus")
-	  :pos(x, y):text(_L['auto focus']):check(MY_Focus.bAutoFocus)
-	  :check(function(bChecked)
-	  	MY_Focus.bAutoFocus = bChecked
-	  	MY_Focus.RescanNearby()
-	  end)
+	ui:append("WndCheckBox", {
+		x = x, y = y, text = _L['auto focus'], checked = MY_Focus.bAutoFocus,
+		oncheck = function(bChecked)
+			MY_Focus.bAutoFocus = bChecked
+			MY_Focus.RescanNearby()
+		end,
+	})
 	
-	local list = ui:append("WndListBox", "WndListBox_1"):children('#WndListBox_1'):pos(x, y + 30):size(wl - x + xl, h - y - 40)
+	local list = ui:append("WndListBox", {x = x, y = y + 30, w = wl - x + xl, h = h - y - 40}, true)
 	-- 初始化list控件
 	for _, v in ipairs(MY_Focus.tAutoFocus) do
 		list:listbox('insert', v, v)
@@ -983,136 +987,186 @@ function PS.OnPanelActive(wnd)
 		}}
 	end)
 	-- add
-	ui:append("WndButton", "WndButton_Add"):children("#WndButton_Add")
-	  :pos(wl - 160, y):width(80)
-	  :text(_L["add"])
-	  :click(function()
-	  	GetUserInput(_L['add auto focus'], function(szText)
-	  		-- 去掉前后空格
-	  		szText = (string.gsub(szText, "^%s*(.-)%s*$", "%1"))
-	  		-- 验证是否为空
-	  		if szText=="" then
-	  			return
-	  		end
-	  		-- 验证是否重复
-	  		for i, v in ipairs(MY_Focus.tAutoFocus) do
-	  			if v == szText then
-	  				return
-	  			end
-	  		end
-	  		-- 加入表
-	  		table.insert(MY_Focus.tAutoFocus, szText)
-	  		-- 更新UI
-	  		list:listbox('insert', szText, szText)
-	  		MY_Focus.RescanNearby()
-	  	end, function() end, function() end, nil, '')
-	  end)
+	ui:append("WndButton", {
+		x = wl - 160, y = y, w = 80,
+		text = _L["add"],
+		onclick = function()
+			GetUserInput(_L['add auto focus'], function(szText)
+				-- 去掉前后空格
+				szText = (string.gsub(szText, "^%s*(.-)%s*$", "%1"))
+				-- 验证是否为空
+				if szText=="" then
+					return
+				end
+				-- 验证是否重复
+				for i, v in ipairs(MY_Focus.tAutoFocus) do
+					if v == szText then
+						return
+					end
+				end
+				-- 加入表
+				table.insert(MY_Focus.tAutoFocus, szText)
+				-- 更新UI
+				list:listbox('insert', szText, szText)
+				MY_Focus.RescanNearby()
+			end, function() end, function() end, nil, '')
+		end,
+	})
 	-- del
-	ui:append("WndButton", "WndButton_Del"):children("#WndButton_Del")
-	  :pos(wl - 80, y):width(80)
-	  :text(_L["delete"])
-	  :click(function()
-	  	for _, v in ipairs(list:listbox('select', 'selected')) do
-	  		list:listbox('delete', v.text, v.id)
-	  		for i = #MY_Focus.tAutoFocus, 1, -1 do
-	  			if MY_Focus.tAutoFocus[i] == v.text then
-	  				table.remove(MY_Focus.tAutoFocus, i)
-	  				MY_Focus.RescanNearby()
-	  			end
-	  		end
-	  	end
-	  end)
+	ui:append("WndButton", {
+		x = wl - 80, y = y, w = 80,
+		text = _L["delete"],
+		onclick = function()
+			for _, v in ipairs(list:listbox('select', 'selected')) do
+				list:listbox('delete', v.text, v.id)
+				for i = #MY_Focus.tAutoFocus, 1, -1 do
+					if MY_Focus.tAutoFocus[i] == v.text then
+						table.remove(MY_Focus.tAutoFocus, i)
+						MY_Focus.RescanNearby()
+					end
+				end
+			end
+		end,
+	})
 	
 	-- 右侧
-	local x, y = xr, yr
+	local x, y = xr, yr - 20
 	local deltaX = 23
-	ui:append("WndCheckBox", "WndCheckBox_Auto_Hide"):children("#WndCheckBox_Auto_Hide")
-	  :pos(x, y):width(wr):text(_L['hide when empty']):check(MY_Focus.bAutoHide)
-	  :check(function(bChecked)
-	  	MY_Focus.bAutoHide = bChecked
-	  end)
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = wr, text = _L['hide when empty'],
+		checked = MY_Focus.bAutoHide,
+		oncheck = function(bChecked)
+			MY_Focus.bAutoHide = bChecked
+		end,
+	})
 	y = y + deltaX
 	
-	ui:append("WndCheckBox", "WndCheckBox_AF_VIN"):children("#WndCheckBox_AF_VIN")
-	  :pos(x, y):width(wr):text(_L['auto focus very important npc'])
-	  :tip(_L['boss list is always been collecting and updating'], MY.Const.UI.Tip.POS_TOP)
-	  :check(MY_Focus.bFocusBoss)
-	  :check(function(bChecked)
-	  	MY_Focus.bFocusBoss = bChecked
-	  	MY_Focus.RescanNearby()
-	  end)
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = wr, text = _L['auto focus very important npc'],
+		tip = _L['boss list is always been collecting and updating'],
+		tippostype = MY.Const.UI.Tip.POS_TOP,
+		checked = MY_Focus.bFocusBoss,
+		oncheck = function(bChecked)
+			MY_Focus.bFocusBoss = bChecked
+			MY_Focus.RescanNearby()
+		end,
+	})
 	y = y + deltaX
 	
-	ui:append("WndCheckBox", "WndCheckBox_AF_Friend"):children("#WndCheckBox_AF_Friend")
-	  :pos(x, y):width(wr):text(_L['auto focus friend']):check(MY_Focus.bFocusFriend)
-	  :check(function(bChecked)
-	  	MY_Focus.bFocusFriend = bChecked
-	  	MY_Focus.RescanNearby()
-	  end)
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = wr, text = _L['auto focus friend'],
+		checked = MY_Focus.bFocusFriend,
+		oncheck = function(bChecked)
+			MY_Focus.bFocusFriend = bChecked
+			MY_Focus.RescanNearby()
+		end,
+	})
 	y = y + deltaX
 	
-	ui:append("WndCheckBox", "WndCheckBox_AF_Tong"):children("#WndCheckBox_AF_Tong")
-	  :pos(x, y):width(wr):text(_L['auto focus tong']):check(MY_Focus.bFocusTong)
-	  :check(function(bChecked)
-	  	MY_Focus.bFocusTong = bChecked
-	  	MY_Focus.RescanNearby()
-	  end)
+	ui:append("Image", {
+		x = x + 5, y = y - 3, w = 10, h = 8,
+		image = "ui/Image/UICommon/ScienceTree.UITex",
+		imageframe = 10,
+	})
+	
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = wr, text = _L['auto focus tong'],
+		checked = MY_Focus.bFocusTong,
+		oncheck = function(bChecked)
+			MY_Focus.bFocusTong = bChecked
+			MY_Focus.RescanNearby()
+		end,
+	})
 	y = y + deltaX
 	
-	ui:append("WndCheckBox", "WndCheckBox_AF_Enemy"):children("#WndCheckBox_AF_Enemy")
-	  :pos(x, y):width(wr):text(_L['auto focus enemy']):check(MY_Focus.bFocusEnemy)
-	  :check(function(bChecked)
-	  	MY_Focus.bFocusEnemy = bChecked
-	  	MY_Focus.RescanNearby()
-	  end)
+	ui:append("Image", {
+		x = x + 5, y = y, w = 10, h = 10,
+		image = "ui/Image/UICommon/ScienceTree.UITex",
+		imageframe = 10,
+	})
+	ui:append("Image", {
+		x = x + 10, y = y + 5, w = 10, h = 10,
+		image = "ui/Image/UICommon/ScienceTree.UITex",
+		imageframe = 8,
+	})
+	ui:append("WndCheckBox", {
+		x = x + 20, y = y, w = wr, text = _L['auto focus only in public map'],
+		checked = MY_Focus.bOnlyPublicMap,
+	  	oncheck = function(bChecked)
+			MY_Focus.bOnlyPublicMap = bChecked
+			MY_Focus.RescanNearby()
+		end,
+	})
 	y = y + deltaX
 	
-	ui:append("WndCheckBox", "WndCheckBox_AF_JJCParty"):children("#WndCheckBox_AF_JJCParty")
-	  :pos(x, y):width(wr):text(_L['jjc auto focus party']):check(MY_Focus.bFocusJJCParty)
-	  :check(function(bChecked)
-	  	MY_Focus.bFocusJJCParty = bChecked
-	  	MY_Focus.RescanNearby()
-	  end)
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = wr, text = _L['auto focus enemy'],
+		checked = MY_Focus.bFocusEnemy,
+		oncheck = function(bChecked)
+			MY_Focus.bFocusEnemy = bChecked
+			MY_Focus.RescanNearby()
+		end,
+	})
 	y = y + deltaX
 	
-	ui:append("WndCheckBox", "WndCheckBox_AF_JJCEnemy"):children("#WndCheckBox_AF_JJCEnemy")
-	  :pos(x, y):width(wr):text(_L['jjc auto focus enemy']):check(MY_Focus.bFocusJJCEnemy)
-	  :check(function(bChecked)
-	  	MY_Focus.bFocusJJCEnemy = bChecked
-	  	MY_Focus.RescanNearby()
-	  end)
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = wr, text = _L['jjc auto focus party'],
+		checked = MY_Focus.bFocusJJCParty,
+		oncheck = function(bChecked)
+			MY_Focus.bFocusJJCParty = bChecked
+			MY_Focus.RescanNearby()
+		end,
+	})
 	y = y + deltaX
 	
-	ui:append("WndCheckBox", "WndCheckBox_ShowTarget"):children("#WndCheckBox_ShowTarget")
-	  :pos(x, y):width(wr):text(_L['show focus\'s target']):check(MY_Focus.bShowTarget)
-	  :check(function(bChecked)
-	  	MY_Focus.bShowTarget = bChecked
-	  	MY_Focus.RescanNearby()
-	  end)
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = wr, text = _L['jjc auto focus enemy'],
+		checked = MY_Focus.bFocusJJCEnemy,
+		oncheck = function(bChecked)
+			MY_Focus.bFocusJJCEnemy = bChecked
+			MY_Focus.RescanNearby()
+		end,
+	})
 	y = y + deltaX
 	
-	ui:append("WndCheckBox", "WndCheckBox_Traversal"):children("#WndCheckBox_Traversal")
-	  :pos(x, y):width(wr):text(_L['traversal object'])
-	  :tip(_L['may cause some problem in dungeon map'], MY.Const.UI.Tip.POS_BOTTOM)
-	  :check(MY_Focus.bTraversal)
-	  :check(function(bChecked)
-	  	MY_Focus.bTraversal = bChecked
-	  end)
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = wr, text = _L['show focus\'s target'],
+		checked = MY_Focus.bShowTarget,
+		oncheck = function(bChecked)
+			MY_Focus.bShowTarget = bChecked
+			MY_Focus.RescanNearby()
+		end,
+	})
 	y = y + deltaX
 	
-	ui:append("WndCheckBox", "WndCheckBox_HideDead"):children("#WndCheckBox_HideDead")
-	  :pos(x, y):width(wr):text(_L['hide dead object']):check(MY_Focus.bHideDeath)
-	  :check(function(bChecked)
-	  	MY_Focus.bHideDeath = bChecked
-	  	MY_Focus.RescanNearby()
-	  end)
+	ui:append("WndCheckBox", {
+		x = x, y = y,w = wr, text = _L['traversal object'],
+		tip = _L['may cause some problem in dungeon map'],
+		tippostype = MY.Const.UI.Tip.POS_BOTTOM,
+		checked = MY_Focus.bTraversal,
+		oncheck = function(bChecked)
+			MY_Focus.bTraversal = bChecked
+		end,
+	})
 	y = y + deltaX
 	
-	ui:append("WndCheckBox", "WndCheckBox_DisplayKungfu"):children("#WndCheckBox_DisplayKungfu")
-	  :pos(x, y):width(wr):text(_L['display kungfu icon instead of location']):check(MY_Focus.bDisplayKungfuIcon or false)
-	  :check(function(bChecked)
-	  	MY_Focus.bDisplayKungfuIcon = bChecked
-	  end)
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = wr, text = _L['hide dead object'],
+		checked = MY_Focus.bHideDeath,
+		oncheck = function(bChecked)
+			MY_Focus.bHideDeath = bChecked
+			MY_Focus.RescanNearby()
+		end,
+	})
+	y = y + deltaX
+	
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = wr, text = _L['display kungfu icon instead of location'],
+		checked = MY_Focus.bDisplayKungfuIcon,
+		oncheck = function(bChecked)
+			MY_Focus.bDisplayKungfuIcon = bChecked
+		end,
+	})
 	y = y + deltaX
 	
 	ui:append("WndCheckBox", "WndCheckBox_SortByDistance", {
@@ -1137,34 +1191,37 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaX
 	
-	ui:append("WndCheckBox", "WndCheckBox_HealHelper"):children("#WndCheckBox_HealHelper")
-	  :pos(x, y):width(wr):text(_L['heal healper'])
-	  :tip(_L['select target when mouse enter'], MY.Const.UI.Tip.POS_BOTTOM)
-	  :check(MY_Focus.bHealHelper)
-	  :check(function(bChecked)
-	  	MY_Focus.bHealHelper = bChecked
-	  end)
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = wr, text = _L['heal healper'],
+		tip = _L['select target when mouse enter'],
+		tippostype = MY.Const.UI.Tip.POS_BOTTOM,
+		checked = MY_Focus.bHealHelper,
+		oncheck = function(bChecked)
+			MY_Focus.bHealHelper = bChecked
+		end,
+	})
 	y = y + deltaX
 	
-	ui:append("WndComboBox", "WndComboBox_MaxLength"):children("#WndComboBox_MaxLength")
-	  :pos(x, y):width(150)
-	  :text(_L['max display length'])
-	  :menu(function()
-	  	local t = {}
-	  	for i = 1, 15 do
-	  		table.insert(t, {
-	  			szOption = i,
-	  			bMCheck = true,
-	  			bChecked = MY_Focus.nMaxDisplay == i,
-	  			fnAction = function()
-	  				Wnd.CloseWindow('PopupMenuPanel')
-	  				MY_Focus.nMaxDisplay = i
-	  				MY_Focus.RedrawList()
-	  			end,
-	  		})
-	  	end
-	  	return t
-	  end)
+	ui:append("WndComboBox", {
+		x = x, y = y, w = 150,
+		text = _L['max display length'],
+		menu = function()
+			local t = {}
+			for i = 1, 15 do
+				table.insert(t, {
+					szOption = i,
+					bMCheck = true,
+					bChecked = MY_Focus.nMaxDisplay == i,
+					fnAction = function()
+						Wnd.CloseWindow('PopupMenuPanel')
+						MY_Focus.nMaxDisplay = i
+						MY_Focus.RedrawList()
+					end,
+				})
+			end
+			return t
+		end,
+	})
 	y = y + deltaX
 	
 	ui:append("WndSliderBox", {
