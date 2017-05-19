@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-05-10 16:39:40
+-- @Last modified time: 2017-05-19 23:21:39
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 -- #################################################################################################################################### --
@@ -274,7 +274,7 @@ function MY.OpenPanel(bMute, bNoFocus, bNoAnimate)
 		MY.UI(MY.GetFrame()):children("#Wnd_Total"):children("#Btn_Weibo")
 		  :text(_L['author\'s weibo'])
 		  :click(function()
-		  	MY.UI.OpenInternetExplorer("http://weibo.com/zymah")
+		  	XGUI.OpenIE("http://weibo.com/zymah")
 		  end)
 		-- updaet logo image
 		MY.UI(MY.GetFrame()):item('#Image_Icon')
