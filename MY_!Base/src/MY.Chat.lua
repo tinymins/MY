@@ -4,7 +4,7 @@
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-05-18 16:01:42
+-- @Last modified time: 2017-05-22 17:14:37
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
 -----------------------------------------------
@@ -1068,7 +1068,7 @@ MY.RegisterMsgMonitor("QIYU", function(szMsg, nFont, bRich, r, g, b, szChannel)
 				S = MY.GetRealServer(1), s = MY.GetRealServer(2),
 				n = szName, a = szAdventure, t = GetCurrentTime()
 			}))
-		MY.DelayCall(math.random(0, 10000), function()
+		MY.DelayCall(math.random(0, 5000), function()
 			MY.Ajax({
 				type = "get",
 				url = url,
