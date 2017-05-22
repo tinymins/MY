@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-05-18 16:26:57
+-- @Last modified time: 2017-05-22 16:29:45
 --------------------------------------------
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Focus/lang/")
@@ -307,7 +307,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 				end
 			end
 		else
-			if not MY_Focus.bOnlyPublicMap or (not MY.IsInBattleField() and not MY.IsInDungeon() and not MY.IsInArena()) then
+			if not MY_Focus.bOnlyPublicMap or (not MY.IsInBattleField() and not MY.IsInDungeon(true) and not MY.IsInArena()) then
 				-- ≈–∂œ∫√”—
 				if dwType == TARGET.PLAYER and
 				MY_Focus.bFocusFriend and
