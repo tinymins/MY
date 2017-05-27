@@ -4,7 +4,7 @@
 -- @Date  : 2014-07-30 19:22:10
 -- @Email : admin@derzh.com
 -- @Last modified by:   Zhai Yiming
--- @Last modified time: 2017-05-22 16:29:45
+-- @Last modified time: 2017-05-27 10:59:42
 --------------------------------------------
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Focus/lang/")
@@ -391,8 +391,12 @@ function MY_Focus.DelFocus(dwType, dwID)
 		end
 	end
 	-- 从UI中删除
-	local hItem = Station.Lookup('Normal/MY_Focus', 'Handle_List/HI_'..dwType..'_'..dwID)
+	local szKey = 'HI_' .. dwType .. '_' .. dwID
+	local hItem = Station.Lookup('Normal/MY_Focus', 'Handle_List/' .. szKey)
 	if hItem then
+		if MY_Focus.bEnableSceneNavi and Navigator_Remove then
+			Navigator_Remove("MY_FOCUS." .. szKey:sub(4))
+		end
 		MY.UI(hItem):remove()
 		-- 补上UI（超过数量限制时）
 		local p = l_tFocusList[MY_Focus.nMaxDisplay]
