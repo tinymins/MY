@@ -951,7 +951,7 @@ function _C.OnChatPanelAppendItemFromString(h, szMsg, szChannel, dwTime, nR, nG,
 				-- save fnAfter's param
 				hc.param = ret
 			else
-				MY.Debug({err}, 'HookChatPanel.Before#' .. szKey, MY_DEBUG.ERROR)
+				MY.Debug({msg}, 'HookChatPanel.Before#' .. szKey, MY_DEBUG.ERROR)
 			end
 		end
 	end
