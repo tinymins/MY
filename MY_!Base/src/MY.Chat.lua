@@ -395,91 +395,84 @@ MY.CopyChatItem = MY.Chat.CopyChatItem
 
 --解析消息
 function MY.Chat.FormatContent(szMsg)
-	local t = {}
-	for n, w in string.gfind(szMsg, "<(%w+)>(.-)</%1>") do
-		if w then
-			table.insert(t, w)
-		end
-	end
+	local t = MY.Xml.Decode(szMsg)
 	-- Output(t)
 	local t2 = {}
-	for k, v in pairs(t) do
-		if not string.find(v, "name=") then
-			if string.find(v, "frame=") then
-				local n = string.match(v, "frame=(%d+)")
-				local p = string.match(v, 'path="(.-)"')
-				local emo = MY.Chat.GetEmotion(p, n, 'image')
-				if emo then
-					table.insert(t2, {type = "emotion", text = emo.szCmd, innerText = emo.szCmd, id = emo.dwID})
-				end
-			elseif string.find(v, "group=") then
-				local n = string.match(v, "group=(%d+)")
-				local p = string.match(v, 'path="(.-)"')
-				local emo = MY.Chat.GetEmotion(p, n, 'animate')
-				if emo then
-					table.insert(t2, {type = "emotion", text = emo.szCmd, innerText = emo.szCmd, id = emo.dwID})
-				end
-			else
-				--普通文字
-				local s = string.match(v, "\"(.*)\"")
-				table.insert(t2, {type= "text", text = s, innerText = s})
+	for _, node in ipairs(t) do
+		local ntype = MY.Xml.GetNodeType(node)
+		local ndata = MY.Xml.GetNodeData(node)
+		-- 静态表情
+		if ntype == "image" then
+			local emo = MY.Chat.GetEmotion(ndata.path, ndata.frame, 'image')
+			if emo then
+				table.insert(t2, {type = "emotion", text = emo.szCmd, innerText = emo.szCmd, id = emo.dwID})
 			end
-		else
-			--物品链接
-			if string.find(v, "name=\"itemlink\"") then
-				local name, userdata = string.match(v,"%[(.-)%].-userdata=(%d+)")
-				table.insert(t2, {type = "item", text = "["..name.."]", innerText = name, item = userdata})
-			--物品信息
-			elseif string.find(v, "name=\"iteminfolink\"") then
-				local name, version, tab, index = string.match(v,"%[(.-)%].-script=\"this.nVersion=(%d+)\\%s*this.dwTabType=(%d+)\\%s*this.dwIndex=(%d+)")
-				table.insert(t2, {type = "iteminfo", text = "["..name.."]", innerText = name, version = version, tabtype = tab, index = index})
-			--姓名
-			elseif string.find(v, "name=\"namelink_%d+\"") then
-				local name = string.match(v,"%[(.-)%]")
-				table.insert(t2, {type = "name", text = "["..name.."]", innerText = "["..name.."]", name = name})
-			--任务
-			elseif string.find(v, "name=\"questlink\"") then
-				local name, userdata = string.match(v,"%[(.-)%].-userdata=(%d+)")
-				table.insert(t2, {type = "quest", text = "["..name.."]", innerText = name, questid = userdata})
-			--生活技艺
-			elseif string.find(v, "name=\"recipelink\"") then
-				local name, craft, recipe = string.match(v,"%[(.-)%].-script=\"this.dwCraftID=(%d+)\\%s*this.dwRecipeID=(%d+)")
-				table.insert(t2, {type = "recipe", text = "["..name.."]", innerText = name, craftid = craft, recipeid = recipe})
-			--技能
-			elseif string.find(v, "name=\"skilllink\"") then
-				local name, skillinfo = string.match(v,"%[(.-)%].-script=\"this.skillKey=%{(.-)%}")
+		-- 动态表情
+		elseif ntype == "animate" then
+			local emo = MY.Chat.GetEmotion(ndata.path, ndata.group, 'animate')
+			if emo then
+				table.insert(t2, {type = "emotion", text = emo.szCmd, innerText = emo.szCmd, id = emo.dwID})
+			end
+		-- 文字内容
+		elseif ntype == "text" then
+			-- 普通文字
+			if not ndata.name then
+				table.insert(t2, {type = "text", text = ndata.text, innerText = ndata.text})
+			-- 物品链接
+			elseif ndata.name == "itemlink" then
+				table.insert(t2, {type = "item", text = ndata.text, innerText = ndata.text:sub(2, -2), item = ndata.userdata})
+			-- 物品信息
+			elseif ndata.name == "iteminfolink" then
+				local version, tab, index = string.match(ndata.script, "this.nVersion=(%d+)%s*this.dwTabType=(%d+)%s*this.dwIndex=(%d+)")
+				table.insert(t2, {type = "iteminfo", text = ndata.text, innerText = ndata.text:sub(2, -2), version = version, tabtype = tab, index = index})
+			-- 姓名
+			elseif ndata.name:sub(1, 9) == "namelink" then
+				table.insert(t2, {type = "name", text = ndata.text, innerText = ndata.text, name = ndata.text:sub(2, -2)})
+			-- 任务
+			elseif ndata.name == "questlink" then
+				table.insert(t2, {type = "quest", text = ndata.text, innerText = ndata.text:sub(2, -2), questid = ndata.userdata})
+			-- 生活技艺
+			elseif ndata.name == "recipelink" then
+				local craft, recipe = string.match(ndata.script, "this.dwCraftID=(%d+)%s*this.dwRecipeID=(%d+)")
+				table.insert(t2, {type = "recipe", text = ndata.text, innerText = ndata.text:sub(2, -2), craftid = craft, recipeid = recipe})
+			-- 技能
+			elseif ndata.name == "skilllink" then
+				local skillinfo = string.match(ndata.script, "this.skillKey=%{(.-)%}")
 				local skillKey = {}
 				for w in string.gfind(skillinfo, "(.-)%,") do
 					local k, v  = string.match(w, "(.-)=(%w+)")
 					skillKey[k] = v
 				end
-				skillKey.text = "["..name.."]"
-				skillKey.innerText = "["..name.."]"
+				skillKey.text = ndata.text
+				skillKey.innerText = ndata.text:sub(2, -2)
 				table.insert(t2, skillKey)
-			--称号
-			elseif string.find(v, "name=\"designationlink\"") then
-				local name, id, fix = string.match(v,"%[(.-)%].-script=\"this.dwID=(%d+)\\%s*this.bPrefix=(.-)")
-				table.insert(t2, {type = "designation", text = "["..name.."]", innerText = name, id = id, prefix = fix})
-			--技能秘籍
-			elseif string.find(v, "name=\"skillrecipelink\"") then
-				local name, id, level = string.match(v,"%[(.-)%].-script=\"this.dwID=(%d+)\\%s*this.dwLevel=(%d+)")
-				table.insert(t2, {type = "skillrecipe", text = "["..name.."]", innerText = name, id = id, level = level})
-			--书籍
-			elseif string.find(v, "name=\"booklink\"") then
-				local name, version, tab, index, id = string.match(v,"%[(.-)%].-script=\"this.nVersion=(%d+)\\%s*this.dwTabType=(%d+)\\%s*this.dwIndex=(%d+)\\%s*this.nBookRecipeID=(%d+)")
-				table.insert(t2, {type = "book", text = "["..name.."]", innerText = name, version = version, tabtype = tab, index = index, bookinfo = id})
-			--成就
-			elseif string.find(v, "name=\"achievementlink\"") then
-				local name, id = string.match(v,"%[(.-)%].-script=\"this.dwID=(%d+)")
-				table.insert(t2, {type = "achievement", text = "["..name.."]", innerText = name, id = id})
-			--强化
-			elseif string.find(v, "name=\"enchantlink\"") then
-				local name, pro, craft, recipe = string.match(v,"%[(.-)%].-script=\"this.dwProID=(%d+)\\%s*this.dwCraftID=(%d+)\\%s*this.dwRecipeID=(%d+)")
-				table.insert(t2, {type = "enchant", text = "["..name.."]", innerText = name, proid = pro, craftid = craft, recipeid = recipe})
-			--事件
-			elseif string.find(v, "name=\"eventlink\"") then
-				local name, na, info = string.match(v,'text="(.-)".-script="this.szName=\\"(.-)\\"\\%s*this.szLinkInfo=\\"(.-)\\"')
-				table.insert(t2, {type = "eventlink", text = name, innerText = name, name = na, linkinfo = info or ""})
+			-- 称号
+			elseif ndata.name == "designationlink" then
+				local id, fix = string.match(ndata.script, "this.dwID=(%d+)%s*this.bPrefix=(.-)")
+				table.insert(t2, {type = "designation", text = ndata.text, innerText = ndata.text:sub(2, -2), id = id, prefix = fix})
+			-- 技能秘籍
+			elseif ndata.name == "skillrecipelink" then
+				local id, level = string.match(ndata.script, "this.dwID=(%d+)%s*this.dwLevel=(%d+)")
+				table.insert(t2, {type = "skillrecipe", text = ndata.text, innerText = ndata.text:sub(2, -2), id = id, level = level})
+			-- 书籍
+			elseif ndata.name == "booklink" then
+				local version, tab, index, id = string.match(ndata.script, "this.nVersion=(%d+)%s*this.dwTabType=(%d+)%s*this.dwIndex=(%d+)%s*this.nBookRecipeID=(%d+)")
+				table.insert(t2, {type = "book", text = ndata.text, innerText = ndata.text:sub(2, -2), version = version, tabtype = tab, index = index, bookinfo = id})
+			-- 成就
+			elseif ndata.name == "achievementlink" then
+				local id = string.match(ndata.script, "this.dwID=(%d+)")
+				table.insert(t2, {type = "achievement", text = ndata.text, innerText = ndata.text:sub(2, -2), id = id})
+			-- 强化
+			elseif ndata.name == "enchantlink" then
+				local pro, craft, recipe = string.match(ndata.script, "this.dwProID=(%d+)%s*this.dwCraftID=(%d+)%s*this.dwRecipeID=(%d+)")
+				table.insert(t2, {type = "enchant", text = ndata.text, innerText = ndata.text:sub(2, -2), proid = pro, craftid = craft, recipeid = recipe})
+			-- 事件
+			elseif ndata.name == "eventlink" then
+				local eventname, linkinfo = string.match(ndata.script, 'this.szName="(.-)"%s*this.szLinkInfo="(.-)""$')
+				if not eventname then
+					eventname, linkinfo = string.match(ndata.script, 'this.szName="(.-)"%s*this.szLinkInfo="(.-)"')
+				end
+				table.insert(t2, {type = "eventlink", text = ndata.text, innerText = ndata.text:sub(2, -2), name = eventname, linkinfo = linkinfo:gsub("\\(.)", "%1")})
 			end
 		end
 	end
@@ -948,15 +941,17 @@ function _C.OnChatPanelAppendItemFromString(h, szMsg, szChannel, dwTime, nR, nG,
 		-- if fnBefore exist and ChatPanel[i] actived or fnOnActive not defined
 		if type(hc.fnBefore) == "function" and (bActived or not hc.fnOnActive) then
 			-- try to execute fnBefore and get return values
-			local res, msg, ret = pcall(hc.fnBefore, h, szChannel, szMsg, dwTime, nR, nG, nB, ...)
+			local status, msg, ret = pcall(hc.fnBefore, h, szChannel, szMsg, dwTime, nR, nG, nB, ...)
 			-- when fnBefore execute succeed
-			if res then
+			if status then
 				-- set msg if returned string
 				if type(msg) == "string" then
 					szMsg = msg
 				end
 				-- save fnAfter's param
 				hc.param = ret
+			else
+				MY.Debug({err}, 'HookChatPanel.Before#' .. szKey, MY_DEBUG.ERROR)
 			end
 		end
 	end

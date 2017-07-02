@@ -321,6 +321,14 @@ local xml2Text = function(xml)
 	return tconcat(t)
 end
 
+local function GetNodeType(node)
+	return node["."]
+end
+
+local function GetNodeData(node)
+	return node[""]
+end
+
 -- public API
 MY = MY or {}
 MY.Xml = MY.Xml or {}
@@ -344,3 +352,9 @@ MY.Xml.Unescape = xmlUnescape
 
 -- xml转纯文字
 MY.Xml.GetPureText = xml2Text
+
+-- xml节点类型
+MY.Xml.GetNodeType = GetNodeType
+
+-- xml节点属性
+MY.Xml.GetNodeData = GetNodeData
