@@ -415,9 +415,10 @@ function MY.Chat.FormatContent(szMsg)
 			end
 		-- 文字内容
 		elseif ntype == "text" then
+			local is_normaltext = false
 			-- 普通文字
 			if not ndata.name then
-				table.insert(t2, {type = "text", text = ndata.text, innerText = ndata.text})
+				is_normaltext = true
 			-- 物品链接
 			elseif ndata.name == "itemlink" then
 				table.insert(t2, {type = "item", text = ndata.text, innerText = ndata.text:sub(2, -2), item = ndata.userdata})
@@ -473,6 +474,12 @@ function MY.Chat.FormatContent(szMsg)
 					eventname, linkinfo = string.match(ndata.script, 'this.szName="(.-)"%s*this.szLinkInfo="(.-)"')
 				end
 				table.insert(t2, {type = "eventlink", text = ndata.text, innerText = ndata.text:sub(2, -2), name = eventname, linkinfo = linkinfo:gsub("\\(.)", "%1")})
+			-- 未知类型的字符串
+			elseif ndata.text then
+				is_normaltext = true
+			end
+			if is_normaltext then
+				table.insert(t2, {type = "text", text = ndata.text, innerText = ndata.text})
 			end
 		end
 	end
