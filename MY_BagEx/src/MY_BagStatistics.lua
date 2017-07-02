@@ -242,6 +242,7 @@ function MY_BagStatistics.UpdateItems(frame)
 	local nPageCount = floor(nCount / nPageSize) + 1
 	frame:Lookup("Window_Main/Wnd_Index/Wnd_IndexEdit/WndEdit_Index"):SetText(frame.nCurrentPage)
 	frame:Lookup("Window_Main/Wnd_Index", "Handle_IndexCount/Text_IndexCount"):SprintfText(_L['%d pages'], nPageCount)
+	frame:Lookup("Window_Main/WndScroll_Name/Wnd_SearchInfo", "Text_SearchInfo"):SprintfText(_L['%d results'], nCount)
 	
 	local hOuter = frame:Lookup("Window_Main/Wnd_Index", "Handle_IndexesOuter")
 	local handle = hOuter:Lookup("Handle_Indexes")

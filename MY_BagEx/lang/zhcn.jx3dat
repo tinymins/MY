@@ -8,6 +8,7 @@ data = {
     ['compare with bag'] = '对比背包',
     
     ['%d pages'] = '共%d页',
+    ['%d results'] = '共%d个结果',
     
     ['Bankx%d Bagx%d Totalx%d'] = '仓库x%d 背包x%d 总x%d',
     ['%s (%s)\tBankx%d Bagx%d Totalx%d\n'] = '%s (%s)\t仓库x%d 背包x%d 总x%d\n',
