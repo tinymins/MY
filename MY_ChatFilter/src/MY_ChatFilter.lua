@@ -55,24 +55,27 @@ MY.HookChatPanel("MY_ChatFilter", function(h, szChannel, szMsg, dwTime)
 	-- 插件消息UUID过滤
 	if MY_ChatFilter.bFilterDuplicateAddonTalk then
 		local me = GetClientPlayer()
-		local tSay = me.GetTalkData()
+		local tSay = MY.Chat.FormatContent(szMsg)
 		if not h.MY_tDuplicateUUID then
 			h.MY_tDuplicateUUID = {}
-		elseif tSay[1] and tSay[1].type == "eventlink" then
-			local data = MY.Json.Decode(tSay[1].linkinfo)
-			if data and data.uuid then
-				local szUUID = data.uuid
-				if szUUID then
-					for k, uuid in pairs(h.MY_tDuplicateUUID) do
-						if uuid == szUUID then
-							return ''
+		end
+		for _, element in ipairs(tSay) do
+			if element.type == "eventlink" and element.name == "" then
+				local data = MY.JsonDecode(element.linkinfo)
+				if data and data.uuid then
+					local szUUID = data.uuid
+					if szUUID then
+						for k, uuid in pairs(h.MY_tDuplicateUUID) do
+							if uuid == szUUID then
+								return ''
+							end
 						end
-					end
-					table.insert(h.MY_tDuplicateUUID, 1, szUUID)
-					local nCount = #h.MY_tDuplicateUUID - MAX_UUID_RECORD
-					if nCount > 0 then
-						for i = nCount, 1, -1 do
-							table.remove(h.MY_tDuplicateUUID)
+						table.insert(h.MY_tDuplicateUUID, 1, szUUID)
+						local nCount = #h.MY_tDuplicateUUID - MAX_UUID_RECORD
+						if nCount > 0 then
+							for i = nCount, 1, -1 do
+								table.remove(h.MY_tDuplicateUUID)
+							end
 						end
 					end
 				end
