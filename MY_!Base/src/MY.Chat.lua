@@ -426,7 +426,7 @@ function MY.Chat.FormatContent(szMsg)
 				local version, tab, index = string.match(ndata.script, "this.nVersion=(%d+)%s*this.dwTabType=(%d+)%s*this.dwIndex=(%d+)")
 				table.insert(t2, {type = "iteminfo", text = ndata.text, innerText = ndata.text:sub(2, -2), version = version, tabtype = tab, index = index})
 			-- ĞÕÃû
-			elseif ndata.name:sub(1, 9) == "namelink" then
+			elseif ndata.name:sub(1, 9) == "namelink_" then
 				table.insert(t2, {type = "name", text = ndata.text, innerText = ndata.text, name = ndata.text:sub(2, -2)})
 			-- ÈÎÎñ
 			elseif ndata.name == "questlink" then
