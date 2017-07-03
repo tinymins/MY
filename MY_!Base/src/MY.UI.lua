@@ -2148,6 +2148,10 @@ function XGUI:size(nWidth, nHeight, nRawWidth, nRawHeight)
 				ele.txt:SetRelX(nRawWidth + 5)
 				ele.txt:SetSize(nWidth - nRawWidth - 5, nHeight)
 				ele.hdl:FormatAllItemPos()
+			elseif ele.type == "WndButton2" then
+				ele.wnd:SetSize(nWidth, nHeight)
+				ele.hdl:SetSize(nWidth, nHeight)
+				ele.txt:SetSize(nWidth, nHeight * 0.83)
 			elseif ele.wnd then
 				pcall(function() ele.wnd:SetSize(nWidth, nHeight) end)
 				pcall(function() ele.hdl:SetSize(nWidth, nHeight) end)
