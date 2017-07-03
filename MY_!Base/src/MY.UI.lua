@@ -995,6 +995,9 @@ end
 function XGUI:clear()
 	self:_checksum()
 	for _, ele in pairs(self.eles) do
+		if ele.raw.Clear then
+			ele.raw:Clear()
+		end
 		if ele.hdl then
 			ele.hdl:Clear()
 			ele.hdl:FormatAllItemPos()
