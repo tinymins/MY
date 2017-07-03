@@ -469,7 +469,7 @@ function MY.Chat.FormatContent(szMsg)
 				table.insert(t2, {type = "enchant", text = ndata.text, innerText = ndata.text:sub(2, -2), proid = pro, craftid = craft, recipeid = recipe})
 			-- ÊÂ¼þ
 			elseif ndata.name == "eventlink" then
-				local eventname, linkinfo = string.match(ndata.script, 'this.szName="(.-)"%s*this.szLinkInfo="(.-)""$')
+				local eventname, linkinfo = string.match(ndata.script, 'this.szName="(.-)"%s*this.szLinkInfo="(.-)"$')
 				if not eventname then
 					eventname, linkinfo = string.match(ndata.script, 'this.szName="(.-)"%s*this.szLinkInfo="(.-)"')
 				end
