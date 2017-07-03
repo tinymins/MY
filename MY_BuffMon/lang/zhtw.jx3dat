@@ -26,4 +26,7 @@ data = {
     },
     ['Delete'] = '刪除',
     ['Create'] = '創建',
+    ['Add as common or current kunfu?'] = '添加爲通用BUFF監控還是僅添加到當前心法？',
+    ['as common'] = '添加通用',
+    ['as current kunfu'] = '僅當前心法',
 }
