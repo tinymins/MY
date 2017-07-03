@@ -3,9 +3,34 @@
 ---------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_BuffMon/lang/")
 local INI_PATH = MY.GetAddonInfo().szRoot .. "MY_BuffMon/ui/MY_BuffMon.ini"
-local DEFAULT_S_CONFIG_FILE = MY.GetAddonInfo().szRoot .. "MY_BuffMon/data/self/$lang.jx3dat"
-local DEFAULT_T_CONFIG_FILE = MY.GetAddonInfo().szRoot .. "MY_BuffMon/data/target/$lang.jx3dat"
-local CUSTOM_STYLES = {
+local ROLE_CONFIG_FILE = {'config/my_buffmon.jx3dat', MY_DATA_PATH.ROLE}
+local DEFAULT_CONFIG_FILE = MY.GetAddonInfo().szRoot .. "MY_BuffMon/data/$lang.jx3dat"
+local CUSTOM_BOXBG_STYLES = {
+	"UI/Image/Common/Box.UITex|0",
+	"UI/Image/Common/Box.UITex|1",
+	"UI/Image/Common/Box.UITex|2",
+	"UI/Image/Common/Box.UITex|3",
+	"UI/Image/Common/Box.UITex|4",
+	"UI/Image/Common/Box.UITex|5",
+	"UI/Image/Common/Box.UITex|6",
+	"UI/Image/Common/Box.UITex|7",
+	"UI/Image/Common/Box.UITex|8",
+	"UI/Image/Common/Box.UITex|9",
+	"UI/Image/Common/Box.UITex|10",
+	"UI/Image/Common/Box.UITex|11",
+	"UI/Image/Common/Box.UITex|12",
+	"UI/Image/Common/Box.UITex|13",
+	"UI/Image/Common/Box.UITex|14",
+	"UI/Image/Common/Box.UITex|34",
+	"UI/Image/Common/Box.UITex|35",
+	"UI/Image/Common/Box.UITex|42",
+	"UI/Image/Common/Box.UITex|43",
+	"UI/Image/Common/Box.UITex|44",
+	"UI/Image/Common/Box.UITex|45",
+	"UI/Image/Common/Box.UITex|77",
+	"UI/Image/Common/Box.UITex|78",
+}
+local CUSTOM_CDBAR_STYLES = {
 	MY.GetAddonInfo().szUITexST .. "|" .. 0,
 	MY.GetAddonInfo().szUITexST .. "|" .. 1,
 	MY.GetAddonInfo().szUITexST .. "|" .. 2,
@@ -39,528 +64,588 @@ local CUSTOM_STYLES = {
 	"/ui/Image/Common/Money.UITex|233",
 	"/ui/Image/Common/Money.UITex|234",
 }
+local Config = {}
 local BOX_SPARKING_FRAME = GLOBAL.GAME_FPS
 
 ----------------------------------------------------------------------------------------------
 -- 通用逻辑
 ----------------------------------------------------------------------------------------------
-local function RedrawBuffList(hFrame, aBuffMon, OBJ)
-	local nBgFrame = OBJ.nBgFrame
-	hFrame.tItem = {}
-	local nWidth = 0
-	local hList = hFrame:Lookup("", "Handle_BuffList")
+local FE = {}
+
+local function ClosePanel(config)
+	Wnd.CloseWindow("MY_BuffMon" .. config.uid)
+end
+
+local function OpenPanel(config, reload)
+	if reload then
+		ClosePanel(config)
+	end
+	if not config.enable then
+		return
+	end
+	local frame = Wnd.OpenWindow(INI_PATH, "MY_BuffMon" .. config.uid)
+	local hList = frame:Lookup("", "Handle_BuffList")
+	
 	hList:Clear()
+	frame.tItem = {}
+	frame.hList = hList
+	frame.config = config
+	local nWidth = 0
 	local nCount = 0
-	for _, mon in ipairs(aBuffMon) do
-		if mon[1] then
-			nCount = nCount + 1
-			local hItem = hList:AppendItemFromIni(INI_PATH, "Handle_Item")
-			local hdlBox = hItem:Lookup("Handle_Box")
-			local hdlBar = hItem:Lookup("Handle_Bar")
-			local hBox = hdlBox:Lookup("Box_Default")
-			local hBoxBg = hdlBox:Lookup("Image_BoxBg")
-			local hSkillName = hdlBar:Lookup("Text_Name")
-			local hProcessTxt = hdlBar:Lookup("Text_Process")
-			local hProcessImg = hdlBar:Lookup("Image_Process")
-			
-			-- Box部分
-			hItem.hBox = hBox
-			hItem.mon = mon
-			hItem.dwIcon = mon[2]
-			if mon[4] then
-				if not hFrame.tItem[mon[3] .. mon[4]] then
-					hFrame.tItem[mon[3] .. mon[4]] = {}
-				end
-				hFrame.tItem[mon[3] .. mon[4]][hItem] = true
-			end
-			if not hFrame.tItem[mon[3]] then
-				hFrame.tItem[mon[3]] = {}
-			end
-			hFrame.tItem[mon[3]][hItem] = true
-			hBox:SetObject(UI_OBJECT.BUFF, mon[2], 1, 1)
-			hBox:SetObjectIcon(hItem.dwIcon or -1)
-			hBox:SetObjectCoolDown(true)
-			hBox:SetCoolDownPercentage(0)
-			hBoxBg:SetFrame(nBgFrame)
-			-- BUFF时间
-			hBox:SetOverTextPosition(1, ITEM_POSITION.LEFT_TOP)
-			hBox:SetOverTextFontScheme(1, 15)
-			-- BUFF层数
-			hBox:SetOverTextPosition(0, ITEM_POSITION.RIGHT_BOTTOM)
-			hBox:SetOverTextFontScheme(0, 15)
-			
-			-- 倒计时条
-			if OBJ.bCDBar then
-				hProcessTxt:SetW(OBJ.nCDWidth - 10)
-				hProcessTxt:SetText("")
-				hItem.hProcessTxt = hProcessTxt
-				
-				hSkillName:SetVisible(OBJ.bSkillName)
-				hSkillName:SetW(OBJ.nCDWidth - 10)
-				hSkillName:SetText(mon[3])
-				hItem.hSkillName = hSkillName
-				
-				XGUI(hProcessImg):image(OBJ.szCDUITex)
-				hProcessImg:SetW(OBJ.nCDWidth)
-				hProcessImg:SetPercentage(0)
-				hItem.hProcessImg = hProcessImg
-				
-				hdlBar:Show()
-				hdlBar:SetW(OBJ.nCDWidth)
-				hItem.hdlBar = hdlBar
-				hItem:SetW(hdlBox:GetW() + OBJ.nCDWidth)
-			else
-				hdlBar:Hide()
-				hItem:SetW(hdlBox:GetW())
-			end
-			
-			if nCount <= OBJ.nMaxLineCount then
-				nWidth = nWidth + hItem:GetW() * hFrame.fScale
-			end
-			hItem:Scale(hFrame.fScale, hFrame.fScale)
-			hItem:SetVisible(not OBJ.bHideVoidBuff)
+	local function CreateItem(mon)
+		if not mon.enable then
+			return
 		end
+		nCount = nCount + 1
+		local hItem        = hList:AppendItemFromIni(INI_PATH, "Handle_Item")
+		local hBox         = hItem:Lookup("Handle_Box")
+		local hCDBar       = hItem:Lookup("Handle_Bar")
+		local box          = hBox:Lookup("Box_Default")
+		local imgBoxBg     = hBox:Lookup("Image_BoxBg")
+		local txtProcess   = hCDBar:Lookup("Text_Process")
+		local imgProcess   = hCDBar:Lookup("Image_Process")
+		local txtBuffName  = hCDBar:Lookup("Text_Name")
+		
+		-- 建立高速索引
+		hItem.box = box
+		hItem.mon = mon
+		hItem.txtProcess = txtProcess
+		hItem.imgProcess = imgProcess
+		hItem.txtBuffName = txtBuffName
+		if mon.buffid and mon.buffid ~= -1 then
+			if not frame.tItem[mon.buffid] then
+				frame.tItem[mon.buffid] = {}
+			end
+			frame.tItem[mon.buffid][hItem] = true
+		elseif mon.buffname then
+			if not frame.tItem[mon.buffname] then
+				frame.tItem[mon.buffname] = {}
+			end
+			frame.tItem[mon.buffname][hItem] = true
+		end
+		
+		-- Box部分
+		box:SetObject(UI_OBJECT.BUFF, mon.buffid, 1, 1)
+		box:SetObjectIcon(mon.iconid or 13)
+		box:SetObjectCoolDown(true)
+		box:SetCoolDownPercentage(0)
+		-- BUFF时间
+		box:SetOverTextPosition(1, ITEM_POSITION.LEFT_TOP)
+		box:SetOverTextFontScheme(1, 15)
+		-- BUFF层数
+		box:SetOverTextPosition(0, ITEM_POSITION.RIGHT_BOTTOM)
+		box:SetOverTextFontScheme(0, 15)
+		-- Box背景图
+		XGUI(imgBoxBg):image(config.boxBgUITex)
+		
+		-- 倒计时条
+		if config.cdBar then
+			txtProcess:SetW(config.cdBarWidth - 10)
+			txtProcess:SetText("")
+			
+			txtBuffName:SetVisible(config.showBuffName)
+			txtBuffName:SetW(config.cdBarWidth - 10)
+			txtBuffName:SetText(mon.buffname or '')
+			
+			XGUI(imgProcess):image(config.cdBarUITex)
+			imgProcess:SetW(config.cdBarWidth)
+			imgProcess:SetPercentage(0)
+			
+			hCDBar:Show()
+			hCDBar:SetW(config.cdBarWidth)
+			hItem.hCDBar = hCDBar
+			hItem:SetW(hBox:GetW() + config.cdBarWidth)
+		else
+			hCDBar:Hide()
+			hItem:SetW(hBox:GetW())
+		end
+		
+		if nCount <= config.maxLineCount then
+			nWidth = nWidth + hItem:GetW() * config.scale
+		end
+		-- hItem:Scale(config.scale, config.scale)
+		hItem:SetVisible(not config.hideVoidBuff)
+	end
+	for _, mon in ipairs(config.monitors.common or EMPTY_TABLE) do
+		CreateItem(mon)
+	end
+	for _, mon in ipairs(config.monitors[GetClientPlayer().GetKungfuMount().dwSkillID] or EMPTY_TABLE) do
+		CreateItem(mon)
 	end
 	hList:SetW(nWidth)
 	hList:FormatAllItemPos()
 	hList:SetSizeByAllItemSize()
 	hList:SetIgnoreInvisibleChild(true)
 	hList:FormatAllItemPos()
+	
 	local nW, nH = hList:GetSize()
-	nW = math.max(nW, 50 * hFrame.fScale)
-	nH = math.max(nH, 50 * hFrame.fScale)
-	hFrame:SetSize(nW, nH)
-	hFrame:SetDragArea(0, 0, nW, nH)
+	nW = math.max(nW, 50 * config.scale)
+	nH = math.max(nH, 50 * config.scale)
+	frame:SetSize(nW, nH)
+	frame:SetDragArea(0, 0, nW, nH)
+	frame:EnableDrag(config.dragable)
+	frame:SetMousePenetrable(not config.dragable)
+	frame:Scale(config.scale, config.scale)
+	frame:SetPoint(config.anchor.s, 0, 0, config.anchor.r, config.anchor.x, config.anchor.y)
+	frame:CorrectPos()
+	
+	for k, v in pairs(FE) do
+		frame[k] = v
+	end
+	frame:RegisterEvent("SKILL_MOUNT_KUNG_FU")
+	frame:RegisterEvent("ON_ENTER_CUSTOM_UI_MODE")
+	frame:RegisterEvent("ON_LEAVE_CUSTOM_UI_MODE")
 end
 
-local _tBuffTime = setmetatable({}, { __mode = "v" })
-local _needFormatItemPos
-local function UpdateBuffList(hFrame, KTarget, bTargetNotChanged, bHideOthers, bHideVoidBuff)
-	local hList = hFrame:Lookup("", "Handle_BuffList")
-	if not KTarget then
-		for i = 0, hList:GetItemCount() - 1 do
-			local hItem = hList:Lookup(i)
-			local hBox = hItem:Lookup("Handle_Box/Box_Default")
-			hBox:SetCoolDownPercentage(0)
-			hBox:SetObjectStaring(false)
-			hBox:SetOverText(0, "")
-			hBox:SetOverText(1, "")
-			hBox:ClearExtentAnimate()
-			hItem:Lookup("Handle_Bar/Text_Process"):SetText("")
-			hItem:Lookup("Handle_Bar/Image_Process"):SetPercentage(0)
-			if bHideVoidBuff and hItem:IsVisible() then
-				_needFormatItemPos = true
-				hItem:Hide()
+local function GetTarget(eType)
+	if eType == "CLIENT_PLAYER" then
+		return TARGET.PLAYER, UI_GetClientPlayerID()
+	elseif eType == "CONTROL_PLAYER" then
+		return TARGET.PLAYER, GetControlPlayerID()
+	elseif eType == "TARGET" then
+		return MY.GetTarget()
+	elseif eType == "TTARGET" then
+		local KTarget = MY.GetObject(MY.GetTarget())
+		if KTarget then
+			return MY.GetTarget(KTarget)
+		else
+			return TARGET.NO_TARGET, 0
+		end
+	end
+end
+
+do
+local needFormatItemPos
+local l_tBuffTime = setmetatable({}, { __mode = "v" })
+local function UpdateItem(hItem, KTarget, buff, szBuffName, tItem, config, nFrameCount, targetChanged)
+	if buff then
+		if not hItem.mon.buffid or hItem.mon.buffid == -1 or hItem.mon.buffid == buff.dwID then
+			if hItem.nRenderFrame == nFrameCount then
+				return
 			end
+			if config.hideVoidBuff and not hItem:IsVisible() then
+				needFormatItemPos = true
+				hItem:Show()
+			end
+			-- 计算BUFF时间
+			local nTimeLeft = ("%.1f"):format(math.max(0, buff.nEndFrame - nFrameCount) / 16)
+			local nBuffTime = math.max(GetBuffTime(buff.dwID, buff.nLevel) / 16, nTimeLeft)
+			if l_tBuffTime[KTarget.dwID][buff.dwID] then
+				nBuffTime = math.max(l_tBuffTime[KTarget.dwID][buff.dwID], nBuffTime)
+			end
+			l_tBuffTime[KTarget.dwID][buff.dwID] = nBuffTime
+			-- 处理新出现的BUFF
+			if not hItem.mon.iconid or hItem.mon.iconid == 13 then
+				-- 计算图标 名字 BuffID等
+				if hItem.mon.buffid ~= -1 then
+					-- 加入精确缓存
+					if not tItem[buff.dwID] then
+						tItem[buff.dwID] = {}
+					end
+					tItem[buff.dwID][hItem] = true
+					-- 移除模糊缓存
+					if tItem[szBuffName] then
+						tItem[szBuffName][hItem] = false
+					end
+					hItem.mon.buffid = buff.dwID
+				end
+				if not hItem.mon.buffname then
+					hItem.mon.buffname = szBuffName
+					hItem.txtBuffName:SetText(szBuffName)
+				end
+				hItem.mon.iconid = Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13
+				hItem.box:SetObjectIcon(hItem.mon.iconid)
+			end
+			-- 倒计时 与 BUFF层数堆叠
+			hItem.txtProcess:SprintfText("%d'", nTimeLeft)
+			hItem.box:SetOverText(1, nTimeLeft .. "'")
+			hItem.box:SetOverText(0, buff.nStackNum == 1 and "" or buff.nStackNum)
+			-- CD百分比
+			local fPercent = nTimeLeft / nBuffTime
+			hItem.imgProcess:SetPercentage(fPercent)
+			hItem.box:SetCoolDownPercentage(fPercent)
+			if fPercent < 0.5 and fPercent > 0.3 then
+				if hItem.fPercent ~= 0.5 then
+					hItem.fPercent = 0.5
+					hItem.box:SetObjectStaring(true)
+				end
+			elseif fPercent < 0.3 and fPercent > 0.1 then
+				if hItem.fPercent ~= 0.3 then
+					hItem.fPercent = 0.3
+					hItem.box:SetExtentAnimate("ui\\Image\\Common\\Box.UITex", 17)
+				end
+			elseif fPercent < 0.1 then
+				if hItem.fPercent ~= 0.1 then
+					hItem.fPercent = 0.1
+					hItem.box:SetExtentAnimate("ui\\Image\\Common\\Box.UITex", 20)
+				end
+			else
+				hItem.box:SetObjectStaring(false)
+				hItem.box:ClearExtentAnimate()
+			end
+			hItem.nRenderFrame = nFrameCount
+		end
+		-- 加入同名BUFF列表
+		if not hItem.mon.buffids then
+			hItem.mon.buffids = {}
+		end
+		if not hItem.mon.buffids[buff.dwID] then
+			hItem.mon.buffids[buff.dwID] = Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13
 		end
 	else
-		local nCurrentFrame = GetLogicFrameCount()
-		for _, buff in ipairs(MY.Player.GetBuffList(KTarget)) do
-			if not bHideOthers or buff.dwSkillSrcID == UI_GetClientPlayerID() then
-				local szName = Table_GetBuffName(buff.dwID, buff.nLevel)
-				local tItems = hFrame.tItem[szName .. buff.dwID] or hFrame.tItem[szName]
+		hItem.box:SetCoolDownPercentage(0)
+		hItem.box:SetObjectStaring(false)
+		hItem.box:SetOverText(0, "")
+		hItem.box:SetOverText(1, "")
+		hItem.box:ClearExtentAnimate()
+		hItem.txtProcess:SetText("")
+		hItem.imgProcess:SetPercentage(0)
+		-- 如果目标没有改变过 且 之前存在 则显示刷新动画
+		if hItem.nRenderFrame and hItem.nRenderFrame >= 0 and hItem.nRenderFrame ~= nFrameCount and not targetChanged then
+			hItem.box:SetObjectSparking(true)
+			hItem.nSparkingFrame = nFrameCount
+		-- 如果勾选隐藏不存在的BUFF 且 当前未隐藏 且 (目标改变过 或 刷新动画没有在播放) 则隐藏
+		elseif config.hideVoidBuff and hItem:IsVisible()
+		and (targetChanged or not hItem.nSparkingFrame or nFrameCount - hItem.nSparkingFrame <= BOX_SPARKING_FRAME) then
+			hItem:Hide()
+			hItem.nSparkingFrame = nil
+			needFormatItemPos = true
+		end
+		hItem.fPercent = 0
+		hItem.nRenderFrame = nil
+	end
+end
+function FE.OnFrameBreathe()
+	local dwType, dwID = GetTarget(this.config.target)
+	if dwType == this.dwType and dwID == this.dwID
+	and dwType ~= TARGET.PLAYER and dwType ~= TARGET.NPC then
+		return
+	end
+	needFormatItemPos = false
+	local hList = this.hList
+	local config = this.config
+	local KTarget = MY.GetObject(dwType, dwID)
+	local targetChanged = dwType ~= this.dwType or dwID ~= this.dwID
+	local nFrameCount = GetLogicFrameCount()
+	
+	if not KTarget then
+		for i = 0, hList:GetItemCount() - 1 do
+			UpdateItem(hList:Lookup(i), KTarget, nil, nil, this.tItem, config, nFrameCount, targetChanged)
+		end
+	else
+		-- BUFF最大时间缓存
+		if not l_tBuffTime[KTarget.dwID] then
+			l_tBuffTime[KTarget.dwID] = {}
+		end
+		-- 更新当前存在的BUFF列表
+		local dwClientPlayerID  = UI_GetClientPlayerID()
+		local dwControlPlayerID = GetControlPlayerID()
+		for _, buff in ipairs(MY.GetBuffList(KTarget)) do
+			if not config.hideOthers or buff.dwSkillSrcID == dwClientPlayerID or buff.dwSkillSrcID == dwControlPlayerID then
+				local szName = Table_GetBuffName(buff.dwID, buff.nLevel) or ""
+				local tItems = this.tItem[buff.dwID]
 				if tItems then
 					for hItem, _ in pairs(tItems) do
-						if not hItem.mon[4] or hItem.mon[4] == -1 or hItem.mon[4] == buff.dwID then
-							if bHideVoidBuff and not hItem:IsVisible() then
-								_needFormatItemPos = true
-								hItem:Show()
-							end
-							local hBox = hItem.hBox
-							-- 计算BUFF时间
-							local nBuffTime = GetBuffTime(buff.dwID, buff.nLevel) / 16
-							local nTimeLeft = ("%.1f"):format(math.max(0, buff.nEndFrame - GetLogicFrameCount()) / 16)
-							if not _tBuffTime[KTarget.dwID] then
-								_tBuffTime[KTarget.dwID] = {}
-								hFrame.tBuffTime = _tBuffTime[KTarget.dwID] -- 防止CD过程中table被GC回收
-							end
-							nBuffTime = math.max(nBuffTime, nTimeLeft)
-							if _tBuffTime[KTarget.dwID][buff.dwID] then
-								nBuffTime = math.max(_tBuffTime[KTarget.dwID][buff.dwID], nBuffTime)
-							end
-							_tBuffTime[KTarget.dwID][buff.dwID] = nBuffTime
-							
-							if not hItem.dwIcon or hItem.dwIcon == 13 then
-								if not hFrame.tItem[szName .. buff.dwID] then
-									hFrame.tItem[szName .. buff.dwID] = {}
-								end
-								hFrame.tItem[szName .. buff.dwID][hItem] = true
-								hItem.dwIcon = Table_GetBuffIconID(buff.dwID, buff.nLevel)
-								hBox:SetObjectIcon(hItem.dwIcon)
-								hItem.mon[2] = hItem.dwIcon
-								if hItem.mon[4] ~= -1 then
-									hItem.mon[4] = buff.dwID
-								end
-							end
-							
-							if hItem.hProcessTxt then
-								hItem.hProcessTxt:SetText(nTimeLeft .. "'")
-							end
-							hBox:SetOverText(1, nTimeLeft .. "'")
-							
-							if buff.nStackNum == 1 then
-								hBox:SetOverText(0, "")
-							else
-								hBox:SetOverText(0, buff.nStackNum)
-							end
-
-							local dwPercent = nTimeLeft / nBuffTime
-							if hItem.hProcessImg then
-								hItem.hProcessImg:SetPercentage(dwPercent)
-							end
-							hBox:SetCoolDownPercentage(dwPercent)
-
-							if dwPercent < 0.5 and dwPercent > 0.3 then
-								if hBox.dwPercent ~= 0.5 then
-									hBox.dwPercent = 0.5
-									hBox:SetObjectStaring(true)
-								end
-							elseif dwPercent < 0.3 and dwPercent > 0.1 then
-								if hBox.dwPercent ~= 0.3 then
-									hBox.dwPercent = 0.3
-									hBox:SetExtentAnimate("ui\\Image\\Common\\Box.UITex", 17)
-								end
-							elseif dwPercent < 0.1 then
-								if hBox.dwPercent ~= 0.1 then
-									hBox.dwPercent = 0.1
-									hBox:SetExtentAnimate("ui\\Image\\Common\\Box.UITex", 20)
-								end
-							else
-								hBox:SetObjectStaring(false)
-								hBox:ClearExtentAnimate()
-							end
-							hItem.nRenderFrame = nCurrentFrame
-						end
-						if not hItem.mon[5] then
-							hItem.mon[5] = {}
-						end
-						if not hItem.mon[5][-1] then
-							hItem.mon[5][-1] = Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13
-						end
-						if not hItem.mon[5][buff.dwID] then
-							hItem.mon[5][buff.dwID] = Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13
-						end
+						UpdateItem(hItem, KTarget, buff, szName, this.tItem, config, nFrameCount, targetChanged)
+					end
+				end
+				local tItems = this.tItem[szName]
+				if tItems then
+					for hItem, _ in pairs(tItems) do
+						UpdateItem(hItem, KTarget, buff, szName, this.tItem, config, nFrameCount, targetChanged)
 					end
 				end
 			end
 		end
-		-- update disappeared buff info
-		if bTargetNotChanged then
-			for i = 0, hList:GetItemCount() - 1 do
-				local hItem = hList:Lookup(i)
-				if hItem.nRenderFrame and hItem.nRenderFrame >= 0
-				and hItem.nRenderFrame ~= nCurrentFrame then
-					local hBox = hItem.hBox
-					hBox.dwPercent = 0
-					hBox:SetCoolDownPercentage(0)
-					hBox:SetOverText(0, "")
-					hBox:SetOverText(1, "")
-					hBox:SetObjectStaring(false)
-					hBox:ClearExtentAnimate()
-					hBox:SetObjectSparking(true)
-					if hItem.hProcessTxt then
-						hItem.hProcessTxt:SetText("")
-					end
-					if hItem.hProcessImg then
-						hItem.hProcessImg:SetPercentage(0)
-					end
-					hItem.nRenderFrame = nil
-					hItem.nSparkingFrame = nCurrentFrame
-				elseif bHideVoidBuff and hItem:IsVisible()
-				and hItem.nSparkingFrame
-				and nCurrentFrame - hItem.nSparkingFrame > BOX_SPARKING_FRAME then
-					hItem.nSparkingFrame = nil
-					_needFormatItemPos = true
-					hItem:Hide()
-				end
-			end
-		else
-			hFrame.tBuffTime = _tBuffTime[KTarget.dwID] -- 防止CD过程中table被GC回收
-			for i = 0, hList:GetItemCount() - 1 do
-				local hItem = hList:Lookup(i)
-				if hItem.nRenderFrame and hItem.nRenderFrame >= 0
-				and hItem.nRenderFrame ~= nCurrentFrame then
-					local hBox = hItem.hBox
-					hBox.dwPercent = 0
-					hBox:SetCoolDownPercentage(0)
-					hBox:SetOverText(0, "")
-					hBox:SetOverText(1, "")
-					hBox:SetObjectStaring(false)
-					hBox:ClearExtentAnimate()
-					if hItem.hProcessTxt then
-						hItem.hProcessTxt:SetText("")
-					end
-					if hItem.hProcessImg then
-						hItem.hProcessImg:SetPercentage(0)
-					end
-					if bHideVoidBuff and hItem:IsVisible() then
-						_needFormatItemPos = true
-						hItem:Hide()
-					end
-					hItem.nRenderFrame = nil
-				end
+		-- 更新消失的BUFF列表
+		for i = 0, hList:GetItemCount() - 1 do
+			if hList:Lookup(i).nRenderFrame ~= nFrameCount then
+				UpdateItem(hList:Lookup(i), KTarget, nil, nil, this.tItem, config, nFrameCount, targetChanged)
 			end
 		end
-		if _needFormatItemPos then
+		-- 防止CD过程中table被GC回收
+		if targetChanged then
+			this.tBuffTime = l_tBuffTime[KTarget.dwID]
+		end
+		-- 检查是否需要重绘界面坐标
+		if needFormatItemPos then
 			hList:FormatAllItemPos()
 		end
 	end
+	this.dwType, this.dwID = dwType, dwID
+end
 end
 
-local function GeneNameSpace(OBJ, NAMESPACE, DEFAULT_CONFIG_FILE, GetTarget, LANG)
-	OBJ.fScale        = 0.8    -- 缩放比
-	OBJ.bEnable       = false  -- 启用标记
-	OBJ.bDragable     = false  -- 是否可拖拽
-	OBJ.nBoxBgFrame   = 43     -- Box背景帧
-	OBJ.bHideOthers   = true   -- 只显示自己的BUFF
-	OBJ.nMaxLineCount = 16     -- 单行最大数量
-	OBJ.bHideVoidBuff = false  -- 隐藏消失的BUFF
-	OBJ.bCDBar        = false  -- 显示倒计时条
-	OBJ.nCDWidth      = 240    -- 倒计时条宽度
-	OBJ.szCDUITex     = MY.GetAddonInfo().szUITexST .. "|7"
-	OBJ.bSkillName    = true   -- 显示技能名字
-	RegisterCustomData(NAMESPACE .. ".fScale")
-	RegisterCustomData(NAMESPACE .. ".bEnable")
-	RegisterCustomData(NAMESPACE .. ".bDragable")
-	RegisterCustomData(NAMESPACE .. ".bHideOthers")
-	RegisterCustomData(NAMESPACE .. ".nMaxLineCount")
-	RegisterCustomData(NAMESPACE .. ".tBuffList")
-	RegisterCustomData(NAMESPACE .. ".bHideVoidBuff")
-	RegisterCustomData(NAMESPACE .. ".bCDBar")
-	RegisterCustomData(NAMESPACE .. ".nCDWidth")
-	RegisterCustomData(NAMESPACE .. ".szCDUITex")
-	RegisterCustomData(NAMESPACE .. ".bSkillName")
+function FE.OnFrameDragEnd()
+	this:CorrectPos()
+	this.config.anchor = GetFrameAnchor(this)
+end
 
-	function OBJ.AddBuff(dwKungFuID, szBuffName)
-		OBJ.GetBuffList(dwKungFuID)
-		if not OBJ.tBuffList[dwKungFuID] then
-			OBJ.tBuffList[dwKungFuID] = {}
+function FE.OnEvent(event)
+	if event == "SKILL_MOUNT_KUNG_FU" then
+		OpenPanel(this.config, true)
+	elseif event == "ON_ENTER_CUSTOM_UI_MODE" then
+		UpdateCustomModeWindow(this, this.config.caption, not this.config.dragable)
+	elseif event == "ON_LEAVE_CUSTOM_UI_MODE" then
+		UpdateCustomModeWindow(this, this.config.caption, not this.config.dragable)
+		if this.config.dragable then
+			this:EnableDrag(true)
 		end
-		table.insert(OBJ.tBuffList[dwKungFuID], {true, 13, szBuffName})
-		OBJ.Reload()
-	end
-
-	function OBJ.DelBuff(dwKungFuID, szBuffName)
-		if OBJ.GetBuffList(dwKungFuID) then
-			for i, mon in ipairs(OBJ.tBuffList[dwKungFuID]) do
-				if mon[3] == szBuffName then
-					table.remove(OBJ.tBuffList[dwKungFuID], i)
-					return OBJ.Reload()
-				end
-			end
-		end
-	end
-
-	function OBJ.EnableBuff(dwKungFuID, szBuffName, bEnable)
-		if OBJ.GetBuffList(dwKungFuID) then
-			for i, mon in ipairs(OBJ.tBuffList[dwKungFuID]) do
-				if mon[3] == szBuffName then
-					mon[1] = bEnable
-					return OBJ.Reload()
-				end
-			end
-		end
-	end
-
-	function OBJ.GetBuffList(dwKungFuID)
-		if not OBJ.tBuffList then
-			OBJ.tBuffList = MY.LoadLUAData(DEFAULT_CONFIG_FILE)
-		end
-		return OBJ.tBuffList[dwKungFuID]
-	end
-
-	function OBJ.RedrawBuffList(hFrame)
-		local dwKungFuID = GetClientPlayer().GetKungfuMount().dwSkillID
-		RedrawBuffList(hFrame, OBJ.GetBuffList(dwKungFuID) or EMPTY_TABLE, OBJ)
-		this:SetPoint(OBJ.anchor.s, 0, 0, OBJ.anchor.r, OBJ.anchor.x, OBJ.anchor.y)
-		this:CorrectPos()
-	end
-
-	function OBJ.OnFrameCreate()
-		this.fScale = OBJ.fScale
-		this:Scale(OBJ.fScale, OBJ.fScale)
-		this:RegisterEvent("SKILL_MOUNT_KUNG_FU")
-		this:RegisterEvent("ON_ENTER_CUSTOM_UI_MODE")
-		this:RegisterEvent("ON_LEAVE_CUSTOM_UI_MODE")
-		this:EnableDrag(OBJ.bDragable)
-		this:SetMousePenetrable(not OBJ.bDragable)
-		OBJ.RedrawBuffList(this)
-	end
-
-	function OBJ.OnFrameBreathe()
-		local dwType, dwID = GetTarget()
-		if dwType ~= this.dwType or dwID ~= this.dwID
-		or dwType == TARGET.PLAYER or dwType == TARGET.NPC then
-			UpdateBuffList(this, MY.GetObject(dwType, dwID), dwType == this.dwType and dwID == this.dwID, OBJ.bHideOthers, OBJ.bHideVoidBuff)
-			this.dwType, this.dwID = dwType, dwID
-		end
-	end
-
-	function OBJ.OnFrameDragEnd()
-		OBJ.anchor = GetFrameAnchor(this, "TOPLEFT")
-	end
-
-	function OBJ.OnEvent(event)
-		if event == "SKILL_MOUNT_KUNG_FU" then
-			OBJ.RedrawBuffList(this)
-		elseif event == "ON_ENTER_CUSTOM_UI_MODE" then
-			UpdateCustomModeWindow(this, LANG.CMTEXT, not OBJ.bDragable)
-		elseif event == "ON_LEAVE_CUSTOM_UI_MODE" then
-			UpdateCustomModeWindow(this, LANG.CMTEXT, not OBJ.bDragable)
-			if OBJ.bDragable then
-				this:EnableDrag(true)
-			end
-			OBJ.anchor = GetFrameAnchor(this, "TOPLEFT")
-		end
-	end
-
-	function OBJ.Open()
-		Wnd.OpenWindow(INI_PATH, NAMESPACE)
-	end
-
-	function OBJ.Close()
-		Wnd.CloseWindow(NAMESPACE)
-	end
-
-	function OBJ.Reload()
-		OBJ.Close()
-		if OBJ.bEnable then
-			OBJ.Open()
-		end
+		FE.OnFrameDragEnd()
 	end
 end
 
 ----------------------------------------------------------------------------------------------
--- 目标监控
+-- 数据存储
 ----------------------------------------------------------------------------------------------
-MY_BuffMonT = {}
-MY_BuffMonT.anchor = { y = 102, x = -343, s = "TOPLEFT", r = "CENTER" }
-RegisterCustomData("MY_BuffMonT.anchor")
-GeneNameSpace(MY_BuffMonT, "MY_BuffMonT", DEFAULT_T_CONFIG_FILE,
-function() return MY.GetTarget() end, {CMTEXT = _L["mingyi target buff monitor"]})
-
-----------------------------------------------------------------------------------------------
--- 自身监控
-----------------------------------------------------------------------------------------------
-MY_BuffMonS = {}
-MY_BuffMonS.anchor = { y = 152, x = -343, s = "TOPLEFT", r = "CENTER" }
-RegisterCustomData("MY_BuffMonS.anchor")
-GeneNameSpace(MY_BuffMonS, "MY_BuffMonS", DEFAULT_S_CONFIG_FILE,
-function() return TARGET.PLAYER, UI_GetClientPlayerID() end, {CMTEXT = _L["mingyi self buff monitor"]})
-
-----------------------------------------------------------------------------------------------
--- 初始化
-----------------------------------------------------------------------------------------------
-MY.RegisterInit("MY_BuffMon", function()
-	if MY_BuffMonT.bEnable then
-		MY_BuffMonT.Open()
+do
+local function OnInit()
+	local data = MY.LoadLUAData(DEFAULT_CONFIG_FILE)
+	Config = MY.LoadLUAData(ROLE_CONFIG_FILE) or data.default
+	if MY_BuffMonS then
+		if not Config[1] then
+			Config[1] = clone(data.template)
+		end
+		Config[1].uid          = 1
+		Config[1].caption      = _L['mingyi self buff monitor']
+		Config[1].target       = "CLIENT_PLAYER"
+		Config[1].scale        = MY_BuffMonS.bScale
+		Config[1].enable       = MY_BuffMonS.bEnable
+		Config[1].dragable     = MY_BuffMonS.bDragable
+		Config[1].hideOthers   = MY_BuffMonS.bHideOthers
+		Config[1].maxLineCount = MY_BuffMonS.nMaxLineCount
+		Config[1].hideVoidBuff = MY_BuffMonS.bHideVoidBuff
+		Config[1].cdBar        = MY_BuffMonS.bCDBar
+		Config[1].cdBarWidth   = MY_BuffMonS.nCDWidth
+		Config[1].cdBarUITex   = MY_BuffMonS.szCDUITex
+		Config[1].showBuffName = MY_BuffMonS.bSkillName
+		Config[1].boxBgUITex   = "UI/Image/Common/Box.UITex|44"
+		Config[1].anchor       = MY_BuffMonS.anchor
+		Config[1].monitors     = {}
+		for kungfuid, mons in pairs(MY_BuffMonS.tBuffList) do
+			Config[1].monitors[kungfuid] = {}
+			for _, mon in ipairs(mons) do
+				table.insert(Config[1].monitors[kungfuid], {
+					enable = mon[1], iconid = mon[2},
+					buffname = mon[3], buffid = mon[4], buffids = mon[5]
+				})
+			end
+		end
 	end
-	if MY_BuffMonS.bEnable then
-		MY_BuffMonS.Open()
+	if MY_BuffMonT then
+		if not Config[2] then
+			Config[2] = clone(data.template)
+		end
+		Config[2].uid          = 1
+		Config[2].caption      = _L['mingyi target buff monitor']
+		Config[2].target       = "TARGET"
+		Config[2].scale        = MY_BuffMonT.bScale
+		Config[2].enable       = MY_BuffMonT.bEnable
+		Config[2].dragable     = MY_BuffMonT.bDragable
+		Config[2].hideOthers   = MY_BuffMonT.bHideOthers
+		Config[2].maxLineCount = MY_BuffMonT.nMaxLineCount
+		Config[2].hideVoidBuff = MY_BuffMonT.bHideVoidBuff
+		Config[2].cdBar        = MY_BuffMonT.bCDBar
+		Config[2].cdBarWidth   = MY_BuffMonT.nCDWidth
+		Config[2].cdBarUITex   = MY_BuffMonT.szCDUITex
+		Config[2].showBuffName = MY_BuffMonT.bSkillName
+		Config[2].boxBgUITex   = "UI/Image/Common/Box.UITex|44"
+		Config[2].anchor       = MY_BuffMonT.anchor
+		Config[2].monitors     = {}
+		for kungfuid, mons in pairs(MY_BuffMonT.tBuffList) do
+			Config[2].monitors[kungfuid] = {}
+			for _, mon in ipairs(mons) do
+				table.insert(Config[2].monitors[kungfuid], {
+					enable = mon[1], iconid = mon[2},
+					buffname = mon[3], buffid = mon[4], buffids = mon[5]
+				})
+			end
+		end
 	end
-end)
+	for i, config in ipairs(Config) do
+		OpenPanel(config, true)
+	end
+	ConfigTemplate = data.template
+end
+MY.RegisterInit("MY_BuffMon", OnInit)
 
+local function OnExit()
+	MY.SaveLUAData(ROLE_CONFIG_FILE, Config)
+end
+MY.RegisterExit("MY_BuffMon", OnExit)
+end
 
-local function GenePS(ui, OBJ, x, y, w, h)
+----------------------------------------------------------------------------------------------
+-- 设置界面
+----------------------------------------------------------------------------------------------
+local PS = {}
+local function GenePS(ui, config, x, y, w, h)
+	ui:append("WndEditBox", {
+		x = x, y = y, w = w * 2 / 3, h = 22,
+		r = 255, g = 255, b = 0, text = config.caption,
+		onchange = function(raw, val) config.caption = val end,
+	})
+	ui:append("WndButton2", {
+		x = w - 70, y = y,
+		w = 60, h = 30,
+		text = _L["Delete"],
+		onclick = function()
+			for i, c in ipairs_r(Config) do
+				if config == c then
+					table.remove(Config, i)
+				end
+			end
+			ClosePanel(config)
+			MY.SwitchTab("MY_BuffMon", true)
+		end,
+	})
+	y = y + 30
+	
 	ui:append("WndCheckBox", {
 		x = x + 20, y = y,
 		text = _L['enable'],
-		checked = OBJ.bEnable,
+		checked = config.enable,
 		oncheck = function(bChecked)
-			OBJ.bEnable = bChecked
-			OBJ.Reload()
+			config.enable = bChecked
+			OpenPanel(config, true)
 		end,
 	})
 	
 	ui:append("WndCheckBox", {
 		x = x + 120, y = y, w = 200,
 		text = _L['hide others buff'],
-		checked = OBJ.bHideOthers,
+		checked = config.hideOthers,
 		oncheck = function(bChecked)
-			OBJ.bHideOthers = bChecked
-			OBJ.Reload()
+			config.hideOthers = bChecked
+			OpenPanel(config, true)
 		end,
 	})
 
 	ui:append("WndComboBox", {
-		x = w - 250, y = y, w = 160,
+		x = w - 250, y = y, w = 135,
 		text = _L['set buff monitor'],
 		menu = function()
 			local dwKungFuID = GetClientPlayer().GetKungfuMount().dwSkillID
 			local t = {{
 				szOption = _L['add'],
 				fnAction = function()
-					GetUserInput(_L['please input buff name:'], function(szVal)
-						szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
-						if szVal ~= "" then
-							OBJ.AddBuff(dwKungFuID, szVal)
-						end
-					end, function() end, function() end, nil, "" )
+					local function Next(kungfuid)
+						GetUserInput(_L['please input buff name:'], function(szVal)
+							szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
+							if szVal ~= "" then
+								if not config.monitors[kungfuid] then
+									config.monitors[kungfuid] = {}
+								end
+								table.insert(config.monitors[kungfuid], {
+									enable = true,
+									iconid = 13,
+									buffid = tonumber(szVal) or nil,
+									buffname = not tonumber(szVal) and szVal or nil,
+								})
+								OpenPanel(config, true)
+							end
+						end, function() end, function() end, nil, "" )
+					end
+					MY.Confirm(_L['Add as common or current kunfu?'], function() Next('common') end,
+						function() Next(dwKungFuID) end, _L['as common'], _L['as current kunfu'])
 				end,
 			}}
-			local tBuffMonList = OBJ.GetBuffList(dwKungFuID)
+			local function InsertMenu(mon)
+				local t1 = {
+					szOption = mon.buffname or mon.buffid,
+					bCheck = true, bChecked = mon.enable,
+					fnAction = function(bChecked)
+						mon.enable = bChecked
+						OpenPanel(config, true)
+					end,
+					szIcon = "ui/Image/UICommon/CommonPanel2.UITex",
+					nFrame = 49,
+					nMouseOverFrame = 51,
+					nIconWidth = 17,
+					nIconHeight = 17,
+					szLayer = "ICON_RIGHTMOST",
+					fnClickIcon = function()
+						for i, m in ipairs_r(config.monitors) do
+							if m == mon then
+								table.remove(config.monitors, i)
+							end
+						end
+						Wnd.CloseWindow("PopupMenuPanel")
+						OpenPanel(config, true)
+					end,
+					nMiniWidth = 120,
+				}
+				if mon.buffids then
+					do
+						local dwBuffID, dwIcon = -1, mon.iconid or 13
+						table.insert(t1, {
+							szOption = _L['all buffid'],
+							bCheck = true, bMCheck = true,
+							bChecked = mon.buffid == nil or dwBuffID == mon.buffid,
+							fnAction = function()
+								mon.iconid = dwIcon
+								mon.buffid = dwBuffID
+								OpenPanel(config, true)
+							end,
+							szIcon = "fromiconid",
+							nFrame = dwIcon or 13,
+							nIconWidth = 22,
+							nIconHeight = 22,
+							szLayer = "ICON_RIGHTMOST",
+						})
+					end
+					for dwBuffID, dwIcon in pairs(mon.buffids) do
+						table.insert(t1, {
+							szOption = dwBuffID,
+							bCheck = true, bMCheck = true,
+							bChecked = dwBuffID == mon.buffid,
+							fnAction = function()
+								mon.iconid = dwIcon or 13
+								mon.buffid = dwBuffID
+								OpenPanel(config, true)
+							end,
+							szIcon = "fromiconid",
+							nFrame = dwIcon or 13,
+							nIconWidth = 22,
+							nIconHeight = 22,
+							szLayer = "ICON_RIGHTMOST",
+						})
+					end
+				end
+				table.insert(t, t1)
+			end
+			local tBuffMonList = config.monitors.common
 			if tBuffMonList and #tBuffMonList > 0 then
 				table.insert(t, { bDevide = true })
 				for i, mon in ipairs(tBuffMonList) do
-					local t1 = {
-						szOption = mon[3],
-						bCheck = true, bChecked = mon[1],
-						fnAction = function(bChecked)
-							OBJ.EnableBuff(dwKungFuID, mon[3], not mon[1])
-						end,
-						szIcon = "ui/Image/UICommon/CommonPanel2.UITex",
-						nFrame = 49,
-						nMouseOverFrame = 51,
-						nIconWidth = 17,
-						nIconHeight = 17,
-						szLayer = "ICON_RIGHTMOST",
-						fnClickIcon = function()
-							OBJ.DelBuff(dwKungFuID, mon[3])
-							Wnd.CloseWindow("PopupMenuPanel")
-						end,
-						nMiniWidth = 120,
-					}
-					if mon[5] then
-						do
-							local dwID, dwIcon = -1, mon[5][-1] or 13
-							table.insert(t1, {
-								szOption = _L['all buffid'],
-								bCheck = true, bMCheck = true,
-								bChecked = mon[4] == nil or dwID == mon[4],
-								fnAction = function()
-									mon[2] = dwIcon
-									mon[4] = dwID
-									OBJ.Reload()
-								end,
-								szIcon = "fromiconid",
-								nFrame = dwIcon or 13,
-								nIconWidth = 22,
-								nIconHeight = 22,
-								szLayer = "ICON_RIGHTMOST",
-							})
-						end
-						for dwID, dwIcon in pairs(mon[5]) do
-							if dwID ~= -1 then
-								table.insert(t1, {
-									szOption = dwID,
-									bCheck = true, bMCheck = true,
-									bChecked = dwID == mon[4],
-									fnAction = function()
-										mon[2] = dwIcon or 13
-										mon[4] = dwID
-										OBJ.Reload()
-									end,
-									szIcon = "fromiconid",
-									nFrame = dwIcon or 13,
-									nIconWidth = 22,
-									nIconHeight = 22,
-									szLayer = "ICON_RIGHTMOST",
-								})
-							end
-						end
-					end
-					table.insert(t, t1)
+					InsertMenu(mon)
 				end
+			end
+			local tBuffMonList = config.monitors[GetClientPlayer().GetKungfuMount().dwSkillID]
+			if tBuffMonList and #tBuffMonList > 0 then
+				table.insert(t, { bDevide = true })
+				for i, mon in ipairs(tBuffMonList) do
+					InsertMenu(mon)
+				end
+			end
+			return t
+		end,
+	})
+	ui:append("WndComboBox", {
+		x = w - 115, y = y, w = 105,
+		text = _L['set target'],
+		menu = function()
+			local dwKungFuID = GetClientPlayer().GetKungfuMount().dwSkillID
+			local t = {}
+			for eType, szText in pairs(_L.TARGET) do
+				table.insert(t, {
+					szOption = szText,
+					rgb = eType == config.target and {255, 255, 0} or nil,
+					fnAction = function()
+						config.target = eType
+						OpenPanel(config, true)
+					end,
+				})
 			end
 			return t
 		end,
@@ -570,20 +655,20 @@ local function GenePS(ui, OBJ, x, y, w, h)
 	ui:append("WndCheckBox", {
 		x = x + 20, y = y, w = 100,
 		text = _L['undragable'],
-		checked = not OBJ.bDragable,
+		checked = not config.dragable,
 		oncheck = function(bChecked)
-			OBJ.bDragable = not bChecked
-			OBJ.Reload()
+			config.dragable = not bChecked
+			OpenPanel(config, true)
 		end,
 	})
 	
 	ui:append("WndCheckBox", {
 		x = x + 120, y = y, w = 200,
 		text = _L['hide void buff'],
-		checked = OBJ.bHideVoidBuff,
+		checked = config.hideVoidBuff,
 		oncheck = function(bChecked)
-			OBJ.bHideVoidBuff = bChecked
-			OBJ.Reload()
+			config.hideVoidBuff = bChecked
+			OpenPanel(config, true)
 		end,
 	})
 	
@@ -591,11 +676,11 @@ local function GenePS(ui, OBJ, x, y, w, h)
 		x = w - 250, y = y,
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		range = {1, 32},
-		value = OBJ.nMaxLineCount,
+		value = config.maxLineCount,
 		textfmt = function(val) return _L("display %d eachline.", val) end,
 		onchange = function(raw, val)
-			OBJ.nMaxLineCount = val
-			OBJ.Reload()
+			config.maxLineCount = val
+			OpenPanel(config, true)
 		end,
 	})
 	y = y + 30
@@ -603,20 +688,20 @@ local function GenePS(ui, OBJ, x, y, w, h)
 	ui:append("WndCheckBox", {
 		x = x + 20, y = y, w = 120,
 		text = _L['show cd bar'],
-		checked = OBJ.bCDBar,
+		checked = config.cdBar,
 		oncheck = function(bCheck)
-			OBJ.bCDBar = bCheck
-			OBJ.Reload()
+			config.cdBar = bCheck
+			OpenPanel(config, true)
 		end,
 	})
 	
 	ui:append("WndCheckBox", {
 		x = x + 120, y = y, w = 120,
 		text = _L['show buff name'],
-		checked = OBJ.bSkillName,
+		checked = config.showBuffName,
 		oncheck = function(bCheck)
-			OBJ.bSkillName = bCheck
-			OBJ.Reload()
+			config.showBuffName = bCheck
+			OpenPanel(config, true)
 		end,
 	})
 	
@@ -624,35 +709,60 @@ local function GenePS(ui, OBJ, x, y, w, h)
 		x = w - 250, y = y,
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		range = {1, 300},
-		value = OBJ.fScale * 100,
+		value = config.scale * 100,
 		textfmt = function(val) return _L("scale %d%%.", val) end,
 		onchange = function(raw, val)
-			OBJ.fScale = val / 100
-			OBJ.Reload()
+			config.scale = val / 100
+			OpenPanel(config, true)
 		end,
 	})
 	y = y + 30
 	
 	ui:append("WndComboBox", {
-		x = 40, y = y, w = w - 250 - 30 - 30,
-		text = _L['Select countdown style'],
+		x = 40, y = y, w = (w - 250 - 30 - 30 - 10) / 2,
+		text = _L['Select background style'],
 		menu = function()
 			local t, subt, szIcon, nFrame = {}
-			for _, text in ipairs(CUSTOM_STYLES) do
+			for _, text in ipairs(CUSTOM_BOXBG_STYLES) do
 				szIcon, nFrame = unpack(text:split("|"))
 				subt = {
 					szOption = text,
 					fnAction = function()
-						OBJ.szCDUITex = text
-						OBJ.Reload()
+						config.boxBgUITex = text
+						OpenPanel(config, true)
 					end,
 					szIcon = szIcon,
 					nFrame = nFrame,
 					nIconMarginLeft = -3,
 					nIconMarginRight = -3,
+					szLayer = "ICON_RIGHTMOST",
+				}
+				if text == config.boxBgUITex then
+					subt.rgb = {255, 255, 0}
+				end
+				table.insert(t, subt)
+			end
+			return t
+		end,
+	})
+	ui:append("WndComboBox", {
+		x = 40 + (w - 250 - 30 - 30 - 10) / 2 + 10, y = y, w = (w - 250 - 30 - 30 - 10) / 2,
+		text = _L['Select countdown style'],
+		menu = function()
+			local t, subt, szIcon, nFrame = {}
+			for _, text in ipairs(CUSTOM_CDBAR_STYLES) do
+				szIcon, nFrame = unpack(text:split("|"))
+				subt = {
+					szOption = text,
+					fnAction = function()
+						config.cdBarUITex = text
+						OpenPanel(config, true)
+					end,
+					szIcon = szIcon,
+					nFrame = nFrame,
 					szLayer = "ICON_FILL",
 				}
-				if text == OBJ.szCDUITex then
+				if text == config.cdBarUITex then
 					subt.rgb = {255, 255, 0}
 				end
 				table.insert(t, subt)
@@ -665,11 +775,11 @@ local function GenePS(ui, OBJ, x, y, w, h)
 		x = w - 250, y = y,
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		range = {50, 1000},
-		value = OBJ.nCDWidth,
+		value = config.cdBarWidth,
 		textfmt = function(val) return _L("CD width %dpx.", val) end,
 		onchange = function(raw, val)
-			OBJ.nCDWidth = val
-			OBJ.Reload()
+			config.cdBarWidth = val
+			OpenPanel(config, true)
 		end,
 	})
 	y = y + 30
@@ -677,21 +787,29 @@ local function GenePS(ui, OBJ, x, y, w, h)
 	return x, y
 end
 
-local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = MY.UI(wnd)
 	local w, h = ui:size()
 	local x, y = 20, 30
 	
-	ui:append("Text", { x = x, y = y, r = 255, g = 255, b = 0, text = _L['* self buff monitor'] })
-	y = y + 30
-
-	x, y = GenePS(ui, MY_BuffMonS, x, y, w, h)
-	y = y + 30
+	for _, config in ipairs(Config) do
+		x, y = GenePS(ui, config, x, y, w, h)
+		y = y + 20
+	end
+	y = y + 10
 	
-	ui:append("Text", { x = x, y = y, r = 255, g = 255, b = 0, text = _L['* target buff monitor'] })
+	ui:append("WndButton2", {
+		x = (w - 60) / 2, y = y,
+		w = 60, h = 30,
+		text = _L["Create"],
+		onclick = function()
+			local config = clone(ConfigTemplate)
+			config.uid = #Config == 0 and 1 or (Config[#Config].uid + 1)
+			table.insert(Config, config)
+			OpenPanel(config)
+			MY.SwitchTab("MY_BuffMon", true)
+		end,
+	})
 	y = y + 30
-	
-	x, y = GenePS(ui, MY_BuffMonT, x, y, w, h)
 end
 MY.RegisterPanel("MY_BuffMon", _L["buff monitor"], _L['Target'], "ui/Image/ChannelsPanel/NewChannels.UITex|141", { 255, 255, 0, 200 }, PS)
