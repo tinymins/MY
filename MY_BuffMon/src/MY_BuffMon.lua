@@ -426,7 +426,7 @@ local function OnInit()
 			Config[1].monitors[kungfuid] = {}
 			for _, mon in ipairs(mons) do
 				table.insert(Config[1].monitors[kungfuid], {
-					enable = mon[1], iconid = mon[2},
+					enable = mon[1], iconid = mon[2],
 					buffname = mon[3], buffid = mon[4], buffids = mon[5]
 				})
 			end
@@ -456,7 +456,7 @@ local function OnInit()
 			Config[2].monitors[kungfuid] = {}
 			for _, mon in ipairs(mons) do
 				table.insert(Config[2].monitors[kungfuid], {
-					enable = mon[1], iconid = mon[2},
+					enable = mon[1], iconid = mon[2],
 					buffname = mon[3], buffid = mon[4], buffids = mon[5]
 				})
 			end
