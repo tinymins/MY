@@ -550,7 +550,7 @@ local function GenePS(ui, config, x, y, w, h)
 						function() Next(dwKungFuID) end, _L['as common'], _L['as current kunfu'])
 				end,
 			}}
-			local function InsertMenu(mon)
+			local function InsertMenu(mon, monlist)
 				local t1 = {
 					szOption = mon.buffname or mon.buffid,
 					bCheck = true, bChecked = mon.enable,
@@ -565,9 +565,9 @@ local function GenePS(ui, config, x, y, w, h)
 					nIconHeight = 17,
 					szLayer = "ICON_RIGHTMOST",
 					fnClickIcon = function()
-						for i, m in ipairs_r(config.monitors) do
+						for i, m in ipairs_r(monlist) do
 							if m == mon then
-								table.remove(config.monitors, i)
+								table.remove(monlist, i)
 							end
 						end
 						Wnd.CloseWindow("PopupMenuPanel")
@@ -618,14 +618,14 @@ local function GenePS(ui, config, x, y, w, h)
 			if tBuffMonList and #tBuffMonList > 0 then
 				table.insert(t, { bDevide = true })
 				for i, mon in ipairs(tBuffMonList) do
-					InsertMenu(mon)
+					InsertMenu(mon, tBuffMonList)
 				end
 			end
 			local tBuffMonList = config.monitors[GetClientPlayer().GetKungfuMount().dwSkillID]
 			if tBuffMonList and #tBuffMonList > 0 then
 				table.insert(t, { bDevide = true })
 				for i, mon in ipairs(tBuffMonList) do
-					InsertMenu(mon)
+					InsertMenu(mon, tBuffMonList)
 				end
 			end
 			return t
