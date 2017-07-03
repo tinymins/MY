@@ -778,7 +778,7 @@ function MY.RedrawTab(szCategory)
 	MY.SwitchTab()
 end
 
-function MY.SwitchTab(szID)
+function MY.SwitchTab(szID, bForceUpdate)
 	local frame = MY.GetFrame()
 	if not frame then
 		return
@@ -805,10 +805,12 @@ function MY.SwitchTab(szID)
 				hTab = hTabs:Lookup(i)
 			end
 		end
-		if (not hTab) or hTab.bActived then
+		if (not hTab) or (hTab.bActived and not bForceUpdate) then
 			return
 		end
-		PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
+		if not hTab.bActived then
+			PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
+		end
 		
 		-- deal with ui response
 		local hTabs = hTab:GetParent()
@@ -822,7 +824,7 @@ function MY.SwitchTab(szID)
 	
 	-- get main panel
 	local wndMainPanel = frame:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel')
-	if wndMainPanel.szID == szID then
+	if not bForceUpdate and wndMainPanel.szID == szID then
 		-- return
 	end
 	-- fire custom registered on switch event
