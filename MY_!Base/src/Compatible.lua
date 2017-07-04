@@ -606,11 +606,13 @@ end
 end
 
 if not str2var then
-local szTempFile = "interface/temp.jx3dat"
+local szTempLog = "interface/temp.log"
+local szTempJx3dat = "interface/temp.jx3dat"
 function str2var(szText)
-	Log(szTempFile, szText, "clear close")
-	local data = LoadLUAData(szTempFile)
-	CPath.DelFile(szTempFile)
+	Log(szTempLog, szText, "clear close")
+	CPath.Move(szTempLog, szTempJx3dat)
+	local data = LoadLUAData(szTempJx3dat)
+	CPath.DelFile(szTempJx3dat)
 	return data
 end
 end
