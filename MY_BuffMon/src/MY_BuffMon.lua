@@ -608,7 +608,7 @@ local function GenePS(ui, config, x, y, w, h)
 								OpenPanel(config, true)
 							end,
 							szIcon = "fromiconid",
-							nFrame = dwIcon,
+							nFrame = dwIcon or 13,
 							nIconWidth = 22,
 							nIconHeight = 22,
 							szLayer = "ICON_RIGHTMOST",
