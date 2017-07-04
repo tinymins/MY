@@ -29,4 +29,5 @@ data = {
     ['Add as common or current kunfu?'] = '添加为通用BUFF监控还是仅添加到当前心法？',
     ['as common'] = '添加通用',
     ['as current kunfu'] = '仅当前心法',
+    ['rename'] = '重命名',
 }
