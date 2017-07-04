@@ -605,4 +605,14 @@ function ipairs_r(tab)
 end
 end
 
+if not str2var then
+local szTempFile = "interface/temp.jx3dat"
+function str2var(szText)
+	Log(szTempFile, szText, "clear close")
+	local data = LoadLUAData(szTempFile)
+	CPath.DelFile(szTempFile)
+	return data
+end
+end
+
 UpdateItemInfoBoxObject = UpdataItemInfoBoxObject
