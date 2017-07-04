@@ -11,7 +11,7 @@ data = {
 		hideVoidBuff = false,  -- 隐藏消失的BUFF
 		cdBar        = false,  -- 显示倒计时条
 		cdBarWidth   = 240  ,  -- 倒计时条宽度
-		cdBarUITex   = "interface/MY/MY_!Base/image/ST_UI.UITex|7",  -- 倒计时条图素
+		cdBarUITex   = "./Interface/MY/MY_!Base/image/ST_UI.UITex|7",  -- 倒计时条图素
 		showBuffName = true ,  -- 显示BUFF名字
 		boxBgUITex   = "UI/Image/Common/Box.UITex|44",  -- Box背景图素
 		anchor = { y = 152, x = -343, s = "TOPLEFT", r = "CENTER" },
@@ -31,7 +31,7 @@ data = {
 			hideVoidBuff = false,  -- 隐藏消失的BUFF
 			cdBar        = false,  -- 显示倒计时条
 			cdBarWidth   = 240  ,  -- 倒计时条宽度
-			cdBarUITex   = "interface/MY/MY_!Base/image/ST_UI.UITex|7",  -- 倒计时条图素
+			cdBarUITex   = "./Interface/MY/MY_!Base/image/ST_UI.UITex|7",  -- 倒计时条图素
 			showBuffName = true ,  -- 显示BUFF名字
 			boxBgUITex   = "UI/Image/Common/Box.UITex|44",  -- Box背景图素
 			anchor = { y = 152, x = -343, s = "TOPLEFT", r = "CENTER" },
@@ -64,7 +64,7 @@ data = {
 			hideVoidBuff = false,  -- 隐藏消失的BUFF
 			cdBar        = false,  -- 显示倒计时条
 			cdBarWidth   = 240  ,  -- 倒计时条宽度
-			cdBarUITex   = "interface/MY/MY_!Base/image/ST_UI.UITex|6"   ,  -- 倒计时条图素
+			cdBarUITex   = "./Interface/MY/MY_!Base/image/ST_UI.UITex|6"   ,  -- 倒计时条图素
 			skillname    = true ,  -- 显示技能名字
 			boxBgUITex   = "UI/Image/Common/Box.UITex|43",  -- Box背景图素
 			anchor = { y = 102, x = -343, s = "TOPLEFT", r = "CENTER" },

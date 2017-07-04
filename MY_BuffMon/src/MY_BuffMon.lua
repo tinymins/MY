@@ -818,7 +818,7 @@ function PS.OnPanelActive(wnd)
 	y = y + 10
 	
 	ui:append("WndButton2", {
-		x = (w - 60) / 2, y = y,
+		x = (w - 290) / 2, y = y,
 		w = 60, h = 30,
 		text = _L["Create"],
 		onclick = function()
@@ -830,7 +830,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	ui:append("WndButton2", {
-		x = (w - 60) / 2, y = y,
+		x = (w - 290) / 2 + 70, y = y,
 		w = 60, h = 30,
 		text = _L["Import"],
 		onclick = function()
@@ -847,8 +847,8 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	ui:append("WndButton2", {
-		x = (w - 60) / 2, y = y,
-		w = 60, h = 30,
+		x = (w - 290) / 2 + 140, y = y,
+		w = 80, h = 30,
 		text = _L["Reset Default"],
 		onclick = function()
 			MY.Confirm(_L['Sure to reset default?'], function()
