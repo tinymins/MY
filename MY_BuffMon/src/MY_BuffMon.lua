@@ -554,8 +554,8 @@ local function GenePS(ui, config, x, y, w, h)
 				local t1 = {
 					szOption = mon.buffname or mon.buffid,
 					bCheck = true, bChecked = mon.enable,
-					fnAction = function(bChecked)
-						mon.enable = bChecked
+					fnAction = function()
+						mon.enable = not mon.enable
 						OpenPanel(config, true)
 					end,
 					szIcon = "ui/Image/UICommon/CommonPanel2.UITex",
