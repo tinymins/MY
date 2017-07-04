@@ -575,7 +575,20 @@ local function GenePS(ui, config, x, y, w, h)
 					end,
 					nMiniWidth = 120,
 				}
+				table.insert(t1, {
+					szOption = _L['rename'],
+					fnAction = function()
+						GetUserInput(_L['please input buff name:'], function(szVal)
+							szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
+							if szVal ~= "" then
+								mon.buffname = szVal
+								OpenPanel(config, true)
+							end
+						end, function() end, function() end, nil, mon.buffname)
+					end,
+				})
 				if mon.buffids then
+					table.insert(t1, { bDevide = true })
 					local function InsertMenuBuff(dwBuffID, dwIcon)
 						table.insert(t1, {
 							szOption = dwBuffID == "common" and _L['all buffid'] or dwBuffID,
