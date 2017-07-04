@@ -937,7 +937,7 @@ function MY.FormatDataStructure(data, struct, maxlevel)
 			if szType == 'table' then
 				local t = {}
 				for k, v in pairs(struct) do
-					t[k] = FormatDataStructure(data[k], v, maxlevel)
+					t[k] = MY.FormatDataStructure(data[k], v, maxlevel)
 				end
 				return t
 			end
