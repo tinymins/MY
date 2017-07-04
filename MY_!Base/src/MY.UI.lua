@@ -62,6 +62,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.enable             ~= nil then ui:enable     (arg.enable     ) end
 		if arg.autoenable         ~= nil then ui:enable     (arg.autoenable ) end
 		if arg.image              ~= nil then ui:image(arg.image, arg.imageframe) end
+		if arg.icon               ~= nil then ui:icon       (arg.icon       ) end
 		-- event handlers
 		if arg.onscroll           ~= nil then ui:scroll     (arg.onscroll   ) end
 		if arg.onhover            ~= nil then ui:hover      (arg.onhover    ) end
@@ -143,6 +144,9 @@ local function raw2ele(raw)
 		ele.itm = raw
 	elseif ele.type == "Shadow" then
 		ele.sdw = raw
+		ele.itm = raw
+	elseif ele.type == "Box" then
+		ele.box = raw
 		ele.itm = raw
 	elseif string.sub(ele.type, 1, 3) == "Wnd" then
 		ele.wnd = ele.wnd or raw
@@ -2376,6 +2380,28 @@ function XGUI:frame(nFrame)
 	return self
 end
 
+-- (self) Instance:icon(dwIcon)
+-- (number) Instance:icon()
+function XGUI:icon(dwIcon)
+	self:_checksum()
+	if dwIcon then
+		dwIcon = tonumber(dwIcon)
+		for _, ele in pairs(self.eles) do
+			local x = ele.box
+			if x then
+				x:SetObject(UI_OBJECT_NOT_NEED_KNOWN)
+				x:SetObjectIcon(dwIcon)
+			end
+		end
+	else
+		local ele = self.eles[1]
+		if ele and ele.box then
+			return ele.box:GetObjectIcon()
+		end
+	end
+	return self
+end
+
 -- (self) Instance:handleStyle(dwStyle)
 function XGUI:handleStyle(dwStyle)
 	self:_checksum()
@@ -3239,6 +3265,9 @@ function  XGUI.CreateFrame(szName, opt)
 			h:FromUITex(szUITexCommon, v)
 		end
 	end
+	if not opt.anchor then
+		opt.anchor = {s='CENTER', r='CENTER', x=0, y=0}
+	end
 	ApplyUIArguments(ui, opt)
 	return ui
 end
@@ -3470,6 +3499,75 @@ function XGUI.OpenFontPicker(callback, t)
 	end
 	Station.SetFocusWindow(ui:raw(1))
 	return ui
+end
+
+local ICON_PAGE
+-- icon选择器
+function XGUI.OpenIconPanel(fnAction)
+	local nMaxIcon, boxs, txts = 8587, {}, {}
+	local ui = XGUI.CreateFrame("MY_IconPanel", { w = 920, h = 650, text = _L["Icon Picker"], simple = true, close = true, esc = true })
+	local function GetPage(nPage, bInit)
+		if nPage == ICON_PAGE and not bInit then
+			return
+		end
+		ICON_PAGE = nPage
+		local nStart = (nPage - 1) * 144
+		for i = 1, 144 do
+			local x = ((i - 1) % 18) * 50 + 10
+			local y = floor((i - 1) / 18) * 70 + 10
+			if boxs[i] then
+				local nIcon = nStart + i
+				if nIcon > nMaxIcon then
+					boxs[i]:toggle(false)
+					txts[i]:toggle(false)
+				else
+					boxs[i]:icon(-1)
+					txts[i]:text(nIcon):toggle(true)
+					MY.DelayCall(function()
+						if mceil(nIcon / 144) == ICON_PAGE and boxs[i] then
+							boxs[i]:icon(nIcon):toggle(true)
+						end
+					end)
+				end
+			else
+				boxs[i] = ui:append("Box", {
+					w = 48, h = 48, x = x, y = y, icon = nStart + i,
+					onhover = function(bHover)
+						this:SetObjectMouseOver(bHover)
+					end,
+					onclick = function()
+						if fnAction then
+							fnAction(this:GetObjectIcon())
+						end
+						ui:remove()
+					end,
+				}, true)
+				txts[i] = ui:append("Text", { w = 48, h = 20, x = x, y = y + 48, text = nStart + i, align = 1 }, true)
+			end
+		end
+	end
+	ui:append("WndEditBox", "Icon", { x = 730, y = 580, w = 50, h = 25, edittype = 0 })
+	ui:append("WndButton2", {
+		text = g_tStrings.STR_HOTKEY_SURE, x = 800, y = 580,
+		onclick = function()
+			local nIcon = tonumber(ui:children("Icon"):text())
+			if nIcon then
+				if fnAction then
+					fnAction(nIcon)
+				end
+				ui:remove()
+			end
+		end,
+	})
+	ui:append("WndSliderBox", {
+		x = 10, y = 580, h = 25, w = 500, textfmt = " Page: %d",
+		range = {1, math.ceil(nMaxIcon / 144)}, value = ICON_PAGE or 21,
+		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		onchange = function(raw, nVal)
+			MY.DelayCall(function() GetPage(nVal) end)
+		end,
+	})
+	GetPage(ICON_PAGE or 21, true)
 end
 
 -- 打开文本编辑器
