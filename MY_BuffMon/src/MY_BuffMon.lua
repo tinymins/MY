@@ -112,7 +112,7 @@ local function OpenPanel(config, reload)
 		hItem.txtProcess = txtProcess
 		hItem.imgProcess = imgProcess
 		hItem.txtBuffName = txtBuffName
-		if mon.buffid and mon.buffid ~= -1 then
+		if mon.buffid and mon.buffid ~= 'common' then
 			if not frame.tItem[mon.buffid] then
 				frame.tItem[mon.buffid] = {}
 			end
@@ -219,7 +219,7 @@ local needFormatItemPos
 local l_tBuffTime = setmetatable({}, { __mode = "v" })
 local function UpdateItem(hItem, KTarget, buff, szBuffName, tItem, config, nFrameCount, targetChanged)
 	if buff then
-		if not hItem.mon.buffid or hItem.mon.buffid == -1 or hItem.mon.buffid == buff.dwID then
+		if not hItem.mon.buffid or hItem.mon.buffid == 'common' or hItem.mon.buffid == buff.dwID then
 			if hItem.nRenderFrame == nFrameCount then
 				return
 			end
@@ -237,7 +237,7 @@ local function UpdateItem(hItem, KTarget, buff, szBuffName, tItem, config, nFram
 			-- 处理新出现的BUFF
 			if not hItem.mon.iconid or hItem.mon.iconid == 13 then
 				-- 计算图标 名字 BuffID等
-				if hItem.mon.buffid ~= -1 then
+				if hItem.mon.buffid ~= "common" then
 					-- 加入精确缓存
 					if not tItem[buff.dwID] then
 						tItem[buff.dwID] = {}
@@ -425,6 +425,12 @@ local function OnInit()
 		for kungfuid, mons in pairs(MY_BuffMonS.tBuffList) do
 			Config[1].monitors[kungfuid] = {}
 			for _, mon in ipairs(mons) do
+				if mon[4] == -1 then
+					mon[4] = 'common'
+				end
+				if mon[5] and mon[5][-1] then
+					mon[5]['common'], mon[5][-1] = mon[5][-1]
+				end
 				table.insert(Config[1].monitors[kungfuid], {
 					enable = mon[1], iconid = mon[2],
 					buffname = mon[3], buffid = mon[4], buffids = mon[5]
@@ -455,6 +461,12 @@ local function OnInit()
 		for kungfuid, mons in pairs(MY_BuffMonT.tBuffList) do
 			Config[2].monitors[kungfuid] = {}
 			for _, mon in ipairs(mons) do
+				if mon[4] == -1 then
+					mon[4] = 'common'
+				end
+				if mon[5] and mon[5][-1] then
+					mon[5]['common'], mon[5][-1] = mon[5][-1]
+				end
 				table.insert(Config[2].monitors[kungfuid], {
 					enable = mon[1], iconid = mon[2],
 					buffname = mon[3], buffid = mon[4], buffids = mon[5]
