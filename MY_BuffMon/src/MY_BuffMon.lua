@@ -576,40 +576,38 @@ local function GenePS(ui, config, x, y, w, h)
 					nMiniWidth = 120,
 				}
 				if mon.buffids then
-					do
-						local dwBuffID, dwIcon = -1, mon.iconid or 13
+					local function InsertMenuBuff(dwBuffID, dwIcon)
 						table.insert(t1, {
-							szOption = _L['all buffid'],
+							szOption = dwBuffID == "common" and _L['all buffid'] or dwBuffID,
 							bCheck = true, bMCheck = true,
-							bChecked = mon.buffid == nil or dwBuffID == mon.buffid,
+							bChecked = dwBuffID == mon.buffid or (dwBuffID == "common" and mon.buffid == nil),
 							fnAction = function()
 								mon.iconid = dwIcon
 								mon.buffid = dwBuffID
 								OpenPanel(config, true)
 							end,
 							szIcon = "fromiconid",
-							nFrame = dwIcon or 13,
+							nFrame = dwIcon,
 							nIconWidth = 22,
 							nIconHeight = 22,
 							szLayer = "ICON_RIGHTMOST",
+							fnClickIcon = function()
+								XGUI.OpenIconPanel(function(dwIcon)
+									mon.buffids[dwBuffID] = dwIcon
+									if mon.buffid == dwBuffID then
+										mon.iconid = dwIcon
+										OpenPanel(config, true)
+									end
+								end)
+								Wnd.CloseWindow("PopupMenuPanel")
+							end,
 						})
 					end
+					InsertMenuBuff('common', mon.buffids.common or mon.iconid or 13)
 					for dwBuffID, dwIcon in pairs(mon.buffids) do
-						table.insert(t1, {
-							szOption = dwBuffID,
-							bCheck = true, bMCheck = true,
-							bChecked = dwBuffID == mon.buffid,
-							fnAction = function()
-								mon.iconid = dwIcon or 13
-								mon.buffid = dwBuffID
-								OpenPanel(config, true)
-							end,
-							szIcon = "fromiconid",
-							nFrame = dwIcon or 13,
-							nIconWidth = 22,
-							nIconHeight = 22,
-							szLayer = "ICON_RIGHTMOST",
-						})
+						if dwBuffID ~= "common" then
+							InsertMenuBuff(dwBuffID, dwIcon)
+						end
 					end
 				end
 				table.insert(t, t1)
