@@ -502,7 +502,7 @@ local function GenePS(ui, config, x, y, w, h)
 		w = 60, h = 30,
 		text = _L["Export"],
 		onclick = function()
-			XGUI.OpenTextEditor(MY.JsonEncode(config))
+			XGUI.OpenTextEditor(var2str(config))
 		end,
 	})
 	ui:append("WndButton2", {
@@ -847,7 +847,7 @@ function PS.OnPanelActive(wnd)
 		text = _L["Import"],
 		onclick = function()
 			GetUserInput(_L['please input import data:'], function(szVal)
-				local config = MY.JsonDecode(szVal)
+				local config = str2var(szVal)
 				if config then
 					config = MY.FormatDataStructure(config, ConfigTemplate, 1)
 					config.uid = #Config == 0 and 1 or (Config[#Config].uid + 1)
