@@ -399,10 +399,36 @@ end
 -- 数据存储
 ----------------------------------------------------------------------------------------------
 do
+MY_BuffMonS = {}
+RegisterCustomData("MY_BuffMonS.bScale")
+RegisterCustomData("MY_BuffMonS.bEnable")
+RegisterCustomData("MY_BuffMonS.bDragable")
+RegisterCustomData("MY_BuffMonS.bHideOthers")
+RegisterCustomData("MY_BuffMonS.nMaxLineCount")
+RegisterCustomData("MY_BuffMonS.bHideVoidBuff")
+RegisterCustomData("MY_BuffMonS.bCDBar")
+RegisterCustomData("MY_BuffMonS.nCDWidth")
+RegisterCustomData("MY_BuffMonS.szCDUITex")
+RegisterCustomData("MY_BuffMonS.bSkillName")
+RegisterCustomData("MY_BuffMonS.anchor")
+RegisterCustomData("MY_BuffMonS.tBuffList")
+MY_BuffMonT = {}
+RegisterCustomData("MY_BuffMonT.bScale")
+RegisterCustomData("MY_BuffMonT.bEnable")
+RegisterCustomData("MY_BuffMonT.bDragable")
+RegisterCustomData("MY_BuffMonT.bHideOthers")
+RegisterCustomData("MY_BuffMonT.nMaxLineCount")
+RegisterCustomData("MY_BuffMonT.bHideVoidBuff")
+RegisterCustomData("MY_BuffMonT.bCDBar")
+RegisterCustomData("MY_BuffMonT.nCDWidth")
+RegisterCustomData("MY_BuffMonT.szCDUITex")
+RegisterCustomData("MY_BuffMonT.bSkillName")
+RegisterCustomData("MY_BuffMonT.anchor")
+RegisterCustomData("MY_BuffMonT.tBuffList")
 local function OnInit()
 	local data = MY.LoadLUAData(DEFAULT_CONFIG_FILE)
 	Config = MY.LoadLUAData(ROLE_CONFIG_FILE) or data.default
-	if MY_BuffMonS then
+	if MY_BuffMonS.tBuffList then
 		if not Config[1] then
 			Config[1] = clone(data.template)
 		end
@@ -437,8 +463,20 @@ local function OnInit()
 				})
 			end
 		end
+		MY_BuffMonS.bScale        = nil
+		MY_BuffMonS.bEnable       = nil
+		MY_BuffMonS.bDragable     = nil
+		MY_BuffMonS.bHideOthers   = nil
+		MY_BuffMonS.nMaxLineCount = nil
+		MY_BuffMonS.bHideVoidBuff = nil
+		MY_BuffMonS.bCDBar        = nil
+		MY_BuffMonS.nCDWidth      = nil
+		MY_BuffMonS.szCDUITex     = nil
+		MY_BuffMonS.bSkillName    = nil
+		MY_BuffMonS.anchor        = nil
+		MY_BuffMonS.tBuffList     = nil
 	end
-	if MY_BuffMonT then
+	if MY_BuffMonT.tBuffList then
 		if not Config[2] then
 			Config[2] = clone(data.template)
 		end
@@ -474,6 +512,19 @@ local function OnInit()
 			end
 		end
 	end
+	MY_BuffMonT.bScale        = nil
+	MY_BuffMonT.bEnable       = nil
+	MY_BuffMonT.bDragable     = nil
+	MY_BuffMonT.bHideOthers   = nil
+	MY_BuffMonT.nMaxLineCount = nil
+	MY_BuffMonT.bHideVoidBuff = nil
+	MY_BuffMonT.bCDBar        = nil
+	MY_BuffMonT.nCDWidth      = nil
+	MY_BuffMonT.szCDUITex     = nil
+	MY_BuffMonT.bSkillName    = nil
+	MY_BuffMonT.anchor        = nil
+	MY_BuffMonT.tBuffList     = nil
+	-- 加载界面
 	for i, config in ipairs(Config) do
 		OpenPanel(config, true)
 	end
