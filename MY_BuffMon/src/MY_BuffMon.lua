@@ -486,6 +486,14 @@ local function GenePS(ui, config, x, y, w, h)
 		onchange = function(raw, val) config.caption = val end,
 	})
 	ui:append("WndButton2", {
+		x = w - 130, y = y,
+		w = 60, h = 30,
+		text = _L["Export"],
+		onclick = function()
+			XGUI.OpenTextEditor(MY.JsonEncode(config))
+		end,
+	})
+	ui:append("WndButton2", {
 		x = w - 70, y = y,
 		w = 60, h = 30,
 		text = _L["Delete"],
@@ -819,6 +827,37 @@ function PS.OnPanelActive(wnd)
 			table.insert(Config, config)
 			OpenPanel(config)
 			MY.SwitchTab("MY_BuffMon", true)
+		end,
+	})
+	ui:append("WndButton2", {
+		x = (w - 60) / 2, y = y,
+		w = 60, h = 30,
+		text = _L["Import"],
+		onclick = function()
+			GetUserInput(_L['please input import data:'], function(szVal)
+				local config = MY.JsonDecode(szVal)
+				if config then
+					config = MY.FormatDataStructure(config, ConfigTemplate, 1)
+					config.uid = #Config == 0 and 1 or (Config[#Config].uid + 1)
+					table.insert(Config, config)
+					OpenPanel(config)
+					MY.SwitchTab("MY_BuffMon", true)
+				end
+			end, function() end, function() end, nil, "" )
+		end,
+	})
+	ui:append("WndButton2", {
+		x = (w - 60) / 2, y = y,
+		w = 60, h = 30,
+		text = _L["Reset Default"],
+		onclick = function()
+			MY.Confirm(_L['Sure to reset default?'], function()
+				Config = MY.LoadLUAData(DEFAULT_CONFIG_FILE).default
+				for i, config in ipairs(Config) do
+					OpenPanel(config, true)
+				end
+				MY.SwitchTab("MY_BuffMon", true)
+			end)
 		end,
 	})
 	y = y + 30
