@@ -71,9 +71,13 @@ local BOX_SPARKING_FRAME = GLOBAL.GAME_FPS
 -- Í¨ÓÃÂß¼­
 ----------------------------------------------------------------------------------------------
 local FE = {}
-
+local l_frames = {}
+local l_frameIndex = -1
 local function ClosePanel(config)
-	Wnd.CloseWindow("MY_BuffMon" .. config.uid)
+	if not l_frames[config] then
+		return
+	end
+	Wnd.CloseWindow(l_frames[config])
 end
 
 local function OpenPanel(config, reload)
@@ -83,8 +87,11 @@ local function OpenPanel(config, reload)
 	if not config.enable then
 		return
 	end
-	local frame = Wnd.OpenWindow(INI_PATH, "MY_BuffMon" .. config.uid)
+	local frame = Wnd.OpenWindow(INI_PATH, "MY_BuffMon#" .. l_frameIndex)
 	local hList = frame:Lookup("", "Handle_BuffList")
+	
+	l_frames[config] = frame
+	l_frameIndex = l_frameIndex + 1
 	
 	hList:Clear()
 	frame.tItem = {}
@@ -432,7 +439,6 @@ local function OnInit()
 		if not Config[1] then
 			Config[1] = clone(data.template)
 		end
-		Config[1].uid          = 1
 		Config[1].caption      = _L['mingyi self buff monitor']
 		Config[1].target       = "CLIENT_PLAYER"
 		Config[1].scale        = MY_BuffMonS.fScale
@@ -480,7 +486,6 @@ local function OnInit()
 		if not Config[2] then
 			Config[2] = clone(data.template)
 		end
-		Config[2].uid          = 2
 		Config[2].caption      = _L['mingyi target buff monitor']
 		Config[2].target       = "TARGET"
 		Config[2].scale        = MY_BuffMonT.fScale
@@ -886,7 +891,6 @@ function PS.OnPanelActive(wnd)
 		text = _L["Create"],
 		onclick = function()
 			local config = clone(ConfigTemplate)
-			config.uid = #Config == 0 and 1 or (Config[#Config].uid + 1)
 			table.insert(Config, config)
 			OpenPanel(config)
 			MY.SwitchTab("MY_BuffMon", true)
@@ -901,7 +905,6 @@ function PS.OnPanelActive(wnd)
 				local config = str2var(szVal)
 				if config then
 					config = MY.FormatDataStructure(config, ConfigTemplate, 1)
-					config.uid = #Config == 0 and 1 or (Config[#Config].uid + 1)
 					table.insert(Config, config)
 					OpenPanel(config)
 					MY.SwitchTab("MY_BuffMon", true)
