@@ -3550,7 +3550,7 @@ function XGUI.OpenIconPanel(fnAction)
 	ui:append("WndButton2", {
 		text = g_tStrings.STR_HOTKEY_SURE, x = 800, y = 580,
 		onclick = function()
-			local nIcon = tonumber(ui:children("Icon"):text())
+			local nIcon = tonumber(ui:children("#Icon"):text())
 			if nIcon then
 				if fnAction then
 					fnAction(nIcon)
