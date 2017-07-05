@@ -168,4 +168,10 @@ data = {
     ["restore team leader: %s"                   ] = "恢复队长为[%s]。",
     ["restore team marker: %s"                   ] = "恢复标记者为[%s]。",
     ["Team list restored"                        ] = "小队状态已恢复。",
+    
+    ['Mingyi plugins storage data'] = '茗伊插件集数据存档',
+    ['Config and storage data of plugins'] = '插件的本地数据配置',
+    ['Global storage'] = '公共数据',
+    ['All characters public data'] = '所有角色公共数据存档',
+    ['All characters in this server'] = '所有该服务器公共数据存档',
 }
