@@ -400,7 +400,7 @@ end
 ----------------------------------------------------------------------------------------------
 do
 MY_BuffMonS = {}
-RegisterCustomData("MY_BuffMonS.bScale")
+RegisterCustomData("MY_BuffMonS.fScale")
 RegisterCustomData("MY_BuffMonS.bEnable")
 RegisterCustomData("MY_BuffMonS.bDragable")
 RegisterCustomData("MY_BuffMonS.bHideOthers")
@@ -413,7 +413,7 @@ RegisterCustomData("MY_BuffMonS.bSkillName")
 RegisterCustomData("MY_BuffMonS.anchor")
 RegisterCustomData("MY_BuffMonS.tBuffList")
 MY_BuffMonT = {}
-RegisterCustomData("MY_BuffMonT.bScale")
+RegisterCustomData("MY_BuffMonT.fScale")
 RegisterCustomData("MY_BuffMonT.bEnable")
 RegisterCustomData("MY_BuffMonT.bDragable")
 RegisterCustomData("MY_BuffMonT.bHideOthers")
@@ -435,7 +435,7 @@ local function OnInit()
 		Config[1].uid          = 1
 		Config[1].caption      = _L['mingyi self buff monitor']
 		Config[1].target       = "CLIENT_PLAYER"
-		Config[1].scale        = MY_BuffMonS.bScale
+		Config[1].scale        = MY_BuffMonS.fScale
 		Config[1].enable       = MY_BuffMonS.bEnable
 		Config[1].dragable     = MY_BuffMonS.bDragable
 		Config[1].hideOthers   = MY_BuffMonS.bHideOthers
@@ -463,7 +463,7 @@ local function OnInit()
 				})
 			end
 		end
-		MY_BuffMonS.bScale        = nil
+		MY_BuffMonS.fScale        = nil
 		MY_BuffMonS.bEnable       = nil
 		MY_BuffMonS.bDragable     = nil
 		MY_BuffMonS.bHideOthers   = nil
@@ -483,7 +483,7 @@ local function OnInit()
 		Config[2].uid          = 1
 		Config[2].caption      = _L['mingyi target buff monitor']
 		Config[2].target       = "TARGET"
-		Config[2].scale        = MY_BuffMonT.bScale
+		Config[2].scale        = MY_BuffMonT.fScale
 		Config[2].enable       = MY_BuffMonT.bEnable
 		Config[2].dragable     = MY_BuffMonT.bDragable
 		Config[2].hideOthers   = MY_BuffMonT.bHideOthers
@@ -512,7 +512,7 @@ local function OnInit()
 			end
 		end
 	end
-	MY_BuffMonT.bScale        = nil
+	MY_BuffMonT.fScale        = nil
 	MY_BuffMonT.bEnable       = nil
 	MY_BuffMonT.bDragable     = nil
 	MY_BuffMonT.bHideOthers   = nil
