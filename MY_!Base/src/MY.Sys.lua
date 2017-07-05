@@ -55,6 +55,9 @@ MY_DATA_PATH = SetmetaReadonly({
 	GLOBAL = 2,
 	SERVER = 3,
 })
+if IsLocalFileExist(MY.GetAddonInfo().szRoot .. '@DATA/') then
+	CPath.Move(MY.GetAddonInfo().szRoot .. '@DATA/', MY.GetAddonInfo().szInterfaceRoot .. "MY#DATA/")
+end
 -- 格式化数据文件路径（替换$uid、$lang、$server以及补全相对路径）
 -- (string) MY.GetLUADataPath(oFilePath)
 function MY.FormatPath(oFilePath, ePathType)
@@ -64,7 +67,7 @@ function MY.FormatPath(oFilePath, ePathType)
 	else
 		szFilePath, ePathType = oFilePath, MY_DATA_PATH.NORMAL
 	end
-	-- if it's relative path then complete path with "/@DATA/"
+	-- if it's relative path then complete path with "/MY@DATA/"
 	if string.sub(szFilePath, 1, 2) ~= './' then
 		if ePathType == MY_DATA_PATH.GLOBAL then
 			szFilePath = "!all-users@$lang/" .. szFilePath
@@ -73,7 +76,7 @@ function MY.FormatPath(oFilePath, ePathType)
 		elseif ePathType == MY_DATA_PATH.SERVER then
 			szFilePath = "#$relserver@$lang/" .. szFilePath
 		end
-		szFilePath = MY.GetAddonInfo().szRoot .. "@DATA/" .. szFilePath
+		szFilePath = MY.GetAddonInfo().szInterfaceRoot .. "MY#DATA/" .. szFilePath
 	end
 	-- Unified the directory separator
 	szFilePath = string.gsub(szFilePath, '\\', '/')
@@ -121,7 +124,7 @@ end
 -- crc                 是否添加CRC校验头（默认true）
 -- nohashlevels        纯LIST表所在层（优化大表读写效率）
 -- (1)： 当路径为绝对路径时(以斜杠开头)不作处理
---       当路径为相对路径时 相对于插件下@DATA目录
+--       当路径为相对路径时 相对于插件`MY@DATA`目录
 --       可以传入表{szPath, ePathType}
 function MY.SaveLUAData(oFilePath, tData, indent, crc, nohashlevels)
 	local nStartTick = GetTickCount()
@@ -138,7 +141,7 @@ end
 -- MY.LoadLUAData(oFilePath)
 -- oFilePath           数据文件路径(1)
 -- (1)： 当路径为./开头时不作处理
---       当路径为其他时 相对于插件下@DATA目录
+--       当路径为其他时 相对于插件`MY@DATA`目录
 --       可以传入表{szPath, ePathType}
 function MY.LoadLUAData(oFilePath)
 	local nStartTick = GetTickCount()
