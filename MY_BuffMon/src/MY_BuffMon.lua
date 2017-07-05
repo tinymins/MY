@@ -74,10 +74,15 @@ local FE = {}
 local l_frames = {}
 local l_frameIndex = -1
 local function ClosePanel(config)
-	if not l_frames[config] then
-		return
+	if config == 'all' then
+		for config, frame in pairs(l_frames) do
+			Wnd.CloseWindow(frame)
+		end
+		l_frames = {}
+	elseif l_frames[config] then
+		Wnd.CloseWindow(l_frames[config])
+		l_frames[config] = nil
 	end
-	Wnd.CloseWindow(l_frames[config])
 end
 
 local function OpenPanel(config, reload)
@@ -918,6 +923,7 @@ function PS.OnPanelActive(wnd)
 		text = _L["Reset Default"],
 		onclick = function()
 			MY.Confirm(_L['Sure to reset default?'], function()
+				ClosePanel('all')
 				Config = MY.LoadLUAData(DEFAULT_CONFIG_FILE).default
 				for i, config in ipairs(Config) do
 					OpenPanel(config, true)
