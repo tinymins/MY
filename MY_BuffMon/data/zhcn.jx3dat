@@ -1,6 +1,5 @@
 data = {
 	template = {
-		uid          = -1,
 		caption      = "新建BUFF监控",
 		target       = "CLIENT_PLAYER",
 		scale        = 0.8  ,  -- 缩放比
@@ -20,7 +19,6 @@ data = {
 	default = {
 		-- 自身BUFF监控
 		{
-			uid          = 1,
 			caption      = "茗伊自身BUFF监控",
 			target       = "CLIENT_PLAYER",
 			scale        = 0.8  ,  -- 缩放比
@@ -53,7 +51,6 @@ data = {
 		},
 		-- 目标BUFF监控
 		{
-			uid          = 2,
 			caption      = "茗伊目标BUFF监控",
 			target       = "TARGET",
 			scale        = 0.8  ,  -- 缩放比
