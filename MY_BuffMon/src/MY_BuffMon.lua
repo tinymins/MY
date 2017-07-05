@@ -480,7 +480,7 @@ local function OnInit()
 		if not Config[2] then
 			Config[2] = clone(data.template)
 		end
-		Config[2].uid          = 1
+		Config[2].uid          = 2
 		Config[2].caption      = _L['mingyi target buff monitor']
 		Config[2].target       = "TARGET"
 		Config[2].scale        = MY_BuffMonT.fScale
