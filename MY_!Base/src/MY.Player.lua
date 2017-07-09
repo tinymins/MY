@@ -681,7 +681,7 @@ end
 
 -- 获取对象的buff列表
 -- (table) MY.GetBuffList(KObject)
-function MY.Player.GetBuffList(KObject)
+function MY.GetBuffList(KObject)
 	KObject = KObject or GetClientPlayer()
 	local aBuffTable = {}
 	local nCount = KObject.GetBuffCount() or 0
@@ -702,7 +702,6 @@ function MY.Player.GetBuffList(KObject)
 	end
 	return aBuffTable
 end
-MY.GetBuffList = MY.Player.GetBuffList
 
 -- 获取对象的buff
 -- (table) MY.GetBuff([KObject, ]dwID[, nLevel])
@@ -733,17 +732,22 @@ end
 MY.GetBuff = MY.Player.GetBuff
 
 -- 点到自己的buff
--- (table) MY.CancelBuff(dwID[, nLevel])
-function MY.Player.CancelBuff(dwID, nLevel)
-	local tBuffs = MY.Player.GetBuffList(GetClientPlayer())
+-- (table) MY.CancelBuff([KObject = me, ]dwID[, nLevel = 0])
+function MY.CancelBuff(KObject, dwID, nLevel)
+	if type(KObject) == 'number' then
+		KObject, dwID, nLevel = nil, KObject, dwID
+	end
+	if not KObject then
+		KObject = GetClientPlayer()
+	end
+	local tBuffs = MY.GetBuffList(KObject)
 	for _, buff in ipairs(tBuffs) do
 		if buff.dwID == dwID
 		and (not nLevel or nLevel == 0 or buff.nLevel == nLevel) then
-			GetClientPlayer().CancelBuff(buff.nIndex)
+			KObject.CancelBuff(buff.nIndex)
 		end
 	end
 end
-MY.CancelBuff = MY.Player.CancelBuff
 
 -- 获取对象是否无敌
 -- (mixed) MY.Player.IsInvincible([object KObject])
