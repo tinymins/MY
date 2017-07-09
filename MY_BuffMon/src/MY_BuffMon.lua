@@ -578,7 +578,7 @@ for i = 1, 5 do
 			if not KTarget then
 				return
 			end
-			MY.CancelBuff(KTarget, hItem.mon.buffid)
+			MY.CancelBuff(KTarget, hItem.mon.buffid == 'common' and hItem.mon.buffname or hItem.mon.buffid)
 		end, nil)
 		title = ""
 	end
