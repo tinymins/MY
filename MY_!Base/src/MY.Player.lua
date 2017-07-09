@@ -734,7 +734,7 @@ MY.GetBuff = MY.Player.GetBuff
 -- 点到自己的buff
 -- (table) MY.CancelBuff([KObject = me, ]dwID[, nLevel = 0])
 function MY.CancelBuff(KObject, dwID, nLevel)
-	if type(KObject) == 'number' then
+	if type(KObject) ~= 'userdata' then
 		KObject, dwID, nLevel = nil, KObject, dwID
 	end
 	if not KObject then
@@ -742,7 +742,7 @@ function MY.CancelBuff(KObject, dwID, nLevel)
 	end
 	local tBuffs = MY.GetBuffList(KObject)
 	for _, buff in ipairs(tBuffs) do
-		if buff.dwID == dwID
+		if (type(dwID) == 'string' and Table_GetBuffName(buff.dwID, buff.nLevel) == dwID or buff.dwID == dwID)
 		and (not nLevel or nLevel == 0 or buff.nLevel == nLevel) then
 			KObject.CancelBuff(buff.nIndex)
 		end
