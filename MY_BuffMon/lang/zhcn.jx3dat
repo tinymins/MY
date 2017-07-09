@@ -37,4 +37,6 @@ data = {
     ['Sure to reset default?'] = '确认恢复默认设置？',
     ['MY Buff Monitor'] = '茗伊BUFF监控',
     ['Cancel buff %d - %d'] = '取消BUFF %d - %d',
+    ['Move Up'] = '上移',
+    ['Move Down'] = '下移',
 }

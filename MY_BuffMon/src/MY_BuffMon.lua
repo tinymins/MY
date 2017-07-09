@@ -209,6 +209,12 @@ local function OpenPanel(config, reload)
 	frame:RegisterEvent("ON_LEAVE_CUSTOM_UI_MODE")
 end
 
+local function OpenAllPanel(reload)
+	for i, config in ipairs(Config) do
+		OpenPanel(config, reload)
+	end
+end
+
 local function GetTarget(eType)
 	if eType == "CLIENT_PLAYER" then
 		return TARGET.PLAYER, UI_GetClientPlayerID()
@@ -537,9 +543,7 @@ local function OnInit()
 	MY_BuffMonT.anchor        = nil
 	MY_BuffMonT.tBuffList     = nil
 	-- º”‘ÿΩÁ√Ê
-	for i, config in ipairs(Config) do
-		OpenPanel(config, true)
-	end
+	OpenAllPanel(true)
 	ConfigTemplate = data.template
 end
 MY.RegisterInit("MY_BuffMon", OnInit)
@@ -586,10 +590,50 @@ end
 ----------------------------------------------------------------------------------------------
 local PS = {}
 local function GenePS(ui, config, x, y, w, h)
+	ui:append("Text", {text = (function()
+		for i = 1, #Config do
+			if Config[i] == config then
+				return i
+			end
+		end
+		return "X"
+	end)() .. ".", x = x, y = y - 3, w = 20, r = 255, g = 255, b = 0})
 	ui:append("WndEditBox", {
-		x = x, y = y, w = w * 2 / 3, h = 22,
+		x = x + 20, y = y, w = w - 290, h = 22,
 		r = 255, g = 255, b = 0, text = config.caption,
 		onchange = function(raw, val) config.caption = val end,
+	})
+	ui:append("WndButton2", {
+		x = w - 240, y = y,
+		w = 50, h = 30,
+		text = _L["Move Up"],
+		onclick = function()
+			for i = 1, #Config do
+				if Config[i] == config then
+					if Config[i - 1] then
+						Config[i], Config[i - 1] = Config[i - 1], Config[i]
+						OpenAllPanel(true)
+						return MY.SwitchTab("MY_BuffMon", true)
+					end
+				end
+			end
+		end,
+	})
+	ui:append("WndButton2", {
+		x = w - 190, y = y,
+		w = 50, h = 30,
+		text = _L["Move Down"],
+		onclick = function()
+			for i = 1, #Config do
+				if Config[i] == config then
+					if Config[i + 1] then
+						Config[i], Config[i + 1] = Config[i + 1], Config[i]
+						OpenAllPanel(true)
+						return MY.SwitchTab("MY_BuffMon", true)
+					end
+				end
+			end
+		end,
 	})
 	ui:append("WndButton2", {
 		x = w - 130, y = y,
@@ -958,9 +1002,7 @@ function PS.OnPanelActive(wnd)
 			MY.Confirm(_L['Sure to reset default?'], function()
 				ClosePanel('all')
 				Config = MY.LoadLUAData(DEFAULT_CONFIG_FILE).default
-				for i, config in ipairs(Config) do
-					OpenPanel(config, true)
-				end
+				OpenAllPanel(true)
 				MY.SwitchTab("MY_BuffMon", true)
 			end)
 		end,
