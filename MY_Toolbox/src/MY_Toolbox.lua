@@ -561,7 +561,7 @@ function PS.OnPanelActive(wnd)
 	  :lclick(function()
 	  	local tGongZhans = {}
 	  	for _, p in pairs(MY.GetNearPlayer()) do
-	  		for _, buff in pairs(MY.Player.GetBuffList(p)) do
+	  		for _, buff in pairs(MY.GetBuffList(p)) do
 	  			if (not buff.bCanCancel) and string.find(Table_GetBuffName(buff.dwID, buff.nLevel), _L["GongZhan"]) ~= nil then
 	  				table.insert(tGongZhans, {p = p, time = (buff.nEndFrame - GetLogicFrameCount()) / 16})
 	  			end
