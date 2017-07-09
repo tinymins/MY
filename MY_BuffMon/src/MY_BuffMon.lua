@@ -85,6 +85,24 @@ local function ClosePanel(config)
 	end
 end
 
+local function UpdateHotkey(frame)
+	local i
+	for ii = 1, #Config do
+		if Config[ii] == frame.config then
+			i = ii
+		end
+	end
+	if not i then
+		return
+	end
+	local hList = frame:Lookup("", "Handle_BuffList")
+	for j = 0, hList:GetItemCount() - 1 do
+		local hItem = hList:Lookup(j)
+		local nKey, bShift, bCtrl, bAlt = Hotkey.Get("MY_BuffMon_" .. i .. "_" .. (j + 1))
+		hItem.box:SetOverText(2, GetKeyShow(nKey, bShift, bCtrl, bAlt, true))
+	end
+end
+
 local function OpenPanel(config, reload)
 	if reload then
 		ClosePanel(config)
@@ -142,11 +160,14 @@ local function OpenPanel(config, reload)
 		box:SetObjectCoolDown(true)
 		box:SetCoolDownPercentage(0)
 		-- BUFF时间
-		box:SetOverTextPosition(1, ITEM_POSITION.LEFT_TOP)
+		box:SetOverTextPosition(1, ITEM_POSITION.LEFT_BOTTOM)
 		box:SetOverTextFontScheme(1, 15)
 		-- BUFF层数
 		box:SetOverTextPosition(0, ITEM_POSITION.RIGHT_BOTTOM)
 		box:SetOverTextFontScheme(0, 15)
+		-- 快捷键
+		box:SetOverTextPosition(2, ITEM_POSITION.LEFT_TOP)
+		box:SetOverTextFontScheme(2, 7)
 		-- Box背景图
 		XGUI(imgBoxBg):image(config.boxBgUITex)
 		
@@ -189,6 +210,7 @@ local function OpenPanel(config, reload)
 	hList:SetSizeByAllItemSize()
 	hList:SetIgnoreInvisibleChild(true)
 	hList:FormatAllItemPos()
+	UpdateHotkey(frame)
 	
 	local nW, nH = hList:GetSize()
 	nW = math.max(nW, 50 * config.scale)
@@ -204,6 +226,7 @@ local function OpenPanel(config, reload)
 	for k, v in pairs(FE) do
 		frame[k] = v
 	end
+	frame:RegisterEvent("HOT_KEY_RELOADED")
 	frame:RegisterEvent("SKILL_MOUNT_KUNG_FU")
 	frame:RegisterEvent("ON_ENTER_CUSTOM_UI_MODE")
 	frame:RegisterEvent("ON_LEAVE_CUSTOM_UI_MODE")
@@ -402,7 +425,9 @@ function FE.OnFrameDragEnd()
 end
 
 function FE.OnEvent(event)
-	if event == "SKILL_MOUNT_KUNG_FU" then
+	if event == "HOT_KEY_RELOADED" then
+		UpdateHotkey(this)
+	elseif event == "SKILL_MOUNT_KUNG_FU" then
 		OpenPanel(this.config, true)
 	elseif event == "ON_ENTER_CUSTOM_UI_MODE" then
 		UpdateCustomModeWindow(this, this.config.caption, not this.config.dragable)
