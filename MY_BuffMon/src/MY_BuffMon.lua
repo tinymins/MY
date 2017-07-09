@@ -223,6 +223,8 @@ local function GetTarget(eType)
 		else
 			return TARGET.NO_TARGET, 0
 		end
+	else
+		return TARGET.NO_TARGET, 0
 	end
 end
 
@@ -546,6 +548,37 @@ local function OnExit()
 	MY.SaveLUAData(ROLE_CONFIG_FILE, Config)
 end
 MY.RegisterExit("MY_BuffMon", OnExit)
+end
+
+----------------------------------------------------------------------------------------------
+-- ¿ì½Ý¼ü
+----------------------------------------------------------------------------------------------
+do
+local title = _L["MY Buff Monitor"]
+for i = 1, 5 do
+	for j = 1, 10 do
+		Hotkey.AddBinding("MY_BuffMon_" .. i .. "_" .. j, _L("Cancel buff %d - %d", i, j), title, function()
+			local config = Config[i]
+			if not config then
+				return
+			end
+			local frame = l_frames[config]
+			if not frame then
+				return
+			end
+			local hItem = frame:Lookup("", "Handle_BuffList"):Lookup(j - 1)
+			if not hItem then
+				return
+			end
+			local KTarget = MY.GetObject(GetTarget(frame.config.target))
+			if not KTarget then
+				return
+			end
+			MY.CancelBuff(KTarget, hItem.mon.buffid)
+		end, nil)
+		title = ""
+	end
+end
 end
 
 ----------------------------------------------------------------------------------------------

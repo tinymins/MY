@@ -35,4 +35,6 @@ data = {
     ['rename'] = '重命名',
     ['please input import data:'] = '请输入导入数据',
     ['Sure to reset default?'] = '确认恢复默认设置？',
+    ['MY Buff Monitor'] = '茗伊BUFF监控',
+    ['Cancel buff %d - %d'] = '取消BUFF %d - %d',
 }
