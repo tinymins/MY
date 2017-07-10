@@ -64,6 +64,22 @@ local CUSTOM_CDBAR_STYLES = {
 	"/ui/Image/Common/Money.UITex|233",
 	"/ui/Image/Common/Money.UITex|234",
 }
+local TARGET_TYPE_LIST = {
+	'CLIENT_PLAYER'  ,
+	'CONTROL_PLAYER' ,
+	'TARGET'         ,
+	'TTARGET'        ,
+	"TEAM_MARK_CLOUD",
+	"TEAM_MARK_SWORD",
+	"TEAM_MARK_AX"   ,
+	"TEAM_MARK_HOOK" ,
+	"TEAM_MARK_DRUM" ,
+	"TEAM_MARK_SHEAR",
+	"TEAM_MARK_STICK",
+	"TEAM_MARK_JADE" ,
+	"TEAM_MARK_DART" ,
+	"TEAM_MARK_FAN"  ,
+}
 local Config = {}
 local BOX_SPARKING_FRAME = GLOBAL.GAME_FPS
 
@@ -160,13 +176,13 @@ local function OpenPanel(config, reload)
 		box:SetObjectCoolDown(true)
 		box:SetCoolDownPercentage(0)
 		-- BUFF时间
-		box:SetOverTextPosition(1, ITEM_POSITION.LEFT_BOTTOM)
+		box:SetOverTextPosition(1, ITEM_POSITION.LEFT_TOP)
 		box:SetOverTextFontScheme(1, 15)
 		-- BUFF层数
 		box:SetOverTextPosition(0, ITEM_POSITION.RIGHT_BOTTOM)
 		box:SetOverTextFontScheme(0, 15)
 		-- 快捷键
-		box:SetOverTextPosition(2, ITEM_POSITION.LEFT_TOP)
+		box:SetOverTextPosition(2, ITEM_POSITION.LEFT_BOTTOM)
 		box:SetOverTextFontScheme(2, 7)
 		-- Box背景图
 		XGUI(imgBoxBg):image(config.boxBgUITex)
@@ -194,7 +210,7 @@ local function OpenPanel(config, reload)
 		end
 		
 		if nCount <= config.maxLineCount then
-			nWidth = nWidth + hItem:GetW() * config.scale
+			nWidth = nWidth + hItem:GetW()
 		end
 		-- hItem:Scale(config.scale, config.scale)
 		hItem:SetVisible(not config.hideVoidBuff)
@@ -238,6 +254,18 @@ local function OpenAllPanel(reload)
 	end
 end
 
+local TEAM_MARK = {
+	["TEAM_MARK_CLOUD"] = 1,
+	["TEAM_MARK_SWORD"] = 2,
+	["TEAM_MARK_AX"   ] = 3,
+	["TEAM_MARK_HOOK" ] = 4,
+	["TEAM_MARK_DRUM" ] = 5,
+	["TEAM_MARK_SHEAR"] = 6,
+	["TEAM_MARK_STICK"] = 7,
+	["TEAM_MARK_JADE" ] = 8,
+	["TEAM_MARK_DART" ] = 9,
+	["TEAM_MARK_FAN"  ] = 10,
+}
 local function GetTarget(eType)
 	if eType == "CLIENT_PLAYER" then
 		return TARGET.PLAYER, UI_GetClientPlayerID()
@@ -249,12 +277,16 @@ local function GetTarget(eType)
 		local KTarget = MY.GetObject(MY.GetTarget())
 		if KTarget then
 			return MY.GetTarget(KTarget)
-		else
-			return TARGET.NO_TARGET, 0
 		end
-	else
-		return TARGET.NO_TARGET, 0
+	elseif TEAM_MARK[eType] then
+		local mark = GetClientTeam().GetTeamMark()
+		for dwID, nMark in pairs(mark) do
+			if TEAM_MARK[eType] == nMark then
+				return TARGET[IsPlayer(dwID) and "PLAYER" or "NPC"], dwID
+			end
+		end
 	end
+	return TARGET.NO_TARGET, 0
 end
 
 do
@@ -831,9 +863,9 @@ local function GenePS(ui, config, x, y, w, h)
 		menu = function()
 			local dwKungFuID = GetClientPlayer().GetKungfuMount().dwSkillID
 			local t = {}
-			for eType, szText in pairs(_L.TARGET) do
+			for _, eType in ipairs(TARGET_TYPE_LIST) do
 				table.insert(t, {
-					szOption = szText,
+					szOption = _L.TARGET[eType],
 					rgb = eType == config.target and {255, 255, 0} or nil,
 					fnAction = function()
 						config.target = eType
