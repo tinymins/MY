@@ -34,7 +34,7 @@ local xmlDecode = function(xml)
 			return char(unpack(bytes))
 		end
 	end
-	local t = {}
+	local t = {["."] = "", [''] = {}}
 	local p = t
 	local p1
 	local stack = {}
@@ -157,7 +157,7 @@ local xmlDecode = function(xml)
 				state = "text_eq"
 			elseif byte_current ~= byte_space then
 				state = "text"
-				p[key][''] = key
+				p[''][key] = key
 				pos = pos - 1
 			end
 		elseif state == "text_eq" then
