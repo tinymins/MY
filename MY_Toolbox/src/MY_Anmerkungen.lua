@@ -337,14 +337,62 @@ MY_Anmerkungen.SaveConfig = function()
 end
 MY.RegisterInit('MY_ANMERKUNGEN', MY_Anmerkungen.LoadConfig)
 MY.RegisterInit('MY_ANMERKUNGEN_PLAYERNOTE', MY_Anmerkungen.ReloadNotePanel)
-MY.RegisterPanel( "MY_Anmerkungen_Player_Note", _L["player note"], _L['Target'], "ui/Image/button/ShopButton.UITex|12", {255,255,0,200}, { OnPanelActive = function(wnd)
+
+local PS = {}
+function PS.OnPanelActive(wnd)
 	local ui = MY.UI(wnd)
 	local w, h = ui:size()
 	local x, y = 0, 0
-
+	
+	ui:append("WndButton2", {
+		x = w - 230, y = y, w = 110,
+		text = _L['Import'],
+		onclick = function()
+			GetUserInput(_L['please input import data:'], function(szVal)
+				local config = str2var(szVal)
+				if config and config.server and config.public and config.private then
+					if config.server ~= MY.GetRealServer() then
+						return MY.Alert(_L['Server not match!'])
+					end
+					local function Next(usenew)
+						for k, v in pairs(config.public) do
+							if not MY_Anmerkungen.tPublicPlayerNotes[k] or usenew then
+								MY_Anmerkungen.tPublicPlayerNotes[k] = v
+							end
+						end
+						for k, v in pairs(config.private) do
+							if not MY_Anmerkungen.tPrivatePlayerNotes[k] or usenew then
+								MY_Anmerkungen.tPrivatePlayerNotes[k] = v
+							end
+						end
+						MY_Anmerkungen.SaveConfig()
+						MY.SwitchTab("MY_Anmerkungen_Player_Note", true)
+					end
+					MY.Confirm(_L['Prefer old data or new data?'], function() Next(false) end,
+						function() Next(true) end, _L['Old data'], _L['New data'])
+				else
+					MY.Alert(_L['Decode data failed!'])
+				end
+			end, function() end, function() end, nil, "" )
+		end,
+	})
+	
+	ui:append("WndButton2", {
+		x = w - 110, y = y, w = 110,
+		text = _L['Export'],
+		onclick = function()
+			XGUI.OpenTextEditor(var2str({
+				server  = MY.GetRealServer(),
+				public  = MY_Anmerkungen.tPublicPlayerNotes,
+				private = MY_Anmerkungen.tPrivatePlayerNotes,
+			}))
+		end,
+	})
+	
+	y = y + 30
 	local list = ui:append("WndListBox", "WndListBox_1"):children('#WndListBox_1')
 	  :pos(x, y)
-	  :size(w, h)
+	  :size(w, h - 30)
 	  :listbox('onlclick', function(hItem, szText, szID, data, bSelected)
 	  	MY_Anmerkungen.OpenPlayerNoteEditPanel(data.dwID, data.szName)
 	  	return false
@@ -355,6 +403,8 @@ MY.RegisterPanel( "MY_Anmerkungen_Player_Note", _L["player note"], _L['Target'],
 		end
 	end
 	_C.list = list
-end, OnPanelDeactive = function()
+end
+function PS.OnPanelDeactive()
 	_C.list = nil
-end})
+end
+MY.RegisterPanel( "MY_Anmerkungen_Player_Note", _L["player note"], _L['Target'], "ui/Image/button/ShopButton.UITex|12", {255,255,0,200}, PS)
