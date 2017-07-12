@@ -199,7 +199,9 @@ local xmlDecode = function(xml)
 		end
 		pos = pos + 1
 	end
-	assert(#stack == 0, "XML decode error: unclosed elements detected.")
+	if #stack ~= 0 then
+		return Log("XML decode error: unclosed elements detected." .. #stack .. " stacks on `" .. xml .. "`")
+	end
 	return t
 end
 
