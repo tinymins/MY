@@ -73,6 +73,14 @@ data = {
     ['tip when group'] = 'TA進組時聊天欄提示我。',
     ['Tip: [%s] is in your team.\nNote: %s'] = '提示：[%s]進入你所在的隊伍。\n備注：%s',
     ['Tip: [%s] is in your team.\nNote: %s\n'] = '提示：[%s]進入你所在的隊伍。\n備注：%s\n',
+    ['Import'] = '導入',
+    ['please input import data:'] = '請輸入導入的數據：',
+    ['Server not match!'] = '服務器不匹配！',
+    ['Prefer old data or new data?'] = '衝突時使用原數據還是導入的新數據？',
+    ['Old data'] = '新數據',
+    ['New data'] = '原數據',
+    ['Decode data failed!'] = '解碼數據失敗！',
+    ['Export'] = '導出',
     
     ['Type to search, use comma to split.'] = '輸入文字進行搜索，半角逗號分隔多個搜索項。\n如：皇竹草,甜象草',
     
