@@ -190,16 +190,6 @@ function MY.GetGlobalValue(szVarPath)
 	return tVariable
 end
 
-do
-local szAddonIniTpl = "[%s]\
-name=%s\
-desc=%s\
-default=1\
-version=1.0\
-package=MY#DATA"
-local szPackageIniTpl = "[Package]\
-name=%s\
-desc=%s"
 function MY.CreateDataRoot(ePathType)
 	-- 创建目录
 	if ePathType == MY_DATA_PATH.ROLE then
@@ -209,32 +199,6 @@ function MY.CreateDataRoot(ePathType)
 	CPath.MakeDir(MY.FormatPath({'config/', ePathType}))
 	CPath.MakeDir(MY.FormatPath({'export/', ePathType}))
 	CPath.MakeDir(MY.FormatPath({'userdata/', ePathType}))
-	
-	-- 生成配置文件
-	local szPackageIni = MY.FormatPath({'package.ini', MY_DATA_PATH.NORMAL})
-	if not IsLocalFileExist(szPackageIni) then
-		Log(szPackageIni .. '.log', szPackageIniTpl:format(_L['Mingyi plugins storage data'], _L['Config and storage data of plugins']), 'clear close')
-		CPath.Move(szPackageIni .. '.log', szPackageIni)
-	end
-	local szAddonIni = MY.FormatPath({'info.ini', ePathType})
-	if IsLocalFileExist(szAddonIni) then
-		CPath.DelFile(szAddonIni)
-	end
-	local szDirName = MY.FormatPath({'', ePathType}):match("/([^/]*)/*$") or ""
-	local szName, szDesc = "", ""
-	if ePathType == MY_DATA_PATH.ROLE then
-		szName = GetUserRoleName()
-		szDesc = '@' .. MY.GetRealServer() .. ' (' .. szDirName:gsub('@.*', '') .. ')'
-	elseif ePathType == MY_DATA_PATH.GLOBAL then
-		szName = _L['Global storage'] .. '(' .. MY.GetLang() .. ')'
-		szDesc = _L['All characters public data']
-	elseif ePathType == MY_DATA_PATH.SERVER then
-		szName = MY.GetRealServer(2) .. '(' .. MY.GetRealServer(1) .. ")"
-		szDesc = _L['All characters in this server']
-	end
-	Log(szAddonIni .. '.log', szAddonIniTpl:format(szDirName, szName, szDesc), 'clear close')
-	CPath.Move(szAddonIni .. '.log', szAddonIni)
-end
 end
 
 -- 播放声音
