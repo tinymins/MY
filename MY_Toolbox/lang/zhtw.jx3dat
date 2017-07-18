@@ -104,7 +104,7 @@ data = {
         '它的主人是(.-)。',
     },
     
-    ['You have been loged in for 2min, you can unlock bag locker now.'] = '你已登入遊戲兩分鍾，可以愉快的解除密保鎖啦！',
+    ['You have been loged in for 2min, you can unlock bag locker now.'] = '你已登入遊戲兩分鍾，可以愉快的解除倉庫鎖啦！',
     LOCK_TIP = {},
     
     ['Warning: Bigwar has been finished but not handed yet!'] = '茗伊提示：大戰還沒交！',
