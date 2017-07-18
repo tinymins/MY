@@ -20,25 +20,15 @@ if int(str_version) <= max_version:
 	print 'Error: current version(%s) is smaller than or equals with last git published version(%d)!' % (str_version, max_version)
 	exit()
 
-# 读取可能需要打包的文件夹列表
-whitelist = {}
-for line in open("7zippathlist.txt"):
-	whitelist[line.strip()] = True
-
 # 读取Git中最大的版本号 到最新版修改文件
 paths = {}
 if git_tag != '':
 	filelist = os.popen('git diff ' + git_tag + ' --name-status').read().strip().split("\n")
 	for file in filelist:
-		file = re.sub('["/].*$', '', re.sub('^[^\t]\t"*', '', file))
-		if file in whitelist:
-			paths[file] = True
-
-# 获取并格式化当前时间字符串
-str_time = time.strftime("%Y%m%d%H%M%S", time.localtime())
+		paths[re.sub('["/].*$', '', re.sub('^[^\t]\t"*', '', file))] = True
 
 # 拼接字符串开始压缩文件
-dst_file = "!src-dist/releases/MY." + str_time + "v" + str_version + ".7z"
+dst_file = "!src-dist/releases/MY." + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "v" + str_version + ".7z"
 print "zippping..."
 cmd = "7z a -t7z " + dst_file + " -xr!manifest.dat -xr!manifest.key -xr!publisher.key -x@7zipignore.txt"
 for path in paths:
