@@ -11,3 +11,4 @@ changelog.html
 MYDev_*\
 *.py
 *.pyc
+MY_ArchHUD
