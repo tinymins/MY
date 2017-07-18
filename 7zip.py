@@ -22,10 +22,19 @@ if int(str_version) <= max_version:
 
 # 读取Git中最大的版本号 到最新版修改文件
 paths = {}
+print 'File change list:'
 if git_tag != '':
 	filelist = os.popen('git diff ' + git_tag + ' --name-status').read().strip().split("\n")
 	for file in filelist:
+		print file
 		paths[re.sub('["/].*$', '', re.sub('^[^\t]\t"*', '', file))] = True
+print ''
+
+# 输出修改的子目录列表
+print 'Subpath change list:'
+for path in paths:
+	print '/' + path
+print ''
 
 # 拼接字符串开始压缩文件
 dst_file = "!src-dist/releases/MY." + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "v" + str_version + ".7z"
@@ -39,3 +48,4 @@ print "File(s) compressing acomplete!"
 print "Url: " + dst_file
 
 time.sleep(5)
+print('Exiting...')
