@@ -410,16 +410,7 @@ MY_DEBUG = SetmetaReadonly({
 
 if not IsPhoneLock then
 function IsPhoneLock()
-	local bPhoneLock = false
-	local hFrame = Station.Lookup("Topmost/BankUnlock")
-	if hFrame then
-		bPhoneLock = not hFrame:Lookup("CheckBox_Keyboard"):IsVisible()
-	else
-		hFrame = Wnd.OpenWindow("BankUnlock")
-		bPhoneLock = not hFrame:Lookup("CheckBox_Keyboard"):IsVisible()
-		Wnd.CloseWindow(hFrame)
-	end
-	return bPhoneLock
+	return GetClientPlayer() and GetClientPlayer().IsTradingMibaoSwitchOpen()
 end
 end
 
