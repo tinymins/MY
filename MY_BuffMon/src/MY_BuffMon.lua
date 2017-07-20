@@ -119,22 +119,29 @@ local function UpdateHotkey(frame)
 	end
 end
 
-local function OpenPanel(config, reload)
-	if reload then
-		ClosePanel(config)
-	end
+local function RecreatePanel(config)
 	if not config.enable then
-		return
+		return ClosePanel(config)
 	end
-	local frame = Wnd.OpenWindow(INI_PATH, "MY_BuffMon#" .. l_frameIndex)
-	local hList = frame:Lookup("", "Handle_BuffList")
-	
-	l_frames[config] = frame
-	l_frameIndex = l_frameIndex + 1
+	local frame = l_frames[config]
+	if not frame then
+		frame = Wnd.OpenWindow(INI_PATH, "MY_BuffMon#" .. l_frameIndex)
+		l_frameIndex = l_frameIndex + 1
+		l_frames[config] = frame
+		frame.hList = frame:Lookup("", "Handle_BuffList")
+		
+		for k, v in pairs(FE) do
+			frame[k] = v
+		end
+		frame:RegisterEvent("HOT_KEY_RELOADED")
+		frame:RegisterEvent("SKILL_MOUNT_KUNG_FU")
+		frame:RegisterEvent("ON_ENTER_CUSTOM_UI_MODE")
+		frame:RegisterEvent("ON_LEAVE_CUSTOM_UI_MODE")
+	end
+	local hList = frame.hList
 	
 	hList:Clear()
 	frame.tItem = {}
-	frame.hList = hList
 	frame.config = config
 	local nWidth = 0
 	local nCount = 0
@@ -238,19 +245,11 @@ local function OpenPanel(config, reload)
 	frame:Scale(config.scale, config.scale)
 	frame:SetPoint(config.anchor.s, 0, 0, config.anchor.r, config.anchor.x, config.anchor.y)
 	frame:CorrectPos()
-	
-	for k, v in pairs(FE) do
-		frame[k] = v
-	end
-	frame:RegisterEvent("HOT_KEY_RELOADED")
-	frame:RegisterEvent("SKILL_MOUNT_KUNG_FU")
-	frame:RegisterEvent("ON_ENTER_CUSTOM_UI_MODE")
-	frame:RegisterEvent("ON_LEAVE_CUSTOM_UI_MODE")
 end
 
-local function OpenAllPanel(reload)
+local function RecreateAllPanel(reload)
 	for i, config in ipairs(Config) do
-		OpenPanel(config, reload)
+		RecreatePanel(config)
 	end
 end
 
@@ -460,7 +459,7 @@ function FE.OnEvent(event)
 	if event == "HOT_KEY_RELOADED" then
 		UpdateHotkey(this)
 	elseif event == "SKILL_MOUNT_KUNG_FU" then
-		OpenPanel(this.config, true)
+		RecreatePanel(this.config)
 	elseif event == "ON_ENTER_CUSTOM_UI_MODE" then
 		UpdateCustomModeWindow(this, this.config.caption, not this.config.dragable)
 	elseif event == "ON_LEAVE_CUSTOM_UI_MODE" then
@@ -600,7 +599,7 @@ local function OnInit()
 	MY_BuffMonT.anchor        = nil
 	MY_BuffMonT.tBuffList     = nil
 	-- º”‘ÿΩÁ√Ê
-	OpenAllPanel(true)
+	RecreateAllPanel()
 	ConfigTemplate = data.template
 end
 MY.RegisterInit("MY_BuffMon", OnInit)
@@ -669,7 +668,7 @@ local function GenePS(ui, config, x, y, w, h)
 				if Config[i] == config then
 					if Config[i - 1] then
 						Config[i], Config[i - 1] = Config[i - 1], Config[i]
-						OpenAllPanel(true)
+						RecreateAllPanel()
 						return MY.SwitchTab("MY_BuffMon", true)
 					end
 				end
@@ -685,7 +684,7 @@ local function GenePS(ui, config, x, y, w, h)
 				if Config[i] == config then
 					if Config[i + 1] then
 						Config[i], Config[i + 1] = Config[i + 1], Config[i]
-						OpenAllPanel(true)
+						RecreateAllPanel()
 						return MY.SwitchTab("MY_BuffMon", true)
 					end
 				end
@@ -722,7 +721,7 @@ local function GenePS(ui, config, x, y, w, h)
 		checked = config.enable,
 		oncheck = function(bChecked)
 			config.enable = bChecked
-			OpenPanel(config, true)
+			RecreatePanel(config)
 		end,
 	})
 	
@@ -732,7 +731,7 @@ local function GenePS(ui, config, x, y, w, h)
 		checked = config.hideOthers,
 		oncheck = function(bChecked)
 			config.hideOthers = bChecked
-			OpenPanel(config, true)
+			RecreatePanel(config)
 		end,
 	})
 
@@ -757,7 +756,7 @@ local function GenePS(ui, config, x, y, w, h)
 									buffid = tonumber(szVal) or nil,
 									buffname = not tonumber(szVal) and szVal or nil,
 								})
-								OpenPanel(config, true)
+								RecreatePanel(config)
 							end
 						end, function() end, function() end, nil, "" )
 					end
@@ -771,7 +770,7 @@ local function GenePS(ui, config, x, y, w, h)
 					bCheck = true, bChecked = mon.enable,
 					fnAction = function()
 						mon.enable = not mon.enable
-						OpenPanel(config, true)
+						RecreatePanel(config)
 					end,
 					szIcon = "ui/Image/UICommon/CommonPanel2.UITex",
 					nFrame = 49,
@@ -786,7 +785,7 @@ local function GenePS(ui, config, x, y, w, h)
 							end
 						end
 						Wnd.CloseWindow("PopupMenuPanel")
-						OpenPanel(config, true)
+						RecreatePanel(config)
 					end,
 					nMiniWidth = 120,
 				}
@@ -797,7 +796,7 @@ local function GenePS(ui, config, x, y, w, h)
 							szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
 							if szVal ~= "" then
 								mon.buffname = szVal
-								OpenPanel(config, true)
+								RecreatePanel(config)
 							end
 						end, function() end, function() end, nil, mon.buffname)
 					end,
@@ -812,7 +811,7 @@ local function GenePS(ui, config, x, y, w, h)
 							fnAction = function()
 								mon.iconid = dwIcon
 								mon.buffid = dwBuffID
-								OpenPanel(config, true)
+								RecreatePanel(config)
 							end,
 							szIcon = "fromiconid",
 							nFrame = dwIcon or 13,
@@ -824,7 +823,7 @@ local function GenePS(ui, config, x, y, w, h)
 									mon.buffids[dwBuffID] = dwIcon
 									if mon.buffid == dwBuffID then
 										mon.iconid = dwIcon
-										OpenPanel(config, true)
+										RecreatePanel(config)
 									end
 								end)
 								Wnd.CloseWindow("PopupMenuPanel")
@@ -869,7 +868,7 @@ local function GenePS(ui, config, x, y, w, h)
 					rgb = eType == config.target and {255, 255, 0} or nil,
 					fnAction = function()
 						config.target = eType
-						OpenPanel(config, true)
+						RecreatePanel(config)
 					end,
 				})
 			end
@@ -884,7 +883,7 @@ local function GenePS(ui, config, x, y, w, h)
 		checked = not config.dragable,
 		oncheck = function(bChecked)
 			config.dragable = not bChecked
-			OpenPanel(config, true)
+			RecreatePanel(config)
 		end,
 	})
 	
@@ -894,7 +893,7 @@ local function GenePS(ui, config, x, y, w, h)
 		checked = config.hideVoidBuff,
 		oncheck = function(bChecked)
 			config.hideVoidBuff = bChecked
-			OpenPanel(config, true)
+			RecreatePanel(config)
 		end,
 	})
 	
@@ -906,7 +905,7 @@ local function GenePS(ui, config, x, y, w, h)
 		textfmt = function(val) return _L("display %d eachline.", val) end,
 		onchange = function(raw, val)
 			config.maxLineCount = val
-			OpenPanel(config, true)
+			RecreatePanel(config)
 		end,
 	})
 	y = y + 30
@@ -917,7 +916,7 @@ local function GenePS(ui, config, x, y, w, h)
 		checked = config.cdBar,
 		oncheck = function(bCheck)
 			config.cdBar = bCheck
-			OpenPanel(config, true)
+			RecreatePanel(config)
 		end,
 	})
 	
@@ -927,7 +926,7 @@ local function GenePS(ui, config, x, y, w, h)
 		checked = config.showBuffName,
 		oncheck = function(bCheck)
 			config.showBuffName = bCheck
-			OpenPanel(config, true)
+			RecreatePanel(config)
 		end,
 	})
 	
@@ -939,7 +938,7 @@ local function GenePS(ui, config, x, y, w, h)
 		textfmt = function(val) return _L("scale %d%%.", val) end,
 		onchange = function(raw, val)
 			config.scale = val / 100
-			OpenPanel(config, true)
+			RecreatePanel(config)
 		end,
 	})
 	y = y + 30
@@ -955,7 +954,7 @@ local function GenePS(ui, config, x, y, w, h)
 					szOption = text,
 					fnAction = function()
 						config.boxBgUITex = text
-						OpenPanel(config, true)
+						RecreatePanel(config)
 					end,
 					szIcon = szIcon,
 					nFrame = nFrame,
@@ -982,7 +981,7 @@ local function GenePS(ui, config, x, y, w, h)
 					szOption = text,
 					fnAction = function()
 						config.cdBarUITex = text
-						OpenPanel(config, true)
+						RecreatePanel(config)
 					end,
 					szIcon = szIcon,
 					nFrame = nFrame,
@@ -1005,7 +1004,7 @@ local function GenePS(ui, config, x, y, w, h)
 		textfmt = function(val) return _L("CD width %dpx.", val) end,
 		onchange = function(raw, val)
 			config.cdBarWidth = val
-			OpenPanel(config, true)
+			RecreatePanel(config)
 		end,
 	})
 	y = y + 30
@@ -1031,7 +1030,7 @@ function PS.OnPanelActive(wnd)
 		onclick = function()
 			local config = clone(ConfigTemplate)
 			table.insert(Config, config)
-			OpenPanel(config)
+			RecreatePanel(config)
 			MY.SwitchTab("MY_BuffMon", true)
 		end,
 	})
@@ -1045,7 +1044,7 @@ function PS.OnPanelActive(wnd)
 				if config then
 					config = MY.FormatDataStructure(config, ConfigTemplate, 1)
 					table.insert(Config, config)
-					OpenPanel(config)
+					RecreatePanel(config)
 					MY.SwitchTab("MY_BuffMon", true)
 				end
 			end, function() end, function() end, nil, "" )
@@ -1059,7 +1058,7 @@ function PS.OnPanelActive(wnd)
 			MY.Confirm(_L['Sure to reset default?'], function()
 				ClosePanel('all')
 				Config = MY.LoadLUAData(DEFAULT_CONFIG_FILE).default
-				OpenAllPanel(true)
+				RecreateAllPanel()
 				MY.SwitchTab("MY_BuffMon", true)
 			end)
 		end,
