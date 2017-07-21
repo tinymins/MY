@@ -34,7 +34,7 @@ local xmlDecode = function(xml)
 			return char(unpack(bytes))
 		end
 	end
-	local t = {["."] = "", [''] = {}}
+	local t = {[''] = {}}
 	local p = t
 	local p1
 	local stack = {}
