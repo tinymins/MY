@@ -161,6 +161,8 @@ local function RecreatePanel(config)
 		frame:RegisterEvent("SKILL_MOUNT_KUNG_FU")
 		frame:RegisterEvent("ON_ENTER_CUSTOM_UI_MODE")
 		frame:RegisterEvent("ON_LEAVE_CUSTOM_UI_MODE")
+	elseif frame.scale then
+		frame:Scale(1 / frame.scale, 1 / frame.scale)
 	end
 	local hList = frame.hList
 	
@@ -262,6 +264,7 @@ local function RecreatePanel(config)
 	local nW, nH = hList:GetSize()
 	nW = math.max(nW, 50 * config.scale)
 	nH = math.max(nH, 50 * config.scale)
+	frame.scale = config.scale
 	frame:SetSize(nW, nH)
 	frame:SetDragArea(0, 0, nW, nH)
 	frame:EnableDrag(config.dragable)
