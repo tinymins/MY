@@ -121,8 +121,9 @@ end
 
 local function CorrectPos(frame)
 	local x, y = frame:GetAbsPos()
-	local w, h = Station.GetClientSize()
-	if x >= w and y >= h then
+	local w, h = frame:GetSize()
+	local cw, ch = Station.GetClientSize()
+	if (x >= cw and y >= ch) or (x + w <= 0 and y + h <= 0) then
 		frame:CorrectPos()
 	end
 end
