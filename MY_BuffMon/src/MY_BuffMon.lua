@@ -119,6 +119,29 @@ local function UpdateHotkey(frame)
 	end
 end
 
+local function CorrectPos(frame)
+	local x, y = frame:GetAbsPos()
+	local w, h = Station.GetClientSize()
+	if x >= w and y >= h then
+		frame:CorrectPos()
+	end
+end
+
+local function SaveAnchor(frame)
+	CorrectPos(frame)
+	if frame.config.hideVoidBuff then
+		frame.config.anchor = GetFrameAnchor(frame, "LEFTTOP")
+	else
+		frame.config.anchor = GetFrameAnchor(frame)
+	end
+end
+
+local function UpdateAnchor(frame)
+	local anchor = frame.config.anchor
+	frame:SetPoint(anchor.s, 0, 0, anchor.r, anchor.x, anchor.y)
+	CorrectPos(frame)
+end
+
 local function RecreatePanel(config)
 	if not config.enable then
 		return ClosePanel(config)
@@ -243,8 +266,7 @@ local function RecreatePanel(config)
 	frame:EnableDrag(config.dragable)
 	frame:SetMousePenetrable(not config.dragable)
 	frame:Scale(config.scale, config.scale)
-	frame:SetPoint(config.anchor.s, 0, 0, config.anchor.r, config.anchor.x, config.anchor.y)
-	frame:CorrectPos()
+	UpdateAnchor(frame)
 end
 
 local function RecreateAllPanel(reload)
@@ -451,8 +473,7 @@ end
 end
 
 function FE.OnFrameDragEnd()
-	this:CorrectPos()
-	this.config.anchor = GetFrameAnchor(this)
+	SaveAnchor(this)
 end
 
 function FE.OnEvent(event)
