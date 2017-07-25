@@ -255,6 +255,7 @@ local function RecreatePanel(config)
 		CreateItem(mon)
 	end
 	hList:SetW(nWidth)
+	hList:SetIgnoreInvisibleChild(false)
 	hList:FormatAllItemPos()
 	hList:SetSizeByAllItemSize()
 	hList:SetIgnoreInvisibleChild(true)
