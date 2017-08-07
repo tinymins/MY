@@ -1,10 +1,10 @@
 ---------------------------------------------------------------------
 -- BUFF¼à¿Ø
 ---------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_BuffMon/lang/")
-local INI_PATH = MY.GetAddonInfo().szRoot .. "MY_BuffMon/ui/MY_BuffMon.ini"
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_TargetMon/lang/")
+local INI_PATH = MY.GetAddonInfo().szRoot .. "MY_TargetMon/ui/MY_TargetMon.ini"
 local ROLE_CONFIG_FILE = {'config/my_buffmon.jx3dat', MY_DATA_PATH.ROLE}
-local DEFAULT_CONFIG_FILE = MY.GetAddonInfo().szRoot .. "MY_BuffMon/data/$lang.jx3dat"
+local DEFAULT_CONFIG_FILE = MY.GetAddonInfo().szRoot .. "MY_TargetMon/data/$lang.jx3dat"
 local CUSTOM_BOXBG_STYLES = {
 	"UI/Image/Common/Box.UITex|0",
 	"UI/Image/Common/Box.UITex|1",
@@ -114,7 +114,7 @@ local function UpdateHotkey(frame)
 	local hList = frame:Lookup("", "Handle_BuffList")
 	for j = 0, hList:GetItemCount() - 1 do
 		local hItem = hList:Lookup(j)
-		local nKey, bShift, bCtrl, bAlt = Hotkey.Get("MY_BuffMon_" .. i .. "_" .. (j + 1))
+		local nKey, bShift, bCtrl, bAlt = Hotkey.Get("MY_TargetMon_" .. i .. "_" .. (j + 1))
 		hItem.box:SetOverText(2, GetKeyShow(nKey, bShift, bCtrl, bAlt, true))
 	end
 end
@@ -149,7 +149,7 @@ local function RecreatePanel(config)
 	end
 	local frame = l_frames[config]
 	if not frame then
-		frame = Wnd.OpenWindow(INI_PATH, "MY_BuffMon#" .. l_frameIndex)
+		frame = Wnd.OpenWindow(INI_PATH, "MY_TargetMon#" .. l_frameIndex)
 		l_frameIndex = l_frameIndex + 1
 		l_frames[config] = frame
 		frame.hList = frame:Lookup("", "Handle_BuffList")
@@ -628,12 +628,12 @@ local function OnInit()
 	RecreateAllPanel()
 	ConfigTemplate = data.template
 end
-MY.RegisterInit("MY_BuffMon", OnInit)
+MY.RegisterInit("MY_TargetMon", OnInit)
 
 local function OnExit()
 	MY.SaveLUAData(ROLE_CONFIG_FILE, Config)
 end
-MY.RegisterExit("MY_BuffMon", OnExit)
+MY.RegisterExit("MY_TargetMon", OnExit)
 end
 
 ----------------------------------------------------------------------------------------------
@@ -643,7 +643,7 @@ do
 local title = _L["MY Buff Monitor"]
 for i = 1, 5 do
 	for j = 1, 10 do
-		Hotkey.AddBinding("MY_BuffMon_" .. i .. "_" .. j, _L("Cancel buff %d - %d", i, j), title, function()
+		Hotkey.AddBinding("MY_TargetMon_" .. i .. "_" .. j, _L("Cancel buff %d - %d", i, j), title, function()
 			if MY.IsInArena() then
 				return OutputMessage("MSG_ANNOUNCE_YELLOW", _L['Cancel buff is disabled in arena.'])
 			end
@@ -698,7 +698,7 @@ local function GenePS(ui, config, x, y, w, h)
 					if Config[i - 1] then
 						Config[i], Config[i - 1] = Config[i - 1], Config[i]
 						RecreateAllPanel()
-						return MY.SwitchTab("MY_BuffMon", true)
+						return MY.SwitchTab("MY_TargetMon", true)
 					end
 				end
 			end
@@ -714,7 +714,7 @@ local function GenePS(ui, config, x, y, w, h)
 					if Config[i + 1] then
 						Config[i], Config[i + 1] = Config[i + 1], Config[i]
 						RecreateAllPanel()
-						return MY.SwitchTab("MY_BuffMon", true)
+						return MY.SwitchTab("MY_TargetMon", true)
 					end
 				end
 			end
@@ -739,7 +739,7 @@ local function GenePS(ui, config, x, y, w, h)
 				end
 			end
 			ClosePanel(config)
-			MY.SwitchTab("MY_BuffMon", true)
+			MY.SwitchTab("MY_TargetMon", true)
 		end,
 	})
 	y = y + 30
@@ -1060,7 +1060,7 @@ function PS.OnPanelActive(wnd)
 			local config = clone(ConfigTemplate)
 			table.insert(Config, config)
 			RecreatePanel(config)
-			MY.SwitchTab("MY_BuffMon", true)
+			MY.SwitchTab("MY_TargetMon", true)
 		end,
 	})
 	ui:append("WndButton2", {
@@ -1074,7 +1074,7 @@ function PS.OnPanelActive(wnd)
 					config = MY.FormatDataStructure(config, ConfigTemplate, 1)
 					table.insert(Config, config)
 					RecreatePanel(config)
-					MY.SwitchTab("MY_BuffMon", true)
+					MY.SwitchTab("MY_TargetMon", true)
 				end
 			end, function() end, function() end, nil, "" )
 		end,
@@ -1088,10 +1088,10 @@ function PS.OnPanelActive(wnd)
 				ClosePanel('all')
 				Config = MY.LoadLUAData(DEFAULT_CONFIG_FILE).default
 				RecreateAllPanel()
-				MY.SwitchTab("MY_BuffMon", true)
+				MY.SwitchTab("MY_TargetMon", true)
 			end)
 		end,
 	})
 	y = y + 30
 end
-MY.RegisterPanel("MY_BuffMon", _L["buff monitor"], _L['Target'], "ui/Image/ChannelsPanel/NewChannels.UITex|141", { 255, 255, 0, 200 }, PS)
+MY.RegisterPanel("MY_TargetMon", _L["target monitor"], _L['Target'], "ui/Image/ChannelsPanel/NewChannels.UITex|141", { 255, 255, 0, 200 }, PS)

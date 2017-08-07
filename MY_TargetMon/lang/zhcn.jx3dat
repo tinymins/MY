@@ -1,6 +1,6 @@
 -- language data (zhcn) updated at 2014-4-10 03:38:11
 data = {
-    ['buff monitor'] = 'BUFF监控',
+    ['target monitor'] = '目标监控',
     ['undragable'] = '禁止拖动',
     ['set buff monitor'] = '设置BUFF监控',
     ['mingyi self buff monitor'] = '茗伊自身BUFF监控',
