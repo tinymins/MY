@@ -543,6 +543,7 @@ local function OnInit()
 						mon.ids , mon.buffids  = mon.buffids , nil
 					end
 				end
+				config.type = 'BUFF'
 				config.showName, config.showBuffName = config.showBuffName, nil
 			end
 		else
