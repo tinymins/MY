@@ -1,6 +1,7 @@
 data = {
 	template = {
 		caption      = "新建BUFF監控",
+		type         = "BUFF",
 		target       = "CLIENT_PLAYER",
 		scale        = 0.8  ,  -- 縮放比
 		enable       = false,  -- 啓用標記
@@ -20,6 +21,7 @@ data = {
 		-- 自身BUFF監控
 		{
 			caption      = "茗伊自身BUFF監控",
+			type         = "BUFF",
 			target       = "CLIENT_PLAYER",
 			scale        = 0.8  ,  -- 縮放比
 			enable       = false,  -- 啓用標記
@@ -52,6 +54,7 @@ data = {
 		-- 目標BUFF監控
 		{
 			caption      = "茗伊目標BUFF監控",
+			type         = "BUFF",
 			target       = "TARGET",
 			scale        = 0.8  ,  -- 縮放比
 			enable       = false,  -- 啓用標記
