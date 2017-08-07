@@ -3,7 +3,7 @@
 ---------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_TargetMon/lang/")
 local INI_PATH = MY.GetAddonInfo().szRoot .. "MY_TargetMon/ui/MY_TargetMon.ini"
-local ROLE_CONFIG_FILE = {'config/my_buffmon.jx3dat', MY_DATA_PATH.ROLE}
+local ROLE_CONFIG_FILE = {'config/my_targetmon.jx3dat', MY_DATA_PATH.ROLE}
 local DEFAULT_CONFIG_FILE = MY.GetAddonInfo().szRoot .. "MY_TargetMon/data/$lang.jx3dat"
 local CUSTOM_BOXBG_STYLES = {
 	"UI/Image/Common/Box.UITex|0",
@@ -111,7 +111,7 @@ local function UpdateHotkey(frame)
 	if not i then
 		return
 	end
-	local hList = frame:Lookup("", "Handle_BuffList")
+	local hList = frame:Lookup("", "Handle_List")
 	for j = 0, hList:GetItemCount() - 1 do
 		local hItem = hList:Lookup(j)
 		local nKey, bShift, bCtrl, bAlt = Hotkey.Get("MY_TargetMon_" .. i .. "_" .. (j + 1))
@@ -130,7 +130,7 @@ end
 
 local function SaveAnchor(frame)
 	CorrectPos(frame)
-	if frame.config.hideVoidBuff then
+	if frame.config.hideVoid then
 		frame.config.anchor = GetFrameAnchor(frame, "LEFTTOP")
 	else
 		frame.config.anchor = GetFrameAnchor(frame)
@@ -152,7 +152,7 @@ local function RecreatePanel(config)
 		frame = Wnd.OpenWindow(INI_PATH, "MY_TargetMon#" .. l_frameIndex)
 		l_frameIndex = l_frameIndex + 1
 		l_frames[config] = frame
-		frame.hList = frame:Lookup("", "Handle_BuffList")
+		frame.hList = frame:Lookup("", "Handle_List")
 		
 		for k, v in pairs(FE) do
 			frame[k] = v
@@ -176,35 +176,35 @@ local function RecreatePanel(config)
 			return
 		end
 		nCount = nCount + 1
-		local hItem        = hList:AppendItemFromIni(INI_PATH, "Handle_Item")
-		local hBox         = hItem:Lookup("Handle_Box")
-		local hCDBar       = hItem:Lookup("Handle_Bar")
-		local box          = hBox:Lookup("Box_Default")
-		local imgBoxBg     = hBox:Lookup("Image_BoxBg")
-		local txtProcess   = hCDBar:Lookup("Text_Process")
-		local imgProcess   = hCDBar:Lookup("Image_Process")
-		local txtBuffName  = hCDBar:Lookup("Text_Name")
+		local hItem      = hList:AppendItemFromIni(INI_PATH, "Handle_Item")
+		local hBox       = hItem:Lookup("Handle_Box")
+		local hCDBar     = hItem:Lookup("Handle_Bar")
+		local box        = hBox:Lookup("Box_Default")
+		local imgBoxBg   = hBox:Lookup("Image_BoxBg")
+		local txtProcess = hCDBar:Lookup("Text_Process")
+		local imgProcess = hCDBar:Lookup("Image_Process")
+		local txtName    = hCDBar:Lookup("Text_Name")
 		
 		-- 建立高速索引
 		hItem.box = box
 		hItem.mon = mon
 		hItem.txtProcess = txtProcess
 		hItem.imgProcess = imgProcess
-		hItem.txtBuffName = txtBuffName
-		if mon.buffid and mon.buffid ~= 'common' then
-			if not frame.tItem[mon.buffid] then
-				frame.tItem[mon.buffid] = {}
+		hItem.txtName    = txtName
+		if mon.id and mon.id ~= 'common' then
+			if not frame.tItem[mon.id] then
+				frame.tItem[mon.id] = {}
 			end
-			frame.tItem[mon.buffid][hItem] = true
-		elseif mon.buffname then
-			if not frame.tItem[mon.buffname] then
-				frame.tItem[mon.buffname] = {}
+			frame.tItem[mon.id][hItem] = true
+		elseif mon.name then
+			if not frame.tItem[mon.name] then
+				frame.tItem[mon.name] = {}
 			end
-			frame.tItem[mon.buffname][hItem] = true
+			frame.tItem[mon.name][hItem] = true
 		end
 		
 		-- Box部分
-		box:SetObject(UI_OBJECT.BUFF, mon.buffid, 1, 1)
+		box:SetObject(UI_OBJECT.BUFF, mon.id, 1, 1)
 		box:SetObjectIcon(mon.iconid or 13)
 		box:SetObjectCoolDown(true)
 		box:SetCoolDownPercentage(0)
@@ -225,9 +225,9 @@ local function RecreatePanel(config)
 			txtProcess:SetW(config.cdBarWidth - 10)
 			txtProcess:SetText("")
 			
-			txtBuffName:SetVisible(config.showBuffName)
-			txtBuffName:SetW(config.cdBarWidth - 10)
-			txtBuffName:SetText(mon.buffname or '')
+			txtName:SetVisible(config.showName)
+			txtName:SetW(config.cdBarWidth - 10)
+			txtName:SetText(mon.name or '')
 			
 			XGUI(imgProcess):image(config.cdBarUITex)
 			imgProcess:SetW(config.cdBarWidth)
@@ -246,7 +246,7 @@ local function RecreatePanel(config)
 			nWidth = nWidth + hItem:GetW()
 		end
 		-- hItem:Scale(config.scale, config.scale)
-		hItem:SetVisible(not config.hideVoidBuff)
+		hItem:SetVisible(not config.hideVoid)
 	end
 	for _, mon in ipairs(config.monitors.common or EMPTY_TABLE) do
 		CreateItem(mon)
@@ -318,13 +318,13 @@ end
 do
 local needFormatItemPos
 local l_tBuffTime = setmetatable({}, { __mode = "v" })
-local function UpdateItem(hItem, KTarget, buff, szBuffName, tItem, config, nFrameCount, targetChanged)
+local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCount, targetChanged)
 	if buff then
-		if not hItem.mon.buffid or hItem.mon.buffid == 'common' or hItem.mon.buffid == buff.dwID then
+		if not hItem.mon.id or hItem.mon.id == 'common' or hItem.mon.id == buff.dwID then
 			if hItem.nRenderFrame == nFrameCount then
 				return
 			end
-			if config.hideVoidBuff and not hItem:IsVisible() then
+			if config.hideVoid and not hItem:IsVisible() then
 				needFormatItemPos = true
 				hItem:Show()
 			end
@@ -337,22 +337,22 @@ local function UpdateItem(hItem, KTarget, buff, szBuffName, tItem, config, nFram
 			l_tBuffTime[KTarget.dwID][buff.dwID] = nBuffTime
 			-- 处理新出现的BUFF
 			if not hItem.mon.iconid or hItem.mon.iconid == 13 then
-				-- 计算图标 名字 BuffID等
-				if hItem.mon.buffid ~= "common" then
+				-- 计算图标 名字 ID等
+				if hItem.mon.id ~= "common" then
 					-- 加入精确缓存
 					if not tItem[buff.dwID] then
 						tItem[buff.dwID] = {}
 					end
 					tItem[buff.dwID][hItem] = true
 					-- 移除模糊缓存
-					if tItem[szBuffName] then
-						tItem[szBuffName][hItem] = false
+					if tItem[szName] then
+						tItem[szName][hItem] = false
 					end
-					hItem.mon.buffid = buff.dwID
+					hItem.mon.id = buff.dwID
 				end
-				if not hItem.mon.buffname then
-					hItem.mon.buffname = szBuffName
-					hItem.txtBuffName:SetText(szBuffName)
+				if not hItem.mon.name then
+					hItem.mon.name = szName
+					hItem.txtName:SetText(szName)
 				end
 				hItem.mon.iconid = Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13
 				hItem.box:SetObjectIcon(hItem.mon.iconid)
@@ -387,11 +387,11 @@ local function UpdateItem(hItem, KTarget, buff, szBuffName, tItem, config, nFram
 			hItem.nRenderFrame = nFrameCount
 		end
 		-- 加入同名BUFF列表
-		if not hItem.mon.buffids then
-			hItem.mon.buffids = {}
+		if not hItem.mon.ids then
+			hItem.mon.ids = {}
 		end
-		if not hItem.mon.buffids[buff.dwID] then
-			hItem.mon.buffids[buff.dwID] = Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13
+		if not hItem.mon.ids[buff.dwID] then
+			hItem.mon.ids[buff.dwID] = Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13
 		end
 	else
 		hItem.box:SetCoolDownPercentage(0)
@@ -406,7 +406,7 @@ local function UpdateItem(hItem, KTarget, buff, szBuffName, tItem, config, nFram
 			hItem.box:SetObjectSparking(true)
 			hItem.nSparkingFrame = nFrameCount
 		-- 如果勾选隐藏不存在的BUFF 且 当前未隐藏 且 (目标改变过 或 刷新动画没有在播放) 则隐藏
-		elseif config.hideVoidBuff and hItem:IsVisible()
+		elseif config.hideVoid and hItem:IsVisible()
 		and (targetChanged or not hItem.nSparkingFrame or nFrameCount - hItem.nSparkingFrame <= BOX_SPARKING_FRAME) then
 			hItem:Hide()
 			hItem.nSparkingFrame = nil
@@ -529,101 +529,82 @@ RegisterCustomData("MY_BuffMonT.anchor")
 RegisterCustomData("MY_BuffMonT.tBuffList")
 local function OnInit()
 	local data = MY.LoadLUAData(DEFAULT_CONFIG_FILE)
-	Config = MY.LoadLUAData(ROLE_CONFIG_FILE) or data.default
-	if MY_BuffMonS.tBuffList then
-		if not Config[1] then
-			Config[1] = clone(data.template)
-		end
-		Config[1].caption      = _L['mingyi self buff monitor']
-		Config[1].target       = "CLIENT_PLAYER"
-		Config[1].scale        = MY_BuffMonS.fScale
-		Config[1].enable       = MY_BuffMonS.bEnable
-		Config[1].dragable     = MY_BuffMonS.bDragable
-		Config[1].hideOthers   = MY_BuffMonS.bHideOthers
-		Config[1].maxLineCount = MY_BuffMonS.nMaxLineCount
-		Config[1].hideVoidBuff = MY_BuffMonS.bHideVoidBuff
-		Config[1].cdBar        = MY_BuffMonS.bCDBar
-		Config[1].cdBarWidth   = MY_BuffMonS.nCDWidth
-		Config[1].cdBarUITex   = MY_BuffMonS.szCDUITex
-		Config[1].showBuffName = MY_BuffMonS.bSkillName
-		Config[1].boxBgUITex   = "UI/Image/Common/Box.UITex|44"
-		Config[1].anchor       = MY_BuffMonS.anchor
-		Config[1].monitors     = {}
-		for kungfuid, mons in pairs(MY_BuffMonS.tBuffList) do
-			Config[1].monitors[kungfuid] = {}
-			for _, mon in ipairs(mons) do
-				if mon[4] == -1 then
-					mon[4] = 'common'
+	local OLD_PATH = {'config/my_buffmon.jx3dat', MY_DATA_PATH.ROLE}
+	local SZ_OLD_PATH = MY.FormatPath(OLD_PATH)
+	if IsLocalFileExist(SZ_OLD_PATH) then
+		Config = MY.LoadLUAData(OLD_PATH)
+		CPath.DelFile(SZ_OLD_PATH)
+		if Config then
+			for _, config in ipairs(Config) do
+				for kungfuid, monitors in pairs(config.monitors) do
+					for _, mon in ipairs(monitors) do
+						mon.name, mon.buffname = mon.buffname, nil
+						mon.id  , mon.buffid   = mon.buffid  , nil
+						mon.ids , mon.buffids  = mon.buffids , nil
+					end
 				end
-				if mon[5] and mon[5][-1] then
-					mon[5]['common'], mon[5][-1] = mon[5][-1]
-				end
-				table.insert(Config[1].monitors[kungfuid], {
-					enable = mon[1], iconid = mon[2],
-					buffname = mon[3], buffid = mon[4], buffids = mon[5]
-				})
+				config.showName, config.showBuffName = config.showBuffName, nil
 			end
+		else
+			Config = MY.LoadLUAData(ROLE_CONFIG_FILE) or data.default
 		end
-		MY_BuffMonS.fScale        = nil
-		MY_BuffMonS.bEnable       = nil
-		MY_BuffMonS.bDragable     = nil
-		MY_BuffMonS.bHideOthers   = nil
-		MY_BuffMonS.nMaxLineCount = nil
-		MY_BuffMonS.bHideVoidBuff = nil
-		MY_BuffMonS.bCDBar        = nil
-		MY_BuffMonS.nCDWidth      = nil
-		MY_BuffMonS.szCDUITex     = nil
-		MY_BuffMonS.bSkillName    = nil
-		MY_BuffMonS.anchor        = nil
-		MY_BuffMonS.tBuffList     = nil
+	else
+		Config = MY.LoadLUAData(ROLE_CONFIG_FILE) or data.default
 	end
-	if MY_BuffMonT.tBuffList then
-		if not Config[2] then
-			Config[2] = clone(data.template)
-		end
-		Config[2].caption      = _L['mingyi target buff monitor']
-		Config[2].target       = "TARGET"
-		Config[2].scale        = MY_BuffMonT.fScale
-		Config[2].enable       = MY_BuffMonT.bEnable
-		Config[2].dragable     = MY_BuffMonT.bDragable
-		Config[2].hideOthers   = MY_BuffMonT.bHideOthers
-		Config[2].maxLineCount = MY_BuffMonT.nMaxLineCount
-		Config[2].hideVoidBuff = MY_BuffMonT.bHideVoidBuff
-		Config[2].cdBar        = MY_BuffMonT.bCDBar
-		Config[2].cdBarWidth   = MY_BuffMonT.nCDWidth
-		Config[2].cdBarUITex   = MY_BuffMonT.szCDUITex
-		Config[2].showBuffName = MY_BuffMonT.bSkillName
-		Config[2].boxBgUITex   = "UI/Image/Common/Box.UITex|44"
-		Config[2].anchor       = MY_BuffMonT.anchor
-		Config[2].monitors     = {}
-		for kungfuid, mons in pairs(MY_BuffMonT.tBuffList) do
-			Config[2].monitors[kungfuid] = {}
-			for _, mon in ipairs(mons) do
-				if mon[4] == -1 then
-					mon[4] = 'common'
-				end
-				if mon[5] and mon[5][-1] then
-					mon[5]['common'], mon[5][-1] = mon[5][-1]
-				end
-				table.insert(Config[2].monitors[kungfuid], {
-					enable = mon[1], iconid = mon[2],
-					buffname = mon[3], buffid = mon[4], buffids = mon[5]
-				})
+	for _, p in ipairs({
+		{ OBJ = MY_BuffMonS, index = 1, title = _L['mingyi self buff monitor'], target = 'CLIENT_PLAYER' },
+		{ OBJ = MY_BuffMonT, index = 2, title = _L['mingyi target buff monitor'], target = 'TARGET' },
+	}) do
+		local OBJ, index = p.OBJ, p.index
+		if OBJ and OBJ.tBuffList then
+			if not Config[index] then
+				Config[index] = clone(data.template)
 			end
+			Config[index].caption      = p.title
+			Config[index].type         = 'BUFF'
+			Config[index].target       = p.target
+			Config[index].scale        = OBJ.fScale
+			Config[index].enable       = OBJ.bEnable
+			Config[index].dragable     = OBJ.bDragable
+			Config[index].hideOthers   = OBJ.bHideOthers
+			Config[index].maxLineCount = OBJ.nMaxLineCount
+			Config[index].hideVoid     = OBJ.bHideVoidBuff
+			Config[index].cdBar        = OBJ.bCDBar
+			Config[index].cdBarWidth   = OBJ.nCDWidth
+			Config[index].cdBarUITex   = OBJ.szCDUITex
+			Config[index].showName     = OBJ.bSkillName
+			Config[index].boxBgUITex   = "UI/Image/Common/Box.UITex|44"
+			Config[index].anchor       = OBJ.anchor
+			Config[index].monitors     = {}
+			for kungfuid, mons in pairs(OBJ.tBuffList) do
+				Config[index].monitors[kungfuid] = {}
+				for _, mon in ipairs(mons) do
+					if mon[4] == -1 then
+						mon[4] = 'common'
+					end
+					if mon[5] and mon[5][-1] then
+						mon[5]['common'], mon[5][-1] = mon[5][-1]
+					end
+					table.insert(Config[index].monitors[kungfuid], {
+						enable = mon[1], iconid = mon[2],
+						name = mon[3], id = mon[4], ids = mon[5]
+					})
+				end
+			end
+			OBJ.fScale        = nil
+			OBJ.bEnable       = nil
+			OBJ.bDragable     = nil
+			OBJ.bHideOthers   = nil
+			OBJ.nMaxLineCount = nil
+			OBJ.bHideVoidBuff = nil
+			OBJ.bCDBar        = nil
+			OBJ.nCDWidth      = nil
+			OBJ.szCDUITex     = nil
+			OBJ.bSkillName    = nil
+			OBJ.anchor        = nil
+			OBJ.tBuffList     = nil
 		end
 	end
-	MY_BuffMonT.fScale        = nil
-	MY_BuffMonT.bEnable       = nil
-	MY_BuffMonT.bDragable     = nil
-	MY_BuffMonT.bHideOthers   = nil
-	MY_BuffMonT.nMaxLineCount = nil
-	MY_BuffMonT.bHideVoidBuff = nil
-	MY_BuffMonT.bCDBar        = nil
-	MY_BuffMonT.nCDWidth      = nil
-	MY_BuffMonT.szCDUITex     = nil
-	MY_BuffMonT.bSkillName    = nil
-	MY_BuffMonT.anchor        = nil
-	MY_BuffMonT.tBuffList     = nil
 	-- 加载界面
 	RecreateAllPanel()
 	ConfigTemplate = data.template
@@ -648,14 +629,14 @@ for i = 1, 5 do
 				return OutputMessage("MSG_ANNOUNCE_YELLOW", _L['Cancel buff is disabled in arena.'])
 			end
 			local config = Config[i]
-			if not config then
+			if not config or config.type ~= 'BUFF' then
 				return
 			end
 			local frame = l_frames[config]
 			if not frame then
 				return
 			end
-			local hItem = frame:Lookup("", "Handle_BuffList"):Lookup(j - 1)
+			local hItem = frame:Lookup("", "Handle_List"):Lookup(j - 1)
 			if not hItem then
 				return
 			end
@@ -663,7 +644,7 @@ for i = 1, 5 do
 			if not KTarget then
 				return
 			end
-			MY.CancelBuff(KTarget, hItem.mon.buffid == 'common' and hItem.mon.buffname or hItem.mon.buffid)
+			MY.CancelBuff(KTarget, hItem.mon.id == 'common' and hItem.mon.name or hItem.mon.id)
 		end, nil)
 		title = ""
 	end
@@ -762,18 +743,21 @@ local function GenePS(ui, config, x, y, w, h)
 			config.hideOthers = bChecked
 			RecreatePanel(config)
 		end,
+		autoenable = function()
+			return config.type == 'BUFF'
+		end,
 	})
 
 	ui:append("WndComboBox", {
 		x = w - 250, y = y, w = 135,
-		text = _L['set buff monitor'],
+		text = _L['set monitor'],
 		menu = function()
 			local dwKungFuID = GetClientPlayer().GetKungfuMount().dwSkillID
 			local t = {{
 				szOption = _L['add'],
 				fnAction = function()
 					local function Next(kungfuid)
-						GetUserInput(_L['please input buff name:'], function(szVal)
+						GetUserInput(_L['please input name:'], function(szVal)
 							szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
 							if szVal ~= "" then
 								if not config.monitors[kungfuid] then
@@ -782,8 +766,8 @@ local function GenePS(ui, config, x, y, w, h)
 								table.insert(config.monitors[kungfuid], {
 									enable = true,
 									iconid = 13,
-									buffid = tonumber(szVal) or nil,
-									buffname = not tonumber(szVal) and szVal or nil,
+									id = tonumber(szVal) or nil,
+									name = not tonumber(szVal) and szVal or nil,
 								})
 								RecreatePanel(config)
 							end
@@ -795,7 +779,7 @@ local function GenePS(ui, config, x, y, w, h)
 			}}
 			local function InsertMenu(mon, monlist)
 				local t1 = {
-					szOption = mon.buffname or mon.buffid,
+					szOption = mon.name or mon.id,
 					bCheck = true, bChecked = mon.enable,
 					fnAction = function()
 						mon.enable = not mon.enable
@@ -821,25 +805,25 @@ local function GenePS(ui, config, x, y, w, h)
 				table.insert(t1, {
 					szOption = _L['rename'],
 					fnAction = function()
-						GetUserInput(_L['please input buff name:'], function(szVal)
+						GetUserInput(_L['please input name:'], function(szVal)
 							szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
 							if szVal ~= "" then
-								mon.buffname = szVal
+								mon.name = szVal
 								RecreatePanel(config)
 							end
-						end, function() end, function() end, nil, mon.buffname)
+						end, function() end, function() end, nil, mon.name)
 					end,
 				})
-				if mon.buffids then
+				if mon.ids then
 					table.insert(t1, { bDevide = true })
-					local function InsertMenuBuff(dwBuffID, dwIcon)
+					local function InsertMenuID(dwID, dwIcon)
 						table.insert(t1, {
-							szOption = dwBuffID == "common" and _L['all buffid'] or dwBuffID,
+							szOption = dwID == "common" and _L['all ids'] or dwID,
 							bCheck = true, bMCheck = true,
-							bChecked = dwBuffID == mon.buffid or (dwBuffID == "common" and mon.buffid == nil),
+							bChecked = dwID == mon.id or (dwID == "common" and mon.id == nil),
 							fnAction = function()
 								mon.iconid = dwIcon
-								mon.buffid = dwBuffID
+								mon.id = dwID
 								RecreatePanel(config)
 							end,
 							szIcon = "fromiconid",
@@ -849,8 +833,8 @@ local function GenePS(ui, config, x, y, w, h)
 							szLayer = "ICON_RIGHTMOST",
 							fnClickIcon = function()
 								XGUI.OpenIconPanel(function(dwIcon)
-									mon.buffids[dwBuffID] = dwIcon
-									if mon.buffid == dwBuffID then
+									mon.ids[dwID] = dwIcon
+									if mon.id == dwID then
 										mon.iconid = dwIcon
 										RecreatePanel(config)
 									end
@@ -859,27 +843,27 @@ local function GenePS(ui, config, x, y, w, h)
 							end,
 						})
 					end
-					InsertMenuBuff('common', mon.buffids.common or mon.iconid or 13)
-					for dwBuffID, dwIcon in pairs(mon.buffids) do
-						if dwBuffID ~= "common" then
-							InsertMenuBuff(dwBuffID, dwIcon)
+					InsertMenuID('common', mon.ids.common or mon.iconid or 13)
+					for dwID, dwIcon in pairs(mon.ids) do
+						if dwID ~= "common" then
+							InsertMenuID(dwID, dwIcon)
 						end
 					end
 				end
 				table.insert(t, t1)
 			end
-			local tBuffMonList = config.monitors.common
-			if tBuffMonList and #tBuffMonList > 0 then
+			local tMonList = config.monitors.common
+			if tMonList and #tMonList > 0 then
 				table.insert(t, { bDevide = true })
-				for i, mon in ipairs(tBuffMonList) do
-					InsertMenu(mon, tBuffMonList)
+				for i, mon in ipairs(tMonList) do
+					InsertMenu(mon, tMonList)
 				end
 			end
-			local tBuffMonList = config.monitors[GetClientPlayer().GetKungfuMount().dwSkillID]
-			if tBuffMonList and #tBuffMonList > 0 then
+			local tMonList = config.monitors[GetClientPlayer().GetKungfuMount().dwSkillID]
+			if tMonList and #tMonList > 0 then
 				table.insert(t, { bDevide = true })
-				for i, mon in ipairs(tBuffMonList) do
-					InsertMenu(mon, tBuffMonList)
+				for i, mon in ipairs(tMonList) do
+					InsertMenu(mon, tMonList)
 				end
 			end
 			return t
@@ -918,10 +902,10 @@ local function GenePS(ui, config, x, y, w, h)
 	
 	ui:append("WndCheckBox", {
 		x = x + 120, y = y, w = 200,
-		text = _L['hide void buff'],
-		checked = config.hideVoidBuff,
+		text = _L['hide void'],
+		checked = config.hideVoid,
 		oncheck = function(bChecked)
-			config.hideVoidBuff = bChecked
+			config.hideVoid = bChecked
 			RecreatePanel(config)
 		end,
 	})
@@ -951,10 +935,10 @@ local function GenePS(ui, config, x, y, w, h)
 	
 	ui:append("WndCheckBox", {
 		x = x + 120, y = y, w = 120,
-		text = _L['show buff name'],
-		checked = config.showBuffName,
+		text = _L['show name'],
+		checked = config.showName,
 		oncheck = function(bCheck)
-			config.showBuffName = bCheck
+			config.showName = bCheck
 			RecreatePanel(config)
 		end,
 	})
