@@ -49,4 +49,5 @@ data = {
     ['Cancel buff %d - %d'] = '取消BUFF %d - %d',
     ['Move Up'] = '上移',
     ['Move Down'] = '下移',
+    ['Cancel buff is disabled in arena.'] = '競技場中禁止使用取消BUFF快捷鍵功能！',
 }
