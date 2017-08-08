@@ -81,7 +81,7 @@ local TARGET_TYPE_LIST = {
 	"TEAM_MARK_FAN"  ,
 }
 local Config = {}
-local BOX_SPARKING_FRAME = GLOBAL.GAME_FPS
+local BOX_SPARKING_FRAME = GLOBAL.GAME_FPS * 2 / 3
 
 ----------------------------------------------------------------------------------------------
 -- 通用逻辑
@@ -442,7 +442,7 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 			hItem.nSparkingFrame = nFrameCount
 		-- 如果勾选隐藏不存在的BUFF 且 当前未隐藏 且 (目标改变过 或 刷新动画没有在播放) 则隐藏
 		elseif config.hideVoid and hItem:IsVisible()
-		and (targetChanged or not hItem.nSparkingFrame or nFrameCount - hItem.nSparkingFrame <= BOX_SPARKING_FRAME) then
+		and (targetChanged or not hItem.nSparkingFrame or nFrameCount - hItem.nSparkingFrame > BOX_SPARKING_FRAME) then
 			hItem:Hide()
 			hItem.nSparkingFrame = nil
 			needFormatItemPos = true
@@ -510,7 +510,7 @@ function FE.OnFrameBreathe()
 				local bFind = false
 				for dwSkillID, dwIcon in pairs(hItem.mon.ids) do
 					local dwLevel = KTarget.GetSkillLevel(dwSkillID)
-					local bCool, nLeft, nTotal, nCDCount, bPublicCD = KTarget.GetSkillCDProgress(dwSkillID, dwLevel)
+					local bCool, nLeft, nTotal, nCDCount, bPublicCD = KTarget.GetSkillCDProgress(dwSkillID, dwLevel, 444)
 					if bCool and nLeft ~= 0 and nTotal ~= 0 and not bPublicCD then
 						bFind = true
 						UpdateItem(hItem, KTarget, dwSkillID, dwLevel, this.tItem, config, nFrameCount, targetChanged, dwID)
@@ -547,20 +547,27 @@ function FE.OnEvent(event)
 			-- (arg1)dwCaster：技能施放者 (arg2)dwSkillID：技能ID (arg3)dwLevel：技能等级
 			-- MY_Recount.OnSkillCast(arg1, arg2, arg3)
 			if arg1 == this.dwID then
-				local szName = Table_GetSkillName(arg2, arg3)
-				for _, p in ipairs(this.config.monitors.common) do
-					if p.name == szName then
-						if not p.ids[arg2] then
-							p.ids[arg2] = Table_GetSkillIconID(arg2, arg3)
+				local dwID, dwLevel = arg2, arg3
+				local tItems = this.tItem[dwID]
+				if tItems then
+					for hItem, _ in pairs(tItems) do
+						if not hItem.mon.ids[dwID] then
+							if not hItem.mon.iconid or hItem.mon.iconid == 13 then
+								hItem.mon.iconid = Table_GetSkillIconID(dwID, dwLevel)
+							end
+							hItem.mon.ids[dwID] = Table_GetSkillIconID(dwID, dwLevel)
 						end
 					end
 				end
-				if GetClientPlayer() then
-					for _, p in ipairs(this.config.monitors[GetClientPlayer().GetKungfuMount().dwSkillID]) do
-						if p.name == szName then
-							if not p.ids[arg2] then
-								p.ids[arg2] = Table_GetSkillIconID(arg2, arg3)
+				local szName = Table_GetSkillName(dwID, dwLevel)
+				local tItems = this.tItem[szName]
+				if tItems then
+					for hItem, _ in pairs(tItems) do
+						if not hItem.mon.ids[dwID] then
+							if not hItem.mon.iconid or hItem.mon.iconid == 13 then
+								hItem.mon.iconid = Table_GetSkillIconID(dwID, dwLevel)
 							end
+							hItem.mon.ids[dwID] = Table_GetSkillIconID(dwID, dwLevel)
 						end
 					end
 				end
@@ -582,6 +589,17 @@ end
 ----------------------------------------------------------------------------------------------
 -- 数据存储
 ----------------------------------------------------------------------------------------------
+local function UpdateConfigDataVersion(config)
+	for kungfuid, monitors in pairs(config.monitors) do
+		for _, mon in ipairs(monitors) do
+			mon.name, mon.buffname = mon.name or mon.buffname, nil
+			mon.id  , mon.buffid   = mon.id   or mon.buffid  , nil
+			mon.ids , mon.buffids  = mon.ids  or mon.buffids , nil
+		end
+	end
+	config.type = config.type or 'BUFF'
+	config.showName, config.showBuffName = config.showName or config.showBuffName, nil
+end
 do
 MY_BuffMonS = {}
 RegisterCustomData("MY_BuffMonS.fScale")
@@ -618,15 +636,7 @@ local function OnInit()
 		CPath.DelFile(SZ_OLD_PATH)
 		if Config then
 			for _, config in ipairs(Config) do
-				for kungfuid, monitors in pairs(config.monitors) do
-					for _, mon in ipairs(monitors) do
-						mon.name, mon.buffname = mon.buffname, nil
-						mon.id  , mon.buffid   = mon.buffid  , nil
-						mon.ids , mon.buffids  = mon.buffids , nil
-					end
-				end
-				config.type = 'BUFF'
-				config.showName, config.showBuffName = config.showBuffName, nil
+				UpdateConfigDataVersion(config)
 			end
 		else
 			Config = MY.LoadLUAData(ROLE_CONFIG_FILE) or data.default
@@ -1160,6 +1170,7 @@ function PS.OnPanelActive(wnd)
 				local config = str2var(szVal)
 				if config then
 					config = MY.FormatDataStructure(config, ConfigTemplate, 1)
+					UpdateConfigDataVersion(config)
 					table.insert(Config, config)
 					RecreatePanel(config)
 					MY.SwitchTab("MY_TargetMon", true)
