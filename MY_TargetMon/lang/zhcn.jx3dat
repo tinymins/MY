@@ -34,6 +34,10 @@ data = {
         ["TEAM_MARK_DART" ] = "团队标记 - 飞镖",
         ["TEAM_MARK_FAN"  ] = "团队标记 - 扇子",
     },
+    ['TYPE'] = {
+        ['BUFF' ] = 'BUFF监控',
+        ['SKILL'] = '技能CD监控',
+    },
     ['Export'] = '导出',
     ['Delete'] = '删除',
     ['Create'] = '创建',
