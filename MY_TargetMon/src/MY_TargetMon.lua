@@ -158,6 +158,7 @@ local function RecreatePanel(config)
 			frame[k] = v
 		end
 		frame:RegisterEvent("HOT_KEY_RELOADED")
+		frame:RegisterEvent("SYS_MSG")
 		frame:RegisterEvent("SKILL_MOUNT_KUNG_FU")
 		frame:RegisterEvent("ON_ENTER_CUSTOM_UI_MODE")
 		frame:RegisterEvent("ON_LEAVE_CUSTOM_UI_MODE")
@@ -219,6 +220,30 @@ local function RecreatePanel(config)
 		box:SetOverTextFontScheme(2, 7)
 		-- Box背景图
 		XGUI(imgBoxBg):image(config.boxBgUITex)
+		
+		if config.type == 'SKILL' then
+			box.__SetCoolDownPercentage = box.SetCoolDownPercentage
+			box.SetCoolDownPercentage = function(box, fPercent, ...)
+				imgProcess:SetPercentage(1 - fPercent)
+				box:__SetCoolDownPercentage(fPercent, ...)
+			end
+			box.__SetObjectCoolDown = box.SetObjectCoolDown
+			box.SetObjectCoolDown = function(box, bCool, ...)
+				imgProcess:SetVisible(bCool)
+				box:__SetObjectCoolDown(bCool, ...)
+			end
+			box.__SetOverText = box.SetOverText
+			box.SetOverText = function(box, nIndex, szText, ...)
+				if nIndex == 3 then
+					if szText == '' then
+						txtProcess:SetText('')
+					else
+						txtProcess:SetText(szText .. "'")
+					end
+				end
+				box:__SetOverText(nIndex, szText, ...)
+			end
+		end
 		
 		-- 倒计时条
 		if config.cdBar then
@@ -318,8 +343,8 @@ end
 do
 local needFormatItemPos
 local l_tBuffTime = setmetatable({}, { __mode = "v" })
-local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCount, targetChanged)
-	if buff then
+local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCount, targetChanged, dwOwnerID)
+	if config.type == 'BUFF' and buff then
 		if not hItem.mon.id or hItem.mon.id == 'common' or hItem.mon.id == buff.dwID then
 			if hItem.nRenderFrame == nFrameCount then
 				return
@@ -387,18 +412,28 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 			hItem.nRenderFrame = nFrameCount
 		end
 		-- 加入同名BUFF列表
-		if not hItem.mon.ids then
-			hItem.mon.ids = {}
-		end
 		if not hItem.mon.ids[buff.dwID] then
 			hItem.mon.ids[buff.dwID] = Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13
 		end
+	elseif config.type == 'SKILL' and buff and szName then
+		if config.hideVoid and not hItem:IsVisible() then
+			needFormatItemPos = true
+			hItem:Show()
+		end
+		local dwID, dwLevel = buff, szName
+		UpdateBoxObject(hItem.box, UI_OBJECT.SKILL, dwID, dwLevel, dwOwnerID)
+		hItem.nRenderFrame = nFrameCount
 	else
-		hItem.box:SetCoolDownPercentage(0)
-		hItem.box:SetObjectStaring(false)
-		hItem.box:SetOverText(0, "")
-		hItem.box:SetOverText(1, "")
-		hItem.box:ClearExtentAnimate()
+		if config.type == 'BUFF' then
+			hItem.box:SetCoolDownPercentage(0)
+			hItem.box:SetObjectStaring(false)
+			hItem.box:SetOverText(0, "")
+			hItem.box:SetOverText(1, "")
+			hItem.box:ClearExtentAnimate()
+		elseif config.type == 'SKILL' then
+			hItem.box:SetOverText(3, "")
+			hItem.box:SetObjectCoolDown(false)
+		end
 		hItem.txtProcess:SetText("")
 		hItem.imgProcess:SetPercentage(0)
 		-- 如果目标没有改变过 且 之前存在 则显示刷新动画
@@ -434,39 +469,58 @@ function FE.OnFrameBreathe()
 			UpdateItem(hList:Lookup(i), KTarget, nil, nil, this.tItem, config, nFrameCount, targetChanged)
 		end
 	else
-		-- BUFF最大时间缓存
-		if not l_tBuffTime[KTarget.dwID] then
-			l_tBuffTime[KTarget.dwID] = {}
-		end
-		-- 更新当前存在的BUFF列表
-		local dwClientPlayerID  = UI_GetClientPlayerID()
-		local dwControlPlayerID = GetControlPlayerID()
-		for _, buff in ipairs(MY.GetBuffList(KTarget)) do
-			if not config.hideOthers or buff.dwSkillSrcID == dwClientPlayerID or buff.dwSkillSrcID == dwControlPlayerID then
-				local szName = Table_GetBuffName(buff.dwID, buff.nLevel) or ""
-				local tItems = this.tItem[buff.dwID]
-				if tItems then
-					for hItem, _ in pairs(tItems) do
-						UpdateItem(hItem, KTarget, buff, szName, this.tItem, config, nFrameCount, targetChanged)
+		if config.type == 'BUFF' then
+			-- BUFF最大时间缓存
+			if not l_tBuffTime[KTarget.dwID] then
+				l_tBuffTime[KTarget.dwID] = {}
+			end
+			-- 更新当前存在的BUFF列表
+			local dwClientPlayerID  = UI_GetClientPlayerID()
+			local dwControlPlayerID = GetControlPlayerID()
+			for _, buff in ipairs(MY.GetBuffList(KTarget)) do
+				if not config.hideOthers or buff.dwSkillSrcID == dwClientPlayerID or buff.dwSkillSrcID == dwControlPlayerID then
+					local szName = Table_GetBuffName(buff.dwID, buff.nLevel) or ""
+					local tItems = this.tItem[buff.dwID]
+					if tItems then
+						for hItem, _ in pairs(tItems) do
+							UpdateItem(hItem, KTarget, buff, szName, this.tItem, config, nFrameCount, targetChanged)
+						end
 					end
-				end
-				local tItems = this.tItem[szName]
-				if tItems then
-					for hItem, _ in pairs(tItems) do
-						UpdateItem(hItem, KTarget, buff, szName, this.tItem, config, nFrameCount, targetChanged)
+					local tItems = this.tItem[szName]
+					if tItems then
+						for hItem, _ in pairs(tItems) do
+							UpdateItem(hItem, KTarget, buff, szName, this.tItem, config, nFrameCount, targetChanged)
+						end
 					end
 				end
 			end
-		end
-		-- 更新消失的BUFF列表
-		for i = 0, hList:GetItemCount() - 1 do
-			if hList:Lookup(i).nRenderFrame ~= nFrameCount then
-				UpdateItem(hList:Lookup(i), KTarget, nil, nil, this.tItem, config, nFrameCount, targetChanged)
+			-- 更新消失的BUFF列表
+			for i = 0, hList:GetItemCount() - 1 do
+				if hList:Lookup(i).nRenderFrame ~= nFrameCount then
+					UpdateItem(hList:Lookup(i), KTarget, nil, nil, this.tItem, config, nFrameCount, targetChanged)
+				end
 			end
-		end
-		-- 防止CD过程中table被GC回收
-		if targetChanged then
-			this.tBuffTime = l_tBuffTime[KTarget.dwID]
+			-- 防止CD过程中table被GC回收
+			if targetChanged then
+				this.tBuffTime = l_tBuffTime[KTarget.dwID]
+			end
+		elseif config.type == 'SKILL' then
+			for i = 0, hList:GetItemCount() - 1 do
+				local hItem = hList:Lookup(i)
+				local bFind = false
+				for dwSkillID, dwIcon in pairs(hItem.mon.ids) do
+					local dwLevel = KTarget.GetSkillLevel(dwSkillID)
+					local bCool, nLeft, nTotal, nCDCount, bPublicCD = KTarget.GetSkillCDProgress(dwSkillID, dwLevel)
+					if bCool and nLeft ~= 0 and nTotal ~= 0 and not bPublicCD then
+						bFind = true
+						UpdateItem(hItem, KTarget, dwSkillID, dwLevel, this.tItem, config, nFrameCount, targetChanged, dwID)
+						break
+					end
+				end
+				if not bFind then
+					UpdateItem(hItem, KTarget, nil, nil, this.tItem, config, nFrameCount, targetChanged, dwID)
+				end
+			end
 		end
 		-- 检查是否需要重绘界面坐标
 		if needFormatItemPos then
@@ -484,6 +538,34 @@ end
 function FE.OnEvent(event)
 	if event == "HOT_KEY_RELOADED" then
 		UpdateHotkey(this)
+	elseif event == "SYS_MSG" then
+		if this.config.type ~= 'SKILL' then
+			return
+		end
+		if arg0 == "UI_OME_SKILL_CAST_LOG" then
+			-- 技能施放日志；
+			-- (arg1)dwCaster：技能施放者 (arg2)dwSkillID：技能ID (arg3)dwLevel：技能等级
+			-- MY_Recount.OnSkillCast(arg1, arg2, arg3)
+			if arg1 == this.dwID then
+				local szName = Table_GetSkillName(arg2, arg3)
+				for _, p in ipairs(this.config.monitors.common) do
+					if p.name == szName then
+						if not p.ids[arg2] then
+							p.ids[arg2] = Table_GetSkillIconID(arg2, arg3)
+						end
+					end
+				end
+				if GetClientPlayer() then
+					for _, p in ipairs(this.config.monitors[GetClientPlayer().GetKungfuMount().dwSkillID]) do
+						if p.name == szName then
+							if not p.ids[arg2] then
+								p.ids[arg2] = Table_GetSkillIconID(arg2, arg3)
+							end
+						end
+					end
+				end
+			end
+		end
 	elseif event == "SKILL_MOUNT_KUNG_FU" then
 		RecreatePanel(this.config)
 	elseif event == "ON_ENTER_CUSTOM_UI_MODE" then
@@ -604,6 +686,15 @@ local function OnInit()
 			OBJ.bSkillName    = nil
 			OBJ.anchor        = nil
 			OBJ.tBuffList     = nil
+		end
+	end
+	for _, config in ipairs(Config) do
+		for _, monitors in pairs(config.monitors) do
+			for _, mon in ipairs(monitors) do
+				if not mon.ids then
+					mon.ids = {}
+				end
+			end
 		end
 	end
 	-- 加载界面
@@ -768,6 +859,7 @@ local function GenePS(ui, config, x, y, w, h)
 									enable = true,
 									iconid = 13,
 									id = tonumber(szVal) or nil,
+									ids = {},
 									name = not tonumber(szVal) and szVal or nil,
 								})
 								RecreatePanel(config)
@@ -815,7 +907,7 @@ local function GenePS(ui, config, x, y, w, h)
 						end, function() end, function() end, nil, mon.name)
 					end,
 				})
-				if mon.ids then
+				if not empty(mon.ids) then
 					table.insert(t1, { bDevide = true })
 					local function InsertMenuID(dwID, dwIcon)
 						table.insert(t1, {
@@ -879,9 +971,20 @@ local function GenePS(ui, config, x, y, w, h)
 			for _, eType in ipairs(TARGET_TYPE_LIST) do
 				table.insert(t, {
 					szOption = _L.TARGET[eType],
-					rgb = eType == config.target and {255, 255, 0} or nil,
+					bCheck = true, bMCheck = true, bChecked = eType == config.target,
 					fnAction = function()
 						config.target = eType
+						RecreatePanel(config)
+					end,
+				})
+			end
+			table.insert(t, { bDevide = true })
+			for _, eType in ipairs({'BUFF', 'SKILL'}) do
+				table.insert(t, {
+					szOption = _L.TYPE[eType],
+					bCheck = true, bMCheck = true, bChecked = eType == config.type,
+					fnAction = function()
+						config.type = eType
 						RecreatePanel(config)
 					end,
 				})
