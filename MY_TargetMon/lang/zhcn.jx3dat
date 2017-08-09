@@ -54,4 +54,6 @@ data = {
     ['Move Up'] = '上移',
     ['Move Down'] = '下移',
     ['Cancel buff is disabled outside dungeon.'] = '取消BUFF快捷键仅在副本内可用',
+    ['Please input id:'] = '请输入ID：',
+    ['Manual add id'] = '手动添加ID',
 }
