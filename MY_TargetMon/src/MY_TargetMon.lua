@@ -608,6 +608,17 @@ local function UpdateConfigDataVersion(config)
 	config.type = config.type or 'BUFF'
 	config.showName, config.showBuffName = config.showName or config.showBuffName, nil
 end
+local function UpdateConfigCalcProps(Config)
+	for _, config in ipairs(Config) do
+		for _, monitors in pairs(config.monitors) do
+			for _, mon in ipairs(monitors) do
+				if not mon.ids then
+					mon.ids = {}
+				end
+			end
+		end
+	end
+end
 do
 MY_BuffMonS = {}
 RegisterCustomData("MY_BuffMonS.fScale")
@@ -706,15 +717,7 @@ local function OnInit()
 			OBJ.tBuffList     = nil
 		end
 	end
-	for _, config in ipairs(Config) do
-		for _, monitors in pairs(config.monitors) do
-			for _, mon in ipairs(monitors) do
-				if not mon.ids then
-					mon.ids = {}
-				end
-			end
-		end
-	end
+	UpdateConfigCalcProps(Config)
 	-- º”‘ÿΩÁ√Ê
 	RecreateAllPanel()
 	ConfigTemplate = data.template
@@ -923,6 +926,30 @@ local function GenePS(ui, config, x, y, w, h)
 								RecreatePanel(config)
 							end
 						end, function() end, function() end, nil, mon.name)
+					end,
+				})
+				table.insert(t1, {
+					szOption = _L['Manual add id'],
+					fnAction = function()
+						GetUserInput(_L['Please input id:'], function(szVal)
+							local nVal = tonumber(string.gsub(szVal, "^%s*(.-)%s*$", "%1"), 10)
+							if nVal then
+								for id, _ in pairs(mon.ids) do
+									if id == nVal then
+										return
+									end
+								end
+								local dwIconID = 13
+								if config.type == "SKILL" then
+									local dwLevel = GetClientPlayer().GetSkillLevel(nVal) or 1
+									dwIconID = Table_GetSkillIconID(nVal, dwLevel) or dwIconID
+								else
+									dwIconID = Table_GetBuffIconID(nVal, 1) or 13
+								end
+								mon.ids[nVal] = dwIconID
+								RecreatePanel(config)
+							end
+						end, function() end, function() end, nil, nil)
 					end,
 				})
 				if not empty(mon.ids) then
@@ -1198,6 +1225,7 @@ function PS.OnPanelActive(wnd)
 			MY.Confirm(_L['Sure to reset default?'], function()
 				ClosePanel('all')
 				Config = MY.LoadLUAData(DEFAULT_CONFIG_FILE).default
+				UpdateConfigCalcProps(Config)
 				RecreateAllPanel()
 				MY.SwitchTab("MY_TargetMon", true)
 			end)
