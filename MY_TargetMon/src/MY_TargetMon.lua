@@ -317,22 +317,22 @@ local TEAM_MARK = {
 	["TEAM_MARK_DART" ] = 9,
 	["TEAM_MARK_FAN"  ] = 10,
 }
-local function GetTarget(eType)
-	if eType == "CLIENT_PLAYER" then
-		return TARGET.PLAYER, UI_GetClientPlayerID()
-	elseif eType == "CONTROL_PLAYER" then
+local function GetTarget(eTarType, eMonType)
+	if eMonType == "SKILL" or eTarType == "CONTROL_PLAYER" then
 		return TARGET.PLAYER, GetControlPlayerID()
-	elseif eType == "TARGET" then
+	elseif eTarType == "CLIENT_PLAYER" then
+		return TARGET.PLAYER, UI_GetClientPlayerID()
+	elseif eTarType == "TARGET" then
 		return MY.GetTarget()
-	elseif eType == "TTARGET" then
+	elseif eTarType == "TTARGET" then
 		local KTarget = MY.GetObject(MY.GetTarget())
 		if KTarget then
 			return MY.GetTarget(KTarget)
 		end
-	elseif TEAM_MARK[eType] then
+	elseif TEAM_MARK[eTarType] then
 		local mark = GetClientTeam().GetTeamMark()
 		for dwID, nMark in pairs(mark) do
-			if TEAM_MARK[eType] == nMark then
+			if TEAM_MARK[eTarType] == nMark then
 				return TARGET[IsPlayer(dwID) and "PLAYER" or "NPC"], dwID
 			end
 		end
@@ -452,7 +452,7 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 	end
 end
 function FE.OnFrameBreathe()
-	local dwType, dwID = GetTarget(this.config.target)
+	local dwType, dwID = GetTarget(this.config.target, this.config.type)
 	if dwType == this.dwType and dwID == this.dwID
 	and dwType ~= TARGET.PLAYER and dwType ~= TARGET.NPC then
 		return
@@ -535,6 +535,32 @@ function FE.OnFrameDragEnd()
 	SaveAnchor(this)
 end
 
+do
+local function OnSkill(this, dwID, dwLevel)
+	local tItems = this.tItem[dwID]
+	if tItems then
+		for hItem, _ in pairs(tItems) do
+			if not hItem.mon.ids[dwID] then
+				if not hItem.mon.iconid or hItem.mon.iconid == 13 then
+					hItem.mon.iconid = Table_GetSkillIconID(dwID, dwLevel)
+				end
+				hItem.mon.ids[dwID] = Table_GetSkillIconID(dwID, dwLevel)
+			end
+		end
+	end
+	local szName = Table_GetSkillName(dwID, dwLevel)
+	local tItems = this.tItem[szName]
+	if tItems then
+		for hItem, _ in pairs(tItems) do
+			if not hItem.mon.ids[dwID] then
+				if not hItem.mon.iconid or hItem.mon.iconid == 13 then
+					hItem.mon.iconid = Table_GetSkillIconID(dwID, dwLevel)
+				end
+				hItem.mon.ids[dwID] = Table_GetSkillIconID(dwID, dwLevel)
+			end
+		end
+	end
+end
 function FE.OnEvent(event)
 	if event == "HOT_KEY_RELOADED" then
 		UpdateHotkey(this)
@@ -547,30 +573,11 @@ function FE.OnEvent(event)
 			-- (arg1)dwCaster：技能施放者 (arg2)dwSkillID：技能ID (arg3)dwLevel：技能等级
 			-- MY_Recount.OnSkillCast(arg1, arg2, arg3)
 			if arg1 == this.dwID then
-				local dwID, dwLevel = arg2, arg3
-				local tItems = this.tItem[dwID]
-				if tItems then
-					for hItem, _ in pairs(tItems) do
-						if not hItem.mon.ids[dwID] then
-							if not hItem.mon.iconid or hItem.mon.iconid == 13 then
-								hItem.mon.iconid = Table_GetSkillIconID(dwID, dwLevel)
-							end
-							hItem.mon.ids[dwID] = Table_GetSkillIconID(dwID, dwLevel)
-						end
-					end
-				end
-				local szName = Table_GetSkillName(dwID, dwLevel)
-				local tItems = this.tItem[szName]
-				if tItems then
-					for hItem, _ in pairs(tItems) do
-						if not hItem.mon.ids[dwID] then
-							if not hItem.mon.iconid or hItem.mon.iconid == 13 then
-								hItem.mon.iconid = Table_GetSkillIconID(dwID, dwLevel)
-							end
-							hItem.mon.ids[dwID] = Table_GetSkillIconID(dwID, dwLevel)
-						end
-					end
-				end
+				OnSkill(this, arg2, arg3)
+			end
+		elseif arg0 == "UI_OME_SKILL_HIT_LOG" then
+			if arg1 == this.dwID then
+				OnSkill(this, arg4, arg5)
 			end
 		end
 	elseif event == "SKILL_MOUNT_KUNG_FU" then
@@ -584,6 +591,7 @@ function FE.OnEvent(event)
 		end
 		FE.OnFrameDragEnd()
 	end
+end
 end
 
 ----------------------------------------------------------------------------------------------
@@ -742,7 +750,7 @@ for i = 1, 5 do
 			if not hItem then
 				return
 			end
-			local KTarget = MY.GetObject(GetTarget(frame.config.target))
+			local KTarget = MY.GetObject(GetTarget(frame.config.target, frame.config.type))
 			if not KTarget then
 				return
 			end
@@ -981,7 +989,11 @@ local function GenePS(ui, config, x, y, w, h)
 			for _, eType in ipairs(TARGET_TYPE_LIST) do
 				table.insert(t, {
 					szOption = _L.TARGET[eType],
-					bCheck = true, bMCheck = true, bChecked = eType == config.target,
+					bCheck = true, bMCheck = true,
+					bChecked = eType == (config.type == "SKILL" and "CONTROL_PLAYER" or config.target),
+					fnDisable = function()
+						return config.type == "SKILL" and eType ~= "CONTROL_PLAYER"
+					end,
 					fnAction = function()
 						config.target = eType
 						RecreatePanel(config)
