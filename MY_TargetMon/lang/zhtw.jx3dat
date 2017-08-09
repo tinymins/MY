@@ -34,6 +34,10 @@ data = {
         ["TEAM_MARK_DART" ] = "團隊標記 - 飛镖",
         ["TEAM_MARK_FAN"  ] = "團隊標記 - 扇子",
     },
+    ['TYPE'] = {
+        ['BUFF' ] = 'BUFF監控',
+        ['SKILL'] = '技能CD監控',
+    },
     ['Export'] = '導出',
     ['Delete'] = '刪除',
     ['Create'] = '創建',
@@ -49,5 +53,5 @@ data = {
     ['Cancel buff %d - %d'] = '取消BUFF %d - %d',
     ['Move Up'] = '上移',
     ['Move Down'] = '下移',
-    ['Cancel buff is disabled in arena.'] = '競技場中禁止使用取消BUFF快捷鍵功能！',
+    ['Cancel buff is disabled outside dungeon.'] = '取消BUFF快捷鍵僅在副本內可用',
 }
