@@ -1,6 +1,6 @@
 data = {
 	template = {
-		caption      = "新建BUFF監控",
+		caption      = "新建目標監控",
 		type         = "BUFF",
 		target       = "CLIENT_PLAYER",
 		scale        = 0.8  ,  -- 縮放比

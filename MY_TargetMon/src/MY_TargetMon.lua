@@ -727,8 +727,8 @@ local title = _L["MY Buff Monitor"]
 for i = 1, 5 do
 	for j = 1, 10 do
 		Hotkey.AddBinding("MY_TargetMon_" .. i .. "_" .. j, _L("Cancel buff %d - %d", i, j), title, function()
-			if MY.IsShieldedVersion() and MY.IsInArena() then
-				return OutputMessage("MSG_ANNOUNCE_YELLOW", _L['Cancel buff is disabled in arena.'])
+			if MY.IsShieldedVersion() and not MY.IsInDungeon(true) then
+				return OutputMessage("MSG_ANNOUNCE_YELLOW", _L['Cancel buff is disabled outside dungeon.'])
 			end
 			local config = Config[i]
 			if not config or config.type ~= 'BUFF' then
