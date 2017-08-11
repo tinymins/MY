@@ -239,7 +239,6 @@ data = {
 				},
 				--云裳
 				[10080] = {
-					{ enable = false, iconid = 897 , id = "common", name = "翔舞" },
 					{ enable = false, iconid = 913 , id = "common", name = "上元点鬟" },
 					{ enable = false, iconid = 1498, id = "common", name = "天地低昂" },
 				},
@@ -255,17 +254,9 @@ data = {
 				},
 				--琉璃
 				[10243] = {
-					{ enable = true , iconid = 4174, id = "common", name = "慈悲" },
-					{ enable = true , iconid = 4177, id = "common", name = "极乐" },
-					{ enable = true , iconid = 3791, id = "common", name = "朝圣" },
-					{ enable = true , iconid = 3796, id = "common", name = "烈日" },
-					{ enable = true , iconid = 3798, id = "common", name = "戒火" },
-					{ enable = true , iconid = 3788, id = "common", name = "暗雾" },
 				},
 				--明教
 				[10242] = {
-					{ enable = false, iconid = 3796, id = "common", name = "烈日" },
-					{ enable = false, iconid = 3843, id = "common", name = "灼烧" },
 				},
 				--易筋经
 				[10003] = {
@@ -275,11 +266,6 @@ data = {
 				},
 				--洗髓
 				[10002] = {
-					{ enable = false, iconid = 420 , id = "common", name = "立地成佛" },
-					{ enable = false, iconid = 433 , id = "common", name = "众佛" },
-					{ enable = false, iconid = 423 , id = "common", name = "执迷" },
-					{ enable = false, iconid = 2962, id = "common", name = "归去来棍" },
-					{ enable = false, iconid = 437 , id = "common", name = "恒河劫沙" },
 				},
 				--铁牢
 				[10062] = {
