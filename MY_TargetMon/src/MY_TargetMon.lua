@@ -648,7 +648,8 @@ RegisterCustomData("MY_BuffMonT.bSkillName")
 RegisterCustomData("MY_BuffMonT.anchor")
 RegisterCustomData("MY_BuffMonT.tBuffList")
 local function OnInit()
-	local data = MY.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE) or MY.LoadLUAData(DEFAULT_CONFIG_FILE)
+	local data = MY.LoadLUAData(DEFAULT_CONFIG_FILE)
+	data.default = MY.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE) or data.default
 	local OLD_PATH = {'config/my_buffmon.jx3dat', MY_DATA_PATH.ROLE}
 	local SZ_OLD_PATH = MY.FormatPath(OLD_PATH)
 	if IsLocalFileExist(SZ_OLD_PATH) then
@@ -1231,9 +1232,7 @@ function PS.OnPanelActive(wnd)
 		text = _L["Save As Default"],
 		onclick = function()
 			MY.Confirm(_L['Sure to save as default?'], function()
-				local data = MY.LoadLUAData(DEFAULT_CONFIG_FILE)
-				data.default = Config
-				MY.SaveLUAData(CUSTOM_DEFAULT_CONFIG_FILE, data)
+				MY.SaveLUAData(CUSTOM_DEFAULT_CONFIG_FILE, Config)
 			end)
 		end,
 	})
@@ -1242,14 +1241,16 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y,
 		w = 80, h = 30,
 		text = _L["Reset Default"],
+		tip = _L['Hold ctrl to reset original default.'],
+		tippostype = MY.Const.UI.Tip.POS_TOP,
 		onclick = function()
-			MY.Confirm(_L['Sure to reset default? (Hold ctrl to reset original default)'], function()
+			local ctrl = IsCtrlKeyDown()
+			MY.Confirm(_L[ctrl and 'Sure to reset original default?' or 'Sure to reset default?'], function()
 				ClosePanel('all')
-				local data = MY.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE)
-				if not data or IsCtrlKeyDown() then
-					data = MY.LoadLUAData(DEFAULT_CONFIG_FILE)
+				Config = MY.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE)
+				if not Config or ctrl then
+					Config = MY.LoadLUAData(DEFAULT_CONFIG_FILE).default
 				end
-				Config = data.default
 				UpdateConfigCalcProps(Config)
 				RecreateAllPanel()
 				MY.SwitchTab("MY_TargetMon", true)
