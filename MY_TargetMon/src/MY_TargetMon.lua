@@ -739,7 +739,10 @@ for i = 1, 5 do
 	for j = 1, 10 do
 		Hotkey.AddBinding("MY_TargetMon_" .. i .. "_" .. j, _L("Cancel buff %d - %d", i, j), title, function()
 			if MY.IsShieldedVersion() and not MY.IsInDungeon(true) then
-				return OutputMessage("MSG_ANNOUNCE_YELLOW", _L['Cancel buff is disabled outside dungeon.'])
+				if not IsDebugClient() then
+					OutputMessage("MSG_ANNOUNCE_YELLOW", _L['Cancel buff is disabled outside dungeon.'])
+				end
+				return
 			end
 			local config = Config[i]
 			if not config or config.type ~= 'BUFF' then
