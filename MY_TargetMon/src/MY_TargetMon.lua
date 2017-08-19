@@ -5,6 +5,7 @@ local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_TargetMon/lang/")
 local INI_PATH = MY.GetAddonInfo().szRoot .. "MY_TargetMon/ui/MY_TargetMon.ini"
 local ROLE_CONFIG_FILE = {'config/my_targetmon.jx3dat', MY_DATA_PATH.ROLE}
 local DEFAULT_CONFIG_FILE = MY.GetAddonInfo().szRoot .. "MY_TargetMon/data/$lang.jx3dat"
+local CUSTOM_DEFAULT_CONFIG_FILE = {'config/my_targetmon.jx3dat', MY_DATA_PATH.GLOBAL}
 local CUSTOM_BOXBG_STYLES = {
 	"UI/Image/Common/Box.UITex|0",
 	"UI/Image/Common/Box.UITex|1",
@@ -647,7 +648,7 @@ RegisterCustomData("MY_BuffMonT.bSkillName")
 RegisterCustomData("MY_BuffMonT.anchor")
 RegisterCustomData("MY_BuffMonT.tBuffList")
 local function OnInit()
-	local data = MY.LoadLUAData(DEFAULT_CONFIG_FILE)
+	local data = MY.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE) or MY.LoadLUAData(DEFAULT_CONFIG_FILE)
 	local OLD_PATH = {'config/my_buffmon.jx3dat', MY_DATA_PATH.ROLE}
 	local SZ_OLD_PATH = MY.FormatPath(OLD_PATH)
 	if IsLocalFileExist(SZ_OLD_PATH) then
@@ -1184,7 +1185,8 @@ end
 function PS.OnPanelActive(wnd)
 	local ui = MY.UI(wnd)
 	local w, h = ui:size()
-	local x, y = 20, 30
+	local X, Y = 20, 30
+	local x, y = X, Y
 	
 	for _, config in ipairs(Config) do
 		x, y = GenePS(ui, config, x, y, w, h)
@@ -1192,8 +1194,9 @@ function PS.OnPanelActive(wnd)
 	end
 	y = y + 10
 	
+	x = (w - 310) / 2
 	ui:append("WndButton2", {
-		x = (w - 290) / 2, y = y,
+		x = x, y = y,
 		w = 60, h = 30,
 		text = _L["Create"],
 		onclick = function()
@@ -1203,8 +1206,9 @@ function PS.OnPanelActive(wnd)
 			MY.SwitchTab("MY_TargetMon", true)
 		end,
 	})
+	x = x + 70
 	ui:append("WndButton2", {
-		x = (w - 290) / 2 + 70, y = y,
+		x = x, y = y,
 		w = 60, h = 30,
 		text = _L["Import"],
 		onclick = function()
@@ -1220,20 +1224,41 @@ function PS.OnPanelActive(wnd)
 			end, function() end, function() end, nil, "" )
 		end,
 	})
+	x = x + 70
 	ui:append("WndButton2", {
-		x = (w - 290) / 2 + 140, y = y,
+		x = x, y = y,
+		w = 80, h = 30,
+		text = _L["Save As Default"],
+		onclick = function()
+			MY.Confirm(_L['Sure to save as default?'], function()
+				local data = MY.LoadLUAData(DEFAULT_CONFIG_FILE)
+				data.default = Config
+				MY.SaveLUAData(CUSTOM_DEFAULT_CONFIG_FILE, data)
+			end)
+		end,
+	})
+	x = x + 90
+	ui:append("WndButton2", {
+		x = x, y = y,
 		w = 80, h = 30,
 		text = _L["Reset Default"],
 		onclick = function()
-			MY.Confirm(_L['Sure to reset default?'], function()
+			MY.Confirm(_L['Sure to reset default? (Hold ctrl to reset original default)'], function()
 				ClosePanel('all')
-				Config = MY.LoadLUAData(DEFAULT_CONFIG_FILE).default
+				local data = MY.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE)
+				if not data or IsCtrlKeyDown() then
+					data = MY.LoadLUAData(DEFAULT_CONFIG_FILE)
+				end
+				Config = data.default
 				UpdateConfigCalcProps(Config)
 				RecreateAllPanel()
 				MY.SwitchTab("MY_TargetMon", true)
 			end)
 		end,
 	})
+	x = x + 90
+
+	x = X
 	y = y + 30
 end
 MY.RegisterPanel("MY_TargetMon", _L["target monitor"], _L['Target'], "ui/Image/ChannelsPanel/NewChannels.UITex|141", { 255, 255, 0, 200 }, PS)
