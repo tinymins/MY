@@ -414,7 +414,7 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 		end
 		-- 加入同名BUFF列表
 		if not hItem.mon.ids[buff.dwID] then
-			hItem.mon.ids[buff.dwID] = Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13
+			hItem.mon.ids[buff.dwID] = { framecount = 0, iconid = Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13 }
 		end
 	elseif config.type == 'SKILL' and buff and szName then
 		if config.hideVoid and not hItem:IsVisible() then
@@ -509,7 +509,7 @@ function FE.OnFrameBreathe()
 			for i = 0, hList:GetItemCount() - 1 do
 				local hItem = hList:Lookup(i)
 				local bFind = false
-				for dwSkillID, dwIcon in pairs(hItem.mon.ids) do
+				for dwSkillID, info in pairs(hItem.mon.ids) do
 					local dwLevel = KTarget.GetSkillLevel(dwSkillID)
 					local bCool, nLeft, nTotal, nCDCount, bPublicCD = KTarget.GetSkillCDProgress(dwSkillID, dwLevel, 444)
 					if bCool and nLeft ~= 0 and nTotal ~= 0 and not bPublicCD then
@@ -545,7 +545,7 @@ local function OnSkill(this, dwID, dwLevel)
 				if not hItem.mon.iconid or hItem.mon.iconid == 13 then
 					hItem.mon.iconid = Table_GetSkillIconID(dwID, dwLevel)
 				end
-				hItem.mon.ids[dwID] = Table_GetSkillIconID(dwID, dwLevel)
+				hItem.mon.ids[dwID] = { framecount = 0, iconid = Table_GetSkillIconID(dwID, dwLevel) }
 			end
 		end
 	end
@@ -557,7 +557,7 @@ local function OnSkill(this, dwID, dwLevel)
 				if not hItem.mon.iconid or hItem.mon.iconid == 13 then
 					hItem.mon.iconid = Table_GetSkillIconID(dwID, dwLevel)
 				end
-				hItem.mon.ids[dwID] = Table_GetSkillIconID(dwID, dwLevel)
+				hItem.mon.ids[dwID] = { framecount = 0, iconid = Table_GetSkillIconID(dwID, dwLevel) }
 			end
 		end
 	end
@@ -604,6 +604,9 @@ local function UpdateConfigDataVersion(config)
 			mon.name, mon.buffname = mon.name or mon.buffname, nil
 			mon.id  , mon.buffid   = mon.id   or mon.buffid  , nil
 			mon.ids , mon.buffids  = mon.ids  or mon.buffids , nil
+			for dwID, dwIconID in pairs(mon.ids) do
+				mon.ids = { framecount = 0, iconid = dwIconID }
+			end
 		end
 	end
 	config.type = config.type or 'BUFF'
@@ -701,7 +704,15 @@ local function OnInit()
 					end
 					table.insert(Config[index].monitors[kungfuid], {
 						enable = mon[1], iconid = mon[2],
-						name = mon[3], id = mon[4], ids = mon[5]
+						name = mon[3], id = mon[4], ids = (function()
+							local ids = {}
+							if mon[5] then
+								for dwID, dwIconID in pairs(mon[5]) do
+									ids[dwID] = { framecount = 0, iconid = dwIconID}
+								end
+							end
+							return ids
+						end)(),
 					})
 				end
 			end
