@@ -178,21 +178,23 @@ local function RecreatePanel(config)
 			return
 		end
 		nCount = nCount + 1
-		local hItem      = hList:AppendItemFromIni(INI_PATH, "Handle_Item")
-		local hBox       = hItem:Lookup("Handle_Box")
-		local hCDBar     = hItem:Lookup("Handle_Bar")
-		local box        = hBox:Lookup("Box_Default")
-		local imgBoxBg   = hBox:Lookup("Image_BoxBg")
-		local txtProcess = hCDBar:Lookup("Text_Process")
-		local imgProcess = hCDBar:Lookup("Image_Process")
-		local txtName    = hCDBar:Lookup("Text_Name")
+		local hItem        = hList:AppendItemFromIni(INI_PATH, "Handle_Item")
+		local hBox         = hItem:Lookup("Handle_Box")
+		local box          = hBox:Lookup("Box_Default")
+		local imgBoxBg     = hBox:Lookup("Image_BoxBg")
+		local txtShortName = hBox:Lookup("Text_ShortName")
+		local hCDBar       = hItem:Lookup("Handle_Bar")
+		local txtProcess   = hCDBar:Lookup("Text_Process")
+		local imgProcess   = hCDBar:Lookup("Image_Process")
+		local txtName      = hCDBar:Lookup("Text_Name")
 		
 		-- 建立高速索引
 		hItem.box = box
 		hItem.mon = mon
-		hItem.txtProcess = txtProcess
-		hItem.imgProcess = imgProcess
-		hItem.txtName    = txtName
+		hItem.txtProcess   = txtProcess
+		hItem.imgProcess   = imgProcess
+		hItem.txtName      = txtName
+		hItem.txtShortName = txtShortName
 		if mon.id and mon.id ~= 'common' then
 			if not frame.tItem[mon.id] then
 				frame.tItem[mon.id] = {}
@@ -263,9 +265,14 @@ local function RecreatePanel(config)
 			hCDBar:SetW(config.cdBarWidth)
 			hItem.hCDBar = hCDBar
 			hItem:SetW(hBox:GetW() + config.cdBarWidth)
+			txtShortName:Hide()
 		else
 			hCDBar:Hide()
 			hItem:SetW(hBox:GetW())
+			txtShortName:SetText(mon.name or '')
+			txtShortName:SetVisible(config.showName)
+			hBox:SetSizeByAllItemSize()
+			hItem:SetSizeByAllItemSize()
 		end
 		
 		if nCount <= config.maxLineCount then
