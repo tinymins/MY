@@ -115,6 +115,7 @@ data = {
     ["can not find wnd component [%s]"          ] = "找不到窗體組件 [%s]",
     ["unable to append handle item [%s]"        ] = "無法追加容器組件 [%s]",
     ["unable to append handle item from string."] = "從字符串追加容器組件失敗。",
+    ['Icon Picker'                              ] = '圖標選擇器',
     ['color picker'                             ] = '顔色選擇器',
     ['color picker ex'                          ] = '調色板',
     ['text editor'                              ] = '文本編輯器',
