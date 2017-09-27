@@ -278,6 +278,12 @@ function MY.OpenPanel(bMute, bNoFocus, bNoAnimate)
 		  :click(function()
 		  	XGUI.OpenIE("http://weibo.com/zymah")
 		  end)
+		MY.UI(hFrame):onevent('UI_SCALED', function()
+			local fn = hFrame:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel').OnScrollBarPosChanged
+			if fn then
+				fn()
+			end
+		end)
 		-- updaet logo image
 		MY.UI(MY.GetFrame()):item('#Image_Icon')
 		  :size(30, 30)
