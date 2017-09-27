@@ -81,7 +81,7 @@ local TARGET_TYPE_LIST = {
 	"TEAM_MARK_DART" ,
 	"TEAM_MARK_FAN"  ,
 }
-local Config = {}
+local Config, ConfigTemplate = {}
 local BOX_SPARKING_FRAME = GLOBAL.GAME_FPS * 2 / 3
 
 ----------------------------------------------------------------------------------------------
@@ -363,7 +363,7 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 			end
 			-- 计算BUFF时间
 			local nTimeLeft = math.max(0, buff.nEndFrame - nFrameCount) / 16
-			local szTimeLeft = ("%.1f'"):format(nTimeLeft)
+			local szTimeLeft = ((config.decimalTime == -1 or nTimeLeft < config.decimalTime) and "%.1f'" or '%d'):format(nTimeLeft)
 			local nBuffTime = math.max(GetBuffTime(buff.dwID, buff.nLevel) / 16, nTimeLeft)
 			if l_tBuffTime[KTarget.dwID][buff.dwID] then
 				nBuffTime = math.max(l_tBuffTime[KTarget.dwID][buff.dwID], nBuffTime)
@@ -399,24 +399,34 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 			local fPercent = nTimeLeft / nBuffTime
 			hItem.imgProcess:SetPercentage(fPercent)
 			hItem.box:SetCoolDownPercentage(fPercent)
-			if fPercent < 0.5 and fPercent > 0.3 then
-				if hItem.fPercent ~= 0.5 then
-					hItem.fPercent = 0.5
-					hItem.box:SetObjectStaring(true)
-				end
-			elseif fPercent < 0.3 and fPercent > 0.1 then
-				if hItem.fPercent ~= 0.3 then
-					hItem.fPercent = 0.3
-					hItem.box:SetExtentAnimate("ui\\Image\\Common\\Box.UITex", 17)
-				end
-			elseif fPercent < 0.1 then
-				if hItem.fPercent ~= 0.1 then
-					hItem.fPercent = 0.1
-					hItem.box:SetExtentAnimate("ui\\Image\\Common\\Box.UITex", 20)
+			if config.cdFlash then
+				if fPercent < 0.5 and fPercent > 0.3 then
+					if hItem.fPercent ~= 0.5 then
+						hItem.fPercent = 0.5
+						hItem.box:SetObjectStaring(true)
+					end
+				elseif fPercent < 0.3 and fPercent > 0.1 then
+					if hItem.fPercent ~= 0.3 then
+						hItem.fPercent = 0.3
+						hItem.box:SetExtentAnimate("ui\\Image\\Common\\Box.UITex", 17)
+					end
+				elseif fPercent < 0.1 then
+					if hItem.fPercent ~= 0.1 then
+						hItem.fPercent = 0.1
+						hItem.box:SetExtentAnimate("ui\\Image\\Common\\Box.UITex", 20)
+					end
+				else
+					hItem.box:SetObjectStaring(false)
+					hItem.box:ClearExtentAnimate()
 				end
 			else
-				hItem.box:SetObjectStaring(false)
-				hItem.box:ClearExtentAnimate()
+				if hItem.box.__SetObjectCoolDown then
+					hItem.box:__SetObjectCoolDown(false)
+					hItem.box:__SetCoolDownPercentage(1)
+				else
+					hItem.box:SetObjectCoolDown(false)
+					hItem.box:SetCoolDownPercentage(1)
+				end
 			end
 			hItem.nRenderFrame = nFrameCount
 		end
@@ -446,7 +456,7 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 		hItem.txtProcess:SetText("")
 		hItem.imgProcess:SetPercentage(0)
 		-- 如果目标没有改变过 且 之前存在 则显示刷新动画
-		if hItem.nRenderFrame and hItem.nRenderFrame >= 0 and hItem.nRenderFrame ~= nFrameCount and not targetChanged then
+		if config.cdFlash and hItem.nRenderFrame and hItem.nRenderFrame >= 0 and hItem.nRenderFrame ~= nFrameCount and not targetChanged then
 			hItem.box:SetObjectSparking(true)
 			hItem.nSparkingFrame = nFrameCount
 		-- 如果勾选隐藏不存在的BUFF 且 当前未隐藏 且 (目标改变过 或 刷新动画没有在播放) 则隐藏
@@ -619,7 +629,13 @@ local function UpdateConfigCalcProps(config)
 			end
 		end
 	end
+	for k, v in pairs(ConfigTemplate) do
+		if type(v) ~= type(config[k]) then
+			config[k] = clone(v)
+		end
+	end
 end
+
 local function UpdateConfigDataVersion(config)
 	for kungfuid, monitors in pairs(config.monitors) do
 		for _, mon in ipairs(monitors) do
@@ -635,6 +651,7 @@ local function UpdateConfigDataVersion(config)
 	config.showName, config.showBuffName = config.showName or config.showBuffName, nil
 	UpdateConfigCalcProps(config)
 end
+
 do
 MY_BuffMonS = {}
 RegisterCustomData("MY_BuffMonS.fScale")
@@ -664,7 +681,9 @@ RegisterCustomData("MY_BuffMonT.anchor")
 RegisterCustomData("MY_BuffMonT.tBuffList")
 local function OnInit()
 	local data = MY.LoadLUAData(DEFAULT_CONFIG_FILE)
+	ConfigTemplate = data.template
 	data.default = MY.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE) or data.default
+	
 	local OLD_PATH = {'config/my_buffmon.jx3dat', MY_DATA_PATH.ROLE}
 	local SZ_OLD_PATH = MY.FormatPath(OLD_PATH)
 	if IsLocalFileExist(SZ_OLD_PATH) then
@@ -728,7 +747,6 @@ local function OnInit()
 					})
 				end
 			end
-			UpdateConfigCalcProps(Config[index])
 			OBJ.fScale        = nil
 			OBJ.bEnable       = nil
 			OBJ.bDragable     = nil
@@ -743,9 +761,11 @@ local function OnInit()
 			OBJ.tBuffList     = nil
 		end
 	end
+	for _, config in pairs(Config) do
+		UpdateConfigCalcProps(config)
+	end
 	-- 加载界面
 	RecreateAllPanel()
-	ConfigTemplate = data.template
 end
 MY.RegisterInit("MY_TargetMon", OnInit)
 
@@ -988,9 +1008,32 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		range = {1, 300},
 		value = config.scale * 100,
-		textfmt = function(val) return _L("scale %d%%.", val) end,
+		textfmt = function(val) return _L("Scale %d%%.", val) end,
 		onchange = function(raw, val)
 			config.scale = val / 100
+			RecreatePanel(config)
+		end,
+	})
+	y = y + 30
+	
+	ui:append("WndCheckBox", {
+		x = x + 20, y = y, w = 200,
+		text = _L['Show cd flash'],
+		checked = config.cdFlash,
+		oncheck = function(bCheck)
+			config.cdFlash = bCheck
+			RecreatePanel(config)
+		end,
+	})
+	
+	ui:append("WndSliderBox", {
+		x = w - 250, y = y,
+		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		range = {50, 1000},
+		value = config.cdBarWidth,
+		textfmt = function(val) return _L("CD width %dpx.", val) end,
+		onchange = function(raw, val)
+			config.cdBarWidth = val
 			RecreatePanel(config)
 		end,
 	})
@@ -1052,11 +1095,19 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 	ui:append("WndSliderBox", {
 		x = w - 250, y = y,
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
-		range = {50, 1000},
-		value = config.cdBarWidth,
-		textfmt = function(val) return _L("CD width %dpx.", val) end,
+		range = {-1, 30},
+		value = config.decimalTime,
+		textfmt = function(val)
+			if val == -1 then
+				return _L['Always show decimal time.']
+			elseif val == 0 then
+				return _L['Never show decimal time.']
+			else
+				return _L("Show decimal time left in %ds.", val)
+			end
+		end,
 		onchange = function(raw, val)
-			config.cdBarWidth = val
+			config.decimalTime = val
 			RecreatePanel(config)
 		end,
 	})
@@ -1304,7 +1355,6 @@ function PS.OnPanelActive(wnd)
 			GetUserInput(_L['Please input import data:'], function(szVal)
 				local config = str2var(szVal)
 				if config then
-					config = MY.FormatDataStructure(config, ConfigTemplate, 1)
 					UpdateConfigDataVersion(config)
 					table.insert(Config, config)
 					RecreatePanel(config)
