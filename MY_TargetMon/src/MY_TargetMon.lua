@@ -606,6 +606,20 @@ end
 ----------------------------------------------------------------------------------------------
 -- 数据存储
 ----------------------------------------------------------------------------------------------
+local function UpdateConfigCalcProps(config)
+	for _, monitors in pairs(config.monitors) do
+		for _, mon in ipairs(monitors) do
+			if not mon.ids then
+				mon.ids = {}
+			end
+			for k, _ in pairs(mon.ids) do
+				if not tonumber(k) then
+					mon.ids[k] = nil
+				end
+			end
+		end
+	end
+end
 local function UpdateConfigDataVersion(config)
 	for kungfuid, monitors in pairs(config.monitors) do
 		for _, mon in ipairs(monitors) do
@@ -613,23 +627,13 @@ local function UpdateConfigDataVersion(config)
 			mon.id  , mon.buffid   = mon.id   or mon.buffid  , nil
 			mon.ids , mon.buffids  = mon.ids  or mon.buffids , nil
 			for dwID, dwIconID in pairs(mon.ids) do
-				mon.ids = { framecount = 0, iconid = dwIconID }
+				mon.ids[dwID] = { framecount = 0, iconid = dwIconID }
 			end
 		end
 	end
 	config.type = config.type or 'BUFF'
 	config.showName, config.showBuffName = config.showName or config.showBuffName, nil
-end
-local function UpdateConfigCalcProps(Config)
-	for _, config in ipairs(Config) do
-		for _, monitors in pairs(config.monitors) do
-			for _, mon in ipairs(monitors) do
-				if not mon.ids then
-					mon.ids = {}
-				end
-			end
-		end
-	end
+	UpdateConfigCalcProps(config)
 end
 do
 MY_BuffMonS = {}
@@ -724,6 +728,7 @@ local function OnInit()
 					})
 				end
 			end
+			UpdateConfigCalcProps(Config[index])
 			OBJ.fScale        = nil
 			OBJ.bEnable       = nil
 			OBJ.bDragable     = nil
@@ -738,7 +743,6 @@ local function OnInit()
 			OBJ.tBuffList     = nil
 		end
 	end
-	UpdateConfigCalcProps(Config)
 	-- 加载界面
 	RecreateAllPanel()
 	ConfigTemplate = data.template
@@ -792,7 +796,7 @@ end
 -- 设置界面
 ----------------------------------------------------------------------------------------------
 local PS = {}
-local function GenePS(ui, config, x, y, w, h)
+local function GenePS(ui, config, x, y, w, h, OpenConfig)
 	ui:append("Text", {text = (function()
 		for i = 1, #Config do
 			if Config[i] == config then
@@ -864,7 +868,7 @@ local function GenePS(ui, config, x, y, w, h)
 	
 	ui:append("WndCheckBox", {
 		x = x + 20, y = y,
-		text = _L['enable'],
+		text = _L['Enable'],
 		checked = config.enable,
 		oncheck = function(bChecked)
 			config.enable = bChecked
@@ -874,7 +878,7 @@ local function GenePS(ui, config, x, y, w, h)
 	
 	ui:append("WndCheckBox", {
 		x = x + 120, y = y, w = 200,
-		text = _L['hide others buff'],
+		text = _L['Hide others buff'],
 		checked = config.hideOthers,
 		oncheck = function(bChecked)
 			config.hideOthers = bChecked
@@ -884,156 +888,10 @@ local function GenePS(ui, config, x, y, w, h)
 			return config.type == 'BUFF'
 		end,
 	})
-
+	
 	ui:append("WndComboBox", {
 		x = w - 250, y = y, w = 135,
-		text = _L['set monitor'],
-		menu = function()
-			local dwKungFuID = GetClientPlayer().GetKungfuMount().dwSkillID
-			local t = {{
-				szOption = _L['add'],
-				fnAction = function()
-					local function Next(kungfuid)
-						GetUserInput(_L['please input name:'], function(szVal)
-							szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
-							if szVal ~= "" then
-								if not config.monitors[kungfuid] then
-									config.monitors[kungfuid] = {}
-								end
-								table.insert(config.monitors[kungfuid], {
-									enable = true,
-									iconid = 13,
-									id = tonumber(szVal) or nil,
-									ids = {},
-									name = not tonumber(szVal) and szVal or nil,
-								})
-								RecreatePanel(config)
-							end
-						end, function() end, function() end, nil, "" )
-					end
-					MY.Confirm(_L['Add as common or current kunfu?'], function() Next('common') end,
-						function() Next(dwKungFuID) end, _L['as common'], _L['as current kunfu'])
-				end,
-			}}
-			local function InsertMenu(mon, monlist)
-				local t1 = {
-					szOption = mon.name or mon.id,
-					bCheck = true, bChecked = mon.enable,
-					fnAction = function()
-						mon.enable = not mon.enable
-						RecreatePanel(config)
-					end,
-					szIcon = "ui/Image/UICommon/CommonPanel2.UITex",
-					nFrame = 49,
-					nMouseOverFrame = 51,
-					nIconWidth = 17,
-					nIconHeight = 17,
-					szLayer = "ICON_RIGHTMOST",
-					fnClickIcon = function()
-						for i, m in ipairs_r(monlist) do
-							if m == mon then
-								table.remove(monlist, i)
-							end
-						end
-						Wnd.CloseWindow("PopupMenuPanel")
-						RecreatePanel(config)
-					end,
-					nMiniWidth = 120,
-				}
-				table.insert(t1, {
-					szOption = _L['rename'],
-					fnAction = function()
-						GetUserInput(_L['please input name:'], function(szVal)
-							szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
-							if szVal ~= "" then
-								mon.name = szVal
-								RecreatePanel(config)
-							end
-						end, function() end, function() end, nil, mon.name)
-					end,
-				})
-				table.insert(t1, {
-					szOption = _L['Manual add id'],
-					fnAction = function()
-						GetUserInput(_L['Please input id:'], function(szVal)
-							local nVal = tonumber(string.gsub(szVal, "^%s*(.-)%s*$", "%1"), 10)
-							if nVal then
-								for id, _ in pairs(mon.ids) do
-									if id == nVal then
-										return
-									end
-								end
-								local dwIconID = 13
-								if config.type == "SKILL" then
-									local dwLevel = GetClientPlayer().GetSkillLevel(nVal) or 1
-									dwIconID = Table_GetSkillIconID(nVal, dwLevel) or dwIconID
-								else
-									dwIconID = Table_GetBuffIconID(nVal, 1) or 13
-								end
-								mon.ids[nVal] = dwIconID
-								RecreatePanel(config)
-							end
-						end, function() end, function() end, nil, nil)
-					end,
-				})
-				if not empty(mon.ids) then
-					table.insert(t1, { bDevide = true })
-					local function InsertMenuID(dwID, dwIcon)
-						table.insert(t1, {
-							szOption = dwID == "common" and _L['all ids'] or dwID,
-							bCheck = true, bMCheck = true,
-							bChecked = dwID == mon.id or (dwID == "common" and mon.id == nil),
-							fnAction = function()
-								mon.iconid = dwIcon
-								mon.id = dwID
-								RecreatePanel(config)
-							end,
-							szIcon = "fromiconid",
-							nFrame = dwIcon or 13,
-							nIconWidth = 22,
-							nIconHeight = 22,
-							szLayer = "ICON_RIGHTMOST",
-							fnClickIcon = function()
-								XGUI.OpenIconPanel(function(dwIcon)
-									mon.ids[dwID] = dwIcon
-									if mon.id == dwID then
-										mon.iconid = dwIcon
-										RecreatePanel(config)
-									end
-								end)
-								Wnd.CloseWindow("PopupMenuPanel")
-							end,
-						})
-					end
-					InsertMenuID('common', mon.ids.common or mon.iconid or 13)
-					for dwID, dwIcon in pairs(mon.ids) do
-						if dwID ~= "common" then
-							InsertMenuID(dwID, dwIcon)
-						end
-					end
-				end
-				table.insert(t, t1)
-			end
-			local tMonList = config.monitors.common
-			if tMonList and #tMonList > 0 then
-				table.insert(t, { bDevide = true })
-				for i, mon in ipairs(tMonList) do
-					InsertMenu(mon, tMonList)
-				end
-			end
-			local tMonList = config.monitors[GetClientPlayer().GetKungfuMount().dwSkillID]
-			if tMonList and #tMonList > 0 then
-				table.insert(t, { bDevide = true })
-				for i, mon in ipairs(tMonList) do
-					InsertMenu(mon, tMonList)
-				end
-			end
-			return t
-		end,
-	})
-	ui:append("WndComboBox", {
-		x = w - 115, y = y, w = 105,
-		text = _L['set target'],
+		text = _L['Set target'],
 		menu = function()
 			local dwKungFuID = GetClientPlayer().GetKungfuMount().dwSkillID
 			local t = {}
@@ -1065,11 +923,16 @@ local function GenePS(ui, config, x, y, w, h)
 			return t
 		end,
 	})
+	ui:append("WndButton2", {
+		x = w - 110, y = y, w = 102,
+		text = _L['Set monitor'],
+		onclick = function() OpenConfig(config) end,
+	})
 	y = y + 30
 	
 	ui:append("WndCheckBox", {
 		x = x + 20, y = y, w = 100,
-		text = _L['undragable'],
+		text = _L['Undragable'],
 		checked = not config.dragable,
 		oncheck = function(bChecked)
 			config.dragable = not bChecked
@@ -1079,7 +942,7 @@ local function GenePS(ui, config, x, y, w, h)
 	
 	ui:append("WndCheckBox", {
 		x = x + 120, y = y, w = 200,
-		text = _L['hide void'],
+		text = _L['Hide void'],
 		checked = config.hideVoid,
 		oncheck = function(bChecked)
 			config.hideVoid = bChecked
@@ -1092,7 +955,7 @@ local function GenePS(ui, config, x, y, w, h)
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		range = {1, 32},
 		value = config.maxLineCount,
-		textfmt = function(val) return _L("display %d eachline.", val) end,
+		textfmt = function(val) return _L("Display %d eachline.", val) end,
 		onchange = function(raw, val)
 			config.maxLineCount = val
 			RecreatePanel(config)
@@ -1102,7 +965,7 @@ local function GenePS(ui, config, x, y, w, h)
 	
 	ui:append("WndCheckBox", {
 		x = x + 20, y = y, w = 120,
-		text = _L['show cd bar'],
+		text = _L['Show cd bar'],
 		checked = config.cdBar,
 		oncheck = function(bCheck)
 			config.cdBar = bCheck
@@ -1112,7 +975,7 @@ local function GenePS(ui, config, x, y, w, h)
 	
 	ui:append("WndCheckBox", {
 		x = x + 120, y = y, w = 120,
-		text = _L['show name'],
+		text = _L['Show name'],
 		checked = config.showName,
 		oncheck = function(bCheck)
 			config.showName = bCheck
@@ -1208,8 +1071,214 @@ function PS.OnPanelActive(wnd)
 	local X, Y = 20, 30
 	local x, y = X, Y
 	
+	local OpenConfig
+	do -- single config details
+		local l_config
+		local uiWrapper = ui:append('WndWindow', 'WndWindow_Wrapper', { x = 0, y = 0, w = w, h = h }, true)
+		uiWrapper:append('Shadow', { x = 0, y = 0, w = w, h = h, r = 0, g = 0, b = 0, alpha = 150 })
+		uiWrapper:append('Shadow', { x = 10, y = 10, w = w - 20, h = h - 20, r = 255, g = 255, b = 255, alpha = 40 })
+		
+		local x0, y0 = 20, 20
+		local w0, h0 = w - 40, h - 30
+		local w1, w2 = w0 / 2 - 5, w0 / 2 - 5
+		local x1, x2 = x0, x0 + w1 + 10
+		
+		local listCommon = uiWrapper:append("WndListBox", { x = x1, y = y0 + 25, w = w1, h = h0 - 30 - 30 }, true)
+		local listKungfu = uiWrapper:append("WndListBox", { x = x2, y = y0 + 25, w = w2, h = h0 - 30 - 30 }, true)
+		
+		local function Add(kungfuid)
+			if kungfuid == 'current' then
+				kungfuid = GetClientPlayer().GetKungfuMount().dwSkillID
+			end
+			GetUserInput(_L['Please input name:'], function(szVal)
+				szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
+				if szVal ~= "" then
+					if not l_config.monitors[kungfuid] then
+						l_config.monitors[kungfuid] = {}
+					end
+					local aMonList = l_config.monitors[kungfuid]
+					local mon = {
+						enable = true,
+						iconid = 13,
+						id = tonumber(szVal) or 'common',
+						ids = {},
+						name = not tonumber(szVal) and szVal or nil,
+					}
+					table.insert(aMonList, mon)
+					local list = kungfuid == 'common' and listCommon or listKungfu
+					list:listbox(
+						'insert',
+						mon.name or mon.id,
+						mon.name or mon.id,
+						{ mon = mon, monlist = aMonList }
+					)
+					RecreatePanel(l_config)
+				end
+			end, function() end, function() end, nil, "" )
+		end
+		uiWrapper:append("Text", { x = x1 + 5, y = y0, w = w1 - 60 - 5,  h = 25, text = _L['Common monitor'] })
+		uiWrapper:append("WndButton2", { x = x1 + w1 - 60, y = y0 - 1, w = 60, h = 28, text = _L['Add'], onclick = function() Add('common') end })
+		uiWrapper:append("Text", { x = x2 + 5, y = y0, w = w2 - 60 - 5,  h = 25, text = _L['Current kungfu monitor'] })
+		uiWrapper:append("WndButton2", { x = x2 + w2 - 60, y = y0 - 1, w = 60, h = 28, text = _L['Add'], onclick = function() Add('current') end })
+		
+		-- 初始化list控件
+		local function onMenu(hItem, szText, szID, data)
+			local mon = data.mon
+			local monlist = data.monlist
+			local t1 = {
+				{
+					szOption = _L['enable'],
+					bCheck = true, bChecked = mon.enable,
+					fnAction = function()
+						mon.enable = not mon.enable
+						RecreatePanel(l_config)
+					end,
+				},
+				{ bDevide = true },
+				{
+					szOption = _L['Delete'],
+					fnAction = function()
+						local list = monlist == l_config.monitors.common and listCommon or listKungfu
+						list:listbox('delete', szText, szID)
+						for i, m in ipairs_r(monlist) do
+							if m == mon then
+								table.remove(monlist, i)
+							end
+						end
+						Wnd.CloseWindow("PopupMenuPanel")
+						RecreatePanel(l_config)
+					end,
+				},
+				{
+					szOption = _L['Rename'],
+					fnAction = function()
+						GetUserInput(_L['Please input name:'], function(szVal)
+							szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
+							if szVal ~= "" then
+								mon.name = szVal
+								RecreatePanel(l_config)
+							end
+						end, function() end, function() end, nil, mon.name)
+					end,
+				},
+				{
+					szOption = _L['Manual add id'],
+					fnAction = function()
+						GetUserInput(_L['Please input id:'], function(szVal)
+							local nVal = tonumber(string.gsub(szVal, "^%s*(.-)%s*$", "%1"), 10)
+							if nVal then
+								for id, _ in pairs(mon.ids) do
+									if id == nVal then
+										return
+									end
+								end
+								local dwIconID = 13
+								if l_config.type == "SKILL" then
+									local dwLevel = GetClientPlayer().GetSkillLevel(nVal) or 1
+									dwIconID = Table_GetSkillIconID(nVal, dwLevel) or dwIconID
+								else
+									dwIconID = Table_GetBuffIconID(nVal, 1) or 13
+								end
+								mon.ids[nVal] = dwIconID
+								RecreatePanel(l_config)
+							end
+						end, function() end, function() end, nil, nil)
+					end,
+				},
+			}
+			if not empty(mon.ids) then
+				table.insert(t1, { bDevide = true })
+				local function InsertMenuID(dwID, dwIcon)
+					table.insert(t1, {
+						szOption = dwID == "common" and _L['All ids'] or dwID,
+						bCheck = true, bMCheck = true,
+						bChecked = dwID == mon.id or (dwID == "common" and mon.id == nil),
+						fnAction = function()
+							mon.iconid = dwIcon
+							mon.id = dwID
+							RecreatePanel(l_config)
+						end,
+						szIcon = "fromiconid",
+						nFrame = dwIcon or 13,
+						nIconWidth = 22,
+						nIconHeight = 22,
+						szLayer = "ICON_RIGHTMOST",
+						fnClickIcon = function()
+							XGUI.OpenIconPanel(function(dwIcon)
+								mon.ids[dwID] = dwIcon
+								if mon.id == dwID then
+									mon.iconid = dwIcon
+									RecreatePanel(l_config)
+								end
+							end)
+							Wnd.CloseWindow("PopupMenuPanel")
+						end,
+						{
+							szOption = _L['Delete'],
+							fnAction = function()
+								mon.ids[dwID] = nil
+								RecreatePanel(l_config)
+							end,
+						}
+					})
+				end
+				InsertMenuID('common', mon.ids.common or mon.iconid or 13)
+				for dwID, dwIcon in pairs(mon.ids) do
+					if dwID ~= "common" then
+						InsertMenuID(dwID, dwIcon)
+					end
+				end
+			end
+			return t1
+		end
+		listCommon:listbox('onmenu', onMenu)
+		listKungfu:listbox('onmenu', onMenu)
+		
+		function OpenConfig(config)
+			l_config = config
+			listCommon:listbox('clear')
+			do local aMonList = config.monitors.common
+				if aMonList and #aMonList > 0 then
+					for i, mon in ipairs(aMonList) do
+						listCommon:listbox(
+							'insert',
+							mon.name or mon.id,
+							mon.name or mon.id,
+							{ mon = mon, monlist = aMonList }
+						)
+					end
+				end
+			end
+			listKungfu:listbox('clear')
+			do local aMonList = config.monitors[GetClientPlayer().GetKungfuMount().dwSkillID]
+				if aMonList and #aMonList > 0 then
+					for i, mon in ipairs(aMonList) do
+						listKungfu:listbox(
+							'insert',
+							mon.name or mon.id,
+							mon.name or mon.id,
+							{ mon = mon, monlist = aMonList }
+						)
+					end
+				end
+			end
+			uiWrapper:show()
+			uiWrapper:bringToTop()
+		end
+		
+		uiWrapper:append('WndButton2', {
+			x = x0 + w0 / 2 - 50, y = y0 + h0 - 30,
+			w = 100, h = 30, text = _L['Close'],
+			onclick = function()
+				l_config = nil
+				uiWrapper:hide()
+			end,
+		})
+		uiWrapper:hide()
+	end
+	
 	for _, config in ipairs(Config) do
-		x, y = GenePS(ui, config, x, y, w, h)
+		x, y = GenePS(ui, config, x, y, w, h, OpenConfig)
 		y = y + 20
 	end
 	y = y + 10
@@ -1232,7 +1301,7 @@ function PS.OnPanelActive(wnd)
 		w = 60, h = 30,
 		text = _L["Import"],
 		onclick = function()
-			GetUserInput(_L['please input import data:'], function(szVal)
+			GetUserInput(_L['Please input import data:'], function(szVal)
 				local config = str2var(szVal)
 				if config then
 					config = MY.FormatDataStructure(config, ConfigTemplate, 1)
@@ -1270,7 +1339,9 @@ function PS.OnPanelActive(wnd)
 				if not Config or ctrl then
 					Config = MY.LoadLUAData(DEFAULT_CONFIG_FILE).default
 				end
-				UpdateConfigCalcProps(Config)
+				for _, config in pairs(Config) do
+					UpdateConfigDataVersion(config)
+				end
 				RecreateAllPanel()
 				MY.SwitchTab("MY_TargetMon", true)
 			end)
@@ -1281,4 +1352,8 @@ function PS.OnPanelActive(wnd)
 	x = X
 	y = y + 30
 end
-MY.RegisterPanel("MY_TargetMon", _L["target monitor"], _L['Target'], "ui/Image/ChannelsPanel/NewChannels.UITex|141", { 255, 255, 0, 200 }, PS)
+
+function PS.OnPanelScroll(wnd, scrollX, scrollY)
+	wnd:Lookup('WndWindow_Wrapper'):SetRelPos(scrollX, scrollY)
+end
+MY.RegisterPanel("MY_TargetMon", _L["Target monitor"], _L['Target'], "ui/Image/ChannelsPanel/NewChannels.UITex|141", { 255, 255, 0, 200 }, PS)
