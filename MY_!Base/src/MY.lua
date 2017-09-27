@@ -829,6 +829,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 	if not bForceUpdate and wndMainPanel.szID == szID then
 		-- return
 	end
+	local wndScroll = frame:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel')
 	-- fire custom registered on switch event
 	if wndMainPanel.OnPanelDeactive then
 		local res, err = pcall(wndMainPanel.OnPanelDeactive, wndMainPanel)
@@ -843,6 +844,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 	wndMainPanel.OnPanelResize   = nil
 	wndMainPanel.OnPanelActive   = nil
 	wndMainPanel.OnPanelDeactive = nil
+	wndScroll.OnScrollBarPosChanged = nil
 	if not szID then
 		-- »¶Ó­Ò³
 		local ui = MY.UI(wndMainPanel)
@@ -905,9 +907,19 @@ function MY.SwitchTab(szID, bForceUpdate)
 						end
 						wndMainPanel:FormatAllContentPos()
 					end
-					wndMainPanel.OnPanelResize   = tab.fn.OnPanelResize
-					wndMainPanel.OnPanelActive   = tab.fn.OnPanelActive
-					wndMainPanel.OnPanelDeactive = tab.fn.OnPanelDeactive
+					wndMainPanel.OnPanelResize      = tab.fn.OnPanelResize
+					wndMainPanel.OnPanelActive      = tab.fn.OnPanelActive
+					wndMainPanel.OnPanelDeactive    = tab.fn.OnPanelDeactive
+					wndScroll.OnScrollBarPosChanged = function()
+						if not tab.fn.OnPanelScroll then
+							return
+						end
+						local scale = Station.GetUIScale()
+						local scrollX, scrollY = wndMainPanel:GetStartRelPos()
+						scrollX = scrollX == 0 and 0 or -scrollX / scale
+						scrollY = scrollY == 0 and 0 or -scrollY / scale
+						tab.fn.OnPanelScroll(wndMainPanel, scrollX, scrollY)
+					end
 					break
 				end
 			end
@@ -980,9 +992,10 @@ function MY.RegisterPanel(szID, szTitle, szCategory, szIconTex, rgbaTitleColor, 
 		rgbTitle    = { rgbaTitleColor[1], rgbaTitleColor[2], rgbaTitleColor[3] },
 		alpha       = rgbaTitleColor[4],
 		fn          = {
-			OnPanelResize  = options.OnPanelResize ,
-			OnPanelActive  = options.OnPanelActive ,
+			OnPanelResize   = options.OnPanelResize  ,
+			OnPanelActive   = options.OnPanelActive  ,
 			OnPanelDeactive = options.OnPanelDeactive,
+			OnPanelScroll   = options.OnPanelScroll  ,
 		},
 	})
 
