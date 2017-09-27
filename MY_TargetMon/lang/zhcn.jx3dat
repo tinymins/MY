@@ -62,4 +62,9 @@ data = {
     ['Cancel buff is disabled outside dungeon.'] = '取消BUFF快捷键仅在副本内可用',
     ['Please input id:'] = '请输入ID：',
     ['Manual add id'] = '手动添加ID',
+    
+    ['Always show decimal time.'] = '总是显示小数点',
+    ['Never show decimal time.'] = '不显示小数点',
+    ["Show decimal time left in %ds."] = '最后%d秒显示小数点',
+    ['Show cd flash'] = '显示倒计时圈与消失特效',
 }
