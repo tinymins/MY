@@ -67,4 +67,9 @@ data = {
     ['Never show decimal time.'] = '不顯示小數點',
     ["Show decimal time left in %ds."] = '最後%d秒顯示小數點',
     ['Show cd flash'] = '顯示倒計時圈與消失特效',
+    ['Not set'] = '未設置',
+    ['Long alias: %s'] = '長別名：%s',
+    ['Please input long alias:'] = '請輸入長別名：',
+    ['Short alias: %s'] = '短別名：%s',
+    ['Please input short alias:'] = '請輸入短別名：',
 }

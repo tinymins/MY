@@ -255,7 +255,7 @@ local function RecreatePanel(config)
 			
 			txtName:SetVisible(config.showName)
 			txtName:SetW(config.cdBarWidth - 10)
-			txtName:SetText(mon.name or '')
+			txtName:SetText(mon.longAlias or mon.name or '')
 			
 			XGUI(imgProcess):image(config.cdBarUITex)
 			imgProcess:SetW(config.cdBarWidth)
@@ -269,7 +269,7 @@ local function RecreatePanel(config)
 		else
 			hCDBar:Hide()
 			hItem:SetW(hBox:GetW())
-			txtShortName:SetText(mon.name or '')
+			txtShortName:SetText(mon.shortAlias or mon.name or '')
 			txtShortName:SetVisible(config.showName)
 			hBox:SetSizeByAllItemSize()
 			hItem:SetSizeByAllItemSize()
@@ -386,7 +386,8 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 				end
 				if not hItem.mon.name then
 					hItem.mon.name = szName
-					hItem.txtName:SetText(szName)
+					hItem.txtName:SetText(hItem.mon.longAlias or szName)
+					hItem.txtShortName:SetText(hItem.mon.shortAlias or szName)
 				end
 				hItem.mon.iconid = Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13
 				hItem.box:SetObjectIcon(hItem.mon.iconid)
@@ -1234,6 +1235,27 @@ function PS.OnPanelActive(wnd)
 								RecreatePanel(l_config)
 							end
 						end, function() end, function() end, nil, nil)
+					end,
+				},
+				{ bDevide = true },
+				{
+					szOption = _L('Long alias: %s', mon.longAlias or _L['Not set']),
+					fnAction = function()
+						GetUserInput(_L['Please input long alias:'], function(szVal)
+							szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
+							mon.longAlias = szVal
+							RecreatePanel(l_config)
+						end, function() end, function() end, nil, mon.longAlias or mon.name)
+					end,
+				},
+				{
+					szOption = _L('Short alias: %s', mon.shortAlias or _L['Not set']),
+					fnAction = function()
+						GetUserInput(_L['Please input short alias:'], function(szVal)
+							szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
+							mon.shortAlias = szVal
+							RecreatePanel(l_config)
+						end, function() end, function() end, nil, mon.shortAlias or mon.name)
 					end,
 				},
 			}
