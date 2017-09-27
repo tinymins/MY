@@ -2498,7 +2498,7 @@ end
 function XGUI:bringToTop()
 	self:_checksum()
 	for _, ele in pairs(self.eles) do
-		local x = ele.frm
+		local x = ele.wnd
 		if x and x.BringToTop then
 			x:BringToTop()
 		end
