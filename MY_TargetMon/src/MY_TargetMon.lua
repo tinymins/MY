@@ -363,7 +363,7 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 			end
 			-- 计算BUFF时间
 			local nTimeLeft = math.max(0, buff.nEndFrame - nFrameCount) / 16
-			local szTimeLeft = ((config.decimalTime == -1 or nTimeLeft < config.decimalTime) and "%.1f'" or '%d'):format(nTimeLeft)
+			local szTimeLeft = nTimeLeft > 3600 and '1h+' or ((config.decimalTime == -1 or nTimeLeft < config.decimalTime) and "%.1f'" or '%d'):format(nTimeLeft)
 			local nBuffTime = math.max(GetBuffTime(buff.dwID, buff.nLevel) / 16, nTimeLeft)
 			if l_tBuffTime[KTarget.dwID][buff.dwID] then
 				nBuffTime = math.max(l_tBuffTime[KTarget.dwID][buff.dwID], nBuffTime)
@@ -394,7 +394,7 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 			end
 			-- 倒计时 与 BUFF层数堆叠
 			hItem.txtProcess:SetText(szTimeLeft)
-			hItem.box:SetOverText(1, nTimeLeft > 3600 and '1h+' or szTimeLeft)
+			hItem.box:SetOverText(1, szTimeLeft)
 			hItem.box:SetOverText(0, buff.nStackNum == 1 and "" or buff.nStackNum)
 			-- CD百分比
 			local fPercent = nTimeLeft / nBuffTime
