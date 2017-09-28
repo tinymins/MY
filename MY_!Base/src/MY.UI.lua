@@ -79,11 +79,20 @@ local function ApplyUIArguments(ui, arg)
 end
 XGUI.ApplyUIArguments = ApplyUIArguments
 
+local GetComponentType, SetComponentType
+do local l_type = setmetatable({}, { __mode = 'k' })
+	function GetComponentType(dom)
+		return l_type[dom] or dom:GetType()
+	end
+	function SetComponentType(dom, szType)
+		l_type[dom] = szType
+	end
+end
 -- conv raw to eles array
 local function raw2ele(raw)
 	-- format tab
 	local ele = { raw = raw }
-	ele.type = raw.szMyuiType or raw:GetType()
+	ele.type = GetComponentType(raw)
 	if ele.type == "WndCheckBox" then
 		ele.chk = raw
 		ele.wnd = ele.wnd or raw
@@ -307,14 +316,14 @@ function XGUI:del(raw)
 			if string.sub(raw, 1, 1) == "^" then
 				-- regexp
 				for i = #eles, 1, -1 do
-					if string.find((eles[i].raw.szMyuiType or eles[i].raw:GetType()), raw) then
+					if string.find(GetComponentType(eles[i].raw), raw) then
 						table.remove(eles, i)
 					end
 				end
 			else
 				-- normal
 				for i = #eles, 1, -1 do
-					if (eles[i].raw.szMyuiType or eles[i].raw:GetType()) == raw then
+					if GetComponentType(eles[i].raw) == raw then
 						table.remove(eles, i)
 					end
 				end
@@ -364,14 +373,14 @@ function XGUI:filter(raw)
 			if string.sub(raw, 1, 1) == "^" then
 				-- regexp
 				for i = #eles, 1, -1 do
-					if not string.find((eles[i].raw.szMyuiType or eles[i].raw:GetType()), raw) then
+					if not string.find(GetComponentType(eles[i].raw), raw) then
 						table.remove(eles, i)
 					end
 				end
 			else
 				-- normal
 				for i = #eles, 1, -1 do
-					if (eles[i].raw.szMyuiType or eles[i].raw:GetType()) ~= raw then
+					if GetComponentType(eles[i].raw) ~= raw then
 						table.remove(eles, i)
 					end
 				end
@@ -750,7 +759,7 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 				if not wnd then
 					MY.Debug({_L("can not find wnd component [%s]", szType)}, 'MY#UI#append', MY_DEBUG.ERROR)
 				else
-					wnd.szMyuiType = szType
+					SetComponentType(wnd, szType)
 					if szName then
 						wnd:SetName(szName)
 					end
