@@ -759,40 +759,36 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 						wnd.bShowPercentage = true
 						wnd.nOffset = 0
 						wnd.tMyOnChange = {}
-						wnd:Lookup("WndNewScrollBar_Default").FormatText = function(value, bPercentage)
+						local scroll = wnd:Lookup("WndNewScrollBar_Default")
+						wnd.FormatText = function(value, bPercentage)
 							if bPercentage then
 								return string.format("%.2f%%", value)
 							else
 								return value
 							end
 						end
-						wnd:Lookup("WndNewScrollBar_Default").OnScrollBarPosChanged = function()
-							local scroll = this
+						wnd.ResponseUpdateScroll = function(bOnlyUI)
+							local _this = this
 							this = wnd
-							local fnFormat = wnd:Lookup("WndNewScrollBar_Default").FormatText
-							if wnd.bShowPercentage then
-								local nCurrentPercentage = scroll:GetScrollPos() * 100 / scroll:GetStepCount()
-								wnd:Lookup("", "Text_Default"):SetText(fnFormat(nCurrentPercentage, true))
-								for _, fn in ipairs(wnd.tMyOnChange) do
-									pcall(fn, wnd, nCurrentPercentage)
-								end
-							else
-								local nCurrentValue = scroll:GetScrollPos() + wnd.nOffset
-								wnd:Lookup("", "Text_Default"):SetText(fnFormat(nCurrentValue, false))
+							local nScrollPos, nStepCount = scroll:GetScrollPos(), scroll:GetStepCount()
+							local nCurrentValue = wnd.bShowPercentage and (nScrollPos * 100 / nStepCount) or (nScrollPos + wnd.nOffset)
+							wnd:Lookup("", "Text_Default"):SetText(wnd.FormatText(nCurrentValue, wnd.bShowPercentage))
+							if not bOnlyUI then
 								for _, fn in ipairs(wnd.tMyOnChange) do
 									pcall(fn, wnd, nCurrentValue)
 								end
 							end
-							this = scroll
+							this = _this
 						end
-						wnd:Lookup("WndNewScrollBar_Default").OnMouseWheel = function()                                   -- listening Mouse Wheel
-							local nDistance = Station.GetMessageWheelDelta()            -- get distance
-							wnd:Lookup("WndNewScrollBar_Default"):ScrollNext(-nDistance*2)            -- wheel scroll position
+						scroll.OnScrollBarPosChanged = function()
+							wnd.ResponseUpdateScroll()
+						end
+						scroll.OnMouseWheel = function()
+							scroll:ScrollNext(-Station.GetMessageWheelDelta() * 2)
 							return 1
 						end
-						wnd:Lookup("WndNewScrollBar_Default"):Lookup('Btn_Track').OnMouseWheel = function()               -- listening Mouse Wheel
-							local nDistance = Station.GetMessageWheelDelta()            -- get distance
-							wnd:Lookup("WndNewScrollBar_Default"):ScrollNext(-nDistance)            -- wheel scroll position
+						scroll:Lookup('Btn_Track').OnMouseWheel = function()
+							scroll:ScrollNext(-Station.GetMessageWheelDelta())
 							return 1
 						end
 					elseif szType=='WndEditBox' then
@@ -1193,7 +1189,8 @@ function XGUI:text(szText)
 				ele.hdl:AppendItemFromString(GetFormatText(szText))
 				ele.hdl:FormatAllItemPos()
 			elseif ele.type == "WndSliderBox" and type(szText)=="function" then
-				ele.sld.FormatText = szText
+				ele.wnd.FormatText = szText
+				ele.wnd.ResponseUpdateScroll(true)
 			elseif ele.type == "WndEditBox" or ele.type == "WndAutocomplete" then
 				if type(szText) == "table" then
 					for k, v in ipairs(szText) do
