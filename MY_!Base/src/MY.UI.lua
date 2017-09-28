@@ -10,7 +10,41 @@
 -------------------------------------
 -- UI object class
 -------------------------------------
-XGUI = class()
+do
+local function createInstance(c, ins, ...)
+	if not ins then
+		ins = c
+	end
+	if c.ctor then
+		c.ctor(ins, ...)
+	end
+	return c
+end
+XGUI = setmetatable({}, {
+	__index = {},
+	__tostring = function(t) return "XGUI (class prototype)" end,
+	__call = function (...)
+		local store = {}
+		return createInstance(setmetatable({}, {
+			__index = function(t, k)
+				if type(k) == 'number' then
+					return store.eles[k] and store.eles[k].raw
+				else
+					return store[k] or XGUI[k]
+				end
+			end,
+			__newindex = function(t, k, v)
+				if type(k) == 'number' then
+					assert(false, 'Elements are readonly!')
+				else
+					store[k] = v
+				end
+			end,
+			__tostring = function(t) return "XGUI (class instance)" end,
+		}), nil, ...)
+	end,
+})
+end
 MY.UI = XGUI
 local XGUI = XGUI
 local _L = MY.LoadLangPack()
@@ -99,7 +133,7 @@ do local l_prop = setmetatable({}, { __mode = 'k' })
 	end
 
 	function GetComponentType(raw)
-		return GetComponentProp(raw, 'type') or raw:GetType()
+		return GetComponentProp(raw, 'type') or (raw and raw:GetType())
 	end
 
 	function SetComponentType(raw, szType)
@@ -237,7 +271,7 @@ end
 --
 -- ui object creator
 -- same as jQuery.$()
-function XGUI:ctor(raw, tab)
+function XGUI:ctor(super, raw, tab)
 	self.eles = self.eles or {} -- setmetatable({}, { __mode = "v" })
 	if type(raw)=="table" and type(raw.eles)=="table" then
 		for i = 1, #raw.eles, 1 do
@@ -265,7 +299,7 @@ function XGUI:clone(eles)
 	for i = 1, #eles, 1 do
 		if eles[i].raw then table.insert(_eles, raw2ele(eles[i].raw)) end
 	end
-	return XGUI.new({eles = _eles})
+	return XGUI({eles = _eles})
 end
 
 --  del bad eles
@@ -2975,12 +3009,11 @@ MY.Const.UI.Tip.HIDE         = 101
 MY.Const.UI.Tip.ANIMATE_HIDE = 102
 
 -- 设置元表，这样可以当作函数调用，其效果相当于 XGUI.Fetch
-setmetatable(XGUI, { __call = function(me, ...) return me.Fetch(...) end, __metatable = true })
 
 
 -- 构造函数 类似jQuery: $(selector)
 function XGUI.Fetch(selector, tab)
-	return XGUI.new(selector, tab)
+	return XGUI(selector, tab)
 end
 -- 绑定UI事件
 function XGUI.RegisterUIEvent(raw, szEvent, fnEvent)
