@@ -79,15 +79,29 @@ local function ApplyUIArguments(ui, arg)
 end
 XGUI.ApplyUIArguments = ApplyUIArguments
 
+local GetComponentProp, SetComponentProp
 local GetComponentType, SetComponentType
-do local l_type = setmetatable({}, { __mode = 'k' })
-	function GetComponentType(dom)
-		return l_type[dom] or dom:GetType()
+do local l_prop = setmetatable({}, { __mode = 'k' })
+	function GetComponentProp(dom, k)
+		return l_prop[dom] and l_prop[dom][k]
 	end
+
+	function SetComponentProp(dom, k, v)
+		if not l_prop[dom] then
+			l_prop[dom] = {}
+		end
+		l_prop[dom][k] = v
+	end
+
+	function GetComponentType(dom)
+		return GetComponentProp(dom, 'type') or dom:GetType()
+	end
+
 	function SetComponentType(dom, szType)
-		l_type[dom] = szType
+		SetComponentProp(dom, 'type', szType)
 	end
 end
+
 -- conv raw to eles array
 local function raw2ele(raw)
 	-- format tab
