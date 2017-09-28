@@ -767,20 +767,23 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 							end
 						end
 						wnd:Lookup("WndNewScrollBar_Default").OnScrollBarPosChanged = function()
+							local scroll = this
+							this = wnd
 							local fnFormat = wnd:Lookup("WndNewScrollBar_Default").FormatText
 							if wnd.bShowPercentage then
-								local nCurrentPercentage = this:GetScrollPos() * 100 / this:GetStepCount()
+								local nCurrentPercentage = scroll:GetScrollPos() * 100 / scroll:GetStepCount()
 								wnd:Lookup("", "Text_Default"):SetText(fnFormat(nCurrentPercentage, true))
 								for _, fn in ipairs(wnd.tMyOnChange) do
 									pcall(fn, wnd, nCurrentPercentage)
 								end
 							else
-								local nCurrentValue = this:GetScrollPos() + wnd.nOffset
+								local nCurrentValue = scroll:GetScrollPos() + wnd.nOffset
 								wnd:Lookup("", "Text_Default"):SetText(fnFormat(nCurrentValue, false))
 								for _, fn in ipairs(wnd.tMyOnChange) do
 									pcall(fn, wnd, nCurrentValue)
 								end
 							end
+							this = scroll
 						end
 						wnd:Lookup("WndNewScrollBar_Default").OnMouseWheel = function()                                   -- listening Mouse Wheel
 							local nDistance = Station.GetMessageWheelDelta()            -- get distance
@@ -945,7 +948,7 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 					if bReturnNewItem then
 						ret = ret:add(wnd)
 					end
-					ui = XGUI(wnd):hover(OnCommonComponentMouseEnter, OnCommonComponentMouseLeave)
+					ui = XGUI(wnd):hover(OnCommonComponentMouseEnter, OnCommonComponentMouseLeave):change(OnCommonComponentMouseEnter)
 				end
 				Wnd.CloseWindow(frame)
 			elseif ( string.sub(szType, 1, 3) ~= "Wnd" and ele.hdl ) then
