@@ -19,14 +19,16 @@ local _L = MY.LoadLangPack()
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 ------------------------------------------------------------------------
+local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
-local tinsert, tremove, tconcat = table.insert, table.remove, table.concat
-local ssub, slen, schar, srep, sbyte, sformat, sgsub = string.sub, string.len, string.char, string.rep, string.byte, string.format, string.gsub
+local insert, remove, concat = table.insert, table.remove, table.concat
+local sub, len, char, rep = string.sub, string.len, string.char, string.rep
+local byte, format, gsub = string.byte, string.format, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
-local floor, mmin, mmax, mceil = math.floor, math.min, math.max, math.ceil
-local GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID = GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID
-local setmetatable = setmetatable
+local floor, min, max, ceil = math.floor, math.min, math.max, math.ceil
+local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 
 ---------------------------------------------------------------------
 -- 本地的 UI 组件对象
@@ -82,23 +84,23 @@ XGUI.ApplyUIArguments = ApplyUIArguments
 local GetComponentProp, SetComponentProp
 local GetComponentType, SetComponentType
 do local l_prop = setmetatable({}, { __mode = 'k' })
-	function GetComponentProp(dom, k)
-		return l_prop[dom] and l_prop[dom][k]
+	function GetComponentProp(raw, k)
+		return l_prop[raw] and l_prop[raw][k]
 	end
 
-	function SetComponentProp(dom, k, v)
-		if not l_prop[dom] then
-			l_prop[dom] = {}
+	function SetComponentProp(raw, k, v)
+		if not l_prop[raw] then
+			l_prop[raw] = {}
 		end
-		l_prop[dom][k] = v
+		l_prop[raw][k] = v
 	end
 
-	function GetComponentType(dom)
-		return GetComponentProp(dom, 'type') or dom:GetType()
+	function GetComponentType(raw)
+		return GetComponentProp(raw, 'type') or raw:GetType()
 	end
 
-	function SetComponentType(dom, szType)
-		SetComponentProp(dom, 'type', szType)
+	function SetComponentType(raw, szType)
+		SetComponentProp(raw, 'type', szType)
 	end
 end
 
@@ -1092,9 +1094,9 @@ local function SetEleEnable(x, ele, bEnable)
 		if ele.txt then
 			local r, g, b = ele.txt:GetFontColor()
 			if bEnable then
-				ele.txt:SetFontColor(mmin(mceil(r * 2.2), 255), mmin(mceil(g * 2.2), 255), mmin(mceil(b * 2.2), 255))
+				ele.txt:SetFontColor(min(ceil(r * 2.2), 255), min(ceil(g * 2.2), 255), min(ceil(b * 2.2), 255))
 			else
-				ele.txt:SetFontColor(mmin(mceil(r / 2.2), 255), mmin(mceil(g / 2.2), 255), mmin(mceil(b / 2.2), 255))
+				ele.txt:SetFontColor(min(ceil(r / 2.2), 255), min(ceil(g / 2.2), 255), min(ceil(b / 2.2), 255))
 			end
 		end
 	end
@@ -3437,7 +3439,7 @@ function XGUI.OpenColorPickerEx(fnAction)
 	local fnHover = function(bHover, r, g, b)
 		if bHover then
 			wnd:item("#Select"):color(r, g, b)
-			wnd:item("#Select_Text"):text(sformat("r=%d, g=%d, b=%d", r, g, b))
+			wnd:item("#Select_Text"):text(format("r=%d, g=%d, b=%d", r, g, b))
 		else
 			wnd:item("#Select"):color(255, 255, 255)
 			wnd:item("#Select_Text"):text(g_tStrings.STR_NONE)
@@ -3547,7 +3549,7 @@ function XGUI.OpenIconPanel(fnAction)
 					boxs[i]:icon(-1)
 					txts[i]:text(nIcon):toggle(true)
 					MY.DelayCall(function()
-						if mceil(nIcon / 144) == ICON_PAGE and boxs[i] then
+						if ceil(nIcon / 144) == ICON_PAGE and boxs[i] then
 							boxs[i]:icon(nIcon):toggle(true)
 						end
 					end)
@@ -3833,7 +3835,7 @@ function XGUI.GetShadowHandle(szName)
 	end
 	local sh = Station.Lookup("Lowest/MY_Shadows") or Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. "ui/MY_Shadows.ini", "MY_Shadows")
 	if not sh:Lookup("", szName) then
-		sh:Lookup("", ""):AppendItemFromString(sformat("<handle> name=\"%s\" </handle>", szName))
+		sh:Lookup("", ""):AppendItemFromString(format("<handle> name=\"%s\" </handle>", szName))
 	end
 	MY.Debug({"Create sh # " .. szName}, "XGUI", MY_DEBUG.LOG)
 	return sh:Lookup("", szName)
