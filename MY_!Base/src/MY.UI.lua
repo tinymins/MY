@@ -85,10 +85,13 @@ local GetComponentProp, SetComponentProp
 local GetComponentType, SetComponentType
 do local l_prop = setmetatable({}, { __mode = 'k' })
 	function GetComponentProp(raw, k)
-		return l_prop[raw] and l_prop[raw][k]
+		return raw and l_prop[raw] and l_prop[raw][k]
 	end
 
 	function SetComponentProp(raw, k, v)
+		if not raw then
+			return
+		end
 		if not l_prop[raw] then
 			l_prop[raw] = {}
 		end
@@ -601,52 +604,6 @@ function XGUI:raw(index, key)
 	if index > 0 and index <= #eles then return eles[index][key] end
 end
 
--- get ele
-function XGUI:ele(index)
-	self:_checksum()
-	local eles, ele = self.eles, {}
-	if index < 0 then index = #eles + index + 1 end
-	if index > 0 and index <= #eles then
-		for k, v in pairs(eles[index]) do
-			ele[k] = v
-		end
-	end
-	return ele
-end
-
--- get frm
-function XGUI:frm(index)
-	self:_checksum()
-	local eles = {}
-	if index < 0 then index = #self.eles + index + 1 end
-	if index > 0 and index <= #self.eles and self.eles[index].frm then
-		table.insert(eles, { raw = self.eles[index].frm })
-	end
-	return self:clone(eles)
-end
-
--- get wnd
-function XGUI:wnd(index)
-	self:_checksum()
-	local eles = {}
-	if index < 0 then index = #self.eles + index + 1 end
-	if index > 0 and index <= #self.eles and self.eles[index].wnd then
-		table.insert(eles, { raw = self.eles[index].wnd })
-	end
-	return self:clone(eles)
-end
-
--- get item
-function XGUI:itm(index)
-	self:_checksum()
-	local eles = {}
-	if index < 0 then index = #eles + index + 1 end
-	if index > 0 and index <= #self.eles and self.eles[index].itm then
-		table.insert(eles, { raw = self.eles[index].itm })
-	end
-	return self:clone(eles)
-end
-
 -- get handle
 function XGUI:hdl(index)
 	self:_checksum()
@@ -1154,22 +1111,18 @@ function XGUI:drag(nX, nY, nW, nH)
 	self:_checksum()
 	if type(nX) == 'boolean' then
 		for _, ele in pairs(self.eles) do
-			local x = ele.frm or ele.raw
+			local x = ele.raw
 			if x and x.EnableDrag then
 				x:EnableDrag(nX)
 			end
 		end
 		return self
-	elseif type(nX) == 'number' or
-	type(nY) == 'number' or
-	type(nW) == 'number' or
-	type(nH) == 'number' then
-		for i = 1, #self.eles, 1 do
-			local s, err =pcall(function()
-				local _w, _h = self:eq(i):size()
-				nX, nY, nW, nH = nX or 0, nY or 0, nW or _w, nH or _h
-				self:frm(i):raw(1):SetDragArea(nX, nY, nW, nH)
-			end)
+	elseif type(nX) == 'number' or type(nY) == 'number' or type(nW) == 'number' or type(nH) == 'number' then
+		for _, ele in ipairs(self.eles) do
+			local x = ele.raw
+			if GetComponentType(x) == 'WndFrame' then
+				x:SetDragArea(nX or 0, nY or 0, nW or x:GetW(), nH or x:GetH())
+			end
 		end
 		return self
 	elseif type(nX) == 'function' or
@@ -2035,7 +1988,7 @@ function XGUI:height(nHeight, nRawHeight)
 	end
 end
 
--- (number, number) Instance:size()
+-- (number, number) Instance:size(bInnerSize)
 -- (self) Instance:size(nLeft, nTop)
 -- (self) Instance:size(OnSizeChanged)
 function XGUI:size(nWidth, nHeight, nRawWidth, nRawHeight)
@@ -2044,7 +1997,7 @@ function XGUI:size(nWidth, nHeight, nRawWidth, nRawHeight)
 		for _, ele in pairs(self.eles) do
 			XGUI.RegisterUIEvent(ele.raw, "OnSizeChanged", nWidth)
 		end
-	elseif nWidth or nHeight then
+	elseif type(nWidth) == 'number' or type(nHeight) == 'number' then
 		for _, ele in pairs(self.eles) do
 			local _nWidth, _nHeight = ele.raw:GetSize()
 			nWidth, nHeight = nWidth or _nWidth, nHeight or _nHeight
@@ -2204,10 +2157,17 @@ function XGUI:size(nWidth, nHeight, nRawWidth, nRawHeight)
 			end
 		end
 		return self
-	else -- get
+	else
 		local ele = self.eles[1]
-		if ele and ele.raw and ele.raw.GetSize then
-			return ele.raw:GetSize()
+		if not ele then
+			return
+		end
+		local x = ele.raw
+		if nWidth == true then
+			x = ele.wnd or ele.raw
+		end
+		if x and x.GetSize then
+			return x:GetSize()
 		end
 	end
 end
@@ -3602,7 +3562,7 @@ function XGUI.OpenTextEditor(szText, szFrameName)
 	end
 	local w, h, ui = 400, 300
 	local function OnResize()
-		ui:children('.WndEditBox'):size(ui:wnd(1):size())
+		ui:children('.WndEditBox'):size(ui:size(true))
 	end
 	ui = XGUI.CreateFrame(szFrameName, {
 		w = w, h = h, text = _L["text editor"], alpha = 180,
