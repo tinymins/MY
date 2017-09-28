@@ -196,6 +196,46 @@ function MY.GetAddonInfo()
 end
 end
 
+do
+local function createInstance(c, ins, ...)
+	if not ins then
+		ins = c
+	end
+	if c.ctor then
+		c.ctor(ins, ...)
+	end
+	return c
+end
+function MY.class(className, super)
+	if type(super) == "string" then
+		className, super = super
+	end
+	if not className then
+		className = "Unnamed Class"
+	end
+	local classPrototype = (function ()
+		local proxys = {}
+		if super then
+			proxys.super = super
+			setmetatable(proxys, { __index = super })
+		end
+		return setmetatable({}, {
+			__index = proxys,
+			__tostring = function(t) return className .. " (class prototype)" end,
+			__call = function (...)
+				return createInstance(setmetatable({}, {
+					__index = classPrototype,
+					__tostring = function(t) return className .. " (class instance)" end,
+				}), nil, ...)
+			end,
+		})
+	end)()
+
+	return classPrototype
+end
+end
+
+
 --------------------------------------------------------------------------------------------------------------------------------------------
 -- 界面开关
 --------------------------------------------------------------------------------------------------------------------------------------------
