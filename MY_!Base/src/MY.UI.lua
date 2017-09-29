@@ -13,9 +13,9 @@
 ------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
-local insert, remove, concat = table.insert, table.remove, table.concat
-local sub, len, char, rep = string.sub, string.len, string.char, string.rep
-local byte, format, gsub = string.byte, string.format, string.gsub
+local insert, remove, concat = insert, remove, concat
+local sub, len, char, rep = sub, len, char, rep
+local byte, format, gsub = byte, format, gsub
 local type, tonumber, tostring = type, tonumber, tostring
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local floor, min, max, ceil = math.floor, math.min, math.max, math.ceil
@@ -37,13 +37,16 @@ local function createInstance(c, ins, ...)
 end
 XGUI = setmetatable({}, {
 	__index = {},
-	__tostring = function(t) return "XGUI (class prototype)" end,
+	__tostring = function(t) return 'XGUI (class prototype)' end,
 	__call = function (...)
 		local store = {}
 		return createInstance(setmetatable({}, {
 			__index = function(t, k)
 				if type(k) == 'number' then
-					return store.eles[k] and store.eles[k].raw
+					if k < 0 then
+						k = #store.raws + k + 1
+					end
+					return store.raws[k]
 				else
 					return store[k] or XGUI[k]
 				end
@@ -55,16 +58,16 @@ XGUI = setmetatable({}, {
 					store[k] = v
 				end
 			end,
-			__tostring = function(t) return "XGUI (class instance)" end,
+			__tostring = function(t) return 'XGUI (class instance)' end,
 		}), nil, ...)
 	end,
 })
 end
 local _L, XGUI = MY.LoadLangPack(), XGUI
 
----------------------------------------------------------------------
--- 本地的 UI 组件对象
----------------------------------------------------------------------
+-----------------------------------------------------------
+-- my ui common functions
+-----------------------------------------------------------
 local function ApplyUIArguments(ui, arg)
 	if ui and arg then
 		-- properties
@@ -91,7 +94,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.limit              ~= nil then ui:limit      (arg.limit      ) end
 		if arg.scroll             ~= nil then ui:scroll     (arg.scroll     ) end
 		if arg.handlestyle        ~= nil then ui:handleStyle(arg.handlestyle) end
-		if arg.edittype           ~= nil then ui:edittype   (arg.edittype   ) end
+		if arg.edittype           ~= nil then ui:editType   (arg.edittype   ) end
 		if arg.visible            ~= nil then ui:visible    (arg.visible    ) end
 		if arg.enable             ~= nil then ui:enable     (arg.enable     ) end
 		if arg.autoenable         ~= nil then ui:enable     (arg.autoenable ) end
@@ -113,21 +116,62 @@ local function ApplyUIArguments(ui, arg)
 end
 XGUI.ApplyUIArguments = ApplyUIArguments
 
-local GetComponentProp, SetComponentProp
-local GetComponentType, SetComponentType
+local function IsElement(element)
+	return type(element) == 'table' and element.IsValid and element:IsValid()
+end
+
+local GetComponentProp, SetComponentProp -- 组件私有属性 仅本文件内使用
+local GetComponentType, SetComponentType -- 组件名字记录
+local GetComponentData, SetComponentData -- 组件公有数据 可在外部通过:data()读写
 do local l_prop = setmetatable({}, { __mode = 'k' })
-	function GetComponentProp(raw, k)
-		return raw and l_prop[raw] and l_prop[raw][k]
+	function GetComponentProp(raw, ...)
+		if not raw or not l_prop[raw] then
+			return
+		end
+		local prop = l_prop[raw]
+		local k = { ... }
+		local kc = select('#', ...)
+		for i = 1, kc, 1 do
+			if not prop[k[i]] then
+				return
+			end
+			prop = prop[k[i]]
+		end
+		return prop
 	end
 
-	function SetComponentProp(raw, k, v)
+	function SetComponentProp(raw, ...)
 		if not raw then
 			return
 		end
 		if not l_prop[raw] then
 			l_prop[raw] = {}
 		end
-		l_prop[raw][k] = v
+		local prop = l_prop[raw]
+		local k = { ... }
+		local v = remove(k)
+		local kc = select('#', ...) - 1
+		for i = 1, kc - 1, 1 do
+			if not prop[k[i]] then
+				prop[k[i]] = {}
+			end
+			prop = prop[k[i]]
+		end
+		prop[k[kc]] = v
+	end
+
+	function GetComponentData(raw, k)
+		return raw and l_data[raw] and l_data[raw][k]
+	end
+
+	function SetComponentData(raw, k, v)
+		if not raw then
+			return
+		end
+		if not l_data[raw] then
+			l_data[raw] = {}
+		end
+		l_data[raw][k] = v
 	end
 
 	function GetComponentType(raw)
@@ -139,427 +183,604 @@ do local l_prop = setmetatable({}, { __mode = 'k' })
 	end
 end
 
--- conv raw to eles array
-local function raw2ele(raw)
-	-- format tab
-	local ele = { raw = raw }
-	ele.type = GetComponentType(raw)
-	if ele.type == "WndCheckBox" then
-		ele.chk = raw
-		ele.wnd = ele.wnd or raw
-		ele.hdl = ele.hdl or raw:Lookup('','')
-		ele.txt = ele.txt or raw:Lookup('','Text_Default')
-	elseif ele.type == "WndRadioBox" then
-		ele.chk = raw
-		ele.wnd = ele.wnd or raw
-		ele.hdl = ele.hdl or raw:Lookup('','')
-		ele.txt = ele.txt or raw:Lookup('','Text_Default')
-	elseif ele.type == "WndEdit" then
-		ele.edt = raw
-		ele.wnd = ele.wnd or raw
-		ele.hdl = ele.hdl or raw:Lookup('','')
-		ele.txt = ele.txt or raw:Lookup('','Text_Default')
-	elseif ele.type == "WndEditBox" then
-		ele.wnd = ele.wnd or raw
-		ele.hdl = ele.hdl or raw:Lookup('','')
-		ele.edt = ele.edt or raw:Lookup('WndEdit_Default')
-		ele.img = ele.img or raw:Lookup('','Image_Default')
-	elseif ele.type == "WndComboBox" then
-		ele.wnd = ele.wnd or raw
-		ele.hdl = ele.hdl or raw:Lookup('','')
-		ele.cmb = ele.cmb or raw:Lookup('Btn_ComboBox')
-		ele.txt = ele.txt or raw:Lookup('','Text_Default')
-		ele.img = ele.img or raw:Lookup('','Image_Default')
-	elseif ele.type == "WndEditComboBox" or ele.type == "WndAutocomplete" then
-		ele.wnd = ele.wnd or raw
-		ele.hdl = ele.hdl or raw:Lookup('','')
-		ele.cmb = ele.cmb or raw:Lookup('Btn_ComboBox')
-		ele.edt = ele.edt or raw:Lookup('WndEdit_Default')
-		ele.img = ele.img or raw:Lookup('','Image_Default')
-	elseif ele.type == "WndScrollBox" then
-		ele.wnd = ele.wnd or raw
-		ele.hdl = ele.hdl or raw:Lookup('','Handle_Padding/Handle_Scroll')
-		ele.txt = ele.txt or raw:Lookup('','Handle_Padding/Handle_Scroll/Text_Default')
-		ele.img = ele.img or raw:Lookup('','Image_Default')
-	elseif ele.type == "WndFrame" then
-		ele.frm = ele.frm or raw
-		ele.wnd = ele.wnd or raw:Lookup("Window_Main")
-		ele.hdl = ele.hdl or (ele.wnd or ele.frm):Lookup("", "")
-		ele.txt = ele.txt or raw:Lookup("", "Text_Title")
-	elseif ele.type == "WndSliderBox" then
-		ele.wnd = ele.wnd or raw
-		ele.hdl = ele.hdl or raw:Lookup('','')
-		ele.sld = ele.sld or raw:Lookup("WndNewScrollBar_Default")
-		ele.txt = ele.txt or raw:Lookup('','Text_Default')
-	elseif ele.type == "Handle" then
-		ele.hdl = raw
-		ele.itm = raw
-		ele.txt = ele.txt or raw:Lookup("Text_Default")
-		ele.img = ele.img or raw:Lookup("Image_Default")
-	elseif ele.type == "Text" then
-		ele.txt = raw
-		ele.itm = raw
-	elseif ele.type == "Image" then
-		ele.img = raw
-		ele.itm = raw
-	elseif ele.type == "Shadow" then
-		ele.sdw = raw
-		ele.itm = raw
-	elseif ele.type == "Box" then
-		ele.box = raw
-		ele.itm = raw
-	elseif string.sub(ele.type, 1, 3) == "Wnd" then
-		ele.wnd = ele.wnd or raw
-		ele.hdl = ele.hdl or raw:Lookup('','')
-		ele.txt = ele.txt or raw:Lookup('','Text_Default')
-	else
-		ele.itm = raw
-	end
-	return ele
-end
-
------------------------------------------------------------
--- my ui common functions
------------------------------------------------------------
--- 获取一个窗体的所有子元素
-local function GetChildren(root)
-	if not root then return {} end
-	local stack = { root }  -- 初始栈
-	local children = {}     -- 保存所有子元素 szTreePath => element 键值对
-	while #stack > 0 do     -- 循环直到栈空
-		--### 弹栈: 弹出栈顶元素
-		local raw = stack[#stack]
-		table.remove(stack, #stack)
-		if raw:GetType()=="Handle" then
-			-- 将当前弹出的Handle加入子元素表
-			children[table.concat({ raw:GetTreePath(), '/Handle' })] = raw
-			for i = 0, raw:GetItemCount() - 1, 1 do
-				-- 如果子元素是Handle/将他压栈
-				if raw:Lookup(i):GetType()=='Handle' then table.insert(stack, raw:Lookup(i))
-				-- 否则压入结果队列
-				else children[table.concat({table.concat({ raw:Lookup(i):GetTreePath() }), i})] = raw:Lookup(i) end
-			end
-		else
-			-- 如果有Handle则将所有Handle压栈待处理
-			local status, handle = pcall(function() return raw:Lookup('','') end) -- raw可能没有Lookup方法 用pcall包裹
-			if status and handle then table.insert(stack, handle) end
-			-- 将当前弹出的元素加入子元素表
-			children[table.concat({ raw:GetTreePath() })] = raw
-			--### 压栈: 将刚刚弹栈的元素的所有子窗体压栈
-			local status, sub_raw = pcall(function() return raw:GetFirstChild() end) -- raw可能没有GetFirstChild方法 用pcall包裹
-			while status and sub_raw do
-				table.insert(stack, sub_raw)
-				sub_raw = sub_raw:GetNext()
-			end
+local function GetComponentElement(raw, elementType)
+	local element
+	local componentType = GetComponentType(raw)
+	local componentBaseType = raw:GetBaseType()
+	if elementType == 'ITEM' then
+		if componentBaseType ~= 'Wnd' then
+			element = raw
+		end
+	elseif elementType == 'WND' then
+		if componentBaseType == 'Wnd' then
+			element = raw
+		end
+	elseif elementType == 'MAIN_WINDOW' then
+		if componentType == 'WndFrame' then
+			element = raw:Lookup('Window_Main') or raw
+		elseif componentBaseType == 'Wnd' then
+			element = raw
+		end
+	elseif elementType == 'MAIN_HANDLE' then
+		if componentType == 'WndScrollBox' then
+			element = raw:Lookup('', 'Handle_Padding/Handle_Scroll')
+		elseif componentType == 'WndFrame' then
+			element = GetComponentElement(raw, 'MAIN_WINDOW'):Lookup('', '')
+		elseif componentType == 'Handle' then
+			element = raw
+		elseif componentBaseType == 'Wnd' then
+			element = raw:Lookup('', '')
+		end
+	elseif elementType == 'FRAME' then
+		if componentType == 'WndFrame' then
+			element = raw
+		end
+	elseif elementType == 'CHECKBOX' then
+		if componentType == 'WndCheckBox' or componentType == 'WndRadioBox' then
+			element = raw
+		end
+	elseif elementType == 'COMBOBOX' then
+		if componentType == 'WndComboBox' or componentType == 'WndEditComboBox' or componentType == 'WndAutocomplete' then
+			element = raw:Lookup('Btn_ComboBox')
+		end
+	elseif elementType == 'EDIT' then
+		if componentType == 'WndEdit' then
+			element = raw
+		elseif componentType == 'WndEditBox' or componentType == 'WndEditComboBox' or componentType == 'WndAutocomplete' then
+			element = raw:Lookup('WndEdit_Default')
+		end
+	elseif elementType == 'SLIDER' then
+		if componentType == 'WndSliderBox' then
+			element = raw:Lookup('WndNewScrollBar_Default')
+		end
+	elseif elementType == 'TEXT' then
+		if componentType == 'WndCheckBox' or componentType == 'WndRadioBox' or componentType == 'WndEdit'
+		or componentType == 'WndComboBox' or componentType == 'WndFrame' or componentType == 'WndSliderBox' then
+			element = raw:Lookup('', 'Text_Default')
+		elseif componentType == 'WndScrollBox' then
+			element = raw:Lookup('', 'Handle_Padding/Handle_Scroll/Text_Default')
+		elseif componentType == 'Handle' then
+			element = raw:Lookup('Text_Default')
+		elseif componentType == 'Text' then
+			element = raw
+		end
+	elseif elementType == 'IMAGE' then
+		if componentType == 'WndEditBox' or componentType == 'WndComboBox' or componentType == 'WndEditComboBox'
+		or componentType == 'WndAutocomplete' or componentType == 'WndScrollBox' then
+			element = raw:Lookup('', 'Image_Default')
+		elseif componentType == 'Handle' then
+			element = raw:Lookup('Image_Default')
+		elseif componentType == 'Image' then
+			element = raw
+		end
+	elseif elementType == 'SHADOW' then
+		if componentType == 'Shadow' then
+			element = raw
+		end
+	elseif elementType == 'BOX' then
+		if componentType == 'Box' then
+			element = raw
 		end
 	end
-	-- 因为是求子元素 所以移除第一个压栈的元素（父元素）
-	children[table.concat({ root:GetTreePath() })] = nil
-	return children
+	return element
+end
+
+local function InitComponent(raw)
+	if szType == 'WndSliderBox' then
+		local scroll = raw:Lookup('WndNewScrollBar_Default')
+		SetComponentProp(raw, 'bShowPercentage', true)
+		SetComponentProp(raw, 'nOffset', 0)
+		SetComponentProp(raw, 'OnChange', {})
+		SetComponentProp(raw, 'FormatText', function(value, bPercentage)
+			if bPercentage then
+				return format('%.2f%%', value)
+			else
+				return value
+			end
+		end)
+		SetComponentProp(raw, 'ResponseUpdateScroll', function(bOnlyUI)
+			local _this = this
+			this = raw
+			local nScrollPos, nStepCount = scroll:GetScrollPos(), scroll:GetStepCount()
+			local nCurrentValue = GetComponentProp(raw, 'bShowPercentage') and (nScrollPos * 100 / nStepCount) or (nScrollPos + raw.nOffset)
+			raw:Lookup('', 'Text_Default'):SetText(raw.FormatText(nCurrentValue, GetComponentProp(raw, 'bShowPercentage')))
+			if not bOnlyUI then
+				for _, fn in ipairs(raw.tMyOnChange) do
+					pcall(fn, raw, nCurrentValue)
+				end
+			end
+			this = _this
+		end)
+		scroll.OnScrollBarPosChanged = function()
+			GetComponentProp(raw, 'ResponseUpdateScroll')()
+		end
+		scroll.OnMouseWheel = function()
+			scroll:ScrollNext(-Station.GetMessageWheelDelta() * 2)
+			return 1
+		end
+		scroll:Lookup('Btn_Track').OnMouseWheel = function()
+			scroll:ScrollNext(-Station.GetMessageWheelDelta())
+			return 1
+		end
+	elseif szType=='WndEditBox' then
+		local edt = raw:Lookup('WndEdit_Default')
+		edt.OnEditSpecialKeyDown = function()
+			local szKey = GetKeyName(Station.GetMessageKey())
+			if szKey == 'Esc' or (
+				szKey == 'Enter' and not edt:IsMultiLine()
+			) then
+				Station.SetFocusWindow(edt:GetRoot())
+				return 1
+			end
+		end
+	elseif szType=='WndAutocomplete' then
+		local edt = raw:Lookup('WndEdit_Default')
+		edt.OnSetFocus = function()
+			local opt = GetComponentProp(raw, 'autocompleteOptions')
+			if opt.disabled or opt.disabledTmp then
+				return
+			end
+			XGUI(raw):autocomplete('search')
+		end
+		edt.OnEditChanged = function()
+			local opt = GetComponentProp(raw, 'autocompleteOptions')
+			if opt.disabled or opt.disabledTmp or Station.GetFocusWindow() ~= this then
+				return
+			end
+			-- placeholder
+			local len = this:GetText():len()
+			-- min search length
+			if len >= opt.minLength then
+				-- delay search
+				MY.DelayCall(opt.delay, function()
+					XGUI(raw):autocomplete('search')
+					-- for compatible
+					Station.SetFocusWindow(edt)
+				end)
+			else
+				XGUI(raw):autocomplete('close')
+			end
+		end
+		edt.OnKillFocus = function()
+			MY.DelayCall(function()
+				if not Station.GetFocusWindow() or Station.GetFocusWindow():GetName() ~= 'PopupMenuPanel' then
+					Wnd.CloseWindow('PopupMenuPanel')
+				end
+			end)
+		end
+		edt.OnEditSpecialKeyDown = function()
+			local szKey = GetKeyName(Station.GetMessageKey())
+			if IsPopupMenuOpened() and PopupMenu_ProcessHotkey then
+				if szKey == 'Enter'
+				or szKey == 'Up'
+				or szKey == 'Down'
+				or szKey == 'Left'
+				or szKey == 'Right' then
+					return PopupMenu_ProcessHotkey(szKey)
+				end
+			elseif szKey == 'Esc' or (
+				szKey == 'Enter' and not edt:IsMultiLine()
+			) then
+				Station.SetFocusWindow(edt:GetRoot())
+				return 1
+			end
+		end
+		SetComponentProp(raw, 'autocompleteOptions', {
+			beforeSearch = nil  , -- @param: raw, option
+			beforePopup  = nil  , -- @param: menu, raw, option
+			beforeDelete = nil  , -- @param: szOption, fnDoDelete, option
+			afterDelete  = nil  , -- @param: szOption, option
+
+			ignoreCase   = true ,  -- ignore case while matching
+			anyMatch     = true ,  -- match any part of option list
+			autoFill     = false,  -- auto fill edit with first match (conflict withanyMatch)
+			delay        = 0    ,  -- delay time when edit changed
+			disabled     = false,  -- disable autocomplete
+			minLength    = 0    ,  -- the min length of the searching string
+			maxOption    = 0    ,  -- the max number of displayed options (0 means no limitation)
+			source       = {}   ,  -- option list
+		})
+	elseif szType == 'WndRadioBox' then
+		XGUI.RegisterUIEvent(raw, 'OnLButtonUp', function()
+			local group = GetComponentProp(raw, 'group')
+			local p = raw:GetParent():GetFirstChild()
+			while p do
+				if p ~= raw and GetComponentType(p) == 'WndRadioBox' then
+					local g = GetComponentProp(p, 'group')
+					if g and g == group and p:IsCheckBoxChecked() then
+						p:Check(false)
+					end
+				end
+				p = p:GetNext()
+			end
+		end)
+	elseif szType == 'WndListBox' then
+		local scroll = raw:Lookup('', 'Handle_Scroll')
+		SetComponentProp(raw, 'OnListItemHandleMouseEnter', function()
+			XGUI(this:Lookup('Image_Bg')):fadeIn(100)
+		end)
+		SetComponentProp(raw, 'OnListItemHandleMouseLeave', function()
+			XGUI(this:Lookup('Image_Bg')):fadeTo(500,0)
+		end)
+		SetComponentProp(raw, 'OnListItemHandleLButtonClick', function()
+			local data = GetComponentProp(this, 'listboxItemData')
+			local onItemClick = GetComponentProp(raw, 'OnListItemHandleCustomLButtonClick')
+			if onItemClick and onItemClick(this, data.text, data.id, data.data, not data.selected) == false then
+				return
+			end
+			local opt = GetComponentProp(raw, 'listboxOptions')
+			if not data.selected then
+				if not opt.multiSelect then
+					for i = scroll:GetItemCount() - 1, 0, -1 do
+						local hItem = scroll:Lookup(i)
+						local data = GetComponentProp(hItem, 'listboxItemData')
+						if data.selected then
+							hItem:Lookup('Image_Sel'):Hide()
+							data.selected = false
+						end
+					end
+				end
+				this:Lookup('Image_Sel'):Show()
+			else
+				this:Lookup('Image_Sel'):Hide()
+			end
+			data.selected = not data.selected
+		end)
+		SetComponentProp(raw, 'OnListItemHandleRButtonClick', function()
+			local data = GetComponentProp(this, 'listboxItemData')
+			if not data.selected then
+				local opt = GetComponentProp(raw, 'listboxOptions')
+				if not opt.multiSelect then
+					for i = scroll:GetItemCount() - 1, 0, -1 do
+						local hItem = scroll:Lookup(i)
+						local data = GetComponentProp(hItem, 'listboxItemData')
+						if data.selected then
+							hItem:Lookup('Image_Sel'):Hide()
+							data.selected = false
+						end
+					end
+				end
+				data.selected = true
+				this:Lookup('Image_Sel'):Show()
+			end
+			local GetMenu = GetComponentProp(raw, 'GetListItemHandleMenu')
+			if GetMenu then
+				PopupMenu(GetMenu(this, data.text, data.id, data.data, data.selected))
+			end
+		end)
+		SetComponentProp(raw, 'listboxOptions', { multiSelect = false })
+	end
 end
 
 -----------------------------------------------------------
 -- my ui selectors -- same as jQuery -- by tinymins --
 -----------------------------------------------------------
 --
--- self.ele       : ui elements table
--- selt.ele[].raw : ui element itself    -- common functions will do with this
--- self.ele[].txt : ui element text box  -- functions like Text() will do with this
--- self.ele[].img : ui element image box -- functions like LoadImage() will do with this
+-- selt.raws[] : ui element list
 --
 -- ui object creator
 -- same as jQuery.$()
-function XGUI:ctor(super, raw, tab)
-	self.eles = self.eles or {} -- setmetatable({}, { __mode = "v" })
-	if type(raw)=="table" and type(raw.eles)=="table" then
-		for i = 1, #raw.eles, 1 do
-			table.insert(self.eles, raw.eles[i])
+function XGUI:ctor(super, mixed)
+	self.raws = {}
+	if type(mixed) == 'table' then
+		if type(mixed.raws) == 'table' then
+			for _, raw in ipairs(mixed.raws) do
+				insert(self.raws, raw)
+			end
+		elseif IsElement(mixed) then
+			insert(self.raws, mixed)
+		else
+			for _, raw in ipairs(mixed) do
+				if IsElement(raw) then
+					insert(self.raws, raw)
+				end
+			end
 		end
-		self.eles = raw.eles
-	else
-		-- farmat raw
-		if type(raw)=="string" then
-			raw = Station.Lookup(raw)
-		end
-		if raw then
-			table.insert( self.eles, raw2ele(raw) )
+	elseif type(mixed) == 'string' then
+		local raw = Station.Lookup(mixed)
+		if IsElement(raw) then
+			insert(self.raws, raw)
 		end
 	end
 	return self
-end
-
--- clone
--- clone and return a new class
-function XGUI:clone(eles)
-	self:_checksum()
-	eles = eles or self.eles
-	local _eles = {}
-	for i = 1, #eles, 1 do
-		if eles[i].raw then table.insert(_eles, raw2ele(eles[i].raw)) end
-	end
-	return XGUI({eles = _eles})
 end
 
 --  del bad eles
 -- (self) _checksum()
 function XGUI:_checksum()
-	for i = #self.eles, 1, -1 do
-		local ele = self.eles[i]
-		local status, err = true, 'szType'
-		if (not ele.raw) or (not ele.raw.___id) then
-			status, err = false, ''
-		else
-			status, err = pcall(function() return ele.raw:GetType() end)
+	for i, raw in ipairs_r(self.raws) do
+		if not IsElement(raw) then
+			remove(self.raws, i)
 		end
-		if (not status) or (err=='') then table.remove(self.eles, i) end
 	end
 	return self
 end
 
--- add a ele to object
+-- add a element to object
 -- same as jQuery.add()
-function XGUI:add(raw, tab)
+function XGUI:add(mixed)
 	self:_checksum()
-	local eles = {}
-	for i = 1, #self.eles, 1 do
-		table.insert(eles, self.eles[i])
+	local raws = {}
+	for i, raw in ipairs(self.raws) do
+		insert(eles, raw)
 	end
-	-- farmat raw
-	if type(raw)=="string" then
-		raw = Station.Lookup(raw)
+	if type(mixed) == 'string' then
+		mixed = Station.Lookup(mixed)
 	end
-	-- insert into eles
-	if raw then
-		table.insert(eles, raw2ele(raw, tab))
+	if IsElement(mixed) then
+		insert(raws, mixed)
 	end
-	return self:clone(eles)
+	return XGUI(raws)
 end
 
 -- delete elements from object
 -- same as jQuery.not()
-function XGUI:del(raw)
+function XGUI:del(mixed)
 	self:_checksum()
-	local eles = {}
-	for i = 1, #self.eles, 1 do
-		table.insert(eles, self.eles[i])
+	local raws = {}
+	for i, raw in ipairs(self.raws) do
+		insert(raws, raw)
 	end
-	if type(raw) == "string" then
-		-- delete ele those id/class fits filter:raw
-		if string.sub(raw, 1, 1) == "#" then
-			raw = string.sub(raw, 2)
-			if string.sub(raw, 1, 1) == "^" then
+	if type(mixed) == 'string' then
+		-- delete raws those id/class fits filter: mixed
+		if sub(mixed, 1, 1) == '#' then
+			mixed = sub(mixed, 2)
+			if sub(mixed, 1, 1) == '^' then
 				-- regexp
-				for i = #eles, 1, -1 do
-					if string.find(eles[i].raw:GetName(), raw) then
-						table.remove(eles, i)
+				for i, raw in ipairs_r(raws) do
+					if find(raw:GetName(), mixed) then
+						remove(raws, i)
 					end
 				end
 			else
 				-- normal
-				for i = #eles, 1, -1 do
-					if eles[i].raw:GetName() == raw then
-						table.remove(eles, i)
+				for i, raw in ipairs_r(raws) do
+					if raw:GetName() == mixed then
+						remove(raws, i)
 					end
 				end
 			end
-		elseif string.sub(raw, 1, 1) == "." then
-			raw = string.sub(raw, 2)
-			if string.sub(raw, 1, 1) == "^" then
+		elseif sub(mixed, 1, 1) == '.' then
+			mixed = sub(mixed, 2)
+			if sub(mixed, 1, 1) == '^' then
 				-- regexp
-				for i = #eles, 1, -1 do
-					if string.find(GetComponentType(eles[i].raw), raw) then
-						table.remove(eles, i)
+				for i, raw in ipairs_r(raws) do
+					if find(GetComponentType(raw), mixed) then
+						remove(raws, i)
 					end
 				end
 			else
 				-- normal
-				for i = #eles, 1, -1 do
-					if GetComponentType(eles[i].raw) == raw then
-						table.remove(eles, i)
+				for i, raw in ipairs_r(raws) do
+					if GetComponentType(raw) == mixed then
+						remove(raws, i)
 					end
 				end
 			end
 		end
-	else
-		-- delete ele those treepath is the same as raw
-		raw = table.concat({ raw:GetTreePath() })
-		for i = #eles, 1, -1 do
-			if table.concat({ eles[i].raw:GetTreePath() }) == raw then
-				table.remove(eles, i)
+	elseif IsElement(mixed) then
+		-- delete raws those treepath is the same as mixed
+		mixed = concat({ mixed:GetTreePath() })
+		for i, raw in ipairs_r(raws) do
+			if concat({ raw:GetTreePath() }) == mixed then
+				remove(raws, i)
 			end
 		end
 	end
-	return self:clone(eles)
+	return XGUI(raws)
 end
 
 -- filter elements from object
 -- same as jQuery.filter()
-function XGUI:filter(raw)
+function XGUI:filter(mixed)
 	self:_checksum()
-	local eles = {}
-	for i = 1, #self.eles, 1 do
-		table.insert(eles, self.eles[i])
+	local raws = {}
+	for i, raw in ipairs(self.raws) do
+		insert(raws, raw)
 	end
-	if type(raw) == "string" then
-		-- delete ele those id/class not fits filter:raw
-		if string.sub(raw, 1, 1) == "#" then
-			raw = string.sub(raw, 2)
-			if string.sub(raw, 1, 1) == "^" then
+	if type(mixed) == 'string' then
+		-- delete raws those id/class not fits filter:mixed
+		if sub(mixed, 1, 1) == '#' then
+			mixed = sub(mixed, 2)
+			if sub(mixed, 1, 1) == '^' then
 				-- regexp
-				for i = #eles, 1, -1 do
-					if not string.find(eles[i].raw:GetName(), raw) then
-						table.remove(eles, i)
+				for i, raw in ipairs_r(raws) do
+					if not find(raw:GetName(), mixed) then
+						remove(raws, i)
 					end
 				end
 			else
 				-- normal
-				for i = #eles, 1, -1 do
-					if eles[i].raw:GetName() ~= raw then
-						table.remove(eles, i)
+				for i, raw in ipairs_r(raws) do
+					if raw:GetName() ~= mixed then
+						remove(raws, i)
 					end
 				end
 			end
-		elseif string.sub(raw, 1, 1) == "." then
-			raw = string.sub(raw, 2)
-			if string.sub(raw, 1, 1) == "^" then
+		elseif sub(mixed, 1, 1) == '.' then
+			mixed = sub(mixed, 2)
+			if sub(mixed, 1, 1) == '^' then
 				-- regexp
-				for i = #eles, 1, -1 do
-					if not string.find(GetComponentType(eles[i].raw), raw) then
-						table.remove(eles, i)
+				for i, raw in ipairs_r(raws) do
+					if not find(GetComponentType(raw), mixed) then
+						remove(raws, i)
 					end
 				end
 			else
 				-- normal
-				for i = #eles, 1, -1 do
-					if GetComponentType(eles[i].raw) ~= raw then
-						table.remove(eles, i)
+				for i, raw in ipairs_r(raws) do
+					if GetComponentType(raw) ~= mixed then
+						remove(raws, i)
 					end
 				end
 			end
 		end
-	elseif type(raw)=="nil" then
-		return self
-	else
-		-- delete ele those treepath is not the same as raw
-		raw = table.concat({ raw:GetTreePath() })
-		for i = #eles, 1, -1 do
-			if table.concat({ eles[i].raw:GetTreePath() }) ~= raw then
-				table.remove(eles, i)
+	elseif IsElement(mixed) then
+		-- delete raws those treepath is not the same as mixed
+		mixed = concat({ mixed:GetTreePath() })
+		for i, raw in ipairs_r(raws) do
+			if concat({ raw:GetTreePath() }) ~= mixed then
+				remove(raws, i)
 			end
 		end
 	end
-	return self:clone(eles)
+	return XGUI(raws)
 end
 
 -- get parent
 -- same as jQuery.parent()
 function XGUI:parent()
 	self:_checksum()
-	local parent = {}
-	for _, ele in pairs(self.eles) do
-		parent[table.concat{ele.raw:GetParent():GetTreePath()}] = ele.raw:GetParent()
+	local raws, hash, path, parent = {}, {}
+	for _, raw in ipairs(self.raws) do
+		parent = raw:GetParent()
+		if parent then
+			path = concat({ parent:GetTreePath() })
+			if not hash[path] then
+				insert(raws, parent)
+				hash[path] = true
+			end
+		end
 	end
-	local eles = {}
-	for _, raw in pairs(parent) do
-		-- insert into eles
-		table.insert(eles, raw2ele(raw))
-	end
-	return self:clone(eles)
+	return XGUI(raws)
 end
 
 -- get children
 -- same as jQuery.children()
 function XGUI:children(filter)
 	self:_checksum()
-	local child = {}
-	local childHash = {}
-	if type(filter)=="string" and string.sub(filter, 1, 1)=="#" and string.sub(filter, 2, 2)~="^" then
-		filter = string.sub(filter, 2)
-		for _, ele in pairs(self.eles) do
-			local c = (ele.wnd or ele.raw):Lookup(filter)
-			if c then
-				table.insert(child, c)
-				childHash[table.concat({ table.concat({ c:GetTreePath() }), filter })] = true
+	if type(filter) == 'string' and sub(filter, 1, 1) == '#' and sub(filter, 2, 2) ~= '^' then
+		local raws, hash, name, child, path = {}, {}, sub(name, 2)
+		for _, raw in ipairs(self.raws) do
+			raw = GetComponentElement(raw, 'MAIN_WINDOW') or raw
+			child = raw:Lookup(name)
+			if child then
+				path = concat({ child:GetTreePath() })
+				if not hash[path] then
+					insert(raws, child)
+					hash[path] = true
+				end
+			end
+			if raw:GetBaseType() == 'Wnd' then
+				child = raw:Lookup('', name)
+				if child then
+					path = concat({ child:GetTreePath() })
+					if not hash[path] then
+						insert(raws, child)
+						hash[path] = true
+					end
+				end
 			end
 		end
-		local eles = {}
-		for _, raw in ipairs(child) do
-			-- insert into eles
-			table.insert(eles, raw2ele(raw))
-		end
-		return self:clone(eles)
+		return XGUI(raws)
 	else
-		for _, ele in pairs(self.eles) do
-			local raw = (ele.wnd or ele.raw)
-			if raw:GetType() == "Handle" then
-				for i = 0, raw:GetItemCount() - 1, 1 do
-					if not childHash[table.concat({ raw:Lookup(i):GetTreePath(), i })] then
-						table.insert(child, raw:Lookup(i))
-						childHash[table.concat({ table.concat({ raw:Lookup(i):GetTreePath() }), i })] = true
+		local raws, hash, child, path = {}, {}
+		for _, raw in ipairs(self.raws) do
+			raw = GetComponentElement(raw, 'MAIN_WINDOW') or raw
+			if raw:GetBaseType() == 'Wnd' then
+				child = raw:GetFirstChild()
+				while child do
+					path = concat({ child:GetTreePath() })
+					if not hash[path] then
+						insert(raws, child)
+						hash[path] = true
 					end
 				end
-			else
-				-- 子handle
-				local status, handle = pcall(function() return raw:Lookup('','') end) -- raw可能没有Lookup方法 用pcall包裹
-				if status and handle and not childHash[table.concat{handle:GetTreePath(),'/Handle'}] then
-					table.insert(child, handle)
-					childHash[table.concat({handle:GetTreePath(),'/Handle'})] = true
-				end
-				-- 子窗体
-				local status, sub_raw = pcall(function() return raw:GetFirstChild() end) -- raw可能没有GetFirstChild方法 用pcall包裹
-				while status and sub_raw do
-					if not childHash[table.concat{sub_raw:GetTreePath()}] then
-						table.insert( child, sub_raw )
-						childHash[table.concat({sub_raw:GetTreePath()})] = true
+				local h = GetComponentElement(raw, 'MAIN_HANDLE') or raw:Lookup('', '')
+				if h then
+					for i = 0, h:GetItemCount() - 1 do
+						child = h:Lookup(i)
+						path = concat({ child:GetTreePath() })
+						if not hash[path] then
+							insert(raws, child)
+							hash[path] = true
+						end
 					end
-					sub_raw = sub_raw:GetNext()
+				end
+			elseif raw:GetType() == 'Handle' then
+				for i = 0, raw:GetItemCount() - 1 do
+					child = raw:Lookup(i)
+					path = concat({ child:GetTreePath() })
+					if not hash[path] then
+						insert(raws, child)
+						hash[path] = true
+					end
 				end
 			end
 		end
-		local eles = {}
-		for _, raw in ipairs(child) do
-			-- insert into eles
-			table.insert(eles, raw2ele(raw))
-		end
-		return self:clone(eles):filter(filter)
+		return XGUI(raws):filter(filter)
 	end
 end
 
--- get child-item
-function XGUI:item(filter)
-	return self:hdl():children(filter)
-end
-
--- find ele
+-- find element
 -- same as jQuery.find()
 function XGUI:find(filter)
 	self:_checksum()
-	local children = {}
-	for _, ele in pairs(self.eles) do
-		if ele.raw then for szTreePath, raw in pairs(GetChildren(ele.raw)) do
-			children[szTreePath] = raw
-		end end
+	local top, raw, child, path
+	local raws, hash, stack, children = {}, {}, {}, {}
+	for _, root in ipairs(self.raws) do
+		top = #raws
+		insert(stack, root)
+		while #stack > 0 do
+			--### 弹出栈顶元素准备处理
+			raw = remove(stack, #stack)
+			path = concat({ raw:GetTreePath() })
+			if not hash[path] then
+				--## 将自身加入结果队列
+				insert(raws, raw)
+				hash[path] = true
+				--## 计算所有子元素并将子元素压栈准备下次循环处理
+				--## 注意要逆序压入栈中以保证最终结果是稳定排序的
+				if raw:GetBaseType() == 'Wnd' then
+					child = raw:Lookup('', '')
+					if child then
+						for i = 0, child:GetItemCount() - 1 do
+							insert(children, raw:Lookup(i))
+						end
+					end
+					child = raw:GetFirstChild()
+					while child do
+						child = child:GetNext()
+						insert(children, child)
+					end
+					repeat
+						child = remove(children)
+						insert(stack, child)
+					until not child
+				elseif raw:GetType() == 'Handle' then
+					for i = 0, raw:GetItemCount() - 1 do
+						insert(children, raw:Lookup(i))
+					end
+					repeat
+						child = remove(children)
+						insert(stack, child)
+					until not child
+				end
+			end
+		end
+		-- 因为是求子元素 所以移除第一个压栈的元素（父元素）
+		remove(raws, top + 1)
 	end
-	local eles = {}
-	for _, raw in pairs(children) do
-		-- insert into eles
-		table.insert(eles, raw2ele(raw))
-	end
-	return self:clone(eles):filter(filter)
+	return XGUI(raws):filter(filter)
 end
 
--- filter mouse in ele
+-- filter mouse in component
 function XGUI:ptIn()
 	self:_checksum()
-	local eles = {}
-	local xC, yC = Cursor.GetPos()
-	for _, ele in pairs(self.eles) do
-		if (ele.itm and ele.itm:PtInItem(xC, yC))
-		or (ele.wnd and ele.wnd:PtInWindow(xC, yC)) then
-			table.insert(eles, raw2ele(ele.raw))
+	local raws = {}
+	local cX, cY = Cursor.GetPos()
+	for _, raw in pairs(self.raws) do
+		if raw:GetBaseType() == 'Wnd' then
+			if raw:PtInItem(cX, cY) then
+				insert(raws, raw)
+			end
+		else
+			if raw:PtInWindow(cX, cY) then
+				insert(raws, raw)
+			end
 		end
 	end
-	return self:clone(eles)
+	return XGUI(raws)
 end
 
 -- each
@@ -567,29 +788,36 @@ end
 -- :each(XGUI each_self)  -- you can use 'this' to visit raw element likes jQuery
 function XGUI:each(fn)
 	self:_checksum()
-	local eles = {}
-	-- get a copy of ele list
-	for _, ele in pairs(self.eles) do
-		table.insert(eles, ele)
-	end
-	-- for each in the list call function
-	for _, ele in pairs(eles) do
-		local _this = this
-		this = ele.raw
-		local res, err = pcall(fn, self:clone({{raw = ele.raw}}))
-		this = _this
-		if res and err == 0 then
-			break
-		end
+	for _, raw in pairs(self.raws) do
+		ExecuteWithThis(raw, fn, XGUI(raw))
 	end
 	return self
+end
+
+-- slice -- index starts from 1
+-- same as jQuery.slice(selector, pos)
+function XGUI:slice(startpos, endpos)
+	self:_checksum()
+	startpos = startpos or 1
+	if startpos < 0 then
+		startpos = #self.raws + startpos + 1
+	end
+	endpos = endpos or #self.raws
+	if endpos < 0 then
+		endpos = #raws + endpos + 1
+	end
+	local raws = {}
+	for i = startpos, endpos, 1 do
+		insert(raws, self.raws[i])
+	end
+	return XGUI(raws)
 end
 
 -- eq
 -- same as jQuery.eq(pos)
 function XGUI:eq(pos)
 	if pos then
-		return self:slice(pos,pos)
+		return self:slice(pos, pos)
 	end
 	return self
 end
@@ -597,60 +825,13 @@ end
 -- first
 -- same as jQuery.first()
 function XGUI:first()
-	return self:slice(1,1)
+	return self:slice(1, 1)
 end
 
 -- last
 -- same as jQuery.last()
 function XGUI:last()
-	return self:slice(-1,-1)
-end
-
--- slice -- index starts from 1
--- same as jQuery.slice(selector, pos)
-function XGUI:slice(startpos, endpos)
-	self:_checksum()
-	local eles = {}
-	for i = 1, #self.eles, 1 do
-		table.insert(eles, self.eles[i])
-	end
-	endpos = endpos or #eles
-	if endpos < 0 then endpos = #eles + endpos + 1 end
-	for i = #eles, endpos + 1, -1 do
-		table.remove(eles)
-	end
-	if startpos < 0 then startpos = #eles + startpos + 1 end
-	for i = startpos, 2, -1 do
-		table.remove(eles, 1)
-	end
-	return self:clone(eles)
-end
-
--- get raw
--- same as jQuery[index]
-function XGUI:raw(index, key)
-	self:_checksum()
-	key = key or 'raw'
-	local eles = self.eles
-	if index < 0 then index = #eles + index + 1 end
-	if index > 0 and index <= #eles then return eles[index][key] end
-end
-
--- get handle
-function XGUI:hdl(index)
-	self:_checksum()
-	local eles = {}
-	if index then
-		if index < 0 then index = #eles + index + 1 end
-		if index > 0 and index <= #self.eles and self.eles[index].hdl then
-			table.insert(eles, { raw = self.eles[index].hdl })
-		end
-	else
-		for _, ele in ipairs(self.eles) do
-			table.insert(eles, { raw = ele.hdl })
-		end
-	end
-	return self:clone(eles)
+	return self:slice(-1, -1)
 end
 
 -- get count
@@ -667,39 +848,31 @@ end
 -- same as jQuery.remove()
 function XGUI:remove()
 	self:_checksum()
-	for _, ele in pairs(self.eles) do
-		if ele.fnOnDestroy then
-			local status, err = pcall(function() ele.fnOnDestroy(ele.raw) end)
-			if not status then
-				MY.Debug({err}, "UI:remove#fnOnDestroy", MY_DEBUG.ERROR)
-			end
+	for _, raw in ipairs(self.raws) do
+		local onDestroy = GetComponentProp(raw, 'OnDestroy')
+		if onDestroy then
+			onDestroy(raw)
 		end
-		if ele.raw:GetType() == "WndFrame" then
-			Wnd.CloseWindow(ele.raw)
-		elseif string.sub(ele.raw:GetType(), 1, 3) == "Wnd" then
-			ele.raw:Destroy()
+		if raw:GetType() == 'WndFrame' then
+			Wnd.CloseWindow(raw)
+		elseif raw:GetBaseType() == 'Wnd' then
+			raw:Destroy()
 		else
-			local h = ele.raw:GetParent()
-			if h:GetType() == "Handle" then
-				h:RemoveItem(ele.raw)
+			local h = raw:GetParent()
+			if h:GetType() == 'Handle' then
+				h:RemoveItem(raw)
 				h:FormatAllItemPos()
 			end
 		end
 	end
-	self.eles = {}
+	for i = 1, #self.raws do
+		remove(self.raws)
+	end
 	return self
 end
 
--- xml string
-local _tItemXML = {
-	["Text"] = "<text>w=150 h=30 valign=1 font=162 eventid=371 </text>",
-	["Image"] = "<image>w=100 h=100 </image>",
-	["Box"] = "<box>w=48 h=48 eventid=525311 </box>",
-	["Shadow"] = "<shadow>w=15 h=15 eventid=277 </shadow>",
-	["Handle"] = "<handle>firstpostype=0 w=10 h=10</handle>",
-}
 local function OnCommonComponentMouseEnter()
-	local hText = XGUI(this):raw(1, 'txt')
+	local hText = GetComponentElement(this, 'TEXT')
 	if not hText then
 		return
 	end
@@ -710,7 +883,7 @@ local function OnCommonComponentMouseEnter()
 	end
 
 	local nDisLen = hText:GetTextPosExtent()
-	local nLen = wstring.len(hText:GetText())
+	local nLen = wlen(hText:GetText())
 	if nDisLen == nLen then
 		return
 	end
@@ -718,11 +891,18 @@ local function OnCommonComponentMouseEnter()
 	local nW = hText:GetW()
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
-	OutputTip(GetFormatText(szText), 400, {x, y, w, h}, ALW.TOP_BOTTOM)
+	OutputTip(GetFormatText(szText), 400, { x, y, w, h }, ALW.TOP_BOTTOM)
 end
-local function OnCommonComponentMouseLeave()
-	HideTip()
-end
+local function OnCommonComponentMouseLeave() HideTip() end
+
+-- xml string
+local _tItemXML = {
+	['Text'] = '<text>w=150 h=30 valign=1 font=162 eventid=371 </text>',
+	['Image'] = '<image>w=100 h=100 </image>',
+	['Box'] = '<box>w=48 h=48 eventid=525311 </box>',
+	['Shadow'] = '<shadow>w=15 h=15 eventid=277 </shadow>',
+	['Handle'] = '<handle>firstpostype=0 w=10 h=10</handle>',
+}
 -- append
 -- similar as jQuery.append()
 -- Instance:append(szType,[ szName,] tArg)
@@ -733,277 +913,70 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 	assert(type(szType) == 'string')
 	if type(szName) == 'table' then
 		szName, tArg, bReturnNewItem = nil, szName, tArg
-	elseif szType:find("%<") then
+	elseif szType:find('%<') then
 		szType, szXml, bReturnNewItem = nil, szType, szName
+	elseif _tItemXML[szType] then
+		szType, szXml = nil, _tItemXML[szType]
 	elseif #szType == 0 then
 		return
 	end
-	local ret
-	if bReturnNewItem then
-		ret = XGUI()
-	else
-		ret = self
-	end
-	if szType then
-		for _, ele in pairs(self.eles) do
-			local ui
-			if ( (ele.wnd or ele.frm) and ( string.sub(szType, 1, 3) == "Wnd" or string.sub(szType, -4) == ".ini" ) ) then
-				-- append from ini file
+	local ui = XGUI()
+	if szType then -- append from ini file
+		for _, raw in ipairs(self.raws) do
+			local parentWnd = GetComponentElement(raw, 'MAIN_WINDOW')
+			local parentHandle = GetComponentElement(raw, 'MAIN_HANDLE')
+			if parentWnd and (sub(szType, 1, 3) == 'Wnd' or sub(szType, -4) == '.ini') then
 				local szFile = szType
-				if string.sub(szType, -4) == ".ini" then
-					szType = string.gsub(szType,".*[/\\]","")
-					szType = string.sub(szType,0,-5)
+				if sub(szType, -4) == '.ini' then
+					szType = gsub(szType,'.*[/\\]','')
+					szType = sub(szType, 0, -5)
 				else
-					szFile = MY.GetAddonInfo().szFrameworkRoot .. "ui\\" .. szFile .. ".ini"
+					szFile = MY.GetAddonInfo().szFrameworkRoot .. 'ui\\' .. szFile .. '.ini'
 				end
-				local frame = Wnd.OpenWindow(szFile, "MY_TempWnd")
+				local frame = Wnd.OpenWindow(szFile, 'MY_TempWnd')
 				if not frame then
-					return MY.Debug({_L("unable to open ini file [%s]", szFile)}, 'MY#UI#append', MY_DEBUG.ERROR)
+					return MY.Debug({ _L('unable to open ini file [%s]', szFile) }, 'MY#UI#append', MY_DEBUG.ERROR)
 				end
-				local wnd = frame:Lookup(szType)
-				if not wnd then
-					MY.Debug({_L("can not find wnd component [%s]", szType)}, 'MY#UI#append', MY_DEBUG.ERROR)
+				local raw = frame:Lookup(szType)
+				if not raw then
+					MY.Debug({_L('can not find wnd component [%s]', szType)}, 'MY#UI#append', MY_DEBUG.ERROR)
 				else
-					SetComponentType(wnd, szType)
+					SetComponentType(raw, szType)
 					if szName then
-						wnd:SetName(szName)
+						raw:SetName(szName)
 					end
-					wnd:ChangeRelation((ele.wnd or ele.frm), true, true)
-					if szType == 'WndSliderBox' then
-						wnd.bShowPercentage = true
-						wnd.nOffset = 0
-						wnd.tMyOnChange = {}
-						local scroll = wnd:Lookup("WndNewScrollBar_Default")
-						wnd.FormatText = function(value, bPercentage)
-							if bPercentage then
-								return string.format("%.2f%%", value)
-							else
-								return value
-							end
-						end
-						wnd.ResponseUpdateScroll = function(bOnlyUI)
-							local _this = this
-							this = wnd
-							local nScrollPos, nStepCount = scroll:GetScrollPos(), scroll:GetStepCount()
-							local nCurrentValue = wnd.bShowPercentage and (nScrollPos * 100 / nStepCount) or (nScrollPos + wnd.nOffset)
-							wnd:Lookup("", "Text_Default"):SetText(wnd.FormatText(nCurrentValue, wnd.bShowPercentage))
-							if not bOnlyUI then
-								for _, fn in ipairs(wnd.tMyOnChange) do
-									pcall(fn, wnd, nCurrentValue)
-								end
-							end
-							this = _this
-						end
-						scroll.OnScrollBarPosChanged = function()
-							wnd.ResponseUpdateScroll()
-						end
-						scroll.OnMouseWheel = function()
-							scroll:ScrollNext(-Station.GetMessageWheelDelta() * 2)
-							return 1
-						end
-						scroll:Lookup('Btn_Track').OnMouseWheel = function()
-							scroll:ScrollNext(-Station.GetMessageWheelDelta())
-							return 1
-						end
-					elseif szType=='WndEditBox' then
-						local edt = wnd:Lookup("WndEdit_Default")
-						edt.OnEditSpecialKeyDown = function()
-							local szKey = GetKeyName(Station.GetMessageKey())
-							if szKey == "Esc" or (
-								szKey == "Enter" and not edt:IsMultiLine()
-							) then
-								Station.SetFocusWindow(edt:GetRoot())
-								return 1
-							end
-						end
-					elseif szType=='WndAutocomplete' then
-						local edt = wnd:Lookup("WndEdit_Default")
-						edt.OnSetFocus = function()
-							-- check disabled
-							if wnd.tMyAcOption.disabled or wnd.tMyAcOption.disabledTmp then
-								return
-							end
-							XGUI(wnd):autocomplete('search')
-						end
-						edt.OnEditChanged = function()
-							-- disabled
-							if wnd.tMyAcOption.disabled or wnd.tMyAcOption.disabledTmp or Station.GetFocusWindow() ~= this then
-								return
-							end
-							-- placeholder
-							local len = this:GetText():len()
-							-- min search length
-							if len >= wnd.tMyAcOption.minLength then
-								-- delay search
-								MY.DelayCall(wnd.tMyAcOption.delay, function()
-									XGUI(wnd):autocomplete('search')
-									-- for compatible
-									Station.SetFocusWindow(edt)
-								end)
-							else
-								XGUI(wnd):autocomplete('close')
-							end
-						end
-						edt.OnKillFocus = function()
-							MY.DelayCall(function()
-								if not Station.GetFocusWindow() or Station.GetFocusWindow():GetName() ~= 'PopupMenuPanel' then
-									Wnd.CloseWindow("PopupMenuPanel")
-								end
-							end)
-						end
-						edt.OnEditSpecialKeyDown = function()
-							local szKey = GetKeyName(Station.GetMessageKey())
-							if IsPopupMenuOpened() and PopupMenu_ProcessHotkey then
-								if szKey == "Enter"
-								or szKey == "Up"
-								or szKey == "Down"
-								or szKey == "Left"
-								or szKey == "Right" then
-									return PopupMenu_ProcessHotkey(szKey)
-								end
-							elseif szKey == "Esc" or (
-								szKey == "Enter" and not edt:IsMultiLine()
-							) then
-								Station.SetFocusWindow(edt:GetRoot())
-								return 1
-							end
-						end
-						wnd.tMyAcOption = {
-							beforeSearch = nil  , -- @param: wnd, option
-							beforePopup  = nil  , -- @param: menu, wnd, option
-							beforeDelete = nil  , -- @param: szOption, fnDoDelete, option
-							afterDelete  = nil  , -- @param: szOption, option
-
-							ignoreCase   = true ,  -- ignore case while matching
-							anyMatch     = true ,  -- match any part of option list
-							autoFill     = false,  -- auto fill edit with first match (conflict withanyMatch)
-							delay        = 0    ,  -- delay time when edit changed
-							disabled     = false,  -- disable autocomplete
-							minLength    = 0    ,  -- the min length of the searching string
-							maxOption    = 0    ,  -- the max number of displayed options (0 means no limitation)
-							source       = {}   ,  -- option list
-						}
-					elseif szType == 'WndRadioBox' then
-						XGUI.RegisterUIEvent(wnd, 'OnLButtonUp', function()
-							local p = wnd:GetParent():GetFirstChild()
-							while p do
-								if p ~= wnd and
-								p.group and
-								p.group == wnd.group and
-								p:GetType() == 'WndCheckBox' and
-								p:IsCheckBoxChecked() then
-									p:Check(false)
-								end
-								p = p:GetNext()
-							end
-						end)
-					elseif szType == 'WndListBox' then
-						local hScroll = wnd:Lookup('', 'Handle_Scroll')
-						hScroll.OnListItemHandleMouseEnter = function()
-							XGUI(this:Lookup('Image_Bg')):fadeIn(100)
-						end
-						hScroll.OnListItemHandleMouseLeave = function()
-							XGUI(this:Lookup('Image_Bg')):fadeTo(500,0)
-						end
-						hScroll.OnListItemHandleLButtonClick = function()
-							if this:GetParent().OnListItemHandleCustomLButtonClick then
-								local status, err = pcall(
-									this:GetParent().OnListItemHandleCustomLButtonClick,
-									this, this.text, this.id, this.data, not this.selected
-								)
-								if not status then
-									MY.Debug({err}, 'WndListBox#CustomLButtonClick', MY_DEBUG.ERROR)
-								elseif err == false then
-									return
-								end
-							end
-							if not this.selected then
-								if not hScroll.tMyLbOption.multiSelect then
-									for i = hScroll:GetItemCount() - 1, 0, -1 do
-										local hItem = hScroll:Lookup(i)
-										if hItem.selected then
-											hItem.selected = false
-											hItem:Lookup('Image_Sel'):Hide()
-										end
-									end
-								end
-								this:Lookup('Image_Sel'):Show()
-							else
-								this:Lookup('Image_Sel'):Hide()
-							end
-							this.selected = not this.selected
-						end
-						hScroll.OnListItemHandleRButtonClick = function()
-							if not this.selected then
-								if not hScroll.tMyLbOption.multiSelect then
-									for i = hScroll:GetItemCount() - 1, 0, -1 do
-										local hItem = hScroll:Lookup(i)
-										if hItem.selected then
-											hItem.selected = false
-											hItem:Lookup('Image_Sel'):Hide()
-										end
-									end
-								end
-								this.selected = true
-								this:Lookup('Image_Sel'):Show()
-							end
-							if hScroll.GetListItemHandleMenu then
-								PopupMenu(hScroll.GetListItemHandleMenu(this, this.text, this.id, this.data, this.selected))
-							end
-						end
-						hScroll.tMyLbOption = {
-							multiSelect = false,
-						}
-					end
-					if bReturnNewItem then
-						ret = ret:add(wnd)
-					end
-					ui = XGUI(wnd):hover(OnCommonComponentMouseEnter, OnCommonComponentMouseLeave):change(OnCommonComponentMouseEnter)
+					raw:ChangeRelation(parentWnd, true, true)
+					InitComponent(raw)
+					ui = ui:add(raw)
+					XGUI(raw):hover(OnCommonComponentMouseEnter, OnCommonComponentMouseLeave):change(OnCommonComponentMouseEnter)
 				end
 				Wnd.CloseWindow(frame)
-			elseif ( string.sub(szType, 1, 3) ~= "Wnd" and ele.hdl ) then
-				local szXml = _tItemXML[szType]
-				local hnd
-				if szXml then
-					-- append from xml
-					local nCount = ele.hdl:GetItemCount()
-					ele.hdl:AppendItemFromString(szXml)
-					hnd = ele.hdl:Lookup(nCount)
-					if hnd and szName then
-						hnd:SetName(szName)
-					end
+			elseif sub(szType, 1, 3) ~= 'Wnd' and parentHandle then
+				raw = parentHandle:AppendItemFromIni(MY.GetAddonInfo().szFrameworkRoot .. 'ui\\HandleItems.ini', 'Handle_' .. szType, szName)
+				parentHandle:FormatAllItemPos()
+				if not raw then
+					return MY.Debug({_L('unable to append handle item [%s]', szType)},'MY#UI:append', MY_DEBUG.ERROR)
 				else
-					-- append from ini
-					hnd = ele.hdl:AppendItemFromIni("interface\\MY\\.Framework\\ui\\HandleItems.ini","Handle_" .. szType, szName)
-				end
-				ele.hdl:FormatAllItemPos()
-				if not hnd then
-					return MY.Debug({_L("unable to append handle item [%s]", szType)},'MY#UI:append', MY_DEBUG.ERROR)
-				else
-					if bReturnNewItem then
-						ret = ret:add(hnd)
-					end
-					ui = XGUI(hnd)
+					ui = ui:add(raw)
 				end
 			end
-			ApplyUIArguments(ui, tArg)
 		end
-	elseif szXml then
-		for _, ele in pairs(self.eles) do
-			if ele.hdl then
-				-- append from xml
-				local nCount = ele.hdl:GetItemCount()
-				ele.hdl:AppendItemFromString(szXml)
-				ele.hdl:FormatAllItemPos()
-				if bReturnNewItem then
-					for i = nCount - 1, ele.hdl:GetItemCount() - 1 do
-						ret = ret:add(ele.hdl:GetItem(i))
-					end
+	elseif szXml then -- append from xml
+		local startIndex
+		for _, raw in ipairs(self.raws) do
+			local h = GetComponentElement(raw, 'MAIN_HANDLE')
+			if h then
+				startIndex = h:GetItemCount()
+				h:AppendItemFromString(szXml)
+				h:FormatAllItemPos()
+				for i = startIndex, h:GetItemCount() - 1 do
+					ui = ui:add(h:GetItem(i))
 				end
 			end
 		end
 	end
-	return ret
+	ApplyUIArguments(ui, tArg)
+	return bReturnNewItem and ui or self
 end
 
 -- clear
@@ -1011,13 +984,14 @@ end
 -- (self) Instance:clear()
 function XGUI:clear()
 	self:_checksum()
-	for _, ele in pairs(self.eles) do
-		if ele.raw.Clear then
-			ele.raw:Clear()
+	for _, raw in ipairs(self.raws) do
+		if raw.Clear then
+			raw:Clear()
 		end
-		if ele.hdl then
-			ele.hdl:Clear()
-			ele.hdl:FormatAllItemPos()
+		raw = GetComponentElement(raw, 'MAIN_HANDLE')
+		if raw then
+			raw:Clear()
+			raw:FormatAllItemPos()
 		end
 	end
 	return self
@@ -1030,26 +1004,24 @@ end
 -- data set/get
 function XGUI:data(key, value)
 	self:_checksum()
-	if key and value then -- set name
-		for _, ele in pairs(self.eles) do
-			ele.raw[key] = value
+	if key and value then -- set
+		for _, raw in ipairs(self.raws) do
+			SetComponentData(raw, key, value)
 		end
 		return self
 	elseif key then -- get
-		local ele = self.eles[1]
-		if ele and ele.raw then
-			return ele.raw[key]
+		local raw = self.raws[1]
+		if raw then
+			return GetComponentData(raw, key)
 		end
-	else
-		return self
 	end
 end
 
 -- show
 function XGUI:show()
 	self:_checksum()
-	for _, ele in pairs(self.eles) do
-		ele.raw:Show()
+	for _, raw in ipairs(self.raws) do
+		raw:Show()
 	end
 	return self
 end
@@ -1057,8 +1029,8 @@ end
 -- hide
 function XGUI:hide()
 	self:_checksum()
-	for _, ele in pairs(self.eles) do
-		ele.raw:Hide()
+	for _, raw in ipairs(self.raws) do
+		raw:Hide()
 	end
 	return self
 end
@@ -1068,55 +1040,56 @@ function XGUI:visible(bVisiable)
 	self:_checksum()
 	if type(bVisiable) == 'boolean' then
 		return self:toggle(bVisiable)
-	else -- get
-		local ele = self.eles[1]
-		if ele and ele.raw and ele.raw.IsVisible then
-			return ele.raw:IsVisible()
+	else
+		local raw = self.raws[1]
+		if raw and raw.IsVisible then
+			return raw:IsVisible()
 		end
 	end
 end
 
 -- enable or disable elements
 do
-local function SetEleEnable(x, ele, bEnable)
-	if x.IsEnabled and (not x:IsEnabled()) ~= (not bEnable) then
-		if ele.txt then
-			local r, g, b = ele.txt:GetFontColor()
+local function SetComponentEnable(raw, bEnable)
+	if raw.IsEnabled and (not raw:IsEnabled()) ~= (not bEnable) then
+		local txt = GetComponentElement(raw, 'TEXT')
+		if txt then
+			local r, g, b = txt:GetFontColor()
 			if bEnable then
-				ele.txt:SetFontColor(min(ceil(r * 2.2), 255), min(ceil(g * 2.2), 255), min(ceil(b * 2.2), 255))
+				txt:SetFontColor(min(ceil(r * 2.2), 255), min(ceil(g * 2.2), 255), min(ceil(b * 2.2), 255))
 			else
-				ele.txt:SetFontColor(min(ceil(r / 2.2), 255), min(ceil(g / 2.2), 255), min(ceil(b / 2.2), 255))
+				txt:SetFontColor(min(ceil(r / 2.2), 255), min(ceil(g / 2.2), 255), min(ceil(b / 2.2), 255))
 			end
 		end
 	end
-	x:Enable(bEnable and true or false)
+	raw:Enable(bEnable and true or false)
 end
 function XGUI:enable(...)
 	self:_checksum()
-	local argc = select("#", ...)
+	local argc = select('#', ...)
 	if argc == 1 then
-		for _, ele in pairs(self.eles) do
-			local bEnable = select(1, ...)
-			local x = ele.chk or ele.wnd or ele.raw
-			if x and x.Enable then
-				if type(bEnable) == "function" then
-					MY.BreatheCall("XGUI_ENABLE_CHECK#" .. tostring(x), function()
-						if x and x.IsValid and x:IsValid() then
-							SetEleEnable(x, ele, bEnable())
+		local bEnable = select(1, ...)
+		for _, raw in ipairs(self.raws) do
+			raw = GetComponentElement(raw, 'CHECKBOX') or GetComponentElement(raw, 'MAIN_WINDOW') or raw
+			if raw.Enable then
+				if type(bEnable) == 'function' then
+					MY.BreatheCall('XGUI_ENABLE_CHECK#' .. tostring(raw), function()
+						if IsElement(raw) then
+							SetComponentEnable(raw, bEnable())
 						else
 							return 0
 						end
 					end)
 				else
-					SetEleEnable(x, ele, bEnable)
+					SetComponentEnable(raw, bEnable)
 				end
 			end
 		end
 		return self
-	else -- get
-		local ele = self.eles[1]
-		if ele and ele.raw and ele.raw.IsEnabled then
-			return ele.raw:IsEnabled()
+	else
+		local raw = self.raws[1]
+		if raw and raw.IsEnabled then
+			return raw:IsEnabled()
 		end
 	end
 end
@@ -1125,11 +1098,11 @@ end
 -- show/hide eles
 function XGUI:toggle(bShow)
 	self:_checksum()
-	for _, ele in pairs(self.eles) do
-		if bShow == false or (bShow == nil and ele.raw:IsVisible()) then
-			ele.raw:Hide()
+	for _, raw in ipairs(self.raws) do
+		if bShow == false or (bShow == nil and raw:IsVisible()) then
+			raw:Hide()
 		else
-			ele.raw:Show()
+			raw:Show()
 		end
 	end
 	return self
@@ -1142,48 +1115,48 @@ end
 function XGUI:drag(nX, nY, nW, nH)
 	self:_checksum()
 	if type(nX) == 'boolean' then
-		for _, ele in pairs(self.eles) do
-			local x = ele.raw
-			if x and x.EnableDrag then
-				x:EnableDrag(nX)
+		for _, raw in ipairs(self.raws) do
+			if raw.EnableDrag then
+				raw:EnableDrag(nX)
 			end
 		end
 		return self
 	elseif type(nX) == 'number' or type(nY) == 'number' or type(nW) == 'number' or type(nH) == 'number' then
-		for _, ele in ipairs(self.eles) do
-			local x = ele.raw
-			if GetComponentType(x) == 'WndFrame' then
-				x:SetDragArea(nX or 0, nY or 0, nW or x:GetW(), nH or x:GetH())
+		for _, raw in ipairs(self.raws) do
+			if GetComponentType(raw) == 'WndFrame' then
+				raw:SetDragArea(nX or 0, nY or 0, nW or raw:GetW(), nH or raw:GetH())
 			end
 		end
 		return self
-	elseif type(nX) == 'function' or
-	type(nY) == 'function' or
-	type(nW) == 'function' then
-		for _, ele in pairs(self.eles) do
-			if ele.frm then
+	elseif type(nX) == 'function' or type(nY) == 'function' or type(nW) == 'function' then
+		for _, raw in ipairs(self.raws) do
+			local frame = GetComponentElement(raw, 'FRAME')
+			if frame then
 				if nX then
-					XGUI.RegisterUIEvent(ele.frm, 'OnFrameDragSetPosEnd', nX)
+					XGUI.RegisterUIEvent(frame, 'OnFrameDragSetPosEnd', nX)
 				end
 				if nY then
-					XGUI.RegisterUIEvent(ele.frm, 'OnFrameDragEnd', nY)
+					XGUI.RegisterUIEvent(frame, 'OnFrameDragEnd', nY)
 				end
-			elseif ele.itm then
-				if nX then
-					XGUI.RegisterUIEvent(ele.itm, 'OnItemLButtonDrag', nX)
-				end
-				if nY then
-					XGUI.RegisterUIEvent(ele.itm, 'OnItemLButtonDragEnd', nY)
+			else
+				local item = GetComponentElement(raw, 'ITEM')
+				if item then
+					if nX then
+						XGUI.RegisterUIEvent(item, 'OnItemLButtonDrag', nX)
+					end
+					if nY then
+						XGUI.RegisterUIEvent(item, 'OnItemLButtonDragEnd', nY)
+					end
 				end
 			end
 		end
 		return self
 	else
-		local ele = self.eles[1]
-		if ele then
-			local x = ele.frm or ele.raw
-			if x and x.IsDragable then
-				return x:IsDragable()
+		local raw = self.raws[1]
+		if raw then
+			raw = GetComponentElement(raw, 'FRAME') or raw
+			if raw.IsDragable then
+				return raw:IsDragable()
 			end
 		end
 	end
@@ -1193,50 +1166,54 @@ end
 function XGUI:text(szText)
 	self:_checksum()
 	if szText then
-		for _, ele in pairs(self.eles) do
-			if ele.type == "WndScrollBox" then
-				ele.hdl:Clear()
-				ele.hdl:AppendItemFromString(GetFormatText(szText))
-				ele.hdl:FormatAllItemPos()
-			elseif ele.type == "WndSliderBox" and type(szText)=="function" then
-				ele.wnd.FormatText = szText
-				ele.wnd.ResponseUpdateScroll(true)
-			elseif ele.type == "WndEditBox" or ele.type == "WndAutocomplete" then
-				if type(szText) == "table" then
+		local componentType, element
+		for _, raw in ipairs(self.raws) do
+			componentType = GetComponentType(raw)
+			if componentType == 'WndScrollBox' then
+				element = GetComponentElement(raw, 'MAIN_HANDLE')
+				element:Clear()
+				element:AppendItemFromString(GetFormatText(szText))
+				element:FormatAllItemPos()
+			elseif componentType == 'WndSliderBox' and type(szText) == 'function' then
+				SetComponentProp(raw, 'FormatText', szText)
+				GetComponentProp(raw, 'ResponseUpdateScroll')(true)
+			elseif componentType == 'WndEditBox' or componentType == 'WndAutocomplete' then
+				element = GetComponentElement(raw, 'EDIT')
+				if type(szText) == 'table' then
 					for k, v in ipairs(szText) do
-						if v.type == "text" then
-							ele.edt:InsertText(v.text)
+						if v.type == 'text' then
+							element:InsertText(v.text)
 						else
-							ele.edt:InsertObj(v.text, v)
+							element:InsertObj(v.text, v)
 						end
 					end
 				else
-					ele.edt:SetText(szText)
+					element:SetText(szText)
 				end
-			elseif ele.type == "Text" then
-				ele.txt:SetText(szText)
-				ele.txt:GetParent():FormatAllItemPos()
-				if ele.raw.bAutoSize then
-					ele.raw:AutoSize()
+			elseif componentType == 'Text' then
+				raw:SetText(szText)
+				if GetComponentProp(raw, 'bAutoSize') then
+					raw:AutoSize()
 				end
-			elseif type(szText) ~= "function" then
-				local x = ele.txt or ele.edt or ele.raw
-				if x and x.SetText then
-					x:SetText(szText)
-					local x = x:GetParent()
-					if x and x.FormatAllItemPos then
-						x:FormatAllItemPos()
-					end
+				raw:GetParent():FormatAllItemPos()
+			elseif type(szText) ~= 'function' then
+				element = GetComponentElement(raw, 'TEXT')
+				if element then
+					element:SetText(szText)
+				end
+				element = GetComponentElement(raw, 'EDIT')
+				if element then
+					element:SetText(szText)
 				end
 			end
 		end
 		return self
 	else
-		local ele = self.eles[1]
-		if ele then
-			local x = ele.txt or ele.edt or ele.raw
-			if x and x.GetText then
-				return x:GetText()
+		local raw = self.raws[1]
+		if raw then
+			raw = GetComponentElement(raw, 'TEXT') or GetComponentElement(raw, 'EDIT') or raw
+			if raw and raw.GetText then
+				return raw:GetText()
 			end
 		end
 	end
@@ -1246,14 +1223,20 @@ end
 function XGUI:placeholder(szText)
 	self:_checksum()
 	if szText then
-		for _, ele in pairs(self.eles) do
-			if ele.edt then ele.edt:SetPlaceholderText(szText) end
+		for _, raw in ipairs(self.raws) do
+			raw = GetComponentElement(raw, 'EDIT')
+			if raw then
+				raw:SetPlaceholderText(szText)
+			end
 		end
 		return self
 	else
-		local ele = self.eles[1]
-		if ele and ele.edt then
-			return ele.edt:GetPlaceholderText()
+		local raw = self.raws[1]
+		if raw then
+			raw = GetComponentElement(raw, 'EDIT')
+			if raw then
+				return raw:GetPlaceholderText()
+			end
 		end
 	end
 end
@@ -1262,11 +1245,10 @@ end
 function XGUI:autocomplete(method, arg1, arg2)
 	self:_checksum()
 	if method == 'option' and (type(arg1) == 'nil' or (type(arg1) == 'string' and type(arg2) == nil)) then -- get
-		-- select the first item
-		local ele = self.eles[1]
 		-- try to get its option
-		if ele then
-			return clone(ele.raw.tMyAcOption)
+		local raw = self.raws[1]
+		if raw then
+			return clone(GetComponentProp(raw, 'autocompleteOptions'))
 		end
 	else -- set
 		if method == 'option' then
@@ -1276,114 +1258,115 @@ function XGUI:autocomplete(method, arg1, arg2)
 				}
 			end
 			if type(arg1) == 'table' then
-				for _, ele in pairs(self.eles) do
-					ele.raw.tMyAcOption = ele.raw.tMyAcOption or {}
-					for k, v in pairs(arg1) do
-						ele.raw.tMyAcOption[k] = v
+				for _, raw in ipairs(self.raws) do
+					if GetComponentType(raw) == 'WndAutocomplete' then
+						for k, v in pairs(arg1) do
+							SetComponentProp(raw, 'autocompleteOptions', k, v)
+						end
 					end
 				end
 			end
 		elseif method == 'close' then
 			Wnd.CloseWindow('PopupMenuPanel')
 		elseif method == 'destroy' then
-			for _, ele in pairs(self.eles) do
-				ele.raw:Lookup("WndEdit_Default").OnSetFocus = nil
-				ele.raw:Lookup("WndEdit_Default").OnKillFocus = nil
+			for _, raw in ipairs(self.raws) do
+				raw:Lookup('WndEdit_Default').OnSetFocus = nil
+				raw:Lookup('WndEdit_Default').OnKillFocus = nil
 			end
 		elseif method == 'disable' then
 			self:autocomplete('option', 'disable', true)
 		elseif method == 'enable' then
 			self:autocomplete('option', 'disable', false)
 		elseif method == 'search' then
-			for _, ele in pairs(self.eles) do
-				if ele.raw.tMyAcOption then
-					local option = ele.raw.tMyAcOption
-					if type(option.beforeSearch) == 'function' then
-						option.beforeSearch(ele.raw, option)
+			for _, raw in ipairs(self.raws) do
+				local opt = GetComponentProp(raw, 'autocompleteOptions')
+				if opt then
+					if type(opt.beforeSearch) == 'function' then
+						opt.beforeSearch(raw, opt)
 					end
-					local keyword = arg1 or ele.raw:Lookup("WndEdit_Default"):GetText()
-					keyword = MY.String.PatternEscape(keyword)
-					if not option.anyMatch then
+					local keyword = arg1 or raw:Lookup('WndEdit_Default'):GetText()
+					keyword = MY.PatternEscape(keyword)
+					if not opt.anyMatch then
 						keyword = '^' .. keyword
 					end
-					if option.ignoreCase then
+					if opt.ignoreCase then
 						keyword = StringLowerW(keyword)
 					end
-					local tOption = {}
+					local aOption = {}
 					-- get matched list
-					for _, src in ipairs(option.source) do
+					for _, src in ipairs(opt.source) do
 						local s = src
-						if option.ignoreCase then
+						if opt.ignoreCase then
 							s = StringLowerW(src)
 						end
-						if string.find(s, keyword) then
-							table.insert(tOption, src)
+						if find(s, keyword) then
+							insert(aOption, src)
 						end
 					end
 
 					-- create menu
 					local menu = {}
-					for _, szOption in ipairs(tOption) do
-						-- max option limit
-						if option.maxOption > 0 and #menu >= option.maxOption then
+					for _, szOption in ipairs(aOption) do
+						-- max opt limit
+						if opt.maxOption > 0 and #menu >= opt.maxOption then
 							break
 						end
-						-- create new option
+						-- create new opt
 						local t = {
 							szOption = szOption,
 							fnAction = function()
-								option.disabledTmp = true
-								XGUI(ele.raw):text(szOption)
-								option.disabledTmp = nil
+								opt.disabledTmp = true
+								raw:Lookup('WndEdit_Default'):SetText(szOption)
+								opt.disabledTmp = nil
 								Wnd.CloseWindow('PopupMenuPanel')
 							end,
 						}
-						if option.beforeDelete or option.afterDelete then
-							t.szIcon = "ui/Image/UICommon/CommonPanel2.UITex"
+						if opt.beforeDelete or opt.afterDelete then
+							t.szIcon = 'ui/Image/UICommon/CommonPanel2.UITex'
 							t.nFrame = 49
 							t.nMouseOverFrame = 51
 							t.nIconWidth = 17
 							t.nIconHeight = 17
-							t.szLayer = "ICON_RIGHTMOST"
+							t.szLayer = 'ICON_RIGHTMOST'
 							t.fnClickIcon = function()
 								local bSure = true
 								local fnDoDelete = function()
-									for i=#option.source, 1, -1 do
-										if option.source[i] == szOption then
-											table.remove(option.source, i)
+									for i=#opt.source, 1, -1 do
+										if opt.source[i] == szOption then
+											remove(opt.source, i)
 										end
 									end
-									XGUI(ele.raw):autocomplete('search')
+									XGUI(raw):autocomplete('search')
 								end
-								if option.beforeDelete then
-									bSure = option.beforeDelete(szOption, fnDoDelete, option)
+								if opt.beforeDelete then
+									bSure = opt.beforeDelete(szOption, fnDoDelete, opt)
 								end
 								if bSure ~= false then
 									fnDoDelete()
 								end
-								if option.afterDelete then
-									option.afterDelete(szOption, option)
+								if opt.afterDelete then
+									opt.afterDelete(szOption, opt)
 								end
 							end
 						end
-						table.insert(menu, t)
+						insert(menu, t)
 					end
-					local nX, nY = ele.raw:GetAbsPos()
-					local nW, nH = ele.raw:GetSize()
+					local nX, nY = raw:GetAbsPos()
+					local nW, nH = raw:GetSize()
 					menu.nMiniWidth = nW
 					menu.x, menu.y = nX, nY + nH
 					menu.bDisableSound = true
 					menu.bShowKillFocus = true
 
-					if type(option.beforePopup) == 'function' then
-						option.beforePopup(menu, ele.raw, option)
+					if type(opt.beforePopup) == 'function' then
+						opt.beforePopup(menu, raw, opt)
 					end
 					-- popup menu
 					if #menu > 0 then
-						option.disabledTmp = true
+						opt.disabledTmp = true
 						PopupMenu(menu)
-						Station.SetFocusWindow(ele.raw:Lookup("WndEdit_Default"))
-						option.disabledTmp = nil
+						Station.SetFocusWindow(raw:Lookup('WndEdit_Default'))
+						opt.disabledTmp = nil
 					else
 						Wnd.CloseWindow('PopupMenuPanel')
 					end
@@ -1396,13 +1379,14 @@ function XGUI:autocomplete(method, arg1, arg2)
 			if type(arg1) == 'table' then
 				for _, src in ipairs(arg1) do
 					if type(src) == 'string' then
-						for _, ele in pairs(self.eles) do
-							for i=#ele.raw.tMyAcOption.source, 1, -1 do
-								 if ele.raw.tMyAcOption.source[i] == src then
-									table.remove(ele.raw.tMyAcOption.source, i)
-								 end
-							 end
-							table.insert(ele.raw.tMyAcOption.source, src)
+						for _, raw in ipairs(self.raws) do
+							local opt = GetComponentProp(raw, 'autocompleteOptions')
+							for i = #opt.source, 1, -1 do
+								if opt.source[i] == src then
+									remove(opt.source, i)
+								end
+							end
+							insert(opt.source, src)
 						end
 					end
 				end
@@ -1414,12 +1398,13 @@ function XGUI:autocomplete(method, arg1, arg2)
 			if type(arg1) == 'table' then
 				for _, src in ipairs(arg1) do
 					if type(src) == 'string' then
-						for _, ele in pairs(self.eles) do
-							for i=#ele.raw.tMyAcOption.source, 1, -1 do
-								 if ele.raw.tMyAcOption.source[i] == arg1 then
-									table.remove(ele.raw.tMyAcOption.source, i)
-								 end
-							 end
+						for _, raw in ipairs(self.raws) do
+							local opt = GetComponentProp(raw, 'autocompleteOptions')
+							for i=#opt.source, 1, -1 do
+								if opt.source[i] == arg1 then
+									remove(opt.source, i)
+								end
+							end
 						end
 					end
 				end
@@ -1433,11 +1418,10 @@ end
 function XGUI:listbox(method, arg1, arg2, arg3, arg4)
 	self:_checksum()
 	if method == 'option' and (type(arg1) == 'nil' or (type(arg1) == 'string' and type(arg2) == nil)) then -- get
-		-- select the first item
-		local ele = self.eles[1]
 		-- try to get its option
-		if ele then
-			return clone(ele.raw.tMyLbOption)
+		local raw = self.raws[1]
+		if raw then
+			return clone(GetComponentProp(raw, 'listboxOptions'))
 		end
 	else -- set
 		if method == 'option' then
@@ -1447,46 +1431,23 @@ function XGUI:listbox(method, arg1, arg2, arg3, arg4)
 				}
 			end
 			if type(arg1) == 'table' then
-				for _, ele in pairs(self.eles) do
-					ele.raw.tMyLbOption = ele.raw.tMyLbOption or {}
+				for _, raw in ipairs(self.raws) do
 					for k, v in pairs(arg1) do
-						ele.raw.tMyLbOption[k] = v
+						SetComponentProp(raw, 'listboxOptions', k, v)
 					end
 				end
 			end
 		elseif method == 'select' then
 			local tData = {}
-			if arg1 == 'all' then
-				for _, ele in pairs(self.eles) do
-					if ele.type == 'WndListBox' then
-						local hScroll = ele.raw:Lookup('', 'Handle_Scroll')
-						for i = 0, hScroll:GetItemCount() - 1, 1 do
-							local hItem = hScroll:Lookup(i)
-							table.insert(tData, { text = hItem.text, id = hItem.id, data = hItem.data, selected = hItem.selected })
-						end
-					end
-				end
-			elseif arg1 == 'unselected' then
-				for _, ele in pairs(self.eles) do
-					if ele.type == 'WndListBox' then
-						local hScroll = ele.raw:Lookup('', 'Handle_Scroll')
-						for i = 0, hScroll:GetItemCount() - 1, 1 do
-							local hItem = hScroll:Lookup(i)
-							if not hItem.selected then
-								table.insert(tData, { text = hItem.text, id = hItem.id, data = hItem.data, selected = hItem.selected })
-							end
-						end
-					end
-				end
-			else--if arg1 == 'selected' then
-				for _, ele in pairs(self.eles) do
-					if ele.type == 'WndListBox' then
-						local hScroll = ele.raw:Lookup('', 'Handle_Scroll')
-						for i = 0, hScroll:GetItemCount() - 1, 1 do
-							local hItem = hScroll:Lookup(i)
-							if hItem.selected then
-								table.insert(tData, { text = hItem.text, id = hItem.id, data = hItem.data, selected = hItem.selected })
-							end
+			for _, raw in ipairs(self.raws) do
+				if GetComponentType(raw) == 'WndListBox' then
+					local hList = raw:Lookup('', 'Handle_Scroll')
+					for i = 0, hList:GetItemCount() - 1, 1 do
+						local data = GetComponentProp(hList:Lookup(i), 'listboxItemData')
+						if arg1 == 'all'
+						or (arg1 == 'unselected' and not data.selected)
+						or (arg1 == 'selected' and data.selected) then
+							insert(tData, data)
 						end
 					end
 				end
@@ -1494,89 +1455,94 @@ function XGUI:listbox(method, arg1, arg2, arg3, arg4)
 			return tData
 		elseif method == 'insert' then
 			local text, id, data, pos = arg1, arg2, arg3, tonumber(arg4)
-			for _, ele in pairs(self.eles) do
-				if ele.type == 'WndListBox' then
-					local hScroll = ele.raw:Lookup('', 'Handle_Scroll')
+			for _, raw in ipairs(self.raws) do
+				if GetComponentType(raw) == 'WndListBox' then
+					local hList = raw:Lookup('', 'Handle_Scroll')
 					local bExist
 					if id then
-						for i = hScroll:GetItemCount() - 1, 0, -1 do
-							if hScroll:Lookup(i).id == id then
+						for i = hList:GetItemCount() - 1, 0, -1 do
+							if hList:Lookup(i).id == id then
 								bExist = true
 							end
 						end
 					end
 					if not bExist then
-						local w, h = hScroll:GetSize()
+						local w, h = hList:GetSize()
 						local xml = '<handle>eventid=371 <image>w='..w..' h=25 path="UI/Image/Common/TextShadow.UITex" frame=5 alpha=0 name="Image_Bg" </image><image>w='..w..' h=25 path="UI/Image/Common/TextShadow.UITex" lockshowhide=1 frame=2 name="Image_Sel" </image><text>w='..w..' h=25 valign=1 name="Text_Default" </text></handle>'
 						local hItem
 						if pos then
 							pos = pos - 1 -- C++ count from zero but lua count from one.
-							hScroll:InsertItemFromString(pos, false, xml)
-							hItem = hScroll:Lookup(pos)
+							hList:InsertItemFromString(pos, false, xml)
+							hItem = hList:Lookup(pos)
 						else
-							hScroll:AppendItemFromString(xml)
-							hItem = hScroll:Lookup(hScroll:GetItemCount() - 1)
+							hList:AppendItemFromString(xml)
+							hItem = hList:Lookup(hList:GetItemCount() - 1)
 						end
-						hItem.id = id
-						hItem.text = text
-						hItem.data = data
+						SetComponentProp(hItem, 'listboxItemData', {
+							id = id,
+							text = text,
+							data = data,
+						})
 						hItem:Lookup('Text_Default'):SetText(text)
-						hItem.OnItemMouseEnter = hScroll.OnListItemHandleMouseEnter
-						hItem.OnItemMouseLeave = hScroll.OnListItemHandleMouseLeave
-						hItem.OnItemLButtonClick = hScroll.OnListItemHandleLButtonClick
-						hItem.OnItemRButtonClick = hScroll.OnListItemHandleRButtonClick
-						hScroll:FormatAllItemPos()
+						hItem.OnItemMouseEnter = GetComponentProp(raw, 'OnListItemHandleMouseEnter')
+						hItem.OnItemMouseLeave = GetComponentProp(raw, 'OnListItemHandleMouseLeave')
+						hItem.OnItemLButtonClick = GetComponentProp(raw, 'OnListItemHandleLButtonClick')
+						hItem.OnItemRButtonClick = GetComponentProp(raw, 'OnListItemHandleRButtonClick')
+						hList:FormatAllItemPos()
 					end
 				end
 			end
 		elseif method == 'update' then
 			local text, id, data = arg1, arg2, arg3
-			for _, ele in pairs(self.eles) do
-				if ele.type == 'WndListBox' then
-					local hScroll = ele.raw:Lookup('', 'Handle_Scroll')
-					for i = hScroll:GetItemCount() - 1, 0, -1 do
-						if id and hScroll:Lookup(i).id == id then
-							hScroll:Lookup(i).data = data
-							hScroll:Lookup(i):Lookup('Text_Default'):SetText(text)
+			for _, raw in ipairs(self.raws) do
+				if GetComponentType(raw) == 'WndListBox' then
+					local hList = raw:Lookup('', 'Handle_Scroll')
+					for i = hList:GetItemCount() - 1, 0, -1 do
+						local hItem = hList:Lookup(i)
+						local data = GetComponentProp(hItem, 'listboxItemData')
+						if id and data.id == id then
+							data.data = data
+							hItem:Lookup('Text_Default'):SetText(text)
 						end
 					end
 				end
 			end
 		elseif method == 'delete' then
 			local text, id = arg1, arg2
-			for _, ele in pairs(self.eles) do
-				if ele.type == 'WndListBox' then
-					local hScroll = ele.raw:Lookup('', 'Handle_Scroll')
-					for i = hScroll:GetItemCount() - 1, 0, -1 do
-						if (id and hScroll:Lookup(i).id == id) or
-						(not id and text and hScroll:Lookup(i).text == text) then
-							hScroll:RemoveItem(i)
+			for _, raw in ipairs(self.raws) do
+				if GetComponentType(raw) == 'WndListBox' then
+					local hList = raw:Lookup('', 'Handle_Scroll')
+					for i = hList:GetItemCount() - 1, 0, -1 do
+						local data = GetComponentProp(hList:Lookup(i), 'listboxItemData')
+						if (id and data.id == id)
+						or (not id and text and data.text == text) then
+							hList:RemoveItem(i)
 						end
 					end
-					hScroll:FormatAllItemPos()
+					hList:FormatAllItemPos()
 				end
 			end
 		elseif method == 'clear' then
-			for _, ele in pairs(self.eles) do
-				if ele.type == 'WndListBox' then
-					ele.raw:Lookup('', 'Handle_Scroll'):Clear()
+			for _, raw in ipairs(self.raws) do
+				if GetComponentType(raw) == 'WndListBox' then
+					raw:Lookup('', 'Handle_Scroll'):Clear()
 				end
 			end
 		elseif method == 'multiSelect' then
 			self:listbox('option', 'multiSelect', arg1)
 		elseif method == 'onmenu' then
 			if type(arg1) == 'function' then
-				for _, ele in pairs(self.eles) do
-					if ele.type == 'WndListBox' then
-						ele.raw:Lookup('', 'Handle_Scroll').GetListItemHandleMenu = arg1
+				for _, raw in ipairs(self.raws) do
+					if GetComponentType(raw) == 'WndListBox' then
+						SetComponentProp(raw, 'GetListItemHandleMenu', arg1)
 					end
 				end
 			end
 		elseif method == 'onlclick' then
 			if type(arg1) == 'function' then
-				for _, ele in pairs(self.eles) do
-					if ele.type == 'WndListBox' then
-						ele.raw:Lookup('', 'Handle_Scroll').OnListItemHandleCustomLButtonClick = arg1
+				for _, raw in ipairs(self.raws) do
+					if GetComponentType(raw) == 'WndListBox' then
+						SetComponentProp(raw, 'OnListItemHandleCustomLButtonClick', arg1)
 					end
 				end
 			end
@@ -1589,14 +1555,14 @@ end
 function XGUI:name(szText)
 	self:_checksum()
 	if szText then -- set name
-		for _, ele in pairs(self.eles) do
-			ele.raw:SetName(szText)
+		for _, raw in ipairs(self.raws) do
+			raw:SetName(szText)
 		end
 		return self
 	else -- get
-		local ele = self.eles[1]
-		if ele and ele.raw and ele.raw.GetName then
-			return ele.raw:GetName()
+		local raw = self.raws[1]
+		if raw and raw.GetName then
+			return raw:GetName()
 		end
 	end
 end
@@ -1605,14 +1571,14 @@ end
 function XGUI:group(szText)
 	self:_checksum()
 	if szText then -- set group
-		for _, ele in pairs(self.eles) do
-			ele.raw.group = szText
+		for _, raw in ipairs(self.raws) do
+			SetComponentProp(raw, 'group', szText)
 		end
 		return self
 	else -- get
-		local ele = self.eles[1]
-		if ele and ele.raw then
-			return ele.raw.group
+		local raw = self.raws[1]
+		if raw then
+			return GetComponentProp(raw, 'group')
 		end
 	end
 end
@@ -1621,14 +1587,16 @@ end
 function XGUI:penetrable(bPenetrable)
 	self:_checksum()
 	if type(bPenetrable) == 'boolean' then -- set penetrable
-		for _, ele in pairs(self.eles) do
-			ele.raw.bPenetrable = bPenetrable
-			if ele.raw.SetMousePenetrable then
-				ele.raw:SetMousePenetrable(bPenetrable)
+		for _, raw in ipairs(self.raws) do
+			SetComponentProp(raw, 'bPenetrable', bPenetrable)
+			if raw.SetMousePenetrable then
+				raw:SetMousePenetrable(bPenetrable)
 			end
-			if ele.wnd and ele.wnd.SetMousePenetrable then
-				ele.wnd:SetMousePenetrable(bPenetrable)
-			end
+		end
+	else
+		local raw = self.raws[1]
+		if raw then
+			return GetComponentProp(raw, 'bPenetrable')
 		end
 	end
 	return self
@@ -1638,14 +1606,14 @@ end
 function XGUI:alpha(nAlpha)
 	self:_checksum()
 	if nAlpha then -- set name
-		for _, ele in pairs(self.eles) do
-			ele.raw:SetAlpha(nAlpha)
+		for _, raw in ipairs(self.raws) do
+			raw:SetAlpha(nAlpha)
 		end
 		return self
 	else -- get
-		local ele = self.eles[1]
-		if ele and ele.raw and ele.raw.GetAlpha then
-			return ele.raw:GetAlpha()
+		local raw = self.raws[1]
+		if raw and raw.GetAlpha then
+			return raw:GetAlpha()
 		end
 	end
 end
@@ -1654,22 +1622,24 @@ end
 function XGUI:fadeTo(nTime, nOpacity, callback)
 	self:_checksum()
 	if nTime and nOpacity then
-		for i = 1, #self.eles, 1 do
-			local ele = self:eq(i)
-			local nStartAlpha = ele:alpha()
+		for i, raw in ipairs(self.raws) do
+			local ui = self:eq(i)
+			local nStartAlpha = ui:alpha()
 			local nStartTime = GetTime()
 			local fnCurrent = function(nStart, nEnd, nTotalTime, nDuringTime)
 				return ( nEnd - nStart ) * nDuringTime / nTotalTime + nStart -- 线性模型
 			end
-			if not ele:visible() then ele:alpha(0):toggle(true) end
-			MY.BreatheCall("MY_FADE_" .. tostring(ele:raw(1)), function()
-				ele:show()
-				local nCurrentAlpha = fnCurrent(nStartAlpha, nOpacity, nTime, GetTime()-nStartTime)
-				ele:alpha(nCurrentAlpha)
-				-- MY.Debug(string.format('%d %d %d %d\n', nStartAlpha, nOpacity, nCurrentAlpha, (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity)), 'fade', MY_DEBUG.LOG)
+			if not ui:visible() then
+				ui:alpha(0):toggle(true)
+			end
+			MY.BreatheCall('MY_FADE_' .. tostring(ui[1]), function()
+				ui:show()
+				local nCurrentAlpha = fnCurrent(nStartAlpha, nOpacity, nTime, GetTime() - nStartTime)
+				ui:alpha(nCurrentAlpha)
+				-- MY.Debug(format('%d %d %d %d\n', nStartAlpha, nOpacity, nCurrentAlpha, (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity)), 'fade', MY_DEBUG.LOG)
 				if (nStartAlpha - nCurrentAlpha)*(nCurrentAlpha - nOpacity) <= 0 then
-					ele:alpha(nOpacity)
-					pcall(callback, ele)
+					ui:alpha(nOpacity)
+					pcall(callback, ui)
 					return 0
 				end
 			end)
@@ -1682,8 +1652,8 @@ end
 function XGUI:fadeIn(nTime, callback)
 	self:_checksum()
 	nTime = nTime or 300
-	for i = 1, #self.eles, 1 do
-		self:eq(i):fadeTo(nTime, self:eq(i):data('nOpacity') or 255, callback)
+	for i, raw in ipairs(self.raws) do
+		self:eq(i):fadeTo(nTime, GetComponentProp(raw, 'nOpacity') or 255, callback)
 	end
 	return self
 end
@@ -1692,13 +1662,15 @@ end
 function XGUI:fadeOut(nTime, callback)
 	self:_checksum()
 	nTime = nTime or 300
-	for i = 1, #self.eles, 1 do
-		local ele = self:eq(i)
-		if ele:alpha() > 0 then ele:data('nOpacity', ele:alpha()) end
+	for i, raw in ipairs(self.raws) do
+		local ui = self:eq(i)
+		if ui:alpha() > 0 then
+			SetComponentProp(ui, 'nOpacity', ui:alpha())
+		end
 	end
-	self:fadeTo(nTime, 0, function(ele)
-		ele:toggle(false)
-		pcall(callback, ele)
+	self:fadeTo(nTime, 0, function(ui)
+		ui:toggle(false)
+		pcall(callback, ui)
 	end)
 	return self
 end
@@ -1707,21 +1679,23 @@ end
 function XGUI:slideTo(nTime, nHeight, callback)
 	self:_checksum()
 	if nTime and nHeight then
-		for i = 1, #self.eles, 1 do
-			local ele = self:eq(i)
-			local nStartValue = ele:height()
+		for i, raw in ipairs(self.raws) do
+			local ui = self:eq(i)
+			local nStartValue = ui:height()
 			local nStartTime = GetTime()
 			local fnCurrent = function(nStart, nEnd, nTotalTime, nDuringTime)
 				return ( nEnd - nStart ) * nDuringTime / nTotalTime + nStart -- 线性模型
 			end
-			if not ele:visible() then ele:height(0):toggle(true) end
+			if not ui:visible() then
+				ui:height(0):toggle(true)
+			end
 			MY.BreatheCall(function()
-				ele:show()
+				ui:show()
 				local nCurrentValue = fnCurrent(nStartValue, nHeight, nTime, GetTime()-nStartTime)
-				ele:height(nCurrentValue)
-				-- MY.Debug(string.format('%d %d %d %d\n', nStartValue, nHeight, nCurrentValue, (nStartValue - nCurrentValue)*(nCurrentValue - nHeight)), 'slide', MY_DEBUG.LOG)
+				ui:height(nCurrentValue)
+				-- MY.Debug(format('%d %d %d %d\n', nStartValue, nHeight, nCurrentValue, (nStartValue - nCurrentValue)*(nCurrentValue - nHeight)), 'slide', MY_DEBUG.LOG)
 				if (nStartValue - nCurrentValue)*(nCurrentValue - nHeight) <= 0 then
-					ele:height(nHeight):toggle( nHeight ~= 0 )
+					ui:height(nHeight):toggle( nHeight ~= 0 )
 					pcall(callback)
 					return 0
 				end
@@ -1735,9 +1709,11 @@ end
 function XGUI:slideUp(nTime, callback)
 	self:_checksum()
 	nTime = nTime or 300
-	for i = 1, #self.eles, 1 do
-		local ele = self:eq(i)
-		if ele:height() > 0 then ele:data('nSlideTo', ele:height()) end
+	for i, raw in ipairs(self.raws) do
+		local ui = self:eq(i)
+		if ui:height() > 0 then
+			SetComponentProp(ui, 'nSlideTo', ui:height())
+		end
 	end
 	self:slideTo(nTime, 0, callback)
 	return self
@@ -1747,8 +1723,8 @@ end
 function XGUI:slideDown(nTime, callback)
 	self:_checksum()
 	nTime = nTime or 300
-	for i = 1, #self.eles, 1 do
-		self:eq(i):slideTo(nTime, self:eq(i):data('nSlideTo'), callback)
+	for i, raw in ipairs(self.raws) do
+		self:eq(i):slideTo(nTime, GetComponentProp(raw, 'nSlideTo'), callback)
 	end
 	return self
 end
@@ -1757,23 +1733,24 @@ end
 -- (self) Instance:font(number nFont)
 function XGUI:font(nFont)
 	self:_checksum()
-	if nFont then-- set name
-		for _, ele in pairs(self.eles) do
-			local x = ele.txt or ele.edt or ele.raw
-			if x then
-				if x.SetFontScheme then
-					x:SetFontScheme(nFont)
-				end
-				if x.SetSelectFontScheme then
-					x:SetSelectFontScheme(nFont)
-				end
+	if nFont then -- set name
+		local element
+		for _, raw in ipairs(self.raws) do
+			element = GetComponentElement(raw, 'TEXT')
+			if element then
+				element:SetFontScheme(nFont)
+			end
+			element = GetComponentElement(raw, 'EDIT')
+			if element then
+				element:SetFontScheme(nFont)
+				element:SetSelectFontScheme(nFont)
 			end
 		end
 		return self
 	else -- get
-		local ele = self.eles[1]
-		if ele and ele.raw and ele.raw.GetFontScheme then
-			return ele.raw:GetFontScheme()
+		local raw = self.raws[1]
+		if raw and raw.GetFontScheme then
+			return raw:GetFontScheme()
 		end
 	end
 end
@@ -1782,32 +1759,36 @@ end
 -- (self) Instance:color(number r, number g, number b)
 function XGUI:color(r, g, b)
 	self:_checksum()
-	if type(r) == "table" then
+	if type(r) == 'table' then
 		r, g, b = unpack(r)
 	end
 	if b then
-		for _, ele in pairs(self.eles) do
-			local x = ele.sdw
-			if x and x.SetColorRGB then
-				x:SetColorRGB(r, g, b)
+		local element
+		for _, raw in ipairs(self.raws) do
+			element = GetComponentElement(raw, 'SHADOW')
+			if element then
+				element:SetColorRGB(r, g, b)
 			end
-			local x = ele.edt or ele.txt
-			if x and x.SetFontColor then
-				if x.IsEnabled and not x:IsEnabled() then
-					x:SetFontColor(r / 2.2, g / 2.2, b / 2.2)
+			element = GetComponentElement(raw, 'EDIT') or GetComponentElement(raw, 'TEXT')
+			if element then
+				if raw.IsEnabled and not raw:IsEnabled() then
+					element:SetFontColor(r / 2.2, g / 2.2, b / 2.2)
 				else
-					x:SetFontColor(r, g, b)
+					element:SetFontColor(r, g, b)
 				end
 			end
 		end
 		return self
-	else -- get
-		local ele = self.eles[1]
-		if ele then
-			if ele.sdw then
-				return ele.sdw:GetColorRGB()
-			elseif ele.edt or ele.txt then
-				return (ele.edt or ele.txt):GetFontColor()
+	else
+		local raw, element = self.raws[1]
+		if raw then
+			element = GetComponentElement(raw, 'SHADOW')
+			if element then
+				return element:GetColorRGB()
+			end
+			element = GetComponentElement(raw, 'EDIT') or GetComponentElement(raw, 'TEXT')
+			if element then
+				return element:GetFontColor()
 			end
 		end
 	end
@@ -1819,8 +1800,8 @@ function XGUI:drawEclipse(nX, nY, nMajorAxis, nMinorAxis, nR, nG, nB, nA, dwRota
 	nAccuracy = nAccuracy or 32
 	local deltaRad = (2 * math.pi) / nAccuracy
 	local sha, nX1, nY1, nMajorAxis1, nMinorAxis1, dwRad1, dwRad2, nDis
-	for _, ele in pairs(self.eles) do
-		sha = ele.sdw
+	for _, raw in ipairs(self.raws) do
+		sha = GetComponentElement(raw, 'SHADOW')
 		if sha then
 			dwRad1 = dwPitch
 			dwRad2 = dwPitch + dwRad
@@ -1858,8 +1839,8 @@ function XGUI:drawCircle(nX, nY, nRadius, nR, nG, nB, nA, dwPitch, dwRad, nAccur
 	nAccuracy = nAccuracy or 32
 	local deltaRad = (2 * math.pi) / nAccuracy
 	local sha, nX1, nY1, nRadius1, dwRad1, dwRad2
-	for _, ele in pairs(self.eles) do
-		sha = ele.sdw
+	for _, raw in ipairs(self.raws) do
+		sha = GetComponentElement(raw, 'SHADOW')
 		if sha then
 			dwRad1 = dwPitch
 			dwRad2 = dwPitch + dwRad
@@ -1907,23 +1888,26 @@ end
 function XGUI:pos(nLeft, nTop)
 	self:_checksum()
 	if nLeft or nTop then
-		for _, ele in pairs(self.eles) do
-			local _nLeft, _nTop = ele.raw:GetRelPos()
-			nLeft, nTop = nLeft or _nLeft, nTop or _nTop
-			if ele.frm then
-				ele.frm:SetRelPos(nLeft, nTop)
-			elseif ele.wnd then
-				ele.wnd:SetRelPos(nLeft, nTop)
-			elseif ele.itm then
-				ele.itm:SetRelPos(nLeft, nTop)
-				ele.itm:GetParent():FormatAllItemPos()
+		local element
+		for _, raw in ipairs(self.raws) do
+			local nLeft, nTop = nLeft or raw:GetRelX(), nTop or raw:GetRelY()
+			if GetComponentType(raw) == 'WndFrame' then
+				GetComponentType(raw, 'FRAME'):SetRelPos(nLeft, nTop)
+			elseif raw:GetBaseType() == 'Wnd' then
+				GetComponentType(raw, 'Wnd'):SetRelPos(nLeft, nTop)
+			else
+				element = GetComponentType(raw, 'ITEM')
+				if element then
+					element:SetRelPos(nLeft, nTop)
+					element:GetParent():FormatAllItemPos()
+				end
 			end
 		end
 		return self
-	else -- get
-		local ele = self.eles[1]
-		if ele and ele.raw and ele.raw.GetRelPos then
-			return ele.raw:GetRelPos()
+	else
+		local raw = self.raws[1]
+		if raw and raw.GetRelPos then
+			return raw:GetRelPos()
 		end
 	end
 end
@@ -1935,10 +1919,10 @@ function XGUI:shake(xrange, yrange, maxspeed, time)
 		local starttime = GetTime()
 		local xspeed, yspeed = maxspeed, - maxspeed
 		local xhalfrange, yhalfrange = xrange / 2, yrange / 2
-		for _, ele in pairs(self.eles) do
-			local ui = XGUI(ele.raw)
+		for _, raw in ipairs(self.raws) do
+			local ui = XGUI(raw)
 			local xoffset, yoffset = 0, 0
-			MY.RenderCall(tostring(ele.raw) .. " shake", function()
+			MY.RenderCall(tostring(raw) .. ' shake', function()
 				if ui:count() == 0 then
 					return 0
 				elseif GetTime() - starttime < time then
@@ -1972,8 +1956,8 @@ function XGUI:shake(xrange, yrange, maxspeed, time)
 			end)
 		end
 	else
-		for _, ele in pairs(self.eles) do
-			MY.RenderCall(tostring(ele.raw) .. " shake", false)
+		for _, raw in ipairs(self.raws) do
+			MY.RenderCall(tostring(raw) .. ' shake', false)
 		end
 	end
 end
@@ -1983,17 +1967,20 @@ end
 function XGUI:anchor(anchor)
 	self:_checksum()
 	if type(anchor) == 'table' then
-		for _, ele in pairs(self.eles) do
-			if ele.frm then
-				ele.frm:SetPoint(anchor.s, 0, 0, anchor.r, anchor.x, anchor.y)
-				ele.frm:CorrectPos()
+		local element
+		for _, raw in ipairs(self.raws) do
+			element = GetComponentElement(raw, 'FRAME')
+			if element then
+				element:SetPoint(anchor.s, 0, 0, anchor.r, anchor.x, anchor.y)
+				element:CorrectPos()
 			end
 		end
 		return self
 	else -- get
-		local ele = self.eles[1]
-		if ele and ele.frm then
-			return GetFrameAnchor(ele.frm, anchor)
+		local raw = self.raws[1]
+		if raw then
+			raw = GetComponentElement(raw, 'FRAME')
+			return GetFrameAnchor(raw, anchor)
 		end
 	end
 end
@@ -2026,17 +2013,19 @@ end
 function XGUI:size(nWidth, nHeight, nRawWidth, nRawHeight)
 	self:_checksum()
 	if type(nWidth) == 'function' then
-		for _, ele in pairs(self.eles) do
-			XGUI.RegisterUIEvent(ele.raw, "OnSizeChanged", nWidth)
+		for _, raw in ipairs(self.raws) do
+			XGUI.RegisterUIEvent(raw, 'OnSizeChanged', nWidth)
 		end
 	elseif type(nWidth) == 'number' or type(nHeight) == 'number' then
-		for _, ele in pairs(self.eles) do
-			local _nWidth, _nHeight = ele.raw:GetSize()
-			nWidth, nHeight = nWidth or _nWidth, nHeight or _nHeight
-			if ele.type == 'WndFrame' then
-				local frm = ele.frm
-				local hnd = frm:Lookup("", "")
-				if frm.simple then
+		local componentType, element
+		for _, raw in ipairs(self.raws) do
+			local nWidth, nHeight = nWidth or raw:GetW(), nHeight or raw:GetH()
+			componentType = GetComponentType(raw)
+			if componentType == 'WndFrame' then
+				local frm = GetComponentElement(raw, 'FRAME')
+				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+				local hnd = frm:Lookup('', '')
+				if GetComponentProp(raw, 'simple') then
 					local nWidthTitleBtnR = 0
 					local p = frm:Lookup('WndContainer_TitleBtnR'):GetFirstChild()
 					while p do
@@ -2052,8 +2041,8 @@ function XGUI:size(nWidth, nHeight, nRawWidth, nRawHeight)
 					frm:SetSize(nWidth, nHeight)
 					frm:SetDragArea(0, 0, nWidth, 30)
 					hnd:SetSize(nWidth, nHeight)
-					ele.wnd:SetSize(nWidth, nHeight - 30)
-				elseif frm.intact then
+					wnd:SetSize(nWidth, nHeight - 30)
+				elseif GetComponentProp(raw, 'intact') then
 					-- fix size
 					if nWidth  < 132 then nWidth  = 132 end
 					if nHeight < 150 then nHeight = 150 end
@@ -2061,163 +2050,189 @@ function XGUI:size(nWidth, nHeight, nRawWidth, nRawHeight)
 					frm:SetSize(nWidth, nHeight)
 					frm:SetDragArea(0, 0, nWidth, 55)
 					hnd:SetSize(nWidth, nHeight)
-					hnd:Lookup("Image_BgT" ):SetSize(nWidth, 64)
-					hnd:Lookup("Image_BgCT"):SetSize(nWidth - 32, 64)
-					hnd:Lookup("Image_BgLC"):SetSize(8, nHeight - 149)
-					hnd:Lookup("Image_BgCC"):SetSize(nWidth - 16, nHeight - 149)
-					hnd:Lookup("Image_BgRC"):SetSize(8, nHeight - 149)
-					hnd:Lookup("Image_BgCB"):SetSize(nWidth - 132, 85)
-					hnd:Lookup("Text_Title"):SetSize(nWidth - 90, 30)
+					hnd:Lookup('Image_BgT' ):SetSize(nWidth, 64)
+					hnd:Lookup('Image_BgCT'):SetSize(nWidth - 32, 64)
+					hnd:Lookup('Image_BgLC'):SetSize(8, nHeight - 149)
+					hnd:Lookup('Image_BgCC'):SetSize(nWidth - 16, nHeight - 149)
+					hnd:Lookup('Image_BgRC'):SetSize(8, nHeight - 149)
+					hnd:Lookup('Image_BgCB'):SetSize(nWidth - 132, 85)
+					hnd:Lookup('Text_Title'):SetSize(nWidth - 90, 30)
 					hnd:FormatAllItemPos()
-					local hClose = frm:Lookup("Btn_Close")
+					local hClose = frm:Lookup('Btn_Close')
 					if hClose then
 						hClose:SetRelPos(nWidth - 35, 15)
 					end
-					local hMax = frm:Lookup("CheckBox_Maximize")
+					local hMax = frm:Lookup('CheckBox_Maximize')
 					if hMax then
 						hMax:SetRelPos(nWidth - 63, 15)
 					end
-					if ele.wnd then
-						ele.wnd:SetSize(nWidth - 40, nHeight - 90)
-						ele.wnd:Lookup("", ""):SetSize(nWidth - 40, nHeight - 90)
+					if wnd then
+						wnd:SetSize(nWidth - 40, nHeight - 90)
+						wnd:Lookup('', ''):SetSize(nWidth - 40, nHeight - 90)
 					end
 					-- reset position
 					local an = GetFrameAnchor(frm)
 					frm:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
 				else
-					ele.frm:SetSize(nWidth, nHeight)
-					ele.hdl:SetSize(nWidth, nHeight)
+					frm:SetSize(nWidth, nHeight)
+					hnd:SetSize(nWidth, nHeight)
 				end
-			elseif ele.type == "WndCheckBox" then
-				ele.wnd:SetSize(nHeight, nHeight)
-				ele.txt:SetSize(nWidth - nHeight - 1, nHeight)
-				ele.txt:SetRelPos(nHeight + 1, 0)
-				ele.hdl:SetSize(nWidth, nHeight)
-				ele.hdl:FormatAllItemPos()
-			elseif ele.type == "WndComboBox" then
-				local w, h= ele.cmb:GetSize()
-				ele.cmb:SetRelPos(nWidth-w-5, math.ceil((nHeight - h)/2))
-				ele.cmb:Lookup("", ""):SetAbsPos(ele.hdl:GetAbsPos())
-				ele.cmb:Lookup("", ""):SetSize(nWidth, nHeight)
-				ele.wnd:SetSize(nWidth, nHeight)
-				ele.hdl:SetSize(nWidth, nHeight)
-				ele.img:SetSize(nWidth, nHeight)
-				ele.txt:SetSize(nWidth - 10, nHeight)
-				ele.hdl:FormatAllItemPos()
-			elseif ele.type == "WndEditComboBox" or ele.type == "WndAutocomplete" then
-				ele.wnd:SetSize(nWidth, nHeight)
-				ele.hdl:SetSize(nWidth, nHeight)
-				ele.img:SetSize(nWidth, nHeight)
-				ele.hdl:FormatAllItemPos()
-				local w, h= ele.cmb:GetSize()
-				ele.edt:SetSize(nWidth-10-w, nHeight-4)
-				ele.cmb:SetRelPos(nWidth-w-5, (nHeight-h-1)/2+1)
-			elseif ele.type == "WndRadioBox" then
-				ele.wnd:SetSize(nHeight, nHeight)
-				ele.txt:SetSize(nWidth - nHeight - 1, nHeight)
-				ele.txt:SetRelPos(nHeight + 1, 0)
-				ele.hdl:SetSize(nWidth, nHeight)
-				ele.hdl:FormatAllItemPos()
-			elseif ele.type == "WndEditBox" then
-				ele.wnd:SetSize(nWidth, nHeight)
-				ele.hdl:SetSize(nWidth, nHeight)
-				ele.img:SetSize(nWidth, nHeight)
-				ele.edt:SetSize(nWidth-8, nHeight-4)
-				ele.hdl:FormatAllItemPos()
-			elseif ele.type == "Text" then
-				ele.txt:SetSize(nWidth, nHeight)
-				ele.txt:GetParent():FormatAllItemPos()
-				ele.raw.bAutoSize = false
-			elseif ele.type == "WndListBox" then
-				ele.raw:SetSize(nWidth, nHeight)
-				ele.raw:Lookup('Scroll_Default'):SetRelPos(nWidth - 15, 10)
-				ele.raw:Lookup('Scroll_Default'):SetSize(15, nHeight - 20)
-				ele.raw:Lookup('', ''):SetSize(nWidth, nHeight)
-				ele.raw:Lookup('', 'Image_Default'):SetSize(nWidth, nHeight)
-				local hScroll = ele.raw:Lookup('', 'Handle_Scroll')
-				hScroll:SetSize(nWidth - 20, nHeight - 20)
-				for i = hScroll:GetItemCount() - 1, 0, -1 do
-					local hItem = hScroll:Lookup(i)
+			elseif componentType == 'WndCheckBox' then
+				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+				local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
+				local txt = GetComponentElement(raw, 'TEXT')
+				wnd:SetSize(nHeight, nHeight)
+				txt:SetSize(nWidth - nHeight - 1, nHeight)
+				txt:SetRelPos(nHeight + 1, 0)
+				hdl:SetSize(nWidth, nHeight)
+				hdl:FormatAllItemPos()
+			elseif componentType == 'WndComboBox' then
+				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+				local cmb = GetComponentElement(raw, 'COMBOBOX')
+				local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
+				local txt = GetComponentElement(raw, 'TEXT')
+				local img = GetComponentElement(raw, 'IMAGE')
+				local w, h = cmb:GetSize()
+				cmb:SetRelPos(nWidth-w-5, math.ceil((nHeight - h)/2))
+				cmb:Lookup('', ''):SetAbsPos(hdl:GetAbsPos())
+				cmb:Lookup('', ''):SetSize(nWidth, nHeight)
+				wnd:SetSize(nWidth, nHeight)
+				hdl:SetSize(nWidth, nHeight)
+				img:SetSize(nWidth, nHeight)
+				txt:SetSize(nWidth - 10, nHeight)
+				hdl:FormatAllItemPos()
+			elseif componentType == 'WndEditComboBox' or componentType == 'WndAutocomplete' then
+				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+				local cmb = GetComponentElement(raw, 'COMBOBOX')
+				local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
+				local img = GetComponentElement(raw, 'IMAGE')
+				local edt = GetComponentElement(raw, 'EDIT')
+				wnd:SetSize(nWidth, nHeight)
+				hdl:SetSize(nWidth, nHeight)
+				img:SetSize(nWidth, nHeight)
+				hdl:FormatAllItemPos()
+				local w, h = cmb:GetSize()
+				edt:SetSize(nWidth - 10 - w, nHeight - 4)
+				cmb:SetRelPos(nWidth - w - 5, (nHeight - h - 1) / 2 + 1)
+			elseif componentType == 'WndRadioBox' then
+				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+				local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
+				local txt = GetComponentElement(raw, 'TEXT')
+				wnd:SetSize(nHeight, nHeight)
+				txt:SetSize(nWidth - nHeight - 1, nHeight)
+				txt:SetRelPos(nHeight + 1, 0)
+				hdl:SetSize(nWidth, nHeight)
+				hdl:FormatAllItemPos()
+			elseif componentType == 'WndEditBox' then
+				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+				local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
+				local img = GetComponentElement(raw, 'IMAGE')
+				local edt = GetComponentElement(raw, 'EDIT')
+				wnd:SetSize(nWidth, nHeight)
+				hdl:SetSize(nWidth, nHeight)
+				img:SetSize(nWidth, nHeight)
+				edt:SetSize(nWidth-8, nHeight-4)
+				hdl:FormatAllItemPos()
+			elseif componentType == 'Text' then
+				local txt = GetComponentElement(raw, 'TEXT')
+				txt:SetSize(nWidth, nHeight)
+				txt:GetParent():FormatAllItemPos()
+				SetComponentProp(raw, 'bAutoSize', false)
+			elseif componentType == 'WndListBox' then
+				raw:SetSize(nWidth, nHeight)
+				raw:Lookup('Scroll_Default'):SetRelPos(nWidth - 15, 10)
+				raw:Lookup('Scroll_Default'):SetSize(15, nHeight - 20)
+				raw:Lookup('', ''):SetSize(nWidth, nHeight)
+				raw:Lookup('', 'Image_Default'):SetSize(nWidth, nHeight)
+				local hList = raw:Lookup('', 'Handle_Scroll')
+				hList:SetSize(nWidth - 20, nHeight - 20)
+				for i = hList:GetItemCount() - 1, 0, -1 do
+					local hItem = hList:Lookup(i)
 					hItem:Lookup('Image_Bg'):SetSize(nWidth - 20, 25)
 					hItem:Lookup('Image_Sel'):SetSize(nWidth - 20, 25)
 					hItem:Lookup('Text_Default'):SetSize(nWidth - 20, 25)
 					hItem:FormatAllItemPos()
 				end
-				hScroll:FormatAllItemPos()
-			elseif ele.type == "WndScrollBox" then
-				ele.raw:SetSize(nWidth, nHeight)
-				ele.raw:Lookup("", ""):SetSize(nWidth, nHeight)
-				ele.raw:Lookup("", "Image_Default"):SetSize(nWidth, nHeight)
-				ele.raw:Lookup("", "Handle_Padding"):SetSize(nWidth - 30, nHeight - 20)
-				ele.raw:Lookup("", "Handle_Padding/Handle_Scroll"):SetSize(nWidth - 30, nHeight - 20)
-				ele.raw:Lookup("", "Handle_Padding/Handle_Scroll"):FormatAllItemPos()
-				ele.raw:Lookup("WndScrollBar"):SetRelX(nWidth - 20)
-				ele.raw:Lookup("WndScrollBar"):SetH(nHeight - 20)
-			elseif ele.type == "WndSliderBox" then
+				hList:FormatAllItemPos()
+			elseif componentType == 'WndScrollBox' then
+				raw:SetSize(nWidth, nHeight)
+				raw:Lookup('', ''):SetSize(nWidth, nHeight)
+				raw:Lookup('', 'Image_Default'):SetSize(nWidth, nHeight)
+				raw:Lookup('', 'Handle_Padding'):SetSize(nWidth - 30, nHeight - 20)
+				raw:Lookup('', 'Handle_Padding/Handle_Scroll'):SetSize(nWidth - 30, nHeight - 20)
+				raw:Lookup('', 'Handle_Padding/Handle_Scroll'):FormatAllItemPos()
+				raw:Lookup('WndScrollBar'):SetRelX(nWidth - 20)
+				raw:Lookup('WndScrollBar'):SetH(nHeight - 20)
+			elseif componentType == 'WndSliderBox' then
+				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+				local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
+				local sld = GetComponentElement(raw, 'SLIDER')
+				local txt = GetComponentElement(raw, 'TEXT')
 				nRawWidth, nRawHeight = nRawWidth or 120, nRawHeight or 12
-				ele.hdl:Lookup("Image_BG"):SetSize(nRawWidth, nRawHeight - 2)
-				ele.sld:SetSize(nRawWidth, nRawHeight)
-				ele.wnd:SetSize(nWidth, nHeight)
-				ele.hdl:SetSize(nWidth, nHeight)
-				ele.txt:SetRelX(nRawWidth + 5)
-				ele.txt:SetSize(nWidth - nRawWidth - 5, nHeight)
-				ele.hdl:FormatAllItemPos()
-			elseif ele.type == "WndButton2" then
-				ele.wnd:SetSize(nWidth, nHeight)
-				ele.hdl:SetSize(nWidth, nHeight)
-				ele.txt:SetSize(nWidth, nHeight * 0.83)
-			elseif ele.wnd then
-				pcall(function() ele.wnd:SetSize(nWidth, nHeight) end)
-				pcall(function() ele.hdl:SetSize(nWidth, nHeight) end)
-				pcall(function() ele.txt:SetSize(nWidth, nHeight) end)
-				pcall(function() ele.img:SetSize(nWidth, nHeight) end)
-				pcall(function() ele.edt:SetSize(nWidth-8, nHeight-4) end)
-				pcall(function() ele.hdl:FormatAllItemPos() end)
-			elseif ele.itm then
-				pcall(function() (ele.itm or ele.raw):SetSize(nWidth, nHeight) end)
-				pcall(function() (ele.itm or ele.raw):GetParent():FormatAllItemPos() end)
-				pcall(function() ele.hdl:FormatAllItemPos() end)
+				hdl:Lookup('Image_BG'):SetSize(nRawWidth, nRawHeight - 2)
+				sld:SetSize(nRawWidth, nRawHeight)
+				wnd:SetSize(nWidth, nHeight)
+				hdl:SetSize(nWidth, nHeight)
+				txt:SetRelX(nRawWidth + 5)
+				txt:SetSize(nWidth - nRawWidth - 5, nHeight)
+				hdl:FormatAllItemPos()
+			elseif componentType == 'WndButton2' then
+				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+				local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
+				local txt = GetComponentElement(raw, 'TEXT')
+				wnd:SetSize(nWidth, nHeight)
+				hdl:SetSize(nWidth, nHeight)
+				txt:SetSize(nWidth, nHeight * 0.83)
+			elseif raw:GetBaseType() == 'Wnd' then
+				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+				local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
+				local txt = GetComponentElement(raw, 'TEXT')
+				local img = GetComponentElement(raw, 'IMAGE')
+				local edt = GetComponentElement(raw, 'EDIT')
+				if wnd then wnd:SetSize(nWidth, nHeight) end
+				if hdl then hdl:SetSize(nWidth, nHeight) end
+				if txt then txt:SetSize(nWidth, nHeight) end
+				if img then img:SetSize(nWidth, nHeight) end
+				if edt then edt:SetSize(nWidth - 8, nHeight - 4) end
+				if hdl then hdl:FormatAllItemPos() end
+			else
+				local itm = GetComponentElement(raw, 'ITEM') or raw
+				itm:SetSize(nWidth, nHeight)
+				itm:GetParent():FormatAllItemPos()
+				GetComponentElement(raw, 'MAIN_HANDLE'):FormatAllItemPos()
 			end
-			if ele.raw.OnSizeChanged then
-				local _this = this
-				this = ele.raw
-				local status, err = pcall(ele.raw.OnSizeChanged)
-				if not status then
-					MY.Debug({err}, 'ERROR XGUI:OnSizeChanged', MY_DEBUG.ERROR)
-				end
-				this = _this
+			if raw.OnSizeChanged then
+				ExecuteWithThis(raw, raw.OnSizeChanged)
 			end
 		end
 		return self
 	else
-		local ele = self.eles[1]
-		if not ele then
-			return
-		end
-		local x = ele.raw
-		if nWidth == true then
-			x = ele.wnd or ele.raw
-		end
-		if x and x.GetSize then
-			return x:GetSize()
+		local raw = self.raws[1]
+		if raw then
+			if nWidth == true then
+				raw = GetComponentElement(raw, 'MAIN_WINDOW') or raw
+			end
+			if raw.GetSize then
+				return raw:GetSize()
+			end
 		end
 	end
 end
 
 -- (self) Instance:autosize() -- resize Text element by autosize
--- (self) Instance:autosize(bool bAutoSize) -- set if Text ele autosize
+-- (self) Instance:autosize(bool bAutoSize) -- set if Text is autosize
 function XGUI:autosize(bAutoSize)
 	self:_checksum()
 	if bAutoSize == nil then
-		for _, ele in pairs(self.eles) do
-			if ele.type == 'Text' then
-				ele.raw:AutoSize()
+		for _, raw in ipairs(self.raws) do
+			if GetComponentType(raw) == 'Text' then
+				raw:AutoSize()
 			end
 		end
 	elseif type(bAutoSize) == 'boolean' then
-		for _, ele in pairs(self.eles) do
-			if ele.type == 'Text' then
-				ele.raw.bAutoSize = true
+		for _, raw in ipairs(self.raws) do
+			if GetComponentType(raw) == 'Text' then
+				raw.bAutoSize = true
 			end
 		end
 	end
@@ -2227,36 +2242,28 @@ end
 -- (number) Instance:scroll() -- get current scroll percentage (none scroll will return -1)
 -- (self) Instance:scroll(number nPercentage) -- set scroll percentage
 -- (self) Instance:scroll(function OnScrollBarPosChanged) -- bind scroll event handle
-function XGUI:scroll(nPercentage)
+function XGUI:scroll(mixed)
 	self:_checksum()
-	if nPercentage then -- set
-		if type(nPercentage) == "number" then
-			for _, ele in pairs(self.eles) do
-				local x = ele.raw:Lookup("WndScrollBar")
-				if x and x.GetStepCount and x.SetScrollPos then
-					x:SetScrollPos(x:GetStepCount() * nPercentage / 100)
+	if mixed then -- set
+		if type(mixed) == 'number' then
+			for _, raw in ipairs(self.raws) do
+				raw = raw:Lookup('WndScrollBar')
+				if raw and raw.GetStepCount and raw.SetScrollPos then
+					raw:SetScrollPos(raw:GetStepCount() * mixed / 100)
 				end
 			end
-		elseif type(nPercentage) == "function" then
-			local fnOnChange = nPercentage
-			for _, ele in pairs(self.eles) do
-				local x = ele.raw:Lookup("WndScrollBar")
-				if x then
-					XGUI.RegisterUIEvent(x, 'OnScrollBarPosChanged', function()
-						if not this.nLastScrollPos then
-							this.nLastScrollPos = 0
-						end
+		elseif type(mixed) == 'function' then
+			for _, raw in ipairs(self.raws) do
+				local raw = raw:Lookup('WndScrollBar')
+				if raw then
+					XGUI.RegisterUIEvent(raw, 'OnScrollBarPosChanged', function()
 						local nDistance = Station.GetMessageWheelDelta()
-						local nScrollPos = x:GetScrollPos()
-						local nStepCount = x:GetStepCount()
-						if this.nLastScrollPos == nScrollPos and nDistance == 0 then
-							return
-						end
-						this.nLastScrollPos = nScrollPos
+						local nScrollPos = raw:GetScrollPos()
+						local nStepCount = raw:GetStepCount()
 						if nStepCount == 0 then
-							fnOnChange(-1, nDistance)
+							mixed(-1, nDistance)
 						else
-							fnOnChange(nScrollPos * 100 / nStepCount, nDistance)
+							mixed(nScrollPos * 100 / nStepCount, nDistance)
 						end
 					end)
 				end
@@ -2264,14 +2271,14 @@ function XGUI:scroll(nPercentage)
 		end
 		return self
 	else -- get
-		local ele = self.eles[1]
-		if ele and ele.raw then
-			local x = ele.raw:Lookup("WndScrollBar")
-			if x and x.GetStepCount and x.GetScrollPos then
-				if x:GetStepCount() == 0 then
+		local raw = self.raws[1]
+		if raw then
+			raw = raw:Lookup('WndScrollBar')
+			if raw and raw.GetStepCount and raw.GetScrollPos then
+				if raw:GetStepCount() == 0 then
 					return -1
 				else
-					return x:GetScrollPos() * 100 / x:GetStepCount()
+					return raw:GetScrollPos() * 100 / raw:GetStepCount()
 				end
 			end
 		end
@@ -2282,18 +2289,20 @@ end
 -- (self) Instance:range(nMin, nMax)
 function XGUI:range(nMin, nMax)
 	self:_checksum()
-	if type(nMin)=='number' and type(nMax)=='number' and nMax>nMin then
-		for _, ele in pairs(self.eles) do
-			if ele.type == "WndSliderBox" then
-				ele.wnd.nOffset = nMin
-				ele.sld:SetStepCount(nMax - nMin)
+	if type(nMin) == 'number' and type(nMax) == 'number' and nMax > nMin then
+		for _, raw in ipairs(self.raws) do
+			if GetComponentType(raw) == 'WndSliderBox' then
+				SetComponentProp(raw, 'nOffset', nMin)
+				GetComponentElement(raw, 'SLIDER'):SetStepCount(nMax - nMin)
 			end
 		end
 		return self
 	else -- get
-		local ele = self.eles[1]
-		if ele and ele.type == "WndSliderBox" then
-			return ele.wnd.nOffset, ele.sld:GetStepCount()
+		local raw = self.raws[1]
+		if raw and GetComponentType(raw) == 'WndSliderBox' then
+			nMin = GetComponentProp(raw, 'nOffset')
+			nMax = nMin + GetComponentElement(raw, 'SLIDER'):GetStepCount()
+			return nMin, nMax
 		end
 	end
 end
@@ -2303,16 +2312,16 @@ end
 function XGUI:value(nValue)
 	self:_checksum()
 	if nValue then
-		for _, ele in pairs(self.eles) do
-			if ele.type == "WndSliderBox" then
-				ele.sld:SetScrollPos(nValue - ele.wnd.nOffset)
+		for _, raw in ipairs(self.raws) do
+			if GetComponentType(raw) == 'WndSliderBox' then
+				GetComponentElement(raw, 'SLIDER'):SetScrollPos(nValue - GetComponentProp(raw, 'nOffset'))
 			end
 		end
 		return self
-	else -- get
-		local ele = self.eles[1]
-		if ele and ele.type == "WndSliderBox" then
-			return ele.wnd.nOffset + ele.sld:GetScrollPos()
+	else
+		local raw = self.raws[1]
+		if raw and GetComponentType(raw) == 'WndSliderBox' then
+			return GetComponentProp(raw, 'nOffset') + GetComponentElement(raw, 'SLIDER'):GetScrollPos()
 		end
 	end
 end
@@ -2323,24 +2332,25 @@ end
 function XGUI:multiLine(bMultiLine)
 	self:_checksum()
 	if type(bMultiLine)=='boolean' then
-		for _, ele in pairs(self.eles) do
-			local x = ele.edt
-			if x and x.SetMultiLine then
-				x:SetMultiLine(bMultiLine)
+		local element
+		for _, raw in ipairs(self.raws) do
+			element = GetComponentElement(raw, 'EDIT')
+			if element then
+				element:SetMultiLine(bMultiLine)
 			end
-			local x = ele.txt
-			if x and x.SetMultiLine then
-				x:SetMultiLine(bMultiLine)
-				x:GetParent():FormatAllItemPos()
+			element = GetComponentElement(raw, 'TEXT')
+			if element then
+				element:SetMultiLine(bMultiLine)
+				element:GetParent():FormatAllItemPos()
 			end
 		end
 		return self
-	else -- get
-		local ele = self.eles[1]
-		if ele then
-			local x = ele.edt or ele.txt
-			if x and x.IsMultiLine then
-				return x:IsMultiLine()
+	else
+		local raw = self.raws[1]
+		if raw then
+			raw = GetComponentElement(raw, 'EDIT') or GetComponentElement(raw, 'TEXT')
+			if raw then
+				return raw:IsMultiLine()
 			end
 		end
 	end
@@ -2351,28 +2361,28 @@ end
 function XGUI:image(szImage, nFrame)
 	self:_checksum()
 	if szImage then
-		nFrame = nFrame or string.gsub(szImage, '.*%|(%d+)', '%1')
-		szImage = string.gsub(szImage, '%|.*', '')
+		nFrame = nFrame or gsub(szImage, '.*%|(%d+)', '%1')
+		szImage = gsub(szImage, '%|.*', '')
 		if nFrame then
 			nFrame = tonumber(nFrame)
-			for _, ele in pairs(self.eles) do
-				local x = ele.img
-				if x and x.FromUITex then
-					x:FromUITex(szImage, nFrame)
-					x:GetParent():FormatAllItemPos()
+			for _, raw in ipairs(self.raws) do
+				raw = GetComponentElement(raw, 'IMAGE')
+				if raw then
+					raw:FromUITex(szImage, nFrame)
+					raw:GetParent():FormatAllItemPos()
 				end
 			end
 		else
-			for _, ele in pairs(self.eles) do
-				local x = ele.img
-				if x and x.FromTextureFile then
-					x:FromTextureFile(szImage)
-					x:GetParent():FormatAllItemPos()
+			for _, raw in ipairs(self.raws) do
+				raw = GetComponentElement(raw, 'IMAGE')
+				if raw then
+					raw:FromTextureFile(szImage)
+					raw:GetParent():FormatAllItemPos()
 				end
 			end
 		end
+		return self
 	end
-	return self
 end
 
 -- (self) Instance:frame(nFrame)
@@ -2381,20 +2391,20 @@ function XGUI:frame(nFrame)
 	self:_checksum()
 	if nFrame then
 		nFrame = tonumber(nFrame)
-		for _, ele in pairs(self.eles) do
-			local x = ele.img
-			if x and x.SetFrame then
-				x:SetFrame(nFrame)
-				x:GetParent():FormatAllItemPos()
+		for _, raw in ipairs(self.raws) do
+			raw = GetComponentElement(raw, 'IMAGE')
+			if raw then
+				raw:SetFrame(nFrame)
+				raw:GetParent():FormatAllItemPos()
 			end
 		end
+		return self
 	else
-		local ele = self.eles[1]
-		if ele and ele.type == 'Image' then
-			return ele.raw:GetFrame()
+		local raw = self.raws[1]
+		if raw and GetComponentType(raw) == 'Image' then
+			return raw:GetFrame()
 		end
 	end
-	return self
 end
 
 -- (self) Instance:icon(dwIcon)
@@ -2403,44 +2413,47 @@ function XGUI:icon(dwIcon)
 	self:_checksum()
 	if dwIcon then
 		dwIcon = tonumber(dwIcon)
-		for _, ele in pairs(self.eles) do
-			local x = ele.box
-			if x then
-				x:SetObject(UI_OBJECT_NOT_NEED_KNOWN)
-				x:SetObjectIcon(dwIcon)
+		for _, raw in ipairs(self.raws) do
+			raw = GetComponentElement(raw, 'BOX')
+			if raw then
+				raw:SetObject(UI_OBJECT_NOT_NEED_KNOWN)
+				raw:SetObjectIcon(dwIcon)
 			end
 		end
+		return self
 	else
-		local ele = self.eles[1]
-		if ele and ele.box then
-			return ele.box:GetObjectIcon()
+		local raw = self.raws[1]
+		if raw then
+			raw = GetComponentElement(raw, 'BOX')
+			if raw then
+				return raw:GetObjectIcon()
+			end
 		end
 	end
-	return self
 end
 
 -- (self) Instance:handleStyle(dwStyle)
 function XGUI:handleStyle(dwStyle)
 	self:_checksum()
 	if dwStyle then
-		for _, ele in pairs(self.eles) do
-			local x = ele.hdl
-			if x and x.SetHandleStyle then
-				x:SetHandleStyle(dwStyle)
+		for _, raw in ipairs(self.raws) do
+			raw = GetComponentElement(raw, 'MAIN_HANDLE')
+			if raw then
+				raw:SetHandleStyle(dwStyle)
 			end
 		end
 	end
 	return self
 end
 
--- (self) Instance:edittype(dwType)
-function XGUI:edittype(dwType)
+-- (self) Instance:editType(dwType)
+function XGUI:editType(dwType)
 	self:_checksum()
 	if dwType then
-		for _, ele in pairs(self.eles) do
-			local x = ele.edt
-			if x and x.SetType then
-				x:SetType(dwType)
+		for _, raw in ipairs(self.raws) do
+			raw = GetComponentElement(raw, 'EDIT')
+			if raw then
+				raw:SetType(dwType)
 			end
 		end
 	end
@@ -2451,19 +2464,19 @@ end
 function XGUI:limit(nLimit)
 	self:_checksum()
 	if nLimit then
-		for _, ele in pairs(self.eles) do
-			local x = ele.edt
-			if x and x.SetLimit then
-				x:SetLimit(nLimit)
+		for _, raw in ipairs(self.raws) do
+			raw = GetComponentElement(raw, 'EDIT')
+			if raw then
+				raw:SetLimit(nLimit)
 			end
 		end
 		return self
-	else -- get
-		local ele = self.eles[1]
-		if ele then
-			local x = ele.edt
-			if x and x.GetLimit then
-				return x:GetLimit()
+	else
+		local raw = self.raws[1]
+		if raw then
+			raw = GetComponentElement(raw, 'EDIT')
+			if raw then
+				return raw:GetLimit()
 			end
 		end
 	end
@@ -2473,27 +2486,27 @@ end
 function XGUI:align(halign, valign)
 	self:_checksum()
 	if valign or halign then
-		for _, ele in pairs(self.eles) do
-			local x = ele.txt
-			if x then
-				if halign and x.SetHAlign then
-					x:SetHAlign(halign)
+		for _, raw in ipairs(self.raws) do
+			raw = GetComponentElement(raw, 'TEXT')
+			if raw then
+				if halign and raw.SetHAlign then
+					raw:SetHAlign(halign)
 				end
-				if valign and x.SetVAlign then
-					x:SetVAlign(valign)
+				if valign and raw.SetVAlign then
+					raw:SetVAlign(valign)
 				end
-				if x.FormatTextForDraw then
-					x:FormatTextForDraw()
+				if raw.FormatTextForDraw then
+					raw:FormatTextForDraw()
 				end
 			end
 		end
 		return self
 	else -- get
-		local ele = self.eles[1]
-		if ele then
-			local x = ele.txt
-			if x and x.GetVAlign and x.GetHAlign then
-				return x:GetVAlign(), x:GetHAlign()
+		local raw = self.raws[1]
+		if raw then
+			raw = GetComponentElement(raw, 'TEXT')
+			if raw and raw.GetVAlign and raw.GetHAlign then
+				return raw:GetVAlign(), raw:GetHAlign()
 			end
 		end
 	end
@@ -2503,9 +2516,9 @@ end
 function XGUI:sliderStyle(nSliderStyle)
 	self:_checksum()
 	local bShowPercentage = nSliderStyle == MY.Const.UI.Slider.SHOW_PERCENT
-	for _, ele in pairs(self.eles) do
-		if ele.type == "WndSliderBox" then
-			ele.wnd.bShowPercentage = bShowPercentage
+	for _, raw in ipairs(self.raws) do
+		if GetComponentType(raw) == 'WndSliderBox' then
+			SetComponentProp(raw, 'bShowPercentage', bShowPercentage)
 		end
 	end
 	return self
@@ -2514,10 +2527,10 @@ end
 -- (self) Instance:bringToTop()
 function XGUI:bringToTop()
 	self:_checksum()
-	for _, ele in pairs(self.eles) do
-		local x = ele.wnd
-		if x and x.BringToTop then
-			x:BringToTop()
+	for _, raw in ipairs(self.raws) do
+		raw = GetComponentElement(raw, 'MAIN_WINDOW')
+		if raw then
+			raw:BringToTop()
 		end
 	end
 	return self
@@ -2526,9 +2539,10 @@ end
 -- (self) Instance:refresh()
 function XGUI:refresh()
 	self:_checksum()
-	for _, ele in pairs(self.eles) do
-		if ele.hdl then
-			ele.hdl:FormatAllItemPos()
+	for _, raw in ipairs(self.raws) do
+		raw = GetComponentElement(raw, 'MAIN_HANDLE')
+		if raw then
+			raw:FormatAllItemPos()
 		end
 	end
 	return self
@@ -2541,46 +2555,48 @@ end
 -- 绑定Frame的事件
 function XGUI:onevent(szEvent, fnEvent)
 	self:_checksum()
-	if type(szEvent) == "string" then
-		local nPos, szKey = (StringFindW(szEvent, "."))
+	if type(szEvent) == 'string' then
+		local nPos, szKey = (StringFindW(szEvent, '.'))
 		if nPos then
-			szKey = string.sub(szEvent, nPos + 1)
-			szEvent = string.sub(szEvent, 1, nPos - 1)
+			szKey = sub(szEvent, nPos + 1)
+			szEvent = sub(szEvent, 1, nPos - 1)
 		end
-		if type(fnEvent)=="function" then
-			for _, ele in pairs(self.eles) do
-				if ele.frm then
-					if not ele.frm.tMyOnEvent then
-						ele.frm.tMyOnEvent = {}
-						ele.frm.OnEvent = function(event)
-							for _, p in ipairs(ele.frm.tMyOnEvent[event] or {}) do pcall(p.fn) end
+		if type(fnEvent) == 'function' then
+			for _, raw in ipairs(self.raws) do
+				local frm = GetComponentElement(raw, 'FRAME')
+				if frm then
+					if not frm.tMyOnEvent then
+						frm.tMyOnEvent = {}
+						frm.OnEvent = function(event)
+							for _, p in ipairs(frm.tMyOnEvent[event] or {}) do pcall(p.fn) end
 						end
 					end
-					if not ele.frm.tMyOnEvent[szEvent] then
-						ele.frm:RegisterEvent(szEvent)
-						ele.frm.tMyOnEvent[szEvent] = {}
+					if not frm.tMyOnEvent[szEvent] then
+						frm:RegisterEvent(szEvent)
+						frm.tMyOnEvent[szEvent] = {}
 					end
 					if szKey then
-						for i = #ele.frm.tMyOnEvent[szEvent], 1, -1 do
-							if ele.frm.tMyOnEvent[szEvent][i].id == szKey then
-								table.remove(ele.frm.tMyOnEvent[szEvent], i)
+						for i = #frm.tMyOnEvent[szEvent], 1, -1 do
+							if frm.tMyOnEvent[szEvent][i].id == szKey then
+								remove(frm.tMyOnEvent[szEvent], i)
 							end
 						end
 					end
-					table.insert(ele.frm.tMyOnEvent[szEvent], { id = szKey, fn = fnEvent })
+					insert(frm.tMyOnEvent[szEvent], { id = szKey, fn = fnEvent })
 				end
 			end
 		else
-			for _, ele in pairs(self.eles) do
-				if ele.frm and ele.frm.tMyOnEvent and ele.frm.tMyOnEvent[szEvent] then
+			for _, raw in ipairs(self.raws) do
+				local frm = GetComponentElement(raw, 'FRAME')
+				if frm and frm.tMyOnEvent and frm.tMyOnEvent[szEvent] then
 					if szKey then
-						for i = #ele.frm.tMyOnEvent[szEvent], 1, -1 do
-							if ele.frm.tMyOnEvent[szEvent][i].id == szKey then
-								table.remove(ele.frm.tMyOnEvent[szEvent], i)
+						for i = #frm.tMyOnEvent[szEvent], 1, -1 do
+							if frm.tMyOnEvent[szEvent][i].id == szKey then
+								remove(frm.tMyOnEvent[szEvent], i)
 							end
 						end
 					else
-						ele.frm.tMyOnEvent[szEvent] = {}
+						frm.tMyOnEvent[szEvent] = {}
 					end
 				end
 			end
@@ -2592,18 +2608,18 @@ end
 -- 绑定ele的UI事件
 function XGUI:onuievent(szEvent, fnEvent)
 	self:_checksum()
-	if type(szEvent)~="string" then
+	if type(szEvent) ~= 'string' then
 		return self
 	end
-	if type(fnEvent)=="function" then
-		for _, ele in pairs(self.eles) do
-			XGUI.RegisterUIEvent(ele.raw, szEvent, fnEvent)
+	if type(fnEvent) == 'function' then
+		for _, raw in ipairs(self.raws) do
+			XGUI.RegisterUIEvent(raw, szEvent, fnEvent)
 		end
 	else
-		for _, ele in pairs(self.eles) do
-			if ele.raw then
-				if ele.raw['tMy' .. szEvent] then
-					ele.raw['tMy' .. szEvent] = {}
+		for _, raw in ipairs(self.raws) do
+			if raw then
+				if raw['tMy' .. szEvent] then
+					raw['tMy' .. szEvent] = {}
 				end
 			end
 		end
@@ -2615,19 +2631,19 @@ end
 -- (self) Instance:customMode(string szTip, function fnOnEnterCustomMode, function fnOnLeaveCustomMode)
 function XGUI:customMode(szTip, fnOnEnterCustomMode, fnOnLeaveCustomMode, szPoint)
 	self:_checksum()
-	if type(szTip)=="string" then
-		self:onevent("ON_ENTER_CUSTOM_UI_MODE", function()
-			UpdateCustomModeWindow(this, szTip, this.bPenetrable)
-		end):onevent("ON_LEAVE_CUSTOM_UI_MODE", function()
-			UpdateCustomModeWindow(this, szTip, this.bPenetrable)
+	if type(szTip) == 'string' then
+		self:onevent('ON_ENTER_CUSTOM_UI_MODE', function()
+			UpdateCustomModeWindow(this, szTip, GetComponentProp(this, 'bPenetrable'))
+		end):onevent('ON_LEAVE_CUSTOM_UI_MODE', function()
+			UpdateCustomModeWindow(this, szTip, GetComponentProp(this, 'bPenetrable'))
 		end)
-		if type(fnOnEnterCustomMode) == "function" then
-			self:onevent("ON_ENTER_CUSTOM_UI_MODE", function()
+		if type(fnOnEnterCustomMode) == 'function' then
+			self:onevent('ON_ENTER_CUSTOM_UI_MODE', function()
 				fnOnEnterCustomMode(GetFrameAnchor(this, szPoint))
 			end)
 		end
-		if type(fnOnLeaveCustomMode) == "function" then
-			self:onevent("ON_LEAVE_CUSTOM_UI_MODE", function()
+		if type(fnOnLeaveCustomMode) == 'function' then
+			self:onevent('ON_LEAVE_CUSTOM_UI_MODE', function()
 				fnOnLeaveCustomMode(GetFrameAnchor(this, szPoint))
 			end)
 		end
@@ -2639,10 +2655,11 @@ end
 -- (self) Instance:breathe(function fnOnFrameBreathe)
 function XGUI:breathe(fnOnFrameBreathe)
 	self:_checksum()
-	if type(fnOnFrameBreathe)=="function" then
-		for _, ele in pairs(self.eles) do
-			if ele.frm then
-				XGUI.RegisterUIEvent(ele.frm, "OnFrameBreathe", fnOnFrameBreathe)
+	if type(fnOnFrameBreathe) == 'function' then
+		for _, raw in ipairs(self.raws) do
+			raw = GetComponentElement(raw, 'FRAME')
+			if raw then
+				XGUI.RegisterUIEvent(raw, 'OnFrameBreathe', fnOnFrameBreathe)
 			end
 		end
 	end
@@ -2659,11 +2676,11 @@ function XGUI:menu(lmenu, rmenu, bNoAutoBind)
 	end
 	-- pop menu function
 	local fnPopMenu = function(raw, menu)
-		local h = raw:Lookup("", "") or raw
+		local h = raw:Lookup('', '') or raw
 		local _menu = nil
 		local nX, nY = h:GetAbsPos()
 		local nW, nH = h:GetSize()
-		if type(menu) == "function" then
+		if type(menu) == 'function' then
 			_menu = menu(raw)
 		else
 			_menu = menu
@@ -2676,13 +2693,13 @@ function XGUI:menu(lmenu, rmenu, bNoAutoBind)
 	-- bind left click
 	if lmenu then
 		self:each(function(eself)
-			eself:lclick(function() fnPopMenu(eself:raw(1), lmenu) end)
+			eself:lclick(function() fnPopMenu(eself[1], lmenu) end)
 		end)
 	end
 	-- bind right click
 	if rmenu then
 		self:each(function(eself)
-			eself:rclick(function() fnPopMenu(eself:raw(1), rmenu) end)
+			eself:rclick(function() fnPopMenu(eself[1], rmenu) end)
 		end)
 	end
 	return self
@@ -2712,61 +2729,77 @@ end
 --   -1    右键
 function XGUI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 	self:_checksum()
-	if type(fnLClick)=="function" or type(fnMClick)=="function" or type(fnRClick)=="function" then
+	if type(fnLClick)=='function' or type(fnMClick)=='function' or type(fnRClick)=='function' then
 		if not bNoAutoBind then
 			fnMClick = fnMClick or fnLClick
 			fnRClick = fnRClick or fnLClick
 		end
-		for _, ele in pairs(self.eles) do
-			if type(fnLClick)=="function" then
-				local fnAction = function() fnLClick(MY.Const.Event.Mouse.LBUTTON, ele.raw) end
-				if ele.type == "WndScrollBox" then
-					XGUI.RegisterUIEvent(ele.hdl ,'OnItemLButtonClick' , fnAction)
-				elseif ele.cmb then
-					XGUI.RegisterUIEvent(ele.cmb ,'OnLButtonClick'     , fnAction)
-				elseif ele.wnd then
-					XGUI.RegisterUIEvent(ele.wnd ,'OnLButtonClick'     , fnAction)
-				elseif ele.itm then
-					ele.itm:RegisterEvent(16)
-					XGUI.RegisterUIEvent(ele.itm ,'OnItemLButtonClick' , fnAction)
-				elseif ele.hdl then
-					ele.hdl:RegisterEvent(16)
-					XGUI.RegisterUIEvent(ele.hdl ,'OnItemLButtonClick' , fnAction)
+		for _, raw in ipairs(self.raws) do
+			if type(fnLClick)=='function' then
+				local fnAction = function() fnLClick(MY.Const.Event.Mouse.LBUTTON, raw) end
+				if GetComponentType(raw) == 'WndScrollBox' then
+					XGUI.RegisterUIEvent(GetComponentElement(raw, 'MAIN_HANDLE'),'OnItemLButtonClick' , fnAction)
+				else
+					local cmb = GetComponentElement(raw, 'COMBOBOX')
+					local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+					local itm = GetComponentElement(raw, 'ITEM')
+					local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
+					if cmb then
+						XGUI.RegisterUIEvent(cmb ,'OnLButtonClick'     , fnAction)
+					elseif wnd then
+						XGUI.RegisterUIEvent(wnd ,'OnLButtonClick'     , fnAction)
+					elseif itm then
+						itm:RegisterEvent(16)
+						XGUI.RegisterUIEvent(itm ,'OnItemLButtonClick' , fnAction)
+					elseif hdl then
+						hdl:RegisterEvent(16)
+						XGUI.RegisterUIEvent(hdl ,'OnItemLButtonClick' , fnAction)
+					end
 				end
 			end
-			if type(fnMClick)=="function" then
+			if type(fnMClick)=='function' then
 
 			end
-			if type(fnRClick)=="function" then
-				local fnAction = function() fnRClick(MY.Const.Event.Mouse.RBUTTON, ele.raw) end
-				if ele.type == "WndScrollBox" then
-					XGUI.RegisterUIEvent(ele.hdl ,'OnItemRButtonClick' , fnAction)
-				elseif ele.cmb then
-					XGUI.RegisterUIEvent(ele.cmb ,'OnRButtonClick'     , fnAction)
-				elseif ele.wnd then
-					XGUI.RegisterUIEvent(ele.wnd ,'OnRButtonClick'     , fnAction)
-				elseif ele.itm then
-					ele.itm:RegisterEvent(32)
-					XGUI.RegisterUIEvent(ele.itm ,'OnItemRButtonClick' , fnAction)
-				elseif ele.hdl then
-					ele.hdl:RegisterEvent(32)
-					XGUI.RegisterUIEvent(ele.hdl ,'OnItemRButtonClick' , fnAction)
+			if type(fnRClick)=='function' then
+				local fnAction = function() fnRClick(MY.Const.Event.Mouse.RBUTTON, raw) end
+				if GetComponentType(raw) == 'WndScrollBox' then
+					XGUI.RegisterUIEvent(GetComponentElement(raw, 'MAIN_HANDLE') ,'OnItemRButtonClick' , fnAction)
+				else
+					local cmb = GetComponentElement(raw, 'COMBOBOX')
+					local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+					local itm = GetComponentElement(raw, 'ITEM')
+					local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
+					if cmb then
+						XGUI.RegisterUIEvent(cmb ,'OnRButtonClick'     , fnAction)
+					elseif wnd then
+						XGUI.RegisterUIEvent(wnd ,'OnRButtonClick'     , fnAction)
+					elseif itm then
+						itm:RegisterEvent(32)
+						XGUI.RegisterUIEvent(itm ,'OnItemRButtonClick' , fnAction)
+					elseif hdl then
+						hdl:RegisterEvent(32)
+						XGUI.RegisterUIEvent(hdl ,'OnItemRButtonClick' , fnAction)
+					end
 				end
 			end
 		end
 	else
 		local nFlag = fnLClick or fnMClick or fnRClick or MY.Const.Event.Mouse.LBUTTON
-		if nFlag==MY.Const.Event.Mouse.LBUTTON then
-			for _, ele in pairs(self.eles) do
-				if ele.wnd then local _this = this this = ele.wnd pcall(ele.wnd.OnLButtonClick) this = _this end
-				if ele.itm then local _this = this this = ele.itm pcall(ele.itm.OnItemLButtonClick) this = _this end
+		if nFlag == MY.Const.Event.Mouse.LBUTTON then
+			for _, raw in ipairs(self.raws) do
+				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+				local itm = GetComponentElement(raw, 'ITEM')
+				if wnd then local _this = this this = wnd pcall(wnd.OnLButtonClick) this = _this end
+				if itm then local _this = this this = itm pcall(itm.OnItemLButtonClick) this = _this end
 			end
 		elseif nFlag==MY.Const.Event.Mouse.MBUTTON then
 
 		elseif nFlag==MY.Const.Event.Mouse.RBUTTON then
-			for _, ele in pairs(self.eles) do
-				if ele.wnd then local _this = this this = ele.wnd pcall(ele.wnd.OnRButtonClick) this = _this end
-				if ele.itm then local _this = this this = ele.itm pcall(ele.itm.OnItemRButtonClick) this = _this end
+			for _, raw in ipairs(self.raws) do
+				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
+				local itm = GetComponentElement(raw, 'ITEM')
+				if wnd then local _this = this this = wnd pcall(wnd.OnRButtonClick) this = _this end
+				if itm then local _this = this this = itm pcall(itm.OnItemRButtonClick) this = _this end
 			end
 		end
 	end
@@ -2794,11 +2827,13 @@ end
 -- :hover(fnHover[, fnLeave]) 绑定
 function XGUI:hover(fnHover, fnLeave, bNoAutoBind)
 	self:_checksum()
-	if not bNoAutoBind then fnLeave = fnLeave or fnHover end
+	if not bNoAutoBind then
+		fnLeave = fnLeave or fnHover
+	end
 	if fnHover then
-		for _, ele in pairs(self.eles) do
-			local wnd = ele.edt or ele.wnd
-			local itm = ele.itm or ele.itm
+		for _, raw in ipairs(self.raws) do
+			local wnd = GetComponentElement(raw, 'EDIT') or GetComponentElement(raw, 'MAIN_WINDOW')
+			local itm = GetComponentElement(raw, 'ITEM')
 			if wnd then
 				XGUI.RegisterUIEvent(wnd, 'OnMouseIn'    , function() fnHover(true) end)
 			elseif itm then
@@ -2808,9 +2843,9 @@ function XGUI:hover(fnHover, fnLeave, bNoAutoBind)
 		end
 	end
 	if fnLeave then
-		for _, ele in pairs(self.eles) do
-			local wnd = ele.edt or ele.wnd
-			local itm = ele.itm or ele.itm
+		for _, raw in ipairs(self.raws) do
+			local wnd = GetComponentElement(raw, 'EDIT') or GetComponentElement(raw, 'MAIN_WINDOW')
+			local itm = GetComponentElement(raw, 'ITEM')
 			if wnd then
 				XGUI.RegisterUIEvent(wnd, 'OnMouseOut'    , function() fnLeave(false) end)
 			elseif itm then
@@ -2873,23 +2908,30 @@ function XGUI:check(fnCheck, fnUncheck, bNoAutoBind)
 	if not bNoAutoBind then
 		fnUncheck = fnUncheck or fnCheck
 	end
-	if type(fnCheck)=="function" or type(fnUncheck)=="function" then
-		for _, ele in pairs(self.eles) do
-			if ele.chk then
-				if type(fnCheck)=="function" then XGUI.RegisterUIEvent(ele.chk, 'OnCheckBoxCheck' , function() fnCheck(true) end) end
-				if type(fnUncheck)=="function" then XGUI.RegisterUIEvent(ele.chk, 'OnCheckBoxUncheck' , function() fnUncheck(false) end) end
+	if type(fnCheck)=='function' or type(fnUncheck)=='function' then
+		for _, raw in ipairs(self.raws) do
+			local chk = GetComponentElement(raw, 'CHECKBOX')
+			if chk then
+				if type(fnCheck)=='function' then XGUI.RegisterUIEvent(chk, 'OnCheckBoxCheck' , function() fnCheck(true) end) end
+				if type(fnUncheck)=='function' then XGUI.RegisterUIEvent(chk, 'OnCheckBoxUncheck' , function() fnUncheck(false) end) end
 			end
 		end
 		return self
-	elseif type(fnCheck) == "boolean" then
-		for _, ele in pairs(self.eles) do
-			if ele.chk then ele.chk:Check(fnCheck) end
+	elseif type(fnCheck) == 'boolean' then
+		for _, raw in ipairs(self.raws) do
+			local chk = GetComponentElement(raw, 'CHECKBOX')
+			if chk then
+				chk:Check(fnCheck)
+			end
 		end
 		return self
 	elseif not fnCheck then
-		local ele = self.eles[1]
-		if ele and ele.chk then
-			return ele.chk:IsCheckBoxChecked()
+		local raw = self.raws[1]
+		if raw then
+			local chk = GetComponentElement(raw, 'CHECKBOX')
+			if chk then
+				return chk:IsCheckBoxChecked()
+			end
 		end
 	else
 		MY.Debug({'fnCheck:'..type(fnCheck)..' fnUncheck:'..type(fnUncheck)}, 'ERROR XGUI:check', MY_DEBUG.ERROR)
@@ -2901,28 +2943,31 @@ end
 -- :change()   调用处理函数
 function XGUI:change(fnOnChange)
 	self:_checksum()
-	if fnOnChange then
-		for _, ele in pairs(self.eles) do
-			if ele.edt then
-				XGUI.RegisterUIEvent(ele.edt, 'OnEditChanged', function() pcall(fnOnChange, ele.raw, ele.edt:GetText()) end)
+	if type(fnOnChange) == 'function' then
+		for _, raw in ipairs(self.raws) do
+			local edt = GetComponentElement(raw, 'EDIT')
+			if edt then
+				XGUI.RegisterUIEvent(edt, 'OnEditChanged', function() pcall(fnOnChange, raw, edt:GetText()) end)
 			end
-			if ele.type=="WndSliderBox" then
-				table.insert(ele.wnd.tMyOnChange, fnOnChange)
+			if GetComponentType(raw) == 'WndSliderBox' then
+				insert(raw.tMyOnChange, fnOnChange)
 			end
 		end
 		return self
 	else
-		for _, ele in pairs(self.eles) do
-			if ele.edt then
+		for _, raw in ipairs(self.raws) do
+			local edt = GetComponentElement(raw, 'EDIT')
+			if edt then
 				local _this = this
-				this = ele.edt
-				pcall(ele.edt.OnEditChanged, ele.raw)
+				this = edt
+				pcall(edt.OnEditChanged, raw)
 				this = _this
 			end
-			if ele.type == "WndSliderBox" then
+			if GetComponentType(raw) == 'WndSliderBox' then
+				local sld = GetComponentElement(raw, 'SLIDER')
 				local _this = this
-				this = ele.sld
-				pcall(ele.sld.OnScrollBarPosChanged, ele.raw)
+				this = sld
+				pcall(sld.OnScrollBarPosChanged, raw)
 				this = _this
 			end
 		end
@@ -2936,16 +2981,18 @@ end
 function XGUI:focus(fnOnSetFocus)
 	self:_checksum()
 	if fnOnSetFocus then
-		for _, ele in pairs(self.eles) do
-			if ele.edt then
-				XGUI.RegisterUIEvent(ele.edt, 'OnSetFocus', function() pcall(fnOnSetFocus, self) end)
+		for _, raw in ipairs(self.raws) do
+			raw = GetComponentElement(raw, 'EDIT')
+			if raw then
+				XGUI.RegisterUIEvent(raw, 'OnSetFocus', function() pcall(fnOnSetFocus, self) end)
 			end
 		end
 		return self
 	else
-		for _, ele in pairs(self.eles) do
-			if ele.edt then
-				Station.SetFocusWindow(ele.edt)
+		for _, raw in ipairs(self.raws) do
+			raw = GetComponentElement(raw, 'EDIT')
+			if raw then
+				Station.SetFocusWindow(raw)
 				break
 			end
 		end
@@ -2959,15 +3006,17 @@ end
 function XGUI:blur(fnOnKillFocus)
 	self:_checksum()
 	if fnOnKillFocus then
-		for _, ele in pairs(self.eles) do
-			if ele.edt then
-				XGUI.RegisterUIEvent(ele.edt, 'OnKillFocus', function() pcall(fnOnKillFocus, self) end)
+		for _, raw in ipairs(self.raws) do
+			raw = GetComponentElement(raw, 'EDIT')
+			if raw then
+				XGUI.RegisterUIEvent(raw, 'OnKillFocus', function() pcall(fnOnKillFocus, self) end)
 			end
 		end
 		return self
 	else
-		for _, ele in pairs(self.eles) do
-			if ele.edt then
+		for _, raw in ipairs(self.raws) do
+			raw = GetComponentElement(raw, 'EDIT')
+			if raw then
 				Station.SetFocusWindow()
 				break
 			end
@@ -3006,13 +3055,6 @@ MY.Const.UI.Tip.NO_HIDE      = 100
 MY.Const.UI.Tip.HIDE         = 101
 MY.Const.UI.Tip.ANIMATE_HIDE = 102
 
--- 设置元表，这样可以当作函数调用，其效果相当于 XGUI.Fetch
-
-
--- 构造函数 类似jQuery: $(selector)
-function XGUI.Fetch(selector, tab)
-	return XGUI(selector, tab)
-end
 -- 绑定UI事件
 function XGUI.RegisterUIEvent(raw, szEvent, fnEvent)
 	if not raw['tMy'..szEvent] then
@@ -3027,18 +3069,18 @@ function XGUI.RegisterUIEvent(raw, szEvent, fnEvent)
 					if not t[1] then
 						MY.Debug({t[2]}, XGUI.GetTreePath(raw) .. '#' .. szEvent, MY_DEBUG.ERROR)
 					elseif not tReturn then
-						table.remove(t, 1)
+						remove(t, 1)
 						tReturn = t
 					end
 				end
 				if tReturn then
 					return unpack(tReturn)
 				end
-			 end
+			end
 		end
 	end
 	if fnEvent then
-		table.insert(raw['tMy'..szEvent], fnEvent)
+		insert(raw['tMy'..szEvent], fnEvent)
 	end
 end
 
@@ -3057,14 +3099,14 @@ function  XGUI.CreateFrame(szName, opt)
 		opt.level == 'Normal1' or opt.level == 'Lowest1' or opt.level == 'Topmost1' or
 		opt.level == 'Normal2' or opt.level == 'Lowest2' or opt.level == 'Topmost2'
 	) then
-		opt.level = "Normal"
+		opt.level = 'Normal'
 	end
 	-- calc ini file path
-	local szIniFile = MY.GetAddonInfo().szFrameworkRoot .. "ui\\WndFrame.ini"
+	local szIniFile = MY.GetAddonInfo().szFrameworkRoot .. 'ui\\WndFrame.ini'
 	if opt.simple then
-		szIniFile = MY.GetAddonInfo().szFrameworkRoot .. "ui\\WndFrameSimple.ini"
+		szIniFile = MY.GetAddonInfo().szFrameworkRoot .. 'ui\\WndFrameSimple.ini'
 	elseif opt.empty then
-		szIniFile = MY.GetAddonInfo().szFrameworkRoot .. "ui\\WndFrameEmpty.ini"
+		szIniFile = MY.GetAddonInfo().szFrameworkRoot .. 'ui\\WndFrameEmpty.ini'
 	end
 
 	-- close and reopen exist frame
@@ -3094,12 +3136,12 @@ function  XGUI.CreateFrame(szName, opt)
 	end
 	if opt.simple then
 		frm.simple = true
-		frm:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
+		frm:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 		-- top right buttons
 		if not opt.close then
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close'):Destroy()
 		else
-			frm:Lookup("WndContainer_TitleBtnR/Wnd_Close/Btn_Close").OnLButtonClick = function()
+			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close/Btn_Close').OnLButtonClick = function()
 				if frm.OnCloseButtonClick then
 					local status, res = pcall(frm.OnCloseButtonClick)
 					if status and res then
@@ -3119,16 +3161,16 @@ function  XGUI.CreateFrame(szName, opt)
 			if opt.onminimize then
 				XGUI.RegisterUIEvent(frm, 'OnMinimize', opt.onminimize)
 			end
-			frm:Lookup("WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize").OnCheckBoxCheck = function()
+			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize').OnCheckBoxCheck = function()
 				if frm.bMaximize then
-					frm:Lookup("WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize"):Check(false)
+					frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize'):Check(false)
 				else
 					frm.w, frm.h = frm:GetSize()
 				end
 				frm:Lookup('Window_Main'):Hide()
 				frm:Lookup('', 'Shadow_Bg'):Hide()
 				frm:SetSize(frm.w, 30)
-				local hMax = frm:Lookup("WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize")
+				local hMax = frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize')
 				if hMax then
 					hMax:Enable(false)
 				end
@@ -3143,11 +3185,11 @@ function  XGUI.CreateFrame(szName, opt)
 				end
 				frm.bMinimize = true
 			end
-			frm:Lookup("WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize").OnCheckBoxUncheck = function()
+			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize').OnCheckBoxUncheck = function()
 				frm:Lookup('Window_Main'):Show()
 				frm:Lookup('', 'Shadow_Bg'):Show()
 				frm:SetSize(frm.w, frm.h)
-				local hMax = frm:Lookup("WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize")
+				local hMax = frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize')
 				if hMax then
 					hMax:Enable(true)
 				end
@@ -3170,11 +3212,11 @@ function  XGUI.CreateFrame(szName, opt)
 				XGUI.RegisterUIEvent(frm, 'OnMaximize', opt.onmaximize)
 			end
 			frm:Lookup('WndContainer_TitleBtnR').OnLButtonDBClick = function()
-				frm:Lookup("WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize"):ToggleCheck()
+				frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize'):ToggleCheck()
 			end
-			frm:Lookup("WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize").OnCheckBoxCheck = function()
+			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize').OnCheckBoxCheck = function()
 				if frm.bMinimize then
-					frm:Lookup("WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize"):Check(false)
+					frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize'):Check(false)
 				else
 					frm.anchor = GetFrameAnchor(frm)
 					frm.w, frm.h = frm:GetSize()
@@ -3195,7 +3237,7 @@ function  XGUI.CreateFrame(szName, opt)
 				end
 				frm.bMaximize = true
 			end
-			frm:Lookup("WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize").OnCheckBoxUncheck = function()
+			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize').OnCheckBoxUncheck = function()
 				XGUI(frm)
 				  :onevent('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
 				  :size(frm.w, frm.h)
@@ -3259,8 +3301,8 @@ function  XGUI.CreateFrame(szName, opt)
 		end
 	elseif not opt.empty then
 		frm.intact = true
-		frm:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
-		frm:Lookup("Btn_Close").OnLButtonClick = function()
+		frm:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
+		frm:Lookup('Btn_Close').OnLButtonClick = function()
 			if frm.OnCloseButtonClick then
 				local status, res = pcall(frm.OnCloseButtonClick)
 				if status and res then
@@ -3293,17 +3335,17 @@ function XGUI.OpenColorPicker(callback, t)
 	if t then
 		return OpenColorTablePanel(callback,nil,nil,t)
 	end
-	local ui = XGUI.CreateFrame("_MY_ColorTable", { simple = true, close = true, esc = true })
-	  :size(900, 500):text(_L["color picker"]):anchor({s='CENTER', r='CENTER', x=0, y=0})
+	local ui = XGUI.CreateFrame('_MY_ColorTable', { simple = true, close = true, esc = true })
+	  :size(900, 500):text(_L['color picker']):anchor({s='CENTER', r='CENTER', x=0, y=0})
 	local fnHover = function(bHover, r, g, b)
 		if bHover then
 			this:SetAlpha(255)
-			ui:item("#Select"):color(r, g, b)
-			ui:item("#Select_Text"):text(string.format("r=%d, g=%d, b=%d", r, g, b))
+			ui:children('#Select'):color(r, g, b)
+			ui:children('#Select_Text'):text(format('r=%d, g=%d, b=%d', r, g, b))
 		else
 			this:SetAlpha(200)
-			ui:item("#Select"):color(255, 255, 255)
-			ui:item("#Select_Text"):text(g_tStrings.STR_NONE)
+			ui:children('#Select'):color(255, 255, 255)
+			ui:children('#Select_Text'):text(g_tStrings.STR_NONE)
 		end
 	end
 	local fnClick = function( ... )
@@ -3318,7 +3360,7 @@ function XGUI.OpenColorPicker(callback, t)
 				local x = 20 + ((nRed - 1) % 4) * 220 + (nGreen - 1) * 25
 				local y = 10 + math.modf((nRed - 1) / 4) * 220 + (nBlue - 1) * 25
 				local r, g, b  = nRed * 32 - 1, nGreen * 32 - 1, nBlue * 32 - 1
-				ui:append("Shadow", {
+				ui:append('Shadow', {
 					w = 23, h = 23, x = x, y = y, color = { r, g, b }, alpha = 200,
 					onhover = function(bHover)
 						fnHover(bHover, r, g, b)
@@ -3335,7 +3377,7 @@ function XGUI.OpenColorPicker(callback, t)
 		local x = 480 + (i - 1) * 25
 		local y = 435
 		local r, g, b  = i * 16 - 1, i * 16 - 1, i * 16 - 1
-		ui:append("Shadow", {
+		ui:append('Shadow', {
 			w = 23, h = 23, x = x, y = y, color = { r, g, b }, alpha = 200,
 			onhover = function(bHover)
 				fnHover(bHover, r, g, b)
@@ -3345,10 +3387,10 @@ function XGUI.OpenColorPicker(callback, t)
 			end,
 		})
 	end
-	ui:append("Shadow", "Select", { w = 25, h = 25, x = 20, y = 435 })
-	ui:append("Text", "Select_Text", { x = 65, y = 435 })
+	ui:append('Shadow', 'Select', { w = 25, h = 25, x = 20, y = 435 })
+	ui:append('Text', 'Select_Text', { x = 65, y = 435 })
 	local GetRGBValue = function()
-		local r, g, b  = tonumber(ui:children("#R"):text()), tonumber(ui:children("#G"):text()), tonumber(ui:children("#B"):text())
+		local r, g, b  = tonumber(ui:children('#R'):text()), tonumber(ui:children('#G'):text()), tonumber(ui:children('#B'):text())
 		if r and g and b and r <= 255 and g <= 255 and b <= 255 then
 			return r, g, b
 		end
@@ -3360,28 +3402,28 @@ function XGUI.OpenColorPicker(callback, t)
 		end
 	end
 	local x, y = 220, 435
-	ui:append("Text", { text = "R", x = x, y = y, w = 10 })
-	ui:append("WndEditBox", "R", { x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, edittype = 0, onchange = onChange })
+	ui:append('Text', { text = 'R', x = x, y = y, w = 10 })
+	ui:append('WndEditBox', 'R', { x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, edittype = 0, onchange = onChange })
 	x = x + 14 + 34
-	ui:append("Text", { text = "G", x = x, y = y, w = 10 })
-	ui:append("WndEditBox", "G", { x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, edittype = 0, onchange = onChange })
+	ui:append('Text', { text = 'G', x = x, y = y, w = 10 })
+	ui:append('WndEditBox', 'G', { x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, edittype = 0, onchange = onChange })
 	x = x + 14 + 34
-	ui:append("Text", { text = "B", x = x, y = y, w = 10 })
-	ui:append("WndEditBox", "B", { x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, edittype = 0, onchange = onChange })
+	ui:append('Text', { text = 'B', x = x, y = y, w = 10 })
+	ui:append('WndEditBox', 'B', { x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, edittype = 0, onchange = onChange })
 	x = x + 14 + 34
-	ui:append("WndButton", { text = g_tStrings.STR_HOTKEY_SURE, x = x + 5, y = y + 3, w = 50, h = 30, onclick = function()
+	ui:append('WndButton', { text = g_tStrings.STR_HOTKEY_SURE, x = x + 5, y = y + 3, w = 50, h = 30, onclick = function()
 		if GetRGBValue() then
 			fnClick(GetRGBValue())
 		else
-			MY.Sysmsg({_L["RGB value error"]})
+			MY.Sysmsg({_L['RGB value error']})
 		end
 	end})
 	x = x + 50
-	ui:append("WndButton", { text = _L['color picker ex'], x = x + 5, y = y + 3, w = 50, h = 30, onclick = function()
+	ui:append('WndButton', { text = _L['color picker ex'], x = x + 5, y = y + 3, w = 50, h = 30, onclick = function()
 		XGUI.OpenColorPickerEx(callback):pos(ui:pos())
 		ui:remove()
 	end})
-	Station.SetFocusWindow(ui:raw(1))
+	Station.SetFocusWindow(ui[1])
 	-- OpenColorTablePanel(callback,nil,nil,t)
 	--  or {
 	--     { r = 0,   g = 255, b = 0  },
@@ -3426,14 +3468,14 @@ function XGUI.OpenColorPickerEx(fnAction)
 		return floor(r * 255), floor(g * 255), floor(b * 255)
 	end
 
-	local wnd = XGUI.CreateFrame("MY_ColorPickerEx", { w = 346, h = 430, text = _L["color picker ex"], simple = true, close = true, esc = true, x = fX + 15, y = fY + 15 }, true)
+	local wnd = XGUI.CreateFrame('MY_ColorPickerEx', { w = 346, h = 430, text = _L['color picker ex'], simple = true, close = true, esc = true, x = fX + 15, y = fY + 15 }, true)
 	local fnHover = function(bHover, r, g, b)
 		if bHover then
-			wnd:item("#Select"):color(r, g, b)
-			wnd:item("#Select_Text"):text(format("r=%d, g=%d, b=%d", r, g, b))
+			wnd:children('#Select'):color(r, g, b)
+			wnd:children('#Select_Text'):text(format('r=%d, g=%d, b=%d', r, g, b))
 		else
-			wnd:item("#Select"):color(255, 255, 255)
-			wnd:item("#Select_Text"):text(g_tStrings.STR_NONE)
+			wnd:children('#Select'):color(255, 255, 255)
+			wnd:children('#Select_Text'):text(g_tStrings.STR_NONE)
 		end
 	end
 	local fnClick = function( ... )
@@ -3450,10 +3492,10 @@ function XGUI.OpenColorPickerEx(fnAction)
 				if tUI[v][s] then
 					tUI[v][s]:color(r, g, b)
 				else
-					tUI[v][s] = wnd:append("Shadow", {
+					tUI[v][s] = wnd:append('Shadow', {
 						w = 9, h = 9, x = x, y = y, color = { r, g, b },
 						onhover = function(bHover)
-							wnd:item("#Select_Image"):pos(this:GetRelPos()):toggle(bHover)
+							wnd:children('#Select_Image'):pos(this:GetRelPos()):toggle(bHover)
 							local r, g, b = this:GetColorRGB()
 							fnHover(bHover, r, g, b)
 						end,
@@ -3466,12 +3508,12 @@ function XGUI.OpenColorPickerEx(fnAction)
 		end
 	end
 	SetColor()
-	wnd:append("Image", "Select_Image", { w = 9, h = 9, x = 0, y = 0 }, true):image("ui/Image/Common/Box.Uitex", 9):toggle(false)
-	wnd:append("Shadow", "Select", { w = 25, h = 25, x = 20, y = 10, color = { 255, 255, 255 } })
-	wnd:append("Text", "Select_Text", { x = 50, y = 10, text = g_tStrings.STR_NONE })
-	wnd:append("WndSliderBox", {
+	wnd:append('Image', 'Select_Image', { w = 9, h = 9, x = 0, y = 0 }, true):image('ui/Image/Common/Box.Uitex', 9):toggle(false)
+	wnd:append('Shadow', 'Select', { w = 25, h = 25, x = 20, y = 10, color = { 255, 255, 255 } })
+	wnd:append('Text', 'Select_Text', { x = 50, y = 10, text = g_tStrings.STR_NONE })
+	wnd:append('WndSliderBox', {
 		x = 20, y = 35, h = 25, w = 306, rw = 272,
-		textfmt = function(val) return ("%d H"):format(val) end,
+		textfmt = function(val) return ('%d H'):format(val) end,
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		value = COLOR_HUE, range = {0, 360},
 		onchange = function(raw, nVal)
@@ -3480,23 +3522,23 @@ function XGUI.OpenColorPickerEx(fnAction)
 		end,
 	})
 	for i = 0, 360, 8 do
-		wnd:append("Shadow", { x = 20 + (0.74 * i), y = 60, h = 10, w = 6, color = { hsv2rgb(i, 100, 100) } })
+		wnd:append('Shadow', { x = 20 + (0.74 * i), y = 60, h = 10, w = 6, color = { hsv2rgb(i, 100, 100) } })
 	end
-	Station.SetFocusWindow(wnd:raw(1))
+	Station.SetFocusWindow(wnd[1])
 	return wnd
 end
 
 -- 打开字体选择
 function XGUI.OpenFontPicker(callback, t)
 	local w, h = 820, 640
-	local ui = XGUI.CreateFrame("_MY_Color_Picker", { simple = true, close = true, esc = true })
-	  :size(w, h):text(_L["color picker"]):anchor({s='CENTER', r='CENTER', x=0, y=0})
+	local ui = XGUI.CreateFrame('_MY_Color_Picker', { simple = true, close = true, esc = true })
+	  :size(w, h):text(_L['color picker']):anchor({s='CENTER', r='CENTER', x=0, y=0})
 
 	for i = 0, 255 do
-		local txt = ui:append("Text", "Text_"..i, {
+		local txt = ui:append('Text', 'Text_'..i, {
 			w = 70, x = i % 10 * 80 + 20, y = math.floor(i / 10) * 25,
-			font = i, alpha = 200, text = _L("Font %d", i)
-		}):item("#Text_"..i)
+			font = i, alpha = 200, text = _L('Font %d', i)
+		}):children('#Text_'..i)
 		  :click(function()
 		  	if callback then callback(i) end
 			if not IsCtrlKeyDown() then
@@ -3513,7 +3555,7 @@ function XGUI.OpenFontPicker(callback, t)
 			txt:remove()
 		end
 	end
-	Station.SetFocusWindow(ui:raw(1))
+	Station.SetFocusWindow(ui[1])
 	return ui
 end
 
@@ -3521,7 +3563,7 @@ local ICON_PAGE
 -- icon选择器
 function XGUI.OpenIconPanel(fnAction)
 	local nMaxIcon, boxs, txts = 8587, {}, {}
-	local ui = XGUI.CreateFrame("MY_IconPanel", { w = 920, h = 650, text = _L["Icon Picker"], simple = true, close = true, esc = true })
+	local ui = XGUI.CreateFrame('MY_IconPanel', { w = 920, h = 650, text = _L['Icon Picker'], simple = true, close = true, esc = true })
 	local function GetPage(nPage, bInit)
 		if nPage == ICON_PAGE and not bInit then
 			return
@@ -3546,7 +3588,7 @@ function XGUI.OpenIconPanel(fnAction)
 					end)
 				end
 			else
-				boxs[i] = ui:append("Box", {
+				boxs[i] = ui:append('Box', {
 					w = 48, h = 48, x = x, y = y, icon = nStart + i,
 					onhover = function(bHover)
 						this:SetObjectMouseOver(bHover)
@@ -3558,15 +3600,15 @@ function XGUI.OpenIconPanel(fnAction)
 						ui:remove()
 					end,
 				}, true)
-				txts[i] = ui:append("Text", { w = 48, h = 20, x = x, y = y + 48, text = nStart + i, align = 1 }, true)
+				txts[i] = ui:append('Text', { w = 48, h = 20, x = x, y = y + 48, text = nStart + i, align = 1 }, true)
 			end
 		end
 	end
-	ui:append("WndEditBox", "Icon", { x = 730, y = 580, w = 50, h = 25, edittype = 0 })
-	ui:append("WndButton2", {
+	ui:append('WndEditBox', 'Icon', { x = 730, y = 580, w = 50, h = 25, edittype = 0 })
+	ui:append('WndButton2', {
 		text = g_tStrings.STR_HOTKEY_SURE, x = 800, y = 580,
 		onclick = function()
-			local nIcon = tonumber(ui:children("#Icon"):text())
+			local nIcon = tonumber(ui:children('#Icon'):text())
 			if nIcon then
 				if fnAction then
 					fnAction(nIcon)
@@ -3575,8 +3617,8 @@ function XGUI.OpenIconPanel(fnAction)
 			end
 		end,
 	})
-	ui:append("WndSliderBox", {
-		x = 10, y = 580, h = 25, w = 500, textfmt = " Page: %d",
+	ui:append('WndSliderBox', {
+		x = 10, y = 580, h = 25, w = 500, textfmt = ' Page: %d',
 		range = {1, math.ceil(nMaxIcon / 144)}, value = ICON_PAGE or 21,
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		onchange = function(raw, nVal)
@@ -3589,20 +3631,20 @@ end
 -- 打开文本编辑器
 function XGUI.OpenTextEditor(szText, szFrameName)
 	if not szFrameName then
-		szFrameName = "MY_DefaultTextEditor"
+		szFrameName = 'MY_DefaultTextEditor'
 	end
 	local w, h, ui = 400, 300
 	local function OnResize()
 		ui:children('.WndEditBox'):size(ui:size(true))
 	end
 	ui = XGUI.CreateFrame(szFrameName, {
-		w = w, h = h, text = _L["text editor"], alpha = 180,
+		w = w, h = h, text = _L['text editor'], alpha = 180,
 		anchor = { s='CENTER', r='CENTER', x=0, y=0 },
 		simple = true, close = true, esc = true,
 		dragresize = true, minimize = true, ondragresize = OnResize,
-	}):append("WndEditBox", { x = 0, y = 0, multiline = true, text = szText })
+	}):append('WndEditBox', { x = 0, y = 0, multiline = true, text = szText })
 	OnResize()
-	Station.SetFocusWindow(ui:raw(1))
+	Station.SetFocusWindow(ui[1])
 	return ui
 end
 
@@ -3610,12 +3652,11 @@ end
 function XGUI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 	local muDel
 	local AddListItem = function(muList, szText)
-		local i = muList:hdl(1):children():count()
-		local muItem = muList:append('<handle><image>w=300 h=25 eventid=371 name="Image_Bg" </image><text>name="Text_Default" </text></handle>'):hdl(1):children():last()
-		local hHandle = muItem:raw(1)
+		local muItem = muList:append('<handle><image>w=300 h=25 eventid=371 name="Image_Bg" </image><text>name="Text_Default" </text></handle>'):children():last()
+		local hHandle = muItem[1]
 		hHandle.Value = szText
-		local hText = muItem:children("#Text_Default"):pos(10, 2):text(szText or ""):raw(1)
-		muItem:children("#Image_Bg"):image("UI/Image/Common/TextShadow.UITex",5):alpha(0):hover(function(bIn)
+		local hText = muItem:children('#Text_Default'):pos(10, 2):text(szText or '')[1]
+		muItem:children('#Image_Bg'):image('UI/Image/Common/TextShadow.UITex',5):alpha(0):hover(function(bIn)
 			if hHandle.Selected then return nil end
 			if bIn then
 				XGUI(this):fadeIn(100)
@@ -3626,7 +3667,7 @@ function XGUI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 			if nButton == MY.Const.Event.Mouse.RBUTTON then
 				hHandle.Selected = true
 				PopupMenu({{
-					szOption = _L["delete"],
+					szOption = _L['delete'],
 					fnAction = function()
 						muDel:click()
 					end,
@@ -3635,18 +3676,18 @@ function XGUI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 				hHandle.Selected = not hHandle.Selected
 			end
 			if hHandle.Selected then
-				XGUI(this):image("UI/Image/Common/TextShadow.UITex",2)
+				XGUI(this):image('UI/Image/Common/TextShadow.UITex',2)
 			else
-				XGUI(this):image("UI/Image/Common/TextShadow.UITex",5)
+				XGUI(this):image('UI/Image/Common/TextShadow.UITex',5)
 			end
 		end)
 	end
 	local ui = XGUI.CreateFrame(szFrameName)
-	ui:append("Image", "Image_Spliter"):find("#Image_Spliter"):pos(-10,25):size(360, 10):image("UI/Image/UICommon/Commonpanel.UITex",42)
-	local muEditBox = ui:append("WndEditBox", "WndEditBox_Keyword"):find("#WndEditBox_Keyword"):pos(0,0):size(170, 25)
-	local muList = ui:append("WndScrollBox", "WndScrollBox_KeywordList"):find("#WndScrollBox_KeywordList"):handleStyle(3):pos(0,30):size(340, 380)
+	ui:append('Image', 'Image_Spliter'):find('#Image_Spliter'):pos(-10,25):size(360, 10):image('UI/Image/UICommon/Commonpanel.UITex',42)
+	local muEditBox = ui:append('WndEditBox', 'WndEditBox_Keyword'):find('#WndEditBox_Keyword'):pos(0,0):size(170, 25)
+	local muList = ui:append('WndScrollBox', 'WndScrollBox_KeywordList'):find('#WndScrollBox_KeywordList'):handleStyle(3):pos(0,30):size(340, 380)
 	-- add
-	ui:append("WndButton", "WndButton_Add"):find("#WndButton_Add"):pos(180,0):width(80):text(_L["add"]):click(function()
+	ui:append('WndButton', 'WndButton_Add'):find('#WndButton_Add'):pos(180,0):width(80):text(_L['add']):click(function()
 		local szText = muEditBox:text()
 		-- 加入表
 		if OnAdd then
@@ -3658,8 +3699,8 @@ function XGUI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 		end
 	end)
 	-- del
-	muDel = ui:append("WndButton", "WndButton_Del"):find("#WndButton_Del"):pos(260,0):width(80):text(_L["delete"]):click(function()
-		muList:hdl(1):children():each(function(ui)
+	muDel = ui:append('WndButton', 'WndButton_Del'):find('#WndButton_Del'):pos(260,0):width(80):text(_L['delete']):click(function()
+		muList:children():each(function(ui)
 			if this.Selected then
 				if OnDel then
 					OnDel(this.Value)
@@ -3672,13 +3713,13 @@ function XGUI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 	for i, v in ipairs(tTextList) do
 		AddListItem(muList, v)
 	end
-	Station.SetFocusWindow(ui:raw(1))
+	Station.SetFocusWindow(ui[1])
 	return ui
 end
 
 -- 判断浏览器是否已开启
 local function IsInternetExplorerOpened(nIndex)
-	local frame = Station.Lookup("Topmost/IE"..nIndex)
+	local frame = Station.Lookup('Topmost/IE'..nIndex)
 	if frame and frame:IsVisible() then
 		return true
 	end
@@ -3690,7 +3731,7 @@ local function IE_GetNewIEFramePos()
 	local nLastTime = 0
 	local nLastIndex = nil
 	for i = 1, 10, 1 do
-		local frame = Station.Lookup("Topmost/IE"..i)
+		local frame = Station.Lookup('Topmost/IE'..i)
 		if frame and frame:IsVisible() then
 			if frame.nOpenTime > nLastTime then
 				nLastTime = frame.nOpenTime
@@ -3699,7 +3740,7 @@ local function IE_GetNewIEFramePos()
 		end
 	end
 	if nLastIndex then
-		local frame = Station.Lookup("Topmost/IE"..nLastIndex)
+		local frame = Station.Lookup('Topmost/IE'..nLastIndex)
 		x, y = frame:GetAbsPos()
 		local wC, hC = Station.GetClientSize()
 		if x + 890 <= wC and y + 630 <= hC then
@@ -3721,11 +3762,11 @@ function XGUI.OpenIE(szAddr, bDisableSound, w, h)
 		end
 	end
 	if not nIndex then
-		OutputMessage("MSG_ANNOUNCE_RED", g_tStrings.MSG_OPEN_TOO_MANY)
+		OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.MSG_OPEN_TOO_MANY)
 		return nil
 	end
 	local x, y = IE_GetNewIEFramePos()
-	local frame = Wnd.OpenWindow("InternetExplorer", "IE"..nIndex)
+	local frame = Wnd.OpenWindow('InternetExplorer', 'IE'..nIndex)
 	frame.bIE = true
 	frame.nIndex = nIndex
 
@@ -3739,10 +3780,10 @@ function XGUI.OpenIE(szAddr, bDisableSound, w, h)
 		frame.x = x
 		frame.y = y
 	else
-		frame:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
+		frame:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 		frame.x, frame.y = frame:GetAbsPos()
 	end
-	local webPage = frame:Lookup("WebPage_Page")
+	local webPage = frame:Lookup('WebPage_Page')
 	if szAddr then
 		webPage:Navigate(szAddr)
 	end
@@ -3756,37 +3797,37 @@ end
 function XGUI.ResizeIE(frame, w, h)
 	if w < 400 then w = 400 end
 	if h < 200 then h = 200 end
-	local handle = frame:Lookup("", "")
+	local handle = frame:Lookup('', '')
 	handle:SetSize(w, h)
-	handle:Lookup("Image_Bg"):SetSize(w, h)
-	handle:Lookup("Image_BgT"):SetSize(w - 6, 64)
+	handle:Lookup('Image_Bg'):SetSize(w, h)
+	handle:Lookup('Image_BgT'):SetSize(w - 6, 64)
 	if not frame.bQuestionnaire then
-		handle:Lookup("Image_Edit"):SetSize(w - 300, 25)
+		handle:Lookup('Image_Edit'):SetSize(w - 300, 25)
 	end
-	handle:Lookup("Text_Title"):SetSize(w - 168, 30)
+	handle:Lookup('Text_Title'):SetSize(w - 168, 30)
 	handle:FormatAllItemPos()
 
-	local webPage = frame:Lookup("WebPage_Page")
+	local webPage = frame:Lookup('WebPage_Page')
 	if frame.bQuestionnaire then
 		webPage:SetSize(w - 20, h - 140)
 	else
 		webPage:SetSize(w - 12, h - 76)
-		frame:Lookup("Edit_Input"):SetSize(w - 306, 20)
-		frame:Lookup("Btn_GoTo"):SetRelPos(w - 110, 38)
+		frame:Lookup('Edit_Input'):SetSize(w - 306, 20)
+		frame:Lookup('Btn_GoTo'):SetRelPos(w - 110, 38)
 	end
 
-	frame:Lookup("Btn_Close"):SetRelPos(w - 40, 10)
-	frame:Lookup("CheckBox_MaxSize"):SetRelPos(w - 70, 10)
+	frame:Lookup('Btn_Close'):SetRelPos(w - 40, 10)
+	frame:Lookup('CheckBox_MaxSize'):SetRelPos(w - 70, 10)
 
-	frame:Lookup("Btn_DL"):SetSize(10, h - 20)
-	frame:Lookup("Btn_DT"):SetSize(w - 20, 10)
-	frame:Lookup("Btn_DTR"):SetRelPos(w - 10, 0)
-	frame:Lookup("Btn_DR"):SetRelPos(w - 10, 10)
-	frame:Lookup("Btn_DR"):SetSize(10, h - 20)
-	frame:Lookup("Btn_DRB"):SetRelPos(w - 10, h - 10)
-	frame:Lookup("Btn_DB"):SetRelPos(10, h - 10)
-	frame:Lookup("Btn_DB"):SetSize(w - 20, 10)
-	frame:Lookup("Btn_DLB"):SetRelPos(0, h - 10)
+	frame:Lookup('Btn_DL'):SetSize(10, h - 20)
+	frame:Lookup('Btn_DT'):SetSize(w - 20, 10)
+	frame:Lookup('Btn_DTR'):SetRelPos(w - 10, 0)
+	frame:Lookup('Btn_DR'):SetRelPos(w - 10, 10)
+	frame:Lookup('Btn_DR'):SetSize(10, h - 20)
+	frame:Lookup('Btn_DRB'):SetRelPos(w - 10, h - 10)
+	frame:Lookup('Btn_DB'):SetRelPos(10, h - 10)
+	frame:Lookup('Btn_DB'):SetSize(w - 20, 10)
+	frame:Lookup('Btn_DLB'):SetRelPos(0, h - 10)
 
 	frame:SetSize(w, h)
 	frame:SetDragArea(0, 0, w, 30)
@@ -3803,33 +3844,33 @@ end
 
 function XGUI.GetTreePath(raw)
 	local tTreePath = {}
-	if type(raw) == "table" and raw.GetTreePath then
-		table.insert(tTreePath, (raw:GetTreePath()):sub(1, -2))
+	if type(raw) == 'table' and raw.GetTreePath then
+		insert(tTreePath, (raw:GetTreePath()):sub(1, -2))
 		while(raw and raw:GetType():sub(1, 3) ~= 'Wnd') do
 			local szName = raw:GetName()
 			if not szName or szName == '' then
-				table.insert(tTreePath, 2, raw:GetIndex())
+				insert(tTreePath, 2, raw:GetIndex())
 			else
-				table.insert(tTreePath, 2, szName)
+				insert(tTreePath, 2, szName)
 			end
 			raw = raw:GetParent()
 		end
 	else
-		table.insert(tTreePath, tostring(raw))
+		insert(tTreePath, tostring(raw))
 	end
-	return table.concat(tTreePath, '/')
+	return concat(tTreePath, '/')
 end
 
 function XGUI.GetShadowHandle(szName)
 	if JH and JH.GetShadowHandle then
 		return JH.GetShadowHandle(szName)
 	end
-	local sh = Station.Lookup("Lowest/MY_Shadows") or Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. "ui/MY_Shadows.ini", "MY_Shadows")
-	if not sh:Lookup("", szName) then
-		sh:Lookup("", ""):AppendItemFromString(format("<handle> name=\"%s\" </handle>", szName))
+	local sh = Station.Lookup('Lowest/MY_Shadows') or Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. 'ui/MY_Shadows.ini', 'MY_Shadows')
+	if not sh:Lookup('', szName) then
+		sh:Lookup('', ''):AppendItemFromString(format('<handle> name=\'%s\' </handle>', szName))
 	end
-	MY.Debug({"Create sh # " .. szName}, "XGUI", MY_DEBUG.LOG)
-	return sh:Lookup("", szName)
+	MY.Debug({'Create sh # ' .. szName}, 'XGUI', MY_DEBUG.LOG)
+	return sh:Lookup('', szName)
 end
 
 MY.UI = XGUI

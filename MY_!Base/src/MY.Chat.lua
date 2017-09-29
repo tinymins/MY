@@ -108,7 +108,7 @@ MY.GetEmotion = MY.Chat.GetEmotion
 function MY.Chat.GetCopyLinkText(szText, rgbf)
 	szText = szText or _L[' * ']
 	rgbf   = rgbf   or { f = 10 }
-	
+
 	return GetFormatText(szText, rgbf.f, rgbf.r, rgbf.g, rgbf.b, 82691,
 		"this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.Chat.LinkEventHandler.OnCopyLClick\nthis.OnItemMButtonDown=MY.Chat.LinkEventHandler.OnCopyMClick\nthis.OnItemRButtonDown=MY.Chat.LinkEventHandler.OnCopyRClick\nthis.OnItemMouseEnter=MY.Chat.LinkEventHandler.OnCopyMouseEnter\nthis.OnItemMouseLeave=MY.Chat.LinkEventHandler.OnCopyMouseLeave",
 		"copylink")
@@ -134,7 +134,7 @@ MY.GetTimeLinkText = MY.Chat.GetTimeLinkText
 function MY.Chat.CopyChatLine(hTime, bTextEditor)
 	local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
 	if bTextEditor then
-		edit = MY.UI.OpenTextEditor():find(".WndEdit"):raw(1)
+		edit = MY.UI.OpenTextEditor():find(".WndEdit")[1]
 	end
 	if not edit then
 		return
@@ -313,7 +313,7 @@ function MY.Chat.RenderLink(argv, argv2)
 					else
 						script = ''
 					end
-					
+
 					if name:sub(1, 8) == 'namelink' then
 						script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.Chat.LinkEventHandler.OnNameLClick\nthis.OnItemRButtonDown=MY.Chat.LinkEventHandler.OnNameRClick'
 					elseif name == 'copy' or name == 'copylink' or name == 'timelink' then
@@ -321,7 +321,7 @@ function MY.Chat.RenderLink(argv, argv2)
 					else
 						script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.Chat.LinkEventHandler.OnItemLClick\nthis.OnItemRButtonDown=MY.Chat.LinkEventHandler.OnItemRClick'
 					end
-					
+
 					if #script > 0 then
 						xml[''].eventid = 82803
 						xml[''].script = script
@@ -348,7 +348,7 @@ function MY.Chat.RenderLink(argv, argv2)
 		end
 		argv.bMyChatRendered = true
 	end
-	
+
 	return argv
 end
 MY.RenderChatLink = MY.Chat.RenderLink
@@ -677,7 +677,7 @@ function MY.Chat.ParseAntiSWS(t)
 						nSensitiveWordEndPos = nEndPos
 					end
 				end
-				
+
 				table.insert(t2, {
 					type = "text",
 					text = string.sub(szText, 1, nSensitiveWordEndPos - nSensitiveWordEndLen)
@@ -885,7 +885,7 @@ function MY.Chat.RegisterMsgMonitor(arg0, arg1, arg2)
 	elseif tp0 == 'string' and not arg1 then
 		szKey = arg0
 	end
-	
+
 	if szKey and _C.tMsgMonitorFun[szKey] then
 		UnRegisterMsgMonitor(_C.tMsgMonitorFun[szKey].fn)
 		_C.tMsgMonitorFun[szKey] = nil

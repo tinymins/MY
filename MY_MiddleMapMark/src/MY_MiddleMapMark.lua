@@ -44,7 +44,7 @@ local function GeneInfoPosKey(mapid, x, y)
 	-- 15 -  0 λ y
 	return mapid * L32 + math.floor(x / MAX_DISTINCT_DISTANCE) * L16 + math.floor(y / MAX_DISTINCT_DISTANCE)
 end
-	
+
 local SZ_CACHE_PATH = "cache/NPC_DOODAD_REC/"
 if IsLocalFileExist(MY.FormatPath(SZ_CACHE_PATH)) then
 	DB:Execute("BEGIN TRANSACTION")
@@ -81,21 +81,21 @@ local function PushDB()
 		return
 	end
 	DB:Execute("BEGIN TRANSACTION")
-	
+
 	for i, p in pairs(l_npc) do
 		DBN_W:ClearBindings()
 		DBN_W:BindAll(p.templateid, p.poskey, p.mapid, p.x, p.y, AnsiToUTF8(p.name), AnsiToUTF8(p.title), p.level)
 		DBN_W:Execute()
 	end
 	l_npc = {}
-	
+
 	for i, p in pairs(l_doodad) do
 		DBD_W:ClearBindings()
 		DBD_W:BindAll(p.templateid, p.poskey, p.mapid, p.x, p.y, AnsiToUTF8(p.name))
 		DBD_W:Execute()
 	end
 	l_doodad = {}
-	
+
 	DB:Execute("END TRANSACTION")
 end
 MY.RegisterEvent('LOADING_ENDING.MY_MiddleMapMark', PushDB)
@@ -132,7 +132,7 @@ local function OnNpcEnterScene()
 	-- switch map
 	local dwMapID = player.GetMapID()
 	local dwPosKey = GeneInfoPosKey(dwMapID, npc.nX, npc.nY)
-	
+
 	-- add rec
 	l_npc[npc.dwTemplateID .. "," .. dwPosKey] = {
 		decoded = true,
@@ -174,7 +174,7 @@ local function OnDoodadEnterScene()
 	-- switch map
 	local dwMapID = player.GetMapID()
 	local dwPosKey = GeneInfoPosKey(dwMapID, doodad.nX, doodad.nY)
-	
+
 	-- add rec
 	l_doodad[doodad.dwTemplateID .. "," .. dwPosKey] = {
 		decoded = true,
@@ -336,7 +336,7 @@ function MY_MiddleMapMark.Search(szKeyword)
 	if not player or not frame or not frame:IsVisible() then
 		return
 	end
-	
+
 	local hInner = frame:Lookup("", "Handle_Inner")
 	local nW, nH = hInner:GetSize()
 	local hMMM = hInner:Lookup("Handle_MY_MMM")
@@ -347,12 +347,12 @@ function MY_MiddleMapMark.Search(szKeyword)
 	end
 	local nCount = 0
 	local nItemCount = hMMM:GetItemCount()
-	
+
 	if l_szKeyword == szKeyword then
 		return
 	end
 	l_szKeyword = szKeyword
-	
+
 	local infos
 	local dwMapID = MiddleMap.dwMapID or player.GetMapID()
 	local aKeywords = {}
@@ -367,7 +367,7 @@ function MY_MiddleMapMark.Search(szKeyword)
 		end
 	end
 	local nX, nY
-	
+
 	for i, szSearch in ipairs(aKeywords) do
 		infos = MY_MiddleMapMark.SearchNpc(szSearch, dwMapID)
 		for _, info in ipairs(infos) do
@@ -394,7 +394,7 @@ function MY_MiddleMapMark.Search(szKeyword)
 			end
 		end
 	end
-	
+
 	for i, szSearch in ipairs(aKeywords) do
 		infos = MY_MiddleMapMark.SearchDoodad(szSearch, dwMapID)
 		for _, info in ipairs(infos) do
@@ -421,7 +421,7 @@ function MY_MiddleMapMark.Search(szKeyword)
 			end
 		end
 	end
-	
+
 	for i = nCount, nItemCount - 1 do
 		hMMM:Lookup(i):Hide()
 	end
@@ -436,7 +436,7 @@ function PS.OnPanelActive(wnd)
 	local ui = MY.UI(wnd)
 	local x, y = ui:pos()
 	local w, h = ui:size()
-	
+
 	local list = ui:append("WndListBox", "WndListBox_1"):children('#WndListBox_1')
 	  :pos(20, 35)
 	  :size(w - 32, h - 50)
@@ -448,12 +448,12 @@ function PS.OnPanelActive(wnd)
 	  		return false
 	  	end
 	  end)
-	
-	local muProgress = ui:append("Image", "Image_Progress"):item('#Image_Progress')
+
+	local muProgress = ui:append("Image", "Image_Progress"):children('#Image_Progress')
 	  :pos(20, 31)
 	  :size(w - 30, 4)
 	  :image('ui/Image/UICommon/RaidTotal.UITex|45')
-	
+
 	ui:append("WndEditBox", "WndEdit_Search", {
 		x = 18, y = 10,
 		w = w - 26, h = 25,
@@ -467,7 +467,7 @@ function PS.OnPanelActive(wnd)
 			local tNames = {}
 			local infos, szName, szTitle
 			list:listbox('clear')
-			
+
 			infos = MY_MiddleMapMark.SearchNpc(szText)
 			nCount = nCount + #infos
 			for _, info in ipairs(infos) do
@@ -486,7 +486,7 @@ function PS.OnPanelActive(wnd)
 					tNames[info.mapid .. szName] = true
 				end
 			end
-			
+
 			infos = MY_MiddleMapMark.SearchDoodad(szText)
 			nCount = nCount + #infos
 			for _, info in ipairs(infos) do
@@ -511,9 +511,9 @@ function PS.OnPanelResize(wnd)
 	local ui = MY.UI(wnd)
 	local x, y = ui:pos()
 	local w, h = ui:size()
-	
+
 	ui:children('#WndListBox_1'):size(w - 32, h - 50)
-	ui:item('#Image_Progress'):size(w - 30, 4)
+	ui:children('#Image_Progress'):size(w - 30, 4)
 	ui:children('#WndEdit_Search'):size(w - 26, 25)
 end
 

@@ -100,7 +100,7 @@ local function InsertElementBasicTip(hElem, tTip)
 	local X, Y = hElem:GetAbsPos()
 	local x, y = hElem:GetRelPos()
 	local w, h = hElem:GetSize()
-	
+
 	tinsert(tTip, _L('Name: %s', hElem:GetName()))
 	tinsert(tTip, _L('Type: %s', hElem:GetType()))
 	tinsert(tTip, _L('Path: %s', MY.UI.GetTreePath(hElem)))
@@ -227,7 +227,7 @@ function MYDev_Snaplines.OnFrameCreate()
 	-- 文字
 	this:Lookup("", "Handle_Tip/Text_HoverTip"):SetFontScheme(MYDev_Snaplines.nTipFont)
 	this:Lookup("", "Handle_Tip/Text_HoverTip"):SetFontColor(unpack(MYDev_Snaplines.rgbTip))
-	
+
 	MYDev_Snaplines.OnEvent("UI_SCALED")
 end
 
@@ -284,7 +284,7 @@ function MYDev_Snaplines.OnFrameBreathe()
 			this:Lookup("", "Handle_Snaplines_Item"):Hide()
 		end
 		hText:SetText(table.concat(tTip, '\n'))
-		
+
 		-- 缩放
 		if MYDev_Snaplines.bAutoScale then
 			-- hText:EnableScale(true)
@@ -297,7 +297,7 @@ function MYDev_Snaplines.OnFrameBreathe()
 				hText:AutoSize()
 			end
 		end
-		
+
 		-- 位置
 		local nTextW, nTextH = hText:GetSize()
 		local nTextX, nTextY
@@ -307,7 +307,7 @@ function MYDev_Snaplines.OnFrameBreathe()
 		elseif nTextX < 0 then
 			nTextX = 0
 		end
-		
+
 		local bReAdjustX
 		if nWndY >= nTextH then -- 顶部可以显示的下
 			nTextY = nWndY - nTextH
@@ -366,7 +366,7 @@ MY.RegisterPanel(
 		local ui = MY.UI(wnd)
 		local w, h = ui:size()
 		local x, y = 20, 20
-		
+
 		ui:append("WndCheckBox", "WndCheckBox_ShowTreePath"):children("#WndCheckBox_ShowTreePath")
 		  :pos(x, y):width(300)
 		  :text(_L['enable tree path view']):check(MYDev_Snaplines.bEnable or false)
@@ -375,7 +375,7 @@ MY.RegisterPanel(
 			MYDev_Snaplines.ReloadUI()
 		end)
 		y = y + 40
-		
+
 		ui:append("WndCheckBox", "WndCheckBox_ShowTip"):children("#WndCheckBox_ShowTip")
 		  :pos(x, y):width(200)
 		  :text(_L['show tip']):check(MYDev_Snaplines.bShowTip or false)
@@ -384,7 +384,7 @@ MY.RegisterPanel(
 			MYDev_Snaplines.ReloadUI()
 		end)
 		x = x + 200
-		ui:append("Shadow", "Shadow_TipColor"):item("#Shadow_TipColor"):pos(x, y)
+		ui:append("Shadow", "Shadow_TipColor"):children("#Shadow_TipColor"):pos(x, y)
 		  :size(20, 20):color(MYDev_Snaplines.rgbTip or {255,255,255})
 		  :click(function()
 			local me = this
@@ -413,7 +413,7 @@ MY.RegisterPanel(
 			MYDev_Snaplines.ReloadUI()
 		end)
 		y = y + 40
-		
+
 		ui:append("WndCheckBox", "WndCheckBox_ShowWndTip"):children("#WndCheckBox_ShowWndTip")
 		  :pos(x, y):width(200)
 		  :text(_L['show wnd tip']):check(MYDev_Snaplines.bShowWndTip or false)
@@ -430,7 +430,7 @@ MY.RegisterPanel(
 			MYDev_Snaplines.ReloadUI()
 		end)
 		y = y + 40
-		
+
 		ui:append("WndCheckBox", "WndCheckBox_ShowWndSnaplines"):children("#WndCheckBox_ShowWndSnaplines")
 		  :pos(x, y):width(200)
 		  :text(_L['show wnd snaplines']):check(MYDev_Snaplines.bShowWndSnaplines or false)
@@ -439,7 +439,7 @@ MY.RegisterPanel(
 			MYDev_Snaplines.ReloadUI()
 		end)
 		x = x + 200
-		ui:append("Shadow", "Shadow_WndSnaplinesColor"):item("#Shadow_WndSnaplinesColor"):pos(x, y)
+		ui:append("Shadow", "Shadow_WndSnaplinesColor"):children("#Shadow_WndSnaplinesColor"):pos(x, y)
 		  :size(20, 20):color(MYDev_Snaplines.rgbWndSnaplines or {255,255,255})
 		  :click(function()
 			local me = this
@@ -451,7 +451,7 @@ MY.RegisterPanel(
 		  end)
 		x = 20
 		y = y + 40
-		
+
 		ui:append("WndCheckBox", "WndCheckBox_ShowItemSnaplines"):children("#WndCheckBox_ShowItemSnaplines")
 		  :pos(x, y):width(200)
 		  :text(_L['show item snaplines']):check(MYDev_Snaplines.bShowItemSnaplines or false)
@@ -460,7 +460,7 @@ MY.RegisterPanel(
 			MYDev_Snaplines.ReloadUI()
 		end)
 		x = x + 200
-		ui:append("Shadow", "Shadow_ItemSnaplinesColor"):item("#Shadow_ItemSnaplinesColor"):pos(x, y)
+		ui:append("Shadow", "Shadow_ItemSnaplinesColor"):children("#Shadow_ItemSnaplinesColor"):pos(x, y)
 		  :size(20, 20):color(MYDev_Snaplines.rgbItemSnaplines or {255,255,255})
 		  :click(function()
 			local me = this
@@ -472,7 +472,7 @@ MY.RegisterPanel(
 		  end)
 		x = 20
 		y = y + 40
-		
+
 		ui:append("WndCheckBox", "WndCheckBox_AutoDetectBox"):children("#WndCheckBox_AutoDetectBox")
 		  :pos(x, y):width(200)
 		  :text(_L['auto detect box']):check(MYDev_Snaplines.bDetectBox or false)
@@ -480,13 +480,13 @@ MY.RegisterPanel(
 			MYDev_Snaplines.bDetectBox = bCheck
 		end)
 		y = y + 40
-		
+
 		ui:append("WndCheckBox", {
 			x = x, y = y, w = 200, text = _L['auto scale'], checked = MYDev_Snaplines.bAutoScale,
 			oncheck = function(bCheck) MYDev_Snaplines.bAutoScale = bCheck end
 		})
 		y = y + 40
-		
+
 		ui:append("Text", "Text_SetHotkey"):find("#Text_SetHotkey"):pos(w-140, 20):color(255,255,0)
 		  :text(_L['>> set hotkey <<'])
 		  :click(function() MY.Game.SetHotKey() end)

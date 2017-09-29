@@ -46,7 +46,7 @@ _C.UpdateAllEquipBox = function() -- update boxes
 	for i = 0, EQUIPMENT_SUIT_COUNT - 1 do
 		local nSuitIndex, dwBox = _C.GetSuitIndex(me, i)
 		for _, nType in ipairs(_C.tEquipPos) do
-			local box = ui:item('#Box_' .. i .. '_' .. nType):raw(1)
+			local box = ui:children('#Box_' .. i .. '_' .. nType)[1]
 			local item = GetPlayerItem(me, dwBox, nType)
 			UpdataItemBoxObject(box, dwBox, nType, item, nil, nSuitIndex)
 		end
@@ -72,13 +72,13 @@ _C.PS = {
 		local x0, y0 = 0 , 10
 		local x , y  = x0, y0
 		local dx, dy, dy2 = 50, 48, 52
-		
+
 		for i = 0, EQUIPMENT_SUIT_COUNT - 1 do
 			for _, nType in ipairs(_C.tEquipPos) do
 				if x + dx > w then
 					x, y = x0, y + dy
 				end
-				ui:item('#Box_' .. i .. '_' .. nType):pos(x, y)
+				ui:children('#Box_' .. i .. '_' .. nType):pos(x, y)
 				x = x + dx
 			end
 			x, y = x0, y + dy2

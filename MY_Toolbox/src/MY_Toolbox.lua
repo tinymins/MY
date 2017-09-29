@@ -99,7 +99,7 @@ MY_ToolBox.ApplyConfig = function()
 		MY.RegisterEvent("PLAYER_FELLOWSHIP_CHANGE.MY_FRIEND_TIP")
 		XGUI.GetShadowHandle("MY_FriendHeadTip"):Hide()
 	end
-	
+
 	-- 帮会成员高亮
 	if Navigator_Remove then
 		Navigator_Remove("MY_GUILDMEMBER_TIP")
@@ -162,7 +162,7 @@ MY_ToolBox.ApplyConfig = function()
 		MY.RegisterEvent("PLAYER_LEAVE_SCENE.MY_GUILDMEMBER_TIP")
 		XGUI.GetShadowHandle("MY_TongMemberHeadTip"):Hide()
 	end
-	
+
 	-- 玩家名字变成link方便组队
 	MY.RegisterEvent('OPEN_WINDOW.NAMELINKER', function(event)
 		local h = Station.Lookup("Normal/DialoguePanel", "Handle_Message")
@@ -190,7 +190,7 @@ MY_ToolBox.ApplyConfig = function()
 		end
 		h:FormatAllItemPos()
 	end)
-	
+
 	-- 试炼之地九宫助手
 	MY.RegisterEvent('OPEN_WINDOW.JIUGONG_HELPER', function(event)
 		if MY.IsShieldedVersion() then
@@ -220,7 +220,7 @@ MY_ToolBox.ApplyConfig = function()
 				{2,7,6,9,5,1,4,3,8},
 				{4,3,8,9,5,1,2,7,6},
 			}
-			
+
 			n1,n2,n3,n4,n5,n6,n7,n8,n9 = tNumList[n1],tNumList[n2],tNumList[n3],tNumList[n4],tNumList[n5],tNumList[n6],tNumList[n7],tNumList[n8],tNumList[n9]
 			local tQuestion = {n1,n2,n3,n4,n5,n6,n7,n8,n9}
 			local tSolution
@@ -251,7 +251,7 @@ MY_ToolBox.ApplyConfig = function()
 			OutputWarningMessage("MSG_WARNING_RED", szText, 10)
 		end)
 	end)
-	
+
 	-- 防止神行CD被吃
 	if MY_ToolBox.bAvoidBlackShenxingCD then
 		MY.RegisterEvent('DO_SKILL_CAST.MY_TOOLBOX_AVOIDBLACKSHENXINGCD', function()
@@ -264,7 +264,7 @@ MY_ToolBox.ApplyConfig = function()
 			if not player then
 				return
 			end
-			
+
 			local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = player.GetSkillPrepareState()
 			if not (bIsPrepare and dwSkillID == 3691) then
 				return
@@ -275,7 +275,7 @@ MY_ToolBox.ApplyConfig = function()
 	else
 		MY.RegisterEvent('DO_SKILL_CAST.MY_TOOLBOX_AVOIDBLACKSHENXINGCD')
 	end
-	
+
 	if MY_ToolBox.bJJCAutoSwitchTalkChannel then
 		MY.RegisterEvent('LOADING_ENDING.MY_TOOLBOX_JJCAUTOSWITCHTALKCHANNEL', function()
 			local bIsBattleField = (GetClientPlayer().GetScene().nType == MAP_TYPE.BATTLE_FIELD)
@@ -290,7 +290,7 @@ MY_ToolBox.ApplyConfig = function()
 	else
 		MY.RegisterEvent('LOADING_ENDING.MY_TOOLBOX_JJCAUTOSWITCHTALKCHANNEL')
 	end
-	
+
 	-- 长歌影子头顶次序
 	if MY_ToolBox.bChangGeShadow then
 		local MAX_LIMIT_TIME = 25
@@ -455,10 +455,10 @@ MY.RegisterEvent("ON_FRAME_CREATE.BIG_WAR_CHECK", function()
 				end
 				if finished then
 					local ui = XGUI(arg0)
-					if ui:item("#Text_MY_Tip"):count() == 0 then
+					if ui:children("#Text_MY_Tip"):count() == 0 then
 						ui:append("Text", "Text_MY_Tip", {y = ui:height(), w = ui:width(), color = {255, 255, 0}, font = 199, halign = 1})
 					end
-					ui = ui:item("#Text_MY_Tip"):text(_L['Warning: Bigwar has been finished but not handed yet!']):shake(10, 10, 10, 1000)
+					ui = ui:children("#Text_MY_Tip"):text(_L['Warning: Bigwar has been finished but not handed yet!']):shake(10, 10, 10, 1000)
 					break
 				end
 			end
@@ -553,7 +553,7 @@ function PS.OnPanelActive(wnd)
 	local ui = MY.UI(wnd)
 	local w, h = ui:size()
 	local x, y = 20, 30
-	
+
 	-- 检测附近共战
 	ui:append("WndButton", "WndButton_GongzhanCheck"):children('#WndButton_GongzhanCheck')
 	  :pos(w - 140, y):width(120)
@@ -588,7 +588,7 @@ function PS.OnPanelActive(wnd)
 	  	end
 	  	return t
 	  end)
-	
+
 	-- 好友高亮
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = 180,
@@ -609,7 +609,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + 30
-	
+
 	-- 帮会高亮
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = 180,
@@ -630,7 +630,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + 30
-	
+
 	-- 背包搜索
 	if MY_BagEx then
 		ui:append("WndCheckBox", {
@@ -643,7 +643,7 @@ function PS.OnPanelActive(wnd)
 		})
 		y = y + 30
 	end
-	
+
 	-- 显示历史技能列表
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = 160,
@@ -654,7 +654,7 @@ function PS.OnPanelActive(wnd)
 			MY_VisualSkill.Reload()
 		end,
 	})
-	
+
 	ui:append("WndSliderBox", {
 		x = x + 160, y = y,
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = {1, 32},
@@ -667,7 +667,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + 30
-	
+
 	-- 防止神行CD被黑
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = 150,
@@ -679,7 +679,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + 30
-	
+
 	-- 自动隐藏聊天栏
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = 150,
@@ -691,7 +691,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + 30
-	
+
 	-- 竞技场频道切换
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = 300,
@@ -703,7 +703,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + 30
-	
+
 	-- 竞技场自动恢复队伍信息
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = 300,
@@ -714,7 +714,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + 30
-	
+
 	-- 竞技场自动恢复队伍信息
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = 300,
@@ -725,7 +725,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + 30
-	
+
 	-- 长歌影子顺序
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = 150,
@@ -799,7 +799,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + 30
-	
+
 	-- 随身便笺
 	ui:append("Text", {
 		x = x, y = y,
@@ -807,7 +807,7 @@ function PS.OnPanelActive(wnd)
 		text = _L['* anmerkungen'],
 	})
 	y = y + 30
-	
+
 	ui:append("WndCheckBox", {
 		x = x, y = y,
 		text = _L['my anmerkungen'],

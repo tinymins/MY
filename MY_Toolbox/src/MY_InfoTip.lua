@@ -188,8 +188,8 @@ MY_InfoTip.Reload = function()
                     cfg.anchor = anchor
                     SaveConfig()
                 end):drag(0,0,0,0):drag(false):penetrable(true)
-                frm:append("Image", "Image_Default"):item("#Image_Default"):size(220,30):image("UI/Image/UICommon/Commonpanel.UITex",86):alpha(180)
-                frm:append("Text", "Text_Default"):item("#Text_Default"):size(220,30):text(cache.title):font(2):raw(1):SetHAlign(1)
+                frm:append("Image", "Image_Default"):children("#Image_Default"):size(220,30):image("UI/Image/UICommon/Commonpanel.UITex",86):alpha(180)
+                frm:append("Text", "Text_Default"):children("#Text_Default"):size(220,30):text(cache.title):font(2)[1]:SetHAlign(1)
                 local txt = frm:find("#Text_Default")
                 frm:breathe(function() txt:text(cache.GetContent()) end)
             end
@@ -203,7 +203,7 @@ MY_InfoTip.Reload = function()
             else
                 cache.formatString = _L[cache.content]
             end
-            frm:item("#Text_Default"):font(cfg.nFont or 0):color(cfg.rgb or {255,255,255})
+            frm:children("#Text_Default"):font(cfg.nFont or 0):color(cfg.rgb or {255,255,255})
             frm:anchor(cfg.anchor)
         else
             frm:remove()
@@ -222,15 +222,15 @@ MY.RegisterPanel( "MY_InfoTip", _L["infotip"], _L['System'], "ui/Image/UICommon/
     local ui = MY.UI(wnd)
     local w, h = ui:size()
     local x, y = 50, 20
-    
+
     ui:append("Text", "Text_InfoTip"):find("#Text_InfoTip")
       :pos(x, y):width(350)
       :text(_L['* infomation tips']):color(255,255,0)
     y = y + 5
-    
+
     for id, cache in pairs(MY_InfoTip.Cache) do
         x, y = 55, y + 30
-        
+
         local cfg = MY_InfoTip.Config[id]
         ui:append("WndCheckBox", "WndCheckBox_InfoTip_"..id):children("#WndCheckBox_InfoTip_"..id):pos(x, y):width(250)
           :text(cache.title):check(cfg.bEnable or false)
@@ -262,7 +262,7 @@ MY.RegisterPanel( "MY_InfoTip", _L["infotip"], _L['System'], "ui/Image/UICommon/
             end)
           end)
         x = x + 60
-        ui:append("Shadow", "Shadow_InfoTipColor_"..id):item("#Shadow_InfoTipColor_"..id):pos(x, y)
+        ui:append("Shadow", "Shadow_InfoTipColor_"..id):children("#Shadow_InfoTipColor_"..id):pos(x, y)
           :size(20, 20):color(cfg.rgb or {255,255,255})
           :click(function()
             local me = this
