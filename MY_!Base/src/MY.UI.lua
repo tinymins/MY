@@ -870,6 +870,9 @@ function XGUI:remove()
 end
 
 local function OnCommonComponentMouseEnter()
+	if not this:IsMouseIn() then
+		return 
+	end
 	local hText = GetComponentElement(this, 'TEXT')
 	if not hText then
 		return
