@@ -71,7 +71,7 @@ MY_Anmerkungen.ReloadNotePanel = function()
 		  :pos(0, 0):size(MY_Anmerkungen.nNotePanelWidth, MY_Anmerkungen.nNotePanelHeight - 30)
 		  :multiLine(true):text(MY_Anmerkungen.szNotePanelContent)
 		  :change(function(raw, txt) MY_Anmerkungen.szNotePanelContent = txt end)
-		  
+
 		ui:onuievent("OnFrameDragEnd", function()
 			MY_Anmerkungen.anchorNotePanel = MY.UI("Normal/MY_Anmerkungen_NotePanel"):anchor()
 		end):onevent("UI_SCALED", function()
@@ -90,20 +90,20 @@ MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
 		ui:remove()
 		return true
 	end
-	
+
 	MY.RegisterEsc('MY_Anmerkungen_PlayerNoteEditPanel', function()
 		return ui and ui:count() > 0
 	end, CloseFrame)
 	ui:onuievent("OnCloseButtonClick", CloseFrame)
-	
+
 	local w, h = 300, 210
 	local x, y = 20 , 0
-	
+
 	ui:size(w + 40, h + 90):anchor( { s = "CENTER", r = "CENTER", x = 0, y = 0 } )
 	-- title
 	ui:text(_L['my anmerkungen - player note edit'])
 	-- id
-	ui:append("Text", "Label_ID"):item("#Label_ID"):pos(x, y)
+	ui:append("Text", "Label_ID"):children("#Label_ID"):pos(x, y)
 	  :text(_L['ID:'])
 	-- id input
 	ui:append("WndEditBox", "WndEditBox_ID"):children("#WndEditBox_ID"):pos(x + 60, y)
@@ -124,7 +124,7 @@ MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
 	  --   end
 	  -- end)
 	-- name
-	ui:append("Text", "Label_Name"):item("#Label_Name"):pos(x, y + 30)
+	ui:append("Text", "Label_Name"):children("#Label_Name"):pos(x, y + 30)
 	  :text(_L['Name:'])
 	-- name input
 	ui:append("WndEditBox", "WndEditBox_Name"):children("#WndEditBox_Name"):pos(x + 60, y + 30)
@@ -155,7 +155,7 @@ MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
 	  	end
 	  end)
 	-- content
-	ui:append("Text", "Label_Content"):item("#Label_Content"):pos(x, y + 60)
+	ui:append("Text", "Label_Content"):children("#Label_Content"):pos(x, y + 60)
 	  :text(_L['Content:'])
 	-- content input
 	ui:append("WndEditBox", "WndEditBox_Content"):children("#WndEditBox_Content")
@@ -187,7 +187,7 @@ MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
 	  :pos(x + 143, y + 190):width(80)
 	  :text(_L['cancel']):click(function() CloseFrame(ui) end)
 	-- delete button
-	ui:append("Text", "Text_Delete"):item("#Text_Delete")
+	ui:append("Text", "Text_Delete"):children("#Text_Delete")
 	  :pos(x + 230, y + 188):width(80):alpha(200)
 	  :text(_L['delete']):color(255,0,0):hover(function(bIn) MY.UI(this):alpha((bIn and 255) or 200) end)
 	  :click(function()
@@ -195,10 +195,10 @@ MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
 	  	CloseFrame(ui)
 	  	-- …æ≥˝
 	  end)
-	  
+
 	-- init data
 	ui:children("#WndEditBox_ID"):change()
-	Station.SetFocusWindow(ui:raw(1))
+	Station.SetFocusWindow(ui[1])
 	PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 end
 -- ÷ÿ‘ÿ”“º¸≤Àµ•
@@ -319,7 +319,7 @@ MY_Anmerkungen.LoadConfig = function()
 	if type(MY_Anmerkungen.tPublicPlayerNotes) == 'string' then
 		MY_Anmerkungen.tPublicPlayerNotes = MY.Json.Decode(MY_Anmerkungen.tPublicPlayerNotes)
 	end
-	
+
 	local szOrgFile = MY.GetLUADataPath("config/PLAYER_NOTES/$uid.$lang.jx3dat")
 	local szFilePath = MY.GetLUADataPath({"config/playernotes.jx3dat", MY_DATA_PATH.ROLE})
 	if IsLocalFileExist(szOrgFile) then
@@ -343,7 +343,7 @@ function PS.OnPanelActive(wnd)
 	local ui = MY.UI(wnd)
 	local w, h = ui:size()
 	local x, y = 0, 0
-	
+
 	ui:append("WndButton2", {
 		x = w - 230, y = y, w = 110,
 		text = _L['Import'],
@@ -376,7 +376,7 @@ function PS.OnPanelActive(wnd)
 			end, function() end, function() end, nil, "" )
 		end,
 	})
-	
+
 	ui:append("WndButton2", {
 		x = w - 110, y = y, w = 110,
 		text = _L['Export'],
@@ -388,7 +388,7 @@ function PS.OnPanelActive(wnd)
 			}))
 		end,
 	})
-	
+
 	y = y + 30
 	local list = ui:append("WndListBox", "WndListBox_1"):children('#WndListBox_1')
 	  :pos(x, y)

@@ -279,7 +279,7 @@ function MY.OpenPanel(bMute, bNoFocus, bNoAnimate)
 		hFrame.intact = true
 		hFrame:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
 		hFrame:CorrectPos()
-		
+
 		-- update some ui handle
 		hFrame:Lookup("", "Text_Title"):SetText(_L['mingyi plugins'] .. " v" .. MY.GetVersion() .. ' Build ' .. _BUILD_)
 		hFrame:Lookup("Wnd_Total", "Handle_DBClick").OnItemLButtonDBClick = function()
@@ -325,7 +325,7 @@ function MY.OpenPanel(bMute, bNoFocus, bNoAnimate)
 			end
 		end)
 		-- updaet logo image
-		MY.UI(MY.GetFrame()):item('#Image_Icon')
+		MY.UI(MY.GetFrame()):children('#Image_Icon')
 		  :size(30, 30)
 		  :image(_UITEX_COMMON_, 0)
 		-- update category
@@ -415,7 +415,7 @@ local function OnInit()
 	MY.CreateDataRoot(MY_DATA_PATH.ROLE)
 	MY.CreateDataRoot(MY_DATA_PATH.GLOBAL)
 	MY.CreateDataRoot(MY_DATA_PATH.SERVER)
-	
+
 	for szKey, fnAction in pairs(INIT_FUNC_LIST) do
 		local nStartTick = GetTickCount()
 		local status, err = pcall(fnAction)
@@ -721,7 +721,7 @@ function MY.RedrawCategory(szCategory)
 	if not frame then
 		return
 	end
-	
+
 	-- draw category
 	local wndCategoryList = frame:Lookup('Wnd_Total/WndContainer_Category')
 	wndCategoryList:Clear()
@@ -740,7 +740,7 @@ function MY.RedrawCategory(szCategory)
 				if chkCategory.bActived then
 					return
 				end
-				
+
 				PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 				local p = chkCategory:GetParent():GetFirstChild()
 				while p do
@@ -756,7 +756,7 @@ function MY.RedrawCategory(szCategory)
 		end
 	end
 	wndCategoryList:FormatAllContentPos()
-	
+
 	MY.SwitchCategory(szCategory)
 end
 
@@ -766,7 +766,7 @@ function MY.SwitchCategory(szCategory)
 	if not frame then
 		return
 	end
-	
+
 	local hList = frame:Lookup('Wnd_Total/WndContainer_Category')
 	local chk = hList:GetFirstChild()
 	while(chk and chk.szCategory ~= szCategory) do
@@ -786,11 +786,11 @@ function MY.RedrawTab(szCategory)
 	if not (frame and szCategory) then
 		return
 	end
-	
+
 	-- draw tabs
 	local hTabs = frame:Lookup('Wnd_Total/WndScroll_Tabs', '')
 	hTabs:Clear()
-	
+
 	for _, ctg in ipairs(TABS_LIST) do
 		if ctg.id == szCategory then
 			for i, tab in ipairs(ctg) do
@@ -822,7 +822,7 @@ function MY.RedrawTab(szCategory)
 		end
 	end
 	hTabs:FormatAllItemPos()
-	
+
 	MY.SwitchTab()
 end
 
@@ -831,7 +831,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 	if not frame then
 		return
 	end
-	
+
 	if szID then
 		-- check if category is right
 		local szCategory = frame:Lookup('Wnd_Total/WndContainer_Category').szCategory
@@ -844,7 +844,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 				end
 			end
 		end
-		
+
 		-- get tab window
 		local hTab
 		local hTabs = frame:Lookup('Wnd_Total/WndScroll_Tabs', '')
@@ -859,7 +859,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 		if not hTab.bActived then
 			PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 		end
-		
+
 		-- deal with ui response
 		local hTabs = hTab:GetParent()
 		for i = 0, hTabs:GetItemCount() - 1 do
@@ -869,7 +869,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 		hTab.bActived = true
 		hTab:Lookup("Image_Bg_Active"):Show()
 	end
-	
+
 	-- get main panel
 	local wndMainPanel = frame:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel')
 	if not bForceUpdate and wndMainPanel.szID == szID then
@@ -886,7 +886,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 	wndMainPanel.OnPanelDeactive = nil
 	wndMainPanel:Clear()
 	wndMainPanel:Lookup('', ''):Clear()
-	
+
 	wndMainPanel.OnPanelResize   = nil
 	wndMainPanel.OnPanelActive   = nil
 	wndMainPanel.OnPanelDeactive = nil
@@ -918,26 +918,26 @@ function MY.SwitchTab(szID, bForceUpdate)
 			local scaleH = w / 557 * 278
 			local bottomH = 90
 			if scaleH > h - bottomH then
-				ui:item('#Image_Adv'):size((h - bottomH) / 278 * 557, (h - bottomH))
-				ui:item('#Text_Adv'):pos(10, h - bottomH + 10)
-				ui:item('#Text_Svr'):pos(10, h - bottomH + 35)
-				ui:item('#Text_ChangeLog'):pos(10, h - bottomH + 60)
-				ui:item('#Text_Serendipity'):pos(90, h - bottomH + 60)
-				ui:item('#Text_Zhezhi'):pos(170, h - bottomH + 60)
+				ui:children('#Image_Adv'):size((h - bottomH) / 278 * 557, (h - bottomH))
+				ui:children('#Text_Adv'):pos(10, h - bottomH + 10)
+				ui:children('#Text_Svr'):pos(10, h - bottomH + 35)
+				ui:children('#Text_ChangeLog'):pos(10, h - bottomH + 60)
+				ui:children('#Text_Serendipity'):pos(90, h - bottomH + 60)
+				ui:children('#Text_Zhezhi'):pos(170, h - bottomH + 60)
 			else
-				ui:item('#Image_Adv'):size(w, scaleH)
-				ui:item('#Text_Adv'):pos(10, scaleH + 10)
-				ui:item('#Text_Svr'):pos(10, scaleH + 35)
-				ui:item('#Text_ChangeLog'):pos(10, scaleH + 60)
-				ui:item('#Text_Serendipity'):pos(90, scaleH + 60)
-				ui:item('#Text_Zhezhi'):pos(170, scaleH + 60)
+				ui:children('#Image_Adv'):size(w, scaleH)
+				ui:children('#Text_Adv'):pos(10, scaleH + 10)
+				ui:children('#Text_Svr'):pos(10, scaleH + 35)
+				ui:children('#Text_ChangeLog'):pos(10, scaleH + 60)
+				ui:children('#Text_Serendipity'):pos(90, scaleH + 60)
+				ui:children('#Text_Zhezhi'):pos(170, scaleH + 60)
 			end
 		end
 		wndMainPanel.OnPanelResize(wndMainPanel)
 		MY.BreatheCall(500, function()
 			local player = GetClientPlayer()
 			if player then
-				ui:item('#Text_Adv'):text(_L('%s, welcome to use mingyi plugins!', player.szName) .. 'v' .. MY.GetVersion())
+				ui:children('#Text_Adv'):text(_L('%s, welcome to use mingyi plugins!', player.szName) .. 'v' .. MY.GetVersion())
 				return 0
 			end
 		end)
@@ -1002,7 +1002,7 @@ function MY.RegisterPanel(szID, szTitle, szCategory, szIconTex, rgbaTitleColor, 
 	if szTitle == nil then
 		return
 	end
-	
+
 	if not category then
 		table.insert(TABS_LIST, {
 			id = szCategory,
@@ -1109,23 +1109,23 @@ function _MY.OnSizeChanged()
 	hWnd:Lookup('WndContainer_Category'):SetSize(nWidth - 22, 32)
 	hWnd:Lookup('WndContainer_Category'):FormatAllContentPos()
 	hWnd:Lookup('Btn_Weibo'):SetRelPos(nWidth - 135, 55)
-	
+
 	hWnd:Lookup('WndScroll_Tabs'):SetSize(171, nHeight - 102)
 	hWnd:Lookup('WndScroll_Tabs', ''):SetSize(171, nHeight - 102)
 	hWnd:Lookup('WndScroll_Tabs', ''):FormatAllItemPos()
 	hWnd:Lookup('WndScroll_Tabs/ScrollBar_Tabs'):SetSize(16, nHeight - 111)
-	
+
 	local bHideTabs = nWidth < 550
 	hWnd:Lookup('WndScroll_Tabs'):SetVisible(not bHideTabs)
 	hTotal:Lookup('Image_Breaker'):SetVisible(not bHideTabs)
-	
+
 	if bHideTabs then
 		nWidth = nWidth + 181
 		hWnd:Lookup('WndScroll_MainPanel'):SetRelX(5)
 	else
 		hWnd:Lookup('WndScroll_MainPanel'):SetRelX(186)
 	end
-	
+
 	hWnd:Lookup('WndScroll_MainPanel'):SetSize(nWidth - 191, nHeight - 100)
 	hWnd:Lookup('WndScroll_MainPanel/ScrollBar_MainPanel'):SetSize(20, nHeight - 100)
 	hWnd:Lookup('WndScroll_MainPanel/ScrollBar_MainPanel'):SetRelPos(nWidth - 209, 0)
@@ -1178,17 +1178,17 @@ end
 
 if _NORESTM_ >= 0 then
 	local time = GetTime()
-	
+
 	local function OnExit()
 		debug.sethook()
 	end
 	MY.RegisterExit("_NORESTM_", OnExit)
-	
+
 	local function OnBreathe()
 		time = GetTime()
 	end
 	BreatheCall("_NORESTM_", OnBreathe)
-	
+
 	local function trace_line(event, line)
 		local delay = GetTime() - time
 		if delay < _NORESTM_ then

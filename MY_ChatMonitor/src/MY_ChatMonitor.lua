@@ -148,7 +148,7 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
         rec.text = szMsg
         rec.html = GetFormatText(szMsg, nil, GetMsgFontColor("MSG_SYS"))
     end
-    
+
     if not MY_ChatMonitor.bIsRegexp then
         rec.text = StringLowerW(rec.text)
     end
@@ -222,7 +222,7 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
         -- ¥¶¿ÌUI
         if _C.uiBoard then
             local nCopyLinkCount = 0
-            _C.uiBoard:hdl(1):children():each(function(ui)
+            _C.uiBoard:children():each(function(ui)
                 local name = ui:name()
                 if this:GetType() == "Text" and
                 (name == 'timelink' or
@@ -242,10 +242,10 @@ end
 _C.OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
     local w, h = ui:size()
-    
+
     ui:append("Text", "Label_KeyWord"):find('#Label_KeyWord')
       :pos(22,15):size(100,25):text(_L['key words:'])
-    
+
     ui:append("WndAutocomplete", "WndAutocomplete_KeyWord"):children('#WndAutocomplete_KeyWord')
       :pos(80,15):size(w-226,25):text(MY_ChatMonitor.szKeyWords)
       :change(function(raw, szText) MY_ChatMonitor.szKeyWords = szText end)
@@ -312,7 +312,7 @@ _C.OnPanelActive = function(wnd)
         local w, h = this:GetSize()
         OutputTip(szText, 450, {x, y, w, h})
     end):alpha(180)
-    
+
     ui:append("Image", "Image_Setting"):find('#Image_Setting'):pos(w-26,13):image('UI/Image/UICommon/Commonpanel.UITex',18):size(30,30):alpha(200):hover(function(bIn) this:SetAlpha((bIn and 255) or 200) end):click(function()
         PopupMenu((function()
             local t = {}
@@ -467,17 +467,17 @@ _C.OnPanelActive = function(wnd)
             MY_ChatMonitor.bCapture = true
         end
     end)
-    
+
     ui:append("WndButton", "Button_Clear"):find('#Button_Clear'):pos(w-81,15):width(50):text(_L['clear']):click(function()
         MY_ChatMonitor.tRecords = {}
         _C.uiBoard:clear()
     end)
-    
+
     _C.uiBoard = ui
       :append("WndScrollBox", "WndScrollBox_TalkList")
       :children('#WndScrollBox_TalkList')
       :handleStyle(3):pos(20,50):size(w-21, h - 70)
-    
+
     local tRecords = MY_ChatMonitor.tRecords
     for i = 1, #tRecords, 1 do
         _C.uiBoard:append(tRecords[i].html)
