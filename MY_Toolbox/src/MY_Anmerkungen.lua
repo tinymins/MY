@@ -85,8 +85,6 @@ MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
 	-- frame
 	local ui = MY.UI.CreateFrame("MY_Anmerkungen_PlayerNoteEdit_"..(dwID or 0))
 	local CloseFrame = function()
-		MY.RegisterEsc('MY_Anmerkungen_PlayerNoteEditPanel')
-		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 		ui:remove()
 		return true
 	end
@@ -94,7 +92,11 @@ MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
 	MY.RegisterEsc('MY_Anmerkungen_PlayerNoteEditPanel', function()
 		return ui and ui:count() > 0
 	end, CloseFrame)
-	ui:uievent("OnCloseButtonClick", CloseFrame)
+	local function onRemove()
+		MY.RegisterEsc('MY_Anmerkungen_PlayerNoteEditPanel')
+		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
+	end
+	ui:remove(onRemove)
 
 	local w, h = 300, 210
 	local x, y = 20 , 0
