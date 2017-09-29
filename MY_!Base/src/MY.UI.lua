@@ -244,11 +244,10 @@ local function GetComponentElement(raw, elementType)
 			element = raw:Lookup('WndNewScrollBar_Default')
 		end
 	elseif elementType == 'TEXT' then
-		if componentType == 'WndCheckBox' or componentType == 'WndRadioBox' or componentType == 'WndEdit'
-		or componentType == 'WndComboBox' or componentType == 'WndFrame' or componentType == 'WndSliderBox' then
-			element = raw:Lookup('', 'Text_Default')
-		elseif componentType == 'WndScrollBox' then
+		if componentType == 'WndScrollBox' then
 			element = raw:Lookup('', 'Handle_Padding/Handle_Scroll/Text_Default')
+		elseif componentBaseType == 'Wnd' then
+			element = raw:Lookup('', 'Text_Default')
 		elseif componentType == 'Handle' then
 			element = raw:Lookup('Text_Default')
 		elseif componentType == 'Text' then
@@ -276,7 +275,7 @@ local function GetComponentElement(raw, elementType)
 end
 
 local function InitComponent(raw, szType)
-	GetComponentType(raw, szType)
+	SetComponentType(raw, szType)
 	if szType == 'WndSliderBox' then
 		local scroll = raw:Lookup('WndNewScrollBar_Default')
 		SetComponentProp(raw, 'bShowPercentage', true)
@@ -292,12 +291,16 @@ local function InitComponent(raw, szType)
 		SetComponentProp(raw, 'ResponseUpdateScroll', function(bOnlyUI)
 			local _this = this
 			this = raw
-			local nScrollPos, nStepCount = scroll:GetScrollPos(), scroll:GetStepCount()
-			local nCurrentValue = GetComponentProp(raw, 'bShowPercentage') and (nScrollPos * 100 / nStepCount) or (nScrollPos + raw.nOffset)
-			raw:Lookup('', 'Text_Default'):SetText(raw.FormatText(nCurrentValue, GetComponentProp(raw, 'bShowPercentage')))
+			local nScrollPos = scroll:GetScrollPos()
+			local nStepCount = scroll:GetStepCount()
+			local nOffset = GetComponentProp(raw, 'nOffset')
+			local bShowPercentage = GetComponentProp(raw, 'bShowPercentage')
+			local nCurrentValue = bShowPercentage and (nScrollPos * 100 / nStepCount) or (nScrollPos + nOffset)
+			local szText = GetComponentProp(raw, 'FormatText')(nCurrentValue, bShowPercentage)
+			raw:Lookup('', 'Text_Default'):SetText(szText)
 			if not bOnlyUI then
 				for _, fn in ipairs(GetComponentProp(raw, 'onChangeEvents')) do
-					pcall(fn, raw, nCurrentValue)
+					fn(raw, nCurrentValue)
 				end
 			end
 			this = _this
@@ -2964,7 +2967,6 @@ function XGUI:change(fnOnChange)
 				XGUI.RegisterUIEvent(edt, 'OnEditChanged', function() pcall(fnOnChange, raw, edt:GetText()) end)
 			end
 			if GetComponentType(raw) == 'WndSliderBox' then
-			Output(GetComponentProp(raw, 'onChangeEvents'), raw)
 				insert(GetComponentProp(raw, 'onChangeEvents'), fnOnChange)
 			end
 		end
