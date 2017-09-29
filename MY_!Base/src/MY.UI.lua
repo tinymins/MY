@@ -114,6 +114,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.onchange           ~= nil then ui:change     (arg.onchange   ) end
 		if arg.autocomplete       ~= nil then for _, v in ipairs(arg.autocomplete) do ui:autocomplete(unpack(v)) end end
 	end
+	return ui
 end
 XGUI.ApplyUIArguments = ApplyUIArguments
 
@@ -683,6 +684,7 @@ function XGUI:children(filter)
 						insert(raws, child)
 						hash[path] = true
 					end
+					child = child:GetNext()
 				end
 				local h = GetComponentElement(raw, 'MAIN_HANDLE') or raw:Lookup('', '')
 				if h then
@@ -733,7 +735,7 @@ function XGUI:find(filter)
 					child = raw:Lookup('', '')
 					if child then
 						for i = 0, child:GetItemCount() - 1 do
-							insert(children, raw:Lookup(i))
+							insert(children, child:Lookup(i))
 						end
 					end
 					child = raw:GetFirstChild()
@@ -844,27 +846,32 @@ end
 
 -- remove
 -- same as jQuery.remove()
-function XGUI:remove()
+-- (void) Instance:remove()
+-- (self) Instance:remove(function onRemove)
+function XGUI:remove(onRemove)
 	self:_checksum()
-	for _, raw in ipairs(self.raws) do
-		local onDestroy = GetComponentProp(raw, 'OnDestroy')
-		if onDestroy then
-			onDestroy(raw)
+	if onRemove then
+		for _, raw in ipairs(self.raws) do
+			SetComponentProp(raw, 'onRemove', onRemove)
 		end
-		if raw:GetType() == 'WndFrame' then
-			Wnd.CloseWindow(raw)
-		elseif raw:GetBaseType() == 'Wnd' then
-			raw:Destroy()
-		else
-			local h = raw:GetParent()
-			if h:GetType() == 'Handle' then
-				h:RemoveItem(raw)
-				h:FormatAllItemPos()
+	else
+		for _, raw in ipairs(self.raws) do
+			local onRemove = GetComponentProp(raw, 'onRemove')
+			if not onRemove or not onRemove(raw) then
+				if raw:GetType() == 'WndFrame' then
+					Wnd.CloseWindow(raw)
+				elseif raw:GetBaseType() == 'Wnd' then
+					raw:Destroy()
+				else
+					local h = raw:GetParent()
+					if h:GetType() == 'Handle' then
+						h:RemoveItem(raw)
+						h:FormatAllItemPos()
+					end
+				end
 			end
 		end
-	end
-	for i = 1, #self.raws do
-		remove(self.raws)
+		self:_checksum()
 	end
 	return self
 end
@@ -897,7 +904,7 @@ end
 local function OnCommonComponentMouseLeave() HideTip() end
 
 -- xml string
- _tItemXML = {
+local _tItemXML = {
 	['Text'] = '<text>w=150 h=30 valign=1 font=162 eventid=371 </text>',
 	['Image'] = '<image>w=100 h=100 </image>',
 	['Box'] = '<box>w=48 h=48 eventid=525311 </box>',
@@ -3160,21 +3167,16 @@ function  XGUI.CreateFrame(szName, opt)
 		end)
 	end
 	if opt.simple then
-		frm.simple = true
+		SetComponentProp(frm, 'simple', true)
 		frm:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 		-- top right buttons
 		if not opt.close then
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close'):Destroy()
 		else
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close/Btn_Close').OnLButtonClick = function()
-				if frm.OnCloseButtonClick then
-					local status, res = pcall(frm.OnCloseButtonClick)
-					if status and res then
-						return
-					end
+				if XGUI(frm):remove():count() == 0 then
+					PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 				end
-				Wnd.CloseWindow(frm)
-				PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 			end
 		end
 		if opt.onrestore then
@@ -3315,7 +3317,7 @@ function  XGUI.CreateFrame(szName, opt)
 			frm:Lookup('', 'Shadow_Bg'):SetAlpha(opt.alpha /255 * 200)
 		end
 	elseif not opt.empty then
-		frm.intact = true
+		SetComponentProp(frm, 'intact', true)
 		frm:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 		frm:Lookup('Btn_Close').OnLButtonClick = function()
 			if frm.OnCloseButtonClick then
@@ -3339,10 +3341,9 @@ function  XGUI.CreateFrame(szName, opt)
 		end
 	end
 	if not opt.anchor then
-		opt.anchor = {s='CENTER', r='CENTER', x=0, y=0}
+		opt.anchor = { s = 'CENTER', r = 'CENTER', x = 0, y = 0 }
 	end
-	ApplyUIArguments(ui, opt)
-	return ui
+	return ApplyUIArguments(ui, opt)
 end
 
 -- 打开取色板
