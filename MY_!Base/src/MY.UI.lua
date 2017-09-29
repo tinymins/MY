@@ -3320,13 +3320,7 @@ function  XGUI.CreateFrame(szName, opt)
 		SetComponentProp(frm, 'intact', true)
 		frm:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 		frm:Lookup('Btn_Close').OnLButtonClick = function()
-			if frm.OnCloseButtonClick then
-				local status, res = pcall(frm.OnCloseButtonClick)
-				if status and res then
-					return
-				end
-			end
-			Wnd.CloseWindow(frm)
+			XGUI(frm):remove()
 		end
 		-- load bg uitex
 		local szUITexCommon = MY.GetAddonInfo().szUITexCommon
