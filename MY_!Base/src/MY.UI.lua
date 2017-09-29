@@ -13,9 +13,10 @@
 ------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
-local insert, remove, concat = insert, remove, concat
-local sub, len, char, rep = sub, len, char, rep
-local byte, format, gsub = byte, format, gsub
+local insert, remove, concat = table.insert, table.remove, table.concat
+local sub, len, char, rep = string.sub, string.len, string.char, string.rep
+local byte, format, gsub = string.byte, string.format, string.gsub
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local type, tonumber, tostring = type, tonumber, tostring
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local floor, min, max, ceil = math.floor, math.min, math.max, math.ceil
@@ -121,8 +122,6 @@ local function IsElement(element)
 end
 
 local GetComponentProp, SetComponentProp -- 组件私有属性 仅本文件内使用
-local GetComponentType, SetComponentType -- 组件名字记录
-local GetComponentData, SetComponentData -- 组件公有数据 可在外部通过:data()读写
 do local l_prop = setmetatable({}, { __mode = 'k' })
 	function GetComponentProp(raw, ...)
 		if not raw or not l_prop[raw] then
@@ -159,7 +158,26 @@ do local l_prop = setmetatable({}, { __mode = 'k' })
 		end
 		prop[k[kc]] = v
 	end
+end
 
+local GetComponentType, SetComponentType -- 组件名字记录
+do local l_type = setmetatable({}, { __mode = 'k' })
+	function GetComponentType(raw)
+		if not raw then
+			return
+		end
+		return l_type[raw] or raw:GetType()
+	end
+	function SetComponentType(raw, type)
+		if not raw then
+			return
+		end
+		l_type[raw] = type
+	end
+end
+
+local GetComponentData, SetComponentData -- 组件公有数据 可在外部通过:data()读写
+do local l_data = setmetatable({}, { __mode = 'k' })
 	function GetComponentData(raw, k)
 		return raw and l_data[raw] and l_data[raw][k]
 	end
@@ -172,14 +190,6 @@ do local l_prop = setmetatable({}, { __mode = 'k' })
 			l_data[raw] = {}
 		end
 		l_data[raw][k] = v
-	end
-
-	function GetComponentType(raw)
-		return GetComponentProp(raw, 'type') or (raw and raw:GetType())
-	end
-
-	function SetComponentType(raw, szType)
-		SetComponentProp(raw, 'type', szType)
 	end
 end
 
@@ -265,12 +275,13 @@ local function GetComponentElement(raw, elementType)
 	return element
 end
 
-local function InitComponent(raw)
+local function InitComponent(raw, szType)
+	GetComponentType(raw, szType)
 	if szType == 'WndSliderBox' then
 		local scroll = raw:Lookup('WndNewScrollBar_Default')
 		SetComponentProp(raw, 'bShowPercentage', true)
 		SetComponentProp(raw, 'nOffset', 0)
-		SetComponentProp(raw, 'OnChange', {})
+		SetComponentProp(raw, 'onChangeEvents', {})
 		SetComponentProp(raw, 'FormatText', function(value, bPercentage)
 			if bPercentage then
 				return format('%.2f%%', value)
@@ -285,7 +296,7 @@ local function InitComponent(raw)
 			local nCurrentValue = GetComponentProp(raw, 'bShowPercentage') and (nScrollPos * 100 / nStepCount) or (nScrollPos + raw.nOffset)
 			raw:Lookup('', 'Text_Default'):SetText(raw.FormatText(nCurrentValue, GetComponentProp(raw, 'bShowPercentage')))
 			if not bOnlyUI then
-				for _, fn in ipairs(raw.tMyOnChange) do
+				for _, fn in ipairs(GetComponentProp(raw, 'onChangeEvents')) do
 					pcall(fn, raw, nCurrentValue)
 				end
 			end
@@ -650,7 +661,7 @@ end
 function XGUI:children(filter)
 	self:_checksum()
 	if type(filter) == 'string' and sub(filter, 1, 1) == '#' and sub(filter, 2, 2) ~= '^' then
-		local raws, hash, name, child, path = {}, {}, sub(name, 2)
+		local raws, hash, name, child, path = {}, {}, sub(filter, 2)
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'MAIN_WINDOW') or raw
 			child = raw:Lookup(name)
@@ -896,13 +907,14 @@ end
 local function OnCommonComponentMouseLeave() HideTip() end
 
 -- xml string
-local _tItemXML = {
+ _tItemXML = {
 	['Text'] = '<text>w=150 h=30 valign=1 font=162 eventid=371 </text>',
 	['Image'] = '<image>w=100 h=100 </image>',
 	['Box'] = '<box>w=48 h=48 eventid=525311 </box>',
 	['Shadow'] = '<shadow>w=15 h=15 eventid=277 </shadow>',
 	['Handle'] = '<handle>firstpostype=0 w=10 h=10</handle>',
 }
+local _szItemINI = MY.GetAddonInfo().szFrameworkRoot .. 'ui\\HandleItems.ini'
 -- append
 -- similar as jQuery.append()
 -- Instance:append(szType,[ szName,] tArg)
@@ -910,15 +922,14 @@ local _tItemXML = {
 function XGUI:append(szType, szName, tArg, bReturnNewItem)
 	self:_checksum()
 	local szXml
-	assert(type(szType) == 'string')
+	assert(type(szType) == 'string' and #szType > 0)
 	if type(szName) == 'table' then
 		szName, tArg, bReturnNewItem = nil, szName, tArg
-	elseif szType:find('%<') then
+	end
+	if szType:find('%<') then
 		szType, szXml, bReturnNewItem = nil, szType, szName
 	elseif _tItemXML[szType] then
 		szType, szXml = nil, _tItemXML[szType]
-	elseif #szType == 0 then
-		return
 	end
 	local ui = XGUI()
 	if szType then -- append from ini file
@@ -941,21 +952,22 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 				if not raw then
 					MY.Debug({_L('can not find wnd component [%s]', szType)}, 'MY#UI#append', MY_DEBUG.ERROR)
 				else
-					SetComponentType(raw, szType)
+					InitComponent(raw, szType)
 					if szName then
 						raw:SetName(szName)
 					end
 					raw:ChangeRelation(parentWnd, true, true)
-					InitComponent(raw)
 					ui = ui:add(raw)
 					XGUI(raw):hover(OnCommonComponentMouseEnter, OnCommonComponentMouseLeave):change(OnCommonComponentMouseEnter)
 				end
 				Wnd.CloseWindow(frame)
 			elseif sub(szType, 1, 3) ~= 'Wnd' and parentHandle then
-				raw = parentHandle:AppendItemFromIni(MY.GetAddonInfo().szFrameworkRoot .. 'ui\\HandleItems.ini', 'Handle_' .. szType, szName)
+				raw = parentHandle:AppendItemFromIni(
+					_szItemINI, szType, szName or szType
+				)
 				parentHandle:FormatAllItemPos()
 				if not raw then
-					return MY.Debug({_L('unable to append handle item [%s]', szType)},'MY#UI:append', MY_DEBUG.ERROR)
+					return MY.Debug({ _L('unable to append handle item [%s]', szType) }, 'MY#UI:append', MY_DEBUG.ERROR)
 				else
 					ui = ui:add(raw)
 				end
@@ -970,7 +982,7 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 				h:AppendItemFromString(szXml)
 				h:FormatAllItemPos()
 				for i = startIndex, h:GetItemCount() - 1 do
-					ui = ui:add(h:GetItem(i))
+					ui = ui:add(h:Lookup(i))
 				end
 			end
 		end
@@ -1894,12 +1906,12 @@ function XGUI:pos(nLeft, nTop)
 			if GetComponentType(raw) == 'WndFrame' then
 				GetComponentType(raw, 'FRAME'):SetRelPos(nLeft, nTop)
 			elseif raw:GetBaseType() == 'Wnd' then
-				GetComponentType(raw, 'Wnd'):SetRelPos(nLeft, nTop)
+				raw:SetRelPos(nLeft, nTop)
 			else
-				element = GetComponentType(raw, 'ITEM')
-				if element then
-					element:SetRelPos(nLeft, nTop)
-					element:GetParent():FormatAllItemPos()
+				raw:SetRelPos(nLeft, nTop)
+				element = raw:GetParent()
+				if element and element:GetType() == 'Handle' then
+					element:FormatAllItemPos()
 				end
 			end
 		end
@@ -2198,8 +2210,10 @@ function XGUI:size(nWidth, nHeight, nRawWidth, nRawHeight)
 			else
 				local itm = GetComponentElement(raw, 'ITEM') or raw
 				itm:SetSize(nWidth, nHeight)
-				itm:GetParent():FormatAllItemPos()
-				GetComponentElement(raw, 'MAIN_HANDLE'):FormatAllItemPos()
+				local h = itm:GetParent()
+				if h and h:GetType() == 'Handle' then
+					h:FormatAllItemPos()
+				end
 			end
 			if raw.OnSizeChanged then
 				ExecuteWithThis(raw, raw.OnSizeChanged)
@@ -2950,7 +2964,8 @@ function XGUI:change(fnOnChange)
 				XGUI.RegisterUIEvent(edt, 'OnEditChanged', function() pcall(fnOnChange, raw, edt:GetText()) end)
 			end
 			if GetComponentType(raw) == 'WndSliderBox' then
-				insert(raw.tMyOnChange, fnOnChange)
+			Output(GetComponentProp(raw, 'onChangeEvents'), raw)
+				insert(GetComponentProp(raw, 'onChangeEvents'), fnOnChange)
 			end
 		end
 		return self
@@ -3867,7 +3882,7 @@ function XGUI.GetShadowHandle(szName)
 	end
 	local sh = Station.Lookup('Lowest/MY_Shadows') or Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. 'ui/MY_Shadows.ini', 'MY_Shadows')
 	if not sh:Lookup('', szName) then
-		sh:Lookup('', ''):AppendItemFromString(format('<handle> name=\'%s\' </handle>', szName))
+		sh:Lookup('', ''):AppendItemFromString(format('<handle> name="%s" </handle>', szName))
 	end
 	MY.Debug({'Create sh # ' .. szName}, 'XGUI', MY_DEBUG.LOG)
 	return sh:Lookup('', szName)
