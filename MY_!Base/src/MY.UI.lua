@@ -7,6 +7,21 @@
 -- @Last modified time: 2017-02-08 20:46:39
 -----------------------------------------------
 
+------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+------------------------------------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local insert, remove, concat = table.insert, table.remove, table.concat
+local sub, len, char, rep = string.sub, string.len, string.char, string.rep
+local byte, format, gsub = string.byte, string.format, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local floor, min, max, ceil = math.floor, math.min, math.max, math.ceil
+local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+
 -------------------------------------
 -- UI object class
 -------------------------------------
@@ -45,24 +60,7 @@ XGUI = setmetatable({}, {
 	end,
 })
 end
-MY.UI = XGUI
-local XGUI = XGUI
-local _L = MY.LoadLangPack()
-
-------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
-------------------------------------------------------------------------
-local setmetatable = setmetatable
-local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
-local insert, remove, concat = table.insert, table.remove, table.concat
-local sub, len, char, rep = string.sub, string.len, string.char, string.rep
-local byte, format, gsub = string.byte, string.format, string.gsub
-local type, tonumber, tostring = type, tonumber, tostring
-local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
-local floor, min, max, ceil = math.floor, math.min, math.max, math.ceil
-local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
-local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local _L, XGUI = MY.LoadLangPack(), XGUI
 
 ---------------------------------------------------------------------
 -- 本地的 UI 组件对象
@@ -705,18 +703,18 @@ local function OnCommonComponentMouseEnter()
 	if not hText then
 		return
 	end
-	
+
 	local szText = hText:GetText()
 	if empty(szText) then
 		return
 	end
-	
+
 	local nDisLen = hText:GetTextPosExtent()
 	local nLen = wstring.len(hText:GetText())
 	if nDisLen == nLen then
 		return
 	end
-	
+
 	local nW = hText:GetW()
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
@@ -1946,7 +1944,7 @@ function XGUI:shake(xrange, yrange, maxspeed, time)
 				elseif GetTime() - starttime < time then
 					local x, y = ui:pos()
 					x, y = x - xoffset, y - yoffset
-					
+
 					xoffset = xoffset + math.random(xspeed > 0 and 0 or xspeed, xspeed > 0 and xspeed or 0)
 					if xoffset < - xhalfrange then
 						xoffset = math.min(- xrange - xoffset, xhalfrange)
@@ -1955,7 +1953,7 @@ function XGUI:shake(xrange, yrange, maxspeed, time)
 						xoffset = math.max(xrange - xoffset, - xhalfrange)
 						xspeed = - xspeed
 					end
-					
+
 					yoffset = yoffset + math.random(yspeed > 0 and 0 or yspeed, yspeed > 0 and yspeed or 0)
 					if yoffset < - yhalfrange then
 						yoffset =  math.min(- yrange - yoffset, yhalfrange)
@@ -1964,7 +1962,7 @@ function XGUI:shake(xrange, yrange, maxspeed, time)
 						yoffset = math.max(yrange - yoffset, - yhalfrange)
 						yspeed = - yspeed
 					end
-					
+
 					ui:pos(x + xoffset, y + yoffset)
 				else
 					local x, y = ui:pos()
@@ -3730,7 +3728,7 @@ function XGUI.OpenIE(szAddr, bDisableSound, w, h)
 	local frame = Wnd.OpenWindow("InternetExplorer", "IE"..nIndex)
 	frame.bIE = true
 	frame.nIndex = nIndex
-	
+
 	if w and h then
 		XGUI.ResizeIE(frame, w, h)
 	end
@@ -3833,3 +3831,5 @@ function XGUI.GetShadowHandle(szName)
 	MY.Debug({"Create sh # " .. szName}, "XGUI", MY_DEBUG.LOG)
 	return sh:Lookup("", szName)
 end
+
+MY.UI = XGUI
