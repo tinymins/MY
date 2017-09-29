@@ -484,7 +484,7 @@ function XGUI:ctor(super, mixed)
 	return self
 end
 
---  del bad eles
+--  del bad raws
 -- (self) _checksum()
 function XGUI:_checksum()
 	for i, raw in ipairs_r(self.raws) do
@@ -501,7 +501,7 @@ function XGUI:add(mixed)
 	self:_checksum()
 	local raws = {}
 	for i, raw in ipairs(self.raws) do
-		insert(eles, raw)
+		insert(raws, raw)
 	end
 	if IsString(mixed) then
 		mixed = Station.Lookup(mixed)
@@ -837,7 +837,7 @@ end
 -- get count
 function XGUI:count()
 	self:_checksum()
-	return #self.eles
+	return #self.raws
 end
 
 -----------------------------------------------------------
@@ -1109,7 +1109,7 @@ function XGUI:enable(...)
 end
 end
 
--- show/hide eles
+-- show/hide raws
 function XGUI:toggle(bShow)
 	self:_checksum()
 	for _, raw in ipairs(self.raws) do
