@@ -950,9 +950,6 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 					MY.Debug({_L('can not find wnd component [%s]', szType)}, 'MY#UI#append', MY_DEBUG.ERROR)
 				else
 					InitComponent(raw, szType)
-					if szName then
-						raw:SetName(szName)
-					end
 					raw:ChangeRelation(parentWnd, true, true)
 					ui = ui:add(raw)
 					XGUI(raw):hover(OnCommonComponentMouseEnter, OnCommonComponentMouseLeave):change(OnCommonComponentMouseEnter)
@@ -983,6 +980,9 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 				end
 			end
 		end
+	end
+	if szName then
+		ui:name(szName)
 	end
 	ApplyUIArguments(ui, tArg)
 	return bReturnNewItem and ui or self
