@@ -122,6 +122,7 @@ XGUI.ApplyUIArguments = ApplyUIArguments
 local function IsElement(element)
 	return type(element) == 'table' and element.IsValid and element:IsValid()
 end
+local function IsNil     (var) return type(var) == 'nil'      end
 local function IsTable   (var) return type(var) == 'table'    end
 local function IsNumber  (var) return type(var) == 'number'   end
 local function IsString  (var) return type(var) == 'string'   end
