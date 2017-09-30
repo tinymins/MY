@@ -72,7 +72,7 @@ MY_Anmerkungen.ReloadNotePanel = function()
 		  :multiLine(true):text(MY_Anmerkungen.szNotePanelContent)
 		  :change(function(raw, txt) MY_Anmerkungen.szNotePanelContent = txt end)
 
-		ui:onuievent("OnFrameDragEnd", function()
+		ui:uievent("OnFrameDragEnd", function()
 			MY_Anmerkungen.anchorNotePanel = MY.UI("Normal/MY_Anmerkungen_NotePanel"):anchor()
 		end):event("UI_SCALED", function()
 			MY.UI(this):anchor(MY_Anmerkungen.anchorNotePanel)
@@ -94,7 +94,7 @@ MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
 	MY.RegisterEsc('MY_Anmerkungen_PlayerNoteEditPanel', function()
 		return ui and ui:count() > 0
 	end, CloseFrame)
-	ui:onuievent("OnCloseButtonClick", CloseFrame)
+	ui:uievent("OnCloseButtonClick", CloseFrame)
 
 	local w, h = 300, 210
 	local x, y = 20 , 0
