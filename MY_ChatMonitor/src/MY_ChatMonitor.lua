@@ -240,12 +240,12 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
 end
 
 _C.OnPanelActive = function(wnd)
-    local ui = MY.UI(wnd)
+    local ui = XGUI(wnd)
     local w, h = ui:size()
 
     ui:append("Text", { x = 22, y = 15, w = 100, h = 25, text = _L['key words:'] })
 
-    local autocomplete = ui:append("WndAutocomplete", {
+    ui:append("WndAutocomplete", {
         x = 80, y = 15, w = w - 226, h = 25, text = MY_ChatMonitor.szKeyWords,
         onchange = function(raw, szText) MY_ChatMonitor.szKeyWords = szText end,
         onfocus = function(self)
@@ -259,7 +259,7 @@ _C.OnPanelActive = function(wnd)
         end,
         onclick = function(nButton, raw)
             if IsPopupMenuOpened() then
-                MY.UI(raw):autocomplete('close')
+                XGUI(raw):autocomplete('close')
             else
                 local source = {}
                 for _, szOpt in ipairs(MY.LoadLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}) or {}) do
@@ -267,8 +267,8 @@ _C.OnPanelActive = function(wnd)
                         table.insert(source, szOpt)
                     end
                 end
-                MY.UI(raw):autocomplete('option', 'source', source)
-                MY.UI(raw):autocomplete('search', '')
+                XGUI(raw):autocomplete('option', 'source', source)
+                XGUI(raw):autocomplete('search', '')
             end
         end,
         autocomplete = {
@@ -289,7 +289,7 @@ _C.OnPanelActive = function(wnd)
                                 table.insert(t, szVal)
                                 MY.SaveLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}, t)
                             end
-                        end, function() end, function() end, nil, autocomplete:text() )
+                        end, function() end, function() end, nil, XGUI(wnd):text() )
                     end })
                 end,
             },
@@ -301,7 +301,7 @@ _C.OnPanelActive = function(wnd)
                             table.remove(t, i)
                         end
                     end
-                    MY.SaveLUAData({_C.szLuaData, t, MY_DATA_PATH.GLOBAL})
+                    MY.SaveLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}, t)
                 end,
             },
         },
