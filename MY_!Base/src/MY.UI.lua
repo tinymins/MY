@@ -2599,7 +2599,7 @@ function XGUI:event(szEvent, fnEvent)
 end
 
 -- 绑定ele的UI事件
-function XGUI:onuievent(szEvent, fnEvent)
+function XGUI:uievent(szEvent, fnEvent)
 	self:_checksum()
 	if not IsString(szEvent) then
 		return self
