@@ -513,7 +513,7 @@ _C.Init = function()
     _C.uiFrame = MY.UI.CreateFrame('MY_ChatMonitor', {level = 'Topmost', empty = true})
       :size(250,150)
       :toggle(false)
-      :onevent("UI_SCALED", function() -- 移动提示窗位置
+      :event("UI_SCALED", function() -- 移动提示窗位置
         _C.uiFrame:anchor(MY_ChatMonitor.anchor)
       end)
       :customMode(_L["chat monitor"], function()

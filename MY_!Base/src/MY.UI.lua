@@ -2548,7 +2548,7 @@ end
 -----------------------------------------------------------
 
 -- 绑定Frame的事件
-function XGUI:onevent(szEvent, fnEvent)
+function XGUI:event(szEvent, fnEvent)
 	self:_checksum()
 	if IsString(szEvent) then
 		local nPos, szKey = (StringFindW(szEvent, '.'))
@@ -2625,18 +2625,18 @@ end
 function XGUI:customMode(szTip, fnOnEnterCustomMode, fnOnLeaveCustomMode, szPoint)
 	self:_checksum()
 	if IsString(szTip) then
-		self:onevent('ON_ENTER_CUSTOM_UI_MODE', function()
+		self:event('ON_ENTER_CUSTOM_UI_MODE', function()
 			UpdateCustomModeWindow(this, szTip, GetComponentProp(this, 'bPenetrable'))
-		end):onevent('ON_LEAVE_CUSTOM_UI_MODE', function()
+		end):event('ON_LEAVE_CUSTOM_UI_MODE', function()
 			UpdateCustomModeWindow(this, szTip, GetComponentProp(this, 'bPenetrable'))
 		end)
 		if IsFunction(fnOnEnterCustomMode) then
-			self:onevent('ON_ENTER_CUSTOM_UI_MODE', function()
+			self:event('ON_ENTER_CUSTOM_UI_MODE', function()
 				fnOnEnterCustomMode(GetFrameAnchor(this, szPoint))
 			end)
 		end
 		if IsFunction(fnOnLeaveCustomMode) then
-			self:onevent('ON_LEAVE_CUSTOM_UI_MODE', function()
+			self:event('ON_LEAVE_CUSTOM_UI_MODE', function()
 				fnOnLeaveCustomMode(GetFrameAnchor(this, szPoint))
 			end)
 		end
@@ -3214,7 +3214,7 @@ function  XGUI.CreateFrame(szName, opt)
 					frm.w, frm.h = frm:GetSize()
 				end
 				local w, h = Station.GetClientSize()
-				XGUI(frm):pos(0, 0):drag(false):size(w, h):onevent('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
+				XGUI(frm):pos(0, 0):drag(false):size(w, h):event('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
 					local w, h = Station.GetClientSize()
 					XGUI(frm):pos(0, 0):size(w, h)
 				end)
@@ -3231,7 +3231,7 @@ function  XGUI.CreateFrame(szName, opt)
 			end
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize').OnCheckBoxUncheck = function()
 				XGUI(frm)
-				  :onevent('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
+				  :event('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
 				  :size(frm.w, frm.h)
 				  :anchor(frm.anchor)
 				  :drag(true)
