@@ -13,7 +13,7 @@ if DelayCall and BreatheCall and FrameCall and RenderCall then
 	MY.FrameCall   = FrameCall
 	MY.RenderCall  = RenderCall
 else
-	
+
 local _time      -- current time
 local _count = 0 -- the count of onactive
 local _no_active
@@ -450,7 +450,7 @@ local function __OnActive()
 	onFrameCall()
 	onBreatheCall()
 end
-MY.UI.RegisterUIEvent(MY, "OnFrameBreathe", __OnActive)
+XGUI(MY):uievent("OnFrameBreathe", __OnActive)
 
 LuaActive_Enable(false)
 

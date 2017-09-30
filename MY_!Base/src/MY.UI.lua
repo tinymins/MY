@@ -379,7 +379,7 @@ local function InitComponent(raw, szType)
 			source       = {}   ,  -- option list
 		})
 	elseif szType == 'WndRadioBox' then
-		XGUI.RegisterUIEvent(raw, 'OnLButtonUp', function()
+		XGUI(raw):uievent('OnLButtonUp', function()
 			local group = GetComponentProp(raw, 'group')
 			local p = raw:GetParent():GetFirstChild()
 			while p do
@@ -1141,17 +1141,17 @@ function XGUI:drag(...)
 		for _, raw in ipairs(self.raws) do
 			if raw:GetType() == 'WndFrame' then
 				if nX then
-					XGUI.RegisterUIEvent(raw, 'OnFrameDragSetPosEnd', nX)
+					XGUI(raw):uievent('OnFrameDragSetPosEnd', nX)
 				end
 				if nY then
-					XGUI.RegisterUIEvent(raw, 'OnFrameDragEnd', nY)
+					XGUI(raw):uievent('OnFrameDragEnd', nY)
 				end
 			elseif raw:GetBaseType() == 'Item' then
 				if nX then
-					XGUI.RegisterUIEvent(raw, 'OnItemLButtonDrag', nX)
+					XGUI(raw):uievent('OnItemLButtonDrag', nX)
 				end
 				if nY then
-					XGUI.RegisterUIEvent(raw, 'OnItemLButtonDragEnd', nY)
+					XGUI(raw):uievent('OnItemLButtonDragEnd', nY)
 				end
 			end
 		end
@@ -2008,7 +2008,7 @@ function XGUI:size(nWidth, nHeight, nRawWidth, nRawHeight)
 	self:_checksum()
 	if IsFunction(nWidth) then
 		for _, raw in ipairs(self.raws) do
-			XGUI.RegisterUIEvent(raw, 'OnSizeChanged', nWidth)
+			XGUI(raw):uievent('OnSizeChanged', nWidth)
 		end
 	elseif IsNumber(nWidth) or IsNumber(nHeight) then
 		local componentType, element
@@ -2196,9 +2196,7 @@ function XGUI:size(nWidth, nHeight, nRawWidth, nRawHeight)
 					h:FormatAllItemPos()
 				end
 			end
-			if raw.OnSizeChanged then
-				ExecuteWithThis(raw, raw.OnSizeChanged)
-			end
+			SafeExecuteWithThis(raw, raw.OnSizeChanged)
 		end
 		return self
 	else
@@ -2251,7 +2249,7 @@ function XGUI:scroll(mixed)
 			for _, raw in ipairs(self.raws) do
 				local raw = raw:Lookup('WndScrollBar')
 				if raw then
-					XGUI.RegisterUIEvent(raw, 'OnScrollBarPosChanged', function()
+					XGUI(raw):uievent('OnScrollBarPosChanged', function()
 						local nDistance = Station.GetMessageWheelDelta()
 						local nScrollPos = raw:GetScrollPos()
 						local nStepCount = raw:GetStepCount()
@@ -2616,18 +2614,60 @@ end
 -- 绑定ele的UI事件
 function XGUI:uievent(szEvent, fnEvent)
 	self:_checksum()
-	if not IsString(szEvent) then
-		return self
-	end
-	if IsFunction(fnEvent) then
-		for _, raw in ipairs(self.raws) do
-			XGUI.RegisterUIEvent(raw, szEvent, fnEvent)
+	if IsString(szEvent) then
+		local nPos, szKey = (StringFindW(szEvent, '.'))
+		if nPos then
+			szKey = sub(szEvent, nPos + 1)
+			szEvent = sub(szEvent, 1, nPos - 1)
 		end
-	else
-		for _, raw in ipairs(self.raws) do
-			if raw then
-				if raw['tMy' .. szEvent] then
-					raw['tMy' .. szEvent] = {}
+		if IsFunction(fnEvent) then
+			for _, raw in ipairs(self.raws) do
+				local uievents = GetComponentProp(raw, 'uievents')
+				if not uievents then
+					uievents = {}
+					SetComponentProp(raw, 'uievents', uievents)
+				end
+				if not uievents[szEvent] then
+					uievents[szEvent] = {}
+					local onEvent = IsFunction(raw[szEvent]) and raw[szEvent]
+					raw[szEvent] = function(...)
+						if onEvent then
+							onEvent(...)
+						end
+						local rets = {}
+						for _, p in ipairs(uievents[szEvent]) do
+							local res = { p.fn(...) }
+							if #res > 0 then
+								if #rets > 0 then
+									MY.Debug(
+										{ _L('Set return value failed, cause another hook has alreay take a returnval. [Path] %s', XGUI.GetTreePath(raw)) },
+										'XGUI:uievent#' .. szEvent .. ':' .. (p.id or 'Unnamed'), MY_DEBUG.WARNING
+									)
+								else
+									res = t
+								end
+							end
+						end
+						return unpack(rets)
+					end
+				end
+				insert(uievents[szEvent], { id = szKey, fn = fnEvent })
+			end
+		else
+			for _, raw in ipairs(self.raws) do
+				local uievents = GetComponentProp(raw, 'uievents')
+				if uievents then
+					if not szKey then
+						for e, _ in pairs(uievents) do
+							uievents[e] = {}
+						end
+					elseif uievents[szEvent] then
+						for i, p in ipairs_r(uievents[szEvent]) do
+							if p.id == szKey then
+								remove(uievents[szEvent], i)
+							end
+						end
+					end
 				end
 			end
 		end
@@ -2666,7 +2706,7 @@ function XGUI:breathe(fnOnFrameBreathe)
 	if IsFunction(fnOnFrameBreathe) then
 		for _, raw in ipairs(self.raws) do
 			if raw:GetType() == 'WndFrame' then
-				XGUI.RegisterUIEvent(raw, 'OnFrameBreathe', fnOnFrameBreathe)
+				XGUI(raw):uievent('OnFrameBreathe', fnOnFrameBreathe)
 			end
 		end
 	end
@@ -2745,22 +2785,22 @@ function XGUI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 			if IsFunction(fnLClick) then
 				local fnAction = function() fnLClick(MY.Const.Event.Mouse.LBUTTON, raw) end
 				if GetComponentType(raw) == 'WndScrollBox' then
-					XGUI.RegisterUIEvent(GetComponentElement(raw, 'MAIN_HANDLE'),'OnItemLButtonClick' , fnAction)
+					XGUI(GetComponentElement(raw, 'MAIN_HANDLE')):uievent('OnItemLButtonClick', fnAction)
 				else
 					local cmb = GetComponentElement(raw, 'COMBOBOX')
 					local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 					local itm = GetComponentElement(raw, 'ITEM')
 					local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
 					if cmb then
-						XGUI.RegisterUIEvent(cmb ,'OnLButtonClick'     , fnAction)
+						XGUI(cmb):uievent('OnLButtonClick', fnAction)
 					elseif wnd then
-						XGUI.RegisterUIEvent(wnd ,'OnLButtonClick'     , fnAction)
+						XGUI(wnd):uievent('OnLButtonClick', fnAction)
 					elseif itm then
 						itm:RegisterEvent(16)
-						XGUI.RegisterUIEvent(itm ,'OnItemLButtonClick' , fnAction)
+						XGUI(itm):uievent('OnItemLButtonClick', fnAction)
 					elseif hdl then
 						hdl:RegisterEvent(16)
-						XGUI.RegisterUIEvent(hdl ,'OnItemLButtonClick' , fnAction)
+						XGUI(hdl):uievent('OnItemLButtonClick', fnAction)
 					end
 				end
 			end
@@ -2770,22 +2810,22 @@ function XGUI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 			if IsFunction(fnRClick) then
 				local fnAction = function() fnRClick(MY.Const.Event.Mouse.RBUTTON, raw) end
 				if GetComponentType(raw) == 'WndScrollBox' then
-					XGUI.RegisterUIEvent(GetComponentElement(raw, 'MAIN_HANDLE') ,'OnItemRButtonClick' , fnAction)
+					XGUI(GetComponentElement(raw, 'MAIN_HANDLE')):uievent('OnItemRButtonClick', fnAction)
 				else
 					local cmb = GetComponentElement(raw, 'COMBOBOX')
 					local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 					local itm = GetComponentElement(raw, 'ITEM')
 					local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
 					if cmb then
-						XGUI.RegisterUIEvent(cmb ,'OnRButtonClick'     , fnAction)
+						XGUI(cmb):uievent('OnRButtonClick', fnAction)
 					elseif wnd then
-						XGUI.RegisterUIEvent(wnd ,'OnRButtonClick'     , fnAction)
+						XGUI(wnd):uievent('OnRButtonClick', fnAction)
 					elseif itm then
 						itm:RegisterEvent(32)
-						XGUI.RegisterUIEvent(itm ,'OnItemRButtonClick' , fnAction)
+						XGUI(itm):uievent('OnItemRButtonClick', fnAction)
 					elseif hdl then
 						hdl:RegisterEvent(32)
-						XGUI.RegisterUIEvent(hdl ,'OnItemRButtonClick' , fnAction)
+						XGUI(hdl):uievent('OnItemRButtonClick', fnAction)
 					end
 				end
 			end
@@ -2842,10 +2882,10 @@ function XGUI:hover(fnHover, fnLeave, bNoAutoBind)
 			local wnd = GetComponentElement(raw, 'EDIT') or GetComponentElement(raw, 'MAIN_WINDOW')
 			local itm = GetComponentElement(raw, 'ITEM')
 			if wnd then
-				XGUI.RegisterUIEvent(wnd, 'OnMouseIn'    , function() fnHover(true) end)
+				XGUI(wnd):uievent('OnMouseIn', function() fnHover(true) end)
 			elseif itm then
 				itm:RegisterEvent(256)
-				XGUI.RegisterUIEvent(itm, 'OnItemMouseIn', function() fnHover(true) end)
+				XGUI(itm):uievent('OnItemMouseIn', function() fnHover(true) end)
 			end
 		end
 	end
@@ -2854,10 +2894,10 @@ function XGUI:hover(fnHover, fnLeave, bNoAutoBind)
 			local wnd = GetComponentElement(raw, 'EDIT') or GetComponentElement(raw, 'MAIN_WINDOW')
 			local itm = GetComponentElement(raw, 'ITEM')
 			if wnd then
-				XGUI.RegisterUIEvent(wnd, 'OnMouseOut'    , function() fnLeave(false) end)
+				XGUI(wnd):uievent('OnMouseOut', function() fnLeave(false) end)
 			elseif itm then
 				itm:RegisterEvent(256)
-				XGUI.RegisterUIEvent(itm, 'OnItemMouseOut', function() fnLeave(false) end)
+				XGUI(itm):uievent('OnItemMouseOut', function() fnLeave(false) end)
 			end
 		end
 	end
@@ -2919,8 +2959,12 @@ function XGUI:check(fnCheck, fnUncheck, bNoAutoBind)
 		for _, raw in ipairs(self.raws) do
 			local chk = GetComponentElement(raw, 'CHECKBOX')
 			if chk then
-				if IsFunction(fnCheck) then XGUI.RegisterUIEvent(chk, 'OnCheckBoxCheck' , function() fnCheck(true) end) end
-				if IsFunction(fnUncheck) then XGUI.RegisterUIEvent(chk, 'OnCheckBoxUncheck' , function() fnUncheck(false) end) end
+				if IsFunction(fnCheck) then
+					XGUI(chk):uievent('OnCheckBoxCheck', function() fnCheck(true) end)
+				end
+				if IsFunction(fnUncheck) then
+					XGUI(chk):uievent('OnCheckBoxUncheck', function() fnUncheck(false) end)
+				end
 			end
 		end
 		return self
@@ -2954,7 +2998,7 @@ function XGUI:change(fnOnChange)
 		for _, raw in ipairs(self.raws) do
 			local edt = GetComponentElement(raw, 'EDIT')
 			if edt then
-				XGUI.RegisterUIEvent(edt, 'OnEditChanged', function() pcall(fnOnChange, raw, edt:GetText()) end)
+				XGUI(edt):uievent('OnEditChanged', function() fnOnChange(raw, edt:GetText()) end)
 			end
 			if GetComponentType(raw) == 'WndSliderBox' then
 				insert(GetComponentProp(raw, 'onChangeEvents'), fnOnChange)
@@ -2991,7 +3035,7 @@ function XGUI:focus(fnOnSetFocus)
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'EDIT')
 			if raw then
-				XGUI.RegisterUIEvent(raw, 'OnSetFocus', function() pcall(fnOnSetFocus, self) end)
+				XGUI(raw):uievent('OnSetFocus', function() pcall(fnOnSetFocus, self) end)
 			end
 		end
 		return self
@@ -3016,7 +3060,7 @@ function XGUI:blur(fnOnKillFocus)
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'EDIT')
 			if raw then
-				XGUI.RegisterUIEvent(raw, 'OnKillFocus', function() pcall(fnOnKillFocus, self) end)
+				XGUI(raw):uievent('OnKillFocus', function() pcall(fnOnKillFocus, self) end)
 			end
 		end
 		return self
@@ -3061,35 +3105,6 @@ MY.Const.UI.Slider.SHOW_PERCENT  = true
 MY.Const.UI.Tip.NO_HIDE      = 100
 MY.Const.UI.Tip.HIDE         = 101
 MY.Const.UI.Tip.ANIMATE_HIDE = 102
-
--- 绑定UI事件
-function XGUI.RegisterUIEvent(raw, szEvent, fnEvent)
-	if not raw['tMy'..szEvent] then
-		-- init onXXX table
-		raw['tMy'..szEvent] = { raw[szEvent] }
-		-- init onXXX function
-		raw[szEvent] = function(...)
-			for _, fn in ipairs(raw['tMy'..szEvent]) do
-				local tReturn
-				for _, fn in ipairs(raw['tMy' .. szEvent] or {}) do
-					local t = { pcall(fn, ...) }
-					if not t[1] then
-						MY.Debug({t[2]}, XGUI.GetTreePath(raw) .. '#' .. szEvent, MY_DEBUG.ERROR)
-					elseif not tReturn then
-						remove(t, 1)
-						tReturn = t
-					end
-				end
-				if tReturn then
-					return unpack(tReturn)
-				end
-			end
-		end
-	end
-	if fnEvent then
-		insert(raw['tMy'..szEvent], fnEvent)
-	end
-end
 
 ---------------------------------------------------
 -- create new frame
@@ -3160,13 +3175,13 @@ function  XGUI.CreateFrame(szName, opt)
 			end
 		end
 		if opt.onrestore then
-			XGUI.RegisterUIEvent(frm, 'OnRestore', opt.onrestore)
+			XGUI(frm):uievent('OnRestore', opt.onrestore)
 		end
 		if not opt.minimize then
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize'):Destroy()
 		else
 			if opt.onminimize then
-				XGUI.RegisterUIEvent(frm, 'OnMinimize', opt.onminimize)
+				XGUI(frm):uievent('OnMinimize', opt.onminimize)
 			end
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize').OnCheckBoxCheck = function()
 				if frm.bMaximize then
@@ -3200,23 +3215,18 @@ function  XGUI.CreateFrame(szName, opt)
 				if hMax then
 					hMax:Enable(true)
 				end
-				if frm.OnRestore then
-					local status, res = pcall(frm.OnRestore, frm:Lookup('Window_Main'))
-					if status and res then
-						return
-					end
-				end
 				if opt.dragresize then
 					frm:Lookup('Btn_Drag'):Show()
 				end
 				frm.bMinimize = false
+				SafeExecuteWithThis(frm:Lookup('Window_Main'), frm.OnRestore)
 			end
 		end
 		if not opt.maximize then
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize'):Destroy()
 		else
 			if opt.onmaximize then
-				XGUI.RegisterUIEvent(frm, 'OnMaximize', opt.onmaximize)
+				XGUI(frm):uievent('OnMaximize', opt.onmaximize)
 			end
 			frm:Lookup('WndContainer_TitleBtnR').OnLButtonDBClick = function()
 				frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize'):ToggleCheck()
@@ -3250,16 +3260,11 @@ function  XGUI.CreateFrame(szName, opt)
 				  :size(frm.w, frm.h)
 				  :anchor(frm.anchor)
 				  :drag(true)
-				if frm.OnRestore then
-					local status, res = pcall(frm.OnRestore, frm:Lookup('Window_Main'))
-					if status and res then
-						return
-					end
-				end
-				if opt.dragresize then
+				  if opt.dragresize then
 					frm:Lookup('Btn_Drag'):Show()
 				end
 				frm.bMaximize = false
+				SafeExecuteWithThis(frm:Lookup('Window_Main'), frm.OnRestore)
 			end
 		end
 		-- drag resize button
@@ -3269,7 +3274,7 @@ function  XGUI.CreateFrame(szName, opt)
 			frm:Lookup('Btn_Drag'):Hide()
 		else
 			if opt.ondragresize then
-				XGUI.RegisterUIEvent(frm, 'OnDragResize', opt.ondragresize)
+				XGUI(frm):uievent('OnDragResize', opt.ondragresize)
 			end
 			frm:Lookup('Btn_Drag').OnDragButton = function()
 				local x, y = Station.GetMessagePos()
