@@ -76,7 +76,8 @@ MY.RegisterPanel(
 		local tWndEditV = {}
 		
 		for i = 1, nLimit do
-			tWndEditK[i] = ui:append("WndEditBox", "WndEditBox_K" .. i, {
+			tWndEditK[i] = ui:append("WndEditBox", {
+				name = "WndEditBox_K" .. i,
 				text = _C.tVarList[i],
 				x = x, y = y + (i - 1) * 25,
 				w = 150, h = 25,
@@ -87,7 +88,8 @@ MY.RegisterPanel(
 				end,
 			}):children("#WndEditBox_K" .. i)
 			
-			tWndEditV[i] = ui:append("WndEditBox", "WndEditBox_V" .. i, {
+			tWndEditV[i] = ui:append("WndEditBox", {
+				name = "WndEditBox_V" .. i,
 				x = x + 150, y = y + (i - 1) * 25,
 				w = w - 2 * x - 150, h = 25,
 				color = {255, 255, 255},

@@ -64,7 +64,8 @@ OnPanelActive = function(wnd)
 	local ui = MY.UI(wnd)
 	local x, y = 10, 30
 	
-	ui:append("WndEditBox", "WndEdit", {
+	ui:append('WndEditBox', {
+		name = 'WndEdit',
 		text = _C.nEventID, x = x, y = y, w = 150, h = 25, font = 201, color = { 255, 255, 255 }
 	}):children('#WndEdit'):change(function(raw, text)
 	  	local nEventID = tonumber(text)
@@ -75,7 +76,8 @@ OnPanelActive = function(wnd)
 	
 	x, y = 5, y + 35
 	for k, event in ipairs(_C.tEventIndex) do
-		ui:append("WndCheckBox", 'Event_' .. event.bit, {
+		ui:append("WndCheckBox", {
+			name = 'Event_' .. event.bit,
 			text = event.text, x = x, y = y, w = 120
 		}):children('#Event_' .. event.bit)
 		  :check(function(bCheck)

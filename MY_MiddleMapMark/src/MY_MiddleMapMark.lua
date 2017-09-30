@@ -454,7 +454,8 @@ function PS.OnPanelActive(wnd)
 	  :size(w - 30, 4)
 	  :image('ui/Image/UICommon/RaidTotal.UITex|45')
 
-	ui:append("WndEditBox", "WndEdit_Search", {
+	ui:append('WndEditBox', {
+		name = 'WndEdit_Search',
 		x = 18, y = 10,
 		w = w - 26, h = 25,
 		onchange = function(raw, szText)

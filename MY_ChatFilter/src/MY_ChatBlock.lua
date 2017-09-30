@@ -272,22 +272,24 @@ function PS.OnPanelActive(wnd)
 	local x, y = 0, 0
 	LoadBlockWords()
 	
-	ui:append("WndCheckBox", "WndCheckBox_Enable"):children("#WndCheckBox_Enable")
-	  :pos(x, y):width(70)
-	  :text(_L['enable'])
-	  :check(MY_ChatBlock.bBlockWords or false)
-	  :check(function(bCheck)
-	  	MY_ChatBlock.bBlockWords = bCheck
-	  end)
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = 70,
+		text = _L['enable'],
+		check = MY_ChatBlock.bBlockWords,
+		oncheck = function(bCheck)
+			MY_ChatBlock.bBlockWords = bCheck
+		end,
+	})
 	x = x + 70
 	
-	local edit = ui:append("WndEditBox", "WndEditBox_Keyword", {
+	local edit = ui:append('WndEditBox', {
+		name = 'WndEditBox_Keyword',
 		x = x, y = y, w = w - 160 - x, h = 25,
 		placeholder = _L['Type keyword, right click list to config.'],
 	}, true)
 	x, y = 0, y + 30
 	
-	local list = ui:append("WndListBox", "WndListBox_1"):children('#WndListBox_1'):pos(x, y):size(w, h - 30)
+	local list = ui:append("WndListBox", { x = x, y = y, w = w, h = h - 30 })
 	-- 初始化list控件
 	for _, bw in ipairs(MY_ChatBlock.tBlockWords) do
 		list:listbox('insert', ChatBlock2Text(bw.keyword, bw.channel), bw.keyword, bw)
@@ -361,47 +363,49 @@ function PS.OnPanelActive(wnd)
 		edit:text(id)
 	end)
 	-- add
-	ui:append("WndButton", "WndButton_Add"):children("#WndButton_Add")
-	  :pos(w - 160, 0):width(80)
-	  :text(_L["add"])
-	  :click(function()
-	  	local szText = edit:text()
-	  	-- 去掉前后空格
-	  	szText = (string.gsub(szText, "^%s*(.-)%s*$", "%1"))
-	  	-- 验证是否为空
-	  	if szText == "" then
-	  		return
-	  	end
-	  	LoadBlockWords()
-	  	-- 验证是否重复
-	  	for i, bw in ipairs(MY_ChatBlock.tBlockWords) do
-	  		if bw.keyword == szText then
-	  			return
-	  		end
-	  	end
-	  	-- 加入表
-		local bw = clone(DEFAULT_KW_CONFIG)
-		bw.keyword = szText
-	  	table.insert(MY_ChatBlock.tBlockWords, 1, bw)
-	  	SaveBlockWords()
-	  	-- 更新UI
-	  	list:listbox('insert', ChatBlock2Text(bw.keyword, bw.channel), bw.keyword, bw, 1)
-	  end)
+	ui:append("WndButton", {
+		x = w - 160, y=  0, w = 80,
+		text = _L["add"],
+		onclick = function()
+			local szText = edit:text()
+			-- 去掉前后空格
+			szText = (string.gsub(szText, "^%s*(.-)%s*$", "%1"))
+			-- 验证是否为空
+			if szText == "" then
+				return
+			end
+			LoadBlockWords()
+			-- 验证是否重复
+			for i, bw in ipairs(MY_ChatBlock.tBlockWords) do
+				if bw.keyword == szText then
+					return
+				end
+			end
+			-- 加入表
+			local bw = clone(DEFAULT_KW_CONFIG)
+			bw.keyword = szText
+			table.insert(MY_ChatBlock.tBlockWords, 1, bw)
+			SaveBlockWords()
+			-- 更新UI
+			list:listbox('insert', ChatBlock2Text(bw.keyword, bw.channel), bw.keyword, bw, 1)
+		end,
+	})
 	-- del
-	ui:append("WndButton", "WndButton_Del"):children("#WndButton_Del")
-	  :pos(w - 80, 0):width(80)
-	  :text(_L["delete"])
-	  :click(function()
-	  	for _, v in ipairs(list:listbox('select', 'selected')) do
-	  		list:listbox('delete', v.text, v.id)
-	  		LoadBlockWords()
-	  		for i = #MY_ChatBlock.tBlockWords, 1, -1 do
-	  			if MY_ChatBlock.tBlockWords[i].keyword == v.id then
-	  				table.remove(MY_ChatBlock.tBlockWords, i)
-	  			end
-	  		end
-	  		SaveBlockWords()
-	  	end
-	  end)
+	ui:append("WndButton", {
+		x = w - 80, y =  0, w = 80,
+		text = _L["delete"],
+		onclick = function()
+			for _, v in ipairs(list:listbox('select', 'selected')) do
+				list:listbox('delete', v.text, v.id)
+				LoadBlockWords()
+				for i = #MY_ChatBlock.tBlockWords, 1, -1 do
+					if MY_ChatBlock.tBlockWords[i].keyword == v.id then
+						table.remove(MY_ChatBlock.tBlockWords, i)
+					end
+				end
+				SaveBlockWords()
+			end
+		end,
+	})
 end
 MY.RegisterPanel( "MY_ChatBlock", _L["chat filter"], _L['Chat'], "UI/Image/Common/Money.UITex|243", {255,255,0,200}, PS)

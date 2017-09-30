@@ -243,104 +243,94 @@ _C.OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
     local w, h = ui:size()
 
-    ui:append("Text", "Label_KeyWord"):find('#Label_KeyWord')
-      :pos(22,15):size(100,25):text(_L['key words:'])
+    ui:append("Text", { x = 22, y = 15, w = 100, h = 25, text = _L['key words:'] })
 
-    ui:append("WndAutocomplete", "WndAutocomplete_KeyWord"):children('#WndAutocomplete_KeyWord')
-      :pos(80,15):size(w-226,25):text(MY_ChatMonitor.szKeyWords)
-      :change(function(raw, szText) MY_ChatMonitor.szKeyWords = szText end)
-      :focus(function(self)
-        local source = {}
-        for _, szOpt in ipairs(MY.LoadLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}) or {}) do
-            if type(szOpt) == "string" then
-                table.insert(source, szOpt)
-            end
-        end
-        self:autocomplete('option', 'source', source)
-      end)
-      :click(function(nButton, raw)
-        if IsPopupMenuOpened() then
-            MY.UI(raw):autocomplete('close')
-        else
+    local autocomplete = ui:append("WndAutocomplete", {
+        x = 80, y = 15, w = w - 226, h = 25, text = MY_ChatMonitor.szKeyWords,
+        onchange = function(raw, szText) MY_ChatMonitor.szKeyWords = szText end,
+        onfocus = function(self)
             local source = {}
             for _, szOpt in ipairs(MY.LoadLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}) or {}) do
                 if type(szOpt) == "string" then
                     table.insert(source, szOpt)
                 end
             end
-            MY.UI(raw):autocomplete('option', 'source', source)
-            MY.UI(raw):autocomplete('search', '')
-        end
-      end)
-      -- :autocomplete('option', 'beforeSearch', function(wnd, option) end)
-      :autocomplete('option', 'beforePopup', function(menu, wnd, option)
-        if #menu > 0 then
-            table.insert(menu, { bDevide = true })
-        end
-        table.insert(menu, { szOption = _L['add'], fnAction = function()
-            local edit = ui:children('#WndAutocomplete_KeyWord')
-            GetUserInput("", function(szVal)
-                szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
-                if szVal~="" then
+            self:autocomplete('option', 'source', source)
+        end,
+        onclick = function(nButton, raw)
+            if IsPopupMenuOpened() then
+                MY.UI(raw):autocomplete('close')
+            else
+                local source = {}
+                for _, szOpt in ipairs(MY.LoadLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}) or {}) do
+                    if type(szOpt) == "string" then
+                        table.insert(source, szOpt)
+                    end
+                end
+                MY.UI(raw):autocomplete('option', 'source', source)
+                MY.UI(raw):autocomplete('search', '')
+            end
+        end,
+        autocomplete = {
+            -- { 'option', 'beforeSearch', function(wnd, option) end },
+            {
+                'option', 'beforePopup', function(menu, wnd, option)
+                    if #menu > 0 then
+                        table.insert(menu, { bDevide = true })
+                    end
+                    table.insert(menu, { szOption = _L['add'], fnAction = function()
+                        GetUserInput("", function(szVal)
+                            szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
+                            if szVal~="" then
+                                local t = MY.LoadLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}) or {}
+                                for i = #t, 1, -1 do
+                                    if t[i] == szVal then return end
+                                end
+                                table.insert(t, szVal)
+                                MY.SaveLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}, t)
+                            end
+                        end, function() end, function() end, nil, autocomplete:text() )
+                    end })
+                end,
+            },
+            {
+                'option', 'beforeDelete', function(szOption, fnDoDelete, option)
                     local t = MY.LoadLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}) or {}
                     for i = #t, 1, -1 do
-                        if t[i] == szVal then return end
-                    end
-                    table.insert(t, szVal)
-                    MY.SaveLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}, t)
-                end
-            end, function() end, function() end, nil, edit:text() )
-        end })
-      end)
-      :autocomplete('option', 'beforeDelete', function(szOption, fnDoDelete, option)
-        local t = MY.LoadLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}) or {}
-        for i = #t, 1, -1 do
-            if t[i] == szOption then
-                table.remove(t, i)
-            end
-        end
-        MY.SaveLUAData({_C.szLuaData, t, MY_DATA_PATH.GLOBAL})
-      end)
-
-    ui:append("Image", "Image_Help"):find('#Image_Help')
-      :image('UI/Image/UICommon/Commonpanel2.UITex',48)
-      :pos(8,10):size(25,25)
-      :hover(function(bIn) this:SetAlpha( (bIn and 255 ) or 180) end)
-      :click(function(nButton)
-        local szText = "<image>path=\"ui/Image/UICommon/Talk_Face.UITex\" frame=25 w=24 h=24</image> <text>text=" .. EncodeComponentsString(_L['CHAT_MONITOR_TIP']) .." font=207 </text>"
-        local x, y = Cursor.GetPos()
-        local w, h = this:GetSize()
-        OutputTip(szText, 450, {x, y, w, h})
-    end):alpha(180)
-
-    ui:append("Image", "Image_Setting"):find('#Image_Setting'):pos(w-26,13):image('UI/Image/UICommon/Commonpanel.UITex',18):size(30,30):alpha(200):hover(function(bIn) this:SetAlpha((bIn and 255) or 200) end):click(function()
-        PopupMenu((function()
-            local t = {}
-            for _, cg in ipairs(_C.tChannelGroups) do
-                local _t = { szOption = cg.szCaption }
-                if cg.tChannels[1] then
-                    for _, szChannel in ipairs(cg.tChannels) do
-                        table.insert(_t,{
-                            szOption = g_tStrings.tChannelName[szChannel],
-                            rgb = GetMsgFontColor(szChannel, true),
-                            fnAction = function()
-                                MY_ChatMonitor.tChannels[szChannel] = not MY_ChatMonitor.tChannels[szChannel]
-                                _C.RegisterMsgMonitor()
-                            end,
-                            bCheck = true,
-                            bChecked = MY_ChatMonitor.tChannels[szChannel]
-                        })
-                    end
-                else
-                    for szPrefix, tChannels in pairs(cg.tChannels) do
-                        if #_t > 0 then
-                            table.insert(_t,{ bDevide = true })
+                        if t[i] == szOption then
+                            table.remove(t, i)
                         end
-                        table.insert(_t,{
-                            szOption = szPrefix,
-                            bDisable = true,
-                        })
-                        for _, szChannel in ipairs(tChannels) do
+                    end
+                    MY.SaveLUAData({_C.szLuaData, t, MY_DATA_PATH.GLOBAL})
+                end,
+            },
+        },
+    })
+
+    ui:append("Image", {
+        image = { 'UI/Image/UICommon/Commonpanel2.UITex', 48 },
+        x = 8, y = 10, w = 25, h = 25, alpha = 180,
+        onhover = function(bIn) this:SetAlpha( (bIn and 255 ) or 180) end,
+        onclick = function(nButton)
+            local szText = "<image>path=\"ui/Image/UICommon/Talk_Face.UITex\" frame=25 w=24 h=24</image> <text>text=" .. EncodeComponentsString(_L['CHAT_MONITOR_TIP']) .." font=207 </text>"
+            local x, y = Cursor.GetPos()
+            local w, h = this:GetSize()
+            OutputTip(szText, 450, {x, y, w, h})
+        end,
+    })
+
+    ui:append("Image", {
+        x = w - 26, y = 13,
+        image = { 'UI/Image/UICommon/Commonpanel.UITex', 18 },
+        w = 30, h = 30, alpha = 200,
+        onhover = function(bIn) this:SetAlpha((bIn and 255) or 200) end,
+        onclick = function()
+            PopupMenu((function()
+                local t = {}
+                for _, cg in ipairs(_C.tChannelGroups) do
+                    local _t = { szOption = cg.szCaption }
+                    if cg.tChannels[1] then
+                        for _, szChannel in ipairs(cg.tChannels) do
                             table.insert(_t,{
                                 szOption = g_tStrings.tChannelName[szChannel],
                                 rgb = GetMsgFontColor(szChannel, true),
@@ -352,131 +342,162 @@ _C.OnPanelActive = function(wnd)
                                 bChecked = MY_ChatMonitor.tChannels[szChannel]
                             })
                         end
+                    else
+                        for szPrefix, tChannels in pairs(cg.tChannels) do
+                            if #_t > 0 then
+                                table.insert(_t,{ bDevide = true })
+                            end
+                            table.insert(_t,{
+                                szOption = szPrefix,
+                                bDisable = true,
+                            })
+                            for _, szChannel in ipairs(tChannels) do
+                                table.insert(_t,{
+                                    szOption = g_tStrings.tChannelName[szChannel],
+                                    rgb = GetMsgFontColor(szChannel, true),
+                                    fnAction = function()
+                                        MY_ChatMonitor.tChannels[szChannel] = not MY_ChatMonitor.tChannels[szChannel]
+                                        _C.RegisterMsgMonitor()
+                                    end,
+                                    bCheck = true,
+                                    bChecked = MY_ChatMonitor.tChannels[szChannel]
+                                })
+                            end
+                        end
                     end
+                    table.insert(t, _t)
                 end
-                table.insert(t, _t)
-            end
-            table.insert(t, { bDevide = true })
-            table.insert(t,{
-                szOption = _L['timestrap format'], {
-                    szOption = "[hh:mm:ss]",
-                    fnAction = function()
-                        MY_ChatMonitor.szTimestrap = "[hh:mm:ss]"
-                    end,
-                    bCheck = true, bMCheck = true,
-                    bChecked = MY_ChatMonitor.szTimestrap == "[hh:mm:ss]"
-                }, {
-                    szOption = "[MM/dd hh:mm:ss]",
-                    fnAction = function()
-                        MY_ChatMonitor.szTimestrap = "[MM/dd hh:mm:ss]"
-                    end,
-                    bCheck = true, bMCheck = true,
-                    bChecked = MY_ChatMonitor.szTimestrap == "[MM/dd hh:mm:ss]"
-                }, {
-                    szOption = _L['custom'],
-                    fnAction = function()
-                        GetUserInput(_L["custom timestrap (eg:[yyyy/MM/dd_hh:mm:ss])"], function(szText)
-        					MY_ChatMonitor.szTimestrap = szText
-        				end, nil, nil, nil, MY_ChatMonitor.szTimestrap)
-                    end,
-                },
-            })
-            table.insert(t,{
-                szOption = _L['max record count'],
-                fnAction = function()
-                    GetUserInputNumber(MY_ChatMonitor.nMaxRecord, 1000, nil, function(val)
-                        MY_ChatMonitor.nMaxRecord = val or MY_ChatMonitor.nMaxRecord
-                    end, nil, function() return not MY.IsPanelVisible() end)
-                end,
-            })
-            table.insert(t,{
-                szOption = _L['show message preview box'],
-                fnAction = function()
-                    MY_ChatMonitor.bShowPreview = not MY_ChatMonitor.bShowPreview
-                end,
-                bCheck = true,
-                bChecked = MY_ChatMonitor.bShowPreview
-            })
-            table.insert(t,{
-                szOption = _L['play new message alert sound'],
-                fnAction = function()
-                    MY_ChatMonitor.bPlaySound = not MY_ChatMonitor.bPlaySound
-                end,
-                bCheck = true,
-                bChecked = MY_ChatMonitor.bPlaySound
-            })
-            table.insert(t,{
-                szOption = _L['output to system channel'],
-                fnAction = function()
-                    MY_ChatMonitor.bRedirectSysChannel = not MY_ChatMonitor.bRedirectSysChannel
-                end,
-                bCheck = true,
-                bChecked = MY_ChatMonitor.bRedirectSysChannel
-            })
-            table.insert(t,{
-                szOption = _L['ignore same message'],
-                fnAction = function()
-                    MY_ChatMonitor.bIgnoreSame = not MY_ChatMonitor.bIgnoreSame
-                end,
-                bCheck = true,
-                bChecked = MY_ChatMonitor.bIgnoreSame
-            })
-            if MY_Chat then
+                table.insert(t, { bDevide = true })
                 table.insert(t,{
-                    szOption = _L['hide blockwords'],
+                    szOption = _L['timestrap format'], {
+                        szOption = "[hh:mm:ss]",
+                        fnAction = function()
+                            MY_ChatMonitor.szTimestrap = "[hh:mm:ss]"
+                        end,
+                        bCheck = true, bMCheck = true,
+                        bChecked = MY_ChatMonitor.szTimestrap == "[hh:mm:ss]"
+                    }, {
+                        szOption = "[MM/dd hh:mm:ss]",
+                        fnAction = function()
+                            MY_ChatMonitor.szTimestrap = "[MM/dd hh:mm:ss]"
+                        end,
+                        bCheck = true, bMCheck = true,
+                        bChecked = MY_ChatMonitor.szTimestrap == "[MM/dd hh:mm:ss]"
+                    }, {
+                        szOption = _L['custom'],
+                        fnAction = function()
+                            GetUserInput(_L["custom timestrap (eg:[yyyy/MM/dd_hh:mm:ss])"], function(szText)
+                                MY_ChatMonitor.szTimestrap = szText
+                            end, nil, nil, nil, MY_ChatMonitor.szTimestrap)
+                        end,
+                    },
+                })
+                table.insert(t,{
+                    szOption = _L['max record count'],
                     fnAction = function()
-                        MY_ChatMonitor.bBlockWords = not MY_ChatMonitor.bBlockWords
+                        GetUserInputNumber(MY_ChatMonitor.nMaxRecord, 1000, nil, function(val)
+                            MY_ChatMonitor.nMaxRecord = val or MY_ChatMonitor.nMaxRecord
+                        end, nil, function() return not MY.IsPanelVisible() end)
+                    end,
+                })
+                table.insert(t,{
+                    szOption = _L['show message preview box'],
+                    fnAction = function()
+                        MY_ChatMonitor.bShowPreview = not MY_ChatMonitor.bShowPreview
                     end,
                     bCheck = true,
-                    bChecked = MY_ChatMonitor.bBlockWords, {
-                        szOption = _L['edit'],
-                        fnAction = function()
-                            MY.SwitchTab("MY_Chat_Filter")
-                        end,
-                    }
+                    bChecked = MY_ChatMonitor.bShowPreview
                 })
+                table.insert(t,{
+                    szOption = _L['play new message alert sound'],
+                    fnAction = function()
+                        MY_ChatMonitor.bPlaySound = not MY_ChatMonitor.bPlaySound
+                    end,
+                    bCheck = true,
+                    bChecked = MY_ChatMonitor.bPlaySound
+                })
+                table.insert(t,{
+                    szOption = _L['output to system channel'],
+                    fnAction = function()
+                        MY_ChatMonitor.bRedirectSysChannel = not MY_ChatMonitor.bRedirectSysChannel
+                    end,
+                    bCheck = true,
+                    bChecked = MY_ChatMonitor.bRedirectSysChannel
+                })
+                table.insert(t,{
+                    szOption = _L['ignore same message'],
+                    fnAction = function()
+                        MY_ChatMonitor.bIgnoreSame = not MY_ChatMonitor.bIgnoreSame
+                    end,
+                    bCheck = true,
+                    bChecked = MY_ChatMonitor.bIgnoreSame
+                })
+                if MY_Chat then
+                    table.insert(t,{
+                        szOption = _L['hide blockwords'],
+                        fnAction = function()
+                            MY_ChatMonitor.bBlockWords = not MY_ChatMonitor.bBlockWords
+                        end,
+                        bCheck = true,
+                        bChecked = MY_ChatMonitor.bBlockWords, {
+                            szOption = _L['edit'],
+                            fnAction = function()
+                                MY.SwitchTab("MY_Chat_Filter")
+                            end,
+                        }
+                    })
+                end
+                table.insert(t, { bDevide = true })
+                table.insert(t,{
+                    szOption = _L['regular expression'],
+                    fnAction = function()
+                        if MY_ChatMonitor.bIsRegexp then
+                            MY_ChatMonitor.bIsRegexp = not MY_ChatMonitor.bIsRegexp
+                        else
+                            MessageBox({
+                                szName = "MY_ChatMonitor_Regexp",
+                                szMessage = _L["Are you sure you want to turn on regex mode?\nRegex is something advanced, make sure you know what you are doing."],
+                                {szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function() MY_ChatMonitor.bIsRegexp = not MY_ChatMonitor.bIsRegexp end},
+                                {szOption = g_tStrings.STR_HOTKEY_CANCEL, fnAction = function() end},
+                            })
+                        end
+                    end,
+                    bCheck = true,
+                    bChecked = MY_ChatMonitor.bIsRegexp
+                })
+                return t
+            end)())
+        end,
+    })
+
+    ui:append("WndButton", {
+        name = "Button_ChatMonitor_Switcher",
+        x = w - 136, y = 15, w = 50,
+        text = (MY_ChatMonitor.bCapture and _L['stop']) or _L['start'],
+        onclick = function()
+            if MY_ChatMonitor.bCapture then
+                MY.UI(this):text(_L['start'])
+                MY_ChatMonitor.bCapture = false
+            else
+                MY.UI(this):text(_L['stop'])
+                MY_ChatMonitor.bCapture = true
             end
-            table.insert(t, { bDevide = true })
-            table.insert(t,{
-                szOption = _L['regular expression'],
-                fnAction = function()
-                    if MY_ChatMonitor.bIsRegexp then
-                        MY_ChatMonitor.bIsRegexp = not MY_ChatMonitor.bIsRegexp
-                    else
-                        MessageBox({
-                            szName = "MY_ChatMonitor_Regexp",
-                            szMessage = _L["Are you sure you want to turn on regex mode?\nRegex is something advanced, make sure you know what you are doing."],
-                            {szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function() MY_ChatMonitor.bIsRegexp = not MY_ChatMonitor.bIsRegexp end},
-                            {szOption = g_tStrings.STR_HOTKEY_CANCEL, fnAction = function() end},
-                        })
-                    end
-                end,
-                bCheck = true,
-                bChecked = MY_ChatMonitor.bIsRegexp
-            })
-            return t
-        end)())
-    end)
+        end,
+    })
 
-    ui:append("WndButton", "Button_ChatMonitor_Switcher"):find('#Button_ChatMonitor_Switcher'):pos(w-136,15):width(50):text((MY_ChatMonitor.bCapture and _L['stop']) or _L['start']):click(function()
-        if MY_ChatMonitor.bCapture then
-            MY.UI(this):text(_L['start'])
-            MY_ChatMonitor.bCapture = false
-        else
-            MY.UI(this):text(_L['stop'])
-            MY_ChatMonitor.bCapture = true
-        end
-    end)
+    ui:append("WndButton", {
+        x = w - 81, y = 15, w = 50,
+        text = _L['clear'],
+        onclick = function()
+            MY_ChatMonitor.tRecords = {}
+            _C.uiBoard:clear()
+        end,
+    })
 
-    ui:append("WndButton", "Button_Clear"):find('#Button_Clear'):pos(w-81,15):width(50):text(_L['clear']):click(function()
-        MY_ChatMonitor.tRecords = {}
-        _C.uiBoard:clear()
-    end)
-
-    _C.uiBoard = ui
-      :append("WndScrollBox", "WndScrollBox_TalkList")
-      :children('#WndScrollBox_TalkList')
-      :handleStyle(3):pos(20,50):size(w-21, h - 70)
+    _C.uiBoard = ui:append("WndScrollBox", {
+        name = "WndScrollBox_TalkList",
+        x = 20, y = 50, w = w - 21, h = h - 70, handlestyle = 3,
+    })
 
     local tRecords = MY_ChatMonitor.tRecords
     for i = 1, #tRecords, 1 do
@@ -525,32 +546,32 @@ _C.Init = function()
       end)
       :anchor(MY_ChatMonitor.anchor)
     -- init tip panel handle and bind animation function
-    _C.uiTipBoard = _C.uiFrame
-      :append("WndScrollBox", "WndScrollBox_TalkList")
-      :children('#WndScrollBox_TalkList')
-      :handleStyle(3):pos(0,0):size(250,150)
-      :text(_L['welcome to use mingyi chat monitor.'])
-      :click(function()
-        if MY.IsInCustomUIMode() then
-            return
-        end
-        MY.OpenPanel()
-        MY.SwitchTab('ChatMonitor')
-        _C.uiFrame:fadeOut(500)
-      end)
-      :hover(function(bIn)
-        if MY.IsInCustomUIMode() then
-            return
-        end
-        if bIn then
-            MY.DelayCall('MY_ChatMonitor_Hide')
-            _C.uiFrame:fadeIn(500)
-        else
-            MY.DelayCall('MY_ChatMonitor_Hide', function()
-                _C.uiFrame:fadeOut(500)
-            end, 5000)
-        end
-      end)
+    _C.uiTipBoard = _C.uiFrame:append("WndScrollBox", {
+        name = "WndScrollBox_TalkList",
+        handlestyle = 3, x = 0, y = 0, w = 250, h = 150,
+        text = _L['welcome to use mingyi chat monitor.'],
+        onclick = function()
+            if MY.IsInCustomUIMode() then
+                return
+            end
+            MY.OpenPanel()
+            MY.SwitchTab('ChatMonitor')
+            _C.uiFrame:fadeOut(500)
+        end,
+        onhover = function(bIn)
+            if MY.IsInCustomUIMode() then
+                return
+            end
+            if bIn then
+                MY.DelayCall('MY_ChatMonitor_Hide')
+                _C.uiFrame:fadeIn(500)
+            else
+                MY.DelayCall('MY_ChatMonitor_Hide', function()
+                    _C.uiFrame:fadeOut(500)
+                end, 5000)
+            end
+        end,
+    })
     -- init tip panel animate
     MY.DelayCall('MY_ChatMonitor_Hide', function()
         _C.uiFrame:fadeOut(500)
