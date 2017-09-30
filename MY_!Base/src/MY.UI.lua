@@ -14,8 +14,8 @@
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local insert, remove, concat = table.insert, table.remove, table.concat
-local sub, len, char, rep = string.sub, string.len, string.char, string.rep
-local byte, format, gsub = string.byte, string.format, string.gsub
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
 local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local type, tonumber, tostring = type, tonumber, tostring
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
@@ -1304,8 +1304,7 @@ function XGUI:autocomplete(method, arg1, arg2)
 					if IsFunction(opt.beforeSearch) then
 						opt.beforeSearch(raw, opt)
 					end
-					local keyword = arg1 or raw:Lookup('WndEdit_Default'):GetText()
-					keyword = MY.PatternEscape(keyword)
+					local keyword = MY.String.PatternEscape(arg1 or raw:Lookup('WndEdit_Default'):GetText())
 					if not opt.anyMatch then
 						keyword = '^' .. keyword
 					end
