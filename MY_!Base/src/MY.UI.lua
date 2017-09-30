@@ -176,23 +176,6 @@ do local l_type = setmetatable({}, { __mode = 'k' })
 	end
 end
 
-local GetComponentData, SetComponentData -- 组件公有数据 可在外部通过:data()读写
-do local l_data = setmetatable({}, { __mode = 'k' })
-	function GetComponentData(raw, k)
-		return raw and l_data[raw] and l_data[raw][k]
-	end
-
-	function SetComponentData(raw, k, v)
-		if not raw then
-			return
-		end
-		if not l_data[raw] then
-			l_data[raw] = {}
-		end
-		l_data[raw][k] = v
-	end
-end
-
 local function GetComponentElement(raw, elementType)
 	local element
 	local componentType = GetComponentType(raw)
@@ -1017,19 +1000,24 @@ end
 -----------------------------------------------------------
 
 -- data set/get
+do local l_data = setmetatable({}, { __mode = 'k' })
 function XGUI:data(key, value)
 	self:_checksum()
 	if key and value then -- set
 		for _, raw in ipairs(self.raws) do
-			SetComponentData(raw, key, value)
+			if not l_data[raw] then
+				l_data[raw] = {}
+			end
+			l_data[raw][key] = value
 		end
 		return self
 	elseif key then -- get
 		local raw = self.raws[1]
 		if raw then
-			return GetComponentData(raw, key)
+			return l_data[raw] and l_data[raw][key]
 		end
 	end
+end
 end
 
 -- show
