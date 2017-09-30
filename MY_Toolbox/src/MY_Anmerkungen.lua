@@ -74,7 +74,7 @@ MY_Anmerkungen.ReloadNotePanel = function()
 
 		ui:onuievent("OnFrameDragEnd", function()
 			MY_Anmerkungen.anchorNotePanel = MY.UI("Normal/MY_Anmerkungen_NotePanel"):anchor()
-		end):onevent("UI_SCALED", function()
+		end):event("UI_SCALED", function()
 			MY.UI(this):anchor(MY_Anmerkungen.anchorNotePanel)
 		end)
 	end
