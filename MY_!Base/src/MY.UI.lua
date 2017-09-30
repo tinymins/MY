@@ -2559,37 +2559,52 @@ function XGUI:event(szEvent, fnEvent)
 		if IsFunction(fnEvent) then
 			for _, raw in ipairs(self.raws) do
 				if raw:GetType() == 'WndFrame' then
-					if not raw.tMyOnEvent then
-						raw.tMyOnEvent = {}
-						raw.OnEvent = function(event)
-							for _, p in ipairs(raw.tMyOnEvent[event] or {}) do pcall(p.fn) end
+					local events = GetComponentProp(raw, 'onEvents')
+					if not events then
+						events = {}
+						local onEvent = IsFunction(raw.OnEvent) and raw.OnEvent
+						raw.OnEvent = function(e, ...)
+							if onEvent then
+								onEvent(e, ...)
+							end
+							if events[e] then
+								for _, p in ipairs(events[e]) do
+									p.fn(e, ...)
+								end
+							end
 						end
+						SetComponentProp(raw, 'events', events)
 					end
-					if not raw.tMyOnEvent[szEvent] then
+					if not events[szEvent] then
 						raw:RegisterEvent(szEvent)
-						raw.tMyOnEvent[szEvent] = {}
+						events[szEvent] = {}
 					end
 					if szKey then
-						for i = #raw.tMyOnEvent[szEvent], 1, -1 do
-							if raw.tMyOnEvent[szEvent][i].id == szKey then
-								remove(raw.tMyOnEvent[szEvent], i)
+						for i, p in ipairs_r(events[szEvent]) do
+							if p.id == szKey then
+								remove(events[szEvent], i)
 							end
 						end
 					end
-					insert(raw.tMyOnEvent[szEvent], { id = szKey, fn = fnEvent })
+					insert(events[szEvent], { id = szKey, fn = fnEvent })
 				end
 			end
 		else
 			for _, raw in ipairs(self.raws) do
-				if raw:GetType() == 'WndFrame' and raw.tMyOnEvent and raw.tMyOnEvent[szEvent] then
-					if szKey then
-						for i = #raw.tMyOnEvent[szEvent], 1, -1 do
-							if raw.tMyOnEvent[szEvent][i].id == szKey then
-								remove(raw.tMyOnEvent[szEvent], i)
+				if raw:GetType() == 'WndFrame' then
+					local events = GetComponentProp(raw, 'events')
+					if events then
+						if not szKey then
+							for e, _ in pairs(events) do
+								events[e] = {}
+							end
+						elseif events[szEvent] then
+							for i, p in ipairs_r(events[szEvent]) do
+								if p.id == szKey then
+									remove(events[szEvent], i)
+								end
 							end
 						end
-					else
-						raw.tMyOnEvent[szEvent] = {}
 					end
 				end
 			end
