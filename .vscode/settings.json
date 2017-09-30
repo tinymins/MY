@@ -2,5 +2,6 @@
   "editor.tabSize": 4,
   "editor.renderWhitespace": "all",
   "editor.insertSpaces": false,
-  "files.encoding": "gbk"
+  "files.encoding": "gbk",
+  "files.eol": "\n"
 }
