@@ -543,6 +543,14 @@ function ExecuteWithThis(element, fnAction, ...)
 	return true
 end
 end
+if not SafeExecuteWithThis then
+function SafeExecuteWithThis(element, fnAction, ...)
+	if not element or not fnAction then
+		return
+	end
+	return ExecuteWithThis(element, fnAction, ...)
+end
+end
 
 if not HookSound then
 local hook = {}
