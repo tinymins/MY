@@ -1304,10 +1304,7 @@ function XGUI:autocomplete(method, arg1, arg2)
 					if IsFunction(opt.beforeSearch) then
 						opt.beforeSearch(raw, opt)
 					end
-					local keyword = MY.String.PatternEscape(arg1 or raw:Lookup('WndEdit_Default'):GetText())
-					if not opt.anyMatch then
-						keyword = '^' .. keyword
-					end
+					local keyword = arg1 or raw:Lookup('WndEdit_Default'):GetText()
 					if opt.ignoreCase then
 						keyword = StringLowerW(keyword)
 					end
@@ -1318,7 +1315,8 @@ function XGUI:autocomplete(method, arg1, arg2)
 						if opt.ignoreCase then
 							s = StringLowerW(src)
 						end
-						if find(s, keyword) then
+						local pos = wfind(s, keyword)
+						if pos and (opt.anyMatch or pos == 0) then
 							insert(aOption, src)
 						end
 					end
@@ -1350,7 +1348,7 @@ function XGUI:autocomplete(method, arg1, arg2)
 							t.fnClickIcon = function()
 								local bSure = true
 								local fnDoDelete = function()
-									for i=#opt.source, 1, -1 do
+									for i = #opt.source, 1, -1 do
 										if opt.source[i] == szOption then
 											remove(opt.source, i)
 										end
