@@ -1126,7 +1126,7 @@ function PS.OnPanelActive(wnd)
 	local OpenConfig
 	do -- single config details
 		local l_config
-		local uiWrapper = ui:append('WndWindow', 'WndWindow_Wrapper', { x = 0, y = 0, w = w, h = h }, true)
+		local uiWrapper = ui:append('WndWindow', { name = 'WndWindow_Wrapper', x = 0, y = 0, w = w, h = h }, true)
 		uiWrapper:append('Shadow', { x = 0, y = 0, w = w, h = h, r = 0, g = 0, b = 0, alpha = 150 })
 		uiWrapper:append('Shadow', { x = 10, y = 10, w = w - 20, h = h - 20, r = 255, g = 255, b = 255, alpha = 40 })
 		

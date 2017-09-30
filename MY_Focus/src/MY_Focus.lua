@@ -1173,7 +1173,8 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaX
 	
-	ui:append("WndCheckBox", "WndCheckBox_SortByDistance", {
+	ui:append('WndCheckBox', {
+		name = 'WndCheckBox_SortByDistance',
 		x = x, y = y, w = wr,
 		text = _L['sort by distance'],
 		checked = MY_Focus.bSortByDistance,
@@ -1184,7 +1185,8 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaX
 	
-	ui:append("WndCheckBox", "WndCheckBox_EnableSceneNavi", {
+	ui:append('WndCheckBox', {
+		name = 'WndCheckBox_EnableSceneNavi',
 		x = x, y = y, w = wr,
 		text = _L['enable scene navi'],
 		checked = MY_Focus.bEnableSceneNavi,

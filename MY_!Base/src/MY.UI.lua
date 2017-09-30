@@ -101,6 +101,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.autoenable         ~= nil then ui:enable     (arg.autoenable ) end
 		if arg.image              ~= nil then ui:image(arg.image, arg.imageframe) end
 		if arg.icon               ~= nil then ui:icon       (arg.icon       ) end
+		if arg.name               ~= nil then ui:name       (arg.name       ) end
 		-- event handlers
 		if arg.onscroll           ~= nil then ui:scroll     (arg.onscroll   ) end
 		if arg.onhover            ~= nil then ui:hover      (arg.onhover    ) end
@@ -462,7 +463,7 @@ end
 function XGUI:ctor(super, mixed)
 	self.raws = {}
 	if IsTable(mixed) then
-		if IsTable(mixed.raws) 'table' then
+		if IsTable(mixed.raws) then
 			for _, raw in ipairs(mixed.raws) do
 				insert(self.raws, raw)
 			end
@@ -914,21 +915,32 @@ local _tItemXML = {
 local _szItemINI = MY.GetAddonInfo().szFrameworkRoot .. 'ui\\HandleItems.ini'
 -- append
 -- similar as jQuery.append()
--- Instance:append(szType,[ szName,] tArg)
--- Instance:append(szItemString)
-function XGUI:append(szType, szName, tArg, bReturnNewItem)
+-- Instance:append(szXml[, bReturnNewItem])
+-- Instance:append(szType[, tArg | szName[, bReturnNewItem]])
+function XGUI:append(arg0, arg1, arg2)
+	assert(IsString(arg0) and #arg0 > 0)
 	self:_checksum()
-	local szXml
-	assert(IsString(szType) and #szType > 0)
-	if IsTable(szName) then
-		szName, tArg, bReturnNewItem = nil, szName, tArg
+
+	local ui, szXml, szType, tArg, bReturnNewItem = XGUI()
+	if arg0:find('%<') then
+		szXml, bReturnNewItem = arg0, arg1
+	else
+		szXml = _tItemXML[arg0]
+		if not szXml then
+			szType = arg0
+		end
+		if IsBoolean(arg1) then
+			bReturnNewItem = arg1
+		else
+			if IsTable(arg1) then
+				tArg = arg1
+			elseif IsString(arg1) then
+				tArg = { name = arg1 }
+			end
+			bReturnNewItem = arg2
+		end
 	end
-	if szType:find('%<') then
-		szType, szXml, bReturnNewItem = nil, szType, szName
-	elseif _tItemXML[szType] then
-		szType, szXml = nil, _tItemXML[szType]
-	end
-	local ui = XGUI()
+
 	if szType then -- append from ini file
 		for _, raw in ipairs(self.raws) do
 			local parentWnd = GetComponentElement(raw, 'MAIN_WINDOW')
@@ -956,15 +968,13 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 				end
 				Wnd.CloseWindow(frame)
 			elseif sub(szType, 1, 3) ~= 'Wnd' and parentHandle then
-				raw = parentHandle:AppendItemFromIni(
-					_szItemINI, szType, szName or szType
-				)
-				parentHandle:FormatAllItemPos()
+				raw = parentHandle:AppendItemFromIni(_szItemINI, szType)
 				if not raw then
 					return MY.Debug({ _L('unable to append handle item [%s]', szType) }, 'MY#UI:append', MY_DEBUG.ERROR)
 				else
 					ui = ui:add(raw)
 				end
+				parentHandle:FormatAllItemPos()
 			end
 		end
 	elseif szXml then -- append from xml
@@ -980,9 +990,6 @@ function XGUI:append(szType, szName, tArg, bReturnNewItem)
 				end
 			end
 		end
-	end
-	if szName then
-		ui:name(szName)
 	end
 	ApplyUIArguments(ui, tArg)
 	return bReturnNewItem and ui or self
@@ -3397,8 +3404,8 @@ function XGUI.OpenColorPicker(callback, t)
 			end,
 		})
 	end
-	ui:append('Shadow', 'Select', { w = 25, h = 25, x = 20, y = 435 })
-	ui:append('Text', 'Select_Text', { x = 65, y = 435 })
+	ui:append('Shadow', { name = 'Select', w = 25, h = 25, x = 20, y = 435 })
+	ui:append('Text', { name = 'Select_Text', x = 65, y = 435 })
 	local GetRGBValue = function()
 		local r, g, b  = tonumber(ui:children('#R'):text()), tonumber(ui:children('#G'):text()), tonumber(ui:children('#B'):text())
 		if r and g and b and r <= 255 and g <= 255 and b <= 255 then
@@ -3413,13 +3420,13 @@ function XGUI.OpenColorPicker(callback, t)
 	end
 	local x, y = 220, 435
 	ui:append('Text', { text = 'R', x = x, y = y, w = 10 })
-	ui:append('WndEditBox', 'R', { x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, edittype = 0, onchange = onChange })
+	ui:append('WndEditBox', { name = 'R', x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, edittype = 0, onchange = onChange })
 	x = x + 14 + 34
 	ui:append('Text', { text = 'G', x = x, y = y, w = 10 })
-	ui:append('WndEditBox', 'G', { x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, edittype = 0, onchange = onChange })
+	ui:append('WndEditBox', { name = 'G', x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, edittype = 0, onchange = onChange })
 	x = x + 14 + 34
 	ui:append('Text', { text = 'B', x = x, y = y, w = 10 })
-	ui:append('WndEditBox', 'B', { x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, edittype = 0, onchange = onChange })
+	ui:append('WndEditBox', { name = 'B', x = x + 14, y = y + 4, w = 34, h = 25, limit = 3, edittype = 0, onchange = onChange })
 	x = x + 14 + 34
 	ui:append('WndButton', { text = g_tStrings.STR_HOTKEY_SURE, x = x + 5, y = y + 3, w = 50, h = 30, onclick = function()
 		if GetRGBValue() then
@@ -3518,9 +3525,9 @@ function XGUI.OpenColorPickerEx(fnAction)
 		end
 	end
 	SetColor()
-	wnd:append('Image', 'Select_Image', { w = 9, h = 9, x = 0, y = 0 }, true):image('ui/Image/Common/Box.Uitex', 9):toggle(false)
-	wnd:append('Shadow', 'Select', { w = 25, h = 25, x = 20, y = 10, color = { 255, 255, 255 } })
-	wnd:append('Text', 'Select_Text', { x = 50, y = 10, text = g_tStrings.STR_NONE })
+	wnd:append('Image', { name = 'Select_Image', w = 9, h = 9, x = 0, y = 0 }, true):image('ui/Image/Common/Box.Uitex', 9):toggle(false)
+	wnd:append('Shadow', { name = 'Select', w = 25, h = 25, x = 20, y = 10, color = { 255, 255, 255 } })
+	wnd:append('Text', { name = 'Select_Text', x = 50, y = 10, text = g_tStrings.STR_NONE })
 	wnd:append('WndSliderBox', {
 		x = 20, y = 35, h = 25, w = 306, rw = 272,
 		textfmt = function(val) return ('%d H'):format(val) end,
@@ -3545,7 +3552,8 @@ function XGUI.OpenFontPicker(callback, t)
 	  :size(w, h):text(_L['color picker']):anchor({s='CENTER', r='CENTER', x=0, y=0})
 
 	for i = 0, 255 do
-		local txt = ui:append('Text', 'Text_'..i, {
+		local txt = ui:append('Text', {
+			name = 'Text_'..i,
 			w = 70, x = i % 10 * 80 + 20, y = math.floor(i / 10) * 25,
 			font = i, alpha = 200, text = _L('Font %d', i)
 		}):children('#Text_'..i)
@@ -3614,7 +3622,7 @@ function XGUI.OpenIconPanel(fnAction)
 			end
 		end
 	end
-	ui:append('WndEditBox', 'Icon', { x = 730, y = 580, w = 50, h = 25, edittype = 0 })
+	ui:append('WndEditBox', { name = 'Icon', x = 730, y = 580, w = 50, h = 25, edittype = 0 })
 	ui:append('WndButton2', {
 		text = g_tStrings.STR_HOTKEY_SURE, x = 800, y = 580,
 		onclick = function()
@@ -3693,32 +3701,38 @@ function XGUI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 		end)
 	end
 	local ui = XGUI.CreateFrame(szFrameName)
-	ui:append('Image', 'Image_Spliter'):find('#Image_Spliter'):pos(-10,25):size(360, 10):image('UI/Image/UICommon/Commonpanel.UITex',42)
-	local muEditBox = ui:append('WndEditBox', 'WndEditBox_Keyword'):find('#WndEditBox_Keyword'):pos(0,0):size(170, 25)
-	local muList = ui:append('WndScrollBox', 'WndScrollBox_KeywordList'):find('#WndScrollBox_KeywordList'):handleStyle(3):pos(0,30):size(340, 380)
+	ui:append('Image', { x = -10, y = 25, w = 360, h = 10, image = { 'UI/Image/UICommon/Commonpanel.UITex', 42 } })
+	local muEditBox = ui:append('WndEditBox', { x = 0, y = 0, w = 170, h = 25 }, true)
+	local muList = ui:append('WndScrollBox', { handlestyle = 3, x = 0, y = 30, w = 340, h = 380 }, true)
 	-- add
-	ui:append('WndButton', 'WndButton_Add'):find('#WndButton_Add'):pos(180,0):width(80):text(_L['add']):click(function()
-		local szText = muEditBox:text()
-		-- 加入表
-		if OnAdd then
-			if OnAdd(szText) ~= false then
+	ui:append('WndButton', {
+		x = 180, y = 0, w = 80, text = _L['add'],
+		onclick = function()
+			local szText = muEditBox:text()
+			-- 加入表
+			if OnAdd then
+				if OnAdd(szText) ~= false then
+					AddListItem(muList, szText)
+				end
+			else
 				AddListItem(muList, szText)
 			end
-		else
-			AddListItem(muList, szText)
-		end
-	end)
+		end,
+	})
 	-- del
-	muDel = ui:append('WndButton', 'WndButton_Del'):find('#WndButton_Del'):pos(260,0):width(80):text(_L['delete']):click(function()
-		muList:children():each(function(ui)
-			if this.Selected then
-				if OnDel then
-					OnDel(this.Value)
+	muDel = ui:append('WndButton', {
+		x = 260, y = 0, w = 80, text = _L['delete'],
+		onclick = function()
+			muList:children():each(function(ui)
+				if this.Selected then
+					if OnDel then
+						OnDel(this.Value)
+					end
+					ui:remove()
 				end
-				ui:remove()
-			end
-		end)
-	end)
+			end)
+		end,
+	})
 	-- insert data to ui
 	for i, v in ipairs(tTextList) do
 		AddListItem(muList, v)

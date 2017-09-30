@@ -194,7 +194,8 @@ local function Hook()
 	local frame = Station.Lookup("Normal/BigBagPanel")
 	if frame and not frame.bMYBagExHook then
 		frame.bMYBagExHook = true
-		MY.UI(frame):append("WndEditBox", "WndEditBox_KeyWord", {
+		MY.UI(frame):append('WndEditBox', {
+			name = 'WndEditBox_KeyWord',
 			w = 100, h = 21, x = 60, y = 30,
 			text = l_szBagFilter,
 			placeholder = _L['Search'],
@@ -214,7 +215,8 @@ local function Hook()
 	local frame = Station.Lookup("Normal/BigBankPanel")
 	if frame and not frame.bMYBagExHook then
 		frame.bMYBagExHook = true
-		MY.UI(frame):append("WndEditBox", "WndEditBox_KeyWord", {
+		MY.UI(frame):append('WndEditBox', {
+			name = 'WndEditBox_KeyWord',
 			w = 150, h = 21, x = 280, y = 80,
 			text = l_szBankFilter,
 			placeholder = _L['Search'],
@@ -228,7 +230,8 @@ local function Hook()
 			end,
 		})
 		
-		MY.UI(frame):append("WndCheckBox", "WndCheckBox_Compare", {
+		MY.UI(frame):append('WndCheckBox', {
+			name = 'WndCheckBox_Compare',
 			w = 100, x = 340, y = 56,
 			text = _L['compare with bag'],
 			checked = l_bCompareBank,
@@ -241,7 +244,8 @@ local function Hook()
 			end
 		})
 		
-		MY.UI(frame):append("WndCheckBox", "CheckBox_TimeLtd", {
+		MY.UI(frame):append('WndCheckBox', {
+			name = 'CheckBox_TimeLtd',
 			w = 60, x = 277, y = 56, alpha = 200,
 			text = _L['Time Limited'],
 			checked = l_bBankTimeLtd,
@@ -260,7 +264,8 @@ local function Hook()
 	local frame = Station.Lookup("Normal/GuildBankPanel")
 	if frame and not frame.bMYBagExHook then
 		frame.bMYBagExHook = true
-		MY.UI("Normal/GuildBankPanel"):append("WndEditBox", "WndEditBox_KeyWord", {
+		MY.UI("Normal/GuildBankPanel"):append('WndEditBox', {
+			name = 'WndEditBox_KeyWord',
 			w = 100, h = 21, x = 60, y = 25,
 			text = l_szGuildBankFilter,
 			placeholder = _L['Search'],
@@ -274,7 +279,8 @@ local function Hook()
 			end,
 		})
 		
-		MY.UI("Normal/GuildBankPanel"):append("WndCheckBox", "WndCheckBox_Compare", {
+		MY.UI("Normal/GuildBankPanel"):append('WndCheckBox', {
+			name = 'WndCheckBox_Compare',
 			w = 100, x = 20, y = 475,
 			text = _L['compare with bag'],
 			checked = l_bCompareGuild,

@@ -456,7 +456,7 @@ MY.RegisterEvent("ON_FRAME_CREATE.BIG_WAR_CHECK", function()
 				if finished then
 					local ui = XGUI(arg0)
 					if ui:children("#Text_MY_Tip"):count() == 0 then
-						ui:append("Text", "Text_MY_Tip", {y = ui:height(), w = ui:width(), color = {255, 255, 0}, font = 199, halign = 1})
+						ui:append('Text', { name = 'Text_MY_Tip',y = ui:height(), w = ui:width(), color = {255, 255, 0}, font = 199, halign = 1})
 					end
 					ui = ui:children("#Text_MY_Tip"):text(_L['Warning: Bigwar has been finished but not handed yet!']):shake(10, 10, 10, 1000)
 					break
