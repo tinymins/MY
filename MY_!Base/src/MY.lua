@@ -1093,48 +1093,66 @@ function MY.OnFrameCreate()
 end
 
 function _MY.OnSizeChanged()
-	local hFrame = this
-	if not hFrame then
+	local frame = this
+	if not frame then
 		return
 	end
-	local nWidth, nHeight = hFrame:GetSize()
-	hFrame:Lookup("Btn_Drag"):SetRelPos(nWidth - 18, nHeight - 20)
-	hFrame:Lookup('', 'Text_Author'):SetRelPos(0, nHeight - 41)
-	hFrame:Lookup('', 'Text_Author'):SetSize(nWidth - 31, 20)
-	hFrame:Lookup('', ''):FormatAllItemPos()
-	local hWnd = hFrame:Lookup('Wnd_Total')
-	local hTotal = hWnd:Lookup('', '')
-	hTotal:SetSize(nWidth, nHeight)
-	hTotal:Lookup('Image_Breaker'):SetSize(6, nHeight - 340)
-	hTotal:Lookup('Image_TabBg'):SetSize(nWidth - 2, 33)
-	hTotal:Lookup('Handle_DBClick'):SetSize(nWidth, 54)
-	hWnd:SetSize(nWidth, nHeight)
-	hWnd:Lookup('WndContainer_Category'):SetSize(nWidth - 22, 32)
-	hWnd:Lookup('WndContainer_Category'):FormatAllContentPos()
-	hWnd:Lookup('Btn_Weibo'):SetRelPos(nWidth - 135, 55)
+	-- fix size
+	local nWidth, nHeight = frame:GetSize()
+	if nWidth  < 132 then nWidth  = 132 end
+	if nHeight < 150 then nHeight = 150 end
+	-- set sizes and positions
+	frame:SetSize(nWidth, nHeight)
+	frame:SetDragArea(0, 0, nWidth, 55)
+	frame:Lookup('Btn_Close'):SetRelPos(nWidth - 35, 15)
+	frame:Lookup("Btn_Drag"):SetRelPos(nWidth - 18, nHeight - 20)
+	frame:Lookup('CheckBox_Maximize'):SetRelPos(nWidth - 63, 15)
 
-	hWnd:Lookup('WndScroll_Tabs'):SetSize(171, nHeight - 102)
-	hWnd:Lookup('WndScroll_Tabs', ''):SetSize(171, nHeight - 102)
-	hWnd:Lookup('WndScroll_Tabs', ''):FormatAllItemPos()
-	hWnd:Lookup('WndScroll_Tabs/ScrollBar_Tabs'):SetSize(16, nHeight - 111)
+	local handle = frame:Lookup('', '')
+	handle:SetSize(nWidth, nHeight)
+	handle:Lookup('Image_BgT' ):SetSize(nWidth, 64)
+	handle:Lookup('Image_BgCT'):SetSize(nWidth - 32, 64)
+	handle:Lookup('Image_BgLC'):SetSize(8, nHeight - 149)
+	handle:Lookup('Image_BgCC'):SetSize(nWidth - 16, nHeight - 149)
+	handle:Lookup('Image_BgRC'):SetSize(8, nHeight - 149)
+	handle:Lookup('Image_BgCB'):SetSize(nWidth - 132, 85)
+	handle:Lookup('Text_Title'):SetSize(nWidth - 90, 30)
+	handle:Lookup('Text_Author'):SetRelPos(0, nHeight - 41)
+	handle:Lookup('Text_Author'):SetSize(nWidth - 31, 20)
+
+	local wnd = frame:Lookup('Wnd_Total')
+	wnd:SetSize(nWidth, nHeight)
+	wnd:Lookup('WndContainer_Category'):SetSize(nWidth - 22, 32)
+	wnd:Lookup('WndContainer_Category'):FormatAllContentPos()
+	wnd:Lookup('Btn_Weibo'):SetRelPos(nWidth - 135, 55)
+	wnd:Lookup('WndScroll_Tabs'):SetSize(171, nHeight - 102)
+	wnd:Lookup('WndScroll_Tabs', ''):SetSize(171, nHeight - 102)
+	wnd:Lookup('WndScroll_Tabs', ''):FormatAllItemPos()
+	wnd:Lookup('WndScroll_Tabs/ScrollBar_Tabs'):SetSize(16, nHeight - 111)
+
+	local hWnd = wnd:Lookup('', '')
+	wnd:Lookup('', ''):SetSize(nWidth, nHeight)
+	hWnd:Lookup('Image_Breaker'):SetSize(6, nHeight - 340)
+	hWnd:Lookup('Image_TabBg'):SetSize(nWidth - 2, 33)
+	hWnd:Lookup('Handle_DBClick'):SetSize(nWidth, 54)
 
 	local bHideTabs = nWidth < 550
-	hWnd:Lookup('WndScroll_Tabs'):SetVisible(not bHideTabs)
-	hTotal:Lookup('Image_Breaker'):SetVisible(not bHideTabs)
+	wnd:Lookup('WndScroll_Tabs'):SetVisible(not bHideTabs)
+	hWnd:Lookup('Image_Breaker'):SetVisible(not bHideTabs)
 
 	if bHideTabs then
 		nWidth = nWidth + 181
-		hWnd:Lookup('WndScroll_MainPanel'):SetRelX(5)
+		wnd:Lookup('WndScroll_MainPanel'):SetRelX(5)
 	else
-		hWnd:Lookup('WndScroll_MainPanel'):SetRelX(186)
+		wnd:Lookup('WndScroll_MainPanel'):SetRelX(186)
 	end
 
-	hWnd:Lookup('WndScroll_MainPanel'):SetSize(nWidth - 191, nHeight - 100)
-	hWnd:Lookup('WndScroll_MainPanel/ScrollBar_MainPanel'):SetSize(20, nHeight - 100)
-	hWnd:Lookup('WndScroll_MainPanel/ScrollBar_MainPanel'):SetRelPos(nWidth - 209, 0)
-	hWnd:Lookup('WndScroll_MainPanel/WndContainer_MainPanel'):SetSize(nWidth - 201, nHeight - 100)
-	hWnd:Lookup('WndScroll_MainPanel/WndContainer_MainPanel', ''):SetSize(nWidth - 201, nHeight - 100)
-	local hWndMainPanel = hFrame:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel')
+	wnd:Lookup('WndScroll_MainPanel'):SetSize(nWidth - 191, nHeight - 100)
+	wnd:Lookup('WndScroll_MainPanel/ScrollBar_MainPanel'):SetSize(20, nHeight - 100)
+	wnd:Lookup('WndScroll_MainPanel/ScrollBar_MainPanel'):SetRelPos(nWidth - 209, 0)
+	wnd:Lookup('WndScroll_MainPanel/WndContainer_MainPanel'):SetSize(nWidth - 201, nHeight - 100)
+	wnd:Lookup('WndScroll_MainPanel/WndContainer_MainPanel', ''):SetSize(nWidth - 201, nHeight - 100)
+	local hWndMainPanel = frame:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel')
 	if hWndMainPanel.OnPanelResize then
 		local res, err = pcall(hWndMainPanel.OnPanelResize, hWndMainPanel)
 		if not res then
@@ -1158,7 +1176,10 @@ function _MY.OnSizeChanged()
 	end
 	hWndMainPanel:FormatAllContentPos()
 	hWndMainPanel:Lookup('', ''):FormatAllItemPos()
-	hTotal:FormatAllItemPos()
+	handle:FormatAllItemPos()
+	-- reset position
+	local an = GetFrameAnchor(frame)
+	frame:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
 end
 
 ---------------------------------------------------
