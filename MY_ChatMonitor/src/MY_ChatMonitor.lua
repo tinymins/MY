@@ -308,7 +308,7 @@ _C.OnPanelActive = function(wnd)
     })
 
     ui:append("Image", {
-        image = { 'UI/Image/UICommon/Commonpanel2.UITex', 48 },
+        image = 'UI/Image/UICommon/Commonpanel2.UITex', imageframe = 48,
         x = 8, y = 10, w = 25, h = 25, alpha = 180,
         onhover = function(bIn) this:SetAlpha( (bIn and 255 ) or 180) end,
         onclick = function(nButton)
@@ -321,7 +321,7 @@ _C.OnPanelActive = function(wnd)
 
     ui:append("Image", {
         x = w - 26, y = 13,
-        image = { 'UI/Image/UICommon/Commonpanel.UITex', 18 },
+        image = 'UI/Image/UICommon/Commonpanel.UITex', imageframe = 18,
         w = 30, h = 30, alpha = 200,
         onhover = function(bIn) this:SetAlpha((bIn and 255) or 200) end,
         onclick = function()

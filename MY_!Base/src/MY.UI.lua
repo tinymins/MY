@@ -3702,7 +3702,7 @@ function XGUI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 		end)
 	end
 	local ui = XGUI.CreateFrame(szFrameName)
-	ui:append('Image', { x = -10, y = 25, w = 360, h = 10, image = { 'UI/Image/UICommon/Commonpanel.UITex', 42 } })
+	ui:append('Image', { x = -10, y = 25, w = 360, h = 10, image = 'UI/Image/UICommon/Commonpanel.UITex', imageframe = 42 })
 	local muEditBox = ui:append('WndEditBox', { x = 0, y = 0, w = 170, h = 25 }, true)
 	local muList = ui:append('WndScrollBox', { handlestyle = 3, x = 0, y = 30, w = 340, h = 380 }, true)
 	-- add
