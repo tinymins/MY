@@ -1,6 +1,23 @@
 ---------------------------------------------------------------------
 -- BUFF¼à¿Ø
 ---------------------------------------------------------------------
+
+------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+------------------------------------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local insert, remove, concat = table.insert, table.remove, table.concat
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local type, tonumber, tostring = type, tonumber, tostring
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local floor, min, max, ceil = math.floor, math.min, math.max, math.ceil
+local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_TargetMon/lang/")
 local INI_PATH = MY.GetAddonInfo().szRoot .. "MY_TargetMon/ui/MY_TargetMon.ini"
 local ROLE_CONFIG_FILE = {'config/my_targetmon.jx3dat', MY_DATA_PATH.ROLE}
@@ -144,6 +161,43 @@ local function UpdateAnchor(frame)
 	CorrectPos(frame)
 end
 
+local function FixFormatAllItemPos(hList)
+	local FormatAllItemPos = hList.FormatAllItemPos
+	hList.FormatAllItemPos = function(hList, ...)
+		local hItem = hList:Lookup(0)
+		if not hItem then
+			return
+		end
+		local W = hList:GetW()
+		local w, h = hItem:GetSize()
+		local columms = max(floor(W / w), 1)
+		local aItem = {}
+		for i = 0, hList:GetItemCount() - 1 do
+			local hItem = hList:Lookup(i)
+			if hItem:IsVisible() then
+				insert(aItem, hItem)
+			end
+		end
+		local align = hList:GetHAlign()
+		while #aItem > 0 do
+			local x, y, deltaX = 0, 0, 0
+			if align == ALIGNMENT.LEFT then
+				x, deltaX = 0, w
+			elseif align == ALIGNMENT.RIGHT then
+				x, deltaX = W, - w
+			elseif align == ALIGNMENT.CENTER then
+				x, deltaX = (W - w * min(#aItem, columms)) / 2, w
+			end
+			for i = 1, min(#aItem, columms) do
+				remove(aItem, 1):SetRelPos(x, y)
+				x = x + deltaX
+			end
+			y = y + deltaY
+		end
+		SafeExecuteWithThis(hList, FormatAllItemPos, hList, ...)
+	end
+end
+
 local function RecreatePanel(config)
 	if not config.enable then
 		return ClosePanel(config)
@@ -154,6 +208,7 @@ local function RecreatePanel(config)
 		l_frameIndex = l_frameIndex + 1
 		l_frames[config] = frame
 		frame.hList = frame:Lookup("", "Handle_List")
+		FixFormatAllItemPos(frame.hList)
 		
 		for k, v in pairs(FE) do
 			frame[k] = v
