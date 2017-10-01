@@ -38,6 +38,11 @@ data = {
         ['BUFF' ] = 'BUFF監控',
         ['SKILL'] = '技能CD監控',
     },
+    ['ALIGNMENT'] = {
+        ['LEFT'] = '左對齊',
+        ['RIGHT'] = '右對齊',
+        ['CENTER'] = '居中對齊',
+    },
     ['Export'] = '導出',
     ['Delete'] = '刪除',
     ['Create'] = '創建',

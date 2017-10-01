@@ -342,6 +342,7 @@ local function RecreatePanel(config)
 	for _, mon in ipairs(config.monitors[GetClientPlayer().GetKungfuMount().dwSkillID] or EMPTY_TABLE) do
 		CreateItem(mon)
 	end
+	hList:SetHAlign(ALIGNMENT[config.alignment] or ALIGNMENT.LEFT)
 	hList:SetW(nWidth)
 	hList:SetIgnoreInvisibleChild(false)
 	hList:FormatAllItemPos()
@@ -394,9 +395,11 @@ local function GetTarget(eTarType, eMonType)
 		end
 	elseif TEAM_MARK[eTarType] then
 		local mark = GetClientTeam().GetTeamMark()
-		for dwID, nMark in pairs(mark) do
-			if TEAM_MARK[eTarType] == nMark then
-				return TARGET[IsPlayer(dwID) and "PLAYER" or "NPC"], dwID
+		if mark then
+			for dwID, nMark in pairs(mark) do
+				if TEAM_MARK[eTarType] == nMark then
+					return TARGET[IsPlayer(dwID) and "PLAYER" or "NPC"], dwID
+				end
 			end
 		end
 	end
@@ -992,6 +995,17 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 					bCheck = true, bMCheck = true, bChecked = eType == config.type,
 					fnAction = function()
 						config.type = eType
+						RecreatePanel(config)
+					end,
+				})
+			end
+			table.insert(t, { bDevide = true })
+			for _, eType in ipairs({'LEFT', 'RIGHT', 'CENTER'}) do
+				table.insert(t, {
+					szOption = _L.ALIGNMENT[eType],
+					bCheck = true, bMCheck = true, bChecked = eType == config.alignment,
+					fnAction = function()
+						config.alignment = eType
 						RecreatePanel(config)
 					end,
 				})
