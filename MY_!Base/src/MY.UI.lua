@@ -1183,47 +1183,52 @@ function XGUI:drag(...)
 end
 
 -- get/set ui object text
-function XGUI:text(szText)
+function XGUI:text(arg0)
 	self:_checksum()
-	if szText then
+	if arg0 then
 		local componentType, element
 		for _, raw in ipairs(self.raws) do
 			componentType = GetComponentType(raw)
-			if componentType == 'WndScrollBox' then
-				element = GetComponentElement(raw, 'MAIN_HANDLE')
-				element:Clear()
-				element:AppendItemFromString(GetFormatText(szText))
-				element:FormatAllItemPos()
-			elseif componentType == 'WndSliderBox' and IsFunction(szText) then
-				SetComponentProp(raw, 'FormatText', szText)
-				GetComponentProp(raw, 'ResponseUpdateScroll')(true)
-			elseif componentType == 'WndEditBox' or componentType == 'WndAutocomplete' then
-				element = GetComponentElement(raw, 'EDIT')
-				if IsTable(szText) then
-					for k, v in ipairs(szText) do
+			if IsString(arg0) then
+				if componentType == 'WndScrollBox' then
+					element = GetComponentElement(raw, 'MAIN_HANDLE')
+					element:Clear()
+					element:AppendItemFromString(GetFormatText(arg0))
+					element:FormatAllItemPos()
+				elseif componentType == 'WndEditBox' or componentType == 'WndAutocomplete' then
+					element = GetComponentElement(raw, 'EDIT')
+					element:SetText(arg0)
+				elseif componentType == 'Text' then
+					raw:SetText(arg0)
+					if GetComponentProp(raw, 'bAutoSize') then
+						raw:AutoSize()
+					end
+					raw:GetParent():FormatAllItemPos()
+				else
+					element = GetComponentElement(raw, 'TEXT')
+					if element then
+						element:SetText(arg0)
+					end
+					element = GetComponentElement(raw, 'EDIT')
+					if element then
+						element:SetText(arg0)
+					end
+				end
+			elseif IsFunction(arg0) then
+				if componentType == 'WndSliderBox' then
+					SetComponentProp(raw, 'FormatText', arg0)
+					GetComponentProp(raw, 'ResponseUpdateScroll')(true)
+				end
+			elseif IsTable(arg0) then
+				if componentType == 'WndEditBox' or componentType == 'WndAutocomplete' then
+					element = GetComponentElement(raw, 'EDIT')
+					for k, v in ipairs(arg0) do
 						if v.type == 'text' then
 							element:InsertText(v.text)
 						else
 							element:InsertObj(v.text, v)
 						end
 					end
-				else
-					element:SetText(szText)
-				end
-			elseif componentType == 'Text' then
-				raw:SetText(szText)
-				if GetComponentProp(raw, 'bAutoSize') then
-					raw:AutoSize()
-				end
-				raw:GetParent():FormatAllItemPos()
-			elseif not IsFunction(szText) then
-				element = GetComponentElement(raw, 'TEXT')
-				if element then
-					element:SetText(szText)
-				end
-				element = GetComponentElement(raw, 'EDIT')
-				if element then
-					element:SetText(szText)
 				end
 			end
 		end
@@ -2302,6 +2307,7 @@ function XGUI:range(nMin, nMax)
 			if GetComponentType(raw) == 'WndSliderBox' then
 				SetComponentProp(raw, 'nOffset', nMin)
 				GetComponentElement(raw, 'SLIDER'):SetStepCount(nMax - nMin)
+				GetComponentProp(raw, 'ResponseUpdateScroll')(true)
 			end
 		end
 		return self
