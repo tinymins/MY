@@ -161,41 +161,40 @@ local function UpdateAnchor(frame)
 	CorrectPos(frame)
 end
 
-local function FixFormatAllItemPos(hList)
-	local FormatAllItemPos = hList.FormatAllItemPos
-	hList.FormatAllItemPos = function(hList, ...)
-		local hItem = hList:Lookup(0)
-		if not hItem then
-			return
-		end
-		local W = hList:GetW()
-		local w, h = hItem:GetSize()
-		local columms = max(floor(W / w), 1)
-		local aItem = {}
-		for i = 0, hList:GetItemCount() - 1 do
-			local hItem = hList:Lookup(i)
-			if hItem:IsVisible() then
-				insert(aItem, hItem)
-			end
-		end
-		local align = hList:GetHAlign()
-		while #aItem > 0 do
-			local x, y, deltaX = 0, 0, 0
-			if align == ALIGNMENT.LEFT then
-				x, deltaX = 0, w
-			elseif align == ALIGNMENT.RIGHT then
-				x, deltaX = W, - w
-			elseif align == ALIGNMENT.CENTER then
-				x, deltaX = (W - w * min(#aItem, columms)) / 2, w
-			end
-			for i = 1, min(#aItem, columms) do
-				remove(aItem, 1):SetRelPos(x, y)
-				x = x + deltaX
-			end
-			y = y + deltaY
-		end
-		SafeExecuteWithThis(hList, FormatAllItemPos, hList, ...)
+local function FormatAllItemPosExt(hList)
+	local hItem = hList:Lookup(0)
+	if not hItem then
+		return
 	end
+	local W = hList:GetW()
+	local w, h = hItem:GetSize()
+	local columms = max(floor(W / w), 1)
+	local ignoreInvisible = hList:IsIgnoreInvisibleChild()
+	local aItem = {}
+	for i = 0, hList:GetItemCount() - 1 do
+		local hItem = hList:Lookup(i)
+		if not ignoreInvisible or hItem:IsVisible() then
+			insert(aItem, hItem)
+		end
+	end
+	local align, y = hList:GetHAlign(), 0
+	while #aItem > 0 do
+		local x, deltaX = 0, 0
+		if align == ALIGNMENT.LEFT then
+			x, deltaX = 0, w
+		elseif align == ALIGNMENT.RIGHT then
+			x, deltaX = W, - w
+		elseif align == ALIGNMENT.CENTER then
+			x, deltaX = (W - w * min(#aItem, columms)) / 2, w
+		end
+		for i = 1, min(#aItem, columms) do
+			remove(aItem, 1):SetRelPos(x, y)
+			x = x + deltaX
+		end
+		y = y + h
+	end
+	hList:SetSize(W, y)
+	hList:FormatAllItemPos()
 end
 
 local function RecreatePanel(config)
@@ -208,7 +207,7 @@ local function RecreatePanel(config)
 		l_frameIndex = l_frameIndex + 1
 		l_frames[config] = frame
 		frame.hList = frame:Lookup("", "Handle_List")
-		FixFormatAllItemPos(frame.hList)
+		frame.hList.FormatAllItemPosExt = FormatAllItemPosExt
 		
 		for k, v in pairs(FE) do
 			frame[k] = v
@@ -226,8 +225,7 @@ local function RecreatePanel(config)
 	hList:Clear()
 	frame.tItem = {}
 	frame.config = config
-	local nWidth = 0
-	local nCount = 0
+	local nItemW, nItemH, nWidth, nHeight, nCount = 0, 0, 0, 0, 0
 	local function CreateItem(mon)
 		if not mon.enable then
 			return
@@ -329,11 +327,15 @@ local function RecreatePanel(config)
 			hBox:SetSizeByAllItemSize()
 			hItem:SetSizeByAllItemSize()
 		end
-		
+		if nCount == 1 then
+			nItemW, nItemH = hItem:GetSize()
+		end
 		if nCount <= config.maxLineCount then
 			nWidth = nWidth + hItem:GetW()
 		end
-		-- hItem:Scale(config.scale, config.scale)
+		if nCount % config.maxLineCount == 1 then
+			nHeight = nHeight + hItem:GetH()
+		end
 		hItem:SetVisible(not config.hideVoid)
 	end
 	for _, mon in ipairs(config.monitors.common or EMPTY_TABLE) do
@@ -342,24 +344,26 @@ local function RecreatePanel(config)
 	for _, mon in ipairs(config.monitors[GetClientPlayer().GetKungfuMount().dwSkillID] or EMPTY_TABLE) do
 		CreateItem(mon)
 	end
+
+	nWidth = nWidth == 0 and 200 or nWidth
+	nHeight = nHeight == 0 and 50 or nHeight
+
+	hList:SetSize(nWidth, nHeight)
 	hList:SetHAlign(ALIGNMENT[config.alignment] or ALIGNMENT.LEFT)
-	hList:SetW(nWidth)
-	hList:SetIgnoreInvisibleChild(false)
-	hList:FormatAllItemPos()
-	hList:SetSizeByAllItemSize()
 	hList:SetIgnoreInvisibleChild(true)
-	hList:FormatAllItemPos()
+	hList:FormatAllItemPosExt()
 	UpdateHotkey(frame)
-	
-	local nW, nH = hList:GetSize()
-	nW = math.max(nW, 50 * config.scale)
-	nH = math.max(nH, 50 * config.scale)
-	frame.scale = config.scale
-	frame:SetSize(nW, nH)
-	frame:SetDragArea(0, 0, nW, nH)
+
+	frame:SetSize(nWidth, nHeight)
+	frame:SetDragArea(0, 0, nWidth, nHeight)
 	frame:EnableDrag(config.dragable)
 	frame:SetMousePenetrable(not config.dragable)
 	frame:Scale(config.scale, config.scale)
+
+	frame.scale = config.scale
+	frame.w, frame.h = frame:GetSize()
+	frame.dragW = (nWidth) == 0 and 200 or (nWidth * config.scale)
+	frame.dragH = (nItemH) == 0 and 200 or (nItemH * config.scale)
 	UpdateAnchor(frame)
 end
 
@@ -602,7 +606,7 @@ function FE.OnFrameBreathe()
 		end
 		-- 检查是否需要重绘界面坐标
 		if needFormatItemPos then
-			hList:FormatAllItemPos()
+			hList:FormatAllItemPosExt()
 		end
 	end
 	this.dwType, this.dwID = dwType, dwID
@@ -661,8 +665,12 @@ function FE.OnEvent(event)
 	elseif event == "SKILL_MOUNT_KUNG_FU" then
 		RecreatePanel(this.config)
 	elseif event == "ON_ENTER_CUSTOM_UI_MODE" then
+		this:SetH(this.dragH)
+		this:Lookup('', 'Handle_List'):SetAlpha(90)
 		UpdateCustomModeWindow(this, this.config.caption, not this.config.dragable)
 	elseif event == "ON_LEAVE_CUSTOM_UI_MODE" then
+		this:SetH(this.h)
+		this:Lookup('', 'Handle_List'):SetAlpha(255)
 		UpdateCustomModeWindow(this, this.config.caption, not this.config.dragable)
 		if this.config.dragable then
 			this:EnableDrag(true)
