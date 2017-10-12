@@ -1029,6 +1029,21 @@ MY.RegisterExit("ChatPanelUnhook", function ()
 	end
 end)
 
+local function UploadSerendipity(szName, szSerendipity, nMethod, bFinish, dwTime)
+	MY.Ajax({
+		type = "post/json",
+		url = 'http://data.jx3.derzh.com/api/serendipities',
+		data = {
+			data = MY.String.SimpleEcrypt(MY.JsonEncode({
+				n = szName, S = MY.GetRealServer(1), s = MY.GetRealServer(2),
+				N = szSerendipity, f = bFinish, t = dwTime, m = nMethod,
+			})),
+			lang = MY.GetLang(),
+		},
+		success = function(settings, content) end,
+	})
+end
+
 MY.RegisterMsgMonitor("QIYU", function(szMsg, nFont, bRich, r, g, b, szChannel)
 	-- 战斗中移动中免打扰
 	local me = GetClientPlayer()
@@ -1064,24 +1079,17 @@ MY.RegisterMsgMonitor("QIYU", function(szMsg, nFont, bRich, r, g, b, szChannel)
 	if bRich then
 		szMsg = GetPureText(szMsg)
 	end
-	szMsg:gsub(_L.ADVENTURE_PATT, function(szName, szAdventure)
-		local url = 'http://data.jx3.derzh.com/serendipity/?l=' .. MY.GetLang()
-			.. "&data=" .. MY.String.SimpleEcrypt(MY.Json.Encode({
-				S = MY.GetRealServer(1), s = MY.GetRealServer(2),
-				n = szName, a = szAdventure, t = GetCurrentTime()
-			}))
-		MY.DelayCall(math.random(0, 5000), function()
-			MY.Ajax({
-				type = "get",
-				url = url,
-				success = function(settings, content) end,
-			})
-		end)
+	szMsg:gsub(_L.ADVENTURE_PATT, function(szName, szSerendipity)
+		local dwTime = GetCurrentTime()
+		local function Upload()
+			UploadSerendipity(szName, szSerendipity, 1, 0, dwTime)
+		end
+		MY.DelayCall(math.random(0, 5000), Upload)
 	end)
 end, {"MSG_SYS"})
 
 do
-local function GetAdventureName(nID)
+local function GetSerendipityName(nID)
 	for i = 2, g_tTable.Adventure:GetRowCount() do
 		local tLine = g_tTable.Adventure:GetRow(i)
 		if tLine.dwID == nID then
@@ -1095,17 +1103,51 @@ MY.RegisterEvent("ON_SERENDIPITY_TRIGGER.QIYU", function()
 	if not me then
 		return
 	end
-	local szName = me.szName
-	local nAdvID, bFinish = arg0, arg1
-	local szAdventure = GetAdventureName(nAdvID)
-	MY.Ajax({
-		type = "get",
-		url = 'http://data.jx3.derzh.com/serendipity/?l=' .. MY.GetLang() .. "&m=2"
-		.. "&data=" .. MY.String.SimpleEcrypt(MY.Json.Encode({
-			n = szName, S = MY.GetRealServer(1), s = MY.GetRealServer(2),
-			a = szAdventure, f = bFinish, t = GetCurrentTime()
-		})),
-		success = function(settings, content) end,
-	})
+	UploadSerendipity(me.szName, GetSerendipityName(arg0), 2, arg1, GetCurrentTime())
+end)
+end
+
+do
+local l_serendipities
+local function GetSerendipityInfo(dwTabType, dwIndex)
+	if not l_serendipities then
+		l_serendipities = MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/serendipities.jx3dat')
+	end
+	local serendipity = l_serendipities[dwTabType] and l_serendipities[dwTabType][dwIndex]
+	if serendipity then
+		local iteminfo = GetItemInfo(serendipity[1], serendipity[2])
+		if iteminfo then
+			return iteminfo.szName, serendipity[3] == 1
+		end
+	end
+end
+
+MY.RegisterEvent('LOOT_ITEM', function()
+	if UI_GetClientPlayerID() ~= arg0 then
+		return
+	end
+	local me = GetClientPlayer()
+	if not me then
+		return
+	end
+	local item = GetItem(arg1)
+	if not item then
+		return
+	end
+	local szSerendipity, bFinish = GetSerendipityInfo(item.dwTabType, item.dwIndex)
+	if szSerendipity then
+		UploadSerendipity(me.szName, szSerendipity, 3, bFinish, GetCurrentTime())
+	end
+end)
+
+MY.RegisterEvent('QUEST_FINISHED', function()
+	local me = GetClientPlayer()
+	if not me then
+		return
+	end
+	local szSerendipity, bFinish = GetSerendipityInfo('quest', arg0)
+	if szSerendipity then
+		UploadSerendipity(me.szName, szSerendipity, 4, bFinish, GetCurrentTime())
+	end
 end)
 end

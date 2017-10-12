@@ -316,7 +316,7 @@ function MY.OpenPanel(bMute, bNoFocus, bNoAnimate)
 		MY.UI(MY.GetFrame()):children("#Wnd_Total"):children("#Btn_Weibo")
 		  :text(_L['author\'s weibo'])
 		  :click(function()
-		  	XGUI.OpenIE("http://weibo.com/zymah")
+		  	XGUI.OpenIE("https://weibo.com/zymah")
 		  end)
 		MY.UI(hFrame):event('UI_SCALED', function()
 			local fn = hFrame:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel').OnScrollBarPosChanged
@@ -906,13 +906,13 @@ function MY.SwitchTab(szID, bForceUpdate)
 		ui:append("Text", {
 			name = 'Text_Serendipity',
 			x = 90, y = 325, w = 80, font = 204, text = _L['serendipity'], alpha = 190,
-			onclick = function() XGUI.OpenIE("http://jx3.derzh.com/serendipity/", false, 500, 800) end,
+			onclick = function() XGUI.OpenIE("https://jx3.derzh.com/serendipity/", false, 500, 800) end,
 			onhover = function(bIn) this:SetAlpha(bIn and 255 or 190) end,
 		})
 		ui:append("Text", {
 			name = 'Text_OnlineTime',
 			x = 90, y = 325, w = 80, font = 204, text = _L['online time'], alpha = 190,
-			onclick = function() XGUI.OpenIE("http://jx3.derzh.com/onlinetime/", false, 500, 800) end,
+			onclick = function() XGUI.OpenIE("https://jx3.derzh.com/onlinetime/", false, 500, 800) end,
 			onhover = function(bIn) this:SetAlpha(bIn and 255 or 190) end,
 		})
 		ui:append("Text", { name = 'Text_Svr', x = 10, y = 345, w = 557, font = 204, text = MY.GetServer() .. " (" .. MY.GetRealServer() .. ")", alpha = 220 })
