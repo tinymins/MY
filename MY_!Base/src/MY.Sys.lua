@@ -276,30 +276,17 @@ local function pcall_this(context, fn, ...)
 	return unpack(rtc)
 end
 
-local l_tAjax = {}
+do
 local l_ajaxsettingsmeta = {
 	__index = {
-		ssl = false,
-		timeout = 10000,
-		success = function(settings, html)
-			MY.Debug({settings.url .. ' - SUCCESS'}, 'RemoteRequest', MY_DEBUG.LOG)
-		end,
-		error = function(settings, errMsg)
-			MY.Debug({settings.url .. ' - ' .. errMsg}, 'RemoteRequest', MY_DEBUG.WARNING)
-		end,
+		type = 'get',
+		timeout = 60000,
 		charset = "utf8",
 	}
 }
 function MY.Ajax(settings)
 	assert(settings and settings.url)
 	setmetatable(settings, l_ajaxsettingsmeta)
-	
-	local szKey = GetTickCount() * 100
-	while l_tAjax["MYAJAX" .. szKey] do
-		szKey = szKey + 1
-	end
-	szKey = "MYAJAX" .. szKey
-	l_tAjax[szKey] = settings
 	
 	local url, data = settings.url, settings.data
 	if settings.charset == "utf8" then
@@ -308,24 +295,50 @@ function MY.Ajax(settings)
 	end
 	data = MY.EncodePostData(data)
 	
-	if settings.type == "post" then
-		CURL_HttpPost(szKey, url, data, settings.ssl, settings.timeout)
-	elseif settings.type == "get" then
-		if not url:find("?") then
-			url = url .. "?"
-		elseif url:sub(-1) ~= "&" then
-			url = url .. "&"
+	local method, payload = unpack(MY.Split(settings.type, '/'))
+	if method == 'post' or method == 'get' then
+		local curl = Curl_Create(url)
+		if method == 'post' then
+			curl:SetMethod('POST')
+			if payload == 'json' then
+				if type(data) == 'table' then
+					data = MY.JsonEncode(data)
+				end
+				curl:AddHeader('Content-Type: application/json')
+			else -- if payload == 'form' then
+				curl:AddHeader('Content-Type: application/x-www-form-urlencoded')
+			end
+			curl:AddPostRawData(data)
+		elseif method == 'get' then
+			if data and #data > 0 then
+				if not url:find("?") then
+					url = url .. "?"
+				elseif url:sub(-1) ~= "&" then
+					url = url .. "&"
+				end
+				url = url .. data
+			end
 		end
-		url = url .. data
-		
-		CURL_HttpRqst(szKey, url, settings.ssl, settings.timeout)
-	else--if settings.type == "webbrowser" then
-		if not url:find("?") then
-			url = url .. "?"
-		elseif url:sub(-1) ~= "&" then
-			url = url .. "&"
+		curl:OnSuccess(settings.success or function(html, status)
+			MY.Debug({settings.url .. ' - SUCCESS'}, 'AJAX', MY_DEBUG.LOG)
+		end)
+		curl:OnError(settings.error or function(html, status, success)
+			MY.Debug({settings.url .. ' - STATUS ' .. (success and status or 'failed')}, 'AJAX', MY_DEBUG.WARNING)
+		end)
+		if settings.complete then
+			curl:OnComplete(settings.complete)
 		end
-		url = url .. data
+		curl:SetConnTimeout(settings.timeout)
+		curl:Perform()
+	elseif method == "webbrowser" then
+		if data and #data > 0 then
+			if not url:find("?") then
+				url = url .. "?"
+			elseif url:sub(-1) ~= "&" then
+				url = url .. "&"
+			end
+			url = url .. data
+		end
 		
 		local RequestID, hFrame
 		local nFreeWebPages = #_C.tFreeWebPages
@@ -381,32 +394,7 @@ function MY.Ajax(settings)
 		wWebPage:Navigate(url)
 	end
 end
-
-MY.RegisterEvent("CURL_REQUEST_RESULT.AJAX", function()
-	local szKey        = arg0
-	local bSuccess     = arg1
-	local szContent    = arg2
-	local dwBufferSize = arg3
-	if l_tAjax[szKey] then
-		local settings = l_tAjax[szKey]
-		if bSuccess then
-			if settings.success then
-				local status, err = pcall_this(settings.context, settings.success, settings, szContent)
-				if not status then
-					MY.Debug({err}, 'MYRR::AjaxSuccess::Callback', MY_DEBUG.ERROR)
-				end
-			end
-		else
-			if settings.error then
-				local status, err = pcall_this(settings.context, settings.error, settings, "failed")
-				if not status then
-					MY.Debug({err}, 'MYRR::TIMEOUT', MY_DEBUG.ERROR)
-				end
-			end
-		end
-		l_tAjax[szKey] = nil
-	end
-end)
+end
 
 do
 -------------------------------
@@ -427,23 +415,26 @@ MY.BreatheCall("MYLIB#STORAGE_DATA", 200, function()
 	end
 	m_nStorageVer = MY.LoadLUAData({'config/storageversion.jx3dat', MY_DATA_PATH.ROLE}) or {}
 	MY.Ajax({
-		type = "post",
-		url = 'http://data.jx3.derzh.com/data/?l=' .. MY.GetLang(),
-		data = "data=" .. MY.SimpleEcrypt(MY.ConvertToUTF8(MY.JsonEncode({
-			g = me.GetGlobalID(), f = me.dwForceID, e = me.GetTotalEquipScore(),
-			n = GetUserRoleName(), i = UI_GetClientPlayerID(), c = me.nCamp,
-			S = MY.GetRealServer(1), s = MY.GetRealServer(2), r = me.nRoleType,
-			_ = GetCurrentTime(), t = MY.GetTongName(),
-		}))),
+		type = "post/json",
+		url = 'http://data.jx3.derzh.com/api/storage',
+		data = MY.JsonEncode({
+			data = MY.SimpleEcrypt(MY.ConvertToUTF8(MY.JsonEncode({
+				g = me.GetGlobalID(), f = me.dwForceID, e = me.GetTotalEquipScore(),
+				n = GetUserRoleName(), i = UI_GetClientPlayerID(), c = me.nCamp,
+				S = MY.GetRealServer(1), s = MY.GetRealServer(2), r = me.nRoleType,
+				_ = GetCurrentTime(), t = MY.GetTongName(),
+			}))),
+			lang = MY.GetLang(),
+		}),
 		success = function(settings, szContent)
-			local data = MY.Json.Decode(szContent)
+			local data = MY.JsonDecode(szContent)
 			if data then
 				for k, v in pairs(data.public or EMPTY_TABLE) do
 					FireUIEvent("MY_PUBLIC_STORAGE_UPDATE", k, v)
 				end
 				for k, v in pairs(data.private or EMPTY_TABLE) do
 					if not m_nStorageVer[k] or m_nStorageVer[k] < v.v then
-						local oData = MY.Json.Decode(v.o)
+						local oData = MY.JsonDecode(v.o)
 						if oData ~= nil then
 							FireUIEvent("MY_PRIVATE_STORAGE_UPDATE", k, oData)
 						end
@@ -468,19 +459,26 @@ function MY.StorageData(szKey, oData)
 		if not me then
 			return
 		end
-		MY.RemoteRequest('http://data.jx3.derzh.com/data/sync.php?l=' .. MY.GetLang()
-		.. "&data=" .. MY.String.SimpleEcrypt(MY.Json.Encode({
-			g = me.GetGlobalID(), f = me.dwForceID, r = me.nRoleType,
-			n = GetUserRoleName(), i = UI_GetClientPlayerID(),
-			S = MY.GetRealServer(1), s = MY.GetRealServer(2),
-			v = GetCurrentTime(),
-			k = szKey, o = oData
-		})), function(settings, szContent)
-			local data = MY.Json.Decode(szContent)
-			if data and data.succeed then
-				FireUIEvent("MY_PRIVATE_STORAGE_SYNC", szKey)
-			end
-		end)
+		MY.Ajax({
+			type = 'post/json',
+			url = 'http://data.jx3.derzh.com/api/storage',
+			data = MY.JsonEncode({
+				data =  MY.String.SimpleEcrypt(MY.Json.Encode({
+					g = me.GetGlobalID(), f = me.dwForceID, r = me.nRoleType,
+					n = GetUserRoleName(), i = UI_GetClientPlayerID(),
+					S = MY.GetRealServer(1), s = MY.GetRealServer(2),
+					v = GetCurrentTime(),
+					k = szKey, o = oData
+				})),
+				lang = MY.GetLang(),
+			}),
+			success = function(szContent, status)
+				local data = MY.JsonDecode(szContent)
+				if data and data.succeed then
+					FireUIEvent("MY_PRIVATE_STORAGE_SYNC", szKey)
+				end
+			end,
+		})
 	end)
 	m_nStorageVer[szKey] = GetCurrentTime()
 end

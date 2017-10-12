@@ -53,6 +53,7 @@ function MY.String.Split(szText, szSep, bIgnoreEmptyPart)
 	end
 	return tResult
 end
+MY.Split = MY.String.Split
 
 -- 转义正则表达式特殊字符
 -- (string) MY.String.PatternEscape(string szText)

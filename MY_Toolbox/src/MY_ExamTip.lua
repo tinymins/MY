@@ -8,8 +8,8 @@
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
 local _C = {
-	szQueryUrl = "http://jx3.derzh.com/exam/?l=%s&q=%s",
-	szSubmitUrl = "http://jx3.derzh.com/exam/submit.php?l=%s&d=%s",
+	szQueryUrl = "https://jx3.derzh.com/api/exam?l=%s&q=%s",
+	szSubmitUrl = "https://jx3.derzh.com/api/exam",
 	tCached = {}, -- 玩家答题缓存
 	tAccept = {}, -- 从服务器获取到的数据缓存
 	tLastQu = "",
@@ -35,52 +35,65 @@ MY_ExamTip.QueryData = function(szQues)
 		end
 	else
 		local _, _, szLang, _ = GetVersion()
-		MY.RemoteRequest(string.format(_C.szQueryUrl, szLang, MY.UrlEncode(szQues)), function(settings, szContent)
-			local data = MY.Json.Decode(szContent)
-			if not data then
-				return nil
-			end
-			
-			local szTip = ''
-			for _, p in ipairs(data.result) do
-				szTip = szTip .. p.szQues .. '\n' .. p.szAnsw
-			end
-			
-			if #data.result == 0 then
-				szTip = _L["No result found. Here's from open search engine:"].."\n" .. szTip
-			else
+		MY.Ajax({
+			type = 'get',
+			url = string.format(_C.szQueryUrl, szLang, MY.UrlEncode(szQues)),
+			success = function(szContent, status)
+				local data = MY.Json.Decode(szContent)
+				if not data then
+					return nil
+				end
+				
+				local szTip = ''
 				for _, p in ipairs(data.result) do
-					if MY_ExamTip.ShowResult(data.question, p.szAnsw, szTip) then
-						_C.tAccept[data.question] = p.szAnsw
-						break
+					szTip = szTip .. p.szQues .. '\n' .. p.szAnsw
+				end
+				
+				if #data.result == 0 then
+					szTip = _L["No result found. Here's from open search engine:"].."\n" .. szTip
+				else
+					for _, p in ipairs(data.result) do
+						if MY_ExamTip.ShowResult(data.question, p.szAnsw, szTip) then
+							_C.tAccept[data.question] = p.szAnsw
+							break
+						end
 					end
 				end
-			end
-		end, function()
-			MY_ExamTip.ShowResult(_C.tLastQu, nil, _L['Loading failed.'])
-			_C.tLastQu = ""
-		end, 10000)
+			end, 
+			error = function()
+				MY_ExamTip.ShowResult(_C.tLastQu, nil, _L['Loading failed.'])
+				_C.tLastQu = ""
+			end,
+			timeout = 10000,
+		})
 	end
 end
 -- 提交玩家正确答案 -- 云数据来源
 MY_ExamTip.SubmitData = function()
 	local _, _, szLang, _ = GetVersion()
 	local nCommited, nAccepted, nUnsubmit = 0, 0, 0
-	-- MY_Anmerkungen.szNotePanelContent = string.format(_C.szSubmitUrl, szLang, MY.UrlEncode(MY.Json.Encode(_C.tCached)))
 	for szQues, szAnsw in pairs(_C.tCached) do
 		if not _C.tAccept[szQues] then
 			nUnsubmit = nUnsubmit + 1
-			MY.RemoteRequest(string.format(_C.szSubmitUrl, szLang, MY.UrlEncode(MY.Json.Encode({[szQues] = szAnsw}))), function(settings, szContent)
-				local r = MY.Json.Decode(szContent)
-				if r then
-					nUnsubmit = nUnsubmit - 1
-					nCommited = nCommited + r.received
-					nAccepted = nAccepted + r.accepted
-				end
-				if not MY.IsShieldedVersion() and nUnsubmit == 0 then
-					MY.Sysmsg({_L('%s record(s) commited, %s record(s) accepted!', nCommited, nAccepted)}, _L['exam tip'])
-				end
-			end)
+			MY.Ajax({
+				type = 'post/json',
+				url = _C.szSubmitUrl,
+				data = MY.JsonEncode({
+					lang = szLang, 
+					data = {[szQues] = szAnsw},
+				}),
+				success = function(szContent, status)
+					local r = MY.Json.Decode(szContent)
+					if r then
+						nUnsubmit = nUnsubmit - 1
+						nCommited = nCommited + r.received
+						nAccepted = nAccepted + r.accepted
+					end
+					if not MY.IsShieldedVersion() and nUnsubmit == 0 then
+						MY.Sysmsg({_L('%s record(s) commited, %s record(s) accepted!', nCommited, nAccepted)}, _L['exam tip'])
+					end
+				end,
+			})
 		end
 	end
 end
