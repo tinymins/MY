@@ -742,8 +742,8 @@ function XGUI:find(filter)
 					end
 					child = raw:GetFirstChild()
 					while child do
-						child = child:GetNext()
 						insert(children, child)
+						child = child:GetNext()
 					end
 					repeat
 						child = remove(children)
