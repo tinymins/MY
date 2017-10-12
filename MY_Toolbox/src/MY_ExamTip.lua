@@ -78,10 +78,10 @@ MY_ExamTip.SubmitData = function()
 			MY.Ajax({
 				type = 'post/json',
 				url = _C.szSubmitUrl,
-				data = MY.JsonEncode({
+				data = {
 					lang = szLang, 
 					data = {[szQues] = szAnsw},
-				}),
+				},
 				success = function(szContent, status)
 					local r = MY.Json.Decode(szContent)
 					if r then

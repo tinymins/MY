@@ -293,7 +293,6 @@ function MY.Ajax(settings)
 		url  = MY.ConvertToUTF8(url)
 		data = MY.ConvertToUTF8(data)
 	end
-	data = MY.EncodePostData(data)
 	
 	local method, payload = unpack(MY.Split(settings.type, '/'))
 	if method == 'post' or method == 'get' then
@@ -301,11 +300,10 @@ function MY.Ajax(settings)
 		if method == 'post' then
 			curl:SetMethod('POST')
 			if payload == 'json' then
-				if type(data) == 'table' then
-					data = MY.JsonEncode(data)
-				end
+				data = MY.JsonEncode(data)
 				curl:AddHeader('Content-Type: application/json')
 			else -- if payload == 'form' then
+				data = MY.EncodePostData(data)
 				curl:AddHeader('Content-Type: application/x-www-form-urlencoded')
 			end
 			curl:AddPostRawData(data)
@@ -417,7 +415,7 @@ MY.BreatheCall("MYLIB#STORAGE_DATA", 200, function()
 	MY.Ajax({
 		type = "post/json",
 		url = 'http://data.jx3.derzh.com/api/storage',
-		data = MY.JsonEncode({
+		data = {
 			data = MY.SimpleEcrypt(MY.ConvertToUTF8(MY.JsonEncode({
 				g = me.GetGlobalID(), f = me.dwForceID, e = me.GetTotalEquipScore(),
 				n = GetUserRoleName(), i = UI_GetClientPlayerID(), c = me.nCamp,
@@ -425,7 +423,7 @@ MY.BreatheCall("MYLIB#STORAGE_DATA", 200, function()
 				_ = GetCurrentTime(), t = MY.GetTongName(),
 			}))),
 			lang = MY.GetLang(),
-		}),
+		},
 		success = function(settings, szContent)
 			local data = MY.JsonDecode(szContent)
 			if data then
@@ -462,7 +460,7 @@ function MY.StorageData(szKey, oData)
 		MY.Ajax({
 			type = 'post/json',
 			url = 'http://data.jx3.derzh.com/api/storage',
-			data = MY.JsonEncode({
+			data = {
 				data =  MY.String.SimpleEcrypt(MY.Json.Encode({
 					g = me.GetGlobalID(), f = me.dwForceID, r = me.nRoleType,
 					n = GetUserRoleName(), i = UI_GetClientPlayerID(),
@@ -471,7 +469,7 @@ function MY.StorageData(szKey, oData)
 					k = szKey, o = oData
 				})),
 				lang = MY.GetLang(),
-			}),
+			},
 			success = function(szContent, status)
 				local data = MY.JsonDecode(szContent)
 				if data and data.succeed then
