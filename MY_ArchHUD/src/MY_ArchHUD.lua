@@ -166,8 +166,9 @@ local function UpdateTargetCasting(hFrame, KTarget)
 	if KTarget then
 		hFrame.hTargetHealth:Show()
 		hFrame.hImageTargetHealth:SetPercentage(KTarget.nCurrentLife / KTarget.nMaxLife)
-		local bPrePare, dwSkillID, dwSkillLevel, fCastPercent = KTarget.GetSkillPrepareState()
-		if bPrePare then
+		local nType, dwSkillID, dwSkillLevel, fCastPercent = KTarget.GetSkillOTActionState()
+		if nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
+		or nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL then
 			hFrame.hImageTargetCasting:SetPercentage(fCastPercent)
 			hFrame.hTargetCasting:Show()
 			if hFrame.dwTargetCasting ~= dwSkillID then

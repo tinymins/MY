@@ -645,16 +645,18 @@ local function CheckInvalidRect(dwType, dwID, me, bNoCreate)
             -- 读条判定
             local nState = xlb:GetOTState()
             if nState ~= OT_STATE.ON_SKILL then
-                local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = object.GetSkillPrepareState()
-                if bIsPrepare then
+			    local nType, dwSkillID, dwSkillLevel, fProgress = object.GetSkillOTActionState()
+                if nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
+				or nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL then
                     xlb:SetOTTitle(Table_GetSkillName(dwSkillID, dwSkillLevel)):DrawOTTitle():SetOTPercentage(fProgress):SetOTState(OT_STATE.START_SKILL)
                 end
             end
             if nState == OT_STATE.START_SKILL then                              -- 技能读条开始
                 xlb:DrawOTBarBorder(Config.nAlpha):SetOTPercentage(0):SetOTState(OT_STATE.ON_SKILL)
             elseif nState == OT_STATE.ON_SKILL then                             -- 技能读条中
-                local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = object.GetSkillPrepareState()
-                if bIsPrepare then
+			    local nType, dwSkillID, dwSkillLevel, fProgress = object.GetSkillOTActionState()
+                if nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
+				or nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL then
                     xlb:SetOTPercentage(fProgress):SetOTTitle(Table_GetSkillName(dwSkillID, dwSkillLevel))
                 else
                     xlb:SetOTPercentage(1):SetOTState(OT_STATE.SUCCEED)
