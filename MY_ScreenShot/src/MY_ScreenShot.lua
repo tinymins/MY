@@ -136,7 +136,7 @@ _MY_ScreenShot.OnPanelActive = function(wnd)
         szValue = string.gsub(szValue, "^%s*(.-)%s*$", "%1")
         szValue = string.gsub(szValue, "\\", "/")
         szValue = string.gsub(szValue, "^(.-)/*$", "%1")
-        szValue = szValue..(#szValue>0 and '/') or ''
+        szValue = szValue..((#szValue>0 and '/') or '')
         MY_ScreenShot.SetConfig("szFilePath", szValue)
       end)
       :tip(_L['Set destination folder which screenshot file will be saved. Absolute path required.\nEx: D:/JX3_ScreenShot/\nAttention: let it blank will save screenshot to default folder.'],MY.Const.UI.Tip.POS_TOP)
