@@ -265,8 +265,11 @@ MY_ToolBox.ApplyConfig = function()
 				return
 			end
 
-			local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = player.GetSkillPrepareState()
-			if not (bIsPrepare and dwSkillID == 3691) then
+			local nType, dwSkillID, dwSkillLevel, fProgress = player.GetSkillOTActionState()
+			if not ((
+				nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
+				or nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
+			) and dwSkillID == 3691) then
 				return
 			end
 			MY.Sysmsg({_L['Shenxing has been cancelled, cause you got the zhenyan.']})

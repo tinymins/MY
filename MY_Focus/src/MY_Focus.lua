@@ -630,12 +630,17 @@ function MY_Focus.DrawFocus(dwType, dwID)
 	end
 	-- ∂¡Ãı
 	if dwType ~= TARGET.DOODAD then
-		local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = obj.GetSkillPrepareState()
+		local nType, dwSkillID, dwSkillLevel, fProgress = obj.GetSkillOTActionState()
 		if MY_Focus.bTraversal and dwType == TARGET.PLAYER
-		and (not bIsPrepare and obj.GetOTActionState() == 1) then
+		and (
+			nType ~= CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
+			and nType ~= CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
+			and obj.GetOTActionState() == 1
+		) then
 			MY.Player.WithTarget(dwType, dwID, function()
-				local bIsPrepare, dwSkillID, dwSkillLevel, fProgress = obj.GetSkillPrepareState()
-				if bIsPrepare then
+				local nType, dwSkillID, dwSkillLevel, fProgress = obj.GetSkillOTActionState()
+				if nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
+				or nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL then
 					hItem:Lookup('Handle_Progress/Image_Progress'):SetPercentage(fProgress)
 					hItem:Lookup('Handle_Progress/Text_Progress'):SetText(MY_Focus.GetSkillName(dwSkillID, dwSkillLevel))
 				else
@@ -644,7 +649,8 @@ function MY_Focus.DrawFocus(dwType, dwID)
 				end
 			end)
 		else
-			if bIsPrepare then
+			if nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
+			or nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL then
 				hItem:Lookup('Handle_Progress/Image_Progress'):SetPercentage(fProgress)
 				hItem:Lookup('Handle_Progress/Text_Progress'):SetText(MY_Focus.GetSkillName(dwSkillID, dwSkillLevel))
 			else
