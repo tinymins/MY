@@ -6,7 +6,14 @@
 		{
 			"taskName": "Run LUA",
 			"type": "shell",
-			"command": "lua-5.1 ${file}",
+			"windows": {
+				"command": "luac",
+				"args": ["${file}"]
+			},
+			"osx": {
+				"command": "lua-5.1",
+				"args": ["${file}"]
+			},
 			"group": {
 				"kind": "build",
 				"isDefault": true
