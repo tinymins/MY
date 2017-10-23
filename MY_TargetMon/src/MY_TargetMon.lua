@@ -427,10 +427,16 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 			local nTimeLeft = math.max(0, buff.nEndFrame - nFrameCount) / 16
 			local szTimeLeft = nTimeLeft > 3600 and '1h+' or ((config.decimalTime == -1 or nTimeLeft < config.decimalTime) and "%.1f'" or "%d'"):format(nTimeLeft)
 			local nBuffTime = math.max(GetBuffTime(buff.dwID, buff.nLevel) / 16, nTimeLeft)
-			if l_tBuffTime[KTarget.dwID][buff.dwID] then
-				nBuffTime = math.max(l_tBuffTime[KTarget.dwID][buff.dwID], nBuffTime)
+			if not l_tBuffTime[KTarget.dwID][buff.dwID] then
+				l_tBuffTime[KTarget.dwID][buff.dwID] = {}
 			end
-			l_tBuffTime[KTarget.dwID][buff.dwID] = nBuffTime
+			if not l_tBuffTime[KTarget.dwID][buff.dwID][buff.nLevel] then
+				l_tBuffTime[KTarget.dwID][buff.dwID][buff.nLevel] = {}
+			end
+			if l_tBuffTime[KTarget.dwID][buff.dwID][buff.nLevel][buff.nStackNum] then
+				nBuffTime = math.max(l_tBuffTime[KTarget.dwID][buff.dwID][buff.nLevel][buff.nStackNum])
+			end
+			l_tBuffTime[KTarget.dwID][buff.dwID][buff.nLevel][buff.nStackNum] = nBuffTime
 			-- 处理新出现的BUFF
 			if not hItem.mon.iconid or hItem.mon.iconid == 13 then
 				-- 计算图标 名字 ID等
