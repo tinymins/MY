@@ -186,9 +186,9 @@ MY_Farbnamen.ShowTip = function(namelink)
 		local tTip = {}
 		-- author info
 		if tInfo.dwID and tInfo.szName and tInfo.szName == MY.GetAddonInfo().tAuthor[tInfo.dwID] then
-			tinsert(tTip, GetFormatText(_L['mingyi plugins'], 8, 255, 95, 159))
-			tinsert(tTip, GetFormatText(' ', 136, 255, 95, 159))
-			tinsert(tTip, GetFormatText(_L['[author]'], 8, 0, 255, 0))
+			tinsert(tTip, GetFormatText(_L['mingyi plugins'], 8, 89, 224, 232))
+			tinsert(tTip, GetFormatText(' ', 136, 89, 224, 232))
+			tinsert(tTip, GetFormatText(_L['[author]'], 8, 89, 224, 232))
 			tinsert(tTip, XML_LINE_BREAKER)
 		end
 		-- Ãû³Æ µÈ¼¶
