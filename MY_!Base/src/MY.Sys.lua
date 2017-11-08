@@ -428,11 +428,14 @@ MY.BreatheCall("MYLIB#STORAGE_DATA", 200, function()
 			local data = MY.JsonDecode(szContent)
 			if data then
 				for k, v in pairs(data.public or EMPTY_TABLE) do
-					FireUIEvent("MY_PUBLIC_STORAGE_UPDATE", k, v)
+					local oData = str2var(v)
+					if oData then
+						FireUIEvent("MY_PUBLIC_STORAGE_UPDATE", k, oData)
+					end
 				end
 				for k, v in pairs(data.private or EMPTY_TABLE) do
 					if not m_nStorageVer[k] or m_nStorageVer[k] < v.v then
-						local oData = MY.JsonDecode(v.o)
+						local oData = str2var(v.o)
 						if oData ~= nil then
 							FireUIEvent("MY_PRIVATE_STORAGE_UPDATE", k, oData)
 						end
