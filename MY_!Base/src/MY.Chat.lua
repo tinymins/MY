@@ -1034,12 +1034,22 @@ local function UploadSerendipity(szName, szSerendipity, nMethod, bFinish, dwTime
 		type = "post/json",
 		url = 'http://data.jx3.derzh.com/api/serendipities',
 		data = {
-			data = MY.String.SimpleEcrypt(MY.JsonEncode({
+			data = MY.SimpleEcrypt(MY.JsonEncode({
 				n = szName, S = MY.GetRealServer(1), s = MY.GetRealServer(2),
 				N = szSerendipity, f = bFinish, t = dwTime, m = nMethod,
 			})),
 			lang = MY.GetLang(),
 		},
+		success = function(settings, content) end,
+	})
+
+	MY.Ajax({
+		type = "get",
+		url = 'http://data.jx3.derzh.com/serendipity/?l=' .. MY.GetLang() .. "&m=" .. nMethod
+		.. "&data=" .. MY.SimpleEcrypt(MY.JsonEncode({
+			n = szName, S = MY.GetRealServer(1), s = MY.GetRealServer(2),
+			a = szAdventure, f = bFinish, t = GetCurrentTime()
+		})),
 		success = function(settings, content) end,
 	})
 end
