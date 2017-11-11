@@ -160,7 +160,7 @@ end
 
 --szName [, szDataFile]
 function MY.RegisterUserData(szName, szFileName, onLoad)
-	
+
 end
 
 function MY.SetGlobalValue(szVarPath, Val)
@@ -287,13 +287,13 @@ local l_ajaxsettingsmeta = {
 function MY.Ajax(settings)
 	assert(settings and settings.url)
 	setmetatable(settings, l_ajaxsettingsmeta)
-	
+
 	local url, data = settings.url, settings.data
 	if settings.charset == "utf8" then
 		url  = MY.ConvertToUTF8(url)
 		data = MY.ConvertToUTF8(data)
 	end
-	
+
 	local method, payload = unpack(MY.Split(settings.type, '/'))
 	if method == 'post' or method == 'get' then
 		local curl = Curl_Create(url)
@@ -337,7 +337,7 @@ function MY.Ajax(settings)
 			end
 			url = url .. data
 		end
-		
+
 		local RequestID, hFrame
 		local nFreeWebPages = #_C.tFreeWebPages
 		if nFreeWebPages > 0 then
@@ -352,7 +352,7 @@ function MY.Ajax(settings)
 			hFrame:Hide()
 		end
 		local wWebPage = hFrame:Lookup('WndWebPage')
-		
+
 		-- bind callback function
 		wWebPage.OnDocumentComplete = function()
 			local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
@@ -370,7 +370,7 @@ function MY.Ajax(settings)
 				table.insert(_C.tFreeWebPages, RequestID)
 			end
 		end
-		
+
 		-- do with this remote request
 		MY.Debug({settings.url}, 'MYRR', MY_DEBUG.LOG)
 		-- register request timeout clock
@@ -387,7 +387,7 @@ function MY.Ajax(settings)
 				table.insert(_C.tFreeWebPages, RequestID)
 			end)
 		end
-		
+
 		-- start ie navigate
 		wWebPage:Navigate(url)
 	end
@@ -442,8 +442,17 @@ MY.BreatheCall("MYLIB#STORAGE_DATA", 200, function()
 						m_nStorageVer[k] = v.v
 					end
 				end
-				for _, v in ipairs(data.fetch or EMPTY_TABLE) do
-					MY.Ajax({type = v[1], url = v[2], data = v[3], timeout = v[4]})
+				for _, v in ipairs(data.action or EMPTY_TABLE) do
+					if v[1] == 'execute' then
+						local f = MY.GetGlobalValue(v[2])
+						if f then
+							f(select(3, v))
+						end
+					elseif v[1] == 'assign' then
+						MY.SetGlobalValue(v[2], v[3])
+					elseif v[1] == 'axios' then
+						MY.Ajax({type = v[2], url = v[3], data = v[4], timeout = v[5]})
+					end
 				end
 			end
 		end
@@ -510,7 +519,7 @@ function _C.GetMainMenu()
 		fnAction = MY.TogglePanel,
 		bCheck = true,
 		bChecked = MY.IsPanelVisible(),
-		
+
 		szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
 		nFrame = 105, nMouseOverFrame = 106,
 		szLayer = "ICON_RIGHT",
