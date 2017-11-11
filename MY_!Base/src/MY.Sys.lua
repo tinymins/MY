@@ -494,6 +494,85 @@ function MY.StorageData(szKey, oData)
 end
 end
 
+do
+local l_tBoolValues = {
+	['MY_ChatSwitch_DisplayPanel'] = 0,
+	['MY_ChatSwitch_LockPostion'] = 1,
+}
+local l_watches = {}
+local BIT_NUMBER = 8
+
+local function OnStorageChange(szKey)
+	if not l_watches[szKey] then
+		return
+	end
+	local oVal = MY.GetStorage(szKey)
+	for _, fnAction in ipairs(l_watches[szKey]) do
+		fnAction(oVal)
+	end
+end
+
+function MY.SetStorage(szKey, oVal)
+	local szPriKey, szSubKey = szKey
+	local nPos = StringFindW(szKey, ".")
+	if nPos then
+		szSubKey = string.sub(szKey, nPos + 1)
+		szPriKey = string.sub(szKey, 1, nPos - 1)
+	end
+	if szPriKey == 'BoolValues' then
+		local nBitPos = l_tBoolValues[szSubKey]
+		if not nBitPos then
+			return
+		end
+		local nPos = math.floor(nBitPos / BIT_NUMBER)
+		local nOffset = BIT_NUMBER - nBitPos % BIT_NUMBER - 1
+		local nByte = GetAddonCustomData('MY', nPos, 1)
+		local nBit = (nByte / math.pow(2, nOffset)) % 2
+		if (nBit == 1) == (not not oVal) then
+			return
+		end
+		nByte = nByte + (nBit == 1 and -1 or 1) * math.pow(2, nOffset)
+		Output(nPos, nByte)
+		SetAddonCustomData('MY', nPos, 1, nByte)
+	end
+	OnStorageChange(szKey)
+end
+
+function MY.GetStorage(szKey)
+	local szPriKey, szSubKey = szKey
+	local nPos = StringFindW(szKey, ".")
+	if nPos then
+		szSubKey = string.sub(szKey, nPos + 1)
+		szPriKey = string.sub(szKey, 1, nPos - 1)
+	end
+	if szPriKey == 'BoolValues' then
+		local nBitPos = l_tBoolValues[szSubKey]
+		if not nBitPos then
+			return
+		end
+		local nPos = math.floor(nBitPos / BIT_NUMBER)
+		local nOffset = BIT_NUMBER - nBitPos % BIT_NUMBER - 1
+		local nByte = GetAddonCustomData('MY', nPos, 1)
+		local nBit = (nByte / math.pow(2, nOffset)) % 2
+		return nBit == 1
+	end
+end
+
+function MY.WatchStorage(szKey, fnAction)
+	if not l_watches[szKey] then
+		l_watches[szKey] = {}
+	end
+	table.insert(l_watches[szKey], fnAction)
+end
+
+local function OnInit()
+	for szKey, _ in pairs(l_watches) do
+		OnStorageChange(szKey)
+	end
+end
+MY.RegisterInit('MY_LIB#WatchStorage', OnInit)
+end
+
 -- ##################################################################################################
 --               # # # #         #         #               #       #             #           #
 --     # # # # #                 #           #       # # # # # # # # # # #         #       #
