@@ -299,12 +299,14 @@ end
 
 -- 系统频道监控处理函数
 local function OnMsgArrive(szMsg, nFont, bRich, r, g, b)
+	local isRoll = false
 	for szName, nRoll in string.gmatch(szMsg, _L['ROLL_MONITOR_EXP'] ) do
 		-- 格式化数值
 		nRoll = tonumber(nRoll)
 		if not nRoll then
 			return
 		end
+		isRoll = true
 		-- 判断缓存中该玩家是否已存在记录
 		if not m_tRecords[szName] then
 			m_tRecords[szName] = { szName = szName }
@@ -313,6 +315,9 @@ local function OnMsgArrive(szMsg, nFont, bRich, r, g, b)
 		-- 格式化数组 更新各数值
 		table.insert(m_aRecTime, GetCurrentTime())
 		table.insert(aRecord, {nTime = GetCurrentTime(), nRoll = nRoll})
+	end
+	if not isRoll then
+		return
 	end
 	MY_RollMonitor.DrawBoard()
 end
