@@ -8,12 +8,12 @@ data = {
     ['friend headtop tips nav'] = '啓用場景追蹤點',
     ['tong member headtop tips'] = '附近幫會成員高亮',
     ['tong member headtop tips nav'] = '啓用場景追蹤點',
-    
+
     ['check nearby gongzhan'] = '檢測附近共戰',
     ['Detected [%s] has Gongzhan BUFF for %d second(s).'] = "檢測到[%s]共戰BUFF剩余%d秒。",
-    
+
     ['* infomation tips'] = '※ 信息條（SHIFT+U移動位置）',
-    
+
     ['ping monitor'   ] = '網絡延遲',
     ['GPS'            ] = '當前位置',
     ['fps monitor'    ] = '遊戲幀數',
@@ -26,7 +26,7 @@ data = {
     ['background'     ] = '背景'    ,
     ['title'          ] = '標題'    ,
     ['font'           ] = '字體'    ,
-    
+
     ['Ping: '        ] = '網絡延遲：',
     ['Location: '    ] = '當前位置：',
     ['FPS: '         ] = 'FPS：',
@@ -44,24 +44,24 @@ data = {
     ['%d:%02d:%02d'  ] = '%d:%02d:%02d',
     ['Lotus Clock: ' ] = '藕和桂花：',
     ['%d:%d:%d'      ] = '%d:%d:%d',
-    
+
     ['GongZhan'] = '共戰',
     ['Detected [%s] has GongZhan buff for %d sec(s).'] = '檢測到[%s]共戰BUFF剩余%d秒。',
     ['Nearby GongZhan Total Count: %d.'] = '附近共戰數量：%d。',
     ['------------------------------------'] = '————————————————————————',
     ['auto hide chat panel'] = '自動隱藏聊天欄',
-    
+
     ['visual skill'] = '顯示曆史技能列表',
     ['display %d skills.'] = '顯示%d格。',
-    
+
     ['avoid blacking shenxing cd'] = '防止神行CD被吃',
     ['Shenxing has been cancelled, cause you got the zhenyan.'] = '您獲取到陣眼，爲防止神行千裏CD被黑，讀條已自動打斷。',
-    
+
     ['auto switch talk channel when into battle field'] = '進出戰場JJC時自動切換團隊/戰場頻道',
-    
+
     ['The kill sequence is: '] = '正確擊殺順序：',
     ['failed to calc.'] = '計算失敗。',
-    
+
     ['my anmerkungen'] = '茗伊隨身便箋',
     ['player note'] = '角色標簽',
     ['* anmerkungen'] = '※ 隨身便箋 記在小本子上',
@@ -81,15 +81,19 @@ data = {
     ['New data'] = '原數據',
     ['Decode data failed!'] = '解碼數據失敗！',
     ['Export'] = '導出',
-    
+
     ['Type to search, use comma to split.'] = '輸入文字進行搜索，半角逗號分隔多個搜索項。\n如：皇竹草,甜象草',
-    
+
     ['exam tip'] = '科舉助手',
-    ['%s record(s) commited, %s record(s) accepted!'] = '已爲您自動提交了%s條題庫數據，其中%s條已被系統通過采納！',
     ["Querying, please wait..."] = '查詢中，請稍後……',
-    ["No result found. Here's from open search engine:"] = '沒有搜索到匹配的結果，以下數據來自開放搜索引擎：',
+    ['Local exam data matched.'] = '匹配到本地題庫。',
+    ["No result found."] = '沒有搜索到匹配的結果。',
+    ["No result found, here's from open search engine:"] = '沒有搜索到匹配的結果，以下數據來自開放搜索引擎：',
+    ['No result matched, here\'s similar answers:'] = '沒有搜索到匹配的結果，以下爲類似題目：',
+    ['Question: %s\nAnswer: %s'] = '問：%s\n答：%s',
     ['Loading failed.'] = '加載失敗。',
-    
+    ['%s record(s) commited, %s record(s) accepted!'] = '已爲您自動提交了%s條題庫數據，其中%s條已被系統通過采納！',
+
     ['autochat'                                        ] = '自動對話',
     ['Common'                                          ] = '通用',
     ['Auto interact disabled due to SHIFT key pressed.'] = '你按住了Shift鍵，自動對話被禁用。',
@@ -99,22 +103,22 @@ data = {
     ['disable when shift key pressed'                  ] = '按住SHIFT時禁用自動對話',
     ['close after auto chat'                           ] = '自動對話後關閉窗口',
     ['Left click to config autochat.\nRight click to edit global config.'] = '左鍵點擊配置該對話框的自動對話\n右鍵點擊配置全局自動對話設定',
-    
+
     ['NAME_PATTERN_LIST'] = {
         '它的主人是(.-)。',
     },
-    
+
     ['You have been loged in for 2min, you can unlock bag locker now.'] = '你已登入遊戲兩分鍾，可以愉快的解除倉庫鎖啦！',
     LOCK_TIP = {},
-    
+
     ['Warning: Bigwar has been finished but not handed yet!'] = '茗伊提示：大戰還沒交！',
-    
+
     ['show changge shadow index'] = '顯示長歌影子次序',
     ['show distance'] = '顯示距離',
     ['show countdown'] = '顯示時間',
     ['scale: %d%%.'] = '縮放: %d%%',
     ['changge force only'] = '僅長歌可用',
-    
+
     ['auto restore team info in arena'] = '競技場中自動恢複上次組隊信息',
     ['auto cancel hide player in arena and battlefield'] = '競技場與戰場中自動取消屏蔽玩家與NPC',
 }
