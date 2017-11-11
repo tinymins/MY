@@ -3,5 +3,7 @@
   "editor.renderWhitespace": "all",
   "editor.insertSpaces": false,
   "files.encoding": "gbk",
-  "files.eol": "\n"
+  "files.eol": "\n",
+  "files.trimTrailingWhitespace": true,
+  "files.trimFinalNewlines": true
 }
