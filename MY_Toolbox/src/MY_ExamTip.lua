@@ -12,17 +12,17 @@ local _C = {
 	szSubmitUrl = "https://jx3.derzh.com/api/exam",
 	tCached = {}, -- 玩家答题缓存
 	tAccept = {}, -- 从服务器获取到的数据缓存
-	tLastQu = "",
+	szLastQu = "",
 }
 MY_ExamTip = {}
 
 -- 获取题目和答案
 MY_ExamTip.QueryData = function(szQues)
-	if _C.tLastQu == szQues then
+	if _C.szLastQu == szQues then
 		return nil
 	end
-	
-	_C.tLastQu = szQues
+	_C.szLastQu = szQues
+
 	MY_ExamTip.ShowResult(szQues, nil, _L["Querying, please wait..."])
 	if not _C.tLocalQaS then
 		_C.tLocalQaS = MY.LoadLUAData({"config/examtip.jx3dat", MY_DATA_PATH.GLOBAL}) or {}
@@ -60,9 +60,11 @@ MY_ExamTip.QueryData = function(szQues)
 					end
 				end
 			end, 
-			error = function()
-				MY_ExamTip.ShowResult(_C.tLastQu, nil, _L['Loading failed.'])
-				_C.tLastQu = ""
+			error = function(html, status, connected)
+				if not connected then
+					_C.szLastQu = ""
+				end
+				MY_ExamTip.ShowResult(_C.szLastQu, nil, _L['Loading failed.'])
 			end,
 			timeout = 10000,
 		})
@@ -113,6 +115,9 @@ MY_ExamTip.ShowResult = function(szQues, szAnsw, szTip)
 	
 	if hQues:GetText() ~= szQues then
 		return false
+	end
+	if szTip then
+		OutputMessage('MSG_SYS', szTip .. '\n')
 	end
 	hTxt1:SetFontColor(0, 0, 0)
 	hTxt2:SetFontColor(0, 0, 0)
