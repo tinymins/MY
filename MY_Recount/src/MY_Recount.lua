@@ -177,9 +177,11 @@ MY_Recount.Open = function()
 	-- open
 	m_frame = Wnd.OpenWindow(_C.szIniFile, 'MY_Recount')
 	-- pos
-	MY.UI(m_frame):anchor(MY_Recount.anchor)
+	local anchor = MY.GetStorage('FrameAnchor.MY_Recount')
+		or { x = 0, y = -70, s = "BOTTOMRIGHT", r = "BOTTOMRIGHT" }
+	MY.UI(m_frame):anchor(anchor)
 	MY.RegisterEvent('UI_SCALED.MY_RECOUNT', function()
-		MY.UI(m_frame):anchor(MY_Recount.anchor)
+		MY.UI(m_frame):anchor(anchor)
 	end)
 	-- draw
 	MY_Recount.DrawUI()
@@ -563,7 +565,7 @@ end
 
 MY_Recount.OnFrameDragEnd = function()
 	this:CorrectPos()
-	MY_Recount.anchor = MY.UI(this):anchor()
+	MY.SetStorage('FrameAnchor.MY_Recount', GetFrameAnchor(this))
 end
 
 -- ShowDetail界面时间相应

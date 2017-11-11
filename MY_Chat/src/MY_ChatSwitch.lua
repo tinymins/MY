@@ -224,10 +224,8 @@ for i, v in ipairs(CHANNEL_LIST) do
 end
 local m_tChannelTime = {}
 
-MY_ChatSwitch.anchor = { x=10, y=-60, s="BOTTOMLEFT", r="BOTTOMLEFT" }
 MY_ChatSwitch.tChannelCount = {}
 MY_ChatSwitch.bAlertBeforeClear = true
-RegisterCustomData("MY_ChatSwitch.anchor")
 RegisterCustomData("MY_ChatSwitch.aWhisper", 1)
 RegisterCustomData("MY_ChatSwitch.tChannelCount")
 RegisterCustomData("MY_ChatSwitch.bAlertBeforeClear")
@@ -385,11 +383,13 @@ end
 
 function MY_ChatSwitch.OnFrameDragEnd()
 	this:CorrectPos()
-	MY_ChatSwitch.anchor = GetFrameAnchor(this)
+	MY.SetStorage('FrameAnchor.MY_ChatSwitch', GetFrameAnchor(this))
 end
 
 function MY_ChatSwitch.UpdateAnchor(this)
-	this:SetPoint(MY_ChatSwitch.anchor.s, 0, 0, MY_ChatSwitch.anchor.r, MY_ChatSwitch.anchor.x, MY_ChatSwitch.anchor.y)
+	local anchor = MY.GetStorage('FrameAnchor.MY_ChatSwitch')
+		or { x = 10, y = -60, s = "BOTTOMLEFT", r = "BOTTOMLEFT" }
+	this:SetPoint(anchor.s, 0, 0, anchor.r, anchor.x, anchor.y)
 	this:CorrectPos()
 end
 

@@ -534,6 +534,8 @@ function MY.SetStorage(szKey, oVal)
 		end
 		nByte = nByte + (nBit == 1 and -1 or 1) * math.pow(2, nOffset)
 		SetAddonCustomData('MY', nPos, 1, nByte)
+	elseif szPriKey == 'FrameAnchor' then
+		return SetOnlineFrameAnchor(szSubKey, oVal)
 	end
 	OnStorageChange(szKey)
 end
@@ -555,6 +557,8 @@ function MY.GetStorage(szKey)
 		local nByte = GetAddonCustomData('MY', nPos, 1)
 		local nBit = math.floor(nByte / math.pow(2, nOffset)) % 2
 		return nBit == 1
+	elseif szPriKey == 'FrameAnchor' then
+		return GetOnlineFrameAnchor(szSubKey)
 	end
 end
 
