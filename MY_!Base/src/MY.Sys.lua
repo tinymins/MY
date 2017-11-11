@@ -582,7 +582,7 @@ local function OnInit()
 	end
 	INIT_FUNC_LIST = {}
 end
-MY.RegisterInit('MY_LIB#WatchStorage', OnInit)
+MY.RegisterEvent('FIRST_SYNC_USER_PREFERENCES_END.MY_LIB_Storage', OnInit)
 end
 
 -- ##################################################################################################
