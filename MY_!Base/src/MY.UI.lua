@@ -880,7 +880,7 @@ end
 
 local function OnCommonComponentMouseEnter()
 	if not this:IsMouseIn() then
-		return 
+		return
 	end
 	local hText = GetComponentElement(this, 'TEXT')
 	if not hText then
@@ -919,7 +919,10 @@ local _szItemINI = MY.GetAddonInfo().szFrameworkRoot .. 'ui\\HandleItems.ini'
 -- Instance:append(szXml[, bReturnNewItem])
 -- Instance:append(szType[, tArg | szName[, bReturnNewItem]])
 function XGUI:append(arg0, arg1, arg2)
-	assert(IsString(arg0) and #arg0 > 0)
+	assert(IsString(arg0))
+	if #arg0 == 0 then
+		return
+	end
 	self:_checksum()
 
 	local ui, szXml, szType, tArg, bReturnNewItem = XGUI()
