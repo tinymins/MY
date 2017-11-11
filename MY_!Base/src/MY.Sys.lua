@@ -498,6 +498,7 @@ do
 local l_tBoolValues = {
 	['MY_ChatSwitch_DisplayPanel'] = 0,
 	['MY_ChatSwitch_LockPostion'] = 1,
+	['MY_Recount_Enable'] = 2,
 }
 local l_watches = {}
 local BIT_NUMBER = 8
@@ -527,12 +528,11 @@ function MY.SetStorage(szKey, oVal)
 		local nPos = math.floor(nBitPos / BIT_NUMBER)
 		local nOffset = BIT_NUMBER - nBitPos % BIT_NUMBER - 1
 		local nByte = GetAddonCustomData('MY', nPos, 1)
-		local nBit = (nByte / math.pow(2, nOffset)) % 2
+		local nBit = math.floor(nByte / math.pow(2, nOffset)) % 2
 		if (nBit == 1) == (not not oVal) then
 			return
 		end
 		nByte = nByte + (nBit == 1 and -1 or 1) * math.pow(2, nOffset)
-		Output(nPos, nByte)
 		SetAddonCustomData('MY', nPos, 1, nByte)
 	end
 	OnStorageChange(szKey)
@@ -553,7 +553,7 @@ function MY.GetStorage(szKey)
 		local nPos = math.floor(nBitPos / BIT_NUMBER)
 		local nOffset = BIT_NUMBER - nBitPos % BIT_NUMBER - 1
 		local nByte = GetAddonCustomData('MY', nPos, 1)
-		local nBit = (nByte / math.pow(2, nOffset)) % 2
+		local nBit = math.floor(nByte / math.pow(2, nOffset)) % 2
 		return nBit == 1
 	end
 end
@@ -565,10 +565,22 @@ function MY.WatchStorage(szKey, fnAction)
 	table.insert(l_watches[szKey], fnAction)
 end
 
+local INIT_FUNC_LIST = {}
+function MY.RegisterStorageInit(szKey, fnAction)
+	INIT_FUNC_LIST[szKey] = fnAction
+end
+
 local function OnInit()
 	for szKey, _ in pairs(l_watches) do
 		OnStorageChange(szKey)
 	end
+	for szKey, fnAction in pairs(INIT_FUNC_LIST) do
+		local status, err = pcall(fnAction)
+		if not status then
+			MY.Debug({err}, "STORAGE_INIT_FUNC_LIST#" .. szKey)
+		end
+	end
+	INIT_FUNC_LIST = {}
 end
 MY.RegisterInit('MY_LIB#WatchStorage', OnInit)
 end
