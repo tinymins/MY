@@ -167,7 +167,7 @@ function MY.Player.GetClientInfo(bForceRefresh)
 			m_ClientInfo.dwPetID           = me.dwPetID
 		end
 	end
-	
+
 	return m_ClientInfo or {}
 end
 MY.GetClientInfo = MY.Player.GetClientInfo
@@ -349,7 +349,7 @@ function MY.Player.GetTongMember(arg0)
 	if not arg0 then
 		return
 	end
-	
+
 	return GetTongClient().GetMemberInfo(arg0)
 end
 MY.GetTongMember = MY.Player.GetTongMember
@@ -413,7 +413,7 @@ function MY.Player.GetFightTime(szFormat)
 	else  -- 脱战状态
 		nTick = _C.nFightEndTick - _C.nFightBeginTick
 	end
-	
+
 	if szFormat then
 		local nSeconds = math.floor(nTick / 1000)
 		local nMinutes = math.floor(nSeconds / 60)
@@ -430,7 +430,7 @@ function MY.Player.GetFightTime(szFormat)
 		szFormat = szFormat:gsub('h', nHours)
 		szFormat = szFormat:gsub('m', nMinute)
 		szFormat = szFormat:gsub('s', nSecond)
-		
+
 		if szFormat:sub(1, 1) ~= '0' and tonumber(szFormat) then
 			szFormat = tonumber(szFormat)
 		end
@@ -597,14 +597,14 @@ function _C.WithTargetHandle()
 
 	_C.lockWithTarget = true
 	local r = table.remove(_C.tWithTarget, 1)
-	
+
 	MY.Player.SetTempTarget(r.dwType, r.dwID)
 	local status, err = pcall(r.callback)
 	if not status then
 		MY.Debug({err}, 'MY.Player.lua#WithTargetHandle', MY_DEBUG.ERROR)
 	end
 	MY.Player.ResumeTarget()
-	
+
 	_C.lockWithTarget = false
 	_C.WithTargetHandle()
 end
@@ -833,15 +833,16 @@ function MY.Player.GetSkillName(dwSkillID, dwLevel)
 end
 
 -- 登出游戏
--- (void) MY.LogOff(bCompletely)
+-- (void) MY.Logout(bCompletely)
 -- bCompletely 为true返回登陆页 为false返回角色页 默认为false
-function MY.Player.LogOff(bCompletely)
+function MY.Player.Logout(bCompletely)
 	if bCompletely then
 		ReInitUI(LOAD_LOGIN_REASON.RETURN_GAME_LOGIN)
 	else
 		ReInitUI(LOAD_LOGIN_REASON.RETURN_ROLE_LIST)
 	end
 end
+MY.Logout = MY.Player.Logout
 
 -- 根据技能 ID 获取引导帧数，非引导技能返回 nil
 -- (number) MY.Player.GetChannelSkillFrame(number dwSkillID)
@@ -903,7 +904,7 @@ function MY.GetTeamInfo(tTeamInfo)
 	tTeamInfo.szMark = team.GetClientTeamMemberName(team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK))
 	tTeamInfo.szDistribute = team.GetClientTeamMemberName(team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE))
 	tTeamInfo.nLootMode = team.nLootMode
-	
+
 	local tMark = team.GetTeamMark()
 	for nGroup = 0, team.nGroupNum - 1 do
 		local tGroupInfo = team.GetGroupInfo(nGroup)
