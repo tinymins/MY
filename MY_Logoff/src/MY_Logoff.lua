@@ -80,7 +80,7 @@ local function IdleOff()
 end
 
 local function onInit()
-	IdleOff()
+	MY.DelayCall(2000, IdleOff)
 end
 MY.RegisterInit('MY_LOGOFF', onInit)
 
