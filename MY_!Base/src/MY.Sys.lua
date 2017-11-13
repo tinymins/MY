@@ -633,6 +633,9 @@ function _C.GetPlayerAddonMenu()
 			table.insert(menu, v)
 		end
 	end
+	table.sort(menu, function(m1, m2)
+		return #m1 < #m2
+	end)
 	return {menu}
 end
 -- get target addon menu
@@ -646,6 +649,9 @@ function _C.GetTargetAddonMenu()
 			table.insert(menu, v)
 		end
 	end
+	table.sort(menu, function(m1, m2)
+		return #m1 < #m2
+	end)
 	return menu
 end
 -- get trace button menu
@@ -659,6 +665,9 @@ function _C.GetTraceButtonMenu()
 			table.insert(menu, v)
 		end
 	end
+	table.sort(menu, function(m1, m2)
+		return #m1 < #m2
+	end)
 	return {menu}
 end
 
