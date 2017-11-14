@@ -67,8 +67,10 @@ function MY.FormatPath(oFilePath, ePathType)
 	else
 		szFilePath, ePathType = oFilePath, MY_DATA_PATH.NORMAL
 	end
+	-- Unified the directory separator
+	szFilePath = string.gsub(szFilePath, '\\', '/')
 	-- if it's relative path then complete path with "/MY@DATA/"
-	if string.sub(szFilePath, 1, 2) ~= './' then
+	if szFilePath:sub(1, 2) ~= './' and szFilePath:sub(2, 3) ~= ':/' then
 		if ePathType == MY_DATA_PATH.GLOBAL then
 			szFilePath = "!all-users@$lang/" .. szFilePath
 		elseif ePathType == MY_DATA_PATH.ROLE then
@@ -78,8 +80,6 @@ function MY.FormatPath(oFilePath, ePathType)
 		end
 		szFilePath = MY.GetAddonInfo().szInterfaceRoot .. "MY#DATA/" .. szFilePath
 	end
-	-- Unified the directory separator
-	szFilePath = string.gsub(szFilePath, '\\', '/')
 	-- if exist $uid then add user role identity
 	if string.find(szFilePath, "%$uid") then
 		szFilePath = szFilePath:gsub("%$uid", MY.Player.GetUUID())
@@ -103,6 +103,10 @@ function MY.FormatPath(oFilePath, ePathType)
 	-- if exist $relserver then add relserver identity
 	if string.find(szFilePath, "%$relserver") then
 		szFilePath = szFilePath:gsub("%$relserver", ((MY.Game.GetRealServer()):gsub('[/\\|:%*%?"<>]', '')))
+	end
+	local rootPath = GetRootPath():gsub('\\', '/')
+	if szFilePath:find(rootPath) == 1 then
+		szFilePath = szFilePath:gsub(rootPath, '')
 	end
 	return szFilePath
 end
@@ -586,6 +590,7 @@ local function OnInit()
 	end
 	INIT_FUNC_LIST = {}
 end
+MY.RegisterEvent('RELOAD_UI_ADDON_END.MY_LIB_Storage', OnInit)
 MY.RegisterEvent('FIRST_SYNC_USER_PREFERENCES_END.MY_LIB_Storage', OnInit)
 end
 
