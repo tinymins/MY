@@ -904,7 +904,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		onchange = function(raw, val) config.caption = val end,
 	})
 	ui:append("WndButton2", {
-		x = w - 240, y = y,
+		x = w - 180, y = y,
 		w = 50, h = 30,
 		text = _L["Move Up"],
 		onclick = function()
@@ -920,7 +920,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		end,
 	})
 	ui:append("WndButton2", {
-		x = w - 190, y = y,
+		x = w - 125, y = y,
 		w = 50, h = 30,
 		text = _L["Move Down"],
 		onclick = function()
@@ -933,14 +933,6 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 					end
 				end
 			end
-		end,
-	})
-	ui:append("WndButton2", {
-		x = w - 130, y = y,
-		w = 60, h = 30,
-		text = _L["Export"],
-		onclick = function()
-			XGUI.OpenTextEditor(var2str(config))
 		end,
 	})
 	ui:append("WndButton2", {
