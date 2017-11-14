@@ -2,6 +2,7 @@
 .git\
 .gitignore
 .gitattributes
+.vscode\
 7z.exe
 7zip.bat
 7zipignore.txt
