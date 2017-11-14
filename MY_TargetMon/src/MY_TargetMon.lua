@@ -208,7 +208,7 @@ local function RecreatePanel(config)
 		l_frames[config] = frame
 		frame.hList = frame:Lookup("", "Handle_List")
 		frame.hList.FormatAllItemPosExt = FormatAllItemPosExt
-		
+
 		for k, v in pairs(FE) do
 			frame[k] = v
 		end
@@ -221,7 +221,7 @@ local function RecreatePanel(config)
 		frame:Scale(1 / frame.scale, 1 / frame.scale)
 	end
 	local hList = frame.hList
-	
+
 	hList:Clear()
 	frame.tItem = {}
 	frame.config = config
@@ -240,7 +240,7 @@ local function RecreatePanel(config)
 		local txtProcess   = hCDBar:Lookup("Text_Process")
 		local imgProcess   = hCDBar:Lookup("Image_Process")
 		local txtName      = hCDBar:Lookup("Text_Name")
-		
+
 		-- 建立高速索引
 		hItem.box = box
 		hItem.mon = mon
@@ -259,7 +259,7 @@ local function RecreatePanel(config)
 			end
 			frame.tItem[mon.name][hItem] = true
 		end
-		
+
 		-- Box部分
 		box:SetObject(UI_OBJECT.BUFF, mon.id, 1, 1)
 		box:SetObjectIcon(mon.iconid or 13)
@@ -276,7 +276,7 @@ local function RecreatePanel(config)
 		box:SetOverTextFontScheme(2, 7)
 		-- Box背景图
 		XGUI(imgBoxBg):image(config.boxBgUITex)
-		
+
 		if config.type == 'SKILL' then
 			box.__SetCoolDownPercentage = box.SetCoolDownPercentage
 			box.SetCoolDownPercentage = function(box, fPercent, ...)
@@ -300,20 +300,20 @@ local function RecreatePanel(config)
 				box:__SetOverText(nIndex, szText, ...)
 			end
 		end
-		
+
 		-- 倒计时条
 		if config.cdBar then
 			txtProcess:SetW(config.cdBarWidth - 10)
 			txtProcess:SetText("")
-			
+
 			txtName:SetVisible(config.showName)
 			txtName:SetW(config.cdBarWidth - 10)
 			txtName:SetText(mon.longAlias or mon.name or '')
-			
+
 			XGUI(imgProcess):image(config.cdBarUITex)
 			imgProcess:SetW(config.cdBarWidth)
 			imgProcess:SetPercentage(0)
-			
+
 			hCDBar:Show()
 			hCDBar:SetW(config.cdBarWidth)
 			hItem.hCDBar = hCDBar
@@ -551,7 +551,7 @@ function FE.OnFrameBreathe()
 	local KTarget = MY.GetObject(dwType, dwID)
 	local targetChanged = dwType ~= this.dwType or dwID ~= this.dwID
 	local nFrameCount = GetLogicFrameCount()
-	
+
 	if not KTarget then
 		for i = 0, hList:GetItemCount() - 1 do
 			UpdateItem(hList:Lookup(i), KTarget, nil, nil, this.tItem, config, nFrameCount, targetChanged)
@@ -756,7 +756,7 @@ local function OnInit()
 	local data = MY.LoadLUAData(DEFAULT_CONFIG_FILE)
 	ConfigTemplate = data.template
 	data.default = MY.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE) or data.default
-	
+
 	local OLD_PATH = {'config/my_buffmon.jx3dat', MY_DATA_PATH.ROLE}
 	local SZ_OLD_PATH = MY.FormatPath(OLD_PATH)
 	if IsLocalFileExist(SZ_OLD_PATH) then
@@ -958,7 +958,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		end,
 	})
 	y = y + 30
-	
+
 	ui:append("WndCheckBox", {
 		x = x + 20, y = y,
 		text = _L['Enable'],
@@ -968,7 +968,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 			RecreatePanel(config)
 		end,
 	})
-	
+
 	ui:append("WndCheckBox", {
 		x = x + 120, y = y, w = 200,
 		text = _L['Hide others buff'],
@@ -981,7 +981,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 			return config.type == 'BUFF'
 		end,
 	})
-	
+
 	ui:append("WndComboBox", {
 		x = w - 250, y = y, w = 135,
 		text = _L['Set target'],
@@ -1033,7 +1033,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		onclick = function() OpenConfig(config) end,
 	})
 	y = y + 30
-	
+
 	ui:append("WndCheckBox", {
 		x = x + 20, y = y, w = 100,
 		text = _L['Undragable'],
@@ -1043,7 +1043,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 			RecreatePanel(config)
 		end,
 	})
-	
+
 	ui:append("WndCheckBox", {
 		x = x + 120, y = y, w = 200,
 		text = _L['Hide void'],
@@ -1053,7 +1053,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 			RecreatePanel(config)
 		end,
 	})
-	
+
 	ui:append("WndSliderBox", {
 		x = w - 250, y = y,
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
@@ -1066,7 +1066,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		end,
 	})
 	y = y + 30
-	
+
 	ui:append("WndCheckBox", {
 		x = x + 20, y = y, w = 120,
 		text = _L['Show cd bar'],
@@ -1076,7 +1076,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 			RecreatePanel(config)
 		end,
 	})
-	
+
 	ui:append("WndCheckBox", {
 		x = x + 120, y = y, w = 120,
 		text = _L['Show name'],
@@ -1086,7 +1086,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 			RecreatePanel(config)
 		end,
 	})
-	
+
 	ui:append("WndSliderBox", {
 		x = w - 250, y = y,
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
@@ -1099,7 +1099,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		end,
 	})
 	y = y + 30
-	
+
 	ui:append("WndCheckBox", {
 		x = x + 20, y = y, w = 200,
 		text = _L['Show cd flash'],
@@ -1109,7 +1109,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 			RecreatePanel(config)
 		end,
 	})
-	
+
 	ui:append("WndSliderBox", {
 		x = w - 250, y = y,
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
@@ -1122,7 +1122,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		end,
 	})
 	y = y + 30
-	
+
 	ui:append("WndComboBox", {
 		x = 40, y = y, w = (w - 250 - 30 - 30 - 10) / 2,
 		text = _L['Select background style'],
@@ -1175,7 +1175,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 			return t
 		end,
 	})
-	
+
 	ui:append("WndSliderBox", {
 		x = w - 250, y = y,
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
@@ -1196,7 +1196,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		end,
 	})
 	y = y + 30
-	
+
 	return x, y
 end
 
@@ -1205,22 +1205,22 @@ function PS.OnPanelActive(wnd)
 	local w, h = ui:size()
 	local X, Y = 20, 30
 	local x, y = X, Y
-	
+
 	local OpenConfig
 	do -- single config details
 		local l_config
 		local uiWrapper = ui:append('WndWindow', { name = 'WndWindow_Wrapper', x = 0, y = 0, w = w, h = h }, true)
 		uiWrapper:append('Shadow', { x = 0, y = 0, w = w, h = h, r = 0, g = 0, b = 0, alpha = 150 })
 		uiWrapper:append('Shadow', { x = 10, y = 10, w = w - 20, h = h - 20, r = 255, g = 255, b = 255, alpha = 40 })
-		
+
 		local x0, y0 = 20, 20
 		local w0, h0 = w - 40, h - 30
 		local w1, w2 = w0 / 2 - 5, w0 / 2 - 5
 		local x1, x2 = x0, x0 + w1 + 10
-		
+
 		local listCommon = uiWrapper:append("WndListBox", { x = x1, y = y0 + 25, w = w1, h = h0 - 30 - 30 }, true)
 		local listKungfu = uiWrapper:append("WndListBox", { x = x2, y = y0 + 25, w = w2, h = h0 - 30 - 30 }, true)
-		
+
 		local function Add(kungfuid)
 			if kungfuid == 'current' then
 				kungfuid = GetClientPlayer().GetKungfuMount().dwSkillID
@@ -1255,7 +1255,7 @@ function PS.OnPanelActive(wnd)
 		uiWrapper:append("WndButton2", { x = x1 + w1 - 60, y = y0 - 1, w = 60, h = 28, text = _L['Add'], onclick = function() Add('common') end })
 		uiWrapper:append("Text", { x = x2 + 5, y = y0, w = w2 - 60 - 5,  h = 25, text = _L['Current kungfu monitor'] })
 		uiWrapper:append("WndButton2", { x = x2 + w2 - 60, y = y0 - 1, w = 60, h = 28, text = _L['Add'], onclick = function() Add('current') end })
-		
+
 		-- 初始化list控件
 		local function onMenu(hItem, szText, szID, data)
 			local mon = data.mon
@@ -1389,7 +1389,7 @@ function PS.OnPanelActive(wnd)
 		end
 		listCommon:listbox('onmenu', onMenu)
 		listKungfu:listbox('onmenu', onMenu)
-		
+
 		function OpenConfig(config)
 			l_config = config
 			listCommon:listbox('clear')
@@ -1421,7 +1421,7 @@ function PS.OnPanelActive(wnd)
 			uiWrapper:show()
 			uiWrapper:bringToTop()
 		end
-		
+
 		uiWrapper:append('WndButton2', {
 			x = x0 + w0 / 2 - 50, y = y0 + h0 - 30,
 			w = 100, h = 30, text = _L['Close'],
@@ -1432,14 +1432,14 @@ function PS.OnPanelActive(wnd)
 		})
 		uiWrapper:hide()
 	end
-	
+
 	for _, config in ipairs(Config) do
 		x, y = GenePS(ui, config, x, y, w, h, OpenConfig)
 		y = y + 20
 	end
 	y = y + 10
-	
-	x = (w - 310) / 2
+
+	x = (w - 380) / 2
 	ui:append("WndButton2", {
 		x = x, y = y,
 		w = 60, h = 30,
@@ -1457,15 +1457,81 @@ function PS.OnPanelActive(wnd)
 		w = 60, h = 30,
 		text = _L["Import"],
 		onclick = function()
-			GetUserInput(_L['Please input import data:'], function(szVal)
-				local config = str2var(szVal)
-				if config then
-					UpdateConfigDataVersion(config)
-					table.insert(Config, config)
-					RecreatePanel(config)
-					MY.SwitchTab("MY_TargetMon", true)
+			local file = GetOpenFileName(
+				_L['Please select import target monitor data file.'],
+				'JX3 File(*.jx3dat)\0*.jx3dat\0All Files(*.*)\0*.*\0\0',
+				MY.FormatPath({ 'export/TargetMon', MY_DATA_PATH.GLOBAL })
+			)
+			if file == '' then
+				return
+			end
+			local configs = MY.LoadLUAData(file)
+			if not configs then
+				return
+			end
+			local importCount = 0
+			local replaceCount = 0
+			for _, config in ipairs(configs) do
+				UpdateConfigDataVersion(config)
+				for i, cfg in ipairs_r(Config) do
+					if cfg.caption == config.caption then
+						table.remove(Config, i)
+						replaceCount = replaceCount + 1
+					end
 				end
-			end, function() end, function() end, nil, "" )
+				table.insert(Config, config)
+				importCount = importCount + 1
+			end
+			RecreateAllPanel(true)
+			MY.SwitchTab("MY_TargetMon", true)
+			MY.Sysmsg({ _L('Import successed, %d imported and %d replaced.', importCount, replaceCount) })
+			OutputMessage('MSG_ANNOUNCE_YELLOW', _L('Import successed, %d imported and %d replaced.', importCount, replaceCount))
+		end,
+	})
+	x = x + 70
+	ui:append("WndButton2", {
+		x = x, y = y,
+		w = 60, h = 30,
+		text = _L["Export"],
+		menu = function()
+			local configs = {}
+			local menu = {}
+			for _, config in ipairs(Config) do
+				table.insert(menu, {
+					bCheck = true,
+					szOption = config.caption,
+					fnAction = function()
+						for i, cfg in ipairs_r(configs) do
+							if cfg == config then
+								table.remove(configs, i)
+								return
+							end
+						end
+						table.insert(configs, config)
+					end,
+				})
+			end
+			if #menu > 0 then
+				table.insert(menu, MENU_DIVIDER)
+			end
+			table.insert(menu, {
+				szOption = _L['Ensure export'],
+				fnAction = function()
+					local file = MY.FormatPath({
+						"export/TargetMon/$name@$server@"
+							.. MY.FormatTime("yyyyMMddhhmmss")
+							.. ".jx3dat",
+						MY_DATA_PATH.GLOBAL,
+					})
+					MY.SaveLUAData(file, configs)
+					MY.Sysmsg({ _L('Data exported, file saved at %s.', file) })
+					OutputMessage('MSG_ANNOUNCE_YELLOW', _L('Data exported, file saved at %s.', file))
+				end,
+				fnDisable = function()
+					return not next(configs)
+				end,
+			})
+			return menu
 		end,
 	})
 	x = x + 70
