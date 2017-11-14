@@ -54,7 +54,7 @@ local function IdleOff()
 	local function onBreatheCall()
 		local remainTime = MY_Logoff.nIdleOffTime * 60 - Station.GetIdleTime()
 		if remainTime <= 0 then
-			return MY.Logout(bCompletely)
+			return MY.Logout(true)
 		end
 		if remainTime > 1200 and remainTime % 600 ~= 0 then
 			return
