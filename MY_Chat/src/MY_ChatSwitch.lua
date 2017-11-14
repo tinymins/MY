@@ -10,7 +10,6 @@ local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Chat/lang/")
 local INI_PATH = MY.GetAddonInfo().szRoot .. "MY_Chat/ui/MY_ChatSwitch.ini"
 local CD_REFRESH_OFFSET = 7 * 60 * 60 -- 7µã¸üÐÂCD
 MY_ChatSwitch = {}
-MY_ChatSwitch.tChannel = {}
 MY_ChatSwitch.aWhisper = {}
 MY_ChatSwitch.szAway = nil
 MY_ChatSwitch.szBusy = nil
@@ -220,7 +219,6 @@ for i, v in ipairs(CHANNEL_LIST) do
 		CHANNEL_CD_TIME[v.channel] = v.cd
 	end
 	CHANNEL_DICT[v.id] = v
-	MY_ChatSwitch.tChannel[v.id] = true
 end
 local m_tChannelTime = {}
 
@@ -229,7 +227,6 @@ MY_ChatSwitch.bAlertBeforeClear = true
 RegisterCustomData("MY_ChatSwitch.aWhisper", 1)
 RegisterCustomData("MY_ChatSwitch.tChannelCount")
 RegisterCustomData("MY_ChatSwitch.bAlertBeforeClear")
-for k, _ in pairs(MY_ChatSwitch.tChannel) do RegisterCustomData("MY_ChatSwitch.tChannel."..k) end
 
 local function OnChannelCheck()
 	MY.SwitchChat(this.info.channel)
@@ -248,10 +245,8 @@ function MY_ChatSwitch.OnFrameCreate()
 	local hContainer = this:Lookup("WndContainer_Radios")
 	hContainer:SetW(0xFFFF)
 	hContainer:Clear()
-	local i = 0
-	for _, v in ipairs(CHANNEL_LIST) do
-		if MY_ChatSwitch.tChannel[v.id] then
-			i = i + 1
+	for i, v in ipairs(CHANNEL_LIST) do
+		if not MY.GetStorage('BoolValues.MY_ChatSwitch_CH' .. i) then
 			local chk, txtTitle, txtCooldown, shaCount
 			if v.head then
 				chk = hContainer:AppendContentFromIni(INI_PATH, "Wnd_Channel"):Lookup("WndRadioChannel")
@@ -471,12 +466,15 @@ function PS.OnPanelActive(wnd)
 					return not MY.GetStorage('BoolValues.MY_ChatSwitch_DisplayPanel')
 				end,
 			}
-			for _, v in ipairs(CHANNEL_LIST) do
+			for i, v in ipairs(CHANNEL_LIST) do
 				table.insert(t, {
 					szOption = v.title, rgb = v.color,
-					bCheck = true, bChecked = MY_ChatSwitch.tChannel[v.id],
+					bCheck = true, bChecked = not MY.GetStorage('BoolValues.MY_ChatSwitch_CH' .. i),
 					fnAction = function()
-						MY_ChatSwitch.tChannel[v.id] = not MY_ChatSwitch.tChannel[v.id]
+						MY.SetStorage(
+							'BoolValues.MY_ChatSwitch_CH' .. i,
+							not MY.GetStorage('BoolValues.MY_ChatSwitch_CH' .. i)
+						)
 						MY_ChatSwitch.ReInitUI()
 					end,
 				})
