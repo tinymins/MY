@@ -44,6 +44,9 @@ data = {
         ['CENTER'] = '居中對齊',
     },
     ['Export'] = '導出',
+    ['Ensure export'] = '確認導出',
+    ['Data exported, file saved at %s.'] = '數據導出成功，文件存放在目錄：%s。',
+    ['Import successed, %d imported and %d replaced.'] = '成功導入數據%d條，其中覆蓋同名數據%d條。',
     ['Delete'] = '刪除',
     ['Create'] = '創建',
     ['Import'] = '導入',
@@ -67,7 +70,7 @@ data = {
     ['Cancel buff is disabled outside dungeon.'] = '取消BUFF快捷鍵僅在副本內可用',
     ['Please input id:'] = '請輸入ID：',
     ['Manual add id'] = '手動添加ID',
-    
+
     ['Always show decimal time.'] = '總是顯示小數點',
     ['Never show decimal time.'] = '不顯示小數點',
     ["Show decimal time left in %ds."] = '最後%d秒顯示小數點',
