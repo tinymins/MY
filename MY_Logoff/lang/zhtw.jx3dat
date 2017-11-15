@@ -19,9 +19,8 @@ data = {
     ['Logoff is ready for your casting unfight skill.'] = '脫戰登出已啓動，請釋放脫戰技能，遊戲將在脫戰瞬間下線。',
     ['Idle off has been cancelled.'] = '暫離登出已取消。',
     ['Idle off notice: you\'ll auto logoff if you keep idle for %ds.'] = '暫離登出提醒：如果您繼續保持離開狀態%d秒後，您將會自動登出遊戲。',
-    ['Idle off has been started, you\'ll auto logoff if you keep idle for %ds.'] = '暫離登出已啓動，當您進入離開狀態%d秒後，您將會自動登出遊戲。',
     ['Idle off notice: you\'ll auto logoff if you keep idle for %dm %ds.'] = '暫離登出提醒：如果您繼續保持離開狀態%d分%d秒後，您將會自動登出遊戲。',
-    ['Idle off has been started, you\'ll auto logoff if you keep idle for %dm %ds.'] = '暫離登出已啓動，當您進入離開狀態%d分%d秒後，您將會自動登出遊戲。',
+    ['Idle off has been started, you\'ll auto logoff if you keep idle for %dm.'] = '暫離登出已啓動，當您進入離開狀態%d分鍾後，您將會自動登出遊戲。',
 
     ['# idle logoff'] = '● 暫離登出',
     ['enable'] = '啓用',
