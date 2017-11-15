@@ -77,7 +77,7 @@ local function IdleOff()
 		end
 	end
 	MY.BreatheCall('MY_LOGOFF_IDLE', 1000, onBreatheCall)
-	MY.Sysmsg({_L('Idle off has been started, you\'ll auto logoff if you keep idle for %ds.', MY_Logoff.nIdleOffTime)})
+	MY.Sysmsg({_L('Idle off has been started, you\'ll auto logoff if you keep idle for %dm.', MY_Logoff.nIdleOffTime)})
 end
 
 local function onInit()
