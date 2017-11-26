@@ -152,11 +152,11 @@ function InitDB(force)
 		return MY.Debug({"Cannot connect to database!!!"}, "MY_ChatLog", MY_DEBUG.ERROR) and false
 	end
 	MY.Debug({"Initializing database..."}, "MY_ChatLog", MY_DEBUG.LOG)
-	
+
 	-- 数据库写入基本信息
 	DB:Execute("CREATE TABLE IF NOT EXISTS ChatLogInfo (key NVARCHAR(128), value NVARCHAR(4096), PRIMARY KEY (key))")
 	DB:Execute("REPLACE INTO ChatLogInfo (key, value) VALUES ('userguid', '" .. l_globalid .. "')")
-	
+
 	-- 测试数据库完整性
 	do local testvalue = "testmalformed_" .. GetCurrentTime()
 		DB:Execute("CREATE TABLE " .. testvalue .. "(a)")
@@ -196,7 +196,7 @@ function InitDB(force)
 			end
 		end
 	end
-	
+
 	-- 初始化聊天记录索引表
 	if DB:Execute("SELECT count(*) AS count FROM sqlite_master WHERE type = 'table' AND name = 'ChatLogIndex'")[1].count == 0 then
 		-- 判断是否会卡 给予提示
@@ -236,13 +236,13 @@ function InitDB(force)
 		end
 		DB:Execute("REPLACE INTO ChatLogIndex (name, stime, etime, count, detailcount) VALUES ('" .. name .. "', 0, -1, (SELECT count(*) FROM " .. name .. "), '')")
 		MY.Debug({"Importing chatlog from v1 version finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
-		
+
 		DB:Execute("END TRANSACTION")
 		MY.Debug({"Creating database finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
 	end
 	l_initialized = true
 	MY.Debug({"Initializing database finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
-	
+
 	-- 导入旧版数据
 	local SZ_OLD_PATH = MY.FormatPath('userdata/CHAT_LOG/$uid/') -- %s/%s.$lang.jx3dat
 	if IsLocalFileExist(SZ_OLD_PATH) then
@@ -293,7 +293,7 @@ function ImportDB(file)
 	end
 	local amount, count = 0
 	local DBI = SQLite3_Open(file)
-	local tables = DBI:Execute("SELECT name FROM sqlite_master WHERE type = 'table' AND (name = 'ChatLog' OR name LIKE 'ChatLog/_%/_%' ESCAPE '/') ORDER BY name")
+	local tables = DBI:Execute("SELECT name FROM sqlite_master WHERE type = 'table' AND (name = 'ChatLog' OR name LIKE 'ChatLog/_%' ESCAPE '/') ORDER BY name")
 	for _, rec in ipairs(tables) do
 		count = DBI:Execute("SELECT count(*) AS count FROM " .. rec.name)[1].count
 		for index = 0, count, 100000 do
@@ -337,7 +337,7 @@ function OptimizeDB(deep)
 		return
 	end
 	DB:Execute("BEGIN TRANSACTION")
-	
+
 	-- 删除不在监控的频道
 	if deep then
 		MY.Debug({"Deleting unwatched channels..."}, "MY_ChatLog", MY_DEBUG.LOG)
@@ -362,7 +362,7 @@ function OptimizeDB(deep)
 		end
 		MY.Debug({"Deleting unwatched channels finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
 	end
-	
+
 	-- 拆记录中的大表
 	local tables = DB:Execute("SELECT * FROM ChatLogIndex ORDER BY stime ASC")
 	for i, info in ipairs(tables) do
@@ -374,7 +374,7 @@ function OptimizeDB(deep)
 			local newinfo = {
 				name  = CreateTable(),
 				stime = info.stime,
-	 			etime = etime,
+				etime = etime,
 			}
 			tinsert(tables, i, newinfo)
 			info.stime = newinfo.etime + 1
@@ -387,11 +387,11 @@ function OptimizeDB(deep)
 				.. info.name .. "', " .. info.stime .. ", " .. info.etime .. ", " .. info.count .. ", '')")
 			newinfo.count = DB:Execute("SELECT count(*) AS count FROM " .. newinfo.name)[1].count
 			DB:Execute("REPLACE INTO ChatLogIndex (name, stime, etime, count, detailcount) VALUES ('"
-			 	.. newinfo.name .. "', " .. newinfo.stime .. ", " .. newinfo.etime .. ", " .. newinfo.count .. ", '')")
+				.. newinfo.name .. "', " .. newinfo.stime .. ", " .. newinfo.etime .. ", " .. newinfo.count .. ", '')")
 			MY.Debug({"Dividing large chatlog table " .. info.name .. " -> " .. newinfo.name .. " finished..."}, "MY_ChatLog", MY_DEBUG.LOG)
 		end
 	end
-	
+
 	-- 合并记录中的小表
 	if deep then
 		local tables = DB:Execute("SELECT * FROM ChatLogIndex ORDER BY stime ASC")
@@ -408,7 +408,7 @@ function OptimizeDB(deep)
 			end
 		end
 	end
-	
+
 	DB:Execute("END TRANSACTION")
 	if deep then
 		MY.Debug({"Compressing database..."}, "MY_ChatLog", MY_DEBUG.LOG)
@@ -551,7 +551,7 @@ function GetChatLog(channels, search, offset, limit)
 	tinsert(values, limit)
 	tinsert(values, offset)
 	sql = sql .. " ORDER BY time ASC LIMIT ? OFFSET ?"
-	
+
 	local index, count, result, data = 0, 0, {}, nil
 	local tables  = GetChatLogTableCount(channels, search)
 	for _, info in ipairs(tables) do
@@ -580,14 +580,14 @@ function GetChatLog(channels, search, offset, limit)
 		end
 		index = index + count
 	end
-	
+
 	return result
 end
-	
+
 local function InitMsgMon()
 	local me = GetClientPlayer()
 	l_globalid = me.GetGlobalID()
-	
+
 	local tChannels, aChannels = {}, {}
 	for _, info in ipairs(LOG_TYPE) do
 		for _, szChannel in ipairs(info.channels) do
@@ -616,7 +616,7 @@ local function InitMsgMon()
 			end
 		end
 		InsertMsg(CHANNELS_R[szChannel], szText, szMsg, szTalker, GetCurrentTime())
-		
+
 		if MY_ChatLog.bRealtimeCommit then
 			PushDB()
 		end
@@ -676,28 +676,28 @@ function MY_ChatLog.OnFrameCreate()
 		wnd:Lookup("CheckBox_ChatChannel", "Text_ChatChannel"):SetFontColor(unpack(MSGTYPE_COLOR[info.channels[1]]))
 	end
 	container:FormatAllContentPos()
-	
+
 	local handle = this:Lookup("Window_Main/Wnd_Index", "Handle_IndexesOuter/Handle_Indexes")
 	handle:Clear()
 	for i = 1, PAGE_DISPLAY do
 		handle:AppendItemFromIni(SZ_INI, "Handle_Index")
 	end
 	handle:FormatAllItemPos()
-	
+
 	local handle = this:Lookup("Window_Main/WndScroll_ChatLog", "Handle_ChatLogs")
 	handle:Clear()
 	for i = 1, PAGE_AMOUNT do
 		handle:AppendItemFromIni(SZ_INI, "Handle_ChatLog")
 	end
 	handle:FormatAllItemPos()
-	
+
 	this:Lookup("", "Text_Title"):SetText(_L['MY - MY_ChatLog'])
 	this:Lookup("Window_Main/Wnd_Search/Edit_Search"):SetPlaceholderText(_L['press enter to search ...'])
-	
+
 	MY_ChatLog.UpdatePage(this)
 	this:RegisterEvent("ON_MY_MOSAICS_RESET")
 	this:RegisterEvent("ON_MY_CHATLOG_PUSHDB")
-	
+
 	this:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
 end
 
@@ -810,7 +810,7 @@ function MY_ChatLog.OnItemRButtonClick()
 			this:Lookup("Shadow_ChatLogSelect"):Show()
 		end
 		this:GetRoot().nLastClickIndex = this:GetIndex()
-		
+
 		local menu = {
 			{
 				szOption = _L["delete record"],
@@ -854,7 +854,7 @@ function MY_ChatLog.UpdatePage(frame, noscroll, nopushdb)
 		end
 	end
 	local search = frame:Lookup("Window_Main/Wnd_Search/Edit_Search"):GetText()
-	
+
 	local nCount = GetChatLogCount(channels, search)
 	local nPageCount = mceil(nCount / PAGE_AMOUNT)
 	local bInit = not frame.nCurrentPage
@@ -865,7 +865,7 @@ function MY_ChatLog.UpdatePage(frame, noscroll, nopushdb)
 	end
 	frame:Lookup("Window_Main/Wnd_Index/Wnd_IndexEdit/WndEdit_Index"):SetText(frame.nCurrentPage)
 	frame:Lookup("Window_Main/Wnd_Index", "Handle_IndexCount/Text_IndexCount"):SprintfText(_L["total %d pages"], nPageCount)
-	
+
 	local hOuter = frame:Lookup("Window_Main/Wnd_Index", "Handle_IndexesOuter")
 	local handle = hOuter:Lookup("Handle_Indexes")
 	if nPageCount <= PAGE_DISPLAY then
@@ -882,13 +882,13 @@ function MY_ChatLog.UpdatePage(frame, noscroll, nopushdb)
 		hItem:Lookup("Text_Index"):SetText(1)
 		hItem:Lookup("Text_IndexUnderline"):SetVisible(1 == frame.nCurrentPage)
 		hItem:Show()
-		
+
 		local hItem = handle:Lookup(PAGE_DISPLAY - 1)
 		hItem.nPage = nPageCount
 		hItem:Lookup("Text_Index"):SetText(nPageCount)
 		hItem:Lookup("Text_IndexUnderline"):SetVisible(nPageCount == frame.nCurrentPage)
 		hItem:Show()
-		
+
 		local nStartPage
 		if frame.nCurrentPage + mceil((PAGE_DISPLAY - 2) / 2) > nPageCount then
 			nStartPage = nPageCount - (PAGE_DISPLAY - 2)
@@ -909,7 +909,7 @@ function MY_ChatLog.UpdatePage(frame, noscroll, nopushdb)
 	handle:FormatAllItemPos()
 	handle:SetSizeByAllItemSize()
 	hOuter:FormatAllItemPos()
-	
+
 	local data = GetChatLog(channels, search, (frame.nCurrentPage - 1) * PAGE_AMOUNT, PAGE_AMOUNT)
 	local scroll = frame:Lookup("Window_Main/WndScroll_ChatLog/Scroll_ChatLog")
 	local handle = frame:Lookup("Window_Main/WndScroll_ChatLog", "Handle_ChatLogs")
@@ -953,7 +953,7 @@ function MY_ChatLog.UpdatePage(frame, noscroll, nopushdb)
 		end
 	end
 	handle:FormatAllItemPos()
-	
+
 	if not noscroll then
 		scroll:SetScrollPos(bInit and scroll:GetStepCount() or 0)
 	end
@@ -990,7 +990,7 @@ span.emotion_44{width:21px; height: 21px; display: inline-block; background-imag
 #controls{background-color: #fff; height: 25px; position: fixed; opacity: 0.92; bottom: 0; left: 0; right: 0}
 #mosaics{width: 200px;height: 20px}
 ]]
-	
+
 	if MY_Farbnamen and MY_Farbnamen.GetForceRgb then
 		for k, v in pairs(g_tStrings.tForceTitle) do
 			szHeader = szHeader .. (".force-%s{color:#%02X%02X%02X}"):format(k, unpack(MY_Farbnamen.GetForceRgb(k)))
@@ -1041,13 +1041,13 @@ span.emotion_44{width:21px; height: 21px; display: inline-block; background-imag
 		(s = ua.match(/chrome\/([\d.]+)/)) ? Sys.chrome = s[1] :
 		(s = ua.match(/opera.([\d.]+)/)) ? Sys.opera = s[1] :
 		(s = ua.match(/version\/([\d.]+).*safari/)) ? Sys.safari = s[1] : 0;
-		
+
 		// if (Sys.ie) document.write('IE: ' + Sys.ie);
 		// if (Sys.firefox) document.write('Firefox: ' + Sys.firefox);
 		// if (Sys.chrome) document.write('Chrome: ' + Sys.chrome);
 		// if (Sys.opera) document.write('Opera: ' + Sys.opera);
 		// if (Sys.safari) document.write('Safari: ' + Sys.safari);
-		
+
 		if (!Sys.chrome && !Sys.firefox) {
 			document.getElementById("browserWarning").innerHTML = "<a>WARNING: Please use </a><a href='http://www.google.cn/chrome/browser/desktop/index.html' style='color: yellow;'>Chrome</a></a> to browse this page!!!</a>";
 		} else {
@@ -1154,7 +1154,7 @@ function MY_ChatLog.ExportConfirm()
 		tChannels[nGroup] = true
 	end
 	y = y + 10
-	
+
 	btnSure = ui:append("WndButton", {
 		x = x, y = y, w = 120,
 		text = _L['export chatlog'],
@@ -1197,7 +1197,7 @@ function MY_ChatLog.Export(szExportFile, aChannels, nPerSec, onProgress)
 		return MY.Sysmsg({_L("Error: open file error %s [%s]", szExportFile, status)})
 	end
 	l_bExporting = true
-	
+
 	local nPage, nPageCount = 0, mceil(GetChatLogCount(aChannels, "") / EXPORT_SLICE)
 	local function Export()
 		if nPage > nPageCount then
@@ -1246,7 +1246,7 @@ function PS.OnPanelActive(wnd)
 	local x, y = 50, 50
 	local dy = 40
 	local wr = 200
-	
+
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = wr,
 		text = _L['filter tong member log message'],
@@ -1256,7 +1256,7 @@ function PS.OnPanelActive(wnd)
 		end
 	})
 	y = y + dy
-	
+
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = wr,
 		text = _L['filter tong online message'],
@@ -1266,7 +1266,7 @@ function PS.OnPanelActive(wnd)
 		end
 	})
 	y = y + dy
-	
+
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = wr,
 		text = _L['realtime database commit'],
@@ -1276,7 +1276,7 @@ function PS.OnPanelActive(wnd)
 		end
 	})
 	y = y + dy
-	
+
 	ui:append("WndButton", {
 		x = x, y = y, w = 150,
 		text = _L["open chatlog"],
@@ -1285,7 +1285,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + dy
-	
+
 	ui:append("WndButton", {
 		x = x, y = y, w = 150,
 		text = _L["export chatlog"],
@@ -1294,7 +1294,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + dy
-	
+
 	ui:append("WndButton", {
 		x = x, y = y, w = 150,
 		text = _L["optimize/compress datebase"],
@@ -1308,7 +1308,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + dy
-	
+
 	ui:append("WndButton", {
 		x = x, y = y, w = 150,
 		text = _L["fix search datebase"],
@@ -1321,7 +1321,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + dy
-	
+
 	ui:append("WndButton", {
 		x = x, y = y, w = 150,
 		text = _L["reindex search datebase"],
@@ -1334,7 +1334,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + dy
-	
+
 	ui:append("WndButton", {
 		x = x, y = y, w = 150,
 		text = _L["import chatlog"],
