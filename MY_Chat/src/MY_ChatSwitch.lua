@@ -243,7 +243,7 @@ function MY_ChatSwitch.OnFrameCreate()
 	this:EnableDrag(not MY.GetStorage('BoolValues.MY_ChatSwitch_LockPostion'))
 
 	local hContainer = this:Lookup("WndContainer_Radios")
-	hContainer:SetW(0xFFFF)
+	hContainer:SetW(2000)
 	hContainer:Clear()
 	for i, v in ipairs(CHANNEL_LIST) do
 		if not MY.GetStorage('BoolValues.MY_ChatSwitch_CH' .. i) then
