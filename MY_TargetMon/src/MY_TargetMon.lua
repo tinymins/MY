@@ -331,7 +331,7 @@ local function RecreatePanel(config)
 			nItemW, nItemH = hItem:GetSize()
 		end
 		if nCount <= config.maxLineCount then
-			nWidth = nWidth + hItem:GetW()
+			nWidth = ceil(nWidth + ceil(hItem:GetW()))
 		end
 		if nCount % config.maxLineCount == 1 then
 			nHeight = nHeight + hItem:GetH()
