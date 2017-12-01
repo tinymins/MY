@@ -42,29 +42,29 @@ local Config_Default = {
     }, bShowOTBar   = { Player = { Party = false, Neutrality = false, Enemy = true , Ally = false, Self = true , Foe = true , },
                         Npc    = { Party = false, Neutrality = false, Enemy = true , Ally = false,                            },
     }, bShowTong    = { Player = { Party = true , Neutrality = true , Enemy = true , Ally = true , Self = true , Foe = true , }, },
-    
+
     nLineHeight = { 100, 80, 60},
     bShowSpecialNpc = false,
     bShowDistance = false,
-    
+
     nLifeWidth = 80,
     nLifeHeight = 8,
     nLifeOffsetY = 27,
     nPerHeight = 42,
-    
+
     nOTBarWidth = 80,
     nOTBarHeight = 6,
     nOTBarOffsetY = 22,
     nOTTitleHeight = 21,
     bOTEnhancedMod = false,
-    
+
     nAlpha = 200,
     nFont = 16,
     nDistance = 24 * 24 * 64 * 64,
-    
+
     bHideLifePercentageWhenFight = false,
     bHideLifePercentageDecimal = false,
-    
+
     bAdjustIndex = false,
 }
 local Config = clone(Config_Default)
@@ -307,7 +307,7 @@ _C.Reset = function()
                 PostThreadCall(function(tab, xScreen, yScreen)
                     tab.nIndex = yScreen or 0
                 end, tab, "Scene_GetCharacterTopScreenPos", dwID)
-                
+
                 table.insert(t, { handle = tab.handle, index = tab.nIndex })
             end
             -- sort
@@ -320,7 +320,7 @@ _C.Reset = function()
             end
         end, 500)
     end
-    
+
     _C.AutoSwitchSysHeadTop()
 end
 -- 加载界面
@@ -446,7 +446,7 @@ function XLifeBar.X:DrawNames()
     end
     a,f = Config.nAlpha, Config.nFont
     r,g,b,a = self:FxColor(r,g,b,a)
-    
+
     local i = #Config.nLineHeight
     if cfgTong then
         local szTong = self.tab.szTong
@@ -469,7 +469,7 @@ function XLifeBar.X:DrawNames()
             i = i - 1
         end
     end
-    
+
     -- 没有名字的玩意隐藏血条
     if cfgName and #tWordlines == 0 then
         self.hp:DrawLifebar(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, {r,g,b,0,self.tab.fLife})
@@ -696,7 +696,7 @@ local function CheckInvalidRect(dwType, dwID, me, bNoCreate)
                     xlb:SetOTTitle(""):SetOTState(OT_STATE.IDLE):DrawOTBarBorder(0):DrawOTBar({nil,nil,nil,0})
                 end
             end
-            
+
             -- 势力切换
             local szForce = _C.GetForce(dwID)
             if szForce ~= tab.szForce then
@@ -725,16 +725,16 @@ function XLifeBar.OnFrameBreathe()
     if not me then
         return
     end
-    
+
     -- local _, _, fPitch = Camera_GetRTParams()
     for k , v in pairs(_C.tNpc) do
         CheckInvalidRect(TARGET.NPC, k, me)
     end
-    
+
     for k , v in pairs(_C.tPlayer) do
         CheckInvalidRect(TARGET.PLAYER, k, me)
     end
-    
+
     if me.bFightState ~= _C.bFightState then
         _C.bFightState = me.bFightState
     end
@@ -836,7 +836,7 @@ end)
 _C.OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
     local w, h = ui:size()
-    
+
     local x, y = 10, 10
     local offsety = 40
     local fnLoadUI = function(ui)
@@ -887,16 +887,16 @@ _C.OnPanelActive = function(wnd)
     })
     x = x + 80
     ui:append("WndCheckBox", {
-        x = x, y = y + 5, w = 80, text = _L['battlefield'],
+        x = x, y = y + 5, w = 70, text = _L['battlefield'],
         checked = XLifeBar.bOnlyInBattleField,
         oncheck = function(bChecked)
             XLifeBar.bOnlyInBattleField = bChecked
             _C.Reset(true)
         end,
     })
-    x = x + 80
+    x = x + 70
     ui:append("WndCheckBox", {
-        x = x, y = y + 5, w = 80, text = _L['dungeon'],
+        x = x, y = y + 5, w = 70, text = _L['dungeon'],
         checked = XLifeBar.bOnlyInDungeon,
         oncheck = function(bChecked)
             XLifeBar.bOnlyInDungeon = bChecked
@@ -906,7 +906,7 @@ _C.OnPanelActive = function(wnd)
     y = y + offsety
     -- <hr />
     ui:append("Image", "Image_Spliter"):find('#Image_Spliter'):pos(10, y-7):size(w - 20, 2):image('UI/Image/UICommon/ScienceTreeNode.UITex',62)
-    
+
     x, y = 10, 60
     offsety = 27
     ui:append("WndSliderBox", "WndSliderBox_LifebarWidth"):children("#WndSliderBox_LifebarWidth")
@@ -915,91 +915,91 @@ _C.OnPanelActive = function(wnd)
       :value(Config.nLifeWidth or Config_Default.nLifeWidth)
       :change(function(raw, value) Config.nLifeWidth = value;_C.Reset() end)
     y = y + offsety
-    
+
     ui:append("WndSliderBox", "WndSliderBox_LifebarHeight"):children("#WndSliderBox_LifebarHeight")
       :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(5,150)
       :text(function(value) return _L("lifebar height: %s px.", value) end)--血条高度
       :value(Config.nLifeHeight or Config_Default.nLifeHeight)
       :change(function(raw, value) Config.nLifeHeight = value;_C.Reset() end)
     y = y + offsety
-    
+
     ui:append("WndSliderBox", "WndSliderBox_LifeHeight"):children("#WndSliderBox_LifeHeight")
       :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
       :text(function(value) return _L("lifebar offset-y: %d px.", value) end)--血条高度偏移
       :value(Config.nLifeOffsetY or Config_Default.nLifeOffsetY)
       :change(function(raw, value) Config.nLifeOffsetY = value;_C.Reset() end)
     y = y + offsety
-    
+
     ui:append("WndSliderBox", "WndSliderBox_PerHeight"):children("#WndSliderBox_PerHeight")
       :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
       :text(function(value) return _L("percentage offset-y: %d px.", value) end)--百分比高度
       :value(Config.nPerHeight or Config_Default.nPerHeight)
       :change(function(raw, value) Config.nPerHeight = value;_C.Reset() end)
     y = y + offsety
-    
+
     ui:append("WndSliderBox", "WndSliderBox_OTBarWidth"):children("#WndSliderBox_OTBarWidth")
       :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(5,150)
       :text(function(value) return _L("otbar width: %s px.", value) end)--OT长度
       :value(Config.nOTBarWidth or Config_Default.nOTBarWidth)
       :change(function(raw, value) Config.nOTBarWidth = value;_C.Reset() end)
     y = y + offsety
-    
+
     ui:append("WndSliderBox", "WndSliderBox_OTBarHeight"):children("#WndSliderBox_OTBarHeight")
       :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(5,150)
       :text(function(value) return _L("otbar height: %s px.", value) end)--OT高度
       :value(Config.nOTBarHeight or Config_Default.nOTBarHeight)
       :change(function(raw, value) Config.nOTBarHeight = value;_C.Reset() end)
     y = y + offsety
-    
+
     ui:append("WndSliderBox", "WndSliderBox_OTHeight"):children("#WndSliderBox_OTHeight")
       :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
       :text(function(value) return _L("otbar offset-y: %d px.", value) end)--OT高度偏移
       :value(Config.nOTBarOffsetY or Config_Default.nOTBarOffsetY)
       :change(function(raw, value) Config.nOTBarOffsetY = value;_C.Reset() end)
     y = y + offsety
-    
+
     ui:append("WndSliderBox", "WndSliderBox_OTTitleHeight"):children("#WndSliderBox_OTTitleHeight")
       :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
       :text(function(value) return _L("ot title offset-y: %d px.", value) end)--OT名称高度
       :value(Config.nOTTitleHeight or Config_Default.nOTTitleHeight)
       :change(function(raw, value) Config.nOTTitleHeight = value;_C.Reset() end)
     y = y + offsety
-    
+
     ui:append("WndSliderBox", "WndSliderBox_FristHeight"):children("#WndSliderBox_FristHeight")
       :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
       :text(function(value) return _L("1st line offset-y: %d px.", value) end)--第一行字高度
       :value(Config.nLineHeight[1] or Config_Default.nLineHeight[1])
       :change(function(raw, value) Config.nLineHeight[1] = value;_C.Reset() end)
     y = y + offsety
-    
+
     ui:append("WndSliderBox", "WndSliderBox_SecondHeight"):children("#WndSliderBox_SecondHeight")
       :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
       :text(function(value) return _L("2nd line offset-y: %d px.", value) end)--第二行字高度
       :value(Config.nLineHeight[2] or Config_Default.nLineHeight[2])
       :change(function(raw, value) Config.nLineHeight[2] = value;_C.Reset() end)
     y = y + offsety
-    
+
     ui:append("WndSliderBox", "WndSliderBox_ThirdHeight"):children("#WndSliderBox_ThirdHeight")
       :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
       :text(function(value) return _L("3rd line offset-y: %d px.", value) end)--第三行字高度
       :value(Config.nLineHeight[3] or Config_Default.nLineHeight[3])
       :change(function(raw, value) Config.nLineHeight[3] = value;_C.Reset() end)
     y = y + offsety
-    
+
     ui:append("WndSliderBox", "WndSliderBox_Distance"):children("#WndSliderBox_Distance")
       :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,300)
       :text(function(value) return _L("Max Distance: %s foot.", value) end)
       :value(math.sqrt(Config.nDistance or Config_Default.nDistance) / 64)
       :change(function(raw, value) Config.nDistance = value * value * 64 * 64;_C.Reset() end)
     y = y + offsety
-    
+
     ui:append("WndSliderBox", "WndSliderBox_Alpha"):children("#WndSliderBox_Alpha")
       :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_PERCENT):range(0,255)
       :text(function(value) return _L("alpha: %.0f%%.", value) end)--透明度
       :value(Config.nAlpha or Config_Default.nAlpha)
       :change(function(raw, value) Config.nAlpha = value*255/100;_C.Reset() end)
     y = y + offsety
-    
+
     -- 右半边
     x, y = 350, 60
     offsety = 33
@@ -1094,7 +1094,7 @@ _C.OnPanelActive = function(wnd)
         return t
       end)
     y = y + offsety
-    
+
     -- 帮会
     ui:append("WndComboBox", "WndComboBox_Tong"):children("#WndComboBox_Tong")
       :pos(x,y):text(_L["tong display config"])
@@ -1121,7 +1121,7 @@ _C.OnPanelActive = function(wnd)
         return t
       end)
     y = y + offsety
-      
+
     -- 血条设置
     ui:append("WndComboBox", "WndComboBox_Lifebar"):children("#WndComboBox_Lifebar")
       :pos(x,y):text(_L["lifebar display config"])
@@ -1167,7 +1167,7 @@ _C.OnPanelActive = function(wnd)
         return t
       end)
     y = y + offsety
-    
+
     -- 显示血量%
     ui:append("WndComboBox", "WndComboBox_LifePercentage"):children("#WndComboBox_LifePercentage")
       :pos(x,y):text(_L["lifepercentage display config"])
@@ -1232,7 +1232,7 @@ _C.OnPanelActive = function(wnd)
         return t
       end)
     y = y + offsety
-    
+
     -- 显示读条%
     ui:append("WndComboBox", "WndComboBox_SkillPercentage"):children("#WndComboBox_SkillPercentage")
       :pos(x,y):text(_L["skillpercentage display config"])
@@ -1279,7 +1279,7 @@ _C.OnPanelActive = function(wnd)
       end)
       :tip(_L['only can see otaction of target and target\'s target'], ALW.TOP_BOTTOM)
     y = y + offsety
-    
+
     -- 当前阵营
     ui:append("WndComboBox", "WndComboBox_CampSwitch"):children("#WndComboBox_CampSwitch")
       :pos(x,y):text(_L["set current camp"])
@@ -1320,25 +1320,25 @@ _C.OnPanelActive = function(wnd)
       end)
     y = y + offsety
     offsety = 32
-    
+
     ui:append("WndCheckBox", "WndCheckBox_ShowSpecialNpc"):children("#WndCheckBox_ShowSpecialNpc")
       :pos(x,y):text(_L['show special npc'])
       :check(Config.bShowSpecialNpc or false)
       :check(function(bChecked) Config.bShowSpecialNpc = bChecked;_C.Reset() end)
     y = y + offsety - 10
-    
+
     ui:append("WndCheckBox", "WndCheckBox_AdjustIndex"):children("#WndCheckBox_AdjustIndex")
       :pos(x, y):text(_L['adjust index'])
       :check(Config.bAdjustIndex or false)
       :check(function(bChecked) Config.bAdjustIndex = bChecked;_C.Reset() end)
     y = y + offsety - 10
-    
+
     ui:append("WndCheckBox", "WndCheckBox_ShowDistance"):children("#WndCheckBox_ShowDistance")
       :pos(x, y):text(_L['show distance'])
       :check(Config.bShowDistance or false)
       :check(function(bChecked) Config.bShowDistance = bChecked;_C.Reset() end)
     y = y + offsety
-    
+
     ui:append("WndButton", "WndButton_Font"):children("#WndButton_Font")
       :pos(x,y):text(_L("Font: %d",Config.nFont))
       :click(function()
@@ -1348,7 +1348,7 @@ _C.OnPanelActive = function(wnd)
         end)
       end)
     y = y + offsety - 10
-    
+
     ui:append("WndButton", "WndButton_Reset"):children("#WndButton_Reset")
       :pos(x,y):width(120):text(_L['reset config'])
       :click(function()
