@@ -1,70 +1,70 @@
 -- language data (zhtw) updated at 2014-4-10 03:38:11
 data = {
     ['x lifebar'] = '扁平血條',
-    
+
     ['only enable in those maps below'] = '√ 僅在以下地圖啓用扁平血條',
-    ['arena'] = '攪基場',
-    ['battlefield'] = '戰場中',
-    ['dungeon'] = '副本中',
-    
+    ['arena'] = '競技場',
+    ['battlefield'] = '戰場',
+    ['dungeon'] = '副本',
+
     ['name display config'] = '名字顯示設置',
     ['player name display'] = '玩家名字顯示',
     ['npc name display'] = 'Npc名字顯示',
-    
+
     ['title display config'] = '稱號顯示設置',
     ['player title display'] = '玩家稱號顯示',
     ['npc title display'] = 'Npc稱號顯示',
-    
+
     ['tong display config'] = '幫會顯示設置',
     ['player tong display'] = '玩家幫會顯示',
-    
+
     ['lifebar display config'] = '血條顯示設置',
     ['player lifebar display'] = '玩家血條顯示',
     ['npc lifebar display'] = 'Npc血條顯示',
-    
+
     ['lifepercentage display config'] = '血量百分比顯示設置',
     ['player lifepercentage display'] = '玩家百分比顯示',
     ['npc lifepercentage display'] = 'Npc百分比顯示',
-    
+
     ['skillpercentage display config'] = '讀條顯示設置',
     ['player skillpercentage display'] = '玩家讀條顯示',
     ['npc skillpercentage display'] = 'Npc讀條顯示',
-    
+
     ['show special npc'] = '顯示特殊Npc',
     ['adjust index'] = '自適應遮擋順序',
-    
+
     ['Max Distance: %s foot.'] = '最大顯示距離：%s尺。',
     ['Font: %d'] = '字體：%d',
     ['lifebar width: %s px.'] = '血條長度%spx。',
     ['lifebar height: %s px.'] = '血條高度%spx。',
     ['lifebar offset-y: %d px.'] = '血條高度偏移%spx。',
     ['percentage offset-y: %d px.'] = '百分比高度偏移%spx。',
-    
+
     ['otbar width: %s px.'] = '技能讀條長度%spx。',
     ['otbar height: %s px.'] = '技能讀條高度%spx。',
     ['otbar offset-y: %d px.'] = '技能讀條高度偏移%spx。',
     ['ot title offset-y: %d px.'] = '技能名稱高度偏移%spx。',
-    
+
     ['1st line offset-y: %d px.'] = '第一行字高度偏移%spx。',
     ['2nd line offset-y: %d px.'] = '第二行字高度偏移%spx。',
     ['3rd line offset-y: %d px.'] = '第三行字高度偏移%spx。',
     ['alpha: %.0f%%.'] = '透明度%.0f%%。',
-    
+
     ['set current camp'] = '設置當前陣營',
     ['auto detect'] = '自動獲取',
-    
+
     ['show distance'] = '顯示距離',
-    
+
     ['Neutrality'] = "中立關系",
     ['Enemy'] = "敵對關系",
     ['Ally'] = "友好關系",
     ['Party'] = "隊友關系",
     ['Self'] = "自己",
     ['Foe'] = "仇人關系",
-    
+
     ['only can see otaction of target and target\'s target'] = "由于官方限制，只能顯示目標以及目標的目標的讀條狀態",
-    
+
     ['hide when unfight'] = '脫戰時隱藏',
     ['hide decimal'] = '不顯示小數',
-    
+
 }
