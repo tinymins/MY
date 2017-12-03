@@ -497,7 +497,7 @@ _C.OnPanelActive = function(wnd)
     _C.uiBoard = ui:append("WndScrollBox", {
         name = "WndScrollBox_TalkList",
         x = 20, y = 50, w = w - 21, h = h - 70, handlestyle = 3,
-    })
+    }, true)
 
     local tRecords = MY_ChatMonitor.tRecords
     for i = 1, #tRecords, 1 do
@@ -571,7 +571,7 @@ _C.Init = function()
                 end, 5000)
             end
         end,
-    })
+    }, true)
     -- init tip panel animate
     MY.DelayCall('MY_ChatMonitor_Hide', function()
         _C.uiFrame:fadeOut(500)
