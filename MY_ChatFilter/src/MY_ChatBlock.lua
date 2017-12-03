@@ -130,7 +130,7 @@ local function LoadBlockWords()
 		tOrgData = MY.LoadLUAData(szOrgPath)
 		CPath.DelFile(szOrgPath)
 	end
-	
+
 	local tKeys = {}
 	for i, bw in ipairs(MY_ChatBlock.tBlockWords) do
 		tKeys[bw.keyword] = true
@@ -159,7 +159,7 @@ local function LoadBlockWords()
 			end
 		end
 	end
-	
+
 	if tOrgData then
 		SaveBlockWords()
 	end
@@ -185,8 +185,8 @@ function MY_ChatBlock.MatchBlockWord(talkData, talkType, dwTalkerID)
 		szText = talkData
 	end
 	local bAcquaintance = dwTalkerID and (MY.GetFriend(dwTalkerID) or MY.GetFoe(dwTalkerID) or MY.GetTongMember(dwTalkerID))
-	
-	
+
+
 	for _, bw in ipairs(MY_ChatBlock.tBlockWords) do
 		local hasfilter = false
 		for _, eType in ipairs(TYPE_CHANNELMSGS_R[talkType] or EMPTY_TABLE) do
@@ -271,7 +271,7 @@ function PS.OnPanelActive(wnd)
 	local w, h = ui:size()
 	local x, y = 0, 0
 	LoadBlockWords()
-	
+
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = 70,
 		text = _L['enable'],
@@ -281,15 +281,15 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	x = x + 70
-	
+
 	local edit = ui:append('WndEditBox', {
 		name = 'WndEditBox_Keyword',
 		x = x, y = y, w = w - 160 - x, h = 25,
 		placeholder = _L['Type keyword, right click list to config.'],
 	}, true)
 	x, y = 0, y + 30
-	
-	local list = ui:append("WndListBox", { x = x, y = y, w = w, h = h - 30 })
+
+	local list = ui:append("WndListBox", { x = x, y = y, w = w, h = h - 30 }, true)
 	-- ³õÊ¼»¯list¿Ø¼þ
 	for _, bw in ipairs(MY_ChatBlock.tBlockWords) do
 		list:listbox('insert', ChatBlock2Text(bw.keyword, bw.channel), bw.keyword, bw)
