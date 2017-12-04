@@ -8,10 +8,17 @@
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
 local _C = { Data = {} }
-MY_AutoChat = { bEnable = false, bEchoOn = false, bAutoSelect1 = false, bAutoClose = false, bEnableShift = true, CurrentWindow = 0, Conents = nil }
+MY_AutoChat = {}
+MY_AutoChat.bEnable = false
+MY_AutoChat.bEchoOn = true
+MY_AutoChat.bAutoClose = true
+MY_AutoChat.bEnableShift = true
+MY_AutoChat.bAutoSelect1 = false
+MY_AutoChat.Conents = nil
+MY_AutoChat.CurrentWindow = 0
 RegisterCustomData("MY_AutoChat.bEnable")
-RegisterCustomData("MY_AutoChat.bEchoOn")
-RegisterCustomData("MY_AutoChat.bAutoClose")
+RegisterCustomData("MY_AutoChat.bEchoOn", 1)
+RegisterCustomData("MY_AutoChat.bAutoClose", 1)
 RegisterCustomData("MY_AutoChat.bEnableShift")
 RegisterCustomData("MY_AutoChat.bAutoSelect1")
 
@@ -80,31 +87,67 @@ local function WindowSelect(dwIndex, dwID)
 	return GetClientPlayer().WindowSelect(dwIndex, dwID)
 end
 
-function MY_AutoChat.Choose(szMap, szName, dwIndex, aInfo)
+local function GetDialogueInfo(v, dwTargetType, dwTargetId)
+	local id, context, image, imageframe
+	if v.name == "$" or v.name == "W" or v.name == "T" then
+		if v.name == "T" then
+			for iconid in string.gmatch(v.context, "%$ (%d+)") do
+				image = "fromiconid"
+				imageframe = iconid
+			end
+		end
+		id = v.attribute.id
+		context = v.context
+	elseif v.name == "M" then -- 商店
+		context = v.context
+	elseif v.name == "Q" then -- 任务对话
+		local dwQuestId = tonumber(v.attribute.questid)
+		local tQuestInfo = Table_GetQuestStringInfo(dwQuestId)
+		if tQuestInfo then
+			local eQuestState, nLevel = GetQuestState(dwQuestId, dwTargetType, dwTargetId)
+			if eQuestState == QUEST_STATE_YELLOW_QUESTION
+			or eQuestState == QUEST_STATE_BLUE_QUESTION
+			or eQuestState == QUEST_STATE_HIDE
+			or eQuestState == QUEST_STATE_YELLOW_EXCLAMATION
+			or eQuestState == QUEST_STATE_BLUE_EXCLAMATION
+			or eQuestState == QUEST_STATE_WHITE_QUESTION
+			or eQuestState == QUEST_STATE_DUN_DIA then
+				context = tQuestInfo.szName
+			end
+		end
+	end
+	return context and { id = id, context = context } or nil
+end
+
+function MY_AutoChat.Choose(dwType, dwID, dwIndex, aInfo)
+	local szName, szMap = MY_AutoChat.GetName(dwType, dwID)
 	if not (szMap and szName and dwIndex and aInfo) then
 		return
 	end
 	local tChat = (_C.Data[szMap] or EMPTY_TABLE)[szName] or EMPTY_TABLE
-	
+
 	local nCount, szContext, dwID = 0
 	for i, v in ipairs(aInfo) do
-		if (v.name == '$' or v.name == "W") and v.attribute.id then
-			if tChat[v.context] and tChat[v.context] > 0 then
-				for i = 1, tChat[v.context] do
-					WindowSelect(dwIndex, v.attribute.id)
+		local info = GetDialogueInfo(v, dwType, dwID)
+		if info then
+			if info.id and tChat[info.context] and tChat[info.context] > 0 then
+				for i = 1, tChat[info.context] do
+					WindowSelect(dwIndex, info.id)
 				end
 				if MY_AutoChat.bEchoOn then
-					MY.Sysmsg({_L("Conversation with [%s] auto chose: %s", szName, v.context)})
+					MY.Sysmsg({_L("Conversation with [%s] auto chose: %s", szName, info.context)})
 				end
 				return true
 			else
+				if info.id then
+					dwID = info.id
+					szContext = v.context
+				end
 				nCount = nCount + 1
-				dwID = v.attribute.id
-				szContext = v.context
 			end
 		end
 	end
-	
+
 	if MY_AutoChat.bAutoSelect1 and nCount == 1 and not MY.IsInDungeon(true) then
 		WindowSelect(dwIndex, dwID)
 		if MY_AutoChat.bEchoOn then
@@ -122,12 +165,9 @@ function MY_AutoChat.DoSomething()
 	end
 	local frame = Station.Lookup("Normal/DialoguePanel")
 	if frame and frame:IsVisible() then
-		local dwType, dwID, dwIndex, aInfo = frame.dwTargetType, frame.dwTargetId, frame.dwIndex, frame.aInfo
-		local szName, szMap = MY_AutoChat.GetName(dwType, dwID)
-		if szName and aInfo then
-			if MY_AutoChat.Choose(szMap, szName, dwIndex, aInfo) and MY_AutoChat.bAutoClose then
-				frame:Hide()
-			end
+		if MY_AutoChat.Choose(frame.dwTargetType, frame.dwTargetId, frame.dwIndex, frame.aInfo)
+		and MY_AutoChat.bAutoClose then
+			frame:Hide()
 		end
 	end
 end
@@ -181,30 +221,30 @@ end)
 ---------------------------------------------------------------------------
 -- 对话面板HOOK 添加自动对话设置按钮
 ---------------------------------------------------------------------------
-local function GetDialoguePanelMenuItem(szMap, szName, szType, szContext, dwID)
+local function GetDialoguePanelMenuItem(szMap, szName, dialogueInfo)
 	local r, g, b = 255, 255, 255
 	local szIcon, nFrame, nMouseOverFrame, szLayer, fnClickIcon, fnAction
-	if _C.Data[szMap] and _C.Data[szMap][szName] and _C.Data[szMap][szName][szContext] then
+	if _C.Data[szMap] and _C.Data[szMap][szName] and _C.Data[szMap][szName][dialogueInfo.context] then
 		szIcon = 'ui/Image/UICommon/Feedanimials.UITex'
 		nFrame = 86
 		nMouseOverFrame = 87
 		szLayer = "ICON_RIGHT"
 		fnClickIcon = function()
-			MY_AutoChat.DelData(szMap, szName, szContext)
+			MY_AutoChat.DelData(szMap, szName, dialogueInfo.context)
 			Wnd.CloseWindow('PopupMenuPanel')
 		end
-		if _C.Data[szMap][szName][szContext] > 0 then
+		if _C.Data[szMap][szName][dialogueInfo.context] > 0 then
 			r, g, b = 255, 0, 255
-			fnAction = function() MY_AutoChat.DisableData(szMap, szName, szContext) end
+			fnAction = function() MY_AutoChat.DisableData(szMap, szName, dialogueInfo.context) end
 		else
 			r, g, b = 255, 255, 255
-			fnAction = function() MY_AutoChat.AddData(szMap, szName, szContext) end
+			fnAction = function() MY_AutoChat.AddData(szMap, szName, dialogueInfo.context) end
 		end
 	else
-		fnAction = function() MY_AutoChat.AddData(szMap, szName, szContext) end
+		fnAction = function() MY_AutoChat.AddData(szMap, szName, dialogueInfo.context) end
 	end
-	if szType == "T" then
-		for szIconID in string.gmatch(szContext, "%$ (%d+)") do
+	if dialogueInfo.name == "T" then
+		for szIconID in string.gmatch(dialogueInfo.context, "%$ (%d+)") do
 			szIcon = "fromiconid"
 			nFrame = szIconID
 			szLayer = "ICON_RIGHT"
@@ -212,7 +252,7 @@ local function GetDialoguePanelMenuItem(szMap, szName, szType, szContext, dwID)
 	end
 	return {
 		r = r, g = g, b = b,
-		szOption =  (IsCtrlKeyDown() and dwID and ("(" .. dwID .. ") ") or "") .. szContext,
+		szOption =  (IsCtrlKeyDown() and dialogueInfo.id and ("(" .. dialogueInfo.id .. ") ") or "") .. dialogueInfo.context,
 		fnAction = fnAction,
 		szIcon = szIcon, nFrame = nFrame, nMouseOverFrame = nMouseOverFrame,
 		szLayer = szLayer, fnClickIcon = fnClickIcon,
@@ -232,17 +272,18 @@ local function GetDialoguePanelMenu()
 			local tChat = {}
 			-- 面板上的对话
 			for i, v in ipairs(frame.aInfo) do
-				if v.name == "$" or v.name == 'W' or v.name == "T" then
-					table.insert(t, GetDialoguePanelMenuItem(szMap, szName, v.name, v.context, v.attribute.id))
-					tChat[v.context] = true
+				local info = GetDialogueInfo(v, dwType, dwID)
+				if info and info.id then
+					table.insert(t, GetDialoguePanelMenuItem(szMap, szName, info))
+					tChat[info.context] = true
 				end
 			end
 			-- 保存的自动对话
 			if _C.Data[szMap] and _C.Data[szMap][szName] then
-				for szKey, nCount in pairs(_C.Data[szMap][szName]) do
-					if not tChat[szKey] then
-						table.insert(t, GetDialoguePanelMenuItem(szMap, szName, "$", szKey))
-						tChat[szKey] = true
+				for szContext, nCount in pairs(_C.Data[szMap][szName]) do
+					if not tChat[szContext] then
+						table.insert(t, GetDialoguePanelMenuItem(szMap, szName, { name = "$", context = szContext }))
+						tChat[szContext] = true
 					end
 				end
 			end
@@ -252,9 +293,13 @@ local function GetDialoguePanelMenu()
 end
 
 local function HookDialoguePanel()
+	if MY.IsShieldedVersion() then
+		return
+	end
 	local frame = Station.Lookup("Normal/DialoguePanel")
 	if frame and frame:IsVisible() and not frame.bMYHooked then
 		MY.UI(frame):append('WndButton', {
+			name = 'WndButton_AutoChat',
 			x = 50, y = 10, w = 80, text = _L['autochat'],
 			tip = _L['Left click to config autochat.\nRight click to edit global config.'],
 			tippostype = MY.Const.UI.Tip.POS_TOP,
@@ -264,8 +309,9 @@ local function HookDialoguePanel()
 		frame.bMYHooked = true
 	end
 end
+MY.RegisterInit("MY_AutoChat", HookDialoguePanel)
 
-RegisterEvent("OPEN_WINDOW", function()
+local function onOpenWindow()
 	if MY.IsShieldedVersion() then
 		return
 	end
@@ -279,4 +325,14 @@ RegisterEvent("OPEN_WINDOW", function()
 	MY_AutoChat.CurrentWindow = arg0
 	MY_AutoChat.Conents = arg1
 	MY_AutoChat.DoSomething()
-end)
+end
+MY.RegisterEvent("OPEN_WINDOW.MY_AutoChat", onOpenWindow)
+
+local function UnhookDialoguePanel()
+	local frame = Station.Lookup("Normal/DialoguePanel")
+	if frame and frame.bMYHooked then
+		MY.UI(frame):children('#WndButton_AutoChat'):remove()
+		frame.bMYHooked = false
+	end
+end
+MY.RegisterReload("MY_AutoChat", UnhookDialoguePanel)
