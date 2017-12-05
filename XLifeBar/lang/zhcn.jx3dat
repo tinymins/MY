@@ -68,4 +68,6 @@ data = {
     ['hide decimal'] = '不显示小数',
 
     ['Default config cannot be loaded, please reinstall!!!'] = '默认配置加载失败，请重新安装！',
+    ['Unified force color'] = '统一染色',
+    ['Differentiate force color'] = '门派染色',
 }
