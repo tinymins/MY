@@ -20,9 +20,16 @@ end
 local Config = clone(Config_Default)
 
 local function GetConfig(key, relation, force)
-    local value = Config[key][relation][force]
-    if value == nil then
-        value = Config[key][relation]["Player"]
+    local cfg, value = Config[key][relation]
+    if force == 'Npc' or force == 'Player' then
+        value = cfg[force]
+    else
+        if cfg.DifferentiateForce then
+            value = cfg[force]
+        end
+        if value == nil then
+            value = Config[key][relation]["Player"]
+        end
     end
     return value
 end
@@ -777,7 +784,8 @@ RegisterEvent("UPDATE_SELECT_TARGET",function()
     end
 end)
 
-_C.OnPanelActive = function(wnd)
+local PS = {}
+function PS.OnPanelActive(wnd)
     local ui = MY.UI(wnd)
     local w, h = ui:size()
 
@@ -947,372 +955,275 @@ _C.OnPanelActive = function(wnd)
     -- 右半边
     x, y = 350, 60
     offsety = 33
-    -- 显示名字
-    ui:append("WndComboBox", "WndComboBox_Name"):children("#WndComboBox_Name")
-      :pos(x,y):text(_L["name display config"])
-      :menu(function()
-        local t = {}
-        table.insert(t,{    szOption = _L["player name display"] , bDisable = true} )
-        for k,v in pairs(Config.ShowName.Player) do
-            table.insert(t,{
-                szOption = _L[k],
-                bCheck = true,
-                bChecked = Config.ShowName.Player[k],
-                fnAction = function()
-                    Config.ShowName.Player[k] = not Config.ShowName.Player[k]
-                    _C.Reset()
-                end,
-                rgb = Config.Color.Player[k],
-                bColorTable = true,
-                fnChangeColor = function(_,r,g,b)
-                    Config.Color.Player[k] = {r,g,b}
-                    _C.Reset()
-                end
-            })
+    local function FillColorTable(opt, relation, tartype)
+        local cfg = Config.Color[relation]
+        opt.rgb = cfg[tartype]
+        opt.bColorTable = true
+        opt.fnChangeColor = function(_, r, g, b)
+            cfg[tartype] = { r, g, b }
+            _C.Reset()
         end
-        table.insert(t,{    bDevide = true} )
-        table.insert(t,{    szOption = _L["npc name display"] , bDisable = true} )
-        for k,v in pairs(Config.ShowName.Npc) do
-            table.insert(t,{
-                szOption = _L[k],
-                bCheck = true,
-                bChecked = Config.ShowName.Npc[k],
-                fnAction = function()
-                    Config.ShowName.Npc[k] = not Config.ShowName.Npc[k]
+        if tartype == "Player" then
+            table.insert(opt, {
+                szOption = _L['Unified force color'],
+                bCheck = true, bMCheck = true,
+                bChecked = not cfg.DifferentiateForce,
+                fnAction = function(_, r, g, b)
+                    cfg.DifferentiateForce = false
                     _C.Reset()
                 end,
-                rgb = Config.Color.Npc[k],
-                bColorTable = true,
-                fnChangeColor = function(_,r,g,b)
-                    Config.Color.Npc[k] = {r,g,b}
-                    _C.Reset()
-                end
+                rgb = cfg[tartype],
+                szIcon = 'ui/Image/button/CommonButton_1.UITex',
+                nFrame = 69, nMouseOverFrame = 70,
+                szLayer = "ICON_RIGHT",
+                fnClickIcon = function()
+                    XGUI.OpenColorPicker(function(r, g, b)
+                        cfg[tartype] = { r, g, b }
+                        _C.Reset()
+                    end)
+                end,
             })
+            table.insert(opt, {
+                szOption = _L['Differentiate force color'],
+                bCheck = true, bMCheck = true,
+                bChecked = cfg.DifferentiateForce,
+                fnAction = function(_, r, g, b)
+                    cfg.DifferentiateForce = true
+                    _C.Reset()
+                end,
+            })
+            table.insert(opt,{ bDevide = true } )
+            for dwForceID, szForceTitle in pairs(g_tStrings.tForceTitle) do
+                table.insert(opt, {
+                    szOption = szForceTitle,
+                    rgb = cfg[dwForceID],
+                    szIcon = 'ui/Image/button/CommonButton_1.UITex',
+                    nFrame = 69, nMouseOverFrame = 70,
+                    szLayer = "ICON_RIGHT",
+                    fnClickIcon = function()
+                        XGUI.OpenColorPicker(function(r, g, b)
+                            cfg[dwForceID] = { r, g, b }
+                            _C.Reset()
+                        end)
+                    end,
+                    fnDisable = function()
+                        return not cfg.DifferentiateForce
+                    end,
+                })
+            end
+        end
+        return opt
+    end
+    local function GeneBooleanPopupMenu(cfgs, szPlayerTip, szNpcTip)
+        local t = {}
+        if szPlayerTip then
+            table.insert(t, { szOption = szPlayerTip, bDisable = true } )
+            for relation, cfg in pairs(cfgs) do
+                if cfg.Player ~= nil then
+                    table.insert(t, FillColorTable({
+                        szOption = _L[relation],
+                        bCheck = true,
+                        bChecked = cfg.Player,
+                        fnAction = function()
+                            cfg.Player = not cfg.Player
+                            _C.Reset()
+                        end,
+                    }, relation, "Player"))
+                end
+            end
+        end
+        if szPlayerTip and szNpcTip then
+            table.insert(t,{ bDevide = true } )
+        end
+        if szNpcTip then
+            table.insert(t,{ szOption = szNpcTip, bDisable = true } )
+            for relation, cfg in pairs(cfgs) do
+                if cfg.Npc ~= nil then
+                    table.insert(t, FillColorTable({
+                        szOption = _L[relation],
+                        bCheck = true,
+                        bChecked = cfg.Npc,
+                        fnAction = function()
+                            cfg.Npc = not cfg.Npc
+                            _C.Reset()
+                        end,
+                    }, relation, "Npc"))
+                end
+            end
         end
         return t
-      end)
+    end
+    -- 显示名字
+    ui:append("WndComboBox", {
+        x = x, y = y, text = _L["name display config"],
+        menu = function()
+            return GeneBooleanPopupMenu(Config.ShowName, _L["player name display"], _L["npc name display"])
+        end,
+    })
     y = y + offsety
 
     -- 称号
-    ui:append("WndComboBox", "WndComboBox_Title"):children("#WndComboBox_Title")
-      :pos(x,y):text(_L["title display config"])
-      :menu(function()
-        local t = {}
-        table.insert(t,{    szOption = _L["player title display"] , bDisable = true} )
-        for k,v in pairs(Config.ShowTitle.Player) do
-            table.insert(t,{
-                szOption = _L[k],
-                bCheck = true,
-                bChecked = Config.ShowTitle.Player[k],
-                fnAction = function()
-                    Config.ShowTitle.Player[k] = not Config.ShowTitle.Player[k];
-                    _C.Reset()
-                end,
-                rgb = Config.Color.Player[k],
-                bColorTable = true,
-                fnChangeColor = function(_,r,g,b)
-                    Config.Color.Player[k] = {r,g,b}
-                    _C.Reset()
-                end
-            })
-        end
-        table.insert(t,{    bDevide = true} )
-        table.insert(t,{    szOption = _L["npc title display"] , bDisable = true} )
-        for k,v in pairs(Config.ShowTitle.Npc) do
-            table.insert(t,{
-                szOption = _L[k],
-                bCheck = true,
-                bChecked = Config.ShowTitle.Npc[k],
-                fnAction = function()
-                    Config.ShowTitle.Npc[k] = not Config.ShowTitle.Npc[k]
-                    _C.Reset()
-                end,
-                rgb = Config.Color.Npc[k],
-                bColorTable = true,
-                fnChangeColor = function(_,r,g,b)
-                    Config.Color.Npc[k] = {r,g,b}
-                    _C.Reset()
-                end
-            })
-        end
-        return t
-      end)
+    ui:append("WndComboBox", {
+        x = x, y = y, text = _L["title display config"],
+        menu = function()
+            return GeneBooleanPopupMenu(Config.ShowTitle, _L["player title display"], _L["npc title display"])
+        end,
+    })
     y = y + offsety
 
     -- 帮会
-    ui:append("WndComboBox", "WndComboBox_Tong"):children("#WndComboBox_Tong")
-      :pos(x,y):text(_L["tong display config"])
-      :menu(function()
-        local t = {}
-        table.insert(t,{    szOption = _L["player tong display"] , bDisable = true} )
-        for k,v in pairs(Config.ShowTong.Player) do
-            table.insert(t,{
-                szOption = _L[k],
-                bCheck = true,
-                bChecked = Config.ShowTong.Player[k],
-                fnAction = function()
-                    Config.ShowTong.Player[k] = not Config.ShowTong.Player[k];
-                    _C.Reset()
-                end,
-                rgb = Config.Color.Player[k],
-                bColorTable = true,
-                fnChangeColor = function(_,r,g,b)
-                    Config.Color.Player[k] = {r,g,b}
-                    _C.Reset()
-                end
-            })
-        end
-        return t
-      end)
+    ui:append("WndComboBox", {
+        x = x, y = y, text = _L["tong display config"],
+        menu = function()
+            return GeneBooleanPopupMenu(Config.ShowTong, _L["player tong display"])
+        end,
+    })
     y = y + offsety
 
     -- 血条设置
-    ui:append("WndComboBox", "WndComboBox_Lifebar"):children("#WndComboBox_Lifebar")
-      :pos(x,y):text(_L["lifebar display config"])
-      :menu(function()
-        local t = {}
-        table.insert(t,{    szOption = _L["player lifebar display"] , bDisable = true} )
-        for k,v in pairs(Config.ShowLife.Player) do
-            table.insert(t,{
-                szOption = _L[k],
-                bCheck = true,
-                bChecked = Config.ShowLife.Player[k],
-                fnAction = function()
-                    Config.ShowLife.Player[k] = not Config.ShowLife.Player[k]
-                    _C.Reset()
-                end,
-                rgb = Config.Color.Player[k],
-                bColorTable = true,
-                fnChangeColor = function(_,r,g,b)
-                    Config.Color.Player[k] = {r,g,b}
-                    _C.Reset()
-                end
-            })
-        end
-        table.insert(t,{    bDevide = true} )
-        table.insert(t,{    szOption = _L["npc lifebar display"] , bDisable = true} )
-        for k,v in pairs(Config.ShowLife.Npc) do
-            table.insert(t,{
-                szOption = _L[k],
-                bCheck = true,
-                bChecked = Config.ShowLife.Npc[k],
-                fnAction = function()
-                    Config.ShowLife.Npc[k] = not Config.ShowLife.Npc[k]
-                    _C.Reset()
-                end,
-                rgb = Config.Color.Npc[k],
-                bColorTable = true,
-                fnChangeColor = function(_,r,g,b)
-                    Config.Color.Npc[k] = {r,g,b}
-                    _C.Reset()
-                end
-            })
-        end
-        return t
-      end)
+    ui:append("WndComboBox", {
+        x = x, y = y, text = _L["lifebar display config"],
+        menu = function()
+            return GeneBooleanPopupMenu(Config.ShowLife, _L["player lifebar display"], _L["npc lifebar display"])
+        end,
+    })
     y = y + offsety
 
     -- 显示血量%
-    ui:append("WndComboBox", "WndComboBox_LifePercentage"):children("#WndComboBox_LifePercentage")
-      :pos(x,y):text(_L["lifepercentage display config"])
-      :menu(function()
-        local t = {}
-        table.insert(t,{    szOption = _L["player lifepercentage display"] , bDisable = true} )
-        for k,v in pairs(Config.ShowLifePer.Player) do
-            table.insert(t,{
-                szOption = _L[k],
+    ui:append("WndComboBox", {
+        x = x, y = y, text = _L["lifepercentage display config"],
+        menu = function()
+            local t = GeneBooleanPopupMenu(Config.ShowLifePer, _L["player lifepercentage display"], _L["npc lifepercentage display"])
+            table.insert(t, { bDevide = true })
+            table.insert(t, {
+                szOption = _L['hide when unfight'],
                 bCheck = true,
-                bChecked = Config.ShowLifePer.Player[k],
+                bChecked = Config.bHideLifePercentageWhenFight,
                 fnAction = function()
-                    Config.ShowLifePer.Player[k] = not Config.ShowLifePer.Player[k]
+                    Config.bHideLifePercentageWhenFight = not Config.bHideLifePercentageWhenFight
                     _C.Reset()
                 end,
-                rgb = Config.Color.Player[k],
-                bColorTable = true,
-                fnChangeColor = function(_,r,g,b)
-                    Config.Color.Player[k] = {r,g,b}
-                    _C.Reset()
-                end
             })
-        end
-        table.insert(t,{    bDevide = true} )
-        table.insert(t,{    szOption = _L["npc lifepercentage display"] , bDisable = true} )
-        for k,v in pairs(Config.ShowLifePer.Npc) do
-            table.insert(t,{
-                szOption = _L[k],
+            table.insert(t, {
+                szOption = _L['hide decimal'],
                 bCheck = true,
-                bChecked = Config.ShowLifePer.Npc[k],
+                bChecked = Config.bHideLifePercentageDecimal,
                 fnAction = function()
-                    Config.ShowLifePer.Npc[k] = not Config.ShowLifePer.Npc[k];
+                    Config.bHideLifePercentageDecimal = not Config.bHideLifePercentageDecimal
                     _C.Reset()
                 end,
-                rgb = Config.Color.Npc[k],
-                bColorTable = true,
-                fnChangeColor = function(_,r,g,b)
-                    Config.Color.Npc[k] = {r,g,b}
-                    _C.Reset()
-                end
             })
-        end
-        table.insert(t,{    bDevide = true} )
-        table.insert(t,{
-            szOption = _L['hide when unfight'],
-            bCheck = true,
-            bChecked = Config.bHideLifePercentageWhenFight,
-            fnAction = function()
-                Config.bHideLifePercentageWhenFight = not Config.bHideLifePercentageWhenFight;
-                _C.Reset()
-            end,
-        })
-        table.insert(t,{
-            szOption = _L['hide decimal'],
-            bCheck = true,
-            bChecked = Config.bHideLifePercentageDecimal,
-            fnAction = function()
-                Config.bHideLifePercentageDecimal = not Config.bHideLifePercentageDecimal;
-                _C.Reset()
-            end,
-        })
-        return t
-      end)
+            return t
+        end,
+    })
     y = y + offsety
 
     -- 显示读条%
-    ui:append("WndComboBox", "WndComboBox_SkillPercentage"):children("#WndComboBox_SkillPercentage")
-      :pos(x,y):text(_L["skillpercentage display config"])
-      :menu(function()
-        local t = {}
-        table.insert(t, {szOption = _L["player skillpercentage display"] , bDisable = true})
-        for k,v in pairs(Config.ShowOTBar.Player) do
-            table.insert(t,{
-                szOption = _L[k],
-                bCheck = true,
-                bChecked = Config.ShowOTBar.Player[k],
-                fnAction = function()
-                    Config.ShowOTBar.Player[k] = not Config.ShowOTBar.Player[k]
-                    _C.Reset()
-                end,
-                rgb = Config.Color.Player[k],
-                bColorTable = true,
-                fnChangeColor = function(_,r,g,b)
-                    Config.Color.Player[k] = {r,g,b}
-                    _C.Reset()
-                end
-            })
-        end
-        table.insert(t,{    bDevide = true} )
-        table.insert(t,{    szOption = _L["npc skillpercentage display"] , bDisable = true} )
-        for k,v in pairs(Config.ShowOTBar.Npc) do
-            table.insert(t,{
-                szOption = _L[k],
-                bCheck = true,
-                bChecked = Config.ShowOTBar.Npc[k],
-                fnAction = function()
-                    Config.ShowOTBar.Npc[k] = not Config.ShowOTBar.Npc[k];
-                    _C.Reset()
-                end,
-                rgb = Config.Color.Npc[k],
-                bColorTable = true,
-                fnChangeColor = function(_,r,g,b)
-                    Config.Color.Npc[k] = {r,g,b}
-                    _C.Reset()
-                end
-            })
-        end
-        return t
-      end)
-      :tip(_L['only can see otaction of target and target\'s target'], ALW.TOP_BOTTOM)
+    ui:append("WndComboBox", {
+        x = x, y = y, text = _L["skillpercentage display config"],
+        menu = function()
+            return GeneBooleanPopupMenu(Config.ShowOTBar, _L["player skillpercentage display"], _L["npc skillpercentage display"])
+        end,
+        tip = _L['only can see otaction of target and target\'s target'],
+        tippostype = ALW.TOP_BOTTOM,
+    })
     y = y + offsety
 
     -- 当前阵营
-    ui:append("WndComboBox", "WndComboBox_CampSwitch"):children("#WndComboBox_CampSwitch")
-      :pos(x,y):text(_L["set current camp"])
-      :menu(function()
-        return {{
-            szOption = _L['auto detect'],
-            bCheck = true, bMCheck = true,
-            bChecked = Config.nCamp == -1,
-            fnAction = function()
-                Config.nCamp = -1
-                _C.Reset()
-            end,
-        }, {
-            szOption = g_tStrings.STR_CAMP_TITLE[CAMP.GOOD],
-            bCheck = true, bMCheck = true,
-            bChecked = Config.nCamp == CAMP.GOOD,
-            fnAction = function()
-                Config.nCamp = CAMP.GOOD
-                _C.Reset()
-            end,
-        }, {
-            szOption = g_tStrings.STR_CAMP_TITLE[CAMP.EVIL],
-            bCheck = true, bMCheck = true,
-            bChecked = Config.nCamp == CAMP.EVIL,
-            fnAction = function()
-                Config.nCamp = CAMP.EVIL
-                _C.Reset()
-            end,
-        }, {
-            szOption = g_tStrings.STR_CAMP_TITLE[CAMP.NEUTRAL],
-            bCheck = true, bMCheck = true,
-            bChecked = Config.nCamp == CAMP.NEUTRAL,
-            fnAction = function()
-                Config.nCamp = CAMP.NEUTRAL
-                _C.Reset()
-            end,
-        }}
-      end)
+    ui:append("WndComboBox", {
+        x = x, y = y, text = _L["set current camp"],
+        menu = function()
+            return {{
+                szOption = _L['auto detect'],
+                bCheck = true, bMCheck = true,
+                bChecked = Config.nCamp == -1,
+                fnAction = function()
+                    Config.nCamp = -1
+                    _C.Reset()
+                end,
+            }, {
+                szOption = g_tStrings.STR_CAMP_TITLE[CAMP.GOOD],
+                bCheck = true, bMCheck = true,
+                bChecked = Config.nCamp == CAMP.GOOD,
+                fnAction = function()
+                    Config.nCamp = CAMP.GOOD
+                    _C.Reset()
+                end,
+            }, {
+                szOption = g_tStrings.STR_CAMP_TITLE[CAMP.EVIL],
+                bCheck = true, bMCheck = true,
+                bChecked = Config.nCamp == CAMP.EVIL,
+                fnAction = function()
+                    Config.nCamp = CAMP.EVIL
+                    _C.Reset()
+                end,
+            }, {
+                szOption = g_tStrings.STR_CAMP_TITLE[CAMP.NEUTRAL],
+                bCheck = true, bMCheck = true,
+                bChecked = Config.nCamp == CAMP.NEUTRAL,
+                fnAction = function()
+                    Config.nCamp = CAMP.NEUTRAL
+                    _C.Reset()
+                end,
+            }}
+        end,
+    })
     y = y + offsety
     offsety = 32
 
-    ui:append("WndCheckBox", "WndCheckBox_ShowSpecialNpc"):children("#WndCheckBox_ShowSpecialNpc")
-      :pos(x,y):text(_L['show special npc'])
-      :check(Config.bShowSpecialNpc or false)
-      :check(function(bChecked) Config.bShowSpecialNpc = bChecked;_C.Reset() end)
+    ui:append("WndCheckBox", {
+        x = x, y = y, text = _L['show special npc'],
+        checked = Config.bShowSpecialNpc,
+        oncheck = function(bChecked) Config.bShowSpecialNpc = bChecked;_C.Reset() end,
+    })
     y = y + offsety - 10
 
-    ui:append("WndCheckBox", "WndCheckBox_AdjustIndex"):children("#WndCheckBox_AdjustIndex")
-      :pos(x, y):text(_L['adjust index'])
-      :check(Config.bAdjustIndex or false)
-      :check(function(bChecked) Config.bAdjustIndex = bChecked;_C.Reset() end)
+    ui:append("WndCheckBox", {
+        x = x, y = y, text = _L['adjust index'],
+        checked = Config.bAdjustIndex,
+        oncheck = function(bChecked) Config.bAdjustIndex = bChecked;_C.Reset() end,
+    })
     y = y + offsety - 10
 
-    ui:append("WndCheckBox", "WndCheckBox_ShowDistance"):children("#WndCheckBox_ShowDistance")
-      :pos(x, y):text(_L['show distance'])
-      :check(Config.bShowDistance or false)
-      :check(function(bChecked) Config.bShowDistance = bChecked;_C.Reset() end)
+    ui:append("WndCheckBox", {
+        x = x, y = y, text = _L['show distance'],
+        checked = Config.bShowDistance,
+        oncheck = function(bChecked) Config.bShowDistance = bChecked;_C.Reset() end,
+    })
     y = y + offsety
 
-    ui:append("WndButton", "WndButton_Font"):children("#WndButton_Font")
-      :pos(x,y):text(_L("Font: %d",Config.nFont))
-      :click(function()
-        MY.UI.OpenFontPicker(function(nFont)
-            Config.nFont = nFont;_C.Reset()
-            ui:children("#WndButton_Font"):text(_L("Font: %d",Config.nFont))
-        end)
-      end)
+    ui:append("WndButton", {
+        x = x, y = y, text = _L("Font: %d",Config.nFont),
+        onclick = function()
+            MY.UI.OpenFontPicker(function(nFont)
+                Config.nFont = nFont;_C.Reset()
+                ui:children("#WndButton_Font"):text(_L("Font: %d",Config.nFont))
+            end)
+        end,
+    })
     y = y + offsety - 10
 
-    ui:append("WndButton", "WndButton_Reset"):children("#WndButton_Reset")
-      :pos(x,y):width(120):text(_L['reset config'])
-      :click(function()
-        MessageBox({
-            szName = "XLifeBar_Reset",
-            szMessage = _L['Are you sure to reset config?'], {
-                szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function()
-                    Config = clone(Config_Default)
-                    _C.Reset()
-                    fnLoadUI(ui)
-                end
-            }, {szOption = g_tStrings.STR_HOTKEY_CANCEL,fnAction = function() end},
-        })
-      end)
+    ui:append("WndButton", {
+        x = x, y = y, w = 120, text = _L['reset config'],
+        onclick = function()
+            MessageBox({
+                szName = "XLifeBar_Reset",
+                szMessage = _L['Are you sure to reset config?'], {
+                    szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function()
+                        Config = clone(Config_Default)
+                        _C.Reset()
+                        fnLoadUI(ui)
+                    end
+                }, {szOption = g_tStrings.STR_HOTKEY_CANCEL,fnAction = function() end},
+            })
+        end,
+    })
     y = y + offsety
 end
-MY.RegisterPanel("XLifeBar", _L["x lifebar"], _L['General'], "UI/Image/LootPanel/LootPanel.UITex|74", {255,127,0,200}, {
-    OnPanelActive = _C.OnPanelActive, OnPanelDeactive = nil
-})
-MY.Game.AddHotKey("XLifeBar_S", _L["x lifebar"], function()
+MY.RegisterPanel("XLifeBar", _L["x lifebar"], _L['General'], "UI/Image/LootPanel/LootPanel.UITex|74", {255,127,0,200}, PS)
+
+local function onSwitch()
     XLifeBar.bEnabled = not XLifeBar.bEnabled
     _C.Reset(true)
-end)
+end
+MY.Game.AddHotKey("XLifeBar_S", _L["x lifebar"], onSwitch)
