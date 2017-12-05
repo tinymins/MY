@@ -663,7 +663,8 @@ function XGUI:children(filter)
 				end
 			end
 			if raw:GetBaseType() == 'Wnd' then
-				child = raw:Lookup('', name)
+				child = GetComponentElement(raw, 'MAIN_HANDLE')
+				child = child and child:Lookup(name)
 				if child then
 					path = concat({ child:GetTreePath() })
 					if not hash[path] then
