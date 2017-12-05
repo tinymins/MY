@@ -539,6 +539,22 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 		hItem.nRenderFrame = nil
 	end
 end
+
+local function CancelBuff(hItem)
+	if not hItem or not hItem.mon then
+		return
+	end
+	local config = hItem:GetRoot().config
+	if not config or config.type ~= 'BUFF' then
+		return
+	end
+	local KTarget = MY.GetObject(GetTarget(config.target, config.type))
+	if not KTarget then
+		return
+	end
+	MY.CancelBuff(KTarget, hItem.mon.id == 'common' and hItem.mon.name or hItem.mon.id)
+end
+
 function FE.OnFrameBreathe()
 	local dwType, dwID = GetTarget(this.config.target, this.config.type)
 	if dwType == this.dwType and dwID == this.dwID
@@ -621,6 +637,13 @@ end
 
 function FE.OnFrameDragEnd()
 	SaveAnchor(this)
+end
+
+function FE.OnItemRButtonClick()
+	local name = this:GetName()
+	if name == 'Box_Default' then
+		CancelBuff(this:GetParent():GetParent())
+	end
 end
 
 do
@@ -863,22 +886,14 @@ for i = 1, 5 do
 				return
 			end
 			local config = Config[i]
-			if not config or config.type ~= 'BUFF' then
+			if not config then
 				return
 			end
 			local frame = l_frames[config]
 			if not frame then
 				return
 			end
-			local hItem = frame:Lookup("", "Handle_List"):Lookup(j - 1)
-			if not hItem then
-				return
-			end
-			local KTarget = MY.GetObject(GetTarget(frame.config.target, frame.config.type))
-			if not KTarget then
-				return
-			end
-			MY.CancelBuff(KTarget, hItem.mon.id == 'common' and hItem.mon.name or hItem.mon.id)
+			CancelBuff(frame:Lookup("", "Handle_List"):Lookup(j - 1))
 		end, nil)
 		title = ""
 	end
