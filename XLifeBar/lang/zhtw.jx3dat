@@ -67,4 +67,5 @@ data = {
     ['hide when unfight'] = '脫戰時隱藏',
     ['hide decimal'] = '不顯示小數',
 
+    ['Default config cannot be loaded, please reinstall!!!'] = '默認配置加載失敗，請重新安裝！',
 }

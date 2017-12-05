@@ -13,61 +13,19 @@ local OT_STATE = {
     IDLE  = 10,         -- 没有读条(空闲)
 }
 
--- 这个只是默认配置 改这里没用的 会修改的话 修改data文件
-local Config_Default = {
-    nCamp = -1,
-    Col = {
-        Player = {
-            Self       = {30 , 140 ,220}, -- 自己
-            Party      = {30 , 140 ,220}, -- 团队
-            Enemy      = {255, 30  ,30 }, -- 敌对
-            Neutrality = {255, 255 ,0  }, -- 中立
-            Ally       = {30 , 255 ,30 }, -- 相同阵营
-            Foe        = {255, 128 ,255}, -- 仇人
-        },
-        Npc = {
-            Party      = {30 , 140, 220}, -- 团队
-            Enemy      = {255, 30 , 30 }, -- 敌对
-            Neutrality = {255, 255, 0  }, -- 中立
-            Ally       = {30 , 255, 30 }, -- 相同阵营
-        }
-    }, bShowName    = { Player = { Party = true , Neutrality = true , Enemy = true , Ally = true , Self = true , Foe = true , },
-                        Npc    = { Party = true , Neutrality = true , Enemy = true , Ally = true ,                            },
-    }, bShowTitle   = { Player = { Party = true , Neutrality = true , Enemy = true , Ally = true , Self = true , Foe = true , },
-                        Npc    = { Party = true , Neutrality = true , Enemy = true , Ally = true ,                            },
-    }, bShowLife    = { Player = { Party = true , Neutrality = true , Enemy = true , Ally = true , Self = true , Foe = true , },
-                        Npc    = { Party = false, Neutrality = true , Enemy = true , Ally = true ,                            },
-    }, bShowLifePer = { Player = { Party = false, Neutrality = false, Enemy = false, Ally = false, Self = false, Foe = false, },
-                        Npc    = { Party = false, Neutrality = false, Enemy = false, Ally = false,                            },
-    }, bShowOTBar   = { Player = { Party = false, Neutrality = false, Enemy = true , Ally = false, Self = true , Foe = true , },
-                        Npc    = { Party = false, Neutrality = false, Enemy = true , Ally = false,                            },
-    }, bShowTong    = { Player = { Party = true , Neutrality = true , Enemy = true , Ally = true , Self = true , Foe = true , }, },
-
-    nLineHeight = { 100, 80, 60},
-    bShowSpecialNpc = false,
-    bShowDistance = false,
-
-    nLifeWidth = 80,
-    nLifeHeight = 8,
-    nLifeOffsetY = 27,
-    nPerHeight = 42,
-
-    nOTBarWidth = 80,
-    nOTBarHeight = 6,
-    nOTBarOffsetY = 22,
-    nOTTitleHeight = 21,
-    bOTEnhancedMod = false,
-
-    nAlpha = 200,
-    nFont = 16,
-    nDistance = 24 * 24 * 64 * 64,
-
-    bHideLifePercentageWhenFight = false,
-    bHideLifePercentageDecimal = false,
-
-    bAdjustIndex = false,
-}
+local Config_Default = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "XLifeBar/config/default.jx3dat")
+if not Config_Default then
+    return MY.Debug({_L["Default config cannot be loaded, please reinstall!!!"]}, _L["x lifebar"], MY_DEBUG.ERROR)
+end
 local Config = clone(Config_Default)
+
+local function GetConfig(key, relation, force)
+    local value = Config[key][relation][force]
+    if value == nil then
+        value = Config[key][relation]["Player"]
+    end
+    return value
+end
 
 XLifeBar = XLifeBar or {}
 setmetatable(XLifeBar, { __call = function(me, ...) return me.X.new(...) end, __metatable = true })
@@ -113,7 +71,7 @@ _C.LoadConfig = function()
     	end
         Config = MY.LoadLUAData(szFilePath)
     end
-    Config = FormatDataStructure(Config, Config_Default)
+    Config = MY.FormatDataStructure(Config, Config_Default, true)
 end
 
 _C.SaveConfig = function()
@@ -125,7 +83,7 @@ _C.SaveConfig = function()
 end
 MY.RegisterExit(_C.SaveConfig)
 
-_C.GetForce = function(dwID)
+_C.GetRelation = function(dwID)
     local me = GetClientPlayer()
     if not me then
         return "Neutrality"
@@ -174,6 +132,19 @@ _C.GetForce = function(dwID)
     end
 end
 
+_C.GetForce = function(dwID)
+    if not IsPlayer(dwID) then
+        return "Npc"
+    else
+        local tar = MY.GetObject(TARGET.PLAYER, dwID)
+        if not tar then
+            return 0
+        else
+            return tar.dwForceID
+        end
+    end
+end
+
 _C.IsEnabled = function()
     return XLifeBar.bEnabled and (
         not (
@@ -212,44 +183,44 @@ _C.AutoSwitchSysHeadTop = function()
     end
 end
 _C.AutoHideSysHeadTop = function()
-    if Config.bShowName.Npc.Party or Config.bShowName.Npc.Neutrality
-    or Config.bShowName.Npc.Ally  or Config.bShowName.Npc.Enemy then
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_NAME , false)
+    if GetConfig("ShowName", "Party", "Npc") or GetConfig("ShowName", "Neutrality", "Npc")
+    or GetConfig("ShowName", "Ally", "Npc")  or GetConfig("ShowName", "Enemy", "Npc") then
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC, GLOBAL_HEAD_NAME , false)
     end
-    if Config.bShowTitle.Npc.Party or Config.bShowTitle.Npc.Neutrality
-    or Config.bShowTitle.Npc.Ally or Config.bShowTitle.Npc.Enemy then
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_TITLE, false)
+    if GetConfig("ShowTitle", "Party", "Npc") or GetConfig("ShowTitle", "Neutrality", "Npc")
+    or GetConfig("ShowTitle", "Ally", "Npc") or GetConfig("ShowTitle", "Enemy", "Npc") then
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC, GLOBAL_HEAD_TITLE, false)
     end
-    if Config.bShowLife.Npc.Party or Config.bShowLife.Npc.Neutrality
-    or Config.bShowLife.Npc.Ally or Config.bShowLife.Npc.Enemy then
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_LIFE , false)
+    if GetConfig("ShowLife", "Party", "Npc") or GetConfig("ShowLife", "Neutrality", "Npc")
+    or GetConfig("ShowLife", "Ally", "Npc") or GetConfig("ShowLife", "Enemy", "Npc") then
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC, GLOBAL_HEAD_LIFE , false)
     end
-    if Config.bShowName.Player.Party or Config.bShowName.Player.Neutrality
-    or Config.bShowName.Player.Ally or Config.bShowName.Player.Enemy then
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_NAME , false)
+    if GetConfig("ShowName", "Party", "Player") or GetConfig("ShowName", "Neutrality", "Player")
+    or GetConfig("ShowName", "Ally", "Player") or GetConfig("ShowName", "Enemy", "Player") then
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER, GLOBAL_HEAD_NAME , false)
     end
-    if Config.bShowTitle.Player.Party or Config.bShowTitle.Player.Neutrality
-    or Config.bShowTitle.Player.Ally or Config.bShowTitle.Player.Enemy then
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_TITLE, false)
+    if GetConfig("ShowTitle", "Party", "Player") or GetConfig("ShowTitle", "Neutrality", "Player")
+    or GetConfig("ShowTitle", "Ally", "Player") or GetConfig("ShowTitle", "Enemy", "Player") then
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER, GLOBAL_HEAD_TITLE, false)
     end
-    if Config.bShowLife.Player.Party or Config.bShowLife.Player.Neutrality
-    or Config.bShowLife.Player.Ally or Config.bShowLife.Player.Enemy then
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_LIFE , false)
+    if GetConfig("ShowLife", "Party", "Player") or GetConfig("ShowLife", "Neutrality", "Player")
+    or GetConfig("ShowLife", "Ally", "Player") or GetConfig("ShowLife", "Enemy", "Player") then
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER, GLOBAL_HEAD_LIFE , false)
     end
-    if Config.bShowTong.Player.Party or Config.bShowTong.Player.Neutrality
-    or Config.bShowTong.Player.Ally or Config.bShowTong.Player.Enemy then
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_GUILD, false)
+    if GetConfig("ShowTong", "Party", "Player") or GetConfig("ShowTong", "Neutrality", "Player")
+    or GetConfig("ShowTong", "Ally", "Player") or GetConfig("ShowTong", "Enemy", "Player") then
+        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER, GLOBAL_HEAD_GUILD, false)
     end
-    if Config.bShowName.Player.Self then
+    if GetConfig("ShowName", "Self", "Player") then
         SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_NAME , false)
     end
-    if Config.bShowTitle.Player.Self then
+    if GetConfig("ShowTitle", "Self", "Player") then
         SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_TITLE, false)
     end
-    if Config.bShowLife.Player.Self then
+    if GetConfig("ShowLife", "Self", "Player") then
         SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_LIFE , false)
     end
-    if Config.bShowTong.Player.Self then
+    if GetConfig("ShowTong", "Self", "Player") then
         SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_GUILD, false)
     end
 end
@@ -341,6 +312,7 @@ function XLifeBar.X:ctor(object)
             szTitle = '' ,
             fLife   = -1 ,
             szForce = _C.GetForce(object.dwID),
+            szRelation = _C.GetRelation(object.dwID),
             OT = {
                 nState      = OT_STATE.IDLE,
                 nPercentage = 0            ,
@@ -354,6 +326,7 @@ function XLifeBar.X:ctor(object)
     self.self = object
     self.tab = _C.tObject[object.dwID]
     self.force = self.tab.szForce
+    self.relation = self.tab.szRelation
     self.hp = HP.new(object.dwID)
     return self
 end
@@ -366,12 +339,7 @@ function XLifeBar.X:Create()
         _C.tObject[self.self.dwID].handle = self.hp.handle
         -- 开始绘制永远不会重绘的东西
         -- 绘制血条边框
-        local cfgLife
-        if IsPlayer(self.self.dwID) then
-            cfgLife = Config.bShowLife.Player[self.force]
-        else
-            cfgLife = Config.bShowLife.Npc[self.force]
-        end
+        local cfgLife = GetConfig("ShowLife", self.relation, self.force)
         if cfgLife then
             self.hp:DrawLifeBorder(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, Config.nAlpha)
         end
@@ -432,17 +400,17 @@ function XLifeBar.X:DrawNames()
     local cfgName, cfgTitle, cfgTong
     local tab = _C.tObject[self.self.dwID]
     if IsPlayer(self.self.dwID) then
-        cfgLife  = Config.bShowLife.Player[self.force]
-        cfgName  = Config.bShowName.Player[self.force]
-        cfgTitle = Config.bShowTitle.Player[self.force]
-        cfgTong  = Config.bShowTong.Player[self.force]
-        r,g,b    = unpack(Config.Col.Player[self.force])
+        cfgLife  = GetConfig("ShowLife", self.relation, self.force)
+        cfgName  = GetConfig("ShowName", self.relation, self.force)
+        cfgTitle = GetConfig("ShowTitle", self.relation, self.force)
+        cfgTong  = GetConfig("ShowTong", self.relation, self.force)
+        r,g,b    = unpack(GetConfig("Color", self.relation, self.force))
     else
-        cfgLife  = Config.bShowLife.Npc[self.force]
-        cfgName  = Config.bShowName.Npc[self.force]
-        cfgTitle = Config.bShowTitle.Npc[self.force]
+        cfgLife  = GetConfig("ShowLife", self.relation, self.force)
+        cfgName  = GetConfig("ShowName", self.relation, self.force)
+        cfgTitle = GetConfig("ShowTitle", self.relation, self.force)
         cfgTong  = false
-        r,g,b    = unpack(Config.Col.Npc[self.force])
+        r,g,b    = unpack(GetConfig("Color", self.relation, self.force))
     end
     a,f = Config.nAlpha, Config.nFont
     r,g,b,a = self:FxColor(r,g,b,a)
@@ -495,18 +463,11 @@ function XLifeBar.X:SetLife(dwLifePercentage)
     return self
 end
 function XLifeBar.X:DrawLife()
-    local cfgLife, cfgLifePer, r,g,b,a,f
-    if IsPlayer(self.self.dwID) then
-        cfgLife    = Config.bShowLife.Player[self.force]
-        cfgLifePer = Config.bShowLifePer.Player[self.force]
-        r,g,b      = unpack(Config.Col.Player[self.force])
-    else
-        cfgLife    = Config.bShowLife.Npc[self.force]
-        cfgLifePer = Config.bShowLifePer.Npc[self.force]
-        r,g,b      = unpack(Config.Col.Npc[self.force])
-    end
-    a, f = Config.nAlpha, Config.nFont
-    r,g,b,a = self:FxColor(r,g,b,a)
+    local cfgLife    = GetConfig("ShowLife", self.relation, self.force)
+    local cfgLifePer = GetConfig("ShowLifePer", self.relation, self.force)
+    local r, g, b    = unpack(GetConfig("Color", self.relation, self.force))
+    local a, f = Config.nAlpha, Config.nFont
+    r, g, b, a = self:FxColor(r, g, b, a)
     if cfgLife then
         self.hp:DrawLifebar(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, {r,g,b,a,self.tab.fLife})
     end
@@ -544,19 +505,13 @@ function XLifeBar.X:SetOTTitle(szOTTitle, rgba)
     return self
 end
 function XLifeBar.X:DrawOTTitle(rgba)
-    local cfgOTBar, r,g,b,a,f
-    if IsPlayer(self.self.dwID) then
-        cfgOTBar   = Config.bShowOTBar.Player[self.force]
-        r,g,b      = unpack(Config.Col.Player[self.force])
-    else
-        cfgOTBar   = Config.bShowOTBar.Npc[self.force]
-        r,g,b      = unpack(Config.Col.Npc[self.force])
-    end
-    a, f = Config.nAlpha, Config.nFont
+    local cfgOTBar = GetConfig("ShowOTBar", self.relation, self.force)
+    local r, g, b  = unpack(GetConfig("Color", self.relation, self.force))
+    local a, f = Config.nAlpha, Config.nFont
     if rgba then r,g,b,a = rgba[1] or r, rgba[2] or g, rgba[3] or b, rgba[4] or a end
     r,g,b,a = self:FxColor(r,g,b,a)
     if cfgOTBar then
-        self.hp:DrawOTTitle({self.tab.OT.szTitle, Config.nOTTitleHeight }, {r,g,b,a,f})
+        self.hp:DrawOTTitle({ self.tab.OT.szTitle, Config.nOTTitleHeight }, {r,g,b,a,f})
     end
     return self
 end
@@ -570,15 +525,9 @@ function XLifeBar.X:SetOTPercentage(nPercentage, rgba)
     return self
 end
 function XLifeBar.X:DrawOTBar(rgba)
-    local cfgOTBar, r,g,b,a,f
-    if IsPlayer(self.self.dwID) then
-        cfgOTBar   = Config.bShowOTBar.Player[self.force]
-        r,g,b      = unpack(Config.Col.Player[self.force])
-    else
-        cfgOTBar   = Config.bShowOTBar.Npc[self.force]
-        r,g,b      = unpack(Config.Col.Npc[self.force])
-    end
-    a, f = Config.nAlpha, Config.nFont
+    local cfgOTBar = GetConfig("ShowOTBar", self.relation, self.force)
+    local r, g, b  = unpack(GetConfig("Color", self.relation, self.force))
+    local a, f = Config.nAlpha, Config.nFont
     if rgba then r,g,b,a,p = rgba[1] or r, rgba[2] or g, rgba[3] or b, rgba[4] or a end
     r,g,b,a = self:FxColor(r,g,b,a)
     if cfgOTBar then
@@ -587,14 +536,9 @@ function XLifeBar.X:DrawOTBar(rgba)
     return self
 end
 function XLifeBar.X:DrawOTBarBorder(nAlpha)
-    nAlpha = nAlpha or Config.nAlpha
-    if IsPlayer(self.self.dwID) then
-        cfgOTBar   = Config.bShowOTBar.Player[self.force]
-    else
-        cfgOTBar   = Config.bShowOTBar.Npc[self.force]
-    end
+    local cfgOTBar = GetConfig("ShowOTBar", self.relation, self.force)
     if cfgOTBar then
-        self.hp:DrawOTBarBorder(Config.nOTBarWidth, Config.nOTBarHeight, Config.nOTBarOffsetY, nAlpha)
+        self.hp:DrawOTBarBorder(Config.nOTBarWidth, Config.nOTBarHeight, Config.nOTBarOffsetY, nAlpha or Config.nAlpha)
     end
     return self
 end
@@ -698,8 +642,8 @@ local function CheckInvalidRect(dwType, dwID, me, bNoCreate)
             end
 
             -- 势力切换
-            local szForce = _C.GetForce(dwID)
-            if szForce ~= tab.szForce then
+            local szRelation = _C.GetRelation(dwID)
+            if szRelation ~= tab.szRelation then
                 XLifeBar(object):Remove():Create()
                 CheckInvalidRect(dwType, dwID, me, true)
             end
@@ -1009,38 +953,38 @@ _C.OnPanelActive = function(wnd)
       :menu(function()
         local t = {}
         table.insert(t,{    szOption = _L["player name display"] , bDisable = true} )
-        for k,v in pairs(Config.bShowName.Player) do
+        for k,v in pairs(Config.ShowName.Player) do
             table.insert(t,{
                 szOption = _L[k],
                 bCheck = true,
-                bChecked = Config.bShowName.Player[k],
+                bChecked = Config.ShowName.Player[k],
                 fnAction = function()
-                    Config.bShowName.Player[k] = not Config.bShowName.Player[k]
+                    Config.ShowName.Player[k] = not Config.ShowName.Player[k]
                     _C.Reset()
                 end,
-                rgb = Config.Col.Player[k],
+                rgb = Config.Color.Player[k],
                 bColorTable = true,
                 fnChangeColor = function(_,r,g,b)
-                    Config.Col.Player[k] = {r,g,b}
+                    Config.Color.Player[k] = {r,g,b}
                     _C.Reset()
                 end
             })
         end
         table.insert(t,{    bDevide = true} )
         table.insert(t,{    szOption = _L["npc name display"] , bDisable = true} )
-        for k,v in pairs(Config.bShowName.Npc) do
+        for k,v in pairs(Config.ShowName.Npc) do
             table.insert(t,{
                 szOption = _L[k],
                 bCheck = true,
-                bChecked = Config.bShowName.Npc[k],
+                bChecked = Config.ShowName.Npc[k],
                 fnAction = function()
-                    Config.bShowName.Npc[k] = not Config.bShowName.Npc[k]
+                    Config.ShowName.Npc[k] = not Config.ShowName.Npc[k]
                     _C.Reset()
                 end,
-                rgb = Config.Col.Npc[k],
+                rgb = Config.Color.Npc[k],
                 bColorTable = true,
                 fnChangeColor = function(_,r,g,b)
-                    Config.Col.Npc[k] = {r,g,b}
+                    Config.Color.Npc[k] = {r,g,b}
                     _C.Reset()
                 end
             })
@@ -1055,38 +999,38 @@ _C.OnPanelActive = function(wnd)
       :menu(function()
         local t = {}
         table.insert(t,{    szOption = _L["player title display"] , bDisable = true} )
-        for k,v in pairs(Config.bShowTitle.Player) do
+        for k,v in pairs(Config.ShowTitle.Player) do
             table.insert(t,{
                 szOption = _L[k],
                 bCheck = true,
-                bChecked = Config.bShowTitle.Player[k],
+                bChecked = Config.ShowTitle.Player[k],
                 fnAction = function()
-                    Config.bShowTitle.Player[k] = not Config.bShowTitle.Player[k];
+                    Config.ShowTitle.Player[k] = not Config.ShowTitle.Player[k];
                     _C.Reset()
                 end,
-                rgb = Config.Col.Player[k],
+                rgb = Config.Color.Player[k],
                 bColorTable = true,
                 fnChangeColor = function(_,r,g,b)
-                    Config.Col.Player[k] = {r,g,b}
+                    Config.Color.Player[k] = {r,g,b}
                     _C.Reset()
                 end
             })
         end
         table.insert(t,{    bDevide = true} )
         table.insert(t,{    szOption = _L["npc title display"] , bDisable = true} )
-        for k,v in pairs(Config.bShowTitle.Npc) do
+        for k,v in pairs(Config.ShowTitle.Npc) do
             table.insert(t,{
                 szOption = _L[k],
                 bCheck = true,
-                bChecked = Config.bShowTitle.Npc[k],
+                bChecked = Config.ShowTitle.Npc[k],
                 fnAction = function()
-                    Config.bShowTitle.Npc[k] = not Config.bShowTitle.Npc[k]
+                    Config.ShowTitle.Npc[k] = not Config.ShowTitle.Npc[k]
                     _C.Reset()
                 end,
-                rgb = Config.Col.Npc[k],
+                rgb = Config.Color.Npc[k],
                 bColorTable = true,
                 fnChangeColor = function(_,r,g,b)
-                    Config.Col.Npc[k] = {r,g,b}
+                    Config.Color.Npc[k] = {r,g,b}
                     _C.Reset()
                 end
             })
@@ -1101,19 +1045,19 @@ _C.OnPanelActive = function(wnd)
       :menu(function()
         local t = {}
         table.insert(t,{    szOption = _L["player tong display"] , bDisable = true} )
-        for k,v in pairs(Config.bShowTong.Player) do
+        for k,v in pairs(Config.ShowTong.Player) do
             table.insert(t,{
                 szOption = _L[k],
                 bCheck = true,
-                bChecked = Config.bShowTong.Player[k],
+                bChecked = Config.ShowTong.Player[k],
                 fnAction = function()
-                    Config.bShowTong.Player[k] = not Config.bShowTong.Player[k];
+                    Config.ShowTong.Player[k] = not Config.ShowTong.Player[k];
                     _C.Reset()
                 end,
-                rgb = Config.Col.Player[k],
+                rgb = Config.Color.Player[k],
                 bColorTable = true,
                 fnChangeColor = function(_,r,g,b)
-                    Config.Col.Player[k] = {r,g,b}
+                    Config.Color.Player[k] = {r,g,b}
                     _C.Reset()
                 end
             })
@@ -1128,38 +1072,38 @@ _C.OnPanelActive = function(wnd)
       :menu(function()
         local t = {}
         table.insert(t,{    szOption = _L["player lifebar display"] , bDisable = true} )
-        for k,v in pairs(Config.bShowLife.Player) do
+        for k,v in pairs(Config.ShowLife.Player) do
             table.insert(t,{
                 szOption = _L[k],
                 bCheck = true,
-                bChecked = Config.bShowLife.Player[k],
+                bChecked = Config.ShowLife.Player[k],
                 fnAction = function()
-                    Config.bShowLife.Player[k] = not Config.bShowLife.Player[k]
+                    Config.ShowLife.Player[k] = not Config.ShowLife.Player[k]
                     _C.Reset()
                 end,
-                rgb = Config.Col.Player[k],
+                rgb = Config.Color.Player[k],
                 bColorTable = true,
                 fnChangeColor = function(_,r,g,b)
-                    Config.Col.Player[k] = {r,g,b}
+                    Config.Color.Player[k] = {r,g,b}
                     _C.Reset()
                 end
             })
         end
         table.insert(t,{    bDevide = true} )
         table.insert(t,{    szOption = _L["npc lifebar display"] , bDisable = true} )
-        for k,v in pairs(Config.bShowLife.Npc) do
+        for k,v in pairs(Config.ShowLife.Npc) do
             table.insert(t,{
                 szOption = _L[k],
                 bCheck = true,
-                bChecked = Config.bShowLife.Npc[k],
+                bChecked = Config.ShowLife.Npc[k],
                 fnAction = function()
-                    Config.bShowLife.Npc[k] = not Config.bShowLife.Npc[k]
+                    Config.ShowLife.Npc[k] = not Config.ShowLife.Npc[k]
                     _C.Reset()
                 end,
-                rgb = Config.Col.Npc[k],
+                rgb = Config.Color.Npc[k],
                 bColorTable = true,
                 fnChangeColor = function(_,r,g,b)
-                    Config.Col.Npc[k] = {r,g,b}
+                    Config.Color.Npc[k] = {r,g,b}
                     _C.Reset()
                 end
             })
@@ -1174,38 +1118,38 @@ _C.OnPanelActive = function(wnd)
       :menu(function()
         local t = {}
         table.insert(t,{    szOption = _L["player lifepercentage display"] , bDisable = true} )
-        for k,v in pairs(Config.bShowLifePer.Player) do
+        for k,v in pairs(Config.ShowLifePer.Player) do
             table.insert(t,{
                 szOption = _L[k],
                 bCheck = true,
-                bChecked = Config.bShowLifePer.Player[k],
+                bChecked = Config.ShowLifePer.Player[k],
                 fnAction = function()
-                    Config.bShowLifePer.Player[k] = not Config.bShowLifePer.Player[k]
+                    Config.ShowLifePer.Player[k] = not Config.ShowLifePer.Player[k]
                     _C.Reset()
                 end,
-                rgb = Config.Col.Player[k],
+                rgb = Config.Color.Player[k],
                 bColorTable = true,
                 fnChangeColor = function(_,r,g,b)
-                    Config.Col.Player[k] = {r,g,b}
+                    Config.Color.Player[k] = {r,g,b}
                     _C.Reset()
                 end
             })
         end
         table.insert(t,{    bDevide = true} )
         table.insert(t,{    szOption = _L["npc lifepercentage display"] , bDisable = true} )
-        for k,v in pairs(Config.bShowLifePer.Npc) do
+        for k,v in pairs(Config.ShowLifePer.Npc) do
             table.insert(t,{
                 szOption = _L[k],
                 bCheck = true,
-                bChecked = Config.bShowLifePer.Npc[k],
+                bChecked = Config.ShowLifePer.Npc[k],
                 fnAction = function()
-                    Config.bShowLifePer.Npc[k] = not Config.bShowLifePer.Npc[k];
+                    Config.ShowLifePer.Npc[k] = not Config.ShowLifePer.Npc[k];
                     _C.Reset()
                 end,
-                rgb = Config.Col.Npc[k],
+                rgb = Config.Color.Npc[k],
                 bColorTable = true,
                 fnChangeColor = function(_,r,g,b)
-                    Config.Col.Npc[k] = {r,g,b}
+                    Config.Color.Npc[k] = {r,g,b}
                     _C.Reset()
                 end
             })
@@ -1239,38 +1183,38 @@ _C.OnPanelActive = function(wnd)
       :menu(function()
         local t = {}
         table.insert(t, {szOption = _L["player skillpercentage display"] , bDisable = true})
-        for k,v in pairs(Config.bShowOTBar.Player) do
+        for k,v in pairs(Config.ShowOTBar.Player) do
             table.insert(t,{
                 szOption = _L[k],
                 bCheck = true,
-                bChecked = Config.bShowOTBar.Player[k],
+                bChecked = Config.ShowOTBar.Player[k],
                 fnAction = function()
-                    Config.bShowOTBar.Player[k] = not Config.bShowOTBar.Player[k]
+                    Config.ShowOTBar.Player[k] = not Config.ShowOTBar.Player[k]
                     _C.Reset()
                 end,
-                rgb = Config.Col.Player[k],
+                rgb = Config.Color.Player[k],
                 bColorTable = true,
                 fnChangeColor = function(_,r,g,b)
-                    Config.Col.Player[k] = {r,g,b}
+                    Config.Color.Player[k] = {r,g,b}
                     _C.Reset()
                 end
             })
         end
         table.insert(t,{    bDevide = true} )
         table.insert(t,{    szOption = _L["npc skillpercentage display"] , bDisable = true} )
-        for k,v in pairs(Config.bShowOTBar.Npc) do
+        for k,v in pairs(Config.ShowOTBar.Npc) do
             table.insert(t,{
                 szOption = _L[k],
                 bCheck = true,
-                bChecked = Config.bShowOTBar.Npc[k],
+                bChecked = Config.ShowOTBar.Npc[k],
                 fnAction = function()
-                    Config.bShowOTBar.Npc[k] = not Config.bShowOTBar.Npc[k];
+                    Config.ShowOTBar.Npc[k] = not Config.ShowOTBar.Npc[k];
                     _C.Reset()
                 end,
-                rgb = Config.Col.Npc[k],
+                rgb = Config.Color.Npc[k],
                 bColorTable = true,
                 fnChangeColor = function(_,r,g,b)
-                    Config.Col.Npc[k] = {r,g,b}
+                    Config.Color.Npc[k] = {r,g,b}
                     _C.Reset()
                 end
             })
