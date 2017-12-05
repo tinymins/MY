@@ -7,14 +7,21 @@ data = {
 
 	nLifeWidth = 80,
 	nLifeHeight = 8,
+	nLifeOffsetX = 0,
 	nLifeOffsetY = 27,
-	nPerHeight = 42,
+	szLifeDirection = 'LEFT_RIGHT',
+
+	nLifePerOffsetX = 0,
+	nLifePerOffsetY = 42,
 
 	nOTBarWidth = 80,
 	nOTBarHeight = 6,
+	nOTBarOffsetX = 0,
 	nOTBarOffsetY = 22,
-	nOTTitleHeight = 21,
+	nOTTitleOffsetX = 0,
+	nOTTitleOffsetY = 21,
 	bOTEnhancedMod = false,
+	szOTBarDirection = 'LEFT_RIGHT',
 
 	nAlpha = 200,
 	nFont = 16,
