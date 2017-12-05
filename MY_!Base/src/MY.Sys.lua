@@ -1088,25 +1088,3 @@ function MY.Confirm(szMsg, fnAction, fnCancel, szSure, szCancel)
 	}
 	MessageBox(tMsg)
 end
-
-
-function MY.FormatDataStructure(data, struct, maxlevel)
-	if not maxlevel or maxlevel > 0 then
-		if maxlevel then
-			maxlevel = maxlevel - 1
-		end
-		local szType = type(struct)
-		if szType == type(data) then
-			if szType == 'table' then
-				local t = {}
-				for k, v in pairs(struct) do
-					t[k] = MY.FormatDataStructure(data[k], v, maxlevel)
-				end
-				return t
-			end
-		else
-			data = clone(struct)
-		end
-	end
-	return data
-end
