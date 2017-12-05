@@ -35,15 +35,19 @@ data = {
 
     ['Max Distance: %s foot.'] = '最大显示距离：%s尺。',
     ['Font: %d'] = '字体：%d',
-    ['lifebar width: %s px.'] = '血条长度%spx。',
+    ['lifebar width: %s px.'] = '血条宽度%spx。',
     ['lifebar height: %s px.'] = '血条高度%spx。',
-    ['lifebar offset-y: %d px.'] = '血条高度偏移%spx。',
-    ['percentage offset-y: %d px.'] = '百分比高度偏移%spx。',
+    ['lifebar offset-x: %d px.'] = '血条水平偏移%spx。',
+    ['lifebar offset-y: %d px.'] = '血条竖直偏移%spx。',
+    ['life percentage offset-x: %d px.'] = '血量百分比水平偏移%spx。',
+    ['life percentage offset-y: %d px.'] = '血量百分比竖直偏移%spx。',
 
-    ['otbar width: %s px.'] = '技能读条长度%spx。',
+    ['otbar width: %s px.'] = '技能读条宽度%spx。',
     ['otbar height: %s px.'] = '技能读条高度%spx。',
-    ['otbar offset-y: %d px.'] = '技能读条高度偏移%spx。',
-    ['ot title offset-y: %d px.'] = '技能名称高度偏移%spx。',
+    ['otbar offset-x: %d px.'] = '技能读条水平偏移%spx。',
+    ['otbar offset-y: %d px.'] = '技能读条竖直偏移%spx。',
+    ['ot title offset-x: %d px.'] = '技能名称水平偏移%spx。',
+    ['ot title offset-y: %d px.'] = '技能名称竖直偏移%spx。',
 
     ['1st line offset-y: %d px.'] = '第一行字高度偏移%spx。',
     ['2nd line offset-y: %d px.'] = '第二行字高度偏移%spx。',
@@ -70,4 +74,12 @@ data = {
     ['Default config cannot be loaded, please reinstall!!!'] = '默认配置加载失败，请重新安装！',
     ['Unified force color'] = '统一染色',
     ['Differentiate force color'] = '门派染色',
+
+    ['Draw direction'] = '绘制方向',
+    ['DIRECTION'] = {
+        ['LEFT_RIGHT'] = '从左至右',
+        ['RIGHT_LEFT'] = '从右至左',
+        ['TOP_BOTTOM'] = '从上至下',
+        ['BOTTOM_TOP'] = '从下至上',
+    },
 }

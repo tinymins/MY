@@ -348,7 +348,7 @@ function XLifeBar.X:Create()
         -- 绘制血条边框
         local cfgLife = GetConfig("ShowLife", self.relation, self.force)
         if cfgLife then
-            self.hp:DrawLifeBorder(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, Config.nAlpha)
+            self.hp:DrawLifeBorder(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetX, Config.nLifeOffsetY, Config.nAlpha)
         end
     end
     return self
@@ -447,11 +447,11 @@ function XLifeBar.X:DrawNames()
 
     -- 没有名字的玩意隐藏血条
     if cfgName and #tWordlines == 0 then
-        self.hp:DrawLifebar(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, {r,g,b,0,self.tab.fLife})
-        self.hp:DrawLifeBorder(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, 0)
+        self.hp:DrawLifeBar(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetX, Config.nLifeOffsetY, { r, g, b, 0, self.tab.fLife, Config.szLifeDirection })
+        self.hp:DrawLifeBorder(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetX, Config.nLifeOffsetY, 0)
     elseif cfgLife then
-        self.hp:DrawLifebar(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, {r,g,b,a,self.tab.fLife})
-        self.hp:DrawLifeBorder(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, a)
+        self.hp:DrawLifeBar(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetX, Config.nLifeOffsetY, { r, g, b, a, self.tab.fLife, Config.szLifeDirection })
+        self.hp:DrawLifeBorder(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetX, Config.nLifeOffsetY, a)
     end
     self.hp:DrawWordlines(tWordlines, {r,g,b,a,f})
     return self
@@ -476,7 +476,7 @@ function XLifeBar.X:DrawLife()
     local a, f = Config.nAlpha, Config.nFont
     r, g, b, a = self:FxColor(r, g, b, a)
     if cfgLife then
-        self.hp:DrawLifebar(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetY, {r,g,b,a,self.tab.fLife})
+        self.hp:DrawLifeBar(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetX, Config.nLifeOffsetY, { r, g, b, a, self.tab.fLife, Config.szLifeDirection })
     end
     if cfgLifePer then
         local szFormatString = '%.1f'
@@ -485,7 +485,7 @@ function XLifeBar.X:DrawLife()
         elseif Config.bHideLifePercentageDecimal then
             szFormatString = '%.0f'
         end
-        self.hp:DrawLifePercentage({string.format(szFormatString, 100 * self.tab.fLife), Config.nPerHeight}, {r,g,b,a,f})
+        self.hp:DrawLifePercentage({string.format(szFormatString, 100 * self.tab.fLife), Config.nLifePerOffsetX, Config.nLifePerOffsetY}, {r,g,b,a,f})
     end
     return self
 end
@@ -518,7 +518,7 @@ function XLifeBar.X:DrawOTTitle(rgba)
     if rgba then r,g,b,a = rgba[1] or r, rgba[2] or g, rgba[3] or b, rgba[4] or a end
     r,g,b,a = self:FxColor(r,g,b,a)
     if cfgOTBar then
-        self.hp:DrawOTTitle({ self.tab.OT.szTitle, Config.nOTTitleHeight }, {r,g,b,a,f})
+        self.hp:DrawOTTitle({ self.tab.OT.szTitle, Config.nOTTitleOffsetX, Config.nOTTitleOffsetY }, {r,g,b,a,f})
     end
     return self
 end
@@ -538,14 +538,14 @@ function XLifeBar.X:DrawOTBar(rgba)
     if rgba then r,g,b,a,p = rgba[1] or r, rgba[2] or g, rgba[3] or b, rgba[4] or a end
     r,g,b,a = self:FxColor(r,g,b,a)
     if cfgOTBar then
-        self.hp:DrawOTBar(Config.nOTBarWidth, Config.nOTBarHeight, Config.nOTBarOffsetY, {r,g,b,a,self.tab.OT.nPercentage})
+        self.hp:DrawOTBar(Config.nOTBarWidth, Config.nOTBarHeight, Config.nOTBarOffsetX, Config.nOTBarOffsetY, { r, g, b, a, self.tab.OT.nPercentage, Config.szOTBarDirection })
     end
     return self
 end
 function XLifeBar.X:DrawOTBarBorder(nAlpha)
     local cfgOTBar = GetConfig("ShowOTBar", self.relation, self.force)
     if cfgOTBar then
-        self.hp:DrawOTBarBorder(Config.nOTBarWidth, Config.nOTBarHeight, Config.nOTBarOffsetY, nAlpha or Config.nAlpha)
+        self.hp:DrawOTBarBorder(Config.nOTBarWidth, Config.nOTBarHeight, Config.nOTBarOffsetX, Config.nOTBarOffsetY, nAlpha or Config.nAlpha)
     end
     return self
 end
@@ -792,20 +792,25 @@ function PS.OnPanelActive(wnd)
     local x, y = 10, 10
     local offsety = 40
     local fnLoadUI = function(ui)
-        ui:children("#WndSliderBox_LifebarWidth"):value(Config.nLifeWidth)
-        ui:children("#WndSliderBox_LifebarHeight"):value(Config.nLifeHeight)
-        ui:children("#WndSliderBox_LifeHeight"):value(Config.nLifeOffsetY)
-        ui:children("#WndSliderBox_OTbarWidth"):value(Config.nOTBarWidth)
-        ui:children("#WndSliderBox_OTbarHeight"):value(Config.nOTBarHeight)
-        ui:children("#WndSliderBox_OTHeight"):value(Config.nOTBarOffsetY)
-        ui:children("#WndSliderBox_FristHeight"):value(Config.nLineHeight[1])
-        ui:children("#WndSliderBox_SecondHeight"):value(Config.nLineHeight[2])
-        ui:children("#WndSliderBox_ThirdHeight"):value(Config.nLineHeight[3])
-        ui:children("#WndSliderBox_PerHeight"):value(Config.nPerHeight)
+        ui:children("#WndSliderBox_LifeBarWidth"):value(Config.nLifeWidth)
+        ui:children("#WndSliderBox_LifeBarHeight"):value(Config.nLifeHeight)
+        ui:children("#WndSliderBox_LifeBarOffsetX"):value(Config.nLifeOffsetX)
+        ui:children("#WndSliderBox_LifeBarOffsetY"):value(Config.nLifeOffsetY)
+        ui:children("#WndSliderBox_OTBarWidth"):value(Config.nOTBarWidth)
+        ui:children("#WndSliderBox_OTBarHeight"):value(Config.nOTBarHeight)
+        ui:children("#WndSliderBox_OTBarOffsetX"):value(Config.nOTBarOffsetX)
+        ui:children("#WndSliderBox_OTBarOffsetY"):value(Config.nOTBarOffsetY)
+        ui:children("#WndSliderBox_OTTitleOffsetX"):value(Config.nOTTitleOffsetX)
+        ui:children("#WndSliderBox_OTTitleOffsetY"):value(Config.nOTTitleOffsetY)
+        ui:children("#WndSliderBox_FristLineHeight"):value(Config.nLineHeight[1])
+        ui:children("#WndSliderBox_SecondLineHeight"):value(Config.nLineHeight[2])
+        ui:children("#WndSliderBox_ThirdLineHeight"):value(Config.nLineHeight[3])
+        ui:children("#WndSliderBox_LifePerOffsetX"):value(Config.nLifePerOffsetX)
+        ui:children("#WndSliderBox_LifePerOffsetY"):value(Config.nLifePerOffsetY)
         ui:children("#WndSliderBox_Distance"):value(math.sqrt(Config.nDistance) / 64)
         ui:children("#WndSliderBox_Alpha"):value(Config.nAlpha)
         ui:children("#WndCheckBox_ShowSpecialNpc"):check(Config.bShowSpecialNpc)
-        ui:children("#WndButton_Font"):text(_L("Font: %d",Config.nFont))
+        ui:children("#WndButton_Font"):text(_L("Font: %d", Config.nFont))
     end
     -- 开启/关闭
     ui:append("WndCheckBox", "WndCheckBox_Switcher"):children("#WndCheckBox_Switcher")
@@ -859,97 +864,159 @@ function PS.OnPanelActive(wnd)
     -- <hr />
     ui:append("Image", "Image_Spliter"):find('#Image_Spliter'):pos(10, y-7):size(w - 20, 2):image('UI/Image/UICommon/ScienceTreeNode.UITex',62)
 
-    x, y = 10, 60
-    offsety = 27
-    ui:append("WndSliderBox", "WndSliderBox_LifebarWidth"):children("#WndSliderBox_LifebarWidth")
-      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(5,150)
-      :text(function(value) return _L("lifebar width: %s px.", value) end)--血条长度
-      :value(Config.nLifeWidth or Config_Default.nLifeWidth)
-      :change(function(raw, value) Config.nLifeWidth = value;_C.Reset() end)
+    x, y = 10, 55
+    offsety = 22
+    ui:append("WndSliderBox", {
+        name = "WndSliderBox_LifeBarWidth",
+        x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 5, 150 },
+        text = function(value) return _L("lifebar width: %s px.", value) end, -- 血条宽度
+        value = Config.nLifeWidth or Config_Default.nLifeWidth,
+        onchange = function(raw, value) Config.nLifeWidth = value;_C.Reset() end,
+    })
     y = y + offsety
 
-    ui:append("WndSliderBox", "WndSliderBox_LifebarHeight"):children("#WndSliderBox_LifebarHeight")
-      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(5,150)
-      :text(function(value) return _L("lifebar height: %s px.", value) end)--血条高度
-      :value(Config.nLifeHeight or Config_Default.nLifeHeight)
-      :change(function(raw, value) Config.nLifeHeight = value;_C.Reset() end)
+    ui:append("WndSliderBox", {
+        name = "WndSliderBox_LifeBarHeight",
+        x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 5, 150 },
+        text = function(value) return _L("lifebar height: %s px.", value) end, -- 血条高度
+        value = Config.nLifeHeight or Config_Default.nLifeHeight,
+        onchange = function(raw, value) Config.nLifeHeight = value;_C.Reset() end,
+    })
     y = y + offsety
 
-    ui:append("WndSliderBox", "WndSliderBox_LifeHeight"):children("#WndSliderBox_LifeHeight")
-      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
-      :text(function(value) return _L("lifebar offset-y: %d px.", value) end)--血条高度偏移
-      :value(Config.nLifeOffsetY or Config_Default.nLifeOffsetY)
-      :change(function(raw, value) Config.nLifeOffsetY = value;_C.Reset() end)
+    ui:append("WndSliderBox", {
+        name = "WndSliderBox_LifeBarOffsetX",
+        x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { -150, 150 },
+        text = function(value) return _L("lifebar offset-x: %d px.", value) end, -- 血条水平偏移
+        value = Config.nLifeOffsetX or Config_Default.nLifeOffsetX,
+        onchange = function(raw, value) Config.nLifeOffsetX = value;_C.Reset() end,
+    })
     y = y + offsety
 
-    ui:append("WndSliderBox", "WndSliderBox_PerHeight"):children("#WndSliderBox_PerHeight")
-      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
-      :text(function(value) return _L("percentage offset-y: %d px.", value) end)--百分比高度
-      :value(Config.nPerHeight or Config_Default.nPerHeight)
-      :change(function(raw, value) Config.nPerHeight = value;_C.Reset() end)
+    ui:append("WndSliderBox", {
+        name = "WndSliderBox_LifeBarOffsetY",
+        x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
+        text = function(value) return _L("lifebar offset-y: %d px.", value) end, -- 血条竖直偏移
+        value = Config.nLifeOffsetY or Config_Default.nLifeOffsetY,
+        onchange = function(raw, value) Config.nLifeOffsetY = value;_C.Reset() end,
+    })
     y = y + offsety
 
-    ui:append("WndSliderBox", "WndSliderBox_OTBarWidth"):children("#WndSliderBox_OTBarWidth")
-      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(5,150)
-      :text(function(value) return _L("otbar width: %s px.", value) end)--OT长度
-      :value(Config.nOTBarWidth or Config_Default.nOTBarWidth)
-      :change(function(raw, value) Config.nOTBarWidth = value;_C.Reset() end)
+    ui:append("WndSliderBox", {
+        name = "WndSliderBox_LifePerOffsetX",
+        x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { -150, 150 },
+        text = function(value) return _L("life percentage offset-x: %d px.", value) end, -- 血量百分比水平偏移
+        value = Config.nLifePerOffsetX or Config_Default.nLifePerOffsetX,
+        onchange = function(raw, value) Config.nLifePerOffsetX = value;_C.Reset() end,
+    })
     y = y + offsety
 
-    ui:append("WndSliderBox", "WndSliderBox_OTBarHeight"):children("#WndSliderBox_OTBarHeight")
-      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(5,150)
-      :text(function(value) return _L("otbar height: %s px.", value) end)--OT高度
-      :value(Config.nOTBarHeight or Config_Default.nOTBarHeight)
-      :change(function(raw, value) Config.nOTBarHeight = value;_C.Reset() end)
+    ui:append("WndSliderBox", {
+        name = "WndSliderBox_LifePerOffsetY",
+        x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
+        text = function(value) return _L("life percentage offset-y: %d px.", value) end, -- 血量百分比竖直偏移
+        value = Config.nLifePerOffsetY or Config_Default.nLifePerOffsetY,
+        onchange = function(raw, value) Config.nLifePerOffsetY = value;_C.Reset() end,
+    })
     y = y + offsety
 
-    ui:append("WndSliderBox", "WndSliderBox_OTHeight"):children("#WndSliderBox_OTHeight")
-      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
-      :text(function(value) return _L("otbar offset-y: %d px.", value) end)--OT高度偏移
-      :value(Config.nOTBarOffsetY or Config_Default.nOTBarOffsetY)
-      :change(function(raw, value) Config.nOTBarOffsetY = value;_C.Reset() end)
+    ui:append("WndSliderBox", {
+        name = "WndSliderBox_OTBarWidth",
+        x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 5, 150 },
+        text = function(value) return _L("otbar width: %s px.", value) end, -- OT宽度
+        value = Config.nOTBarWidth or Config_Default.nOTBarWidth,
+        onchange = function(raw, value) Config.nOTBarWidth = value;_C.Reset() end,
+    })
     y = y + offsety
 
-    ui:append("WndSliderBox", "WndSliderBox_OTTitleHeight"):children("#WndSliderBox_OTTitleHeight")
-      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
-      :text(function(value) return _L("ot title offset-y: %d px.", value) end)--OT名称高度
-      :value(Config.nOTTitleHeight or Config_Default.nOTTitleHeight)
-      :change(function(raw, value) Config.nOTTitleHeight = value;_C.Reset() end)
+    ui:append("WndSliderBox", {
+        name = "WndSliderBox_OTBarHeight",
+        x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 5, 150 },
+        text = function(value) return _L("otbar height: %s px.", value) end, -- OT高度
+        value = Config.nOTBarHeight or Config_Default.nOTBarHeight,
+        onchange = function(raw, value) Config.nOTBarHeight = value;_C.Reset() end,
+    })
     y = y + offsety
 
-    ui:append("WndSliderBox", "WndSliderBox_FristHeight"):children("#WndSliderBox_FristHeight")
-      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
-      :text(function(value) return _L("1st line offset-y: %d px.", value) end)--第一行字高度
-      :value(Config.nLineHeight[1] or Config_Default.nLineHeight[1])
-      :change(function(raw, value) Config.nLineHeight[1] = value;_C.Reset() end)
+    ui:append("WndSliderBox", {
+        name = "WndSliderBox_OTBarOffsetX",
+        x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { -150, 150 },
+        text = function(value) return _L("otbar offset-x: %d px.", value) end, -- OT水平偏移
+        value = Config.nOTBarOffsetX or Config_Default.nOTBarOffsetX,
+        onchange = function(raw, value) Config.nOTBarOffsetX = value;_C.Reset() end,
+    })
     y = y + offsety
 
-    ui:append("WndSliderBox", "WndSliderBox_SecondHeight"):children("#WndSliderBox_SecondHeight")
-      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
-      :text(function(value) return _L("2nd line offset-y: %d px.", value) end)--第二行字高度
-      :value(Config.nLineHeight[2] or Config_Default.nLineHeight[2])
-      :change(function(raw, value) Config.nLineHeight[2] = value;_C.Reset() end)
+    ui:append("WndSliderBox", {
+        name = "WndSliderBox_OTBarOffsetY",
+        x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
+        text = function(value) return _L("otbar offset-y: %d px.", value) end, -- OT竖直偏移
+        value = Config.nOTBarOffsetY or Config_Default.nOTBarOffsetY,
+        onchange = function(raw, value) Config.nOTBarOffsetY = value;_C.Reset() end,
+    })
     y = y + offsety
 
-    ui:append("WndSliderBox", "WndSliderBox_ThirdHeight"):children("#WndSliderBox_ThirdHeight")
-      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,150)
-      :text(function(value) return _L("3rd line offset-y: %d px.", value) end)--第三行字高度
-      :value(Config.nLineHeight[3] or Config_Default.nLineHeight[3])
-      :change(function(raw, value) Config.nLineHeight[3] = value;_C.Reset() end)
+    ui:append("WndSliderBox", {
+        name = "WndSliderBox_OTTitleOffsetX",
+        x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { -150, 150 },
+        text = function(value) return _L("ot title offset-x: %d px.", value) end, -- OT名称水平偏移
+        value = Config.nOTTitleOffsetX or Config_Default.nOTTitleOffsetX,
+        onchange = function(raw, value) Config.nOTTitleOffsetX = value;_C.Reset() end,
+    })
     y = y + offsety
 
-    ui:append("WndSliderBox", "WndSliderBox_Distance"):children("#WndSliderBox_Distance")
-      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_VALUE):range(0,300)
-      :text(function(value) return _L("Max Distance: %s foot.", value) end)
-      :value(math.sqrt(Config.nDistance or Config_Default.nDistance) / 64)
-      :change(function(raw, value) Config.nDistance = value * value * 64 * 64;_C.Reset() end)
+    ui:append("WndSliderBox", {
+        name = "WndSliderBox_OTTitleOffsetY",
+        x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
+        text = function(value) return _L("ot title offset-y: %d px.", value) end, -- OT名称竖直偏移
+        value = Config.nOTTitleOffsetY or Config_Default.nOTTitleOffsetY,
+        onchange = function(raw, value) Config.nOTTitleOffsetY = value;_C.Reset() end,
+    })
     y = y + offsety
 
-    ui:append("WndSliderBox", "WndSliderBox_Alpha"):children("#WndSliderBox_Alpha")
-      :pos(x,y):sliderStyle(MY.Const.UI.Slider.SHOW_PERCENT):range(0,255)
-      :text(function(value) return _L("alpha: %.0f%%.", value) end)--透明度
-      :value(Config.nAlpha or Config_Default.nAlpha)
-      :change(function(raw, value) Config.nAlpha = value*255/100;_C.Reset() end)
+    ui:append("WndSliderBox", {
+        name = "WndSliderBox_FristLineHeight",
+        x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
+        text = function(value) return _L("1st line offset-y: %d px.", value) end, -- 第一行字高度
+        value = Config.nLineHeight[1] or Config_Default.nLineHeight[1],
+        onchange = function(raw, value) Config.nLineHeight[1] = value;_C.Reset() end,
+    })
+    y = y + offsety
+
+    ui:append("WndSliderBox", {
+        name = "WndSliderBox_SecondLineHeight",
+        x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
+        text = function(value) return _L("2nd line offset-y: %d px.", value) end, -- 第二行字高度
+        value = Config.nLineHeight[2] or Config_Default.nLineHeight[2],
+        onchange = function(raw, value) Config.nLineHeight[2] = value;_C.Reset() end,
+    })
+    y = y + offsety
+
+    ui:append("WndSliderBox", {
+        name = "WndSliderBox_ThirdLineHeight",
+        x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
+        text = function(value) return _L("3rd line offset-y: %d px.", value) end, -- 第三行字高度
+        value = Config.nLineHeight[3] or Config_Default.nLineHeight[3],
+        onchange = function(raw, value) Config.nLineHeight[3] = value;_C.Reset() end,
+    })
+    y = y + offsety
+
+    ui:append("WndSliderBox", {
+        name = "WndSliderBox_Distance",
+        x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 300 },
+        text = function(value) return _L("Max Distance: %s foot.", value) end,
+        value = math.sqrt(Config.nDistance or Config_Default.nDistance) / 64,
+        onchange = function(raw, value) Config.nDistance = value * value * 64 * 64;_C.Reset() end,
+    })
+    y = y + offsety
+
+    ui:append("WndSliderBox", {
+        name = "WndSliderBox_Alpha",
+        x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_PERCENT, range = { 0, 255 },
+        text = function(value) return _L("alpha: %.0f%%.", value) end, -- 透明度
+        value = Config.nAlpha or Config_Default.nAlpha,
+        onchange = function(raw, value) Config.nAlpha = value*255/100;_C.Reset() end,
+    })
     y = y + offsety
 
     -- 右半边
@@ -1084,7 +1151,24 @@ function PS.OnPanelActive(wnd)
     ui:append("WndComboBox", {
         x = x, y = y, text = _L["lifebar display config"],
         menu = function()
-            return GeneBooleanPopupMenu(Config.ShowLife, _L["player lifebar display"], _L["npc lifebar display"])
+            local t = GeneBooleanPopupMenu(Config.ShowLife, _L["player lifebar display"], _L["npc lifebar display"])
+            table.insert(t, { bDevide = true })
+            local t1 = {
+                szOption = _L['Draw direction'],
+            }
+            for _, szDirection in ipairs({ "LEFT_RIGHT", "RIGHT_LEFT", "TOP_BOTTOM", "BOTTOM_TOP" }) do
+                table.insert(t1, {
+                    szOption = _L.DIRECTION[szDirection],
+                    bCheck = true, bMCheck = true,
+                    bChecked = Config.szLifeDirection == szDirection,
+                    fnAction = function()
+                        Config.szLifeDirection = szDirection
+                        _C.Reset()
+                    end,
+                })
+            end
+            table.insert(t, t1)
+            return t
         end,
     })
     y = y + offsety
@@ -1122,7 +1206,24 @@ function PS.OnPanelActive(wnd)
     ui:append("WndComboBox", {
         x = x, y = y, text = _L["skillpercentage display config"],
         menu = function()
-            return GeneBooleanPopupMenu(Config.ShowOTBar, _L["player skillpercentage display"], _L["npc skillpercentage display"])
+            local t = GeneBooleanPopupMenu(Config.ShowOTBar, _L["player skillpercentage display"], _L["npc skillpercentage display"])
+            table.insert(t, { bDevide = true })
+            local t1 = {
+                szOption = _L['Draw direction'],
+            }
+            for _, szDirection in ipairs({ "LEFT_RIGHT", "RIGHT_LEFT", "TOP_BOTTOM", "BOTTOM_TOP" }) do
+                table.insert(t1, {
+                    szOption = _L.DIRECTION[szDirection],
+                    bCheck = true, bMCheck = true,
+                    bChecked = Config.szOTBarDirection == szDirection,
+                    fnAction = function()
+                        Config.szOTBarDirection = szDirection
+                        _C.Reset()
+                    end,
+                })
+            end
+            table.insert(t, t1)
+            return t
         end,
         tip = _L['only can see otaction of target and target\'s target'],
         tippostype = ALW.TOP_BOTTOM,
