@@ -167,6 +167,32 @@ function MY.RegisterUserData(szName, szFileName, onLoad)
 
 end
 
+-- Format data's structure the same as struct.
+-- @param ignoreNil: if struct is nil, data will not be checked
+-- @param maxDepth: max format depth to table, set nil to full depth format
+-- @return: formated data
+local function FormatDataStructure(data, struct, ignoreNil, maxDepth)
+	if maxDepth ~= 0 then
+		if maxDepth then
+			maxDepth = maxDepth - 1
+		end
+		local szType = type(struct)
+		if ignoreNil and struct == nil or szType == type(data) then
+			if szType == 'table' then
+				local t = {}
+				for k, v in pairs(struct) do
+					t[k] = FormatDataStructure(data[k], v, ignoreNil, maxDepth)
+				end
+				return t
+			end
+		else
+			data = clone(struct)
+		end
+	end
+	return data
+end
+MY.FormatDataStructure = FormatDataStructure
+
 function MY.SetGlobalValue(szVarPath, Val)
 	local t = MY.String.Split(szVarPath, ".")
 	local tab = _G
