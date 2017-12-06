@@ -183,7 +183,7 @@ local function FormatAllItemPosExt(hList)
 		if align == ALIGNMENT.LEFT then
 			x, deltaX = 0, w
 		elseif align == ALIGNMENT.RIGHT then
-			x, deltaX = W, - w
+			x, deltaX = W - w, - w
 		elseif align == ALIGNMENT.CENTER then
 			x, deltaX = (W - w * min(#aItem, columms)) / 2, w
 		end
