@@ -148,7 +148,7 @@ function MY_AutoChat.Choose(dwType, dwID, dwIndex, aInfo)
 		end
 	end
 
-	if MY_AutoChat.bAutoSelect1 and nCount == 1 and not MY.IsInDungeon(true) then
+	if MY_AutoChat.bAutoSelect1 and dwID and nCount == 1 and not MY.IsInDungeon(true) then
 		WindowSelect(dwIndex, dwID)
 		if MY_AutoChat.bEchoOn then
 			MY.Sysmsg({_L("Conversation with [%s] auto chose: %s", szName, szContext)})
