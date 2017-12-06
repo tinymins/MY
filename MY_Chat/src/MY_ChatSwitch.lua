@@ -247,21 +247,24 @@ function MY_ChatSwitch.OnFrameCreate()
 	hContainer:Clear()
 	for i, v in ipairs(CHANNEL_LIST) do
 		if not MY.GetStorage('BoolValues.MY_ChatSwitch_CH' .. i) then
-			local chk, txtTitle, txtCooldown, shaCount
+			local wnd, chk, txtTitle, txtCooldown, shaCount
 			if v.head then
-				chk = hContainer:AppendContentFromIni(INI_PATH, "Wnd_Channel"):Lookup("WndRadioChannel")
+				wnd = hContainer:AppendContentFromIni(INI_PATH, "Wnd_Channel")
+				chk = wnd:Lookup("WndRadioChannel")
 				txtTitle = chk:Lookup("", "Text_Channel")
 				txtCooldown = chk:Lookup("", "Text_CD")
 				shaCount = chk:Lookup("", "Shadow_Count")
 				chk.OnCheckBoxCheck = OnChannelCheck
 			elseif v.onclick then
-				chk = hContainer:AppendContentFromIni(INI_PATH, "Wnd_Channel"):Lookup("WndRadioChannel")
+				wnd = hContainer:AppendContentFromIni(INI_PATH, "Wnd_Channel")
+				chk = wnd:Lookup("WndRadioChannel")
 				txtTitle = chk:Lookup("", "Text_Channel")
 				txtCooldown = chk:Lookup("", "Text_CD")
 				shaCount = chk:Lookup("", "Shadow_Count")
 				chk.OnCheckBoxCheck = v.onclick
 			else
-				chk = hContainer:AppendContentFromIni(INI_PATH, "Wnd_CheckBox"):Lookup("WndCheckBox")
+				wnd = hContainer:AppendContentFromIni(INI_PATH, "Wnd_CheckBox")
+				chk = wnd:Lookup("WndCheckBox")
 				txtTitle = chk:Lookup("", "Text_CheckBox")
 				chk.OnCheckBoxCheck = v.oncheck
 				chk.OnCheckBoxUncheck = v.onuncheck
@@ -289,8 +292,8 @@ function MY_ChatSwitch.OnFrameCreate()
 				XGUI(shaCount):drawCircle(0, 0, 0)
 			end
 			chk.info = v
-			nWidth = nWidth + chk:GetW()
-			nHeight = math.max(nHeight, chk:GetH())
+			nWidth = nWidth + math.ceil(wnd:GetW())
+			nHeight = math.max(nHeight, math.ceil(wnd:GetH()))
 			UpdateChannelDailyLimit(chk)
 		end
 	end
