@@ -242,8 +242,8 @@ function MY_ChatSwitch.OnFrameCreate()
 	this:RegisterEvent("CUSTOM_DATA_LOADED")
 	this:EnableDrag(not MY.GetStorage('BoolValues.MY_ChatSwitch_LockPostion'))
 
+	local nWidth, nHeight = 0, 0
 	local hContainer = this:Lookup("WndContainer_Radios")
-	hContainer:SetW(2000)
 	hContainer:Clear()
 	for i, v in ipairs(CHANNEL_LIST) do
 		if not MY.GetStorage('BoolValues.MY_ChatSwitch_CH' .. i) then
@@ -289,14 +289,16 @@ function MY_ChatSwitch.OnFrameCreate()
 				XGUI(shaCount):drawCircle(0, 0, 0)
 			end
 			chk.info = v
+			nWidth = nWidth + chk:GetW()
+			nHeight = math.max(nHeight, chk:GetH())
 			UpdateChannelDailyLimit(chk)
 		end
 	end
+	hContainer:SetSize(nWidth, nHeight)
 	hContainer:FormatAllContentPos()
-	hContainer:SetSize(hContainer:GetAllContentSize())
 
-	this:Lookup("", "Image_Bar"):SetW(hContainer:GetW() + 35)
-	this:SetW(hContainer:GetW() + 60)
+	this:Lookup("", "Image_Bar"):SetW(nWidth + 35)
+	this:SetW(nWidth + 60)
 	MY_ChatSwitch.UpdateAnchor(this)
 end
 
