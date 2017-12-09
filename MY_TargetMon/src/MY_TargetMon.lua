@@ -206,6 +206,7 @@ local function RecreatePanel(config)
 		frame = Wnd.OpenWindow(INI_PATH, "MY_TargetMon#" .. l_frameIndex)
 		l_frameIndex = l_frameIndex + 1
 		l_frames[config] = frame
+		frame.hTotal = frame:Lookup("", "")
 		frame.hList = frame:Lookup("", "Handle_List")
 		frame.hList.FormatAllItemPosExt = FormatAllItemPosExt
 
@@ -220,7 +221,7 @@ local function RecreatePanel(config)
 	elseif frame.scale then
 		frame:Scale(1 / frame.scale, 1 / frame.scale)
 	end
-	local hList = frame.hList
+	local hTotal, hList = frame.hTotal, frame.hList
 
 	hList:Clear()
 	frame.tItem = {}
@@ -352,6 +353,7 @@ local function RecreatePanel(config)
 	hList:SetHAlign(ALIGNMENT[config.alignment] or ALIGNMENT.LEFT)
 	hList:SetIgnoreInvisibleChild(true)
 	hList:FormatAllItemPosExt()
+	hTotal:SetSizeByAllItemSize()
 	UpdateHotkey(frame)
 
 	frame:SetSize(nWidth, nHeight)
@@ -408,6 +410,21 @@ local function GetTarget(eTarType, eMonType)
 		end
 	end
 	return TARGET.NO_TARGET, 0
+end
+
+local function CancelBuff(hItem)
+	if not hItem or not hItem.mon then
+		return
+	end
+	local config = hItem:GetRoot().config
+	if not config or config.type ~= 'BUFF' then
+		return
+	end
+	local KTarget = MY.GetObject(GetTarget(config.target, config.type))
+	if not KTarget then
+		return
+	end
+	MY.CancelBuff(KTarget, hItem.mon.id == 'common' and hItem.mon.name or hItem.mon.id)
 end
 
 do
@@ -497,6 +514,9 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 					hItem.box:SetCoolDownPercentage(1)
 				end
 			end
+			hItem.dwID = buff.dwID
+			hItem.nLevel = buff.nLevel
+			hItem.nTimeLeft = nTimeLeft
 			hItem.nRenderFrame = nFrameCount
 		end
 		-- 加入同名BUFF列表
@@ -540,21 +560,6 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 	end
 end
 
-local function CancelBuff(hItem)
-	if not hItem or not hItem.mon then
-		return
-	end
-	local config = hItem:GetRoot().config
-	if not config or config.type ~= 'BUFF' then
-		return
-	end
-	local KTarget = MY.GetObject(GetTarget(config.target, config.type))
-	if not KTarget then
-		return
-	end
-	MY.CancelBuff(KTarget, hItem.mon.id == 'common' and hItem.mon.name or hItem.mon.id)
-end
-
 function FE.OnFrameBreathe()
 	local dwType, dwID = GetTarget(this.config.target, this.config.type)
 	if dwType == this.dwType and dwID == this.dwID
@@ -562,7 +567,7 @@ function FE.OnFrameBreathe()
 		return
 	end
 	needFormatItemPos = false
-	local hList = this.hList
+	local hTotal, hList = this.hTotal, this.hList
 	local config = this.config
 	local KTarget = MY.GetObject(dwType, dwID)
 	local targetChanged = dwType ~= this.dwType or dwID ~= this.dwID
@@ -628,7 +633,10 @@ function FE.OnFrameBreathe()
 		end
 		-- 检查是否需要重绘界面坐标
 		if needFormatItemPos then
+			hList:SetW(this.w)
 			hList:FormatAllItemPosExt()
+			hList:SetSizeByAllItemSize()
+			hTotal:SetSizeByAllItemSize()
 		end
 	end
 	this.dwType, this.dwID = dwType, dwID
@@ -641,10 +649,58 @@ end
 
 function FE.OnItemRButtonClick()
 	local name = this:GetName()
-	if name == 'Box_Default' then
+	local frame = this:GetRoot()
+	if name == 'Box_Default' and frame.config.type == 'BUFF' then
 		CancelBuff(this:GetParent():GetParent())
 	end
 end
+
+function FE.OnItemMouseEnter()
+	local name = this:GetName()
+	local frame = this:GetRoot()
+	local eMonType = frame.config.type
+	if name == 'Box_Default' then
+		if eMonType == 'BUFF' then
+			local hItem = this:GetParent():GetParent()
+			local w, h = hItem:GetW(), hItem:GetH()
+			local x, y = hItem:GetAbsX(), hItem:GetAbsY()
+			MY.OutputBuffTip(hItem.dwID, hItem.nLevel, {x, y, w, h}, hItem.nTimeLeft)
+		end
+		this:SetObjectMouseOver(1)
+	end
+end
+
+function FE.OnItemMouseLeave()
+	local name = this:GetName()
+	local frame = this:GetRoot()
+	local eMonType = frame.config.type
+	if name == 'Box_Default' then
+		if eMonType == 'BUFF' then
+			HideTip()
+		end
+		this:SetObjectMouseOver(0)
+	end
+end
+
+function FE.OnItemLButtonDown()
+	local name = this:GetName()
+	local frame = this:GetRoot()
+	local eMonType = frame.config.type
+	if name == 'Box_Default' then
+		this:SetObjectPressed(1)
+	end
+end
+FE.OnItemRButtonDown = FE.OnItemLButtonDown
+
+function FE.OnItemLButtonUp()
+	local name = this:GetName()
+	local frame = this:GetRoot()
+	local eMonType = frame.config.type
+	if name == 'Box_Default' then
+		this:SetObjectPressed(0)
+	end
+end
+FE.OnItemRButtonUp = FE.OnItemLButtonUp
 
 do
 local function OnSkill(this, dwID, dwLevel)
