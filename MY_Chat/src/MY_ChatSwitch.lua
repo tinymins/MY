@@ -243,32 +243,35 @@ function MY_ChatSwitch.OnFrameCreate()
 	this:EnableDrag(not MY.GetStorage('BoolValues.MY_ChatSwitch_LockPostion'))
 
 	local nWidth, nHeight = 0, 0
-	local hContainer = this:Lookup("WndContainer_Radios")
-	hContainer:Clear()
+	local container = this:Lookup("WndContainer_Radios")
+	container:Clear()
 	for i, v in ipairs(CHANNEL_LIST) do
 		if not MY.GetStorage('BoolValues.MY_ChatSwitch_CH' .. i) then
 			local wnd, chk, txtTitle, txtCooldown, shaCount
 			if v.head then
-				wnd = hContainer:AppendContentFromIni(INI_PATH, "Wnd_Channel")
+				wnd = container:AppendContentFromIni(INI_PATH, "Wnd_Channel")
 				chk = wnd:Lookup("WndRadioChannel")
 				txtTitle = chk:Lookup("", "Text_Channel")
 				txtCooldown = chk:Lookup("", "Text_CD")
 				shaCount = chk:Lookup("", "Shadow_Count")
 				chk.OnCheckBoxCheck = OnChannelCheck
 			elseif v.onclick then
-				wnd = hContainer:AppendContentFromIni(INI_PATH, "Wnd_Channel")
+				wnd = container:AppendContentFromIni(INI_PATH, "Wnd_Channel")
 				chk = wnd:Lookup("WndRadioChannel")
 				txtTitle = chk:Lookup("", "Text_Channel")
 				txtCooldown = chk:Lookup("", "Text_CD")
 				shaCount = chk:Lookup("", "Shadow_Count")
 				chk.OnCheckBoxCheck = v.onclick
 			else
-				wnd = hContainer:AppendContentFromIni(INI_PATH, "Wnd_CheckBox")
+				wnd = container:AppendContentFromIni(INI_PATH, "Wnd_CheckBox")
 				chk = wnd:Lookup("WndCheckBox")
 				txtTitle = chk:Lookup("", "Text_CheckBox")
 				chk.OnCheckBoxCheck = v.oncheck
 				chk.OnCheckBoxUncheck = v.onuncheck
 			end
+			wnd:SetRelX(nWidth)
+			nWidth = nWidth + math.ceil(wnd:GetW())
+			nHeight = math.max(nHeight, math.ceil(wnd:GetH()))
 			chk.txtTitle = txtTitle
 			chk.txtCooldown = txtCooldown
 			chk.shaCount = shaCount
@@ -292,13 +295,10 @@ function MY_ChatSwitch.OnFrameCreate()
 				XGUI(shaCount):drawCircle(0, 0, 0)
 			end
 			chk.info = v
-			nWidth = nWidth + math.ceil(wnd:GetW())
-			nHeight = math.max(nHeight, math.ceil(wnd:GetH()))
 			UpdateChannelDailyLimit(chk)
 		end
 	end
-	hContainer:SetSize(nWidth, nHeight)
-	hContainer:FormatAllContentPos()
+	container:SetSize(nWidth, nHeight)
 
 	this:Lookup("", "Image_Bar"):SetW(nWidth + 35)
 	this:SetW(nWidth + 60)
