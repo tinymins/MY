@@ -138,13 +138,13 @@ do local l_prop = setmetatable({}, { __mode = 'k' })
 		local prop = l_prop[raw]
 		local k = { ... }
 		local kc = select('#', ...)
-		for i = 1, kc, 1 do
+		for i = 1, kc - 1, 1 do
 			if not prop[k[i]] then
 				return
 			end
 			prop = prop[k[i]]
 		end
-		return prop
+		return prop[k[kc]]
 	end
 
 	function SetComponentProp(raw, ...)
@@ -1078,19 +1078,47 @@ end
 -- enable or disable elements
 do
 local function SetComponentEnable(raw, bEnable)
-	if raw.IsEnabled and (not raw:IsEnabled()) ~= (not bEnable) then
-		local txt = GetComponentElement(raw, 'TEXT')
-		if txt then
-			local r, g, b = txt:GetFontColor()
-			if bEnable then
-				txt:SetFontColor(min(ceil(r * 2.2), 255), min(ceil(g * 2.2), 255), min(ceil(b * 2.2), 255))
-			else
-				txt:SetFontColor(min(ceil(r / 2.2), 255), min(ceil(g / 2.2), 255), min(ceil(b / 2.2), 255))
-			end
+	-- check if set value equals with current status
+	local bEnable = bEnable and true or false
+	local bEnabled = GetComponentProp(raw, 'bEnable')
+	if bEnabled == nil then
+		if raw.IsEnabled then
+			bEnabled = raw:IsEnabled()
+		else
+			bEnabled = true
 		end
 	end
-	raw:Enable(bEnable and true or false)
+	if bEnabled == bEnable then
+		return
+	end
+	-- make gray
+	local txt = GetComponentElement(raw, 'TEXT')
+	if txt then
+		local r, g, b = txt:GetFontColor()
+		local ratio = bEnable and 2.2 or (1 / 2.2)
+		if max(r, g, b) * ratio > 255 then
+			ratio = 255 / max(r, g, b)
+		end
+		txt:SetFontColor(ceil(r * ratio), ceil(g * ratio), ceil(b * ratio))
+	end
+	-- set sub elements enable
+	local combo = GetComponentElement(raw, 'COMBOBOX')
+	if combo then
+		combo:Enable(bEnable)
+	end
+	local slider = GetComponentElement(raw, 'SLIDER')
+	if slider then
+		slider:Enable(bEnable)
+	end
+	local edit = GetComponentElement(raw, 'EDIT')
+	if edit then
+		edit:Enable(bEnable)
+	end
+	-- set enable
+	raw:Enable(bEnable)
+	SetComponentProp(raw, 'bEnable', bEnable)
 end
+
 function XGUI:enable(...)
 	self:_checksum()
 	local argc = select('#', ...)
@@ -1200,15 +1228,12 @@ function XGUI:text(arg0)
 					element:Clear()
 					element:AppendItemFromString(GetFormatText(arg0))
 					element:FormatAllItemPos()
-				elseif componentType == 'WndEditBox' or componentType == 'WndAutocomplete' then
-					element = GetComponentElement(raw, 'EDIT')
-					element:SetText(arg0)
 				elseif componentType == 'Text' then
 					raw:SetText(arg0)
 					if GetComponentProp(raw, 'bAutoSize') then
 						raw:AutoSize()
+						raw:GetParent():FormatAllItemPos()
 					end
-					raw:GetParent():FormatAllItemPos()
 				else
 					element = GetComponentElement(raw, 'TEXT')
 					if element then
