@@ -273,17 +273,20 @@ end
 
 -- open window
 function MY.OpenPanel(bMute, bNoFocus, bNoAnimate)
-	local hFrame = MY.GetFrame()
-	if not hFrame then
-		hFrame = Wnd.OpenWindow(INI_PATH, "MY")
-		hFrame.intact = true
-		hFrame:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
-		hFrame:CorrectPos()
+	local frame = MY.GetFrame()
+	if frame and frame:IsVisible() then
+		return
+	end
+	if not frame then
+		frame = Wnd.OpenWindow(INI_PATH, "MY")
+		frame.intact = true
+		frame:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
+		frame:CorrectPos()
 
 		-- update some ui handle
-		hFrame:Lookup("", "Text_Title"):SetText(_L['mingyi plugins'] .. " v" .. MY.GetVersion() .. ' Build ' .. _BUILD_)
-		hFrame:Lookup("Wnd_Total", "Handle_DBClick").OnItemLButtonDBClick = function()
-			hFrame:Lookup('CheckBox_Maximize'):ToggleCheck()
+		frame:Lookup("", "Text_Title"):SetText(_L['mingyi plugins'] .. " v" .. MY.GetVersion() .. ' Build ' .. _BUILD_)
+		frame:Lookup("Wnd_Total", "Handle_DBClick").OnItemLButtonDBClick = function()
+			frame:Lookup('CheckBox_Maximize'):ToggleCheck()
 		end
 		-- load bg uitex
 		for k, v in pairs({
@@ -292,13 +295,13 @@ function MY.OpenPanel(bMute, bNoFocus, bNoAnimate)
 			['Image_BgRT'] = 7,
 			['Image_BgT' ] = 6,
 		}) do
-			hFrame:Lookup('', k):FromUITex(_UITEX_COMMON_, v)
+			frame:Lookup('', k):FromUITex(_UITEX_COMMON_, v)
 		end
-		MY.UI(hFrame):size(_MY.OnSizeChanged)
+		MY.UI(frame):size(_MY.OnSizeChanged)
 		-- bind close button event
-		MY.UI(hFrame):children("#Btn_Close"):click(function() MY.ClosePanel() end)
-		MY.UI(hFrame):children("#CheckBox_Maximize"):check(function()
-			local ui = MY.UI(hFrame)
+		MY.UI(frame):children("#Btn_Close"):click(function() MY.ClosePanel() end)
+		MY.UI(frame):children("#CheckBox_Maximize"):check(function()
+			local ui = MY.UI(frame)
 			_MY.anchor = ui:anchor()
 			_MY.w, _MY.h = ui:size()
 			ui:pos(0, 0):event('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
@@ -307,7 +310,7 @@ function MY.OpenPanel(bMute, bNoFocus, bNoAnimate)
 			MY.ResizePanel(Station.GetClientSize())
 		end, function()
 			MY.ResizePanel(_MY.w, _MY.h)
-			MY.UI(hFrame)
+			MY.UI(frame)
 			  :event('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
 			  :drag(true)
 			  :anchor(_MY.anchor)
@@ -318,8 +321,8 @@ function MY.OpenPanel(bMute, bNoFocus, bNoAnimate)
 		  :click(function()
 		  	XGUI.OpenIE("https://weibo.com/zymah")
 		  end)
-		MY.UI(hFrame):event('UI_SCALED', function()
-			local fn = hFrame:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel').OnScrollBarPosChanged
+		MY.UI(frame):event('UI_SCALED', function()
+			local fn = frame:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel').OnScrollBarPosChanged
 			if fn then
 				fn()
 			end
@@ -331,15 +334,15 @@ function MY.OpenPanel(bMute, bNoFocus, bNoAnimate)
 		-- update category
 		MY.RedrawCategory()
 	end
-	hFrame:Show()
+	frame:Show()
 	if not bNoFocus and Cursor.IsVisible() then
-		hFrame:BringToTop()
-		Station.SetFocusWindow(hFrame)
+		frame:BringToTop()
+		Station.SetFocusWindow(frame)
 	end
 	if not bNoAnimate then
-		hFrame.bToggling = true
-		tweenlite.from(300, hFrame, {relY = hFrame:GetRelY() - 10, alpha = 0, complete = function()
-			hFrame.bToggling = false
+		frame.bToggling = true
+		tweenlite.from(300, frame, {relY = frame:GetRelY() - 10, alpha = 0, complete = function()
+			frame.bToggling = false
 		end})
 	end
 	if not bMute then
