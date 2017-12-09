@@ -1353,14 +1353,14 @@ function PS.OnPanelActive(wnd)
 						name = not tonumber(szVal) and szVal or nil,
 					}
 					if not index then
-						index = #aMonList
+						index = #aMonList + 1
 					end
 					table.insert(aMonList, index, mon)
 					local list = kungfuid == 'common' and listCommon or listKungfu
 					list:listbox(
 						'insert',
 						mon.name or mon.id,
-						mon.name or mon.id,
+						mon,
 						{ mon = mon, monlist = aMonList },
 						index
 					)
@@ -1391,7 +1391,7 @@ function PS.OnPanelActive(wnd)
 					szOption = _L['Delete'],
 					fnAction = function()
 						local list = monlist == l_config.monitors.common and listCommon or listKungfu
-						list:listbox('delete', 'id', szID)
+						list:listbox('delete', 'id', mon)
 						for i, m in ipairs_r(monlist) do
 							if m == mon then
 								table.remove(monlist, i)
@@ -1529,7 +1529,7 @@ function PS.OnPanelActive(wnd)
 						listCommon:listbox(
 							'insert',
 							mon.name or mon.id,
-							mon.name or mon.id,
+							mon,
 							{ mon = mon, monlist = aMonList }
 						)
 					end
@@ -1542,7 +1542,7 @@ function PS.OnPanelActive(wnd)
 						listKungfu:listbox(
 							'insert',
 							mon.name or mon.id,
-							mon.name or mon.id,
+							mon,
 							{ mon = mon, monlist = aMonList }
 						)
 					end
