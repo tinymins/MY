@@ -719,7 +719,7 @@ end
 -- same as jQuery.find()
 function XGUI:find(filter)
 	self:_checksum()
-	local top, raw, child, path
+	local top, raw, ruid, child
 	local raws, hash, stack, children = {}, {}, {}, {}
 	for _, root in ipairs(self.raws) do
 		top = #raws
@@ -727,11 +727,12 @@ function XGUI:find(filter)
 		while #stack > 0 do
 			--### 弹出栈顶元素准备处理
 			raw = remove(stack, #stack)
-			path = concat({ raw:GetTreePath() })
-			if not hash[path] then
+			ruid = tostring(raw)
+			--### 判断不在结果集中则处理
+			if not hash[ruid] then
 				--## 将自身加入结果队列
 				insert(raws, raw)
-				hash[path] = true
+				hash[ruid] = true
 				--## 计算所有子元素并将子元素压栈准备下次循环处理
 				--## 注意要逆序压入栈中以保证最终结果是稳定排序的
 				if raw:GetBaseType() == 'Wnd' then
