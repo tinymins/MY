@@ -94,7 +94,7 @@ end
 function MY_Focus.SetScale(fScaleX, fScaleY)
 	MY_Focus.fScaleX = fScaleX
 	MY_Focus.fScaleY = fScaleY
-	
+
 	local hFrame = MY_Focus.GetFrame()
 	if not hFrame then
 		return
@@ -283,7 +283,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 				end
 			end
 		end
-		
+
 		-- 判断竞技场
 		if MY.IsInArena() then
 			if dwType == TARGET.PLAYER then
@@ -329,7 +329,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 				bFocus = true
 			end
 		end
-		
+
 		-- 判断重要NPC
 		if not bFocus and
 		dwType == TARGET.NPC and
@@ -337,7 +337,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		MY.IsBoss(me.GetMapID(), obj.dwTemplateID) then
 			bFocus = true
 		end
-		
+
 		-- 加入焦点
 		if bFocus then
 			MY_Focus.AddFocus(dwType, dwID, szName)
@@ -421,7 +421,7 @@ function MY_Focus.ClearFocus()
 	if Navigator_Remove then
 		Navigator_Remove("MY_FOCUS")
 	end
-	
+
 	local hList = Station.Lookup('Normal/MY_Focus', 'Handle_List')
 	if not hList then
 		return
@@ -489,7 +489,7 @@ function MY_Focus.DrawFocus(dwType, dwID)
 		hItem:Scale(MY_Focus.fScaleX, MY_Focus.fScaleY)
 		hItem:SetName('HI_'..dwType..'_'..dwID)
 	end
-	
+
 	---------- 左侧 ----------
 	-- 小图标列表
 	local hInfoList = hItem:Lookup("Handle_InfoList")
@@ -540,7 +540,7 @@ function MY_Focus.DrawFocus(dwType, dwID)
 		end
 	end
 	hInfoList:FormatAllItemPos()
-	
+
 	-- 目标距离
 	local nDistance = math.floor(math.sqrt(math.pow(player.nX - obj.nX, 2) + math.pow(player.nY - obj.nY, 2) + math.pow((player.nZ - obj.nZ) / 8, 2)) * 10 / 64) / 10
 	hItem:Lookup('Handle_Compass/Compass_Distance'):SetText(nDistance)
@@ -677,7 +677,7 @@ function MY_Focus.DrawFocus(dwType, dwID)
 			hItem:Lookup('Image_Select'):Show()
 		end
 	end
-	
+
 	hItem:FormatAllItemPos()
 	hList:FormatAllItemPos()
 end
@@ -688,7 +688,7 @@ function MY_Focus.AdjustUI()
 	if not hList then
 		return
 	end
-	
+
 	local tList = MY_Focus.GetDisplayList()
 	hList:SetH(70 * #tList * MY_Focus.fScaleY)
 	hList:GetRoot():SetH((70 * #tList + 32) * MY_Focus.fScaleY)
@@ -757,7 +757,7 @@ function MY_Focus.OnFrameCreate()
 	this:RegisterEvent("NPC_LEAVE_SCENE")
 	this:RegisterEvent("DOODAD_LEAVE_SCENE")
 	this:RegisterEvent("CUSTOM_DATA_LOADED")
-	
+
 	MY_Focus.SetScale(MY_Focus.fScaleX, MY_Focus.fScaleY)
 	MY_Focus.OnEvent("UI_SCALED")
 	MY_Focus.OnEvent("LOADING_END")
@@ -948,7 +948,7 @@ function PS.OnPanelActive(wnd)
 	local h  = math.max(ui:height(), 440)
 	local xr, yr, wr = w - 260, 40, 260
 	local xl, yl, wl = 5,  5, w - wr -15
-	
+
 	-- 左侧
 	local x, y = xl, yl
 	ui:append("WndCheckBox", {
@@ -964,11 +964,11 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + 25
-	
+
 	-- <hr />
 	ui:append("Image", {x = x, y = y, w = w - x, h = 1, image = 'UI/Image/UICommon/ScienceTreeNode.UITex', imageframe = 62})
 	y = y + 5
-	
+
 	ui:append("WndCheckBox", {
 		x = x, y = y, text = _L['auto focus'], checked = MY_Focus.bAutoFocus,
 		oncheck = function(bChecked)
@@ -976,7 +976,7 @@ function PS.OnPanelActive(wnd)
 			MY_Focus.RescanNearby()
 		end,
 	})
-	
+
 	local list = ui:append("WndListBox", {x = x, y = y + 30, w = wl - x + xl, h = h - y - 40}, true)
 	-- 初始化list控件
 	for _, v in ipairs(MY_Focus.tAutoFocus) do
@@ -986,7 +986,7 @@ function PS.OnPanelActive(wnd)
 		return {{
 			szOption = _L['delete'],
 			fnAction = function()
-				list:listbox('delete', szText, szID)
+				list:listbox('delete', 'id', szID)
 				for i = #MY_Focus.tAutoFocus, 1, -1 do
 					if MY_Focus.tAutoFocus[i] == szText then
 						table.remove(MY_Focus.tAutoFocus, i)
@@ -1028,7 +1028,7 @@ function PS.OnPanelActive(wnd)
 		text = _L["delete"],
 		onclick = function()
 			for _, v in ipairs(list:listbox('select', 'selected')) do
-				list:listbox('delete', v.text, v.id)
+				list:listbox('delete', 'id', v.id)
 				for i = #MY_Focus.tAutoFocus, 1, -1 do
 					if MY_Focus.tAutoFocus[i] == v.text then
 						table.remove(MY_Focus.tAutoFocus, i)
@@ -1038,7 +1038,7 @@ function PS.OnPanelActive(wnd)
 			end
 		end,
 	})
-	
+
 	-- 右侧
 	local x, y = xr, yr - 20
 	local deltaX = 23
@@ -1050,7 +1050,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + deltaX
-	
+
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = wr, text = _L['auto focus very important npc'],
 		tip = _L['boss list is always been collecting and updating'],
@@ -1062,7 +1062,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + deltaX
-	
+
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = wr, text = _L['auto focus friend'],
 		checked = MY_Focus.bFocusFriend,
@@ -1072,13 +1072,13 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + deltaX
-	
+
 	ui:append("Image", {
 		x = x + 5, y = y - 3, w = 10, h = 8,
 		image = "ui/Image/UICommon/ScienceTree.UITex",
 		imageframe = 10,
 	})
-	
+
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = wr, text = _L['auto focus tong'],
 		checked = MY_Focus.bFocusTong,
@@ -1088,7 +1088,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + deltaX
-	
+
 	ui:append("Image", {
 		x = x + 5, y = y, w = 10, h = 10,
 		image = "ui/Image/UICommon/ScienceTree.UITex",
@@ -1108,7 +1108,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + deltaX
-	
+
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = wr, text = _L['auto focus enemy'],
 		checked = MY_Focus.bFocusEnemy,
@@ -1118,7 +1118,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + deltaX
-	
+
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = wr, text = _L['jjc auto focus party'],
 		checked = MY_Focus.bFocusJJCParty,
@@ -1128,7 +1128,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + deltaX
-	
+
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = wr, text = _L['jjc auto focus enemy'],
 		checked = MY_Focus.bFocusJJCEnemy,
@@ -1138,7 +1138,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + deltaX
-	
+
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = wr, text = _L['show focus\'s target'],
 		checked = MY_Focus.bShowTarget,
@@ -1148,7 +1148,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + deltaX
-	
+
 	ui:append("WndCheckBox", {
 		x = x, y = y,w = wr, text = _L['traversal object'],
 		tip = _L['may cause some problem in dungeon map'],
@@ -1159,7 +1159,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + deltaX
-	
+
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = wr, text = _L['hide dead object'],
 		checked = MY_Focus.bHideDeath,
@@ -1169,7 +1169,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + deltaX
-	
+
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = wr, text = _L['display kungfu icon instead of location'],
 		checked = MY_Focus.bDisplayKungfuIcon,
@@ -1178,7 +1178,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + deltaX
-	
+
 	ui:append('WndCheckBox', {
 		name = 'WndCheckBox_SortByDistance',
 		x = x, y = y, w = wr,
@@ -1190,7 +1190,7 @@ function PS.OnPanelActive(wnd)
 		end
 	})
 	y = y + deltaX
-	
+
 	ui:append('WndCheckBox', {
 		name = 'WndCheckBox_EnableSceneNavi',
 		x = x, y = y, w = wr,
@@ -1202,7 +1202,7 @@ function PS.OnPanelActive(wnd)
 		end
 	})
 	y = y + deltaX
-	
+
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = wr, text = _L['heal healper'],
 		tip = _L['select target when mouse enter'],
@@ -1213,7 +1213,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + deltaX
-	
+
 	ui:append("WndComboBox", {
 		x = x, y = y, w = 150,
 		text = _L['max display length'],
@@ -1235,7 +1235,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + deltaX
-	
+
 	ui:append("WndSliderBox", {
 		x = x, y = y, w = 150,
 		textfmt = function(val) return _L("current scale-x is %d%%.", val) end,
@@ -1247,7 +1247,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + deltaX
-	
+
 	ui:append("WndSliderBox", {
 		x = x, y = y, w = 150,
 		textfmt = function(val) return _L("current scale-y is %d%%.", val) end,

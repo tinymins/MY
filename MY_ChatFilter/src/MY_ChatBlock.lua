@@ -348,7 +348,7 @@ function PS.OnPanelActive(wnd)
 		table.insert(menu, {
 			szOption = _L['delete'],
 			fnAction = function()
-				list:listbox('delete', text, id)
+				list:listbox('delete', 'id', id)
 				LoadBlockWords()
 				for i = #MY_ChatBlock.tBlockWords, 1, -1 do
 					if MY_ChatBlock.tBlockWords[i].keyword == id then
@@ -396,7 +396,7 @@ function PS.OnPanelActive(wnd)
 		text = _L["delete"],
 		onclick = function()
 			for _, v in ipairs(list:listbox('select', 'selected')) do
-				list:listbox('delete', v.text, v.id)
+				list:listbox('delete', 'id', v.id)
 				LoadBlockWords()
 				for i = #MY_ChatBlock.tBlockWords, 1, -1 do
 					if MY_ChatBlock.tBlockWords[i].keyword == v.id then

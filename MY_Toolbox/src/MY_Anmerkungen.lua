@@ -284,7 +284,7 @@ MY_Anmerkungen.SetPlayerNote = function(dwID, szName, szContent, bTipWhenGroup, 
 			MY_Anmerkungen.tPublicPlayerNotes[dwID] = nil
 		end
 		if _C.list then
-			_C.list:listbox('delete', nil, dwID)
+			_C.list:listbox('delete', 'id', dwID)
 		end
 		MY_Anmerkungen.SaveConfig()
 		return nil
