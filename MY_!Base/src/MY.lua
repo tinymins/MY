@@ -743,6 +743,7 @@ function MY.RedrawCategory(szCategory)
 				if chkCategory.bActived then
 					return
 				end
+				wndCategoryList.szCategory = chkCategory.szCategory
 
 				PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 				local p = chkCategory:GetParent():GetFirstChild()
@@ -770,16 +771,16 @@ function MY.SwitchCategory(szCategory)
 		return
 	end
 
-	local hList = frame:Lookup('Wnd_Total/WndContainer_Category')
-	local chk = hList:GetFirstChild()
+	local container = frame:Lookup('Wnd_Total/WndContainer_Category')
+	local chk = container:GetFirstChild()
 	while(chk and chk.szCategory ~= szCategory) do
 		chk = chk:GetNext()
 	end
 	if not chk then
-		chk = hList:GetFirstChild()
+		chk = container:GetFirstChild()
 	end
 	if chk then
-		hList.szCategory = chk.szCategory
+		container.szCategory = chk.szCategory
 		chk:Check(true)
 	end
 end
@@ -835,19 +836,30 @@ function MY.SwitchTab(szID, bForceUpdate)
 		return
 	end
 
+	local category, tab
 	if szID then
-		-- check if category is right
-		local szCategory = frame:Lookup('Wnd_Total/WndContainer_Category').szCategory
 		for _, ctg in ipairs(TABS_LIST) do
-			for i, tab in ipairs(ctg) do
-				if tab.szID == szID then
-					if ctg.id ~= szCategory then
-						MY.SwitchCategory(ctg.id)
-					end
+			for _, p in ipairs(ctg) do
+				if p.szID == szID then
+					category, tab = ctg, p
 				end
 			end
 		end
+		if not tab then
+			MY.Debug({_L('Cannot find tab: %s', szID)}, 'MY.SwitchTab#' .. szID, MY_DEBUG.WARNING)
+		end
+	end
 
+	-- check if category is right
+	if category then
+		local szCategory = frame:Lookup('Wnd_Total/WndContainer_Category').szCategory
+		if category.id ~= szCategory then
+			MY.SwitchCategory(category.id)
+		end
+	end
+
+	-- check if tab is alreay actived and update tab active status
+	if tab then
 		-- get tab window
 		local hTab
 		local hTabs = frame:Lookup('Wnd_Total/WndScroll_Tabs', '')
@@ -874,29 +886,29 @@ function MY.SwitchTab(szID, bForceUpdate)
 	end
 
 	-- get main panel
-	local wndMainPanel = frame:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel')
-	if not bForceUpdate and wndMainPanel.szID == szID then
-		-- return
-	end
-	local wndScroll = frame:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel')
+	local wnd = frame:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel')
+	local scroll = frame:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel')
 	-- fire custom registered on switch event
-	if wndMainPanel.OnPanelDeactive then
-		local res, err = pcall(wndMainPanel.OnPanelDeactive, wndMainPanel)
+	if wnd.OnPanelDeactive then
+		local res, err = pcall(wnd.OnPanelDeactive, wnd)
 		if not res then
 			MY.Debug({err}, 'MY#OnPanelDeactive', MY_DEBUG.ERROR)
 		end
 	end
-	wndMainPanel.OnPanelDeactive = nil
-	wndMainPanel:Clear()
-	wndMainPanel:Lookup('', ''):Clear()
+	-- clear all events
+	wnd.OnPanelActive   = nil
+	wnd.OnPanelDeactive = nil
+	wnd.OnPanelResize   = nil
+	wnd.OnPanelScroll   = nil
+	-- reset main panel status
+	scroll:SetScrollPos(0)
+	wnd:Clear()
+	wnd:Lookup('', ''):Clear()
 
-	wndMainPanel.OnPanelResize   = nil
-	wndMainPanel.OnPanelActive   = nil
-	wndMainPanel.OnPanelDeactive = nil
-	wndScroll.OnScrollBarPosChanged = nil
-	if not szID then
+	-- ready to draw
+	if not tab then
 		-- »¶Ó­Ò³
-		local ui = MY.UI(wndMainPanel)
+		local ui = MY.UI(wnd)
 		local w, h = ui:size()
 		ui:append("Image", { name = 'Image_Adv', x = 0, y = 0, image = _UITEX_POSTER_, imageframe = 0 })
 		ui:append("Text", { name = 'Text_Adv', x = 10, y = 300, w = 557, font = 200 })
@@ -919,7 +931,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 			onhover = function(bIn) this:SetAlpha(bIn and 255 or 190) end,
 		})
 		ui:append("Text", { name = 'Text_Svr', x = 10, y = 345, w = 557, font = 204, text = MY.GetServer() .. " (" .. MY.GetRealServer() .. ")", alpha = 220 })
-		wndMainPanel.OnPanelResize = function(wnd)
+		wnd.OnPanelResize = function(wnd)
 			local w, h = MY.UI(wnd):size()
 			local scaleH = w / 557 * 278
 			local bottomH = 90
@@ -939,7 +951,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 				ui:children('#Text_OnlineTime'):pos(170, scaleH + 60)
 			end
 		end
-		wndMainPanel.OnPanelResize(wndMainPanel)
+		wnd.OnPanelResize(wnd)
 		MY.BreatheCall(500, function()
 			local player = GetClientPlayer()
 			if player then
@@ -947,37 +959,21 @@ function MY.SwitchTab(szID, bForceUpdate)
 				return 0
 			end
 		end)
-		wndMainPanel:FormatAllContentPos()
+		wnd:FormatAllContentPos()
 	else
-		for _, ctg in ipairs(TABS_LIST) do
-			for _, tab in ipairs(ctg) do
-				if tab.szID == szID then
-					if tab.fn.OnPanelActive then
-						local res, err = pcall(tab.fn.OnPanelActive, wndMainPanel)
-						if not res then
-							MY.Debug({err}, 'MY#OnPanelActive', MY_DEBUG.ERROR)
-						end
-						wndMainPanel:FormatAllContentPos()
-					end
-					wndMainPanel.OnPanelResize      = tab.fn.OnPanelResize
-					wndMainPanel.OnPanelActive      = tab.fn.OnPanelActive
-					wndMainPanel.OnPanelDeactive    = tab.fn.OnPanelDeactive
-					wndScroll.OnScrollBarPosChanged = function()
-						if not tab.fn.OnPanelScroll then
-							return
-						end
-						local scale = Station.GetUIScale()
-						local scrollX, scrollY = wndMainPanel:GetStartRelPos()
-						scrollX = scrollX == 0 and 0 or -scrollX / scale
-						scrollY = scrollY == 0 and 0 or -scrollY / scale
-						tab.fn.OnPanelScroll(wndMainPanel, scrollX, scrollY)
-					end
-					break
-				end
+		if tab.fn.OnPanelActive then
+			local res, err = pcall(tab.fn.OnPanelActive, wnd)
+			if not res then
+				MY.Debug({err}, 'MY#OnPanelActive', MY_DEBUG.ERROR)
 			end
+			wnd:FormatAllContentPos()
 		end
+		wnd.OnPanelResize   = tab.fn.OnPanelResize
+		wnd.OnPanelActive   = tab.fn.OnPanelActive
+		wnd.OnPanelDeactive = tab.fn.OnPanelDeactive
+		wnd.OnPanelScroll   = tab.fn.OnPanelScroll
 	end
-	wndMainPanel.szID = szID
+	wnd.szID = szID
 end
 
 -- ×¢²áÑ¡Ïî¿¨
@@ -1092,6 +1088,18 @@ function MY.OnDragButton()
 end
 
 function MY.OnFrameCreate()
+	local wnd = this:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel')
+	local scroll = this:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel')
+	scroll.OnScrollBarPosChanged = function()
+		if not wnd.OnPanelScroll then
+			return
+		end
+		local scale = Station.GetUIScale()
+		local scrollX, scrollY = wnd:GetStartRelPos()
+		scrollX = scrollX == 0 and 0 or -scrollX / scale
+		scrollY = scrollY == 0 and 0 or -scrollY / scale
+		wnd.OnPanelScroll(wnd, scrollX, scrollY)
+	end
 	this:Lookup("Btn_Drag"):RegisterLButtonDrag()
 end
 
