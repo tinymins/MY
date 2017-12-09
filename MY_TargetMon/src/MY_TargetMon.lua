@@ -964,7 +964,7 @@ end
 -- …Ë÷√ΩÁ√Ê
 ----------------------------------------------------------------------------------------------
 local PS = {}
-local function GenePS(ui, config, x, y, w, h, OpenConfig)
+local function GenePS(ui, config, x, y, w, h, OpenConfig, Add)
 	ui:append("Text", {text = (function()
 		for i = 1, #Config do
 			if Config[i] == config then
@@ -1334,7 +1334,7 @@ function PS.OnPanelActive(wnd)
 		local listCommon = uiWrapper:append("WndListBox", { x = x1, y = y0 + 25, w = w1, h = h0 - 30 - 30 }, true)
 		local listKungfu = uiWrapper:append("WndListBox", { x = x2, y = y0 + 25, w = w2, h = h0 - 30 - 30 }, true)
 
-		local function Add(kungfuid)
+		local function Add(kungfuid, index)
 			if kungfuid == 'current' then
 				kungfuid = GetClientPlayer().GetKungfuMount().dwSkillID
 			end
@@ -1352,13 +1352,17 @@ function PS.OnPanelActive(wnd)
 						ids = {},
 						name = not tonumber(szVal) and szVal or nil,
 					}
-					table.insert(aMonList, mon)
+					if not index then
+						index = #aMonList
+					end
+					table.insert(aMonList, index, mon)
 					local list = kungfuid == 'common' and listCommon or listKungfu
 					list:listbox(
 						'insert',
 						mon.name or mon.id,
 						mon.name or mon.id,
-						{ mon = mon, monlist = aMonList }
+						{ mon = mon, monlist = aMonList },
+						index
 					)
 					RecreatePanel(l_config)
 				end
@@ -1375,7 +1379,7 @@ function PS.OnPanelActive(wnd)
 			local monlist = data.monlist
 			local t1 = {
 				{
-					szOption = _L['enable'],
+					szOption = _L['Enable'],
 					bCheck = true, bChecked = mon.enable,
 					fnAction = function()
 						mon.enable = not mon.enable
@@ -1395,6 +1399,19 @@ function PS.OnPanelActive(wnd)
 						end
 						Wnd.CloseWindow("PopupMenuPanel")
 						RecreatePanel(l_config)
+					end,
+				},
+				{
+					szOption = _L['Insert'],
+					fnAction = function()
+						local mode = monlist == l_config.monitors.common and 'common' or 'current'
+						local index = #monlist
+						for i, m in ipairs_r(monlist) do
+							if m == mon then
+								index = i
+							end
+						end
+						Add(mode, index)
 					end,
 				},
 				{
@@ -1547,7 +1564,7 @@ function PS.OnPanelActive(wnd)
 	end
 
 	for _, config in ipairs(Config) do
-		x, y = GenePS(ui, config, x, y, w, h, OpenConfig)
+		x, y = GenePS(ui, config, x, y, w, h, OpenConfig, Add)
 		y = y + 20
 	end
 	y = y + 10
