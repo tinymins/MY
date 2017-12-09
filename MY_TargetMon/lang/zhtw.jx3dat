@@ -55,6 +55,7 @@ data = {
     ['Data exported, file saved at %s.'] = '數據導出成功，文件存放在目錄：%s。',
     ['Import successed, %d imported and %d replaced.'] = '成功導入數據%d條，其中覆蓋同名數據%d條。',
     ['Delete'] = '刪除',
+    ['Insert'] = '插入',
     ['Create'] = '創建',
     ['Import'] = '導入',
     ['Save As Default'] = '設爲默認',
