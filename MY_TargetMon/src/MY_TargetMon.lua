@@ -359,7 +359,7 @@ local function RecreatePanel(config)
 	frame:SetSize(nWidth, nHeight)
 	frame:SetDragArea(0, 0, nWidth, nHeight)
 	frame:EnableDrag(config.dragable)
-	frame:SetMousePenetrable(not config.dragable)
+	frame:SetMousePenetrable(config.penetrable)
 	frame:Scale(config.scale, config.scale)
 
 	frame.scale = config.scale
@@ -484,7 +484,6 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 			-- CD百分比
 			local fPercent = nTimeLeft / nBuffTime
 			hItem.imgProcess:SetPercentage(fPercent)
-			hItem.box:SetCoolDownPercentage(fPercent)
 			if config.cdFlash then
 				if fPercent < 0.5 and fPercent > 0.3 then
 					if hItem.fPercent ~= 0.5 then
@@ -505,6 +504,9 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 					hItem.box:SetObjectStaring(false)
 					hItem.box:ClearExtentAnimate()
 				end
+			end
+			if config.cdCircle then
+				hItem.box:SetCoolDownPercentage(fPercent)
 			else
 				if hItem.box.__SetObjectCoolDown then
 					hItem.box:__SetObjectCoolDown(false)
@@ -514,6 +516,7 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 					hItem.box:SetCoolDownPercentage(1)
 				end
 			end
+			-- 缓存数据更新
 			hItem.dwID = buff.dwID
 			hItem.nLevel = buff.nLevel
 			hItem.nTimeLeft = nTimeLeft
@@ -545,7 +548,7 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 		hItem.txtProcess:SetText("")
 		hItem.imgProcess:SetPercentage(0)
 		-- 如果目标没有改变过 且 之前存在 则显示刷新动画
-		if config.cdFlash and hItem.nRenderFrame and hItem.nRenderFrame >= 0 and hItem.nRenderFrame ~= nFrameCount and not targetChanged then
+		if config.cdReadySpark and hItem.nRenderFrame and hItem.nRenderFrame >= 0 and hItem.nRenderFrame ~= nFrameCount and not targetChanged then
 			hItem.box:SetObjectSparking(true)
 			hItem.nSparkingFrame = nFrameCount
 		-- 如果勾选隐藏不存在的BUFF 且 当前未隐藏 且 (目标改变过 或 刷新动画没有在播放) 则隐藏
@@ -752,11 +755,11 @@ function FE.OnEvent(event)
 	elseif event == "ON_ENTER_CUSTOM_UI_MODE" then
 		this:SetH(this.dragH)
 		this:Lookup('', 'Handle_List'):SetAlpha(90)
-		UpdateCustomModeWindow(this, this.config.caption, not this.config.dragable)
+		UpdateCustomModeWindow(this, this.config.caption, this.config.penetrable)
 	elseif event == "ON_LEAVE_CUSTOM_UI_MODE" then
 		this:SetH(this.h)
 		this:Lookup('', 'Handle_List'):SetAlpha(255)
-		UpdateCustomModeWindow(this, this.config.caption, not this.config.dragable)
+		UpdateCustomModeWindow(this, this.config.caption, this.config.penetrable)
 		if this.config.dragable then
 			this:EnableDrag(true)
 		end
@@ -791,9 +794,9 @@ end
 local function UpdateConfigDataVersion(config)
 	for kungfuid, monitors in pairs(config.monitors) do
 		for _, mon in ipairs(monitors) do
-			mon.name, mon.buffname = mon.name or mon.buffname, nil
-			mon.id  , mon.buffid   = mon.id   or mon.buffid  , nil
-			mon.ids , mon.buffids  = mon.ids  or mon.buffids , nil
+			mon.name, mon.buffname = mon.name or mon.buffname     , nil
+			mon.id  , mon.buffid   = mon.id   or mon.buffid       , nil
+			mon.ids , mon.buffids  = mon.ids  or mon.buffids or {}, nil
 			for dwID, dwIconID in pairs(mon.ids) do
 				mon.ids[dwID] = { framecount = 0, iconid = dwIconID }
 			end
@@ -1033,7 +1036,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 	})
 
 	ui:append("WndCheckBox", {
-		x = x + 120, y = y, w = 200,
+		x = x + 110, y = y, w = 200,
 		text = _L['Hide others buff'],
 		checked = config.hideOthers,
 		oncheck = function(bChecked)
@@ -1041,7 +1044,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 			RecreatePanel(config)
 		end,
 		autoenable = function()
-			return config.type == 'BUFF'
+			return config.enable and config.type == 'BUFF'
 		end,
 	})
 
@@ -1089,32 +1092,47 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 			end
 			return t
 		end,
+		autoenable = function() return config.enable end,
 	})
 	ui:append("WndButton2", {
 		x = w - 110, y = y, w = 102,
 		text = _L['Set monitor'],
 		onclick = function() OpenConfig(config) end,
+		autoenable = function() return config.enable end,
 	})
 	y = y + 30
 
 	ui:append("WndCheckBox", {
-		x = x + 20, y = y, w = 100,
+		x = x + 20, y = y, w = 90,
+		text = _L['Penetrable'],
+		checked = config.penetrable,
+		oncheck = function(bChecked)
+			config.penetrable = bChecked
+			RecreatePanel(config)
+		end,
+		autoenable = function() return config.enable end,
+	})
+
+	ui:append("WndCheckBox", {
+		x = x + 110, y = y, w = 100,
 		text = _L['Undragable'],
 		checked = not config.dragable,
 		oncheck = function(bChecked)
 			config.dragable = not bChecked
 			RecreatePanel(config)
 		end,
+		autoenable = function() return config.enable and not config.penetrable end,
 	})
 
 	ui:append("WndCheckBox", {
-		x = x + 120, y = y, w = 200,
+		x = x + 200, y = y, w = 180,
 		text = _L['Hide void'],
 		checked = config.hideVoid,
 		oncheck = function(bChecked)
 			config.hideVoid = bChecked
 			RecreatePanel(config)
 		end,
+		autoenable = function() return config.enable end,
 	})
 
 	ui:append("WndSliderBox", {
@@ -1127,27 +1145,41 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 			config.maxLineCount = val
 			RecreatePanel(config)
 		end,
+		autoenable = function() return config.enable end,
 	})
 	y = y + 30
 
 	ui:append("WndCheckBox", {
-		x = x + 20, y = y, w = 120,
-		text = _L['Show cd bar'],
-		checked = config.cdBar,
+		x = x + 20, y = y, w = 200,
+		text = _L['Show cd circle'],
+		checked = config.cdCircle,
 		oncheck = function(bCheck)
-			config.cdBar = bCheck
+			config.cdCircle = bCheck
 			RecreatePanel(config)
 		end,
+		autoenable = function() return config.enable end,
 	})
 
 	ui:append("WndCheckBox", {
-		x = x + 120, y = y, w = 120,
-		text = _L['Show name'],
-		checked = config.showName,
+		x = x + 110, y = y, w = 200,
+		text = _L['Show cd flash'],
+		checked = config.cdFlash,
 		oncheck = function(bCheck)
-			config.showName = bCheck
+			config.cdFlash = bCheck
 			RecreatePanel(config)
 		end,
+		autoenable = function() return config.enable end,
+	})
+
+	ui:append("WndCheckBox", {
+		x = x + 200, y = y, w = 200,
+		text = _L['Show cd ready spark'],
+		checked = config.cdReadySpark,
+		oncheck = function(bCheck)
+			config.cdReadySpark = bCheck
+			RecreatePanel(config)
+		end,
+		autoenable = function() return config.enable end,
 	})
 
 	ui:append("WndSliderBox", {
@@ -1160,17 +1192,30 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 			config.scale = val / 100
 			RecreatePanel(config)
 		end,
+		autoenable = function() return config.enable end,
 	})
 	y = y + 30
 
 	ui:append("WndCheckBox", {
-		x = x + 20, y = y, w = 200,
-		text = _L['Show cd flash'],
-		checked = config.cdFlash,
+		x = x + 20, y = y, w = 120,
+		text = _L['Show cd bar'],
+		checked = config.cdBar,
 		oncheck = function(bCheck)
-			config.cdFlash = bCheck
+			config.cdBar = bCheck
 			RecreatePanel(config)
 		end,
+		autoenable = function() return config.enable end,
+	})
+
+	ui:append("WndCheckBox", {
+		x = x + 110, y = y, w = 120,
+		text = _L['Show name'],
+		checked = config.showName,
+		oncheck = function(bCheck)
+			config.showName = bCheck
+			RecreatePanel(config)
+		end,
+		autoenable = function() return config.enable and config.cdBar end,
 	})
 
 	ui:append("WndSliderBox", {
@@ -1183,6 +1228,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 			config.cdBarWidth = val
 			RecreatePanel(config)
 		end,
+		autoenable = function() return config.enable end,
 	})
 	y = y + 30
 
@@ -1212,6 +1258,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 			end
 			return t
 		end,
+		autoenable = function() return config.enable end,
 	})
 	ui:append("WndComboBox", {
 		x = 40 + (w - 250 - 30 - 30 - 10) / 2 + 10, y = y, w = (w - 250 - 30 - 30 - 10) / 2,
@@ -1237,6 +1284,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 			end
 			return t
 		end,
+		autoenable = function() return config.enable end,
 	})
 
 	ui:append("WndSliderBox", {
@@ -1257,6 +1305,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 			config.decimalTime = val
 			RecreatePanel(config)
 		end,
+		autoenable = function() return config.enable end,
 	})
 	y = y + 30
 

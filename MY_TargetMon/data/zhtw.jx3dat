@@ -5,17 +5,19 @@ data = {
 		target       = "CLIENT_PLAYER",
 		scale        = 0.8  ,  -- 縮放比
 		enable       = false,  -- 啓用標記
+		penetrable   = true ,  -- 是否穿透
 		dragable     = false,  -- 是否可拖拽
 		alignment    = "LEFT", -- 對齊方式
 		hideOthers   = false,  -- 只顯示自己的BUFF
 		maxLineCount = 16   ,  -- 單行最大數量
 		hideVoid     = false,  -- 隱藏消失的BUFF
-		cdFlash      = true ,  -- 倒計時圈與消失特效
+		cdCircle     = true ,  -- 倒計時圈
+		cdFlash      = true ,  -- 倒計時分段特效
+		cdReadySpark = true ,  -- 消失特效
 		decimalTime  = -1   ,  -- 倒計時出現小數點時間
 		cdBar        = false,  -- 顯示倒計時條
 		cdBarWidth   = 240  ,  -- 倒計時條寬度
 		cdBarUITex   = "./Interface/MY/MY_!Base/image/ST_UI.UITex|7",  -- 倒計時條圖素
-		showName     = true ,  -- 顯示名字
 		boxBgUITex   = "UI/Image/Common/Box.UITex|44",  -- Box背景圖素
 		anchor = { y = 152, x = -343, s = "TOPLEFT", r = "CENTER" },
 		monitors = {},
@@ -26,24 +28,16 @@ data = {
 			caption      = "茗伊自身BUFF監控",
 			type         = "BUFF",
 			target       = "CLIENT_PLAYER",
-			scale        = 0.8  ,  -- 縮放比
 			enable       = false,  -- 啓用標記
-			dragable     = false,  -- 是否可拖拽
 			alignment    = 'LEFT', -- 對齊方式
-			hideOthers   = false,  -- 只顯示自己的BUFF
-			maxLineCount = 16   ,  -- 單行最大數量
-			hideVoid     = false,  -- 隱藏消失的BUFF
-			decimalTime  = -1   ,  -- 倒計時出現小數點時間
-			cdBar        = false,  -- 顯示倒計時條
-			cdBarWidth   = 240  ,  -- 倒計時條寬度
+			cdFlash      = false,  -- 消失特效
 			cdBarUITex   = "./Interface/MY/MY_!Base/image/ST_UI.UITex|7",  -- 倒計時條圖素
-			showName     = true ,  -- 顯示名字
 			boxBgUITex   = "UI/Image/Common/Box.UITex|44",  -- Box背景圖素
 			anchor = { y = 152, x = -343, s = "TOPLEFT", r = "CENTER" },
 			monitors = {
 				-- 通用
 				['common'] = {
-					
+
 				},
 				-- 紫霞功
 				[10014] = {
@@ -61,16 +55,9 @@ data = {
 			caption      = "茗伊目標BUFF監控",
 			type         = "BUFF",
 			target       = "TARGET",
-			scale        = 0.8  ,  -- 縮放比
 			enable       = false,  -- 啓用標記
-			dragable     = false,  -- 是否可拖拽
 			alignment    = 'RIGHT', -- 對齊方式
-			hideOthers   = false,  -- 只顯示自己的BUFF
-			maxLineCount = 16   ,  -- 單行最大數量
-			hideVoid     = false,  -- 隱藏消失的BUFF
-			decimalTime  = -1   ,  -- 倒計時出現小數點時間
-			cdBar        = false,  -- 顯示倒計時條
-			cdBarWidth   = 240  ,  -- 倒計時條寬度
+			cdFlash      = false,  -- 消失特效
 			cdBarUITex   = "./Interface/MY/MY_!Base/image/ST_UI.UITex|6"   ,  -- 倒計時條圖素
 			showName     = true ,  -- 顯示名字
 			boxBgUITex   = "UI/Image/Common/Box.UITex|43",  -- Box背景圖素
@@ -78,7 +65,7 @@ data = {
 			monitors = {
 			-- 通用
 				['common'] = {
-					
+
 				},
 				--花間
 				[10021] = {
