@@ -1544,6 +1544,34 @@ function XGUI:listbox(method, arg1, arg2, arg3, arg4)
 					end
 				end
 			end
+		elseif method == 'exchange' then
+			local mode, key1, key2 = arg1, arg2, arg3
+			for _, raw in ipairs(self.raws) do
+				if GetComponentType(raw) == 'WndListBox' then
+					local hList = raw:Lookup('', 'Handle_Scroll')
+					local index1, index2
+					if mode == 'id' then
+						for i = hList:GetItemCount() - 1, 0, -1 do
+							if hList:Lookup(i).id == key1 then
+								index1 = i
+							elseif hList:Lookup(i).id == key2 then
+								index2 = i
+							end
+						end
+					elseif mode == 'index' then
+						if key1 > 0 and key1 < hList:GetItemCount() + 1 then
+							index1 = key1 - 1 -- C++ count from zero but lua count from one.
+						end
+						if key2 >= 0 and key2 < hList:GetItemCount() + 1 then
+							index2 = key2 - 1 -- C++ count from zero but lua count from one.
+						end
+					end
+					if index1 and index2 then
+						hList:ExchangeItemIndex(index1, index2)
+						hList:FormatAllItemPos()
+					end
+				end
+			end
 		elseif method == 'update' then
 			local text, id, data = arg1, arg2, arg3
 			for _, raw in ipairs(self.raws) do
