@@ -1415,6 +1415,42 @@ function PS.OnPanelActive(wnd)
 					end,
 				},
 				{
+					szOption = _L['Move up'],
+					fnAction = function()
+						local mode = monlist == l_config.monitors.common and 'common' or 'current'
+						local list = monlist == l_config.monitors.common and listCommon or listKungfu
+						local index = #monlist
+						for i, m in ipairs_r(monlist) do
+							if m == mon then
+								index = i
+							end
+						end
+						if index < 2 then
+							return
+						end
+						insert(monlist, index - 1, remove(monlist, index))
+						list:listbox('exchange', 'index', index - 1, index)
+					end,
+				},
+				{
+					szOption = _L['Move down'],
+					fnAction = function()
+						local mode = monlist == l_config.monitors.common and 'common' or 'current'
+						local list = monlist == l_config.monitors.common and listCommon or listKungfu
+						local index = #monlist
+						for i, m in ipairs_r(monlist) do
+							if m == mon then
+								index = i
+							end
+						end
+						if index == #monlist then
+							return
+						end
+						insert(monlist, index + 1, remove(monlist, index))
+						list:listbox('exchange', 'index', index + 1, index)
+					end,
+				},
+				{
 					szOption = _L['Rename'],
 					fnAction = function()
 						GetUserInput(_L['Please input name:'], function(szVal)
