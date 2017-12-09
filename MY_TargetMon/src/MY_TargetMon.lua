@@ -536,6 +536,7 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 		hItem.nRenderFrame = nFrameCount
 	else
 		if config.type == 'BUFF' then
+			hItem.box:SetObjectCoolDown(true)
 			hItem.box:SetCoolDownPercentage(0)
 			hItem.box:SetObjectStaring(false)
 			hItem.box:SetOverText(0, "")
