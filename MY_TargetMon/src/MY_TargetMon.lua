@@ -1391,7 +1391,7 @@ function PS.OnPanelActive(wnd)
 					szOption = _L['Delete'],
 					fnAction = function()
 						local list = monlist == l_config.monitors.common and listCommon or listKungfu
-						list:listbox('delete', szText, szID)
+						list:listbox('delete', 'id', szID)
 						for i, m in ipairs_r(monlist) do
 							if m == mon then
 								table.remove(monlist, i)

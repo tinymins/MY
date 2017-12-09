@@ -1560,14 +1560,14 @@ function XGUI:listbox(method, arg1, arg2, arg3, arg4)
 				end
 			end
 		elseif method == 'delete' then
-			local text, id = arg1, arg2
+			local mode, search = arg1, arg2
 			for _, raw in ipairs(self.raws) do
 				if GetComponentType(raw) == 'WndListBox' then
 					local hList = raw:Lookup('', 'Handle_Scroll')
 					for i = hList:GetItemCount() - 1, 0, -1 do
 						local data = GetComponentProp(hList:Lookup(i), 'listboxItemData')
-						if (id and data.id == id)
-						or (not id and text and data.text == text) then
+						if (mode == 'id' and data.id == search)
+						or (mode == 'text' and data.text == search) then
 							hList:RemoveItem(i)
 						end
 					end
