@@ -1,4 +1,7 @@
-data = {
+(function()
+local __META__ = '__META__'
+return {
+	meta = __META__,
 	template = {
 		caption      = "新建目标监控",
 		type         = "BUFF",
@@ -11,6 +14,7 @@ data = {
 		hideOthers   = false,  -- 只显示自己的BUFF
 		maxLineCount = 16   ,  -- 单行最大数量
 		hideVoid     = false,  -- 隐藏消失的BUFF
+		showName     = true ,  -- 显示名字
 		cdCircle     = true ,  -- 倒计时圈
 		cdFlash      = true ,  -- 倒计时分段特效
 		cdReadySpark = true ,  -- 消失特效
@@ -20,7 +24,37 @@ data = {
 		cdBarUITex   = "./Interface/MY/MY_!Base/image/ST_UI.UITex|7",  -- 倒计时条图素
 		boxBgUITex   = "UI/Image/Common/Box.UITex|44",  -- Box背景图素
 		anchor = { y = 152, x = -343, s = "TOPLEFT", r = "CENTER" },
-		monitors = {},
+		monitors = {
+			__META__,
+			__VALUE__ = {},
+			__CHILD_TEMPLATE__ = { -- kungfuid
+				__META__,
+				__VALUE__ = {},
+				__CHILD_TEMPLATE__ = {
+					__META__,
+					__VALUE__ = { -- mon
+						enable = true,
+						iconid = 13,
+						id = {__META__, {'number', 'string'}, 'common'},
+						level = { __META__, {'number', 'string'}, 'common'},
+						name = {__META__, {'nil', 'string'}, nil},
+						iconid = {__META__, {'number'}, 13},
+						alias = {__META__, {'nil', 'string'}, nil},
+						shortAlias = {__META__, {'nil', 'string'}, nil},
+						ids = {
+							__META__,
+							__VALUE__ = {},
+							__CHILD_TEMPLATE__ = {
+								iconid = 13,
+								framecount = 0,
+								id = {__META__, {'number', 'string'}, 'common'},
+								level = {__META__, {'number', 'string'}, 'common'},
+							},
+						},
+					},
+				},
+			},
+		},
 	},
 	default = {
 		-- 自身BUFF监控
@@ -52,15 +86,14 @@ data = {
 		},
 		-- 目标BUFF监控
 		{
-			caption      = "茗伊目标BUFF监控",
-			type         = "BUFF",
-			target       = "TARGET",
-			enable       = false,  -- 启用标记
-			alignment    = 'RIGHT', -- 对齐方式
-			cdFlash      = false,  -- 消失特效
-			cdBarUITex   = "./Interface/MY/MY_!Base/image/ST_UI.UITex|6"   ,  -- 倒计时条图素
-			showName     = true ,  -- 显示名字
-			boxBgUITex   = "UI/Image/Common/Box.UITex|43",  -- Box背景图素
+			caption    = "茗伊目标BUFF监控",
+			type       = "BUFF",
+			target     = "TARGET",
+			enable     = false,  -- 启用标记
+			alignment  = 'RIGHT', -- 对齐方式
+			cdFlash    = false,  -- 消失特效
+			cdBarUITex = "./Interface/MY/MY_!Base/image/ST_UI.UITex|6"   ,  -- 倒计时条图素
+			boxBgUITex = "UI/Image/Common/Box.UITex|43",  -- Box背景图素
 			anchor = { y = 102, x = -343, s = "TOPLEFT", r = "CENTER" },
 			monitors = {
 			-- 通用
@@ -184,3 +217,4 @@ data = {
 		},
 	},
 }
+end)()
