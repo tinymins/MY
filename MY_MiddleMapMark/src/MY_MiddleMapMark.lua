@@ -314,6 +314,21 @@ MiddleMap.OnMouseLeave = function()
 	end
 end
 
+local function onReload()
+	for _, szKey in ipairs({
+		'ShowMap',
+		'OnEditChanged',
+		'OnMouseEnter',
+		'OnMouseLeave',
+	}) do
+		if MiddleMap['_MY_MMM_' .. szKey] then
+			MiddleMap[szKey] = MiddleMap['_MY_MMM_' .. szKey]
+			MiddleMap['_MY_MMM_' .. szKey] = nil
+		end
+	end
+end
+MY.RegisterReload('MY_MiddleMapMark', onReload)
+
 -- start search
 local MAX_DISPLAY_COUNT = 1000
 local function OnMMMItemMouseEnter()
