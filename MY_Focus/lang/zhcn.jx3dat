@@ -14,23 +14,24 @@ data = {
     ['traversal object'    ] = '获取信息时设置临时目标',
     ['may cause some problem in dungeon map'] = '获取信息更加精准但是可能造成性能和其他问题（建议副本中不要开启）',
     ['show focus\'s target'] = '显示目标的目标',
+    ['show 3d distance'] = '显示三维坐标距离',
     ['hide dead object'    ] = '隐藏重伤的目标',
     ['display kungfu icon instead of location'] = '显示内功心法图标',
     ['enable scene navi'] = '启用场景目标追踪',
     ['heal healper'] = '治疗辅助',
     ['select target when mouse enter'] = '鼠标移入时即选中目标',
-    
+
     ['auto focus'              ] = '启用默认焦点',
     ['add auto focus'          ] = '添加默认焦点',
     ['namelist manager'        ] = '管理默认焦点',
     ['delete focus'            ] = '删除焦点',
     ['add to focus list'       ] = '加入茗伊焦点',
     ['add to static focus list'] = '加入永久焦点',
-    ['max display length'      ] = '最大显示数量',
+    ['max display count %d.'   ] = '最大显示数量%d个。',
     ['sort by distance'        ] = '优先焦点近距离目标',
     ['current scale-x is %d%%.'] = '界面X轴缩放%d%%。',
     ['current scale-y is %d%%.'] = '界面Y轴缩放%d%%。',
-    
+
     ['lock focus'] = '锁定目标',
     ['unlock focus'] = '取消锁定目标',
 }
