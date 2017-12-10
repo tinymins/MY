@@ -167,31 +167,111 @@ function MY.RegisterUserData(szName, szFileName, onLoad)
 
 end
 
--- Format data's structure the same as struct.
--- @param ignoreNil: if struct is nil, data will not be checked
--- @param maxDepth: max format depth to table, set nil to full depth format
--- @return: formated data
-local function FormatDataStructure(data, struct, ignoreNil, maxDepth)
-	if maxDepth ~= 0 then
-		if maxDepth then
-			maxDepth = maxDepth - 1
+-- Format data's structure as struct descripted.
+do
+local defaultParams = { keepNewChild = false }
+local function FormatDataStructure(data, struct, assign, metaFlag)
+	if metaFlag == nil then
+		metaFlag = '__META__'
+	end
+	-- 标准化参数
+	local params = setmetatable({}, defaultParams)
+	local structTypes, defaultData, defaultDataType
+	local childTemplate, arrayTemplate, dictTemplate
+	if type(struct) == 'table' and struct[1] == metaFlag then
+		-- 处理有META标记的数据项
+		-- 允许类型和默认值
+		structTypes = struct[2] or { type(struct.__VALUE__) }
+		defaultData = struct[3] or struct.__VALUE__
+		defaultDataType = type(defaultData)
+		-- 表模板相关参数
+		if defaultDataType == 'table' then
+			childTemplate = struct.__CHILD_TEMPLATE__
+			arrayTemplate = struct.__ARRAY_TEMPLATE__
+			dictionaryTemplate = struct.__DICTIONARY_TEMPLATE__
 		end
-		local szType = type(struct)
-		if ignoreNil and struct == nil or szType == type(data) then
-			if szType == 'table' then
-				local t = {}
-				for k, v in pairs(struct) do
-					t[k] = FormatDataStructure(data[k], v, ignoreNil, maxDepth)
-				end
-				return t
+		-- 附加参数
+		if struct.__PARAMS__ then
+			for k, v in pairs(struct.__PARAMS__) do
+				params[k] = v
 			end
-		else
-			data = clone(struct)
+		end
+	else
+		-- 处理普通数据项
+		structTypes = { type(struct) }
+		defaultData = struct
+		defaultDataType = type(defaultData)
+	end
+	-- 计算结构和数据的类型
+	local dataType = type(data)
+	local dataTypeExists = false
+	if not dataTypeExists then
+		for _, v in ipairs(structTypes) do
+			if dataType == v then
+				dataTypeExists = true
+				break
+			end
+		end
+	end
+	-- 分别处理类型匹配与不匹配的情况
+	if dataTypeExists then
+		if not assign then
+			data = clone(data)
+		end
+		local keys = {}
+		-- 数据类型是表且META信息中定义了子元素模板 则递归检查子元素与子元素模板
+		if dataType == 'table' and childTemplate then
+			for i, v in pairs(data) do
+				keys[i] = true
+				data[i] = FormatDataStructure(data[i], childTemplate)
+			end
+		end
+		-- 数据类型是表且META信息中定义了列表子元素模板 则递归检查子元素与列表子元素模板
+		if dataType == 'table' and arrayTemplate then
+			for i, v in pairs(data) do
+				if type(i) == 'number' then
+					keys[i] = true
+					data[i] = FormatDataStructure(data[i], arrayTemplate)
+				end
+			end
+		end
+		-- 数据类型是表且META信息中定义了哈希子元素模板 则递归检查子元素与哈希子元素模板
+		if dataType == 'table' and dictionaryTemplate then
+			for i, v in pairs(data) do
+				if type(i) ~= 'number' then
+					keys[i] = true
+					data[i] = FormatDataStructure(data[i], dictionaryTemplate)
+				end
+			end
+		end
+		-- 数据类型是表且默认数据也是表 则递归检查子元素与默认子元素
+		if dataType == 'table' and defaultDataType == 'table' then
+			for k, v in pairs(defaultData) do
+				data[k] = FormatDataStructure(data[k], defaultData[k])
+			end
+			if not params.keepNewChild then
+				for k, v in pairs(data) do
+					if defaultData[k] == nil and not keys[k] then
+						data[k] = nil
+					end
+				end
+			end
+		end
+	else -- 类型不匹配的情况
+		if type(defaultData) == 'table' then
+			-- 默认值为表 需要递归检查子元素
+			data = {}
+			for k, v in pairs(defaultData) do
+				data[k] = FormatDataStructure(nil, v)
+			end
+		else -- 默认值不是表 直接克隆数据
+			data = clone(defaultData)
 		end
 	end
 	return data
 end
 MY.FormatDataStructure = FormatDataStructure
+end
 
 function MY.SetGlobalValue(szVarPath, Val)
 	local t = MY.String.Split(szVarPath, ".")
