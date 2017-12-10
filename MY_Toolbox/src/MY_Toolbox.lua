@@ -383,7 +383,8 @@ MY.RegisterInit('MY_LOCK_TIP', function()
 end)
 
 -- 【台服用】老地图神行
-_C.tNonwarData = {
+do
+local tNonwarData = {
 	{ id =  8, x =   70, y =   5 }, -- 洛阳
 	{ id = 11, x =   15, y = -90 }, -- 天策
 	{ id = 12, x = -150, y = 110 }, -- 枫华
@@ -391,12 +392,12 @@ _C.tNonwarData = {
 	{ id = 26, x =  -20, y =  90 }, -- 荻花宫
 	{ id = 32, x =   50, y =  45 }, -- 小战宝
 }
-MY.BreatheCall(130, function()
+local function drawNonwarMap()
 	if MY.IsShieldedVersion() then
 		return
 	end
 	local h = Station.Lookup("Topmost1/WorldMap/Wnd_All", "Handle_CopyBtn")
-	if not h or h.tNonwarData then
+	if not h or h.__MY_NonwarData or not h:IsVisible() then
 		return
 	end
 	local me = GetClientPlayer()
@@ -408,7 +409,7 @@ MY.BreatheCall(130, function()
 		if m and m.mapid == 160 then
 			local _w, _ = m:GetSize()
 			local fS = m.w / _w
-			for _, v in ipairs(_C.tNonwarData) do
+			for _, v in ipairs(tNonwarData) do
 				local bOpen = me.GetMapVisitFlag(v.id)
 				local szFile, nFrame = "ui/Image/MiddleMap/MapWindow.UITex", 41
 				if bOpen then
@@ -434,8 +435,39 @@ MY.BreatheCall(130, function()
 			break
 		end
 	end
-	h.tNonwarData = true
-end)
+	h.__MY_NonwarData = true
+end
+MY.BreatheCall('MY_Toolbox#NonwarData', 130, drawNonwarMap)
+end
+
+-- 【台服用】强开所有地图
+do
+local h, hList, hItem
+local function openAllMap()
+	if MY.IsShieldedVersion() then
+		return
+	end
+	h = Station.Lookup("Topmost1/WorldMap/Wnd_All", "")
+	if not h or not h:IsVisible() then
+		return
+	end
+	for _, szHandleName in ipairs({
+		'Handle_CityBtn',
+		'Handle_CopyBtn',
+	}) do
+		hList = h:Lookup(szHandleName)
+		if hList then
+			for i = 0, hList:GetItemCount() - 1 do
+				hItem = hList:Lookup(i)
+				hItem.bEnable = true
+				hItem.mapid = tostring(hItem.mapid)
+			end
+		end
+	end
+	h, hList, hItem = nil
+end
+MY.BreatheCall('MY_Toolbox#OpenAllMap', 130, openAllMap)
+end
 
 -- 大战没交
 local m_aBigWars = {14765, 14766, 14767, 14768, 14769}
