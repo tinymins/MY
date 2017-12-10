@@ -9,7 +9,7 @@
 -----------------------------------------------
 MY.CreateDataRoot(MY_DATA_PATH.GLOBAL)
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_MiddleMapMark/lang/")
-local l_szKeyword = ""
+local l_szKeyword, l_dwMapID = ""
 local SZ_DB_PATH = MY.FormatPath({"cache/npc_doodad_rec.db", MY_DATA_PATH.GLOBAL})
 local DB = SQLite3_Open(SZ_DB_PATH)
 if not DB then
@@ -251,21 +251,14 @@ end
 -- ÖÐµØÍ¼HOOK
 ---------------------------------------------------------------
 -- HOOK MAP SWITCH
-if MiddleMap._MY_MMM_ShowMap == nil then
-	MiddleMap._MY_MMM_ShowMap = MiddleMap.ShowMap or false
+if MiddleMap._MY_MMM_UpdateCurrentMap == nil then
+	MiddleMap._MY_MMM_UpdateCurrentMap = MiddleMap.UpdateCurrentMap or false
 end
-MiddleMap.ShowMap = function(...)
-	if MiddleMap._MY_MMM_ShowMap then
-		MiddleMap._MY_MMM_ShowMap(...)
+MiddleMap.UpdateCurrentMap = function(...)
+	if MiddleMap._MY_MMM_UpdateCurrentMap then
+		MiddleMap._MY_MMM_UpdateCurrentMap(...)
 	end
 	MY_MiddleMapMark.Search(l_szKeyword)
-	-- for mapid changing
-	local dwMapID = MiddleMap.dwMapID
-	MY.DelayCall(function()
-		if dwMapID ~= MiddleMap.dwMapID then
-			MY_MiddleMapMark.Search(l_szKeyword)
-		end
-	end, 200)
 end
 
 -- HOOK OnEditChanged
@@ -316,10 +309,10 @@ end
 
 local function onReload()
 	for _, szKey in ipairs({
-		'ShowMap',
 		'OnEditChanged',
 		'OnMouseEnter',
 		'OnMouseLeave',
+		'UpdateCurrentMap',
 	}) do
 		if MiddleMap['_MY_MMM_' .. szKey] then
 			MiddleMap[szKey] = MiddleMap['_MY_MMM_' .. szKey]
@@ -352,6 +345,12 @@ function MY_MiddleMapMark.Search(szKeyword)
 		return
 	end
 
+	local dwMapID = MiddleMap.dwMapID or player.GetMapID()
+	if l_dwMapID == dwMapID and l_szKeyword == szKeyword then
+		return
+	end
+	l_dwMapID, l_szKeyword = dwMapID, szKeyword
+
 	local hInner = frame:Lookup("", "Handle_Inner")
 	local nW, nH = hInner:GetSize()
 	local hMMM = hInner:Lookup("Handle_MY_MMM")
@@ -363,13 +362,7 @@ function MY_MiddleMapMark.Search(szKeyword)
 	local nCount = 0
 	local nItemCount = hMMM:GetItemCount()
 
-	if l_szKeyword == szKeyword then
-		return
-	end
-	l_szKeyword = szKeyword
-
 	local infos
-	local dwMapID = MiddleMap.dwMapID or player.GetMapID()
 	local aKeywords = {}
 	do
 		local i = 1
