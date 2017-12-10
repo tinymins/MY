@@ -6,6 +6,18 @@
 -- @Last modified by:   Zhai Yiming
 -- @Last modified time: 2017-05-27 10:59:42
 --------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local insert, remove, concat = table.insert, table.remove, table.concat
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local type, tonumber, tostring = type, tonumber, tostring
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local floor, min, max, ceil, pow, sqrt = math.floor, math.min, math.max, math.ceil, math.pow, math.sqrt
+local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Focus/lang/")
 local l_tFocusList = {}
@@ -27,6 +39,7 @@ MY_Focus.bDisplayKungfuIcon = false -- 显示心法图标
 MY_Focus.bFocusJJCParty     = false -- 焦竞技场队友
 MY_Focus.bFocusJJCEnemy     = true  -- 焦竞技场敌队
 MY_Focus.bShowTarget        = false -- 显示目标目标
+MY_Focus.bDistanceZ         = false -- 显示三维坐标距离
 MY_Focus.bTraversal         = false -- 遍历焦点列表
 MY_Focus.bHealHelper        = false -- 辅助治疗模式
 MY_Focus.bEnableSceneNavi   = false -- 场景追踪点
@@ -58,6 +71,7 @@ RegisterCustomData("MY_Focus.bDisplayKungfuIcon")
 RegisterCustomData("MY_Focus.bFocusJJCParty")
 RegisterCustomData("MY_Focus.bFocusJJCEnemy")
 RegisterCustomData("MY_Focus.bShowTarget")
+RegisterCustomData("MY_Focus.bDistanceZ")
 RegisterCustomData("MY_Focus.bTraversal")
 RegisterCustomData("MY_Focus.bHealHelper")
 RegisterCustomData("MY_Focus.bEnableSceneNavi")
@@ -145,7 +159,7 @@ function MY_Focus.SortFocus(fn)
 		p1 = MY.GetObject(p1.dwType, p1.dwID)
 		p2 = MY.GetObject(p2.dwType, p2.dwID)
 		if p1 and p2 then
-			return math.pow(p.nX - p1.nX, 2) + math.pow(p.nY - p1.nY, 2) < math.pow(p.nX - p2.nX, 2) + math.pow(p.nY - p2.nY, 2)
+			return pow(p.nX - p1.nX, 2) + pow(p.nY - p1.nY, 2) < pow(p.nX - p2.nX, 2) + pow(p.nY - p2.nY, 2)
 		end
 		return true
 	end
@@ -542,7 +556,7 @@ function MY_Focus.DrawFocus(dwType, dwID)
 	hInfoList:FormatAllItemPos()
 
 	-- 目标距离
-	local nDistance = math.floor(math.sqrt(math.pow(player.nX - obj.nX, 2) + math.pow(player.nY - obj.nY, 2) + math.pow((player.nZ - obj.nZ) / 8, 2)) * 10 / 64) / 10
+	local nDistance = floor(sqrt(pow(player.nX - obj.nX, 2) + pow(player.nY - obj.nY, 2) + (MY_Focus.bDistanceZ and pow((player.nZ - obj.nZ) / 8, 2) or 0)) * 10 / 64) / 10
 	hItem:Lookup('Handle_Compass/Compass_Distance'):SetText(nDistance)
 	hItem:Lookup('Handle_School/School_Distance'):SetText(nDistance)
 	-- 自身面向
@@ -610,12 +624,12 @@ function MY_Focus.DrawFocus(dwType, dwID)
 		local nCurrentMana, nMaxMana = info.nCurrentMana, info.nMaxMana
 		local szLife = ''
 		if nCurrentLife > 10000 then
-			szLife = szLife .. FormatString(g_tStrings.MPNEY_TENTHOUSAND, math.floor(nCurrentLife / 1000) / 10)
+			szLife = szLife .. FormatString(g_tStrings.MPNEY_TENTHOUSAND, floor(nCurrentLife / 1000) / 10)
 		else
 			szLife = szLife .. nCurrentLife
 		end
 		if nMaxLife > 0 then
-			local nPercent = math.floor(nCurrentLife / nMaxLife * 100)
+			local nPercent = floor(nCurrentLife / nMaxLife * 100)
 			if nPercent > 100 then
 				nPercent = 100
 			end
@@ -945,8 +959,8 @@ local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = MY.UI(wnd)
 	local w  = ui:width()
-	local h  = math.max(ui:height(), 440)
-	local xr, yr, wr = w - 260, 40, 260
+	local h  = max(ui:height(), 440)
+	local xr, yr, wr = w - 260, 5, 260
 	local xl, yl, wl = 5,  5, w - wr -15
 
 	-- 左侧
@@ -966,7 +980,7 @@ function PS.OnPanelActive(wnd)
 	y = y + 25
 
 	-- <hr />
-	ui:append("Image", {x = x, y = y, w = w - x, h = 1, image = 'UI/Image/UICommon/ScienceTreeNode.UITex', imageframe = 62})
+	ui:append("Image", {x = x, y = y, w = wl, h = 1, image = 'UI/Image/UICommon/ScienceTreeNode.UITex', imageframe = 62})
 	y = y + 5
 
 	ui:append("WndCheckBox", {
@@ -975,9 +989,13 @@ function PS.OnPanelActive(wnd)
 			MY_Focus.bAutoFocus = bChecked
 			MY_Focus.RescanNearby()
 		end,
+		autoenable = function() return MY_Focus.bEnable end,
 	})
 
-	local list = ui:append("WndListBox", {x = x, y = y + 30, w = wl - x + xl, h = h - y - 40}, true)
+	local list = ui:append("WndListBox", {
+		x = x, y = y + 30, w = wl - x + xl, h = h - y - 40,
+		autoenable = function() return MY_Focus.bEnable end,
+	}, true)
 	-- 初始化list控件
 	for _, v in ipairs(MY_Focus.tAutoFocus) do
 		list:listbox('insert', v, v)
@@ -1021,6 +1039,7 @@ function PS.OnPanelActive(wnd)
 				MY_Focus.RescanNearby()
 			end, function() end, function() end, nil, '')
 		end,
+		autoenable = function() return MY_Focus.bEnable end,
 	})
 	-- del
 	ui:append("WndButton", {
@@ -1037,19 +1056,21 @@ function PS.OnPanelActive(wnd)
 				end
 			end
 		end,
+		autoenable = function() return MY_Focus.bEnable end,
 	})
 
 	-- 右侧
-	local x, y = xr, yr - 20
-	local deltaX = 23
+	local x, y = xr, yr
+	local deltaY = (h - y * 2) / 19
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = wr, text = _L['hide when empty'],
 		checked = MY_Focus.bAutoHide,
 		oncheck = function(bChecked)
 			MY_Focus.bAutoHide = bChecked
 		end,
+		autoenable = function() return MY_Focus.bEnable end,
 	})
-	y = y + deltaX
+	y = y + deltaY
 
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = wr, text = _L['auto focus very important npc'],
@@ -1060,8 +1081,9 @@ function PS.OnPanelActive(wnd)
 			MY_Focus.bFocusBoss = bChecked
 			MY_Focus.RescanNearby()
 		end,
+		autoenable = function() return MY_Focus.bEnable end,
 	})
-	y = y + deltaX
+	y = y + deltaY
 
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = wr, text = _L['auto focus friend'],
@@ -1070,13 +1092,15 @@ function PS.OnPanelActive(wnd)
 			MY_Focus.bFocusFriend = bChecked
 			MY_Focus.RescanNearby()
 		end,
+		autoenable = function() return MY_Focus.bEnable end,
 	})
-	y = y + deltaX
+	y = y + deltaY
 
 	ui:append("Image", {
 		x = x + 5, y = y - 3, w = 10, h = 8,
 		image = "ui/Image/UICommon/ScienceTree.UITex",
 		imageframe = 10,
+		autoenable = function() return MY_Focus.bEnable end,
 	})
 
 	ui:append("WndCheckBox", {
@@ -1086,28 +1110,32 @@ function PS.OnPanelActive(wnd)
 			MY_Focus.bFocusTong = bChecked
 			MY_Focus.RescanNearby()
 		end,
+		autoenable = function() return MY_Focus.bEnable end,
 	})
-	y = y + deltaX
+	y = y + deltaY
 
 	ui:append("Image", {
 		x = x + 5, y = y, w = 10, h = 10,
 		image = "ui/Image/UICommon/ScienceTree.UITex",
 		imageframe = 10,
+		autoenable = function() return MY_Focus.bEnable end,
 	})
 	ui:append("Image", {
 		x = x + 10, y = y + 5, w = 10, h = 10,
 		image = "ui/Image/UICommon/ScienceTree.UITex",
 		imageframe = 8,
+		autoenable = function() return MY_Focus.bEnable end,
 	})
 	ui:append("WndCheckBox", {
 		x = x + 20, y = y, w = wr, text = _L['auto focus only in public map'],
 		checked = MY_Focus.bOnlyPublicMap,
-	  	oncheck = function(bChecked)
+		oncheck = function(bChecked)
 			MY_Focus.bOnlyPublicMap = bChecked
 			MY_Focus.RescanNearby()
 		end,
+		autoenable = function() return MY_Focus.bEnable end,
 	})
-	y = y + deltaX
+	y = y + deltaY
 
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = wr, text = _L['auto focus enemy'],
@@ -1116,8 +1144,9 @@ function PS.OnPanelActive(wnd)
 			MY_Focus.bFocusEnemy = bChecked
 			MY_Focus.RescanNearby()
 		end,
+		autoenable = function() return MY_Focus.bEnable end,
 	})
-	y = y + deltaX
+	y = y + deltaY
 
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = wr, text = _L['jjc auto focus party'],
@@ -1126,8 +1155,9 @@ function PS.OnPanelActive(wnd)
 			MY_Focus.bFocusJJCParty = bChecked
 			MY_Focus.RescanNearby()
 		end,
+		autoenable = function() return MY_Focus.bEnable end,
 	})
-	y = y + deltaX
+	y = y + deltaY
 
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = wr, text = _L['jjc auto focus enemy'],
@@ -1136,8 +1166,9 @@ function PS.OnPanelActive(wnd)
 			MY_Focus.bFocusJJCEnemy = bChecked
 			MY_Focus.RescanNearby()
 		end,
+		autoenable = function() return MY_Focus.bEnable end,
 	})
-	y = y + deltaX
+	y = y + deltaY
 
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = wr, text = _L['show focus\'s target'],
@@ -1146,8 +1177,19 @@ function PS.OnPanelActive(wnd)
 			MY_Focus.bShowTarget = bChecked
 			MY_Focus.RescanNearby()
 		end,
+		autoenable = function() return MY_Focus.bEnable end,
 	})
-	y = y + deltaX
+	y = y + deltaY
+
+	ui:append("WndCheckBox", {
+		x = x, y = y, w = wr, text = _L['show 3d distance'],
+		checked = MY_Focus.bDistanceZ,
+		oncheck = function(bChecked)
+			MY_Focus.bDistanceZ = bChecked
+		end,
+		autoenable = function() return MY_Focus.bEnable end,
+	})
+	y = y + deltaY
 
 	ui:append("WndCheckBox", {
 		x = x, y = y,w = wr, text = _L['traversal object'],
@@ -1157,8 +1199,9 @@ function PS.OnPanelActive(wnd)
 		oncheck = function(bChecked)
 			MY_Focus.bTraversal = bChecked
 		end,
+		autoenable = function() return MY_Focus.bEnable end,
 	})
-	y = y + deltaX
+	y = y + deltaY
 
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = wr, text = _L['hide dead object'],
@@ -1167,8 +1210,9 @@ function PS.OnPanelActive(wnd)
 			MY_Focus.bHideDeath = bChecked
 			MY_Focus.RescanNearby()
 		end,
+		autoenable = function() return MY_Focus.bEnable end,
 	})
-	y = y + deltaX
+	y = y + deltaY
 
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = wr, text = _L['display kungfu icon instead of location'],
@@ -1176,8 +1220,9 @@ function PS.OnPanelActive(wnd)
 		oncheck = function(bChecked)
 			MY_Focus.bDisplayKungfuIcon = bChecked
 		end,
+		autoenable = function() return MY_Focus.bEnable end,
 	})
-	y = y + deltaX
+	y = y + deltaY
 
 	ui:append('WndCheckBox', {
 		name = 'WndCheckBox_SortByDistance',
@@ -1187,9 +1232,10 @@ function PS.OnPanelActive(wnd)
 		oncheck = function(bChecked)
 			MY_Focus.bSortByDistance = bChecked
 			MY_Focus.RedrawList()
-		end
+		end,
+		autoenable = function() return MY_Focus.bEnable end,
 	})
-	y = y + deltaX
+	y = y + deltaY
 
 	ui:append('WndCheckBox', {
 		name = 'WndCheckBox_EnableSceneNavi',
@@ -1199,9 +1245,10 @@ function PS.OnPanelActive(wnd)
 		oncheck = function(bChecked)
 			MY_Focus.bEnableSceneNavi = bChecked
 			MY_Focus.RescanNearby()
-		end
+		end,
+		autoenable = function() return MY_Focus.bEnable end,
 	})
-	y = y + deltaX
+	y = y + deltaY
 
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = wr, text = _L['heal healper'],
@@ -1211,30 +1258,23 @@ function PS.OnPanelActive(wnd)
 		oncheck = function(bChecked)
 			MY_Focus.bHealHelper = bChecked
 		end,
+		autoenable = function() return MY_Focus.bEnable end,
 	})
-	y = y + deltaX
+	y = y + deltaY
 
-	ui:append("WndComboBox", {
+	ui:append("WndSliderBox", {
 		x = x, y = y, w = 150,
-		text = _L['max display length'],
-		menu = function()
-			local t = {}
-			for i = 1, 15 do
-				table.insert(t, {
-					szOption = i,
-					bMCheck = true,
-					bChecked = MY_Focus.nMaxDisplay == i,
-					fnAction = function()
-						Wnd.CloseWindow('PopupMenuPanel')
-						MY_Focus.nMaxDisplay = i
-						MY_Focus.RedrawList()
-					end,
-				})
-			end
-			return t
+		textfmt = function(val) return _L("max display count %d.", val) end,
+		range = {1, 20},
+		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		value = MY_Focus.nMaxDisplay,
+		onchange = function(raw, val)
+			MY_Focus.nMaxDisplay = val
+			MY_Focus.RedrawList()
 		end,
+		autoenable = function() return MY_Focus.bEnable end,
 	})
-	y = y + deltaX
+	y = y + deltaY
 
 	ui:append("WndSliderBox", {
 		x = x, y = y, w = 150,
@@ -1245,8 +1285,9 @@ function PS.OnPanelActive(wnd)
 		onchange = function(raw, val)
 			MY_Focus.SetScale(val / 100, MY_Focus.fScaleY)
 		end,
+		autoenable = function() return MY_Focus.bEnable end,
 	})
-	y = y + deltaX
+	y = y + deltaY
 
 	ui:append("WndSliderBox", {
 		x = x, y = y, w = 150,
@@ -1257,7 +1298,8 @@ function PS.OnPanelActive(wnd)
 		onchange = function(raw, val)
 			MY_Focus.SetScale(MY_Focus.fScaleX, val / 100)
 		end,
+		autoenable = function() return MY_Focus.bEnable end,
 	})
-	y = y + deltaX
+	y = y + deltaY
 end
 MY.RegisterPanel("MY_Focus", _L["focus list"], _L['Target'], "ui/Image/button/SystemButton_1.UITex|9", {255,255,0,200}, PS)
