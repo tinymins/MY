@@ -785,11 +785,7 @@ local function UpdateConfigCalcProps(config)
 			end
 		end
 	end
-	for k, v in pairs(ConfigTemplate) do
-		if type(v) ~= type(config[k]) then
-			config[k] = clone(v)
-		end
-	end
+	MY.FormatDataStructure(config, ConfigTemplate, true)
 end
 
 local function UpdateConfigDataVersion(config)
@@ -799,7 +795,9 @@ local function UpdateConfigDataVersion(config)
 			mon.id  , mon.buffid   = mon.id   or mon.buffid       , nil
 			mon.ids , mon.buffids  = mon.ids  or mon.buffids or {}, nil
 			for dwID, dwIconID in pairs(mon.ids) do
-				mon.ids[dwID] = { framecount = 0, iconid = dwIconID }
+				if type(dwIconID) == 'number' then
+					mon.ids[dwID] = { framecount = 0, iconid = dwIconID }
+				end
 			end
 		end
 	end
@@ -1216,7 +1214,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig, Add)
 			config.showName = bCheck
 			RecreatePanel(config)
 		end,
-		autoenable = function() return config.enable and config.cdBar end,
+		autoenable = function() return config.enable end,
 	})
 
 	ui:append("WndSliderBox", {
@@ -1480,7 +1478,7 @@ function PS.OnPanelActive(wnd)
 								else
 									dwIconID = Table_GetBuffIconID(nVal, 1) or 13
 								end
-								mon.ids[nVal] = dwIconID
+								mon.ids[nVal] = { iconid = dwIconID }
 								RecreatePanel(l_config)
 							end
 						end, function() end, function() end, nil, nil)
@@ -1511,7 +1509,7 @@ function PS.OnPanelActive(wnd)
 			if not empty(mon.ids) then
 				table.insert(t1, { bDevide = true })
 				local function InsertMenuID(dwID, dwIcon)
-					table.insert(t1, {
+					local t2 = {
 						szOption = dwID == "common" and _L['All ids'] or dwID,
 						bCheck = true, bMCheck = true,
 						bChecked = dwID == mon.id or (dwID == "common" and mon.id == nil),
@@ -1527,27 +1525,36 @@ function PS.OnPanelActive(wnd)
 						szLayer = "ICON_RIGHTMOST",
 						fnClickIcon = function()
 							XGUI.OpenIconPanel(function(dwIcon)
-								mon.ids[dwID] = dwIcon
-								if mon.id == dwID then
+								if dwID == "common" then
 									mon.iconid = dwIcon
+								else
+									if mon.id == dwID then
+										mon.iconid = dwIcon
+									end
+									mon.ids[dwID].iconid = dwIcon
+								end
+								if mon.id == dwID then
 									RecreatePanel(l_config)
 								end
 							end)
 							Wnd.CloseWindow("PopupMenuPanel")
 						end,
-						{
+					}
+					if dwID ~= 'common' then
+						table.insert(t2, {
 							szOption = _L['Delete'],
 							fnAction = function()
 								mon.ids[dwID] = nil
 								RecreatePanel(l_config)
 							end,
-						}
-					})
+						})
+					end
+					table.insert(t1, t2)
 				end
 				InsertMenuID('common', mon.ids.common or mon.iconid or 13)
-				for dwID, dwIcon in pairs(mon.ids) do
+				for dwID, info in pairs(mon.ids) do
 					if dwID ~= "common" then
-						InsertMenuID(dwID, dwIcon)
+						InsertMenuID(dwID, info.iconid)
 					end
 				end
 			end
@@ -1611,7 +1618,7 @@ function PS.OnPanelActive(wnd)
 		w = 60, h = 30,
 		text = _L["Create"],
 		onclick = function()
-			local config = clone(ConfigTemplate)
+			local config = MY.FormatDataStructure(nil, ConfigTemplate)
 			table.insert(Config, config)
 			RecreatePanel(config)
 			MY.SwitchTab("MY_TargetMon", true)
@@ -1641,6 +1648,7 @@ function PS.OnPanelActive(wnd)
 				UpdateConfigDataVersion(config)
 				for i, cfg in ipairs_r(Config) do
 					if cfg.caption == config.caption then
+						ClosePanel(cfg)
 						table.remove(Config, i)
 						replaceCount = replaceCount + 1
 					end
