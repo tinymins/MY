@@ -168,7 +168,7 @@ MY_Recount.Data.nMinFightTime = 30
 local _Cache = {}
 local Data          -- 当前战斗数据记录
 local History = {}  -- 历史战斗记录
-local SZ_REC_FILE = '$uid@$lang/cache/fight_recount_log.db'
+local SZ_REC_FILE = '$uid@$lang/cache/fight_recount_log.jx3dat'
 
 -- ##################################################################################################
 --             #                 #         #             #         #                 # # # # # # #
@@ -186,21 +186,23 @@ local SZ_REC_FILE = '$uid@$lang/cache/fight_recount_log.db'
 -- ##################################################################################################
 -- 登陆游戏加载保存的数据
 function MY_Recount.Data.LoadData()
-	local DB = UnQLite_Open(MY.FormatPath(SZ_REC_FILE))
-	History                       = DB:Get("History")       or {}
-	MY_Recount.Data.nMaxHistory   = DB:Get("nMaxHistory")   or 10
-	MY_Recount.Data.nMinFightTime = DB:Get("nMinFightTime") or 30
-	DB:Release()
+	local data = MY.LoadLUAData(SZ_REC_FILE)
+	if data then
+		History                       = data.History       or {}
+		MY_Recount.Data.nMaxHistory   = data.nMaxHistory   or 10
+		MY_Recount.Data.nMinFightTime = data.nMinFightTime or 30
+	end
 	MY_Recount.Data.Init()
 end
 
 -- 退出游戏保存数据
 function MY_Recount.Data.SaveData()
-	local DB = UnQLite_Open(MY.FormatPath(SZ_REC_FILE))
-	DB:Set("History"      , History                      )
-	DB:Set("nMaxHistory"  , MY_Recount.Data.nMaxHistory  )
-	DB:Set("nMinFightTime", MY_Recount.Data.nMinFightTime)
-	DB:Release()
+	local data = {
+		History = History,
+		nMaxHistory = MY_Recount.Data.nMaxHistory,
+		nMinFightTime = MY_Recount.Data.nMinFightTime,
+	}
+	local data = MY.SaveLUAData(SZ_REC_FILE, data)
 end
 
 -- 过图清除当前战斗数据
@@ -349,7 +351,7 @@ function MY_Recount.Data.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffect
 	end
 	dwCaster = hCaster.dwID
 	dwTarget = hTarget.dwID
-	
+
 	-- 获取效果名称
 	local szEffectName
 	if nEffectType == SKILL_EFFECT_TYPE.SKILL then
@@ -360,7 +362,7 @@ function MY_Recount.Data.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffect
 	if not szEffectName then
 		return
 	end
-	
+
 	-- 过滤掉无伤害无治疗的命中效果记录
 	if nSkillResult == SKILL_RESULT.HIT or nSkillResult == SKILL_RESULT.CRITICAL then
 		local bRec
@@ -374,7 +376,7 @@ function MY_Recount.Data.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffect
 			return
 		end
 	end
-	
+
 	-- 过滤掉不是队友的以及不是BOSS的
 	local me = GetClientPlayer()
 	if dwCaster ~= me.dwID                 -- 释放者不是自己
@@ -387,14 +389,14 @@ function MY_Recount.Data.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffect
 	then -- 则忽视
 		return
 	end
-	
+
 	-- 未进战则初始化统计数据（即默认当前帧所有的技能日志为进战技能）
 	if not MY.Player.GetFightUUID() and
 	_Cache.nLastAutoInitFrame ~= GetLogicFrameCount() then
 		_Cache.nLastAutoInitFrame = GetLogicFrameCount()
 		MY_Recount.Data.Init(true)
 	end
-	
+
 	local nTherapy = tResult[SKILL_RESULT_TYPE.THERAPY] or 0
 	local nEffectTherapy = tResult[SKILL_RESULT_TYPE.EFFECTIVE_THERAPY] or 0
 	local nDamage = (tResult[SKILL_RESULT_TYPE.PHYSICS_DAMAGE      ] or 0) + -- 外功伤害
@@ -423,7 +425,7 @@ function MY_Recount.Data.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffect
 	nSkillResult == SKILL_RESULT.DODGE      then  -- 闪避
 		MY_Recount.Data.AddDamageRecord(hCaster, hTarget, szEffectName, 0, 0, nSkillResult)
 	end
-	
+
 	Data.nTimeDuring = GetCurrentTime() - Data.nTimeBegin
 end
 
@@ -434,7 +436,7 @@ function MY_Recount.Data.GetNameAusID(id, data)
 	if not data then
 		data = DataDisplay
 	end
-	
+
 	local dwID = tonumber(id)
 	local szName
 	if dwID then
@@ -442,7 +444,7 @@ function MY_Recount.Data.GetNameAusID(id, data)
 	else
 		szName = id
 	end
-	
+
 	if not szName then
 		szName = ''
 	end
@@ -508,7 +510,7 @@ function _Cache.AddRecord(data, szRecordType, idRecord, idTarget, szEffectName, 
 	tResult.nTotalEffect = tResult.nTotalEffect + nEffectValue               -- 所有命中总有效伤害
 	tResult.nAvg         = math.floor(tResult.nTotal / tResult.nCount)       -- 单次命中平均值
 	tResult.nAvgEffect   = math.floor(tResult.nTotalEffect / tResult.nCount) -- 单次命中平均有效值
-	
+
 	------------------------
 	-- # 节： tRecord.Skill
 	------------------------
@@ -532,7 +534,7 @@ function _Cache.AddRecord(data, szRecordType, idRecord, idTarget, szEffectName, 
 	tSkillRecord.nTotalEffect        = tSkillRecord.nTotalEffect + nEffectValue
 	tSkillRecord.nAvg                = math.floor(tSkillRecord.nTotal / tSkillRecord.nCount)
 	tSkillRecord.nAvgEffect          = math.floor(tSkillRecord.nTotalEffect / tSkillRecord.nCount)
-	
+
 	---------------------------------
 	-- # 节： tRecord.Skill[x].Detail
 	---------------------------------
@@ -560,7 +562,7 @@ function _Cache.AddRecord(data, szRecordType, idRecord, idTarget, szEffectName, 
 	tResult.nTotalEffect = tResult.nTotalEffect + nEffectValue          -- 所有命中总有效伤害
 	tResult.nAvg         = math.floor(tResult.nTotal / tResult.nCount)
 	tResult.nAvgEffect   = math.floor(tResult.nTotalEffect / tResult.nCount)
-	
+
 	------------------------------
 	-- # 节： tRecord.Skill.Target
 	------------------------------
@@ -584,7 +586,7 @@ function _Cache.AddRecord(data, szRecordType, idRecord, idTarget, szEffectName, 
 	tSkillTargetData.nTotal              = tSkillTargetData.nTotal + nValue
 	tSkillTargetData.nTotalEffect        = tSkillTargetData.nTotalEffect + nEffectValue
 	tSkillTargetData.Count[nSkillResult] = (tSkillTargetData.Count[nSkillResult] or 0) + 1
-	
+
 	------------------------
 	-- # 节： tRecord.Target
 	------------------------
@@ -608,7 +610,7 @@ function _Cache.AddRecord(data, szRecordType, idRecord, idTarget, szEffectName, 
 	tTargetRecord.nTotalEffect        = tTargetRecord.nTotalEffect + nEffectValue
 	tTargetRecord.nAvg                = math.floor(tTargetRecord.nTotal / tTargetRecord.nCount)
 	tTargetRecord.nAvgEffect          = math.floor(tTargetRecord.nTotalEffect / tTargetRecord.nCount)
-	
+
 	----------------------------------
 	-- # 节： tRecord.Target[x].Detail
 	----------------------------------
@@ -636,7 +638,7 @@ function _Cache.AddRecord(data, szRecordType, idRecord, idTarget, szEffectName, 
 	tResult.nTotalEffect = tResult.nTotalEffect + nEffectValue          -- 所有命中总有效伤害
 	tResult.nAvg         = math.floor(tResult.nTotal / tResult.nCount)
 	tResult.nAvgEffect   = math.floor(tResult.nTotalEffect / tResult.nCount)
-	
+
 	---------------------------------
 	-- # 节： tRecord.Target[x].Skill
 	---------------------------------
@@ -667,7 +669,7 @@ function MY_Recount.Data.AddDamageRecord(hCaster, hTarget, szEffectName, nDamage
 	-- 获取索引ID
 	local idCaster = (IsPlayer(hCaster.dwID) and hCaster.dwID) or MY.GetObjectName(hCaster) or g_tStrings.STR_NAME_UNKNOWN
 	local idTarget = (IsPlayer(hTarget.dwID) and hTarget.dwID) or MY.GetObjectName(hTarget) or g_tStrings.STR_NAME_UNKNOWN
-	
+
 	-- 添加伤害记录
 	_Cache.InitObjectData(Data, hCaster, 'Damage')
 	_Cache.AddRecord(Data, 'Damage'  , idCaster, idTarget, szEffectName, nDamage, nEffectDamage, nSkillResult)
@@ -681,7 +683,7 @@ function MY_Recount.Data.AddHealRecord(hCaster, hTarget, szEffectName, nHeal, nE
 	-- 获取索引ID
 	local idCaster = (IsPlayer(hCaster.dwID) and hCaster.dwID) or MY.GetObjectName(hCaster) or g_tStrings.STR_NAME_UNKNOWN
 	local idTarget = (IsPlayer(hTarget.dwID) and hTarget.dwID) or MY.GetObjectName(hTarget) or g_tStrings.STR_NAME_UNKNOWN
-	
+
 	-- 添加伤害记录
 	_Cache.InitObjectData(Data, hCaster, 'Heal')
 	_Cache.AddRecord(Data, 'Heal'    , idCaster, idTarget, szEffectName, nHeal, nEffectHeal, nSkillResult)
@@ -697,7 +699,7 @@ function _Cache.InitObjectData(data, obj, szChannel)
 		data.Namelist[id]  = MY.Game.GetObjectName(obj) -- 名称缓存
 		data.Forcelist[id] = obj.dwForceID or 0         -- 势力缓存
 	end
-	
+
 	if not data[szChannel][id] then
 		data[szChannel][id] = {
 			szMD5        = obj.dwID, -- 唯一标识
@@ -735,7 +737,7 @@ function MY_Recount.Data.Init(bForceInit)
 			},
 		}
 	end
-	
+
 	if not Data.UUID and MY.Player.GetFightUUID() then
 		Data.UUID       = MY.Player.GetFightUUID()
 		Data.nTimeBegin = GetCurrentTime()
@@ -747,7 +749,7 @@ function MY_Recount.Data.Push()
 	if not (Data and Data.UUID) then
 		return
 	end
-	
+
 	-- 过滤空记录
 	if empty(Data.BeDamage)
 	and empty(Data.Damage)
@@ -755,7 +757,7 @@ function MY_Recount.Data.Push()
 	and empty(Data.BeHeal) then
 		return
 	end
-	
+
 	-- 计算受伤最多的名字作为战斗名称
 	local nMaxValue, szBossName = 0, nil
 	local nEnemyMaxValue, szEnemyBossName = 0, nil
@@ -783,14 +785,14 @@ function MY_Recount.Data.Push()
 		end
 	end
 	Data.szBossName = szEnemyBossName or szBossName or ''
-	
+
 	if Data.nTimeDuring > MY_Recount.Data.nMinFightTime then
 		table.insert(History, 1, Data)
 		while #History > MY_Recount.Data.nMaxHistory do
 			table.remove(History)
 		end
 	end
-	
+
 	MY_Recount.Data.Init(true)
 end
 
@@ -862,7 +864,7 @@ end)
 --         local nEffectType     = arg7
 --         local nResultCount    = 1
 --         local tResult         = { [nType] = nValue }
-		
+
 --         if nType == SKILL_RESULT_TYPE.PHYSICS_DAMAGE -- 外功伤害
 --         or nType == SKILL_RESULT_TYPE.SOLAR_MAGIC_DAMAGE -- 阳性内功伤害
 --         or nType == SKILL_RESULT_TYPE.NEUTRAL_MAGIC_DAMAGE -- 中性内功伤害
