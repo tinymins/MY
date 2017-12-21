@@ -183,55 +183,26 @@ end
 
 _C.AutoSwitchSysHeadTop = function()
     if _C.IsEnabled() then
-        _C.PushSysHeadTop()
-        _C.AutoHideSysHeadTop()
+        _C.SaveSysHeadTop()
+        _C.HideSysHeadTop()
     else
         _C.ResumeSysHeadTop()
     end
 end
-_C.AutoHideSysHeadTop = function()
-    if GetConfig("ShowName", "Party", "Npc") or GetConfig("ShowName", "Neutrality", "Npc")
-    or GetConfig("ShowName", "Ally", "Npc")  or GetConfig("ShowName", "Enemy", "Npc") then
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC, GLOBAL_HEAD_NAME , false)
-    end
-    if GetConfig("ShowTitle", "Party", "Npc") or GetConfig("ShowTitle", "Neutrality", "Npc")
-    or GetConfig("ShowTitle", "Ally", "Npc") or GetConfig("ShowTitle", "Enemy", "Npc") then
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC, GLOBAL_HEAD_TITLE, false)
-    end
-    if GetConfig("ShowLife", "Party", "Npc") or GetConfig("ShowLife", "Neutrality", "Npc")
-    or GetConfig("ShowLife", "Ally", "Npc") or GetConfig("ShowLife", "Enemy", "Npc") then
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC, GLOBAL_HEAD_LIFE , false)
-    end
-    if GetConfig("ShowName", "Party", "Player") or GetConfig("ShowName", "Neutrality", "Player")
-    or GetConfig("ShowName", "Ally", "Player") or GetConfig("ShowName", "Enemy", "Player") then
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER, GLOBAL_HEAD_NAME , false)
-    end
-    if GetConfig("ShowTitle", "Party", "Player") or GetConfig("ShowTitle", "Neutrality", "Player")
-    or GetConfig("ShowTitle", "Ally", "Player") or GetConfig("ShowTitle", "Enemy", "Player") then
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER, GLOBAL_HEAD_TITLE, false)
-    end
-    if GetConfig("ShowLife", "Party", "Player") or GetConfig("ShowLife", "Neutrality", "Player")
-    or GetConfig("ShowLife", "Ally", "Player") or GetConfig("ShowLife", "Enemy", "Player") then
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER, GLOBAL_HEAD_LIFE , false)
-    end
-    if GetConfig("ShowTong", "Party", "Player") or GetConfig("ShowTong", "Neutrality", "Player")
-    or GetConfig("ShowTong", "Ally", "Player") or GetConfig("ShowTong", "Enemy", "Player") then
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER, GLOBAL_HEAD_GUILD, false)
-    end
-    if GetConfig("ShowName", "Self", "Player") then
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_NAME , false)
-    end
-    if GetConfig("ShowTitle", "Self", "Player") then
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_TITLE, false)
-    end
-    if GetConfig("ShowLife", "Self", "Player") then
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_LIFE , false)
-    end
-    if GetConfig("ShowTong", "Self", "Player") then
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_GUILD, false)
-    end
+_C.HideSysHeadTop = function()
+    SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC, GLOBAL_HEAD_NAME , false)
+    SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC, GLOBAL_HEAD_TITLE, false)
+    SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC, GLOBAL_HEAD_LIFE , false)
+    SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER, GLOBAL_HEAD_NAME , false)
+    SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER, GLOBAL_HEAD_TITLE, false)
+    SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER, GLOBAL_HEAD_LIFE , false)
+    SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER, GLOBAL_HEAD_GUILD, false)
+    SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_NAME , false)
+    SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_TITLE, false)
+    SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_LIFE , false)
+    SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_GUILD, false)
 end
-_C.PushSysHeadTop = function()
+_C.SaveSysHeadTop = function()
     if not _C.tSysHeadTop then
         _C.tSysHeadTop = {
             ['GLOBAL_HEAD_NPC_NAME'          ] = GetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_NAME ),
