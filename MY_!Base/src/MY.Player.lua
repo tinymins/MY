@@ -891,6 +891,14 @@ function MY.Player.IsInDungeon(bType)
 end
 MY.IsInDungeon = MY.Player.IsInDungeon
 
+-- 判断当前地图是不是PUBG
+-- (bool) MY.Player.IsInPubg()
+function MY.Player.IsInPubg()
+	local me = GetClientPlayer()
+	return me and me.GetMapID() == 296
+end
+MY.IsInPubg = MY.Player.IsInPubg
+
 do local MARK_NAME = { _L["Cloud"], _L["Sword"], _L["Ax"], _L["Hook"], _L["Drum"], _L["Shear"], _L["Stick"], _L["Jade"], _L["Dart"], _L["Fan"] }
 -- 保存当前团队信息
 -- (table) MY.GetTeamInfo([table tTeamInfo])

@@ -747,6 +747,9 @@ end
 -- ########################################################################## --
 -- ÷‹∆⁄÷ÿªÊ
 function MY_Focus.OnFrameBreathe()
+	if MY.IsInPubg() then
+		return
+	end
 	if l_dwLockType and l_dwLockID and l_lockInDisplay then
 		local dwType, dwID = MY.GetTarget()
 		if dwType ~= l_dwLockType or dwID ~= l_dwLockID then
@@ -976,6 +979,12 @@ function PS.OnPanelActive(wnd)
 				MY_Focus.Close()
 			end
 		end,
+		tip = function()
+			if MY.IsInPubg() then
+				return _L['Can not use in pubg map!']
+			end
+		end,
+		autoenable = function() return not MY.IsInPubg() end,
 	})
 	y = y + 25
 
