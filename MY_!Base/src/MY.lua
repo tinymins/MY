@@ -288,15 +288,6 @@ function MY.OpenPanel(bMute, bNoFocus, bNoAnimate)
 		frame:Lookup("Wnd_Total", "Handle_DBClick").OnItemLButtonDBClick = function()
 			frame:Lookup('CheckBox_Maximize'):ToggleCheck()
 		end
-		-- load bg uitex
-		for k, v in pairs({
-			['Image_BgLT'] = 9,
-			['Image_BgCT'] = 8,
-			['Image_BgRT'] = 7,
-			['Image_BgT' ] = 6,
-		}) do
-			frame:Lookup('', k):FromUITex(_UITEX_COMMON_, v)
-		end
 		MY.UI(frame):size(_MY.OnSizeChanged)
 		-- bind close button event
 		MY.UI(frame):children("#Btn_Close"):click(function() MY.ClosePanel() end)
@@ -1121,15 +1112,15 @@ function _MY.OnSizeChanged()
 
 	local handle = frame:Lookup('', '')
 	handle:SetSize(nWidth, nHeight)
-	handle:Lookup('Image_BgT' ):SetSize(nWidth, 64)
-	handle:Lookup('Image_BgCT'):SetSize(nWidth - 32, 64)
-	handle:Lookup('Image_BgLC'):SetSize(8, nHeight - 149)
+	handle:Lookup('Image_BgTL_Flex'):SetW((nWidth - 675) / 2)
+	handle:Lookup('Image_BgTR_Flex'):SetW((nWidth - 675) / 2)
+	handle:Lookup('Image_BgCL'):SetH(nHeight - 149)
 	handle:Lookup('Image_BgCC'):SetSize(nWidth - 16, nHeight - 149)
-	handle:Lookup('Image_BgRC'):SetSize(8, nHeight - 149)
-	handle:Lookup('Image_BgCB'):SetSize(nWidth - 132, 85)
-	handle:Lookup('Text_Title'):SetSize(nWidth - 90, 30)
-	handle:Lookup('Text_Author'):SetRelPos(0, nHeight - 41)
-	handle:Lookup('Text_Author'):SetSize(nWidth - 31, 20)
+	handle:Lookup('Image_BgCR'):SetH(nHeight - 149)
+	handle:Lookup('Image_BgBC'):SetW(nWidth - 132)
+	handle:Lookup('Text_Title'):SetW(nWidth - 90)
+	handle:Lookup('Text_Author'):SetW(nWidth - 31)
+	handle:Lookup('Text_Author'):SetRelY(nHeight - 41)
 
 	local wnd = frame:Lookup('Wnd_Total')
 	wnd:SetSize(nWidth, nHeight)
