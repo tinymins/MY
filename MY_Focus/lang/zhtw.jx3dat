@@ -34,4 +34,5 @@ data = {
 
     ['lock focus'] = '鎖定目標',
     ['unlock focus'] = '取消鎖定目標',
+    ['Can not use in pubg map!'] = '瀚海狂沙中，禁止使用。',
 }
