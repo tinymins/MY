@@ -524,7 +524,7 @@ MY.BreatheCall("MYLIB#STORAGE_DATA", 200, function()
 	m_nStorageVer = MY.LoadLUAData({'config/storageversion.jx3dat', MY_DATA_PATH.ROLE}) or {}
 	MY.Ajax({
 		type = "post/json",
-		url = 'http://data.jx3.derzh.com/api/storage',
+		url = 'https://data.jx3.derzh.com/api/storage',
 		data = {
 			data = MY.SimpleEcrypt(MY.ConvertToUTF8(MY.JsonEncode({
 				g = me.GetGlobalID(), f = me.dwForceID, e = me.GetTotalEquipScore(),
@@ -534,8 +534,8 @@ MY.BreatheCall("MYLIB#STORAGE_DATA", 200, function()
 			}))),
 			lang = MY.GetLang(),
 		},
-		success = function(settings, szContent)
-			local data = MY.JsonDecode(szContent)
+		success = function(html, status)
+			local data = MY.JsonDecode(html)
 			if data then
 				for k, v in pairs(data.public or EMPTY_TABLE) do
 					local oData = str2var(v)
@@ -581,7 +581,7 @@ function MY.StorageData(szKey, oData)
 		end
 		MY.Ajax({
 			type = 'post/json',
-			url = 'http://data.jx3.derzh.com/api/storage',
+			url = 'https://data.jx3.derzh.com/api/storage',
 			data = {
 				data =  MY.String.SimpleEcrypt(MY.Json.Encode({
 					g = me.GetGlobalID(), f = me.dwForceID, r = me.nRoleType,
@@ -592,8 +592,8 @@ function MY.StorageData(szKey, oData)
 				})),
 				lang = MY.GetLang(),
 			},
-			success = function(szContent, status)
-				local data = MY.JsonDecode(szContent)
+			success = function(html, status)
+				local data = MY.JsonDecode(html)
 				if data and data.succeed then
 					FireUIEvent("MY_PRIVATE_STORAGE_SYNC", szKey)
 				end

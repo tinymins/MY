@@ -7,8 +7,8 @@
 -- @Last modified time: 2016-12-13 14:49:52
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Toolbox/lang/")
-local QUERY_URL = "https://jx3.derzh.com/api/exam?l=%s&q=%s"
-local SUBMIT_URL = "https://jx3.derzh.com/api/exam"
+local QUERY_URL = "https://data.jx3.derzh.com/api/exam?l=%s&q=%s"
+local SUBMIT_URL = "https://data.jx3.derzh.com/api/exam"
 local l_tLocal -- 本地题库
 local l_tCached = {} -- 玩家答题缓存
 local l_tAccept = {} -- 从服务器获取到的数据缓存
@@ -66,8 +66,8 @@ local function QueryData(szQues)
 	MY.Ajax({
 		type = 'get',
 		url = QUERY_URL:format(szLang, MY.UrlEncode(szQues)),
-		success = function(szContent, status)
-			local res = MY.JsonDecode(szContent)
+		success = function(html, status)
+			local res = MY.JsonDecode(html)
 			if not res or not IsCurrentQuestion(res.ques) then
 				return
 			end
