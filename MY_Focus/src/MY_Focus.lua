@@ -82,6 +82,9 @@ RegisterCustomData("MY_Focus.anchor")
 RegisterCustomData("MY_Focus.fScaleX")
 RegisterCustomData("MY_Focus.fScaleY")
 
+local function IsShielded() return MY.IsShieldedVersion() and MY.IsInPubg() end
+local function IsEnabled() return MY_Focus.bEnable and not IsShielded() end
+
 function MY_Focus.Open()
 	Wnd.OpenWindow(INI_PATH, 'MY_Focus')
 end
@@ -299,7 +302,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		end
 
 		-- 判断竞技场
-		if MY.IsInArena() then
+		if MY.IsInArena() or MY.IsInPubg() then
 			if dwType == TARGET.PLAYER then
 				if MY_Focus.bFocusJJCEnemy and MY_Focus.bFocusJJCParty then
 					bFocus = true
@@ -556,7 +559,10 @@ function MY_Focus.DrawFocus(dwType, dwID)
 	hInfoList:FormatAllItemPos()
 
 	-- 目标距离
-	local nDistance = floor(sqrt(pow(player.nX - obj.nX, 2) + pow(player.nY - obj.nY, 2) + (MY_Focus.bDistanceZ and pow((player.nZ - obj.nZ) / 8, 2) or 0)) * 10 / 64) / 10
+	local nDistance = 0
+	if player then
+		nDistance = floor(sqrt(pow(player.nX - obj.nX, 2) + pow(player.nY - obj.nY, 2) + (MY_Focus.bDistanceZ and pow((player.nZ - obj.nZ) / 8, 2) or 0)) * 10 / 64) / 10
+	end
 	hItem:Lookup('Handle_Compass/Compass_Distance'):SetText(nDistance)
 	hItem:Lookup('Handle_School/School_Distance'):SetText(nDistance)
 	-- 自身面向
@@ -747,7 +753,7 @@ end
 -- ########################################################################## --
 -- 周期重绘
 function MY_Focus.OnFrameBreathe()
-	if MY.IsInPubg() then
+	if MY.IsInPubg() and MY.IsShieldedVersion() then
 		return
 	end
 	if l_dwLockType and l_dwLockID and l_lockInDisplay then
@@ -980,11 +986,11 @@ function PS.OnPanelActive(wnd)
 			end
 		end,
 		tip = function()
-			if MY.IsInPubg() then
+			if IsShielded() then
 				return _L['Can not use in pubg map!']
 			end
 		end,
-		autoenable = function() return not MY.IsInPubg() end,
+		autoenable = function() return not IsShielded() end,
 	})
 	y = y + 25
 
@@ -998,12 +1004,12 @@ function PS.OnPanelActive(wnd)
 			MY_Focus.bAutoFocus = bChecked
 			MY_Focus.RescanNearby()
 		end,
-		autoenable = function() return MY_Focus.bEnable end,
+		autoenable = function() return IsEnabled() end,
 	})
 
 	local list = ui:append("WndListBox", {
 		x = x, y = y + 30, w = wl - x + xl, h = h - y - 40,
-		autoenable = function() return MY_Focus.bEnable end,
+		autoenable = function() return IsEnabled() end,
 	}, true)
 	-- 初始化list控件
 	for _, v in ipairs(MY_Focus.tAutoFocus) do
@@ -1048,7 +1054,7 @@ function PS.OnPanelActive(wnd)
 				MY_Focus.RescanNearby()
 			end, function() end, function() end, nil, '')
 		end,
-		autoenable = function() return MY_Focus.bEnable end,
+		autoenable = function() return IsEnabled() end,
 	})
 	-- del
 	ui:append("WndButton", {
@@ -1065,7 +1071,7 @@ function PS.OnPanelActive(wnd)
 				end
 			end
 		end,
-		autoenable = function() return MY_Focus.bEnable end,
+		autoenable = function() return IsEnabled() end,
 	})
 
 	-- 右侧
@@ -1077,7 +1083,7 @@ function PS.OnPanelActive(wnd)
 		oncheck = function(bChecked)
 			MY_Focus.bAutoHide = bChecked
 		end,
-		autoenable = function() return MY_Focus.bEnable end,
+		autoenable = function() return IsEnabled() end,
 	})
 	y = y + deltaY
 
@@ -1090,7 +1096,7 @@ function PS.OnPanelActive(wnd)
 			MY_Focus.bFocusBoss = bChecked
 			MY_Focus.RescanNearby()
 		end,
-		autoenable = function() return MY_Focus.bEnable end,
+		autoenable = function() return IsEnabled() end,
 	})
 	y = y + deltaY
 
@@ -1101,7 +1107,7 @@ function PS.OnPanelActive(wnd)
 			MY_Focus.bFocusFriend = bChecked
 			MY_Focus.RescanNearby()
 		end,
-		autoenable = function() return MY_Focus.bEnable end,
+		autoenable = function() return IsEnabled() end,
 	})
 	y = y + deltaY
 
@@ -1109,7 +1115,7 @@ function PS.OnPanelActive(wnd)
 		x = x + 5, y = y - 3, w = 10, h = 8,
 		image = "ui/Image/UICommon/ScienceTree.UITex",
 		imageframe = 10,
-		autoenable = function() return MY_Focus.bEnable end,
+		autoenable = function() return IsEnabled() end,
 	})
 
 	ui:append("WndCheckBox", {
@@ -1119,7 +1125,7 @@ function PS.OnPanelActive(wnd)
 			MY_Focus.bFocusTong = bChecked
 			MY_Focus.RescanNearby()
 		end,
-		autoenable = function() return MY_Focus.bEnable end,
+		autoenable = function() return IsEnabled() end,
 	})
 	y = y + deltaY
 
@@ -1127,13 +1133,13 @@ function PS.OnPanelActive(wnd)
 		x = x + 5, y = y, w = 10, h = 10,
 		image = "ui/Image/UICommon/ScienceTree.UITex",
 		imageframe = 10,
-		autoenable = function() return MY_Focus.bEnable end,
+		autoenable = function() return IsEnabled() end,
 	})
 	ui:append("Image", {
 		x = x + 10, y = y + 5, w = 10, h = 10,
 		image = "ui/Image/UICommon/ScienceTree.UITex",
 		imageframe = 8,
-		autoenable = function() return MY_Focus.bEnable end,
+		autoenable = function() return IsEnabled() end,
 	})
 	ui:append("WndCheckBox", {
 		x = x + 20, y = y, w = wr, text = _L['auto focus only in public map'],
@@ -1142,7 +1148,7 @@ function PS.OnPanelActive(wnd)
 			MY_Focus.bOnlyPublicMap = bChecked
 			MY_Focus.RescanNearby()
 		end,
-		autoenable = function() return MY_Focus.bEnable end,
+		autoenable = function() return IsEnabled() end,
 	})
 	y = y + deltaY
 
@@ -1153,7 +1159,7 @@ function PS.OnPanelActive(wnd)
 			MY_Focus.bFocusEnemy = bChecked
 			MY_Focus.RescanNearby()
 		end,
-		autoenable = function() return MY_Focus.bEnable end,
+		autoenable = function() return IsEnabled() end,
 	})
 	y = y + deltaY
 
@@ -1164,7 +1170,7 @@ function PS.OnPanelActive(wnd)
 			MY_Focus.bFocusJJCParty = bChecked
 			MY_Focus.RescanNearby()
 		end,
-		autoenable = function() return MY_Focus.bEnable end,
+		autoenable = function() return IsEnabled() end,
 	})
 	y = y + deltaY
 
@@ -1175,7 +1181,7 @@ function PS.OnPanelActive(wnd)
 			MY_Focus.bFocusJJCEnemy = bChecked
 			MY_Focus.RescanNearby()
 		end,
-		autoenable = function() return MY_Focus.bEnable end,
+		autoenable = function() return IsEnabled() end,
 	})
 	y = y + deltaY
 
@@ -1186,7 +1192,7 @@ function PS.OnPanelActive(wnd)
 			MY_Focus.bShowTarget = bChecked
 			MY_Focus.RescanNearby()
 		end,
-		autoenable = function() return MY_Focus.bEnable end,
+		autoenable = function() return IsEnabled() end,
 	})
 	y = y + deltaY
 
@@ -1196,7 +1202,7 @@ function PS.OnPanelActive(wnd)
 		oncheck = function(bChecked)
 			MY_Focus.bDistanceZ = bChecked
 		end,
-		autoenable = function() return MY_Focus.bEnable end,
+		autoenable = function() return IsEnabled() end,
 	})
 	y = y + deltaY
 
@@ -1208,7 +1214,7 @@ function PS.OnPanelActive(wnd)
 		oncheck = function(bChecked)
 			MY_Focus.bTraversal = bChecked
 		end,
-		autoenable = function() return MY_Focus.bEnable end,
+		autoenable = function() return IsEnabled() end,
 	})
 	y = y + deltaY
 
@@ -1219,7 +1225,7 @@ function PS.OnPanelActive(wnd)
 			MY_Focus.bHideDeath = bChecked
 			MY_Focus.RescanNearby()
 		end,
-		autoenable = function() return MY_Focus.bEnable end,
+		autoenable = function() return IsEnabled() end,
 	})
 	y = y + deltaY
 
@@ -1229,7 +1235,7 @@ function PS.OnPanelActive(wnd)
 		oncheck = function(bChecked)
 			MY_Focus.bDisplayKungfuIcon = bChecked
 		end,
-		autoenable = function() return MY_Focus.bEnable end,
+		autoenable = function() return IsEnabled() end,
 	})
 	y = y + deltaY
 
@@ -1242,7 +1248,7 @@ function PS.OnPanelActive(wnd)
 			MY_Focus.bSortByDistance = bChecked
 			MY_Focus.RedrawList()
 		end,
-		autoenable = function() return MY_Focus.bEnable end,
+		autoenable = function() return IsEnabled() end,
 	})
 	y = y + deltaY
 
@@ -1255,7 +1261,7 @@ function PS.OnPanelActive(wnd)
 			MY_Focus.bEnableSceneNavi = bChecked
 			MY_Focus.RescanNearby()
 		end,
-		autoenable = function() return MY_Focus.bEnable end,
+		autoenable = function() return IsEnabled() end,
 	})
 	y = y + deltaY
 
@@ -1267,7 +1273,7 @@ function PS.OnPanelActive(wnd)
 		oncheck = function(bChecked)
 			MY_Focus.bHealHelper = bChecked
 		end,
-		autoenable = function() return MY_Focus.bEnable end,
+		autoenable = function() return IsEnabled() end,
 	})
 	y = y + deltaY
 
@@ -1281,7 +1287,7 @@ function PS.OnPanelActive(wnd)
 			MY_Focus.nMaxDisplay = val
 			MY_Focus.RedrawList()
 		end,
-		autoenable = function() return MY_Focus.bEnable end,
+		autoenable = function() return IsEnabled() end,
 	})
 	y = y + deltaY
 
@@ -1294,7 +1300,7 @@ function PS.OnPanelActive(wnd)
 		onchange = function(raw, val)
 			MY_Focus.SetScale(val / 100, MY_Focus.fScaleY)
 		end,
-		autoenable = function() return MY_Focus.bEnable end,
+		autoenable = function() return IsEnabled() end,
 	})
 	y = y + deltaY
 
@@ -1307,7 +1313,7 @@ function PS.OnPanelActive(wnd)
 		onchange = function(raw, val)
 			MY_Focus.SetScale(MY_Focus.fScaleX, val / 100)
 		end,
-		autoenable = function() return MY_Focus.bEnable end,
+		autoenable = function() return IsEnabled() end,
 	})
 	y = y + deltaY
 end
