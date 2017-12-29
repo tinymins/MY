@@ -34,6 +34,7 @@ data = {
     ['adjust index'] = '自適應遮擋順序',
 
     ['Max Distance: %s foot.'] = '最大顯示距離：%s尺。',
+    ['Max Distance: Unlimited.'] = '最大顯示距離：不限制。',
     ['Font: %d'] = '字體：%d',
     ['lifebar width: %s px.'] = '血條寬度%spx。',
     ['lifebar height: %s px.'] = '血條高度%spx。',
@@ -82,4 +83,5 @@ data = {
         ['TOP_BOTTOM'] = '從上至下',
         ['BOTTOM_TOP'] = '從下至上',
     },
+    ['Can not use in pubg map!'] = '孤城瀚海中，禁止使用。',
 }

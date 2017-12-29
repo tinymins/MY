@@ -46,6 +46,23 @@ RegisterCustomData("XLifeBar.bUseGlobalConfig")
 RegisterCustomData("XLifeBar.bOnlyInDungeon")
 RegisterCustomData("XLifeBar.bOnlyInArena")
 RegisterCustomData("XLifeBar.bOnlyInBattleField")
+
+local function IsShielded() return MY.IsShieldedVersion() and MY.IsInPubg() end
+local function IsEnabled() return XLifeBar.bEnabled and not IsShielded() end
+local function IsMapEnabled()
+    return IsEnabled() and (
+        not (
+            XLifeBar.bOnlyInDungeon or
+            XLifeBar.bOnlyInArena or
+            XLifeBar.bOnlyInBattleField
+        ) or (
+            (XLifeBar.bOnlyInDungeon     and MY.IsInDungeon(true)) or
+            (XLifeBar.bOnlyInArena       and MY.IsInArena()) or
+            (XLifeBar.bOnlyInBattleField and (MY.IsInBattleField() or MY.IsInPubg()))
+        )
+    )
+end
+
 local _C = {
     szConfig = {"config/xlifebar.jx3dat", MY_DATA_PATH.GLOBAL},
     szUserConfig = {"config/xlifebar.jx3dat", MY_DATA_PATH.ROLE},
@@ -152,20 +169,6 @@ _C.GetForce = function(dwID)
     end
 end
 
-_C.IsEnabled = function()
-    return XLifeBar.bEnabled and (
-        not (
-            XLifeBar.bOnlyInDungeon or
-            XLifeBar.bOnlyInArena or
-            XLifeBar.bOnlyInBattleField
-        ) or (
-            (XLifeBar.bOnlyInDungeon     and MY.IsInDungeon(true) ) or
-            (XLifeBar.bOnlyInArena       and MY.IsInArena()       ) or
-            (XLifeBar.bOnlyInBattleField and MY.IsInBattleField() )
-        )
-    )
-end
-
 _C.GetTongName = function(dwTongID, szFormatString)
     szFormatString = szFormatString or "%s"
     if type(dwTongID) ~= 'number' or dwTongID == 0 then
@@ -182,7 +185,7 @@ _C.GetTongName = function(dwTongID, szFormatString)
 end
 
 _C.AutoSwitchSysHeadTop = function()
-    if _C.IsEnabled() then
+    if IsMapEnabled() then
         _C.SaveSysHeadTop()
         _C.HideSysHeadTop()
     else
@@ -539,7 +542,7 @@ local function CheckInvalidRect(dwType, dwID, me, bNoCreate)
         return
     end
     _nDisX, _nDisY = me.nX - object.nX, me.nY - object.nY
-    if _nDisX * _nDisX + _nDisY * _nDisY < Config.nDistance
+    if Config.nDistance <= 0 or _nDisX * _nDisX + _nDisY * _nDisY < Config.nDistance
     -- 这是镜头补偿判断 但是不好用先不加 and (fPitch > -0.8 or _C.GetNz(me.nZ,object.nZ) < Config.nDistance / 2.5)
     then
         if _C.tObject[dwID] and _C.tObject[dwID].handle then
@@ -640,7 +643,7 @@ local function CheckInvalidRect(dwType, dwID, me, bNoCreate)
 end
 
 function XLifeBar.OnFrameBreathe()
-    if not _C.IsEnabled() then
+    if not IsMapEnabled() then
         return
     end
     local me = GetClientPlayer()
@@ -784,26 +787,36 @@ function PS.OnPanelActive(wnd)
         ui:children("#WndButton_Font"):text(_L("Font: %d", Config.nFont))
     end
     -- 开启/关闭
-    ui:append("WndCheckBox", "WndCheckBox_Switcher"):children("#WndCheckBox_Switcher")
-      :pos(x,y):text(_L["enable/disable"])
-      :check(XLifeBar.bEnabled or false)
-      :check(function(bChecked) XLifeBar.bEnabled = bChecked _C.Reset(true) end)
+    ui:append("WndCheckBox", {
+        x = x, y = y, text = _L["enable/disable"],
+        checked = XLifeBar.bEnabled,
+        oncheck = function(bChecked) XLifeBar.bEnabled = bChecked _C.Reset(true) end,
+		tip = function()
+			if IsShielded() then
+				return _L['Can not use in pubg map!']
+			end
+		end,
+        autoenable = function() return not IsShielded() end,
+    })
     x = x + 110
     -- 使用所有角色公共设置
-    ui:append("WndCheckBox", "WndCheckBox_GlobalConfig"):children("#WndCheckBox_GlobalConfig")
-      :width(180):pos(x, y):text(_L["use global config"])
-      :check(XLifeBar.bUseGlobalConfig or false)
-      :check(function(bChecked)
-        _C.SaveConfig()
-        XLifeBar.bUseGlobalConfig = bChecked
-        _C.LoadConfig()
-        fnLoadUI(ui)
-        _C.Reset()
-      end)
+    ui:append("WndCheckBox", {
+        w = 180, x = x, y = y, text = _L["use global config"],
+        checked = XLifeBar.bUseGlobalConfig,
+        oncheck = function(bChecked)
+            _C.SaveConfig()
+            XLifeBar.bUseGlobalConfig = bChecked
+            _C.LoadConfig()
+            fnLoadUI(ui)
+            _C.Reset()
+        end,
+        autoenable = function() return IsEnabled() end,
+    })
     x = x + 180
     ui:append("Text", {
         x = x + 5, y = y - 15,
         text = _L['only enable in those maps below'],
+        autoenable = function() return IsEnabled() end,
     })
     ui:append("WndCheckBox", {
         x = x, y = y + 5, w = 80, text = _L['arena'],
@@ -812,6 +825,7 @@ function PS.OnPanelActive(wnd)
             XLifeBar.bOnlyInArena = bChecked
             _C.Reset(true)
         end,
+        autoenable = function() return IsEnabled() end,
     })
     x = x + 80
     ui:append("WndCheckBox", {
@@ -821,6 +835,7 @@ function PS.OnPanelActive(wnd)
             XLifeBar.bOnlyInBattleField = bChecked
             _C.Reset(true)
         end,
+        autoenable = function() return IsEnabled() end,
     })
     x = x + 70
     ui:append("WndCheckBox", {
@@ -830,6 +845,7 @@ function PS.OnPanelActive(wnd)
             XLifeBar.bOnlyInDungeon = bChecked
             _C.Reset(true)
         end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
     -- <hr />
@@ -843,6 +859,7 @@ function PS.OnPanelActive(wnd)
         text = function(value) return _L("lifebar width: %s px.", value) end, -- 血条宽度
         value = Config.nLifeWidth or Config_Default.nLifeWidth,
         onchange = function(raw, value) Config.nLifeWidth = value;_C.Reset() end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
 
@@ -852,6 +869,7 @@ function PS.OnPanelActive(wnd)
         text = function(value) return _L("lifebar height: %s px.", value) end, -- 血条高度
         value = Config.nLifeHeight or Config_Default.nLifeHeight,
         onchange = function(raw, value) Config.nLifeHeight = value;_C.Reset() end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
 
@@ -861,6 +879,7 @@ function PS.OnPanelActive(wnd)
         text = function(value) return _L("lifebar offset-x: %d px.", value) end, -- 血条水平偏移
         value = Config.nLifeOffsetX or Config_Default.nLifeOffsetX,
         onchange = function(raw, value) Config.nLifeOffsetX = value;_C.Reset() end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
 
@@ -870,6 +889,7 @@ function PS.OnPanelActive(wnd)
         text = function(value) return _L("lifebar offset-y: %d px.", value) end, -- 血条竖直偏移
         value = Config.nLifeOffsetY or Config_Default.nLifeOffsetY,
         onchange = function(raw, value) Config.nLifeOffsetY = value;_C.Reset() end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
 
@@ -879,6 +899,7 @@ function PS.OnPanelActive(wnd)
         text = function(value) return _L("life percentage offset-x: %d px.", value) end, -- 血量百分比水平偏移
         value = Config.nLifePerOffsetX or Config_Default.nLifePerOffsetX,
         onchange = function(raw, value) Config.nLifePerOffsetX = value;_C.Reset() end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
 
@@ -888,6 +909,7 @@ function PS.OnPanelActive(wnd)
         text = function(value) return _L("life percentage offset-y: %d px.", value) end, -- 血量百分比竖直偏移
         value = Config.nLifePerOffsetY or Config_Default.nLifePerOffsetY,
         onchange = function(raw, value) Config.nLifePerOffsetY = value;_C.Reset() end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
 
@@ -897,6 +919,7 @@ function PS.OnPanelActive(wnd)
         text = function(value) return _L("otbar width: %s px.", value) end, -- OT宽度
         value = Config.nOTBarWidth or Config_Default.nOTBarWidth,
         onchange = function(raw, value) Config.nOTBarWidth = value;_C.Reset() end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
 
@@ -906,6 +929,7 @@ function PS.OnPanelActive(wnd)
         text = function(value) return _L("otbar height: %s px.", value) end, -- OT高度
         value = Config.nOTBarHeight or Config_Default.nOTBarHeight,
         onchange = function(raw, value) Config.nOTBarHeight = value;_C.Reset() end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
 
@@ -915,6 +939,7 @@ function PS.OnPanelActive(wnd)
         text = function(value) return _L("otbar offset-x: %d px.", value) end, -- OT水平偏移
         value = Config.nOTBarOffsetX or Config_Default.nOTBarOffsetX,
         onchange = function(raw, value) Config.nOTBarOffsetX = value;_C.Reset() end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
 
@@ -924,6 +949,7 @@ function PS.OnPanelActive(wnd)
         text = function(value) return _L("otbar offset-y: %d px.", value) end, -- OT竖直偏移
         value = Config.nOTBarOffsetY or Config_Default.nOTBarOffsetY,
         onchange = function(raw, value) Config.nOTBarOffsetY = value;_C.Reset() end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
 
@@ -933,6 +959,7 @@ function PS.OnPanelActive(wnd)
         text = function(value) return _L("ot title offset-x: %d px.", value) end, -- OT名称水平偏移
         value = Config.nOTTitleOffsetX or Config_Default.nOTTitleOffsetX,
         onchange = function(raw, value) Config.nOTTitleOffsetX = value;_C.Reset() end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
 
@@ -942,6 +969,7 @@ function PS.OnPanelActive(wnd)
         text = function(value) return _L("ot title offset-y: %d px.", value) end, -- OT名称竖直偏移
         value = Config.nOTTitleOffsetY or Config_Default.nOTTitleOffsetY,
         onchange = function(raw, value) Config.nOTTitleOffsetY = value;_C.Reset() end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
 
@@ -951,6 +979,7 @@ function PS.OnPanelActive(wnd)
         text = function(value) return _L("1st line offset-y: %d px.", value) end, -- 第一行字高度
         value = Config.nLineHeight[1] or Config_Default.nLineHeight[1],
         onchange = function(raw, value) Config.nLineHeight[1] = value;_C.Reset() end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
 
@@ -960,6 +989,7 @@ function PS.OnPanelActive(wnd)
         text = function(value) return _L("2nd line offset-y: %d px.", value) end, -- 第二行字高度
         value = Config.nLineHeight[2] or Config_Default.nLineHeight[2],
         onchange = function(raw, value) Config.nLineHeight[2] = value;_C.Reset() end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
 
@@ -969,15 +999,17 @@ function PS.OnPanelActive(wnd)
         text = function(value) return _L("3rd line offset-y: %d px.", value) end, -- 第三行字高度
         value = Config.nLineHeight[3] or Config_Default.nLineHeight[3],
         onchange = function(raw, value) Config.nLineHeight[3] = value;_C.Reset() end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
 
     ui:append("WndSliderBox", {
         name = "WndSliderBox_Distance",
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 300 },
-        text = function(value) return _L("Max Distance: %s foot.", value) end,
+        text = function(value) return value == 0 and _L["Max Distance: Unlimited."] or _L("Max Distance: %s foot.", value) end,
         value = math.sqrt(Config.nDistance or Config_Default.nDistance) / 64,
         onchange = function(raw, value) Config.nDistance = value * value * 64 * 64;_C.Reset() end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
 
@@ -987,6 +1019,7 @@ function PS.OnPanelActive(wnd)
         text = function(value) return _L("alpha: %.0f%%.", value) end, -- 透明度
         value = Config.nAlpha or Config_Default.nAlpha,
         onchange = function(raw, value) Config.nAlpha = value*255/100;_C.Reset() end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
 
@@ -1097,6 +1130,7 @@ function PS.OnPanelActive(wnd)
         menu = function()
             return GeneBooleanPopupMenu(Config.ShowName, _L["player name display"], _L["npc name display"])
         end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
 
@@ -1106,6 +1140,7 @@ function PS.OnPanelActive(wnd)
         menu = function()
             return GeneBooleanPopupMenu(Config.ShowTitle, _L["player title display"], _L["npc title display"])
         end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
 
@@ -1115,6 +1150,7 @@ function PS.OnPanelActive(wnd)
         menu = function()
             return GeneBooleanPopupMenu(Config.ShowTong, _L["player tong display"])
         end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
 
@@ -1141,6 +1177,7 @@ function PS.OnPanelActive(wnd)
             table.insert(t, t1)
             return t
         end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
 
@@ -1170,6 +1207,7 @@ function PS.OnPanelActive(wnd)
             })
             return t
         end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
 
@@ -1198,6 +1236,7 @@ function PS.OnPanelActive(wnd)
         end,
         tip = _L['only can see otaction of target and target\'s target'],
         tippostype = ALW.TOP_BOTTOM,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
 
@@ -1239,6 +1278,7 @@ function PS.OnPanelActive(wnd)
                 end,
             }}
         end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
     offsety = 32
@@ -1247,6 +1287,7 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, text = _L['show special npc'],
         checked = Config.bShowSpecialNpc,
         oncheck = function(bChecked) Config.bShowSpecialNpc = bChecked;_C.Reset() end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety - 10
 
@@ -1254,6 +1295,7 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, text = _L['adjust index'],
         checked = Config.bAdjustIndex,
         oncheck = function(bChecked) Config.bAdjustIndex = bChecked;_C.Reset() end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety - 10
 
@@ -1261,6 +1303,7 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, text = _L['show distance'],
         checked = Config.bShowDistance,
         oncheck = function(bChecked) Config.bShowDistance = bChecked;_C.Reset() end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
 
@@ -1272,6 +1315,7 @@ function PS.OnPanelActive(wnd)
                 ui:children("#WndButton_Font"):text(_L("Font: %d",Config.nFont))
             end)
         end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety - 10
 
@@ -1289,6 +1333,7 @@ function PS.OnPanelActive(wnd)
                 }, {szOption = g_tStrings.STR_HOTKEY_CANCEL,fnAction = function() end},
             })
         end,
+        autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
 end
