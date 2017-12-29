@@ -1032,7 +1032,7 @@ end)
 local function UploadSerendipity(szName, szSerendipity, nMethod, bFinish, dwTime)
 	MY.Ajax({
 		type = "post/json",
-		url = 'http://data.jx3.derzh.com/api/serendipities',
+		url = 'https://data.jx3.derzh.com/api/serendipities',
 		data = {
 			data = MY.SimpleEcrypt(MY.JsonEncode({
 				n = szName, S = MY.GetRealServer(1), s = MY.GetRealServer(2),
@@ -1040,17 +1040,17 @@ local function UploadSerendipity(szName, szSerendipity, nMethod, bFinish, dwTime
 			})),
 			lang = MY.GetLang(),
 		},
-		success = function(settings, content) end,
+		success = function(html, status) end,
 	})
 
 	MY.Ajax({
 		type = "get",
-		url = 'http://data.jx3.derzh.com/serendipity/?l=' .. MY.GetLang() .. "&m=" .. nMethod
+		url = 'https://data.jx3.derzh.com/serendipity/?l=' .. MY.GetLang() .. "&m=" .. nMethod
 		.. "&data=" .. MY.SimpleEcrypt(MY.JsonEncode({
 			n = szName, S = MY.GetRealServer(1), s = MY.GetRealServer(2),
 			a = szAdventure, f = bFinish, t = GetCurrentTime()
 		})),
-		success = function(settings, content) end,
+		success = function(html, status) end,
 	})
 end
 
