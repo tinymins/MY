@@ -451,6 +451,8 @@ local function openAllMap()
 	if not h or not h:IsVisible() then
 		return
 	end
+	local me = GetClientPlayer()
+	local dwCurrMapID = me and me.GetScene().dwMapID
 	for _, szHandleName in ipairs({
 		'Handle_CityBtn',
 		'Handle_CopyBtn',
@@ -459,8 +461,12 @@ local function openAllMap()
 		if hList then
 			for i = 0, hList:GetItemCount() - 1 do
 				hItem = hList:Lookup(i)
+				if hItem.mapid == 1 or dwCurrMapID == hItem.mapid then
+					hItem.mapid = tostring(hItem.mapid)
+				else
+					hItem.mapid = tonumber(hItem.mapid) or hItem.mapid
+				end
 				hItem.bEnable = true
-				hItem.mapid = tostring(hItem.mapid)
 			end
 		end
 	end
