@@ -935,6 +935,10 @@ function MY_ChatLog.UpdatePage(frame, noscroll, nopushdb)
 			if MY_ChatMosaics and MY_ChatMosaics.Mosaics then
 				MY_ChatMosaics.Mosaics(h)
 			end
+			local last = h:Lookup(h:GetItemCount() - 1)
+			if last and last:GetType() == 'Text' and last:GetText():sub(-1) == '\n' then
+				last:SetText(last:GetText():sub(0, -2))
+			end
 			h:FormatAllItemPos()
 			local nW, nH = h:GetAllItemSize()
 			h:SetH(nH)
