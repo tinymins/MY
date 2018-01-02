@@ -3,10 +3,10 @@
 如 MsgArrive.wav 则放到 Interface/MY/@Custom/MsgArrive.wav 下
 插件检测到有Interface/MY/@Custom/MsgArrive.wav 存在就不会播放默认音频
 
-当然 @Custom文件夹如果不存在的话 你要先创建一个 
+当然 @Custom文件夹如果不存在的话 你要先创建一个
 
 Good Luck
 
-翟一鸣 @ ZhaiYiMing.CoM [20140803]
+茗伊 @tinymins [20140803]
 
 『茗伊@挽月堂@双梦镇』

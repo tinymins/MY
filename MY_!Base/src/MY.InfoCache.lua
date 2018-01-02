@@ -3,7 +3,7 @@
 -- @Author: ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
 -- @Date  : 2015-11-3 16:24:28
 -- @Email : admin@derzh.com
--- @Last Modified by:   µÔÒ»Ãù @tinymins
+-- @Last Modified by:   ÜøÒÁ @tinymins
 -- @Last Modified time: 2015-11-3 16:24:40
 -----------------------------------------------
 local tconcat = table.concat
