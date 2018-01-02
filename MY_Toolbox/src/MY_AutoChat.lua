@@ -300,7 +300,7 @@ local function HookDialoguePanel()
 	if frame and frame:IsVisible() and not frame.bMYHooked then
 		MY.UI(frame):append('WndButton', {
 			name = 'WndButton_AutoChat',
-			x = 50, y = 10, w = 80, text = _L['autochat'],
+			x = 53, y = 4, w = 80, text = _L['autochat'],
 			tip = _L['Left click to config autochat.\nRight click to edit global config.'],
 			tippostype = MY.Const.UI.Tip.POS_TOP,
 			lmenu = GetDialoguePanelMenu,
