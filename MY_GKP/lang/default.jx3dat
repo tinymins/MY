@@ -1,0 +1,4 @@
+-- language data (default) override
+data = {
+	["SOUND_nat_view2"] = "data/sound/场景/view/nat_view2.wav",
+}

@@ -60,7 +60,10 @@ if IsLocalFileExist(MY.GetAddonInfo().szRoot .. '@DATA/') then
 end
 -- 格式化数据文件路径（替换$uid、$lang、$server以及补全相对路径）
 -- (string) MY.GetLUADataPath(oFilePath)
-function MY.FormatPath(oFilePath, ePathType)
+function MY.FormatPath(oFilePath, tParams)
+	if not tParams then
+		tParams = {}
+	end
 	local szFilePath, ePathType
 	if type(oFilePath) == "table" then
 		szFilePath, ePathType = unpack(oFilePath)
@@ -82,27 +85,27 @@ function MY.FormatPath(oFilePath, ePathType)
 	end
 	-- if exist $uid then add user role identity
 	if string.find(szFilePath, "%$uid") then
-		szFilePath = szFilePath:gsub("%$uid", MY.Player.GetUUID())
+		szFilePath = szFilePath:gsub("%$uid", tParams["uid"] or MY.Player.GetUUID())
 	end
 	-- if exist $name then add user role identity
 	if string.find(szFilePath, "%$name") then
-		szFilePath = szFilePath:gsub("%$name", MY.GetClientInfo().szName or MY.Player.GetUUID())
+		szFilePath = szFilePath:gsub("%$name", tParams["name"] or MY.GetClientInfo().szName or MY.Player.GetUUID())
 	end
 	-- if exist $lang then add language identity
 	if string.find(szFilePath, "%$lang") then
-		szFilePath = szFilePath:gsub("%$lang", string.lower(MY.GetLang()))
+		szFilePath = szFilePath:gsub("%$lang", tParams["lang"] or string.lower(MY.GetLang()))
 	end
 	-- if exist $date then add date identity
 	if string.find(szFilePath, "%$date") then
-		szFilePath = szFilePath:gsub("%$date", MY.FormatTime("yyyyMMdd", GetCurrentTime()))
+		szFilePath = szFilePath:gsub("%$date", tParams["date"] or MY.FormatTime("yyyyMMdd", GetCurrentTime()))
 	end
 	-- if exist $server then add server identity
 	if string.find(szFilePath, "%$server") then
-		szFilePath = szFilePath:gsub("%$server", ((MY.Game.GetServer()):gsub('[/\\|:%*%?"<>]', '')))
+		szFilePath = szFilePath:gsub("%$server", tParams["server"] or ((MY.Game.GetServer()):gsub('[/\\|:%*%?"<>]', '')))
 	end
 	-- if exist $relserver then add relserver identity
 	if string.find(szFilePath, "%$relserver") then
-		szFilePath = szFilePath:gsub("%$relserver", ((MY.Game.GetRealServer()):gsub('[/\\|:%*%?"<>]', '')))
+		szFilePath = szFilePath:gsub("%$relserver", tParams["relserver"] or ((MY.Game.GetRealServer()):gsub('[/\\|:%*%?"<>]', '')))
 	end
 	local rootPath = GetRootPath():gsub('\\', '/')
 	if szFilePath:find(rootPath) == 1 then
@@ -158,8 +161,18 @@ function MY.LoadLUAData(oFilePath)
 	return data
 end
 
-function MY.RegisterCustomData(szName, ...)
-	RegisterCustomData(szName, ...)
+
+-- 注册用户定义数据，支持全局变量数组遍历
+-- (void) MY.RegisterCustomData(string szVarPath[, number nVersion])
+function MY.RegisterCustomData(szVarPath, nVersion, szDomain)
+	szDomain = szDomain or "Role"
+	if _G and type(_G[szVarPath]) == "table" then
+		for k, _ in pairs(_G[szVarPath]) do
+			RegisterCustomData(szDomain .. "/" .. szVarPath .. "." .. k, nVersion)
+		end
+	else
+		RegisterCustomData(szDomain .. "/" .. szVarPath, nVersion)
+	end
 end
 
 --szName [, szDataFile]
@@ -915,7 +928,7 @@ Target_AppendAddonMenu( { _C.GetTargetAddonMenu } )
 -- szTitle      消息头部
 -- tContentRgbF 主体消息文字颜色rgbf[可选，为空使用默认颜色字体。]
 -- tTitleRgbF   消息头部文字颜色rgbf[可选，为空和主体消息文字颜色相同。]
-function MY.Sysmsg(oContent, oTitle)
+function MY.Sysmsg(oContent, oTitle, szType)
 	oTitle = oTitle or MY.GetAddonInfo().szShortName
 	if type(oTitle)~='table' then oTitle = { oTitle, bNoWrap = true } end
 	if type(oContent)~='table' then oContent = { oContent, bNoWrap = true } end
@@ -944,7 +957,19 @@ function MY.Sysmsg(oContent, oTitle)
 		szMsg = szMsg .. GetFormatText(oContent[i], oContent.f, oContent.r, oContent.g, oContent.b)
 	end
 	-- Output
-	OutputMessage("MSG_SYS", szMsg, true)
+	OutputMessage(szType or "MSG_SYS", szMsg, true)
+end
+
+-- 没有头的中央信息 也可以用于系统信息
+function MY.Topmsg(szText, szType)
+	MY.Sysmsg(szText, {}, szType or "MSG_ANNOUNCE_YELLOW")
+end
+
+-- 输出一条密聊信息
+function MY.OutputWhisper(szMsg, szHead)
+	szHead = szHead or MY.GetAddonInfo().szShortName
+	OutputMessage("MSG_WHISPER", "[" .. szHead .. "]" .. g_tStrings.STR_TALK_HEAD_WHISPER .. szMsg .. "\n")
+	PlaySound(SOUND.UI_SOUND, g_sound.Whisper)
 end
 
 -- Debug输出
