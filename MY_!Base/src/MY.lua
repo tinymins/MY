@@ -588,7 +588,7 @@ function MY.RegisterEvent(szEvent, fnAction)
 end
 end
 
-do local BG_EVENT_LIST = {}
+do local BG_MSG_LIST = {}
 ------------------------------------
 --            背景通讯             --
 ------------------------------------
@@ -599,24 +599,24 @@ do local BG_EVENT_LIST = {}
 -- arg3: 消息发布者名字
 -- arg4: 不定长参数数组数据
 ------------------------------------
-local function OnBgEvent()
-	local szEvent, nChannel, dwID, szName, aParam = arg0, arg1, arg2, arg3, arg4
-	if dwID ~= UI_GetClientPlayerID() and szEvent and BG_EVENT_LIST[szEvent] then
-		for szKey, fnAction in pairs(BG_EVENT_LIST[szEvent]) do
-			local status, err = pcall(fnAction, szEvent, dwID, szName, nChannel, unpack(aParam))
+local function OnBgMsg()
+	local szMsgID, nChannel, dwID, szName, aParam, bSelf = arg0, arg1, arg2, arg3, arg4, dwID == UI_GetClientPlayerID()
+	if szMsgID and BG_MSG_LIST[szMsgID] then
+		for szKey, fnAction in pairs(BG_MSG_LIST[szMsgID]) do
+			local status, err = pcall(fnAction, szMsgID, nChannel, dwID, szName, bSelf, unpack(aParam))
 			if not status then
-				MY.Debug({err}, "BG_EVENT#" .. szEvent .. "." .. szKey, MY_DEBUG.ERROR)
+				MY.Debug({err}, "BG_EVENT#" .. szMsgID .. "." .. szKey, MY_DEBUG.ERROR)
 			end
 		end
 	end
 end
-RegisterEvent("ON_BG_CHANNEL_MSG", OnBgEvent)
+RegisterEvent("ON_BG_CHANNEL_MSG", OnBgMsg)
 
--- MY.RegisterBgEvent("MY_CHECK_INSTALL", function(dwTalkerID, szTalkerName, nChannel, oData) MY.BgTalk(szTalkerName, "MY_CHECK_INSTALL_REPLY", oData) end) -- 注册
--- MY.RegisterBgEvent("MY_CHECK_INSTALL") -- 注销
--- MY.RegisterBgEvent("MY_CHECK_INSTALL.RECEIVER_01", function(dwTalkerID, szTalkerName, nChannel, oData) MY.BgTalk(szTalkerName, "MY_CHECK_INSTALL_REPLY", oData) end) -- 注册
--- MY.RegisterBgEvent("MY_CHECK_INSTALL.RECEIVER_01") -- 注销
-function MY.RegisterBgEvent(szEvent, fnAction)
+-- MY.RegisterBgMsg("MY_CHECK_INSTALL", function(nChannel, dwTalkerID, szTalkerName, bSelf, oDatas...) MY.BgTalk(szTalkerName, "MY_CHECK_INSTALL_REPLY", oData) end) -- 注册
+-- MY.RegisterBgMsg("MY_CHECK_INSTALL") -- 注销
+-- MY.RegisterBgMsg("MY_CHECK_INSTALL.RECEIVER_01", function(nChannel, dwTalkerID, szTalkerName, bSelf, oDatas...) MY.BgTalk(szTalkerName, "MY_CHECK_INSTALL_REPLY", oData) end) -- 注册
+-- MY.RegisterBgMsg("MY_CHECK_INSTALL.RECEIVER_01") -- 注销
+function MY.RegisterBgMsg(szEvent, fnAction)
 	local szKey = nil
 	local nPos = StringFindW(szEvent, ".")
 	if nPos then
@@ -624,19 +624,19 @@ function MY.RegisterBgEvent(szEvent, fnAction)
 		szEvent = string.sub(szEvent, 1, nPos - 1)
 	end
 	if fnAction then
-		if not BG_EVENT_LIST[szEvent] then
-			BG_EVENT_LIST[szEvent] = {}
+		if not BG_MSG_LIST[szEvent] then
+			BG_MSG_LIST[szEvent] = {}
 		end
 		if szKey then
-			BG_EVENT_LIST[szEvent][szKey] = fnAction
+			BG_MSG_LIST[szEvent][szKey] = fnAction
 		else
-			table.insert(BG_EVENT_LIST[szEvent], fnAction)
+			table.insert(BG_MSG_LIST[szEvent], fnAction)
 		end
 	else
 		if szKey then
-			BG_EVENT_LIST[szEvent][szKey] = nil
+			BG_MSG_LIST[szEvent][szKey] = nil
 		else
-			BG_EVENT_LIST[szEvent] = nil
+			BG_MSG_LIST[szEvent] = nil
 		end
 	end
 end
@@ -669,7 +669,10 @@ function MY.BgTalk(nChannel, szEvent, ...)
 	me.Talk(nChannel, szTarget, tSay)
 end
 -- 测试用（请求共享位置）
-MY.RegisterBgEvent("ASK_CURRENT_LOC", function(szEvent, dwTalkerID, szTalkerName, nChannel)
+MY.RegisterBgMsg("ASK_CURRENT_LOC", function(_, nChannel, dwTalkerID, szTalkerName, bSelf)
+	if bSelf then
+		return
+	end
 	MessageBox({
 		szName = "ASK_CURRENT_LOC" .. dwTalkerID,
 		szMessage = _L("[%s] wants to get your location, would you like to share?", szTalkerName), {
@@ -681,7 +684,10 @@ MY.RegisterBgEvent("ASK_CURRENT_LOC", function(szEvent, dwTalkerID, szTalkerName
 	})
 end)
 -- 测试用（查看版本信息）
-MY.RegisterBgEvent("MY_VERSION_CHECK", function(szEvent, dwTalkerID, szTalkerName, nChannel, bSilent)
+MY.RegisterBgMsg("MY_VERSION_CHECK", function(_, nChannel, dwTalkerID, szTalkerName, bSelf, bSilent)
+	if bSelf then
+		return
+	end
 	if not bSilent and MY.IsInParty() then
 		MY.Talk(PLAYER_TALK_CHANNEL.RAID, _L("I've installed MY plugins v%s", MY.GetVersion()))
 	end

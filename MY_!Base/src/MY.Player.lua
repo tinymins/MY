@@ -855,6 +855,18 @@ end
 -- Load skill extend data
 _C.tSkillEx = MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. "data/skill_ex.jx3dat") or {}
 
+function MY.IsMarker()
+	return GetClientTeam().GetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK) == UI_GetClientPlayerID()
+end
+
+function MY.IsLeader()
+	return GetClientTeam().GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER) == UI_GetClientPlayerID()
+end
+
+function MY.IsDistributer()
+	return GetClientTeam().GetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE) == UI_GetClientPlayerID()
+end
+
 -- 判断自己在不在队伍里
 -- (bool) MY.Player.IsInParty()
 function MY.Player.IsInParty()

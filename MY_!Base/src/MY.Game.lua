@@ -38,6 +38,8 @@ function MY.Game.AddHotKey(szName, szTitle, fnAction)
 	end
 	table.insert(_Cache.tHotkey, { szName = szName, szTitle = szTitle, fnAction = fnAction })
 end
+MY.AddHotKey = MY.Game.AddHotKey
+
 -- 获取快捷键名称
 -- (string) MY.GetHotKeyName(string szName, boolean bBracket, boolean bShort)      -- 取得快捷键名称
 function MY.Game.GetHotKeyName(szName, bBracket, bShort)
@@ -51,6 +53,8 @@ function MY.Game.GetHotKeyName(szName, bBracket, bShort)
 	end
 	return szKey
 end
+MY.GetHotKeyName = MY.Game.GetHotKeyName
+
 -- 获取快捷键
 -- (table) MY.GetHotKey(string szName, true , true )       -- 取得快捷键
 -- (number nKey, boolean bShift, boolean bCtrl, boolean bAlt) MY.GetHotKey(string szName, true , fasle)        -- 取得快捷键
@@ -66,6 +70,8 @@ function MY.Game.GetHotKey(szName, bBracket, bShort)
 		return nKey, bShift, bCtrl, bAlt
 	end
 end
+MY.GetHotKey = MY.Game.GetHotKey
+
 -- 设置快捷键/打开快捷键设置面板    -- HM里面抠出来的
 -- (void) MY.SetHotKey()                               -- 打开快捷键设置面板
 -- (void) MY.SetHotKey(string szGroup)     -- 打开快捷键设置面板并定位到 szGroup 分组（不可用）
@@ -204,6 +210,7 @@ function MY.Game.SetHotKey(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
 		end
 	end
 end
+MY.SetHotKey = MY.Game.SetHotKey
 
 MY.RegisterInit('MYLIB#BIND_HOTKEY', function()
 	-- hotkey
@@ -284,7 +291,7 @@ function MY.Game.GetObject(dwType, dwID)
 		dwType, dwID = nil, dwType
 	end
 	local p, info, b
-	
+
 	if not dwType then
 		if IsPlayer(dwID) then
 			dwType = TARGET.PLAYER
@@ -294,7 +301,7 @@ function MY.Game.GetObject(dwType, dwID)
 			dwType = TARGET.NPC
 		end
 	end
-	
+
 	if dwType == TARGET.PLAYER then
 		local me = GetClientPlayer()
 		if me and dwID == me.dwID then
@@ -342,7 +349,7 @@ function MY.Game.GetObjectName(obj)
 			local szEmpName = MY.GetObjectName(
 				(IsPlayer(obj.dwEmployer) and GetPlayer(obj.dwEmployer)) or GetNpc(obj.dwEmployer)
 			) or g_tStrings.STR_SOME_BODY
-			
+
 			szName =  szEmpName .. g_tStrings.STR_PET_SKILL_LOG .. (szName or '')
 		end
 		return szName
@@ -435,7 +442,7 @@ function MY.Game.GetTargetContextMenu(dwType, szName, dwID)
 			end
 		end
 	end
-	
+
 	return t
 end
 MY.GetTargetContextMenu = MY.Game.GetTargetContextMenu
@@ -481,7 +488,7 @@ local function GeneDungeonBoss()
 	if l_tBossList then
 		return
 	end
-	
+
 	l_tBossList = {}
 	local nCount = g_tTable.DungeonBoss:GetRowCount()
 	for i = 2, nCount do
@@ -498,7 +505,7 @@ local function GeneDungeonBoss()
 			end
 		end
 	end
-	
+
 	for dwMapID, tBoss in pairs(MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. "data/bosslist/add/$lang.jx3dat") or {}) do
 		if not l_tBossList[dwMapID] then
 			l_tBossList[dwMapID] = {}
@@ -535,5 +542,49 @@ end
 function MY.IsBoss(dwMapID, dwTemplateID)
 	GeneDungeonBoss()
 	return l_tBossList[dwMapID] and l_tBossList[dwMapID][dwTemplateID] and true or false
+end
+end
+
+do
+local MY_FORCE_COLOR = setmetatable({
+	[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
+	[FORCE_TYPE.SHAO_LIN ] = { 255, 178, 95  }, -- 少林
+	[FORCE_TYPE.WAN_HUA  ] = { 196, 152, 255 }, -- 万花
+	[FORCE_TYPE.TIAN_CE  ] = { 255, 111, 83  }, -- 天策
+	[FORCE_TYPE.CHUN_YANG] = { 89 , 224, 232 }, -- 纯阳
+	[FORCE_TYPE.QI_XIU   ] = { 255, 129, 176 }, -- 七秀
+	[FORCE_TYPE.WU_DU    ] = { 55 , 147, 255 }, -- 五毒
+	[FORCE_TYPE.TANG_MEN ] = { 121, 183, 54  }, -- 唐门
+	[FORCE_TYPE.CANG_JIAN] = { 214, 249, 93  }, -- 藏剑
+	[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐帮
+	[FORCE_TYPE.MING_JIAO] = { 240, 70 , 96  }, -- 明教
+	[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 苍云
+	[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 长歌
+	[FORCE_TYPE.BA_DAO   ] = { 106 ,108, 189 }, -- 霸刀
+}, {
+	__index = function()
+		return { 225, 225, 225 }
+	end,
+	__metatable = true,
+})
+
+function MY.GetForceColor(dwForce)
+	return unpack(MY_FORCE_COLOR[dwForce])
+end
+end
+
+do
+local MY_CACHE_ITEM = {}
+function MY.GetItemName(nUiId)
+	if not MY_CACHE_ITEM[nUiId] then
+		local szName = Table_GetItemName(nUiId)
+		local nIcon = Table_GetItemIconID(nUiId)
+		if szName ~= "" and nIocn ~= -1 then
+			MY_CACHE_ITEM[nUiId] = { szName, nIcon }
+		else
+			MY_CACHE_ITEM[nUiId] = { "ITEM#" .. nUiId, 1435 }
+		end
+	end
+	return unpack(MY_CACHE_ITEM[nUiId])
 end
 end

@@ -1370,6 +1370,9 @@ function XGUI:autocomplete(method, arg1, arg2)
 								opt.disabledTmp = true
 								raw:Lookup('WndEdit_Default'):SetText(szOption)
 								opt.disabledTmp = nil
+								if IsFunction(opt.afterComplete) then
+									opt.afterComplete(raw, opt, szOption)
+								end
 								Wnd.CloseWindow('PopupMenuPanel')
 							end,
 						}
@@ -2044,7 +2047,7 @@ function XGUI:anchor(anchor)
 	if IsTable(anchor) then
 		for _, raw in ipairs(self.raws) do
 			if raw:GetType() == 'WndFrame' then
-				raw:SetPoint(anchor.s, 0, 0, anchor.r, anchor.x, anchor.y)
+				raw:SetPoint(anchor.s or "CENTER", 0, 0, anchor.r or "CENTER", anchor.x or 0, anchor.y or 0)
 				raw:CorrectPos()
 			end
 		end
@@ -2479,8 +2482,52 @@ function XGUI:frame(nFrame)
 	end
 end
 
+-- (self) Instance:itemInfo(...)
+-- NOTICE：only for Box
+function XGUI:itemInfo(...)
+	local data = { ... }
+	for _, raw in ipairs(self.raws) do
+		raw = GetComponentElement(raw, 'BOX')
+		if raw then
+			if IsEmpty(data) then
+				UpdataItemBoxObject(raw)
+			else
+				local KItemInfo = GetItemInfo(data[2], data[3])
+				if KItemInfo.nGenre == ITEM_GENRE.BOOK and #data == 4 then -- 西山居BUG
+					table.insert(data, 4, 99999)
+				end
+				local res, err = pcall(UpdataItemInfoBoxObject, raw, unpack(data)) -- 防止itemtab不一样
+				if not res then
+					MY.Debug({ err }, 'MY#UI:itemInfo', MY_DEBUG.ERROR)
+				end
+			end
+		end
+	end
+	return self
+end
+
+-- (self) Instance:boxInfo(nType, ...)
+-- NOTICE：only for Box
+function XGUI:boxInfo(nType, ...)
+	for _, raw in ipairs(self.raws) do
+		raw = GetComponentElement(raw, 'BOX')
+		if raw then
+			if IsEmpty({ ... }) then
+				UpdataItemBoxObject(raw)
+			else
+				local res, err = pcall(UpdateBoxObject, raw, nType, ...) -- 防止itemtab内外网不一样
+				if not res then
+					MY.Debug({ err }, 'MY#UI:boxInfo', MY_DEBUG.ERROR)
+				end
+			end
+		end
+	end
+	return self
+end
+
 -- (self) Instance:icon(dwIcon)
 -- (number) Instance:icon()
+-- NOTICE：only for Box
 function XGUI:icon(dwIcon)
 	self:_checksum()
 	if dwIcon then
@@ -2803,18 +2850,18 @@ function XGUI:menu(lmenu, rmenu, bNoAutoBind)
 	-- pop menu function
 	local fnPopMenu = function(raw, menu)
 		local h = raw:Lookup('', '') or raw
-		local _menu = nil
 		local nX, nY = h:GetAbsPos()
 		local nW, nH = h:GetSize()
 		if IsFunction(menu) then
-			_menu = menu(raw)
-		else
-			_menu = menu
+			menu = menu(raw)
 		end
-		_menu.nMiniWidth = nW
-		_menu.x = nX
-		_menu.y = nY + nH
-		PopupMenu(_menu)
+		if type(menu) ~= 'table' then
+			return
+		end
+		menu.nMiniWidth = nW
+		menu.x = nX
+		menu.y = nY + nH
+		PopupMenu(menu)
 	end
 	-- bind left click
 	if lmenu then
