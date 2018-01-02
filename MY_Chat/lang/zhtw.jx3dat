@@ -18,15 +18,15 @@ data = {
     ['MOSAICS']  = '馬',
     ['Today: %d\nDaily limit: %d'] = '當日已發：%d\n每日上限：%d',
     ['Today: %d\nDaily limit: no limitation'] = '當日已發：%d\n每日上限：無限制',
-    
+
     ['chat helper'] = '聊天助手',
     ['chat switch'] = '頻道切換',
     ['Max log: %d'] = '最大記錄：%d',
-    
+
     ['clear chat panel'] = '清空聊天欄',
     ["Are you sure you want to clear current message panel?\nPress CTRL when click can clear without alert.\nPress ALT when click can clear all window."] = "你確定要清空當前聊天欄消息嗎？\n按住CTRL點擊可以跳過該警告。\n按住ALT點擊可以清空所有聊天欄。",
     ["Are you sure you want to clear all message panel?"] = "你確定要清空所有聊天欄消息嗎？",
-    
+
     ['about...'] = '關于',
     ['display panel'] = '顯示聊天頻道快速切換面板',
     ['lock postion'] = '鎖定聊天頻道快速切換面板位置',
@@ -36,15 +36,15 @@ data = {
     ['hh:mm'] = '時：分',
     ['hh:mm:ss'] = '時：分：秒',
     ['channel setting'] = '頻道設置',
-        
+
     ['always show *'] = '總是顯示※號',
     ['always be white'] = '永遠顯示爲白色',
     ['hide system msg copy'] = '不複制系統消息',
     ['farbnamen'] = '職業染色',
     ['chat time format'] = '聊天時間格式',
-    
-    ['Mingyi Plugins - Chatpanel\nThis plugin is developed by Zhai YiMing @ derzh.com.'] = '[茗伊插件集] - 聊天輔助\n------------\n√該插件由翟一鳴小朋宇獨立開發完成。\n√有問題請聯系：茗伊@雙夢鎮@光明頂@荻花宮@體服',
-    
+
+    ['Mingyi Plugins - Chatpanel\nThis plugin is developed by tinymins @ derzh.com.'] = '[茗伊插件集] - 聊天輔助\n------------\n√該插件由茗伊小朋宇獨立開發完成。\n√有問題請聯系：茗伊@雙夢鎮@光明頂@荻花宮@體服',
+
     ['MOSAICS_CHAR'] = '…',
     ['chat mosaics'] = '聊天打碼',
     ['chat mosaics (mosaics names in chat panel)'] = '聊天打碼（聊天欄中名字打上馬賽克）',

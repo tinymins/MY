@@ -1,9 +1,9 @@
 --------------------------------------------
 -- @Desc  : 自动对话（for 台服）
--- @Author: 翟一鸣 @tinymins
+-- @Author: 茗伊 @tinymins
 -- @Date  : 2015-03-09 21:26:52
 -- @Email : admin@derzh.com
--- @Last modified by:   Zhai Yiming
+-- @Last modified by:   tinymins
 -- @Last modified time: 2016-12-13 14:46:58
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")

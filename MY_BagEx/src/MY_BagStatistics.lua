@@ -1,9 +1,9 @@
 --
--- @Author: Zhai Yiming
+-- @Author: tinymins
 -- @Date:   2017-01-22 18:30:42
 -- @Email:  root@derzh.com
 -- @Project: JX3 UI
--- @Last modified by:   Zhai Yiming
+-- @Last modified by:   tinymins
 -- @Last modified time: 2017-05-18 15:27:52
 --
 -- these global functions are accessed all the time by the event handler
@@ -197,7 +197,7 @@ function MY_BagStatistics.UpdateNames(frame)
 	DB_OwnerInfoR:ClearBindings()
 	DB_OwnerInfoR:BindAll(AnsiToUTF8("%" .. searchname .. "%"), AnsiToUTF8("%" .. searchname .. "%"))
 	local result = DB_OwnerInfoR:GetAll()
-	
+
 	local container = frame:Lookup("Window_Main/WndScroll_Name/WndContainer_Name")
 	container:Clear()
 	for _, rec in ipairs(result) do
@@ -215,7 +215,7 @@ end
 
 function MY_BagStatistics.UpdateItems(frame)
 	PushDB()
-	
+
 	local searchitem = frame:Lookup("Window_Main/Wnd_SearchItem/Edit_SearchItem"):GetText():gsub("%s+", "%%")
 	local sqlfrom = "(SELECT B.ownerkey, B.boxtype, B.boxindex, B.tabtype, B.tabindex, B.tabsubindex, B.bagcount, B.bankcount, B.time FROM BagItems AS B LEFT JOIN ItemInfo AS I ON B.tabtype = I.tabtype AND B.tabindex = I.tabindex WHERE B.tabtype != -1 AND B.tabindex != -1 AND (I.name LIKE ? OR I.desc LIKE ?)) AS C LEFT JOIN OwnerInfo AS O ON C.ownerkey = O.ownerkey WHERE "
 	local sql  = "SELECT C.ownerkey AS ownerkey, C.boxtype AS boxtype, C.boxindex AS boxindex, C.tabtype AS tabtype, C.tabindex AS tabindex, C.tabsubindex AS tabsubindex, SUM(C.bagcount) AS bagcount, SUM(C.bankcount) AS bankcount, C.time AS time, O.ownername AS ownername, O.servername AS servername FROM" .. sqlfrom
@@ -235,7 +235,7 @@ function MY_BagStatistics.UpdateItems(frame)
 	local sqlgroup = " GROUP BY C.tabtype, C.tabindex"
 	sql  = sql  .. sqlwhere .. sqlgroup .. " LIMIT " .. nPageSize .. " OFFSET " .. ((frame.nCurrentPage - 1) * nPageSize)
 	sqlc = sqlc .. sqlwhere .. sqlgroup
-	
+
 	-- 绘制页码
 	local DB_CountR = DB:Prepare(sqlc)
 	DB_CountR:ClearBindings()
@@ -245,7 +245,7 @@ function MY_BagStatistics.UpdateItems(frame)
 	frame:Lookup("Window_Main/Wnd_Index/Wnd_IndexEdit/WndEdit_Index"):SetText(frame.nCurrentPage)
 	frame:Lookup("Window_Main/Wnd_Index", "Handle_IndexCount/Text_IndexCount"):SprintfText(_L['%d pages'], nPageCount)
 	frame:Lookup("Window_Main/WndScroll_Name/Wnd_SearchInfo", "Text_SearchInfo"):SprintfText(_L['%d results'], nCount)
-	
+
 	local hOuter = frame:Lookup("Window_Main/Wnd_Index", "Handle_IndexesOuter")
 	local handle = hOuter:Lookup("Handle_Indexes")
 	handle:Clear()
@@ -261,7 +261,7 @@ function MY_BagStatistics.UpdateItems(frame)
 		hItem.nPage = 1
 		hItem:Lookup("Text_Index"):SetText(1)
 		hItem:Lookup("Text_IndexUnderline"):SetVisible(1 == frame.nCurrentPage)
-		
+
 		local nStartPage
 		if frame.nCurrentPage + mceil((PAGE_DISPLAY - 2) / 2) > nPageCount then
 			nStartPage = nPageCount - (PAGE_DISPLAY - 2)
@@ -276,7 +276,7 @@ function MY_BagStatistics.UpdateItems(frame)
 			hItem:Lookup("Text_Index"):SetText(nStartPage + i - 1)
 			hItem:Lookup("Text_IndexUnderline"):SetVisible(nStartPage + i - 1 == frame.nCurrentPage)
 		end
-		
+
 		local hItem = handle:AppendItemFromIni(SZ_INI, "Handle_Index")
 		hItem.nPage = nPageCount
 		hItem:Lookup("Text_Index"):SetText(nPageCount)
@@ -286,17 +286,17 @@ function MY_BagStatistics.UpdateItems(frame)
 	handle:FormatAllItemPos()
 	handle:SetSizeByAllItemSize()
 	hOuter:FormatAllItemPos()
-	
+
 	-- 绘制列表
 	local DB_ItemInfoR = DB:Prepare(sql)
 	DB_ItemInfoR:ClearBindings()
 	DB_ItemInfoR:BindAll(AnsiToUTF8("%" .. searchitem .. "%"), AnsiToUTF8("%" .. searchitem .. "%"), unpack(ownerkeys))
 	local result = DB_ItemInfoR:GetAll()
-	
+
 	local sqlbelongs = "SELECT * FROM (SELECT ownerkey, SUM(bagcount) AS bagcount, SUM(bankcount) AS bankcount FROM BagItems WHERE tabtype = ? AND tabindex = ? AND tabsubindex = ? GROUP BY ownerkey) AS B LEFT JOIN OwnerInfo AS O ON B.ownerkey = O.ownerkey WHERE "
 	sqlbelongs = sqlbelongs .. ((#wheres == 0 and " 1 = 0 ") or ("(" .. tconcat(wheres, " OR ") .. ")"))
 	local DB_BelongsR = DB:Prepare(sqlbelongs)
-	
+
 	local handle = frame:Lookup("Window_Main/WndScroll_Item", "Handle_Items")
 	local scroll = frame:Lookup("Window_Main/WndScroll_Item/Scroll_Item")
 	handle:Clear()
@@ -307,7 +307,7 @@ function MY_BagStatistics.UpdateItems(frame)
 				local count = 0
 				local hItem = handle:AppendItemFromIni(SZ_INI, "Handle_ItemCompact")
 				local box = hItem:Lookup("Box_ItemCompact")
-				
+
 				DB_BelongsR:ClearBindings()
 				DB_BelongsR:BindAll(rec.tabtype, rec.tabindex, rec.tabsubindex, unpack(ownerkeys))
 				local result = DB_BelongsR:GetAll()
@@ -333,7 +333,7 @@ function MY_BagStatistics.UpdateItems(frame)
 					hItem:Lookup("Handle_ItemInfo/Text_ItemDesc"):SetText("")
 				end
 				hItem:Lookup("Handle_ItemInfo"):FormatAllItemPos()
-				
+
 				DB_BelongsR:ClearBindings()
 				DB_BelongsR:BindAll(rec.tabtype, rec.tabindex, rec.tabsubindex, unpack(ownerkeys))
 				local result = DB_BelongsR:GetAll()
@@ -359,7 +359,7 @@ end
 
 function MY_BagStatistics.OnFrameCreate()
 	PushDB()
-	
+
 	MY_BagStatistics.UpdateNames(this)
 	this:BringToTop()
 	this:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)

@@ -1,9 +1,9 @@
 --------------------------------------------
 -- @Desc  : UI事件ID计算
--- @Author: 翟一鸣 @tinymins
+-- @Author: 茗伊 @tinymins
 -- @Date  : 2015-02-28 17:37:53
 -- @Email : admin@derzh.com
--- @Last modified by:   Zhai Yiming
+-- @Last modified by:   tinymins
 -- @Last modified time: 2016-12-01 10:10:13
 --------------------------------------------
 local _C = {}
@@ -63,7 +63,7 @@ MY.RegisterPanel(
 OnPanelActive = function(wnd)
 	local ui = MY.UI(wnd)
 	local x, y = 10, 30
-	
+
 	ui:append('WndEditBox', {
 		name = 'WndEdit',
 		text = _C.nEventID, x = x, y = y, w = 150, h = 25, font = 201, color = { 255, 255, 255 }
@@ -73,7 +73,7 @@ OnPanelActive = function(wnd)
 	  		_C.SetEventID(ui, nEventID)
 	  	end
 	  end)
-	
+
 	x, y = 5, y + 35
 	for k, event in ipairs(_C.tEventIndex) do
 		ui:append("WndCheckBox", {
@@ -90,11 +90,11 @@ OnPanelActive = function(wnd)
 		  	ui:children("#WndEdit"):text(_C.nEventID)
 		  end)
 		x = x + 90
-		
+
 		if(k - 1) % 5 == 1 or k == 2 then
 			x, y = 5, y + 25
 		end
 	end
-	
+
 	_C.SetEventID(ui, _C.nEventID)
 end})

@@ -1,9 +1,9 @@
 --------------------------------------------
 -- @Desc  : 技能显示 - 战斗可视化
--- @Author: 翟一鸣 @tinymins
+-- @Author: 茗伊 @tinymins
 -- @Date  : 2015-03-02 10:08:45
 -- @Email : admin@derzh.com
--- @Last modified by:   Zhai Yiming
+-- @Last modified by:   tinymins
 -- @Last modified time: 2017-05-06 02:52:18
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
@@ -37,14 +37,14 @@ local function UpdateUI(frame, during)
 	local percentage = math.min(math.max(during / ANI_TIME, 0), 1)
 	local hList = frame:Lookup("", "Handle_Boxes")
 	local nCount = hList:GetItemCount()
-	
+
 	local hItem = hList:Lookup(GetRealIndex(0, frame.nIndexBase, nCount))
 	if not hItem.nStartX then
 		hItem.nStartX = hItem:GetRelX()
 	end
 	hItem:SetAlpha((1 - percentage) * 255)
 	hItem:SetRelX(hItem.nStartX - (hItem.nStartX + OUT_DISTANCE) * percentage)
-	
+
 	local nRelX = 0
 	for i = 1, nCount - 2 do
 		local hItem = hList:Lookup(GetRealIndex(i, frame.nIndexBase, nCount))
@@ -55,11 +55,11 @@ local function UpdateUI(frame, during)
 		hItem:SetRelX(nRelX + (hItem.nStartX - nRelX) * (1 - percentage))
 		nRelX = nRelX + hItem:GetW()
 	end
-	
+
 	local hItem = hList:Lookup(GetRealIndex(nCount - 1, frame.nIndexBase, nCount))
 	hItem:SetAlpha(percentage * 255)
 	hItem:SetRelX(nRelX + OUT_DISTANCE * (1 - percentage))
-	
+
 	hList:FormatAllItemPos()
 end
 
@@ -150,16 +150,16 @@ local function OnSkillCast(frame, dwSkillID, dwSkillLevel)
 	then
 		return
 	end
-	
+
 	local hList = frame:Lookup("", "Handle_Boxes")
 	local hItem = hList:Lookup(frame.nIndexBase)
 	frame.nIndexBase = (frame.nIndexBase + 1) % hList:GetItemCount()
-	
+
 	local box = hItem:Lookup("Box_Skill")
 	box:SetObject(UI_OBJECT_SKILL, dwSkillID, dwSkillLevel)
 	box:SetObjectIcon(dwIconID)
 	box:Show()
-	
+
 	StartAnimation(frame)
 end
 

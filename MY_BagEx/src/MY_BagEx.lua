@@ -1,9 +1,9 @@
 -----------------------------------------------
 -- @Desc  : 仓库背包增强（搜索/对比）
--- @Author: 翟一鸣 @tinymins
+-- @Author: 茗伊 @tinymins
 -- @Date  : 2014-11-25 10:40:14
 -- @Email : admin@derzh.com
--- @Last modified by:   Zhai Yiming
+-- @Last modified by:   tinymins
 -- @Last modified time: 2017-01-23 11:18:00
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_BagEx/lang/")
@@ -117,7 +117,7 @@ end
 local function DoCompare(ui1, ui2)
 	local itemlist1 = {}
 	local itemlist2 = {}
-	
+
 	ui1:find('.Box'):each(function(e)
 		if this.bBag then return end
 		local szBoxType, nUiId, dwBox, dwX, suitIndex, dwTabType, dwIndex = this:GetObject()
@@ -130,7 +130,7 @@ local function DoCompare(ui1, ui2)
 		local szBoxType, nUiId, dwBox, dwX, suitIndex, dwTabType, dwIndex = this:GetObject()
 		if szBoxType == UI_OBJECT_ITEM then
 			itemlist2[dwTabType .. ',' .. dwIndex] = true
-			
+
 			if itemlist1[dwTabType .. ',' .. dwIndex] then
 				e:alpha(255)
 			else
@@ -155,7 +155,7 @@ local function DoCompareBank(bForce)
 	if l_bCompareBank then
 		local frmBag = Station.Lookup("Normal/BigBagPanel")
 		local frmBank = Station.Lookup("Normal/BigBankPanel")
-		
+
 		if frmBag and frmBank and frmBank:IsVisible() then
 			MY.UI("Normal/BigBagPanel/CheckBox_Totle"):check(true):check(false)
 			DoCompare(MY.UI(frmBag), MY.UI(frmBank))
@@ -170,7 +170,7 @@ local function DoCompareGuildBank(bForce)
 	if l_bCompareGuild then
 		local frmBag = Station.Lookup("Normal/BigBagPanel")
 		local frmGuildBank = Station.Lookup("Normal/GuildBankPanel")
-		
+
 		if frmBag and frmGuildBank and frmGuildBank:IsVisible() then
 			MY.UI("Normal/BigBagPanel/CheckBox_Totle"):check(true):check(false)
 			DoCompare(MY.UI(frmBag), MY.UI(frmGuildBank))
@@ -208,10 +208,10 @@ local function Hook()
 				DoFilterBag()
 			end,
 		})
-		
+
 		HookTableFunc(frame, "OnFrameKeyDown", OnFrameKeyDown, false, true)
 	end
-	
+
 	local frame = Station.Lookup("Normal/BigBankPanel")
 	if frame and not frame.bMYBagExHook then
 		frame.bMYBagExHook = true
@@ -229,7 +229,7 @@ local function Hook()
 				DoFilterBank(true)
 			end,
 		})
-		
+
 		MY.UI(frame):append('WndCheckBox', {
 			name = 'WndCheckBox_Compare',
 			w = 100, x = 340, y = 56,
@@ -243,7 +243,7 @@ local function Hook()
 				DoCompareBank(true)
 			end
 		})
-		
+
 		MY.UI(frame):append('WndCheckBox', {
 			name = 'CheckBox_TimeLtd',
 			w = 60, x = 277, y = 56, alpha = 200,
@@ -257,10 +257,10 @@ local function Hook()
 				DoFilterBank(true)
 			end
 		})
-		
+
 		HookTableFunc(frame, "OnFrameKeyDown", OnFrameKeyDown, false, true)
 	end
-	
+
 	local frame = Station.Lookup("Normal/GuildBankPanel")
 	if frame and not frame.bMYBagExHook then
 		frame.bMYBagExHook = true
@@ -278,7 +278,7 @@ local function Hook()
 				DoFilterGuildBank(true)
 			end,
 		})
-		
+
 		MY.UI("Normal/GuildBankPanel"):append('WndCheckBox', {
 			name = 'WndCheckBox_Compare',
 			w = 100, x = 20, y = 475,
@@ -289,10 +289,10 @@ local function Hook()
 				DoCompareGuildBank(true)
 			end
 		})
-		
+
 		HookTableFunc(frame, "OnFrameKeyDown", OnFrameKeyDown, false, true)
 	end
-	
+
 	MY.RegisterEvent("EXECUTE_BINDING.MY_BAGEX", function(e)
 		local szName, bDown = arg0, arg1
 		if Cursor.IsVisible()
@@ -303,7 +303,7 @@ local function Hook()
 			end
 		end
 	end)
-	
+
 	DoFilterBank()
 	DoCompareBank()
 	DoFilterGuildBank()
@@ -317,7 +317,7 @@ local function Unhook()
 		frame:Lookup("WndEditBox_KeyWord"):Destroy()
 		UnhookTableFunc(frame, "OnFrameKeyDown", OnFrameKeyDown)
 	end
-	
+
 	local frame = Station.Lookup("Normal/BigBankPanel")
 	if frame and frame.bMYBagExHook then
 		frame.bMYBagExHook = nil
@@ -326,7 +326,7 @@ local function Unhook()
 		frame:Lookup("WndCheckBox_Compare"):Destroy()
 		UnhookTableFunc(frame, "OnFrameKeyDown", OnFrameKeyDown)
 	end
-	
+
 	local frame = Station.Lookup("Normal/GuildBankPanel")
 	if frame and frame.bMYBagExHook then
 		frame.bMYBagExHook = nil
@@ -334,7 +334,7 @@ local function Unhook()
 		frame:Lookup("WndCheckBox_Compare"):Destroy()
 		UnhookTableFunc(frame, "OnFrameKeyDown", OnFrameKeyDown)
 	end
-	
+
 	MY.RegisterEvent("EXECUTE_BINDING.MY_BAGEX")
 end
 

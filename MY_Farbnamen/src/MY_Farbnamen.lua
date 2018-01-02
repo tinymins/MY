@@ -1,7 +1,6 @@
 --
 -- 聊天窗口名称染色插件
 -- By 茗伊@双梦镇@荻花宫
--- ZhaiYiMing.CoM
 -- 2014年5月19日05:07:02
 --
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Farbnamen/lang/")
@@ -67,7 +66,7 @@ do if IsDebugClient() then -- 旧版缓存转换
 		end
 		DB:Execute("END TRANSACTION")
 		MY.Debug({"Farbnamen info cache trans from file to sqlite finished!"}, "MY_Farbnamen", MY_DEBUG.LOG)
-		
+
 		MY.Debug({"Farbnamen tong cache trans from file to sqlite start!"}, "MY_Farbnamen", MY_DEBUG.LOG)
 		DB:Execute("BEGIN TRANSACTION")
 		for i = 0, 128 do
@@ -84,7 +83,7 @@ do if IsDebugClient() then -- 旧版缓存转换
 		end
 		DB:Execute("END TRANSACTION")
 		MY.Debug({"Farbnamen tong cache trans from file to sqlite finished!"}, "MY_Farbnamen", MY_DEBUG.LOG)
-		
+
 		MY.Debug({"Farbnamen cleaning file cache start: " .. SZ_IC_PATH}, "MY_Farbnamen", MY_DEBUG.LOG)
 		CPath.DelDir(SZ_IC_PATH)
 		MY.Debug({"Farbnamen cleaning file cache finished!"}, "MY_Farbnamen", MY_DEBUG.LOG)
@@ -180,7 +179,7 @@ MY_Farbnamen.ShowTip = function(namelink)
 	local szName = string.gsub(namelink:GetText(), '[%[%]]', '')
 	x, y = namelink:GetAbsPos()
 	w, h = namelink:GetSize()
-	
+
 	local tInfo = MY_Farbnamen.GetAusName(szName)
 	if tInfo then
 		local tTip = {}
@@ -265,7 +264,7 @@ local function OnExit()
 		DBI_W:Execute()
 	end
 	DB:Execute("END TRANSACTION")
-	
+
 	DB:Execute("BEGIN TRANSACTION")
 	for id, name in pairs(l_tongnames_w) do
 		DBT_W:ClearBindings()
@@ -273,7 +272,7 @@ local function OnExit()
 		DBT_W:Execute()
 	end
 	DB:Execute("END TRANSACTION")
-	
+
 	DB:Release()
 end
 MY.RegisterExit("MY_Farbnamen_Save", OnExit)
@@ -333,7 +332,7 @@ function MY_Farbnamen.AddAusID(dwID)
 		info.title = player.nX ~= 0 and player.szTitle or info.title
 		info.camp  = player.nCamp or -1
 		info.tong  = player.dwTongID or -1
-		
+
 		if IsRemotePlayer(info.id) then
 			l_infocache[info.id] = info
 			l_infocache[info.name] = info

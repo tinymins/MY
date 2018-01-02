@@ -1,8 +1,8 @@
 ---------------------------------------------------------
 -- Simple JX3 XML decoding and encoding in pure Lua.
 ---------------------------------------------------------
--- @author µ‘“ª√˘ @tinymins
--- @refer http://zhaiyiming.com/
+-- @author ‹¯“¡ @tinymins
+-- @refer http://jx3.derzh.com/
 ---------------------------------------------------------
 -- local lua_value = MY.Xml.Decode(raw_xml_text)
 -- local raw_xml_text = MY.Xml.Encode(lua_table_or_value)
@@ -46,7 +46,7 @@ local xmlDecode = function(xml)
 	local byte_lt, byte_gt, byte_amp, byte_eq, byte_space = (byte("<")), (byte(">")), (byte("&")), (byte("=")), (byte(" "))
 	local byte_char_n, byte_char_t, byte_lf, byte_tab = (byte("n")), (byte("t")), (byte("\n")), (byte("\t"))
 	local pos1, pos2, byte_quote, key, b_escaping, bytes_string
-	-- <        label         attribute_key=attribute_value>        text_key=text_value<        /     label         >       
+	-- <        label         attribute_key=attribute_value>        text_key=text_value<        /     label         >
 	-- label_lt label_opening attribute                    label_gt text               label_lt slash label_closing label_gt
 	while pos <= len do
 		byte_current = byte(xml, pos)
@@ -250,12 +250,12 @@ end
 local xmlEncode
 xmlEncode = function(xml)
 	local t = {}
-	
+
 	-- head
 	if xml['.'] then
 		tinsert(t, '<')
 		tinsert(t, xml['.'])
-		
+
 		-- attributes
 		local attr = ''
 		for k, v in pairs(xml) do
@@ -274,7 +274,7 @@ xmlEncode = function(xml)
 				end
 			end
 		end
-		
+
 		tinsert(t, '>')
 	end
 	-- inner attritubes
@@ -295,18 +295,18 @@ xmlEncode = function(xml)
 			end
 		end
 	end
-	
+
 	-- children
 	for _, v in ipairs(xml) do
 		tinsert(t, xmlEncode(v))
 	end
-	
+
 	if xml['.'] then
 		tinsert(t, '</')
 		tinsert(t, xml['.'])
 		tinsert(t, '>')
 	end
-	
+
 	return (tconcat(t))
 end
 

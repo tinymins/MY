@@ -3,7 +3,7 @@
 -- @Author: ‹¯“¡ @ À´√Œ’Ú @ ›∂ª®π¨
 -- @Date  : 2014-05-10 08:40:30
 -- @Email : admin@derzh.com
--- @Last modified by:   Zhai Yiming
+-- @Last modified by:   tinymins
 -- @Last modified time: 2017-05-08 17:30:11
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")

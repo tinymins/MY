@@ -1,9 +1,9 @@
 --------------------------------------------
 -- @Desc  : UI事件ID计算
--- @Author: 翟一鸣 @tinymins
+-- @Author: 茗伊 @tinymins
 -- @Date  : 2015-02-28 17:37:53
 -- @Email : admin@derzh.com
--- @Last modified by:   Zhai Yiming
+-- @Last modified by:   tinymins
 -- @Last modified time: 2017-01-05 18:25:03
 --------------------------------------------
 local _C = {}
@@ -71,10 +71,10 @@ MY.RegisterPanel(
 		local x, y = 10, 10
 		local w, h = ui:size()
 		local nLimit = 20
-		
+
 		local tWndEditK = {}
 		local tWndEditV = {}
-		
+
 		for i = 1, nLimit do
 			tWndEditK[i] = ui:append("WndEditBox", {
 				name = "WndEditBox_K" .. i,
@@ -87,7 +87,7 @@ MY.RegisterPanel(
 					MY.SaveLUAData(DATA_PATH, _C.tVarList)
 				end,
 			}):children("#WndEditBox_K" .. i)
-			
+
 			tWndEditV[i] = ui:append("WndEditBox", {
 				name = "WndEditBox_V" .. i,
 				x = x + 150, y = y + (i - 1) * 25,
@@ -95,7 +95,7 @@ MY.RegisterPanel(
 				color = {255, 255, 255},
 			}):children("#WndEditBox_V" .. i)
 		end
-		
+
 		MY.BreatheCall("DEV_VARWATCH", function()
 			for i = 1, nLimit do
 				local szKey = _C.tVarList[i]

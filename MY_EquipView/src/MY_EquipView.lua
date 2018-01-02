@@ -1,9 +1,9 @@
 --------------------------------------------
 -- @Desc  : 我的装备一览
--- @Author: 翟一鸣 @tinymins
+-- @Author: 茗伊 @tinymins
 -- @Date  : 2015-4-20 09:04:25
 -- @Email : admin@derzh.com
--- @Last Modified by:   翟一鸣 @tinymins
+-- @Last Modified by:   茗伊 @tinymins
 -- @Last Modified time: 2015-04-20 12:09:59
 --------------------------------------------
 local _C = {}

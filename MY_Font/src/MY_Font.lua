@@ -1,9 +1,9 @@
 --------------------------------------------
 -- @Desc  : ”Œœ∑◊÷ÃÂ
--- @Author: µ‘“ª√˘ @tinymins
+-- @Author: ‹¯“¡ @tinymins
 -- @Date  : 2015-02-28 17:37:53
 -- @Email : admin@derzh.com
--- @Last modified by:   Zhai Yiming
+-- @Last modified by:   tinymins
 -- @Last modified time: 2016-12-13 14:56:23
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Font/lang/")
@@ -80,7 +80,7 @@ OnPanelActive = function(wnd)
 	local ui = MY.UI(wnd)
 	local x, y = 10, 30
 	local w, h = ui:size()
-	
+
 	for _, p in ipairs(C.tFontType) do
 		local szName, szFile, nSize, tStyle = Font.GetFont(p.tIDs[1])
 		if tStyle then
@@ -95,7 +95,7 @@ OnPanelActive = function(wnd)
 			x = 10
 			ui:append("Text", { text = _L[" * "] .. p.szName, x = x, y = y })
 			y = y + 40
-			
+
 			acFile = ui:append("WndAutocomplete", {
 				x = x, y = y, w = w - 180 - 30,
 				text = szFile,
@@ -120,7 +120,7 @@ OnPanelActive = function(wnd)
 			  	end,
 				autocomplete = {{"option", "source", C.aFontPath}},
 			}, true)
-			
+
 			ui:append("WndButton", {
 				x = w - 180 - x - 10, y = y, w = 25,
 				text = "...",
@@ -135,7 +135,7 @@ OnPanelActive = function(wnd)
 					end
 				end,
 			})
-			
+
 			acName = ui:append("WndAutocomplete", {
 				w = 100, h = 25, x = w - 180 + x, y = y,
 				text = szName,
@@ -159,7 +159,7 @@ OnPanelActive = function(wnd)
 			  	end,
 				autocomplete = {{"option", "source", C.aFontName}},
 			}, true)
-			
+
 			btnSure = ui:append("WndButton", {
 				w = 60, h = 25, x = w - 60, y = y,
 				text = _L['apply' ], enable = false,

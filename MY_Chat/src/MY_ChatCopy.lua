@@ -1,9 +1,9 @@
 --------------------------------------------
 -- @Desc  : ÁÄÌì¸¨Öú
--- @Author: µÔÒ»Ãù @tinymins
+-- @Author: ÜøÒÁ @tinymins
 -- @Date  : 2016-02-5 11:35:53
 -- @Email : admin@derzh.com
--- @Last modified by:   Zhai Yiming
+-- @Last modified by:   tinymins
 -- @Last modified time: 2016-12-13 10:40:35
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_ChatCopy/lang/")

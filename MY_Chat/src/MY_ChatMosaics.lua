@@ -1,14 +1,14 @@
 --------------------------------------------
 -- @File  : MY_ChatMosaics.lua
 -- @Desc  : ÁÄÌìÀ¸ĞÕÃûÒ»¼ü´òÂë
--- @Author: µÔÒ»Ãù (tinymins) @ derzh.com
+-- @Author: ÜøÒÁ (tinymins) @ derzh.com
 -- @Date  : 2015-05-21 10:34:08
 -- @Email : admin@derzh.com
--- @Last modified by:   Zhai Yiming
+-- @Last modified by:   tinymins
 -- @Last modified time: 2016-11-11 10:04:36
 -- @Version: 1.0
 -- @ChangeLog:
---  + v1.0 File founded. -- viaµÔÒ»Ãù
+--  + v1.0 File founded. -- viaÜøÒÁ
 --------------------------------------------
 MY_ChatMosaics = {}
 local _C = {}
@@ -197,7 +197,7 @@ OnPanelActive = function(wnd)
 		end,
 	})
 	y = y + 30
-	
+
 	ui:append("WndEditBox", {
 		placeholder = _L['unmosaics names (split by comma)'],
 		x = x, y = y, w = w - 2 * x, h = h - y - 50,

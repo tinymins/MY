@@ -1,8 +1,8 @@
 --
 -- 聊天记录
 -- 记录团队/好友/帮会/密聊 供日后查询
--- 作者：翟一鸣 @ tinymins
--- 网站：ZhaiYiMing.CoM
+-- 作者：茗伊 @ tinymins
+-- 网站：jx3.derzh.com
 --
 
 -- these global functions are accessed all the time by the event handler

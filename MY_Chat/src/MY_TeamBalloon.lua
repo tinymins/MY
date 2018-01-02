@@ -1,9 +1,9 @@
 --------------------------------------------
 -- @Desc  : ¡ƒÃÏ≈›≈›
--- @Author: µ‘“ª√˘ @tinymins
+-- @Author: ‹¯“¡ @tinymins
 -- @Date  : 2016-02-5 11:35:53
 -- @Email : admin@derzh.com
--- @Last modified by:   Zhai Yiming
+-- @Last modified by:   tinymins
 -- @Last modified time: 2016-11-11 10:04:55
 --------------------------------------------
 local INI_PATH = MY.GetAddonInfo().szRoot .. "MY_Chat/ui/MY_TeamBalloon.ini"
@@ -28,7 +28,7 @@ local function AppendBalloon(hFrame, dwID, szMsg)
 	hContent:AppendItemFromString(szMsg)
 	hContent:FormatAllItemPos()
 	hContent:SetSizeByAllItemSize()
-	
+
 	-- Adjust balloon size
 	local w, h = hContent:GetSize()
 	w, h = w + 20, h + 20
@@ -39,7 +39,7 @@ local function AppendBalloon(hFrame, dwID, szMsg)
 	hBalloon:SetSize(10000, 10000)
 	hBalloon:FormatAllItemPos()
 	hBalloon:SetSizeByAllItemSize()
-		
+
 	-- Show balloon
 	local hWnd = Station.Lookup("Normal/Teammate")
 	local hContent = hBalloon:Lookup("Handle_Content")

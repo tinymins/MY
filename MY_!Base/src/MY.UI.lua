@@ -1,9 +1,9 @@
 -----------------------------------------------
 -- @Desc  : ÜøÒÁ²å¼ş¼¯UI¿â
--- @Author: µÔÒ»Ãù @tinymins
+-- @Author: ÜøÒÁ @tinymins
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
--- @Last modified by:   Zhai Yiming
+-- @Last modified by:   tinymins
 -- @Last modified time: 2017-02-08 20:46:39
 -----------------------------------------------
 

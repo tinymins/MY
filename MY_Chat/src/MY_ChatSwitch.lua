@@ -1,9 +1,9 @@
 --------------------------------------------
 -- @Desc  : ¡ƒÃÏ∆µµ¿«–ªª
--- @Author: µ‘“ª√˘ @tinymins
+-- @Author: ‹¯“¡ @tinymins
 -- @Date  : 2016-02-5 11:35:53
 -- @Email : admin@derzh.com
--- @Last modified by:   Zhai Yiming
+-- @Last modified by:   tinymins
 -- @Last modified time: 2017-02-08 20:25:53
 --------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Chat/lang/")
@@ -433,7 +433,7 @@ function PS.OnPanelActive(wnd)
 		x = w - x - 80, y = y,
 		w = 80, h = 30,
 		text = _L["about..."],
-		onclick = function() MY.Alert(_L["Mingyi Plugins - Chatpanel\nThis plugin is developed by Zhai YiMing @ derzh.com."]) end,
+		onclick = function() MY.Alert(_L["Mingyi Plugins - Chatpanel\nThis plugin is developed by tinymins @ derzh.com."]) end,
 	})
 
 	ui:append("WndCheckBox", {

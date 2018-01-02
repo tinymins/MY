@@ -1,7 +1,6 @@
 -------------------------
 -- 弧形血条 -- 重构
 -- By 茗伊@双梦镇@荻花宫
--- ZhaiYiMing.CoM
 -- 2015-12-11 09:54:01
 -------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_ArchHUD/lang/")
@@ -37,7 +36,7 @@ local function UpdatePlayerData(hFrame, KSelf)
 	if not KSelf then
 		return
 	end
-	
+
 	local nCurrentMana, nMaxMana
 	local nManaR, nManaG, nManaB
 	local szMana, szManaImage, nManaFrame
@@ -111,11 +110,11 @@ local function UpdatePlayerData(hFrame, KSelf)
 	else
 		nCurrentMana, nMaxMana = KSelf.nCurrentMana, KSelf.nMaxMana
 	end
-	
+
 	hFrame.hSelfHealth:Show()
 	hFrame.hTextSelfHealth:SetText(tostring(KSelf.nCurrentLife) .. "(" .. KeepTwoByteFloat(KSelf.nCurrentLife / KSelf.nMaxLife * 100) .. "%)")
 	hFrame.hImageSelfHealth:SetPercentage(KSelf.nCurrentLife / KSelf.nMaxLife)
-	
+
 	hFrame.hSelfMana:Show()
 	if nManaR and nManaG and nManaB then
 		hFrame.hTextSelfMana:SetFontColor(nManaR, nManaG, nManaB)
@@ -128,7 +127,7 @@ local function UpdatePlayerData(hFrame, KSelf)
 	end
 	hFrame.hTextSelfMana:SetText(szMana)
 	hFrame.hImageSelfMana:SetPercentage(nCurrentMana / nMaxMana)
-	
+
 	if nCurrentExtra then
 		hFrame.hSelfExtra:Show()
 		if szExtraImage and nExtraFrame then
@@ -309,7 +308,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + 45
-	
+
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = 200,
 		text = _L['hide when unfight'],
@@ -320,7 +319,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + 45
-	
+
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = 200,
 		text = _L['display target casting'],
@@ -331,7 +330,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + 45
-	
+
 	ui:append("WndSliderBox", {
 		x = x, y = y, w = 200,
 		text = _L('current alpha is %d%%.', MY_ArchHUD.nAlpha),
@@ -347,7 +346,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	y = y + 45
-	
+
 	ui:append("Text", {
 		x = x, y = y, w = 120,
 		text = _L['origin author: Sulian Yi'],

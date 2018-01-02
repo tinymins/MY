@@ -1,6 +1,6 @@
 ----------------------------------------------------
 -- ÜøÒÁ½ØÍ¼ÖúÊÖ ver 0.2 Build 20140717
--- Code by: µÔÒ»Ãùtinymins @ ZhaiYiMing.CoM
+-- Code by: ÜøÒÁ @tinymins
 -- µçÎå¡¤Ë«ÃÎÕò¡¤ÜøÒÁ
 ---------------------------------------------------
 local _GLOBAL_CONFIG_ = {"config/screenshot.jx3dat", MY_DATA_PATH.GLOBAL}
@@ -100,17 +100,17 @@ _MY_ScreenShot.OnPanelActive = function(wnd)
         ui:children("#WndSliderBox_Quality"):value(MY_ScreenShot.GetConfig("nQuality"))
         ui:children("#WndEditBox_SsRoot"):text(MY_ScreenShot.GetConfig("szFilePath"))
     end
-    
+
     ui:append("WndCheckBox", "WndCheckBox_UseGlobal"):children("#WndCheckBox_UseGlobal"):pos(30,30):width(200)
       :text(_L["use global config"]):tip(_L['Check to use global config, otherwise use private setting.'])
       :check(function(bChecked) MY_ScreenShot.bUseGlobalConfig = bChecked fnRefreshPanel(ui) end)
       :check(MY_ScreenShot.bUseGlobalConfig)
-    
+
     ui:append("WndCheckBox", "WndCheckBox_HideUI"):children("#WndCheckBox_HideUI"):pos(30,70)
       :text(_L['auto hide ui while shot screen']):tip(_L['Check it if you want to hide ui automatic.'])
       :check(function(bChecked) MY_ScreenShot.SetConfig("bAutoHideUI", bChecked) end)
       :check(MY_ScreenShot.GetConfig("bAutoHideUI"))
-      
+
     ui:append("Text", "Text_FileExName"):find("#Text_FileExName"):text(_L['file format']):pos(30,110)
     ui:append("WndComboBox", "WndCombo_FileExName"):children('#WndCombo_FileExName'):pos(110,110):width(80)
       :menu(function()
@@ -122,13 +122,13 @@ _MY_ScreenShot.OnPanelActive = function(wnd)
         }
       end)
       :text(MY_ScreenShot.GetConfig("szFileExName"))
-    
+
     ui:append("Text", "Text_Quality"):find("#Text_Quality"):text(_L['set quality (0-100)']):pos(30,150)
     ui:append("WndSliderBox", "WndSliderBox_Quality"):children("#WndSliderBox_Quality"):pos(180,150)
       :sliderStyle(false):range(0, 100)
       :tip(_L['Set screenshot quality(0-100): the larger number, the image will use more hdd space.'])
       :change(function(raw, nValue) MY_ScreenShot.SetConfig('nQuality', nValue) end)
-    
+
     ui:append("Text", "Text_SsRoot"):find("#Text_SsRoot"):text(_L['set folder']):pos(30,190)
     ui:append("WndEditBox", "WndEditBox_SsRoot"):children("#WndEditBox_SsRoot"):pos(30,220):size(620,100)
       :text(MY_ScreenShot.GetConfig("szFilePath"))
@@ -140,17 +140,17 @@ _MY_ScreenShot.OnPanelActive = function(wnd)
         MY_ScreenShot.SetConfig("szFilePath", szValue)
       end)
       :tip(_L['Set destination folder which screenshot file will be saved. Absolute path required.\nEx: D:/JX3_ScreenShot/\nAttention: let it blank will save screenshot to default folder.'],MY.Const.UI.Tip.POS_TOP)
-    
+
     ui:append("WndButton", "WndButton_HotkeyCheck"):children("#WndButton_HotkeyCheck"):pos(w-180, 30):width(170)
       :text(_L["set default screenshot tool"])
       :click(function() MY.Game.SetHotKey("MY_ScreenShot_Hotkey",1,44,false,false,false) end)
-    
+
     ui:append("Text", "Text_SetHotkey"):find("#Text_SetHotkey"):pos(w-140, 60):color(255,255,0)
       :text(_L['>> set hotkey <<'])
       :click(function() MY.Game.SetHotKey() end)
-    
+
     fnRefreshPanel(ui)
-    
+
     -- ×¢²áÄ¬ÈÏ¹¤¾ß¼ì²é
     MY.BreatheCall("MY_ScreenShot_Hotkey_Check", 1000, function()
         local nKey, nShift, nCtrl, nAlt = MY.Game.GetHotKey("MY_ScreenShot_Hotkey")

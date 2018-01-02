@@ -1,14 +1,14 @@
 --------------------------------------------
 -- @File  : MY_TalkEx.lua
 -- @Desc  : ∫∞ª∞∏®÷˙
--- @Author: µ‘“ª√˘ (tinymins) @ derzh.com
+-- @Author: ‹¯“¡ (tinymins) @ derzh.com
 -- @Date  : 2015-05-18 10:30:29
 -- @Email : admin@derzh.com
--- @Last modified by:   Zhai Yiming
+-- @Last modified by:   tinymins
 -- @Last modified time: 2016-11-11 10:06:00
 -- @Version: 1.0
 -- @ChangeLog:
---  + v1.0 File founded. -- viaµ‘“ª√˘
+--  + v1.0 File founded. -- via‹¯“¡
 --------------------------------------------
 MY_TalkEx = MY_TalkEx or {}
 local _C = {}
@@ -54,7 +54,7 @@ _C.Talk = function()
 	if #MY_TalkEx.szTalk == 0 then
 		return MY.Sysmsg({_L["please input something."], r=255, g=0, b=0})
 	end
-	
+
 	if not MY.IsShieldedVersion() and MY.ProcessCommand
 	and MY_TalkEx.szTalk:sub(1, 8) == '/script ' then
 		MY.ProcessCommand(MY_TalkEx.szTalk:sub(9))
