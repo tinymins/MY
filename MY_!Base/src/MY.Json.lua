@@ -22,21 +22,28 @@ MY.Json = MY.Json or {}
 -- local raw_json_text = MY.Json.Encode(lua_table_or_value)
 -- local pretty_json_text = MY.Json.Encode(lua_table_or_value, true)
 ---------------------------------------------------------------------------
+local pairs, ipairs = pairs, ipairs
+local char, srep = string.char, string.rep
+local floor, huge, max = math.floor, math.huge, math.max
+local tonumber, tostring = tonumber, tostring
+local type = type
+local tconcat, tinsert = table.concat, table.insert
+
 -- decode util functions
 local function unicode_codepoint_as_utf8(codepoint)
 	-- codepoint is a number
 	if codepoint <= 127 then
-		return string.char(codepoint)
+		return char(codepoint)
 	elseif codepoint <= 2047 then
 		-- 110yyyxx 10xxxxxx         <-- useful notation from http://en.wikipedia.org/wiki/Utf8
-		local highpart = math.floor(codepoint / 0x40)
+		local highpart = floor(codepoint / 0x40)
 		local lowpart  = codepoint - (0x40 * highpart)
-		return string.char(0xC0 + highpart, 0x80 + lowpart)
+		return char(0xC0 + highpart, 0x80 + lowpart)
 	elseif codepoint <= 65535 then
 		-- 1110yyyy 10yyyyxx 10xxxxxx
-		local highpart  = math.floor(codepoint / 0x1000)
+		local highpart  = floor(codepoint / 0x1000)
 		local remainder = codepoint - 0x1000 * highpart
-		local midpart   = math.floor(remainder / 0x40)
+		local midpart   = floor(remainder / 0x40)
 		local lowpart   = remainder - 0x40 * midpart
 		highpart = 0xE0 + highpart
 		midpart  = 0x80 + midpart
@@ -49,17 +56,17 @@ local function unicode_codepoint_as_utf8(codepoint)
 			( highpart == 0xF4 and midpart > 0x8F ) then
 			return "?"
 		else
-			return string.char(highpart, midpart, lowpart)
+			return char(highpart, midpart, lowpart)
 		end
 	else
 		-- 11110zzz 10zzyyyy 10yyyyxx 10xxxxxx
-		local highpart  = math.floor(codepoint / 0x40000)
+		local highpart  = floor(codepoint / 0x40000)
 		local remainder = codepoint - 0x40000 * highpart
-		local midA      = math.floor(remainder / 0x1000)
+		local midA      = floor(remainder / 0x1000)
 		remainder       = remainder - 0x1000 * midA
-		local midB      = math.floor(remainder / 0x40)
+		local midB      = floor(remainder / 0x40)
 		local lowpart   = remainder - 0x40 * midB
-		return string.char(0xF0 + highpart, 0x80 + midA, 0x80 + midB, 0x80 + lowpart)
+		return char(0xF0 + highpart, 0x80 + midA, 0x80 + midB, 0x80 + lowpart)
 	end
 end
 
@@ -318,10 +325,10 @@ local function object_or_array(T)
 	-- fetch all keys
 	for key in pairs(T) do
 		if type(key) == "string" then
-			table.insert(string_keys, key)
+			tinsert(string_keys, key)
 		elseif type(key) == "number" then
-			table.insert(number_keys, key)
-			if key <= 0 or key >= math.huge then
+			tinsert(number_keys, key)
+			if key <= 0 or key >= huge then
 				number_keys_must_be_strings = true
 			elseif not maximum_number_key or key > maximum_number_key then
 				maximum_number_key = key
@@ -349,7 +356,7 @@ local function object_or_array(T)
 		for _, number_key in ipairs(number_keys) do
 			local string_key = tostring(number_key)
 			if map[string_key] == nil then
-				table.insert(string_keys , string_key)
+				tinsert(string_keys , string_key)
 				map[string_key] = T[number_key]
 			end
 		end
@@ -370,14 +377,14 @@ local function encode_value(value, parents, indent)
 			-- NaN (Not a Number).
 			-- JSON has no NaN, so we have to fudge the best we can. This should really be a package option.
 			return "null"
-		elseif value >= math.huge then
+		elseif value >= huge then
 			-- Positive infinity. JSON has no INF, so we have to fudge the best we can. This should
 			-- really be a package option. Note: at least with some implementations, positive infinity
-			-- is both ">= math.huge" and "<= -math.huge", which makes no sense but that's how it is.
-			-- Negative infinity is properly "<= -math.huge". So, we must be sure to check the ">="
+			-- is both ">= huge" and "<= -huge", which makes no sense but that's how it is.
+			-- Negative infinity is properly "<= -huge". So, we must be sure to check the ">="
 			-- case first.
 			return "1e+9999"
-		elseif value <= -math.huge then
+		elseif value <= -huge then
 			-- Negative infinity.
 			-- JSON has no INF, so we have to fudge the best we can. This should really be a package option.
 			return "-1e+9999"
@@ -402,12 +409,12 @@ local function encode_value(value, parents, indent)
 			-- An array
 			local ITEMS = {}
 			for i = 1, maximum_number_key do
-				table.insert(ITEMS, encode_value(T[i], parents, indent))
+				tinsert(ITEMS, encode_value(T[i], parents, indent))
 			end
 			if indent then
-				result_value = "[ " .. table.concat(ITEMS, ", ") .. " ]"
+				result_value = "[ " .. tconcat(ITEMS, ", ") .. " ]"
 			else
-				result_value = "[" .. table.concat(ITEMS, ",") .. "]"
+				result_value = "[" .. tconcat(ITEMS, ",") .. "]"
 			end
 		elseif object_keys then
 			-- An object
@@ -417,30 +424,30 @@ local function encode_value(value, parents, indent)
 				local max_key_length = 0
 				for _, key in ipairs(object_keys) do
 					local encoded = encode_value(tostring(key), parents, "")
-					max_key_length = math.max(max_key_length, #encoded)
-					table.insert(KEYS, encoded)
+					max_key_length = max(max_key_length, #encoded)
+					tinsert(KEYS, encoded)
 				end
 				local key_indent = indent .. "    "
-				local subtable_indent = indent .. string.rep(" ", max_key_length + 2 + 4)
+				local subtable_indent = indent .. srep(" ", max_key_length + 2 + 4)
 				local FORMAT = "%s%" .. string.format("%d", max_key_length) .. "s: %s"
 				local COMBINED_PARTS = {}
 				for i, key in ipairs(object_keys) do
 					local encoded_val = encode_value(TT[key], parents, subtable_indent)
 					if encoded_val then
-						table.insert(COMBINED_PARTS, string.format(FORMAT, key_indent, KEYS[i], encoded_val))
+						tinsert(COMBINED_PARTS, string.format(FORMAT, key_indent, KEYS[i], encoded_val))
 					end
 				end
-				result_value = "{\n" .. table.concat(COMBINED_PARTS, ",\n") .. "\n" .. indent .. "}"
+				result_value = "{\n" .. tconcat(COMBINED_PARTS, ",\n") .. "\n" .. indent .. "}"
 			else
 				local PARTS = {}
 				for _, key in ipairs(object_keys) do
 					local encoded_val = encode_value(TT[key], parents, indent)
 					if encoded_val then
 						local encoded_key = encode_value(tostring(key), parents, indent)
-						table.insert(PARTS, string.format("%s:%s", encoded_key, encoded_val))
+						tinsert(PARTS, string.format("%s:%s", encoded_key, encoded_val))
 					end
 				end
-				result_value = "{" .. table.concat(PARTS, ",") .. "}"
+				result_value = "{" .. tconcat(PARTS, ",") .. "}"
 			end
 		else
 			result_value = "[]"
