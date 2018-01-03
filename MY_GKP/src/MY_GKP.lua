@@ -1367,7 +1367,7 @@ function _GKP.Record(tab, item, bEnter)
 		name = "Name", x = 140, y = 91, w = 185, h = 25,
 		autocomplete = {
 			{
-				'option', 'beforeSearch', function(raw, option)
+				'option', 'beforeSearch', function(raw, option, text)
 					option.source = {}
 					for k, v in ipairs(_GKP.Config.Subsidies) do
 						if v[3] then
@@ -1377,45 +1377,54 @@ function _GKP.Record(tab, item, bEnter)
 				end,
 			},
 			{
-				'option', 'afterComplete', function(raw, option, szText)
-					if szText then
+				'option', 'afterComplete', function(raw, option, text)
+					if text then
 						ui:children("#Money"):focus()
 					end
 				end,
 			},
 		},
 	}, true)
-	local hMoney = ui:append("WndEditBox", { name = "Money", x = 140, y = 151, w = 185, h = 25, limit = 8, edittype = 1 }, true)
-	-- :autocomplete(function(szText)
-	-- 	if tonumber(szText) and tonumber(szText) < 100 and tonumber(szText) > -100 and tonumber(szText) ~= 0 then
-	-- 		local menu = {}
-	-- 		for k, v in ipairs({2, 3, 4}) do
-	-- 			local nMoney = string.format("%0.".. v .."f", szText):gsub("%.", "")
-	-- 			table.insert(menu, {
-	-- 				bRichText = true,
-	-- 				szOption  = _GKP.GetMoneyTipText(tonumber(nMoney)),
-	-- 				option    = nMoney,
-	-- 			})
-	-- 		end
-	-- 		table.insert(menu, { bDevide = true })
-	-- 		table.insert(menu, { bRichText = true, szOption = _GKP.GetMoneyTipText(tonumber(szText)), option = szText, self = true })
-	-- 		return menu
-	-- 	else
-	-- 		if tonumber(szText) then
-	-- 			return {{ bRichText = true, szOption = _GKP.GetMoneyTipText(tonumber(szText)), option = szText, self = true }}
-	-- 		else
-	-- 			return {}
-	-- 		end
-	-- 	end
-	-- end):Change(function(szText)
-	-- 	if tonumber(szText) or szText == "" or szText == "-" then
-	-- 		this.szText = szText
-	-- 		this:SetFontColor(_GKP.GetMoneyCol(szText))
-	-- 	else
-	-- 		MY.Sysmsg(_L["Please enter numbers"])
-	-- 		this:SetText(this.szText or "")
-	-- 	end
-	-- end)
+	local hMoney = ui:append("WndAutocomplete", {
+		name = "Money", x = 140, y = 151, w = 185, h = 25, limit = 8, edittype = 1,
+		autocomplete = {
+			{
+				'option', 'beforeSearch', function(raw, option, text)
+					option.source = {}
+					if tonumber(text) then
+						if tonumber(text) < 100 and tonumber(text) > -100 and tonumber(text) ~= 0 then
+							for k, v in ipairs({2, 3, 4}) do
+								local szMoney = string.format("%0.".. v .."f", text):gsub("%.", "")
+								table.insert(option.source, {
+									text     = szMoney,
+									keyword  = text,
+									display  = _GKP.GetMoneyTipText(tonumber(szMoney)),
+									richtext = true,
+								})
+							end
+							table.insert(option.source, { divide = true, keyword = text })
+						end
+						table.insert(option.source, {
+							text     = text,
+							keyword  = text,
+							display  = _GKP.GetMoneyTipText(tonumber(text)),
+							richtext = true,
+						})
+					end
+				end,
+			},
+		},
+		onchange = function(raw, szText)
+			local ui = XGUI(raw)
+			if tonumber(szText) or szText == "" or szText == "-" then
+				raw.szText = szText
+				ui:color(_GKP.GetMoneyCol(szText))
+			else
+				MY.Sysmsg({_L["Please enter numbers"]})
+				ui:text(raw.szText or "")
+			end
+		end,
+	}, true)
 	-- set frame
 	if tab and type(item) == "userdata" then
 		hPlayer:text(tab.szPlayer):color(MY.GetForceColor(tab.dwForceID))

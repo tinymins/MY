@@ -1336,19 +1336,17 @@ function XGUI:autocomplete(method, arg1, arg2)
 			for _, raw in ipairs(self.raws) do
 				local opt = GetComponentProp(raw, 'autocompleteOptions')
 				if opt then
-					local needle = arg1 or raw:Lookup('WndEdit_Default'):GetText()
+					local text = arg1 or raw:Lookup('WndEdit_Default'):GetText()
 					if IsFunction(opt.beforeSearch) then
-						opt.beforeSearch(raw, opt, needle)
+						opt.beforeSearch(raw, opt, text)
 					end
-					if opt.ignoreCase then
-						needle = StringLowerW(needle)
-					end
+					local needle = opt.ignoreCase and StringLowerW(needle) or text
 					local aSrc = {}
 					-- get matched list
 					for _, src in ipairs(opt.source) do
 						local haystack = type(src) == 'table' and (src.keyword or tostring(src.text)) or tostring(src)
 						if opt.ignoreCase then
-							haystack = StringLowerW(src)
+							haystack = StringLowerW(haystack)
 						end
 						local pos = wfind(haystack, needle)
 						if pos and (opt.anyMatch or pos == 0) then
@@ -1359,14 +1357,16 @@ function XGUI:autocomplete(method, arg1, arg2)
 					-- create menu
 					local menu = {}
 					for _, src in ipairs(aSrc) do
-						local szText, szOption, bRichText
+						local szText, szOption, bDivide, bRichText
 						if type(src) == 'table' then
 							szText = src.text
 							szDisplay = src.display or szText
+							bDivide = src.divide or false
 							bRichText = src.richtext or false
 						else
 							szText = tostring(src)
 							szDisplay = szText
+							bDivide = false
 							bRichText = false
 						end
 						-- max opt limit
@@ -1374,48 +1374,57 @@ function XGUI:autocomplete(method, arg1, arg2)
 							break
 						end
 						-- create new opt
-						local t = {
-							szOption = szDisplay,
-							bRichText = bRichText,
-							fnAction = function()
-								opt.disabledTmp = true
-								raw:Lookup('WndEdit_Default'):SetText(szText)
-								opt.disabledTmp = nil
-								if IsFunction(opt.afterComplete) then
-									opt.afterComplete(raw, opt, src)
-								end
-								Wnd.CloseWindow('PopupMenuPanel')
-							end,
-						}
-						if opt.beforeDelete or opt.afterDelete then
-							t.szIcon = 'ui/Image/UICommon/CommonPanel2.UITex'
-							t.nFrame = 49
-							t.nMouseOverFrame = 51
-							t.nIconWidth = 17
-							t.nIconHeight = 17
-							t.szLayer = 'ICON_RIGHTMOST'
-							t.fnClickIcon = function()
-								local bSure = true
-								local fnDoDelete = function()
-									for i = #opt.source, 1, -1 do
-										if opt.source[i] == src then
-											remove(opt.source, i)
-										end
+						local t
+						if bDivide then
+							if #menu == 0 or not menu[#menu].bDevide then
+								t = MENU_DIVIDER
+							end
+						else
+							t = {
+								szOption = szDisplay,
+								bRichText = bRichText,
+								fnAction = function()
+									opt.disabledTmp = true
+									raw:Lookup('WndEdit_Default'):SetText(szText)
+									if IsFunction(opt.afterComplete) then
+										opt.afterComplete(raw, opt, text, src)
 									end
-									XGUI(raw):autocomplete('search')
-								end
-								if opt.beforeDelete then
-									bSure = opt.beforeDelete(src, fnDoDelete, opt)
-								end
-								if bSure ~= false then
-									fnDoDelete()
-								end
-								if opt.afterDelete then
-									opt.afterDelete(src, opt)
+									Wnd.CloseWindow('PopupMenuPanel')
+									opt.disabledTmp = nil
+								end,
+							}
+							if opt.beforeDelete or opt.afterDelete then
+								t.szIcon = 'ui/Image/UICommon/CommonPanel2.UITex'
+								t.nFrame = 49
+								t.nMouseOverFrame = 51
+								t.nIconWidth = 17
+								t.nIconHeight = 17
+								t.szLayer = 'ICON_RIGHTMOST'
+								t.fnClickIcon = function()
+									local bSure = true
+									local fnDoDelete = function()
+										for i = #opt.source, 1, -1 do
+											if opt.source[i] == src then
+												remove(opt.source, i)
+											end
+										end
+										XGUI(raw):autocomplete('search')
+									end
+									if opt.beforeDelete then
+										bSure = opt.beforeDelete(src, fnDoDelete, opt)
+									end
+									if bSure ~= false then
+										fnDoDelete()
+									end
+									if opt.afterDelete then
+										opt.afterDelete(src, opt)
+									end
 								end
 							end
 						end
-						insert(menu, t)
+						if t then
+							insert(menu, t)
+						end
 					end
 					local nX, nY = raw:GetAbsPos()
 					local nW, nH = raw:GetSize()
@@ -1425,7 +1434,7 @@ function XGUI:autocomplete(method, arg1, arg2)
 					menu.bShowKillFocus = true
 
 					if IsFunction(opt.beforePopup) then
-						opt.beforePopup(raw, opt, menu)
+						opt.beforePopup(raw, opt, text, menu)
 					end
 					-- popup menu
 					if #menu > 0 then
