@@ -3,7 +3,7 @@
 -- @Author: 茗伊 @双梦镇 @追风蹑影
 -- @Date  : 2014-11-24 08:40:30
 -- @Email : admin@derzh.com
--- @Last modified by:   Zhai Yiming
+-- @Last modified by:   tinymins
 -- @Last modified time: 2017-05-22 17:33:24
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
@@ -115,8 +115,8 @@ MY = {}
 --------------------------------------------------------------------------------------------------------------------------------------------
 -- 本地函数变量
 --------------------------------------------------------------------------------------------------------------------------------------------
-local _BUILD_ = "20171229"
-local _VERSION_ = 0x2008400
+local _BUILD_ = "20180101 Happy New Year!"
+local _VERSION_ = 0x2008500
 local _DEBUGLV_ = tonumber(LoadLUAData('interface/my.debug.level') or nil) or 4
 local _DELOGLV_ = tonumber(LoadLUAData('interface/my.delog.level') or nil) or 4
 local _NORESTM_ = tonumber(LoadLUAData('interface/my.nrtim.level') or nil) or -1
