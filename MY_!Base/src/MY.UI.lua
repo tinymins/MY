@@ -1425,7 +1425,7 @@ function XGUI:autocomplete(method, arg1, arg2)
 					menu.bShowKillFocus = true
 
 					if IsFunction(opt.beforePopup) then
-						opt.beforePopup(menu, raw, opt)
+						opt.beforePopup(raw, opt, menu)
 					end
 					-- popup menu
 					if #menu > 0 then
