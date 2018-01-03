@@ -468,9 +468,11 @@ end
 function MY_Focus.UpdateList()
 	l_lockInDisplay = false
 	local tNames = {}
-	for i, p in ipairs(MY_Focus.GetDisplayList()) do
-		MY_Focus.DrawFocus(p.dwType, p.dwID)
-		tNames['HI_' .. p.dwType .. '_' .. p.dwID] = true
+	if not IsShielded() then
+		for i, p in ipairs(MY_Focus.GetDisplayList()) do
+			MY_Focus.DrawFocus(p.dwType, p.dwID)
+			tNames['HI_' .. p.dwType .. '_' .. p.dwID] = true
+		end
 	end
 	local hList = Station.Lookup('Normal/MY_Focus', 'Handle_List')
 	if hList then
@@ -753,7 +755,7 @@ end
 -- ########################################################################## --
 -- ÷‹∆⁄÷ÿªÊ
 function MY_Focus.OnFrameBreathe()
-	if MY.IsInPubg() and MY.IsShieldedVersion() then
+	if IsShielded() then
 		return
 	end
 	if l_dwLockType and l_dwLockID and l_lockInDisplay then
