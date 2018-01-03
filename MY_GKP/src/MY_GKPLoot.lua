@@ -2,6 +2,18 @@
 -- @Date:   2016-01-20 09:31:57
 -- @Last Modified by:   Administrator
 -- @Last Modified time: 2016-12-13 01:08:57
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local insert, remove, concat = table.insert, table.remove, table.concat
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local type, tonumber, tostring = type, tonumber, tostring
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local floor, min, max, ceil = math.floor, math.min, math.max, math.ceil
+local pow, sqrt, pi, cos, sin, atan = math.pow, math.sqrt, math.pi, math.cos, math.sin, math.atan
+local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 
 local PATH_ROOT = MY.GetAddonInfo().szRoot .. "MY_GKP/"
 local _L = MY.LoadLangPack(PATH_ROOT .. "lang/")
@@ -58,6 +70,51 @@ function MY_GKP_Loot.OnFrameCreate()
 	this:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
 	this:Lookup("WndContainer_DoodadList"):Clear()
 	Loot.AdjustFrame(this)
+end
+
+function MY_GKP_Loot.OnFrameBreathe()
+	local me = GetClientPlayer()
+	local wnd = this:Lookup("WndContainer_DoodadList"):LookupContent(0)
+	while wnd do
+		local doodad = GetDoodad(wnd.dwDoodadID)
+		-- 目标距离
+		local nDistance = 0
+		if me and doodad then
+			nDistance = floor(sqrt(pow(me.nX - doodad.nX, 2) + pow(me.nY - doodad.nY, 2)) * 10 / 64) / 10
+		end
+		wnd:Lookup("", "Handle_Compass/Compass_Distance"):SetText(nDistance < 4 and "" or nDistance .. '"')
+		-- 自身面向
+		if me then
+			wnd:Lookup("", "Handle_Compass/Image_Player"):Show()
+			wnd:Lookup("", "Handle_Compass/Image_Player"):SetRotate( - me.nFaceDirection / 128 * pi)
+		end
+		-- 物品位置
+		local nRotate, nRadius = 0, 10.125
+		if me and doodad and nDistance > 0 then
+			-- 特判角度
+			if me.nX == doodad.nX then
+				if me.nY > doodad.nY then
+					nRotate = pi / 2
+				else
+					nRotate = - pi / 2
+				end
+			else
+				nRotate = atan((me.nY - doodad.nY) / (me.nX - doodad.nX))
+			end
+			if nRotate < 0 then
+				nRotate = nRotate + pi
+			end
+			if doodad.nY < me.nY then
+				nRotate = pi + nRotate
+			end
+		end
+		local nX = nRadius + nRadius * cos(nRotate) + 2
+		local nY = nRadius - 3 - nRadius * sin(nRotate)
+		wnd:Lookup("", "Handle_Compass/Image_PointGreen"):SetRelPos(nX, nY)
+		wnd:Lookup("", "Handle_Compass"):FormatAllItemPos()
+		wnd:Lookup("", "Image_DoodadTitleBg"):SetFrame(doodad.CanDialog(me) and 0 or 3)
+		wnd = wnd:GetNext()
+	end
 end
 
 function MY_GKP_Loot.OnEvent(szEvent)
@@ -574,6 +631,7 @@ function Loot.AdjustWnd(wnd)
 	hList:SetSizeByAllItemSize()
 	hList:SetVisible(not bMini)
 	hDoodad:SetSize(nOuterW, (bMini and 0 or hList:GetH()) + 30)
+	hDoodad:Lookup("Handle_Compass"):SetRelX(nOuterW - 107)
 	hDoodad:Lookup("Image_DoodadTitleBg"):SetW(nOuterW)
 	hDoodad:Lookup("Image_DoodadBg"):SetSize(nOuterW, hDoodad:GetH() - 20)
 	hDoodad:FormatAllItemPos()
@@ -592,7 +650,6 @@ function Loot.DrawLootList(dwID)
 	if not szName or nCount == 0 then
 		if frame then
 			Loot.RemoveLootList(dwID)
-			Loot.AdjustFrame(frame)
 		end
 		return MY.Debug({"Doodad does not exist!"}, "MY_GKP_Loot:DrawLootList", MY_DEBUG.LOG)
 	end
