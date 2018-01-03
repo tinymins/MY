@@ -544,8 +544,8 @@ function PS.OnPanelActive(wnd)
 	y = y + 28
 
 	y = y + 5
-	ui:append("WndComboBox", { x = x, y = y, text = _L["Edit Allowance Protocols"], menu = _GKP.GetSubsidiesMenu })
-	ui:append("WndComboBox", { x = x + 100, y = y, text = _L["Edit Auction Protocols"], menu = _GKP.GetSchemeMenu })
+	ui:append("WndComboBox", { x = x, y = y, w = 150, text = _L["Edit Allowance Protocols"], menu = _GKP.GetSubsidiesMenu })
+	ui:append("WndComboBox", { x = x + 160, y = y, text = _L["Edit Auction Protocols"], menu = _GKP.GetSchemeMenu })
 	y = y + 28
 
 	x = X
@@ -554,7 +554,7 @@ function PS.OnPanelActive(wnd)
 
 	x = x + 10
 	ui:append("WndCheckBox", {
-		x = x, y = y, checked = MY_GKP.bMoneySystem, text = _L["Track Money Trend in the System"],
+		x = x, y = y, w = 150, checked = MY_GKP.bMoneySystem, text = _L["Track Money Trend in the System"],
 		oncheck = function(bChecked)
 			MY_GKP.bMoneySystem = bChecked
 		end,
@@ -562,11 +562,20 @@ function PS.OnPanelActive(wnd)
 	y = y + 28
 
 	ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Enable Money Trend"], checked = MY_GKP.bMoneyTalk,
+		x = x, y = y, w = 150, text = _L["Enable Money Trend"], checked = MY_GKP.bMoneyTalk,
 		oncheck = function(bChecked)
 			MY_GKP.bMoneyTalk = bChecked
 		end,
 	})
+	y = y + 28
+
+	x = X
+	ui:append("Text", { x = x, y = y, text = _L["GKP Loot"], font = 27 })
+	y = y + 28
+
+	x = x + 10
+	ui:append("WndComboBox", { x = x, y = y, w = 150, text = _L["Quality filter"], menu = MY_GKP_Loot.GetQualityFilterMenu })
+	ui:append("WndComboBox", { x = x + 160, y = y, w = 170, text = _L["Auto pickup all"], menu = MY_GKP_Loot.GetAutoPickupAllMenu })
 	y = y + 28
 
 	if MY_GKP.bDebug then

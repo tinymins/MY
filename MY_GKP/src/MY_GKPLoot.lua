@@ -50,14 +50,24 @@ local GKP_LOOT_AUTO_LIST = { -- 记录分配上次的物品
 	[74368]  = true,
 	[153896] = true,
 }
+local GKP_ITEM_QUALITIES = {
+	{ nQuality = -1, szTitle = g_tStrings.STR_ADDON_BLOCK },
+	{ nQuality = 1, szTitle = g_tStrings.STR_WHITE },
+	{ nQuality = 2, szTitle = g_tStrings.STR_ROLLQUALITY_GREEN },
+	{ nQuality = 3, szTitle = g_tStrings.STR_ROLLQUALITY_BLUE },
+	{ nQuality = 4, szTitle = g_tStrings.STR_ROLLQUALITY_PURPLE },
+	{ nQuality = 5, szTitle = g_tStrings.STR_ROLLQUALITY_NACARAT },
+}
+
+local Loot = {}
 -- setmetatable(GKP_LOOT_AUTO_LIST, { __index = function() return true end })
 MY_GKP_Loot = {
 	bVertical = true,
 	bSetColor = true,
+	nQualityFilter = -1,
 	nAutoPickupQuality = -1,
 }
 MY.RegisterCustomData("MY_GKP_Loot")
-local Loot = {}
 
 function MY_GKP_Loot.OnFrameCreate()
 	this:RegisterEvent("UI_SCALED")
@@ -226,27 +236,11 @@ function MY_GKP_Loot.OnLButtonClick()
 		}
 		if not MY.IsShieldedVersion() then
 			table.insert(menu, MENU_DIVIDER)
-			local aQualities = {
-				{ nQuality = -1, szTitle = g_tStrings.STR_ADDON_BLOCK },
-				{ nQuality = 2, szTitle = g_tStrings.STR_ROLLQUALITY_GREEN },
-				{ nQuality = 3, szTitle = g_tStrings.STR_ROLLQUALITY_BLUE },
-				{ nQuality = 4, szTitle = g_tStrings.STR_ROLLQUALITY_PURPLE },
-				{ nQuality = 5, szTitle = g_tStrings.STR_ROLLQUALITY_NACARAT },
-			}
-			local t = { szOption = _L['Auto pickup all'] }
-			for i, p in ipairs(aQualities) do
-				table.insert(t, {
-					szOption = p.szTitle,
-					rgb = p.nQuality == -1 and {255, 255, 255} or { GetItemFontColorByQuality(p.nQuality) },
-					bCheck = true, bMCheck = true, bChecked = MY_GKP_Loot.nAutoPickupQuality == p.nQuality,
-					fnAction = function()
-						MY_GKP_Loot.nAutoPickupQuality = p.nQuality
-					end,
-				})
-			end
-			table.insert(menu, t)
+			table.insert(menu, Loot.GetQualityFilterMenu())
+			table.insert(menu, Loot.GetAutoPickupAllMenu())
+
 			local t = { szOption = _L['Auto pickup this'] }
-			for i, p in ipairs(aQualities) do
+			for i, p in ipairs(GKP_ITEM_QUALITIES) do
 				table.insert(t, {
 					szOption = p.szTitle,
 					rgb = p.nQuality == -1 and {255, 255, 255} or { GetItemFontColorByQuality(p.nQuality) },
@@ -411,6 +405,36 @@ function MY_GKP_Loot.OnItemRButtonClick()
 		end
 		PopupMenu(menu)
 	end
+end
+
+function Loot.GetQualityFilterMenu()
+	local t = { szOption = _L['Quality filter'] }
+	for i, p in ipairs(GKP_ITEM_QUALITIES) do
+		table.insert(t, {
+			szOption = p.szTitle,
+			rgb = p.nQuality == -1 and {255, 255, 255} or { GetItemFontColorByQuality(p.nQuality) },
+			bCheck = true, bMCheck = true, bChecked = MY_GKP_Loot.nQualityFilter == p.nQuality,
+			fnAction = function()
+				MY_GKP_Loot.nQualityFilter = p.nQuality
+			end,
+		})
+	end
+	return t
+end
+
+function Loot.GetAutoPickupAllMenu()
+	local t = { szOption = _L['Auto pickup all'] }
+	for i, p in ipairs(GKP_ITEM_QUALITIES) do
+		table.insert(t, {
+			szOption = p.szTitle,
+			rgb = p.nQuality == -1 and {255, 255, 255} or { GetItemFontColorByQuality(p.nQuality) },
+			bCheck = true, bMCheck = true, bChecked = MY_GKP_Loot.nAutoPickupQuality == p.nQuality,
+			fnAction = function()
+				MY_GKP_Loot.nAutoPickupQuality = p.nQuality
+			end,
+		})
+	end
+	return t
 end
 
 function Loot.GetBossAction(dwDoodadID, bMenu)
@@ -706,6 +730,14 @@ function Loot.DrawLootList(dwID)
 	-- 计算掉落
 	local szName, data, bSpecial = Loot.GetDoodad(dwID)
 	local nCount = #data
+	if MY_GKP_Loot.nQualityFilter ~= -1 then
+		nCount = 0
+		for i, v in ipairs(data) do
+			if v.item.nQuality >= MY_GKP_Loot.nQualityFilter then
+				nCount = nCount + 1
+			end
+		end
+	end
 	MY.Debug({(string.format("Doodad %d, items %d.", dwID, nCount))}, "MY_GKP_Loot", MY_DEBUG.LOG)
 	if not szName or nCount == 0 then
 		if frame then
@@ -733,47 +765,49 @@ function Loot.DrawLootList(dwID)
 	hList:Clear()
 	for i, v in ipairs(data) do
 		local item = v.item
-		local szName = GetItemNameByItem(item)
-		local h = hList:AppendItemFromIni(GKP_LOOT_INIFILE, "Handle_Item")
-		local box = h:Lookup("Box_Item")
-		local txt = h:Lookup("Text_Item")
-		txt:SetText(szName)
-		txt:SetFontColor(GetItemFontColorByQuality(item.nQuality))
-		if MY_GKP_Loot.bSetColor and item.nGenre == ITEM_GENRE.MATERIAL then
-			for k, v in pairs(g_tStrings.tForceTitle) do
-				if szName:find(v) then
-					txt:SetFontColor(MY.GetForceColor(k))
-					break
+		if MY_GKP_Loot.nQualityFilter == -1 or item.nQuality >= MY_GKP_Loot.nQualityFilter then
+			local szName = GetItemNameByItem(item)
+			local h = hList:AppendItemFromIni(GKP_LOOT_INIFILE, "Handle_Item")
+			local box = h:Lookup("Box_Item")
+			local txt = h:Lookup("Text_Item")
+			txt:SetText(szName)
+			txt:SetFontColor(GetItemFontColorByQuality(item.nQuality))
+			if MY_GKP_Loot.bSetColor and item.nGenre == ITEM_GENRE.MATERIAL then
+				for k, v in pairs(g_tStrings.tForceTitle) do
+					if szName:find(v) then
+						txt:SetFontColor(MY.GetForceColor(k))
+						break
+					end
 				end
 			end
-		end
-		if MY_GKP_Loot.bVertical then
-			h:Lookup("Image_Spliter"):SetVisible(i ~= #data)
-		else
-			txt:Hide()
-			box:SetSize(48, 48)
-			box:SetRelPos(2, 2)
-			h:SetSize(52, 52)
-			h:FormatAllItemPos()
-			h:Lookup("Image_Spliter"):Hide()
-			h:Lookup("Image_Hover"):SetSize(0, 0)
-		end
-		UpdateBoxObject(box, UI_OBJECT_ITEM_ONLY_ID, item.dwID)
-		-- box:SetOverText(3, "")
-		-- box:SetOverTextFontScheme(3, 15)
-		-- box:SetOverTextPosition(3, ITEM_POSITION.LEFT_TOP)
-		box.data = {
-			dwDoodadID = dwID,
-			dwID       = item.dwID,
-			nQuality   = item.nQuality,
-			szName     = szName,
-			bNeedRoll  = v.bNeedRoll,
-			bDist      = v.bDist,
-			bBidding   = v.bBidding,
-			item       = v.item,
-		}
-		if GKP_LOOT_AUTO[item.nUiId] then
-			box:SetObjectStaring(true)
+			if MY_GKP_Loot.bVertical then
+				h:Lookup("Image_Spliter"):SetVisible(i ~= #data)
+			else
+				txt:Hide()
+				box:SetSize(48, 48)
+				box:SetRelPos(2, 2)
+				h:SetSize(52, 52)
+				h:FormatAllItemPos()
+				h:Lookup("Image_Spliter"):Hide()
+				h:Lookup("Image_Hover"):SetSize(0, 0)
+			end
+			UpdateBoxObject(box, UI_OBJECT_ITEM_ONLY_ID, item.dwID)
+			-- box:SetOverText(3, "")
+			-- box:SetOverTextFontScheme(3, 15)
+			-- box:SetOverTextPosition(3, ITEM_POSITION.LEFT_TOP)
+			box.data = {
+				dwDoodadID = dwID,
+				dwID       = item.dwID,
+				nQuality   = item.nQuality,
+				szName     = szName,
+				bNeedRoll  = v.bNeedRoll,
+				bDist      = v.bDist,
+				bBidding   = v.bBidding,
+				item       = v.item,
+			}
+			if GKP_LOOT_AUTO[item.nUiId] then
+				box:SetObjectStaring(true)
+			end
 		end
 	end
 	if bSpecial then
@@ -910,7 +944,9 @@ MY.RegisterEvent("MY_GKP_LOOT_BOSS", function()
 end)
 
 local ui = {
-	GetMessageBox   = Loot.GetMessageBox,
-	GetaPartyMember = Loot.GetaPartyMember
+	GetMessageBox        = Loot.GetMessageBox,
+	GetaPartyMember      = Loot.GetaPartyMember,
+	GetQualityFilterMenu = Loot.GetQualityFilterMenu,
+	GetAutoPickupAllMenu = Loot.GetAutoPickupAllMenu,
 }
 setmetatable(MY_GKP_Loot, { __index = ui, __newindex = function() end, __metatable = true })
