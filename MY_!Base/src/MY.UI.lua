@@ -1336,10 +1336,10 @@ function XGUI:autocomplete(method, arg1, arg2)
 			for _, raw in ipairs(self.raws) do
 				local opt = GetComponentProp(raw, 'autocompleteOptions')
 				if opt then
-					if IsFunction(opt.beforeSearch) then
-						opt.beforeSearch(raw, opt)
-					end
 					local needle = arg1 or raw:Lookup('WndEdit_Default'):GetText()
+					if IsFunction(opt.beforeSearch) then
+						opt.beforeSearch(raw, opt, needle)
+					end
 					if opt.ignoreCase then
 						needle = StringLowerW(needle)
 					end
