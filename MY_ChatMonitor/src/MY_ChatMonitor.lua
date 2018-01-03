@@ -272,9 +272,9 @@ _C.OnPanelActive = function(wnd)
             end
         end,
         autocomplete = {
-            -- { 'option', 'beforeSearch', function(wnd, option) end },
+            -- { 'option', 'beforeSearch', function(raw, option, text) end },
             {
-                'option', 'beforePopup', function(wnd, option, menu)
+                'option', 'beforePopup', function(wnd, option, text, menu)
                     if #menu > 0 then
                         table.insert(menu, { bDevide = true })
                     end
