@@ -54,6 +54,7 @@ local GKP_LOOT_AUTO_LIST = { -- 记录分配上次的物品
 MY_GKP_Loot = {
 	bVertical = true,
 	bSetColor = true,
+	nAutoPickupQuality = -1,
 }
 MY.RegisterCustomData("MY_GKP_Loot")
 local Loot = {}
@@ -112,7 +113,18 @@ function MY_GKP_Loot.OnFrameBreathe()
 		local nY = nRadius - 3 - nRadius * sin(nRotate)
 		wnd:Lookup("", "Handle_Compass/Image_PointGreen"):SetRelPos(nX, nY)
 		wnd:Lookup("", "Handle_Compass"):FormatAllItemPos()
-		wnd:Lookup("", "Image_DoodadTitleBg"):SetFrame(doodad.CanDialog(me) and 0 or 3)
+		local bCanDialog = doodad.CanDialog(me)
+		if bCanDialog and not MY.IsShieldedVersion() and (MY_GKP_Loot.nAutoPickupQuality >= 0 or wnd.nAutoPickupQuality >= 0) then
+			local hList = wnd:Lookup("", "Handle_ItemList")
+			for i = 0, hList:GetItemCount() - 1 do
+				local nQuality = hList:Lookup(i):Lookup("Box_Item").data.nQuality
+				if (MY_GKP_Loot.nAutoPickupQuality ~= -1 and nQuality > MY_GKP_Loot.nAutoPickupQuality)
+				or (wnd.nAutoPickupQuality ~= -1 and nQuality > wnd.nAutoPickupQuality) then
+					ExecuteWithThis(hList:Lookup(i), MY_GKP_Loot.OnItemLButtonClick)
+				end
+			end
+		end
+		wnd:Lookup("", "Image_DoodadTitleBg"):SetFrame(bCanDialog and 0 or 3)
 		wnd = wnd:GetNext()
 	end
 end
@@ -173,31 +185,79 @@ function MY_GKP_Loot.OnLButtonClick()
 	if szName == "Btn_Close" then
 		Loot.RemoveLootList(this:GetParent().dwDoodadID)
 	elseif szName == "Btn_Style" then
-		local dwDoodadID = this:GetParent().dwDoodadID
+		local wnd = this:GetParent()
+		local dwDoodadID = wnd.dwDoodadID
 		local menu = {
-			{ szOption = _L["Set Force Color"], bCheck = true, bChecked = MY_GKP_Loot.bSetColor, fnAction = function()
-				MY_GKP_Loot.bSetColor = not MY_GKP_Loot.bSetColor
-				FireUIEvent("MY_GKP_LOOT_RELOAD")
-			end },
+			{
+				szOption = _L["Set Force Color"],
+				bCheck = true, bChecked = MY_GKP_Loot.bSetColor,
+				fnAction = function()
+					MY_GKP_Loot.bSetColor = not MY_GKP_Loot.bSetColor
+					FireUIEvent("MY_GKP_LOOT_RELOAD")
+				end,
+			},
 			{ bDevide = true },
-			{ szOption = _L["Link All Item"], fnAction = function()
-				local szName, data, bSpecial = Loot.GetDoodad(dwDoodadID)
-				local t = {}
-				for k, v in ipairs(data) do
-					table.insert(t, MY_GKP.GetFormatLink(v.item))
-				end
-				MY.Talk(PLAYER_TALK_CHANNEL.RAID, t)
-			end },
+			{
+				szOption = _L["Link All Item"],
+				fnAction = function()
+					local szName, data, bSpecial = Loot.GetDoodad(dwDoodadID)
+					local t = {}
+					for k, v in ipairs(data) do
+						table.insert(t, MY_GKP.GetFormatLink(v.item))
+					end
+					MY.Talk(PLAYER_TALK_CHANNEL.RAID, t)
+				end,
+			},
 			{ bDevide = true },
-			{ szOption = _L["switch styles"], fnAction = function()
-				MY_GKP_Loot.bVertical = not MY_GKP_Loot.bVertical
-				FireUIEvent("MY_GKP_LOOT_RELOAD")
-			end },
+			{
+				szOption = _L["switch styles"],
+				fnAction = function()
+					MY_GKP_Loot.bVertical = not MY_GKP_Loot.bVertical
+					FireUIEvent("MY_GKP_LOOT_RELOAD")
+				end,
+			},
 			{ bDevide = true },
-			{ szOption = _L["About"], fnAction = function()
-				MY.Alert(_L["GKP_TIPS"])
-			end }
+			{
+				szOption = _L["About"],
+				fnAction = function()
+					MY.Alert(_L["GKP_TIPS"])
+				end,
+			},
 		}
+		if not MY.IsShieldedVersion() then
+			table.insert(menu, MENU_DIVIDER)
+			local aQualities = {
+				{ nQuality = -1, szTitle = g_tStrings.STR_ADDON_BLOCK },
+				{ nQuality = 2, szTitle = g_tStrings.STR_ROLLQUALITY_GREEN },
+				{ nQuality = 3, szTitle = g_tStrings.STR_ROLLQUALITY_BLUE },
+				{ nQuality = 4, szTitle = g_tStrings.STR_ROLLQUALITY_PURPLE },
+				{ nQuality = 5, szTitle = g_tStrings.STR_ROLLQUALITY_NACARAT },
+			}
+			local t = { szOption = _L['Auto pickup all'] }
+			for i, p in ipairs(aQualities) do
+				table.insert(t, {
+					szOption = p.szTitle,
+					rgb = p.nQuality == -1 and {255, 255, 255} or { GetItemFontColorByQuality(p.nQuality) },
+					bCheck = true, bMCheck = true, bChecked = MY_GKP_Loot.nAutoPickupQuality == p.nQuality,
+					fnAction = function()
+						MY_GKP_Loot.nAutoPickupQuality = p.nQuality
+					end,
+				})
+			end
+			table.insert(menu, t)
+			local t = { szOption = _L['Auto pickup this'] }
+			for i, p in ipairs(aQualities) do
+				table.insert(t, {
+					szOption = p.szTitle,
+					rgb = p.nQuality == -1 and {255, 255, 255} or { GetItemFontColorByQuality(p.nQuality) },
+					bCheck = true, bMCheck = true, bChecked = wnd.nAutoPickupQuality == p.nQuality,
+					fnAction = function()
+						wnd.nAutoPickupQuality = p.nQuality
+					end,
+				})
+			end
+			table.insert(menu, t)
+		end
 		PopupMenu(menu)
 	elseif szName == "Btn_Boss" then
 		Loot.GetBossAction(this:GetParent().dwDoodadID, type(MY_GKP_LOOT_BOSS) == "nil")
@@ -665,6 +725,7 @@ function Loot.DrawLootList(dwID)
 	if not wnd then
 		wnd = container:AppendContentFromIni(GKP_LOOT_INIFILE, "Wnd_Doodad")
 		wnd.dwDoodadID = dwID
+		wnd.nAutoPickupQuality = -1
 	end
 	-- 修改UI元素
 	local hDoodad = wnd:Lookup("", "")
