@@ -755,17 +755,16 @@ end
 -- ########################################################################## --
 -- ÷‹∆⁄÷ÿªÊ
 function MY_Focus.OnFrameBreathe()
-	if IsShielded() then
-		return
-	end
-	if l_dwLockType and l_dwLockID and l_lockInDisplay then
-		local dwType, dwID = MY.GetTarget()
-		if dwType ~= l_dwLockType or dwID ~= l_dwLockID then
-			MY.SetTarget(l_dwLockType, l_dwLockID)
+	if not IsShielded() then
+		if l_dwLockType and l_dwLockID and l_lockInDisplay then
+			local dwType, dwID = MY.GetTarget()
+			if dwType ~= l_dwLockType or dwID ~= l_dwLockID then
+				MY.SetTarget(l_dwLockType, l_dwLockID)
+			end
 		end
-	end
-	if MY_Focus.bSortByDistance then
-		MY_Focus.SortFocus()
+		if MY_Focus.bSortByDistance then
+			MY_Focus.SortFocus()
+		end
 	end
 	MY_Focus.UpdateList()
 	MY_Focus.AdjustUI()
