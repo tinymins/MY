@@ -8,7 +8,7 @@ local _L = MY.LoadLangPack(PATH_ROOT .. "lang/")
 
 local GKP_LOOT_ANCHOR  = { s = "CENTER", r = "CENTER", x = 0, y = 0 }
 local GKP_LOOT_INIFILE = PATH_ROOT .. "ui/MY_GKP_Loot.ini"
-local GKP_LOOT_BOSS -- 散件老板
+local MY_GKP_LOOT_BOSS -- 散件老板
 
 local GKP_LOOT_HUANGBABA = {
 	[MY.GetItemName(72592)]  = true,
@@ -39,7 +39,6 @@ local GKP_LOOT_AUTO_LIST = { -- 记录分配上次的物品
 	[153896] = true,
 }
 -- setmetatable(GKP_LOOT_AUTO_LIST, { __index = function() return true end })
-MY_GKP_Loot_Base = class()
 MY_GKP_Loot = {
 	bVertical = true,
 	bSetColor = true,
@@ -47,24 +46,24 @@ MY_GKP_Loot = {
 MY.RegisterCustomData("MY_GKP_Loot")
 local Loot = {}
 
-function MY_GKP_Loot_Base.OnFrameCreate()
+function MY_GKP_Loot.OnFrameCreate()
 	this:RegisterEvent("UI_SCALED")
 	this:RegisterEvent("PARTY_LOOT_MODE_CHANGED")
 	this:RegisterEvent("PARTY_DISBAND")
 	this:RegisterEvent("PARTY_DELETE_MEMBER")
 	this:RegisterEvent("DOODAD_LEAVE_SCENE")
-	this:RegisterEvent("GKP_LOOT_RELOAD")
-	this:RegisterEvent("GKP_LOOT_BOSS")
-	this.dwDoodadID = arg0
+	this:RegisterEvent("MY_GKP_LOOT_RELOAD")
+	this:RegisterEvent("MY_GKP_LOOT_BOSS")
 	local a = GKP_LOOT_ANCHOR
 	this:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
+	this:Lookup("WndContainer_DoodadList"):Clear()
+	Loot.AdjustFrame(this)
 end
 
-function MY_GKP_Loot_Base.OnEvent(szEvent)
+function MY_GKP_Loot.OnEvent(szEvent)
 	if szEvent == "DOODAD_LEAVE_SCENE" then
 		if arg0 == this.dwDoodadID then
-			Wnd.CloseWindow(this) -- 不加动画 是系统关闭而不是手动
-			PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
+			Loot.RemoveLootList(arg0)
 		end
 	elseif szEvent == "PARTY_LOOT_MODE_CHANGED" then
 		if arg1 ~= PARTY_LOOT_MODE.DISTRIBUTE then
@@ -74,37 +73,60 @@ function MY_GKP_Loot_Base.OnEvent(szEvent)
 		if szEvent == "PARTY_DELETE_MEMBER" and arg1 ~= UI_GetClientPlayerID() then
 			return
 		end
-		Wnd.CloseWindow(this)
-		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
+		Loot.CloseFrame()
 	elseif szEvent == "UI_SCALED" then
 		local a = this.anchor or GKP_LOOT_ANCHOR
 		this:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
-	elseif szEvent == "GKP_LOOT_RELOAD" or szEvent == "GKP_LOOT_BOSS" then
-		Loot.DrawLootList(this.dwDoodadID)
+	elseif szEvent == "MY_GKP_LOOT_RELOAD" or szEvent == "MY_GKP_LOOT_BOSS" then
+		local wnd = this:Lookup("WndContainer_DoodadList"):LookupContent(0)
+		local aDoodadID = {}
+		while wnd do
+			table.insert(aDoodadID, wnd.dwDoodadID)
+			wnd = wnd:GetNext()
+		end
+		for _, dwDoodadID in ipairs(aDoodadID) do
+			Loot.DrawLootList(dwDoodadID)
+		end
 	end
 end
 
-function MY_GKP_Loot_Base.OnFrameDragEnd()
+function MY_GKP_Loot.OnFrameDragEnd()
 	this:CorrectPos()
 	local anchor    = GetFrameAnchor(this, "LEFTTOP")
 	GKP_LOOT_ANCHOR = anchor
 	this.anchor     = anchor
 end
 
-function MY_GKP_Loot_Base.OnLButtonClick()
+function MY_GKP_Loot.OnCheckBoxCheck()
+	local name = this:GetName()
+	if name == "CheckBox_Mini" then
+		Loot.AdjustWnd(this:GetParent())
+		Loot.AdjustFrame(this:GetRoot())
+	end
+end
+
+function MY_GKP_Loot.OnCheckBoxUncheck()
+	local name = this:GetName()
+	if name == "CheckBox_Mini" then
+		Loot.AdjustWnd(this:GetParent())
+		Loot.AdjustFrame(this:GetRoot())
+	end
+end
+
+function MY_GKP_Loot.OnLButtonClick()
 	local szName = this:GetName()
 	if szName == "Btn_Close" then
-		Loot.CloseFrame(this:GetRoot().dwDoodadID)
+		Loot.RemoveLootList(this:GetParent().dwDoodadID)
 	elseif szName == "Btn_Style" then
-		local ui = this:GetRoot()
+		local dwDoodadID = this:GetParent().dwDoodadID
 		local menu = {
 			{ szOption = _L["Set Force Color"], bCheck = true, bChecked = MY_GKP_Loot.bSetColor, fnAction = function()
 				MY_GKP_Loot.bSetColor = not MY_GKP_Loot.bSetColor
-				FireUIEvent("GKP_LOOT_RELOAD")
+				FireUIEvent("MY_GKP_LOOT_RELOAD")
 			end },
 			{ bDevide = true },
 			{ szOption = _L["Link All Item"], fnAction = function()
-				local szName, data, bSpecial = Loot.GetDoodad(ui.dwDoodadID)
+				local szName, data, bSpecial = Loot.GetDoodad(dwDoodadID)
 				local t = {}
 				for k, v in ipairs(data) do
 					table.insert(t, MY_GKP.GetFormatLink(v.item))
@@ -114,7 +136,7 @@ function MY_GKP_Loot_Base.OnLButtonClick()
 			{ bDevide = true },
 			{ szOption = _L["switch styles"], fnAction = function()
 				MY_GKP_Loot.bVertical = not MY_GKP_Loot.bVertical
-				FireUIEvent("GKP_LOOT_RELOAD")
+				FireUIEvent("MY_GKP_LOOT_RELOAD")
 			end },
 			{ bDevide = true },
 			{ szOption = _L["About"], fnAction = function()
@@ -123,18 +145,18 @@ function MY_GKP_Loot_Base.OnLButtonClick()
 		}
 		PopupMenu(menu)
 	elseif szName == "Btn_Boss" then
-		Loot.GetBossAction(this:GetRoot().dwDoodadID, type(GKP_LOOT_BOSS) == "nil")
+		Loot.GetBossAction(this:GetParent().dwDoodadID, type(MY_GKP_LOOT_BOSS) == "nil")
 	end
 end
 
-function MY_GKP_Loot_Base.OnRButtonClick()
+function MY_GKP_Loot.OnRButtonClick()
 	local szName = this:GetName()
 	if szName == "Btn_Boss" then
-		Loot.GetBossAction(this:GetRoot().dwDoodadID, true)
+		Loot.GetBossAction(this:GetParent().dwDoodadID, true)
 	end
 end
 
-function MY_GKP_Loot_Base.OnItemLButtonDown()
+function MY_GKP_Loot.OnItemLButtonDown()
 	local szName = this:GetName()
 	if szName == "Handle_Item" then
 		this = this:Lookup("Box_Item")
@@ -142,7 +164,7 @@ function MY_GKP_Loot_Base.OnItemLButtonDown()
 	end
 end
 
-function MY_GKP_Loot_Base.OnItemLButtonUp()
+function MY_GKP_Loot.OnItemLButtonUp()
 	local szName = this:GetName()
 	if szName == "Handle_Item" then
 		this = this:Lookup("Box_Item")
@@ -150,21 +172,12 @@ function MY_GKP_Loot_Base.OnItemLButtonUp()
 	end
 end
 
-function MY_GKP_Loot_Base.OnItemMouseEnter()
+function MY_GKP_Loot.OnItemMouseEnter()
 	local szName = this:GetName()
 	if szName == "Handle_Item" or szName == "Box_Item" then
 		if szName == "Handle_Item" then
-			this:Lookup("Image_Copper"):Show()
 			this = this:Lookup("Box_Item")
 			this.OnItemMouseEnter()
-		elseif szName == "Box_Item" then
-			local hParent = this:GetParent()
-			if hParent then
-				local szParent = hParent:GetName()
-				if szParent == "Handle_Item" then
-					hParent:Lookup("Image_Copper"):Show()
-				end
-			end
 		end
 		-- local item = this.data.item
 		-- if itme and item.nGenre == ITEM_GENRE.EQUIPMENT then
@@ -177,24 +190,13 @@ function MY_GKP_Loot_Base.OnItemMouseEnter()
 	end
 end
 
-function MY_GKP_Loot_Base.OnItemMouseLeave()
+function MY_GKP_Loot.OnItemMouseLeave()
 	local szName = this:GetName()
 	if szName == "Handle_Item" or szName == "Box_Item" then
 		if szName == "Handle_Item" then
-			if this:Lookup("Image_Copper") and this:Lookup("Image_Copper"):IsValid() then
-				this:Lookup("Image_Copper"):Hide()
-				this = this:Lookup("Box_Item")
+			this = this:Lookup("Box_Item")
+			if this then
 				this.OnItemMouseLeave()
-			end
-		elseif szName == "Box_Item" then
-			local hParent = this:GetParent()
-			if hParent then
-				local szParent = hParent:GetName()
-				if szParent == "Handle_Item" then
-					if hParent:Lookup("Image_Copper") and hParent:Lookup("Image_Copper"):IsValid() then
-						hParent:Lookup("Image_Copper"):Hide()
-					end
-				end
 			end
 		end
 		-- if this and this:IsValid() and this.SetOverText then
@@ -204,7 +206,7 @@ function MY_GKP_Loot_Base.OnItemMouseLeave()
 end
 
 -- 分配菜单
-function MY_GKP_Loot_Base.OnItemLButtonClick()
+function MY_GKP_Loot.OnItemLButtonClick()
 	local szName = this:GetName()
 	if IsCtrlKeyDown() or IsAltKeyDown() then
 		return
@@ -213,8 +215,7 @@ function MY_GKP_Loot_Base.OnItemLButtonClick()
 		local box        = szName == "Handle_Item" and this:Lookup("Box_Item") or this
 		local data       = box.data
 		local me, team   = GetClientPlayer(), GetClientTeam()
-		local frame      = this:GetRoot()
-		local dwDoodadID = frame.dwDoodadID
+		local dwDoodadID = data.dwDoodadID
 		local doodad     = GetDoodad(dwDoodadID)
 		-- if data.bDist or MY_GKP.bDebug then
 		if not data.bDist and not data.bBidding then
@@ -227,7 +228,7 @@ function MY_GKP_Loot_Base.OnItemLButtonClick()
 		if data.bDist then
 			if not doodad then
 				MY.Debug({"Doodad does not exist!"}, "MY_GKP_Loot:OnItemLButtonClick", MY_DEBUG.WARNING)
-				return Wnd.CloseWindow(frame)
+				return Loot.RemoveLootList(dwDoodadID)
 			end
 			if not Loot.AuthCheck(dwDoodadID) then
 				return
@@ -245,22 +246,21 @@ function MY_GKP_Loot_Base.OnItemLButtonClick()
 		elseif data.bNeedRoll then
 			MY.Topmsg(g_tStrings.ERROR_LOOT_ROLL)
 		else -- 左键摸走
-			LootItem(frame.dwDoodadID, data.dwID)
+			LootItem(dwDoodadID, data.dwID)
 		end
 	end
 end
 -- 右键拍卖
-function MY_GKP_Loot_Base.OnItemRButtonClick()
+function MY_GKP_Loot.OnItemRButtonClick()
 	local szName = this:GetName()
 	if szName == "Handle_Item" or szName == "Box_Item" then
-		local box       = szName == "Handle_Item" and this:Lookup("Box_Item") or this
-		local data      = box.data
+		local box  = szName == "Handle_Item" and this:Lookup("Box_Item") or this
+		local data = box.data
 		if not data.bDist then
 			return
 		end
 		local me, team   = GetClientPlayer(), GetClientTeam()
-		local frame      = this:GetRoot()
-		local dwDoodadID = frame.dwDoodadID
+		local dwDoodadID = data.dwDoodadID
 		if not Loot.AuthCheck(dwDoodadID) then
 			return
 		end
@@ -324,7 +324,7 @@ function Loot.GetBossAction(dwDoodadID, bMenu)
 			return MY.Alert(_L["No Equiptment left for Equiptment Boss"])
 		end
 		local aPartyMember = Loot.GetaPartyMember(GetDoodad(dwDoodadID))
-		local p = aPartyMember(GKP_LOOT_BOSS)
+		local p = aPartyMember(MY_GKP_LOOT_BOSS)
 		if p and p.bOnlineFlag then  -- 这个人存在团队的情况下
 			local szXml = GetFormatText(_L["Are you sure you want the following item\n"], 162, 255, 255, 255)
 			local r, g, b = MY.GetForceColor(p.dwForceID)
@@ -343,7 +343,7 @@ function Loot.GetBossAction(dwDoodadID, bMenu)
 					szOption = g_tStrings.STR_HOTKEY_SURE,
 					fnAction = function()
 						for k, v in ipairs(tEquipment) do
-							Loot.DistributeItem(GKP_LOOT_BOSS, dwDoodadID, v.dwID, {}, true)
+							Loot.DistributeItem(MY_GKP_LOOT_BOSS, dwDoodadID, v.dwID, {}, true)
 						end
 					end
 				},
@@ -358,7 +358,7 @@ function Loot.GetBossAction(dwDoodadID, bMenu)
 	end
 	if bMenu then
 		local menu = MY_GKP.GetTeamMemberMenu(function(v)
-			GKP_LOOT_BOSS = v.dwID
+			MY_GKP_LOOT_BOSS = v.dwID
 			fnAction()
 		end, false, true)
 		table.insert(menu, 1, { bDevide = true })
@@ -550,105 +550,156 @@ function Loot.GetDistributeMenu(dwDoodadID, data)
 	return menu
 end
 
+function Loot.AdjustFrame(frame)
+	local container = frame:Lookup("WndContainer_DoodadList")
+	local nW, nH = frame:GetW(), 0
+	local wnd = container:LookupContent(0)
+	while wnd do
+		nW = wnd:GetW()
+		nH = nH + wnd:GetH()
+		wnd = wnd:GetNext()
+	end
+	container:FormatAllContentPos()
+	container:SetSize(nW, nH)
+	frame:SetSize(nW, nH)
+end
+
+function Loot.AdjustWnd(wnd)
+	local nInnerW = MY_GKP_Loot.bVertical and 270 or (52 * 8)
+	local nOuterW = MY_GKP_Loot.bVertical and nInnerW or (nInnerW + 10)
+	local hDoodad = wnd:Lookup("", "")
+	local hList = hDoodad:Lookup("Handle_ItemList")
+	local bMini = wnd:Lookup("CheckBox_Mini"):IsCheckBoxChecked()
+	hList:SetW(nInnerW)
+	hList:SetRelX((nOuterW - nInnerW) / 2)
+	hList:FormatAllItemPos()
+	hList:SetSizeByAllItemSize()
+	hList:SetVisible(not bMini)
+	hDoodad:SetSize(nOuterW, (bMini and 0 or hList:GetH()) + 30)
+	hDoodad:Lookup("Image_DoodadTitleBg"):SetW(nOuterW)
+	hDoodad:Lookup("Image_DoodadBg"):SetSize(nOuterW, hDoodad:GetH() - 20)
+	hDoodad:FormatAllItemPos()
+	wnd:SetSize(nOuterW, hDoodad:GetH())
+	wnd:Lookup("Btn_Boss"):SetRelX(nOuterW - 80)
+	wnd:Lookup("CheckBox_Mini"):SetRelX(nOuterW - 50)
+	wnd:Lookup("Btn_Close"):SetRelX(nOuterW - 28)
+end
+
 function Loot.DrawLootList(dwID)
-	local frame = Loot.GetFrame(dwID)
+	local frame = Loot.GetFrame()
+	-- 计算掉落
 	local szName, data, bSpecial = Loot.GetDoodad(dwID)
 	local nCount = #data
 	MY.Debug({(string.format("Doodad %d, items %d.", dwID, nCount))}, "MY_GKP_Loot", MY_DEBUG.LOG)
-	if not frame or not szName or nCount == 0 then
+	if not szName or nCount == 0 then
 		if frame then
-			return Wnd.CloseWindow(frame)
+			Loot.RemoveLootList(dwID)
+			Loot.AdjustFrame(frame)
 		end
-		return MY.Debug({"Doodad does not exist!"}, "MY_GKP_Loot:DrawLootList", MY_DEBUG.WARNING)
+		return MY.Debug({"Doodad does not exist!"}, "MY_GKP_Loot:DrawLootList", MY_DEBUG.LOG)
 	end
-	-- 修改UI大小
-	local handle = frame:Lookup("", "Handle_Box")
-	handle:Clear()
-	if MY_GKP_Loot.bVertical then
-		frame:Lookup("", "Image_Bg"):SetSize(280, nCount * 56 + 35)
-		frame:Lookup("", "Image_Title"):SetSize(280, 30)
-		frame:Lookup("Btn_Close"):SetRelPos(250, 4)
-		frame:Lookup("Btn_Boss"):SetRelPos(210, 3)
-		frame:SetSize(280, nCount * 56 + 35)
-		handle:SetHandleStyle(3)
-	else
-		if nCount <= 6 then
-			frame:Lookup("", "Image_Bg"):SetSize(6 * 72, 110)
-			frame:Lookup("", "Image_Title"):SetSize(6 * 72, 30)
-			frame:SetSize(6 * 72, 110)
-		else
-			frame:Lookup("", "Image_Bg"):SetSize(6 * 72, 30 + math.ceil(nCount / 6) * 75)
-			frame:Lookup("", "Image_Title"):SetSize(6 * 72, 30)
-			frame:SetSize(6 * 72, 8 + 30 + math.ceil(nCount / 6) * 75)
-		end
-		local w, h = frame:GetSize()
-		frame:Lookup("Btn_Close"):SetRelPos(w - 30, 4)
-		frame:Lookup("Btn_Boss"):SetRelPos(w - 70, 3)
-		handle:SetHandleStyle(0)
+	-- 获取/创建UI元素
+	if not frame then
+		frame = Loot.OpenFrame()
 	end
-	if bSpecial then
-		frame:Lookup("", "Image_Bg"):FromUITex("ui/Image/OperationActivity/RedEnvelope2.uitex", 14)
-		frame:Lookup("", "Image_Title"):FromUITex("ui/Image/OperationActivity/RedEnvelope2.uitex", 14)
-		frame:Lookup("", "Text_Title"):SetAlpha(255)
-		frame:Lookup("", "SFX"):Show()
-		handle:SetRelPos(5, 30)
-		handle:GetParent():FormatAllItemPos()
+	local container = frame:Lookup("WndContainer_DoodadList")
+	local wnd = container:LookupContent(0)
+	while wnd and wnd.dwDoodadID ~= dwID do
+		wnd = wnd:GetNext()
 	end
+	if not wnd then
+		wnd = container:AppendContentFromIni(GKP_LOOT_INIFILE, "Wnd_Doodad")
+		wnd.dwDoodadID = dwID
+	end
+	-- 修改UI元素
+	local hDoodad = wnd:Lookup("", "")
+	local hList = hDoodad:Lookup("Handle_ItemList")
+	hList:Clear()
 	for k, v in ipairs(data) do
 		local item = v.item
 		local szName = GetItemNameByItem(item)
-		local box
-		if MY_GKP_Loot.bVertical then
-			local h = handle:AppendItemFromIni(GKP_LOOT_INIFILE, "Handle_Item")
-			box = h:Lookup("Box_Item")
-			local txt = h:Lookup("Text_Item")
-			txt:SetText(szName)
-			txt:SetFontColor(GetItemFontColorByQuality(item.nQuality))
-			if MY_GKP_Loot.bSetColor and item.nGenre == ITEM_GENRE.MATERIAL then
-				for k, v in pairs(g_tStrings.tForceTitle) do
-					if szName:find(v) then
-						txt:SetFontColor(MY.GetForceColor(k))
-						break
-					end
+		local h = hList:AppendItemFromIni(GKP_LOOT_INIFILE, "Handle_Item")
+		local box = h:Lookup("Box_Item")
+		local txt = h:Lookup("Text_Item")
+		txt:SetText(szName)
+		txt:SetFontColor(GetItemFontColorByQuality(item.nQuality))
+		if MY_GKP_Loot.bSetColor and item.nGenre == ITEM_GENRE.MATERIAL then
+			for k, v in pairs(g_tStrings.tForceTitle) do
+				if szName:find(v) then
+					txt:SetFontColor(MY.GetForceColor(k))
+					break
 				end
 			end
-		else
-			handle:AppendItemFromString("<Box>name=\"Box_Item\" w=64 h=64 </Box>")
-			box = handle:Lookup(k - 1)
-			-- append box
-			local x, y = (k - 1) % 6, math.ceil(k / 6) - 1
-			box:SetRelPos(x * 70 + 5, y * 70 + 5)
+		end
+		if not MY_GKP_Loot.bVertical then
+			txt:Hide()
+			box:SetSize(48, 48)
+			box:SetRelPos(2, 2)
+			h:SetSize(52, 52)
+			h:FormatAllItemPos()
+			h:Lookup("Image_Spliter"):Hide()
+			h:Lookup("Image_Hover"):SetSize(0, 0)
 		end
 		UpdateBoxObject(box, UI_OBJECT_ITEM_ONLY_ID, item.dwID)
 		-- box:SetOverText(3, "")
 		-- box:SetOverTextFontScheme(3, 15)
 		-- box:SetOverTextPosition(3, ITEM_POSITION.LEFT_TOP)
 		box.data = {
-			dwID      = item.dwID,
-			nQuality  = item.nQuality,
-			szName    = szName,
-			bNeedRoll = v.bNeedRoll,
-			bDist     = v.bDist,
-			bBidding  = v.bBidding,
-			item      = v.item,
+			dwDoodadID = dwID,
+			dwID       = item.dwID,
+			nQuality   = item.nQuality,
+			szName     = szName,
+			bNeedRoll  = v.bNeedRoll,
+			bDist      = v.bDist,
+			bBidding   = v.bBidding,
+			item       = v.item,
 		}
 		if GKP_LOOT_AUTO[item.nUiId] then
 			box:SetObjectStaring(true)
 		end
 	end
-	handle:FormatAllItemPos()
-	-- frame:Lookup("", "Text_Title"):SetText(g_tStrings.STR_LOOT_SHOW_LIST .. " - " .. szName)
-	frame:Lookup("", "Text_Title"):SetText(szName)
+	if bSpecial then
+		hDoodad:Lookup("Image_DoodadBg"):FromUITex("ui/Image/OperationActivity/RedEnvelope2.uitex", 14)
+		hDoodad:Lookup("Image_DoodadTitleBg"):FromUITex("ui/Image/OperationActivity/RedEnvelope2.uitex", 14)
+		hDoodad:Lookup("Text_Title"):SetAlpha(255)
+		hDoodad:Lookup("SFX"):Show()
+	end
+	hDoodad:Lookup("Text_Title"):SetText(szName .. " (" .. #data ..  ")")
+	-- 修改UI大小
+	Loot.AdjustWnd(wnd)
+	Loot.AdjustFrame(frame)
 end
 
-function Loot.GetFrame(dwID)
-	return Station.Lookup("Normal/MY_GKP_Loot_" .. dwID)
+function Loot.RemoveLootList(dwID)
+	local frame = Loot.GetFrame()
+	if not frame then
+		return
+	end
+	local container = frame:Lookup("WndContainer_DoodadList")
+	local wnd = container:LookupContent(0)
+	while wnd and wnd.dwDoodadID ~= dwID do
+		wnd = wnd:GetNext()
+	end
+	if wnd then
+		wnd:Destroy()
+		Loot.AdjustFrame(frame)
+	end
+	if container:GetAllContentCount() == 0 then
+		return Loot.CloseFrame()
+	end
 end
 
-function Loot.OpenFrame(dwID)
-	local frame = Wnd.OpenWindow(GKP_LOOT_INIFILE, "MY_GKP_Loot_" .. dwID)
-	Loot.DrawLootList(dwID)
-	PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
+function Loot.GetFrame()
+	return Station.Lookup("Normal/MY_GKP_Loot")
+end
+
+function Loot.OpenFrame()
+	local frame = Loot.GetFrame()
+	if not frame then
+		frame = Wnd.OpenWindow(GKP_LOOT_INIFILE, "MY_GKP_Loot")
+		PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
+	end
+	return frame
 end
 
 -- 手动关闭 不适用自定关闭
@@ -702,17 +753,10 @@ MY.RegisterEvent("OPEN_DOODAD", function()
 			PlaySound(SOUND.UI_SOUND, g_sound.PickupMoney)
 		end
 		local szName, data = Loot.GetDoodad(arg0)
-		local frame = Loot.GetFrame(arg0)
 		if #data == 0 then
-			if frame then
-				Wnd.CloseWindow(frame)
-			end
-			return
-		elseif not frame then
-			Loot.OpenFrame(arg0)
-		else
-			Loot.DrawLootList(arg0)
+			return Loot.RemoveLootList(arg0)
 		end
+		Loot.DrawLootList(arg0)
 		MY.Debug({"Open Doodad: " .. arg0}, "MY_GKP_Loot", MY_DEBUG.LOG)
 		local hLoot = Station.Lookup("Normal/LootList")
 		if hLoot then
@@ -724,26 +768,14 @@ end)
 
 -- 刷新箱子
 MY.RegisterEvent("SYNC_LOOT_LIST", function()
-	local frame = Loot.GetFrame(arg0)
 	if (MY_GKP.bDebug2 and MY_GKP.bDebug) or frame then
-		if not frame then
-			local szName, data = Loot.GetDoodad(arg0)
-			if #data > 0 then
-				Loot.OpenFrame(arg0)
-			end
-		end
-		if Loot.GetFrame(arg0) then
-			if frame then
-				Loot.DrawLootList(arg0)
-			end
-		end
+		Loot.DrawLootList(arg0)
 	end
 end)
-Loot_OpenFrame = Loot.OpenFrame
-
-MY.RegisterEvent("GKP_LOOT_BOSS", function()
+Loot_OpenFrame = Loot.Open
+MY.RegisterEvent("MY_GKP_LOOT_BOSS", function()
 	if not arg0 then
-		GKP_LOOT_BOSS = nil
+		MY_GKP_LOOT_BOSS = nil
 		GKP_LOOT_AUTO = {}
 	else
 		local team = GetClientTeam()
@@ -751,7 +783,7 @@ MY.RegisterEvent("GKP_LOOT_BOSS", function()
 			for k, v in ipairs(team.GetTeamMemberList()) do
 				local info = GetClientTeam().GetMemberInfo(v)
 				if info.szName == arg0 then
-					GKP_LOOT_BOSS = v
+					MY_GKP_LOOT_BOSS = v
 					break
 				end
 			end

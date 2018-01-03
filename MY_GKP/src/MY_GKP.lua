@@ -1116,7 +1116,7 @@ function _GKP.ClearData(bConfirm)
 		_GKP.DrawRecord()
 		_GKP.DrawAccount()
 		_GKP.UpdateStat()
-		FireUIEvent("GKP_LOOT_BOSS")
+		FireUIEvent("MY_GKP_LOOT_BOSS")
 		MY.Alert(_L["Recods are wiped"])
 	end
 	if bConfirm then
@@ -1517,7 +1517,7 @@ function _GKP.Record(tab, item, bEnter)
 			end
 		end
 		if ui:children("#WndCheckBox"):check() then
-			FireUIEvent("GKP_LOOT_BOSS", tab.szPlayer)
+			FireUIEvent("MY_GKP_LOOT_BOSS", tab.szPlayer)
 		end
 		if tab and type(item) == "number" then
 			MY_GKP("GKP_Record", item, tab)
