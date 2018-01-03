@@ -62,9 +62,7 @@ end
 
 function MY_GKP_Loot.OnEvent(szEvent)
 	if szEvent == "DOODAD_LEAVE_SCENE" then
-		if arg0 == this.dwDoodadID then
-			Loot.RemoveLootList(arg0)
-		end
+		Loot.RemoveLootList(arg0)
 	elseif szEvent == "PARTY_LOOT_MODE_CHANGED" then
 		if arg1 ~= PARTY_LOOT_MODE.DISTRIBUTE then
 			-- Wnd.CloseWindow(this)
@@ -615,7 +613,7 @@ function Loot.DrawLootList(dwID)
 	local hDoodad = wnd:Lookup("", "")
 	local hList = hDoodad:Lookup("Handle_ItemList")
 	hList:Clear()
-	for k, v in ipairs(data) do
+	for i, v in ipairs(data) do
 		local item = v.item
 		local szName = GetItemNameByItem(item)
 		local h = hList:AppendItemFromIni(GKP_LOOT_INIFILE, "Handle_Item")
@@ -631,7 +629,9 @@ function Loot.DrawLootList(dwID)
 				end
 			end
 		end
-		if not MY_GKP_Loot.bVertical then
+		if MY_GKP_Loot.bVertical then
+			h:Lookup("Image_Spliter"):SetVisible(i ~= #data)
+		else
 			txt:Hide()
 			box:SetSize(48, 48)
 			box:SetRelPos(2, 2)
