@@ -133,4 +133,6 @@ data = {
 	["Manually load from file."] = "手动加载记录文件",
 	["Please select gkp file."] = "请选择GKP记录文件",
 	["Confirm?"] = "确定执行这个操作？",
+	["Auto pickup all"] = "自动拾取全部物品",
+	["Auto pickup this"] = "自动拾取该组物品",
 }
