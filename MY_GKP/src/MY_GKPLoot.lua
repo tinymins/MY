@@ -59,12 +59,13 @@ local GKP_ITEM_QUALITIES = {
 	{ nQuality = 5, szTitle = g_tStrings.STR_ROLLQUALITY_NACARAT },
 }
 
-local Loot = {}
+local Loot = {
+	nQualityFilter = -1,
+}
 -- setmetatable(GKP_LOOT_AUTO_LIST, { __index = function() return true end })
 MY_GKP_Loot = {
 	bVertical = true,
 	bSetColor = true,
-	nQualityFilter = -1,
 	nAutoPickupQuality = -1,
 }
 MY.RegisterCustomData("MY_GKP_Loot")
@@ -128,8 +129,8 @@ function MY_GKP_Loot.OnFrameBreathe()
 			local hList = wnd:Lookup("", "Handle_ItemList")
 			for i = 0, hList:GetItemCount() - 1 do
 				local nQuality = hList:Lookup(i):Lookup("Box_Item").data.nQuality
-				if (MY_GKP_Loot.nAutoPickupQuality ~= -1 and nQuality > MY_GKP_Loot.nAutoPickupQuality)
-				or (wnd.nAutoPickupQuality ~= -1 and nQuality > wnd.nAutoPickupQuality) then
+				if (MY_GKP_Loot.nAutoPickupQuality ~= -1 and nQuality >= MY_GKP_Loot.nAutoPickupQuality)
+				or (wnd.nAutoPickupQuality ~= -1 and nQuality >= wnd.nAutoPickupQuality) then
 					ExecuteWithThis(hList:Lookup(i), MY_GKP_Loot.OnItemLButtonClick)
 				end
 			end
@@ -413,9 +414,9 @@ function Loot.GetQualityFilterMenu()
 		table.insert(t, {
 			szOption = p.szTitle,
 			rgb = p.nQuality == -1 and {255, 255, 255} or { GetItemFontColorByQuality(p.nQuality) },
-			bCheck = true, bMCheck = true, bChecked = MY_GKP_Loot.nQualityFilter == p.nQuality,
+			bCheck = true, bMCheck = true, bChecked = Loot.nQualityFilter == p.nQuality,
 			fnAction = function()
-				MY_GKP_Loot.nQualityFilter = p.nQuality
+				Loot.nQualityFilter = p.nQuality
 			end,
 		})
 	end
@@ -730,10 +731,10 @@ function Loot.DrawLootList(dwID)
 	-- ¼ÆËãµôÂä
 	local szName, data, bSpecial = Loot.GetDoodad(dwID)
 	local nCount = #data
-	if MY_GKP_Loot.nQualityFilter ~= -1 then
+	if Loot.nQualityFilter ~= -1 then
 		nCount = 0
 		for i, v in ipairs(data) do
-			if v.item.nQuality >= MY_GKP_Loot.nQualityFilter then
+			if v.item.nQuality >= Loot.nQualityFilter then
 				nCount = nCount + 1
 			end
 		end
@@ -765,7 +766,7 @@ function Loot.DrawLootList(dwID)
 	hList:Clear()
 	for i, v in ipairs(data) do
 		local item = v.item
-		if MY_GKP_Loot.nQualityFilter == -1 or item.nQuality >= MY_GKP_Loot.nQualityFilter then
+		if Loot.nQualityFilter == -1 or item.nQuality >= Loot.nQualityFilter then
 			local szName = GetItemNameByItem(item)
 			local h = hList:AppendItemFromIni(GKP_LOOT_INIFILE, "Handle_Item")
 			local box = h:Lookup("Box_Item")
