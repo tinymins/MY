@@ -1339,39 +1339,50 @@ function XGUI:autocomplete(method, arg1, arg2)
 					if IsFunction(opt.beforeSearch) then
 						opt.beforeSearch(raw, opt)
 					end
-					local keyword = arg1 or raw:Lookup('WndEdit_Default'):GetText()
+					local needle = arg1 or raw:Lookup('WndEdit_Default'):GetText()
 					if opt.ignoreCase then
-						keyword = StringLowerW(keyword)
+						needle = StringLowerW(needle)
 					end
-					local aOption = {}
+					local aSrc = {}
 					-- get matched list
 					for _, src in ipairs(opt.source) do
-						local s = src
+						local haystack = type(src) == 'table' and (src.keyword or tostring(src.text)) or tostring(src)
 						if opt.ignoreCase then
-							s = StringLowerW(src)
+							haystack = StringLowerW(src)
 						end
-						local pos = wfind(s, keyword)
+						local pos = wfind(haystack, needle)
 						if pos and (opt.anyMatch or pos == 0) then
-							insert(aOption, src)
+							insert(aSrc, src)
 						end
 					end
 
 					-- create menu
 					local menu = {}
-					for _, szOption in ipairs(aOption) do
+					for _, src in ipairs(aSrc) do
+						local szText, szOption, bRichText
+						if type(src) == 'table' then
+							szText = src.text
+							szDisplay = src.display or szText
+							bRichText = src.richtext or false
+						else
+							szText = tostring(src)
+							szDisplay = szText
+							bRichText = false
+						end
 						-- max opt limit
 						if opt.maxOption > 0 and #menu >= opt.maxOption then
 							break
 						end
 						-- create new opt
 						local t = {
-							szOption = szOption,
+							szOption = szDisplay,
+							bRichText = bRichText,
 							fnAction = function()
 								opt.disabledTmp = true
-								raw:Lookup('WndEdit_Default'):SetText(szOption)
+								raw:Lookup('WndEdit_Default'):SetText(szText)
 								opt.disabledTmp = nil
 								if IsFunction(opt.afterComplete) then
-									opt.afterComplete(raw, opt, szOption)
+									opt.afterComplete(raw, opt, src)
 								end
 								Wnd.CloseWindow('PopupMenuPanel')
 							end,
@@ -1387,20 +1398,20 @@ function XGUI:autocomplete(method, arg1, arg2)
 								local bSure = true
 								local fnDoDelete = function()
 									for i = #opt.source, 1, -1 do
-										if opt.source[i] == szOption then
+										if opt.source[i] == src then
 											remove(opt.source, i)
 										end
 									end
 									XGUI(raw):autocomplete('search')
 								end
 								if opt.beforeDelete then
-									bSure = opt.beforeDelete(szOption, fnDoDelete, opt)
+									bSure = opt.beforeDelete(src, fnDoDelete, opt)
 								end
 								if bSure ~= false then
 									fnDoDelete()
 								end
 								if opt.afterDelete then
-									opt.afterDelete(szOption, opt)
+									opt.afterDelete(src, opt)
 								end
 							end
 						end
