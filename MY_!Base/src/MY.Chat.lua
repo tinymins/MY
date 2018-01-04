@@ -1044,6 +1044,7 @@ local function UploadSerendipity(szName, szSerendipity, nMethod, bFinish, dwTime
 	})
 
 	MY.Ajax({
+		driver = "origin",
 		type = "get",
 		url = 'http://data.jx3.derzh.com/serendipity/?l=' .. MY.GetLang() .. "&m=" .. nMethod
 		.. "&data=" .. MY.SimpleEcrypt(MY.JsonEncode({
