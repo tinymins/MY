@@ -7,8 +7,8 @@
 -- @Last modified time: 2016-12-13 14:49:52
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Toolbox/lang/")
-local QUERY_URL = "https://data.jx3.derzh.com/api/exam?l=%s&q=%s"
-local SUBMIT_URL = "https://data.jx3.derzh.com/api/exam"
+local QUERY_URL = "http://data.jx3.derzh.com/api/exam?l=%s&q=%s"
+local SUBMIT_URL = "http://data.jx3.derzh.com/api/exam"
 local l_tLocal -- 本地题库
 local l_tCached = {} -- 玩家答题缓存
 local l_tAccept = {} -- 从服务器获取到的数据缓存

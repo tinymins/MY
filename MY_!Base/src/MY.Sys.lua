@@ -439,6 +439,7 @@ function MY.Ajax(settings)
 				end
 				url = url .. data
 			end
+			curl:AddHeader('Content-Type: application/x-www-form-urlencoded')
 		end
 		curl:OnSuccess(settings.success or function(html, status)
 			MY.Debug({settings.url .. ' - SUCCESS'}, 'AJAX', MY_DEBUG.LOG)
@@ -537,7 +538,7 @@ MY.BreatheCall("MYLIB#STORAGE_DATA", 200, function()
 	m_nStorageVer = MY.LoadLUAData({'config/storageversion.jx3dat', MY_DATA_PATH.ROLE}) or {}
 	MY.Ajax({
 		type = "post/json",
-		url = 'https://data.jx3.derzh.com/api/storage',
+		url = 'http://data.jx3.derzh.com/api/storage',
 		data = {
 			data = MY.SimpleEcrypt(MY.ConvertToUTF8(MY.JsonEncode({
 				g = me.GetGlobalID(), f = me.dwForceID, e = me.GetTotalEquipScore(),
@@ -594,7 +595,7 @@ function MY.StorageData(szKey, oData)
 		end
 		MY.Ajax({
 			type = 'post/json',
-			url = 'https://data.jx3.derzh.com/api/storage',
+			url = 'http://data.jx3.derzh.com/api/storage',
 			data = {
 				data =  MY.String.SimpleEcrypt(MY.Json.Encode({
 					g = me.GetGlobalID(), f = me.dwForceID, r = me.nRoleType,
