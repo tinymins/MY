@@ -1439,7 +1439,7 @@ function _GKP.Record(tab, item, bEnter)
 		hPlayer:text(tab.szPlayer):color(MY.GetForceColor(tab.dwForceID))
 		hName:text(tab.szName):enable(false)
 		hSource:text(tab.szNpcName):enable(false)
-		ui:Raw().userdata = true
+		ui[1].userdata = true
 	else
 		hPlayer:text(g_tStrings.PLAYER_NOT_EMPTY):color(255, 255, 255)
 		hSource:text(_L["Add Manually"]):enable(false)
@@ -1495,7 +1495,7 @@ function _GKP.Record(tab, item, bEnter)
 			if MY.IsDistributer() then
 				MY.Talk(PLAYER_TALK_CHANNEL.RAID, {
 					_GKP.GetFormatLink(tab),
-					_GKP.GetFormatLink(" ".. nMoney ..g_tStrings.STR_GOLD),
+					_GKP.GetFormatLink(" ".. nMoney .. g_tStrings.STR_GOLD),
 					_GKP.GetFormatLink(_L[" Distribute to "]),
 					_GKP.GetFormatLink(tab.szPlayer, true)
 				})
@@ -1512,7 +1512,7 @@ function _GKP.Record(tab, item, bEnter)
 					_GKP.GetFormatLink(" ".. nMoney ..g_tStrings.STR_GOLD),
 					_GKP.GetFormatLink(_L["Make changes to the record."]),
 				})
-				MY.BgTalk(PLAYER_TALK_CHANNEL.RAID,"MY_GKP", "edit", tab)
+				MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "MY_GKP", "edit", tab)
 			end
 		else
 			if MY.IsDistributer() then
@@ -1522,7 +1522,7 @@ function _GKP.Record(tab, item, bEnter)
 					_GKP.GetFormatLink(_L["Manually make record to"]),
 					_GKP.GetFormatLink(tab.szPlayer, true)
 				})
-				MY.BgTalk(PLAYER_TALK_CHANNEL.RAID,"MY_GKP", "add", tab)
+				MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "MY_GKP", "add", tab)
 			end
 		end
 		if ui:children("#WndCheckBox"):check() then
@@ -1533,7 +1533,7 @@ function _GKP.Record(tab, item, bEnter)
 		else
 			MY_GKP("GKP_Record", tab)
 		end
-		ui:remove()
+		Wnd.CloseWindow(ui[1])
 	end)
 	if bEnter then
 		hButton:click()
