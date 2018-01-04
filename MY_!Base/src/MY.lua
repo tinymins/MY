@@ -600,7 +600,7 @@ do local BG_MSG_LIST = {}
 -- arg4: 不定长参数数组数据
 ------------------------------------
 local function OnBgMsg()
-	local szMsgID, nChannel, dwID, szName, aParam, bSelf = arg0, arg1, arg2, arg3, arg4, dwID == UI_GetClientPlayerID()
+	local szMsgID, nChannel, dwID, szName, aParam, bSelf = arg0, arg1, arg2, arg3, arg4, arg2 == UI_GetClientPlayerID()
 	if szMsgID and BG_MSG_LIST[szMsgID] then
 		for szKey, fnAction in pairs(BG_MSG_LIST[szMsgID]) do
 			local status, err = pcall(fnAction, szMsgID, nChannel, dwID, szName, bSelf, unpack(aParam))
