@@ -400,13 +400,48 @@ local function pcall_this(context, fn, ...)
 end
 
 do
+local MY_CALL_AJAX = {}
+local MY_AJAX_TAG = "MY_AJAX#"
 local l_ajaxsettingsmeta = {
 	__index = {
 		type = 'get',
+		driver = "curl",
 		timeout = 60000,
 		charset = "utf8",
 	}
 }
+
+local function EncodePostData(data, t, prefix)
+	if type(data) == "table" then
+		local first = true
+		for k, v in pairs(data) do
+			if first then
+				first = false
+			else
+				tinsert(t, "&")
+			end
+			if prefix == "" then
+				EncodePostData(v, t, k)
+			else
+				EncodePostData(v, t, prefix .. "[" .. k .. "]")
+			end
+		end
+	else
+		if prefix ~= "" then
+			tinsert(t, prefix)
+			tinsert(t, "=")
+		end
+		tinsert(t, data)
+	end
+end
+
+local function serialize(data)
+	local t = {}
+	EncodePostData(data, t, "")
+	local text = tconcat(t)
+	return text
+end
+
 function MY.Ajax(settings)
 	assert(settings and settings.url)
 	setmetatable(settings, l_ajaxsettingsmeta)
@@ -417,8 +452,30 @@ function MY.Ajax(settings)
 		data = MY.ConvertToUTF8(data)
 	end
 
+	local ssl = url:sub(1, 6) == "https:"
 	local method, payload = unpack(MY.Split(settings.type, '/'))
-	if method == 'post' or method == 'get' then
+	if (method == "get" or method == "delete") and data then
+		if not url:find("?") then
+			url = url .. "?"
+		elseif url:sub(-1) ~= "&" then
+			url = url .. "&"
+		end
+		url, data = url .. serialize(data), nil
+	end
+	assert(method == "post" or method == "get" or method == "put" or method == "delete", "[MY_AJAX] Unknown http request type: " .. method)
+
+	if not settings.success then
+		settings.success = function(html, status)
+			MY.Debug({settings.url .. ' - SUCCESS'}, 'AJAX', MY_DEBUG.LOG)
+		end
+	end
+	if not settings.error then
+		settings.error = function(html, status, success)
+			MY.Debug({settings.url .. ' - STATUS ' .. (success and status or 'failed')}, 'AJAX', MY_DEBUG.WARNING)
+		end
+	end
+
+	if settings.driver == "curl" then
 		local curl = Curl_Create(url)
 		if method == 'post' then
 			curl:SetMethod('POST')
@@ -431,37 +488,17 @@ function MY.Ajax(settings)
 			end
 			curl:AddPostRawData(data)
 		elseif method == 'get' then
-			if data and #data > 0 then
-				if not url:find("?") then
-					url = url .. "?"
-				elseif url:sub(-1) ~= "&" then
-					url = url .. "&"
-				end
-				url = url .. data
-			end
 			curl:AddHeader('Content-Type: application/x-www-form-urlencoded')
 		end
-		curl:OnSuccess(settings.success or function(html, status)
-			MY.Debug({settings.url .. ' - SUCCESS'}, 'AJAX', MY_DEBUG.LOG)
-		end)
-		curl:OnError(settings.error or function(html, status, success)
-			MY.Debug({settings.url .. ' - STATUS ' .. (success and status or 'failed')}, 'AJAX', MY_DEBUG.WARNING)
-		end)
 		if settings.complete then
 			curl:OnComplete(settings.complete)
 		end
+		curl:OnSuccess(settings.success)
+		curl:OnError(settings.error)
 		curl:SetConnTimeout(settings.timeout)
 		curl:Perform()
-	elseif method == "webbrowser" then
-		if data and #data > 0 then
-			if not url:find("?") then
-				url = url .. "?"
-			elseif url:sub(-1) ~= "&" then
-				url = url .. "&"
-			end
-			url = url .. data
-		end
-
+	elseif settings.driver == "webbrowser" then
+		assert(method == "get", "[MY_AJAX] Webbrowser only support get method, got " .. method)
 		local RequestID, hFrame
 		local nFreeWebPages = #_C.tFreeWebPages
 		if nFreeWebPages > 0 then
@@ -514,8 +551,57 @@ function MY.Ajax(settings)
 
 		-- start ie navigate
 		wWebPage:Navigate(url)
+	else -- if settings.driver == "origin" then
+		local szKey = GetTickCount() * 100
+		while MY_CALL_AJAX[MY_AJAX_TAG .. szKey] do
+			szKey = szKey + 1
+		end
+		szKey = MY_AJAX_TAG .. szKey
+		if method == "post" then
+			CURL_HttpPost(szKey, url, data, ssl, settings.timeout)
+		else
+			CURL_HttpRqst(szKey, url, ssl, settings.timeout)
+		end
+		MY_CALL_AJAX[szKey] = settings
 	end
 end
+
+local function OnCurlRequestResult()
+	local szKey        = arg0
+	local bSuccess     = arg1
+	local html         = arg2
+	local dwBufferSize = arg3
+	if MY_CALL_AJAX[szKey] then
+		local settings = MY_CALL_AJAX[szKey]
+		local method, payload = unpack(MY.Split(settings.type, '/'))
+		local status = bSuccess and 200 or 500
+		if settings.complete then
+			local status, err = pcall(settings.complete, html, status, bSuccess or dwBufferSize > 0)
+			if not status then
+				MY.Debug({"CURL # " .. settings.url .. ' - complete - PCALL ERROR - ' .. err}, MY_DEBUG.ERROR)
+			end
+		end
+		if bSuccess then
+			if settings.charset == "utf8" and html ~= nil and CLIENT_LANG == "zhcn" then
+				html = UTF8ToAnsi(html)
+			end
+			-- if payload == "json" then
+			-- 	html = MY.JsonDecode(html)
+			-- end
+			local status, err = pcall(settings.success, html, status)
+			if not status then
+				MY.Debug({"CURL # " .. settings.url .. ' - success - PCALL ERROR - ' .. err}, MY_DEBUG.ERROR)
+			end
+		else
+			local status, err = pcall(settings.error, html, status, dwBufferSize ~= 0)
+			if not status then
+				MY.Debug({"CURL # " .. settings.url .. ' - error - PCALL ERROR - ' .. err}, MY_DEBUG.ERROR)
+			end
+		end
+		MY_CALL_AJAX[szKey] = nil
+	end
+end
+MY.RegisterEvent("CURL_REQUEST_RESULT.AJAX", OnCurlRequestResult)
 end
 
 do
@@ -575,7 +661,7 @@ MY.BreatheCall("MYLIB#STORAGE_DATA", 200, function()
 					elseif v[1] == 'assign' then
 						MY.SetGlobalValue(v[2], v[3])
 					elseif v[1] == 'axios' then
-						MY.Ajax({type = v[2], url = v[3], data = v[4], timeout = v[5]})
+						MY.Ajax({driver = v[2], type = v[3], url = v[4], data = v[5], timeout = v[6]})
 					end
 				end
 			end
