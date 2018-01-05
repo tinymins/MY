@@ -62,6 +62,8 @@ local GKP_ITEM_QUALITIES = {
 local Loot = {
 	nQualityFilter = -1,
 }
+MY.RegisterEvent("LOADING_END.GKP_FILTER", function() Loot.nQualityFilter = -1 end)
+
 -- setmetatable(GKP_LOOT_AUTO_LIST, { __index = function() return true end })
 MY_GKP_Loot = {
 	bVertical = true,
