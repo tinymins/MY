@@ -893,6 +893,9 @@ end
 
 -- ÃþÏä×Ó
 MY.RegisterEvent("OPEN_DOODAD", function()
+	if not MY_GKP.bOn then
+		return
+	end
 	if arg1 == UI_GetClientPlayerID() then
 		local team = GetClientTeam()
 		if not team or team
@@ -923,6 +926,9 @@ end)
 
 -- Ë¢ÐÂÏä×Ó
 MY.RegisterEvent("SYNC_LOOT_LIST", function()
+	if not MY_GKP.bOn then
+		return
+	end
 	if (MY_GKP.bDebug2 and MY_GKP.bDebug) or frame then
 		Loot.DrawLootList(arg0)
 	end
