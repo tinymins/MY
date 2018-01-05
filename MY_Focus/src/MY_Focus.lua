@@ -468,11 +468,8 @@ end
 function MY_Focus.UpdateList()
 	l_lockInDisplay = false
 	local tNames = {}
-	if not IsShielded() then
-		for i, p in ipairs(MY_Focus.GetDisplayList()) do
-			MY_Focus.DrawFocus(p.dwType, p.dwID)
-			tNames['HI_' .. p.dwType .. '_' .. p.dwID] = true
-		end
+	for i, p in ipairs(MY_Focus.GetDisplayList()) do
+		tNames['HI_' .. p.dwType .. '_' .. p.dwID] = MY_Focus.DrawFocus(p.dwType, p.dwID)
 	end
 	local hList = Station.Lookup('Normal/MY_Focus', 'Handle_List')
 	if hList then
@@ -491,6 +488,9 @@ end
 
 -- 绘制指定的焦点Handle（没有则添加创建）
 function MY_Focus.DrawFocus(dwType, dwID)
+	if IsShielded() then
+		return
+	end
 	local obj, info, bInfo = MY.Game.GetObject(dwType, dwID)
 	local szName = MY.Game.GetObjectName(obj)
 	local hList = Station.Lookup('Normal/MY_Focus', 'Handle_List')
@@ -699,9 +699,10 @@ function MY_Focus.DrawFocus(dwType, dwID)
 			hItem:Lookup('Image_Select'):Show()
 		end
 	end
-
 	hItem:FormatAllItemPos()
 	hList:FormatAllItemPos()
+
+	return true
 end
 
 -- 自适应调整界面大小
