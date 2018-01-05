@@ -569,12 +569,12 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + 28
 
-	x = X
-	ui:append("Text", { x = x, y = y, text = _L["GKP Loot"], font = 27 })
-	y = y + 28
-
-	x = x + 10
 	if not MY.IsShieldedVersion() then
+		x = X
+		ui:append("Text", { x = x, y = y, text = _L["GKP Loot"], font = 27 })
+		y = y + 28
+
+		x = x + 10
 		ui:append("WndComboBox", { x = x, y = y, w = 150, text = _L["Quality filter"], menu = MY_GKP_Loot.GetQualityFilterMenu })
 		ui:append("WndComboBox", { x = x + 160, y = y, w = 170, text = _L["Auto pickup all"], menu = MY_GKP_Loot.GetAutoPickupAllMenu })
 		y = y + 28
