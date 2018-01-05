@@ -1044,12 +1044,11 @@ local function UploadSerendipity(szName, szSerendipity, nMethod, bFinish, dwTime
 	})
 
 	MY.Ajax({
-		driver = "origin",
 		type = "get",
 		url = 'http://data.jx3.derzh.com/serendipity/?l=' .. MY.GetLang() .. "&m=" .. nMethod
 		.. "&data=" .. MY.SimpleEcrypt(MY.JsonEncode({
 			n = szName, S = MY.GetRealServer(1), s = MY.GetRealServer(2),
-			a = szAdventure, f = bFinish, t = GetCurrentTime()
+			a = szSerendipity, f = bFinish, t = dwTime,
 		})),
 		success = function(html, status) end,
 	})
