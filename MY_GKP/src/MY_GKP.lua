@@ -574,9 +574,11 @@ function PS.OnPanelActive(wnd)
 	y = y + 28
 
 	x = x + 10
-	ui:append("WndComboBox", { x = x, y = y, w = 150, text = _L["Quality filter"], menu = MY_GKP_Loot.GetQualityFilterMenu })
-	ui:append("WndComboBox", { x = x + 160, y = y, w = 170, text = _L["Auto pickup all"], menu = MY_GKP_Loot.GetAutoPickupAllMenu })
-	y = y + 28
+	if not MY.IsShieldedVersion() then
+		ui:append("WndComboBox", { x = x, y = y, w = 150, text = _L["Quality filter"], menu = MY_GKP_Loot.GetQualityFilterMenu })
+		ui:append("WndComboBox", { x = x + 160, y = y, w = 170, text = _L["Auto pickup all"], menu = MY_GKP_Loot.GetAutoPickupAllMenu })
+		y = y + 28
+	end
 
 	if MY_GKP.bDebug then
 		ui:append("WndCheckBox", {
