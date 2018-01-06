@@ -59,18 +59,27 @@ local GKP_ITEM_QUALITIES = {
 	{ nQuality = 5, szTitle = g_tStrings.STR_ROLLQUALITY_NACARAT },
 }
 
-local Loot = {
-	nQualityFilter = -1,
-}
-MY.RegisterEvent("LOADING_END.GKP_FILTER", function() Loot.nQualityFilter = -1 end)
-
+local Loot = {}
 -- setmetatable(GKP_LOOT_AUTO_LIST, { __index = function() return true end })
 MY_GKP_Loot = {
 	bVertical = true,
 	bSetColor = true,
-	nAutoPickupQuality = -1,
 }
 MY.RegisterCustomData("MY_GKP_Loot")
+
+MY_GKP_Loot.tItemConfig = {
+	nQualityFilter = -1,
+	nAutoPickupQuality = -1,
+}
+MY.RegisterCustomData("MY_GKP_Loot.tItemConfig")
+
+function MY_GKP_Loot.IsItemDisplay(itemData, config)
+	return config.nQualityFilter == -1 or itemData.nQuality >= config.nQualityFilter
+end
+
+function MY_GKP_Loot.IsItemAutoPickup(itemData, config, doodad, bCanDialog)
+	return bCanDialog and config.nAutoPickupQuality ~= -1 and itemData.nQuality >= config.nAutoPickupQuality
+end
 
 function MY_GKP_Loot.OnFrameCreate()
 	this:RegisterEvent("UI_SCALED")
@@ -91,6 +100,17 @@ function MY_GKP_Loot.OnFrameBreathe()
 	local wnd = this:Lookup("WndContainer_DoodadList"):LookupContent(0)
 	while wnd do
 		local doodad = GetDoodad(wnd.dwDoodadID)
+		-- 拾取判定
+		local bCanDialog = doodad.CanDialog(me)
+		if not MY.IsShieldedVersion() then
+			local hList = wnd:Lookup("", "Handle_ItemList")
+			for i = 0, hList:GetItemCount() - 1 do
+				if MY_GKP_Loot.IsItemAutoPickup(wnd.itemData, wnd.tItemConfig, doodad, bCanDialog) then
+					ExecuteWithThis(hList:Lookup(i), MY_GKP_Loot.OnItemLButtonClick)
+				end
+			end
+		end
+		wnd:Lookup("", "Image_DoodadTitleBg"):SetFrame(bCanDialog and 0 or 3)
 		-- 目标距离
 		local nDistance = 0
 		if me and doodad then
@@ -126,18 +146,6 @@ function MY_GKP_Loot.OnFrameBreathe()
 		local nY = nRadius - 3 - nRadius * sin(nRotate)
 		wnd:Lookup("", "Handle_Compass/Image_PointGreen"):SetRelPos(nX, nY)
 		wnd:Lookup("", "Handle_Compass"):FormatAllItemPos()
-		local bCanDialog = doodad.CanDialog(me)
-		if bCanDialog and not MY.IsShieldedVersion() and (MY_GKP_Loot.nAutoPickupQuality >= 0 or wnd.nAutoPickupQuality >= 0) then
-			local hList = wnd:Lookup("", "Handle_ItemList")
-			for i = 0, hList:GetItemCount() - 1 do
-				local nQuality = hList:Lookup(i):Lookup("Box_Item").data.nQuality
-				if (MY_GKP_Loot.nAutoPickupQuality ~= -1 and nQuality >= MY_GKP_Loot.nAutoPickupQuality)
-				or (wnd.nAutoPickupQuality ~= -1 and nQuality >= wnd.nAutoPickupQuality) then
-					ExecuteWithThis(hList:Lookup(i), MY_GKP_Loot.OnItemLButtonClick)
-				end
-			end
-		end
-		wnd:Lookup("", "Image_DoodadTitleBg"):SetFrame(bCanDialog and 0 or 3)
 		wnd = wnd:GetNext()
 	end
 end
@@ -213,9 +221,9 @@ function MY_GKP_Loot.OnLButtonClick()
 			{
 				szOption = _L["Link All Item"],
 				fnAction = function()
-					local szName, data, bSpecial = Loot.GetDoodad(dwDoodadID)
+					local szName, aItemData, bSpecial = Loot.GetDoodad(dwDoodadID)
 					local t = {}
-					for k, v in ipairs(data) do
+					for k, v in ipairs(aItemData) do
 						table.insert(t, MY_GKP.GetFormatLink(v.item))
 					end
 					MY.Talk(PLAYER_TALK_CHANNEL.RAID, t)
@@ -291,7 +299,7 @@ function MY_GKP_Loot.OnItemMouseEnter()
 			this = this:Lookup("Box_Item")
 			this.OnItemMouseEnter()
 		end
-		-- local item = this.data.item
+		-- local item = this.itemData.item
 		-- if itme and item.nGenre == ITEM_GENRE.EQUIPMENT then
 		-- 	if itme.nSub == EQUIPMENT_SUB.MELEE_WEAPON then
 		-- 		this:SetOverText(3, g_tStrings.WeapenDetail[item.nDetail])
@@ -325,7 +333,7 @@ function MY_GKP_Loot.OnItemLButtonClick()
 	end
 	if szName == "Handle_Item" or szName == "Box_Item" then
 		local box        = szName == "Handle_Item" and this:Lookup("Box_Item") or this
-		local data       = box.data
+		local data       = box.itemData
 		local me, team   = GetClientPlayer(), GetClientTeam()
 		local dwDoodadID = data.dwDoodadID
 		local doodad     = GetDoodad(dwDoodadID)
@@ -367,7 +375,7 @@ function MY_GKP_Loot.OnItemRButtonClick()
 	local szName = this:GetName()
 	if szName == "Handle_Item" or szName == "Box_Item" then
 		local box  = szName == "Handle_Item" and this:Lookup("Box_Item") or this
-		local data = box.data
+		local data = box.itemData
 		if not data.bDist then
 			return
 		end
@@ -416,9 +424,9 @@ function Loot.GetQualityFilterMenu()
 		table.insert(t, {
 			szOption = p.szTitle,
 			rgb = p.nQuality == -1 and {255, 255, 255} or { GetItemFontColorByQuality(p.nQuality) },
-			bCheck = true, bMCheck = true, bChecked = Loot.nQualityFilter == p.nQuality,
+			bCheck = true, bMCheck = true, bChecked = MY_GKP_Loot.tItemConfig.nQualityFilter == p.nQuality,
 			fnAction = function()
-				Loot.nQualityFilter = p.nQuality
+				MY_GKP_Loot.tItemConfig.nQualityFilter = p.nQuality
 			end,
 		})
 	end
@@ -444,10 +452,10 @@ function Loot.GetBossAction(dwDoodadID, bMenu)
 	if not Loot.AuthCheck(dwDoodadID) then
 		return
 	end
-	local szName, data = Loot.GetDoodad(dwDoodadID)
+	local szName, aItemData = Loot.GetDoodad(dwDoodadID)
 	local fnAction = function()
 		local tEquipment = {}
-		for k, v in ipairs(data) do
+		for k, v in ipairs(aItemData) do
 			if (v.item.nGenre == ITEM_GENRE.EQUIPMENT or IsCtrlKeyDown())
 				and v.item.nSub ~= EQUIPMENT_SUB.WAIST_EXTEND
 				and v.item.nSub ~= EQUIPMENT_SUB.BACK_EXTEND
@@ -564,9 +572,9 @@ function Loot.DistributeItem(dwID, dwDoodadID, dwItemID, info, bShift)
 	local item = GetItem(dwItemID)
 	if not item then
 		MY.Debug({"Item does not exist, check!!"}, "MY_GKP_Loot", MY_DEBUG.WARNING)
-		local szName, data = Loot.GetDoodad(dwDoodadID)
-		for k, v in ipairs(data) do
-			if v.item.nQuality == info.nQuality and GetItemNameByItem(v.item) == info.szName then
+		local szName, aItemData = Loot.GetDoodad(dwDoodadID)
+		for k, v in ipairs(aItemData) do
+			if v.nQuality == info.nQuality and GetItemNameByItem(v.item) == info.szName then
 				dwItemID = v.item.dwID
 				MY.Debug({"Item matching, " .. GetItemNameByItem(v.item)}, "MY_GKP_Loot", MY_DEBUG.LOG)
 				break
@@ -728,47 +736,64 @@ function Loot.AdjustWnd(wnd)
 	wnd:Lookup("Btn_Close"):SetRelX(nOuterW - 28)
 end
 
-function Loot.DrawLootList(dwID)
-	local frame = Loot.GetFrame()
-	-- 计算掉落
-	local szName, data, bSpecial = Loot.GetDoodad(dwID)
-	local nCount = #data
-	if Loot.nQualityFilter ~= -1 then
-		nCount = 0
-		for i, v in ipairs(data) do
-			if v.item.nQuality >= Loot.nQualityFilter then
-				nCount = nCount + 1
-			end
-		end
-	end
-	MY.Debug({(string.format("Doodad %d, items %d.", dwID, nCount))}, "MY_GKP_Loot", MY_DEBUG.LOG)
-	if not szName or nCount == 0 then
-		if frame then
-			Loot.RemoveLootList(dwID)
-		end
-		return MY.Debug({"Doodad does not exist!"}, "MY_GKP_Loot:DrawLootList", MY_DEBUG.LOG)
-	end
-	-- 获取/创建UI元素
+function Loot.GetDoodadWnd(frame, dwID, bCreate)
 	if not frame then
-		frame = Loot.OpenFrame()
+		return
 	end
 	local container = frame:Lookup("WndContainer_DoodadList")
 	local wnd = container:LookupContent(0)
 	while wnd and wnd.dwDoodadID ~= dwID do
 		wnd = wnd:GetNext()
 	end
-	if not wnd then
+	if not wnd and bCreate then
 		wnd = container:AppendContentFromIni(GKP_LOOT_INIFILE, "Wnd_Doodad")
 		wnd.dwDoodadID = dwID
-		wnd.nAutoPickupQuality = -1
+		wnd.tItemConfig = setmetatable({}, { __index = MY_GKP_Loot.tItemConfig })
 	end
+	return wnd
+end
+
+function Loot.DrawLootList(dwID)
+	local frame = Loot.GetFrame()
+	local wnd = Loot.GetDoodadWnd(frame, dwID)
+	local config = wnd and wnd.tItemConfig or MY_GKP_Loot.tItemConfig
+
+	-- 计算掉落
+	local szName, aItemData, bSpecial = Loot.GetDoodad(dwID)
+	local nCount = #aItemData
+	if config.nQualityFilter ~= -1 then
+		nCount = 0
+		for i, v in ipairs(aItemData) do
+			if MY_GKP_Loot.IsItemDisplay(v, config) then
+				nCount = nCount + 1
+			end
+		end
+	end
+	MY.Debug({(string.format("Doodad %d, items %d.", dwID, nCount))}, "MY_GKP_Loot", MY_DEBUG.LOG)
+
+	if not szName or nCount == 0 then
+		if frame then
+			Loot.RemoveLootList(dwID)
+		end
+		return MY.Debug({"Doodad does not exist!"}, "MY_GKP_Loot:DrawLootList", MY_DEBUG.LOG)
+	end
+
+	-- 获取/创建UI元素
+	if not frame then
+		frame = Loot.OpenFrame()
+	end
+	if not wnd then
+		wnd = Loot.GetDoodadWnd(frame, dwID, true)
+	end
+	config = wnd.tItemConfig
+
 	-- 修改UI元素
 	local hDoodad = wnd:Lookup("", "")
 	local hList = hDoodad:Lookup("Handle_ItemList")
 	hList:Clear()
-	for i, v in ipairs(data) do
-		local item = v.item
-		if Loot.nQualityFilter == -1 or item.nQuality >= Loot.nQualityFilter then
+	for i, itemData in ipairs(aItemData) do
+		local item = itemData.item
+		if MY_GKP_Loot.IsItemDisplay(itemData, config) then
 			local szName = GetItemNameByItem(item)
 			local h = hList:AppendItemFromIni(GKP_LOOT_INIFILE, "Handle_Item")
 			local box = h:Lookup("Box_Item")
@@ -776,15 +801,15 @@ function Loot.DrawLootList(dwID)
 			txt:SetText(szName)
 			txt:SetFontColor(GetItemFontColorByQuality(item.nQuality))
 			if MY_GKP_Loot.bSetColor and item.nGenre == ITEM_GENRE.MATERIAL then
-				for k, v in pairs(g_tStrings.tForceTitle) do
-					if szName:find(v) then
-						txt:SetFontColor(MY.GetForceColor(k))
+				for dwForceID, szForceTitle in pairs(g_tStrings.tForceTitle) do
+					if szName:find(szForceTitle) then
+						txt:SetFontColor(MY.GetForceColor(dwForceID))
 						break
 					end
 				end
 			end
 			if MY_GKP_Loot.bVertical then
-				h:Lookup("Image_Spliter"):SetVisible(i ~= #data)
+				h:Lookup("Image_Spliter"):SetVisible(i ~= #aItemData)
 			else
 				txt:Hide()
 				box:SetSize(48, 48)
@@ -798,19 +823,10 @@ function Loot.DrawLootList(dwID)
 			-- box:SetOverText(3, "")
 			-- box:SetOverTextFontScheme(3, 15)
 			-- box:SetOverTextPosition(3, ITEM_POSITION.LEFT_TOP)
-			box.data = {
-				dwDoodadID = dwID,
-				dwID       = item.dwID,
-				nQuality   = item.nQuality,
-				szName     = szName,
-				bNeedRoll  = v.bNeedRoll,
-				bDist      = v.bDist,
-				bBidding   = v.bBidding,
-				item       = v.item,
-			}
 			if GKP_LOOT_AUTO[item.nUiId] then
 				box:SetObjectStaring(true)
 			end
+			box.itemData = itemData
 		end
 	end
 	if bSpecial then
@@ -819,7 +835,8 @@ function Loot.DrawLootList(dwID)
 		hDoodad:Lookup("Text_Title"):SetAlpha(255)
 		hDoodad:Lookup("SFX"):Show()
 	end
-	hDoodad:Lookup("Text_Title"):SetText(szName .. " (" .. #data ..  ")")
+	hDoodad:Lookup("Text_Title"):SetText(szName .. " (" .. #aItemData ..  ")")
+
 	-- 修改UI大小
 	Loot.AdjustWnd(wnd)
 	Loot.AdjustFrame(frame)
@@ -870,7 +887,7 @@ end
 function Loot.GetDoodad(dwID)
 	local me   = GetClientPlayer()
 	local d    = GetDoodad(dwID)
-	local data = {}
+	local aItemData = {}
 	local szName
 	local bSpecial = false
 	if me and d then
@@ -884,11 +901,21 @@ function Loot.GetDoodad(dwID)
 					bSpecial = true
 				end
 				-- bSpecial = true -- debug
-				table.insert(data, { item = item, bNeedRoll = bNeedRoll, bDist = bDist, bBidding = bBidding })
+				table.insert(aItemData, {
+					dwDoodadID   = dwID         ,
+					szDoodadName = szName       ,
+					item         = item         ,
+					szName       = szItemName   ,
+					dwID         = item.dwID    ,
+					nQuality     = item.nQuality,
+					bNeedRoll    = bNeedRoll    ,
+					bDist        = bDist        ,
+					bBidding     = bBidding     ,
+				})
 			end
 		end
 	end
-	return szName, data, bSpecial
+	return szName, aItemData, bSpecial
 end
 
 -- 摸箱子
