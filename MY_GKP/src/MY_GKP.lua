@@ -1433,13 +1433,13 @@ function _GKP.Record(tab, item, bEnter)
 				end,
 			},
 		},
-        onclick = function(nButton, raw)
-            if IsPopupMenuOpened() then
-                XGUI(raw):autocomplete('close')
-            else
-                XGUI(raw):autocomplete('search', '')
-            end
-        end,
+		onclick = function(raw)
+			if IsPopupMenuOpened() then
+				XGUI(raw):autocomplete('close')
+			else
+				XGUI(raw):autocomplete('search', '')
+			end
+		end,
 	}, true)
 	local hMoney = ui:append("WndAutocomplete", {
 		name = "Money", x = 140, y = 151, w = 185, h = 25, limit = 8, edittype = 1,
