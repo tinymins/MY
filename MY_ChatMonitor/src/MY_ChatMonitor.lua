@@ -257,7 +257,7 @@ _C.OnPanelActive = function(wnd)
             end
             self:autocomplete('option', 'source', source)
         end,
-        onclick = function(nButton, raw)
+        onclick = function(raw)
             if IsPopupMenuOpened() then
                 XGUI(raw):autocomplete('close')
             else
@@ -311,7 +311,7 @@ _C.OnPanelActive = function(wnd)
         image = 'UI/Image/UICommon/Commonpanel2.UITex', imageframe = 48,
         x = 8, y = 10, w = 25, h = 25, alpha = 180,
         onhover = function(bIn) this:SetAlpha( (bIn and 255 ) or 180) end,
-        onclick = function(nButton)
+        onclick = function()
             local szText = "<image>path=\"ui/Image/UICommon/Talk_Face.UITex\" frame=25 w=24 h=24</image> <text>text=" .. EncodeComponentsString(_L['CHAT_MONITOR_TIP']) .." font=207 </text>"
             local x, y = Cursor.GetPos()
             local w, h = this:GetSize()
