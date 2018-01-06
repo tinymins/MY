@@ -958,8 +958,8 @@ MY.RegisterEvent("SYNC_LOOT_LIST", function()
 	if not MY_GKP.bOn then
 		return
 	end
-	local frame = MY_GKP_Loot.GetFrame()
-	local wnd = MY_GKP_Loot.GetDoodadWnd(frame, arg0)
+	local frame = Loot.GetFrame()
+	local wnd = Loot.GetDoodadWnd(frame, arg0)
 	if not wnd and not (MY_GKP.bDebug and MY_GKP.bDebug2) then
 		return
 	end
