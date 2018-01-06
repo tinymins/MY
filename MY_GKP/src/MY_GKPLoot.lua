@@ -668,6 +668,8 @@ function Loot.GetDistributeMenu(dwDoodadID, data)
 		{ bDevide = true }
 	}
 	local fnGetMenu = function(v, szName)
+		local frame = Loot.GetFrame()
+		local wnd = Loot.GetDoodadWnd(frame, dwDoodadID)
 		local szIcon, nFrame = GetForceImage(v.dwForceID)
 		return {
 			szOption = v.szName .. (szName and " - " .. szName or ""),
@@ -675,7 +677,7 @@ function Loot.GetDistributeMenu(dwDoodadID, data)
 			rgb = { MY.GetForceColor(v.dwForceID) },
 			szIcon = szIcon, nFrame = nFrame,
 			fnAutoClose = function()
-				return not frame or false
+				return not wnd or not wnd:IsValid()
 			end,
 			szLayer = "ICON_RIGHTMOST",
 			fnAction = function()
@@ -956,11 +958,14 @@ MY.RegisterEvent("SYNC_LOOT_LIST", function()
 	if not MY_GKP.bOn then
 		return
 	end
-	if (MY_GKP.bDebug2 and MY_GKP.bDebug) or frame then
-		Loot.DrawLootList(arg0)
+	local frame = MY_GKP_Loot.GetFrame()
+	local wnd = MY_GKP_Loot.GetDoodadWnd(frame, arg0)
+	if not wnd and not (MY_GKP.bDebug and MY_GKP.bDebug2) then
+		return
 	end
+	Loot.DrawLootList(arg0)
 end)
-Loot_OpenFrame = Loot.Open
+
 MY.RegisterEvent("MY_GKP_LOOT_BOSS", function()
 	if not arg0 then
 		MY_GKP_LOOT_BOSS = nil
