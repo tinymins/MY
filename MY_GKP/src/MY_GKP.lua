@@ -336,7 +336,12 @@ function MY_GKP.OnFrameCreate()
 	ui:append("WndButton3", { name = "Debt", x = 690, y = 660, text = _L["Debt Issued"], onclick = _GKP.OweList })
 	ui:append("WndButton3", { x = 540, y = 660, text = _L["Clear Record"], onclick = _GKP.ClearData })
 	ui:append("WndButton3", { x = 390, y = 660, text = _L["Loading Record"], menu = _GKP.RecoveryMenu })
-	ui:append("WndButton3", { x = 240, y = 660, text = _L["Manual SYNC"], menu = _GKP.OnSyncMenu })
+	ui:append("WndButton3", {
+		x = 240, y = 660, text = _L["Manual SYNC"],
+		lmenu = _GKP.OnSyncFromMenu, rmenu = _GKP.OnSyncToMenu,
+		tip = _L["Left click to sync from others, right click to sync to others"],
+		tippostype = MY.Const.UI.Tip.POS_TOP,
+	})
 
 	local hPageSet = ui:children("#PageSet_Menu")
 	hPageSet:children("#WndCheck_GKP_Record"):children("#Text_GKP_Record"):text(g_tStrings.GOLD_BID_RECORD_STATIC_TITLE)
@@ -818,12 +823,12 @@ end
 ---------------------------------------------------------------------->
 -- 同步数据
 ----------------------------------------------------------------------<
-function _GKP.OnSyncMenu()
+function _GKP.OnSyncFromMenu()
 	local me = GetClientPlayer()
 	if me.IsInParty() then
 		local menu = MY_GKP.GetTeamMemberMenu(function(v)
-			MY.Confirm(_L["Wheater replace the current record with the synchronization target's record?\n Please notice, this means you are going to lose the information of current record."], function()
-				MY.Alert(_L["Asking for the sychoronization information...\n If no response in longtime, it may because the opposite side are not using MY_GKP plugin or not responding."])
+			MY.Confirm(_L("Wheater replace the current record with the synchronization [%s]'s record?\n Please notice, this means you are going to lose the information of current record.", v.szName), function()
+				MY.Alert(_L("Asking for the sychoronization information...\n If no response in longtime, it may because [%s] is not using MY_GKP plugin or not responding.", v.szName))
 				MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "MY_GKP", "GKP_Sync", v.szName) -- 请求同步信息
 			end)
 		end, true)
@@ -835,6 +840,49 @@ function _GKP.OnSyncMenu()
 	end
 end
 
+function _GKP.OnSyncToMenu()
+	local me = GetClientPlayer()
+	if not me.IsInParty() then
+		MY.Alert(_L["You are not in the team."])
+	elseif not MY.IsDistributer() and not MY_GKP.bDebug then
+		MY.Alert(_L["You are not the distrubutor."])
+	else
+		local menu = MY_GKP.GetTeamMemberMenu(function(v)
+			MY.Confirm(_L("Wheater synchronize your record to [%s]?\n Please notice, this means the opposite sites are going to lose their information of current record.", v.szName), function()
+				_GKP.SyncSend(v.dwID)
+			end)
+		end, true)
+		table.insert(menu, { bDevide = true })
+		table.insert(menu, {
+			szOption = _L["Full raid."],
+			fnAction = function()
+				MY.Confirm(_L["Wheater synchronize your record to full raid?\n Please notice, this means the opposite sites are going to lose their information of current record."], function()
+					_GKP.SyncSend(0)
+				end)
+			end,
+		})
+		table.insert(menu, 1, { bDevide = true })
+		table.insert(menu, 1, { szOption = _L["Please select which will be the one you are going to send record to."], bDisable = true })
+		return menu
+	end
+end
+
+function _GKP.SyncSend(dwID)
+	local tab = {
+		GKP_Record  = MY_GKP("GKP_Record"),
+		GKP_Account = MY_GKP("GKP_Account"),
+	}
+	local str = MY.JsonEncode(tab)
+	local nMax = 500
+	local nTotle = math.ceil(#str / nMax)
+	-- 密聊频道限制了字数 发起来太慢了
+	MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "MY_GKP", "GKP_Sync_Start", dwID, nTotle)
+	for i = 1, nTotle do
+		MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "MY_GKP", "GKP_Sync_Content", dwID, string.sub(str ,(i-1) * nMax + 1, i * nMax))
+	end
+	MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "MY_GKP", "GKP_Sync_Stop", dwID)
+end
+
 local SYNC_LENG = 0
 
 MY.RegisterBgMsg("MY_GKP", function(_, nChannel, dwID, szName, bIsSelf, ...)
@@ -844,25 +892,15 @@ MY.RegisterBgMsg("MY_GKP", function(_, nChannel, dwID, szName, bIsSelf, ...)
 	if team then
 		if not bIsSelf then
 			if data[1] == "GKP_Sync" and data[2] == me.szName then
-				local tab = {
-					GKP_Record  = MY_GKP("GKP_Record"),
-					GKP_Account = MY_GKP("GKP_Account"),
-				}
-				local str = MY.JsonEncode(tab)
-				local nMax = 500
-				local nTotle = math.ceil(#str / nMax)
-				-- 密聊频道限制了字数 发起来太慢了
-				MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "MY_GKP", "GKP_Sync_Start", dwID, nTotle)
-				for i = 1, nTotle do
-					MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "MY_GKP", "GKP_Sync_Content", dwID, string.sub(str ,(i-1) * nMax + 1, i * nMax))
-				end
-				MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "MY_GKP", "GKP_Sync_Stop", dwID)
+				_GKP.SyncSend(dwID)
 			end
 
-			if data[2] == me.dwID then
+			if data[2] == me.dwID or data[2] == 0 then
 				if data[1] == "GKP_Sync_Start" then
+					if data[2] ~= 0 then
+						MY.Alert(_L["Start Sychoronizing..."])
+					end
 					_GKP.bSync, SYNC_LENG = true, data[3]
-					MY.Alert(_L["Start Sychoronizing..."])
 				end
 
 				if data[1] == "GKP_Sync_Content" and _GKP.bSync then
@@ -883,7 +921,7 @@ MY.RegisterBgMsg("MY_GKP", function(_, nChannel, dwID, szName, bIsSelf, ...)
 						MY.Debug({err}, "MY_GKP", MY_DEBUG.ERROR)
 						return _GKP.Sysmsg(_L["Abnormal with Data Sharing, Please contact and make feed back with the writer."])
 					end
-					MY.Confirm(_L("Data Sharing Finished, you have one last chance to confirm wheather cover the current data or not? \n data of team bidding: %s\n transation data: %s", #tData.GKP_Record, #tData.GKP_Account), function()
+					MY.Confirm(_L("Data Sharing Finished, you have one last chance to confirm wheather cover the current data with [%s]'s data or not? \n data of team bidding: %s\n transation data: %s", szName, #tData.GKP_Record, #tData.GKP_Account), function()
 						_GKP.GKP_Record  = tData.GKP_Record
 						_GKP.GKP_Account = tData.GKP_Account
 						_GKP.DrawRecord()
@@ -1635,6 +1673,7 @@ end)
 
 MY.AddHotKey("MY_GKP", _L["Open/Close Golden Team Record"], _GKP.TogglePanel)
 MY.RegisterPlayerAddonMenu({ szOption = _L["Golden Team Record"], fnAction = _GKP.OpenPanel })
+MY.RegisterTraceButtonMenu({ szOption = _L["Golden Team Record"], fnAction = _GKP.OpenPanel })
 
 RegisterEvent("LOADING_END",function()
 	if MY.IsInDungeon() and MY_GKP.bAlertMessage then
