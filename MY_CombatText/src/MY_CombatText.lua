@@ -839,7 +839,7 @@ function PS.OnPanelActive(frame)
 	})
 	x = x + 130
 
-	nX = ui:append("WndCheckBox", {
+	ui:append("WndCheckBox", {
 		x = x, y = y, w = 200, text = _L["Enable Render"],
 		checked = MY_CombatText.bRender,
 		oncheck = function(bCheck)
@@ -904,9 +904,9 @@ function PS.OnPanelActive(frame)
 	})
 
 	x = 240
-	nX = ui:append("Text", { x = x, y = y, text = _L["FadeOut time"], color = { 255, 255, 200 }, autoenable = IsEnabled })
+	ui:append("Text", { x = x, y = y, text = _L["FadeOut time"], color = { 255, 255, 200 }, autoenable = IsEnabled })
 	x = x + 70
-	nX, nY = ui:append("WndSliderBox", {
+	ui:append("WndSliderBox", {
 		x = x, y = y, textfmt = function(val) return val .. _L["Frame"] end,
 		rang = {0, 15},
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
@@ -937,7 +937,7 @@ function PS.OnPanelActive(frame)
 	x = X
 	ui:append("Text", { x = x, y = y, text = _L["Circle Style"], font = 27, autoenable = IsEnabled })
 	x = x + 70
-	nX = ui:append("WndRadioBox", {
+	ui:append("WndRadioBox", {
 		x = x, y = y + 5, text = _L["hit feel"],
 		group = "style",
 		checked = MY_CombatText.nStyle == 0,
