@@ -420,7 +420,7 @@ function PS.OnPanelActive(frame)
 	local X, Y = 20, 20
 	local x, y = X, Y
 
-	ui:append("Text", { x = x, y = y, text = g_tStrings.HATRED_COLLECT, font = 27, autoenable = IsEnabled })
+	ui:append("Text", { x = x, y = y, text = g_tStrings.HATRED_COLLECT, font = 27 })
 	x = x + 10
 	y = y + 28
 
