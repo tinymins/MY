@@ -277,16 +277,17 @@ MY_Recount.UpdateUI = function(data)
 	end
 
 	-- 获取统计数据
-	local tRecord, szUnit
+	local tInfo, szUnit
 	if MY_Recount.nChannel == CHANNEL.DPS then       -- 伤害统计
-		tRecord, szUnit = data.Damage  , 'DPS'
+		tInfo, szUnit = data.Damage  , 'DPS'
 	elseif MY_Recount.nChannel == CHANNEL.HPS then   -- 治疗统计
-		tRecord, szUnit = data.Heal    , 'HPS'
+		tInfo, szUnit = data.Heal    , 'HPS'
 	elseif MY_Recount.nChannel == CHANNEL.BDPS then  -- 承伤统计
-		tRecord, szUnit = data.BeDamage, 'DPS'
+		tInfo, szUnit = data.BeDamage, 'DPS'
 	elseif MY_Recount.nChannel == CHANNEL.BHPS then  -- 承疗统计
-		tRecord, szUnit = data.BeHeal  , 'HPS'
+		tInfo, szUnit = data.BeHeal  , 'HPS'
 	end
+	local tRecord = tInfo.Statistics
 
 	-- 计算战斗时间
 	local nTimeCount = MY_Recount.Data.GeneFightTime(data, nil, MY_Recount.bSysTimeMode and SZ_CHANNEL_KEY[MY_Recount.nChannel])
