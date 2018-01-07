@@ -1238,10 +1238,9 @@ local menu = {
 	szOption = _L["chat log"],
 	fnAction = function() MY_ChatLog.Toggle() end,
 }
-MY.RegisterPlayerAddonMenu('MY_CHATLOG_MENU', menu)
-MY.RegisterTraceButtonMenu('MY_CHATLOG_MENU', menu)
-MY.Game.AddHotKey("MY_ChatLog", _L['chat log'], MY_ChatLog.Toggle, nil)
+MY.RegisterAddonMenu('MY_CHATLOG_MENU', menu)
 end
+MY.Game.AddHotKey("MY_ChatLog", _L['chat log'], MY_ChatLog.Toggle, nil)
 
 local PS = {}
 function PS.OnPanelActive(wnd)

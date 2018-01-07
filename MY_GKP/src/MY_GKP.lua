@@ -1679,8 +1679,7 @@ RegisterEvent("MONEY_UPDATE",function() --½ðÇ®±ä¶¯
 end)
 
 MY.AddHotKey("MY_GKP", _L["Open/Close Golden Team Record"], _GKP.TogglePanel)
-MY.RegisterPlayerAddonMenu({ szOption = _L["Golden Team Record"], fnAction = _GKP.OpenPanel })
-MY.RegisterTraceButtonMenu({ szOption = _L["Golden Team Record"], fnAction = _GKP.OpenPanel })
+MY.RegisterAddonMenu({ szOption = _L["Golden Team Record"], fnAction = _GKP.OpenPanel })
 
 RegisterEvent("LOADING_END",function()
 	if MY.IsInDungeon() and MY_GKP.bAlertMessage then

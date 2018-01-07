@@ -456,7 +456,6 @@ local menu = {
 	szOption = _L["MY_BagStatistics"],
 	fnAction = function() MY_BagStatistics.Toggle() end,
 }
-MY.RegisterPlayerAddonMenu('MY_BAGSTATISTICS_MENU', menu)
-MY.RegisterTraceButtonMenu('MY_BAGSTATISTICS_MENU', menu)
-MY.Game.AddHotKey("MY_BagStatistics", _L['MY_BagStatistics'], MY_BagStatistics.Toggle, nil)
+MY.RegisterAddonMenu('MY_BAGSTATISTICS_MENU', menu)
 end
+MY.Game.AddHotKey("MY_BagStatistics", _L['MY_BagStatistics'], MY_BagStatistics.Toggle, nil)

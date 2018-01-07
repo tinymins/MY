@@ -1337,5 +1337,4 @@ MY_Recount.GetPublishMenu = function()
 	return t
 end
 
-MY.RegisterPlayerAddonMenu('MY_RECOUNT_MENU', MY_Recount.GetMenu)
-MY.RegisterTraceButtonMenu('MY_RECOUNT_MENU', MY_Recount.GetMenu)
+MY.RegisterAddonMenu('MY_RECOUNT_MENU', MY_Recount.GetMenu)

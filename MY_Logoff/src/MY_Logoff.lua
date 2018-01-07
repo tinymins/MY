@@ -193,8 +193,7 @@ local menu = {
 		end,
 	},
 }
-MY.RegisterPlayerAddonMenu('MY_LOGOFF_MENU', menu)
-MY.RegisterTraceButtonMenu('MY_LOGOFF_MENU', menu)
+MY.RegisterAddonMenu('MY_LOGOFF_MENU', menu)
 end
 
 MY.Game.AddHotKey('LogOff_RUI', _L['return to role list'], function() Logoff(false) end, nil)

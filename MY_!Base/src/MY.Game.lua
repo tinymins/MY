@@ -366,6 +366,32 @@ function MY.Game.GetObjectName(obj)
 end
 MY.GetObjectName = MY.Game.GetObjectName
 
+do local MY_CACHE_BUFF = {}
+function MY.GetBuffName(dwBuffID, dwLevel)
+	local xKey = dwBuffID
+	if dwLevel then
+		xKey = dwBuffID .. "_" .. dwLevel
+	end
+	if not MY_CACHE_BUFF[xKey] then
+		local tLine = Table_GetBuff(dwBuffID, dwLevel or 1)
+		if tLine then
+			MY_CACHE_BUFF[xKey] = { tLine.szName, tLine.dwIconID }
+		else
+			local szName = "BUFF#" .. dwBuffID
+			if dwLevel then
+				szName = szName .. ":" .. dwLevel
+			end
+			MY_CACHE_BUFF[xKey] = { szName, 1436 }
+		end
+	end
+	return unpack(MY_CACHE_BUFF[xKey])
+end
+end
+
+function MY.GetEndTime(nEndFrame)
+	return (nEndFrame - GetLogicFrameCount()) / GLOBAL.GAME_FPS
+end
+
 -- 获取指定名字的右键菜单
 function MY.Game.GetTargetContextMenu(dwType, szName, dwID)
 	local t = {}
