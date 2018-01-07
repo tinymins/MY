@@ -430,8 +430,7 @@ MY_Farbnamen.GetMenu = function()
 	})
 	return t
 end
-MY.RegisterPlayerAddonMenu('MY_Farbenamen', MY_Farbnamen.GetMenu)
-MY.RegisterTraceButtonMenu('MY_Farbenamen', MY_Farbnamen.GetMenu)
+MY.RegisterAddonMenu('MY_Farbenamen', MY_Farbnamen.GetMenu)
 --------------------------------------------------------------
 -- ×¢²áÊÂ¼þ
 --------------------------------------------------------------

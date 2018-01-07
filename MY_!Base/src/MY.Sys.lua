@@ -848,6 +848,22 @@ function _C.GetMainMenu()
 		fnClickIcon = MY.TogglePanel
 	}
 end
+-- get target addon menu
+function _C.GetTargetAddonMenu()
+	local menu = {}
+	for i = 1, #_C.tTargetMenu, 1 do
+		local m = _C.tTargetMenu[i].Menu
+		if type(m) == "function" then m = m() end
+		if not m or m.szOption then m = {m} end
+		for _, v in ipairs(m) do
+			table.insert(menu, v)
+		end
+	end
+	table.sort(menu, function(m1, m2)
+		return #m1 < #m2
+	end)
+	return menu
+end
 -- get player addon menu
 function _C.GetPlayerAddonMenu()
 	-- 创建菜单
@@ -865,24 +881,8 @@ function _C.GetPlayerAddonMenu()
 	end)
 	return {menu}
 end
--- get target addon menu
-function _C.GetTargetAddonMenu()
-	local menu = {}
-	for i = 1, #_C.tTargetMenu, 1 do
-		local m = _C.tTargetMenu[i].Menu
-		if type(m) == "function" then m = m() end
-		if not m or m.szOption then m = {m} end
-		for _, v in ipairs(m) do
-			table.insert(menu, v)
-		end
-	end
-	table.sort(menu, function(m1, m2)
-		return #m1 < #m2
-	end)
-	return menu
-end
 -- get trace button menu
-function _C.GetTraceButtonMenu()
+function _C.GetTraceButtonAddonMenu()
 	local menu = _C.GetMainMenu()
 	for i = 1, #_C.tTraceMenu, 1 do
 		local m = _C.tTraceMenu[i].Menu
@@ -896,37 +896,6 @@ function _C.GetTraceButtonMenu()
 		return #m1 < #m2
 	end)
 	return {menu}
-end
-
--- 注册玩家头像菜单
--- 注册
--- (void) MY.RegisterPlayerAddonMenu(szName,Menu)
--- (void) MY.RegisterPlayerAddonMenu(Menu)
--- 注销
--- (void) MY.RegisterPlayerAddonMenu(szName)
-function MY.RegisterPlayerAddonMenu(arg1, arg2)
-	local szName, Menu
-	if type(arg1)=='string' then szName = arg1 end
-	if type(arg2)=='string' then szName = arg2 end
-	if type(arg1)=='table' then Menu = arg1 end
-	if type(arg1)=='function' then Menu = arg1 end
-	if type(arg2)=='table' then Menu = arg2 end
-	if type(arg2)=='function' then Menu = arg2 end
-	if Menu then
-		if szName then for i = #_C.tPlayerMenu, 1, -1 do
-			if _C.tPlayerMenu[i].szName == szName then
-				_C.tPlayerMenu[i] = {szName = szName, Menu = Menu}
-				return nil
-			end
-		end end
-		table.insert(_C.tPlayerMenu, {szName = szName, Menu = Menu})
-	elseif szName then
-		for i = #_C.tPlayerMenu, 1, -1 do
-			if _C.tPlayerMenu[i].szName == szName then
-				table.remove(_C.tPlayerMenu, i)
-			end
-		end
-	end
 end
 
 -- 注册目标头像菜单
@@ -960,13 +929,44 @@ function MY.RegisterTargetAddonMenu(arg1, arg2)
 	end
 end
 
+-- 注册玩家头像菜单
+-- 注册
+-- (void) MY.RegisterPlayerAddonMenu(szName,Menu)
+-- (void) MY.RegisterPlayerAddonMenu(Menu)
+-- 注销
+-- (void) MY.RegisterPlayerAddonMenu(szName)
+function MY.RegisterPlayerAddonMenu(arg1, arg2)
+	local szName, Menu
+	if type(arg1)=='string' then szName = arg1 end
+	if type(arg2)=='string' then szName = arg2 end
+	if type(arg1)=='table' then Menu = arg1 end
+	if type(arg1)=='function' then Menu = arg1 end
+	if type(arg2)=='table' then Menu = arg2 end
+	if type(arg2)=='function' then Menu = arg2 end
+	if Menu then
+		if szName then for i = #_C.tPlayerMenu, 1, -1 do
+			if _C.tPlayerMenu[i].szName == szName then
+				_C.tPlayerMenu[i] = {szName = szName, Menu = Menu}
+				return nil
+			end
+		end end
+		table.insert(_C.tPlayerMenu, {szName = szName, Menu = Menu})
+	elseif szName then
+		for i = #_C.tPlayerMenu, 1, -1 do
+			if _C.tPlayerMenu[i].szName == szName then
+				table.remove(_C.tPlayerMenu, i)
+			end
+		end
+	end
+end
+
 -- 注册工具栏菜单
 -- 注册
--- (void) MY.RegisterTraceButtonMenu(szName,Menu)
--- (void) MY.RegisterTraceButtonMenu(Menu)
+-- (void) MY.RegisterTraceButtonAddonMenu(szName,Menu)
+-- (void) MY.RegisterTraceButtonAddonMenu(Menu)
 -- 注销
--- (void) MY.RegisterTraceButtonMenu(szName)
-function MY.RegisterTraceButtonMenu(arg1, arg2)
+-- (void) MY.RegisterTraceButtonAddonMenu(szName)
+function MY.RegisterTraceButtonAddonMenu(arg1, arg2)
 	local szName, Menu
 	if type(arg1)=='string' then szName = arg1 end
 	if type(arg2)=='string' then szName = arg2 end
@@ -991,9 +991,20 @@ function MY.RegisterTraceButtonMenu(arg1, arg2)
 	end
 end
 
-TraceButton_AppendAddonMenu( { _C.GetTraceButtonMenu } )
-Player_AppendAddonMenu( { _C.GetPlayerAddonMenu } )
+-- 注册玩家头像和工具栏菜单
+-- 注册
+-- (void) MY.RegisterAddonMenu(szName,Menu)
+-- (void) MY.RegisterAddonMenu(Menu)
+-- 注销
+-- (void) MY.RegisterAddonMenu(szName)
+function MY.RegisterAddonMenu(...)
+	MY.RegisterPlayerAddonMenu(...)
+	MY.RegisterTraceButtonAddonMenu(...)
+end
+
 Target_AppendAddonMenu( { _C.GetTargetAddonMenu } )
+Player_AppendAddonMenu( { _C.GetPlayerAddonMenu } )
+TraceButton_AppendAddonMenu( { _C.GetTraceButtonAddonMenu } )
 
 -- ##################################################################################################
 --               # # # #         #         #             #         #                   #
