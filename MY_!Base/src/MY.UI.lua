@@ -1115,7 +1115,9 @@ local function SetComponentEnable(raw, bEnable)
 		edit:Enable(bEnable)
 	end
 	-- set enable
-	raw:Enable(bEnable)
+	if raw.Enable then
+		raw:Enable(bEnable)
+	end
 	SetComponentProp(raw, 'bEnable', bEnable)
 end
 
@@ -1126,23 +1128,25 @@ function XGUI:enable(...)
 		local bEnable = select(1, ...)
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'CHECKBOX') or GetComponentElement(raw, 'MAIN_WINDOW') or raw
-			if raw.Enable then
-				if IsFunction(bEnable) then
-					MY.BreatheCall('XGUI_ENABLE_CHECK#' .. tostring(raw), function()
-						if IsElement(raw) then
-							SetComponentEnable(raw, bEnable())
-						else
-							return 0
-						end
-					end)
-				else
-					SetComponentEnable(raw, bEnable)
-				end
+			if IsFunction(bEnable) then
+				MY.BreatheCall('XGUI_ENABLE_CHECK#' .. tostring(raw), function()
+					if IsElement(raw) then
+						SetComponentEnable(raw, bEnable())
+					else
+						return 0
+					end
+				end)
+			else
+				SetComponentEnable(raw, bEnable)
 			end
 		end
 		return self
 	else
 		local raw = self.raws[1]
+		local bEnable = GetComponentProp(raw, 'bEnable')
+		if bEnable ~= nil then
+			return bEnable
+		end
 		if raw and raw.IsEnabled then
 			return raw:IsEnabled()
 		end
