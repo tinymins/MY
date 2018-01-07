@@ -1,0 +1,67 @@
+-- 请注意 这个文件用于控制风格的图片和文字
+data = {
+	{
+		-- FromUITex szImage, nFrame
+		-- [1] = > 0.01
+		-- [2] = > 0.50
+		-- [3] = > 0.80
+		-- [4] = > 1.00
+		-- [5] = me
+		-- [6] = name, value FontScheme
+		{ "ui/Image/TargetPanel/Target.UITex", 73 },
+		{ "ui/Image/TargetPanel/Target.UITex", 87 },
+		{ "ui/Image/TargetPanel/Target.UITex", 38 },
+		{ "ui/Image/TargetPanel/Target.UITex", 40 },
+		{ "ui/Image/TargetPanel/Target.UITex", 37 },
+		{ 168, 15 }
+	},
+	{
+		{ "ui/Image/Common/Money.uitex", 210 },
+		{ "ui/Image/Common/Money.uitex", 207 },
+		{ "ui/Image/Common/Money.uitex", 203 },
+		{ "ui/Image/Common/Money.uitex", 26 },
+		{ "ui/Image/Common/Money.uitex", 208 },
+		{ 168, 15 }
+	},
+	{
+		{ "ui/Image/Common/Money.uitex", 217 },
+		{ "ui/Image/Common/Money.uitex", 214 },
+		{ "ui/Image/Common/Money.uitex", 216 },
+		{ "ui/Image/Common/Money.uitex", 215 },
+		{ "ui/Image/Common/Money.uitex", 213 },
+		{ 168, 15 }
+	},
+	{
+		{ "ui/Image/UICommon/RaidTotal.UITex", 59 },
+		{ "ui/Image/UICommon/RaidTotal.UITex", 58 },
+		{ "ui/Image/UICommon/RaidTotal.UITex", 60 },
+		{ "ui/Image/UICommon/RaidTotal.UITex", 54 },
+		{ "ui/Image/UICommon/RaidTotal.UITex", 57 },
+		{ 168, 15 }
+	},
+	{
+		{ "ui/Image/UICommon/ShopEntry.UITex", 5 },
+		{ "ui/Image/UICommon/ShopEntry.UITex", 2 },
+		{ "ui/Image/UICommon/ShopEntry.UITex", 3 },
+		{ "ui/Image/UICommon/ShopEntry.UITex", 1 },
+		{ "ui/Image/UICommon/ShopEntry.UITex", 0 },
+		{ 40, 15 }
+	},
+	{
+		{ "ui/Image/UICommon/Feedanimials.UITex", 19 },
+		{ "ui/Image/UICommon/Feedanimials.UITex", 19 },
+		{ "ui/Image/UICommon/Feedanimials.UITex", 15 },
+		{ "ui/Image/UICommon/Feedanimials.UITex", 14 },
+		{ "ui/Image/UICommon/Feedanimials.UITex", 18 },
+		{ 168, 15 }
+	},
+	{
+		{ "interface/JH/JH_DBM/image/ST_UI.UITex", 6 },
+		{ "interface/JH/JH_DBM/image/ST_UI.UITex", 4 },
+		{ "interface/JH/JH_DBM/image/ST_UI.UITex", 0 },
+		{ "interface/JH/JH_DBM/image/ST_UI.UITex", 2 },
+		{ "interface/JH/JH_DBM/image/ST_UI.UITex", 5 },
+		{ 168, 15 }
+	},
+
+}
