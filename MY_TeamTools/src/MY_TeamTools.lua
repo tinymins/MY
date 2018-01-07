@@ -618,7 +618,7 @@ function RT.UpdateList()
 					if item and not item.bFree then
 						local dwID, nLevel, nEndFrame = select(2, item:GetObject())
 						if dwID and nLevel then
-							if not MY.GetBuff(dwID, nLevel, v.p) then
+							if not MY.GetBuff(v.p, dwID, nLevel) then
 								h.hHandle_Food.Pool:Remove(item)
 							end
 						end
@@ -652,7 +652,7 @@ function RT.UpdateList()
 					hBox.OnItemMouseEnter = function()
 						local x, y = this:GetAbsPos()
 						local w, h = this:GetSize()
-						local kBuff = MY.GetBuff(RT_GONGZHAN_ID, v.p)
+						local kBuff = MY.GetBuff(v.p, RT_GONGZHAN_ID)
 						if kBuff then
 							MY.OutputBuffTip(kBuff.dwID, kBuff.nLevel, { x, y, w, h })
 						end
