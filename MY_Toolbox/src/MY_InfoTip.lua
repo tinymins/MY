@@ -10,11 +10,11 @@ local _Cache = {
 local Config_Default = {
     Ping        = { -- 网络延迟
     	bEnable = false, bShowBg = false, bShowTitle = false, rgb = { 95, 255, 95 },
-    	anchor = { x = -180, y = -210, s = "BOTTOMCENTER", r = "BOTTOMCENTER" }, nFont = 48,
+    	anchor = { x = -133, y = -111, s = "BOTTOMCENTER", r = "BOTTOMCENTER" }, nFont = 48,
     },
     TimeMachine = { -- 倍速显示（显示服务器有多卡……）
         bEnable = false, bShowBg = false, bShowTitle = true, rgb = { 31, 255, 31 },
-        anchor  = { x = -272, y = -211, s = "BOTTOMCENTER", r = "BOTTOMCENTER" },
+        anchor  = { x = -276, y = -111, s = "BOTTOMCENTER", r = "BOTTOMCENTER" },
     },
     FPS         = { -- FPS
         bEnable = false, bShowBg = true, bShowTitle = true,
@@ -30,7 +30,7 @@ local Config_Default = {
     },
     FightTime   = { -- 战斗计时
         bEnable = false, bShowBg = false, bShowTitle = false, rgb = { 255, 0, 128 },
-        anchor  = { x = 340, y = -214, s = "BOTTOMCENTER", r = "BOTTOMCENTER" }, nFont = 199,
+        anchor  = { x = 353, y = -117, s = "BOTTOMCENTER", r = "BOTTOMCENTER" }, nFont = 199,
     },
     LotusTime   = { -- 桂花和藕倒计时
         bEnable = false, bShowBg = true, bShowTitle = true,
