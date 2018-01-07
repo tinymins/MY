@@ -211,7 +211,7 @@ local function GetSettingMenu()
 	}
 end
 
-MY.RegisterPlayerAddonMenu('MY_AutoChat', function()
+MY.RegisterAddonMenu('MY_AutoChat', function()
 	if MY.IsShieldedVersion() then
 		return
 	end

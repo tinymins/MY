@@ -102,7 +102,7 @@ end
 
 local function OnSkillCast(frame, dwSkillID, dwSkillLevel)
 	-- get name
-	local szSkillName, dwIconID = MY.Player.GetSkillName(dwSkillID, dwSkillLevel)
+	local szSkillName, dwIconID = MY.GetSkillName(dwSkillID, dwSkillLevel)
 	if dwSkillID == 4097 then -- Æï³Ë
 		dwIconID = 1899
 	elseif Table_IsSkillFormation(dwSkillID, dwSkillLevel)        -- Õó·¨¼¼ÄÜ

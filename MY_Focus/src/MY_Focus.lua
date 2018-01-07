@@ -251,13 +251,13 @@ end
 
 -- 重新扫描附近对象更新焦点列表（只增不减）
 function MY_Focus.ScanNearby()
-	for dwID, _ in pairs(MY.Player.GetNearPlayer()) do
+	for dwID, _ in pairs(MY.GetNearPlayer()) do
 		MY_Focus.OnObjectEnterScene(TARGET.PLAYER, dwID)
 	end
-	for dwID, _ in pairs(MY.Player.GetNearNpc()) do
+	for dwID, _ in pairs(MY.GetNearNpc()) do
 		MY_Focus.OnObjectEnterScene(TARGET.NPC, dwID)
 	end
-	for dwID, _ in pairs(MY.Player.GetNearDoodad()) do
+	for dwID, _ in pairs(MY.GetNearDoodad()) do
 		MY_Focus.OnObjectEnterScene(TARGET.DOODAD, dwID)
 	end
 end
@@ -659,7 +659,7 @@ function MY_Focus.DrawFocus(dwType, dwID)
 			and nType ~= CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
 			and obj.GetOTActionState() == 1
 		) then
-			MY.Player.WithTarget(dwType, dwID, function()
+			MY.WithTarget(dwType, dwID, function()
 				local nType, dwSkillID, dwSkillLevel, fProgress = obj.GetSkillOTActionState()
 				if nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
 				or nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL then

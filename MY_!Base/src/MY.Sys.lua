@@ -85,11 +85,11 @@ function MY.FormatPath(oFilePath, tParams)
 	end
 	-- if exist $uid then add user role identity
 	if string.find(szFilePath, "%$uid") then
-		szFilePath = szFilePath:gsub("%$uid", tParams["uid"] or MY.Player.GetUUID())
+		szFilePath = szFilePath:gsub("%$uid", tParams["uid"] or MY.GetClientUUID())
 	end
 	-- if exist $name then add user role identity
 	if string.find(szFilePath, "%$name") then
-		szFilePath = szFilePath:gsub("%$name", tParams["name"] or MY.GetClientInfo().szName or MY.Player.GetUUID())
+		szFilePath = szFilePath:gsub("%$name", tParams["name"] or MY.GetClientInfo().szName or MY.GetClientUUID())
 	end
 	-- if exist $lang then add language identity
 	if string.find(szFilePath, "%$lang") then
