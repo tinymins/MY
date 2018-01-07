@@ -50,7 +50,7 @@ MY_ToolBox.ApplyConfig = function()
 			if not tar then
 				return
 			end
-			local p = MY.Player.GetFriend(dwID)
+			local p = MY.GetFriend(dwID)
 			if p then
 				if MY_ToolBox.bFriendHeadTipNav and Navigator_SetID then
 					Navigator_SetID("MY_FRIEND_TIP." .. dwID, TARGET.PLAYER, dwID, p.name)
@@ -81,7 +81,7 @@ MY_ToolBox.ApplyConfig = function()
 			end
 		end
 		local function RescanNearby()
-			for _, p in pairs(MY.Player.GetNearPlayer()) do
+			for _, p in pairs(MY.GetNearPlayer()) do
 				OnPlayerEnter(p.dwID)
 			end
 		end
@@ -152,7 +152,7 @@ MY_ToolBox.ApplyConfig = function()
 				end
 			end
 		end
-		for _, p in pairs(MY.Player.GetNearPlayer()) do
+		for _, p in pairs(MY.GetNearPlayer()) do
 			OnPlayerEnter(p.dwID)
 		end
 		MY.RegisterEvent("PLAYER_ENTER_SCENE.MY_GUILDMEMBER_TIP", function(event) OnPlayerEnter(arg0) end)

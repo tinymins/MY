@@ -121,7 +121,7 @@ _C.GetRelation = function(dwID)
             return "Neutrality"
         elseif IsEnemy(me.dwID, dwID) then -- 敌对关系
             local r, g, b = GetHeadTextForceFontColor(dwID, me.dwID) -- 我看他的颜色
-            if MY.Player.GetFoe(dwID) then
+            if MY.GetFoe(dwID) then
                 return "Foe"
             elseif r == 255 and g == 255 and b == 0 then
                 return "Neutrality"
@@ -141,7 +141,7 @@ _C.GetRelation = function(dwID)
             return "Self"
         elseif IsParty(me.dwID, dwID) then
             return "Party"
-        elseif MY.Player.GetFoe(dwID) then
+        elseif MY.GetFoe(dwID) then
             return "Foe"
         elseif tar.nCamp == Config.nCamp then
             return "Ally"
@@ -679,8 +679,8 @@ MY.RegisterEvent("DO_SKILL_CAST", function()
     local skill = GetSkill(arg1, 1)
     if skill.bIsChannelSkill then
         local tab = _C.tObject[dwID]
-        local nFrame = MY.Player.GetChannelSkillFrame(dwSkillID) or 0
-        local object = MY.Game.GetObject(dwID)
+        local nFrame = MY.GetChannelSkillFrame(dwSkillID) or 0
+        local object = MY.GetObject(dwID)
         if object then
             XLifeBar(object):StartOTBar(skill.szSkillName, nFrame, true)
         end
@@ -689,7 +689,7 @@ end)
 -- 读条打断事件响应
 MY.RegisterEvent("OT_ACTION_PROGRESS_BREAK", function()
     if _C.tObject[arg0] then
-        local object = MY.Game.GetObject(arg0)
+        local object = MY.GetObject(arg0)
         if object then
             XLifeBar(object):SetOTState(OT_STATE.BREAK)
         end

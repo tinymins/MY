@@ -461,7 +461,7 @@ MY_Recount.UpdateUI = function(data)
 	-- 初始化颜色
 	if not hItem.bInited then
 		hItem.OnItemRefreshTip = MY_Recount.OnItemRefreshTip
-		local dwForceID = (MY.Player.GetClientInfo() or {}).dwForceID
+		local dwForceID = (MY.GetClientInfo() or {}).dwForceID
 		if dwForceID then
 			local css = _C.Css.Bar[dwForceID] or {}
 			if css.image and css.frame then -- uitex, frame
@@ -556,7 +556,7 @@ MY_Recount.OnFrameBreathe = function()
 	this.nLastRedrawFrame = GetLogicFrameCount()
 
 	-- 不进战时不刷新UI
-	if not _C.bHistoryMode and not MY.Player.GetFightUUID() then
+	if not _C.bHistoryMode and not MY.GetFightUUID() then
 		return
 	end
 

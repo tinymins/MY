@@ -214,7 +214,7 @@ end)
 
 -- 退出战斗 保存数据
 MY.RegisterEvent('MY_FIGHT_HINT', function(event)
-	if arg0 and MY.Player.GetFightUUID() ~= Data.UUID then -- 进入新的战斗
+	if arg0 and MY.GetFightUUID() ~= Data.UUID then -- 进入新的战斗
 		MY_Recount.Data.Init()
 		FireUIEvent('MY_RECOUNT_NEW_FIGHT')
 	else
@@ -222,7 +222,7 @@ MY.RegisterEvent('MY_FIGHT_HINT', function(event)
 	end
 end)
 MY.BreatheCall('MY_Recount_FightTime', function()
-	if MY.Player.IsFighting() then
+	if MY.IsFighting() then
 		Data.nTimeDuring = GetCurrentTime() - Data.nTimeBegin
 	end
 end)
@@ -391,7 +391,7 @@ function MY_Recount.Data.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffect
 	end
 
 	-- 未进战则初始化统计数据（即默认当前帧所有的技能日志为进战技能）
-	if not MY.Player.GetFightUUID() and
+	if not MY.GetFightUUID() and
 	_Cache.nLastAutoInitFrame ~= GetLogicFrameCount() then
 		_Cache.nLastAutoInitFrame = GetLogicFrameCount()
 		MY_Recount.Data.Init(true)
@@ -716,20 +716,20 @@ end
 function MY_Recount.Data.Init(bForceInit)
 	local bNew
 	if bForceInit or (not Data) or
-	(Data.UUID and MY.Player.GetFightUUID() ~= Data.UUID) then
+	(Data.UUID and MY.GetFightUUID() ~= Data.UUID) then
 		Data = {
-			UUID         = MY.Player.GetFightUUID(), -- 战斗唯一标识
-			nTimeBegin   = GetCurrentTime(),         -- 战斗开始时间
-			nTimeDuring  =  0,                       -- 战斗持续时间
-			Awaytime     = {},                       -- 死亡/掉线时间节点
-			Namelist     = {},                       -- 名称缓存
-			Forcelist    = {},                       -- 势力缓存
-			Damage       = {},                       -- 输出统计
-			Heal         = {},                       -- 治疗统计
-			BeHeal       = {},                       -- 承疗统计
-			BeDamage     = {},                       -- 承伤统计
-			LastRecTime  = {},                       -- 最后一次记录时间
-			Summary      = {                         -- 统计总和
+			UUID         = MY.GetFightUUID(), -- 战斗唯一标识
+			nTimeBegin   = GetCurrentTime(),  -- 战斗开始时间
+			nTimeDuring  =  0,                -- 战斗持续时间
+			Awaytime     = {},                -- 死亡/掉线时间节点
+			Namelist     = {},                -- 名称缓存
+			Forcelist    = {},                -- 势力缓存
+			Damage       = {},                -- 输出统计
+			Heal         = {},                -- 治疗统计
+			BeHeal       = {},                -- 承疗统计
+			BeDamage     = {},                -- 承伤统计
+			LastRecTime  = {},                -- 最后一次记录时间
+			Summary      = {                  -- 统计总和
 				nDamage   = 0, nEffectDamage   = 0,
 				nHeal     = 0, nEffectHeal     = 0,
 				nBeHeal   = 0, nEffectBeHeal   = 0,
@@ -738,8 +738,8 @@ function MY_Recount.Data.Init(bForceInit)
 		}
 	end
 
-	if not Data.UUID and MY.Player.GetFightUUID() then
-		Data.UUID       = MY.Player.GetFightUUID()
+	if not Data.UUID and MY.GetFightUUID() then
+		Data.UUID       = MY.GetFightUUID()
 		Data.nTimeBegin = GetCurrentTime()
 	end
 end
