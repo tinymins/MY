@@ -26,123 +26,138 @@ SKILL_RESULT_TYPE.TRANSFER_MANA        = 16 -- 吸取内力
 -- Data DataDisplay History[] 数据结构
 Data = {
 	UUID = 战斗统一标示符,
+	nVersion = 数据版本号,
 	nTimeBegin  = 战斗开始UNIX时间戳,
 	nTimeDuring = 战斗持续秒数,
-	LastRecTime = {
-		Damage = 最后一次伤害技能记录UNIX时间戳,
-		Heal   = 最后一次治疗技能记录UNIX时间戳,
-		...
+	Awaytime = {
+		玩家的dwID = {
+			{ 暂离开始时间, 暂离结束时间 }, ...
+		}, ...
 	},
 	Damage = {                                                -- 输出统计
-		玩家的dwID = {                                        -- 该对象的输出统计
-			nTotal       = 2314214,                           -- 总输出
-			nTotalEffect = 132144 ,                           -- 有效输出
-			Detail = {                                        -- 输出结果分类统计
-				SKILL_RESULT.HIT = {
-					nCount       = 10    ,                    -- 命中记录数量
-					nMax         = 34210 ,                    -- 单次命中最大值
-					nMaxEffect   = 29817 ,                    -- 单次命中最大有效值
-					nMin         = 8790  ,                    -- 单次命中最小值
-					nMinEffect   = 7657  ,                    -- 单次命中最小有效值
-					nAvg         = 27818 ,                    -- 单次命中平均值
-					nAvgEffect   = 27818 ,                    -- 单次命中平均有效值
-					nTotal       = 278560,                    -- 所以命中总伤害
-					nTotalEffect = 224750,                    -- 所有命中总有效伤害
+		nTimeDuring = 最后一次记录时离开始的秒数,
+		nTotal = 全队的输出量,
+		nTotalEffect = 全队的有效输出量,
+		Snapshots = {
+			{
+				nTimeDuring  = 当前快照战斗秒数,
+				nTotal       = 当前快照时间全队输出量,
+				nTotalEffect = 当前快照时间全队有效输出量,
+				Statistics   = {
+					玩家的dwID = {
+						nTotal       = 当前快照时间该玩家总输出量,
+						nTotalEffect = 当前快照时间该玩家总有效输出量,
+					},
+					NPC的名字 = { ... },
 				},
-				SKILL_RESULT.MISS = { ... },
-				SKILL_RESULT.CRITICAL = { ... },
-			},
-			Skill = {                                         -- 该玩家具体造成输出的技能统计
-				四象轮回 = {                                  -- 该玩家四象轮回造成的输出统计
-					nCount       = 2     ,                    -- 该玩家四象轮回输出次数
-					nMax         = 13415 ,                    -- 该玩家四象轮回最大输出量
-					nMaxEffect   = 9080  ,                    -- 该玩家四象轮回最大有效输出量
-					nTotal       = 23213 ,                    -- 该玩家四象轮回输出量总和
-					nTotalEffect = 321421,                    -- 该玩家四象轮回有效输出量总和
-					Detail = {                                -- 该玩家四象轮回输出结果分类统计
-						SKILL_RESULT.HIT = {
-							nCount       = 10    ,            -- 该玩家四象轮回命中记录数量
-							nMax         = 34210 ,            -- 该玩家四象轮回单次命中最大值
-							nMaxEffect   = 29817 ,            -- 该玩家四象轮回单次命中最大有效值
-							nMin         = 8790  ,            -- 该玩家四象轮回单次命中最小值
-							nMinEffect   = 7657  ,            -- 该玩家四象轮回单次命中最小有效值
-							nAvg         = 27818 ,            -- 该玩家四象轮回单次命中平均值
-							nAvgEffect   = 27818 ,            -- 该玩家四象轮回单次命中平均有效值
-							nTotal       = 278560,            -- 该玩家四象轮回所有命中总伤害
-							nTotalEffect = 224750,            -- 该玩家四象轮回所有命中总有效伤害
-						},
-						SKILL_RESULT.MISS = { ... },
-						SKILL_RESULT.CRITICAL = { ... },
-					},
-					Target = {                                -- 该玩家四象轮回承受者统计
-						玩家dwID = {                          -- 该玩家四象轮回击中的这个玩家数据统计
-							nMax         = 13415 ,            -- 该玩家四象轮回击中的这个玩家最大伤害
-							nMaxEffect   = 9080  ,            -- 该玩家四象轮回击中的这个玩家最大有效伤害
-							nTotal       = 23213 ,            -- 该玩家四象轮回击中的这个玩家伤害总和
-							nTotalEffect = 321421,            -- 该玩家四象轮回击中的这个玩家有效伤害总和
-							Count = {                         -- 该玩家四象轮回击中的这个玩家结果统计
-								SKILL_RESULT.HIT      = 5,
-								SKILL_RESULT.MISS     = 3,
-								SKILL_RESULT.CRITICAL = 3,
-							},
-						},
-						Npc名字 = { ... },
-						...
-					},
-				},
-				两仪化形 = { ... },
-				...
-			},
-			Target = {                                        -- 该玩家具体造成输出的对象统计
-				玩家dwID = {                                  -- 该玩家对该dwID的玩家造成的输出统计
-					nCount       = 2     ,                    -- 该玩家对该dwID的玩家输出次数
-					nMax         = 13415 ,                    -- 该玩家对该dwID的玩家单次最大输出量
-					nMaxEffect   = 9080  ,                    -- 该玩家对该dwID的玩家单次最大有效输出量
-					nTotal       = 23213 ,                    -- 该玩家对该dwID的玩家输出量总和
-					nTotalEffect = 321421,                    -- 该玩家对该dwID的玩家有效输出量总和
-					Detail = {                                -- 该玩家对该dwID的玩家输出结果分类统计
-						SKILL_RESULT.HIT = {
-							nCount       = 10    ,            -- 该玩家对该dwID的玩家命中记录数量
-							nMax         = 34210 ,            -- 该玩家对该dwID的玩家单次命中最大值
-							nMaxEffect   = 29817 ,            -- 该玩家对该dwID的玩家单次命中最大有效值
-							nMin         = 8790  ,            -- 该玩家对该dwID的玩家单次命中最小值
-							nMinEffect   = 7657  ,            -- 该玩家对该dwID的玩家单次命中最小有效值
-							nAvg         = 27818 ,            -- 该玩家对该dwID的玩家单次命中平均值
-							nAvgEffect   = 27818 ,            -- 该玩家对该dwID的玩家单次命中平均有效值
-							nTotal       = 278560,            -- 该玩家对该dwID的玩家所有命中总伤害
-							nTotalEffect = 224750,            -- 该玩家对该dwID的玩家所有命中总有效伤害
-						},
-						SKILL_RESULT.MISS = { ... },
-						SKILL_RESULT.CRITICAL = { ... },
-					},
-					Skill = {                                 -- 该玩家四象轮回承受者统计
-						玩家dwID = {                          -- 该玩家四象轮回击中的这个玩家数据统计
-							nMax         = 13415 ,            -- 该玩家四象轮回击中的这个玩家最大伤害
-							nMaxEffect   = 9080  ,            -- 该玩家四象轮回击中的这个玩家最大有效伤害
-							nTotal       = 23213 ,            -- 该玩家四象轮回击中的这个玩家伤害总和
-							nTotalEffect = 321421,            -- 该玩家四象轮回击中的这个玩家有效伤害总和
-							Count = {                         -- 该玩家四象轮回击中的这个玩家结果统计
-								SKILL_RESULT.HIT      = 5,
-								SKILL_RESULT.MISS     = 3,
-								SKILL_RESULT.CRITICAL = 3,
-							},
-						},
-						Npc名字 = { ... },
-						...
-					},
-				},
-			},
+			}, ...
 		},
-		NPC的名字 = { ... },
+		Statistics = {
+			玩家的dwID = {                                        -- 该对象的输出统计
+				nTotal       = 2314214,                           -- 总输出
+				nTotalEffect = 132144 ,                           -- 有效输出
+				Detail = {                                        -- 输出结果分类统计
+					SKILL_RESULT.HIT = {
+						nCount       = 10    ,                    -- 命中记录数量
+						nMax         = 34210 ,                    -- 单次命中最大值
+						nMaxEffect   = 29817 ,                    -- 单次命中最大有效值
+						nMin         = 8790  ,                    -- 单次命中最小值
+						nMinEffect   = 7657  ,                    -- 单次命中最小有效值
+						nAvg         = 27818 ,                    -- 单次命中平均值
+						nAvgEffect   = 27818 ,                    -- 单次命中平均有效值
+						nTotal       = 278560,                    -- 所以命中总伤害
+						nTotalEffect = 224750,                    -- 所有命中总有效伤害
+					},
+					SKILL_RESULT.MISS = { ... },
+					SKILL_RESULT.CRITICAL = { ... },
+				},
+				Skill = {                                         -- 该玩家具体造成输出的技能统计
+					四象轮回 = {                                  -- 该玩家四象轮回造成的输出统计
+						nCount       = 2     ,                    -- 该玩家四象轮回输出次数
+						nMax         = 13415 ,                    -- 该玩家四象轮回最大输出量
+						nMaxEffect   = 9080  ,                    -- 该玩家四象轮回最大有效输出量
+						nTotal       = 23213 ,                    -- 该玩家四象轮回输出量总和
+						nTotalEffect = 321421,                    -- 该玩家四象轮回有效输出量总和
+						Detail = {                                -- 该玩家四象轮回输出结果分类统计
+							SKILL_RESULT.HIT = {
+								nCount       = 10    ,            -- 该玩家四象轮回命中记录数量
+								nMax         = 34210 ,            -- 该玩家四象轮回单次命中最大值
+								nMaxEffect   = 29817 ,            -- 该玩家四象轮回单次命中最大有效值
+								nMin         = 8790  ,            -- 该玩家四象轮回单次命中最小值
+								nMinEffect   = 7657  ,            -- 该玩家四象轮回单次命中最小有效值
+								nAvg         = 27818 ,            -- 该玩家四象轮回单次命中平均值
+								nAvgEffect   = 27818 ,            -- 该玩家四象轮回单次命中平均有效值
+								nTotal       = 278560,            -- 该玩家四象轮回所有命中总伤害
+								nTotalEffect = 224750,            -- 该玩家四象轮回所有命中总有效伤害
+							},
+							SKILL_RESULT.MISS = { ... },
+							SKILL_RESULT.CRITICAL = { ... },
+						},
+						Target = {                                -- 该玩家四象轮回承受者统计
+							玩家dwID = {                          -- 该玩家四象轮回击中的这个玩家数据统计
+								nMax         = 13415 ,            -- 该玩家四象轮回击中的这个玩家最大伤害
+								nMaxEffect   = 9080  ,            -- 该玩家四象轮回击中的这个玩家最大有效伤害
+								nTotal       = 23213 ,            -- 该玩家四象轮回击中的这个玩家伤害总和
+								nTotalEffect = 321421,            -- 该玩家四象轮回击中的这个玩家有效伤害总和
+								Count = {                         -- 该玩家四象轮回击中的这个玩家结果统计
+									SKILL_RESULT.HIT      = 5,
+									SKILL_RESULT.MISS     = 3,
+									SKILL_RESULT.CRITICAL = 3,
+								},
+							},
+							Npc名字 = { ... },
+							...
+						},
+					},
+					两仪化形 = { ... },
+					...
+				},
+				Target = {                                        -- 该玩家具体造成输出的对象统计
+					玩家dwID = {                                  -- 该玩家对该dwID的玩家造成的输出统计
+						nCount       = 2     ,                    -- 该玩家对该dwID的玩家输出次数
+						nMax         = 13415 ,                    -- 该玩家对该dwID的玩家单次最大输出量
+						nMaxEffect   = 9080  ,                    -- 该玩家对该dwID的玩家单次最大有效输出量
+						nTotal       = 23213 ,                    -- 该玩家对该dwID的玩家输出量总和
+						nTotalEffect = 321421,                    -- 该玩家对该dwID的玩家有效输出量总和
+						Detail = {                                -- 该玩家对该dwID的玩家输出结果分类统计
+							SKILL_RESULT.HIT = {
+								nCount       = 10    ,            -- 该玩家对该dwID的玩家命中记录数量
+								nMax         = 34210 ,            -- 该玩家对该dwID的玩家单次命中最大值
+								nMaxEffect   = 29817 ,            -- 该玩家对该dwID的玩家单次命中最大有效值
+								nMin         = 8790  ,            -- 该玩家对该dwID的玩家单次命中最小值
+								nMinEffect   = 7657  ,            -- 该玩家对该dwID的玩家单次命中最小有效值
+								nAvg         = 27818 ,            -- 该玩家对该dwID的玩家单次命中平均值
+								nAvgEffect   = 27818 ,            -- 该玩家对该dwID的玩家单次命中平均有效值
+								nTotal       = 278560,            -- 该玩家对该dwID的玩家所有命中总伤害
+								nTotalEffect = 224750,            -- 该玩家对该dwID的玩家所有命中总有效伤害
+							},
+							SKILL_RESULT.MISS = { ... },
+							SKILL_RESULT.CRITICAL = { ... },
+						},
+						Skill = {                                 -- 该玩家四象轮回承受者统计
+							玩家dwID = {                          -- 该玩家四象轮回击中的这个玩家数据统计
+								nMax         = 13415 ,            -- 该玩家四象轮回击中的这个玩家最大伤害
+								nMaxEffect   = 9080  ,            -- 该玩家四象轮回击中的这个玩家最大有效伤害
+								nTotal       = 23213 ,            -- 该玩家四象轮回击中的这个玩家伤害总和
+								nTotalEffect = 321421,            -- 该玩家四象轮回击中的这个玩家有效伤害总和
+								Count = {                         -- 该玩家四象轮回击中的这个玩家结果统计
+									SKILL_RESULT.HIT      = 5,
+									SKILL_RESULT.MISS     = 3,
+									SKILL_RESULT.CRITICAL = 3,
+								},
+							},
+							Npc名字 = { ... },
+							...
+						},
+					},
+				},
+			},
+			NPC的名字 = { ... },
+		},
 	},
 	Heal = { ... },
 	BeHeal = { ... },
 	BeDamage = { ... },
-	Summary = {
-		nDamage = 全队的输出量,
-		nEffectDamage = 全队的有效输出量,
-		...
-	},
 }
 ]]
 local SKILL_RESULT = {
@@ -159,6 +174,7 @@ local AWAYTIME_TYPE = {
 	OFFLINE        = 1,
 	HALFWAY_JOINED = 2,
 }
+local VERSION = 1
 
 MY_Recount = MY_Recount or {}
 MY_Recount.Data = {}
@@ -192,6 +208,11 @@ function MY_Recount.Data.LoadData()
 		MY_Recount.Data.nMaxHistory   = data.nMaxHistory   or 10
 		MY_Recount.Data.nMinFightTime = data.nMinFightTime or 30
 	end
+	for i = #History, 1, -1 do
+		if History[i].nVersion ~= VERSION then
+			table.remove(History, i)
+		end
+	end
 	MY_Recount.Data.Init()
 end
 
@@ -221,9 +242,25 @@ MY.RegisterEvent('MY_FIGHT_HINT', function(event)
 		MY_Recount.Data.Push()
 	end
 end)
-MY.BreatheCall('MY_Recount_FightTime', function()
+MY.BreatheCall('MY_Recount_FightTime', 1000, function()
 	if MY.IsFighting() then
 		Data.nTimeDuring = GetCurrentTime() - Data.nTimeBegin
+		for _, szRecordType in ipairs({"Damage", "Heal", "BeDamage", "BeHeal"}) do
+			local tInfo = Data[szRecordType]
+			local tSnapshot = {
+				nTimeDuring  = Data.nTimeDuring,
+				nTotal       = tInfo.nTotal,
+				nTotalEffect = tInfo.nTotalEffect,
+				Statistics   = {},
+			}
+			for k, v in pairs(tInfo.Statistics) do
+				tSnapshot.Statistics[k] = {
+					nTotal = v.nTotal,
+					nTotalEffect = v.nTotalEffect,
+				}
+			end
+			table.insert(Data[szRecordType].Snapshots, tSnapshot)
+		end
 	end
 end)
 
@@ -280,8 +317,8 @@ end
 function MY_Recount.Data.GeneAwayTime(data, dwID, szRecordType)
 	local nFightTime = MY_Recount.Data.GeneFightTime(data, dwID, szRecordType)
 	local nAwayTime
-	if szRecordType and data.LastRecTime and data.LastRecTime[szRecordType] then
-		nAwayTime = data.LastRecTime[szRecordType] - data.nTimeBegin - nFightTime
+	if szRecordType and data[szRecordType] and data[szRecordType].nTimeDuring then
+		nAwayTime = data[szRecordType].nTimeDuring - nFightTime
 	else
 		nAwayTime = data.nTimeDuring - nFightTime
 	end
@@ -297,8 +334,8 @@ end
 function MY_Recount.Data.GeneFightTime(data, dwID, szRecordType)
 	local nTimeDuring = data.nTimeDuring
 	local nTimeBegin  = data.nTimeBegin
-	if szRecordType and data.LastRecTime and data.LastRecTime[szRecordType] then
-		nTimeDuring = data.LastRecTime[szRecordType] - nTimeBegin
+	if szRecordType and data[szRecordType] and data[szRecordType].nTimeDuring then
+		nTimeDuring = data[szRecordType].nTimeDuring
 	end
 	if dwID and data.Awaytime and data.Awaytime[dwID] then
 		for _, rec in ipairs(data.Awaytime[dwID]) do
@@ -466,18 +503,17 @@ end
 
 -- 将一条记录插入数组
 function _Cache.AddRecord(data, szRecordType, idRecord, idTarget, szEffectName, nValue, nEffectValue, nSkillResult)
-	local tSummary = data.Summary
-	local tRecords = data[szRecordType]
-	local tRecord  = tRecords[idRecord]
+	local tInfo   = data[szRecordType]
+	local tRecord = tInfo.Statistics[idRecord]
 	if not szEffectName or szEffectName == "" then
 		return
 	end
-	data.LastRecTime[szRecordType] = GetCurrentTime()
 	------------------------
-	-- # 节： data.Summary
+	-- # 节： tInfo
 	------------------------
-	tSummary['n'       .. szRecordType] = tSummary['n'       .. szRecordType] + nValue
-	tSummary['nEffect' .. szRecordType] = tSummary['nEffect' .. szRecordType] + nEffectValue
+	tInfo.nTimeDuring = GetCurrentTime() - data.nTimeBegin
+	tInfo.nTotal        = tInfo.nTotal + nValue
+	tInfo.nTotalEffect  = tInfo.nTotalEffect + nEffectValue
 	------------------------
 	-- # 节： tRecord
 	------------------------
@@ -700,8 +736,8 @@ function _Cache.InitObjectData(data, obj, szChannel)
 		data.Forcelist[id] = obj.dwForceID or 0         -- 势力缓存
 	end
 
-	if not data[szChannel][id] then
-		data[szChannel][id] = {
+	if not data[szChannel].Statistics[id] then
+		data[szChannel].Statistics[id] = {
 			szMD5        = obj.dwID, -- 唯一标识
 			nTotal       = 0       , -- 总输出
 			nTotalEffect = 0       , -- 有效输出
@@ -713,28 +749,32 @@ function _Cache.InitObjectData(data, obj, szChannel)
 end
 
 -- 初始化Data
+do
+local function GeneTypeNS()
+	return {
+		nTimeDuring  = 0,
+		nTotal       = 0,
+		nTotalEffect = 0,
+		Snapshots    = {},
+		Statistics   = {},
+	}
+end
 function MY_Recount.Data.Init(bForceInit)
 	local bNew
 	if bForceInit or (not Data) or
 	(Data.UUID and MY.GetFightUUID() ~= Data.UUID) then
 		Data = {
 			UUID         = MY.GetFightUUID(), -- 战斗唯一标识
+			nVersion     = VERSION,           -- 数据版本号
 			nTimeBegin   = GetCurrentTime(),  -- 战斗开始时间
 			nTimeDuring  =  0,                -- 战斗持续时间
 			Awaytime     = {},                -- 死亡/掉线时间节点
 			Namelist     = {},                -- 名称缓存
 			Forcelist    = {},                -- 势力缓存
-			Damage       = {},                -- 输出统计
-			Heal         = {},                -- 治疗统计
-			BeHeal       = {},                -- 承疗统计
-			BeDamage     = {},                -- 承伤统计
-			LastRecTime  = {},                -- 最后一次记录时间
-			Summary      = {                  -- 统计总和
-				nDamage   = 0, nEffectDamage   = 0,
-				nHeal     = 0, nEffectHeal     = 0,
-				nBeHeal   = 0, nEffectBeHeal   = 0,
-				nBeDamage = 0, nEffectBeDamage = 0,
-			},
+			Damage       = GeneTypeNS(),      -- 输出统计
+			Heal         = GeneTypeNS(),      -- 治疗统计
+			BeHeal       = GeneTypeNS(),      -- 承疗统计
+			BeDamage     = GeneTypeNS(),      -- 承伤统计
 		}
 	end
 
@@ -742,6 +782,7 @@ function MY_Recount.Data.Init(bForceInit)
 		Data.UUID       = MY.GetFightUUID()
 		Data.nTimeBegin = GetCurrentTime()
 	end
+end
 end
 
 -- Data数据压入历史记录 并重新初始化Data
@@ -751,17 +792,17 @@ function MY_Recount.Data.Push()
 	end
 
 	-- 过滤空记录
-	if empty(Data.BeDamage)
-	and empty(Data.Damage)
-	and empty(Data.Heal)
-	and empty(Data.BeHeal) then
+	if empty(Data.BeDamage.Statistics)
+	and empty(Data.Damage.Statistics)
+	and empty(Data.Heal.Statistics)
+	and empty(Data.BeHeal.Statistics) then
 		return
 	end
 
 	-- 计算受伤最多的名字作为战斗名称
 	local nMaxValue, szBossName = 0, nil
 	local nEnemyMaxValue, szEnemyBossName = 0, nil
-	for id, p in pairs(Data.BeDamage) do
+	for id, p in pairs(Data.BeDamage.Statistics) do
 		if nEnemyMaxValue < p.nTotalEffect and not MY_Recount.Data.IsParty(id, Data) then
 			nEnemyMaxValue  = p.nTotalEffect
 			szEnemyBossName = MY_Recount.Data.GetNameAusID(id, Data)
@@ -773,7 +814,7 @@ function MY_Recount.Data.Push()
 	end
 	-- 如果没有 则计算输出最多的NPC名字作为战斗名称
 	if not szBossName or not szEnemyBossName then
-		for id, p in pairs(Data.Damage) do
+		for id, p in pairs(Data.Damage.Statistics) do
 			if nEnemyMaxValue < p.nTotalEffect and not MY_Recount.Data.IsParty(id, Data) then
 				nEnemyMaxValue  = p.nTotalEffect
 				szEnemyBossName = MY_Recount.Data.GetNameAusID(id, Data)
