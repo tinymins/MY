@@ -1712,3 +1712,24 @@ function MY.SetTeamInfo(tTeamInfo)
 	MY.Sysmsg({_L["Team list restored"]})
 end
 end
+
+function MY.UpdateItemBoxExtend(box, nQuality)
+	local szImage = "ui/Image/Common/Box.UITex"
+	local nFrame
+	if nQuality == 2 then
+		nFrame = 13
+	elseif nQuality == 3 then
+		nFrame = 12
+	elseif nQuality == 4 then
+		nFrame = 14
+	elseif nQuality == 5 then
+		nFrame = 17
+	end
+	box:ClearExtentImage()
+	box:ClearExtentAnimate()
+	if nFrame and nQuality < 5 then
+		box:SetExtentImage(szImage, nFrame)
+	elseif nQuality == 5 then
+		box:SetExtentAnimate(szImage, nFrame, -1)
+	end
+end
