@@ -133,8 +133,15 @@ function _GKP.SaveConfig()
 	MY.SaveLUAData({"config/gkp.cfg", MY_DATA_PATH.GLOBAL}, _GKP.Config)
 end
 
-function _GKP.SaveData()
-	local szPath = "userdata/gkp/" .. FormatTime("%Y-%m-%d",GetCurrentTime()) .. ".gkp"
+function _GKP.SaveData(bStorage)
+	local szPath = "userdata/gkp/current.gkp"
+	if bStorage then
+		local i = 0
+		repeat
+			szPath = "userdata/gkp/" .. MY.FormatTime("yyyy-MM-dd-hh-mm-ss",GetCurrentTime()) .. (i == 0 and "" or ("-" .. i)) .. ".gkp"
+			i = i + 1
+		until not IsLocalFileExist(MY.FormatPath(szPath) .. ".jx3dat")
+	end
 	MY.SaveLUAData({szPath, MY_DATA_PATH.ROLE}, { GKP_Record = MY_GKP("GKP_Record") , GKP_Account = MY_GKP("GKP_Account") })
 	_GKP.UpdateStat()
 end
@@ -231,9 +238,10 @@ end
 -- initlization
 function _GKP.Init()
 	_GKP.OpenPanel(true):Hide()
-	MY.DelayCall(function() -- Init延后 避免和进入副本冲突
-		_GKP.LoadData("gkp/" .. FormatTime("%Y-%m-%d", GetCurrentTime()))
-	end, 125)
+	local function onDelay() -- Init延后 避免和进入副本冲突
+		_GKP.LoadData("gkp/current")
+	end
+	MY.DelayCall(125, onDelay)
 end
 MY.RegisterEvent("FIRST_LOADING_END", _GKP.Init)
 
@@ -1119,20 +1127,48 @@ end
 function _GKP.RecoveryMenu()
 	local me = GetClientPlayer()
 	local menu = {}
-	for i = 0, 21 do
-		local nTime = GetCurrentTime() - i * 86400
-		local szPath = MY.FormatPath({"userdata/gkp/" .. FormatTime("%Y-%m-%d",nTime) .. ".gkp", MY_DATA_PATH.ROLE})
+	local aFiles = {}
+	local szPath = MY.FormatPath({"userdata/gkp/", MY_DATA_PATH.ROLE}):sub(3):gsub("/", "\\"):sub(1, -2)
+	for i, path in ipairs(CPath.GetFileList(szPath)) do
+		local year, month, day, hour, minute, second, index = path:match("^(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%.gkp.jx3dat")
+		if not year then
+			year, month, day, hour, minute, second = path:match("^(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%.gkp.jx3dat")
+		end
+		if not year then
+			year, month, day = path:match("^(%d+)%-(%d+)%-(%d+)%.gkp.jx3dat")
+		end
+		if year then
+			table.insert(aFiles, {year, month, day, hour, minute, second, index})
+		end
+	end
+	local function sortFile(a, b)
+		local n = math.max(#a, #b)
+		for i = 1, n do
+			if not a[i] then
+				return true
+			elseif not b[i] then
+				return false
+			elseif a[i] ~= b[i] then
+				return a[i] > b[i]
+			end
+		end
+		return true
+	end
+	table.sort(aFiles, sortFile)
+
+	for i = 1, math.min(#aFiles, 21) do
+		local szFile = table.concat(aFiles[i], "-")
 		table.insert(menu, {
-			szOption = FormatTime("%Y-%m-%d",nTime) .. ".gkp",
-			bDisable = not IsLocalFileExist(szPath:sub(3) .. ".jx3dat"),
+			szOption = szFile .. ".gkp",
 			fnAction = function()
 				MY.Confirm(_L["Are you sure to cover the current information with the last record data?"], function()
-					_GKP.LoadData("gkp/" .. FormatTime("%Y-%m-%d",nTime))
+					_GKP.LoadData("gkp/" .. szFile)
 					MY.Alert(_L["Reocrd Recovered."])
 				end)
 			end,
 		})
 	end
+
 	if #menu > 0 then
 		table.insert(menu, MENU_DIVIDER)
 	end
@@ -1160,6 +1196,9 @@ end
 ----------------------------------------------------------------------<
 function _GKP.ClearData(bConfirm)
 	local fnAction = function()
+		if #_GKP.GKP_Record ~= 0 or #_GKP.GKP_Account ~= 0 then
+			_GKP.SaveData(true)
+		end
 		_GKP.GKP_Record = {}
 		_GKP.GKP_Account = {}
 		_GKP.DrawRecord()
