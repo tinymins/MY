@@ -26,7 +26,8 @@ local GetPlayer, GetNpc, IsPlayer, ApplyCharacterThreatRankList = GetPlayer, Get
 local GetClientPlayer, GetClientTeam = GetClientPlayer, GetClientTeam
 local UI_GetClientPlayerID, GetTime = UI_GetClientPlayerID, GetTime
 local HATRED_COLLECT = g_tStrings.HATRED_COLLECT
-local GetBuff, GetBuffName, GetEndTime, GetObjName, GetForceColor = MY.GetBuff, MY.GetBuffName, MY.GetEndTime, MY.GetObjectName, MY.GetForceColor
+local MY_GetObjName, MY_GetForceColor = MY.GetObjectName, MY.GetForceColor
+local MY_GetBuff, MY_GetBuffName, MY_GetEndTime = MY.GetBuff, MY.GetBuffName, MY.GetEndTime
 local GetNpcIntensity = GetNpcIntensity
 local GetTime = GetTime
 
@@ -112,12 +113,12 @@ function TS.OnFrameBreathe()
 		else
 			local lifeper = p.nCurrentLife / p.nMaxLife
 			this.CastBar:Hide()
-			this.txt:SetText(GetObjName(p, true) .. string.format(" (%0.1f%%)", lifeper * 100))
+			this.txt:SetText(MY_GetObjName(p, true) .. string.format(" (%0.1f%%)", lifeper * 100))
 			this.Life:SetPercentage(lifeper)
 		end
 
 		-- ŒﬁÕ˛–≤Ã·–—
-		local KBuff = GetBuff({
+		local KBuff = MY_GetBuff({
 			[917]  = 0,
 			[4487] = 0,
 			[926]  = 0,
@@ -128,8 +129,8 @@ function TS.OnFrameBreathe()
 		local hText = this:Lookup("", "Text_Title")
 		local szText = hText.szText or ""
 		if KBuff then
-			local szName = GetBuffName(KBuff.dwID, KBuff.nLevel)
-			hText:SetText(string.format("%s (%ds)", szName, math.floor(GetEndTime(KBuff.GetEndTime()))) .. szText)
+			local szName = MY_GetBuffName(KBuff.dwID, KBuff.nLevel)
+			hText:SetText(string.format("%s (%ds)", szName, math.floor(MY_GetEndTime(KBuff.GetEndTime()))) .. szText)
 			hText:SetFontColor(0, 255, 0)
 		else
 			hText:SetText(HATRED_COLLECT .. szText)
@@ -149,7 +150,7 @@ function TS.OnFrameBreathe()
 						local team = GetClientTeam()
 						local szMember = team.GetClientTeamMemberName(p.dwDropTargetPlayerID)
 						local nGroup = team.GetMemberGroupIndex(p.dwDropTargetPlayerID) + 1
-						local name = GetObjName(p)
+						local name = MY_GetObjName(p)
 						local oContent = {_L("Well done! %s in %d group first to attack %s!!", nGroup, szMember, name), r = 150, g = 250, b = 230}
 						local oTitile = {g_tStrings.HATRED_COLLECT, r = 150, g = 250, b = 230}
 						MY.Sysmsg(oContent, oTitile)
@@ -363,7 +364,7 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 					end
 				end
 				if TS.bForceColor then
-					r, g, b = GetForceColor(p.dwForceID)
+					r, g, b = MY_GetForceColor(p.dwForceID)
 				else
 					r, g, b = 255, 255, 255
 				end
