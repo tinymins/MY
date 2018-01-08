@@ -631,7 +631,7 @@ local function CheckInvalidRect(dwType, dwID, me, bNoCreate)
         elseif not bNoCreate then
             if dwType == TARGET.PLAYER
             or object.CanSeeName()
-            or object.dwTemplateID == 46140 -- 清绝歌影
+            or (object.dwTemplateID == 46140 and (not MY.IsShieldedVersion() or _C.GetRelation(object) ~= "Enemy")) -- 清绝歌影
             or Config.bShowSpecialNpc then
                 XLifeBar(object):Create()
                 CheckInvalidRect(dwType, dwID, me, true)
