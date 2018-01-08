@@ -103,10 +103,11 @@ function MY_GKP_Loot.OnFrameBreathe()
 		-- Ê°È¡ÅÐ¶¨
 		local bCanDialog = doodad.CanDialog(me)
 		if not MY.IsShieldedVersion() then
-			local hList = wnd:Lookup("", "Handle_ItemList")
+			local hList, box = wnd:Lookup("", "Handle_ItemList")
 			for i = 0, hList:GetItemCount() - 1 do
-				if MY_GKP_Loot.IsItemAutoPickup(wnd.itemData, wnd.tItemConfig, doodad, bCanDialog) then
-					ExecuteWithThis(hList:Lookup(i), MY_GKP_Loot.OnItemLButtonClick)
+				box = hList:Lookup(i):Lookup("Box_Item")
+				if MY_GKP_Loot.IsItemAutoPickup(box.itemData, wnd.tItemConfig, doodad, bCanDialog) then
+					ExecuteWithThis(box, MY_GKP_Loot.OnItemLButtonClick)
 				end
 			end
 		end
