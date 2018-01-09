@@ -190,7 +190,7 @@ local function FormatDataStructure(data, struct, assign, metaFlag)
 	-- 标准化参数
 	local params = setmetatable({}, defaultParams)
 	local structTypes, defaultData, defaultDataType
-	local childTemplate, arrayTemplate, dictTemplate
+	local keyTemplate, childTemplate, arrayTemplate, dictTemplate
 	if type(struct) == 'table' and struct[1] == metaFlag then
 		-- 处理有META标记的数据项
 		-- 允许类型和默认值
@@ -199,6 +199,7 @@ local function FormatDataStructure(data, struct, assign, metaFlag)
 		defaultDataType = type(defaultData)
 		-- 表模板相关参数
 		if defaultDataType == 'table' then
+			keyTemplate = struct.__KEY_TEMPLATE__
 			childTemplate = struct.__CHILD_TEMPLATE__
 			arrayTemplate = struct.__ARRAY_TEMPLATE__
 			dictionaryTemplate = struct.__DICTIONARY_TEMPLATE__
@@ -232,6 +233,18 @@ local function FormatDataStructure(data, struct, assign, metaFlag)
 			data = clone(data)
 		end
 		local keys = {}
+		-- 数据类型是表且META信息中定义了子元素KEY模板 则递归检查子元素KEY与子元素KEY模板
+		if dataType == 'table' and keyTemplate then
+			for k, v in pairs(data) do
+				local k1 = FormatDataStructure(k, keyTemplate)
+				if k1 ~= k then
+					if k1 ~= nil then
+						data[k1] = data[k]
+					end
+					data[k] = nil
+				end
+			end
+		end
 		-- 数据类型是表且META信息中定义了子元素模板 则递归检查子元素与子元素模板
 		if dataType == 'table' and childTemplate then
 			for i, v in pairs(data) do
