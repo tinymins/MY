@@ -265,6 +265,14 @@ function MY_TargetMon_Base.OnFrameCreate()
 	ReloadFrame(this)
 end
 
+function D.GeneMonItemData(level, iconid)
+	return MY_TargetMon.FormatMonItemStructure({
+		iconid = iconid,
+		levels = { [level] = { iconid = iconid } },
+		ignoreLevel = true,
+	})
+end
+
 do
 local needFormatItemPos
 local l_tBuffTime = setmetatable({}, { __mode = "v" })
@@ -293,20 +301,8 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 			end
 			l_tBuffTime[KTarget.dwID][buff.dwID][buff.nLevel][buff.nStackNum] = nBuffTime
 			-- 处理新出现的BUFF
-			if not hItem.mon.iconid or hItem.mon.iconid == 13 then
+			if hItem.mon.iconid == 13 then
 				-- 计算图标 名字 ID等
-				if hItem.mon.id ~= "common" then
-					-- 加入精确缓存
-					if not tItem[buff.dwID] then
-						tItem[buff.dwID] = {}
-					end
-					tItem[buff.dwID][hItem] = true
-					-- 移除模糊缓存
-					if tItem[szName] then
-						tItem[szName][hItem] = false
-					end
-					hItem.mon.id = buff.dwID
-				end
 				if not hItem.mon.name then
 					hItem.mon.name = szName
 					hItem.txtName:SetText(hItem.mon.longAlias or szName)
@@ -362,7 +358,7 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 		end
 		-- 加入同名BUFF列表
 		if not hItem.mon.ids[buff.dwID] then
-			hItem.mon.ids[buff.dwID] = { framecount = 0, iconid = Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13 }
+			hItem.mon.ids[buff.dwID] = D.GeneMonItemData(buff.nLevel, Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13)
 		end
 	elseif config.type == 'SKILL' and buff and szName then
 		if config.hideVoid and not hItem:IsVisible() then
@@ -605,7 +601,7 @@ local function OnSkill(this, dwID, dwLevel)
 				if not hItem.mon.iconid or hItem.mon.iconid == 13 then
 					hItem.mon.iconid = Table_GetSkillIconID(dwID, dwLevel)
 				end
-				hItem.mon.ids[dwID] = { framecount = 0, iconid = Table_GetSkillIconID(dwID, dwLevel) }
+				hItem.mon.ids[dwID] = D.GeneMonItemData(dwLevel, Table_GetSkillIconID(dwID, dwLevel))
 			end
 		end
 	end
@@ -617,7 +613,7 @@ local function OnSkill(this, dwID, dwLevel)
 				if not hItem.mon.iconid or hItem.mon.iconid == 13 then
 					hItem.mon.iconid = Table_GetSkillIconID(dwID, dwLevel)
 				end
-				hItem.mon.ids[dwID] = { framecount = 0, iconid = Table_GetSkillIconID(dwID, dwLevel) }
+				hItem.mon.ids[dwID] = D.GeneMonItemData(dwLevel, Table_GetSkillIconID(dwID, dwLevel))
 			end
 		end
 	end
@@ -662,7 +658,7 @@ function MY_TargetMon_Base.OnEvent(event)
 		end
 		ReloadFrame(this)
 	elseif event == "UI_SCALED" then
-		D.UpdateAnchor(frame)
+		D.UpdateAnchor(this)
 	end
 end
 end

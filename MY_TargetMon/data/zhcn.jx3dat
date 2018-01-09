@@ -30,27 +30,30 @@ return {
 			__CHILD_TEMPLATE__ = { -- kungfuid
 				__META__,
 				__VALUE__ = {},
-				__CHILD_TEMPLATE__ = {
+				__CHILD_TEMPLATE__ = { -- mon
 					__META__,
-					__VALUE__ = { -- mon
+					__VALUE__ = {
 						enable = true,
 						iconid = 13,
-						id = {__META__, {'number', 'string'}, 'common'},
-						level = { __META__, {'number', 'string'}, 'common'},
-						name = {__META__, {'nil', 'string'}, nil},
-						iconid = {__META__, {'number'}, 13},
+						name = "",
 						alias = {__META__, {'nil', 'string'}, nil},
 						shortAlias = {__META__, {'nil', 'string'}, nil},
 						ids = {
 							__META__,
 							__VALUE__ = {},
-							__CHILD_TEMPLATE__ = {
+							__CHILD_TEMPLATE__ = { -- monid
+								enable = true,
 								iconid = 13,
-								framecount = 0,
-								id = {__META__, {'number', 'string'}, 'common'},
-								level = {__META__, {'number', 'string'}, 'common'},
+								levels = {
+									__META__,
+									__VALUE__ = {},
+									__KEY_TEMPLATE__ = {__META__, {'number'}, nil},
+									__CHILD_TEMPLATE__ = { enable = true, iconid = 13 },
+								},
+								ignoreLevel = true,
 							},
 						},
+						ignoreId = true,
 					},
 				},
 			},
