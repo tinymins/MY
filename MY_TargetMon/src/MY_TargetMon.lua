@@ -797,17 +797,43 @@ function PS.OnPanelActive(wnd)
 					end,
 				})
 				for dwID, info in pairs(mon.ids) do
-					if dwID ~= "common" then
-						local t2 = {
-							szOption = dwID,
-							bCheck = true,
-							bChecked = info.enable,
-							fnAction = function()
-								info.enable = not info.enable
+					local t2 = {
+						szOption = dwID,
+						bCheck = true,
+						bChecked = info.enable,
+						fnAction = function()
+							info.enable = not info.enable
+							D.CheckFrame(l_config)
+						end,
+						fnDisable = function()
+							return mon.ignoreId
+						end,
+						szIcon = "fromiconid",
+						nFrame = info.iconid,
+						nIconWidth = 22,
+						nIconHeight = 22,
+						szLayer = "ICON_RIGHTMOST",
+						fnClickIcon = function()
+							if mon.ignoreId then
+								return
+							end
+							XGUI.OpenIconPanel(function(dwIcon)
+								info.iconid = dwIcon
 								D.CheckFrame(l_config)
-							end,
-							fnDisable = function()
-								return mon.ignoreId
+							end)
+							Wnd.CloseWindow("PopupMenuPanel")
+						end,
+					}
+					if not empty(info.levels) then
+						table.insert(t2, { szOption = _L['Levels'], bDisable = true })
+						table.insert(t2, MENU_DIVIDER)
+						table.insert(t2, {
+							szOption = _L['All levels'],
+							bCheck = true,
+							bChecked = info.ignoreLevel,
+							fnAction = function()
+								info.ignoreLevel = not info.ignoreLevel
+								D.CheckFrame(l_config)
 							end,
 							szIcon = "fromiconid",
 							nFrame = info.iconid,
@@ -815,73 +841,51 @@ function PS.OnPanelActive(wnd)
 							nIconHeight = 22,
 							szLayer = "ICON_RIGHTMOST",
 							fnClickIcon = function()
+								if mon.ignoreId or info.ignoreLevel then
+									return
+								end
 								XGUI.OpenIconPanel(function(dwIcon)
 									info.iconid = dwIcon
-									D.CheckFrame(l_config)
 								end)
 								Wnd.CloseWindow("PopupMenuPanel")
 							end,
-						}
-						if not empty(info.levels) then
-							table.insert(t2, { szOption = _L['Levels'], bDisable = true })
-							table.insert(t2, MENU_DIVIDER)
+						})
+						for nLevel, infoLevel in ipairs(info.levels) do
 							table.insert(t2, {
-								szOption = _L['All levels'],
+								szOption = nLevel,
 								bCheck = true,
-								bChecked = info.ignoreLevel,
+								bChecked = infoLevel.enable,
 								fnAction = function()
-									info.ignoreLevel = not info.ignoreLevel
+									infoLevel.enable = not infoLevel.enable
 									D.CheckFrame(l_config)
 								end,
+								fnDisable = function()
+									return mon.ignoreId or info.ignoreLevel
+								end,
 								szIcon = "fromiconid",
-								nFrame = info.iconid,
+								nFrame = infoLevel.iconid,
 								nIconWidth = 22,
 								nIconHeight = 22,
 								szLayer = "ICON_RIGHTMOST",
 								fnClickIcon = function()
 									XGUI.OpenIconPanel(function(dwIcon)
-										info.iconid = dwIcon
+										infoLevel.iconid = dwIcon
+										D.CheckFrame(l_config)
 									end)
 									Wnd.CloseWindow("PopupMenuPanel")
 								end,
 							})
-							for nLevel, infoLevel in ipairs(info.levels) do
-								table.insert(t2, {
-									szOption = nLevel,
-									bCheck = true,
-									bChecked = infoLevel.enable,
-									fnAction = function()
-										infoLevel.enable = not infoLevel.enable
-										D.CheckFrame(l_config)
-									end,
-									fnDisable = function()
-										return mon.ignoreId or info.ignoreLevel
-									end,
-									szIcon = "fromiconid",
-									nFrame = infoLevel.iconid,
-									nIconWidth = 22,
-									nIconHeight = 22,
-									szLayer = "ICON_RIGHTMOST",
-									fnClickIcon = function()
-										XGUI.OpenIconPanel(function(dwIcon)
-											infoLevel.iconid = dwIcon
-											D.CheckFrame(l_config)
-										end)
-										Wnd.CloseWindow("PopupMenuPanel")
-									end,
-								})
-							end
-							table.insert(t2, MENU_DIVIDER)
 						end
-						table.insert(t2, {
-							szOption = _L['Delete'],
-							fnAction = function()
-								mon.ids[dwID] = nil
-								D.CheckFrame(l_config)
-							end,
-						})
-						table.insert(t1, t2)
+						table.insert(t2, MENU_DIVIDER)
 					end
+					table.insert(t2, {
+						szOption = _L['Delete'],
+						fnAction = function()
+							mon.ids[dwID] = nil
+							D.CheckFrame(l_config)
+						end,
+					})
+					table.insert(t1, t2)
 				end
 			end
 			return t1
