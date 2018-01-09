@@ -317,8 +317,8 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 				end
 			elseif dwType == TARGET.NPC then
 				if MY_Focus.bFocusJJCParty
-				and not IsEnemy(UI_GetClientPlayerID(), dwID)
-				and obj.dwTemplateID == 46140 then -- 清绝歌影 的主体影子
+				and obj.dwTemplateID == 46140 -- 清绝歌影 的主体影子
+				and not (IsEnemy(UI_GetClientPlayerID(), dwID) and MY.IsShieldedVersion()) then
 					MY_Focus.DelFocus(TARGET.PLAYER, obj.dwEmployer)
 					bFocus = true
 				end
