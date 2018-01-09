@@ -152,20 +152,16 @@ end
 ----------------------------------------------------------------------------------------------
 -- Êý¾Ý´æ´¢
 ----------------------------------------------------------------------------------------------
-local function UpdateConfigCalcProps(config)
-	for _, monitors in pairs(config.monitors) do
-		for _, mon in ipairs(monitors) do
-			if not mon.ids then
-				mon.ids = {}
-			end
-			for k, _ in pairs(mon.ids) do
-				if not tonumber(k) then
-					mon.ids[k] = nil
-				end
-			end
-		end
-	end
-	MY.FormatDataStructure(config, ConfigTemplate, true)
+function D.FormatConfigStructure(config)
+	return MY.FormatDataStructure(config, ConfigTemplate, true)
+end
+
+function D.FormatMonStructure(config)
+	return MY.FormatDataStructure(config, ConfigTemplate.monitors.__CHILD_TEMPLATE__.__CHILD_TEMPLATE__, true)
+end
+
+function D.FormatMonItemStructure(config)
+	return MY.FormatDataStructure(config, ConfigTemplate.monitors.__CHILD_TEMPLATE__.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__, true)
 end
 
 function D.LoadConfig(bDefault, bOriginal)
@@ -174,7 +170,7 @@ function D.LoadConfig(bDefault, bOriginal)
 		and MY.LoadLUAData(ROLE_CONFIG_FILE)
 		or (not bOriginal and MY.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE) or ConfigDefault)
 	for _, config in pairs(Config) do
-		UpdateConfigCalcProps(config)
+		D.FormatConfigStructure(config)
 	end
 	D.CheckAllFrame()
 end
@@ -780,39 +776,103 @@ function PS.OnPanelActive(wnd)
 			}
 			if not empty(mon.ids) then
 				table.insert(t1, { bDevide = true })
-				local function InsertMenuID(dwID, dwIcon)
-					local t2 = {
-						szOption = dwID == "common" and _L['All ids'] or dwID,
-						bCheck = true, bMCheck = true,
-						bChecked = dwID == mon.id or (dwID == "common" and mon.id == nil),
-						fnAction = function()
+				table.insert(t1, {
+					szOption = _L['All ids'],
+					bCheck = true,
+					bChecked = mon.ignoreId,
+					fnAction = function()
+						mon.ignoreId = not mon.ignoreId
+						D.CheckFrame(l_config)
+					end,
+					szIcon = "fromiconid",
+					nFrame = mon.iconid,
+					nIconWidth = 22,
+					nIconHeight = 22,
+					szLayer = "ICON_RIGHTMOST",
+					fnClickIcon = function()
+						XGUI.OpenIconPanel(function(dwIcon)
 							mon.iconid = dwIcon
-							mon.id = dwID
-							D.CheckFrame(l_config)
-						end,
-						szIcon = "fromiconid",
-						nFrame = dwIcon or 13,
-						nIconWidth = 22,
-						nIconHeight = 22,
-						szLayer = "ICON_RIGHTMOST",
-						fnClickIcon = function()
-							XGUI.OpenIconPanel(function(dwIcon)
-								if dwID == "common" then
-									mon.iconid = dwIcon
-								else
-									if mon.id == dwID then
-										mon.iconid = dwIcon
-									end
-									mon.ids[dwID].iconid = dwIcon
-								end
-								if mon.id == dwID then
+						end)
+						Wnd.CloseWindow("PopupMenuPanel")
+					end,
+				})
+				for dwID, info in pairs(mon.ids) do
+					if dwID ~= "common" then
+						local t2 = {
+							szOption = dwID,
+							bCheck = true,
+							bChecked = info.enable,
+							fnAction = function()
+								info.enable = not info.enable
+								D.CheckFrame(l_config)
+							end,
+							fnDisable = function()
+								return mon.ignoreId
+							end,
+							szIcon = "fromiconid",
+							nFrame = info.iconid,
+							nIconWidth = 22,
+							nIconHeight = 22,
+							szLayer = "ICON_RIGHTMOST",
+							fnClickIcon = function()
+								XGUI.OpenIconPanel(function(dwIcon)
+									info.iconid = dwIcon
 									D.CheckFrame(l_config)
-								end
-							end)
-							Wnd.CloseWindow("PopupMenuPanel")
-						end,
-					}
-					if dwID ~= 'common' then
+								end)
+								Wnd.CloseWindow("PopupMenuPanel")
+							end,
+						}
+						if not empty(info.levels) then
+							table.insert(t2, { szOption = _L['Levels'], bDisable = true })
+							table.insert(t2, MENU_DIVIDER)
+							table.insert(t2, {
+								szOption = _L['All levels'],
+								bCheck = true,
+								bChecked = info.ignoreLevel,
+								fnAction = function()
+									info.ignoreLevel = not info.ignoreLevel
+									D.CheckFrame(l_config)
+								end,
+								szIcon = "fromiconid",
+								nFrame = info.iconid,
+								nIconWidth = 22,
+								nIconHeight = 22,
+								szLayer = "ICON_RIGHTMOST",
+								fnClickIcon = function()
+									XGUI.OpenIconPanel(function(dwIcon)
+										info.iconid = dwIcon
+									end)
+									Wnd.CloseWindow("PopupMenuPanel")
+								end,
+							})
+							for nLevel, infoLevel in ipairs(info.levels) do
+								table.insert(t2, {
+									szOption = nLevel,
+									bCheck = true,
+									bChecked = infoLevel.enable,
+									fnAction = function()
+										infoLevel.enable = not infoLevel.enable
+										D.CheckFrame(l_config)
+									end,
+									fnDisable = function()
+										return mon.ignoreId or info.ignoreLevel
+									end,
+									szIcon = "fromiconid",
+									nFrame = infoLevel.iconid,
+									nIconWidth = 22,
+									nIconHeight = 22,
+									szLayer = "ICON_RIGHTMOST",
+									fnClickIcon = function()
+										XGUI.OpenIconPanel(function(dwIcon)
+											infoLevel.iconid = dwIcon
+											D.CheckFrame(l_config)
+										end)
+										Wnd.CloseWindow("PopupMenuPanel")
+									end,
+								})
+							end
+							table.insert(t2, MENU_DIVIDER)
+						end
 						table.insert(t2, {
 							szOption = _L['Delete'],
 							fnAction = function()
@@ -820,13 +880,7 @@ function PS.OnPanelActive(wnd)
 								D.CheckFrame(l_config)
 							end,
 						})
-					end
-					table.insert(t1, t2)
-				end
-				InsertMenuID('common', mon.ids.common or mon.iconid or 13)
-				for dwID, info in pairs(mon.ids) do
-					if dwID ~= "common" then
-						InsertMenuID(dwID, info.iconid)
+						table.insert(t1, t2)
 					end
 				end
 			end
@@ -1018,6 +1072,9 @@ MY.RegisterPanel("MY_TargetMon", _L["Target monitor"], _L['Target'], "ui/Image/C
 
 
 local ui = {
-	GetFrameData = D.GetFrameData,
+	GetFrameData          = D.GetFrameData,
+	FormatConfigStructure = D.FormatConfigStructure,
+	FormatMonStructure    = D.FormatMonStructure,
+	FormatMonItemStructure  = D.FormatMonItemStructure,
 }
 MY_TargetMon = setmetatable({}, { __index = ui, __newindex = function() end, __metatable = true })
