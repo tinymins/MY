@@ -287,7 +287,11 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 			bFocus = true
 		end
 		if dwType ~= TARGET.PLAYER then
-			if MY_Focus.tFocusTplList[dwType][obj.dwTemplateID] then
+			if obj.dwTemplateID == 46140 -- 清绝歌影 的主体影子
+			and (MY.IsInArena() or MY.IsInPubg())
+			and not (IsEnemy(UI_GetClientPlayerID(), dwID) and MY.IsShieldedVersion()) then
+				bFocus = false
+			elseif MY_Focus.tFocusTplList[dwType][obj.dwTemplateID] then
 				bFocus = true
 			end
 		end
