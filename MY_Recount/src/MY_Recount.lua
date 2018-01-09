@@ -584,7 +584,7 @@ _C.OnDetailFrameBreathe = function()
 		id = tonumber(id)
 	end
 	-- 获取数据
-	local tData = DataDisplay[szChannel][id]
+	local tData = DataDisplay[szChannel].Statistics[id]
 	if not tData then
 		this:Lookup('WndScroll_Detail', 'Handle_DetailList'):Clear()
 		this:Lookup('WndScroll_Skill' , 'Handle_SkillList' ):Clear()
