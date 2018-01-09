@@ -611,13 +611,15 @@ function PS.OnPanelActive(wnd)
 						l_config.monitors[kungfuid] = {}
 					end
 					local aMonList = l_config.monitors[kungfuid]
-					local mon = {
-						enable = true,
-						iconid = 13,
-						id = tonumber(szVal) or 'common',
-						ids = {},
-						name = not tonumber(szVal) and szVal or nil,
-					}
+					local mon = MY_TargetMon.FormatMonStructure({
+						name = szVal,
+						ignoreId = not tonumber(szVal),
+					})
+					if not mon.ignoreId then
+						mon.ids[tonumber(szVal)] = MY_TargetMon.FormatMonItemStructure({
+							enable = true,
+						})
+					end
 					if not index then
 						index = #aMonList + 1
 					end
