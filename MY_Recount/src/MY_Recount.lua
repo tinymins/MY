@@ -169,7 +169,6 @@ MY_Recount.bShowPerSec   = true                 -- ÏÔÊ¾ÎªÃ¿ÃëÊý¾Ý£¨·´Ö®ÏÔÊ¾×ÜºÍ£
 MY_Recount.bShowEffect   = true                 -- ÏÔÊ¾ÓÐÐ§ÉËº¦/ÖÎÁÆ
 MY_Recount.bSaveRecount  = false                -- ÍË³öÓÎÏ·Ê±±£´æÕ½¶·¼ÇÂ¼
 MY_Recount.nDisplayMode  = DISPLAY_MODE.BOTH    -- Í³¼ÆÏÔÊ¾Ä£Ê½£¨ÏÔÊ¾NPC/Íæ¼ÒÊý¾Ý£©£¨Ä¬ÈÏ»ìºÏÏÔÊ¾£©
-MY_Recount.nPublishLimit = 30                   -- ·¢²¼µ½ÁÄÌìÆµµÀÊýÁ¿
 MY_Recount.nPublishMode  = PUBLISH_MODE.EFFECT  -- ·¢²¼Ä£Ê½
 MY_Recount.nDrawInterval = GLOBAL.GAME_FPS / 2  -- UIÖØ»æÖÜÆÚ£¨Ö¡£©
 MY_Recount.bShowNodataTeammate = false  -- ÏÔÊ¾Ã»ÓÐÊý¾ÝµÄ¶ÓÓÑ
@@ -182,7 +181,6 @@ RegisterCustomData("MY_Recount.bShowPerSec")
 RegisterCustomData("MY_Recount.bShowEffect")
 RegisterCustomData("MY_Recount.bSaveRecount")
 RegisterCustomData("MY_Recount.nDisplayMode")
-RegisterCustomData("MY_Recount.nPublishLimit")
 RegisterCustomData("MY_Recount.nPublishMode")
 RegisterCustomData("MY_Recount.nDrawInterval")
 RegisterCustomData("MY_Recount.bShowNodataTeammate")
@@ -1242,23 +1240,6 @@ end
 MY_Recount.GetPublishMenu = function()
 	local t = {}
 
-	local t1 = {
-		szOption = _L['publish limit'],
-	}
-	for _, i in pairs({
-		1,2,3,4,5,8,10,15,20,30,50,100
-	}) do
-		table.insert(t1, {
-			szOption = _L('top %d', i),
-			bCheck = true, bMCheck = true,
-			bChecked = MY_Recount.nPublishLimit == i,
-			fnAction = function()
-				MY_Recount.nPublishLimit = i
-			end,
-		})
-	end
-	table.insert(t, t1)
-
 	-- ·¢²¼ÀàÐÍ
 	table.insert(t, {
 		szOption = _L['publish mode'],
@@ -1286,73 +1267,83 @@ MY_Recount.GetPublishMenu = function()
 		}
 	})
 
+	local function Publish(nChannel, nLimit)
+		local frame = Station.Lookup('Normal/MY_Recount')
+		if not frame then
+			return
+		end
+		MY.Talk(
+			nChannel,
+			'[' .. _L['mingyi plugin'] .. ']'
+			.. _L['fight recount'] .. ' - '
+			.. frame:Lookup('Wnd_Title', 'Text_Title'):GetText()
+			.. ' ' .. ((DataDisplay.szBossName and ' - ' .. DataDisplay.szBossName) or '')
+			.. '(' .. MY.FormatTimeCount('M:ss', DataDisplay.nTimeDuring) .. ')',
+			nil,
+			true
+		)
+		MY.Talk(nChannel, '------------------------')
+		local hList      = frame:Lookup('Wnd_Main', 'Handle_List')
+		local szUnit     = (' ' .. hList.szUnit) or ''
+		local nTimeCount = hList.nTimeCount or 0
+		local aResult = {} -- ÊÕ¼¯Êý¾Ý
+		local nMaxNameLen = 0
+		for i = 0, min(hList:GetItemCount(), nLimit) - 1 do
+			local hItem = hList:Lookup(i)
+			table.insert(aResult, hItem.data)
+			nMaxNameLen = math.max(nMaxNameLen, wstring.len(hItem.data.szName))
+		end
+		if not MY_Recount.bShowPerSec then
+			nTimeCount = 1
+			szUnit = ""
+		end
+		-- ·¢²¼Êý¾Ý
+		for i, p in ipairs(aResult) do
+			local szText = string.format('%02d', i) .. '.[' .. p.szName .. ']'
+			for i = wstring.len(p.szName), nMaxNameLen - 1 do
+				szText = szText .. g_tStrings.STR_ONE_CHINESE_SPACE
+			end
+			if MY_Recount.nPublishMode == PUBLISH_MODE.BOTH then
+				szText = szText .. _L('%7d%s(Effect) %7d%s(Total)',
+					p.nEffectValue / nTimeCount, szUnit,
+					p.nValue / nTimeCount, szUnit
+				)
+			elseif MY_Recount.nPublishMode == PUBLISH_MODE.EFFECT then
+				szText = szText .. _L('%7d%s(Effect)',
+					p.nEffectValue / nTimeCount, szUnit
+				)
+			elseif MY_Recount.nPublishMode == PUBLISH_MODE.TOTAL then
+				szText = szText .. _L('%7d%s(Total)',
+					p.nValue / nTimeCount, szUnit
+				)
+			end
+
+			MY.Talk(nChannel, szText, nil, p.id == p.szName)
+		end
+
+		MY.Talk(nChannel, '------------------------')
+	end
 	for nChannel, szChannel in pairs({
 		[PLAYER_TALK_CHANNEL.RAID] = 'MSG_TEAM',
 		[PLAYER_TALK_CHANNEL.TEAM] = 'MSG_PARTY',
 		[PLAYER_TALK_CHANNEL.TONG] = 'MSG_GUILD',
 	}) do
-		table.insert(t, {
+		local t1 = {
 			szOption = g_tStrings.tChannelName[szChannel],
-			rgb = GetMsgFontColor(szChannel, true),
+			bCheck = true, -- ²»ÉèÖÃ³É¿ÉÑ¡¿ò²»ÄÜµã¨q¡É¨r(¦á¦ä¦á£©¨q¡É¨rÀ¬»ø
 			fnAction = function()
-				local frame = Station.Lookup('Normal/MY_Recount')
-				if not frame then
-					return
-				end
-				MY.Talk(
-					nChannel,
-					'[' .. _L['mingyi plugin'] .. ']' ..
-					_L['fight recount'] .. ' - ' ..
-					frame:Lookup('Wnd_Title', 'Text_Title'):GetText() ..
-					((DataDisplay.szBossName and ' - ' .. DataDisplay.szBossName) or ''),
-					nil,
-					true
-				)
-				MY.Talk(nChannel, '------------------------')
-				local hList      = frame:Lookup('Wnd_Main', 'Handle_List')
-				local szUnit     = (' ' .. hList.szUnit) or ''
-				local nTimeCount = hList.nTimeCount or 0
-				local aResult = {} -- ÊÕ¼¯Êý¾Ý
-				local nMaxNameLen = 0
-				for i = 0, MY_Recount.nPublishLimit do
-					local hItem = hList:Lookup(i)
-					if not hItem then
-						break
-					end
-					table.insert(aResult, hItem.data)
-					nMaxNameLen = math.max(nMaxNameLen, wstring.len(hItem.data.szName))
-				end
-				if not MY_Recount.bShowPerSec then
-					nTimeCount = 1
-					szUnit = ""
-				end
-				-- ·¢²¼Êý¾Ý
-				for i, p in ipairs(aResult) do
-					local szText = string.format('%02d', i) .. '.[' .. p.szName .. ']'
-					for i = wstring.len(p.szName), nMaxNameLen - 1 do
-						szText = szText .. g_tStrings.STR_ONE_CHINESE_SPACE
-					end
-					if MY_Recount.nPublishMode == PUBLISH_MODE.BOTH then
-						szText = szText .. _L('%7d%s(Effect) %7d%s(Total)',
-							p.nEffectValue / nTimeCount, szUnit,
-							p.nValue / nTimeCount, szUnit
-						)
-					elseif MY_Recount.nPublishMode == PUBLISH_MODE.EFFECT then
-						szText = szText .. _L('%7d%s(Effect)',
-							p.nEffectValue / nTimeCount, szUnit
-						)
-					elseif MY_Recount.nPublishMode == PUBLISH_MODE.TOTAL then
-						szText = szText .. _L('%7d%s(Total)',
-							p.nValue / nTimeCount, szUnit
-						)
-					end
-
-					MY.Talk(nChannel, szText, nil, p.id == p.szName)
-				end
-
-				MY.Talk(nChannel, '------------------------')
-			end
-		})
+				Publish(nChannel, huge)
+				Wnd.CloseWindow("PopupMenuPanel")
+			end,
+			rgb = GetMsgFontColor(szChannel, true),
+		}
+		for _, nLimit in ipairs({1, 2, 3, 4, 5, 8, 10, 15, 20, 30, 50, 100}) do
+			insert(t1, {
+				szOption = _L('top %d', nLimit),
+				fnAction = function() Publish(nChannel, nLimit) end,
+			})
+		end
+		table.insert(t, t1)
 	end
 
 	return t
@@ -1375,10 +1366,11 @@ function MY_Recount.GetDetailMenu(frame)
 		local bDetail = frame:Lookup("", "Handle_Spliter"):IsVisible()
 		MY.Talk(
 			nChannel,
-			'[' .. _L['mingyi plugin'] .. ']' ..
-			_L['fight recount'] .. ' - ' ..
-			frame:Lookup('', 'Text_Default'):GetText() ..
-			((DataDisplay.szBossName and ' - ' .. DataDisplay.szBossName) or ''),
+			'[' .. _L['mingyi plugin'] .. ']'
+			.. _L['fight recount'] .. ' - '
+			.. frame:Lookup('', 'Text_Default'):GetText()
+			.. ' ' .. ((DataDisplay.szBossName and ' - ' .. DataDisplay.szBossName) or '')
+			.. '(' .. MY.FormatTimeCount('M:ss', DataDisplay.nTimeDuring) .. ')',
 			nil,
 			true
 		)
@@ -1430,8 +1422,12 @@ function MY_Recount.GetDetailMenu(frame)
 	}) do
 		local t1 = {
 			szOption = g_tStrings.tChannelName[szChannel],
+			bCheck = true, -- ²»ÉèÖÃ³É¿ÉÑ¡¿ò²»ÄÜµã¨q¡É¨r(¦á¦ä¦á£©¨q¡É¨rÀ¬»ø
+			fnAction = function()
+				Publish(nChannel, huge)
+				Wnd.CloseWindow("PopupMenuPanel")
+			end,
 			rgb = GetMsgFontColor(szChannel, true),
-			fnAction = function() Publish(nChannel, huge) end,
 		}
 		for _, nLimit in ipairs({1, 2, 3, 4, 5, 8, 10, 15, 20, 30, 50, 100}) do
 			insert(t1, {
