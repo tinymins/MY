@@ -104,10 +104,11 @@ function TS.OnFrameBreathe()
 	local p = GetNpc(this.dwTargetID)
 	if p then
 		ApplyCharacterThreatRankList(this.dwTargetID)
-		local bIsPrepare, dwSkillID, dwSkillLevel, per = p.GetSkillPrepareState()
-		if bIsPrepare then
+		local nType, dwSkillID, dwSkillLevel, fCastPercent = p.GetSkillOTActionState()
+		if nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
+		or nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL then
 			this.CastBar:Show()
-			this.CastBar:SetPercentage(per)
+			this.CastBar:SetPercentage(fCastPercent)
 			local szName = MY.GetSkillName(dwSkillID, dwSkillLevel)
 			this.txt:SetText(szName)
 		else
