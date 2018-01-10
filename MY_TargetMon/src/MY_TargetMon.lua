@@ -1008,6 +1008,7 @@ function PS.OnPanelActive(wnd)
 			local importCount = 0
 			local replaceCount = 0
 			for _, config in ipairs(configs) do
+				D.FormatConfigStructure(config)
 				for i, cfg in ipairs_r(Config) do
 					if cfg.caption == config.caption then
 						D.CloseFrame(cfg)
