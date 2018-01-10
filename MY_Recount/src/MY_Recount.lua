@@ -865,7 +865,7 @@ MY_Recount.OnItemRefreshTip = function()
 		end
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
-		local tRec = DataDisplay[SZ_CHANNEL_KEY[MY_Recount.nChannel]][id]
+		local tRec = DataDisplay[SZ_CHANNEL_KEY[MY_Recount.nChannel]].Statistics[id]
 		if tRec then
 			local szXml = ''
 			local szColon = g_tStrings.STR_COLON
