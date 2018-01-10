@@ -294,11 +294,11 @@ local l_tBuffTime = setmetatable({}, { __mode = "v" })
 local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCount, targetChanged, dwOwnerID)
 	if config.type == 'BUFF' and buff then
 		-- 加入同名BUFF列表
-		if not hItem.mon.ids[buff.dwID] or not hItem.mon.ids[buff.dwID][buff.nLevel] then
+		if not hItem.mon.ids[buff.dwID] or not hItem.mon.ids[buff.dwID].levels[buff.nLevel] then
 			if not hItem.mon.ids[buff.dwID] then
 				hItem.mon.ids[buff.dwID] = D.GeneMonItemData(buff.nLevel, Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13)
-			elseif not hItem.mon.ids[buff.dwID][buff.nLevel] then
-				hItem.mon.ids[buff.dwID][buff.nLevel] = MY_TargetMon.FormatMonItemLevelStructure({
+			elseif not hItem.mon.ids[buff.dwID].levels[buff.nLevel] then
+				hItem.mon.ids[buff.dwID].levels[buff.nLevel] = MY_TargetMon.FormatMonItemLevelStructure({
 					iconid = Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13,
 				})
 			end
@@ -328,14 +328,14 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 			end
 			hItem.mon.ids[buff.dwID].iconid = Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13
 		end
-		if hItem.mon.ids[buff.dwID][buff.nLevel].iconid == 13 then
-			hItem.mon.ids[buff.dwID][buff.nLevel].iconid = Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13
+		if hItem.mon.ids[buff.dwID].levels[buff.nLevel].iconid == 13 then
+			hItem.mon.ids[buff.dwID].levels[buff.nLevel].iconid = Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13
 		end
 		-- 刷新BUFF图标
 		local iconid
 		if not hItem.mon.ignoreId then
 			if not hItem.mon.ids[buff.dwID].ignoreLevel then
-				iconid = hItem.mon.ids[buff.dwID][buff.nLevel].iconid
+				iconid = hItem.mon.ids[buff.dwID].levels[buff.nLevel].iconid
 			end
 			if not iconid or iconid == 13 then
 				iconid = hItem.mon.ids[buff.dwID].iconid
