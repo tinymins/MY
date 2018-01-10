@@ -164,6 +164,10 @@ function D.FormatMonItemStructure(config)
 	return MY.FormatDataStructure(config, ConfigTemplate.monitors.__CHILD_TEMPLATE__.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__, true)
 end
 
+function D.FormatMonItemLevelStructure(config)
+	return MY.FormatDataStructure(config, ConfigTemplate.monitors.__CHILD_TEMPLATE__.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__.levels.__CHILD_TEMPLATE__, true)
+end
+
 function D.LoadConfig(bDefault, bOriginal)
 	D.CloseFrame('all')
 	Config = not bDefault
@@ -724,6 +728,12 @@ function PS.OnPanelActive(wnd)
 						GetUserInput(_L['Please input name:'], function(szVal)
 							szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
 							if szVal ~= "" then
+								local list = monlist == l_config.monitors.common and listCommon or listKungfu
+								list:listbox(
+									'update',
+									'id', mon,
+									{ "text" }, { szVal }
+								)
 								mon.name = szVal
 								D.CheckFrame(l_config)
 							end
@@ -1078,9 +1088,10 @@ MY.RegisterPanel("MY_TargetMon", _L["Target monitor"], _L['Target'], "ui/Image/C
 
 
 local ui = {
-	GetFrameData          = D.GetFrameData,
-	FormatConfigStructure = D.FormatConfigStructure,
-	FormatMonStructure    = D.FormatMonStructure,
-	FormatMonItemStructure  = D.FormatMonItemStructure,
+	GetFrameData                 = D.GetFrameData,
+	FormatConfigStructure        = D.FormatConfigStructure,
+	FormatMonStructure           = D.FormatMonStructure,
+	FormatMonItemStructure       = D.FormatMonItemStructure,
+	FormatMonItemLevelStructure  = D.FormatMonItemLevelStructure,
 }
 MY_TargetMon = setmetatable({}, { __index = ui, __newindex = function() end, __metatable = true })

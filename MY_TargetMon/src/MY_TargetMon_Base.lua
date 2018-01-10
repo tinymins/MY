@@ -68,8 +68,8 @@ local function ReloadFrame(frame)
 	end
 	local hTotal, hList = frame.hTotal, frame.hList
 
-	hList:Clear()
 	frame.tItem = {}
+	hList:Clear()
 	local nItemW, nItemH, nWidth, nHeight, nCount = 0, 0, 0, 0, 0
 	local function CreateItem(mon)
 		if not mon.enable then
@@ -93,12 +93,27 @@ local function ReloadFrame(frame)
 		hItem.imgProcess   = imgProcess
 		hItem.txtName      = txtName
 		hItem.txtShortName = txtShortName
-		if mon.id and mon.id ~= 'common' then
-			if not frame.tItem[mon.id] then
-				frame.tItem[mon.id] = {}
+		for dwID, info in pairs(mon.ids) do
+			if info.enable or mon.ignoreId then
+				if not frame.tItem[dwID] then
+					frame.tItem[dwID] = {}
+				end
+				if not mon.ignoreId and not info.ignoreLevel then
+					for nLevel, levelInfo in pairs(info.levels) do
+						if not frame.tItem[dwID][nLevel] then
+							frame.tItem[dwID][nLevel] = {}
+						end
+						frame.tItem[dwID][nLevel][hItem] = true
+					end
+				else
+					if not frame.tItem[dwID]['all'] then
+						frame.tItem[dwID]['all'] = {}
+					end
+					frame.tItem[dwID]['all'][hItem] = true
+				end
 			end
-			frame.tItem[mon.id][hItem] = true
-		elseif mon.name then
+		end
+		if mon.name then
 			if not frame.tItem[mon.name] then
 				frame.tItem[mon.name] = {}
 			end
@@ -278,88 +293,120 @@ local needFormatItemPos
 local l_tBuffTime = setmetatable({}, { __mode = "v" })
 local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCount, targetChanged, dwOwnerID)
 	if config.type == 'BUFF' and buff then
-		if not hItem.mon.id or hItem.mon.id == 'common' or hItem.mon.id == buff.dwID then
-			if hItem.nRenderFrame == nFrameCount then
-				return
-			end
-			if config.hideVoid and not hItem:IsVisible() then
-				needFormatItemPos = true
-				hItem:Show()
-			end
-			-- 计算BUFF时间
-			local nTimeLeft = math.max(0, buff.nEndFrame - nFrameCount) / 16
-			local szTimeLeft = nTimeLeft > 3600 and '1h+' or ((config.decimalTime == -1 or nTimeLeft < config.decimalTime) and "%.1f'" or "%d'"):format(nTimeLeft)
-			local nBuffTime = math.max(GetBuffTime(buff.dwID, buff.nLevel) / 16, nTimeLeft)
-			if not l_tBuffTime[KTarget.dwID][buff.dwID] then
-				l_tBuffTime[KTarget.dwID][buff.dwID] = {}
-			end
-			if not l_tBuffTime[KTarget.dwID][buff.dwID][buff.nLevel] then
-				l_tBuffTime[KTarget.dwID][buff.dwID][buff.nLevel] = {}
-			end
-			if l_tBuffTime[KTarget.dwID][buff.dwID][buff.nLevel][buff.nStackNum] then
-				nBuffTime = math.max(l_tBuffTime[KTarget.dwID][buff.dwID][buff.nLevel][buff.nStackNum])
-			end
-			l_tBuffTime[KTarget.dwID][buff.dwID][buff.nLevel][buff.nStackNum] = nBuffTime
-			-- 处理新出现的BUFF
-			if hItem.mon.iconid == 13 then
-				-- 计算图标 名字 ID等
-				if not hItem.mon.name then
-					hItem.mon.name = szName
-					hItem.txtName:SetText(hItem.mon.longAlias or szName)
-					hItem.txtShortName:SetText(hItem.mon.shortAlias or szName)
-				end
-				hItem.mon.iconid = Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13
-				hItem.box:SetObjectIcon(hItem.mon.iconid)
-			end
-			-- 倒计时 与 BUFF层数堆叠
-			hItem.txtProcess:SetText(szTimeLeft)
-			hItem.box:SetOverText(1, szTimeLeft)
-			hItem.box:SetOverText(0, buff.nStackNum == 1 and "" or buff.nStackNum)
-			-- CD百分比
-			local fPercent = nTimeLeft / nBuffTime
-			hItem.imgProcess:SetPercentage(fPercent)
-			if config.cdFlash then
-				if fPercent < 0.5 and fPercent > 0.3 then
-					if hItem.fPercent ~= 0.5 then
-						hItem.fPercent = 0.5
-						hItem.box:SetObjectStaring(true)
-					end
-				elseif fPercent < 0.3 and fPercent > 0.1 then
-					if hItem.fPercent ~= 0.3 then
-						hItem.fPercent = 0.3
-						hItem.box:SetExtentAnimate("ui\\Image\\Common\\Box.UITex", 17)
-					end
-				elseif fPercent < 0.1 then
-					if hItem.fPercent ~= 0.1 then
-						hItem.fPercent = 0.1
-						hItem.box:SetExtentAnimate("ui\\Image\\Common\\Box.UITex", 20)
-					end
-				else
-					hItem.box:SetObjectStaring(false)
-					hItem.box:ClearExtentAnimate()
-				end
-			end
-			if config.cdCircle then
-				hItem.box:SetCoolDownPercentage(fPercent)
-			else
-				if hItem.box.__SetObjectCoolDown then
-					hItem.box:__SetObjectCoolDown(false)
-					hItem.box:__SetCoolDownPercentage(1)
-				else
-					hItem.box:SetObjectCoolDown(false)
-					hItem.box:SetCoolDownPercentage(1)
-				end
-			end
-			-- 缓存数据更新
-			hItem.dwID = buff.dwID
-			hItem.nLevel = buff.nLevel
-			hItem.nTimeLeft = nTimeLeft
-			hItem.nRenderFrame = nFrameCount
-		end
 		-- 加入同名BUFF列表
-		if not hItem.mon.ids[buff.dwID] then
-			hItem.mon.ids[buff.dwID] = D.GeneMonItemData(buff.nLevel, Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13)
+		if not hItem.mon.ids[buff.dwID] or not hItem.mon.ids[buff.dwID][buff.nLevel] then
+			if not hItem.mon.ids[buff.dwID] then
+				hItem.mon.ids[buff.dwID] = D.GeneMonItemData(buff.nLevel, Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13)
+			elseif not hItem.mon.ids[buff.dwID][buff.nLevel] then
+				hItem.mon.ids[buff.dwID][buff.nLevel] = MY_TargetMon.FormatMonItemLevelStructure({
+					iconid = Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13,
+				})
+			end
+			local id = buff.dwID
+			local level = (hItem.mon.ignoreId or hItem.mon.ids[id].ignoreLevel) and "all" or buff.nLevel
+			if not tItem[id] then
+				tItem[id] = {}
+			end
+			if not tItem[id][level] then
+				tItem[id][level] = {}
+			end
+			tItem[id][level][hItem] = true
 		end
+		if hItem.nRenderFrame == nFrameCount then
+			return
+		end
+		-- 处理新出现的BUFF
+		if hItem.mon.iconid == 13 then
+			hItem.mon.iconid = Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13
+		end
+		if hItem.mon.ids[buff.dwID].iconid == 13 then
+			-- 计算图标 名字 ID等
+			if tonumber(hItem.mon.name) == buff.dwID then
+				hItem.mon.name = szName
+				hItem.txtName:SetText(hItem.mon.longAlias or szName)
+				hItem.txtShortName:SetText(hItem.mon.shortAlias or szName)
+			end
+			hItem.mon.ids[buff.dwID].iconid = Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13
+		end
+		if hItem.mon.ids[buff.dwID][buff.nLevel].iconid == 13 then
+			hItem.mon.ids[buff.dwID][buff.nLevel].iconid = Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13
+		end
+		-- 刷新BUFF图标
+		local iconid
+		if not hItem.mon.ignoreId then
+			if not hItem.mon.ids[buff.dwID].ignoreLevel then
+				iconid = hItem.mon.ids[buff.dwID][buff.nLevel].iconid
+			end
+			if not iconid or iconid == 13 then
+				iconid = hItem.mon.ids[buff.dwID].iconid
+			end
+		end
+		if not iconid or iconid == 13 then
+			iconid = hItem.mon.iconid or 13
+		end
+		hItem.box:SetObjectIcon(iconid)
+		-- 计算BUFF时间
+		local nTimeLeft = math.max(0, buff.nEndFrame - nFrameCount) / 16
+		local szTimeLeft = nTimeLeft > 3600 and '1h+' or ((config.decimalTime == -1 or nTimeLeft < config.decimalTime) and "%.1f'" or "%d'"):format(nTimeLeft)
+		local nBuffTime = math.max(GetBuffTime(buff.dwID, buff.nLevel) / 16, nTimeLeft)
+		if not l_tBuffTime[KTarget.dwID][buff.dwID] then
+			l_tBuffTime[KTarget.dwID][buff.dwID] = {}
+		end
+		if not l_tBuffTime[KTarget.dwID][buff.dwID][buff.nLevel] then
+			l_tBuffTime[KTarget.dwID][buff.dwID][buff.nLevel] = {}
+		end
+		if l_tBuffTime[KTarget.dwID][buff.dwID][buff.nLevel][buff.nStackNum] then
+			nBuffTime = math.max(l_tBuffTime[KTarget.dwID][buff.dwID][buff.nLevel][buff.nStackNum])
+		end
+		l_tBuffTime[KTarget.dwID][buff.dwID][buff.nLevel][buff.nStackNum] = nBuffTime
+		-- 倒计时 与 BUFF层数堆叠
+		hItem.txtProcess:SetText(szTimeLeft)
+		hItem.box:SetOverText(1, szTimeLeft)
+		hItem.box:SetOverText(0, buff.nStackNum == 1 and "" or buff.nStackNum)
+		-- CD百分比
+		local fPercent = nTimeLeft / nBuffTime
+		hItem.imgProcess:SetPercentage(fPercent)
+		if config.cdFlash then
+			if fPercent < 0.5 and fPercent > 0.3 then
+				if hItem.fPercent ~= 0.5 then
+					hItem.fPercent = 0.5
+					hItem.box:SetObjectStaring(true)
+				end
+			elseif fPercent < 0.3 and fPercent > 0.1 then
+				if hItem.fPercent ~= 0.3 then
+					hItem.fPercent = 0.3
+					hItem.box:SetExtentAnimate("ui\\Image\\Common\\Box.UITex", 17)
+				end
+			elseif fPercent < 0.1 then
+				if hItem.fPercent ~= 0.1 then
+					hItem.fPercent = 0.1
+					hItem.box:SetExtentAnimate("ui\\Image\\Common\\Box.UITex", 20)
+				end
+			else
+				hItem.box:SetObjectStaring(false)
+				hItem.box:ClearExtentAnimate()
+			end
+		end
+		if config.cdCircle then
+			hItem.box:SetCoolDownPercentage(fPercent)
+		else
+			if hItem.box.__SetObjectCoolDown then
+				hItem.box:__SetObjectCoolDown(false)
+				hItem.box:__SetCoolDownPercentage(1)
+			else
+				hItem.box:SetObjectCoolDown(false)
+				hItem.box:SetCoolDownPercentage(1)
+			end
+		end
+		if config.hideVoid and not hItem:IsVisible() then
+			needFormatItemPos = true
+			hItem:Show()
+		end
+		-- 缓存数据更新
+		hItem.dwID = buff.dwID
+		hItem.nLevel = buff.nLevel
+		hItem.nTimeLeft = nTimeLeft
+		hItem.nRenderFrame = nFrameCount
 	elseif config.type == 'SKILL' and buff and szName then
 		if config.hideVoid and not hItem:IsVisible() then
 			needFormatItemPos = true
@@ -479,13 +526,19 @@ function MY_TargetMon_Base.OnFrameBreathe()
 			for _, buff in ipairs(MY.GetBuffList(KTarget)) do
 				if not config.hideOthers or buff.dwSkillSrcID == dwClientPlayerID or buff.dwSkillSrcID == dwControlPlayerID then
 					local szName = Table_GetBuffName(buff.dwID, buff.nLevel) or ""
-					local tItems = this.tItem[buff.dwID]
+					local tItems = this.tItem[szName]
 					if tItems then
 						for hItem, _ in pairs(tItems) do
 							UpdateItem(hItem, KTarget, buff, szName, this.tItem, config, nFrameCount, targetChanged)
 						end
 					end
-					local tItems = this.tItem[szName]
+					local tItems = this.tItem[buff.dwID] and this.tItem[buff.dwID]["all"]
+					if tItems then
+						for hItem, _ in pairs(tItems) do
+							UpdateItem(hItem, KTarget, buff, szName, this.tItem, config, nFrameCount, targetChanged)
+						end
+					end
+					local tItems = this.tItem[buff.dwID] and this.tItem[buff.dwID][buff.nLevel]
 					if tItems then
 						for hItem, _ in pairs(tItems) do
 							UpdateItem(hItem, KTarget, buff, szName, this.tItem, config, nFrameCount, targetChanged)
@@ -593,29 +646,29 @@ end
 MY_TargetMon_Base.OnItemRButtonUp = MY_TargetMon_Base.OnItemLButtonUp
 
 do
-local function OnSkill(this, dwID, dwLevel)
-	local tItems = this.tItem[dwID]
-	if tItems then
-		for hItem, _ in pairs(tItems) do
-			if not hItem.mon.ids[dwID] then
-				if not hItem.mon.iconid or hItem.mon.iconid == 13 then
-					hItem.mon.iconid = Table_GetSkillIconID(dwID, dwLevel)
-				end
-				hItem.mon.ids[dwID] = D.GeneMonItemData(dwLevel, Table_GetSkillIconID(dwID, dwLevel))
+local function OnSkillItem(tItems, dwID, dwLevel)
+	for hItem, _ in pairs(tItems) do
+		if not hItem.mon.ids[dwID] then
+			if not hItem.mon.iconid or hItem.mon.iconid == 13 then
+				hItem.mon.iconid = Table_GetSkillIconID(dwID, dwLevel)
 			end
+			hItem.mon.ids[dwID] = D.GeneMonItemData(dwLevel, Table_GetSkillIconID(dwID, dwLevel))
 		end
 	end
+end
+local function OnSkill(this, dwID, dwLevel)
 	local szName = Table_GetSkillName(dwID, dwLevel)
 	local tItems = this.tItem[szName]
 	if tItems then
-		for hItem, _ in pairs(tItems) do
-			if not hItem.mon.ids[dwID] then
-				if not hItem.mon.iconid or hItem.mon.iconid == 13 then
-					hItem.mon.iconid = Table_GetSkillIconID(dwID, dwLevel)
-				end
-				hItem.mon.ids[dwID] = D.GeneMonItemData(dwLevel, Table_GetSkillIconID(dwID, dwLevel))
-			end
-		end
+		OnSkillItem(tItems, dwID, dwLevel)
+	end
+	local tItems = this.tItem[dwID] and this.tItem[dwID]["all"]
+	if tItems then
+		OnSkillItem(tItems, dwID, dwLevel)
+	end
+	local tItems = this.tItem[dwID] and this.tItem[dwID][dwLevel]
+	if tItems then
+		OnSkillItem(tItems, dwID, dwLevel)
 	end
 end
 
