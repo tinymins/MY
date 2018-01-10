@@ -1392,7 +1392,7 @@ function MY_Recount.GetDetailMenu(frame)
 				D.InsertFromText(aTabTalk, hList:Lookup(i))
 			end
 		end
-		MY.TabTalk(nChannel, aTabTalk)
+		MY.TabTalk(nChannel, aTabTalk, {"L", "L", "R", "R", "R"})
 		MY.Talk(nChannel, '------------------------------')
 
 		if bDetail then
@@ -1402,7 +1402,7 @@ function MY_Recount.GetDetailMenu(frame)
 			for i = 0, hList:GetItemCount() - 1 do
 				D.InsertFromText(aTabTalk, hList:Lookup(i))
 			end
-			MY.TabTalk(nChannel, aTabTalk)
+			MY.TabTalk(nChannel, aTabTalk, {"L", "L", "R", "R", "R", "R", "R"})
 			MY.Talk(nChannel, '------------------------------')
 
 			local aTabTalk = {}
@@ -1411,7 +1411,7 @@ function MY_Recount.GetDetailMenu(frame)
 			for i = 0, min(hList:GetItemCount(), nLimit) - 1 do
 				D.InsertFromText(aTabTalk, hList:Lookup(i))
 			end
-			MY.TabTalk(nChannel, aTabTalk)
+			MY.TabTalk(nChannel, aTabTalk, {"L", "L", "R", "R", "R", "R", "R", "R"})
 			MY.Talk(nChannel, '------------------------------')
 		end
 	end
