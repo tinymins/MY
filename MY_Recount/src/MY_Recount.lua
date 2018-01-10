@@ -3,6 +3,22 @@
 -- by 茗伊 @ 双梦镇 @ 荻花宫
 -- Build 20140730
 --
+----------------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local insert, remove, concat, unpack = table.insert, table.remove, table.concat, table.unpack
+local sub, len, char, rep = string.sub, string.len, string.char, string.rep
+local byte, format, gsub = string.byte, string.format, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local floor, min, max, ceil = math.floor, math.min, math.max, math.ceil
+local huge, pi, sin, cos, tan = math.huge, math.pi, math.sin, math.cos, math.tan
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+----------------------------------------------------------------------------------------------
 local CHANNEL = { -- 统计类型
 	DPS  = 1, -- 输出统计
 	HPS  = 2, -- 治疗统计
@@ -171,6 +187,8 @@ RegisterCustomData("MY_Recount.nPublishMode")
 RegisterCustomData("MY_Recount.nDrawInterval")
 RegisterCustomData("MY_Recount.bShowNodataTeammate")
 RegisterCustomData("MY_Recount.anchor")
+
+local D, MY_Recount = {}, MY_Recount
 
 local m_frame
 MY_Recount.Open = function()
@@ -779,6 +797,8 @@ _C.OnDetailLButtonClick = function()
 		this:GetRoot().szSelectedSkill  = nil
 		this:GetRoot().szSelectedTarget = nil
 		this:GetRoot().nLastRedrawFrame = 0
+	elseif name == 'Btn_Issuance' then
+		PopupMenu(MY_Recount.GetDetailMenu(this:GetRoot()))
 	end
 end
 _C.OnDetailItemLButtonDown = function()
@@ -1333,6 +1353,93 @@ MY_Recount.GetPublishMenu = function()
 				MY.Talk(nChannel, '------------------------')
 			end
 		})
+	end
+
+	return t
+end
+
+function D.InsertFromText(aTabTalk, h)
+	local aText = {}
+	for i = 0, h:GetItemCount() - 1 do
+		local p = h:Lookup(i)
+		if p:GetType() == "Text" then
+			table.insert(aText, p:GetText())
+		end
+	end
+	table.insert(aTabTalk, aText)
+end
+
+function MY_Recount.GetDetailMenu(frame)
+	local t = {}
+	local function Publish(nChannel, nLimit)
+		local bDetail = frame:Lookup("", "Handle_Spliter"):IsVisible()
+		MY.Talk(
+			nChannel,
+			'[' .. _L['mingyi plugin'] .. ']' ..
+			_L['fight recount'] .. ' - ' ..
+			frame:Lookup('', 'Text_Default'):GetText() ..
+			((DataDisplay.szBossName and ' - ' .. DataDisplay.szBossName) or ''),
+			nil,
+			true
+		)
+		MY.Talk(nChannel, '------------------------------')
+
+		local aTabTalk = {}
+		D.InsertFromText(aTabTalk, frame:Lookup('WndScroll_Skill', 'Handle_SkillTitle'))
+		local hList = frame:Lookup('WndScroll_Skill', 'Handle_SkillList')
+		if bDetail then
+			for i = 0, hList:GetItemCount() - 1 do
+				local hItem = hList:Lookup(i)
+				if hItem:Lookup("Shadow_SkillEntry"):IsVisible() then
+					D.InsertFromText(aTabTalk, hItem)
+					break
+				end
+			end
+		else
+			for i = 0, min(hList:GetItemCount(), nLimit) - 1 do
+				D.InsertFromText(aTabTalk, hList:Lookup(i))
+			end
+		end
+		MY.TabTalk(nChannel, aTabTalk)
+		MY.Talk(nChannel, '------------------------------')
+
+		if bDetail then
+			local aTabTalk = {}
+			D.InsertFromText(aTabTalk, frame:Lookup('WndScroll_Detail', 'Handle_DetailTitle'))
+			local hList = frame:Lookup('WndScroll_Detail', 'Handle_DetailList')
+			for i = 0, hList:GetItemCount() - 1 do
+				D.InsertFromText(aTabTalk, hList:Lookup(i))
+			end
+			MY.TabTalk(nChannel, aTabTalk)
+			MY.Talk(nChannel, '------------------------------')
+
+			local aTabTalk = {}
+			D.InsertFromText(aTabTalk, frame:Lookup('WndScroll_Target', 'Handle_TargetTitle'))
+			local hList = frame:Lookup('WndScroll_Target', 'Handle_TargetList')
+			for i = 0, min(hList:GetItemCount(), nLimit) - 1 do
+				D.InsertFromText(aTabTalk, hList:Lookup(i))
+			end
+			MY.TabTalk(nChannel, aTabTalk)
+			MY.Talk(nChannel, '------------------------------')
+		end
+	end
+	for nChannel, szChannel in pairs({
+		[PLAYER_TALK_CHANNEL.RAID] = 'MSG_TEAM',
+		[PLAYER_TALK_CHANNEL.TEAM] = 'MSG_PARTY',
+		[PLAYER_TALK_CHANNEL.TONG] = 'MSG_GUILD',
+	}) do
+		local t1 = {
+			szOption = g_tStrings.tChannelName[szChannel],
+			rgb = GetMsgFontColor(szChannel, true),
+			fnAction = function() Publish(nChannel, huge) end,
+		}
+		for _, nLimit in ipairs({1, 2, 3, 4, 5, 8, 10, 15, 20, 30, 50, 100}) do
+			insert(t1, {
+				szOption = _L('top %d', nLimit),
+				fnAction = function() Publish(nChannel, nLimit) end,
+			})
+		end
+		table.insert(t, t1)
 	end
 
 	return t
