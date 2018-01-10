@@ -306,7 +306,7 @@ MY_Anmerkungen.SetPlayerNote = function(dwID, szName, szContent, bTipWhenGroup, 
 		MY_Anmerkungen.tPublicPlayerNotes[szName] = dwID
 	end
 	if _C.list then
-		_C.list:listbox('update', _L('[%s] %s', t.szName, t.szContent), dwID, t)
+		_C.list:listbox('update', 'id', dwID, {"text", "data"}, { _L('[%s] %s', t.szName, t.szContent), t })
 	end
 	MY_Anmerkungen.SaveConfig()
 end

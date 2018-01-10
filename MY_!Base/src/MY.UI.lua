@@ -1600,16 +1600,22 @@ function XGUI:listbox(method, arg1, arg2, arg3, arg4)
 				end
 			end
 		elseif method == 'update' then
-			local text, id, data = arg1, arg2, arg3
+			local mode, search, argk, argv = arg1, arg2, arg3, arg4
 			for _, raw in ipairs(self.raws) do
 				if GetComponentType(raw) == 'WndListBox' then
 					local hList = raw:Lookup('', 'Handle_Scroll')
 					for i = hList:GetItemCount() - 1, 0, -1 do
 						local hItem = hList:Lookup(i)
 						local data = GetComponentProp(hItem, 'listboxItemData')
-						if id and data.id == id then
-							data.data = data
-							hItem:Lookup('Text_Default'):SetText(text)
+						if (mode == 'id' and data.id == search)
+						or (mode == 'text' and data.text == search) then
+							for i, k in ipairs(argk) do
+								if k == "data" then
+									data.data = argv[i]
+								elseif k == "text" then
+									hItem:Lookup('Text_Default'):SetText(argv[i])
+								end
+							end
 						end
 					end
 				end
