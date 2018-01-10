@@ -831,6 +831,9 @@ MY_Recount.OnItemLButtonClick = function()
 			frm.OnFrameBreathe = _C.OnDetailFrameBreathe
 			frm.OnItemLButtonDown = _C.OnDetailItemLButtonDown
 			frm:Lookup('', 'Text_Default'):SetText(MY_Recount.Data.GetNameAusID(id, DataDisplay) .. ' ' .. SZ_CHANNEL[MY_Recount.nChannel])
+			frm:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_5'):SetText(g_tStrings.STR_HIT_NAME)
+			frm:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_6'):SetText(g_tStrings.STR_CS_NAME)
+			frm:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_7'):SetText(g_tStrings.STR_MSG_MISS)
 			MY.RegisterEsc(frm:GetTreePath(), function()
 				if Station.Lookup('Normal/MY_Recount_' .. id .. '_' .. szChannel) then
 					return true
