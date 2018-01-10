@@ -287,7 +287,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig, Add)
 		onclick = function()
 			for i, c in ipairs_r(Config) do
 				if config == c then
-					table.remove(Config, i)
+					remove(Config, i)
 				end
 			end
 			D.CloseFrame(config)
@@ -326,7 +326,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig, Add)
 			local dwKungFuID = GetClientPlayer().GetKungfuMount().dwSkillID
 			local t = {}
 			for _, eType in ipairs(TARGET_TYPE_LIST) do
-				table.insert(t, {
+				insert(t, {
 					szOption = _L.TARGET[eType],
 					bCheck = true, bMCheck = true,
 					bChecked = eType == (config.type == "SKILL" and "CONTROL_PLAYER" or config.target),
@@ -339,9 +339,9 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig, Add)
 					end,
 				})
 			end
-			table.insert(t, { bDevide = true })
+			insert(t, { bDevide = true })
 			for _, eType in ipairs({'BUFF', 'SKILL'}) do
-				table.insert(t, {
+				insert(t, {
 					szOption = _L.TYPE[eType],
 					bCheck = true, bMCheck = true, bChecked = eType == config.type,
 					fnAction = function()
@@ -350,9 +350,9 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig, Add)
 					end,
 				})
 			end
-			table.insert(t, { bDevide = true })
+			insert(t, { bDevide = true })
 			for _, eType in ipairs({'LEFT', 'RIGHT', 'CENTER'}) do
-				table.insert(t, {
+				insert(t, {
 					szOption = _L.ALIGNMENT[eType],
 					bCheck = true, bMCheck = true, bChecked = eType == config.alignment,
 					fnAction = function()
@@ -525,7 +525,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig, Add)
 				if text == config.boxBgUITex then
 					subt.rgb = {255, 255, 0}
 				end
-				table.insert(t, subt)
+				insert(t, subt)
 			end
 			return t
 		end,
@@ -551,7 +551,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig, Add)
 				if text == config.cdBarUITex then
 					subt.rgb = {255, 255, 0}
 				end
-				table.insert(t, subt)
+				insert(t, subt)
 			end
 			return t
 		end,
@@ -627,7 +627,7 @@ function PS.OnPanelActive(wnd)
 					if not index then
 						index = #aMonList + 1
 					end
-					table.insert(aMonList, index, mon)
+					insert(aMonList, index, mon)
 					local list = kungfuid == 'common' and listCommon or listKungfu
 					list:listbox(
 						'insert',
@@ -666,7 +666,7 @@ function PS.OnPanelActive(wnd)
 						list:listbox('delete', 'id', mon)
 						for i, m in ipairs_r(monlist) do
 							if m == mon then
-								table.remove(monlist, i)
+								remove(monlist, i)
 							end
 						end
 						Wnd.CloseWindow("PopupMenuPanel")
@@ -740,30 +740,6 @@ function PS.OnPanelActive(wnd)
 						end, function() end, function() end, nil, mon.name)
 					end,
 				},
-				{
-					szOption = _L['Manual add id'],
-					fnAction = function()
-						GetUserInput(_L['Please input id:'], function(szVal)
-							local nVal = tonumber(string.gsub(szVal, "^%s*(.-)%s*$", "%1"), 10)
-							if nVal then
-								for id, _ in pairs(mon.ids) do
-									if id == nVal then
-										return
-									end
-								end
-								local dwIconID = 13
-								if l_config.type == "SKILL" then
-									local dwLevel = GetClientPlayer().GetSkillLevel(nVal) or 1
-									dwIconID = Table_GetSkillIconID(nVal, dwLevel) or dwIconID
-								else
-									dwIconID = Table_GetBuffIconID(nVal, 1) or 13
-								end
-								mon.ids[nVal] = { iconid = dwIconID }
-								D.CheckFrame(l_config)
-							end
-						end, function() end, function() end, nil, nil)
-					end,
-				},
 				{ bDevide = true },
 				{
 					szOption = _L('Long alias: %s', mon.longAlias or _L['Not set']),
@@ -787,8 +763,9 @@ function PS.OnPanelActive(wnd)
 				},
 			}
 			if not empty(mon.ids) then
-				table.insert(t1, { bDevide = true })
-				table.insert(t1, {
+				insert(t1, { bDevide = true })
+				insert(t1, { szOption = _L['Ids'], bDisable = true })
+				insert(t1, {
 					szOption = _L['All ids'],
 					bCheck = true,
 					bChecked = mon.ignoreId,
@@ -837,9 +814,9 @@ function PS.OnPanelActive(wnd)
 						end,
 					}
 					if not empty(info.levels) then
-						table.insert(t2, { szOption = _L['Levels'], bDisable = true })
-						table.insert(t2, MENU_DIVIDER)
-						table.insert(t2, {
+						insert(t2, { szOption = _L['Levels'], bDisable = true })
+						insert(t2, MENU_DIVIDER)
+						insert(t2, {
 							szOption = _L['All levels'],
 							bCheck = true,
 							bChecked = info.ignoreLevel,
@@ -863,7 +840,7 @@ function PS.OnPanelActive(wnd)
 							end,
 						})
 						for nLevel, infoLevel in ipairs(info.levels) do
-							table.insert(t2, {
+							insert(t2, {
 								szOption = nLevel,
 								bCheck = true,
 								bChecked = infoLevel.enable,
@@ -888,18 +865,62 @@ function PS.OnPanelActive(wnd)
 								end,
 							})
 						end
-						table.insert(t2, MENU_DIVIDER)
+						insert(t2, MENU_DIVIDER)
 					end
-					table.insert(t2, {
+					insert(t2, {
+						szOption = _L['Manual add level'],
+						fnAction = function()
+							GetUserInput(_L['Please input level:'], function(szVal)
+								local nLevel = tonumber(string.gsub(szVal, "^%s*(.-)%s*$", "%1"), 10)
+								if nLevel then
+									if info.levels[nLevel] then
+										return
+									end
+									local dwIconID = 13
+									if l_config.type == "SKILL" then
+										dwIconID = Table_GetSkillIconID(dwID, nLevel) or dwIconID
+									else
+										dwIconID = Table_GetBuffIconID(dwID, nLevel) or dwIconID
+									end
+									info.levels[nLevel] = D.FormatMonItemLevelStructure({ iconid = dwIconID })
+									D.CheckFrame(l_config)
+								end
+							end, function() end, function() end, nil, nil)
+						end,
+					})
+					insert(t2, {
 						szOption = _L['Delete'],
 						fnAction = function()
 							mon.ids[dwID] = nil
 							D.CheckFrame(l_config)
 						end,
 					})
-					table.insert(t1, t2)
+					insert(t1, t2)
 				end
 			end
+			insert(t1, { bDevide = true })
+			insert(t1, {
+				szOption = _L['Manual add id'],
+				fnAction = function()
+					GetUserInput(_L['Please input id:'], function(szVal)
+						local dwID = tonumber(string.gsub(szVal, "^%s*(.-)%s*$", "%1"), 10)
+						if dwID then
+							if mon.ids[dwID] then
+								return
+							end
+							local dwIconID = 13
+							if l_config.type == "SKILL" then
+								local dwLevel = GetClientPlayer().GetSkillLevel(dwID) or 1
+								dwIconID = Table_GetSkillIconID(dwID, dwLevel) or dwIconID
+							else
+								dwIconID = Table_GetBuffIconID(dwID, 1) or 13
+							end
+							mon.ids[dwID] = D.FormatMonItemStructure({ iconid = dwIconID })
+							D.CheckFrame(l_config)
+						end
+					end, function() end, function() end, nil, nil)
+				end,
+			})
 			return t1
 		end
 		listCommon:listbox('onmenu', onMenu)
@@ -961,7 +982,7 @@ function PS.OnPanelActive(wnd)
 		text = _L["Create"],
 		onclick = function()
 			local config = MY.FormatDataStructure(nil, ConfigTemplate)
-			table.insert(Config, config)
+			insert(Config, config)
 			D.CheckFrame(config)
 			MY.SwitchTab("MY_TargetMon", true)
 		end,
@@ -990,11 +1011,11 @@ function PS.OnPanelActive(wnd)
 				for i, cfg in ipairs_r(Config) do
 					if cfg.caption == config.caption then
 						D.CloseFrame(cfg)
-						table.remove(Config, i)
+						remove(Config, i)
 						replaceCount = replaceCount + 1
 					end
 				end
-				table.insert(Config, config)
+				insert(Config, config)
 				importCount = importCount + 1
 			end
 			D.CheckAllFrame()
@@ -1012,24 +1033,24 @@ function PS.OnPanelActive(wnd)
 			local configs = {}
 			local menu = {}
 			for _, config in ipairs(Config) do
-				table.insert(menu, {
+				insert(menu, {
 					bCheck = true,
 					szOption = config.caption,
 					fnAction = function()
 						for i, cfg in ipairs_r(configs) do
 							if cfg == config then
-								table.remove(configs, i)
+								remove(configs, i)
 								return
 							end
 						end
-						table.insert(configs, config)
+						insert(configs, config)
 					end,
 				})
 			end
 			if #menu > 0 then
-				table.insert(menu, MENU_DIVIDER)
+				insert(menu, MENU_DIVIDER)
 			end
-			table.insert(menu, {
+			insert(menu, {
 				szOption = _L['Ensure export'],
 				fnAction = function()
 					local file = MY.FormatPath({

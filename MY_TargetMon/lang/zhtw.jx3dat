@@ -82,6 +82,8 @@ data = {
     ['Cancel buff is disabled outside dungeon.'] = '取消BUFF快捷鍵僅在副本內可用',
     ['Please input id:'] = '請輸入ID：',
     ['Manual add id'] = '手動添加ID',
+    ['Please input level:'] = '請輸入等級：',
+    ['Manual add level'] = '手動添加等級',
 
     ['Always show decimal time.'] = '總是顯示小數點',
     ['Never show decimal time.'] = '不顯示小數點',
