@@ -7,6 +7,21 @@
 -- @Last modified time: 2017-05-22 17:14:37
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 -----------------------------------------------
+----------------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local insert, remove, concat, unpack = table.insert, table.remove, table.concat, table.unpack
+local sub, len, char, rep = string.sub, string.len, string.char, string.rep
+local byte, format, gsub = string.byte, string.format, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local floor, min, max, ceil = math.floor, math.min, math.max, math.ceil
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+----------------------------------------------------------------------------------------------
 -----------------------------------------------
 -- 本地函数和变量
 -----------------------------------------------
@@ -774,6 +789,48 @@ function MY.Chat.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToCha
 	end
 end
 MY.Talk = MY.Chat.Talk
+
+do
+local SPACE = " "
+local W_SPACE = g_tStrings.STR_ONE_CHINESE_SPACE
+local metaAlignment = { __index = function() return "L" end }
+local function MergeHW(s)
+	return s:gsub(W_SPACE, "W"):gsub(" (W*) ", W_SPACE .. "%1"):gsub("W", W_SPACE)
+end
+function MY.TabTalk(nChannel, aTable, aAlignment)
+	local aLenHW, aMaxLenHW = {}, {}
+	for i, aText in ipairs(aTable) do
+		aLenHW[i] = {}
+		for j, szText in ipairs(aText) do
+			aLenHW[i][j] = #szText
+			aMaxLenHW[j] = max(aLenHW[i][j], aMaxLenHW[j] or 0)
+		end
+	end
+	local aAlignment = setmetatable(aAlignment or {}, metaAlignment)
+	for i, aText in ipairs(aTable) do
+		local aTalk, szFixL, szFixR = {}
+		local nFixLenFW, nFixLenHW
+		for j, szText in ipairs(aText) do
+			nFixLenFW = floor(max(0, aMaxLenHW[j] - aLenHW[i][j]) / 2)
+			if nFixLenFW % 2 == 1 then
+				nFixLenFW = nFixLenFW - 1
+			end
+			nFixLenHW = aMaxLenHW[j] - (aLenHW[i][j] + nFixLenFW * 2)
+			szFixL = W_SPACE:rep(ceil(nFixLenFW / 2)) .. SPACE:rep(ceil(nFixLenHW / 2))
+			szFixR = W_SPACE:rep(floor(nFixLenFW / 2)) .. SPACE:rep(floor(nFixLenHW / 2))
+			if aAlignment[j] == "M" then
+				aTalk[j] = szFixL .. szText .. szFixR
+			elseif aAlignment[j] == "R" then
+				aTalk[j] = MergeHW(szFixL .. szFixR) .. szText
+			else
+				aTalk[j] = szText .. MergeHW(szFixL .. szFixR)
+			end
+		end
+		-- MY.Sysmsg({(concat(aTalk, "|"))})
+		MY.Talk(nChannel, (concat(aTalk, " ")))
+	end
+end
+end
 
 local m_LevelUpData
 local function GetRegisterChannelLimitTable()
