@@ -100,10 +100,12 @@ local function ReloadFrame(frame)
 				end
 				if not mon.ignoreId and not info.ignoreLevel then
 					for nLevel, levelInfo in pairs(info.levels) do
-						if not frame.tItem[dwID][nLevel] then
-							frame.tItem[dwID][nLevel] = {}
+						if levelInfo.enable then
+							if not frame.tItem[dwID][nLevel] then
+								frame.tItem[dwID][nLevel] = {}
+							end
+							frame.tItem[dwID][nLevel][hItem] = true
 						end
-						frame.tItem[dwID][nLevel][hItem] = true
 					end
 				else
 					if not frame.tItem[dwID]['all'] then
@@ -311,6 +313,13 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 				tItem[id][level] = {}
 			end
 			tItem[id][level][hItem] = true
+		end
+		if not hItem.mon.ignoreId and not hItem.mon.ids[buff.dwID].enable then
+			return
+		end
+		if not hItem.mon.ignoreId and not hItem.mon.ids[buff.dwID].ignoreLevel
+		and not hItem.mon.ids[buff.dwID].levels[buff.nLevel].enable then
+			return
 		end
 		if hItem.nRenderFrame == nFrameCount then
 			return
@@ -526,19 +535,22 @@ function MY_TargetMon_Base.OnFrameBreathe()
 			for _, buff in ipairs(MY.GetBuffList(KTarget)) do
 				if not config.hideOthers or buff.dwSkillSrcID == dwClientPlayerID or buff.dwSkillSrcID == dwControlPlayerID then
 					local szName = Table_GetBuffName(buff.dwID, buff.nLevel) or ""
-					local tItems = this.tItem[szName]
+					-- 先按ID和等级严格匹配（顺序不可颠倒）
+					local tItems = this.tItem[buff.dwID] and this.tItem[buff.dwID][buff.nLevel]
 					if tItems then
 						for hItem, _ in pairs(tItems) do
 							UpdateItem(hItem, KTarget, buff, szName, this.tItem, config, nFrameCount, targetChanged)
 						end
 					end
+					-- 再按照ID匹配
 					local tItems = this.tItem[buff.dwID] and this.tItem[buff.dwID]["all"]
 					if tItems then
 						for hItem, _ in pairs(tItems) do
 							UpdateItem(hItem, KTarget, buff, szName, this.tItem, config, nFrameCount, targetChanged)
 						end
 					end
-					local tItems = this.tItem[buff.dwID] and this.tItem[buff.dwID][buff.nLevel]
+					-- 再按照名字匹配
+					local tItems = this.tItem[szName]
 					if tItems then
 						for hItem, _ in pairs(tItems) do
 							UpdateItem(hItem, KTarget, buff, szName, this.tItem, config, nFrameCount, targetChanged)
