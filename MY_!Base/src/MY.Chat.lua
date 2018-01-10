@@ -668,11 +668,13 @@ function MY.Chat.ParseName(t)
 end
 MY.Chat.tSensitiveWord = {
 	'   ',
-	' '  .. g_tStrings.STR_ONE_CHINESE_SPACE .. g_tStrings.STR_ONE_CHINESE_SPACE,
 	'  ' .. g_tStrings.STR_ONE_CHINESE_SPACE,
-	g_tStrings.STR_ONE_CHINESE_SPACE .. g_tStrings.STR_ONE_CHINESE_SPACE .. g_tStrings.STR_ONE_CHINESE_SPACE,
-	g_tStrings.STR_ONE_CHINESE_SPACE .. g_tStrings.STR_ONE_CHINESE_SPACE .. ' ',
+	' '  .. g_tStrings.STR_ONE_CHINESE_SPACE:rep(2),
+	g_tStrings.STR_ONE_CHINESE_SPACE:rep(3),
+	g_tStrings.STR_ONE_CHINESE_SPACE:rep(2) .. ' ',
 	g_tStrings.STR_ONE_CHINESE_SPACE .. '  ',
+	' ' .. g_tStrings.STR_ONE_CHINESE_SPACE .. ' ',
+	g_tStrings.STR_ONE_CHINESE_SPACE .. ' ' .. g_tStrings.STR_ONE_CHINESE_SPACE,
 }
 -- anti sensitive word shielding in talking message
 function MY.Chat.ParseAntiSWS(t)
