@@ -821,7 +821,7 @@ end
 local PS = {}
 function PS.OnPanelActive(frame)
 	local ui = XGUI(frame)
-	local X, Y = 0, 0
+	local X, Y = 10, 10
 	local x, y = X, Y
 	local deltaY = 28
 
@@ -860,7 +860,7 @@ function PS.OnPanelActive(frame)
 	})
 	y = y + deltaY
 
-	x = X
+	x = X + 10
 	ui:append("Text", { x = x, y = y, text = g_tStrings.STR_QUESTTRACE_CHANGE_ALPHA, color = { 255, 255, 200 }, autoenable = IsEnabled })
 	x = x + 70
 	ui:append("WndSliderBox", {
@@ -889,7 +889,7 @@ function PS.OnPanelActive(frame)
 	})
 	y = y + deltaY
 
-	x = X
+	x = X + 10
 	ui:append("Text", { x = x, y = y, text = _L["FadeIn time"], color = { 255, 255, 200 }, autoenable = IsEnabled })
 	x = x + 70
 	ui:append("WndSliderBox", {
@@ -918,7 +918,7 @@ function PS.OnPanelActive(frame)
 	})
 	y = y + deltaY
 
-	x = X
+	x = X + 10
 	ui:append("Text", { x = x, y = y, text = _L["Font Size"], color = { 255, 255, 200 }, autoenable = IsEnabled })
 	x = x + 70
 	ui:append("WndSliderBox", {
@@ -995,7 +995,7 @@ function PS.OnPanelActive(frame)
 	x = x + 110
 	ui:append("WndEditBox", {
 		x = x, y = y, w = 250, h = 25, text = MY_CombatText.szSkill, limit = 30,
-		onchange = function(szText)
+		onchange = function(_, szText)
 			MY_CombatText.szSkill = szText
 		end,
 		autoenable = IsEnabled,
@@ -1023,7 +1023,7 @@ function PS.OnPanelActive(frame)
 	x = x + 110
 	ui:append("WndEditBox", {
 		x = x, y = y, w = 250, h = 25, text = MY_CombatText.szDamage, limit = 30,
-		onchange = function(szText)
+		onchange = function(_, szText)
 			MY_CombatText.szDamage = szText
 		end,
 		autoenable = IsEnabled,
@@ -1051,7 +1051,7 @@ function PS.OnPanelActive(frame)
 	x = x + 110
 	ui:append("WndEditBox", {
 		x = x, y = y, w = 250, h = 25, text = MY_CombatText.szTherapy, limit = 30,
-		onchange = function(szText)
+		onchange = function(_, szText)
 			MY_CombatText.szTherapy = szText
 		end,
 		autoenable = IsEnabled,
