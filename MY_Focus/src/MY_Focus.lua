@@ -287,11 +287,12 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 			bFocus = true
 		end
 		if dwType ~= TARGET.PLAYER then
-			if obj.dwTemplateID == 46140 -- 清绝歌影 的主体影子
-			and (MY.IsInArena() or MY.IsInPubg())
-			and not (IsEnemy(UI_GetClientPlayerID(), dwID) and MY.IsShieldedVersion()) then
-				bFocus = false
-			elseif MY_Focus.tFocusTplList[dwType][obj.dwTemplateID] then
+			if MY_Focus.tFocusTplList[dwType][obj.dwTemplateID]
+			and not (
+				obj.dwTemplateID == 46140 -- 清绝歌影 的主体影子
+				and IsEnemy(UI_GetClientPlayerID(), dwID)
+				and not MY.IsShieldedVersion()
+			) then
 				bFocus = true
 			end
 		end
@@ -372,9 +373,8 @@ function MY_Focus.OnObjectLeaveScene(dwType, dwID)
 	if KObject then
 		if dwType == TARGET.NPC then
 			if MY_Focus.bFocusJJCParty
-			and MY.IsInArena()
-			and not IsEnemy(UI_GetClientPlayerID(), dwID)
-			and KObject.dwTemplateID == 46140 then -- 清绝歌影 的主体影子
+			and KObject.dwTemplateID == 46140 -- 清绝歌影 的主体影子
+			and MY.IsInArena() and not (IsEnemy(UI_GetClientPlayerID(), dwID) and MY.IsShieldedVersion()) then
 				MY_Focus.AddFocus(TARGET.PLAYER, KObject.dwEmployer, MY.GetObjectName(KObject))
 			end
 		end
