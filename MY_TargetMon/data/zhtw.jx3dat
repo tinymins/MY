@@ -36,6 +36,7 @@ return {
 						enable = true,
 						iconid = 13,
 						name = "",
+						capture = true,
 						alias = {__META__, {'nil', 'string'}, nil},
 						rgbAlias = {255, 255, 0},
 						shortAlias = {__META__, {'nil', 'string'}, nil},

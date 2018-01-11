@@ -115,7 +115,7 @@ local function ReloadFrame(frame)
 				end
 			end
 		end
-		if mon.name then
+		if mon.name and mon.capture then
 			if not frame.tItem[mon.name] then
 				frame.tItem[mon.name] = {}
 			end
