@@ -73,6 +73,14 @@ MY_GKP_Loot.tItemConfig = {
 }
 MY.RegisterCustomData("MY_GKP_Loot.tItemConfig")
 
+do
+local function onLoadingEnd()
+	MY_GKP_Loot.tItemConfig.nQualityFilter = -1
+	MY_GKP_Loot.tItemConfig.nAutoPickupQuality = -1
+end
+MY.RegisterEvent("LOADING_END.MY_GKP_Loot", onLoadingEnd)
+end
+
 function MY_GKP_Loot.IsItemDisplay(itemData, config)
 	return config.nQualityFilter == -1 or itemData.nQuality >= config.nQualityFilter
 end
@@ -256,9 +264,9 @@ function MY_GKP_Loot.OnLButtonClick()
 				table.insert(t, {
 					szOption = p.szTitle,
 					rgb = p.nQuality == -1 and {255, 255, 255} or { GetItemFontColorByQuality(p.nQuality) },
-					bCheck = true, bMCheck = true, bChecked = wnd.nAutoPickupQuality == p.nQuality,
+					bCheck = true, bMCheck = true, bChecked = wnd.tItemConfig.nAutoPickupQuality == p.nQuality,
 					fnAction = function()
-						wnd.nAutoPickupQuality = p.nQuality
+						wnd.tItemConfig.nAutoPickupQuality = p.nQuality
 					end,
 				})
 			end
@@ -440,9 +448,9 @@ function Loot.GetAutoPickupAllMenu()
 		table.insert(t, {
 			szOption = p.szTitle,
 			rgb = p.nQuality == -1 and {255, 255, 255} or { GetItemFontColorByQuality(p.nQuality) },
-			bCheck = true, bMCheck = true, bChecked = MY_GKP_Loot.nAutoPickupQuality == p.nQuality,
+			bCheck = true, bMCheck = true, bChecked = MY_GKP_Loot.tItemConfig.nAutoPickupQuality == p.nQuality,
 			fnAction = function()
-				MY_GKP_Loot.nAutoPickupQuality = p.nQuality
+				MY_GKP_Loot.tItemConfig.nAutoPickupQuality = p.nQuality
 			end,
 		})
 	end
