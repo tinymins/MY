@@ -37,7 +37,9 @@ return {
 						iconid = 13,
 						name = "",
 						alias = {__META__, {'nil', 'string'}, nil},
+						rgbAlias = {255, 255, 0},
 						shortAlias = {__META__, {'nil', 'string'}, nil},
+						rgbShortAlias = {255, 255, 0},
 						ids = {
 							__META__,
 							__VALUE__ = {},

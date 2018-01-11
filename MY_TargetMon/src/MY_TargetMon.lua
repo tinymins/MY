@@ -750,6 +750,12 @@ function PS.OnPanelActive(wnd)
 							D.CheckFrame(l_config)
 						end, function() end, function() end, nil, mon.longAlias or mon.name)
 					end,
+					rgb = mon.rgbAlias,
+					bColorTable = true,
+					fnChangeColor = function(_, r, g, b)
+						mon.rgbAlias = { r, g, b }
+						D.CheckFrame(l_config)
+					end,
 				},
 				{
 					szOption = _L('Short alias: %s', mon.shortAlias or _L['Not set']),
@@ -759,6 +765,12 @@ function PS.OnPanelActive(wnd)
 							mon.shortAlias = szVal
 							D.CheckFrame(l_config)
 						end, function() end, function() end, nil, mon.shortAlias or mon.name)
+					end,
+					rgb = mon.rgbShortAlias,
+					bColorTable = true,
+					fnChangeColor = function(_, r, g, b)
+						mon.rgbShortAlias = { r, g, b }
+						D.CheckFrame(l_config)
 					end,
 				},
 			}
