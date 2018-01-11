@@ -912,6 +912,14 @@ function PS.OnPanelActive(wnd)
 			end
 			insert(t1, { bDevide = true })
 			insert(t1, {
+				szOption = _L['Auto capture by name'],
+				bCheck = true, bChecked = mon.capture,
+				fnAction = function()
+					mon.capture = not mon.capture
+					D.CheckFrame(l_config)
+				end,
+			})
+			insert(t1, {
 				szOption = _L['Manual add id'],
 				fnAction = function()
 					GetUserInput(_L['Please input id:'], function(szVal)
