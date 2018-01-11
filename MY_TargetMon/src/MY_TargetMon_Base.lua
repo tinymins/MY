@@ -284,8 +284,9 @@ function MY_TargetMon_Base.OnFrameCreate()
 	ReloadFrame(this)
 end
 
-function D.GeneMonItemData(level, iconid)
+function D.GeneMonItemData(level, iconid, enable)
 	return MY_TargetMon.FormatMonItemStructure({
+		enable = enable,
 		iconid = iconid,
 		levels = { [level] = { iconid = iconid } },
 		ignoreLevel = true,
@@ -300,9 +301,10 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 		-- 加入同名BUFF列表
 		if not hItem.mon.ids[buff.dwID] or not hItem.mon.ids[buff.dwID].levels[buff.nLevel] then
 			if not hItem.mon.ids[buff.dwID] then
-				hItem.mon.ids[buff.dwID] = D.GeneMonItemData(buff.nLevel, Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13)
+				hItem.mon.ids[buff.dwID] = D.GeneMonItemData(buff.nLevel, Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13, hItem.mon.ignoreId)
 			elseif not hItem.mon.ids[buff.dwID].levels[buff.nLevel] then
 				hItem.mon.ids[buff.dwID].levels[buff.nLevel] = MY_TargetMon.FormatMonItemLevelStructure({
+					enable = hItem.mon.ids[buff.dwID].ignoreLevel,
 					iconid = Table_GetBuffIconID(buff.dwID, buff.nLevel) or 13,
 				})
 			end
@@ -666,7 +668,7 @@ local function OnSkillItem(tItems, dwID, dwLevel)
 			if not hItem.mon.iconid or hItem.mon.iconid == 13 then
 				hItem.mon.iconid = Table_GetSkillIconID(dwID, dwLevel)
 			end
-			hItem.mon.ids[dwID] = D.GeneMonItemData(dwLevel, Table_GetSkillIconID(dwID, dwLevel))
+			hItem.mon.ids[dwID] = D.GeneMonItemData(dwLevel, Table_GetSkillIconID(dwID, dwLevel), hItem.mon.ignoreId)
 		end
 	end
 end
