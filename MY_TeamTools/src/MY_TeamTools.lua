@@ -672,7 +672,7 @@ function RT.UpdateList()
 				box.OnItemRefreshTip = function()
 					local x, y = this:GetAbsPos()
 					local w, h = this:GetSize()
-					local desc
+					local desc = ""
 					if vv.CommonEnchant then
 						desc = Table_GetCommonEnchantDesc(vv.dwTemporaryEnchantID)
 					else
@@ -703,7 +703,7 @@ function RT.UpdateList()
 							end
 						end
 					end
-					if desc then
+					if desc and #desc > 0 then
 						OutputTip(desc:gsub("font=%d+", "font=113") .. GetFormatText(FormatString(g_tStrings.STR_ITEM_TEMP_ECHANT_LEFT_TIME .."\n", GetTimeText(vv.nTemporaryEnchantLeftSeconds)), 102), 400, { x, y, w, h })
 					end
 				end
