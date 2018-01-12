@@ -720,7 +720,7 @@ function MY_TargetMon_Base.OnEvent(event)
 		if this.config.dragable then
 			this:EnableDrag(true)
 		end
-		MY_TargetMon_Base.OnFrameDragEnd()
+		D.SaveAnchor(this)
 	elseif event == "MY_TARGET_MON_RELOAD" then
 		if this.config ~= arg0 then
 			return
