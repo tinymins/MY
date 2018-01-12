@@ -1509,14 +1509,14 @@ function _GKP.Record(tab, item, bEnter)
 				end,
 			},
 		},
-		onchange = function(raw, szText)
-			local ui = XGUI(raw)
+		onchange = function(szText)
+			local ui = XGUI(this)
 			if tonumber(szText) or szText == "" or szText == "-" then
-				raw.szText = szText
+				this.szText = szText
 				ui:color(_GKP.GetMoneyCol(szText))
 			else
 				MY.Sysmsg({_L["Please enter numbers"]})
-				ui:text(raw.szText or "")
+				ui:text(this.szText or "")
 			end
 		end,
 	}, true)

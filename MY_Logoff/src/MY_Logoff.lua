@@ -116,7 +116,7 @@ function PS.OnPanelActive(wnd)
 		range = {1, 1440},
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		value = MY_Logoff.nIdleOffTime,
-		onchange = function(raw, val)
+		onchange = function(val)
 			MY_Logoff.nIdleOffTime = val
 			MY.DelayCall('MY_LOGOFF_IDLE_TIME_CHANGE', 500, IdleOff)
 		end,

@@ -187,7 +187,7 @@ OnPanelActive = function(wnd)
 		placeholder = _L['mosaics character'],
 		x = x, y = y, w = w - 2 * x, h = 25,
 		text = MY_ChatMosaics.szMosaics,
-		onchange = function(raw, szText)
+		onchange = function(szText)
 			if szText == "" then
 				MY_ChatMosaics.szMosaics = _L.MOSAICS_CHAR
 			else
@@ -208,7 +208,7 @@ OnPanelActive = function(wnd)
 			end
 			table.concat(t, ",")
 		end)(),
-		onchange = function(raw, szText)
+		onchange = function(szText)
 			MY_ChatMosaics.tIgnoreNames = {}
 			for _, szName in ipairs(MY.String.Split(szText, ",")) do
 				MY_ChatMosaics.tIgnoreNames[szName] = true

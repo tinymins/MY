@@ -247,7 +247,7 @@ _C.OnPanelActive = function(wnd)
 
     ui:append("WndAutocomplete", {
         x = 80, y = 15, w = w - 226, h = 25, text = MY_ChatMonitor.szKeyWords,
-        onchange = function(raw, szText) MY_ChatMonitor.szKeyWords = szText end,
+        onchange = function(szText) MY_ChatMonitor.szKeyWords = szText end,
         onfocus = function(self)
             local source = {}
             for _, szOpt in ipairs(MY.LoadLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}) or {}) do

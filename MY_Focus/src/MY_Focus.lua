@@ -1289,7 +1289,7 @@ function PS.OnPanelActive(wnd)
 		range = {1, 20},
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		value = MY_Focus.nMaxDisplay,
-		onchange = function(raw, val)
+		onchange = function(val)
 			MY_Focus.nMaxDisplay = val
 			MY_Focus.RedrawList()
 		end,
@@ -1303,7 +1303,7 @@ function PS.OnPanelActive(wnd)
 		range = {10, 300},
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		value = MY_Focus.fScaleX * 100,
-		onchange = function(raw, val)
+		onchange = function(val)
 			MY_Focus.SetScale(val / 100, MY_Focus.fScaleY)
 		end,
 		autoenable = function() return IsEnabled() end,
@@ -1316,7 +1316,7 @@ function PS.OnPanelActive(wnd)
 		range = {10, 300},
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		value = MY_Focus.fScaleY * 100,
-		onchange = function(raw, val)
+		onchange = function(val)
 			MY_Focus.SetScale(MY_Focus.fScaleX, val / 100)
 		end,
 		autoenable = function() return IsEnabled() end,

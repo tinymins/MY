@@ -702,7 +702,7 @@ function PS.OnPanelActive(wnd)
 		value = MY_VisualSkill.nVisualSkillBoxCount,
 		text = _L("display %d skills.", MY_VisualSkill.nVisualSkillBoxCount),
 		textfmt = function(val) return _L("display %d skills.", val) end,
-		onchange = function(raw, val)
+		onchange = function(val)
 			MY_VisualSkill.nVisualSkillBoxCount = val
 			MY_VisualSkill.Reload()
 		end,
@@ -831,7 +831,7 @@ function PS.OnPanelActive(wnd)
 		range = {10, 800},
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		value = MY_ToolBox.fChangeGeShadowScale * 100,
-		onchange = function(raw, val)
+		onchange = function(val)
 			MY_ToolBox.fChangeGeShadowScale = val / 100
 		end,
 		autoenable = function()
