@@ -275,7 +275,7 @@ function PS.OnPanelActive(wnd)
 	ui:append("WndCheckBox", {
 		x = x, y = y, w = 70,
 		text = _L['enable'],
-		check = MY_ChatBlock.bBlockWords,
+		checked = MY_ChatBlock.bBlockWords,
 		oncheck = function(bCheck)
 			MY_ChatBlock.bBlockWords = bCheck
 		end,
