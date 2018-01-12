@@ -754,10 +754,10 @@ function PS.OnPanelActive(wnd)
 							D.CheckFrame(l_config)
 						end, function() end, function() end, nil, mon.longAlias or mon.name)
 					end,
-					rgb = mon.rgbAlias,
+					rgb = mon.rgbLongAlias,
 					bColorTable = true,
 					fnChangeColor = function(_, r, g, b)
-						mon.rgbAlias = { r, g, b }
+						mon.rgbLongAlias = { r, g, b }
 						D.CheckFrame(l_config)
 					end,
 				},

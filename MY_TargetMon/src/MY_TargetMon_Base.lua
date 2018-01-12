@@ -171,7 +171,7 @@ local function ReloadFrame(frame)
 			txtName:SetVisible(config.showName)
 			txtName:SetW(config.cdBarWidth - 10)
 			txtName:SetText(mon.longAlias or mon.name or '')
-			txtName:SetFontColor(unpack(mon.rgbAlias))
+			txtName:SetFontColor(unpack(mon.rgbLongAlias))
 
 			XGUI(imgProcess):image(config.cdBarUITex)
 			imgProcess:SetW(config.cdBarWidth)
