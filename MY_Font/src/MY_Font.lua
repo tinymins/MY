@@ -111,11 +111,11 @@ OnPanelActive = function(wnd)
 					end
 					acName:text(g_tStrings.STR_CUSTOM_TEAM)
 				end,
-				onclick = function(raw)
+				onclick = function()
 					if IsPopupMenuOpened() then
-						MY.UI(raw):autocomplete('close')
+						MY.UI(this):autocomplete('close')
 					else
-						MY.UI(raw):autocomplete('search', '')
+						MY.UI(this):autocomplete('search', '')
 					end
 				end,
 				autocomplete = {{"option", "source", C.aFontPath}},
@@ -150,11 +150,11 @@ OnPanelActive = function(wnd)
 						end
 					end
 				end,
-				onclick = function(raw)
+				onclick = function()
 					if IsPopupMenuOpened() then
-						MY.UI(raw):autocomplete('close')
+						MY.UI(this):autocomplete('close')
 					else
-						MY.UI(raw):autocomplete('search', '')
+						MY.UI(this):autocomplete('search', '')
 					end
 				end,
 				autocomplete = {{"option", "source", C.aFontName}},

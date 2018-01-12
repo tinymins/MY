@@ -257,9 +257,9 @@ _C.OnPanelActive = function(wnd)
             end
             self:autocomplete('option', 'source', source)
         end,
-        onclick = function(raw)
+        onclick = function()
             if IsPopupMenuOpened() then
-                XGUI(raw):autocomplete('close')
+                XGUI(this):autocomplete('close')
             else
                 local source = {}
                 for _, szOpt in ipairs(MY.LoadLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}) or {}) do
@@ -267,8 +267,8 @@ _C.OnPanelActive = function(wnd)
                         table.insert(source, szOpt)
                     end
                 end
-                XGUI(raw):autocomplete('option', 'source', source)
-                XGUI(raw):autocomplete('search', '')
+                XGUI(this):autocomplete('option', 'source', source)
+                XGUI(this):autocomplete('search', '')
             end
         end,
         autocomplete = {

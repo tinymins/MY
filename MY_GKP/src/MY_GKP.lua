@@ -1472,11 +1472,11 @@ function _GKP.Record(tab, item, bEnter)
 				end,
 			},
 		},
-		onclick = function(raw)
+		onclick = function()
 			if IsPopupMenuOpened() then
-				XGUI(raw):autocomplete('close')
+				XGUI(this):autocomplete('close')
 			else
-				XGUI(raw):autocomplete('search', '')
+				XGUI(this):autocomplete('search', '')
 			end
 		end,
 	}, true)
