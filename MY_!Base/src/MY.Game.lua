@@ -1557,11 +1557,24 @@ function MY.Game.IsInDungeon(bType)
 end
 MY.IsInDungeon = MY.Game.IsInDungeon
 
+-- 判断地图是不是PUBG
+-- (bool) MY.Game.IsInPubg(dwMapID)
+do
+local PUBG_MAP = {}
+function MY.Game.IsPubgMap(dwMapID)
+	if PUBG_MAP[dwMapID] == nil then
+		PUBG_MAP[dwMapID] = Table_IsTreasureBattleFieldMap(dwMapID)
+	end
+	return PUBG_MAP[dwMapID]
+end
+MY.IsPubgMap = MY.Game.IsPubgMap
+end
+
 -- 判断当前地图是不是PUBG
 -- (bool) MY.Game.IsInPubg()
 function MY.Game.IsInPubg()
 	local me = GetClientPlayer()
-	return me and me.GetMapID() == 296
+	return me and MY.IsPubgMap(me.GetMapID())
 end
 MY.IsInPubg = MY.Game.IsInPubg
 
