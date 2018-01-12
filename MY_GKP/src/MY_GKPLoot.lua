@@ -918,6 +918,7 @@ function Loot.GetDoodad(dwID)
 					item         = item         ,
 					szName       = szItemName   ,
 					dwID         = item.dwID    ,
+					nGenre       = item.nGenre  ,
 					nQuality     = item.nQuality,
 					bNeedRoll    = bNeedRoll    ,
 					bDist        = bDist        ,
