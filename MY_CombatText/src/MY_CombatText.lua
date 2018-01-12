@@ -821,7 +821,7 @@ end
 local PS = {}
 function PS.OnPanelActive(frame)
 	local ui = XGUI(frame)
-	local X, Y = 10, 10
+	local X, Y = 20, 10
 	local x, y = X, Y
 	local deltaY = 28
 
@@ -874,7 +874,7 @@ function PS.OnPanelActive(frame)
 		autoenable = IsEnabled,
 	})
 
-	x = 240
+	x = x + 180
 	ui:append("Text", { x = x, y = y, text = _L["Hold time"], color = { 255, 255, 200 }, autoenable = IsEnabled })
 	x = x + 70
 	ui:append("WndSliderBox", {
@@ -903,7 +903,7 @@ function PS.OnPanelActive(frame)
 		autoenable = IsEnabled,
 	})
 
-	x = 240
+	x = x + 180
 	ui:append("Text", { x = x, y = y, text = _L["FadeOut time"], color = { 255, 255, 200 }, autoenable = IsEnabled })
 	x = x + 70
 	ui:append("WndSliderBox", {
@@ -1097,13 +1097,13 @@ function PS.OnPanelActive(frame)
 	x = x + 110
 
 	ui:append("WndCheckBox", {
-		x = x, y = y, w = 160, text = _L["therapy effective only"], checked = MY_CombatText.bTherEffOnly,
+		x = x, y = y, w = 140, text = _L["therapy effective only"], checked = MY_CombatText.bTherEffOnly,
 		oncheck = function(bCheck)
 			MY_CombatText.bTherEffOnly = bCheck
 		end,
 		autoenable = IsEnabled,
 	})
-	x = x + 160
+	x = x + 140
 
 	ui:append("WndButton", {
 		x = x, y = y, text = _L["Font edit"],
