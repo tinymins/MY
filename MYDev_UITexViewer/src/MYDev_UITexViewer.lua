@@ -58,11 +58,11 @@ _Cache.OnPanelActive = function(wnd)
             end
         end
       end)
-      :click(function(nButton, raw)
+      :click(function(nButton)
         if IsPopupMenuOpened() then
-            MY.UI(raw):autocomplete('close')
+            MY.UI(this):autocomplete('close')
         else
-            MY.UI(raw):autocomplete('search', '')
+            MY.UI(this):autocomplete('search', '')
         end
       end)
       :autocomplete('option', 'maxOption', 20)

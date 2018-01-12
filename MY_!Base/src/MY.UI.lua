@@ -2939,7 +2939,7 @@ function XGUI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 		end
 		for _, raw in ipairs(self.raws) do
 			if IsFunction(fnLClick) then
-				local fnAction = function() fnLClick(raw, MY.Const.Event.Mouse.LBUTTON) end
+				local fnAction = function() ExecuteWithThis(raw, fnLClick, MY.Const.Event.Mouse.LBUTTON) end
 				if GetComponentType(raw) == 'WndScrollBox' then
 					XGUI(GetComponentElement(raw, 'MAIN_HANDLE')):uievent('OnItemLButtonClick', fnAction)
 				else
@@ -2964,7 +2964,7 @@ function XGUI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 
 			end
 			if IsFunction(fnRClick) then
-				local fnAction = function() fnRClick(raw, MY.Const.Event.Mouse.RBUTTON) end
+				local fnAction = function() ExecuteWithThis(raw, fnRClick, MY.Const.Event.Mouse.RBUTTON) end
 				if GetComponentType(raw) == 'WndScrollBox' then
 					XGUI(GetComponentElement(raw, 'MAIN_HANDLE')):uievent('OnItemRButtonClick', fnAction)
 				else
