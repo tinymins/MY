@@ -2,21 +2,25 @@
 -- BUFF¼à¿Ø
 ---------------------------------------------------------------------
 
-------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
-------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
-local insert, remove, concat = table.insert, table.remove, table.concat
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
 local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
-local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local type, tonumber, tostring = type, tonumber, tostring
-local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local floor, min, max, ceil = math.floor, math.min, math.max, math.ceil
+local huge, pi, sin, cos, tan = math.huge, math.pi, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+-----------------------------------------------------------------------------------------
 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_TargetMon/lang/")
 local INI_PATH = MY.GetAddonInfo().szRoot .. "MY_TargetMon/ui/MY_TargetMon.ini"
@@ -851,31 +855,38 @@ function PS.OnPanelActive(wnd)
 								Wnd.CloseWindow("PopupMenuPanel")
 							end,
 						})
-						for nLevel, infoLevel in ipairs(info.levels) do
-							insert(t2, {
-								szOption = nLevel,
-								bCheck = true,
-								bChecked = infoLevel.enable,
-								fnAction = function()
-									infoLevel.enable = not infoLevel.enable
-									D.CheckFrame(l_config)
-								end,
-								fnDisable = function()
-									return mon.ignoreId or info.ignoreLevel
-								end,
-								szIcon = "fromiconid",
-								nFrame = infoLevel.iconid,
-								nIconWidth = 22,
-								nIconHeight = 22,
-								szLayer = "ICON_RIGHTMOST",
-								fnClickIcon = function()
-									XGUI.OpenIconPanel(function(dwIcon)
-										infoLevel.iconid = dwIcon
+						local tLevels = {}
+						for nLevel, infoLevel in pairs(info.levels) do
+							insert(tLevels, {
+								nLevel, {
+									szOption = nLevel,
+									bCheck = true,
+									bChecked = infoLevel.enable,
+									fnAction = function()
+										infoLevel.enable = not infoLevel.enable
 										D.CheckFrame(l_config)
-									end)
-									Wnd.CloseWindow("PopupMenuPanel")
-								end,
+									end,
+									fnDisable = function()
+										return mon.ignoreId or info.ignoreLevel
+									end,
+									szIcon = "fromiconid",
+									nFrame = infoLevel.iconid,
+									nIconWidth = 22,
+									nIconHeight = 22,
+									szLayer = "ICON_RIGHTMOST",
+									fnClickIcon = function()
+										XGUI.OpenIconPanel(function(dwIcon)
+											infoLevel.iconid = dwIcon
+											D.CheckFrame(l_config)
+										end)
+										Wnd.CloseWindow("PopupMenuPanel")
+									end,
+								}
 							})
+						end
+						sort(tLevels, function(a, b) return a[1] < b[1] end)
+						for _, p in ipairs(tLevels) do
+							insert(t2, p[2])
 						end
 						insert(t2, MENU_DIVIDER)
 					end
