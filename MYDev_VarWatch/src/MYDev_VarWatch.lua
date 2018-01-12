@@ -82,7 +82,7 @@ MY.RegisterPanel(
 				x = x, y = y + (i - 1) * 25,
 				w = 150, h = 25,
 				color = {255, 255, 255},
-				onchange = function(raw, text)
+				onchange = function(text)
 					_C.tVarList[i] = MY.String.Trim(text)
 					MY.SaveLUAData(DATA_PATH, _C.tVarList)
 				end,

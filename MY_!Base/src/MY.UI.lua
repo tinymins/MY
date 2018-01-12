@@ -287,7 +287,7 @@ local function InitComponent(raw, szType)
 			raw:Lookup('', 'Text_Default'):SetText(szText)
 			if not bOnlyUI then
 				for _, fn in ipairs(GetComponentProp(raw, 'onChangeEvents')) do
-					fn(raw, nCurrentValue)
+					ExecuteWithThis(raw, fn, nCurrentValue)
 				end
 			end
 			this = _this
@@ -3154,7 +3154,7 @@ function XGUI:change(fnOnChange)
 		for _, raw in ipairs(self.raws) do
 			local edt = GetComponentElement(raw, 'EDIT')
 			if edt then
-				XGUI(edt):uievent('OnEditChanged', function() fnOnChange(raw, edt:GetText()) end)
+				XGUI(edt):uievent('OnEditChanged', function() ExecuteWithThis(raw, fnOnChange, edt:GetText()) end)
 			end
 			if GetComponentType(raw) == 'WndSliderBox' then
 				insert(GetComponentProp(raw, 'onChangeEvents'), fnOnChange)
@@ -3744,7 +3744,7 @@ function XGUI.OpenColorPickerEx(fnAction)
 		textfmt = function(val) return ('%d H'):format(val) end,
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		value = COLOR_HUE, range = {0, 360},
-		onchange = function(raw, nVal)
+		onchange = function(nVal)
 			COLOR_HUE = nVal
 			SetColor()
 		end,
@@ -3850,7 +3850,7 @@ function XGUI.OpenIconPanel(fnAction)
 		x = 10, y = 580, h = 25, w = 500, textfmt = ' Page: %d',
 		range = {1, math.ceil(nMaxIcon / 144)}, value = ICON_PAGE or 21,
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
-		onchange = function(raw, nVal)
+		onchange = function(nVal)
 			MY.DelayCall(function() GetPage(nVal) end)
 		end,
 	})

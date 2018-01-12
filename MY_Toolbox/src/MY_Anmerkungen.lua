@@ -70,7 +70,7 @@ MY_Anmerkungen.ReloadNotePanel = function()
 		ui:append("WndEditBox", "WndEditBox_Anmerkungen"):children("#WndEditBox_Anmerkungen")
 		  :pos(0, 0):size(MY_Anmerkungen.nNotePanelWidth, MY_Anmerkungen.nNotePanelHeight - 30)
 		  :multiLine(true):text(MY_Anmerkungen.szNotePanelContent)
-		  :change(function(raw, txt) MY_Anmerkungen.szNotePanelContent = txt end)
+		  :change(function(txt) MY_Anmerkungen.szNotePanelContent = txt end)
 
 		ui:uievent("OnFrameDragEnd", function()
 			MY_Anmerkungen.anchorNotePanel = MY.UI("Normal/MY_Anmerkungen_NotePanel"):anchor()
@@ -111,7 +111,7 @@ MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
 	ui:append("WndEditBox", "WndEditBox_ID"):children("#WndEditBox_ID"):pos(x + 60, y)
 	  :size(200, 25):multiLine(false):enable(false):color(200,200,200)
 	  :text(dwID or note.dwID or "")
-	  -- :change(function(raw, dwID)
+	  -- :change(function(dwID)
 	  --   if dwID == "" or string.find(dwID, "[^%d]") then
 	  --       ui:children("#WndButton_Submit"):enable(false)
 	  --   else
@@ -131,7 +131,7 @@ MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
 	-- name input
 	ui:append("WndEditBox", "WndEditBox_Name"):children("#WndEditBox_Name"):pos(x + 60, y + 30)
 	  :size(200, 25):multiLine(false):text(szName or note.szName or "")
-	  :change(function(raw, szName)
+	  :change(function(szName)
 	  	local rec = MY_Anmerkungen.GetPlayerNote(szName)
 	  	if rec then
 	  		ui:children("#WndButton_Submit"):enable(true)

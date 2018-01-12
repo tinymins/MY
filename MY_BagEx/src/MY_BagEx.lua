@@ -199,11 +199,11 @@ local function Hook()
 			w = 100, h = 21, x = 60, y = 30,
 			text = l_szBagFilter,
 			placeholder = _L['Search'],
-			onchange = function(raw, txt)
+			onchange = function(txt)
 				local nLen = txt:len()
 				nLen = math.max(nLen, 10)
 				nLen = math.min(nLen, 20)
-				XGUI(raw):width(nLen * 10)
+				XGUI(this):width(nLen * 10)
 				l_szBagFilter = txt
 				DoFilterBag()
 			end,
@@ -220,11 +220,11 @@ local function Hook()
 			w = 150, h = 21, x = 280, y = 80,
 			text = l_szBankFilter,
 			placeholder = _L['Search'],
-			onchange = function(raw, txt)
+			onchange = function(txt)
 				local nLen = txt:len()
 				nLen = math.max(nLen, 15)
 				nLen = math.min(nLen, 25)
-				XGUI(raw):width(nLen * 10)
+				XGUI(this):width(nLen * 10)
 				l_szBankFilter = txt
 				DoFilterBank(true)
 			end,
@@ -269,11 +269,11 @@ local function Hook()
 			w = 100, h = 21, x = 60, y = 25,
 			text = l_szGuildBankFilter,
 			placeholder = _L['Search'],
-			onchange = function(raw, txt)
+			onchange = function(txt)
 				local nLen = txt:len()
 				nLen = math.max(nLen, 10)
 				nLen = math.min(nLen, 25)
-				XGUI(raw):width(nLen * 10)
+				XGUI(this):width(nLen * 10)
 				l_szGuildBankFilter = txt
 				DoFilterGuildBank(true)
 			end,

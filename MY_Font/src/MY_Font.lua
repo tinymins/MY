@@ -99,7 +99,7 @@ OnPanelActive = function(wnd)
 			acFile = ui:append("WndAutocomplete", {
 				x = x, y = y, w = w - 180 - 30,
 				text = szFile,
-				onchange = function(raw, szText)
+				onchange = function(szText)
 					UpdateBtnEnable()
 					szText = StringLowerW(szText)
 					for _, p in ipairs(C.tFontList) do
@@ -139,7 +139,7 @@ OnPanelActive = function(wnd)
 			acName = ui:append("WndAutocomplete", {
 				w = 100, h = 25, x = w - 180 + x, y = y,
 				text = szName,
-				onchange = function(raw, szText)
+				onchange = function(szText)
 					UpdateBtnEnable()
 					szText = StringLowerW(szText)
 					for _, p in ipairs(C.tFontList) do

@@ -868,7 +868,7 @@ function PS.OnPanelActive(frame)
 		range = {1, 255},
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		value = MY_CombatText.nMaxAlpha,
-		onchange = function(raw, nVal)
+		onchange = function(nVal)
 			MY_CombatText.nMaxAlpha = nVal
 		end,
 		autoenable = IsEnabled,
@@ -882,7 +882,7 @@ function PS.OnPanelActive(frame)
 		range = {700, 2500},
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		value = MY_CombatText.nTime * COMBAT_TEXT_TOTAL,
-		onchange = function(raw, nVal)
+		onchange = function(nVal)
 			MY_CombatText.nTime = nVal / COMBAT_TEXT_TOTAL
 		end,
 		autoenable = IsEnabled,
@@ -897,7 +897,7 @@ function PS.OnPanelActive(frame)
 		range = {0, 15},
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		value = MY_CombatText.nFadeIn,
-		onchange = function(raw, nVal)
+		onchange = function(nVal)
 			MY_CombatText.nFadeIn = nVal
 		end,
 		autoenable = IsEnabled,
@@ -911,7 +911,7 @@ function PS.OnPanelActive(frame)
 		rang = {0, 15},
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		value = MY_CombatText.nFadeOut,
-		onchange = function(raw, nVal)
+		onchange = function(nVal)
 			MY_CombatText.nFadeOut = nVal
 		end,
 		autoenable = IsEnabled,
@@ -926,7 +926,7 @@ function PS.OnPanelActive(frame)
 		range = {50, 200},
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		value = MY_CombatText.fScale * 100,
-		onchange = function(raw, nVal)
+		onchange = function(nVal)
 			MY_CombatText.fScale = nVal / 100
 			COMBAT_TEXT_TRAJECTORY = CombatText.TrajectoryCount()
 		end,
@@ -995,7 +995,7 @@ function PS.OnPanelActive(frame)
 	x = x + 110
 	ui:append("WndEditBox", {
 		x = x, y = y, w = 250, h = 25, text = MY_CombatText.szSkill, limit = 30,
-		onchange = function(_, szText)
+		onchange = function(szText)
 			MY_CombatText.szSkill = szText
 		end,
 		autoenable = IsEnabled,
@@ -1023,7 +1023,7 @@ function PS.OnPanelActive(frame)
 	x = x + 110
 	ui:append("WndEditBox", {
 		x = x, y = y, w = 250, h = 25, text = MY_CombatText.szDamage, limit = 30,
-		onchange = function(_, szText)
+		onchange = function(szText)
 			MY_CombatText.szDamage = szText
 		end,
 		autoenable = IsEnabled,
@@ -1051,7 +1051,7 @@ function PS.OnPanelActive(frame)
 	x = x + 110
 	ui:append("WndEditBox", {
 		x = x, y = y, w = 250, h = 25, text = MY_CombatText.szTherapy, limit = 30,
-		onchange = function(_, szText)
+		onchange = function(szText)
 			MY_CombatText.szTherapy = szText
 		end,
 		autoenable = IsEnabled,

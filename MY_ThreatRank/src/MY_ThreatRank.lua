@@ -563,7 +563,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y, text = "",
 		range = {0, 100},
 		value = TS.nBGAlpha,
-		onchange = function(raw, nVal)
+		onchange = function(nVal)
 			TS.nBGAlpha = nVal
 			local frame = _TS.GetFrame()
 			if frame then

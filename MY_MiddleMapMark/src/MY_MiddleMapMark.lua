@@ -466,7 +466,7 @@ function PS.OnPanelActive(wnd)
 		name = 'WndEdit_Search',
 		x = 18, y = 10,
 		w = w - 26, h = 25,
-		onchange = function(raw, szText)
+		onchange = function(szText)
 			if not (szText and #szText > 0) then
 				return
 			end

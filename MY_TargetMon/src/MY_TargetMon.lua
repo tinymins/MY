@@ -244,7 +244,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig, Add)
 	ui:append("WndEditBox", {
 		x = x + 20, y = y, w = w - 290, h = 22,
 		r = 255, g = 255, b = 0, text = config.caption,
-		onchange = function(raw, val) config.caption = val end,
+		onchange = function(val) config.caption = val end,
 	})
 	ui:append("WndButton2", {
 		x = w - 180, y = y,
@@ -412,7 +412,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig, Add)
 		range = {1, 32},
 		value = config.maxLineCount,
 		textfmt = function(val) return _L("Display %d eachline.", val) end,
-		onchange = function(raw, val)
+		onchange = function(val)
 			config.maxLineCount = val
 			D.CheckFrame(config)
 		end,
@@ -459,7 +459,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig, Add)
 		range = {1, 300},
 		value = config.scale * 100,
 		textfmt = function(val) return _L("Scale %d%%.", val) end,
-		onchange = function(raw, val)
+		onchange = function(val)
 			config.scale = val / 100
 			D.CheckFrame(config)
 		end,
@@ -495,7 +495,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig, Add)
 		range = {50, 1000},
 		value = config.cdBarWidth,
 		textfmt = function(val) return _L("CD width %dpx.", val) end,
-		onchange = function(raw, val)
+		onchange = function(val)
 			config.cdBarWidth = val
 			D.CheckFrame(config)
 		end,
@@ -572,7 +572,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig, Add)
 				return _L("Show decimal time left in %ds.", val)
 			end
 		end,
-		onchange = function(raw, val)
+		onchange = function(val)
 			config.decimalTime = val
 			D.CheckFrame(config)
 		end,

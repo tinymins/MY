@@ -858,7 +858,7 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 5, 150 },
         text = function(value) return _L("lifebar width: %s px.", value) end, -- 血条宽度
         value = Config.nLifeWidth or Config_Default.nLifeWidth,
-        onchange = function(raw, value) Config.nLifeWidth = value;_C.Reset() end,
+        onchange = function(value) Config.nLifeWidth = value;_C.Reset() end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -868,7 +868,7 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 5, 150 },
         text = function(value) return _L("lifebar height: %s px.", value) end, -- 血条高度
         value = Config.nLifeHeight or Config_Default.nLifeHeight,
-        onchange = function(raw, value) Config.nLifeHeight = value;_C.Reset() end,
+        onchange = function(value) Config.nLifeHeight = value;_C.Reset() end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -878,7 +878,7 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { -150, 150 },
         text = function(value) return _L("lifebar offset-x: %d px.", value) end, -- 血条水平偏移
         value = Config.nLifeOffsetX or Config_Default.nLifeOffsetX,
-        onchange = function(raw, value) Config.nLifeOffsetX = value;_C.Reset() end,
+        onchange = function(value) Config.nLifeOffsetX = value;_C.Reset() end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -888,7 +888,7 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
         text = function(value) return _L("lifebar offset-y: %d px.", value) end, -- 血条竖直偏移
         value = Config.nLifeOffsetY or Config_Default.nLifeOffsetY,
-        onchange = function(raw, value) Config.nLifeOffsetY = value;_C.Reset() end,
+        onchange = function(value) Config.nLifeOffsetY = value;_C.Reset() end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -898,7 +898,7 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { -150, 150 },
         text = function(value) return _L("life percentage offset-x: %d px.", value) end, -- 血量百分比水平偏移
         value = Config.nLifePerOffsetX or Config_Default.nLifePerOffsetX,
-        onchange = function(raw, value) Config.nLifePerOffsetX = value;_C.Reset() end,
+        onchange = function(value) Config.nLifePerOffsetX = value;_C.Reset() end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -908,7 +908,7 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
         text = function(value) return _L("life percentage offset-y: %d px.", value) end, -- 血量百分比竖直偏移
         value = Config.nLifePerOffsetY or Config_Default.nLifePerOffsetY,
-        onchange = function(raw, value) Config.nLifePerOffsetY = value;_C.Reset() end,
+        onchange = function(value) Config.nLifePerOffsetY = value;_C.Reset() end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -918,7 +918,7 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 5, 150 },
         text = function(value) return _L("otbar width: %s px.", value) end, -- OT宽度
         value = Config.nOTBarWidth or Config_Default.nOTBarWidth,
-        onchange = function(raw, value) Config.nOTBarWidth = value;_C.Reset() end,
+        onchange = function(value) Config.nOTBarWidth = value;_C.Reset() end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -928,7 +928,7 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 5, 150 },
         text = function(value) return _L("otbar height: %s px.", value) end, -- OT高度
         value = Config.nOTBarHeight or Config_Default.nOTBarHeight,
-        onchange = function(raw, value) Config.nOTBarHeight = value;_C.Reset() end,
+        onchange = function(value) Config.nOTBarHeight = value;_C.Reset() end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -938,7 +938,7 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { -150, 150 },
         text = function(value) return _L("otbar offset-x: %d px.", value) end, -- OT水平偏移
         value = Config.nOTBarOffsetX or Config_Default.nOTBarOffsetX,
-        onchange = function(raw, value) Config.nOTBarOffsetX = value;_C.Reset() end,
+        onchange = function(value) Config.nOTBarOffsetX = value;_C.Reset() end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -948,7 +948,7 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
         text = function(value) return _L("otbar offset-y: %d px.", value) end, -- OT竖直偏移
         value = Config.nOTBarOffsetY or Config_Default.nOTBarOffsetY,
-        onchange = function(raw, value) Config.nOTBarOffsetY = value;_C.Reset() end,
+        onchange = function(value) Config.nOTBarOffsetY = value;_C.Reset() end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -958,7 +958,7 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { -150, 150 },
         text = function(value) return _L("ot title offset-x: %d px.", value) end, -- OT名称水平偏移
         value = Config.nOTTitleOffsetX or Config_Default.nOTTitleOffsetX,
-        onchange = function(raw, value) Config.nOTTitleOffsetX = value;_C.Reset() end,
+        onchange = function(value) Config.nOTTitleOffsetX = value;_C.Reset() end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -968,7 +968,7 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
         text = function(value) return _L("ot title offset-y: %d px.", value) end, -- OT名称竖直偏移
         value = Config.nOTTitleOffsetY or Config_Default.nOTTitleOffsetY,
-        onchange = function(raw, value) Config.nOTTitleOffsetY = value;_C.Reset() end,
+        onchange = function(value) Config.nOTTitleOffsetY = value;_C.Reset() end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -978,7 +978,7 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
         text = function(value) return _L("1st line offset-y: %d px.", value) end, -- 第一行字高度
         value = Config.nLineHeight[1] or Config_Default.nLineHeight[1],
-        onchange = function(raw, value) Config.nLineHeight[1] = value;_C.Reset() end,
+        onchange = function(value) Config.nLineHeight[1] = value;_C.Reset() end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -988,7 +988,7 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
         text = function(value) return _L("2nd line offset-y: %d px.", value) end, -- 第二行字高度
         value = Config.nLineHeight[2] or Config_Default.nLineHeight[2],
-        onchange = function(raw, value) Config.nLineHeight[2] = value;_C.Reset() end,
+        onchange = function(value) Config.nLineHeight[2] = value;_C.Reset() end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -998,7 +998,7 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
         text = function(value) return _L("3rd line offset-y: %d px.", value) end, -- 第三行字高度
         value = Config.nLineHeight[3] or Config_Default.nLineHeight[3],
-        onchange = function(raw, value) Config.nLineHeight[3] = value;_C.Reset() end,
+        onchange = function(value) Config.nLineHeight[3] = value;_C.Reset() end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -1008,7 +1008,7 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 300 },
         text = function(value) return value == 0 and _L["Max Distance: Unlimited."] or _L("Max Distance: %s foot.", value) end,
         value = math.sqrt(Config.nDistance or Config_Default.nDistance) / 64,
-        onchange = function(raw, value) Config.nDistance = value * value * 64 * 64;_C.Reset() end,
+        onchange = function(value) Config.nDistance = value * value * 64 * 64;_C.Reset() end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -1018,7 +1018,7 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_PERCENT, range = { 0, 255 },
         text = function(value) return _L("alpha: %.0f%%.", value) end, -- 透明度
         value = Config.nAlpha or Config_Default.nAlpha,
-        onchange = function(raw, value) Config.nAlpha = value*255/100;_C.Reset() end,
+        onchange = function(value) Config.nAlpha = value*255/100;_C.Reset() end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
