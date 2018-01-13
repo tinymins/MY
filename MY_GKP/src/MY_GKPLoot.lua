@@ -81,6 +81,10 @@ end
 MY.RegisterEvent("LOADING_END.MY_GKP_Loot", onLoadingEnd)
 end
 
+function MY_GKP_Loot.CanDialog(tar, doodad)
+	return doodad.CanDialog(tar)
+end
+
 function MY_GKP_Loot.IsItemDisplay(itemData, config)
 	return config.nQualityFilter == -1 or itemData.nQuality >= config.nQualityFilter
 end
@@ -109,7 +113,7 @@ function MY_GKP_Loot.OnFrameBreathe()
 	while wnd do
 		local doodad = GetDoodad(wnd.dwDoodadID)
 		-- Ê°È¡ÅÐ¶¨
-		local bCanDialog = doodad.CanDialog(me)
+		local bCanDialog = MY_GKP_Loot.CanDialog(me, doodad)
 		if not MY.IsShieldedVersion() then
 			local hList, box = wnd:Lookup("", "Handle_ItemList")
 			for i = 0, hList:GetItemCount() - 1 do
