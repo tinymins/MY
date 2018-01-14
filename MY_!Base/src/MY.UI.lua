@@ -2326,39 +2326,74 @@ function XGUI:size(nWidth, nHeight, nRawWidth, nRawHeight)
 	end
 end
 
--- (self) Instance:autosize() -- resize Text element by autosize
--- (self) Instance:autosize(bool bAutoSize) -- set if Text is autosize
-function XGUI:autosize(bAutoSize)
-	self:_checksum()
-	if bAutoSize == nil then
-		for _, raw in ipairs(self.raws) do
-			if GetComponentType(raw) == 'Text' then
-				raw:AutoSize()
-			else
-				local componentType = GetComponentType(raw)
-				if componentType == 'WndCheckBox'
-				or componentType == 'WndRadioBox'
-				or componentType == 'WndComboBox'
-				or componentType == 'WndSliderBox' then
-					local txt = GetComponentElement(raw, 'TEXT')
-					if txt then
-						local ui = XGUI(raw)
-						local W, H = ui:size()
-						local w, h = txt:GetSize()
-						txt:AutoSize()
-						ui:size(W - w + txt:GetW(), H - h + txt:GetH())
-					end
-				end
+do
+local function AutoSize(raw, bAutoWidth, bAutoHeight)
+	if GetComponentType(raw) == 'Text' then
+		local w, h = raw:GetSize()
+		raw:AutoSize()
+		if not bAutoWidth then
+			raw:SetW(w)
+		end
+		if not bAutoHeight then
+			raw:SetH(h)
+		end
+	else
+		local componentType = GetComponentType(raw)
+		if componentType == 'WndCheckBox'
+		or componentType == 'WndRadioBox'
+		or componentType == 'WndComboBox'
+		or componentType == 'WndSliderBox' then
+			local txt = GetComponentElement(raw, 'TEXT')
+			if txt then
+				local ui = XGUI(raw)
+				local W, H = ui:size()
+				local w, h = txt:GetSize()
+				txt:AutoSize()
+				w = W - w + txt:GetW()
+				h = H - h + txt:GetH()
+				ui:size(bAutoWidth and w or W, bAutoHeight and h or H)
 			end
 		end
-	elseif IsBoolean(bAutoSize) then
+	end
+end
+
+-- Auto set width of element by text
+-- (self) Instance:autoWidth()
+function XGUI:autoWidth()
+	self:_checksum()
+	for _, raw in ipairs(self.raws) do
+		AutoSize(raw, true, false)
+	end
+	return self
+end
+
+-- Auto set height of element by text
+-- (self) Instance:autoHeight()
+function XGUI:autoHeight()
+	self:_checksum()
+	for _, raw in ipairs(self.raws) do
+		AutoSize(raw, false, true)
+	end
+	return self
+end
+
+-- (self) Instance:autoSize() -- resize Text element by autoSize
+-- (self) Instance:autoSize(bool bAutoSize) -- set if Text is autoSize
+function XGUI:autoSize(arg0, arg1)
+	self:_checksum()
+	if IsNil(arg0) then
+		for _, raw in ipairs(self.raws) do
+			AutoSize(raw, true, true)
+		end
+	elseif IsBoolean(arg0) then
 		for _, raw in ipairs(self.raws) do
 			if GetComponentType(raw) == 'Text' then
-				raw.bAutoSize = true
+				raw.bAutoSize = arg0
 			end
 		end
 	end
 	return self
+end
 end
 
 -- (number) Instance:scroll() -- get current scroll percentage (none scroll will return -1)
