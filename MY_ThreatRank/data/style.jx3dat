@@ -56,11 +56,11 @@ data = {
 		{ 168, 15 }
 	},
 	{
-		{ "interface/JH/JH_DBM/image/ST_UI.UITex", 6 },
-		{ "interface/JH/JH_DBM/image/ST_UI.UITex", 4 },
-		{ "interface/JH/JH_DBM/image/ST_UI.UITex", 0 },
-		{ "interface/JH/JH_DBM/image/ST_UI.UITex", 2 },
-		{ "interface/JH/JH_DBM/image/ST_UI.UITex", 5 },
+		{ "interface/MY/MY_DBM/image/ST_UI.UITex", 6 },
+		{ "interface/MY/MY_DBM/image/ST_UI.UITex", 4 },
+		{ "interface/MY/MY_DBM/image/ST_UI.UITex", 0 },
+		{ "interface/MY/MY_DBM/image/ST_UI.UITex", 2 },
+		{ "interface/MY/MY_DBM/image/ST_UI.UITex", 5 },
 		{ 168, 15 }
 	},
 
