@@ -2316,6 +2316,9 @@ function XGUI:size(nWidth, nHeight, nRawWidth, nRawHeight)
 			if nWidth == true then
 				raw = GetComponentElement(raw, 'MAIN_WINDOW') or raw
 			end
+			if raw.IsDummyWnd and raw:IsDummyWnd() then
+				raw = raw:Lookup("", "")
+			end
 			if raw.GetSize then
 				return raw:GetSize()
 			end
@@ -2331,6 +2334,21 @@ function XGUI:autosize(bAutoSize)
 		for _, raw in ipairs(self.raws) do
 			if GetComponentType(raw) == 'Text' then
 				raw:AutoSize()
+			else
+				local componentType = GetComponentType(raw)
+				if componentType == 'WndCheckBox'
+				or componentType == 'WndRadioBox'
+				or componentType == 'WndComboBox'
+				or componentType == 'WndSliderBox' then
+					local txt = GetComponentElement(raw, 'TEXT')
+					if txt then
+						local ui = XGUI(raw)
+						local W, H = ui:size()
+						local w, h = txt:GetSize()
+						txt:AutoSize()
+						ui:size(W - w + txt:GetW(), H - h + txt:GetH())
+					end
+				end
 			end
 		end
 	elseif IsBoolean(bAutoSize) then
@@ -3758,7 +3776,7 @@ end
 
 -- 打开字体选择
 function XGUI.OpenFontPicker(callback, t)
-	local w, h = 820, 640
+	local w, h = 820, 700
 	local ui = XGUI.CreateFrame('_MY_Color_Picker', { simple = true, close = true, esc = true })
 	  :size(w, h):text(_L['color picker']):anchor({s='CENTER', r='CENTER', x=0, y=0})
 
