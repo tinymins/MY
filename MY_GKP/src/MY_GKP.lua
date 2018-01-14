@@ -32,7 +32,7 @@ local _GKP = {
 	Config = {
 		Subsidies = {
 			{ _L["Treasure Chests"], "", true},
-			-- { JH.GetItemName(73214), "", true},
+			-- { MY.GetItemName(73214), "", true},
 			{ _L["Boss"], "", true},
 			{ _L["Banquet Allowance"], -1000, true},
 			{ _L["Fines"], "", true},

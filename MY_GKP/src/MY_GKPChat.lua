@@ -76,7 +76,7 @@ end
 function Chat.OpenFrame(item, menu, data)
 	local frame = Chat.GetFrame()
 	if not frame then
-		frame = Wnd.OpenWindow(MY.GetAddonInfo().szRoot .. "JH_GKP/ui/MY_GKP_Chat.ini", "MY_GKP_Chat")
+		frame = Wnd.OpenWindow(MY.GetAddonInfo().szRoot .. "MY_GKP/ui/MY_GKP_Chat.ini", "MY_GKP_Chat")
 		GUI(frame):Point():RegisterClose(Chat.CloseFrame)
 		:Append("WndButton2", { x = 380, y = 38, txt = _L["Stop Bidding"] }):Click(function()
 			MY.Talk(PLAYER_TALK_CHANNEL.RAID, _L["--- Stop Bidding ---"])
