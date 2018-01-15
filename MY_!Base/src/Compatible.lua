@@ -616,4 +616,12 @@ function str2var(szText)
 end
 end
 
+if not GVoiceBase_GetSaying then
+GVoiceBase_GetSaying = GV_GetSayings
+end
+
+if not GVoiceBase_CheckMicState then
+GVoiceBase_CheckMicState = GVoice_CheckMicState
+end
+
 UpdateItemInfoBoxObject = UpdataItemInfoBoxObject
