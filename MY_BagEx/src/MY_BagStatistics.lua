@@ -458,4 +458,4 @@ local menu = {
 }
 MY.RegisterAddonMenu('MY_BAGSTATISTICS_MENU', menu)
 end
-MY.Game.AddHotKey("MY_BagStatistics", _L['MY_BagStatistics'], MY_BagStatistics.Toggle, nil)
+MY.Game.RegisterHotKey("MY_BagStatistics", _L['MY_BagStatistics'], MY_BagStatistics.Toggle, nil)

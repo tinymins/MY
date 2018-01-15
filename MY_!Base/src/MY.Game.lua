@@ -7,6 +7,25 @@
 -- @Last modified time: 2016-12-06 14:49:07
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
+-----------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+-----------------------------------------------------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local floor, min, max, ceil = math.floor, math.min, math.max, math.ceil
+local huge, pi, sin, cos, tan = math.huge, math.pi, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+-----------------------------------------------------------------------------------------
 -----------------------------------------------
 -- 本地函数和变量
 -----------------------------------------------
@@ -31,37 +50,28 @@ local _C = {}
 -- #######################################################################################################
 _Cache.tHotkey = {}
 -- 增加系统快捷键
--- (void) MY.AddHotKey(string szName, string szTitle, func fnAction)   -- 增加系统快捷键
-function MY.Game.AddHotKey(szName, szTitle, fnAction)
-	if string.sub(szName, 1, 3) ~= "MY_" then
-		szName = "MY_" .. szName
-	end
-	table.insert(_Cache.tHotkey, { szName = szName, szTitle = szTitle, fnAction = fnAction })
+-- (void) MY.RegisterHotKey(string szName, string szTitle, func fnAction)   -- 增加系统快捷键
+function MY.Game.RegisterHotKey(szName, szTitle, fnAction)
+	insert(_Cache.tHotkey, { szName = szName, szTitle = szTitle, fnAction = fnAction })
 end
-MY.AddHotKey = MY.Game.AddHotKey
+MY.RegisterHotKey = MY.Game.RegisterHotKey
 
 -- 获取快捷键名称
--- (string) MY.GetHotKeyName(string szName, boolean bBracket, boolean bShort)      -- 取得快捷键名称
-function MY.Game.GetHotKeyName(szName, bBracket, bShort)
-	if string.sub(szName, 1, 3) ~= "MY_" then
-		szName = "MY_" .. szName
-	end
+-- (string) MY.GetHotKeyDisplay(string szName, boolean bBracket, boolean bShort)      -- 取得快捷键名称
+function MY.Game.GetHotKeyDisplay(szName, bBracket, bShort)
 	local nKey, bShift, bCtrl, bAlt = Hotkey.Get(szName)
-	local szKey = GetKeyShow(nKey, bShift, bCtrl, bAlt, bShort == true)
-	if szKey ~= "" and bBracket then
-		szKey = "(" .. szKey .. ")"
+	local szDisplay = GetKeyShow(nKey, bShift, bCtrl, bAlt, bShort == true)
+	if szDisplay ~= "" and bBracket then
+		szDisplay = "(" .. szDisplay .. ")"
 	end
-	return szKey
+	return szDisplay
 end
-MY.GetHotKeyName = MY.Game.GetHotKeyName
+MY.GetHotKeyDisplay = MY.Game.GetHotKeyDisplay
 
 -- 获取快捷键
 -- (table) MY.GetHotKey(string szName, true , true )       -- 取得快捷键
 -- (number nKey, boolean bShift, boolean bCtrl, boolean bAlt) MY.GetHotKey(string szName, true , fasle)        -- 取得快捷键
 function MY.Game.GetHotKey(szName, bBracket, bShort)
-	if string.sub(szName, 1, 3) ~= "MY_" then
-		szName = "MY_" .. szName
-	end
 	local nKey, bShift, bCtrl, bAlt = Hotkey.Get(szName)
 	if nKey==0 then return nil end
 	if bBracket then
@@ -79,10 +89,9 @@ MY.GetHotKey = MY.Game.GetHotKey
 -- (void) MY.SetHotKey(string szCommand, number nIndex, number nKey [, boolean bShift [, boolean bCtrl [, boolean bAlt] ] ])       -- 设置快捷键
 function MY.Game.SetHotKey(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
 	if nIndex then
-		if string.sub(szCommand, 1, 3) ~= "MY_" then
-			szCommand = "MY_" .. szCommand
+		if not nKey then
+			nIndex, nKey = 1, nIndex
 		end
-		if not nKey then nIndex, nKey = 1, nIndex end
 		Hotkey.Set(szCommand, nIndex, nKey, bShift == true, bCtrl == true, bAlt == true)
 	else
 		local szGroup = szCommand or MY.GetAddonInfo().szName
@@ -222,7 +231,7 @@ MY.RegisterInit('MYLIB#BIND_HOTKEY', function()
 		Hotkey.AddBinding('MY_HotKey_Null_'..i, _L['none-function hotkey'], "", function() end, nil)
 	end
 end)
-MY.Game.AddHotKey("MY_STOP_CASTING", _L["Stop cast skill"], function() GetClientPlayer().StopCurrentAction() end)
+MY.Game.RegisterHotKey("MY_STOP_CASTING", _L["Stop cast skill"], function() GetClientPlayer().StopCurrentAction() end)
 -- #######################################################################################################
 --                                 #                   # # # #   # # # #
 --     # # # #   # # # # #       # # # # # # #         #     #   #     #
@@ -365,6 +374,17 @@ function MY.Game.GetObjectName(obj)
 	end
 end
 MY.GetObjectName = MY.Game.GetObjectName
+
+function MY.GetDistance(nX, nY, nZ)
+	local me = GetClientPlayer()
+	if not nY and not nZ then
+		local tar = nX
+		nX, nY, nZ = tar.nX, tar.nY, tar.nZ
+	elseif not nZ then
+		return floor(((me.nX - nX) ^ 2 + (me.nY - nY) ^ 2) ^ 0.5)/64
+	end
+	return floor(((me.nX - nX) ^ 2 + (me.nY - nY) ^ 2 + (me.nZ/8 - nZ/8) ^ 2) ^ 0.5)/64
+end
 
 do local MY_CACHE_BUFF = {}
 function MY.GetBuffName(dwBuffID, dwLevel)
@@ -595,6 +615,9 @@ local MY_FORCE_COLOR = setmetatable({
 })
 
 function MY.GetForceColor(dwForce)
+	if dwForce == "all" then
+		return MY_FORCE_COLOR
+	end
 	return unpack(MY_FORCE_COLOR[dwForce])
 end
 end
