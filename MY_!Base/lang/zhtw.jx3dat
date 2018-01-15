@@ -8,15 +8,16 @@ data = {
     ["change log"] = "更新日志",
     ["serendipity"] = "奇遇查詢",
     ["online time"] = "開服時間",
-    
+
     ["General"] = "常用",
     ["Chat"] = "聊天",
+    ["Raid"] = "團隊",
     ["Target"] = "目標",
     ["System"] = "系統",
     ["Battle"] = "戰鬥",
     ["Others"] = "其它",
     ["Development"] = "開發",
-    
+
     ['nearby channel'] = '近聊頻道',
     ['friend channel'] = '好友頻道',
     ['team channel'] = '隊伍頻道',
@@ -30,7 +31,7 @@ data = {
     ['whisper channel'] = '密聊頻道',
     ['world channel'] = '世界頻道',
     ['system channel'] = '系統頻道',
-    
+
     ['NEARBY'] = '近聊',
     ['FRIENDS'] = '好友',
     ['TEAM'] = '隊伍',
@@ -43,14 +44,14 @@ data = {
     ['WHISPER'] = '密聊',
     ['WORLD'] = '世界',
     ['SYSTEM'] = '系統',
-    
+
     ['send'] = '發送',
     ['send to'] = '發送到',
     ['send to ...'] = '發送到...',
-    
+
     ['ji guan'] = '機關',
     ['nu jian'] = '弩箭',
-    
+
     ['all force'] = '所有人',
     ['JiangHu']   = '江湖',
     ['ShaoLin']   = '少林',
@@ -63,16 +64,16 @@ data = {
     ['CangJian']  = '藏劍',
     ['GaiBang']   = '丐幫',
     ['MingJiao']  = '明教',
-    
+
     ['man']   = '成男',
     ['woman'] = '成女',
     ['boy']   = '少俠',
     ['girl']  = '蘿莉',
-    
+
     ['ZhongLi']   = '中立',
     ['HaoQiMeng'] = '浩氣盟',
     ['ERenGu']    = '惡人谷',
-    
+
     ['start'] = '開始',
     ['restart'] = '重新開始',
     ['stop'] = '停止',
@@ -81,31 +82,31 @@ data = {
     ['cancel'] = '取消',
     ['use'] = '使用',
     ['got it'] = '朕已閱',
-    
+
     ['close'] = '關閉',
     ['enable/disable'] = '開啓/關閉',
     ['enable'] = '啓用',
-    
+
     ['reset data'] = '重置數據',
     ['analyse data'] = '分析數據',
-    
+
     ['add'] = '添加',
     ['delete'] = '刪除',
     ['add group'] = '添加分組',
     ['delete group'] = '刪除分組',
-    
+
     ['copy'] = '複制',
     ['paste'] = '粘貼',
     ['whisper'] = '密聊',
     ['show equipment'] = '查看裝備',
-    
+
     ['none-function hotkey'] = '空白快捷鍵',
     ['set hotkey'] = '設置快捷鍵',
     ['>> set hotkey <<'] = '>> 設置快捷鍵 <<',
     ['use global config'] = '使用所有角色公共設置',
     ['reset config'] = '恢複默認設置',
     ['Are you sure to reset config?'] = '確認真的要恢複默認設置麽？',
-    
+
     -- MY.lua
     ['mingyi plugin'                            ] = '茗伊插件',
     ['mingyi plugins'                           ] = '茗伊插件集',
@@ -120,33 +121,33 @@ data = {
     ['color picker ex'                          ] = '調色板',
     ['text editor'                              ] = '文本編輯器',
     ['Font %d'                                  ] = '字體 %d',
-    
+
     ['author\'s weibo'] = '作者 @一名宅',
     ['MingYi @ Double Dream Town'] = '茗伊 @ 雙夢鎮',
-    
+
     -- MY_CheckUpdate.lua
     ['new version found.'] = '發現新版本！',
     ['new version found, would you want to download immediately?'] = '發現新版本！是否立即前往下載？',
     ['download immediately'] = '立即下載',
     ['see new feature'] = '更新日志',
-    
+
     ['Important Npc list updated to v%s.'] = '重要NPC列表已成功更新至v%s。',
-    
+
     ["[%s] wants to get your location, would you like to share?"] = "[%s] 希望取得你當前所在地圖位置，你是否願意共享當前位置信息？",
     ["I've installed MY plugins v%s"] = "我已安裝茗伊插件集 v%s。",
-    
+
     ['LClick to copy to editbox.\nMClick to remove this line.\nRClick to repeat this line.'] = '左鍵複制到聊天欄\n中鍵刪除該行文本\n右鍵複制發佈到當前聊天頻道',
-    
-    
+
+
     ['Invalid player ID!']           = '您要查看裝備的玩家ID不合法！',
     ['Peek other player failed!']    = '查看裝備失敗！',
     ['Can not find player to peek!'] = '您要查看的玩家不存在！',
     ['Player is too far to peek!']   = '距離太遠查看裝備失敗！',
-    
+
     ["Stop cast skill"] = "打斷自身讀條",
-    
+
     ["ADVENTURE_PATT"] = "“(.-)”[女俠在].-觸發奇遇【(.-)】",
-    
+
     ["Cloud"] = "白雲",
     ["Sword"] = "小劍",
     ["Ax"   ] = "斧頭",
@@ -157,7 +158,7 @@ data = {
     ["Jade" ] = "如意",
     ["Dart" ] = "飛镖",
     ["Fan"  ] = "扇子",
-    
+
     ["restore formation of %d group: %s"         ] = "恢複第%d小隊陣眼[%s]。",
     ["restore player marked as [%s]: %s"         ] = "恢複標記%s爲[%s]。",
     ["You are not team leader, permission denied"] = "你不是隊長，無權操作隊伍。",
@@ -169,7 +170,7 @@ data = {
     ["restore team leader: %s"                   ] = "恢複隊長爲[%s]。",
     ["restore team marker: %s"                   ] = "恢複標記者爲[%s]。",
     ["Team list restored"                        ] = "小隊狀態已恢複。",
-    
+
     ['Mingyi plugins storage data'] = '茗伊插件集數據存檔',
     ['Config and storage data of plugins'] = '插件的本地數據配置',
     ['Global storage'] = '公共數據',

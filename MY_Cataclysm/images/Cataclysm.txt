@@ -1,0 +1,9 @@
+Farme	Left	Top	Width	High	File
+0	18	36	16	16	C:\Users\Webster\Desktop\CTM\B.tga
+1	0	36	16	16	C:\Users\Webster\Desktop\CTM\BL.tga
+2	36	36	16	16	C:\Users\Webster\Desktop\CTM\BR.tga
+3	0	18	16	16	C:\Users\Webster\Desktop\CTM\L.tga
+4	36	18	16	16	C:\Users\Webster\Desktop\CTM\R.tga
+5	18	0	16	16	C:\Users\Webster\Desktop\CTM\T.tga
+6	0	0	16	16	C:\Users\Webster\Desktop\CTM\TL.tga
+7	36	0	16	16	C:\Users\Webster\Desktop\CTM\TR.tga
