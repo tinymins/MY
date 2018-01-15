@@ -1717,7 +1717,7 @@ RegisterEvent("MONEY_UPDATE",function() --½ðÇ®±ä¶¯
 	_GKP.MoneyUpdate(arg0, arg1, arg2)
 end)
 
-MY.AddHotKey("MY_GKP", _L["Open/Close Golden Team Record"], _GKP.TogglePanel)
+MY.RegisterHotKey("MY_GKP", _L["Open/Close Golden Team Record"], _GKP.TogglePanel)
 MY.RegisterAddonMenu({ szOption = _L["Golden Team Record"], fnAction = _GKP.OpenPanel })
 
 RegisterEvent("LOADING_END",function()

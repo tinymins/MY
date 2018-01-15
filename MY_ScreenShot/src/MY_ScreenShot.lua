@@ -166,7 +166,7 @@ _MY_ScreenShot.OnPanelDeactive = function( ... )
 end
 -- ¿ì½Ý¼ü°ó¶¨
 -----------------------------------------------
-MY.Game.AddHotKey("MY_ScreenShot_Hotkey", _L["shotscreen"], function() MY_ScreenShot.ShotScreen((MY_ScreenShot.GetConfig('bAutoHideUI') and MY_ScreenShot.Const.HIDE_UI) or nil) end, nil)
-MY.Game.AddHotKey("MY_ScreenShot_Hotkey_HideUI", _L["shotscreen without ui"], function() MY_ScreenShot.ShotScreen(MY_ScreenShot.Const.HIDE_UI) end, nil)
-MY.Game.AddHotKey("MY_ScreenShot_Hotkey_ShowUI", _L["shotscreen with ui"], function() MY_ScreenShot.ShotScreen(MY_ScreenShot.Const.SHOW_UI) end, nil)
+MY.Game.RegisterHotKey("MY_ScreenShot_Hotkey", _L["shotscreen"], function() MY_ScreenShot.ShotScreen((MY_ScreenShot.GetConfig('bAutoHideUI') and MY_ScreenShot.Const.HIDE_UI) or nil) end, nil)
+MY.Game.RegisterHotKey("MY_ScreenShot_Hotkey_HideUI", _L["shotscreen without ui"], function() MY_ScreenShot.ShotScreen(MY_ScreenShot.Const.HIDE_UI) end, nil)
+MY.Game.RegisterHotKey("MY_ScreenShot_Hotkey_ShowUI", _L["shotscreen with ui"], function() MY_ScreenShot.ShotScreen(MY_ScreenShot.Const.SHOW_UI) end, nil)
 MY.RegisterPanel( "ScreenShot", _L["screenshot helper"], _L['System'], "UI/Image/UICommon/Commonpanel.UITex|9", {255,127,0,200}, { OnPanelActive = _MY_ScreenShot.OnPanelActive, OnPanelDeactive = _MY_ScreenShot.OnPanelDeactive } )

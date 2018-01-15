@@ -1209,7 +1209,7 @@ end
 MY.RegisterEvent("LOGIN_GAME", RT.SetStyle)
 
 MY.RegisterAddonMenu({ szOption = _L["Raid Tools Panel"], fnAction = RT.TogglePanel })
-MY.Game.AddHotKey("MY_RaidTools", _L["Open/Close Raid Tools Panel"], RT.TogglePanel)
+MY.Game.RegisterHotKey("MY_RaidTools", _L["Open/Close Raid Tools Panel"], RT.TogglePanel)
 
 local ui = {
 	TogglePanel = RT.TogglePanel

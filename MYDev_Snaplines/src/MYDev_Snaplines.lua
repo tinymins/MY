@@ -493,14 +493,14 @@ MY.RegisterPanel(
 	end
 })
 -- ×¢²á¿ì½Ý¼ü
-MY.Game.AddHotKey("Dev_Snaplines"         , _L["Snaplines"]           , function() MYDev_Snaplines.bEnable   = not MYDev_Snaplines.bEnable   MYDev_Snaplines.ReloadUI() end, nil)
-MY.Game.AddHotKey("Dev_Snaplines_ShowTip" , _L["Snaplines - ShowTip"] , function() MYDev_Snaplines.bShowTip  = not MYDev_Snaplines.bShowTip  MYDev_Snaplines.ReloadUI() end, nil)
-MY.Game.AddHotKey("Dev_Snaplines_ShowData", _L["Snaplines - ShowData"], function() MYDev_Snaplines.bShowData = not MYDev_Snaplines.bShowData MYDev_Snaplines.ReloadUI() end, nil)
+MY.Game.RegisterHotKey("MY_Dev_Snaplines"         , _L["Snaplines"]           , function() MYDev_Snaplines.bEnable   = not MYDev_Snaplines.bEnable   MYDev_Snaplines.ReloadUI() end, nil)
+MY.Game.RegisterHotKey("MY_Dev_Snaplines_ShowTip" , _L["Snaplines - ShowTip"] , function() MYDev_Snaplines.bShowTip  = not MYDev_Snaplines.bShowTip  MYDev_Snaplines.ReloadUI() end, nil)
+MY.Game.RegisterHotKey("MY_Dev_Snaplines_ShowData", _L["Snaplines - ShowData"], function() MYDev_Snaplines.bShowData = not MYDev_Snaplines.bShowData MYDev_Snaplines.ReloadUI() end, nil)
 -- For Debug
 if IsDebugClient and IsDebugClient() then
 	MY.RegisterInit("Dev_Snaplines_Hotkey", function()
-		MY.Game.SetHotKey("Dev_Snaplines", 121)
-		MY.Game.SetHotKey("Dev_Snaplines_ShowTip", 122)
-		MY.Game.SetHotKey("Dev_Snaplines_ShowData", 123)
+		MY.Game.SetHotKey("MY_Dev_Snaplines", 121)
+		MY.Game.SetHotKey("MY_Dev_Snaplines_ShowTip", 122)
+		MY.Game.SetHotKey("MY_Dev_Snaplines_ShowData", 123)
 	end)
 end

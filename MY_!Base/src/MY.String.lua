@@ -67,6 +67,7 @@ function MY.String.Trim(szText)
 	end
 	return (string.gsub(szText, "^%s*(.-)%s*$", "%1"))
 end
+MY.Trim = MY.String.Trim
 
 function MY.String.LenW(str)
 	return wstring.len(str)

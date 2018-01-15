@@ -590,7 +590,7 @@ _C.RegisterMsgMonitor = function()
     RegisterMsgMonitor(_C.OnMsgArrive, t)
 end
 
-MY.Game.AddHotKey("MY_ChatMonitor_Hotkey", _L["chat monitor"],
+MY.Game.RegisterHotKey("MY_ChatMonitor_Hotkey", _L["chat monitor"],
     function()
         if MY_ChatMonitor.bCapture then
             MY.UI(MY.GetFrame()):find('#Button_ChatMonitor_Switcher'):text(_L['start'])

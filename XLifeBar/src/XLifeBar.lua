@@ -1343,4 +1343,4 @@ local function onSwitch()
     XLifeBar.bEnabled = not XLifeBar.bEnabled
     _C.Reset(true)
 end
-MY.Game.AddHotKey("XLifeBar_S", _L["x lifebar"], onSwitch)
+MY.Game.RegisterHotKey("MY_XLifeBar_S", _L["x lifebar"], onSwitch)
