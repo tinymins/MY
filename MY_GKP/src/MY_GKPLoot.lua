@@ -258,6 +258,9 @@ function MY_GKP_Loot.OnLButtonClick()
 				end,
 			},
 		}
+		if IsCtrlKeyDown() then
+			insert(menu, 1, { szOption = dwDoodadID, bDisable = true })
+		end
 		if not MY.IsShieldedVersion() then
 			table.insert(menu, MENU_DIVIDER)
 			table.insert(menu, Loot.GetQualityFilterMenu())
