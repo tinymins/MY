@@ -27,18 +27,16 @@ local MOVE_STATE_ON_STAND    = MOVE_STATE.ON_STAND
 local MOVE_STATE_ON_DEATH    = MOVE_STATE.ON_DEATH
 -- local value
 local CTM_ALPHA_STEP         = 15    -- 240 / CTM_ALPHA_STEP
-local CTM_BOX_HEIGHT         = 42    -- 注意::受限ini 这里只是作用于动态修改
 local CTM_GROUP_COUNT        = 5 - 1 -- 防止以后开个什么40人本 估计不太可能 就和剑三这还得好几年
 local CTM_MEMBER_COUNT       = 5
 local CTM_DRAG               = false
-local CTM_INIFILE            = MY.GetAddonInfo().szRoot .. "MY_Cataclysm/ui/Cataclysm_Party.ini"
+local CTM_INIFILE            = MY.GetAddonInfo().szRoot .. "MY_Cataclysm/ui/Cataclysm_Party1.ini"
 local CTM_DRAG_ID
 local CTM_TARGET
 local CTM_TTARGET
 local CTM_CACHE              = setmetatable({}, { __mode = "v" })
 local CTM_LIFE_CACHE         = {}
 local CTM_BUFF_CACHE         = {}
-local CTM_BORDER_FRAME       = Random(4)
 -- Package func
 local HIDE_FORCE = {
 	[7]  = true,
@@ -302,8 +300,8 @@ function CTM_Party_Base.OnItemLButtonDown()
 end
 
 function CTM_Party_Base.OnItemMouseEnter()
-	if CTM_DRAG then
-		this:Lookup("Image_Selected"):Show()
+	if CTM_DRAG and this:Lookup("Image_Slot") and this:Lookup("Image_Slot"):IsValid() then
+		this:Lookup("Image_Slot"):Show()
 	end
 	if not this.dwID then return end
 	local nX, nY = this:GetRoot():GetAbsPos()
@@ -319,8 +317,8 @@ function CTM_Party_Base.OnItemMouseEnter()
 end
 
 function CTM_Party_Base.OnItemMouseLeave()
-	if CTM_DRAG and this:Lookup("Image_Selected") and this:Lookup("Image_Selected"):IsValid() then
-		this:Lookup("Image_Selected"):Hide()
+	if CTM_DRAG and this:Lookup("Image_Slot") and this:Lookup("Image_Slot"):IsValid() then
+		this:Lookup("Image_Slot"):Hide()
 	end
 	HideTip()
 	if not this.dwID then return end
@@ -415,7 +413,7 @@ end
 function CTM:GetMemberHandle(nGroup, nIndex)
 	local frame = self:GetPartyFrame(nGroup)
 	if frame then
-		return frame:Lookup("", "Handle_Roles"):Lookup(nIndex)
+		return frame:Lookup("", "Handle_Cols/Handle_Roles"):Lookup(nIndex)
 	end
 end
 
@@ -437,7 +435,7 @@ function CTM:RefreshGroupText()
 	for i = 0, team.nGroupNum - 1 do
 		local frame = self:GetPartyFrame(i)
 		if frame then
-			local TextGroup = frame:Lookup("", "Handle_BG/Text_GroupIndex")
+			local TextGroup = frame:Lookup("", "Handle_Cols/Handle_Title/Text_Title")
 			if me.IsInRaid() then
 				TextGroup:SetText(g_tStrings.STR_NUMBER[i + 1])
 				TextGroup:SetFontScheme(7)
@@ -524,7 +522,6 @@ function CTM:RefreshTarget(dwOldID, nOldType, dwNewID, nNewType)
 		if CTM_CACHE[dwNewID] and CTM_CACHE[dwNewID]:IsValid() then
 			if CTM_CACHE[dwNewID]:Lookup("Image_Selected") and CTM_CACHE[dwNewID]:Lookup("Image_Selected"):IsValid() then
 				CTM_CACHE[dwNewID]:Lookup("Image_Selected"):Show()
-				CTM_CACHE[dwNewID]:Lookup("Image_Selected"):SetFrame(CTM_BORDER_FRAME)
 			end
 		end
 	end
@@ -720,9 +717,6 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bNa
 				fScale = fScale * 0.9
 			end
 			img:SetSize(28 * fScale, 28 * fScale)
-			local pos = -10 - (fScale - 1) * 15
-			img:SetRelPos(pos, pos)
-			h:FormatAllItemPos()
 			img:Show()
 		else -- 不再由icon控制 转交给textname
 			img:Hide()
@@ -732,29 +726,28 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bNa
 	-- 刷新名字
 	if bName then
 		local TextName = h:Lookup("Text_Name")
-		TextName:SetText(info.szName)
-		-- TextName:SetText("测试测试测试")
-		TextName:SetFontScheme(CFG.nFont)
+		local TextSchool = h:Lookup("Text_School_Name")
+		local r, g, b = 255, 255, 255
 		if CFG.nColoredName == 1 then
-			TextName:SetFontColor(GetForceColor(info.dwForceID))
+			r, g, b = GetForceColor(info.dwForceID)
 		elseif CFG.nColoredName == 0 then
-			TextName:SetFontColor(255, 255, 255)
+			r, b, b = 255, 255, 255
 		elseif CFG.nColoredName == 2 then
 			if info.nCamp == 0 then
-				TextName:SetFontColor(255, 255, 255)
+				r, g, b = 255, 255, 255
 			elseif info.nCamp == CAMP_GOOD then
-				TextName:SetFontColor(60, 128, 220)
+				r, g, b = 60, 128, 220
 			elseif info.nCamp == CAMP_EVIL then
-				TextName:SetFontColor(160, 30, 30)
+				r, g, b = 160, 30, 30
 			end
 		end
-		if CFG.nShowIcon == 4 then
-			TextName:SetRelPos(-6, 0 - (CFG.fScaleY - 1) * 8)
-			TextName:SetText(string.format("%s %s", CTM_KUNGFU_TEXT[info.dwMountKungfuID], info.szName))
-		else
-			TextName:SetRelPos(17 + (CFG.fScaleX - 1) * 15, 0 - (CFG.fScaleY - 1) * 5)
-		end
-		h:FormatAllItemPos()
+		TextName:SetText(info.szName)
+		TextName:SetFontScheme(CFG.nFont)
+		TextName:SetFontColor(r, g, b)
+		TextSchool:SetText(CTM_KUNGFU_TEXT[info.dwMountKungfuID])
+		TextSchool:SetFontScheme(CFG.nFont)
+		TextSchool:SetFontColor(r, g, b)
+		TextSchool:SetVisible(CFG.nShowIcon == 4)
 	end
 end
 
@@ -825,21 +818,21 @@ function CTM:DrawParty(nIndex)
 	local team = GetClientTeam()
 	local tGroup = team.GetGroupInfo(nIndex)
 	local frame = self:GetPartyFrame(nIndex)
-	local handle = frame:Lookup("", "Handle_Roles")
+	local handle = frame:Lookup("", "Handle_Cols/Handle_Roles")
 	local tSetting = self:GetTeamInfo()
 	local hMember = Cataclysm_Main.GetFrame().hMember
 	handle:Clear()
 	for i = 1, CTM_MEMBER_COUNT do
 		local dwID = tGroup.MemberList[i]
 		local h = handle:AppendItemFromData(hMember, i)
-		h.nGroup = nIndex
 		if dwID then
 			h.dwID = dwID
 			CTM_CACHE[dwID] = h
 			local info = self:GetMemberInfo(dwID)
-			h:Lookup("Handle_Common/Image_BG_Force"):Show()
+			h:Lookup("Image_MemberBg"):Show()
 			self:RefreshImages(h, dwID, info, tSetting, true, dwID == tGroup.dwFormationLeader, true)
 		end
+		h.nGroup = nIndex
 		self:Scale(CFG.fScaleX, CFG.fScaleY, h)
 	end
 	handle:FormatAllItemPos()
@@ -881,42 +874,45 @@ end
 
 function CTM:FormatFrame(frame, nMemberCount)
 	local fX, fY = CFG.fScaleX, CFG.fScaleY
-	local helgit, nGrouphelgit = (CFG.fScaleY - 1) * 18, 0
+	local height, nGroupHeight = (CFG.fScaleY - 1) * 18, 0
 	local h = frame:Lookup("", "Handle_BG")
+	local nRolesH = 0
 	if CTM_DRAG or CFG.bShowAllGrid then
 		nMemberCount = CTM_MEMBER_COUNT
-		local handle = frame:Lookup("", "Handle_Roles")
+		local handle = frame:Lookup("", "Handle_Cols/Handle_Roles")
 		for i = 0, handle:GetItemCount() - 1 do
 			local h = handle:Lookup(i)
-			if h and h:IsValid() and not h.dwID then
-				handle:Lookup(i):Lookup("Image_BG_Slot"):Show()
+			if not h.dwID then
+				h:Lookup("Image_SlotBg"):Show()
+				h:Lookup("Image_MemberBg"):Show()
 			end
+			nRolesH = nRolesH + h:GetH()
 		end
 	else
 		nMemberCount = frame.nMemberCount or CTM_MEMBER_COUNT
-		local handle = frame:Lookup("", "Handle_Roles")
+		local handle = frame:Lookup("", "Handle_Cols/Handle_Roles")
 		for i = 0, handle:GetItemCount() - 1 do
-			handle:Lookup(i):Lookup("Image_BG_Slot"):Hide()
+			local h = handle:Lookup(i)
+			if h.dwID then
+				nRolesH = nRolesH + h:GetH()
+			end
+			h:Lookup("Image_SlotBg"):Hide()
+			h:Lookup("Image_MemberBg"):SetVisible(not not h.dwID)
 		end
 	end
 	if not CFG.bShowGropuNumber then
-		nGrouphelgit = 21
+		nGroupHeight = 21
 	end
-	frame:SetSize(128 * fX, (25 + nMemberCount * CTM_BOX_HEIGHT) * fY - helgit - nGrouphelgit)
-	h:Lookup("Shadow_BG"):SetSize(120 * fX, (20 + nMemberCount * CTM_BOX_HEIGHT) * fY - helgit - nGrouphelgit)
-	h:Lookup("Image_BG_L"):SetSize(18 * fX, nMemberCount * (CTM_BOX_HEIGHT + 3) * fY - helgit - nGrouphelgit)
-	h:Lookup("Image_BG_R"):SetSize(18 * fX, nMemberCount * (CTM_BOX_HEIGHT + 3) * fY - helgit - nGrouphelgit)
-	h:Lookup("Image_BG_BL"):SetRelPos(0, (11 + nMemberCount * CTM_BOX_HEIGHT) * fY - helgit - nGrouphelgit)
+	frame:SetSize(128 * fX, 25 * fY + nRolesH - height - nGroupHeight)
+	h:Lookup("Shadow_BG"):SetSize(120 * fX, nRolesH + 20 * fY - height - nGroupHeight)
+	h:Lookup("Image_BG_L"):SetSize(18 * fX, nRolesH + nMemberCount * 3 * fY - height - nGroupHeight)
+	h:Lookup("Image_BG_R"):SetSize(18 * fX, nRolesH + nMemberCount * 3 * fY - height - nGroupHeight)
+	h:Lookup("Image_BG_BL"):SetRelPos(0, nRolesH + 11 * fY - height - nGroupHeight)
 	h:Lookup("Image_BG_T"):SetSize(110 * fX, 18 * fY)
 	h:Lookup("Image_BG_B"):SetSize(110 * fX, 18 * fY)
-	h:Lookup("Image_BG_B"):SetRelPos(14 * fX, (11 + nMemberCount * CTM_BOX_HEIGHT) * fY - helgit - nGrouphelgit)
-	h:Lookup("Image_BG_BR"):SetRelPos(112 * fX, (11 + nMemberCount * CTM_BOX_HEIGHT) * fY - helgit - nGrouphelgit)
-	if CFG.bShowGropuNumber then
-		h:Lookup("Text_GroupIndex"):SetSize(128 * fX, 26 * fY - helgit)
-		h:Lookup("Text_GroupIndex"):SetRelPos(0, nMemberCount * CTM_BOX_HEIGHT * fY)
-	else
-		h:Lookup("Text_GroupIndex"):Hide()
-	end
+	h:Lookup("Image_BG_B"):SetRelPos(14 * fX, nRolesH + 11 * fY - height - nGroupHeight)
+	h:Lookup("Image_BG_BR"):SetRelPos(112 * fX, nRolesH + 11 * fY - height - nGroupHeight)
+	frame:Lookup("", "Handle_Cols/Handle_Title/Text_Title"):SetVisible(CFG.bShowGropuNumber)
 	h:FormatAllItemPos()
 end
 
@@ -1029,15 +1025,14 @@ function CTM:RefreshDistance()
 		for k, v in pairs(CTM_CACHE) do
 			if v:IsValid() then
 				local p = GetPlayer(k) -- info.nPoX 刷新太慢了 对于治疗来说 这个太重要了
-				local Lsha = v:Lookup("Handle_Common/Shadow_Life")
 				if p then
 					local nDistance = MY_GetDistance(p.nX, p.nY) -- 只计算平面
 					if CFG.nBGColorMode == 1 then
 						local find
 						for kk, vv in ipairs(CFG.tDistanceLevel) do
 							if nDistance <= vv then
-								if Lsha.nLevel ~= kk then
-									Lsha.nLevel = kk
+								if v.nLevel ~= kk then
+									v.nLevel = kk
 									self:CallDrawHPMP(k, true)
 								end
 								find = true
@@ -1045,13 +1040,13 @@ function CTM:RefreshDistance()
 							end
 						end
 						-- 如果上面都不匹配的话 默认认为出了同步范围 feedback 桥之于水
-						if not find and Lsha.nLevel then
-							Lsha.nLevel = nil
+						if not find and v.nLevel then
+							v.nLevel = nil
 							self:CallDrawHPMP(k, true)
 						end
 					else
-						local _nDistance = Lsha.nDistance or 0
-						Lsha.nDistance = nDistance
+						local _nDistance = v.nDistance or 0
+						v.nDistance = nDistance
 						if (nDistance > 20 and _nDistance <= 20) or (nDistance <= 20 and _nDistance > 20) then
 							self:CallDrawHPMP(k, true)
 						end
@@ -1066,9 +1061,9 @@ function CTM:RefreshDistance()
 					if CFG.bShowDistance then
 						v:Lookup("Handle_Common/Text_Distance"):SetText("")
 					end
-					if Lsha.nLevel or Lsha.nDistance then
-						Lsha.nLevel = nil
-						Lsha.nDistance = nil
+					if v.nLevel or v.nDistance then
+						v.nLevel = nil
+						v.nDistance = nil
 						self:CallDrawHPMP(k, true)
 					end
 				end
@@ -1077,10 +1072,9 @@ function CTM:RefreshDistance()
 	else
 		for k, v in pairs(CTM_CACHE) do
 			if v:IsValid() then
-				local Lsha = v:Lookup("Handle_Common/Shadow_Life")
-				if Lsha.nLevel or Lsha.nDistance ~= 0 then
-					Lsha.nLevel = 1
-					Lsha.nDistance = 0
+				if v.nLevel or v.nDistance ~= 0 then
+					v.nLevel = 1
+					v.nDistance = 0
 					self:CallDrawHPMP(k, true)
 				end
 			end
@@ -1111,7 +1105,10 @@ end
 function CTM:DrawHPMP(h, dwID, info, bRefresh)
 	if not info then return end
 	local Lsha = h:Lookup("Handle_Common/Shadow_Life")
+	local Limg = h:Lookup("Handle_Common/Image_Life")
+	local Ledg = h:Lookup("Handle_Common/Image_LifeLine")
 	local Msha = h:Lookup("Handle_Common/Shadow_Mana")
+	local Mimg = h:Lookup("Handle_Common/Image_Mana")
 	local p, dwMountType
 	if CFG.bFasterHP then
 		p = GetPlayer(dwID)
@@ -1146,7 +1143,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 	end
 	local nAlpha = 255
 	if CFG.nBGColorMode ~= 1 then
-		if (Lsha.nDistance and Lsha.nDistance > 20) or not Lsha.nDistance then
+		if (h.nDistance and h.nDistance > 20) or not h.nDistance then
 			if info.bIsOnLine then
 				nAlpha = nAlpha * 0.6
 			end
@@ -1165,74 +1162,114 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 				mana:SetText(nManaShow)
 			end
 		end
-		if not nPercentage or nPercentage < 0 or nPercentage > 1 then nPercentage = 1 end
-		local r, g, b = unpack(CFG.tManaColor)
-		self:DrawShadow(Msha, 119 * nPercentage, 9, r, g, b, nAlpha, CFG.bManaGradient)
-		Msha:Show()
-	else
-		Msha:Hide()
-	end
-	-- 缓存
-	if not CFG.bFasterHP or bRefresh or (CFG.bFasterHP and CTM_LIFE_CACHE[dwID] ~= nLifePercentage) then
-		-- 颜色计算
-		local nNewW = 119 * nLifePercentage
-		local r, g, b = unpack(CFG.tOtherCol[2]) -- 不在线就灰色了
-		if info.bIsOnLine then
-			if CFG.nBGColorMode == 1 then
-				if p or GetPlayer(dwID) then
-					if Lsha.nLevel then
-						r, g, b = unpack(CFG.tDistanceCol[Lsha.nLevel])
-					else
-						r, g, b = unpack(CFG.tOtherCol[3])
-					end
-				else
-					r, g, b = unpack(CFG.tOtherCol[3]) -- 在线使用白色
-				end
-			elseif CFG.nBGColorMode == 0 then
-				r, g, b = unpack(CFG.tDistanceCol[1]) -- 使用用户配色1
-			elseif CFG.nBGColorMode == 2 then
-				r, g, b = MY.GetForceColor(info.dwForceID)
-			end
-		else
-			nAlpha = 255
+		if not nPercentage or nPercentage < 0 or nPercentage > 1 then
+			nPercentage = 1
 		end
-		self:DrawShadow(Lsha, nNewW, 32, r, g, b, nAlpha, CFG.bLifeGradient)
-		Lsha:Show()
-		if CFG.bHPHitAlert then
-			local lifeFade = h:Lookup("Handle_Common/Shadow_Life_Fade")
-			if CTM_LIFE_CACHE[dwID] and CTM_LIFE_CACHE[dwID] > nLifePercentage then
-				local alpha = lifeFade:GetAlpha()
-				if alpha == 0 then
-					lifeFade:SetSize(CTM_LIFE_CACHE[dwID] * 119 * CFG.fScaleX, 31 * CFG.fScaleY)
+		if Msha then
+			local r, g, b = unpack(CFG.tManaColor)
+			self:DrawShadow(Msha, 119 * nPercentage, 9, r, g, b, nAlpha, CFG.bManaGradient)
+			Msha:Show()
+		end
+		if Mimg then
+			Mimg:SetPercentage(nPercentage)
+			Mimg:SetVisible(info.bIsOnLine)
+		end
+	else
+		if Msha then
+			Msha:Hide()
+		end
+		if Mimg then
+			Mimg:Hide()
+		end
+	end
+	-- 掉血警告 必须早于血条绘制
+	if CFG.bHPHitAlert then
+		local lifeFade = h:Lookup("Handle_Common/Shadow_Life_Fade")
+		if CTM_LIFE_CACHE[dwID] and CTM_LIFE_CACHE[dwID] > nLifePercentage then
+			local nAlpha, nW, nH = lifeFade:GetAlpha(), 0, 0
+			if nAlpha == 0 then
+				if Lsha then
+					nW, nH = Lsha:GetSize()
+				elseif Limg then
+					nW, nH = Limg:GetW() * CTM_LIFE_CACHE[dwID], Limg:GetH()
 				end
-				if CFG.nBGColorMode ~= 1 then
-					if (Lsha.nDistance and Lsha.nDistance > 20) or not Lsha.nDistance then
-						lifeFade:SetAlpha(0)
-						lifeFade:Hide()
-					else
-						lifeFade:SetAlpha(240)
-						lifeFade:Show()
-					end
+				lifeFade:SetSize(nW, nH)
+			end
+			if CFG.nBGColorMode ~= 1 then
+				if (h.nDistance and h.nDistance > 20) or not h.nDistance then
+					lifeFade:SetAlpha(0)
+					lifeFade:Hide()
 				else
 					lifeFade:SetAlpha(240)
 					lifeFade:Show()
 				end
-				local key = "CTM_HIT_" .. dwID
-				MY.BreatheCall(key, false)
-				MY.BreatheCall(key, function()
-					if lifeFade:IsValid() then
-						local nFadeAlpha = math.max(lifeFade:GetAlpha() - CTM_ALPHA_STEP, 0)
-						lifeFade:SetAlpha(nFadeAlpha)
-						if nFadeAlpha <= 0 then
-							MY.BreatheCall(key, false)
-						end
-					else
+			else
+				lifeFade:SetAlpha(240)
+				lifeFade:Show()
+			end
+			local key = "CTM_HIT_" .. dwID
+			MY.BreatheCall(key, false)
+			MY.BreatheCall(key, function()
+				if lifeFade:IsValid() then
+					local nFadeAlpha = math.max(lifeFade:GetAlpha() - CTM_ALPHA_STEP, 0)
+					lifeFade:SetAlpha(nFadeAlpha)
+					if nFadeAlpha <= 0 then
 						MY.BreatheCall(key, false)
 					end
-				end)
+				else
+					MY.BreatheCall(key, false)
+				end
+			end)
+		end
+	else
+		h:Lookup("Handle_Common/Shadow_Life_Fade"):Hide()
+	end
+	-- 缓存
+	if not CFG.bFasterHP or bRefresh or (CFG.bFasterHP and CTM_LIFE_CACHE[dwID] ~= nLifePercentage) then
+		if Lsha then
+			-- 颜色计算
+			local nNewW = 119 * nLifePercentage
+			local r, g, b = unpack(CFG.tOtherCol[2]) -- 不在线就灰色了
+			if info.bIsOnLine then
+				if CFG.nBGColorMode == 1 then
+					if p or GetPlayer(dwID) then
+						if h.nLevel then
+							r, g, b = unpack(CFG.tDistanceCol[h.nLevel])
+						else
+							r, g, b = unpack(CFG.tOtherCol[3])
+						end
+					else
+						r, g, b = unpack(CFG.tOtherCol[3]) -- 在线使用白色
+					end
+				elseif CFG.nBGColorMode == 0 then
+					r, g, b = unpack(CFG.tDistanceCol[1]) -- 使用用户配色1
+				elseif CFG.nBGColorMode == 2 then
+					r, g, b = MY.GetForceColor(info.dwForceID)
+				end
+			else
+				nAlpha = 255
+			end
+			self:DrawShadow(Lsha, nNewW, 32, r, g, b, nAlpha, CFG.bLifeGradient)
+			Lsha:Show()
+		end
+		if info.bIsOnLine then
+			if Limg then
+				Limg:SetPercentage(nLifePercentage)
+				Limg:Show()
+			end
+			if Ledg and (Limg or Lsha) then
+				local nRelX = ((Limg and (Limg:GetRelX() + Limg:GetW() * nLifePercentage)) or (Lsha:GetRelX() + Lsha:GetW())) - Ledg:GetW()
+				Ledg:SetRelX(nRelX)
+				Ledg:SetAbsX(h:GetAbsX() + nRelX)
+				Ledg:Show()
 			end
 		else
-			h:Lookup("Handle_Common/Shadow_Life_Fade"):Hide()
+			if Limg then
+				Limg:Hide()
+			end
+			if Ledg then
+				Ledg:Hide()
+			end
 		end
 
 		if not CTM_LIFE_CACHE[dwID] then
@@ -1244,7 +1281,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 		local life = h:Lookup("Handle_Common/Text_Life")
 		life:SetFontScheme(CFG.nLifeFont)
 		if CFG.nBGColorMode ~= 1 then
-			if (Lsha.nDistance and Lsha.nDistance > 20) or not Lsha.nDistance then
+			if (h.nDistance and h.nDistance > 20) or not h.nDistance then
 				life:SetAlpha(150)
 			else
 				life:SetAlpha(255)
@@ -1295,6 +1332,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 		-- if info.dwMountKungfuID == 0 then -- 没有同步成功时显示的内容
 			-- life:SetText("sync ...")
 		-- end
+		h:Lookup("Handle_Common/Image_PlayerBg"):SetVisible(info.bIsOnLine)
 	end
 end
 
