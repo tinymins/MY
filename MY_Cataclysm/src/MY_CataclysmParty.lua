@@ -1079,14 +1079,14 @@ function CTM:RefreshDistance()
 						end
 					end
 					if CFG.bShowDistance then
-						v:Lookup("Handle_Common/Text_Distance"):SetText(string.format("%.1f", nDistance))
-						v:Lookup("Handle_Common/Text_Distance"):SetFontColor(255, math.max(0, 255 - nDistance * 8), math.max(0, 255 - nDistance * 8))
+						v:Lookup("Text_Distance"):SetText(string.format("%.1f", nDistance))
+						v:Lookup("Text_Distance"):SetFontColor(255, math.max(0, 255 - nDistance * 8), math.max(0, 255 - nDistance * 8))
 					else
-						v:Lookup("Handle_Common/Text_Distance"):SetText("")
+						v:Lookup("Text_Distance"):SetText("")
 					end
 				else
 					if CFG.bShowDistance then
-						v:Lookup("Handle_Common/Text_Distance"):SetText("")
+						v:Lookup("Text_Distance"):SetText("")
 					end
 					if v.nDistanceLevel or v.nDistance then
 						v.nDistanceLevel = nil
