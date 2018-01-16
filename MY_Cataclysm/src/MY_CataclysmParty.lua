@@ -901,11 +901,11 @@ end
 function CTM:FormatFrame(frame, nMemberCount)
 	local fX, fY = CFG.fScaleX, CFG.fScaleY
 	local height, nGroupHeight = (CFG.fScaleY - 1) * 18, 0
-	local h = frame:Lookup("", "Handle_BG")
+	local h = frame:Lookup("", "")
 	local nRolesH = 0
 	if CTM_DRAG or CFG.bShowAllGrid then
 		nMemberCount = CTM_MEMBER_COUNT
-		local handle = frame:Lookup("", "Handle_Cols/Handle_Roles")
+		local handle = h:Lookup("Handle_Cols/Handle_Roles")
 		for i = 0, handle:GetItemCount() - 1 do
 			local h = handle:Lookup(i)
 			if not h.dwID then
@@ -916,7 +916,7 @@ function CTM:FormatFrame(frame, nMemberCount)
 		end
 	else
 		nMemberCount = frame.nMemberCount or CTM_MEMBER_COUNT
-		local handle = frame:Lookup("", "Handle_Cols/Handle_Roles")
+		local handle = h:Lookup("Handle_Cols/Handle_Roles")
 		for i = 0, handle:GetItemCount() - 1 do
 			local h = handle:Lookup(i)
 			if h.dwID then
@@ -926,20 +926,21 @@ function CTM:FormatFrame(frame, nMemberCount)
 			h:Lookup("Image_MemberBg"):SetVisible(not not h.dwID)
 		end
 	end
-	if not CFG.bShowGropuNumber then
+	if not CFG.bShowGroupNumber then
 		nGroupHeight = 21
 	end
 	frame:SetSize(128 * fX, 25 * fY + nRolesH - height - nGroupHeight)
-	h:Lookup("Shadow_BG"):SetSize(120 * fX, nRolesH + 20 * fY - height - nGroupHeight)
-	h:Lookup("Image_BG_L"):SetSize(18 * fX, nRolesH + nMemberCount * 3 * fY - height - nGroupHeight)
-	h:Lookup("Image_BG_R"):SetSize(18 * fX, nRolesH + nMemberCount * 3 * fY - height - nGroupHeight)
-	h:Lookup("Image_BG_BL"):SetRelPos(0, nRolesH + 11 * fY - height - nGroupHeight)
-	h:Lookup("Image_BG_T"):SetSize(110 * fX, 18 * fY)
-	h:Lookup("Image_BG_B"):SetSize(110 * fX, 18 * fY)
-	h:Lookup("Image_BG_B"):SetRelPos(14 * fX, nRolesH + 11 * fY - height - nGroupHeight)
-	h:Lookup("Image_BG_BR"):SetRelPos(112 * fX, nRolesH + 11 * fY - height - nGroupHeight)
-	frame:Lookup("", "Handle_Cols/Handle_Title/Text_Title"):SetVisible(CFG.bShowGropuNumber)
-	h:FormatAllItemPos()
+	h:Lookup("Handle_BG/Shadow_BG"):SetSize(120 * fX, nRolesH + 20 * fY - height - nGroupHeight)
+	h:Lookup("Handle_BG/Image_BG_L"):SetSize(18 * fX, nRolesH + nMemberCount * 3 * fY - height - nGroupHeight)
+	h:Lookup("Handle_BG/Image_BG_R"):SetSize(18 * fX, nRolesH + nMemberCount * 3 * fY - height - nGroupHeight)
+	h:Lookup("Handle_BG/Image_BG_BL"):SetRelPos(0, nRolesH + 11 * fY - height - nGroupHeight)
+	h:Lookup("Handle_BG/Image_BG_T"):SetSize(110 * fX, 18 * fY)
+	h:Lookup("Handle_BG/Image_BG_B"):SetSize(110 * fX, 18 * fY)
+	h:Lookup("Handle_BG/Image_BG_B"):SetRelPos(14 * fX, nRolesH + 11 * fY - height - nGroupHeight)
+	h:Lookup("Handle_BG/Image_BG_BR"):SetRelPos(112 * fX, nRolesH + 11 * fY - height - nGroupHeight)
+	h:Lookup("Handle_BG"):FormatAllItemPos()
+	h:Lookup("Handle_Cols/Handle_Title"):SetVisible(CFG.bShowGroupNumber)
+	h:Lookup("Handle_Cols"):FormatAllItemPos()
 end
 
 -- 注册buff
@@ -1053,12 +1054,12 @@ function CTM:RefreshDistance()
 				local p = GetPlayer(k) -- info.nPoX 刷新太慢了 对于治疗来说 这个太重要了
 				if p then
 					local nDistance = MY_GetDistance(p.nX, p.nY) -- 只计算平面
-					if CFG.nBGColorMode == 1 then
+					if CFG.nBGColorMode == 1 or CFG.nBGColorMode == 3 then
 						local find
 						for kk, vv in ipairs(CFG.tDistanceLevel) do
 							if nDistance <= vv then
-								if v.nLevel ~= kk then
-									v.nLevel = kk
+								if v.nDistanceLevel ~= kk then
+									v.nDistanceLevel = kk
 									self:CallDrawHPMP(k, true)
 								end
 								find = true
@@ -1066,8 +1067,8 @@ function CTM:RefreshDistance()
 							end
 						end
 						-- 如果上面都不匹配的话 默认认为出了同步范围 feedback 桥之于水
-						if not find and v.nLevel then
-							v.nLevel = nil
+						if not find and v.nDistanceLevel then
+							v.nDistanceLevel = nil
 							self:CallDrawHPMP(k, true)
 						end
 					else
@@ -1087,8 +1088,8 @@ function CTM:RefreshDistance()
 					if CFG.bShowDistance then
 						v:Lookup("Handle_Common/Text_Distance"):SetText("")
 					end
-					if v.nLevel or v.nDistance then
-						v.nLevel = nil
+					if v.nDistanceLevel or v.nDistance then
+						v.nDistanceLevel = nil
 						v.nDistance = nil
 						self:CallDrawHPMP(k, true)
 					end
@@ -1098,8 +1099,8 @@ function CTM:RefreshDistance()
 	else
 		for k, v in pairs(CTM_CACHE) do
 			if v:IsValid() then
-				if v.nLevel or v.nDistance ~= 0 then
-					v.nLevel = 1
+				if v.nDistanceLevel or v.nDistance ~= 0 then
+					v.nDistanceLevel = 1
 					v.nDistance = 0
 					self:CallDrawHPMP(k, true)
 				end
@@ -1169,7 +1170,15 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 		end
 	end
 	local nAlpha = 255
-	if CFG.nBGColorMode ~= 1 then
+	if CFG.nBGColorMode == 3 then
+		if h.nDistanceLevel then
+			nAlpha = CFG.tDistanceAlpha[h.nDistanceLevel]
+		elseif info.bIsOnLine then
+			nAlpha = CFG.tOtherAlpha[3]
+		else
+			nAlpha = CFG.tOtherAlpha[2]
+		end
+	elseif CFG.nBGColorMode ~= 1 then
 		if (h.nDistance and h.nDistance > 20) or not h.nDistance then
 			if info.bIsOnLine then
 				nAlpha = nAlpha * 0.6
@@ -1197,6 +1206,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			self:DrawShadow(Msha, 119 * nPercentage, 9, r, g, b, nAlpha, CFG.bManaGradient)
 			Msha:Show()
 		else
+			Mimg:SetAlpha(nAlpha)
 			Mimg:SetPercentage(nPercentage)
 			Mimg:SetVisible(info.bIsOnLine)
 		end
@@ -1258,8 +1268,8 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			if info.bIsOnLine then
 				if CFG.nBGColorMode == 1 then
 					if p or GetPlayer(dwID) then
-						if h.nLevel then
-							r, g, b = unpack(CFG.tDistanceCol[h.nLevel])
+						if h.nDistanceLevel then
+							r, g, b = unpack(CFG.tDistanceCol[h.nDistanceLevel])
 						else
 							r, g, b = unpack(CFG.tOtherCol[3])
 						end
@@ -1278,10 +1288,12 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			Lsha:Show()
 		else
 			local nRelX = Limg:GetRelX() + Limg:GetW() * nLifePercentage - Ledg:GetW()
-			Ledg:SetVisible(info.bIsOnLine)
+			Ledg:Show()
+			Ledg:SetAlpha(nAlpha)
 			Ledg:SetRelX(nRelX)
 			Ledg:SetAbsX(h:GetAbsX() + nRelX)
-			Limg:SetVisible(info.bIsOnLine)
+			Limg:Show()
+			Limg:SetAlpha(nAlpha)
 			Limg:SetPercentage(nLifePercentage)
 		end
 

@@ -1144,7 +1144,8 @@ function PS.OnPanelActive(frame)
 	x = X + 20
 	y = y + 10
 	if Cataclysm_Main.nBGColorMode ~= 2 then
-		if Cataclysm_Main.nBGColorMode == 1 then
+		-- 设置分段距离等级
+		if Cataclysm_Main.nBGColorMode == 1 or Cataclysm_Main.nBGColorMode == 3 then
 			y = y + ui:append("WndButton3", {
 				x = x, y = y, text = _L["Edit Distance Level"],
 				onclick = function()
@@ -1161,8 +1162,10 @@ function PS.OnPanelActive(frame)
 						if #t > 0 then
 							Cataclysm_Main.tDistanceLevel = tt
 							Cataclysm_Main.tDistanceCol = {}
+							Cataclysm_Main.tDistanceAlpha = {}
 							for k, v in ipairs(t) do
 								table.insert(Cataclysm_Main.tDistanceCol, { 255, 255, 255 })
+								table.insert(Cataclysm_Main.tDistanceAlpha, 255)
 							end
 							MY.SwitchTab("MY_Cataclysm_GridStyle")
 						end
@@ -1170,22 +1173,70 @@ function PS.OnPanelActive(frame)
 				end,
 			}, true):height()
 		end
+		-- 分段距离背景
 		for i = 1, #Cataclysm_Main.tDistanceLevel do
+			if Cataclysm_Main.nBGColorMode ~= 1 and Cataclysm_Main.nBGColorMode ~= 3 and i > 1 then
+				break
+			end
 			local n = Cataclysm_Main.tDistanceLevel[i - 1] or 0
 			local txt = n .. g_tStrings.STR_METER .. " - " .. Cataclysm_Main.tDistanceLevel[i] .. g_tStrings.STR_METER .. g_tStrings.BACK_COLOR
 			if Cataclysm_Main.nBGColorMode == 0 then
 				txt = g_tStrings.BACK_COLOR
 			end
-			if Cataclysm_Main.nBGColorMode ~= 1 and i > 1 then
-				break
-			end
 			ui:append("Text", { x = x, y = y, text = txt }):autoWidth()
+			if Cataclysm_Main.nBGColorMode == 3 then
+				y = y + ui:append("WndSliderBox", {
+					x = 280, y = y + 3, h = 22,
+					range = {0, 255},
+					value = Cataclysm_Main.tDistanceAlpha[i],
+					sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+					onchange = function(val)
+						Cataclysm_Main.tDistanceAlpha[i] = val
+						if GetFrame() then
+							Grid_CTM:CallDrawHPMP(true, true)
+						end
+					end,
+				}, true):height() + 5
+			else
+				y = y + ui:append("Shadow", {
+					w = 22, h = 22, x = 280, y = y + 3, color = Cataclysm_Main.tDistanceCol[i],
+					onclick = function()
+						local this = this
+						XGUI.OpenColorPicker(function(r, g, b)
+							Cataclysm_Main.tDistanceCol[i] = { r, g, b }
+							if GetFrame() then
+								Grid_CTM:CallDrawHPMP(true, true)
+							end
+							XGUI(this):color(r, g, b)
+						end)
+					end,
+				}, true):height() + 5
+			end
+		end
+
+		-- 出同步范围背景
+		ui:append("Text", { x = x, y = y, text = g_tStrings.STR_RAID_DISTANCE_M4 }):autoWidth()
+		if Cataclysm_Main.nBGColorMode == 3 then
+			y = y + ui:append("WndSliderBox", {
+				x = 280, y = y + 3, h = 22,
+				range = {0, 255},
+				value = Cataclysm_Main.tOtherAlpha[3],
+				sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+				onchange = function(val)
+					Cataclysm_Main.tOtherAlpha[3] = val
+					if GetFrame() then
+						Grid_CTM:CallDrawHPMP(true, true)
+					end
+				end,
+			}, true):height() + 5
+		else
 			y = y + ui:append("Shadow", {
-				w = 22, h = 22, x = 280, y = y + 3, color = Cataclysm_Main.tDistanceCol[i],
+				w = 22, h = 22, x = 280, y = y + 3,
+				color = Cataclysm_Main.tOtherCol[3],
 				onclick = function()
 					local this = this
 					XGUI.OpenColorPicker(function(r, g, b)
-						Cataclysm_Main.tDistanceCol[i] = { r, g, b }
+						Cataclysm_Main.tOtherCol[3] = { r, g, b }
 						if GetFrame() then
 							Grid_CTM:CallDrawHPMP(true, true)
 						end
@@ -1195,50 +1246,53 @@ function PS.OnPanelActive(frame)
 			}, true):height() + 5
 		end
 
-		ui:append("Text", { x = x, y = y, text = g_tStrings.STR_RAID_DISTANCE_M4 }):autoWidth()
-		y = y + ui:append("Shadow", {
-			w = 22, h = 22, x = 280, y = y + 3,
-			color = Cataclysm_Main.tOtherCol[3],
-			onclick = function()
-				local this = this
-				XGUI.OpenColorPicker(function(r, g, b)
-					Cataclysm_Main.tOtherCol[3] = { r, g, b }
-					if GetFrame() then
-						Grid_CTM:CallDrawHPMP(true, true)
-					end
-					XGUI(this):color(r, g, b)
-				end)
-			end,
-		}, true):height() + 5
-
+		-- 离线背景
 		ui:append("Text", { x = x, y = y, text = g_tStrings.STR_GUILD_OFFLINE .. g_tStrings.BACK_COLOR }, true):autoWidth()
-		y = y + ui:append("Shadow", {
-			w = 22, h = 22, x = 280, y = y + 3, color = Cataclysm_Main.tOtherCol[2],
-			onclick = function()
-				local this = this
-				XGUI.OpenColorPicker(function(r, g, b)
-					Cataclysm_Main.tOtherCol[2] = { r, g, b }
+		if Cataclysm_Main.nBGColorMode == 3 then
+			y = y + ui:append("WndSliderBox", {
+				x = 280, y = y + 3, h = 22,
+				range = {0, 255},
+				value = Cataclysm_Main.tOtherAlpha[2],
+				sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+				onchange = function(val)
+					Cataclysm_Main.tOtherAlpha[2] = val
 					if GetFrame() then
 						Grid_CTM:CallDrawHPMP(true, true)
 					end
-					XGUI(this):color(r, g, b)
-				end)
-			end,
-		}, true):height() + 5
+				end,
+			}, true):height() + 5
+		else
+			y = y + ui:append("Shadow", {
+				w = 22, h = 22, x = 280, y = y + 3, color = Cataclysm_Main.tOtherCol[2],
+				onclick = function()
+					local this = this
+					XGUI.OpenColorPicker(function(r, g, b)
+						Cataclysm_Main.tOtherCol[2] = { r, g, b }
+						if GetFrame() then
+							Grid_CTM:CallDrawHPMP(true, true)
+						end
+						XGUI(this):color(r, g, b)
+					end)
+				end,
+			}, true):height() + 5
+		end
 
-		ui:append("Text", { x = x, y = y, text = g_tStrings.STR_SKILL_MANA .. g_tStrings.BACK_COLOR }, true):autoWidth()
-		y = y + ui:append("Shadow", {
-			w = 22, h = 22, x = 280, y = y + 3, color = Cataclysm_Main.tManaColor,
-			onclick = function()
-				XGUI.OpenColorPicker(function(r, g, b)
-					Cataclysm_Main.tManaColor = { r, g, b }
-					ui:Fetch("STR_SKILL_MANA"):Color(r, g, b)
-					if GetFrame() then
-						Grid_CTM:CallDrawHPMP(true, true)
-					end
-				end)
-			end,
-		}, true):height() + 5
+		-- 内力
+		if Cataclysm_Main.nBGColorMode ~= 3 then
+			ui:append("Text", { x = x, y = y, text = g_tStrings.STR_SKILL_MANA .. g_tStrings.BACK_COLOR }, true):autoWidth()
+			y = y + ui:append("Shadow", {
+				w = 22, h = 22, x = 280, y = y + 3, color = Cataclysm_Main.tManaColor,
+				onclick = function()
+					XGUI.OpenColorPicker(function(r, g, b)
+						Cataclysm_Main.tManaColor = { r, g, b }
+						ui:Fetch("STR_SKILL_MANA"):Color(r, g, b)
+						if GetFrame() then
+							Grid_CTM:CallDrawHPMP(true, true)
+						end
+					end)
+				end,
+			}, true):height() + 5
+		end
 	end
 end
 MY.RegisterPanel("MY_Cataclysm_GridStyle", _L["Grid Style"], _L["Raid"], "ui/Image/UICommon/RaidTotal.uitex|68", {255, 255, 0}, PS)
@@ -1328,9 +1382,9 @@ function PS.OnPanelActive(frame)
 	x = x + 10
 	y = y + ui:append("WndCheckBox", {
 		x = x, y = y, text = _L["Show Group Number"],
-		checked = Cataclysm_Main.bShowGropuNumber,
+		checked = Cataclysm_Main.bShowGroupNumber,
 		oncheck = function(bCheck)
-			Cataclysm_Main.bShowGropuNumber = bCheck
+			Cataclysm_Main.bShowGroupNumber = bCheck
 			if GetFrame() then
 				Grid_CTM:CloseParty()
 				Grid_CTM:ReloadParty()
@@ -1338,20 +1392,22 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):height()
 
-	x = x + ui:append("Text", { x = x, y = y, text = g_tStrings.STR_ALPHA }, true):autoWidth():width() + 5
-	y = y + ui:append("WndSliderBox", {
-		x = x, y = y + 3,
-		range = {0, 255},
-		value = Cataclysm_Main.nAlpha,
-		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
-		onchange = function(nVal)
-			Cataclysm_Main.nAlpha = nVal
-			if GetFrame() then
-				FireUIEvent("CTM_SET_ALPHA")
-			end
-		end,
-		textfmt = function(val) return _L("%d%%", val) end,
-	}, true):height()
+	if Cataclysm_Main.nBGColorMode ~= 3 then
+		x = x + ui:append("Text", { x = x, y = y, text = g_tStrings.STR_ALPHA }, true):autoWidth():width() + 5
+		y = y + ui:append("WndSliderBox", {
+			x = x, y = y + 3,
+			range = {0, 255},
+			value = Cataclysm_Main.nAlpha,
+			sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+			onchange = function(nVal)
+				Cataclysm_Main.nAlpha = nVal
+				if GetFrame() then
+					FireUIEvent("CTM_SET_ALPHA")
+				end
+			end,
+			textfmt = function(val) return _L("%d%%", val) end,
+		}, true):height()
+	end
 
 	x = X
 	y = y + 10
