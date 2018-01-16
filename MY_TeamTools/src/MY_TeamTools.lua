@@ -888,7 +888,7 @@ function RT.GetEquipCache(p)
 			-- 大附魔 / 临时附魔 用于评分
 			if item.dwTemporaryEnchantID and item.dwTemporaryEnchantID ~= 0 then
 				local dat = {
- 					dwTemporaryEnchantID         = item.dwTemporaryEnchantID,
+					dwTemporaryEnchantID         = item.dwTemporaryEnchantID,
 					nTemporaryEnchantLeftSeconds = item.GetTemporaryEnchantLeftSeconds()
 				}
 				if Table_GetCommonEnchantDesc(item.dwTemporaryEnchantID) then

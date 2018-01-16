@@ -624,4 +624,23 @@ if not GVoiceBase_CheckMicState then
 GVoiceBase_CheckMicState = GVoice_CheckMicState
 end
 
+if not Table_GetCommonEnchantDesc then
+function Table_GetCommonEnchantDesc(enchant_id)
+	local res = g_tTable.CommonEnchant:Search(enchant_id)
+	if res then
+		return res.desc
+	end
+end
+end
+if not Table_GetProfessionName then
+function Table_GetProfessionName(dwProfessionID)
+	local szName = ""
+	local tProfession = g_tTable.ProfessionName:Search(dwProfessionID)
+	if tProfession then
+		szName = tProfession.szName
+	end
+	return szName
+end
+end
+
 UpdateItemInfoBoxObject = UpdataItemInfoBoxObject
