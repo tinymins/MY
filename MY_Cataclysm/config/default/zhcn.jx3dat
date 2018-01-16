@@ -1,4 +1,5 @@
 data = {
+	nCss                 = 1, -- INI样式 1 系统样式 2 Cataclysm样式
 	bDrag                = true,
 	bRaidEnable          = false,
 	bShowInRaid          = false,
@@ -14,7 +15,7 @@ data = {
 	nShowIcon            = 2,
 	bShowDistance        = false,
 	bEnableDistance      = true,
-	nBGColorMode         = 1, -- 0 不着色 1 根据距离 2 根据门派
+	nBGColorMode         = 3, -- 0 不着色 1 根据距离 2 根据门派 3官方着色
 	bShowTargetTargetAni = false,
 	nFont                = 234,
 	nLifeFont            = 212,

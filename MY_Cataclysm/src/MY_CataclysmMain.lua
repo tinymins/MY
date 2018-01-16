@@ -338,7 +338,7 @@ function Cataclysm_Main.OnFrameCreate()
 	CreateControlBar()
 	this:EnableDrag(Cataclysm_Main.bDrag)
 	-- 中间层数据 常用的
-	this.hMember = this:CreateItemData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/ui/Cataclysm_Item1.ini", "Handle_RoleDummy")
+	this.hMember = this:CreateItemData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/ui/Cataclysm_Item" .. Cataclysm_Main.nCss .. ".ini", "Handle_RoleDummy")
 	this.hBuff   = this:CreateItemData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/ui/Cataclysm_Item_Buff.ini", "Handle_Buff")
 
 end
@@ -963,6 +963,7 @@ function PS.OnPanelActive(frame)
 	y = y + ui:append("Text", { x = x, y = y, text = _L["Grid Style"], font = 27 }, true):height()
 
 	x = x + 10
+	y = y + 5
 	x = x + ui:append("WndRadioBox", {
 		x = x, y = y, text = g_tStrings.STR_GUILD_NAME .. g_tStrings.STR_RAID_COLOR_NAME_SCHOOL,
 		group = "namecolor", checked = Cataclysm_Main.nColoredName == 1,
@@ -1027,21 +1028,10 @@ function PS.OnPanelActive(frame)
 	}, true):autoWidth():width() + 5
 
 	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["LifeBar Gradient"],
-		checked = Cataclysm_Main.bLifeGradient,
+		x = x, y = y, text = g_tStrings.STR_RAID_DISTANCE,
+		checked = Cataclysm_Main.bEnableDistance,
 		oncheck = function(bCheck)
-			Cataclysm_Main.bLifeGradient = bCheck
-			if GetFrame() then
-				Grid_CTM:CallDrawHPMP(true, true)
-			end
-		end,
-	}, true):autoWidth():width() + 5
-
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["ManaBar Gradient"],
-		checked = Cataclysm_Main.bManaGradient,
-		oncheck = function(bCheck)
-			Cataclysm_Main.bManaGradient = bCheck
+			Cataclysm_Main.bEnableDistance = bCheck
 			if GetFrame() then
 				Grid_CTM:CallDrawHPMP(true, true)
 			end
@@ -1060,23 +1050,27 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):height()
 
-	x = X + 10
-	y = y + ui:append("WndCheckBox", {
-		x = x, y = y, text = g_tStrings.STR_RAID_DISTANCE,
-		checked = Cataclysm_Main.bEnableDistance,
-		oncheck = function(bCheck)
-			Cataclysm_Main.bEnableDistance = bCheck
-			if GetFrame() then
-				Grid_CTM:CallDrawHPMP(true, true)
-			end
-		end,
-	}, true):autoWidth():height()
-
 	x = X
 	y = y + 10
 	y = y + ui:append("Text", { x = x, y = y, text = g_tStrings.BACK_COLOR, font = 27 }, true):height()
 
 	x = x + 10
+	y = y + 5
+	x = x + ui:append("WndRadioBox", {
+		x = x, y = y, text = _L["Colored as official team frame"],
+		group = "BACK_COLOR", checked = Cataclysm_Main.nBGColorMode == 3,
+		oncheck = function(bChecked)
+			if not bChecked then
+				return
+			end
+			Cataclysm_Main.nBGColorMode = 3
+			if GetFrame() then
+				Grid_CTM:CallDrawHPMP(true, true)
+			end
+			MY.SwitchTab("MY_Cataclysm_GridStyle", true)
+		end,
+	}, true):autoWidth():width() + 5
+
 	x = x + ui:append("WndRadioBox", {
 		x = x, y = y, text = g_tStrings.STR_RAID_COLOR_NAME_NONE,
 		group = "BACK_COLOR", checked = Cataclysm_Main.nBGColorMode == 0,
@@ -1120,7 +1114,32 @@ function PS.OnPanelActive(frame)
 			end
 			MY.SwitchTab("MY_Cataclysm_GridStyle", true)
 		end,
-	}, true):autoWidth():height()
+	}, true):autoWidth():height() + 5
+
+	if Cataclysm_Main.nBGColorMode ~= 3 then
+		x = X + 10
+		x = x + ui:append("WndCheckBox", {
+			x = x, y = y, text = _L["LifeBar Gradient"],
+			checked = Cataclysm_Main.bLifeGradient,
+			oncheck = function(bCheck)
+				Cataclysm_Main.bLifeGradient = bCheck
+				if GetFrame() then
+					Grid_CTM:CallDrawHPMP(true, true)
+				end
+			end,
+		}, true):autoWidth():width() + 5
+
+		y = y + ui:append("WndCheckBox", {
+			x = x, y = y, text = _L["ManaBar Gradient"],
+			checked = Cataclysm_Main.bManaGradient,
+			oncheck = function(bCheck)
+				Cataclysm_Main.bManaGradient = bCheck
+				if GetFrame() then
+					Grid_CTM:CallDrawHPMP(true, true)
+				end
+			end,
+		}, true):autoWidth():height()
+	end
 
 	x = X + 20
 	y = y + 10
@@ -1175,52 +1194,52 @@ function PS.OnPanelActive(frame)
 				end,
 			}, true):height() + 5
 		end
+
+		ui:append("Text", { x = x, y = y, text = g_tStrings.STR_RAID_DISTANCE_M4 }):autoWidth()
+		y = y + ui:append("Shadow", {
+			w = 22, h = 22, x = 280, y = y + 3,
+			color = Cataclysm_Main.tOtherCol[3],
+			onclick = function()
+				local this = this
+				XGUI.OpenColorPicker(function(r, g, b)
+					Cataclysm_Main.tOtherCol[3] = { r, g, b }
+					if GetFrame() then
+						Grid_CTM:CallDrawHPMP(true, true)
+					end
+					XGUI(this):color(r, g, b)
+				end)
+			end,
+		}, true):height() + 5
+
+		ui:append("Text", { x = x, y = y, text = g_tStrings.STR_GUILD_OFFLINE .. g_tStrings.BACK_COLOR }, true):autoWidth()
+		y = y + ui:append("Shadow", {
+			w = 22, h = 22, x = 280, y = y + 3, color = Cataclysm_Main.tOtherCol[2],
+			onclick = function()
+				local this = this
+				XGUI.OpenColorPicker(function(r, g, b)
+					Cataclysm_Main.tOtherCol[2] = { r, g, b }
+					if GetFrame() then
+						Grid_CTM:CallDrawHPMP(true, true)
+					end
+					XGUI(this):color(r, g, b)
+				end)
+			end,
+		}, true):height() + 5
+
+		ui:append("Text", { x = x, y = y, text = g_tStrings.STR_SKILL_MANA .. g_tStrings.BACK_COLOR }, true):autoWidth()
+		y = y + ui:append("Shadow", {
+			w = 22, h = 22, x = 280, y = y + 3, color = Cataclysm_Main.tManaColor,
+			onclick = function()
+				XGUI.OpenColorPicker(function(r, g, b)
+					Cataclysm_Main.tManaColor = { r, g, b }
+					ui:Fetch("STR_SKILL_MANA"):Color(r, g, b)
+					if GetFrame() then
+						Grid_CTM:CallDrawHPMP(true, true)
+					end
+				end)
+			end,
+		}, true):height() + 5
 	end
-
-	ui:append("Text", { x = x, y = y, text = g_tStrings.STR_RAID_DISTANCE_M4 }):autoWidth()
-	y = y + ui:append("Shadow", {
-		w = 22, h = 22, x = 280, y = y + 3,
-		color = Cataclysm_Main.tOtherCol[3],
-		onclick = function()
-			local this = this
-			XGUI.OpenColorPicker(function(r, g, b)
-				Cataclysm_Main.tOtherCol[3] = { r, g, b }
-				if GetFrame() then
-					Grid_CTM:CallDrawHPMP(true, true)
-				end
-				XGUI(this):color(r, g, b)
-			end)
-		end,
-	}, true):height() + 5
-
-	ui:append("Text", { x = x, y = y, text = g_tStrings.STR_GUILD_OFFLINE .. g_tStrings.BACK_COLOR }, true):autoWidth()
-	y = y + ui:append("Shadow", {
-		w = 22, h = 22, x = 280, y = y + 3, color = Cataclysm_Main.tOtherCol[2],
-		onclick = function()
-			local this = this
-			XGUI.OpenColorPicker(function(r, g, b)
-				Cataclysm_Main.tOtherCol[2] = { r, g, b }
-				if GetFrame() then
-					Grid_CTM:CallDrawHPMP(true, true)
-				end
-				XGUI(this):color(r, g, b)
-			end)
-		end,
-	}, true):height() + 5
-
-	ui:append("Text", { x = x, y = y, text = g_tStrings.STR_SKILL_MANA .. g_tStrings.BACK_COLOR }, true):autoWidth()
-	y = y + ui:append("Shadow", {
-		w = 22, h = 22, x = 280, y = y + 3, color = Cataclysm_Main.tManaColor,
-		onclick = function()
-			XGUI.OpenColorPicker(function(r, g, b)
-				Cataclysm_Main.tManaColor = { r, g, b }
-				ui:Fetch("STR_SKILL_MANA"):Color(r, g, b)
-				if GetFrame() then
-					Grid_CTM:CallDrawHPMP(true, true)
-				end
-			end)
-		end,
-	}, true):height() + 5
 end
 MY.RegisterPanel("MY_Cataclysm_GridStyle", _L["Grid Style"], _L["Raid"], "ui/Image/UICommon/RaidTotal.uitex|68", {255, 255, 0}, PS)
 end
@@ -1233,6 +1252,38 @@ function PS.OnPanelActive(frame)
 	local x, y = X, Y
 
 	y = y + ui:append("Text", { x = x, y = y, text = _L["Interface settings"], font = 27 }, true):height()
+
+	x = X + 10
+	y = y + 3
+	x = x + ui:append("WndRadioBox", {
+		x = x, y = y, text = _L["Official team frame style"],
+		group = "CSS", checked = Cataclysm_Main.nCss == 1,
+		oncheck = function(bChecked)
+			if not bChecked then
+				return
+			end
+			Cataclysm_Main.nCss = 1
+			if GetFrame() then
+				Grid_CTM:CloseParty()
+				Grid_CTM:ReloadParty()
+			end
+		end,
+	}, true):autoWidth():width() + 5
+
+	y = y + ui:append("WndRadioBox", {
+		x = x, y = y, text = _L["Cataclysm team frame style"],
+		group = "CSS", checked = Cataclysm_Main.nCss == 2,
+		oncheck = function(bChecked)
+			if not bChecked then
+				return
+			end
+			Cataclysm_Main.nCss = 2
+			if GetFrame() then
+				Grid_CTM:CloseParty()
+				Grid_CTM:ReloadParty()
+			end
+		end,
+	}, true):autoWidth():height()
 
 	x = X + 10
 	x = x + ui:append("Text", { x = x, y = y, text = _L["Interface Width"]}, true):autoWidth():width() + 5

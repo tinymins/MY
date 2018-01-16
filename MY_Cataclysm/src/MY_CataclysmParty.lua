@@ -30,7 +30,6 @@ local CTM_ALPHA_STEP         = 15    -- 240 / CTM_ALPHA_STEP
 local CTM_GROUP_COUNT        = 5 - 1 -- 防止以后开个什么40人本 估计不太可能 就和剑三这还得好几年
 local CTM_MEMBER_COUNT       = 5
 local CTM_DRAG               = false
-local CTM_INIFILE            = MY.GetAddonInfo().szRoot .. "MY_Cataclysm/ui/Cataclysm_Party1.ini"
 local CTM_DRAG_ID
 local CTM_TARGET
 local CTM_TTARGET
@@ -422,12 +421,16 @@ function CTM:CreatePanel(nIndex)
 	local me = GetClientPlayer()
 	local frame = self:GetPartyFrame(nIndex)
 	if not frame then
-		frame = Wnd.OpenWindow(CTM_INIFILE, "Cataclysm_Party_" .. nIndex)
+		frame = Wnd.OpenWindow(
+			MY.GetAddonInfo().szRoot .. "MY_Cataclysm/ui/Cataclysm_Party" .. CFG.nCss .. ".ini",
+			"Cataclysm_Party_" .. nIndex
+		)
 		frame:Scale(CFG.fScaleX, CFG.fScaleY)
 	end
 	self:AutoLinkAllPanel()
 	self:RefreshGroupText()
 end
+
 -- 刷新团队组编号
 function CTM:RefreshGroupText()
 	local team = GetClientTeam()
@@ -530,8 +533,8 @@ end
 
 local function HideTTarget()
 	if CTM_CACHE[CTM_TTARGET] and CTM_CACHE[CTM_TTARGET]:IsValid() then
-		if CTM_CACHE[CTM_TTARGET]:Lookup("Animate_TargetTarget") and CTM_CACHE[CTM_TTARGET]:Lookup("Animate_TargetTarget"):IsValid() then
-			CTM_CACHE[CTM_TTARGET]:Lookup("Animate_TargetTarget"):Hide()
+		if CTM_CACHE[CTM_TTARGET]:Lookup("Handle_TargetAnimate") and CTM_CACHE[CTM_TTARGET]:Lookup("Handle_TargetAnimate"):IsValid() then
+			CTM_CACHE[CTM_TTARGET]:Lookup("Handle_TargetAnimate"):Hide()
 		end
 	end
 end
@@ -548,8 +551,8 @@ function CTM:RefreshTTarget()
 				end
 				if tdwID and tdwID ~= 0 and tdwType == TARGET.PLAYER then
 					if CTM_CACHE[tdwID] and CTM_CACHE[tdwID]:IsValid() then
-						if CTM_CACHE[tdwID]:Lookup("Animate_TargetTarget") and CTM_CACHE[tdwID]:Lookup("Animate_TargetTarget"):IsValid() then
-							CTM_CACHE[tdwID]:Lookup("Animate_TargetTarget"):Show()
+						if CTM_CACHE[tdwID]:Lookup("Handle_TargetAnimate") and CTM_CACHE[tdwID]:Lookup("Handle_TargetAnimate"):IsValid() then
+							CTM_CACHE[tdwID]:Lookup("Handle_TargetAnimate"):Show()
 						end
 					end
 				end
@@ -584,6 +587,28 @@ function CTM:RefreshMark()
 			else
 				v:Lookup("Image_MarkImage"):Hide()
 			end
+		end
+	end
+end
+
+-- 由于SFX的缩放独立于UI缩放 所以需要单独计算
+-- 我们准备三个Handle 一个允许缩放 一个禁止缩放 SFX初始为1倍缩放 结构为 允许缩放Handle/禁止缩放Handle/SFX
+--    允许缩放的那个Handle初始大小是你想要得到的最终显示大小 初始位置亦为你想要显示的最终位置
+--    禁止缩放的那个Handle初始大小应该等于SFX模型缩放比为1时在屏幕上的矩形区域大小 初始位置为刚好覆盖SFX
+--    SFX初始中心应当为最终想要的中心点
+-- 计算方法是 每次计算允许缩放的Handle与禁止缩放的Handle的比例差即可得知SFX当前理应当缩放和平移数值
+function CTM:RefreshSFX()
+	local hDest, hScale, hFixed
+	local fSFXX, fSFXY -- SFX当前状态下对比初始时正确的缩放比
+	local fUIX, fUIY -- UI当前状态下对应1.0的缩放比
+	for dwID, h in pairs(CTM_CACHE) do
+		if h:IsValid() then
+			hDest = h:Lookup("Handle_TargetAnimate")
+			hScale = hDest:Lookup("Handle_TargetAnimate_Scale")
+			hFixed = hDest:Lookup("Handle_TargetAnimate_Fixed")
+			fUIX, fUIY = hScale:GetW() / hFixed:GetW(), hScale:GetH() / hFixed:GetH()
+			fSFXX, fSFXY = hDest:GetW() / hFixed:GetW(), hDest:GetH() / hFixed:GetH()
+			hDest:Lookup("SFX_TargetAnimate"):Get3DModel():SetScaling(fSFXX, fSFXY, fSFXX)
 		end
 	end
 end
@@ -867,6 +892,7 @@ function CTM:Scale(fX, fY, frame)
 	end
 	self:AutoLinkAllPanel()
 	self:CallRefreshImages(true, true, true, nil, true) -- 缩放其他图标
+	self:RefreshSFX() -- 缩放特效
 	self:RefreshFormation() -- 缩放阵眼
 	self:RefreshMark() -- 缩放标记
 	self:RefreshGVoice() -- 缩放语音
@@ -1104,6 +1130,7 @@ end
 -- 缩放对动态构建的UI不会缩放 所以需要后处理
 function CTM:DrawHPMP(h, dwID, info, bRefresh)
 	if not info then return end
+	local bSha = CFG.nBGColorMode ~= 3
 	local Lsha = h:Lookup("Handle_Common/Shadow_Life")
 	local Limg = h:Lookup("Handle_Common/Image_Life")
 	local Ledg = h:Lookup("Handle_Common/Image_LifeLine")
@@ -1165,20 +1192,18 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 		if not nPercentage or nPercentage < 0 or nPercentage > 1 then
 			nPercentage = 1
 		end
-		if Msha then
+		if bSha then
 			local r, g, b = unpack(CFG.tManaColor)
 			self:DrawShadow(Msha, 119 * nPercentage, 9, r, g, b, nAlpha, CFG.bManaGradient)
 			Msha:Show()
-		end
-		if Mimg then
+		else
 			Mimg:SetPercentage(nPercentage)
 			Mimg:SetVisible(info.bIsOnLine)
 		end
 	else
-		if Msha then
+		if bSha then
 			Msha:Hide()
-		end
-		if Mimg then
+		else
 			Mimg:Hide()
 		end
 	end
@@ -1188,9 +1213,9 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 		if CTM_LIFE_CACHE[dwID] and CTM_LIFE_CACHE[dwID] > nLifePercentage then
 			local nAlpha, nW, nH = lifeFade:GetAlpha(), 0, 0
 			if nAlpha == 0 then
-				if Lsha then
+				if bSha then
 					nW, nH = Lsha:GetSize()
-				elseif Limg then
+				else
 					nW, nH = Limg:GetW() * CTM_LIFE_CACHE[dwID], Limg:GetH()
 				end
 				lifeFade:SetSize(nW, nH)
@@ -1226,7 +1251,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 	end
 	-- 缓存
 	if not CFG.bFasterHP or bRefresh or (CFG.bFasterHP and CTM_LIFE_CACHE[dwID] ~= nLifePercentage) then
-		if Lsha then
+		if bSha then
 			-- 颜色计算
 			local nNewW = 119 * nLifePercentage
 			local r, g, b = unpack(CFG.tOtherCol[2]) -- 不在线就灰色了
@@ -1251,25 +1276,13 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			end
 			self:DrawShadow(Lsha, nNewW, 32, r, g, b, nAlpha, CFG.bLifeGradient)
 			Lsha:Show()
-		end
-		if info.bIsOnLine then
-			if Limg then
-				Limg:SetPercentage(nLifePercentage)
-				Limg:Show()
-			end
-			if Ledg and (Limg or Lsha) then
-				local nRelX = ((Limg and (Limg:GetRelX() + Limg:GetW() * nLifePercentage)) or (Lsha:GetRelX() + Lsha:GetW())) - Ledg:GetW()
-				Ledg:SetRelX(nRelX)
-				Ledg:SetAbsX(h:GetAbsX() + nRelX)
-				Ledg:Show()
-			end
 		else
-			if Limg then
-				Limg:Hide()
-			end
-			if Ledg then
-				Ledg:Hide()
-			end
+			local nRelX = Limg:GetRelX() + Limg:GetW() * nLifePercentage - Ledg:GetW()
+			Ledg:SetVisible(info.bIsOnLine)
+			Ledg:SetRelX(nRelX)
+			Ledg:SetAbsX(h:GetAbsX() + nRelX)
+			Limg:SetVisible(info.bIsOnLine)
+			Limg:SetPercentage(nLifePercentage)
 		end
 
 		if not CTM_LIFE_CACHE[dwID] then
