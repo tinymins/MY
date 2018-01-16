@@ -19,6 +19,7 @@ data = {
 	["Color settings"] = "文字&顔色&距離",
 	["LifeBar Gradient"] = "血條漸變色",
 	["ManaBar Gradient"] = "藍條漸變色",
+	["Colored as official team frame"] = "官方著色",
 	["Colored according to the distance"] = "按距離著色",
 	["Edit Distance Level"] = "編輯距離等級",
 	["distance, distance, ..."] = "8,20,22,24,30, ...",
@@ -79,4 +80,6 @@ data = {
 	["KUNGFU_0"] = "俠",
 	["take back all permissions"] = "收回所有權限",
 	["Please install and load GKP addon first."] = "未檢測到金團記錄插件，請先返回角色選擇界面進入插件管理界面，安裝並加載茗伊金團記錄子插件。",
+	["Official team frame style"] = "官方樣式",
+	["Cataclysm team frame style"] = "Cataclysm樣式",
 }
