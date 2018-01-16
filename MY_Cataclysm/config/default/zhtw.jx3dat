@@ -1,0 +1,54 @@
+data = {
+	bDrag                = true,
+	bRaidEnable          = false,
+	bShowInRaid          = false,
+	bEditMode            = false,
+	bShowAllGrid         = false,
+	tAnchor              = {},
+	nAutoLinkMode        = 5,
+	nHPShownMode2        = 2,
+	nHPShownNumMode      = 3,
+	nShowMP              = false,
+	bHPHitAlert          = true,
+	nColoredName         = 1,
+	nShowIcon            = 2,
+	bShowDistance        = false,
+	bEnableDistance      = true,
+	nBGColorMode         = 1, -- 0 不著色 1 根據距離 2 根據門派
+	bShowTargetTargetAni = false,
+	nFont                = 234,
+	nLifeFont            = 212,
+	nMaxShowBuff         = 4,
+	bLifeGradient        = true,
+	bManaGradient        = true,
+	nAlpha               = 220,
+	fBuffScale           = 1,
+	bAutoBuffSize        = true,
+	bTempTargetFightTip  = false,
+	bTempTargetEnable    = false,
+	fScaleX              = 1,
+	fScaleY              = 1,
+	tDistanceLevel       = { 20, 22, 200 },
+	tManaColor           = { 0, 96, 255 },
+	bFasterHP            = false,
+	bStaring             = false,
+	bShowBuffTime        = false,
+	bShowBuffNum         = false,
+	bShowGropuNumber     = true,
+	bShowEffect          = false, -- 五毒醉舞提示 萬花距離提示 晚點做
+	tBuffList = { -- 結構的話 就這樣吧不過顔色不讓設置
+		-- ["調息"] = { bSelf = true, col = 255, 255, 255}
+	},
+	tDistanceCol = {
+		{ 0,   180, 52  }, -- 綠
+		{ 0,   180, 52  }, -- 綠
+		-- 免得被說亂
+		-- { 230, 170, 40  }, -- 黃
+		{ 230, 80,  80  }, -- 紅
+	},
+	tOtherCol = {
+		{ 255, 255, 255 },
+		{ 128, 128, 128 },
+		{ 192, 192, 192 }
+	},
+}

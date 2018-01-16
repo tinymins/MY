@@ -25,60 +25,9 @@ local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/lang/")
 local Station, UI_GetClientPlayerID, Table_BuffIsVisible = Station, UI_GetClientPlayerID, Table_BuffIsVisible
 local GetBuffName = MY.GetBuffName
 
-local CTM_CONFIG = {
-	bDrag                = true,
-	bRaidEnable          = false,
-	bShowInRaid          = false,
-	bEditMode            = false,
-	bShowAllGrid         = false,
-	tAnchor              = {},
-	nAutoLinkMode        = 5,
-	nHPShownMode2        = 2,
-	nHPShownNumMode      = 3,
-	nShowMP              = false,
-	bHPHitAlert          = true,
-	nColoredName         = 1,
-	nShowIcon            = 2,
-	bShowDistance        = false,
-	bEnableDistance      = true,
-	nBGColorMode         = 1, -- 0 不着色 1 根据距离 2 根据门派
-	bShowTargetTargetAni = false,
-	nFont                = 40,
-	nLifeFont            = 15,
-	nMaxShowBuff         = 4,
-	bLifeGradient        = true,
-	bManaGradient        = true,
-	nAlpha               = 220,
-	fBuffScale           = 1,
-	bAutoBuffSize        = true,
-	bTempTargetFightTip  = false,
-	bTempTargetEnable    = false,
-	fScaleX              = 1,
-	fScaleY              = 1,
-	tDistanceLevel       = { 20, 22, 200 },
-	tManaColor           = { 0, 96, 255 },
-	bFasterHP            = false,
-	bStaring             = false,
-	bShowBuffTime        = false,
-	bShowBuffNum         = false,
-	bShowGropuNumber     = true,
-	bShowEffect          = false, -- 五毒醉舞提示 万花距离提示 晚点做
-	tBuffList = { -- 结构的话 就这样吧不过颜色不让设置
-		-- ["调息"] = { bSelf = true, col = 255, 255, 255}
-	},
-	tDistanceCol = {
-		{ 0,   180, 52  }, -- 绿
-		{ 0,   180, 52  }, -- 绿
-		-- 免得被说乱
-		-- { 230, 170, 40  }, -- 黄
-		{ 230, 80,  80  }, -- 红
-	},
-	tOtherCol = {
-		{ 255, 255, 255 },
-		{ 128, 128, 128 },
-		{ 192, 192, 192 }
-	},
-}
+-- local CTM_CONFIG = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/config/ctm/$lang.jx3dat")
+local CTM_CONFIG = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/config/default/$lang.jx3dat")
+
 local TEAM_VOTE_REQUEST = {}
 local GKP_RECORD_TOTAL = 0
 local CTM_CONFIG_PLAYER
@@ -389,7 +338,7 @@ function Cataclysm_Main.OnFrameCreate()
 	CreateControlBar()
 	this:EnableDrag(Cataclysm_Main.bDrag)
 	-- 中间层数据 常用的
-	this.hMember = this:CreateItemData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/ui/Cataclysm_Item.ini", "Handle_RoleDummy")
+	this.hMember = this:CreateItemData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/ui/Cataclysm_Item1.ini", "Handle_RoleDummy")
 	this.hBuff   = this:CreateItemData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/ui/Cataclysm_Item_Buff.ini", "Handle_Buff")
 
 end
@@ -666,6 +615,7 @@ function Cataclysm_Main.OnMouseLeave()
 	if not IsKeyDown("LButton") then
 		SetFrameSize()
 	end
+	HideTip()
 end
 
 local SPEAKER_TIP = {
