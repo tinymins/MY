@@ -533,8 +533,8 @@ end
 
 local function HideTTarget()
 	if CTM_CACHE[CTM_TTARGET] and CTM_CACHE[CTM_TTARGET]:IsValid() then
-		if CTM_CACHE[CTM_TTARGET]:Lookup("Handle_TargetAnimate") and CTM_CACHE[CTM_TTARGET]:Lookup("Handle_TargetAnimate"):IsValid() then
-			CTM_CACHE[CTM_TTARGET]:Lookup("Handle_TargetAnimate"):Hide()
+		if CTM_CACHE[CTM_TTARGET]:Lookup("Handle_TargetTarget") and CTM_CACHE[CTM_TTARGET]:Lookup("Handle_TargetTarget"):IsValid() then
+			CTM_CACHE[CTM_TTARGET]:Lookup("Handle_TargetTarget"):Hide()
 		end
 	end
 end
@@ -551,8 +551,8 @@ function CTM:RefreshTTarget()
 				end
 				if tdwID and tdwID ~= 0 and tdwType == TARGET.PLAYER then
 					if CTM_CACHE[tdwID] and CTM_CACHE[tdwID]:IsValid() then
-						if CTM_CACHE[tdwID]:Lookup("Handle_TargetAnimate") and CTM_CACHE[tdwID]:Lookup("Handle_TargetAnimate"):IsValid() then
-							CTM_CACHE[tdwID]:Lookup("Handle_TargetAnimate"):Show()
+						if CTM_CACHE[tdwID]:Lookup("Handle_TargetTarget") and CTM_CACHE[tdwID]:Lookup("Handle_TargetTarget"):IsValid() then
+							CTM_CACHE[tdwID]:Lookup("Handle_TargetTarget"):Show()
 						end
 					end
 				end
@@ -603,12 +603,12 @@ function CTM:RefreshSFX()
 	local fUIX, fUIY -- UI当前状态下对应1.0的缩放比
 	for dwID, h in pairs(CTM_CACHE) do
 		if h:IsValid() then
-			hDest = h:Lookup("Handle_TargetAnimate")
-			hScale = hDest:Lookup("Handle_TargetAnimate_Scale")
-			hFixed = hDest:Lookup("Handle_TargetAnimate_Fixed")
+			hDest = h:Lookup("Handle_TargetTarget")
+			hScale = hDest:Lookup("Handle_TargetTarget_Scale")
+			hFixed = hDest:Lookup("Handle_TargetTarget_Fixed")
 			fUIX, fUIY = hScale:GetW() / hFixed:GetW(), hScale:GetH() / hFixed:GetH()
 			fSFXX, fSFXY = hDest:GetW() / hFixed:GetW(), hDest:GetH() / hFixed:GetH()
-			hDest:Lookup("SFX_TargetAnimate"):Get3DModel():SetScaling(fSFXX, fSFXY, fSFXX)
+			hDest:Lookup("SFX_TargetTarget"):Get3DModel():SetScaling(fSFXX, fSFXY, fSFXX)
 		end
 	end
 end
@@ -1154,7 +1154,14 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 	nMaxLife     = mmax(1, nMaxLife)
 	nCurrentLife = mmax(0, nCurrentLife)
 	nLifePercentage = nCurrentLife / nMaxLife
-	if not nLifePercentage or nLifePercentage < 0 or nLifePercentage > 1 then nLifePercentage = 1 end
+	if not nLifePercentage or nLifePercentage < 0 or nLifePercentage > 1 then
+		nLifePercentage = 1
+	end
+	Lsha:SetVisible(bSha)
+	Msha:SetVisible(bSha)
+	Limg:SetVisible(not bSha)
+	Ledg:SetVisible(not bSha)
+	Mimg:SetVisible(not bSha)
 
 	local bDeathFlag = info.bDeathFlag
 	-- 有待验证
@@ -1170,6 +1177,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			bDeathFlag = p.nMoveState == MOVE_STATE_ON_DEATH
 		end
 	end
+	-- 透明度
 	local nAlpha = 255
 	if CFG.nBGColorMode == 3 then
 		if h.nDistanceLevel then
@@ -1204,19 +1212,16 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 		end
 		if bSha then
 			local r, g, b = unpack(CFG.tManaColor)
-			self:DrawShadow(Msha, 119 * nPercentage, 9, r, g, b, nAlpha, CFG.bManaGradient)
+			self:DrawShadow(Msha, hCommon:GetW() * nPercentage, Msha:GetH(), r, g, b, nAlpha, CFG.bManaGradient)
 			Msha:Show()
 		else
+			Mimg:Show()
 			Mimg:SetAlpha(nAlpha)
 			Mimg:SetPercentage(nPercentage)
 			Mimg:SetVisible(info.bIsOnLine)
 		end
 	else
-		if bSha then
-			Msha:Hide()
-		else
-			Mimg:Hide()
-		end
+		Mimg:Hide()
 	end
 	-- 掉血警告 必须早于血条绘制
 	if CFG.bHPHitAlert then
@@ -1264,7 +1269,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 	if not CFG.bFasterHP or bRefresh or (CFG.bFasterHP and CTM_LIFE_CACHE[dwID] ~= nLifePercentage) then
 		if bSha then
 			-- 颜色计算
-			local nNewW = 119 * nLifePercentage
+			local nNewW = hCommon:GetW() * nLifePercentage
 			local r, g, b = unpack(CFG.tOtherCol[2]) -- 不在线就灰色了
 			if info.bIsOnLine then
 				if CFG.nBGColorMode == 1 then
@@ -1285,7 +1290,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			else
 				nAlpha = 255
 			end
-			self:DrawShadow(Lsha, nNewW, 32, r, g, b, nAlpha, CFG.bLifeGradient)
+			self:DrawShadow(Lsha, nNewW, Lsha:GetH(), r, g, b, nAlpha, CFG.bLifeGradient)
 			Lsha:Show()
 		else
 			local nRelX = Limg:GetRelX() + Limg:GetW() * nLifePercentage - Ledg:GetW()
@@ -1365,8 +1370,6 @@ end
 function CTM:DrawShadow(sha, x, y, r, g, b, a, bGradient) -- 重绘三角扇
 	sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
 	sha:ClearTriangleFanPoint()
-	x = x * CFG.fScaleX
-	y = y * CFG.fScaleY
 	if bGradient then
 		sha:AppendTriangleFanPoint(0, 0, 64, 64, 64, a)
 		sha:AppendTriangleFanPoint(x, 0, 64, 64, 64, a)

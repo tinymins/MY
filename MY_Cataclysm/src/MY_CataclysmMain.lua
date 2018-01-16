@@ -721,7 +721,7 @@ function PS.OnPanelActive(frame)
 	x = X
 	y = y + ui:append("Text", { x = x, y = y, text = g_tStrings.STR_RAID_TIP_IMAGE, font = 27 }, true):height()
 
-	x = x + 10
+	x = X + 10
 	x = x + ui:append("WndCheckBox", {
 		x = x, y = y, text = g_tStrings.STR_RAID_TIP_TARGET,
 		checked = Cataclysm_Main.bShowTargetTargetAni,
@@ -779,6 +779,7 @@ function PS.OnPanelActive(frame)
 	x = X
 	y = y + ui:append("Text", { x = x, y = y, text = g_tStrings.STR_RAID_LIFE_SHOW .. _L["& Icon"], font = 27 }, true):height()
 
+	x = x + 10
 	x = x + ui:append("WndRadioBox", {
 		x = x, y = y, text = g_tStrings.STR_RAID_LIFE_LEFT,
 		group = "lifemode", checked = Cataclysm_Main.nHPShownMode2 == 2,
@@ -813,7 +814,7 @@ function PS.OnPanelActive(frame)
 	}, true):autoWidth():height()
 
 	-- 数值
-	x = X
+	x = X + 10
 	x = x + ui:append("WndRadioBox", {
 		x = x, y = y, text = _L["Show Format value"],
 		group = "lifval", checked = Cataclysm_Main.nHPShownNumMode == 1,
@@ -851,7 +852,7 @@ function PS.OnPanelActive(frame)
 	}, true):autoWidth():height()
 
 	-- Icon
-	x = X
+	x = X + 10
 	x = x + ui:append("WndRadioBox", {
 		x = x, y = y, text = _L["Show Force Icon"],
 		group = "icon", checked = Cataclysm_Main.nShowIcon == 1,
@@ -1113,35 +1114,9 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():height() + 5
 
-	if Cataclysm_Main.nBGColorMode ~= 3 then
-		x = X + 10
-		x = x + ui:append("WndCheckBox", {
-			x = x, y = y, text = _L["LifeBar Gradient"],
-			checked = Cataclysm_Main.bLifeGradient,
-			oncheck = function(bCheck)
-				Cataclysm_Main.bLifeGradient = bCheck
-				if GetFrame() then
-					Grid_CTM:CallDrawHPMP(true, true)
-				end
-			end,
-		}, true):autoWidth():width() + 5
-
-		y = y + ui:append("WndCheckBox", {
-			x = x, y = y, text = _L["ManaBar Gradient"],
-			checked = Cataclysm_Main.bManaGradient,
-			oncheck = function(bCheck)
-				Cataclysm_Main.bManaGradient = bCheck
-				if GetFrame() then
-					Grid_CTM:CallDrawHPMP(true, true)
-				end
-			end,
-		}, true):autoWidth():height()
-	end
-
-	x = X + 20
-	y = y + 10
 	if Cataclysm_Main.nBGColorMode ~= 2 then
 		-- 设置分段距离等级
+		x = X + 10
 		if Cataclysm_Main.nBGColorMode == 1 or Cataclysm_Main.nBGColorMode == 3 then
 			y = y + ui:append("WndButton3", {
 				x = x, y = y, text = _L["Edit Distance Level"],
@@ -1164,13 +1139,15 @@ function PS.OnPanelActive(frame)
 								table.insert(Cataclysm_Main.tDistanceCol, { 255, 255, 255 })
 								table.insert(Cataclysm_Main.tDistanceAlpha, 255)
 							end
-							MY.SwitchTab("MY_Cataclysm_GridStyle")
+							MY.SwitchTab("MY_Cataclysm_GridStyle", true)
 						end
 					end)
 				end,
 			}, true):height()
 		end
+
 		-- 分段距离背景
+		x = X + 20
 		for i = 1, #Cataclysm_Main.tDistanceLevel do
 			if Cataclysm_Main.nBGColorMode ~= 1 and Cataclysm_Main.nBGColorMode ~= 3 and i > 1 then
 				break
@@ -1290,6 +1267,33 @@ function PS.OnPanelActive(frame)
 				end,
 			}, true):height() + 5
 		end
+	end
+
+	-- 血条蓝条渐变色
+	x = X + 10
+	y = y + 5
+	if Cataclysm_Main.nBGColorMode ~= 3 then
+		x = x + ui:append("WndCheckBox", {
+			x = x, y = y, text = _L["LifeBar Gradient"],
+			checked = Cataclysm_Main.bLifeGradient,
+			oncheck = function(bCheck)
+				Cataclysm_Main.bLifeGradient = bCheck
+				if GetFrame() then
+					Grid_CTM:CallDrawHPMP(true, true)
+				end
+			end,
+		}, true):autoWidth():width() + 5
+
+		x = x + ui:append("WndCheckBox", {
+			x = x, y = y, text = _L["ManaBar Gradient"],
+			checked = Cataclysm_Main.bManaGradient,
+			oncheck = function(bCheck)
+				Cataclysm_Main.bManaGradient = bCheck
+				if GetFrame() then
+					Grid_CTM:CallDrawHPMP(true, true)
+				end
+			end,
+		}, true):autoWidth():width() + 5
 	end
 end
 MY.RegisterPanel("MY_Cataclysm_GridStyle", _L["Grid Style"], _L["Raid"], "ui/Image/UICommon/RaidTotal.uitex|68", {255, 255, 0}, PS)
