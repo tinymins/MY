@@ -510,7 +510,7 @@ function Cataclysm_Main.OnFrameBreathe()
 	local me = GetClientPlayer()
 	if not me then return end
 	Grid_CTM:RefreshDistance()
-	Grid_CTM:RefresBuff()
+	Grid_CTM:RefreshBuff()
 	if Cataclysm_Main.bShowTargetTargetAni then
 		Grid_CTM:RefreshTTarget()
 	end
@@ -1020,10 +1020,7 @@ function PS.OnPanelActive(frame)
 		checked = Cataclysm_Main.bShowAllGrid,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowAllGrid = bCheck
-			if GetFrame() then
-				Grid_CTM:CloseParty()
-				Grid_CTM:ReloadParty()
-			end
+			ReloadCataclysmPanel()
 		end,
 	}, true):autoWidth():width() + 5
 
@@ -1317,10 +1314,7 @@ function PS.OnPanelActive(frame)
 				return
 			end
 			Cataclysm_Main.nCss = 1
-			if GetFrame() then
-				Grid_CTM:CloseParty()
-				Grid_CTM:ReloadParty()
-			end
+			ReloadCataclysmPanel()
 		end,
 	}, true):autoWidth():width() + 5
 
@@ -1332,10 +1326,7 @@ function PS.OnPanelActive(frame)
 				return
 			end
 			Cataclysm_Main.nCss = 2
-			if GetFrame() then
-				Grid_CTM:CloseParty()
-				Grid_CTM:ReloadParty()
-			end
+			ReloadCataclysmPanel()
 		end,
 	}, true):autoWidth():height()
 
@@ -1354,7 +1345,7 @@ function PS.OnPanelActive(frame)
 				Grid_CTM:Scale(nNewX, nNewY)
 			end
 		end,
-		textfmt = function(val) return _L("%d%%", val / 250 * 100) end,
+		textfmt = function(val) return _L("%d%%", val) end,
 	}, true):height()
 
 	x = X + 10
@@ -1372,7 +1363,7 @@ function PS.OnPanelActive(frame)
 				Grid_CTM:Scale(nNewX, nNewY)
 			end
 		end,
-		textfmt = function(val) return _L("%d%%", val / 250 * 100) end,
+		textfmt = function(val) return _L("%d%%", val) end,
 	}, true):height()
 
 	x = X
@@ -1385,10 +1376,7 @@ function PS.OnPanelActive(frame)
 		checked = Cataclysm_Main.bShowGroupNumber,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowGroupNumber = bCheck
-			if GetFrame() then
-				Grid_CTM:CloseParty()
-				Grid_CTM:ReloadParty()
-			end
+			ReloadCataclysmPanel()
 		end,
 	}, true):height()
 
@@ -1526,6 +1514,7 @@ function PS.OnPanelActive(frame)
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		onchange = function(nVal)
 			Cataclysm_Main.nMaxShowBuff = nVal
+			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
 	}, true):height()
 
@@ -1537,6 +1526,7 @@ function PS.OnPanelActive(frame)
 		checked = Cataclysm_Main.bAutoBuffSize,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bAutoBuffSize = bCheck
+			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width()
 	y = y + ui:append("WndSliderBox", {
@@ -1548,6 +1538,7 @@ function PS.OnPanelActive(frame)
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		onchange = function(nVal)
 			Cataclysm_Main.fBuffScale = nVal / 100
+			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
 		textfmt = function(val) return _L("%d%%", val) end,
 	}, true):autoWidth():height()
@@ -1559,6 +1550,7 @@ function PS.OnPanelActive(frame)
 		checked = Cataclysm_Main.bStaring,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bStaring = bCheck
+			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():height()
 	y = y + ui:append("WndCheckBox", {
@@ -1566,6 +1558,7 @@ function PS.OnPanelActive(frame)
 		checked = Cataclysm_Main.bShowBuffTime,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowBuffTime = bCheck
+			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():height()
 	y = y + ui:append("WndCheckBox", {
@@ -1573,6 +1566,7 @@ function PS.OnPanelActive(frame)
 		checked = Cataclysm_Main.bShowBuffNum,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowBuffNum = bCheck
+			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():height()
 
@@ -1598,6 +1592,7 @@ function PS.OnPanelActive(frame)
 				end
 			end
 			Cataclysm_Main.tBuffList = t
+			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
 	}, true):height()
 

@@ -948,7 +948,7 @@ function CTM:RecBuff(dwMemberID, data)
 	CTM_BUFF_CACHE[data.dwID] = data
 end
 
-function CTM:RefresBuff()
+function CTM:RefreshBuff()
 	local team, me = GetClientTeam(), GetClientPlayer()
 	local tCheck = {}
 	for k, v in ipairs(team.GetTeamMemberList()) do
@@ -1132,11 +1132,12 @@ end
 function CTM:DrawHPMP(h, dwID, info, bRefresh)
 	if not info then return end
 	local bSha = CFG.nBGColorMode ~= 3
-	local Lsha = h:Lookup("Handle_Common/Shadow_Life")
-	local Limg = h:Lookup("Handle_Common/Image_Life")
-	local Ledg = h:Lookup("Handle_Common/Image_LifeLine")
-	local Msha = h:Lookup("Handle_Common/Shadow_Mana")
-	local Mimg = h:Lookup("Handle_Common/Image_Mana")
+	local hCommon = h:Lookup("Handle_Common")
+	local Lsha = hCommon:Lookup("Shadow_Life")
+	local Limg = hCommon:Lookup("Image_Life")
+	local Ledg = hCommon:Lookup("Image_LifeLine")
+	local Msha = hCommon:Lookup("Shadow_Mana")
+	local Mimg = hCommon:Lookup("Image_Mana")
 	local p, dwMountType
 	if CFG.bFasterHP then
 		p = GetPlayer(dwID)
@@ -1188,7 +1189,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 	-- 内力
 	if not bDeathFlag then
 		local nPercentage, nManaShow = 1, 1
-		local mana = h:Lookup("Handle_Common/Text_Mana")
+		local mana = hCommon:Lookup("Text_Mana")
 		if not IsPlayerManaHide(info.dwForceID, dwMountType) then -- 内力不需要那么准
 			nPercentage = info.nCurrentMana / info.nMaxMana
 			nManaShow = info.nCurrentMana
@@ -1219,7 +1220,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 	end
 	-- 掉血警告 必须早于血条绘制
 	if CFG.bHPHitAlert then
-		local lifeFade = h:Lookup("Handle_Common/Shadow_Life_Fade")
+		local lifeFade = hCommon:Lookup("Shadow_Life_Fade")
 		if CTM_LIFE_CACHE[dwID] and CTM_LIFE_CACHE[dwID] > nLifePercentage then
 			local nAlpha, nW, nH = lifeFade:GetAlpha(), 0, 0
 			if nAlpha == 0 then
@@ -1257,7 +1258,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			end)
 		end
 	else
-		h:Lookup("Handle_Common/Shadow_Life_Fade"):Hide()
+		hCommon:Lookup("Shadow_Life_Fade"):Hide()
 	end
 	-- 缓存
 	if not CFG.bFasterHP or bRefresh or (CFG.bFasterHP and CTM_LIFE_CACHE[dwID] ~= nLifePercentage) then
@@ -1291,7 +1292,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			Ledg:Show()
 			Ledg:SetAlpha(nAlpha)
 			Ledg:SetRelX(nRelX)
-			Ledg:SetAbsX(h:GetAbsX() + nRelX)
+			Ledg:SetAbsX(hCommon:GetAbsX() + nRelX)
 			Limg:Show()
 			Limg:SetAlpha(nAlpha)
 			Limg:SetPercentage(nLifePercentage)
@@ -1303,7 +1304,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			CTM_LIFE_CACHE[dwID] = nLifePercentage
 		end
 		-- 数值绘制
-		local life = h:Lookup("Handle_Common/Text_Life")
+		local life = hCommon:Lookup("Text_Life")
 		life:SetFontScheme(CFG.nLifeFont)
 		if CFG.nBGColorMode ~= 1 then
 			if (h.nDistance and h.nDistance > 20) or not h.nDistance then
@@ -1345,11 +1346,9 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 				end
 			end
 		elseif not info.bIsOnLine then
-			life:SetFontColor(128, 128, 128)
-			life:SetText(STR_FRIEND_NOT_ON_LINE)
+			life:SetText("")
 		elseif bDeathFlag then
-			life:SetFontColor(255, 0, 0)
-			life:SetText(FIGHT_DEATH)
+			life:SetText("")
 		else
 			life:SetFontColor(128, 128, 128)
 			life:SetText(COINSHOP_SOURCE_NULL)
@@ -1357,7 +1356,9 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 		-- if info.dwMountKungfuID == 0 then -- 没有同步成功时显示的内容
 			-- life:SetText("sync ...")
 		-- end
-		h:Lookup("Handle_Common/Image_PlayerBg"):SetVisible(info.bIsOnLine)
+		h:Lookup("Text_Death"):SetVisible(bDeathFlag)
+		h:Lookup("Text_OffLine"):SetVisible(not info.bIsOnLine)
+		h:Lookup("Image_PlayerBg"):SetVisible(info.bIsOnLine)
 	end
 end
 
