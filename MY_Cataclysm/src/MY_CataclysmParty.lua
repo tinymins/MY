@@ -311,7 +311,7 @@ function CTM_Party_Base.OnItemMouseEnter()
 	end
 	local info = CTM:GetMemberInfo(this.dwID)
 	if info.bIsOnLine and GetPlayer(this.dwID) and CFG.bTempTargetEnable then
-		MY.SetTempTarget(this.dwID, true)
+		MY.SetTempTarget(TARGET.PLAYER, this.dwID)
 	end
 end
 
@@ -324,7 +324,7 @@ function CTM_Party_Base.OnItemMouseLeave()
 	local info = CTM:GetMemberInfo(this.dwID)
 	if not info then return end -- ÍË×âµÄÎÊÌâ
 	if info.bIsOnLine and GetPlayer(this.dwID) and CFG.bTempTargetEnable then
-		MY.SetTempTarget(this.dwID, false)
+		MY.ResumeTarget()
 	end
 end
 
