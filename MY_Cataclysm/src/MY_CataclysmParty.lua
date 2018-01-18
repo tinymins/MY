@@ -925,6 +925,7 @@ function CTM:FormatFrame(frame, nMemberCount)
 			h:Lookup("Image_SlotBg"):Hide()
 			h:Lookup("Image_MemberBg"):SetVisible(not not h.dwID)
 		end
+		handle:SetH(nRolesH)
 	end
 	if not CFG.bShowGroupNumber then
 		nGroupHeight = 21

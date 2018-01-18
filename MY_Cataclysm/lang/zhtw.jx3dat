@@ -4,7 +4,7 @@ data = {
 	["Interface settings"] = "界面設置",
 	["Cataclysm"] = "團隊面板",
 	["Please hold down Ctrl, change it"] = "請按住Ctrl來更改分配模式。",
-	["Enable Cataclysm Team Panel"] = "啓用Cataclysm團隊面板",
+	["Enable Cataclysm Team Panel"] = "啓用團隊面板",
 	["Only in team"] = "只在團隊中顯示",
 	["Show distance"] = "顯示距離",
 	["Show ManaCount"] = "顯示內力數值",
@@ -51,7 +51,7 @@ data = {
 	["Cataclysm_TIPS"] = "記住是每行一個，格式可以是 翔舞 或 翔舞|self ，後者表示僅來源自己。",
 	["Show Group Number"] = "顯示分組編號",
 	["Team Members: %d, %d agree %d%%"] = "團隊共%d人，%d人已同意發放工資，當前比率%d%%。",
-	["Cataclysm Team Panel"] = "Cataclysm 團隊面板",
+	["Cataclysm Team Panel"] = "團隊面板",
 	-- Cataclysm_Party.lua --
 	["KUNGFU_10080"] = "雲",
 	["KUNGFU_10081"] = "冰",
