@@ -75,6 +75,8 @@ local CTM_LOOT_MODE = {
 	[PARTY_LOOT_MODE.BIDDING]      = {"ui/Image/UICommon/GoldTeam.UITex", 6},
 }
 local CTM_LOOT_QUALITY = {
+	[0] = 2399,
+	[1] = 2396,
 	[2] = 2401,
 	[3] = 2397,
 	[4] = 2402,
@@ -110,6 +112,31 @@ local function InsertForceCountMenu(tMenu)
 		})
 	end
 	table.insert(tMenu, tSubMenu)
+end
+
+local _InsertDistributeMenu = InsertDistributeMenu
+local function InsertDistributeMenu(tMenu)
+	local aDistributeMenu = {}
+	_InsertDistributeMenu(aDistributeMenu, not MY.IsDistributer())
+	for _, menu in ipairs(aDistributeMenu) do
+		if menu.szOption == g_tStrings.STR_LOOT_LEVEL then
+			insert(menu, 1, {
+				bDisable = not MY.IsDistributer(),
+				szOption = g_tStrings.STR_WHITE,
+				nFont = 79, rgb = {GetItemFontColorByQuality(1)},
+				bMCheck = true, bChecked = GetClientTeam().nRollQuality == 1,
+				fnAction = function() GetClientTeam().SetTeamRollQuality(1) end,
+			})
+			insert(menu, 1, {
+				bDisable = not MY.IsDistributer(),
+				szOption = g_tStrings.STR_GRAY,
+				nFont = 79, rgb = {GetItemFontColorByQuality(0)},
+				bMCheck = true, bChecked = GetClientTeam().nRollQuality == 0,
+				fnAction = function() GetClientTeam().SetTeamRollQuality(0) end,
+			})
+		end
+		insert(tMenu, menu)
+	end
 end
 
 local function GetTeammateFrame()

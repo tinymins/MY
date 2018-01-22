@@ -421,7 +421,7 @@ function MY_GKP_Loot.OnItemRButtonClick()
 				table.insert(menu, {
 					szOption = v[1],
 					fnAction = function()
-						GKP_Chat.OpenFrame(data.item, Loot.GetDistributeMenu(dwDoodadID, data), {
+						MY_GKP_Chat.OpenFrame(data.item, Loot.GetDistributeMenu(dwDoodadID, data), {
 							dwDoodadID = dwDoodadID,
 							data = data,
 						})
