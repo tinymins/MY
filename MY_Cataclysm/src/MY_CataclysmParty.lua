@@ -981,7 +981,7 @@ function CTM:RefreshBuff()
 						if not data.col then
 							item:Lookup("Shadow"):Hide()
 						else
-							item:Lookup("Shadow"):SetColorRGB(unpack(data.col))
+							item:Lookup("Shadow"):SetColorRGB(unpack(MY.HumanColor2RGB(data.col) or {255, 255, 0}))
 						end
 						local szName, icon = MY.GetBuffName(data.dwID, data.nLevelEx)
 						if data.nIcon and tonumber(data.nIcon) then
