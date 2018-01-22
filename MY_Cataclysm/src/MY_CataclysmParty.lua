@@ -36,6 +36,7 @@ local CTM_TTARGET
 local CTM_CACHE              = setmetatable({}, { __mode = "v" })
 local CTM_LIFE_CACHE         = {}
 local CTM_BUFF_CACHE         = {}
+local CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID
 -- Package func
 local HIDE_FORCE = {
 	[7]  = true,
@@ -293,6 +294,10 @@ function CTM_Party_Base.OnItemLButtonDown()
 	if IsCtrlKeyDown() then
 		EditBox_AppendLinkPlayer(info.szName)
 	elseif info.bIsOnLine and GetPlayer(this.dwID) then -- 有待考证
+		if CFG.bTempTargetEnable then
+			MY.DelayCall("MY_Cataclysm_TempTarget", false)
+			CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = nil
+		end
 		SetTarget(TARGET.PLAYER, this.dwID)
 		FireUIEvent("MY_TAR_TEMP_UPDATE", this.dwID)
 	end
@@ -311,10 +316,19 @@ function CTM_Party_Base.OnItemMouseEnter()
 	end
 	local info = CTM:GetMemberInfo(this.dwID)
 	if info.bIsOnLine and GetPlayer(this.dwID) and CFG.bTempTargetEnable then
-		MY.SetTempTarget(TARGET.PLAYER, this.dwID)
+		if not CTM_TEMP_TARGET_TYPE or CTM_TEMP_TARGET_TYPE == TARGET.NO_TARGET then
+			CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = MY.GetTarget()
+		end
+		MY.SetTarget(TARGET.PLAYER, this.dwID)
+		MY.DelayCall("MY_Cataclysm_TempTarget", false)
 	end
 end
 
+do
+local function ResumeTempTarget()
+	MY.SetTarget(CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID)
+	CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = nil
+end
 function CTM_Party_Base.OnItemMouseLeave()
 	if CTM_DRAG and this:Lookup("Image_Slot") and this:Lookup("Image_Slot"):IsValid() then
 		this:Lookup("Image_Slot"):Hide()
@@ -323,9 +337,12 @@ function CTM_Party_Base.OnItemMouseLeave()
 	if not this.dwID then return end
 	local info = CTM:GetMemberInfo(this.dwID)
 	if not info then return end -- 退租的问题
-	if info.bIsOnLine and GetPlayer(this.dwID) and CFG.bTempTargetEnable then
-		MY.ResumeTarget()
+	if info.bIsOnLine and GetPlayer(this.dwID) and CFG.bTempTargetEnable and CTM_TEMP_TARGET_TYPE then
+		if dwType ~= TARGET.NO_TARGET then
+			MY.DelayCall("MY_Cataclysm_TempTarget", ResumeTempTarget)
+		end
 	end
+end
 end
 
 function CTM_Party_Base.OnItemRButtonClick()
