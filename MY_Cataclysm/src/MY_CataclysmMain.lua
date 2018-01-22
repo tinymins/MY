@@ -1007,7 +1007,9 @@ function PS.OnPanelActive(frame)
 				{
 					szOption = _L["Restore official"],
 					fnAction = function()
-						SetConfig(clone(CTM_CONFIG))
+						local Config = clone(CTM_CONFIG)
+						Config.tBuffList = CTM_CONFIG_PLAYER.tBuffList
+						SetConfig(Config)
 						CheckEnableTeamPanel()
 						MY.SwitchTab("MY_Cataclysm", true)
 					end,
@@ -1015,7 +1017,9 @@ function PS.OnPanelActive(frame)
 				{
 					szOption = _L["Restore cataclysm"],
 					fnAction = function()
-						SetConfig(clone(CTM_CONFIG_CATACLYSM))
+						local Config = clone(CTM_CONFIG_CATACLYSM)
+						Config.tBuffList = CTM_CONFIG_PLAYER.tBuffList
+						SetConfig(Config)
 						CheckEnableTeamPanel()
 						MY.SwitchTab("MY_Cataclysm", true)
 					end,
