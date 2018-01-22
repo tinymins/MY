@@ -1154,7 +1154,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 	end
 	nMaxLife     = mmax(1, nMaxLife)
 	nCurrentLife = mmax(0, nCurrentLife)
-	nLifePercentage = nCurrentLife / nMaxLife
+	nLifePercentage = nMaxLife ~= 0 and (nCurrentLife / nMaxLife)
 	if not nLifePercentage or nLifePercentage < 0 or nLifePercentage > 1 then
 		nLifePercentage = 1
 	end
@@ -1200,7 +1200,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 		local nPercentage, nManaShow = 1, 1
 		local mana = hCommon:Lookup("Text_Mana")
 		if not IsPlayerManaHide(info.dwForceID, dwMountType) then -- 内力不需要那么准
-			nPercentage = info.nCurrentMana / info.nMaxMana
+			nPercentage = info.nMaxMana ~= 0 and (info.nCurrentMana / info.nMaxMana)
 			nManaShow = info.nCurrentMana
 			if not CFG.nShowMP then
 				mana:SetText("")

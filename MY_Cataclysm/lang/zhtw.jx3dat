@@ -82,4 +82,8 @@ data = {
 	["Please install and load GKP addon first."] = "未檢測到金團記錄插件，請先返回角色選擇界面進入插件管理界面，安裝並加載茗伊金團記錄子插件。",
 	["Official team frame style"] = "官方樣式",
 	["Cataclysm team frame style"] = "Cataclysm樣式",
+	["Restore default"] = "恢複默認",
+	["Sure to restore default?"] = "確認恢複默認設置？",
+	["Restore official"] = "恢複官方預設",
+	["Restore cataclysm"] = "恢複Cataclysm預設",
 }
