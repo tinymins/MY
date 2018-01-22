@@ -313,8 +313,8 @@ function MY.OpenPanel(bMute, bNoFocus, bNoAnimate)
 		MY.RedrawCategory()
 	end
 	frame:Show()
+	frame:BringToTop()
 	if not bNoFocus and Cursor.IsVisible() then
-		frame:BringToTop()
 		Station.SetFocusWindow(frame)
 	end
 	if not bNoAnimate then
