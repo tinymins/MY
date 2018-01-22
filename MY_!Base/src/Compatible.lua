@@ -643,4 +643,27 @@ function Table_GetProfessionName(dwProfessionID)
 end
 end
 
+if not EditBox_AppendLinkPlayer then
+function EditBox_AppendLinkPlayer(szName)
+	local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
+	edit:InsertObj("[".. szName .."]", { type = "name", text = "[".. szName .."]", name = szName })
+	Station.SetFocusWindow(edit)
+	return true
+end
+end
+
+if not EditBox_AppendLinkItem then
+function EditBox_AppendLinkItem(dwID)
+	local item = GetItem(dwID)
+	if not item then
+		return false
+	end
+	local szName = "[" .. GetItemNameByItem(item) .."]"
+	local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
+	edit:InsertObj(szName, { type = "item", text = szName, item = item.dwID })
+	Station.SetFocusWindow(edit)
+	return true
+end
+end
+
 UpdateItemInfoBoxObject = UpdataItemInfoBoxObject
