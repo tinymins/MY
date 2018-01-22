@@ -26,8 +26,8 @@ local Station, UI_GetClientPlayerID, Table_BuffIsVisible = Station, UI_GetClient
 local GetBuffName = MY.GetBuffName
 
 local INI_ROOT = MY.GetAddonInfo().szRoot .. "MY_Cataclysm/ui/"
--- local CTM_CONFIG = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/config/ctm/$lang.jx3dat")
 local CTM_CONFIG = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/config/default/$lang.jx3dat")
+local CTM_CONFIG_CATACLYSM = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/config/ctm/$lang.jx3dat")
 
 local TEAM_VOTE_REQUEST = {}
 local GKP_RECORD_TOTAL = 0
@@ -43,12 +43,7 @@ local function GetConfigurePath()
 	return {"config/cataclysm/" .. MY_Cataclysm.szConfigName .. ".jx3dat", MY_DATA_PATH.GLOBAL}
 end
 
-local function SetConfigure(szConfigName)
-	if szConfigName then
-		MY_Cataclysm.szConfigName = szConfigName
-	end
-	local Config = MY.LoadLUAData(GetConfigurePath()) or CTM_CONFIG
-	local bChanged = Config ~= CTM_CONFIG_PLAYER
+local function SetConfig(Config)
 	CTM_CONFIG_PLAYER = Config
 	-- options fixed
 	for k, v in pairs(CTM_CONFIG) do
@@ -61,7 +56,13 @@ local function SetConfigure(szConfigName)
 		__newindex = CTM_CONFIG_PLAYER,
 	})
 	CTM_CONFIG_PLAYER.bFasterHP = false
-	return bChanged
+end
+
+local function SetConfigureName(szConfigName)
+	if szConfigName then
+		MY_Cataclysm.szConfigName = szConfigName
+	end
+	SetConfig(MY.LoadLUAData(GetConfigurePath()) or clone(CTM_CONFIG))
 end
 
 local function GetFrame()
@@ -983,16 +984,46 @@ function PS.OnPanelActive(frame)
 	x = x + 10
 	x = x + ui:append("Text", { x = x, y = y, text = _L["Configuration name"] }, true):autoWidth():width() + 5
 
-	ui:append("WndEditBox", {
+	x = x + ui:append("WndEditBox", {
 		x = x, y = y + 4, w = 200, h = 25,
 		text = MY_Cataclysm.szConfigName,
 		onchange = function(txt)
-			if SetConfigure(txt) then
-				CheckEnableTeamPanel()
-				MY.SwitchTab("MY_Cataclysm", true)
-			end
+			SetConfigureName(txt)
 		end,
-	}, true):focus()
+		onblur = function()
+			CheckEnableTeamPanel()
+			MY.SwitchTab("MY_Cataclysm", true)
+		end,
+	}, true):width() + 5
+
+	-- »Ö¸´Ä¬ÈÏ
+	y = y + ui:append("WndButton2", {
+		x = x, y = y, text = _L["Restore default"],
+		onclick = function()
+			MessageBox({
+				szName = "MY_Cataclysm Restore default",
+				szAlignment = "CENTER",
+				szMessage = _L["Sure to restore default?"],
+				{
+					szOption = _L["Restore official"],
+					fnAction = function()
+						SetConfig(clone(CTM_CONFIG))
+						CheckEnableTeamPanel()
+						MY.SwitchTab("MY_Cataclysm", true)
+					end,
+				},
+				{
+					szOption = _L["Restore cataclysm"],
+					fnAction = function()
+						SetConfig(clone(CTM_CONFIG_CATACLYSM))
+						CheckEnableTeamPanel()
+						MY.SwitchTab("MY_Cataclysm", true)
+					end,
+				},
+				{ szOption = g_tStrings.STR_HOTKEY_CANCEL },
+			})
+		end,
+	}, true):height()
 end
 MY.RegisterPanel("MY_Cataclysm", _L["Cataclysm"], _L["Raid"], "ui/Image/UICommon/RaidTotal.uitex|62", {255, 255, 0}, PS)
 end
@@ -1698,7 +1729,7 @@ MY.RegisterExit(function()
 	MY.SaveLUAData(GetConfigurePath(), CTM_CONFIG_PLAYER)
 end)
 
-MY.RegisterInit("MY_Cataclysm", function() SetConfigure() end)
+MY.RegisterInit("MY_Cataclysm", function() SetConfigureName() end)
 
 
 MY.RegisterAddonMenu(function()
