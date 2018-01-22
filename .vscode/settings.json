@@ -5,5 +5,6 @@
   "files.encoding": "gbk",
   "files.eol": "\n",
   "files.trimTrailingWhitespace": true,
-  "files.trimFinalNewlines": true
+  "files.trimFinalNewlines": true,
+  "lua.targetVersion": "5.1"
 }
