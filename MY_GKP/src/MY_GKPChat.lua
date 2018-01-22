@@ -77,11 +77,15 @@ function Chat.OpenFrame(item, menu, data)
 	local frame = Chat.GetFrame()
 	if not frame then
 		frame = Wnd.OpenWindow(MY.GetAddonInfo().szRoot .. "MY_GKP/ui/MY_GKP_Chat.ini", "MY_GKP_Chat")
-		GUI(frame):Point():RegisterClose(Chat.CloseFrame)
-		:Append("WndButton2", { x = 380, y = 38, txt = _L["Stop Bidding"] }):Click(function()
-			MY.Talk(PLAYER_TALK_CHANNEL.RAID, _L["--- Stop Bidding ---"])
-			MY.DelayCall(function() UnRegisterMsgMonitor(Chat.OnMsgArrive) end, 1000)
-		end)
+		XGUI(frame):anchor({})
+			:append("WndButton2", {
+				x = 380, y = 38, text = _L["Stop Bidding"],
+				onclick = function()
+					MY.Talk(PLAYER_TALK_CHANNEL.RAID, _L["--- Stop Bidding ---"])
+					MY.DelayCall(1000, function() UnRegisterMsgMonitor(Chat.OnMsgArrive) end)
+				end,
+			})
+			:children("#Btn_Close"):click(Chat.CloseFrame)
 	end
 	local box = frame:Lookup("", "Box")
 	local txt = frame:Lookup("", "Text")
