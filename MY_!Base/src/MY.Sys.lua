@@ -1304,3 +1304,55 @@ function MY.Confirm(szMsg, fnAction, fnCancel, szSure, szCancel)
 	}
 	MessageBox(tMsg)
 end
+
+do
+function MY.Hex2RGB(hex)
+	local s, r, g, b = (hex:gsub("#", ""))
+	if #s == 3 then
+		r, g, b = s:sub(1, 1) .. s:sub(1, 1), s:sub(2, 2) .. s:sub(2, 2), s:sub(3, 3) .. s:sub(3, 3)
+	elseif #s == 6 then
+		r, g, b = s:sub(1, 2), s:sub(3, 4), s:sub(5, 6)
+	end
+
+	if not r or not g or not b then
+		return
+	end
+	r, g, b = tonumber("0x" .. r), tonumber("0x" .. g), tonumber("0x" .. b)
+
+	if not r or not g or not b then
+		return
+	end
+	return r, g, b
+end
+
+function MY.RGB2Hex(r, g, b)
+	return (("#%02X%02X%02X"):format(r, g, b))
+end
+
+local COLOR_NAME_RGB = {}
+do
+	local tColor = MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. "data/colors.jx3dat")
+	for id, col in pairs(tColor) do
+		local r, g, b = MY.Hex2RGB(col)
+		if r then
+			if _L.COLOR_NAME[id] then
+				COLOR_NAME_RGB[_L.COLOR_NAME[id]] = {r, g, b}
+			end
+			COLOR_NAME_RGB[id] = {r, g, b}
+		end
+	end
+end
+
+function MY.ColorName2RGB(name)
+	return COLOR_NAME_RGB[name]
+end
+
+local HUMAN_COLOR_CACHE = setmetatable({}, {__mode = "v", __index = COLOR_NAME_RGB})
+function MY.HumanColor2RGB(name)
+	if HUMAN_COLOR_CACHE[name] == nil then
+		local r, g, b = MY.Hex2RGB(name)
+		HUMAN_COLOR_CACHE[name] = r and {r, g, b} or false
+	end
+	return HUMAN_COLOR_CACHE[name] or nil
+end
+end

@@ -1537,6 +1537,9 @@ local function GetListText(tab)
 			if v.bSelf then
 				k = k .. "|self"
 			end
+			if v.col then
+				k = k .. "," .. v.col
+			end
 			table.insert(tName, k)
 		end
 	end
@@ -1548,6 +1551,7 @@ function PS.OnPanelActive(frame)
 	local ui = XGUI(frame)
 	local X, Y = 20, 20
 	local x, y = X, Y
+	local w, h = ui:size()
 
 	-- BUFF…Ë÷√
 	y = y + ui:append("Text", { x = x, y = y, text = _L["Buff settings"], font = 27 }, true):autoSize():height()
@@ -1632,10 +1636,12 @@ function PS.OnPanelActive(frame)
 			for _, v in ipairs(MY.Split(szText, "\n")) do
 				v = MY.Trim(v)
 				if v ~= "" then
-					local a = MY.Split(v, "|")
-					t[MY.Trim(a[1])] = {
-						bSelf = a[2] and true or false
-					}
+					local settings = MY.Split(v, ",")
+					local identities = MY.Split(settings[1], "|")
+					local id = MY.Trim(identities[1])
+					local bSelf = identities[2] and true or false
+					local col = settings[2]
+					t[id] = { bSelf = bSelf, col = col }
 				end
 			end
 			Cataclysm_Main.tBuffList = t
@@ -1649,7 +1655,7 @@ function PS.OnPanelActive(frame)
 	y = y + ui:append("Text", { x = x, y = y, text = _L["Tips"], font = 27 }, true):autoSize():height()
 
 	x = x + 10
-	ui:append("Text", { x = x, y = y, text = _L["Cataclysm_TIPS"] }, true):autoWidth()
+	ui:append("Text", { x = x, y = y, w = w - x * 2, text = _L["Cataclysm_TIPS"], multiline = true }, true):autoHeight()
 end
 MY.RegisterPanel("MY_Cataclysm_BuffSettings", _L["Buff settings"], _L["Raid"], "ui/Image/UICommon/RaidTotal.uitex|74", {255, 255, 0}, PS)
 end
