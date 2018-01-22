@@ -62,7 +62,7 @@ local function SetConfigureName(szConfigName)
 	if szConfigName then
 		MY_Cataclysm.szConfigName = szConfigName
 	end
-	SetConfig(MY.LoadLUAData(GetConfigurePath()) or clone(CTM_CONFIG))
+	SetConfig(MY.LoadLUAData(GetConfigurePath()) or clone(CTM_CONFIG_CATACLYSM))
 end
 
 local function GetFrame()
