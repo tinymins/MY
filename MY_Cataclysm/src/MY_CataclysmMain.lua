@@ -25,6 +25,7 @@ local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/lang/")
 local Station, UI_GetClientPlayerID, Table_BuffIsVisible = Station, UI_GetClientPlayerID, Table_BuffIsVisible
 local GetBuffName = MY.GetBuffName
 
+local INI_ROOT = MY.GetAddonInfo().szRoot .. "MY_Cataclysm/ui/"
 -- local CTM_CONFIG = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/config/ctm/$lang.jx3dat")
 local CTM_CONFIG = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/config/default/$lang.jx3dat")
 
@@ -188,7 +189,7 @@ local function CreateControlBar()
 	local nRollQuality = team.nRollQuality
 	local frame        = GetFrame()
 	local container    = frame:Lookup("Container_Main")
-	local szIniFile    = MY.GetAddonInfo().szRoot .. "MY_Cataclysm/ui/Cataclysm_Button.ini"
+	local szIniFile    = INI_ROOT .. "Cataclysm_Button.ini"
 	container:Clear()
 	-- 分配模式
 	local hLootMode = container:AppendContentFromIni(szIniFile, "WndButton_LootMode")
@@ -236,9 +237,26 @@ local function CreateControlBar()
 	SetFrameSize(false)
 end
 
+-- 创建中间层数据 常用的
+local function CreateItemData()
+	local frame = GetFrame()
+	if not frame then
+		return
+	end
+	for _, p in ipairs({
+		{"hMember", "Cataclysm_Item" .. Cataclysm_Main.nCss .. ".ini", "Handle_RoleDummy"},
+		{"hBuff", "Cataclysm_Item_Buff.ini", "Handle_Buff"},
+	}) do
+		if frame[p[1]] then
+			frame:RemoveItemData(frame[p[1]])
+		end
+		frame[p[1]] = frame:CreateItemData(INI_ROOT .. p[2], p[3]) or frame[p[1]] -- 兼容当前KGUI错误代码
+	end
+end
+
 local function OpenCataclysmPanel()
 	if not GetFrame() then
-		Wnd.OpenWindow(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/ui/Cataclysm_Main.ini", "Cataclysm_Main")
+		Wnd.OpenWindow(INI_ROOT .. "Cataclysm_Main.ini", "Cataclysm_Main")
 	end
 end
 
@@ -269,6 +287,7 @@ end
 
 local function ReloadCataclysmPanel()
 	if GetFrame() then
+		CreateItemData()
 		CreateControlBar()
 		Grid_CTM:CloseParty()
 		Grid_CTM:ReloadParty()
@@ -335,12 +354,9 @@ function Cataclysm_Main.OnFrameCreate()
 		Grid_CTM:AutoLinkAllPanel()
 	end
 	SetFrameSize()
+	CreateItemData()
 	CreateControlBar()
 	this:EnableDrag(Cataclysm_Main.bDrag)
-	-- 中间层数据 常用的
-	this.hMember = this:CreateItemData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/ui/Cataclysm_Item" .. Cataclysm_Main.nCss .. ".ini", "Handle_RoleDummy")
-	this.hBuff   = this:CreateItemData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/ui/Cataclysm_Item_Buff.ini", "Handle_Buff")
-
 end
 -------------------------------------------------
 -- 拖动窗体 OnFrameDrag
