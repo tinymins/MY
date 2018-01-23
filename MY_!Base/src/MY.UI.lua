@@ -2280,13 +2280,6 @@ function XGUI:size(nWidth, nHeight, nRawWidth, nRawHeight)
 				txt:SetRelX(nRawWidth + 5)
 				txt:SetSize(nWidth - nRawWidth - 5, nHeight)
 				hdl:FormatAllItemPos()
-			elseif componentType == 'WndButton2' then
-				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
-				local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
-				local txt = GetComponentElement(raw, 'TEXT')
-				wnd:SetSize(nWidth, nHeight)
-				hdl:SetSize(nWidth, nHeight)
-				txt:SetSize(nWidth, nHeight * 0.83)
 			elseif raw:GetBaseType() == 'Wnd' then
 				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 				local hdl = GetComponentElement(raw, 'MAIN_HANDLE')

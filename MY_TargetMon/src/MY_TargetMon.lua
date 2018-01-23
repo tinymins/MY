@@ -252,7 +252,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig, Add)
 	})
 	ui:append("WndButton2", {
 		x = w - 180, y = y,
-		w = 50, h = 30,
+		w = 50, h = 25,
 		text = _L["Move Up"],
 		onclick = function()
 			for i = 1, #Config do
@@ -269,7 +269,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig, Add)
 	})
 	ui:append("WndButton2", {
 		x = w - 125, y = y,
-		w = 50, h = 30,
+		w = 50, h = 25,
 		text = _L["Move Down"],
 		onclick = function()
 			for i = 1, #Config do
@@ -286,7 +286,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig, Add)
 	})
 	ui:append("WndButton2", {
 		x = w - 70, y = y,
-		w = 60, h = 30,
+		w = 60, h = 25,
 		text = _L["Delete"],
 		onclick = function()
 			for i, c in ipairs_r(Config) do
