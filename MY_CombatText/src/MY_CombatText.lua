@@ -1049,7 +1049,7 @@ function PS.OnPanelActive(frame)
 	y = y + deltaY
 
 	x = X + 10
-	ui:append("Text", { x = 10, y = y, text = _L["Therapy Style"], color = { 255, 255, 200 }, autoenable = IsEnabled })
+	ui:append("Text", { x = x, y = y, text = _L["Therapy Style"], color = { 255, 255, 200 }, autoenable = IsEnabled })
 	x = x + 110
 	ui:append("WndEditBox", {
 		x = x, y = y, w = 250, h = 25, text = MY_CombatText.szTherapy, limit = 30,
