@@ -1064,6 +1064,7 @@ function PS.OnPanelActive(wnd)
 		menu = function()
 			local configs = {}
 			local menu = {}
+			local indent = IsCtrlKeyDown() and "\t" or nil
 			for _, config in ipairs(Config) do
 				insert(menu, {
 					bCheck = true,
@@ -1091,7 +1092,7 @@ function PS.OnPanelActive(wnd)
 							.. ".jx3dat",
 						MY_DATA_PATH.GLOBAL,
 					})
-					MY.SaveLUAData(file, configs)
+					MY.SaveLUAData(file, configs, indent)
 					MY.Sysmsg({ _L('Data exported, file saved at %s.', file) })
 					OutputMessage('MSG_ANNOUNCE_YELLOW', _L('Data exported, file saved at %s.', file))
 				end,
