@@ -1356,3 +1356,29 @@ function MY.HumanColor2RGB(name)
 	return HUMAN_COLOR_CACHE[name] or nil
 end
 end
+
+function MY.ExecuteWithThis(element, fnAction, ...)
+	if not (element and element:IsValid()) then
+		-- Log("[UI ERROR]Invalid element on executing ui event!")
+		return false
+	end
+	if type(fnAction) == "string" then
+		if element[fnAction] then
+			fnAction = element[fnAction]
+		else
+			local szFrame = element:GetRoot():GetName()
+			if type(_G[szFrame]) == "table" then
+				fnAction = _G[szFrame][fnAction]
+			end
+		end
+	end
+	if type(fnAction) ~= "function" then
+		-- Log("[UI ERROR]Invalid function on executing ui event! # " .. element:GetTreePath())
+		return false
+	end
+	local _this = this
+	this = element
+	local rets = {fnAction(...)}
+	this = _this
+	return true, unpack(rets)
+end

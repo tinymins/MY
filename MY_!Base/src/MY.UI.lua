@@ -287,7 +287,7 @@ local function InitComponent(raw, szType)
 			raw:Lookup('', 'Text_Default'):SetText(szText)
 			if not bOnlyUI then
 				for _, fn in ipairs(GetComponentProp(raw, 'onChangeEvents')) do
-					ExecuteWithThis(raw, fn, nCurrentValue)
+					MY.ExecuteWithThis(raw, fn, nCurrentValue)
 				end
 			end
 			this = _this
@@ -793,7 +793,7 @@ end
 function XGUI:each(fn)
 	self:_checksum()
 	for _, raw in pairs(self.raws) do
-		ExecuteWithThis(raw, fn, XGUI(raw))
+		MY.ExecuteWithThis(raw, fn, XGUI(raw))
 	end
 	return self
 end
@@ -2323,7 +2323,7 @@ function XGUI:size(nWidth, nHeight, nRawWidth, nRawHeight)
 					h:FormatAllItemPos()
 				end
 			end
-			SafeExecuteWithThis(raw, raw.OnSizeChanged)
+			MY.ExecuteWithThis(raw, raw.OnSizeChanged)
 		end
 		return self
 	else
@@ -3008,7 +3008,7 @@ function XGUI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 		end
 		for _, raw in ipairs(self.raws) do
 			if IsFunction(fnLClick) then
-				local fnAction = function() ExecuteWithThis(raw, fnLClick, MY.Const.Event.Mouse.LBUTTON) end
+				local fnAction = function() MY.ExecuteWithThis(raw, fnLClick, MY.Const.Event.Mouse.LBUTTON) end
 				if GetComponentType(raw) == 'WndScrollBox' then
 					XGUI(GetComponentElement(raw, 'MAIN_HANDLE')):uievent('OnItemLButtonClick', fnAction)
 				else
@@ -3033,7 +3033,7 @@ function XGUI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 
 			end
 			if IsFunction(fnRClick) then
-				local fnAction = function() ExecuteWithThis(raw, fnRClick, MY.Const.Event.Mouse.RBUTTON) end
+				local fnAction = function() MY.ExecuteWithThis(raw, fnRClick, MY.Const.Event.Mouse.RBUTTON) end
 				if GetComponentType(raw) == 'WndScrollBox' then
 					XGUI(GetComponentElement(raw, 'MAIN_HANDLE')):uievent('OnItemRButtonClick', fnAction)
 				else
@@ -3223,7 +3223,7 @@ function XGUI:change(fnOnChange)
 		for _, raw in ipairs(self.raws) do
 			local edt = GetComponentElement(raw, 'EDIT')
 			if edt then
-				XGUI(edt):uievent('OnEditChanged', function() ExecuteWithThis(raw, fnOnChange, edt:GetText()) end)
+				XGUI(edt):uievent('OnEditChanged', function() MY.ExecuteWithThis(raw, fnOnChange, edt:GetText()) end)
 			end
 			if GetComponentType(raw) == 'WndSliderBox' then
 				insert(GetComponentProp(raw, 'onChangeEvents'), fnOnChange)
@@ -3285,7 +3285,7 @@ function XGUI:blur(fnOnKillFocus)
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'EDIT')
 			if raw then
-				XGUI(raw):uievent('OnKillFocus', function() pcall(fnOnKillFocus, self) end)
+				XGUI(raw):uievent('OnKillFocus', function() MY.ExecuteWithThis(raw, fnOnKillFocus) end)
 			end
 		end
 		return self
@@ -3483,15 +3483,12 @@ function  XGUI.CreateFrame(szName, opt)
 				frm:Lookup('Wnd_Total'):Hide()
 				frm:Lookup('', 'Shadow_Bg'):Hide()
 				frm:SetSize(frm.w, 30)
-				local hMax = frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize')
-				if hMax then
-					hMax:Enable(false)
+				local chkMax = frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize')
+				if chkMax then
+					chkMax:Enable(false)
 				end
-				if frm.OnMinimize then
-					local status, res = pcall(frm.OnMinimize, frm:Lookup('Wnd_Total'))
-					if status and res then
-						return
-					end
+				if select(2, MY.ExecuteWithThis(frm, frm.OnMinimize, frm:Lookup('Wnd_Total'))) then
+					return
 				end
 				if opt.dragresize then
 					frm:Lookup('Btn_Drag'):Hide()
@@ -3502,15 +3499,15 @@ function  XGUI.CreateFrame(szName, opt)
 				frm:Lookup('Wnd_Total'):Show()
 				frm:Lookup('', 'Shadow_Bg'):Show()
 				frm:SetSize(frm.w, frm.h)
-				local hMax = frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize')
-				if hMax then
-					hMax:Enable(true)
+				local chkMax = frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize')
+				if chkMax then
+					chkMax:Enable(true)
 				end
 				if opt.dragresize then
 					frm:Lookup('Btn_Drag'):Show()
 				end
 				frm.bMinimize = false
-				SafeExecuteWithThis(frm:Lookup('Wnd_Total'), frm.OnRestore)
+				MY.ExecuteWithThis(frm, frm.OnRestore, frm:Lookup('Wnd_Total'))
 			end
 		end
 		if not opt.maximize then
@@ -3534,11 +3531,8 @@ function  XGUI.CreateFrame(szName, opt)
 					local w, h = Station.GetClientSize()
 					XGUI(frm):pos(0, 0):size(w, h)
 				end)
-				if frm.OnMaximize then
-					local status, res = pcall(frm.OnMaximize, frm:Lookup('Wnd_Total'))
-					if status and res then
-						return
-					end
+				if select(2, MY.ExecuteWithThis(frm, frm.OnMaximize, frm:Lookup('Wnd_Total'))) then
+					return
 				end
 				if opt.dragresize then
 					frm:Lookup('Btn_Drag'):Hide()
@@ -3555,7 +3549,7 @@ function  XGUI.CreateFrame(szName, opt)
 					frm:Lookup('Btn_Drag'):Show()
 				end
 				frm.bMaximize = false
-				SafeExecuteWithThis(frm:Lookup('Wnd_Total'), frm.OnRestore)
+				MY.ExecuteWithThis(frm, frm.OnRestore, frm:Lookup('Wnd_Total'))
 			end
 		end
 		-- drag resize button
