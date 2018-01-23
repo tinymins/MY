@@ -119,7 +119,7 @@ function MY_GKP_Loot.OnFrameBreathe()
 			for i = 0, hList:GetItemCount() - 1 do
 				box = hList:Lookup(i):Lookup("Box_Item")
 				if MY_GKP_Loot.IsItemAutoPickup(box.itemData, wnd.tItemConfig, doodad, bCanDialog) then
-					ExecuteWithThis(box, MY_GKP_Loot.OnItemLButtonClick)
+					MY.ExecuteWithThis(box, MY_GKP_Loot.OnItemLButtonClick)
 				end
 			end
 		end

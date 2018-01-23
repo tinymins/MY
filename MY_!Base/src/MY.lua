@@ -272,27 +272,7 @@ function MY.OpenPanel(bMute, bNoFocus, bNoAnimate)
 
 		-- update some ui handle
 		frame:Lookup("", "Text_Title"):SetText(_L['mingyi plugins'] .. " v" .. MY.GetVersion() .. ' Build ' .. _BUILD_)
-		frame:Lookup("Wnd_Total", "Handle_DBClick").OnItemLButtonDBClick = function()
-			frame:Lookup('CheckBox_Maximize'):ToggleCheck()
-		end
 		MY.UI(frame):size(_MY.OnSizeChanged)
-		-- bind close button event
-		MY.UI(frame):children("#Btn_Close"):click(function() MY.ClosePanel() end)
-		MY.UI(frame):children("#CheckBox_Maximize"):check(function()
-			local ui = MY.UI(frame)
-			_MY.anchor = ui:anchor()
-			_MY.w, _MY.h = ui:size()
-			ui:pos(0, 0):event('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
-				ui:size(Station.GetClientSize())
-			end):drag(false)
-			MY.ResizePanel(Station.GetClientSize())
-		end, function()
-			MY.ResizePanel(_MY.w, _MY.h)
-			MY.UI(frame)
-			  :event('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
-			  :drag(true)
-			  :anchor(_MY.anchor)
-		end)
 		-- update author infomation button
 		MY.UI(MY.GetFrame()):children("#Wnd_Total"):children("#Btn_Weibo")
 		  :text(_L['author\'s weibo'])
@@ -1040,6 +1020,13 @@ end
 --------------------------------------------------------------------------------------------------------------------------------------------
 -- ´°¿Úº¯Êý
 --------------------------------------------------------------------------------------------------------------------------------------------
+function MY.OnItemLButtonDBClick()
+	local name = this:GetName()
+	if name == "Handle_DBClick" then
+		this:GetRoot():Lookup("CheckBox_Maximize"):ToggleCheck()
+	end
+end
+
 function MY.OnMouseWheel()
 	local p = this
 	while p do
@@ -1049,6 +1036,37 @@ function MY.OnMouseWheel()
 		p = p:GetParent()
 	end
 	return true
+end
+
+function MY.OnLButtonClick()
+	local name = this:GetName()
+	if name == "Btn_Close" then
+		MY.ClosePanel()
+	end
+end
+
+function MY.OnCheckBoxCheck()
+	local name = this:GetName()
+	if name == "CheckBox_Maximize" then
+		local ui = MY.UI(this:GetRoot())
+		_MY.anchor = ui:anchor()
+		_MY.w, _MY.h = ui:size()
+		ui:pos(0, 0):event('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
+			ui:size(Station.GetClientSize())
+		end):drag(false)
+		MY.ResizePanel(Station.GetClientSize())
+	end
+end
+
+function MY.OnCheckBoxUncheck()
+	local name = this:GetName()
+	if name == "CheckBox_Maximize" then
+		MY.ResizePanel(_MY.w, _MY.h)
+		MY.UI(this:GetRoot())
+			:event('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
+			:drag(true)
+			:anchor(_MY.anchor)
+	end
 end
 
 function MY.OnDragButtonBegin()
