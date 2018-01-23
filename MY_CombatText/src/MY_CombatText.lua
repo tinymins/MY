@@ -1008,6 +1008,7 @@ function PS.OnPanelActive(frame)
 		ui:append("Shadow", {
 			x = x, y = y + 8, color = MY_CombatText.tCriticalC, w = 15, h = 15,
 			onclick = function()
+				local this = this
 				XGUI.OpenColorPicker(function(r, g, b)
 					MY_CombatText.tCriticalC = { r, g, b }
 					XGUI(this):color(r, g, b)
@@ -1036,6 +1037,7 @@ function PS.OnPanelActive(frame)
 		ui:append("Shadow", {
 			x = x, y = y + 8, color = MY_CombatText.tCriticalB, w = 15, h = 15,
 			onclick = function()
+				local this = this
 				XGUI.OpenColorPicker(function(r, g, b)
 					MY_CombatText.tCriticalB = { r, g, b }
 					XGUI(this):color(r, g, b)
@@ -1064,6 +1066,7 @@ function PS.OnPanelActive(frame)
 		ui:append("Shadow", {
 			x = x, y = y + 8, color = MY_CombatText.tCriticalH, w = 15, h = 15,
 			onclick = function()
+				local this = this
 				XGUI.OpenColorPicker(function(r, g, b)
 					MY_CombatText.tCriticalH = { r, g, b }
 					XGUI(this):color(r, g, b)
@@ -1140,6 +1143,7 @@ function PS.OnPanelActive(frame)
 			ui:append("Shadow", {
 				x = x + (i % 8) * 65 + 35, y = y + 30 * floor(i / 8) + 8, color = v, w = 15, h = 15,
 				onclick = function()
+					local this = this
 					XGUI.OpenColorPicker(function(r, g, b)
 						MY_CombatText.col[k] = { r, g, b }
 						XGUI(this):color(r, g, b)
