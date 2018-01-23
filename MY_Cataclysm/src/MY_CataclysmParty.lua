@@ -945,7 +945,7 @@ function CTM:FormatFrame(frame, nMemberCount)
 		handle:SetH(nRolesH)
 	end
 	if not CFG.bShowGroupNumber then
-		nGroupHeight = 21
+		nGroupHeight = 23
 	end
 	frame:SetSize(128 * fX, 25 * fY + nRolesH - height - nGroupHeight)
 	h:Lookup("Handle_BG/Shadow_BG"):SetSize(120 * fX, nRolesH + 20 * fY - height - nGroupHeight)
@@ -958,6 +958,9 @@ function CTM:FormatFrame(frame, nMemberCount)
 	h:Lookup("Handle_BG/Image_BG_BR"):SetRelPos(112 * fX, nRolesH + 11 * fY - height - nGroupHeight)
 	h:Lookup("Handle_BG"):FormatAllItemPos()
 	h:Lookup("Handle_Cols/Handle_Title"):SetVisible(CFG.bShowGroupNumber)
+	h:Lookup("Handle_Cols/Handle_Title"):SetH(23)
+	h:Lookup("Handle_Cols/Handle_Title/Text_Title"):SetH(23)
+	h:Lookup("Handle_Cols/Handle_Title/Image_TitleBg"):SetH(23)
 	h:Lookup("Handle_Cols"):FormatAllItemPos()
 end
 
