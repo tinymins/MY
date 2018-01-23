@@ -1539,7 +1539,7 @@ function PS.OnPanelActive(frame)
 					FireUIEvent("CTM_SET_ALPHA")
 				end
 			end,
-			textfmt = function(val) return _L("%d%%", val) end,
+			textfmt = function(val) return _L("%d%%", val / 255 * 100) end,
 		}, true):height()
 	end
 
