@@ -1,11 +1,7 @@
-Farme	Left	Top	Width	High	File
-0	0	0	32	32	D:\Program Files\_Game\Kingsoft\jx3_dev\bin\zhcn\interface\MY\!src-dist\UITex\MY.tga
-1	0	66	224	63	D:\Program Files\_Game\Kingsoft\jx3_dev\bin\zhcn\interface\MY\!src-dist\UITex\选项卡1.tga
-2	0	131	224	63	D:\Program Files\_Game\Kingsoft\jx3_dev\bin\zhcn\interface\MY\!src-dist\UITex\选项卡2.tga
-3	0	196	224	63	D:\Program Files\_Game\Kingsoft\jx3_dev\bin\zhcn\interface\MY\!src-dist\UITex\选项卡3.tga
-4	0	261	224	63	D:\Program Files\_Game\Kingsoft\jx3_dev\bin\zhcn\interface\MY\!src-dist\UITex\选项卡4.tga
-5	0	34	16	16	D:\Program Files\_Game\Kingsoft\jx3_dev\bin\zhcn\interface\MY\!src-dist\UITex\Black.tga
-6	80	0	430	64	D:\Program Files\_Game\Kingsoft\jx3_dev\bin\zhcn\interface\MY\!src-dist\UITex\顶部花纹.tga
-7	62	0	16	64	D:\Program Files\_Game\Kingsoft\jx3_dev\bin\zhcn\interface\MY\!src-dist\UITex\面板右上.tga
-8	52	0	8	64	D:\Program Files\_Game\Kingsoft\jx3_dev\bin\zhcn\interface\MY\!src-dist\UITex\面板中上.tga
-9	34	0	16	64	D:\Program Files\_Game\Kingsoft\jx3_dev\bin\zhcn\interface\MY\!src-dist\UITex\面板左上.tga
+Farme	Group	GroupIndex	GroupFrameDelay	Left	Top	Width	Height	Name
+0	0	0	100	226	0	32	32	
+1				0	0	224	63	
+2				0	65	224	63	
+3				0	130	224	63	
+4				0	195	224	63	
+5				226	34	16	16	
