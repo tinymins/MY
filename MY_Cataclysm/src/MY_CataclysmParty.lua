@@ -784,10 +784,11 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bNa
 			end
 		end
 		TextName:SetText(info.szName)
-		TextName:SetFontScheme(CFG.nFont)
+		TextName:SetFontScheme(CFG.nNameFont)
 		TextName:SetFontColor(r, g, b)
+		TextName:SetFontScale(CFG.fNameFontScale)
 		TextSchool:SetText(CTM_KUNGFU_TEXT[info.dwMountKungfuID])
-		TextSchool:SetFontScheme(CFG.nFont)
+		TextSchool:SetFontScheme(CFG.nNameFont)
 		TextSchool:SetFontColor(r, g, b)
 		TextSchool:SetVisible(CFG.nShowIcon == 4)
 	end
@@ -1227,6 +1228,8 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			else
 				mana:SetText(nManaShow)
 			end
+			mana:SetFontScheme(CFG.nManaFont)
+			mana:SetFontScale(CFG.fManaFontScale)
 		end
 		if not nPercentage or nPercentage < 0 or nPercentage > 1 then
 			nPercentage = 1
@@ -1332,6 +1335,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 		-- ÊýÖµ»æÖÆ
 		local life = hCommon:Lookup("Text_Life")
 		life:SetFontScheme(CFG.nLifeFont)
+		life:SetFontScale(CFG.fLifeFontScale)
 		if CFG.nBGColorMode ~= 1 then
 			if (h.nDistance and h.nDistance > 20) or not h.nDistance then
 				life:SetAlpha(150)
@@ -1384,6 +1388,8 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 		-- end
 		h:Lookup("Text_Death"):SetVisible(bDeathFlag)
 		h:Lookup("Text_OffLine"):SetVisible(not info.bIsOnLine)
+		h:Lookup("Text_Death"):SetFontScale(CFG.fLifeFontScale)
+		h:Lookup("Text_OffLine"):SetFontScale(CFG.fLifeFontScale)
 		h:Lookup("Image_PlayerBg"):SetVisible(info.bIsOnLine)
 	end
 end

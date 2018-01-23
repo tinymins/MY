@@ -767,6 +767,47 @@ function PS.OnPanelActive(frame)
 
 	x = X + 10
 	x = x + ui:append("WndCheckBox", {
+		x = x, y = y, text = _L["Show ManaCount"],
+		checked = Cataclysm_Main.nShowMP,
+		oncheck = function(bCheck)
+			Cataclysm_Main.nShowMP = bCheck
+			if GetFrame() then
+				Grid_CTM:CallDrawHPMP(true, true)
+			end
+		end,
+	}, true):autoWidth():width() + 5
+
+	x = x + ui:append("WndButton2", {
+		x = x, y = y, text = g_tStrings.STR_SKILL_MANA .. g_tStrings.FONT,
+		onclick = function()
+			XGUI.OpenFontPicker(function(nFont)
+				Cataclysm_Main.nManaFont = nFont
+				if GetFrame() then
+					Grid_CTM:CallDrawHPMP(true, true)
+				end
+			end)
+		end,
+		autoenable = function() return Cataclysm_Main.nShowMP end,
+	}, true):width() + 5
+
+	ui:append("WndSliderBox", {
+		x = x, y = y - 1,
+		value = Cataclysm_Main.fManaFontScale * 100,
+		range = {1, 400},
+		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		textfmt = function(val) return _L("Scale %d%%", val) end,
+		onchange = function(val)
+			Cataclysm_Main.fManaFontScale = val / 100
+			if GetFrame() then
+				Grid_CTM:CallDrawHPMP(true, true)
+			end
+		end,
+		autoenable = function() return Cataclysm_Main.nShowMP end,
+	}, true)
+	y = y + 25
+
+	x = X + 10
+	x = x + ui:append("WndCheckBox", {
 		x = x, y = y, text = g_tStrings.STR_RAID_TIP_TARGET,
 		checked = Cataclysm_Main.bShowTargetTargetAni,
 		oncheck = function(bCheck)
@@ -786,17 +827,6 @@ function PS.OnPanelActive(frame)
 	}, true):autoWidth():width() + 5
 
 	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Show ManaCount"],
-		checked = Cataclysm_Main.nShowMP,
-		oncheck = function(bCheck)
-			Cataclysm_Main.nShowMP = bCheck
-			if GetFrame() then
-				Grid_CTM:CallDrawHPMP(true, true)
-			end
-		end,
-	}, true):autoWidth():width() + 5
-
-	y = y + ui:append("WndCheckBox", {
 		x = x, y = y, text = _L["Attack Warning"],
 		checked = Cataclysm_Main.bHPHitAlert,
 		oncheck = function(bCheck)
@@ -805,19 +835,20 @@ function PS.OnPanelActive(frame)
 				Grid_CTM:CallDrawHPMP(true, true)
 			end
 		end,
-	}, true):autoWidth():height()
+	}, true):autoWidth():width() + 5
 
 	local me = GetClientPlayer()
 	if me.dwForceID == 6 then
-		y = y + ui:append("WndCheckBox", {
+		x = x + ui:append("WndCheckBox", {
 			x = X + 10, y = y, text = _L["ZuiWu Effect"],
 			color = { MY.GetForceColor(6) },
 			checked = Cataclysm_Main.bShowEffect,
 			oncheck = function(bCheck)
 				Cataclysm_Main.bShowEffect = bCheck
 			end,
-		}, true):autoWidth():height()
+		}, true):autoWidth():width() + 5
 	end
+	y = y + 25
 
 	-- 血量显示
 	x = X
@@ -846,7 +877,7 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():width() + 5
 
-	y = y + ui:append("WndRadioBox", {
+	x = x + ui:append("WndRadioBox", {
 		x = x, y = y, text = g_tStrings.STR_RAID_LIFE_HIDE,
 		group = "lifemode", checked = Cataclysm_Main.nHPShownMode2 == 0,
 		oncheck = function()
@@ -855,7 +886,23 @@ function PS.OnPanelActive(frame)
 				Grid_CTM:CallDrawHPMP(true, true)
 			end
 		end,
-	}, true):autoWidth():height()
+	}, true):autoWidth():width() + 5
+
+	ui:append("WndSliderBox", {
+		x = x, y = y - 1,
+		value = Cataclysm_Main.fLifeFontScale * 100,
+		range = {1, 400},
+		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		textfmt = function(val) return _L("Scale %d%%", val) end,
+		onchange = function(val)
+			Cataclysm_Main.fLifeFontScale = val / 100
+			if GetFrame() then
+				Grid_CTM:CallDrawHPMP(true, true)
+			end
+		end,
+		autoenable = function() return Cataclysm_Main.nHPShownMode2 ~= 0 end,
+	}, true)
+	y = y + 25
 
 	-- 数值
 	x = X + 10
@@ -883,7 +930,7 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():width() + 5
 
-	y = y + ui:append("WndRadioBox", {
+	x = x + ui:append("WndRadioBox", {
 		x = x, y = y, text = _L["Show full value"],
 		group = "lifval", checked = Cataclysm_Main.nHPShownNumMode == 3,
 		autoenable = function() return Cataclysm_Main.nHPShownMode2 ~= 0 end,
@@ -893,7 +940,21 @@ function PS.OnPanelActive(frame)
 				Grid_CTM:CallDrawHPMP(true, true)
 			end
 		end,
-	}, true):autoWidth():height()
+	}, true):autoWidth():width() + 5
+
+	ui:append("WndButton2", {
+		x = x, y = y - 1, text = g_tStrings.STR_RAID_LIFE_SHOW .. g_tStrings.FONT,
+		onclick = function()
+			XGUI.OpenFontPicker(function(nFont)
+				Cataclysm_Main.nLifeFont = nFont
+				if GetFrame() then
+					Grid_CTM:CallDrawHPMP(true, true)
+				end
+			end)
+		end,
+		autoenable = function() return Cataclysm_Main.nHPShownMode2 ~= 0 end,
+	}, true)
+	y = y + 25
 
 	-- Icon
 	x = X + 10
@@ -933,7 +994,7 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():width() + 5
 
-	y = y + ui:append("WndRadioBox", {
+	ui:append("WndRadioBox", {
 		x = x, y = y, text = _L["Show Text Force"],
 		group = "icon", checked = Cataclysm_Main.nShowIcon == 4,
 		oncheck = function()
@@ -943,7 +1004,8 @@ function PS.OnPanelActive(frame)
 				Grid_CTM:CallDrawHPMP(true, true)
 			end
 		end,
-	}, true):autoWidth():height()
+	}, true):autoWidth()
+	y = y + 25
 
 	-- 其他
 	x = X
@@ -1084,7 +1146,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y - 3, text = g_tStrings.STR_GUILD_NAME .. g_tStrings.FONT,
 		onclick = function()
 			XGUI.OpenFontPicker(function(nFont)
-				Cataclysm_Main.nFont = nFont
+				Cataclysm_Main.nNameFont = nFont
 				if GetFrame() then
 					Grid_CTM:CallRefreshImages(true, false, false, nil, true)
 					Grid_CTM:CallDrawHPMP(true, true)
@@ -1114,15 +1176,17 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():width() + 5
 
-	y = y + ui:append("WndButton2", {
-		x = x, y = y, text = g_tStrings.STR_RAID_LIFE_SHOW .. g_tStrings.FONT,
-		onclick = function()
-			XGUI.OpenFontPicker(function(nFont)
-				Cataclysm_Main.nLifeFont = nFont
-				if GetFrame() then
-					Grid_CTM:CallDrawHPMP(true, true)
-				end
-			end)
+	y = y + ui:append("WndSliderBox", {
+		x = x, y = y - 1,
+		value = Cataclysm_Main.fNameFontScale * 100,
+		range = {1, 400},
+		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		textfmt = function(val) return g_tStrings.STR_GUILD_NAME .. _L("Scale %d%%", val) end,
+		onchange = function(val)
+			Cataclysm_Main.fNameFontScale = val / 100
+			if GetFrame() then
+				Grid_CTM:CallRefreshImages(nil, nil, nil, nil, true)
+			end
 		end,
 	}, true):height()
 

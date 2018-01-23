@@ -86,4 +86,5 @@ data = {
 	["Sure to restore default?"] = "确认恢复默认设置？",
 	["Restore official"] = "恢复官方预设",
 	["Restore cataclysm"] = "恢复Cataclysm预设",
+	["Scale %d%%"] = "缩放%d%%",
 }
