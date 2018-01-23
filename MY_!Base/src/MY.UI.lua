@@ -198,7 +198,7 @@ local function GetComponentElement(raw, elementType)
 		end
 	elseif elementType == 'MAIN_WINDOW' then
 		if componentType == 'WndFrame' then
-			element = raw:Lookup('Window_Main') or raw
+			element = raw:Lookup('Wnd_Total') or raw
 		elseif componentBaseType == 'Wnd' then
 			element = raw
 		end
@@ -2146,34 +2146,57 @@ function XGUI:size(nWidth, nHeight, nRawWidth, nRawHeight)
 					raw:SetDragArea(0, 0, nWidth, 30)
 					hnd:SetSize(nWidth, nHeight)
 					wnd:SetSize(nWidth, nHeight - 30)
-				elseif GetComponentProp(raw, 'intact') then
-					-- fix size
-					if nWidth  < 132 then nWidth  = 132 end
-					if nHeight < 150 then nHeight = 150 end
-					-- set size
-					raw:SetSize(nWidth, nHeight)
-					raw:SetDragArea(0, 0, nWidth, 55)
+				elseif GetComponentProp(raw, 'intact') or raw == MY.GetFrame() then
+					if nWidth  < 128 then nWidth  = 128 end
+					if nHeight < 160 then nHeight = 160 end
+					-- 处理窗口背景自适应缩放
 					hnd:SetSize(nWidth, nHeight)
-					hnd:Lookup('Image_BgT' ):SetSize(nWidth, 64)
-					hnd:Lookup('Image_BgCT'):SetSize(nWidth - 32, 64)
-					hnd:Lookup('Image_BgLC'):SetSize(8, nHeight - 149)
-					hnd:Lookup('Image_BgCC'):SetSize(nWidth - 16, nHeight - 149)
-					hnd:Lookup('Image_BgRC'):SetSize(8, nHeight - 149)
-					hnd:Lookup('Image_BgCB'):SetSize(nWidth - 132, 85)
-					hnd:Lookup('Text_Title'):SetSize(nWidth - 90, 30)
+					local fScale = nWidth < 426 and (nWidth / 426) or 1
+					local nTH = 70 * fScale
+					local nTConnerW = 213 * fScale
+					hnd:Lookup('Image_BgTL_Conner'):SetSize(nTConnerW, nTH)
+					hnd:Lookup('Image_BgTR_Conner'):SetSize(nTConnerW, nTH)
+					local nTFlexW = max(0, (nWidth - (nWidth >= 674 and 674 or 426)) / 2)
+					hnd:Lookup('Image_BgTL_Flex'):SetSize(nTFlexW, nTH)
+					hnd:Lookup('Image_BgTR_Flex'):SetSize(nTFlexW, nTH)
+					local nTCenterW = nWidth >= 674 and (124 * fScale) or 0
+					hnd:Lookup('Image_BgTL_Center'):SetSize(nTCenterW, nTH)
+					hnd:Lookup('Image_BgTR_Center'):SetSize(nTCenterW, nTH)
+					local nBLW, nBRW = ceil(124 * fScale), ceil(8 * fScale)
+					local nBCW, nBH = nWidth - nBLW - nBRW + 1, 85 * fScale -- 不知道为什么差一像素 但是加上就好了
+					hnd:Lookup('Image_BgBL'):SetSize(nBLW, nBH)
+					hnd:Lookup('Image_BgBC'):SetSize(nBCW, nBH)
+					hnd:Lookup('Image_BgBR'):SetSize(nBRW, nBH)
+					local nCEdgeW = ceil(8 * fScale)
+					local nCCW, nCH = nWidth - 2 * nCEdgeW + 1, nHeight - nTH - nBH -- 不知道为什么差一像素 但是加上就好了
+					hnd:Lookup('Image_BgCL'):SetSize(nCEdgeW, nCH)
+					hnd:Lookup('Image_BgCC'):SetSize(nCCW, nCH)
+					hnd:Lookup('Image_BgCR'):SetSize(nCEdgeW, nCH)
+					hnd:Lookup('Image_BgCL'):SetRelY(nTH)
+					hnd:Lookup('Image_BgBL'):SetRelY(nTH + nCH)
+					-- 处理窗口其它组件
+					hnd:Lookup('Text_Title'):SetW(nWidth - 90)
+					hnd:Lookup('Text_Author'):SetW(nWidth - 31)
+					hnd:Lookup('Text_Author'):SetRelY(nHeight - 41)
 					hnd:FormatAllItemPos()
-					local hClose = raw:Lookup('Btn_Close')
-					if hClose then
-						hClose:SetRelPos(nWidth - 35, 15)
+					local btnClose = raw:Lookup('Btn_Close')
+					if btnClose then
+						btnClose:SetRelPos(nWidth - 35, 15)
 					end
-					local hMax = raw:Lookup('CheckBox_Maximize')
-					if hMax then
-						hMax:SetRelPos(nWidth - 63, 15)
+					local btnDrag = raw:Lookup('Btn_Drag')
+					if btnDrag then
+						btnDrag:SetRelPos(nWidth - 18, nHeight - 20)
+					end
+					local btnMax = raw:Lookup('CheckBox_Maximize')
+					if btnMax then
+						btnMax:SetRelPos(nWidth - 63, 15)
 					end
 					if wnd then
-						wnd:SetSize(nWidth - 40, nHeight - 90)
-						wnd:Lookup('', ''):SetSize(nWidth - 40, nHeight - 90)
+						wnd:SetSize(nWidth, nHeight)
+						wnd:Lookup('', ''):SetSize(nWidth, nHeight)
 					end
+					raw:SetSize(nWidth, nHeight)
+					raw:SetDragArea(0, 0, nWidth, 55)
 					-- reset position
 					local an = GetFrameAnchor(raw)
 					raw:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
@@ -3432,7 +3455,6 @@ function  XGUI.CreateFrame(szName, opt)
 	end
 	if opt.simple then
 		SetComponentProp(frm, 'simple', true)
-		frm:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 		-- top right buttons
 		if not opt.close then
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close'):Destroy()
@@ -3458,7 +3480,7 @@ function  XGUI.CreateFrame(szName, opt)
 				else
 					frm.w, frm.h = frm:GetSize()
 				end
-				frm:Lookup('Window_Main'):Hide()
+				frm:Lookup('Wnd_Total'):Hide()
 				frm:Lookup('', 'Shadow_Bg'):Hide()
 				frm:SetSize(frm.w, 30)
 				local hMax = frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize')
@@ -3466,7 +3488,7 @@ function  XGUI.CreateFrame(szName, opt)
 					hMax:Enable(false)
 				end
 				if frm.OnMinimize then
-					local status, res = pcall(frm.OnMinimize, frm:Lookup('Window_Main'))
+					local status, res = pcall(frm.OnMinimize, frm:Lookup('Wnd_Total'))
 					if status and res then
 						return
 					end
@@ -3477,7 +3499,7 @@ function  XGUI.CreateFrame(szName, opt)
 				frm.bMinimize = true
 			end
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize').OnCheckBoxUncheck = function()
-				frm:Lookup('Window_Main'):Show()
+				frm:Lookup('Wnd_Total'):Show()
 				frm:Lookup('', 'Shadow_Bg'):Show()
 				frm:SetSize(frm.w, frm.h)
 				local hMax = frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize')
@@ -3488,7 +3510,7 @@ function  XGUI.CreateFrame(szName, opt)
 					frm:Lookup('Btn_Drag'):Show()
 				end
 				frm.bMinimize = false
-				SafeExecuteWithThis(frm:Lookup('Window_Main'), frm.OnRestore)
+				SafeExecuteWithThis(frm:Lookup('Wnd_Total'), frm.OnRestore)
 			end
 		end
 		if not opt.maximize then
@@ -3513,7 +3535,7 @@ function  XGUI.CreateFrame(szName, opt)
 					XGUI(frm):pos(0, 0):size(w, h)
 				end)
 				if frm.OnMaximize then
-					local status, res = pcall(frm.OnMaximize, frm:Lookup('Window_Main'))
+					local status, res = pcall(frm.OnMaximize, frm:Lookup('Wnd_Total'))
 					if status and res then
 						return
 					end
@@ -3533,7 +3555,7 @@ function  XGUI.CreateFrame(szName, opt)
 					frm:Lookup('Btn_Drag'):Show()
 				end
 				frm.bMaximize = false
-				SafeExecuteWithThis(frm:Lookup('Window_Main'), frm.OnRestore)
+				SafeExecuteWithThis(frm:Lookup('Wnd_Total'), frm.OnRestore)
 			end
 		end
 		-- drag resize button
@@ -3558,16 +3580,16 @@ function  XGUI.CreateFrame(szName, opt)
 				frm:Lookup('', 'Shadow_Bg'):SetSize(w, h)
 			end
 			frm:Lookup('Btn_Drag').OnDragButtonBegin = function()
-				frm:Lookup('Window_Main'):Hide()
+				frm:Lookup('Wnd_Total'):Hide()
 			end
 			frm:Lookup('Btn_Drag').OnDragButtonEnd = function()
-				frm:Lookup('Window_Main'):Show()
+				frm:Lookup('Wnd_Total'):Show()
 				local w, h = this:GetRelPos()
 				w = math.max(w + 16, opt.minwidth)
 				h = math.max(h + 16, opt.minheight)
 				XGUI(frm):size(w, h)
 				if frm.OnDragResize then
-					local status, res = pcall(frm.OnDragResize, frm:Lookup('Window_Main'))
+					local status, res = pcall(frm.OnDragResize, frm:Lookup('Wnd_Total'))
 					if status and res then
 						return
 					end
@@ -3582,20 +3604,8 @@ function  XGUI.CreateFrame(szName, opt)
 		end
 	elseif not opt.empty then
 		SetComponentProp(frm, 'intact', true)
-		frm:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 		frm:Lookup('Btn_Close').OnLButtonClick = function()
 			XGUI(frm):remove()
-		end
-		-- load bg uitex
-		local szUITexCommon = MY.GetAddonInfo().szUITexCommon
-		for k, v in pairs({
-			['Image_BgLT'] = 9,
-			['Image_BgCT'] = 8,
-			['Image_BgRT'] = 7,
-			['Image_BgT' ] = 6,
-		}) do
-			local h = frm:Lookup('', k)
-			h:FromUITex(szUITexCommon, v)
 		end
 	end
 	if not opt.anchor then

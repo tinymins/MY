@@ -1094,33 +1094,7 @@ function _MY.OnSizeChanged()
 	end
 	-- fix size
 	local nWidth, nHeight = frame:GetSize()
-	if nWidth  < 132 then nWidth  = 132 end
-	if nHeight < 150 then nHeight = 150 end
-	-- set sizes and positions
-	frame:SetSize(nWidth, nHeight)
-	frame:SetDragArea(0, 0, nWidth, 55)
-	frame:Lookup('Btn_Close'):SetRelPos(nWidth - 35, 15)
-	frame:Lookup("Btn_Drag"):SetRelPos(nWidth - 18, nHeight - 20)
-	frame:Lookup('CheckBox_Maximize'):SetRelPos(nWidth - 63, 15)
-
-	local handle = frame:Lookup('', '')
-	handle:SetSize(nWidth, nHeight)
-	local nFlexWidth = nWidth >= 675 and ((nWidth - 675) / 2) or ((nWidth - 427) / 2)
-	handle:Lookup('Image_BgTL_Flex'):SetW(nFlexWidth)
-	handle:Lookup('Image_BgTR_Flex'):SetW(nFlexWidth)
-	local nCenterWidth = nWidth >= 675 and 124 or 0
-	handle:Lookup('Image_BgTL_Center'):SetW(nCenterWidth)
-	handle:Lookup('Image_BgTR_Center'):SetW(nCenterWidth)
-	handle:Lookup('Image_BgCL'):SetH(nHeight - 149)
-	handle:Lookup('Image_BgCC'):SetSize(nWidth - 16, nHeight - 149)
-	handle:Lookup('Image_BgCR'):SetH(nHeight - 149)
-	handle:Lookup('Image_BgBC'):SetW(nWidth - 132)
-	handle:Lookup('Text_Title'):SetW(nWidth - 90)
-	handle:Lookup('Text_Author'):SetW(nWidth - 31)
-	handle:Lookup('Text_Author'):SetRelY(nHeight - 41)
-
 	local wnd = frame:Lookup('Wnd_Total')
-	wnd:SetSize(nWidth, nHeight)
 	wnd:Lookup('WndContainer_Category'):SetSize(nWidth - 22, 32)
 	wnd:Lookup('WndContainer_Category'):FormatAllContentPos()
 	wnd:Lookup('Btn_Weibo'):SetRelPos(nWidth - 135, 55)
@@ -1175,7 +1149,6 @@ function _MY.OnSizeChanged()
 	end
 	hWndMainPanel:FormatAllContentPos()
 	hWndMainPanel:Lookup('', ''):FormatAllItemPos()
-	handle:FormatAllItemPos()
 	-- reset position
 	local an = GetFrameAnchor(frame)
 	frame:SetPoint(an.s, 0, 0, an.r, an.x, an.y)
