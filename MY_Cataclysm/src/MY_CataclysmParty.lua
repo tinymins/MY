@@ -927,11 +927,14 @@ function CTM:FormatFrame(frame, nMemberCount)
 		for i = 0, handle:GetItemCount() - 1 do
 			local h = handle:Lookup(i)
 			if not h.dwID then
-				h:Lookup("Image_SlotBg"):Show()
+				if CTM_DRAG then
+					h:Lookup("Image_SlotBg"):Show()
+				end
 				h:Lookup("Image_MemberBg"):Show()
 			end
 			nRolesH = nRolesH + h:GetH()
 		end
+		handle:SetH(nRolesH)
 	else
 		nMemberCount = frame.nMemberCount or CTM_MEMBER_COUNT
 		local handle = h:Lookup("Handle_Cols/Handle_Roles")
