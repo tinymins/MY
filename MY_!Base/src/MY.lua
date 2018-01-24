@@ -579,39 +579,46 @@ local function OnBgMsg()
 end
 RegisterEvent("ON_BG_CHANNEL_MSG", OnBgMsg)
 
+
 -- MY.RegisterBgMsg("MY_CHECK_INSTALL", function(nChannel, dwTalkerID, szTalkerName, bSelf, oDatas...) MY.BgTalk(szTalkerName, "MY_CHECK_INSTALL_REPLY", oData) end) -- 注册
 -- MY.RegisterBgMsg("MY_CHECK_INSTALL") -- 注销
 -- MY.RegisterBgMsg("MY_CHECK_INSTALL.RECEIVER_01", function(nChannel, dwTalkerID, szTalkerName, bSelf, oDatas...) MY.BgTalk(szTalkerName, "MY_CHECK_INSTALL_REPLY", oData) end) -- 注册
 -- MY.RegisterBgMsg("MY_CHECK_INSTALL.RECEIVER_01") -- 注销
-function MY.RegisterBgMsg(szEvent, fnAction)
+function MY.RegisterBgMsg(szMsgID, fnAction)
+	if type(szMsgID) == "table" then
+		for _, szMsgID in ipairs(szMsgID) do
+			MY.RegisterBgMsg(szMsgID, fnAction)
+		end
+		return
+	end
 	local szKey = nil
-	local nPos = StringFindW(szEvent, ".")
+	local nPos = StringFindW(szMsgID, ".")
 	if nPos then
-		szKey = string.sub(szEvent, nPos + 1)
-		szEvent = string.sub(szEvent, 1, nPos - 1)
+		szKey = string.sub(szMsgID, nPos + 1)
+		szMsgID = string.sub(szMsgID, 1, nPos - 1)
 	end
 	if fnAction then
-		if not BG_MSG_LIST[szEvent] then
-			BG_MSG_LIST[szEvent] = {}
+		if not BG_MSG_LIST[szMsgID] then
+			BG_MSG_LIST[szMsgID] = {}
 		end
 		if szKey then
-			BG_MSG_LIST[szEvent][szKey] = fnAction
+			BG_MSG_LIST[szMsgID][szKey] = fnAction
 		else
-			table.insert(BG_MSG_LIST[szEvent], fnAction)
+			table.insert(BG_MSG_LIST[szMsgID], fnAction)
 		end
 	else
 		if szKey then
-			BG_MSG_LIST[szEvent][szKey] = nil
+			BG_MSG_LIST[szMsgID][szKey] = nil
 		else
-			BG_MSG_LIST[szEvent] = nil
+			BG_MSG_LIST[szMsgID] = nil
 		end
 	end
 end
 end
 
--- MY.BgTalk(szName, szEvent, ...)
--- MY.BgTalk(nChannel, szEvent, ...)
-function MY.BgTalk(nChannel, szEvent, ...)
+-- MY.BgTalk(szName, szMsgID, ...)
+-- MY.BgTalk(nChannel, szMsgID, ...)
+function MY.BgTalk(nChannel, szMsgID, ...)
 	local szTarget, me = "", GetClientPlayer()
 	if not (me and nChannel) then
 		return
@@ -627,7 +634,7 @@ function MY.BgTalk(nChannel, szEvent, ...)
 		nChannel = PLAYER_TALK_CHANNEL.BATTLE_FIELD
 	end
 	-- talk
-	local tSay = {{ type = "eventlink", name = "BG_CHANNEL_MSG", linkinfo = szEvent }}
+	local tSay = {{ type = "eventlink", name = "BG_CHANNEL_MSG", linkinfo = szMsgID }}
 	local tArg = {...}
 	local nCount = select("#", ...) -- 这里有个坑 如果直接ipairs({...})可能会掉进坑： for遇到nil就中断了导致后续参数丢失
 	for i = 1, nCount do
