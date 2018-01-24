@@ -915,7 +915,9 @@ MY.RegisterBgMsg("LR_GKP", function(szMsgID, nChannel, dwID, szName, bIsSelf, ..
 			dwDoodadID = rawData.dwDoodadID or 0,
 			nUiId = rawData.nUiId or 0,
 			szNpcName = rawData.szSourceName,
-			nBookID = rawData.nBookID and rawData.nBookID ~= 0 and rawData.nBookID or nil,
+			nBookID = rawData.nGenre == ITEM_GENRE.BOOK
+				and rawData.nBookID and rawData.nBookID ~= 0
+				and rawData.nBookID or nil,
 			nStackNum = rawData.nStackNum,
 		}
 		local szKey
