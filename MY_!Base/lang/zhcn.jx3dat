@@ -123,6 +123,7 @@ data = {
 	['Font %d'                                  ] = '字体 %d',
 
 	['author\'s weibo'] = '作者 @一名宅',
+	['author\'s signature'] = '-- by 茗伊@双梦镇@唯满侠@追风蹑景',
 	['MingYi @ Double Dream Town'] = '茗伊 @ 双梦镇',
 
 	-- MY_CheckUpdate.lua
