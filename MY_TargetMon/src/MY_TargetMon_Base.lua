@@ -294,45 +294,6 @@ function D.GeneMonItemData(level, iconid, enable)
 end
 
 do
-local TEAM_MARK = {
-	["TEAM_MARK_CLOUD"] = 1,
-	["TEAM_MARK_SWORD"] = 2,
-	["TEAM_MARK_AX"   ] = 3,
-	["TEAM_MARK_HOOK" ] = 4,
-	["TEAM_MARK_DRUM" ] = 5,
-	["TEAM_MARK_SHEAR"] = 6,
-	["TEAM_MARK_STICK"] = 7,
-	["TEAM_MARK_JADE" ] = 8,
-	["TEAM_MARK_DART" ] = 9,
-	["TEAM_MARK_FAN"  ] = 10,
-}
-function D.GetTarget(eTarType, eMonType)
-	if eMonType == "SKILL" or eTarType == "CONTROL_PLAYER" then
-		return TARGET.PLAYER, GetControlPlayerID()
-	elseif eTarType == "CLIENT_PLAYER" then
-		return TARGET.PLAYER, UI_GetClientPlayerID()
-	elseif eTarType == "TARGET" then
-		return MY.GetTarget()
-	elseif eTarType == "TTARGET" then
-		local KTarget = MY.GetObject(MY.GetTarget())
-		if KTarget then
-			return MY.GetTarget(KTarget)
-		end
-	elseif TEAM_MARK[eTarType] then
-		local mark = GetClientTeam().GetTeamMark()
-		if mark then
-			for dwID, nMark in pairs(mark) do
-				if TEAM_MARK[eTarType] == nMark then
-					return TARGET[IsPlayer(dwID) and "PLAYER" or "NPC"], dwID
-				end
-			end
-		end
-	end
-	return TARGET.NO_TARGET, 0
-end
-end
-
-do
 local needFormatItemPos
 local l_tBuffTime = setmetatable({}, { __mode = "v" })
 local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCount, targetChanged, dwOwnerID)
@@ -498,7 +459,7 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 end
 
 function MY_TargetMon_Base.OnFrameBreathe()
-	local dwType, dwID = D.GetTarget(this.config.target, this.config.type)
+	local dwType, dwID = MY_TargetMon.GetTarget(this.config.target, this.config.type)
 	if dwType == this.dwType and dwID == this.dwID
 	and dwType ~= TARGET.PLAYER and dwType ~= TARGET.NPC then
 		return
@@ -646,7 +607,7 @@ function MY_TargetMon_Base.OnItemRButtonClick()
 	local config = frame.config
 	if name == 'Box_Default' and config.type == 'BUFF' then
 		local hItem = this:GetParent():GetParent()
-		local KTarget = MY.GetObject(D.GetTarget(config.target, config.type))
+		local KTarget = MY.GetObject(MY_TargetMon.GetTarget(config.target, config.type))
 		if not KTarget then
 			return
 		end
