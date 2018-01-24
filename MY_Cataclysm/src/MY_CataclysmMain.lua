@@ -558,13 +558,14 @@ function Cataclysm_Main.OnFrameBreathe()
 	if Cataclysm_Main.bShowTargetTargetAni then
 		Grid_CTM:RefreshTTarget()
 	end
+	-- kill System Panel
+	RaidPanel_Switch(DEBUG)
+	TeammatePanel_Switch(false)
+	-- 官方代码太容易报错 放最后
 	if not this.nBreatheTime or GetTime() - this.nBreatheTime >= 300 then -- 语音最短刷新间隔300ms
 		Grid_CTM:RefreshGVoice()
 		this.nBreatheTime = GetTime()
 	end
-	-- kill System Panel
-	RaidPanel_Switch(DEBUG)
-	TeammatePanel_Switch(false)
 	GVoiceBase_CheckMicState()
 end
 
