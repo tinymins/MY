@@ -893,6 +893,47 @@ end
 
 local SYNC_LENG = 0
 
+MY.RegisterBgMsg("LR_GKP", function(szMsgID, nChannel, dwID, szName, bIsSelf, ...)
+	local data = {...}
+	if (data[1] == "SYNC" or data[1] == "DEL") and MY_GKP.bAutoSync then
+		local rawData = data[2]
+		local tab = {
+			bSync = true,
+			bEdit = true,
+			bDelete = data[1] == "DEL",
+			szPlayer = rawData.szPurchaserName,
+			dwIndex = rawData.dwIndex,
+			dwTabType = rawData.dwTabType,
+			nQuality = rawData.nQuality,
+			nVersion = rawData.nVersion or 0,
+			nGenre = rawData.nGenre,
+			nTime = rawData.nCreateTime,
+			nMoney = rawData.nGold,
+			key = rawData.hash,
+			dwForceID = rawData.dwPurchaserForceID,
+			szName = rawData.szName,
+			dwDoodadID = rawData.dwDoodadID or 0,
+			nUiId = rawData.nUiId or 0,
+			szNpcName = rawData.szSourceName,
+			nBookID = rawData.nBookID and rawData.nBookID ~= 0 and rawData.nBookID or nil,
+			nStackNum = rawData.nStackNum,
+		}
+		local szKey
+		for k, v in ipairs(MY_GKP("GKP_Record")) do
+			if v.key == tab.key then
+				szKey = k
+				break
+			end
+		end
+		if szKey then
+			MY_GKP("GKP_Record", szKey, tab)
+		else
+			MY_GKP("GKP_Record", tab)
+		end
+		MY.Debug({"#MY_GKP# Sync From LR Success"}, "MY_GKP", MY_DEBUG.LOG)
+	end
+end)
+
 MY.RegisterBgMsg("MY_GKP", function(_, nChannel, dwID, szName, bIsSelf, ...)
 	local data = {...}
 	local me = GetClientPlayer()
