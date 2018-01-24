@@ -153,6 +153,45 @@ function D.GetFrameData(id)
 	end
 end
 
+do
+local TEAM_MARK = {
+	["TEAM_MARK_CLOUD"] = 1,
+	["TEAM_MARK_SWORD"] = 2,
+	["TEAM_MARK_AX"   ] = 3,
+	["TEAM_MARK_HOOK" ] = 4,
+	["TEAM_MARK_DRUM" ] = 5,
+	["TEAM_MARK_SHEAR"] = 6,
+	["TEAM_MARK_STICK"] = 7,
+	["TEAM_MARK_JADE" ] = 8,
+	["TEAM_MARK_DART" ] = 9,
+	["TEAM_MARK_FAN"  ] = 10,
+}
+function D.GetTarget(eTarType, eMonType)
+	if eMonType == "SKILL" or eTarType == "CONTROL_PLAYER" then
+		return TARGET.PLAYER, GetControlPlayerID()
+	elseif eTarType == "CLIENT_PLAYER" then
+		return TARGET.PLAYER, UI_GetClientPlayerID()
+	elseif eTarType == "TARGET" then
+		return MY.GetTarget()
+	elseif eTarType == "TTARGET" then
+		local KTarget = MY.GetObject(MY.GetTarget())
+		if KTarget then
+			return MY.GetTarget(KTarget)
+		end
+	elseif TEAM_MARK[eTarType] then
+		local mark = GetClientTeam().GetTeamMark()
+		if mark then
+			for dwID, nMark in pairs(mark) do
+				if TEAM_MARK[eTarType] == nMark then
+					return TARGET[IsPlayer(dwID) and "PLAYER" or "NPC"], dwID
+				end
+			end
+		end
+	end
+	return TARGET.NO_TARGET, 0
+end
+end
+
 ----------------------------------------------------------------------------------------------
 -- Êý¾Ý´æ´¢
 ----------------------------------------------------------------------------------------------
@@ -206,7 +245,7 @@ for i = 1, 5 do
 	for j = 1, 10 do
 		Hotkey.AddBinding(
 			"MY_TargetMon_" .. i .. "_" .. j, _L("Cancel buff %d - %d", i, j),
-			i == 0 and j == 0 and _L["MY Buff Monitor"] or "",
+			i == 1 and j == 1 and _L["MY Buff Monitor"] or "",
 			function()
 				if MY.IsShieldedVersion() and not MY.IsInDungeon(true) then
 					if not IsDebugClient() then
@@ -226,7 +265,11 @@ for i = 1, 5 do
 				if not hItem then
 					return
 				end
-				MY.ExecuteWithThis(hItem:Lookup("Box_Default"), MY_TargetMon_Base.OnItemRButtonClick)
+				local KTarget = MY.GetObject(D.GetTarget(config.target, config.type))
+				if not KTarget then
+					return
+				end
+				MY.CancelBuff(KTarget, hItem.dwID, hItem.nLevel)
 			end, nil)
 	end
 end
@@ -1142,6 +1185,7 @@ MY.RegisterPanel("MY_TargetMon", _L["Target monitor"], _L['Target'], "ui/Image/C
 
 
 local ui = {
+	GetTarget                    = D.GetTarget,
 	GetFrameData                 = D.GetFrameData,
 	FormatConfigStructure        = D.FormatConfigStructure,
 	FormatMonStructure           = D.FormatMonStructure,
