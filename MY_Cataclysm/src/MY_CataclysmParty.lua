@@ -631,11 +631,12 @@ end
 function CTM:RefreshGVoice()
 	local team = GetClientTeam()
 	local sayingInfo = GVoiceBase_GetSaying()
+	local bInRoom = GVoiceBase_GetMicState() ~= MIC_STATE.CLOSE_NOT_IN_ROOM
 	for dwID, h in pairs(CTM_CACHE) do
 		if h:IsValid() then
 			local fScale = min(CFG.fScaleY, CFG.fScaleX)
 			local hSpeaker = h:Lookup("Handle_Speaker")
-			if GVoiceBase_IsMemberForbid(dwID) then
+			if bInRoom and GVoiceBase_IsMemberForbid(dwID) then
 				hSpeaker:Show()
 				hSpeaker:SetRelX(h:GetW() - hSpeaker:GetW())
 				hSpeaker:SetAbsX(h:GetAbsX() + h:GetW() - 30 * fScale)
@@ -644,7 +645,7 @@ function CTM:RefreshGVoice()
 				hSpeaker:Lookup("Animate_SpeakerEffect"):Hide()
 				hSpeaker:Lookup("Handle_ForbidSpeaker/Image_Speaker"):SetSize(11 * fScale, 16 * fScale)
 				hSpeaker:Lookup("Handle_ForbidSpeaker/Image_ForbidSpeaker"):SetSize(16 * fScale, 16 * fScale)
-			elseif GVoiceBase_IsMemberSaying(dwID, sayingInfo) then
+			elseif bInRoom and GVoiceBase_IsMemberSaying(dwID, sayingInfo) then
 				hSpeaker:Show()
 				hSpeaker:SetRelX(h:GetW() - hSpeaker:GetW())
 				hSpeaker:SetAbsX(h:GetAbsX() + h:GetW() - 30 * fScale)
