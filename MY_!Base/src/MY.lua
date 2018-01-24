@@ -275,11 +275,8 @@ function MY.OpenPanel(bMute, bNoFocus, bNoAnimate)
 		frame:Lookup("", "Text_Title"):SetText(_L['mingyi plugins'] .. " v" .. MY.GetVersion() .. ' Build ' .. _BUILD_)
 		MY.UI(frame):size(_MY.OnSizeChanged)
 		-- update author infomation button
-		MY.UI(MY.GetFrame()):children("#Wnd_Total"):children("#Btn_Weibo")
-		  :text(_L['author\'s weibo'])
-		  :click(function()
-		  	XGUI.OpenIE("https://weibo.com/zymah")
-		  end)
+		frame:Lookup("", "Text_Author"):SetText(_L['author\'s signature'])
+		frame:Lookup("Wnd_Total/Btn_Weibo", "Text_Default"):SetText(_L['author\'s weibo'])
 		MY.UI(frame):event('UI_SCALED', function()
 			local fn = frame:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel').OnScrollBarPosChanged
 			if fn then
@@ -1050,6 +1047,8 @@ function MY.OnLButtonClick()
 	local name = this:GetName()
 	if name == "Btn_Close" then
 		MY.ClosePanel()
+	elseif name == "Btn_Weibo" then
+		XGUI.OpenIE("https://weibo.com/zymah")
 	end
 end
 
