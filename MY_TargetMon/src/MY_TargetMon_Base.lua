@@ -662,7 +662,7 @@ function MY_TargetMon_Base.OnEvent(event)
 			end
 		end
 	elseif event == "SKILL_MOUNT_KUNG_FU" then
-		D.OpenFrame(this.config)
+		ReloadFrame(this)
 	elseif event == "ON_ENTER_CUSTOM_UI_MODE" then
 		this:SetH(this.dragH)
 		this:Lookup('', 'Handle_List'):SetAlpha(90)
