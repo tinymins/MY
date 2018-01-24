@@ -316,7 +316,7 @@ function CTM_Party_Base.OnItemMouseEnter()
 	end
 	local info = CTM:GetMemberInfo(this.dwID)
 	if info.bIsOnLine and GetPlayer(this.dwID) and CFG.bTempTargetEnable then
-		if not CTM_TEMP_TARGET_TYPE or CTM_TEMP_TARGET_TYPE == TARGET.NO_TARGET then
+		if not CTM_TEMP_TARGET_TYPE then
 			CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = MY.GetTarget()
 		end
 		MY.SetTarget(TARGET.PLAYER, this.dwID)
@@ -338,9 +338,7 @@ function CTM_Party_Base.OnItemMouseLeave()
 	local info = CTM:GetMemberInfo(this.dwID)
 	if not info then return end -- ÍË×âµÄÎÊÌâ
 	if info.bIsOnLine and GetPlayer(this.dwID) and CFG.bTempTargetEnable and CTM_TEMP_TARGET_TYPE then
-		if dwType ~= TARGET.NO_TARGET then
-			MY.DelayCall("MY_Cataclysm_TempTarget", ResumeTempTarget)
-		end
+		MY.DelayCall("MY_Cataclysm_TempTarget", ResumeTempTarget)
 	end
 end
 end
