@@ -630,4 +630,80 @@ function EditBox_AppendLinkItem(dwID)
 end
 end
 
+-------------------------------------------
+-- 语音相关API兼容防止枚举以及接口没有导致报错
+-------------------------------------------
+if not MIC_STATE then
+MIC_STATE = {
+	NOT_AVIAL = 1,
+	CLOSE_NOT_IN_ROOM = 2,
+	CLOSE_IN_ROOM = 3,
+	KEY = 4,
+	FREE = 5,
+}
+end
+
+if not GVoiceBase_IsOpen then
+function GVoiceBase_IsOpen()
+	return false
+end
+end
+
+if not GVoiceBase_GetMicState then
+function GVoiceBase_GetMicState()
+	return MIC_STATE.CLOSE_NOT_IN_ROOM
+end
+end
+
+if not GVoiceBase_SwitchMicState then
+function GVoiceBase_SwitchMicState()
+end
+end
+
+if not GVoiceBase_CheckMicState then
+function GVoiceBase_CheckMicState()
+end
+end
+
+if not SPEAKER_STATE then
+SPEAKER_STATE = {
+	OPEN = 1,
+	CLOSE = 2,
+}
+end
+
+if not GVoiceBase_GetSpeakerState then
+function GVoiceBase_GetSpeakerState()
+	return SPEAKER_STATE.CLOSE
+end
+end
+
+if not GVoiceBase_SwitchSpeakerState then
+function GVoiceBase_SwitchSpeakerState()
+end
+end
+
+if not GVoiceBase_GetSaying then
+function GVoiceBase_GetSaying()
+	return {}
+end
+end
+
+if not GVoiceBase_IsMemberSaying then
+function GVoiceBase_IsMemberSaying(dwMemberID, sayingInfo)
+	return false
+end
+end
+
+if not GVoiceBase_IsMemberForbid then
+function GVoiceBase_IsMemberForbid(dwMemberID)
+	return false
+end
+end
+
+if not GVoiceBase_ForbidMember then
+function GVoiceBase_ForbidMember(dwMemberID, Forbid)
+end
+end
+
 UpdateItemInfoBoxObject = UpdataItemInfoBoxObject
