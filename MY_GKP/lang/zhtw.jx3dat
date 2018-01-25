@@ -16,6 +16,17 @@ data = {
 	["Userdata is overdue, distribut failed, please try again."] = "userdata過期，分配失敗，清重新嘗試。",
 	["Pick up time limit exceeded, please try again."] = "拾取時間超出限制，請再試一次。",
 	["No Pick up Object, may due to Network off - line"] = "沒有拾取對象，可能是掉線了。",
+	["Cannot distrubute items to Equipment Boss, may due to Equipment Boss is too far away or got dropline when looting."] = "無法將物品分配給當前散件老板，可能因爲散件老板不在線、距離太遠或者物品拾取時散件老板掉線了。",
+
+
+	['LClick to distrubute all equipment to '] = "鼠標左鍵點擊分配所有裝備給",
+	['Ctrl + LClick to distrubute all lootable items to '] = "按住Ctrl點擊鼠標左鍵分配所有物品給",
+	['.'] = "。",
+	['RClick to reselect Equipment Boss.'] = "右鍵點擊重新選擇散件老板。",
+	['LClick to distrubute all equipment to Equipment Boss.'] = "鼠標左鍵點擊分配所有裝備給散件老板。",
+	['Ctrl + LClick to distrubute all lootable items to Equipment Boss.'] = "按住Ctrl點擊鼠標左鍵分配所有物品給散件老板。",
+	['Click to select Equipment Boss.'] = "點擊選擇散件老板。",
+
 	["No Pick up Object, Please confirm that in the Dungeon."] = "沒有拾取對象，請確認在同一地圖。",
 	["Stop Bidding"] = "拍賣結束",
 	["--- Stop Bidding ---"] = "------  拍賣結束  ------",
