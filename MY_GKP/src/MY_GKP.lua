@@ -136,6 +136,7 @@ end
 function _GKP.SaveData(bStorage)
 	local szPath = "userdata/gkp/current.gkp"
 	if bStorage then
+		MY.SaveLUAData({szPath, MY_DATA_PATH.ROLE}, nil) -- 存储模式时清空当前存盘数据
 		local i = 0
 		repeat
 			szPath = "userdata/gkp/" .. MY.FormatTime("yyyy-MM-dd-hh-mm-ss",GetCurrentTime()) .. (i == 0 and "" or ("-" .. i)) .. ".gkp"
@@ -1251,7 +1252,7 @@ function _GKP.ClearData(bConfirm)
 		_GKP.DrawAccount()
 		_GKP.UpdateStat()
 		FireUIEvent("MY_GKP_LOOT_BOSS")
-		MY.Alert(_L["Recods are wiped"])
+		MY.Alert(_L["Records are wiped"])
 	end
 	if bConfirm then
 		fnAction()
