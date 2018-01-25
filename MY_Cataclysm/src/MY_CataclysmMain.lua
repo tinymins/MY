@@ -273,7 +273,7 @@ local function CreateItemData()
 	end
 	for _, p in ipairs({
 		{"hMember", "Cataclysm_Item" .. Cataclysm_Main.nCss .. ".ini", "Handle_RoleDummy"},
-		{"hBuff", "Cataclysm_Item_Buff.ini", "Handle_Buff"},
+		{"hBuff", "Cataclysm_Item" .. Cataclysm_Main.nCss .. ".ini", "Handle_Buff"},
 	}) do
 		if frame[p[1]] then
 			frame:RemoveItemData(frame[p[1]])
