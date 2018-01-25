@@ -214,6 +214,40 @@ function MY_GKP_Loot.OnCheckBoxUncheck()
 	end
 end
 
+function MY_GKP_Loot.OnMouseEnter()
+	local name = this:GetName()
+	if name == "Btn_Boss" then
+		local x, y = this:GetAbsPos()
+		local w, h = this:GetSize()
+		local szXml = ""
+		local dwDoodadID = this:GetParent().dwDoodadID
+		local aPartyMember = Loot.GetaPartyMember(GetDoodad(dwDoodadID))
+		local p = MY_GKP_LOOT_BOSS and aPartyMember(MY_GKP_LOOT_BOSS)
+		if p then
+			local r, g, b = MY.GetForceColor(p.dwForceID)
+			szXml = szXml .. GetFormatText(_L['LClick to distrubute all equipment to '], 136)
+			szXml = szXml .. GetFormatText("[".. p.szName .."]", 162, r, g, b)
+			szXml = szXml .. GetFormatText(_L['.'] .. "\n" .. _L['Ctrl + LClick to distrubute all lootable items to '], 136)
+			szXml = szXml .. GetFormatText("[".. p.szName .."]", 162, r, g, b)
+			szXml = szXml .. GetFormatText(_L['.'] .. "\n" .. _L['RClick to reselect Equipment Boss.'], 136)
+		elseif MY_GKP_LOOT_BOSS then
+			szXml = szXml .. GetFormatText(_L['LClick to distrubute all equipment to Equipment Boss.'] .. "\n", 136)
+			szXml = szXml .. GetFormatText(_L['Ctrl + LClick to distrubute all lootable items to Equipment Boss.'] .. "\n", 136)
+			szXml = szXml .. GetFormatText(_L['RClick to reselect Equipment Boss.'], 136)
+		else
+			szXml = szXml .. GetFormatText(_L['Click to select Equipment Boss.'], 136)
+		end
+		OutputTip(szXml, 450, {x, y, w, h}, ALW.TOP_BOTTOM)
+	end
+end
+
+function MY_GKP_Loot.OnMouseLeave()
+	local name = this:GetName()
+	if name == "Btn_Boss" then
+		HideTip()
+	end
+end
+
 function MY_GKP_Loot.OnLButtonClick()
 	local szName = this:GetName()
 	if szName == "Btn_Close" then
@@ -519,7 +553,7 @@ function Loot.GetBossAction(dwDoodadID, bMenu)
 			}
 			MessageBox(msg)
 		else
-			return MY.Alert(_L["No Pick up Object, may due to Network off - line"])
+			return MY.Alert(_L["Cannot distrubute items to Equipment Boss, may due to Equipment Boss is too far away or got dropline when looting."])
 		end
 	end
 	if bMenu then
