@@ -372,12 +372,14 @@ function CTM_Party_Base.OnItemRButtonClick()
 		for _, v in ipairs(t) do
 			if v.szOption == g_tStrings.LOOKUP_INFO then
 				for _, vv in ipairs(v) do
-					if vv.szOption == g_tStrings.LOOKUP_NEW_TANLENT then
+					if vv.szOption == g_tStrings.LOOKUP_NEW_TANLENT then -- ÆæÑ¨
 						table.insert(menu, vv)
 						break
 					end
 				end
-				break
+			end
+			if v.szOption == g_tStrings.STR_MAKE_TRADDING then -- ½»Ò×
+				table.insert(menu, v)
 			end
 		end
 		table.insert(menu, { szOption = g_tStrings.STR_LOOKUP, bDisable = not info.bIsOnLine, fnAction = function()
