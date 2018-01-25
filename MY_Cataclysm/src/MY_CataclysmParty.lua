@@ -90,8 +90,8 @@ local function OpenRaidDragPanel(dwMemberID)
 	local szPath, nFrame = GetForceImage(tMemberInfo.dwForceID)
 	hMember:Lookup("Image_Force"):FromUITex(szPath, nFrame)
 
-	local hTextName = hMember:Lookup("Text_Name")
-	hTextName:SetText(tMemberInfo.szName)
+	local htxtName = hMember:Lookup("Text_Name")
+	htxtName:SetText(tMemberInfo.szName)
 
 	local hImageLife = hMember:Lookup("Image_Health")
 	local hImageMana = hMember:Lookup("Image_Mana")
@@ -453,22 +453,22 @@ function CTM:RefreshGroupText()
 	for i = 0, team.nGroupNum - 1 do
 		local frame = self:GetPartyFrame(i)
 		if frame then
-			local TextGroup = frame:Lookup("", "Handle_Cols/Handle_Title/Text_Title")
+			local txtGroup = frame:Lookup("", "Handle_Cols/Handle_Title/Text_Title")
 			if me.IsInRaid() then
-				TextGroup:SetText(g_tStrings.STR_NUMBER[i + 1])
-				TextGroup:SetFontScheme(7)
+				txtGroup:SetText(g_tStrings.STR_NUMBER[i + 1])
+				txtGroup:SetFontScheme(7)
 				local tGroup = team.GetGroupInfo(i)
 				if tGroup and tGroup.MemberList then
 					for k, v in ipairs(tGroup.MemberList) do
 						if v == UI_GetClientPlayerID() then
-							-- TextGroup:SetFontScheme(2)
-							TextGroup:SetFontColor(255, 128, 0) -- 自己所在的小队 黄色
+							-- txtGroup:SetFontScheme(2)
+							txtGroup:SetFontColor(255, 128, 0) -- 自己所在的小队 黄色
 							break
 						end
 					end
 				end
 			else
-				TextGroup:SetText(g_tStrings.STR_TEAM)
+				txtGroup:SetText(g_tStrings.STR_TEAM)
 			end
 		end
 	end
@@ -759,6 +759,13 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bNa
 			end
 			img:SetSize(28 * fScale, 28 * fScale)
 			img:Show()
+			-- 如果名字是左对齐的 刷新名字位置
+			local txtName = h:Lookup("Text_Name")
+			if txtName:GetHAlign() == 0 then
+				txtName:SetRelX(img:GetRelX() + img:GetW())
+				txtName:SetAbsX(img:GetAbsX() + img:GetW())
+				txtName:SetW(h:GetW() - img:GetRelX() - img:GetW())
+			end
 		else -- 不再由icon控制 转交给textname
 			img:Hide()
 			bName = true
@@ -766,8 +773,8 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bNa
 	end
 	-- 刷新名字
 	if bName then
-		local TextName = h:Lookup("Text_Name")
-		local TextSchool = h:Lookup("Text_School_Name")
+		local txtName = h:Lookup("Text_Name")
+		local txtSchool = h:Lookup("Text_School_Name")
 		local r, g, b = 255, 255, 255
 		if CFG.nColoredName == 1 then
 			r, g, b = GetForceColor(info.dwForceID)
@@ -782,14 +789,14 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bNa
 				r, g, b = 160, 30, 30
 			end
 		end
-		TextName:SetText(info.szName)
-		TextName:SetFontScheme(CFG.nNameFont)
-		TextName:SetFontColor(r, g, b)
-		TextName:SetFontScale(CFG.fNameFontScale)
-		TextSchool:SetText(CTM_KUNGFU_TEXT[info.dwMountKungfuID])
-		TextSchool:SetFontScheme(CFG.nNameFont)
-		TextSchool:SetFontColor(r, g, b)
-		TextSchool:SetVisible(CFG.nShowIcon == 4)
+		txtName:SetText(info.szName)
+		txtName:SetFontScheme(CFG.nNameFont)
+		txtName:SetFontColor(r, g, b)
+		txtName:SetFontScale(CFG.fNameFontScale)
+		txtSchool:SetText(CTM_KUNGFU_TEXT[info.dwMountKungfuID])
+		txtSchool:SetFontScheme(CFG.nNameFont)
+		txtSchool:SetFontColor(r, g, b)
+		txtSchool:SetVisible(CFG.nShowIcon == 4)
 	end
 end
 
