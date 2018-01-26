@@ -41,8 +41,8 @@ data = {
 	bShowBuffNum         = false,
 	bShowGroupNumber     = true,
 	bShowEffect          = false, -- 五毒醉舞提示 萬花距離提示 晚點做
-	tBuffList = { -- 結構的話 就這樣吧不過顔色不讓設置
-		-- ["調息"] = { bSelf = true, col = 255, 255, 255}
+	aBuffList = { -- 結構的話 就這樣吧不過顔色不讓設置
+		-- { szName = "調息", bSelf = true, col = 255, 255, 255}
 	},
 	tDistanceCol = {
 		{ 0,   180, 52  }, -- 綠

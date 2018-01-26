@@ -30,6 +30,7 @@ local CTM_CONFIG = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/conf
 local CTM_CONFIG_CATACLYSM = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/config/ctm/$lang.jx3dat")
 
 local TEAM_VOTE_REQUEST = {}
+local BUFF_LIST = {}
 local GKP_RECORD_TOTAL = 0
 local CTM_CONFIG_PLAYER
 local DEBUG = false
@@ -39,12 +40,35 @@ MY_Cataclysm.bDebug = false
 MY_Cataclysm.szConfigName = "common"
 RegisterCustomData("MY_Cataclysm.szConfigName")
 
+local function UpdateBuffListCache()
+	BUFF_LIST = {}
+	for _, tab in ipairs(Cataclysm_Main.aBuffList) do
+		local id = tab.dwID or tab.szName
+		if not BUFF_LIST[id] then
+			BUFF_LIST[id] = {}
+		end
+		insert(BUFF_LIST[id], tab)
+	end
+end
+
 local function GetConfigurePath()
 	return {"config/cataclysm/" .. MY_Cataclysm.szConfigName .. ".jx3dat", MY_DATA_PATH.GLOBAL}
 end
 
 local function SetConfig(Config)
 	CTM_CONFIG_PLAYER = Config
+	-- update version
+	if Config.tBuffList then
+		Config.aBuffList = {}
+		for k, v in pairs(Config.tBuffList) do
+			v.dwID = tonumber(k)
+			if not v.dwID then
+				v.szName = k
+			end
+			insert(Config.aBuffList, v)
+		end
+		Config.tBuffList = nil
+	end
 	-- options fixed
 	for k, v in pairs(CTM_CONFIG) do
 		if type(CTM_CONFIG_PLAYER[k]) == "nil" then
@@ -55,6 +79,7 @@ local function SetConfig(Config)
 		__index = CTM_CONFIG_PLAYER,
 		__newindex = CTM_CONFIG_PLAYER,
 	})
+	UpdateBuffListCache()
 	CTM_CONFIG_PLAYER.bFasterHP = false
 end
 
@@ -403,6 +428,20 @@ end
 -------------------------------------------------
 -- 事件处理
 -------------------------------------------------
+do
+local function RecBuffWithTabs(tabs, dwOwnerID, dwBuffID, dwSrcID)
+	if not tabs then
+		return
+	end
+	for _, tab in ipairs(tabs) do
+		if not tab.bOnlySelf or dwSrcID == UI_GetClientPlayerID() then
+			Grid_CTM:RecBuff(dwOwnerID, setmetatable({
+				dwID      = dwBuffID,
+				nLevel    = tab.nLevel or 0,
+			}, { __index = tab }))
+		end
+	end
+end
 function Cataclysm_Main.OnEvent(szEvent)
 	if szEvent == "RENDER_FRAME_UPDATE" then
 		Grid_CTM:CallDrawHPMP(true)
@@ -520,18 +559,15 @@ function Cataclysm_Main.OnEvent(szEvent)
 	elseif szEvent == "MY_RAID_REC_BUFF" then
 		Grid_CTM:RecBuff(arg0, arg1)
 	elseif szEvent == "BUFF_UPDATE" then
-		if arg1 then return end
-		local szName = GetBuffName(arg4, arg8)
-		local tab = Cataclysm_Main.tBuffList[szName] or Cataclysm_Main.tBuffList[tostring(arg4)]
-		if tab and Table_BuffIsVisible(arg4, arg8) then
-			if tab.bSelf and arg9 == UI_GetClientPlayerID() or not tab.bSelf then
-				Grid_CTM:RecBuff(arg0, {
-					dwID      = arg4,
-					nLevel    = 0,
-					col       = tab.col,
-					bOnlySelf = tab.bSelf
-				})
-			end
+		-- local owner, bdelete, index, cancancel, id  , stacknum, endframe, binit, level, srcid, isvalid, leftframe
+		--     = arg0 , arg1   , arg2 , arg3     , arg4, arg5    , arg6    , arg7 , arg8 , arg9 , arg10  , arg11
+		if arg1 then
+			return
+		end
+		if Table_BuffIsVisible(arg4, arg8) then
+			local szName = GetBuffName(arg4, arg8)
+			RecBuffWithTabs(BUFF_LIST[arg4], arg0, arg4, arg9)
+			RecBuffWithTabs(BUFF_LIST[szName], arg0, arg4, arg9)
 		end
 	elseif szEvent == "GKP_RECORD_TOTAL" then
 		GKP_RECORD_TOTAL = arg0
@@ -548,6 +584,7 @@ function Cataclysm_Main.OnEvent(szEvent)
 		TeammatePanel_Switch(false)
 		SetFrameSize()
 	end
+end
 end
 
 function Cataclysm_Main.OnFrameBreathe()
@@ -1071,7 +1108,7 @@ function PS.OnPanelActive(frame)
 					szOption = _L["Restore official"],
 					fnAction = function()
 						local Config = clone(CTM_CONFIG)
-						Config.tBuffList = CTM_CONFIG_PLAYER.tBuffList
+						Config.aBuffList = CTM_CONFIG_PLAYER.aBuffList
 						SetConfig(Config)
 						CheckEnableTeamPanel()
 						MY.SwitchTab("MY_Cataclysm", true)
@@ -1081,7 +1118,7 @@ function PS.OnPanelActive(frame)
 					szOption = _L["Restore cataclysm"],
 					fnAction = function()
 						local Config = clone(CTM_CONFIG_CATACLYSM)
-						Config.tBuffList = CTM_CONFIG_PLAYER.tBuffList
+						Config.aBuffList = CTM_CONFIG_PLAYER.aBuffList
 						SetConfig(Config)
 						CheckEnableTeamPanel()
 						MY.SwitchTab("MY_Cataclysm", true)
@@ -1630,20 +1667,87 @@ end
 
 do
 -- 解析
-local function GetListText(tab)
-	local tName = {}
-	for k, v in pairs(tab) do
-		if type(k) == "string" then
-			if v.bSelf then
-				k = k .. "|self"
+local function GetListText(aBuffList)
+	local aName = {}
+	for _, v in ipairs(aBuffList) do
+		local a = {}
+		insert(a, v.szName or v.dwID)
+		if v.nLevel then
+			insert(a, "lv" .. v.nLevel)
+		end
+		if v.nStackNum and v.szStackOp then
+			insert(a, "sn" .. v.szStackOp .. v.nStackNum)
+		end
+		if v.bOnlySelf then
+			insert(a, "self")
+		end
+		a = { concat(a, "|") }
+
+		if v.col then
+			local cols = { v.col }
+			if v.nColAlpha and v.col:sub(1, 1) ~= "#" then
+				insert(cols, v.nColAlpha)
 			end
-			if v.col then
-				k = k .. "," .. v.col
+			insert(a, "[" .. concat(cols, "|") .. "]")
+		end
+		if v.nPriority then
+			insert(a, "#" .. v.nPriority)
+		end
+		insert(aName, (concat(a, ",")))
+	end
+	return concat(aName, "\n")
+end
+
+local function GetTextList(szText)
+	local t = {}
+	for _, line in ipairs(MY.Split(szText, "\n")) do
+		line = MY.Trim(line)
+		if line ~= "" then
+			local tab = {}
+			local vals = MY.Split(line, ",")
+			for i, val in ipairs(vals) do
+				if i == 1 then
+					local vs = MY.Split(val, "|")
+					for j, v in ipairs(vs) do
+						v = MY.Trim(v)
+						if v ~= "" then
+							if j == 1 then
+								tab.dwID = tonumber(v)
+								if not tab.dwID then
+									tab.szName = v
+								end
+							elseif v == "self" then
+								tab.bOnlySelf = true
+							elseif v:sub(1, 2) == "lv" then
+								tab.nLevel = tonumber((v:sub(3)))
+							elseif v:sub(1, 2) == "sn" then
+								if tonumber(v:sub(4, 4)) then
+									tab.szStackOp = v:sub(3, 3)
+									tab.nStackNum = tonumber((v:sub(4)))
+								else
+									tab.szStackOp = v:sub(3, 4)
+									tab.nStackNum = tonumber((v:sub(5)))
+								end
+							end
+						end
+					end
+				elseif val:sub(1, 1) == "#" then
+					tab.nPriority = tonumber((val:sub(2)))
+				elseif val:sub(1, 1) == "[" and val:sub(-1, -1) == "]" then
+					val = val:sub(2, -2)
+					if val:sub(1, 1) == "#" then
+						tab.col = val
+					else
+						local vs = MY.Split(val, "|")
+						tab.col = vs[1]
+						tab.nColAlpha = vs[2] and tonumber(vs[2])
+					end
+				end
 			end
-			table.insert(tName, k)
+			insert(t, tab)
 		end
 	end
-	return table.concat(tName, "\n")
+	return t
 end
 
 local PS = {}
@@ -1696,22 +1800,22 @@ function PS.OnPanelActive(frame)
 
 	x = X + 10
 	y = y + 5
-	y = y + ui:append("WndCheckBox", {
+	x = x + ui:append("WndCheckBox", {
 		x = x, y = y, text = _L["Buff Staring"],
 		checked = Cataclysm_Main.bStaring,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bStaring = bCheck
 			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
-	}, true):autoWidth():height()
-	y = y + ui:append("WndCheckBox", {
+	}, true):autoWidth():width() + 5
+	x = x + ui:append("WndCheckBox", {
 		x = x, y = y, text = _L["Show Buff Time"],
 		checked = Cataclysm_Main.bShowBuffTime,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowBuffTime = bCheck
 			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
-	}, true):autoWidth():height()
+	}, true):autoWidth():width() + 5
 	y = y + ui:append("WndCheckBox", {
 		x = x, y = y, text = _L["Show Buff Num"],
 		checked = Cataclysm_Main.bShowBuffNum,
@@ -1730,21 +1834,10 @@ function PS.OnPanelActive(frame)
 	y = y + 5
 	y = y + ui:append("WndEditBox",{
 		x = x, y = y, w = 450, h = 150, limit = 4096, multiline = true,
-		text = GetListText(Cataclysm_Main.tBuffList),
+		text = GetListText(Cataclysm_Main.aBuffList),
 		onchange = function(szText)
-			local t = {}
-			for _, v in ipairs(MY.Split(szText, "\n")) do
-				v = MY.Trim(v)
-				if v ~= "" then
-					local settings = MY.Split(v, ",")
-					local identities = MY.Split(settings[1], "|")
-					local id = MY.Trim(identities[1])
-					local bSelf = identities[2] and true or false
-					local col = settings[2]
-					t[id] = { bSelf = bSelf, col = col }
-				end
-			end
-			Cataclysm_Main.tBuffList = t
+			Cataclysm_Main.aBuffList = GetTextList(szText)
+			UpdateBuffListCache()
 			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
 	}, true):height()
@@ -1755,6 +1848,7 @@ function PS.OnPanelActive(frame)
 	y = y + ui:append("Text", { x = x, y = y, text = _L["Tips"], font = 27 }, true):autoSize():height()
 
 	x = x + 10
+	y = y + 5
 	ui:append("Text", { x = x, y = y, w = w - x * 2, text = _L["Cataclysm_TIPS"], multiline = true }, true):autoHeight()
 end
 MY.RegisterPanel("MY_Cataclysm_BuffSettings", _L["Buff settings"], _L["Raid"], "ui/Image/UICommon/RaidTotal.uitex|74", {255, 255, 0}, PS)
