@@ -63,9 +63,15 @@ local function ReloadFrame(frame)
 	this.index = index
 	this.config = config
 
-	if frame.scale then
-		frame:Scale(1 / frame.scale, 1 / frame.scale)
+	if not frame.scale then
+		frame.scale = 1
 	end
+	if config.scale ~= frame.scale then
+		local relScale = config.scale / frame.scale
+		frame:Scale(relScale, relScale)
+		frame.scale = config.scale
+	end
+
 	local hTotal, hList = frame.hTotal, frame.hList
 
 	frame.tItem = {}
@@ -122,6 +128,8 @@ local function ReloadFrame(frame)
 			frame.tItem[mon.name][hItem] = true
 		end
 
+		-- 缩放先
+		hItem:Scale(config.scale, config.scale)
 		-- Box部分
 		box:SetObject(UI_OBJECT.BUFF, mon.id, 1, 1)
 		box:SetObjectIcon(mon.iconid or 13)
@@ -164,14 +172,17 @@ local function ReloadFrame(frame)
 		end
 
 		-- 倒计时条
+		local fontScale = max(0.85, config.scale * 0.58)
 		if config.cdBar then
 			txtProcess:SetW(config.cdBarWidth - 10)
 			txtProcess:SetText("")
+			txtProcess:SetFontScale(fontScale)
 
 			txtName:SetVisible(config.showName)
 			txtName:SetW(config.cdBarWidth - 10)
 			txtName:SetText(mon.longAlias or mon.name or '')
 			txtName:SetFontColor(unpack(mon.rgbLongAlias))
+			txtName:SetFontScale(fontScale)
 
 			XGUI(imgProcess):image(config.cdBarUITex)
 			imgProcess:SetW(config.cdBarWidth)
@@ -188,6 +199,9 @@ local function ReloadFrame(frame)
 			txtShortName:SetText(mon.shortAlias or mon.name or '')
 			txtShortName:SetVisible(config.showName)
 			txtShortName:SetFontColor(unpack(mon.rgbShortAlias))
+			txtShortName:SetFontScale(fontScale)
+			txtShortName:SetW(hBox:GetW() - txtShortName:GetRelX() * 2)
+			txtShortName:SetH(txtShortName:GetH() * fontScale * 1.5)
 			hBox:SetSizeByAllItemSize()
 			hItem:SetSizeByAllItemSize()
 		end
@@ -223,9 +237,7 @@ local function ReloadFrame(frame)
 	frame:SetDragArea(0, 0, nWidth, nHeight)
 	frame:EnableDrag(config.dragable)
 	frame:SetMousePenetrable(config.penetrable)
-	frame:Scale(config.scale, config.scale)
 
-	frame.scale = config.scale
 	frame.w, frame.h = frame:GetSize()
 	frame.dragW = (nWidth) == 0 and 200 or (nWidth * config.scale)
 	frame.dragH = (nItemH) == 0 and 200 or (nItemH * config.scale)
