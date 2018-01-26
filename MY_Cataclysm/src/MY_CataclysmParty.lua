@@ -990,7 +990,7 @@ function CTM:RefreshBuff()
 			local handle = CTM_CACHE[v]:Lookup("Handle_Buff_Boxes")
 			for dwID, data in pairs(CTM_BUFF_CACHE) do
 				local KBuff = MY_GetBuff(p, dwID, data.nLevel)
-				local key = dwID .. "," .. data.nLevel
+				local key = dwID .. "," .. tostring(data)
 				local item = handle:Lookup(key)
 				local nEndFrame, _, nStackNum
 				-- init check
@@ -1006,14 +1006,47 @@ function CTM:RefreshBuff()
 						end
 					end
 				end
-				if nEndFrame and (not data.nStackNum or nStackNum >= data.nStackNum) then
+				if data.nStackNum then
+					local szStackOp = data.szStackOp or ">="
+					if (szStackOp == "=" and not nStackNum == data.nStackNum)
+					or (szStackOp == "!=" and not nStackNum ~= data.nStackNum)
+					or (szStackOp == "<" and not nStackNum < data.nStackNum)
+					or (szStackOp == "<=" and not nStackNum <= data.nStackNum)
+					or (szStackOp == ">" and not nStackNum > data.nStackNum)
+					or (szStackOp == ">=" and not nStackNum >= data.nStackNum)
+					then
+						nEndFrame = nil
+					end
+				end
+				if nEndFrame then
+					-- check pr
+					if data.nPriority and handle:GetItemCount() == CFG.nMaxShowBuff then
+						local item = handle:Lookup(CFG.nMaxShowBuff - 1)
+						if not item.nPriority or data.nPriority < item.nPriority then
+							handle:RemoveItem(item)
+						end
+					end
 					-- create
 					if not item and handle:GetItemCount() < CFG.nMaxShowBuff then
 						item = handle:AppendItemFromData(Cataclysm_Main.GetFrame().hBuff, key)
 						if not data.col then
 							item:Lookup("Shadow"):Hide()
 						else
-							item:Lookup("Shadow"):SetColorRGB(unpack(MY.HumanColor2RGB(data.col) or {255, 255, 0}))
+							local r, g, b, a = unpack(MY.HumanColor2RGB(data.col) or {255, 255, 0})
+							item:Lookup("Shadow"):SetAlpha(a or data.nColAlpha or 192)
+							item:Lookup("Shadow"):SetColorRGB(r, g, b)
+						end
+						if data.nPriority then
+							local index = handle:GetItemCount() - 1
+							for i = 0, index - 1 do
+								local item = handle:Lookup(i)
+								if not item.nPriority or data.nPriority < item.nPriority then
+									for j = i, index - 1 do
+										handle:ExchangeItemIndex(j, index)
+									end
+								end
+							end
+							item.nPriority = data.nPriority
 						end
 						local szName, icon = MY.GetBuffName(data.dwID, data.nLevelEx)
 						if data.nIcon and tonumber(data.nIcon) then

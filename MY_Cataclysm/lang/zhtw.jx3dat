@@ -48,7 +48,7 @@ data = {
 	["Show Buff Num"] = "顯示BUFF層數",
 	["Manually add (One per line)"] = "手動添加BUFF名稱（每行一個）",
 	["Tips"] = "小提示",
-	["Cataclysm_TIPS"] = "記住是每行一個，格式可以是 翔舞 或 翔舞|self，後者表示僅來源自己。\n如需顔色描邊請在每行後添加半角逗號+顔色：翔舞,煙白 或者 翔舞,#00FF00 或者 翔舞,darkkhaki",
+	["Cataclysm_TIPS"] = "每行一個，完整格式爲“翔舞|lv1|sn>=1|self,[#FFFF00FF],#1”。\nlv1表示等級爲1，sn>=1表示層數至少爲1，self表示僅來源自己，#1表示排序優先級爲1，[#FFFF00FF]表示描邊顔色和透明度（支持顔色名[煙白|255]、顔色十六進制(rgba)[#FF0][#FF0F][#FFFF00][#FFFF00FF]、WEB顔色名[darkkhaki|255]）。",
 	["Show Group Number"] = "顯示分組編號",
 	["Team Members: %d, %d agree %d%%"] = "團隊共%d人，%d人已同意發放工資，當前比率%d%%。",
 	["Cataclysm Team Panel"] = "團隊面板",

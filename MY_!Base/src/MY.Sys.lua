@@ -1307,25 +1307,35 @@ end
 
 do
 function MY.Hex2RGB(hex)
-	local s, r, g, b = (hex:gsub("#", ""))
+	local s, r, g, b, a = (hex:gsub("#", ""))
 	if #s == 3 then
-		r, g, b = s:sub(1, 1) .. s:sub(1, 1), s:sub(2, 2) .. s:sub(2, 2), s:sub(3, 3) .. s:sub(3, 3)
+		r, g, b = s:sub(1, 1):rep(2), s:sub(2, 2):rep(2), s:sub(3, 3):rep(2)
+	elseif #s == 4 then
+		r, g, b, a = s:sub(1, 1):rep(2), s:sub(2, 2):rep(2), s:sub(3, 3):rep(2), s:sub(4, 4):rep(2)
 	elseif #s == 6 then
 		r, g, b = s:sub(1, 2), s:sub(3, 4), s:sub(5, 6)
+	elseif #s == 8 then
+		r, g, b, a = s:sub(1, 2), s:sub(3, 4), s:sub(5, 6), s:sub(7, 8)
 	end
 
 	if not r or not g or not b then
 		return
+	end
+	if a then
+		a = tonumber("0x" .. a)
 	end
 	r, g, b = tonumber("0x" .. r), tonumber("0x" .. g), tonumber("0x" .. b)
 
 	if not r or not g or not b then
 		return
 	end
-	return r, g, b
+	return r, g, b, a
 end
 
-function MY.RGB2Hex(r, g, b)
+function MY.RGB2Hex(r, g, b, a)
+	if a then
+		return (("#%02X%02X%02X%02X"):format(r, g, b, a))
+	end
 	return (("#%02X%02X%02X"):format(r, g, b))
 end
 
@@ -1350,8 +1360,8 @@ end
 local HUMAN_COLOR_CACHE = setmetatable({}, {__mode = "v", __index = COLOR_NAME_RGB})
 function MY.HumanColor2RGB(name)
 	if HUMAN_COLOR_CACHE[name] == nil then
-		local r, g, b = MY.Hex2RGB(name)
-		HUMAN_COLOR_CACHE[name] = r and {r, g, b} or false
+		local r, g, b, a = MY.Hex2RGB(name)
+		HUMAN_COLOR_CACHE[name] = r and {r, g, b, a} or false
 	end
 	return HUMAN_COLOR_CACHE[name] or nil
 end

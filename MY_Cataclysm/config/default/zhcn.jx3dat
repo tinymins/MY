@@ -41,8 +41,8 @@ data = {
 	bShowBuffNum         = false,
 	bShowGroupNumber     = true,
 	bShowEffect          = false, -- 五毒醉舞提示 万花距离提示 晚点做
-	tBuffList = { -- 结构的话 就这样吧不过颜色不让设置
-		-- ["调息"] = { bSelf = true, col = 255, 255, 255}
+	aBuffList = { -- 结构的话 就这样吧不过颜色不让设置
+		-- { szName = "调息", bSelf = true, col = 255, 255, 255}
 	},
 	tDistanceCol = {
 		{ 0,   180, 52  }, -- 绿
