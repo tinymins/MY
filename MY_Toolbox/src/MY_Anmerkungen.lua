@@ -99,7 +99,7 @@ MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
 	ui:remove(onRemove)
 
 	local w, h = 300, 210
-	local x, y = 20 , 0
+	local x, y = 35 , 50
 
 	ui:size(w + 40, h + 90):anchor( { s = "CENTER", r = "CENTER", x = 0, y = 0 } )
 	-- title
