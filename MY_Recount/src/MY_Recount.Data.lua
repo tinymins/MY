@@ -394,10 +394,15 @@ function MY_Recount.Data.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffect
 	if nEffectType == SKILL_EFFECT_TYPE.SKILL then
 		szEffectName = Table_GetSkillName(dwEffectID, dwEffectLevel)
 	elseif nEffectType == SKILL_EFFECT_TYPE.BUFF then
-		szEffectName = Table_GetBuffName(dwEffectID, dwEffectLevel) .. '(BUFF)'
+		szEffectName = Table_GetBuffName(dwEffectID, dwEffectLevel)
 	end
 	if not szEffectName then
 		return
+	end
+	local szDamageEffectName, szHealEffectName = szEffectName, szEffectName
+	if nEffectType == SKILL_EFFECT_TYPE.BUFF then
+		szHealEffectName = szHealEffectName .. "(HOT)"
+		szDamageEffectName = szDamageEffectName .. "(DOT)"
 	end
 
 	-- 过滤掉无伤害无治疗的命中效果记录
@@ -447,20 +452,20 @@ function MY_Recount.Data.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffect
 	-- 识破
 	local nValue = tResult[SKILL_RESULT_TYPE.INSIGHT_DAMAGE]
 	if nValue and nValue > 0 then
-		MY_Recount.Data.AddDamageRecord(hCaster, hTarget, szEffectName, nDamage, nEffectDamage, SKILL_RESULT.INSIGHT)
+		MY_Recount.Data.AddDamageRecord(hCaster, hTarget, szDamageEffectName, nDamage, nEffectDamage, SKILL_RESULT.INSIGHT)
 	elseif nSkillResult == SKILL_RESULT.HIT or
 	nSkillResult == SKILL_RESULT.CRITICAL then -- 击中
 		if nTherapy > 0 then -- 有治疗
-			MY_Recount.Data.AddHealRecord(hCaster, hTarget, szEffectName, nTherapy, nEffectTherapy, nSkillResult)
+			MY_Recount.Data.AddHealRecord(hCaster, hTarget, szHealEffectName, nTherapy, nEffectTherapy, nSkillResult)
 		end
 		if nDamage > 0 then -- 有伤害
-			MY_Recount.Data.AddDamageRecord(hCaster, hTarget, szEffectName, nDamage, nEffectDamage, nSkillResult)
+			MY_Recount.Data.AddDamageRecord(hCaster, hTarget, szDamageEffectName, nDamage, nEffectDamage, nSkillResult)
 		end
 	elseif nSkillResult == SKILL_RESULT.BLOCK or  -- 格挡
 	nSkillResult == SKILL_RESULT.SHIELD       or  -- 无效
 	nSkillResult == SKILL_RESULT.MISS         or  -- 偏离
 	nSkillResult == SKILL_RESULT.DODGE      then  -- 闪避
-		MY_Recount.Data.AddDamageRecord(hCaster, hTarget, szEffectName, 0, 0, nSkillResult)
+		MY_Recount.Data.AddDamageRecord(hCaster, hTarget, szDamageEffectName, 0, 0, nSkillResult)
 	end
 
 	Data.nTimeDuring = GetCurrentTime() - Data.nTimeBegin
