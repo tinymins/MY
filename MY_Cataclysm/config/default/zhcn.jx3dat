@@ -39,6 +39,7 @@ data = {
 	bStaring             = false,
 	bShowBuffTime        = true,
 	bShowBuffNum         = true,
+	bShowBuffReminder    = false,
 	bShowGroupNumber     = true,
 	bShowEffect          = false, -- 五毒醉舞提示 万花距离提示 晚点做
 	aBuffList = { -- 结构的话 就这样吧不过颜色不让设置

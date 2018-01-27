@@ -1690,6 +1690,9 @@ local function GetListText(aBuffList)
 			end
 			insert(a, "[" .. concat(cols, "|") .. "]")
 		end
+		if v.szReminder then
+			insert(a, "(" .. v.szReminder .. ")")
+		end
 		if v.nPriority then
 			insert(a, "#" .. v.nPriority)
 		end
@@ -1742,6 +1745,8 @@ local function GetTextList(szText)
 						tab.col = vs[1]
 						tab.nColAlpha = vs[2] and tonumber(vs[2])
 					end
+				elseif val:sub(1, 1) == "(" and val:sub(-1, -1) == ")" then
+					tab.szReminder = val:sub(2, -2)
 				end
 			end
 			insert(t, tab)
@@ -1816,11 +1821,19 @@ function PS.OnPanelActive(frame)
 			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width() + 5
-	y = y + ui:append("WndCheckBox", {
+	x = x + ui:append("WndCheckBox", {
 		x = x, y = y, text = _L["Show Buff Num"],
 		checked = Cataclysm_Main.bShowBuffNum,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowBuffNum = bCheck
+			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
+		end,
+	}, true):autoWidth():width() + 5
+	y = y + ui:append("WndCheckBox", {
+		x = x, y = y, text = _L["Show Buff Reminder"],
+		checked = Cataclysm_Main.bShowBuffReminder,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bShowBuffReminder = bCheck
 			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():height()
