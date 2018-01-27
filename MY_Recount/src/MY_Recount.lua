@@ -210,10 +210,8 @@ MY_Recount.Close = function()
 end
 
 MY.RegisterInit('MY_RECOUNT', function()
-	if MY_Recount.bSaveRecount then
-		MY_Recount.Data.LoadData()
-	end
 	MY_Recount.LoadCustomCss()
+	MY_Recount.Data.LoadData(MY_Recount.bSaveRecount)
 end)
 
 MY.RegisterStorageInit('MY_RECOUNT', function()
@@ -225,9 +223,7 @@ MY.RegisterStorageInit('MY_RECOUNT', function()
 end)
 
 MY.RegisterExit(function()
-	if MY_Recount.bSaveRecount then
-		MY_Recount.Data.SaveData()
-	end
+	MY_Recount.Data.SaveData(MY_Recount.bSaveRecount)
 end)
 
 -- ########################################################################## --
@@ -657,11 +653,11 @@ _C.OnDetailFrameBreathe = function()
 	end
 	-- ΩÁ√Ê÷ÿªÊ
 	local hSelectedItem
-	this:Lookup('WndScroll_Skill'):SetSize(480, 112)
-	this:Lookup('WndScroll_Skill', ''):SetSize(480, 112)
+	this:Lookup('WndScroll_Skill'):SetSize(480, 96)
+	this:Lookup('WndScroll_Skill', ''):SetSize(480, 96)
 	this:Lookup('WndScroll_Skill', ''):FormatAllItemPos()
 	local hList = this:Lookup('WndScroll_Skill', 'Handle_SkillList')
-	hList:SetSize(480, 90)
+	hList:SetSize(480, 80)
 	hList:Clear()
 	for i, p in ipairs(aResult) do
 		local hItem = hList:AppendItemFromIni(_C.szIniDetail, 'Handle_SkillItem')
@@ -1051,6 +1047,36 @@ MY_Recount.GetMenu = function()
 			fnAction = function()
 				MY_Recount.bSysTimeMode = not MY_Recount.bSysTimeMode
 				MY_Recount.DrawUI()
+			end,
+			fnDisable = function()
+				return not MY.GetStorage('BoolValues.MY_Recount_Enable')
+			end,
+		}, {
+			szOption = _L['distinct target id with same name'],
+			bCheck = true,
+			bChecked = MY_Recount.Data.bDistinctTargetID,
+			fnAction = function()
+				MY_Recount.Data.bDistinctTargetID = not MY_Recount.Data.bDistinctTargetID
+			end,
+			fnDisable = function()
+				return not MY.GetStorage('BoolValues.MY_Recount_Enable')
+			end,
+		}, {
+			szOption = _L['distinct effect id with same name'],
+			bCheck = true,
+			bChecked = MY_Recount.Data.bDistinctEffectID,
+			fnAction = function()
+				MY_Recount.Data.bDistinctEffectID = not MY_Recount.Data.bDistinctEffectID
+			end,
+			fnDisable = function()
+				return not MY.GetStorage('BoolValues.MY_Recount_Enable')
+			end,
+		}, {
+			szOption = _L['record anonymous effect'],
+			bCheck = true,
+			bChecked = MY_Recount.Data.bRecAnonymous,
+			fnAction = function()
+				MY_Recount.Data.bRecAnonymous = not MY_Recount.Data.bRecAnonymous
 			end,
 			fnDisable = function()
 				return not MY.GetStorage('BoolValues.MY_Recount_Enable')
