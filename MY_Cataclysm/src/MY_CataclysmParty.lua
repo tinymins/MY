@@ -1019,14 +1019,14 @@ function CTM:RefreshBuff()
 						end
 					end
 				end
-				if data.nStackNum then
+				if nStackNum and data.nStackNum then
 					local szStackOp = data.szStackOp or ">="
-					if (szStackOp == "=" and not nStackNum == data.nStackNum)
-					or (szStackOp == "!=" and not nStackNum ~= data.nStackNum)
-					or (szStackOp == "<" and not nStackNum < data.nStackNum)
-					or (szStackOp == "<=" and not nStackNum <= data.nStackNum)
-					or (szStackOp == ">" and not nStackNum > data.nStackNum)
-					or (szStackOp == ">=" and not nStackNum >= data.nStackNum)
+					if (szStackOp == "=" and nStackNum ~= data.nStackNum)
+					or (szStackOp == "!=" and nStackNum == data.nStackNum)
+					or (szStackOp == "<" and nStackNum >= data.nStackNum)
+					or (szStackOp == "<=" and nStackNum > data.nStackNum)
+					or (szStackOp == ">" and nStackNum <= data.nStackNum)
+					or (szStackOp == ">=" and nStackNum < data.nStackNum)
 					then
 						nEndFrame = nil
 					end
