@@ -55,4 +55,12 @@ data = {
 	["Syncing..."] = "正在同步數據...",
 	["Refuse request"] = "對方拒絕了您的請求！",
 	["Party limit"] = "必須和對方組隊",
+
+	["Edit team info?"] = "是否填寫團隊小告示（團員進組可看到）",
+	["Team Message"] = "團隊告示",
+	["Asking..., If no response in longtime, team leader not enable plug-in."] = "請求已發出，如果沒有響應可能是團長沒有開啓小告示",
+	["YY:"] = "YY:",
+	["Paste YY"] = "發佈YY",
+	["GKP Golden Team Record"] = "金團記錄",
+	["Import Data"] = "導入數據",
 }
