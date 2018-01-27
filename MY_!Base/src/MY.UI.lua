@@ -233,6 +233,8 @@ local function GetComponentElement(raw, elementType)
 	elseif elementType == 'TEXT' then
 		if componentType == 'WndScrollBox' then
 			element = raw:Lookup('', 'Handle_Padding/Handle_Scroll/Text_Default')
+		elseif componentType == 'WndFrame' then
+			element = raw:Lookup('', 'Text_Title') or raw:Lookup('', 'Text_Default')
 		elseif componentBaseType == 'Wnd' then
 			element = raw:Lookup('', 'Text_Default')
 		elseif componentType == 'Handle' then
@@ -2535,9 +2537,11 @@ end
 function XGUI:image(szImage, nFrame)
 	self:_checksum()
 	if szImage then
-		nFrame = nFrame or gsub(szImage, '.*%|(%d+)', '%1')
-		szImage = gsub(szImage, '%|.*', '')
-		if nFrame then
+		if IsString(szImage) and IsNil(nFrame) then
+			nFrame = gsub(szImage, '.*%|(%d+)', '%1')
+			szImage = gsub(szImage, '%|.*', '')
+		end
+		if IsString(szImage) and IsNumber(nFrame) then
 			nFrame = tonumber(nFrame)
 			for _, raw in ipairs(self.raws) do
 				raw = GetComponentElement(raw, 'IMAGE')
@@ -2546,7 +2550,7 @@ function XGUI:image(szImage, nFrame)
 					raw:GetParent():FormatAllItemPos()
 				end
 			end
-		else
+		elseif IsString(szImage) then
 			for _, raw in ipairs(self.raws) do
 				raw = GetComponentElement(raw, 'IMAGE')
 				if raw then
@@ -2627,15 +2631,19 @@ end
 -- (self) Instance:icon(dwIcon)
 -- (number) Instance:icon()
 -- NOTICE£ºonly for Box
-function XGUI:icon(dwIcon)
+function XGUI:icon(dwIconID)
 	self:_checksum()
-	if dwIcon then
-		dwIcon = tonumber(dwIcon)
+	if IsNumber(dwIconID) then
+		local element
 		for _, raw in ipairs(self.raws) do
-			raw = GetComponentElement(raw, 'BOX')
-			if raw then
-				raw:SetObject(UI_OBJECT_NOT_NEED_KNOWN)
-				raw:SetObjectIcon(dwIcon)
+			element = GetComponentElement(raw, 'BOX')
+			if element then
+				element:SetObject(UI_OBJECT_NOT_NEED_KNOWN)
+				element:SetObjectIcon(dwIconID)
+			end
+			element = GetComponentElement(raw, 'IMAGE')
+			if element then
+				element:FromIconID(dwIconID)
 			end
 		end
 		return self
