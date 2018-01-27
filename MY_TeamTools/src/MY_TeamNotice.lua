@@ -126,9 +126,17 @@ function TI.CreateFrame(a, b)
 	})
 	x, y = 5, 130
 	x = x + ui:append("WndButton2", { x = x, y = y, text = _L["Raid Tools"], onclick = MY_RaidTools.TogglePanel }, true):autoWidth():width() + 5
-	if MY_GKP then
-		x = x + ui:append("WndButton2", { x = x, y = y, text = _L["GKP Golden Team Record"], onclick = MY_GKP.TogglePanel }, true):autoWidth():width() + 5
-	end
+	x = x + ui:append("WndButton2", {
+		x = x, y = y,
+		text = _L["GKP Golden Team Record"],
+		onclick = function()
+			if MY_GKP then
+				MY_GKP.TogglePanel()
+			else
+				MY.Alert(_L["You haven't had MY_GKP installed and loaded yet."])
+			end
+		end,
+	}, true):autoWidth():width() + 5
 	if DBM_RemoteRequest then
 		x = x + ui:append("WndButton2", { x = x, y = y, text = _L["Import Data"], onclick = DBM_RemoteRequest.TogglePanel }, true):autoWidth():width() + 5
 	end

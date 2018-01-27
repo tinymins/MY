@@ -42,6 +42,8 @@ function MY_PartyRequest.OnLButtonClick()
 			end,
 		})
 		PopupMenu(menu)
+	elseif szName == "Btn_Close" then
+		PR.ClosePanel()
 	end
 end
 
@@ -200,7 +202,7 @@ function PR.UpdateFrame()
 				EditBox_AppendLinkPlayer(v.szName)
 			end
 		end
-		ui:append("WndButton2", { x = 240, y = 10, w = 60, h = 34, text = g_tStrings.STR_ACCEPT }, true):click(function()
+		ui:append("WndButton2", { x = 240, y = 7, w = 60, h = 34, text = g_tStrings.STR_ACCEPT }, true):click(function()
 			v.fnAction()
 			table.remove(PR_PARTY_REQUEST, k)
 			PR.UpdateFrame()
@@ -211,7 +213,7 @@ function PR.UpdateFrame()
 				ui:children("#Cover"):toggle(false)
 			end
 		end)
-		ui:append("WndButton2", { x = 305, y = 10, w = 60, h = 34, text = g_tStrings.STR_REFUSE }, true):click(function()
+		ui:append("WndButton2", { x = 305, y = 7, w = 60, h = 34, text = g_tStrings.STR_REFUSE }, true):click(function()
 			v.fnCancelAction()
 			table.remove(PR_PARTY_REQUEST, k)
 			PR.UpdateFrame()
@@ -223,7 +225,7 @@ function PR.UpdateFrame()
 			end
 		end)
 		if v.bDetail then
-			ui:append("WndButton2",{ name = "Details", x = 370, y = 10, w = 90, h = 34, text = g_tStrings.STR_LOOKUP, color = { 255, 255, 0 } }, true):click(function()
+			ui:append("WndButton2",{ name = "Details", x = 370, y = 7, w = 90, h = 34, text = g_tStrings.STR_LOOKUP, color = { 255, 255, 0 } }, true):click(function()
 				ViewInviteToPlayer(v.dwID)
 			end):hover(function(bHover)
 				if bHover then
@@ -233,7 +235,7 @@ function PR.UpdateFrame()
 				end
 			end)
 		else
-			ui:append("WndButton2",{ name = "Details", x = 370, y = 10, w = 90, h = 34, text = _L["Details"] }, true):click(function()
+			ui:append("WndButton2",{ name = "Details", x = 370, y = 7, w = 90, h = 34, text = _L["Details"] }, true):click(function()
 				MY.BgTalk(v.szName, "RL", "ASK")
 				ui:children("#Details"):enable(false):text(_L["loading..."])
 				MY.Sysmsg({_L["If it is always loading, the target may not install plugin or refuse."]})
