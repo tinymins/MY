@@ -1197,18 +1197,18 @@ function XGUI:drag(...)
 	elseif IsFunction(arg0) or IsFunction(arg1) then
 		for _, raw in ipairs(self.raws) do
 			if raw:GetType() == 'WndFrame' then
-				if nX then
-					XGUI(raw):uievent('OnFrameDragSetPosEnd', nX)
+				if arg0 then
+					XGUI(raw):uievent('OnFrameDragSetPosEnd', arg0)
 				end
-				if nY then
-					XGUI(raw):uievent('OnFrameDragEnd', nY)
+				if arg1 then
+					XGUI(raw):uievent('OnFrameDragEnd', arg1)
 				end
 			elseif raw:GetBaseType() == 'Item' then
-				if nX then
-					XGUI(raw):uievent('OnItemLButtonDrag', nX)
+				if arg0 then
+					XGUI(raw):uievent('OnItemLButtonDrag', arg0)
 				end
-				if nY then
-					XGUI(raw):uievent('OnItemLButtonDragEnd', nY)
+				if arg1 then
+					XGUI(raw):uievent('OnItemLButtonDragEnd', arg1)
 				end
 			end
 		end
@@ -3472,6 +3472,11 @@ function  XGUI.CreateFrame(szName, opt)
 					PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 				end
 			end
+		end
+		if not opt.setting then
+			frm:Lookup('Btn_Setting'):Destroy()
+		else
+			frm:Lookup('Btn_Setting').OnLButtonClick = opt.setting
 		end
 		if opt.onrestore then
 			XGUI(frm):uievent('OnRestore', opt.onrestore)
