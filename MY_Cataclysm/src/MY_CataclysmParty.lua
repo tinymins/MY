@@ -1081,6 +1081,10 @@ function CTM:RefreshBuff()
 						item:Lookup("Text_Time"):SetFontScale(fScale * 0.85)
 						item:Lookup("Text_StackNum"):SetFontScale(fScale * 0.85)
 						item:Lookup("Text_StackNum"):SetFontColor(255, 255, 255)
+						item:Lookup("Text_Reminder"):SetText(data.szReminder)
+						item:Lookup("Text_Reminder"):SetVisible(CFG.bShowBuffReminder)
+						item:Lookup("Text_Reminder"):SetFontScale(fScale * 1.1)
+						item:Lookup("Text_Reminder"):SetFontColor(unpack(MY.HumanColor2RGB(data.col) or {255, 255, 255}))
 						handle:FormatAllItemPos()
 					end
 					-- revise
@@ -1100,7 +1104,7 @@ function CTM:RefreshBuff()
 								txtTime:SetText(floor(nTime) .. "'")
 								txtTime:SetFontColor(r, g, b)
 							else
-								txtTime:SetText("0")
+								txtTime:SetText("")
 							end
 						end
 						txtTime:SetVisible(CFG.bShowBuffTime)
