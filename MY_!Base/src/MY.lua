@@ -665,7 +665,20 @@ MY.RegisterBgMsg("MY_VERSION_CHECK", function(_, nChannel, dwTalkerID, szTalkerN
 	end
 	MY.BgTalk(szTalkerName, "MY_VERSION_REPLY", MY.GetVersion())
 end)
-
+-- 查看属性
+MY.RegisterBgMsg("RL", function(_, nChannel, dwID, szName, bIsSelf, ...)
+	local data = {...}
+	if not bIsSelf then
+		if data[1] == "ASK" then
+			MY.Confirm(_L("[%s] want to see your info, OK?", szName), function()
+				local me = GetClientPlayer()
+				local nGongZhan = MY.GetBuff(3219) and 1 or 0
+				local bEx = MY.GetAddonInfo().tAuthor[me.dwID] == me.szName and "Author" or "Player"
+				MY.BgTalk(szName, "RL", "Feedback", me.dwID, UI_GetPlayerMountKungfuID(), nGongZhan, bEx)
+			end)
+		end
+	end
+end)
 --------------------------------------------------------------------------------------------------------------------------------------------
 -- 选项卡
 --------------------------------------------------------------------------------------------------------------------------------------------
@@ -879,7 +892,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 		-- 欢迎页
 		local ui = MY.UI(wnd)
 		local w, h = ui:size()
-		ui:append("Image", { name = 'Image_Adv', x = 0, y = 0, image = _UITEX_POSTER_, imageframe = 0 })
+		ui:append("Image", { name = 'Image_Adv', x = 0, y = 0, image = _UITEX_POSTER_, imageframe = (GetTime() % 2) })
 		ui:append("Text", { name = 'Text_Adv', x = 10, y = 300, w = 557, font = 200 })
 		ui:append("Text", {
 			name = 'Text_ChangeLog',
