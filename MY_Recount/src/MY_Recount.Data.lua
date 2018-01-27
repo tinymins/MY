@@ -29,6 +29,8 @@ Data = {
 	nVersion = 数据版本号,
 	nTimeBegin  = 战斗开始UNIX时间戳,
 	nTimeDuring = 战斗持续秒数,
+	bDistinctTargetID = 该数据是否根据目标ID区分同名记录,
+	bDistinctEffectID = 该数据是否根据效果ID区分同名记录,
 	Awaytime = {
 		玩家的dwID = {
 			{ 暂离开始时间, 暂离结束时间 }, ...
@@ -178,8 +180,11 @@ local VERSION = 1
 
 MY_Recount = MY_Recount or {}
 MY_Recount.Data = {}
-MY_Recount.Data.nMaxHistory   = 10
-MY_Recount.Data.nMinFightTime = 30
+MY_Recount.Data.nMaxHistory       = 10
+MY_Recount.Data.nMinFightTime     = 30
+MY_Recount.Data.bRecAnonymous     = true
+MY_Recount.Data.bDistinctTargetID = false
+MY_Recount.Data.bDistinctEffectID = false
 
 local _Cache = {}
 local Data          -- 当前战斗数据记录
@@ -201,37 +206,49 @@ local SZ_REC_FILE = '$uid@$lang/cache/fight_recount_log.jx3dat'
 --           # #               #           #         #           # # # # #         # # # # # # # #
 -- ##################################################################################################
 -- 登陆游戏加载保存的数据
-function MY_Recount.Data.LoadData()
+function MY_Recount.Data.LoadData(bLoadHistory)
 	local data = MY.LoadLUAData(SZ_REC_FILE)
 	if data then
-		History                       = data.History       or {}
-		MY_Recount.Data.nMaxHistory   = data.nMaxHistory   or 10
-		MY_Recount.Data.nMinFightTime = data.nMinFightTime or 30
-	end
-	for i = #History, 1, -1 do
-		if History[i].nVersion ~= VERSION then
-			table.remove(History, i)
+		if bLoadHistory then
+			History = data.History or {}
+			for i = #History, 1, -1 do
+				if History[i].nVersion ~= VERSION then
+					table.remove(History, i)
+				end
+			end
 		end
+		MY_Recount.Data.nMaxHistory       = data.nMaxHistory   or 10
+		MY_Recount.Data.nMinFightTime     = data.nMinFightTime or 30
+		MY_Recount.Data.bRecAnonymous     = MY.FormatDataStructure(data.bRecAnonymous, true)
+		MY_Recount.Data.bDistinctTargetID = MY.FormatDataStructure(data.bDistinctTargetID, false)
+		MY_Recount.Data.bDistinctEffectID = MY.FormatDataStructure(data.bDistinctEffectID, false)
 	end
 	MY_Recount.Data.Init()
 end
 
 -- 退出游戏保存数据
-function MY_Recount.Data.SaveData()
+function MY_Recount.Data.SaveData(bSaveHistory)
 	local data = {
-		History = History,
-		nMaxHistory = MY_Recount.Data.nMaxHistory,
-		nMinFightTime = MY_Recount.Data.nMinFightTime,
+		History = bSaveHistory and History or nil,
+		nMaxHistory       = MY_Recount.Data.nMaxHistory,
+		nMinFightTime     = MY_Recount.Data.nMinFightTime,
+		bRecAnonymous     = MY_Recount.Data.bRecAnonymous,
+		bDistinctTargetID = MY_Recount.Data.bDistinctTargetID,
+		bDistinctEffectID = MY_Recount.Data.bDistinctEffectID,
 	}
 	local data = MY.SaveLUAData(SZ_REC_FILE, data)
 end
 
 -- 过图清除当前战斗数据
-MY.RegisterEvent('LOADING_ENDING', function()
+do
+local function onLoadingEnding()
 	MY_Recount.Data.Push()
 	MY_Recount.Data.Init(true)
 	FireUIEvent('MY_RECOUNT_NEW_FIGHT')
-end)
+end
+MY.RegisterEvent('LOADING_ENDING', onLoadingEnding)
+MY.RegisterEvent('RELOAD_UI_ADDON_END', onLoadingEnding)
+end
 
 -- 退出战斗 保存数据
 MY.RegisterEvent('MY_FIGHT_HINT', function(event)
@@ -397,7 +414,12 @@ function MY_Recount.Data.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffect
 		szEffectName = Table_GetBuffName(dwEffectID, dwEffectLevel)
 	end
 	if not szEffectName then
-		return
+		if not MY_Recount.Data.bRecAnonymous then
+			return
+		end
+		szEffectName = "#" .. dwEffectID
+	elseif Data.bDistinctEffectID then
+		szEffectName = szEffectName .. "#" .. dwEffectID
 	end
 	local szDamageEffectName, szHealEffectName = szEffectName, szEffectName
 	if nEffectType == SKILL_EFFECT_TYPE.BUFF then
@@ -705,11 +727,23 @@ function _Cache.AddRecord(data, szRecordType, idRecord, idTarget, szEffectName, 
 	tTargetSkillData.Count[nSkillResult] = (tTargetSkillData.Count[nSkillResult] or 0) + 1
 end
 
+-- 获取索引ID
+local function GetObjectKeyID(obj)
+	if IsPlayer(obj.dwID) then
+		return obj.dwID
+	end
+	local id = MY.GetObjectName(obj) or g_tStrings.STR_NAME_UNKNOWN
+	if Data.bDistinctTargetID then
+		id = id .. "#" .. obj.dwID
+	end
+	return id
+end
+
 -- 插入一条伤害记录
 function MY_Recount.Data.AddDamageRecord(hCaster, hTarget, szEffectName, nDamage, nEffectDamage, nSkillResult)
 	-- 获取索引ID
-	local idCaster = (IsPlayer(hCaster.dwID) and hCaster.dwID) or MY.GetObjectName(hCaster) or g_tStrings.STR_NAME_UNKNOWN
-	local idTarget = (IsPlayer(hTarget.dwID) and hTarget.dwID) or MY.GetObjectName(hTarget) or g_tStrings.STR_NAME_UNKNOWN
+	local idCaster = GetObjectKeyID(hCaster)
+	local idTarget = GetObjectKeyID(hTarget)
 
 	-- 添加伤害记录
 	_Cache.InitObjectData(Data, hCaster, 'Damage')
@@ -722,8 +756,8 @@ end
 -- 插入一条治疗记录
 function MY_Recount.Data.AddHealRecord(hCaster, hTarget, szEffectName, nHeal, nEffectHeal, nSkillResult)
 	-- 获取索引ID
-	local idCaster = (IsPlayer(hCaster.dwID) and hCaster.dwID) or MY.GetObjectName(hCaster) or g_tStrings.STR_NAME_UNKNOWN
-	local idTarget = (IsPlayer(hTarget.dwID) and hTarget.dwID) or MY.GetObjectName(hTarget) or g_tStrings.STR_NAME_UNKNOWN
+	local idCaster = GetObjectKeyID(hCaster)
+	local idTarget = GetObjectKeyID(hTarget)
 
 	-- 添加伤害记录
 	_Cache.InitObjectData(Data, hCaster, 'Heal')
@@ -735,7 +769,7 @@ end
 
 -- 确认对象数据已创建（未创建则创建）
 function _Cache.InitObjectData(data, obj, szChannel)
-	local id = (IsPlayer(obj.dwID) and obj.dwID) or MY.GetObjectName(obj) or g_tStrings.STR_NAME_UNKNOWN
+	local id = GetObjectKeyID(obj)
 	if IsPlayer(obj.dwID) and not data.Namelist[id] then
 		data.Namelist[id]  = MY.Game.GetObjectName(obj) -- 名称缓存
 		data.Forcelist[id] = obj.dwForceID or 0         -- 势力缓存
@@ -765,21 +799,22 @@ local function GeneTypeNS()
 	}
 end
 function MY_Recount.Data.Init(bForceInit)
-	local bNew
 	if bForceInit or (not Data) or
 	(Data.UUID and MY.GetFightUUID() ~= Data.UUID) then
 		Data = {
-			UUID         = MY.GetFightUUID(), -- 战斗唯一标识
-			nVersion     = VERSION,           -- 数据版本号
-			nTimeBegin   = GetCurrentTime(),  -- 战斗开始时间
-			nTimeDuring  =  0,                -- 战斗持续时间
-			Awaytime     = {},                -- 死亡/掉线时间节点
-			Namelist     = {},                -- 名称缓存
-			Forcelist    = {},                -- 势力缓存
-			Damage       = GeneTypeNS(),      -- 输出统计
-			Heal         = GeneTypeNS(),      -- 治疗统计
-			BeHeal       = GeneTypeNS(),      -- 承疗统计
-			BeDamage     = GeneTypeNS(),      -- 承伤统计
+			UUID              = MY.GetFightUUID(),                 -- 战斗唯一标识
+			nVersion          = VERSION,                           -- 数据版本号
+			bDistinctTargetID = MY_Recount.Data.bDistinctTargetID, -- 是否根据ID区分同名目标
+			bDistinctEffectID = MY_Recount.Data.bDistinctEffectID, -- 是否根据ID区分同名效果
+			nTimeBegin        = GetCurrentTime(),                  -- 战斗开始时间
+			nTimeDuring       =  0,                                -- 战斗持续时间
+			Awaytime          = {},                                -- 死亡/掉线时间节点
+			Namelist          = {},                                -- 名称缓存
+			Forcelist         = {},                                -- 势力缓存
+			Damage            = GeneTypeNS(),                      -- 输出统计
+			Heal              = GeneTypeNS(),                      -- 治疗统计
+			BeHeal            = GeneTypeNS(),                      -- 承疗统计
+			BeDamage          = GeneTypeNS(),                      -- 承伤统计
 		}
 	end
 

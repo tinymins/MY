@@ -3,46 +3,49 @@ data = {
     ['enable'] = '启用',
     ['current fight'] = '当前统计',
     ['fight recount'] = '战斗统计',
-    
+
     ['switch recount mode'] = '切换统计类型',
     ['filter short fight'] = '过滤短时战斗',
     ['no time limit'] = '无时间限制',
     ['less than %d second'] = '不足%d秒',
     ['less than %d minute'] = '不足%d分钟',
     ['less than %d minute and a half'] = '不足%d分半',
-    
+
     ['redraw interval'] = '数值刷新周期',
     ['realtime refresh'] = '实时刷新',
     ['every %.1f second'] = '每隔%.1f秒',
-    
+
     ['display only npc record'] = '只显示NPC记录',
     ['display only player record'] = '只显示玩家记录',
     ['display all record'] = '显示所有记录',
-    
+
     ['auto save data while exit game'] = '退出游戏时保存数据',
-    
-    ['display as per second'  ] = '显示每秒平均数值',
-    ['display effective value'] = '显示战斗有效数值',
-    ['uncount awaytime'       ] = '除去玩家暂离时间',
-    ['show nodata teammate'   ] = '显示无数据的队友',
-    ['use system time count'  ] = '使用官方时间算法',
-    ['theme'                  ] = '自定界面风格选择',
-    ['max history'            ] = '最大历史记录设置',
-    
+
+    ['display as per second'            ] = '显示每秒平均数值',
+    ['display effective value'          ] = '显示战斗有效数值',
+    ['uncount awaytime'                 ] = '除去玩家暂离时间',
+    ['show nodata teammate'             ] = '显示无数据的队友',
+    ['use system time count'            ] = '使用官方时间算法',
+    ['distinct target id with same name'] = '区分同名字的目标',
+    ['distinct effect id with same name'] = '区分同名字的技能',
+    ['record anonymous effect'          ] = '显示没名字的技能',
+    ['theme'                            ] = '自定界面风格选择',
+    ['max history'                      ] = '最大历史记录设置',
+
     ['publish limit'] = '发布数量',
     ['top %d'] = '前%d名',
     ['publish mode'] = '发布模式',
     ['only effect value'] = '仅发布有效值',
     ['only total value'] = '仅发布总数值',
     ['effect and total value'] = '发布有效和总数值',
-    
+
     ['%7d%s(Effect) %7d%s(Total)'] = '%7d%s(有效) %7d%s(总)',
     ['%7d%s(Effect)'] = '%7d%s(有效)',
     ['%7d%s(Total)'] = '%7d%s(总)',
-    
+
     ['total: '] = '总：',
     ['effect: '] = '有效：',
-    
+
     ['template'] = '数据模板',
     ['away count: %d, away time: %ds'] = '暂离次数：%d次　暂离时间：%d秒',
 }
