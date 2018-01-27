@@ -1068,42 +1068,50 @@ function CTM:RefreshBuff()
 						local box = item:Lookup("Box")
 						box:SetObject(UI_OBJECT_NOT_NEED_KNOWN, data.dwID, data.nLevelEx)
 						box:SetObjectIcon(icon)
-						box:SetOverTextPosition(0, ITEM_POSITION.RIGHT_BOTTOM)
 						box:SetObjectStaring(CFG.bStaring)
+						local fScale = 1
 						if CFG.bAutoBuffSize then
 							if CFG.fScaleY > 1 then
-								item:Scale(CFG.fScaleY, CFG.fScaleY)
+								fScale = CFG.fScaleY
 							end
 						else
-							item:Scale(CFG.fBuffScale, CFG.fBuffScale)
+							fScale = CFG.fBuffScale
 						end
+						item:Scale(fScale, fScale)
+						item:Lookup("Text_Time"):SetFontScale(fScale * 0.85)
+						item:Lookup("Text_StackNum"):SetFontScale(fScale * 0.85)
+						item:Lookup("Text_StackNum"):SetFontColor(255, 255, 255)
 						handle:FormatAllItemPos()
 					end
 					-- revise
 					if item then
-						local hBox = item:Lookup("Box")
+						-- buff time
+						local txtTime = item:Lookup("Text_Time")
 						if CFG.bShowBuffTime then
-							local nTime = GetEndTime(nEndFrame)
-							if nTime < 5 then
+							local nTime, r, g, b = GetEndTime(nEndFrame)
+							if nTime <= 5 then
 								if nTime >= 0 then
-									hBox:SetOverTextFontScheme(0, 219)
-									hBox:SetOverText(0, floor(nTime) .. " ")
+									r, g, b = 255, 0, 0
 								end
-							elseif nTime < 10 then
-								hBox:SetOverTextFontScheme(0, 27)
-								hBox:SetOverText(0, floor(nTime) .. " ")
-							else
-								hBox:SetOverText(0, "")
+							elseif nTime <= 15 then
+								r, g, b = 255, 255, 0
 							end
-						else
-							hBox:SetOverText(0, "")
+							if r and g and b then
+								txtTime:SetText(floor(nTime) .. "'")
+								txtTime:SetFontColor(r, g, b)
+							else
+								txtTime:SetText("0")
+							end
 						end
+						txtTime:SetVisible(CFG.bShowBuffTime)
+						-- buff stack number
+						local txtStackNum = item:Lookup("Text_StackNum")
 						if CFG.bShowBuffNum and nStackNum > 1 then
-							hBox:SetOverTextFontScheme(1, 15)
-							hBox:SetOverText(1, nStackNum .. " ")
+							txtStackNum:SetText(nStackNum)
 						else
-							hBox:SetOverText(1, "")
+							txtStackNum:SetText("")
 						end
+						txtStackNum:SetVisible(CFG.bShowBuffNum)
 					end
 					tCheck[dwID] = true
 				else
