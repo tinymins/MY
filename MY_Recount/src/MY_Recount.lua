@@ -669,7 +669,7 @@ _C.OnDetailFrameBreathe = function()
 		hItem:Lookup('Text_SkillName'):SetText(p.szName)
 		hItem:Lookup('Text_SkillCount'):SetText(p.nCount)
 		hItem:Lookup('Text_SkillTotal'):SetText(p.nTotalEffect)
-		hItem:Lookup('Text_SkillPercentage'):SetText(nTotalEffect > 0 and _L('%.1f%%', math.floor(p.nTotalEffect / nTotalEffect * 100)) or ' - ')
+		hItem:Lookup('Text_SkillPercentage'):SetText(nTotalEffect > 0 and _L('%.1f%%', (i == 1 and ceil or floor)(p.nTotalEffect / nTotalEffect * 1000) / 10) or ' - ')
 
 		if szPrimarySort == 'Skill' and szSelectedSkill == p.szKey or
 		szPrimarySort == 'Target' and szSelectedTarget == p.szKey then
@@ -711,7 +711,7 @@ _C.OnDetailFrameBreathe = function()
 			hItem:Lookup('Text_DetailAverage'):SetText(p.nAvgEffect)
 			hItem:Lookup('Text_DetailMax'):SetText(p.nMaxEffect)
 			hItem:Lookup('Text_DetailCount'):SetText(p.nCount)
-			hItem:Lookup('Text_DetailPercent'):SetText(nCount > 0 and _L('%.1f%%', math.floor(p.nCount / nCount * 100)) or ' - ')
+			hItem:Lookup('Text_DetailPercent'):SetText(nCount > 0 and _L('%.1f%%', (i == 1 and ceil or floor)(p.nCount / nCount * 1000) / 10) or ' - ')
 		end
 		hList:FormatAllItemPos()
 
@@ -764,7 +764,7 @@ _C.OnDetailFrameBreathe = function()
 			hItem:Lookup('Text_TargetHit'):SetText(p.nHitCount)
 			hItem:Lookup('Text_TargetCritical'):SetText(p.nCriticalCount)
 			hItem:Lookup('Text_TargetMiss'):SetText(p.nMissCount)
-			hItem:Lookup('Text_TargetPercent'):SetText((nTotalEffect > 0 and _L('%.1f%%', math.floor(p.nTotalEffect / nTotalEffect * 100)) or ' - '))
+			hItem:Lookup('Text_TargetPercent'):SetText((nTotalEffect > 0 and _L('%.1f%%', (i == 1 and ceil or floor)(p.nTotalEffect / nTotalEffect * 1000) / 10) or ' - '))
 		end
 		hList:FormatAllItemPos()
 	else
