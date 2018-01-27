@@ -3,10 +3,10 @@
 -- @Last Modified by:   Administrator
 -- @Last Modified time: 2016-12-29 11:13:26
 
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Toolbox/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_TeamTools/lang/")
 local PR = {}
 local PR_MAX_LEVEL = 95
-local PR_INI_PATH      = MY.GetAddonInfo().szRoot .. "MY_Toolbox/ui/MY_PartyRequest.ini"
+local PR_INI_PATH = MY.GetAddonInfo().szRoot .. "MY_TeamTools/ui/MY_PartyRequest.ini"
 local PR_EQUIP_REQUEST = {}
 local PR_MT = { __call = function(me, szName)
 	for k, v in ipairs(me) do

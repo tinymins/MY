@@ -41,4 +41,18 @@ data = {
 	["TRANSFER_LIFE"] = "吸取生命",
 	["TRANSFER_MANA"] = "吸取內力",
 	["Clear Record"] = "清空記錄",
+
+	["Party Request"] = "優化入隊申請列表",
+	["Clear list and close?"] = "清空列表並關閉？",
+	["Details"] = "詢問詳情",
+	["loading..."] = "讀取中..",
+	["If it is always loading, the target may not install plugin or refuse."] = "如果一直提示加載中，可能是對方沒有安裝插件或者拒絕了您的請求",
+	["[%s] want to see your char info, OK?"] = "[%s] 想知曉您的當前屬性是否告知？",
+	["Allow view charinfo"] = "允許其他人查看屬性",
+	["Auto Refuse No full level Player"] = "自動拒絕未滿級玩家",
+	["Auto Refuse %s(%s %d%s) Party request"] = "自動拒絕了 %s(%s %d%s) 的組隊請求",
+	["Asking..."] = "正在征詢對方意見\n如果長時間未響應可能是對方沒有安裝插件。",
+	["Syncing..."] = "正在同步數據...",
+	["Refuse request"] = "對方拒絕了您的請求！",
+	["Party limit"] = "必須和對方組隊",
 }

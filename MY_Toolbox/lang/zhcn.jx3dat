@@ -121,18 +121,4 @@ data = {
 
     ['auto restore team info in arena'] = '竞技场中自动恢复上次组队信息',
     ['auto cancel hide player in arena and battlefield'] = '竞技场与战场中自动取消屏蔽玩家与NPC',
-
-	["Party Request"] = "优化入队申请列表",
-	["Clear list and close?"] = "清空列表并关闭？",
-	["Details"] = "询问详情",
-	["loading..."] = "读取中..",
-	["If it is always loading, the target may not install plugin or refuse."] = "如果一直提示加载中，可能是对方没有安装插件或者拒绝了您的请求",
-	["[%s] want to see your char info, OK?"] = "[%s] 想知晓您的当前属性是否告知？",
-	["Allow view charinfo"] = "允许其他人查看属性",
-	["Auto Refuse No full level Player"] = "自动拒绝未满级玩家",
-	["Auto Refuse %s(%s %d%s) Party request"] = "自动拒绝了 %s(%s %d%s) 的组队请求",
-	["Asking..."] = "正在征询对方意见\n如果长时间未响应可能是对方没有安装插件。",
-	["Syncing..."] = "正在同步数据...",
-	["Refuse request"] = "对方拒绝了您的请求！",
-	["Party limit"] = "必须和对方组队",
 }

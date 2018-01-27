@@ -2,7 +2,7 @@
 -- @Date:   2016-01-04 15:18:23
 -- @Last Modified by:   Webster
 -- @Last Modified time: 2016-01-20 09:34:24
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Toolbox/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_TeamTools/lang/")
 
 MY_CharInfo = {
 	bEnable = true,
