@@ -990,7 +990,7 @@ function CTM:RefreshBuff()
 			local handle = CTM_CACHE[v]:Lookup("Handle_Buff_Boxes")
 			for dwID, data in pairs(CTM_BUFF_CACHE) do
 				local KBuff = MY_GetBuff(p, dwID, data.nLevel)
-				local key = dwID .. "," .. tostring(data)
+				local key = dwID .. "," .. data.nLevel
 				local item = handle:Lookup(key)
 				local nEndFrame, _, nStackNum
 				-- init check
