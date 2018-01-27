@@ -1354,16 +1354,19 @@ do
 end
 
 function MY.ColorName2RGB(name)
-	return COLOR_NAME_RGB[name]
+	if not COLOR_NAME_RGB[name] then
+		return
+	end
+	return unpack(COLOR_NAME_RGB[name])
 end
 
 local HUMAN_COLOR_CACHE = setmetatable({}, {__mode = "v", __index = COLOR_NAME_RGB})
 function MY.HumanColor2RGB(name)
-	if HUMAN_COLOR_CACHE[name] == nil then
+	if not HUMAN_COLOR_CACHE[name] then
 		local r, g, b, a = MY.Hex2RGB(name)
-		HUMAN_COLOR_CACHE[name] = r and {r, g, b, a} or false
+		HUMAN_COLOR_CACHE[name] = {r, g, b, a}
 	end
-	return HUMAN_COLOR_CACHE[name] or nil
+	return unpack(HUMAN_COLOR_CACHE[name])
 end
 end
 

@@ -1040,27 +1040,53 @@ function CTM:RefreshBuff()
 						end
 					end
 					-- create
-					if not item and handle:GetItemCount() < CFG.nMaxShowBuff then
+					if not item and handle:GetItemCount() <= CFG.nMaxShowBuff then
+						-- Ãè±ß
+						local r, g, b, a
+						if data.col then
+							r, g, b, a = MY.HumanColor2RGB(data.col)
+						end
 						item = handle:AppendItemFromData(Cataclysm_Main.GetFrame().hBuff, key)
 						if not data.col then
 							item:Lookup("Shadow"):Hide()
 						else
-							local r, g, b, a = unpack(MY.HumanColor2RGB(data.col) or {255, 255, 0})
 							item:Lookup("Shadow"):SetAlpha(a or data.nColAlpha or 192)
-							item:Lookup("Shadow"):SetColorRGB(r, g, b)
+							item:Lookup("Shadow"):SetColorRGB(r or 255, g or 255, b or 0)
 						end
-						if data.nPriority then
-							local index = handle:GetItemCount() - 1
-							for i = 0, index - 1 do
+						-- ÅÅÐò
+						local fromIndex, toIndex = handle:GetItemCount() - 1
+						if not data.nPriority then
+							for i = 0, fromIndex - 1 do
 								local item = handle:Lookup(i)
-								if not item.nPriority or data.nPriority < item.nPriority then
-									for j = i, index - 1 do
-										handle:ExchangeItemIndex(j, index)
-									end
+								if item.nPriority and item.nPriority < 0 then
+									toIndex = i
+									break
 								end
 							end
-							item.nPriority = data.nPriority
+						elseif data.nPriority >= 0 then
+							for i = 0, fromIndex - 1 do
+								local item = handle:Lookup(i)
+								if not item.nPriority or item.nPriority < 0 or data.nPriority < item.nPriority then
+									toIndex = i
+									break
+								end
+							end
+						else
+							for i = 0, fromIndex - 1 do
+								local item = handle:Lookup(i)
+								if item.nPriority and item.nPriority < 0 and data.nPriority > item.nPriority then
+									toIndex = i
+									break
+								end
+							end
 						end
+						if toIndex then
+							for i = fromIndex, toIndex + 1, -1 do
+								handle:ExchangeItemIndex(i, i - 1)
+							end
+						end
+						item.nPriority = data.nPriority
+						-- ÎÄ×Ö´óÐ¡
 						local szName, icon = MY.GetBuffName(data.dwID, data.nLevelEx)
 						if data.nIcon and tonumber(data.nIcon) then
 							icon = data.nIcon
@@ -1078,13 +1104,16 @@ function CTM:RefreshBuff()
 							fScale = CFG.fBuffScale
 						end
 						item:Scale(fScale, fScale)
-						item:Lookup("Text_Time"):SetFontScale(fScale * 0.85)
-						item:Lookup("Text_StackNum"):SetFontScale(fScale * 0.85)
-						item:Lookup("Text_StackNum"):SetFontColor(255, 255, 255)
-						item:Lookup("Text_Reminder"):SetText(data.szReminder)
-						item:Lookup("Text_Reminder"):SetVisible(CFG.bShowBuffReminder)
-						item:Lookup("Text_Reminder"):SetFontScale(fScale * 1.1)
-						item:Lookup("Text_Reminder"):SetFontColor(unpack(MY.HumanColor2RGB(data.col) or {255, 255, 255}))
+						local txtTime = item:Lookup("Text_Time")
+						txtTime:SetFontScale(fScale * (item:GetH() / txtTime:GetH()) * 0.4)
+						local txtStackNum = item:Lookup("Text_StackNum")
+						txtStackNum:SetFontScale(fScale * (item:GetH() / txtStackNum:GetH()) * 0.6)
+						txtStackNum:SetFontColor(255, 255, 255)
+						local txtReminder = item:Lookup("Text_Reminder")
+						txtReminder:SetText(data.szReminder)
+						txtReminder:SetVisible(CFG.bShowBuffReminder)
+						txtReminder:SetFontScale(fScale * (item:GetH() / txtReminder:GetH()) * 0.6)
+						txtReminder:SetFontColor(r or 255, g or 255, b or 255)
 						handle:FormatAllItemPos()
 					end
 					-- revise
