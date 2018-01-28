@@ -1126,7 +1126,7 @@ function CTM:RefreshBuff()
 								if nTime >= 0 then
 									r, g, b = 255, 0, 0
 								end
-							elseif nTime <= 15 then
+							elseif nTime <= 30 then
 								r, g, b = 255, 255, 0
 							end
 							if r and g and b then
