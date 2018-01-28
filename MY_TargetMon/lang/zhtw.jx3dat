@@ -14,6 +14,7 @@ data = {
     ['Show cd ready spark'] = '結束特效',
     ['Show cd bar'] = '倒計時條',
     ['Show name'] = '顯示名稱',
+    ['Ignore system ui scale'] = '禁系統縮放',
 
     ['Please input name:'] = '請輸入名稱：',
     ['Display %d eachline.'] = '每行%d個',

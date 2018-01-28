@@ -55,25 +55,58 @@ function D.UpdateAnchor(frame)
 	frame:CorrectPos()
 end
 
+function D.UpdateScale(frame)
+	-- 禁止系统UI缩放
+	local uiscale = Station.GetUIScale()
+	if not frame.uiscale then
+		frame.uiscale = 1
+	end
+	if frame.uiscale ~= uiscale then
+		if frame.config.ignoreSystemUIScale and frame.uiscale then
+			local hList, hItem, txt = frame:Lookup("", "Handle_List")
+			for i = 0, hList:GetItemCount() - 1 do
+				hItem = hList:Lookup(i)
+				txt = hItem:Lookup("Handle_Box/Text_ShortName")
+				txt:SetFontScale(txt:GetFontScale() * frame.uiscale / uiscale)
+				txt = hItem:Lookup("Handle_Bar/Text_Name")
+				txt:SetFontScale(txt:GetFontScale() * frame.uiscale / uiscale)
+				txt = hItem:Lookup("Handle_Bar/Text_Process")
+				txt:SetFontScale(txt:GetFontScale() * frame.uiscale / uiscale)
+			end
+			frame:Scale(frame.uiscale / uiscale, frame.uiscale / uiscale)
+		end
+		frame.uiscale = uiscale
+	end
+	-- 界面自定义缩放
+	if not frame.scale then
+		frame.scale = 1
+	end
+	local scale = frame.config.scale
+	if scale ~= frame.scale then
+		local relScale = scale / frame.scale
+		frame:Scale(relScale, relScale)
+		frame.scale = frame.config.scale
+	end
+end
+
+local function GetScale(config)
+	local scale = config.scale
+	if config.ignoreSystemUIScale then
+		scale = scale / Station.GetUIScale()
+	end
+	return scale, scale
+end
+
 local function ReloadFrame(frame)
 	local config, index = MY_TargetMon.GetFrameData(frame:GetName():sub(#"MY_TargetMon#" + 1))
 	if not config then
 		return Wnd.CloseWindow(frame)
 	end
-	this.index = index
-	this.config = config
-
-	if not frame.scale then
-		frame.scale = 1
-	end
-	if config.scale ~= frame.scale then
-		local relScale = config.scale / frame.scale
-		frame:Scale(relScale, relScale)
-		frame.scale = config.scale
-	end
+	frame.index = index
+	frame.config = config
+	D.UpdateScale(frame)
 
 	local hTotal, hList = frame.hTotal, frame.hList
-
 	frame.tItem = {}
 	hList:Clear()
 	local nItemW, nItemH, nWidth, nHeight, nCount = 0, 0, 0, 0, 0
@@ -129,7 +162,7 @@ local function ReloadFrame(frame)
 		end
 
 		-- 缩放先
-		hItem:Scale(config.scale, config.scale)
+		hItem:Scale(GetScale(config))
 		-- Box部分
 		box:SetObject(UI_OBJECT.BUFF, mon.id, 1, 1)
 		box:SetObjectIcon(mon.iconid or 13)
@@ -172,7 +205,7 @@ local function ReloadFrame(frame)
 		end
 
 		-- 倒计时条
-		local fontScale = max(0.85, config.scale * 0.58)
+		local fontScale = max(0.85, GetScale(config) * 0.58)
 		if config.cdBar then
 			txtProcess:SetW(config.cdBarWidth - 10)
 			txtProcess:SetText("")
@@ -239,8 +272,8 @@ local function ReloadFrame(frame)
 	frame:SetMousePenetrable(config.penetrable)
 
 	frame.w, frame.h = frame:GetSize()
-	frame.dragW = (nWidth) == 0 and 200 or (nWidth * config.scale)
-	frame.dragH = (nItemH) == 0 and 200 or (nItemH * config.scale)
+	frame.dragW = nWidth == 0 and 200 or nWidth
+	frame.dragH = nItemH == 0 and 200 or nItemH
 	D.UpdateAnchor(frame)
 end
 
@@ -693,6 +726,7 @@ function MY_TargetMon_Base.OnEvent(event)
 		end
 		ReloadFrame(this)
 	elseif event == "UI_SCALED" then
+		D.UpdateScale(this)
 		D.UpdateAnchor(this)
 	end
 end
