@@ -133,7 +133,7 @@ MY.RegisterPanel("TalkEx", _L["talk ex"], _L['Chat'], "UI/Image/UICommon/Science
 	ui:append("WndEditBox", "WndEdit_Talk"):children('#WndEdit_Talk'):pos(25,15)
 	  :size(w-136,208):multiLine(true)
 	  :text(MY_TalkEx.szTalk)
-	  :change(function() MY_TalkEx.szTalk = this:GetText() end)
+	  :change(function(text) MY_TalkEx.szTalk = text end)
 	-- º°»°ÆµµÀ
 	local y = 12
 	local nChannelCount = #_C.tTalkChannels
