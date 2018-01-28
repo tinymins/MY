@@ -406,7 +406,7 @@ MY_Recount.UpdateUI = function(data)
 			hItem:Lookup('Image_PerBack'):SetAlpha((css.a or 255) / 255 * 100)
 			hItem:Lookup('Shadow_PerFore'):SetAlpha(css.a or 255)
 			hItem:Lookup('Shadow_PerBack'):SetAlpha((css.a or 255) / 255 * 100)
-			hItem:Lookup('Text_L'):SetText(p.szName)
+			hItem:Lookup('Text_L'):SetText((p.szName:gsub("#.*", "")))
 			hItem.id = p.id
 		end
 		if hItem:GetIndex() ~= i - 1 then
@@ -662,7 +662,7 @@ _C.OnDetailFrameBreathe = function()
 	for i, p in ipairs(aResult) do
 		local hItem = hList:AppendItemFromIni(_C.szIniDetail, 'Handle_SkillItem')
 		hItem:Lookup('Text_SkillNo'):SetText(i)
-		hItem:Lookup('Text_SkillName'):SetText(p.szName)
+		hItem:Lookup('Text_SkillName'):SetText((p.szName:gsub("#.*", "")))
 		hItem:Lookup('Text_SkillCount'):SetText(p.nCount)
 		hItem:Lookup('Text_SkillTotal'):SetText(p.nTotalEffect)
 		hItem:Lookup('Text_SkillPercentage'):SetText(nTotalEffect > 0 and _L('%.1f%%', (i == 1 and ceil or floor)(p.nTotalEffect / nTotalEffect * 1000) / 10) or ' - ')
@@ -754,7 +754,7 @@ _C.OnDetailFrameBreathe = function()
 		for i, p in ipairs(aResult) do
 			local hItem = hList:AppendItemFromIni(_C.szIniDetail, 'Handle_TargetItem')
 			hItem:Lookup('Text_TargetNo'):SetText(i)
-			hItem:Lookup('Text_TargetName'):SetText(p.szName)
+			hItem:Lookup('Text_TargetName'):SetText((p.szName:gsub("#.*", "")))
 			hItem:Lookup('Text_TargetTotal'):SetText(p.nTotalEffect)
 			hItem:Lookup('Text_TargetMax'):SetText(p.nMaxEffect)
 			hItem:Lookup('Text_TargetHit'):SetText(p.nHitCount)
@@ -866,7 +866,7 @@ MY_Recount.OnItemRefreshTip = function()
 		local w, h = this:GetSize()
 		local tRec = DataDisplay[SZ_CHANNEL_KEY[MY_Recount.nChannel]].Statistics[id]
 		if tRec then
-			local szXml = ''
+			local szXml = GetFormatText((DataDisplay.Namelist[id] or id) .. "\n", 60, 255, 45, 255)
 			local szColon = g_tStrings.STR_COLON
 			local t = {}
 			for szSkillName, p in pairs(tRec.Skill) do
