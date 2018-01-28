@@ -1,2 +1,3 @@
 Farme	Left	Top	Width	High	File
 0	0	0	512	256	D:\Program Files\_Game\Kingsoft\jx3_dev\bin\zhcn\interface\MY\!src-dist\UITex\Poster.tga
+1	0	258	512	256	F:\JX3HD\bin\zhcn_hd\interface\MY\!src-dist\UITex\Poster1.tga

@@ -879,7 +879,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 		-- »¶Ó­Ò³
 		local ui = MY.UI(wnd)
 		local w, h = ui:size()
-		ui:append("Image", { name = 'Image_Adv', x = 0, y = 0, image = _UITEX_POSTER_, imageframe = 0 })
+		ui:append("Image", { name = 'Image_Adv', x = 0, y = 0, image = _UITEX_POSTER_, imageframe = (GetTime() % 2) })
 		ui:append("Text", { name = 'Text_Adv', x = 10, y = 300, w = 557, font = 200 })
 		ui:append("Text", {
 			name = 'Text_ChangeLog',
