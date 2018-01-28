@@ -536,6 +536,17 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig, Add)
 		autoenable = function() return config.enable end,
 	})
 
+	ui:append("WndCheckBox", {
+		x = x + 200, y = y, w = 120,
+		text = _L['Ignore system ui scale'],
+		checked = config.ignoreSystemUIScale,
+		oncheck = function(bCheck)
+			config.ignoreSystemUIScale = bCheck
+			D.CheckFrame(config)
+		end,
+		autoenable = function() return config.enable end,
+	})
+
 	ui:append("WndSliderBox", {
 		x = w - 250, y = y,
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
