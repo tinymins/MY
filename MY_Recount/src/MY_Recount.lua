@@ -1081,6 +1081,16 @@ MY_Recount.GetMenu = function()
 			fnDisable = function()
 				return not MY.GetStorage('BoolValues.MY_Recount_Enable')
 			end,
+		}, {
+			szOption = _L['ignore zero value effect'],
+			bCheck = true,
+			bChecked = MY_Recount.Data.bIgnoreZeroEffect,
+			fnAction = function()
+				MY_Recount.Data.bIgnoreZeroEffect = not MY_Recount.Data.bIgnoreZeroEffect
+			end,
+			fnDisable = function()
+				return not MY.GetStorage('BoolValues.MY_Recount_Enable')
+			end,
 		},
 		{   -- 切换统计类型
 			szOption = _L['switch recount mode'],
