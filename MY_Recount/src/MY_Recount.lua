@@ -1233,7 +1233,7 @@ MY_Recount.GetHistoryMenu = function()
 	for _, data in ipairs(MY_Recount.Data.Get()) do
 		if data.UUID and data.nTimeDuring then
 			local t1 = {
-				szOption = (data.szBossName or '') .. ' (' .. MY.FormatTimeCount('M:ss', data.nTimeDuring) .. ')',
+				szOption = (data.szBossName or ''):gsub("#.*", "") .. ' (' .. MY.FormatTimeCount('M:ss', data.nTimeDuring) .. ')',
 				rgb = (data == DataDisplay and {255, 255, 0}) or nil,
 				fnAction = function()
 					MY_Recount.DisplayData(data)
