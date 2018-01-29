@@ -706,4 +706,10 @@ function GVoiceBase_ForbidMember(dwMemberID, Forbid)
 end
 end
 
+if not Table_IsTreasureBattleFieldMap then
+function Table_IsTreasureBattleFieldMap()
+	return false
+end
+end
+
 UpdateItemInfoBoxObject = UpdataItemInfoBoxObject
