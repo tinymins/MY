@@ -27,8 +27,9 @@ data = {
     ['show nodata teammate'             ] = '顯示無數據的隊友',
     ['use system time count'            ] = '使用官方時間算法',
     ['distinct target id with same name'] = '區分同名字的目標',
-    ['distinct effect id with same name'] = '區分同名字的技能',
-    ['record anonymous effect'          ] = '顯示沒名字的技能',
+    ['distinct effect id with same name'] = '區分同名字的記錄',
+    ['record anonymous effect'          ] = '顯示沒名字的記錄',
+    ['ignore zero value effect'         ] = '忽略零數值的記錄',
     ['theme'                            ] = '自定界面風格選擇',
     ['max history'                      ] = '最大曆史記錄設置',
 

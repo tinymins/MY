@@ -183,6 +183,7 @@ MY_Recount.Data = {}
 MY_Recount.Data.nMaxHistory       = 10
 MY_Recount.Data.nMinFightTime     = 30
 MY_Recount.Data.bRecAnonymous     = true
+MY_Recount.Data.bIgnoreZeroEffect = true
 MY_Recount.Data.bDistinctTargetID = false
 MY_Recount.Data.bDistinctEffectID = false
 
@@ -220,6 +221,7 @@ function MY_Recount.Data.LoadData(bLoadHistory)
 		MY_Recount.Data.nMaxHistory       = data.nMaxHistory   or 10
 		MY_Recount.Data.nMinFightTime     = data.nMinFightTime or 30
 		MY_Recount.Data.bRecAnonymous     = MY.FormatDataStructure(data.bRecAnonymous, true)
+		MY_Recount.Data.bIgnoreZeroEffect = MY.FormatDataStructure(data.bIgnoreZeroEffect, true)
 		MY_Recount.Data.bDistinctTargetID = MY.FormatDataStructure(data.bDistinctTargetID, false)
 		MY_Recount.Data.bDistinctEffectID = MY.FormatDataStructure(data.bDistinctEffectID, false)
 	end
@@ -233,6 +235,7 @@ function MY_Recount.Data.SaveData(bSaveHistory)
 		nMaxHistory       = MY_Recount.Data.nMaxHistory,
 		nMinFightTime     = MY_Recount.Data.nMinFightTime,
 		bRecAnonymous     = MY_Recount.Data.bRecAnonymous,
+		bIgnoreZeroEffect = MY_Recount.Data.bIgnoreZeroEffect,
 		bDistinctTargetID = MY_Recount.Data.bDistinctTargetID,
 		bDistinctEffectID = MY_Recount.Data.bDistinctEffectID,
 	}
@@ -428,7 +431,9 @@ function MY_Recount.Data.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffect
 	end
 
 	-- 过滤掉无伤害无治疗的命中效果记录
-	if nSkillResult == SKILL_RESULT.HIT or nSkillResult == SKILL_RESULT.CRITICAL then
+	if MY_Recount.Data.bIgnoreZeroEffect and (
+		nSkillResult == SKILL_RESULT.HIT or nSkillResult == SKILL_RESULT.CRITICAL
+	) then
 		local bRec
 		for _, v in pairs(tResult) do
 			if v > 0 then
@@ -480,7 +485,7 @@ function MY_Recount.Data.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffect
 		if nTherapy > 0 then -- 有治疗
 			MY_Recount.Data.AddHealRecord(hCaster, hTarget, szHealEffectName, nTherapy, nEffectTherapy, nSkillResult)
 		end
-		if nDamage > 0 then -- 有伤害
+		if nDamage > 0 or nTherapy == 0 then -- 有伤害 或者 无伤害无治疗的效果
 			MY_Recount.Data.AddDamageRecord(hCaster, hTarget, szDamageEffectName, nDamage, nEffectDamage, nSkillResult)
 		end
 	elseif nSkillResult == SKILL_RESULT.BLOCK or  -- 格挡
