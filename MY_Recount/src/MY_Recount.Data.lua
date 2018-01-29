@@ -183,7 +183,7 @@ MY_Recount.Data = {}
 MY_Recount.Data.nMaxHistory       = 10
 MY_Recount.Data.nMinFightTime     = 30
 MY_Recount.Data.bRecAnonymous     = true
-MY_Recount.Data.bIgnoreZeroEffect = true
+MY_Recount.Data.bIgnoreZeroEffect = false
 MY_Recount.Data.bDistinctTargetID = false
 MY_Recount.Data.bDistinctEffectID = false
 
@@ -221,7 +221,7 @@ function MY_Recount.Data.LoadData(bLoadHistory)
 		MY_Recount.Data.nMaxHistory       = data.nMaxHistory   or 10
 		MY_Recount.Data.nMinFightTime     = data.nMinFightTime or 30
 		MY_Recount.Data.bRecAnonymous     = MY.FormatDataStructure(data.bRecAnonymous, true)
-		MY_Recount.Data.bIgnoreZeroEffect = MY.FormatDataStructure(data.bIgnoreZeroEffect, true)
+		MY_Recount.Data.bIgnoreZeroEffect = MY.FormatDataStructure(data.bIgnoreZeroEffect, false)
 		MY_Recount.Data.bDistinctTargetID = MY.FormatDataStructure(data.bDistinctTargetID, false)
 		MY_Recount.Data.bDistinctEffectID = MY.FormatDataStructure(data.bDistinctEffectID, false)
 	end
