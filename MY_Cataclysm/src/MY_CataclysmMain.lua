@@ -1749,7 +1749,9 @@ local function GetTextList(szText)
 					tab.szReminder = val:sub(2, -2)
 				end
 			end
-			insert(t, tab)
+			if tab.dwID or tab.szName then
+				insert(t, tab)
+			end
 		end
 	end
 	return t
