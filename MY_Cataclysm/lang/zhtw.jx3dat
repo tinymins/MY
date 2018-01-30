@@ -88,4 +88,5 @@ data = {
 	["Restore official"] = "恢複官方預設",
 	["Restore cataclysm"] = "恢複Cataclysm預設",
 	["Scale %d%%"] = "縮放%d%%",
+	["Target assist delay %dms."] = "延遲%d毫秒選中目標。",
 }

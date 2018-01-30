@@ -31,6 +31,7 @@ data = {
 	bAutoBuffSize        = true,
 	bTempTargetFightTip  = false,
 	bTempTargetEnable    = false,
+	nTempTargetDelay     = 75,
 	fScaleX              = 1,
 	fScaleY              = 1,
 	tDistanceLevel       = { 20, 22, 200 },

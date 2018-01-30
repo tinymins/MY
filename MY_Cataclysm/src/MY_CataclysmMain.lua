@@ -1049,7 +1049,15 @@ function PS.OnPanelActive(frame)
 	x = X
 	y = y + ui:append("Text", { x = x, y = y, text = g_tStrings.OTHER, font = 27 }, true):height()
 
-	x = x + 10
+	x = X + 10
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y, text = _L["Don't show Tip in fight"],
+		checked = Cataclysm_Main.bTempTargetFightTip,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bTempTargetFightTip = bCheck
+		end,
+	}, true):autoWidth():width()
+
 	x = x + ui:append("WndCheckBox", {
 		x = x, y = y, text = g_tStrings.STR_RAID_TARGET_ASSIST,
 		checked = Cataclysm_Main.bTempTargetEnable,
@@ -1058,14 +1066,18 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():width()
 
-	y = y + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Don't show Tip in fight"],
-		checked = Cataclysm_Main.bTempTargetFightTip,
-		oncheck = function(bCheck)
-			Cataclysm_Main.bTempTargetFightTip = bCheck
+	x = x + ui:append("WndSliderBox", {
+		x = x, y = y - 1,
+		value = Cataclysm_Main.nTempTargetDelay / 75,
+		range = {0, 8},
+		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		onchange = function(val)
+			Cataclysm_Main.nTempTargetDelay = val * 75
 		end,
-	}, true):autoWidth():height()
+		textfmt = function(val) return _L("Target assist delay %dms.", val * 75) end,
+	}):autoWidth():width()
 
+	y = y + 25
 	-- y = y + ui:append("WndCheckBox", { x = 10, y = nY, text = _L["Faster Refresh HP(Greater performance loss)"], checked = Cataclysm_Main.bFasterHP, enable = false })
 	-- :Click(function(bCheck)
 	-- 	Cataclysm_Main.bFasterHP = bCheck
