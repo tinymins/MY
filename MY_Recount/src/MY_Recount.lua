@@ -69,8 +69,8 @@ local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Recount/lang/")
 local _C = {
 	szCssFile   = 'config/MY_RECOUNT/style.jx3dat',
 	szIniRoot   = MY.GetAddonInfo().szRoot .. 'MY_Recount/ui/',
-	szIniFile   = MY.GetAddonInfo().szRoot .. 'MY_Recount/ui/Recount.ini',
-	szIniDetail = MY.GetAddonInfo().szRoot .. 'MY_Recount/ui/ShowDetail.ini',
+	szIniFile   = MY.GetAddonInfo().szRoot .. 'MY_Recount/ui/MY_Recount.ini',
+	szIniDetail = MY.GetAddonInfo().szRoot .. 'MY_Recount/ui/MY_Recount_Detail.ini',
 	tRandFrame  = {
 		169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182,
 		183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193
@@ -581,232 +581,6 @@ function MY_Recount.OnFrameDragEnd()
 	MY.SetStorage('FrameAnchor.MY_Recount', GetFrameAnchor(this))
 end
 
--- ShowDetail界面时间相应
-function _C.OnDetailFrameBreathe()
-	if this.nLastRedrawFrame and
-	GetLogicFrameCount() - this.nLastRedrawFrame > 0 and
-	GetLogicFrameCount() - this.nLastRedrawFrame < MY_Recount.nDrawInterval then
-		return
-	end
-	this.nLastRedrawFrame = GetLogicFrameCount()
-
-	local id        = this.id
-	local szChannel = this.szChannel
-	if tonumber(id) then
-		id = tonumber(id)
-	end
-	-- 获取数据
-	local tData = DataDisplay[szChannel].Statistics[id]
-	if not tData then
-		this:Lookup('WndScroll_Detail', 'Handle_DetailList'):Clear()
-		this:Lookup('WndScroll_Skill' , 'Handle_SkillList' ):Clear()
-		this:Lookup('WndScroll_Target', 'Handle_TargetList'):Clear()
-		return
-	end
-
-	local szPrimarySort   = this.szPrimarySort or 'Skill'
-	local szSecondarySort = (szPrimarySort == 'Skill' and 'Target') or 'Skill'
-
-	--------------- 一、技能列表更新 -----------------
-	-- 数据收集
-	local aResult, nTotalEffect = {}, tData.nTotalEffect
-	if szPrimarySort == 'Skill' then
-		for szSkillName, p in pairs(tData.Skill) do
-			table.insert(aResult, {
-				szKey        = szSkillName   ,
-				szName       = szSkillName   ,
-				nCount       = p.nCount      ,
-				nTotalEffect = p.nTotalEffect,
-			})
-		end
-	else
-		for id, p in pairs(tData.Target) do
-			table.insert(aResult, {
-				szKey        = id                              ,
-				szName       = MY_Recount.Data.GetNameAusID(id),
-				nCount       = p.nCount                        ,
-				nTotalEffect = p.nTotalEffect                  ,
-			})
-		end
-	end
-	table.sort(aResult, function(p1, p2)
-		return p1.nTotalEffect > p2.nTotalEffect
-	end)
-	-- 默认选中第一个
-	if this.bFirstRendering then
-		if aResult[1] then
-			if szPrimarySort == 'Skill' then
-				this.szSelectedSkill  = aResult[1].szKey
-			else
-				this.szSelectedTarget = aResult[1].szKey
-			end
-		end
-		this.bFirstRendering = nil
-	end
-	local szSelected
-	local szSelectedSkill  = this.szSelectedSkill
-	local szSelectedTarget = this.szSelectedTarget
-	if szPrimarySort == 'Skill' then
-		szSelected = this.szSelectedSkill
-	else
-		szSelected = this.szSelectedTarget
-	end
-	-- 界面重绘
-	local hSelectedItem
-	this:Lookup('WndScroll_Skill'):SetSize(480, 96)
-	this:Lookup('WndScroll_Skill', ''):SetSize(480, 96)
-	this:Lookup('WndScroll_Skill', ''):FormatAllItemPos()
-	local hList = this:Lookup('WndScroll_Skill', 'Handle_SkillList')
-	hList:SetSize(480, 80)
-	hList:Clear()
-	for i, p in ipairs(aResult) do
-		local hItem = hList:AppendItemFromIni(_C.szIniDetail, 'Handle_SkillItem')
-		hItem:Lookup('Text_SkillNo'):SetText(i)
-		hItem:Lookup('Text_SkillName'):SetText((p.szName:gsub("#.*", "")))
-		hItem:Lookup('Text_SkillCount'):SetText(p.nCount)
-		hItem:Lookup('Text_SkillTotal'):SetText(p.nTotalEffect)
-		hItem:Lookup('Text_SkillPercentage'):SetText(nTotalEffect > 0 and _L('%.1f%%', (i == 1 and ceil or floor)(p.nTotalEffect / nTotalEffect * 1000) / 10) or ' - ')
-
-		if szPrimarySort == 'Skill' and szSelectedSkill == p.szKey or
-		szPrimarySort == 'Target' and szSelectedTarget == p.szKey then
-			hSelectedItem = hItem
-			hItem:Lookup('Shadow_SkillEntry'):Show()
-		end
-		hItem.szKey = p.szKey
-		hItem.OnItemLButtonDown = _C.OnDetailItemLButtonDown
-	end
-	hList:FormatAllItemPos()
-
-	if szSelected and tData[szPrimarySort][szSelected] then
-		this:Lookup('', 'Handle_Spliter'):Show()
-		--------------- 二、技能释放结果列表更新 -----------------
-		-- 数据收集
-		local aResult, nTotalEffect, nCount = {}, tData[szPrimarySort][szSelected].nTotalEffect, tData[szPrimarySort][szSelected].nCount
-		for nSkillResult, p in pairs(tData[szPrimarySort][szSelected].Detail) do
-			table.insert(aResult, {
-				nCount     = p.nCount    ,
-				nMinEffect = p.nMinEffect,
-				nAvgEffect = p.nAvgEffect,
-				nMaxEffect = p.nMaxEffect,
-				nTotalEffect = p.nTotalEffect,
-				szSkillResult = SZ_SKILL_RESULT[nSkillResult],
-			})
-		end
-		table.sort(aResult, function(p1, p2)
-			return p1.nAvgEffect > p2.nAvgEffect
-		end)
-		-- 界面重绘
-		this:Lookup('WndScroll_Detail'):Show()
-		local hList = this:Lookup('WndScroll_Detail', 'Handle_DetailList')
-		hList:Clear()
-		for i, p in ipairs(aResult) do
-			local hItem = hList:AppendItemFromIni(_C.szIniDetail, 'Handle_DetailItem')
-			hItem:Lookup('Text_DetailNo'):SetText(i)
-			hItem:Lookup('Text_DetailType'):SetText(p.szSkillResult)
-			hItem:Lookup('Text_DetailMin'):SetText(p.nMinEffect)
-			hItem:Lookup('Text_DetailAverage'):SetText(p.nAvgEffect)
-			hItem:Lookup('Text_DetailMax'):SetText(p.nMaxEffect)
-			hItem:Lookup('Text_DetailCount'):SetText(p.nCount)
-			hItem:Lookup('Text_DetailPercent'):SetText(nCount > 0 and _L('%.1f%%', (i == 1 and ceil or floor)(p.nCount / nCount * 1000) / 10) or ' - ')
-		end
-		hList:FormatAllItemPos()
-
-		-- 调整滚动条 增强用户体验
-		if hSelectedItem and not this:Lookup('WndScroll_Target'):IsVisible() then
-			-- 说明是刚从未选择状态切换过来 滚动条滚动到选中项
-			local hScroll = this:Lookup('WndScroll_Skill/Scroll_Skill_List')
-			hScroll:SetScrollPos(math.ceil(hScroll:GetStepCount() * hSelectedItem:GetIndex() / hSelectedItem:GetParent():GetItemCount()))
-		end
-
-		--------------- 三、技能释放结果列表更新 -----------------
-		-- 数据收集
-		local aResult, nTotalEffect = {}, tData[szPrimarySort][szSelected].nTotalEffect
-		if szPrimarySort == 'Skill' then
-			for id, p in pairs(tData.Skill[szSelectedSkill].Target) do
-				table.insert(aResult, {
-					nHitCount      = p.Count[SKILL_RESULT.HIT] or 0,
-					nMissCount     = p.Count[SKILL_RESULT.MISS] or 0,
-					nCriticalCount = p.Count[SKILL_RESULT.CRITICAL] or 0,
-					nMaxEffect     = p.nMaxEffect,
-					nTotalEffect   = p.nTotalEffect,
-					szName         = MY_Recount.Data.GetNameAusID(id, DataDisplay),
-				})
-			end
-		else
-			for szSkillName, p in pairs(tData.Target[szSelectedTarget].Skill) do
-				table.insert(aResult, {
-					nHitCount      = p.Count[SKILL_RESULT.HIT] or 0,
-					nMissCount     = p.Count[SKILL_RESULT.MISS] or 0,
-					nCriticalCount = p.Count[SKILL_RESULT.CRITICAL] or 0,
-					nMaxEffect     = p.nMaxEffect,
-					nTotalEffect   = p.nTotalEffect,
-					szName         = szSkillName,
-				})
-			end
-		end
-		table.sort(aResult, function(p1, p2)
-			return p1.nTotalEffect > p2.nTotalEffect
-		end)
-		-- 界面重绘
-		this:Lookup('WndScroll_Target'):Show()
-		local hList = this:Lookup('WndScroll_Target', 'Handle_TargetList')
-		hList:Clear()
-		for i, p in ipairs(aResult) do
-			local hItem = hList:AppendItemFromIni(_C.szIniDetail, 'Handle_TargetItem')
-			hItem:Lookup('Text_TargetNo'):SetText(i)
-			hItem:Lookup('Text_TargetName'):SetText((p.szName:gsub("#.*", "")))
-			hItem:Lookup('Text_TargetTotal'):SetText(p.nTotalEffect)
-			hItem:Lookup('Text_TargetMax'):SetText(p.nMaxEffect)
-			hItem:Lookup('Text_TargetHit'):SetText(p.nHitCount)
-			hItem:Lookup('Text_TargetCritical'):SetText(p.nCriticalCount)
-			hItem:Lookup('Text_TargetMiss'):SetText(p.nMissCount)
-			hItem:Lookup('Text_TargetPercent'):SetText((nTotalEffect > 0 and _L('%.1f%%', (i == 1 and ceil or floor)(p.nTotalEffect / nTotalEffect * 1000) / 10) or ' - '))
-		end
-		hList:FormatAllItemPos()
-	else
-		this:Lookup('WndScroll_Skill'):SetSize(480, 348)
-		this:Lookup('WndScroll_Skill', ''):SetSize(480, 348)
-		this:Lookup('WndScroll_Skill', 'Handle_SkillList'):SetSize(480, 332)
-		this:Lookup('WndScroll_Skill', 'Handle_SkillList'):FormatAllItemPos()
-		this:Lookup('WndScroll_Skill', ''):FormatAllItemPos()
-		this:Lookup('WndScroll_Detail'):Hide()
-		this:Lookup('WndScroll_Target'):Hide()
-		this:Lookup('', 'Handle_Spliter'):Hide()
-	end
-
-end
-function _C.OnDetailLButtonClick()
-	local name = this:GetName()
-	if name == 'Btn_Close' then
-		MY.RegisterEsc(this:GetRoot():GetTreePath())
-		Wnd.CloseWindow(this:GetRoot())
-	elseif name == 'Btn_Switch' then
-		if this:GetRoot().szPrimarySort == 'Skill' then
-			this:GetRoot().szPrimarySort = 'Target'
-		else
-			this:GetRoot().szPrimarySort = 'Skill'
-		end
-		this:GetRoot().nLastRedrawFrame = 0
-	elseif name == 'Btn_Unselect' then
-		this:GetRoot().szSelectedSkill  = nil
-		this:GetRoot().szSelectedTarget = nil
-		this:GetRoot().nLastRedrawFrame = 0
-	elseif name == 'Btn_Issuance' then
-		PopupMenu(MY_Recount.GetDetailMenu(this:GetRoot()))
-	end
-end
-function _C.OnDetailItemLButtonDown()
-	local name = this:GetName()
-	if name == 'Handle_SkillItem' then
-		if this:GetRoot().szPrimarySort == 'Skill' then
-			this:GetRoot().szSelectedSkill = this.szKey
-		else
-			this:GetRoot().szSelectedTarget = this.szKey
-		end
-		this:GetRoot().nLastRedrawFrame = 0
-	end
-end
-
 function MY_Recount.OnItemLButtonClick()
 	local id = this.id
 	local name = this:GetName()
@@ -814,41 +588,9 @@ function MY_Recount.OnItemLButtonClick()
 		id = UI_GetClientPlayerID()
 		name = 'Handle_LI_' .. UI_GetClientPlayerID()
 	end
-	name:gsub('Handle_LI_(.+)', function()
-		local szChannel = SZ_CHANNEL_KEY[MY_Recount.nChannel]
-		if not Station.Lookup('Normal/MY_Recount_' .. id .. '_' .. szChannel) then
-			local frm = Wnd.OpenWindow(_C.szIniDetail, 'MY_Recount_' .. id .. '_' .. szChannel)
-			frm.id = id
-			frm.bFirstRendering = true
-			frm.szChannel = szChannel
-			frm.szPrimarySort = ((MY_Recount.nChannel == CHANNEL.DPS or MY_Recount.nChannel == CHANNEL.HPS) and 'Skill') or 'Target'
-			frm.szSecondarySort = ((MY_Recount.nChannel == CHANNEL.DPS or MY_Recount.nChannel == CHANNEL.HPS) and 'Target') or 'Skill'
-			frm:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
-			frm.OnFrameBreathe = _C.OnDetailFrameBreathe
-			frm.OnItemLButtonDown = _C.OnDetailItemLButtonDown
-			frm:Lookup('', 'Text_Default'):SetText(MY_Recount.Data.GetNameAusID(id, DataDisplay) .. ' ' .. SZ_CHANNEL[MY_Recount.nChannel])
-			frm:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_5'):SetText(g_tStrings.STR_HIT_NAME)
-			frm:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_6'):SetText(g_tStrings.STR_CS_NAME)
-			frm:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_7'):SetText(g_tStrings.STR_MSG_MISS)
-			MY.RegisterEsc(frm:GetTreePath(), function()
-				if Station.Lookup('Normal/MY_Recount_' .. id .. '_' .. szChannel) then
-					return true
-				else
-					MY.RegisterEsc('MY_Recount_' .. id .. '_' .. szChannel)
-				end
-			end, function()
-				if frm.szSelectedSkill or frm.szSelectedTarget then
-					frm.szSelectedSkill  = nil
-					frm.szSelectedTarget = nil
-				else
-					MY.RegisterEsc(frm:GetTreePath())
-					MY.UI(frm):remove()
-				end
-			end)
-
-			MY.UI(frm):children('Btn_Close'):click(_C.OnDetailLButtonClick)
-		end
-	end)
+	if id and name:find("Handle_LI_") == 1 then
+		Wnd.OpenWindow(_C.szIniDetail, "MY_Recount_Detail#" .. id .. "_" .. SZ_CHANNEL_KEY[MY_Recount.nChannel])
+	end
 end
 
 function MY_Recount.OnItemRefreshTip()
@@ -964,6 +706,307 @@ function MY_Recount.OnCheckBoxUncheck()
 	end
 end
 
+-------------------------------------------------------------------------------
+-- 详情面板
+-------------------------------------------------------------------------------
+MY_Recount_Detail = class()
+
+function MY_Recount_Detail.OnFrameCreate()
+	local frame = this
+	local id, szChannel = this:GetName():match("^MY_Recount_Detail#([^_]*)_([^_]*)$")
+	frame.id = tonumber(id) or id
+	frame.szChannel = szChannel
+	frame.bFirstRendering = true
+	frame.szPrimarySort = ((MY_Recount.nChannel == CHANNEL.DPS or MY_Recount.nChannel == CHANNEL.HPS) and 'Skill') or 'Target'
+	frame.szSecondarySort = ((MY_Recount.nChannel == CHANNEL.DPS or MY_Recount.nChannel == CHANNEL.HPS) and 'Target') or 'Skill'
+	frame:Lookup('', 'Text_Default'):SetText(MY_Recount.Data.GetNameAusID(id, DataDisplay) .. ' ' .. SZ_CHANNEL[MY_Recount.nChannel])
+	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_5'):SetText(g_tStrings.STR_HIT_NAME)
+	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_6'):SetText(g_tStrings.STR_CS_NAME)
+	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_7'):SetText(g_tStrings.STR_MSG_MISS)
+	frame:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
+
+	local function canEsc()
+		if frame and frame:IsValid() then
+			return true
+		else
+			MY.RegisterEsc(frame:GetName())
+		end
+	end
+	local function onEsc()
+		if frame.szSelectedSkill or frame.szSelectedTarget then
+			frame.szSelectedSkill  = nil
+			frame.szSelectedTarget = nil
+		else
+			MY.RegisterEsc(frame:GetName())
+			Wnd.CloseWindow(frame)
+		end
+	end
+	MY.RegisterEsc(frame:GetName(), canEsc, onEsc)
+end
+
+function MY_Recount_Detail.OnFrameBreathe()
+	if this.nLastRedrawFrame and
+	GetLogicFrameCount() - this.nLastRedrawFrame > 0 and
+	GetLogicFrameCount() - this.nLastRedrawFrame < MY_Recount.nDrawInterval then
+		return
+	end
+	this.nLastRedrawFrame = GetLogicFrameCount()
+
+	local id        = this.id
+	local szChannel = this.szChannel
+	if tonumber(id) then
+		id = tonumber(id)
+	end
+	-- 获取数据
+	local tData = DataDisplay[szChannel].Statistics[id]
+	if not tData then
+		this:Lookup('WndScroll_Detail', 'Handle_DetailList'):Clear()
+		this:Lookup('WndScroll_Skill' , 'Handle_SkillList' ):Clear()
+		this:Lookup('WndScroll_Target', 'Handle_TargetList'):Clear()
+		return
+	end
+
+	local szPrimarySort   = this.szPrimarySort or 'Skill'
+	local szSecondarySort = (szPrimarySort == 'Skill' and 'Target') or 'Skill'
+
+	--------------- 一、技能列表更新 -----------------
+	-- 数据收集
+	local aResult, nTotalEffect = {}, tData.nTotalEffect
+	if szPrimarySort == 'Skill' then
+		for szSkillName, p in pairs(tData.Skill) do
+			table.insert(aResult, {
+				szKey        = szSkillName   ,
+				szName       = szSkillName   ,
+				nCount       = p.nCount      ,
+				nTotalEffect = p.nTotalEffect,
+			})
+		end
+	else
+		for id, p in pairs(tData.Target) do
+			table.insert(aResult, {
+				szKey        = id                              ,
+				szName       = MY_Recount.Data.GetNameAusID(id),
+				nCount       = p.nCount                        ,
+				nTotalEffect = p.nTotalEffect                  ,
+			})
+		end
+	end
+	table.sort(aResult, function(p1, p2)
+		return p1.nTotalEffect > p2.nTotalEffect
+	end)
+	-- 默认选中第一个
+	if this.bFirstRendering then
+		if aResult[1] then
+			if szPrimarySort == 'Skill' then
+				this.szSelectedSkill  = aResult[1].szKey
+			else
+				this.szSelectedTarget = aResult[1].szKey
+			end
+		end
+		this.bFirstRendering = nil
+	end
+	local szSelected
+	local szSelectedSkill  = this.szSelectedSkill
+	local szSelectedTarget = this.szSelectedTarget
+	if szPrimarySort == 'Skill' then
+		szSelected = this.szSelectedSkill
+	else
+		szSelected = this.szSelectedTarget
+	end
+	-- 界面重绘
+	local hSelectedItem
+	this:Lookup('WndScroll_Skill'):SetSize(480, 96)
+	this:Lookup('WndScroll_Skill', ''):SetSize(480, 96)
+	this:Lookup('WndScroll_Skill', ''):FormatAllItemPos()
+	local hList = this:Lookup('WndScroll_Skill', 'Handle_SkillList')
+	hList:SetSize(480, 80)
+	for i, p in ipairs(aResult) do
+		local hItem = hList:Lookup(i - 1) or hList:AppendItemFromIni(_C.szIniDetail, 'Handle_SkillItem')
+		hItem:Lookup('Text_SkillNo'):SetText(i)
+		hItem:Lookup('Text_SkillName'):SetText((p.szName:gsub("#.*", "")))
+		hItem:Lookup('Text_SkillCount'):SetText(p.nCount)
+		hItem:Lookup('Text_SkillTotal'):SetText(p.nTotalEffect)
+		hItem:Lookup('Text_SkillPercentage'):SetText(nTotalEffect > 0 and _L('%.1f%%', (i == 1 and ceil or floor)(p.nTotalEffect / nTotalEffect * 1000) / 10) or ' - ')
+
+		if szPrimarySort == 'Skill' and szSelectedSkill == p.szKey or
+		szPrimarySort == 'Target' and szSelectedTarget == p.szKey then
+			hSelectedItem = hItem
+			hItem:Lookup('Shadow_SkillEntry'):Show()
+		else
+			hItem:Lookup('Shadow_SkillEntry'):Hide()
+		end
+		hItem.szKey = p.szKey
+	end
+	for i = hList:GetItemCount() - 1, #aResult, -1 do
+		hList:RemoveItem(i)
+	end
+	hList:FormatAllItemPos()
+
+	if szSelected and tData[szPrimarySort][szSelected] then
+		this:Lookup('', 'Handle_Spliter'):Show()
+		--------------- 二、技能释放结果列表更新 -----------------
+		-- 数据收集
+		local aResult, nTotalEffect, nCount = {}, tData[szPrimarySort][szSelected].nTotalEffect, tData[szPrimarySort][szSelected].nCount
+		for nSkillResult, p in pairs(tData[szPrimarySort][szSelected].Detail) do
+			table.insert(aResult, {
+				nCount     = p.nCount    ,
+				nMinEffect = p.nMinEffect,
+				nAvgEffect = p.nAvgEffect,
+				nMaxEffect = p.nMaxEffect,
+				nTotalEffect = p.nTotalEffect,
+				szSkillResult = SZ_SKILL_RESULT[nSkillResult],
+			})
+		end
+		table.sort(aResult, function(p1, p2)
+			return p1.nAvgEffect > p2.nAvgEffect
+		end)
+		-- 界面重绘
+		this:Lookup('WndScroll_Detail'):Show()
+		local hList = this:Lookup('WndScroll_Detail', 'Handle_DetailList')
+		for i, p in ipairs(aResult) do
+			local hItem = hList:Lookup(i - 1) or hList:AppendItemFromIni(_C.szIniDetail, 'Handle_DetailItem')
+			hItem:Lookup('Text_DetailNo'):SetText(i)
+			hItem:Lookup('Text_DetailType'):SetText(p.szSkillResult)
+			hItem:Lookup('Text_DetailMin'):SetText(p.nMinEffect)
+			hItem:Lookup('Text_DetailAverage'):SetText(p.nAvgEffect)
+			hItem:Lookup('Text_DetailMax'):SetText(p.nMaxEffect)
+			hItem:Lookup('Text_DetailCount'):SetText(p.nCount)
+			hItem:Lookup('Text_DetailPercent'):SetText(nCount > 0 and _L('%.1f%%', (i == 1 and ceil or floor)(p.nCount / nCount * 1000) / 10) or ' - ')
+		end
+		for i = hList:GetItemCount() - 1, #aResult, -1 do
+			hList:RemoveItem(i)
+		end
+		hList:FormatAllItemPos()
+
+		-- 调整滚动条 增强用户体验
+		if hSelectedItem and not this:Lookup('WndScroll_Target'):IsVisible() then
+			-- 说明是刚从未选择状态切换过来 滚动条滚动到选中项
+			local hScroll = this:Lookup('WndScroll_Skill/Scroll_Skill_List')
+			hScroll:SetScrollPos(math.ceil(hScroll:GetStepCount() * hSelectedItem:GetIndex() / hSelectedItem:GetParent():GetItemCount()))
+		end
+
+		--------------- 三、技能释放结果列表更新 -----------------
+		-- 数据收集
+		local aResult, nTotalEffect = {}, tData[szPrimarySort][szSelected].nTotalEffect
+		if szPrimarySort == 'Skill' then
+			for id, p in pairs(tData.Skill[szSelectedSkill].Target) do
+				table.insert(aResult, {
+					szKey          = id,
+					nHitCount      = p.Count[SKILL_RESULT.HIT] or 0,
+					nMissCount     = p.Count[SKILL_RESULT.MISS] or 0,
+					nCriticalCount = p.Count[SKILL_RESULT.CRITICAL] or 0,
+					nMaxEffect     = p.nMaxEffect,
+					nTotalEffect   = p.nTotalEffect,
+					szName         = MY_Recount.Data.GetNameAusID(id, DataDisplay),
+				})
+			end
+		else
+			for szSkillName, p in pairs(tData.Target[szSelectedTarget].Skill) do
+				table.insert(aResult, {
+					nHitCount      = p.Count[SKILL_RESULT.HIT] or 0,
+					nMissCount     = p.Count[SKILL_RESULT.MISS] or 0,
+					nCriticalCount = p.Count[SKILL_RESULT.CRITICAL] or 0,
+					nMaxEffect     = p.nMaxEffect,
+					nTotalEffect   = p.nTotalEffect,
+					szName         = szSkillName,
+				})
+			end
+		end
+		table.sort(aResult, function(p1, p2)
+			return p1.nTotalEffect > p2.nTotalEffect
+		end)
+		-- 界面重绘
+		this:Lookup('WndScroll_Target'):Show()
+		local hList = this:Lookup('WndScroll_Target', 'Handle_TargetList')
+		for i, p in ipairs(aResult) do
+			local hItem = hList:Lookup(i - 1) or hList:AppendItemFromIni(_C.szIniDetail, 'Handle_TargetItem')
+			hItem:Lookup('Text_TargetNo'):SetText(i)
+			hItem:Lookup('Text_TargetName'):SetText((p.szName:gsub("#.*", "")))
+			hItem:Lookup('Text_TargetTotal'):SetText(p.nTotalEffect)
+			hItem:Lookup('Text_TargetMax'):SetText(p.nMaxEffect)
+			hItem:Lookup('Text_TargetHit'):SetText(p.nHitCount)
+			hItem:Lookup('Text_TargetCritical'):SetText(p.nCriticalCount)
+			hItem:Lookup('Text_TargetMiss'):SetText(p.nMissCount)
+			hItem:Lookup('Text_TargetPercent'):SetText((nTotalEffect > 0 and _L('%.1f%%', (i == 1 and ceil or floor)(p.nTotalEffect / nTotalEffect * 1000) / 10) or ' - '))
+			hItem.szKey = p.szKey
+		end
+		for i = hList:GetItemCount() - 1, #aResult, -1 do
+			hList:RemoveItem(i)
+		end
+		hList:FormatAllItemPos()
+	else
+		this:Lookup('WndScroll_Skill'):SetSize(480, 348)
+		this:Lookup('WndScroll_Skill', ''):SetSize(480, 348)
+		this:Lookup('WndScroll_Skill', 'Handle_SkillList'):SetSize(480, 332)
+		this:Lookup('WndScroll_Skill', 'Handle_SkillList'):FormatAllItemPos()
+		this:Lookup('WndScroll_Skill', ''):FormatAllItemPos()
+		this:Lookup('WndScroll_Detail'):Hide()
+		this:Lookup('WndScroll_Target'):Hide()
+		this:Lookup('', 'Handle_Spliter'):Hide()
+	end
+
+end
+
+function MY_Recount_Detail.OnLButtonClick()
+	local name = this:GetName()
+	if name == 'Btn_Close' then
+		MY.RegisterEsc(this:GetRoot():GetTreePath())
+		Wnd.CloseWindow(this:GetRoot())
+	elseif name == 'Btn_Switch' then
+		if this:GetRoot().szPrimarySort == 'Skill' then
+			this:GetRoot().szPrimarySort = 'Target'
+		else
+			this:GetRoot().szPrimarySort = 'Skill'
+		end
+		this:GetRoot().nLastRedrawFrame = 0
+	elseif name == 'Btn_Unselect' then
+		this:GetRoot().szSelectedSkill  = nil
+		this:GetRoot().szSelectedTarget = nil
+		this:GetRoot().nLastRedrawFrame = 0
+	elseif name == 'Btn_Issuance' then
+		PopupMenu(MY_Recount.GetDetailMenu(this:GetRoot()))
+	end
+end
+
+function MY_Recount_Detail.OnItemLButtonDown()
+	local name = this:GetName()
+	if name == 'Handle_SkillItem' then
+		if this:GetRoot().szPrimarySort == 'Skill' then
+			this:GetRoot().szSelectedSkill = this.szKey
+		else
+			this:GetRoot().szSelectedTarget = this.szKey
+		end
+		this:GetRoot().nLastRedrawFrame = 0
+	end
+end
+
+function MY_Recount_Detail.OnItemRButtonClick()
+	local name = this:GetName()
+	if (name == 'Handle_SkillItem' and this:GetRoot().szPrimarySort == 'Target')
+	or (name == 'Handle_TargetItem' and this:GetRoot().szPrimarySort == 'Skill') then
+		local szKey = this.szKey
+		local szChannel = this:GetRoot().szChannel
+		local menu = {}
+		menu.x, menu.y = Cursor.GetPos(true)
+		for _, nChannel in ipairs({ CHANNEL.DPS, CHANNEL.HPS, CHANNEL.BDPS, CHANNEL.BHPS }) do
+			insert(menu, {
+				szOption = SZ_CHANNEL[nChannel],
+				fnAction = function()
+					Wnd.OpenWindow(_C.szIniDetail, "MY_Recount_Detail#" .. szKey .. "_" .. SZ_CHANNEL_KEY[nChannel])
+				end,
+			})
+		end
+		PopupMenu(menu)
+	end
+end
+
+function MY_Recount_Detail.OnItemLButtonDBClick()
+	local name = this:GetName()
+	if (name == 'Handle_SkillItem' and this:GetRoot().szPrimarySort == 'Target')
+	or (name == 'Handle_TargetItem' and this:GetRoot().szPrimarySort == 'Skill') then
+		Wnd.OpenWindow(_C.szIniDetail, "MY_Recount_Detail#" .. this.szKey .. "_" .. this:GetRoot().szChannel)
+	end
+end
 
 -- ################################################################################################## --
 --         #       #             #           #                 #                         #   #        --
