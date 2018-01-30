@@ -311,8 +311,12 @@ function CTM_Party_Base.OnItemLButtonDown()
 			MY.DelayCall("MY_Cataclysm_TempTarget", false)
 			CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = nil
 		end
-		SetTarget(TARGET.PLAYER, this.dwID)
-		FireUIEvent("MY_TAR_TEMP_UPDATE", this.dwID)
+		if MY.IsInPubg() and GetClientPlayer().nMoveState == MOVE_STATE.ON_DEATH then
+			BattleField_MatchPlayer(this.dwID)
+		else
+			SetTarget(TARGET.PLAYER, this.dwID)
+			FireUIEvent("MY_TAR_TEMP_UPDATE", this.dwID)
+		end
 	end
 end
 
@@ -320,7 +324,9 @@ function CTM_Party_Base.OnItemMouseEnter()
 	if CTM_DRAG and this:Lookup("Image_Slot") and this:Lookup("Image_Slot"):IsValid() then
 		this:Lookup("Image_Slot"):Show()
 	end
-	if not this.dwID then return end
+	if not this.dwID then
+		return
+	end
 	local nX, nY = this:GetRoot():GetAbsPos()
 	local nW, nH = this:GetRoot():GetSize()
 	local me = GetClientPlayer()
@@ -329,11 +335,19 @@ function CTM_Party_Base.OnItemMouseEnter()
 	end
 	local info = CTM:GetMemberInfo(this.dwID)
 	if info.bIsOnLine and GetPlayer(this.dwID) and CFG.bTempTargetEnable then
-		if not CTM_TEMP_TARGET_TYPE then
-			CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = MY.GetTarget()
-		end
-		MY.SetTarget(TARGET.PLAYER, this.dwID)
 		MY.DelayCall("MY_Cataclysm_TempTarget", false)
+		local dwID = this.dwID
+		local function fnAction()
+			if not CTM_TEMP_TARGET_TYPE then
+				CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = MY.GetTarget()
+			end
+			MY.SetTarget(TARGET.PLAYER, dwID)
+		end
+		if CFG.nTempTargetDelay == 0 then
+			fnAction()
+		else
+			MY.DelayCall("MY_Cataclysm_TempTarget", CFG.nTempTargetDelay, fnAction)
+		end
 	end
 end
 
@@ -350,8 +364,11 @@ function CTM_Party_Base.OnItemMouseLeave()
 	if not this.dwID then return end
 	local info = CTM:GetMemberInfo(this.dwID)
 	if not info then return end -- 退租的问题
-	if info.bIsOnLine and GetPlayer(this.dwID) and CFG.bTempTargetEnable and CTM_TEMP_TARGET_TYPE then
-		MY.DelayCall("MY_Cataclysm_TempTarget", ResumeTempTarget)
+	if info.bIsOnLine and GetPlayer(this.dwID) and CFG.bTempTargetEnable then
+		MY.DelayCall("MY_Cataclysm_TempTarget", false)
+		if CTM_TEMP_TARGET_TYPE then
+			MY.DelayCall("MY_Cataclysm_TempTarget", ResumeTempTarget) -- 延迟到下一帧 因为可能当前帧临时选中另外一个玩家 那么不需要切回目标
+		end
 	end
 end
 end
