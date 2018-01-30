@@ -189,7 +189,7 @@ RegisterCustomData("MY_Recount.anchor")
 local D, MY_Recount = {}, MY_Recount
 
 local m_frame
-MY_Recount.Open = function()
+function MY_Recount.Open()
 	-- open
 	m_frame = Wnd.OpenWindow(_C.szIniFile, 'MY_Recount')
 	-- pos
@@ -204,7 +204,7 @@ MY_Recount.Open = function()
 end
 
 
-MY_Recount.Close = function()
+function MY_Recount.Close()
 	Wnd.CloseWindow(m_frame)
 	MY.RegisterEvent('UI_SCALED.MY_RECOUNT')
 end
@@ -240,7 +240,7 @@ end)
 --                           # #     # # # # # # #     #   # # #         #    --
 --                                               #         #         # # #    --
 -- ########################################################################## --
-MY_Recount.LoadCustomCss = function(nCss)
+function MY_Recount.LoadCustomCss(nCss)
 	if not nCss then
 		nCss = MY_Recount.nCss
 	else
@@ -252,7 +252,7 @@ end
 -- 切换绑定显示记录
 -- MY_Recount.DisplayData(number nHistory): 显示第nHistory条历史记录 当nHistory等于0时显示当前记录
 -- MY_Recount.DisplayData(table  data): 显示数据为data的历史记录
-MY_Recount.DisplayData = function(data)
+function MY_Recount.DisplayData(data)
 	if type(data) == 'number' then
 		data = MY_Recount.Data.Get(data)
 	end
@@ -264,7 +264,7 @@ MY_Recount.DisplayData = function(data)
 	end
 end
 
-MY_Recount.DrawUI = function(data)
+function MY_Recount.DrawUI(data)
 	if not data then
 		data = DataDisplay
 	end
@@ -279,7 +279,7 @@ MY_Recount.DrawUI = function(data)
 	MY_Recount.UpdateUI(data)
 end
 
-MY_Recount.UpdateUI = function(data)
+function MY_Recount.UpdateUI(data)
 	if not data then
 		data = DataDisplay
 	end
@@ -560,7 +560,7 @@ end
 --                                   # #               #           #          --
 -- ########################################################################## --
 -- 周期重绘
-MY_Recount.OnFrameBreathe = function()
+function MY_Recount.OnFrameBreathe()
 	if this.nLastRedrawFrame and
 	GetLogicFrameCount() - this.nLastRedrawFrame > 0 and
 	GetLogicFrameCount() - this.nLastRedrawFrame < MY_Recount.nDrawInterval then
@@ -576,13 +576,13 @@ MY_Recount.OnFrameBreathe = function()
 	MY_Recount.UpdateUI()
 end
 
-MY_Recount.OnFrameDragEnd = function()
+function MY_Recount.OnFrameDragEnd()
 	this:CorrectPos()
 	MY.SetStorage('FrameAnchor.MY_Recount', GetFrameAnchor(this))
 end
 
 -- ShowDetail界面时间相应
-_C.OnDetailFrameBreathe = function()
+function _C.OnDetailFrameBreathe()
 	if this.nLastRedrawFrame and
 	GetLogicFrameCount() - this.nLastRedrawFrame > 0 and
 	GetLogicFrameCount() - this.nLastRedrawFrame < MY_Recount.nDrawInterval then
@@ -775,7 +775,7 @@ _C.OnDetailFrameBreathe = function()
 	end
 
 end
-_C.OnDetailLButtonClick = function()
+function _C.OnDetailLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Close' then
 		MY.RegisterEsc(this:GetRoot():GetTreePath())
@@ -795,7 +795,7 @@ _C.OnDetailLButtonClick = function()
 		PopupMenu(MY_Recount.GetDetailMenu(this:GetRoot()))
 	end
 end
-_C.OnDetailItemLButtonDown = function()
+function _C.OnDetailItemLButtonDown()
 	local name = this:GetName()
 	if name == 'Handle_SkillItem' then
 		if this:GetRoot().szPrimarySort == 'Skill' then
@@ -807,7 +807,7 @@ _C.OnDetailItemLButtonDown = function()
 	end
 end
 
-MY_Recount.OnItemLButtonClick = function()
+function MY_Recount.OnItemLButtonClick()
 	local id = this.id
 	local name = this:GetName()
 	if name == 'Handle_Me' then
@@ -851,7 +851,7 @@ MY_Recount.OnItemLButtonClick = function()
 	end)
 end
 
-MY_Recount.OnItemRefreshTip = function()
+function MY_Recount.OnItemRefreshTip()
 	local id = this.id
 	local name = this:GetName()
 	if name == 'Handle_Me' then
@@ -905,11 +905,11 @@ MY_Recount.OnItemRefreshTip = function()
 	end)
 end
 
-MY_Recount.OnItemMouseLeave = function()
+function MY_Recount.OnItemMouseLeave()
 	HideTip()
 end
 
-MY_Recount.OnLButtonClick = function()
+function MY_Recount.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Right' then
 		if MY_Recount.nChannel == CHANNEL.DPS then
@@ -946,7 +946,7 @@ MY_Recount.OnLButtonClick = function()
 	end
 end
 
-MY_Recount.OnCheckBoxCheck = function()
+function MY_Recount.OnCheckBoxCheck()
 	local name = this:GetName()
 	if name == 'CheckBox_Minimize' then
 		this:GetRoot():Lookup('Wnd_Main'):Hide()
@@ -955,7 +955,7 @@ MY_Recount.OnCheckBoxCheck = function()
 	end
 end
 
-MY_Recount.OnCheckBoxUncheck = function()
+function MY_Recount.OnCheckBoxUncheck()
 	local name = this:GetName()
 	if name == 'CheckBox_Minimize' then
 		this:GetRoot():Lookup('Wnd_Main'):Show()
@@ -980,7 +980,7 @@ end
 --   # #       #       # #             #             # # # # # # # # # # #   #       #           #    --
 -- ################################################################################################## --
 -- 获取设置菜单
-MY_Recount.GetMenu = function()
+function MY_Recount.GetMenu()
 	local t = {
 		szOption = _L["fight recount"],
 		{
@@ -1231,7 +1231,7 @@ MY_Recount.GetMenu = function()
 end
 
 -- 获取历史记录菜单
-MY_Recount.GetHistoryMenu = function()
+function MY_Recount.GetHistoryMenu()
 	local t = {{
 		szOption = _L["current fight"],
 		rgb = (MY_Recount.Data.Get(0) == DataDisplay and {255, 255, 0}) or nil,
@@ -1276,7 +1276,7 @@ MY_Recount.GetHistoryMenu = function()
 end
 
 -- 获取发布菜单
-MY_Recount.GetPublishMenu = function()
+function MY_Recount.GetPublishMenu()
 	local t = {}
 
 	-- 发布类型
