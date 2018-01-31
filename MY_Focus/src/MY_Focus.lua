@@ -18,6 +18,7 @@ local floor, min, max, ceil, pow, sqrt = math.floor, math.min, math.max, math.ce
 local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 
+local CHANGGE_REAL_SHADOW_TEMPLATE_ID = 46140 -- 清绝歌影 的主体影子
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Focus/lang/")
 local l_tFocusList = {}
@@ -289,9 +290,9 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		if dwType ~= TARGET.PLAYER then
 			if MY_Focus.tFocusTplList[dwType][obj.dwTemplateID]
 			and not (
-				obj.dwTemplateID == 46140 -- 清绝歌影 的主体影子
+				obj.dwTemplateID == CHANGGE_REAL_SHADOW_TEMPLATE_ID
 				and IsEnemy(UI_GetClientPlayerID(), dwID)
-				and not MY.IsShieldedVersion()
+				and MY.IsShieldedVersion()
 			) then
 				bFocus = true
 			end
@@ -322,7 +323,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 				end
 			elseif dwType == TARGET.NPC then
 				if MY_Focus.bFocusJJCParty
-				and obj.dwTemplateID == 46140 -- 清绝歌影 的主体影子
+				and obj.dwTemplateID == CHANGGE_REAL_SHADOW_TEMPLATE_ID
 				and not (IsEnemy(UI_GetClientPlayerID(), dwID) and MY.IsShieldedVersion()) then
 					MY_Focus.DelFocus(TARGET.PLAYER, obj.dwEmployer)
 					bFocus = true
@@ -373,7 +374,7 @@ function MY_Focus.OnObjectLeaveScene(dwType, dwID)
 	if KObject then
 		if dwType == TARGET.NPC then
 			if MY_Focus.bFocusJJCParty
-			and KObject.dwTemplateID == 46140 -- 清绝歌影 的主体影子
+			and KObject.dwTemplateID == CHANGGE_REAL_SHADOW_TEMPLATE_ID
 			and MY.IsInArena() and not (IsEnemy(UI_GetClientPlayerID(), dwID) and MY.IsShieldedVersion()) then
 				MY_Focus.AddFocus(TARGET.PLAYER, KObject.dwEmployer, MY.GetObjectName(KObject))
 			end
