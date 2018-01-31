@@ -37,6 +37,34 @@ local CTM_CACHE              = setmetatable({}, { __mode = "v" })
 local CTM_LIFE_CACHE         = {}
 local CTM_BUFF_CACHE         = {}
 local CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID
+local CHANGGE_REAL_SHADOW_ID    = 46140 -- 清绝歌影 的主体影子
+local CHANGGE_REAL_SHADOW_CACHE = {}
+do
+local function onNpcEnterScene()
+	local npc = GetNpc(arg0)
+	if npc.dwTemplateID == CHANGGE_REAL_SHADOW_ID then
+		CHANGGE_REAL_SHADOW_CACHE[npc.dwEmployer] = arg0
+		CHANGGE_REAL_SHADOW_CACHE[arg0] = npc.dwEmployer
+	end
+end
+MY.RegisterEvent("NPC_ENTER_SCENE", onNpcEnterScene)
+
+local function onNpcLeaveScene()
+	if CHANGGE_REAL_SHADOW_CACHE[arg0] then
+		CHANGGE_REAL_SHADOW_CACHE[CHANGGE_REAL_SHADOW_CACHE[arg0]] = nil
+		CHANGGE_REAL_SHADOW_CACHE[arg0] = nil
+	end
+end
+MY.RegisterEvent("NPC_LEAVE_SCENE", onNpcLeaveScene)
+end
+
+local function SetTarget(dwType, dwID)
+	if CHANGGE_REAL_SHADOW_CACHE[arg0] then
+		dwType, dwID = TARGET.NPC, CHANGGE_REAL_SHADOW_CACHE[arg0]
+	end
+	MY.SetTarget(dwType, dwID)
+end
+
 -- Package func
 local HIDE_FORCE = {
 	[7]  = true,
@@ -315,7 +343,6 @@ function CTM_Party_Base.OnItemLButtonDown()
 			BattleField_MatchPlayer(this.dwID)
 		else
 			SetTarget(TARGET.PLAYER, this.dwID)
-			FireUIEvent("MY_TAR_TEMP_UPDATE", this.dwID)
 		end
 	end
 end
@@ -341,7 +368,7 @@ function CTM_Party_Base.OnItemMouseEnter()
 			if not CTM_TEMP_TARGET_TYPE then
 				CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = MY.GetTarget()
 			end
-			MY.SetTarget(TARGET.PLAYER, dwID)
+			SetTarget(TARGET.PLAYER, dwID)
 		end
 		if CFG.nTempTargetDelay == 0 then
 			fnAction()
@@ -353,7 +380,7 @@ end
 
 do
 local function ResumeTempTarget()
-	MY.SetTarget(CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID)
+	SetTarget(CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID)
 	CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = nil
 end
 function CTM_Party_Base.OnItemMouseLeave()
