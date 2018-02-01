@@ -43,6 +43,12 @@ do
 local function onNpcEnterScene()
 	local npc = GetNpc(arg0)
 	if npc.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID then
+		if not (IsEnemy(UI_GetClientPlayerID(), arg0) and MY.IsShieldedVersion()) then
+			local dwType, dwID = MY.GetTarget()
+			if dwType == TARGET.PLAYER and dwID == npc.dwEmployer then
+				MY.SetTarget(TARGET.NPC, arg0)
+			end
+		end
 		CHANGGE_REAL_SHADOW_CACHE[npc.dwEmployer] = arg0
 		CHANGGE_REAL_SHADOW_CACHE[arg0] = npc.dwEmployer
 	end
@@ -50,7 +56,14 @@ end
 MY.RegisterEvent("NPC_ENTER_SCENE", onNpcEnterScene)
 
 local function onNpcLeaveScene()
+	local npc = GetNpc(arg0)
 	if CHANGGE_REAL_SHADOW_CACHE[arg0] then
+		if not (IsEnemy(UI_GetClientPlayerID(), arg0) and MY.IsShieldedVersion()) then
+			local dwType, dwID = MY.GetTarget()
+			if dwType == TARGET.NPC and dwID == arg0 then
+				MY.SetTarget(TARGET.PLAYER, npc.dwEmployer)
+			end
+		end
 		CHANGGE_REAL_SHADOW_CACHE[CHANGGE_REAL_SHADOW_CACHE[arg0]] = nil
 		CHANGGE_REAL_SHADOW_CACHE[arg0] = nil
 	end
@@ -59,8 +72,8 @@ MY.RegisterEvent("NPC_LEAVE_SCENE", onNpcLeaveScene)
 end
 
 local function SetTarget(dwType, dwID)
-	if CHANGGE_REAL_SHADOW_CACHE[arg0] then
-		dwType, dwID = TARGET.NPC, CHANGGE_REAL_SHADOW_CACHE[arg0]
+	if CHANGGE_REAL_SHADOW_CACHE[dwID] then
+		dwType, dwID = TARGET.NPC, CHANGGE_REAL_SHADOW_CACHE[dwID]
 	end
 	MY.SetTarget(dwType, dwID)
 end
@@ -1302,15 +1315,20 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 	local Ledg = hCommon:Lookup("Image_LifeLine")
 	local Msha = hCommon:Lookup("Shadow_Mana")
 	local Mimg = hCommon:Lookup("Image_Mana")
-	local p, dwMountType
+	local player, npc, dwMountType
+	if CHANGGE_REAL_SHADOW_CACHE[dwID] then
+		npc = GetNpc(CHANGGE_REAL_SHADOW_CACHE[dwID])
+	end
 	if CFG.bFasterHP then
-		p = GetPlayer(dwID)
+		player = GetPlayer(dwID)
 	end
 	-- 气血计算 因为sync 必须拿出来单独算
+	local obj = npc or player
 	local nLifePercentage, nCurrentLife, nMaxLife
-	if p and p.nMaxLife ~= 1 and p.nCurrentLife ~= 1 and p.nCurrentLife ~= 255 and p.nMaxLife ~= 255 and p.nCurrentLife < 10000000 and p.nCurrentLife > - 1000 then -- p sync err fix
-		nCurrentLife = p.nCurrentLife
-		nMaxLife = p.nMaxLife
+	if obj and obj.nMaxLife ~= 1 and obj.nCurrentLife ~= 1 and obj.nCurrentLife ~= 255
+	and obj.nMaxLife ~= 255 and obj.nCurrentLife < 1000000 and obj.nCurrentLife > - 1000 then -- obj sync err fix
+		nCurrentLife = obj.nCurrentLife
+		nMaxLife = obj.nMaxLife
 	else
 		nCurrentLife = info.nCurrentLife
 		nMaxLife = info.nMaxLife
@@ -1329,16 +1347,16 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 
 	local bDeathFlag = info.bDeathFlag
 	-- 有待验证
-	if p then
-		if p.GetKungfuMount() then
-			dwMountType = p.GetKungfuMount().dwMountType
+	if player then
+		if player.GetKungfuMount() then
+			dwMountType = player.GetKungfuMount().dwMountType
 		end
-		if p.nMoveState == MOVE_STATE_ON_STAND then
+		if player.nMoveState == MOVE_STATE_ON_STAND then
 			if info.bDeathFlag then
 				bDeathFlag = true
 			end
 		else
-			bDeathFlag = p.nMoveState == MOVE_STATE_ON_DEATH
+			bDeathFlag = player.nMoveState == MOVE_STATE_ON_DEATH
 		end
 	end
 	-- 透明度
@@ -1439,7 +1457,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			local r, g, b = unpack(CFG.tOtherCol[2]) -- 不在线就灰色了
 			if info.bIsOnLine then
 				if CFG.nBGColorMode == 1 then
-					if p or GetPlayer(dwID) then
+					if player or GetPlayer(dwID) then
 						if h.nDistanceLevel then
 							r, g, b = unpack(CFG.tDistanceCol[h.nDistanceLevel])
 						else
