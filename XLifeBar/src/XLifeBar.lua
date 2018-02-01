@@ -1,5 +1,5 @@
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."XLifeBar/lang/")
-local _C = {}
+local D = {}
 local OT_STATE = {
     START_SKILL   = 1,  -- 开始技能读条(显示边框)
     START_PREPARE = 2,  -- 开始读条(显示边框)
@@ -63,33 +63,31 @@ local function IsMapEnabled()
     )
 end
 
-local _C = {
-    szConfig = {"config/xlifebar.jx3dat", MY_DATA_PATH.GLOBAL},
-    szUserConfig = {"config/xlifebar.jx3dat", MY_DATA_PATH.ROLE},
-    tObject = {},
-    tTongList = {},
-    tNpc = {},
-    tPlayer = {},
-    dwTargetID = 0,
-    bFightState = false,
-}
+local CONFIG_PATH = "config/xlifebar.jx3dat"
+local OBJECT_INFO_CACHE = {}
+local TONG_NAME_CACHE = {}
+local NPC_CACHE = {}
+local PLAYER_CACHE = {}
+local TARGET_ID = 0
+local LAST_FIGHT_STATE = false
+local SYS_HEAD_TOP_STATE
 local HP = XLifeBar.HP
 
-_C.GetNz = function(nZ,nZ2)
+function D.GetNz(nZ,nZ2)
     return math.floor(((nZ/8 - nZ2/8) ^ 2) ^ 0.5)/64
 end
 
-_C.LoadConfig = function()
+function D.LoadConfig()
     if XLifeBar.bUseGlobalConfig then
     	local szOrgFile = MY.GetLUADataPath("userdata/XLifeBar/cfg.$lang.jx3dat")
-    	local szFilePath = MY.GetLUADataPath(_C.szConfig)
+    	local szFilePath = MY.GetLUADataPath({ CONFIG_PATH, MY_DATA_PATH.GLOBAL })
     	if IsLocalFileExist(szOrgFile) then
     		CPath.Move(szOrgFile, szFilePath)
     	end
         Config = MY.LoadLUAData(szFilePath)
     else
     	local szOrgFile = MY.GetLUADataPath("userdata/XLifeBar/cfg_$uid.$lang.jx3dat")
-    	local szFilePath = MY.GetLUADataPath(_C.szUserConfig)
+    	local szFilePath = MY.GetLUADataPath({ CONFIG_PATH, MY_DATA_PATH.ROLE })
     	if IsLocalFileExist(szOrgFile) then
     		CPath.Move(szOrgFile, szFilePath)
     	end
@@ -98,16 +96,17 @@ _C.LoadConfig = function()
     Config = MY.FormatDataStructure(Config, Config_Default, true)
 end
 
-_C.SaveConfig = function()
-    if XLifeBar.bUseGlobalConfig then
-        MY.SaveLUAData(_C.szConfig, Config)
-    else
-        MY.SaveLUAData(_C.szUserConfig, Config)
-    end
+function D.SaveConfig()
+    MY.SaveLUAData({
+        CONFIG_PATH,
+        XLifeBar.bUseGlobalConfig
+            and MY_DATA_PATH.GLOBAL
+            or MY_DATA_PATH.ROLE
+    }, Config)
 end
-MY.RegisterExit(_C.SaveConfig)
+MY.RegisterExit(D.SaveConfig)
 
-_C.GetRelation = function(dwID)
+function D.GetRelation(dwID)
     local me = GetClientPlayer()
     if not me then
         return "Neutrality"
@@ -156,7 +155,7 @@ _C.GetRelation = function(dwID)
     end
 end
 
-_C.GetForce = function(dwID)
+function D.GetForce(dwID)
     if not IsPlayer(dwID) then
         return "Npc"
     else
@@ -169,30 +168,28 @@ _C.GetForce = function(dwID)
     end
 end
 
-_C.GetTongName = function(dwTongID, szFormatString)
+function D.GetTongName(dwTongID, szFormatString)
     szFormatString = szFormatString or "%s"
     if type(dwTongID) ~= 'number' or dwTongID == 0 then
         return nil
     end
-    if not _C.tTongList[dwTongID] then
-        if GetTongClient().ApplyGetTongName(dwTongID) then
-            _C.tTongList[dwTongID] = GetTongClient().ApplyGetTongName(dwTongID)
-        end
+    if not TONG_NAME_CACHE[dwTongID] then
+        TONG_NAME_CACHE[dwTongID] = GetTongClient().ApplyGetTongName(dwTongID)
     end
-    if _C.tTongList[dwTongID] then
-        return string.format(szFormatString, _C.tTongList[dwTongID])
+    if TONG_NAME_CACHE[dwTongID] then
+        return string.format(szFormatString, TONG_NAME_CACHE[dwTongID])
     end
 end
 
-_C.AutoSwitchSysHeadTop = function()
+function D.AutoSwitchSysHeadTop()
     if IsMapEnabled() then
-        _C.SaveSysHeadTop()
-        _C.HideSysHeadTop()
+        D.SaveSysHeadTop()
+        D.HideSysHeadTop()
     else
-        _C.ResumeSysHeadTop()
+        D.ResumeSysHeadTop()
     end
 end
-_C.HideSysHeadTop = function()
+function D.HideSysHeadTop()
     SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC, GLOBAL_HEAD_NAME , false)
     SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC, GLOBAL_HEAD_TITLE, false)
     SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC, GLOBAL_HEAD_LIFE , false)
@@ -205,44 +202,46 @@ _C.HideSysHeadTop = function()
     SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_LIFE , false)
     SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_GUILD, false)
 end
-_C.SaveSysHeadTop = function()
-    if not _C.tSysHeadTop then
-        _C.tSysHeadTop = {
-            ['GLOBAL_HEAD_NPC_NAME'          ] = GetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_NAME ),
-            ['GLOBAL_HEAD_NPC_TITLE'         ] = GetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_TITLE),
-            ['GLOBAL_HEAD_NPC_LEFE'          ] = GetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_LIFE ),
-            ['GLOBAL_HEAD_OTHERPLAYER_NAME'  ] = GetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_NAME ),
-            ['GLOBAL_HEAD_OTHERPLAYER_TITLE' ] = GetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_TITLE),
-            ['GLOBAL_HEAD_OTHERPLAYER_LEFE'  ] = GetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_LIFE ),
-            ['GLOBAL_HEAD_OTHERPLAYER_GUILD' ] = GetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_GUILD),
-            ['GLOBAL_HEAD_CLIENTPLAYER_NAME' ] = GetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_NAME ),
-            ['GLOBAL_HEAD_CLIENTPLAYER_TITLE'] = GetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_TITLE),
-            ['GLOBAL_HEAD_CLIENTPLAYER_LEFE' ] = GetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_LIFE ),
-            ['GLOBAL_HEAD_CLIENTPLAYER_GUILD'] = GetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_GUILD),
-        }
+function D.SaveSysHeadTop()
+    if SYS_HEAD_TOP_STATE then
+        return
     end
+    SYS_HEAD_TOP_STATE = {
+        ['GLOBAL_HEAD_NPC_NAME'          ] = GetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_NAME ),
+        ['GLOBAL_HEAD_NPC_TITLE'         ] = GetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_TITLE),
+        ['GLOBAL_HEAD_NPC_LEFE'          ] = GetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_LIFE ),
+        ['GLOBAL_HEAD_OTHERPLAYER_NAME'  ] = GetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_NAME ),
+        ['GLOBAL_HEAD_OTHERPLAYER_TITLE' ] = GetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_TITLE),
+        ['GLOBAL_HEAD_OTHERPLAYER_LEFE'  ] = GetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_LIFE ),
+        ['GLOBAL_HEAD_OTHERPLAYER_GUILD' ] = GetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_GUILD),
+        ['GLOBAL_HEAD_CLIENTPLAYER_NAME' ] = GetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_NAME ),
+        ['GLOBAL_HEAD_CLIENTPLAYER_TITLE'] = GetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_TITLE),
+        ['GLOBAL_HEAD_CLIENTPLAYER_LEFE' ] = GetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_LIFE ),
+        ['GLOBAL_HEAD_CLIENTPLAYER_GUILD'] = GetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_GUILD),
+    }
 end
-_C.ResumeSysHeadTop = function()
-    if _C.tSysHeadTop then
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_NAME , _C.tSysHeadTop['GLOBAL_HEAD_NPC_NAME'])
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_TITLE, _C.tSysHeadTop['GLOBAL_HEAD_NPC_TITLE'])
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_LIFE , _C.tSysHeadTop['GLOBAL_HEAD_NPC_LEFE'])
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_NAME , _C.tSysHeadTop['GLOBAL_HEAD_OTHERPLAYER_NAME'])
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_TITLE, _C.tSysHeadTop['GLOBAL_HEAD_OTHERPLAYER_TITLE'])
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_LIFE , _C.tSysHeadTop['GLOBAL_HEAD_OTHERPLAYER_LEFE'])
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_GUILD, _C.tSysHeadTop['GLOBAL_HEAD_OTHERPLAYER_GUILD'])
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_NAME , _C.tSysHeadTop['GLOBAL_HEAD_CLIENTPLAYER_NAME'])
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_TITLE, _C.tSysHeadTop['GLOBAL_HEAD_CLIENTPLAYER_TITLE'])
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_LIFE , _C.tSysHeadTop['GLOBAL_HEAD_CLIENTPLAYER_LEFE'])
-        SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_GUILD, _C.tSysHeadTop['GLOBAL_HEAD_CLIENTPLAYER_GUILD'])
-        _C.tSysHeadTop = nil
+function D.ResumeSysHeadTop()
+    if not SYS_HEAD_TOP_STATE then
+        return
     end
+    SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_NAME , SYS_HEAD_TOP_STATE['GLOBAL_HEAD_NPC_NAME'])
+    SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_TITLE, SYS_HEAD_TOP_STATE['GLOBAL_HEAD_NPC_TITLE'])
+    SetGlobalTopHeadFlag(GLOBAL_HEAD_NPC         , GLOBAL_HEAD_LIFE , SYS_HEAD_TOP_STATE['GLOBAL_HEAD_NPC_LEFE'])
+    SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_NAME , SYS_HEAD_TOP_STATE['GLOBAL_HEAD_OTHERPLAYER_NAME'])
+    SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_TITLE, SYS_HEAD_TOP_STATE['GLOBAL_HEAD_OTHERPLAYER_TITLE'])
+    SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_LIFE , SYS_HEAD_TOP_STATE['GLOBAL_HEAD_OTHERPLAYER_LEFE'])
+    SetGlobalTopHeadFlag(GLOBAL_HEAD_OTHERPLAYER , GLOBAL_HEAD_GUILD, SYS_HEAD_TOP_STATE['GLOBAL_HEAD_OTHERPLAYER_GUILD'])
+    SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_NAME , SYS_HEAD_TOP_STATE['GLOBAL_HEAD_CLIENTPLAYER_NAME'])
+    SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_TITLE, SYS_HEAD_TOP_STATE['GLOBAL_HEAD_CLIENTPLAYER_TITLE'])
+    SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_LIFE , SYS_HEAD_TOP_STATE['GLOBAL_HEAD_CLIENTPLAYER_LEFE'])
+    SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_GUILD, SYS_HEAD_TOP_STATE['GLOBAL_HEAD_CLIENTPLAYER_GUILD'])
+    SYS_HEAD_TOP_STATE = nil
 end
-MY.RegisterExit(_C.ResumeSysHeadTop)
+MY.RegisterExit(D.ResumeSysHeadTop)
 
 -- 重绘所有UI
-_C.Reset = function()
-    _C.tObject = {}
+function D.Reset()
+    OBJECT_INFO_CACHE = {}
     XGUI.GetShadowHandle("XLifeBar"):Clear()
     -- auto adjust index
     MY.BreatheCall("XLifeBar_AdjustIndex")
@@ -251,7 +250,7 @@ _C.Reset = function()
             local n = 0
             local t = {}
             -- refresh current index data
-            for dwID, tab in pairs(_C.tObject) do
+            for dwID, tab in pairs(OBJECT_INFO_CACHE) do
                 n = n + 1
                 if n > 200 then
                     break
@@ -273,27 +272,27 @@ _C.Reset = function()
         end, 500)
     end
 
-    _C.AutoSwitchSysHeadTop()
+    D.AutoSwitchSysHeadTop()
 end
 -- 加载界面
 MY.RegisterEvent('LOGIN_GAME', function() MY.UI.CreateFrame("XLifeBar", { level = "Lowest", empty = true }) end)
 -- 重载配置文件并重绘
-MY.RegisterEvent('FIRST_LOADING_END', function() _C.LoadConfig() _C.Reset() end)
+MY.RegisterEvent('FIRST_LOADING_END', function() D.LoadConfig() D.Reset() end)
 -- 过图可能切换开关状态
-MY.RegisterEvent('LOADING_END', _C.AutoSwitchSysHeadTop)
+MY.RegisterEvent('LOADING_END', D.AutoSwitchSysHeadTop)
 
 XLifeBar.X = class()
 -- 构造函数
 function XLifeBar.X:ctor(object)
-    if not _C.tObject[object.dwID] then
-        _C.tObject[object.dwID] = {
+    if not OBJECT_INFO_CACHE[object.dwID] then
+        OBJECT_INFO_CACHE[object.dwID] = {
             handle  = nil,
             szName  = '' ,
             szTong  = '' ,
             szTitle = '' ,
             fLife   = -1 ,
-            szForce = _C.GetForce(object.dwID),
-            szRelation = _C.GetRelation(object.dwID),
+            szForce = D.GetForce(object.dwID),
+            szRelation = D.GetRelation(object.dwID),
             OT = {
                 nState      = OT_STATE.IDLE,
                 nPercentage = 0            ,
@@ -305,7 +304,7 @@ function XLifeBar.X:ctor(object)
         }
     end
     self.self = object
-    self.tab = _C.tObject[object.dwID]
+    self.tab = OBJECT_INFO_CACHE[object.dwID]
     self.force = self.tab.szForce
     self.relation = self.tab.szRelation
     self.hp = HP.new(object.dwID)
@@ -317,7 +316,7 @@ function XLifeBar.X:Create()
         -- 创建UI
         self.hp:Create()
         -- handle写回缓存 防止二次Create()
-        _C.tObject[self.self.dwID].handle = self.hp.handle
+        OBJECT_INFO_CACHE[self.self.dwID].handle = self.hp.handle
         -- 开始绘制永远不会重绘的东西
         -- 绘制血条边框
         local cfgLife = GetConfig("ShowLife", self.relation, self.force)
@@ -332,19 +331,19 @@ function XLifeBar.X:Remove()
     if self.hp.handle then
         self.hp:Remove()
     end
-    _C.tObject[self.self.dwID] = nil
+    OBJECT_INFO_CACHE[self.self.dwID] = nil
     return self
 end
 -- 对目标头顶颜色进行滤镜处理（高亮/死亡）
 function XLifeBar.X:FxColor(r,g,b,a)
     -- 死亡判定
     if self.self.nMoveState == MOVE_STATE.ON_DEATH then
-        if _C.dwTargetID == self.self.dwID then
+        if TARGET_ID == self.self.dwID then
             return math.ceil(r/2.2), math.ceil(g/2.2), math.ceil(b/2.2), a
         else
             return math.ceil(r/2.5), math.ceil(g/2.5), math.ceil(b/2.5), a
         end
-    elseif _C.dwTargetID == self.self.dwID then
+    elseif TARGET_ID == self.self.dwID then
         return 255-(255-r)*0.3, 255-(255-g)*0.3, 255-(255-b)*0.3, a
     else
         return r,g,b,a
@@ -379,7 +378,7 @@ function XLifeBar.X:DrawNames()
     local tWordlines = {}
     local r,g,b,a,f
     local cfgName, cfgTitle, cfgTong
-    local tab = _C.tObject[self.self.dwID]
+    local tab = OBJECT_INFO_CACHE[self.self.dwID]
     if IsPlayer(self.self.dwID) then
         cfgLife  = GetConfig("ShowLife", self.relation, self.force)
         cfgName  = GetConfig("ShowName", self.relation, self.force)
@@ -525,7 +524,7 @@ function XLifeBar.X:DrawOTBarBorder(nAlpha)
 end
 -- 开始读条
 function XLifeBar.X:StartOTBar(szOTTitle, nFrameCount, bIsChannelSkill)
-    local tab = _C.tObject[self.self.dwID]
+    local tab = OBJECT_INFO_CACHE[self.self.dwID]
     tab.OT = {
         nState = ( bIsChannelSkill and OT_STATE.START_CHANNEL ) or OT_STATE.START_PREPARE,
         szTitle = szOTTitle,
@@ -543,14 +542,14 @@ local function CheckInvalidRect(dwType, dwID, me, bNoCreate)
     end
     _nDisX, _nDisY = me.nX - object.nX, me.nY - object.nY
     if Config.nDistance <= 0 or _nDisX * _nDisX + _nDisY * _nDisY < Config.nDistance
-    -- 这是镜头补偿判断 但是不好用先不加 and (fPitch > -0.8 or _C.GetNz(me.nZ,object.nZ) < Config.nDistance / 2.5)
+    -- 这是镜头补偿判断 但是不好用先不加 and (fPitch > -0.8 or D.GetNz(me.nZ,object.nZ) < Config.nDistance / 2.5)
     then
-        if _C.tObject[dwID] and _C.tObject[dwID].handle then
-            local tab = _C.tObject[dwID]
+        if OBJECT_INFO_CACHE[dwID] and OBJECT_INFO_CACHE[dwID].handle then
+            local tab = OBJECT_INFO_CACHE[dwID]
             local xlb = XLifeBar(object)
             -- 基本属性设置
             xlb:SetLife(info.nCurrentLife / info.nMaxLife)
-               :SetTong(_C.GetTongName(object.dwTongID, "[%s]"))
+               :SetTong(D.GetTongName(object.dwTongID, "[%s]"))
                :SetTitle(object.szTitle)
             local szName = MY.Game.GetObjectName(object)
             if szName then
@@ -564,7 +563,7 @@ local function CheckInvalidRect(dwType, dwID, me, bNoCreate)
                     )
                 end
             end
-            if me.bFightState ~= _C.bFightState then
+            if me.bFightState ~= LAST_FIGHT_STATE then
                 xlb:DrawLife()
             end
             -- 读条判定
@@ -623,7 +622,7 @@ local function CheckInvalidRect(dwType, dwID, me, bNoCreate)
             end
 
             -- 势力切换
-            local szRelation = _C.GetRelation(dwID)
+            local szRelation = D.GetRelation(dwID)
             if szRelation ~= tab.szRelation then
                 XLifeBar(object):Remove():Create()
                 CheckInvalidRect(dwType, dwID, me, true)
@@ -631,13 +630,13 @@ local function CheckInvalidRect(dwType, dwID, me, bNoCreate)
         elseif not bNoCreate then
             if dwType == TARGET.PLAYER
             or object.CanSeeName()
-            or (object.dwTemplateID == 46140 and (not MY.IsShieldedVersion() or _C.GetRelation(object) ~= "Enemy")) -- 清绝歌影
+            or (object.dwTemplateID == 46140 and (not MY.IsShieldedVersion() or D.GetRelation(object) ~= "Enemy")) -- 清绝歌影
             or Config.bShowSpecialNpc then
                 XLifeBar(object):Create()
                 CheckInvalidRect(dwType, dwID, me, true)
             end
         end
-    elseif _C.tObject[dwID] then
+    elseif OBJECT_INFO_CACHE[dwID] then
         XLifeBar(object):Remove()
     end
 end
@@ -652,16 +651,16 @@ function XLifeBar.OnFrameBreathe()
     end
 
     -- local _, _, fPitch = Camera_GetRTParams()
-    for k , v in pairs(_C.tNpc) do
+    for k , v in pairs(NPC_CACHE) do
         CheckInvalidRect(TARGET.NPC, k, me)
     end
 
-    for k , v in pairs(_C.tPlayer) do
+    for k , v in pairs(PLAYER_CACHE) do
         CheckInvalidRect(TARGET.PLAYER, k, me)
     end
 
-    if me.bFightState ~= _C.bFightState then
-        _C.bFightState = me.bFightState
+    if me.bFightState ~= LAST_FIGHT_STATE then
+        LAST_FIGHT_STATE = me.bFightState
     end
 end
 
@@ -678,7 +677,7 @@ MY.RegisterEvent("DO_SKILL_CAST", function()
     local dwID, dwSkillID = arg0, arg1
     local skill = GetSkill(arg1, 1)
     if skill.bIsChannelSkill then
-        local tab = _C.tObject[dwID]
+        local tab = OBJECT_INFO_CACHE[dwID]
         local nFrame = MY.GetChannelSkillFrame(dwSkillID) or 0
         local object = MY.GetObject(dwID)
         if object then
@@ -688,7 +687,7 @@ MY.RegisterEvent("DO_SKILL_CAST", function()
 end)
 -- 读条打断事件响应
 MY.RegisterEvent("OT_ACTION_PROGRESS_BREAK", function()
-    if _C.tObject[arg0] then
+    if OBJECT_INFO_CACHE[arg0] then
         local object = MY.GetObject(arg0)
         if object then
             XLifeBar(object):SetOTState(OT_STATE.BREAK)
@@ -714,11 +713,11 @@ end)
 -- MY.RegisterEvent("ON_SKILL_CHANNEL_PROGRESS ", function()Output("ON_SKILL_CHANNEL_PROGRESS",arg0, arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13) end)
 
 RegisterEvent("NPC_ENTER_SCENE",function()
-    _C.tNpc[arg0] = true
+    NPC_CACHE[arg0] = true
 end)
 
 RegisterEvent("NPC_LEAVE_SCENE",function()
-    _C.tNpc[arg0] = nil
+    NPC_CACHE[arg0] = nil
     local object = GetNpc(arg0)
     if object then
         XLifeBar(object):Remove()
@@ -726,11 +725,11 @@ RegisterEvent("NPC_LEAVE_SCENE",function()
 end)
 
 RegisterEvent("PLAYER_ENTER_SCENE",function()
-    _C.tPlayer[arg0] = true
+    PLAYER_CACHE[arg0] = true
 end)
 
 RegisterEvent("PLAYER_LEAVE_SCENE",function()
-    _C.tPlayer[arg0] = nil
+    PLAYER_CACHE[arg0] = nil
     local object = GetPlayer(arg0)
     if object then
         XLifeBar(object):Remove()
@@ -739,18 +738,18 @@ end)
 
 RegisterEvent("UPDATE_SELECT_TARGET",function()
     local _, dwID = MY.GetTarget()
-    if _C.dwTargetID == dwID then
+    if TARGET_ID == dwID then
         return
     end
-    local dwOldTargetID = _C.dwTargetID
-    _C.dwTargetID = dwID
-    if _C.tObject[dwOldTargetID] then
+    local dwOldTargetID = TARGET_ID
+    TARGET_ID = dwID
+    if OBJECT_INFO_CACHE[dwOldTargetID] then
         local object = MY.Game.GetObject(dwOldTargetID)
         if object then
             XLifeBar(object):DrawNames():DrawLife()
         end
     end
-    if _C.tObject[dwID] then
+    if OBJECT_INFO_CACHE[dwID] then
         local object = MY.Game.GetObject(dwID)
         if object then
             XLifeBar(object):DrawNames():DrawLife()
@@ -759,38 +758,38 @@ RegisterEvent("UPDATE_SELECT_TARGET",function()
 end)
 
 local PS = {}
+local function LoadUI(ui)
+    ui:children("#WndSliderBox_LifeBarWidth"):value(Config.nLifeWidth)
+    ui:children("#WndSliderBox_LifeBarHeight"):value(Config.nLifeHeight)
+    ui:children("#WndSliderBox_LifeBarOffsetX"):value(Config.nLifeOffsetX)
+    ui:children("#WndSliderBox_LifeBarOffsetY"):value(Config.nLifeOffsetY)
+    ui:children("#WndSliderBox_OTBarWidth"):value(Config.nOTBarWidth)
+    ui:children("#WndSliderBox_OTBarHeight"):value(Config.nOTBarHeight)
+    ui:children("#WndSliderBox_OTBarOffsetX"):value(Config.nOTBarOffsetX)
+    ui:children("#WndSliderBox_OTBarOffsetY"):value(Config.nOTBarOffsetY)
+    ui:children("#WndSliderBox_OTTitleOffsetX"):value(Config.nOTTitleOffsetX)
+    ui:children("#WndSliderBox_OTTitleOffsetY"):value(Config.nOTTitleOffsetY)
+    ui:children("#WndSliderBox_FristLineHeight"):value(Config.nLineHeight[1])
+    ui:children("#WndSliderBox_SecondLineHeight"):value(Config.nLineHeight[2])
+    ui:children("#WndSliderBox_ThirdLineHeight"):value(Config.nLineHeight[3])
+    ui:children("#WndSliderBox_LifePerOffsetX"):value(Config.nLifePerOffsetX)
+    ui:children("#WndSliderBox_LifePerOffsetY"):value(Config.nLifePerOffsetY)
+    ui:children("#WndSliderBox_Distance"):value(math.sqrt(Config.nDistance) / 64)
+    ui:children("#WndSliderBox_Alpha"):value(Config.nAlpha)
+    ui:children("#WndCheckBox_ShowSpecialNpc"):check(Config.bShowSpecialNpc)
+    ui:children("#WndButton_Font"):text(_L("Font: %d", Config.nFont))
+end
 function PS.OnPanelActive(wnd)
     local ui = MY.UI(wnd)
     local w, h = ui:size()
 
     local x, y = 10, 10
     local offsety = 40
-    local fnLoadUI = function(ui)
-        ui:children("#WndSliderBox_LifeBarWidth"):value(Config.nLifeWidth)
-        ui:children("#WndSliderBox_LifeBarHeight"):value(Config.nLifeHeight)
-        ui:children("#WndSliderBox_LifeBarOffsetX"):value(Config.nLifeOffsetX)
-        ui:children("#WndSliderBox_LifeBarOffsetY"):value(Config.nLifeOffsetY)
-        ui:children("#WndSliderBox_OTBarWidth"):value(Config.nOTBarWidth)
-        ui:children("#WndSliderBox_OTBarHeight"):value(Config.nOTBarHeight)
-        ui:children("#WndSliderBox_OTBarOffsetX"):value(Config.nOTBarOffsetX)
-        ui:children("#WndSliderBox_OTBarOffsetY"):value(Config.nOTBarOffsetY)
-        ui:children("#WndSliderBox_OTTitleOffsetX"):value(Config.nOTTitleOffsetX)
-        ui:children("#WndSliderBox_OTTitleOffsetY"):value(Config.nOTTitleOffsetY)
-        ui:children("#WndSliderBox_FristLineHeight"):value(Config.nLineHeight[1])
-        ui:children("#WndSliderBox_SecondLineHeight"):value(Config.nLineHeight[2])
-        ui:children("#WndSliderBox_ThirdLineHeight"):value(Config.nLineHeight[3])
-        ui:children("#WndSliderBox_LifePerOffsetX"):value(Config.nLifePerOffsetX)
-        ui:children("#WndSliderBox_LifePerOffsetY"):value(Config.nLifePerOffsetY)
-        ui:children("#WndSliderBox_Distance"):value(math.sqrt(Config.nDistance) / 64)
-        ui:children("#WndSliderBox_Alpha"):value(Config.nAlpha)
-        ui:children("#WndCheckBox_ShowSpecialNpc"):check(Config.bShowSpecialNpc)
-        ui:children("#WndButton_Font"):text(_L("Font: %d", Config.nFont))
-    end
     -- 开启/关闭
     ui:append("WndCheckBox", {
         x = x, y = y, text = _L["enable/disable"],
         checked = XLifeBar.bEnabled,
-        oncheck = function(bChecked) XLifeBar.bEnabled = bChecked _C.Reset(true) end,
+        oncheck = function(bChecked) XLifeBar.bEnabled = bChecked D.Reset(true) end,
 		tip = function()
 			if IsShielded() then
 				return _L['Can not use in pubg map!']
@@ -804,11 +803,11 @@ function PS.OnPanelActive(wnd)
         w = 180, x = x, y = y, text = _L["use global config"],
         checked = XLifeBar.bUseGlobalConfig,
         oncheck = function(bChecked)
-            _C.SaveConfig()
+            D.SaveConfig()
             XLifeBar.bUseGlobalConfig = bChecked
-            _C.LoadConfig()
-            fnLoadUI(ui)
-            _C.Reset()
+            D.LoadConfig()
+            LoadUI(ui)
+            D.Reset()
         end,
         autoenable = function() return IsEnabled() end,
     })
@@ -823,7 +822,7 @@ function PS.OnPanelActive(wnd)
         checked = XLifeBar.bOnlyInArena,
         oncheck = function(bChecked)
             XLifeBar.bOnlyInArena = bChecked
-            _C.Reset(true)
+            D.Reset(true)
         end,
         autoenable = function() return IsEnabled() end,
     })
@@ -833,7 +832,7 @@ function PS.OnPanelActive(wnd)
         checked = XLifeBar.bOnlyInBattleField,
         oncheck = function(bChecked)
             XLifeBar.bOnlyInBattleField = bChecked
-            _C.Reset(true)
+            D.Reset(true)
         end,
         autoenable = function() return IsEnabled() end,
     })
@@ -843,7 +842,7 @@ function PS.OnPanelActive(wnd)
         checked = XLifeBar.bOnlyInDungeon,
         oncheck = function(bChecked)
             XLifeBar.bOnlyInDungeon = bChecked
-            _C.Reset(true)
+            D.Reset(true)
         end,
         autoenable = function() return IsEnabled() end,
     })
@@ -858,7 +857,10 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 5, 150 },
         text = function(value) return _L("lifebar width: %s px.", value) end, -- 血条宽度
         value = Config.nLifeWidth or Config_Default.nLifeWidth,
-        onchange = function(value) Config.nLifeWidth = value;_C.Reset() end,
+        onchange = function(value)
+            Config.nLifeWidth = value
+            D.Reset()
+        end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -868,7 +870,10 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 5, 150 },
         text = function(value) return _L("lifebar height: %s px.", value) end, -- 血条高度
         value = Config.nLifeHeight or Config_Default.nLifeHeight,
-        onchange = function(value) Config.nLifeHeight = value;_C.Reset() end,
+        onchange = function(value)
+            Config.nLifeHeight = value
+            D.Reset()
+        end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -878,7 +883,10 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { -150, 150 },
         text = function(value) return _L("lifebar offset-x: %d px.", value) end, -- 血条水平偏移
         value = Config.nLifeOffsetX or Config_Default.nLifeOffsetX,
-        onchange = function(value) Config.nLifeOffsetX = value;_C.Reset() end,
+        onchange = function(value)
+            Config.nLifeOffsetX = value
+            D.Reset()
+        end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -888,7 +896,10 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
         text = function(value) return _L("lifebar offset-y: %d px.", value) end, -- 血条竖直偏移
         value = Config.nLifeOffsetY or Config_Default.nLifeOffsetY,
-        onchange = function(value) Config.nLifeOffsetY = value;_C.Reset() end,
+        onchange = function(value)
+            Config.nLifeOffsetY = value
+            D.Reset()
+        end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -898,7 +909,10 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { -150, 150 },
         text = function(value) return _L("life percentage offset-x: %d px.", value) end, -- 血量百分比水平偏移
         value = Config.nLifePerOffsetX or Config_Default.nLifePerOffsetX,
-        onchange = function(value) Config.nLifePerOffsetX = value;_C.Reset() end,
+        onchange = function(value)
+            Config.nLifePerOffsetX = value
+            D.Reset()
+        end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -908,7 +922,10 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
         text = function(value) return _L("life percentage offset-y: %d px.", value) end, -- 血量百分比竖直偏移
         value = Config.nLifePerOffsetY or Config_Default.nLifePerOffsetY,
-        onchange = function(value) Config.nLifePerOffsetY = value;_C.Reset() end,
+        onchange = function(value)
+            Config.nLifePerOffsetY = value
+            D.Reset()
+        end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -918,7 +935,10 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 5, 150 },
         text = function(value) return _L("otbar width: %s px.", value) end, -- OT宽度
         value = Config.nOTBarWidth or Config_Default.nOTBarWidth,
-        onchange = function(value) Config.nOTBarWidth = value;_C.Reset() end,
+        onchange = function(value)
+            Config.nOTBarWidth = value
+            D.Reset()
+        end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -928,7 +948,10 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 5, 150 },
         text = function(value) return _L("otbar height: %s px.", value) end, -- OT高度
         value = Config.nOTBarHeight or Config_Default.nOTBarHeight,
-        onchange = function(value) Config.nOTBarHeight = value;_C.Reset() end,
+        onchange = function(value)
+            Config.nOTBarHeight = value
+            D.Reset()
+        end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -938,7 +961,10 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { -150, 150 },
         text = function(value) return _L("otbar offset-x: %d px.", value) end, -- OT水平偏移
         value = Config.nOTBarOffsetX or Config_Default.nOTBarOffsetX,
-        onchange = function(value) Config.nOTBarOffsetX = value;_C.Reset() end,
+        onchange = function(value)
+            Config.nOTBarOffsetX = value
+            D.Reset()
+        end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -948,7 +974,10 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
         text = function(value) return _L("otbar offset-y: %d px.", value) end, -- OT竖直偏移
         value = Config.nOTBarOffsetY or Config_Default.nOTBarOffsetY,
-        onchange = function(value) Config.nOTBarOffsetY = value;_C.Reset() end,
+        onchange = function(value)
+            Config.nOTBarOffsetY = value
+            D.Reset()
+        end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -958,7 +987,10 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { -150, 150 },
         text = function(value) return _L("ot title offset-x: %d px.", value) end, -- OT名称水平偏移
         value = Config.nOTTitleOffsetX or Config_Default.nOTTitleOffsetX,
-        onchange = function(value) Config.nOTTitleOffsetX = value;_C.Reset() end,
+        onchange = function(value)
+            Config.nOTTitleOffsetX = value
+            D.Reset()
+        end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -968,7 +1000,10 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
         text = function(value) return _L("ot title offset-y: %d px.", value) end, -- OT名称竖直偏移
         value = Config.nOTTitleOffsetY or Config_Default.nOTTitleOffsetY,
-        onchange = function(value) Config.nOTTitleOffsetY = value;_C.Reset() end,
+        onchange = function(value)
+            Config.nOTTitleOffsetY = value
+            D.Reset()
+        end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -978,7 +1013,10 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
         text = function(value) return _L("1st line offset-y: %d px.", value) end, -- 第一行字高度
         value = Config.nLineHeight[1] or Config_Default.nLineHeight[1],
-        onchange = function(value) Config.nLineHeight[1] = value;_C.Reset() end,
+        onchange = function(value)
+            Config.nLineHeight[1] = value
+            D.Reset()
+        end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -988,7 +1026,10 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
         text = function(value) return _L("2nd line offset-y: %d px.", value) end, -- 第二行字高度
         value = Config.nLineHeight[2] or Config_Default.nLineHeight[2],
-        onchange = function(value) Config.nLineHeight[2] = value;_C.Reset() end,
+        onchange = function(value)
+            Config.nLineHeight[2] = value
+            D.Reset()
+        end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -998,7 +1039,10 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
         text = function(value) return _L("3rd line offset-y: %d px.", value) end, -- 第三行字高度
         value = Config.nLineHeight[3] or Config_Default.nLineHeight[3],
-        onchange = function(value) Config.nLineHeight[3] = value;_C.Reset() end,
+        onchange = function(value)
+            Config.nLineHeight[3] = value
+            D.Reset()
+        end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -1008,7 +1052,10 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 300 },
         text = function(value) return value == 0 and _L["Max Distance: Unlimited."] or _L("Max Distance: %s foot.", value) end,
         value = math.sqrt(Config.nDistance or Config_Default.nDistance) / 64,
-        onchange = function(value) Config.nDistance = value * value * 64 * 64;_C.Reset() end,
+        onchange = function(value)
+            Config.nDistance = value * value * 64 * 64
+            D.Reset()
+        end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -1018,7 +1065,10 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_PERCENT, range = { 0, 255 },
         text = function(value) return _L("alpha: %.0f%%.", value) end, -- 透明度
         value = Config.nAlpha or Config_Default.nAlpha,
-        onchange = function(value) Config.nAlpha = value*255/100;_C.Reset() end,
+        onchange = function(value)
+            Config.nAlpha = value * 255 / 100
+            D.Reset()
+        end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -1032,7 +1082,7 @@ function PS.OnPanelActive(wnd)
         opt.bColorTable = true
         opt.fnChangeColor = function(_, r, g, b)
             cfg[tartype] = { r, g, b }
-            _C.Reset()
+            D.Reset()
         end
         if tartype == "Player" then
             table.insert(opt, {
@@ -1041,7 +1091,7 @@ function PS.OnPanelActive(wnd)
                 bChecked = not cfg.DifferentiateForce,
                 fnAction = function(_, r, g, b)
                     cfg.DifferentiateForce = false
-                    _C.Reset()
+                    D.Reset()
                 end,
                 rgb = cfg[tartype],
                 szIcon = 'ui/Image/button/CommonButton_1.UITex',
@@ -1050,7 +1100,7 @@ function PS.OnPanelActive(wnd)
                 fnClickIcon = function()
                     XGUI.OpenColorPicker(function(r, g, b)
                         cfg[tartype] = { r, g, b }
-                        _C.Reset()
+                        D.Reset()
                     end)
                 end,
             })
@@ -1060,7 +1110,7 @@ function PS.OnPanelActive(wnd)
                 bChecked = cfg.DifferentiateForce,
                 fnAction = function(_, r, g, b)
                     cfg.DifferentiateForce = true
-                    _C.Reset()
+                    D.Reset()
                 end,
             })
             table.insert(opt,{ bDevide = true } )
@@ -1074,7 +1124,7 @@ function PS.OnPanelActive(wnd)
                     fnClickIcon = function()
                         XGUI.OpenColorPicker(function(r, g, b)
                             cfg[dwForceID] = { r, g, b }
-                            _C.Reset()
+                            D.Reset()
                         end)
                     end,
                     fnDisable = function()
@@ -1097,7 +1147,7 @@ function PS.OnPanelActive(wnd)
                         bChecked = cfg.Player,
                         fnAction = function()
                             cfg.Player = not cfg.Player
-                            _C.Reset()
+                            D.Reset()
                         end,
                     }, relation, "Player"))
                 end
@@ -1116,7 +1166,7 @@ function PS.OnPanelActive(wnd)
                         bChecked = cfg.Npc,
                         fnAction = function()
                             cfg.Npc = not cfg.Npc
-                            _C.Reset()
+                            D.Reset()
                         end,
                     }, relation, "Npc"))
                 end
@@ -1170,7 +1220,7 @@ function PS.OnPanelActive(wnd)
                     bChecked = Config.szLifeDirection == szDirection,
                     fnAction = function()
                         Config.szLifeDirection = szDirection
-                        _C.Reset()
+                        D.Reset()
                     end,
                 })
             end
@@ -1193,7 +1243,7 @@ function PS.OnPanelActive(wnd)
                 bChecked = Config.bHideLifePercentageWhenFight,
                 fnAction = function()
                     Config.bHideLifePercentageWhenFight = not Config.bHideLifePercentageWhenFight
-                    _C.Reset()
+                    D.Reset()
                 end,
             })
             table.insert(t, {
@@ -1202,7 +1252,7 @@ function PS.OnPanelActive(wnd)
                 bChecked = Config.bHideLifePercentageDecimal,
                 fnAction = function()
                     Config.bHideLifePercentageDecimal = not Config.bHideLifePercentageDecimal
-                    _C.Reset()
+                    D.Reset()
                 end,
             })
             return t
@@ -1227,7 +1277,7 @@ function PS.OnPanelActive(wnd)
                     bChecked = Config.szOTBarDirection == szDirection,
                     fnAction = function()
                         Config.szOTBarDirection = szDirection
-                        _C.Reset()
+                        D.Reset()
                     end,
                 })
             end
@@ -1250,7 +1300,7 @@ function PS.OnPanelActive(wnd)
                 bChecked = Config.nCamp == -1,
                 fnAction = function()
                     Config.nCamp = -1
-                    _C.Reset()
+                    D.Reset()
                 end,
             }, {
                 szOption = g_tStrings.STR_CAMP_TITLE[CAMP.GOOD],
@@ -1258,7 +1308,7 @@ function PS.OnPanelActive(wnd)
                 bChecked = Config.nCamp == CAMP.GOOD,
                 fnAction = function()
                     Config.nCamp = CAMP.GOOD
-                    _C.Reset()
+                    D.Reset()
                 end,
             }, {
                 szOption = g_tStrings.STR_CAMP_TITLE[CAMP.EVIL],
@@ -1266,7 +1316,7 @@ function PS.OnPanelActive(wnd)
                 bChecked = Config.nCamp == CAMP.EVIL,
                 fnAction = function()
                     Config.nCamp = CAMP.EVIL
-                    _C.Reset()
+                    D.Reset()
                 end,
             }, {
                 szOption = g_tStrings.STR_CAMP_TITLE[CAMP.NEUTRAL],
@@ -1274,7 +1324,7 @@ function PS.OnPanelActive(wnd)
                 bChecked = Config.nCamp == CAMP.NEUTRAL,
                 fnAction = function()
                     Config.nCamp = CAMP.NEUTRAL
-                    _C.Reset()
+                    D.Reset()
                 end,
             }}
         end,
@@ -1286,7 +1336,10 @@ function PS.OnPanelActive(wnd)
     ui:append("WndCheckBox", {
         x = x, y = y, text = _L['show special npc'],
         checked = Config.bShowSpecialNpc,
-        oncheck = function(bChecked) Config.bShowSpecialNpc = bChecked;_C.Reset() end,
+        oncheck = function(bChecked)
+            Config.bShowSpecialNpc = bChecked
+            D.Reset()
+        end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety - 10
@@ -1294,7 +1347,10 @@ function PS.OnPanelActive(wnd)
     ui:append("WndCheckBox", {
         x = x, y = y, text = _L['adjust index'],
         checked = Config.bAdjustIndex,
-        oncheck = function(bChecked) Config.bAdjustIndex = bChecked;_C.Reset() end,
+        oncheck = function(bChecked)
+            Config.bAdjustIndex = bChecked
+            D.Reset()
+        end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety - 10
@@ -1302,7 +1358,10 @@ function PS.OnPanelActive(wnd)
     ui:append("WndCheckBox", {
         x = x, y = y, text = _L['show distance'],
         checked = Config.bShowDistance,
-        oncheck = function(bChecked) Config.bShowDistance = bChecked;_C.Reset() end,
+        oncheck = function(bChecked)
+            Config.bShowDistance = bChecked
+            D.Reset()
+        end,
         autoenable = function() return IsEnabled() end,
     })
     y = y + offsety
@@ -1311,7 +1370,8 @@ function PS.OnPanelActive(wnd)
         x = x, y = y, text = _L("Font: %d",Config.nFont),
         onclick = function()
             MY.UI.OpenFontPicker(function(nFont)
-                Config.nFont = nFont;_C.Reset()
+                Config.nFont = nFont
+                D.Reset()
                 ui:children("#WndButton_Font"):text(_L("Font: %d",Config.nFont))
             end)
         end,
@@ -1327,8 +1387,8 @@ function PS.OnPanelActive(wnd)
                 szMessage = _L['Are you sure to reset config?'], {
                     szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function()
                         Config = clone(Config_Default)
-                        _C.Reset()
-                        fnLoadUI(ui)
+                        D.Reset()
+                        LoadUI(ui)
                     end
                 }, {szOption = g_tStrings.STR_HOTKEY_CANCEL,fnAction = function() end},
             })
@@ -1341,6 +1401,6 @@ MY.RegisterPanel("XLifeBar", _L["x lifebar"], _L['General'], "UI/Image/LootPanel
 
 local function onSwitch()
     XLifeBar.bEnabled = not XLifeBar.bEnabled
-    _C.Reset(true)
+    D.Reset(true)
 end
 MY.Game.RegisterHotKey("MY_XLifeBar_S", _L["x lifebar"], onSwitch)
