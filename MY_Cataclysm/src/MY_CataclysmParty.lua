@@ -37,12 +37,12 @@ local CTM_CACHE              = setmetatable({}, { __mode = "v" })
 local CTM_LIFE_CACHE         = {}
 local CTM_BUFF_CACHE         = {}
 local CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID
-local CHANGGE_REAL_SHADOW_ID    = 46140 -- 清绝歌影 的主体影子
+local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子
 local CHANGGE_REAL_SHADOW_CACHE = {}
 do
 local function onNpcEnterScene()
 	local npc = GetNpc(arg0)
-	if npc.dwTemplateID == CHANGGE_REAL_SHADOW_ID then
+	if npc.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID then
 		CHANGGE_REAL_SHADOW_CACHE[npc.dwEmployer] = arg0
 		CHANGGE_REAL_SHADOW_CACHE[arg0] = npc.dwEmployer
 	end
