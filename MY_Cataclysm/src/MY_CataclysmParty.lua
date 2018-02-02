@@ -31,8 +31,8 @@ local CTM_GROUP_COUNT        = 5 - 1 -- 防止以后开个什么40人本 估计不太可能 就和
 local CTM_MEMBER_COUNT       = 5
 local CTM_DRAG               = false
 local CTM_DRAG_ID
-local CTM_TARGET
-local CTM_TTARGET
+local CTM_TARGET -- 注意这个是UI逻辑选中目标 不一定是真实的当前目标
+local CTM_TTARGET -- 注意这个是UI逻辑目标选中的目标 不一定是真实的当前目标
 local CTM_CACHE              = setmetatable({}, { __mode = "v" })
 local CTM_LIFE_CACHE         = {}
 local CTM_BUFF_CACHE         = {}
@@ -597,32 +597,42 @@ function CTM:GetTeamInfo()
 end
 
 local function HideTarget()
-	if CTM_CACHE[CTM_TARGET] and CTM_CACHE[CTM_TARGET]:IsValid() then
-		if CTM_CACHE[CTM_TARGET]:Lookup("Image_Selected") and CTM_CACHE[CTM_TARGET]:Lookup("Image_Selected"):IsValid() then
-			CTM_CACHE[CTM_TARGET]:Lookup("Image_Selected"):Hide()
-		end
+	if CTM_TARGET
+	and CTM_CACHE[CTM_TARGET]
+	and CTM_CACHE[CTM_TARGET]:IsValid()
+	and CTM_CACHE[CTM_TARGET]:Lookup("Image_Selected")
+	and CTM_CACHE[CTM_TARGET]:Lookup("Image_Selected"):IsValid() then
+		CTM_CACHE[CTM_TARGET]:Lookup("Image_Selected"):Hide()
 	end
 end
 
 function CTM:RefreshTarget(dwOldID, nOldType, dwNewID, nNewType)
+	if nOldType == TARGET.NPC and CHANGGE_REAL_SHADOW_CACHE[dwOldID] then
+		nOldType, dwOldID = TARGET.PLAYER, CHANGGE_REAL_SHADOW_CACHE[dwOldID]
+	end
+	if nNewType == TARGET.NPC and CHANGGE_REAL_SHADOW_CACHE[dwNewID] then
+		nNewType, dwNewID = TARGET.PLAYER, CHANGGE_REAL_SHADOW_CACHE[dwNewID]
+	end
 	if dwOldID == CTM_TARGET then
 		HideTarget()
 	end
-	if nNewType == TARGET.PLAYER then
-		if CTM_CACHE[dwNewID] and CTM_CACHE[dwNewID]:IsValid() then
-			if CTM_CACHE[dwNewID]:Lookup("Image_Selected") and CTM_CACHE[dwNewID]:Lookup("Image_Selected"):IsValid() then
-				CTM_CACHE[dwNewID]:Lookup("Image_Selected"):Show()
-			end
-		end
+	if nNewType == TARGET.PLAYER
+	and CTM_CACHE[dwNewID]
+	and CTM_CACHE[dwNewID]:IsValid()
+	and CTM_CACHE[dwNewID]:Lookup("Image_Selected")
+	and CTM_CACHE[dwNewID]:Lookup("Image_Selected"):IsValid() then
+		CTM_CACHE[dwNewID]:Lookup("Image_Selected"):Show()
 	end
 	CTM_TARGET = dwNewID
 end
 
 local function HideTTarget()
-	if CTM_CACHE[CTM_TTARGET] and CTM_CACHE[CTM_TTARGET]:IsValid() then
-		if CTM_CACHE[CTM_TTARGET]:Lookup("Handle_TargetTarget") and CTM_CACHE[CTM_TTARGET]:Lookup("Handle_TargetTarget"):IsValid() then
-			CTM_CACHE[CTM_TTARGET]:Lookup("Handle_TargetTarget"):Hide()
-		end
+	if CTM_TTARGET
+	and CTM_CACHE[CTM_TTARGET]
+	and CTM_CACHE[CTM_TTARGET]:IsValid()
+	and CTM_CACHE[CTM_TTARGET]:Lookup("Handle_TargetTarget")
+	and CTM_CACHE[CTM_TTARGET]:Lookup("Handle_TargetTarget"):IsValid() then
+		CTM_CACHE[CTM_TTARGET]:Lookup("Handle_TargetTarget"):Hide()
 	end
 end
 
@@ -632,27 +642,26 @@ function CTM:RefreshTTarget()
 		if dwID then
 			local KObject = MY_GetObject(dwID)
 			if KObject then
-				local tdwType, tdwID = KObject.GetTarget()
-				if tdwID ~= CTM_TTARGET then
+				local dwTarType, dwTarID = KObject.GetTarget()
+				if dwTarType == TARGET.NPC and CHANGGE_REAL_SHADOW_CACHE[dwTarID] then
+					dwTarType, dwTarID = TARGET.PLAYER, CHANGGE_REAL_SHADOW_CACHE[dwTarID]
+				end
+				if dwTarID ~= CTM_TTARGET then
 					HideTTarget()
 				end
-				if tdwID and tdwID ~= 0 and tdwType == TARGET.PLAYER then
-					if CTM_CACHE[tdwID] and CTM_CACHE[tdwID]:IsValid() then
-						if CTM_CACHE[tdwID]:Lookup("Handle_TargetTarget") and CTM_CACHE[tdwID]:Lookup("Handle_TargetTarget"):IsValid() then
-							CTM_CACHE[tdwID]:Lookup("Handle_TargetTarget"):Show()
-						end
-					end
+				if dwTarID and dwTarID ~= 0 and dwTarType == TARGET.PLAYER
+				and CTM_CACHE[dwTarID]
+				and CTM_CACHE[dwTarID]:IsValid()
+				and CTM_CACHE[dwTarID]:Lookup("Handle_TargetTarget")
+				and CTM_CACHE[dwTarID]:Lookup("Handle_TargetTarget"):IsValid() then
+					CTM_CACHE[dwTarID]:Lookup("Handle_TargetTarget"):Show()
 				end
-				CTM_TTARGET = tdwID
-			else
-				HideTTarget()
+				CTM_TTARGET = dwTarID
+				return
 			end
-		else
-			HideTTarget()
 		end
-	else
-		HideTTarget()
 	end
+	HideTTarget()
 end
 
 function CTM:RefreshMark()
@@ -968,8 +977,8 @@ function CTM:DrawParty(nIndex)
 	end
 	CTM_LIFE_CACHE = {}
 	-- 刷新
-	CTM_TTARGET = nil
 	CTM_TARGET = nil
+	CTM_TTARGET = nil
 	local dwType, dwID = Target_GetTargetData()
 	self:RefreshTarget(dwID, dwType, dwID, dwType)
 	self:RefreshTTarget()
