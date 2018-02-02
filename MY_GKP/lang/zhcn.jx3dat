@@ -153,4 +153,5 @@ data = {
 	["Auto pickup all"] = "自动拾取全部物品",
 	["Auto pickup this"] = "自动拾取该组物品",
 	["GKP Loot"] = "拾取助手",
+	["Team Members: %d, %d agree %d%%"] = "团队共%d人，%d人已同意发放工资，当前比率%d%%。",
 }
