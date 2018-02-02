@@ -874,9 +874,23 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bNa
 		txtName:SetFontScheme(CFG.nNameFont)
 		txtName:SetFontColor(r, g, b)
 		txtName:SetFontScale(CFG.fNameFontScale)
-		txtSchool:SetText(CTM_KUNGFU_TEXT[info.dwMountKungfuID])
-		txtSchool:SetFontScheme(CFG.nNameFont)
-		txtSchool:SetFontColor(r, g, b)
+		local fScale = (CFG.fScaleY + CFG.fScaleX) / 2
+		if fScale * 0.9 > 1 then
+			fScale = fScale * 0.9
+		end
+		if CFG.nShowIcon == 4 then
+			txtSchool:SetText(CTM_KUNGFU_TEXT[info.dwMountKungfuID])
+			txtSchool:SetFontScheme(CFG.nNameFont)
+			txtSchool:SetFontColor(r, g, b)
+			txtSchool:SetFontScale(fScale)
+			txtSchool:AutoSize()
+			local txtName = h:Lookup("Text_Name")
+			if txtName:GetHAlign() == 0 then -- 如果名字是左对齐的 刷新名字位置
+				txtName:SetRelX(txtSchool:GetRelX() + txtSchool:GetW() + 5)
+				txtName:SetAbsX(txtSchool:GetAbsX() + txtSchool:GetW() + 5)
+				txtName:SetW(h:GetW() - txtSchool:GetRelX() - txtSchool:GetW() - 10)
+			end
+		end
 		txtSchool:SetVisible(CFG.nShowIcon == 4)
 	end
 end
