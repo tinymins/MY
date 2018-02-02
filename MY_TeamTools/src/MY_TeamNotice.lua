@@ -31,6 +31,8 @@ function TI.CreateFrame(a, b)
 	local ui = TI.GetFrame()
 	if ui then
 		ui = XGUI(ui)
+		ui:children("#YY"):text(a)
+		ui:children("#Message"):text(b)
 	else
 		ui = XGUI.CreateFrame("MY_TeamNotice", {
 			w = 320, h = 195,
@@ -39,128 +41,128 @@ function TI.CreateFrame(a, b)
 			simple = true, close = true, close = true,
 			setting = function() MY.OpenPanel() MY.SwitchTab("MY_TeamTools") end,
 		}):drag(function() MY_TeamNotice.anchor = GetFrameAnchor(TI.GetFrame()) end)
-	end
-	local x, y = 10, 5
-	x = x + ui:append("Text", { x = x, y = y - 3, text = _L["YY:"], font = 48 }, true):autoWidth():width() + 5
-	x = x + ui:append("WndAutocomplete", {
-		name = "YY",
-		w = 160, h = 26, x = x, y = y,
-		text = a, font = 48, color = { 128, 255, 0 },
-		onclick = function()
-			if IsPopupMenuOpened() then
-				XGUI(this):autocomplete('close')
-			elseif MY.IsLeader() then
-				XGUI(this):autocomplete('search', '')
-			end
-		end,
-		onchange = function(szText)
-			if TI.szYY == szText then
-				return
-			end
-			if MY.IsLeader() then
-				TI.szYY = szText
-				MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "TI", "Edit", szText, ui:children("#Message"):text())
-			else
-				ui:children("#YY"):text(TI.szYY, true)
-			end
-		end,
-		autocomplete = {
-			{
-				'option', 'beforeSearch', function(raw, option, text)
-					if MY.IsLeader() then
-						TI.tList = TI.GetList()
-						option.source = {}
-						for k, v in pairs(TI.tList) do
-							table.insert(option.source, k)
-						end
-						if #option.source == 1 and tostring(option.source[1]) == text then
+		local x, y = 10, 5
+		x = x + ui:append("Text", { x = x, y = y - 3, text = _L["YY:"], font = 48 }, true):autoWidth():width() + 5
+		x = x + ui:append("WndAutocomplete", {
+			name = "YY",
+			w = 160, h = 26, x = x, y = y,
+			text = a, font = 48, color = { 128, 255, 0 },
+			onclick = function()
+				if IsPopupMenuOpened() then
+					XGUI(this):autocomplete('close')
+				elseif MY.IsLeader() then
+					XGUI(this):autocomplete('search', '')
+				end
+			end,
+			onchange = function(szText)
+				if TI.szYY == szText then
+					return
+				end
+				if MY.IsLeader() then
+					TI.szYY = szText
+					MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "TI", "Edit", szText, ui:children("#Message"):text())
+				else
+					ui:children("#YY"):text(TI.szYY, true)
+				end
+			end,
+			autocomplete = {
+				{
+					'option', 'beforeSearch', function(raw, option, text)
+						if MY.IsLeader() then
+							TI.tList = TI.GetList()
+							option.source = {}
+							for k, v in pairs(TI.tList) do
+								table.insert(option.source, k)
+							end
+							if #option.source == 1 and tostring(option.source[1]) == text then
+								option.source = {}
+							end
+						else
 							option.source = {}
 						end
-					else
-						option.source = {}
+					end,
+				},
+				{
+					'option', 'beforeDelete', function(szOption, fnDoDelete, option)
+						TI.tList[tonumber(szOption)] = nil
+						TI.SaveList()
+					end,
+				},
+			},
+		}, true):width() + 5
+		y = y + ui:append("WndButton2", {
+			x = x, y = y, text = _L["Paste YY"],
+			onclick = function()
+				local yy = ui:children("#YY"):text()
+				if tonumber(yy) then
+					TI.tList = TI.GetList()
+					if not TI.tList[tonumber(yy)] then
+						TI.tList[tonumber(yy)] = true
+						TI.SaveList()
 					end
-				end,
-			},
-			{
-				'option', 'beforeDelete', function(szOption, fnDoDelete, option)
-					TI.tList[tonumber(szOption)] = nil
-					TI.SaveList()
-				end,
-			},
-		},
-	}, true):width() + 5
-	y = y + ui:append("WndButton2", {
-		x = x, y = y, text = _L["Paste YY"],
-		onclick = function()
-			local yy = ui:children("#YY"):text()
-			if tonumber(yy) then
-				TI.tList = TI.GetList()
-				if not TI.tList[tonumber(yy)] then
-					TI.tList[tonumber(yy)] = true
-					TI.SaveList()
 				end
-			end
-			if yy ~= "" then
-				for i = 0, 2 do -- 发三次
-					MY.Talk(PLAYER_TALK_CHANNEL.RAID, yy)
+				if yy ~= "" then
+					for i = 0, 2 do -- 发三次
+						MY.Talk(PLAYER_TALK_CHANNEL.RAID, yy)
+					end
 				end
-			end
-		end,
-	}, true):height() + 5
-	ui:append("WndEditBox", {
-		name = "Message",
-		w = 300, h = 80, x = 10, y = y,
-		multiline = true, limit = 512,
-		text = b,
-		onchange = function(szText)
-			if TI.szNote == szText then
-				return
-			end
-			if MY.IsLeader() then
-				TI.szNote = szText
-				MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "TI", "Edit", ui:children("#YY"):text(), szText)
-			else
-				ui:children("#Message"):text(TI.szNote)
-			end
-		end,
-	})
-	x, y = 5, 130
-	x = x + ui:append("WndButton2", { x = x, y = y, text = _L["Raid Tools"], onclick = MY_RaidTools.TogglePanel }, true):autoWidth():width() + 5
-	x = x + ui:append("WndButton2", {
-		x = x, y = y,
-		text = _L["GKP Golden Team Record"],
-		onclick = function()
-			if MY_GKP then
-				MY_GKP.TogglePanel()
-			else
-				MY.Alert(_L["You haven't had MY_GKP installed and loaded yet."])
-			end
-		end,
-	}, true):autoWidth():width() + 5
-	if DBM_RemoteRequest then
-		x = x + ui:append("WndButton2", { x = x, y = y, text = _L["Import Data"], onclick = DBM_RemoteRequest.TogglePanel }, true):autoWidth():width() + 5
-	end
-	TI.szYY   = ui:children("#YY"):text()
-	TI.szNote = ui:children("#Message"):text()
-	-- 注册事件
-	local frame = TI.GetFrame()
-	frame.OnFrameKeyDown = nil -- esc close --> nil
-	frame:RegisterEvent("PARTY_DISBAND")
-	frame:RegisterEvent("PARTY_DELETE_MEMBER")
-	frame:RegisterEvent("PARTY_ADD_MEMBER")
-	frame.OnEvent = function(szEvent)
-		if szEvent == "PARTY_DISBAND" then
-			ui:remove()
-		elseif szEvent == "PARTY_DELETE_MEMBER" then
-			if arg1 == UI_GetClientPlayerID() then
+			end,
+		}, true):height() + 5
+		ui:append("WndEditBox", {
+			name = "Message",
+			w = 300, h = 80, x = 10, y = y,
+			multiline = true, limit = 512,
+			text = b,
+			onchange = function(szText)
+				if TI.szNote == szText then
+					return
+				end
+				if MY.IsLeader() then
+					TI.szNote = szText
+					MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "TI", "Edit", ui:children("#YY"):text(), szText)
+				else
+					ui:children("#Message"):text(TI.szNote)
+				end
+			end,
+		})
+		x, y = 5, 130
+		x = x + ui:append("WndButton2", { x = x, y = y, text = _L["Raid Tools"], onclick = MY_RaidTools.TogglePanel }, true):autoWidth():width() + 5
+		x = x + ui:append("WndButton2", {
+			x = x, y = y,
+			text = _L["GKP Golden Team Record"],
+			onclick = function()
+				if MY_GKP then
+					MY_GKP.TogglePanel()
+				else
+					MY.Alert(_L["You haven't had MY_GKP installed and loaded yet."])
+				end
+			end,
+		}, true):autoWidth():width() + 5
+		if DBM_RemoteRequest then
+			x = x + ui:append("WndButton2", { x = x, y = y, text = _L["Import Data"], onclick = DBM_RemoteRequest.TogglePanel }, true):autoWidth():width() + 5
+		end
+		-- 注册事件
+		local frame = TI.GetFrame()
+		frame.OnFrameKeyDown = nil -- esc close --> nil
+		frame:RegisterEvent("PARTY_DISBAND")
+		frame:RegisterEvent("PARTY_DELETE_MEMBER")
+		frame:RegisterEvent("PARTY_ADD_MEMBER")
+		frame.OnEvent = function(szEvent)
+			if szEvent == "PARTY_DISBAND" then
 				ui:remove()
-			end
-		elseif szEvent == "PARTY_ADD_MEMBER" then
-			if MY.IsLeader() then
-				MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "TI", "reply", arg1, TI.szYY, TI.szNote)
+			elseif szEvent == "PARTY_DELETE_MEMBER" then
+				if arg1 == UI_GetClientPlayerID() then
+					ui:remove()
+				end
+			elseif szEvent == "PARTY_ADD_MEMBER" then
+				if MY.IsLeader() then
+					MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "TI", "reply", arg1, TI.szYY, TI.szNote)
+				end
 			end
 		end
 	end
+	TI.szYY   = a
+	TI.szNote = b
 end
 
 MY.RegisterEvent("PARTY_LEVEL_UP_RAID.TEAM_NOTICE", function()
