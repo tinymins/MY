@@ -16,6 +16,7 @@ local GetClientPlayer, GetClientTeam, GetPlayer = GetClientPlayer, GetClientTeam
 local Station, SetTarget, Target_GetTargetData = Station, SetTarget, Target_GetTargetData
 local Table_BuffIsVisible = Table_BuffIsVisible
 local CFG                    = Cataclysm_Main
+local CTM_BG_COLOR_MODE      = MY_Cataclysm.BG_COLOR_MODE
 -- global STR cache
 local COINSHOP_SOURCE_NULL   = g_tStrings.COINSHOP_SOURCE_NULL
 local STR_FRIEND_NOT_ON_LINE = g_tStrings.STR_FRIEND_NOT_ON_LINE
@@ -1256,60 +1257,45 @@ function CTM:RefreshBuff()
 end
 
 function CTM:RefreshDistance()
-	if CFG.bEnableDistance then
-		for k, v in pairs(CTM_CACHE) do
-			if v:IsValid() then
-				local p = GetPlayer(k) -- info.nPoX 刷新太慢了 对于治疗来说 这个太重要了
-				if p then
-					local nDistance = MY_GetDistance(p.nX, p.nY) -- 只计算平面
-					if CFG.nBGColorMode == 1 or CFG.nBGColorMode == 3 then
-						local find
-						for kk, vv in ipairs(CFG.tDistanceLevel) do
-							if nDistance <= vv then
-								if v.nDistanceLevel ~= kk then
-									v.nDistanceLevel = kk
-									self:CallDrawHPMP(k, true)
-								end
-								find = true
-								break
+	for k, v in pairs(CTM_CACHE) do
+		if v:IsValid() then
+			local p = GetPlayer(k) -- info.nPoX 刷新太慢了 对于治疗来说 这个太重要了
+			if p then
+				local nDistance = MY_GetDistance(p.nX, p.nY) -- 只计算平面
+				if CFG.bEnableDistance then
+					local find
+					for kk, vv in ipairs(CFG.tDistanceLevel) do
+						if nDistance <= vv then
+							if v.nDistanceLevel ~= kk then
+								v.nDistanceLevel = kk
+								self:CallDrawHPMP(k, true)
 							end
-						end
-						-- 如果上面都不匹配的话 默认认为出了同步范围 feedback 桥之于水
-						if not find and v.nDistanceLevel then
-							v.nDistanceLevel = nil
-							self:CallDrawHPMP(k, true)
-						end
-					else
-						local _nDistance = v.nDistance or 0
-						v.nDistance = nDistance
-						if (nDistance > 20 and _nDistance <= 20) or (nDistance <= 20 and _nDistance > 20) then
-							self:CallDrawHPMP(k, true)
+							find = true
+							break
 						end
 					end
-					if CFG.bShowDistance then
-						v:Lookup("Text_Distance"):SetText(string.format("%.1f", nDistance))
-						v:Lookup("Text_Distance"):SetFontColor(255, math.max(0, 255 - nDistance * 8), math.max(0, 255 - nDistance * 8))
-					else
-						v:Lookup("Text_Distance"):SetText("")
-					end
-				else
-					if CFG.bShowDistance then
-						v:Lookup("Text_Distance"):SetText("")
-					end
-					if v.nDistanceLevel or v.nDistance then
+					-- 如果上面都不匹配的话 默认认为出了同步范围 feedback 桥之于水
+					if not find and v.nDistanceLevel then
 						v.nDistanceLevel = nil
-						v.nDistance = nil
 						self:CallDrawHPMP(k, true)
 					end
-				end
-			end
-		end
-	else
-		for k, v in pairs(CTM_CACHE) do
-			if v:IsValid() then
-				if v.nDistanceLevel or v.nDistance ~= 0 then
-					v.nDistanceLevel = 1
+				else
 					v.nDistance = 0
+					v.nDistanceLevel = 1
+				end
+				if CFG.bShowDistance then
+					v:Lookup("Text_Distance"):SetText(string.format("%.1f", nDistance))
+					v:Lookup("Text_Distance"):SetFontColor(255, math.max(0, 255 - nDistance * 8), math.max(0, 255 - nDistance * 8))
+				else
+					v:Lookup("Text_Distance"):SetText("")
+				end
+			else
+				if CFG.bShowDistance then
+					v:Lookup("Text_Distance"):SetText("")
+				end
+				if v.nDistance or v.nDistanceLevel then
+					v.nDistance = nil
+					v.nDistanceLevel = nil
 					self:CallDrawHPMP(k, true)
 				end
 			end
@@ -1339,7 +1325,7 @@ end
 -- 缩放对动态构建的UI不会缩放 所以需要后处理
 function CTM:DrawHPMP(h, dwID, info, bRefresh)
 	if not info then return end
-	local bSha = CFG.nBGColorMode ~= 3
+	local bSha = CFG.nBGColorMode ~= CTM_BG_COLOR_MODE.OFFICIAL
 	local hLife = h:Lookup("Handle_Life")
 	local hMana = h:Lookup("Handle_Mana")
 	local Lsha = hLife:Lookup("Shadow_Life")
@@ -1393,7 +1379,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 	end
 	-- 透明度
 	local nAlpha = 255
-	if CFG.nBGColorMode == 3 then
+	if CFG.nBGColorMode ~= CTM_BG_COLOR_MODE.BY_DISTANCE then
 		if h.nDistanceLevel then
 			nAlpha = CFG.tDistanceAlpha[h.nDistanceLevel]
 		elseif info.bIsOnLine then
@@ -1401,12 +1387,8 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 		else
 			nAlpha = CFG.tOtherAlpha[2]
 		end
-	elseif CFG.nBGColorMode ~= 1 then
-		if (h.nDistance and h.nDistance > 20) or not h.nDistance then
-			if info.bIsOnLine then
-				nAlpha = nAlpha * 0.6
-			end
-		end
+	else
+		nAlpha = 255
 	end
 	-- 内力
 	if not bDeathFlag then
@@ -1428,6 +1410,9 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 		end
 		if bSha then
 			local r, g, b = unpack(CFG.tManaColor)
+			if not info.bIsOnLine then
+				r, g, b = unpack(CFG.tOtherCol[2]) -- 不在线就灰色了
+			end
 			self:DrawShadow(Msha, hMana:GetW() * nPercentage, Msha:GetH(), r, g, b, nAlpha, CFG.bManaGradient)
 			Msha:Show()
 		else
@@ -1452,18 +1437,9 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 				end
 				lifeFade:SetSize(nW * CTM_LIFE_CACHE[dwID], nH)
 			end
-			if CFG.nBGColorMode ~= 1 then
-				if (h.nDistance and h.nDistance > 20) or not h.nDistance then
-					lifeFade:SetAlpha(0)
-					lifeFade:Hide()
-				else
-					lifeFade:SetAlpha(240)
-					lifeFade:Show()
-				end
-			else
-				lifeFade:SetAlpha(240)
-				lifeFade:Show()
-			end
+			lifeFade:SetAlpha(240)
+			lifeFade:Show()
+
 			local key = "CTM_HIT_" .. dwID
 			MY.BreatheCall(key, false)
 			MY.BreatheCall(key, function()
@@ -1488,7 +1464,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			local nNewW = hLife:GetW() * nLifePercentage
 			local r, g, b = unpack(CFG.tOtherCol[2]) -- 不在线就灰色了
 			if info.bIsOnLine then
-				if CFG.nBGColorMode == 1 then
+				if CFG.nBGColorMode == CTM_BG_COLOR_MODE.BY_DISTANCE then
 					if player or GetPlayer(dwID) then
 						if h.nDistanceLevel then
 							r, g, b = unpack(CFG.tDistanceCol[h.nDistanceLevel])
@@ -1498,13 +1474,11 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 					else
 						r, g, b = unpack(CFG.tOtherCol[3]) -- 在线使用白色
 					end
-				elseif CFG.nBGColorMode == 0 then
+				elseif CFG.nBGColorMode == CTM_BG_COLOR_MODE.SAME_COLOR then
 					r, g, b = unpack(CFG.tDistanceCol[1]) -- 使用用户配色1
-				elseif CFG.nBGColorMode == 2 then
+				elseif CFG.nBGColorMode == CTM_BG_COLOR_MODE.BY_FORCE then
 					r, g, b = MY.GetForceColor(info.dwForceID)
 				end
-			else
-				nAlpha = 255
 			end
 			self:DrawShadow(Lsha, nNewW, Lsha:GetH(), r, g, b, nAlpha, CFG.bLifeGradient)
 			Lsha:Show()
@@ -1526,17 +1500,11 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 		end
 		-- 数值绘制
 		local life = h:Lookup("Text_Life")
+		local nFontAlpha = min(nAlpha * 0.4 + 255 * 0.6, 255)
+		life:SetAlpha(nAlpha == 0 and 0 or nFontAlpha)
 		life:SetFontScheme(CFG.nLifeFont)
 		life:SetFontScale(CFG.fLifeFontScale)
-		if CFG.nBGColorMode ~= 1 then
-			if (h.nDistance and h.nDistance > 20) or not h.nDistance then
-				life:SetAlpha(150)
-			else
-				life:SetAlpha(255)
-			end
-		else
-			life:SetAlpha(255)
-		end
+		h:Lookup("Text_Name"):SetAlpha(nFontAlpha)
 
 		if not bDeathFlag and info.bIsOnLine then
 			life:SetFontColor(255, 255, 255)

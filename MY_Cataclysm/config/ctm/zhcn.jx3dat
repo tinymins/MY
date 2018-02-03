@@ -1,6 +1,7 @@
 data = {
 	nCss                 = 2, -- INI样式 1 系统样式 2 Cataclysm样式
 	nBGColorMode         = 1, -- 0 不着色 1 根据距离 2 根据门派
+	nColoredName         = 1,
 	nNameFont            = 40,
 	nLifeFont            = 15,
 	fScaleX              = 1.1,
@@ -20,5 +21,10 @@ data = {
 		{ 255, 255, 255 },
 		{ 128, 128, 128 },
 		{ 192, 192, 192 }
+	},
+	tOtherAlpha = {
+		0,
+		255, -- 不在线
+		255 * 0.2, -- 出同步范围
 	},
 }

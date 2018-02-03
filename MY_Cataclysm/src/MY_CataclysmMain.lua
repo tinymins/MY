@@ -29,6 +29,12 @@ local INI_ROOT = MY.GetAddonInfo().szRoot .. "MY_Cataclysm/ui/"
 local CTM_CONFIG = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/config/default/$lang.jx3dat")
 local CTM_CONFIG_CATACLYSM = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/config/ctm/$lang.jx3dat")
 
+local CTM_BG_COLOR_MODE = {
+	SAME_COLOR = 0,
+	BY_DISTANCE = 1,
+	BY_FORCE = 2,
+	OFFICIAL = 3,
+}
 local TEAM_VOTE_REQUEST = {}
 local BUFF_LIST = {}
 local GKP_RECORD_TOTAL = 0
@@ -38,6 +44,7 @@ local DEBUG = false
 MY_Cataclysm = {}
 MY_Cataclysm.bDebug = false
 MY_Cataclysm.szConfigName = "common"
+MY_Cataclysm.BG_COLOR_MODE = CTM_BG_COLOR_MODE
 RegisterCustomData("MY_Cataclysm.szConfigName")
 
 local function UpdateBuffListCache()
@@ -1219,17 +1226,6 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():width() + 5
 
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = g_tStrings.STR_RAID_DISTANCE,
-		checked = Cataclysm_Main.bEnableDistance,
-		oncheck = function(bCheck)
-			Cataclysm_Main.bEnableDistance = bCheck
-			if GetFrame() then
-				Grid_CTM:CallDrawHPMP(true, true)
-			end
-		end,
-	}, true):autoWidth():width() + 5
-
 	y = y + ui:append("WndSliderBox", {
 		x = x, y = y - 1,
 		value = Cataclysm_Main.fNameFontScale * 100,
@@ -1252,12 +1248,12 @@ function PS.OnPanelActive(frame)
 	y = y + 5
 	x = x + ui:append("WndRadioBox", {
 		x = x, y = y, text = _L["Colored as official team frame"],
-		group = "BACK_COLOR", checked = Cataclysm_Main.nBGColorMode == 3,
+		group = "BACK_COLOR", checked = Cataclysm_Main.nBGColorMode == CTM_BG_COLOR_MODE.OFFICIAL,
 		oncheck = function(bChecked)
 			if not bChecked then
 				return
 			end
-			Cataclysm_Main.nBGColorMode = 3
+			Cataclysm_Main.nBGColorMode = CTM_BG_COLOR_MODE.OFFICIAL
 			if GetFrame() then
 				Grid_CTM:CallDrawHPMP(true, true)
 			end
@@ -1266,13 +1262,13 @@ function PS.OnPanelActive(frame)
 	}, true):autoWidth():width() + 5
 
 	x = x + ui:append("WndRadioBox", {
-		x = x, y = y, text = g_tStrings.STR_RAID_COLOR_NAME_NONE,
-		group = "BACK_COLOR", checked = Cataclysm_Main.nBGColorMode == 0,
+		x = x, y = y, text = _L["Colored all the same"],
+		group = "BACK_COLOR", checked = Cataclysm_Main.nBGColorMode == CTM_BG_COLOR_MODE.SAME_COLOR,
 		oncheck = function(bChecked)
 			if not bChecked then
 				return
 			end
-			Cataclysm_Main.nBGColorMode = 0
+			Cataclysm_Main.nBGColorMode = CTM_BG_COLOR_MODE.SAME_COLOR
 			if GetFrame() then
 				Grid_CTM:CallDrawHPMP(true, true)
 			end
@@ -1282,12 +1278,12 @@ function PS.OnPanelActive(frame)
 
 	x = x + ui:append("WndRadioBox", {
 		x = x, y = y, text = _L["Colored according to the distance"],
-		group = "BACK_COLOR", checked = Cataclysm_Main.nBGColorMode == 1,
+		group = "BACK_COLOR", checked = Cataclysm_Main.nBGColorMode == CTM_BG_COLOR_MODE.BY_DISTANCE,
 		oncheck = function(bChecked)
 			if not bChecked then
 				return
 			end
-			Cataclysm_Main.nBGColorMode = 1
+			Cataclysm_Main.nBGColorMode = CTM_BG_COLOR_MODE.BY_DISTANCE
 			if GetFrame() then
 				Grid_CTM:CallDrawHPMP(true, true)
 			end
@@ -1295,14 +1291,26 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():width() + 5
 
-	y = y + ui:append("WndRadioBox", {
+	x = x + ui:append("WndRadioBox", {
 		x = x, y = y, text = g_tStrings.STR_RAID_COLOR_NAME_SCHOOL,
-		group = "BACK_COLOR", checked = Cataclysm_Main.nBGColorMode == 2,
+		group = "BACK_COLOR", checked = Cataclysm_Main.nBGColorMode == CTM_BG_COLOR_MODE.BY_FORCE,
 		oncheck = function(bChecked)
 			if not bChecked then
 				return
 			end
-			Cataclysm_Main.nBGColorMode = 2
+			Cataclysm_Main.nBGColorMode = CTM_BG_COLOR_MODE.BY_FORCE
+			if GetFrame() then
+				Grid_CTM:CallDrawHPMP(true, true)
+			end
+			MY.SwitchTab("MY_Cataclysm_GridStyle", true)
+		end,
+	}, true):autoWidth():width() + 5
+
+	y = y + ui:append("WndCheckBox", {
+		x = x, y = y, text = g_tStrings.STR_RAID_DISTANCE,
+		checked = Cataclysm_Main.bEnableDistance,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bEnableDistance = bCheck
 			if GetFrame() then
 				Grid_CTM:CallDrawHPMP(true, true)
 			end
@@ -1310,66 +1318,70 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():height() + 5
 
-	if Cataclysm_Main.nBGColorMode ~= 2 then
-		-- 设置分段距离等级
-		x = X + 10
-		if Cataclysm_Main.nBGColorMode == 1 or Cataclysm_Main.nBGColorMode == 3 then
-			y = y + ui:append("WndButton3", {
-				x = x, y = y, text = _L["Edit Distance Level"],
-				onclick = function()
-					GetUserInput(_L["distance, distance, ..."], function(szText)
-						local t = MY.Split(MY.Trim(szText), ",")
-						local tt = {}
+	-- 设置分段距离等级
+	x = X + 10
+	if Cataclysm_Main.bEnableDistance then
+		y = y + ui:append("WndButton3", {
+			x = x, y = y, text = _L["Edit Distance Level"],
+			onclick = function()
+				GetUserInput(_L["distance, distance, ..."], function(szText)
+					local t = MY.Split(MY.Trim(szText), ",")
+					local tt = {}
+					for k, v in ipairs(t) do
+						if not tonumber(v) then
+							table.remove(t, k)
+						else
+							table.insert(tt, tonumber(v))
+						end
+					end
+					if #t > 0 then
+						Cataclysm_Main.tDistanceLevel = tt
+						Cataclysm_Main.tDistanceCol = {}
+						Cataclysm_Main.tDistanceAlpha = {}
 						for k, v in ipairs(t) do
-							if not tonumber(v) then
-								table.remove(t, k)
-							else
-								table.insert(tt, tonumber(v))
-							end
+							table.insert(Cataclysm_Main.tDistanceCol, { 255, 255, 255 })
+							table.insert(Cataclysm_Main.tDistanceAlpha, 255)
 						end
-						if #t > 0 then
-							Cataclysm_Main.tDistanceLevel = tt
-							Cataclysm_Main.tDistanceCol = {}
-							Cataclysm_Main.tDistanceAlpha = {}
-							for k, v in ipairs(t) do
-								table.insert(Cataclysm_Main.tDistanceCol, { 255, 255, 255 })
-								table.insert(Cataclysm_Main.tDistanceAlpha, 255)
-							end
-							MY.SwitchTab("MY_Cataclysm_GridStyle", true)
-						end
-					end)
-				end,
-			}, true):height()
-		end
+						MY.SwitchTab("MY_Cataclysm_GridStyle", true)
+					end
+				end)
+			end,
+		}, true):height()
+	end
 
-		-- 分段距离背景
+	-- 统一背景
+	if not Cataclysm_Main.bEnableDistance
+	or Cataclysm_Main.nBGColorMode == CTM_BG_COLOR_MODE.SAME_COLOR then
+		x = X + 20
+		ui:append("Text", { x = x, y = y, text = g_tStrings.BACK_COLOR }):autoWidth()
+		x = 280
+		x = x + ui:append("Shadow", {
+			w = 22, h = 22, x = x, y = y + 3, color = Cataclysm_Main.tDistanceCol[1],
+			onclick = function()
+				local this = this
+				XGUI.OpenColorPicker(function(r, g, b)
+					Cataclysm_Main.tDistanceCol[1] = { r, g, b }
+					if GetFrame() then
+						Grid_CTM:CallDrawHPMP(true, true)
+					end
+					XGUI(this):color(r, g, b)
+				end)
+			end,
+		}, true):width() + 5
+		y = y + 30
+	end
+
+	-- 分段距离背景
+	if Cataclysm_Main.bEnableDistance then
 		x = X + 20
 		for i = 1, #Cataclysm_Main.tDistanceLevel do
-			if Cataclysm_Main.nBGColorMode ~= 1 and Cataclysm_Main.nBGColorMode ~= 3 and i > 1 then
-				break
-			end
 			local n = Cataclysm_Main.tDistanceLevel[i - 1] or 0
 			local txt = n .. g_tStrings.STR_METER .. " - " .. Cataclysm_Main.tDistanceLevel[i] .. g_tStrings.STR_METER .. g_tStrings.BACK_COLOR
-			if Cataclysm_Main.nBGColorMode == 0 then
-				txt = g_tStrings.BACK_COLOR
-			end
 			ui:append("Text", { x = x, y = y, text = txt }):autoWidth()
-			if Cataclysm_Main.nBGColorMode == 3 then
-				y = y + ui:append("WndSliderBox", {
-					x = 280, y = y + 3, h = 22,
-					range = {0, 255},
-					value = Cataclysm_Main.tDistanceAlpha[i],
-					sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
-					onchange = function(val)
-						Cataclysm_Main.tDistanceAlpha[i] = val
-						if GetFrame() then
-							Grid_CTM:CallDrawHPMP(true, true)
-						end
-					end,
-				}, true):height() + 5
-			else
-				y = y + ui:append("Shadow", {
-					w = 22, h = 22, x = 280, y = y + 3, color = Cataclysm_Main.tDistanceCol[i],
+			local x = 280
+			if Cataclysm_Main.nBGColorMode == CTM_BG_COLOR_MODE.BY_DISTANCE then
+				x = x + ui:append("Shadow", {
+					w = 22, h = 22, x = x, y = y + 3, color = Cataclysm_Main.tDistanceCol[i],
 					onclick = function()
 						local this = this
 						XGUI.OpenColorPicker(function(r, g, b)
@@ -1380,95 +1392,120 @@ function PS.OnPanelActive(frame)
 							XGUI(this):color(r, g, b)
 						end)
 					end,
-				}, true):height() + 5
+				}, true):width() + 5
+			else
+				x = x + ui:append("WndSliderBox", {
+					x = x, y = y + 3, h = 22,
+					range = {0, 255},
+					value = Cataclysm_Main.tDistanceAlpha[i],
+					sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+					onchange = function(val)
+						Cataclysm_Main.tDistanceAlpha[i] = val
+						if GetFrame() then
+							Grid_CTM:CallDrawHPMP(true, true)
+						end
+					end,
+				}, true):width() + 5
 			end
+			y = y + 30
 		end
+	end
 
-		-- 出同步范围背景
-		ui:append("Text", { x = x, y = y, text = g_tStrings.STR_RAID_DISTANCE_M4 }):autoWidth()
-		if Cataclysm_Main.nBGColorMode == 3 then
-			y = y + ui:append("WndSliderBox", {
-				x = 280, y = y + 3, h = 22,
-				range = {0, 255},
-				value = Cataclysm_Main.tOtherAlpha[3],
-				sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
-				onchange = function(val)
-					Cataclysm_Main.tOtherAlpha[3] = val
+	-- 出同步范围背景
+	x = X + 20
+	ui:append("Text", { x = x, y = y, text = g_tStrings.STR_RAID_DISTANCE_M4 }):autoWidth()
+	x = 280
+	if Cataclysm_Main.nBGColorMode ~= CTM_BG_COLOR_MODE.BY_FORCE
+	and Cataclysm_Main.nBGColorMode ~= CTM_BG_COLOR_MODE.OFFICIAL then
+		x = x + ui:append("Shadow", {
+			w = 22, h = 22, x = x, y = y + 3,
+			color = Cataclysm_Main.tOtherCol[3],
+			onclick = function()
+				local this = this
+				XGUI.OpenColorPicker(function(r, g, b)
+					Cataclysm_Main.tOtherCol[3] = { r, g, b }
 					if GetFrame() then
 						Grid_CTM:CallDrawHPMP(true, true)
 					end
-				end,
-			}, true):height() + 5
-		else
-			y = y + ui:append("Shadow", {
-				w = 22, h = 22, x = 280, y = y + 3,
-				color = Cataclysm_Main.tOtherCol[3],
-				onclick = function()
-					local this = this
-					XGUI.OpenColorPicker(function(r, g, b)
-						Cataclysm_Main.tOtherCol[3] = { r, g, b }
-						if GetFrame() then
-							Grid_CTM:CallDrawHPMP(true, true)
-						end
-						XGUI(this):color(r, g, b)
-					end)
-				end,
-			}, true):height() + 5
-		end
+					XGUI(this):color(r, g, b)
+				end)
+			end,
+		}, true):width() + 5
+	end
+	if Cataclysm_Main.nBGColorMode ~= CTM_BG_COLOR_MODE.BY_DISTANCE then
+		x = x + ui:append("WndSliderBox", {
+			x = x, y = y + 3, h = 22,
+			range = {0, 255},
+			value = Cataclysm_Main.tOtherAlpha[3],
+			sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+			onchange = function(val)
+				Cataclysm_Main.tOtherAlpha[3] = val
+				if GetFrame() then
+					Grid_CTM:CallDrawHPMP(true, true)
+				end
+			end,
+		}, true):width() + 5
+	end
+	y = y + 30
 
-		-- 离线背景
-		ui:append("Text", { x = x, y = y, text = g_tStrings.STR_GUILD_OFFLINE .. g_tStrings.BACK_COLOR }, true):autoWidth()
-		if Cataclysm_Main.nBGColorMode == 3 then
-			y = y + ui:append("WndSliderBox", {
-				x = 280, y = y + 3, h = 22,
-				range = {0, 255},
-				value = Cataclysm_Main.tOtherAlpha[2],
-				sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
-				onchange = function(val)
-					Cataclysm_Main.tOtherAlpha[2] = val
+	-- 离线背景
+	x = X + 20
+	ui:append("Text", { x = x, y = y, text = g_tStrings.STR_GUILD_OFFLINE .. g_tStrings.BACK_COLOR }, true):autoWidth()
+	x = 280
+	if Cataclysm_Main.nBGColorMode ~= CTM_BG_COLOR_MODE.OFFICIAL then
+		x = x + ui:append("Shadow", {
+			w = 22, h = 22, x = x, y = y + 3, color = Cataclysm_Main.tOtherCol[2],
+			onclick = function()
+				local this = this
+				XGUI.OpenColorPicker(function(r, g, b)
+					Cataclysm_Main.tOtherCol[2] = { r, g, b }
 					if GetFrame() then
 						Grid_CTM:CallDrawHPMP(true, true)
 					end
-				end,
-			}, true):height() + 5
-		else
-			y = y + ui:append("Shadow", {
-				w = 22, h = 22, x = 280, y = y + 3, color = Cataclysm_Main.tOtherCol[2],
-				onclick = function()
-					local this = this
-					XGUI.OpenColorPicker(function(r, g, b)
-						Cataclysm_Main.tOtherCol[2] = { r, g, b }
-						if GetFrame() then
-							Grid_CTM:CallDrawHPMP(true, true)
-						end
-						XGUI(this):color(r, g, b)
-					end)
-				end,
-			}, true):height() + 5
-		end
+					XGUI(this):color(r, g, b)
+				end)
+			end,
+		}, true):width() + 5
+	end
+	if Cataclysm_Main.nBGColorMode ~= CTM_BG_COLOR_MODE.BY_DISTANCE then
+		x = x + ui:append("WndSliderBox", {
+			x = x, y = y + 3, h = 22,
+			range = {0, 255},
+			value = Cataclysm_Main.tOtherAlpha[2],
+			sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+			onchange = function(val)
+				Cataclysm_Main.tOtherAlpha[2] = val
+				if GetFrame() then
+					Grid_CTM:CallDrawHPMP(true, true)
+				end
+			end,
+		}, true):width() + 5
+	end
+	y = y + 30
 
-		-- 内力
-		if Cataclysm_Main.nBGColorMode ~= 3 then
-			ui:append("Text", { x = x, y = y, text = g_tStrings.STR_SKILL_MANA .. g_tStrings.BACK_COLOR }, true):autoWidth()
-			y = y + ui:append("Shadow", {
-				w = 22, h = 22, x = 280, y = y + 3, color = Cataclysm_Main.tManaColor,
-				onclick = function()
-					XGUI.OpenColorPicker(function(r, g, b)
-						Cataclysm_Main.tManaColor = { r, g, b }
-						ui:Fetch("STR_SKILL_MANA"):Color(r, g, b)
-						if GetFrame() then
-							Grid_CTM:CallDrawHPMP(true, true)
-						end
-					end)
-				end,
-			}, true):height() + 5
-		end
+	-- 内力
+	x = X + 20
+	if Cataclysm_Main.nBGColorMode ~= CTM_BG_COLOR_MODE.OFFICIAL then
+		ui:append("Text", { x = x, y = y, text = g_tStrings.STR_SKILL_MANA .. g_tStrings.BACK_COLOR }, true):autoWidth()
+		y = y + ui:append("Shadow", {
+			w = 22, h = 22, x = 280, y = y + 3, color = Cataclysm_Main.tManaColor,
+			onclick = function()
+				local this = this
+				XGUI.OpenColorPicker(function(r, g, b)
+					Cataclysm_Main.tManaColor = { r, g, b }
+					if GetFrame() then
+						Grid_CTM:CallDrawHPMP(true, true)
+					end
+					XGUI(this):color(r, g, b)
+				end)
+			end,
+		}, true):height() + 5
 	end
 
 	-- 血条蓝条渐变色
 	x = X + 10
 	y = y + 5
-	if Cataclysm_Main.nBGColorMode ~= 3 then
+	if Cataclysm_Main.nBGColorMode ~= CTM_BG_COLOR_MODE.OFFICIAL then
 		x = x + ui:append("WndCheckBox", {
 			x = x, y = y, text = _L["LifeBar Gradient"],
 			checked = Cataclysm_Main.bLifeGradient,
@@ -1580,7 +1617,7 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):height()
 
-	if Cataclysm_Main.nBGColorMode ~= 3 then
+	if Cataclysm_Main.nBGColorMode ~= CTM_BG_COLOR_MODE.OFFICIAL then
 		x = x + ui:append("Text", { x = x, y = y, text = g_tStrings.STR_ALPHA }, true):autoWidth():width() + 5
 		y = y + ui:append("WndSliderBox", {
 			x = x, y = y + 3,

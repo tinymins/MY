@@ -21,6 +21,7 @@ data = {
 	["ManaBar Gradient"] = "藍條漸變色",
 	["Colored as official team frame"] = "官方著色",
 	["Colored according to the distance"] = "按距離著色",
+	["Colored all the same"] = "單色著色",
 	["Edit Distance Level"] = "編輯距離等級",
 	["distance, distance, ..."] = "8,20,22,24,30, ...",
 	["Max buff count"] = "BUFF最大顯示數量",

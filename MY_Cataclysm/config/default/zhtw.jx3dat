@@ -11,7 +11,7 @@ data = {
 	nHPShownNumMode      = 3,
 	nShowMP              = false,
 	bHPHitAlert          = true,
-	nColoredName         = 1,
+	nColoredName         = 0,
 	nShowIcon            = 2,
 	bShowDistance        = false,
 	bEnableDistance      = true,
@@ -66,7 +66,7 @@ data = {
 	},
 	tOtherAlpha = {
 		0,
-		0,
-		255 * 0.2,
+		0, -- 不在線
+		255 * 0.2, -- 出同步範圍
 	},
 }
