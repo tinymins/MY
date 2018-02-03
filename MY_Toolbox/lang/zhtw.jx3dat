@@ -121,4 +121,6 @@ data = {
 
     ['auto restore team info in arena'] = '競技場中自動恢複上次組隊信息',
     ['auto cancel hide player in arena and battlefield'] = '競技場與戰場中自動取消屏蔽玩家與NPC',
+
+    ["Loop target between me and target"] = "循環選擇自己和目標",
 }

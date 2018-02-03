@@ -861,3 +861,17 @@ function PS.OnPanelActive(wnd)
 	y = y + 30
 end
 MY.RegisterPanel( "MY_ToolBox", _L["toolbox"], _L['General'], "UI/Image/Common/Money.UITex|243", { 255, 255, 0, 200 }, PS)
+
+do
+local TARGET_TYPE, TARGET_ID
+local function onHotKey()
+	if TARGET_TYPE then
+		MY.SetTarget(TARGET_TYPE, TARGET_ID)
+		TARGET_TYPE, TARGET_ID = nil
+	else
+		TARGET_TYPE, TARGET_ID = MY.GetTarget()
+		MY.SetTarget(TARGET.PLAYER, UI_GetClientPlayerID())
+	end
+end
+MY.RegisterHotKey("MY_AutoLoopMeAndTarget", _L["Loop target between me and target"], onHotKey)
+end
