@@ -1448,9 +1448,9 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 				if bSha then
 					nW, nH = Lsha:GetSize()
 				else
-					nW, nH = Limg:GetW() * CTM_LIFE_CACHE[dwID], Limg:GetH()
+					nW, nH = Limg:GetSize()
 				end
-				lifeFade:SetSize(nW, nH)
+				lifeFade:SetSize(nW * CTM_LIFE_CACHE[dwID], nH)
 			end
 			if CFG.nBGColorMode ~= 1 then
 				if (h.nDistance and h.nDistance > 20) or not h.nDistance then
