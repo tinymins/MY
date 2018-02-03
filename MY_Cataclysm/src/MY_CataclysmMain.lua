@@ -895,11 +895,64 @@ function PS.OnPanelActive(frame)
 	end
 	y = y + 25
 
-	-- 血量显示
+	-- 名字、图标和血量显示方案
 	x = X
-	y = y + ui:append("Text", { x = x, y = y, text = g_tStrings.STR_RAID_LIFE_SHOW .. _L["& Icon"], font = 27 }, true):height()
+	y = y + ui:append("Text", { x = x, y = y, text = _L["Name/Icon/Life Display"], font = 27 }, true):height()
 
-	x = x + 10
+	-- 血量数值显示方案
+	x = X + 10
+	x = x + ui:append("WndRadioBox", {
+		x = x, y = y, text = _L["Show Format value"],
+		group = "lifval", checked = Cataclysm_Main.nHPShownNumMode == 1,
+		autoenable = function() return Cataclysm_Main.nHPShownMode2 ~= 0 end,
+		oncheck = function()
+			Cataclysm_Main.nHPShownNumMode = 1
+			if GetFrame() then
+				Grid_CTM:CallDrawHPMP(true, true)
+			end
+		end,
+	}, true):autoWidth():width() + 5
+
+	x = x + ui:append("WndRadioBox", {
+		x = x, y = y, text = _L["Show Percentage value"],
+		group = "lifval", checked = Cataclysm_Main.nHPShownNumMode == 2,
+		autoenable = function() return Cataclysm_Main.nHPShownMode2 ~= 0 end,
+		oncheck = function()
+			Cataclysm_Main.nHPShownNumMode = 2
+			if GetFrame() then
+				Grid_CTM:CallDrawHPMP(true, true)
+			end
+		end,
+	}, true):autoWidth():width() + 5
+
+	x = x + ui:append("WndRadioBox", {
+		x = x, y = y, text = _L["Show full value"],
+		group = "lifval", checked = Cataclysm_Main.nHPShownNumMode == 3,
+		autoenable = function() return Cataclysm_Main.nHPShownMode2 ~= 0 end,
+		oncheck = function()
+			Cataclysm_Main.nHPShownNumMode = 3
+			if GetFrame() then
+				Grid_CTM:CallDrawHPMP(true, true)
+			end
+		end,
+	}, true):autoWidth():width() + 5
+
+	ui:append("WndButton2", {
+		x = x, y = y - 1, text = _L["Life font"],
+		onclick = function()
+			XGUI.OpenFontPicker(function(nFont)
+				Cataclysm_Main.nLifeFont = nFont
+				if GetFrame() then
+					Grid_CTM:CallDrawHPMP(true, true)
+				end
+			end)
+		end,
+		autoenable = function() return Cataclysm_Main.nHPShownMode2 ~= 0 end,
+	}, true):autoWidth()
+	y = y + 25
+
+	-- 血量显示方式
+	x = X + 10
 	x = x + ui:append("WndRadioBox", {
 		x = x, y = y, text = g_tStrings.STR_RAID_LIFE_LEFT,
 		group = "lifemode", checked = Cataclysm_Main.nHPShownMode2 == 2,
@@ -949,59 +1002,7 @@ function PS.OnPanelActive(frame)
 	}, true)
 	y = y + 25
 
-	-- 数值
-	x = X + 10
-	x = x + ui:append("WndRadioBox", {
-		x = x, y = y, text = _L["Show Format value"],
-		group = "lifval", checked = Cataclysm_Main.nHPShownNumMode == 1,
-		autoenable = function() return Cataclysm_Main.nHPShownMode2 ~= 0 end,
-		oncheck = function()
-			Cataclysm_Main.nHPShownNumMode = 1
-			if GetFrame() then
-				Grid_CTM:CallDrawHPMP(true, true)
-			end
-		end,
-	}, true):autoWidth():width() + 5
-
-	x = x + ui:append("WndRadioBox", {
-		x = x, y = y, text = _L["Show Percentage value"],
-		group = "lifval", checked = Cataclysm_Main.nHPShownNumMode == 2,
-		autoenable = function() return Cataclysm_Main.nHPShownMode2 ~= 0 end,
-		oncheck = function()
-			Cataclysm_Main.nHPShownNumMode = 2
-			if GetFrame() then
-				Grid_CTM:CallDrawHPMP(true, true)
-			end
-		end,
-	}, true):autoWidth():width() + 5
-
-	x = x + ui:append("WndRadioBox", {
-		x = x, y = y, text = _L["Show full value"],
-		group = "lifval", checked = Cataclysm_Main.nHPShownNumMode == 3,
-		autoenable = function() return Cataclysm_Main.nHPShownMode2 ~= 0 end,
-		oncheck = function()
-			Cataclysm_Main.nHPShownNumMode = 3
-			if GetFrame() then
-				Grid_CTM:CallDrawHPMP(true, true)
-			end
-		end,
-	}, true):autoWidth():width() + 5
-
-	ui:append("WndButton2", {
-		x = x, y = y - 1, text = g_tStrings.STR_RAID_LIFE_SHOW .. g_tStrings.FONT,
-		onclick = function()
-			XGUI.OpenFontPicker(function(nFont)
-				Cataclysm_Main.nLifeFont = nFont
-				if GetFrame() then
-					Grid_CTM:CallDrawHPMP(true, true)
-				end
-			end)
-		end,
-		autoenable = function() return Cataclysm_Main.nHPShownMode2 ~= 0 end,
-	}, true)
-	y = y + 25
-
-	-- Icon
+	-- 图标显示方案
 	x = X + 10
 	x = x + ui:append("WndRadioBox", {
 		x = x, y = y, text = _L["Show Force Icon"],
@@ -1039,7 +1040,7 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():width() + 5
 
-	ui:append("WndRadioBox", {
+	x = x + ui:append("WndRadioBox", {
 		x = x, y = y, text = _L["Show Text Force"],
 		group = "icon", checked = Cataclysm_Main.nShowIcon == 4,
 		oncheck = function()
@@ -1049,8 +1050,74 @@ function PS.OnPanelActive(frame)
 				Grid_CTM:CallDrawHPMP(true, true)
 			end
 		end,
-	}, true):autoWidth()
+	}, true):autoWidth():width() + 5
+
+	-- 名字字体修改 放不下了放上面
+	x = x + ui:append("WndButton2", {
+		x = x, y = y - 3, text = _L["Name font"],
+		onclick = function()
+			XGUI.OpenFontPicker(function(nFont)
+				Cataclysm_Main.nNameFont = nFont
+				if GetFrame() then
+					Grid_CTM:CallRefreshImages(true, false, false, nil, true)
+					Grid_CTM:CallDrawHPMP(true, true)
+				end
+			end)
+		end,
+	}, true):autoWidth():width() + 5
 	y = y + 25
+
+	-- 名字
+	x = X + 10
+	x = x + ui:append("WndRadioBox", {
+		x = x, y = y, text = _L["Name colored by force"],
+		group = "namecolor", checked = Cataclysm_Main.nColoredName == 1,
+		oncheck = function()
+			Cataclysm_Main.nColoredName = 1
+			if GetFrame() then
+				Grid_CTM:CallRefreshImages(true, false, false, nil, true)
+				Grid_CTM:CallDrawHPMP(true ,true)
+			end
+		end,
+	}, true):autoWidth():width() + 5
+
+	x = x + ui:append("WndRadioBox", {
+		x = x, y = y, text = _L["Name colored by camp"],
+		group = "namecolor", checked = Cataclysm_Main.nColoredName == 2,
+		oncheck = function()
+			Cataclysm_Main.nColoredName = 2
+			if GetFrame() then
+				Grid_CTM:CallRefreshImages(true, false, false, nil, true)
+				Grid_CTM:CallDrawHPMP(true ,true)
+			end
+		end,
+	}, true):autoWidth():width() + 5
+
+	x = x + ui:append("WndRadioBox", {
+		x = x, y = y, text = _L["Name without color"],
+		group = "namecolor", checked = Cataclysm_Main.nColoredName == 0,
+		oncheck = function()
+			Cataclysm_Main.nColoredName = 0
+			if GetFrame() then
+				Grid_CTM:CallRefreshImages(true, false, false, nil, true)
+				Grid_CTM:CallDrawHPMP(true ,true)
+			end
+		end,
+	}, true):autoWidth():width() + 5
+
+	y = y + ui:append("WndSliderBox", {
+		x = x, y = y - 1,
+		value = Cataclysm_Main.fNameFontScale * 100,
+		range = {1, 400},
+		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		textfmt = function(val) return _L("Scale %d%%", val) end,
+		onchange = function(val)
+			Cataclysm_Main.fNameFontScale = val / 100
+			if GetFrame() then
+				Grid_CTM:CallRefreshImages(nil, nil, nil, nil, true)
+			end
+		end,
+	}, true):height()
 
 	-- 其他
 	x = X
@@ -1164,81 +1231,17 @@ function PS.OnPanelActive(frame)
 
 	y = y + ui:append("Text", { x = x, y = y, text = _L["Grid Style"], font = 27 }, true):height()
 
-	x = x + 10
 	y = y + 5
-	x = x + ui:append("WndRadioBox", {
-		x = x, y = y, text = g_tStrings.STR_GUILD_NAME .. g_tStrings.STR_RAID_COLOR_NAME_SCHOOL,
-		group = "namecolor", checked = Cataclysm_Main.nColoredName == 1,
-		oncheck = function()
-			Cataclysm_Main.nColoredName = 1
-			if GetFrame() then
-				Grid_CTM:CallRefreshImages(true, false, false, nil, true)
-				Grid_CTM:CallDrawHPMP(true ,true)
-			end
-		end,
-	}, true):autoWidth():width() + 5
-
-	x = x + ui:append("WndRadioBox", {
-		x = x, y = y, text = g_tStrings.STR_GUILD_NAME .. g_tStrings.STR_RAID_COLOR_NAME_CAMP,
-		group = "namecolor", checked = Cataclysm_Main.nColoredName == 2,
-		oncheck = function()
-			Cataclysm_Main.nColoredName = 2
-			if GetFrame() then
-				Grid_CTM:CallRefreshImages(true, false, false, nil, true)
-				Grid_CTM:CallDrawHPMP(true ,true)
-			end
-		end,
-	}, true):autoWidth():width() + 5
-
-	x = x + ui:append("WndRadioBox", {
-		x = x, y = y, text = g_tStrings.STR_GUILD_NAME .. g_tStrings.STR_RAID_COLOR_NAME_NONE,
-		group = "namecolor", checked = Cataclysm_Main.nColoredName == 0,
-		oncheck = function()
-			Cataclysm_Main.nColoredName = 0
-			if GetFrame() then
-				Grid_CTM:CallRefreshImages(true, false, false, nil, true)
-				Grid_CTM:CallDrawHPMP(true ,true)
-			end
-		end,
-	}, true):autoWidth():width() + 5
-
-	-- 字体修改
-	y = y + ui:append("WndButton2", {
-		x = x, y = y - 3, text = g_tStrings.STR_GUILD_NAME .. g_tStrings.FONT,
-		onclick = function()
-			XGUI.OpenFontPicker(function(nFont)
-				Cataclysm_Main.nNameFont = nFont
-				if GetFrame() then
-					Grid_CTM:CallRefreshImages(true, false, false, nil, true)
-					Grid_CTM:CallDrawHPMP(true, true)
-				end
-			end)
-		end,
-	}, true):height()
 
 	x = X + 10
-	x = x + ui:append("WndCheckBox", {
+	y = y + ui:append("WndCheckBox", {
 		x = x, y = y, text = _L["Show AllGrid"],
 		checked = Cataclysm_Main.bShowAllGrid,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowAllGrid = bCheck
 			ReloadCataclysmPanel()
 		end,
-	}, true):autoWidth():width() + 5
-
-	y = y + ui:append("WndSliderBox", {
-		x = x, y = y - 1,
-		value = Cataclysm_Main.fNameFontScale * 100,
-		range = {1, 400},
-		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
-		textfmt = function(val) return g_tStrings.STR_GUILD_NAME .. _L("Scale %d%%", val) end,
-		onchange = function(val)
-			Cataclysm_Main.fNameFontScale = val / 100
-			if GetFrame() then
-				Grid_CTM:CallRefreshImages(nil, nil, nil, nil, true)
-			end
-		end,
-	}, true):height()
+	}, true):autoWidth():height() + 5
 
 	x = X
 	y = y + 10
@@ -1259,7 +1262,7 @@ function PS.OnPanelActive(frame)
 			end
 			MY.SwitchTab("MY_Cataclysm_GridStyle", true)
 		end,
-	}, true):autoWidth():width() + 5
+	}, true):autoWidth():width()
 
 	x = x + ui:append("WndRadioBox", {
 		x = x, y = y, text = _L["Colored all the same"],
