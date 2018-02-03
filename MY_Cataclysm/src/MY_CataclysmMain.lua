@@ -1074,7 +1074,11 @@ function PS.OnPanelActive(frame)
 		onchange = function(val)
 			Cataclysm_Main.nTempTargetDelay = val * 75
 		end,
-		textfmt = function(val) return _L("Target assist delay %dms.", val * 75) end,
+		textfmt = function(val)
+			return val == 0
+				and _L['Target assist no delay.']
+				or _L("Target assist delay %dms.", val * 75)
+		end,
 	}):autoWidth():width()
 
 	y = y + 25

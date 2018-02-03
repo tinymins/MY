@@ -89,4 +89,5 @@ data = {
 	["Restore cataclysm"] = "恢复Cataclysm预设",
 	["Scale %d%%"] = "缩放%d%%",
 	["Target assist delay %dms."] = "延迟%d毫秒选中目标。",
+	["Target assist no delay."] = "鼠标移入立即选中。",
 }
