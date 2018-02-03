@@ -1128,10 +1128,17 @@ function CTM:RefreshBuff()
 						end
 						item = handle:AppendItemFromData(Cataclysm_Main.GetFrame().hBuff, key)
 						if not data.col then
-							item:Lookup("Shadow"):Hide()
+							item:Lookup("Handle_RbgBorders"):Hide()
+							item:Lookup("Handle_InnerBorders"):Hide()
 						else
-							item:Lookup("Shadow"):SetAlpha(a or data.nColAlpha or 192)
-							item:Lookup("Shadow"):SetColorRGB(r or 255, g or 255, b or 0)
+							local hSha, sha = item:Lookup("Handle_RbgBorders")
+							for i = 0, hSha:GetItemCount() - 1 do
+								sha = hSha:Lookup(i)
+								sha:SetAlpha(a or data.nColAlpha or 192)
+								sha:SetColorRGB(r or 255, g or 255, b or 0)
+							end
+							item:Lookup("Handle_RbgBorders"):Show()
+							item:Lookup("Handle_InnerBorders"):Show()
 						end
 						-- ≈≈–Ú
 						local fromIndex, toIndex = handle:GetItemCount() - 1
