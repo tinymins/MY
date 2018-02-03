@@ -1340,12 +1340,13 @@ end
 function CTM:DrawHPMP(h, dwID, info, bRefresh)
 	if not info then return end
 	local bSha = CFG.nBGColorMode ~= 3
-	local hCommon = h:Lookup("Handle_Common")
-	local Lsha = hCommon:Lookup("Shadow_Life")
-	local Limg = hCommon:Lookup("Image_Life")
-	local Ledg = hCommon:Lookup("Image_LifeLine")
-	local Msha = hCommon:Lookup("Shadow_Mana")
-	local Mimg = hCommon:Lookup("Image_Mana")
+	local hLife = h:Lookup("Handle_Life")
+	local hMana = h:Lookup("Handle_Mana")
+	local Lsha = hLife:Lookup("Shadow_Life")
+	local Limg = hLife:Lookup("Image_Life")
+	local Ledg = hLife:Lookup("Image_LifeLine")
+	local Msha = hMana:Lookup("Shadow_Mana")
+	local Mimg = hMana:Lookup("Image_Mana")
 	local player, npc, dwMountType
 	if CHANGGE_REAL_SHADOW_CACHE[dwID] then
 		npc = GetNpc(CHANGGE_REAL_SHADOW_CACHE[dwID])
@@ -1410,7 +1411,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 	-- 内力
 	if not bDeathFlag then
 		local nPercentage, nManaShow = 1, 1
-		local mana = hCommon:Lookup("Text_Mana")
+		local mana = h:Lookup("Text_Mana")
 		if not IsPlayerManaHide(info.dwForceID, dwMountType) then -- 内力不需要那么准
 			nPercentage = info.nMaxMana ~= 0 and (info.nCurrentMana / info.nMaxMana)
 			nManaShow = info.nCurrentMana
@@ -1427,7 +1428,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 		end
 		if bSha then
 			local r, g, b = unpack(CFG.tManaColor)
-			self:DrawShadow(Msha, hCommon:GetW() * nPercentage, Msha:GetH(), r, g, b, nAlpha, CFG.bManaGradient)
+			self:DrawShadow(Msha, hMana:GetW() * nPercentage, Msha:GetH(), r, g, b, nAlpha, CFG.bManaGradient)
 			Msha:Show()
 		else
 			Mimg:Show()
@@ -1440,7 +1441,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 	end
 	-- 掉血警告 必须早于血条绘制
 	if CFG.bHPHitAlert then
-		local lifeFade = hCommon:Lookup("Shadow_Life_Fade")
+		local lifeFade = hLife:Lookup("Shadow_Life_Fade")
 		if CTM_LIFE_CACHE[dwID] and CTM_LIFE_CACHE[dwID] > nLifePercentage then
 			local nAlpha, nW, nH = lifeFade:GetAlpha(), 0, 0
 			if nAlpha == 0 then
@@ -1478,13 +1479,13 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			end)
 		end
 	else
-		hCommon:Lookup("Shadow_Life_Fade"):Hide()
+		hLife:Lookup("Shadow_Life_Fade"):Hide()
 	end
 	-- 缓存
 	if not CFG.bFasterHP or bRefresh or (CFG.bFasterHP and CTM_LIFE_CACHE[dwID] ~= nLifePercentage) then
 		if bSha then
 			-- 颜色计算
-			local nNewW = hCommon:GetW() * nLifePercentage
+			local nNewW = hLife:GetW() * nLifePercentage
 			local r, g, b = unpack(CFG.tOtherCol[2]) -- 不在线就灰色了
 			if info.bIsOnLine then
 				if CFG.nBGColorMode == 1 then
@@ -1512,7 +1513,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			Ledg:Show()
 			Ledg:SetAlpha(nAlpha)
 			Ledg:SetRelX(nRelX)
-			Ledg:SetAbsX(hCommon:GetAbsX() + nRelX)
+			Ledg:SetAbsX(hLife:GetAbsX() + nRelX)
 			Limg:Show()
 			Limg:SetAlpha(nAlpha)
 			Limg:SetPercentage(nLifePercentage)
@@ -1524,7 +1525,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			CTM_LIFE_CACHE[dwID] = nLifePercentage
 		end
 		-- 数值绘制
-		local life = hCommon:Lookup("Text_Life")
+		local life = h:Lookup("Text_Life")
 		life:SetFontScheme(CFG.nLifeFont)
 		life:SetFontScale(CFG.fLifeFontScale)
 		if CFG.nBGColorMode ~= 1 then
