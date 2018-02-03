@@ -1325,3 +1325,21 @@ function PS.OnPanelActive(wnd)
 	y = y + deltaY
 end
 MY.RegisterPanel("MY_Focus", _L["focus list"], _L['Target'], "ui/Image/button/SystemButton_1.UITex|9", {255,255,0,200}, PS)
+
+do
+local function onHotKey()
+	local dwType, dwID = MY.GetTarget()
+	local aList = MY_Focus.GetDisplayList()
+	local t = aList[1]
+	if not t then
+		return
+	end
+	for i, p in ipairs(aList) do
+		if p.dwType == dwType and p.dwID == dwID then
+			t = aList[i + 1] or t
+		end
+	end
+	MY.SetTarget(t.dwType, t.dwID)
+end
+MY.RegisterHotKey("MY_Focus_LoopTarget", _L["Loop target in focus"], onHotKey)
+end
