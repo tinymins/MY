@@ -27,6 +27,8 @@ local _GKP = {
 	szIniFile   = PATH_ROOT .. "ui/MY_GKP.ini",
 	tSyncQueue  = {},
 	bSync       = {},
+	GKP_Map     = "",
+	GKP_Time    = 0,
 	GKP_Record  = {},
 	GKP_Account = {},
 	Config = {
@@ -62,7 +64,14 @@ _GKP.Config = MY.LoadLUAData({"config/gkp.cfg", MY_DATA_PATH.GLOBAL}) or _GKP.Co
 ----------------------------------------------------------------------<
 setmetatable(MY_GKP, { __call = function(me, key, value, sort)
 	if _GKP[key] then
-		if value and type(value) == "table" then
+		if value and (key == "GKP_Time" or key == "GKP_Map") then
+			_GKP[key] = value
+			_GKP.UpdateTitle()
+		elseif value and type(value) == "table" then
+			local me = GetClientPlayer()
+			if _GKP.GKP_Map == "" and me and me.GetMapID() then
+				MY_GKP("GKP_Map", Table_GetMapName(me.GetMapID()) or "")
+			end
 			table.insert(_GKP[key], value)
 			_GKP.SaveData()
 			if key == "GKP_Record" then
@@ -139,12 +148,22 @@ function _GKP.SaveData(bStorage)
 		MY.SaveLUAData({szPath, MY_DATA_PATH.ROLE}, nil) -- 存储模式时清空当前存盘数据
 		local i = 0
 		repeat
-			szPath = "userdata/gkp/" .. MY.FormatTime("yyyy-MM-dd-hh-mm-ss",GetCurrentTime()) .. (i == 0 and "" or ("-" .. i)) .. ".gkp"
+			szPath = "userdata/gkp/"
+				.. MY.FormatTime("yyyy-MM-dd-hh-mm-ss", MY_GKP("GKP_Time") or GetCurrentTime())
+				.. (i == 0 and "" or ("-" .. i))
+				.. "_" .. MY_GKP("GKP_Map")
+				.. ".gkp"
 			i = i + 1
 		until not IsLocalFileExist(MY.FormatPath(szPath) .. ".jx3dat")
 	end
-	MY.SaveLUAData({szPath, MY_DATA_PATH.ROLE}, { GKP_Record = MY_GKP("GKP_Record") , GKP_Account = MY_GKP("GKP_Account") })
+	MY.SaveLUAData({szPath, MY_DATA_PATH.ROLE}, {
+		GKP_Map = MY_GKP("GKP_Map"),
+		GKP_Time = MY_GKP("GKP_Time"),
+		GKP_Record = MY_GKP("GKP_Record"),
+		GKP_Account = MY_GKP("GKP_Account"),
+	})
 	_GKP.UpdateStat()
+	_GKP.UpdateTitle()
 end
 
 function _GKP.LoadData(szFile, bAbs)
@@ -153,12 +172,25 @@ function _GKP.LoadData(szFile, bAbs)
 	end
 	local t = MY.LoadLUAData(szFile)
 	if t then
+		_GKP.GKP_Map = t.GKP_Map or ""
+		_GKP.GKP_Time = t.GKP_Time or 0
 		_GKP.GKP_Record = t.GKP_Record or {}
 		_GKP.GKP_Account = t.GKP_Account or {}
 	end
 	_GKP.DrawRecord()
 	_GKP.DrawAccount()
 	_GKP.UpdateStat()
+	_GKP.UpdateTitle()
+end
+
+function _GKP.UpdateTitle()
+	local txtTitle = Station.Lookup("Normal/MY_GKP", "Text_Title")
+	local szMap = MY_GKP("GKP_Map")
+	local nTime = MY_GKP("GKP_Time")
+	local szText = _L["GKP Golden Team Record"]
+		.. (szMap ~= "" and (" - " .. szMap) or "")
+		.. (nTime ~= 0 and (" - " .. MY.FormatTime("yyyy-MM-dd-hh-mm-ss", nTime)) or "")
+	txtTitle:SetText(szText)
 end
 
 function _GKP.UpdateStat()
@@ -1246,11 +1278,14 @@ function _GKP.ClearData(bConfirm)
 		if #_GKP.GKP_Record ~= 0 or #_GKP.GKP_Account ~= 0 then
 			_GKP.SaveData(true)
 		end
+		_GKP.GKP_Map = ""
+		_GKP.GKP_Time = GetCurrentTime()
 		_GKP.GKP_Record = {}
 		_GKP.GKP_Account = {}
 		_GKP.DrawRecord()
 		_GKP.DrawAccount()
 		_GKP.UpdateStat()
+		_GKP.UpdateTitle()
 		FireUIEvent("MY_GKP_LOOT_BOSS")
 		MY.Alert(_L["Records are wiped"])
 	end
