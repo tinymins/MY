@@ -1142,7 +1142,7 @@ function PS.OnPanelActive(frame)
 		oncheck = function(bCheck)
 			Cataclysm_Main.bTempTargetFightTip = bCheck
 		end,
-	}, true):autoWidth():width()
+	}, true):autoWidth():width() + 5
 
 	x = x + ui:append("WndCheckBox", {
 		x = x, y = y, text = g_tStrings.STR_RAID_TARGET_ASSIST,
@@ -1150,7 +1150,7 @@ function PS.OnPanelActive(frame)
 		oncheck = function(bCheck)
 			Cataclysm_Main.bTempTargetEnable = bCheck
 		end,
-	}, true):autoWidth():width()
+	}, true):autoWidth():width() + 5
 
 	x = x + ui:append("WndSliderBox", {
 		x = x, y = y - 1,
