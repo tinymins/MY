@@ -2538,11 +2538,10 @@ function XGUI:image(szImage, nFrame)
 	self:_checksum()
 	if szImage then
 		if IsString(szImage) and IsNil(nFrame) then
-			nFrame = gsub(szImage, '.*%|(%d+)', '%1')
+			nFrame = tonumber((gsub(szImage, '.*%|(%d+)', '%1')))
 			szImage = gsub(szImage, '%|.*', '')
 		end
 		if IsString(szImage) and IsNumber(nFrame) then
-			nFrame = tonumber(nFrame)
 			for _, raw in ipairs(self.raws) do
 				raw = GetComponentElement(raw, 'IMAGE')
 				if raw then
