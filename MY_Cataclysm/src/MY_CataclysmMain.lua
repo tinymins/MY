@@ -1408,6 +1408,7 @@ function PS.OnPanelActive(frame)
 							Grid_CTM:CallDrawHPMP(true, true)
 						end
 					end,
+					textfmt = function(val) return _L("Alpha: %d.", val) end,
 				}, true):width() + 5
 			end
 			y = y + 30
@@ -1433,6 +1434,7 @@ function PS.OnPanelActive(frame)
 					XGUI(this):color(r, g, b)
 				end)
 			end,
+			textfmt = function(val) return _L("Alpha: %d.", val) end,
 		}, true):width() + 5
 	end
 	if Cataclysm_Main.nBGColorMode ~= CTM_BG_COLOR_MODE.BY_DISTANCE then
@@ -1447,6 +1449,7 @@ function PS.OnPanelActive(frame)
 					Grid_CTM:CallDrawHPMP(true, true)
 				end
 			end,
+			textfmt = function(val) return _L("Alpha: %d.", val) end,
 		}, true):width() + 5
 	end
 	y = y + 30
@@ -1482,6 +1485,7 @@ function PS.OnPanelActive(frame)
 					Grid_CTM:CallDrawHPMP(true, true)
 				end
 			end,
+			textfmt = function(val) return _L("Alpha: %d.", val) end,
 		}, true):width() + 5
 	end
 	y = y + 30
