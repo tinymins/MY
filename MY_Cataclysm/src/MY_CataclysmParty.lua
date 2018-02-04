@@ -704,12 +704,14 @@ function CTM:RefreshSFX()
 	local fUIX, fUIY -- UI当前状态下对应1.0的缩放比
 	for dwID, h in pairs(CTM_CACHE) do
 		if h:IsValid() then
-			hDest = h:Lookup("Handle_TargetTarget")
-			hScale = hDest:Lookup("Handle_TargetTarget_Scale")
-			hFixed = hDest:Lookup("Handle_TargetTarget_Fixed")
-			fUIX, fUIY = hScale:GetW() / hFixed:GetW(), hScale:GetH() / hFixed:GetH()
-			fSFXX, fSFXY = hDest:GetW() / hFixed:GetW(), hDest:GetH() / hFixed:GetH()
-			hDest:Lookup("SFX_TargetTarget"):Get3DModel():SetScaling(fSFXX, fSFXY, fSFXX)
+			for _, szID in ipairs({ "TargetTarget", "Focus" }) do
+				hDest = h:Lookup("Handle_" .. szID)
+				hScale = hDest:Lookup("Handle_" .. szID .. "_Scale")
+				hFixed = hDest:Lookup("Handle_" .. szID .. "_Fixed")
+				fUIX, fUIY = hScale:GetW() / hFixed:GetW(), hScale:GetH() / hFixed:GetH()
+				fSFXX, fSFXY = hDest:GetW() / hFixed:GetW(), hDest:GetH() / hFixed:GetH()
+				hDest:Lookup("SFX_" .. szID):Get3DModel():SetScaling(fSFXX, fSFXY, fSFXX)
+			end
 		end
 	end
 end
