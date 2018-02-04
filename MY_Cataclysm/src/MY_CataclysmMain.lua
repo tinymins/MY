@@ -281,10 +281,18 @@ local function CreateControlBar()
 			:SetVisible(nMicState == MIC_STATE.NOT_AVIAL)
 		container:Lookup("Wnd_Microphone/WndButton_Microphone", "Image_Close_Mic")
 			:SetVisible(nMicState == MIC_STATE.CLOSE_NOT_IN_ROOM or nMicState == MIC_STATE.CLOSE_IN_ROOM)
-		container:Lookup("Wnd_Microphone/WndButton_Microphone", "Handle_HotKey")
-			:SetVisible(nMicState == MIC_STATE.KEY)
-		container:Lookup("Wnd_Microphone/WndButton_Microphone", "Handle_Free_Mic")
-			:SetVisible(nMicState == MIC_STATE.FREE)
+		local hMicFree = container:Lookup("Wnd_Microphone/WndButton_Microphone", "Handle_Free_Mic")
+		local hMicHotKey = container:Lookup("Wnd_Microphone/WndButton_Microphone", "Handle_HotKey")
+		hMicFree:SetVisible(nMicState == MIC_STATE.FREE)
+		hMicHotKey:SetVisible(nMicState == MIC_STATE.KEY)
+		-- 自动调整语音按钮宽度
+		local nMicWidth = hMicFree:GetRelX()
+		if nMicState == MIC_STATE.FREE then
+			nMicWidth = nMicWidth + hMicFree:GetW()
+		elseif nMicState == MIC_STATE.KEY then
+			nMicWidth = hMicHotKey:GetRelX() + hMicHotKey:GetW()
+		end
+		container:Lookup("Wnd_Microphone"):SetW(nMicWidth)
 	end
 	local nW, wnd = 0
 	for i = 0, container:GetAllContentCount() - 1 do
