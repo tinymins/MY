@@ -1941,7 +1941,7 @@ function PS.OnPanelActive(frame)
 
 	x = x + 10
 	y = y + 5
-	ui:append("Text", { x = x, y = y, w = w - x * 2, text = _L["Cataclysm_TIPS"], multiline = true }, true):autoHeight()
+	ui:append("Text", { x = x, y = y, w = w - x - X, text = _L["Cataclysm_TIPS"], multiline = true }, true):autoHeight()
 end
 MY.RegisterPanel("MY_Cataclysm_BuffSettings", _L["Buff settings"], _L["Raid"], "ui/Image/UICommon/RaidTotal.uitex|74", {255, 255, 0}, PS)
 end

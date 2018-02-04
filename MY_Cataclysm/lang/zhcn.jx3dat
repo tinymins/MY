@@ -55,7 +55,7 @@ data = {
 	["Show Buff Reminder"] = "显示BUFF备注",
 	["Manually add (One per line)"] = "手动添加BUFF名称（每行一个）",
 	["Tips"] = "小提示",
-	["Cataclysm_TIPS"] = "每行一个，完整格式为“翔舞|lv1|sn>=1|self,[#FFFF00FF],(翔),#1”。\nlv1表示等级为1，sn>=1表示层数至少为1，self表示仅来源自己，(翔)表示BUFF备注显示为翔，#1表示排序优先级为1，[#FFFF00FF]表示描边颜色和透明度（支持颜色名[烟白|255]、颜色十六进制(rgba)[#FF0][#FF0F][#FFFF00][#FFFF00FF]、WEB颜色名[darkkhaki|255]）。",
+	["Cataclysm_TIPS"] = "每行一个，完整格式为“翔舞|lv1|sn>=1|self,[#FFFF00FF],(翔),#1,!!!”。\nlv1表示等级为1。sn>=1表示层数至少为1。self表示仅来源自己。(翔)表示BUFF备注显示为翔。#1表示排序优先级为1。!!!表示这是一个非常重要的BUFF，会用大括号显示。[#FFFF00FF]表示描边颜色和透明度（支持颜色名[烟白|255]、颜色十六进制(rgba)[#FF0][#FF0F][#FFFF00][#FFFF00FF]、WEB颜色名[darkkhaki|255]）。",
 	["Show Group Number"] = "显示分组编号",
 	["Team Members: %d, %d agree %d%%"] = "团队共%d人，%d人已同意发放工资，当前比率%d%%。",
 	["Cataclysm Team Panel"] = "团队面板",
