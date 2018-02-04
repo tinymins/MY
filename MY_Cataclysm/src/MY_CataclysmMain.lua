@@ -612,9 +612,8 @@ function Cataclysm_Main.OnFrameBreathe()
 	if not me then return end
 	Grid_CTM:RefreshDistance()
 	Grid_CTM:RefreshBuff()
-	if Cataclysm_Main.bShowTargetTargetAni then
-		Grid_CTM:RefreshTTarget()
-	end
+	Grid_CTM:RefreshAttention()
+	Grid_CTM:RefreshTTarget()
 	-- kill System Panel
 	RaidPanel_Switch(DEBUG)
 	TeammatePanel_Switch(false)
@@ -1769,6 +1768,9 @@ local function GetListText(aBuffList)
 		if v.nPriority then
 			insert(a, "#" .. v.nPriority)
 		end
+		if v.bAttention then
+			insert(a, "!!!")
+		end
 		insert(aName, (concat(a, ",")))
 	end
 	return concat(aName, "\n")
@@ -1807,6 +1809,8 @@ local function GetTextList(szText)
 							end
 						end
 					end
+				elseif val == "!!!" then
+					tab.bAttention = true
 				elseif val:sub(1, 1) == "#" then
 					tab.nPriority = tonumber((val:sub(2)))
 				elseif val:sub(1, 1) == "[" and val:sub(-1, -1) == "]" then

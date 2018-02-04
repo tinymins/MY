@@ -38,6 +38,7 @@ local CTM_TTARGET -- 注意这个是UI逻辑目标选中的目标 不一定是真实的当前目标
 local CTM_CACHE              = setmetatable({}, { __mode = "v" })
 local CTM_LIFE_CACHE         = {}
 local CTM_BUFF_CACHE         = {}
+local CTM_ATTENTION_CACHE    = {}
 local CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID
 local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子
 local CHANGGE_REAL_SHADOW_CACHE = {}
@@ -669,6 +670,24 @@ function CTM:RefreshTTarget()
 	HideTTarget()
 end
 
+function CTM:RefreshAttention()
+	local team, me = GetClientTeam(), GetClientPlayer()
+	local tCheck = {}
+	for _, dwTarID in ipairs(team.GetTeamMemberList()) do
+		local p = GetPlayer(dwTarID)
+		if CTM_CACHE[dwTarID] and CTM_CACHE[dwTarID]:IsValid() then
+			CTM_CACHE[dwTarID]:Lookup("Handle_Attention"):SetVisible(p and not empty(CTM_ATTENTION_CACHE[dwTarID]))
+		end
+		tCheck[dwTarID] = true
+	end
+	for dwTarID, _ in pairs(CTM_ATTENTION_CACHE) do
+		if not tCheck[dwTarID] then
+			CTM_ATTENTION_CACHE[dwTarID] = nil
+		end
+	end
+	-- Output(CTM_ATTENTION_CACHE)
+end
+
 function CTM:RefreshMark()
 	local team = GetClientTeam()
 	local tPartyMark = team.GetTeamMark()
@@ -704,7 +723,7 @@ function CTM:RefreshSFX()
 	local fUIX, fUIY -- UI当前状态下对应1.0的缩放比
 	for dwID, h in pairs(CTM_CACHE) do
 		if h:IsValid() then
-			for _, szID in ipairs({ "TargetTarget", "Focus" }) do
+			for _, szID in ipairs({ "TargetTarget", "Attention" }) do
 				hDest = h:Lookup("Handle_" .. szID)
 				hScale = hDest:Lookup("Handle_" .. szID .. "_Scale")
 				hFixed = hDest:Lookup("Handle_" .. szID .. "_Fixed")
@@ -1241,11 +1260,21 @@ function CTM:RefreshBuff()
 						end
 						txtStackNum:SetVisible(CFG.bShowBuffNum)
 					end
+					-- update attention
+					if data.bAttention then
+						if not CTM_ATTENTION_CACHE[v] then
+							CTM_ATTENTION_CACHE[v] = {}
+						end
+						CTM_ATTENTION_CACHE[v]["BUFF#" .. key] = true
+					end
 					tCheck[dwID] = true
 				else
 					if item then
 						handle:RemoveItem(item)
 						handle:FormatAllItemPos() -- 格式化buff的位置
+					end
+					if CTM_ATTENTION_CACHE[v] then
+						CTM_ATTENTION_CACHE[v]["BUFF#" .. key] = nil
 					end
 				end
 			end
