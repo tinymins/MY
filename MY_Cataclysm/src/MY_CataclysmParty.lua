@@ -16,6 +16,7 @@ local GetClientPlayer, GetClientTeam, GetPlayer = GetClientPlayer, GetClientTeam
 local Station, SetTarget, Target_GetTargetData = Station, SetTarget, Target_GetTargetData
 local Table_BuffIsVisible = Table_BuffIsVisible
 local CFG                    = Cataclysm_Main
+local CTM_STYLE              = MY_Cataclysm.STYLE
 local CTM_BG_COLOR_MODE      = MY_Cataclysm.BG_COLOR_MODE
 -- global STR cache
 local COINSHOP_SOURCE_NULL   = g_tStrings.COINSHOP_SOURCE_NULL
@@ -526,10 +527,11 @@ function CTM:RefreshGroupText()
 	for i = 0, team.nGroupNum - 1 do
 		local frame = self:GetPartyFrame(i)
 		if frame then
-			local txtGroup = frame:Lookup("", "Handle_Cols/Handle_Title/Text_Title")
+			local txtGroup, szGroup = frame:Lookup("", "Handle_Cols/Handle_Title/Text_Title")
 			if me.IsInRaid() then
-				txtGroup:SetText(g_tStrings.STR_NUMBER[i + 1])
-				txtGroup:SetFontScheme(7)
+				if CFG.nCss == CTM_STYLE.CATACLYSM then
+					txtGroup:SetFontScheme(7)
+				end
 				local tGroup = team.GetGroupInfo(i)
 				if tGroup and tGroup.MemberList then
 					for k, v in ipairs(tGroup.MemberList) do
@@ -540,9 +542,11 @@ function CTM:RefreshGroupText()
 						end
 					end
 				end
+				szGroup = CFG.nCss == CTM_STYLE.CATACLYSM and g_tStrings.STR_NUMBER[i + 1] or tostring(i + 1)
 			else
-				txtGroup:SetText(g_tStrings.STR_TEAM)
+				szGroup = g_tStrings.STR_TEAM
 			end
+			txtGroup:SetText(szGroup)
 		end
 	end
 end

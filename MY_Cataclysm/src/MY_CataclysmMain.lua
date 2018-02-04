@@ -29,6 +29,10 @@ local INI_ROOT = MY.GetAddonInfo().szRoot .. "MY_Cataclysm/ui/"
 local CTM_CONFIG = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/config/default/$lang.jx3dat")
 local CTM_CONFIG_CATACLYSM = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/config/ctm/$lang.jx3dat")
 
+local CTM_STYLE = {
+	OFFICIAL = 1,
+	CATACLYSM = 2,
+}
 local CTM_BG_COLOR_MODE = {
 	SAME_COLOR = 0,
 	BY_DISTANCE = 1,
@@ -44,6 +48,7 @@ local DEBUG = false
 MY_Cataclysm = {}
 MY_Cataclysm.bDebug = false
 MY_Cataclysm.szConfigName = "common"
+MY_Cataclysm.STYLE = CTM_STYLE
 MY_Cataclysm.BG_COLOR_MODE = CTM_BG_COLOR_MODE
 RegisterCustomData("MY_Cataclysm.szConfigName")
 
@@ -232,7 +237,7 @@ local function SetFrameSize(bEnter)
 		local container = frame:Lookup("Container_Main")
 		local fScaleX = math.max(nGroupEx == 1 and 1 or 0, Cataclysm_Main.fScaleX)
 		local minW = container:GetRelX() + container:GetW()
-		local w = max(128 * nGroupEx * fScaleX, minW)
+		local w = max(128 * nGroupEx * fScaleX, minW + 30)
 		local h = select(2, frame:GetSize())
 		frame:SetW(w)
 		if not bEnter then
@@ -1560,24 +1565,24 @@ function PS.OnPanelActive(frame)
 	y = y + 3
 	x = x + ui:append("WndRadioBox", {
 		x = x, y = y, text = _L["Official team frame style"],
-		group = "CSS", checked = Cataclysm_Main.nCss == 1,
+		group = "CSS", checked = Cataclysm_Main.nCss == CTM_STYLE.OFFICIAL,
 		oncheck = function(bChecked)
 			if not bChecked then
 				return
 			end
-			Cataclysm_Main.nCss = 1
+			Cataclysm_Main.nCss = CTM_STYLE.OFFICIAL
 			ReloadCataclysmPanel()
 		end,
 	}, true):autoWidth():width() + 5
 
 	y = y + ui:append("WndRadioBox", {
 		x = x, y = y, text = _L["Cataclysm team frame style"],
-		group = "CSS", checked = Cataclysm_Main.nCss == 2,
+		group = "CSS", checked = Cataclysm_Main.nCss == CTM_STYLE.CATACLYSM,
 		oncheck = function(bChecked)
 			if not bChecked then
 				return
 			end
-			Cataclysm_Main.nCss = 2
+			Cataclysm_Main.nCss = CTM_STYLE.CATACLYSM
 			ReloadCataclysmPanel()
 		end,
 	}, true):autoWidth():height()
