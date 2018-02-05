@@ -6,15 +6,28 @@ local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/lang/")
 -----------------------------------------------
 -- 重构 @ 2015 赶时间 很多东西写的很粗略
 -----------------------------------------------
--- global cache
-local pairs, ipairs = pairs, ipairs
-local type, unpack = type, unpack
-local floor, min, mmax = math.floor, math.min, math.max
+-----------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+-----------------------------------------------------------------------------------------
 local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local floor, min, max, ceil = math.floor, math.min, math.max, math.ceil
+local huge, pi, sin, cos, tan = math.huge, math.pi, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+-----------------------------------------------------------------------------------------
+local Station, SetTarget = Station, SetTarget
+local Target_GetTargetData, Table_BuffIsVisible = Target_GetTargetData, Table_BuffIsVisible
 local MY_GetDistance, MY_GetBuff, GetEndTime, MY_GetObject = MY.GetDistance, MY.GetBuff, MY.GetEndTime, MY.GetObject
-local GetClientPlayer, GetClientTeam, GetPlayer = GetClientPlayer, GetClientTeam, GetPlayer
-local Station, SetTarget, Target_GetTargetData = Station, SetTarget, Target_GetTargetData
-local Table_BuffIsVisible = Table_BuffIsVisible
 local CFG                    = Cataclysm_Main
 local CTM_STYLE              = MY_Cataclysm.STYLE
 local CTM_BG_COLOR_MODE      = MY_Cataclysm.BG_COLOR_MODE
@@ -38,7 +51,9 @@ local CTM_TTARGET -- 注意这个是UI逻辑目标选中的目标 不一定是真实的当前目标
 local CTM_CACHE              = setmetatable({}, { __mode = "v" })
 local CTM_LIFE_CACHE         = {}
 local CTM_BUFF_CACHE         = {}
+local CTM_ATTENTION_LIST     = {}
 local CTM_ATTENTION_CACHE    = {}
+local CTM_CAUTION_CACHE      = {}
 local CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID
 local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子
 local CHANGGE_REAL_SHADOW_CACHE = {}
@@ -676,16 +691,41 @@ function CTM:RefreshAttention()
 	for _, dwTarID in ipairs(team.GetTeamMemberList()) do
 		local p = GetPlayer(dwTarID)
 		if CTM_CACHE[dwTarID] and CTM_CACHE[dwTarID]:IsValid() then
-			CTM_CACHE[dwTarID]:Lookup("Handle_Attention"):SetVisible(p and not empty(CTM_ATTENTION_CACHE[dwTarID]))
+			if p and not empty(CTM_ATTENTION_LIST[dwTarID]) then
+				local r, g, b = MY.HumanColor2RGB(CTM_ATTENTION_LIST[dwTarID][1].col)
+				CTM_CACHE[dwTarID]:Lookup("Shadow_Attention"):SetColorRGB(r, g, b)
+				CTM_CACHE[dwTarID]:Lookup("Shadow_Attention"):Show()
+			else
+				CTM_CACHE[dwTarID]:Lookup("Shadow_Attention"):Hide()
+			end
 		end
 		tCheck[dwTarID] = true
 	end
 	for dwTarID, _ in pairs(CTM_ATTENTION_CACHE) do
 		if not tCheck[dwTarID] then
+			CTM_ATTENTION_LIST[dwTarID] = nil
 			CTM_ATTENTION_CACHE[dwTarID] = nil
 		end
 	end
 	-- Output(CTM_ATTENTION_CACHE)
+end
+
+function CTM:RefreshCaution()
+	local team, me = GetClientTeam(), GetClientPlayer()
+	local tCheck = {}
+	for _, dwTarID in ipairs(team.GetTeamMemberList()) do
+		local p = GetPlayer(dwTarID)
+		if CTM_CACHE[dwTarID] and CTM_CACHE[dwTarID]:IsValid() then
+			CTM_CACHE[dwTarID]:Lookup("Handle_Caution"):SetVisible(p and not empty(CTM_CAUTION_CACHE[dwTarID]))
+		end
+		tCheck[dwTarID] = true
+	end
+	for dwTarID, _ in pairs(CTM_CAUTION_CACHE) do
+		if not tCheck[dwTarID] then
+			CTM_CAUTION_CACHE[dwTarID] = nil
+		end
+	end
+	-- Output(CTM_CAUTION_CACHE)
 end
 
 function CTM:RefreshMark()
@@ -723,7 +763,7 @@ function CTM:RefreshSFX()
 	local fUIX, fUIY -- UI当前状态下对应1.0的缩放比
 	for dwID, h in pairs(CTM_CACHE) do
 		if h:IsValid() then
-			for _, szID in ipairs({ "TargetTarget", "Attention" }) do
+			for _, szID in ipairs({ "TargetTarget", "Caution" }) do
 				hDest = h:Lookup("Handle_" .. szID)
 				hScale = hDest:Lookup("Handle_" .. szID .. "_Scale")
 				hFixed = hDest:Lookup("Handle_" .. szID .. "_Fixed")
@@ -1263,9 +1303,23 @@ function CTM:RefreshBuff()
 					-- update attention
 					if data.bAttention then
 						if not CTM_ATTENTION_CACHE[v] then
+							CTM_ATTENTION_LIST[v] = {}
 							CTM_ATTENTION_CACHE[v] = {}
 						end
-						CTM_ATTENTION_CACHE[v]["BUFF#" .. key] = true
+						if not CTM_ATTENTION_CACHE[v]["BUFF#" .. key] then
+							local rec = {
+								col = data.col or "yellow",
+							}
+							insert(CTM_ATTENTION_LIST[v], 1, rec)
+							CTM_ATTENTION_CACHE[v]["BUFF#" .. key] = rec
+						end
+					end
+					-- update caution
+					if data.bCaution then
+						if not CTM_CAUTION_CACHE[v] then
+							CTM_CAUTION_CACHE[v] = {}
+						end
+						CTM_CAUTION_CACHE[v]["BUFF#" .. key] = true
 					end
 					tCheck[dwID] = true
 				else
@@ -1273,8 +1327,18 @@ function CTM:RefreshBuff()
 						handle:RemoveItem(item)
 						handle:FormatAllItemPos() -- 格式化buff的位置
 					end
-					if CTM_ATTENTION_CACHE[v] then
+					local rec = CTM_ATTENTION_CACHE[v] and CTM_ATTENTION_CACHE[v]["BUFF#" .. key]
+					if rec then
+						for i, vv in ipairs_r(CTM_ATTENTION_LIST[v]) do
+							if vv == rec then
+								remove(CTM_ATTENTION_LIST[v], i)
+								break
+							end
+						end
 						CTM_ATTENTION_CACHE[v]["BUFF#" .. key] = nil
+					end
+					if CTM_CAUTION_CACHE[v] then
+						CTM_CAUTION_CACHE[v]["BUFF#" .. key] = nil
 					end
 				end
 			end
@@ -1386,8 +1450,8 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 		nCurrentLife = info.nCurrentLife
 		nMaxLife = info.nMaxLife
 	end
-	nMaxLife     = mmax(1, nMaxLife)
-	nCurrentLife = mmax(0, nCurrentLife)
+	nMaxLife     = max(1, nMaxLife)
+	nCurrentLife = max(0, nCurrentLife)
 	nLifePercentage = nMaxLife ~= 0 and (nCurrentLife / nMaxLife)
 	if not nLifePercentage or nLifePercentage < 0 or nLifePercentage > 1 then
 		nLifePercentage = 1
