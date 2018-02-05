@@ -163,6 +163,7 @@ local function ReloadFrame(frame)
 
 		-- 缩放先
 		hItem:Scale(GetScale(config))
+		nItemW, nItemH = imgBoxBg:GetSize()
 		-- Box部分
 		box:SetObject(UI_OBJECT.BUFF, mon.id, 1, 1)
 		box:SetObjectIcon(mon.iconid or 13)
@@ -205,7 +206,7 @@ local function ReloadFrame(frame)
 		end
 
 		-- 倒计时条
-		local fontScale = max(0.85, GetScale(config) * 0.58)
+		local fontScale = max(0.85, GetScale(config) * 0.95)
 		if config.cdBar then
 			txtProcess:SetW(config.cdBarWidth - 10)
 			txtProcess:SetText("")
@@ -224,22 +225,19 @@ local function ReloadFrame(frame)
 			hCDBar:Show()
 			hCDBar:SetW(config.cdBarWidth)
 			hItem.hCDBar = hCDBar
-			hItem:SetW(hBox:GetW() + config.cdBarWidth)
+			hItem:SetW(nItemW + config.cdBarWidth)
 			txtShortName:Hide()
 		else
 			hCDBar:Hide()
-			hItem:SetW(hBox:GetW())
+			hItem:SetW(nItemW)
 			txtShortName:SetText(mon.shortAlias or mon.name or '')
 			txtShortName:SetVisible(config.showName)
 			txtShortName:SetFontColor(unpack(mon.rgbShortAlias))
 			txtShortName:SetFontScale(fontScale)
-			txtShortName:SetW(hBox:GetW() - txtShortName:GetRelX() * 2)
-			txtShortName:SetH(txtShortName:GetH() * fontScale * 1.5)
+			txtShortName:SetW(nItemW - txtShortName:GetRelX() * 2)
+			txtShortName:SetH(txtShortName:GetH() * Station.GetUIScale() * fontScale * 1.3)
 			hBox:SetSizeByAllItemSize()
 			hItem:SetSizeByAllItemSize()
-		end
-		if nCount == 1 then
-			nItemW, nItemH = hItem:GetSize()
 		end
 		if nCount <= config.maxLineCount then
 			nWidth = ceil(nWidth + ceil(hItem:GetW()))
