@@ -1350,12 +1350,14 @@ function PS.OnPanelActive(frame)
 						end
 					end
 					if #t > 0 then
+						local tDistanceCol = Cataclysm_Main.tDistanceCol
+						local tDistanceAlpha = Cataclysm_Main.tDistanceAlpha
 						Cataclysm_Main.tDistanceLevel = tt
 						Cataclysm_Main.tDistanceCol = {}
 						Cataclysm_Main.tDistanceAlpha = {}
-						for k, v in ipairs(t) do
-							table.insert(Cataclysm_Main.tDistanceCol, { 255, 255, 255 })
-							table.insert(Cataclysm_Main.tDistanceAlpha, 255)
+						for i = 1, #t do
+							table.insert(Cataclysm_Main.tDistanceCol, tDistanceCol[i] or { 255, 255, 255 })
+							table.insert(Cataclysm_Main.tDistanceAlpha, tDistanceAlpha[i] or 255)
 						end
 						MY.SwitchTab("MY_Cataclysm_GridStyle", true)
 					end
@@ -1391,8 +1393,10 @@ function PS.OnPanelActive(frame)
 		x = X + 20
 		for i = 1, #Cataclysm_Main.tDistanceLevel do
 			local n = Cataclysm_Main.tDistanceLevel[i - 1] or 0
-			local txt = n .. g_tStrings.STR_METER .. " - " .. Cataclysm_Main.tDistanceLevel[i] .. g_tStrings.STR_METER .. g_tStrings.BACK_COLOR
-			ui:append("Text", { x = x, y = y, text = txt }):autoWidth()
+			local text = n .. g_tStrings.STR_METER .. " - "
+				.. Cataclysm_Main.tDistanceLevel[i]
+				.. g_tStrings.STR_METER .. g_tStrings.BACK_COLOR
+			ui:append("Text", { x = x, y = y, text = text }):autoWidth()
 			local x = 280
 			if Cataclysm_Main.nBGColorMode == CTM_BG_COLOR_MODE.BY_DISTANCE then
 				x = x + ui:append("Shadow", {
@@ -1429,7 +1433,12 @@ function PS.OnPanelActive(frame)
 
 	-- ³öÍ¬²½·¶Î§±³¾°
 	x = X + 20
-	ui:append("Text", { x = x, y = y, text = g_tStrings.STR_RAID_DISTANCE_M4 }):autoWidth()
+	ui:append("Text", {
+		x = x, y = y,
+		text = Cataclysm_Main.bEnableDistance
+			and _L("More than %d meter", Cataclysm_Main.tDistanceLevel[#Cataclysm_Main.tDistanceLevel])
+			or g_tStrings.STR_RAID_DISTANCE_M4,
+	}):autoWidth()
 	x = 280
 	if Cataclysm_Main.nBGColorMode ~= CTM_BG_COLOR_MODE.BY_FORCE
 	and Cataclysm_Main.nBGColorMode ~= CTM_BG_COLOR_MODE.OFFICIAL then

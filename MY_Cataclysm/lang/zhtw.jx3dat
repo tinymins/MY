@@ -97,4 +97,5 @@ data = {
 	["Target assist delay %dms."] = "延遲%d毫秒選中目標。",
 	["Target assist no delay."] = "鼠標移入立即選中。",
 	["Alpha: %d."] = "透明度：%d。",
+	["More than %d meter"] = "%d尺以上",
 }
