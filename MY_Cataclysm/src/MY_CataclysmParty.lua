@@ -51,16 +51,21 @@ local CTM_TTARGET -- 注意这个是UI逻辑目标选中的目标 不一定是真实的当前目标
 local CTM_CACHE              = setmetatable({}, { __mode = "v" })
 local CTM_LIFE_CACHE         = {}
 local CTM_BUFF_CACHE         = {}
-local CTM_TOPTREAT_CACHE     = {}
+local CTM_BOSS_CACHE         = {}
 local CTM_ATTENTION_LIST     = {}
 local CTM_ATTENTION_CACHE    = {}
 local CTM_CAUTION_CACHE      = {}
+local CTM_BOSS_TARGET_CACHE  = {}
 local CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID
 local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子
 local CHANGGE_REAL_SHADOW_CACHE = {}
 do
 local function onNpcEnterScene()
+	local me = GetClientPlayer()
 	local npc = GetNpc(arg0)
+	if MY.IsBoss(me.GetMapID(), npc.dwTemplateID) then
+		CTM_BOSS_CACHE[npc.dwID] = npc
+	end
 	if npc.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID then
 		if not (IsEnemy(UI_GetClientPlayerID(), arg0) and MY.IsShieldedVersion()) then
 			local dwType, dwID = MY.GetTarget()
@@ -86,6 +91,7 @@ local function onNpcLeaveScene()
 		CHANGGE_REAL_SHADOW_CACHE[CHANGGE_REAL_SHADOW_CACHE[arg0]] = nil
 		CHANGGE_REAL_SHADOW_CACHE[arg0] = nil
 	end
+	CTM_BOSS_CACHE[npc.dwID] = nil
 end
 MY.RegisterEvent("NPC_LEAVE_SCENE", onNpcLeaveScene)
 end
@@ -687,6 +693,44 @@ function CTM:RefreshTTarget()
 end
 end
 
+do
+local function HideBossTarget(dwTarID)
+	if CTM_CACHE[dwTarID]
+	and CTM_CACHE[dwTarID]:IsValid()
+	and CTM_CACHE[dwTarID]:Lookup("Image_Threat")
+	and CTM_CACHE[dwTarID]:Lookup("Image_Threat"):IsValid() then
+		CTM_CACHE[dwTarID]:Lookup("Image_Threat"):Hide()
+	end
+end
+function CTM:RefreshBossTarget()
+	local tCheck = {}
+	if CFG.bShowBossTarget then
+		for dwNpcID, npc in pairs(CTM_BOSS_CACHE) do
+			local dwTarID = IsEnemy(UI_GetClientPlayerID(), dwNpcID) and npc.bFightState and select(2, npc.GetTarget()) or nil
+			if dwTarID then
+				if dwTarID ~= CTM_BOSS_TARGET_CACHE[dwNpcID] then
+					HideBossTarget(CTM_BOSS_TARGET_CACHE[dwNpcID])
+					if CTM_CACHE[dwTarID]
+					and CTM_CACHE[dwTarID]:IsValid()
+					and CTM_CACHE[dwTarID]:Lookup("Image_Threat")
+					and CTM_CACHE[dwTarID]:Lookup("Image_Threat"):IsValid() then
+						CTM_CACHE[dwTarID]:Lookup("Image_Threat"):Show()
+					end
+					CTM_BOSS_TARGET_CACHE[dwNpcID] = dwTarID
+				end
+				tCheck[dwTarID] = true
+			end
+		end
+	end
+	for dwNpcID, dwTarID in pairs(CTM_BOSS_TARGET_CACHE) do
+		if not tCheck[dwTarID] then
+			HideBossTarget(dwTarID)
+			CTM_BOSS_TARGET_CACHE[dwNpcID] = nil
+		end
+	end
+end
+end
+
 function CTM:RefreshAttention()
 	local team, me = GetClientTeam(), GetClientPlayer()
 	local tCheck = {}
@@ -728,53 +772,6 @@ function CTM:RefreshCaution()
 		end
 	end
 	-- Output(CTM_CAUTION_CACHE)
-end
-
-do
-local function HideThreat(dwTarID)
-	if CTM_CACHE[dwTarID]
-	and CTM_CACHE[dwTarID]:IsValid()
-	and CTM_CACHE[dwTarID]:Lookup("Image_Threat")
-	and CTM_CACHE[dwTarID]:Lookup("Image_Threat"):IsValid() then
-		CTM_CACHE[dwTarID]:Lookup("Image_Threat"):Hide()
-	end
-end
-function CTM:UpdateThreat(dwNpcID, dwOwnerID, aThreat)
-	local dwTime = GetTime()
-	if CFG.bShowTopThreat then
-		-- 隐藏上次的一仇
-		if CTM_TOPTREAT_CACHE[dwNpcID] then
-			local dwID = CTM_TOPTREAT_CACHE[dwNpcID].dwID
-			CTM_TOPTREAT_CACHE[dwID] = nil
-			CTM_TOPTREAT_CACHE[dwNpcID] = nil
-			HideThreat(dwID)
-		end
-		local info = CTM_TOPTREAT_CACHE[dwOwnerID]
-		if not info then
-			info = {}
-			CTM_TOPTREAT_CACHE[dwOwnerID] = info
-		end
-		if dwOwnerID then
-			if CTM_CACHE[dwOwnerID]
-			and CTM_CACHE[dwOwnerID]:IsValid()
-			and CTM_CACHE[dwOwnerID]:Lookup("Image_Threat")
-			and CTM_CACHE[dwOwnerID]:Lookup("Image_Threat"):IsValid() then
-				CTM_CACHE[dwOwnerID]:Lookup("Image_Threat"):Show()
-			end
-			info.dwID = dwOwnerID
-			info.dwTime = dwTime
-		end
-	end
-	for dwNpcID, info in pairs(CTM_TOPTREAT_CACHE) do
-		if not IsPlayer(dwNpcID) and not (GetNpc(dwNpcID) and GetPlayer(info.dwID)) then
-			HideThreat(info.dwID)
-			CTM_TOPTREAT_CACHE[dwNpcID] = nil
-			CTM_TOPTREAT_CACHE[info.dwID] = nil
-		elseif dwTime - info.dwTime > 500 then
-			ApplyCharacterThreatRankList(dwNpcID)
-		end
-	end
-end
 end
 
 function CTM:RefreshMark()
