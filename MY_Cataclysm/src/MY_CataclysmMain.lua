@@ -419,6 +419,7 @@ function Cataclysm_Main.OnFrameCreate()
 	this:RegisterEvent("SYS_MSG")
 	this:RegisterEvent("MY_KUNGFU_SWITCH")
 	this:RegisterEvent("MY_RAID_REC_BUFF")
+	this:RegisterEvent("CHARACTER_THREAT_RANKLIST")
 	this:RegisterEvent("GKP_RECORD_TOTAL")
 	this:RegisterEvent("GVOICE_MIC_STATE_CHANGED")
 	this:RegisterEvent("GVOICE_SPEAKER_STATE_CHANGED")
@@ -589,6 +590,16 @@ function Cataclysm_Main.OnEvent(szEvent)
 			RecBuffWithTabs(BUFF_LIST[arg4], arg0, arg4, arg9)
 			RecBuffWithTabs(BUFF_LIST[szName], arg0, arg4, arg9)
 		end
+	elseif szEvent == "CHARACTER_THREAT_RANKLIST" then
+		local t = {}
+		for dwID, nThreat in pairs(arg1) do
+			insert(t, {
+				dwID = dwID,
+				nThreat = nThreat,
+			})
+		end
+		sort(t, function(a, b) return a.nThreat > b.nThreat end)
+		Grid_CTM:UpdateThreat(arg0, arg2, t)
 	elseif szEvent == "GKP_RECORD_TOTAL" then
 		GKP_RECORD_TOTAL = arg0
 	elseif szEvent == "GVOICE_MIC_STATE_CHANGED" then
@@ -881,6 +892,14 @@ function PS.OnPanelActive(frame)
 		checked = Cataclysm_Main.bShowDistance,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowDistance = bCheck
+		end,
+	}, true):autoWidth():width() + 5
+
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y, text = _L["Show top threat"],
+		checked = Cataclysm_Main.bShowTopThreat,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bShowTopThreat = bCheck
 		end,
 	}, true):autoWidth():width() + 5
 

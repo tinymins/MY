@@ -14,6 +14,7 @@ data = {
 	nColoredName         = 0,
 	nShowIcon            = 2,
 	bShowDistance        = false,
+	bShowTopThreat       = false,
 	bEnableDistance      = true,
 	nBGColorMode         = 3, -- 0 不着色 1 根据距离 2 根据门派 3官方着色
 	bShowTargetTargetAni = false,

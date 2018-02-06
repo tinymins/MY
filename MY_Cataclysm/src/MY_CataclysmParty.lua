@@ -51,6 +51,7 @@ local CTM_TTARGET -- 注意这个是UI逻辑目标选中的目标 不一定是真实的当前目标
 local CTM_CACHE              = setmetatable({}, { __mode = "v" })
 local CTM_LIFE_CACHE         = {}
 local CTM_BUFF_CACHE         = {}
+local CTM_TOPTREAT_CACHE     = {}
 local CTM_ATTENTION_LIST     = {}
 local CTM_ATTENTION_CACHE    = {}
 local CTM_CAUTION_CACHE      = {}
@@ -647,6 +648,7 @@ function CTM:RefreshTarget(dwOldID, nOldType, dwNewID, nNewType)
 	CTM_TARGET = dwNewID
 end
 
+do
 local function HideTTarget()
 	if CTM_TTARGET
 	and CTM_CACHE[CTM_TTARGET]
@@ -656,7 +658,6 @@ local function HideTTarget()
 		CTM_CACHE[CTM_TTARGET]:Lookup("Handle_TargetTarget"):Hide()
 	end
 end
-
 function CTM:RefreshTTarget()
 	if CFG.bShowTargetTargetAni then
 		local dwType, dwID = Target_GetTargetData()
@@ -683,6 +684,7 @@ function CTM:RefreshTTarget()
 		end
 	end
 	HideTTarget()
+end
 end
 
 function CTM:RefreshAttention()
@@ -726,6 +728,53 @@ function CTM:RefreshCaution()
 		end
 	end
 	-- Output(CTM_CAUTION_CACHE)
+end
+
+do
+local function HideThreat(dwTarID)
+	if CTM_CACHE[dwTarID]
+	and CTM_CACHE[dwTarID]:IsValid()
+	and CTM_CACHE[dwTarID]:Lookup("Image_Threat")
+	and CTM_CACHE[dwTarID]:Lookup("Image_Threat"):IsValid() then
+		CTM_CACHE[dwTarID]:Lookup("Image_Threat"):Hide()
+	end
+end
+function CTM:UpdateThreat(dwNpcID, dwOwnerID, aThreat)
+	local dwTime = GetTime()
+	if CFG.bShowTopThreat then
+		-- 隐藏上次的一仇
+		if CTM_TOPTREAT_CACHE[dwNpcID] then
+			local dwID = CTM_TOPTREAT_CACHE[dwNpcID].dwID
+			CTM_TOPTREAT_CACHE[dwID] = nil
+			CTM_TOPTREAT_CACHE[dwNpcID] = nil
+			HideThreat(dwID)
+		end
+		local info = CTM_TOPTREAT_CACHE[dwOwnerID]
+		if not info then
+			info = {}
+			CTM_TOPTREAT_CACHE[dwOwnerID] = info
+		end
+		if dwOwnerID then
+			if CTM_CACHE[dwOwnerID]
+			and CTM_CACHE[dwOwnerID]:IsValid()
+			and CTM_CACHE[dwOwnerID]:Lookup("Image_Threat")
+			and CTM_CACHE[dwOwnerID]:Lookup("Image_Threat"):IsValid() then
+				CTM_CACHE[dwOwnerID]:Lookup("Image_Threat"):Show()
+			end
+			info.dwID = dwOwnerID
+			info.dwTime = dwTime
+		end
+	end
+	for dwNpcID, info in pairs(CTM_TOPTREAT_CACHE) do
+		if not IsPlayer(dwNpcID) and not (GetNpc(dwNpcID) and GetPlayer(info.dwID)) then
+			HideThreat(info.dwID)
+			CTM_TOPTREAT_CACHE[dwNpcID] = nil
+			CTM_TOPTREAT_CACHE[info.dwID] = nil
+		elseif dwTime - info.dwTime > 500 then
+			ApplyCharacterThreatRankList(dwNpcID)
+		end
+	end
+end
 end
 
 function CTM:RefreshMark()
