@@ -480,6 +480,7 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 			hItem.box:SetOverText(1, "")
 			hItem.box:ClearExtentAnimate()
 		elseif config.type == 'SKILL' then
+			UpdateBoxObject(hItem.box, UI_OBJECT.SKILL)
 			hItem.box:SetOverText(3, "")
 			hItem.box:SetObjectCoolDown(false)
 		end
