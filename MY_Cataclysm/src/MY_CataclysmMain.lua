@@ -1869,9 +1869,9 @@ function PS.OnPanelActive(frame)
 	y = y + ui:append("Text", { x = x, y = y, text = _L["Buff settings"], font = 27 }, true):autoSize():height()
 
 	x = X + 10
-	x = x + ui:append("Text", { x = x, y = y, text = _L["Max buff count"]}, true):autoWidth():width() + 5
-	y = y + ui:append("WndSliderBox", {
-		x = x, y = y, text = "",
+	x = x + ui:append("Text", { x = x, y = y, text = _L["Max count"]}, true):autoWidth():width() + 5
+	x = x + ui:append("WndSliderBox", {
+		x = x, y = y + 3, rw = 90, text = "",
 		range = {0, 10},
 		value = Cataclysm_Main.nMaxShowBuff,
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
@@ -1879,21 +1879,11 @@ function PS.OnPanelActive(frame)
 			Cataclysm_Main.nMaxShowBuff = nVal
 			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
-	}, true):height()
+	}, true):autoWidth():width() + 30
 
-	x = X + 10
-	x = x + ui:append("Text", { x = x, y = y, text = _L["buff Size"]}, true):autoWidth():width() + 5
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y,
-		text = g_tStrings.STR_OPTIMIZE_AUTO,
-		checked = Cataclysm_Main.bAutoBuffSize,
-		oncheck = function(bCheck)
-			Cataclysm_Main.bAutoBuffSize = bCheck
-			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
-		end,
-	}, true):autoWidth():width()
-	y = y + ui:append("WndSliderBox", {
-		x = x, y = y + 3, h = 25, w = 200,
+	x = x + ui:append("Text", { x = x, y = y, text = _L["Scale"]}, true):autoWidth():width() + 5
+	x = x + ui:append("WndSliderBox", {
+		x = x, y = y + 3, h = 25, rw = 90,
 		enable = not Cataclysm_Main.bAutoBuffSize,
 		autoenable = function() return not Cataclysm_Main.bAutoBuffSize end,
 		range = {50, 200},
@@ -1904,7 +1894,17 @@ function PS.OnPanelActive(frame)
 			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
 		textfmt = function(val) return _L("%d%%", val) end,
-	}, true):autoWidth():height()
+	}, true):autoWidth():width() + 10
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y,
+		text = _L["Follow panel scale"],
+		checked = Cataclysm_Main.bAutoBuffSize,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bAutoBuffSize = bCheck
+			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
+		end,
+	}, true):autoWidth():width()
+	y = y + 25
 
 	x = X + 10
 	y = y + 5
