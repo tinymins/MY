@@ -1208,16 +1208,16 @@ function _GKP.RecoveryMenu()
 	local menu = {}
 	local aFiles = {}
 	local szPath = MY.FormatPath({"userdata/gkp/", MY_DATA_PATH.ROLE}):sub(3):gsub("/", "\\"):sub(1, -2)
-	for i, path in ipairs(CPath.GetFileList(szPath)) do
-		local year, month, day, hour, minute, second, index = path:match("^(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%.gkp.jx3dat")
+	for i, filename in ipairs(CPath.GetFileList(szPath)) do
+		local year, month, day, hour, minute, second, index = filename:match("^(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+).-%.gkp.jx3dat")
 		if not year then
-			year, month, day, hour, minute, second = path:match("^(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%.gkp.jx3dat")
+			year, month, day, hour, minute, second = filename:match("^(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+)%-(%d+).-%.gkp.jx3dat")
 		end
 		if not year then
-			year, month, day = path:match("^(%d+)%-(%d+)%-(%d+)%.gkp.jx3dat")
+			year, month, day = filename:match("^(%d+)%-(%d+)%-(%d+)%.gkp.jx3dat")
 		end
 		if year then
-			table.insert(aFiles, {year, month, day, hour, minute, second, index})
+			table.insert(aFiles, {year, month, day, hour, minute, second, index, filename = filename:sub(1, -12)})
 		end
 	end
 	local function sortFile(a, b)
@@ -1236,7 +1236,7 @@ function _GKP.RecoveryMenu()
 	table.sort(aFiles, sortFile)
 
 	for i = 1, math.min(#aFiles, 21) do
-		local szFile = table.concat(aFiles[i], "-")
+		local szFile = aFiles[i].filename
 		table.insert(menu, {
 			szOption = szFile .. ".gkp",
 			fnAction = function()
