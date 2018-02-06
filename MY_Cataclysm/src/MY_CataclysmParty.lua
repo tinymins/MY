@@ -96,6 +96,19 @@ end
 MY.RegisterEvent("NPC_LEAVE_SCENE", onNpcLeaveScene)
 end
 
+do
+local function onBossSet()
+	CTM_BOSS_CACHE = {}
+	local dwMapID = GetClientPlayer().GetMapID()
+	for dwID, npc in pairs(MY.GetNearNpc()) do
+		if MY.IsBoss(dwMapID, npc.dwTemplateID) then
+			CTM_BOSS_CACHE[dwID] = npc
+		end
+	end
+end
+MY.RegisterEvent("MY_SET_BOSS", onBossSet)
+end
+
 local function SetTarget(dwType, dwID)
 	if CHANGGE_REAL_SHADOW_CACHE[dwID] then
 		dwType, dwID = TARGET.NPC, CHANGGE_REAL_SHADOW_CACHE[dwID]

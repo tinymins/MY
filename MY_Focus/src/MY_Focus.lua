@@ -786,6 +786,7 @@ function MY_Focus.OnFrameCreate()
 	this:RegisterEvent("PLAYER_LEAVE_SCENE")
 	this:RegisterEvent("NPC_LEAVE_SCENE")
 	this:RegisterEvent("DOODAD_LEAVE_SCENE")
+	this:RegisterEvent("MY_SET_IMPORTANT_NPC")
 	this:RegisterEvent("CUSTOM_DATA_LOADED")
 
 	MY_Focus.SetScale(MY_Focus.fScaleX, MY_Focus.fScaleY)
@@ -828,6 +829,8 @@ function MY_Focus.OnEvent(event)
 		MY_Focus.OnObjectLeaveScene(TARGET.NPC, arg0)
 	elseif event == 'DOODAD_LEAVE_SCENE' then
 		MY_Focus.OnObjectLeaveScene(TARGET.DOODAD, arg0)
+	elseif event == 'MY_SET_IMPORTANT_NPC' then
+		MY_Focus.RescanNearby()
 	end
 end
 

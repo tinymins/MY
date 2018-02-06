@@ -524,19 +524,28 @@ end
 MY.IsDungeonMap = MY.Game.IsDungeonMap
 
 -- 地图BOSS列表
-do local l_tBossList
-local function GeneDungeonBoss()
-	if l_tBossList then
+do local BOSS_LIST, BOSS_LIST_CUSTOM
+local function LoadCustomList()
+	if not BOSS_LIST_CUSTOM then
+		BOSS_LIST_CUSTOM = MY.LoadLUAData({'config/bosslist.jx3dat', MY_DATA_PATH.GLOBAL}) or {}
+	end
+end
+local function SaveCustomList()
+	MY.SaveLUAData({'config/bosslist.jx3dat', MY_DATA_PATH.GLOBAL}, BOSS_LIST_CUSTOM)
+end
+local function GenerateList()
+	LoadCustomList()
+	if BOSS_LIST then
 		return
 	end
 	local VERSION = select(2, GetVersion())
 	local CACHE_PATH = 'cache/bosslist/' .. VERSION .. '.jx3dat'
-	l_tBossList = MY.LoadLUAData({CACHE_PATH, MY_DATA_PATH.GLOBAL})
-	if l_tBossList then
+	BOSS_LIST = MY.LoadLUAData({CACHE_PATH, MY_DATA_PATH.GLOBAL})
+	if BOSS_LIST then
 		return
 	end
 
-	l_tBossList = {}
+	BOSS_LIST = {}
 	local nCount = g_tTable.DungeonBoss:GetRowCount()
 	for i = 2, nCount do
 		local tLine = g_tTable.DungeonBoss:GetRow(i)
@@ -545,84 +554,188 @@ local function GeneDungeonBoss()
 		for szNpcIndex in string.gmatch(szNpcList, "(%d+)") do
 			local p = g_tTable.DungeonNpc:Search(tonumber(szNpcIndex))
 			if p then
-				if not l_tBossList[dwMapID] then
-					l_tBossList[dwMapID] = {}
+				if not BOSS_LIST[dwMapID] then
+					BOSS_LIST[dwMapID] = {}
 				end
-				l_tBossList[dwMapID][p.dwNpcID] = p.szName
+				BOSS_LIST[dwMapID][p.dwNpcID] = p.szName
 			end
 		end
 	end
 
-	for dwMapID, tBoss in pairs(MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. "data/bosslist/add/$lang.jx3dat") or {}) do
-		if not l_tBossList[dwMapID] then
-			l_tBossList[dwMapID] = {}
+	for dwMapID, tInfo in pairs(MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. "data/bosslist/$lang.jx3dat") or {}) do
+		if not BOSS_LIST[dwMapID] then
+			BOSS_LIST[dwMapID] = {}
 		end
-		for dwNpcID, szName in pairs(tBoss) do
-			l_tBossList[dwMapID][dwNpcID] = szName
+		for dwNpcID, szName in pairs(tInfo.ADD or EMPTY_TABLE) do
+			BOSS_LIST[dwMapID][dwNpcID] = szName
 		end
-	end
-	for dwMapID, tBoss in pairs(MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. "data/bosslist/del/$lang.jx3dat") or {}) do
-		if l_tBossList[dwMapID] then
-			for dwNpcID, _ in pairs(tBoss) do
-				l_tBossList[dwMapID][dwNpcID] = nil
-			end
+		for dwNpcID, szName in pairs(tInfo.DEL or EMPTY_TABLE) do
+			BOSS_LIST[dwMapID][dwNpcID] = nil
 		end
 	end
-	MY.SaveLUAData({CACHE_PATH, MY_DATA_PATH.GLOBAL}, l_tBossList)
-	MY.Sysmsg({_L('Dungeon Boss list updated to v%s.', VERSION)})
+	MY.SaveLUAData({CACHE_PATH, MY_DATA_PATH.GLOBAL}, BOSS_LIST)
+	MY.Sysmsg({_L('Boss list updated to v%s.', VERSION)})
 end
 
 -- 获取指定地图指定模板ID的NPC是不是BOSS
 -- (boolean) MY.IsBoss(dwMapID, dwTem)
 function MY.IsBoss(dwMapID, dwTemplateID)
-	GeneDungeonBoss()
-	return l_tBossList[dwMapID] and l_tBossList[dwMapID][dwTemplateID] and true or false
+	GenerateList()
+	return (
+		(
+			BOSS_LIST[dwMapID] and BOSS_LIST[dwMapID][dwTemplateID]
+			and not (BOSS_LIST_CUSTOM[dwMapID] and BOSS_LIST_CUSTOM[dwMapID].DEL[dwTemplateID])
+		) or (BOSS_LIST_CUSTOM[dwMapID] and BOSS_LIST_CUSTOM[dwMapID].ADD[dwTemplateID])
+	) and true or false
 end
+
+MY.RegisterTargetAddonMenu("MY.Game.Bosslist", function()
+	local dwType, dwID = MY.GetTarget()
+	if dwType == TARGET.NPC and (IsCtrlKeyDown() or IsAltKeyDown() or IsShiftKeyDown()) then
+		GenerateList()
+		local p = MY.GetObject(dwType, dwID)
+		local szName = MY.GetObjectName(p)
+		local dwMapID = GetClientPlayer().GetMapID()
+		local szMapName = Table_GetMapName(dwMapID)
+		local dwTemplateID = p.dwTemplateID
+		if MY.IsBoss(dwMapID, dwTemplateID) then
+			return {
+				szOption = _L['Remove from Boss list'],
+				fnAction = function()
+					if not BOSS_LIST_CUSTOM[dwMapID] then
+						BOSS_LIST_CUSTOM[dwMapID] = {
+							NAME = szMapName,
+							ADD = {},
+							DEL = {},
+						}
+					end
+					if BOSS_LIST[dwMapID] and BOSS_LIST[dwMapID][dwTemplateID] then
+						BOSS_LIST_CUSTOM[dwMapID].DEL[dwTemplateID] = szName
+					end
+					BOSS_LIST_CUSTOM[dwMapID].ADD[dwTemplateID] = nil
+					SaveCustomList()
+					FireUIEvent("MY_SET_BOSS", dwMapID, dwTemplateID, false)
+					FireUIEvent("MY_SET_IMPORTANT_NPC", dwMapID, dwTemplateID, MY.IsImportantNpc(dwMapID, dwTemplateID))
+				end,
+			}
+		else
+			return {
+				szOption = _L['Add to Boss list'],
+				fnAction = function()
+					if not BOSS_LIST_CUSTOM[dwMapID] then
+						BOSS_LIST_CUSTOM[dwMapID] = {
+							NAME = szMapName,
+							ADD = {},
+							DEL = {},
+						}
+					end
+					BOSS_LIST_CUSTOM[dwMapID].ADD[dwTemplateID] = szName
+					SaveCustomList()
+					FireUIEvent("MY_SET_BOSS", dwMapID, dwTemplateID, true)
+					FireUIEvent("MY_SET_IMPORTANT_NPC", dwMapID, dwTemplateID, MY.IsImportantNpc(dwMapID, dwTemplateID))
+				end,
+			}
+		end
+	end
+end)
 end
 
 -- 地图重要NPC列表
-do local l_tImportantNpcList
-local function GeneImportantNpc()
-	if l_tImportantNpcList then
+do local INPC_LIST, INPC_LIST_CUSTOM
+local function LoadCustomList()
+	if not INPC_LIST_CUSTOM then
+		INPC_LIST_CUSTOM = MY.LoadLUAData({'config/inpclist.jx3dat', MY_DATA_PATH.GLOBAL}) or {}
+	end
+end
+local function SaveCustomList()
+	MY.SaveLUAData({'config/inpclist.jx3dat', MY_DATA_PATH.GLOBAL}, INPC_LIST_CUSTOM)
+end
+local function GenerateList()
+	LoadCustomList()
+	if INPC_LIST then
 		return
 	end
 	local VERSION = select(2, GetVersion())
 	local CACHE_PATH = 'cache/inpclist/' .. VERSION .. '.jx3dat'
-	l_tImportantNpcList = MY.LoadLUAData({CACHE_PATH, MY_DATA_PATH.GLOBAL})
-	if l_tImportantNpcList then
+	INPC_LIST = MY.LoadLUAData({CACHE_PATH, MY_DATA_PATH.GLOBAL})
+	if INPC_LIST then
 		return
 	end
-
-	l_tImportantNpcList = {}
-
-	for dwMapID, tBoss in pairs(MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. "data/inpclist/add/$lang.jx3dat") or {}) do
-		if not l_tImportantNpcList[dwMapID] then
-			l_tImportantNpcList[dwMapID] = {}
+	INPC_LIST = {}
+	for dwMapID, tInfo in pairs(MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. "data/inpclist/$lang.jx3dat") or {}) do
+		if not INPC_LIST[dwMapID] then
+			INPC_LIST[dwMapID] = {}
 		end
-		for dwNpcID, szName in pairs(tBoss) do
-			l_tImportantNpcList[dwMapID][dwNpcID] = szName
+		for dwNpcID, szName in pairs(tInfo.ADD or EMPTY_TABLE) do
+			INPC_LIST[dwMapID][dwNpcID] = szName
 		end
-	end
-	for dwMapID, tBoss in pairs(MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. "data/inpclist/del/$lang.jx3dat") or {}) do
-		if not l_tImportantNpcList[dwMapID] then
-			l_tImportantNpcList[dwMapID] = {}
-		end
-		if l_tImportantNpcList[dwMapID] then
-			for dwNpcID, _ in pairs(tBoss) do
-				l_tImportantNpcList[dwMapID][dwNpcID] = false
-			end
+		for dwNpcID, szName in pairs(tInfo.DEL or EMPTY_TABLE) do
+			INPC_LIST[dwMapID][dwNpcID] = nil
 		end
 	end
-	MY.SaveLUAData({CACHE_PATH, MY_DATA_PATH.GLOBAL}, l_tImportantNpcList)
+	MY.SaveLUAData({CACHE_PATH, MY_DATA_PATH.GLOBAL}, INPC_LIST)
 	MY.Sysmsg({_L('Important Npc list updated to v%s.', VERSION)})
 end
 
 -- 获取指定地图指定模板ID的NPC是不是重要NPC
 -- (boolean) MY.IsImportantNpc(dwMapID, dwTem)
-function MY.IsImportantNpc(dwMapID, dwTemplateID)
-	GeneImportantNpc()
-	return l_tImportantNpcList[dwMapID] and l_tImportantNpcList[dwMapID][dwTemplateID] and true or MY.IsBoss(dwMapID, dwTemplateID)
+function MY.IsImportantNpc(dwMapID, dwTemplateID, bNoBoss)
+	GenerateList()
+	return (
+		(
+			INPC_LIST[dwMapID] and INPC_LIST[dwMapID][dwTemplateID]
+			and not (INPC_LIST_CUSTOM[dwMapID] and INPC_LIST_CUSTOM[dwMapID].DEL[dwTemplateID])
+		) or (INPC_LIST_CUSTOM[dwMapID] and INPC_LIST_CUSTOM[dwMapID].ADD[dwTemplateID])
+	) and true or (not bNoBoss and MY.IsBoss(dwMapID, dwTemplateID) or false)
 end
+
+MY.RegisterTargetAddonMenu("MY.Game.ImportantNpclist", function()
+	local dwType, dwID = MY.GetTarget()
+	if dwType == TARGET.NPC and (IsCtrlKeyDown() or IsAltKeyDown() or IsShiftKeyDown()) then
+		GenerateList()
+		local p = MY.GetObject(dwType, dwID)
+		local szName = MY.GetObjectName(p)
+		local dwMapID = GetClientPlayer().GetMapID()
+		local szMapName = Table_GetMapName(dwMapID)
+		local dwTemplateID = p.dwTemplateID
+		if MY.IsImportantNpc(dwMapID, dwTemplateID, true) then
+			return {
+				szOption = _L['Remove from important npc list'],
+				fnAction = function()
+					if not INPC_LIST_CUSTOM[dwMapID] then
+						INPC_LIST_CUSTOM[dwMapID] = {
+							NAME = szMapName,
+							ADD = {},
+							DEL = {},
+						}
+					end
+					if INPC_LIST[dwMapID] and INPC_LIST[dwMapID][dwTemplateID] then
+						INPC_LIST_CUSTOM[dwMapID].DEL[dwTemplateID] = szName
+					end
+					INPC_LIST_CUSTOM[dwMapID].ADD[dwTemplateID] = nil
+					SaveCustomList()
+					FireUIEvent("MY_SET_IMPORTANT_NPC", dwMapID, dwTemplateID, false)
+				end,
+			}
+		else
+			return {
+				szOption = _L['Add to important npc list'],
+				fnAction = function()
+					if not INPC_LIST_CUSTOM[dwMapID] then
+						INPC_LIST_CUSTOM[dwMapID] = {
+							NAME = szMapName,
+							ADD = {},
+							DEL = {},
+						}
+					end
+					INPC_LIST_CUSTOM[dwMapID].ADD[dwTemplateID] = szName
+					SaveCustomList()
+					FireUIEvent("MY_SET_IMPORTANT_NPC", dwMapID, dwTemplateID, true)
+				end,
+			}
+		end
+	end
+end)
 end
 
 do
