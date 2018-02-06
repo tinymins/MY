@@ -385,35 +385,53 @@ function CTM_Party_Base.OnItemLButtonDown()
 	end
 end
 
+do
+local function OnBuffMouseEnter(this)
+	if CFG.bTempTargetFightTip and not me.bFightState or not CFG.bTempTargetFightTip then
+		local nX, nY = this:GetAbsPos()
+		local nW, nH = this:GetSize()
+		MY.OutputBuffTip(this.dwID, this.nLevel, { nX, nY + 5, nW, nH }, GetEndTime(this.nEndFrame))
+	end
+end
+
+function CTM_Party_Base.OnItemRefreshTip()
+	if this.bBuff then
+		OnBuffMouseEnter(this)
+	end
+end
+
 function CTM_Party_Base.OnItemMouseEnter()
 	if CTM_DRAG and this:Lookup("Image_Slot") and this:Lookup("Image_Slot"):IsValid() then
 		this:Lookup("Image_Slot"):Show()
 	end
-	if not this.dwID then
-		return
-	end
-	local nX, nY = this:GetRoot():GetAbsPos()
-	local nW, nH = this:GetRoot():GetSize()
-	local me = GetClientPlayer()
-	if CFG.bTempTargetFightTip and not me.bFightState or not CFG.bTempTargetFightTip then
-		OutputTeamMemberTip(this.dwID, { nX, nY + 5, nW, nH })
-	end
-	local info = CTM:GetMemberInfo(this.dwID)
-	if info.bIsOnLine and GetPlayer(this.dwID) and CFG.bTempTargetEnable then
-		MY.DelayCall("MY_Cataclysm_TempTarget", false)
-		local dwID = this.dwID
-		local function fnAction()
-			if not CTM_TEMP_TARGET_TYPE then
-				CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = MY.GetTarget()
+	local name = this:GetName()
+	if this.bBuff then
+		OnBuffMouseEnter(this)
+	elseif this.bRole then
+		local nX, nY = this:GetRoot():GetAbsPos()
+		local nW, nH = this:GetRoot():GetSize()
+		local me = GetClientPlayer()
+		if CFG.bTempTargetFightTip and not me.bFightState or not CFG.bTempTargetFightTip then
+			OutputTeamMemberTip(this.dwID, { nX, nY + 5, nW, nH })
+		end
+		local info = CTM:GetMemberInfo(this.dwID)
+		if info.bIsOnLine and GetPlayer(this.dwID) and CFG.bTempTargetEnable then
+			MY.DelayCall("MY_Cataclysm_TempTarget", false)
+			local dwID = this.dwID
+			local function fnAction()
+				if not CTM_TEMP_TARGET_TYPE then
+					CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = MY.GetTarget()
+				end
+				SetTarget(TARGET.PLAYER, dwID)
 			end
-			SetTarget(TARGET.PLAYER, dwID)
-		end
-		if CFG.nTempTargetDelay == 0 then
-			fnAction()
-		else
-			MY.DelayCall("MY_Cataclysm_TempTarget", CFG.nTempTargetDelay, fnAction)
+			if CFG.nTempTargetDelay == 0 then
+				fnAction()
+			else
+				MY.DelayCall("MY_Cataclysm_TempTarget", CFG.nTempTargetDelay, fnAction)
+			end
 		end
 	end
+end
 end
 
 do
@@ -1082,6 +1100,7 @@ function CTM:DrawParty(nIndex)
 		local dwID = tGroup.MemberList[i]
 		local h = handle:AppendItemFromData(hMember, i)
 		if dwID then
+			h.bRole = true
 			h.dwID = dwID
 			CTM_CACHE[dwID] = h
 			local info = self:GetMemberInfo(dwID)
@@ -1233,12 +1252,13 @@ function CTM:RefreshBuff()
 					end
 					-- create
 					if not item and handle:GetItemCount() <= CFG.nMaxShowBuff then
+						item = handle:AppendItemFromData(Cataclysm_Main.GetFrame().hBuff, key)
+						item.bBuff = true
 						-- Ãè±ß
 						local r, g, b, a
 						if data.col then
 							r, g, b, a = MY.HumanColor2RGB(data.col)
 						end
-						item = handle:AppendItemFromData(Cataclysm_Main.GetFrame().hBuff, key)
 						if not data.col then
 							item:Lookup("Handle_RbgBorders"):Hide()
 							item:Lookup("Handle_InnerBorders"):Hide()
@@ -1318,6 +1338,10 @@ function CTM:RefreshBuff()
 					end
 					-- revise
 					if item then
+						-- update data
+						item.dwID = KBuff.dwID
+						item.nLevel = KBuff.nLevel
+						item.nEndFrame = nEndFrame
 						-- buff time
 						local txtTime = item:Lookup("Text_Time")
 						if CFG.bShowBuffTime then
