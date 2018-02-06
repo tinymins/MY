@@ -357,7 +357,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		if not bFocus and
 		dwType == TARGET.NPC and
 		MY_Focus.bFocusBoss and
-		MY.IsBoss(me.GetMapID(), obj.dwTemplateID) then
+		MY.IsImportantNpc(me.GetMapID(), obj.dwTemplateID) then
 			bFocus = true
 		end
 

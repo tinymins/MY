@@ -563,25 +563,13 @@ local function GeneDungeonBoss()
 	end
 	for dwMapID, tBoss in pairs(MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. "data/bosslist/del/$lang.jx3dat") or {}) do
 		if l_tBossList[dwMapID] then
-			for dwNpcID, szName in pairs(tBoss) do
+			for dwNpcID, _ in pairs(tBoss) do
 				l_tBossList[dwMapID][dwNpcID] = nil
 			end
 		end
 	end
 	MY.SaveLUAData({CACHE_PATH, MY_DATA_PATH.GLOBAL}, l_tBossList)
-	MY.Sysmsg({_L('Important Npc list updated to v%s.', VERSION)})
-end
-
--- 获取地图BOSS列表
--- (table) MY.GetBossList()
--- (table) MY.GetBossList(dwMapID)
-function MY.GetBossList(dwMapID)
-	GeneDungeonBoss()
-	if dwMapID then
-		return clone(l_tBossList[dwMapID])
-	else
-		return clone(l_tBossList)
-	end
+	MY.Sysmsg({_L('Dungeon Boss list updated to v%s.', VERSION)})
 end
 
 -- 获取指定地图指定模板ID的NPC是不是BOSS
@@ -589,6 +577,51 @@ end
 function MY.IsBoss(dwMapID, dwTemplateID)
 	GeneDungeonBoss()
 	return l_tBossList[dwMapID] and l_tBossList[dwMapID][dwTemplateID] and true or false
+end
+end
+
+-- 地图重要NPC列表
+do local l_tImportantNpcList
+local function GeneImportantNpc()
+	if l_tImportantNpcList then
+		return
+	end
+	local VERSION = select(2, GetVersion())
+	local CACHE_PATH = 'cache/inpclist/' .. VERSION .. '.jx3dat'
+	l_tImportantNpcList = MY.LoadLUAData({CACHE_PATH, MY_DATA_PATH.GLOBAL})
+	if l_tImportantNpcList then
+		return
+	end
+
+	l_tImportantNpcList = {}
+
+	for dwMapID, tBoss in pairs(MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. "data/inpclist/add/$lang.jx3dat") or {}) do
+		if not l_tImportantNpcList[dwMapID] then
+			l_tImportantNpcList[dwMapID] = {}
+		end
+		for dwNpcID, szName in pairs(tBoss) do
+			l_tImportantNpcList[dwMapID][dwNpcID] = szName
+		end
+	end
+	for dwMapID, tBoss in pairs(MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. "data/inpclist/del/$lang.jx3dat") or {}) do
+		if not l_tImportantNpcList[dwMapID] then
+			l_tImportantNpcList[dwMapID] = {}
+		end
+		if l_tImportantNpcList[dwMapID] then
+			for dwNpcID, _ in pairs(tBoss) do
+				l_tImportantNpcList[dwMapID][dwNpcID] = false
+			end
+		end
+	end
+	MY.SaveLUAData({CACHE_PATH, MY_DATA_PATH.GLOBAL}, l_tImportantNpcList)
+	MY.Sysmsg({_L('Important Npc list updated to v%s.', VERSION)})
+end
+
+-- 获取指定地图指定模板ID的NPC是不是重要NPC
+-- (boolean) MY.IsImportantNpc(dwMapID, dwTem)
+function MY.IsImportantNpc(dwMapID, dwTemplateID)
+	GeneImportantNpc()
+	return l_tImportantNpcList[dwMapID] and l_tImportantNpcList[dwMapID][dwTemplateID] and true or MY.IsBoss(dwMapID, dwTemplateID)
 end
 end
 

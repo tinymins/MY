@@ -132,6 +132,7 @@ data = {
 	['download immediately'] = '立即下载',
 	['see new feature'] = '更新日志',
 
+	['Dungeon Boss list updated to v%s.'] = '副本BOSS列表已成功更新至v%s。',
 	['Important Npc list updated to v%s.'] = '重要NPC列表已成功更新至v%s。',
 
 	["[%s] wants to get your location, would you like to share?"] = "[%s] 希望取得你当前所在地图位置，你是否愿意共享当前位置信息？",
