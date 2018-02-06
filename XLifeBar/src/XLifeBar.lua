@@ -12,6 +12,7 @@ local OT_STATE = {
     FAILED = 9,         -- 读条失败结束(隐藏)
     IDLE  = 10,         -- 没有读条(空闲)
 }
+local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子
 
 local Config_Default = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "XLifeBar/config/default.jx3dat")
 if not Config_Default then
@@ -630,7 +631,10 @@ local function CheckInvalidRect(dwType, dwID, me, bNoCreate)
         elseif not bNoCreate then
             if dwType == TARGET.PLAYER
             or object.CanSeeName()
-            or (object.dwTemplateID == 46140 and (not MY.IsShieldedVersion() or D.GetRelation(object) ~= "Enemy")) -- 清绝歌影
+            or (
+                object.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
+                and not (IsEnemy(me.dwID, dwID) and MY.IsShieldedVersion())
+            )
             or Config.bShowSpecialNpc then
                 XLifeBar(object):Create()
                 CheckInvalidRect(dwType, dwID, me, true)
