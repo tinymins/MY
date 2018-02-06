@@ -2117,16 +2117,16 @@ end
 -- (number, number) Instance:size(bInnerSize)
 -- (self) Instance:size(nLeft, nTop)
 -- (self) Instance:size(OnSizeChanged)
-function XGUI:size(nWidth, nHeight, nRawWidth, nRawHeight)
+function XGUI:size(arg0, arg1, arg2, arg3)
 	self:_checksum()
-	if IsFunction(nWidth) then
+	if IsFunction(arg0) then
 		for _, raw in ipairs(self.raws) do
-			XGUI(raw):uievent('OnSizeChanged', nWidth)
+			XGUI(raw):uievent('OnSizeChanged', arg0)
 		end
-	elseif IsNumber(nWidth) or IsNumber(nHeight) then
+	elseif IsNumber(arg0) or IsNumber(arg1) or IsNumber(arg2) or IsNumber(arg3) then
 		local componentType, element
 		for _, raw in ipairs(self.raws) do
-			local nWidth, nHeight = nWidth or raw:GetW(), nHeight or raw:GetH()
+			local nWidth, nHeight = arg0 or raw:GetW(), arg1 or raw:GetH()
 			componentType = GetComponentType(raw)
 			if componentType == 'WndFrame' then
 				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
@@ -2297,11 +2297,15 @@ function XGUI:size(nWidth, nHeight, nRawWidth, nRawHeight)
 				local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
 				local sld = GetComponentElement(raw, 'SLIDER')
 				local txt = GetComponentElement(raw, 'TEXT')
-				nRawWidth, nRawHeight = nRawWidth or 120, nRawHeight or 12
-				hdl:Lookup('Image_BG'):SetSize(nRawWidth, nRawHeight - 2)
-				sld:SetSize(nRawWidth, nRawHeight)
+				local nWidth = arg0 or max(nWidth, (arg2 or 0) + 5)
+				local nHeight = arg1 or max(nHeight, (arg3 or 0) + 5)
+				local nRawWidth = min(nWidth, arg2 or sld:GetW())
+				local nRawHeight = min(nHeight, arg3 or sld:GetH())
 				wnd:SetSize(nWidth, nHeight)
+				sld:SetSize(nRawWidth, nRawHeight)
+				sld:Lookup("Btn_Track"):SetSize(min(34, nRawWidth * 0.6), nRawHeight)
 				hdl:SetSize(nWidth, nHeight)
+				hdl:Lookup('Image_BG'):SetSize(nRawWidth, nRawHeight - 2)
 				txt:SetRelX(nRawWidth + 5)
 				txt:SetSize(nWidth - nRawWidth - 5, nHeight)
 				hdl:FormatAllItemPos()
@@ -2329,18 +2333,23 @@ function XGUI:size(nWidth, nHeight, nRawWidth, nRawHeight)
 		end
 		return self
 	else
-		local raw = self.raws[1]
+		local raw, w, h, rw, rh = self.raws[1]
 		if raw then
-			if nWidth == true then
+			if arg0 == true then
 				raw = GetComponentElement(raw, 'MAIN_WINDOW') or raw
 			end
 			if raw.IsDummyWnd and raw:IsDummyWnd() then
 				raw = raw:Lookup("", "")
 			end
 			if raw.GetSize then
-				return raw:GetSize()
+				w, h = raw:GetSize()
+			end
+			raw = GetComponentElement(raw, "SLIDER")
+			if raw then
+				rw, rh = raw:GetSize()
 			end
 		end
+		return w, h, rw, rh
 	end
 end
 
@@ -2364,12 +2373,24 @@ local function AutoSize(raw, bAutoWidth, bAutoHeight)
 			local txt = GetComponentElement(raw, 'TEXT')
 			if txt then
 				local ui = XGUI(raw)
-				local W, H = ui:size()
-				local w, h = txt:GetSize()
+				local W, H, RW, RH = ui:size()
+				local ow, oh = txt:GetSize()
 				txt:AutoSize()
-				w = W - w + txt:GetW()
-				h = H - h + txt:GetH()
-				ui:size(bAutoWidth and w or W, bAutoHeight and h or H)
+				ow = txt:GetW() - ow
+				oh = txt:GetW() - oh
+				if bAutoWidth then
+					if RW then
+						RW = RW + ow
+					end
+					W = W + ow
+				end
+				if bAutoHeight then
+					if RH then
+						RH = RH + oh
+					end
+					H = H + oh
+				end
+				ui:size(W, H, RW, RH)
 			end
 		end
 	end
