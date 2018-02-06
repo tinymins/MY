@@ -401,9 +401,9 @@ end
 do
 local function OnBuffMouseEnter(this)
 	if CFG.bTempTargetFightTip and not me.bFightState or not CFG.bTempTargetFightTip then
-		local nX, nY = this:GetAbsPos()
-		local nW, nH = this:GetSize()
-		MY.OutputBuffTip(this.dwID, this.nLevel, { nX, nY, nW, nH }, GetEndTime(this.nEndFrame))
+		local nX, nY = this:GetRoot():GetAbsPos()
+		local nW, nH = this:GetRoot():GetSize()
+		MY.OutputBuffTip(this.dwID, this.nLevel, { nX, nY + 5, nW, nH }, GetEndTime(this.nEndFrame))
 	end
 end
 
