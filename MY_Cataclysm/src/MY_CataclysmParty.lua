@@ -418,8 +418,10 @@ function CTM_Party_Base.OnItemMouseEnter()
 		this:Lookup("Image_Slot"):Show()
 	end
 	local name = this:GetName()
+	local dwID
 	if this.bBuff then
 		OnBuffMouseEnter(this)
+		dwID = this:GetParent():GetParent().dwID
 	elseif this.bRole then
 		local nX, nY = this:GetRoot():GetAbsPos()
 		local nW, nH = this:GetRoot():GetSize()
@@ -427,21 +429,28 @@ function CTM_Party_Base.OnItemMouseEnter()
 		if CFG.bTempTargetFightTip and not me.bFightState or not CFG.bTempTargetFightTip then
 			OutputTeamMemberTip(this.dwID, { nX, nY + 5, nW, nH })
 		end
-		local info = CTM:GetMemberInfo(this.dwID)
-		if info.bIsOnLine and GetPlayer(this.dwID) and CFG.bTempTargetEnable then
-			MY.DelayCall("MY_Cataclysm_TempTarget", false)
-			local dwID = this.dwID
-			local function fnAction()
-				if not CTM_TEMP_TARGET_TYPE then
-					CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = MY.GetTarget()
-				end
-				SetTarget(TARGET.PLAYER, dwID)
+		dwID = this.dwID
+	end
+	if dwID == CTM_TEMP_TARGET_ID then
+		return
+	end
+	local info = CTM:GetMemberInfo(this.dwID)
+	if not info then
+		return
+	end
+	if info.bIsOnLine and GetPlayer(this.dwID) and CFG.bTempTargetEnable then
+		MY.DelayCall("MY_Cataclysm_TempTarget", false)
+		local dwID = this.dwID
+		local function fnAction()
+			if not CTM_TEMP_TARGET_TYPE then
+				CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = MY.GetTarget()
 			end
-			if CFG.nTempTargetDelay == 0 then
-				fnAction()
-			else
-				MY.DelayCall("MY_Cataclysm_TempTarget", CFG.nTempTargetDelay, fnAction)
-			end
+			SetTarget(TARGET.PLAYER, dwID)
+		end
+		if CFG.nTempTargetDelay == 0 then
+			fnAction()
+		else
+			MY.DelayCall("MY_Cataclysm_TempTarget", CFG.nTempTargetDelay, fnAction)
 		end
 	end
 end
@@ -452,14 +461,35 @@ local function ResumeTempTarget()
 	SetTarget(CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID)
 	CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = nil
 end
-function CTM_Party_Base.OnItemMouseLeave()
+function CTM_Party_Base.OnItemMouseLeave(dst)
 	if CTM_DRAG and this:Lookup("Image_Slot") and this:Lookup("Image_Slot"):IsValid() then
 		this:Lookup("Image_Slot"):Hide()
 	end
 	HideTip()
-	if not this.dwID then return end
+	local dwID
+	if this.bRole then
+		dwID = this.dwID
+	elseif this.bBuff then
+		dwID = this:GetParent():GetParent().dwID
+	end
+	if dst then
+		local dwDstID
+		if dst.bRole then
+			dwDstID = dst.dwID
+		elseif dst.bBuff then
+			dwDstID = dst:GetParent():GetParent().dwID
+		end
+		if dwDstID == dwID then
+			return
+		end
+	end
+	if not dwID then
+		return
+	end
 	local info = CTM:GetMemberInfo(this.dwID)
-	if not info then return end -- 退租的问题
+	if not info then -- 退组的问题
+		return
+	end
 	if info.bIsOnLine and GetPlayer(this.dwID) and CFG.bTempTargetEnable then
 		MY.DelayCall("MY_Cataclysm_TempTarget", false)
 		if CTM_TEMP_TARGET_TYPE then
