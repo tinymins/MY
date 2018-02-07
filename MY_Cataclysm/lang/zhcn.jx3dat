@@ -8,6 +8,7 @@ data = {
 	["Only in team"] = "只在团队中显示",
 	["Show distance"] = "显示距离",
 	["Show ManaCount"] = "显示内力数值",
+	["Show target's target"] = "显示目标的目标",
 	["Show Boss target"] = "显示BOSS目标",
 	["Attack Warning"] = "被攻击提示",
 	["Name/Icon/Life Display"] = "名字、图标和血量显示方案",

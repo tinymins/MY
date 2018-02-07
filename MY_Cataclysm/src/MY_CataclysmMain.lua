@@ -882,7 +882,7 @@ function PS.OnPanelActive(frame)
 
 	x = X + 10
 	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = g_tStrings.STR_RAID_TIP_TARGET,
+		x = x, y = y, text = _L["Show target's target"],
 		checked = Cataclysm_Main.bShowTargetTargetAni,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowTargetTargetAni = bCheck
