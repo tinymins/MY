@@ -770,6 +770,26 @@ end
 end
 
 do
+local MY_CAMP_COLOR = setmetatable({
+	[CAMP.NEUTRAL] = { 255, 255, 255 }, -- 中立
+	[CAMP.GOOD   ] = {  60, 128, 220 }, -- 浩气盟
+	[CAMP.EVIL   ] = { 160,  30,  30 }, -- 恶人谷
+}, {
+	__index = function()
+		return { 225, 225, 225 }
+	end,
+	__metatable = true,
+})
+
+function MY.GetCampColor(nCamp)
+	if nCamp == "all" then
+		return MY_CAMP_COLOR
+	end
+	return unpack(MY_CAMP_COLOR[nCamp])
+end
+end
+
+do
 -- skillid, uitex, frame
 local MY_KUNGFU_LIST = setmetatable({
 	-- MT

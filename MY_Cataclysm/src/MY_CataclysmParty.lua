@@ -35,8 +35,6 @@ local CTM_BG_COLOR_MODE      = MY_Cataclysm.BG_COLOR_MODE
 local COINSHOP_SOURCE_NULL   = g_tStrings.COINSHOP_SOURCE_NULL
 local STR_FRIEND_NOT_ON_LINE = g_tStrings.STR_FRIEND_NOT_ON_LINE
 local FIGHT_DEATH            = g_tStrings.FIGHT_DEATH
-local CAMP_GOOD              = CAMP.GOOD
-local CAMP_EVIL              = CAMP.EVIL
 -- STATE cache
 local MOVE_STATE_ON_STAND    = MOVE_STATE.ON_STAND
 local MOVE_STATE_ON_DEATH    = MOVE_STATE.ON_DEATH
@@ -1031,17 +1029,11 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bNa
 		local txtSchool = h:Lookup("Text_School_Name")
 		local r, g, b = 255, 255, 255
 		if CFG.nColoredName == 1 then
-			r, g, b = GetForceColor(info.dwForceID)
+			r, g, b = MY.GetForceColor(info.dwForceID)
 		elseif CFG.nColoredName == 0 then
 			r, b, b = 255, 255, 255
 		elseif CFG.nColoredName == 2 then
-			if info.nCamp == 0 then
-				r, g, b = 255, 255, 255
-			elseif info.nCamp == CAMP_GOOD then
-				r, g, b = 60, 128, 220
-			elseif info.nCamp == CAMP_EVIL then
-				r, g, b = 160, 30, 30
-			end
+			r, g, b = MY.GetCampColor(info.nCamp)
 		end
 		txtName:SetText(info.szName)
 		txtName:SetFontScheme(CFG.nNameFont)
