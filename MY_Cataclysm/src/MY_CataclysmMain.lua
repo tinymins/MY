@@ -27,6 +27,7 @@ local GetBuffName = MY.GetBuffName
 
 local INI_ROOT = MY.GetAddonInfo().szRoot .. "MY_Cataclysm/ui/"
 local CTM_CONFIG = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/config/default/$lang.jx3dat")
+local CTM_BUFF_NGB = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/data/nangongbo/$lang.jx3dat") or {}
 local CTM_CONFIG_CATACLYSM = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/config/ctm/$lang.jx3dat")
 
 local CTM_STYLE = {
@@ -52,15 +53,24 @@ MY_Cataclysm.STYLE = CTM_STYLE
 MY_Cataclysm.BG_COLOR_MODE = CTM_BG_COLOR_MODE
 RegisterCustomData("MY_Cataclysm.szConfigName")
 
-local function UpdateBuffListCache()
-	BUFF_LIST = {}
-	for _, tab in ipairs(Cataclysm_Main.aBuffList) do
+local UpdateBuffListCache
+do
+local function InsertBuffListCache(aBuffList)
+	for _, tab in ipairs(aBuffList) do
 		local id = tab.dwID or tab.szName
 		if not BUFF_LIST[id] then
 			BUFF_LIST[id] = {}
 		end
 		insert(BUFF_LIST[id], tab)
 	end
+end
+function UpdateBuffListCache()
+	BUFF_LIST = {}
+	if Cataclysm_Main.bBuffDataNangongbo then
+		InsertBuffListCache(CTM_BUFF_NGB)
+	end
+	InsertBuffListCache(Cataclysm_Main.aBuffList)
+end
 end
 
 local function GetConfigurePath()
@@ -1940,6 +1950,24 @@ function PS.OnPanelActive(frame)
 			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():height()
+
+	x = X + 10
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y, text = _L["Enable default data"],
+		checked = Cataclysm_Main.bBuffDataNangongbo,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bBuffDataNangongbo = bCheck
+			UpdateBuffListCache()
+			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
+		end,
+	}, true):autoWidth():width() + 5
+	y = y + ui:append("WndButton2", {
+		x = x, y = y, w = 200,
+		text = _L["Feedback @nangongbo"],
+		onclick = function()
+			XGUI.OpenIE("https://weibo.com/nangongbo")
+		end,
+	}, true):autoHeight():height()
 
 	-- 手动添加BUFF名称
 	x = X

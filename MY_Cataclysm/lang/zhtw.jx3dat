@@ -100,4 +100,6 @@ data = {
 	["Target assist no delay."] = "鼠標移入立即選中。",
 	["Alpha: %d."] = "透明度：%d。",
 	["More than %d meter"] = "%d尺以上",
+	["Enable default data"] = "啓用默認數據",
+	["Feedback @nangongbo"] = "問題反饋 @劍網3南宮伯",
 }
