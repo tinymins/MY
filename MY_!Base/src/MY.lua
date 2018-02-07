@@ -683,10 +683,13 @@ end)
 -- ѡ�
 --------------------------------------------------------------------------------------------------------------------------------------------
 do local TABS_LIST = {
-	{ id = _L["General"], },
-	{ id = _L["Target"] , },
-	{ id = _L["Battle"] , },
-	{ id = _L["Others"] , },
+	{ id = _L["General"] },
+	{ id = _L["Chat"] },
+	{ id = _L["Target"] },
+	{ id = _L["Battle"] },
+	{ id = _L["Raid"] },
+	{ id = _L["System"] },
+	{ id = _L["Others"] },
 }
 --[[ tTabs:
 	{
@@ -710,7 +713,7 @@ function MY.RedrawCategory(szCategory)
 	-- draw category
 	local wndCategoryList = frame:Lookup('Wnd_Total/WndContainer_Category')
 	wndCategoryList:Clear()
-	for _, ctg in pairs(TABS_LIST) do
+	for _, ctg in ipairs(TABS_LIST) do
 		local nCount = 0
 		for i, tab in ipairs(ctg) do
 			if not (tab.bShielded and MY.IsShieldedVersion()) then
