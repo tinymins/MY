@@ -429,6 +429,8 @@ function Cataclysm_Main.OnFrameCreate()
 	this:RegisterEvent("SYS_MSG")
 	this:RegisterEvent("MY_KUNGFU_SWITCH")
 	this:RegisterEvent("MY_RAID_REC_BUFF")
+	this:RegisterEvent("MY_CAMP_COLOR_UPDATE")
+	this:RegisterEvent("MY_FORCE_COLOR_UPDATE")
 	this:RegisterEvent("GKP_RECORD_TOTAL")
 	this:RegisterEvent("GVOICE_MIC_STATE_CHANGED")
 	this:RegisterEvent("GVOICE_SPEAKER_STATE_CHANGED")
@@ -599,6 +601,9 @@ function Cataclysm_Main.OnEvent(szEvent)
 			RecBuffWithTabs(BUFF_LIST[arg4], arg0, arg4, arg9)
 			RecBuffWithTabs(BUFF_LIST[szName], arg0, arg4, arg9)
 		end
+	elseif szEvent == "MY_CAMP_COLOR_UPDATE"
+	or szEvent == "MY_FORCE_COLOR_UPDATE" then
+		ReloadCataclysmPanel()
 	elseif szEvent == "GKP_RECORD_TOTAL" then
 		GKP_RECORD_TOTAL = arg0
 	elseif szEvent == "GVOICE_MIC_STATE_CHANGED" then
