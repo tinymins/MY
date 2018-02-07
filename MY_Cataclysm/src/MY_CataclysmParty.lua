@@ -215,7 +215,7 @@ local function OutputTeamMemberTip(dwID, rc)
 	if not tMemberInfo then
 		return
 	end
-	local r, g, b = MY.GetForceColor(tMemberInfo.dwForceID)
+	local r, g, b = MY.GetForceColor(tMemberInfo.dwForceID, "foreground")
 	local szPath, nFrame = GetForceImage(tMemberInfo.dwForceID)
 	local xml = {}
 	table.insert(xml, GetFormatImage(szPath, nFrame, 22, 22))
@@ -267,25 +267,6 @@ local function InsertChangeGroupMenu(tMenu, dwMemberID)
 	if #tSubMenu > 0 then
 		table.insert(tMenu, tSubMenu)
 	end
-end
-
-local CTM_FORCE_COLOR = {
-	-- [0] =  { 255, 255, 255 },
-	[1] =  { 255, 255, 170 },
-	[2] =  { 175, 25 , 255 },
-	[3] =  { 250, 75 , 100 },
-	[4] =  { 148, 178, 255 },
-	[5] =  { 255, 125, 255 },
-	[6] =  { 140, 80 , 255 },
-	[7] =  { 0  , 128, 192 },
-	[8] =  { 255, 200, 0   },
-	[9] =  { 185, 125, 60  },
-	[10] = { 240, 50 , 200 },
-	-- [21] = { 180, 60 , 0   },
-}
-setmetatable(CTM_FORCE_COLOR, { __index = MY.GetForceColor('all'), __metatable = true })
-local function GetForceColor(dwForceID) --获得成员颜色
-	return unpack(CTM_FORCE_COLOR[dwForceID])
 end
 
 -- 有各个版本之间的文本差异，所以做到翻译中
@@ -507,7 +488,7 @@ function CTM_Party_Base.OnItemRButtonClick()
 	table.insert(menu, {
 		szOption = info.szName,
 		szLayer = "ICON_RIGHT",
-		rgb = { MY.GetForceColor(info.dwForceID) },
+		rgb = { MY.GetForceColor(info.dwForceID, "foreground") },
 		szIcon = szPath,
 		nFrame = nFrame
 	})
@@ -1029,11 +1010,11 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bNa
 		local txtSchool = h:Lookup("Text_School_Name")
 		local r, g, b = 255, 255, 255
 		if CFG.nColoredName == 1 then
-			r, g, b = MY.GetForceColor(info.dwForceID)
+			r, g, b = MY.GetForceColor(info.dwForceID, "foreground")
 		elseif CFG.nColoredName == 0 then
 			r, b, b = 255, 255, 255
 		elseif CFG.nColoredName == 2 then
-			r, g, b = MY.GetCampColor(info.nCamp)
+			r, g, b = MY.GetCampColor(info.nCamp, "foreground")
 		end
 		txtName:SetText(info.szName)
 		txtName:SetFontScheme(CFG.nNameFont)
@@ -1681,7 +1662,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 				elseif CFG.nBGColorMode == CTM_BG_COLOR_MODE.SAME_COLOR then
 					r, g, b = unpack(CFG.tDistanceCol[1]) -- 使用用户配色1
 				elseif CFG.nBGColorMode == CTM_BG_COLOR_MODE.BY_FORCE then
-					r, g, b = MY.GetForceColor(info.dwForceID)
+					r, g, b = MY.GetForceColor(info.dwForceID, "background")
 				end
 			end
 			self:DrawShadow(Lsha, nNewW, Lsha:GetH(), r, g, b, nAlpha, CFG.bLifeGradient)

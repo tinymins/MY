@@ -739,7 +739,28 @@ end)
 end
 
 do
-local MY_FORCE_COLOR = setmetatable({
+local MY_FORCE_COLOR_FG = setmetatable({
+	[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
+	[FORCE_TYPE.SHAO_LIN ] = { 255, 178, 95  }, -- 少林
+	[FORCE_TYPE.WAN_HUA  ] = { 196, 152, 255 }, -- 万花
+	[FORCE_TYPE.TIAN_CE  ] = { 255, 111, 83  }, -- 天策
+	[FORCE_TYPE.CHUN_YANG] = { 22 , 216, 216 }, -- 纯阳
+	[FORCE_TYPE.QI_XIU   ] = { 255, 129, 176 }, -- 七秀
+	[FORCE_TYPE.WU_DU    ] = { 55 , 147, 255 }, -- 五毒
+	[FORCE_TYPE.TANG_MEN ] = { 121, 183, 54  }, -- 唐门
+	[FORCE_TYPE.CANG_JIAN] = { 214, 249, 93  }, -- 藏剑
+	[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐帮
+	[FORCE_TYPE.MING_JIAO] = { 240, 70 , 96  }, -- 明教
+	[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 苍云
+	[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 长歌
+	[FORCE_TYPE.BA_DAO   ] = { 106 ,108, 189 }, -- 霸刀
+}, {
+	__index = function()
+		return { 225, 225, 225 }
+	end,
+	__metatable = true,
+})
+local MY_FORCE_COLOR_BG = setmetatable({
 	[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
 	[FORCE_TYPE.SHAO_LIN ] = { 255, 178, 95  }, -- 少林
 	[FORCE_TYPE.WAN_HUA  ] = { 196, 152, 255 }, -- 万花
@@ -761,16 +782,29 @@ local MY_FORCE_COLOR = setmetatable({
 	__metatable = true,
 })
 
-function MY.GetForceColor(dwForce)
+function MY.GetForceColor(dwForce, szType)
+	local COLOR = szType == "background"
+		and MY_FORCE_COLOR_BG
+		or MY_FORCE_COLOR_FG
 	if dwForce == "all" then
-		return MY_FORCE_COLOR
+		return COLOR
 	end
-	return unpack(MY_FORCE_COLOR[dwForce])
+	return unpack(COLOR[dwForce])
 end
 end
 
 do
-local MY_CAMP_COLOR = setmetatable({
+local MY_CAMP_COLOR_FG = setmetatable({
+	[CAMP.NEUTRAL] = { 255, 255, 255 }, -- 中立
+	[CAMP.GOOD   ] = {  60, 128, 220 }, -- 浩气盟
+	[CAMP.EVIL   ] = { 160,  30,  30 }, -- 恶人谷
+}, {
+	__index = function()
+		return { 225, 225, 225 }
+	end,
+	__metatable = true,
+})
+local MY_CAMP_COLOR_BG = setmetatable({
 	[CAMP.NEUTRAL] = { 255, 255, 255 }, -- 中立
 	[CAMP.GOOD   ] = {  60, 128, 220 }, -- 浩气盟
 	[CAMP.EVIL   ] = { 160,  30,  30 }, -- 恶人谷
@@ -781,11 +815,14 @@ local MY_CAMP_COLOR = setmetatable({
 	__metatable = true,
 })
 
-function MY.GetCampColor(nCamp)
+function MY.GetCampColor(nCamp, szType)
+	local COLOR = szType == "background"
+		and MY_CAMP_COLOR_BG
+		or MY_CAMP_COLOR_FG
 	if nCamp == "all" then
-		return MY_CAMP_COLOR
+		return COLOR
 	end
-	return unpack(MY_CAMP_COLOR[nCamp])
+	return unpack(COLOR[nCamp])
 end
 end
 
