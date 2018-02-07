@@ -164,8 +164,13 @@ local function ReloadFrame(frame)
 		-- 缩放先
 		hItem:Scale(GetScale(config))
 		nItemW, nItemH = imgBoxBg:GetSize()
+		-- 用于显示默认BUFFTIP
+		hItem.dwID = next(mon.ids)
+		if hItem.dwID then
+			hItem.nLevel = next(mon.ids[hItem.dwID].levels) or 1
+		end
 		-- Box部分
-		box:SetObject(UI_OBJECT.BUFF, mon.id, 1, 1)
+		box:SetObject(UI_OBJECT.NOT_NEED_KNOWN)
 		box:SetObjectIcon(mon.iconid or 13)
 		box:SetObjectCoolDown(true)
 		box:SetCoolDownPercentage(0)
@@ -603,8 +608,8 @@ function MY_TargetMon_Base.OnItemMouseEnter()
 	local frame = this:GetRoot()
 	local eMonType = frame.config.type
 	if name == 'Box_Default' then
-		if eMonType == 'BUFF' then
-			local hItem = this:GetParent():GetParent()
+		local hItem = this:GetParent():GetParent()
+		if eMonType == 'BUFF' and hItem.dwID and hItem.nLevel then
 			local w, h = hItem:GetW(), hItem:GetH()
 			local x, y = hItem:GetAbsX(), hItem:GetAbsY()
 			MY.OutputBuffTip(hItem.dwID, hItem.nLevel, {x, y, w, h}, hItem.nTimeLeft)
