@@ -1025,6 +1025,7 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bNa
 			fScale = fScale * 0.9
 		end
 		if CFG.nShowIcon == 4 then
+			local r, g, b = MY.GetForceColor(info.dwForceID, "foreground")
 			txtSchool:SetText(CTM_KUNGFU_TEXT[info.dwMountKungfuID])
 			txtSchool:SetFontScheme(CFG.nNameFont)
 			txtSchool:SetFontColor(r, g, b)
