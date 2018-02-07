@@ -11,26 +11,7 @@ local tinsert, tconcat, tremove = table.insert, table.concat, table.remove
 -- 设置和数据
 ---------------------------------------------------------------
 MY.CreateDataRoot(MY_DATA_PATH.SERVER)
-local SZ_CONFIG_PATH = "config/player_force_color.jx3dat"
 local SZ_DB_PATH = MY.FormatPath({"cache/player_info.db", MY_DATA_PATH.SERVER})
-local Config_Default = {
-	tForceColor = MY.LoadLUAData({SZ_CONFIG_PATH, MY_DATA_PATH.GLOBAL}) or {
-		[FORCE_TYPE.JIANG_HU ] = {255, 255, 255}, -- 江湖
-		[FORCE_TYPE.SHAO_LIN ] = {255, 178, 95 }, -- 少林
-		[FORCE_TYPE.WAN_HUA  ] = {196, 152, 255}, -- 万花
-		[FORCE_TYPE.TIAN_CE  ] = {255, 111, 83 }, -- 天策
-		[FORCE_TYPE.CHUN_YANG] = {89 , 224, 232}, -- 纯阳
-		[FORCE_TYPE.QI_XIU   ] = {255, 129, 176}, -- 七秀
-		[FORCE_TYPE.WU_DU    ] = {55 , 147, 255}, -- 五毒
-		[FORCE_TYPE.TANG_MEN ] = {121, 183, 54 }, -- 唐门
-		[FORCE_TYPE.CANG_JIAN] = {214, 249, 93 }, -- 藏剑
-		[FORCE_TYPE.GAI_BANG ] = {205, 133, 63 }, -- 丐帮
-		[FORCE_TYPE.MING_JIAO] = {240, 70 , 96 }, -- 明教
-		[FORCE_TYPE.CANG_YUN ] = {180, 60 , 0  }, -- 苍云
-		[FORCE_TYPE.CHANG_GE ] = {100, 250, 180}, -- 长歌
-		[FORCE_TYPE.BA_DAO   ] = {106 ,108, 189}, -- 霸刀
-	},
-}
 local DB = SQLite3_Open(SZ_DB_PATH)
 if not DB then
 	return MY.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L["MY_Farbnamen"])
@@ -90,7 +71,6 @@ do if IsDebugClient() then -- 旧版缓存转换
 	end
 end end
 
-local Config = clone(Config_Default)
 local _MY_Farbnamen = {
 	tForceString = clone(g_tStrings.tForceTitle),
 	tRoleType    = {
@@ -305,7 +285,7 @@ function MY_Farbnamen.Get(szKey)
 			szTitle   = info.title,
 			nCamp     = info.camp,
 			szTongID  = GetTongName(info.tong) or "",
-			rgb       = Config.tForceColor[info.force] or {255, 255, 255}
+			rgb       = { MY.GetForceColor(info.force, "forecolor") },
 		}
 	end
 end
@@ -352,30 +332,6 @@ function MY_Farbnamen.AddAusID(dwID)
 		return true
 	end
 end
--- 保存用户设置
-function _MY_Farbnamen.SaveCustomData()
-	local t = {}
-	t.tForceColor = {}
-	for dwForceID, tCol in pairs(Config.tForceColor) do
-		if not IsSameData(tCol, Config_Default[dwForceID]) then
-			t.tForceColor[dwForceID] = tCol
-		end
-	end
-	MY.SaveLUAData({SZ_CONFIG_PATH, MY_DATA_PATH.ROLE}, t)
-end
--- 加载用户配置
-function _MY_Farbnamen.LoadCustomData()
-	local t = MY.LoadLUAData({SZ_CONFIG_PATH, MY_DATA_PATH.ROLE}) or {}
-	if t.tForceColor then
-		for k, v in pairs(t.tForceColor) do
-			Config.tForceColor[k] = v
-		end
-	end
-end
-
-function MY_Farbnamen.GetForceRgb(nForce)
-	return Config.tForceColor[nForce] or Config_Default.tForceColor[nForce] or {255, 255, 255}
-end
 
 --------------------------------------------------------------
 -- 菜单
@@ -392,27 +348,9 @@ MY_Farbnamen.GetMenu = function()
 	})
 	table.insert(t, {
 		szOption = _L['customize color'],
-		fnDisable = function()
-			return not MY_Farbnamen.bEnabled
-		end,
-	})
-	for nForce, szForce in pairs(_MY_Farbnamen.tForceString) do
-		table.insert(t[#t], {
-			szOption = szForce,
-			rgb = Config.tForceColor[nForce],
-			bColorTable = true,
-			fnChangeColor = function(_,r,g,b)
-				Config.tForceColor[nForce] = {r,g,b}
-				_MY_Farbnamen.SaveCustomData()
-			end,
-		})
-	end
-	table.insert(t[#t], { bDevide = true })
-	table.insert(t[#t], {
-		szOption = _L['load default setting'],
 		fnAction = function()
-			Config.tForceColor = clone(Config_Default.tForceColor)
-			_MY_Farbnamen.SaveCustomData()
+			MY.OpenPanel()
+			MY.SwitchTab("GlobalColor")
 		end,
 		fnDisable = function()
 			return not MY_Farbnamen.bEnabled
@@ -455,5 +393,4 @@ end
 MY.RegisterEvent("PEEK_OTHER_PLAYER", OnPeekPlayer)
 MY.RegisterEvent("PLAYER_ENTER_SCENE", function() l_peeklist[arg0] = 0 end)
 MY.RegisterEvent("ON_GET_TONG_NAME_NOTIFY", function() l_tongnames[arg1], l_tongnames_w[arg1] = arg2, arg2 end)
-MY.RegisterInit('MY_FARBNAMEN_CUSTOMDATA', _MY_Farbnamen.LoadCustomData)
 end

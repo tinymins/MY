@@ -995,10 +995,8 @@ span.emotion_44{width:21px; height: 21px; display: inline-block; background-imag
 #mosaics{width: 200px;height: 20px}
 ]]
 
-	if MY_Farbnamen and MY_Farbnamen.GetForceRgb then
-		for k, v in pairs(g_tStrings.tForceTitle) do
-			szHeader = szHeader .. (".force-%s{color:#%02X%02X%02X}"):format(k, unpack(MY_Farbnamen.GetForceRgb(k)))
-		end
+	for k, v in pairs(g_tStrings.tForceTitle) do
+		szHeader = szHeader .. (".force-%s{color:#%02X%02X%02X}"):format(k, unpack(MY.GetForceColor(k, "forecolor")))
 	end
 
 	szHeader = szHeader .. [[
