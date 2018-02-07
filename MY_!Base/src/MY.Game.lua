@@ -739,7 +739,8 @@ end)
 end
 
 do
-local MY_FORCE_COLOR_FG = setmetatable({
+local SZ_FORCE_COLOR_FG = "config/player_force_color.jx3dat"
+local MY_FORCE_COLOR_FG_DEFAULT = setmetatable({
 	[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
 	[FORCE_TYPE.SHAO_LIN ] = { 255, 178, 95  }, -- 少林
 	[FORCE_TYPE.WAN_HUA  ] = { 196, 152, 255 }, -- 万花
@@ -755,12 +756,21 @@ local MY_FORCE_COLOR_FG = setmetatable({
 	[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 长歌
 	[FORCE_TYPE.BA_DAO   ] = { 106 ,108, 189 }, -- 霸刀
 }, {
-	__index = function()
+	__index = function(t, k)
 		return { 225, 225, 225 }
 	end,
 	__metatable = true,
 })
-local MY_FORCE_COLOR_BG = setmetatable({
+local MY_FORCE_COLOR_FG_GLOBAL = MY.LoadLUAData({SZ_FORCE_COLOR_FG, MY_DATA_PATH.GLOBAL}) or {}
+local MY_FORCE_COLOR_FG_CUSTOM = {}
+local MY_FORCE_COLOR_FG = setmetatable({}, {
+	__index = function(t, k)
+		return MY_FORCE_COLOR_FG_CUSTOM[k] or MY_FORCE_COLOR_FG_GLOBAL[k] or MY_FORCE_COLOR_FG_DEFAULT[k]
+	end,
+})
+
+local SZ_FORCE_COLOR_BG = "config/player_force_color_bg.jx3dat"
+local MY_FORCE_COLOR_BG_DEFAULT = setmetatable({
 	[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
 	[FORCE_TYPE.SHAO_LIN ] = { 255, 178, 95  }, -- 少林
 	[FORCE_TYPE.WAN_HUA  ] = { 196, 152, 255 }, -- 万花
@@ -776,11 +786,25 @@ local MY_FORCE_COLOR_BG = setmetatable({
 	[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 长歌
 	[FORCE_TYPE.BA_DAO   ] = { 106 ,108, 189 }, -- 霸刀
 }, {
-	__index = function()
+	__index = function(t, k)
 		return { 225, 225, 225 }
 	end,
 	__metatable = true,
 })
+local MY_FORCE_COLOR_BG_GLOBAL = MY.LoadLUAData({SZ_FORCE_COLOR_BG, MY_DATA_PATH.GLOBAL}) or {}
+local MY_FORCE_COLOR_BG_CUSTOM = {}
+local MY_FORCE_COLOR_BG = setmetatable({}, {
+	__index = function(t, k)
+		return MY_FORCE_COLOR_BG_CUSTOM[k] or MY_FORCE_COLOR_BG_GLOBAL[k] or MY_FORCE_COLOR_BG_DEFAULT[k]
+	end,
+})
+
+local function initForceCustom()
+	MY_FORCE_COLOR_FG_CUSTOM = MY.LoadLUAData({SZ_FORCE_COLOR_FG, MY_DATA_PATH.ROLE}) or {}
+	MY_FORCE_COLOR_BG_CUSTOM = MY.LoadLUAData({SZ_FORCE_COLOR_BG, MY_DATA_PATH.ROLE}) or {}
+	FireUIEvent("MY_FORCE_COLOR_UPDATE")
+end
+MY.RegisterInit(initForceCustom)
 
 function MY.GetForceColor(dwForce, szType)
 	local COLOR = szType == "background"
@@ -791,29 +815,51 @@ function MY.GetForceColor(dwForce, szType)
 	end
 	return unpack(COLOR[dwForce])
 end
-end
 
-do
-local MY_CAMP_COLOR_FG = setmetatable({
+local SZ_CAMP_COLOR_FG = "config/player_camp_color.jx3dat"
+local MY_CAMP_COLOR_FG_DEFAULT = setmetatable({
 	[CAMP.NEUTRAL] = { 255, 255, 255 }, -- 中立
 	[CAMP.GOOD   ] = {  60, 128, 220 }, -- 浩气盟
 	[CAMP.EVIL   ] = { 160,  30,  30 }, -- 恶人谷
 }, {
-	__index = function()
+	__index = function(t, k)
 		return { 225, 225, 225 }
 	end,
 	__metatable = true,
 })
-local MY_CAMP_COLOR_BG = setmetatable({
+local MY_CAMP_COLOR_FG_GLOBAL = MY.LoadLUAData({SZ_CAMP_COLOR_FG, MY_DATA_PATH.GLOBAL}) or {}
+local MY_CAMP_COLOR_FG_CUSTOM = {}
+local MY_CAMP_COLOR_FG = setmetatable({}, {
+	__index = function(t, k)
+		return MY_CAMP_COLOR_FG_CUSTOM[k] or MY_CAMP_COLOR_FG_GLOBAL[k] or MY_CAMP_COLOR_FG_DEFAULT[k]
+	end,
+})
+
+local SZ_CAMP_COLOR_BG = "config/player_camp_color_bg.jx3dat"
+local MY_CAMP_COLOR_BG_DEFAULT = setmetatable({
 	[CAMP.NEUTRAL] = { 255, 255, 255 }, -- 中立
 	[CAMP.GOOD   ] = {  60, 128, 220 }, -- 浩气盟
 	[CAMP.EVIL   ] = { 160,  30,  30 }, -- 恶人谷
 }, {
-	__index = function()
+	__index = function(t, k)
 		return { 225, 225, 225 }
 	end,
 	__metatable = true,
 })
+local MY_CAMP_COLOR_BG_GLOBAL = MY.LoadLUAData({SZ_CAMP_COLOR_BG, MY_DATA_PATH.GLOBAL}) or {}
+local MY_CAMP_COLOR_BG_CUSTOM = {}
+local MY_CAMP_COLOR_BG = setmetatable({}, {
+	__index = function(t, k)
+		return MY_CAMP_COLOR_BG_CUSTOM[k] or MY_CAMP_COLOR_BG_GLOBAL[k] or MY_CAMP_COLOR_BG_DEFAULT[k]
+	end,
+})
+
+local function initCampCustom()
+	MY_CAMP_COLOR_FG_CUSTOM = MY.LoadLUAData({SZ_CAMP_COLOR_FG, MY_DATA_PATH.ROLE}) or {}
+	MY_CAMP_COLOR_BG_CUSTOM = MY.LoadLUAData({SZ_CAMP_COLOR_BG, MY_DATA_PATH.ROLE}) or {}
+	FireUIEvent("MY_FORCE_COLOR_UPDATE")
+end
+MY.RegisterInit(initCampCustom)
 
 function MY.GetCampColor(nCamp, szType)
 	local COLOR = szType == "background"
@@ -824,6 +870,152 @@ function MY.GetCampColor(nCamp, szType)
 	end
 	return unpack(COLOR[nCamp])
 end
+
+local PS = {}
+function PS.OnPanelActive(wnd)
+	local ui = XGUI(wnd)
+	local w, h = ui:size()
+	local X, Y = 20, 20
+	local x, y = X, Y
+
+	ui:append("Text", {
+		x = X - 10, y = y,
+		text = _L["Force color"],
+		color = { 255, 255, 0 },
+	}, true):autoWidth()
+	x, y = X, y + 30
+	for _, dwForceID in pairs_c(FORCE_TYPE) do
+		local x0 = x
+		local sha = ui:append("Shadow", {
+			x = x, y = y, w = 100, h = 25,
+			text = g_tStrings.tForceTitle[dwForceID],
+			color = { MY.GetForceColor(dwForceID, "background") },
+		}, true)
+		local txt = ui:append("Text", {
+			x = x + 5, y = y, w = 100, h = 25,
+			text = g_tStrings.tForceTitle[dwForceID],
+			color = { MY.GetForceColor(dwForceID, "foreground") },
+		}, true)
+		x = x + 105
+		ui:append("Shadow", {
+			x = x, y = y, w = 25, h = 25,
+			color = { MY.GetForceColor(dwForceID, "foreground") },
+			onclick = function()
+				local this = this
+				XGUI.OpenColorPicker(function(r, g, b)
+					MY_FORCE_COLOR_FG_CUSTOM[dwForceID] = { r, g, b }
+					MY.SaveLUAData({SZ_FORCE_COLOR_FG, MY_DATA_PATH.ROLE}, MY_FORCE_COLOR_FG_CUSTOM)
+					txt:color(r, g, b)
+					XGUI(this):color(r, g, b)
+					FireUIEvent("MY_FORCE_COLOR_UPDATE")
+				end)
+			end,
+		})
+		x = x + 30
+		ui:append("Shadow", {
+			x = x, y = y, w = 25, h = 25,
+			color = { MY.GetForceColor(dwForceID, "background") },
+			onclick = function()
+				local this = this
+				XGUI.OpenColorPicker(function(r, g, b)
+					MY_FORCE_COLOR_BG_CUSTOM[dwForceID] = { r, g, b }
+					MY.SaveLUAData({SZ_FORCE_COLOR_BG, MY_DATA_PATH.ROLE}, MY_FORCE_COLOR_BG_CUSTOM)
+					sha:color(r, g, b)
+					XGUI(this):color(r, g, b)
+					FireUIEvent("MY_FORCE_COLOR_UPDATE")
+				end)
+			end,
+		})
+		x = x + 40
+
+		if 2 * x - x0 > w then
+			x = X
+			y = y + 35
+		end
+	end
+	ui:append("WndButton2", {
+		x = x, y = y, w = 160,
+		text = _L["Restore default"],
+		onclick = function()
+			MY_FORCE_COLOR_FG_CUSTOM = {}
+			MY_FORCE_COLOR_BG_CUSTOM = {}
+			MY.SaveLUAData({SZ_FORCE_COLOR_FG, MY_DATA_PATH.ROLE}, MY_FORCE_COLOR_FG_CUSTOM)
+			MY.SaveLUAData({SZ_FORCE_COLOR_BG, MY_DATA_PATH.ROLE}, MY_FORCE_COLOR_BG_CUSTOM)
+			MY.SwitchTab("GlobalColor", true)
+			FireUIEvent("MY_FORCE_COLOR_UPDATE")
+		end,
+	})
+
+	y = y + 45
+	ui:append("Text", {
+		x = X - 10, y = y,
+		text = _L["Camp color"],
+		color = { 255, 255, 0 },
+	}, true):autoWidth()
+	x, y = X, y + 30
+	for _, nCamp in ipairs({ CAMP.NEUTRAL, CAMP.GOOD, CAMP.EVIL }) do
+		local x0 = x
+		local sha = ui:append("Shadow", {
+			x = x, y = y, w = 100, h = 25,
+			text = g_tStrings.STR_CAMP_TITLE[nCamp],
+			color = { MY.GetCampColor(nCamp, "background") },
+		}, true)
+		local txt = ui:append("Text", {
+			x = x + 5, y = y, w = 100, h = 25,
+			text = g_tStrings.STR_CAMP_TITLE[nCamp],
+			color = { MY.GetCampColor(nCamp, "foreground") },
+		}, true)
+		x = x + 105
+		ui:append("Shadow", {
+			x = x, y = y, w = 25, h = 25,
+			color = { MY.GetCampColor(nCamp, "foreground") },
+			onclick = function()
+				local this = this
+				XGUI.OpenColorPicker(function(r, g, b)
+					MY_CAMP_COLOR_FG_CUSTOM[nCamp] = { r, g, b }
+					MY.SaveLUAData({SZ_CAMP_COLOR_FG, MY_DATA_PATH.ROLE}, MY_CAMP_COLOR_FG_CUSTOM)
+					txt:color(r, g, b)
+					XGUI(this):color(r, g, b)
+					FireUIEvent("MY_CAMP_COLOR_UPDATE")
+				end)
+			end,
+		})
+		x = x + 30
+		ui:append("Shadow", {
+			x = x, y = y, w = 25, h = 25,
+			color = { MY.GetCampColor(nCamp, "background") },
+			onclick = function()
+				local this = this
+				XGUI.OpenColorPicker(function(r, g, b)
+					MY_CAMP_COLOR_BG_CUSTOM[nCamp] = { r, g, b }
+					MY.SaveLUAData({SZ_CAMP_COLOR_BG, MY_DATA_PATH.ROLE}, MY_CAMP_COLOR_BG_CUSTOM)
+					sha:color(r, g, b)
+					XGUI(this):color(r, g, b)
+					FireUIEvent("MY_CAMP_COLOR_UPDATE")
+				end)
+			end,
+		})
+		x = x + 40
+
+		if 2 * x - x0 > w then
+			x = X
+			y = y + 35
+		end
+	end
+	ui:append("WndButton2", {
+		x = x, y = y, w = 160,
+		text = _L["Restore default"],
+		onclick = function()
+			MY_CAMP_COLOR_FG_CUSTOM = {}
+			MY_CAMP_COLOR_BG_CUSTOM = {}
+			MY.SaveLUAData({SZ_CAMP_COLOR_FG, MY_DATA_PATH.ROLE}, MY_CAMP_COLOR_FG_CUSTOM)
+			MY.SaveLUAData({SZ_CAMP_COLOR_BG, MY_DATA_PATH.ROLE}, MY_CAMP_COLOR_BG_CUSTOM)
+			MY.SwitchTab("GlobalColor", true)
+			FireUIEvent("MY_CAMP_COLOR_UPDATE")
+		end,
+	})
+end
+MY.RegisterPanel("GlobalColor", _L["GlobalColor"], _L["Configure"], 2673, {255,255,0,200}, PS)
 end
 
 do

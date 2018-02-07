@@ -17,6 +17,12 @@ data = {
 	["Battle"] = "战斗",
 	["Others"] = "其它",
 	["Development"] = "开发",
+	["Configure"] = "设置",
+
+	["GlobalColor"] = "全局配色",
+	["Force color"] = "门派配色",
+	["Camp color"] = "阵营配色",
+	["Restore default"] = "恢复默认",
 
 	['nearby channel'] = '近聊频道',
 	['friend channel'] = '好友频道',
