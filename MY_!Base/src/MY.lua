@@ -262,9 +262,7 @@ end
 -- open window
 function MY.OpenPanel(bMute, bNoFocus, bNoAnimate)
 	local frame = MY.GetFrame()
-	if frame and frame:IsVisible() then
-		return
-	end
+	local bNoAnimate = bNoAnimate or (frame and frame:IsVisible())
 	if not frame then
 		frame = Wnd.OpenWindow(INI_PATH, "MY")
 		frame.intact = true
