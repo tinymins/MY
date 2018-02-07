@@ -17,7 +17,6 @@ data = {
 	["Battle"] = "戰鬥",
 	["Others"] = "其它",
 	["Development"] = "開發",
-	["Configure"] = "設置",
 
 	["GlobalColor"] = "全局配色",
 	["Force color"] = "門派配色",
