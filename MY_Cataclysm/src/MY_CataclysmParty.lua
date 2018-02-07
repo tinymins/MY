@@ -378,48 +378,38 @@ function CTM_Party_Base.OnItemLButtonDown()
 end
 
 do
-local function OnBuffMouseEnter(this)
-	if CFG.bTempTargetFightTip and not me.bFightState or not CFG.bTempTargetFightTip then
-		local nX, nY = this:GetRoot():GetAbsPos()
-		local nW, nH = this:GetRoot():GetSize()
-		MY.OutputBuffTip(this.dwID, this.nLevel, { nX, nY + 5, nW, nH }, GetEndTime(this.nEndFrame))
-	end
-end
 
-function CTM_Party_Base.OnItemRefreshTip()
+local function OnItemRefreshTip()
+	local me = GetClientPlayer()
+	local bTip = not CFG.bTempTargetFightTip or not me.bFightState
+	if not bTip then
+		return
+	end
+	local nX, nY = this:GetRoot():GetAbsPos()
+	local nW, nH = this:GetRoot():GetSize()
 	if this.bBuff then
-		OnBuffMouseEnter(this)
+		MY.OutputBuffTip(this.dwID, this.nLevel, { nX, nY + 5, nW, nH }, GetEndTime(this.nEndFrame))
+	elseif this.bRole then
+		OutputTeamMemberTip(this.dwID, { nX, nY + 5, nW, nH })
 	end
 end
+CTM_Party_Base.OnItemRefreshTip = OnItemRefreshTip
 
 function CTM_Party_Base.OnItemMouseEnter()
 	if CTM_DRAG and this:Lookup("Image_Slot") and this:Lookup("Image_Slot"):IsValid() then
 		this:Lookup("Image_Slot"):Show()
 	end
-	local name = this:GetName()
-	local dwID
-	if this.bBuff then
-		OnBuffMouseEnter(this)
-		dwID = this:GetParent():GetParent().dwID
-	elseif this.bRole then
-		local nX, nY = this:GetRoot():GetAbsPos()
-		local nW, nH = this:GetRoot():GetSize()
-		local me = GetClientPlayer()
-		if CFG.bTempTargetFightTip and not me.bFightState or not CFG.bTempTargetFightTip then
-			OutputTeamMemberTip(this.dwID, { nX, nY + 5, nW, nH })
-		end
-		dwID = this.dwID
-	end
+	OnItemRefreshTip()
+	local dwID = (this.bBuff and this:GetParent():GetParent().dwID) or (this.bRole and this.dwID)
 	if dwID == CTM_TEMP_TARGET_ID then
 		return
 	end
-	local info = CTM:GetMemberInfo(this.dwID)
+	local info = CTM:GetMemberInfo(dwID)
 	if not info then
 		return
 	end
-	if info.bIsOnLine and GetPlayer(this.dwID) and CFG.bTempTargetEnable then
+	if info.bIsOnLine and GetPlayer(dwID) and CFG.bTempTargetEnable then
 		MY.DelayCall("MY_Cataclysm_TempTarget", false)
-		local dwID = this.dwID
 		local function fnAction()
 			if not CTM_TEMP_TARGET_TYPE then
 				CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = MY.GetTarget()
@@ -465,11 +455,11 @@ function CTM_Party_Base.OnItemMouseLeave(dst)
 	if not dwID then
 		return
 	end
-	local info = CTM:GetMemberInfo(this.dwID)
+	local info = CTM:GetMemberInfo(dwID)
 	if not info then -- 退组的问题
 		return
 	end
-	if info.bIsOnLine and GetPlayer(this.dwID) and CFG.bTempTargetEnable then
+	if info.bIsOnLine and GetPlayer(dwID) and CFG.bTempTargetEnable then
 		MY.DelayCall("MY_Cataclysm_TempTarget", false)
 		if CTM_TEMP_TARGET_TYPE then
 			MY.DelayCall("MY_Cataclysm_TempTarget", ResumeTempTarget) -- 延迟到下一帧 因为可能当前帧临时选中另外一个玩家 那么不需要切回目标
@@ -479,7 +469,9 @@ end
 end
 
 function CTM_Party_Base.OnItemRButtonClick()
-	if not this.dwID then return end
+	if not this.dwID then
+		return
+	end
 	local dwID = this.dwID
 	local menu = {}
 	local me = GetClientPlayer()
