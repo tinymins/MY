@@ -1982,7 +1982,7 @@ function PS.OnPanelActive(frame)
 	x = x + 10
 	y = y + 5
 	y = y + ui:append("WndEditBox",{
-		x = x, y = y, w = 450, h = 150, limit = 4096, multiline = true,
+		x = x, y = y, w = 450, h = 130, limit = 4096, multiline = true,
 		text = GetListText(Cataclysm_Main.aBuffList),
 		onchange = function(szText)
 			Cataclysm_Main.aBuffList = GetTextList(szText)
