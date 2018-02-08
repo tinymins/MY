@@ -112,15 +112,20 @@ function CharInfo.CreateComplete(dwID)
 			for i = 2, #data do
 				local v = data[i]
 				ui:append("Text", { x = 20, y = (i - 1) * 25 + 50, w = 200, h = 25, halign = 0, text = v.label })
-				ui:append("Text", { x = 20, y = (i - 1) * 25 + 50, w = 200, h = 25, halign = 2, text = v.value, color = GetSelfValue(v.label, v.value) }):hover(function(bHover)
-					if bHover then
-						local x, y = this:GetAbsPos()
-						local w, h = this:GetSize()
-						OutputTip(v.szTip, 550, { x, y, w, h })
-					else
-						HideTip()
-					end
-				end)
+				ui:append("Text", {
+					x = 20, y = (i - 1) * 25 + 50, w = 200, h = 25,
+					halign = 2, text = v.value,
+					color = GetSelfValue(v.label, v.value),
+					onhover = function(bHover)
+						if bHover then
+							local x, y = this:GetAbsPos()
+							local w, h = this:GetSize()
+							OutputTip(v.szTip, 550, { x, y, w, h })
+						else
+							HideTip()
+						end
+					end,
+				})
 			end
 			frame.data = nil
 		else
