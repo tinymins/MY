@@ -1351,7 +1351,7 @@ function CTM:RefreshBuff()
 						end
 						item:Scale(fScale, fScale)
 						local txtTime = item:Lookup("Text_Time")
-						local fFontScale = fScale * 0.9 / (1 + Font.GetOffset() * 0.075)
+						local fFontScale = fScale * 0.9 / (1 + Font.GetOffset() * 0.07)
 						txtTime:SetFontScale(fFontScale * (item:GetH() / txtTime:GetH()) * 0.6)
 						local txtStackNum = item:Lookup("Text_StackNum")
 						txtStackNum:SetFontScale(fFontScale * (item:GetH() / txtStackNum:GetH()) * 0.55)
