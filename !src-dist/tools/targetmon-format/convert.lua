@@ -167,7 +167,10 @@ function str2var(str, env)
 		Log('[LOADSTRING ERROR]bad argument #1 to str2var, string expected, got ' .. type(str) .. '.')
 		return
 	end
-	local fn = loadstring("return " .. str) or loadstring(str)
+	local fn, bdata = loadstring("return " .. str)
+	if not fn then
+		fn, bdata = loadstring(str), true
+	end
 	if not fn then
 		Log('[LOADSTRING ERROR]failed on decoding #1 of str2var, plain text is: ' .. str)
 		return
@@ -178,7 +181,11 @@ function str2var(str, env)
 	datalist = {pcall(fn)}
 	setmetatable(env, nil)
 	if datalist[1] then
-		tremove(datalist, 1)
+		if bdata then
+			datalist = env.data
+		else
+			tremove(datalist, 1)
+		end
 	else
 		Log('[CALL ERROR]str2var("' .. str .. '"): \nERROR:' .. datalist[2])
 	end
@@ -201,5 +208,5 @@ end
 
 local content = Read(arg[1])
 local data = str2var(content)
-local content = var2str(data, "\t")
+local content = "data = " .. var2str(data, "\t")
 Write(arg[1], content)
