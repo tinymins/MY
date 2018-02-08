@@ -185,7 +185,10 @@ local function ReloadFrame(frame)
 		box:SetOverTextPosition(2, ITEM_POSITION.LEFT_BOTTOM)
 		box:SetOverTextFontScheme(2, 7)
 		-- Box±³¾°Í¼
-		XGUI(imgBoxBg):image(config.boxBgUITex)
+		if config.boxBgUITex ~= "" then
+			XGUI(imgBoxBg):image(config.boxBgUITex)
+		end
+		imgBoxBg:SetVisible(config.boxBgUITex ~= "")
 
 		if config.type == 'SKILL' then
 			box.__SetCoolDownPercentage = box.SetCoolDownPercentage
