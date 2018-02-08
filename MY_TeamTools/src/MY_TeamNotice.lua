@@ -36,7 +36,7 @@ function TI.CreateFrame(a, b)
 	else
 		ui = XGUI.CreateFrame("MY_TeamNotice", {
 			w = 320, h = 195,
-			title = _L["Team Message"],
+			text = _L["Team Message"],
 			anchor = MY_TeamNotice.anchor,
 			simple = true, close = true, close = true,
 			setting = function() MY.OpenPanel() MY.SwitchTab("MY_TeamTools") end,
@@ -184,6 +184,15 @@ MY.RegisterEvent("FIRST_LOADING_END.TEAM_NOTICE", function()
 	end
 end)
 
+MY.RegisterBgMsg("LR_TeamNotice", function(_, nChannel, dwID, szName, bIsSelf, szCmd, szText)
+	if not MY_TeamNotice.bEnable then
+		return
+	end
+	if szCmd == "SEND" then
+		TI.CreateFrame("", szText)
+	end
+end)
+
 MY.RegisterBgMsg("TI", function(_, nChannel, dwID, szName, bIsSelf, ...)
 	if not MY_TeamNotice.bEnable then
 		return
@@ -224,6 +233,7 @@ local function GetMenu()
 					TI.CreateFrame()
 				else
 					MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "TI", "ASK")
+					MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "LR_TeamNotice", "ASK")
 					MY.Sysmsg(_L["Asking..., If no response in longtime, team leader not enable plug-in."])
 				end
 			end
