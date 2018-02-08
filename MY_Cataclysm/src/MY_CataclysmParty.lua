@@ -54,6 +54,7 @@ local CTM_ATTENTION_LIST     = {}
 local CTM_ATTENTION_CACHE    = {}
 local CTM_CAUTION_CACHE      = {}
 local CTM_BOSS_TARGET_CACHE  = {}
+local CTM_THREAT_NPC_ID, CTM_THREAT_TARGET_ID
 local CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID
 local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子
 local CHANGGE_REAL_SHADOW_CACHE = {}
@@ -738,7 +739,9 @@ function CTM:RefreshBossTarget()
 	local tCheck = {}
 	if CFG.bShowBossTarget then
 		for dwNpcID, npc in pairs(CTM_BOSS_CACHE) do
-			local dwTarID = IsEnemy(UI_GetClientPlayerID(), dwNpcID) and npc.bFightState and select(2, npc.GetTarget()) or nil
+			local dwTarID = (IsEnemy(UI_GetClientPlayerID(), dwNpcID) and npc.bFightState)
+				and (CTM_THREAT_NPC_ID == dwNpcID and CTM_THREAT_TARGET_ID or select(2, npc.GetTarget()))
+				or nil
 			if dwTarID then
 				if dwTarID ~= CTM_BOSS_TARGET_CACHE[dwNpcID] then
 					HideBossTarget(CTM_BOSS_TARGET_CACHE[dwNpcID])
@@ -761,6 +764,12 @@ function CTM:RefreshBossTarget()
 		end
 	end
 end
+end
+
+function CTM:RefreshThreat(dwNpcID, dwTarID)
+	CTM_THREAT_NPC_ID = dwNpcID
+	CTM_THREAT_TARGET_ID = dwTarID
+	self:RefreshBossTarget()
 end
 
 function CTM:RefreshAttention()

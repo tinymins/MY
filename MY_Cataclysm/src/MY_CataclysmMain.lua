@@ -420,6 +420,7 @@ function Cataclysm_Main.OnFrameCreate()
 	this:RegisterEvent("PARTY_ROLL_QUALITY_CHANGED")
 	this:RegisterEvent("LOADING_END")
 	this:RegisterEvent("TARGET_CHANGE")
+	this:RegisterEvent("CHARACTER_THREAT_RANKLIST")
 	this:RegisterEvent("BUFF_UPDATE")
 	-- 拍团部分 arg0 0=T人 1=分工资
 	this:RegisterEvent("TEAM_VOTE_REQUEST")
@@ -589,6 +590,8 @@ function Cataclysm_Main.OnEvent(szEvent)
 	elseif szEvent == "TARGET_CHANGE" then
 		-- oldid， oldtype, newid, newtype
 		Grid_CTM:RefreshTarget(arg0, arg1, arg2, arg3)
+	elseif szEvent == "CHARACTER_THREAT_RANKLIST" then
+		Grid_CTM:RefreshThreat(arg0, arg1)
 	elseif szEvent == "MY_RAID_REC_BUFF" then
 		Grid_CTM:RecBuff(arg0, arg1)
 	elseif szEvent == "BUFF_UPDATE" then
