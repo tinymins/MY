@@ -531,7 +531,7 @@ local function LoadCustomList()
 	end
 end
 local function SaveCustomList()
-	MY.SaveLUAData({'config/bosslist.jx3dat', MY_DATA_PATH.GLOBAL}, BOSS_LIST_CUSTOM)
+	MY.SaveLUAData({'config/bosslist.jx3dat', MY_DATA_PATH.GLOBAL}, BOSS_LIST_CUSTOM, IsDebugClient() and "\t" or nil)
 end
 local function GenerateList()
 	LoadCustomList()
@@ -648,7 +648,7 @@ local function LoadCustomList()
 	end
 end
 local function SaveCustomList()
-	MY.SaveLUAData({'config/inpclist.jx3dat', MY_DATA_PATH.GLOBAL}, INPC_LIST_CUSTOM)
+	MY.SaveLUAData({'config/inpclist.jx3dat', MY_DATA_PATH.GLOBAL}, INPC_LIST_CUSTOM, IsDebugClient() and "\t" or nil)
 end
 local function GenerateList()
 	LoadCustomList()
