@@ -216,6 +216,9 @@ local function ReloadFrame(frame)
 
 		-- µ¹¼ÆÊ±Ìõ
 		local fontScale = max(0.85, GetScale(config) * 0.95)
+		if config.ignoreSystemUIScale then
+			fontScale = fontScale / (1 + Font.GetOffset() * 0.07)
+		end
 		if config.cdBar then
 			txtProcess:SetW(config.cdBarWidth - 10)
 			txtProcess:SetText("")
