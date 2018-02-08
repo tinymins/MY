@@ -27,6 +27,7 @@ local INI_PATH = MY.GetAddonInfo().szRoot .. "MY_TargetMon/ui/MY_TargetMon.ini"
 local ROLE_CONFIG_FILE = {'config/my_targetmon.jx3dat', MY_DATA_PATH.ROLE}
 local DEFAULT_CONFIG_FILE = MY.GetAddonInfo().szRoot .. "MY_TargetMon/data/$lang.jx3dat"
 local CUSTOM_DEFAULT_CONFIG_FILE = {'config/my_targetmon.jx3dat', MY_DATA_PATH.GLOBAL}
+local EMBEDDED_CONFIG_FILE = MY.GetAddonInfo().szRoot .. "MY_TargetMon/data/embedded/$lang.jx3dat"
 local CUSTOM_BOXBG_STYLES = {
 	"UI/Image/Common/Box.UITex|0",
 	"UI/Image/Common/Box.UITex|1",
@@ -102,7 +103,7 @@ local TARGET_TYPE_LIST = {
 	"TEAM_MARK_DART" ,
 	"TEAM_MARK_FAN"  ,
 }
-local Config, ConfigTemplate, ConfigDefault = {}
+local Config, ConfigEmbedded, ConfigTemplate, ConfigDefault = {}, {}
 
 ----------------------------------------------------------------------------------------------
 -- 通用逻辑
@@ -119,6 +120,9 @@ end
 
 function D.CloseFrame(config)
 	if config == 'all' then
+		for _, config in ipairs(ConfigEmbedded) do
+			D.CloseFrame(config)
+		end
 		for _, config in ipairs(Config) do
 			D.CloseFrame(config)
 		end
@@ -140,12 +144,20 @@ function D.CheckFrame(config)
 end
 
 function D.CheckAllFrame(reload)
+	for i, config in ipairs(ConfigEmbedded) do
+		D.CheckFrame(config)
+	end
 	for i, config in ipairs(Config) do
 		D.CheckFrame(config)
 	end
 end
 
 function D.GetFrameData(id)
+	for index, config in ipairs(ConfigEmbedded) do
+		if tostring(config):sub(8) == id then
+			return config, index
+		end
+	end
 	for index, config in ipairs(Config) do
 		if tostring(config):sub(8) == id then
 			return config, index
@@ -216,7 +228,17 @@ function D.LoadConfig(bDefault, bOriginal)
 	Config = not bDefault
 		and MY.LoadLUAData(ROLE_CONFIG_FILE)
 		or (not bOriginal and MY.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE) or ConfigDefault)
-	for _, config in pairs(Config) do
+	ConfigEmbedded = MY.LoadLUAData(EMBEDDED_CONFIG_FILE) or {}
+	local Embedded = Config.Embedded or {}
+	for _, config in ipairs(ConfigEmbedded) do
+		for k, v in pairs(Embedded[config.caption] or {}) do
+			if k ~= "caption" and k ~= "target" and k ~= "monitors" then
+				config[k] = v
+			end
+		end
+		D.FormatConfigStructure(config)
+	end
+	for _, config in ipairs(Config) do
 		D.FormatConfigStructure(config)
 	end
 	D.CheckAllFrame()
@@ -232,6 +254,17 @@ end
 MY.RegisterInit("MY_TargetMon", OnInit)
 
 local function OnExit()
+	local Embedded = Config.Embedded or {}
+	for _, config in ipairs(ConfigEmbedded) do
+		local EmbeddedCfg = Embedded[config.caption] or {}
+		for k, v in pairs(config) do
+			if k ~= "caption" and k ~= "target" and k ~= "monitors" then
+				EmbeddedCfg[k] = v
+			end
+		end
+		Embedded[config.caption] = EmbeddedCfg
+	end
+	Config.Embedded = Embedded
 	MY.SaveLUAData(ROLE_CONFIG_FILE, Config)
 end
 MY.RegisterExit("MY_TargetMon", OnExit)
@@ -279,68 +312,84 @@ end
 -- 设置界面
 ----------------------------------------------------------------------------------------------
 local PS = {}
-local function GenePS(ui, config, x, y, w, h, OpenConfig, Add)
-	ui:append("Text", {text = (function()
+local function GenePS(ui, config, x, y, w, h, OpenConfig)
+	local bEmbedded = not OpenConfig
+	local text = _L["*"]
+	if not bEmbedded then
+		text = "X."
 		for i = 1, #Config do
 			if Config[i] == config then
-				return i
+				text = i .. "."
+				break
 			end
 		end
-		return "X"
-	end)() .. ".", x = x, y = y - 3, w = 20, r = 255, g = 255, b = 0})
-	ui:append("WndEditBox", {
-		x = x + 20, y = y, w = w - 290, h = 22,
-		r = 255, g = 255, b = 0, text = config.caption,
-		onchange = function(val) config.caption = val end,
+	end
+	ui:append("Text", {
+		x = x, y = y - 3, w = 20,
+		r = 255, g = 255, b = 0,
+		text = text,
 	})
-	ui:append("WndButton2", {
-		x = w - 180, y = y,
-		w = 50, h = 25,
-		text = _L["Move Up"],
-		onclick = function()
-			for i = 1, #Config do
-				if Config[i] == config then
-					if Config[i - 1] then
-						Config[i], Config[i - 1] = Config[i - 1], Config[i]
-						D.CheckFrame(Config[i])
-						D.CheckFrame(Config[i - 1])
-						return MY.SwitchTab("MY_TargetMon", true)
+	if not bEmbedded then
+		ui:append("WndEditBox", {
+			x = x + 20, y = y, w = w - 290, h = 22,
+			r = 255, g = 255, b = 0, text = config.caption,
+			onchange = function(val) config.caption = val end,
+		})
+		ui:append("WndButton2", {
+			x = w - 180, y = y,
+			w = 50, h = 25,
+			text = _L["Move Up"],
+			onclick = function()
+				for i = 1, #Config do
+					if Config[i] == config then
+						if Config[i - 1] then
+							Config[i], Config[i - 1] = Config[i - 1], Config[i]
+							D.CheckFrame(Config[i])
+							D.CheckFrame(Config[i - 1])
+							return MY.SwitchTab("MY_TargetMon", true)
+						end
 					end
 				end
-			end
-		end,
-	})
-	ui:append("WndButton2", {
-		x = w - 125, y = y,
-		w = 50, h = 25,
-		text = _L["Move Down"],
-		onclick = function()
-			for i = 1, #Config do
-				if Config[i] == config then
-					if Config[i + 1] then
-						Config[i], Config[i + 1] = Config[i + 1], Config[i]
-						D.CheckFrame(Config[i])
-						D.CheckFrame(Config[i + 1])
-						return MY.SwitchTab("MY_TargetMon", true)
+			end,
+		})
+		ui:append("WndButton2", {
+			x = w - 125, y = y,
+			w = 50, h = 25,
+			text = _L["Move Down"],
+			onclick = function()
+				for i = 1, #Config do
+					if Config[i] == config then
+						if Config[i + 1] then
+							Config[i], Config[i + 1] = Config[i + 1], Config[i]
+							D.CheckFrame(Config[i])
+							D.CheckFrame(Config[i + 1])
+							return MY.SwitchTab("MY_TargetMon", true)
+						end
 					end
 				end
-			end
-		end,
-	})
-	ui:append("WndButton2", {
-		x = w - 70, y = y,
-		w = 60, h = 25,
-		text = _L["Delete"],
-		onclick = function()
-			for i, c in ipairs_r(Config) do
-				if config == c then
-					remove(Config, i)
+			end,
+		})
+		ui:append("WndButton2", {
+			x = w - 70, y = y,
+			w = 60, h = 25,
+			text = _L["Delete"],
+			onclick = function()
+				for i, c in ipairs_r(Config) do
+					if config == c then
+						remove(Config, i)
+					end
 				end
-			end
-			D.CloseFrame(config)
-			MY.SwitchTab("MY_TargetMon", true)
-		end,
-	})
+				D.CloseFrame(config)
+				MY.SwitchTab("MY_TargetMon", true)
+			end,
+		})
+	else
+		ui:append("Text", {
+			x = x + 20, y = y - 3,
+			text = config.caption,
+			r = 255, g = 255, b = 0,
+		})
+	end
 	y = y + 30
 
 	ui:append("WndCheckBox", {
@@ -372,32 +421,34 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig, Add)
 		menu = function()
 			local dwKungFuID = GetClientPlayer().GetKungfuMount().dwSkillID
 			local t = {}
-			for _, eType in ipairs(TARGET_TYPE_LIST) do
-				insert(t, {
-					szOption = _L.TARGET[eType],
-					bCheck = true, bMCheck = true,
-					bChecked = eType == (config.type == "SKILL" and "CONTROL_PLAYER" or config.target),
-					fnDisable = function()
-						return config.type == "SKILL" and eType ~= "CONTROL_PLAYER"
-					end,
-					fnAction = function()
-						config.target = eType
-						D.CheckFrame(config)
-					end,
-				})
+			if not bEmbedded then
+				for _, eType in ipairs(TARGET_TYPE_LIST) do
+					insert(t, {
+						szOption = _L.TARGET[eType],
+						bCheck = true, bMCheck = true,
+						bChecked = eType == (config.type == "SKILL" and "CONTROL_PLAYER" or config.target),
+						fnDisable = function()
+							return config.type == "SKILL" and eType ~= "CONTROL_PLAYER"
+						end,
+						fnAction = function()
+							config.target = eType
+							D.CheckFrame(config)
+						end,
+					})
+				end
+				insert(t, { bDevide = true })
+				for _, eType in ipairs({'BUFF', 'SKILL'}) do
+					insert(t, {
+						szOption = _L.TYPE[eType],
+						bCheck = true, bMCheck = true, bChecked = eType == config.type,
+						fnAction = function()
+							config.type = eType
+							D.CheckFrame(config)
+						end,
+					})
+				end
+				insert(t, { bDevide = true })
 			end
-			insert(t, { bDevide = true })
-			for _, eType in ipairs({'BUFF', 'SKILL'}) do
-				insert(t, {
-					szOption = _L.TYPE[eType],
-					bCheck = true, bMCheck = true, bChecked = eType == config.type,
-					fnAction = function()
-						config.type = eType
-						D.CheckFrame(config)
-					end,
-				})
-			end
-			insert(t, { bDevide = true })
 			for _, eType in ipairs({'LEFT', 'RIGHT', 'CENTER'}) do
 				insert(t, {
 					szOption = _L.ALIGNMENT[eType],
@@ -412,12 +463,14 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig, Add)
 		end,
 		autoenable = function() return config.enable end,
 	})
-	ui:append("WndButton2", {
-		x = w - 110, y = y, w = 102,
-		text = _L['Set monitor'],
-		onclick = function() OpenConfig(config) end,
-		autoenable = function() return config.enable end,
-	})
+	if not bEmbedded then
+		ui:append("WndButton2", {
+			x = w - 110, y = y, w = 102,
+			text = _L['Set monitor'],
+			onclick = function() OpenConfig(config) end,
+			autoenable = function() return config.enable end,
+		})
+	end
 	y = y + 30
 
 	ui:append("WndCheckBox", {
@@ -644,7 +697,7 @@ end
 function PS.OnPanelActive(wnd)
 	local ui = MY.UI(wnd)
 	local w, h = ui:size()
-	local X, Y = 20, 30
+	local X, Y = 20, 20
 	local x, y = X, Y
 
 	local OpenConfig
@@ -1054,9 +1107,15 @@ function PS.OnPanelActive(wnd)
 		uiWrapper:hide()
 	end
 
+	for _, config in ipairs(ConfigEmbedded) do
+		x, y = GenePS(ui, config, x, y, w, h)
+		y = y + 10
+	end
+	y = y + 10
+
 	for _, config in ipairs(Config) do
-		x, y = GenePS(ui, config, x, y, w, h, OpenConfig, Add)
-		y = y + 20
+		x, y = GenePS(ui, config, x, y, w, h, OpenConfig)
+		y = y + 10
 	end
 	y = y + 10
 

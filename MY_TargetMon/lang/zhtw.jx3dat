@@ -1,6 +1,8 @@
 -- language data (zhtw) updated at 2014-4-10 03:38:11
 data = {
+    ["*"] = "●",
     ['Target monitor'] = '目標監控',
+    ['[MY TargetMon] '] = '[茗伊監控] ',
     ['Mingyi self buff monitor'] = '茗伊自身BUFF監控',
     ['Mingyi target buff monitor'] = '茗伊目標BUFF監控',
 

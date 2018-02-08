@@ -23,6 +23,7 @@ local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local D = {}
 local BOX_SPARKING_FRAME = GLOBAL.GAME_FPS * 2 / 3
 local INI_PATH = MY.GetAddonInfo().szRoot .. "MY_TargetMon/ui/MY_TargetMon.ini"
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_TargetMon/lang/")
 
 function D.UpdateHotkey(frame)
 	local i = this.index
@@ -715,11 +716,11 @@ function MY_TargetMon_Base.OnEvent(event)
 	elseif event == "ON_ENTER_CUSTOM_UI_MODE" then
 		this:SetH(this.dragH)
 		this:Lookup('', 'Handle_List'):SetAlpha(90)
-		UpdateCustomModeWindow(this, this.config.caption, this.config.penetrable)
+		UpdateCustomModeWindow(this, _L["[MY TargetMon] "] .. this.config.caption, this.config.penetrable)
 	elseif event == "ON_LEAVE_CUSTOM_UI_MODE" then
 		this:SetH(this.h)
 		this:Lookup('', 'Handle_List'):SetAlpha(255)
-		UpdateCustomModeWindow(this, this.config.caption, this.config.penetrable)
+		UpdateCustomModeWindow(this, _L["[MY TargetMon] "] .. this.config.caption, this.config.penetrable)
 		if this.config.dragable then
 			this:EnableDrag(true)
 		end
