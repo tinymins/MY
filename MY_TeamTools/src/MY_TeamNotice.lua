@@ -168,11 +168,15 @@ end
 MY.RegisterEvent("PARTY_LEVEL_UP_RAID.TEAM_NOTICE", function()
 	if MY.IsLeader() then
 		MY.Confirm(_L["Edit team info?"], function()
+			MY_TeamNotice.bEnable = true
 			TI.CreateFrame()
 		end)
 	end
 end)
 MY.RegisterEvent("FIRST_LOADING_END.TEAM_NOTICE", function()
+	if not MY_TeamNotice.bEnable then
+		return
+	end
 	-- 不存在队长不队长的问题了
 	local me = GetClientPlayer()
 	if me.IsInRaid() then
@@ -181,6 +185,9 @@ MY.RegisterEvent("FIRST_LOADING_END.TEAM_NOTICE", function()
 end)
 
 MY.RegisterBgMsg("TI", function(_, nChannel, dwID, szName, bIsSelf, ...)
+	if not MY_TeamNotice.bEnable then
+		return
+	end
 	local data = {...}
 	if not bIsSelf then
 		local me = GetClientPlayer()
