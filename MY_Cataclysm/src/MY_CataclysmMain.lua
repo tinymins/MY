@@ -27,7 +27,9 @@ local GetBuffName = MY.GetBuffName
 
 local INI_ROOT = MY.GetAddonInfo().szRoot .. "MY_Cataclysm/ui/"
 local CTM_CONFIG = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/config/default/$lang.jx3dat")
-local CTM_BUFF_NGB = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/data/nangongbo/$lang.jx3dat") or {}
+local CTM_BUFF_NGB_BASE = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/data/nangongbo/base/$lang.jx3dat") or {}
+local CTM_BUFF_NGB_CMD = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/data/nangongbo/cmd/$lang.jx3dat") or {}
+local CTM_BUFF_NGB_HEAL = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/data/nangongbo/heal/$lang.jx3dat") or {}
 local CTM_CONFIG_CATACLYSM = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/config/ctm/$lang.jx3dat")
 
 local CTM_STYLE = {
@@ -67,7 +69,13 @@ end
 function UpdateBuffListCache()
 	BUFF_LIST = {}
 	if Cataclysm_Main.bBuffDataNangongbo then
-		InsertBuffListCache(CTM_BUFF_NGB)
+		InsertBuffListCache(CTM_BUFF_NGB_BASE)
+		if Cataclysm_Main.bBuffDataNangongboCmd then
+			InsertBuffListCache(CTM_BUFF_NGB_CMD)
+		end
+		if Cataclysm_Main.bBuffDataNangongboHeal then
+			InsertBuffListCache(CTM_BUFF_NGB_HEAL)
+		end
 	end
 	InsertBuffListCache(Cataclysm_Main.aBuffList)
 end
@@ -1969,6 +1977,26 @@ function PS.OnPanelActive(frame)
 			UpdateBuffListCache()
 			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
+	}, true):autoWidth():width() + 5
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y, text = _L["Cmd data"],
+		checked = Cataclysm_Main.bBuffDataNangongboCmd,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bBuffDataNangongboCmd = bCheck
+			UpdateBuffListCache()
+			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
+		end,
+		autoenable = function() return Cataclysm_Main.bBuffDataNangongbo end,
+	}, true):autoWidth():width() + 5
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y, text = _L["Heal data"],
+		checked = Cataclysm_Main.bBuffDataNangongboHeal,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bBuffDataNangongboHeal = bCheck
+			UpdateBuffListCache()
+			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
+		end,
+		autoenable = function() return Cataclysm_Main.bBuffDataNangongbo end,
 	}, true):autoWidth():width() + 5
 	y = y + ui:append("WndButton2", {
 		x = x, y = y, w = 200,
