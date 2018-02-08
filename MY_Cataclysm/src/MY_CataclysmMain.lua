@@ -853,6 +853,79 @@ function PS.OnPanelActive(frame)
 
 	x = X + 10
 	x = x + ui:append("WndCheckBox", {
+		x = x, y = y, text = _L["Show target's target"],
+		checked = Cataclysm_Main.bShowTargetTargetAni,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bShowTargetTargetAni = bCheck
+			if GetFrame() then
+				Grid_CTM:RefreshTTarget()
+			end
+		end,
+	}, true):autoWidth():width() + 5
+
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y, text = _L["Show distance"],
+		checked = Cataclysm_Main.bShowDistance,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bShowDistance = bCheck
+		end,
+	}, true):autoWidth():width() + 5
+
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y, text = _L["Show Boss target"],
+		checked = Cataclysm_Main.bShowBossTarget,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bShowBossTarget = bCheck
+		end,
+	}, true):autoWidth():width() + 5
+
+	y = y + ui:append("WndCheckBox", {
+		x = x, y = y, text = _L["Attack Warning"],
+		checked = Cataclysm_Main.bHPHitAlert,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bHPHitAlert = bCheck
+			if GetFrame() then
+				Grid_CTM:CallDrawHPMP(true, true)
+			end
+		end,
+	}, true):autoWidth():height()
+
+	x = X + 10
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y, text = _L["Show attention shadow"],
+		checked = Cataclysm_Main.bShowAttention,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bShowAttention = bCheck
+		end,
+	}, true):autoWidth():width() + 5
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y, text = _L["Show caution animate"],
+		checked = Cataclysm_Main.bShowCaution,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bShowCaution = bCheck
+		end,
+	}, true):autoWidth():width() + 5
+
+	local me = GetClientPlayer()
+	if me.dwForceID == 6 then
+		x = x + ui:append("WndCheckBox", {
+			x = X + 10, y = y, text = _L["ZuiWu Effect"],
+			color = { MY.GetForceColor(6) },
+			checked = Cataclysm_Main.bShowEffect,
+			oncheck = function(bCheck)
+				Cataclysm_Main.bShowEffect = bCheck
+			end,
+		}, true):autoWidth():width() + 5
+	end
+	y = y + 25
+
+	-- 名字、图标、内力和血量显示方案
+	x = X
+	y = y + ui:append("Text", { x = x, y = y, text = _L["Name/Icon/Mana/Life Display"], font = 27 }, true):height()
+
+	-- 内力显示
+	x = X + 10
+	x = x + ui:append("WndCheckBox", {
 		x = x, y = y, text = _L["Show ManaCount"],
 		checked = Cataclysm_Main.nShowMP,
 		oncheck = function(bCheck)
@@ -891,62 +964,6 @@ function PS.OnPanelActive(frame)
 		autoenable = function() return Cataclysm_Main.nShowMP end,
 	}, true)
 	y = y + 25
-
-	x = X + 10
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Show target's target"],
-		checked = Cataclysm_Main.bShowTargetTargetAni,
-		oncheck = function(bCheck)
-			Cataclysm_Main.bShowTargetTargetAni = bCheck
-			if GetFrame() then
-				Grid_CTM:RefreshTTarget()
-			end
-		end,
-	}, true):autoWidth():width() + 5
-
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Show distance"],
-		checked = Cataclysm_Main.bShowDistance,
-		oncheck = function(bCheck)
-			Cataclysm_Main.bShowDistance = bCheck
-		end,
-	}, true):autoWidth():width() + 5
-
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Show Boss target"],
-		checked = Cataclysm_Main.bShowBossTarget,
-		oncheck = function(bCheck)
-			Cataclysm_Main.bShowBossTarget = bCheck
-		end,
-	}, true):autoWidth():width() + 5
-
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Attack Warning"],
-		checked = Cataclysm_Main.bHPHitAlert,
-		oncheck = function(bCheck)
-			Cataclysm_Main.bHPHitAlert = bCheck
-			if GetFrame() then
-				Grid_CTM:CallDrawHPMP(true, true)
-			end
-		end,
-	}, true):autoWidth():width() + 5
-
-	local me = GetClientPlayer()
-	if me.dwForceID == 6 then
-		x = x + ui:append("WndCheckBox", {
-			x = X + 10, y = y, text = _L["ZuiWu Effect"],
-			color = { MY.GetForceColor(6) },
-			checked = Cataclysm_Main.bShowEffect,
-			oncheck = function(bCheck)
-				Cataclysm_Main.bShowEffect = bCheck
-			end,
-		}, true):autoWidth():width() + 5
-	end
-	y = y + 25
-
-	-- 名字、图标和血量显示方案
-	x = X
-	y = y + ui:append("Text", { x = x, y = y, text = _L["Name/Icon/Life Display"], font = 27 }, true):height()
 
 	-- 血量数值显示方案
 	x = X + 10

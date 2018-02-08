@@ -773,43 +773,59 @@ function CTM:RefreshThreat(dwNpcID, dwTarID)
 end
 
 function CTM:RefreshAttention()
-	local team, me = GetClientTeam(), GetClientPlayer()
-	local tCheck = {}
-	for _, dwTarID in ipairs(team.GetTeamMemberList()) do
-		local p = GetPlayer(dwTarID)
-		if CTM_CACHE[dwTarID] and CTM_CACHE[dwTarID]:IsValid() then
-			if p and not empty(CTM_ATTENTION_LIST[dwTarID]) then
-				local r, g, b = MY.HumanColor2RGB(CTM_ATTENTION_LIST[dwTarID][1].col)
-				CTM_CACHE[dwTarID]:Lookup("Shadow_Attention"):SetColorRGB(r, g, b)
-				CTM_CACHE[dwTarID]:Lookup("Shadow_Attention"):Show()
-			else
-				CTM_CACHE[dwTarID]:Lookup("Shadow_Attention"):Hide()
+	if CFG.bShowAttention then
+		local team, me = GetClientTeam(), GetClientPlayer()
+		local tCheck = {}
+		for _, dwTarID in ipairs(team.GetTeamMemberList()) do
+			local p = GetPlayer(dwTarID)
+			if CTM_CACHE[dwTarID] and CTM_CACHE[dwTarID]:IsValid() then
+				if p and not empty(CTM_ATTENTION_LIST[dwTarID]) then
+					local r, g, b = MY.HumanColor2RGB(CTM_ATTENTION_LIST[dwTarID][1].col)
+					CTM_CACHE[dwTarID]:Lookup("Shadow_Attention"):SetColorRGB(r, g, b)
+					CTM_CACHE[dwTarID]:Lookup("Shadow_Attention"):Show()
+				else
+					CTM_CACHE[dwTarID]:Lookup("Shadow_Attention"):Hide()
+				end
+			end
+			tCheck[dwTarID] = true
+		end
+		for dwTarID, _ in pairs(CTM_ATTENTION_CACHE) do
+			if not tCheck[dwTarID] then
+				CTM_ATTENTION_LIST[dwTarID] = nil
+				CTM_ATTENTION_CACHE[dwTarID] = nil
 			end
 		end
-		tCheck[dwTarID] = true
-	end
-	for dwTarID, _ in pairs(CTM_ATTENTION_CACHE) do
-		if not tCheck[dwTarID] then
-			CTM_ATTENTION_LIST[dwTarID] = nil
-			CTM_ATTENTION_CACHE[dwTarID] = nil
+	else
+		for dwTarID, _ in pairs(CTM_ATTENTION_CACHE) do
+			if CTM_CACHE[dwTarID] and CTM_CACHE[dwTarID]:IsValid() then
+				CTM_CACHE[dwTarID]:Lookup("Shadow_Attention"):Hide()
+			end
 		end
 	end
 	-- Output(CTM_ATTENTION_CACHE)
 end
 
 function CTM:RefreshCaution()
-	local team, me = GetClientTeam(), GetClientPlayer()
-	local tCheck = {}
-	for _, dwTarID in ipairs(team.GetTeamMemberList()) do
-		local p = GetPlayer(dwTarID)
-		if CTM_CACHE[dwTarID] and CTM_CACHE[dwTarID]:IsValid() then
-			CTM_CACHE[dwTarID]:Lookup("Handle_Caution"):SetVisible(p and not empty(CTM_CAUTION_CACHE[dwTarID]))
+	if CFG.bShowCaution then
+		local team, me = GetClientTeam(), GetClientPlayer()
+		local tCheck = {}
+		for _, dwTarID in ipairs(team.GetTeamMemberList()) do
+			local p = GetPlayer(dwTarID)
+			if CTM_CACHE[dwTarID] and CTM_CACHE[dwTarID]:IsValid() then
+				CTM_CACHE[dwTarID]:Lookup("Handle_Caution"):SetVisible(p and not empty(CTM_CAUTION_CACHE[dwTarID]))
+			end
+			tCheck[dwTarID] = true
 		end
-		tCheck[dwTarID] = true
-	end
-	for dwTarID, _ in pairs(CTM_CAUTION_CACHE) do
-		if not tCheck[dwTarID] then
-			CTM_CAUTION_CACHE[dwTarID] = nil
+		for dwTarID, _ in pairs(CTM_CAUTION_CACHE) do
+			if not tCheck[dwTarID] then
+				CTM_CAUTION_CACHE[dwTarID] = nil
+			end
+		end
+	else
+		for dwTarID, _ in pairs(CTM_CAUTION_CACHE) do
+			if CTM_CACHE[dwTarID] and CTM_CACHE[dwTarID]:IsValid() then
+				CTM_CACHE[dwTarID]:Lookup("Handle_Caution"):Hide()
+			end
 		end
 	end
 	-- Output(CTM_CAUTION_CACHE)
