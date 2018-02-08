@@ -1253,10 +1253,18 @@ function CTM:RefreshBuff()
 					end
 				end
 				if nEndFrame then
-					-- check pr
-					if data.nPriority and handle:GetItemCount() == CFG.nMaxShowBuff then
+					-- check priority
+					local nPriority = data.nPriority
+					if not nPriority then
+						if data.bCaution then
+							nPriority = 0
+						elseif data.bAttention then
+							nPriority = 1
+						end
+					end
+					if nPriority and handle:GetItemCount() == CFG.nMaxShowBuff then
 						local item = handle:Lookup(CFG.nMaxShowBuff - 1)
-						if not item.nPriority or data.nPriority < item.nPriority then
+						if not item.nPriority or nPriority < item.nPriority then
 							handle:RemoveItem(item)
 						end
 					end
@@ -1284,7 +1292,7 @@ function CTM:RefreshBuff()
 						end
 						-- ÅÅÐò
 						local fromIndex, toIndex = handle:GetItemCount() - 1
-						if not data.nPriority then
+						if not nPriority then
 							for i = 0, fromIndex - 1 do
 								local item = handle:Lookup(i)
 								if item.nPriority and item.nPriority < 0 then
@@ -1292,10 +1300,10 @@ function CTM:RefreshBuff()
 									break
 								end
 							end
-						elseif data.nPriority >= 0 then
+						elseif nPriority >= 0 then
 							for i = 0, fromIndex - 1 do
 								local item = handle:Lookup(i)
-								if not item.nPriority or item.nPriority < 0 or data.nPriority < item.nPriority then
+								if not item.nPriority or item.nPriority < 0 or nPriority < item.nPriority then
 									toIndex = i
 									break
 								end
@@ -1303,7 +1311,7 @@ function CTM:RefreshBuff()
 						else
 							for i = 0, fromIndex - 1 do
 								local item = handle:Lookup(i)
-								if item.nPriority and item.nPriority < 0 and data.nPriority > item.nPriority then
+								if item.nPriority and item.nPriority < 0 and nPriority > item.nPriority then
 									toIndex = i
 									break
 								end
@@ -1314,7 +1322,7 @@ function CTM:RefreshBuff()
 								handle:ExchangeItemIndex(i, i - 1)
 							end
 						end
-						item.nPriority = data.nPriority
+						item.nPriority = nPriority
 						-- ÎÄ×Ö´óÐ¡
 						local szName, icon = MY.GetBuffName(data.dwID, data.nLevelEx)
 						if data.nIcon and tonumber(data.nIcon) then
