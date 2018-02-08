@@ -1888,7 +1888,7 @@ end
 local PS = {}
 function PS.OnPanelActive(frame)
 	local ui = XGUI(frame)
-	local X, Y = 20, 20
+	local X, Y = 20, 10
 	local x, y = X, Y
 	local w, h = ui:size()
 
@@ -1896,19 +1896,16 @@ function PS.OnPanelActive(frame)
 	y = y + ui:append("Text", { x = x, y = y, text = _L["Buff settings"], font = 27 }, true):autoSize():height()
 
 	x = X + 10
-	x = x + ui:append("Text", { x = x, y = y, text = _L["Max count"]}, true):autoWidth():width() + 5
-	x = x + ui:append("WndSliderBox", {
-		x = x, y = y + 3, rw = 90, text = "",
-		range = {0, 10},
-		value = Cataclysm_Main.nMaxShowBuff,
-		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
-		onchange = function(nVal)
-			Cataclysm_Main.nMaxShowBuff = nVal
+	y = y + 3
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y,
+		text = _L["Follow panel scale"],
+		checked = Cataclysm_Main.bAutoBuffSize,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bAutoBuffSize = bCheck
 			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
-	}, true):autoWidth():width() + 30
-
-	x = x + ui:append("Text", { x = x, y = y, text = _L["Scale"]}, true):autoWidth():width() + 5
+	}, true):autoWidth():width() + 5
 	x = x + ui:append("WndSliderBox", {
 		x = x, y = y + 3, h = 25, rw = 90,
 		enable = not Cataclysm_Main.bAutoBuffSize,
@@ -1922,19 +1919,21 @@ function PS.OnPanelActive(frame)
 		end,
 		textfmt = function(val) return _L("%d%%", val) end,
 	}, true):autoWidth():width() + 10
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y,
-		text = _L["Follow panel scale"],
-		checked = Cataclysm_Main.bAutoBuffSize,
-		oncheck = function(bCheck)
-			Cataclysm_Main.bAutoBuffSize = bCheck
+
+	x = x + ui:append("Text", { x = x, y = y, text = _L["Max count"]}, true):autoWidth():width() + 5
+	x = x + ui:append("WndSliderBox", {
+		x = x, y = y + 3, rw = 90, text = "",
+		range = {0, 10},
+		value = Cataclysm_Main.nMaxShowBuff,
+		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		onchange = function(nVal)
+			Cataclysm_Main.nMaxShowBuff = nVal
 			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
-	}, true):autoWidth():width()
-	y = y + 25
+	}, true):autoWidth():width() + 5
+	y = y + 28
 
 	x = X + 10
-	y = y + 5
 	x = x + ui:append("WndCheckBox", {
 		x = x, y = y, text = _L["Buff Staring"],
 		checked = Cataclysm_Main.bStaring,
@@ -1959,14 +1958,15 @@ function PS.OnPanelActive(frame)
 			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width() + 5
-	y = y + ui:append("WndCheckBox", {
+	x = x + ui:append("WndCheckBox", {
 		x = x, y = y, text = _L["Show Buff Reminder"],
 		checked = Cataclysm_Main.bShowBuffReminder,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowBuffReminder = bCheck
 			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
-	}, true):autoWidth():height()
+	}, true):autoWidth():width() + 5
+	y = y + 28
 
 	x = X + 10
 	x = x + ui:append("WndCheckBox", {
@@ -1998,17 +1998,18 @@ function PS.OnPanelActive(frame)
 		end,
 		autoenable = function() return Cataclysm_Main.bBuffDataNangongbo end,
 	}, true):autoWidth():width() + 5
-	y = y + ui:append("WndButton2", {
+	x = x + ui:append("WndButton2", {
 		x = x, y = y, w = 200,
 		text = _L["Feedback @nangongbo"],
 		onclick = function()
 			XGUI.OpenIE("https://weibo.com/nangongbo")
 		end,
-	}, true):autoHeight():height()
+	}, true):autoHeight():width()
+	y = y + 28
 
 	-- 手动添加BUFF名称
 	x = X
-	y = y + 10
+	y = y + 5
 	y = y + ui:append("Text", { x = x, y = y, text = _L["Manually add (One per line)"], font = 27 }, true):autoSize():height()
 
 	x = x + 10
