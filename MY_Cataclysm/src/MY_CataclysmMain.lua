@@ -427,7 +427,6 @@ function Cataclysm_Main.OnFrameCreate()
 	this:RegisterEvent("TEAM_VOTE_RESPOND")
 	-- this:RegisterEvent("TEAM_INCOMEMONEY_CHANGE_NOTIFY")
 	this:RegisterEvent("SYS_MSG")
-	this:RegisterEvent("MY_KUNGFU_SWITCH")
 	this:RegisterEvent("MY_RAID_REC_BUFF")
 	this:RegisterEvent("MY_CAMP_COLOR_UPDATE")
 	this:RegisterEvent("MY_FORCE_COLOR_UPDATE")
@@ -478,8 +477,12 @@ function Cataclysm_Main.OnEvent(szEvent)
 	if szEvent == "RENDER_FRAME_UPDATE" then
 		Grid_CTM:CallDrawHPMP(true)
 	elseif szEvent == "SYS_MSG" then
+		if arg0 == "UI_OME_SKILL_CAST_LOG" and arg2 == 13165 then
+			Grid_CTM:KungFuSwitch(arg1)
+		end
 		if Cataclysm_Main.bShowEffect then
-			if arg0 == "UI_OME_SKILL_EFFECT_LOG" and arg5 == 6252 and arg1 == UI_GetClientPlayerID() and arg9[SKILL_RESULT_TYPE.THERAPY] then
+			if arg0 == "UI_OME_SKILL_EFFECT_LOG" and arg5 == 6252
+			and arg1 == UI_GetClientPlayerID() and arg9[SKILL_RESULT_TYPE.THERAPY] then
 				Grid_CTM:CallEffect(arg2, 500)
 			end
 		end
@@ -583,8 +586,6 @@ function Cataclysm_Main.OnEvent(szEvent)
 		CreateControlBar()
 	elseif szEvent == "PARTY_ROLL_QUALITY_CHANGED" then
 		CreateControlBar()
-	elseif szEvent == "MY_KUNGFU_SWITCH" then
-		Grid_CTM:KungFuSwitch(arg0)
 	elseif szEvent == "TARGET_CHANGE" then
 		-- oldid£¬ oldtype, newid, newtype
 		Grid_CTM:RefreshTarget(arg0, arg1, arg2, arg3)

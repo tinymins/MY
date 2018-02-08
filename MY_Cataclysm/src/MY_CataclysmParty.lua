@@ -909,18 +909,19 @@ function CTM:KungFuSwitch(dwID)
 			local img = handle:Lookup("Image_Icon")
 			MY.BreatheCall(key, function()
 				local player = GetPlayer(dwID)
-				if img and img:IsValid() and player and player.GetSkillPrepareState() then
-					local bIsPrepare, dwSkillID, dwSkillLevel, nPer = player.GetSkillPrepareState()
-					local alpha = 255 * (math.abs(math.mod(nPer * 300, 32) - 7) + 4) / 12
-					if alpha <= 255 then
-						img:SetAlpha(alpha)
-					end
-				else
-					if img and img:IsValid() then
+				if player and img and img:IsValid() then
+					local nType, dwSkillID, dwSkillLevel, fCastPercent = player.GetSkillOTActionState()
+					if nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE then
+						local alpha = 255 * (math.abs(math.mod(fCastPercent * 300, 32) - 7) + 4) / 12
+						if alpha <= 255 then
+							img:SetAlpha(alpha)
+						end
+						return
+					else
 						img:SetAlpha(255)
 					end
-					MY.BreatheCall(key, false)
 				end
+				MY.BreatheCall(key, false)
 			end)
 		end
 	end
