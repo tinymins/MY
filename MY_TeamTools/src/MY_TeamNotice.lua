@@ -201,8 +201,9 @@ MY.RegisterBgMsg("TI", function(_, nChannel, dwID, szName, bIsSelf, ...)
 	end
 end)
 
-MY.RegisterAddonMenu(function()
-	return {
+do
+local function GetMenu()
+	return {{
 		szOption = _L["Team Message"],
 		fnDisable = function()
 			local me = GetClientPlayer()
@@ -220,5 +221,14 @@ MY.RegisterAddonMenu(function()
 				end
 			end
 		end
-	}
-end)
+	}}
+end
+MY.RegisterAddonMenu(GetMenu)
+
+local function GetMenuTB()
+	local menu = GetMenu()
+	menu[1].szOption = _L["Team Small Message"]
+	return menu
+end
+TraceButton_AppendAddonMenu({ GetMenuTB })
+end

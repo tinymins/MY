@@ -58,6 +58,7 @@ data = {
 
 	["Edit team info?"] = "是否填写团队小告示（团员进组可看到）",
 	["Team Message"] = "团队告示",
+	["Team Small Message"] = "团队小告示",
 	["Asking..., If no response in longtime, team leader not enable plug-in."] = "请求已发出，如果没有响应可能是团长没有开启小告示",
 	["YY:"] = "YY:",
 	["Paste YY"] = "发布YY",
