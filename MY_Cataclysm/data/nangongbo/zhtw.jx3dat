@@ -230,7 +230,6 @@ data = {
 	{dwID = 631, bOnlySelf = true},
 	{dwID = 9933, szReminder = "籠", col = "#AAFF0000"},
 	{dwID = 5693, bOnlySelf = true},
-	{dwID = 6268, bOnlySelf = true},
 	{dwID = 9334, bOnlySelf = true},
 	{dwID = 9544, szReminder = "笑", col = "#00FF0000"},
 	{dwID = 9265, szReminder = "雲", col = "#00FF0000"},
