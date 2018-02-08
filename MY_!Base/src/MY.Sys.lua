@@ -124,7 +124,7 @@ function MY.GetLUADataPath(oFilePath)
 end
 
 -- 保存数据文件
--- MY.SaveLUAData(oFilePath, tData, ePathType, indent, crc)
+-- MY.SaveLUAData(oFilePath, tData, indent, crc)
 -- oFilePath           数据文件路径(1)
 -- tData               要保存的数据
 -- indent              数据文件缩进
@@ -133,12 +133,12 @@ end
 -- (1)： 当路径为绝对路径时(以斜杠开头)不作处理
 --       当路径为相对路径时 相对于插件`MY@DATA`目录
 --       可以传入表{szPath, ePathType}
-function MY.SaveLUAData(oFilePath, tData, indent, crc, nohashlevels)
+function MY.SaveLUAData(oFilePath, tData, indent, crc)
 	local nStartTick = GetTickCount()
 	-- format uri
 	local szFilePath = MY.GetLUADataPath(oFilePath)
 	-- save data
-	local data = SaveLUAData(szFilePath, tData, indent, crc or false, nohashlevels)
+	local data = SaveLUAData(szFilePath, tData, indent, crc or false)
 	-- performance monitor
 	MY.Debug({_L('%s saved during %dms.', szFilePath, GetTickCount() - nStartTick)}, 'PMTool', MY_DEBUG.PMLOG)
 	return data
