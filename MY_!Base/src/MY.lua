@@ -383,8 +383,9 @@ local function OnInit()
 	end
 	INIT_FUNC_LIST = nil
 	-- 加载主窗体
+	local fScale = 1 + math.max(Font.GetOffset() * 0.03, 0)
 	MY.OpenPanel(true, true, true)
-	MY.ResizePanel(780, 540)
+	MY.ResizePanel(780 * fScale, 540 * fScale)
 	MY.ClosePanel(true, false, true)
 	-- 显示欢迎信息
 	MY.Sysmsg({_L("%s, welcome to use mingyi plugins!", GetClientPlayer().szName) .. " v" .. MY.GetVersion() .. ' Build ' .. _BUILD_})
