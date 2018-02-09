@@ -215,7 +215,7 @@ local function ReloadFrame(frame)
 		end
 
 		-- µ¹¼ÆÊ±Ìõ
-		local fontScale = max(0.85, GetScale(config) * 0.95)
+		local fontScale = max(0.8, GetScale(config) * 0.90)
 		if config.ignoreSystemUIScale then
 			fontScale = fontScale / (1 + Font.GetOffset() * 0.07)
 		end
