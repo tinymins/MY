@@ -60,10 +60,22 @@ do
 local function InsertBuffListCache(aBuffList)
 	for _, tab in ipairs(aBuffList) do
 		local id = tab.dwID or tab.szName
-		if not BUFF_LIST[id] then
-			BUFF_LIST[id] = {}
+		if tab.bDelete then
+			if tab.szName then
+				for id, _ in pairs(BUFF_LIST) do
+					if type(id) == "number"
+					and Table_GetBuffName(id, 1) == tab.szName then
+						BUFF_LIST[id] = nil
+					end
+				end
+			end
+			BUFF_LIST[id] = nil
+		else
+			if not BUFF_LIST[id] then
+				BUFF_LIST[id] = {}
+			end
+			insert(BUFF_LIST[id], 1, tab)
 		end
-		insert(BUFF_LIST[id], tab)
 	end
 end
 function UpdateBuffListCache()
@@ -1837,6 +1849,9 @@ local function GetListText(aBuffList)
 		if v.bCaution then
 			insert(a, "!!!")
 		end
+		if v.bDelete then
+			insert(a, "-")
+		end
 		insert(aName, (concat(a, ",")))
 	end
 	return concat(aName, "\n")
@@ -1879,6 +1894,8 @@ local function GetTextList(szText)
 					tab.bAttention = true
 				elseif val == "!!!" then
 					tab.bCaution = true
+				elseif val == "-" then
+					tab.bDelete = true
 				elseif val:sub(1, 1) == "#" then
 					tab.nPriority = tonumber((val:sub(2)))
 				elseif val:sub(1, 1) == "[" and val:sub(-1, -1) == "]" then
