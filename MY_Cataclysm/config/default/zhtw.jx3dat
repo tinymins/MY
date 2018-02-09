@@ -42,6 +42,7 @@ data = {
 	bShowBuffTime          = true,
 	bShowBuffNum           = true,
 	bShowBuffReminder      = true,
+	bBuffDataOfficial      = true,
 	bBuffDataNangongbo     = true,
 	bBuffDataNangongboCmd  = false,
 	bBuffDataNangongboHeal = false,

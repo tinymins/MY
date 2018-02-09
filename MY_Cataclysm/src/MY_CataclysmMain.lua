@@ -25,6 +25,7 @@ local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/lang/")
 local Station, UI_GetClientPlayerID, Table_BuffIsVisible = Station, UI_GetClientPlayerID, Table_BuffIsVisible
 local GetBuffName = MY.GetBuffName
 
+local CTM_BUFF_OFFICIAL = {}
 local INI_ROOT = MY.GetAddonInfo().szRoot .. "MY_Cataclysm/ui/"
 local CTM_CONFIG = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/config/default/$lang.jx3dat")
 local CTM_BUFF_NGB_BASE = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/data/nangongbo/base/$lang.jx3dat") or {}
@@ -57,6 +58,20 @@ RegisterCustomData("MY_Cataclysm.szConfigName")
 
 local UpdateBuffListCache
 do
+local _Raid_MonitorBuffs = Raid_MonitorBuffs
+function Raid_MonitorBuffs(tBuffs, ...)
+	CTM_BUFF_OFFICIAL = {}
+	if tBuffs then
+		for _, dwID in pairs(tBuffs) do
+			insert(CTM_BUFF_OFFICIAL, { dwID = dwID })
+		end
+	end
+	if Cataclysm_Main.bBuffDataOfficial then
+		UpdateBuffListCache()
+	end
+	_Raid_MonitorBuffs(tBuffs, ...)
+end
+
 local function InsertBuffListCache(aBuffList)
 	for _, tab in ipairs(aBuffList) do
 		local id = tab.dwID or tab.szName
@@ -80,6 +95,9 @@ local function InsertBuffListCache(aBuffList)
 end
 function UpdateBuffListCache()
 	BUFF_LIST = {}
+	if Cataclysm_Main.bBuffDataOfficial then
+		InsertBuffListCache(CTM_BUFF_OFFICIAL)
+	end
 	if Cataclysm_Main.bBuffDataNangongbo then
 		InsertBuffListCache(CTM_BUFF_NGB_BASE)
 		if Cataclysm_Main.bBuffDataNangongboCmd then
@@ -1968,6 +1986,14 @@ function PS.OnPanelActive(frame)
 	y = y + 28
 
 	x = X + 10
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y, text = _L["Show Official Buff"],
+		checked = Cataclysm_Main.bBuffDataOfficial,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bBuffDataOfficial = bCheck
+			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
+		end,
+	}, true):autoWidth():width() + 5
 	x = x + ui:append("WndCheckBox", {
 		x = x, y = y, text = _L["Buff Staring"],
 		checked = Cataclysm_Main.bStaring,
