@@ -361,18 +361,24 @@ function CTM_Party_Base.OnItemLButtonDragEnd()
 end
 
 function CTM_Party_Base.OnItemLButtonDown()
-	if not this.dwID then return end
+	if not this.dwID then
+		return
+	end
 	local info = CTM:GetMemberInfo(this.dwID)
 	if IsCtrlKeyDown() then
 		EditBox_AppendLinkPlayer(info.szName)
-	elseif info.bIsOnLine and GetPlayer(this.dwID) then -- 有待考证
+	else
 		if CFG.bTempTargetEnable then
 			MY.DelayCall("MY_Cataclysm_TempTarget", false)
 			CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = nil
 		end
 		if MY.IsInPubg() and GetClientPlayer().nMoveState == MOVE_STATE.ON_DEATH then
 			BattleField_MatchPlayer(this.dwID)
-		else
+		elseif info.bIsOnLine and GetPlayer(this.dwID) then -- 有待考证
+			if CFG.bTempTargetEnable then
+				MY.DelayCall("MY_Cataclysm_TempTarget", false)
+				CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = nil
+			end
 			SetTarget(TARGET.PLAYER, this.dwID)
 		end
 	end
