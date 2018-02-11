@@ -508,6 +508,7 @@ local function RecBuffWithTabs(tabs, dwOwnerID, dwBuffID, dwSrcID)
 			Grid_CTM:RecBuff(dwOwnerID, setmetatable({
 				dwID      = dwBuffID,
 				nLevel    = tab.nLevel or 0,
+				bOnlySelf = tab.bOnlySelf or tab.bSelf,
 			}, { __index = tab }))
 		end
 	end
@@ -1843,7 +1844,7 @@ local function GetListText(aBuffList)
 		if v.nStackNum and v.szStackOp then
 			insert(a, "sn" .. v.szStackOp .. v.nStackNum)
 		end
-		if v.bOnlySelf then
+		if v.bOnlySelf or v.bSelf then
 			insert(a, "self")
 		end
 		a = { concat(a, "|") }
