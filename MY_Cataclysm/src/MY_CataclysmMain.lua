@@ -1991,6 +1991,7 @@ function PS.OnPanelActive(frame)
 		checked = Cataclysm_Main.bBuffDataOfficial,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bBuffDataOfficial = bCheck
+			UpdateBuffListCache()
 			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width() + 5
