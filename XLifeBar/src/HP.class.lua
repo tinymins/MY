@@ -7,7 +7,7 @@
 -- @Last Modified by:   άψÒΑ @tinymins
 -- @Last Modified time: 2015-05-14 10:27:36
 --------------------------------------------
-local l_handle
+local l_handle, l_hMe
 XLifeBar = XLifeBar or {}
 XLifeBar.HP = class()
 local HP = XLifeBar.HP
@@ -29,6 +29,11 @@ function HP:Create()
 
 	local handle = l_handle:Lookup(tostring(self.dwID))
 	if not handle:Lookup(string.format("hp_bg_%s",self.dwID)) then
+		if self.dwID == UI_GetClientPlayerID() then
+			l_hMe = handle
+		elseif l_hMe then
+			l_handle:ExchangeItemIndex(l_hMe, handle)
+		end
 		handle:AppendItemFromString( string.format("<shadow>name=\"hp_bg_%s\"</shadow>",self.dwID) )
 		handle:AppendItemFromString( string.format("<shadow>name=\"hp_bg2_%s\"</shadow>",self.dwID) )
 		handle:AppendItemFromString( string.format("<shadow>name=\"hp_%s\"</shadow>",self.dwID) )
@@ -45,8 +50,12 @@ end
 
 -- ΙΎ³ύ
 function HP:Remove()
-	if l_handle:Lookup(tostring(self.dwID)) then
-		l_handle:RemoveItem(l_handle:Lookup(tostring(self.dwID)))
+	local hItem = l_handle:Lookup(tostring(self.dwID))
+	if hItem then
+		if hItem == l_hMe then
+			l_hMe = nil
+		end
+		l_handle:RemoveItem(hItem)
 	end
 	return self
 end
