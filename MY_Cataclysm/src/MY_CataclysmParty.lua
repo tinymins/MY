@@ -1719,6 +1719,9 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 		-- ÊýÖµ»æÖÆ
 		local life = h:Lookup("Text_Life")
 		local nFontAlpha = min(nAlpha * 0.4 + 255 * 0.6, 255)
+		if not info.bIsOnLine then
+			nFontAlpha = nFontAlpha * 0.8
+		end
 		life:SetAlpha(nAlpha == 0 and 0 or nFontAlpha)
 		life:SetFontScheme(CFG.nLifeFont)
 		life:SetFontScale(CFG.fLifeFontScale)
