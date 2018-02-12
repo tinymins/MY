@@ -167,6 +167,7 @@ MY_Recount.bAwayMode     = true                 -- 计算DPS时是否减去暂离时间
 MY_Recount.bSysTimeMode  = false                -- 使用官方战斗统计计时方式
 MY_Recount.bShowPerSec   = true                 -- 显示为每秒数据（反之显示总和）
 MY_Recount.bShowEffect   = true                 -- 显示有效伤害/治疗
+MY_Recount.bShowZeroVal  = false                -- 显示零值记录
 MY_Recount.bSaveRecount  = false                -- 退出游戏时保存战斗记录
 MY_Recount.nDisplayMode  = DISPLAY_MODE.BOTH    -- 统计显示模式（显示NPC/玩家数据）（默认混合显示）
 MY_Recount.nPublishMode  = PUBLISH_MODE.EFFECT  -- 发布模式
@@ -618,22 +619,24 @@ function MY_Recount.OnItemRefreshTip()
 				return p1.rec.nTotal > p2.rec.nTotal
 			end)
 			for _, p in ipairs(t) do
-				szXml = szXml .. GetFormatText(p.szName .. "\n", nil, 255, 150, 0)
-				szXml = szXml .. GetFormatText(_L['total: '] .. p.rec.nTotal .. ' ' .. _L['effect: '] .. p.rec.nTotalEffect .. "\n")
-				for _, nSkillResult in ipairs({
-					SKILL_RESULT.HIT     ,
-					SKILL_RESULT.INSIGHT ,
-					SKILL_RESULT.CRITICAL,
-					SKILL_RESULT.MISS    ,
-				}) do
-					local nCount = 0
-					if p.rec.Detail[nSkillResult] then
-						nCount = p.rec.Detail[nSkillResult].nCount
+				if MY_Recount.bShowZeroVal or p.rec.nTotal > 0 then
+					szXml = szXml .. GetFormatText(p.szName .. "\n", nil, 255, 150, 0)
+					szXml = szXml .. GetFormatText(_L['total: '] .. p.rec.nTotal .. ' ' .. _L['effect: '] .. p.rec.nTotalEffect .. "\n")
+					for _, nSkillResult in ipairs({
+						SKILL_RESULT.HIT     ,
+						SKILL_RESULT.INSIGHT ,
+						SKILL_RESULT.CRITICAL,
+						SKILL_RESULT.MISS    ,
+					}) do
+						local nCount = 0
+						if p.rec.Detail[nSkillResult] then
+							nCount = p.rec.Detail[nSkillResult].nCount
+						end
+						szXml = szXml .. GetFormatText(SZ_SKILL_RESULT[nSkillResult] .. szColon, nil, 255, 202, 126)
+						szXml = szXml .. GetFormatText(string.format('%2d', nCount) .. ' ')
 					end
-					szXml = szXml .. GetFormatText(SZ_SKILL_RESULT[nSkillResult] .. szColon, nil, 255, 202, 126)
-					szXml = szXml .. GetFormatText(string.format('%2d', nCount) .. ' ')
+					szXml = szXml .. GetFormatText('\n')
 				end
-				szXml = szXml .. GetFormatText('\n')
 			end
 			if DataDisplay.Awaytime[id] then
 				szXml = szXml .. GetFormatText(_L(
@@ -771,29 +774,33 @@ function MY_Recount_Detail.OnFrameBreathe()
 
 	--------------- 一、技能列表更新 -----------------
 	-- 数据收集
-	local aResult, nTotalEffect = {}, tData.nTotalEffect
+	local aResult, nTotal = {}, MY_Recount.bShowEffect and tData.nTotalEffect or tData.nTotal
 	if szPrimarySort == 'Skill' then
 		for szSkillName, p in pairs(tData.Skill) do
-			table.insert(aResult, {
-				szKey        = szSkillName   ,
-				szName       = szSkillName   ,
-				nCount       = p.nCount      ,
-				nTotalEffect = p.nTotalEffect,
-			})
+			local rec = {
+				szKey  = szSkillName,
+				szName = szSkillName,
+				nCount = p.nCount   ,
+				nTotal = MY_Recount.bShowEffect and p.nTotalEffect or p.nTotal,
+			}
+			if MY_Recount.bShowZeroVal or rec.nTotal > 0 then
+				table.insert(aResult, rec)
+			end
 		end
 	else
 		for id, p in pairs(tData.Target) do
-			table.insert(aResult, {
-				szKey        = id                              ,
-				szName       = MY_Recount.Data.GetNameAusID(id),
-				nCount       = p.nCount                        ,
-				nTotalEffect = p.nTotalEffect                  ,
-			})
+			local rec = {
+				szKey  = id                              ,
+				szName = MY_Recount.Data.GetNameAusID(id),
+				nCount = p.nCount                        ,
+				nTotal = MY_Recount.bShowEffect and p.nTotalEffect or p.nTotal,
+			}
+			if MY_Recount.bShowZeroVal or rec.nTotal > 0 then
+				table.insert(aResult, rec)
+			end
 		end
 	end
-	table.sort(aResult, function(p1, p2)
-		return p1.nTotalEffect > p2.nTotalEffect
-	end)
+	table.sort(aResult, function(p1, p2) return p1.nTotal > p2.nTotal end)
 	-- 默认选中第一个
 	if this.bFirstRendering then
 		if aResult[1] then
@@ -825,8 +832,8 @@ function MY_Recount_Detail.OnFrameBreathe()
 		hItem:Lookup('Text_SkillNo'):SetText(i)
 		hItem:Lookup('Text_SkillName'):SetText((p.szName:gsub("#.*", "")))
 		hItem:Lookup('Text_SkillCount'):SetText(p.nCount)
-		hItem:Lookup('Text_SkillTotal'):SetText(p.nTotalEffect)
-		hItem:Lookup('Text_SkillPercentage'):SetText(nTotalEffect > 0 and _L('%.1f%%', (i == 1 and ceil or floor)(p.nTotalEffect / nTotalEffect * 1000) / 10) or ' - ')
+		hItem:Lookup('Text_SkillTotal'):SetText(p.nTotal)
+		hItem:Lookup('Text_SkillPercentage'):SetText(nTotal > 0 and _L('%.1f%%', (i == 1 and ceil or floor)(p.nTotal / nTotal * 1000) / 10) or ' - ')
 
 		if szPrimarySort == 'Skill' and szSelectedSkill == p.szKey or
 		szPrimarySort == 'Target' and szSelectedTarget == p.szKey then
@@ -846,20 +853,19 @@ function MY_Recount_Detail.OnFrameBreathe()
 		this:Lookup('', 'Handle_Spliter'):Show()
 		--------------- 二、技能释放结果列表更新 -----------------
 		-- 数据收集
-		local aResult, nTotalEffect, nCount = {}, tData[szPrimarySort][szSelected].nTotalEffect, tData[szPrimarySort][szSelected].nCount
+		local aResult, nCount = {}, tData[szPrimarySort][szSelected].nCount
+		local nTotal = tData[szPrimarySort][szSelected][MY_Recount.bShowEffect and "nTotalEffect" or "nTotal"]
 		for nSkillResult, p in pairs(tData[szPrimarySort][szSelected].Detail) do
 			table.insert(aResult, {
-				nCount     = p.nCount    ,
-				nMinEffect = p.nMinEffect,
-				nAvgEffect = p.nAvgEffect,
-				nMaxEffect = p.nMaxEffect,
-				nTotalEffect = p.nTotalEffect,
+				nCount = p.nCount,
+				nMin   = MY_Recount.bShowEffect and p.nMinEffect or p.nMin,
+				nAvg   = MY_Recount.bShowEffect and p.nAvgEffect or p.nAvg,
+				nMax   = MY_Recount.bShowEffect and p.nMaxEffect or p.nMax,
+				nTotal = MY_Recount.bShowEffect and p.nTotalEffect or p.nTotal,
 				szSkillResult = SZ_SKILL_RESULT[nSkillResult],
 			})
 		end
-		table.sort(aResult, function(p1, p2)
-			return p1.nAvgEffect > p2.nAvgEffect
-		end)
+		table.sort(aResult, function(p1, p2) return p1.nAvg > p2.nAvg end)
 		-- 界面重绘
 		this:Lookup('WndScroll_Detail'):Show()
 		local hList = this:Lookup('WndScroll_Detail', 'Handle_DetailList')
@@ -887,34 +893,38 @@ function MY_Recount_Detail.OnFrameBreathe()
 
 		--------------- 三、技能释放结果列表更新 -----------------
 		-- 数据收集
-		local aResult, nTotalEffect = {}, tData[szPrimarySort][szSelected].nTotalEffect
+		local aResult, nTotal = {}, tData[szPrimarySort][szSelected][MY_Recount.bShowEffect and "nTotalEffect" or "nTotal"]
 		if szPrimarySort == 'Skill' then
 			for id, p in pairs(tData.Skill[szSelectedSkill].Target) do
-				table.insert(aResult, {
+				local rec = {
 					szKey          = id,
 					nHitCount      = p.Count[SKILL_RESULT.HIT] or 0,
 					nMissCount     = p.Count[SKILL_RESULT.MISS] or 0,
 					nCriticalCount = p.Count[SKILL_RESULT.CRITICAL] or 0,
-					nMaxEffect     = p.nMaxEffect,
-					nTotalEffect   = p.nTotalEffect,
+					nMax           = MY_Recount.bShowEffect and p.nMaxEffect or p.nMax,
+					nTotal         = MY_Recount.bShowEffect and p.nTotalEffect or p.nTotal,
 					szName         = MY_Recount.Data.GetNameAusID(id, DataDisplay),
-				})
+				}
+				if MY_Recount.bShowZeroVal or rec.nTotal > 0 or rec.nMissCount > 0 then
+					table.insert(aResult, rec)
+				end
 			end
 		else
 			for szSkillName, p in pairs(tData.Target[szSelectedTarget].Skill) do
-				table.insert(aResult, {
+				local rec = {
 					nHitCount      = p.Count[SKILL_RESULT.HIT] or 0,
 					nMissCount     = p.Count[SKILL_RESULT.MISS] or 0,
 					nCriticalCount = p.Count[SKILL_RESULT.CRITICAL] or 0,
-					nMaxEffect     = p.nMaxEffect,
-					nTotalEffect   = p.nTotalEffect,
+					nMax           = MY_Recount.bShowEffect and p.nMaxEffect or p.nMax,
+					nTotal         = MY_Recount.bShowEffect and p.nTotalEffect or p.nTotal,
 					szName         = szSkillName,
-				})
+				}
+				if MY_Recount.bShowZeroVal or rec.nTotal > 0 or rec.nMissCount > 0 then
+					table.insert(aResult, rec)
+				end
 			end
 		end
-		table.sort(aResult, function(p1, p2)
-			return p1.nTotalEffect > p2.nTotalEffect
-		end)
+		table.sort(aResult, function(p1, p2) return p1.nTotal > p2.nTotal end)
 		-- 界面重绘
 		this:Lookup('WndScroll_Target'):Show()
 		local hList = this:Lookup('WndScroll_Target', 'Handle_TargetList')
@@ -922,12 +932,12 @@ function MY_Recount_Detail.OnFrameBreathe()
 			local hItem = hList:Lookup(i - 1) or hList:AppendItemFromIni(_C.szIniDetail, 'Handle_TargetItem')
 			hItem:Lookup('Text_TargetNo'):SetText(i)
 			hItem:Lookup('Text_TargetName'):SetText((p.szName:gsub("#.*", "")))
-			hItem:Lookup('Text_TargetTotal'):SetText(p.nTotalEffect)
-			hItem:Lookup('Text_TargetMax'):SetText(p.nMaxEffect)
+			hItem:Lookup('Text_TargetTotal'):SetText(p.nTotal)
+			hItem:Lookup('Text_TargetMax'):SetText(p.nMax)
 			hItem:Lookup('Text_TargetHit'):SetText(p.nHitCount)
 			hItem:Lookup('Text_TargetCritical'):SetText(p.nCriticalCount)
 			hItem:Lookup('Text_TargetMiss'):SetText(p.nMissCount)
-			hItem:Lookup('Text_TargetPercent'):SetText((nTotalEffect > 0 and _L('%.1f%%', (i == 1 and ceil or floor)(p.nTotalEffect / nTotalEffect * 1000) / 10) or ' - '))
+			hItem:Lookup('Text_TargetPercent'):SetText((nTotal > 0 and _L('%.1f%%', (i == 1 and ceil or floor)(p.nTotal / nTotal * 1000) / 10) or ' - '))
 			hItem.szKey = p.szKey
 		end
 		for i = hList:GetItemCount() - 1, #aResult, -1 do
@@ -1125,11 +1135,11 @@ function MY_Recount.GetMenu()
 				return not MY.GetStorage('BoolValues.MY_Recount_Enable')
 			end,
 		}, {
-			szOption = _L['ignore zero value effect'],
+			szOption = _L['show zero value effect'],
 			bCheck = true,
-			bChecked = MY_Recount.Data.bIgnoreZeroEffect,
+			bChecked = MY_Recount.bShowZeroVal,
 			fnAction = function()
-				MY_Recount.Data.bIgnoreZeroEffect = not MY_Recount.Data.bIgnoreZeroEffect
+				MY_Recount.bShowZeroVal = not MY_Recount.bShowZeroVal
 			end,
 			fnDisable = function()
 				return not MY.GetStorage('BoolValues.MY_Recount_Enable')

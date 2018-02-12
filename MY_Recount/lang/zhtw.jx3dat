@@ -29,7 +29,7 @@ data = {
     ['distinct target id with same name'] = '區分同名字的目標',
     ['distinct effect id with same name'] = '區分同名字的記錄',
     ['record anonymous effect'          ] = '顯示沒名字的記錄',
-    ['ignore zero value effect'         ] = '忽略零數值的記錄',
+    ['show zero value effect'           ] = '顯示零數值的記錄',
     ['theme'                            ] = '自定界面風格選擇',
     ['max history'                      ] = '最大曆史記錄設置',
 
