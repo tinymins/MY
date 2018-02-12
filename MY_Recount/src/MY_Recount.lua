@@ -590,7 +590,7 @@ function MY_Recount.OnItemLButtonClick()
 		name = 'Handle_LI_' .. UI_GetClientPlayerID()
 	end
 	if id and name:find("Handle_LI_") == 1 then
-		Wnd.OpenWindow(_C.szIniDetail, "MY_Recount_Detail#" .. id .. "_" .. SZ_CHANNEL_KEY[MY_Recount.nChannel])
+		Wnd.OpenWindow(_C.szIniDetail, "MY_Recount_Detail#" .. id .. "_" .. MY_Recount.nChannel)
 	end
 end
 
@@ -716,13 +716,13 @@ MY_Recount_Detail = class()
 
 function MY_Recount_Detail.OnFrameCreate()
 	local frame = this
-	local id, szChannel = this:GetName():match("^MY_Recount_Detail#([^_]*)_([^_]*)$")
+	local id, nChannel = this:GetName():match("^MY_Recount_Detail#([^_]+)_(%d+)$")
 	frame.id = tonumber(id) or id
-	frame.szChannel = szChannel
+	frame.nChannel = tonumber(nChannel)
 	frame.bFirstRendering = true
-	frame.szPrimarySort = ((MY_Recount.nChannel == CHANNEL.DPS or MY_Recount.nChannel == CHANNEL.HPS) and 'Skill') or 'Target'
-	frame.szSecondarySort = ((MY_Recount.nChannel == CHANNEL.DPS or MY_Recount.nChannel == CHANNEL.HPS) and 'Target') or 'Skill'
-	frame:Lookup('', 'Text_Default'):SetText(MY_Recount.Data.GetNameAusID(id, DataDisplay) .. ' ' .. SZ_CHANNEL[MY_Recount.nChannel])
+	frame.szPrimarySort = ((frame.nChannel == CHANNEL.DPS or frame.nChannel == CHANNEL.HPS) and 'Skill') or 'Target'
+	frame.szSecondarySort = ((frame.nChannel == CHANNEL.DPS or frame.nChannel == CHANNEL.HPS) and 'Target') or 'Skill'
+	frame:Lookup('', 'Text_Default'):SetText(MY_Recount.Data.GetNameAusID(id, DataDisplay) .. ' ' .. SZ_CHANNEL[frame.nChannel])
 	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_5'):SetText(g_tStrings.STR_HIT_NAME)
 	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_6'):SetText(g_tStrings.STR_CS_NAME)
 	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_7'):SetText(g_tStrings.STR_MSG_MISS)
@@ -756,7 +756,7 @@ function MY_Recount_Detail.OnFrameBreathe()
 	this.nLastRedrawFrame = GetLogicFrameCount()
 
 	local id        = this.id
-	local szChannel = this.szChannel
+	local szChannel = SZ_CHANNEL_KEY[this.nChannel]
 	if tonumber(id) then
 		id = tonumber(id)
 	end
@@ -995,14 +995,13 @@ function MY_Recount_Detail.OnItemRButtonClick()
 	if (name == 'Handle_SkillItem' and this:GetRoot().szPrimarySort == 'Target')
 	or (name == 'Handle_TargetItem' and this:GetRoot().szPrimarySort == 'Skill') then
 		local szKey = this.szKey
-		local szChannel = this:GetRoot().szChannel
 		local menu = {}
 		menu.x, menu.y = Cursor.GetPos(true)
 		for _, nChannel in ipairs({ CHANNEL.DPS, CHANNEL.HPS, CHANNEL.BDPS, CHANNEL.BHPS }) do
 			insert(menu, {
 				szOption = SZ_CHANNEL[nChannel],
 				fnAction = function()
-					Wnd.OpenWindow(_C.szIniDetail, "MY_Recount_Detail#" .. szKey .. "_" .. SZ_CHANNEL_KEY[nChannel])
+					Wnd.OpenWindow(_C.szIniDetail, "MY_Recount_Detail#" .. szKey .. "_" .. nChannel)
 				end,
 			})
 		end
@@ -1014,7 +1013,7 @@ function MY_Recount_Detail.OnItemLButtonDBClick()
 	local name = this:GetName()
 	if (name == 'Handle_SkillItem' and this:GetRoot().szPrimarySort == 'Target')
 	or (name == 'Handle_TargetItem' and this:GetRoot().szPrimarySort == 'Skill') then
-		Wnd.OpenWindow(_C.szIniDetail, "MY_Recount_Detail#" .. this.szKey .. "_" .. this:GetRoot().szChannel)
+		Wnd.OpenWindow(_C.szIniDetail, "MY_Recount_Detail#" .. this.szKey .. "_" .. this:GetRoot().nChannel)
 	end
 end
 
