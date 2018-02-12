@@ -541,25 +541,25 @@ local function GenerateList()
 	local VERSION = select(2, GetVersion())
 	local CACHE_PATH = 'cache/bosslist/' .. VERSION .. '.jx3dat'
 	BOSS_LIST = MY.LoadLUAData({CACHE_PATH, MY_DATA_PATH.GLOBAL})
-	if BOSS_LIST then
-		return
-	end
-
-	BOSS_LIST = {}
-	local nCount = g_tTable.DungeonBoss:GetRowCount()
-	for i = 2, nCount do
-		local tLine = g_tTable.DungeonBoss:GetRow(i)
-		local dwMapID = tLine.dwMapID
-		local szNpcList = tLine.szNpcList
-		for szNpcIndex in string.gmatch(szNpcList, "(%d+)") do
-			local p = g_tTable.DungeonNpc:Search(tonumber(szNpcIndex))
-			if p then
-				if not BOSS_LIST[dwMapID] then
-					BOSS_LIST[dwMapID] = {}
+	if not BOSS_LIST then
+		BOSS_LIST = {}
+		local nCount = g_tTable.DungeonBoss:GetRowCount()
+		for i = 2, nCount do
+			local tLine = g_tTable.DungeonBoss:GetRow(i)
+			local dwMapID = tLine.dwMapID
+			local szNpcList = tLine.szNpcList
+			for szNpcIndex in string.gmatch(szNpcList, "(%d+)") do
+				local p = g_tTable.DungeonNpc:Search(tonumber(szNpcIndex))
+				if p then
+					if not BOSS_LIST[dwMapID] then
+						BOSS_LIST[dwMapID] = {}
+					end
+					BOSS_LIST[dwMapID][p.dwNpcID] = p.szName
 				end
-				BOSS_LIST[dwMapID][p.dwNpcID] = p.szName
 			end
 		end
+		MY.SaveLUAData({CACHE_PATH, MY_DATA_PATH.GLOBAL}, BOSS_LIST)
+		MY.Sysmsg({_L('Boss list updated to v%s.', VERSION)})
 	end
 
 	for dwMapID, tInfo in pairs(MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. "data/bosslist/$lang.jx3dat") or {}) do
@@ -573,8 +573,6 @@ local function GenerateList()
 			BOSS_LIST[dwMapID][dwNpcID] = nil
 		end
 	end
-	MY.SaveLUAData({CACHE_PATH, MY_DATA_PATH.GLOBAL}, BOSS_LIST)
-	MY.Sysmsg({_L('Boss list updated to v%s.', VERSION)})
 end
 
 -- 获取指定地图指定模板ID的NPC是不是BOSS
@@ -658,10 +656,11 @@ local function GenerateList()
 	local VERSION = select(2, GetVersion())
 	local CACHE_PATH = 'cache/inpclist/' .. VERSION .. '.jx3dat'
 	INPC_LIST = MY.LoadLUAData({CACHE_PATH, MY_DATA_PATH.GLOBAL})
-	if INPC_LIST then
-		return
+	if not INPC_LIST then
+		INPC_LIST = {}
+		MY.SaveLUAData({CACHE_PATH, MY_DATA_PATH.GLOBAL}, INPC_LIST)
+		MY.Sysmsg({_L('Important Npc list updated to v%s.', VERSION)})
 	end
-	INPC_LIST = {}
 	for dwMapID, tInfo in pairs(MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. "data/inpclist/$lang.jx3dat") or {}) do
 		if not INPC_LIST[dwMapID] then
 			INPC_LIST[dwMapID] = {}
@@ -673,8 +672,6 @@ local function GenerateList()
 			INPC_LIST[dwMapID][dwNpcID] = nil
 		end
 	end
-	MY.SaveLUAData({CACHE_PATH, MY_DATA_PATH.GLOBAL}, INPC_LIST)
-	MY.Sysmsg({_L('Important Npc list updated to v%s.', VERSION)})
 end
 
 -- 获取指定地图指定模板ID的NPC是不是重要NPC
