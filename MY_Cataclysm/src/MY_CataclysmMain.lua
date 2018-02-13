@@ -1952,7 +1952,7 @@ function PS.OnPanelActive(frame)
 	y = y + 3
 	x = x + ui:append("WndCheckBox", {
 		x = x, y = y,
-		text = _L["Follow panel scale"],
+		text = _L["Auto scale"],
 		checked = Cataclysm_Main.bAutoBuffSize,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bAutoBuffSize = bCheck

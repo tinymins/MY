@@ -1368,6 +1368,7 @@ function CTM:RefreshBuff()
 							if CFG.fScaleY > 1 then
 								fScale = CFG.fScaleY
 							end
+							fScale = fScale * 0.8 -- INI画大了不好调 这里调整下吧
 						else
 							fScale = CFG.fBuffScale
 						end
