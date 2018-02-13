@@ -533,15 +533,15 @@ end
 local function SaveCustomList()
 	MY.SaveLUAData({'config/bosslist.jx3dat', MY_DATA_PATH.GLOBAL}, BOSS_LIST_CUSTOM, IsDebugClient() and "\t" or nil)
 end
-local function GenerateList()
+local function GenerateList(bForceRefresh)
 	LoadCustomList()
-	if BOSS_LIST then
+	if BOSS_LIST and not bForceRefresh then
 		return
 	end
 	local VERSION = select(2, GetVersion())
 	local CACHE_PATH = 'cache/bosslist/' .. VERSION .. '.jx3dat'
 	BOSS_LIST = MY.LoadLUAData({CACHE_PATH, MY_DATA_PATH.GLOBAL})
-	if not BOSS_LIST then
+	if bForceRefresh or not BOSS_LIST then
 		BOSS_LIST = {}
 		local nCount = g_tTable.DungeonBoss:GetRowCount()
 		for i = 2, nCount do
@@ -600,6 +600,7 @@ MY.RegisterTargetAddonMenu("MY.Game.Bosslist", function()
 			return {
 				szOption = _L['Remove from Boss list'],
 				fnAction = function()
+					GenerateList(true)
 					if not BOSS_LIST_CUSTOM[dwMapID] then
 						BOSS_LIST_CUSTOM[dwMapID] = {
 							NAME = szMapName,
@@ -620,6 +621,7 @@ MY.RegisterTargetAddonMenu("MY.Game.Bosslist", function()
 			return {
 				szOption = _L['Add to Boss list'],
 				fnAction = function()
+					GenerateList(true)
 					if not BOSS_LIST_CUSTOM[dwMapID] then
 						BOSS_LIST_CUSTOM[dwMapID] = {
 							NAME = szMapName,
@@ -648,15 +650,15 @@ end
 local function SaveCustomList()
 	MY.SaveLUAData({'config/inpclist.jx3dat', MY_DATA_PATH.GLOBAL}, INPC_LIST_CUSTOM, IsDebugClient() and "\t" or nil)
 end
-local function GenerateList()
+local function GenerateList(bForceRefresh)
 	LoadCustomList()
-	if INPC_LIST then
+	if INPC_LIST and not bForceRefresh then
 		return
 	end
 	local VERSION = select(2, GetVersion())
 	local CACHE_PATH = 'cache/inpclist/' .. VERSION .. '.jx3dat'
 	INPC_LIST = MY.LoadLUAData({CACHE_PATH, MY_DATA_PATH.GLOBAL})
-	if not INPC_LIST then
+	if bForceRefresh or not INPC_LIST then
 		INPC_LIST = {}
 		MY.SaveLUAData({CACHE_PATH, MY_DATA_PATH.GLOBAL}, INPC_LIST)
 		MY.Sysmsg({_L('Important Npc list updated to v%s.', VERSION)})
@@ -699,6 +701,7 @@ MY.RegisterTargetAddonMenu("MY.Game.ImportantNpclist", function()
 			return {
 				szOption = _L['Remove from important npc list'],
 				fnAction = function()
+					GenerateList(true)
 					if not INPC_LIST_CUSTOM[dwMapID] then
 						INPC_LIST_CUSTOM[dwMapID] = {
 							NAME = szMapName,
@@ -718,6 +721,7 @@ MY.RegisterTargetAddonMenu("MY.Game.ImportantNpclist", function()
 			return {
 				szOption = _L['Add to important npc list'],
 				fnAction = function()
+					GenerateList(true)
 					if not INPC_LIST_CUSTOM[dwMapID] then
 						INPC_LIST_CUSTOM[dwMapID] = {
 							NAME = szMapName,
