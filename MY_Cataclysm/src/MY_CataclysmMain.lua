@@ -844,6 +844,58 @@ function PS.OnPanelActive(frame)
 	local X, Y = 20, 20
 	local x, y = X, Y
 
+	x = X
+	y = y + ui:append("Text", { x = x, y = y, text = _L["configure"], font = 27 }, true):height()
+
+	x = x + 10
+	x = x + ui:append("Text", { x = x, y = y, text = _L["Configuration name"] }, true):autoWidth():width() + 5
+
+	x = x + ui:append("WndEditBox", {
+		x = x, y = y + 4, w = 200, h = 25,
+		text = MY_Cataclysm.szConfigName,
+		onchange = function(txt)
+			SetConfigureName(txt)
+		end,
+		onblur = function()
+			CheckEnableTeamPanel()
+			MY.SwitchTab("MY_Cataclysm", true)
+		end,
+	}, true):width() + 5
+
+	-- 恢复默认
+	y = y + ui:append("WndButton2", {
+		x = x, y = y, text = _L["Restore default"],
+		onclick = function()
+			MessageBox({
+				szName = "MY_Cataclysm Restore default",
+				szAlignment = "CENTER",
+				szMessage = _L["Sure to restore default?"],
+				{
+					szOption = _L["Restore official"],
+					fnAction = function()
+						local Config = clone(CTM_CONFIG)
+						Config.aBuffList = CTM_CONFIG_PLAYER.aBuffList
+						SetConfig(Config)
+						CheckEnableTeamPanel()
+						MY.SwitchTab("MY_Cataclysm", true)
+					end,
+				},
+				{
+					szOption = _L["Restore cataclysm"],
+					fnAction = function()
+						local Config = clone(CTM_CONFIG_CATACLYSM)
+						Config.aBuffList = CTM_CONFIG_PLAYER.aBuffList
+						SetConfig(Config)
+						CheckEnableTeamPanel()
+						MY.SwitchTab("MY_Cataclysm", true)
+					end,
+				},
+				{ szOption = g_tStrings.STR_HOTKEY_CANCEL },
+			})
+		end,
+	}, true):height() + 20
+
+	x = X
 	y = y + ui:append("Text", { x = x, y = y, text = _L["Cataclysm Team Panel"], font = 27 }, true):autoWidth():height()
 
 	x = x + 10
@@ -949,6 +1001,82 @@ function PS.OnPanelActive(frame)
 		}, true):autoWidth():width() + 5
 	end
 	y = y + 25
+
+	-- 其他
+	x = X
+	y = y + ui:append("Text", { x = x, y = y, text = g_tStrings.OTHER, font = 27 }, true):height()
+
+	x = X + 10
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y, text = _L["Don't show Tip in fight"],
+		checked = Cataclysm_Main.bTempTargetFightTip,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bTempTargetFightTip = bCheck
+		end,
+	}, true):autoWidth():width() + 5
+
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y, text = g_tStrings.STR_RAID_TARGET_ASSIST,
+		checked = Cataclysm_Main.bTempTargetEnable,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bTempTargetEnable = bCheck
+		end,
+	}, true):autoWidth():width() + 5
+
+	x = x + ui:append("WndSliderBox", {
+		x = x, y = y - 1,
+		value = Cataclysm_Main.nTempTargetDelay / 75,
+		range = {0, 8},
+		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		onchange = function(val)
+			Cataclysm_Main.nTempTargetDelay = val * 75
+		end,
+		textfmt = function(val)
+			return val == 0
+				and _L['Target assist no delay.']
+				or _L("Target assist delay %dms.", val * 75)
+		end,
+	}):autoWidth():width()
+
+	y = y + 25
+	-- y = y + ui:append("WndCheckBox", { x = 10, y = nY, text = _L["Faster Refresh HP(Greater performance loss)"], checked = Cataclysm_Main.bFasterHP, enable = false })
+	-- :Click(function(bCheck)
+	-- 	Cataclysm_Main.bFasterHP = bCheck
+	-- 	if GetFrame() then
+	-- 		if bCheck then
+	-- 			GetFrame():RegisterEvent("RENDER_FRAME_UPDATE")
+	-- 		else
+	-- 			GetFrame():UnRegisterEvent("RENDER_FRAME_UPDATE")
+	-- 		end
+	-- 	end
+	-- end, true):Pos_()
+end
+MY.RegisterPanel("MY_Cataclysm", _L["Cataclysm"], _L["Raid"], "ui/Image/UICommon/RaidTotal.uitex|62", {255, 255, 0}, PS)
+end
+
+do
+local PS = {}
+function PS.OnPanelActive(frame)
+	local ui = XGUI(frame)
+	local X, Y = 20, 20
+	local x, y = X, Y
+
+	y = y + ui:append("Text", { x = x, y = y, text = _L["Grid Style"], font = 27 }, true):height()
+
+	y = y + 5
+
+	x = X + 10
+	y = y + ui:append("WndCheckBox", {
+		x = x, y = y, text = _L["Show AllGrid"],
+		checked = Cataclysm_Main.bShowAllGrid,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bShowAllGrid = bCheck
+			ReloadCataclysmPanel()
+		end,
+	}, true):autoWidth():height() + 5
+
+	x = X
+	y = y + 10
 
 	-- 名字、图标、内力和血量显示方案
 	x = X
@@ -1215,108 +1343,8 @@ function PS.OnPanelActive(frame)
 			end
 		end,
 	}, true):height()
-
-	-- 其他
-	x = X
-	y = y + ui:append("Text", { x = x, y = y, text = g_tStrings.OTHER, font = 27 }, true):height()
-
-	x = X + 10
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Don't show Tip in fight"],
-		checked = Cataclysm_Main.bTempTargetFightTip,
-		oncheck = function(bCheck)
-			Cataclysm_Main.bTempTargetFightTip = bCheck
-		end,
-	}, true):autoWidth():width() + 5
-
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = g_tStrings.STR_RAID_TARGET_ASSIST,
-		checked = Cataclysm_Main.bTempTargetEnable,
-		oncheck = function(bCheck)
-			Cataclysm_Main.bTempTargetEnable = bCheck
-		end,
-	}, true):autoWidth():width() + 5
-
-	x = x + ui:append("WndSliderBox", {
-		x = x, y = y - 1,
-		value = Cataclysm_Main.nTempTargetDelay / 75,
-		range = {0, 8},
-		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
-		onchange = function(val)
-			Cataclysm_Main.nTempTargetDelay = val * 75
-		end,
-		textfmt = function(val)
-			return val == 0
-				and _L['Target assist no delay.']
-				or _L("Target assist delay %dms.", val * 75)
-		end,
-	}):autoWidth():width()
-
-	y = y + 25
-	-- y = y + ui:append("WndCheckBox", { x = 10, y = nY, text = _L["Faster Refresh HP(Greater performance loss)"], checked = Cataclysm_Main.bFasterHP, enable = false })
-	-- :Click(function(bCheck)
-	-- 	Cataclysm_Main.bFasterHP = bCheck
-	-- 	if GetFrame() then
-	-- 		if bCheck then
-	-- 			GetFrame():RegisterEvent("RENDER_FRAME_UPDATE")
-	-- 		else
-	-- 			GetFrame():UnRegisterEvent("RENDER_FRAME_UPDATE")
-	-- 		end
-	-- 	end
-	-- end, true):Pos_()
-
-	x = X
-	y = y + ui:append("Text", { x = x, y = y, text = _L["configure"], font = 27 }, true):height()
-
-	x = x + 10
-	x = x + ui:append("Text", { x = x, y = y, text = _L["Configuration name"] }, true):autoWidth():width() + 5
-
-	x = x + ui:append("WndEditBox", {
-		x = x, y = y + 4, w = 200, h = 25,
-		text = MY_Cataclysm.szConfigName,
-		onchange = function(txt)
-			SetConfigureName(txt)
-		end,
-		onblur = function()
-			CheckEnableTeamPanel()
-			MY.SwitchTab("MY_Cataclysm", true)
-		end,
-	}, true):width() + 5
-
-	-- 恢复默认
-	y = y + ui:append("WndButton2", {
-		x = x, y = y, text = _L["Restore default"],
-		onclick = function()
-			MessageBox({
-				szName = "MY_Cataclysm Restore default",
-				szAlignment = "CENTER",
-				szMessage = _L["Sure to restore default?"],
-				{
-					szOption = _L["Restore official"],
-					fnAction = function()
-						local Config = clone(CTM_CONFIG)
-						Config.aBuffList = CTM_CONFIG_PLAYER.aBuffList
-						SetConfig(Config)
-						CheckEnableTeamPanel()
-						MY.SwitchTab("MY_Cataclysm", true)
-					end,
-				},
-				{
-					szOption = _L["Restore cataclysm"],
-					fnAction = function()
-						local Config = clone(CTM_CONFIG_CATACLYSM)
-						Config.aBuffList = CTM_CONFIG_PLAYER.aBuffList
-						SetConfig(Config)
-						CheckEnableTeamPanel()
-						MY.SwitchTab("MY_Cataclysm", true)
-					end,
-				},
-				{ szOption = g_tStrings.STR_HOTKEY_CANCEL },
-			})
-		end,
-	}, true):height()
 end
-MY.RegisterPanel("MY_Cataclysm", _L["Cataclysm"], _L["Raid"], "ui/Image/UICommon/RaidTotal.uitex|62", {255, 255, 0}, PS)
+MY.RegisterPanel("MY_Cataclysm_GridStyle", _L["Grid Style"], _L["Raid"], "ui/Image/UICommon/RaidTotal.uitex|68", {255, 255, 0}, PS)
 end
 
 do
@@ -1326,22 +1354,6 @@ function PS.OnPanelActive(frame)
 	local X, Y = 20, 20
 	local x, y = X, Y
 
-	y = y + ui:append("Text", { x = x, y = y, text = _L["Grid Style"], font = 27 }, true):height()
-
-	y = y + 5
-
-	x = X + 10
-	y = y + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Show AllGrid"],
-		checked = Cataclysm_Main.bShowAllGrid,
-		oncheck = function(bCheck)
-			Cataclysm_Main.bShowAllGrid = bCheck
-			ReloadCataclysmPanel()
-		end,
-	}, true):autoWidth():height() + 5
-
-	x = X
-	y = y + 10
 	y = y + ui:append("Text", { x = x, y = y, text = g_tStrings.BACK_COLOR, font = 27 }, true):height()
 
 	x = x + 10
@@ -1357,7 +1369,7 @@ function PS.OnPanelActive(frame)
 			if GetFrame() then
 				Grid_CTM:CallDrawHPMP(true, true)
 			end
-			MY.SwitchTab("MY_Cataclysm_GridStyle", true)
+			MY.SwitchTab("MY_Cataclysm_GridColor", true)
 		end,
 	}, true):autoWidth():width()
 
@@ -1372,7 +1384,7 @@ function PS.OnPanelActive(frame)
 			if GetFrame() then
 				Grid_CTM:CallDrawHPMP(true, true)
 			end
-			MY.SwitchTab("MY_Cataclysm_GridStyle", true)
+			MY.SwitchTab("MY_Cataclysm_GridColor", true)
 		end,
 	}, true):autoWidth():width() + 5
 
@@ -1387,7 +1399,7 @@ function PS.OnPanelActive(frame)
 			if GetFrame() then
 				Grid_CTM:CallDrawHPMP(true, true)
 			end
-			MY.SwitchTab("MY_Cataclysm_GridStyle", true)
+			MY.SwitchTab("MY_Cataclysm_GridColor", true)
 		end,
 	}, true):autoWidth():width() + 5
 
@@ -1402,7 +1414,7 @@ function PS.OnPanelActive(frame)
 			if GetFrame() then
 				Grid_CTM:CallDrawHPMP(true, true)
 			end
-			MY.SwitchTab("MY_Cataclysm_GridStyle", true)
+			MY.SwitchTab("MY_Cataclysm_GridColor", true)
 		end,
 	}, true):autoWidth():width() + 5
 
@@ -1414,7 +1426,7 @@ function PS.OnPanelActive(frame)
 			if GetFrame() then
 				Grid_CTM:CallDrawHPMP(true, true)
 			end
-			MY.SwitchTab("MY_Cataclysm_GridStyle", true)
+			MY.SwitchTab("MY_Cataclysm_GridColor", true)
 		end,
 	}, true):autoWidth():height() + 5
 
@@ -1444,7 +1456,7 @@ function PS.OnPanelActive(frame)
 							table.insert(Cataclysm_Main.tDistanceCol, tDistanceCol[i] or { 255, 255, 255 })
 							table.insert(Cataclysm_Main.tDistanceAlpha, tDistanceAlpha[i] or 255)
 						end
-						MY.SwitchTab("MY_Cataclysm_GridStyle", true)
+						MY.SwitchTab("MY_Cataclysm_GridColor", true)
 					end
 				end)
 			end,
@@ -1642,7 +1654,7 @@ function PS.OnPanelActive(frame)
 		}, true):autoWidth():width() + 5
 	end
 end
-MY.RegisterPanel("MY_Cataclysm_GridStyle", _L["Grid Style"], _L["Raid"], "ui/Image/UICommon/RaidTotal.uitex|68", {255, 255, 0}, PS)
+MY.RegisterPanel("MY_Cataclysm_GridColor", _L["Grid Color"], _L["Raid"], "ui/Image/UICommon/RaidTotal.uitex|71", {255, 255, 0}, PS)
 end
 
 do
@@ -1828,7 +1840,7 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():height() + 3
 end
-MY.RegisterPanel("MY_Cataclysm_InterfaceSettings", _L["Interface settings"], _L["Raid"], "ui/Image/UICommon/RaidTotal.uitex|71", {255, 255, 0}, PS)
+MY.RegisterPanel("MY_Cataclysm_InterfaceSettings", _L["Interface settings"], _L["Raid"], "ui/Image/UICommon/RaidTotal.uitex|74", {255, 255, 0}, PS)
 end
 
 do
@@ -2095,7 +2107,7 @@ function PS.OnPanelActive(frame)
 	y = y + 5
 	ui:append("Text", { x = x, y = y, w = w - x - X, text = _L["Cataclysm_TIPS"], multiline = true }, true):autoHeight()
 end
-MY.RegisterPanel("MY_Cataclysm_BuffSettings", _L["Buff settings"], _L["Raid"], "ui/Image/UICommon/RaidTotal.uitex|74", {255, 255, 0}, PS)
+MY.RegisterPanel("MY_Cataclysm_BuffSettings", _L["Buff settings"], _L["Raid"], "ui/Image/UICommon/RaidTotal.uitex|65", {255, 255, 0}, PS)
 end
 
 MY.RegisterEvent("CTM_PANEL_TEAMATE", function()

@@ -46,6 +46,7 @@ data = {
 	["Don't show Tip in fight"] = "戰鬥中不顯示玩家TIP",
 	["Faster Refresh HP(Greater performance loss)"] = "更快的血量刷新（目前官方有BUG，暫時關閉）",
 	["Grid Style"] = "格子樣式",
+	["Grid Color"] = "背景顔色",
 	["Panel"] = "面板",
 	["configure"] = "配置（如果希望不共用設置，請隨意修改爲任意字符，否則請勿修改）",
 	["Configuration name"] = "配置文件名稱",
