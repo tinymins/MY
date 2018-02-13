@@ -234,7 +234,7 @@ local function GetMenu()
 				else
 					MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "TI", "ASK")
 					MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "LR_TeamNotice", "ASK")
-					MY.Sysmsg(_L["Asking..., If no response in longtime, team leader not enable plug-in."])
+					MY.Sysmsg({_L["Asking..., If no response in longtime, team leader not enable plug-in."]})
 				end
 			end
 		end
