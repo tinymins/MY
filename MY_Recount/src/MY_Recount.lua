@@ -314,9 +314,12 @@ function MY_Recount.UpdateUI(data)
 	-- 整理数据 生成要显示的列表
 	local nMaxValue, aResult, tIDs = 0, {}, {}
 	for id, rec in pairs(tRecord) do
-		if MY_Recount.nDisplayMode == DISPLAY_MODE.BOTH or  -- 确定显示模式（显示NPC/显示玩家/全部显示）
-		(MY_Recount.nDisplayMode == DISPLAY_MODE.NPC    and type(id) == 'string') or
-		(MY_Recount.nDisplayMode == DISPLAY_MODE.PLAYER and type(id) == 'number') then
+		if (MY_Recount.bShowZeroVal or rec[MY_Recount.bShowEffect and "nTotalEffect" or "nTotal"] > 0)
+		and (
+			MY_Recount.nDisplayMode == DISPLAY_MODE.BOTH or  -- 确定显示模式（显示NPC/显示玩家/全部显示）
+			(MY_Recount.nDisplayMode == DISPLAY_MODE.NPC    and type(id) == 'string') or
+			(MY_Recount.nDisplayMode == DISPLAY_MODE.PLAYER and type(id) == 'number')
+		) then
 			tRec = {
 				id           = id                                    ,
 				szMD5        = rec.szMD5                             ,
@@ -1109,6 +1112,7 @@ function MY_Recount.GetMenu()
 			bChecked = MY_Recount.Data.bDistinctTargetID,
 			fnAction = function()
 				MY_Recount.Data.bDistinctTargetID = not MY_Recount.Data.bDistinctTargetID
+				MY_Recount.DrawUI()
 			end,
 			fnDisable = function()
 				return not MY.GetStorage('BoolValues.MY_Recount_Enable')
@@ -1119,6 +1123,7 @@ function MY_Recount.GetMenu()
 			bChecked = MY_Recount.Data.bDistinctEffectID,
 			fnAction = function()
 				MY_Recount.Data.bDistinctEffectID = not MY_Recount.Data.bDistinctEffectID
+				MY_Recount.DrawUI()
 			end,
 			fnDisable = function()
 				return not MY.GetStorage('BoolValues.MY_Recount_Enable')
@@ -1129,6 +1134,7 @@ function MY_Recount.GetMenu()
 			bChecked = MY_Recount.Data.bRecAnonymous,
 			fnAction = function()
 				MY_Recount.Data.bRecAnonymous = not MY_Recount.Data.bRecAnonymous
+				MY_Recount.DrawUI()
 			end,
 			fnDisable = function()
 				return not MY.GetStorage('BoolValues.MY_Recount_Enable')
@@ -1139,6 +1145,7 @@ function MY_Recount.GetMenu()
 			bChecked = MY_Recount.bShowZeroVal,
 			fnAction = function()
 				MY_Recount.bShowZeroVal = not MY_Recount.bShowZeroVal
+				MY_Recount.DrawUI()
 			end,
 			fnDisable = function()
 				return not MY.GetStorage('BoolValues.MY_Recount_Enable')
