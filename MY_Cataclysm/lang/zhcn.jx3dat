@@ -114,4 +114,5 @@ data = {
 	["Left"] = "左",
 	["Center"] = "中",
 	["Right"] = "右",
+	["Show Decimal"] = "显示小数",
 }

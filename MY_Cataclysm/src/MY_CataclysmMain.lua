@@ -1216,6 +1216,17 @@ function PS.OnPanelActive(frame)
 			end,
 		}, true):autoWidth():width() + 5
 	end
+
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y, text = _L["Show Decimal"],
+		checked = Cataclysm_Main.bShowHPDecimal,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bShowHPDecimal = bCheck
+			if GetFrame() then
+				Grid_CTM:CallDrawHPMP(true, true)
+			end
+		end,
+	}, true):autoWidth():width() + 5
 	y = y + 25
 
 	x = X + 10

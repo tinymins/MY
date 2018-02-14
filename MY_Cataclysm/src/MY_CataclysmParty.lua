@@ -1756,15 +1756,12 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 				local fnAction = function(val, max)
 					if CFG.nHPShownNumMode == 1 then
 						if val > 9999 then
-							return string.format("%.1fw", val / 10000)
-						else
-							return val
+							val = (CFG.bShowHPDecimal and "%.1fw" or "%dw"):format(val / 10000)
 						end
 					elseif CFG.nHPShownNumMode == 2 then
-						return string.format("%.1f", val / max * 100) .. "%"
-					elseif CFG.nHPShownNumMode == 3 then
-						return val
+						val = (CFG.bShowHPDecimal and "%.1f%%" or "%d%%"):format(val / max * 100)
 					end
+					return val
 				end
 				if CFG.nHPShownMode2 == 2 then
 					life:SetText(fnAction(nCurrentLife, nMaxLife))
