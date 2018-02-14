@@ -116,4 +116,5 @@ data = {
 	["Right"] = "右",
 	["Show Decimal"] = "顯示小數",
 	["Over mana bar"] = "遮擋內力",
+	["[%s] got buff [%s], remaining %ds."] = "[%s]獲得效果[%s]，剩余持續時間%d秒。",
 }

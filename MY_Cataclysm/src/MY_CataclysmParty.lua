@@ -361,10 +361,34 @@ function CTM_Party_Base.OnItemLButtonDragEnd()
 end
 
 function CTM_Party_Base.OnItemLButtonDown()
-	if not this.dwID then
+	local dwID = (this.bBuff and this:GetParent():GetParent().dwID) or (this.bRole and this.dwID)
+	if not dwID then
 		return
 	end
-	local info = CTM:GetMemberInfo(this.dwID)
+	local info = CTM:GetMemberInfo(dwID)
+	if not info then
+		return
+	end
+	if IsAltKeyDown() then
+		if this.bBuff then
+			MY.Talk(
+				PLAYER_TALK_CHANNEL.RAID,
+				_L(
+					"[%s] got buff [%s], remaining %ds.",
+					info.szName,
+					MY.GetBuffName(this.dwID, this.nLevel),
+					GetEndTime(this.nEndFrame)
+				)
+			)
+		elseif this.bRole then
+			if IsCtrlKeyDown() then
+				ViewCharInfoToPlayer(dwID)
+			else
+				ViewInviteToPlayer(dwID)
+			end
+		end
+		return
+	end
 	if IsCtrlKeyDown() then
 		EditBox_AppendLinkPlayer(info.szName)
 	else
@@ -373,13 +397,13 @@ function CTM_Party_Base.OnItemLButtonDown()
 			CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = nil
 		end
 		if MY.IsInPubg() and GetClientPlayer().nMoveState == MOVE_STATE.ON_DEATH then
-			BattleField_MatchPlayer(this.dwID)
-		elseif info.bIsOnLine and GetPlayer(this.dwID) then -- 有待考证
+			BattleField_MatchPlayer(dwID)
+		elseif info.bIsOnLine and GetPlayer(dwID) then -- 有待考证
 			if CFG.bTempTargetEnable then
 				MY.DelayCall("MY_Cataclysm_TempTarget", false)
 				CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = nil
 			end
-			SetTarget(TARGET.PLAYER, this.dwID)
+			SetTarget(TARGET.PLAYER, dwID)
 		end
 	end
 end
