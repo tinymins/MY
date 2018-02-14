@@ -108,4 +108,10 @@ data = {
 	["Cmd data"] = "指揮數據",
 	["Heal data"] = "治療數據",
 	["Feedback @nangongbo"] = "問題反饋 @劍網3南宮伯",
+	["Top"] = "上",
+	["Middle"] = "中",
+	["Bottom"] = "下",
+	["Left"] = "左",
+	["Center"] = "中",
+	["Right"] = "右",
 }

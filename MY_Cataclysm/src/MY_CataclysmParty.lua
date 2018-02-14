@@ -181,8 +181,8 @@ local function OpenRaidDragPanel(dwMemberID)
 	local szPath, nFrame = GetForceImage(tMemberInfo.dwForceID)
 	hMember:Lookup("Image_Force"):FromUITex(szPath, nFrame)
 
-	local htxtName = hMember:Lookup("Text_Name")
-	htxtName:SetText(tMemberInfo.szName)
+	local txtName = hMember:Lookup("Text_Name")
+	txtName:SetText(tMemberInfo.szName)
 
 	local hImageLife = hMember:Lookup("Image_Health")
 	local hImageMana = hMember:Lookup("Image_Mana")
@@ -959,7 +959,7 @@ function CTM:KungFuSwitch(dwID)
 end
 
 -- 刷新图标和名字之类的信息
-function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bName)
+function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bText)
 	-- assert(info)
 	if not info then return end
 	-- 刷新团队权限标记
@@ -1016,21 +1016,17 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bNa
 			end
 			img:SetSize(28 * fScale, 28 * fScale)
 			img:Show()
-			-- 如果名字是左对齐的 刷新名字位置
-			local txtName = h:Lookup("Text_Name")
-			if txtName:GetHAlign() == 0 then
-				txtName:SetRelX(img:GetRelX() + img:GetW())
-				txtName:SetAbsX(img:GetAbsX() + img:GetW())
-				txtName:SetW(h:GetW() - img:GetRelX() - img:GetW())
-			end
 		else -- 不再由icon控制 转交给textname
 			img:Hide()
-			bName = true
 		end
+		bText = true
 	end
 	-- 刷新名字
-	if bName then
+	if bText then
 		local txtName = h:Lookup("Text_Name")
+		local txtLife = h:Lookup("Text_Life")
+		local txtDeath = h:Lookup("Text_Death")
+		local txtOffLine = h:Lookup("Text_OffLine")
 		local txtSchool = h:Lookup("Text_School_Name")
 		local r, g, b = 255, 255, 255
 		if CFG.nColoredName == 1 then
@@ -1041,10 +1037,18 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bNa
 			r, g, b = MY.GetCampColor(info.nCamp, "foreground")
 		end
 		txtName:SetText(info.szName)
+		txtName:SetVAlign(CFG.nNameVAlignment)
+		txtName:SetHAlign(CFG.nNameHAlignment)
 		txtName:SetFontScheme(CFG.nNameFont)
 		txtName:SetFontColor(r, g, b)
 		txtName:SetFontScale(CFG.fNameFontScale)
-		local fScale = (CFG.fScaleY + CFG.fScaleX) / 2
+		txtLife:SetVAlign(CFG.nHPVAlignment)
+		txtLife:SetHAlign(CFG.nHPHAlignment)
+		txtDeath:SetVAlign(CFG.nHPVAlignment)
+		txtDeath:SetHAlign(CFG.nHPHAlignment)
+		txtOffLine:SetVAlign(CFG.nHPVAlignment)
+		txtOffLine:SetHAlign(CFG.nHPHAlignment)
+		local fScale, nRelX = (CFG.fScaleY + CFG.fScaleX) / 2
 		if fScale * 0.9 > 1 then
 			fScale = fScale * 0.9
 		end
@@ -1055,14 +1059,30 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bNa
 			txtSchool:SetFontColor(r, g, b)
 			txtSchool:SetFontScale(fScale)
 			txtSchool:AutoSize()
-			local txtName = h:Lookup("Text_Name")
-			if txtName:GetHAlign() == 0 then -- 如果名字是左对齐的 刷新名字位置
-				txtName:SetRelX(txtSchool:GetRelX() + txtSchool:GetW() + 5)
-				txtName:SetAbsX(txtSchool:GetAbsX() + txtSchool:GetW() + 5)
-				txtName:SetW(h:GetW() - txtSchool:GetRelX() - txtSchool:GetW() - 10)
+			txtSchool:Show()
+			nRelX = txtSchool:GetRelX() + txtSchool:GetW() + 5
+		else
+			local img = h:Lookup("Image_Icon")
+			txtSchool:Hide()
+			nRelX = img:GetRelX() + img:GetW()
+		end
+		-- 刷新名字血量位置
+		local nMargin = CFG.nCss == CTM_STYLE.OFFICIAL and 8 or 10
+		for _, szItemName in ipairs({"Text_Name", "Text_Life", "Text_Death", "Text_OffLine"}) do
+			local txt = h:Lookup(szItemName)
+			local nVAlign = txt:GetVAlign()
+			local nHAlign = txt:GetHAlign()
+			if nVAlign == ALIGNMENT.TOP
+			and (nHAlign == ALIGNMENT.LEFT or nHAlign == ALIGNMENT.RIGHT) then
+				txt:SetRelX(nRelX)
+				txt:SetAbsX(h:GetAbsX() + nRelX)
+				txt:SetW(h:GetW() - nRelX - nMargin)
+			else
+				txt:SetRelX(nMargin)
+				txt:SetAbsX(h:GetAbsX() + nMargin)
+				txt:SetW(h:GetW() - nMargin * 2)
 			end
 		end
-		txtSchool:SetVisible(CFG.nShowIcon == 4)
 	end
 end
 

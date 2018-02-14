@@ -847,11 +847,11 @@ function PS.OnPanelActive(frame)
 	x = X
 	y = y + ui:append("Text", { x = x, y = y, text = _L["configure"], font = 27 }, true):height()
 
-	x = x + 10
+	x = X + 10
 	x = x + ui:append("Text", { x = x, y = y, text = _L["Configuration name"] }, true):autoWidth():width() + 5
 
 	x = x + ui:append("WndEditBox", {
-		x = x, y = y + 4, w = 200, h = 25,
+		x = x, y = y + 3, w = 200, h = 25,
 		text = MY_Cataclysm.szConfigName,
 		onchange = function(txt)
 			SetConfigureName(txt)
@@ -864,7 +864,7 @@ function PS.OnPanelActive(frame)
 
 	-- 恢复默认
 	y = y + ui:append("WndButton2", {
-		x = x, y = y, text = _L["Restore default"],
+		x = x, y = y + 3, text = _L["Restore default"],
 		onclick = function()
 			MessageBox({
 				szName = "MY_Cataclysm Restore default",
@@ -1082,8 +1082,88 @@ function PS.OnPanelActive(frame)
 	x = X
 	y = y + ui:append("Text", { x = x, y = y, text = _L["Name/Icon/Mana/Life Display"], font = 27 }, true):height()
 
+	-- 名字
+	x = X + 10
+	y = y + 5
+	for _, p in ipairs({
+		{ 1, _L["Name colored by force"] },
+		{ 2, _L["Name colored by camp"] },
+		{ 0, _L["Name without color"] },
+	}) do
+		x = x + ui:append("WndRadioBox", {
+			x = x, y = y, text = p[2],
+			group = "namecolor", checked = Cataclysm_Main.nColoredName == p[1],
+			oncheck = function()
+				Cataclysm_Main.nColoredName = p[1]
+				if GetFrame() then
+					Grid_CTM:CallRefreshImages(true, false, false, nil, true)
+					Grid_CTM:CallDrawHPMP(true ,true)
+				end
+			end,
+		}, true):autoWidth():width() + 5
+	end
+
+	y = y + ui:append("WndSliderBox", {
+		x = x, y = y - 1,
+		value = Cataclysm_Main.fNameFontScale * 100,
+		range = {1, 400},
+		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		textfmt = function(val) return _L("Scale %d%%", val) end,
+		onchange = function(val)
+			Cataclysm_Main.fNameFontScale = val / 100
+			if GetFrame() then
+				Grid_CTM:CallRefreshImages(nil, nil, nil, nil, true)
+			end
+		end,
+	}, true):height()
+
+	x = X + 10
+	for _, p in ipairs({
+		{ 0, _L["Top"] },
+		{ 1, _L["Middle"] },
+		{ 2, _L["Bottom"] },
+	}) do
+		x = x + ui:append("WndRadioBox", {
+			x = x, y = y, text = p[2],
+			group = "namevali", checked = Cataclysm_Main.nNameVAlignment == p[1],
+			oncheck = function()
+				Cataclysm_Main.nNameVAlignment = p[1]
+				Grid_CTM:CallRefreshImages(true, false, true, nil, true)
+			end,
+		}, true):autoWidth():width() + 5
+	end
+	for _, p in ipairs({
+		{ 0, _L["Left"] },
+		{ 1, _L["Center"] },
+		{ 2, _L["Right"] },
+	}) do
+		x = x + ui:append("WndRadioBox", {
+			x = x, y = y, text = p[2],
+			group = "namehali", checked = Cataclysm_Main.nNameHAlignment == p[1],
+			oncheck = function()
+				Cataclysm_Main.nNameHAlignment = p[1]
+				Grid_CTM:CallRefreshImages(true, false, true, nil, true)
+			end,
+		}, true):autoWidth():width() + 5
+	end
+	-- 名字字体修改
+	x = x + ui:append("WndButton2", {
+		x = x, y = y - 3, text = _L["Name font"],
+		onclick = function()
+			XGUI.OpenFontPicker(function(nFont)
+				Cataclysm_Main.nNameFont = nFont
+				if GetFrame() then
+					Grid_CTM:CallRefreshImages(true, false, false, nil, true)
+					Grid_CTM:CallDrawHPMP(true, true)
+				end
+			end)
+		end,
+	}, true):autoWidth():width() + 5
+	y = y + 25
+
 	-- 血量显示方式
 	x = X + 10
+	y = y + 10
 	for _, p in ipairs({
 		{ 2, g_tStrings.STR_RAID_LIFE_LEFT },
 		{ 1, g_tStrings.STR_RAID_LIFE_LOSE },
@@ -1136,7 +1216,39 @@ function PS.OnPanelActive(frame)
 			end,
 		}, true):autoWidth():width() + 5
 	end
+	y = y + 25
 
+	x = X + 10
+	for _, p in ipairs({
+		{ 0, _L["Top"] },
+		{ 1, _L["Middle"] },
+		{ 2, _L["Bottom"] },
+	}) do
+		x = x + ui:append("WndRadioBox", {
+			x = x, y = y, text = p[2],
+			group = "lifvali", checked = Cataclysm_Main.nHPVAlignment == p[1],
+			autoenable = function() return Cataclysm_Main.nHPShownMode2 ~= 0 end,
+			oncheck = function()
+				Cataclysm_Main.nHPVAlignment = p[1]
+				Grid_CTM:CallRefreshImages(true, false, true, nil, true)
+			end,
+		}, true):autoWidth():width() + 5
+	end
+	for _, p in ipairs({
+		{ 0, _L["Left"] },
+		{ 1, _L["Center"] },
+		{ 2, _L["Right"] },
+	}) do
+		x = x + ui:append("WndRadioBox", {
+			x = x, y = y, text = p[2],
+			group = "lifhali", checked = Cataclysm_Main.nHPHAlignment == p[1],
+			autoenable = function() return Cataclysm_Main.nHPShownMode2 ~= 0 end,
+			oncheck = function()
+				Cataclysm_Main.nHPHAlignment = p[1]
+				Grid_CTM:CallRefreshImages(true, false, true, nil, true)
+			end,
+		}, true):autoWidth():width() + 5
+	end
 	ui:append("WndButton2", {
 		x = x, y = y - 1, text = _L["Life font"],
 		onclick = function()
@@ -1153,6 +1265,7 @@ function PS.OnPanelActive(frame)
 
 	-- 图标显示方案
 	x = X + 10
+	y = y + 10
 	for _, p in ipairs({
 		{ 1, _L["Show Force Icon"] },
 		{ 2, g_tStrings.STR_SHOW_KUNGFU },
@@ -1171,55 +1284,7 @@ function PS.OnPanelActive(frame)
 			end,
 		}, true):autoWidth():width() + 5
 	end
-
-	-- 名字字体修改 放不下了放上面
-	x = x + ui:append("WndButton2", {
-		x = x, y = y - 3, text = _L["Name font"],
-		onclick = function()
-			XGUI.OpenFontPicker(function(nFont)
-				Cataclysm_Main.nNameFont = nFont
-				if GetFrame() then
-					Grid_CTM:CallRefreshImages(true, false, false, nil, true)
-					Grid_CTM:CallDrawHPMP(true, true)
-				end
-			end)
-		end,
-	}, true):autoWidth():width() + 5
 	y = y + 25
-
-	-- 名字
-	x = X + 10
-	for _, p in ipairs({
-		{ 1, _L["Name colored by force"] },
-		{ 2, _L["Name colored by camp"] },
-		{ 0, _L["Name without color"] },
-	}) do
-		x = x + ui:append("WndRadioBox", {
-			x = x, y = y, text = p[2],
-			group = "namecolor", checked = Cataclysm_Main.nColoredName == p[1],
-			oncheck = function()
-				Cataclysm_Main.nColoredName = p[1]
-				if GetFrame() then
-					Grid_CTM:CallRefreshImages(true, false, false, nil, true)
-					Grid_CTM:CallDrawHPMP(true ,true)
-				end
-			end,
-		}, true):autoWidth():width() + 5
-	end
-
-	y = y + ui:append("WndSliderBox", {
-		x = x, y = y - 1,
-		value = Cataclysm_Main.fNameFontScale * 100,
-		range = {1, 400},
-		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
-		textfmt = function(val) return _L("Scale %d%%", val) end,
-		onchange = function(val)
-			Cataclysm_Main.fNameFontScale = val / 100
-			if GetFrame() then
-				Grid_CTM:CallRefreshImages(nil, nil, nil, nil, true)
-			end
-		end,
-	}, true):height()
 
 	-- 内力显示
 	x = X + 10
