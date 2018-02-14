@@ -1967,7 +1967,7 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():width() + 5
 	x = x + ui:append("WndSliderBox", {
-		x = x, y = y + 3, h = 25, rw = 90,
+		x = x, y = y + 3, h = 25, rw = 80,
 		enable = not Cataclysm_Main.bAutoBuffSize,
 		autoenable = function() return not Cataclysm_Main.bAutoBuffSize end,
 		range = {50, 200},
@@ -1982,12 +1982,21 @@ function PS.OnPanelActive(frame)
 
 	x = x + ui:append("Text", { x = x, y = y, text = _L["Max count"]}, true):autoWidth():width() + 5
 	x = x + ui:append("WndSliderBox", {
-		x = x, y = y + 3, rw = 90, text = "",
+		x = x, y = y + 3, rw = 80, text = "",
 		range = {0, 10},
 		value = Cataclysm_Main.nMaxShowBuff,
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		onchange = function(nVal)
 			Cataclysm_Main.nMaxShowBuff = nVal
+			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
+		end,
+	}, true):autoWidth():width() + 8
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y,
+		text = _L["Over mana bar"],
+		checked = not Cataclysm_Main.bBuffAboveMana,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bBuffAboveMana = not bCheck
 			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width() + 5

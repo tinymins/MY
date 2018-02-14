@@ -115,4 +115,5 @@ data = {
 	["Center"] = "中",
 	["Right"] = "右",
 	["Show Decimal"] = "显示小数",
+	["Over mana bar"] = "遮挡内力",
 }

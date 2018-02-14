@@ -959,7 +959,7 @@ function CTM:KungFuSwitch(dwID)
 end
 
 -- 刷新图标和名字之类的信息
-function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bText)
+function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bLayout)
 	-- assert(info)
 	if not info then return end
 	-- 刷新团队权限标记
@@ -1019,10 +1019,10 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bTe
 		else -- 不再由icon控制 转交给textname
 			img:Hide()
 		end
-		bText = true
+		bLayout = true
 	end
 	-- 刷新名字
-	if bText then
+	if bLayout then
 		local txtName = h:Lookup("Text_Name")
 		local txtLife = h:Lookup("Text_Life")
 		local txtDeath = h:Lookup("Text_Death")
@@ -1082,6 +1082,13 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bTe
 				txt:SetAbsX(h:GetAbsX() + nMargin)
 				txt:SetW(h:GetW() - nMargin * 2)
 			end
+		end
+		-- 刷新BUFF位置
+		if CFG.bBuffAboveMana then
+			local hMana = h:Lookup("Handle_Mana")
+			local hBoxes = h:Lookup("Handle_Buff_Boxes")
+			hBoxes:SetRelY(hMana:GetRelY() - hBoxes:GetH())
+			hBoxes:SetAbsY(hMana:GetAbsY() - hBoxes:GetH())
 		end
 	end
 end

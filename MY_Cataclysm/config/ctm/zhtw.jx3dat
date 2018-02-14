@@ -7,7 +7,6 @@ data = {
 	nHPShownNumMode      = 3,
 	nHPVAlignment        = 2,
 	nHPHAlignment        = 2,
-	bShowHPDecimal       = true,
 	nNameFont            = 40,
 	nLifeFont            = 15,
 	fScaleX              = 1.1,
