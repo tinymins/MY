@@ -1,86 +1,20 @@
 -----------------------------------------------
--- @Desc  : 随身便笺 玩家标签
+-- @Desc  : 角色小本本
 -- @Author: 茗伊 @tinymins
 -- @Date  : 2014-11-25 12:31:03
 -- @Email : admin@derzh.com
 -- @Last modified by:   tinymins
 -- @Last modified time: 2016-12-13 15:23:48
 -----------------------------------------------
--- #######################################################################################################
---   * * *         *                 *                     *                   *           *
---   *   *   * * * * * * *       * * * * * * *             * * * * * * * *     * * * *     * * * *
---   *   *       *               *           *           *         *         *   *       *   *
---   *   * *   * * * * *         * * * * * * *           *   * * * * * * *         *     *     *
---   * *     *   *     *         *           *         * *   *     *     *           *     *
---   * *         * * * *         * * * * * * *   *   *   *   * * * * * * *           * * * * * *
---   *   * * *   *     *         *           * *         *   *     *     *     * * * *
---   *   *   *   * * * *     * * * * * * * * *           *   * * * * * * *           *   * * * * *
---   *   *   *   *     *               * *   *           *     *   *         * * * * * *     *
---   * *     *   *   * *           * *       *           *       *                     *   *
---   *       *               * * *           *           *     *   *                   * *       *
---   *     *   * * * * * *               * * *           *   *       * * *     * * * *     * * * *
--- #######################################################################################################
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Toolbox/lang/")
 local _C = {}
-MY_Anmerkungen = {}
-MY_Anmerkungen.bNotePanelEnable = false
-MY_Anmerkungen.anchorNotePanel = { s = "TOPRIGHT", r = "TOPRIGHT", x = -310, y = 135 }
-MY_Anmerkungen.nNotePanelWidth = 200
-MY_Anmerkungen.nNotePanelHeight = 200
-MY_Anmerkungen.szNotePanelContent = ""
-MY_Anmerkungen.tPrivatePlayerNotes = {} -- 私有玩家描述
-MY_Anmerkungen.tPublicPlayerNotes = {} -- 公共玩家描述
+local PUBLIC_PLAYER_NOTES = {} -- 公共玩家描述
+local PRIVATE_PLAYER_NOTES = {} -- 私有玩家描述
+MY_Anmerkungen = MY_Anmerkungen or {}
 -- dwID : { dwID = dwID, szName = szName, szContent = szContent, bAlertWhenGroup, bTipWhenGroup }
-RegisterCustomData("MY_Anmerkungen.bNotePanelEnable")
-RegisterCustomData("MY_Anmerkungen.anchorNotePanel")
-RegisterCustomData("MY_Anmerkungen.nNotePanelWidth")
-RegisterCustomData("MY_Anmerkungen.nNotePanelHeight")
-RegisterCustomData("MY_Anmerkungen.szNotePanelContent")
--- 重载便笺
-MY_Anmerkungen.ReloadNotePanel = function()
-	MY.UI("Normal/MY_Anmerkungen_NotePanel"):remove()
-	if MY_Anmerkungen.bNotePanelEnable then
-		-- frame
-		local ui = MY.UI.CreateFrame("MY_Anmerkungen_NotePanel", {
-			simple = true, alpha = 140,
-			maximize = true, minimize = true, dragresize = true,
-			minwidth = 180, minheight = 100,
-			onmaximize = function(wnd)
-				local ui = MY.UI(wnd)
-				ui:children("#WndEditBox_Anmerkungen"):size(ui:size())
-			end,
-			onrestore = function(wnd)
-				local ui = MY.UI(wnd)
-				ui:children("#WndEditBox_Anmerkungen"):size(ui:size())
-			end,
-			ondragresize = function(wnd)
-				local ui = MY.UI(wnd:GetRoot())
-				MY_Anmerkungen.nNotePanelWidth  = ui:width()
-				MY_Anmerkungen.anchorNotePanel  = ui:anchor()
-				MY_Anmerkungen.nNotePanelHeight = ui:height()
-				local ui = MY.UI(wnd)
-				ui:children("#WndEditBox_Anmerkungen"):size(ui:size())
-			end,
-		})
-		ui:size(MY_Anmerkungen.nNotePanelWidth, MY_Anmerkungen.nNotePanelHeight)
-		  :drag(true):drag(0,0,MY_Anmerkungen.nNotePanelWidth, 30)
-		  :text(_L['my anmerkungen'])
-		  :anchor(MY_Anmerkungen.anchorNotePanel)
-		-- input box
-		ui:append("WndEditBox", "WndEditBox_Anmerkungen"):children("#WndEditBox_Anmerkungen")
-		  :pos(0, 0):size(MY_Anmerkungen.nNotePanelWidth, MY_Anmerkungen.nNotePanelHeight - 30)
-		  :multiLine(true):text(MY_Anmerkungen.szNotePanelContent)
-		  :change(function(txt) MY_Anmerkungen.szNotePanelContent = txt end)
 
-		ui:uievent("OnFrameDragEnd", function()
-			MY_Anmerkungen.anchorNotePanel = MY.UI("Normal/MY_Anmerkungen_NotePanel"):anchor()
-		end):event("UI_SCALED", function()
-			MY.UI(this):anchor(MY_Anmerkungen.anchorNotePanel)
-		end)
-	end
-end
 -- 打开一个玩家的记录编辑器
-MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
+function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 	local note = MY_Anmerkungen.GetPlayerNote(dwID) or {}
 	-- frame
 	local ui = MY.UI.CreateFrame("MY_Anmerkungen_PlayerNoteEdit_"..(dwID or 0))
@@ -213,21 +147,21 @@ local menu = {
 MY.RegisterAddonMenu("MY_Anmerkungen_PlayerNotes", menu)
 end
 -- 获取一个玩家的记录
-MY_Anmerkungen.GetPlayerNote = function(dwID)
+function MY_Anmerkungen.GetPlayerNote(dwID)
 	-- { dwID, szName, szContent, bTipWhenGroup, bAlertWhenGroup, bPrivate }
 	dwID = tostring(dwID)
 	local t, rec = {}, nil
 	if not rec then
-		rec = MY_Anmerkungen.tPrivatePlayerNotes[dwID]
+		rec = PRIVATE_PLAYER_NOTES[dwID]
 		if type(rec) ~= "table" then
-			rec = MY_Anmerkungen.tPrivatePlayerNotes[tostring(rec)]
+			rec = PRIVATE_PLAYER_NOTES[tostring(rec)]
 		end
 		t.bPrivate = true
 	end
 	if not rec then
-		rec = MY_Anmerkungen.tPublicPlayerNotes[dwID]
+		rec = PUBLIC_PLAYER_NOTES[dwID]
 		if type(rec) ~= "table" then
-			rec = MY_Anmerkungen.tPublicPlayerNotes[tostring(rec)]
+			rec = PUBLIC_PLAYER_NOTES[tostring(rec)]
 		end
 		t.bPrivate = false
 	end
@@ -239,10 +173,10 @@ MY_Anmerkungen.GetPlayerNote = function(dwID)
 	return t
 end
 -- 当有玩家进队时
-MY_Anmerkungen.OnPartyAddMember = function()
+function MY_Anmerkungen.OnPartyAddMember()
 	MY_Anmerkungen.PartyAddMember(arg1)
 end
-MY_Anmerkungen.PartyAddMember = function(dwID)
+function MY_Anmerkungen.PartyAddMember(dwID)
 	local team = GetClientTeam()
 	local szName = team.GetClientTeamMemberName(dwID)
 	-- local dwLeaderID = team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER)
@@ -264,18 +198,18 @@ end
 MY.RegisterEvent("PARTY_ADD_MEMBER", MY_Anmerkungen.OnPartyAddMember)
 MY.RegisterEvent("PARTY_SYNC_MEMBER_DATA", MY_Anmerkungen.OnPartyAddMember)
 -- 设置一个玩家的记录
-MY_Anmerkungen.SetPlayerNote = function(dwID, szName, szContent, bTipWhenGroup, bAlertWhenGroup, bPrivate)
+function MY_Anmerkungen.SetPlayerNote(dwID, szName, szContent, bTipWhenGroup, bAlertWhenGroup, bPrivate)
 	if not dwID then return nil end
 	dwID = tostring(dwID)
 	if not szName then -- 删除一个玩家的记录
 		MY_Anmerkungen.LoadConfig()
-		if MY_Anmerkungen.tPrivatePlayerNotes[dwID] then
-			MY_Anmerkungen.tPrivatePlayerNotes[MY_Anmerkungen.tPrivatePlayerNotes[dwID].szName] = nil
-			MY_Anmerkungen.tPrivatePlayerNotes[dwID] = nil
+		if PRIVATE_PLAYER_NOTES[dwID] then
+			PRIVATE_PLAYER_NOTES[PRIVATE_PLAYER_NOTES[dwID].szName] = nil
+			PRIVATE_PLAYER_NOTES[dwID] = nil
 		end
-		if MY_Anmerkungen.tPublicPlayerNotes[dwID] then
-			MY_Anmerkungen.tPublicPlayerNotes[MY_Anmerkungen.tPublicPlayerNotes[dwID].szName] = nil
-			MY_Anmerkungen.tPublicPlayerNotes[dwID] = nil
+		if PUBLIC_PLAYER_NOTES[dwID] then
+			PUBLIC_PLAYER_NOTES[PUBLIC_PLAYER_NOTES[dwID].szName] = nil
+			PUBLIC_PLAYER_NOTES[dwID] = nil
 		end
 		if _C.list then
 			_C.list:listbox('delete', 'id', dwID)
@@ -293,11 +227,11 @@ MY_Anmerkungen.SetPlayerNote = function(dwID, szName, szContent, bTipWhenGroup, 
 		bAlertWhenGroup = bAlertWhenGroup,
 	}
 	if bPrivate then
-		MY_Anmerkungen.tPrivatePlayerNotes[dwID] = t
-		MY_Anmerkungen.tPrivatePlayerNotes[szName] = dwID
+		PRIVATE_PLAYER_NOTES[dwID] = t
+		PRIVATE_PLAYER_NOTES[szName] = dwID
 	else
-		MY_Anmerkungen.tPublicPlayerNotes[dwID] = t
-		MY_Anmerkungen.tPublicPlayerNotes[szName] = dwID
+		PUBLIC_PLAYER_NOTES[dwID] = t
+		PUBLIC_PLAYER_NOTES[szName] = dwID
 	end
 	if _C.list then
 		_C.list:listbox('update', 'id', dwID, {"text", "data"}, { _L('[%s] %s', t.szName, t.szContent), t })
@@ -305,15 +239,15 @@ MY_Anmerkungen.SetPlayerNote = function(dwID, szName, szContent, bTipWhenGroup, 
 	MY_Anmerkungen.SaveConfig()
 end
 -- 读取公共数据
-MY_Anmerkungen.LoadConfig = function()
+function MY_Anmerkungen.LoadConfig()
 	local szOrgFile = MY.GetLUADataPath("config/PLAYER_NOTES/$relserver.$lang.jx3dat")
 	local szFilePath = MY.GetLUADataPath({"config/playernotes.jx3dat", MY_DATA_PATH.SERVER})
 	if IsLocalFileExist(szOrgFile) then
 		CPath.Move(szOrgFile, szFilePath)
 	end
-	MY_Anmerkungen.tPublicPlayerNotes = MY.LoadLUAData(szFilePath) or {}
-	if type(MY_Anmerkungen.tPublicPlayerNotes) == 'string' then
-		MY_Anmerkungen.tPublicPlayerNotes = MY.Json.Decode(MY_Anmerkungen.tPublicPlayerNotes)
+	PUBLIC_PLAYER_NOTES = MY.LoadLUAData(szFilePath) or {}
+	if type(PUBLIC_PLAYER_NOTES) == 'string' then
+		PUBLIC_PLAYER_NOTES = MY.Json.Decode(PUBLIC_PLAYER_NOTES)
 	end
 
 	local szOrgFile = MY.GetLUADataPath("config/PLAYER_NOTES/$uid.$lang.jx3dat")
@@ -321,18 +255,17 @@ MY_Anmerkungen.LoadConfig = function()
 	if IsLocalFileExist(szOrgFile) then
 		CPath.Move(szOrgFile, szFilePath)
 	end
-	MY_Anmerkungen.tPrivatePlayerNotes = MY.LoadLUAData(szFilePath) or {}
-	if type(MY_Anmerkungen.tPrivatePlayerNotes) == 'string' then
-		MY_Anmerkungen.tPrivatePlayerNotes = MY.Json.Decode(MY_Anmerkungen.tPrivatePlayerNotes)
+	PRIVATE_PLAYER_NOTES = MY.LoadLUAData(szFilePath) or {}
+	if type(PRIVATE_PLAYER_NOTES) == 'string' then
+		PRIVATE_PLAYER_NOTES = MY.Json.Decode(PRIVATE_PLAYER_NOTES)
 	end
 end
 -- 保存公共数据
-MY_Anmerkungen.SaveConfig = function()
-	MY.SaveLUAData({"config/playernotes.jx3dat", MY_DATA_PATH.SERVER}, MY_Anmerkungen.tPublicPlayerNotes)
-	MY.SaveLUAData({"config/playernotes.jx3dat", MY_DATA_PATH.ROLE}, MY_Anmerkungen.tPrivatePlayerNotes)
+function MY_Anmerkungen.SaveConfig()
+	MY.SaveLUAData({"config/playernotes.jx3dat", MY_DATA_PATH.SERVER}, PUBLIC_PLAYER_NOTES)
+	MY.SaveLUAData({"config/playernotes.jx3dat", MY_DATA_PATH.ROLE}, PRIVATE_PLAYER_NOTES)
 end
 MY.RegisterInit('MY_ANMERKUNGEN', MY_Anmerkungen.LoadConfig)
-MY.RegisterInit('MY_ANMERKUNGEN_PLAYERNOTE', MY_Anmerkungen.ReloadNotePanel)
 
 local PS = {}
 function PS.OnPanelActive(wnd)
@@ -360,13 +293,13 @@ function PS.OnPanelActive(wnd)
 					end
 					local function Next(usenew)
 						for k, v in pairs(config.public) do
-							if not MY_Anmerkungen.tPublicPlayerNotes[k] or usenew then
-								MY_Anmerkungen.tPublicPlayerNotes[k] = v
+							if not PUBLIC_PLAYER_NOTES[k] or usenew then
+								PUBLIC_PLAYER_NOTES[k] = v
 							end
 						end
 						for k, v in pairs(config.private) do
-							if not MY_Anmerkungen.tPrivatePlayerNotes[k] or usenew then
-								MY_Anmerkungen.tPrivatePlayerNotes[k] = v
+							if not PRIVATE_PLAYER_NOTES[k] or usenew then
+								PRIVATE_PLAYER_NOTES[k] = v
 							end
 						end
 						MY_Anmerkungen.SaveConfig()
@@ -387,8 +320,8 @@ function PS.OnPanelActive(wnd)
 		onclick = function()
 			XGUI.OpenTextEditor(var2str({
 				server  = MY.GetRealServer(),
-				public  = MY_Anmerkungen.tPublicPlayerNotes,
-				private = MY_Anmerkungen.tPrivatePlayerNotes,
+				public  = PUBLIC_PLAYER_NOTES,
+				private = PRIVATE_PLAYER_NOTES,
 			}))
 		end,
 	})
@@ -401,7 +334,7 @@ function PS.OnPanelActive(wnd)
 	  	MY_Anmerkungen.OpenPlayerNoteEditPanel(data.dwID, data.szName)
 	  	return false
 	  end)
-	for dwID, t in pairs(MY_Anmerkungen.tPublicPlayerNotes) do
+	for dwID, t in pairs(PUBLIC_PLAYER_NOTES) do
 		if tonumber(dwID) then
 			list:listbox('insert', _L('[%s] %s', t.szName, t.szContent), t.dwID, t)
 		end

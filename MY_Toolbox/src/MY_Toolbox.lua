@@ -593,7 +593,8 @@ local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = MY.UI(wnd)
 	local w, h = ui:size()
-	local x, y = 20, 30
+	local X, Y = 20, 30
+	local x, y = X, Y
 
 	-- 检测附近共战
 	ui:append("WndButton", "WndButton_GongzhanCheck"):children('#WndButton_GongzhanCheck')
@@ -842,23 +843,26 @@ function PS.OnPanelActive(wnd)
 	y = y + 30
 
 	-- 随身便笺
-	ui:append("Text", {
+	x = x + ui:append("WndCheckBox", {
 		x = x, y = y,
-		r = 255, g = 255, b = 0,
-		text = _L['* anmerkungen'],
-	})
+		text = _L['Memo (Role)'],
+		checked = MY_Memo.IsEnable(false),
+		oncheck = function(bChecked)
+			MY_Memo.Toggle(false, bChecked)
+		end,
+	}, true):autoWidth():width() + 5
+
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y,
+		text = _L['Memo (Global)'],
+		checked = MY_Memo.IsEnable(true),
+		oncheck = function(bChecked)
+			MY_Memo.Toggle(true, bChecked)
+		end,
+	}, true):autoWidth():width() + 5
 	y = y + 30
 
-	ui:append("WndCheckBox", {
-		x = x, y = y,
-		text = _L['my anmerkungen'],
-		checked = MY_Anmerkungen.bNotePanelEnable,
-		oncheck = function(bChecked)
-			MY_Anmerkungen.bNotePanelEnable = bChecked
-			MY_Anmerkungen.ReloadNotePanel()
-		end,
-	})
-	y = y + 30
+	x = X
 end
 MY.RegisterPanel( "MY_ToolBox", _L["toolbox"], _L['General'], "UI/Image/Common/Money.UITex|243", { 255, 255, 0, 200 }, PS)
 
