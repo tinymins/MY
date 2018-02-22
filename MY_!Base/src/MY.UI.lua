@@ -116,6 +116,8 @@ local function ApplyUIArguments(ui, arg)
 		if arg.oncheck            ~= nil then ui:check          (arg.oncheck    ) end
 		if arg.onchange           ~= nil then ui:change         (arg.onchange   ) end
 		if arg.ondragging or arg.ondrag  then ui:drag(arg.ondragging, arg.ondrag) end
+		if arg.events             ~= nil then for _, v in ipairs(arg.events) do ui:event(unpack(v)) end end
+		if arg.uievents           ~= nil then for _, v in ipairs(arg.uievents) do ui:uievent(unpack(v)) end end
 		if arg.autocomplete       ~= nil then for _, v in ipairs(arg.autocomplete) do ui:autocomplete(unpack(v)) end end
 	end
 	return ui
