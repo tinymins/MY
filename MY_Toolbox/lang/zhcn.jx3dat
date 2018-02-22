@@ -63,7 +63,9 @@ data = {
     ['failed to calc.'] = '计算失败。',
 
     ['my anmerkungen'] = '茗伊随身便笺',
-    ['player note'] = '角色标签',
+    ['player note'] = '管理小本本',
+    ['Create'] = '添加',
+    ['Create new anmerkungen'] = '添加备注',
     ['* anmerkungen'] = '※ 随身便笺 记在小本子上',
     ['edit player note'] = '记到小本本里',
     ['my anmerkungen - player note edit'] = '把TA记进小本本',

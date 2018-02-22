@@ -111,20 +111,6 @@ MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
 	ui:append("WndEditBox", "WndEditBox_ID"):children("#WndEditBox_ID"):pos(x + 60, y)
 	  :size(200, 25):multiLine(false):enable(false):color(200,200,200)
 	  :text(dwID or note.dwID or "")
-	  -- :change(function(dwID)
-	  --   if dwID == "" or string.find(dwID, "[^%d]") then
-	  --       ui:children("#WndButton_Submit"):enable(false)
-	  --   else
-	  --       ui:children("#WndButton_Submit"):enable(true)
-	  --       local rec = MY_Anmerkungen.GetPlayerNote(dwID)
-	  --       if rec then
-	  --           ui:children("#WndEditBox_Name"):text(rec.szName)
-	  --           ui:children("#WndEditBox_Content"):text(rec.szContent)
-	  --           ui:children("#WndCheckBox_TipWhenGroup"):check(rec.bTipWhenGroup)
-	  --           ui:children("#WndCheckBox_AlertWhenGroup"):check(rec.bAlertWhenGroup)
-	  --       end
-	  --   end
-	  -- end)
 	-- name
 	ui:append("Text", "Label_Name"):children("#Label_Name"):pos(x, y + 30)
 	  :text(_L['Name:'])
@@ -199,7 +185,7 @@ MY_Anmerkungen.OpenPlayerNoteEditPanel = function(dwID, szName)
 	  end)
 
 	-- init data
-	ui:children("#WndEditBox_ID"):change()
+	ui:children("#WndEditBox_Name"):change()
 	Station.SetFocusWindow(ui[1])
 	PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 end
@@ -218,6 +204,14 @@ MY.RegisterTargetAddonMenu("MY_Anmerkungen_PlayerNotes", function()
 		}
 	end
 end)
+
+do
+local menu = {
+	szOption = _L["Create new anmerkungen"],
+	fnAction = function() MY_Anmerkungen.OpenPlayerNoteEditPanel() end,
+}
+MY.RegisterAddonMenu("MY_Anmerkungen_PlayerNotes", menu)
+end
 -- 获取一个玩家的记录
 MY_Anmerkungen.GetPlayerNote = function(dwID)
 	-- { dwID, szName, szContent, bTipWhenGroup, bAlertWhenGroup, bPrivate }
@@ -345,6 +339,14 @@ function PS.OnPanelActive(wnd)
 	local ui = MY.UI(wnd)
 	local w, h = ui:size()
 	local x, y = 0, 0
+
+	ui:append("WndButton2", {
+		x = x, y = y, w = 110,
+		text = _L['Create'],
+		onclick = function()
+			MY_Anmerkungen.OpenPlayerNoteEditPanel()
+		end,
+	})
 
 	ui:append("WndButton2", {
 		x = w - 230, y = y, w = 110,
