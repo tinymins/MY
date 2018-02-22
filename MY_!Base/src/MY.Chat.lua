@@ -1049,8 +1049,8 @@ function _C.OnChatPanelAppendItemFromString(h, szMsg, szChannel, dwTime, nR, nG,
 	end
 end
 
-_C.Hook = {}
-function _C.Hook.Reg(i)
+do
+local function Hook(i)
 	local h = Station.Lookup("Lowest2/ChatPanel" .. i .. "/Wnd_Message", "Handle_Message")
 	-- local ttl = Station.Lookup("Lowest2/ChatPanel" .. i .. "/CheckBox_Title", "Text_TitleName")
 	-- if h and (not ttl or ttl:GetText() ~= g_tStrings.CHANNEL_MENTOR) then
@@ -1062,7 +1062,8 @@ function _C.Hook.Reg(i)
 		h.AppendItemFromString = _C.OnChatPanelAppendItemFromString
 	end
 end
-function _C.Hook.Unreg(i)
+
+local function Unhook(i)
 	local h = Station.Lookup("Lowest2/ChatPanel" .. i .. "/Wnd_Message", "Handle_Message")
 	if h and h._AppendItemFromString_MY then
 		h.AppendItemFromString = _C._AppendItemFromString_MY
@@ -1070,23 +1071,29 @@ function _C.Hook.Unreg(i)
 	end
 end
 
-MY.RegisterEvent("CHAT_PANEL_INIT", function ()
+local function HookAll()
 	for i = 1, 10 do
-		_C.Hook.Reg(i)
+		Hook(i)
 	end
-end)
-MY.RegisterEvent("CHAT_PANEL_OPEN", function(event) _C.Hook.Reg(arg0) end)
+end
+MY.RegisterEvent("CHAT_PANEL_INIT", HookAll)
+MY.RegisterEvent("CHAT_PANEL_OPEN", function(event) Hook(arg0) end)
 
-MY.RegisterReload("ChatPanelHook", function ()
+local function RehookAll()
 	for i = 1, 10 do
-		_C.Hook.Reg(i)
+		Unhook(i)
+		Hook(i)
 	end
-end)
-MY.RegisterExit("ChatPanelUnhook", function ()
+end
+MY.RegisterReload("ChatPanelHook", RehookAll)
+
+local function UnhookAll()
 	for i = 1, 10 do
-		_C.Hook.Unreg(i)
+		Unhook(i)
 	end
-end)
+end
+MY.RegisterExit("ChatPanelUnhook", UnhookAll)
+end
 
 local function UploadSerendipity(szName, szSerendipity, nMethod, bFinish, dwTime)
 	MY.Ajax({
