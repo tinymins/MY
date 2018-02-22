@@ -125,7 +125,7 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 		onclick = function() ui:remove() end,
 	})
 	ui:append("Text", {
-		x = x + 230, y = y + 3, w = 80, alpha = 200,
+		x = x + 230, y = y - 3, w = 80, alpha = 200,
 		text = _L['delete'], color = {255,0,0},
 		onhover = function(bIn) MY.UI(this):alpha((bIn and 255) or 200) end,
 		onclick = function()
