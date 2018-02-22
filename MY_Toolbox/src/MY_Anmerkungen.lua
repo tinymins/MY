@@ -8,123 +8,140 @@
 -----------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Toolbox/lang/")
 local _C = {}
-local PUBLIC_PLAYER_NOTES = {} -- 公共玩家描述
-local PRIVATE_PLAYER_NOTES = {} -- 私有玩家描述
+local PUBLIC_PLAYER_IDS = {}
+local PUBLIC_PLAYER_NOTES = {}
+local PRIVATE_PLAYER_IDS = {}
+local PRIVATE_PLAYER_NOTES = {}
 MY_Anmerkungen = MY_Anmerkungen or {}
 -- dwID : { dwID = dwID, szName = szName, szContent = szContent, bAlertWhenGroup, bTipWhenGroup }
 
 -- 打开一个玩家的记录编辑器
 function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
+	if not MY_Farbnamen then
+		return MY.Alert(_L['MY_Farbnamen not detected! Please check addon load!'])
+	end
 	local note = MY_Anmerkungen.GetPlayerNote(dwID) or {}
-	-- frame
-	local ui = MY.UI.CreateFrame("MY_Anmerkungen_PlayerNoteEdit_"..(dwID or 0))
-	local CloseFrame = function()
+
+	local w, h = 340, 300
+	local ui = MY.UI.CreateFrame("MY_Anmerkungen_PlayerNoteEdit_" .. (dwID or 0), {
+		w = w, h = h, anchor = {},
+		text = _L['my anmerkungen - player note edit'],
+	})
+
+	local function IsValid()
+		return ui and ui:count() > 0
+	end
+	local function RemoveFrame()
 		ui:remove()
 		return true
 	end
+	MY.RegisterEsc('MY_Anmerkungen_PlayerNoteEditPanel', IsValid, RemoveFrame)
 
-	MY.RegisterEsc('MY_Anmerkungen_PlayerNoteEditPanel', function()
-		return ui and ui:count() > 0
-	end, CloseFrame)
 	local function onRemove()
 		MY.RegisterEsc('MY_Anmerkungen_PlayerNoteEditPanel')
 		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 	end
 	ui:remove(onRemove)
 
-	local w, h = 300, 210
 	local x, y = 35 , 50
+	ui:append("Text", { x = x, y = y, text = _L['ID:'] })
+	ui:append("WndEditBox", {
+		name = "WndEditBox_ID", x = x + 60, y = y, w = 200, h = 25,
+		text = dwID or note.dwID or "",
+		multiline = false, enable = false, color = {200,200,200},
+	})
+	y = y + 30
 
-	ui:size(w + 40, h + 90):anchor( { s = "CENTER", r = "CENTER", x = 0, y = 0 } )
-	-- title
-	ui:text(_L['my anmerkungen - player note edit'])
-	-- id
-	ui:append("Text", "Label_ID"):children("#Label_ID"):pos(x, y)
-	  :text(_L['ID:'])
-	-- id input
-	ui:append("WndEditBox", "WndEditBox_ID"):children("#WndEditBox_ID"):pos(x + 60, y)
-	  :size(200, 25):multiLine(false):enable(false):color(200,200,200)
-	  :text(dwID or note.dwID or "")
-	-- name
-	ui:append("Text", "Label_Name"):children("#Label_Name"):pos(x, y + 30)
-	  :text(_L['Name:'])
-	-- name input
-	ui:append("WndEditBox", "WndEditBox_Name"):children("#WndEditBox_Name"):pos(x + 60, y + 30)
-	  :size(200, 25):multiLine(false):text(szName or note.szName or "")
-	  :change(function(szName)
-	  	local rec = MY_Anmerkungen.GetPlayerNote(szName)
-	  	if rec then
-	  		ui:children("#WndButton_Submit"):enable(true)
-	  		ui:children("#WndEditBox_ID"):text(rec.dwID)
-	  		ui:children("#WndEditBox_Content"):text(rec.szContent)
-	  		ui:children("#WndCheckBox_TipWhenGroup"):check(rec.bTipWhenGroup)
-	  		ui:children("#WndCheckBox_AlertWhenGroup"):check(rec.bAlertWhenGroup)
-	  	else
-	  		local tInfo
-	  		if MY_Farbnamen then
-	  			tInfo = MY_Farbnamen.GetAusName(szName)
-	  		end
-	  		if tInfo then
-	  			ui:children("#WndButton_Submit"):enable(true)
-	  			ui:children("#WndEditBox_ID"):text(tInfo.dwID)
-	  			ui:children("#WndEditBox_Content"):text('')
-	  			ui:children("#WndCheckBox_TipWhenGroup"):check(true)
-	  			ui:children("#WndCheckBox_AlertWhenGroup"):check(false)
-	  		else
-	  			ui:children("#WndButton_Submit"):enable(false)
-	  			ui:children("#WndEditBox_ID"):text('')
-	  		end
-	  	end
-	  end)
-	-- content
-	ui:append("Text", "Label_Content"):children("#Label_Content"):pos(x, y + 60)
-	  :text(_L['Content:'])
-	-- content input
-	ui:append("WndEditBox", "WndEditBox_Content"):children("#WndEditBox_Content")
-	  :pos(x + 60, y + 60):size(200, 80)
-	  :multiLine(true):text(note.szContent or "")
-	-- alert when group
-	ui:append("WndCheckBox", "WndCheckBox_AlertWhenGroup"):children("#WndCheckBox_AlertWhenGroup")
-	  :pos(x + 58, y + 140):width(200)
-	  :text(_L['alert when group']):check(note.bAlertWhenGroup or false)
-	-- tip when group
-	ui:append("WndCheckBox", "WndCheckBox_TipWhenGroup"):children("#WndCheckBox_TipWhenGroup")
-	  :pos(x + 58, y + 160):width(200)
-	  :text(_L['tip when group']):check(note.bTipWhenGroup or true)
-	-- submit button
-	ui:append("WndButton", "WndButton_Submit"):children("#WndButton_Submit")
-	  :pos(x + 58, y + 190):width(80)
-	  :text(_L['sure']):click(function()
-	  	MY_Anmerkungen.SetPlayerNote(
-	  		ui:children("#WndEditBox_ID"):text(),
-	  		ui:children("#WndEditBox_Name"):text(),
-	  		ui:children("#WndEditBox_Content"):text(),
-	  		ui:children("#WndCheckBox_TipWhenGroup"):check(),
-	  		ui:children("#WndCheckBox_AlertWhenGroup"):check()
-	  	)
-	  	CloseFrame(ui)
-	  end)
-	-- cancel button
-	ui:append("WndButton", "WndButton_Cancel"):children("#WndButton_Cancel")
-	  :pos(x + 143, y + 190):width(80)
-	  :text(_L['cancel']):click(function() CloseFrame(ui) end)
-	-- delete button
-	ui:append("Text", "Text_Delete"):children("#Text_Delete")
-	  :pos(x + 230, y + 188):width(80):alpha(200)
-	  :text(_L['delete']):color(255,0,0):hover(function(bIn) MY.UI(this):alpha((bIn and 255) or 200) end)
-	  :click(function()
-	  	MY_Anmerkungen.SetPlayerNote(ui:children("#WndEditBox_ID"):text())
-	  	CloseFrame(ui)
-	  	-- 删除
-	  end)
+	ui:append("Text", { x = x, y = y, text = _L['Name:'] })
+	ui:append("WndEditBox", {
+		name = "WndEditBox_Name",
+		x = x + 60, y = y, w = 200, h = 25,
+		multiline = false, text = szName or note.szName or "",
+		onchange = function(szName)
+			local rec = MY_Anmerkungen.GetPlayerNote(szName) or {}
+			local info = MY_Farbnamen.GetAusName(szName)
+			if info and rec.dwID ~= info.dwID then
+				rec.dwID = info.dwID
+				rec.szContent = ""
+				rec.bTipWhenGroup = true
+				rec.bAlertWhenGroup = false
+			end
+			if rec.dwID then
+				ui:children("#WndButton_Submit"):enable(true)
+				ui:children("#WndEditBox_ID"):text(rec.dwID)
+				ui:children("#WndEditBox_Content"):text(rec.szContent)
+				ui:children("#WndCheckBox_TipWhenGroup"):check(rec.bTipWhenGroup)
+				ui:children("#WndCheckBox_AlertWhenGroup"):check(rec.bAlertWhenGroup)
+			else
+				ui:children("#WndButton_Submit"):enable(false)
+				ui:children("#WndEditBox_ID"):text(_L['Not found in local store'])
+			end
+		end,
+	})
+	y = y + 30
 
-	-- init data
-	ui:children("#WndEditBox_Name"):change()
+	ui:append("Text", { x = x, y = y, text = _L['Content:'] })
+	ui:append("WndEditBox", {
+		name = "WndEditBox_Content",
+		x = x + 60, y = y, w = 200, h = 80,
+		multiline = true, text = note.szContent or "",
+	})
+	y = y + 90
+
+	ui:append("WndCheckBox", {
+		name = "WndCheckBox_AlertWhenGroup",
+		x = x + 58, y = y, w = 200,
+		text = _L['alert when group'],
+		checked = note.bAlertWhenGroup,
+	})
+	y = y + 20
+
+	ui:append("WndCheckBox", {
+		name = "WndCheckBox_TipWhenGroup",
+		x = x + 58, y = y, w = 200,
+		text = _L['tip when group'],
+		checked = note.bTipWhenGroup,
+	})
+	y = y + 30
+
+	ui:append("WndButton", {
+		name = "WndButton_Submit",
+		x = x + 58, y = y, w = 80,
+		text = _L['sure'],
+		onclick = function()
+			MY_Anmerkungen.SetPlayerNote(
+				ui:children("#WndEditBox_ID"):text(),
+				ui:children("#WndEditBox_Name"):text(),
+				ui:children("#WndEditBox_Content"):text(),
+				ui:children("#WndCheckBox_TipWhenGroup"):check(),
+				ui:children("#WndCheckBox_AlertWhenGroup"):check()
+			)
+			ui:remove()
+		end,
+	})
+	ui:append("WndButton", {
+		x = x + 143, y = y, w = 80,
+		text = _L['cancel'],
+		onclick = function() ui:remove() end,
+	})
+	ui:append("Text", {
+		x = x + 230, y = y + 3, w = 80, alpha = 200,
+		text = _L['delete'], color = {255,0,0},
+		onhover = function(bIn) MY.UI(this):alpha((bIn and 255) or 200) end,
+		onclick = function()
+			MY_Anmerkungen.SetPlayerNote(ui:children("#WndEditBox_ID"):text())
+			ui:remove()
+		end,
+	})
+
+	-- init
 	Station.SetFocusWindow(ui[1])
+	ui:children("#WndEditBox_Name"):change()
 	PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 end
--- 重载右键菜单
-MY.RegisterTargetAddonMenu("MY_Anmerkungen_PlayerNotes", function()
+
+do
+local function onMenu()
 	local dwType, dwID = MY.GetTarget()
 	if dwType == TARGET.PLAYER then
 		local p = MY.GetObject(dwType, dwID)
@@ -137,46 +154,87 @@ MY.RegisterTargetAddonMenu("MY_Anmerkungen_PlayerNotes", function()
 			end
 		}
 	end
-end)
+end
+MY.RegisterTargetAddonMenu("MY_Anmerkungen_PlayerNotes", onMenu)
+end
 
 do
 local menu = {
-	szOption = _L["Create new anmerkungen"],
-	fnAction = function() MY_Anmerkungen.OpenPlayerNoteEditPanel() end,
+	szOption = _L["View anmerkungen"],
+	fnAction = function()
+		MY.OpenPanel()
+		MY.SwitchTab("MY_Anmerkungen")
+	end,
 }
 MY.RegisterAddonMenu("MY_Anmerkungen_PlayerNotes", menu)
 end
+
 -- 获取一个玩家的记录
+-- MY_Anmerkungen.GetPlayerNote(dwID)
+-- MY_Anmerkungen.GetPlayerNote(szName)
 function MY_Anmerkungen.GetPlayerNote(dwID)
-	-- { dwID, szName, szContent, bTipWhenGroup, bAlertWhenGroup, bPrivate }
-	dwID = tostring(dwID)
-	local t, rec = {}, nil
-	if not rec then
-		rec = PRIVATE_PLAYER_NOTES[dwID]
-		if type(rec) ~= "table" then
-			rec = PRIVATE_PLAYER_NOTES[tostring(rec)]
-		end
+	local t
+	local rec = PRIVATE_PLAYER_NOTES[PRIVATE_PLAYER_IDS[dwID] or dwID]
+	if rec then
+		t = clone(rec)
 		t.bPrivate = true
-	end
-	if not rec then
-		rec = PUBLIC_PLAYER_NOTES[dwID]
-		if type(rec) ~= "table" then
-			rec = PUBLIC_PLAYER_NOTES[tostring(rec)]
-		end
-		t.bPrivate = false
-	end
-	if not rec then
-		t = nil
 	else
-		t.dwID, t.szName, t.szContent, t,bTipWhenGroup, t.bAlertWhenGroup = rec.dwID, rec.szName, rec.szContent, rec,bTipWhenGroup, rec.bAlertWhenGroup
+		rec = PUBLIC_PLAYER_NOTES[PUBLIC_PLAYER_IDS[dwID] or dwID]
+		if rec then
+			t = clone(rec)
+			t.bPrivate = false
+		end
 	end
 	return t
 end
--- 当有玩家进队时
-function MY_Anmerkungen.OnPartyAddMember()
-	MY_Anmerkungen.PartyAddMember(arg1)
+
+-- 设置一个玩家的记录
+function MY_Anmerkungen.SetPlayerNote(dwID, szName, szContent, bTipWhenGroup, bAlertWhenGroup, bPrivate)
+	dwID = dwID and tonumber(dwID)
+	if not dwID then
+		return nil
+	end
+	MY_Anmerkungen.LoadConfig()
+	-- remove
+	local rec = PRIVATE_PLAYER_NOTES[dwID]
+	if rec then
+		PRIVATE_PLAYER_IDS[rec.szName] = nil
+		PRIVATE_PLAYER_NOTES[dwID] = nil
+	end
+	local rec = PUBLIC_PLAYER_NOTES[dwID]
+	if rec then
+		PUBLIC_PLAYER_IDS[rec.szName] = nil
+		PUBLIC_PLAYER_NOTES[dwID] = nil
+	end
+	-- add
+	if szName then
+		local t = {
+			dwID = dwID,
+			szName = szName,
+			szContent = szContent,
+			bTipWhenGroup = bTipWhenGroup,
+			bAlertWhenGroup = bAlertWhenGroup,
+		}
+		if bPrivate then
+			PRIVATE_PLAYER_NOTES[dwID] = t
+			PRIVATE_PLAYER_IDS[szName] = dwID
+		else
+			PUBLIC_PLAYER_NOTES[dwID] = t
+			PUBLIC_PLAYER_IDS[szName] = dwID
+		end
+		if _C.list then
+			_C.list:listbox('update', 'id', dwID, {"text", "data"}, { _L('[%s] %s', t.szName, t.szContent), t })
+		end
+	elseif _C.list then
+		_C.list:listbox('delete', 'id', dwID)
+	end
+	MY_Anmerkungen.SaveConfig()
 end
-function MY_Anmerkungen.PartyAddMember(dwID)
+
+-- 当有玩家进队时
+do
+local function OnPartyAddMember()
+	local dwID = arg1
 	local team = GetClientTeam()
 	local szName = team.GetClientTeamMemberName(dwID)
 	-- local dwLeaderID = team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER)
@@ -195,75 +253,81 @@ function MY_Anmerkungen.PartyAddMember(dwID)
 		end
 	end
 end
-MY.RegisterEvent("PARTY_ADD_MEMBER", MY_Anmerkungen.OnPartyAddMember)
-MY.RegisterEvent("PARTY_SYNC_MEMBER_DATA", MY_Anmerkungen.OnPartyAddMember)
--- 设置一个玩家的记录
-function MY_Anmerkungen.SetPlayerNote(dwID, szName, szContent, bTipWhenGroup, bAlertWhenGroup, bPrivate)
-	if not dwID then return nil end
-	dwID = tostring(dwID)
-	if not szName then -- 删除一个玩家的记录
-		MY_Anmerkungen.LoadConfig()
-		if PRIVATE_PLAYER_NOTES[dwID] then
-			PRIVATE_PLAYER_NOTES[PRIVATE_PLAYER_NOTES[dwID].szName] = nil
-			PRIVATE_PLAYER_NOTES[dwID] = nil
-		end
-		if PUBLIC_PLAYER_NOTES[dwID] then
-			PUBLIC_PLAYER_NOTES[PUBLIC_PLAYER_NOTES[dwID].szName] = nil
-			PUBLIC_PLAYER_NOTES[dwID] = nil
-		end
-		if _C.list then
-			_C.list:listbox('delete', 'id', dwID)
-		end
-		MY_Anmerkungen.SaveConfig()
-		return nil
-	end
-	MY_Anmerkungen.SetPlayerNote(dwID)
-	MY_Anmerkungen.LoadConfig()
-	local t = {
-		dwID = dwID,
-		szName = szName,
-		szContent = szContent,
-		bTipWhenGroup = bTipWhenGroup,
-		bAlertWhenGroup = bAlertWhenGroup,
-	}
-	if bPrivate then
-		PRIVATE_PLAYER_NOTES[dwID] = t
-		PRIVATE_PLAYER_NOTES[szName] = dwID
-	else
-		PUBLIC_PLAYER_NOTES[dwID] = t
-		PUBLIC_PLAYER_NOTES[szName] = dwID
-	end
-	if _C.list then
-		_C.list:listbox('update', 'id', dwID, {"text", "data"}, { _L('[%s] %s', t.szName, t.szContent), t })
-	end
-	MY_Anmerkungen.SaveConfig()
+MY.RegisterEvent("PARTY_ADD_MEMBER", OnPartyAddMember)
+-- MY.RegisterEvent("PARTY_SYNC_MEMBER_DATA", OnPartyAddMember)
 end
+
 -- 读取公共数据
 function MY_Anmerkungen.LoadConfig()
+	local data = MY.LoadLUAData({"config/anmerkungen.jx3dat", MY_DATA_PATH.SERVER})
+	if data then
+		PUBLIC_PLAYER_IDS = data.ids or {}
+		PUBLIC_PLAYER_NOTES = data.data or {}
+	end
 	local szOrgFile = MY.GetLUADataPath("config/PLAYER_NOTES/$relserver.$lang.jx3dat")
 	local szFilePath = MY.GetLUADataPath({"config/playernotes.jx3dat", MY_DATA_PATH.SERVER})
 	if IsLocalFileExist(szOrgFile) then
 		CPath.Move(szOrgFile, szFilePath)
 	end
-	PUBLIC_PLAYER_NOTES = MY.LoadLUAData(szFilePath) or {}
-	if type(PUBLIC_PLAYER_NOTES) == 'string' then
-		PUBLIC_PLAYER_NOTES = MY.Json.Decode(PUBLIC_PLAYER_NOTES)
+	if IsLocalFileExist(szFilePath) then
+		local data = MY.LoadLUAData(szFilePath) or {}
+		if type(data) == 'string' then
+			data = MY.Json.Decode(data)
+		end
+		for k, v in pairs(data) do
+			if type(v) == "table" then
+				k = tonumber(k)
+				v.dwID = tonumber(v.dwID)
+				PUBLIC_PLAYER_NOTES[k] = v
+			else
+				PUBLIC_PLAYER_IDS[k] = tonumber(v)
+			end
+		end
+		CPath.DelFile(szFilePath)
+		MY_Anmerkungen.SaveConfig()
 	end
 
+	local data = MY.LoadLUAData({"config/anmerkungen.jx3dat", MY_DATA_PATH.ROLE})
+	if data then
+		PRIVATE_PLAYER_IDS = data.ids or {}
+		PRIVATE_PLAYER_NOTES = data.data or {}
+	end
 	local szOrgFile = MY.GetLUADataPath("config/PLAYER_NOTES/$uid.$lang.jx3dat")
 	local szFilePath = MY.GetLUADataPath({"config/playernotes.jx3dat", MY_DATA_PATH.ROLE})
 	if IsLocalFileExist(szOrgFile) then
 		CPath.Move(szOrgFile, szFilePath)
 	end
-	PRIVATE_PLAYER_NOTES = MY.LoadLUAData(szFilePath) or {}
-	if type(PRIVATE_PLAYER_NOTES) == 'string' then
-		PRIVATE_PLAYER_NOTES = MY.Json.Decode(PRIVATE_PLAYER_NOTES)
+	if IsLocalFileExist(szFilePath) then
+		local data = MY.LoadLUAData(szFilePath) or {}
+		if type(data) == 'string' then
+			data = MY.Json.Decode(data)
+		end
+		for k, v in pairs(data) do
+			if type(v) == "table" then
+				k = tonumber(k)
+				v.dwID = tonumber(v.dwID)
+				PRIVATE_PLAYER_NOTES[k] = v
+			else
+				PRIVATE_PLAYER_IDS[k] = tonumber(v)
+			end
+		end
+		CPath.DelFile(szFilePath)
+		MY_Anmerkungen.SaveConfig()
 	end
 end
 -- 保存公共数据
 function MY_Anmerkungen.SaveConfig()
-	MY.SaveLUAData({"config/playernotes.jx3dat", MY_DATA_PATH.SERVER}, PUBLIC_PLAYER_NOTES)
-	MY.SaveLUAData({"config/playernotes.jx3dat", MY_DATA_PATH.ROLE}, PRIVATE_PLAYER_NOTES)
+	local data = {
+		ids = PUBLIC_PLAYER_IDS,
+		data = PUBLIC_PLAYER_NOTES,
+	}
+	MY.SaveLUAData({"config/anmerkungen.jx3dat", MY_DATA_PATH.SERVER}, data)
+
+	local data = {
+		ids = PRIVATE_PLAYER_IDS,
+		data = PRIVATE_PLAYER_NOTES,
+	}
+	MY.SaveLUAData({"config/anmerkungen.jx3dat", MY_DATA_PATH.ROLE}, data)
 end
 MY.RegisterInit('MY_ANMERKUNGEN', MY_Anmerkungen.LoadConfig)
 
@@ -293,11 +357,45 @@ function PS.OnPanelActive(wnd)
 					end
 					local function Next(usenew)
 						for k, v in pairs(config.public) do
+							if type(v) == "table" then
+								k = tonumber(k)
+								if not PUBLIC_PLAYER_NOTES[k] or usenew then
+									v.dwID = tonumber(v.dwID)
+									PUBLIC_PLAYER_NOTES[k] = v
+								end
+							else
+								v = tonumber(v)
+								PUBLIC_PLAYER_IDS[k] = v
+							end
+						end
+						for k, v in pairs(config.publici) do
+							if not PUBLIC_PLAYER_IDS[k] or usenew then
+								PUBLIC_PLAYER_IDS[k] = v
+							end
+						end
+						for k, v in pairs(config.publicd) do
 							if not PUBLIC_PLAYER_NOTES[k] or usenew then
 								PUBLIC_PLAYER_NOTES[k] = v
 							end
 						end
 						for k, v in pairs(config.private) do
+							if type(v) == "table" then
+								k = tonumber(k)
+								if not PRIVATE_PLAYER_NOTES[k] or usenew then
+									v.dwID = tonumber(v.dwID)
+									PRIVATE_PLAYER_NOTES[k] = v
+								end
+							else
+								v = tonumber(v)
+								PRIVATE_PLAYER_IDS[k] = v
+							end
+						end
+						for k, v in pairs(config.privatei) do
+							if not PRIVATE_PLAYER_IDS[k] or usenew then
+								PRIVATE_PLAYER_IDS[k] = v
+							end
+						end
+						for k, v in pairs(config.privated) do
 							if not PRIVATE_PLAYER_NOTES[k] or usenew then
 								PRIVATE_PLAYER_NOTES[k] = v
 							end
@@ -319,21 +417,27 @@ function PS.OnPanelActive(wnd)
 		text = _L['Export'],
 		onclick = function()
 			XGUI.OpenTextEditor(var2str({
-				server  = MY.GetRealServer(),
-				public  = PUBLIC_PLAYER_NOTES,
-				private = PRIVATE_PLAYER_NOTES,
+				server   = MY.GetRealServer(),
+				publici  = PUBLIC_PLAYER_IDS,
+				publicd  = PUBLIC_PLAYER_NOTES,
+				privatei = PRIVATE_PLAYER_IDS,
+				privated = PRIVATE_PLAYER_NOTES,
 			}))
 		end,
 	})
 
 	y = y + 30
-	local list = ui:append("WndListBox", "WndListBox_1"):children('#WndListBox_1')
-	  :pos(x, y)
-	  :size(w, h - 30)
-	  :listbox('onlclick', function(hItem, szText, szID, data, bSelected)
-	  	MY_Anmerkungen.OpenPlayerNoteEditPanel(data.dwID, data.szName)
-	  	return false
-	  end)
+	local list = ui:append("WndListBox", {
+		x = x, y = y,
+		w = w, h = h - 30,
+		listbox = {{
+			'onlclick',
+			function(hItem, szText, szID, data, bSelected)
+				MY_Anmerkungen.OpenPlayerNoteEditPanel(data.dwID, data.szName)
+				return false
+			end,
+		}},
+	}, true)
 	for dwID, t in pairs(PUBLIC_PLAYER_NOTES) do
 		if tonumber(dwID) then
 			list:listbox('insert', _L('[%s] %s', t.szName, t.szContent), t.dwID, t)

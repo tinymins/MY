@@ -196,9 +196,9 @@ MY_Farbnamen.ShowTip = function(namelink)
 		tinsert(tTip, XML_LINE_BREAKER)
 		-- ÀÊ…Ì±„º„
 		if MY_Anmerkungen and MY_Anmerkungen.GetPlayerNote then
-			local tPlayerNote = MY_Anmerkungen.GetPlayerNote(tInfo.dwID)
-			if tPlayerNote then
-				tinsert(tTip, GetFormatText(tPlayerNote.szContent, 0))
+			local note = MY_Anmerkungen.GetPlayerNote(tInfo.dwID)
+			if note and note.szContent ~= "" then
+				tinsert(tTip, GetFormatText(note.szContent, 0))
 				tinsert(tTip, XML_LINE_BREAKER)
 			end
 		end
