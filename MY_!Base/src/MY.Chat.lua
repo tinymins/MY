@@ -1076,23 +1076,17 @@ local function HookAll()
 		Hook(i)
 	end
 end
-MY.RegisterEvent("CHAT_PANEL_INIT", HookAll)
-MY.RegisterEvent("CHAT_PANEL_OPEN", function(event) Hook(arg0) end)
-
-local function RehookAll()
-	for i = 1, 10 do
-		Unhook(i)
-		Hook(i)
-	end
-end
-MY.RegisterReload("ChatPanelHook", RehookAll)
+MY.RegisterEvent("CHAT_PANEL_INIT.ChatPanelHook", HookAll)
+MY.RegisterEvent("CHAT_PANEL_OPEN.ChatPanelHook", function(event) Hook(arg0) end)
+MY.RegisterEvent('RELOAD_UI_ADDON_END.ChatPanelHook', HookAll)
 
 local function UnhookAll()
 	for i = 1, 10 do
 		Unhook(i)
 	end
 end
-MY.RegisterExit("ChatPanelUnhook", UnhookAll)
+MY.RegisterExit("ChatPanelHook", UnhookAll)
+MY.RegisterReload("ChatPanelHook", UnhookAll)
 end
 
 local function UploadSerendipity(szName, szSerendipity, nMethod, bFinish, dwTime)
