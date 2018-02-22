@@ -44,14 +44,6 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 	ui:remove(onRemove)
 
 	local x, y = 35 , 50
-	ui:append("Text", { x = x, y = y, text = _L['ID:'] })
-	ui:append("WndEditBox", {
-		name = "WndEditBox_ID", x = x + 60, y = y, w = 200, h = 25,
-		text = dwID or note.dwID or "",
-		multiline = false, enable = false, color = {200,200,200},
-	})
-	y = y + 30
-
 	ui:append("Text", { x = x, y = y, text = _L['Name:'] })
 	ui:append("WndEditBox", {
 		name = "WndEditBox_Name",
@@ -77,6 +69,14 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 				ui:children("#WndEditBox_ID"):text(_L['Not found in local store'])
 			end
 		end,
+	})
+	y = y + 30
+
+	ui:append("Text", { x = x, y = y, text = _L['ID:'] })
+	ui:append("WndEditBox", {
+		name = "WndEditBox_ID", x = x + 60, y = y, w = 200, h = 25,
+		text = dwID or note.dwID or "",
+		multiline = false, enable = false, color = {200,200,200},
 	})
 	y = y + 30
 
