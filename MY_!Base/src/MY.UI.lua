@@ -1228,7 +1228,26 @@ function XGUI:text(arg0)
 		local componentType, element
 		for _, raw in ipairs(self.raws) do
 			componentType = GetComponentType(raw)
-			if IsString(arg0) then
+			if IsFunction(arg0) then
+				if componentType == 'WndSliderBox' then
+					SetComponentProp(raw, 'FormatText', arg0)
+					GetComponentProp(raw, 'ResponseUpdateScroll')(true)
+				end
+			elseif IsTable(arg0) then
+				if componentType == 'WndEditBox' or componentType == 'WndAutocomplete' then
+					element = GetComponentElement(raw, 'EDIT')
+					for k, v in ipairs(arg0) do
+						if v.type == 'text' then
+							element:InsertText(v.text)
+						else
+							element:InsertObj(v.text, v)
+						end
+					end
+				end
+			else
+				if not IsString(arg0) then
+					arg0 = tostring(arg0)
+				end
 				if componentType == 'WndScrollBox' then
 					element = GetComponentElement(raw, 'MAIN_HANDLE')
 					element:Clear()
@@ -1248,22 +1267,6 @@ function XGUI:text(arg0)
 					element = GetComponentElement(raw, 'EDIT')
 					if element then
 						element:SetText(arg0)
-					end
-				end
-			elseif IsFunction(arg0) then
-				if componentType == 'WndSliderBox' then
-					SetComponentProp(raw, 'FormatText', arg0)
-					GetComponentProp(raw, 'ResponseUpdateScroll')(true)
-				end
-			elseif IsTable(arg0) then
-				if componentType == 'WndEditBox' or componentType == 'WndAutocomplete' then
-					element = GetComponentElement(raw, 'EDIT')
-					for k, v in ipairs(arg0) do
-						if v.type == 'text' then
-							element:InsertText(v.text)
-						else
-							element:InsertObj(v.text, v)
-						end
 					end
 				end
 			end
