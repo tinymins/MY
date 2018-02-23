@@ -115,6 +115,10 @@ local function GetConfigurePath()
 	return {"config/cataclysm/" .. MY_Cataclysm.szConfigName .. ".jx3dat", MY_DATA_PATH.GLOBAL}
 end
 
+local function SaveConfigure()
+	MY.SaveLUAData(GetConfigurePath(), CTM_CONFIG_PLAYER)
+end
+
 local function SetConfig(Config)
 	CTM_CONFIG_PLAYER = Config
 	-- update version
@@ -145,6 +149,9 @@ end
 
 local function SetConfigureName(szConfigName)
 	if szConfigName then
+		if MY_Cataclysm.szConfigName then
+			SaveConfigure()
+		end
 		MY_Cataclysm.szConfigName = szConfigName
 	end
 	SetConfig(MY.LoadLUAData(GetConfigurePath()) or clone(CTM_CONFIG_CATACLYSM))
@@ -2148,9 +2155,7 @@ end)
 MY.RegisterEvent("LOADING_END", CheckCataclysmEnable)
 
 -- ±£¥Ê∫Õ∂¡»°≈‰÷√
-MY.RegisterExit(function()
-	MY.SaveLUAData(GetConfigurePath(), CTM_CONFIG_PLAYER)
-end)
+MY.RegisterExit(SaveConfigure)
 
 MY.RegisterInit("MY_Cataclysm", function() SetConfigureName() end)
 
