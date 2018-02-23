@@ -1,0 +1,64 @@
+(function()
+local __META__ = '__META__'
+return {
+	caption             = "新建目标监控",
+	type                = "BUFF",
+	target              = "CLIENT_PLAYER",
+	scale               = 0.8   , -- 缩放比
+	ignoreSystemUIScale = false , -- 禁止系统缩放
+	enable              = false , -- 启用标记
+	penetrable          = true  , -- 是否穿透
+	dragable            = false , -- 是否可拖拽
+	alignment           = "LEFT", -- 对齐方式
+	hideOthers          = false , -- 只显示自己的BUFF
+	maxLineCount        = 16    , -- 单行最大数量
+	hideVoid            = false , -- 隐藏消失的BUFF
+	showName            = true  , -- 显示名字
+	cdCircle            = true  , -- 倒计时圈
+	cdFlash             = true  , -- 倒计时分段特效
+	cdReadySpark        = true  , -- 消失特效
+	decimalTime         = -1    , -- 倒计时出现小数点时间
+	cdBar               = false , -- 显示倒计时条
+	cdBarWidth          = 240   , -- 倒计时条宽度
+	cdBarUITex          = "./Interface/MY/MY_!Base/image/ST_UI.UITex|7",  -- 倒计时条图素
+	boxBgUITex          = "UI/Image/Common/Box.UITex|44",  -- Box背景图素
+	anchor = { y = 152, x = -343, s = "TOPLEFT", r = "CENTER" },
+	monitors = {
+		__META__,
+		__VALUE__ = {},
+		__CHILD_TEMPLATE__ = { -- kungfuid
+			__META__,
+			__VALUE__ = {},
+			__CHILD_TEMPLATE__ = { -- mon
+				__META__,
+				__VALUE__ = {
+					enable = true,
+					iconid = 13,
+					name = "",
+					capture = true,
+					longAlias = {__META__, {'nil', 'string'}, nil},
+					rgbLongAlias = {255, 255, 0},
+					shortAlias = {__META__, {'nil', 'string'}, nil},
+					rgbShortAlias = {255, 255, 0},
+					ids = {
+						__META__,
+						__VALUE__ = {},
+						__CHILD_TEMPLATE__ = { -- monid
+							enable = true,
+							iconid = 13,
+							levels = {
+								__META__,
+								__VALUE__ = {},
+								__KEY_TEMPLATE__ = {__META__, {'number'}, nil},
+								__CHILD_TEMPLATE__ = { enable = true, iconid = 13 },
+							},
+							ignoreLevel = true,
+						},
+					},
+					ignoreId = true,
+				},
+			},
+		},
+	},
+}
+end)()

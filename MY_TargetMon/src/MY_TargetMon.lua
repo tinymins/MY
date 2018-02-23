@@ -25,9 +25,9 @@ local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_TargetMon/lang/")
 local INI_PATH = MY.GetAddonInfo().szRoot .. "MY_TargetMon/ui/MY_TargetMon.ini"
 local ROLE_CONFIG_FILE = {'config/my_targetmon.jx3dat', MY_DATA_PATH.ROLE}
-local DEFAULT_CONFIG_FILE = MY.GetAddonInfo().szRoot .. "MY_TargetMon/data/$lang.jx3dat"
-local CUSTOM_DEFAULT_CONFIG_FILE = {'config/my_targetmon.jx3dat', MY_DATA_PATH.GLOBAL}
+local TEMPLATE_CONFIG_FILE = MY.GetAddonInfo().szRoot .. "MY_TargetMon/data/template/$lang.jx3dat"
 local EMBEDDED_CONFIG_FILE = MY.GetAddonInfo().szRoot .. "MY_TargetMon/data/embedded/$lang.jx3dat"
+local CUSTOM_DEFAULT_CONFIG_FILE = {'config/my_targetmon.jx3dat', MY_DATA_PATH.GLOBAL}
 local CUSTOM_BOXBG_STYLES = {
 	"UI/Image/Common/Box.UITex|0",
 	"UI/Image/Common/Box.UITex|1",
@@ -120,9 +120,6 @@ end
 
 function D.CloseFrame(config)
 	if config == 'all' then
-		for _, config in ipairs(ConfigEmbedded) do
-			D.CloseFrame(config)
-		end
 		for _, config in ipairs(Config) do
 			D.CloseFrame(config)
 		end
@@ -144,20 +141,12 @@ function D.CheckFrame(config)
 end
 
 function D.CheckAllFrame(reload)
-	for i, config in ipairs(ConfigEmbedded) do
-		D.CheckFrame(config)
-	end
 	for i, config in ipairs(Config) do
 		D.CheckFrame(config)
 	end
 end
 
 function D.GetFrameData(id)
-	for index, config in ipairs(ConfigEmbedded) do
-		if tostring(config):sub(8) == id then
-			return config, index
-		end
-	end
 	for index, config in ipairs(Config) do
 		if tostring(config):sub(8) == id then
 			return config, index
@@ -227,16 +216,18 @@ function D.LoadConfig(bDefault, bOriginal)
 	D.CloseFrame('all')
 	Config = not bDefault
 		and MY.LoadLUAData(ROLE_CONFIG_FILE)
-		or (not bOriginal and MY.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE) or ConfigDefault)
-	ConfigEmbedded = MY.LoadLUAData(EMBEDDED_CONFIG_FILE) or {}
-	local Embedded = Config.Embedded or {}
-	for _, config in ipairs(ConfigEmbedded) do
-		for k, v in pairs(Embedded[config.caption] or {}) do
-			if k ~= "caption" and k ~= "target" and k ~= "monitors" then
-				config[k] = v
+		or (not bOriginal and MY.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE) or clone(ConfigEmbedded))
+	local Embedded = Config.Embedded
+	if Embedded then
+		for _, config in ipairs(clone(ConfigEmbedded)) do
+			for k, v in pairs(Embedded[config.caption] or {}) do
+				if k ~= "caption" and k ~= "target" and k ~= "monitors" then
+					config[k] = v
+				end
 			end
+			insert(Config, 1, config)
 		end
-		D.FormatConfigStructure(config)
+		Config.Embedded = nil
 	end
 	for _, config in ipairs(Config) do
 		D.FormatConfigStructure(config)
@@ -246,25 +237,13 @@ end
 
 do
 local function OnInit()
-	local data = MY.LoadLUAData(DEFAULT_CONFIG_FILE)
-	ConfigDefault = data.default
-	ConfigTemplate = data.template
+	ConfigTemplate = MY.LoadLUAData(TEMPLATE_CONFIG_FILE)
+	ConfigEmbedded = MY.LoadLUAData(EMBEDDED_CONFIG_FILE) or {}
 	D.LoadConfig()
 end
 MY.RegisterInit("MY_TargetMon", OnInit)
 
 local function OnExit()
-	local Embedded = Config.Embedded or {}
-	for _, config in ipairs(ConfigEmbedded) do
-		local EmbeddedCfg = Embedded[config.caption] or {}
-		for k, v in pairs(config) do
-			if k ~= "caption" and k ~= "target" and k ~= "monitors" then
-				EmbeddedCfg[k] = v
-			end
-		end
-		Embedded[config.caption] = EmbeddedCfg
-	end
-	Config.Embedded = Embedded
 	MY.SaveLUAData(ROLE_CONFIG_FILE, Config)
 end
 MY.RegisterExit("MY_TargetMon", OnExit)
@@ -1106,12 +1085,6 @@ function PS.OnPanelActive(wnd)
 		})
 		uiWrapper:hide()
 	end
-
-	for _, config in ipairs(ConfigEmbedded) do
-		x, y = GenePS(ui, config, x, y, w, h)
-		y = y + 10
-	end
-	y = y + 10
 
 	for _, config in ipairs(Config) do
 		x, y = GenePS(ui, config, x, y, w, h, OpenConfig)
