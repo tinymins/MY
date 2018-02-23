@@ -1091,7 +1091,7 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bLa
 			nRelX = img:GetRelX() + img:GetW()
 		end
 		-- 刷新名字血量位置
-		local nMargin = CFG.nCss == CTM_STYLE.OFFICIAL and 8 or 10
+		local nMargin = CFG.nCss == CTM_STYLE.OFFICIAL and 8 or 5
 		for _, szItemName in ipairs({"Text_Name", "Text_Life", "Text_Death", "Text_OffLine"}) do
 			local txt = h:Lookup(szItemName)
 			local nVAlign = txt:GetVAlign()
