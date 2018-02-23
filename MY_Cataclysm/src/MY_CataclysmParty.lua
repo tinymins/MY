@@ -1091,7 +1091,7 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bLa
 			nRelX = img:GetRelX() + img:GetW()
 		end
 		-- 刷新名字血量位置
-		local nMargin = CFG.nCss == CTM_STYLE.OFFICIAL and 8 or 5
+		local nMargin = CFG.nCss == CTM_STYLE.OFFICIAL and 7 or 5
 		for _, szItemName in ipairs({"Text_Name", "Text_Life", "Text_Death", "Text_OffLine"}) do
 			local txt = h:Lookup(szItemName)
 			local nVAlign = txt:GetVAlign()
@@ -1111,8 +1111,8 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bLa
 		if CFG.bBuffAboveMana then
 			local hMana = h:Lookup("Handle_Mana")
 			local hBoxes = h:Lookup("Handle_Buff_Boxes")
-			hBoxes:SetRelY(hMana:GetRelY() - hBoxes:GetH() + hMana:GetH() / 2)
-			hBoxes:SetAbsY(hMana:GetAbsY() - hBoxes:GetH() + hMana:GetH() / 2)
+			hBoxes:SetRelPos(hMana:GetRelX() - 1, hMana:GetRelY() - hBoxes:GetH() + hMana:GetH() / 2)
+			hBoxes:SetAbsPos(hMana:GetAbsX() - 1, hMana:GetAbsY() - hBoxes:GetH() + hMana:GetH() / 2)
 		end
 	end
 end
