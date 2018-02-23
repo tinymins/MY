@@ -633,7 +633,9 @@ function MY_Recount.OnItemRefreshTip()
 					}) do
 						local nCount = 0
 						if p.rec.Detail[nSkillResult] then
-							nCount = p.rec.Detail[nSkillResult].nCount
+							nCount = not MY_Recount.bShowZeroVal
+								and p.rec.Detail[nSkillResult].nNzCount
+								or p.rec.Detail[nSkillResult].nCount
 						end
 						szXml = szXml .. GetFormatText(SZ_SKILL_RESULT[nSkillResult] .. szColon, nil, 255, 202, 126)
 						szXml = szXml .. GetFormatText(string.format('%2d', nCount) .. ' ')
@@ -783,7 +785,7 @@ function MY_Recount_Detail.OnFrameBreathe()
 			local rec = {
 				szKey  = szSkillName,
 				szName = szSkillName,
-				nCount = p.nCount   ,
+				nCount = not MY_Recount.bShowZeroVal and p.nNzCount or p.nCount,
 				nTotal = MY_Recount.bShowEffect and p.nTotalEffect or p.nTotal,
 			}
 			if MY_Recount.bShowZeroVal or rec.nTotal > 0 then
@@ -795,7 +797,7 @@ function MY_Recount_Detail.OnFrameBreathe()
 			local rec = {
 				szKey  = id                              ,
 				szName = MY_Recount.Data.GetNameAusID(id),
-				nCount = p.nCount                        ,
+				nCount = not MY_Recount.bShowZeroVal and p.nNzCount or p.nCount,
 				nTotal = MY_Recount.bShowEffect and p.nTotalEffect or p.nTotal,
 			}
 			if MY_Recount.bShowZeroVal or rec.nTotal > 0 then
@@ -834,7 +836,7 @@ function MY_Recount_Detail.OnFrameBreathe()
 		local hItem = hList:Lookup(i - 1) or hList:AppendItemFromIni(_C.szIniDetail, 'Handle_SkillItem')
 		hItem:Lookup('Text_SkillNo'):SetText(i)
 		hItem:Lookup('Text_SkillName'):SetText((p.szName:gsub("#.*", "")))
-		hItem:Lookup('Text_SkillCount'):SetText(p.nCount)
+		hItem:Lookup('Text_SkillCount'):SetText(not MY_Recount.bShowZeroVal and p.nNzCount or p.nCount)
 		hItem:Lookup('Text_SkillTotal'):SetText(p.nTotal)
 		hItem:Lookup('Text_SkillPercentage'):SetText(nTotal > 0 and _L('%.1f%%', (i == 1 and ceil or floor)(p.nTotal / nTotal * 1000) / 10) or ' - ')
 
@@ -856,13 +858,17 @@ function MY_Recount_Detail.OnFrameBreathe()
 		this:Lookup('', 'Handle_Spliter'):Show()
 		--------------- 二、技能释放结果列表更新 -----------------
 		-- 数据收集
-		local aResult, nCount = {}, tData[szPrimarySort][szSelected].nCount
+		local aResult, nCountSum = {}, not MY_Recount.bShowZeroVal and tData[szPrimarySort][szSelected].nNzCount or tData[szPrimarySort][szSelected].nCount
 		local nTotal = tData[szPrimarySort][szSelected][MY_Recount.bShowEffect and "nTotalEffect" or "nTotal"]
 		for nSkillResult, p in pairs(tData[szPrimarySort][szSelected].Detail) do
 			table.insert(aResult, {
-				nCount = p.nCount,
-				nMin   = MY_Recount.bShowEffect and p.nMinEffect or p.nMin,
-				nAvg   = MY_Recount.bShowEffect and p.nAvgEffect or p.nAvg,
+				nCount = not MY_Recount.bShowZeroVal and p.nNzCount or p.nCount,
+				nMin   = not MY_Recount.bShowEffect
+					and (not MY_Recount.bShowZeroVal and p.nNzMin or p.nMin)
+					or (not MY_Recount.bShowZeroVal and p.nNzMinEffect or p.nMinEffect),
+				nAvg   = not MY_Recount.bShowEffect
+					and (not MY_Recount.bShowZeroVal and p.nNzAvg or p.nAvg)
+					or (not MY_Recount.bShowZeroVal and p.nNzAvgEffect or p.nAvgEffect),
 				nMax   = MY_Recount.bShowEffect and p.nMaxEffect or p.nMax,
 				nTotal = MY_Recount.bShowEffect and p.nTotalEffect or p.nTotal,
 				szSkillResult = SZ_SKILL_RESULT[nSkillResult],
@@ -874,13 +880,14 @@ function MY_Recount_Detail.OnFrameBreathe()
 		local hList = this:Lookup('WndScroll_Detail', 'Handle_DetailList')
 		for i, p in ipairs(aResult) do
 			local hItem = hList:Lookup(i - 1) or hList:AppendItemFromIni(_C.szIniDetail, 'Handle_DetailItem')
+			local nCount = not MY_Recount.bShowZeroVal and p.nNzCount or p.nCount
 			hItem:Lookup('Text_DetailNo'):SetText(i)
 			hItem:Lookup('Text_DetailType'):SetText(p.szSkillResult)
-			hItem:Lookup('Text_DetailMin'):SetText(p.nMinEffect)
-			hItem:Lookup('Text_DetailAverage'):SetText(p.nAvgEffect)
-			hItem:Lookup('Text_DetailMax'):SetText(p.nMaxEffect)
-			hItem:Lookup('Text_DetailCount'):SetText(p.nCount)
-			hItem:Lookup('Text_DetailPercent'):SetText(nCount > 0 and _L('%.1f%%', (i == 1 and ceil or floor)(p.nCount / nCount * 1000) / 10) or ' - ')
+			hItem:Lookup('Text_DetailMin'):SetText(p.nMin)
+			hItem:Lookup('Text_DetailAverage'):SetText(p.nAvg)
+			hItem:Lookup('Text_DetailMax'):SetText(p.nMax)
+			hItem:Lookup('Text_DetailCount'):SetText(nCount)
+			hItem:Lookup('Text_DetailPercent'):SetText(nCountSum > 0 and _L('%.1f%%', (i == 1 and ceil or floor)(nCount / nCountSum * 1000) / 10) or ' - ')
 		end
 		for i = hList:GetItemCount() - 1, #aResult, -1 do
 			hList:RemoveItem(i)

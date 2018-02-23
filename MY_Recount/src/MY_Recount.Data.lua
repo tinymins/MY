@@ -3,6 +3,25 @@
 -- by 茗伊 @ 双梦镇 @ 荻花宫
 -- Build 20140730
 --
+-----------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+-----------------------------------------------------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local floor, min, max, ceil = math.floor, math.min, math.max, math.ceil
+local huge, pi, sin, cos, tan = math.huge, math.pi, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+-----------------------------------------------------------------------------------------
 --[[
 [SKILL_RESULT_TYPE]枚举：
 SKILL_RESULT_TYPE.PHYSICS_DAMAGE       = 0  -- 外功伤害
@@ -339,7 +358,7 @@ function MY_Recount.Data.GeneAwayTime(data, dwID, szRecordType)
 	else
 		nAwayTime = data.nTimeDuring - nFightTime
 	end
-	return math.max(nAwayTime, 0)
+	return max(nAwayTime, 0)
 end
 
 -- 计算战斗时间
@@ -356,7 +375,7 @@ function MY_Recount.Data.GeneFightTime(data, dwID, szRecordType)
 	end
 	if dwID and data.Awaytime and data.Awaytime[dwID] then
 		for _, rec in ipairs(data.Awaytime[dwID]) do
-			local nAwayBegin = math.max(rec[1], nTimeBegin)
+			local nAwayBegin = max(rec[1], nTimeBegin)
 			local nAwayEnd   = rec[2]
 			if nAwayEnd then -- 完整的离开记录
 				nTimeDuring = nTimeDuring - (nAwayEnd - nAwayBegin)
@@ -366,7 +385,7 @@ function MY_Recount.Data.GeneFightTime(data, dwID, szRecordType)
 			end
 		end
 	end
-	return math.max(nTimeDuring, 0)
+	return max(nTimeDuring, 0)
 end
 
 -- ################################################################################################## --
@@ -538,27 +557,39 @@ function _Cache.AddRecord(data, szRecordType, idRecord, idTarget, szEffectName, 
 	-- 添加/更新结果分类统计
 	if not tRecord.Detail[nSkillResult] then
 		tRecord.Detail[nSkillResult] = {
-			nCount       =  0, -- 命中记录数量
+			nCount       =  0, -- 命中记录数量（假设nSkillResult是命中）
+			nNzCount     =  0, -- 非零值命中记录数量
 			nMax         =  0, -- 单次命中最大值
 			nMaxEffect   =  0, -- 单次命中最大有效值
 			nMin         = -1, -- 单次命中最小值
+			nNzMin       = -1, -- 单次非零值命中最小值
 			nMinEffect   = -1, -- 单次命中最小有效值
-			nTotal       =  0, -- 所以命中总伤害
+			nNzMinEffect = -1, -- 单次非零值命中最小有效值
+			nTotal       =  0, -- 所有命中总伤害
 			nTotalEffect =  0, -- 所有命中总有效伤害
 			nAvg         =  0, -- 所有命中平均伤害
+			nNzAvg       =  0, -- 所有非零值命中平均伤害
 			nAvgEffect   =  0, -- 所有命中平均有效伤害
+			nNzAvgEffect =  0, -- 所有非零值命中平均有效伤害
 		}
 	end
 	local tResult = tRecord.Detail[nSkillResult]
 	tResult.nCount       = tResult.nCount + 1                                -- 命中次数（假设nSkillResult是命中）
-	tResult.nMax         = math.max(tResult.nMax, nValue)                    -- 单次命中最大值
-	tResult.nMaxEffect   = math.max(tResult.nMaxEffect, nEffectValue)        -- 单次命中最大有效值
-	tResult.nMin         = (tResult.nMin ~= -1 and math.min(tResult.nMin, nValue)) or nValue                         -- 单次命中最小值
-	tResult.nMinEffect   = (tResult.nMinEffect ~= -1 and math.min(tResult.nMinEffect, nEffectValue)) or nEffectValue -- 单次命中最小有效值
+	tResult.nMax         = max(tResult.nMax, nValue)                    -- 单次命中最大值
+	tResult.nMaxEffect   = max(tResult.nMaxEffect, nEffectValue)        -- 单次命中最大有效值
+	tResult.nMin         = (tResult.nMin ~= -1 and min(tResult.nMin, nValue)) or nValue                         -- 单次命中最小值
+	tResult.nMinEffect   = (tResult.nMinEffect ~= -1 and min(tResult.nMinEffect, nEffectValue)) or nEffectValue -- 单次命中最小有效值
 	tResult.nTotal       = tResult.nTotal + nValue                           -- 所以命中总伤害
 	tResult.nTotalEffect = tResult.nTotalEffect + nEffectValue               -- 所有命中总有效伤害
-	tResult.nAvg         = math.floor(tResult.nTotal / tResult.nCount)       -- 单次命中平均值
-	tResult.nAvgEffect   = math.floor(tResult.nTotalEffect / tResult.nCount) -- 单次命中平均有效值
+	tResult.nAvg         = floor(tResult.nTotal / tResult.nCount)       -- 单次命中平均值
+	tResult.nAvgEffect   = floor(tResult.nTotalEffect / tResult.nCount) -- 单次命中平均有效值
+	if nValue ~= 0 then
+		tResult.nNzCount     = tResult.nNzCount + 1                           -- 命中次数（假设nSkillResult是命中）
+		tResult.nNzMin       = (tResult.nNzMin ~= -1 and min(tResult.nNzMin, nValue)) or nValue                         -- 单次命中最小值
+		tResult.nNzMinEffect = (tResult.nNzMinEffect ~= -1 and min(tResult.nNzMinEffect, nEffectValue)) or nEffectValue -- 单次命中最小有效值
+		tResult.nNzAvg       = floor(tResult.nTotal / tResult.nNzCount)       -- 单次命中平均值
+		tResult.nNzAvgEffect = floor(tResult.nTotalEffect / tResult.nNzCount) -- 单次命中平均有效值
+	end
 
 	------------------------
 	-- # 节： tRecord.Skill
@@ -566,23 +597,33 @@ function _Cache.AddRecord(data, szRecordType, idRecord, idTarget, szEffectName, 
 	-- 添加具体技能记录
 	if not tRecord.Skill[szEffectName] then
 		tRecord.Skill[szEffectName] = {
-			nCount       =  0, -- 该玩家四象轮回释放次数
+			nCount       =  0, -- 该玩家四象轮回释放次数（假设szEffectName是四象轮回）
+			nNzCount     =  0, -- 该玩家非零值四象轮回释放次数
 			nMax         =  0, -- 该玩家四象轮回最大输出量
 			nMaxEffect   =  0, -- 该玩家四象轮回最大有效输出量
 			nTotal       =  0, -- 该玩家四象轮回输出量总和
 			nTotalEffect =  0, -- 该玩家四象轮回有效输出量总和
+			nAvg         =  0, -- 该玩家所有四象轮回平均伤害
+			nNzAvg       =  0, -- 该玩家所有非零值四象轮回平均伤害
+			nAvgEffect   =  0, -- 该玩家所有四象轮回平均有效伤害
+			nNzAvgEffect =  0, -- 该玩家所有非零值四象轮回平均有效伤害
 			Detail       = {}, -- 该玩家四象轮回输出结果分类统计
 			Target       = {}, -- 该玩家四象轮回承受者统计
 		}
 	end
 	local tSkillRecord = tRecord.Skill[szEffectName]
-	tSkillRecord.nCount              = tSkillRecord.nCount + 1
-	tSkillRecord.nMax                = math.max(tSkillRecord.nMax, nValue)
-	tSkillRecord.nMaxEffect          = math.max(tSkillRecord.nMaxEffect, nEffectValue)
-	tSkillRecord.nTotal              = tSkillRecord.nTotal + nValue
-	tSkillRecord.nTotalEffect        = tSkillRecord.nTotalEffect + nEffectValue
-	tSkillRecord.nAvg                = math.floor(tSkillRecord.nTotal / tSkillRecord.nCount)
-	tSkillRecord.nAvgEffect          = math.floor(tSkillRecord.nTotalEffect / tSkillRecord.nCount)
+	tSkillRecord.nCount       = tSkillRecord.nCount + 1
+	tSkillRecord.nMax         = max(tSkillRecord.nMax, nValue)
+	tSkillRecord.nMaxEffect   = max(tSkillRecord.nMaxEffect, nEffectValue)
+	tSkillRecord.nTotal       = tSkillRecord.nTotal + nValue
+	tSkillRecord.nTotalEffect = tSkillRecord.nTotalEffect + nEffectValue
+	tSkillRecord.nAvg         = floor(tSkillRecord.nTotal / tSkillRecord.nCount)
+	tSkillRecord.nAvgEffect   = floor(tSkillRecord.nTotalEffect / tSkillRecord.nCount)
+	if nValue ~= 0 then
+		tSkillRecord.nNzCount     = tSkillRecord.nNzCount + 1
+		tSkillRecord.nNzAvg       = floor(tSkillRecord.nTotal / tSkillRecord.nNzCount)
+		tSkillRecord.nNzAvgEffect = floor(tSkillRecord.nTotalEffect / tSkillRecord.nNzCount)
+	end
 
 	---------------------------------
 	-- # 节： tRecord.Skill[x].Detail
@@ -591,26 +632,38 @@ function _Cache.AddRecord(data, szRecordType, idRecord, idTarget, szEffectName, 
 	if not tSkillRecord.Detail[nSkillResult] then
 		tSkillRecord.Detail[nSkillResult] = {
 			nCount       =  0, -- 命中记录数量
+			nNzCount     =  0, -- 非零值命中记录数量
 			nMax         =  0, -- 单次命中最大值
 			nMaxEffect   =  0, -- 单次命中最大有效值
 			nMin         = -1, -- 单次命中最小值
+			nNzMin       = -1, -- 单次非零值命中最小值
 			nMinEffect   = -1, -- 单次命中最小有效值
+			nNzMinEffect = -1, -- 单次非零值命中最小有效值
 			nTotal       =  0, -- 所以命中总伤害
 			nTotalEffect =  0, -- 所有命中总有效伤害
 			nAvg         =  0, -- 所有命中平均伤害
+			nNzAvg       =  0, -- 所有非零值命中平均伤害
 			nAvgEffect   =  0, -- 所有命中平均有效伤害
+			nNzAvgEffect =  0, -- 所有非零值命中平均有效伤害
 		}
 	end
 	local tResult = tSkillRecord.Detail[nSkillResult]
 	tResult.nCount       = tResult.nCount + 1                           -- 命中次数（假设nSkillResult是命中）
-	tResult.nMax         = math.max(tResult.nMax, nValue)               -- 单次命中最大值
-	tResult.nMaxEffect   = math.max(tResult.nMaxEffect, nEffectValue)   -- 单次命中最大有效值
-	tResult.nMin         = (tResult.nMin ~= -1 and math.min(tResult.nMin, nValue)) or nValue                         -- 单次命中最小值
-	tResult.nMinEffect   = (tResult.nMinEffect ~= -1 and math.min(tResult.nMinEffect, nEffectValue)) or nEffectValue -- 单次命中最小有效值
+	tResult.nMax         = max(tResult.nMax, nValue)               -- 单次命中最大值
+	tResult.nMaxEffect   = max(tResult.nMaxEffect, nEffectValue)   -- 单次命中最大有效值
+	tResult.nMin         = (tResult.nMin ~= -1 and min(tResult.nMin, nValue)) or nValue                         -- 单次命中最小值
+	tResult.nMinEffect   = (tResult.nMinEffect ~= -1 and min(tResult.nMinEffect, nEffectValue)) or nEffectValue -- 单次命中最小有效值
 	tResult.nTotal       = tResult.nTotal + nValue                      -- 所以命中总伤害
 	tResult.nTotalEffect = tResult.nTotalEffect + nEffectValue          -- 所有命中总有效伤害
-	tResult.nAvg         = math.floor(tResult.nTotal / tResult.nCount)
-	tResult.nAvgEffect   = math.floor(tResult.nTotalEffect / tResult.nCount)
+	tResult.nAvg         = floor(tResult.nTotal / tResult.nCount)
+	tResult.nAvgEffect   = floor(tResult.nTotalEffect / tResult.nCount)
+	if nValue ~= 0 then
+		tResult.nNzCount     = tResult.nNzCount + 1                           -- 命中次数（假设nSkillResult是命中）
+		tResult.nNzMin       = (tResult.nNzMin ~= -1 and min(tResult.nNzMin, nValue)) or nValue                         -- 单次命中最小值
+		tResult.nNzMinEffect = (tResult.nNzMinEffect ~= -1 and min(tResult.nNzMinEffect, nEffectValue)) or nEffectValue -- 单次命中最小有效值
+		tResult.nNzAvg       = floor(tResult.nTotal / tResult.nNzCount)
+		tResult.nNzAvgEffect = floor(tResult.nTotalEffect / tResult.nNzCount)
+	end
 
 	------------------------------
 	-- # 节： tRecord.Skill.Target
@@ -623,18 +676,26 @@ function _Cache.AddRecord(data, szRecordType, idRecord, idTarget, szEffectName, 
 			nTotal       = 0,            -- 该玩家四象轮回击中的这个玩家伤害总和
 			nTotalEffect = 0,            -- 该玩家四象轮回击中的这个玩家有效伤害总和
 			Count = {                    -- 该玩家四象轮回击中的这个玩家结果统计
-				-- SKILL_RESULT.HIT      = 5,
-				-- SKILL_RESULT.MISS     = 3,
-				-- SKILL_RESULT.CRITICAL = 3,
+				-- [SKILL_RESULT.HIT     ] = 5,
+				-- [SKILL_RESULT.MISS    ] = 3,
+				-- [SKILL_RESULT.CRITICAL] = 3,
+			},
+			NzCount = {                  -- 该玩家非零值四象轮回击中的这个玩家结果统计
+				-- [SKILL_RESULT.HIT     ] = 5,
+				-- [SKILL_RESULT.MISS    ] = 3,
+				-- [SKILL_RESULT.CRITICAL] = 3,
 			},
 		}
 	end
 	local tSkillTargetData = tSkillRecord.Target[idTarget]
-	tSkillTargetData.nMax                = math.max(tSkillTargetData.nMax, nValue)
-	tSkillTargetData.nMaxEffect          = math.max(tSkillTargetData.nMaxEffect, nEffectValue)
+	tSkillTargetData.nMax                = max(tSkillTargetData.nMax, nValue)
+	tSkillTargetData.nMaxEffect          = max(tSkillTargetData.nMaxEffect, nEffectValue)
 	tSkillTargetData.nTotal              = tSkillTargetData.nTotal + nValue
 	tSkillTargetData.nTotalEffect        = tSkillTargetData.nTotalEffect + nEffectValue
 	tSkillTargetData.Count[nSkillResult] = (tSkillTargetData.Count[nSkillResult] or 0) + 1
+	if nValue ~= 0 then
+		tSkillTargetData.NzCount[nSkillResult] = (tSkillTargetData.NzCount[nSkillResult] or 0) + 1
+	end
 
 	------------------------
 	-- # 节： tRecord.Target
@@ -643,22 +704,32 @@ function _Cache.AddRecord(data, szRecordType, idRecord, idTarget, szEffectName, 
 	if not tRecord.Target[idTarget] then
 		tRecord.Target[idTarget] = {
 			nCount       =  0, -- 该玩家对idTarget的技能释放次数
+			nNzCount     =  0, -- 该玩家对idTarget的非零值技能释放次数
 			nMax         =  0, -- 该玩家对idTarget的技能最大输出量
 			nMaxEffect   =  0, -- 该玩家对idTarget的技能最大有效输出量
 			nTotal       =  0, -- 该玩家对idTarget的技能输出量总和
 			nTotalEffect =  0, -- 该玩家对idTarget的技能有效输出量总和
+			nAvg         =  0, -- 该玩家对idTarget的技能平均输出量
+			nNzAvg       =  0, -- 该玩家对idTarget的非零值技能平均输出量
+			nAvgEffect   =  0, -- 该玩家对idTarget的技能平均有效输出量
+			nNzAvgEffect =  0, -- 该玩家对idTarget的非零值技能平均有效输出量
 			Detail       = {}, -- 该玩家对idTarget的技能输出结果分类统计
 			Skill        = {}, -- 该玩家对idTarget的技能具体分别统计
 		}
 	end
 	local tTargetRecord = tRecord.Target[idTarget]
-	tTargetRecord.nCount              = tTargetRecord.nCount + 1
-	tTargetRecord.nMax                = math.max(tTargetRecord.nMax, nValue)
-	tTargetRecord.nMaxEffect          = math.max(tTargetRecord.nMaxEffect, nEffectValue)
-	tTargetRecord.nTotal              = tTargetRecord.nTotal + nValue
-	tTargetRecord.nTotalEffect        = tTargetRecord.nTotalEffect + nEffectValue
-	tTargetRecord.nAvg                = math.floor(tTargetRecord.nTotal / tTargetRecord.nCount)
-	tTargetRecord.nAvgEffect          = math.floor(tTargetRecord.nTotalEffect / tTargetRecord.nCount)
+	tTargetRecord.nCount       = tTargetRecord.nCount + 1
+	tTargetRecord.nMax         = max(tTargetRecord.nMax, nValue)
+	tTargetRecord.nMaxEffect   = max(tTargetRecord.nMaxEffect, nEffectValue)
+	tTargetRecord.nTotal       = tTargetRecord.nTotal + nValue
+	tTargetRecord.nTotalEffect = tTargetRecord.nTotalEffect + nEffectValue
+	tTargetRecord.nAvg         = floor(tTargetRecord.nTotal / tTargetRecord.nCount)
+	tTargetRecord.nAvgEffect   = floor(tTargetRecord.nTotalEffect / tTargetRecord.nCount)
+	if nValue ~= 0 then
+		tTargetRecord.nNzCount     = tTargetRecord.nNzCount + 1
+		tTargetRecord.nNzAvg       = floor(tTargetRecord.nTotal / tTargetRecord.nNzCount)
+		tTargetRecord.nNzAvgEffect = floor(tTargetRecord.nTotalEffect / tTargetRecord.nNzCount)
+	end
 
 	----------------------------------
 	-- # 节： tRecord.Target[x].Detail
@@ -667,26 +738,38 @@ function _Cache.AddRecord(data, szRecordType, idRecord, idTarget, szEffectName, 
 	if not tTargetRecord.Detail[nSkillResult] then
 		tTargetRecord.Detail[nSkillResult] = {
 			nCount       =  0, -- 命中记录数量（假设nSkillResult是命中）
+			nNzCount     =  0, -- 非零值命中记录数量
 			nMax         =  0, -- 单次命中最大值
 			nMaxEffect   =  0, -- 单次命中最大有效值
 			nMin         = -1, -- 单次命中最小值
+			nNzMin       = -1, -- 单次非零值命中最小值
 			nMinEffect   = -1, -- 单次命中最小有效值
+			nNzMinEffect = -1, -- 单次非零值命中最小有效值
 			nTotal       =  0, -- 所以命中总伤害
 			nTotalEffect =  0, -- 所有命中总有效伤害
 			nAvg         =  0, -- 所有命中平均伤害
+			nNzAvg       =  0, -- 所有非零值命中平均伤害
 			nAvgEffect   =  0, -- 所有命中平均有效伤害
+			nNzAvgEffect =  0, -- 所有非零值命中平均有效伤害
 		}
 	end
 	local tResult = tTargetRecord.Detail[nSkillResult]
 	tResult.nCount       = tResult.nCount + 1                           -- 命中次数（假设nSkillResult是命中）
-	tResult.nMax         = math.max(tResult.nMax, nValue)               -- 单次命中最大值
-	tResult.nMaxEffect   = math.max(tResult.nMaxEffect, nEffectValue)   -- 单次命中最大有效值
-	tResult.nMin         = (tResult.nMin ~= -1 and math.min(tResult.nMin, nValue)) or nValue                         -- 单次命中最小值
-	tResult.nMinEffect   = (tResult.nMinEffect ~= -1 and math.min(tResult.nMinEffect, nEffectValue)) or nEffectValue -- 单次命中最小有效值
+	tResult.nMax         = max(tResult.nMax, nValue)               -- 单次命中最大值
+	tResult.nMaxEffect   = max(tResult.nMaxEffect, nEffectValue)   -- 单次命中最大有效值
+	tResult.nMin         = (tResult.nMin ~= -1 and min(tResult.nMin, nValue)) or nValue                         -- 单次命中最小值
+	tResult.nMinEffect   = (tResult.nMinEffect ~= -1 and min(tResult.nMinEffect, nEffectValue)) or nEffectValue -- 单次命中最小有效值
 	tResult.nTotal       = tResult.nTotal + nValue                      -- 所以命中总伤害
 	tResult.nTotalEffect = tResult.nTotalEffect + nEffectValue          -- 所有命中总有效伤害
-	tResult.nAvg         = math.floor(tResult.nTotal / tResult.nCount)
-	tResult.nAvgEffect   = math.floor(tResult.nTotalEffect / tResult.nCount)
+	tResult.nAvg         = floor(tResult.nTotal / tResult.nCount)
+	tResult.nAvgEffect   = floor(tResult.nTotalEffect / tResult.nCount)
+	if nValue ~= 0 then
+		tResult.nNzCount       = tResult.nNzCount + 1                           -- 命中次数（假设nSkillResult是命中）
+		tResult.nNzMin         = (tResult.nNzMin ~= -1 and min(tResult.nNzMin, nValue)) or nValue                         -- 单次命中最小值
+		tResult.nNzMinEffect   = (tResult.nNzMinEffect ~= -1 and min(tResult.nNzMinEffect, nEffectValue)) or nEffectValue -- 单次命中最小有效值
+		tResult.nNzAvg         = floor(tResult.nTotal / tResult.nNzCount)
+		tResult.nNzAvgEffect   = floor(tResult.nTotalEffect / tResult.nNzCount)
+	end
 
 	---------------------------------
 	-- # 节： tRecord.Target[x].Skill
@@ -699,18 +782,26 @@ function _Cache.AddRecord(data, szRecordType, idRecord, idTarget, szEffectName, 
 			nTotal       = 0,            -- 该玩家击中这个玩家的四象轮回伤害总和
 			nTotalEffect = 0,            -- 该玩家击中这个玩家的四象轮回有效伤害总和
 			Count = {                    -- 该玩家击中这个玩家的四象轮回结果统计
-				-- SKILL_RESULT.HIT      = 5,
-				-- SKILL_RESULT.MISS     = 3,
-				-- SKILL_RESULT.CRITICAL = 3,
+				-- [SKILL_RESULT.HIT     ] = 5,
+				-- [SKILL_RESULT.MISS    ] = 3,
+				-- [SKILL_RESULT.CRITICAL] = 3,
+			},
+			NzCount = {                    -- 该玩家非零值击中这个玩家的四象轮回结果统计
+				-- [SKILL_RESULT.HIT     ] = 5,
+				-- [SKILL_RESULT.MISS    ] = 3,
+				-- [SKILL_RESULT.CRITICAL] = 3,
 			},
 		}
 	end
 	local tTargetSkillData = tTargetRecord.Skill[szEffectName]
-	tTargetSkillData.nMax                = math.max(tTargetSkillData.nMax, nValue)
-	tTargetSkillData.nMaxEffect          = math.max(tTargetSkillData.nMaxEffect, nEffectValue)
+	tTargetSkillData.nMax                = max(tTargetSkillData.nMax, nValue)
+	tTargetSkillData.nMaxEffect          = max(tTargetSkillData.nMaxEffect, nEffectValue)
 	tTargetSkillData.nTotal              = tTargetSkillData.nTotal + nValue
 	tTargetSkillData.nTotalEffect        = tTargetSkillData.nTotalEffect + nEffectValue
 	tTargetSkillData.Count[nSkillResult] = (tTargetSkillData.Count[nSkillResult] or 0) + 1
+	if nValue ~= 0 then
+		tTargetSkillData.NzCount[nSkillResult] = (tTargetSkillData.NzCount[nSkillResult] or 0) + 1
+	end
 end
 
 -- 获取索引ID
