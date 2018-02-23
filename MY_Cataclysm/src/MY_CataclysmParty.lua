@@ -1111,8 +1111,8 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bLa
 		if CFG.bBuffAboveMana then
 			local hMana = h:Lookup("Handle_Mana")
 			local hBoxes = h:Lookup("Handle_Buff_Boxes")
-			hBoxes:SetRelY(hMana:GetRelY() - hBoxes:GetH())
-			hBoxes:SetAbsY(hMana:GetAbsY() - hBoxes:GetH())
+			hBoxes:SetRelY(hMana:GetRelY() - hBoxes:GetH() + hMana:GetH() / 2)
+			hBoxes:SetAbsY(hMana:GetAbsY() - hBoxes:GetH() + hMana:GetH() / 2)
 		end
 	end
 end
