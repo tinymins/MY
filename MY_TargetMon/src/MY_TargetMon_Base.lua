@@ -415,7 +415,24 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 		hItem.box:SetObjectIcon(iconid)
 		-- ¼ÆËãBUFFÊ±¼ä
 		local nTimeLeft = math.max(0, buff.nEndFrame - nFrameCount) / 16
-		local szTimeLeft = nTimeLeft > 3600 and '1h+' or ((config.decimalTime == -1 or nTimeLeft < config.decimalTime) and "%.1f'" or "%d'"):format(nTimeLeft)
+		local szTimeLeft = "1h+"
+		if nTimeLeft <= 3600 then
+			if nTimeLeft > 60 then
+				if config.decimalTime == -1 or nTimeLeft < config.decimalTime then
+					szTimeLeft = "%d'%.1f"
+				else
+					szTimeLeft = "%d'%d"
+				end
+				szTimeLeft = szTimeLeft:format(floor(nTimeLeft / 60), nTimeLeft % 60)
+			else
+				if config.decimalTime == -1 or nTimeLeft < config.decimalTime then
+					szTimeLeft = "%.1f"
+				else
+					szTimeLeft = "%d"
+				end
+				szTimeLeft = szTimeLeft:format(nTimeLeft)
+			end
+		end
 		local nBuffTime = math.max(GetBuffTime(buff.dwID, buff.nLevel) / 16, nTimeLeft)
 		if not l_tBuffTime[KTarget.dwID][buff.dwID] then
 			l_tBuffTime[KTarget.dwID][buff.dwID] = {}
