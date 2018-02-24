@@ -2067,28 +2067,6 @@ function OpenBuffEditPanel(rec)
 	y = y + 30
 
 	x = X
-	x = x + ui:append("Shadow", {
-		x = x, y = y, w = 22, h = 22,
-		color = rec.col and {MY.HumanColor2RGB(rec.col)} or {255, 255, 0},
-		onclick = function()
-			local this = this
-			XGUI.OpenColorPicker(function(r, g, b)
-				local a = rec.col and select(4, MY.Hex2RGB(rec.col)) or 255
-				rec.nColAlpha = a
-				rec.col = MY.RGB2Hex(r, g, b, a)
-				XGUI(this):color(r, g, b)
-				update()
-			end)
-		end,
-	}, true):autoWidth():width() + 5
-	x = x + ui:append("Text", {
-		x = x, y = y, h = 25,
-		text = _L['Clear color'],
-		onclick = function()
-			rec.col = nil
-			update()
-		end,
-	}, true):autoWidth():width() + 5
 	x = x + ui:append("Text", {
 		x = x, y = y, h = 25,
 		text = _L['Reminder'],
@@ -2114,6 +2092,28 @@ function OpenBuffEditPanel(rec)
 			update()
 		end,
 	}, true):width() + 5
+	x = x + ui:append("Shadow", {
+		x = x, y = y, w = 22, h = 22,
+		color = rec.col and {MY.HumanColor2RGB(rec.col)} or {255, 255, 0},
+		onclick = function()
+			local this = this
+			XGUI.OpenColorPicker(function(r, g, b)
+				local a = rec.col and select(4, MY.Hex2RGB(rec.col)) or 255
+				rec.nColAlpha = a
+				rec.col = MY.RGB2Hex(r, g, b, a)
+				XGUI(this):color(r, g, b)
+				update()
+			end)
+		end,
+	}, true):autoWidth():width() + 5
+	x = x + ui:append("Text", {
+		x = x, y = y, h = 25,
+		text = _L['Clear color'],
+		onclick = function()
+			rec.col = nil
+			update()
+		end,
+	}, true):autoWidth():width() + 5
 	y = y + 30
 
 	x = X
