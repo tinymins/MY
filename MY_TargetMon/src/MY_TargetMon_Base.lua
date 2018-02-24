@@ -40,7 +40,7 @@ end
 
 function D.SaveAnchor(frame)
 	frame.config.anchor = frame.config.hideVoid
-		and GetFrameAnchor(frame, "LEFTTOP")
+		and GetFrameAnchor(frame, "TOPLEFT")
 		or GetFrameAnchor(frame)
 end
 
