@@ -2,6 +2,25 @@
 -- @Date:   2016-01-04 12:57:33
 -- @Last Modified by:   Administrator
 -- @Last Modified time: 2016-12-29 11:13:26
+-----------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+-----------------------------------------------------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local floor, min, max, ceil = math.floor, math.min, math.max, math.ceil
+local huge, pi, sin, cos, tan = math.huge, math.pi, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+-----------------------------------------------------------------------------------------
 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_TeamTools/lang/")
 local PR = {}
@@ -24,15 +43,14 @@ MY_PartyRequest = {
 MY.RegisterCustomData("MY_PartyRequest")
 
 function MY_PartyRequest.OnFrameCreate()
-	this.bg = this:Lookup("", "Image_Bg")
 	this:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
 	this:Lookup("", "Text_Title"):SetText(g_tStrings.STR_ARENA_INVITE)
 	MY.RegisterEsc("MY_PartyRequest", PR.GetFrame, PR.ClosePanel)
 end
 
 function MY_PartyRequest.OnLButtonClick()
-	local szName = this:GetName()
-	if szName == "Btn_Setting" then
+	local name = this:GetName()
+	if name == "Btn_Setting" then
 		local menu = {}
 		table.insert(menu, {
 			szOption = _L["Auto Refuse No full level Player"],
@@ -42,8 +60,74 @@ function MY_PartyRequest.OnLButtonClick()
 			end,
 		})
 		PopupMenu(menu)
-	elseif szName == "Btn_Close" then
+	elseif name == "Btn_Close" then
 		PR.ClosePanel()
+	elseif name == "Btn_Accept" then
+		local info = this:GetParent().info
+		info.fnAction()
+		for i, v in ipairs_r(PR_PARTY_REQUEST) do
+			if v == info then
+				remove(PR_PARTY_REQUEST, i)
+			end
+		end
+		PR.UpdateFrame()
+	elseif name == "Btn_Refuse" then
+		local info = this:GetParent().info
+		info.fnCancelAction()
+		for i, v in ipairs_r(PR_PARTY_REQUEST) do
+			if v == info then
+				remove(PR_PARTY_REQUEST, i)
+			end
+		end
+		PR.UpdateFrame()
+	elseif name == "Btn_Lookup" then
+		local info = this:GetParent().info
+		if info.bDetail then
+			ViewInviteToPlayer(info.dwID)
+		else
+			MY.BgTalk(info.szName, "RL", "ASK")
+			this:Enable(false)
+			this:Lookup("", "Text_Lookup"):SetText(_L["loading..."])
+			MY.Sysmsg({_L["If it is always loading, the target may not install plugin or refuse."]})
+		end
+	elseif this.info then
+		if IsCtrlKeyDown() then
+			EditBox_AppendLinkPlayer(this.info.szName)
+		end
+	end
+end
+
+function MY_PartyRequest.OnRButtonClick()
+	if this.info then
+		local menu = {}
+		InsertPlayerCommonMenu(menu, 0, this.info.szName)
+		menu[4] = nil
+		if this.info.dwID then
+			table.insert(menu, {
+				szOption = g_tStrings.STR_LOOKUP,
+				fnAction = function()
+					ViewInviteToPlayer(this.info.dwID)
+				end,
+			})
+		end
+		PopupMenu(menu)
+	end
+end
+
+function MY_PartyRequest.OnMouseEnter()
+	if this.info then
+		local x, y = this:GetAbsPos()
+		local w, h = this:GetSize()
+		local szTip = MY_Farbnamen.GetTip(this.info.szName)
+		if szTip then
+			OutputTip(szTip, 450, {x, y, w, h}, MY.Const.UI.Tip.POS_TOP)
+		end
+	end
+end
+
+function MY_PartyRequest.OnMouseLeave()
+	if this.info then
+		HideTip()
 	end
 end
 
@@ -154,107 +238,43 @@ function PR.UpdateFrame()
 	if #PR_PARTY_REQUEST == 0 then
 		return PR.ClosePanel(true)
 	end
-	local hContainer = frame:Lookup("WndContainer_Request")
-	hContainer:Clear()
-	local cover = "ui/Image/Common/CoverShadow.UITex"
+	local container, nH = frame:Lookup("WndContainer_Request"), 0
+	container:Clear()
 	for k, v in ipairs(PR_PARTY_REQUEST) do
-		local item = hContainer:AppendContentFromIni(PR_INI_PATH, "WndWindow_Item", k)
-		local ui = XGUI(item)
+		local wnd = container:AppendContentFromIni(PR_INI_PATH, "WndWindow_Item", k)
+		local hItem = wnd:Lookup("", "")
+		hItem:Lookup("Image_Hover"):SetFrame(2)
+
 		if v.dwKungfuID then
-			ui:append("Image", { x = 5, y = 5, w = 40, h = 40 }, true):image(Table_GetSkillIconID(v.dwKungfuID, 1))
+			hItem:Lookup("Image_Icon"):FromIconID(Table_GetSkillIconID(v.dwKungfuID, 1))
 		else
-			ui:append("Image", { x = 5, y = 5, w = 40, h = 40 }, true):image(GetForceImage(v.dwForce))
+			hItem:Lookup("Image_Icon"):FromUITex(GetForceImage(v.dwForce))
 		end
-		if v.nGongZhan == 1 then
-			ui:append("Image", { x = 25, y = 30, w = 15, h = 15 }, true):image(Table_GetBuffIconID(3219, 1))
+		hItem:Lookup("Handle_Status/Handle_Gongzhan"):SetVisible(v.nGongZhan == 1)
+
+		local nCampFrame = GetCampImageFrame(v.nCamp)
+		if nCampFrame then
+			hItem:Lookup("Handle_Status/Handle_Camp/Image_Camp"):SetFrame(nCampFrame)
 		end
-		ui:append("Image", { x = 215, y = 15, w = 20, h = 20 }, true):image("ui/Image/UICommon/CommonPanel2.UITex", GetCampImageFrame(v.nCamp) or -1)
-		ui:append("Image", { x = 0, y = 42, w = 420, h = 8 }, true):image("ui/Image/UICommon/CommonPanel.UITex", 45)
-		ui:append("Image", { name = "Cover", x = 0, y = 0, w = 420, h = 50 }, true):image(cover, 2):toggle(false)
-		ui:hover(function(bHover)
-			if bHover then
-				ui:children("#Cover"):image(cover, 2):toggle(true)
-			else
-				ui:children("#Cover"):toggle(false)
-			end
-		end)
-		:rclick(function()
-			local menu = {}
-			InsertPlayerCommonMenu(menu, 0, v.szName)
-			menu[4] = nil
-			if v.dwID then
-				table.insert(menu, {
-					szOption = g_tStrings.STR_LOOKUP, fnAction = function()
-						ViewInviteToPlayer(v.dwID)
-					end,
-				})
-			end
-			PopupMenu(menu)
-		end)
+		hItem:Lookup("Handle_Status/Handle_Camp"):SetVisible(not not nCampFrame)
+
 		if v.bDetail and v.bEx == "Author" then
-			ui:append("Text", { x = 47, y = 8, text = v.szName, font = 15, color = { 255, 255, 0 } })
-		else
-			ui:append("Text", { x = 47, y = 8, text = v.szName, font = 15  })
+			hItem:Lookup("Text_Name"):SetFontColor(255, 255, 0)
 		end
-		ui:append("Text", { x = 5, y = 25, text = v.nLevel, font = 215 })
-		item.OnLButtonDown = function()
-			if IsCtrlKeyDown() then
-				EditBox_AppendLinkPlayer(v.szName)
-			end
-		end
-		ui:append("WndButton2", { x = 240, y = 7, w = 60, h = 34, text = g_tStrings.STR_ACCEPT }, true):click(function()
-			v.fnAction()
-			table.remove(PR_PARTY_REQUEST, k)
-			PR.UpdateFrame()
-		end):hover(function(bHover)
-			if bHover then
-				ui:children("#Cover"):image(cover, 3):toggle(true)
-			else
-				ui:children("#Cover"):toggle(false)
-			end
-		end)
-		ui:append("WndButton2", { x = 305, y = 7, w = 60, h = 34, text = g_tStrings.STR_REFUSE }, true):click(function()
-			v.fnCancelAction()
-			table.remove(PR_PARTY_REQUEST, k)
-			PR.UpdateFrame()
-		end):hover(function(bHover)
-			if bHover then
-				ui:children("#Cover"):image(cover, 4):toggle(true)
-			else
-				ui:children("#Cover"):toggle(false)
-			end
-		end)
-		if v.bDetail then
-			ui:append("WndButton2",{ name = "Details", x = 370, y = 7, w = 90, h = 34, text = g_tStrings.STR_LOOKUP, color = { 255, 255, 0 } }, true):click(function()
-				ViewInviteToPlayer(v.dwID)
-			end):hover(function(bHover)
-				if bHover then
-					ui:children("#Cover"):image(cover, 1):toggle(true)
-				else
-					ui:children("#Cover"):toggle(false)
-				end
-			end)
-		else
-			ui:append("WndButton2",{ name = "Details", x = 370, y = 7, w = 90, h = 34, text = _L["Details"] }, true):click(function()
-				MY.BgTalk(v.szName, "RL", "ASK")
-				ui:children("#Details"):enable(false):text(_L["loading..."])
-				MY.Sysmsg({_L["If it is always loading, the target may not install plugin or refuse."]})
-			end):hover(function(bHover)
-				if bHover then
-					ui:children("#Cover"):image(cover,1):toggle(true)
-				else
-					ui:children("#Cover"):toggle(false)
-				end
-			end)
-		end
+		hItem:Lookup("Text_Name"):SetText(v.szName)
+		hItem:Lookup("Text_Level"):SetText(v.nLevel)
+
+		wnd:Lookup("Btn_Accept", "Text_Accept"):SetText(g_tStrings.STR_ACCEPT)
+		wnd:Lookup("Btn_Refuse", "Text_Refuse"):SetText(g_tStrings.STR_REFUSE)
+		wnd:Lookup("Btn_Lookup", "Text_Lookup"):SetText(v.bDetail and g_tStrings.STR_LOOKUP or _L["Details"])
+		wnd.info = v
+		nH = nH + wnd:GetH()
 	end
-	local w, h = 470, 50
-	local n = hContainer:GetAllContentCount()
-	hContainer:SetH(h * n)
-	frame:SetH(h * n + 30)
-	frame:SetDragArea(0, 0, w, h * n + 30)
-	frame.bg:SetH(h * n + 30)
-	hContainer:FormatAllContentPos()
+	container:SetH(nH)
+	container:FormatAllContentPos()
+	frame:Lookup("", "Image_Bg"):SetH(nH)
+	frame:SetH(nH + 30)
+	frame:SetDragArea(0, 0, frame:GetW(), frame:GetH())
 end
 
 function PR.Feedback(szName, data)
