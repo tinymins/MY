@@ -553,17 +553,51 @@ function CTM_Party_Base.OnItemRButtonClick()
 	else
 		table.insert(menu, { bDevide = true })
 		InsertPlayerMenu(menu, dwID)
-		if MY.IsLeader() or MY_Cataclysm.bDebug then
+		if MY.IsLeader() then
 			table.insert(menu, { bDevide = true })
-			table.insert(menu, { szOption = _L["take back all permissions"], rgb = { 255, 255, 0 }, fnAction = function()
-				if MY.IsLeader() then
+			table.insert(menu, {
+				szOption = _L["Take back all permissions"],
+				rgb = { 255, 255, 0 },
+				fnAction = function()
 					local team = GetClientTeam()
 					team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK, UI_GetClientPlayerID())
 					team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE, UI_GetClientPlayerID())
-				else
-					MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "MY_ABOUT", "TeamAuth")
-				end
-			end	})
+				end,
+			})
+		elseif MY_Cataclysm.bDebug then
+			table.insert(menu, { bDevide = true })
+			table.insert(menu, {
+				szOption = _L["Take back permissions"],
+				rgb = { 255, 255, 0 },
+				{
+					szOption = _L["Take back all permissions"],
+					rgb = { 255, 255, 0 },
+					fnAction = function()
+						MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "MY_ABOUT", "TeamAuth")
+					end,
+				},
+				{
+					szOption = _L["Take back leader permission"],
+					rgb = { 255, 255, 0 },
+					fnAction = function()
+						MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "MY_ABOUT", "TeamLeader")
+					end,
+				},
+				{
+					szOption = _L["Take back mark permission"],
+					rgb = { 255, 255, 0 },
+					fnAction = function()
+						MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "MY_ABOUT", "TeamMark")
+					end,
+				},
+				{
+					szOption = _L["Take back distribute permission"],
+					rgb = { 255, 255, 0 },
+					fnAction = function()
+						MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "MY_ABOUT", "TeamDistribute")
+					end,
+				}
+			})
 		end
 	end
 	if #menu > 0 then

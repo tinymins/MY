@@ -678,6 +678,37 @@ MY.RegisterBgMsg("RL", function(_, nChannel, dwID, szName, bIsSelf, ...)
 		end
 	end
 end)
+-- 搬运JH_ABOUT
+MY.RegisterBgMsg("MY_ABOUT", function(_, nChannel, dwID, szName, bIsSelf, ...)
+	local data = {...}
+	if data[1] == "Author" then -- 版本检查 自用 可以绘制详细表格
+		local me, szTong = GetClientPlayer(), ""
+		if me.dwTongID > 0 then
+			szTong = GetTongClient().ApplyGetTongName(me.dwTongID) or "Failed"
+		end
+		local szServer = select(2, GetUserServer())
+		MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "JH_ABOUT", "info",
+			me.GetTotalEquipScore(),
+			me.GetMapID(),
+			szTong,
+			me.nRoleType,
+			_VERSION_,
+			szServer,
+			MY.GetBuff(3219)
+		)
+	elseif data[1] == "TeamAuth" then -- 防止有人睡着 遇到了不止一次了
+		local team = GetClientTeam()
+		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER, dwID)
+		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK, dwID)
+		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE, dwID)
+	elseif data[1] == "TeamLeader" then
+		GetClientTeam().SetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER, dwID)
+	elseif data[1] == "TeamMark" then
+		GetClientTeam().SetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK, dwID)
+	elseif data[1] == "TeamDistribute" then
+		GetClientTeam().SetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE, dwID)
+	end
+end)
 --------------------------------------------------------------------------------------------------------------------------------------------
 -- 选项卡
 --------------------------------------------------------------------------------------------------------------------------------------------
