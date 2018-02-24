@@ -46,6 +46,7 @@ data = {
 	["Party Request"] = "優化入隊申請列表",
 	["Clear list and close?"] = "清空列表並關閉？",
 	["Details"] = "詢問詳情",
+	["Press alt and click to view equipment."] = "按住ALT點擊左鍵可查看裝備",
 	["loading..."] = "讀取中..",
 	["If it is always loading, the target may not install plugin or refuse."] = "如果一直提示加載中，可能是對方沒有安裝插件或者拒絕了您的請求",
 	["[%s] want to see your char info, OK?"] = "[%s] 想知曉您的當前屬性是否告知？",

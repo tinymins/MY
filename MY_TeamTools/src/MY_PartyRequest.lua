@@ -82,7 +82,7 @@ function MY_PartyRequest.OnLButtonClick()
 		PR.UpdateFrame()
 	elseif name == "Btn_Lookup" then
 		local info = this:GetParent().info
-		if info.bDetail then
+		if info.bDetail or (info.dwID and IsAltKeyDown()) then
 			ViewInviteToPlayer(info.dwID)
 		else
 			MY.BgTalk(info.szName, "RL", "ASK")
@@ -93,6 +93,8 @@ function MY_PartyRequest.OnLButtonClick()
 	elseif this.info then
 		if IsCtrlKeyDown() then
 			EditBox_AppendLinkPlayer(this.info.szName)
+		elseif IsAltKeyDown() and this.info.dwID then
+			ViewInviteToPlayer(this.info.dwID)
 		end
 	end
 end
@@ -115,7 +117,16 @@ function MY_PartyRequest.OnRButtonClick()
 end
 
 function MY_PartyRequest.OnMouseEnter()
-	if this.info then
+	local name = this:GetName()
+	if name == "Btn_Lookup" then
+		local info = this:GetParent().info
+		if not info.bDetail and info.dwID then
+			local x, y = this:GetAbsPos()
+			local w, h = this:GetSize()
+			local szTip = GetFormatText(_L["Press alt and click to view equipment."])
+			OutputTip(szTip, 450, {x, y, w, h}, MY.Const.UI.Tip.POS_TOP)
+		end
+	elseif this.info then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		local szTip = MY_Farbnamen.GetTip(this.info.szName)
@@ -165,7 +176,7 @@ function PR.OnPeekPlayer()
 			if p then
 				local mnt = p.GetKungfuMount()
 				local data = { nil, arg1, mnt and mnt.dwSkillID or nil, false }
-				PR.Feedback(p.szName, data)
+				PR.Feedback(p.szName, data, false)
 			end
 		end
 		PR_EQUIP_REQUEST[arg1] = nil
@@ -277,10 +288,10 @@ function PR.UpdateFrame()
 	frame:SetDragArea(0, 0, frame:GetW(), frame:GetH())
 end
 
-function PR.Feedback(szName, data)
+function PR.Feedback(szName, data, bDetail)
 	for k, v in ipairs(PR_PARTY_REQUEST) do
 		if v.szName == szName then
-			v.bDetail    = true
+			v.bDetail    = bDetail
 			v.dwID       = data[2]
 			v.dwKungfuID = data[3]
 			v.nGongZhan  = data[4]
@@ -299,7 +310,7 @@ MY.RegisterBgMsg("RL", function(_, nChannel, dwID, szName, bIsSelf, ...)
 	local data = {...}
 	if not bIsSelf then
 		if data[1] == "Feedback" then
-			PR.Feedback(szName, data)
+			PR.Feedback(szName, data, true)
 		end
 	end
 end)
