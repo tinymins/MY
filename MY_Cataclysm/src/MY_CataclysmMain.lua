@@ -2163,15 +2163,72 @@ end
 
 function PS.OnPanelActive(frame)
 	local ui = XGUI(frame)
-	local X, Y = 20, 10
+	local X, Y = 10, 10
 	local x, y = X, Y
 	local w, h = ui:size()
 
-	-- BUFF设置
-	y = y + ui:append("Text", { x = x, y = y, text = _L["Buff settings"], font = 27 }, true):autoSize():height()
+	x = X
+	x = x + ui:append("WndButton2", {
+		x = x, y = y, w = 100,
+		text = _L["Add"],
+		onclick = function()
+			local rec = {}
+			insert(Cataclysm_Main.aBuffList, rec)
+			OpenBuffEditPanel(rec, l_list)
+		end,
+	}, true):autoHeight():width() + 5
+	x = x + ui:append("WndButton2", {
+		x = x, y = y, w = 100,
+		text = _L["Edit"],
+		onclick = function()
+			local ui = XGUI.CreateFrame("MY_Cataclysm_BuffConfig", {
+				w = 350, h = 550,
+				text = _L["Edit buff"],
+				close = true, anchor = {},
+			})
+			local X, Y = 20, 60
+			local x, y = X, Y
+			local edit = ui:append("WndEditBox",{
+				x = x, y = y, w = 310, h = 440, limit = 4096, multiline = true,
+				text = GetListText(Cataclysm_Main.aBuffList),
+			}, true)
+			y = y + edit:height() + 5
 
-	x = X + 10
-	y = y + 3
+			ui:append("WndButton2", {
+				x = x, y = y, w = 310,
+				text = _L["Sure"],
+				onclick = function()
+					Cataclysm_Main.aBuffList = GetTextList(edit:text())
+					UpdateBuffListCache()
+					ui:remove()
+					MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
+					MY.SwitchTab("MY_Cataclysm_BuffSettings", true)
+				end,
+			})
+		end,
+	}, true):autoHeight():width() + 5
+	x = X
+	y = y + 30
+
+	l_list = ui:append("WndListBox", {
+		x = x, y = y,
+		w = w - 240 - 20, h = h - y - 5,
+		listbox = {{
+			'onlclick',
+			function(hItem, szText, id, data, bSelected)
+				OpenBuffEditPanel(data, l_list)
+				return false
+			end,
+		}},
+	}, true)
+	for _, rec in ipairs(Cataclysm_Main.aBuffList) do
+		l_list:listbox('insert', GetListText({rec}), rec, rec)
+	end
+	y = h
+
+	X = w - 240
+	x = X
+	y = Y + 25
 	x = x + ui:append("WndCheckBox", {
 		x = x, y = y,
 		text = _L["Auto scale"],
@@ -2182,7 +2239,7 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():width() + 5
 	x = x + ui:append("WndSliderBox", {
-		x = x, y = y + 3, h = 25, rw = 80,
+		x = x, y = y, h = 25, rw = 80,
 		enable = not Cataclysm_Main.bAutoBuffSize,
 		autoenable = function() return not Cataclysm_Main.bAutoBuffSize end,
 		range = {50, 200},
@@ -2195,6 +2252,8 @@ function PS.OnPanelActive(frame)
 		textfmt = function(val) return _L("%d%%", val) end,
 	}, true):autoWidth():width() + 10
 
+	x = X
+	y = y + 30
 	x = x + ui:append("Text", { x = x, y = y, text = _L["Max count"]}, true):autoWidth():width() + 5
 	x = x + ui:append("WndSliderBox", {
 		x = x, y = y + 3, rw = 80, text = "",
@@ -2206,18 +2265,9 @@ function PS.OnPanelActive(frame)
 			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width() + 8
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y,
-		text = _L["Over mana bar"],
-		checked = not Cataclysm_Main.bBuffAboveMana,
-		oncheck = function(bCheck)
-			Cataclysm_Main.bBuffAboveMana = not bCheck
-			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
-		end,
-	}, true):autoWidth():width() + 5
-	y = y + 28
 
-	x = X + 10
+	x = X
+	y = y + 30
 	x = x + ui:append("WndCheckBox", {
 		x = x, y = y, text = _L["Show Official Buff"],
 		checked = Cataclysm_Main.bBuffDataOfficial,
@@ -2235,6 +2285,9 @@ function PS.OnPanelActive(frame)
 			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width() + 5
+
+	x = X
+	y = y + 30
 	x = x + ui:append("WndCheckBox", {
 		x = x, y = y, text = _L["Show Buff Time"],
 		checked = Cataclysm_Main.bShowBuffTime,
@@ -2243,6 +2296,18 @@ function PS.OnPanelActive(frame)
 			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width() + 5
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y,
+		text = _L["Over mana bar"],
+		checked = not Cataclysm_Main.bBuffAboveMana,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bBuffAboveMana = not bCheck
+			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
+		end,
+	}, true):autoWidth():width() + 5
+
+	x = X
+	y = y + 30
 	x = x + ui:append("WndCheckBox", {
 		x = x, y = y, text = _L["Show Buff Num"],
 		checked = Cataclysm_Main.bShowBuffNum,
@@ -2261,7 +2326,7 @@ function PS.OnPanelActive(frame)
 	}, true):autoWidth():width() + 5
 	y = y + 28
 
-	x = X + 10
+	x = X
 	x = x + ui:append("WndCheckBox", {
 		x = x, y = y, text = _L["Enable default data"],
 		checked = Cataclysm_Main.bBuffDataNangongbo,
@@ -2271,6 +2336,9 @@ function PS.OnPanelActive(frame)
 			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width() + 5
+	y = y + 28
+
+	x = X
 	x = x + ui:append("WndCheckBox", {
 		x = x, y = y, text = _L["Cmd data"],
 		checked = Cataclysm_Main.bBuffDataNangongboCmd,
@@ -2291,76 +2359,17 @@ function PS.OnPanelActive(frame)
 		end,
 		autoenable = function() return Cataclysm_Main.bBuffDataNangongbo end,
 	}, true):autoWidth():width() + 5
+
+	x = X
+	y = y + 30
 	x = x + ui:append("WndButton2", {
-		x = x, y = y, w = 200,
+		x = x, y = y, w = 220,
 		text = _L["Feedback @nangongbo"],
 		onclick = function()
 			XGUI.OpenIE("https://weibo.com/nangongbo")
 		end,
 	}, true):autoHeight():width()
 	y = y + 28
-
-	x = X + 10
-	x = x + ui:append("WndButton2", {
-		x = x, y = y, w = 100,
-		text = _L["Add"],
-		onclick = function()
-			local rec = {}
-			insert(Cataclysm_Main.aBuffList, rec)
-			OpenBuffEditPanel(rec, l_list)
-		end,
-	}, true):autoHeight():width() + 5
-	x = x + ui:append("WndButton2", {
-		x = x, y = y, w = 100,
-		text = _L["Edit"],
-		onclick = function()
-			XGUI.OpenIE("https://weibo.com/nangongbo")
-		end,
-	}, true):autoHeight():width() + 5
-	x = X + 10
-	y = y + 30
-
-	l_list = ui:append("WndListBox", {
-		x = x, y = y,
-		w = w, h = h - y - 5,
-		listbox = {{
-			'onlclick',
-			function(hItem, szText, id, data, bSelected)
-				OpenBuffEditPanel(data, l_list)
-				return false
-			end,
-		}},
-	}, true)
-	for _, rec in ipairs(Cataclysm_Main.aBuffList) do
-		l_list:listbox('insert', GetListText({rec}), rec, rec)
-	end
-	y = h
-
-	-- 手动添加BUFF名称
-	x = X
-	y = y + 5
-	y = y + ui:append("Text", { x = x, y = y, text = _L["Manually add (One per line)"], font = 27 }, true):autoSize():height()
-
-	x = x + 10
-	y = y + 5
-	y = y + ui:append("WndEditBox",{
-		x = x, y = y, w = 450, h = 130, limit = 4096, multiline = true,
-		text = GetListText(Cataclysm_Main.aBuffList),
-		onchange = function(szText)
-			Cataclysm_Main.aBuffList = GetTextList(szText)
-			UpdateBuffListCache()
-			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
-		end,
-	}, true):height()
-
-	-- 小提示
-	x = X
-	y = y + 10
-	y = y + ui:append("Text", { x = x, y = y, text = _L["Tips"], font = 27 }, true):autoSize():height()
-
-	x = x + 10
-	y = y + 5
-	ui:append("Text", { x = x, y = y, w = w - x - X, text = _L["Cataclysm_TIPS"], multiline = true }, true):autoHeight()
 end
 function PS.OnPanelDeactive()
 	l_list = nil
