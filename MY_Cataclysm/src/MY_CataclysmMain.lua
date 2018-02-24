@@ -1986,7 +1986,7 @@ function OpenBuffEditPanel(rec)
 		text = _L['Name or id'],
 	}, true):autoWidth():width() + 5
 	x = x + ui:append("WndEditBox", {
-		x = x, y = y, w = 120, h = 25,
+		x = x, y = y, w = 105, h = 25,
 		text = rec.dwID or rec.szName,
 		onchange = function(text)
 			if tonumber(text) then
@@ -2005,7 +2005,7 @@ function OpenBuffEditPanel(rec)
 		text = _L['Level'],
 	}, true):autoWidth():width() + 5
 	x = x + ui:append("WndEditBox", {
-		x = x, y = y, w = 35, h = 25,
+		x = x, y = y, w = 50, h = 25,
 		placeholder = _L['No limit'],
 		edittype = 0, text = rec.nLevel,
 		onchange = function(text)
@@ -2067,6 +2067,7 @@ function OpenBuffEditPanel(rec)
 	y = y + 30
 
 	x = X
+	y = y + 10
 	x = x + ui:append("Text", {
 		x = x, y = y, h = 25,
 		text = _L['Reminder'],
