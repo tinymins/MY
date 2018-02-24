@@ -102,7 +102,7 @@ end)
 -- 开放的名称染色接口
 -- (userdata) MY_Farbnamen.Render(userdata namelink)    处理namelink染色 namelink是一个姓名Text元素
 -- (string) MY_Farbnamen.Render(string szMsg)           格式化szMsg 处理里面的名字
-MY_Farbnamen.Render = function(szMsg)
+function MY_Farbnamen.Render(szMsg)
 	if type(szMsg) == 'string' then
 		-- <text>text="[就是个阵眼]" font=10 r=255 g=255 b=255  name="namelink_4662931" eventid=515</text><text>text="说：" font=10 r=255 g=255 b=255 </text><text>text="[茗伊]" font=10 r=255 g=255 b=255  name="namelink_4662931" eventid=771</text><text>text="\n" font=10 r=255 g=255 b=255 </text>
 		local xml = MY.Xml.Decode(szMsg)
@@ -147,19 +147,8 @@ MY_Farbnamen.Render = function(szMsg)
 	end
 	return szMsg
 end
--- 显示Tip
-MY_Farbnamen.ShowTip = function(namelink)
-	local x, y, w, h = 0, 0, 0, 0
-	if type(namelink) ~= "table" then
-		namelink = this
-	end
-	if not namelink then
-		return
-	end
-	local szName = string.gsub(namelink:GetText(), '[%[%]]', '')
-	x, y = namelink:GetAbsPos()
-	w, h = namelink:GetSize()
 
+function MY_Farbnamen.GetTip(szName)
 	local tInfo = MY_Farbnamen.GetAusName(szName)
 	if tInfo then
 		local tTip = {}
@@ -207,8 +196,25 @@ MY_Farbnamen.ShowTip = function(namelink)
 			tinsert(tTip, XML_LINE_BREAKER)
 			tinsert(tTip, GetFormatText(_L("Player ID: %d", tInfo.dwID), 102))
 		end
-		-- 显示Tip
-		OutputTip(tconcat(tTip), 450, {x, y, w, h}, MY.Const.UI.Tip.POS_TOP)
+		-- 组装Tip
+		return tconcat(tTip)
+	end
+end
+
+function MY_Farbnamen.ShowTip(namelink)
+	if type(namelink) ~= "table" then
+		namelink = this
+	end
+	if not namelink then
+		return
+	end
+	local szName = string.gsub(namelink:GetText(), '[%[%]]', '')
+	local x, y = namelink:GetAbsPos()
+	local w, h = namelink:GetSize()
+
+	local szTip = MY_Farbnamen.GetTip(szName)
+	if szTip then
+		OutputTip(szTip, 450, {x, y, w, h}, MY.Const.UI.Tip.POS_TOP)
 	end
 end
 ---------------------------------------------------------------
@@ -336,7 +342,7 @@ end
 --------------------------------------------------------------
 -- 菜单
 --------------------------------------------------------------
-MY_Farbnamen.GetMenu = function()
+function MY_Farbnamen.GetMenu()
 	local t = {szOption = _L['Farbnamen']}
 	table.insert(t, {
 		szOption = _L["enable"],
