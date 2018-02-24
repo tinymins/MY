@@ -1952,7 +1952,215 @@ local function GetTextList(szText)
 	return t
 end
 
-local PS = {}
+local PS, l_list = {}
+function OpenBuffEditPanel(rec)
+	local ui = XGUI.CreateFrame("MY_Cataclysm_BuffConfig", {
+		w = 300, h = 250,
+		text = _L["Edit buff"],
+		close = true, anchor = {},
+	}):remove(function()
+		if not rec.dwID and (not rec.szName or rec.szName == "") then
+			for i, p in ipairs(Cataclysm_Main.aBuffList) do
+				if p == rec then
+					if l_list then
+						l_list:listbox("delete", "id", rec)
+					end
+					remove(Cataclysm_Main.aBuffList, i)
+					UpdateBuffListCache()
+					return
+				end
+			end
+		end
+	end)
+	local function update()
+		UpdateBuffListCache()
+		if not l_list then
+			return
+		end
+		l_list:listbox("update", "id", rec, {"text"}, {GetListText({rec})})
+	end
+	local X, Y = 20, 60
+	local x, y = X, Y
+	x = x + ui:append("Text", {
+		x = x, y = y, h = 25,
+		text = _L['Name or id'],
+	}, true):autoWidth():width() + 5
+	x = x + ui:append("WndEditBox", {
+		x = x, y = y, w = 120, h = 25,
+		text = rec.dwID or rec.szName,
+		onchange = function(text)
+			if tonumber(text) then
+				rec.dwID = tonumber(text)
+				rec.szName = nil
+			else
+				rec.dwID = nil
+				rec.szName = text
+			end
+			update()
+		end,
+	}, true):width() + 5
+
+	x = x + ui:append("Text", {
+		x = x, y = y, h = 25,
+		text = _L['Level'],
+	}, true):autoWidth():width() + 5
+	x = x + ui:append("WndEditBox", {
+		x = x, y = y, w = 35, h = 25,
+		placeholder = _L['No limit'],
+		edittype = 0, text = rec.nLevel,
+		onchange = function(text)
+			rec.nLevel = tonumber(text)
+			update()
+		end,
+	}, true):width() + 5
+	y = y + 30
+
+	x = X
+	x = x + ui:append("Text", {
+		x = x, y = y, h = 25,
+		text = _L['Stacknum'],
+	}, true):autoWidth():width() + 5
+	x = x + ui:append("WndComboBox", {
+		x = x, y = y, w = 70, h = 25,
+		text = rec.szStackOp or _L['No limit'],
+		menu = function()
+			local this = this
+			local menu = {{
+				szOption = _L['No limit'],
+				fnAction = function()
+					rec.szStackOp = nil
+					update()
+					XGUI(this):text(_L['No limit'])
+				end,
+			}}
+			for _, op in ipairs({ ">=", "=", "!=", "<", "<=", ">", ">=" }) do
+				insert(menu, {
+					szOption = op,
+					fnAction = function()
+						rec.szStackOp = op
+						update()
+						XGUI(this):text(op)
+					end,
+				})
+			end
+			return menu
+		end,
+	}, true):width() + 5
+	x = x + ui:append("WndEditBox", {
+		x = x, y = y, w = 30, h = 25,
+		edittype = 0,
+		text = rec.nStackNum,
+		onchange = function(text)
+			rec.nStackNum = tonumber(text)
+			update()
+		end,
+	}, true):width() + 10
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y,
+		text = _L['Only self'],
+		checked = rec.bOnlySelf,
+		oncheck = function(bChecked)
+			rec.bOnlySelf = bChecked
+			update()
+		end,
+	}, true):autoWidth():width() + 5
+	y = y + 30
+
+	x = X
+	x = x + ui:append("Shadow", {
+		x = x, y = y, w = 22, h = 22,
+		color = rec.col and {MY.HumanColor2RGB(rec.col)} or {255, 255, 0},
+		onclick = function()
+			local this = this
+			XGUI.OpenColorPicker(function(r, g, b)
+				local a = rec.col and select(4, MY.Hex2RGB(rec.col)) or 255
+				rec.nColAlpha = a
+				rec.col = MY.RGB2Hex(r, g, b, a)
+				XGUI(this):color(r, g, b)
+				update()
+			end)
+		end,
+	}, true):autoWidth():width() + 5
+	x = x + ui:append("Text", {
+		x = x, y = y, h = 25,
+		text = _L['Clear color'],
+		onclick = function()
+			rec.col = nil
+			update()
+		end,
+	}, true):autoWidth():width() + 5
+	x = x + ui:append("Text", {
+		x = x, y = y, h = 25,
+		text = _L['Reminder'],
+	}, true):autoWidth():width() + 5
+	x = x + ui:append("WndEditBox", {
+		x = x, y = y, w = 30, h = 25,
+		text = rec.szReminder,
+		onchange = function(text)
+			rec.szReminder = text
+			update()
+		end,
+	}, true):width() + 5
+	x = x + ui:append("Text", {
+		x = x, y = y, h = 25,
+		text = _L['Priority'],
+	}, true):autoWidth():width() + 5
+	x = x + ui:append("WndEditBox", {
+		x = x, y = y, w = 40, h = 25,
+		edittype = 0,
+		text = rec.nPriority,
+		onchange = function(text)
+			rec.nPriority = tonumber(text)
+			update()
+		end,
+	}, true):width() + 5
+	y = y + 30
+
+	x = X
+	x = x + ui:append("Text", {
+		x = x, y = y, h = 25,
+		text = _L['Border alpha'],
+	}, true):autoWidth():width() + 5
+	x = x + ui:append("WndSliderBox", {
+		x = x, y = y, text = "",
+		range = {0, 255},
+		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		value = rec.col and select(4, MY.HumanColor2RGB(rec.col)) or rec.nColAlpha or 255,
+		onchange = function(nVal)
+			if rec.col then
+				local r, g, b = MY.Hex2RGB(rec.col)
+				if r and g and b then
+					rec.col = MY.RGB2Hex(r, g, b, nVal)
+				end
+			end
+			rec.nColAlpha = nVal
+			update()
+		end,
+		autoenable = IsEnabled,
+	}, true):autoWidth():width() + 5
+	y = y + 30
+
+	x = X
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y,
+		text = _L['Attention'],
+		checked = rec.bAttention,
+		oncheck = function(bChecked)
+			rec.bAttention = bChecked
+			update()
+		end,
+	}, true):autoWidth():width() + 5
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y,
+		text = _L['Caution'],
+		checked = rec.bCaution,
+		oncheck = function(bChecked)
+			rec.bCaution = bChecked
+			update()
+		end,
+	}, true):autoWidth():width() + 5
+end
+
 function PS.OnPanelActive(frame)
 	local ui = XGUI(frame)
 	local X, Y = 20, 10
@@ -2092,6 +2300,42 @@ function PS.OnPanelActive(frame)
 	}, true):autoHeight():width()
 	y = y + 28
 
+	x = X + 10
+	x = x + ui:append("WndButton2", {
+		x = x, y = y, w = 100,
+		text = _L["Add"],
+		onclick = function()
+			local rec = {}
+			insert(Cataclysm_Main.aBuffList, rec)
+			OpenBuffEditPanel(rec, l_list)
+		end,
+	}, true):autoHeight():width() + 5
+	x = x + ui:append("WndButton2", {
+		x = x, y = y, w = 100,
+		text = _L["Edit"],
+		onclick = function()
+			XGUI.OpenIE("https://weibo.com/nangongbo")
+		end,
+	}, true):autoHeight():width() + 5
+	x = X + 10
+	y = y + 30
+
+	l_list = ui:append("WndListBox", {
+		x = x, y = y,
+		w = w, h = h - y - 5,
+		listbox = {{
+			'onlclick',
+			function(hItem, szText, id, data, bSelected)
+				OpenBuffEditPanel(data, l_list)
+				return false
+			end,
+		}},
+	}, true)
+	for _, rec in ipairs(Cataclysm_Main.aBuffList) do
+		l_list:listbox('insert', GetListText({rec}), rec, rec)
+	end
+	y = h
+
 	-- 手动添加BUFF名称
 	x = X
 	y = y + 5
@@ -2117,6 +2361,9 @@ function PS.OnPanelActive(frame)
 	x = x + 10
 	y = y + 5
 	ui:append("Text", { x = x, y = y, w = w - x - X, text = _L["Cataclysm_TIPS"], multiline = true }, true):autoHeight()
+end
+function PS.OnPanelDeactive()
+	l_list = nil
 end
 MY.RegisterPanel("MY_Cataclysm_BuffSettings", _L["Buff settings"], _L["Raid"], "ui/Image/UICommon/RaidTotal.uitex|65", {255, 255, 0}, PS)
 end
