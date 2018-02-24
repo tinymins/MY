@@ -1059,7 +1059,9 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bLa
 	if bIcon then -- Ë¢ÐÂicon
 		local img = h:Lookup("Image_Icon")
 		if CFG.nShowIcon ~= 4 then
-			if CFG.nShowIcon == 2 then
+			if CFG.nShowIcon == 2 and info.dwMountKungfuID == 0 then
+				img:FromUITex("ui/image/TargetPanel/Target.UITex", 21)
+			elseif CFG.nShowIcon == 2 then
 				local _, nIconID = MY.GetSkillName(info.dwMountKungfuID, 1)
 				if nIconID == 1435 then nIconID = 889 end
 				img:FromIconID(nIconID)
