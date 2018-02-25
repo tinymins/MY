@@ -1227,7 +1227,7 @@ function _GKP.RecoveryMenu()
 				return true
 			elseif not b[i] then
 				return false
-			elseif a[i] ~= b[i] then
+			else
 				return a[i] > b[i]
 			end
 		end
