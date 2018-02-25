@@ -254,13 +254,17 @@ function ChatLinkEvents.OnNameLClick(element, link)
 	if not link then
 		link = element
 	end
-	if IsCtrlKeyDown() then
+	if IsCtrlKeyDown() and IsAltKeyDown() then
+		local menu = {}
+		InsertInviteTeamMenu(menu, (MY.UI(link):text():gsub("[%[%]]", "")))
+		menu[1].fnAction()
+	elseif IsCtrlKeyDown() then
 		MY.Chat.CopyChatItem(link)
 	elseif IsShiftKeyDown() then
 		MY.SetTarget(TARGET.PLAYER, MY.UI(link):text())
 	elseif IsAltKeyDown() then
 		if MY_Farbnamen and MY_Farbnamen.Get then
-			local info = MY_Farbnamen.Get(MY.UI(link):text():gsub("[%[%]]", ""))
+			local info = MY_Farbnamen.Get((MY.UI(link):text():gsub("[%[%]]", "")))
 			if info then
 				_C.tPeekPlayer[info.dwID] = true
 				ViewInviteToPlayer(info.dwID)
