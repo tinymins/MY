@@ -125,7 +125,7 @@ function MY.Chat.GetCopyLinkText(szText, rgbf)
 	rgbf   = rgbf   or { f = 10 }
 
 	return GetFormatText(szText, rgbf.f, rgbf.r, rgbf.g, rgbf.b, 82691,
-		"this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.Chat.LinkEventHandler.OnCopyLClick\nthis.OnItemMButtonDown=MY.Chat.LinkEventHandler.OnCopyMClick\nthis.OnItemRButtonDown=MY.Chat.LinkEventHandler.OnCopyRClick\nthis.OnItemMouseEnter=MY.Chat.LinkEventHandler.OnCopyMouseEnter\nthis.OnItemMouseLeave=MY.Chat.LinkEventHandler.OnCopyMouseLeave",
+		"this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.ChatLinkEventHandlers.OnCopyLClick\nthis.OnItemMButtonDown=MY.ChatLinkEventHandlers.OnCopyMClick\nthis.OnItemRButtonDown=MY.ChatLinkEventHandlers.OnCopyRClick\nthis.OnItemMouseEnter=MY.ChatLinkEventHandlers.OnCopyMouseEnter\nthis.OnItemMouseLeave=MY.ChatLinkEventHandlers.OnCopyMouseLeave",
 		"copylink")
 end
 MY.GetCopyLinkText = MY.Chat.GetCopyLinkText
@@ -139,7 +139,7 @@ function MY.Chat.GetTimeLinkText(rgbfs, dwTime)
 	return GetFormatText(
 		MY.FormatTime(rgbfs.s or '[hh:mm.ss]', dwTime),
 		rgbfs.f, rgbfs.r, rgbfs.g, rgbfs.b, 82691,
-		"this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.Chat.LinkEventHandler.OnCopyLClick\nthis.OnItemMButtonDown=MY.Chat.LinkEventHandler.OnCopyMClick\nthis.OnItemRButtonDown=MY.Chat.LinkEventHandler.OnCopyRClick\nthis.OnItemMouseEnter=MY.Chat.LinkEventHandler.OnCopyMouseEnter\nthis.OnItemMouseLeave=MY.Chat.LinkEventHandler.OnCopyMouseLeave",
+		"this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.ChatLinkEventHandlers.OnCopyLClick\nthis.OnItemMButtonDown=MY.ChatLinkEventHandlers.OnCopyMClick\nthis.OnItemRButtonDown=MY.ChatLinkEventHandlers.OnCopyRClick\nthis.OnItemMouseEnter=MY.ChatLinkEventHandlers.OnCopyMouseEnter\nthis.OnItemMouseLeave=MY.ChatLinkEventHandlers.OnCopyMouseLeave",
 		"timelink"
 	)
 end
@@ -234,66 +234,7 @@ function MY.Chat.CopyChatLine(hTime, bTextEditor)
 end
 MY.CopyChatLine = MY.Chat.CopyChatLine
 
-MY.Chat.LinkEventHandler = {
-	OnNameLClick = function(hT)
-		if not hT then
-			hT = this
-		end
-		if IsCtrlKeyDown() then
-			MY.Chat.CopyChatItem(hT)
-		elseif IsShiftKeyDown() then
-			MY.SetTarget(TARGET.PLAYER, MY.UI(hT):text())
-		elseif IsAltKeyDown() then
-			if MY_Farbnamen and MY_Farbnamen.Get then
-				local info = MY_Farbnamen.Get(MY.UI(hT):text():gsub("[%[%]]", ""))
-				if info then
-					_C.tPeekPlayer[info.dwID] = true
-					ViewInviteToPlayer(info.dwID)
-				end
-			end
-		else
-			MY.SwitchChat(MY.UI(hT):text())
-			local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
-			if edit then
-				Station.SetFocusWindow(edit)
-			end
-		end
-	end,
-	OnNameRClick = function(hT)
-		if not hT then
-			hT = this
-		end
-		PopupMenu((function()
-			return MY.Game.GetTargetContextMenu(TARGET.PLAYER, (MY.UI(hT):text():gsub('[%[%]]', '')))
-		end)())
-	end,
-	OnCopyLClick = function(hT)
-		MY.Chat.CopyChatLine(hT or this, IsCtrlKeyDown())
-	end,
-	OnCopyMClick = function(hT)
-		MY.Chat.RemoveChatLine(hT or this)
-	end,
-	OnCopyRClick = function(hT)
-		MY.Chat.RepeatChatLine(hT or this)
-	end,
-	OnCopyMouseEnter = function(hT)
-		local x, y = this:GetAbsPos()
-		local w, h = this:GetSize()
-		local szText = GetFormatText(_L['LClick to copy to editbox.\nMClick to remove this line.\nRClick to repeat this line.'], 136)
-		OutputTip(szText, 450, {x, y, w, h}, MY.Const.UI.Tip.POS_TOP)
-	end,
-	OnCopyMouseLeave = function(hT)
-		HideTip()
-	end,
-	OnItemLClick = function(hT)
-		OnItemLinkDown(hT or this)
-	end,
-	OnItemRClick = function(hT)
-		if IsCtrlKeyDown() then
-			MY.Chat.CopyChatItem(hT or this)
-		end
-	end,
-}
+do local ChatLinkEvents = {}
 MY.RegisterEvent("PEEK_OTHER_PLAYER", function()
 	if not _C.tPeekPlayer[arg1] then
 		return
@@ -309,6 +250,97 @@ MY.RegisterEvent("PEEK_OTHER_PLAYER", function()
 	end
 	_C.tPeekPlayer[arg1] = nil
 end)
+function ChatLinkEvents.OnNameLClick(element, link)
+	if not link then
+		link = element
+	end
+	if IsCtrlKeyDown() then
+		MY.Chat.CopyChatItem(link)
+	elseif IsShiftKeyDown() then
+		MY.SetTarget(TARGET.PLAYER, MY.UI(link):text())
+	elseif IsAltKeyDown() then
+		if MY_Farbnamen and MY_Farbnamen.Get then
+			local info = MY_Farbnamen.Get(MY.UI(link):text():gsub("[%[%]]", ""))
+			if info then
+				_C.tPeekPlayer[info.dwID] = true
+				ViewInviteToPlayer(info.dwID)
+			end
+		end
+	else
+		MY.SwitchChat(MY.UI(link):text())
+		local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
+		if edit then
+			Station.SetFocusWindow(edit)
+		end
+	end
+end
+function ChatLinkEvents.OnNameRClick(element, link)
+	if not link then
+		link = element
+	end
+	PopupMenu(MY.Game.GetTargetContextMenu(TARGET.PLAYER, (MY.UI(link):text():gsub('[%[%]]', ''))))
+end
+function ChatLinkEvents.OnCopyLClick(element, link)
+	if not link then
+		link = element
+	end
+	MY.Chat.CopyChatLine(link, IsCtrlKeyDown())
+end
+function ChatLinkEvents.OnCopyMClick(element, link)
+	if not link then
+		link = element
+	end
+	MY.Chat.RemoveChatLine(link)
+end
+function ChatLinkEvents.OnCopyRClick(element, link)
+	if not link then
+		link = element
+	end
+	MY.Chat.RepeatChatLine(link)
+end
+function ChatLinkEvents.OnCopyMouseEnter(element, link)
+	if not link then
+		link = element
+	end
+	local x, y = element:GetAbsPos()
+	local w, h = element:GetSize()
+	local szText = GetFormatText(_L['LClick to copy to editbox.\nMClick to remove this line.\nRClick to repeat this line.'], 136)
+	OutputTip(szText, 450, {x, y, w, h}, MY.Const.UI.Tip.POS_TOP)
+end
+function ChatLinkEvents.OnCopyMouseLeave(element, link)
+	if not link then
+		link = element
+	end
+	HideTip()
+end
+function ChatLinkEvents.OnItemLClick(element, link)
+	if not link then
+		link = element
+	end
+	OnItemLinkDown(link)
+end
+function ChatLinkEvents.OnItemRClick(element, link)
+	if not link then
+		link = element
+	end
+	if IsCtrlKeyDown() then
+		MY.Chat.CopyChatItem(link)
+	end
+end
+MY.ChatLinkEvents = ChatLinkEvents
+
+local ChatLinkEventHandlers = {}
+function ChatLinkEventHandlers.OnNameLClick() ChatLinkEvents.OnNameLClick(this) end
+function ChatLinkEventHandlers.OnNameRClick() ChatLinkEvents.OnNameRClick(this) end
+function ChatLinkEventHandlers.OnCopyLClick() ChatLinkEvents.OnCopyLClick(this) end
+function ChatLinkEventHandlers.OnCopyMClick() ChatLinkEvents.OnCopyMClick(this) end
+function ChatLinkEventHandlers.OnCopyRClick() ChatLinkEvents.OnCopyRClick(this) end
+function ChatLinkEventHandlers.OnCopyMouseEnter() ChatLinkEvents.OnCopyMouseEnter(this) end
+function ChatLinkEventHandlers.OnCopyMouseLeave() ChatLinkEvents.OnCopyMouseLeave(this) end
+function ChatLinkEventHandlers.OnItemLClick() ChatLinkEvents.OnItemLClick(this) end
+function ChatLinkEventHandlers.OnItemRClick() ChatLinkEvents.OnItemRClick(this) end
+MY.ChatLinkEventHandlers = ChatLinkEventHandlers
+
 -- 绑定link事件响应
 -- (userdata) MY.Chat.RenderLink(userdata link)                   处理link的各种事件绑定 namelink是一个超链接Text元素
 -- (userdata) MY.Chat.RenderLink(userdata element, userdata link) 处理element的各种事件绑定 数据源是link
@@ -316,9 +348,10 @@ end)
 -- link   : 一个超链接Text元素
 -- element: 一个可以挂鼠标消息响应的UI元素
 -- szMsg  : 格式化的UIXML消息
-function MY.Chat.RenderLink(argv, argv2)
-	if type(argv) == 'string' then -- szMsg
-		local xmls = MY.Xml.Decode(argv)
+function MY.Chat.RenderLink(arg1, arg2)
+	if type(arg1) == 'string' then -- szMsg
+		local szMsg = arg1
+		local xmls = MY.Xml.Decode(szMsg)
 		if xmls then
 			for i, xml in ipairs(xmls) do
 				if xml and xml['.'] == "text" and xml[''] and xml[''].name then
@@ -330,11 +363,11 @@ function MY.Chat.RenderLink(argv, argv2)
 					end
 
 					if name:sub(1, 8) == 'namelink' then
-						script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.Chat.LinkEventHandler.OnNameLClick\nthis.OnItemRButtonDown=MY.Chat.LinkEventHandler.OnNameRClick'
+						script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.ChatLinkEventHandlers.OnNameLClick\nthis.OnItemRButtonDown=MY.ChatLinkEventHandlers.OnNameRClick'
 					elseif name == 'copy' or name == 'copylink' or name == 'timelink' then
-						script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.Chat.LinkEventHandler.OnCopyLClick\nthis.OnItemMButtonDown=MY.Chat.LinkEventHandler.OnCopyMClick\nthis.OnItemRButtonDown=MY.Chat.LinkEventHandler.OnCopyRClick\nthis.OnItemMouseEnter=MY.Chat.LinkEventHandler.OnCopyMouseEnter\nthis.OnItemMouseLeave=MY.Chat.LinkEventHandler.OnCopyMouseLeave'
+						script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.ChatLinkEventHandlers.OnCopyLClick\nthis.OnItemMButtonDown=MY.ChatLinkEventHandlers.OnCopyMClick\nthis.OnItemRButtonDown=MY.ChatLinkEventHandlers.OnCopyRClick\nthis.OnItemMouseEnter=MY.ChatLinkEventHandlers.OnCopyMouseEnter\nthis.OnItemMouseLeave=MY.ChatLinkEventHandlers.OnCopyMouseLeave'
 					else
-						script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.Chat.LinkEventHandler.OnItemLClick\nthis.OnItemRButtonDown=MY.Chat.LinkEventHandler.OnItemRClick'
+						script = script .. 'this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.ChatLinkEventHandlers.OnItemLClick\nthis.OnItemRButtonDown=MY.ChatLinkEventHandlers.OnItemRClick'
 					end
 
 					if #script > 0 then
@@ -343,30 +376,34 @@ function MY.Chat.RenderLink(argv, argv2)
 					end
 				end
 			end
-			argv = MY.Xml.Encode(xmls)
+			szMsg = MY.Xml.Encode(xmls)
 		end
-	elseif type(argv) == 'table' and type(argv.GetName) == 'function' then
-		if argv.bMyChatRendered then
+		return szMsg
+	elseif type(arg1) == 'table' and type(arg1.GetName) == 'function' then
+		local element = arg1
+		local link = arg2 or arg1
+		if element.bMyChatRendered then
 			return
 		end
-		local link = MY.UI(argv)
-		local name = link:name()
+		local ui = XGUI(element)
+		local name = ui:name()
 		if name:sub(1, 8) == 'namelink' then
-			link:click(function() MY.Chat.LinkEventHandler.OnNameLClick(argv2) end,
-					   function() MY.Chat.LinkEventHandler.OnNameRClick(argv2) end)
+			ui:lclick(function() ChatLinkEvents.OnNameLClick(element, link) end)
+			ui:rclick(function() ChatLinkEvents.OnNameRClick(element, link) end)
 		elseif name == 'copy' or name == 'copylink' then
-			link:click(function() MY.Chat.LinkEventHandler.OnCopyLClick(argv2) end,
-					   function() MY.Chat.LinkEventHandler.OnCopyRClick(argv2) end)
+			ui:lclick(function() ChatLinkEvents.OnCopyLClick(element, link) end)
+			ui:rclick(function() ChatLinkEvents.OnCopyRClick(element, link) end)
+			ui:mclick(function() ChatLinkEvents.OnCopyMClick(element, link) end)
 		else
-			link:click(function() MY.Chat.LinkEventHandler.OnItemLClick(argv2) end,
-					   function() MY.Chat.LinkEventHandler.OnItemRClick(argv2) end)
+			ui:lclick(function() ChatLinkEvents.OnItemLClick(element, link) end)
+			ui:rclick(function() ChatLinkEvents.OnItemRClick(element, link) end)
 		end
-		argv.bMyChatRendered = true
+		element.bMyChatRendered = true
+		return element
 	end
-
-	return argv
 end
 MY.RenderChatLink = MY.Chat.RenderLink
+end
 
 -- 复制Item到输入框
 function MY.Chat.CopyChatItem(p)
@@ -996,7 +1033,7 @@ end
 
 function _C.OnChatPanelNamelinkLButtonDown(...)
 	this.__MY_OnItemLButtonDown(...)
-	MY.Chat.LinkEventHandler.OnNameLClick(...)
+	MY.ChatLinkEventHandlers.OnNameLClick(...)
 end
 
 function _C.OnChatPanelAppendItemFromString(h, szMsg, szChannel, dwTime, nR, nG, nB, ...)
@@ -1033,7 +1070,7 @@ function _C.OnChatPanelAppendItemFromString(h, szMsg, szChannel, dwTime, nR, nG,
 				hItem.__MY_OnItemLButtonDown = hItem.OnItemLButtonDown
 				hItem.OnItemLButtonDown = _C.OnChatPanelNamelinkLButtonDown
 			else
-				hItem.OnItemLButtonDown = MY.Chat.LinkEventHandler.OnNameLClick
+				hItem.OnItemLButtonDown = MY.ChatLinkEventHandlers.OnNameLClick
 			end
 		end
 	end
