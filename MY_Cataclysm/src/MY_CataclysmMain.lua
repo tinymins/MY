@@ -107,6 +107,11 @@ function UpdateBuffListCache()
 			InsertBuffListCache(CTM_BUFF_NGB_HEAL)
 		end
 	end
+	for i, p in ipairs_r(Cataclysm_Main.aBuffList) do
+		if not p.dwID and (not p.szName or p.szName == "") then
+			remove(Cataclysm_Main.aBuffList, i)
+		end
+	end
 	InsertBuffListCache(Cataclysm_Main.aBuffList)
 end
 end
@@ -467,6 +472,7 @@ function Cataclysm_Main.OnFrameCreate()
 	this:RegisterEvent("TARGET_CHANGE")
 	this:RegisterEvent("CHARACTER_THREAT_RANKLIST")
 	this:RegisterEvent("BUFF_UPDATE")
+	this:RegisterEvent("PLAYER_ENTER_SCENE")
 	-- 拍团部分 arg0 0=T人 1=分工资
 	this:RegisterEvent("TEAM_VOTE_REQUEST")
 	-- arg0 回应状态 arg1 dwID arg2 同意=1 反对=0
@@ -650,6 +656,24 @@ function Cataclysm_Main.OnEvent(szEvent)
 			local szName = GetBuffName(arg4, arg8)
 			RecBuffWithTabs(BUFF_LIST[arg4], arg0, arg4, arg9)
 			RecBuffWithTabs(BUFF_LIST[szName], arg0, arg4, arg9)
+		end
+	elseif szEvent == "PLAYER_ENTER_SCENE" then
+		local me = GetClientPlayer()
+		if not me then
+			return
+		end
+		if me.IsPlayerInMyParty(arg0) then
+			local tar = GetPlayer(arg0)
+			if not tar then
+				return
+			end
+			for i, p in ipairs(MY.GetBuffList(tar)) do
+				if Table_BuffIsVisible(p.dwID, p.nLevel) then
+					local szName = GetBuffName(arg4, arg8)
+					RecBuffWithTabs(BUFF_LIST[p.dwID], arg0, p.dwID, p.nLevel)
+					RecBuffWithTabs(BUFF_LIST[szName], arg0, p.dwID, p.nLevel)
+				end
+			end
 		end
 	elseif szEvent == "MY_CAMP_COLOR_UPDATE"
 	or szEvent == "MY_FORCE_COLOR_UPDATE" then
@@ -1954,8 +1978,9 @@ end
 
 local PS, l_list = {}
 function OpenBuffEditPanel(rec)
+	local w, h = 300, 280
 	local ui = XGUI.CreateFrame("MY_Cataclysm_BuffConfig", {
-		w = 300, h = 250,
+		w = w, h = h,
 		text = _L["Edit buff"],
 		close = true, anchor = {},
 	}):remove(function()
@@ -1967,7 +1992,7 @@ function OpenBuffEditPanel(rec)
 					end
 					remove(Cataclysm_Main.aBuffList, i)
 					UpdateBuffListCache()
-					return
+					break
 				end
 			end
 		end
@@ -2160,6 +2185,31 @@ function OpenBuffEditPanel(rec)
 			update()
 		end,
 	}, true):autoWidth():width() + 5
+
+	ui:append("WndButton2", {
+		x = (w - 120) / 2, y = h - 50, w = 120,
+		text = _L['Delete'], color = {223, 63, 95},
+		onclick = function()
+			local function fnAction()
+				for i, p in ipairs(Cataclysm_Main.aBuffList) do
+					if p == rec then
+						if l_list then
+							l_list:listbox("delete", "id", rec)
+						end
+						remove(Cataclysm_Main.aBuffList, i)
+						UpdateBuffListCache()
+						break
+					end
+				end
+				ui:remove()
+			end
+			if rec.dwID or (rec.szName and rec.szName ~= "") then
+				MY.Confirm(_L("Delete [%s]?", rec.szName or rec.dwID), fnAction)
+			else
+				fnAction()
+			end
+		end,
+	}, true)
 end
 
 function PS.OnPanelActive(frame)

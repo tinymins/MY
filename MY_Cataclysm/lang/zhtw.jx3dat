@@ -117,7 +117,7 @@ data = {
 	["Right"] = "右",
 	["Show Decimal"] = "顯示小數",
 	["Over mana bar"] = "遮擋內力",
-	["[%s] got buff [%s], remaining %ds."] = "[%s]獲得效果[%s]，剩余持續時間%d秒。",
+	["[%s] got buff [%s]x%d, remaining %ds."] = "[%s]獲得效果[%s]x%d，剩余持續時間%d秒。",
 	["Edit buff"] = "團隊BUFF監控",
 	["Name or id"] = "ID/名稱",
 	["Level"] = "等級",
@@ -133,4 +133,6 @@ data = {
 	["Add"] = "添加",
 	["Edit"] = "編輯",
 	["Sure"] = "確定",
+	["Delete"] = "刪除",
+	["Delete [%s]?"] = "刪除[%s]？",
 }

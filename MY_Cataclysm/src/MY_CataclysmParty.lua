@@ -374,9 +374,10 @@ function CTM_Party_Base.OnItemLButtonDown()
 			MY.Talk(
 				PLAYER_TALK_CHANNEL.RAID,
 				_L(
-					"[%s] got buff [%s], remaining %ds.",
+					"[%s] got buff [%s]x%d, remaining %ds.",
 					info.szName,
 					MY.GetBuffName(this.dwID, this.nLevel),
+					this.nStackNum or 1,
 					GetEndTime(this.nEndFrame)
 				)
 			)
@@ -1479,6 +1480,7 @@ function CTM:RefreshBuff()
 						item.dwID = KBuff.dwID
 						item.nLevel = KBuff.nLevel
 						item.nEndFrame = nEndFrame
+						item.nStackNum = nStackNum
 						-- buff time
 						local txtTime = item:Lookup("Text_Time")
 						if CFG.bShowBuffTime then
