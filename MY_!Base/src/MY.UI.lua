@@ -3131,6 +3131,14 @@ function XGUI:rclick(fnRClick)
 	return self:click(nil, fnRClick or MY.Const.Event.Mouse.RBUTTON, nil, true)
 end
 
+-- mclick 鼠标右键单击事件
+-- same as jQuery.mclick()
+-- :mclick(fnAction) 绑定
+-- :mclick()         触发
+function XGUI:mclick(fnMClick)
+	return self:click(nil, nil, fnMClick or MY.Const.Event.Mouse.MBUTTON, true)
+end
+
 -- hover 鼠标悬停事件
 -- same as jQuery.hover()
 -- :hover(fnHover[, fnLeave]) 绑定
