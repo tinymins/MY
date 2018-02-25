@@ -414,16 +414,21 @@ end
 -- (table ) tResult     : 所有效果数值集合
 function MY_Recount.Data.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffectID, dwEffectLevel, nSkillResult, nResultCount, tResult)
 	-- 获取释放对象和承受对象
-	local hCaster = MY.Game.GetObject(dwCaster)
-	if (not IsPlayer(dwCaster)) and hCaster and hCaster.dwEmployer and hCaster.dwEmployer ~= 0 then -- 宠物的数据算在主人统计中
-		hCaster = MY.Game.GetObject(hCaster.dwEmployer)
+	local KCaster = MY.GetObject(dwCaster)
+	if KCaster and not IsPlayer(dwCaster)
+	and KCaster.dwEmployer and KCaster.dwEmployer ~= 0 then -- 宠物的数据算在主人统计中
+		KCaster = MY.GetObject(KCaster.dwEmployer)
 	end
-	local hTarget = MY.Game.GetObject(dwTarget)
-	if not (hCaster and hTarget) then
+	local KTarget, dwTargetEmployer = MY.GetObject(dwTarget), nil
+	if KTarget and not IsPlayer(dwTarget)
+	and KTarget.dwEmployer and KTarget.dwEmployer ~= 0 then
+		dwTargetEmployer = KTarget.dwEmployer
+	end
+	if not (KCaster and KTarget) then
 		return
 	end
-	dwCaster = hCaster.dwID
-	dwTarget = hTarget.dwID
+	dwCaster = KCaster.dwID
+	dwTarget = KTarget.dwID
 
 	-- 获取效果名称
 	local szEffectName
@@ -450,11 +455,12 @@ function MY_Recount.Data.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffect
 	local me = GetClientPlayer()
 	if dwCaster ~= me.dwID                 -- 释放者不是自己
 	and dwTarget ~= me.dwID                -- 承受者不是自己
+	and dwTargetEmployer ~= me.dwID        -- 承受者主人不是自己
 	and not MY.IsInArena()                 -- 不在竞技场
 	and not MY.IsInBattleField()           -- 不在战场
-	and IsPlayer(dwCaster)                 -- 释放者是玩家
 	and not me.IsPlayerInMyParty(dwCaster) -- 且释放者不是队友
 	and not me.IsPlayerInMyParty(dwTarget) -- 且承受者不是队友
+	and not (dwTargetEmployer and me.IsPlayerInMyParty(dwTargetEmployer)) -- 且承受者主人不是队友
 	then -- 则忽视
 		return
 	end
@@ -479,20 +485,20 @@ function MY_Recount.Data.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffect
 	-- 识破
 	local nValue = tResult[SKILL_RESULT_TYPE.INSIGHT_DAMAGE]
 	if nValue and nValue > 0 then
-		MY_Recount.Data.AddDamageRecord(hCaster, hTarget, szDamageEffectName, nDamage, nEffectDamage, SKILL_RESULT.INSIGHT)
+		MY_Recount.Data.AddDamageRecord(KCaster, KTarget, szDamageEffectName, nDamage, nEffectDamage, SKILL_RESULT.INSIGHT)
 	elseif nSkillResult == SKILL_RESULT.HIT or
 	nSkillResult == SKILL_RESULT.CRITICAL then -- 击中
 		if nTherapy > 0 then -- 有治疗
-			MY_Recount.Data.AddHealRecord(hCaster, hTarget, szHealEffectName, nTherapy, nEffectTherapy, nSkillResult)
+			MY_Recount.Data.AddHealRecord(KCaster, KTarget, szHealEffectName, nTherapy, nEffectTherapy, nSkillResult)
 		end
 		if nDamage > 0 or nTherapy == 0 then -- 有伤害 或者 无伤害无治疗的效果
-			MY_Recount.Data.AddDamageRecord(hCaster, hTarget, szDamageEffectName, nDamage, nEffectDamage, nSkillResult)
+			MY_Recount.Data.AddDamageRecord(KCaster, KTarget, szDamageEffectName, nDamage, nEffectDamage, nSkillResult)
 		end
 	elseif nSkillResult == SKILL_RESULT.BLOCK or  -- 格挡
 	nSkillResult == SKILL_RESULT.SHIELD       or  -- 无效
 	nSkillResult == SKILL_RESULT.MISS         or  -- 偏离
 	nSkillResult == SKILL_RESULT.DODGE      then  -- 闪避
-		MY_Recount.Data.AddDamageRecord(hCaster, hTarget, szDamageEffectName, 0, 0, nSkillResult)
+		MY_Recount.Data.AddDamageRecord(KCaster, KTarget, szDamageEffectName, 0, 0, nSkillResult)
 	end
 
 	Data.nTimeDuring = GetCurrentTime() - Data.nTimeBegin
@@ -817,30 +823,30 @@ local function GetObjectKeyID(obj)
 end
 
 -- 插入一条伤害记录
-function MY_Recount.Data.AddDamageRecord(hCaster, hTarget, szEffectName, nDamage, nEffectDamage, nSkillResult)
+function MY_Recount.Data.AddDamageRecord(KCaster, KTarget, szEffectName, nDamage, nEffectDamage, nSkillResult)
 	-- 获取索引ID
-	local idCaster = GetObjectKeyID(hCaster)
-	local idTarget = GetObjectKeyID(hTarget)
+	local idCaster = GetObjectKeyID(KCaster)
+	local idTarget = GetObjectKeyID(KTarget)
 
 	-- 添加伤害记录
-	_Cache.InitObjectData(Data, hCaster, 'Damage')
+	_Cache.InitObjectData(Data, KCaster, 'Damage')
 	_Cache.AddRecord(Data, 'Damage'  , idCaster, idTarget, szEffectName, nDamage, nEffectDamage, nSkillResult)
 	-- 添加承伤记录
-	_Cache.InitObjectData(Data, hTarget, 'BeDamage')
+	_Cache.InitObjectData(Data, KTarget, 'BeDamage')
 	_Cache.AddRecord(Data, 'BeDamage', idTarget, idCaster, szEffectName, nDamage, nEffectDamage, nSkillResult)
 end
 
 -- 插入一条治疗记录
-function MY_Recount.Data.AddHealRecord(hCaster, hTarget, szEffectName, nHeal, nEffectHeal, nSkillResult)
+function MY_Recount.Data.AddHealRecord(KCaster, KTarget, szEffectName, nHeal, nEffectHeal, nSkillResult)
 	-- 获取索引ID
-	local idCaster = GetObjectKeyID(hCaster)
-	local idTarget = GetObjectKeyID(hTarget)
+	local idCaster = GetObjectKeyID(KCaster)
+	local idTarget = GetObjectKeyID(KTarget)
 
 	-- 添加伤害记录
-	_Cache.InitObjectData(Data, hCaster, 'Heal')
+	_Cache.InitObjectData(Data, KCaster, 'Heal')
 	_Cache.AddRecord(Data, 'Heal'    , idCaster, idTarget, szEffectName, nHeal, nEffectHeal, nSkillResult)
 	-- 添加承伤记录
-	_Cache.InitObjectData(Data, hTarget, 'BeHeal')
+	_Cache.InitObjectData(Data, KTarget, 'BeHeal')
 	_Cache.AddRecord(Data, 'BeHeal'  , idTarget, idCaster, szEffectName, nHeal, nEffectHeal, nSkillResult)
 end
 
