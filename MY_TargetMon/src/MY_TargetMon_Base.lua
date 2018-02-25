@@ -415,7 +415,7 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 		hItem.box:SetObjectIcon(iconid)
 		-- º∆À„BUFF ±º‰
 		local nTimeLeft = math.max(0, buff.nEndFrame - nFrameCount) / 16
-		local szTimeLeft = "1h+"
+		local szTimeLeft = ""
 		if nTimeLeft <= 3600 then
 			if nTimeLeft > 60 then
 				if config.decimalTime == -1 or nTimeLeft < config.decimalTime then
