@@ -7,21 +7,25 @@
 -- @Last modified time: 2017-02-08 20:46:39
 -----------------------------------------------
 
-------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
-------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
-local insert, remove, concat = table.insert, table.remove, table.concat
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
 local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
-local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local type, tonumber, tostring = type, tonumber, tostring
-local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local floor, min, max, ceil = math.floor, math.min, math.max, math.ceil
+local huge, pi, sin, cos, tan = math.huge, math.pi, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+-----------------------------------------------------------------------------------------
 
 -------------------------------------
 -- UI object class
@@ -1983,6 +1987,44 @@ function XGUI:drawCircle(nX, nY, nRadius, nR, nG, nB, nA, dwPitch, dwRad, nAccur
 		end
 	end
 	return self
+end
+
+function XGUI:drawGwText(szText, nX ,nY, nZ, nR, nG, nB, nA, nFont, fFontScale, fSpacing)
+	for _, raw in ipairs(self.raws) do
+		sha = GetComponentElement(raw, 'SHADOW')
+		if sha then
+			sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
+			sha:ClearTriangleFanPoint()
+			sha:AppendTriangleFan3DPoint(
+				nX ,nY, nZ,
+				nR or 255, nG or 255, nB or 255, nA or 255,
+				aDelta or 0, -- fYDelta | {fXDelta, fYDelta, fZDelta, fScreenXDelta, fScreenYDelta}
+				nFont or 40,
+				szText,
+				fSpacing or 0,
+				fFontScale or 1
+			)
+			sha:Show()
+		end
+	end
+	return self
+end
+
+function XGUI:drawGwCircle(nX, nY, nZ, nR, nG, nB, nA, nRadius, dwPitch, dwRad)
+	nRadius, dwPitch, dwRad = nRadius or 64 * 3, dwPitch or 0, dwRad or (2 * pi)
+	nR, nG, nB, nA = nR or 255, nG or 255, nB or 255, nA or 255
+	local dwRad1, dwRad2 = dwPitch, dwPitch + dwRad * 1.05 -- 稍微大点 不然整个圈的时候会有个缝
+	sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
+	sha:SetD3DPT(D3DPT.TRIANGLEFAN)
+	sha:ClearTriangleFanPoint()
+	sha:AppendTriangleFan3DPoint(nX ,nY, nZ, nR, nG, nB, nA)
+	sha:Show()
+	local nSceneX, nSceneZ, nSceneXD, nSceneZD = Scene_PlaneGameWorldPosToScene(nX, nY)
+	repeat
+		nSceneXD, nSceneZD = Scene_PlaneGameWorldPosToScene(nX + cos(dwRad1) * nRadius, nY + sin(dwRad1) * nRadius)
+		sha:AppendTriangleFan3DPoint(nX ,nY, nZ, nR, nG, nB, nA, { nSceneXD - nSceneX, 0, nSceneZD - nSceneZ })
+		dwRad1 = dwRad1 + pi / 16
+	until dwRad1 > dwRad2
 end
 
 -- (number) Instance:left()
