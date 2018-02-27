@@ -20,12 +20,14 @@ DB:Execute("CREATE INDEX IF NOT EXISTS mmm_name_idx ON NpcInfo(name, mapid)")
 DB:Execute("CREATE INDEX IF NOT EXISTS mmm_title_idx ON NpcInfo(title, mapid)")
 DB:Execute("CREATE INDEX IF NOT EXISTS mmm_template_idx ON NpcInfo(templateid, mapid)")
 local DBN_W  = DB:Prepare("REPLACE INTO NpcInfo (templateid, poskey, mapid, x, y, name, title, level) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
+local DBN_DM  = DB:Prepare("DELETE FROM NpcInfo WHERE mapid = ?")
 local DBN_RI = DB:Prepare("SELECT templateid, poskey, mapid, x, y, name, title, level FROM NpcInfo WHERE templateid = ?")
 local DBN_RN = DB:Prepare("SELECT templateid, poskey, mapid, x, y, name, title, level FROM NpcInfo WHERE name LIKE ? OR title LIKE ?")
 local DBN_RNM = DB:Prepare("SELECT templateid, poskey, mapid, x, y, name, title, level FROM NpcInfo WHERE (name LIKE ? AND mapid = ?) OR (title LIKE ? AND mapid = ?)")
 DB:Execute("CREATE TABLE IF NOT EXISTS DoodadInfo (templateid INTEGER, poskey INTEGER, mapid INTEGER, x INTEGER, y INTEGER, name VARCHAR(20) NOT NULL, PRIMARY KEY (templateid, poskey))")
 DB:Execute("CREATE INDEX IF NOT EXISTS mmm_name_idx ON DoodadInfo(name, mapid)")
 local DBD_W  = DB:Prepare("REPLACE INTO DoodadInfo (templateid, poskey, mapid, x, y, name) VALUES (?, ?, ?, ?, ?, ?)")
+local DBD_DM  = DB:Prepare("DELETE FROM DoodadInfo WHERE mapid = ?")
 local DBD_RI = DB:Prepare("SELECT templateid, poskey, mapid, x, y, name FROM DoodadInfo WHERE templateid = ?")
 local DBD_RN = DB:Prepare("SELECT templateid, poskey, mapid, x, y, name FROM DoodadInfo WHERE name LIKE ?")
 local DBD_RNM = DB:Prepare("SELECT templateid, poskey, mapid, x, y, name FROM DoodadInfo WHERE name LIKE ? AND mapid = ?")
@@ -76,6 +78,7 @@ end
 ---------------------------------------------------------------
 local l_npc = {}
 local l_doodad = {}
+local l_tempMap = false
 local function PushDB()
 	if empty(l_npc) and empty(l_doodad) then
 		return
@@ -83,22 +86,39 @@ local function PushDB()
 	DB:Execute("BEGIN TRANSACTION")
 
 	for i, p in pairs(l_npc) do
-		DBN_W:ClearBindings()
-		DBN_W:BindAll(p.templateid, p.poskey, p.mapid, p.x, p.y, AnsiToUTF8(p.name), AnsiToUTF8(p.title), p.level)
-		DBN_W:Execute()
+		if not p.temp then
+			DBN_W:ClearBindings()
+			DBN_W:BindAll(p.templateid, p.poskey, p.mapid, p.x, p.y, AnsiToUTF8(p.name), AnsiToUTF8(p.title), p.level)
+			DBN_W:Execute()
+		end
 	end
 	l_npc = {}
 
 	for i, p in pairs(l_doodad) do
-		DBD_W:ClearBindings()
-		DBD_W:BindAll(p.templateid, p.poskey, p.mapid, p.x, p.y, AnsiToUTF8(p.name))
-		DBD_W:Execute()
+		if not p.temp then
+			DBD_W:ClearBindings()
+			DBD_W:BindAll(p.templateid, p.poskey, p.mapid, p.x, p.y, AnsiToUTF8(p.name))
+			DBD_W:Execute()
+		end
 	end
 	l_doodad = {}
 
 	DB:Execute("END TRANSACTION")
 end
-MY.RegisterEvent('LOADING_ENDING.MY_MiddleMapMark', PushDB)
+local function onLoadingEnding()
+	l_tempMap = MY.IsInPubg() or MY.IsInArena() or MY.IsInBattleField() or false
+	if l_tempMap then
+		local dwMapID = GetClientPlayer().GetMapID()
+		DBN_DM:ClearBindings()
+		DBN_DM:BindAll(dwMapID)
+		DBN_DM:Execute()
+		DBD_DM:ClearBindings()
+		DBD_DM:BindAll(dwMapID)
+		DBD_DM:Execute()
+	end
+	PushDB()
+end
+MY.RegisterEvent('LOADING_ENDING.MY_MiddleMapMark', onLoadingEnding)
 
 local function OnExit()
 	PushDB()
@@ -111,6 +131,9 @@ local DoodadTpl = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_MiddleMapMark/d
 local m_nLastRedrawFrame = GetLogicFrameCount()
 local MARK_RENDER_INTERVAL = GLOBAL.GAME_FPS * 5
 local function OnNpcEnterScene()
+	if l_tempMap and MY.IsShieldedVersion() then
+		return
+	end
 	local npc = GetNpc(arg0)
 	local player = GetClientPlayer()
 	if not (npc and player) then
@@ -136,6 +159,7 @@ local function OnNpcEnterScene()
 	-- add rec
 	l_npc[npc.dwTemplateID .. "," .. dwPosKey] = {
 		decoded = true,
+		temp = l_tempMap,
 		x = npc.nX,
 		y = npc.nY,
 		mapid = dwMapID,
@@ -154,6 +178,9 @@ end
 MY.RegisterEvent("NPC_ENTER_SCENE.MY_MIDDLEMAPMARK", OnNpcEnterScene)
 
 local function OnDoodadEnterScene()
+	if l_tempMap and MY.IsShieldedVersion() then
+		return
+	end
 	local doodad = GetDoodad(arg0)
 	local player = GetClientPlayer()
 	if not (doodad and player) then
@@ -178,6 +205,7 @@ local function OnDoodadEnterScene()
 	-- add rec
 	l_doodad[doodad.dwTemplateID .. "," .. dwPosKey] = {
 		decoded = true,
+		temp = l_tempMap,
 		x = doodad.nX,
 		y = doodad.nY,
 		name = szName,
