@@ -526,6 +526,20 @@ local function RecBuffWithTabs(tabs, dwOwnerID, dwBuffID, dwSrcID)
 		end
 	end
 end
+local function OnBuffUpdate(dwOwnerID, dwID, nLevel, nStackNum, dwSrcID)
+	if MY.IsBossFocusBuff(dwID, nLevel, nStackNum) then
+		Grid_CTM:RecBossFocusBuff(dwOwnerID, {
+			dwID      = dwID     ,
+			nLevel    = nLevel   ,
+			nStackNum = nStackNum,
+		})
+	end
+	if Table_BuffIsVisible(dwID, nLevel) then
+		local szName = GetBuffName(dwID, nLevel)
+		RecBuffWithTabs(BUFF_LIST[dwID], dwOwnerID, dwID, dwSrcID)
+		RecBuffWithTabs(BUFF_LIST[szName], dwOwnerID, dwID, dwSrcID)
+	end
+end
 function Cataclysm_Main.OnEvent(szEvent)
 	if szEvent == "RENDER_FRAME_UPDATE" then
 		Grid_CTM:CallDrawHPMP(true)
@@ -649,17 +663,10 @@ function Cataclysm_Main.OnEvent(szEvent)
 	elseif szEvent == "BUFF_UPDATE" then
 		-- local owner, bdelete, index, cancancel, id  , stacknum, endframe, binit, level, srcid, isvalid, leftframe
 		--     = arg0 , arg1   , arg2 , arg3     , arg4, arg5    , arg6    , arg7 , arg8 , arg9 , arg10  , arg11
-		if MY.IsBossFocusBuff(arg4, arg8, arg5) then
-			Grid_CTM:RefreshBossFocus(arg0, not arg1)
-		end
 		if arg1 then
 			return
 		end
-		if Table_BuffIsVisible(arg4, arg8) then
-			local szName = GetBuffName(arg4, arg8)
-			RecBuffWithTabs(BUFF_LIST[arg4], arg0, arg4, arg9)
-			RecBuffWithTabs(BUFF_LIST[szName], arg0, arg4, arg9)
-		end
+		OnBuffUpdate(arg0, arg4, arg8, arg5, arg9)
 	elseif szEvent == "PLAYER_ENTER_SCENE" then
 		local me = GetClientPlayer()
 		if not me then
@@ -675,14 +682,7 @@ function Cataclysm_Main.OnEvent(szEvent)
 				return
 			end
 			for i, p in ipairs(MY.GetBuffList(tar)) do
-				if MY.IsBossFocusBuff(p.dwID, p.nLevel, p.nStackNum) then
-					Grid_CTM:RefreshBossFocus(dwID, true)
-				end
-				if Table_BuffIsVisible(p.dwID, p.nLevel) then
-					local szName = GetBuffName(p.dwID, p.nLevel)
-					RecBuffWithTabs(BUFF_LIST[p.dwID], dwID, p.dwID, p.nLevel)
-					RecBuffWithTabs(BUFF_LIST[szName], dwID, p.dwID, p.nLevel)
-				end
+				OnBuffUpdate(dwID, p.dwID, p.nLevel, p.nStackNum, p.dwSkillSrcID)
 			end
 		end
 		MY.DelayCall(update, 200)
@@ -705,17 +705,19 @@ function Cataclysm_Main.OnEvent(szEvent)
 		SetFrameSize()
 	end
 end
-end
 
 function Cataclysm_Main.OnFrameBreathe()
 	local me = GetClientPlayer()
-	if not me then return end
+	if not me then
+		return
+	end
 	Grid_CTM:RefreshDistance()
 	Grid_CTM:RefreshBuff()
 	Grid_CTM:RefreshAttention()
 	Grid_CTM:RefreshCaution()
 	Grid_CTM:RefreshTTarget()
 	Grid_CTM:RefreshBossTarget()
+	Grid_CTM:RefreshBossFocus()
 	-- kill System Panel
 	RaidPanel_Switch(DEBUG)
 	TeammatePanel_Switch(false)
@@ -725,6 +727,7 @@ function Cataclysm_Main.OnFrameBreathe()
 		this.nBreatheTime = GetTime()
 	end
 	GVoiceBase_CheckMicState()
+end
 end
 
 function Cataclysm_Main.OnLButtonClick()
@@ -1004,15 +1007,16 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():width() + 5
 
-	x = x + ui:append("WndCheckBox", {
+	y = y + ui:append("WndCheckBox", {
 		x = x, y = y, text = _L["Show Boss focus"],
 		checked = Cataclysm_Main.bShowBossFocus,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowBossFocus = bCheck
 		end,
-	}, true):autoWidth():width() + 5
+	}, true):autoWidth():height()
 
-	y = y + ui:append("WndCheckBox", {
+	x = X + 10
+	x = x + ui:append("WndCheckBox", {
 		x = x, y = y, text = _L["Attack Warning"],
 		checked = Cataclysm_Main.bHPHitAlert,
 		oncheck = function(bCheck)
@@ -1021,9 +1025,8 @@ function PS.OnPanelActive(frame)
 				Grid_CTM:CallDrawHPMP(true, true)
 			end
 		end,
-	}, true):autoWidth():height()
+	}, true):autoWidth():width() + 5
 
-	x = X + 10
 	x = x + ui:append("WndCheckBox", {
 		x = x, y = y, text = _L["Show attention shadow"],
 		checked = Cataclysm_Main.bShowAttention,
