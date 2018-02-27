@@ -10,7 +10,7 @@
 MY.CreateDataRoot(MY_DATA_PATH.GLOBAL)
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_MiddleMapMark/lang/")
 local l_szKeyword, l_dwMapID = ""
-local SZ_DB_PATH = MY.FormatPath({"cache/npc_doodad_rec.db", MY_DATA_PATH.GLOBAL})
+local SZ_DB_PATH = MY.FormatPath({"cache/npc_doodad_rec.v2.db", MY_DATA_PATH.GLOBAL})
 local DB = SQLite3_Open(SZ_DB_PATH)
 if not DB then
 	return MY.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L["MY_MiddleMapMark"])
@@ -39,12 +39,19 @@ do
 ---------------------------------------------------------------
 local L16 = 0x10000
 local L32 = 0x100000000
-local MAX_DISTINCT_DISTANCE = 2 * 64 -- 最大独立距离2尺（低于该距离的两个实体视为同一个）-- 不可随意更改，更改需要清空数据库重新建立key索引
-local function GeneInfoPosKey(mapid, x, y)
-	-- 47 - 32 位 mapid
-	-- 31 - 16 位 x
-	-- 15 -  0 位 y
-	return mapid * L32 + math.floor(x / MAX_DISTINCT_DISTANCE) * L16 + math.floor(y / MAX_DISTINCT_DISTANCE)
+-- NPC 最大独立距离8尺（低于该距离的两个实体视为同一个）
+-- DOODAD 最大独立距离2尺（低于该距离的两个实体视为同一个）
+-- 不可随意更改，更改需要清空数据库重新建立key索引
+local NPC_MAX_DISTINCT_DISTANCE = 8 * 64
+local DOODAD_MAX_DISTINCT_DISTANCE = 2 * 64
+-- 47 - 32 位 mapid
+-- 31 - 16 位 x
+-- 15 -  0 位 y
+local function GeneNpcInfoPosKey(mapid, x, y)
+	return mapid * L32 + math.floor(x / NPC_MAX_DISTINCT_DISTANCE) * L16 + math.floor(y / NPC_MAX_DISTINCT_DISTANCE)
+end
+local function GeneDoodadInfoPosKey(mapid, x, y)
+	return mapid * L32 + math.floor(x / DOODAD_MAX_DISTINCT_DISTANCE) * L16 + math.floor(y / DOODAD_MAX_DISTINCT_DISTANCE)
 end
 
 local SZ_CACHE_PATH = "cache/NPC_DOODAD_REC/"
@@ -58,12 +65,12 @@ if IsLocalFileExist(MY.FormatPath(SZ_CACHE_PATH)) then
 		if data then
 			for _, p in ipairs(data.Npc) do
 				DBN_W:ClearBindings()
-				DBN_W:BindAll(p.dwTemplateID, GeneInfoPosKey(dwMapID, p.nX, p.nY), dwMapID, p.nX, p.nY, AnsiToUTF8(p.szName), AnsiToUTF8(p.szTitle), p.nLevel)
+				DBN_W:BindAll(p.dwTemplateID, GeneNpcInfoPosKey(dwMapID, p.nX, p.nY), dwMapID, p.nX, p.nY, AnsiToUTF8(p.szName), AnsiToUTF8(p.szTitle), p.nLevel)
 				DBN_W:Execute()
 			end
 			for _, p in ipairs(data.Doodad) do
 				DBD_W:ClearBindings()
-				DBD_W:BindAll(p.dwTemplateID, GeneInfoPosKey(dwMapID, p.nX, p.nY), dwMapID, p.nX, p.nY, AnsiToUTF8(p.szName))
+				DBD_W:BindAll(p.dwTemplateID, GeneDoodadInfoPosKey(dwMapID, p.nX, p.nY), dwMapID, p.nX, p.nY, AnsiToUTF8(p.szName))
 				DBD_W:Execute()
 			end
 			MY.Debug({"MiddleMapMark cache trans from file to sqlite finished!"}, "MY_MiddleMapMark", MY_DEBUG.LOG)
@@ -154,7 +161,7 @@ local function OnNpcEnterScene()
 	end
 	-- switch map
 	local dwMapID = player.GetMapID()
-	local dwPosKey = GeneInfoPosKey(dwMapID, npc.nX, npc.nY)
+	local dwPosKey = GeneNpcInfoPosKey(dwMapID, npc.nX, npc.nY)
 
 	-- add rec
 	l_npc[npc.dwTemplateID .. "," .. dwPosKey] = {
@@ -218,7 +225,7 @@ local function OnDoodadEnterScene()
 	end
 	-- switch map
 	local dwMapID = player.GetMapID()
-	local dwPosKey = GeneInfoPosKey(dwMapID, doodad.nX, doodad.nY)
+	local dwPosKey = GeneDoodadInfoPosKey(dwMapID, doodad.nX, doodad.nY)
 
 	-- add rec
 	l_doodad[doodad.dwTemplateID .. "," .. dwPosKey] = {
