@@ -177,6 +177,24 @@ local function OnNpcEnterScene()
 end
 MY.RegisterEvent("NPC_ENTER_SCENE.MY_MIDDLEMAPMARK", OnNpcEnterScene)
 
+local REC_DOODAD_TYPES = {
+	[DOODAD_KIND.INVALID     ] = false,
+	[DOODAD_KIND.NORMAL      ] = true , -- 普通的Doodad,有Tip,不能操作
+	[DOODAD_KIND.CORPSE      ] = false, -- 尸体
+	[DOODAD_KIND.QUEST       ] = true , -- 任务相关的Doodad
+	[DOODAD_KIND.READ        ] = true , -- 可以看的Doodad
+	[DOODAD_KIND.DIALOG      ] = true , -- 可以对话的Doodad
+	[DOODAD_KIND.ACCEPT_QUEST] = true , -- 可以接任务的Doodad,本质上上面3个类型是一样的,只是图标不同而已
+	[DOODAD_KIND.TREASURE    ] = false, -- 宝箱
+	[DOODAD_KIND.ORNAMENT    ] = false, -- 装饰物,不能操作
+	[DOODAD_KIND.CRAFT_TARGET] = true , -- 生活技能的采集物
+	[DOODAD_KIND.CLIENT_ONLY ] = false, -- 客户端用
+	[DOODAD_KIND.CHAIR       ] = true , -- 可以坐的Doodad
+	[DOODAD_KIND.GUIDE       ] = false, -- 路标
+	[DOODAD_KIND.DOOR        ] = false, -- 门之类有动态障碍的Doodad
+	[DOODAD_KIND.NPCDROP     ] = false, -- 使用NPC掉落模式的doodad
+	[DOODAD_KIND.SPRINT      ] = false, -- 轻功落脚点
+}
 local function OnDoodadEnterScene()
 	if l_tempMap and MY.IsShieldedVersion() then
 		return
@@ -186,7 +204,7 @@ local function OnDoodadEnterScene()
 	if not (doodad and player) then
 		return
 	end
-	if doodad.nKind == DOODAD_KIND.CORPSE then
+	if not REC_DOODAD_TYPES[doodad.nKind] then
 		return
 	end
 	-- avoid special doodad
