@@ -475,6 +475,52 @@ end
 MY.BreatheCall('MY_Toolbox#OpenAllMap', 130, openAllMap)
 end
 
+-- 台服用 吃鸡安全点显示
+do
+local fStartScale, fEndScale, nStartX, nStartY, nEndX, nEndY, nDuration, nStartTime
+local function onUpdateMiddleMapCircle()
+	if nIndex == 2 then
+		nStartX, nStartY, fStartScale, nEndX, nEndY, fEndScale, nDuration, nStartTime =
+		arg2   , arg3   , arg0       , arg4 , arg5 , arg1     , arg6     , GetTickCount()
+	end
+end
+MY.RegisterEvent("UPDATE_MIDDLE_MAP_CIRCLE", onUpdateMiddleMapCircle)
+
+local hPubg, uiCircle, uiDistance
+local function onBreatheCall()
+	if not nStartTime or MY.IsShieldedVersion() then
+		return
+	end
+	local me = GetClientPlayer()
+	if not me then
+		return
+	end
+	-- TODO: vars below should be in an animation, fix it in game later.
+	local fScale = fEndScale
+	local nX, nY, nZ = nEndX, nEndY, me.nZ
+	local nDistance = MY.GetDistance(nX, nY)
+	MY.Sysmsg({_L("%f %f %f, %d, %f", nX, nY, nZ, nDistance, fScale)})
+	uiCircle:drawGwCircle(nX, nY, nZ, fScale)
+	uiDistance:drawGwText(_L("%.1f meter(s)", nDistance), nX, nY, me.nZ)
+end
+local function onLoadingEnd()
+	if not hPubg then
+		hPubg = XGUI.GetShadowHandle("PubgInfo")
+		uiCircle = XGUI(hPubg):append("Shadow", true)
+		uiDistance = XGUI(hPubg):append("Shadow", true)
+	end
+	nStartTime = nil
+
+	if MY.IsInPubg() then
+		hPubg:Show()
+		MY.BreatheCall("PUBG_INFO", onBreatheCall)
+	else
+		hPubg:Hide()
+		MY.BreatheCall("PUBG_INFO", false)
+	end
+end
+end
+
 -- 大战没交
 local m_aBigWars = {17816, 17817, 17818, 17819, 17820}
 MY.RegisterEvent("ON_FRAME_CREATE.BIG_WAR_CHECK", function()
