@@ -1234,7 +1234,7 @@ end
 -- get/set ui object text
 function XGUI:text(arg0)
 	self:_checksum()
-	if arg0 then
+	if not IsNil(arg0) and not IsBoolean(arg0) then
 		local componentType, element
 		for _, raw in ipairs(self.raws) do
 			componentType = GetComponentType(raw)
@@ -1282,12 +1282,20 @@ function XGUI:text(arg0)
 			end
 		end
 		return self
-	else
+	else -- arg0: bStruct
 		local raw = self.raws[1]
 		if raw then
 			raw = GetComponentElement(raw, 'TEXT') or GetComponentElement(raw, 'EDIT') or raw
-			if raw and raw.GetText then
-				return raw:GetText()
+			if raw then
+				if arg0 then
+					if raw.GetTextStruct then
+						return raw:GetTextStruct()
+					elseif raw.GetText then
+						return { type = "text", text = raw:GetText() }
+					end
+				elseif raw.GetText then
+					return raw:GetText()
+				end
 			end
 		end
 	end
