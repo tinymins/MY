@@ -308,11 +308,15 @@ CTM_Party_Base = class()
 function CTM_Party_Base.OnFrameCreate()
 	this:Lookup("", "Handle_BG/Shadow_BG"):SetAlpha(CFG.nAlpha)
 	this:RegisterEvent("CTM_SET_ALPHA")
+	this:SetVisible(not MY_Cataclysm.bFold)
+	this:RegisterEvent("CTM_SET_FOLD")
 end
 
 function CTM_Party_Base.OnEvent(szEvent)
 	if szEvent == "CTM_SET_ALPHA" then
 		this:Lookup("", "Handle_BG/Shadow_BG"):SetAlpha(CFG.nAlpha)
+	elseif szEvent == "CTM_SET_FOLD" then
+		this:SetVisible(not MY_Cataclysm.bFold)
 	end
 end
 

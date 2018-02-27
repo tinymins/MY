@@ -309,6 +309,7 @@ local function SetFrameSize(bEnter)
 end
 
 local function CreateControlBar()
+	local me           = GetClientPlayer()
 	local team         = GetClientTeam()
 	local nLootMode    = team.nLootMode
 	local nRollQuality = team.nRollQuality
@@ -358,6 +359,11 @@ local function CreateControlBar()
 			nMicWidth = hMicHotKey:GetRelX() + hMicHotKey:GetW()
 		end
 		container:Lookup("Wnd_Microphone"):SetW(nMicWidth)
+	end
+	-- ×îÐ¡»¯
+	if me.IsInRaid() then
+		container:AppendContentFromIni(szIniFile, "Wnd_Fold")
+			:Lookup("CheckBox_Fold"):Check(MY_Cataclysm.bFold, WNDEVENT_FIRETYPE.PREVENT)
 	end
 	local nW, wnd = 0
 	for i = 0, container:GetAllContentCount() - 1 do
@@ -812,6 +818,21 @@ function Cataclysm_Main.OnRButtonDown()
 	Grid_CTM:BringToTop()
 end
 
+function Cataclysm_Main.OnCheckBoxCheck()
+	local name = this:GetName()
+	if name == "CheckBox_Fold" then
+		MY_Cataclysm.bFold = true
+		FireUIEvent("CTM_SET_FOLD")
+	end
+end
+
+function Cataclysm_Main.OnCheckBoxUncheck()
+	local name = this:GetName()
+	if name == "CheckBox_Fold" then
+		MY_Cataclysm.bFold = false
+		FireUIEvent("CTM_SET_FOLD")
+	end
+end
 
 function Cataclysm_Main.OnMouseLeave()
 	local szName = this:GetName()
