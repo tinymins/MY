@@ -10,6 +10,7 @@ data = {
 	["Show ManaCount"] = "显示内力数值",
 	["Show target's target"] = "显示目标的目标",
 	["Show Boss target"] = "显示BOSS目标",
+	["Show Boss focus"] = "显示BOSS点名",
 	["Attack Warning"] = "被攻击提示",
 	["Show attention shadow"] = "显示警告色",
 	["Show caution animate"] = "显示警告特效",

@@ -649,6 +649,9 @@ function Cataclysm_Main.OnEvent(szEvent)
 	elseif szEvent == "BUFF_UPDATE" then
 		-- local owner, bdelete, index, cancancel, id  , stacknum, endframe, binit, level, srcid, isvalid, leftframe
 		--     = arg0 , arg1   , arg2 , arg3     , arg4, arg5    , arg6    , arg7 , arg8 , arg9 , arg10  , arg11
+		if MY.IsBossFocusBuff(arg4, arg8, arg5) then
+			Grid_CTM:RefreshBossFocus(arg0, not arg1)
+		end
 		if arg1 then
 			return
 		end
@@ -668,6 +671,9 @@ function Cataclysm_Main.OnEvent(szEvent)
 				return
 			end
 			for i, p in ipairs(MY.GetBuffList(tar)) do
+				if MY.IsBossFocusBuff(p.dwID, p.nLevel, p.nStackNum) then
+					Grid_CTM:RefreshBossFocus(arg0, true)
+				end
 				if Table_BuffIsVisible(p.dwID, p.nLevel) then
 					local szName = GetBuffName(arg4, arg8)
 					RecBuffWithTabs(BUFF_LIST[p.dwID], arg0, p.dwID, p.nLevel)
@@ -990,6 +996,14 @@ function PS.OnPanelActive(frame)
 		checked = Cataclysm_Main.bShowBossTarget,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowBossTarget = bCheck
+		end,
+	}, true):autoWidth():width() + 5
+
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y, text = _L["Show Boss focus"],
+		checked = Cataclysm_Main.bShowBossFocus,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bShowBossFocus = bCheck
 		end,
 	}, true):autoWidth():width() + 5
 

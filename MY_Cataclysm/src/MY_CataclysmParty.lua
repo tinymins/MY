@@ -837,6 +837,17 @@ function CTM:RefreshThreat(dwNpcID, dwTarID)
 	self:RefreshBossTarget()
 end
 
+function CTM:RefreshBossFocus(dwID, bFocus)
+	if not CFG.bShowBossFocus then
+		return
+	end
+	if not CTM_CAUTION_CACHE[dwID] then
+		CTM_CAUTION_CACHE[dwID] = {}
+	end
+	CTM_CAUTION_CACHE[dwID]["BOSS_FOCUS"] = bFocus
+	self:RefreshCaution()
+end
+
 function CTM:RefreshAttention()
 	if CFG.bShowAttention then
 		local team, me = GetClientTeam(), GetClientPlayer()
