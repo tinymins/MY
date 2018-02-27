@@ -1823,6 +1823,25 @@ function MY.CancelBuff(KObject, dwID, nLevel)
 	end
 end
 
+do
+local BUFF_CACHE
+function MY.IsBossFocusBuff(dwID, nLevel, nStackNum)
+	if not BUFF_CACHE then
+		BUFF_CACHE = {}
+		for i = 2, g_tTable.BossFocusBuff:GetRowCount() do
+			local tLine = g_tTable.BossFocusBuff:GetRow(i)
+			if tLine then
+				if not BUFF_CACHE[tLine.nBuffID] then
+					BUFF_CACHE[tLine.nBuffID] = {}
+				end
+				BUFF_CACHE[tLine.nBuffID][tLine.nBuffLevel] = tLine.nBuffStack
+			end
+		end
+	end
+	return BUFF_CACHE[dwID] and BUFF_CACHE[dwID][nLevel] and nStackNum >= BUFF_CACHE[dwID][nLevel]
+end
+end
+
 -- 获取对象是否无敌
 -- (mixed) MY.Game.IsInvincible([object KObject])
 -- @return <nil >: invalid KObject
