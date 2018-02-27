@@ -317,6 +317,11 @@ local function CreateControlBar()
 	local container    = frame:Lookup("Container_Main")
 	local szIniFile    = INI_ROOT .. "Cataclysm_Button.ini"
 	container:Clear()
+	-- 团队工具 团队告示
+	if me.IsInRaid() then
+		container:AppendContentFromIni(szIniFile, "Wnd_TeamTools")
+		container:AppendContentFromIni(szIniFile, "Wnd_TeamNotice")
+	end
 	-- 分配模式
 	local hLootMode = container:AppendContentFromIni(szIniFile, "WndButton_LootMode")
 	hLootMode:Lookup("", "Image_LootMode"):FromUITex(unpack(CTM_LOOT_MODE[nLootMode]))
@@ -790,6 +795,10 @@ function Cataclysm_Main.OnLButtonClick()
 			return MY.Alert(_L["Please install and load GKP addon first."])
 		end
 		return MY_GKP.TogglePanel()
+	elseif szName == "Wnd_TeamTools" then
+		MY_RaidTools.TogglePanel()
+	elseif szName == "Wnd_TeamNotice" then
+		MY_TeamNotice.OpenFrame()
 	elseif szName == "WndButton_LootMode" or szName == "WndButton_LootQuality" then
 		if MY.IsDistributer() then
 			local menu = {}
@@ -836,7 +845,11 @@ end
 
 function Cataclysm_Main.OnMouseLeave()
 	local szName = this:GetName()
-	if szName == "WndButton_GKP" or szName == "WndButton_LootMode" or szName == "WndButton_LootQuality" then
+	if szName == "WndButton_GKP"
+	or szName == "WndButton_LootMode"
+	or szName == "WndButton_LootQuality"
+	or szName == "Wnd_TeamTools"
+	or szName == "Wnd_TeamNotice" then
 		this:SetAlpha(220)
 	end
 	if not IsKeyDown("LButton") then
@@ -869,7 +882,11 @@ local MIC_TIP = setmetatable({
 
 function Cataclysm_Main.OnMouseEnter()
 	local szName = this:GetName()
-	if szName == "WndButton_GKP" or szName == "WndButton_LootMode" or szName == "WndButton_LootQuality" then
+	if szName == "WndButton_GKP"
+	or szName == "WndButton_LootMode"
+	or szName == "WndButton_LootQuality"
+	or szName == "Wnd_TeamTools"
+	or szName == "Wnd_TeamNotice" then
 		this:SetAlpha(255)
 	end
 	if szName == "WndButton_Speaker" then

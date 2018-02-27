@@ -160,9 +160,24 @@ function TI.CreateFrame(a, b)
 				end
 			end
 		end
+		PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 	end
 	TI.szYY   = a
 	TI.szNote = b
+end
+
+function TI.OpenFrame()
+	local me = GetClientPlayer()
+	MY_TeamNotice.bEnable = true
+	if me.IsInRaid() then
+		if MY.IsLeader() then
+			TI.CreateFrame()
+		else
+			MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "TI", "ASK")
+			MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "LR_TeamNotice", "ASK")
+			MY.Sysmsg({_L["Asking..., If no response in longtime, team leader not enable plug-in."]})
+		end
+	end
 end
 
 MY.RegisterEvent("PARTY_LEVEL_UP_RAID.TEAM_NOTICE", function()
@@ -225,19 +240,7 @@ local function GetMenu()
 			local me = GetClientPlayer()
 			return not me.IsInRaid()
 		end,
-		fnAction = function()
-			local me = GetClientPlayer()
-			MY_TeamNotice.bEnable = true
-			if me.IsInRaid() then
-				if MY.IsLeader() then
-					TI.CreateFrame()
-				else
-					MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "TI", "ASK")
-					MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "LR_TeamNotice", "ASK")
-					MY.Sysmsg({_L["Asking..., If no response in longtime, team leader not enable plug-in."]})
-				end
-			end
-		end
+		fnAction = TI.OpenFrame,
 	}}
 end
 MY.RegisterAddonMenu(GetMenu)
@@ -249,3 +252,8 @@ local function GetMenuTB()
 end
 TraceButton_AppendAddonMenu({ GetMenuTB })
 end
+
+local ui = {
+	OpenFrame = TI.OpenFrame
+}
+setmetatable(MY_TeamNotice, { __index = ui, __metatable = true })
