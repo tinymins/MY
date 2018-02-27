@@ -665,22 +665,27 @@ function Cataclysm_Main.OnEvent(szEvent)
 		if not me then
 			return
 		end
-		if me.IsPlayerInMyParty(arg0) then
-			local tar = GetPlayer(arg0)
+		local dwID = arg0
+		if not me.IsPlayerInMyParty(dwID) then
+			return
+		end
+		local function update()
+			local tar = GetPlayer(dwID)
 			if not tar then
 				return
 			end
 			for i, p in ipairs(MY.GetBuffList(tar)) do
 				if MY.IsBossFocusBuff(p.dwID, p.nLevel, p.nStackNum) then
-					Grid_CTM:RefreshBossFocus(arg0, true)
+					Grid_CTM:RefreshBossFocus(dwID, true)
 				end
 				if Table_BuffIsVisible(p.dwID, p.nLevel) then
-					local szName = GetBuffName(arg4, arg8)
-					RecBuffWithTabs(BUFF_LIST[p.dwID], arg0, p.dwID, p.nLevel)
-					RecBuffWithTabs(BUFF_LIST[szName], arg0, p.dwID, p.nLevel)
+					local szName = GetBuffName(p.dwID, p.nLevel)
+					RecBuffWithTabs(BUFF_LIST[p.dwID], dwID, p.dwID, p.nLevel)
+					RecBuffWithTabs(BUFF_LIST[szName], dwID, p.dwID, p.nLevel)
 				end
 			end
 		end
+		MY.DelayCall(update, 200)
 	elseif szEvent == "MY_CAMP_COLOR_UPDATE"
 	or szEvent == "MY_FORCE_COLOR_UPDATE" then
 		ReloadCataclysmPanel()
