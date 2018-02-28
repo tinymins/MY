@@ -1344,6 +1344,10 @@ function CTM:RecBuff(dwMemberID, data)
 	CTM_BUFF_CACHE[data.dwID] = data
 end
 
+function CTM:ClearBuff(dwMemberID)
+	CTM_BUFF_CACHE = {}
+end
+
 function CTM:RefreshBuff()
 	local team, me = GetClientTeam(), GetClientPlayer()
 	local tCheck = {}

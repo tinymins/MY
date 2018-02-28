@@ -113,6 +113,7 @@ function UpdateBuffListCache()
 		end
 	end
 	InsertBuffListCache(Cataclysm_Main.aBuffList)
+	FireUIEvent("CTM_BUFF_LIST_CACHE_UPDATE")
 end
 end
 
@@ -484,6 +485,7 @@ function Cataclysm_Main.OnFrameCreate()
 	this:RegisterEvent("CHARACTER_THREAT_RANKLIST")
 	this:RegisterEvent("BUFF_UPDATE")
 	this:RegisterEvent("PLAYER_ENTER_SCENE")
+	this:RegisterEvent("CTM_BUFF_LIST_CACHE_UPDATE")
 	-- 拍团部分 arg0 0=T人 1=分工资
 	this:RegisterEvent("TEAM_VOTE_REQUEST")
 	-- arg0 回应状态 arg1 dwID arg2 同意=1 反对=0
@@ -697,6 +699,20 @@ function Cataclysm_Main.OnEvent(szEvent)
 			end
 		end
 		MY.DelayCall(update, 200)
+	elseif szEvent == "CTM_BUFF_LIST_CACHE_UPDATE" then
+		local team = GetClientTeam()
+		if not team then
+			return
+		end
+		Grid_CTM:ClearBuff()
+		for _, dwID in ipairs(team.GetTeamMemberList()) do
+			local tar = GetPlayer(dwID)
+			if tar then
+				for i, p in ipairs(MY.GetBuffList(tar)) do
+					OnBuffUpdate(dwID, p.dwID, p.nLevel, p.nStackNum, p.dwSkillSrcID)
+				end
+			end
+		end
 	elseif szEvent == "MY_CAMP_COLOR_UPDATE"
 	or szEvent == "MY_FORCE_COLOR_UPDATE" then
 		ReloadCataclysmPanel()
