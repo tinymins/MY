@@ -204,7 +204,7 @@ function D.FormatConfigStructure(config)
 				dwKungfuID = 0
 			end
 			for _, mon in ipairs(aMonList) do
-				mon.kungfus = { dwKungfuID }
+				mon.kungfus = { [dwKungfuID] = true }
 				insert(monitors, mon)
 			end
 		end
@@ -700,8 +700,7 @@ function PS.OnPanelActive(wnd)
 
 		local x0, y0 = 20, 20
 		local w0, h0 = w - 40, h - 30
-		local w1, w2 = w0 / 2 - 5, w0 / 2 - 5
-		local x1, x2 = x0, x0 + w1 + 10
+		local w1, x1 = w0 - 5, x0
 		local list = uiWrapper:append("WndListBox", { x = x1, y = y0 + 25, w = w1, h = h0 - 30 - 30 }, true)
 
 		local function InsertMonitor(index)
