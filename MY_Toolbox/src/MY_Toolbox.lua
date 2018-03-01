@@ -479,10 +479,11 @@ end
 do
 local fStartScale, fEndScale, nStartX, nStartY, nEndX, nEndY, nDuration, nStartTime
 local function onUpdateMiddleMapCircle()
-	if nIndex == 2 then
+	if arg0 == 2 then
 		nStartX, nStartY, fStartScale, nEndX, nEndY, fEndScale, nDuration, nStartTime =
 		arg2   , arg3   , arg0       , arg4 , arg5 , arg1     , arg6     , GetTickCount()
 	end
+	-- Output(arg0, arg1, arg2, arg3, arg4, arg5, arg6)
 end
 MY.RegisterEvent("UPDATE_MIDDLE_MAP_CIRCLE", onUpdateMiddleMapCircle)
 
@@ -499,8 +500,8 @@ local function onBreatheCall()
 	local fScale = fEndScale
 	local nX, nY, nZ = nEndX, nEndY, me.nZ
 	local nDistance = MY.GetDistance(nX, nY)
-	MY.Sysmsg({_L("%f %f %f, %d, %f", nX, nY, nZ, nDistance, fScale)})
-	uiCircle:drawGwCircle(nX, nY, nZ, fScale)
+	-- MY.Sysmsg({_L("%f %f %f, %d, %f", nX, nY, nZ, nDistance, fScale)})
+	uiCircle:drawGwCircle(nX, nY, nZ, fScale * 64, 255, 255, 255, 50)
 	uiDistance:drawGwText(_L("%.1f meter(s)", nDistance), nX, nY, me.nZ)
 end
 local function onLoadingEnd()
@@ -513,12 +514,15 @@ local function onLoadingEnd()
 
 	if MY.IsInPubg() then
 		hPubg:Show()
+		Output("On")
 		MY.BreatheCall("PUBG_INFO", onBreatheCall)
 	else
 		hPubg:Hide()
+		Output("Off")
 		MY.BreatheCall("PUBG_INFO", false)
 	end
 end
+MY.RegisterEvent("LOADING_END.PUBG_INFO", onLoadingEnd)
 end
 
 -- 大战没交
