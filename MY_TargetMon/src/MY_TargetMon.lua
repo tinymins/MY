@@ -197,19 +197,32 @@ end
 -- 数据存储
 ----------------------------------------------------------------------------------------------
 function D.FormatConfigStructure(config)
+	if config.monitors and config.monitors.common then
+		local monitors = {}
+		for dwKungfuID, aMonList in pairs(config.monitors) do
+			if dwKungfuID == "common" then
+				dwKungfuID = 0
+			end
+			for _, mon in ipairs(aMonList) do
+				mon.kungfus = { dwKungfuID }
+				insert(monitors, mon)
+			end
+		end
+		config.monitors = monitors
+	end
 	return MY.FormatDataStructure(config, ConfigTemplate, true)
 end
 
 function D.FormatMonStructure(config)
-	return MY.FormatDataStructure(config, ConfigTemplate.monitors.__CHILD_TEMPLATE__.__CHILD_TEMPLATE__, true)
+	return MY.FormatDataStructure(config, ConfigTemplate.monitors.__CHILD_TEMPLATE__, true)
 end
 
 function D.FormatMonItemStructure(config)
-	return MY.FormatDataStructure(config, ConfigTemplate.monitors.__CHILD_TEMPLATE__.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__, true)
+	return MY.FormatDataStructure(config, ConfigTemplate.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__, true)
 end
 
 function D.FormatMonItemLevelStructure(config)
-	return MY.FormatDataStructure(config, ConfigTemplate.monitors.__CHILD_TEMPLATE__.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__.levels.__CHILD_TEMPLATE__, true)
+	return MY.FormatDataStructure(config, ConfigTemplate.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__.levels.__CHILD_TEMPLATE__, true)
 end
 
 function D.LoadConfig(bDefault, bOriginal)
@@ -398,7 +411,6 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		x = w - 250, y = y, w = 135,
 		text = _L['Set target'],
 		menu = function()
-			local dwKungFuID = GetClientPlayer().GetKungfuMount().dwSkillID
 			local t = {}
 			if not bEmbedded then
 				for _, eType in ipairs(TARGET_TYPE_LIST) do
@@ -690,21 +702,13 @@ function PS.OnPanelActive(wnd)
 		local w0, h0 = w - 40, h - 30
 		local w1, w2 = w0 / 2 - 5, w0 / 2 - 5
 		local x1, x2 = x0, x0 + w1 + 10
+		local list = uiWrapper:append("WndListBox", { x = x1, y = y0 + 25, w = w1, h = h0 - 30 - 30 }, true)
 
-		local listCommon = uiWrapper:append("WndListBox", { x = x1, y = y0 + 25, w = w1, h = h0 - 30 - 30 }, true)
-		local listKungfu = uiWrapper:append("WndListBox", { x = x2, y = y0 + 25, w = w2, h = h0 - 30 - 30 }, true)
-
-		local function Add(kungfuid, index)
-			if kungfuid == 'current' then
-				kungfuid = GetClientPlayer().GetKungfuMount().dwSkillID
-			end
+		local function InsertMonitor(index)
 			GetUserInput(_L['Please input name:'], function(szVal)
 				szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
 				if szVal ~= "" then
-					if not l_config.monitors[kungfuid] then
-						l_config.monitors[kungfuid] = {}
-					end
-					local aMonList = l_config.monitors[kungfuid]
+					local aMonList = l_config.monitors
 					local mon = MY_TargetMon.FormatMonStructure({
 						name = szVal,
 						ignoreId = not tonumber(szVal),
@@ -718,7 +722,6 @@ function PS.OnPanelActive(wnd)
 						index = #aMonList + 1
 					end
 					insert(aMonList, index, mon)
-					local list = kungfuid == 'common' and listCommon or listKungfu
 					list:listbox(
 						'insert',
 						mon.name or mon.id,
@@ -728,12 +731,12 @@ function PS.OnPanelActive(wnd)
 					)
 					D.CheckFrame(l_config)
 				end
-			end, function() end, function() end, nil, "" )
+			end, function() end, function() end, nil, "")
 		end
-		uiWrapper:append("Text", { x = x1 + 5, y = y0, w = w1 - 60 - 5,  h = 25, text = _L['Common monitor'] })
-		uiWrapper:append("WndButton2", { x = x1 + w1 - 60, y = y0 - 1, w = 60, h = 28, text = _L['Add'], onclick = function() Add('common') end })
-		uiWrapper:append("Text", { x = x2 + 5, y = y0, w = w2 - 60 - 5,  h = 25, text = _L['Current kungfu monitor'] })
-		uiWrapper:append("WndButton2", { x = x2 + w2 - 60, y = y0 - 1, w = 60, h = 28, text = _L['Add'], onclick = function() Add('current') end })
+		uiWrapper:append("WndButton2", {
+			x = x1 + w1 - 60, y = y0 - 1, w = 60, h = 28,
+			text = _L['Add'], onclick = function() InsertMonitor() end,
+		})
 
 		-- 初始化list控件
 		local function onMenu(hItem, szText, szID, data)
@@ -752,7 +755,6 @@ function PS.OnPanelActive(wnd)
 				{
 					szOption = _L['Delete'],
 					fnAction = function()
-						local list = monlist == l_config.monitors.common and listCommon or listKungfu
 						list:listbox('delete', 'id', mon)
 						for i, m in ipairs_r(monlist) do
 							if m == mon then
@@ -766,21 +768,18 @@ function PS.OnPanelActive(wnd)
 				{
 					szOption = _L['Insert'],
 					fnAction = function()
-						local mode = monlist == l_config.monitors.common and 'common' or 'current'
 						local index = #monlist
 						for i, m in ipairs_r(monlist) do
 							if m == mon then
 								index = i
 							end
 						end
-						Add(mode, index)
+						InsertMonitor(index)
 					end,
 				},
 				{
 					szOption = _L['Move up'],
 					fnAction = function()
-						local mode = monlist == l_config.monitors.common and 'common' or 'current'
-						local list = monlist == l_config.monitors.common and listCommon or listKungfu
 						local index = #monlist
 						for i, m in ipairs_r(monlist) do
 							if m == mon then
@@ -797,8 +796,6 @@ function PS.OnPanelActive(wnd)
 				{
 					szOption = _L['Move down'],
 					fnAction = function()
-						local mode = monlist == l_config.monitors.common and 'common' or 'current'
-						local list = monlist == l_config.monitors.common and listCommon or listKungfu
 						local index = #monlist
 						for i, m in ipairs_r(monlist) do
 							if m == mon then
@@ -818,7 +815,6 @@ function PS.OnPanelActive(wnd)
 						GetUserInput(_L['Please input name:'], function(szVal)
 							szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
 							if szVal ~= "" then
-								local list = monlist == l_config.monitors.common and listCommon or listKungfu
 								list:listbox(
 									'update',
 									'id', mon,
@@ -864,6 +860,22 @@ function PS.OnPanelActive(wnd)
 					end,
 				},
 			}
+			local t2 = { szOption = _L['Target kungfu'] }
+			for _, dwForceID in pairs_c(FORCE_TYPE) do
+				for i, dwKungfuID in ipairs(ForceIDToKungfuIDs(dwForceID) or {}) do
+					insert(t2, {
+						szOption = MY.GetSkillName(dwKungfuID, 1),
+						rgb = {MY.GetForceColor(dwForceID, "foreground")},
+						bCheck = true, bMCheck = true,
+						bChecked = mon.kungfus[dwKungfuID],
+						fnAction = function()
+							mon.kungfus[dwKungfuID] = not mon.kungfus[dwKungfuID]
+							D.CheckFrame(l_config)
+						end,
+					})
+				end
+			end
+			insert(t1, t2)
 			if not empty(mon.ids) then
 				insert(t1, { bDevide = true })
 				insert(t1, { szOption = _L['Ids'], bDisable = true })
@@ -1040,35 +1052,20 @@ function PS.OnPanelActive(wnd)
 			})
 			return t1
 		end
-		listCommon:listbox('onmenu', onMenu)
-		listKungfu:listbox('onmenu', onMenu)
+		list:listbox('onmenu', onMenu)
 
 		function OpenConfig(config)
 			l_config = config
-			listCommon:listbox('clear')
-			do local aMonList = config.monitors.common
-				if aMonList and #aMonList > 0 then
-					for i, mon in ipairs(aMonList) do
-						listCommon:listbox(
-							'insert',
-							mon.name or mon.id,
-							mon,
-							{ mon = mon, monlist = aMonList }
-						)
-					end
-				end
-			end
-			listKungfu:listbox('clear')
-			do local aMonList = config.monitors[GetClientPlayer().GetKungfuMount().dwSkillID]
-				if aMonList and #aMonList > 0 then
-					for i, mon in ipairs(aMonList) do
-						listKungfu:listbox(
-							'insert',
-							mon.name or mon.id,
-							mon,
-							{ mon = mon, monlist = aMonList }
-						)
-					end
+			list:listbox('clear')
+			local aMonList = config.monitors
+			if aMonList and #aMonList > 0 then
+				for i, mon in ipairs(aMonList) do
+					list:listbox(
+						'insert',
+						mon.name or mon.id,
+						mon,
+						{ mon = mon, monlist = aMonList }
+					)
 				end
 			end
 			uiWrapper:show()

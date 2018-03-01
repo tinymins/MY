@@ -26,37 +26,38 @@ return {
 	monitors = {
 		__META__,
 		__VALUE__ = {},
-		__CHILD_TEMPLATE__ = { -- kungfuid
+		__CHILD_TEMPLATE__ = { -- mon
 			__META__,
-			__VALUE__ = {},
-			__CHILD_TEMPLATE__ = { -- mon
-				__META__,
-				__VALUE__ = {
-					enable = true,
-					iconid = 13,
-					name = "",
-					capture = true,
-					longAlias = {__META__, {'nil', 'string'}, nil},
-					rgbLongAlias = {255, 255, 0},
-					shortAlias = {__META__, {'nil', 'string'}, nil},
-					rgbShortAlias = {255, 255, 0},
-					ids = {
-						__META__,
-						__VALUE__ = {},
-						__CHILD_TEMPLATE__ = { -- monid
-							enable = true,
-							iconid = 13,
-							levels = {
-								__META__,
-								__VALUE__ = {},
-								__KEY_TEMPLATE__ = {__META__, {'number'}, nil},
-								__CHILD_TEMPLATE__ = { enable = true, iconid = 13 },
-							},
-							ignoreLevel = true,
+			__VALUE__ = {
+				enable = true,
+				iconid = 13,
+				name = "",
+				capture = true,
+				longAlias = {__META__, {'nil', 'string'}, nil},
+				rgbLongAlias = {255, 255, 0},
+				shortAlias = {__META__, {'nil', 'string'}, nil},
+				rgbShortAlias = {255, 255, 0},
+				ids = {
+					__META__,
+					__VALUE__ = {},
+					__CHILD_TEMPLATE__ = { -- monid
+						enable = true,
+						iconid = 13,
+						levels = {
+							__META__,
+							__VALUE__ = {},
+							__KEY_TEMPLATE__ = {__META__, {'number'}, nil},
+							__CHILD_TEMPLATE__ = { enable = true, iconid = 13 },
 						},
+						ignoreLevel = true,
 					},
-					ignoreId = true,
 				},
+				kungfus = {
+					__META__,
+					__VALUE__ = {},
+					__CHILD_TEMPLATE__ = true,
+				},
+				ignoreId = true,
 			},
 		},
 	},
