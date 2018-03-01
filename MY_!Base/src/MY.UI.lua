@@ -1998,6 +1998,7 @@ function XGUI:drawCircle(nX, nY, nRadius, nR, nG, nB, nA, dwPitch, dwRad, nAccur
 end
 
 function XGUI:drawGwText(szText, nX ,nY, nZ, nR, nG, nB, nA, nFont, fFontScale, fSpacing)
+	local sha
 	for _, raw in ipairs(self.raws) do
 		sha = GetComponentElement(raw, 'SHADOW')
 		if sha then
@@ -2018,21 +2019,28 @@ function XGUI:drawGwText(szText, nX ,nY, nZ, nR, nG, nB, nA, nFont, fFontScale, 
 	return self
 end
 
-function XGUI:drawGwCircle(nX, nY, nZ, nR, nG, nB, nA, nRadius, dwPitch, dwRad)
+function XGUI:drawGwCircle(nX, nY, nZ, nRadius, nR, nG, nB, nA, dwPitch, dwRad)
 	nRadius, dwPitch, dwRad = nRadius or 64 * 3, dwPitch or 0, dwRad or (2 * pi)
-	nR, nG, nB, nA = nR or 255, nG or 255, nB or 255, nA or 255
-	local dwRad1, dwRad2 = dwPitch, dwPitch + dwRad * 1.05 -- 稍微大点 不然整个圈的时候会有个缝
-	sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
-	sha:SetD3DPT(D3DPT.TRIANGLEFAN)
-	sha:ClearTriangleFanPoint()
-	sha:AppendTriangleFan3DPoint(nX ,nY, nZ, nR, nG, nB, nA)
-	sha:Show()
-	local nSceneX, nSceneZ, nSceneXD, nSceneZD = Scene_PlaneGameWorldPosToScene(nX, nY)
-	repeat
-		nSceneXD, nSceneZD = Scene_PlaneGameWorldPosToScene(nX + cos(dwRad1) * nRadius, nY + sin(dwRad1) * nRadius)
-		sha:AppendTriangleFan3DPoint(nX ,nY, nZ, nR, nG, nB, nA, { nSceneXD - nSceneX, 0, nSceneZD - nSceneZ })
-		dwRad1 = dwRad1 + pi / 16
-	until dwRad1 > dwRad2
+	nR, nG, nB, nA = nR or 255, nG or 255, nB or 255, nA or 120
+	local sha, dwRad1, dwRad2, nSceneX, nSceneZ, nSceneXD, nSceneZD
+	for _, raw in ipairs(self.raws) do
+		sha = GetComponentElement(raw, 'SHADOW')
+		if sha then
+			dwRad1, dwRad2 = dwPitch, dwPitch + dwRad * 1.05 -- 稍微大点 不然整个圈的时候会有个缝
+			sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
+			sha:SetD3DPT(D3DPT.TRIANGLEFAN)
+			sha:ClearTriangleFanPoint()
+			sha:AppendTriangleFan3DPoint(nX ,nY, nZ, nR, nG, nB, nA)
+			sha:Show()
+			nSceneX, nSceneZ, nSceneXD, nSceneZD = Scene_PlaneGameWorldPosToScene(nX, nY)
+			repeat
+				nSceneXD, nSceneZD = Scene_PlaneGameWorldPosToScene(nX + cos(dwRad1) * nRadius, nY + sin(dwRad1) * nRadius)
+				sha:AppendTriangleFan3DPoint(nX ,nY, nZ, nR, nG, nB, nA, { nSceneXD - nSceneX, 0, nSceneZD - nSceneZ })
+				dwRad1 = dwRad1 + pi / 16
+			until dwRad1 > dwRad2
+		end
+	end
+	return self
 end
 
 -- (number) Instance:left()
