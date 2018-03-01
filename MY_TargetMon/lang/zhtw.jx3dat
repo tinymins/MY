@@ -96,5 +96,7 @@ data = {
     ['Please input long alias:'] = '請輸入長別名：',
     ['Short alias: %s'] = '短別名：%s',
     ['Please input short alias:'] = '請輸入短別名：',
+    ['Target kungfu'] = '目標心法',
+    ['All kungfus'] = '全部心法',
     ['Auto capture by name'] = '自動捕獲ID',
 }

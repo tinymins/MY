@@ -860,7 +860,19 @@ function PS.OnPanelActive(wnd)
 					end,
 				},
 			}
-			local t2 = { szOption = _L['Target kungfu'] }
+			local t2 = {
+				szOption = _L['Target kungfu'],
+				{
+					szOption = _L["All kungfus"],
+					rgb = {255, 255, 0},
+					bCheck = true, bMCheck = true,
+					bChecked = mon.kungfus[0],
+					fnAction = function()
+						mon.kungfus[0] = not mon.kungfus[0]
+						D.CheckFrame(l_config)
+					end,
+				},
+			}
 			for _, dwForceID in pairs_c(FORCE_TYPE) do
 				for i, dwKungfuID in ipairs(ForceIDToKungfuIDs(dwForceID) or {}) do
 					insert(t2, {
@@ -872,6 +884,7 @@ function PS.OnPanelActive(wnd)
 							mon.kungfus[dwKungfuID] = not mon.kungfus[dwKungfuID]
 							D.CheckFrame(l_config)
 						end,
+						fnDisable = function() return mon.kungfus[0] end,
 					})
 				end
 			end
