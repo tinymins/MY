@@ -1804,10 +1804,12 @@ MY.RegisterHotKey("MY_GKP", _L["Open/Close Golden Team Record"], _GKP.TogglePane
 MY.RegisterAddonMenu({ szOption = _L["Golden Team Record"], fnAction = _GKP.OpenPanel })
 
 RegisterEvent("LOADING_END",function()
-	if MY.IsInDungeon() and MY_GKP.bAlertMessage then
-		if not IsEmpty(MY_GKP("GKP_Record")) or not IsEmpty(MY_GKP("GKP_Account")) then
+	if not IsEmpty(MY_GKP("GKP_Record")) or not IsEmpty(MY_GKP("GKP_Account")) then
+		if MY.IsInDungeon() and MY_GKP.bAlertMessage then
 			MY.Confirm(_L["Do you want to wipe the previous data when you enter the dungeon's map?"],function() _GKP.ClearData(true) end)
 		end
+	else
+		MY_GKP("GKP_Time", GetCurrentTime())
 	end
 end)
 MY_GKP.Record          = _GKP.Record
