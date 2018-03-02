@@ -552,7 +552,7 @@ function MY_TargetMon_Base.OnFrameBreathe()
 			UpdateItem(hList:Lookup(i), KTarget, nil, nil, this.tItem, config, nFrameCount, targetChanged)
 		end
 	else
-		local dwTarKungfuID = dwType == TARGET.PLAYER and KTarget.GetKungfuMount().dwSkillID or 0
+		local dwTarKungfuID = dwType == TARGET.PLAYER and KTarget.GetKungfuMount() and KTarget.GetKungfuMount().dwSkillID or 0
 		if config.type == 'BUFF' then
 			-- BUFF最大时间缓存
 			if not l_tBuffTime[KTarget.dwID] then
