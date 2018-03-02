@@ -503,9 +503,12 @@ local function onBreatheCall()
 	local nDistance = MY.GetDistance(nX, nY)
 	-- MY.Sysmsg({_L("%f %f %f, %d, %f", nX, nY, nZ, nDistance, fScale)})
 	uiCircle:drawGwCircle(nX, nY, nZ, fScale * 64, 255, 255, 255, 50)
-	Navigator_SetPoint("MY_PUBG_INFO", nX, nY, nZ, _L("%%.1f/%d meter(s)", fScale), nil, nil, bRefresh)
 	-- uiDistance:drawGwText(_L("%.1f/%d meter(s)", nDistance, fScale), nX, nY, me.nZ)
-	bRefresh = false
+	if bRefresh then
+		bRefresh = false
+		Navigator_Remove("MY_PUBG_INFO")
+		Navigator_SetPoint("MY_PUBG_INFO", nX, nY, nZ, _L("%%.1f/%d meter(s)", fScale))
+	end
 end
 local function onLoadingEnd()
 	if not hPubg then
