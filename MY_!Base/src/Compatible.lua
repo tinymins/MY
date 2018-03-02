@@ -712,4 +712,29 @@ function Table_IsTreasureBattleFieldMap()
 end
 end
 
+if not ForceIDToKungfuIDs then
+-- * 获取门派对应心法ID列表
+local m_tForceToKungfu
+function ForceIDToKungfuIDs(dwForceID)
+	if not m_tForceToKungfu then
+		m_tForceToKungfu = {
+			[FORCE_TYPE.SHAO_LIN ] = { 10002, 10003, },
+			[FORCE_TYPE.WAN_HUA  ] = { 10021, 10028, },
+			[FORCE_TYPE.TIAN_CE  ] = { 10026, 10062, },
+			[FORCE_TYPE.CHUN_YANG] = { 10014, 10015, },
+			[FORCE_TYPE.QI_XIU   ] = { 10080, 10081, },
+			[FORCE_TYPE.WU_DU    ] = { 10175, 10176, },
+			[FORCE_TYPE.TANG_MEN ] = { 10224, 10225, },
+			[FORCE_TYPE.CANG_JIAN] = { 10144, 10145, },
+			[FORCE_TYPE.GAI_BANG ] = { 10268, },
+			[FORCE_TYPE.MING_JIAO] = { 10242, 10243, },
+			[FORCE_TYPE.CANG_YUN ] = { 10389, 10390, },
+			[FORCE_TYPE.CHANG_GE ] = { 10447, 10448, },
+			[FORCE_TYPE.BA_DAO   ] = { 10464, },
+		}
+	end
+	return m_tForceToKungfu[dwForceID] or {}
+end
+end
+
 UpdateItemInfoBoxObject = UpdataItemInfoBoxObject
