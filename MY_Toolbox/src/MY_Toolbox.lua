@@ -502,23 +502,23 @@ local function onBreatheCall()
 	local nDistance = MY.GetDistance(nX, nY)
 	-- MY.Sysmsg({_L("%f %f %f, %d, %f", nX, nY, nZ, nDistance, fScale)})
 	uiCircle:drawGwCircle(nX, nY, nZ, fScale * 64, 255, 255, 255, 50)
-	uiDistance:drawGwText(_L("%.1f meter(s)", nDistance), nX, nY, me.nZ)
+	Navigator_SetPoint("MY_PUBG_INFO", nX, nY, nZ, _L("%%.1f/%d meter(s)", fScale), nil, nil, false)
+	-- uiDistance:drawGwText(_L("%.1f/%d meter(s)", nDistance, fScale), nX, nY, me.nZ)
 end
 local function onLoadingEnd()
 	if not hPubg then
 		hPubg = XGUI.GetShadowHandle("PubgInfo")
 		uiCircle = XGUI(hPubg):append("Shadow", true)
-		uiDistance = XGUI(hPubg):append("Shadow", true)
+		-- uiDistance = XGUI(hPubg):append("Shadow", true)
 	end
 	nStartTime = nil
 
 	if MY.IsInPubg() then
 		hPubg:Show()
-		Output("On")
 		MY.BreatheCall("PUBG_INFO", onBreatheCall)
 	else
 		hPubg:Hide()
-		Output("Off")
+		Navigator_Remove("MY_PUBG_INFO")
 		MY.BreatheCall("PUBG_INFO", false)
 	end
 end

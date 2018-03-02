@@ -129,4 +129,5 @@ data = {
     ['auto cancel hide player in arena and battlefield'] = '競技場與戰場中自動取消屏蔽玩家與NPC',
 
     ["Loop target between me and target"] = "循環選擇自己和目標",
+    ["%%.1f/%d meter(s)"] = "%%.1f/%d 尺",
 }
