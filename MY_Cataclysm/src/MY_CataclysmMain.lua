@@ -2308,6 +2308,7 @@ function PS.OnPanelActive(frame)
 		onclick = function()
 			local rec = {}
 			insert(Cataclysm_Main.aBuffList, rec)
+			l_list:listbox('insert', GetListText({rec}), rec, rec)
 			OpenBuffEditPanel(rec, l_list)
 		end,
 	}, true):autoHeight():width() + 5
