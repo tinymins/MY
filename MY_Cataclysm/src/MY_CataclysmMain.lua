@@ -27,11 +27,11 @@ local GetBuffName = MY.GetBuffName
 
 local CTM_BUFF_OFFICIAL = {}
 local INI_ROOT = MY.GetAddonInfo().szRoot .. "MY_Cataclysm/ui/"
-local CTM_CONFIG = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/config/default/$lang.jx3dat")
+local CTM_CONFIG_DEFAULT = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/config/default/$lang.jx3dat")
+local CTM_CONFIG_CATACLYSM = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/config/cataclysm/$lang.jx3dat")
 local CTM_BUFF_NGB_BASE = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/data/nangongbo/base/$lang.jx3dat") or {}
 local CTM_BUFF_NGB_CMD = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/data/nangongbo/cmd/$lang.jx3dat") or {}
 local CTM_BUFF_NGB_HEAL = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/data/nangongbo/heal/$lang.jx3dat") or {}
-local CTM_CONFIG_CATACLYSM = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/config/ctm/$lang.jx3dat")
 
 local CTM_STYLE = {
 	OFFICIAL = 1,
@@ -140,7 +140,14 @@ local function SetConfig(Config)
 		Config.tBuffList = nil
 	end
 	-- options fixed
-	for k, v in pairs(CTM_CONFIG) do
+	if Config.nCss == CTM_STYLE.CATACLYSM then
+		for k, v in pairs(CTM_CONFIG_CATACLYSM) do
+			if type(CTM_CONFIG_PLAYER[k]) == "nil" then
+				CTM_CONFIG_PLAYER[k] = v
+			end
+		end
+	end
+	for k, v in pairs(CTM_CONFIG_DEFAULT) do
 		if type(CTM_CONFIG_PLAYER[k]) == "nil" then
 			CTM_CONFIG_PLAYER[k] = v
 		end
@@ -972,7 +979,7 @@ function PS.OnPanelActive(frame)
 				{
 					szOption = _L["Restore official"],
 					fnAction = function()
-						local Config = clone(CTM_CONFIG)
+						local Config = clone(CTM_CONFIG_DEFAULT)
 						Config.aBuffList = CTM_CONFIG_PLAYER.aBuffList
 						SetConfig(Config)
 						CheckEnableTeamPanel()
