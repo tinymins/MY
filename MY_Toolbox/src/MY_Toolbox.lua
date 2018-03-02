@@ -477,11 +477,12 @@ end
 
 -- 台服用 吃鸡安全点显示
 do
+local bRefresh = false
 local fStartScale, fEndScale, nStartX, nStartY, nEndX, nEndY, nDuration, nStartTime
 local function onUpdateMiddleMapCircle()
 	if arg0 == 2 then
-		nStartX, nStartY, fStartScale, nEndX, nEndY, fEndScale, nDuration, nStartTime =
-		arg2   , arg3   , arg0       , arg4 , arg5 , arg1     , arg6     , GetTickCount()
+		nStartX, nStartY, fStartScale, nEndX, nEndY, fEndScale, nDuration, nStartTime, bRefresh =
+		arg2   , arg3   , arg0       , arg4 , arg5 , arg1     , arg6     , GetTickCount(), true
 	end
 	-- Output(arg0, arg1, arg2, arg3, arg4, arg5, arg6)
 end
@@ -502,8 +503,9 @@ local function onBreatheCall()
 	local nDistance = MY.GetDistance(nX, nY)
 	-- MY.Sysmsg({_L("%f %f %f, %d, %f", nX, nY, nZ, nDistance, fScale)})
 	uiCircle:drawGwCircle(nX, nY, nZ, fScale * 64, 255, 255, 255, 50)
-	Navigator_SetPoint("MY_PUBG_INFO", nX, nY, nZ, _L("%%.1f/%d meter(s)", fScale), nil, nil, false)
+	Navigator_SetPoint("MY_PUBG_INFO", nX, nY, nZ, _L("%%.1f/%d meter(s)", fScale), nil, nil, bRefresh)
 	-- uiDistance:drawGwText(_L("%.1f/%d meter(s)", nDistance, fScale), nX, nY, me.nZ)
+	bRefresh = false
 end
 local function onLoadingEnd()
 	if not hPubg then
