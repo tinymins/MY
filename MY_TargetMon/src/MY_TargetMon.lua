@@ -201,7 +201,7 @@ function D.FormatConfigStructure(config)
 		local monitors = {}
 		for dwKungfuID, aMonList in pairs(config.monitors) do
 			if dwKungfuID == "common" then
-				dwKungfuID = 0
+				dwKungfuID = "all"
 			end
 			for _, mon in ipairs(aMonList) do
 				mon.kungfus = { [dwKungfuID] = true }
@@ -865,9 +865,9 @@ function PS.OnPanelActive(wnd)
 					szOption = _L["All kungfus"],
 					rgb = {255, 255, 0},
 					bCheck = true, bMCheck = true,
-					bChecked = mon.kungfus[0],
+					bChecked = mon.kungfus.all,
 					fnAction = function()
-						mon.kungfus[0] = not mon.kungfus[0]
+						mon.kungfus.all = not mon.kungfus.all
 						D.CheckFrame(l_config)
 					end,
 				},
@@ -883,7 +883,7 @@ function PS.OnPanelActive(wnd)
 							mon.kungfus[dwKungfuID] = not mon.kungfus[dwKungfuID]
 							D.CheckFrame(l_config)
 						end,
-						fnDisable = function() return mon.kungfus[0] end,
+						fnDisable = function() return mon.kungfus.all end,
 					})
 				end
 			end

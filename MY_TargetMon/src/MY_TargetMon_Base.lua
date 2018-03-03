@@ -370,7 +370,7 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 			end
 			tItem[id][level][hItem] = true
 		end
-		if not empty(hItem.mon.kungfus) and not hItem.mon.kungfus[0] and not hItem.mon.kungfus[dwTarKungfuID] then
+		if not empty(hItem.mon.kungfus) and not hItem.mon.kungfus.all and not hItem.mon.kungfus[dwTarKungfuID] then
 			return
 		end
 		if not hItem.mon.ignoreId and not hItem.mon.ids[buff.dwID].enable then
@@ -493,7 +493,7 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 		hItem.nTimeLeft = nTimeLeft
 		hItem.nRenderFrame = nFrameCount
 	elseif config.type == 'SKILL' and buff and szName then
-		if not empty(hItem.mon.kungfus) and not hItem.mon.kungfus[0] and not hItem.mon.kungfus[dwTarKungfuID] then
+		if not empty(hItem.mon.kungfus) and not hItem.mon.kungfus.all and not hItem.mon.kungfus[dwTarKungfuID] then
 			return
 		end
 		if config.hideVoid and not hItem:IsVisible() then
