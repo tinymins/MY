@@ -2238,6 +2238,7 @@ function OpenBuffEditPanel(rec)
 		autoenable = function() return not rec.bDelete end,
 	}, true):width() + 5
 	x = x + ui:append("Shadow", {
+		name = "Shadow_Color",
 		x = x, y = y + 2, w = 22, h = 22,
 		color = rec.col and {MY.HumanColor2RGB(rec.col)} or {255, 255, 0},
 		onclick = function()
@@ -2256,6 +2257,7 @@ function OpenBuffEditPanel(rec)
 		x = x, y = y, h = 25, w = 80,
 		text = _L['Clear color'],
 		onclick = function()
+			ui:children("#Shadow_Color"):color(255, 255, 0)
 			rec.col = nil
 			update()
 		end,
