@@ -116,6 +116,17 @@ local function SetTarget(dwType, dwID)
 	MY.SetTarget(dwType, dwID)
 end
 
+local function CanTarget(dwID)
+	if CHANGGE_REAL_SHADOW_CACHE[dwID] then
+		dwID = CHANGGE_REAL_SHADOW_CACHE[dwID]
+	end
+	if IsPlayer(dwID) then
+		return GetPlayer(dwID)
+	else
+		return GetNpc(dwID)
+	end
+end
+
 -- Package func
 local HIDE_FORCE = {
 	[7]  = true,
@@ -404,7 +415,7 @@ function CTM_Party_Base.OnItemLButtonDown()
 		end
 		if MY.IsInPubg() and GetClientPlayer().nMoveState == MOVE_STATE.ON_DEATH then
 			BattleField_MatchPlayer(dwID)
-		elseif info.bIsOnLine and GetPlayer(dwID) then -- 有待考证
+		elseif info.bIsOnLine and CanTarget(dwID) then -- 有待考证
 			if CFG.bTempTargetEnable then
 				MY.DelayCall("MY_Cataclysm_TempTarget", false)
 				CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = nil
@@ -445,7 +456,7 @@ function CTM_Party_Base.OnItemMouseEnter()
 	if not info then
 		return
 	end
-	if info.bIsOnLine and GetPlayer(dwID) and CFG.bTempTargetEnable then
+	if info.bIsOnLine and CanTarget(dwID) and CFG.bTempTargetEnable then
 		MY.DelayCall("MY_Cataclysm_TempTarget", false)
 		local function fnAction()
 			if not CTM_TEMP_TARGET_TYPE then
@@ -492,11 +503,7 @@ function CTM_Party_Base.OnItemMouseLeave(dst)
 	if not dwID then
 		return
 	end
-	local info = CTM:GetMemberInfo(dwID)
-	if not info then -- 退组的问题
-		return
-	end
-	if info.bIsOnLine and GetPlayer(dwID) and CFG.bTempTargetEnable then
+	if CFG.bTempTargetEnable then
 		MY.DelayCall("MY_Cataclysm_TempTarget", false)
 		if CTM_TEMP_TARGET_TYPE then
 			MY.DelayCall("MY_Cataclysm_TempTarget", ResumeTempTarget) -- 延迟到下一帧 因为可能当前帧临时选中另外一个玩家 那么不需要切回目标
