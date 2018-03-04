@@ -707,11 +707,15 @@ function Cataclysm_Main.OnEvent(szEvent)
 			if not tar then
 				return
 			end
-			for i, p in ipairs(MY.GetBuffList(tar)) do
+			local aList = MY.GetBuffList(tar)
+			if #aList == 0 then
+				return MY.DelayCall(update, 75)
+			end
+			for i, p in ipairs(aList) do
 				OnBuffUpdate(dwID, p.dwID, p.nLevel, p.nStackNum, p.dwSkillSrcID)
 			end
 		end
-		MY.DelayCall(update, 200)
+		MY.DelayCall(update, 75)
 	elseif szEvent == "CTM_BUFF_LIST_CACHE_UPDATE" then
 		local team = GetClientTeam()
 		if not team then
