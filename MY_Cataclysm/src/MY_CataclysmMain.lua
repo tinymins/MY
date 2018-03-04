@@ -75,27 +75,29 @@ end
 local function InsertBuffListCache(aBuffList)
 	for _, tab in ipairs(aBuffList) do
 		local id = tab.dwID or tab.szName
-		if tab.bDelete then
-			for iid, aList in pairs(BUFF_LIST) do
-				if iid == id or (tab.szName and type(iid) == "number" and Table_GetBuffName(iid, 1) == tab.szName) then
-					for i, p in ipairs_r(aList) do
-						if (not tab.nLevel or p.nLevel == tab.nLevel)
-						and (not tab.szStackOp or p.szStackOp == tab.szStackOp)
-						and (not tab.nStackNum or p.nStackNum == tab.nStackNum)
-						and (not tab.bOnlySelf or p.bOnlySelf == tab.bOnlySelf) then
-							remove(aList, i)
+		if id then
+			if tab.bDelete then
+				for iid, aList in pairs(BUFF_LIST) do
+					if iid == id or (tab.szName and type(iid) == "number" and Table_GetBuffName(iid, 1) == tab.szName) then
+						for i, p in ipairs_r(aList) do
+							if (not tab.nLevel or p.nLevel == tab.nLevel)
+							and (not tab.szStackOp or p.szStackOp == tab.szStackOp)
+							and (not tab.nStackNum or p.nStackNum == tab.nStackNum)
+							and (not tab.bOnlySelf or p.bOnlySelf == tab.bOnlySelf) then
+								remove(aList, i)
+							end
+						end
+						if #aList == 0 then
+							BUFF_LIST[iid] = nil
 						end
 					end
-					if #aList == 0 then
-						BUFF_LIST[iid] = nil
-					end
 				end
+			else
+				if not BUFF_LIST[id] then
+					BUFF_LIST[id] = {}
+				end
+				insert(BUFF_LIST[id], 1, tab)
 			end
-		else
-			if not BUFF_LIST[id] then
-				BUFF_LIST[id] = {}
-			end
-			insert(BUFF_LIST[id], 1, tab)
 		end
 	end
 end
@@ -111,11 +113,6 @@ function UpdateBuffListCache()
 		end
 		if Cataclysm_Main.bBuffDataNangongboHeal then
 			InsertBuffListCache(CTM_BUFF_NGB_HEAL)
-		end
-	end
-	for i, p in ipairs_r(Cataclysm_Main.aBuffList) do
-		if not p.dwID and (not p.szName or p.szName == "") then
-			remove(Cataclysm_Main.aBuffList, i)
 		end
 	end
 	InsertBuffListCache(Cataclysm_Main.aBuffList)
