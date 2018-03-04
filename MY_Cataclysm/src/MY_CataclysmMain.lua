@@ -46,7 +46,7 @@ local CTM_BG_COLOR_MODE = {
 local TEAM_VOTE_REQUEST = {}
 local BUFF_LIST = {}
 local GKP_RECORD_TOTAL = 0
-local CTM_CONFIG_PLAYER
+local CTM_CONFIG_PLAYER, CTM_CONFIG_LOADED
 local DEBUG = false
 
 MY_Cataclysm = {}
@@ -76,15 +76,21 @@ local function InsertBuffListCache(aBuffList)
 	for _, tab in ipairs(aBuffList) do
 		local id = tab.dwID or tab.szName
 		if tab.bDelete then
-			if tab.szName then
-				for id, _ in pairs(BUFF_LIST) do
-					if type(id) == "number"
-					and Table_GetBuffName(id, 1) == tab.szName then
-						BUFF_LIST[id] = nil
+			for iid, aList in pairs(BUFF_LIST) do
+				if iid == id or (tab.szName and type(iid) == "number" and Table_GetBuffName(iid, 1) == tab.szName) then
+					for i, p in ipairs_r(aList) do
+						if (not tab.nLevel or p.nLevel == tab.nLevel)
+						and (not tab.szStackOp or p.szStackOp == tab.szStackOp)
+						and (not tab.nStackNum or p.nStackNum == tab.nStackNum)
+						and (not tab.bOnlySelf or p.bOnlySelf == tab.bOnlySelf) then
+							remove(aList, i)
+						end
+					end
+					if #aList == 0 then
+						BUFF_LIST[iid] = nil
 					end
 				end
 			end
-			BUFF_LIST[id] = nil
 		else
 			if not BUFF_LIST[id] then
 				BUFF_LIST[id] = {}
@@ -122,10 +128,14 @@ local function GetConfigurePath()
 end
 
 local function SaveConfigure()
+	if not CTM_CONFIG_LOADED then
+		return
+	end
 	MY.SaveLUAData(GetConfigurePath(), CTM_CONFIG_PLAYER)
 end
 
 local function SetConfig(Config)
+	CTM_CONFIG_LOADED = true
 	CTM_CONFIG_PLAYER = Config
 	-- update version
 	if Config.tBuffList then
@@ -2061,7 +2071,7 @@ end
 
 local PS, l_list = {}
 function OpenBuffEditPanel(rec)
-	local w, h = 300, 280
+	local w, h = 320, 320
 	local ui = XGUI.CreateFrame("MY_Cataclysm_BuffConfig", {
 		w = w, h = h,
 		text = _L["Edit buff"],
@@ -2087,7 +2097,7 @@ function OpenBuffEditPanel(rec)
 		end
 		l_list:listbox("update", "id", rec, {"text"}, {GetListText({rec})})
 	end
-	local X, Y = 20, 60
+	local X, Y = 25, 60
 	local x, y = X, Y
 	x = x + ui:append("Text", {
 		x = x, y = y, h = 25,
@@ -2106,14 +2116,14 @@ function OpenBuffEditPanel(rec)
 			end
 			update()
 		end,
-	}, true):width() + 5
+	}, true):width() + 15
 
 	x = x + ui:append("Text", {
 		x = x, y = y, h = 25,
 		text = _L['Level'],
 	}, true):autoWidth():width() + 5
 	x = x + ui:append("WndEditBox", {
-		x = x, y = y, w = 50, h = 25,
+		x = x, y = y, w = 60, h = 25,
 		placeholder = _L['No limit'],
 		edittype = 0, text = rec.nLevel,
 		onchange = function(text)
@@ -2129,7 +2139,7 @@ function OpenBuffEditPanel(rec)
 		text = _L['Stacknum'],
 	}, true):autoWidth():width() + 5
 	x = x + ui:append("WndComboBox", {
-		x = x, y = y, w = 70, h = 25,
+		x = x, y = y, w = 90, h = 25,
 		text = rec.szStackOp or _L['No limit'],
 		menu = function()
 			local this = this
@@ -2176,9 +2186,23 @@ function OpenBuffEditPanel(rec)
 
 	x = X
 	y = y + 10
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y,
+		text = _L['Hide (Can Modify Default Data)'],
+		checked = rec.bDelete,
+		oncheck = function(bChecked)
+			rec.bDelete = bChecked
+			update()
+		end,
+	}, true):autoWidth():width() + 5
+
+	x = X
+	y = y + 30
+	y = y + 10
 	x = x + ui:append("Text", {
 		x = x, y = y, h = 25,
 		text = _L['Reminder'],
+		autoenable = function() return not rec.bDelete end,
 	}, true):autoWidth():width() + 5
 	x = x + ui:append("WndEditBox", {
 		x = x, y = y, w = 30, h = 25,
@@ -2187,10 +2211,12 @@ function OpenBuffEditPanel(rec)
 			rec.szReminder = text
 			update()
 		end,
+		autoenable = function() return not rec.bDelete end,
 	}, true):width() + 5
 	x = x + ui:append("Text", {
 		x = x, y = y, h = 25,
 		text = _L['Priority'],
+		autoenable = function() return not rec.bDelete end,
 	}, true):autoWidth():width() + 5
 	x = x + ui:append("WndEditBox", {
 		x = x, y = y, w = 40, h = 25,
@@ -2200,9 +2226,10 @@ function OpenBuffEditPanel(rec)
 			rec.nPriority = tonumber(text)
 			update()
 		end,
+		autoenable = function() return not rec.bDelete end,
 	}, true):width() + 5
 	x = x + ui:append("Shadow", {
-		x = x, y = y, w = 22, h = 22,
+		x = x, y = y + 2, w = 22, h = 22,
 		color = rec.col and {MY.HumanColor2RGB(rec.col)} or {255, 255, 0},
 		onclick = function()
 			local this = this
@@ -2214,21 +2241,24 @@ function OpenBuffEditPanel(rec)
 				update()
 			end)
 		end,
+		autoenable = function() return not rec.bDelete end,
 	}, true):autoWidth():width() + 5
-	x = x + ui:append("Text", {
-		x = x, y = y, h = 25,
+	x = x + ui:append("WndButton2", {
+		x = x, y = y, h = 25, w = 80,
 		text = _L['Clear color'],
 		onclick = function()
 			rec.col = nil
 			update()
 		end,
-	}, true):autoWidth():width() + 5
+		autoenable = function() return not rec.bDelete end,
+	}, true):width() + 5
 	y = y + 30
 
 	x = X
 	x = x + ui:append("Text", {
 		x = x, y = y, h = 25,
 		text = _L['Border alpha'],
+		autoenable = function() return not rec.bDelete end,
 	}, true):autoWidth():width() + 5
 	x = x + ui:append("WndSliderBox", {
 		x = x, y = y, text = "",
@@ -2245,7 +2275,7 @@ function OpenBuffEditPanel(rec)
 			rec.nColAlpha = nVal
 			update()
 		end,
-		autoenable = IsEnabled,
+		autoenable = function() return not rec.bDelete end,
 	}, true):autoWidth():width() + 5
 	y = y + 30
 
@@ -2258,6 +2288,7 @@ function OpenBuffEditPanel(rec)
 			rec.bAttention = bChecked
 			update()
 		end,
+		autoenable = function() return not rec.bDelete end,
 	}, true):autoWidth():width() + 5
 	x = x + ui:append("WndCheckBox", {
 		x = x, y = y,
@@ -2267,6 +2298,7 @@ function OpenBuffEditPanel(rec)
 			rec.bCaution = bChecked
 			update()
 		end,
+		autoenable = function() return not rec.bDelete end,
 	}, true):autoWidth():width() + 5
 
 	ui:append("WndButton2", {

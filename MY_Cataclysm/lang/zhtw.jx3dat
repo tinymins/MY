@@ -127,6 +127,7 @@ data = {
 	["Level"] = "等級",
 	["Stacknum"] = "層數",
 	["Only self"] = "僅來源自己",
+	["Hide (Can Modify Default Data)"] = "隱藏 (可隱藏指定的默認數據)",
 	["No limit"] = "不限",
 	["Clear color"] = "清除顔色",
 	["Border alpha"] = "描邊透明度",
