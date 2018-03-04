@@ -44,17 +44,18 @@ local CTM_GROUP_COUNT        = 5 - 1 -- 防止以后开个什么40人本 估计不太可能 就和
 local CTM_MEMBER_COUNT       = 5
 local CTM_DRAG               = false
 local CTM_DRAG_ID
-local CTM_TARGET -- 注意这个是UI逻辑选中目标 不一定是真实的当前目标
+local CTM_TARGET  -- 注意这个是UI逻辑选中目标 不一定是真实的当前目标
 local CTM_TTARGET -- 注意这个是UI逻辑目标选中的目标 不一定是真实的当前目标
 local CTM_CACHE              = setmetatable({}, { __mode = "v" })
-local CTM_LIFE_CACHE         = {}
-local CTM_BUFF_CACHE         = {}
-local CTM_BF_BUFF_CACHE      = {}
-local CTM_BOSS_CACHE         = {}
-local CTM_ATTENTION_LIST     = {}
-local CTM_ATTENTION_CACHE    = {}
-local CTM_CAUTION_CACHE      = {}
-local CTM_BOSS_TARGET_CACHE  = {}
+local CTM_LIFE_CACHE         = {} -- 当前帧队友血量缓存
+local CTM_BUFF_CACHE         = {} -- 附近记录到的需要显示的BUFF缓存
+local CTM_BOSS_CACHE         = {} -- 附近的BOSS缓存
+local CTM_BOSS_FOCUS_BUFF    = {} -- 附近记录到的BOSS点名BUFF缓存
+local CTM_ATTENTION_BUFF     = {} -- 附近记录到的需要显示蒙版的BUFF缓存
+local CTM_ATTENTION_STACK    = {} -- 蒙版BUFF栈（取第一个也就是最新入栈的作为显示颜色）
+local CTM_CAUTION_BUFF       = {} -- 附近记录到的警告BUFF缓存
+local CTM_BOSS_TARGET        = {} -- BOSS目标缓存
+local CTM_BOSS_FOCUSED_STATE = {} -- 被BOSS点名的状态缓存
 local CTM_THREAT_NPC_ID, CTM_THREAT_TARGET_ID
 local CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID
 local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子
@@ -820,24 +821,24 @@ function CTM:RefreshBossTarget()
 				and (CTM_THREAT_NPC_ID == dwNpcID and CTM_THREAT_TARGET_ID or select(2, npc.GetTarget()))
 				or nil
 			if dwTarID then
-				if dwTarID ~= CTM_BOSS_TARGET_CACHE[dwNpcID] then
-					HideBossTarget(CTM_BOSS_TARGET_CACHE[dwNpcID])
+				if dwTarID ~= CTM_BOSS_TARGET[dwNpcID] then
+					HideBossTarget(CTM_BOSS_TARGET[dwNpcID])
 					if CTM_CACHE[dwTarID]
 					and CTM_CACHE[dwTarID]:IsValid()
 					and CTM_CACHE[dwTarID]:Lookup("Image_Threat")
 					and CTM_CACHE[dwTarID]:Lookup("Image_Threat"):IsValid() then
 						CTM_CACHE[dwTarID]:Lookup("Image_Threat"):Show()
 					end
-					CTM_BOSS_TARGET_CACHE[dwNpcID] = dwTarID
+					CTM_BOSS_TARGET[dwNpcID] = dwTarID
 				end
 				tCheck[dwTarID] = true
 			end
 		end
 	end
-	for dwNpcID, dwTarID in pairs(CTM_BOSS_TARGET_CACHE) do
+	for dwNpcID, dwTarID in pairs(CTM_BOSS_TARGET) do
 		if not tCheck[dwTarID] then
 			HideBossTarget(dwTarID)
-			CTM_BOSS_TARGET_CACHE[dwNpcID] = nil
+			CTM_BOSS_TARGET[dwNpcID] = nil
 		end
 	end
 end
@@ -856,8 +857,8 @@ function CTM:RefreshAttention()
 		for _, dwTarID in ipairs(team.GetTeamMemberList()) do
 			local p = GetPlayer(dwTarID)
 			if CTM_CACHE[dwTarID] and CTM_CACHE[dwTarID]:IsValid() then
-				if p and not empty(CTM_ATTENTION_LIST[dwTarID]) then
-					local r, g, b = MY.HumanColor2RGB(CTM_ATTENTION_LIST[dwTarID][1].col)
+				if p and not empty(CTM_ATTENTION_STACK[dwTarID]) then
+					local r, g, b = MY.HumanColor2RGB(CTM_ATTENTION_STACK[dwTarID][1].col)
 					CTM_CACHE[dwTarID]:Lookup("Shadow_Attention"):SetColorRGB(r, g, b)
 					CTM_CACHE[dwTarID]:Lookup("Shadow_Attention"):Show()
 				else
@@ -866,20 +867,20 @@ function CTM:RefreshAttention()
 			end
 			tCheck[dwTarID] = true
 		end
-		for dwTarID, _ in pairs(CTM_ATTENTION_CACHE) do
+		for dwTarID, _ in pairs(CTM_ATTENTION_BUFF) do
 			if not tCheck[dwTarID] then
-				CTM_ATTENTION_LIST[dwTarID] = nil
-				CTM_ATTENTION_CACHE[dwTarID] = nil
+				CTM_ATTENTION_BUFF[dwTarID] = nil
+				CTM_ATTENTION_STACK[dwTarID] = nil
 			end
 		end
 	else
-		for dwTarID, _ in pairs(CTM_ATTENTION_CACHE) do
+		for dwTarID, _ in pairs(CTM_ATTENTION_BUFF) do
 			if CTM_CACHE[dwTarID] and CTM_CACHE[dwTarID]:IsValid() then
 				CTM_CACHE[dwTarID]:Lookup("Shadow_Attention"):Hide()
 			end
 		end
 	end
-	-- Output(CTM_ATTENTION_CACHE)
+	-- Output(CTM_ATTENTION_BUFF, CTM_ATTENTION_STACK)
 end
 
 function CTM:RefreshCaution()
@@ -890,27 +891,41 @@ function CTM:RefreshCaution()
 			local p = GetPlayer(dwTarID)
 			if CTM_CACHE[dwTarID] and CTM_CACHE[dwTarID]:IsValid() then
 				CTM_CACHE[dwTarID]:Lookup("Handle_Caution"):SetVisible(
-					p and CTM_CAUTION_CACHE[dwTarID] and (
-						(CFG.bShowCaution and not empty(CTM_CAUTION_CACHE[dwTarID]["BUFF"]))
-						or (CFG.bShowBossFocus and CTM_CAUTION_CACHE[dwTarID]["BOSS_FOCUS"])
+					p and (
+						(CFG.bShowCaution and not empty(CTM_CAUTION_BUFF[dwTarID]))
+						or (CFG.bShowBossFocus and CTM_BOSS_FOCUSED_STATE[dwTarID])
 					)
 				)
 			end
 			tCheck[dwTarID] = true
 		end
-		for dwTarID, _ in pairs(CTM_CAUTION_CACHE) do
-			if not tCheck[dwTarID] then
-				CTM_CAUTION_CACHE[dwTarID] = nil
+		if CFG.bShowCaution then
+			for dwTarID, _ in pairs(CTM_CAUTION_BUFF) do
+				if not tCheck[dwTarID] then
+					CTM_CAUTION_BUFF[dwTarID] = nil
+				end
+			end
+		end
+		if CFG.bShowBossFocus then
+			for dwTarID, _ in pairs(CTM_BOSS_FOCUSED_STATE) do
+				if not tCheck[dwTarID] then
+					CTM_BOSS_FOCUSED_STATE[dwTarID] = nil
+				end
 			end
 		end
 	else
-		for dwTarID, _ in pairs(CTM_CAUTION_CACHE) do
+		for dwTarID, _ in pairs(CTM_CAUTION_BUFF) do
+			if CTM_CACHE[dwTarID] and CTM_CACHE[dwTarID]:IsValid() then
+				CTM_CACHE[dwTarID]:Lookup("Handle_Caution"):Hide()
+			end
+		end
+		for dwTarID, _ in pairs(CTM_BOSS_FOCUSED_STATE) do
 			if CTM_CACHE[dwTarID] and CTM_CACHE[dwTarID]:IsValid() then
 				CTM_CACHE[dwTarID]:Lookup("Handle_Caution"):Hide()
 			end
 		end
 	end
-	-- Output(CTM_CAUTION_CACHE)
+	-- Output(CTM_CAUTION_BUFF, CTM_BOSS_FOCUSED_STATE)
 end
 
 function CTM:RefreshMark()
@@ -1348,10 +1363,30 @@ end
 
 -- 注册buff
 function CTM:RecBuff(dwMemberID, data)
-	CTM_BUFF_CACHE[data.dwID] = data
+	CTM_BUFF_CACHE[data.dwID .. "," .. data.nLevel] = data
 end
 
 function CTM:ClearBuff(dwMemberID)
+	local team = GetClientTeam()
+	for k, v in ipairs(team.GetTeamMemberList()) do
+		if CTM_CACHE[v] and CTM_CACHE[v]:IsValid() then
+			CTM_CACHE[v]:Lookup("Handle_Buff_Boxes"):Clear()
+		end
+		if CTM_CAUTION_BUFF[v] then
+			CTM_CAUTION_BUFF[v] = nil
+		end
+		if CTM_ATTENTION_BUFF[v] then
+			for _, p in pairs(CTM_ATTENTION_BUFF[v]) do
+				for i, rec in ipairs_r(CTM_ATTENTION_STACK[v]) do
+					if rec == p then
+						remove(CTM_ATTENTION_STACK[v], i)
+						break
+					end
+				end
+			end
+			CTM_ATTENTION_BUFF[v] = nil
+		end
+	end
 	CTM_BUFF_CACHE = {}
 end
 
@@ -1362,9 +1397,8 @@ function CTM:RefreshBuff()
 		local p = GetPlayer(v)
 		if CTM_CACHE[v] and CTM_CACHE[v]:IsValid() and p then
 			local handle = CTM_CACHE[v]:Lookup("Handle_Buff_Boxes")
-			for dwID, data in pairs(CTM_BUFF_CACHE) do
-				local KBuff = MY_GetBuff(p, dwID, data.nLevel)
-				local key = dwID .. "," .. data.nLevel
+			for key, data in pairs(CTM_BUFF_CACHE) do
+				local KBuff = MY_GetBuff(p, data.dwID, data.nLevel)
 				local item = handle:Lookup(key)
 				local nEndFrame, _, nStackNum
 				-- init check
@@ -1373,7 +1407,7 @@ function CTM:RefreshBuff()
 						nEndFrame, nStackNum = KBuff.GetEndTime(), KBuff.nStackNum
 					else
 						for kk, vv in ipairs(MY.GetBuffList(p)) do
-							if vv.dwID == dwID and vv.dwSkillSrcID == me.dwID and (data.nLevel == 0 or data.nLevel == vv.nLevel) then
+							if vv.dwID == data.dwID and vv.dwSkillSrcID == me.dwID and (data.nLevel == 0 or data.nLevel == vv.nLevel) then
 								nEndFrame, _, nStackNum = select(4, p.GetBuff(vv.nCount - 1))
 								break
 							end
@@ -1532,46 +1566,45 @@ function CTM:RefreshBuff()
 					end
 					-- update attention
 					if data.bAttention then
-						if not CTM_ATTENTION_CACHE[v] then
-							CTM_ATTENTION_LIST[v] = {}
-							CTM_ATTENTION_CACHE[v] = {}
+						if not CTM_ATTENTION_BUFF[v] then
+							CTM_ATTENTION_BUFF[v] = {}
 						end
-						if not CTM_ATTENTION_CACHE[v]["BUFF#" .. key] then
+						if not CTM_ATTENTION_STACK[v] then
+							CTM_ATTENTION_STACK[v] = {}
+						end
+						if not CTM_ATTENTION_BUFF[v][key] then
 							local rec = {
 								col = data.col or "yellow",
 							}
-							insert(CTM_ATTENTION_LIST[v], 1, rec)
-							CTM_ATTENTION_CACHE[v]["BUFF#" .. key] = rec
+							CTM_ATTENTION_BUFF[v][key] = rec
+							insert(CTM_ATTENTION_STACK[v], 1, rec)
 						end
 					end
 					-- update caution
 					if data.bCaution then
-						if not CTM_CAUTION_CACHE[v] then
-							CTM_CAUTION_CACHE[v] = {}
+						if not CTM_CAUTION_BUFF[v] then
+							CTM_CAUTION_BUFF[v] = {}
 						end
-						if not CTM_CAUTION_CACHE[v]["BUFF"] then
-							CTM_CAUTION_CACHE[v]["BUFF"] = {}
-						end
-						CTM_CAUTION_CACHE[v]["BUFF"][key] = true
+						CTM_CAUTION_BUFF[v][key] = true
 					end
-					tCheck[dwID] = true
+					tCheck[key] = true
 				else
 					if item then
 						handle:RemoveItem(item)
 						handle:FormatAllItemPos() -- 格式化buff的位置
 					end
-					local rec = CTM_ATTENTION_CACHE[v] and CTM_ATTENTION_CACHE[v]["BUFF#" .. key]
+					local rec = CTM_ATTENTION_BUFF[v] and CTM_ATTENTION_BUFF[v][key]
 					if rec then
-						for i, vv in ipairs_r(CTM_ATTENTION_LIST[v]) do
+						for i, vv in ipairs_r(CTM_ATTENTION_STACK[v]) do
 							if vv == rec then
-								remove(CTM_ATTENTION_LIST[v], i)
+								remove(CTM_ATTENTION_STACK[v], i)
 								break
 							end
 						end
-						CTM_ATTENTION_CACHE[v]["BUFF#" .. key] = nil
+						CTM_ATTENTION_BUFF[v][key] = nil
 					end
-					if CTM_CAUTION_CACHE[v] and CTM_CAUTION_CACHE[v]["BUFF"] then
-						CTM_CAUTION_CACHE[v]["BUFF"][key] = nil
+					if CTM_CAUTION_BUFF[v] then
+						CTM_CAUTION_BUFF[v][key] = nil
 					end
 				end
 			end
@@ -1589,7 +1622,7 @@ function CTM:RefreshBuff()
 end
 
 function CTM:RecBossFocusBuff(dwMemberID, data)
-	CTM_BF_BUFF_CACHE[data.dwID .. "#" .. data.nLevel] = data
+	CTM_BOSS_FOCUS_BUFF[data.dwID .. "#" .. data.nLevel] = data
 end
 
 function CTM:RefreshBossFocus()
@@ -1597,9 +1630,9 @@ function CTM:RefreshBossFocus()
 	local tCheck = {}
 	for k, v in ipairs(team.GetTeamMemberList()) do
 		if CTM_CACHE[v] and CTM_CACHE[v]:IsValid() then
-			local p, bFocus = GetPlayer(v), false
+			local p, bFocus = GetPlayer(v), nil
 			if p then
-				for _, data in pairs(CTM_BF_BUFF_CACHE) do
+				for _, data in pairs(CTM_BOSS_FOCUS_BUFF) do
 					local KBuff = MY_GetBuff(p, data.dwID, data.nLevel)
 					if KBuff and KBuff.nStackNum >= data.nStackNum then
 						bFocus = true
@@ -1607,10 +1640,7 @@ function CTM:RefreshBossFocus()
 					end
 				end
 			end
-			if not CTM_CAUTION_CACHE[v] then
-				CTM_CAUTION_CACHE[v] = {}
-			end
-			CTM_CAUTION_CACHE[v]["BOSS_FOCUS"] = bFocus
+			CTM_BOSS_FOCUSED_STATE[v] = bFocus
 		end
 	end
 	self:RefreshCaution()

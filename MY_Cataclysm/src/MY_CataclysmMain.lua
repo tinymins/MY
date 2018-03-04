@@ -76,23 +76,22 @@ local function InsertBuffListCache(aBuffList)
 	for _, tab in ipairs(aBuffList) do
 		local id = tab.dwID or tab.szName
 		if id then
-			if tab.bDelete then
-				for iid, aList in pairs(BUFF_LIST) do
-					if iid == id or (tab.szName and type(iid) == "number" and Table_GetBuffName(iid, 1) == tab.szName) then
-						for i, p in ipairs_r(aList) do
-							if (not tab.nLevel or p.nLevel == tab.nLevel)
-							and (not tab.szStackOp or p.szStackOp == tab.szStackOp)
-							and (not tab.nStackNum or p.nStackNum == tab.nStackNum)
-							and (not tab.bOnlySelf or p.bOnlySelf == tab.bOnlySelf) then
-								remove(aList, i)
-							end
-						end
-						if #aList == 0 then
-							BUFF_LIST[iid] = nil
+			for iid, aList in pairs(BUFF_LIST) do
+				if iid == id or (tab.szName and type(iid) == "number" and Table_GetBuffName(iid, 1) == tab.szName) then
+					for i, p in ipairs_r(aList) do
+						if (not tab.nLevel or p.nLevel == tab.nLevel)
+						and (not tab.szStackOp or p.szStackOp == tab.szStackOp)
+						and (not tab.nStackNum or p.nStackNum == tab.nStackNum)
+						and (not tab.bOnlySelf or p.bOnlySelf == tab.bOnlySelf) then
+							remove(aList, i)
 						end
 					end
+					if #aList == 0 then
+						BUFF_LIST[iid] = nil
+					end
 				end
-			else
+			end
+			if not tab.bDelete then
 				if not BUFF_LIST[id] then
 					BUFF_LIST[id] = {}
 				end
@@ -1969,8 +1968,8 @@ local function GetListText(aBuffList)
 		if v.nLevel then
 			insert(a, "lv" .. v.nLevel)
 		end
-		if v.nStackNum and v.szStackOp then
-			insert(a, "sn" .. v.szStackOp .. v.nStackNum)
+		if v.nStackNum then
+			insert(a, "sn" .. (v.szStackOp or ">=") .. v.nStackNum)
 		end
 		if v.bOnlySelf or v.bSelf then
 			insert(a, "self")
@@ -2136,14 +2135,16 @@ function OpenBuffEditPanel(rec)
 		text = _L['Stacknum'],
 	}, true):autoWidth():width() + 5
 	x = x + ui:append("WndComboBox", {
+		name = "WndComboBox_StackOp",
 		x = x, y = y, w = 90, h = 25,
-		text = rec.szStackOp or _L['No limit'],
+		text = rec.szStackOp or (rec.nStackNum and ">=" or _L['No limit']),
 		menu = function()
 			local this = this
 			local menu = {{
 				szOption = _L['No limit'],
 				fnAction = function()
 					rec.szStackOp = nil
+					ui:children("#WndEditBox_StackNum"):text("")
 					update()
 					XGUI(this):text(_L['No limit'])
 				end,
@@ -2162,11 +2163,18 @@ function OpenBuffEditPanel(rec)
 		end,
 	}, true):width() + 5
 	x = x + ui:append("WndEditBox", {
+		name = "WndEditBox_StackNum",
 		x = x, y = y, w = 30, h = 25,
 		edittype = 0,
 		text = rec.nStackNum,
 		onchange = function(text)
 			rec.nStackNum = tonumber(text)
+			if rec.nStackNum then
+				if not rec.szStackOp then
+					rec.szStackOp = ">="
+					ui:children("#WndComboBox_StackOp"):text(">=")
+				end
+			end
 			update()
 		end,
 	}, true):width() + 10
