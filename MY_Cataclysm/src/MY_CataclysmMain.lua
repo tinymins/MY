@@ -2463,7 +2463,9 @@ function PS.OnPanelActive(frame)
 
 	x = X
 	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Enable default data"],
+		x = x, y = y,
+		text = _L["Enable default data"], tip = _L["Default data TIP"],
+		tippostype = MY.Const.UI.Tip.POS_BOTTOM,
 		checked = Cataclysm_Main.bBuffDataNangongbo,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bBuffDataNangongbo = bCheck
@@ -2475,7 +2477,9 @@ function PS.OnPanelActive(frame)
 
 	x = X
 	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Cmd data"],
+		x = x, y = y,
+		text = _L["Cmd data"], tip = _L["Cmd data TIP"],
+		tippostype = MY.Const.UI.Tip.POS_BOTTOM,
 		checked = Cataclysm_Main.bBuffDataNangongboCmd,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bBuffDataNangongboCmd = bCheck
@@ -2485,7 +2489,9 @@ function PS.OnPanelActive(frame)
 		autoenable = function() return Cataclysm_Main.bBuffDataNangongbo end,
 	}, true):autoWidth():width() + 5
 	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Heal data"],
+		x = x, y = y,
+		text = _L["Heal data"], tip = _L["Heal data TIP"],
+		tippostype = MY.Const.UI.Tip.POS_BOTTOM,
 		checked = Cataclysm_Main.bBuffDataNangongboHeal,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bBuffDataNangongboHeal = bCheck
