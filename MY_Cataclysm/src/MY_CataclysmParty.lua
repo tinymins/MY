@@ -1363,7 +1363,12 @@ end
 
 -- ×¢²ábuff
 function CTM:RecBuff(dwMemberID, data)
-	CTM_BUFF_CACHE[data.dwID .. "," .. data.nLevel] = data
+	local szKey = ("%d,%d,%s%d"):format(
+		data.dwID, data.nLevel,
+		data.szStackOp or "",
+		data.nStackNum or 0
+	)
+	CTM_BUFF_CACHE[szKey] = data
 end
 
 function CTM:ClearBuff(dwMemberID)
