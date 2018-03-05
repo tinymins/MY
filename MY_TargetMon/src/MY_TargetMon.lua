@@ -397,6 +397,8 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 	ui:append("WndCheckBox", {
 		x = x + 110, y = y, w = 200,
 		text = _L['Hide others buff'],
+		tip = _L['Hide others buff TIP'],
+		tippostype = MY.Const.UI.Tip.POS_TOP,
 		checked = config.hideOthers,
 		oncheck = function(bChecked)
 			config.hideOthers = bChecked
@@ -405,6 +407,17 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		autoenable = function()
 			return config.enable and config.type == 'BUFF'
 		end,
+	})
+
+	ui:append("WndCheckBox", {
+		x = x + 200, y = y, w = 180,
+		text = _L['Hide void'],
+		checked = config.hideVoid,
+		oncheck = function(bChecked)
+			config.hideVoid = bChecked
+			D.CheckFrame(config)
+		end,
+		autoenable = function() return config.enable end,
 	})
 
 	ui:append("WndComboBox", {
@@ -487,11 +500,11 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 	})
 
 	ui:append("WndCheckBox", {
-		x = x + 200, y = y, w = 180,
-		text = _L['Hide void'],
-		checked = config.hideVoid,
-		oncheck = function(bChecked)
-			config.hideVoid = bChecked
+		x = x + 200, y = y, w = 120,
+		text = _L['Ignore system ui scale'],
+		checked = config.ignoreSystemUIScale,
+		oncheck = function(bCheck)
+			config.ignoreSystemUIScale = bCheck
 			D.CheckFrame(config)
 		end,
 		autoenable = function() return config.enable end,
@@ -582,10 +595,10 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 
 	ui:append("WndCheckBox", {
 		x = x + 200, y = y, w = 120,
-		text = _L['Ignore system ui scale'],
-		checked = config.ignoreSystemUIScale,
+		text = _L['Show time'],
+		checked = config.showTime,
 		oncheck = function(bCheck)
-			config.ignoreSystemUIScale = bCheck
+			config.showTime = bCheck
 			D.CheckFrame(config)
 		end,
 		autoenable = function() return config.enable end,

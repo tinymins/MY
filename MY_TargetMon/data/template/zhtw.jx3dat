@@ -14,6 +14,7 @@ return {
 	maxLineCount        = 16    , -- 單行最大數量
 	hideVoid            = false , -- 隱藏消失的BUFF
 	showName            = true  , -- 顯示名字
+	showTime            = true  , -- 顯示時間
 	cdCircle            = true  , -- 倒計時圈
 	cdFlash             = true  , -- 倒計時分段特效
 	cdReadySpark        = true  , -- 消失特效

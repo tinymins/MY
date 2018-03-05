@@ -223,6 +223,7 @@ local function ReloadFrame(frame)
 			txtProcess:SetW(config.cdBarWidth - 10)
 			txtProcess:SetText("")
 			txtProcess:SetFontScale(fontScale)
+			txtProcess:SetVisible(config.showTime)
 
 			txtName:SetVisible(config.showName)
 			txtName:SetW(config.cdBarWidth - 10)
