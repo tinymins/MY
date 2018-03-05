@@ -1,114 +1,145 @@
 data = {
-	{szStackOp = ">=", nStackNum = 3, dwID = 11657},
-	{szStackOp = ">=", nStackNum = 3, dwID = 11658},
-	{dwID = 11652},
-	{szStackOp = ">=", nStackNum = 15, dwID = 11756},
-	{dwID = 11606},
-	{dwID = 11694},
-	{dwID = 11612},
-	{dwID = 11760},
-	{dwID = 11804},
-	{dwID = 11772},
-	{dwID = 11911},
-	{dwID = 11953},
-	{dwID = 11952},
-	{dwID = 11960},
-	{szStackOp = ">=", nStackNum = 2, dwID = 11918},
-	{szStackOp = ">=", nStackNum = 3, dwID = 11553},
-	{dwID = 11556},
-	{dwID = 12039},
-	{dwID = 12601},
-	{dwID = 12423},
-	{szStackOp = ">=", nStackNum = 2, dwID = 12395},
-	{dwID = 12194, nPriority = 3, szReminder = "潛", col = "#8055FFFF"},
-	{dwID = 12253, nPriority = 3, szReminder = "擒", col = "#FF00FFFF"},
-	{dwID = 12142},
-	{dwID = 12132},
-	{dwID = 12151},
-	{dwID = 12399},
-	{dwID = 12141},
-	{dwID = 10657},
-	{dwID = 10557, nPriority = 3, szReminder = "妒", col = "#FF3232FF"},
-	{dwID = 10570, nPriority = 3, szReminder = "命", col = "#FF00FFFF"},
-	{dwID = 10631},
-	{dwID = 10632},
-	{dwID = 10638},
-	{dwID = 10645},
-	{dwID = 10653, nPriority = 3, szReminder = "挑", col = "#FFFF00FF"},
-	{dwID = 10547, nPriority = 3, szReminder = "箭", col = "#FFFFFFFF"},
-	{dwID = 10940, nPriority = 3, szReminder = "碧", col = "#FF3232FF"},
-	{nStackNum = 1, col = "#FF00FFFF", dwID = 10585, nPriority = 3, szReminder = "花", szStackOp = ">="},
-	{nStackNum = 3, col = "#8055FFFF", dwID = 10584, nPriority = 3, szReminder = "蛛", szStackOp = ">="},
-	{dwID = 11230},
-	{dwID = 11215},
-	{dwID = 10871},
-	{dwID = 10920, nPriority = 3, szReminder = "破", col = "#FFFF00FF"},
-	{szStackOp = ">=", nStackNum = 2, dwID = 10870},
-	{dwID = 9535, nPriority = 3, szReminder = "縛", col = "#FF00FFFF"},
-	{nStackNum = 10, col = "#8055FFFF", dwID = 9371, nPriority = 3, szReminder = "意", szStackOp = ">="},
-	{dwID = 9778},
-	{dwID = 9420},
-	{dwID = 9213, nPriority = 3, szReminder = "鎮", col = "#FF00FFFF"},
-	{dwID = 9635, nPriority = 3, szReminder = "滅", col = "#8055FFFF"},
-	{dwID = 9325},
-	{dwID = 9203, nPriority = 3, szReminder = "割", col = "#FF3232FF"},
-	{dwID = 9196},
-	{dwID = 10238},
-	{dwID = 9122},
-	{dwID = 9239, nPriority = 3, szReminder = "破", col = "#FF00FFFF"},
-	{dwID = 9429},
-	{nStackNum = 4, col = "#FFFF00FF", dwID = 9189, nPriority = 3, szReminder = "絕", szStackOp = ">="},
-	{dwID = 9661},
-	{dwID = 9664},
-	{dwID = 8885},
-	{nStackNum = 5, col = "#0096FFFF", dwID = 9662, nPriority = 3, szReminder = "纏", szStackOp = ">="},
-	{dwID = 8981, nPriority = 3, szReminder = "月", col = "#FFFF00FF"},
-	{dwID = 8975, nPriority = 3, szReminder = "烈", col = "#FF3232FF"},
-	{dwID = 8896},
-	{dwID = 377},
-	{dwID = 4439},
-	{dwID = 1242, nPriority = 3, szReminder = "舍", col = "#AAFF0000"},
-	{dwID = 10208, nPriority = 3, szReminder = "弘", col = "#AAFF0000"},
-	{dwID = 12488},
-	{dwID = 2778},
-	{dwID = 367},
-	{dwID = 6163},
-	{dwID = 203},
-	{dwID = 360},
-	{dwID = 6636},
-	{dwID = 2316, bOnlySelf = true, nPriority = 4},
-	{dwID = 681, bOnlySelf = true, nPriority = 4},
-	{dwID = 676, bOnlySelf = true, nPriority = 4},
-	{dwID = 680, bOnlySelf = true, nPriority = 4},
-	{dwID = 1727, bOnlySelf = true, nPriority = 4},
-	{dwID = 113},
-	{dwID = 122},
-	{dwID = 6264},
-	{dwID = 6257},
-	{dwID = 11920},
-	{dwID = 631, bOnlySelf = true, nPriority = 4},
-	{dwID = 1105, bOnlySelf = true, nPriority = 4},
-	{dwID = 1551, bOnlySelf = true, nPriority = 4},
-	{dwID = 2107, bOnlySelf = true, nPriority = 4},
-	{dwID = 3110, bOnlySelf = true, nPriority = 4},
-	{dwID = 3170, bOnlySelf = true, nPriority = 4},
-	{dwID = 3744, bOnlySelf = true, nPriority = 4},
-	{dwID = 7052, bOnlySelf = true, nPriority = 4},
-	{dwID = 9933, nPriority = 3, szReminder = "籠", col = "#AAFF0000"},
-	{dwID = 5693, bOnlySelf = true, nPriority = 4},
-	{dwID = 9334, bOnlySelf = true, nPriority = 4},
-	{dwID = 9544, nPriority = 3, szReminder = "笑", col = "#00FF0000"},
-	{dwID = 9265, nPriority = 3, szReminder = "雲", col = "#00FF0000"},
-	{dwID = 9459, bOnlySelf = true, nPriority = 4},
-	{dwID = 9460, bOnlySelf = true, nPriority = 4},
-	{dwID = 9461, bOnlySelf = true, nPriority = 4},
-	{dwID = 9462, bOnlySelf = true, nPriority = 4},
-	{dwID = 9463, bOnlySelf = true, nPriority = 4},
-	{dwID = 9464, bOnlySelf = true, nPriority = 4},
-	{dwID = 9465, bOnlySelf = true, nPriority = 4},
-	{dwID = 9466, bOnlySelf = true, nPriority = 4},
-	{dwID = 9336, bOnlySelf = true, nPriority = 4},
-	{dwID = 9337, bOnlySelf = true, nPriority = 4},
-	{dwID = 9335, bOnlySelf = true, nPriority = 4},
-	{dwID = 2313}
+	{dwID=11742},--雷擊---鍛刀廳
+	{dwID=11657},--浴火---鍛刀廳
+	{dwID=11658},--浸寒---鍛刀廳
+	{dwID=11652},--禦海刀氣---鍛刀廳
+	{dwID=11756},--慢性毒藥---鍛刀廳
+	{dwID=11606},--劇毒---鍛刀廳
+	{dwID=11694},--喋骨---鍛刀廳
+	{dwID=11612},--封髓勁---千雷殿
+	{dwID=11760},--破甲---千雷殿
+	{dwID=11804},--灼燒·焰---千雷殿
+	{dwID=11772},--烙傷---千雷殿
+	{dwID=11911},--定身---千雷殿
+	{dwID=11953},--水邪---千雷殿
+	{dwID=11952},--焦黑灼傷---千雷殿
+	{dwID=11960},--淬水之寒---千雷殿
+	{dwID=11918},--雷鳴---千雷殿
+	{dwID=11553},--崩雷---千雷殿
+	{dwID=11556},--狂雷---千雷殿
+	{dwID=12039},--化仙---戰獸山
+	{dwID=12601},--眩暈---戰獸山
+	{dwID=12423},--骨刺---戰獸山
+	{dwID=12395},--骨髓血毒---戰獸山
+	{dwID=12194,col="#8055FFFF",szReminder="潛",nPriority=3},--潛伏之種---戰獸山
+	{dwID=12253,col="#FF00FFFF",szReminder="擒",nPriority=3},--被擒---戰獸山
+	{dwID=12142},--地陷吸收---燕然峰
+	{dwID=12132},--蝕體---燕然峰
+	{dwID=12151},--寒絕劍---燕然峰
+	{dwID=12399},--天劍破體·強---燕然峰
+	{dwID=12141},--天劍破體---燕然峰
+	{dwID=10657},--刺骨---觀風殿
+	{dwID=10557,col="#FF3232FF",szReminder="妒",nPriority=3},--妒夫人---觀風殿
+	{dwID=10570,col="#FF00FFFF",szReminder="命",nPriority=3},--命闇---觀風殿
+	{dwID=10631},--破甲---觀風殿
+	{dwID=10632},--封脈---觀風殿
+	{dwID=10638},--索敵---觀風殿
+	{dwID=10645},--噬心---觀風殿
+	{dwID=10653,col="#FFFF00FF",szReminder="挑",nPriority=3},--挑釁---觀風殿
+	{dwID=10547,col="#FFFFFFFF",szReminder="箭",nPriority=3},--箭氣---觀風殿
+	{dwID=10940,col="#FF3232FF",szReminder="碧",nPriority=3},--碧落斬---觀風殿
+	{dwID=10585,col="#FF00FFFF",szReminder="花",nPriority=3},--花毒---雙曜亭
+	{dwID=10584,col="#8055FFFF",szReminder="蛛",nPriority=3},--蛛毒---雙曜亭
+	{dwID=11230},--裂足---雙曜亭
+	{dwID=11215},--穿體---雙曜亭
+	{dwID=10871},--裂骨---雙曜亭
+	{dwID=10920,col="#FFFF00FF",szReminder="破",nPriority=3},--破甲---雙曜亭
+	{dwID=10870},--暗傷---雙曜亭
+	{dwID=9535,col="#FF00FFFF",szReminder="縛",nPriority=3},--舞天縛---仙侶庭院
+	{dwID=9371,col="#8055FFFF",szReminder="意",nPriority=3},--青冥意---仙侶庭院
+	{dwID=9778},--入八荒---仙侶庭院
+	{dwID=9420},--經脈麻痹---仙侶庭院
+	{dwID=9213,col="#FF00FFFF",szReminder="鎮",nPriority=3},--紫金缽·鎮---仙侶庭院
+	{dwID=9635,col="#8055FFFF",szReminder="滅",nPriority=3},--紫金缽·滅---仙侶庭院
+	{dwID=9203,col="#FF3232FF",szReminder="割",nPriority=3},--割裂---仙侶庭院
+	{dwID=9196},--狙目---仙侶庭院
+	{dwID=10238},--血肉撕裂---仙侶庭院
+	{dwID=9122},--盾擊---仙侶庭院
+	{dwID=9239,col="#FF00FFFF",szReminder="破",nPriority=3},--破敵---仙侶庭院
+	{dwID=9429},--鎖定---仙侶庭院
+	{dwID=9189,col="#FFFF00FF",szReminder="絕",nPriority=3},--絕脈勁---仙侶庭院
+	{dwID=9661},--落英鎖定---花月別院
+	{dwID=9664},--幻魔附體---花月別院
+	{dwID=8885},--錯筋---花月別院
+	{dwID=9662,col="#0096FFFF",szReminder="纏",nPriority=3},--音纏---花月別院
+	{dwID=8981,col="#FFFF00FF",szReminder="月",nPriority=3},--月滿---花月別院
+	{dwID=8975,col="#FF3232FF",szReminder="烈",nPriority=3},--烈明---花月別院
+	{dwID=8896},--灼君---花月別院
+	{dwID=1866},--碎星辰---宮中神武遺迹
+	{dwID=5195},--虛弱---南诏皇宮
+	{dwID=5157},--絞喉---南诏皇宮
+	{dwID=7184},--風暴之眼---血戰天策
+	{dwID=6549,col="#FF3232FF",szReminder="怒",nPriority=3},--天怒---血戰天策
+	{dwID=6936},--閃舞刺---血戰天策
+	{dwID=8346},--火燎---夜守孤城
+	{dwID=8343},--瞄准---夜守孤城
+	{dwID=8084},--威懾---夜守孤城
+	{dwID=8028,col="#FF800000",szReminder="碎",nPriority=4},--碎甲---逐虎驅狼
+	{dwID=8319},--回龍碎甲---逐虎驅狼
+	{dwID=8352},--鋸骨---逐虎驅狼
+	{dwID=8312},--腐血狂亂---逐虎驅狼
+	{dwID=8215},--氣血翻湧---逐虎驅狼
+	{dwID=7993,col="#FF323200",szReminder="聲",nPriority=4},--聲嘯九天---逐虎驅狼
+	{dwID=7992,col="#0096FF00",szReminder="弦",nPriority=4},--弦音天籁---逐虎驅狼
+	{dwID=8170,col="#FF323200",szReminder="蓮",nPriority=4},--蓮花指---逐虎驅狼
+	{dwID=8172,col="#0096FF00",szReminder="蓮",nPriority=4},--蓮花指---逐虎驅狼
+	{dwID=8174},--音波衝擊---逐虎驅狼
+	{dwID=8027},--音波衝擊---逐虎驅狼
+	{dwID=8046},--失血---逐虎驅狼
+	{dwID=8039,col="#FF3232FF",szReminder="聖",nPriority=3},--聖炎---逐虎驅狼
+	{dwID=8040,col="#00FFFFFF",szReminder="寒",nPriority=3},--寒意---逐虎驅狼
+	{dwID=8036,col="#FFFF0000",szReminder="瞄",nPriority=4},--瞄准---逐虎驅狼
+	{dwID=8029,col="#FF323200",szReminder="流",nPriority=4},--流血---逐虎驅狼
+	{dwID=8010},--戰鬥標記---逐虎驅狼
+	{dwID=7554,col="#00FFFFFF",szReminder="轉",nPriority=3},--陰陽易轉---風雪稻香村
+	{dwID=6927},--金蛇毒---秦皇陵
+	{dwID=7486,col="#0096FF00",szReminder="遲",nPriority=4},--步遲---秦皇陵
+	{dwID=7488},--火靈---秦皇陵
+	{dwID=377},--鎮山河---純陽
+	{dwID=4439},--貪魔體---明教
+	{dwID=1242,col="#00FF00FF",szReminder="舍",nPriority=3},--舍身---少林
+	{dwID=10208,col="#00FF00FF",szReminder="弘",nPriority=3},--弘法---少林
+	{dwID=12488},--獅嘯---少林
+	{dwID=2778},--淵---天策
+	{dwID=367},--守如山---天策
+	{dwID=6163},--守如山---天策
+	{dwID=203},--嘯如虎---天策
+	{dwID=360},--禦---天策
+	{dwID=6636},--聖手織天---五毒
+	{dwID=2316,bOnlySelf=true,nPriority=4},--蠱惑衆生---五毒
+	{dwID=681,bOnlySelf=true,nPriority=4},--上元點鬟---七秀
+	{dwID=676,bOnlySelf=true,nPriority=4},--雨霖鈴---七秀
+	{dwID=680,bOnlySelf=true,nPriority=4},--翔舞---七秀
+	{dwID=1727,bOnlySelf=true,nPriority=4},--夢冧---七秀
+	{dwID=113},--碧水滔天---萬花
+	{dwID=122},--春泥護花---萬花
+	{dwID=6264},--春泥護花---萬花
+	{dwID=6257},--春泥護花---萬花
+	{dwID=11920},--春泥護花---萬花
+	{dwID=631,bOnlySelf=true,nPriority=4},--握針---萬花
+	{dwID=1105,bOnlySelf=true,nPriority=4},--握針---萬花
+	{dwID=1551,bOnlySelf=true,nPriority=4},--握針---萬花
+	{dwID=2107,bOnlySelf=true,nPriority=4},--握針---萬花
+	{dwID=3110,bOnlySelf=true,nPriority=4},--握針---萬花
+	{dwID=3170,bOnlySelf=true,nPriority=4},--握針---萬花
+	{dwID=3744,bOnlySelf=true,nPriority=4},--握針---萬花
+	{dwID=7052,bOnlySelf=true,nPriority=4},--握針---萬花
+	{dwID=9933,col="#00FF00FF",szReminder="籠",nPriority=3},--籠花---萬花
+	{dwID=5693,bOnlySelf=true,nPriority=4},--述懷---萬花
+	{dwID=9334,bOnlySelf=true,nPriority=4},--梅花三弄---長歌
+	{dwID=9544,col="#00FF00FF",szReminder="笑",nPriority=3},--笑傲光陰---長歌
+	{dwID=9265,col="#00FF00FF",szReminder="雲",nPriority=3},--雲生結海---長歌
+	{dwID=9459,bOnlySelf=true,nPriority=4},--商---長歌
+	{dwID=9460,bOnlySelf=true,nPriority=4},--商---長歌
+	{dwID=9461,bOnlySelf=true,nPriority=4},--商---長歌
+	{dwID=9462,bOnlySelf=true,nPriority=4},--商---長歌
+	{dwID=9463,bOnlySelf=true,nPriority=4},--角---長歌
+	{dwID=9464,bOnlySelf=true,nPriority=4},--角---長歌
+	{dwID=9465,bOnlySelf=true,nPriority=4},--角---長歌
+	{dwID=9466,bOnlySelf=true,nPriority=4},--角---長歌
+	{dwID=9336,bOnlySelf=true,nPriority=4},--寒梅---長歌
+	{dwID=9337,bOnlySelf=true,nPriority=4},--寒梅---長歌
+	{dwID=9335,bOnlySelf=true,nPriority=4},--落梅---長歌
+	{dwID=2313},--鳳凰蠱---五毒
+
 }
