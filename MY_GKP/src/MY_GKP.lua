@@ -68,10 +68,7 @@ setmetatable(MY_GKP, { __call = function(me, key, value, sort)
 			_GKP[key] = value
 			_GKP.UpdateTitle()
 		elseif value and type(value) == "table" then
-			local me = GetClientPlayer()
-			if _GKP.GKP_Map == "" and me and me.GetMapID() then
-				MY_GKP("GKP_Map", Table_GetMapName(me.GetMapID()) or "")
-			end
+			_GKP.GeneDataInfo()
 			table.insert(_GKP[key], value)
 			_GKP.SaveData()
 			if key == "GKP_Record" then
@@ -138,6 +135,13 @@ end})
 ---------------------------------------------------------------------->
 -- ±¾µØº¯Êý
 ----------------------------------------------------------------------<
+function _GKP.GeneDataInfo()
+	local me = GetClientPlayer()
+	if MY_GKP("GKP_Map") == "" and me and me.GetMapID() then
+		MY_GKP("GKP_Map", Table_GetMapName(me.GetMapID()) or "")
+	end
+end
+
 function _GKP.SaveConfig()
 	MY.SaveLUAData({"config/gkp.cfg", MY_DATA_PATH.GLOBAL}, _GKP.Config)
 end
