@@ -14,6 +14,7 @@ data = {
 	["Attack Warning"] = "被攻击提示",
 	["Show attention shadow"] = "显示警告色",
 	["Show caution animate"] = "显示警告特效",
+	["ZuiWu Effect"] = "醉舞范围",
 	["Name/Icon/Mana/Life Display"] = "名字、图标、内力和血量显示方案",
 	["Life font"] = "血量字体",
 	["Name font"] = "名字字体",

@@ -1109,17 +1109,17 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():width() + 5
 
-	local me = GetClientPlayer()
-	if me.dwForceID == 6 then
-		x = x + ui:append("WndCheckBox", {
-			x = X + 10, y = y, text = _L["ZuiWu Effect"],
-			color = { MY.GetForceColor(6) },
-			checked = Cataclysm_Main.bShowEffect,
-			oncheck = function(bCheck)
-				Cataclysm_Main.bShowEffect = bCheck
-			end,
-		}, true):autoWidth():width() + 5
-	end
+	-- local me = GetClientPlayer()
+	-- if me.dwForceID == 6 then
+	-- 	x = x + ui:append("WndCheckBox", {
+	-- 		x = x, y = y, text = _L["ZuiWu Effect"],
+	-- 		color = { MY.GetForceColor(6) },
+	-- 		checked = Cataclysm_Main.bShowEffect,
+	-- 		oncheck = function(bCheck)
+	-- 			Cataclysm_Main.bShowEffect = bCheck
+	-- 		end,
+	-- 	}, true):autoWidth():width() + 5
+	-- end
 	y = y + 25
 
 	-- ÆäËû
