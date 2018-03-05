@@ -190,6 +190,12 @@ local SKILL_RESULT = {
 	CRITICAL= 5, -- 会心
 	INSIGHT = 6, -- 识破
 }
+local NZ_SKILL_RESULT = {
+	[SKILL_RESULT.BLOCK ] = true,
+	[SKILL_RESULT.SHIELD] = true,
+	[SKILL_RESULT.MISS  ] = true,
+	[SKILL_RESULT.DODGE ] = true,
+}
 local AWAYTIME_TYPE = {
 	DEATH          = 0,
 	OFFLINE        = 1,
@@ -589,7 +595,7 @@ function _Cache.AddRecord(data, szRecordType, idRecord, idTarget, szEffectName, 
 	tResult.nTotalEffect = tResult.nTotalEffect + nEffectValue               -- 所有命中总有效伤害
 	tResult.nAvg         = floor(tResult.nTotal / tResult.nCount)       -- 单次命中平均值
 	tResult.nAvgEffect   = floor(tResult.nTotalEffect / tResult.nCount) -- 单次命中平均有效值
-	if nValue ~= 0 then
+	if nValue ~= 0 or NZ_SKILL_RESULT[nSkillResult] then
 		tResult.nNzCount     = tResult.nNzCount + 1                           -- 命中次数（假设nSkillResult是命中）
 		tResult.nNzMin       = (tResult.nNzMin ~= -1 and min(tResult.nNzMin, nValue)) or nValue                         -- 单次命中最小值
 		tResult.nNzMinEffect = (tResult.nNzMinEffect ~= -1 and min(tResult.nNzMinEffect, nEffectValue)) or nEffectValue -- 单次命中最小有效值
@@ -625,7 +631,7 @@ function _Cache.AddRecord(data, szRecordType, idRecord, idTarget, szEffectName, 
 	tSkillRecord.nTotalEffect = tSkillRecord.nTotalEffect + nEffectValue
 	tSkillRecord.nAvg         = floor(tSkillRecord.nTotal / tSkillRecord.nCount)
 	tSkillRecord.nAvgEffect   = floor(tSkillRecord.nTotalEffect / tSkillRecord.nCount)
-	if nValue ~= 0 then
+	if nValue ~= 0 or NZ_SKILL_RESULT[nSkillResult] then
 		tSkillRecord.nNzCount     = tSkillRecord.nNzCount + 1
 		tSkillRecord.nNzAvg       = floor(tSkillRecord.nTotal / tSkillRecord.nNzCount)
 		tSkillRecord.nNzAvgEffect = floor(tSkillRecord.nTotalEffect / tSkillRecord.nNzCount)
@@ -663,7 +669,7 @@ function _Cache.AddRecord(data, szRecordType, idRecord, idTarget, szEffectName, 
 	tResult.nTotalEffect = tResult.nTotalEffect + nEffectValue          -- 所有命中总有效伤害
 	tResult.nAvg         = floor(tResult.nTotal / tResult.nCount)
 	tResult.nAvgEffect   = floor(tResult.nTotalEffect / tResult.nCount)
-	if nValue ~= 0 then
+	if nValue ~= 0 or NZ_SKILL_RESULT[nSkillResult] then
 		tResult.nNzCount     = tResult.nNzCount + 1                           -- 命中次数（假设nSkillResult是命中）
 		tResult.nNzMin       = (tResult.nNzMin ~= -1 and min(tResult.nNzMin, nValue)) or nValue                         -- 单次命中最小值
 		tResult.nNzMinEffect = (tResult.nNzMinEffect ~= -1 and min(tResult.nNzMinEffect, nEffectValue)) or nEffectValue -- 单次命中最小有效值
@@ -731,7 +737,7 @@ function _Cache.AddRecord(data, szRecordType, idRecord, idTarget, szEffectName, 
 	tTargetRecord.nTotalEffect = tTargetRecord.nTotalEffect + nEffectValue
 	tTargetRecord.nAvg         = floor(tTargetRecord.nTotal / tTargetRecord.nCount)
 	tTargetRecord.nAvgEffect   = floor(tTargetRecord.nTotalEffect / tTargetRecord.nCount)
-	if nValue ~= 0 then
+	if nValue ~= 0 or NZ_SKILL_RESULT[nSkillResult] then
 		tTargetRecord.nNzCount     = tTargetRecord.nNzCount + 1
 		tTargetRecord.nNzAvg       = floor(tTargetRecord.nTotal / tTargetRecord.nNzCount)
 		tTargetRecord.nNzAvgEffect = floor(tTargetRecord.nTotalEffect / tTargetRecord.nNzCount)
@@ -769,7 +775,7 @@ function _Cache.AddRecord(data, szRecordType, idRecord, idTarget, szEffectName, 
 	tResult.nTotalEffect = tResult.nTotalEffect + nEffectValue          -- 所有命中总有效伤害
 	tResult.nAvg         = floor(tResult.nTotal / tResult.nCount)
 	tResult.nAvgEffect   = floor(tResult.nTotalEffect / tResult.nCount)
-	if nValue ~= 0 then
+	if nValue ~= 0 or NZ_SKILL_RESULT[nSkillResult] then
 		tResult.nNzCount       = tResult.nNzCount + 1                           -- 命中次数（假设nSkillResult是命中）
 		tResult.nNzMin         = (tResult.nNzMin ~= -1 and min(tResult.nNzMin, nValue)) or nValue                         -- 单次命中最小值
 		tResult.nNzMinEffect   = (tResult.nNzMinEffect ~= -1 and min(tResult.nNzMinEffect, nEffectValue)) or nEffectValue -- 单次命中最小有效值
