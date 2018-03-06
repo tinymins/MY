@@ -342,19 +342,20 @@ function CTM_Party_Base.OnRButtonDown()
 end
 
 function CTM_Party_Base.OnItemLButtonDrag()
-	if not this.dwID then
+	local dwID = (this.bBuff and this:GetParent():GetParent().dwID) or (this.bRole and this.dwID)
+	if not dwID then
 		return
 	end
 	local team = GetClientTeam()
 	local me = GetClientPlayer()
 	if (IsAltKeyDown() or CFG.bEditMode) and me.IsInRaid() and MY.IsLeader() then
 		CTM_DRAG = true
-		CTM_DRAG_ID = this.dwID
+		CTM_DRAG_ID = dwID
 		CTM_CLICK_DISMISS = true
 		CTM:DrawAllParty()
 		CTM:AutoLinkAllPanel()
 		CTM:BringToTop()
-		OpenRaidDragPanel(this.dwID)
+		OpenRaidDragPanel(dwID)
 	end
 end
 
@@ -371,9 +372,11 @@ function CTM_Party_Base.OnItemLButtonUp()
 end
 
 function CTM_Party_Base.OnItemLButtonDragEnd()
-	if CTM_DRAG and this.dwID ~= CTM_DRAG_ID then
+	local dwID = (this.bBuff and this:GetParent():GetParent().dwID) or (this.bRole and this.dwID)
+	if CTM_DRAG and dwID ~= CTM_DRAG_ID then
 		local team = GetClientTeam()
-		team.ChangeMemberGroup(CTM_DRAG_ID, this.nGroup, this.dwID or 0)
+		local nGroup = (this.bBuff and this:GetParent():GetParent().nGroup) or this.nGroup
+		team.ChangeMemberGroup(CTM_DRAG_ID, nGroup, dwID or 0)
 		CTM_DRAG, CTM_DRAG_ID = false, nil
 		CloseRaidDragPanel()
 		CTM:CloseParty()
