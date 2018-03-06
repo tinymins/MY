@@ -877,7 +877,7 @@ function PS.OnPanelActive(wnd)
 				{
 					szOption = _L["All kungfus"],
 					rgb = {255, 255, 0},
-					bCheck = true, bMCheck = true,
+					bCheck = true,
 					bChecked = mon.kungfus.all,
 					fnAction = function()
 						mon.kungfus.all = not mon.kungfus.all
@@ -890,7 +890,7 @@ function PS.OnPanelActive(wnd)
 					insert(t2, {
 						szOption = MY.GetSkillName(dwKungfuID, 1),
 						rgb = {MY.GetForceColor(dwForceID, "foreground")},
-						bCheck = true, bMCheck = true,
+						bCheck = true,
 						bChecked = mon.kungfus[dwKungfuID],
 						fnAction = function()
 							mon.kungfus[dwKungfuID] = not mon.kungfus[dwKungfuID]
