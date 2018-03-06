@@ -423,6 +423,10 @@ function CTM_Party_Base.OnItemLButtonClick()
 	if not info then
 		return
 	end
+	local me = GetClientPlayer()
+	if not me then
+		return
+	end
 	if IsAltKeyDown() then
 		if this.bBuff then
 			MY.Talk(
@@ -435,7 +439,7 @@ function CTM_Party_Base.OnItemLButtonClick()
 					GetEndTime(this.nEndFrame)
 				)
 			)
-		elseif this.bRole then
+		elseif this.bRole and (CFG.bAltViewInFight or not me.bFightState) then
 			if IsCtrlKeyDown() then
 				ViewCharInfoToPlayer(dwID)
 			else
@@ -451,7 +455,7 @@ do
 
 local function OnItemRefreshTip()
 	local me = GetClientPlayer()
-	local bTip = not CFG.bTempTargetFightTip or not me.bFightState
+	local bTip = not CFG.bHideTipInFight or not me.bFightState
 	if not bTip then
 		return
 	end

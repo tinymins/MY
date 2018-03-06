@@ -1133,9 +1133,9 @@ function PS.OnPanelActive(frame)
 	x = X + 10
 	x = x + ui:append("WndCheckBox", {
 		x = x, y = y, text = _L["Don't show Tip in fight"],
-		checked = Cataclysm_Main.bTempTargetFightTip,
+		checked = Cataclysm_Main.bHideTipInFight,
 		oncheck = function(bCheck)
-			Cataclysm_Main.bTempTargetFightTip = bCheck
+			Cataclysm_Main.bHideTipInFight = bCheck
 		end,
 	}, true):autoWidth():width() + 5
 
@@ -1163,6 +1163,13 @@ function PS.OnPanelActive(frame)
 	}):autoWidth():width()
 
 	y = y + 25
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y, text = _L["Disable alt view player in fight"],
+		checked = not Cataclysm_Main.bAltViewInFight,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bAltViewInFight = not bCheck
+		end,
+	}, true):autoWidth():width() + 5
 	-- y = y + ui:append("WndCheckBox", { x = 10, y = nY, text = _L["Faster Refresh HP(Greater performance loss)"], checked = Cataclysm_Main.bFasterHP, enable = false })
 	-- :Click(function(bCheck)
 	-- 	Cataclysm_Main.bFasterHP = bCheck
@@ -1174,6 +1181,7 @@ function PS.OnPanelActive(frame)
 	-- 		end
 	-- 	end
 	-- end, true):Pos_()
+	y = y + 25
 end
 MY.RegisterPanel("MY_Cataclysm", _L["Cataclysm"], _L["Raid"], "ui/Image/UICommon/RaidTotal.uitex|62", {255, 255, 0}, PS)
 end
