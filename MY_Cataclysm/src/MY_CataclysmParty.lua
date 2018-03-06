@@ -589,6 +589,18 @@ function CTM_Party_Base.OnItemRButtonClick()
 				end
 			})
 		end
+		local extra = {}
+		if MY_Focus then
+			for _, v in ipairs(MY_Focus.GetTargetMenu(TARGET.PLAYER, dwID)) do
+				insert(extra, v)
+			end
+		end
+		if #extra > 0 then
+			insert(menu, MENU_DIVIDER)
+			for _, v in ipairs(extra) do
+				insert(menu, v)
+			end
+		end
 	else
 		table.insert(menu, { bDevide = true })
 		InsertPlayerMenu(menu, dwID)
