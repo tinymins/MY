@@ -44,6 +44,7 @@ local CTM_GROUP_COUNT        = 5 - 1 -- 防止以后开个什么40人本 估计不太可能 就和
 local CTM_MEMBER_COUNT       = 5
 local CTM_DRAG               = false
 local CTM_DRAG_ID
+local CTM_CLICK_DISMISS
 local CTM_TARGET  -- 注意这个是UI逻辑选中目标 不一定是真实的当前目标
 local CTM_TTARGET -- 注意这个是UI逻辑目标选中的目标 不一定是真实的当前目标
 local CTM_CACHE              = setmetatable({}, { __mode = "v" })
@@ -341,12 +342,15 @@ function CTM_Party_Base.OnRButtonDown()
 end
 
 function CTM_Party_Base.OnItemLButtonDrag()
-	if not this.dwID then return end
+	if not this.dwID then
+		return
+	end
 	local team = GetClientTeam()
 	local me = GetClientPlayer()
 	if (IsAltKeyDown() or CFG.bEditMode) and me.IsInRaid() and MY.IsLeader() then
 		CTM_DRAG = true
 		CTM_DRAG_ID = this.dwID
+		CTM_CLICK_DISMISS = true
 		CTM:DrawAllParty()
 		CTM:AutoLinkAllPanel()
 		CTM:BringToTop()
@@ -386,6 +390,36 @@ function CTM_Party_Base.OnItemLButtonDown()
 	if not info then
 		return
 	end
+	if not IsCtrlKeyDown() and not IsAltKeyDown() then
+		if CFG.bTempTargetEnable then
+			MY.DelayCall("MY_Cataclysm_TempTarget", false)
+			CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = nil
+		end
+		if MY.IsInPubg() and GetClientPlayer().nMoveState == MOVE_STATE.ON_DEATH then
+			BattleField_MatchPlayer(dwID)
+		elseif info.bIsOnLine and CanTarget(dwID) then -- 有待考证
+			if CFG.bTempTargetEnable then
+				MY.DelayCall("MY_Cataclysm_TempTarget", false)
+				CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = nil
+			end
+			SetTarget(TARGET.PLAYER, dwID)
+		end
+	end
+	CTM_CLICK_DISMISS = false
+end
+
+function CTM_Party_Base.OnItemLButtonClick()
+	if CTM_CLICK_DISMISS then
+		return
+	end
+	local dwID = (this.bBuff and this:GetParent():GetParent().dwID) or (this.bRole and this.dwID)
+	if not dwID then
+		return
+	end
+	local info = CTM:GetMemberInfo(dwID)
+	if not info then
+		return
+	end
 	if IsAltKeyDown() then
 		if this.bBuff then
 			MY.Talk(
@@ -405,24 +439,8 @@ function CTM_Party_Base.OnItemLButtonDown()
 				ViewInviteToPlayer(dwID)
 			end
 		end
-		return
-	end
-	if IsCtrlKeyDown() then
+	elseif IsCtrlKeyDown() then
 		EditBox_AppendLinkPlayer(info.szName)
-	else
-		if CFG.bTempTargetEnable then
-			MY.DelayCall("MY_Cataclysm_TempTarget", false)
-			CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = nil
-		end
-		if MY.IsInPubg() and GetClientPlayer().nMoveState == MOVE_STATE.ON_DEATH then
-			BattleField_MatchPlayer(dwID)
-		elseif info.bIsOnLine and CanTarget(dwID) then -- 有待考证
-			if CFG.bTempTargetEnable then
-				MY.DelayCall("MY_Cataclysm_TempTarget", false)
-				CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = nil
-			end
-			SetTarget(TARGET.PLAYER, dwID)
-		end
 	end
 end
 
