@@ -22,8 +22,14 @@ local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Focus/lang/")
 local l_tFocusList = {}
+local l_tTempFocusList = {
+	[TARGET.PLAYER] = {},   -- dwID
+	[TARGET.NPC]    = {},   -- dwTemplateID
+	[TARGET.DOODAD] = {},   -- dwTemplateID
+}
 local l_bMinimize = false
 local l_dwLockType, l_dwLockID, l_lockInDisplay
+local D = {}
 MY_Focus = {}
 MY_Focus.bEnable            = false -- 是否启用
 MY_Focus.bFocusBoss         = true  -- 焦点重要NPC
@@ -48,13 +54,9 @@ MY_Focus.fScaleX            = 1     -- 缩放比例
 MY_Focus.fScaleY            = 1     -- 缩放比例
 MY_Focus.tAutoFocus = {}    -- 默认焦点
 MY_Focus.tFocusList = {     -- 永久焦点
-	[TARGET.NPC]    = {},
-	[TARGET.PLAYER] = {},
-	[TARGET.DOODAD] = {},
-}
-MY_Focus.tFocusTplList = {  -- 永久焦点(按照TemplateID)
-	[TARGET.NPC]    = {},
-	[TARGET.DOODAD] = {},
+	[TARGET.PLAYER] = {},   -- dwID
+	[TARGET.NPC]    = {},   -- dwTemplateID
+	[TARGET.DOODAD] = {},   -- dwTemplateID
 }
 MY_Focus.anchor = { x=-300, y=220, s="TOPRIGHT", r="TOPRIGHT" } -- 默认坐标
 RegisterCustomData("MY_Focus.bEnable", 1)
@@ -78,7 +80,6 @@ RegisterCustomData("MY_Focus.bHealHelper")
 RegisterCustomData("MY_Focus.bEnableSceneNavi")
 RegisterCustomData("MY_Focus.tAutoFocus")
 RegisterCustomData("MY_Focus.tFocusList")
-RegisterCustomData("MY_Focus.tFocusTplList")
 RegisterCustomData("MY_Focus.anchor")
 RegisterCustomData("MY_Focus.fScaleX")
 RegisterCustomData("MY_Focus.fScaleY")
@@ -175,8 +176,30 @@ function MY_Focus.GetHandle(dwType, dwID)
 	return Station.Lookup('Normal/MY_Focus', 'Handle_List/HI_'..dwType..'_'..dwID)
 end
 
+function MY_Focus.GetTargetMenu(dwType, dwID)
+	return {{
+		szOption = _L['add to temp focus list'],
+		fnAction = function()
+			if not MY_Focus.bEnable then
+				MY_Focus.bEnable = true
+				MY_Focus.Open()
+			end
+			MY_Focus.SetFocusID(dwType, dwID)
+		end,
+	}, {
+		szOption = _L['add to static focus list'],
+		fnAction = function()
+			if not MY_Focus.bEnable then
+				MY_Focus.bEnable = true
+				MY_Focus.Open()
+			end
+			MY_Focus.SetFocusID(dwType, dwID, true)
+		end,
+	}}
+end
+
 -- 添加默认焦点
-function MY_Focus.AddAutoFocus(szName)
+function MY_Focus.SetFocusName(szName)
 	for _, v in ipairs(MY_Focus.tAutoFocus) do
 		if v == szName then
 			return
@@ -188,7 +211,7 @@ function MY_Focus.AddAutoFocus(szName)
 end
 
 -- 删除默认焦点
-function MY_Focus.DelAutoFocus(szName)
+function MY_Focus.RemoveFocusName(szName)
 	for i = #MY_Focus.tAutoFocus, 1, -1 do
 		if MY_Focus.tAutoFocus[i] == szName then
 			table.remove(MY_Focus.tAutoFocus, i)
@@ -202,50 +225,48 @@ function MY_Focus.DelAutoFocus(szName)
 		-- 全字符匹配模式：检查是否在永久焦点中 没有则删除Handle
 		for i = #l_tFocusList, 1, -1 do
 			local p = l_tFocusList[i]
-			local h = MY.Game.GetObject(p.dwType, p.dwID)
-			if h and MY.Game.GetObjectName(h) == szName and
-			not MY_Focus.tFocusList[p.dwType][p.dwID] then
+			local KObject = MY.GetObject(p.dwType, p.dwID)
+			local dwTemplateID = p.dwType == TARGET.PLAYER and p.dwID or KObject.dwTemplateID
+			if KObject and MY.GetObjectName(KObject) == szName
+			and not l_tTempFocusList[p.dwType][p.dwID]
+			and not MY_Focus.tFocusList[p.dwType][dwTemplateID] then
 				MY_Focus.OnObjectLeaveScene(p.dwType, p.dwID)
 			end
 		end
 	end
 end
 
--- 添加永久焦点
-function MY_Focus.AddStaticFocus(dwType, dwID, bDistinctTplID)
+-- 添加ID焦点
+function MY_Focus.SetFocusID(dwType, dwID, bSave)
 	dwType, dwID = tonumber(dwType), tonumber(dwID)
-	if bDistinctTplID then
+	if bSave then
 		local KObject = MY.GetObject(dwType, dwID)
-		local dwTemplateID = KObject.dwTemplateID
-		if MY_Focus.tFocusTplList[dwType]
-		and MY_Focus.tFocusTplList[dwType][dwTemplateID] then
+		local dwTemplateID = dwType == TARGET.PLAYER and dwID or KObject.dwTemplateID
+		if MY_Focus.tFocusList[dwType][dwTemplateID] then
 			return
 		end
-		MY_Focus.tFocusTplList[dwType][dwTemplateID] = true
+		MY_Focus.tFocusList[dwType][dwTemplateID] = true
 		MY_Focus.RescanNearby()
 	else
-		if MY_Focus.tFocusList[dwType]
-		and MY_Focus.tFocusList[dwType][dwID] then
+		if l_tTempFocusList[dwType][dwID] then
 			return
 		end
-		MY_Focus.tFocusList[dwType][dwID] = true
+		l_tTempFocusList[dwType][dwID] = true
 		MY_Focus.OnObjectEnterScene(dwType, dwID)
 	end
 end
 
--- 删除永久焦点
-function MY_Focus.DelStaticFocus(dwType, dwID)
+-- 删除ID焦点
+function MY_Focus.RemoveFocusID(dwType, dwID)
 	dwType, dwID = tonumber(dwType), tonumber(dwID)
-	if MY_Focus.tFocusList[dwType][dwID] then
-		MY_Focus.tFocusList[dwType][dwID] = nil
+	if l_tTempFocusList[dwType][dwID] then
+		l_tTempFocusList[dwType][dwID] = nil
 		MY_Focus.OnObjectLeaveScene(dwType, dwID)
-	else
-		local KObject = MY.GetObject(dwType, dwID)
-		local dwTemplateID = KObject.dwTemplateID
-		if MY_Focus.tFocusTplList[dwType]
-		and MY_Focus.tFocusTplList[dwType][dwTemplateID] then
-			MY_Focus.tFocusTplList[dwType][dwTemplateID] = nil
-		end
+	end
+	local KObject = MY.GetObject(dwType, dwID)
+	local dwTemplateID = dwType == TARGET.PLAYER and dwID or KObject.dwTemplateID
+	if MY_Focus.tFocusList[dwType][dwTemplateID] then
+		MY_Focus.tFocusList[dwType][dwTemplateID] = nil
 		MY_Focus.RescanNearby()
 	end
 end
@@ -269,12 +290,12 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		return
 	end
 	local me = GetClientPlayer()
-	local obj = MY.Game.GetObject(dwType, dwID)
-	if not obj then
+	local KObject = MY.GetObject(dwType, dwID)
+	if not KObject then
 		return
 	end
 
-	local szName = MY.Game.GetObjectName(obj)
+	local szName = MY.GetObjectName(KObject)
 	-- 解决玩家刚进入视野时名字为空的问题
 	if (dwType == TARGET.PLAYER and not szName) or
 	not me then -- 解决自身刚进入场景的时候的问题
@@ -283,14 +304,16 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		end)
 	elseif szName then -- 判断是否需要焦点
 		local bFocus = false
-		-- 判断永久焦点
-		if MY_Focus.tFocusList[dwType][dwID] then
+		if l_tTempFocusList[dwType][dwID] then
 			bFocus = true
 		end
-		if dwType ~= TARGET.PLAYER then
-			if MY_Focus.tFocusTplList[dwType][obj.dwTemplateID]
+		-- 判断永久焦点
+		if not bFocus then
+			local dwTemplateID = dwType == TARGET.PLAYER and dwID or KObject.dwTemplateID
+			if MY_Focus.tFocusList[dwType][dwTemplateID]
 			and not (
-				obj.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
+				dwType == TARGET.NPC
+				and dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
 				and IsEnemy(UI_GetClientPlayerID(), dwID)
 				and MY.IsShieldedVersion()
 			) then
@@ -323,9 +346,9 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 				end
 			elseif dwType == TARGET.NPC then
 				if MY_Focus.bFocusJJCParty
-				and obj.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
+				and KObject.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
 				and not (IsEnemy(UI_GetClientPlayerID(), dwID) and MY.IsShieldedVersion()) then
-					MY_Focus.DelFocus(TARGET.PLAYER, obj.dwEmployer)
+					D.OnRemoveFocus(TARGET.PLAYER, KObject.dwEmployer)
 					bFocus = true
 				end
 			end
@@ -357,13 +380,13 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		if not bFocus and
 		dwType == TARGET.NPC and
 		MY_Focus.bFocusBoss and
-		MY.IsImportantNpc(me.GetMapID(), obj.dwTemplateID) then
+		MY.IsImportantNpc(me.GetMapID(), KObject.dwTemplateID) then
 			bFocus = true
 		end
 
 		-- 加入焦点
 		if bFocus then
-			MY_Focus.AddFocus(dwType, dwID, szName)
+			D.OnSetFocus(dwType, dwID, szName)
 		end
 	end
 end
@@ -376,15 +399,15 @@ function MY_Focus.OnObjectLeaveScene(dwType, dwID)
 			if MY_Focus.bFocusJJCParty
 			and KObject.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
 			and MY.IsInArena() and not (IsEnemy(UI_GetClientPlayerID(), dwID) and MY.IsShieldedVersion()) then
-				MY_Focus.AddFocus(TARGET.PLAYER, KObject.dwEmployer, MY.GetObjectName(KObject))
+				D.OnSetFocus(TARGET.PLAYER, KObject.dwEmployer, MY.GetObjectName(KObject))
 			end
 		end
 	end
-	MY_Focus.DelFocus(dwType, dwID)
+	D.OnRemoveFocus(dwType, dwID)
 end
 
 -- 目标加入焦点列表
-function MY_Focus.AddFocus(dwType, dwID, szName)
+function D.OnSetFocus(dwType, dwID, szName)
 	local nIndex
 	for i, p in ipairs(l_tFocusList) do
 		if p.dwType == dwType and p.dwID == dwID then
@@ -403,7 +426,7 @@ function MY_Focus.AddFocus(dwType, dwID, szName)
 end
 
 -- 目标移除焦点列表
-function MY_Focus.DelFocus(dwType, dwID)
+function D.OnRemoveFocus(dwType, dwID)
 	-- 从列表数据中删除
 	for i = #l_tFocusList, 1, -1 do
 		local p = l_tFocusList[i]
@@ -805,14 +828,6 @@ function MY_Focus.OnEvent(event)
 				MY_Focus.tFocusList[dwType] = {}
 			end
 		end
-		if not MY_Focus.tFocusTplList then
-			MY_Focus.tFocusTplList = {}
-		end
-		for _, dwType in ipairs({TARGET.NPC, TARGET.DOODAD}) do
-			if not MY_Focus.tFocusTplList[dwType] then
-				MY_Focus.tFocusTplList[dwType] = {}
-			end
-		end
 	elseif event == "PARTY_SET_MARK" then
 		MY_Focus.UpdateList()
 	elseif event == 'UI_SCALED' then
@@ -884,7 +899,7 @@ function MY_Focus.OnItemRButtonClick()
 					l_dwLockType = nil
 					l_dwLockID = nil
 				end
-				MY_Focus.DelStaticFocus(dwType, dwID)
+				MY_Focus.RemoveFocusID(dwType, dwID)
 			end,
 		})
 		local bLock = dwType == l_dwLockType and dwID == l_dwLockID
@@ -932,38 +947,7 @@ end
 
 MY.RegisterTargetAddonMenu('MY_Focus', function()
 	local dwType, dwID = GetClientPlayer().GetTarget()
-	if dwType == TARGET.PLAYER then
-		return {
-			szOption = _L['add to focus list'],
-			fnAction = function()
-				if not MY_Focus.bEnable then
-					MY_Focus.bEnable = true
-					MY_Focus.Open()
-				end
-				MY_Focus.AddStaticFocus(dwType, dwID)
-			end,
-		}
-	else
-		return {{
-			szOption = _L['add to focus list'],
-			fnAction = function()
-				if not MY_Focus.bEnable then
-					MY_Focus.bEnable = true
-					MY_Focus.Open()
-				end
-				MY_Focus.AddStaticFocus(dwType, dwID)
-			end,
-		}, {
-			szOption = _L['add to static focus list'],
-			fnAction = function()
-				if not MY_Focus.bEnable then
-					MY_Focus.bEnable = true
-					MY_Focus.Open()
-				end
-				MY_Focus.AddStaticFocus(dwType, dwID, true)
-			end,
-		}}
-	end
+	return MY_Focus.GetTargetMenu(dwType, dwID)
 end)
 
 MY.RegisterInit('MY_FOCUS', function()
