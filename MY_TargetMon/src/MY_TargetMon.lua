@@ -197,18 +197,26 @@ end
 -- Êý¾Ý´æ´¢
 ----------------------------------------------------------------------------------------------
 function D.FormatConfigStructure(config)
-	if config.monitors and config.monitors.common then
-		local monitors = {}
-		for dwKungfuID, aMonList in pairs(config.monitors) do
-			if dwKungfuID == "common" then
-				dwKungfuID = "all"
+	if config.monitors then
+		if config.monitors.common then
+			local monitors = {}
+			for dwKungfuID, aMonList in pairs(config.monitors) do
+				if dwKungfuID == "common" then
+					dwKungfuID = "all"
+				end
+				for _, mon in ipairs(aMonList) do
+					mon.kungfus = { [dwKungfuID] = true }
+					insert(monitors, mon)
+				end
 			end
-			for _, mon in ipairs(aMonList) do
-				mon.kungfus = { [dwKungfuID] = true }
-				insert(monitors, mon)
+			config.monitors = monitors
+		end
+		for _, mon in ipairs(config.monitors) do
+			if mon.kungfus[0] then
+				mon.kungfus[0] = nil
+				mon.kungfus.all = true
 			end
 		end
-		config.monitors = monitors
 	end
 	return MY.FormatDataStructure(config, ConfigTemplate, true)
 end
