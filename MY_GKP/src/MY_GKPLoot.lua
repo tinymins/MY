@@ -1012,7 +1012,17 @@ MY.RegisterEvent("SYNC_LOOT_LIST", function()
 	local frame = Loot.GetFrame()
 	local wnd = Loot.GetDoodadWnd(frame, arg0)
 	if not wnd and not (MY_GKP.bDebug and MY_GKP.bDebug2) then
-		return
+		local bDungeonTreasure = false
+		local szName, aItemData = Loot.GetDoodad(arg0)
+		for k, v in ipairs(aItemData) do
+			if wstring.find(v.szName, _L["Dungeon treasure"]) == 1 then
+				bDungeonTreasure = true
+				break
+			end
+		end
+		if not bDungeonTreasure then
+			return
+		end
 	end
 	Loot.DrawLootList(arg0)
 end)
