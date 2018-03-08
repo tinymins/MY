@@ -3,6 +3,6 @@
 */manifest.dat
 */manifest.key
 */publisher.key
-.Framework/data/bosslist.jx3dat
-\!src-dist/releases/
 /@DATA
+\!src-dist/releases/
+\!src-dist/tools/targetmon-format/*.jx3dat
