@@ -502,7 +502,7 @@ local function onBreatheCall()
 	local nX, nY, nZ = nEndX, nEndY, me.nZ
 	local nDistance = MY.GetDistance(nX, nY)
 	-- MY.Sysmsg({_L("%f %f %f, %d, %f", nX, nY, nZ, nDistance, fScale)})
-	uiCircle:drawGwCircle(nX, nY, nZ, fScale * 64, 255, 255, 255, 50)
+	-- uiCircle:drawGwCircle(nX, nY, nZ, fScale * 64, 255, 255, 255, 50)
 	-- uiDistance:drawGwText(_L("%.1f/%d meter(s)", nDistance, fScale), nX, nY, me.nZ)
 	if bRefresh then
 		bRefresh = false
@@ -513,7 +513,7 @@ end
 local function onLoadingEnd()
 	if not hPubg then
 		hPubg = XGUI.GetShadowHandle("PubgInfo")
-		uiCircle = XGUI(hPubg):append("Shadow", true)
+		-- uiCircle = XGUI(hPubg):append("Shadow", true)
 		-- uiDistance = XGUI(hPubg):append("Shadow", true)
 	end
 	nStartTime = nil
