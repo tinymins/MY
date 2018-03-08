@@ -57,7 +57,7 @@ function empty(var)
 end
 
 local function table_r(var, level, indent)
-	if level == 4 then
+	if level == 3 then
 		indent = nil
 	end
 	local t = {}
