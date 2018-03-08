@@ -196,6 +196,27 @@ end
 ----------------------------------------------------------------------------------------------
 -- 数据存储
 ----------------------------------------------------------------------------------------------
+do
+local function FormatMonitorData(mon)
+	if mon.kungfus[0] then
+		mon.kungfus[0] = nil
+		mon.kungfus.all = true
+	elseif mon.kungfus.all == nil then
+		mon.kungfus.all = empty(mon.kungfus)
+	end
+	if mon.tarkungfus.all == nil then
+		mon.tarkungfus.all = empty(mon.tarkungfus)
+	end
+	return mon
+end
+
+local function FormatConfigData(config)
+	for _, mon in ipairs(config.monitors) do
+		FormatMonitorData(mon)
+	end
+	return config
+end
+
 function D.FormatConfigStructure(config)
 	if config.monitors then
 		if config.monitors.common then
@@ -211,26 +232,25 @@ function D.FormatConfigStructure(config)
 			end
 			config.monitors = monitors
 		end
-		for _, mon in ipairs(config.monitors) do
-			if mon.kungfus[0] then
-				mon.kungfus[0] = nil
-				mon.kungfus.all = true
-			end
-		end
 	end
-	return MY.FormatDataStructure(config, ConfigTemplate, true)
+	return FormatConfigData(MY.FormatDataStructure(config, ConfigTemplate, true))
 end
 
 function D.FormatMonStructure(config)
-	return MY.FormatDataStructure(config, ConfigTemplate.monitors.__CHILD_TEMPLATE__, true)
+	return FormatMonitorData(MY.FormatDataStructure(config, ConfigTemplate.monitors.__CHILD_TEMPLATE__, true))
 end
 
 function D.FormatMonItemStructure(config)
-	return MY.FormatDataStructure(config, ConfigTemplate.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__, true)
+	config = MY.FormatDataStructure(config, ConfigTemplate.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__, true)
+	for _, mon in ipairs(config.monitors) do
+		FormatMonitorData(mon)
+	end
+	return config
 end
 
 function D.FormatMonItemLevelStructure(config)
 	return MY.FormatDataStructure(config, ConfigTemplate.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__.levels.__CHILD_TEMPLATE__, true)
+end
 end
 
 function D.LoadConfig(bDefault, bOriginal)
@@ -880,8 +900,9 @@ function PS.OnPanelActive(wnd)
 					end,
 				},
 			}
+			-- 自身心法
 			local t2 = {
-				szOption = _L['Target kungfu'],
+				szOption = _L['Self kungfu'],
 				{
 					szOption = _L["All kungfus"],
 					rgb = {255, 255, 0},
@@ -909,6 +930,37 @@ function PS.OnPanelActive(wnd)
 				end
 			end
 			insert(t1, t2)
+			-- 目标心法
+			local t2 = {
+				szOption = _L['Target kungfu'],
+				{
+					szOption = _L["All kungfus"],
+					rgb = {255, 255, 0},
+					bCheck = true,
+					bChecked = mon.tarkungfus.all,
+					fnAction = function()
+						mon.tarkungfus.all = not mon.tarkungfus.all
+						D.CheckFrame(l_config)
+					end,
+				},
+			}
+			for _, dwForceID in pairs_c(FORCE_TYPE) do
+				for i, dwKungfuID in ipairs(ForceIDToKungfuIDs(dwForceID) or {}) do
+					insert(t2, {
+						szOption = MY.GetSkillName(dwKungfuID, 1),
+						rgb = {MY.GetForceColor(dwForceID, "foreground")},
+						bCheck = true,
+						bChecked = mon.tarkungfus[dwKungfuID],
+						fnAction = function()
+							mon.tarkungfus[dwKungfuID] = not mon.tarkungfus[dwKungfuID]
+							D.CheckFrame(l_config)
+						end,
+						fnDisable = function() return mon.tarkungfus.all end,
+					})
+				end
+			end
+			insert(t1, t2)
+			-- ID设置
 			if not empty(mon.ids) then
 				insert(t1, { bDevide = true })
 				insert(t1, { szOption = _L['Ids'], bDisable = true })
