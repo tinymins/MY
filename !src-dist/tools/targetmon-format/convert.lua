@@ -182,7 +182,7 @@ function str2var(str, env)
 	setmetatable(env, nil)
 	if datalist[1] then
 		if bdata then
-			datalist = env.data
+			datalist = {env.data}
 		else
 			tremove(datalist, 1)
 		end
