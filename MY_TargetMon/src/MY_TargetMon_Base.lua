@@ -553,7 +553,7 @@ function MY_TargetMon_Base.OnFrameBreathe()
 	local nFrameCount = GetLogicFrameCount()
 
 	local dwKungfuID = me.GetKungfuMount() and me.GetKungfuMount().dwSkillID or 0
-	local dwTarKungfuID = dwType == TARGET.PLAYER and KTarget.GetKungfuMount() and KTarget.GetKungfuMount().dwSkillID or 0
+	local dwTarKungfuID = dwType == TARGET.PLAYER and KTarget and KTarget.GetKungfuMount() and KTarget.GetKungfuMount().dwSkillID or 0
 	if not KTarget then
 		for i = 0, hList:GetItemCount() - 1 do
 			UpdateItem(hList:Lookup(i), KTarget, nil, nil, this.tItem, config, nFrameCount, targetChanged, nil, dwKungfuID, dwTarKungfuID)
