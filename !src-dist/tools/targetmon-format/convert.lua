@@ -207,6 +207,9 @@ local function Write(path, content)
 end
 
 local content = Read(arg[1])
-local data = str2var(content)
+local data = str2var(content) or {}
+for i, v in ipairs(data) do
+	v.enable = false
+end
 local content = "data = " .. var2str(data, "\t")
-Write(arg[1], content)
+Write(arg[2] or arg[1], content)
