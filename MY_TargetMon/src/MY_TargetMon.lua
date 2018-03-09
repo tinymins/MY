@@ -197,6 +197,15 @@ end
 -- 数据存储
 ----------------------------------------------------------------------------------------------
 do
+
+function D.FormatMonItemLevelStructure(config)
+	return MY.FormatDataStructure(config, ConfigTemplate.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__.levels.__CHILD_TEMPLATE__, true)
+end
+
+function D.FormatMonItemStructure(config)
+	return MY.FormatDataStructure(config, ConfigTemplate.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__, true)
+end
+
 local function FormatMonitorData(mon)
 	if mon.kungfus[0] then
 		mon.kungfus[0] = nil
@@ -207,7 +216,16 @@ local function FormatMonitorData(mon)
 	if mon.tarkungfus.all == nil then
 		mon.tarkungfus.all = empty(mon.tarkungfus)
 	end
+	if not mon.uuid then
+		mon.uuid = tostring(mon):sub(8)
+	end
 	return mon
+end
+function D.FormatMonStructure(config)
+	if not config.uuid then
+		config.uuid = tostring(config):sub(8)
+	end
+	return FormatMonitorData(MY.FormatDataStructure(config, ConfigTemplate.monitors.__CHILD_TEMPLATE__, true))
 end
 
 local function FormatConfigData(config)
@@ -216,8 +234,11 @@ local function FormatConfigData(config)
 	end
 	return config
 end
-
 function D.FormatConfigStructure(config)
+	-- 处理用户修改的内建数据
+	if config.delete then
+		return
+	end
 	if config.monitors then
 		if config.monitors.common then
 			local monitors = {}
@@ -232,24 +253,91 @@ function D.FormatConfigStructure(config)
 			end
 			config.monitors = monitors
 		end
+	else
+		config.monitors = {}
+	end
+	for _, embedded in ipairs(ConfigEmbedded) do
+		if embedded.uuid == config.uuid then
+			-- 设置内嵌数据默认属性
+			for k, v in pairs(embedded) do
+				if k ~= "monitors" and config[k] == nil then
+					config[k] = v
+				end
+			end
+			-- 设置内嵌数据删除项和自定义项
+			for _, p in ipairs(embedded.monitors) do
+				local exist = false
+				for i, mon in ipairs_r(config.monitors) do
+					if mon.uuid == p.uuid then
+						if mon.delete then
+							remove(config.monitors, i)
+						elseif not mon.manually then
+							config.monitors[i] = clone(p)
+						end
+						exist = true
+						break
+					end
+				end
+				if not exist then
+					insert(config.monitors, clone(p))
+				end
+			end
+			-- 删除上版本存在当前版本不存在的内嵌数据
+			for i, mon in ipairs_r(config.monitors) do
+				local exist = false
+				for _, p in ipairs(embedded.monitors) do
+					if mon.uuid == p.uuid then
+						exist = true
+						break
+					end
+				end
+				if not exist and not mon.manually then
+					remove(config.monitors, i)
+				end
+			end
+		end
+	end
+	if not config.uuid then
+		config.uuid = tostring(config):sub(8)
 	end
 	return FormatConfigData(MY.FormatDataStructure(config, ConfigTemplate, true))
 end
 
-function D.FormatMonStructure(config)
-	return FormatMonitorData(MY.FormatDataStructure(config, ConfigTemplate.monitors.__CHILD_TEMPLATE__, true))
-end
-
-function D.FormatMonItemStructure(config)
-	config = MY.FormatDataStructure(config, ConfigTemplate.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__, true)
-	for _, mon in ipairs(config.monitors) do
-		FormatMonitorData(mon)
+function D.FormatSavingConfig(config)
+	for _, embedded in ipairs(ConfigEmbedded) do
+		if embedded.uuid == config.uuid then
+			local cfg = { uuid = config.uuid, monitors = {} }
+			-- 保存修改的全局属性
+			for k, v in pairs(config) do
+				if k ~= "uuid" and k ~= "monitors" and v ~= embedded[k] then
+					cfg[k] = v
+				end
+			end
+			-- 保存添加以及排序修改的部分
+			for i, mon in ipairs(config.monitors) do
+				if not mon.manually and mon.uuid then
+					insert(cfg.monitors, { uuid = mon.uuid })
+				else
+					insert(cfg.monitors, mon)
+				end
+			end
+			-- 保存删减的部分
+			for _, p in ipairs(embedded.monitors) do
+				local exist = false
+				for _, mon in ipairs(config.monitors) do
+					if mon.uuid == p.uuid then
+						exist = true
+						break
+					end
+				end
+				if not exist then
+					insert(cfg.monitors, { uuid = p.uuid, delete = true })
+				end
+			end
+			return cfg
+		end
 	end
 	return config
-end
-
-function D.FormatMonItemLevelStructure(config)
-	return MY.FormatDataStructure(config, ConfigTemplate.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__.levels.__CHILD_TEMPLATE__, true)
 end
 end
 
@@ -257,7 +345,8 @@ function D.LoadConfig(bDefault, bOriginal)
 	D.CloseFrame('all')
 	Config = not bDefault
 		and MY.LoadLUAData(ROLE_CONFIG_FILE)
-		or (not bOriginal and MY.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE) or clone(ConfigEmbedded))
+		or (not bOriginal and MY.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE) or {})
+	-- 兼容旧数据
 	local Embedded = Config.Embedded
 	if Embedded then
 		for _, config in ipairs(clone(ConfigEmbedded)) do
@@ -270,8 +359,24 @@ function D.LoadConfig(bDefault, bOriginal)
 		end
 		Config.Embedded = nil
 	end
-	for _, config in ipairs(Config) do
-		D.FormatConfigStructure(config)
+	-- 插入内建数据
+	for _, embedded in ipairs_r(ConfigEmbedded) do
+		local exist = false
+		for _, config in ipairs(Config) do
+			if config.uuid == embedded.uuid then
+				exist = true
+				break
+			end
+		end
+		if not exist then
+			insert(Config, 1, { uuid = embedded.uuid, monitors = {} })
+		end
+	end
+	-- 格式化数据
+	for i, config in ipairs_r(Config) do
+		if not D.FormatConfigStructure(config) then
+			remove(Config, i)
+		end
 	end
 	D.CheckAllFrame()
 end
@@ -285,7 +390,22 @@ end
 MY.RegisterInit("MY_TargetMon", OnInit)
 
 local function OnExit()
-	MY.SaveLUAData(ROLE_CONFIG_FILE, Config)
+	local cfgs = {}
+	for _, config in ipairs(Config) do
+		insert(cfgs, D.FormatSavingConfig(config))
+	end
+	for _, embedded in ipairs_r(ConfigEmbedded) do
+		local exist = false
+		for _, config in ipairs(Config) do
+			if config.uuid == embedded.uuid then
+				exist = true
+			end
+		end
+		if not exist then
+			insert(cfgs, { uuid = embedded.uuid, delete = true })
+		end
+	end
+	MY.SaveLUAData(ROLE_CONFIG_FILE, cfgs)
 end
 MY.RegisterExit("MY_TargetMon", OnExit)
 end
@@ -333,83 +453,64 @@ end
 ----------------------------------------------------------------------------------------------
 local PS = {}
 local function GenePS(ui, config, x, y, w, h, OpenConfig)
-	local bEmbedded = not OpenConfig
-	local text = _L["*"]
-	if not bEmbedded then
-		text = "X."
-		for i = 1, #Config do
-			if Config[i] == config then
-				text = i .. "."
-				break
-			end
-		end
-	end
 	ui:append("Text", {
 		x = x, y = y - 3, w = 20,
 		r = 255, g = 255, b = 0,
-		text = text,
+		text = _L["*"],
 	})
-	if not bEmbedded then
-		ui:append("WndEditBox", {
-			x = x + 20, y = y, w = w - 290, h = 22,
-			r = 255, g = 255, b = 0, text = config.caption,
-			onchange = function(val) config.caption = val end,
-		})
-		ui:append("WndButton2", {
-			x = w - 180, y = y,
-			w = 50, h = 25,
-			text = _L["Move Up"],
-			onclick = function()
-				for i = 1, #Config do
-					if Config[i] == config then
-						if Config[i - 1] then
-							Config[i], Config[i - 1] = Config[i - 1], Config[i]
-							D.CheckFrame(Config[i])
-							D.CheckFrame(Config[i - 1])
-							return MY.SwitchTab("MY_TargetMon", true)
-						end
+	ui:append("WndEditBox", {
+		x = x + 20, y = y, w = w - 290, h = 22,
+		r = 255, g = 255, b = 0, text = config.caption,
+		onchange = function(val) config.caption = val end,
+	})
+	ui:append("WndButton2", {
+		x = w - 180, y = y,
+		w = 50, h = 25,
+		text = _L["Move Up"],
+		onclick = function()
+			for i = 1, #Config do
+				if Config[i] == config then
+					if Config[i - 1] then
+						Config[i], Config[i - 1] = Config[i - 1], Config[i]
+						D.CheckFrame(Config[i])
+						D.CheckFrame(Config[i - 1])
+						return MY.SwitchTab("MY_TargetMon", true)
 					end
 				end
-			end,
-		})
-		ui:append("WndButton2", {
-			x = w - 125, y = y,
-			w = 50, h = 25,
-			text = _L["Move Down"],
-			onclick = function()
-				for i = 1, #Config do
-					if Config[i] == config then
-						if Config[i + 1] then
-							Config[i], Config[i + 1] = Config[i + 1], Config[i]
-							D.CheckFrame(Config[i])
-							D.CheckFrame(Config[i + 1])
-							return MY.SwitchTab("MY_TargetMon", true)
-						end
+			end
+		end,
+	})
+	ui:append("WndButton2", {
+		x = w - 125, y = y,
+		w = 50, h = 25,
+		text = _L["Move Down"],
+		onclick = function()
+			for i = 1, #Config do
+				if Config[i] == config then
+					if Config[i + 1] then
+						Config[i], Config[i + 1] = Config[i + 1], Config[i]
+						D.CheckFrame(Config[i])
+						D.CheckFrame(Config[i + 1])
+						return MY.SwitchTab("MY_TargetMon", true)
 					end
 				end
-			end,
-		})
-		ui:append("WndButton2", {
-			x = w - 70, y = y,
-			w = 60, h = 25,
-			text = _L["Delete"],
-			onclick = function()
-				for i, c in ipairs_r(Config) do
-					if config == c then
-						remove(Config, i)
-					end
+			end
+		end,
+	})
+	ui:append("WndButton2", {
+		x = w - 70, y = y,
+		w = 60, h = 25,
+		text = _L["Delete"],
+		onclick = function()
+			for i, c in ipairs_r(Config) do
+				if config == c then
+					remove(Config, i)
 				end
-				D.CloseFrame(config)
-				MY.SwitchTab("MY_TargetMon", true)
-			end,
-		})
-	else
-		ui:append("Text", {
-			x = x + 20, y = y - 3,
-			text = config.caption,
-			r = 255, g = 255, b = 0,
-		})
-	end
+			end
+			D.CloseFrame(config)
+			MY.SwitchTab("MY_TargetMon", true)
+		end,
+	})
 	y = y + 30
 
 	ui:append("WndCheckBox", {
@@ -453,34 +554,32 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		text = _L['Set target'],
 		menu = function()
 			local t = {}
-			if not bEmbedded then
-				for _, eType in ipairs(TARGET_TYPE_LIST) do
-					insert(t, {
-						szOption = _L.TARGET[eType],
-						bCheck = true, bMCheck = true,
-						bChecked = eType == (config.type == "SKILL" and "CONTROL_PLAYER" or config.target),
-						fnDisable = function()
-							return config.type == "SKILL" and eType ~= "CONTROL_PLAYER"
-						end,
-						fnAction = function()
-							config.target = eType
-							D.CheckFrame(config)
-						end,
-					})
-				end
-				insert(t, { bDevide = true })
-				for _, eType in ipairs({'BUFF', 'SKILL'}) do
-					insert(t, {
-						szOption = _L.TYPE[eType],
-						bCheck = true, bMCheck = true, bChecked = eType == config.type,
-						fnAction = function()
-							config.type = eType
-							D.CheckFrame(config)
-						end,
-					})
-				end
-				insert(t, { bDevide = true })
+			for _, eType in ipairs(TARGET_TYPE_LIST) do
+				insert(t, {
+					szOption = _L.TARGET[eType],
+					bCheck = true, bMCheck = true,
+					bChecked = eType == (config.type == "SKILL" and "CONTROL_PLAYER" or config.target),
+					fnDisable = function()
+						return config.type == "SKILL" and eType ~= "CONTROL_PLAYER"
+					end,
+					fnAction = function()
+						config.target = eType
+						D.CheckFrame(config)
+					end,
+				})
 			end
+			insert(t, { bDevide = true })
+			for _, eType in ipairs({'BUFF', 'SKILL'}) do
+				insert(t, {
+					szOption = _L.TYPE[eType],
+					bCheck = true, bMCheck = true, bChecked = eType == config.type,
+					fnAction = function()
+						config.type = eType
+						D.CheckFrame(config)
+					end,
+				})
+			end
+			insert(t, { bDevide = true })
 			for _, eType in ipairs({'LEFT', 'RIGHT', 'CENTER'}) do
 				insert(t, {
 					szOption = _L.ALIGNMENT[eType],
@@ -495,14 +594,12 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		end,
 		autoenable = function() return config.enable end,
 	})
-	if not bEmbedded then
-		ui:append("WndButton2", {
-			x = w - 110, y = y, w = 102,
-			text = _L['Set monitor'],
-			onclick = function() OpenConfig(config) end,
-			autoenable = function() return config.enable end,
-		})
-	end
+	ui:append("WndButton2", {
+		x = w - 110, y = y, w = 102,
+		text = _L['Set monitor'],
+		onclick = function() OpenConfig(config) end,
+		autoenable = function() return config.enable end,
+	})
 	y = y + 30
 
 	ui:append("WndCheckBox", {
@@ -751,6 +848,7 @@ function PS.OnPanelActive(wnd)
 					local aMonList = l_config.monitors
 					local mon = MY_TargetMon.FormatMonStructure({
 						name = szVal,
+						manually = true,
 						ignoreId = not tonumber(szVal),
 					})
 					if not mon.ignoreId then
@@ -788,6 +886,7 @@ function PS.OnPanelActive(wnd)
 					bCheck = true, bChecked = mon.enable,
 					fnAction = function()
 						mon.enable = not mon.enable
+						mon.manually = true
 						D.CheckFrame(l_config)
 					end,
 				},
@@ -861,6 +960,7 @@ function PS.OnPanelActive(wnd)
 									{ "text" }, { szVal }
 								)
 								mon.name = szVal
+								mon.manually = true
 								D.CheckFrame(l_config)
 							end
 						end, function() end, function() end, nil, mon.name)
@@ -873,6 +973,7 @@ function PS.OnPanelActive(wnd)
 						GetUserInput(_L['Please input long alias:'], function(szVal)
 							szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
 							mon.longAlias = szVal
+							mon.manually = true
 							D.CheckFrame(l_config)
 						end, function() end, function() end, nil, mon.longAlias or mon.name)
 					end,
@@ -880,6 +981,7 @@ function PS.OnPanelActive(wnd)
 					bColorTable = true,
 					fnChangeColor = function(_, r, g, b)
 						mon.rgbLongAlias = { r, g, b }
+						mon.manually = true
 						D.CheckFrame(l_config)
 					end,
 				},
@@ -889,6 +991,7 @@ function PS.OnPanelActive(wnd)
 						GetUserInput(_L['Please input short alias:'], function(szVal)
 							szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
 							mon.shortAlias = szVal
+							mon.manually = true
 							D.CheckFrame(l_config)
 						end, function() end, function() end, nil, mon.shortAlias or mon.name)
 					end,
@@ -910,6 +1013,7 @@ function PS.OnPanelActive(wnd)
 					bChecked = mon.kungfus.all,
 					fnAction = function()
 						mon.kungfus.all = not mon.kungfus.all
+						mon.manually = true
 						D.CheckFrame(l_config)
 					end,
 				},
@@ -923,6 +1027,7 @@ function PS.OnPanelActive(wnd)
 						bChecked = mon.kungfus[dwKungfuID],
 						fnAction = function()
 							mon.kungfus[dwKungfuID] = not mon.kungfus[dwKungfuID]
+							mon.manually = true
 							D.CheckFrame(l_config)
 						end,
 						fnDisable = function() return mon.kungfus.all end,
@@ -970,6 +1075,7 @@ function PS.OnPanelActive(wnd)
 					bChecked = mon.ignoreId,
 					fnAction = function()
 						mon.ignoreId = not mon.ignoreId
+						mon.manually = true
 						D.CheckFrame(l_config)
 					end,
 					szIcon = "fromiconid",
@@ -979,6 +1085,7 @@ function PS.OnPanelActive(wnd)
 					szLayer = "ICON_RIGHTMOST",
 					fnClickIcon = function()
 						XGUI.OpenIconPanel(function(dwIcon)
+							mon.manually = true
 							mon.iconid = dwIcon
 						end)
 						Wnd.CloseWindow("PopupMenuPanel")
@@ -991,6 +1098,7 @@ function PS.OnPanelActive(wnd)
 						bChecked = info.enable,
 						fnAction = function()
 							info.enable = not info.enable
+							mon.manually = true
 							D.CheckFrame(l_config)
 						end,
 						fnDisable = function()
@@ -1007,6 +1115,7 @@ function PS.OnPanelActive(wnd)
 							end
 							XGUI.OpenIconPanel(function(dwIcon)
 								info.iconid = dwIcon
+								mon.manually = true
 								D.CheckFrame(l_config)
 							end)
 							Wnd.CloseWindow("PopupMenuPanel")
@@ -1021,6 +1130,7 @@ function PS.OnPanelActive(wnd)
 							bChecked = info.ignoreLevel,
 							fnAction = function()
 								info.ignoreLevel = not info.ignoreLevel
+								mon.manually = true
 								D.CheckFrame(l_config)
 							end,
 							szIcon = "fromiconid",
@@ -1034,6 +1144,7 @@ function PS.OnPanelActive(wnd)
 								end
 								XGUI.OpenIconPanel(function(dwIcon)
 									info.iconid = dwIcon
+									mon.manually = true
 								end)
 								Wnd.CloseWindow("PopupMenuPanel")
 							end,
@@ -1047,6 +1158,7 @@ function PS.OnPanelActive(wnd)
 									bChecked = infoLevel.enable,
 									fnAction = function()
 										infoLevel.enable = not infoLevel.enable
+										mon.manually = true
 										D.CheckFrame(l_config)
 									end,
 									fnDisable = function()
@@ -1060,6 +1172,7 @@ function PS.OnPanelActive(wnd)
 									fnClickIcon = function()
 										XGUI.OpenIconPanel(function(dwIcon)
 											infoLevel.iconid = dwIcon
+											mon.manually = true
 											D.CheckFrame(l_config)
 										end)
 										Wnd.CloseWindow("PopupMenuPanel")
@@ -1089,6 +1202,7 @@ function PS.OnPanelActive(wnd)
 										dwIconID = Table_GetBuffIconID(dwID, nLevel) or dwIconID
 									end
 									info.levels[nLevel] = D.FormatMonItemLevelStructure({ iconid = dwIconID })
+									mon.manually = true
 									D.CheckFrame(l_config)
 								end
 							end, function() end, function() end, nil, nil)
@@ -1098,6 +1212,7 @@ function PS.OnPanelActive(wnd)
 						szOption = _L['Delete'],
 						fnAction = function()
 							mon.ids[dwID] = nil
+							mon.manually = true
 							D.CheckFrame(l_config)
 						end,
 					})
@@ -1110,6 +1225,7 @@ function PS.OnPanelActive(wnd)
 				bCheck = true, bChecked = mon.capture,
 				fnAction = function()
 					mon.capture = not mon.capture
+					mon.manually = true
 					D.CheckFrame(l_config)
 				end,
 			})
@@ -1130,6 +1246,7 @@ function PS.OnPanelActive(wnd)
 								dwIconID = Table_GetBuffIconID(dwID, 1) or 13
 							end
 							mon.ids[dwID] = D.FormatMonItemStructure({ iconid = dwIconID })
+							mon.manually = true
 							D.CheckFrame(l_config)
 						end
 					end, function() end, function() end, nil, nil)
@@ -1207,16 +1324,17 @@ function PS.OnPanelActive(wnd)
 			local importCount = 0
 			local replaceCount = 0
 			for _, config in ipairs(configs) do
-				D.FormatConfigStructure(config)
-				for i, cfg in ipairs_r(Config) do
-					if cfg.caption == config.caption then
-						D.CloseFrame(cfg)
-						remove(Config, i)
-						replaceCount = replaceCount + 1
+				if D.FormatConfigStructure(config) then
+					for i, cfg in ipairs_r(Config) do
+						if config.uuid and config.uuid == cfg.uuid then
+							D.CloseFrame(cfg)
+							remove(Config, i)
+							replaceCount = replaceCount + 1
+						end
 					end
+					insert(Config, config)
+					importCount = importCount + 1
 				end
-				insert(Config, config)
-				importCount = importCount + 1
 			end
 			D.CheckAllFrame()
 			MY.SwitchTab("MY_TargetMon", true)
@@ -1260,7 +1378,11 @@ function PS.OnPanelActive(wnd)
 							.. ".jx3dat",
 						MY_DATA_PATH.GLOBAL,
 					})
-					MY.SaveLUAData(file, configs, indent)
+					local cfgs = {}
+					for i, config in ipairs(configs) do
+						insert(cfgs, D.FormatSavingConfig(config))
+					end
+					MY.SaveLUAData(file, cfgs, indent)
 					MY.Sysmsg({ _L('Data exported, file saved at %s.', file) })
 					OutputMessage('MSG_ANNOUNCE_YELLOW', _L('Data exported, file saved at %s.', file))
 				end,
