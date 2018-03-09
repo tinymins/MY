@@ -831,7 +831,7 @@ function PS.OnPanelActive(wnd)
 
 	local OpenConfig
 	do -- single config details
-		local l_config
+		local l_config, l_search
 		local uiWrapper = ui:append('WndWindow', { name = 'WndWindow_Wrapper', x = 0, y = 0, w = w, h = h }, true)
 		uiWrapper:append('Shadow', { x = 0, y = 0, w = w, h = h, r = 0, g = 0, b = 0, alpha = 150 })
 		uiWrapper:append('Shadow', { x = 10, y = 10, w = w - 20, h = h - 20, r = 255, g = 255, b = 255, alpha = 40 })
@@ -839,7 +839,25 @@ function PS.OnPanelActive(wnd)
 		local x0, y0 = 20, 20
 		local w0, h0 = w - 40, h - 30
 		local w1, x1 = w0 - 5, x0
-		local list = uiWrapper:append("WndListBox", { x = x1, y = y0 + 25, w = w1, h = h0 - 30 - 30 }, true)
+		local list = uiWrapper:append("WndListBox", { x = x1, y = y0 + 30, w = w1, h = h0 - 35 - 30 }, true)
+
+		local function Search()
+			list:listbox('clear')
+			local aMonList = l_config.monitors or {}
+			for i, mon in ipairs(aMonList) do
+				if not l_search or l_search == ""
+				or (mon.name and wfind(mon.name, l_search))
+				or (mon.longAlias and wfind(mon.longAlias, l_search))
+				or (mon.shortAlias and wfind(mon.shortAlias, l_search)) then
+					list:listbox(
+						'insert',
+						mon.name or mon.id,
+						mon,
+						{ mon = mon, monlist = aMonList }
+					)
+				end
+			end
+		end
 
 		local function InsertMonitor(index)
 			GetUserInput(_L['Please input name:'], function(szVal)
@@ -871,15 +889,26 @@ function PS.OnPanelActive(wnd)
 				end
 			end, function() end, function() end, nil, "")
 		end
+
+		uiWrapper:append('WndEditBox', {
+			x = x0, y = y0,
+			w = 200, h = 30, placeholder = _L['Search'],
+			onchange = function(text)
+				l_search = text
+				Search()
+			end,
+		})
 		uiWrapper:append("WndButton2", {
 			x = x1 + w1 - 60, y = y0 - 1, w = 60, h = 28,
 			text = _L['Add'], onclick = function() InsertMonitor() end,
+			autoenable = function() return not l_search or l_search == "" end,
 		})
 
 		-- ³õÊ¼»¯list¿Ø¼þ
 		local function onMenu(hItem, szText, szID, data)
 			local mon = data.mon
 			local monlist = data.monlist
+			local search = l_search and l_search ~= ""
 			local t1 = {
 				{
 					szOption = _L['Enable'],
@@ -915,6 +944,7 @@ function PS.OnPanelActive(wnd)
 						end
 						InsertMonitor(index)
 					end,
+					bDisable = search,
 				},
 				{
 					szOption = _L['Move up'],
@@ -931,6 +961,7 @@ function PS.OnPanelActive(wnd)
 						insert(monlist, index - 1, remove(monlist, index))
 						list:listbox('exchange', 'index', index - 1, index)
 					end,
+					bDisable = search,
 				},
 				{
 					szOption = _L['Move down'],
@@ -947,6 +978,7 @@ function PS.OnPanelActive(wnd)
 						insert(monlist, index + 1, remove(monlist, index))
 						list:listbox('exchange', 'index', index + 1, index)
 					end,
+					bDisable = search,
 				},
 				{
 					szOption = _L['Rename'],
@@ -1258,18 +1290,7 @@ function PS.OnPanelActive(wnd)
 
 		function OpenConfig(config)
 			l_config = config
-			list:listbox('clear')
-			local aMonList = config.monitors
-			if aMonList and #aMonList > 0 then
-				for i, mon in ipairs(aMonList) do
-					list:listbox(
-						'insert',
-						mon.name or mon.id,
-						mon,
-						{ mon = mon, monlist = aMonList }
-					)
-				end
-			end
+			Search()
 			uiWrapper:show()
 			uiWrapper:bringToTop()
 		end

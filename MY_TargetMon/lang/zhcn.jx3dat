@@ -102,4 +102,5 @@ data = {
     ['Target kungfu'] = '目标心法要求',
     ['All kungfus'] = '全部心法',
     ['Auto capture by name'] = '自动捕获ID',
+    ['Search'] = '搜索',
 }
