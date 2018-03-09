@@ -439,7 +439,7 @@ function CTM_Party_Base.OnItemLButtonClick()
 					GetEndTime(this.nEndFrame)
 				)
 			)
-		elseif this.bRole and (CFG.bAltViewInFight or not me.bFightState) then
+		elseif this.bRole and CFG.bAltView and (CFG.bAltViewInFight or not me.bFightState) then
 			if IsCtrlKeyDown() then
 				ViewCharInfoToPlayer(dwID)
 			else

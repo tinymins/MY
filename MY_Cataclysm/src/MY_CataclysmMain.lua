@@ -1162,9 +1162,17 @@ function PS.OnPanelActive(frame)
 		end,
 	}):autoWidth():width()
 
+	x = X + 10
 	y = y + 25
 	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Disable alt view player in fight"],
+		x = x, y = y, text = _L["Alt view player"],
+		checked = Cataclysm_Main.bAltView,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bAltView = bCheck
+		end,
+	}, true):autoWidth():width() + 5
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y, text = _L["Disable in fight"],
 		checked = not Cataclysm_Main.bAltViewInFight,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bAltViewInFight = not bCheck

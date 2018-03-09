@@ -37,6 +37,7 @@ data = {
 	nAlpha                 = 220,
 	fBuffScale             = 1,
 	bAutoBuffSize          = true,
+	bAltView               = false,
 	bAltViewInFight        = false,
 	bHideTipInFight        = false,
 	bTempTargetEnable      = false,
