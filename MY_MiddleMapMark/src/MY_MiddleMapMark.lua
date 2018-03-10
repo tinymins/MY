@@ -9,7 +9,7 @@
 -----------------------------------------------
 MY.CreateDataRoot(MY_DATA_PATH.GLOBAL)
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_MiddleMapMark/lang/")
-local l_szKeyword, l_dwMapID = ""
+local l_szKeyword, l_dwMapID, l_nMapIndex = ""
 local SZ_DB_PATH = MY.FormatPath({"cache/npc_doodad_rec.v2.db", MY_DATA_PATH.GLOBAL})
 local DB = SQLite3_Open(SZ_DB_PATH)
 if not DB then
@@ -415,11 +415,12 @@ function MY_MiddleMapMark.Search(szKeyword)
 	end
 
 	local dwMapID = MiddleMap.dwMapID or player.GetMapID()
-	if l_dwMapID == dwMapID and l_szKeyword == szKeyword then
+	local nMapIndex = MiddleMap.nIndex
+	if l_dwMapID == dwMapID and l_nMapIndex == nMapIndex and l_szKeyword == szKeyword then
 		return
 	end
 	l_renderTime = GetTime()
-	l_dwMapID, l_szKeyword = dwMapID, szKeyword
+	l_dwMapID, l_nMapIndex, l_szKeyword = dwMapID, nMapIndex, szKeyword
 
 	local hInner = frame:Lookup("", "Handle_Inner")
 	local nW, nH = hInner:GetSize()
