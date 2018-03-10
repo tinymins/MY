@@ -120,6 +120,9 @@ local function ReloadFrame(frame)
 		local hBox         = hItem:Lookup("Handle_Box")
 		local box          = hBox:Lookup("Box_Default")
 		local imgBoxBg     = hBox:Lookup("Image_BoxBg")
+		local txtTime      = hBox:Lookup("Text_Time")
+		local txtHotkey    = hBox:Lookup("Text_Hotkey")
+		local txtStackNum  = hBox:Lookup("Text_StackNum")
 		local txtShortName = hBox:Lookup("Text_ShortName")
 		local hCDBar       = hItem:Lookup("Handle_Bar")
 		local txtProcess   = hCDBar:Lookup("Text_Process")
@@ -129,6 +132,9 @@ local function ReloadFrame(frame)
 		-- 建立高速索引
 		hItem.box = box
 		hItem.mon = mon
+		hItem.txtTime      = txtTime
+		hItem.txtHotkey    = txtHotkey
+		hItem.txtStackNum  = txtStackNum
 		hItem.txtProcess   = txtProcess
 		hItem.imgProcess   = imgProcess
 		hItem.txtName      = txtName
@@ -176,14 +182,11 @@ local function ReloadFrame(frame)
 		box:SetObjectCoolDown(true)
 		box:SetCoolDownPercentage(0)
 		-- BUFF时间
-		box:SetOverTextPosition(1, ITEM_POSITION.LEFT_TOP)
-		box:SetOverTextFontScheme(1, 15)
+		txtTime:SetFontScheme(15)
 		-- BUFF层数
-		box:SetOverTextPosition(0, ITEM_POSITION.RIGHT_BOTTOM)
-		box:SetOverTextFontScheme(0, 15)
+		txtStackNum:SetFontScheme(15)
 		-- 快捷键
-		box:SetOverTextPosition(2, ITEM_POSITION.LEFT_BOTTOM)
-		box:SetOverTextFontScheme(2, 7)
+		txtHotkey:SetFontScheme(7)
 		-- Box背景图
 		if config.boxBgUITex ~= "" then
 			XGUI(imgBoxBg):image(config.boxBgUITex)
@@ -205,12 +208,17 @@ local function ReloadFrame(frame)
 			box.SetOverText = function(box, nIndex, szText, ...)
 				if nIndex == 3 then
 					if szText == '' then
+						txtTime:SetText('')
 						txtProcess:SetText('')
 					else
-						txtProcess:SetText(szText .. "'")
+						txtTime:SetText(szText)
+						txtProcess:SetText(szText)
 					end
+				elseif nIndex == 1 then
+					txtStackNum:SetText(szText)
+				else
+					box:__SetOverText(nIndex, szText, ...)
 				end
-				box:__SetOverText(nIndex, szText, ...)
 			end
 		end
 
@@ -219,6 +227,9 @@ local function ReloadFrame(frame)
 		if config.ignoreSystemUIScale then
 			fontScale = fontScale / (1 + Font.GetOffset() * 0.07)
 		end
+		txtTime:SetFontScale(fontScale * 1.2)
+		txtHotkey:SetFontScale(fontScale)
+		txtStackNum:SetFontScale(fontScale)
 		if config.cdBar then
 			txtProcess:SetW(config.cdBarWidth - 10)
 			txtProcess:SetText("")
@@ -450,8 +461,8 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 		l_tBuffTime[KTarget.dwID][buff.dwID][buff.nLevel][buff.nStackNum] = nBuffTime
 		-- 倒计时 与 BUFF层数堆叠
 		hItem.txtProcess:SetText(szTimeLeft)
-		hItem.box:SetOverText(1, szTimeLeft)
-		hItem.box:SetOverText(0, buff.nStackNum == 1 and "" or buff.nStackNum)
+		hItem.txtTime:SetText(szTimeLeft)
+		hItem.txtStackNum:SetText(buff.nStackNum == 1 and "" or buff.nStackNum)
 		-- CD百分比
 		local fPercent = nTimeLeft / nBuffTime
 		hItem.imgProcess:SetPercentage(fPercent)
