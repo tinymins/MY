@@ -2566,7 +2566,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y, w = 220,
 		text = _L["Feedback @nangongbo"],
 		onclick = function()
-			XGUI.OpenIE("https://weibo.com/nangongbo")
+			XGUI.OpenBrowser("https://weibo.com/nangongbo")
 		end,
 	}, true):autoHeight():width()
 	y = y + 28

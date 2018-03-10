@@ -4187,6 +4187,10 @@ function XGUI.OpenIE(szAddr, bDisableSound, w, h)
 	return webPage
 end
 
+function XGUI.OpenBrowser(szAddr)
+	OpenBrowser(szAddr)
+end
+
 function XGUI.ResizeIE(frame, w, h)
 	if w < 400 then w = 400 end
 	if h < 200 then h = 200 end

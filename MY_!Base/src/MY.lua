@@ -930,19 +930,19 @@ function MY.SwitchTab(szID, bForceUpdate)
 		ui:append("Text", {
 			name = 'Text_ChangeLog',
 			x = 10, y = 325, w = 80, font = 204, text = _L['change log'], alpha = 190,
-			onclick = function() XGUI.OpenIE("https://cdn.rawgit.com/tinymins/MY/master/changelog.html?_=" .. GetCurrentTime(), false, 600, 800) end,
+			onclick = function() XGUI.OpenBrowser("https://cdn.rawgit.com/tinymins/MY/master/changelog.html?_=" .. GetCurrentTime()) end,
 			onhover = function(bIn) this:SetAlpha(bIn and 255 or 190) end,
 		})
 		ui:append("Text", {
 			name = 'Text_Serendipity',
 			x = 90, y = 325, w = 80, font = 204, text = _L['serendipity'], alpha = 190,
-			onclick = function() XGUI.OpenIE("https://jx3.derzh.com/serendipity/", false, 500, 800) end,
+			onclick = function() XGUI.OpenBrowser("https://jx3.derzh.com/serendipity/") end,
 			onhover = function(bIn) this:SetAlpha(bIn and 255 or 190) end,
 		})
 		ui:append("Text", {
 			name = 'Text_OnlineTime',
 			x = 90, y = 325, w = 80, font = 204, text = _L['online time'], alpha = 190,
-			onclick = function() XGUI.OpenIE("https://jx3.derzh.com/onlinetime/", false, 500, 800) end,
+			onclick = function() XGUI.OpenBrowser("https://jx3.derzh.com/onlinetime/") end,
 			onhover = function(bIn) this:SetAlpha(bIn and 255 or 190) end,
 		})
 		ui:append("Text", { name = 'Text_Svr', x = 10, y = 345, w = 557, font = 204, text = MY.GetServer() .. " (" .. MY.GetRealServer() .. ")", alpha = 220 })
@@ -1094,7 +1094,7 @@ function MY.OnLButtonClick()
 	if name == "Btn_Close" then
 		MY.ClosePanel()
 	elseif name == "Btn_Weibo" then
-		XGUI.OpenIE("https://weibo.com/zymah")
+		XGUI.OpenBrowser("https://weibo.com/zymah")
 	end
 end
 
