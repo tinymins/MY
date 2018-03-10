@@ -380,11 +380,11 @@ local MAX_DISPLAY_COUNT = 1000
 local function OnMMMItemMouseEnter()
 	local x, y = this:GetAbsPos()
 	local w, h = this:GetSize()
-	local szTip = this.decoded and this.name or UTF8ToAnsi(this.name) ..
-	((this.level and this.level > 0 and ' lv.' .. this.level) or '') ..
-	((this.title and this.title ~= '' and '\n<' .. (this.decoded and this.title or UTF8ToAnsi(this.title)) .. '>') or '')
+	local szTip = (this.decoded and this.name or UTF8ToAnsi(this.name))
+		.. (this.level and this.level > 0 and (' lv.' .. this.level) or '')
+		.. (this.title and this.title ~= '' and ('\n<' .. (this.decoded and this.title or UTF8ToAnsi(this.title)) .. '>') or '')
 	if IsCtrlKeyDown() then
-		szTip = szTip .. ((this.templateid and '\n' .. this.type .. ' Template ID: ' .. this.templateid))
+		szTip = szTip .. (this.templateid and ('\n' .. this.type .. ' Template ID: ' .. this.templateid) or '')
 	end
 	OutputTip(GetFormatText(szTip, 136), 450, {x, y, w, h}, ALW.TOP_BOTTOM)
 end
