@@ -86,6 +86,8 @@ end
 local l_npc = {}
 local l_doodad = {}
 local l_tempMap = false
+local l_renderTime = 0
+local MAX_RENDER_INTERVAL = GLOBAL.GAME_FPS * 5
 local function PushDB()
 	if empty(l_npc) and empty(l_doodad) then
 		return
@@ -133,10 +135,20 @@ local function OnExit()
 end
 MY.RegisterExit("MY_MiddleMapMark_Save", OnExit)
 
+local function Rerender()
+	MY_MiddleMapMark.Search(l_szKeyword)
+end
+
+local function AutomaticRerender()
+	if GetTime() - l_renderTime > MAX_RENDER_INTERVAL then
+		Rerender()
+	elseif not MY.DelayCall("MY_MiddleMapMark_Refresh") then
+		MY.DelayCall("MY_MiddleMapMark_Refresh", MAX_RENDER_INTERVAL, Rerender)
+	end
+end
+
 local NpcTpl = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_MiddleMapMark/data/npc/$lang.jx3dat")
 local DoodadTpl = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_MiddleMapMark/data/doodad/$lang.jx3dat")
-local m_nLastRedrawFrame = GetLogicFrameCount()
-local MARK_RENDER_INTERVAL = GLOBAL.GAME_FPS * 5
 local function OnNpcEnterScene()
 	if l_tempMap and MY.IsShieldedVersion() then
 		return
@@ -177,10 +189,7 @@ local function OnNpcEnterScene()
 		templateid = npc.dwTemplateID,
 	}
 	-- redraw ui
-	-- if GetLogicFrameCount() - m_nLastRedrawFrame > MARK_RENDER_INTERVAL then
-	-- 	m_nLastRedrawFrame = GetLogicFrameCount()
-	-- 	MY_MiddleMapMark.Search(_Cache.szKeyword)
-	-- end
+	AutomaticRerender()
 end
 MY.RegisterEvent("NPC_ENTER_SCENE.MY_MIDDLEMAPMARK", OnNpcEnterScene)
 
@@ -239,10 +248,7 @@ local function OnDoodadEnterScene()
 		templateid = doodad.dwTemplateID,
 	}
 	-- redraw ui
-	-- if GetLogicFrameCount() - m_nLastRedrawFrame > MARK_RENDER_INTERVAL then
-	-- 	m_nLastRedrawFrame = GetLogicFrameCount()
-	-- 	MY_MiddleMapMark.Search(_Cache.szKeyword)
-	-- end
+	AutomaticRerender()
 end
 MY.RegisterEvent("DOODAD_ENTER_SCENE.MY_MIDDLEMAPMARK", OnDoodadEnterScene)
 
@@ -304,6 +310,16 @@ end
 -- ÖÐµØÍ¼HOOK
 ---------------------------------------------------------------
 -- HOOK MAP SWITCH
+if MiddleMap._MY_MMM_ShowMap == nil then
+	MiddleMap._MY_MMM_ShowMap = MiddleMap.ShowMap or false
+end
+MiddleMap.ShowMap = function(...)
+	if MiddleMap._MY_MMM_ShowMap then
+		MiddleMap._MY_MMM_ShowMap(...)
+	end
+	MY_MiddleMapMark.Search(l_szKeyword)
+end
+
 if MiddleMap._MY_MMM_UpdateCurrentMap == nil then
 	MiddleMap._MY_MMM_UpdateCurrentMap = MiddleMap.UpdateCurrentMap or false
 end
@@ -402,6 +418,7 @@ function MY_MiddleMapMark.Search(szKeyword)
 	if l_dwMapID == dwMapID and l_szKeyword == szKeyword then
 		return
 	end
+	l_renderTime = GetTime()
 	l_dwMapID, l_szKeyword = dwMapID, szKeyword
 
 	local hInner = frame:Lookup("", "Handle_Inner")
