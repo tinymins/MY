@@ -271,8 +271,7 @@ function MY_MiddleMapMark.SearchNpc(szText, dwMapID)
 		end
 	end
 	for _, info in pairs(l_npc) do
-		if wstring.find(info.name, szText)
-		or wstring.find(info.title, szText) then
+		if info.mapid == dwMapID and (wstring.find(info.name, szText) or wstring.find(info.title, szText)) then
 			table.insert(aInfos, 1, info)
 		end
 	end
