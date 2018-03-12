@@ -428,7 +428,7 @@ function CTM_Party_Base.OnItemLButtonClick()
 		return
 	end
 	if IsAltKeyDown() then
-		if this.bBuff then
+		if this.bBuff and CFG.bBuffAltPublish then
 			MY.Talk(
 				PLAYER_TALK_CHANNEL.RAID,
 				_L(

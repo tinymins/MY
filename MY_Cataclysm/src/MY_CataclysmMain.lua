@@ -2518,7 +2518,17 @@ function PS.OnPanelActive(frame)
 			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width() + 5
-	y = y + 28
+
+	x = X
+	y = y + 30
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y, text = _L["Alt Click Publish"],
+		checked = Cataclysm_Main.bBuffAltPublish,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bBuffAltPublish = bCheck
+		end,
+	}, true):autoWidth():width() + 5
+	y = y + 30
 
 	x = X
 	x = x + ui:append("WndCheckBox", {
@@ -2532,7 +2542,7 @@ function PS.OnPanelActive(frame)
 			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width() + 5
-	y = y + 28
+	y = y + 30
 
 	x = X
 	x = x + ui:append("WndCheckBox", {

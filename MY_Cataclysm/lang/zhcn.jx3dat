@@ -109,6 +109,7 @@ data = {
 	["Target assist no delay."] = "鼠标移入立即选中。",
 	["Alpha: %d."] = "透明度：%d。",
 	["More than %d meter"] = "%d尺以上",
+	["Alt Click Publish"] = "按住ALT点击快速发布到团队",
 	["Enable default data"] = "启用默认数据",
 	["Default data TIP"] = "含重要BUFF满足团员团长基本需求",
 	["Cmd data"] = "指挥辅助",

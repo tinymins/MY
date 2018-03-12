@@ -51,6 +51,7 @@ data = {
 	bShowBuffTime          = true,
 	bShowBuffNum           = true,
 	bShowBuffReminder      = true,
+	bBuffAltPublish        = true,
 	bBuffDataOfficial      = false,
 	bBuffDataNangongbo     = true,
 	bBuffDataNangongboCmd  = false,
