@@ -369,7 +369,7 @@ function D.LoadConfig(bDefault, bOriginal)
 			end
 		end
 		if not exist then
-			insert(Config, 1, { uuid = embedded.uuid, monitors = {} })
+			insert(Config, 1, { uuid = embedded.uuid, monitors = {}, enable = false })
 		end
 	end
 	-- 格式化数据
