@@ -1,11 +1,11 @@
 data = {
 	{dwID=11742},--雷击---锻刀厅
-	{dwID=11657},--浴火---锻刀厅
-	{dwID=11658},--浸寒---锻刀厅
-	{dwID=11652},--御海刀气---锻刀厅
-	{dwID=11756},--慢性毒药---锻刀厅
+	{dwID=11657,szStackOp=">=",nStackNum=3},--浴火---锻刀厅
+	{dwID=11658,szStackOp=">=",nStackNum=3},--浸寒---锻刀厅
+	{dwID=11652,col="#FFFF00FF",szReminder="御",nPriority=3},--御海刀气---锻刀厅
+	{dwID=11756,szStackOp=">=",nStackNum=15},--慢性毒药---锻刀厅
 	{dwID=11606},--剧毒---锻刀厅
-	{dwID=11694},--喋骨---锻刀厅
+	{dwID=11694,col="#FFFF00FF",szReminder="喋",nPriority=3},--喋骨---锻刀厅
 	{dwID=11612},--封髓劲---千雷殿
 	{dwID=11760},--破甲---千雷殿
 	{dwID=11804},--灼烧·焰---千雷殿
@@ -14,13 +14,13 @@ data = {
 	{dwID=11953},--水邪---千雷殿
 	{dwID=11952},--焦黑灼伤---千雷殿
 	{dwID=11960},--淬水之寒---千雷殿
-	{dwID=11918},--雷鸣---千雷殿
-	{dwID=11553},--崩雷---千雷殿
+	{dwID=11918,szStackOp=">=",nStackNum=2},--雷鸣---千雷殿
+	{dwID=11553,szStackOp=">=",nStackNum=3},--崩雷---千雷殿
 	{dwID=11556},--狂雷---千雷殿
 	{dwID=12039},--化仙---战兽山
 	{dwID=12601},--眩晕---战兽山
 	{dwID=12423},--骨刺---战兽山
-	{dwID=12395},--骨髓血毒---战兽山
+	{dwID=12395,szStackOp=">=",nStackNum=2},--骨髓血毒---战兽山
 	{dwID=12194,col="#8055FFFF",szReminder="潜",nPriority=3},--潜伏之种---战兽山
 	{dwID=12253,col="#FF00FFFF",szReminder="擒",nPriority=3},--被擒---战兽山
 	{dwID=12142},--地陷吸收---燕然峰
@@ -38,15 +38,15 @@ data = {
 	{dwID=10653,col="#FFFF00FF",szReminder="挑",nPriority=3},--挑衅---观风殿
 	{dwID=10547,col="#FFFFFFFF",szReminder="箭",nPriority=3},--箭气---观风殿
 	{dwID=10940,col="#FF3232FF",szReminder="碧",nPriority=3},--碧落斩---观风殿
-	{dwID=10585,col="#FF00FFFF",szReminder="花",nPriority=3},--花毒---双曜亭
-	{dwID=10584,col="#8055FFFF",szReminder="蛛",nPriority=3},--蛛毒---双曜亭
+	{dwID=10585,col="#FF00FFFF",szReminder="花",nPriority=3,szStackOp=">=",nStackNum=1},--花毒---双曜亭
+	{dwID=10584,col="#8055FFFF",szReminder="蛛",nPriority=3,szStackOp=">=",nStackNum=3},--蛛毒---双曜亭
 	{dwID=11230},--裂足---双曜亭
 	{dwID=11215},--穿体---双曜亭
 	{dwID=10871},--裂骨---双曜亭
 	{dwID=10920,col="#FFFF00FF",szReminder="破",nPriority=3},--破甲---双曜亭
-	{dwID=10870},--暗伤---双曜亭
+	{dwID=10870,szStackOp=">=",nStackNum=2},--暗伤---双曜亭
 	{dwID=9535,col="#FF00FFFF",szReminder="缚",nPriority=3},--舞天缚---仙侣庭院
-	{dwID=9371,col="#8055FFFF",szReminder="意",nPriority=3},--青冥意---仙侣庭院
+	{dwID=9371,col="#8055FFFF",szReminder="意",nPriority=3,szStackOp=">=",nStackNum=10},--青冥意---仙侣庭院
 	{dwID=9778},--入八荒---仙侣庭院
 	{dwID=9420},--经脉麻痹---仙侣庭院
 	{dwID=9213,col="#FF00FFFF",szReminder="镇",nPriority=3},--紫金钵·镇---仙侣庭院
@@ -57,30 +57,30 @@ data = {
 	{dwID=9122},--盾击---仙侣庭院
 	{dwID=9239,col="#FF00FFFF",szReminder="破",nPriority=3},--破敌---仙侣庭院
 	{dwID=9429},--锁定---仙侣庭院
-	{dwID=9189,col="#FFFF00FF",szReminder="绝",nPriority=3},--绝脉劲---仙侣庭院
+	{dwID=9189,col="#FFFF00FF",szReminder="绝",nPriority=3,szStackOp=">=",nStackNum=4},--绝脉劲---仙侣庭院
 	{dwID=9661},--落英锁定---花月别院
 	{dwID=9664},--幻魔附体---花月别院
 	{dwID=8885},--错筋---花月别院
-	{dwID=9662,col="#0096FFFF",szReminder="缠",nPriority=3},--音缠---花月别院
+	{dwID=9662,col="#0096FFFF",szReminder="缠",nPriority=3,szStackOp=">=",nStackNum=5},--音缠---花月别院
 	{dwID=8981,col="#FFFF00FF",szReminder="月",nPriority=3},--月满---花月别院
 	{dwID=8975,col="#FF3232FF",szReminder="烈",nPriority=3},--烈明---花月别院
 	{dwID=8896},--灼君---花月别院
 	{dwID=1866},--碎星辰---宫中神武遗迹
 	{dwID=5195},--虚弱---南诏皇宫
 	{dwID=5157},--绞喉---南诏皇宫
-	{dwID=7184},--风暴之眼---血战天策
+	{dwID=7184,szStackOp=">=",nStackNum=10},--风暴之眼---血战天策
 	{dwID=6549,col="#FF3232FF",szReminder="怒",nPriority=3},--天怒---血战天策
 	{dwID=6936},--闪舞刺---血战天策
 	{dwID=8346},--火燎---夜守孤城
 	{dwID=8343},--瞄准---夜守孤城
 	{dwID=8084},--威慑---夜守孤城
-	{dwID=8028,col="#FF800000",szReminder="碎",nPriority=4},--碎甲---逐虎驱狼
+	{dwID=8028,col="#FF800000",szReminder="碎",nPriority=4,szStackOp=">=",nStackNum=2},--碎甲---逐虎驱狼
 	{dwID=8319},--回龙碎甲---逐虎驱狼
 	{dwID=8352},--锯骨---逐虎驱狼
 	{dwID=8312},--腐血狂乱---逐虎驱狼
 	{dwID=8215},--气血翻涌---逐虎驱狼
-	{dwID=7993,col="#FF323200",szReminder="声",nPriority=4},--声啸九天---逐虎驱狼
-	{dwID=7992,col="#0096FF00",szReminder="弦",nPriority=4},--弦音天籁---逐虎驱狼
+	{dwID=7993,col="#FF323200",szReminder="声",nPriority=4,szStackOp=">=",nStackNum=9},--声啸九天---逐虎驱狼
+	{dwID=7992,col="#0096FF00",szReminder="弦",nPriority=4,szStackOp=">=",nStackNum=9},--弦音天籁---逐虎驱狼
 	{dwID=8170,col="#FF323200",szReminder="莲",nPriority=4},--莲花指---逐虎驱狼
 	{dwID=8172,col="#0096FF00",szReminder="莲",nPriority=4},--莲花指---逐虎驱狼
 	{dwID=8174},--音波冲击---逐虎驱狼
@@ -89,11 +89,11 @@ data = {
 	{dwID=8039,col="#FF3232FF",szReminder="圣",nPriority=3},--圣炎---逐虎驱狼
 	{dwID=8040,col="#00FFFFFF",szReminder="寒",nPriority=3},--寒意---逐虎驱狼
 	{dwID=8036,col="#FFFF0000",szReminder="瞄",nPriority=4},--瞄准---逐虎驱狼
-	{dwID=8029,col="#FF323200",szReminder="流",nPriority=4},--流血---逐虎驱狼
+	{dwID=8029,col="#FF323200",szReminder="流",nPriority=4,szStackOp=">=",nStackNum=2},--流血---逐虎驱狼
 	{dwID=8010},--战斗标记---逐虎驱狼
 	{dwID=7554,col="#00FFFFFF",szReminder="转",nPriority=3},--阴阳易转---风雪稻香村
-	{dwID=6927},--金蛇毒---秦皇陵
-	{dwID=7486,col="#0096FF00",szReminder="迟",nPriority=4},--步迟---秦皇陵
+	{dwID=6927,szStackOp=">=",nStackNum=2},--金蛇毒---秦皇陵
+	{dwID=7486,col="#0096FF00",szReminder="迟",nPriority=4,szStackOp=">=",nStackNum=6},--步迟---秦皇陵
 	{dwID=7488},--火灵---秦皇陵
 	{dwID=377},--镇山河---纯阳
 	{dwID=4439},--贪魔体---明教
@@ -105,41 +105,41 @@ data = {
 	{dwID=6163},--守如山---天策
 	{dwID=203},--啸如虎---天策
 	{dwID=360},--御---天策
-	{dwID=6636},--圣手织天---五毒
-	{dwID=2316,bOnlySelf=true,nPriority=4},--蛊惑众生---五毒
-	{dwID=681,bOnlySelf=true,nPriority=4},--上元点鬟---七秀
-	{dwID=676,bOnlySelf=true,nPriority=4},--雨霖铃---七秀
-	{dwID=680,bOnlySelf=true,nPriority=4},--翔舞---七秀
-	{dwID=1727,bOnlySelf=true,nPriority=4},--梦冧---七秀
-	{dwID=113},--碧水滔天---万花
+	{dwID=6636,col="#00FF0000",szReminder="圣",nPriority=4},--圣手织天---五毒
+	{dwID=2316,bOnlySelf=true,col="#FF323200",szReminder="惑",nPriority=5},--蛊惑众生---五毒
+	{dwID=681,bOnlySelf=true,nPriority=5},--上元点鬟---七秀
+	{dwID=676,bOnlySelf=true,nPriority=5},--雨霖铃---七秀
+	{dwID=680,bOnlySelf=true,nPriority=5},--翔舞---七秀
+	{dwID=1727,bOnlySelf=true,nPriority=5},--梦冧---七秀
+	{dwID=113,col="#00FF0000",szReminder="碧",nPriority=4},--碧水滔天---万花
 	{dwID=122},--春泥护花---万花
 	{dwID=6264},--春泥护花---万花
 	{dwID=6257},--春泥护花---万花
 	{dwID=11920},--春泥护花---万花
-	{dwID=631,bOnlySelf=true,nPriority=4},--握针---万花
-	{dwID=1105,bOnlySelf=true,nPriority=4},--握针---万花
-	{dwID=1551,bOnlySelf=true,nPriority=4},--握针---万花
-	{dwID=2107,bOnlySelf=true,nPriority=4},--握针---万花
-	{dwID=3110,bOnlySelf=true,nPriority=4},--握针---万花
-	{dwID=3170,bOnlySelf=true,nPriority=4},--握针---万花
-	{dwID=3744,bOnlySelf=true,nPriority=4},--握针---万花
-	{dwID=7052,bOnlySelf=true,nPriority=4},--握针---万花
+	{dwID=631,bOnlySelf=true,nPriority=5},--握针---万花
+	{dwID=1105,bOnlySelf=true,nPriority=5},--握针---万花
+	{dwID=1551,bOnlySelf=true,nPriority=5},--握针---万花
+	{dwID=2107,bOnlySelf=true,nPriority=5},--握针---万花
+	{dwID=3110,bOnlySelf=true,nPriority=5},--握针---万花
+	{dwID=3170,bOnlySelf=true,nPriority=5},--握针---万花
+	{dwID=3744,bOnlySelf=true,nPriority=5},--握针---万花
+	{dwID=7052,bOnlySelf=true,nPriority=5},--握针---万花
 	{dwID=9933,col="#00FF00FF",szReminder="笼",nPriority=3},--笼花---万花
-	{dwID=5693,bOnlySelf=true,nPriority=4},--述怀---万花
-	{dwID=9334,bOnlySelf=true,nPriority=4},--梅花三弄---长歌
+	{dwID=5693,bOnlySelf=true,nPriority=5},--述怀---万花
+	{dwID=9334,bOnlySelf=true,col="#00FF0000",szReminder="梅",nPriority=5},--梅花三弄---长歌
 	{dwID=9544,col="#00FF00FF",szReminder="笑",nPriority=3},--笑傲光阴---长歌
 	{dwID=9265,col="#00FF00FF",szReminder="云",nPriority=3},--云生结海---长歌
-	{dwID=9459,bOnlySelf=true,nPriority=4},--商---长歌
-	{dwID=9460,bOnlySelf=true,nPriority=4},--商---长歌
-	{dwID=9461,bOnlySelf=true,nPriority=4},--商---长歌
-	{dwID=9462,bOnlySelf=true,nPriority=4},--商---长歌
-	{dwID=9463,bOnlySelf=true,nPriority=4},--角---长歌
-	{dwID=9464,bOnlySelf=true,nPriority=4},--角---长歌
-	{dwID=9465,bOnlySelf=true,nPriority=4},--角---长歌
-	{dwID=9466,bOnlySelf=true,nPriority=4},--角---长歌
-	{dwID=9336,bOnlySelf=true,nPriority=4},--寒梅---长歌
-	{dwID=9337,bOnlySelf=true,nPriority=4},--寒梅---长歌
-	{dwID=9335,bOnlySelf=true,nPriority=4},--落梅---长歌
+	{dwID=9459,bOnlySelf=true,nPriority=5},--商---长歌
+	{dwID=9460,bOnlySelf=true,nPriority=5},--商---长歌
+	{dwID=9461,bOnlySelf=true,nPriority=5},--商---长歌
+	{dwID=9462,bOnlySelf=true,nPriority=5},--商---长歌
+	{dwID=9463,bOnlySelf=true,nPriority=5},--角---长歌
+	{dwID=9464,bOnlySelf=true,nPriority=5},--角---长歌
+	{dwID=9465,bOnlySelf=true,nPriority=5},--角---长歌
+	{dwID=9466,bOnlySelf=true,nPriority=5},--角---长歌
+	{dwID=9336,bOnlySelf=true,col="#00FF0000",szReminder="寒",nPriority=5},--寒梅---长歌
+	{dwID=9337,bOnlySelf=true,col="#00FF0000",szReminder="寒",nPriority=5},--寒梅---长歌
+	{dwID=9335,bOnlySelf=true,col="#FF323200",szReminder="落",nPriority=5},--落梅---长歌
 	{dwID=2313},--凤凰蛊---五毒
 
 }

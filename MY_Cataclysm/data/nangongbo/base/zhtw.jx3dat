@@ -1,15 +1,15 @@
 data = {
 	{dwID=11771,col="#FF3232FF",szReminder="蛇",nPriority=2,bAttention=true},--蛇毒---鍛刀廳
 	{dwID=11763},--內傷---鍛刀廳
-	{dwID=11661,col="#FF3232FF",szReminder="火",nPriority=2,bAttention=true},--火力---鍛刀廳
-	{dwID=11662,col="#00FFFFFF",szReminder="寒",nPriority=2,bAttention=true},--寒力---鍛刀廳
-	{dwID=11644,col="#FF00FFFF",szReminder="鎖",nPriority=2,bAttention=true},--鎖魂刀---鍛刀廳
+	{dwID=11661,col="#FF3232FF",szReminder="火",nPriority=0,bAttention=true,bCaution=true},--火力---鍛刀廳
+	{dwID=11662,col="#00FFFFFF",szReminder="寒",nPriority=0,bAttention=true,bCaution=true},--寒力---鍛刀廳
+	{dwID=11644,col="#FF00FFFF",szReminder="鎖",nPriority=0,bAttention=true,bCaution=true},--鎖魂刀---鍛刀廳
 	{dwID=11752},--中陷---鍛刀廳
 	{dwID=11897,col="#FF00FFFF",szReminder="導",nPriority=2,bAttention=true},--導電---千雷殿
 	{dwID=10790},--烈風勁---白帝水宮
-	{dwID=10780},--冰結---白帝水宮
-	{dwID=10778,col="#FF3232FF",szReminder="霜",nPriority=0,bAttention=true,bCaution=true},--大道一心·霜印---白帝水宮
-	{dwID=10853,col="#0096FFFF",szReminder="極",nPriority=3},--極寒---白帝水宮
+	{dwID=10780,col="#FFFF00FF",szReminder="冰",nPriority=1,bCaution=true},--冰結---白帝水宮
+	{dwID=10778,col="#FF00FFFF",szReminder="霜",nPriority=0,bAttention=true,bCaution=true},--大道一心·霜印---白帝水宮
+	{dwID=10853,col="#00FFFFFF",szReminder="極",nPriority=3},--極寒---白帝水宮
 	{dwID=11092},--楓之傷---夕顔閣
 	{dwID=11848},--烈陽---刀輪海廳
 	{dwID=11616},--亂---刀輪海廳
@@ -32,9 +32,15 @@ data = {
 	{dwID=12187},--毒刺---銀霧湖
 	{dwID=12198},--蠱毒---銀霧湖
 	{dwID=12272},--傷口開裂---銀霧湖
-	{dwID=12375},--傀儡絲纏---稻香秘事
+	{dwID=12375,col="#8055FFFF",szReminder="纏",nPriority=3},--傀儡絲纏---稻香秘事
+	{dwID=12671,col="#FF3232FF",szReminder="注",nPriority=1,bCaution=true},--被董龍注視---稻香秘事
+	{dwID=12346},--震暈---稻香秘事
+	{dwID=12376},--傀儡·標記---稻香秘事
+	{dwID=12218},--水鏈纏繞---戰獸山
+	{dwID=12381,col="#FF00FF00",szReminder="亡",nPriority=4},--亡骨血毒---戰獸山
+	{dwID=12424,col="#FF323200",szReminder="暗",nPriority=4},--暗流劇毒---戰獸山
 	{dwID=12237,col="#FFFF00FF",szReminder="穿",nPriority=2,bAttention=true},--穿刺---戰獸山
-	{dwID=12029,col="#FF3232FF",szReminder="瘡",nPriority=1,bCaution=true},--寄生濃瘡---戰獸山
+	{dwID=12029,col="#FF3232FF",szReminder="瘡",nPriority=1,bCaution=true,szStackOp=">=",nStackNum=3},--寄生濃瘡---戰獸山
 	{dwID=12202,col="#FF00FFFF",szReminder="寄",nPriority=1,bCaution=true},--寄生之種---戰獸山
 	{dwID=12193,col="#FF3232FF",szReminder="荊",nPriority=2,bAttention=true},--荊棘之種---戰獸山
 	{dwID=12259,col="#8055FFFF",szReminder="纏",nPriority=2,bAttention=true},--屍毒纏繞---戰獸山
@@ -100,6 +106,11 @@ data = {
 	{dwID=4001,col="#FF3232FF",szReminder="拉",nPriority=2,bAttention=true},--拉人判定---燭龍殿
 	{dwID=3984,col="#00FFFFFF",szReminder="萬",nPriority=3},--萬毒噬骨---燭龍殿
 	{dwID=3971,col="#FFFF00FF",szReminder="噬",nPriority=2,bAttention=true},--噬脈蠱---燭龍殿
+	{dwID=3769},--破裂---燭龍殿
+	{dwID=3974,szStackOp=">=",nStackNum=5},--腐蝕---燭龍殿
+	{dwID=3978},--淬毒---燭龍殿
+	{dwID=4008,col="#FF323200",szReminder="封",nPriority=4},--封鎖---燭龍殿
+	{dwID=3976,col="#00FFFF00",szReminder="吸",nPriority=4},--吸魂功---燭龍殿
 	{dwID=4066,col="#8055FFFF",szReminder="毒",nPriority=3},--毒蠱---燭龍殿
 	{dwID=3799,col="#FF3232FF",szReminder="瞄",nPriority=1,bCaution=true},--瞄准---會戰唐門
 	{dwID=3808,col="#00FFFFFF",szReminder="煞",nPriority=3},--狼煞---會戰唐門
@@ -117,12 +128,13 @@ data = {
 	{dwID=5513,col="#FFFF00FF",szReminder="追",nPriority=1,bCaution=true},--追擊---大明宮
 	{dwID=5701,col="#00FFFF00",szReminder="殇",nPriority=4},--夜殇---大明宮
 	{dwID=5522,col="#FF3232FF",szReminder="血",nPriority=0,bAttention=true,bCaution=true},--血重樓---大明宮
+	{dwID=5632,col="#00FF0000",szReminder="火",nPriority=4},--火把---大明宮
 	{dwID=5084,col="#FFFF00FF",szReminder="牢",nPriority=2,bAttention=true},--牢籠被鎖---南诏皇宮
 	{dwID=5081},--魁龍氣---南诏皇宮
 	{dwID=5096,col="#FF3232FF",szReminder="精",nPriority=0,bAttention=true,bCaution=true},--精准射殺---南诏皇宮
 	{dwID=5079,col="#00FFFFFF",szReminder="散",nPriority=2,bAttention=true},--致死散射---南诏皇宮
 	{dwID=4378,col="#FFFF00FF",szReminder="鍾",nPriority=1,bCaution=true},--點名撞鍾---南诏皇宮
-	{dwID=4314,col="#00FFFFFF",szReminder="霜",nPriority=3},--冰霜---南诏皇宮
+	{dwID=4314,col="#00FFFFFF",szReminder="霜",nPriority=3,szStackOp=">=",nStackNum=6},--冰霜---南诏皇宮
 	{dwID=4637,col="#FF8000FF",szReminder="追",nPriority=1,bCaution=true},--追擊---南诏皇宮
 	{dwID=4310},--龍象波諾---南诏皇宮
 	{dwID=4899,col="#FF00FF00",szReminder="盾",nPriority=4},--封魔盾---南诏皇宮
@@ -200,7 +212,7 @@ data = {
 	{dwID=7895,col="#FF3232FF",szReminder="車",nPriority=3},--戰車鎖定---春明門
 	{dwID=7896,col="#FF00FFFF",szReminder="射",nPriority=3},--射擊鎖定---春明門
 	{dwID=7874,col="#00FFFFFF",szReminder="牢",nPriority=3},--畫地爲牢---春明門
-	{dwID=7972,col="#FF3232FF",szReminder="刺",nPriority=3},--地刺---藏寶洞·野人谷
+	{dwID=7972,col="#FF3232FF",szReminder="刺",nPriority=3,szStackOp=">=",nStackNum=2},--地刺---藏寶洞·野人谷
 	{dwID=7962},--怒天刀---藏寶洞·夜狼山
 	{dwID=7973},--火引---藏寶洞·夜狼山
 	{dwID=8322,col="#8055FF00",szReminder="毒",nPriority=4},--中毒---雁門關之役
@@ -215,7 +227,7 @@ data = {
 	{dwID=8912,col="#0096FF00",szReminder="重",nPriority=4},--黑岩重水---璨翠海廳
 	{dwID=8948,col="#FF00FF00",szReminder="截",nPriority=4},--一指截脈---璨翠海廳
 	{dwID=8781,col="#00FFFFFF",szReminder="凍",nPriority=2,bAttention=true},--凍結---天泣林
-	{dwID=8734},--劇毒---天泣林
+	{dwID=8734,szStackOp=">=",nStackNum=4},--劇毒---天泣林
 	{dwID=8752,col="#00FFFFFF",szReminder="傾",nPriority=3},--傾湖雷音---徽山書院
 	{dwID=8773,col="#FF323200",szReminder="牢",nPriority=4},--畫地爲牢---徽山書院
 	{dwID=9024},--刀毒---陰山聖泉

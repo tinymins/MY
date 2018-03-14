@@ -1,12 +1,12 @@
 data = {
 	{dwID=11742},--雷擊---鍛刀廳
-	{dwID=11657},--浴火---鍛刀廳
-	{dwID=11658},--浸寒---鍛刀廳
-	{dwID=11652},--禦海刀氣---鍛刀廳
-	{dwID=11756},--慢性毒藥---鍛刀廳
+	{dwID=11657,szStackOp=">=",nStackNum=3},--浴火---鍛刀廳
+	{dwID=11658,szStackOp=">=",nStackNum=3},--浸寒---鍛刀廳
+	{dwID=11652,col="#FFFF00FF",szReminder="禦",nPriority=3},--禦海刀氣---鍛刀廳
+	{dwID=11756,szStackOp=">=",nStackNum=15},--慢性毒藥---鍛刀廳
 	{dwID=11606},--劇毒---鍛刀廳
 	{dwID=11608,col="#FF00FFFF",szReminder="牽",nPriority=3},--牽絲曼羅---鍛刀廳
-	{dwID=11694},--喋骨---鍛刀廳
+	{dwID=11694,col="#FFFF00FF",szReminder="喋",nPriority=3},--喋骨---鍛刀廳
 	{dwID=11612},--封髓勁---千雷殿
 	{dwID=11760},--破甲---千雷殿
 	{dwID=11804},--灼燒·焰---千雷殿
@@ -16,33 +16,33 @@ data = {
 	{dwID=11953},--水邪---千雷殿
 	{dwID=11952},--焦黑灼傷---千雷殿
 	{dwID=11960},--淬水之寒---千雷殿
-	{dwID=11553},--崩雷---千雷殿
+	{dwID=11553,szStackOp=">=",nStackNum=3},--崩雷---千雷殿
 	{dwID=11556},--狂雷---千雷殿
-	{dwID=11703},--雷擊---千雷殿
+	{dwID=11703,szStackOp=">=",nStackNum=12},--雷擊---千雷殿
 	{dwID=11581},--幻境---千雷殿
 	{dwID=12040},--化羽---戰獸山
 	{dwID=12039},--化仙---戰獸山
 	{dwID=12601},--眩暈---戰獸山
 	{dwID=12423},--骨刺---戰獸山
-	{dwID=12395},--骨髓血毒---戰獸山
-	{dwID=12222},--荊棘之地---戰獸山
+	{dwID=12395,szStackOp=">=",nStackNum=2},--骨髓血毒---戰獸山
+	{dwID=12222,szStackOp=">=",nStackNum=4},--荊棘之地---戰獸山
 	{dwID=12223},--荊棘裹身---戰獸山
 	{dwID=12194,col="#8055FFFF",szReminder="潛",nPriority=3},--潛伏之種---戰獸山
-	{dwID=12258},--屍毒---戰獸山
+	{dwID=12258,szStackOp=">=",nStackNum=3},--屍毒---戰獸山
 	{dwID=12253,col="#FF00FFFF",szReminder="擒",nPriority=3},--被擒---戰獸山
-	{dwID=12261,col="#00ffffFF",szReminder="緩",nPriority=3},--冰塞川·緩---燕然峰
+	{dwID=12261,col="#00ffffFF",szReminder="緩",nPriority=3,szStackOp=">=",nStackNum=6},--冰塞川·緩---燕然峰
 	{dwID=12262},--冰塞川·凍凝---燕然峰
 	{dwID=12132},--蝕體---燕然峰
 	{dwID=12151},--寒絕劍---燕然峰
 	{dwID=12399},--天劍破體·強---燕然峰
 	{dwID=12141},--天劍破體---燕然峰
 	{dwID=12095},--體內---燕然峰
-	{dwID=11073},--奇毒---觀風殿
+	{dwID=11073,szStackOp=">=",nStackNum=7},--奇毒---觀風殿
 	{dwID=11075},--纏絲---觀風殿
 	{dwID=10657},--刺骨---觀風殿
 	{dwID=10557,col="#FF3232FF",szReminder="妒",nPriority=3},--妒夫人---觀風殿
 	{dwID=10570,col="#FF00FFFF",szReminder="命",nPriority=3},--命闇---觀風殿
-	{dwID=10560},--魅惑---觀風殿
+	{dwID=10560,szStackOp=">=",nStackNum=90},--魅惑---觀風殿
 	{dwID=10813},--神識泯滅---觀風殿
 	{dwID=10631},--破甲---觀風殿
 	{dwID=10632},--封脈---觀風殿
@@ -53,23 +53,23 @@ data = {
 	{dwID=10940,col="#FF3232FF",szReminder="碧",nPriority=3},--碧落斬---觀風殿
 	{dwID=10950},--青薔墜---觀風殿
 	{dwID=10956},--壯志淩雲---觀風殿
-	{dwID=10585,col="#FF00FFFF",szReminder="花",nPriority=3},--花毒---雙曜亭
-	{dwID=10584,col="#8055FFFF",szReminder="蛛",nPriority=3},--蛛毒---雙曜亭
+	{dwID=10585,col="#FF00FFFF",szReminder="花",nPriority=3,szStackOp=">=",nStackNum=1},--花毒---雙曜亭
+	{dwID=10584,col="#8055FFFF",szReminder="蛛",nPriority=3,szStackOp=">=",nStackNum=3},--蛛毒---雙曜亭
 	{dwID=11063},--格擋---雙曜亭
 	{dwID=11230},--裂足---雙曜亭
 	{dwID=11215},--穿體---雙曜亭
 	{dwID=10866},--屍毒---雙曜亭
 	{dwID=10871},--裂骨---雙曜亭
 	{dwID=10874},--震懾---雙曜亭
-	{dwID=10870},--暗傷---雙曜亭
+	{dwID=10870,szStackOp=">=",nStackNum=2},--暗傷---雙曜亭
 	{dwID=9535,col="#FF00FFFF",szReminder="縛",nPriority=3},--舞天縛---仙侶庭院
-	{dwID=9371,col="#8055FFFF",szReminder="意",nPriority=3},--青冥意---仙侶庭院
+	{dwID=9371,col="#8055FFFF",szReminder="意",nPriority=3,szStackOp=">=",nStackNum=10},--青冥意---仙侶庭院
 	{dwID=9778},--入八荒---仙侶庭院
 	{dwID=9537},--劍氣殘意---仙侶庭院
 	{dwID=9536},--劍氣殘意---仙侶庭院
 	{dwID=9420},--經脈麻痹---仙侶庭院
 	{dwID=9213,col="#FF00FFFF",szReminder="鎮",nPriority=3},--紫金缽·鎮---仙侶庭院
-	{dwID=9762},--禅心---仙侶庭院
+	{dwID=9762,szStackOp=">=",nStackNum=8},--禅心---仙侶庭院
 	{dwID=9635,col="#8055FFFF",szReminder="滅",nPriority=3},--紫金缽·滅---仙侶庭院
 	{dwID=9325},--撼地---仙侶庭院
 	{dwID=9203,col="#FF3232FF",szReminder="割",nPriority=3},--割裂---仙侶庭院
@@ -80,14 +80,14 @@ data = {
 	{dwID=9240},--劍氣引爆---仙侶庭院
 	{dwID=9239,col="#FF00FFFF",szReminder="破",nPriority=3},--破敵---仙侶庭院
 	{dwID=9429},--鎖定---仙侶庭院
-	{dwID=9189,col="#FFFF00FF",szReminder="絕",nPriority=3},--絕脈勁---仙侶庭院
+	{dwID=9189,col="#FFFF00FF",szReminder="絕",nPriority=3,szStackOp=">=",nStackNum=4},--絕脈勁---仙侶庭院
 	{dwID=9195,col="#0096FFFF",szReminder="追",nPriority=3},--追魂訣---仙侶庭院
 	{dwID=8969},--鎖---花月別院
 	{dwID=8895},--鎮獄眼---花月別院
 	{dwID=9661},--落英鎖定---花月別院
 	{dwID=9664},--幻魔附體---花月別院
 	{dwID=8885},--錯筋---花月別院
-	{dwID=9662,col="#0096FFFF",szReminder="纏",nPriority=3},--音纏---花月別院
+	{dwID=9662,col="#0096FFFF",szReminder="纏",nPriority=3,szStackOp=">=",nStackNum=5},--音纏---花月別院
 	{dwID=8981,col="#FFFF00FF",szReminder="月",nPriority=3},--月滿---花月別院
 	{dwID=8975,col="#FF3232FF",szReminder="烈",nPriority=3},--烈明---花月別院
 	{dwID=8978},--青焱---花月別院
@@ -99,7 +99,7 @@ data = {
 	{dwID=5580,col="#8055FF00",szReminder="纏",nPriority=4},--百生·纏---大明宮
 	{dwID=5195},--虛弱---南诏皇宮
 	{dwID=5157},--絞喉---南诏皇宮
-	{dwID=7184},--風暴之眼---血戰天策
+	{dwID=7184,szStackOp=">=",nStackNum=10},--風暴之眼---血戰天策
 	{dwID=6549,col="#FF3232FF",szReminder="怒",nPriority=3},--天怒---血戰天策
 	{dwID=6936},--閃舞刺---血戰天策
 	{dwID=6991},--禁療---血戰天策
@@ -112,7 +112,7 @@ data = {
 	{dwID=8084},--威懾---夜守孤城
 	{dwID=8535},--田佈戈炮火成就---夜守孤城
 	{dwID=8536},--田佈戈威懾成就---夜守孤城
-	{dwID=8028,col="#FF800000",szReminder="碎",nPriority=4},--碎甲---逐虎驅狼
+	{dwID=8028,col="#FF800000",szReminder="碎",nPriority=4,szStackOp=">=",nStackNum=2},--碎甲---逐虎驅狼
 	{dwID=8319},--回龍碎甲---逐虎驅狼
 	{dwID=8352},--鋸骨---逐虎驅狼
 	{dwID=8312},--腐血狂亂---逐虎驅狼
@@ -122,8 +122,8 @@ data = {
 	{dwID=8199,col="#8055FFFF",szReminder="霜",nPriority=3},--冰霜氣勁---逐虎驅狼
 	{dwID=8822},--音波之殇·陽---逐虎驅狼
 	{dwID=8823},--音波之殇·陰---逐虎驅狼
-	{dwID=7993,col="#FF323200",szReminder="聲",nPriority=4},--聲嘯九天---逐虎驅狼
-	{dwID=7992,col="#0096FF00",szReminder="弦",nPriority=4},--弦音天籁---逐虎驅狼
+	{dwID=7993,col="#FF323200",szReminder="聲",nPriority=4,szStackOp=">=",nStackNum=9},--聲嘯九天---逐虎驅狼
+	{dwID=7992,col="#0096FF00",szReminder="弦",nPriority=4,szStackOp=">=",nStackNum=9},--弦音天籁---逐虎驅狼
 	{dwID=7996},--夢境纏繞---逐虎驅狼
 	{dwID=8170,col="#FF323200",szReminder="蓮",nPriority=4},--蓮花指---逐虎驅狼
 	{dwID=8172,col="#0096FF00",szReminder="蓮",nPriority=4},--蓮花指---逐虎驅狼
@@ -136,13 +136,13 @@ data = {
 	{dwID=8039,col="#FF3232FF",szReminder="聖",nPriority=3},--聖炎---逐虎驅狼
 	{dwID=8040,col="#00FFFFFF",szReminder="寒",nPriority=3},--寒意---逐虎驅狼
 	{dwID=8036,col="#FFFF0000",szReminder="瞄",nPriority=4},--瞄准---逐虎驅狼
-	{dwID=8029,col="#FF323200",szReminder="流",nPriority=4},--流血---逐虎驅狼
+	{dwID=8029,col="#FF323200",szReminder="流",nPriority=4,szStackOp=">=",nStackNum=2},--流血---逐虎驅狼
 	{dwID=8010},--戰鬥標記---逐虎驅狼
 	{dwID=7554,col="#00FFFFFF",szReminder="轉",nPriority=3},--陰陽易轉---風雪稻香村
 	{dwID=6954,col="#FFFF0000",szReminder="鎖",nPriority=4},--地顫---秦皇陵
 	{dwID=6955,col="#FF323200",szReminder="暈",nPriority=4},--地顫---秦皇陵
-	{dwID=6927},--金蛇毒---秦皇陵
-	{dwID=7486,col="#0096FF00",szReminder="遲",nPriority=4},--步遲---秦皇陵
+	{dwID=6927,szStackOp=">=",nStackNum=2},--金蛇毒---秦皇陵
+	{dwID=7486,col="#0096FF00",szReminder="遲",nPriority=4,szStackOp=">=",nStackNum=6},--步遲---秦皇陵
 	{dwID=7488},--火靈---秦皇陵
 	{dwID=7169,col="#FF00FFFF",szReminder="吐",nPriority=3},--白蛇吐信---秦皇陵
 	{dwID=6953},--地顫---秦皇陵
@@ -156,8 +156,8 @@ data = {
 	{dwID=6163},--守如山---天策
 	{dwID=203},--嘯如虎---天策
 	{dwID=360},--禦---天策
-	{dwID=6636},--聖手織天---五毒
-	{dwID=113},--碧水滔天---萬花
+	{dwID=6636,col="#00FF0000",szReminder="聖",nPriority=4},--聖手織天---五毒
+	{dwID=113,col="#00FF0000",szReminder="碧",nPriority=4},--碧水滔天---萬花
 	{dwID=122},--春泥護花---萬花
 	{dwID=6264},--春泥護花---萬花
 	{dwID=6257},--春泥護花---萬花
@@ -168,7 +168,7 @@ data = {
 	{dwID=9299,col="#FF8000FF",szReminder="杯",nPriority=3},--杯水留影---長歌
 	{dwID=1263},--經脈暢行---通用
 	{dwID=3678},--重禦---通用
-	{dwID=5034},--寵物寶寶的寶貝---通用
+	{dwID=5034,col="#00FF0000",szReminder="修",nPriority=4},--寵物寶寶的寶貝---通用
 	{dwID=2313},--鳳凰蠱---五毒
 
 }
