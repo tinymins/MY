@@ -1851,7 +1851,6 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			Mimg:Show()
 			Mimg:SetAlpha(nAlpha)
 			Mimg:SetPercentage(nPercentage)
-			Mimg:SetVisible(info.bIsOnLine)
 		end
 	else
 		Mimg:Hide()
