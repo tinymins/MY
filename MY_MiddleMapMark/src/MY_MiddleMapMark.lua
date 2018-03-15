@@ -266,12 +266,14 @@ function MY_MiddleMapMark.SearchNpc(szText, dwMapID)
 	end
 	for i = #aInfos, 1, -1 do
 		local p = aInfos[i]
-		if l_npc[p.templateid .. "," .. p.poskey] then
+		if (not dwMapID or p.mapid == dwMapID)
+		and l_npc[p.templateid .. "," .. p.poskey] then
 			table.remove(aInfos, i)
 		end
 	end
 	for _, info in pairs(l_npc) do
-		if info.mapid == dwMapID and (wstring.find(info.name, szText) or wstring.find(info.title, szText)) then
+		if (not dwMapID or info.mapid == dwMapID)
+		and (wstring.find(info.name, szText) or wstring.find(info.title, szText)) then
 			table.insert(aInfos, 1, info)
 		end
 	end
@@ -284,20 +286,22 @@ function MY_MiddleMapMark.SearchDoodad(szText, dwMapID)
 	if dwMapID then
 		DBD_RNM:ClearBindings()
 		DBD_RNM:BindAll(szSearch, dwMapID)
-		return DBD_RNM:GetAll()
+		aInfos = DBD_RNM:GetAll()
 	else
 		DBD_RN:ClearBindings()
 		DBD_RN:BindAll(szSearch)
-		return DBD_RN:GetAll()
+		aInfos = DBD_RN:GetAll()
 	end
 	for i = #aInfos, 1, -1 do
 		local p = aInfos[i]
-		if l_doodad[p.templateid .. "," .. p.poskey] then
+		if (not dwMapID or p.mapid == dwMapID)
+		and l_doodad[p.templateid .. "," .. p.poskey] then
 			table.remove(aInfos, i)
 		end
 	end
 	for _, info in pairs(l_doodad) do
-		if wstring.find(info.name, szText) then
+		if (not dwMapID or info.mapid == dwMapID)
+		and (wstring.find(info.name, szText)) then
 			table.insert(aInfos, 1, info)
 		end
 	end
