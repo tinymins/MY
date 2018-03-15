@@ -1848,6 +1848,11 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			self:DrawShadow(Msha, hMana:GetW() * nPercentage, Msha:GetH(), r, g, b, nAlpha, CFG.bManaGradient)
 			Msha:Show()
 		else
+			if info.bIsOnLine then
+				Mimg:ToNormal()
+			else
+				Mimg:ToGray()
+			end
 			Mimg:Show()
 			Mimg:SetAlpha(nAlpha)
 			Mimg:SetPercentage(nPercentage)
@@ -1919,6 +1924,11 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			Ledg:SetAlpha(nAlpha)
 			Ledg:SetRelX(nRelX)
 			Ledg:SetAbsX(hLife:GetAbsX() + nRelX)
+			if info.bIsOnLine then
+				Limg:ToNormal()
+			else
+				Limg:ToGray()
+			end
 			Limg:Show()
 			Limg:SetAlpha(nAlpha)
 			Limg:SetPercentage(nLifePercentage)
