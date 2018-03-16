@@ -25,6 +25,8 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local IsNil, IsNumber, IsFunction = MY.IsNil, MY.IsNumber, MY.IsFunction
+local IsBoolean, IsString, IsTable = MY.IsBoolean, MY.IsString, MY.IsTable
 -----------------------------------------------------------------------------------------
 
 -------------------------------------
@@ -73,6 +75,10 @@ local _L, XGUI = MY.LoadLangPack(), XGUI
 -----------------------------------------------------------
 -- my ui common functions
 -----------------------------------------------------------
+local function IsElement(element)
+	return type(element) == 'table' and element.IsValid and element:IsValid()
+end
+
 local function ApplyUIArguments(ui, arg)
 	if ui and arg then
 		-- properties
@@ -128,16 +134,6 @@ local function ApplyUIArguments(ui, arg)
 	return ui
 end
 XGUI.ApplyUIArguments = ApplyUIArguments
-
-local function IsElement(element)
-	return type(element) == 'table' and element.IsValid and element:IsValid()
-end
-local function IsNil     (var) return type(var) == 'nil'      end
-local function IsTable   (var) return type(var) == 'table'    end
-local function IsNumber  (var) return type(var) == 'number'   end
-local function IsString  (var) return type(var) == 'string'   end
-local function IsBoolean (var) return type(var) == 'boolean'  end
-local function IsFunction(var) return type(var) == 'function' end
 
 local GetComponentProp, SetComponentProp -- 组件私有属性 仅本文件内使用
 do local l_prop = setmetatable({}, { __mode = 'k' })

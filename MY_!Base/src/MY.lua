@@ -99,6 +99,12 @@
 -- ###################################################################################################################################################### --
 
 MY = {}
+function MY.IsNil     (var) return type(var) == 'nil'      end
+function MY.IsTable   (var) return type(var) == 'table'    end
+function MY.IsNumber  (var) return type(var) == 'number'   end
+function MY.IsString  (var) return type(var) == 'string'   end
+function MY.IsBoolean (var) return type(var) == 'boolean'  end
+function MY.IsFunction(var) return type(var) == 'function' end
 --------------------------------------------------------------------------------------------------------------------------------------------
 -- 本地函数变量
 --------------------------------------------------------------------------------------------------------------------------------------------
@@ -114,6 +120,8 @@ local _PSS_ST_         = _FRAMEWORK_ROOT_ .. "image/ST.pss"
 local _UITEX_ST_       = _FRAMEWORK_ROOT_ .. "image/ST_UI.UITex"
 local _UITEX_POSTER_   = _FRAMEWORK_ROOT_ .. "image/Poster.UITex"
 local _UITEX_COMMON_   = _FRAMEWORK_ROOT_ .. "image/UICommon.UITex"
+local IsNil, IsNumber, IsFunction = MY.IsNil, MY.IsNumber, MY.IsFunction
+local IsBoolean, IsString, IsTable = MY.IsBoolean, MY.IsString, MY.IsTable
 Log("[MY] Debug level " .. _DEBUGLV_ .. " / delog level " .. _DELOGLV_)
 
 -- 多语言处理
