@@ -469,7 +469,7 @@ end
 local function serialize(data)
 	local t = {}
 	EncodePostData(data, t, "")
-	local text = tconcat(t)
+	local text = concat(t)
 	return text
 end
 
@@ -1296,7 +1296,7 @@ function MY.OutputBuffTip(dwID, nLevel, Rect, nTime)
 		insert(t, XML_LINE_BREAKER)
 		insert(t, GetFormatText("IconID: " .. tostring(Table_GetBuffIconID(dwID, nLevel)), 102))
 	end
-	OutputTip(tconcat(t), 300, Rect)
+	OutputTip(concat(t), 300, Rect)
 end
 
 
