@@ -7,9 +7,27 @@
 -- @Last modified time: 2017-02-08 17:56:29
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
-local srep, tostring, string2byte = string.rep, tostring, string.byte
-local tconcat, tinsert, tremove = table.concat, table.insert, table.remove
-local type, next, print, pairs, ipairs = type, next, print, pairs, ipairs
+-----------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+-----------------------------------------------------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local floor, min, max, ceil = math.floor, math.min, math.max, math.ceil
+local huge, pi, sin, cos, tan = math.huge, math.pi, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local IsNil, IsNumber, IsFunction = MY.IsNil, MY.IsNumber, MY.IsFunction
+local IsBoolean, IsString, IsTable = MY.IsBoolean, MY.IsString, MY.IsTable
+-----------------------------------------------------------------------------------------
 MY = MY or {}
 MY.Sys = MY.Sys or {}
 MY.Sys.bShieldedVersion = false -- 屏蔽被河蟹的功能（国服启用）
@@ -431,7 +449,7 @@ local function EncodePostData(data, t, prefix)
 			if first then
 				first = false
 			else
-				tinsert(t, "&")
+				insert(t, "&")
 			end
 			if prefix == "" then
 				EncodePostData(v, t, k)
@@ -441,10 +459,10 @@ local function EncodePostData(data, t, prefix)
 		end
 	else
 		if prefix ~= "" then
-			tinsert(t, prefix)
-			tinsert(t, "=")
+			insert(t, prefix)
+			insert(t, "=")
 		end
-		tinsert(t, data)
+		insert(t, data)
 	end
 end
 
@@ -1036,36 +1054,43 @@ TraceButton_AppendAddonMenu( { _C.GetTraceButtonAddonMenu } )
 -- szTitle      消息头部
 -- tContentRgbF 主体消息文字颜色rgbf[可选，为空使用默认颜色字体。]
 -- tTitleRgbF   消息头部文字颜色rgbf[可选，为空和主体消息文字颜色相同。]
-function MY.Sysmsg(oContent, oTitle, szType)
-	oTitle = oTitle or MY.GetAddonInfo().szShortName
-	if type(oTitle)~='table' then oTitle = { oTitle, bNoWrap = true } end
-	if type(oContent)~='table' then oContent = { oContent, bNoWrap = true } end
-	oContent.r, oContent.g, oContent.b, oContent.f = oContent.r or 255, oContent.g or 255, oContent.b or 0, oContent.f or 10
+function MY.Sysmsg(arg0, arg1, arg2)
+	local szType, szMsg = arg2 or "MSG_SYS", ""
+	local r, g, b = GetMsgFontColor(szType)
+	local f = GetMsgFont(szType)
+	local ac, at, sc, st = {}, {}
 
-	for i = #oContent, 1, -1 do
-		if type(oContent[i])=="number"  then oContent[i] = '' .. oContent[i] end
-		if type(oContent[i])=="boolean" then oContent[i] = (oContent[i] and 'true') or 'false' end
-		-- auto wrap each line
-		if (not oContent.bNoWrap) and type(oContent[i])=="string" and string.sub(oContent[i], -1)~='\n' then
-			oContent[i] = oContent[i] .. '\n'
+	if IsTable(arg0) then
+		for _, v in ipairs(arg0) do
+			insert(ac, tostring(v))
 		end
+		ac.r, ac.g, ac.b, ac.f = arg0.r, arg0.g, arg0.b, arg0.f
+	else
+		insert(ac, tostring(arg0))
+		ac.bNoWrap = true
+	end
+	if IsTable(arg1) then
+		for _, v in ipairs(arg1) do
+			insert(at, tostring(v))
+		end
+		at.r, at.g, at.b, at.f = arg1.r, arg1.g, arg1.b, arg1.f
+	else
+		insert(at, tostring(arg1 or MY.GetAddonInfo().szShortName))
 	end
 
-	-- calc szMsg
-	local szMsg = ''
-	for i = 1, #oTitle, 1 do
-		if oTitle[i]~='' then
-			szMsg = szMsg .. '['..oTitle[i]..']'
-		end
+	sc = concat(ac, ac.bNoWrap and "" or "\n")
+	if not ac.bNoWrap then
+		sc = sc .. "\n"
 	end
-	if #szMsg > 0 then
-		szMsg = GetFormatText( szMsg..' ', oTitle.f or oContent.f, oTitle.r or oContent.r, oTitle.g or oContent.g, oTitle.b or oContent.b )
+	szMsg = szMsg .. GetFormatText(sc, ac.f or f, ac.r or r, ac.g or g, ac.b or b)
+
+	st = concat(at, "][")
+	if st ~= "" then
+		st = "[" .. st .. "] "
 	end
-	for i = 1, #oContent, 1 do
-		szMsg = szMsg .. GetFormatText(oContent[i], oContent.f, oContent.r, oContent.g, oContent.b)
-	end
-	-- Output
-	OutputMessage(szType or "MSG_SYS", szMsg, true)
+	szMsg = GetFormatText(st, at.f or ac.f or f, at.r or ac.r or r, at.g or ac.g or g, at.b or ac.b or b) .. szMsg
+
+	OutputMessage(szType, szMsg, true)
 end
 
 -- 没有头的中央信息 也可以用于系统信息
@@ -1224,23 +1249,23 @@ end
 function MY.OutputBuffTip(dwID, nLevel, Rect, nTime)
 	local t = {}
 
-	tinsert(t, GetFormatText(Table_GetBuffName(dwID, nLevel) .. "\t", 65))
+	insert(t, GetFormatText(Table_GetBuffName(dwID, nLevel) .. "\t", 65))
 	local buffInfo = GetBuffInfo(dwID, nLevel, {})
 	if buffInfo and buffInfo.nDetachType and g_tStrings.tBuffDetachType[buffInfo.nDetachType] then
-		tinsert(t, GetFormatText(g_tStrings.tBuffDetachType[buffInfo.nDetachType] .. '\n', 106))
+		insert(t, GetFormatText(g_tStrings.tBuffDetachType[buffInfo.nDetachType] .. '\n', 106))
 	else
-		tinsert(t, XML_LINE_BREAKER)
+		insert(t, XML_LINE_BREAKER)
 	end
 
 	local szDesc = GetBuffDesc(dwID, nLevel, "desc")
 	if szDesc then
-		tinsert(t, GetFormatText(szDesc .. g_tStrings.STR_FULL_STOP, 106))
+		insert(t, GetFormatText(szDesc .. g_tStrings.STR_FULL_STOP, 106))
 	end
 
 	if nTime then
 		if nTime == 0 then
-			tinsert(t, XML_LINE_BREAKER)
-			tinsert(t, GetFormatText(g_tStrings.STR_BUFF_H_TIME_ZERO, 102))
+			insert(t, XML_LINE_BREAKER)
+			insert(t, GetFormatText(g_tStrings.STR_BUFF_H_TIME_ZERO, 102))
 		else
 			local H, M, S = "", "", ""
 			local h = math.floor(nTime / 3600)
@@ -1254,22 +1279,22 @@ function MY.OutputBuffTip(dwID, nLevel, Rect, nTime)
 			end
 			S = s..g_tStrings.STR_BUFF_H_TIME_S
 			if h < 720 then
-				tinsert(t, XML_LINE_BREAKER)
-				tinsert(t, GetFormatText(FormatString(g_tStrings.STR_BUFF_H_LEFT_TIME_MSG, H, M, S), 102))
+				insert(t, XML_LINE_BREAKER)
+				insert(t, GetFormatText(FormatString(g_tStrings.STR_BUFF_H_LEFT_TIME_MSG, H, M, S), 102))
 			end
 		end
 	end
 
 	-- For test
 	if IsCtrlKeyDown() then
-		tinsert(t, XML_LINE_BREAKER)
-		tinsert(t, GetFormatText(g_tStrings.DEBUG_INFO_ITEM_TIP, 102))
-		tinsert(t, XML_LINE_BREAKER)
-		tinsert(t, GetFormatText("ID:     " .. dwID, 102))
-		tinsert(t, XML_LINE_BREAKER)
-		tinsert(t, GetFormatText("Level:  " .. nLevel, 102))
-		tinsert(t, XML_LINE_BREAKER)
-		tinsert(t, GetFormatText("IconID: " .. tostring(Table_GetBuffIconID(dwID, nLevel)), 102))
+		insert(t, XML_LINE_BREAKER)
+		insert(t, GetFormatText(g_tStrings.DEBUG_INFO_ITEM_TIP, 102))
+		insert(t, XML_LINE_BREAKER)
+		insert(t, GetFormatText("ID:     " .. dwID, 102))
+		insert(t, XML_LINE_BREAKER)
+		insert(t, GetFormatText("Level:  " .. nLevel, 102))
+		insert(t, XML_LINE_BREAKER)
+		insert(t, GetFormatText("IconID: " .. tostring(Table_GetBuffIconID(dwID, nLevel)), 102))
 	end
 	OutputTip(tconcat(t), 300, Rect)
 end
