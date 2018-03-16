@@ -34,7 +34,7 @@ function D.UpdateHotkey(frame)
 	for j = 0, hList:GetItemCount() - 1 do
 		local hItem = hList:Lookup(j)
 		local nKey, bShift, bCtrl, bAlt = Hotkey.Get("MY_TargetMon_" .. i .. "_" .. (j + 1))
-		hItem.box:SetOverText(2, GetKeyShow(nKey, bShift, bCtrl, bAlt, true))
+		hItem.txtHotkey:SetText(GetKeyShow(nKey, bShift, bCtrl, bAlt, true))
 	end
 end
 
@@ -520,8 +520,8 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 			hItem.box:SetObjectCoolDown(true)
 			hItem.box:SetCoolDownPercentage(0)
 			hItem.box:SetObjectStaring(false)
-			hItem.box:SetOverText(0, "")
-			hItem.box:SetOverText(1, "")
+			hItem.txtTime:SetText("")
+			hItem.txtStackNum:SetText("")
 			hItem.box:ClearExtentAnimate()
 		elseif config.type == 'SKILL' then
 			UpdateBoxObject(hItem.box, UI_OBJECT.SKILL)
