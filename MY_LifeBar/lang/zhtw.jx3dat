@@ -1,6 +1,9 @@
 -- language data (zhtw) updated at 2014-4-10 03:38:11
 data = {
-    ['x lifebar'] = '扁平血條',
+    ['MY_LifeBar'] = '扁平血條',
+
+	['Enable'] = '啓用',
+    ['Configure name'] = '配置文件名稱',
 
     ['only enable in those maps below'] = '√ 僅在以下地圖啓用扁平血條',
     ['arena'] = '競技場',

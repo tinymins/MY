@@ -7,55 +7,45 @@
 -- @Last Modified by:   茗伊 @tinymins
 -- @Last Modified time: 2015-05-14 10:27:36
 --------------------------------------------
-local l_handle, l_hMe
-XLifeBar = XLifeBar or {}
-XLifeBar.HP = class()
-local HP = XLifeBar.HP
+local HP = class()
+local CACHE = setmetatable({}, { __mode = "v" })
 
-function HP:ctor(dwID) -- KGobject
-	if not l_handle then
-		l_handle = XGUI.GetShadowHandle("XLifeBar")
-	end
+function HP:ctor(dwType, dwID) -- KGobject
+	local hList = XGUI.GetShadowHandle("MY_LifeBar")
+	local szName = dwType .. "_" .. dwID
+	self.szName = szName
+	self.dwType = dwType
 	self.dwID = dwID
-	self.handle = l_handle:Lookup(tostring(self.dwID))
+	self.handle = hList:Lookup(self.szName)
 	return self
 end
+
 -- 创建
 function HP:Create()
-	-- Create handle
-	if not l_handle:Lookup(tostring(self.dwID)) then
-		l_handle:AppendItemFromString(FormatHandle( string.format("name=\"%s\"",self.dwID) ))
+	if not self.handle then
+		local hList = XGUI.GetShadowHandle("MY_LifeBar")
+		hList:AppendItemFromString(FormatHandle( string.format("name=\"%s\"",self.szName) ))
+		local hItem = hList:Lookup(self.szName)
+		hItem:AppendItemFromString("<shadow>name=\"hp_bg\"</shadow>")
+		hItem:AppendItemFromString("<shadow>name=\"hp_bg2\"</shadow>")
+		hItem:AppendItemFromString("<shadow>name=\"hp\"</shadow>")
+		hItem:AppendItemFromString("<shadow>name=\"ot_bg\"</shadow>")
+		hItem:AppendItemFromString("<shadow>name=\"ot_bg2\"</shadow>")
+		hItem:AppendItemFromString("<shadow>name=\"ot\"</shadow>")
+		hItem:AppendItemFromString("<shadow>name=\"lines\"</shadow>")
+		hItem:AppendItemFromString("<shadow>name=\"hp_title\"</shadow>")
+		hItem:AppendItemFromString("<shadow>name=\"ot_title\"</shadow>")
+		self.handle = hItem
 	end
-
-	local handle = l_handle:Lookup(tostring(self.dwID))
-	if not handle:Lookup(string.format("hp_bg_%s",self.dwID)) then
-		if self.dwID == UI_GetClientPlayerID() then
-			l_hMe = handle
-		elseif l_hMe then
-			l_handle:ExchangeItemIndex(l_hMe, handle)
-		end
-		handle:AppendItemFromString( string.format("<shadow>name=\"hp_bg_%s\"</shadow>",self.dwID) )
-		handle:AppendItemFromString( string.format("<shadow>name=\"hp_bg2_%s\"</shadow>",self.dwID) )
-		handle:AppendItemFromString( string.format("<shadow>name=\"hp_%s\"</shadow>",self.dwID) )
-		handle:AppendItemFromString( string.format("<shadow>name=\"ot_bg_%s\"</shadow>",self.dwID) )
-		handle:AppendItemFromString( string.format("<shadow>name=\"ot_bg2_%s\"</shadow>",self.dwID) )
-		handle:AppendItemFromString( string.format("<shadow>name=\"ot_%s\"</shadow>",self.dwID) )
-		handle:AppendItemFromString( string.format("<shadow>name=\"lines_%s\"</shadow>",self.dwID) )
-		handle:AppendItemFromString( string.format("<shadow>name=\"hp_title_%s\"</shadow>",self.dwID) )
-		handle:AppendItemFromString( string.format("<shadow>name=\"ot_title_%s\"</shadow>",self.dwID) )
-	end
-	self.handle = handle
 	return self
 end
 
 -- 删除
 function HP:Remove()
-	local hItem = l_handle:Lookup(tostring(self.dwID))
-	if hItem then
-		if hItem == l_hMe then
-			l_hMe = nil
-		end
-		l_handle:RemoveItem(hItem)
+	if self.handle then
+		local hList = XGUI.GetShadowHandle("MY_LifeBar")
+		hList:RemoveItem(self.handle)
+		self.handle = nil
 	end
 	return self
 end
@@ -66,7 +56,7 @@ end
 function HP:DrawWordlines(tWordlines, rgbaf)
 	if self.handle then
 		local r,g,b,a,f = unpack(rgbaf)
-		local sha = self.handle:Lookup(string.format("lines_%s",self.dwID))
+		local sha = self.handle:Lookup("lines")
 
 		sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
 		sha:ClearTriangleFanPoint()
@@ -82,17 +72,16 @@ end
 
 -- 绘制血量百分比文字（减少重绘次数所以和Wordlines分离）
 function HP:DrawLifePercentage(aWordline, rgbaf)
-	if not self.handle then
-		return
-	end
-	local r,g,b,a,f = unpack(rgbaf)
-	local sha = self.handle:Lookup(string.format("hp_title_%s",self.dwID))
+	if self.handle then
+		local r,g,b,a,f = unpack(rgbaf)
+		local sha = self.handle:Lookup("hp_title")
 
-	sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
-	sha:ClearTriangleFanPoint()
+		sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
+		sha:ClearTriangleFanPoint()
 
-	if aWordline[1] and #aWordline[1] > 0 then
-		sha:AppendCharacterID(self.dwID, true, r, g, b, a, { 0, 0, 0, aWordline[2], - aWordline[3] }, f, aWordline[1], 1, 1)
+		if aWordline[1] and #aWordline[1] > 0 then
+			sha:AppendCharacterID(self.dwID, true, r, g, b, a, { 0, 0, 0, aWordline[2], - aWordline[3] }, f, aWordline[1], 1, 1)
+		end
 	end
 	return self
 end
@@ -101,7 +90,7 @@ end
 function HP:DrawOTTitle(aWordline, rgbaf)
 	if self.handle then
 		local r,g,b,a,f = unpack(rgbaf)
-		local sha = self.handle:Lookup(string.format("ot_title_%s",self.dwID))
+		local sha = self.handle:Lookup("ot_title")
 
 		sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
 		sha:ClearTriangleFanPoint()
@@ -114,7 +103,7 @@ function HP:DrawOTTitle(aWordline, rgbaf)
 end
 
 -- 填充边框 默认200的nAlpha
-function HP:DrawBorder(nWidth, nHeight, nOffsetX, nOffsetY, nAlpha, szShadowName, szShadowName2)
+function HP:DrawBorder(szShadowName, szShadowName2, nWidth, nHeight, nOffsetX, nOffsetY, nAlpha)
 	if self.handle then
 		nAlpha = nAlpha or 200
 		nWidth   = nWidth * Station.GetUIScale()
@@ -124,7 +113,7 @@ function HP:DrawBorder(nWidth, nHeight, nOffsetX, nOffsetY, nAlpha, szShadowName
 		local handle = self.handle
 
 		-- 绘制外边框
-		local sha = handle:Lookup(string.format(szShadowName,self.dwID))
+		local sha = handle:Lookup(szShadowName)
 		sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
 		sha:SetD3DPT(D3DPT.TRIANGLEFAN)
 		sha:ClearTriangleFanPoint()
@@ -136,7 +125,7 @@ function HP:DrawBorder(nWidth, nHeight, nOffsetX, nOffsetY, nAlpha, szShadowName
 		sha:AppendCharacterID(self.dwID,true,180,180,180,nAlpha,{0,0,0,bcX,bcY+nHeight})
 
 		-- 绘制内边框
-		local sha = handle:Lookup(string.format(szShadowName2,self.dwID))
+		local sha = handle:Lookup(szShadowName2)
 		sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
 		sha:SetD3DPT(D3DPT.TRIANGLEFAN)
 		sha:ClearTriangleFanPoint()
@@ -152,16 +141,16 @@ end
 
 -- 填充血条边框 默认200的nAlpha
 function HP:DrawLifeBorder(nWidth, nHeight, nOffsetX, nOffsetY, nAlpha)
-	return self:DrawBorder(nWidth, nHeight, nOffsetX, nOffsetY, nAlpha, "hp_bg_%s", "hp_bg2_%s")
+	return self:DrawBorder("hp_bg", "hp_bg2", nWidth, nHeight, nOffsetX, nOffsetY, nAlpha)
 end
 -- 填充读条边框 默认200的nAlpha
 function HP:DrawOTBarBorder(nWidth, nHeight, nOffsetX, nOffsetY, nAlpha)
-	return self:DrawBorder(nWidth, nHeight, nOffsetX, nOffsetY, nAlpha, "ot_bg_%s", "ot_bg2_%s")
+	return self:DrawBorder("ot_bg", "ot_bg2", nWidth, nHeight, nOffsetX, nOffsetY, nAlpha)
 end
 
 -- 填充矩形（进度条/血条）
 -- rgbap: 红,绿,蓝,透明度,进度,绘制方向
-function HP:DrawRect(nWidth, nHeight, nOffsetX, nOffsetY, rgbapd, szShadowName)
+function HP:DrawRect(szShadowName, nWidth, nHeight, nOffsetX, nOffsetY, rgbapd)
 	if self.handle then
 		local r,g,b,a,p,d = unpack(rgbapd)
 		nWidth   = nWidth * Station.GetUIScale()
@@ -173,7 +162,7 @@ function HP:DrawRect(nWidth, nHeight, nOffsetX, nOffsetY, rgbapd, szShadowName)
 		elseif p < 0 then
 			p = 0
 		end -- fix
-		local sha = self.handle:Lookup(string.format(szShadowName,self.dwID))
+		local sha = self.handle:Lookup(szShadowName)
 
 		sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
 		sha:SetD3DPT(D3DPT.TRIANGLEFAN)
@@ -207,10 +196,23 @@ end
 
 -- 填充血条
 function HP:DrawLifeBar(nWidth, nHeight, nOffsetX, nOffsetY, rgbapd)
-	return self:DrawRect(nWidth, nHeight, nOffsetX, nOffsetY, rgbapd, "hp_%s")
+	return self:DrawRect("hp", nWidth, nHeight, nOffsetX, nOffsetY, rgbapd)
 end
 
 -- 填充读条
 function HP:DrawOTBar(nWidth, nHeight, nOffsetX, nOffsetY, rgbapd)
-	return self:DrawRect(nWidth, nHeight, nOffsetX, nOffsetY, rgbapd, "ot_%s")
+	return self:DrawRect("ot", nWidth, nHeight, nOffsetX, nOffsetY, rgbapd)
+end
+
+function MY_LifeBar_HP(dwType, dwID)
+	if dwType == "clear" then
+		CACHE = {}
+		XGUI.GetShadowHandle("MY_LifeBar"):Clear()
+	else
+		local szName = dwType .. "_" .. dwID
+		if not CACHE[szName] then
+			CACHE[szName] = HP.new(dwType, dwID)
+		end
+		return CACHE[szName]
+	end
 end
