@@ -103,6 +103,8 @@ local function ReloadFrame(frame)
 	if not config then
 		return Wnd.CloseWindow(frame)
 	end
+	frame.dwType = nil
+	frame.dwID = nil
 	frame.index = index
 	frame.config = config
 	D.UpdateScale(frame)
@@ -293,6 +295,7 @@ local function ReloadFrame(frame)
 	frame.w, frame.h = frame:GetSize()
 	frame.dragW = nWidth == 0 and 200 or nWidth
 	frame.dragH = nItemH == 0 and 200 or nItemH
+	D.UpdateFrame(frame)
 	D.UpdateAnchor(frame)
 end
 
@@ -546,28 +549,28 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 	end
 end
 
-function MY_TargetMon_Base.OnFrameBreathe()
+function D.UpdateFrame(frame)
 	local me = GetClientPlayer()
 	if not me then
 		return
 	end
-	local dwType, dwID = MY_TargetMon.GetTarget(this.config.target, this.config.type)
-	if dwType == this.dwType and dwID == this.dwID
+	local dwType, dwID = MY_TargetMon.GetTarget(frame.config.target, frame.config.type)
+	if dwType == frame.dwType and dwID == frame.dwID
 	and dwType ~= TARGET.PLAYER and dwType ~= TARGET.NPC then
 		return
 	end
 	needFormatItemPos = false
-	local hTotal, hList = this.hTotal, this.hList
-	local config = this.config
+	local hTotal, hList = frame.hTotal, frame.hList
+	local config = frame.config
 	local KTarget = MY.GetObject(dwType, dwID)
-	local targetChanged = dwType ~= this.dwType or dwID ~= this.dwID
+	local targetChanged = dwType ~= frame.dwType or dwID ~= frame.dwID
 	local nFrameCount = GetLogicFrameCount()
 
 	local dwKungfuID = me.GetKungfuMount() and me.GetKungfuMount().dwSkillID or 0
 	local dwTarKungfuID = dwType == TARGET.PLAYER and KTarget and KTarget.GetKungfuMount() and KTarget.GetKungfuMount().dwSkillID or 0
 	if not KTarget then
 		for i = 0, hList:GetItemCount() - 1 do
-			UpdateItem(hList:Lookup(i), KTarget, nil, nil, this.tItem, config, nFrameCount, targetChanged, nil, dwKungfuID, dwTarKungfuID)
+			UpdateItem(hList:Lookup(i), KTarget, nil, nil, frame.tItem, config, nFrameCount, targetChanged, nil, dwKungfuID, dwTarKungfuID)
 		end
 	else
 		if config.type == 'BUFF' then
@@ -582,24 +585,24 @@ function MY_TargetMon_Base.OnFrameBreathe()
 				if not config.hideOthers or buff.dwSkillSrcID == dwClientPlayerID or buff.dwSkillSrcID == dwControlPlayerID then
 					local szName = Table_GetBuffName(buff.dwID, buff.nLevel) or ""
 					-- 先按ID和等级严格匹配（顺序不可颠倒）
-					local tItems = this.tItem[buff.dwID] and this.tItem[buff.dwID][buff.nLevel]
+					local tItems = frame.tItem[buff.dwID] and frame.tItem[buff.dwID][buff.nLevel]
 					if tItems then
 						for hItem, _ in pairs(tItems) do
-							UpdateItem(hItem, KTarget, buff, szName, this.tItem, config, nFrameCount, targetChanged, nil, dwKungfuID, dwTarKungfuID)
+							UpdateItem(hItem, KTarget, buff, szName, frame.tItem, config, nFrameCount, targetChanged, nil, dwKungfuID, dwTarKungfuID)
 						end
 					end
 					-- 再按照ID匹配
-					local tItems = this.tItem[buff.dwID] and this.tItem[buff.dwID]["all"]
+					local tItems = frame.tItem[buff.dwID] and frame.tItem[buff.dwID]["all"]
 					if tItems then
 						for hItem, _ in pairs(tItems) do
-							UpdateItem(hItem, KTarget, buff, szName, this.tItem, config, nFrameCount, targetChanged, nil, dwKungfuID, dwTarKungfuID)
+							UpdateItem(hItem, KTarget, buff, szName, frame.tItem, config, nFrameCount, targetChanged, nil, dwKungfuID, dwTarKungfuID)
 						end
 					end
 					-- 再按照名字匹配
-					local tItems = this.tItem[szName]
+					local tItems = frame.tItem[szName]
 					if tItems then
 						for hItem, _ in pairs(tItems) do
-							UpdateItem(hItem, KTarget, buff, szName, this.tItem, config, nFrameCount, targetChanged, nil, dwKungfuID, dwTarKungfuID)
+							UpdateItem(hItem, KTarget, buff, szName, frame.tItem, config, nFrameCount, targetChanged, nil, dwKungfuID, dwTarKungfuID)
 						end
 					end
 				end
@@ -607,12 +610,12 @@ function MY_TargetMon_Base.OnFrameBreathe()
 			-- 更新消失的BUFF列表
 			for i = 0, hList:GetItemCount() - 1 do
 				if hList:Lookup(i).nRenderFrame ~= nFrameCount then
-					UpdateItem(hList:Lookup(i), KTarget, nil, nil, this.tItem, config, nFrameCount, targetChanged, nil, dwKungfuID, dwTarKungfuID)
+					UpdateItem(hList:Lookup(i), KTarget, nil, nil, frame.tItem, config, nFrameCount, targetChanged, nil, dwKungfuID, dwTarKungfuID)
 				end
 			end
 			-- 防止CD过程中table被GC回收
 			if targetChanged then
-				this.tBuffTime = l_tBuffTime[KTarget.dwID]
+				frame.tBuffTime = l_tBuffTime[KTarget.dwID]
 			end
 		elseif config.type == 'SKILL' then
 			for i = 0, hList:GetItemCount() - 1 do
@@ -623,25 +626,29 @@ function MY_TargetMon_Base.OnFrameBreathe()
 					local bCool, nLeft, nTotal, nCDCount, bPublicCD = KTarget.GetSkillCDProgress(dwSkillID, dwLevel, 444)
 					if bCool and nLeft ~= 0 and nTotal ~= 0 and not bPublicCD then
 						bFind = true
-						UpdateItem(hItem, KTarget, dwSkillID, dwLevel, this.tItem, config, nFrameCount, targetChanged, dwID, dwKungfuID, dwTarKungfuID)
+						UpdateItem(hItem, KTarget, dwSkillID, dwLevel, frame.tItem, config, nFrameCount, targetChanged, dwID, dwKungfuID, dwTarKungfuID)
 						break
 					end
 				end
 				if not bFind then
-					UpdateItem(hItem, KTarget, nil, nil, this.tItem, config, nFrameCount, targetChanged, dwID, dwKungfuID, dwTarKungfuID)
+					UpdateItem(hItem, KTarget, nil, nil, frame.tItem, config, nFrameCount, targetChanged, dwID, dwKungfuID, dwTarKungfuID)
 				end
 			end
 		end
-		-- 检查是否需要重绘界面坐标
-		if needFormatItemPos then
-			hList:SetW(this.w)
-			hList:FormatAllItemPosExt()
-			hList:SetSizeByAllItemSize()
-			hTotal:SetSizeByAllItemSize()
-		end
 	end
-	this.dwType, this.dwID = dwType, dwID
+	-- 检查是否需要重绘界面坐标
+	if needFormatItemPos then
+		hList:SetW(frame.w)
+		hList:FormatAllItemPosExt()
+		hList:SetSizeByAllItemSize()
+		hTotal:SetSizeByAllItemSize()
+	end
+	frame.dwType, frame.dwID = dwType, dwID
 end
+end
+
+function MY_TargetMon_Base.OnFrameBreathe()
+	D.UpdateFrame(this)
 end
 
 function MY_TargetMon_Base.OnFrameDragEnd()
