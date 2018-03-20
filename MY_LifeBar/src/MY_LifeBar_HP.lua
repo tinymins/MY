@@ -50,6 +50,16 @@ function HP:Remove()
 	return self
 end
 
+function HP:ClearShadow(szShadowName)
+	if self.handle then
+		local sha = self.handle:Lookup(szShadowName)
+		if sha then
+			sha:ClearTriangleFanPoint()
+		end
+	end
+	return self
+end
+
 -- 绘制名字/帮会/称号 等等 行文字
 -- rgbaf: 红,绿,蓝,透明度,字体
 -- tWordlines: {[文字,高度偏移],...}
@@ -142,6 +152,11 @@ end
 -- 填充血条边框 默认200的nAlpha
 function HP:DrawLifeBorder(nWidth, nHeight, nOffsetX, nOffsetY, nAlpha)
 	return self:DrawBorder("hp_bg", "hp_bg2", nWidth, nHeight, nOffsetX, nOffsetY, nAlpha)
+end
+function HP:ClearLifeBorder()
+	self:ClearShadow("hp_bg")
+	self:ClearShadow("hp_bg2")
+	return self
 end
 -- 填充读条边框 默认200的nAlpha
 function HP:DrawOTBarBorder(nWidth, nHeight, nOffsetX, nOffsetY, nAlpha)

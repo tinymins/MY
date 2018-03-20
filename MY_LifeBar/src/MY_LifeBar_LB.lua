@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 12:50:01
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-03-20 00:26:23
+-- @Last Modified time: 2018-03-20 11:02:42
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -90,12 +90,7 @@ end
 function LB:Create()
 	if not self.hp.handle then
 		self.hp:Create()
-		-- 绘制永远不会重绘的东西
-		-- 血条边框
-		local cfgLife = GetConfigValue("ShowLife", self.relation, self.force)
-		if cfgLife then
-			self.hp:DrawLifeBorder(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetX, Config.nLifeOffsetY, Config.nAlpha)
-		end
+		self:Init()
 	end
 	return self
 end
@@ -103,6 +98,31 @@ end
 -- 删除UI
 function LB:Remove()
 	self.hp:Remove()
+	return self
+end
+
+-- 初始化 绘制永远不会重绘的东西
+function LB:Init()
+	-- 血条边框
+	local cfgLife = GetConfigValue("ShowLife", self.relation, self.force)
+	if cfgLife then
+		self.hp:DrawLifeBorder(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetX, Config.nLifeOffsetY, Config.nAlpha)
+	else
+		self.hp:ClearLifeBorder()
+	end
+	return self
+end
+
+-- 重新初始化
+function LB:Reinit(bCreate)
+	if bCreate and not self.hp.handle then
+		self:Create()
+	elseif self.hp.handle then
+		self:Init()
+		self:DrawLife()
+		self:DrawNames()
+		self:DrawOTTitle()
+	end
 	return self
 end
 
@@ -245,9 +265,7 @@ end
 function LB:SetForce(force)
 	if self.force ~= force then
 		self.force = force
-		if self.handle then
-			self:Remove():Create()
-		end
+		self:Reinit()
 	end
 	return self
 end
@@ -255,9 +273,7 @@ end
 function LB:SetRelation(relation)
 	if self.relation ~= relation then
 		self.relation = relation
-		if self.handle then
-			self:Remove():Create()
-		end
+		self:Reinit()
 	end
 	return self
 end
