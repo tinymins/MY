@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 12:50:01
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-03-20 11:02:42
+-- @Last Modified time: 2018-03-20 11:30:57
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -127,6 +127,7 @@ function LB:Reinit(bCreate)
 end
 
 -- 对目标头顶颜色进行滤镜处理（高亮/死亡）
+do local TARGET_ID
 function LB:FxColor(r,g,b,a)
 	-- 死亡判定
 	if self.object.nMoveState == MOVE_STATE.ON_DEATH then
@@ -140,6 +141,10 @@ function LB:FxColor(r,g,b,a)
 	else
 		return r,g,b,a
 	end
+end
+RegisterEvent("UPDATE_SELECT_TARGET",function()
+	TARGET_ID = select(2, MY.GetTarget())
+end)
 end
 
 -- 设置名字
