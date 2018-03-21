@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 12:50:01
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-03-20 11:30:57
+-- @Last Modified time: 2018-03-21 10:36:51
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -90,7 +90,7 @@ end
 function LB:Create()
 	if not self.hp.handle then
 		self.hp:Create()
-		self:Init()
+		self:DrawAll()
 	end
 	return self
 end
@@ -101,24 +101,10 @@ function LB:Remove()
 	return self
 end
 
--- 初始化 绘制永远不会重绘的东西
-function LB:Init()
-	-- 血条边框
-	local cfgLife = GetConfigValue("ShowLife", self.relation, self.force)
-	if cfgLife then
-		self.hp:DrawLifeBorder(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetX, Config.nLifeOffsetY, Config.nAlpha)
-	else
-		self.hp:ClearLifeBorder()
-	end
-	return self
-end
-
--- 重新初始化
-function LB:Reinit(bCreate)
-	if bCreate and not self.hp.handle then
-		self:Create()
-	elseif self.hp.handle then
-		self:Init()
+-- 重新绘制全部
+function LB:DrawAll()
+	if self.hp.handle then
+		self:DrawLifeBorder()
 		self:DrawLife()
 		self:DrawNames()
 		self:DrawOTTitle()
@@ -220,8 +206,8 @@ function LB:DrawNames()
 
 	-- 没有名字的玩意隐藏血条
 	if cfgName and #tWordlines == 0 then
-		self.hp:DrawLifeBar(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetX, Config.nLifeOffsetY, { r, g, b, 0, self.life, Config.szLifeDirection })
-		self.hp:DrawLifeBorder(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetX, Config.nLifeOffsetY, 0)
+		self.hp:ClearLifeBar()
+		self.hp:ClearLifeBorder()
 	elseif cfgLife then
 		self.hp:DrawLifeBar(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetX, Config.nLifeOffsetY, { r, g, b, a, self.life, Config.szLifeDirection })
 		self.hp:DrawLifeBorder(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetX, Config.nLifeOffsetY, a)
@@ -244,6 +230,16 @@ function LB:SetLife(life)
 		self:DrawLife()
 	end
 	return self
+end
+
+-- 血条边框
+function LB:DrawLifeBorder()
+	local cfgLife = GetConfigValue("ShowLife", self.relation, self.force)
+	if cfgLife then
+		self.hp:DrawLifeBorder(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetX, Config.nLifeOffsetY, Config.nAlpha)
+	else
+		self.hp:ClearLifeBorder()
+	end
 end
 
 function LB:DrawLife()
@@ -270,7 +266,7 @@ end
 function LB:SetForce(force)
 	if self.force ~= force then
 		self.force = force
-		self:Reinit()
+		self:DrawAll()
 	end
 	return self
 end
@@ -278,7 +274,7 @@ end
 function LB:SetRelation(relation)
 	if self.relation ~= relation then
 		self.relation = relation
-		self:Reinit()
+		self:DrawAll()
 	end
 	return self
 end

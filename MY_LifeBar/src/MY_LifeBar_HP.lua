@@ -214,6 +214,10 @@ function HP:DrawLifeBar(nWidth, nHeight, nOffsetX, nOffsetY, rgbapd)
 	return self:DrawRect("hp", nWidth, nHeight, nOffsetX, nOffsetY, rgbapd)
 end
 
+function HP:ClearLifeBar(nWidth, nHeight, nOffsetX, nOffsetY, rgbapd)
+	return self:ClearShadow("hp")
+end
+
 -- ÃÓ≥‰∂¡Ãı
 function HP:DrawOTBar(nWidth, nHeight, nOffsetX, nOffsetY, rgbapd)
 	return self:DrawRect("ot", nWidth, nHeight, nOffsetX, nOffsetY, rgbapd)
