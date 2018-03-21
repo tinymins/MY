@@ -36,6 +36,7 @@ data = {
 	{dwID=12671,col="#FF3232FF",szReminder="注",nPriority=1,bCaution=true},--被董龙注视---稻香秘事
 	{dwID=12346},--震晕---稻香秘事
 	{dwID=12376},--傀儡·标记---稻香秘事
+	{dwID=12383},--氧气---战兽山
 	{dwID=12218},--水链缠绕---战兽山
 	{dwID=12381,col="#FF00FF00",szReminder="亡",nPriority=4},--亡骨血毒---战兽山
 	{dwID=12424,col="#FF323200",szReminder="暗",nPriority=4},--暗流剧毒---战兽山
@@ -43,14 +44,14 @@ data = {
 	{dwID=12029,col="#FF3232FF",szReminder="疮",nPriority=1,bCaution=true,szStackOp=">=",nStackNum=3},--寄生浓疮---战兽山
 	{dwID=12202,col="#FF00FFFF",szReminder="寄",nPriority=1,bCaution=true},--寄生之种---战兽山
 	{dwID=12193,col="#FF3232FF",szReminder="荆",nPriority=2,bAttention=true},--荆棘之种---战兽山
-	{dwID=12259,col="#8055FFFF",szReminder="缠",nPriority=2,bAttention=true},--尸毒缠绕---战兽山
+	{dwID=12259,col="#FF00FFFF",szReminder="缠",nPriority=2,bAttention=true},--尸毒缠绕---战兽山
 	{dwID=12254,col="#FF3232FF",szReminder="狂",nPriority=0,bAttention=true,bCaution=true},--狂尸蔓藤---战兽山
 	{dwID=12264,col="#FF00FFFF",szReminder="幽",nPriority=1,bCaution=true},--幽寒境---燕然峰
 	{dwID=12150,col="#FFFF00FF",szReminder="汲",nPriority=2,bAttention=true},--汲取---燕然峰
-	{dwID=12137,col="#00FFFFFF",szReminder="域",nPriority=2,bAttention=true},--天剑域---燕然峰
-	{dwID=12139,col="#8055FFFF",szReminder="绝",nPriority=1,bCaution=true},--天剑绝式---燕然峰
+	{dwID=12137,col="#00FFFFFF",szReminder="域",nPriority=0,bAttention=true,bCaution=true},--天剑域---燕然峰
+	{dwID=12139,col="#8055FFFF",szReminder="绝",nPriority=0,bAttention=true,bCaution=true},--天剑绝式---燕然峰
 	{dwID=12146,col="#FF00FFFF",szReminder="凝",nPriority=0,bAttention=true,bCaution=true},--冰凝---燕然峰
-	{dwID=12117,col="#FFFF00FF",szReminder="瞄",nPriority=0,bAttention=true,bCaution=true},--瞄准---燕然峰
+	{dwID=12117,col="#FF00FFFF",szReminder="瞄",nPriority=0,bAttention=true,bCaution=true},--瞄准---燕然峰
 	{dwID=11371,col="#FFFFFFFF",szReminder="墩",nPriority=2,bAttention=true},--破甲---观风殿
 	{dwID=10552,col="#FFFFFFFF",szReminder="钩",nPriority=2,bAttention=true},--钩吻---观风殿
 	{dwID=11290,col="#FFFF00FF",szReminder="扰",nPriority=2,bAttention=true},--扰心---观风殿
@@ -79,11 +80,11 @@ data = {
 	{dwID=9155,col="#FF00FFFF",szReminder="住",nPriority=0,bAttention=true,bCaution=true},--住相---仙侣庭院
 	{dwID=9423,col="#0096FFFF",szReminder="喉",nPriority=3},--见血封喉---仙侣庭院
 	{dwID=9422,col="#0096FFFF",szReminder="寒",nPriority=2,bAttention=true},--寒气刺骨---仙侣庭院
-	{dwID=9402,col="#FFFFFFFF",szReminder="一",nPriority=2,bAttention=true},--叫阵---仙侣庭院
-	{dwID=9403,col="#FFFF00FF",szReminder="二",nPriority=2,bAttention=true},--叫阵---仙侣庭院
-	{dwID=9404,col="#0096FFFF",szReminder="三",nPriority=2,bAttention=true},--叫阵---仙侣庭院
-	{dwID=9405,col="#00FF00FF",szReminder="四",nPriority=2,bAttention=true},--叫阵---仙侣庭院
-	{dwID=9406,col="#FF3232FF",szReminder="五",nPriority=2,bAttention=true},--叫阵---仙侣庭院
+	{dwID=9402,col="#FFFFFFFF",szReminder="一",nPriority=0,bAttention=true,bCaution=true},--叫阵---仙侣庭院
+	{dwID=9403,col="#FFFF00FF",szReminder="二",nPriority=0,bAttention=true,bCaution=true},--叫阵---仙侣庭院
+	{dwID=9404,col="#0096FFFF",szReminder="三",nPriority=0,bAttention=true,bCaution=true},--叫阵---仙侣庭院
+	{dwID=9405,col="#00FF00FF",szReminder="四",nPriority=0,bAttention=true,bCaution=true},--叫阵---仙侣庭院
+	{dwID=9406,col="#FF3232FF",szReminder="五",nPriority=0,bAttention=true,bCaution=true},--叫阵---仙侣庭院
 	{dwID=9412,col="#FFFF00FF",szReminder="步",nPriority=2,bAttention=true},--步步紧逼---仙侣庭院
 	{dwID=9193,col="#FF3232FF",szReminder="血",nPriority=2,bAttention=true},--血咒---仙侣庭院
 	{dwID=9652,col="#FF3232FF",szReminder="封",nPriority=3},--点穴封脉---花月别院
@@ -150,8 +151,8 @@ data = {
 	{dwID=6861},--噬魄---血战天策
 	{dwID=7110,col="#FF3232FF",szReminder="折",nPriority=2,bAttention=true},--黑齿折磨---血战天策
 	{dwID=6917},--月下夜影---血战天策
-	{dwID=8083,col="#FF3232FF",szReminder="骨",nPriority=1,bCaution=true},--骨折---夜守孤城
-	{dwID=8392,col="#FFFFFFFF",szReminder="追",nPriority=1,bCaution=true},--火龙追击---夜守孤城
+	{dwID=8083},--骨折---夜守孤城
+	{dwID=8392,col="#FFFF00FF",szReminder="追",nPriority=1,bCaution=true},--火龙追击---夜守孤城
 	{dwID=7945,col="#00FF00FF",szReminder="盾",nPriority=3},--重盾---夜守孤城
 	{dwID=8347,col="#FF00FFFF",szReminder="三",nPriority=0,bAttention=true,bCaution=true},--三毒入体---逐虎驱狼
 	{dwID=8340,col="#FF3232FF",szReminder="注",nPriority=2,bAttention=true},--注目---逐虎驱狼

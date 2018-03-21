@@ -29,7 +29,7 @@ data = {
 	{dwID=12223},--荊棘裹身---戰獸山
 	{dwID=12194,col="#8055FFFF",szReminder="潛",nPriority=3},--潛伏之種---戰獸山
 	{dwID=12258,szStackOp=">=",nStackNum=3},--屍毒---戰獸山
-	{dwID=12253,col="#FF00FFFF",szReminder="擒",nPriority=3},--被擒---戰獸山
+	{dwID=12253,col="#FFFF00FF",szReminder="擒",nPriority=3},--被擒---戰獸山
 	{dwID=12261,col="#00ffffFF",szReminder="緩",nPriority=3,szStackOp=">=",nStackNum=6},--冰塞川·緩---燕然峰
 	{dwID=12262},--冰塞川·凍凝---燕然峰
 	{dwID=12132},--蝕體---燕然峰
@@ -109,7 +109,7 @@ data = {
 	{dwID=8343},--瞄准---夜守孤城
 	{dwID=8380},--眩暈---夜守孤城
 	{dwID=7360},--無法移動---夜守孤城
-	{dwID=8084},--威懾---夜守孤城
+	{dwID=8084,col="#FF3232FF",szReminder="威",nPriority=3},--威懾---夜守孤城
 	{dwID=8535},--田佈戈炮火成就---夜守孤城
 	{dwID=8536},--田佈戈威懾成就---夜守孤城
 	{dwID=8028,col="#FF800000",szReminder="碎",nPriority=4,szStackOp=">=",nStackNum=2},--碎甲---逐虎驅狼
@@ -118,7 +118,7 @@ data = {
 	{dwID=8312},--腐血狂亂---逐虎驅狼
 	{dwID=8215},--氣血翻湧---逐虎驅狼
 	{dwID=8042},--凍結---逐虎驅狼
-	{dwID=8196,col="#00FFFFFF",szReminder="冰",nPriority=3},--冰霜一指---逐虎驅狼
+	{dwID=8196,col="#00FFFFFF",szReminder="冰",nPriority=3,bCaution=true},--冰霜一指---逐虎驅狼
 	{dwID=8199,col="#8055FFFF",szReminder="霜",nPriority=3},--冰霜氣勁---逐虎驅狼
 	{dwID=8822},--音波之殇·陽---逐虎驅狼
 	{dwID=8823},--音波之殇·陰---逐虎驅狼
@@ -131,10 +131,10 @@ data = {
 	{dwID=8027},--音波衝擊---逐虎驅狼
 	{dwID=8047},--散魂---逐虎驅狼
 	{dwID=8046},--失血---逐虎驅狼
-	{dwID=8044,col="#FF3232FF",szReminder="鮮",nPriority=3},--鮮血獻祭---逐虎驅狼
-	{dwID=8045,col="#FF00FFFF",szReminder="靈",nPriority=3},--靈魂獻祭---逐虎驅狼
-	{dwID=8039,col="#FF3232FF",szReminder="聖",nPriority=3},--聖炎---逐虎驅狼
-	{dwID=8040,col="#00FFFFFF",szReminder="寒",nPriority=3},--寒意---逐虎驅狼
+	{dwID=8044,col="#FF3232FF",szReminder="鮮",nPriority=0,bAttention=true,bCaution=true},--鮮血獻祭---逐虎驅狼
+	{dwID=8045,col="#FF00FFFF",szReminder="靈",nPriority=0,bAttention=true,bCaution=true},--靈魂獻祭---逐虎驅狼
+	{dwID=8039,col="#FF3232FF",szReminder="聖",nPriority=0,bAttention=true,bCaution=true},--聖炎---逐虎驅狼
+	{dwID=8040,col="#00FFFFFF",szReminder="寒",nPriority=0,bAttention=true,bCaution=true},--寒意---逐虎驅狼
 	{dwID=8036,col="#FFFF0000",szReminder="瞄",nPriority=4},--瞄准---逐虎驅狼
 	{dwID=8029,col="#FF323200",szReminder="流",nPriority=4,szStackOp=">=",nStackNum=2},--流血---逐虎驅狼
 	{dwID=8010},--戰鬥標記---逐虎驅狼

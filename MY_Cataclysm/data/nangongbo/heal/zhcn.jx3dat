@@ -22,7 +22,7 @@ data = {
 	{dwID=12423},--骨刺---战兽山
 	{dwID=12395,szStackOp=">=",nStackNum=2},--骨髓血毒---战兽山
 	{dwID=12194,col="#8055FFFF",szReminder="潜",nPriority=3},--潜伏之种---战兽山
-	{dwID=12253,col="#FF00FFFF",szReminder="擒",nPriority=3},--被擒---战兽山
+	{dwID=12253,col="#FFFF00FF",szReminder="擒",nPriority=3},--被擒---战兽山
 	{dwID=12142},--地陷吸收---燕然峰
 	{dwID=12132},--蚀体---燕然峰
 	{dwID=12151},--寒绝剑---燕然峰
@@ -73,7 +73,7 @@ data = {
 	{dwID=6936},--闪舞刺---血战天策
 	{dwID=8346},--火燎---夜守孤城
 	{dwID=8343},--瞄准---夜守孤城
-	{dwID=8084},--威慑---夜守孤城
+	{dwID=8084,col="#FF3232FF",szReminder="威",nPriority=3},--威慑---夜守孤城
 	{dwID=8028,col="#FF800000",szReminder="碎",nPriority=4,szStackOp=">=",nStackNum=2},--碎甲---逐虎驱狼
 	{dwID=8319},--回龙碎甲---逐虎驱狼
 	{dwID=8352},--锯骨---逐虎驱狼
@@ -86,8 +86,8 @@ data = {
 	{dwID=8174},--音波冲击---逐虎驱狼
 	{dwID=8027},--音波冲击---逐虎驱狼
 	{dwID=8046},--失血---逐虎驱狼
-	{dwID=8039,col="#FF3232FF",szReminder="圣",nPriority=3},--圣炎---逐虎驱狼
-	{dwID=8040,col="#00FFFFFF",szReminder="寒",nPriority=3},--寒意---逐虎驱狼
+	{dwID=8039,col="#FF3232FF",szReminder="圣",nPriority=0,bAttention=true,bCaution=true},--圣炎---逐虎驱狼
+	{dwID=8040,col="#00FFFFFF",szReminder="寒",nPriority=0,bAttention=true,bCaution=true},--寒意---逐虎驱狼
 	{dwID=8036,col="#FFFF0000",szReminder="瞄",nPriority=4},--瞄准---逐虎驱狼
 	{dwID=8029,col="#FF323200",szReminder="流",nPriority=4,szStackOp=">=",nStackNum=2},--流血---逐虎驱狼
 	{dwID=8010},--战斗标记---逐虎驱狼
