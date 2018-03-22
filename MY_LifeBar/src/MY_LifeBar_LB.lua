@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 12:50:01
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-03-21 10:36:51
+-- @Last Modified time: 2018-03-22 16:17:29
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -66,6 +66,7 @@ function LB:ctor(dwType, dwID)
 	self.type = dwType
 	self.id = dwID
 	self.object = MY.GetObject(dwType, dwID)
+	self.cfx = nil
 	self.name = ""
 	self.title = ""
 	self.tong = ""
@@ -112,25 +113,12 @@ function LB:DrawAll()
 	return self
 end
 
--- 对目标头顶颜色进行滤镜处理（高亮/死亡）
-do local TARGET_ID
-function LB:FxColor(r,g,b,a)
-	-- 死亡判定
-	if self.object.nMoveState == MOVE_STATE.ON_DEATH then
-		if TARGET_ID == self.object.dwID then
-			return math.ceil(r/2.2), math.ceil(g/2.2), math.ceil(b/2.2), a
-		else
-			return math.ceil(r/2.5), math.ceil(g/2.5), math.ceil(b/2.5), a
-		end
-	elseif TARGET_ID == self.object.dwID then
-		return 255-(255-r)*0.3, 255-(255-g)*0.3, 255-(255-b)*0.3, a
-	else
-		return r,g,b,a
+function LB:SetColorFx(cfx)
+	if self.cfx ~= cfx then
+		self.cfx = cfx
+		self:DrawAll()
 	end
-end
-RegisterEvent("UPDATE_SELECT_TARGET",function()
-	TARGET_ID = select(2, MY.GetTarget())
-end)
+	return self
 end
 
 -- 设置名字
@@ -179,7 +167,10 @@ function LB:DrawNames()
 		r,g,b    = unpack(GetConfigValue("Color", self.relation, self.force))
 	end
 	a,f = Config.nAlpha, Config.nFont
-	r,g,b,a = self:FxColor(r,g,b,a)
+
+	if self.cfx then
+		r, g, b, a = self.cfx(r, g, b, a)
+	end
 
 	local i = #Config.nLineHeight
 	if cfgTong then
@@ -247,7 +238,9 @@ function LB:DrawLife()
 	local cfgLifePer = GetConfigValue("ShowLifePer", self.relation, self.force)
 	local r, g, b    = unpack(GetConfigValue("Color", self.relation, self.force))
 	local a, f = Config.nAlpha, Config.nFont
-	r, g, b, a = self:FxColor(r, g, b, a)
+	if self.cfx then
+		r, g, b, a = self.cfx(r, g, b, a)
+	end
 	if cfgLife then
 		self.hp:DrawLifeBar(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetX, Config.nLifeOffsetY, { r, g, b, a, self.life, Config.szLifeDirection })
 	end
@@ -309,7 +302,9 @@ function LB:DrawOTTitle(rgba)
 	local r, g, b  = unpack(GetConfigValue("Color", self.relation, self.force))
 	local a, f = Config.nAlpha, Config.nFont
 	if rgba then r,g,b,a = rgba[1] or r, rgba[2] or g, rgba[3] or b, rgba[4] or a end
-	r,g,b,a = self:FxColor(r,g,b,a)
+	if self.cfx then
+		r, g, b, a = self.cfx(r, g, b, a)
+	end
 	if cfgOTBar then
 		self.hp:DrawOTTitle({ self.info.OT.szTitle, Config.nOTTitleOffsetX, Config.nOTTitleOffsetY }, {r,g,b,a,f})
 	end
@@ -331,7 +326,9 @@ function LB:DrawOTBar(rgba)
 	local r, g, b  = unpack(GetConfigValue("Color", self.relation, self.force))
 	local a, f = Config.nAlpha, Config.nFont
 	if rgba then r,g,b,a,p = rgba[1] or r, rgba[2] or g, rgba[3] or b, rgba[4] or a end
-	r,g,b,a = self:FxColor(r,g,b,a)
+	if self.cfx then
+		r, g, b, a = self.cfx(r, g, b, a)
+	end
 	if cfgOTBar then
 		self.hp:DrawOTBar(Config.nOTBarWidth, Config.nOTBarHeight, Config.nOTBarOffsetX, Config.nOTBarOffsetY, { r, g, b, a, self.info.OT.nPercentage, Config.szOTBarDirection })
 	end

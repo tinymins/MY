@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-03-20 10:45:13
+-- @Last Modified time: 2018-03-22 16:14:16
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -35,7 +35,6 @@ local LB_CACHE = {}
 local TONG_NAME_CACHE = {}
 local NPC_CACHE = {}
 local PLAYER_CACHE = {}
-local TARGET_ID = 0
 local LAST_FIGHT_STATE = false
 local SYS_HEAD_TOP_STATE
 local LB = MY_LifeBar_LB
@@ -245,6 +244,10 @@ MY.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED', function() D.Reset() end)
 -- 过图可能切换开关状态
 MY.RegisterEvent('LOADING_END', D.AutoSwitchSysHeadTop)
 
+local function fxTarget(r, g, b, a) return 255 - (255 - r) * 0.3, 255 - (255 - g) * 0.3, 255 - (255 - b) * 0.3, a end
+local function fxDeath(r, g, b, a) return ceil(r * 0.4), ceil(g * 0.4), ceil(b * 0.4), a end
+local function fxDeathTarget(r, g, b, a) return ceil(r * 0.45), ceil(g * 0.45), ceil(b * 0.45), a end
+
 local function CheckInvalidRect(dwType, dwID, me)
 	local lb = LB_CACHE[dwID]
 	local object, info = MY.GetObject(dwType, dwID)
@@ -276,13 +279,18 @@ local function CheckInvalidRect(dwType, dwID, me)
 			lb = LB(dwType, dwID)
 			LB_CACHE[dwID] = lb
 		end
+		local dwTarType, dwTarID = me.GetTarget()
 		-- 基本属性设置
 		lb:SetForce(D.GetForce(dwID))
 			:SetRelation(D.GetRelation(dwID))
 			:SetLife(info.nCurrentLife / info.nMaxLife)
 			:SetTong(D.GetTongName(object.dwTongID, "[%s]"))
 			:SetTitle(object.szTitle)
-			:Create()
+			:SetColorFx(
+				object.nMoveState == MOVE_STATE.ON_DEATH
+				and (dwID == dwTarID and fxDeathTarget or fxDeath)
+				or (dwID == dwTarID and fxTarget or nil)
+			):Create()
 		local szName = MY.GetObjectName(object)
 		if szName then
 			if not Config.bShowDistance or dwID == me.dwID then
@@ -450,21 +458,6 @@ RegisterEvent("PLAYER_LEAVE_SCENE",function()
 		LB_CACHE[arg0] = nil
 	end
 	PLAYER_CACHE[arg0] = nil
-end)
-
-RegisterEvent("UPDATE_SELECT_TARGET",function()
-	local _, dwID = MY.GetTarget()
-	if TARGET_ID == dwID then
-		return
-	end
-	local dwOldTargetID = TARGET_ID
-	TARGET_ID = dwID
-	if LB_CACHE[dwOldTargetID] then
-		LB_CACHE[dwOldTargetID]:DrawNames():DrawLife()
-	end
-	if LB_CACHE[dwID] then
-		LB_CACHE[dwID]:DrawNames():DrawLife()
-	end
 end)
 
 local function onSwitch()
