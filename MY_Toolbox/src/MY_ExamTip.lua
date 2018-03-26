@@ -62,6 +62,9 @@ local function QueryData(szQues)
 		end
 	end
 
+	if MY.IsInDevMode() then
+		return
+	end
 	local _, _, szLang, _ = GetVersion()
 	MY.Ajax({
 		type = 'get',

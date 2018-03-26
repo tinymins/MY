@@ -635,6 +635,17 @@ end
 MY.RegisterEvent("CURL_REQUEST_RESULT.AJAX", OnCurlRequestResult)
 end
 
+function MY.IsInDevMode()
+	if IsDebugClient() then
+		return true
+	end
+	local ip = select(7, GetUserServer())
+	if ip:find("^192%.") or ip:find("^10%.") then
+		return true
+	end
+	return false
+end
+
 do
 -------------------------------
 -- remote data storage online
@@ -651,6 +662,9 @@ MY.BreatheCall("MYLIB#STORAGE_DATA", 200, function()
 	local me = GetClientPlayer()
 	if not me or IsRemotePlayer(me.dwID) or not MY.GetTongName() then
 		return
+	end
+	if MY.IsInDevMode() then
+		return 0
 	end
 	m_nStorageVer = MY.LoadLUAData({'config/storageversion.jx3dat', MY_DATA_PATH.ROLE}) or {}
 	MY.Ajax({
@@ -705,6 +719,9 @@ MY.RegisterExit("MYLIB#STORAGE_DATA", function()
 end)
 -- 保存个人数据 方便网吧党和公司家里多电脑切换
 function MY.StorageData(szKey, oData)
+	if MY.IsInDevMode() then
+		return
+	end
 	MY.DelayCall("STORAGE_" .. szKey, 120000, function()
 		local me = GetClientPlayer()
 		if not me then

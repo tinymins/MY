@@ -1131,6 +1131,9 @@ MY.RegisterReload("ChatPanelHook", UnhookAll)
 end
 
 local function UploadSerendipity(szName, szSerendipity, nMethod, bFinish, dwTime)
+	if MY.IsInDevMode() then
+		return
+	end
 	MY.Ajax({
 		type = "post/json",
 		url = 'http://data.jx3.derzh.com/api/serendipities',
