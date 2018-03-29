@@ -14,6 +14,8 @@ local tinsert, tremove = table.insert, table.remove
 
 -- (table) Number2Bitmap(number n)
 -- 将一个数值转换成一个Bit表（低位在前 高位在后）
+do
+local metatable = { __index = function() return 0 end }
 function _C.Number2Bitmap(n)
 	local t = {}
 	if n == 0 then
@@ -25,9 +27,10 @@ function _C.Number2Bitmap(n)
 			n = math.floor(n / 2)
 		end
 	end
-	return t
+	return setmetatable(t, metatable)
 end
 MY.Math.Number2Bitmap = _C.Number2Bitmap
+end
 
 -- (number) Bitmap2Number(table t)
 -- 将一个Bit表转换成一个数值（低位在前 高位在后）
