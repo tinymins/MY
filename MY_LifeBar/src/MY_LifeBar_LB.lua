@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 12:50:01
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-03-29 19:53:52
+-- @Last Modified time: 2018-03-29 20:02:16
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -28,6 +28,7 @@ local IsBoolean, IsString, IsTable = MY.IsBoolean, MY.IsString, MY.IsTable
 local LB = class()
 local HP = MY_LifeBar_HP
 local CACHE = setmetatable({}, { __mode = "v" })
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_LifeBar/lang/")
 
 local function InitConfigData(self)
 	-- ÅäÉ«
