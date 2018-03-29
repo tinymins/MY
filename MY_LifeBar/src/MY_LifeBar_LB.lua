@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 12:50:01
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-03-29 20:02:16
+-- @Last Modified time: 2018-03-29 20:14:12
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -259,22 +259,22 @@ function LB:DrawTexts(force)
 			insert(aTexts, "<" .. self.title_text .. ">")
 		end
 		local text = ""
-		if self.name_visible and self.name_text and self.name_text ~= "" then
-			text = text .. self.name_text
-		end
-		if self.kungfu_visible and self.kungfu_text and self.kungfu_text ~= "" then
-			if text ~= "" then
-				text = text .. _L.STR_SPLIT_DOT
+		if self.name_visible then
+			if self.name_text and self.name_text ~= "" then
+				text = text .. self.name_text
 			end
-			text = text .. self.kungfu_text
-		end
-		if self.distance_visible and self.distance and self.distance ~= 0 then
-			if text ~= "" then
-				text = text .. _L.STR_SPLIT_DOT
+			if self.kungfu_visible and self.kungfu_text and self.kungfu_text ~= "" then
+				if text ~= "" then
+					text = text .. _L.STR_SPLIT_DOT
+				end
+				text = text .. self.kungfu_text
 			end
-			text = text .. self.distance_fmt:format(self.distance)
-		end
-		if text ~= "" then
+			if self.distance_visible and self.distance and self.distance ~= 0 then
+				if text ~= "" then
+					text = text .. _L.STR_SPLIT_DOT
+				end
+				text = text .. self.distance_fmt:format(self.distance)
+			end
 			insert(aTexts, text)
 		end
 		self.hp:DrawTexts(aTexts, self.texts_y, self.texts_height, r, g, b, a, f)
