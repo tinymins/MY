@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 12:50:01
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-03-29 20:14:12
+-- @Last Modified time: 2018-03-29 23:04:51
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -346,7 +346,7 @@ end
 
 function LB:DrawLife(force)
 	if self.life_bar_invalid or self.life_bar_border_invalid or self.life_text_invalid or force then
-		local r, g, b, a = self.r, self.g, self.b, self.a
+		local r, g, b, a, f = self.r, self.g, self.b, self.a, self.font
 		if self.cfx then
 			r, g, b, a = self.cfx(r, g, b, a)
 		end
@@ -360,7 +360,7 @@ function LB:DrawLife(force)
 		end
 		if self.life_text_invalid or force then
 			if self.life_text_visible then
-				self.hp:DrawLifeText(self.life_text_fmt:format(100 * self.life / self.max_life), Config.nLifePerOffsetX, Config.nLifePerOffsetY, r, g, b, a, f)
+				self.hp:DrawLifeText(self.life_text_fmt:format(100 * self.life / self.max_life), self.life_text_x, self.life_text_y, r, g, b, a, f)
 			else
 				self.hp:ClearLifeText()
 			end

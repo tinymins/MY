@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-03-29 19:45:32
+-- @Last Modified time: 2018-03-29 23:00:52
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -359,7 +359,7 @@ local function CheckInvalidRect(dwType, dwID, me)
 		-- 血量数值部分
 		local bShowLifePercent = GetConfigValue("ShowLifePer", relation, force) and (not Config.bHideLifePercentageWhenFight or me.bFightState)
 		if bShowLifePercent then
-			lb:SetLifeText(Config.bHideLifePercentageDecimal and "%.0f" or "%.1f")
+			lb:SetLifeText(Config.nLifePerOffsetX, Config.nLifePerOffsetY, Config.bHideLifePercentageDecimal and "%.0f" or "%.1f")
 		end
 		lb:SetLifeTextVisible(bShowLifePercent)
 		lb:Paint()
