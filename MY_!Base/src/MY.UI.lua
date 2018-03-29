@@ -2186,6 +2186,7 @@ function XGUI:size(arg0, arg1, arg2, arg3)
 		for _, raw in ipairs(self.raws) do
 			XGUI(raw):uievent('OnSizeChanged', arg0)
 		end
+		return self
 	elseif IsNumber(arg0) or IsNumber(arg1) or IsNumber(arg2) or IsNumber(arg3) then
 		local componentType, element
 		for _, raw in ipairs(self.raws) do
