@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-03-22 16:14:16
+-- @Last Modified time: 2018-03-29 16:59:06
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -27,8 +27,24 @@ local IsBoolean, IsString, IsTable = MY.IsBoolean, MY.IsString, MY.IsTable
 -----------------------------------------------------------------------------------------
 local Config = MY_LifeBar_Config
 if not Config then
-	return
+    return
 end
+
+local function GetConfigValue(key, relation, force)
+	local cfg, value = Config[key][relation]
+	if force == 'Npc' or force == 'Player' then
+		value = cfg[force]
+	else
+		if cfg.DifferentiateForce then
+			value = cfg[force]
+		end
+		if value == nil then
+			value = Config[key][relation]["Player"]
+		end
+	end
+	return value
+end
+-----------------------------------------------------------------------------------------
 
 local _L, D = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_LifeBar/lang/"), {}
 local LB_CACHE = {}
@@ -38,7 +54,6 @@ local PLAYER_CACHE = {}
 local LAST_FIGHT_STATE = false
 local SYS_HEAD_TOP_STATE
 local LB = MY_LifeBar_LB
-local OT_STATE = MY_LifeBar_LB.OT_STATE
 local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子
 
 MY_LifeBar = {}
@@ -129,10 +144,7 @@ function D.GetForce(dwID)
 	end
 end
 
-function D.GetTongName(dwTongID, szFormatString)
-	if not szFormatString then
-		szFormatString = "%s"
-	end
+function D.GetTongName(dwTongID)
 	if not IsNumber(dwTongID) or dwTongID == 0 then
 		return
 	end
@@ -140,7 +152,7 @@ function D.GetTongName(dwTongID, szFormatString)
 		TONG_NAME_CACHE[dwTongID] = GetTongClient().ApplyGetTongName(dwTongID)
 	end
 	if TONG_NAME_CACHE[dwTongID] then
-		return string.format(szFormatString, TONG_NAME_CACHE[dwTongID])
+		return TONG_NAME_CACHE[dwTongID]
 	end
 end
 
@@ -202,14 +214,19 @@ function D.ResumeSysHeadTop()
 end
 MY.RegisterExit(D.ResumeSysHeadTop)
 
--- 重绘所有UI
+function D.Repaint()
+	for _, lb in pairs(LB_CACHE) do
+		lb:Paint(true)
+	end
+end
+MY.RegisterEvent("UI_SCALED", D.Repaint)
+
 function D.Reset()
 	LB_CACHE = {}
 	LB("clear")
 	-- auto adjust index
-	MY.BreatheCall("XLifeBar_AdjustIndex", false)
-	if Config.bAdjustIndex then
-		MY.BreatheCall("XLifeBar_AdjustIndex", function()
+	if MY_LifeBar.bEnabled and Config.bAdjustIndex then
+		MY.BreatheCall("MY_LifeBar_AdjustIndex", function()
 			local n = 0
 			local t = {}
 			-- refresh current index data
@@ -233,21 +250,18 @@ function D.Reset()
 				end
 			end
 		end, 500)
+	else
+		MY.BreatheCall("MY_LifeBar_AdjustIndex", false)
 	end
-
 	D.AutoSwitchSysHeadTop()
 end
--- 加载界面
-MY.RegisterEvent('LOGIN_GAME', function() MY.UI.CreateFrame("MY_LifeBar", { level = "Lowest", empty = true }) end)
--- 重载配置文件并重绘
-MY.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED', function() D.Reset() end)
--- 过图可能切换开关状态
+MY.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED', D.Reset)
 MY.RegisterEvent('LOADING_END', D.AutoSwitchSysHeadTop)
 
+do
 local function fxTarget(r, g, b, a) return 255 - (255 - r) * 0.3, 255 - (255 - g) * 0.3, 255 - (255 - b) * 0.3, a end
 local function fxDeath(r, g, b, a) return ceil(r * 0.4), ceil(g * 0.4), ceil(b * 0.4), a end
 local function fxDeathTarget(r, g, b, a) return ceil(r * 0.45), ceil(g * 0.45), ceil(b * 0.45), a end
-
 local function CheckInvalidRect(dwType, dwID, me)
 	local lb = LB_CACHE[dwID]
 	local object, info = MY.GetObject(dwType, dwID)
@@ -277,96 +291,71 @@ local function CheckInvalidRect(dwType, dwID, me)
 	if bVisible then
 		if not lb then
 			lb = LB(dwType, dwID)
+				:SetFont(Config.nFont)
+				:SetTextsPos(Config.nTextOffsetY, Config.nTextLineHeight)
+				:Create()
 			LB_CACHE[dwID] = lb
 		end
 		local dwTarType, dwTarID = me.GetTarget()
-		-- 基本属性设置
-		lb:SetForce(D.GetForce(dwID))
-			:SetRelation(D.GetRelation(dwID))
-			:SetLife(info.nCurrentLife / info.nMaxLife)
-			:SetTong(D.GetTongName(object.dwTongID, "[%s]"))
-			:SetTitle(object.szTitle)
-			:SetColorFx(
-				object.nMoveState == MOVE_STATE.ON_DEATH
-				and (dwID == dwTarID and fxDeathTarget or fxDeath)
-				or (dwID == dwTarID and fxTarget or nil)
-			):Create()
+		local relation = D.GetRelation(dwID)
+		local force = D.GetForce(dwID)
 		local szName = MY.GetObjectName(object)
-		if szName then
-			if not Config.bShowDistance or dwID == me.dwID then
-				lb:SetName(szName)
-			else
-				lb:SetName(
-					szName .. _L.STR_SPLIT_DOT
-					.. math.floor(GetCharacterDistance(me.dwID, dwID) / 64)
-					.. g_tStrings.STR_METER
-				)
+		-- 配色
+		local r, g, b = unpack(GetConfigValue("Color", relation, force))
+		lb:SetColor(r, g, b, Config.nAlpha, Config.nFont)
+		lb:SetColorFx(
+			object.nMoveState == MOVE_STATE.ON_DEATH
+			and (dwID == dwTarID and fxDeathTarget or fxDeath)
+			or (dwID == dwTarID and fxTarget or nil)
+		)
+		-- 名字/帮会/称号部分
+		local bShowName = GetConfigValue("ShowName", relation, force)
+		if bShowName then
+			if szName then
+				if not Config.bShowDistance or dwID == me.dwID then
+					lb:SetName(szName)
+				else
+					lb:SetName(
+						szName
+						.. _L.STR_SPLIT_DOT
+						.. math.floor(GetCharacterDistance(me.dwID, dwID) / 64)
+						.. g_tStrings.STR_METER
+					)
+				end
 			end
 		end
-		if me.bFightState ~= LAST_FIGHT_STATE then
-			lb:DrawLife()
+		lb:SetNameVisible(bShowName)
+		local bShowTong = GetConfigValue("ShowTong", relation, force)
+		if bShowTong then
+			lb:SetTong(D.GetTongName(object.dwTongID) or "")
 		end
-		-- 读条判定
-		local nState = lb:GetOTState()
-		if nState ~= OT_STATE.ON_SKILL then
-			local nType, dwSkillID, dwSkillLevel, fProgress = object.GetSkillOTActionState()
-			if nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
-			or nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL then
-				lb:SetOTTitle(Table_GetSkillName(dwSkillID, dwSkillLevel)):DrawOTTitle():SetOTPercentage(fProgress):SetOTState(OT_STATE.START_SKILL)
-			end
+		lb:SetTongVisible(bShowTong)
+		local bShowTitle = GetConfigValue("ShowTitle", relation, force)
+		if bShowTitle then
+			lb:SetTitle(object.szTitle or "")
 		end
-		if nState == OT_STATE.START_SKILL then                              -- 技能读条开始
-			lb:DrawOTBarBorder(Config.nAlpha):SetOTPercentage(0):SetOTState(OT_STATE.ON_SKILL)
-		elseif nState == OT_STATE.ON_SKILL then                             -- 技能读条中
-			local nType, dwSkillID, dwSkillLevel, fProgress = object.GetSkillOTActionState()
-			if nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
-			or nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL then
-				lb:SetOTPercentage(fProgress):SetOTTitle(Table_GetSkillName(dwSkillID, dwSkillLevel))
-			else
-				lb:SetOTPercentage(1):SetOTState(OT_STATE.SUCCEED)
-			end
-		elseif nState == OT_STATE.START_PREPARE then                        -- 读条开始
-			lb:DrawOTBarBorder(Config.nAlpha):SetOTPercentage(0):SetOTState(OT_STATE.ON_PREPARE):DrawOTTitle()
-		elseif nState == OT_STATE.ON_PREPARE then                           -- 读条中
-			if not object.GetOTActionState or object.GetOTActionState() == 0 then    -- 为0 说明没有读条
-				lb:SetOTPercentage(1):SetOTState(OT_STATE.SUCCEED)
-			else
-				lb:SetOTPercentage(( GetLogicFrameCount() - lb.info.OT.nStartFrame ) / lb.info.OT.nFrameCount)
-			end
-		elseif nState == OT_STATE.START_CHANNEL then                        -- 逆读条开始
-			lb:DrawOTBarBorder(Config.nAlpha):SetOTPercentage(1):SetOTState(OT_STATE.ON_CHANNEL):DrawOTTitle()
-		elseif nState == OT_STATE.ON_CHANNEL then                           -- 逆读条中
-			local nPercentage = 1 - ( GetLogicFrameCount() - lb.info.OT.nStartFrame ) / lb.info.OT.nFrameCount
-			if object.GetOTActionState and
-			object.GetOTActionState() == 2 and -- 为2 说明在读条引导保护 计算当前帧进度
-			nPercentage >= 0 then
-				lb:SetOTPercentage(nPercentage):DrawOTTitle()
-			else
-				lb:SetOTPercentage(0):SetOTState(OT_STATE.SUCCEED)
-			end
-		elseif nState == OT_STATE.SUCCEED then                              -- 读条成功
-			if GetLogicFrameCount() - lb.info.OT.nStartFrame < 16 then -- 渐变
-				local rgba = { nil,nil,nil, Config.nAlpha - (GetLogicFrameCount() - lb.info.OT.nStartFrame) * (Config.nAlpha/16) }
-				lb:DrawOTBarBorder(rgba[4]):DrawOTBar(rgba):DrawOTTitle(rgba)
-			else
-				local rgba = { nil,nil,nil, 0 }
-				lb:SetOTTitle("", rgba):SetOTState(OT_STATE.IDLE):DrawOTBarBorder(0):DrawOTBar(rgba)
-			end
-		elseif nState == OT_STATE.BREAK then                                -- 读条打断
-			if GetLogicFrameCount() - lb.info.OT.nStartFrame < 16 then -- 渐变
-				local rgba = { 255,0,0, Config.nAlpha - (GetLogicFrameCount() - lb.info.OT.nStartFrame) * (Config.nAlpha/16) }
-				lb:DrawOTBarBorder(rgba[4]):DrawOTBar(rgba):DrawOTTitle(rgba)
-			else
-				lb:SetOTTitle(""):SetOTState(OT_STATE.IDLE):DrawOTBarBorder(0):DrawOTBar({nil,nil,nil,0})
-			end
+		lb:SetTitleVisible(bShowTitle)
+		-- 血条部分
+		lb:SetLife(info.nCurrentLife, info.nMaxLife)
+		local bShowLife = szName ~= "" and GetConfigValue("ShowLife", relation, force)
+		if bShowLife then
+			lb:SetLifeBar(Config.nLifeOffsetX, Config.nLifeOffsetY, Config.nLifeWidth, Config.nLifeHeight)
 		end
+		lb:SetLifeBarVisible(bShowLife)
+		-- 血量数值部分
+		local bShowLifePercent = GetConfigValue("ShowLifePer", relation, force) and (not Config.bHideLifePercentageWhenFight or me.bFightState)
+		if bShowLifePercent then
+			lb:SetLifeText(Config.bHideLifePercentageDecimal and "%.0f" or "%.1f")
+		end
+		lb:SetLifeTextVisible(bShowLifePercent)
+		lb:Paint()
 	elseif lb then
 		lb:Remove()
 		LB_CACHE[dwID] = nil
 	end
 end
 
-function MY_LifeBar.OnFrameBreathe()
+local function onBreathe()
 	if not D.IsMapEnabled() then
 		return
 	end
@@ -383,56 +372,9 @@ function MY_LifeBar.OnFrameBreathe()
 	for k , v in pairs(PLAYER_CACHE) do
 		CheckInvalidRect(TARGET.PLAYER, k, me)
 	end
-
-	if me.bFightState ~= LAST_FIGHT_STATE then
-		LAST_FIGHT_STATE = me.bFightState
-	end
 end
-
--- -- event
--- MY.RegisterEvent("SYS_MSG", function()
---     if arg0 == "UI_OME_SKILL_HIT_LOG" and arg3 == SKILL_EFFECT_TYPE.SKILL then
---         Output(arg1, arg4, arg5, arg0, "UI_OME_SKILL_HIT_LOG")
---     elseif arg0 == "UI_OME_SKILL_EFFECT_LOG" and arg4 == SKILL_EFFECT_TYPE.SKILL then
---         Output(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10 ,arg11, arg12, arg13, GetPlayer(arg1).szName, GetSkill(arg5, arg6).szSkillName)
---     end
--- end)
--- 逆读条事件响应
-MY.RegisterEvent("DO_SKILL_CAST", function()
-	local dwID, dwSkillID = arg0, arg1
-	local skill = GetSkill(arg1, 1)
-	if skill.bIsChannelSkill then
-		local lb = LB_CACHE[dwID]
-		if lb then
-			local nFrame = MY.GetChannelSkillFrame(dwSkillID) or 0
-			lb:StartOTBar(skill.szSkillName, nFrame, true)
-		end
-	end
-end)
--- 读条打断事件响应
-MY.RegisterEvent("OT_ACTION_PROGRESS_BREAK", function()
-	local lb = LB_CACHE[arg0]
-	if lb then
-		lb:SetOTState(OT_STATE.BREAK)
-	end
-end)
--- MY.RegisterEvent("OT_ACTION_PROGRESS", function()Output("OT_ACTION_PROGRESS",arg0, arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13) end)
--- MY.RegisterEvent("OT_ACTION_PROGRESS_UPDATE", function()Output("OT_ACTION_PROGRESS_UPDATE",arg0, arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13) end)
--- MY.RegisterEvent("DO_SKILL_PREPARE_PROGRESS", function()Output("DO_SKILL_PREPARE_PROGRESS",arg0, arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13) end)
--- MY.RegisterEvent("DO_SKILL_CHANNEL_PROGRESS", function()Output("DO_SKILL_CHANNEL_PROGRESS",arg0, arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13) end)
--- MY.RegisterEvent("DO_SKILL_HOARD_PROGRESS", function()Output("DO_SKILL_HOARD_PROGRESS",arg0, arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13) end)
--- 拾取事件响应
-MY.RegisterEvent("DO_PICK_PREPARE_PROGRESS", function()
-	local dooadad = GetDoodad(arg1)
-	local szName = dooadad.szName
-	if szName == "" then
-		szName = GetDoodadTemplate(dooadad.dwTemplateID).szName
-	end
-	LB_CACHE[UI_GetClientPlayerID()]:StartOTBar(szName, arg0, false)
-end)
--- MY.RegisterEvent("DO_CUSTOM_OTACTION_PROGRESS ", function()Output("DO_CUSTOM_OTACTION_PROGRESS",arg0, arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13) end)
--- MY.RegisterEvent("DO_RECIPE_PREPARE_PROGRESS", function()Output("DO_RECIPE_PREPARE_PROGRESS",arg0, arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13) end)
--- MY.RegisterEvent("ON_SKILL_CHANNEL_PROGRESS ", function()Output("ON_SKILL_CHANNEL_PROGRESS",arg0, arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13) end)
+MY.BreatheCall("MY_LifeBar", onBreathe)
+end
 
 RegisterEvent("NPC_ENTER_SCENE",function()
 	NPC_CACHE[arg0] = true
@@ -464,7 +406,7 @@ local function onSwitch()
 	MY_LifeBar.bEnabled = not MY_LifeBar.bEnabled
 	D.Reset(true)
 end
-MY.Game.RegisterHotKey("MY_XLifeBar_S", _L["x lifebar"], onSwitch)
+MY.Game.RegisterHotKey("MY_LifeBar_S", _L["x lifebar"], onSwitch)
 
 setmetatable(MY_LifeBar, {
 	__index = {

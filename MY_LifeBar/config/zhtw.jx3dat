@@ -4,7 +4,9 @@ data = {
 	bOnlyInDungeon = false,
 	bOnlyInBattleField = false,
 
-	nLineHeight = { 100, 80, 60 },
+	nTextOffsetY = 60,
+	nTextLineHeight = 20,
+
 	bShowSpecialNpc = false,
 	bShowDistance = false,
 
@@ -16,15 +18,6 @@ data = {
 
 	nLifePerOffsetX = 0,
 	nLifePerOffsetY = 42,
-
-	nOTBarWidth = 80,
-	nOTBarHeight = 6,
-	nOTBarOffsetX = 0,
-	nOTBarOffsetY = 22,
-	nOTTitleOffsetX = 0,
-	nOTTitleOffsetY = 21,
-	bOTEnhancedMod = false,
-	szOTBarDirection = 'LEFT_RIGHT',
 
 	nAlpha = 200,
 	nFont = 16,
@@ -149,35 +142,11 @@ data = {
 			[FORCE_TYPE.BA_DAO   ] = { 71 , 73 , 166 }, -- 霸刀
 		},
 	},
-	ShowLifePer = {
-		Party = { Npc = false, Player = false },
-		Self = { Player = false },
-		Neutrality = { Npc = false, Player = false },
-		Ally = { Npc = false, Player = false },
-		Foe = { Player = false },
-		Enemy = { Npc = false, Player = false },
-	},
-	ShowTitle = {
+	ShowName = {
 		Party = { Npc = true, Player = true },
 		Self = { Player = true },
 		Neutrality = { Npc = true, Player = true },
 		Ally = { Npc = true, Player = true },
-		Foe = { Player = true },
-		Enemy = { Npc = true, Player = true },
-	},
-	ShowLife = {
-		Party = { Npc = false, Player = true },
-		Self = { Player = true },
-		Neutrality = { Npc = true, Player = true },
-		Ally = { Npc = true, Player = true },
-		Foe = { Player = true },
-		Enemy = { Npc = true, Player = true },
-	},
-	ShowOTBar = {
-		Party = { Npc = false, Player = false },
-		Self = { Player = true },
-		Neutrality = { Npc = false, Player = false },
-		Ally = { Npc = false, Player = false },
 		Foe = { Player = true },
 		Enemy = { Npc = true, Player = true },
 	},
@@ -189,8 +158,24 @@ data = {
 		Enemy = { Player = true },
 		Foe = { Player = true },
 	},
-	ShowName = {
+	ShowTitle = {
 		Party = { Npc = true, Player = true },
+		Self = { Player = true },
+		Neutrality = { Npc = true, Player = true },
+		Ally = { Npc = true, Player = true },
+		Foe = { Player = true },
+		Enemy = { Npc = true, Player = true },
+	},
+	ShowLifePer = {
+		Party = { Npc = false, Player = false },
+		Self = { Player = false },
+		Neutrality = { Npc = false, Player = false },
+		Ally = { Npc = false, Player = false },
+		Foe = { Player = false },
+		Enemy = { Npc = false, Player = false },
+	},
+	ShowLife = {
+		Party = { Npc = false, Player = true },
 		Self = { Player = true },
 		Neutrality = { Npc = true, Player = true },
 		Ally = { Npc = true, Player = true },

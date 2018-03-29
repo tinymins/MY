@@ -46,16 +46,8 @@ data = {
     ['life percentage offset-x: %d px.'] = '血量百分比水平偏移%spx。',
     ['life percentage offset-y: %d px.'] = '血量百分比豎直偏移%spx。',
 
-    ['otbar width: %s px.'] = '技能讀條寬度%spx。',
-    ['otbar height: %s px.'] = '技能讀條高度%spx。',
-    ['otbar offset-x: %d px.'] = '技能讀條水平偏移%spx。',
-    ['otbar offset-y: %d px.'] = '技能讀條豎直偏移%spx。',
-    ['ot title offset-x: %d px.'] = '技能名稱水平偏移%spx。',
-    ['ot title offset-y: %d px.'] = '技能名稱豎直偏移%spx。',
-
-    ['1st line offset-y: %d px.'] = '第一行字高度偏移%spx。',
-    ['2nd line offset-y: %d px.'] = '第二行字高度偏移%spx。',
-    ['3rd line offset-y: %d px.'] = '第三行字高度偏移%spx。',
+    ['text offset-y: %d px.'] = '文字高度偏移%spx。',
+    ['text line height: %d px.'] = '文字行高%spx。',
     ['alpha: %.0f%%.'] = '透明度%.0f%%。',
 
     ['set current camp'] = '設置當前陣營',
@@ -69,8 +61,6 @@ data = {
     ['Party'] = "隊友關系",
     ['Self'] = "自己",
     ['Foe'] = "仇人關系",
-
-    ['only can see otaction of target and target\'s target'] = "由于官方限制，只能顯示目標以及目標的目標的讀條狀態",
 
     ['hide when unfight'] = '脫戰時隱藏',
     ['hide decimal'] = '不顯示小數',

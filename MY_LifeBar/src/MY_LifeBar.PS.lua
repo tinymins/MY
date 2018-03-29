@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 10:36:40
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-03-20 01:04:57
+-- @Last Modified time: 2018-03-29 16:18:05
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -43,15 +43,8 @@ local function LoadUI(ui)
 	ui:children("#WndSliderBox_LifeBarHeight"):value(Config.nLifeHeight)
 	ui:children("#WndSliderBox_LifeBarOffsetX"):value(Config.nLifeOffsetX)
 	ui:children("#WndSliderBox_LifeBarOffsetY"):value(Config.nLifeOffsetY)
-	ui:children("#WndSliderBox_OTBarWidth"):value(Config.nOTBarWidth)
-	ui:children("#WndSliderBox_OTBarHeight"):value(Config.nOTBarHeight)
-	ui:children("#WndSliderBox_OTBarOffsetX"):value(Config.nOTBarOffsetX)
-	ui:children("#WndSliderBox_OTBarOffsetY"):value(Config.nOTBarOffsetY)
-	ui:children("#WndSliderBox_OTTitleOffsetX"):value(Config.nOTTitleOffsetX)
-	ui:children("#WndSliderBox_OTTitleOffsetY"):value(Config.nOTTitleOffsetY)
-	ui:children("#WndSliderBox_FristLineHeight"):value(Config.nLineHeight[1])
-	ui:children("#WndSliderBox_SecondLineHeight"):value(Config.nLineHeight[2])
-	ui:children("#WndSliderBox_ThirdLineHeight"):value(Config.nLineHeight[3])
+	ui:children("#WndSliderBox_TextOffsetY"):value(Config.nTextOffsetY)
+	ui:children("#WndSliderBox_TextLineHeight"):value(Config.nTextLineHeight)
 	ui:children("#WndSliderBox_LifePerOffsetX"):value(Config.nLifePerOffsetX)
 	ui:children("#WndSliderBox_LifePerOffsetY"):value(Config.nLifePerOffsetY)
 	ui:children("#WndSliderBox_Distance"):value(math.sqrt(Config.nDistance) / 64)
@@ -136,8 +129,8 @@ function PS.OnPanelActive(wnd)
 	-- <hr />
 	ui:append("Image", "Image_Spliter"):find('#Image_Spliter'):pos(10, y-7):size(w - 20, 2):image('UI/Image/UICommon/ScienceTreeNode.UITex',62)
 
-	x, y = 10, 55
-	offsety = 22
+	x, y = 15, 65
+	offsety = 35
 	ui:append("WndSliderBox", {
 		name = "WndSliderBox_LifeBarWidth",
 		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 5, 150 },
@@ -217,51 +210,12 @@ function PS.OnPanelActive(wnd)
 	y = y + offsety
 
 	ui:append("WndSliderBox", {
-		name = "WndSliderBox_OTBarWidth",
-		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 5, 150 },
-		text = function(value) return _L("otbar width: %s px.", value) end, -- OT宽度
-		value = Config.nOTBarWidth,
-		onchange = function(value)
-			Config.nOTBarWidth = value
-			D.Reset()
-		end,
-		autoenable = function() return D.IsEnabled() end,
-	})
-	y = y + offsety
-
-	ui:append("WndSliderBox", {
-		name = "WndSliderBox_OTBarHeight",
-		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 5, 150 },
-		text = function(value) return _L("otbar height: %s px.", value) end, -- OT高度
-		value = Config.nOTBarHeight,
-		onchange = function(value)
-			Config.nOTBarHeight = value
-			D.Reset()
-		end,
-		autoenable = function() return D.IsEnabled() end,
-	})
-	y = y + offsety
-
-	ui:append("WndSliderBox", {
-		name = "WndSliderBox_OTBarOffsetX",
-		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { -150, 150 },
-		text = function(value) return _L("otbar offset-x: %d px.", value) end, -- OT水平偏移
-		value = Config.nOTBarOffsetX,
-		onchange = function(value)
-			Config.nOTBarOffsetX = value
-			D.Reset()
-		end,
-		autoenable = function() return D.IsEnabled() end,
-	})
-	y = y + offsety
-
-	ui:append("WndSliderBox", {
-		name = "WndSliderBox_OTBarOffsetY",
+		name = "WndSliderBox_TextOffsetY",
 		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
-		text = function(value) return _L("otbar offset-y: %d px.", value) end, -- OT竖直偏移
-		value = Config.nOTBarOffsetY,
+		text = function(value) return _L("text offset-y: %d px.", value) end, -- 第一行字高度
+		value = Config.nTextOffsetY,
 		onchange = function(value)
-			Config.nOTBarOffsetY = value
+			Config.nTextOffsetY = value
 			D.Reset()
 		end,
 		autoenable = function() return D.IsEnabled() end,
@@ -269,64 +223,12 @@ function PS.OnPanelActive(wnd)
 	y = y + offsety
 
 	ui:append("WndSliderBox", {
-		name = "WndSliderBox_OTTitleOffsetX",
-		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { -150, 150 },
-		text = function(value) return _L("ot title offset-x: %d px.", value) end, -- OT名称水平偏移
-		value = Config.nOTTitleOffsetX,
-		onchange = function(value)
-			Config.nOTTitleOffsetX = value
-			D.Reset()
-		end,
-		autoenable = function() return D.IsEnabled() end,
-	})
-	y = y + offsety
-
-	ui:append("WndSliderBox", {
-		name = "WndSliderBox_OTTitleOffsetY",
+		name = "WndSliderBox_TextLineHeight",
 		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
-		text = function(value) return _L("ot title offset-y: %d px.", value) end, -- OT名称竖直偏移
-		value = Config.nOTTitleOffsetY,
+		text = function(value) return _L("text line height: %d px.", value) end, -- 字行高度
+		value = Config.nTextLineHeight,
 		onchange = function(value)
-			Config.nOTTitleOffsetY = value
-			D.Reset()
-		end,
-		autoenable = function() return D.IsEnabled() end,
-	})
-	y = y + offsety
-
-	ui:append("WndSliderBox", {
-		name = "WndSliderBox_FristLineHeight",
-		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
-		text = function(value) return _L("1st line offset-y: %d px.", value) end, -- 第一行字高度
-		value = Config.nLineHeight[1],
-		onchange = function(value)
-			Config.nLineHeight[1] = value
-			D.Reset()
-		end,
-		autoenable = function() return D.IsEnabled() end,
-	})
-	y = y + offsety
-
-	ui:append("WndSliderBox", {
-		name = "WndSliderBox_SecondLineHeight",
-		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
-		text = function(value) return _L("2nd line offset-y: %d px.", value) end, -- 第二行字高度
-		value = Config.nLineHeight[2],
-		onchange = function(value)
-			Config.nLineHeight[2] = value
-			D.Reset()
-		end,
-		autoenable = function() return D.IsEnabled() end,
-	})
-	y = y + offsety
-
-	ui:append("WndSliderBox", {
-		name = "WndSliderBox_ThirdLineHeight",
-		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
-		text = function(value) return _L("3rd line offset-y: %d px.", value) end, -- 第三行字高度
-		value = Config.nLineHeight[3],
-		onchange = function(value)
-			Config.nLineHeight[3] = value
+			Config.nTextLineHeight = value
 			D.Reset()
 		end,
 		autoenable = function() return D.IsEnabled() end,
@@ -360,7 +262,7 @@ function PS.OnPanelActive(wnd)
 	y = y + offsety
 
 	-- 右半边
-	x, y = 350, 60
+	x, y = 350, 75
 	offsety = 33
 	local function FillColorTable(opt, relation, tartype)
 		local cfg = Config.Color[relation]
@@ -543,35 +445,6 @@ function PS.OnPanelActive(wnd)
 			})
 			return t
 		end,
-		autoenable = function() return D.IsEnabled() end,
-	})
-	y = y + offsety
-
-	-- 显示读条%
-	ui:append("WndComboBox", {
-		x = x, y = y, text = _L["skillpercentage display config"],
-		menu = function()
-			local t = GeneBooleanPopupMenu(Config.ShowOTBar, _L["player skillpercentage display"], _L["npc skillpercentage display"])
-			table.insert(t, { bDevide = true })
-			local t1 = {
-				szOption = _L['Draw direction'],
-			}
-			for _, szDirection in ipairs({ "LEFT_RIGHT", "RIGHT_LEFT", "TOP_BOTTOM", "BOTTOM_TOP" }) do
-				table.insert(t1, {
-					szOption = _L.DIRECTION[szDirection],
-					bCheck = true, bMCheck = true,
-					bChecked = Config.szOTBarDirection == szDirection,
-					fnAction = function()
-						Config.szOTBarDirection = szDirection
-						D.Reset()
-					end,
-				})
-			end
-			table.insert(t, t1)
-			return t
-		end,
-		tip = _L['only can see otaction of target and target\'s target'],
-		tippostype = ALW.TOP_BOTTOM,
 		autoenable = function() return D.IsEnabled() end,
 	})
 	y = y + offsety

@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 12:50:01
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-03-22 16:17:29
+-- @Last Modified time: 2018-03-29 17:03:49
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -25,65 +25,54 @@ local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local IsNil, IsNumber, IsFunction = MY.IsNil, MY.IsNumber, MY.IsFunction
 local IsBoolean, IsString, IsTable = MY.IsBoolean, MY.IsString, MY.IsTable
 -----------------------------------------------------------------------------------------
-local Config = MY_LifeBar_Config
-if not Config then
-    return
-end
-
-local function GetConfigValue(key, relation, force)
-	local cfg, value = Config[key][relation]
-	if force == 'Npc' or force == 'Player' then
-		value = cfg[force]
-	else
-		if cfg.DifferentiateForce then
-			value = cfg[force]
-		end
-		if value == nil then
-			value = Config[key][relation]["Player"]
-		end
-	end
-	return value
-end
------------------------------------------------------------------------------------------
-local OT_STATE = {
-	START_SKILL   = 1,  -- 开始技能读条(显示边框)
-	START_PREPARE = 2,  -- 开始读条(显示边框)
-	START_CHANNEL = 3,  -- 开始逆读条(显示边框)
-	ON_SKILL      = 4,  -- 正在技能读条(需要每帧获取值重绘)
-	ON_PREPARE    = 5,  -- 正在正向读条(需要每帧计算重绘)
-	ON_CHANNEL    = 6,  -- 正在逆向读条(需要每帧计算重绘)
-	BREAK = 7,          -- 打断读条(变红隐藏)
-	SUCCEED = 8,        -- 读条成功结束(隐藏)
-	FAILED = 9,         -- 读条失败结束(隐藏)
-	IDLE  = 10,         -- 没有读条(空闲)
-}
 local LB = class()
 local HP = MY_LifeBar_HP
 local CACHE = setmetatable({}, { __mode = "v" })
+
+local function InitConfigData(self)
+	-- 配色
+	self.r = 0
+	self.g = 0
+	self.b = 0
+	self.a = 0
+	self.cfx = nil
+	self.font = 10
+	-- 名字/帮会/称号部分
+	self.name_visible = true
+	self.name_text = ""
+	self.tong_visible = true
+	self.tong_text = ""
+	self.title_visible = true
+	self.title_text = ""
+	self.texts_y = 100
+	self.texts_height = 20
+	self.texts_invalid = true
+	-- 血量部分
+	self.life = 1
+	self.max_life = 1
+	-- 血量数值部分
+	self.life_text_visible = true
+	self.life_text_x = 0
+	self.life_text_y = 42
+	self.life_text_fmt = ""
+	self.life_text_invalid = true
+	-- 血条部分
+	self.life_bar_visible = true
+	self.life_bar_x = 0
+	self.life_bar_y = 0
+	self.life_bar_w = 0
+	self.life_bar_h = 0
+	self.life_bar_direction = "LEFT_RIGHT"
+	self.life_bar_invalid = true
+	self.life_bar_border_invalid = true
+end
 
 -- 构造函数
 function LB:ctor(dwType, dwID)
 	self.type = dwType
 	self.id = dwID
-	self.object = MY.GetObject(dwType, dwID)
-	self.cfx = nil
-	self.name = ""
-	self.title = ""
-	self.tong = ""
-	self.life = -1
-	self.force = -1
-	self.relation = "Neutrality"
-	self.info = {
-		OT = {
-			nState      = OT_STATE.IDLE,
-			nPercentage = 0            ,
-			szTitle     = ""           ,
-			nStartFrame = 0            ,
-			nFrameCount = 0            ,
-		},
-		nIndex = 0,
-	}
 	self.hp = HP(dwType, dwID)
+	InitConfigData(self)
 	return self
 end
 
@@ -91,7 +80,6 @@ end
 function LB:Create()
 	if not self.hp.handle then
 		self.hp:Create()
-		self:DrawAll()
 	end
 	return self
 end
@@ -102,13 +90,33 @@ function LB:Remove()
 	return self
 end
 
--- 重新绘制全部
-function LB:DrawAll()
+function LB:SetInvalid(key, force)
+	if force or self[key .. "_visible"] then
+		self[key .. "_invalid"] = true
+	end
+	return self
+end
+
+-- 重绘无效区域
+function LB:Paint(force)
 	if self.hp.handle then
-		self:DrawLifeBorder()
-		self:DrawLife()
-		self:DrawNames()
-		self:DrawOTTitle()
+		self:DrawLifeBorder(force)
+		self:DrawLife(force)
+		self:DrawTexts(force)
+	end
+	return self
+end
+
+function LB:SetColor(r, g, b, a)
+	if self.r ~= r or self.g ~= g
+	or self.b ~= b or self.a ~= a then
+		self.r = r
+		self.g = g
+		self.b = b
+		self.a = a
+		self:SetInvalid("life_bar")
+		self:SetInvalid("life_text")
+		self:SetInvalid("texts", true)
 	end
 	return self
 end
@@ -116,258 +124,199 @@ end
 function LB:SetColorFx(cfx)
 	if self.cfx ~= cfx then
 		self.cfx = cfx
-		self:DrawAll()
+		self:SetInvalid("life_bar")
+		self:SetInvalid("life_text")
+		self:SetInvalid("texts", true)
 	end
 	return self
 end
 
--- 设置名字
-function LB:SetName(name)
-	if self.name ~= name then
-		self.name = name
-		self:DrawNames()
+function LB:SetFont(font)
+	if self.font ~= font then
+		self.font = font
+		self:SetInvalid("life_text")
+		self:SetInvalid("texts", true)
 	end
 	return self
 end
 
--- 设置称号
-function LB:SetTitle(title)
-	if self.title ~= title then
-		self.title = title
-		self:DrawNames()
+function LB:SetTextsPos(y, height)
+	if self.texts_y ~= y or self.texts_height ~= height then
+		self.texts_y = y
+		self.texts_height = height
+		self:SetInvalid("texts", true)
 	end
 	return self
 end
 
--- 设置帮会
-function LB:SetTong(tong)
-	if self.tong ~= tong then
-		self.tong = tong
-		self:DrawNames()
+function LB:SetNameVisible(visible)
+	if self.name_visible ~= visible then
+		self.name_visible = visible
+		self:SetInvalid("texts", true)
 	end
 	return self
 end
 
--- 重绘头顶文字
-function LB:DrawNames()
-	local tWordlines = {}
-	local r,g,b,a,f
-	local cfgName, cfgTitle, cfgTong
-	if IsPlayer(self.object.dwID) then
-		cfgLife  = GetConfigValue("ShowLife", self.relation, self.force)
-		cfgName  = GetConfigValue("ShowName", self.relation, self.force)
-		cfgTitle = GetConfigValue("ShowTitle", self.relation, self.force)
-		cfgTong  = GetConfigValue("ShowTong", self.relation, self.force)
-		r,g,b    = unpack(GetConfigValue("Color", self.relation, self.force))
-	else
-		cfgLife  = GetConfigValue("ShowLife", self.relation, self.force)
-		cfgName  = GetConfigValue("ShowName", self.relation, self.force)
-		cfgTitle = GetConfigValue("ShowTitle", self.relation, self.force)
-		cfgTong  = false
-		r,g,b    = unpack(GetConfigValue("Color", self.relation, self.force))
+function LB:SetName(text)
+	if self.name_text ~= text then
+		self.name_text = text
+		self:SetInvalid("texts", true)
+		self:SetInvalid("life_bar", true)
+		self:SetInvalid("life_bar_border", true)
 	end
-	a,f = Config.nAlpha, Config.nFont
+	return self
+end
 
-	if self.cfx then
-		r, g, b, a = self.cfx(r, g, b, a)
+function LB:SetTitleVisible(visible)
+	if self.title_visible ~= visible then
+		self.title_visible = visible
+		self:SetInvalid("texts", true)
 	end
+	return self
+end
 
-	local i = #Config.nLineHeight
-	if cfgTong then
-		local szTong = self.tong
-		if szTong and szTong ~= '' then
-			table.insert(tWordlines, { szTong, Config.nLineHeight[i] })
-			i = i - 1
+function LB:SetTitle(text)
+	if self.title_text ~= text then
+		self.title_text = text
+		self:SetInvalid("texts", true)
+	end
+	return self
+end
+
+function LB:SetTongVisible(visible)
+	if self.tong_visible ~= visible then
+		self.tong_visible = visible
+		self:SetInvalid("texts", true)
+	end
+	return self
+end
+
+function LB:SetTong(text)
+	if self.tong_text ~= text then
+		self.tong_text = text
+		self:SetInvalid("texts", true)
+	end
+	return self
+end
+
+function LB:DrawTexts(force)
+	if self.texts_invalid or force then
+		local aTexts = {}
+		local r, g, b, a, f = self.r, self.g, self.b, self.a, self.font
+		if self.cfx then
+			r, g, b, a = self.cfx(r, g, b, a)
 		end
-	end
-	if cfgTitle then
-		local szTitle = self.title
-		if szTitle and szTitle ~= "" then
-			table.insert(tWordlines, { "<" .. self.title .. ">", Config.nLineHeight[i] })
-			i = i - 1
+		if self.tong_visible and self.tong_text ~= "" then
+			insert(aTexts, "[" .. self.tong_text .. "]")
 		end
-	end
-	if cfgName then
-		local szName = self.name
-		if szName and not tonumber(szName) then
-			table.insert(tWordlines, { szName, Config.nLineHeight[i] })
-			i = i - 1
+		if self.title_visible and self.title_text ~= "" then
+			insert(aTexts, "<" .. self.title_text .. ">")
 		end
+		if self.name_visible and self.name_text ~= "" then
+			insert(aTexts, self.name_text)
+		end
+		self.hp:DrawTexts(aTexts, self.texts_y, self.texts_height, r, g, b, a, f)
+		self.texts_invalid = false
 	end
-
-	-- 没有名字的玩意隐藏血条
-	if cfgName and #tWordlines == 0 then
-		self.hp:ClearLifeBar()
-		self.hp:ClearLifeBorder()
-	elseif cfgLife then
-		self.hp:DrawLifeBar(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetX, Config.nLifeOffsetY, { r, g, b, a, self.life, Config.szLifeDirection })
-		self.hp:DrawLifeBorder(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetX, Config.nLifeOffsetY, a)
-	end
-	self.hp:DrawWordlines(tWordlines, {r,g,b,a,f})
 	return self
 end
 
 -- 设置血量
-function LB:SetLife(life)
-	if life < 0 or life > 1 then
-		life = 1
-	end -- fix
-	if self.life ~= life then
-		local dwLife = self.life
+function LB:SetLife(life, max_life)
+	if self.life ~= life or self.max_life ~= max_life then
 		self.life = life
-		if dwLife < 0.01 or life < 0.01 then
-			self:DrawNames()
-		end
-		self:DrawLife()
+		self.max_life = max_life
+		self:SetInvalid("life_bar")
+		self:SetInvalid("life_text")
+	end
+	return self
+end
+
+function LB:SetLifeBarVisible(life_bar_visible)
+	if self.life_bar_visible ~= life_bar_visible then
+		self.life_bar_visible = life_bar_visible
+		self:SetInvalid("life_bar", true)
+	end
+	return self
+end
+
+function LB:SetLifeBar(x, y, w, h)
+	if self.life_bar_x ~= x or self.life_bar_y ~= y or self.life_bar_w ~= w or self.life_bar_h ~= h then
+		self.life_bar_x = x
+		self.life_bar_y = y
+		self.life_bar_w = w
+		self.life_bar_h = h
+		self:SetInvalid("life_bar", true)
+	end
+	return self
+end
+
+function LB:SetLifeTextVisible(life_text_visible)
+	if self.life_text_visible ~= life_text_visible then
+		self.life_text_visible = life_text_visible
+		self:SetInvalid("life_text", true)
+	end
+	return self
+end
+
+function LB:SetLifeText(x, y, fmt)
+	if self.life_text_x ~= x or self.life_text_y ~= y or self.life_text_fmt ~= fmt then
+		self.life_text_x = x
+		self.life_text_y = y
+		self.life_text_fmt = fmt
+		self:SetInvalid("life_text", true)
 	end
 	return self
 end
 
 -- 血条边框
-function LB:DrawLifeBorder()
-	local cfgLife = GetConfigValue("ShowLife", self.relation, self.force)
-	if cfgLife then
-		self.hp:DrawLifeBorder(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetX, Config.nLifeOffsetY, Config.nAlpha)
-	else
-		self.hp:ClearLifeBorder()
-	end
-end
-
-function LB:DrawLife()
-	local cfgLife    = GetConfigValue("ShowLife", self.relation, self.force)
-	local cfgLifePer = GetConfigValue("ShowLifePer", self.relation, self.force)
-	local r, g, b    = unpack(GetConfigValue("Color", self.relation, self.force))
-	local a, f = Config.nAlpha, Config.nFont
-	if self.cfx then
-		r, g, b, a = self.cfx(r, g, b, a)
-	end
-	if cfgLife then
-		self.hp:DrawLifeBar(Config.nLifeWidth, Config.nLifeHeight, Config.nLifeOffsetX, Config.nLifeOffsetY, { r, g, b, a, self.life, Config.szLifeDirection })
-	end
-	if cfgLifePer then
-		local szFormatString = '%.1f'
-		if Config.bHideLifePercentageWhenFight and not GetClientPlayer().bFightState then
-			szFormatString = ''
-		elseif Config.bHideLifePercentageDecimal then
-			szFormatString = '%.0f'
-		end
-		self.hp:DrawLifePercentage({string.format(szFormatString, 100 * self.life), Config.nLifePerOffsetX, Config.nLifePerOffsetY}, {r,g,b,a,f})
-	end
-	return self
-end
-
-function LB:SetForce(force)
-	if self.force ~= force then
-		self.force = force
-		self:DrawAll()
-	end
-	return self
-end
-
-function LB:SetRelation(relation)
-	if self.relation ~= relation then
-		self.relation = relation
-		self:DrawAll()
-	end
-	return self
-end
-
--- 设置/获取OT状态
-function LB:SetOTState(nState)
-	if nState == OT_STATE.BREAK then
-		self.info.OT.nStartFrame = GetLogicFrameCount()
-		self:DrawOTBar({255,0,0}):DrawOTTitle({255,0,0})
-	elseif nState == OT_STATE.SUCCEED then
-		self.info.OT.nStartFrame = GetLogicFrameCount()
-	end
-	self.info.OT.nState = nState
-	return self
-end
-
-function LB:GetOTState()
-	return self.info.OT.nState
-end
-
--- 设置读条标题
-function LB:SetOTTitle(szOTTitle, rgba)
-	if self.info.OT.szTitle ~= szOTTitle then
-		self.info.OT.szTitle = szOTTitle
-		self:DrawOTTitle(rgba)
-	end
-	return self
-end
-
-function LB:DrawOTTitle(rgba)
-	local cfgOTBar = GetConfigValue("ShowOTBar", self.relation, self.force)
-	local r, g, b  = unpack(GetConfigValue("Color", self.relation, self.force))
-	local a, f = Config.nAlpha, Config.nFont
-	if rgba then r,g,b,a = rgba[1] or r, rgba[2] or g, rgba[3] or b, rgba[4] or a end
-	if self.cfx then
-		r, g, b, a = self.cfx(r, g, b, a)
-	end
-	if cfgOTBar then
-		self.hp:DrawOTTitle({ self.info.OT.szTitle, Config.nOTTitleOffsetX, Config.nOTTitleOffsetY }, {r,g,b,a,f})
-	end
-	return self
-end
-
--- 设置读条进度
-function LB:SetOTPercentage(nPercentage, rgba)
-	if nPercentage > 1 then nPercentage = 1 elseif nPercentage < 0 then nPercentage = 0 end
-	if self.info.OT.nPercentage ~= nPercentage then
-		self.info.OT.nPercentage = nPercentage
-		self:DrawOTBar(rgba)
-	end
-	return self
-end
-
-function LB:DrawOTBar(rgba)
-	local cfgOTBar = GetConfigValue("ShowOTBar", self.relation, self.force)
-	local r, g, b  = unpack(GetConfigValue("Color", self.relation, self.force))
-	local a, f = Config.nAlpha, Config.nFont
-	if rgba then r,g,b,a,p = rgba[1] or r, rgba[2] or g, rgba[3] or b, rgba[4] or a end
-	if self.cfx then
-		r, g, b, a = self.cfx(r, g, b, a)
-	end
-	if cfgOTBar then
-		self.hp:DrawOTBar(Config.nOTBarWidth, Config.nOTBarHeight, Config.nOTBarOffsetX, Config.nOTBarOffsetY, { r, g, b, a, self.info.OT.nPercentage, Config.szOTBarDirection })
-	end
-	return self
-end
-
-function LB:DrawOTBarBorder(nAlpha)
-	local cfgOTBar = GetConfigValue("ShowOTBar", self.relation, self.force)
-	if cfgOTBar then
-		self.hp:DrawOTBarBorder(Config.nOTBarWidth, Config.nOTBarHeight, Config.nOTBarOffsetX, Config.nOTBarOffsetY, nAlpha or Config.nAlpha)
-	end
-	return self
-end
-
--- 开始读条
-function LB:StartOTBar(szOTTitle, nFrameCount, bIsChannelSkill)
-	self.info.OT = {
-		nState = ( bIsChannelSkill and OT_STATE.START_CHANNEL ) or OT_STATE.START_PREPARE,
-		szTitle = szOTTitle,
-		nStartFrame = GetLogicFrameCount(),
-		nFrameCount = nFrameCount,
-	}
-	return self
-end
-
-MY_LifeBar_LB = setmetatable({}, {
-	__index = {
-		OT_STATE = OT_STATE,
-	},
-	__call = function(t, dwType, dwID)
-		if dwType == "clear" then
-			CACHE = {}
-			HP("clear")
+function LB:DrawLifeBorder(force)
+	if self.life_bar_border_invalid or force then
+		if self.life_bar_visible then
+			self.hp:DrawLifeBorder(self.life_bar_w, self.life_bar_h, self.life_bar_x, self.life_bar_y, self.a)
 		else
-			local szName = dwType .. "_" .. dwID
-			if not CACHE[szName] then
-				CACHE[szName] = LB.new(dwType, dwID)
-			end
-			return CACHE[szName]
+			self.hp:ClearLifeBorder()
 		end
-	end,
-})
+		self.life_bar_border_invalid = false
+	end
+	return self
+end
+
+function LB:DrawLife(force)
+	if self.life_bar_invalid or self.life_bar_border_invalid or self.life_text_invalid or force then
+		local r, g, b, a = self.r, self.g, self.b, self.a
+		if self.cfx then
+			r, g, b, a = self.cfx(r, g, b, a)
+		end
+		if self.life_bar_invalid or force then
+			if self.life_bar_visible then
+				self.hp:DrawLifeBar(self.life_bar_w, self.life_bar_h, self.life_bar_x, self.life_bar_y, r, g, b, a, self.life / self.max_life, self.life_bar_direction)
+			else
+				self.hp:ClearLifeBar()
+			end
+			self.life_bar_invalid = false
+		end
+		if self.life_text_invalid or force then
+			if self.life_text_visible then
+				self.hp:DrawLifeText(self.life_text_fmt:format(100 * self.life / self.max_life), Config.nLifePerOffsetX, Config.nLifePerOffsetY, r, g, b, a, f)
+			else
+				self.hp:ClearLifeText()
+			end
+			self.life_text_invalid = false
+		end
+	end
+	return self
+end
+
+function MY_LifeBar_LB(dwType, dwID)
+	if dwType == "clear" then
+		CACHE = {}
+		HP("clear")
+	else
+		local szName = dwType .. "_" .. dwID
+		if not CACHE[szName] then
+			CACHE[szName] = LB.new(dwType, dwID)
+		end
+		return CACHE[szName]
+	end
+end
