@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 12:50:01
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-03-29 23:04:51
+-- @Last Modified time: 2018-03-30 00:48:15
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -86,6 +86,10 @@ end
 function LB:Create()
 	if not self.hp.handle then
 		self.hp:Create()
+		self:SetInvalid("texts", true)
+		self:SetInvalid("life_text", true)
+		self:SetInvalid("life_bar", true)
+		self:SetInvalid("life_bar_border", true)
 	end
 	return self
 end
@@ -97,7 +101,7 @@ function LB:Remove()
 end
 
 function LB:SetInvalid(key, force)
-	if force or self[key .. "_visible"] then
+	if force or self[key .. "_visible"] ~= false then
 		self[key .. "_invalid"] = true
 	end
 	return self
@@ -298,6 +302,7 @@ function LB:SetLifeBarVisible(life_bar_visible)
 	if self.life_bar_visible ~= life_bar_visible then
 		self.life_bar_visible = life_bar_visible
 		self:SetInvalid("life_bar", true)
+		self:SetInvalid("life_bar_border", true)
 	end
 	return self
 end
