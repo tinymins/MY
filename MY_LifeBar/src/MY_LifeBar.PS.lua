@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 10:36:40
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-03-29 17:51:03
+-- @Last Modified time: 2018-03-29 18:04:00
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -515,7 +515,17 @@ function PS.OnPanelActive(wnd)
 	y = y + offsety - 10
 
 	ui:append("WndCheckBox", {
-		x = x, y = y, text = _L['show distance'],
+		x = x, y = y, text = _L['show kungfu'],
+		checked = Config.bShowKungfu,
+		oncheck = function(bChecked)
+			Config.bShowKungfu = bChecked
+			D.Reset()
+		end,
+		autoenable = function() return D.IsEnabled() end,
+	})
+
+	ui:append("WndCheckBox", {
+		x = x + 90, y = y, text = _L['show distance'],
 		checked = Config.bShowDistance,
 		oncheck = function(bChecked)
 			Config.bShowDistance = bChecked

@@ -1069,6 +1069,22 @@ end
 end
 
 do
+local KUNGFU_NAME_CACHE = {}
+local KUNGFU_SHORT_NAME_CACHE = {}
+function MY.GetKungfuName(dwKungfuID, szType)
+	if not KUNGFU_NAME_CACHE[dwKungfuID] then
+		KUNGFU_NAME_CACHE[dwKungfuID] = Table_GetSkillName(dwKungfuID, 1) or ""
+		KUNGFU_SHORT_NAME_CACHE[dwKungfuID] = wstring.sub(KUNGFU_NAME_CACHE[dwKungfuID], 1, 2)
+	end
+	if szType == "short" then
+		return KUNGFU_SHORT_NAME_CACHE[dwKungfuID]
+	else
+		return KUNGFU_NAME_CACHE[dwKungfuID]
+	end
+end
+end
+
+do
 local MY_CACHE_ITEM = {}
 function MY.GetItemName(nUiId)
 	if not MY_CACHE_ITEM[nUiId] then

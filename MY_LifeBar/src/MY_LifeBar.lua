@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-03-29 17:38:00
+-- @Last Modified time: 2018-03-29 19:45:32
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -293,6 +293,7 @@ local function CheckInvalidRect(dwType, dwID, me)
 			lb = LB(dwType, dwID)
 				:SetFont(Config.nFont)
 				:SetTextsPos(Config.nTextOffsetY, Config.nTextLineHeight)
+				:SetDistanceFmt("%d" .. g_tStrings.STR_METER)
 				:Create()
 			LB_CACHE[dwID] = lb
 		end
@@ -309,27 +310,40 @@ local function CheckInvalidRect(dwType, dwID, me)
 			or (dwID == dwTarID and fxTarget or nil)
 		)
 		-- Ãû×Ö/°ï»á/³ÆºÅ²¿·Ö
+		-- Ãû×Ö
 		local bShowName = GetConfigValue("ShowName", relation, force)
 		if bShowName then
-			if szName then
-				if not Config.bShowDistance or dwID == me.dwID then
-					lb:SetName(szName)
-				else
-					lb:SetName(
-						szName
-						.. _L.STR_SPLIT_DOT
-						.. math.floor(GetCharacterDistance(me.dwID, dwID) / 64)
-						.. g_tStrings.STR_METER
-					)
-				end
-			end
+			lb:SetName(szName)
 		end
 		lb:SetNameVisible(bShowName)
+		-- Ãû×Ö
+		local bShowKungfu = Config.bShowKungfu and dwType == TARGET.PLAYER and dwID ~= me.dwID
+		if bShowKungfu then
+			local kunfu = object.GetKungfuMount()
+			if kunfu and kunfu.dwSkillID and kunfu.dwSkillID ~= 0 then
+				lb:SetKungfu(MY.GetKungfuName(kunfu.dwSkillID, "short"))
+			else
+				lb:SetKungfu(g_tStrings.tForceTitle[object.dwForceID])
+			end
+		end
+		lb:SetKungfuVisible(bShowKungfu)
+		-- ¾àÀë
+		if Config.bShowDistance then
+			lb:SetDistance(GetCharacterDistance(me.dwID, dwID) / 64)
+		end
+		lb:SetDistanceVisible(Config.bShowDistance)
+		-- ¾àÀë
+		if Config.bShowDistance then
+			lb:SetDistance(GetCharacterDistance(me.dwID, dwID) / 64)
+		end
+		lb:SetDistanceVisible(Config.bShowDistance)
+		-- °ï»á
 		local bShowTong = GetConfigValue("ShowTong", relation, force)
 		if bShowTong then
 			lb:SetTong(D.GetTongName(object.dwTongID) or "")
 		end
 		lb:SetTongVisible(bShowTong)
+		-- ³ÆºÅ
 		local bShowTitle = GetConfigValue("ShowTitle", relation, force)
 		if bShowTitle then
 			lb:SetTitle(object.szTitle or "")

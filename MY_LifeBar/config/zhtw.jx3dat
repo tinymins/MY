@@ -8,6 +8,7 @@ data = {
 	nTextLineHeight = 24,
 
 	bShowSpecialNpc = false,
+	bShowKungfu = false,
 	bShowDistance = false,
 
 	nLifeWidth = 80,
@@ -21,7 +22,7 @@ data = {
 
 	nAlpha = 200,
 	nFont = 16,
-	nDistance = 24 * 24 * 64 * 64,
+	nDistance = 72 * 72 * 64 * 64,
 
 	bHideLifePercentageWhenFight = false,
 	bHideLifePercentageDecimal = false,

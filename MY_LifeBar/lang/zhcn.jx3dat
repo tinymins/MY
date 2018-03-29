@@ -53,6 +53,7 @@ data = {
     ['set current camp'] = '设置当前阵营',
     ['auto detect'] = '自动获取',
 
+    ['show kungfu'] = '显示心法',
     ['show distance'] = '显示距离',
 
     ['Neutrality'] = "中立关系",

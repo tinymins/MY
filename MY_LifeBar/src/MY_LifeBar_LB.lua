@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 12:50:01
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-03-29 17:03:49
+-- @Last Modified time: 2018-03-29 19:53:52
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -40,6 +40,11 @@ local function InitConfigData(self)
 	-- 名字/帮会/称号部分
 	self.name_visible = true
 	self.name_text = ""
+	self.kungfu_visible = true
+	self.kungfu_text = ""
+	self.distance_visible = true
+	self.distance = ""
+	self.distance_fmt = ""
 	self.tong_visible = true
 	self.tong_text = ""
 	self.title_visible = true
@@ -167,6 +172,46 @@ function LB:SetName(text)
 	return self
 end
 
+function LB:SetDistanceVisible(visible)
+	if self.distance_visible ~= visible then
+		self.distance_visible = visible
+		self:SetInvalid("texts", true)
+	end
+	return self
+end
+
+function LB:SetDistance(distance)
+	if self.distance ~= distance then
+		self.distance = distance
+		self:SetInvalid("texts", true)
+	end
+	return self
+end
+
+function LB:SetDistanceFmt(fmt)
+	if self.distance_fmt ~= fmt then
+		self.distance_fmt = fmt
+		self:SetInvalid("texts", true)
+	end
+	return self
+end
+
+function LB:SetKungfuVisible(visible)
+	if self.kungfu_visible ~= visible then
+		self.kungfu_visible = visible
+		self:SetInvalid("texts", true)
+	end
+	return self
+end
+
+function LB:SetKungfu(text)
+	if self.kungfu_text ~= text then
+		self.kungfu_text = text
+		self:SetInvalid("texts", true)
+	end
+	return self
+end
+
 function LB:SetTitleVisible(visible)
 	if self.title_visible ~= visible then
 		self.title_visible = visible
@@ -212,8 +257,24 @@ function LB:DrawTexts(force)
 		if self.title_visible and self.title_text ~= "" then
 			insert(aTexts, "<" .. self.title_text .. ">")
 		end
-		if self.name_visible and self.name_text ~= "" then
-			insert(aTexts, self.name_text)
+		local text = ""
+		if self.name_visible and self.name_text and self.name_text ~= "" then
+			text = text .. self.name_text
+		end
+		if self.kungfu_visible and self.kungfu_text and self.kungfu_text ~= "" then
+			if text ~= "" then
+				text = text .. _L.STR_SPLIT_DOT
+			end
+			text = text .. self.kungfu_text
+		end
+		if self.distance_visible and self.distance and self.distance ~= 0 then
+			if text ~= "" then
+				text = text .. _L.STR_SPLIT_DOT
+			end
+			text = text .. self.distance_fmt:format(self.distance)
+		end
+		if text ~= "" then
+			insert(aTexts, text)
 		end
 		self.hp:DrawTexts(aTexts, self.texts_y, self.texts_height, r, g, b, a, f)
 		self.texts_invalid = false
