@@ -5,7 +5,7 @@ data = {
 	bOnlyInBattleField = false,
 
 	nTextOffsetY = 60,
-	nTextLineHeight = 20,
+	nTextLineHeight = 24,
 
 	bShowSpecialNpc = false,
 	bShowDistance = false,

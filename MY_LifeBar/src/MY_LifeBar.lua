@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-03-29 16:59:06
+-- @Last Modified time: 2018-03-29 17:38:00
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -411,6 +411,7 @@ MY.Game.RegisterHotKey("MY_LifeBar_S", _L["x lifebar"], onSwitch)
 setmetatable(MY_LifeBar, {
 	__index = {
 		Reset = D.Reset,
+		Repaint = D.Repaint,
 		IsEnabled = D.IsEnabled,
 		IsShielded = D.IsShielded,
 	},

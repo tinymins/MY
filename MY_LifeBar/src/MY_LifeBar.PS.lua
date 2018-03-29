@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 10:36:40
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-03-29 17:29:24
+-- @Last Modified time: 2018-03-29 17:51:03
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -32,6 +32,7 @@ end
 
 local D = {
 	Reset = MY_LifeBar.Reset,
+	Repaint = MY_LifeBar.Repaint,
 	IsEnabled = MY_LifeBar.IsEnabled,
 	IsShielded = MY_LifeBar.IsShielded,
 }
@@ -50,7 +51,6 @@ local function LoadUI(ui)
 	ui:children("#WndSliderBox_Distance"):value(math.sqrt(Config.nDistance) / 64)
 	ui:children("#WndSliderBox_Alpha"):value(Config.nAlpha)
 	ui:children("#WndCheckBox_ShowSpecialNpc"):check(Config.bShowSpecialNpc)
-	ui:children("#WndButton_Font"):text(_L("Font: %d", Config.nFont))
 end
 function PS.OnPanelActive(wnd)
 	local ui = MY.UI(wnd)
@@ -90,14 +90,14 @@ function PS.OnPanelActive(wnd)
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
-	x = x + 220
+	x = x + 235
 	ui:append("Text", {
-		x = x + 5, y = y - 18,
+		x = x + 3, y = y - 16,
 		text = _L['only enable in those maps below'],
 		autoenable = function() return D.IsEnabled() end,
 	})
 	ui:append("WndCheckBox", {
-		x = x, y = y + 8, w = 80, text = _L['arena'],
+		x = x, y = y + 9, w = 80, text = _L['arena'],
 		checked = Config.bOnlyInArena,
 		oncheck = function(bChecked)
 			Config.bOnlyInArena = bChecked
@@ -107,7 +107,7 @@ function PS.OnPanelActive(wnd)
 	})
 	x = x + 80
 	ui:append("WndCheckBox", {
-		x = x, y = y + 8, w = 70, text = _L['battlefield'],
+		x = x, y = y + 9, w = 70, text = _L['battlefield'],
 		checked = Config.bOnlyInBattleField,
 		oncheck = function(bChecked)
 			Config.bOnlyInBattleField = bChecked
@@ -117,7 +117,7 @@ function PS.OnPanelActive(wnd)
 	})
 	x = x + 70
 	ui:append("WndCheckBox", {
-		x = x, y = y + 8, w = 70, text = _L['dungeon'],
+		x = x, y = y + 9, w = 70, text = _L['dungeon'],
 		checked = Config.bOnlyInDungeon,
 		oncheck = function(bChecked)
 			Config.bOnlyInDungeon = bChecked
@@ -263,7 +263,7 @@ function PS.OnPanelActive(wnd)
 
 	-- ”“∞Î±ﬂ
 	x, y = 350, 75
-	offsety = 33
+	offsety = 35
 	local function FillColorTable(opt, relation, tartype)
 		local cfg = Config.Color[relation]
 		opt.rgb = cfg[tartype]
@@ -526,20 +526,18 @@ function PS.OnPanelActive(wnd)
 	y = y + offsety
 
 	ui:append("WndButton", {
-		x = x, y = y, text = _L("Font: %d",Config.nFont),
+		x = x, y = y, w = 65, text = _L["Font"],
 		onclick = function()
 			MY.UI.OpenFontPicker(function(nFont)
 				Config.nFont = nFont
 				D.Reset()
-				ui:children("#WndButton_Font"):text(_L("Font: %d",Config.nFont))
 			end)
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
-	y = y + offsety - 10
 
 	ui:append("WndButton", {
-		x = x, y = y, w = 120, text = _L['reset config'],
+		x = x + 65, y = y, w = 120, text = _L['reset config'],
 		onclick = function()
 			MessageBox({
 				szName = "XLifeBar_Reset",

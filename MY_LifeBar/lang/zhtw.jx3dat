@@ -38,7 +38,7 @@ data = {
 
     ['Max Distance: %s foot.'] = '最大顯示距離：%s尺。',
     ['Max Distance: Unlimited.'] = '最大顯示距離：不限制。',
-    ['Font: %d'] = '字體：%d',
+    ['Font'] = '字體',
     ['lifebar width: %s px.'] = '血條寬度%spx。',
     ['lifebar height: %s px.'] = '血條高度%spx。',
     ['lifebar offset-x: %d px.'] = '血條水平偏移%spx。',
