@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 10:36:40
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-03-29 16:18:05
+-- @Last Modified time: 2018-03-29 17:29:24
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -56,8 +56,8 @@ function PS.OnPanelActive(wnd)
 	local ui = MY.UI(wnd)
 	local w, h = ui:size()
 
-	local x, y = 10, 10
-	local offsety = 40
+	local x, y = 10, 15
+	local offsety = 45
 	-- ¿ªÆô
 	ui:append("WndCheckBox", {
 		x = x, y = y, text = _L["Enable"],
@@ -92,12 +92,12 @@ function PS.OnPanelActive(wnd)
 	})
 	x = x + 220
 	ui:append("Text", {
-		x = x + 5, y = y - 15,
+		x = x + 5, y = y - 18,
 		text = _L['only enable in those maps below'],
 		autoenable = function() return D.IsEnabled() end,
 	})
 	ui:append("WndCheckBox", {
-		x = x, y = y + 5, w = 80, text = _L['arena'],
+		x = x, y = y + 8, w = 80, text = _L['arena'],
 		checked = Config.bOnlyInArena,
 		oncheck = function(bChecked)
 			Config.bOnlyInArena = bChecked
@@ -107,7 +107,7 @@ function PS.OnPanelActive(wnd)
 	})
 	x = x + 80
 	ui:append("WndCheckBox", {
-		x = x, y = y + 5, w = 70, text = _L['battlefield'],
+		x = x, y = y + 8, w = 70, text = _L['battlefield'],
 		checked = Config.bOnlyInBattleField,
 		oncheck = function(bChecked)
 			Config.bOnlyInBattleField = bChecked
@@ -117,7 +117,7 @@ function PS.OnPanelActive(wnd)
 	})
 	x = x + 70
 	ui:append("WndCheckBox", {
-		x = x, y = y + 5, w = 70, text = _L['dungeon'],
+		x = x, y = y + 8, w = 70, text = _L['dungeon'],
 		checked = Config.bOnlyInDungeon,
 		oncheck = function(bChecked)
 			Config.bOnlyInDungeon = bChecked
@@ -129,8 +129,8 @@ function PS.OnPanelActive(wnd)
 	-- <hr />
 	ui:append("Image", "Image_Spliter"):find('#Image_Spliter'):pos(10, y-7):size(w - 20, 2):image('UI/Image/UICommon/ScienceTreeNode.UITex',62)
 
-	x, y = 15, 65
-	offsety = 35
+	x, y = 15, 70
+	offsety = 32
 	ui:append("WndSliderBox", {
 		name = "WndSliderBox_LifeBarWidth",
 		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 5, 150 },
