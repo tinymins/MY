@@ -62,9 +62,6 @@ local function QueryData(szQues)
 		end
 	end
 
-	if MY.IsInDevMode() then
-		return
-	end
 	local _, _, szLang, _ = GetVersion()
 	MY.Ajax({
 		type = 'get',
@@ -107,6 +104,9 @@ local function QueryData(szQues)
 end
 
 local function SubmitData()
+	if MY.IsInDevMode() then
+		return
+	end
 	local data = {}
 	for szQues, szAnsw in pairs(l_tCached) do
 		if not l_tAccept[szQues] then
