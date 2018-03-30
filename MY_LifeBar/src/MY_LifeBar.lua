@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-03-29 23:00:52
+-- @Last Modified time: 2018-03-30 15:59:03
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -224,35 +224,35 @@ MY.RegisterEvent("UI_SCALED", D.Repaint)
 function D.Reset()
 	LB_CACHE = {}
 	LB("clear")
-	-- auto adjust index
-	if MY_LifeBar.bEnabled and Config.bAdjustIndex then
-		MY.BreatheCall("MY_LifeBar_AdjustIndex", function()
-			local n = 0
-			local t = {}
-			-- refresh current index data
-			for dwID, lb in pairs(LB_CACHE) do
-				n = n + 1
-				if n > 200 then
-					break
-				end
-				PostThreadCall(function(info, xScreen, yScreen)
-					info.nIndex = yScreen or 0
-				end, lb.info, "Scene_GetCharacterTopScreenPos", dwID)
+	-- -- auto adjust index
+	-- if MY_LifeBar.bEnabled and Config.bAdjustIndex then
+	-- 	MY.BreatheCall("MY_LifeBar_AdjustIndex", function()
+	-- 		local n = 0
+	-- 		local t = {}
+	-- 		-- refresh current index data
+	-- 		for dwID, lb in pairs(LB_CACHE) do
+	-- 			n = n + 1
+	-- 			if n > 200 then
+	-- 				break
+	-- 			end
+	-- 			PostThreadCall(function(info, xScreen, yScreen)
+	-- 				info.nIndex = yScreen or 0
+	-- 			end, lb.info, "Scene_GetCharacterTopScreenPos", dwID)
 
-				insert(t, { handle = lb.info.handle, index = lb.info.nIndex })
-			end
-			-- sort
-			table.sort(t, function(a, b) return a.index < b.index end)
-			-- adjust
-			for i = #t, 1, -1 do
-				if t[i].handle and t[i].handle:GetIndex() ~= i - 1 then
-					t[i].handle:ExchangeIndex(i - 1)
-				end
-			end
-		end, 500)
-	else
-		MY.BreatheCall("MY_LifeBar_AdjustIndex", false)
-	end
+	-- 			insert(t, { handle = lb.info.handle, index = lb.info.nIndex })
+	-- 		end
+	-- 		-- sort
+	-- 		table.sort(t, function(a, b) return a.index < b.index end)
+	-- 		-- adjust
+	-- 		for i = #t, 1, -1 do
+	-- 			if t[i].handle and t[i].handle:GetIndex() ~= i - 1 then
+	-- 				t[i].handle:ExchangeIndex(i - 1)
+	-- 			end
+	-- 		end
+	-- 	end, 500)
+	-- else
+	-- 	MY.BreatheCall("MY_LifeBar_AdjustIndex", false)
+	-- end
 	D.AutoSwitchSysHeadTop()
 end
 MY.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED', D.Reset)
