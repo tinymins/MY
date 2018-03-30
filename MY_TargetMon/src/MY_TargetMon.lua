@@ -1031,6 +1031,7 @@ function PS.OnPanelActive(wnd)
 					bColorTable = true,
 					fnChangeColor = function(_, r, g, b)
 						mon.rgbShortAlias = { r, g, b }
+						mon.manually = true
 						D.CheckFrame(l_config)
 					end,
 				},
