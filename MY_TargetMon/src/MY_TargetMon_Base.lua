@@ -289,7 +289,7 @@ local function ReloadFrame(frame)
 
 	frame:SetSize(nWidth, nHeight)
 	frame:SetDragArea(0, 0, nWidth, nHeight)
-	frame:EnableDrag(config.dragable)
+	frame:EnableDrag(not config.penetrable and config.dragable)
 	frame:SetMousePenetrable(config.penetrable)
 
 	frame.w, frame.h = frame:GetSize()
