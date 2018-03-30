@@ -92,8 +92,8 @@ data = {
 	{dwID=8975,col="#FF3232FF",szReminder="烈",nPriority=3},--烈明---花月别院
 	{dwID=8978},--青焱---花月别院
 	{dwID=8896},--灼君---花月别院
-	{dwID=8917},--无暇剑壁·阴---花月别院
-	{dwID=8915},--无暇剑壁·阳---花月别院
+	{dwID=8917},--无暇剑璧·阴---花月别院
+	{dwID=8915},--无暇剑璧·阳---花月别院
 	{dwID=1858},--豪气剑空---宫中神武遗迹
 	{dwID=2677},--胁迫---龙渊泽
 	{dwID=5580,col="#8055FF00",szReminder="缠",nPriority=4},--百生·缠---大明宫
@@ -102,7 +102,7 @@ data = {
 	{dwID=7184,szStackOp=">=",nStackNum=10},--风暴之眼---血战天策
 	{dwID=6549,col="#FF3232FF",szReminder="怒",nPriority=3},--天怒---血战天策
 	{dwID=6936},--闪舞刺---血战天策
-	{dwID=6991},--禁疗---血战天策
+	{dwID=6991},--致命猎杀---血战天策
 	{dwID=8013,col="#8055FF00",szReminder="油",nPriority=4},--油腻---夜守孤城
 	{dwID=8346},--火燎---夜守孤城
 	{dwID=7942},--残废---夜守孤城
@@ -118,7 +118,7 @@ data = {
 	{dwID=8312},--腐血狂乱---逐虎驱狼
 	{dwID=8215},--气血翻涌---逐虎驱狼
 	{dwID=8042},--冻结---逐虎驱狼
-	{dwID=8196,col="#00FFFFFF",szReminder="冰",nPriority=3,bCaution=true},--冰霜一指---逐虎驱狼
+	{dwID=8196,col="#00FFFFFF",szReminder="冰",nPriority=1,bCaution=true},--冰霜一指---逐虎驱狼
 	{dwID=8199,col="#8055FFFF",szReminder="霜",nPriority=3},--冰霜气劲---逐虎驱狼
 	{dwID=8822},--音波之殇·阳---逐虎驱狼
 	{dwID=8823},--音波之殇·阴---逐虎驱狼
@@ -129,7 +129,7 @@ data = {
 	{dwID=8172,col="#0096FF00",szReminder="莲",nPriority=4},--莲花指---逐虎驱狼
 	{dwID=8174},--音波冲击---逐虎驱狼
 	{dwID=8027},--音波冲击---逐虎驱狼
-	{dwID=8047},--散魂---逐虎驱狼
+	{dwID=8047},--散魄---逐虎驱狼
 	{dwID=8046},--失血---逐虎驱狼
 	{dwID=8044,col="#FF3232FF",szReminder="鲜",nPriority=0,bAttention=true,bCaution=true},--鲜血献祭---逐虎驱狼
 	{dwID=8045,col="#FF00FFFF",szReminder="灵",nPriority=0,bAttention=true,bCaution=true},--灵魂献祭---逐虎驱狼

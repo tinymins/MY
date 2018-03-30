@@ -132,8 +132,8 @@ data = {
 	{dwID=5632,col="#00FF0000",szReminder="火",nPriority=4},--火把---大明宮
 	{dwID=5084,col="#FFFF00FF",szReminder="牢",nPriority=2,bAttention=true},--牢籠被鎖---南诏皇宮
 	{dwID=5081},--魁龍氣---南诏皇宮
-	{dwID=5096,col="#FF3232FF",szReminder="精",nPriority=0,bAttention=true,bCaution=true},--精准射殺---南诏皇宮
-	{dwID=5079,col="#00FFFFFF",szReminder="散",nPriority=2,bAttention=true},--致死散射---南诏皇宮
+	{dwID=5096,col="#FF3232FF",szReminder="精",nPriority=0,bAttention=true,bCaution=true},--精確射殺---南诏皇宮
+	{dwID=5096,col="#0096FFFF",szReminder="散",nPriority=1,bCaution=true},--致死散射---南诏皇宮
 	{dwID=4378,col="#FFFF00FF",szReminder="鍾",nPriority=1,bCaution=true},--點名撞鍾---南诏皇宮
 	{dwID=4314,col="#00FFFFFF",szReminder="霜",nPriority=3,szStackOp=">=",nStackNum=6},--冰霜---南诏皇宮
 	{dwID=4637,col="#FF8000FF",szReminder="追",nPriority=1,bCaution=true},--追擊---南诏皇宮
@@ -253,8 +253,8 @@ data = {
 	{dwID=7868,col="#FF3232FF",szReminder="箱",nPriority=3},--惡人谷菌箱---其他
 	{dwID=7867,col="#0096FFFF",szReminder="箱",nPriority=3},--浩氣盟菌箱---其他
 	{dwID=2427},--放屁---其他
-	{dwID=2549},--嘔吐物---其他
-	{dwID=11604},--內滿·二---其他
+	{dwID=2549},--眩暈---其他
+	{dwID=11604},--內滿·貳---其他
 	{dwID=12004},--損壞---其他
 	{dwID=11048},--身體不適---其他
 	{dwID=11607},--戰意---其他
