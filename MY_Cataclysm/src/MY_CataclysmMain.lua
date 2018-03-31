@@ -520,6 +520,7 @@ function Cataclysm_Main.OnFrameCreate()
 	CreateControlBar()
 	this:EnableDrag(Cataclysm_Main.bDrag)
 end
+
 -------------------------------------------------
 -- ÍÏ¶¯´°Ìå OnFrameDrag
 -------------------------------------------------
@@ -762,6 +763,46 @@ function Cataclysm_Main.OnFrameBreathe()
 	Grid_CTM:RefreshTTarget()
 	Grid_CTM:RefreshBossTarget()
 	Grid_CTM:RefreshBossFocus()
+	local fPrepare, szPrepare, nAlpha
+	local dwType, dwID = me.GetTarget()
+	if dwType == TARGET.NPC then
+		local h = Station.Lookup("Normal/Target", "Handle_Bar")
+		if h and h:IsVisible() then
+			local txt = h:Lookup("Text_Name")
+			if txt then
+				szPrepare = txt:GetText()
+			end
+			local img = h:Lookup("Image_Progress")
+			if img then
+				fPrepare = img:GetPercentage()
+			end
+			nAlpha = h:GetAlpha()
+		end
+	elseif dwType == TARGET.PLAYER then
+		local tar = GetPlayer(dwID)
+		local dwType, dwID = tar.GetTarget()
+		if dwType == TARGET.NPC then
+			local h = Station.Lookup("Normal/TargetTarget", "Handle_Bar")
+			if h and h:IsVisible() then
+				local txt = h:Lookup("Text_Name")
+				if txt then
+					szPrepare = txt:GetText()
+				end
+				local img = h:Lookup("Image_Progress")
+				if img then
+					fPrepare = img:GetPercentage()
+				end
+				nAlpha = h:GetAlpha()
+			end
+		end
+	end
+	if fPrepare and szPrepare and nAlpha then
+		this:Lookup("", "Handle_Prepare/Text_Prepare"):SetText(szPrepare)
+		this:Lookup("", "Handle_Prepare/Image_Prepare"):SetPercentage(fPrepare)
+		this:Lookup("", "Handle_Prepare"):SetAlpha(nAlpha)
+	else
+		this:Lookup("", "Handle_Prepare"):SetAlpha(0)
+	end
 	-- kill System Panel
 	RaidPanel_Switch(DEBUG)
 	TeammatePanel_Switch(false)
