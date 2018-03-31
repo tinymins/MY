@@ -321,8 +321,8 @@ CTM_Party_Base = class()
 function CTM_Party_Base.OnFrameCreate()
 	this:Lookup("", "Handle_BG/Shadow_BG"):SetAlpha(CFG.nAlpha)
 	this:RegisterEvent("CTM_SET_ALPHA")
-	this:SetVisible(not MY_Cataclysm.bFold)
 	this:RegisterEvent("CTM_SET_FOLD")
+	this:SetVisible(not MY_Cataclysm.bFold)
 end
 
 function CTM_Party_Base.OnEvent(szEvent)
@@ -686,6 +686,7 @@ function CTM:CreatePanel(nIndex)
 			"Cataclysm_Party_" .. nIndex
 		)
 		frame:Scale(CFG.fScaleX, CFG.fScaleY)
+		frame:SetVisible(not MY_Cataclysm.bFold)
 	end
 	self:AutoLinkAllPanel()
 	self:RefreshGroupText()
