@@ -300,6 +300,18 @@ local function GetGroupTotal()
 	return nGroup
 end
 
+local function UpdatePrepareBarPos()
+	local frame    = GetFrame()
+	local hTotal   = frame:Lookup("", "")
+	local hPrepare = hTotal:Lookup("Handle_Prepare")
+	if MY_Cataclysm.bFold or GetGroupTotal() < 3 then
+		hPrepare:SetRelPos(0, -18)
+	else
+		hPrepare:SetRelPos(frame:Lookup("", "Handle_BG/Image_Title_BG"):GetW(), 3)
+	end
+	hTotal:FormatAllItemPos()
+end
+
 local function SetFrameSize(bEnter)
 	local frame = GetFrame()
 	if frame then
@@ -319,6 +331,7 @@ local function SetFrameSize(bEnter)
 		end
 		frame:SetDragArea(0, 0, w, h)
 		frame:Lookup("", "Handle_BG/Image_Title_BG"):SetW(w)
+		UpdatePrepareBarPos()
 	end
 end
 
@@ -499,6 +512,7 @@ function Cataclysm_Main.OnFrameCreate()
 	this:RegisterEvent("BUFF_UPDATE")
 	this:RegisterEvent("PLAYER_ENTER_SCENE")
 	this:RegisterEvent("CTM_BUFF_LIST_CACHE_UPDATE")
+	this:RegisterEvent("CTM_SET_FOLD")
 	-- 拍团部分 arg0 0=T人 1=分工资
 	this:RegisterEvent("TEAM_VOTE_REQUEST")
 	-- arg0 回应状态 arg1 dwID arg2 同意=1 反对=0
@@ -594,6 +608,7 @@ function Cataclysm_Main.OnEvent(szEvent)
 		if Cataclysm_Main.nAutoLinkMode ~= 5 then
 			Grid_CTM:AutoLinkAllPanel()
 		end
+		UpdatePrepareBarPos()
 	elseif szEvent == "PARTY_DELETE_MEMBER" then
 		local me = GetClientPlayer()
 		if me.dwID == arg1 then
@@ -612,6 +627,7 @@ function Cataclysm_Main.OnEvent(szEvent)
 			end
 		end
 		SetFrameSize()
+		UpdatePrepareBarPos()
 	elseif szEvent == "PARTY_DISBAND" then
 		CloseCataclysmPanel()
 	elseif szEvent == "PARTY_UPDATE_MEMBER_LMR" then
@@ -731,6 +747,8 @@ function Cataclysm_Main.OnEvent(szEvent)
 				end
 			end
 		end
+	elseif szEvent == "CTM_SET_FOLD" then
+		UpdatePrepareBarPos()
 	elseif szEvent == "MY_CAMP_COLOR_UPDATE"
 	or szEvent == "MY_FORCE_COLOR_UPDATE" then
 		ReloadCataclysmPanel()
@@ -796,12 +814,13 @@ function Cataclysm_Main.OnFrameBreathe()
 			end
 		end
 	end
+	local hPrepare = this:Lookup("", "Handle_Prepare")
 	if fPrepare and szPrepare and nAlpha then
-		this:Lookup("", "Handle_Prepare/Text_Prepare"):SetText(szPrepare)
-		this:Lookup("", "Handle_Prepare/Image_Prepare"):SetPercentage(fPrepare)
-		this:Lookup("", "Handle_Prepare"):SetAlpha(nAlpha)
+		hPrepare:Lookup("Text_Prepare"):SetText(szPrepare)
+		hPrepare:Lookup("Image_Prepare"):SetPercentage(fPrepare)
+		hPrepare:SetAlpha(nAlpha)
 	else
-		this:Lookup("", "Handle_Prepare"):SetAlpha(0)
+		hPrepare:SetAlpha(0)
 	end
 	-- kill System Panel
 	RaidPanel_Switch(DEBUG)
