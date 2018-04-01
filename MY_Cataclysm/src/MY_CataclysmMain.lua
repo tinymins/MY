@@ -301,13 +301,17 @@ local function GetGroupTotal()
 end
 
 local function UpdatePrepareBarPos()
-	local frame    = GetFrame()
-	local hTotal   = frame:Lookup("", "")
+	local frame = GetFrame()
+	if not frame then
+		return
+	end
+	local hTotal = frame:Lookup("", "")
 	local hPrepare = hTotal:Lookup("Handle_Prepare")
 	if MY_Cataclysm.bFold or GetGroupTotal() < 3 then
 		hPrepare:SetRelPos(0, -18)
 	else
-		hPrepare:SetRelPos(frame:Lookup("", "Handle_BG/Image_Title_BG"):GetW(), 3)
+		local container = frame:Lookup("Container_Main")
+		hPrepare:SetRelPos(container:GetRelX() + container:GetW(), 3)
 	end
 	hTotal:FormatAllItemPos()
 end
