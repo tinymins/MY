@@ -6,20 +6,25 @@
 -- 主要功能: 按关键字过滤获取聊天消息
 --
 --[[
-    MY_ChatMonitor.tRecords = {
+    RECORD_LIST = {
         -- （数组部分）监控记录
         {
             html = 消息A的UI序列化值(szMsg) 消息源数据UI XML,
             hash = 消息A的HASH值 计算当前消息的哈希 用于过滤相同,
             text = 消息A的纯文本 计算当前消息的纯文字内容 用于匹配,
         }, ...
+    }
+    RECORD_HASH = {
         -- （哈希部分）记录数量
         [消息A的HASH值] = 相同的消息A捕获的数量, -- 当为0时删除改HASH
         ...
     }
 ]]
+local D = {}
 local _C = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_ChatMonitor/lang/")
+local DATA_FILE = "userdata/chatmonitor.jx3dat"
+local RECORD_LIST, RECORD_HASH = {}, {}
 MY_ChatMonitor = {}
 MY_ChatMonitor.szKeyWords          = _L.CHAT_MONITOR_KEYWORDS_SAMPLE
 MY_ChatMonitor.bIsRegexp           = false
@@ -30,9 +35,10 @@ MY_ChatMonitor.bRedirectSysChannel = false
 MY_ChatMonitor.bCapture            = false
 MY_ChatMonitor.bBlockWords         = true
 MY_ChatMonitor.bIgnoreSame         = true
+MY_ChatMonitor.bRealtimeSave       = false
+MY_ChatMonitor.bDistinctServer     = false
 MY_ChatMonitor.szTimestrap         = "[hh:mm:ss]"
 MY_ChatMonitor.anchor              = { x = -100, y = -150, s = "BOTTOMRIGHT", r = "BOTTOMRIGHT" }
-MY_ChatMonitor.tRecords            = {}
 MY_ChatMonitor.tChannels           = {
     ["MSG_NORMAL"] = true, ["MSG_CAMP" ] = true, ["MSG_WORLD" ] = true, ["MSG_MAP"     ] = true,
     ["MSG_SCHOOL"] = true, ["MSG_GUILD"] = true, ["MSG_FRIEND"] = true, ["MSG_IDENTITY"] = true,
@@ -48,8 +54,9 @@ RegisterCustomData('MY_ChatMonitor.bPlaySound')
 RegisterCustomData('MY_ChatMonitor.bRedirectSysChannel')
 RegisterCustomData('MY_ChatMonitor.anchor')
 RegisterCustomData('MY_ChatMonitor.bIgnoreSame')
+RegisterCustomData('MY_ChatMonitor.bRealtimeSave')
+RegisterCustomData('MY_ChatMonitor.bDistinctServer')
 RegisterCustomData('MY_ChatMonitor.szTimestrap')
-RegisterCustomData('MY_ChatMonitor.tRecords')
 _C.bInited = false
 _C.ui = nil
 _C.uiBoard = nil
@@ -97,6 +104,36 @@ _C.tChannelGroups = {
     }
 }
 _C.nLastLoadDataTime = -1000000
+
+function D.SaveData()
+    local TYPE = MY_ChatMonitor.bDistinctServer
+        and MY_DATA_PATH.SERVER or MY_DATA_PATH.ROLE
+    MY.SaveLUAData({DATA_FILE, TYPE}, {list = RECORD_LIST, hash = RECORD_HASH})
+end
+MY.RegisterExit(D.SaveData)
+
+function D.LoadData()
+    local data = MY_ChatMonitor.bDistinctServer
+        and (MY.LoadLUAData({DATA_FILE, MY_DATA_PATH.SERVER}) or {})
+        or (MY.LoadLUAData({DATA_FILE, MY_DATA_PATH.ROLE}) or {})
+    RECORD_LIST = data.list or {}
+    RECORD_HASH = data.hash or {}
+end
+MY.RegisterInit(D.LoadData)
+
+function D.GetHTML(rec)
+    local html = MY.Chat.GetTimeLinkText({
+        r = rec.r, g = rec.g, b = rec.b,
+        f = rec.font, s = MY_ChatMonitor.szTimestrap,
+    }) .. rec.html
+    -- render link event
+    html = MY.Chat.RenderLink(html)
+    -- render player name color
+    if MY_Farbnamen and MY_Farbnamen.Render then
+        html = MY_Farbnamen.Render(html)
+    end
+    return html
+end
 
 -- 插入聊天内容时监控聊天信息
 _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
@@ -164,21 +201,17 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
             return
         end
     end
-    local tRecords = MY_ChatMonitor.tRecords
     -- 验证消息哈希 如果存在则跳过该消息
-    if MY_ChatMonitor.bIgnoreSame and tRecords[rec.hash] then
+    if MY_ChatMonitor.bIgnoreSame and RECORD_HASH[rec.hash] then
         return
     end
     --------------------------------------------------------------------------------------
     -- 如果符合要求
     -- 开始渲染一条记录的UIXML字符串
-    rec.html = MY.Chat.GetTimeLinkText({r=r, g=g, b=b, f=nFont, s=MY_ChatMonitor.szTimestrap}) .. rec.html
-    -- render link event
-    rec.html = MY.Chat.RenderLink(rec.html)
-    -- render player name color
-    if MY_Farbnamen and MY_Farbnamen.Render then
-        rec.html = MY_Farbnamen.Render(rec.html)
-    end
+    rec.r, rec.g, rec.b = r, g, b
+    rec.font = nFont
+    rec.time = GetCurrentTime()
+    local html = D.GetHTML(rec)
     -- 发出提示音
     if MY_ChatMonitor.bPlaySound then
         MY.PlaySound(MY.GetAddonInfo().szRoot .. "MY_ChatMonitor/audio/MsgArrive.wav", "MsgArrive.wav")
@@ -192,32 +225,32 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
     -- 更新UI
     if _C.uiBoard then
         local nPos = _C.uiBoard:scroll()
-        _C.uiBoard:append(rec.html)
+        _C.uiBoard:append(html)
         if nPos == 100 or nPos == -1 then
             _C.uiBoard:scroll(100)
         end
     end
     if MY_ChatMonitor.bShowPreview then
-        _C.ShowTip(rec.html)
+        _C.ShowTip(html)
     end
     --------------------------------------------------------------------------------------
     -- 开始处理记录的数据保存
     -- 更新缓存数组 哈希表
-    table.insert(tRecords, rec)
-    tRecords[rec.hash] = (tRecords[rec.hash] or 0) + 1
+    table.insert(RECORD_LIST, rec)
+    RECORD_HASH[rec.hash] = (RECORD_HASH[rec.hash] or 0) + 1
     -- 验证记录是否超过限制条数
-    local nOverflowed = #tRecords - MY_ChatMonitor.nMaxRecord
+    local nOverflowed = #RECORD_LIST - MY_ChatMonitor.nMaxRecord
     if nOverflowed > 0 then
         -- 处理记录列表
         for i = nOverflowed, 1, -1 do
-            local hash = tRecords[1].hash
+            local hash = RECORD_LIST[1].hash
             if hash then
-                tRecords[hash] = tRecords[hash] - 1
-                if tRecords[hash] <= 0 then
-                    tRecords[hash] = nil
+                RECORD_LIST[hash] = RECORD_LIST[hash] - 1
+                if RECORD_LIST[hash] <= 0 then
+                    RECORD_LIST[hash] = nil
                 end
             end
-            table.remove(tRecords, 1)
+            table.remove(RECORD_LIST, 1)
         end
         -- 处理UI
         if _C.uiBoard then
@@ -236,6 +269,9 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
                 ui:remove()
             end)
         end
+    end
+    if MY_ChatMonitor.bRealtimeSave then
+        D.SaveData()
     end
 end
 
@@ -432,6 +468,26 @@ _C.OnPanelActive = function(wnd)
                     bCheck = true,
                     bChecked = MY_ChatMonitor.bIgnoreSame
                 })
+                if IsCtrlKeyDown() then
+                    table.insert(t, {
+                        szOption = _L['Realtime save'],
+                        fnAction = function()
+                            MY_ChatMonitor.bRealtimeSave = not MY_ChatMonitor.bRealtimeSave
+                        end,
+                        bCheck = true,
+                        bChecked = MY_ChatMonitor.bRealtimeSave
+                    })
+                    table.insert(t, {
+                        szOption = _L['Distinct server'],
+                        fnAction = function()
+                            MY_ChatMonitor.bDistinctServer = not MY_ChatMonitor.bDistinctServer
+                            D.LoadData()
+                            MY.SwitchTab("ChatMonitor", true)
+                        end,
+                        bCheck = true,
+                        bChecked = MY_ChatMonitor.bDistinctServer
+                    })
+                end
                 if MY_Chat then
                     table.insert(t,{
                         szOption = _L['hide blockwords'],
@@ -489,7 +545,7 @@ _C.OnPanelActive = function(wnd)
         x = w - 81, y = 15, w = 50,
         text = _L['clear'],
         onclick = function()
-            MY_ChatMonitor.tRecords = {}
+            RECORD_LIST = {}
             _C.uiBoard:clear()
         end,
     })
@@ -499,9 +555,8 @@ _C.OnPanelActive = function(wnd)
         x = 20, y = 50, w = w - 21, h = h - 70, handlestyle = 3,
     }, true)
 
-    local tRecords = MY_ChatMonitor.tRecords
-    for i = 1, #tRecords, 1 do
-        _C.uiBoard:append(tRecords[i].html)
+    for i = 1, #RECORD_LIST, 1 do
+        _C.uiBoard:append(D.GetHTML(RECORD_LIST[i]))
     end
     _C.uiBoard:scroll(100)
     _C.ui = MY.UI(wnd)
