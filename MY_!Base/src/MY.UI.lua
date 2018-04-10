@@ -95,6 +95,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.textfmt            ~= nil then ui:text           (arg.textfmt    ) end -- must before :text()
 		if arg.text               ~= nil then ui:text           (arg.text       ) end
 		if arg.placeholder        ~= nil then ui:placeholder    (arg.placeholder) end
+		if arg.navigate           ~= nil then ui:navigate       (arg.navigate   ) end
 		if arg.group              ~= nil then ui:group          (arg.group      ) end
 		if arg.tip                ~= nil then ui:tip(arg.tip, arg.tippostype, arg.tipoffset, arg.tiprichtext) end
 		if arg.range              ~= nil then ui:range        (unpack(arg.range)) end
@@ -231,6 +232,19 @@ local function GetComponentElement(raw, elementType)
 			element = raw
 		elseif componentType == 'WndEditBox' or componentType == 'WndEditComboBox' or componentType == 'WndAutocomplete' then
 			element = raw:Lookup('WndEdit_Default')
+		end
+	elseif elementType == 'WEB' then
+		if componentType == 'WndWebPage'
+		or componentType == 'WndWebCef' then
+			element = raw
+		end
+	elseif elementType == 'WEBPAGE' then
+		if componentType == 'WndWebPage' then
+			element = raw
+		end
+	elseif elementType == 'WEBCEF' then
+		if componentType == 'WndWebCef' then
+			element = raw
 		end
 	elseif elementType == 'SLIDER' then
 		if componentType == 'WndSliderBox' then
@@ -3349,6 +3363,17 @@ function XGUI:change(fnOnChange)
 		end
 		return self
 	end
+end
+
+function XGUI:navigate(szURL)
+	self:_checksum()
+	for _, raw in ipairs(self.raws) do
+		raw = GetComponentElement(raw, 'WEB')
+		if raw then
+			raw:Navigate(szURL)
+		end
+	end
+	return self
 end
 
 -- focus （输入框）获得焦点 -- 好像只有输入框能获得焦点
