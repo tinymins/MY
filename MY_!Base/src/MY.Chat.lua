@@ -1134,28 +1134,29 @@ local function UploadSerendipity(szName, szSerendipity, nMethod, bFinish, dwTime
 	if MY.IsInDevMode() then
 		return
 	end
-	MY.Ajax({
-		type = "post/json",
-		url = 'http://data.jx3.derzh.com/api/serendipities',
-		data = {
-			data = MY.SimpleEncrypt(MY.JsonEncode({
+	local szKey = szName .. "_" .. szSerendipity .. "_" .. dwTime
+	local szText = szName == GetClientPlayer().szName
+		and _L(bFinish
+			and "You finished %s, would you like to share?"
+			or "You got %s, would you like to share?", szSerendipity)
+		or _L(bFinish
+			and "[%s] finished %s, would you like to share?"
+			or "[%s] got %s, would you like to share?", szName, szSerendipity)
+	local function fnAction()
+		XGUI.CreateFrame("MY_Serendipity#" .. szKey, {
+			w = 300, h = 400, close = true, text = "",
+		}):append("WndWebCef", {
+			x = 0, y = 0, w = 300, h = 400,
+			navigate = 'http://data.jx3.derzh.com/serendipity/?l='
+			.. MY.GetLang() .. "&m=" .. nMethod
+			.. "&data=" .. MY.SimpleEncrypt(MY.JsonEncode({
 				n = szName, S = MY.GetRealServer(1), s = MY.GetRealServer(2),
-				N = szSerendipity, f = bFinish, t = dwTime, m = nMethod,
+				a = szSerendipity, f = bFinish, t = dwTime,
 			})),
-			lang = MY.GetLang(),
-		},
-		success = function(html, status) end,
-	})
-
-	MY.Ajax({
-		type = "get",
-		url = 'http://data.jx3.derzh.com/serendipity/?l=' .. MY.GetLang() .. "&m=" .. nMethod
-		.. "&data=" .. MY.SimpleEncrypt(MY.JsonEncode({
-			n = szName, S = MY.GetRealServer(1), s = MY.GetRealServer(2),
-			a = szSerendipity, f = bFinish, t = dwTime,
-		})),
-		success = function(html, status) end,
-	})
+		})
+		MY_Notify.Dismiss(szKey)
+	end
+	MY_Notify.Create(szKey, GetFormatText(szText), fnAction)
 end
 
 MY.RegisterMsgMonitor("QIYU", function(szMsg, nFont, bRich, r, g, b, szChannel)
