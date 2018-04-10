@@ -22,11 +22,11 @@ local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_ChatLog/lang/")
 MY_ChatLog = MY_ChatLog or {}
 MY_ChatLog.bIgnoreTongOnlineMsg    = true -- 帮会上线通知
 MY_ChatLog.bIgnoreTongMemberLogMsg = true -- 帮会成员上线下线提示
-MY_ChatLog.bRealtimeCommit         = false-- 实时写入数据库
+-- MY_ChatLog.bRealtimeCommit         = false-- 实时写入数据库
 MY_ChatLog.tUncheckedChannel = {}
 RegisterCustomData('MY_ChatLog.bIgnoreTongOnlineMsg')
 RegisterCustomData('MY_ChatLog.bIgnoreTongMemberLogMsg')
-RegisterCustomData('MY_ChatLog.bRealtimeCommit')
+-- RegisterCustomData('MY_ChatLog.bRealtimeCommit')
 RegisterCustomData('MY_ChatLog.tUncheckedChannel')
 
 ------------------------------------------------------------------------------------------------------
@@ -617,9 +617,9 @@ local function InitMsgMon()
 		end
 		InsertMsg(CHANNELS_R[szChannel], szText, szMsg, szTalker, GetCurrentTime())
 
-		if MY_ChatLog.bRealtimeCommit then
-			PushDB()
-		end
+		-- if MY_ChatLog.bRealtimeCommit then
+		-- 	PushDB()
+		-- end
 	end
 	MY.RegisterMsgMonitor('MY_ChatLog', OnMsg, aChannels)
 	MY.RegisterEvent("LOADING_ENDING.MY_ChatLog_Save", PushDB)
@@ -1268,15 +1268,15 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + dy
 
-	ui:append("WndCheckBox", {
-		x = x, y = y, w = wr,
-		text = _L['realtime database commit'],
-		checked = MY_ChatLog.bRealtimeCommit,
-		oncheck = function(bChecked)
-			MY_ChatLog.bRealtimeCommit = bChecked
-		end
-	})
-	y = y + dy
+	-- ui:append("WndCheckBox", {
+	-- 	x = x, y = y, w = wr,
+	-- 	text = _L['realtime database commit'],
+	-- 	checked = MY_ChatLog.bRealtimeCommit,
+	-- 	oncheck = function(bChecked)
+	-- 		MY_ChatLog.bRealtimeCommit = bChecked
+	-- 	end
+	-- })
+	-- y = y + dy
 
 	ui:append("WndButton", {
 		x = x, y = y, w = 150,
