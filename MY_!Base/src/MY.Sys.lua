@@ -507,6 +507,9 @@ function MY.Ajax(settings)
 	end
 
 	if settings.driver == "curl" then
+		if not Curl_Create then
+			return settings.error()
+		end
 		local curl = Curl_Create(url)
 		if method == 'post' then
 			curl:SetMethod('POST')
@@ -589,8 +592,14 @@ function MY.Ajax(settings)
 		end
 		szKey = MY_AJAX_TAG .. szKey
 		if method == "post" then
+			if not CURL_HttpPost then
+				return settings.error()
+			end
 			CURL_HttpPost(szKey, url, data, ssl, settings.timeout)
 		else
+			if not CURL_HttpRqst then
+				return settings.error()
+			end
 			CURL_HttpRqst(szKey, url, ssl, settings.timeout)
 		end
 		MY_CALL_AJAX[szKey] = settings
