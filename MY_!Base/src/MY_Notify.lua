@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-04-10 09:46:03
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-04-10 17:53:51
+-- @Last Modified time: 2018-04-11 13:56:04
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -45,12 +45,17 @@ function MY_Notify.Create(szKey, szMsg, fnAction)
 	return szKey
 end
 
-function MY_Notify.Dismiss(szKey)
+function MY_Notify.Dismiss(szKey, bOnlyData)
 	for i, v in ipairs_r(NOTIFY_LIST) do
 		if v.szKey == szKey then
 			remove(NOTIFY_LIST, i)
 		end
 	end
+	if bOnlyData then
+		return
+	end
+	D.UpdateEntry()
+	D.DrawNotifies(true)
 end
 
 function D.UpdateEntry()
@@ -124,7 +129,7 @@ function D.DrawNotifies(bAutoClose)
 end
 
 function MY_Notify.OnFrameCreate()
-	D.DrawNotifies(this)
+	D.DrawNotifies()
 	this:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
 end
 
@@ -145,11 +150,11 @@ function MY_Notify.OnItemLButtonClick()
 			bDismiss = true
 		end
 		if bDismiss then
-			MY_Notify.Dismiss(notify.szKey)
+			MY_Notify.Dismiss(notify.szKey, true)
 		end
 		notify.bUnread = false
 		D.UpdateEntry()
-		D.DrawNotifies(this:GetRoot(), true)
+		D.DrawNotifies(true)
 	end
 end
 

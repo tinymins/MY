@@ -335,4 +335,5 @@ data = {
 	["[%s] got %s, would you like to share?"] = "[%s]獲得了%s，是否願意點擊分享到公共數據查詢中？",
 	["You finished %s, would you like to share?"] = "你完成了%s，是否願意點擊分享到公共數據查詢中？",
 	["[%s] finished %s, would you like to share?"] = "[%s]完成了%s，是否願意點擊分享到公共數據查詢中？",
+	["Please input your realname, left blank for anonymous report:"] = "輸入您希望顯示的分享者名稱，匿名分享請留空：",
 }
