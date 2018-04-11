@@ -439,6 +439,8 @@ local function CloseCataclysmPanel()
 	if GetFrame() then
 		Wnd.CloseWindow(GetFrame())
 		Grid_CTM:CloseParty()
+		MY_Cataclysm.bFold = false
+		FireUIEvent("CTM_SET_FOLD")
 	end
 end
 
