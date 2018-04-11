@@ -1134,6 +1134,27 @@ local function UploadSerendipity(szName, szSerendipity, nMethod, bFinish, dwTime
 	if MY.IsInDevMode() then
 		return
 	end
+	MY.Ajax({
+		type = "post/json",
+		url = 'http://data.jx3.derzh.com/api/serendipities',
+		data = {
+			data = MY.SimpleEncrypt(MY.JsonEncode({
+				n = szName, S = MY.GetRealServer(1), s = MY.GetRealServer(2),
+				N = szSerendipity, f = bFinish, t = dwTime, m = nMethod,
+			})),
+			lang = MY.GetLang(),
+		},
+		success = function(html, status) end,
+	})
+	MY.Ajax({
+		type = "get",
+		url = 'http://data.jx3.derzh.com/serendipity/?l=' .. MY.GetLang() .. "&m=" .. nMethod
+		.. "&data=" .. MY.SimpleEncrypt(MY.JsonEncode({
+			n = szName, S = MY.GetRealServer(1), s = MY.GetRealServer(2),
+			a = szSerendipity, f = bFinish, t = dwTime,
+		})),
+		success = function(html, status) end,
+	})
 	local szKey = szName .. "_" .. szSerendipity .. "_" .. dwTime
 	local szText = szName == GetClientPlayer().szName
 		and _L(bFinish
