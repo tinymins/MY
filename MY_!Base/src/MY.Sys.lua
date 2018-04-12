@@ -138,6 +138,10 @@ function MY.GetLUADataPath(oFilePath)
 	if string.sub(szFilePath, -1) == '/' then
 		szFilePath = szFilePath .. "data"
 	end
+	-- ensure file ext name
+	if string.sub(szFilePath, -7):lower() ~= '.jx3dat' then
+		szFilePath = szFilePath .. ".jx3dat"
+	end
 	return szFilePath
 end
 
