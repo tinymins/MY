@@ -5,7 +5,7 @@ import time, os, re
 str_version = "0x0000000"
 for line in open("MY_!Base/src/MY.lua"):
 	if line[6:15] == "_VERSION_":
-		str_version = line[23:25]
+		str_version = line[22:25]
 
 # 读取Git中最大的版本号
 version_list = os.popen('git tag').read().strip().split("\n")
