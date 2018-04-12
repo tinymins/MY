@@ -381,6 +381,7 @@ local function OnInit()
 	MY.CreateDataRoot(MY_DATA_PATH.GLOBAL)
 	MY.CreateDataRoot(MY_DATA_PATH.SERVER)
 
+	MY.bShowNotifyPush = MY.LoadLUAData({"config/show_notify.jx3dat", MY_DATA_PATH.GLOBAL}) or false
 	for szKey, fnAction in pairs(INIT_FUNC_LIST) do
 		local nStartTick = GetTickCount()
 		local status, err = pcall(fnAction)
@@ -936,6 +937,19 @@ function MY.SwitchTab(szID, bForceUpdate)
 		ui:append("Image", { name = 'Image_Adv', x = 0, y = 0, image = _UITEX_POSTER_, imageframe = (GetTime() % 2) })
 		ui:append("Text", { name = 'Text_Adv', x = 10, y = 300, w = 557, font = 200 })
 		ui:append("Text", { name = 'Text_Svr', x = 10, y = 345, w = 557, font = 204, text = MY.GetServer() .. " (" .. MY.GetRealServer() .. ")", alpha = 220 })
+		ui:append("WndCheckBox", {
+			x = 7, y = 375,
+			name = "WndCheckBox_Notify",
+			text = _L["Show share notify."],
+			checked = MY.bShowNotifyPush,
+			oncheck = function()
+				MY.bShowNotifyPush = not MY.bShowNotifyPush
+				MY.SaveLUAData({"config/show_notify.jx3dat", MY_DATA_PATH.GLOBAL}, MY.bShowNotifyPush)
+				FireUIEvent("MY_NOTIFY_PUSH_VISIBLE")
+			end,
+			tip = _L["Monitor serendipity and show share notify."],
+			tippostype = MY.Const.UI.Tip.POS_BOTTOM,
+		}, true):autoWidth()
 		wnd.OnPanelResize = function(wnd)
 			local w, h = MY.UI(wnd):size()
 			local scaleH = w / 557 * 278
@@ -949,6 +963,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 				ui:children('#Text_Adv'):pos(10, scaleH + 10)
 				ui:children('#Text_Svr'):pos(10, scaleH + 35)
 			end
+			ui:children('#WndCheckBox_Notify'):top(scaleH + 65)
 		end
 		wnd.OnPanelResize(wnd)
 		MY.BreatheCall(500, function()

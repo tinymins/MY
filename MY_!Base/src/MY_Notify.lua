@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-04-10 09:46:03
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-04-11 13:56:04
+-- @Last Modified time: 2018-04-12 12:43:36
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -70,7 +70,7 @@ function D.UpdateEntry()
 		end
 	end
 	local wItem = container:Lookup("Wnd_MY_NotifyIcon")
-	if #NOTIFY_LIST == 0 then
+	if not MY.bShowNotifyPush or #NOTIFY_LIST == 0 then
 		if wItem then
 			-- container:SetW(container:GetW() - wItem:GetW())
 			wItem:Destroy()
@@ -94,6 +94,7 @@ function D.UpdateEntry()
 	end
 end
 MY.RegisterInit("MY_Notify", D.UpdateEntry)
+MY.RegisterEvent("MY_NOTIFY_PUSH_VISIBLE", D.UpdateEntry)
 
 function D.RemoveEntry()
 	local container = Station.Lookup("Normal/TopMenu/WndContainer_List")
