@@ -108,8 +108,8 @@ function MY.IsFunction(var) return type(var) == 'function' end
 --------------------------------------------------------------------------------------------------------------------------------------------
 -- 本地函数变量
 --------------------------------------------------------------------------------------------------------------------------------------------
-local _BUILD_ = "20180411"
-local _VERSION_ = 0x2009900
+local _BUILD_ = "20180412"
+local _VERSION_ = 0x2010000
 local _DEBUGLV_ = tonumber(LoadLUAData('interface/my.debug.level') or nil) or 4
 local _DELOGLV_ = tonumber(LoadLUAData('interface/my.delog.level') or nil) or 4
 local _NORESTM_ = tonumber(LoadLUAData('interface/my.nrtim.level') or nil) or -1
