@@ -1181,7 +1181,7 @@ local function UploadSerendipity(szName, szSerendipity, nMethod, bFinish, dwTime
 				})),
 			})
 			MY_Notify.Dismiss(szKey)
-		end, nil, nil, nil, szReporter, 6, nil, nil, nil, true)
+		end, nil, nil, nil, szReporter, 6)
 	end
 	MY_Notify.Create(szKey, GetFormatText(szText), fnAction)
 end
