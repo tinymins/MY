@@ -245,9 +245,9 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
         for i = nOverflowed, 1, -1 do
             local hash = RECORD_LIST[1].hash
             if hash then
-                RECORD_LIST[hash] = RECORD_LIST[hash] - 1
-                if RECORD_LIST[hash] <= 0 then
-                    RECORD_LIST[hash] = nil
+                RECORD_HASH[hash] = RECORD_HASH[hash] - 1
+                if RECORD_HASH[hash] <= 0 then
+                    RECORD_HASH[hash] = nil
                 end
             end
             table.remove(RECORD_LIST, 1)
