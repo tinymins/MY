@@ -4,7 +4,8 @@
 -----
 
 <https://jx3.derzh.com/donate/>
-![Donate](https://static.derzh.com/image/donate/qrcode/alipay-0.jpg)
+
+<a href="https://jx3.derzh.com/donate/">![Donate](https://cdn.jsdelivr.net/gh/tinymins/donate@master/combine.jpg)</a>
 
 Á´½Ó
 -----
