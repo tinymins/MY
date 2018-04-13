@@ -122,16 +122,16 @@ end
 MY.RegisterInit(D.LoadData)
 
 function D.GetHTML(rec)
-    local html = MY.Chat.GetTimeLinkText({
-        r = rec.r, g = rec.g, b = rec.b,
-        f = rec.font, s = MY_ChatMonitor.szTimestrap,
-    }) .. rec.html
     -- render link event
-    html = MY.Chat.RenderLink(html)
+    local html = MY.Chat.RenderLink(rec.html)
     -- render player name color
     if MY_Farbnamen and MY_Farbnamen.Render then
         html = MY_Farbnamen.Render(html)
     end
+    html = MY.Chat.GetTimeLinkText({
+        r = rec.r, g = rec.g, b = rec.b,
+        f = rec.font, s = MY_ChatMonitor.szTimestrap,
+    }, rec.time) .. html
     return html
 end
 
@@ -546,6 +546,7 @@ _C.OnPanelActive = function(wnd)
         text = _L['clear'],
         onclick = function()
             RECORD_LIST = {}
+            RECORD_HASH = {}
             _C.uiBoard:clear()
         end,
     })
