@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-04-10 09:46:03
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-04-12 12:43:36
+-- @Last Modified time: 2018-04-13 11:36:26
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -58,6 +58,30 @@ function MY_Notify.Dismiss(szKey, bOnlyData)
 	D.DrawNotifies(true)
 end
 
+function MY_Notify.LoadConfig()
+	MY_Notify.bShowEntry = MY.LoadLUAData({"config/show_notify.jx3dat", MY_DATA_PATH.GLOBAL})
+	if MY_Notify.bShowEntry == nil then
+		MY_Notify.bShowEntry = IsLocalFileExist(MY.GetLUADataPath({"config/realname.jx3dat", MY_DATA_PATH.ROLE}))
+		MY_Notify.SaveConfig()
+	end
+end
+
+function MY_Notify.SaveConfig()
+	if MY_Notify.bShowEntry == nil then
+		return
+	end
+	MY.SaveLUAData({"config/show_notify.jx3dat", MY_DATA_PATH.GLOBAL}, MY_Notify.bShowEntry)
+end
+
+function MY_Notify.ToggleEntry(bShowEntry)
+	if bShowEntry == nil then
+		bShowEntry = not MY_Notify.bShowEntry
+	end
+	MY_Notify.bShowEntry = bShowEntry
+	MY_Notify.SaveConfig()
+	D.UpdateEntry()
+end
+
 function D.UpdateEntry()
 	local container = Station.Lookup("Normal/TopMenu/WndContainer_List")
 	if not container then
@@ -70,7 +94,7 @@ function D.UpdateEntry()
 		end
 	end
 	local wItem = container:Lookup("Wnd_MY_NotifyIcon")
-	if not MY.bShowNotifyPush or #NOTIFY_LIST == 0 then
+	if not MY_Notify.bShowEntry or #NOTIFY_LIST == 0 then
 		if wItem then
 			-- container:SetW(container:GetW() - wItem:GetW())
 			wItem:Destroy()
@@ -94,7 +118,6 @@ function D.UpdateEntry()
 	end
 end
 MY.RegisterInit("MY_Notify", D.UpdateEntry)
-MY.RegisterEvent("MY_NOTIFY_PUSH_VISIBLE", D.UpdateEntry)
 
 function D.RemoveEntry()
 	local container = Station.Lookup("Normal/TopMenu/WndContainer_List")

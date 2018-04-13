@@ -381,7 +381,7 @@ local function OnInit()
 	MY.CreateDataRoot(MY_DATA_PATH.GLOBAL)
 	MY.CreateDataRoot(MY_DATA_PATH.SERVER)
 
-	MY.bShowNotifyPush = MY.LoadLUAData({"config/show_notify.jx3dat", MY_DATA_PATH.GLOBAL}) or false
+	MY_Notify.LoadConfig()
 	for szKey, fnAction in pairs(INIT_FUNC_LIST) do
 		local nStartTick = GetTickCount()
 		local status, err = pcall(fnAction)
@@ -941,11 +941,9 @@ function MY.SwitchTab(szID, bForceUpdate)
 			x = 7, y = 375,
 			name = "WndCheckBox_Notify",
 			text = _L["Show share notify."],
-			checked = MY.bShowNotifyPush,
+			checked = MY_Notify.bShowEntry,
 			oncheck = function()
-				MY.bShowNotifyPush = not MY.bShowNotifyPush
-				MY.SaveLUAData({"config/show_notify.jx3dat", MY_DATA_PATH.GLOBAL}, MY.bShowNotifyPush)
-				FireUIEvent("MY_NOTIFY_PUSH_VISIBLE")
+				MY_Notify.ToggleEntry()
 			end,
 			tip = _L["Monitor serendipity and show share notify."],
 			tippostype = MY.Const.UI.Tip.POS_BOTTOM,
