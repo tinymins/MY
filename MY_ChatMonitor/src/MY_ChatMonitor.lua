@@ -244,30 +244,16 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
         -- 处理记录列表
         for i = nOverflowed, 1, -1 do
             local hash = RECORD_LIST[1].hash
-            if hash then
+            if hash and RECORD_HASH[hash] then
                 RECORD_HASH[hash] = RECORD_HASH[hash] - 1
                 if RECORD_HASH[hash] <= 0 then
                     RECORD_HASH[hash] = nil
                 end
             end
+            if _C.uiBoard then
+                _C.uiBoard:removeItemUntilNewLine()
+            end
             table.remove(RECORD_LIST, 1)
-        end
-        -- 处理UI
-        if _C.uiBoard then
-            local nCopyLinkCount = 0
-            _C.uiBoard:children():each(function(ui)
-                local name = ui:name()
-                if this:GetType() == "Text" and
-                (name == 'timelink' or
-                 name == 'copylink' or
-                 name == 'copy') then
-                    nCopyLinkCount = nCopyLinkCount + 1
-                end
-                if nCopyLinkCount > nOverflowed then
-                    return 0
-                end
-                ui:remove()
-            end)
         end
     end
     if MY_ChatMonitor.bRealtimeSave then
