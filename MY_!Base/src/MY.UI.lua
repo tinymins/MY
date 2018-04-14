@@ -1041,6 +1041,23 @@ function XGUI:clear()
 	return self
 end
 
+-- remove child item until new line
+-- (self) Instance:removeItemUntilNewLine()
+function XGUI:removeItemUntilNewLine()
+	self:_checksum()
+	for _, raw in ipairs(self.raws) do
+		if raw.Clear then
+			raw:Clear()
+		end
+		raw = GetComponentElement(raw, 'MAIN_HANDLE')
+		if raw then
+			raw:RemoveItemUntilNewLine()
+			raw:FormatAllItemPos()
+		end
+	end
+	return self
+end
+
 -----------------------------------------------------------
 -- my ui property visitors
 -----------------------------------------------------------
