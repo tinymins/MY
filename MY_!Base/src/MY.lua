@@ -937,8 +937,9 @@ function MY.SwitchTab(szID, bForceUpdate)
 		ui:append("Image", { name = 'Image_Adv', x = 0, y = 0, image = _UITEX_POSTER_, imageframe = (GetTime() % 2) })
 		ui:append("Text", { name = 'Text_Adv', x = 10, y = 300, w = 557, font = 200 })
 		ui:append("Text", { name = 'Text_Svr', x = 10, y = 345, w = 557, font = 204, text = MY.GetServer() .. " (" .. MY.GetRealServer() .. ")", alpha = 220 })
-		ui:append("WndCheckBox", {
-			x = 7, y = 375,
+		local x = 7
+		x = x + ui:append("WndCheckBox", {
+			x = x, y = 375,
 			name = "WndCheckBox_Notify",
 			text = _L["Show share notify."],
 			checked = MY_Notify.bShowEntry,
@@ -947,7 +948,25 @@ function MY.SwitchTab(szID, bForceUpdate)
 			end,
 			tip = _L["Monitor serendipity and show share notify."],
 			tippostype = MY.Const.UI.Tip.POS_BOTTOM,
-		}, true):autoWidth()
+		}, true):autoWidth():width()
+		x = x + ui:append("WndCheckBox", {
+			x = x, y = 375,
+			name = "WndCheckBox_NotifyTip",
+			text = _L["Show notify tip."],
+			checked = MY_Notify.bShowTip,
+			oncheck = function()
+				MY_Notify.bShowTip = not MY_Notify.bShowTip
+			end,
+		}, true):autoWidth():width()
+		x = x + ui:append("WndCheckBox", {
+			x = x, y = 375,
+			name = "WndCheckBox_NotifySound",
+			text = _L["Play notify sound."],
+			checked = MY_Notify.bPlaySound,
+			oncheck = function()
+				MY_Notify.bPlaySound = not MY_Notify.bPlaySound
+			end,
+		}, true):autoWidth():width()
 		wnd.OnPanelResize = function(wnd)
 			local w, h = MY.UI(wnd):size()
 			local scaleH = w / 557 * 278
@@ -962,6 +981,8 @@ function MY.SwitchTab(szID, bForceUpdate)
 				ui:children('#Text_Svr'):pos(10, scaleH + 35)
 			end
 			ui:children('#WndCheckBox_Notify'):top(scaleH + 65)
+			ui:children('#WndCheckBox_NotifyTip'):top(scaleH + 65)
+			ui:children('#WndCheckBox_NotifySound'):top(scaleH + 65)
 		end
 		wnd.OnPanelResize(wnd)
 		MY.BreatheCall(500, function()

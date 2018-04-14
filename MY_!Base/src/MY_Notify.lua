@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-04-10 09:46:03
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-04-13 11:36:26
+-- @Last Modified time: 2018-04-14 19:49:14
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -27,13 +27,23 @@ local IsBoolean, IsString, IsTable = MY.IsBoolean, MY.IsString, MY.IsTable
 -----------------------------------------------------------------------------------------
 
 MY_Notify = {}
+MY_Notify.bShowTip = true
+MY_Notify.bPlaySound = true
+MY_Notify.anchor = { x = -100, y = -150, s = "BOTTOMRIGHT", r = "BOTTOMRIGHT" }
+RegisterCustomData('MY_Notify.bShowTip')
+RegisterCustomData('MY_Notify.bPlaySound')
+RegisterCustomData('MY_Notify.anchor')
 
+local _L = MY.LoadLangPack()
 local D = {}
 local NOTIFY_LIST = {}
 local INI_PATH = MY.GetAddonInfo().szFrameworkRoot .. "ui/MY_Notify.ini"
 local ENTRY_INI_PATH = MY.GetAddonInfo().szFrameworkRoot .. "ui/MY_NotifyIcon.ini"
 
 function MY_Notify.Create(szKey, szMsg, fnAction)
+	if MY_Notify.bPlaySound then
+		MY.PlaySound("Notify.ogg")
+	end
 	insert(NOTIFY_LIST, {
 		szKey = szKey,
 		szMsg = szMsg,
@@ -42,6 +52,7 @@ function MY_Notify.Create(szKey, szMsg, fnAction)
 	})
 	D.UpdateEntry()
 	D.DrawNotifies()
+	D.ShowTip(szMsg)
 	return szKey
 end
 
@@ -56,6 +67,10 @@ function MY_Notify.Dismiss(szKey, bOnlyData)
 	end
 	D.UpdateEntry()
 	D.DrawNotifies(true)
+end
+
+function MY_Notify.OpenPanel()
+	Wnd.OpenWindow(INI_PATH, "MY_Notify")
 end
 
 function MY_Notify.LoadConfig()
@@ -110,7 +125,7 @@ function D.UpdateEntry()
 			h.OnItemMouseLeave = function() this:Lookup("Image_MY_NotifyIcon"):SetAlpha(230) end
 			h.OnItemLButtonDown = function() this:Lookup("Image_MY_NotifyIcon"):SetAlpha(230) end
 			h.OnItemLButtonUp = function() this:Lookup("Image_MY_NotifyIcon"):SetAlpha(255) end
-			h.OnItemLButtonClick = function() Wnd.OpenWindow(INI_PATH, "MY_Notify") end
+			h.OnItemLButtonClick = function() MY_Notify.OpenPanel() end
 			container:FormatAllContentPos()
 		end
 		wItem:Lookup("Wnd_MY_NotifyIcon_Inner", "Handle_MY_NotifyIcon_Num"):SetVisible(nUnread > 0)
@@ -187,4 +202,68 @@ function MY_Notify.OnLButtonClick()
 	if name == "Btn_Close" then
 		Wnd.CloseWindow(this:GetRoot())
 	end
+end
+
+do
+local l_uiFrame, l_uiTipBoard
+function D.ShowTip(szMsg)
+	if not MY_Notify.bShowTip then
+		return
+	end
+	l_uiTipBoard:clear():append(szMsg)
+	l_uiFrame:fadeTo(500, 255)
+	local szHoverFrame = Station.GetMouseOverWindow() and Station.GetMouseOverWindow():GetRoot():GetName()
+	if szHoverFrame == 'MY_NotifyTip' then
+		MY.DelayCall('MY_NotifyTip_Hide', 5000)
+	else
+		MY.DelayCall('MY_NotifyTip_Hide', 5000, function()
+			l_uiFrame:fadeOut(500)
+		end)
+	end
+end
+
+local function OnInit()
+	if l_uiFrame then
+		return
+	end
+	-- init tip frame
+	l_uiFrame = MY.UI.CreateFrame('MY_NotifyTip', {
+		level = 'Topmost', empty = true,
+		w = 250, h = 150, visible = false,
+		events = {{ "UI_SCALED", function() l_uiFrame:anchor(MY_Notify.anchor) end }},
+	})
+	:customMode(_L["MY_Notify"], function()
+		MY.DelayCall('MY_NotifyTip_Hide')
+		l_uiFrame:show():alpha(255)
+	end, function()
+		MY_Notify.anchor = l_uiFrame:anchor()
+		l_uiFrame:alpha(0):hide()
+	end)
+	:anchor(MY_Notify.anchor)
+	-- init tip panel handle and bind animation function
+	l_uiTipBoard = l_uiFrame:append("WndScrollBox", {
+		handlestyle = 3, x = 0, y = 0, w = 250, h = 150,
+		onclick = function()
+			if MY.IsInCustomUIMode() then
+				return
+			end
+			MY_Notify.OpenPanel()
+			l_uiFrame:fadeOut(500)
+		end,
+		onhover = function(bIn)
+			if MY.IsInCustomUIMode() then
+				return
+			end
+			if bIn then
+				MY.DelayCall('MY_NotifyTip_Hide')
+				l_uiFrame:fadeIn(500)
+			else
+				MY.DelayCall('MY_NotifyTip_Hide', function()
+					l_uiFrame:fadeOut(500)
+				end, 5000)
+			end
+		end,
+	}, true)
+end
+MY.RegisterInit('MY_NotifyTip', OnInit)
 end

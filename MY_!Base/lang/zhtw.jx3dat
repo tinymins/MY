@@ -331,7 +331,10 @@ data = {
 		["yellowgreen"] = "黃綠",
 	},
 
+	["MY_Notify"] = "茗伊消息中心",
 	["Show share notify."] = "啓用奇遇等數據分享提示",
+	["Show notify tip."] = "顯示提示框",
+	["Play notify sound."] = "播放提示音",
 	["Monitor serendipity and show share notify."] = "監控系統公告和自身奇遇事件等，便于有分享精神的俠士在觸發時可以手動通過網頁上傳分享。",
 	["You got %s, would you like to share?"] = "你觸發了%s，是否願意點擊分享到公共數據查詢中？",
 	["[%s] got %s, would you like to share?"] = "[%s]觸發了%s，是否願意點擊分享到公共數據查詢中？",
