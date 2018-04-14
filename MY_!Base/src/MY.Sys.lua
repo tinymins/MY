@@ -353,6 +353,7 @@ function MY.CreateDataRoot(ePathType)
 	if ePathType == MY_DATA_PATH.ROLE then
 		CPath.MakeDir(MY.FormatPath({'$name/', MY_DATA_PATH.ROLE}))
 	end
+	CPath.MakeDir(MY.FormatPath({'audio/', ePathType}))
 	CPath.MakeDir(MY.FormatPath({'cache/', ePathType}))
 	CPath.MakeDir(MY.FormatPath({'config/', ePathType}))
 	CPath.MakeDir(MY.FormatPath({'export/', ePathType}))
@@ -365,24 +366,28 @@ end
 -- szCustomPath 个性化音频文件地址
 -- 注：优先播放szCustomPath, szCustomPath不存在才会播放szFilePath
 function MY.PlaySound(szFilePath, szCustomPath)
-	szCustomPath = szCustomPath or szFilePath
-	-- 统一化目录分隔符
-	szCustomPath = string.gsub(szCustomPath, '\\', '/')
-	-- 如果是相对路径则从/@Custom/补全
-	if string.sub(szCustomPath, 1, 2) ~= './' then
-		szCustomPath = MY.GetAddonInfo().szRoot .. "@Custom/" .. szCustomPath
+	if not szCustomPath then
+		szCustomPath = szFilePath
 	end
-	if IsFileExist(szCustomPath) then
-		PlaySound(SOUND.UI_SOUND, szCustomPath)
-	else
-		-- 统一化目录分隔符
-		szFilePath = string.gsub(szFilePath, '\\', '/')
-		-- 如果是相对路径则从/@Custom/补全
-		if string.sub(szFilePath, 1, 2) ~= './' then
-			szFilePath = MY.GetAddonInfo().szFrameworkRoot .. "audio/" .. szFilePath
+	-- 播放自定义声音
+	for _, ePathType in ipairs({
+		MY_DATA_PATH.ROLE,
+		MY_DATA_PATH.GLOBAL,
+	}) do
+		local szPath = MY.FormatPath({ "audio/" .. szCustomPath, ePathType })
+		if IsFileExist(szPath) then
+			return PlaySound(SOUND.UI_SOUND, szPath)
 		end
-		PlaySound(SOUND.UI_SOUND, szFilePath)
 	end
+	-- 播放默认声音
+	local szPath = string.gsub(szFilePath, '\\', '/')
+	if string.sub(szPath, 1, 2) ~= './' then
+		szPath = MY.GetAddonInfo().szFrameworkRoot .. "audio/" .. szPath
+	end
+	if not IsFileExist(szPath) then
+		return
+	end
+	PlaySound(SOUND.UI_SOUND, szPath)
 end
 -- 加载注册数据
 MY.RegisterInit('MYLIB#INITDATA', function()
