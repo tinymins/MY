@@ -1265,20 +1265,14 @@ local function GetSerendipityInfo(dwTabType, dwIndex)
 end
 
 MY.RegisterEvent('LOOT_ITEM', function()
-	if UI_GetClientPlayerID() ~= arg0 then
-		return
-	end
-	local me = GetClientPlayer()
-	if not me then
-		return
-	end
+	local player = GetPlayer(arg0)
 	local item = GetItem(arg1)
-	if not item then
+	if not player or not item then
 		return
 	end
 	local szSerendipity, bFinish = GetSerendipityInfo(item.dwTabType, item.dwIndex)
 	if szSerendipity then
-		UploadSerendipity(me.szName, szSerendipity, 3, bFinish, GetCurrentTime())
+		UploadSerendipity(player.szName, szSerendipity, 3, bFinish, GetCurrentTime())
 	end
 end)
 
