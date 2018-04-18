@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-04-10 09:46:03
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-04-14 19:49:14
+-- @Last Modified time: 2018-04-18 17:28:51
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -55,6 +55,7 @@ function MY_Notify.Create(szKey, szMsg, fnAction)
 	D.ShowTip(szMsg)
 	return szKey
 end
+MY.CreateNotify = MY_Notify.Create
 
 function MY_Notify.Dismiss(szKey, bOnlyData)
 	for i, v in ipairs_r(NOTIFY_LIST) do
@@ -68,6 +69,7 @@ function MY_Notify.Dismiss(szKey, bOnlyData)
 	D.UpdateEntry()
 	D.DrawNotifies(true)
 end
+MY.DismissNotify = MY_Notify.Dismiss
 
 function MY_Notify.OpenPanel()
 	Wnd.OpenWindow(INI_PATH, "MY_Notify")

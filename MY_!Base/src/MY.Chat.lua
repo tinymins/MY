@@ -1180,10 +1180,10 @@ local function UploadSerendipity(szName, szSerendipity, nMethod, bFinish, dwTime
 					a = szSerendipity, f = bFinish, t = dwTime, R = szText,
 				})),
 			})
-			MY_Notify.Dismiss(szKey)
+			MY.DismissNotify(szKey)
 		end, nil, nil, nil, szReporter, 6)
 	end
-	MY_Notify.Create(szKey, GetFormatText(szText), fnAction)
+	MY.CreateNotify(szKey, GetFormatText(szText), fnAction)
 end
 
 MY.RegisterMsgMonitor("QIYU", function(szMsg, nFont, bRich, r, g, b, szChannel)
