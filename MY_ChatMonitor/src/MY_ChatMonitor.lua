@@ -60,7 +60,6 @@ RegisterCustomData('MY_ChatMonitor.szTimestrap')
 _C.bInited = false
 _C.ui = nil
 _C.uiBoard = nil
-_C.uiTipBoard = nil
 _C.szLuaData = 'config/chatmonitor.jx3dat'
 do local SZ_OLD_PATH = MY.FormatPath('config/MY_CHATMONITOR/cfg_$lang.jx3dat')
     if IsLocalFileExist(SZ_OLD_PATH) then
@@ -133,6 +132,12 @@ function D.GetHTML(rec)
         f = rec.font, s = MY_ChatMonitor.szTimestrap,
     }, rec.time) .. html
     return html
+end
+
+function D.OnNotifyCB()
+    MY.OpenPanel()
+    MY.SwitchTab("MY_ChatMonitor")
+    MY.DismissNotify("MY_ChatMonitor")
 end
 
 -- 插入聊天内容时监控聊天信息
@@ -231,7 +236,7 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
         end
     end
     if MY_ChatMonitor.bShowPreview then
-        _C.ShowTip(html)
+        MY.CreateNotify("MY_ChatMonitor", html, D.OnNotifyCB)
     end
     --------------------------------------------------------------------------------------
     -- 开始处理记录的数据保存
@@ -468,7 +473,7 @@ _C.OnPanelActive = function(wnd)
                         fnAction = function()
                             MY_ChatMonitor.bDistinctServer = not MY_ChatMonitor.bDistinctServer
                             D.LoadData()
-                            MY.SwitchTab("ChatMonitor", true)
+                            MY.SwitchTab("MY_ChatMonitor", true)
                         end,
                         bCheck = true,
                         bChecked = MY_ChatMonitor.bDistinctServer
@@ -484,7 +489,7 @@ _C.OnPanelActive = function(wnd)
                         bChecked = MY_ChatMonitor.bBlockWords, {
                             szOption = _L['edit'],
                             fnAction = function()
-                                MY.SwitchTab("MY_Chat_Filter")
+                                MY.SwitchTab("MY_ChatBlock")
                             end,
                         }
                     })
@@ -550,76 +555,12 @@ _C.OnPanelActive = function(wnd)
     _C.Init()
 end
 
-_C.ShowTip = function(szMsg)
-    if szMsg then
-        _C.uiTipBoard:clear():append(szMsg)
-    end
-    _C.uiFrame:fadeTo(500, 255)
-    if Station.GetMouseOverWindow() and
-    Station.GetMouseOverWindow():GetRoot():GetName() == 'MY_ChatMonitor' then
-        MY.DelayCall('MY_ChatMonitor_Hide', 5000)
-    else
-        MY.DelayCall('MY_ChatMonitor_Hide', 5000, function()
-            _C.uiFrame:fadeOut(500)
-        end)
-    end
-end
-
 _C.Init = function()
     if _C.bInited then
         return
     end
     _C.bInited = true
     _C.RegisterMsgMonitor()
-
-    -- create tip frame
-    _C.uiFrame = MY.UI.CreateFrame('MY_ChatMonitor', {level = 'Topmost', empty = true})
-      :size(250,150)
-      :toggle(false)
-      :event("UI_SCALED", function() -- 移动提示窗位置
-        _C.uiFrame:anchor(MY_ChatMonitor.anchor)
-      end)
-      :customMode(_L["chat monitor"], function()
-        MY.DelayCall('MY_ChatMonitor_Hide')
-        _C.uiFrame:show():alpha(255)
-      end, function()
-        MY_ChatMonitor.anchor = _C.uiFrame:anchor()
-        _C.uiFrame:alpha(0):hide()
-      end)
-      :anchor(MY_ChatMonitor.anchor)
-    -- init tip panel handle and bind animation function
-    _C.uiTipBoard = _C.uiFrame:append("WndScrollBox", {
-        name = "WndScrollBox_TalkList",
-        handlestyle = 3, x = 0, y = 0, w = 250, h = 150,
-        text = _L['welcome to use mingyi chat monitor.'],
-        onclick = function()
-            if MY.IsInCustomUIMode() then
-                return
-            end
-            MY.OpenPanel()
-            MY.SwitchTab('ChatMonitor')
-            _C.uiFrame:fadeOut(500)
-        end,
-        onhover = function(bIn)
-            if MY.IsInCustomUIMode() then
-                return
-            end
-            if bIn then
-                MY.DelayCall('MY_ChatMonitor_Hide')
-                _C.uiFrame:fadeIn(500)
-            else
-                MY.DelayCall('MY_ChatMonitor_Hide', function()
-                    _C.uiFrame:fadeOut(500)
-                end, 5000)
-            end
-        end,
-    }, true)
-    -- init tip panel animate
-    MY.DelayCall('MY_ChatMonitor_Hide', function()
-        _C.uiFrame:fadeOut(500)
-    end, 10000)
-    -- show tip
-    _C.ShowTip()
 end
 MY.RegisterInit('MY_CHATMONITOR', _C.Init)
 
@@ -644,7 +585,7 @@ MY.Game.RegisterHotKey("MY_ChatMonitor_Hotkey", _L["chat monitor"],
     end
 , nil)
 
-MY.RegisterPanel( "ChatMonitor", _L["chat monitor"], _L['Chat'], "UI/Image/Minimap/Minimap.UITex|197", {255,127,0,200}, {
+MY.RegisterPanel("MY_ChatMonitor", _L["chat monitor"], _L['Chat'], "UI/Image/Minimap/Minimap.UITex|197", {255,127,0,200}, {
     OnPanelActive = _C.OnPanelActive,
     OnPanelDeactive = function()
         _C.uiBoard = nil
