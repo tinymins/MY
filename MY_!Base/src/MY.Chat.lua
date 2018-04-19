@@ -1164,10 +1164,16 @@ local function UploadSerendipity(szName, szSerendipity, nMethod, bFinish, dwTime
 			and "[%s] finished %s, would you like to share?"
 			or "[%s] got %s, would you like to share?", szName, szSerendipity)
 	local function fnAction()
+		local szName = szName
+		local szNameU = AnsiToUTF8(szName)
+		local szNameCRC = ("%x%x%x"):format(szNameU:byte(), GetStringCRC(szNameU), szNameU:byte(-1))
 		local szReporter = MY.LoadLUAData({"config/realname.jx3dat", MY_DATA_PATH.ROLE}) or GetClientPlayer().szName:gsub("@.-$", "")
 		GetUserInput(_L["Please input your realname, left blank for anonymous report:"], function(szText)
 			if szText ~= szReporter then
 				MY.SaveLUAData({"config/realname.jx3dat", MY_DATA_PATH.ROLE}, szText)
+			end
+			if szText == '' and nMethod == 1 then
+				szName = ''
 			end
 			XGUI.CreateFrame("MY_Serendipity#" .. szKey, {
 				w = 300, h = 400, close = true, text = "",
@@ -1176,8 +1182,9 @@ local function UploadSerendipity(szName, szSerendipity, nMethod, bFinish, dwTime
 				navigate = 'https://jx3.derzh.com/serendipity/?l='
 				.. MY.GetLang() .. "&m=" .. nMethod
 				.. "&data=" .. MY.SimpleEncrypt(MY.JsonEncode({
-					n = szName, S = MY.GetRealServer(1), s = MY.GetRealServer(2),
-					a = szSerendipity, f = bFinish, t = dwTime, R = szText,
+					n = szName, N = szNameCRC, R = szText,
+					S = MY.GetRealServer(1), s = MY.GetRealServer(2),
+					a = szSerendipity, f = bFinish, t = dwTime,
 				})),
 			})
 			MY.DismissNotify(szKey)
