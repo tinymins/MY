@@ -83,10 +83,10 @@ function MY.String.SubW(str,s,e)
 	return wstring.sub(str, s, e)
 end
 
-function MY.String.SimpleEcrypt(szText)
+function MY.String.SimpleEncrypt(szText)
 	return szText:gsub('.', function (c) return string.format ("%02X", (string.byte(c) + 13) % 256) end):gsub(" ", "+")
 end
-MY.SimpleEcrypt = MY.String.SimpleEcrypt
+MY.SimpleEncrypt = MY.String.SimpleEncrypt
 
 local function EncodePostData(data, t, prefix)
 	if type(data) == "table" then

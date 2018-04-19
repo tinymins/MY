@@ -671,7 +671,7 @@ MY.BreatheCall("MYLIB#STORAGE_DATA", 200, function()
 		type = "post/json",
 		url = 'http://data.jx3.derzh.com/api/storage',
 		data = {
-			data = MY.SimpleEcrypt(MY.ConvertToUTF8(MY.JsonEncode({
+			data = MY.SimpleEncrypt(MY.ConvertToUTF8(MY.JsonEncode({
 				g = me.GetGlobalID(), f = me.dwForceID, e = me.GetTotalEquipScore(),
 				n = GetUserRoleName(), i = UI_GetClientPlayerID(), c = me.nCamp,
 				S = MY.GetRealServer(1), s = MY.GetRealServer(2), r = me.nRoleType,
@@ -731,7 +731,7 @@ function MY.StorageData(szKey, oData)
 			type = 'post/json',
 			url = 'http://data.jx3.derzh.com/api/storage',
 			data = {
-				data =  MY.String.SimpleEcrypt(MY.Json.Encode({
+				data =  MY.SimpleEncrypt(MY.Json.Encode({
 					g = me.GetGlobalID(), f = me.dwForceID, r = me.nRoleType,
 					n = GetUserRoleName(), i = UI_GetClientPlayerID(),
 					S = MY.GetRealServer(1), s = MY.GetRealServer(2),
