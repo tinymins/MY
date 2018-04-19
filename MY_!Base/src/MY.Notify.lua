@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-04-10 09:46:03
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-04-18 17:28:51
+-- @Last Modified time: 2018-04-19 23:07:54
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -160,10 +160,34 @@ function D.DrawNotifies(bAutoClose)
 	hList:Clear()
 	for i, notify in ipairs(NOTIFY_LIST) do
 		local hItem = hList:AppendItemFromIni(INI_PATH, "Handle_Notify")
-		hItem:Lookup("Handle_Notify_Msg"):AppendItemFromString(notify.szMsg)
-		hItem:Lookup("Handle_Notify_Msg"):FormatAllItemPos()
+		local hMsg = hItem:Lookup("Handle_Notify_Msg")
+		local nDeltaH = hMsg:GetH()
+		hMsg:AppendItemFromString(notify.szMsg)
+		hMsg:FormatAllItemPos()
+		nDeltaH = max(select(2, hMsg:GetAllItemSize()) - 10, 25) - nDeltaH
+		hMsg:SetH(hMsg:GetH() + nDeltaH)
+		hItem:SetH(hItem:GetH() + nDeltaH)
+		for _, v in ipairs({
+			{ name = "Shadow_NotifyHover", scaleH = 1 },
+			{ name = "Shadow_NotifySelect", scaleH = 1 },
+			{ name = "Image_Notify_Spliter", scaleY = 1 },
+			{ name = "Image_Notify_Unread", scaleY = 0.5 },
+			{ name = "Handle_Notify_View", scaleY = 0.5 },
+			{ name = "Handle_Notify_Dismiss", scaleY = 0.5 },
+		}) do
+			local p = hItem:Lookup(v.name)
+			if p then
+				if v.scaleH then
+					p:SetH(p:GetH() + nDeltaH * v.scaleH)
+				end
+				if v.scaleY then
+					p:SetRelY(p:GetRelY() + nDeltaH * v.scaleY)
+				end
+			end
+		end
 		hItem:Lookup("Handle_Notify_View"):SetVisible(not not notify.fnAction)
 		hItem:Lookup("Image_Notify_Unread"):SetVisible(notify.bUnread)
+		hItem:FormatAllItemPos()
 		hItem.notify = notify
 	end
 	hList:FormatAllItemPos()
