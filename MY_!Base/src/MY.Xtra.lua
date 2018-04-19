@@ -30,6 +30,49 @@ local IsBoolean, IsString, IsTable = MY.IsBoolean, MY.IsString, MY.IsTable
 -----------------------------------------------------------------------------------------
 local _L = MY.LoadLangPack()
 
+local SERENDIPITY_LIST = {}
+do
+local Xtra = {
+	bSerendipity        = MY.FormatDataStructure(MY.LoadLUAData({"config/show_notify.jx3dat"        , MY_DATA_PATH.GLOBAL}), false),
+	bSerendipitySound   = MY.FormatDataStructure(MY.LoadLUAData({"config/serendipity_sound.jx3dat"  , MY_DATA_PATH.GLOBAL}), true ),
+	bSerendipityPreview = MY.FormatDataStructure(MY.LoadLUAData({"config/serendipity_preview.jx3dat", MY_DATA_PATH.GLOBAL}), true ),
+}
+MY.Xtra = setmetatable({}, {
+	__index = function(t, k)
+		return Xtra[k]
+	end,
+	__newindex = function(t, k, v)
+		if Xtra[k] == v then
+			return
+		end
+		if k == "bSerendipity" then
+			if v then
+				for i, p in ipairs_r(SERENDIPITY_LIST) do
+					MY.CreateNotify({
+						szKey = p.szKey,
+						szMsg = p.szXml,
+						fnAction = p.fnAction,
+						fnCancel = p.fnCancel,
+						bPlaySound = false,
+						bPopupPreview = false,
+					})
+				end
+			else
+				for i, p in ipairs_r(SERENDIPITY_LIST) do
+					MY.DismissNotify(p.szKey)
+				end
+			end
+			MY.SaveLUAData({"config/show_notify.jx3dat", MY_DATA_PATH.GLOBAL}, v)
+		elseif k == "bSerendipitySound" then
+			MY.SaveLUAData({"config/serendipity_sound.jx3dat", MY_DATA_PATH.GLOBAL}, v)
+		elseif k == "bSerendipityPreview" then
+			MY.SaveLUAData({"config/serendipity_preview.jx3dat", MY_DATA_PATH.GLOBAL}, v)
+		end
+		Xtra[k] = v
+	end,
+})
+end
+
 local function UploadSerendipity(szName, szSerendipity, nMethod, bFinish, dwTime)
 	if MY.IsInDevMode() then
 		return
@@ -87,10 +130,33 @@ local function UploadSerendipity(szName, szSerendipity, nMethod, bFinish, dwTime
 					a = szSerendipity, f = bFinish, t = dwTime,
 				})),
 			})
+			for i, p in ipairs_r(SERENDIPITY_LIST) do
+				if p.szKey == szKey then
+					remove(SERENDIPITY_LIST, i)
+				end
+			end
 			MY.DismissNotify(szKey)
 		end, nil, nil, nil, szReporter, 6)
 	end
-	MY.CreateNotify(szKey, GetFormatText(szText), fnAction)
+	local function fnCancel()
+		for i, p in ipairs_r(SERENDIPITY_LIST) do
+			if p.szKey == szKey then
+				remove(SERENDIPITY_LIST, i)
+			end
+		end
+	end
+	local szXml = GetFormatText(szText)
+	if MY.Xtra.bSerendipity then
+		MY.CreateNotify({
+			szKey = szKey,
+			szMsg = szXml,
+			fnAction = fnAction,
+			fnCancel = fnCancel,
+			bPlaySound = MY.Xtra.bSerendipitySound,
+			bPopupPreview = MY.Xtra.bSerendipityPreview,
+		})
+	end
+	insert(SERENDIPITY_LIST, { szKey = szKey, szXml = szXml, fnAction = fnAction, fnCancel = fnCancel })
 end
 
 MY.RegisterMsgMonitor("QIYU", function(szMsg, nFont, bRich, r, g, b, szChannel)

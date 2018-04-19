@@ -381,7 +381,6 @@ local function OnInit()
 	MY.CreateDataRoot(MY_DATA_PATH.GLOBAL)
 	MY.CreateDataRoot(MY_DATA_PATH.SERVER)
 
-	MY_Notify.LoadConfig()
 	for szKey, fnAction in pairs(INIT_FUNC_LIST) do
 		local nStartTick = GetTickCount()
 		local status, err = pcall(fnAction)
@@ -942,9 +941,9 @@ function MY.SwitchTab(szID, bForceUpdate)
 			x = x, y = 375,
 			name = "WndCheckBox_Notify",
 			text = _L["Show share notify."],
-			checked = MY_Notify.bShowEntry,
+			checked = MY.Xtra.bSerendipity,
 			oncheck = function()
-				MY_Notify.ToggleEntry()
+				MY.Xtra.bSerendipity = not MY.Xtra.bSerendipity
 			end,
 			tip = _L["Monitor serendipity and show share notify."],
 			tippostype = MY.Const.UI.Tip.POS_BOTTOM,
@@ -953,18 +952,18 @@ function MY.SwitchTab(szID, bForceUpdate)
 			x = x, y = 375,
 			name = "WndCheckBox_NotifyTip",
 			text = _L["Show notify tip."],
-			checked = MY_Notify.bShowTip,
+			checked = MY.Xtra.bSerendipityPreview,
 			oncheck = function()
-				MY_Notify.bShowTip = not MY_Notify.bShowTip
+				MY.Xtra.bSerendipityPreview = not MY.Xtra.bSerendipityPreview
 			end,
 		}, true):autoWidth():width()
 		x = x + ui:append("WndCheckBox", {
 			x = x, y = 375,
 			name = "WndCheckBox_NotifySound",
 			text = _L["Play notify sound."],
-			checked = MY_Notify.bPlaySound,
+			checked = MY.Xtra.bSerendipitySound,
 			oncheck = function()
-				MY_Notify.bPlaySound = not MY_Notify.bPlaySound
+				MY.Xtra.bSerendipitySound = not MY.Xtra.bSerendipitySound
 			end,
 		}, true):autoWidth():width()
 		wnd.OnPanelResize = function(wnd)

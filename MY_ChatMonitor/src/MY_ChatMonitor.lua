@@ -217,10 +217,6 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
     rec.font = nFont
     rec.time = GetCurrentTime()
     local html = D.GetHTML(rec)
-    -- 发出提示音
-    if MY_ChatMonitor.bPlaySound then
-        MY.PlaySound(MY.GetAddonInfo().szRoot .. "MY_ChatMonitor/audio/MsgArrive.ogg", "MsgArrive.ogg")
-    end
     -- 如果设置重定向到系统消息则输出（输出时加个标记防止又被自己捕捉了死循环）
     if MY_ChatMonitor.bRedirectSysChannel and szChannel ~= "MSG_SYS" then
         OutputMessage("MSG_SYS", GetFormatText("", nil, 255,255,0) .. szMsg, true)
@@ -235,9 +231,15 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
             _C.uiBoard:scroll(100)
         end
     end
-    if MY_ChatMonitor.bShowPreview then
-        MY.CreateNotify("MY_ChatMonitor", html, D.OnNotifyCB)
-    end
+    MY.CreateNotify({
+        szKey = "MY_ChatMonitor",
+        szMsg = html,
+        fnAction = D.OnNotifyCB,
+        bPlaySound = MY_ChatMonitor.bPlaySound,
+        szSound = MY.GetAddonInfo().szRoot .. "MY_ChatMonitor/audio/MsgArrive.ogg",
+        szCustomSound = "MsgArrive.ogg",
+        bPopupPreview = MY_ChatMonitor.bShowPreview,
+    })
     --------------------------------------------------------------------------------------
     -- 开始处理记录的数据保存
     -- 更新缓存数组 哈希表

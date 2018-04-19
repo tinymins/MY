@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-04-10 09:46:03
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-04-19 23:07:54
+-- @Last Modified time: 2018-04-25 22:49:03
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -27,11 +27,7 @@ local IsBoolean, IsString, IsTable = MY.IsBoolean, MY.IsString, MY.IsTable
 -----------------------------------------------------------------------------------------
 
 MY_Notify = {}
-MY_Notify.bShowTip = true
-MY_Notify.bPlaySound = true
 MY_Notify.anchor = { x = -100, y = -150, s = "BOTTOMRIGHT", r = "BOTTOMRIGHT" }
-RegisterCustomData('MY_Notify.bShowTip')
-RegisterCustomData('MY_Notify.bPlaySound')
 RegisterCustomData('MY_Notify.anchor')
 
 local _L = MY.LoadLangPack()
@@ -40,19 +36,22 @@ local NOTIFY_LIST = {}
 local INI_PATH = MY.GetAddonInfo().szFrameworkRoot .. "ui/MY_Notify.ini"
 local ENTRY_INI_PATH = MY.GetAddonInfo().szFrameworkRoot .. "ui/MY_NotifyIcon.ini"
 
-function MY_Notify.Create(szKey, szMsg, fnAction)
-	if MY_Notify.bPlaySound then
-		MY.PlaySound("Notify.ogg")
-	end
+function MY_Notify.Create(opt)
 	insert(NOTIFY_LIST, {
-		szKey = szKey,
-		szMsg = szMsg,
 		bUnread = true,
-		fnAction = fnAction,
+		szKey = opt.szKey,
+		szMsg = opt.szMsg,
+		fnAction = opt.fnAction,
+		fnCancel = opt.fnCancel,
 	})
 	D.UpdateEntry()
 	D.DrawNotifies()
-	D.ShowTip(szMsg)
+	if opt.bPopupPreview then
+		D.ShowTip(opt.szMsg)
+	end
+	if opt.bPlaySound then
+		MY.PlaySound(opt.szSound or "Notify.ogg", opt.szCustomSound)
+	end
 	return szKey
 end
 MY.CreateNotify = MY_Notify.Create
@@ -75,30 +74,6 @@ function MY_Notify.OpenPanel()
 	Wnd.OpenWindow(INI_PATH, "MY_Notify")
 end
 
-function MY_Notify.LoadConfig()
-	MY_Notify.bShowEntry = MY.LoadLUAData({"config/show_notify.jx3dat", MY_DATA_PATH.GLOBAL})
-	if MY_Notify.bShowEntry == nil then
-		MY_Notify.bShowEntry = IsLocalFileExist(MY.GetLUADataPath({"config/realname.jx3dat", MY_DATA_PATH.ROLE}))
-		MY_Notify.SaveConfig()
-	end
-end
-
-function MY_Notify.SaveConfig()
-	if MY_Notify.bShowEntry == nil then
-		return
-	end
-	MY.SaveLUAData({"config/show_notify.jx3dat", MY_DATA_PATH.GLOBAL}, MY_Notify.bShowEntry)
-end
-
-function MY_Notify.ToggleEntry(bShowEntry)
-	if bShowEntry == nil then
-		bShowEntry = not MY_Notify.bShowEntry
-	end
-	MY_Notify.bShowEntry = bShowEntry
-	MY_Notify.SaveConfig()
-	D.UpdateEntry()
-end
-
 function D.UpdateEntry()
 	local container = Station.Lookup("Normal/TopMenu/WndContainer_List")
 	if not container then
@@ -111,7 +86,7 @@ function D.UpdateEntry()
 		end
 	end
 	local wItem = container:Lookup("Wnd_MY_NotifyIcon")
-	if not MY_Notify.bShowEntry or #NOTIFY_LIST == 0 then
+	if #NOTIFY_LIST == 0 then
 		if wItem then
 			-- container:SetW(container:GetW() - wItem:GetW())
 			wItem:Destroy()
@@ -212,6 +187,9 @@ function MY_Notify.OnItemLButtonClick()
 			bDismiss = not notify.fnAction or notify.fnAction(notify.szKey)
 		elseif name == "Handle_Notify_Dismiss" then
 			notify = this:GetParent().notify
+			if notify.fnCancel then
+				notify.fnCancel(notify.szKey)
+			end
 			bDismiss = true
 		end
 		if bDismiss then
@@ -233,9 +211,6 @@ end
 do
 local l_uiFrame, l_uiTipBoard
 function D.ShowTip(szMsg)
-	if not MY_Notify.bShowTip then
-		return
-	end
 	l_uiTipBoard:clear():append(szMsg)
 	l_uiFrame:fadeTo(500, 255)
 	local szHoverFrame = Station.GetMouseOverWindow() and Station.GetMouseOverWindow():GetRoot():GetName()
