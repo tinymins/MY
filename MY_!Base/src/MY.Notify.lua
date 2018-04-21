@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-04-10 09:46:03
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-04-25 22:49:03
+-- @Last Modified time: 2018-04-26 02:58:30
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -75,7 +75,7 @@ function MY_Notify.OpenPanel()
 end
 
 function D.UpdateEntry()
-	local container = Station.Lookup("Normal/TopMenu/WndContainer_List")
+	local container = Station.Lookup("Normal/TopMenu/WndContainer_ListOther")
 	if not container then
 		return
 	end
@@ -85,28 +85,34 @@ function D.UpdateEntry()
 			nUnread = nUnread + 1
 		end
 	end
-	local wItem = container:Lookup("Wnd_MY_NotifyIcon")
+	local wItem = container:Lookup("Wnd_News_XJ")
 	if #NOTIFY_LIST == 0 then
-		if wItem then
-			-- container:SetW(container:GetW() - wItem:GetW())
-			wItem:Destroy()
-			container:FormatAllContentPos()
-		end
+		-- if wItem then
+		-- 	-- container:SetW(container:GetW() - wItem:GetW())
+		-- 	wItem:Destroy()
+		-- 	container:FormatAllContentPos()
+		-- end
+		wItem:Hide()
+		container:FormatAllContentPos()
 	else
-		if not wItem then
-			wItem = container:AppendContentFromIni(ENTRY_INI_PATH, "Wnd_MY_NotifyIcon")
-			-- container:SetW(container:GetW() + wItem:GetW())
-			local h = wItem:Lookup("Wnd_MY_NotifyIcon_Inner", "")
-			h:Lookup("Image_MY_NotifyIcon"):SetAlpha(230)
-			h.OnItemMouseEnter = function() this:Lookup("Image_MY_NotifyIcon"):SetAlpha(255) end
-			h.OnItemMouseLeave = function() this:Lookup("Image_MY_NotifyIcon"):SetAlpha(230) end
-			h.OnItemLButtonDown = function() this:Lookup("Image_MY_NotifyIcon"):SetAlpha(230) end
-			h.OnItemLButtonUp = function() this:Lookup("Image_MY_NotifyIcon"):SetAlpha(255) end
-			h.OnItemLButtonClick = function() MY_Notify.OpenPanel() end
-			container:FormatAllContentPos()
-		end
-		wItem:Lookup("Wnd_MY_NotifyIcon_Inner", "Handle_MY_NotifyIcon_Num"):SetVisible(nUnread > 0)
-		wItem:Lookup("Wnd_MY_NotifyIcon_Inner", "Handle_MY_NotifyIcon_Num/Text_MY_NotifyIcon_Num"):SetText(nUnread)
+		-- if not wItem then
+		-- 	wItem = container:AppendContentFromIni(ENTRY_INI_PATH, "Wnd_MY_NotifyIcon")
+		-- 	-- container:SetW(container:GetW() + wItem:GetW())
+		-- 	local h = wItem:Lookup("Wnd_MY_NotifyIcon_Inner", "")
+		-- 	h:Lookup("Image_MY_NotifyIcon"):SetAlpha(230)
+		-- 	h.OnItemMouseEnter = function() this:Lookup("Image_MY_NotifyIcon"):SetAlpha(255) end
+		-- 	h.OnItemMouseLeave = function() this:Lookup("Image_MY_NotifyIcon"):SetAlpha(230) end
+		-- 	h.OnItemLButtonDown = function() this:Lookup("Image_MY_NotifyIcon"):SetAlpha(230) end
+		-- 	h.OnItemLButtonUp = function() this:Lookup("Image_MY_NotifyIcon"):SetAlpha(255) end
+		-- 	h.OnItemLButtonClick = function() MY_Notify.OpenPanel() end
+		-- 	container:FormatAllContentPos()
+		-- end
+		-- wItem:Lookup("Wnd_MY_NotifyIcon_Inner", "Handle_MY_NotifyIcon_Num"):SetVisible(nUnread > 0)
+		-- wItem:Lookup("Wnd_MY_NotifyIcon_Inner", "Handle_MY_NotifyIcon_Num/Text_MY_NotifyIcon_Num"):SetText(nUnread)
+		wItem:Show()
+		wItem:Lookup("Btn_News_XJ", "Image_Red_Pot"):SetVisible(nUnread > 0)
+		wItem:Lookup("Btn_News_XJ").OnLButtonClick = function() MY_Notify.OpenPanel() end
+		container:FormatAllContentPos()
 	end
 end
 MY.RegisterInit("MY_Notify", D.UpdateEntry)
