@@ -132,6 +132,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, bFinish, dwTi
 				n = szName, N = szNameCRC, R = szReporter,
 				S = MY.GetRealServer(1), s = MY.GetRealServer(2),
 				a = szSerendipity, f = bFinish, t = dwTime,
+				w = w, h = h, c = Station.GetUIScale(),
 			})),
 			oncomplete = function() MY.DelayCall(5000, function() ui:remove() end) end,
 		})
