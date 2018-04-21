@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-04-10 09:46:03
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-04-26 02:58:30
+-- @Last Modified time: 2018-05-03 23:48:25
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -60,6 +60,7 @@ function MY_Notify.Dismiss(szKey, bOnlyData)
 	for i, v in ipairs_r(NOTIFY_LIST) do
 		if v.szKey == szKey then
 			remove(NOTIFY_LIST, i)
+			FireUIEvent("MY_NOTIFY_DISMISS", szKey)
 		end
 	end
 	if bOnlyData then

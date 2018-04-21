@@ -28,14 +28,15 @@ local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local IsNil, IsNumber, IsFunction = MY.IsNil, MY.IsNumber, MY.IsFunction
 local IsBoolean, IsString, IsTable = MY.IsBoolean, MY.IsString, MY.IsTable
 -----------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack()
+local _L, D = MY.LoadLangPack(), {}
 
 local SERENDIPITY_LIST = {}
 do
 local Xtra = {
-	bSerendipity        = MY.FormatDataStructure(MY.LoadLUAData({"config/show_notify.jx3dat"        , MY_DATA_PATH.GLOBAL}), false),
-	bSerendipitySound   = MY.FormatDataStructure(MY.LoadLUAData({"config/serendipity_sound.jx3dat"  , MY_DATA_PATH.GLOBAL}), true ),
-	bSerendipityPreview = MY.FormatDataStructure(MY.LoadLUAData({"config/serendipity_preview.jx3dat", MY_DATA_PATH.GLOBAL}), true ),
+	bSerendipity          = MY.FormatDataStructure(MY.LoadLUAData({"config/show_notify.jx3dat"          , MY_DATA_PATH.GLOBAL}), false),
+	bSerendipitySound     = MY.FormatDataStructure(MY.LoadLUAData({"config/serendipity_sound.jx3dat"    , MY_DATA_PATH.GLOBAL}), true ),
+	bSerendipityPreview   = MY.FormatDataStructure(MY.LoadLUAData({"config/serendipity_preview.jx3dat"  , MY_DATA_PATH.GLOBAL}), true ),
+	bSerendipityAutoShare = MY.FormatDataStructure(MY.LoadLUAData({"config/serendipity_autoshare.jx3dat", MY_DATA_PATH.GLOBAL}), false),
 }
 MY.Xtra = setmetatable({}, {
 	__index = function(t, k)
@@ -52,7 +53,6 @@ MY.Xtra = setmetatable({}, {
 						szKey = p.szKey,
 						szMsg = p.szXml,
 						fnAction = p.fnAction,
-						fnCancel = p.fnCancel,
 						bPlaySound = false,
 						bPopupPreview = false,
 					})
@@ -67,96 +67,109 @@ MY.Xtra = setmetatable({}, {
 			MY.SaveLUAData({"config/serendipity_sound.jx3dat", MY_DATA_PATH.GLOBAL}, v)
 		elseif k == "bSerendipityPreview" then
 			MY.SaveLUAData({"config/serendipity_preview.jx3dat", MY_DATA_PATH.GLOBAL}, v)
+		elseif k == "bSerendipityAutoShare" then
+			MY.SaveLUAData({"config/serendipity_autoshare.jx3dat", MY_DATA_PATH.GLOBAL}, v)
 		end
 		Xtra[k] = v
 	end,
 })
 end
 
-local function UploadSerendipity(szName, szSerendipity, nMethod, bFinish, dwTime)
-	if MY.IsInDevMode() then
-		return
+do
+local function OnMyNotifyDismiss()
+	for i, p in ipairs_r(SERENDIPITY_LIST) do
+		if p.szKey == arg0 then
+			remove(SERENDIPITY_LIST, i)
+		end
 	end
-	MY.Ajax({
-		type = "post/json",
-		url = 'http://data.jx3.derzh.com/api/serendipities',
-		data = {
-			data = MY.SimpleEncrypt(MY.JsonEncode({
-				n = szName, S = MY.GetRealServer(1), s = MY.GetRealServer(2),
-				N = szSerendipity, f = bFinish, t = dwTime, m = nMethod,
-			})),
-			lang = MY.GetLang(),
-		},
-		success = function(html, status) end,
-	})
-	MY.Ajax({
-		type = "get",
-		url = 'http://data.jx3.derzh.com/serendipity/?l=' .. MY.GetLang() .. "&m=" .. nMethod
-		.. "&data=" .. MY.SimpleEncrypt(MY.JsonEncode({
-			n = szName, S = MY.GetRealServer(1), s = MY.GetRealServer(2),
-			a = szSerendipity, f = bFinish, t = dwTime,
-		})),
-		success = function(html, status) end,
-	})
-	local szKey = szName .. "_" .. szSerendipity .. "_" .. dwTime
-	local szText = szName == GetClientPlayer().szName
-		and _L(bFinish
-			and "You finished %s, would you like to share?"
-			or "You got %s, would you like to share?", szSerendipity)
-		or _L(bFinish
-			and "[%s] finished %s, would you like to share?"
-			or "[%s] got %s, would you like to share?", szName, szSerendipity)
-	local function fnAction()
-		local szName = szName
-		local szNameU = AnsiToUTF8(szName)
-		local szNameCRC = ("%x%x%x"):format(szNameU:byte(), GetStringCRC(szNameU), szNameU:byte(-1))
-		local szReporter = MY.LoadLUAData({"config/realname.jx3dat", MY_DATA_PATH.ROLE}) or GetClientPlayer().szName:gsub("@.-$", "")
-		GetUserInput(_L["Please input your realname, left blank for anonymous report:"], function(szText)
+end
+MY.RegisterEvent("MY_NOTIFY_DISMISS", OnMyNotifyDismiss)
+end
+
+function D.GetSerendipityShareName(fnAction, bNoConfirm)
+	local szReporter = MY.LoadLUAData({"config/realname.jx3dat", MY_DATA_PATH.ROLE}) or GetClientPlayer().szName:gsub("@.-$", "")
+	if bNoConfirm then
+		if fnAction then
+			fnAction(szReporter)
+		end
+	else
+		local function fnConfirm(szText)
 			if szText ~= szReporter then
 				MY.SaveLUAData({"config/realname.jx3dat", MY_DATA_PATH.ROLE}, szText)
 			end
-			if szText == '' and nMethod == 1 then
-				szName = ''
-			end
-			XGUI.CreateFrame("MY_Serendipity#" .. szKey, {
-				w = 300, h = 400, close = true, text = "",
-			}):append("WndWebCef", {
-				x = 0, y = 0, w = 300, h = 400,
-				navigate = 'https://jx3.derzh.com/serendipity/?l='
-				.. MY.GetLang() .. "&m=" .. nMethod
-				.. "&data=" .. MY.SimpleEncrypt(MY.JsonEncode({
-					n = szName, N = szNameCRC, R = szText,
-					S = MY.GetRealServer(1), s = MY.GetRealServer(2),
-					a = szSerendipity, f = bFinish, t = dwTime,
-				})),
-			})
-			for i, p in ipairs_r(SERENDIPITY_LIST) do
-				if p.szKey == szKey then
-					remove(SERENDIPITY_LIST, i)
-				end
-			end
-			MY.DismissNotify(szKey)
-		end, nil, nil, nil, szReporter, 6)
-	end
-	local function fnCancel()
-		for i, p in ipairs_r(SERENDIPITY_LIST) do
-			if p.szKey == szKey then
-				remove(SERENDIPITY_LIST, i)
+			if fnAction then
+				fnAction(szText)
 			end
 		end
+		GetUserInput(_L["Please input your realname, left blank for anonymous report:"], fnConfirm, nil, nil, nil, szReporter, 6)
 	end
-	local szXml = GetFormatText(szText)
-	if MY.Xtra.bSerendipity then
-		MY.CreateNotify({
-			szKey = szKey,
-			szMsg = szXml,
-			fnAction = fnAction,
-			fnCancel = fnCancel,
-			bPlaySound = MY.Xtra.bSerendipitySound,
-			bPopupPreview = MY.Xtra.bSerendipityPreview,
+end
+MY.Xtra.GetSerendipityShareName = D.GetSerendipityShareName
+
+function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, bFinish, dwTime, bAuto)
+	local szKey = szName .. "_" .. szSerendipity .. "_" .. dwTime
+	local szNameU = AnsiToUTF8(szName)
+	local szNameCRC = ("%x%x%x"):format(szNameU:byte(), GetStringCRC(szNameU), szNameU:byte(-1))
+	local function fnAction(szReporter)
+		if szReporter == '' and nMethod == 1 then
+			szName = ''
+		end
+		local h = bAuto and 200 or 400
+		local w = bAuto and 255 or 400
+		local ui = XGUI.CreateFrame("MY_Serendipity#" .. szKey, {
+			w = w, h = h, close = true, text = "",
 		})
+		if bAuto then
+			ui:alpha(200)
+			ui:anchor({ x = 0, y = -60, s = "BOTTOMRIGHT", r = "BOTTOMRIGHT" })
+		end
+		ui:append("WndWebCef", {
+			x = 0, y = 0, w = w, h = h,
+			-- navigate = 'http://127.0.0.1/serendipity/?l='
+			navigate = 'https://jx3.derzh.com/serendipity/?l='
+			.. MY.GetLang() .. "&m=" .. nMethod
+			.. "&data=" .. MY.SimpleEncrypt(MY.JsonEncode({
+				n = szName, N = szNameCRC, R = szReporter,
+				S = MY.GetRealServer(1), s = MY.GetRealServer(2),
+				a = szSerendipity, f = bFinish, t = dwTime,
+			})),
+			oncomplete = function() MY.DelayCall(5000, function() ui:remove() end) end,
+		})
+		MY.DismissNotify(szKey)
 	end
-	insert(SERENDIPITY_LIST, { szKey = szKey, szXml = szXml, fnAction = fnAction, fnCancel = fnCancel })
+	D.GetSerendipityShareName(fnAction, bAuto)
+end
+
+function D.OnSerendipity(szName, szSerendipity, nMethod, bFinish, dwTime)
+	if MY.IsInDevMode() then
+		return
+	end
+	local szKey = szName .. "_" .. szSerendipity .. "_" .. dwTime
+	if MY.Xtra.bSerendipityAutoShare then
+		D.SerendipityShareConfirm(szName, szSerendipity, nMethod, bFinish, dwTime, true)
+	else
+		local szXml = GetFormatText(szName == GetClientPlayer().szName
+			and _L(bFinish
+				and "You finished %s, would you like to share?"
+				or "You got %s, would you like to share?", szSerendipity)
+			or _L(bFinish
+				and "[%s] finished %s, would you like to share?"
+				or "[%s] got %s, would you like to share?", szName, szSerendipity)
+		)
+		local function fnAction()
+			D.SerendipityShareConfirm(szName, szSerendipity, nMethod, bFinish, dwTime, false)
+		end
+		if MY.Xtra.bSerendipity then
+			MY.CreateNotify({
+				szKey = szKey,
+				szMsg = szXml,
+				fnAction = fnAction,
+				bPlaySound = MY.Xtra.bSerendipitySound,
+				bPopupPreview = MY.Xtra.bSerendipityPreview,
+			})
+		end
+		insert(SERENDIPITY_LIST, { szKey = szKey, szXml = szXml, fnAction = fnAction })
+	end
 end
 
 MY.RegisterMsgMonitor("QIYU", function(szMsg, nFont, bRich, r, g, b, szChannel)
@@ -195,11 +208,7 @@ MY.RegisterMsgMonitor("QIYU", function(szMsg, nFont, bRich, r, g, b, szChannel)
 		szMsg = GetPureText(szMsg)
 	end
 	szMsg:gsub(_L.ADVENTURE_PATT, function(szName, szSerendipity)
-		local dwTime = GetCurrentTime()
-		local function Upload()
-			UploadSerendipity(szName, szSerendipity, 1, 0, dwTime)
-		end
-		MY.DelayCall(math.random(0, 5000), Upload)
+		D.OnSerendipity(szName, szSerendipity, 1, 0, GetCurrentTime())
 	end)
 end, {"MSG_SYS"})
 
@@ -218,7 +227,7 @@ MY.RegisterEvent("ON_SERENDIPITY_TRIGGER.QIYU", function()
 	if not me then
 		return
 	end
-	UploadSerendipity(me.szName, GetSerendipityName(arg0), 2, arg1, GetCurrentTime())
+	D.OnSerendipity(me.szName, GetSerendipityName(arg0), 2, arg1, GetCurrentTime())
 end)
 end
 
@@ -245,7 +254,7 @@ MY.RegisterEvent('LOOT_ITEM', function()
 	end
 	local szSerendipity, bFinish = GetSerendipityInfo(item.dwTabType, item.dwIndex)
 	if szSerendipity then
-		UploadSerendipity(player.szName, szSerendipity, 3, bFinish, GetCurrentTime())
+		D.OnSerendipity(player.szName, szSerendipity, 3, bFinish, GetCurrentTime())
 	end
 end)
 
@@ -256,7 +265,7 @@ MY.RegisterEvent('QUEST_FINISHED', function()
 	end
 	local szSerendipity, bFinish = GetSerendipityInfo('quest', arg0)
 	if szSerendipity then
-		UploadSerendipity(me.szName, szSerendipity, 4, bFinish, GetCurrentTime())
+		D.OnSerendipity(me.szName, szSerendipity, 4, bFinish, GetCurrentTime())
 	end
 end)
 end

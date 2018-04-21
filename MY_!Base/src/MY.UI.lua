@@ -95,6 +95,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.textfmt            ~= nil then ui:text           (arg.textfmt    ) end -- must before :text()
 		if arg.text               ~= nil then ui:text           (arg.text       ) end
 		if arg.placeholder        ~= nil then ui:placeholder    (arg.placeholder) end
+		if arg.oncomplete         ~= nil then ui:complete       (arg.oncomplete ) end
 		if arg.navigate           ~= nil then ui:navigate       (arg.navigate   ) end
 		if arg.group              ~= nil then ui:group          (arg.group      ) end
 		if arg.tip                ~= nil then ui:tip(arg.tip, arg.tippostype, arg.tipoffset, arg.tiprichtext) end
@@ -3223,6 +3224,25 @@ end
 -- :mclick()         触发
 function XGUI:mclick(fnMClick)
 	return self:click(nil, nil, fnMClick or MY.Const.Event.Mouse.MBUTTON, true)
+end
+
+-- complete 加载完成事件
+-- :complete(fnOnComplete) 绑定
+function XGUI:complete(fnOnComplete)
+	self:_checksum()
+	if fnOnComplete then
+		for _, raw in ipairs(self.raws) do
+			local wnd = GetComponentElement(raw, 'WEBPAGE')
+			if wnd then
+				XGUI(wnd):uievent('OnDocumentComplete', fnOnComplete)
+			end
+			local wnd = GetComponentElement(raw, 'WEBCEF')
+			if wnd then
+				XGUI(wnd):uievent('OnWebLoadEnd', fnOnComplete)
+			end
+		end
+	end
+	return self
 end
 
 -- hover 鼠标悬停事件

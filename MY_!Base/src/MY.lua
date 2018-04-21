@@ -939,7 +939,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 		local x = 7
 		x = x + ui:append("WndCheckBox", {
 			x = x, y = 375,
-			name = "WndCheckBox_Notify",
+			name = "WndCheckBox_SerendipityNotify",
 			text = _L["Show share notify."],
 			checked = MY.Xtra.bSerendipity,
 			oncheck = function()
@@ -950,20 +950,34 @@ function MY.SwitchTab(szID, bForceUpdate)
 		}, true):autoWidth():width()
 		x = x + ui:append("WndCheckBox", {
 			x = x, y = 375,
-			name = "WndCheckBox_NotifyTip",
+			name = "WndCheckBox_SerendipityNotifyTip",
 			text = _L["Show notify tip."],
 			checked = MY.Xtra.bSerendipityPreview,
 			oncheck = function()
 				MY.Xtra.bSerendipityPreview = not MY.Xtra.bSerendipityPreview
 			end,
+			autoenable = function() return not MY.Xtra.bSerendipityAutoShare end,
 		}, true):autoWidth():width()
 		x = x + ui:append("WndCheckBox", {
 			x = x, y = 375,
-			name = "WndCheckBox_NotifySound",
+			name = "WndCheckBox_SerendipityNotifySound",
 			text = _L["Play notify sound."],
 			checked = MY.Xtra.bSerendipitySound,
 			oncheck = function()
 				MY.Xtra.bSerendipitySound = not MY.Xtra.bSerendipitySound
+			end,
+			autoenable = function() return not MY.Xtra.bSerendipityAutoShare end,
+		}, true):autoWidth():width()
+		x = x + ui:append("WndCheckBox", {
+			x = x, y = 375,
+			name = "WndCheckBox_SerendipityAutoShare",
+			text = _L["Auto share."],
+			checked = MY.Xtra.bSerendipityAutoShare,
+			oncheck = function()
+				if not MY.Xtra.bSerendipityAutoShare then
+					MY.Xtra.GetSerendipityShareName()
+				end
+				MY.Xtra.bSerendipityAutoShare = not MY.Xtra.bSerendipityAutoShare
 			end,
 		}, true):autoWidth():width()
 		wnd.OnPanelResize = function(wnd)
@@ -979,9 +993,10 @@ function MY.SwitchTab(szID, bForceUpdate)
 				ui:children('#Text_Adv'):pos(10, scaleH + 10)
 				ui:children('#Text_Svr'):pos(10, scaleH + 35)
 			end
-			ui:children('#WndCheckBox_Notify'):top(scaleH + 65)
-			ui:children('#WndCheckBox_NotifyTip'):top(scaleH + 65)
-			ui:children('#WndCheckBox_NotifySound'):top(scaleH + 65)
+			ui:children('#WndCheckBox_SerendipityNotify'):top(scaleH + 65)
+			ui:children('#WndCheckBox_SerendipityNotifyTip'):top(scaleH + 65)
+			ui:children('#WndCheckBox_SerendipityNotifySound'):top(scaleH + 65)
+			ui:children('#WndCheckBox_SerendipityAutoShare'):top(scaleH + 65)
 		end
 		wnd.OnPanelResize(wnd)
 		MY.BreatheCall(500, function()

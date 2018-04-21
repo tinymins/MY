@@ -335,6 +335,7 @@ data = {
 	["Show share notify."] = "启用奇遇等数据分享提示",
 	["Show notify tip."] = "显示提示框",
 	["Play notify sound."] = "播放提示音",
+	["Auto share."] = "自动分享",
 	["Monitor serendipity and show share notify."] = "监控系统公告和自身奇遇事件等，便于有分享精神的侠士在触发时可以手动通过网页上传分享。",
 	["You got %s, would you like to share?"] = "你触发了%s，是否愿意点击分享到公共数据查询中？",
 	["[%s] got %s, would you like to share?"] = "[%s]触发了%s，是否愿意点击分享到公共数据查询中？",
