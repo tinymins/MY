@@ -543,20 +543,25 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 			hItem:Hide()
 			hItem.nSparkingFrame = nil
 			needFormatItemPos = true
+		elseif not config.hideVoid and not hItem:IsVisible() then
+			hItem:Show()
+			needFormatItemPos = true
 		end
 		hItem.fPercent = 0
 		hItem.nRenderFrame = nil
 	end
 end
 
-function D.UpdateFrame(frame)
+function D.UpdateFrame(frame, force)
 	local me = GetClientPlayer()
 	if not me then
 		return
 	end
 	local dwType, dwID = MY_TargetMon.GetTarget(frame.config.target, frame.config.type)
-	if dwType == frame.dwType and dwID == frame.dwID
-	and dwType ~= TARGET.PLAYER and dwType ~= TARGET.NPC then
+	if not force and (
+		dwType == frame.dwType and dwID == frame.dwID
+		and dwType ~= TARGET.PLAYER and dwType ~= TARGET.NPC
+	) then
 		return
 	end
 	needFormatItemPos = false
@@ -763,7 +768,7 @@ function MY_TargetMon_Base.OnEvent(event)
 			end
 		end
 	elseif event == "SKILL_MOUNT_KUNG_FU" then
-		-- ReloadFrame(this)
+		D.UpdateFrame(this, true)
 	elseif event == "ON_ENTER_CUSTOM_UI_MODE" then
 		this:SetH(this.dragH)
 		this:Lookup('', 'Handle_List'):SetAlpha(90)
