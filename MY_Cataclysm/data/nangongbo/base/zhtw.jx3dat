@@ -133,7 +133,7 @@ data = {
 	{dwID=5084,col="#FFFF00FF",szReminder="牢",nPriority=2,bAttention=true},--牢籠被鎖---南诏皇宮
 	{dwID=5081},--魁龍氣---南诏皇宮
 	{dwID=5096,col="#FF3232FF",szReminder="精",nPriority=0,bAttention=true,bCaution=true},--精確射殺---南诏皇宮
-	{dwID=5096,col="#0096FFFF",szReminder="散",nPriority=1,bCaution=true},--致死散射---南诏皇宮
+	{dwID=5096,col="#00FFFFFF",szReminder="散",nPriority=1,bCaution=true},--致死散射---南诏皇宮
 	{dwID=4378,col="#FFFF00FF",szReminder="鍾",nPriority=1,bCaution=true},--點名撞鍾---南诏皇宮
 	{dwID=4314,col="#00FFFFFF",szReminder="霜",nPriority=3,szStackOp=">=",nStackNum=6},--冰霜---南诏皇宮
 	{dwID=4637,col="#FF8000FF",szReminder="追",nPriority=1,bCaution=true},--追擊---南诏皇宮
@@ -159,6 +159,8 @@ data = {
 	{dwID=8313,col="#00FFFFFF",szReminder="魔",nPriority=2,bAttention=true},--魔血化生---逐虎驅狼
 	{dwID=8307,col="#FFFFFFFF",szReminder="閻",nPriority=2,bAttention=true},--閻羅附體---逐虎驅狼
 	{dwID=8305,col="#FF3232FF",szReminder="毒",nPriority=1,bCaution=true},--毒血湧動---逐虎驅狼
+	{dwID=8039,col="#FF3232FF",szReminder="聖",nPriority=0,bAttention=true,bCaution=true},--聖炎---逐虎驅狼
+	{dwID=8040,col="#00FFFFFF",szReminder="寒",nPriority=0,bAttention=true,bCaution=true},--寒意---逐虎驅狼
 	{dwID=8014,col="#FF323200",szReminder="恐",nPriority=4},--恐懼---逐虎驅狼
 	{dwID=5343,col="#FF00FFFF",szReminder="龍",nPriority=3},--龍相氣勁---戰寶軍械庫
 	{dwID=5475,col="#00FFFFFF",szReminder="雁",nPriority=3},--雁返疊雲---戰寶軍械庫

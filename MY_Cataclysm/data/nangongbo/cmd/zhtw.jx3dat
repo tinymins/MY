@@ -133,8 +133,6 @@ data = {
 	{dwID=8046},--失血---逐虎驅狼
 	{dwID=8044,col="#FF3232FF",szReminder="鮮",nPriority=0,bAttention=true,bCaution=true},--鮮血獻祭---逐虎驅狼
 	{dwID=8045,col="#FF00FFFF",szReminder="靈",nPriority=0,bAttention=true,bCaution=true},--靈魂獻祭---逐虎驅狼
-	{dwID=8039,col="#FF3232FF",szReminder="聖",nPriority=0,bAttention=true,bCaution=true},--聖炎---逐虎驅狼
-	{dwID=8040,col="#00FFFFFF",szReminder="寒",nPriority=0,bAttention=true,bCaution=true},--寒意---逐虎驅狼
 	{dwID=8036,col="#FFFF0000",szReminder="瞄",nPriority=4},--瞄准---逐虎驅狼
 	{dwID=8029,col="#FF323200",szReminder="流",nPriority=4,szStackOp=">=",nStackNum=2},--流血---逐虎驅狼
 	{dwID=8010},--戰鬥標記---逐虎驅狼

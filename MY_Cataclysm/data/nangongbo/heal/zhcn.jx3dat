@@ -86,8 +86,6 @@ data = {
 	{dwID=8174},--Òô²¨³å»÷---Öð»¢ÇýÀÇ
 	{dwID=8027},--Òô²¨³å»÷---Öð»¢ÇýÀÇ
 	{dwID=8046},--Ê§Ñª---Öð»¢ÇýÀÇ
-	{dwID=8039,col="#FF3232FF",szReminder="Ê¥",nPriority=0,bAttention=true,bCaution=true},--Ê¥Ñ×---Öð»¢ÇýÀÇ
-	{dwID=8040,col="#00FFFFFF",szReminder="º®",nPriority=0,bAttention=true,bCaution=true},--º®Òâ---Öð»¢ÇýÀÇ
 	{dwID=8036,col="#FFFF0000",szReminder="Ãé",nPriority=4},--Ãé×¼---Öð»¢ÇýÀÇ
 	{dwID=8029,col="#FF323200",szReminder="Á÷",nPriority=4,szStackOp=">=",nStackNum=2},--Á÷Ñª---Öð»¢ÇýÀÇ
 	{dwID=8010},--Õ½¶·±ê¼Ç---Öð»¢ÇýÀÇ

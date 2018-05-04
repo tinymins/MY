@@ -133,8 +133,6 @@ data = {
 	{dwID=8046},--Ê§Ñª---Öð»¢ÇýÀÇ
 	{dwID=8044,col="#FF3232FF",szReminder="ÏÊ",nPriority=0,bAttention=true,bCaution=true},--ÏÊÑªÏ×¼À---Öð»¢ÇýÀÇ
 	{dwID=8045,col="#FF00FFFF",szReminder="Áé",nPriority=0,bAttention=true,bCaution=true},--Áé»êÏ×¼À---Öð»¢ÇýÀÇ
-	{dwID=8039,col="#FF3232FF",szReminder="Ê¥",nPriority=0,bAttention=true,bCaution=true},--Ê¥Ñ×---Öð»¢ÇýÀÇ
-	{dwID=8040,col="#00FFFFFF",szReminder="º®",nPriority=0,bAttention=true,bCaution=true},--º®Òâ---Öð»¢ÇýÀÇ
 	{dwID=8036,col="#FFFF0000",szReminder="Ãé",nPriority=4},--Ãé×¼---Öð»¢ÇýÀÇ
 	{dwID=8029,col="#FF323200",szReminder="Á÷",nPriority=4,szStackOp=">=",nStackNum=2},--Á÷Ñª---Öð»¢ÇýÀÇ
 	{dwID=8010},--Õ½¶·±ê¼Ç---Öð»¢ÇýÀÇ
