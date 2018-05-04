@@ -571,8 +571,12 @@ function D.UpdateFrame(frame, force)
 	local targetChanged = dwType ~= frame.dwType or dwID ~= frame.dwID
 	local nFrameCount = GetLogicFrameCount()
 
-	local dwKungfuID = me.GetKungfuMount() and me.GetKungfuMount().dwSkillID or 0
-	local dwTarKungfuID = dwType == TARGET.PLAYER and KTarget and KTarget.GetKungfuMount() and KTarget.GetKungfuMount().dwSkillID or 0
+	local dwKungfuID, dwTarKungfuID = me.GetKungfuMount() and me.GetKungfuMount().dwSkillID or 0, 0
+	if dwType == TARGET.NPC then
+		dwTarKungfuID = 'npc'
+	elseif dwType == TARGET.PLAYER then
+		dwTarKungfuID = KTarget and KTarget.GetKungfuMount() and KTarget.GetKungfuMount().dwSkillID or 0
+	end
 	if not KTarget then
 		for i = 0, hList:GetItemCount() - 1 do
 			UpdateItem(hList:Lookup(i), KTarget, nil, nil, frame.tItem, config, nFrameCount, targetChanged, nil, dwKungfuID, dwTarKungfuID)

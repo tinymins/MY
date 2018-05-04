@@ -1085,6 +1085,17 @@ function PS.OnPanelActive(wnd)
 						D.CheckFrame(l_config)
 					end,
 				},
+				{
+					szOption = _L["NPC"],
+					rgb = {255, 255, 0},
+					bCheck = true,
+					bChecked = mon.tarkungfus.npc,
+					fnAction = function()
+						mon.tarkungfus.npc = not mon.tarkungfus.npc
+						D.CheckFrame(l_config)
+					end,
+					fnDisable = function() return mon.tarkungfus.all end,
+				},
 			}
 			for _, dwForceID in pairs_c(FORCE_TYPE) do
 				for i, dwKungfuID in ipairs(ForceIDToKungfuIDs(dwForceID) or {}) do
