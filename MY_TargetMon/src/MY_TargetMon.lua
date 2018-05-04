@@ -339,6 +339,25 @@ function D.FormatSavingConfig(config)
 	end
 	return config
 end
+
+function D.FormatSavingConfigs(Config)
+	local cfgs = {}
+	for _, config in ipairs(Config) do
+		insert(cfgs, D.FormatSavingConfig(config))
+	end
+	for _, embedded in ipairs_r(ConfigEmbedded) do
+		local exist = false
+		for _, config in ipairs(Config) do
+			if config.uuid == embedded.uuid then
+				exist = true
+			end
+		end
+		if not exist then
+			insert(cfgs, { uuid = embedded.uuid, delete = true })
+		end
+	end
+	return cfgs
+end
 end
 
 function D.LoadConfig(bDefault, bOriginal)
@@ -390,22 +409,7 @@ end
 MY.RegisterInit("MY_TargetMon", OnInit)
 
 local function OnExit()
-	local cfgs = {}
-	for _, config in ipairs(Config) do
-		insert(cfgs, D.FormatSavingConfig(config))
-	end
-	for _, embedded in ipairs_r(ConfigEmbedded) do
-		local exist = false
-		for _, config in ipairs(Config) do
-			if config.uuid == embedded.uuid then
-				exist = true
-			end
-		end
-		if not exist then
-			insert(cfgs, { uuid = embedded.uuid, delete = true })
-		end
-	end
-	MY.SaveLUAData(ROLE_CONFIG_FILE, cfgs)
+	MY.SaveLUAData(ROLE_CONFIG_FILE, D.FormatSavingConfigs(Config))
 end
 MY.RegisterExit("MY_TargetMon", OnExit)
 end
@@ -1422,7 +1426,7 @@ function PS.OnPanelActive(wnd)
 		text = _L["Save As Default"],
 		onclick = function()
 			MY.Confirm(_L['Sure to save as default?'], function()
-				MY.SaveLUAData(CUSTOM_DEFAULT_CONFIG_FILE, Config)
+				MY.SaveLUAData(CUSTOM_DEFAULT_CONFIG_FILE, D.FormatSavingConfigs(Config))
 			end)
 		end,
 	})
