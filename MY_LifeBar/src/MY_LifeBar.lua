@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-03-30 15:59:03
+-- @Last Modified time: 2018-05-09 05:45:08
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -362,7 +362,7 @@ local function CheckInvalidRect(dwType, dwID, me)
 			lb:SetLifeText(Config.nLifePerOffsetX, Config.nLifePerOffsetY, Config.bHideLifePercentageDecimal and "%.0f" or "%.1f")
 		end
 		lb:SetLifeTextVisible(bShowLifePercent)
-		lb:Paint()
+		lb:Create():Paint()
 	elseif lb then
 		lb:Remove()
 		LB_CACHE[dwID] = nil
