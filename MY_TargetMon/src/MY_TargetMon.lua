@@ -1113,6 +1113,74 @@ function PS.OnPanelActive(wnd)
 				end
 			end
 			insert(t1, t2)
+			-- 出现声音
+			local t2 = {
+				szOption = _L['Play sound when appear'],
+				fnMouseEnter = function()
+					if mon.soundAppear == "" then
+						return
+					end
+					OutputTip(GetFormatText(mon.soundAppear), 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
+				end,
+				fnAction = function()
+					local file = GetOpenFileName(
+						_L['Please select sound file.'],
+						'Sound Files(*.wav,*.ogg)\0*.wav;*.ogg\0All Files(*.*)\0*.*\0\0',
+						MY.FormatPath({ 'audio/', MY_DATA_PATH.GLOBAL })
+					)
+					if file == '' then
+						return
+					end
+					mon.soundAppear = MY.GetRelativePath(file, { 'audio/', MY_DATA_PATH.GLOBAL })
+				end,
+			}
+			if mon.soundAppear ~= "" then
+				t2.szIcon = 'ui/Image/UICommon/CommonPanel2.UITex'
+				t2.nFrame = 49
+				t2.nMouseOverFrame = 51
+				t2.nIconWidth = 17
+				t2.nIconHeight = 17
+				t2.szLayer = 'ICON_RIGHTMOST'
+				t2.fnClickIcon = function()
+					mon.soundAppear = ""
+					Wnd.CloseWindow("PopupMenuPanel")
+				end
+			end
+			insert(t1, t2)
+			-- 消失声音
+			local t2 = {
+				szOption = _L['Play sound when disappear'],
+				fnMouseEnter = function()
+					if mon.soundDisappear == "" then
+						return
+					end
+					OutputTip(GetFormatText(mon.soundDisappear), 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
+				end,
+				fnAction = function()
+					local file = GetOpenFileName(
+						_L['Please select sound file.'],
+						'Sound Files(*.wav,*.ogg)\0*.wav;*.ogg\0All Files(*.*)\0*.*\0\0',
+						MY.FormatPath({ 'audio/', MY_DATA_PATH.GLOBAL })
+					)
+					if file == '' then
+						return
+					end
+					mon.soundDisappear = MY.GetRelativePath(file, { 'audio/', MY_DATA_PATH.GLOBAL })
+				end,
+			}
+			if mon.soundDisappear ~= "" then
+				t2.szIcon = 'ui/Image/UICommon/CommonPanel2.UITex'
+				t2.nFrame = 49
+				t2.nMouseOverFrame = 51
+				t2.nIconWidth = 17
+				t2.nIconHeight = 17
+				t2.szLayer = 'ICON_RIGHTMOST'
+				t2.fnClickIcon = function()
+					mon.soundDisappear = ""
+					Wnd.CloseWindow("PopupMenuPanel")
+				end
+			end
+			insert(t1, t2)
 			-- ID设置
 			if not empty(mon.ids) then
 				insert(t1, { bDevide = true })
