@@ -29,6 +29,11 @@ local IsNil, IsNumber, IsFunction = MY.IsNil, MY.IsNumber, MY.IsFunction
 local IsBoolean, IsString, IsTable = MY.IsBoolean, MY.IsString, MY.IsTable
 -----------------------------------------------------------------------------------------
 local _L, D = MY.LoadLangPack(), {}
+local SERENDIPITY_STATUS = {
+	START = 0,
+	FINISH = 1,
+	START_AND_FINISH = 2,
+}
 
 local SERENDIPITY_LIST = {}
 do
@@ -106,12 +111,12 @@ function D.GetSerendipityShareName(fnAction, bNoConfirm)
 end
 MY.Xtra.GetSerendipityShareName = D.GetSerendipityShareName
 
-function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, bFinish, dwTime, bAuto)
+function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTime, bAuto)
 	local szKey = szName .. "_" .. szSerendipity .. "_" .. dwTime
 	local szNameU = AnsiToUTF8(szName)
 	local szNameCRC = ("%x%x%x"):format(szNameU:byte(), GetStringCRC(szNameU), szNameU:byte(-1))
 	local function fnAction(szReporter)
-		if szReporter == '' and nMethod == 1 then
+		if szReporter == '' and nMethod ~= 1 then
 			szName = ''
 		end
 		local h = bAuto and 200 or 400
@@ -131,7 +136,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, bFinish, dwTi
 			.. "&data=" .. MY.SimpleEncrypt(MY.JsonEncode({
 				n = szName, N = szNameCRC, R = szReporter,
 				S = MY.GetRealServer(1), s = MY.GetRealServer(2),
-				a = szSerendipity, f = bFinish, t = dwTime,
+				a = szSerendipity, f = nStatus, t = dwTime,
 				w = w, h = h, c = Station.GetUIScale(),
 			})),
 			oncomplete = function() MY.DelayCall(5000, function() ui:remove() end) end,
@@ -141,24 +146,24 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, bFinish, dwTi
 	D.GetSerendipityShareName(fnAction, bAuto)
 end
 
-function D.OnSerendipity(szName, szSerendipity, nMethod, bFinish, dwTime)
+function D.OnSerendipity(szName, szSerendipity, nMethod, nStatus, dwTime)
 	if MY.IsInDevMode() then
 		return
 	end
 	local szKey = szName .. "_" .. szSerendipity .. "_" .. dwTime
 	if MY.Xtra.bSerendipityAutoShare then
-		D.SerendipityShareConfirm(szName, szSerendipity, nMethod, bFinish, dwTime, true)
+		D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTime, true)
 	else
 		local szXml = GetFormatText(szName == GetClientPlayer().szName
-			and _L(bFinish
-				and "You finished %s, would you like to share?"
-				or "You got %s, would you like to share?", szSerendipity)
-			or _L(bFinish
-				and "[%s] finished %s, would you like to share?"
-				or "[%s] got %s, would you like to share?", szName, szSerendipity)
+			and _L(nStatus == SERENDIPITY_STATUS.START
+				and "You got %s, would you like to share?"
+				or "You finished %s, would you like to share?", szSerendipity)
+			or _L(nStatus == SERENDIPITY_STATUS.START
+				and "[%s] got %s, would you like to share?"
+				or "[%s] finished %s, would you like to share?", szName, szSerendipity)
 		)
 		local function fnAction()
-			D.SerendipityShareConfirm(szName, szSerendipity, nMethod, bFinish, dwTime, false)
+			D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTime, false)
 		end
 		if MY.Xtra.bSerendipity then
 			MY.CreateNotify({
@@ -236,13 +241,13 @@ do
 local l_serendipities
 local function GetSerendipityInfo(dwTabType, dwIndex)
 	if not l_serendipities then
-		l_serendipities = MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/serendipities.jx3dat')
+		l_serendipities = MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/serendipities/$lang.jx3dat')
 	end
 	local serendipity = l_serendipities[dwTabType] and l_serendipities[dwTabType][dwIndex]
 	if serendipity then
 		local iteminfo = GetItemInfo(serendipity[1], serendipity[2])
 		if iteminfo then
-			return iteminfo.szName, serendipity[3] == 1
+			return iteminfo.szName, serendipity[3]
 		end
 	end
 end
@@ -253,9 +258,9 @@ MY.RegisterEvent('LOOT_ITEM', function()
 	if not player or not item then
 		return
 	end
-	local szSerendipity, bFinish = GetSerendipityInfo(item.dwTabType, item.dwIndex)
+	local szSerendipity, nStatus = GetSerendipityInfo(item.dwTabType, item.dwIndex)
 	if szSerendipity then
-		D.OnSerendipity(player.szName, szSerendipity, 3, bFinish, GetCurrentTime())
+		D.OnSerendipity(player.szName, szSerendipity, 3, nStatus, GetCurrentTime())
 	end
 end)
 
@@ -264,9 +269,9 @@ MY.RegisterEvent('QUEST_FINISHED', function()
 	if not me then
 		return
 	end
-	local szSerendipity, bFinish = GetSerendipityInfo('quest', arg0)
+	local szSerendipity, nStatus = GetSerendipityInfo('quest', arg0)
 	if szSerendipity then
-		D.OnSerendipity(me.szName, szSerendipity, 4, bFinish, GetCurrentTime())
+		D.OnSerendipity(me.szName, szSerendipity, 4, nStatus, GetCurrentTime())
 	end
 end)
 end
