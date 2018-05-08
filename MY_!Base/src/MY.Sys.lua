@@ -76,6 +76,7 @@ MY_DATA_PATH = SetmetaReadonly({
 if IsLocalFileExist(MY.GetAddonInfo().szRoot .. '@DATA/') then
 	CPath.Move(MY.GetAddonInfo().szRoot .. '@DATA/', MY.GetAddonInfo().szInterfaceRoot .. "MY#DATA/")
 end
+
 -- 格式化数据文件路径（替换$uid、$lang、$server以及补全相对路径）
 -- (string) MY.GetLUADataPath(oFilePath)
 function MY.FormatPath(oFilePath, tParams)
@@ -127,9 +128,18 @@ function MY.FormatPath(oFilePath, tParams)
 	end
 	local rootPath = GetRootPath():gsub('\\', '/')
 	if szFilePath:find(rootPath) == 1 then
-		szFilePath = szFilePath:gsub(rootPath, '')
+		szFilePath = szFilePath:gsub(rootPath, '.')
 	end
 	return szFilePath
+end
+
+function MY.GetRelativePath(oPath, oRoot)
+	local szPath = MY.FormatPath(oPath)
+	local szRoot = MY.FormatPath(oRoot)
+	if wstring.find(szPath:lower(), szRoot:lower()) ~= 1 then
+		return
+	end
+	return szPath:sub(#szRoot + 1)
 end
 
 function MY.GetLUADataPath(oFilePath)
