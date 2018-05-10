@@ -37,4 +37,13 @@ data = {
     ['Can not use in pubg map!'] = '孤城瀚海中，禁止使用。',
 
     ["Loop target in focus"] = "焦點列表循環選擇",
+
+    ['Target type'] = '目標類型',
+    ['All'] = '全部',
+    ['None'] = '無',
+    TARGET = {
+        [TARGET.NPC] = 'NPC',
+        [TARGET.PLAYER] = '玩家',
+        [TARGET.DOODAD] = '交互物件',
+    },
 }

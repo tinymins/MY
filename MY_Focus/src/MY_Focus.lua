@@ -6,18 +6,28 @@
 -- @Last modified by:   tinymins
 -- @Last modified time: 2017-05-27 10:59:42
 --------------------------------------------
+-----------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+-----------------------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
-local insert, remove, concat = table.insert, table.remove, table.concat
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
 local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
-local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local type, tonumber, tostring = type, tonumber, tostring
+local huge, pi = math.huge, math.pi
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
-local floor, min, max, ceil, pow, sqrt = math.floor, math.min, math.max, math.ceil, math.pow, math.sqrt
 local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-
+local IsNil, IsNumber, IsFunction = MY.IsNil, MY.IsNumber, MY.IsFunction
+local IsBoolean, IsString, IsTable = MY.IsBoolean, MY.IsString, MY.IsTable
+-----------------------------------------------------------------------------------------
 local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Focus/lang/")
@@ -200,20 +210,28 @@ end
 
 -- 添加默认焦点
 function MY_Focus.SetFocusName(szName)
+	szName = (string.gsub(szName, "^%s*(.-)%s*$", "%1"))
 	for _, v in ipairs(MY_Focus.tAutoFocus) do
-		if v == szName then
+		if v.name == szName then
 			return
 		end
 	end
-	table.insert(MY_Focus.tAutoFocus, szName)
+	local tData = {
+		type = {
+			all = true,
+		},
+		name = szName,
+	}
+	insert(MY_Focus.tAutoFocus, tData)
 	-- 更新焦点列表
 	MY_Focus.ScanNearby()
+	return tData
 end
 
 -- 删除默认焦点
 function MY_Focus.RemoveFocusName(szName)
 	for i = #MY_Focus.tAutoFocus, 1, -1 do
-		if MY_Focus.tAutoFocus[i] == szName then
+		if MY_Focus.tAutoFocus[i].name == szName then
 			table.remove(MY_Focus.tAutoFocus, i)
 		end
 	end
@@ -282,6 +300,7 @@ function MY_Focus.ScanNearby()
 	for dwID, _ in pairs(MY.GetNearDoodad()) do
 		MY_Focus.OnObjectEnterScene(TARGET.DOODAD, dwID)
 	end
+	return true
 end
 
 -- 对象进入视野
@@ -323,8 +342,11 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		-- 判断默认焦点
 		if MY_Focus.bAutoFocus and not bFocus then
 			for _, v in ipairs(MY_Focus.tAutoFocus) do
-				if v == szName or
-				(v:sub(1,1) == '^' and string.find(szName, v)) then
+				if (v.type.all or v.type[dwType])
+				and (
+					v.name == szName
+					or (v.name:sub(1,1) == '^' and string.find(szName, v.name))
+				) then
 					bFocus = true
 				end
 			end
@@ -820,6 +842,19 @@ end
 
 function MY_Focus.OnEvent(event)
 	if event == "LOADING_END" or event == "CUSTOM_DATA_LOADED" then
+		if not MY_Focus.tAutoFocus then
+			MY_Focus.tAutoFocus = {}
+		end
+		for i, v in ipairs(MY_Focus.tAutoFocus) do
+			if IsString(v) then
+				MY_Focus.tAutoFocus[i] = {
+					type = {
+						all = true,
+					},
+					name = v,
+				}
+			end
+		end
 		if not MY_Focus.tFocusList then
 			MY_Focus.tFocusList = {}
 		end
@@ -1001,27 +1036,69 @@ function PS.OnPanelActive(wnd)
 		autoenable = function() return IsEnabled() end,
 	})
 
+	local function GeneItemText(v)
+		local szType
+		if v.type.all then
+			szType = _L['All']
+		else
+			local aText = {}
+			for _, eType in ipairs({ TARGET.NPC, TARGET.PLAYER, TARGET.DOODAD }) do
+				if v.type[eType] then
+					insert(aText, _L.TARGET[eType])
+				end
+			end
+			szType = #aText == 0 and _L['None'] or concat(aText, ',')
+		end
+		return v.name .. ' (' .. szType .. ')'
+	end
 	local list = ui:append("WndListBox", {
 		x = x, y = y + 30, w = wl - x + xl, h = h - y - 40,
 		autoenable = function() return IsEnabled() end,
 	}, true)
 	-- 初始化list控件
 	for _, v in ipairs(MY_Focus.tAutoFocus) do
-		list:listbox('insert', v, v)
+		list:listbox('insert', GeneItemText(v), v, v)
 	end
-	list:listbox('onmenu', function(hItem, szText, szID)
-		return {{
+	list:listbox('onmenu', function(hItem, szText, oID, tData)
+		local t = {{
 			szOption = _L['delete'],
 			fnAction = function()
-				list:listbox('delete', 'id', szID)
 				for i = #MY_Focus.tAutoFocus, 1, -1 do
-					if MY_Focus.tAutoFocus[i] == szText then
+					if MY_Focus.tAutoFocus[i].name == szText then
 						table.remove(MY_Focus.tAutoFocus, i)
 						MY_Focus.RescanNearby()
 					end
 				end
+				list:listbox('delete', 'id', oID)
 			end,
 		}}
+		local t1 = {
+			szOption = _L['Target type'], {
+				szOption = _L['All'],
+				bCheck = true, bChecked = tData.type.all,
+				fnAction = function()
+					tData.type.all = not tData.type.all
+					MY_Focus.RescanNearby()
+					list:listbox('update', 'id', oID, {'text'}, {GeneItemText(tData)})
+				end,
+			}
+		}
+		for _, eType in ipairs({ TARGET.NPC, TARGET.PLAYER, TARGET.DOODAD }) do
+			insert(t1, {
+				szOption = _L.TARGET[eType],
+				bCheck = true, bChecked = tData.type[eType],
+				fnAction = function()
+					tData.type[eType] = not tData.type[eType]
+					MY_Focus.RescanNearby()
+					list:listbox('update', 'id', oID, {'text'}, {GeneItemText(tData)})
+				end,
+				fnDisable = function()
+					return tData.type.all
+				end,
+			})
+		end
+		insert(t, t1)
+		return t
 	end)
 	-- add
 	ui:append("WndButton", {
@@ -1029,23 +1106,11 @@ function PS.OnPanelActive(wnd)
 		text = _L["add"],
 		onclick = function()
 			GetUserInput(_L['add auto focus'], function(szText)
-				-- 去掉前后空格
-				szText = (string.gsub(szText, "^%s*(.-)%s*$", "%1"))
-				-- 验证是否为空
-				if szText=="" then
+				local tData = MY_Focus.SetFocusName(szText)
+				if not tData then
 					return
 				end
-				-- 验证是否重复
-				for i, v in ipairs(MY_Focus.tAutoFocus) do
-					if v == szText then
-						return
-					end
-				end
-				-- 加入表
-				table.insert(MY_Focus.tAutoFocus, szText)
-				-- 更新UI
-				list:listbox('insert', szText, szText)
-				MY_Focus.RescanNearby()
+				list:listbox('insert', GeneItemText(tData), tData, tData)
 			end, function() end, function() end, nil, '')
 		end,
 		autoenable = function() return IsEnabled() end,
@@ -1056,13 +1121,8 @@ function PS.OnPanelActive(wnd)
 		text = _L["delete"],
 		onclick = function()
 			for _, v in ipairs(list:listbox('select', 'selected')) do
+				MY_Focus.RemoveFocusName(v.text)
 				list:listbox('delete', 'id', v.id)
-				for i = #MY_Focus.tAutoFocus, 1, -1 do
-					if MY_Focus.tAutoFocus[i] == v.text then
-						table.remove(MY_Focus.tAutoFocus, i)
-						MY_Focus.RescanNearby()
-					end
-				end
 			end
 		end,
 		autoenable = function() return IsEnabled() end,
