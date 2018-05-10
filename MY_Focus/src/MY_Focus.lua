@@ -131,7 +131,7 @@ end
 -- 获取当前显示的焦点列表
 function MY_Focus.GetDisplayList()
 	local t = {}
-	if l_bMinimize then
+	if l_bMinimize or IsShielded() then
 		return t
 	end
 	if MY_Focus.bHideDeath then
