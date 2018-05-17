@@ -2,7 +2,7 @@
 -- @Date:   2015-01-21 15:21:19
 -- @Last Modified by:   Administrator
 -- @Last Modified time: 2016-12-14 21:45:47
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/lang/")
+local _L, D = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/lang/"), {}
 -----------------------------------------------
 -- 重构 @ 2015 赶时间 很多东西写的很粗略
 -----------------------------------------------
@@ -384,6 +384,18 @@ function CTM_Party_Base.OnItemLButtonDragEnd()
 	end
 end
 
+function D.SetTargetTeammate(dwID, info)
+	if MY.IsInPubg() and GetClientPlayer().nMoveState == MOVE_STATE.ON_DEATH then
+		BattleField_MatchPlayer(dwID)
+	elseif info.bIsOnLine and CanTarget(dwID) then -- 有待考证
+		if CFG.bTempTargetEnable then
+			MY.DelayCall("MY_Cataclysm_TempTarget", false)
+			CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = nil
+		end
+		SetTarget(TARGET.PLAYER, dwID)
+	end
+end
+
 function CTM_Party_Base.OnItemLButtonDown()
 	local dwID = (this.bBuff and this:GetParent():GetParent().dwID) or (this.bRole and this.dwID)
 	if not dwID then
@@ -394,19 +406,7 @@ function CTM_Party_Base.OnItemLButtonDown()
 		return
 	end
 	if not IsCtrlKeyDown() and not IsAltKeyDown() then
-		if CFG.bTempTargetEnable then
-			MY.DelayCall("MY_Cataclysm_TempTarget", false)
-			CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = nil
-		end
-		if MY.IsInPubg() and GetClientPlayer().nMoveState == MOVE_STATE.ON_DEATH then
-			BattleField_MatchPlayer(dwID)
-		elseif info.bIsOnLine and CanTarget(dwID) then -- 有待考证
-			if CFG.bTempTargetEnable then
-				MY.DelayCall("MY_Cataclysm_TempTarget", false)
-				CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = nil
-			end
-			SetTarget(TARGET.PLAYER, dwID)
-		end
+		D.SetTargetTeammate(dwID, info)
 	end
 	CTM_CLICK_DISMISS = false
 end
@@ -445,6 +445,8 @@ function CTM_Party_Base.OnItemLButtonClick()
 			else
 				ViewInviteToPlayer(dwID)
 			end
+		else
+			D.SetTargetTeammate(dwID, info)
 		end
 	elseif IsCtrlKeyDown() then
 		EditBox_AppendLinkPlayer(info.szName)
