@@ -1462,3 +1462,31 @@ function MY.ExecuteWithThis(element, fnAction, ...)
 	this = _this
 	return true, unpack(rets)
 end
+
+function MY.InsertOperatorMenu(t, opt, action, opts, L)
+	for _, op in ipairs(opts or { "==", "!=", "<", ">=", ">", "<=" }) do
+		insert(t, {
+			szOption = L and L[op] or _L.OPERATOR[op],
+			bCheck = true, bMCheck = true,
+			bChecked = opt == op,
+			fnAction = function() action(op) end,
+		})
+	end
+	return t
+end
+
+function MY.JudgeOperator(opt, lval, rval, ...)
+	if opt == '>' then
+		return lval > rval
+	elseif opt == '>=' then
+		return lval >= rval
+	elseif opt == '<' then
+		return lval < rval
+	elseif opt == '<=' then
+		return lval <= rval
+	elseif opt == '==' or opt == '===' then
+		return lval == rval
+	elseif opt == '~=' or opt == '!=' or opt == '!==' then
+		return lval ~= rval
+	end
+end
