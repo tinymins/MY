@@ -39,11 +39,26 @@ data = {
     ["Loop target in focus"] = "焦點列表循環選擇",
 
     ['Target type'] = '目標類型',
+    ['Target life percentage'] = '目標血量百分比',
     ['All'] = '全部',
     ['None'] = '無',
+    ['Enable'] = '啓用',
+    ['Judge method'] = '匹配方式',
+    JUDGE_METHOD = {
+        ['NAME'] = '按名字',
+        ['NAME_PATT'] = '按名字(模式匹配)',
+        ['ID'] = '按ID',
+        ['TEMPLATE_ID'] = '按模板ID',
+        ['TONG_NAME'] = '按幫會名字',
+        ['TONG_NAME_PATT'] = '按幫會名字(模式匹配)',
+    },
     TARGET = {
         [TARGET.NPC] = 'NPC',
         [TARGET.PLAYER] = '玩家',
         [TARGET.DOODAD] = '交互物件',
     },
+    ['Operator'] = '運算符',
+    ['Value'] = '數值',
+    ['Name display'] = '名稱顯示',
+    ['Please input display name, leave blank to use its own name:'] = '請輸入顯示名稱，留空顯示目標默認名稱：',
 }
