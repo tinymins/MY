@@ -1120,7 +1120,7 @@ function PS.OnPanelActive(wnd)
 					if mon.soundAppear == "" then
 						return
 					end
-					OutputTip(GetFormatText(mon.soundAppear), 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
+					OutputTip(GetFormatText(mon.soundAppear, nil, 255, 255, 0), 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
 				end,
 				fnAction = function()
 					local file = GetOpenFileName(
@@ -1154,7 +1154,7 @@ function PS.OnPanelActive(wnd)
 					if mon.soundDisappear == "" then
 						return
 					end
-					OutputTip(GetFormatText(mon.soundDisappear), 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
+					OutputTip(GetFormatText(mon.soundDisappear, nil, 255, 255, 0), 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
 				end,
 				fnAction = function()
 					local file = GetOpenFileName(
