@@ -2531,6 +2531,29 @@ function XGUI:autoSize(arg0, arg1)
 end
 end
 
+-- (number) Instance:fontScale()
+-- (self) Instance:fontScale(bool nScale)
+function XGUI:fontScale(nScale)
+	self:_checksum()
+	if IsNumber(nScale) then
+		for _, raw in ipairs(self.raws) do
+			raw = GetComponentElement(raw, 'TEXT')
+			if raw then
+				raw:SetFontScale(nScale)
+			end
+		end
+		return self
+	else -- get
+		local raw = self.raws[1]
+		if raw then
+			raw = GetComponentElement(raw, 'TEXT')
+			if raw then
+				return raw:GetFontScale()
+			end
+		end
+	end
+end
+
 -- (number) Instance:scroll() -- get current scroll percentage (none scroll will return -1)
 -- (self) Instance:scroll(number nPercentage) -- set scroll percentage
 -- (self) Instance:scroll(function OnScrollBarPosChanged) -- bind scroll event handle
