@@ -311,26 +311,25 @@ end
 -- 更新列表
 function D.UpdateList(frame)
 	l_lockInDisplay = false
-	local tNames = {}
+	local nCount = 0
 	local hList = frame:Lookup("", "Handle_List")
 	local aList = MY_Focus.GetDisplayList()
-	local bCountChanged = false
 	for i = 1, hList:GetItemCount() do
 		local p = aList[i]
 		local hItem = hList:Lookup(i - 1)
 		if p then
 			if not hItem:IsVisible() then
 				hItem:Show()
-				bCountChanged = true
 			end
 			D.UpdateItem(hItem, p)
+			nCount = nCount + 1
 		elseif hItem:IsVisible() then
 			hItem:Hide()
-			bCountChanged = true
 		end
 	end
-	if bCountChanged then
+	if frame.nCount ~= nCount then
 		D.AutosizeUI(frame)
+		frame.nCount = nCount
 	end
 end
 
