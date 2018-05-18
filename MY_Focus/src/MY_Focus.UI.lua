@@ -270,7 +270,7 @@ function D.UpdateItem(hItem, p)
 				if nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
 				or nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL then
 					hItem:Lookup('Handle_Progress/Image_Progress'):SetPercentage(fProgress)
-					hItem:Lookup('Handle_Progress/Text_Progress'):SetText(MY.GetSkillName(dwSkillID, dwSkillLevel))
+					hItem:Lookup('Handle_Progress/Text_Progress'):SetText((MY.GetSkillName(dwSkillID, dwSkillLevel)))
 				else
 					hItem:Lookup('Handle_Progress/Image_Progress'):SetPercentage(0)
 					hItem:Lookup('Handle_Progress/Text_Progress'):SetText('')
@@ -280,7 +280,7 @@ function D.UpdateItem(hItem, p)
 			if nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
 			or nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL then
 				hItem:Lookup('Handle_Progress/Image_Progress'):SetPercentage(fProgress)
-				hItem:Lookup('Handle_Progress/Text_Progress'):SetText(MY.GetSkillName(dwSkillID, dwSkillLevel))
+				hItem:Lookup('Handle_Progress/Text_Progress'):SetText((MY.GetSkillName(dwSkillID, dwSkillLevel)))
 			else
 				hItem:Lookup('Handle_Progress/Image_Progress'):SetPercentage(0)
 				hItem:Lookup('Handle_Progress/Text_Progress'):SetText('')
