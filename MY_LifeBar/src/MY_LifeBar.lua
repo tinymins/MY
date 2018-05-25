@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-05-09 05:45:08
+-- @Last Modified time: 2018-05-26 02:45:52
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -71,7 +71,7 @@ function D.IsMapEnabled()
 			Config.bOnlyInArena or
 			Config.bOnlyInBattleField
 		) or (
-			(Config.bOnlyInDungeon     and MY.IsInDungeon(true)) or
+			(Config.bOnlyInDungeon     and MY.IsInDungeon()) or
 			(Config.bOnlyInArena       and MY.IsInArena()) or
 			(Config.bOnlyInBattleField and (MY.IsInBattleField() or MY.IsInPubg()))
 		)

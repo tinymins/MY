@@ -207,7 +207,7 @@ end
 function _TS.CheckOpen()
 	if TS.bEnable then
 		if TS.bInDungeon then
-			if MY.IsInDungeon(true) then
+			if MY.IsInDungeon() then
 				_TS.OpenPanel()
 			else
 				_TS.ClosePanel()

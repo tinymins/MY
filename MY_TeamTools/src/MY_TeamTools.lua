@@ -437,7 +437,7 @@ end
 
 function RT.UpdateDungeonInfo(hDungeon)
 	local me = GetClientPlayer()
-	if MY.IsInDungeon(true) then
+	if MY.IsInDungeon() then
 		local scene = me.GetScene()
 		hDungeon:Lookup("Text_Dungeon"):SetText(Table_GetMapName(me.GetMapID()) .. "\n" .. "ID:(" .. scene.nCopyIndex  ..")")
 		hDungeon:Show()

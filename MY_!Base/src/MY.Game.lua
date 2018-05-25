@@ -495,9 +495,9 @@ end
 MY.GetTargetContextMenu = MY.Game.GetTargetContextMenu
 
 -- 判断一个地图是不是副本
--- (bool) MY.Game.IsDungeonMap(szMapName, bType)
--- (bool) MY.Game.IsDungeonMap(dwMapID, bType)
-function MY.Game.IsDungeonMap(dwMapID, bType)
+-- (bool) MY.Game.IsDungeonMap(szMapName, bRaid)
+-- (bool) MY.Game.IsDungeonMap(dwMapID, bRaid)
+function MY.Game.IsDungeonMap(dwMapID, bRaid)
 	if not _Cache.tMapList then
 		_Cache.tMapList = {}
 		for _, dwMapID in ipairs(GetMapList()) do
@@ -515,10 +515,10 @@ function MY.Game.IsDungeonMap(dwMapID, bType)
 	if map then
 		dwMapID = map.dwMapID
 	end
-	if bType then -- 只判断地图的类型 而不是严格判断25人本
-		return select(2, GetMapParams(dwMapID)) == MAP_TYPE.DUNGEON
-	else
+	if bRaid then -- 严格判断25人本
 		return map and map.bDungeon
+	else -- 只判断地图的类型
+		return select(2, GetMapParams(dwMapID)) == MAP_TYPE.DUNGEON
 	end
 end
 MY.IsDungeonMap = MY.Game.IsDungeonMap
@@ -2005,10 +2005,10 @@ end
 MY.IsInBattleField = MY.Game.IsInBattleField
 
 -- 判断当前地图是不是副本
--- (bool) MY.Game.IsInDungeon(bool bType)
-function MY.Game.IsInDungeon(bType)
+-- (bool) MY.Game.IsInDungeon(bool bRaid)
+function MY.Game.IsInDungeon(bRaid)
 	local me = GetClientPlayer()
-	return me and MY.IsDungeonMap(me.GetMapID(), bType)
+	return me and MY.IsDungeonMap(me.GetMapID(), bRaid)
 end
 MY.IsInDungeon = MY.Game.IsInDungeon
 

@@ -331,7 +331,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 				end
 			end
 		else
-			if not MY_Focus.bOnlyPublicMap or (not MY.IsInBattleField() and not MY.IsInDungeon(true) and not MY.IsInArena()) then
+			if not MY_Focus.bOnlyPublicMap or (not MY.IsInBattleField() and not MY.IsInDungeon() and not MY.IsInArena()) then
 				-- ≈–∂œ∫√”—
 				if dwType == TARGET.PLAYER and
 				MY_Focus.bFocusFriend and
