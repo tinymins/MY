@@ -100,6 +100,7 @@ local function FormatAutoFocusData(data)
 		szMethod = 'NAME',
 		szPattern = '',
 		szDisplay = '',
+		dwMapID = -1,
 		tType = {
 			bAll = true,
 			[TARGET.NPC] = true,
@@ -240,9 +241,10 @@ function MY_Focus.RescanNearby()
 	MY_Focus.ScanNearby()
 end
 
-function D.GetEligibleRule(tRules, dwType, dwID, dwTemplateID, szName, szTong)
+function D.GetEligibleRule(tRules, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
 	for _, v in ipairs(tRules) do
 		if (v.tType.all or v.tType[dwType])
+		and (v.dwMapID == -1 or v.dwMapID == dwMapID)
 		and (
 			(v.szMethod == 'NAME' and v.szPattern == szName)
 			or (v.szMethod == 'NAME_PATT' and szName:find(v.szPattern))
@@ -276,6 +278,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		end)
 	elseif szName then -- 判断是否需要焦点
 		local bFocus, tRule = false, nil
+		local dwMapID = me.GetMapID()
 		local dwTemplateID, szTong = -1, ''
 		if dwType == TARGET.PLAYER then
 			if KObject.dwTongID ~= 0 then
@@ -307,7 +310,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		end
 		-- 判断默认焦点
 		if MY_Focus.bAutoFocus and not bFocus then
-			tRule = D.GetEligibleRule(tRules, dwType, dwID, dwTemplateID, szName, szTong)
+			tRule = D.GetEligibleRule(MY_Focus.tAutoFocus, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
 			if tRule then
 				bFocus = true
 			end
