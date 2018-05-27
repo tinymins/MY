@@ -271,8 +271,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 
 	local szName = MY.GetObjectName(KObject)
 	-- 解决玩家刚进入视野时名字为空的问题
-	if (dwType == TARGET.PLAYER and not szName) or
-	not me then -- 解决自身刚进入场景的时候的问题
+	if (dwType == TARGET.PLAYER and not szName) or not me then -- 解决自身刚进入场景的时候的问题
 		MY.DelayCall(300, function()
 			MY_Focus.OnObjectEnterScene(dwType, dwID, (nRetryCount or 0) + 1)
 		end)
@@ -309,7 +308,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 			end
 		end
 		-- 判断默认焦点
-		if MY_Focus.bAutoFocus and not bFocus then
+		if not bFocus and MY_Focus.bAutoFocus then
 			tRule = D.GetEligibleRule(MY_Focus.tAutoFocus, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
 			if tRule then
 				bFocus = true
@@ -317,56 +316,57 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		end
 
 		-- 判断竞技场
-		if MY.IsInArena() or MY.IsInPubg() then
-			if dwType == TARGET.PLAYER then
-				if MY_Focus.bFocusJJCEnemy and MY_Focus.bFocusJJCParty then
-					bFocus = true
-				elseif MY_Focus.bFocusJJCParty then
-					if not IsEnemy(UI_GetClientPlayerID(), dwID) then
+		if not bFocus then
+			if MY.IsInArena() or MY.IsInPubg() then
+				if dwType == TARGET.PLAYER then
+					if MY_Focus.bFocusJJCEnemy and MY_Focus.bFocusJJCParty then
+						bFocus = true
+					elseif MY_Focus.bFocusJJCParty then
+						if not IsEnemy(UI_GetClientPlayerID(), dwID) then
+							bFocus = true
+						end
+					elseif MY_Focus.bFocusJJCEnemy then
+						if IsEnemy(UI_GetClientPlayerID(), dwID) then
+							bFocus = true
+						end
+					end
+				elseif dwType == TARGET.NPC then
+					if MY_Focus.bFocusJJCParty
+					and KObject.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
+					and not (IsEnemy(UI_GetClientPlayerID(), dwID) and MY.IsShieldedVersion()) then
+						D.OnRemoveFocus(TARGET.PLAYER, KObject.dwEmployer)
 						bFocus = true
 					end
-				elseif MY_Focus.bFocusJJCEnemy then
-					if IsEnemy(UI_GetClientPlayerID(), dwID) then
+				end
+			else
+				if not MY_Focus.bOnlyPublicMap or (not MY.IsInBattleField() and not MY.IsInDungeon() and not MY.IsInArena()) then
+					-- 判断好友
+					if dwType == TARGET.PLAYER
+					and MY_Focus.bFocusFriend
+					and MY.GetFriend(dwID) then
+						bFocus = true
+					end
+					-- 判断同帮会
+					if dwType == TARGET.PLAYER
+					and MY_Focus.bFocusTong
+					and dwID ~= MY.GetClientInfo().dwID
+					and MY.GetTongMember(dwID) then
 						bFocus = true
 					end
 				end
-			elseif dwType == TARGET.NPC then
-				if MY_Focus.bFocusJJCParty
-				and KObject.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
-				and not (IsEnemy(UI_GetClientPlayerID(), dwID) and MY.IsShieldedVersion()) then
-					D.OnRemoveFocus(TARGET.PLAYER, KObject.dwEmployer)
+				-- 判断敌对玩家
+				if dwType == TARGET.PLAYER
+				and MY_Focus.bFocusEnemy
+				and IsEnemy(UI_GetClientPlayerID(), dwID) then
 					bFocus = true
 				end
-			end
-		else
-			if not MY_Focus.bOnlyPublicMap or (not MY.IsInBattleField() and not MY.IsInDungeon() and not MY.IsInArena()) then
-				-- 判断好友
-				if dwType == TARGET.PLAYER and
-				MY_Focus.bFocusFriend and
-				MY.GetFriend(dwID) then
-					bFocus = true
-				end
-				-- 判断同帮会
-				if dwType == TARGET.PLAYER and
-				MY_Focus.bFocusTong and
-				dwID ~= MY.GetClientInfo().dwID and
-				MY.GetTongMember(dwID) then
-					bFocus = true
-				end
-			end
-			-- 判断敌对玩家
-			if dwType == TARGET.PLAYER and
-			MY_Focus.bFocusEnemy and
-			IsEnemy(UI_GetClientPlayerID(), dwID) then
-				bFocus = true
 			end
 		end
 
 		-- 判断重要NPC
-		if not bFocus and
-		dwType == TARGET.NPC and
-		MY_Focus.bFocusBoss and
-		MY.IsImportantNpc(me.GetMapID(), KObject.dwTemplateID) then
+		if not bFocus and MY_Focus.bFocusBoss
+		and dwType == TARGET.NPC
+		and MY.IsImportantNpc(me.GetMapID(), KObject.dwTemplateID) then
 			bFocus = true
 		end
 
