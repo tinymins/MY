@@ -104,7 +104,7 @@ end
 function D.UpdateItem(hItem, p)
 	local dwType, dwID = p.dwType, p.dwID
 	local KObject, info, bInfo = MY.Game.GetObject(dwType, dwID)
-	local szName = p.tRule and p.tRule.display
+	local szName = p.tRule and p.tRule.szDisplay
 	if not szName or szName == "" then
 		szName = MY.Game.GetObjectName(KObject)
 	end

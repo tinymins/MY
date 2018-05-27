@@ -75,18 +75,18 @@ function PS.OnPanelActive(wnd)
 
 	local function GeneItemText(v)
 		local szType
-		if v.type.all then
+		if v.tType.bAll then
 			szType = _L['All']
 		else
 			local aText = {}
 			for _, eType in ipairs({ TARGET.NPC, TARGET.PLAYER, TARGET.DOODAD }) do
-				if v.type[eType] then
+				if v.tType[eType] then
 					insert(aText, _L.TARGET[eType])
 				end
 			end
 			szType = #aText == 0 and _L['None'] or concat(aText, ',')
 		end
-		return v.pattern .. ' (' .. szType .. ')'
+		return v.szPattern .. ' (' .. szType .. ')'
 	end
 	local list = ui:append("WndListBox", {
 		x = x, y = y + 30, w = wl - x + xl, h = h - y - 40,
@@ -100,7 +100,7 @@ function PS.OnPanelActive(wnd)
 		local t = {{
 			szOption = _L['delete'],
 			fnAction = function()
-				MY_Focus.RemoveFocusPattern(tData.pattern)
+				MY_Focus.RemoveFocusPattern(tData.szPattern)
 				list:listbox('delete', 'id', oID)
 			end,
 		}}
@@ -122,9 +122,9 @@ function PS.OnPanelActive(wnd)
 		local t1 = {
 			szOption = _L['Target type'], {
 				szOption = _L['All'],
-				bCheck = true, bChecked = tData.type.all,
+				bCheck = true, bChecked = tData.tType.bAll,
 				fnAction = function()
-					tData.type.all = not tData.type.all
+					tData.tType.bAll = not tData.tType.bAll
 					MY_Focus.RescanNearby()
 					list:listbox('update', 'id', oID, {'text'}, {GeneItemText(tData)})
 				end,
@@ -133,14 +133,14 @@ function PS.OnPanelActive(wnd)
 		for _, eType in ipairs({ TARGET.NPC, TARGET.PLAYER, TARGET.DOODAD }) do
 			insert(t1, {
 				szOption = _L.TARGET[eType],
-				bCheck = true, bChecked = tData.type[eType],
+				bCheck = true, bChecked = tData.tType[eType],
 				fnAction = function()
-					tData.type[eType] = not tData.type[eType]
+					tData.tType[eType] = not tData.tType[eType]
 					MY_Focus.RescanNearby()
 					list:listbox('update', 'id', oID, {'text'}, {GeneItemText(tData)})
 				end,
 				fnDisable = function()
-					return tData.type.all
+					return tData.tType.bAll
 				end,
 			})
 		end
@@ -149,29 +149,29 @@ function PS.OnPanelActive(wnd)
 		local t1 = {
 			szOption = _L['Target life percentage'], {
 				szOption = _L['Enable'],
-				bCheck = true, bChecked = tData.life.enable,
+				bCheck = true, bChecked = tData.tLife.bEnable,
 				fnAction = function()
-					tData.life.enable = not tData.life.enable
+					tData.tLife.bEnable = not tData.tLife.bEnable
 				end,
 			},
 			MY.InsertOperatorMenu({
 				szOption = _L['Operator'],
-				fnDisable = function() return not tData.life.enable end,
-			}, tData.life.operator, function(op)
-				tData.life.operator = op
+				fnDisable = function() return not tData.tLife.bEnable end,
+			}, tData.tLife.szOperator, function(op)
+				tData.tLife.szOperator = op
 				MY_Focus.RescanNearby()
 			end), {
 				szOption = _L['Value'],
 				fnMouseEnter = function()
-					OutputTip(GetFormatText(tData.life.value .. "%", nil, 255, 255, 0), 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
+					OutputTip(GetFormatText(tData.tLife.nValue .. "%", nil, 255, 255, 0), 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
 				end,
 				fnAction = function()
-					GetUserInputNumber(tData.life.value, 100, nil, function(val)
-						tData.life.value = val
+					GetUserInputNumber(tData.tLife.nValue, 100, nil, function(val)
+						tData.tLife.nValue = val
 						MY_Focus.RescanNearby()
 					end, nil, function() return not MY.IsPanelVisible() end)
 				end,
-				fnDisable = function() return not tData.life.enable end,
+				fnDisable = function() return not tData.tLife.bEnable end,
 			},
 		}
 		insert(t, t1)
@@ -179,16 +179,16 @@ function PS.OnPanelActive(wnd)
 		local t1 = {
 			szOption = _L['Name display'],
 			fnMouseEnter = function()
-				if tData.display == '' then
+				if tData.szDisplay == '' then
 					return
 				end
-				OutputTip(GetFormatText(tData.display, nil, 255, 255, 0), 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
+				OutputTip(GetFormatText(tData.szDisplay, nil, 255, 255, 0), 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
 			end,
 			fnAction = function()
 				GetUserInput(_L['Please input display name, leave blank to use its own name:'], function(val)
-					tData.display = val
+					tData.szDisplay = val
 					MY_Focus.RescanNearby()
-				end, nil, function() return not MY.IsPanelVisible() end, nil, tData.display)
+				end, nil, function() return not MY.IsPanelVisible() end, nil, tData.szDisplay)
 			end,
 		}
 		insert(t, t1)
@@ -215,7 +215,7 @@ function PS.OnPanelActive(wnd)
 		text = _L["delete"],
 		onclick = function()
 			for _, v in ipairs(list:listbox('select', 'selected')) do
-				MY_Focus.RemoveFocusPattern(v.pattern)
+				MY_Focus.RemoveFocusPattern(v.szPattern)
 				list:listbox('delete', 'id', v.id)
 			end
 		end,

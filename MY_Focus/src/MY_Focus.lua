@@ -97,19 +97,19 @@ RegisterCustomData("MY_Focus.fScaleY")
 
 local function FormatAutoFocusData(data)
 	local ds = {
-		method = 'NAME',
-		pattern = '',
-		display = '',
-		type = {
-			all = true,
+		szMethod = 'NAME',
+		szPattern = '',
+		szDisplay = '',
+		tType = {
+			bAll = true,
 			[TARGET.NPC] = true,
 			[TARGET.PLAYER] = true,
 			[TARGET.DOODAD] = true,
 		},
-		life = {
-			enable = false,
-			operator = '>',
-			value = 0,
+		tLife = {
+			bEnable = false,
+			szOperator = '>',
+			nValue = 0,
 		},
 	}
 	return MY.FormatDataStructure(data, ds)
@@ -132,12 +132,12 @@ end
 function MY_Focus.SetFocusPattern(szName)
 	szName = MY.Trim(szName)
 	for _, v in ipairs(MY_Focus.tAutoFocus) do
-		if v.pattern == szName then
+		if v.szPattern == szName then
 			return
 		end
 	end
 	local tData = FormatAutoFocusData({
-		pattern = szName,
+		szPattern = szName,
 	})
 	insert(MY_Focus.tAutoFocus, tData)
 	-- 更新焦点列表
@@ -149,7 +149,7 @@ end
 function MY_Focus.RemoveFocusPattern(szPattern)
 	local p
 	for i = #MY_Focus.tAutoFocus, 1, -1 do
-		if MY_Focus.tAutoFocus[i].pattern == szPattern then
+		if MY_Focus.tAutoFocus[i].szPattern == szPattern then
 			p = MY_Focus.tAutoFocus[i]
 			remove(MY_Focus.tAutoFocus, i)
 			break
@@ -159,7 +159,7 @@ function MY_Focus.RemoveFocusPattern(szPattern)
 		return
 	end
 	-- 刷新UI
-	if p.method == 'NAME' then
+	if p.szMethod == 'NAME' then
 		-- 全字符匹配模式：检查是否在永久焦点中 没有则删除Handle （节约性能）
 		for i = #FOCUS_LIST, 1, -1 do
 			local p = FOCUS_LIST[i]
@@ -240,6 +240,22 @@ function MY_Focus.RescanNearby()
 	MY_Focus.ScanNearby()
 end
 
+function D.GetEligibleRule(tRules, dwType, dwID, dwTemplateID, szName, szTong)
+	for _, v in ipairs(tRules) do
+		if (v.tType.all or v.tType[dwType])
+		and (
+			(v.szMethod == 'NAME' and v.szPattern == szName)
+			or (v.szMethod == 'NAME_PATT' and szName:find(v.szPattern))
+			or (v.szMethod == 'ID' and tonumber(v.szPattern) == dwID)
+			or (v.szMethod == 'TEMPLATE_ID' and tonumber(v.szPattern) == dwTemplateID)
+			or (v.szMethod == 'TONG_NAME' and v.szPattern == szTong)
+			or (v.szMethod == 'TONG_NAME_PATT' and szTong:find(v.szPattern))
+		) then
+			return v
+		end
+	end
+end
+
 -- 对象进入视野
 function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 	if nRetryCount and nRetryCount > 5 then
@@ -291,20 +307,9 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		end
 		-- 判断默认焦点
 		if MY_Focus.bAutoFocus and not bFocus then
-			for _, v in ipairs(MY_Focus.tAutoFocus) do
-				if (v.type.all or v.type[dwType])
-				and (
-					(v.method == 'NAME' and v.pattern == szName)
-					or (v.method == 'NAME_PATT' and szName:find(v.pattern))
-					or (v.method == 'ID' and tonumber(v.pattern) == dwID)
-					or (v.method == 'TEMPLATE_ID' and tonumber(v.pattern) == dwTemplateID)
-					or (v.method == 'TONG_NAME' and v.pattern == szTong)
-					or (v.method == 'TONG_NAME_PATT' and szTong:find(v.pattern))
-				) then
-					tRule = v
-					bFocus = true
-					break
-				end
+			tRule = D.GetEligibleRule(tRules, dwType, dwID, dwTemplateID, szName, szTong)
+			if tRule then
+				bFocus = true
 			end
 		end
 
@@ -454,8 +459,8 @@ function MY_Focus.GetDisplayList()
 				or (p.dwType == TARGET.DOODAD and KObject.nKind == DOODAD_KIND.CORPSE)
 			))
 			and (
-				not p.tRule or not p.tRule.life.enable
-				or MY.JudgeOperator(p.tRule.life.operator, KObject.nCurrentLife / KObject.nMaxLife * 100, p.tRule.life.value)
+				not p.tRule or not p.tRule.tLife.bEnable
+				or MY.JudgeOperator(p.tRule.tLife.szOperator, KObject.nCurrentLife / KObject.nMaxLife * 100, p.tRule.tLife.nValue)
 			) then
 				table.insert(t, p)
 			end
@@ -493,7 +498,7 @@ local function onInit()
 	end
 	for i, v in ipairs(MY_Focus.tAutoFocus) do
 		if IsString(v) then
-			v = { pattern = v }
+			v = { szPattern = v }
 		end
 		MY_Focus.tAutoFocus[i] = FormatAutoFocusData(v)
 	end
