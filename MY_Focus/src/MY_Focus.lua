@@ -405,6 +405,9 @@ function D.OnSetFocus(dwType, dwID, szName, tRule)
 		table.insert(FOCUS_LIST, {dwType = dwType, dwID = dwID, szName = szName, tRule = tRule})
 		nIndex = #FOCUS_LIST
 	end
+	if MY_Focus.bEnableSceneNavi and Navigator_SetID then
+		Navigator_SetID("MY_FOCUS." .. dwType .. '_' .. dwID, dwType, dwID, szName)
+	end
 	FireUIEvent("MY_FOCUS_UPDATE")
 end
 
