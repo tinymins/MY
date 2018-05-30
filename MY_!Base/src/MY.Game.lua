@@ -2034,6 +2034,16 @@ end
 MY.IsInPubg = MY.Game.IsInPubg
 
 do local MARK_NAME = { _L["Cloud"], _L["Sword"], _L["Ax"], _L["Hook"], _L["Drum"], _L["Shear"], _L["Stick"], _L["Jade"], _L["Dart"], _L["Fan"] }
+-- 获取标记中文名
+-- (string) MY.GetMarkName([number nIndex])
+function MY.GetMarkName(nIndex)
+	if nIndex then
+		return MARK_NAME[nIndex]
+	else
+		return clone(MARK_NAME)
+	end
+end
+
 -- 保存当前团队信息
 -- (table) MY.GetTeamInfo([table tTeamInfo])
 function MY.GetTeamInfo(tTeamInfo)
