@@ -941,9 +941,9 @@ function MY.SwitchTab(szID, bForceUpdate)
 			x = x, y = 375,
 			name = "WndCheckBox_SerendipityNotify",
 			text = _L["Show share notify."],
-			checked = MY.Xtra.bSerendipity,
+			checked = MY_Serendipity.bEnable,
 			oncheck = function()
-				MY.Xtra.bSerendipity = not MY.Xtra.bSerendipity
+				MY_Serendipity.bEnable = not MY_Serendipity.bEnable
 			end,
 			tip = _L["Monitor serendipity and show share notify."],
 			tippostype = MY.Const.UI.Tip.POS_BOTTOM,
@@ -952,32 +952,32 @@ function MY.SwitchTab(szID, bForceUpdate)
 			x = x, y = 375,
 			name = "WndCheckBox_SerendipityNotifyTip",
 			text = _L["Show notify tip."],
-			checked = MY.Xtra.bSerendipityPreview,
+			checked = MY_Serendipity.bPreview,
 			oncheck = function()
-				MY.Xtra.bSerendipityPreview = not MY.Xtra.bSerendipityPreview
+				MY_Serendipity.bPreview = not MY_Serendipity.bPreview
 			end,
-			autoenable = function() return not MY.Xtra.bSerendipityAutoShare end,
+			autoenable = function() return not MY_Serendipity.bAutoShare end,
 		}, true):autoWidth():width()
 		x = x + ui:append("WndCheckBox", {
 			x = x, y = 375,
 			name = "WndCheckBox_SerendipityNotifySound",
 			text = _L["Play notify sound."],
-			checked = MY.Xtra.bSerendipitySound,
+			checked = MY_Serendipity.bSound,
 			oncheck = function()
-				MY.Xtra.bSerendipitySound = not MY.Xtra.bSerendipitySound
+				MY_Serendipity.bSound = not MY_Serendipity.bSound
 			end,
-			autoenable = function() return not MY.Xtra.bSerendipityAutoShare end,
+			autoenable = function() return not MY_Serendipity.bAutoShare end,
 		}, true):autoWidth():width()
 		x = x + ui:append("WndCheckBox", {
 			x = x, y = 375,
 			name = "WndCheckBox_SerendipityAutoShare",
 			text = _L["Auto share."],
-			checked = MY.Xtra.bSerendipityAutoShare,
+			checked = MY_Serendipity.bAutoShare,
 			oncheck = function()
-				if not MY.Xtra.bSerendipityAutoShare then
-					MY.Xtra.GetSerendipityShareName()
+				if not MY_Serendipity.bAutoShare then
+					MY_Serendipity.GetSerendipityShareName()
 				end
-				MY.Xtra.bSerendipityAutoShare = not MY.Xtra.bSerendipityAutoShare
+				MY_Serendipity.bAutoShare = not MY_Serendipity.bAutoShare
 			end,
 		}, true):autoWidth():width()
 		wnd.OnPanelResize = function(wnd)

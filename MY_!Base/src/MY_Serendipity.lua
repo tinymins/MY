@@ -38,12 +38,12 @@ local SERENDIPITY_STATUS = {
 local SERENDIPITY_LIST = {}
 do
 local Xtra = {
-	bSerendipity          = MY.FormatDataStructure(MY.LoadLUAData({"config/show_notify.jx3dat"          , MY_DATA_PATH.GLOBAL}), false),
-	bSerendipitySound     = MY.FormatDataStructure(MY.LoadLUAData({"config/serendipity_sound.jx3dat"    , MY_DATA_PATH.GLOBAL}), true ),
-	bSerendipityPreview   = MY.FormatDataStructure(MY.LoadLUAData({"config/serendipity_preview.jx3dat"  , MY_DATA_PATH.GLOBAL}), true ),
-	bSerendipityAutoShare = MY.FormatDataStructure(MY.LoadLUAData({"config/serendipity_autoshare.jx3dat", MY_DATA_PATH.GLOBAL}), false),
+	bEnable    = MY.FormatDataStructure(MY.LoadLUAData({"config/show_notify.jx3dat"          , MY_DATA_PATH.GLOBAL}), false),
+	bSound     = MY.FormatDataStructure(MY.LoadLUAData({"config/serendipity_sound.jx3dat"    , MY_DATA_PATH.GLOBAL}), true ),
+	bPreview   = MY.FormatDataStructure(MY.LoadLUAData({"config/serendipity_preview.jx3dat"  , MY_DATA_PATH.GLOBAL}), true ),
+	bAutoShare = MY.FormatDataStructure(MY.LoadLUAData({"config/serendipity_autoshare.jx3dat", MY_DATA_PATH.GLOBAL}), false),
 }
-MY.Xtra = setmetatable({}, {
+MY_Serendipity = setmetatable({}, {
 	__index = function(t, k)
 		return Xtra[k]
 	end,
@@ -51,7 +51,7 @@ MY.Xtra = setmetatable({}, {
 		if Xtra[k] == v then
 			return
 		end
-		if k == "bSerendipity" then
+		if k == "bEnable" then
 			if v then
 				for i, p in ipairs_r(SERENDIPITY_LIST) do
 					MY.CreateNotify({
@@ -68,11 +68,11 @@ MY.Xtra = setmetatable({}, {
 				end
 			end
 			MY.SaveLUAData({"config/show_notify.jx3dat", MY_DATA_PATH.GLOBAL}, v)
-		elseif k == "bSerendipitySound" then
+		elseif k == "bSound" then
 			MY.SaveLUAData({"config/serendipity_sound.jx3dat", MY_DATA_PATH.GLOBAL}, v)
-		elseif k == "bSerendipityPreview" then
+		elseif k == "bPreview" then
 			MY.SaveLUAData({"config/serendipity_preview.jx3dat", MY_DATA_PATH.GLOBAL}, v)
-		elseif k == "bSerendipityAutoShare" then
+		elseif k == "bAutoShare" then
 			MY.SaveLUAData({"config/serendipity_autoshare.jx3dat", MY_DATA_PATH.GLOBAL}, v)
 		end
 		Xtra[k] = v
@@ -109,7 +109,7 @@ function D.GetSerendipityShareName(fnAction, bNoConfirm)
 		GetUserInput(_L["Please input your realname, left blank for anonymous report:"], fnConfirm, nil, nil, nil, szReporter, 6)
 	end
 end
-MY.Xtra.GetSerendipityShareName = D.GetSerendipityShareName
+MY_Serendipity.GetSerendipityShareName = D.GetSerendipityShareName
 
 function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTime, bAuto)
 	local szKey = szName .. "_" .. szSerendipity .. "_" .. dwTime
@@ -151,7 +151,7 @@ function D.OnSerendipity(szName, szSerendipity, nMethod, nStatus, dwTime)
 		return
 	end
 	local szKey = szName .. "_" .. szSerendipity .. "_" .. dwTime
-	if MY.Xtra.bSerendipityAutoShare then
+	if MY_Serendipity.bAutoShare then
 		D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTime, true)
 	else
 		local szXml = GetFormatText(szName == GetClientPlayer().szName
@@ -165,13 +165,13 @@ function D.OnSerendipity(szName, szSerendipity, nMethod, nStatus, dwTime)
 		local function fnAction()
 			D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTime, false)
 		end
-		if MY.Xtra.bSerendipity then
+		if MY_Serendipity.bEnable then
 			MY.CreateNotify({
 				szKey = szKey,
 				szMsg = szXml,
 				fnAction = fnAction,
-				bPlaySound = MY.Xtra.bSerendipitySound,
-				bPopupPreview = MY.Xtra.bSerendipityPreview,
+				bPlaySound = MY_Serendipity.bSound,
+				bPopupPreview = MY_Serendipity.bPreview,
 			})
 		end
 		insert(SERENDIPITY_LIST, { szKey = szKey, szXml = szXml, fnAction = fnAction })
