@@ -1429,6 +1429,12 @@ end
 
 local HUMAN_COLOR_CACHE = setmetatable({}, {__mode = "v", __index = COLOR_NAME_RGB})
 function MY.HumanColor2RGB(name)
+	if IsTable(name) then
+		if name.r then
+			return name.r, name.g, name.b
+		end
+		return unpack(name)
+	end
 	if not HUMAN_COLOR_CACHE[name] then
 		local r, g, b, a = MY.Hex2RGB(name)
 		HUMAN_COLOR_CACHE[name] = {r, g, b, a}
