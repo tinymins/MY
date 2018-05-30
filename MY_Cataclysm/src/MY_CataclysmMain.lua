@@ -1118,6 +1118,63 @@ function PS.OnPanelActive(frame)
 
 	x = X + 10
 	x = x + ui:append("WndCheckBox", {
+		x = x, y = y, text = _L["Show attention shadow"],
+		checked = Cataclysm_Main.bShowAttention,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bShowAttention = bCheck
+		end,
+	}, true):autoWidth():width() + 5
+
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y, text = _L["Show caution animate"],
+		checked = Cataclysm_Main.bShowCaution,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bShowCaution = bCheck
+		end,
+	}, true):autoWidth():width() + 5
+
+	y = y + ui:append("WndCheckBox", {
+		x = x, y = y, text = _L["Show screen head"],
+		checked = Cataclysm_Main.bShowScreenHead,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bShowScreenHead = bCheck
+		end,
+	}, true):autoWidth():height()
+
+	x = X + 10
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y, text = _L["Attack Warning"],
+		checked = Cataclysm_Main.bHPHitAlert,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bHPHitAlert = bCheck
+			if GetFrame() then
+				Grid_CTM:CallDrawHPMP(true, true)
+			end
+		end,
+	}, true):autoWidth():width() + 5
+
+	y = y + ui:append("WndCheckBox", {
+		x = x, y = y, text = _L["Show distance"],
+		checked = Cataclysm_Main.bShowDistance,
+		oncheck = function(bCheck)
+			Cataclysm_Main.bShowDistance = bCheck
+		end,
+	}, true):autoWidth():height()
+
+	-- local me = GetClientPlayer()
+	-- if me.dwForceID == 6 then
+	-- 	x = x + ui:append("WndCheckBox", {
+	-- 		x = x, y = y, text = _L["ZuiWu Effect"],
+	-- 		color = { MY.GetForceColor(6) },
+	-- 		checked = Cataclysm_Main.bShowEffect,
+	-- 		oncheck = function(bCheck)
+	-- 			Cataclysm_Main.bShowEffect = bCheck
+	-- 		end,
+	-- 	}, true):autoWidth():width() + 5
+	-- end
+
+	x = X + 10
+	x = x + ui:append("WndCheckBox", {
 		x = x, y = y, text = _L["Show target's target"],
 		checked = Cataclysm_Main.bShowTargetTargetAni,
 		oncheck = function(bCheck)
@@ -1125,14 +1182,6 @@ function PS.OnPanelActive(frame)
 			if GetFrame() then
 				Grid_CTM:RefreshTTarget()
 			end
-		end,
-	}, true):autoWidth():width() + 5
-
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Show distance"],
-		checked = Cataclysm_Main.bShowDistance,
-		oncheck = function(bCheck)
-			Cataclysm_Main.bShowDistance = bCheck
 		end,
 	}, true):autoWidth():width() + 5
 
@@ -1152,48 +1201,9 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():height()
 
-	x = X + 10
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Attack Warning"],
-		checked = Cataclysm_Main.bHPHitAlert,
-		oncheck = function(bCheck)
-			Cataclysm_Main.bHPHitAlert = bCheck
-			if GetFrame() then
-				Grid_CTM:CallDrawHPMP(true, true)
-			end
-		end,
-	}, true):autoWidth():width() + 5
-
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Show attention shadow"],
-		checked = Cataclysm_Main.bShowAttention,
-		oncheck = function(bCheck)
-			Cataclysm_Main.bShowAttention = bCheck
-		end,
-	}, true):autoWidth():width() + 5
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Show caution animate"],
-		checked = Cataclysm_Main.bShowCaution,
-		oncheck = function(bCheck)
-			Cataclysm_Main.bShowCaution = bCheck
-		end,
-	}, true):autoWidth():width() + 5
-
-	-- local me = GetClientPlayer()
-	-- if me.dwForceID == 6 then
-	-- 	x = x + ui:append("WndCheckBox", {
-	-- 		x = x, y = y, text = _L["ZuiWu Effect"],
-	-- 		color = { MY.GetForceColor(6) },
-	-- 		checked = Cataclysm_Main.bShowEffect,
-	-- 		oncheck = function(bCheck)
-	-- 			Cataclysm_Main.bShowEffect = bCheck
-	-- 		end,
-	-- 	}, true):autoWidth():width() + 5
-	-- end
-	y = y + 25
-
 	-- ÆäËû
 	x = X
+	y = y + 4
 	y = y + ui:append("Text", { x = x, y = y, text = g_tStrings.OTHER, font = 27 }, true):height()
 
 	x = X + 10
@@ -2081,6 +2091,9 @@ local function GetListText(aBuffList)
 		if v.bCaution then
 			insert(a, "!!!")
 		end
+		if v.bScreenHead then
+			insert(a, "!!!!")
+		end
 		if v.bDelete then
 			insert(a, "-")
 		end
@@ -2126,6 +2139,8 @@ local function GetTextList(szText)
 					tab.bAttention = true
 				elseif val == "!!!" then
 					tab.bCaution = true
+				elseif val == "!!!!" then
+					tab.bScreenHead = true
 				elseif val == "-" then
 					tab.bDelete = true
 				elseif val:sub(1, 1) == "#" then
@@ -2389,6 +2404,16 @@ function OpenBuffEditPanel(rec)
 		checked = rec.bCaution,
 		oncheck = function(bChecked)
 			rec.bCaution = bChecked
+			update()
+		end,
+		autoenable = function() return not rec.bDelete end,
+	}, true):autoWidth():width() + 5
+	x = x + ui:append("WndCheckBox", {
+		x = x, y = y,
+		text = _L['Screen Head'],
+		checked = rec.bScreenHead,
+		oncheck = function(bChecked)
+			rec.bScreenHead = bChecked
 			update()
 		end,
 		autoenable = function() return not rec.bDelete end,

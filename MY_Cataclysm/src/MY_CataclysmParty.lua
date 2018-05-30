@@ -55,6 +55,7 @@ local CTM_BOSS_FOCUS_BUFF    = {} -- 附近记录到的BOSS点名BUFF缓存
 local CTM_ATTENTION_BUFF     = {} -- 附近记录到的需要显示蒙版的BUFF缓存
 local CTM_ATTENTION_STACK    = {} -- 蒙版BUFF栈（取第一个也就是最新入栈的作为显示颜色）
 local CTM_CAUTION_BUFF       = {} -- 附近记录到的警告BUFF缓存
+local CTM_SCREEN_HEAD        = {} -- 头顶倒计时缓存
 local CTM_BOSS_TARGET        = {} -- BOSS目标缓存
 local CTM_BOSS_FOCUSED_STATE = {} -- 被BOSS点名的状态缓存
 local CTM_THREAT_NPC_ID, CTM_THREAT_TARGET_ID
@@ -1547,6 +1548,7 @@ function CTM:RefreshBuff()
 						if data.nIcon and tonumber(data.nIcon) then
 							icon = data.nIcon
 						end
+						item.szName = szName
 						local box = item:Lookup("Box")
 						box:SetObject(UI_OBJECT_NOT_NEED_KNOWN, data.dwID, data.nLevelEx)
 						box:SetObjectIcon(icon)
@@ -1632,6 +1634,20 @@ function CTM:RefreshBuff()
 						end
 						CTM_CAUTION_BUFF[v][key] = true
 					end
+					-- update screen head
+					if data.bScreenHead then
+						if not CTM_SCREEN_HEAD[v] then
+							CTM_SCREEN_HEAD[v] = {}
+						end
+						if not CTM_SCREEN_HEAD[v][key] then
+							FireUIEvent("MY_SA_CREATE", KBuff.bCanCancel and "BUFF" or "DEBUFF", v, {
+								dwID = item.dwID,
+								col = data.col or "yellow",
+								text = item.szName .. "_" .. p.szName,
+							})
+							CTM_SCREEN_HEAD[v][key] = true
+						end
+					end
 					tCheck[key] = true
 				else
 					if item then
@@ -1650,6 +1666,9 @@ function CTM:RefreshBuff()
 					end
 					if CTM_CAUTION_BUFF[v] then
 						CTM_CAUTION_BUFF[v][key] = nil
+					end
+					if CTM_SCREEN_HEAD[v] then
+						CTM_SCREEN_HEAD[v][key] = nil
 					end
 				end
 			end
