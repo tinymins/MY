@@ -91,6 +91,7 @@ data = {
 	['close'] = '关闭',
 	['enable/disable'] = '开启/关闭',
 	['enable'] = '启用',
+	["Enable"] = "启用",
 
 	['reset data'] = '重置数据',
 	['analyse data'] = '分析数据',
@@ -354,4 +355,12 @@ data = {
 	["You finished %s, would you like to share?"] = "你获得了%s，是否愿意点击分享到公共数据查询中？",
 	["[%s] finished %s, would you like to share?"] = "[%s]获得了%s，是否愿意点击分享到公共数据查询中？",
 	["Please input your realname, left blank for anonymous report:"] = "输入您希望显示的分享者名称，匿名分享请留空：",
+
+	["Screen head alarm"] = "头顶警告",
+	["Draw school color"] = "绘制门派颜色",
+	["Low life/mana head alert"] = "战斗中低血蓝头顶报警",
+	["Only monitor self"] = "只监控自己",
+	["While HP less than %d."] = "血量低于%d。",
+	["While MP less than %d."] = "蓝量低于%d。",
+	["Preview"] = "预览",
 }
