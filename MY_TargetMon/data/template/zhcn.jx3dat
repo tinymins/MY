@@ -1,7 +1,7 @@
 (function()
-local __META__ = '__META__'
+local __META__ = "__META__"
 return {
-	uuid                = {__META__, {'nil', 'string'}, nil},
+	uuid                = {__META__, {"nil", "string"}, nil},
 	caption             = "新建目标监控",
 	type                = "BUFF",
 	target              = "CLIENT_PLAYER",
@@ -34,12 +34,12 @@ return {
 				enable = true,
 				iconid = 13,
 				name = "",
-				uuid = {__META__, {'nil', 'string'}, nil},
-				manually = {__META__, {'nil', 'boolean'}, nil},
+				uuid = {__META__, {"nil", "string"}, nil},
+				manually = {__META__, {"nil", "boolean"}, nil},
 				capture = true,
-				longAlias = {__META__, {'nil', 'string'}, nil},
+				longAlias = {__META__, {"nil", "string"}, nil},
 				rgbLongAlias = {255, 255, 0},
-				shortAlias = {__META__, {'nil', 'string'}, nil},
+				shortAlias = {__META__, {"nil", "string"}, nil},
 				rgbShortAlias = {255, 255, 0},
 				soundAppear = "",
 				soundDisappear = "",
@@ -54,7 +54,7 @@ return {
 						levels = {
 							__META__,
 							__VALUE__ = {},
-							__KEY_TEMPLATE__ = {__META__, {'number'}, nil},
+							__KEY_TEMPLATE__ = {__META__, {"number"}, nil},
 							__CHILD_TEMPLATE__ = { enable = true, iconid = 13 },
 						},
 						ignoreLevel = true,

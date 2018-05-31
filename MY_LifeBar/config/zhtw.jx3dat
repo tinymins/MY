@@ -15,7 +15,7 @@ data = {
 	nLifeHeight = 8,
 	nLifeOffsetX = 0,
 	nLifeOffsetY = 27,
-	szLifeDirection = 'LEFT_RIGHT',
+	szLifeDirection = "LEFT_RIGHT",
 
 	nLifePerOffsetX = 0,
 	nLifePerOffsetY = 42,
