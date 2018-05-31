@@ -103,9 +103,9 @@ local function FormatAutoFocusData(data)
 		dwMapID = -1,
 		tType = {
 			bAll = true,
-			[TARGET.NPC] = true,
-			[TARGET.PLAYER] = true,
-			[TARGET.DOODAD] = true,
+			[TARGET.NPC] = false,
+			[TARGET.PLAYER] = false,
+			[TARGET.DOODAD] = false,
 		},
 		tLife = {
 			bEnable = false,
