@@ -42,7 +42,7 @@ local D = {}
 MY_Focus = {}
 MY_Focus.bEnable            = false -- 是否启用
 MY_Focus.bMinimize          = false -- 是否最小化
-MY_Focus.bFocusBoss         = true  -- 焦点重要NPC
+MY_Focus.bFocusINpc         = true  -- 焦点重要NPC
 MY_Focus.bFocusFriend       = false -- 焦点附近好友
 MY_Focus.bFocusTong         = false -- 焦点帮会成员
 MY_Focus.bOnlyPublicMap     = true  -- 仅在公共地图焦点好友帮会成员
@@ -51,6 +51,7 @@ MY_Focus.bFocusEnemy        = false -- 焦点敌对玩家
 MY_Focus.bAutoHide          = true  -- 无焦点时隐藏
 MY_Focus.nMaxDisplay        = 5     -- 最大显示数量
 MY_Focus.bAutoFocus         = true  -- 启用默认焦点
+MY_Focus.bEmbededFocus      = true  -- 启用内嵌默认焦点
 MY_Focus.bHideDeath         = false -- 隐藏死亡目标
 MY_Focus.bDisplayKungfuIcon = false -- 显示心法图标
 MY_Focus.bFocusJJCParty     = false -- 焦竞技场队友
@@ -62,6 +63,7 @@ MY_Focus.bHealHelper        = false -- 辅助治疗模式
 MY_Focus.bEnableSceneNavi   = false -- 场景追踪点
 MY_Focus.fScaleX            = 1     -- 缩放比例
 MY_Focus.fScaleY            = 1     -- 缩放比例
+MY_Focus.tEmbededFocus = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Focus/data/embeded/') or {}
 MY_Focus.tAutoFocus = {}    -- 默认焦点
 MY_Focus.tFocusList = {     -- 永久焦点
 	[TARGET.PLAYER] = {},   -- dwID
@@ -71,7 +73,7 @@ MY_Focus.tFocusList = {     -- 永久焦点
 MY_Focus.anchor = { x=-300, y=220, s='TOPRIGHT', r='TOPRIGHT' } -- 默认坐标
 RegisterCustomData('MY_Focus.bEnable', 1)
 RegisterCustomData('MY_Focus.bMinimize')
-RegisterCustomData('MY_Focus.bFocusBoss')
+RegisterCustomData('MY_Focus.bFocusINpc')
 RegisterCustomData('MY_Focus.bFocusFriend')
 RegisterCustomData('MY_Focus.bFocusTong')
 RegisterCustomData('MY_Focus.bOnlyPublicMap')
@@ -80,6 +82,7 @@ RegisterCustomData('MY_Focus.bFocusEnemy')
 RegisterCustomData('MY_Focus.bAutoHide')
 RegisterCustomData('MY_Focus.nMaxDisplay')
 RegisterCustomData('MY_Focus.bAutoFocus')
+RegisterCustomData('MY_Focus.bEmbededFocus')
 RegisterCustomData('MY_Focus.bHideDeath')
 RegisterCustomData('MY_Focus.bDisplayKungfuIcon')
 RegisterCustomData('MY_Focus.bFocusJJCParty')
@@ -291,6 +294,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		else
 			dwTemplateID = KObject.dwTemplateID
 		end
+		-- 判断临时焦点
 		if l_tTempFocusList[dwType][dwID] then
 			bFocus = true
 		end
@@ -310,6 +314,13 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		-- 判断默认焦点
 		if not bFocus and MY_Focus.bAutoFocus then
 			tRule = D.GetEligibleRule(MY_Focus.tAutoFocus, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
+			if tRule then
+				bFocus = true
+			end
+		end
+		-- 判断内嵌默认焦点
+		if not bFocus and MY_Focus.bEmbededFocus then
+			tRule = D.GetEligibleRule(MY_Focus.tEmbededFocus, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
 			if tRule then
 				bFocus = true
 			end
@@ -364,7 +375,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		end
 
 		-- 判断重要NPC
-		if not bFocus and MY_Focus.bFocusBoss
+		if not bFocus and MY_Focus.bFocusINpc
 		and dwType == TARGET.NPC
 		and MY.IsImportantNpc(me.GetMapID(), KObject.dwTemplateID) then
 			bFocus = true
@@ -499,6 +510,14 @@ end
 
 do
 local function onInit()
+	-- 内嵌默认焦点
+	if not MY_Focus.tEmbededFocus then
+		MY_Focus.tEmbededFocus = {}
+	end
+	for i, v in ipairs(MY_Focus.tEmbededFocus) do
+		MY_Focus.tEmbededFocus[i] = FormatAutoFocusData(v)
+	end
+	-- 用户自定义默认焦点
 	if not MY_Focus.tAutoFocus then
 		MY_Focus.tAutoFocus = {}
 	end
@@ -508,6 +527,7 @@ local function onInit()
 		end
 		MY_Focus.tAutoFocus[i] = FormatAutoFocusData(v)
 	end
+	-- 永久焦点
 	if not MY_Focus.tFocusList then
 		MY_Focus.tFocusList = {}
 	end

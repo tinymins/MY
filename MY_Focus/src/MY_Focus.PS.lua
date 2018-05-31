@@ -224,7 +224,7 @@ function PS.OnPanelActive(wnd)
 
 	-- ср╡Ю
 	local x, y = xr, yr
-	local deltaY = (h - y * 2) / 19
+	local deltaY = (h - y * 2) / 20
 	ui:append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['hide when empty'],
 		checked = MY_Focus.bAutoHide,
@@ -239,9 +239,22 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = wr, text = _L['auto focus very important npc'],
 		tip = _L['boss list is always been collecting and updating'],
 		tippostype = MY.Const.UI.Tip.POS_TOP,
-		checked = MY_Focus.bFocusBoss,
+		checked = MY_Focus.bFocusINpc,
 		oncheck = function(bChecked)
-			MY_Focus.bFocusBoss = bChecked
+			MY_Focus.bFocusINpc = bChecked
+			MY_Focus.RescanNearby()
+		end,
+		autoenable = function() return MY_Focus.IsEnabled() end,
+	})
+	y = y + deltaY
+
+	ui:append('WndCheckBox', {
+		x = x, y = y, w = wr, text = _L['Embeded focus (powered by nangongbo)'],
+		tip = _L['Embeded focus is always been collecting and updating'],
+		tippostype = MY.Const.UI.Tip.POS_TOP,
+		checked = MY_Focus.bEmbededFocus,
+		oncheck = function(bChecked)
+			MY_Focus.bEmbededFocus = bChecked
 			MY_Focus.RescanNearby()
 		end,
 		autoenable = function() return MY_Focus.IsEnabled() end,
