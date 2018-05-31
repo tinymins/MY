@@ -10,11 +10,11 @@ local STATE = {
     HIDDING = 4, -- ½¥±äÒþ²ØÖÐ
 }
 local m_nState = STATE.SHOW
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot..'MY_Toolbox/lang/')
 local _Cache = {}
 MY_AutoHideChat = {}
 MY_AutoHideChat.bAutoHideChatPanel = false
-RegisterCustomData("MY_AutoHideChat.bAutoHideChatPanel")
+RegisterCustomData('MY_AutoHideChat.bAutoHideChatPanel')
 
 -- get sys chat bg alpha
 MY_AutoHideChat.GetBgAlpha = function()
@@ -47,7 +47,7 @@ MY_AutoHideChat.ShowChatPanel = function(nShowFrame, nDelayFrame, callback)
         MY.BreatheCall('MY_AutoHideChat_Hide')
     end
     m_nState = STATE.SHOWING
-    
+
     -- get start alpha
     local nStartAlpha = Station.Lookup('Lowest1/ChatTitleBG'):GetAlpha()
     local nStartFrame = GetLogicFrameCount()
@@ -101,7 +101,7 @@ MY_AutoHideChat.HideChatPanel = function(nHideFrame, nDelayFrame, callback)
         MY.BreatheCall('MY_AutoHideChat_Hide')
     end
     m_nState = STATE.HIDDING
-    
+
     -- get start alpha
     local nStartAlpha = Station.Lookup('Lowest1/ChatTitleBG'):GetAlpha()
     local nStartFrame = GetLogicFrameCount()
@@ -175,7 +175,7 @@ MY_AutoHideChat.ApplyConfig = function()
                 MY_AutoHideChat.HideChatPanel(GLOBAL.GAME_FPS / 2, GLOBAL.GAME_FPS * 5)
             end)
         end)
-        
+
         -- hook chat edit box
         local hEditInput = Station.Lookup('Lowest2/EditBox/Edit_Input')
         -- save org
@@ -208,7 +208,7 @@ MY_AutoHideChat.ApplyConfig = function()
             hEditInput.OnSetFocus = nil
         end
         hEditInput._MY_T_AHCP_OnSetFocus = nil
-        
+
         if hEditInput._MY_T_AHCP_OnKillFocus then
             hEditInput.OnKillFocus = hEditInput._MY_T_AHCP_OnKillFocus
         else
@@ -216,7 +216,7 @@ MY_AutoHideChat.ApplyConfig = function()
         end
         hEditInput._MY_T_AHCP_OnKillFocus = nil
         MY.Chat.HookChatPanel('MY_AutoHideChat')
-        
+
         MY_AutoHideChat.ShowChatPanel()
     end
 end

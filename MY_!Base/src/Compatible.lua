@@ -8,7 +8,7 @@
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
 EMPTY_TABLE = SetmetaReadonly({})
-XML_LINE_BREAKER = GetFormatText("\n")
+XML_LINE_BREAKER = GetFormatText('\n')
 MENU_DIVIDER = { bDevide = true }
 local XML_LINE_BREAKER = XML_LINE_BREAKER
 local srep, tostring, string2byte = string.rep, tostring, string.byte
@@ -64,9 +64,9 @@ end
 -- -- 只读表字典枚举
 -- if not pairs_c then
 -- function pairs_c(t, ...)
--- 	if type(t) == "table" then
+-- 	if type(t) == 'table' then
 -- 		local metatable = getmetatable(t)
--- 		if type(metatable) == "table" and metatable.const_table then
+-- 		if type(metatable) == 'table' and metatable.const_table then
 -- 			return pairs(metatable.const_table, ...)
 -- 		end
 -- 	end
@@ -77,9 +77,9 @@ end
 -- -- 只读表数组枚举
 -- if not ipairs_c then
 -- function ipairs_c(t, ...)
--- 	if type(t) == "table" then
+-- 	if type(t) == 'table' then
 -- 		local metatable = getmetatable(t)
--- 		if type(metatable) == "table" and metatable.const_table then
+-- 		if type(metatable) == 'table' and metatable.const_table then
 -- 			return ipairs(metatable.const_table, ...)
 -- 		end
 -- 	end
@@ -90,12 +90,12 @@ end
 if not clone then
 function clone(var)
 	local szType = type(var)
-	if szType == "nil"
-	or szType == "boolean"
-	or szType == "number"
-	or szType == "string" then
+	if szType == 'nil'
+	or szType == 'boolean'
+	or szType == 'number'
+	or szType == 'string' then
 		return var
-	elseif szType == "table" then
+	elseif szType == 'table' then
 		local t = {}
 		for key, val in pairs(var) do
 			key = clone(key)
@@ -103,8 +103,8 @@ function clone(var)
 			t[key] = val
 		end
 		return t
-	elseif szType == "function"
-	or szType == "userdata" then
+	elseif szType == 'function'
+	or szType == 'userdata' then
 		return nil
 	else
 		return nil
@@ -115,17 +115,17 @@ end
 if not empty then
 function empty(var)
 	local szType = type(var)
-	if szType == "nil" then
+	if szType == 'nil' then
 		return true
-	elseif szType == "boolean" then
+	elseif szType == 'boolean' then
 		return var
-	elseif szType == "number" then
+	elseif szType == 'number' then
 		return var == 0
-	elseif szType == "string" then
-		return var == ""
-	elseif szType == "function" then
+	elseif szType == 'string' then
+		return var == ''
+	elseif szType == 'function' then
 		return false
-	elseif szType == "table" then
+	elseif szType == 'table' then
 		for _, _ in pairs(var) do
 			return false
 		end
@@ -141,49 +141,49 @@ function var2str(var, indent, level)
 	local function table_r(var, level, indent)
 		local t = {}
 		local szType = type(var)
-		if szType == "nil" then
-			tinsert(t, "nil")
-		elseif szType == "number" then
+		if szType == 'nil' then
+			tinsert(t, 'nil')
+		elseif szType == 'number' then
 			tinsert(t, tostring(var))
-		elseif szType == "string" then
-			tinsert(t, string.format("%q", var))
-		elseif szType == "function" then
+		elseif szType == 'string' then
+			tinsert(t, string.format('%q', var))
+		elseif szType == 'function' then
 			local s = string.dump(var)
 			tinsert(t, 'loadstring("')
-			-- "string slice too long"
+			-- 'string slice too long'
 			for i = 1, #s, 2000 do
-				tinsert(t, tconcat({'', string2byte(s, i, i + 2000 - 1)}, "\\"))
+				tinsert(t, tconcat({'', string2byte(s, i, i + 2000 - 1)}, '\\'))
 			end
 			tinsert(t, '")')
-		elseif szType == "boolean" then
+		elseif szType == 'boolean' then
 			tinsert(t, tostring(var))
-		elseif szType == "table" then
-			tinsert(t, "{")
-			local s_tab_equ = "]="
+		elseif szType == 'table' then
+			tinsert(t, '{')
+			local s_tab_equ = ']='
 			if indent then
-				s_tab_equ = "] = "
+				s_tab_equ = '] = '
 				if not empty(var) then
-					tinsert(t, "\n")
+					tinsert(t, '\n')
 				end
 			end
 			for key, val in pairs(var) do
 				if indent then
 					tinsert(t, srep(indent, level + 1))
 				end
-				tinsert(t, "[")
+				tinsert(t, '[')
 				tinsert(t, table_r(key, level + 1, indent))
-				tinsert(t, s_tab_equ) --"] = "
+				tinsert(t, s_tab_equ) --'] = '
 				tinsert(t, table_r(val, level + 1, indent))
-				tinsert(t, ",")
+				tinsert(t, ',')
 				if indent then
-					tinsert(t, "\n")
+					tinsert(t, '\n')
 				end
 			end
 			if indent and not empty(var) then
 				tinsert(t, srep(indent, level))
 			end
-			tinsert(t, "}")
-		else --if (szType == "userdata") then
+			tinsert(t, '}')
+		else --if (szType == 'userdata') then
 			tinsert(t, '"')
 			tinsert(t, tostring(var))
 			tinsert(t, '"')
@@ -207,7 +207,7 @@ end
 if not GetUserAccount then
 function GetUserAccount()
 	local szAccount
-	local hFrame = Wnd.OpenWindow("LoginPassword")
+	local hFrame = Wnd.OpenWindow('LoginPassword')
 	if hFrame then
 		local hEdit = hFrame:Lookup('WndPassword/Edit_Account')
 		if hEdit then
@@ -434,7 +434,7 @@ end
 
 if not IsSameData then
 function IsSameData(data1, data2)
-	if type(data1) == "table" and type(data2) == "table" then
+	if type(data1) == 'table' and type(data2) == 'table' then
 		for k, v in pairs(data1) do
 			if not IsSameData(data1[k], data2[k]) then
 				return false
@@ -460,7 +460,7 @@ end
 -- 判断一个tSay结构是不是背景通讯
 if not IsBgMsg then
 function IsBgMsg(t)
-	return type(t) == "table" and t[1] and t[1].type == "eventlink" and t[1].name == "BG_CHANNEL_MSG"
+	return type(t) == 'table' and t[1] and t[1].type == 'eventlink' and t[1].name == 'BG_CHANNEL_MSG'
 end
 end
 
@@ -475,34 +475,34 @@ end
 -- 	 	or nChannel == PLAYER_TALK_CHANNEL.FRIENDS
 -- 	 	or nChannel == PLAYER_TALK_CHANNEL.MENTOR
 -- 	) then
--- 		local szKey, aParam = t[1].linkinfo or "", {}
+-- 		local szKey, aParam = t[1].linkinfo or '', {}
 -- 		if #t > 1 then
 -- 			for i = 2, #t do
--- 				if t[i].type == "text" then
+-- 				if t[i].type == 'text' then
 -- 					table.insert(aParam, (t[i].text))
--- 				elseif t[i].type == "eventlink" and t[i].name == "" then
+-- 				elseif t[i].type == 'eventlink' and t[i].name == '' then
 -- 					table.insert(aParam, (str2var(t[i].linkinfo)))
 -- 				end
 -- 			end
 -- 		end
--- 		FireUIEvent("ON_BG_CHANNEL_MSG", szKey, nChannel, dwTalkerID, szName, aParam)
+-- 		FireUIEvent('ON_BG_CHANNEL_MSG', szKey, nChannel, dwTalkerID, szName, aParam)
 -- 	end
 -- end
 -- end
 
 -- 发送背景通讯
--- SendBgMsg("茗伊", "RAID_READY_CONFIRM") -- 单人背景通讯
--- SendBgMsg(PLAYER_TALK_CHANNEL.RAID, "RAID_READY_CONFIRM") -- 频道背景通讯
+-- SendBgMsg('茗伊', 'RAID_READY_CONFIRM') -- 单人背景通讯
+-- SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'RAID_READY_CONFIRM') -- 频道背景通讯
 if not SendBgMsg then
 function SendBgMsg(nChannel, szKey, ...)
-	local tSay ={{ type = "eventlink", name = "BG_CHANNEL_MSG", linkinfo = szKey }}
-	local szTarget = ""
-	if type(nChannel) == "string" then
+	local tSay ={{ type = 'eventlink', name = 'BG_CHANNEL_MSG', linkinfo = szKey }}
+	local szTarget = ''
+	if type(nChannel) == 'string' then
 		szTarget = nChannel
 		nChannel = PLAYER_TALK_CHANNEL.WHISPER
 	end
 	for _, v in ipairs({...}) do
-		table.insert(tSay, { type = "eventlink", name = "", linkinfo = var2str(v) })
+		table.insert(tSay, { type = 'eventlink', name = '', linkinfo = var2str(v) })
 	end
 	GetClientPlayer().Talk(nChannel, szTarget, tSay)
 end
@@ -569,10 +569,10 @@ end
 end
 
 if not str2var then
-local szTempLog = "interface/temp.log"
-local szTempJx3dat = "interface/temp.jx3dat"
+local szTempLog = 'interface/temp.log'
+local szTempJx3dat = 'interface/temp.jx3dat'
 function str2var(szText)
-	Log(szTempLog, szText, "clear close")
+	Log(szTempLog, szText, 'clear close')
 	CPath.Move(szTempLog, szTempJx3dat)
 	local data = LoadLUAData(szTempJx3dat)
 	CPath.DelFile(szTempJx3dat)
@@ -598,7 +598,7 @@ end
 end
 if not Table_GetProfessionName then
 function Table_GetProfessionName(dwProfessionID)
-	local szName = ""
+	local szName = ''
 	local tProfession = g_tTable.ProfessionName:Search(dwProfessionID)
 	if tProfession then
 		szName = tProfession.szName
@@ -609,8 +609,8 @@ end
 
 if not EditBox_AppendLinkPlayer then
 function EditBox_AppendLinkPlayer(szName)
-	local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
-	edit:InsertObj("[".. szName .."]", { type = "name", text = "[".. szName .."]", name = szName })
+	local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
+	edit:InsertObj('['.. szName ..']', { type = 'name', text = '['.. szName ..']', name = szName })
 	Station.SetFocusWindow(edit)
 	return true
 end
@@ -622,9 +622,9 @@ function EditBox_AppendLinkItem(dwID)
 	if not item then
 		return false
 	end
-	local szName = "[" .. GetItemNameByItem(item) .."]"
-	local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
-	edit:InsertObj(szName, { type = "item", text = szName, item = item.dwID })
+	local szName = '[' .. GetItemNameByItem(item) ..']'
+	local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
+	edit:InsertObj(szName, { type = 'item', text = szName, item = item.dwID })
 	Station.SetFocusWindow(edit)
 	return true
 end

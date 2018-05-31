@@ -2,7 +2,7 @@
 -- @Date:   2015-01-21 15:21:19
 -- @Last Modified by:   Administrator
 -- @Last Modified time: 2016-12-13 01:03:53
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_ThreatRank/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_ThreatRank/lang/')
 
 MY_ThreatRank = {
 	bEnable       = true,  -- 开启
@@ -18,7 +18,7 @@ MY_ThreatRank = {
 	tAnchor       = {},
 	nStyle        = 2,
 }
-MY.RegisterCustomData("MY_ThreatRank")
+MY.RegisterCustomData('MY_ThreatRank')
 
 local TS = MY_ThreatRank
 local ipairs, pairs = ipairs, pairs
@@ -31,38 +31,38 @@ local MY_GetBuff, MY_GetBuffName, MY_GetEndTime = MY.GetBuff, MY.GetBuffName, MY
 local GetNpcIntensity = GetNpcIntensity
 local GetTime = GetTime
 
-local TS_INIFILE = MY.GetAddonInfo().szRoot .. "MY_ThreatRank/ui/MY_ThreatRank.ini"
+local TS_INIFILE = MY.GetAddonInfo().szRoot .. 'MY_ThreatRank/ui/MY_ThreatRank.ini'
 
 local _TS = {
-	tStyle = LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_ThreatRank/data/style.jx3dat"),
+	tStyle = LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_ThreatRank/data/style.jx3dat'),
 }
 local function IsEnabled() return TS.bEnable end
 
 function TS.OnFrameCreate()
-	this:RegisterEvent("CHARACTER_THREAT_RANKLIST")
-	this:RegisterEvent("UI_SCALED")
-	this:RegisterEvent("TARGET_CHANGE")
-	this:RegisterEvent("FIGHT_HINT")
-	this:RegisterEvent("LOADING_END")
-	this.hItemData      = this:CreateItemData(MY.GetAddonInfo().szRoot .. "MY_ThreatRank/ui/Handle_ThreatBar.ini", "Handle_ThreatBar")
+	this:RegisterEvent('CHARACTER_THREAT_RANKLIST')
+	this:RegisterEvent('UI_SCALED')
+	this:RegisterEvent('TARGET_CHANGE')
+	this:RegisterEvent('FIGHT_HINT')
+	this:RegisterEvent('LOADING_END')
+	this.hItemData      = this:CreateItemData(MY.GetAddonInfo().szRoot .. 'MY_ThreatRank/ui/Handle_ThreatBar.ini', 'Handle_ThreatBar')
 	this.dwTargetID     = 0
 	this.nTime          = 0
 	this.bSelfTreatRank = 0
-	this.bg         = this:Lookup("", "Image_Background")
+	this.bg         = this:Lookup('', 'Image_Background')
 	this.bg:SetAlpha(255 * TS.nBGAlpha / 100)
-	this.handle     = this:Lookup("", "Handle_List")
-	this.txt        = this:Lookup("", "Handle_TargetInfo"):Lookup("Text_Name")
-	this.CastBar    = this:Lookup("", "Handle_TargetInfo"):Lookup("Image_Cast_Bar")
-	this.Life       = this:Lookup("", "Handle_TargetInfo"):Lookup("Image_Life")
-	this:Lookup("", "Text_Title"):SetText(g_tStrings.HATRED_COLLECT)
+	this.handle     = this:Lookup('', 'Handle_List')
+	this.txt        = this:Lookup('', 'Handle_TargetInfo'):Lookup('Text_Name')
+	this.CastBar    = this:Lookup('', 'Handle_TargetInfo'):Lookup('Image_Cast_Bar')
+	this.Life       = this:Lookup('', 'Handle_TargetInfo'):Lookup('Image_Life')
+	this:Lookup('', 'Text_Title'):SetText(g_tStrings.HATRED_COLLECT)
 	_TS.UpdateAnchor(this)
-	TS.OnEvent("TARGET_CHANGE")
+	TS.OnEvent('TARGET_CHANGE')
 end
 
 function TS.OnEvent(szEvent)
-	if szEvent == "UI_SCALED" then
+	if szEvent == 'UI_SCALED' then
 		_TS.UpdateAnchor(this)
-	elseif szEvent == "TARGET_CHANGE" then
+	elseif szEvent == 'TARGET_CHANGE' then
 		local dwType, dwID = Target_GetTargetData()
 		local dwTargetID
 		-- check tar
@@ -85,15 +85,15 @@ function TS.OnEvent(szEvent)
 		else
 			_TS.UnBreathe()
 		end
-	elseif szEvent == "CHARACTER_THREAT_RANKLIST" then
+	elseif szEvent == 'CHARACTER_THREAT_RANKLIST' then
 		if arg0 == this.dwTargetID then
 			_TS.UpdateThreatBars(arg1, arg2, arg0)
 		end
-	elseif szEvent == "FIGHT_HINT" then
+	elseif szEvent == 'FIGHT_HINT' then
 		if not arg0 then
 			this.nTime = GetTime()
 		end
-	elseif szEvent == "LOADING_END" then
+	elseif szEvent == 'LOADING_END' then
 		this.dwTargetID     = 0
 		this.nTime          = 0
 		this.bSelfTreatRank = 0
@@ -114,7 +114,7 @@ function TS.OnFrameBreathe()
 		else
 			local lifeper = p.nCurrentLife / p.nMaxLife
 			this.CastBar:Hide()
-			this.txt:SetText(MY_GetObjName(p, true) .. string.format(" (%0.1f%%)", lifeper * 100))
+			this.txt:SetText(MY_GetObjName(p, true) .. string.format(' (%0.1f%%)', lifeper * 100))
 			this.Life:SetPercentage(lifeper)
 		end
 
@@ -127,11 +127,11 @@ function TS.OnFrameBreathe()
 			[4101] = 0,
 			[8422] = 0
 		})
-		local hText = this:Lookup("", "Text_Title")
-		local szText = hText.szText or ""
+		local hText = this:Lookup('', 'Text_Title')
+		local szText = hText.szText or ''
 		if KBuff then
 			local szName = MY_GetBuffName(KBuff.dwID, KBuff.nLevel)
-			hText:SetText(string.format("%s (%ds)", szName, math.floor(MY_GetEndTime(KBuff.GetEndTime()))) .. szText)
+			hText:SetText(string.format('%s (%ds)', szName, math.floor(MY_GetEndTime(KBuff.GetEndTime()))) .. szText)
 			hText:SetFontColor(0, 255, 0)
 		else
 			hText:SetText(HATRED_COLLECT .. szText)
@@ -152,7 +152,7 @@ function TS.OnFrameBreathe()
 						local szMember = team.GetClientTeamMemberName(p.dwDropTargetPlayerID)
 						local nGroup = team.GetMemberGroupIndex(p.dwDropTargetPlayerID) + 1
 						local name = MY_GetObjName(p)
-						local oContent = {_L("Well done! %s in %d group first to attack %s!!", nGroup, szMember, name), r = 150, g = 250, b = 230}
+						local oContent = {_L('Well done! %s in %d group first to attack %s!!', nGroup, szMember, name), r = 150, g = 250, b = 230}
 						local oTitile = {g_tStrings.HATRED_COLLECT, r = 150, g = 250, b = 230}
 						MY.Sysmsg(oContent, oTitile)
 					end
@@ -166,15 +166,15 @@ end
 
 function TS.OnLButtonClick()
 	local szName = this:GetName()
-	if szName == "Btn_Setting" then
+	if szName == 'Btn_Setting' then
 		MY.OpenPanel()
-		MY.SwitchTab("MY_ThreatRank")
+		MY.SwitchTab('MY_ThreatRank')
 	end
 end
 
 function TS.OnCheckBoxCheck()
 	local szName = this:GetName()
-	if szName == "CheckBox_ScrutinyLock" then
+	if szName == 'CheckBox_ScrutinyLock' then
 		local dwType, dwID = Target_GetTargetData()
 		local frame = this:GetRoot()
 		frame.dwLockTargetID = frame.dwTargetID
@@ -183,7 +183,7 @@ end
 
 function TS.OnCheckBoxUncheck()
 	local szName = this:GetName()
-	if szName == "CheckBox_ScrutinyLock" then
+	if szName == 'CheckBox_ScrutinyLock' then
 		local dwType, dwID = Target_GetTargetData()
 		local frame = this:GetRoot()
 		frame.dwLockTargetID = 0
@@ -201,7 +201,7 @@ function TS.OnFrameDragEnd()
 end
 
 function _TS.GetFrame()
-	return Station.Lookup("Normal/MY_ThreatRank")
+	return Station.Lookup('Normal/MY_ThreatRank')
 end
 
 function _TS.CheckOpen()
@@ -223,7 +223,7 @@ end
 function _TS.OpenPanel()
 	local frame = _TS.GetFrame()
 	if not frame then
-		frame = Wnd.OpenWindow(TS_INIFILE, "MY_ThreatRank")
+		frame = Wnd.OpenWindow(TS_INIFILE, 'MY_ThreatRank')
 		local dwType = Target_GetTargetData()
 		if dwType ~= TARGET.NPC then
 			frame:Hide()
@@ -244,9 +244,9 @@ function _TS.UnBreathe()
 	frame.dwTargetID = 0
 	frame.handle:Clear()
 	frame.bg:SetSize(240, 55)
-	frame.txt:SetText(_L["Loading..."])
+	frame.txt:SetText(_L['Loading...'])
 	frame.Life:SetPercentage(0)
-	frame:Lookup("", "Text_Title").szText = ""
+	frame:Lookup('', 'Text_Title').szText = ''
 end
 
 function _TS.UpdateAnchor(frame)
@@ -254,7 +254,7 @@ function _TS.UpdateAnchor(frame)
 	if not IsEmpty(a) then
 		frame:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
 	else
-		frame:SetPoint("TOPRIGHT", -300, 300, "TOPRIGHT", 0, 0)
+		frame:SetPoint('TOPRIGHT', -300, 300, 'TOPRIGHT', 0, 0)
 	end
 	this:CorrectPos()
 end
@@ -318,9 +318,9 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 			if UI_GetClientPlayerID() == v.id then
 				if TS.nOTAlertLevel > 0 and GetNpcIntensity(KGnpc) > 2 then
 					if this.bSelfTreatRank < TS.nOTAlertLevel and v.val / nTopRank >= TS.nOTAlertLevel then
-						MY.Topmsg(_L("** You Threat more than %d, 120% is Out of Taunt! **", TS.nOTAlertLevel * 100))
+						MY.Topmsg(_L('** You Threat more than %d, 120% is Out of Taunt! **', TS.nOTAlertLevel * 100))
 						if TS.bOTAlertSound then
-							PlaySound(SOUND.UI_SOUND, _L["SOUND_nat_view2"])
+							PlaySound(SOUND.UI_SOUND, _L['SOUND_nat_view2'])
 						end
 					end
 				end
@@ -335,21 +335,21 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 			if v.val ~= 0 then
 				fDiff = v.val / nTopRank
 				nThreatPercentage = fDiff * (100 / 120)
-				item:Lookup("Text_ThreatValue"):SetText(math.floor(100 * fDiff) .. "%")
+				item:Lookup('Text_ThreatValue'):SetText(math.floor(100 * fDiff) .. '%')
 			else
-				item:Lookup("Text_ThreatValue"):SetText("0%")
+				item:Lookup('Text_ThreatValue'):SetText('0%')
 			end
-			item:Lookup("Text_ThreatValue"):SetFontScheme(dat[6][2])
+			item:Lookup('Text_ThreatValue'):SetFontScheme(dat[6][2])
 
 			if v.id == dwTargetID then
 				if dwTargetID == UI_GetClientPlayerID() then
-					item:Lookup("Image_Target"):SetFrame(10)
+					item:Lookup('Image_Target'):SetFrame(10)
 				end
-				item:Lookup("Image_Target"):Show()
+				item:Lookup('Image_Target'):Show()
 			end
 
 			local r, g, b = 188, 188, 188
-			local szName, dwForceID = _L["Loading..."], 0
+			local szName, dwForceID = _L['Loading...'], 0
 			if IsPlayer(v.id) then
 				local p = GetPlayer(v.id)
 				if p then
@@ -378,35 +378,35 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 					end
 				end
 			end
-			item:Lookup("Text_ThreatName"):SetText(v.sort .. "." .. szName)
-			item:Lookup("Text_ThreatName"):SetFontScheme(dat[6][1])
-			item:Lookup("Text_ThreatName"):SetFontColor(r, g, b)
+			item:Lookup('Text_ThreatName'):SetText(v.sort .. '.' .. szName)
+			item:Lookup('Text_ThreatName'):SetFontScheme(dat[6][1])
+			item:Lookup('Text_ThreatName'):SetFontColor(r, g, b)
 			if TS.bForceIcon then
 				if MY.IsParty(v.id) and IsPlayer(v.id) then
 					local dwMountKungfuID =	team.GetMemberInfo(v.id).dwMountKungfuID
-					item:Lookup("Image_Icon"):FromIconID(Table_GetSkillIconID(dwMountKungfuID, 1))
+					item:Lookup('Image_Icon'):FromIconID(Table_GetSkillIconID(dwMountKungfuID, 1))
 				elseif IsPlayer(v.id) then
-					item:Lookup("Image_Icon"):FromUITex(GetForceImage(dwForceID))
+					item:Lookup('Image_Icon'):FromUITex(GetForceImage(dwForceID))
 				else
-					item:Lookup("Image_Icon"):FromUITex("ui/Image/TargetPanel/Target.uitex", 57)
+					item:Lookup('Image_Icon'):FromUITex('ui/Image/TargetPanel/Target.uitex', 57)
 				end
-				item:Lookup("Text_ThreatName"):SetRelPos(21, 4)
+				item:Lookup('Text_ThreatName'):SetRelPos(21, 4)
 				item:FormatAllItemPos()
 			end
 			if fDiff > 1 then
-				item:Lookup("Image_Treat_Bar"):FromUITex(unpack(dat[4]))
-				item:Lookup("Text_ThreatName"):SetFontColor(255, 255, 255) --红色的 无论如何都显示白了 否则看不清
+				item:Lookup('Image_Treat_Bar'):FromUITex(unpack(dat[4]))
+				item:Lookup('Text_ThreatName'):SetFontColor(255, 255, 255) --红色的 无论如何都显示白了 否则看不清
 			elseif fDiff >= 0.80 then
-				item:Lookup("Image_Treat_Bar"):FromUITex(unpack(dat[3]))
+				item:Lookup('Image_Treat_Bar'):FromUITex(unpack(dat[3]))
 			elseif fDiff >= 0.50 then
-				item:Lookup("Image_Treat_Bar"):FromUITex(unpack(dat[2]))
+				item:Lookup('Image_Treat_Bar'):FromUITex(unpack(dat[2]))
 			elseif fDiff >= 0.01 then
-				item:Lookup("Image_Treat_Bar"):FromUITex(unpack(dat[1]))
+				item:Lookup('Image_Treat_Bar'):FromUITex(unpack(dat[1]))
 			end
 			if TS.bSpecialSelf and v.id == UI_GetClientPlayerID() then
-				item:Lookup("Image_Treat_Bar"):FromUITex(unpack(dat[5]))
+				item:Lookup('Image_Treat_Bar'):FromUITex(unpack(dat[5]))
 			end
-			item:Lookup("Image_Treat_Bar"):SetPercentage(nThreatPercentage)
+			item:Lookup('Image_Treat_Bar'):SetPercentage(nThreatPercentage)
 			item:Show()
 		end
 		this.handle:FormatAllItemPos()
@@ -422,12 +422,12 @@ function PS.OnPanelActive(frame)
 	local X, Y = 20, 20
 	local x, y = X, Y
 
-	ui:append("Text", { x = x, y = y, text = g_tStrings.HATRED_COLLECT, font = 27 })
+	ui:append('Text', { x = x, y = y, text = g_tStrings.HATRED_COLLECT, font = 27 })
 	x = x + 10
 	y = y + 28
 
-	ui:append("WndCheckBox", {
-		x = x, y = y, w = 130, checked = TS.bEnable, text = _L["Enable ThreatScrutiny"],
+	ui:append('WndCheckBox', {
+		x = x, y = y, w = 130, checked = TS.bEnable, text = _L['Enable ThreatScrutiny'],
 		oncheck = function(bChecked)
 			TS.bEnable = bChecked
 			_TS.CheckOpen()
@@ -435,10 +435,10 @@ function PS.OnPanelActive(frame)
 	})
 	x = x + 130
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x, y = y, w = 250, checked = TS.bInDungeon,
 		enable = TS.bEnable,
-		text = _L["Only in the map type is Dungeon Enable plug-in"],
+		text = _L['Only in the map type is Dungeon Enable plug-in'],
 		oncheck = function(bChecked)
 			TS.bInDungeon = bChecked
 			_TS.CheckOpen()
@@ -448,11 +448,11 @@ function PS.OnPanelActive(frame)
 	y = y + 28
 
 	x = X
-	ui:append("Text", { x = x, y = y, text = _L["Alert Setting"], font = 27, autoenable = IsEnabled })
+	ui:append('Text', { x = x, y = y, text = _L['Alert Setting'], font = 27, autoenable = IsEnabled })
 	x = x + 10
 	y = y + 28
-	ui:append("WndCheckBox", {
-		x = x, y = y, checked = TS.nOTAlertLevel == 1, text = _L["OT Alert"],
+	ui:append('WndCheckBox', {
+		x = x, y = y, checked = TS.nOTAlertLevel == 1, text = _L['OT Alert'],
 		oncheck = function(bChecked)
 			if bChecked then -- 以后可以做% 暂时先不管
 				TS.nOTAlertLevel = 1
@@ -464,8 +464,8 @@ function PS.OnPanelActive(frame)
 	})
 	y = y + 28
 
-	ui:append("WndCheckBox", {
-		x = x, y = y, checked = TS.bOTAlertSound, text = _L["OT Alert Sound"],
+	ui:append('WndCheckBox', {
+		x = x, y = y, checked = TS.bOTAlertSound, text = _L['OT Alert Sound'],
 		autoenable = function() return TS.nOTAlertLevel == 1 end,
 		oncheck = function(bChecked)
 			TS.bOTAlertSound = bChecked
@@ -475,12 +475,12 @@ function PS.OnPanelActive(frame)
 	y = y + 28
 
 	x = X
-	ui:append("Text", { x = x, y = y, text = _L["Style Setting"], font = 27, autoenable = IsEnabled })
+	ui:append('Text', { x = x, y = y, text = _L['Style Setting'], font = 27, autoenable = IsEnabled })
 	y = y + 28
 
 	x = x + 10
-	ui:append("WndCheckBox", {
-		x = x , y = y, checked = TS.bTopTarget, text = _L["Top Target"],
+	ui:append('WndCheckBox', {
+		x = x , y = y, checked = TS.bTopTarget, text = _L['Top Target'],
 		oncheck = function(bChecked)
 			TS.bTopTarget = bChecked
 		end,
@@ -488,7 +488,7 @@ function PS.OnPanelActive(frame)
 	})
 	y = y + 28
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x , y = y, checked = TS.bForceColor, text = g_tStrings.STR_RAID_COLOR_NAME_SCHOOL,
 		oncheck = function(bChecked)
 			TS.bForceColor = bChecked
@@ -497,7 +497,7 @@ function PS.OnPanelActive(frame)
 	})
 	y = y + 28
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x , y = y, checked = TS.bForceIcon, text = g_tStrings.STR_SHOW_KUNGFU,
 		oncheck = function(bChecked)
 			TS.bForceIcon = bChecked
@@ -506,8 +506,8 @@ function PS.OnPanelActive(frame)
 	})
 	y = y + 28
 
-	ui:append("WndCheckBox", {
-		x = x , y = y, w = 200, checked = TS.bSpecialSelf, text = _L["Special Self"],
+	ui:append('WndCheckBox', {
+		x = x , y = y, w = 200, checked = TS.bSpecialSelf, text = _L['Special Self'],
 		oncheck = function(bChecked)
 			TS.bSpecialSelf = bChecked
 		end,
@@ -515,13 +515,13 @@ function PS.OnPanelActive(frame)
 	})
 	y = y + 28
 
-	ui:append("WndComboBox", {
-		x = x, y = y, text = _L["Style Select"],
+	ui:append('WndComboBox', {
+		x = x, y = y, text = _L['Style Select'],
 		menu = function()
 			local t = {}
 			for k, v in ipairs(_TS.tStyle) do
 				table.insert(t, {
-					szOption = _L("Style %d", k),
+					szOption = _L('Style %d', k),
 					bMCheck = true,
 					bChecked = TS.nStyle == k,
 					fnAction = function()
@@ -535,7 +535,7 @@ function PS.OnPanelActive(frame)
 	})
 	y = y + 28
 
-	ui:append("WndComboBox", {
+	ui:append('WndComboBox', {
 		x = x, y = y, text = g_tStrings.STR_SHOW_HATRE_COUNTS,
 		menu = function()
 			local t = {}
@@ -556,11 +556,11 @@ function PS.OnPanelActive(frame)
 	y = y + 28
 
 	x = X
-	ui:append("Text", { x = x, y = y, text = g_tStrings.STR_RAID_MENU_BG_ALPHA, autoenable = IsEnabled })
+	ui:append('Text', { x = x, y = y, text = g_tStrings.STR_RAID_MENU_BG_ALPHA, autoenable = IsEnabled })
 	x = x + 5
 	y = y + 28
-	ui:append("WndSliderBox", {
-		x = x, y = y, text = "",
+	ui:append('WndSliderBox', {
+		x = x, y = y, text = '',
 		range = {0, 100},
 		value = TS.nBGAlpha,
 		onchange = function(nVal)
@@ -573,7 +573,7 @@ function PS.OnPanelActive(frame)
 		autoenable = IsEnabled,
 	})
 end
-MY.RegisterPanel("MY_ThreatRank", g_tStrings.HATRED_COLLECT, _L["Target"], 632, {255, 255, 0}, PS)
+MY.RegisterPanel('MY_ThreatRank', g_tStrings.HATRED_COLLECT, _L['Target'], 632, {255, 255, 0}, PS)
 
 do
 local function GetMenu()
@@ -591,4 +591,4 @@ local function GetMenu()
 end
 MY.RegisterAddonMenu(GetMenu)
 end
-MY.RegisterEvent("LOADING_END", _TS.CheckOpen)
+MY.RegisterEvent('LOADING_END', _TS.CheckOpen)

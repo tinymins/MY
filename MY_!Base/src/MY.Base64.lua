@@ -60,8 +60,8 @@ end
 
 
 local function from_base64(to_decode)
-	local padded = to_decode:gsub("%s", "")
-	local unpadded = padded:gsub("=", "")
+	local padded = to_decode:gsub('%s', '')
+	local unpadded = padded:gsub('=', '')
 	local bit_pattern = ''
 	local decoded = ''
 
@@ -69,7 +69,7 @@ local function from_base64(to_decode)
 		local char = string.sub(to_decode, i, i)
 		local offset, _ = string.find(index_table, char)
 		if offset == nil then
-			error("Invalid character '" .. char .. "' found.")
+			error('Invalid character \'' .. char .. '\' found.')
 		end
 
 		bit_pattern = bit_pattern .. string.sub(to_binary(offset-1), 3)

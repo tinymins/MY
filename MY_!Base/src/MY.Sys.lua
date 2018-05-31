@@ -74,7 +74,7 @@ MY_DATA_PATH = SetmetaReadonly({
 	SERVER = 3,
 })
 if IsLocalFileExist(MY.GetAddonInfo().szRoot .. '@DATA/') then
-	CPath.Move(MY.GetAddonInfo().szRoot .. '@DATA/', MY.GetAddonInfo().szInterfaceRoot .. "MY#DATA/")
+	CPath.Move(MY.GetAddonInfo().szRoot .. '@DATA/', MY.GetAddonInfo().szInterfaceRoot .. 'MY#DATA/')
 end
 
 -- 格式化数据文件路径（替换$uid、$lang、$server以及补全相对路径）
@@ -84,47 +84,47 @@ function MY.FormatPath(oFilePath, tParams)
 		tParams = {}
 	end
 	local szFilePath, ePathType
-	if type(oFilePath) == "table" then
+	if type(oFilePath) == 'table' then
 		szFilePath, ePathType = unpack(oFilePath)
 	else
 		szFilePath, ePathType = oFilePath, MY_DATA_PATH.NORMAL
 	end
 	-- Unified the directory separator
 	szFilePath = string.gsub(szFilePath, '\\', '/')
-	-- if it's relative path then complete path with "/MY@DATA/"
+	-- if it's relative path then complete path with '/MY@DATA/'
 	if szFilePath:sub(1, 2) ~= './' and szFilePath:sub(2, 3) ~= ':/' then
 		if ePathType == MY_DATA_PATH.GLOBAL then
-			szFilePath = "!all-users@$lang/" .. szFilePath
+			szFilePath = '!all-users@$lang/' .. szFilePath
 		elseif ePathType == MY_DATA_PATH.ROLE then
-			szFilePath = "$uid@$lang/" .. szFilePath
+			szFilePath = '$uid@$lang/' .. szFilePath
 		elseif ePathType == MY_DATA_PATH.SERVER then
-			szFilePath = "#$relserver@$lang/" .. szFilePath
+			szFilePath = '#$relserver@$lang/' .. szFilePath
 		end
-		szFilePath = MY.GetAddonInfo().szInterfaceRoot .. "MY#DATA/" .. szFilePath
+		szFilePath = MY.GetAddonInfo().szInterfaceRoot .. 'MY#DATA/' .. szFilePath
 	end
 	-- if exist $uid then add user role identity
-	if string.find(szFilePath, "%$uid") then
-		szFilePath = szFilePath:gsub("%$uid", tParams["uid"] or MY.GetClientUUID())
+	if string.find(szFilePath, '%$uid') then
+		szFilePath = szFilePath:gsub('%$uid', tParams['uid'] or MY.GetClientUUID())
 	end
 	-- if exist $name then add user role identity
-	if string.find(szFilePath, "%$name") then
-		szFilePath = szFilePath:gsub("%$name", tParams["name"] or MY.GetClientInfo().szName or MY.GetClientUUID())
+	if string.find(szFilePath, '%$name') then
+		szFilePath = szFilePath:gsub('%$name', tParams['name'] or MY.GetClientInfo().szName or MY.GetClientUUID())
 	end
 	-- if exist $lang then add language identity
-	if string.find(szFilePath, "%$lang") then
-		szFilePath = szFilePath:gsub("%$lang", tParams["lang"] or string.lower(MY.GetLang()))
+	if string.find(szFilePath, '%$lang') then
+		szFilePath = szFilePath:gsub('%$lang', tParams['lang'] or string.lower(MY.GetLang()))
 	end
 	-- if exist $date then add date identity
-	if string.find(szFilePath, "%$date") then
-		szFilePath = szFilePath:gsub("%$date", tParams["date"] or MY.FormatTime("yyyyMMdd", GetCurrentTime()))
+	if string.find(szFilePath, '%$date') then
+		szFilePath = szFilePath:gsub('%$date', tParams['date'] or MY.FormatTime('yyyyMMdd', GetCurrentTime()))
 	end
 	-- if exist $server then add server identity
-	if string.find(szFilePath, "%$server") then
-		szFilePath = szFilePath:gsub("%$server", tParams["server"] or ((MY.Game.GetServer()):gsub('[/\\|:%*%?"<>]', '')))
+	if string.find(szFilePath, '%$server') then
+		szFilePath = szFilePath:gsub('%$server', tParams['server'] or ((MY.Game.GetServer()):gsub('[/\\|:%*%?"<>]', '')))
 	end
 	-- if exist $relserver then add relserver identity
-	if string.find(szFilePath, "%$relserver") then
-		szFilePath = szFilePath:gsub("%$relserver", tParams["relserver"] or ((MY.Game.GetRealServer()):gsub('[/\\|:%*%?"<>]', '')))
+	if string.find(szFilePath, '%$relserver') then
+		szFilePath = szFilePath:gsub('%$relserver', tParams['relserver'] or ((MY.Game.GetRealServer()):gsub('[/\\|:%*%?"<>]', '')))
 	end
 	local rootPath = GetRootPath():gsub('\\', '/')
 	if szFilePath:find(rootPath) == 1 then
@@ -146,11 +146,11 @@ function MY.GetLUADataPath(oFilePath)
 	local szFilePath = MY.FormatPath(oFilePath)
 	-- ensure has file name
 	if string.sub(szFilePath, -1) == '/' then
-		szFilePath = szFilePath .. "data"
+		szFilePath = szFilePath .. 'data'
 	end
 	-- ensure file ext name
 	if string.sub(szFilePath, -7):lower() ~= '.jx3dat' then
-		szFilePath = szFilePath .. ".jx3dat"
+		szFilePath = szFilePath .. '.jx3dat'
 	end
 	return szFilePath
 end
@@ -197,13 +197,13 @@ end
 -- 注册用户定义数据，支持全局变量数组遍历
 -- (void) MY.RegisterCustomData(string szVarPath[, number nVersion])
 function MY.RegisterCustomData(szVarPath, nVersion, szDomain)
-	szDomain = szDomain or "Role"
-	if _G and type(_G[szVarPath]) == "table" then
+	szDomain = szDomain or 'Role'
+	if _G and type(_G[szVarPath]) == 'table' then
 		for k, _ in pairs(_G[szVarPath]) do
-			RegisterCustomData(szDomain .. "/" .. szVarPath .. "." .. k, nVersion)
+			RegisterCustomData(szDomain .. '/' .. szVarPath .. '.' .. k, nVersion)
 		end
 	else
-		RegisterCustomData(szDomain .. "/" .. szVarPath, nVersion)
+		RegisterCustomData(szDomain .. '/' .. szVarPath, nVersion)
 	end
 end
 
@@ -332,10 +332,10 @@ MY.FormatDataStructure = FormatDataStructure
 end
 
 function MY.SetGlobalValue(szVarPath, Val)
-	local t = MY.String.Split(szVarPath, ".")
+	local t = MY.String.Split(szVarPath, '.')
 	local tab = _G
 	for k, v in ipairs(t) do
-		if type(tab[v]) == "nil" then
+		if type(tab[v]) == 'nil' then
 			tab[v] = {}
 		end
 		if k == #t then
@@ -347,8 +347,8 @@ end
 
 function MY.GetGlobalValue(szVarPath)
 	local tVariable = _G
-	for szIndex in string.gmatch(szVarPath, "[^%.]+") do
-		if tVariable and type(tVariable) == "table" then
+	for szIndex in string.gmatch(szVarPath, '[^%.]+') do
+		if tVariable and type(tVariable) == 'table' then
 			tVariable = tVariable[szIndex]
 		else
 			tVariable = nil
@@ -384,7 +384,7 @@ function MY.PlaySound(szFilePath, szCustomPath)
 		MY_DATA_PATH.ROLE,
 		MY_DATA_PATH.GLOBAL,
 	}) do
-		local szPath = MY.FormatPath({ "audio/" .. szCustomPath, ePathType })
+		local szPath = MY.FormatPath({ 'audio/' .. szCustomPath, ePathType })
 		if IsFileExist(szPath) then
 			return PlaySound(SOUND.UI_SOUND, szPath)
 		end
@@ -392,7 +392,7 @@ function MY.PlaySound(szFilePath, szCustomPath)
 	-- 播放默认声音
 	local szPath = string.gsub(szFilePath, '\\', '/')
 	if string.sub(szPath, 1, 2) ~= './' then
-		szPath = MY.GetAddonInfo().szFrameworkRoot .. "audio/" .. szPath
+		szPath = MY.GetAddonInfo().szFrameworkRoot .. 'audio/' .. szPath
 	end
 	if not IsFileExist(szPath) then
 		return
@@ -451,35 +451,35 @@ end
 
 do
 local MY_CALL_AJAX = {}
-local MY_AJAX_TAG = "MY_AJAX#"
+local MY_AJAX_TAG = 'MY_AJAX#'
 local l_ajaxsettingsmeta = {
 	__index = {
 		type = 'get',
-		driver = "curl",
+		driver = 'curl',
 		timeout = 60000,
-		charset = "utf8",
+		charset = 'utf8',
 	}
 }
 
 local function EncodePostData(data, t, prefix)
-	if type(data) == "table" then
+	if type(data) == 'table' then
 		local first = true
 		for k, v in pairs(data) do
 			if first then
 				first = false
 			else
-				insert(t, "&")
+				insert(t, '&')
 			end
-			if prefix == "" then
+			if prefix == '' then
 				EncodePostData(v, t, k)
 			else
-				EncodePostData(v, t, prefix .. "[" .. k .. "]")
+				EncodePostData(v, t, prefix .. '[' .. k .. ']')
 			end
 		end
 	else
-		if prefix ~= "" then
+		if prefix ~= '' then
 			insert(t, prefix)
-			insert(t, "=")
+			insert(t, '=')
 		end
 		insert(t, data)
 	end
@@ -487,7 +487,7 @@ end
 
 local function serialize(data)
 	local t = {}
-	EncodePostData(data, t, "")
+	EncodePostData(data, t, '')
 	local text = concat(t)
 	return text
 end
@@ -497,22 +497,22 @@ function MY.Ajax(settings)
 	setmetatable(settings, l_ajaxsettingsmeta)
 
 	local url, data = settings.url, settings.data
-	if settings.charset == "utf8" then
+	if settings.charset == 'utf8' then
 		url  = MY.ConvertToUTF8(url)
 		data = MY.ConvertToUTF8(data)
 	end
 
-	local ssl = url:sub(1, 6) == "https:"
+	local ssl = url:sub(1, 6) == 'https:'
 	local method, payload = unpack(MY.Split(settings.type, '/'))
-	if (method == "get" or method == "delete") and data then
-		if not url:find("?") then
-			url = url .. "?"
-		elseif url:sub(-1) ~= "&" then
-			url = url .. "&"
+	if (method == 'get' or method == 'delete') and data then
+		if not url:find('?') then
+			url = url .. '?'
+		elseif url:sub(-1) ~= '&' then
+			url = url .. '&'
 		end
 		url, data = url .. serialize(data), nil
 	end
-	assert(method == "post" or method == "get" or method == "put" or method == "delete", "[MY_AJAX] Unknown http request type: " .. method)
+	assert(method == 'post' or method == 'get' or method == 'put' or method == 'delete', '[MY_AJAX] Unknown http request type: ' .. method)
 
 	if not settings.success then
 		settings.success = function(html, status)
@@ -525,7 +525,7 @@ function MY.Ajax(settings)
 		end
 	end
 
-	if settings.driver == "curl" then
+	if settings.driver == 'curl' then
 		if not Curl_Create then
 			return settings.error()
 		end
@@ -550,8 +550,8 @@ function MY.Ajax(settings)
 		curl:OnError(settings.error)
 		curl:SetConnTimeout(settings.timeout)
 		curl:Perform()
-	elseif settings.driver == "webbrowser" then
-		assert(method == "get", "[MY_AJAX] Webbrowser only support get method, got " .. method)
+	elseif settings.driver == 'webbrowser' then
+		assert(method == 'get', '[MY_AJAX] Webbrowser only support get method, got ' .. method)
 		local RequestID, hFrame
 		local nFreeWebPages = #_C.tFreeWebPages
 		if nFreeWebPages > 0 then
@@ -561,8 +561,8 @@ function MY.Ajax(settings)
 		end
 		-- create page
 		if not hFrame then
-			RequestID = ("%X_%X"):format(GetTickCount(), math.floor(math.random() * 65536))
-			hFrame = Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. 'ui/WndWebPage.ini', "MYRR_" .. RequestID)
+			RequestID = ('%X_%X'):format(GetTickCount(), math.floor(math.random() * 65536))
+			hFrame = Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. 'ui/WndWebPage.ini', 'MYRR_' .. RequestID)
 			hFrame:Hide()
 		end
 		local wWebPage = hFrame:Lookup('WndWebPage')
@@ -570,10 +570,10 @@ function MY.Ajax(settings)
 		-- bind callback function
 		wWebPage.OnDocumentComplete = function()
 			local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
-			if szUrl ~= szTitle or szContent ~= "" then
-				MY.Debug({string.format("%s - %s", szTitle, szUrl)}, 'MYRR::OnDocumentComplete', MY_DEBUG.LOG)
+			if szUrl ~= szTitle or szContent ~= '' then
+				MY.Debug({string.format('%s - %s', szTitle, szUrl)}, 'MYRR::OnDocumentComplete', MY_DEBUG.LOG)
 				-- 注销超时处理时钟
-				MY.DelayCall("MYRR_TO_" .. RequestID, false)
+				MY.DelayCall('MYRR_TO_' .. RequestID, false)
 				-- 成功回调函数
 				if settings.success then
 					local status, err = pcall_this(settings.context, settings.success, settings, szContent)
@@ -589,11 +589,11 @@ function MY.Ajax(settings)
 		MY.Debug({settings.url}, 'MYRR', MY_DEBUG.LOG)
 		-- register request timeout clock
 		if settings.timeout > 0 then
-			MY.DelayCall("MYRR_TO_" .. RequestID, settings.timeout, function()
+			MY.DelayCall('MYRR_TO_' .. RequestID, settings.timeout, function()
 				MY.Debug({settings.url}, 'MYRR::Timeout', MY_DEBUG.WARNING) -- log
 				-- request timeout, call timeout function.
 				if settings.error then
-					local status, err = pcall_this(settings.context, settings.error, settings, "timeout")
+					local status, err = pcall_this(settings.context, settings.error, settings, 'timeout')
 					if not status then
 						MY.Debug({err}, 'MYRR::TIMEOUT', MY_DEBUG.ERROR)
 					end
@@ -604,13 +604,13 @@ function MY.Ajax(settings)
 
 		-- start ie navigate
 		wWebPage:Navigate(url)
-	else -- if settings.driver == "origin" then
+	else -- if settings.driver == 'origin' then
 		local szKey = GetTickCount() * 100
 		while MY_CALL_AJAX[MY_AJAX_TAG .. szKey] do
 			szKey = szKey + 1
 		end
 		szKey = MY_AJAX_TAG .. szKey
-		if method == "post" then
+		if method == 'post' then
 			if not CURL_HttpPost then
 				return settings.error()
 			end
@@ -637,30 +637,30 @@ local function OnCurlRequestResult()
 		if settings.complete then
 			local status, err = pcall(settings.complete, html, status, bSuccess or dwBufferSize > 0)
 			if not status then
-				MY.Debug({"CURL # " .. settings.url .. ' - complete - PCALL ERROR - ' .. err}, MY_DEBUG.ERROR)
+				MY.Debug({'CURL # ' .. settings.url .. ' - complete - PCALL ERROR - ' .. err}, MY_DEBUG.ERROR)
 			end
 		end
 		if bSuccess then
-			if settings.charset == "utf8" and html ~= nil and CLIENT_LANG == "zhcn" then
+			if settings.charset == 'utf8' and html ~= nil and CLIENT_LANG == 'zhcn' then
 				html = UTF8ToAnsi(html)
 			end
-			-- if payload == "json" then
+			-- if payload == 'json' then
 			-- 	html = MY.JsonDecode(html)
 			-- end
 			local status, err = pcall(settings.success, html, status)
 			if not status then
-				MY.Debug({"CURL # " .. settings.url .. ' - success - PCALL ERROR - ' .. err}, MY_DEBUG.ERROR)
+				MY.Debug({'CURL # ' .. settings.url .. ' - success - PCALL ERROR - ' .. err}, MY_DEBUG.ERROR)
 			end
 		else
 			local status, err = pcall(settings.error, html, status, dwBufferSize ~= 0)
 			if not status then
-				MY.Debug({"CURL # " .. settings.url .. ' - error - PCALL ERROR - ' .. err}, MY_DEBUG.ERROR)
+				MY.Debug({'CURL # ' .. settings.url .. ' - error - PCALL ERROR - ' .. err}, MY_DEBUG.ERROR)
 			end
 		end
 		MY_CALL_AJAX[szKey] = nil
 	end
 end
-MY.RegisterEvent("CURL_REQUEST_RESULT.AJAX", OnCurlRequestResult)
+MY.RegisterEvent('CURL_REQUEST_RESULT.AJAX', OnCurlRequestResult)
 end
 
 function MY.IsInDevMode()
@@ -668,7 +668,7 @@ function MY.IsInDevMode()
 		return true
 	end
 	local ip = select(7, GetUserServer())
-	if ip:find("^192%.") or ip:find("^10%.") then
+	if ip:find('^192%.') or ip:find('^10%.') then
 		return true
 	end
 	return false
@@ -683,7 +683,7 @@ do
 -------------------------------
 -- 个人数据版本号
 local m_nStorageVer = {}
-MY.BreatheCall("MYLIB#STORAGE_DATA", 200, function()
+MY.BreatheCall('MYLIB#STORAGE_DATA', 200, function()
 	if not MY.IsInitialized() then
 		return
 	end
@@ -696,7 +696,7 @@ MY.BreatheCall("MYLIB#STORAGE_DATA", 200, function()
 	end
 	m_nStorageVer = MY.LoadLUAData({'config/storageversion.jx3dat', MY_DATA_PATH.ROLE}) or {}
 	MY.Ajax({
-		type = "post/json",
+		type = 'post/json',
 		url = 'http://data.jx3.derzh.com/api/storage',
 		data = {
 			data = MY.SimpleEncrypt(MY.ConvertToUTF8(MY.JsonEncode({
@@ -713,14 +713,14 @@ MY.BreatheCall("MYLIB#STORAGE_DATA", 200, function()
 				for k, v in pairs(data.public or EMPTY_TABLE) do
 					local oData = str2var(v)
 					if oData then
-						FireUIEvent("MY_PUBLIC_STORAGE_UPDATE", k, oData)
+						FireUIEvent('MY_PUBLIC_STORAGE_UPDATE', k, oData)
 					end
 				end
 				for k, v in pairs(data.private or EMPTY_TABLE) do
 					if not m_nStorageVer[k] or m_nStorageVer[k] < v.v then
 						local oData = str2var(v.o)
 						if oData ~= nil then
-							FireUIEvent("MY_PRIVATE_STORAGE_UPDATE", k, oData)
+							FireUIEvent('MY_PRIVATE_STORAGE_UPDATE', k, oData)
 						end
 						m_nStorageVer[k] = v.v
 					end
@@ -742,7 +742,7 @@ MY.BreatheCall("MYLIB#STORAGE_DATA", 200, function()
 	})
 	return 0
 end)
-MY.RegisterExit("MYLIB#STORAGE_DATA", function()
+MY.RegisterExit('MYLIB#STORAGE_DATA', function()
 	MY.SaveLUAData({'config/storageversion.jx3dat', MY_DATA_PATH.ROLE}, m_nStorageVer)
 end)
 -- 保存个人数据 方便网吧党和公司家里多电脑切换
@@ -750,7 +750,7 @@ function MY.StorageData(szKey, oData)
 	if MY.IsInDevMode() then
 		return
 	end
-	MY.DelayCall("STORAGE_" .. szKey, 120000, function()
+	MY.DelayCall('STORAGE_' .. szKey, 120000, function()
 		local me = GetClientPlayer()
 		if not me then
 			return
@@ -771,7 +771,7 @@ function MY.StorageData(szKey, oData)
 			success = function(html, status)
 				local data = MY.JsonDecode(html)
 				if data and data.succeed then
-					FireUIEvent("MY_PRIVATE_STORAGE_SYNC", szKey)
+					FireUIEvent('MY_PRIVATE_STORAGE_SYNC', szKey)
 				end
 			end,
 		})
@@ -817,7 +817,7 @@ end
 
 function MY.SetStorage(szKey, oVal)
 	local szPriKey, szSubKey = szKey
-	local nPos = StringFindW(szKey, ".")
+	local nPos = StringFindW(szKey, '.')
 	if nPos then
 		szSubKey = string.sub(szKey, nPos + 1)
 		szPriKey = string.sub(szKey, 1, nPos - 1)
@@ -844,7 +844,7 @@ end
 
 function MY.GetStorage(szKey)
 	local szPriKey, szSubKey = szKey
-	local nPos = StringFindW(szKey, ".")
+	local nPos = StringFindW(szKey, '.')
 	if nPos then
 		szSubKey = string.sub(szKey, nPos + 1)
 		szPriKey = string.sub(szKey, 1, nPos - 1)
@@ -883,7 +883,7 @@ local function OnInit()
 	for szKey, fnAction in pairs(INIT_FUNC_LIST) do
 		local status, err = pcall(fnAction)
 		if not status then
-			MY.Debug({err}, "STORAGE_INIT_FUNC_LIST#" .. szKey)
+			MY.Debug({err}, 'STORAGE_INIT_FUNC_LIST#' .. szKey)
 		end
 	end
 	INIT_FUNC_LIST = {}
@@ -913,14 +913,14 @@ _C.tTraceMenu  = {}   -- 工具栏菜单
 -- get plugin folder menu
 function _C.GetMainMenu()
 	return {
-		szOption = _L["mingyi plugins"],
+		szOption = _L['mingyi plugins'],
 		fnAction = MY.TogglePanel,
 		bCheck = true,
 		bChecked = MY.IsPanelVisible(),
 
 		szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
 		nFrame = 105, nMouseOverFrame = 106,
-		szLayer = "ICON_RIGHT",
+		szLayer = 'ICON_RIGHT',
 		fnClickIcon = MY.TogglePanel
 	}
 end
@@ -929,7 +929,7 @@ function _C.GetTargetAddonMenu()
 	local menu = {}
 	for i = 1, #_C.tTargetMenu, 1 do
 		local m = _C.tTargetMenu[i].Menu
-		if type(m) == "function" then m = m() end
+		if type(m) == 'function' then m = m() end
 		if not m or m.szOption then m = {m} end
 		for _, v in ipairs(m) do
 			table.insert(menu, v)
@@ -943,7 +943,7 @@ function _C.GetPlayerAddonMenu()
 	local menu = _C.GetMainMenu()
 	for i = 1, #_C.tPlayerMenu, 1 do
 		local m = _C.tPlayerMenu[i].Menu
-		if type(m) == "function" then m = m() end
+		if type(m) == 'function' then m = m() end
 		if not m or m.szOption then m = {m} end
 		for _, v in ipairs(m) do
 			table.insert(menu, v)
@@ -959,7 +959,7 @@ function _C.GetTraceButtonAddonMenu()
 	local menu = _C.GetMainMenu()
 	for i = 1, #_C.tTraceMenu, 1 do
 		local m = _C.tTraceMenu[i].Menu
-		if type(m) == "function" then m = m() end
+		if type(m) == 'function' then m = m() end
 		if not m or m.szOption then m = {m} end
 		for _, v in ipairs(m) do
 			table.insert(menu, v)
@@ -1100,7 +1100,7 @@ TraceButton_AppendAddonMenu( { _C.GetTraceButtonAddonMenu } )
 -- tContentRgbF 主体消息文字颜色rgbf[可选，为空使用默认颜色字体。]
 -- tTitleRgbF   消息头部文字颜色rgbf[可选，为空和主体消息文字颜色相同。]
 function MY.Sysmsg(arg0, arg1, arg2)
-	local szType, szMsg = arg2 or "MSG_SYS", ""
+	local szType, szMsg = arg2 or 'MSG_SYS', ''
 	local r, g, b = GetMsgFontColor(szType)
 	local f = GetMsgFont(szType)
 	local ac, at, sc, st = {}, {}
@@ -1123,15 +1123,15 @@ function MY.Sysmsg(arg0, arg1, arg2)
 		insert(at, tostring(arg1 or MY.GetAddonInfo().szShortName))
 	end
 
-	sc = concat(ac, ac.bNoWrap and "" or "\n")
+	sc = concat(ac, ac.bNoWrap and '' or '\n')
 	if not ac.bNoWrap then
-		sc = sc .. "\n"
+		sc = sc .. '\n'
 	end
 	szMsg = szMsg .. GetFormatText(sc, ac.f or f, ac.r or r, ac.g or g, ac.b or b)
 
-	st = concat(at, "][")
-	if st ~= "" then
-		st = "[" .. st .. "] "
+	st = concat(at, '][')
+	if st ~= '' then
+		st = '[' .. st .. '] '
 	end
 	szMsg = GetFormatText(st, at.f or ac.f or f, at.r or ac.r or r, at.g or ac.g or g, at.b or ac.b or b) .. szMsg
 
@@ -1140,13 +1140,13 @@ end
 
 -- 没有头的中央信息 也可以用于系统信息
 function MY.Topmsg(szText, szType)
-	MY.Sysmsg(szText, {}, szType or "MSG_ANNOUNCE_YELLOW")
+	MY.Sysmsg(szText, {}, szType or 'MSG_ANNOUNCE_YELLOW')
 end
 
 -- 输出一条密聊信息
 function MY.OutputWhisper(szMsg, szHead)
 	szHead = szHead or MY.GetAddonInfo().szShortName
-	OutputMessage("MSG_WHISPER", "[" .. szHead .. "]" .. g_tStrings.STR_TALK_HEAD_WHISPER .. szMsg .. "\n")
+	OutputMessage('MSG_WHISPER', '[' .. szHead .. ']' .. g_tStrings.STR_TALK_HEAD_WHISPER .. szMsg .. '\n')
 	PlaySound(SOUND.UI_SOUND, g_sound.Whisper)
 end
 
@@ -1156,8 +1156,8 @@ end
 -- szTitle  Debug头
 -- nLevel   Debug级别[低于当前设置值将不会输出]
 function MY.Debug(oContent, szTitle, nLevel)
-	if type(nLevel)~="number"  then nLevel = MY_DEBUG.WARNING end
-	if type(szTitle)~="string" then szTitle = 'MY DEBUG' end
+	if type(nLevel)~='number'  then nLevel = MY_DEBUG.WARNING end
+	if type(szTitle)~='string' then szTitle = 'MY DEBUG' end
 	if type(oContent)~='table' then oContent = { oContent, bNoWrap = true } end
 	if not oContent.r then
 		if nLevel == 0 then
@@ -1171,10 +1171,10 @@ function MY.Debug(oContent, szTitle, nLevel)
 		end
 	end
 	if nLevel >= MY.GetAddonInfo().nDebugLevel then
-		Log('[MY_DEBUG][LEVEL_' .. nLevel .. ']' .. '[' .. szTitle .. ']' .. table.concat(oContent, "\n"))
+		Log('[MY_DEBUG][LEVEL_' .. nLevel .. ']' .. '[' .. szTitle .. ']' .. table.concat(oContent, '\n'))
 		MY.Sysmsg(oContent, szTitle)
 	elseif nLevel >= MY.GetAddonInfo().nLogLevel then
-		Log('[MY_DEBUG][LEVEL_' .. nLevel .. ']' .. '[' .. szTitle .. ']' .. table.concat(oContent, "\n"))
+		Log('[MY_DEBUG][LEVEL_' .. nLevel .. ']' .. '[' .. szTitle .. ']' .. table.concat(oContent, '\n'))
 	end
 end
 
@@ -1250,7 +1250,7 @@ end
 -- 测试用
 if loadstring then
 function MY.ProcessCommand(cmd)
-	local ls = loadstring("return " .. cmd)
+	local ls = loadstring('return ' .. cmd)
 	if ls then
 		return ls()
 	end
@@ -1262,15 +1262,15 @@ local bCustomMode = false
 function MY.IsInCustomUIMode()
 	return bCustomMode
 end
-RegisterEvent("ON_ENTER_CUSTOM_UI_MODE", function() bCustomMode = true  end)
-RegisterEvent("ON_LEAVE_CUSTOM_UI_MODE", function() bCustomMode = false end)
+RegisterEvent('ON_ENTER_CUSTOM_UI_MODE', function() bCustomMode = true  end)
+RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE', function() bCustomMode = false end)
 end
 
 function MY.DoMessageBox(szName, i)
-	local frame = Station.Lookup("Topmost2/MB_" .. szName) or Station.Lookup("Topmost/MB_" .. szName)
+	local frame = Station.Lookup('Topmost2/MB_' .. szName) or Station.Lookup('Topmost/MB_' .. szName)
 	if frame then
 		i = i or 1
-		local btn = frame:Lookup("Wnd_All/Btn_Option" .. i)
+		local btn = frame:Lookup('Wnd_All/Btn_Option' .. i)
 		if btn and btn:IsEnabled() then
 			if btn.fnAction then
 				if frame.args then
@@ -1294,7 +1294,7 @@ end
 function MY.OutputBuffTip(dwID, nLevel, Rect, nTime)
 	local t = {}
 
-	insert(t, GetFormatText(Table_GetBuffName(dwID, nLevel) .. "\t", 65))
+	insert(t, GetFormatText(Table_GetBuffName(dwID, nLevel) .. '\t', 65))
 	local buffInfo = GetBuffInfo(dwID, nLevel, {})
 	if buffInfo and buffInfo.nDetachType and g_tStrings.tBuffDetachType[buffInfo.nDetachType] then
 		insert(t, GetFormatText(g_tStrings.tBuffDetachType[buffInfo.nDetachType] .. '\n', 106))
@@ -1302,7 +1302,7 @@ function MY.OutputBuffTip(dwID, nLevel, Rect, nTime)
 		insert(t, XML_LINE_BREAKER)
 	end
 
-	local szDesc = GetBuffDesc(dwID, nLevel, "desc")
+	local szDesc = GetBuffDesc(dwID, nLevel, 'desc')
 	if szDesc then
 		insert(t, GetFormatText(szDesc .. g_tStrings.STR_FULL_STOP, 106))
 	end
@@ -1312,15 +1312,15 @@ function MY.OutputBuffTip(dwID, nLevel, Rect, nTime)
 			insert(t, XML_LINE_BREAKER)
 			insert(t, GetFormatText(g_tStrings.STR_BUFF_H_TIME_ZERO, 102))
 		else
-			local H, M, S = "", "", ""
+			local H, M, S = '', '', ''
 			local h = math.floor(nTime / 3600)
 			local m = math.floor(nTime / 60) % 60
 			local s = math.floor(nTime % 60)
 			if h > 0 then
-				H = h .. g_tStrings.STR_BUFF_H_TIME_H .. " "
+				H = h .. g_tStrings.STR_BUFF_H_TIME_H .. ' '
 			end
 			if h > 0 or m > 0 then
-				M = m .. g_tStrings.STR_BUFF_H_TIME_M_SHORT .. " "
+				M = m .. g_tStrings.STR_BUFF_H_TIME_M_SHORT .. ' '
 			end
 			S = s..g_tStrings.STR_BUFF_H_TIME_S
 			if h < 720 then
@@ -1335,11 +1335,11 @@ function MY.OutputBuffTip(dwID, nLevel, Rect, nTime)
 		insert(t, XML_LINE_BREAKER)
 		insert(t, GetFormatText(g_tStrings.DEBUG_INFO_ITEM_TIP, 102))
 		insert(t, XML_LINE_BREAKER)
-		insert(t, GetFormatText("ID:     " .. dwID, 102))
+		insert(t, GetFormatText('ID:     ' .. dwID, 102))
 		insert(t, XML_LINE_BREAKER)
-		insert(t, GetFormatText("Level:  " .. nLevel, 102))
+		insert(t, GetFormatText('Level:  ' .. nLevel, 102))
 		insert(t, XML_LINE_BREAKER)
-		insert(t, GetFormatText("IconID: " .. tostring(Table_GetBuffIconID(dwID, nLevel)), 102))
+		insert(t, GetFormatText('IconID: ' .. tostring(Table_GetBuffIconID(dwID, nLevel)), 102))
 	end
 	OutputTip(concat(t), 300, Rect)
 end
@@ -1348,7 +1348,7 @@ end
 function MY.Alert(szMsg, fnAction, szSure)
 	local nW, nH = Station.GetClientSize()
 	local tMsg = {
-		x = nW / 2, y = nH / 3, szMessage = szMsg, szName = "MY_Alert", szAlignment = "CENTER",
+		x = nW / 2, y = nH / 3, szMessage = szMsg, szName = 'MY_Alert', szAlignment = 'CENTER',
 		{
 			szOption = szSure or g_tStrings.STR_HOTKEY_SURE,
 			fnAction = fnAction,
@@ -1360,7 +1360,7 @@ end
 function MY.Confirm(szMsg, fnAction, fnCancel, szSure, szCancel)
 	local nW, nH = Station.GetClientSize()
 	local tMsg = {
-		x = nW / 2, y = nH / 3, szMessage = szMsg, szName = "MY_Confirm", szAlignment = "CENTER",
+		x = nW / 2, y = nH / 3, szMessage = szMsg, szName = 'MY_Confirm', szAlignment = 'CENTER',
 		{
 			szOption = szSure or g_tStrings.STR_HOTKEY_SURE,
 			fnAction = fnAction,
@@ -1374,7 +1374,7 @@ end
 
 do
 function MY.Hex2RGB(hex)
-	local s, r, g, b, a = (hex:gsub("#", ""))
+	local s, r, g, b, a = (hex:gsub('#', ''))
 	if #s == 3 then
 		r, g, b = s:sub(1, 1):rep(2), s:sub(2, 2):rep(2), s:sub(3, 3):rep(2)
 	elseif #s == 4 then
@@ -1389,9 +1389,9 @@ function MY.Hex2RGB(hex)
 		return
 	end
 	if a then
-		a = tonumber("0x" .. a)
+		a = tonumber('0x' .. a)
 	end
-	r, g, b = tonumber("0x" .. r), tonumber("0x" .. g), tonumber("0x" .. b)
+	r, g, b = tonumber('0x' .. r), tonumber('0x' .. g), tonumber('0x' .. b)
 
 	if not r or not g or not b then
 		return
@@ -1401,14 +1401,14 @@ end
 
 function MY.RGB2Hex(r, g, b, a)
 	if a then
-		return (("#%02X%02X%02X%02X"):format(r, g, b, a))
+		return (('#%02X%02X%02X%02X'):format(r, g, b, a))
 	end
-	return (("#%02X%02X%02X"):format(r, g, b))
+	return (('#%02X%02X%02X'):format(r, g, b))
 end
 
 local COLOR_NAME_RGB = {}
 do
-	local tColor = MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. "data/colors.jx3dat")
+	local tColor = MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/colors.jx3dat')
 	for id, col in pairs(tColor) do
 		local r, g, b = MY.Hex2RGB(col)
 		if r then
@@ -1427,7 +1427,7 @@ function MY.ColorName2RGB(name)
 	return unpack(COLOR_NAME_RGB[name])
 end
 
-local HUMAN_COLOR_CACHE = setmetatable({}, {__mode = "v", __index = COLOR_NAME_RGB})
+local HUMAN_COLOR_CACHE = setmetatable({}, {__mode = 'v', __index = COLOR_NAME_RGB})
 function MY.HumanColor2RGB(name)
 	if IsTable(name) then
 		if name.r then
@@ -1445,21 +1445,21 @@ end
 
 function MY.ExecuteWithThis(element, fnAction, ...)
 	if not (element and element:IsValid()) then
-		-- Log("[UI ERROR]Invalid element on executing ui event!")
+		-- Log('[UI ERROR]Invalid element on executing ui event!')
 		return false
 	end
-	if type(fnAction) == "string" then
+	if type(fnAction) == 'string' then
 		if element[fnAction] then
 			fnAction = element[fnAction]
 		else
 			local szFrame = element:GetRoot():GetName()
-			if type(_G[szFrame]) == "table" then
+			if type(_G[szFrame]) == 'table' then
 				fnAction = _G[szFrame][fnAction]
 			end
 		end
 	end
-	if type(fnAction) ~= "function" then
-		-- Log("[UI ERROR]Invalid function on executing ui event! # " .. element:GetTreePath())
+	if type(fnAction) ~= 'function' then
+		-- Log('[UI ERROR]Invalid function on executing ui event! # ' .. element:GetTreePath())
 		return false
 	end
 	local _this = this
@@ -1470,7 +1470,7 @@ function MY.ExecuteWithThis(element, fnAction, ...)
 end
 
 function MY.InsertOperatorMenu(t, opt, action, opts, L)
-	for _, op in ipairs(opts or { "==", "!=", "<", ">=", ">", "<=" }) do
+	for _, op in ipairs(opts or { '==', '!=', '<', '>=', '>', '<=' }) do
 		insert(t, {
 			szOption = L and L[op] or _L.OPERATOR[op],
 			bCheck = true, bMCheck = true,

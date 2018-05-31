@@ -29,7 +29,7 @@ local IsNil, IsNumber, IsFunction = MY.IsNil, MY.IsNumber, MY.IsFunction
 local IsBoolean, IsString, IsTable = MY.IsBoolean, MY.IsString, MY.IsTable
 -----------------------------------------------------------------------------------------
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Focus/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Focus/lang/')
 local l_dwLockType, l_dwLockID, l_lockInDisplay
 local D = {}
 
@@ -40,7 +40,7 @@ function D.Scale(frame)
 	frame.fScaleX = MY_Focus.fScaleX
 	frame.fScaleY = MY_Focus.fScaleY
 	frame:Scale(MY_Focus.fScaleX, MY_Focus.fScaleY)
-	XGUI(frame):find(".Text"):fontScale((MY_Focus.fScaleX + MY_Focus.fScaleY) / 2)
+	XGUI(frame):find('.Text'):fontScale((MY_Focus.fScaleX + MY_Focus.fScaleY) / 2)
 end
 
 function D.CreateList(frame)
@@ -50,7 +50,7 @@ function D.CreateList(frame)
 		local hItem = hList:AppendItemFromIni(INI_PATH, 'Handle_Info')
 		if frame.fScaleX and frame.fScaleY then
 			hItem:Scale(frame.fScaleX, frame.fScaleY)
-			XGUI(hItem):find(".Text"):fontScale((frame.fScaleX + frame.fScaleY) / 2)
+			XGUI(hItem):find('.Text'):fontScale((frame.fScaleX + frame.fScaleY) / 2)
 		end
 		hItem:Hide()
 	end
@@ -97,7 +97,7 @@ function D.AutosizeUI(frame)
 	end
 	hList:SetH(nHeight)
 	frame:SetVisible(nHeight > 0 or not MY_Focus.bAutoHide)
-	frame:SetH(nHeight + frame:Lookup("", "Image_Title"):GetH())
+	frame:SetH(nHeight + frame:Lookup('', 'Image_Title'):GetH())
 end
 
 -- 绘制指定的焦点Handle
@@ -105,7 +105,7 @@ function D.UpdateItem(hItem, p)
 	local dwType, dwID = p.dwType, p.dwID
 	local KObject, info, bInfo = MY.Game.GetObject(dwType, dwID)
 	local szName = p.tRule and p.tRule.szDisplay
-	if not szName or szName == "" then
+	if not szName or szName == '' then
 		szName = MY.Game.GetObjectName(KObject)
 	end
 	local player = GetClientPlayer()
@@ -117,7 +117,7 @@ function D.UpdateItem(hItem, p)
 
 	---------- 左侧 ----------
 	-- 小图标列表
-	local hInfoList = hItem:Lookup("Handle_InfoList")
+	local hInfoList = hItem:Lookup('Handle_InfoList')
 	-- 锁定
 	hInfoList:Lookup('Handle_Lock'):Hide()
 	if dwType == l_dwLockType and dwID == l_dwLockID then
@@ -312,7 +312,7 @@ end
 function D.UpdateList(frame)
 	l_lockInDisplay = false
 	local nCount = 0
-	local hList = frame:Lookup("", "Handle_List")
+	local hList = frame:Lookup('', 'Handle_List')
 	local aList = MY_Focus.GetDisplayList()
 	for i = 1, hList:GetItemCount() do
 		local p = aList[i]
@@ -364,27 +364,27 @@ function MY_Focus.OnFrameBreathe()
 end
 
 function MY_Focus.OnFrameCreate()
-	this:RegisterEvent("PARTY_SET_MARK")
-	this:RegisterEvent("UI_SCALED")
-	this:RegisterEvent("PLAYER_ENTER_SCENE")
-	this:RegisterEvent("NPC_ENTER_SCENE")
-	this:RegisterEvent("DOODAD_ENTER_SCENE")
-	this:RegisterEvent("PLAYER_LEAVE_SCENE")
-	this:RegisterEvent("NPC_LEAVE_SCENE")
-	this:RegisterEvent("DOODAD_LEAVE_SCENE")
-	this:RegisterEvent("MY_SET_IMPORTANT_NPC")
-	this:RegisterEvent("MY_FOCUS_LOCK_UPDATE")
-	this:RegisterEvent("MY_FOCUS_SCALE_UPDATE")
-	this:RegisterEvent("MY_FOCUS_MAX_DISPLAY_UPDATE")
+	this:RegisterEvent('PARTY_SET_MARK')
+	this:RegisterEvent('UI_SCALED')
+	this:RegisterEvent('PLAYER_ENTER_SCENE')
+	this:RegisterEvent('NPC_ENTER_SCENE')
+	this:RegisterEvent('DOODAD_ENTER_SCENE')
+	this:RegisterEvent('PLAYER_LEAVE_SCENE')
+	this:RegisterEvent('NPC_LEAVE_SCENE')
+	this:RegisterEvent('DOODAD_LEAVE_SCENE')
+	this:RegisterEvent('MY_SET_IMPORTANT_NPC')
+	this:RegisterEvent('MY_FOCUS_LOCK_UPDATE')
+	this:RegisterEvent('MY_FOCUS_SCALE_UPDATE')
+	this:RegisterEvent('MY_FOCUS_MAX_DISPLAY_UPDATE')
 
 	D.Scale(this)
 	D.CreateList(this)
-	MY_Focus.OnEvent("UI_SCALED")
+	MY_Focus.OnEvent('UI_SCALED')
 	MY_Focus.RescanNearby()
 end
 
 function MY_Focus.OnEvent(event)
-	if event == "PARTY_SET_MARK" then
+	if event == 'PARTY_SET_MARK' then
 		D.UpdateList(this)
 	elseif event == 'UI_SCALED' then
 		XGUI(this):anchor(MY_Focus.anchor)
@@ -418,8 +418,8 @@ end
 
 function MY_Focus.OnItemMouseEnter()
 	local name = this:GetName()
-	if name == "Handle_Info" then
-		this:Lookup("Image_Hover"):Show()
+	if name == 'Handle_Info' then
+		this:Lookup('Image_Hover'):Show()
 		if MY_Focus.bHealHelper then
 			this.dwLastType, this.dwLastID = MY.GetTarget()
 			MY_Focus.OnItemLButtonClick()
@@ -429,9 +429,9 @@ end
 
 function MY_Focus.OnItemMouseLeave()
 	local name = this:GetName()
-	if name == "Handle_Info" then
-		if this:Lookup("Image_Hover") then
-			this:Lookup("Image_Hover"):Hide()
+	if name == 'Handle_Info' then
+		if this:Lookup('Image_Hover') then
+			this:Lookup('Image_Hover'):Hide()
 			if MY_Focus.bHealHelper then
 				MY.SetTarget(this.dwLastType, this.dwLastID)
 				this.dwLastType, this.dwLastID = nil
@@ -442,7 +442,7 @@ end
 
 function MY_Focus.OnItemLButtonClick()
 	local name = this:GetName()
-	if name == "Handle_Info" then
+	if name == 'Handle_Info' then
 		if MY_Focus.bHealHelper then
 			this.dwLastType, this.dwLastID = this.dwType, this.dwID
 		end
@@ -452,7 +452,7 @@ end
 
 function MY_Focus.OnItemRButtonClick()
 	local name = this:GetName()
-	if name == "Handle_Info" then
+	if name == 'Handle_Info' then
 		local dwType, dwID = this.dwType, this.dwID
 		local t = MY.Game.GetTargetContextMenu(dwType, this:Lookup('Handle_LMN/Text_Name'):GetText(), dwID)
 		table.insert(t, 1, {
@@ -477,7 +477,7 @@ function MY_Focus.OnItemRButtonClick()
 					l_dwLockType = dwType
 					MY.SetTarget(dwType, dwID)
 				end
-				FireUIEvent("MY_FOCUS_LOCK_UPDATE")
+				FireUIEvent('MY_FOCUS_LOCK_UPDATE')
 			end,
 		})
 		PopupMenu(t)

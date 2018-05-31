@@ -11,9 +11,9 @@ local tinsert, tremove, tconcat = table.insert, table.remove, table.concat
 
 local xmlDecode = function(xml)
 	local function str2var(str)
-		if str == "true" then
+		if str == 'true' then
 			return true
-		elseif str == "false" then
+		elseif str == 'false' then
 			return false
 		elseif tonumber(str) then
 			return tonumber(str)
@@ -38,88 +38,88 @@ local xmlDecode = function(xml)
 	local p = t
 	local p1
 	local stack = {}
-	local state = "text"
+	local state = 'text'
 	local unpack = unpack or table.unpack
 	local pos, len = 1, #xml
 	local byte_current
-	local byte_apos, byte_quot, byte_escape, byte_slash = (byte("'")) , (byte('"')), (byte("\\")), (byte("/"))
-	local byte_lt, byte_gt, byte_amp, byte_eq, byte_space = (byte("<")), (byte(">")), (byte("&")), (byte("=")), (byte(" "))
-	local byte_char_n, byte_char_t, byte_lf, byte_tab = (byte("n")), (byte("t")), (byte("\n")), (byte("\t"))
+	local byte_apos, byte_quot, byte_escape, byte_slash = (byte('"')) , (byte('"')), (byte('\\')), (byte('/'))
+	local byte_lt, byte_gt, byte_amp, byte_eq, byte_space = (byte('<')), (byte('>')), (byte('&')), (byte('=')), (byte(' '))
+	local byte_char_n, byte_char_t, byte_lf, byte_tab = (byte('n')), (byte('t')), (byte('\n')), (byte('\t'))
 	local pos1, pos2, byte_quote, key, b_escaping, bytes_string
 	-- <        label         attribute_key=attribute_value>        text_key=text_value<        /     label         >
 	-- label_lt label_opening attribute                    label_gt text               label_lt slash label_closing label_gt
 	while pos <= len do
 		byte_current = byte(xml, pos)
-		if state == "text" then
+		if state == 'text' then
 			if byte_current == byte_lt then
-				state = "label_lt"
+				state = 'label_lt'
 			elseif byte_current ~= byte_space then
-				state = "text_key"
+				state = 'text_key'
 				pos1 = pos
 			end
-		elseif state == "label_lt" then
+		elseif state == 'label_lt' then
 			if byte_current == byte_slash then
-				state = "label_closing"
+				state = 'label_closing'
 				pos1 = pos + 1
 			elseif byte_current ~= byte_space then
-				state = "label_opening"
+				state = 'label_opening'
 				pos1 = pos
 			end
-		elseif state == "label_opening" then
+		elseif state == 'label_opening' then
 			if byte_current == byte_gt then
-				state = "text"
-				p1 = { ["."] = xml:sub(pos1, pos - 1), [''] = {} }
+				state = 'text'
+				p1 = { ['.'] = xml:sub(pos1, pos - 1), [''] = {} }
 				tinsert(stack, p1)
 				tinsert(p, p1)
 				p = p1
 			elseif byte_current == byte_space then
-				state = "attribute"
-				p1 = { ["."] = xml:sub(pos1, pos - 1), [''] = {} }
+				state = 'attribute'
+				p1 = { ['.'] = xml:sub(pos1, pos - 1), [''] = {} }
 				tinsert(stack, p1)
 				tinsert(p, p1)
 				p = p1
 			end
-		elseif state == "label_closing" then
+		elseif state == 'label_closing' then
 			if byte_current == byte_gt then
-				state = "text"
+				state = 'text'
 				tremove(stack)
 				p = stack[#stack] or t
 			end
-		elseif state == "attribute" then
+		elseif state == 'attribute' then
 			if byte_current == byte_gt then
-				state = "text"
+				state = 'text'
 			elseif byte_current ~= byte_space then
-				state = "attribute_key"
+				state = 'attribute_key'
 				pos1 = pos
 			end
-		elseif state == "attribute_key" then
+		elseif state == 'attribute_key' then
 			if byte_current == byte_space then
 				key = xml:sub(pos1, pos - 1)
-				state = "attribute_key_end"
+				state = 'attribute_key_end'
 			elseif byte_current == byte_eq then
 				key = xml:sub(pos1, pos - 1)
-				state = "attribute_eq"
+				state = 'attribute_eq'
 			end
-		elseif state == "attribute_key_end" then
+		elseif state == 'attribute_key_end' then
 			if byte_current == byte_eq then
-				state = "attribute_eq"
+				state = 'attribute_eq'
 			elseif byte_current ~= byte_space then
-				state = "attribute"
+				state = 'attribute'
 				p[key] = key
 				pos = pos - 1
 			end
-		elseif state == "attribute_eq" then
+		elseif state == 'attribute_eq' then
 			if byte_current == byte_apos
 			or byte_current == byte_quot then
 				byte_quote = byte_current
-				state = "attribute_value_string"
+				state = 'attribute_value_string'
 				bytes_string = {}
 				pos1 = pos + 1
 			elseif byte_current ~= byte_space then
-				state = "attribute_value"
+				state = 'attribute_value'
 				pos1 = pos
 			end
-		elseif state == "attribute_value_string" then
+		elseif state == 'attribute_value_string' then
 			if b_escaping then
 				b_escaping = false
 				if byte_current == byte_char_n then
@@ -132,46 +132,46 @@ local xmlDecode = function(xml)
 				b_escaping = true
 			elseif byte_current == byte_quote then
 				p[key] = bytes2string(bytes_string)
-				state = "attribute"
+				state = 'attribute'
 			else
 				tinsert(bytes_string, byte_current)
 			end
-		elseif state == "attribute_value" then
+		elseif state == 'attribute_value' then
 			if byte_current == byte_space then
 				p[key] = str2var(xml:sub(pos1, pos))
-				state = "attribute"
+				state = 'attribute'
 			elseif byte_current == byte_gt then
 				p[key] = str2var(xml:sub(pos1, pos - 1))
-				state = "text"
+				state = 'text'
 			end
-		elseif state == "text_key" then
+		elseif state == 'text_key' then
 			if byte_current == byte_space then
 				key = xml:sub(pos1, pos - 1)
-				state = "text_key_end"
+				state = 'text_key_end'
 			elseif byte_current == byte_eq then
 				key = xml:sub(pos1, pos - 1)
-				state = "text_eq"
+				state = 'text_eq'
 			end
-		elseif state == "text_key_end" then
+		elseif state == 'text_key_end' then
 			if byte_current == byte_eq then
-				state = "text_eq"
+				state = 'text_eq'
 			elseif byte_current ~= byte_space then
-				state = "text"
+				state = 'text'
 				p[''][key] = key
 				pos = pos - 1
 			end
-		elseif state == "text_eq" then
+		elseif state == 'text_eq' then
 			if byte_current == byte_apos
 			or byte_current == byte_quot then
 				byte_quote = byte_current
-				state = "text_value_string"
+				state = 'text_value_string'
 				bytes_string = {}
 				pos1 = pos + 1
 			elseif byte_current ~= byte_space then
-				state = "text_value"
+				state = 'text_value'
 				pos1 = pos
 			end
-		elseif state == "text_value_string" then
+		elseif state == 'text_value_string' then
 			if b_escaping then
 				b_escaping = false
 				if byte_current == byte_char_n then
@@ -184,23 +184,23 @@ local xmlDecode = function(xml)
 				b_escaping = true
 			elseif byte_current == byte_quote then
 				p[''][key] = bytes2string(bytes_string)
-				state = "text"
+				state = 'text'
 			else
 				tinsert(bytes_string, byte_current)
 			end
-		elseif state == "text_value" then
+		elseif state == 'text_value' then
 			if byte_current == byte_space then
 				p[''][key] = str2var(xml:sub(pos1, pos))
-				state = "text"
+				state = 'text'
 			elseif byte_current == byte_lt then
 				p[''][key] = str2var(xml:sub(pos1, pos - 1))
-				state = "label_lt"
+				state = 'label_lt'
 			end
 		end
 		pos = pos + 1
 	end
 	if #stack ~= 0 then
-		return Log("XML decode error: unclosed elements detected." .. #stack .. " stacks on `" .. xml .. "`")
+		return Log('XML decode error: unclosed elements detected.' .. #stack .. ' stacks on `' .. xml .. '`')
 	end
 	return t
 end
@@ -227,7 +227,7 @@ end
 local xmlUnescape = function(str)
 	local bytes2string, tinsert, byte = bytes2string, tinsert, string.byte
 	local bytes_string, b_escaping, len, byte_current = {}, false, #str
-	local byte_char_n, byte_char_t, byte_lf, byte_tab, byte_escape = (byte("n")), (byte("t")), (byte("\n")), (byte("\t")), (byte("\\"))
+	local byte_char_n, byte_char_t, byte_lf, byte_tab, byte_escape = (byte('n')), (byte('t')), (byte('\n')), (byte('\t')), (byte('\\'))
 	for i = 1, len do
 		byte_current = byte(str, i)
 		if b_escaping then
@@ -259,7 +259,7 @@ xmlEncode = function(xml)
 		-- attributes
 		local attr = ''
 		for k, v in pairs(xml) do
-			if type(k) == 'string' and string.find(k, "^[a-zA-Z0-9_]+$") then
+			if type(k) == 'string' and string.find(k, '^[a-zA-Z0-9_]+$') then
 				tinsert(t, ' ')
 				tinsert(t, k)
 				tinsert(t, '=')
@@ -324,11 +324,11 @@ local xml2Text = function(xml)
 end
 
 local function GetNodeType(node)
-	return node["."]
+	return node['.']
 end
 
 local function GetNodeData(node)
-	return node[""]
+	return node['']
 end
 
 -- public API

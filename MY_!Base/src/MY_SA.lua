@@ -36,7 +36,7 @@ MY_SA = {
 	nFont      = 203,
 	bDrawColor = false,
 }
-MY.RegisterCustomData("MY_SA")
+MY.RegisterCustomData('MY_SA')
 
 local _L = MY.LoadLangPack()
 local MARK_NAME = MY.GetMarkName()
@@ -51,24 +51,24 @@ local SA = {}
 SA.__index = SA
 local SA_COLOR = {
 	FONT = {
-		["BUFF"]    = { 255, 128, 0   },
-		["DEBUFF"]  = { 255, 0,   255 },
-		["Life"]    = { 130, 255, 130 },
-		["Mana"]    = { 255, 255, 128 },
-		["NPC"]     = { 0,   255, 255 },
-		["CASTING"] = { 150, 200, 255 },
-		["DOODAD"]  = { 200, 200, 255 },
-		["TIME"]    = { 128, 255, 255 },
+		['BUFF']    = { 255, 128, 0   },
+		['DEBUFF']  = { 255, 0,   255 },
+		['Life']    = { 130, 255, 130 },
+		['Mana']    = { 255, 255, 128 },
+		['NPC']     = { 0,   255, 255 },
+		['CASTING'] = { 150, 200, 255 },
+		['DOODAD']  = { 200, 200, 255 },
+		['TIME']    = { 128, 255, 255 },
 	},
 	ARROW = {
-		["BUFF"]    = { 0,   255, 0   },
-		["DEBUFF"]  = { 255, 0,   0   },
-		["Life"]    = { 255, 0,   0   },
-		["Mana"]    = { 0,   0,   255 },
-		["NPC"]     = { 0,   128, 255 },
-		["CASTING"] = { 255, 128, 0   },
-		["DOODAD"]  = { 200, 200, 255 },
-		["TIME"]    = { 255, 0,   0   },
+		['BUFF']    = { 0,   255, 0   },
+		['DEBUFF']  = { 255, 0,   0   },
+		['Life']    = { 255, 0,   0   },
+		['Mana']    = { 0,   0,   255 },
+		['NPC']     = { 0,   128, 255 },
+		['CASTING'] = { 255, 128, 0   },
+		['DOODAD']  = { 200, 200, 255 },
+		['TIME']    = { 255, 0,   0   },
 	}
 }
 do
@@ -116,7 +116,7 @@ local SPECIAL_NPC = {
 	[46268] = true, -- 大攻防 物资车
 }
 
--- for i=1, 2 do FireUIEvent("MY_SA_CREATE", "TIME", GetClientPlayer().dwID, { col = { 255, 255, 255 }, txt = "test" })end
+-- for i=1, 2 do FireUIEvent('MY_SA_CREATE', 'TIME', GetClientPlayer().dwID, { col = { 255, 255, 255 }, txt = 'test' })end
 local function CreateScreenArrow(szClass, dwID, tArgs)
 	tArgs = tArgs or {}
 	SA:ctor(szClass, dwID, tArgs)
@@ -124,8 +124,8 @@ end
 
 local ScreenArrow = {
 	tCache = {
-		["Life"] = {},
-		["Mana"] = {},
+		['Life'] = {},
+		['Mana'] = {},
 	}
 }
 
@@ -134,7 +134,7 @@ function ScreenArrow.OnSort()
 	for k, v in pairs(HANDLE:GetAllItem(true)) do
 		PostThreadCall(function(v, xScreen, yScreen)
 			v.nIndex = yScreen or 0
-		end, v, "Scene_GetCharacterTopScreenPos", v.dwID)
+		end, v, 'Scene_GetCharacterTopScreenPos', v.dwID)
 		insert(t, { handle = v, index = v.nIndex or 0 })
 	end
 	sort(t, function(a, b) return a.index < b.index end)
@@ -162,47 +162,47 @@ function ScreenArrow.OnBreathe()
 				local szName
 				if dwType == TARGET.DOODAD then
 					szName = tInfo.szName
-					if szName == "" then szName = object.dwTemplateID end
+					if szName == '' then szName = object.dwTemplateID end
 				else
 					szName = MY.GetObjectName(object)
 				end
 				-- szName = obj.szName or szName
 				szName = object.szName or szName
 				if tTeamMark[dwID] then
-					szName = szName .. _L("[%s]", MARK_NAME[tTeamMark[dwID]])
+					szName = szName .. _L('[%s]', MARK_NAME[tTeamMark[dwID]])
 				end
-				local txt = ""
-				if obj.szClass == "BUFF" or obj.szClass == "DEBUFF" then
+				local txt = ''
+				if obj.szClass == 'BUFF' or obj.szClass == 'DEBUFF' then
 					local KBuff = MY.GetBuff(object, obj.dwBuffID) -- 只判断dwID 反正不可能同时获得不同lv
 					if KBuff then
 						local nSec = MY.GetEndTime(KBuff.GetEndTime())
-						local szSec = MY.FormatTimeCount(nSec >= 60 and "M'ss" or "ss", min(nSec, 5999))
+						local szSec = MY.FormatTimeCount(nSec >= 60 and 'M\'ss' or 'ss', min(nSec, 5999))
 						if KBuff.nStackNum > 1 then
-							-- txt = string.format("%s(%d)_%s", obj.txt or MY.GetBuffName(KBuff.dwID, KBuff.nLevel), KBuff.nStackNum, szSec)
-							txt = string.format("%s(%d)_%s", MY.GetBuffName(KBuff.dwID, KBuff.nLevel), KBuff.nStackNum, szSec)
+							-- txt = string.format('%s(%d)_%s', obj.txt or MY.GetBuffName(KBuff.dwID, KBuff.nLevel), KBuff.nStackNum, szSec)
+							txt = string.format('%s(%d)_%s', MY.GetBuffName(KBuff.dwID, KBuff.nLevel), KBuff.nStackNum, szSec)
 						else
-							-- txt = string.format("%s_%s", obj.txt or MY.GetBuffName(KBuff.dwID, KBuff.nLevel), szSec)
-							txt = string.format("%s_%s", MY.GetBuffName(KBuff.dwID, KBuff.nLevel), szSec)
+							-- txt = string.format('%s_%s', obj.txt or MY.GetBuffName(KBuff.dwID, KBuff.nLevel), szSec)
+							txt = string.format('%s_%s', MY.GetBuffName(KBuff.dwID, KBuff.nLevel), szSec)
 						end
 					else
 						return obj:Free()
 					end
-				elseif obj.szClass == "Life" or obj.szClass == "Mana" then
+				elseif obj.szClass == 'Life' or obj.szClass == 'Mana' then
 					if object.nMoveState == MOVE_STATE.ON_DEATH then
 						return obj:Free()
 					end
-					if obj.szClass == "Life" then
+					if obj.szClass == 'Life' then
 						if fLifePer > MY_SA.fLifePer then
 							return obj:Free()
 						end
-						txt = g_tStrings.STR_SKILL_H_LIFE_COST .. string.format("%d/%d", tInfo.nCurrentLife, tInfo.nMaxLife)
-					elseif obj.szClass == "Mana" then
+						txt = g_tStrings.STR_SKILL_H_LIFE_COST .. string.format('%d/%d', tInfo.nCurrentLife, tInfo.nMaxLife)
+					elseif obj.szClass == 'Mana' then
 						if fManaPer > MY_SA.fManaPer then
 							return obj:Free()
 						end
-						txt = g_tStrings.STR_SKILL_H_MANA_COST .. string.format("%d/%d", tInfo.nCurrentMana, tInfo.nMaxMana)
+						txt = g_tStrings.STR_SKILL_H_MANA_COST .. string.format('%d/%d', tInfo.nCurrentMana, tInfo.nMaxMana)
 					end
-				elseif obj.szClass == "CASTING" then
+				elseif obj.szClass == 'CASTING' then
 					local bIsPrepare, dwSkillID, dwSkillLevel, fPer = object.GetSkillPrepareState()
 					if bIsPrepare then
 						-- txt = obj.txt or MY.GetSkillName(dwSkillID, dwSkillLevel)
@@ -211,13 +211,13 @@ function ScreenArrow.OnBreathe()
 					else
 						return obj:Free()
 					end
-				elseif obj.szClass == "NPC" or obj.szClass == "DOODAD" then
+				elseif obj.szClass == 'NPC' or obj.szClass == 'DOODAD' then
 					-- txt = obj.txt or txt
-				elseif obj.szClass == "TIME" then
+				elseif obj.szClass == 'TIME' then
 					if (GetTime() - obj.nNow) / 1000 > 3 then
 						return obj:Free()
 					end
-					txt = obj.txt or _L["Call Alert"]
+					txt = obj.txt or _L['Call Alert']
 				end
 				if not obj.init then
 					obj:DrawBackGround()
@@ -245,7 +245,7 @@ end
 
 function ScreenArrow.GetObject(szClass, dwID)
 	local dwType, object, tInfo
-	if szClass == "DOODAD" or szClass == TARGET.DOODAD then
+	if szClass == 'DOODAD' or szClass == TARGET.DOODAD then
 		dwType = TARGET.DOODAD
 		object = GetDoodad(dwID)
 	elseif IsPlayer(dwID) then
@@ -269,16 +269,16 @@ end
 
 function ScreenArrow.RegisterFight()
 	if arg0 and MY_SA.bAlert then
-		MY.BreatheCall("ScreenArrow_Fight", ScreenArrow.OnBreatheFight)
+		MY.BreatheCall('ScreenArrow_Fight', ScreenArrow.OnBreatheFight)
 	else
 		ScreenArrow.KillBreathe()
 	end
 end
 
 function ScreenArrow.KillBreathe()
-	MY.BreatheCall("ScreenArrow_Fight", false)
-	ScreenArrow.tCache["Mana"] = {}
-	ScreenArrow.tCache["Life"] = {}
+	MY.BreatheCall('ScreenArrow_Fight', false)
+	ScreenArrow.tCache['Mana'] = {}
+	ScreenArrow.tCache['Life'] = {}
 end
 
 function ScreenArrow.OnBreatheFight()
@@ -298,26 +298,26 @@ function ScreenArrow.OnBreatheFight()
 		local p, info = select(2, ScreenArrow.GetObject(TARGET.PLAYER, v))
 		if p and info then
 			if p.nMoveState == MOVE_STATE.ON_DEATH then
-				ScreenArrow.tCache["Mana"][v] = nil
-				ScreenArrow.tCache["Life"][v] = nil
+				ScreenArrow.tCache['Mana'][v] = nil
+				ScreenArrow.tCache['Life'][v] = nil
 			else
 				local fLifePer = info.nCurrentLife / max(info.nMaxLife, info.nCurrentLife, 1)
 				local fManaPer = info.nCurrentMana / max(info.nMaxMana, info.nCurrentMana, 1)
 				if fLifePer < MY_SA.fLifePer then
-					if not ScreenArrow.tCache["Life"][v] then
-						ScreenArrow.tCache["Life"][v] = true
-						CreateScreenArrow("Life", v)
+					if not ScreenArrow.tCache['Life'][v] then
+						ScreenArrow.tCache['Life'][v] = true
+						CreateScreenArrow('Life', v)
 					end
 				else
-					ScreenArrow.tCache["Life"][v] = nil
+					ScreenArrow.tCache['Life'][v] = nil
 				end
 				if fManaPer < MY_SA.fManaPer and (p.dwForceID < 7 or p.dwForceID == 22) then
-					if not ScreenArrow.tCache["Mana"][v] then
-						ScreenArrow.tCache["Mana"][v] = true
-						CreateScreenArrow("Mana", v)
+					if not ScreenArrow.tCache['Mana'][v] then
+						ScreenArrow.tCache['Mana'][v] = true
+						CreateScreenArrow('Mana', v)
 					end
 				else
-					ScreenArrow.tCache["Mana"][v] = nil
+					ScreenArrow.tCache['Mana'][v] = nil
 				end
 			end
 		end
@@ -353,7 +353,7 @@ function SA:ctor(szClass, dwID, tArgs)
 	oo.nTop     = 10
 	oo.dwID     = dwID
 	oo.dwType   = dwType
-	if szClass == "TIME" then
+	if szClass == 'TIME' then
 		oo.nNow = GetTime()
 	end
 	oo.Text:SetTriangleFan(GEOMETRY_TYPE.TEXT)
@@ -373,7 +373,7 @@ function SA:DrawText( ... )
 	local r, g, b = unpack(SA_COLOR.FONT[self.szClass])
 	local i = 1
 	for k, v in ipairs({ ... }) do
-		if v and v ~= "" then
+		if v and v ~= '' then
 			local top = nTop + i * -23 * UI_SCALED
 			if self.dwType == TARGET.DOODAD then
 				self.Text:AppendDoodadID(self.dwID, r, g, b, 240, { 0, 0, 0, 0, top }, MY_SA.nFont, v, 1, 1)
@@ -381,7 +381,7 @@ function SA:DrawText( ... )
 				if MY_SA.bDrawColor and self.dwType == TARGET.PLAYER and k ~= 1 then
 					local p = select(2, ScreenArrow.GetObject(self.szClass, self.dwID))
 					if p then
-						r, g, b = MY.GetForceColor(p.dwForceID, "background")
+						r, g, b = MY.GetForceColor(p.dwForceID, 'background')
 					end
 				end
 				self.Text:AppendCharacterID(self.dwID, true, r, g, b, 240, { 0, 0, 0, 0, top }, MY_SA.nFont, v, 1, 1)
@@ -447,7 +447,7 @@ function SA:DrawLifeBar(fLifePer, fManaPer)
 		if fManaPer > 0 then
 			local bcX, bcY = -49, -54
 			local r, g ,b = 50, 100, 255
-			if self.szClass == "CASTING" then
+			if self.szClass == 'CASTING' then
 				r, g ,b = 255, 128, 0
 			end
 			if self.dwType == TARGET.DOODAD then
@@ -540,11 +540,11 @@ function PS.OnPanelActive(wnd)
 	local x, y = X, Y
 
 	x = X + 10
-	y = y + ui:append("Text", { x = X, y = y, text = _L["Screen head alarm"], font = 27 }, true):height() + 10
+	y = y + ui:append('Text', { x = X, y = y, text = _L['Screen head alarm'], font = 27 }, true):height() + 10
 
-	y = y + ui:append("WndCheckBox", {
+	y = y + ui:append('WndCheckBox', {
 		x = 10, y = y,
-		text = _L["Draw school color"],
+		text = _L['Draw school color'],
 		checked = MY_SA.bDrawColor,
 		oncheck = function(bChecked)
 			MY_SA.bDrawColor = bChecked
@@ -552,25 +552,25 @@ function PS.OnPanelActive(wnd)
 	}, true):height() + 5
 
 	x = X + 10
-	y = y + ui:append("Text", { x = X, y = y, text = _L["Low life/mana head alert"], font = 27 }, true):height() + 10
+	y = y + ui:append('Text', { x = X, y = y, text = _L['Low life/mana head alert'], font = 27 }, true):height() + 10
 
-	x = x + ui:append("WndCheckBox",{
-		x = 10, y = y, text = _L["Enable"],
+	x = x + ui:append('WndCheckBox',{
+		x = 10, y = y, text = _L['Enable'],
 		checked = MY_SA.bAlert,
 		oncheck = function(bChecked)
 			MY_SA.bAlert = bChecked
 			local me = GetClientPlayer()
 			if bChecked and me.bFightState then
-				MY.BreatheCall("ScreenArrow_Fight", ScreenArrow.OnBreatheFight)
+				MY.BreatheCall('ScreenArrow_Fight', ScreenArrow.OnBreatheFight)
 			else
 				ScreenArrow.KillBreathe()
 			end
 		end,
 	}, true):autoWidth():width() + 5
 
-	y = y + ui:append("WndCheckBox", {
+	y = y + ui:append('WndCheckBox', {
 		x = x, y = y,
-		text = _L["Only monitor self"],
+		text = _L['Only monitor self'],
 		checked = MY_SA.bOnlySelf,
 		oncheck = function(bChecked)
 			MY_SA.bOnlySelf = bChecked
@@ -579,24 +579,24 @@ function PS.OnPanelActive(wnd)
 	}, true):height()
 
 	x = X + 10
-	y = y + ui:append("WndSliderBox", {
+	y = y + ui:append('WndSliderBox', {
 		x = x, y = y,
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		range = {0, 100},
 		value = MY_SA.fLifePer * 100,
-		textfmt = function(val) return _L("While HP less than %d.", val) end,
+		textfmt = function(val) return _L('While HP less than %d.', val) end,
 		onchange = function(nVal)
 			MY_SA.fLifePer = nVal / 100
 		end,
 		autoenable = function() return MY_SA.bAlert end,
 	}, true):height()
 
-	y = y + ui:append("WndSliderBox", {
+	y = y + ui:append('WndSliderBox', {
 		x = x, y = y,
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		range = {0, 100},
 		value = MY_SA.fManaPer * 100,
-		textfmt = function(val) return _L("While MP less than %d.", val) end,
+		textfmt = function(val) return _L('While MP less than %d.', val) end,
 		onchange = function(nVal)
 			MY_SA.fManaPer = nVal / 100
 		end,
@@ -605,7 +605,7 @@ function PS.OnPanelActive(wnd)
 
 	x = X + 10
 	y = y + 5
-	x = x + ui:append("WndButton2", {
+	x = x + ui:append('WndButton2', {
 		x = x, y = y,
 		text = g_tStrings.FONT,
 		onclick = function()
@@ -615,23 +615,23 @@ function PS.OnPanelActive(wnd)
 		end,
 	}, true):width() + 10
 
-	y = y + ui:append("WndButton2", {
-		text = _L["Preview"],
+	y = y + ui:append('WndButton2', {
+		text = _L['Preview'],
 		x = x, y = y,
 		onclick = function()
-			CreateScreenArrow("TIME", GetClientPlayer().dwID, { text = _L("%s, welcome to use mingyi plugins!", GetUserRoleName()) })
+			CreateScreenArrow('TIME', GetClientPlayer().dwID, { text = _L('%s, welcome to use mingyi plugins!', GetUserRoleName()) })
 		end,
 	}, true):height()
 end
-MY.RegisterPanel("MY_SA", _L["Screen head alarm"], _L["System"], 431, {255, 255, 255}, PS)
+MY.RegisterPanel('MY_SA', _L['Screen head alarm'], _L['System'], 431, {255, 255, 255}, PS)
 
 function ScreenArrow.Init()
-	HANDLE = XGUI.HandlePool(XGUI.GetShadowHandle("MY_ScreenArrow"), FormatHandle(string.rep("<shadow></shadow>", 6)))
-	MY.BreatheCall("ScreenArrow_Sort", 500, ScreenArrow.OnSort)
+	HANDLE = XGUI.HandlePool(XGUI.GetShadowHandle('MY_ScreenArrow'), FormatHandle(string.rep('<shadow></shadow>', 6)))
+	MY.BreatheCall('ScreenArrow_Sort', 500, ScreenArrow.OnSort)
 end
 
-MY.BreatheCall("ScreenArrow", ScreenArrow.OnBreathe)
-MY.RegisterEvent("LOGIN_GAME", ScreenArrow.Init)
-MY.RegisterEvent("FIGHT_HINT", ScreenArrow.RegisterFight)
-MY.RegisterEvent("UI_SCALED", function() UI_SCALED = Station.GetUIScale() end)
-MY.RegisterEvent("MY_SA_CREATE", function() CreateScreenArrow(arg0, arg1, arg2) end)
+MY.BreatheCall('ScreenArrow', ScreenArrow.OnBreathe)
+MY.RegisterEvent('LOGIN_GAME', ScreenArrow.Init)
+MY.RegisterEvent('FIGHT_HINT', ScreenArrow.RegisterFight)
+MY.RegisterEvent('UI_SCALED', function() UI_SCALED = Station.GetUIScale() end)
+MY.RegisterEvent('MY_SA_CREATE', function() CreateScreenArrow(arg0, arg1, arg2) end)

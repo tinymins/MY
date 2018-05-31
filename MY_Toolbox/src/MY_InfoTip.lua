@@ -1,7 +1,7 @@
 ------------------------------------------
 -- 信息条显示
 ------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Toolbox/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Toolbox/lang/')
 local _Cache = {
     bFighting = false,
     nLastFightStartTimestarp = 0,
@@ -10,39 +10,39 @@ local _Cache = {
 local Config_Default = {
     Ping        = { -- 网络延迟
     	bEnable = false, bShowBg = false, bShowTitle = false, rgb = { 95, 255, 95 },
-    	anchor = { x = -133, y = -111, s = "BOTTOMCENTER", r = "BOTTOMCENTER" }, nFont = 48,
+    	anchor = { x = -133, y = -111, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' }, nFont = 48,
     },
     TimeMachine = { -- 倍速显示（显示服务器有多卡……）
         bEnable = false, bShowBg = false, bShowTitle = true, rgb = { 31, 255, 31 },
-        anchor  = { x = -276, y = -111, s = "BOTTOMCENTER", r = "BOTTOMCENTER" },
+        anchor  = { x = -276, y = -111, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' },
     },
     FPS         = { -- FPS
         bEnable = false, bShowBg = true, bShowTitle = true,
-    	anchor  = { x = -10, y = -220, s = "BOTTOMRIGHT", r = "BOTTOMRIGHT" },
+    	anchor  = { x = -10, y = -220, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' },
     },
     Distance    = { -- 目标距离
         bEnable = false, bShowBg = false, bShowTitle = false, rgb = { 255, 255, 0 },
-        anchor  = { x = 203, y = -106, s = "CENTER", r = "CENTER" }, nFont = 209,
+        anchor  = { x = 203, y = -106, s = 'CENTER', r = 'CENTER' }, nFont = 209,
     },
     SysTime     = { -- 系统时间
         bEnable = false, bShowBg = true, bShowTitle = true,
-    	anchor  = { x = 285, y = -18, s = "BOTTOMLEFT", r = "BOTTOMLEFT" },
+    	anchor  = { x = 285, y = -18, s = 'BOTTOMLEFT', r = 'BOTTOMLEFT' },
     },
     FightTime   = { -- 战斗计时
         bEnable = false, bShowBg = false, bShowTitle = false, rgb = { 255, 0, 128 },
-        anchor  = { x = 353, y = -117, s = "BOTTOMCENTER", r = "BOTTOMCENTER" }, nFont = 199,
+        anchor  = { x = 353, y = -117, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER' }, nFont = 199,
     },
     LotusTime   = { -- 桂花和藕倒计时
         bEnable = false, bShowBg = true, bShowTitle = true,
-    	anchor  = { x = -290, y = -38, s = "BOTTOMRIGHT", r = "BOTTOMRIGHT" },
+    	anchor  = { x = -290, y = -38, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' },
     },
     GPS         = { -- 角色坐标
         bEnable = false, bShowBg = true, bShowTitle = false, rgb = { 255, 255, 255 },
-        anchor  = { x = -21, y = 250, s = "TOPRIGHT", r = "TOPRIGHT" }, nFont = 0,
+        anchor  = { x = -21, y = 250, s = 'TOPRIGHT', r = 'TOPRIGHT' }, nFont = 0,
     },
     Speedometer = { -- 角色速度
         bEnable = false, bShowBg = false, bShowTitle = false, rgb = { 255, 255, 255 },
-        anchor  = { x = -10, y = 210, s = "TOPRIGHT", r = "TOPRIGHT" }, nFont = 0,
+        anchor  = { x = -10, y = 210, s = 'TOPRIGHT', r = 'TOPRIGHT' }, nFont = 0,
     },
 }
 local _C = {}
@@ -81,7 +81,7 @@ MY_InfoTip.Cache = {
     Distance  = { -- 目标距离
         formatString = '', title = _L['target distance'], prefix = _L['Distance: '], content = _L['%.1f Foot'],
         GetContent = function()
-            local p, s = MY.GetObject(MY.GetTarget()), _L["No Target"]
+            local p, s = MY.GetObject(MY.GetTarget()), _L['No Target']
             if p then
                 s = string.format(MY_InfoTip.Cache.Distance.formatString, GetCharacterDistance(GetClientPlayer().dwID, p.dwID)/64)
             end
@@ -96,12 +96,12 @@ MY_InfoTip.Cache = {
         end
     },
     FightTime = { -- 战斗计时
-        formatString = '', title = _L['fight clock'], prefix = _L['Fight Clock: '], content = "",
+        formatString = '', title = _L['fight clock'], prefix = _L['Fight Clock: '], content = '',
         GetContent = function()
             if MY.GetFightUUID() or MY.GetLastFightUUID() then
-                return MY_InfoTip.Cache.FightTime.formatString .. MY.GetFightTime("H:mm:ss")
+                return MY_InfoTip.Cache.FightTime.formatString .. MY.GetFightTime('H:mm:ss')
             else
-                return _L["Never Fight"]
+                return _L['Never Fight']
             end
         end
     },
@@ -165,7 +165,7 @@ local LoadConfig = function()
         end
     end
 end
-RegisterEvent("CUSTOM_UI_MODE_SET_DEFAULT", function()
+RegisterEvent('CUSTOM_UI_MODE_SET_DEFAULT', function()
     for k, v in pairs(Config_Default) do
         MY_InfoTip.Config[k].anchor = v.anchor
     end
@@ -178,7 +178,7 @@ MY_InfoTip.Reload = function()
         local frm = MY.UI('Normal/MY_InfoTip_'..id)
         if cfg.bEnable then
             if frm:count()==0 then
-                frm = MY.UI.CreateFrame('MY_InfoTip_'..id, {empty = true}):size(220,30):event("UI_SCALED", function()
+                frm = MY.UI.CreateFrame('MY_InfoTip_'..id, {empty = true}):size(220,30):event('UI_SCALED', function()
                     MY.UI(this):anchor(cfg.anchor)
                 end):customMode(cache.title, function(anchor)
                     MY.UI(this):bringToTop()
@@ -188,22 +188,22 @@ MY_InfoTip.Reload = function()
                     cfg.anchor = anchor
                     SaveConfig()
                 end):drag(0,0,0,0):drag(false):penetrable(true)
-                frm:append("Image", "Image_Default"):children("#Image_Default"):size(220,30):image("UI/Image/UICommon/Commonpanel.UITex",86):alpha(180)
-                frm:append("Text", "Text_Default"):children("#Text_Default"):size(220,30):text(cache.title):font(2)[1]:SetHAlign(1)
-                local txt = frm:find("#Text_Default")
+                frm:append('Image', 'Image_Default'):children('#Image_Default'):size(220,30):image('UI/Image/UICommon/Commonpanel.UITex',86):alpha(180)
+                frm:append('Text', 'Text_Default'):children('#Text_Default'):size(220,30):text(cache.title):font(2)[1]:SetHAlign(1)
+                local txt = frm:find('#Text_Default')
                 frm:breathe(function() txt:text(cache.GetContent()) end)
             end
             if cfg.bShowBg then
-                frm:find("#Image_Default"):show()
+                frm:find('#Image_Default'):show()
             else
-                frm:find("#Image_Default"):hide()
+                frm:find('#Image_Default'):hide()
             end
             if cfg.bShowTitle then
                 cache.formatString = _L[cache.prefix] .. _L[cache.content]
             else
                 cache.formatString = _L[cache.content]
             end
-            frm:children("#Text_Default"):font(cfg.nFont or 0):color(cfg.rgb or {255,255,255})
+            frm:children('#Text_Default'):font(cfg.nFont or 0):color(cfg.rgb or {255,255,255})
             frm:anchor(cfg.anchor)
         else
             frm:remove()
@@ -212,18 +212,18 @@ MY_InfoTip.Reload = function()
     SaveConfig()
 end
 -- 注册INIT事件
-MY.RegisterInit("MY_INFOTIP", function()
+MY.RegisterInit('MY_INFOTIP', function()
     LoadConfig()
     MY_InfoTip.Reload()
 end)
 
 
-MY.RegisterPanel( "MY_InfoTip", _L["infotip"], _L['System'], "ui/Image/UICommon/ActivePopularize2.UITex|22", {255,255,0,200}, { OnPanelActive = function(wnd)
+MY.RegisterPanel( 'MY_InfoTip', _L['infotip'], _L['System'], 'ui/Image/UICommon/ActivePopularize2.UITex|22', {255,255,0,200}, { OnPanelActive = function(wnd)
     local ui = MY.UI(wnd)
     local w, h = ui:size()
     local x, y = 50, 20
 
-    ui:append("Text", "Text_InfoTip"):find("#Text_InfoTip")
+    ui:append('Text', 'Text_InfoTip'):find('#Text_InfoTip')
       :pos(x, y):width(350)
       :text(_L['* infomation tips']):color(255,255,0)
     y = y + 5
@@ -232,28 +232,28 @@ MY.RegisterPanel( "MY_InfoTip", _L["infotip"], _L['System'], "ui/Image/UICommon/
         x, y = 55, y + 30
 
         local cfg = MY_InfoTip.Config[id]
-        ui:append("WndCheckBox", "WndCheckBox_InfoTip_"..id):children("#WndCheckBox_InfoTip_"..id):pos(x, y):width(250)
+        ui:append('WndCheckBox', 'WndCheckBox_InfoTip_'..id):children('#WndCheckBox_InfoTip_'..id):pos(x, y):width(250)
           :text(cache.title):check(cfg.bEnable or false)
           :check(function(bChecked)
             cfg.bEnable = bChecked
             MY_InfoTip.Reload()
           end)
         x = x + 220
-        ui:append("WndCheckBox", "WndCheckBox_InfoTipTitle_"..id):children("#WndCheckBox_InfoTipTitle_"..id):pos(x, y):width(60)
+        ui:append('WndCheckBox', 'WndCheckBox_InfoTipTitle_'..id):children('#WndCheckBox_InfoTipTitle_'..id):pos(x, y):width(60)
           :text(_L['title']):check(cfg.bShowTitle or false)
           :check(function(bChecked)
             cfg.bShowTitle = bChecked
             MY_InfoTip.Reload()
           end)
         x = x + 70
-        ui:append("WndCheckBox", "WndCheckBox_InfoTipBg_"..id):children("#WndCheckBox_InfoTipBg_"..id):pos(x, y):width(60)
+        ui:append('WndCheckBox', 'WndCheckBox_InfoTipBg_'..id):children('#WndCheckBox_InfoTipBg_'..id):pos(x, y):width(60)
           :text(_L['background']):check(cfg.bShowBg or false)
           :check(function(bChecked)
             cfg.bShowBg = bChecked
             MY_InfoTip.Reload()
           end)
         x = x + 70
-        ui:append("WndButton", "WndButton_InfoTipFont_"..id):children("#WndButton_InfoTipFont_"..id):pos(x, y)
+        ui:append('WndButton', 'WndButton_InfoTipFont_'..id):children('#WndButton_InfoTipFont_'..id):pos(x, y)
           :width(50):text(_L['font'])
           :click(function()
             MY.UI.OpenFontPicker(function(f)
@@ -262,7 +262,7 @@ MY.RegisterPanel( "MY_InfoTip", _L["infotip"], _L['System'], "ui/Image/UICommon/
             end)
           end)
         x = x + 60
-        ui:append("Shadow", "Shadow_InfoTipColor_"..id):children("#Shadow_InfoTipColor_"..id):pos(x, y)
+        ui:append('Shadow', 'Shadow_InfoTipColor_'..id):children('#Shadow_InfoTipColor_'..id):pos(x, y)
           :size(20, 20):color(cfg.rgb or {255,255,255})
           :click(function()
             local me = this

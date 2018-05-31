@@ -39,14 +39,14 @@ local function GetConfigValue(key, relation, force)
 			value = cfg[force]
 		end
 		if value == nil then
-			value = Config[key][relation]["Player"]
+			value = Config[key][relation]['Player']
 		end
 	end
 	return value
 end
 -----------------------------------------------------------------------------------------
 
-local _L, D = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_LifeBar/lang/"), {}
+local _L, D = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/lang/'), {}
 local LB_CACHE = {}
 local TONG_NAME_CACHE = {}
 local NPC_CACHE = {}
@@ -58,9 +58,9 @@ local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子
 
 MY_LifeBar = {}
 MY_LifeBar.bEnabled = false
-MY_LifeBar.szConfig = "common"
-RegisterCustomData("MY_LifeBar.bEnabled")
-RegisterCustomData("MY_LifeBar.szConfig")
+MY_LifeBar.szConfig = 'common'
+RegisterCustomData('MY_LifeBar.bEnabled')
+RegisterCustomData('MY_LifeBar.szConfig')
 
 function D.IsShielded() return MY.IsShieldedVersion() and MY.IsInPubg() end
 function D.IsEnabled() return MY_LifeBar.bEnabled and not D.IsShielded() end
@@ -85,55 +85,55 @@ end
 function D.GetRelation(dwID)
 	local me = GetClientPlayer()
 	if not me then
-		return "Neutrality"
+		return 'Neutrality'
 	end
 	if Config.nCamp == -1 or not IsPlayer(dwID) then
 		if dwID == me.dwID then
-			return "Self"
+			return 'Self'
 		elseif IsParty(me.dwID, dwID) then
-			return "Party"
+			return 'Party'
 		elseif IsNeutrality(me.dwID, dwID) then
-			return "Neutrality"
+			return 'Neutrality'
 		elseif IsEnemy(me.dwID, dwID) then -- 敌对关系
 			local r, g, b = GetHeadTextForceFontColor(dwID, me.dwID) -- 我看他的颜色
 			if MY.GetFoe(dwID) then
-				return "Foe"
+				return 'Foe'
 			elseif r == 255 and g == 255 and b == 0 then
-				return "Neutrality"
+				return 'Neutrality'
 			else
-				return "Enemy"
+				return 'Enemy'
 			end
 		elseif IsAlly(me.dwID, dwID) then -- 相同阵营
-			return "Ally"
+			return 'Ally'
 		else
-			return "Neutrality" -- "Other"
+			return 'Neutrality' -- 'Other'
 		end
 	else
 		local tar = MY.GetObject(TARGET.PLAYER, dwID)
 		if not tar then
-			return "Neutrality"
+			return 'Neutrality'
 		elseif dwID == me.dwID then
-			return "Self"
+			return 'Self'
 		elseif IsParty(me.dwID, dwID) then
-			return "Party"
+			return 'Party'
 		elseif MY.GetFoe(dwID) then
-			return "Foe"
+			return 'Foe'
 		elseif tar.nCamp == Config.nCamp then
-			return "Ally"
+			return 'Ally'
 		elseif not tar.bCampFlag        -- 没开阵营
 		or tar.nCamp == CAMP.NEUTRAL    -- 目标中立
 		or Config.nCamp == CAMP.NEUTRAL -- 自己中立
 		or me.GetScene().nCampType == MAP_CAMP_TYPE.ALL_PROTECT then -- 停战地图
-			return "Neutrality"
+			return 'Neutrality'
 		else
-			return "Enemy"
+			return 'Enemy'
 		end
 	end
 end
 
 function D.GetForce(dwID)
 	if not IsPlayer(dwID) then
-		return "Npc"
+		return 'Npc'
 	else
 		local tar = MY.GetObject(TARGET.PLAYER, dwID)
 		if not tar then
@@ -219,14 +219,14 @@ function D.Repaint()
 		lb:Paint(true)
 	end
 end
-MY.RegisterEvent("UI_SCALED", D.Repaint)
+MY.RegisterEvent('UI_SCALED', D.Repaint)
 
 function D.Reset()
 	LB_CACHE = {}
-	LB("clear")
+	LB('clear')
 	-- -- auto adjust index
 	-- if MY_LifeBar.bEnabled and Config.bAdjustIndex then
-	-- 	MY.BreatheCall("MY_LifeBar_AdjustIndex", function()
+	-- 	MY.BreatheCall('MY_LifeBar_AdjustIndex', function()
 	-- 		local n = 0
 	-- 		local t = {}
 	-- 		-- refresh current index data
@@ -237,7 +237,7 @@ function D.Reset()
 	-- 			end
 	-- 			PostThreadCall(function(info, xScreen, yScreen)
 	-- 				info.nIndex = yScreen or 0
-	-- 			end, lb.info, "Scene_GetCharacterTopScreenPos", dwID)
+	-- 			end, lb.info, 'Scene_GetCharacterTopScreenPos', dwID)
 
 	-- 			insert(t, { handle = lb.info.handle, index = lb.info.nIndex })
 	-- 		end
@@ -251,7 +251,7 @@ function D.Reset()
 	-- 		end
 	-- 	end, 500)
 	-- else
-	-- 	MY.BreatheCall("MY_LifeBar_AdjustIndex", false)
+	-- 	MY.BreatheCall('MY_LifeBar_AdjustIndex', false)
 	-- end
 	D.AutoSwitchSysHeadTop()
 end
@@ -293,7 +293,7 @@ local function CheckInvalidRect(dwType, dwID, me)
 			lb = LB(dwType, dwID)
 				:SetFont(Config.nFont)
 				:SetTextsPos(Config.nTextOffsetY, Config.nTextLineHeight)
-				:SetDistanceFmt("%d" .. g_tStrings.STR_METER)
+				:SetDistanceFmt('%d' .. g_tStrings.STR_METER)
 				:Create()
 			LB_CACHE[dwID] = lb
 		end
@@ -302,7 +302,7 @@ local function CheckInvalidRect(dwType, dwID, me)
 		local force = D.GetForce(dwID)
 		local szName = MY.GetObjectName(object)
 		-- 配色
-		local r, g, b = unpack(GetConfigValue("Color", relation, force))
+		local r, g, b = unpack(GetConfigValue('Color', relation, force))
 		lb:SetColor(r, g, b, Config.nAlpha, Config.nFont)
 		lb:SetColorFx(
 			object.nMoveState == MOVE_STATE.ON_DEATH
@@ -311,7 +311,7 @@ local function CheckInvalidRect(dwType, dwID, me)
 		)
 		-- 名字/帮会/称号部分
 		-- 名字
-		local bShowName = GetConfigValue("ShowName", relation, force)
+		local bShowName = GetConfigValue('ShowName', relation, force)
 		if bShowName then
 			lb:SetName(szName)
 		end
@@ -321,7 +321,7 @@ local function CheckInvalidRect(dwType, dwID, me)
 		if bShowKungfu then
 			local kunfu = object.GetKungfuMount()
 			if kunfu and kunfu.dwSkillID and kunfu.dwSkillID ~= 0 then
-				lb:SetKungfu(MY.GetKungfuName(kunfu.dwSkillID, "short"))
+				lb:SetKungfu(MY.GetKungfuName(kunfu.dwSkillID, 'short'))
 			else
 				lb:SetKungfu(g_tStrings.tForceTitle[object.dwForceID])
 			end
@@ -338,28 +338,28 @@ local function CheckInvalidRect(dwType, dwID, me)
 		end
 		lb:SetDistanceVisible(Config.bShowDistance)
 		-- 帮会
-		local bShowTong = GetConfigValue("ShowTong", relation, force)
+		local bShowTong = GetConfigValue('ShowTong', relation, force)
 		if bShowTong then
-			lb:SetTong(D.GetTongName(object.dwTongID) or "")
+			lb:SetTong(D.GetTongName(object.dwTongID) or '')
 		end
 		lb:SetTongVisible(bShowTong)
 		-- 称号
-		local bShowTitle = GetConfigValue("ShowTitle", relation, force)
+		local bShowTitle = GetConfigValue('ShowTitle', relation, force)
 		if bShowTitle then
-			lb:SetTitle(object.szTitle or "")
+			lb:SetTitle(object.szTitle or '')
 		end
 		lb:SetTitleVisible(bShowTitle)
 		-- 血条部分
 		lb:SetLife(info.nCurrentLife, info.nMaxLife)
-		local bShowLife = szName ~= "" and GetConfigValue("ShowLife", relation, force)
+		local bShowLife = szName ~= '' and GetConfigValue('ShowLife', relation, force)
 		if bShowLife then
 			lb:SetLifeBar(Config.nLifeOffsetX, Config.nLifeOffsetY, Config.nLifeWidth, Config.nLifeHeight)
 		end
 		lb:SetLifeBarVisible(bShowLife)
 		-- 血量数值部分
-		local bShowLifePercent = GetConfigValue("ShowLifePer", relation, force) and (not Config.bHideLifePercentageWhenFight or me.bFightState)
+		local bShowLifePercent = GetConfigValue('ShowLifePer', relation, force) and (not Config.bHideLifePercentageWhenFight or me.bFightState)
 		if bShowLifePercent then
-			lb:SetLifeText(Config.nLifePerOffsetX, Config.nLifePerOffsetY, Config.bHideLifePercentageDecimal and "%.0f" or "%.1f")
+			lb:SetLifeText(Config.nLifePerOffsetX, Config.nLifePerOffsetY, Config.bHideLifePercentageDecimal and '%.0f' or '%.1f')
 		end
 		lb:SetLifeTextVisible(bShowLifePercent)
 		lb:Create():Paint()
@@ -387,14 +387,14 @@ local function onBreathe()
 		CheckInvalidRect(TARGET.PLAYER, k, me)
 	end
 end
-MY.BreatheCall("MY_LifeBar", onBreathe)
+MY.BreatheCall('MY_LifeBar', onBreathe)
 end
 
-RegisterEvent("NPC_ENTER_SCENE",function()
+RegisterEvent('NPC_ENTER_SCENE',function()
 	NPC_CACHE[arg0] = true
 end)
 
-RegisterEvent("NPC_LEAVE_SCENE",function()
+RegisterEvent('NPC_LEAVE_SCENE',function()
 	local lb = LB_CACHE[arg0]
 	if lb then
 		lb:Remove()
@@ -403,11 +403,11 @@ RegisterEvent("NPC_LEAVE_SCENE",function()
 	NPC_CACHE[arg0] = nil
 end)
 
-RegisterEvent("PLAYER_ENTER_SCENE",function()
+RegisterEvent('PLAYER_ENTER_SCENE',function()
 	PLAYER_CACHE[arg0] = true
 end)
 
-RegisterEvent("PLAYER_LEAVE_SCENE",function()
+RegisterEvent('PLAYER_LEAVE_SCENE',function()
 	local lb = LB_CACHE[arg0]
 	if lb then
 		lb:Remove()
@@ -420,7 +420,7 @@ local function onSwitch()
 	MY_LifeBar.bEnabled = not MY_LifeBar.bEnabled
 	D.Reset(true)
 end
-MY.Game.RegisterHotKey("MY_LifeBar_S", _L["x lifebar"], onSwitch)
+MY.Game.RegisterHotKey('MY_LifeBar_S', _L['x lifebar'], onSwitch)
 
 setmetatable(MY_LifeBar, {
 	__index = {

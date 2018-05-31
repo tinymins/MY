@@ -56,12 +56,12 @@ data = {
     ['show kungfu'] = '顯示心法',
     ['show distance'] = '顯示距離',
 
-    ['Neutrality'] = "中立關系",
-    ['Enemy'] = "敵對關系",
-    ['Ally'] = "友好關系",
-    ['Party'] = "隊友關系",
-    ['Self'] = "自己",
-    ['Foe'] = "仇人關系",
+    ['Neutrality'] = '中立關系',
+    ['Enemy'] = '敵對關系',
+    ['Ally'] = '友好關系',
+    ['Party'] = '隊友關系',
+    ['Self'] = '自己',
+    ['Foe'] = '仇人關系',
 
     ['hide when unfight'] = '脫戰時隱藏',
     ['hide decimal'] = '不顯示小數',

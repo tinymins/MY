@@ -61,8 +61,8 @@ MY.RegisterHotKey = MY.Game.RegisterHotKey
 function MY.Game.GetHotKeyDisplay(szName, bBracket, bShort)
 	local nKey, bShift, bCtrl, bAlt = Hotkey.Get(szName)
 	local szDisplay = GetKeyShow(nKey, bShift, bCtrl, bAlt, bShort == true)
-	if szDisplay ~= "" and bBracket then
-		szDisplay = "(" .. szDisplay .. ")"
+	if szDisplay ~= '' and bBracket then
+		szDisplay = '(' .. szDisplay .. ')'
 	end
 	return szDisplay
 end
@@ -96,9 +96,9 @@ function MY.Game.SetHotKey(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
 	else
 		local szGroup = szCommand or MY.GetAddonInfo().szName
 
-		local frame = Station.Lookup("Topmost/HotkeyPanel")
+		local frame = Station.Lookup('Topmost/HotkeyPanel')
 		if not frame then
-			frame = Wnd.OpenWindow("HotkeyPanel")
+			frame = Wnd.OpenWindow('HotkeyPanel')
 		elseif not frame:IsVisible() then
 			frame:Show()
 		end
@@ -106,7 +106,7 @@ function MY.Game.SetHotKey(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
 		-- load aKey
 		local aKey, nI, bindings = nil, 0, Hotkey.GetBinding(false)
 		for k, v in pairs(bindings) do
-			if v.szHeader ~= "" then
+			if v.szHeader ~= '' then
 				if aKey then
 					break
 				elseif v.szHeader == szGroup then
@@ -126,7 +126,7 @@ function MY.Game.SetHotKey(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
 			end
 		end
 		if not aKey then return end
-		local hP = frame:Lookup("", "Handle_List")
+		local hP = frame:Lookup('', 'Handle_List')
 		local hI = hP:Lookup(nI)
 		if hI.bSel then return end
 		-- update list effect
@@ -135,58 +135,58 @@ function MY.Game.SetHotKey(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
 			if hB.bSel then
 				hB.bSel = false
 				if hB.IsOver then
-					hB:Lookup("Image_Sel"):SetAlpha(128)
-					hB:Lookup("Image_Sel"):Show()
+					hB:Lookup('Image_Sel'):SetAlpha(128)
+					hB:Lookup('Image_Sel'):Show()
 				else
-					hB:Lookup("Image_Sel"):Hide()
+					hB:Lookup('Image_Sel'):Hide()
 				end
 			end
 		end
 		hI.bSel = true
-		hI:Lookup("Image_Sel"):SetAlpha(255)
-		hI:Lookup("Image_Sel"):Show()
+		hI:Lookup('Image_Sel'):SetAlpha(255)
+		hI:Lookup('Image_Sel'):Show()
 		-- update content keys [hI.nGroupIndex]
-		local hK = frame:Lookup("", "Handle_Hotkey")
-		local szIniFile = "UI/Config/default/HotkeyPanel.ini"
+		local hK = frame:Lookup('', 'Handle_Hotkey')
+		local szIniFile = 'UI/Config/default/HotkeyPanel.ini'
 		Hotkey.SetCapture(false)
 		hK:Clear()
 		hK.nGroupIndex = hI.nGroupIndex
-		hK:AppendItemFromIni(szIniFile, "Text_GroupName")
+		hK:AppendItemFromIni(szIniFile, 'Text_GroupName')
 		hK:Lookup(0):SetText(szGroup)
 		hK:Lookup(0).bGroup = true
 		for k, v in ipairs(aKey) do
-			hK:AppendItemFromIni(szIniFile, "Handle_Binding")
+			hK:AppendItemFromIni(szIniFile, 'Handle_Binding')
 			local hI = hK:Lookup(k)
 			hI.bBinding = true
 			hI.nIndex = k
 			hI.szTip = v.szTip
-			hI:Lookup("Text_Name"):SetText(v.szDesc)
+			hI:Lookup('Text_Name'):SetText(v.szDesc)
 			for i = 1, 2, 1 do
-				local hK = hI:Lookup("Handle_Key"..i)
+				local hK = hI:Lookup('Handle_Key'..i)
 				hK.bKey = true
 				hK.nIndex = i
-				local hotkey = v["Hotkey"..i]
+				local hotkey = v['Hotkey'..i]
 				hotkey.bUnchangeable = v.bUnchangeable
 				hK.bUnchangeable = v.bUnchangeable
-				local text = hK:Lookup("Text_Key"..i)
+				local text = hK:Lookup('Text_Key'..i)
 				text:SetText(GetKeyShow(hotkey.nKey, hotkey.bShift, hotkey.bCtrl, hotkey.bAlt))
 				-- update btn
 				if hK.bUnchangeable then
-					hK:Lookup("Image_Key"..hK.nIndex):SetFrame(56)
+					hK:Lookup('Image_Key'..hK.nIndex):SetFrame(56)
 				elseif hK.bDown then
-					hK:Lookup("Image_Key"..hK.nIndex):SetFrame(55)
+					hK:Lookup('Image_Key'..hK.nIndex):SetFrame(55)
 				elseif hK.bRDown then
-					hK:Lookup("Image_Key"..hK.nIndex):SetFrame(55)
+					hK:Lookup('Image_Key'..hK.nIndex):SetFrame(55)
 				elseif hK.bSel then
-					hK:Lookup("Image_Key"..hK.nIndex):SetFrame(55)
+					hK:Lookup('Image_Key'..hK.nIndex):SetFrame(55)
 				elseif hK.bOver then
-					hK:Lookup("Image_Key"..hK.nIndex):SetFrame(54)
+					hK:Lookup('Image_Key'..hK.nIndex):SetFrame(54)
 				elseif hotkey.bChange then
-					hK:Lookup("Image_Key"..hK.nIndex):SetFrame(56)
+					hK:Lookup('Image_Key'..hK.nIndex):SetFrame(56)
 				elseif hotkey.bConflict then
-					hK:Lookup("Image_Key"..hK.nIndex):SetFrame(54)
+					hK:Lookup('Image_Key'..hK.nIndex):SetFrame(54)
 				else
-					hK:Lookup("Image_Key"..hK.nIndex):SetFrame(53)
+					hK:Lookup('Image_Key'..hK.nIndex):SetFrame(53)
 				end
 			end
 		end
@@ -194,21 +194,21 @@ function MY.Game.SetHotKey(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
 		hK:FormatAllItemPos()
 		local wAll, hAll = hK:GetAllItemSize()
 		local w, h = hK:GetSize()
-		local scroll = frame:Lookup("Scroll_Key")
+		local scroll = frame:Lookup('Scroll_Key')
 		local nCountStep = math.ceil((hAll - h) / 10)
 		scroll:SetStepCount(nCountStep)
 		scroll:SetScrollPos(0)
 		if nCountStep > 0 then
 			scroll:Show()
-			scroll:GetParent():Lookup("Btn_Up"):Show()
-			scroll:GetParent():Lookup("Btn_Down"):Show()
+			scroll:GetParent():Lookup('Btn_Up'):Show()
+			scroll:GetParent():Lookup('Btn_Down'):Show()
 		else
 			scroll:Hide()
-			scroll:GetParent():Lookup("Btn_Up"):Hide()
-			scroll:GetParent():Lookup("Btn_Down"):Hide()
+			scroll:GetParent():Lookup('Btn_Up'):Hide()
+			scroll:GetParent():Lookup('Btn_Down'):Hide()
 		end
 		-- update list scroll
-		local scroll = frame:Lookup("Scroll_List")
+		local scroll = frame:Lookup('Scroll_List')
 		if scroll:GetStepCount() > 0 then
 			local _, nH = hI:GetSize()
 			local nStep = math.ceil((nI * nH) / 10)
@@ -223,15 +223,15 @@ MY.SetHotKey = MY.Game.SetHotKey
 
 MY.RegisterInit('MYLIB#BIND_HOTKEY', function()
 	-- hotkey
-	Hotkey.AddBinding("MY_Total", _L["Open/Close main panel"], MY.GetAddonInfo().szName, MY.TogglePanel, nil)
+	Hotkey.AddBinding('MY_Total', _L['Open/Close main panel'], MY.GetAddonInfo().szName, MY.TogglePanel, nil)
 	for _, v in ipairs(_Cache.tHotkey) do
-		Hotkey.AddBinding(v.szName, v.szTitle, "", v.fnAction, nil)
+		Hotkey.AddBinding(v.szName, v.szTitle, '', v.fnAction, nil)
 	end
 	for i = 1, 5 do
-		Hotkey.AddBinding('MY_HotKey_Null_'..i, _L['none-function hotkey'], "", function() end, nil)
+		Hotkey.AddBinding('MY_HotKey_Null_'..i, _L['none-function hotkey'], '', function() end, nil)
 	end
 end)
-MY.Game.RegisterHotKey("MY_STOP_CASTING", _L["Stop cast skill"], function() GetClientPlayer().StopCurrentAction() end)
+MY.Game.RegisterHotKey('MY_STOP_CASTING', _L['Stop cast skill'], function() GetClientPlayer().StopCurrentAction() end)
 -- #######################################################################################################
 --                                 #                   # # # #   # # # #
 --     # # # #   # # # # #       # # # # # # #         #     #   #     #
@@ -256,7 +256,7 @@ function MY.Game.GetServer(nIndex)
 	elseif nIndex == 2 then
 		return server
 	else
-		return region .. "_" .. server, {region, server}
+		return region .. '_' .. server, {region, server}
 	end
 end
 MY.GetServer = MY.Game.GetServer
@@ -269,7 +269,7 @@ function MY.Game.GetDisplayServer(nIndex)
 	elseif nIndex == 2 then
 		return display_server
 	else
-		return display_region .. "_" .. display_server, {display_region, display_server}
+		return display_region .. '_' .. display_server, {display_region, display_server}
 	end
 end
 MY.GetDisplayServer = MY.Game.GetDisplayServer
@@ -284,7 +284,7 @@ function MY.Game.GetRealServer(nIndex)
 	elseif nIndex == 2 then
 		return real_server
 	else
-		return real_region .. "_" .. real_server, {real_region, real_server}
+		return real_region .. '_' .. real_server, {real_region, real_server}
 	end
 end
 MY.GetRealServer = MY.Game.GetRealServer
@@ -339,14 +339,14 @@ function MY.Game.GetObjectName(obj)
 
 	local szName = obj.szName
 	if IsPlayer(obj.dwID) then  -- PLAYER
-		if szName == "" then
+		if szName == '' then
 			szName = nil
 		end
 		return szName
 	elseif obj.nMaxLife then    -- NPC
-		if szName == "" then
-			szName = string.gsub(Table_GetNpcTemplateName(obj.dwTemplateID), "^%s*(.-)%s*$", "%1")
-			if szName == "" then
+		if szName == '' then
+			szName = string.gsub(Table_GetNpcTemplateName(obj.dwTemplateID), '^%s*(.-)%s*$', '%1')
+			if szName == '' then
 				if obj.dwEmployer and obj.dwEmployer ~= 0 then
 					return MY.GetObjectName(GetPlayer(obj.dwEmployer)) -- 长歌影子
 				else
@@ -363,9 +363,9 @@ function MY.Game.GetObjectName(obj)
 		end
 		return szName
 	elseif obj.CanLoot then -- DOODAD
-		if szName == "" then
-			szName = string.gsub(Table_GetDoodadTemplateName(obj.dwTemplateID), "^%s*(.-)%s*$", "%1")
-			if szName == "" then
+		if szName == '' then
+			szName = string.gsub(Table_GetDoodadTemplateName(obj.dwTemplateID), '^%s*(.-)%s*$', '%1')
+			if szName == '' then
 				szName = nil
 			end
 		end
@@ -390,16 +390,16 @@ do local MY_CACHE_BUFF = {}
 function MY.GetBuffName(dwBuffID, dwLevel)
 	local xKey = dwBuffID
 	if dwLevel then
-		xKey = dwBuffID .. "_" .. dwLevel
+		xKey = dwBuffID .. '_' .. dwLevel
 	end
 	if not MY_CACHE_BUFF[xKey] then
 		local tLine = Table_GetBuff(dwBuffID, dwLevel or 1)
 		if tLine then
 			MY_CACHE_BUFF[xKey] = { tLine.szName, tLine.dwIconID }
 		else
-			local szName = "BUFF#" .. dwBuffID
+			local szName = 'BUFF#' .. dwBuffID
 			if dwLevel then
-				szName = szName .. ":" .. dwLevel
+				szName = szName .. ':' .. dwLevel
 			end
 			MY_CACHE_BUFF[xKey] = { szName, 1436 }
 		end
@@ -457,7 +457,7 @@ function MY.Game.GetTargetContextMenu(dwType, szName, dwID)
 			szOption = g_tStrings.LOOKUP_CORPS,
 			-- fnDisable = function() return not GetPlayer(dwID) end,
 			fnAction = function()
-				Wnd.CloseWindow("ArenaCorpsPanel")
+				Wnd.CloseWindow('ArenaCorpsPanel')
 				OpenArenaCorpsPanel(true, dwID)
 			end,
 		})
@@ -531,7 +531,7 @@ local function LoadCustomList()
 	end
 end
 local function SaveCustomList()
-	MY.SaveLUAData({'config/bosslist.jx3dat', MY_DATA_PATH.GLOBAL}, BOSS_LIST_CUSTOM, IsDebugClient() and "\t" or nil)
+	MY.SaveLUAData({'config/bosslist.jx3dat', MY_DATA_PATH.GLOBAL}, BOSS_LIST_CUSTOM, IsDebugClient() and '\t' or nil)
 end
 local function GenerateList(bForceRefresh)
 	LoadCustomList()
@@ -548,7 +548,7 @@ local function GenerateList(bForceRefresh)
 			local tLine = g_tTable.DungeonBoss:GetRow(i)
 			local dwMapID = tLine.dwMapID
 			local szNpcList = tLine.szNpcList
-			for szNpcIndex in string.gmatch(szNpcList, "(%d+)") do
+			for szNpcIndex in string.gmatch(szNpcList, '(%d+)') do
 				local p = g_tTable.DungeonNpc:Search(tonumber(szNpcIndex))
 				if p then
 					if not BOSS_LIST[dwMapID] then
@@ -562,7 +562,7 @@ local function GenerateList(bForceRefresh)
 		MY.Sysmsg({_L('Boss list updated to v%s.', VERSION)})
 	end
 
-	for dwMapID, tInfo in pairs(MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. "data/bosslist/$lang.jx3dat") or {}) do
+	for dwMapID, tInfo in pairs(MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/bosslist/$lang.jx3dat') or {}) do
 		if not BOSS_LIST[dwMapID] then
 			BOSS_LIST[dwMapID] = {}
 		end
@@ -587,7 +587,7 @@ function MY.IsBoss(dwMapID, dwTemplateID)
 	) and true or false
 end
 
-MY.RegisterTargetAddonMenu("MY.Game.Bosslist", function()
+MY.RegisterTargetAddonMenu('MY.Game.Bosslist', function()
 	local dwType, dwID = MY.GetTarget()
 	if dwType == TARGET.NPC and (IsCtrlKeyDown() or IsAltKeyDown() or IsShiftKeyDown()) then
 		GenerateList()
@@ -613,8 +613,8 @@ MY.RegisterTargetAddonMenu("MY.Game.Bosslist", function()
 					end
 					BOSS_LIST_CUSTOM[dwMapID].ADD[dwTemplateID] = nil
 					SaveCustomList()
-					FireUIEvent("MY_SET_BOSS", dwMapID, dwTemplateID, false)
-					FireUIEvent("MY_SET_IMPORTANT_NPC", dwMapID, dwTemplateID, MY.IsImportantNpc(dwMapID, dwTemplateID))
+					FireUIEvent('MY_SET_BOSS', dwMapID, dwTemplateID, false)
+					FireUIEvent('MY_SET_IMPORTANT_NPC', dwMapID, dwTemplateID, MY.IsImportantNpc(dwMapID, dwTemplateID))
 				end,
 			}
 		else
@@ -631,8 +631,8 @@ MY.RegisterTargetAddonMenu("MY.Game.Bosslist", function()
 					end
 					BOSS_LIST_CUSTOM[dwMapID].ADD[dwTemplateID] = szName
 					SaveCustomList()
-					FireUIEvent("MY_SET_BOSS", dwMapID, dwTemplateID, true)
-					FireUIEvent("MY_SET_IMPORTANT_NPC", dwMapID, dwTemplateID, MY.IsImportantNpc(dwMapID, dwTemplateID))
+					FireUIEvent('MY_SET_BOSS', dwMapID, dwTemplateID, true)
+					FireUIEvent('MY_SET_IMPORTANT_NPC', dwMapID, dwTemplateID, MY.IsImportantNpc(dwMapID, dwTemplateID))
 				end,
 			}
 		end
@@ -648,7 +648,7 @@ local function LoadCustomList()
 	end
 end
 local function SaveCustomList()
-	MY.SaveLUAData({'config/inpclist.jx3dat', MY_DATA_PATH.GLOBAL}, INPC_LIST_CUSTOM, IsDebugClient() and "\t" or nil)
+	MY.SaveLUAData({'config/inpclist.jx3dat', MY_DATA_PATH.GLOBAL}, INPC_LIST_CUSTOM, IsDebugClient() and '\t' or nil)
 end
 local function GenerateList(bForceRefresh)
 	LoadCustomList()
@@ -663,7 +663,7 @@ local function GenerateList(bForceRefresh)
 		MY.SaveLUAData({CACHE_PATH, MY_DATA_PATH.GLOBAL}, INPC_LIST)
 		MY.Sysmsg({_L('Important Npc list updated to v%s.', VERSION)})
 	end
-	for dwMapID, tInfo in pairs(MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. "data/inpclist/$lang.jx3dat") or {}) do
+	for dwMapID, tInfo in pairs(MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/inpclist/$lang.jx3dat') or {}) do
 		if not INPC_LIST[dwMapID] then
 			INPC_LIST[dwMapID] = {}
 		end
@@ -688,7 +688,7 @@ function MY.IsImportantNpc(dwMapID, dwTemplateID, bNoBoss)
 	) and true or (not bNoBoss and MY.IsBoss(dwMapID, dwTemplateID) or false)
 end
 
-MY.RegisterTargetAddonMenu("MY.Game.ImportantNpclist", function()
+MY.RegisterTargetAddonMenu('MY.Game.ImportantNpclist', function()
 	local dwType, dwID = MY.GetTarget()
 	if dwType == TARGET.NPC and (IsCtrlKeyDown() or IsAltKeyDown() or IsShiftKeyDown()) then
 		GenerateList()
@@ -714,7 +714,7 @@ MY.RegisterTargetAddonMenu("MY.Game.ImportantNpclist", function()
 					end
 					INPC_LIST_CUSTOM[dwMapID].ADD[dwTemplateID] = nil
 					SaveCustomList()
-					FireUIEvent("MY_SET_IMPORTANT_NPC", dwMapID, dwTemplateID, false)
+					FireUIEvent('MY_SET_IMPORTANT_NPC', dwMapID, dwTemplateID, false)
 				end,
 			}
 		else
@@ -731,7 +731,7 @@ MY.RegisterTargetAddonMenu("MY.Game.ImportantNpclist", function()
 					end
 					INPC_LIST_CUSTOM[dwMapID].ADD[dwTemplateID] = szName
 					SaveCustomList()
-					FireUIEvent("MY_SET_IMPORTANT_NPC", dwMapID, dwTemplateID, true)
+					FireUIEvent('MY_SET_IMPORTANT_NPC', dwMapID, dwTemplateID, true)
 				end,
 			}
 		end
@@ -740,7 +740,7 @@ end)
 end
 
 do
-local SZ_FORCE_COLOR_FG = "config/player_force_color.jx3dat"
+local SZ_FORCE_COLOR_FG = 'config/player_force_color.jx3dat'
 local MY_FORCE_COLOR_FG_DEFAULT = setmetatable({
 	[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
 	[FORCE_TYPE.SHAO_LIN ] = { 255, 178, 95  }, -- 少林
@@ -770,7 +770,7 @@ local MY_FORCE_COLOR_FG = setmetatable({}, {
 	end,
 })
 
-local SZ_FORCE_COLOR_BG = "config/player_force_color_bg.jx3dat"
+local SZ_FORCE_COLOR_BG = 'config/player_force_color_bg.jx3dat'
 local MY_FORCE_COLOR_BG_DEFAULT = setmetatable({
 	[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
 	[FORCE_TYPE.SHAO_LIN ] = { 255, 178, 95  }, -- 少林
@@ -803,21 +803,21 @@ local MY_FORCE_COLOR_BG = setmetatable({}, {
 local function initForceCustom()
 	MY_FORCE_COLOR_FG_CUSTOM = MY.LoadLUAData({SZ_FORCE_COLOR_FG, MY_DATA_PATH.ROLE}) or {}
 	MY_FORCE_COLOR_BG_CUSTOM = MY.LoadLUAData({SZ_FORCE_COLOR_BG, MY_DATA_PATH.ROLE}) or {}
-	FireUIEvent("MY_FORCE_COLOR_UPDATE")
+	FireUIEvent('MY_FORCE_COLOR_UPDATE')
 end
 MY.RegisterInit(initForceCustom)
 
 function MY.GetForceColor(dwForce, szType)
-	local COLOR = szType == "background"
+	local COLOR = szType == 'background'
 		and MY_FORCE_COLOR_BG
 		or MY_FORCE_COLOR_FG
-	if dwForce == "all" then
+	if dwForce == 'all' then
 		return COLOR
 	end
 	return unpack(COLOR[dwForce])
 end
 
-local SZ_CAMP_COLOR_FG = "config/player_camp_color.jx3dat"
+local SZ_CAMP_COLOR_FG = 'config/player_camp_color.jx3dat'
 local MY_CAMP_COLOR_FG_DEFAULT = setmetatable({
 	[CAMP.NEUTRAL] = { 255, 255, 255 }, -- 中立
 	[CAMP.GOOD   ] = {  60, 128, 220 }, -- 浩气盟
@@ -836,7 +836,7 @@ local MY_CAMP_COLOR_FG = setmetatable({}, {
 	end,
 })
 
-local SZ_CAMP_COLOR_BG = "config/player_camp_color_bg.jx3dat"
+local SZ_CAMP_COLOR_BG = 'config/player_camp_color_bg.jx3dat'
 local MY_CAMP_COLOR_BG_DEFAULT = setmetatable({
 	[CAMP.NEUTRAL] = { 255, 255, 255 }, -- 中立
 	[CAMP.GOOD   ] = {  60, 128, 220 }, -- 浩气盟
@@ -858,15 +858,15 @@ local MY_CAMP_COLOR_BG = setmetatable({}, {
 local function initCampCustom()
 	MY_CAMP_COLOR_FG_CUSTOM = MY.LoadLUAData({SZ_CAMP_COLOR_FG, MY_DATA_PATH.ROLE}) or {}
 	MY_CAMP_COLOR_BG_CUSTOM = MY.LoadLUAData({SZ_CAMP_COLOR_BG, MY_DATA_PATH.ROLE}) or {}
-	FireUIEvent("MY_FORCE_COLOR_UPDATE")
+	FireUIEvent('MY_FORCE_COLOR_UPDATE')
 end
 MY.RegisterInit(initCampCustom)
 
 function MY.GetCampColor(nCamp, szType)
-	local COLOR = szType == "background"
+	local COLOR = szType == 'background'
 		and MY_CAMP_COLOR_BG
 		or MY_CAMP_COLOR_FG
-	if nCamp == "all" then
+	if nCamp == 'all' then
 		return COLOR
 	end
 	return unpack(COLOR[nCamp])
@@ -879,28 +879,28 @@ function PS.OnPanelActive(wnd)
 	local X, Y = 20, 20
 	local x, y = X, Y
 
-	ui:append("Text", {
+	ui:append('Text', {
 		x = X - 10, y = y,
-		text = _L["Force color"],
+		text = _L['Force color'],
 		color = { 255, 255, 0 },
 	}, true):autoWidth()
 	x, y = X, y + 30
 	for _, dwForceID in pairs_c(FORCE_TYPE) do
 		local x0 = x
-		local sha = ui:append("Shadow", {
+		local sha = ui:append('Shadow', {
 			x = x, y = y, w = 100, h = 25,
 			text = g_tStrings.tForceTitle[dwForceID],
-			color = { MY.GetForceColor(dwForceID, "background") },
+			color = { MY.GetForceColor(dwForceID, 'background') },
 		}, true)
-		local txt = ui:append("Text", {
+		local txt = ui:append('Text', {
 			x = x + 5, y = y, w = 100, h = 25,
 			text = g_tStrings.tForceTitle[dwForceID],
-			color = { MY.GetForceColor(dwForceID, "foreground") },
+			color = { MY.GetForceColor(dwForceID, 'foreground') },
 		}, true)
 		x = x + 105
-		ui:append("Shadow", {
+		ui:append('Shadow', {
 			x = x, y = y, w = 25, h = 25,
-			color = { MY.GetForceColor(dwForceID, "foreground") },
+			color = { MY.GetForceColor(dwForceID, 'foreground') },
 			onclick = function()
 				local this = this
 				XGUI.OpenColorPicker(function(r, g, b)
@@ -908,14 +908,14 @@ function PS.OnPanelActive(wnd)
 					MY.SaveLUAData({SZ_FORCE_COLOR_FG, MY_DATA_PATH.ROLE}, MY_FORCE_COLOR_FG_CUSTOM)
 					txt:color(r, g, b)
 					XGUI(this):color(r, g, b)
-					FireUIEvent("MY_FORCE_COLOR_UPDATE")
+					FireUIEvent('MY_FORCE_COLOR_UPDATE')
 				end)
 			end,
 		})
 		x = x + 30
-		ui:append("Shadow", {
+		ui:append('Shadow', {
 			x = x, y = y, w = 25, h = 25,
-			color = { MY.GetForceColor(dwForceID, "background") },
+			color = { MY.GetForceColor(dwForceID, 'background') },
 			onclick = function()
 				local this = this
 				XGUI.OpenColorPicker(function(r, g, b)
@@ -923,7 +923,7 @@ function PS.OnPanelActive(wnd)
 					MY.SaveLUAData({SZ_FORCE_COLOR_BG, MY_DATA_PATH.ROLE}, MY_FORCE_COLOR_BG_CUSTOM)
 					sha:color(r, g, b)
 					XGUI(this):color(r, g, b)
-					FireUIEvent("MY_FORCE_COLOR_UPDATE")
+					FireUIEvent('MY_FORCE_COLOR_UPDATE')
 				end)
 			end,
 		})
@@ -934,42 +934,42 @@ function PS.OnPanelActive(wnd)
 			y = y + 35
 		end
 	end
-	ui:append("WndButton2", {
+	ui:append('WndButton2', {
 		x = x, y = y, w = 160,
-		text = _L["Restore default"],
+		text = _L['Restore default'],
 		onclick = function()
 			MY_FORCE_COLOR_FG_CUSTOM = {}
 			MY_FORCE_COLOR_BG_CUSTOM = {}
 			MY.SaveLUAData({SZ_FORCE_COLOR_FG, MY_DATA_PATH.ROLE}, MY_FORCE_COLOR_FG_CUSTOM)
 			MY.SaveLUAData({SZ_FORCE_COLOR_BG, MY_DATA_PATH.ROLE}, MY_FORCE_COLOR_BG_CUSTOM)
-			MY.SwitchTab("GlobalColor", true)
-			FireUIEvent("MY_FORCE_COLOR_UPDATE")
+			MY.SwitchTab('GlobalColor', true)
+			FireUIEvent('MY_FORCE_COLOR_UPDATE')
 		end,
 	})
 
 	y = y + 45
-	ui:append("Text", {
+	ui:append('Text', {
 		x = X - 10, y = y,
-		text = _L["Camp color"],
+		text = _L['Camp color'],
 		color = { 255, 255, 0 },
 	}, true):autoWidth()
 	x, y = X, y + 30
 	for _, nCamp in ipairs({ CAMP.NEUTRAL, CAMP.GOOD, CAMP.EVIL }) do
 		local x0 = x
-		local sha = ui:append("Shadow", {
+		local sha = ui:append('Shadow', {
 			x = x, y = y, w = 100, h = 25,
 			text = g_tStrings.STR_CAMP_TITLE[nCamp],
-			color = { MY.GetCampColor(nCamp, "background") },
+			color = { MY.GetCampColor(nCamp, 'background') },
 		}, true)
-		local txt = ui:append("Text", {
+		local txt = ui:append('Text', {
 			x = x + 5, y = y, w = 100, h = 25,
 			text = g_tStrings.STR_CAMP_TITLE[nCamp],
-			color = { MY.GetCampColor(nCamp, "foreground") },
+			color = { MY.GetCampColor(nCamp, 'foreground') },
 		}, true)
 		x = x + 105
-		ui:append("Shadow", {
+		ui:append('Shadow', {
 			x = x, y = y, w = 25, h = 25,
-			color = { MY.GetCampColor(nCamp, "foreground") },
+			color = { MY.GetCampColor(nCamp, 'foreground') },
 			onclick = function()
 				local this = this
 				XGUI.OpenColorPicker(function(r, g, b)
@@ -977,14 +977,14 @@ function PS.OnPanelActive(wnd)
 					MY.SaveLUAData({SZ_CAMP_COLOR_FG, MY_DATA_PATH.ROLE}, MY_CAMP_COLOR_FG_CUSTOM)
 					txt:color(r, g, b)
 					XGUI(this):color(r, g, b)
-					FireUIEvent("MY_CAMP_COLOR_UPDATE")
+					FireUIEvent('MY_CAMP_COLOR_UPDATE')
 				end)
 			end,
 		})
 		x = x + 30
-		ui:append("Shadow", {
+		ui:append('Shadow', {
 			x = x, y = y, w = 25, h = 25,
-			color = { MY.GetCampColor(nCamp, "background") },
+			color = { MY.GetCampColor(nCamp, 'background') },
 			onclick = function()
 				local this = this
 				XGUI.OpenColorPicker(function(r, g, b)
@@ -992,7 +992,7 @@ function PS.OnPanelActive(wnd)
 					MY.SaveLUAData({SZ_CAMP_COLOR_BG, MY_DATA_PATH.ROLE}, MY_CAMP_COLOR_BG_CUSTOM)
 					sha:color(r, g, b)
 					XGUI(this):color(r, g, b)
-					FireUIEvent("MY_CAMP_COLOR_UPDATE")
+					FireUIEvent('MY_CAMP_COLOR_UPDATE')
 				end)
 			end,
 		})
@@ -1003,53 +1003,53 @@ function PS.OnPanelActive(wnd)
 			y = y + 35
 		end
 	end
-	ui:append("WndButton2", {
+	ui:append('WndButton2', {
 		x = x, y = y, w = 160,
-		text = _L["Restore default"],
+		text = _L['Restore default'],
 		onclick = function()
 			MY_CAMP_COLOR_FG_CUSTOM = {}
 			MY_CAMP_COLOR_BG_CUSTOM = {}
 			MY.SaveLUAData({SZ_CAMP_COLOR_FG, MY_DATA_PATH.ROLE}, MY_CAMP_COLOR_FG_CUSTOM)
 			MY.SaveLUAData({SZ_CAMP_COLOR_BG, MY_DATA_PATH.ROLE}, MY_CAMP_COLOR_BG_CUSTOM)
-			MY.SwitchTab("GlobalColor", true)
-			FireUIEvent("MY_CAMP_COLOR_UPDATE")
+			MY.SwitchTab('GlobalColor', true)
+			FireUIEvent('MY_CAMP_COLOR_UPDATE')
 		end,
 	})
 end
-MY.RegisterPanel("GlobalColor", _L["GlobalColor"], _L["System"], 2673, {255,255,0,200}, PS)
+MY.RegisterPanel('GlobalColor', _L['GlobalColor'], _L['System'], 2673, {255,255,0,200}, PS)
 end
 
 do
 -- skillid, uitex, frame
 local MY_KUNGFU_LIST = setmetatable({
 	-- MT
-	{ 10062, "ui/Image/icon/skill_tiance01.UITex",     0 }, -- 铁牢
-	{ 10243, "ui/Image/icon/mingjiao_taolu_7.UITex",   0 }, -- 明尊
-	{ 10389, "ui/Image/icon/Skill_CangY_33.UITex",     0 }, -- 铁骨
-	{ 10002, "ui/Image/icon/skill_shaolin14.UITex",    0 }, -- 少林
+	{ 10062, 'ui/Image/icon/skill_tiance01.UITex',     0 }, -- 铁牢
+	{ 10243, 'ui/Image/icon/mingjiao_taolu_7.UITex',   0 }, -- 明尊
+	{ 10389, 'ui/Image/icon/Skill_CangY_33.UITex',     0 }, -- 铁骨
+	{ 10002, 'ui/Image/icon/skill_shaolin14.UITex',    0 }, -- 少林
 	-- 治疗
-	{ 10080, "ui/Image/icon/skill_qixiu02.UITex",      0 }, -- 云裳
-	{ 10176, "ui/Image/icon/wudu_neigong_2.UITex",     0 }, -- 补天
-	{ 10028, "ui/Image/icon/skill_wanhua23.UITex",     0 }, -- 离经
-	{ 10448, "ui/Image/icon/skill_0514_23.UITex",      0 }, -- 相知
+	{ 10080, 'ui/Image/icon/skill_qixiu02.UITex',      0 }, -- 云裳
+	{ 10176, 'ui/Image/icon/wudu_neigong_2.UITex',     0 }, -- 补天
+	{ 10028, 'ui/Image/icon/skill_wanhua23.UITex',     0 }, -- 离经
+	{ 10448, 'ui/Image/icon/skill_0514_23.UITex',      0 }, -- 相知
 	-- 内功
-	{ 10225, "ui/Image/icon/skill_tangm_20.UITex",     0 }, -- 天罗
-	{ 10081, "ui/Image/icon/skill_qixiu03.UITex",      0 }, -- 冰心
-	{ 10175, "ui/Image/icon/wudu_neigong_1.UITex",     0 }, -- 毒经
-	{ 10242, "ui/Image/icon/mingjiao_taolu_8.UITex",   0 }, -- 焚影
-	{ 10014, "ui/Image/icon/skill_chunyang21.UITex",   0 }, -- 紫霞
-	{ 10021, "ui/Image/icon/skill_wanhua17.UITex",     0 }, -- 花间
-	{ 10003, "ui/Image/icon/skill_shaolin10.UITex",    0 }, -- 易经
-	{ 10447, "ui/Image/icon/skill_0514_27.UITex",      0 }, -- 莫问
+	{ 10225, 'ui/Image/icon/skill_tangm_20.UITex',     0 }, -- 天罗
+	{ 10081, 'ui/Image/icon/skill_qixiu03.UITex',      0 }, -- 冰心
+	{ 10175, 'ui/Image/icon/wudu_neigong_1.UITex',     0 }, -- 毒经
+	{ 10242, 'ui/Image/icon/mingjiao_taolu_8.UITex',   0 }, -- 焚影
+	{ 10014, 'ui/Image/icon/skill_chunyang21.UITex',   0 }, -- 紫霞
+	{ 10021, 'ui/Image/icon/skill_wanhua17.UITex',     0 }, -- 花间
+	{ 10003, 'ui/Image/icon/skill_shaolin10.UITex',    0 }, -- 易经
+	{ 10447, 'ui/Image/icon/skill_0514_27.UITex',      0 }, -- 莫问
 	-- 外功
-	{ 10390, "ui/Image/icon/Skill_CangY_32.UITex",     0 }, -- 分山
-	{ 10224, "ui/Image/icon/skill_tangm_01.UITex",     0 }, -- 鲸鱼
-	{ 10144, "ui/Image/icon/cangjian_neigong_1.UITex", 0 }, -- 问水
-	{ 10145, "ui/Image/icon/cangjian_neigong_2.UITex", 0 }, -- 山居
-	{ 10015, "ui/Image/icon/skill_chunyang13.UITex",   0 }, -- 备胎剑意
-	{ 10026, "ui/Image/icon/skill_tiance02.UITex",     0 }, -- 傲雪
-	{ 10268, "ui/Image/icon/skill_GB_30.UITex",        0 }, -- 笑尘
-	{ 10464, "ui/Image/icon/daoj_16_8_25_16.UITex",    0 }, -- 霸刀
+	{ 10390, 'ui/Image/icon/Skill_CangY_32.UITex',     0 }, -- 分山
+	{ 10224, 'ui/Image/icon/skill_tangm_01.UITex',     0 }, -- 鲸鱼
+	{ 10144, 'ui/Image/icon/cangjian_neigong_1.UITex', 0 }, -- 问水
+	{ 10145, 'ui/Image/icon/cangjian_neigong_2.UITex', 0 }, -- 山居
+	{ 10015, 'ui/Image/icon/skill_chunyang13.UITex',   0 }, -- 备胎剑意
+	{ 10026, 'ui/Image/icon/skill_tiance02.UITex',     0 }, -- 傲雪
+	{ 10268, 'ui/Image/icon/skill_GB_30.UITex',        0 }, -- 笑尘
+	{ 10464, 'ui/Image/icon/daoj_16_8_25_16.UITex',    0 }, -- 霸刀
 }, {
 	__index = function(me, key)
 		for k, v in pairs(me) do
@@ -1061,7 +1061,7 @@ local MY_KUNGFU_LIST = setmetatable({
 })
 
 function MY.GetKungfuInfo(dwKungfuID)
-	if dwKungfuID == "all" then
+	if dwKungfuID == 'all' then
 		return MY_KUNGFU_LIST
 	end
 	return unpack(MY_KUNGFU_LIST[dwKungfuID])
@@ -1073,10 +1073,10 @@ local KUNGFU_NAME_CACHE = {}
 local KUNGFU_SHORT_NAME_CACHE = {}
 function MY.GetKungfuName(dwKungfuID, szType)
 	if not KUNGFU_NAME_CACHE[dwKungfuID] then
-		KUNGFU_NAME_CACHE[dwKungfuID] = Table_GetSkillName(dwKungfuID, 1) or ""
+		KUNGFU_NAME_CACHE[dwKungfuID] = Table_GetSkillName(dwKungfuID, 1) or ''
 		KUNGFU_SHORT_NAME_CACHE[dwKungfuID] = wstring.sub(KUNGFU_NAME_CACHE[dwKungfuID], 1, 2)
 	end
-	if szType == "short" then
+	if szType == 'short' then
 		return KUNGFU_SHORT_NAME_CACHE[dwKungfuID]
 	else
 		return KUNGFU_NAME_CACHE[dwKungfuID]
@@ -1090,10 +1090,10 @@ function MY.GetItemName(nUiId)
 	if not MY_CACHE_ITEM[nUiId] then
 		local szName = Table_GetItemName(nUiId)
 		local nIcon = Table_GetItemIconID(nUiId)
-		if szName ~= "" and nIocn ~= -1 then
+		if szName ~= '' and nIocn ~= -1 then
 			MY_CACHE_ITEM[nUiId] = { szName, nIcon }
 		else
-			MY_CACHE_ITEM[nUiId] = { "ITEM#" .. nUiId, 1435 }
+			MY_CACHE_ITEM[nUiId] = { 'ITEM#' .. nUiId, 1435 }
 		end
 	end
 	return unpack(MY_CACHE_ITEM[nUiId])
@@ -1129,8 +1129,8 @@ function MY.Game.GetNearNpc(nLimit)
 			MY_NEARBY_NPC[dwID] = nil
 		else
 			i = i + 1
-			if npc.szName=="" then
-				npc.szName = string.gsub(Table_GetNpcTemplateName(npc.dwTemplateID), "^%s*(.-)%s*$", "%1")
+			if npc.szName=='' then
+				npc.szName = string.gsub(Table_GetNpcTemplateName(npc.dwTemplateID), '^%s*(.-)%s*$', '%1')
 			end
 			tNpc[dwID] = npc
 			if nLimit and i == nLimit then break end
@@ -1176,12 +1176,12 @@ function MY.Game.GetNearDoodad(nLimit)
 end
 MY.GetNearDoodad = MY.Game.GetNearDoodad
 
-RegisterEvent("NPC_ENTER_SCENE",    function() MY_NEARBY_NPC[arg0]    = true end)
-RegisterEvent("NPC_LEAVE_SCENE",    function() MY_NEARBY_NPC[arg0]    = nil  end)
-RegisterEvent("PLAYER_ENTER_SCENE", function() MY_NEARBY_PLAYER[arg0] = true end)
-RegisterEvent("PLAYER_LEAVE_SCENE", function() MY_NEARBY_PLAYER[arg0] = nil  end)
-RegisterEvent("DOODAD_ENTER_SCENE", function() MY_NEARBY_DOODAD[arg0] = true end)
-RegisterEvent("DOODAD_LEAVE_SCENE", function() MY_NEARBY_DOODAD[arg0] = nil  end)
+RegisterEvent('NPC_ENTER_SCENE',    function() MY_NEARBY_NPC[arg0]    = true end)
+RegisterEvent('NPC_LEAVE_SCENE',    function() MY_NEARBY_NPC[arg0]    = nil  end)
+RegisterEvent('PLAYER_ENTER_SCENE', function() MY_NEARBY_PLAYER[arg0] = true end)
+RegisterEvent('PLAYER_LEAVE_SCENE', function() MY_NEARBY_PLAYER[arg0] = nil  end)
+RegisterEvent('DOODAD_ENTER_SCENE', function() MY_NEARBY_DOODAD[arg0] = true end)
+RegisterEvent('DOODAD_LEAVE_SCENE', function() MY_NEARBY_DOODAD[arg0] = nil  end)
 end
 
 -- 获取玩家自身信息（缓存）
@@ -1267,10 +1267,10 @@ do local m_szUUID
 function MY.GetClientUUID()
 	if not m_szUUID then
 		local me = GetClientPlayer()
-		if me.GetGlobalID and me.GetGlobalID() ~= "0" then
+		if me.GetGlobalID and me.GetGlobalID() ~= '0' then
 			m_szUUID = me.GetGlobalID()
 		else
-			m_szUUID = (MY.Game.GetRealServer()):gsub('[/\\|:%*%?"<>]', '') .. "_" .. MY.Game.GetClientInfo().dwID
+			m_szUUID = (MY.Game.GetRealServer()):gsub('[/\\|:%*%?"<>]', '') .. '_' .. MY.Game.GetClientInfo().dwID
 		end
 	end
 	return m_szUUID
@@ -1285,7 +1285,7 @@ function _C.GeneFriendListCache()
 			if infos then
 				_C.tFriendListByID = {}
 				_C.tFriendListByName = {}
-				_C.tFriendListByGroup = {{ id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND or "" }} -- 默认分组
+				_C.tFriendListByGroup = {{ id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND or '' }} -- 默认分组
 				for _, group in ipairs(infos) do
 					table.insert(_C.tFriendListByGroup, group)
 				end
@@ -1308,24 +1308,24 @@ function _C.OnFriendListChange()
 	_C.tFriendListByName = nil
 	_C.tFriendListByGroup = nil
 end
-MY.RegisterEvent("PLAYER_FELLOWSHIP_UPDATE"     , _C.OnFriendListChange)
-MY.RegisterEvent("PLAYER_FELLOWSHIP_CHANGE"     , _C.OnFriendListChange)
-MY.RegisterEvent("PLAYER_FELLOWSHIP_LOGIN"      , _C.OnFriendListChange)
-MY.RegisterEvent("PLAYER_FOE_UPDATE"            , _C.OnFriendListChange)
-MY.RegisterEvent("PLAYER_BLACK_LIST_UPDATE"     , _C.OnFriendListChange)
-MY.RegisterEvent("DELETE_FELLOWSHIP"            , _C.OnFriendListChange)
-MY.RegisterEvent("FELLOWSHIP_TWOWAY_FLAG_CHANGE", _C.OnFriendListChange)
+MY.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE'     , _C.OnFriendListChange)
+MY.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE'     , _C.OnFriendListChange)
+MY.RegisterEvent('PLAYER_FELLOWSHIP_LOGIN'      , _C.OnFriendListChange)
+MY.RegisterEvent('PLAYER_FOE_UPDATE'            , _C.OnFriendListChange)
+MY.RegisterEvent('PLAYER_BLACK_LIST_UPDATE'     , _C.OnFriendListChange)
+MY.RegisterEvent('DELETE_FELLOWSHIP'            , _C.OnFriendListChange)
+MY.RegisterEvent('FELLOWSHIP_TWOWAY_FLAG_CHANGE', _C.OnFriendListChange)
 -- 获取好友列表
 -- MY.Game.GetFriendList()         获取所有好友列表
 -- MY.Game.GetFriendList(1)        获取第一个分组好友列表
--- MY.Game.GetFriendList("挽月堂") 获取分组名称为挽月堂的好友列表
+-- MY.Game.GetFriendList('挽月堂') 获取分组名称为挽月堂的好友列表
 function MY.Game.GetFriendList(arg0)
 	local t = {}
 	local tGroup = {}
 	if _C.GeneFriendListCache() then
-		if type(arg0) == "number" then
+		if type(arg0) == 'number' then
 			table.insert(tGroup, _C.tFriendListByGroup[arg0])
-		elseif type(arg0) == "string" then
+		elseif type(arg0) == 'string' then
 			for _, group in ipairs(_C.tFriendListByGroup) do
 				if group.name == arg0 then
 					table.insert(tGroup, clone(group))
@@ -1347,9 +1347,9 @@ end
 -- 获取好友
 function MY.Game.GetFriend(arg0)
 	if arg0 and _C.GeneFriendListCache() then
-		if type(arg0) == "number" then
+		if type(arg0) == 'number' then
 			return clone(_C.tFriendListByID[arg0])
-		elseif type(arg0) == "string" then
+		elseif type(arg0) == 'string' then
 			return clone(_C.tFriendListByName[arg0])
 		end
 	end
@@ -1384,7 +1384,7 @@ function _C.OnFoeListChange()
 	_C.tFoeListByID = nil
 	_C.tFoeListByName = nil
 end
-MY.RegisterEvent("PLAYER_FOE_UPDATE", _C.OnFoeListChange)
+MY.RegisterEvent('PLAYER_FOE_UPDATE', _C.OnFoeListChange)
 -- 获取仇人列表
 function MY.Game.GetFoeList()
 	if _C.GeneFoeListCache() then
@@ -1394,9 +1394,9 @@ end
 -- 获取仇人
 function MY.Game.GetFoe(arg0)
 	if arg0 and _C.GeneFoeListCache() then
-		if type(arg0) == "number" then
+		if type(arg0) == 'number' then
 			return _C.tFoeListByID[arg0]
-		elseif type(arg0) == "string" then
+		elseif type(arg0) == 'string' then
 			return _C.tFoeListByName[arg0]
 		end
 	end
@@ -1409,12 +1409,12 @@ function MY.Game.GetTongMemberList(bShowOffLine, szSorter, bAsc)
 	if szSorter     == nil then szSorter     = 'name' end
 	if bAsc         == nil then bAsc         = true   end
 	local aSorter = {
-		["name"  ] = "name"                    ,
-		["level" ] = "group"                   ,
-		["school"] = "development_contribution",
-		["score" ] = "score"                   ,
-		["map"   ] = "join_time"               ,
-		["remark"] = "last_offline_time"       ,
+		['name'  ] = 'name'                    ,
+		['level' ] = 'group'                   ,
+		['school'] = 'development_contribution',
+		['score' ] = 'score'                   ,
+		['map'   ] = 'join_time'               ,
+		['remark'] = 'last_offline_time'       ,
 	}
 	szSorter = aSorter[szSorter]
 	-- GetMemberList(bShowOffLine, szSorter, bAsc, nGroupFilter, -1) -- 后面两个参数不知道什么鬼
@@ -1429,7 +1429,7 @@ function MY.GetTongName(dwTongID)
 	if dwTongID and dwTongID ~= 0 then
 		szTongName = GetTongClient().ApplyGetTongName(dwTongID, 253)
 	else
-		szTongName = ""
+		szTongName = ''
 	end
 	return szTongName
 end
@@ -1572,8 +1572,8 @@ function MY.IsFighting()
 	end
 	return bFightState
 end
-MY.RegisterEvent("LOADING_ENDING.MY-PLAYER", function() _C.bJJCStart = nil end)
-MY.RegisterEvent("ARENA_START.MY-PLAYER", function() _C.bJJCStart = true end)
+MY.RegisterEvent('LOADING_ENDING.MY-PLAYER', function() _C.bJJCStart = nil end)
+MY.RegisterEvent('ARENA_START.MY-PLAYER', function() _C.bJJCStart = true end)
 
 -------------------------------------------------------------------------------------------------------------------
 --                                   #                                                       #                   --
@@ -1610,15 +1610,15 @@ MY.GetTarget = MY.Game.GetTarget
 -- dwID     -- 目标 ID
 function MY.Game.SetTarget(dwType, dwID)
 	-- check dwType
-	if type(dwType) == "userdata" then
+	if type(dwType) == 'userdata' then
 		dwType, dwID = ( IsPlayer(dwType) and TARGET.PLAYER ) or TARGET.NPC, dwType.dwID
-	elseif type(dwType) == "string" then
+	elseif type(dwType) == 'string' then
 		dwType, dwID = nil, dwType
 	end
 	-- conv if dwID is string
-	if type(dwID) == "string" then
+	if type(dwID) == 'string' then
 		local tTarget = {}
-		for _, szName in pairs(MY.String.Split(dwID:gsub('[%[%]]', ''), "|")) do
+		for _, szName in pairs(MY.String.Split(dwID:gsub('[%[%]]', ''), '|')) do
 			tTarget[szName] = true
 		end
 		dwID = nil
@@ -1721,11 +1721,11 @@ end
 -- @return nil    参数错误
 -- @return number 面向角(-180, 180]
 function MY.Game.GetFaceAngel(nX, nY, nFace, nTX, nTY, bAbs)
-	if type(nY) == "userdata" and type(nX) == "userdata" then
+	if type(nY) == 'userdata' and type(nX) == 'userdata' then
 		nX, nY, nFace, nTX, nTY, bAbs = nX.nX, nX.nY, nX.nFaceDirection, nY.nX, nY.nY, nFace
 	end
-	if type(nX) == "number" and type(nY) == "number" and type(nFace) == "number"
-	and type(nTX) == "number" and type(nTY) == "number" then
+	if type(nX) == 'number' and type(nY) == 'number' and type(nFace) == 'number'
+	and type(nTX) == 'number' and type(nTY) == 'number' then
 		local nFace = (nFace * 2 * math.pi / 255) - math.pi
 		local nSight = (nX == nTX and ((nY > nTY and math.pi / 2) or - math.pi / 2)) or math.atan((nTY - nY) / (nTX - nX))
 		local nAngel = ((nSight - nFace) % (math.pi * 2) - math.pi) / math.pi * 180
@@ -1750,7 +1750,7 @@ function MY.Game.Equip(szName)
 					j=j+1
 				elseif Table_GetItemName(item.nUiId)==szName then -- GetItemNameByItem(item)
 					local eRetCode, nEquipPos = me.GetEquipPos(i, j)
-					if szName==_L["ji guan"] or szName==_L["nu jian"] then
+					if szName==_L['ji guan'] or szName==_L['nu jian'] then
 						for k=0,15 do
 							if me.GetItem(INVENTORY_INDEX.BULLET_PACKAGE, k) == nil then
 								OnExchangeItem(i, j, INVENTORY_INDEX.BULLET_PACKAGE, k)
@@ -1797,20 +1797,20 @@ end
 -- (table) MY.GetBuff([KObject, ]dwID[, nLevel])
 function MY.Game.GetBuff(KObject, dwID, nLevel)
 	local tBuff = {}
-	if type(KObject) ~= "userdata" then
+	if type(KObject) ~= 'userdata' then
 		KObject, dwID, nLevel = GetClientPlayer(), KObject, dwID
 	end
-	if type(dwID) == "table" then
+	if type(dwID) == 'table' then
 		tBuff = dwID
-	elseif type(dwID) == "number" then
-		if type(nLevel) == "number" then
+	elseif type(dwID) == 'number' then
+		if type(nLevel) == 'number' then
 			tBuff[dwID] = nLevel
 		else
 			tBuff[dwID] = 0
 		end
 	end
 	if not KObject.GetBuff then
-		return MY.Debug({"KObject do not have a function named GetBuff."}, "MY.Game.GetBuff", MY_DEBUG.ERROR)
+		return MY.Debug({'KObject do not have a function named GetBuff.'}, 'MY.Game.GetBuff', MY_DEBUG.ERROR)
 	end
 	for k, v in pairs(tBuff) do
 		local KBuff = KObject.GetBuff(k, v)
@@ -1900,7 +1900,7 @@ end
 -- (bool) MY.CanUseSkill(number dwSkillID[, dwLevel])
 function MY.Game.CanUseSkill(dwSkillID, dwLevel)
 	-- 判断技能是否有效 并将中文名转换为技能ID
-	if type(dwSkillID) == "string" then if MY.IsValidSkill(dwSkillID) then dwSkillID = MY.Game.GetSkillByName(dwSkillID).dwSkillID else return false end end
+	if type(dwSkillID) == 'string' then if MY.IsValidSkill(dwSkillID) then dwSkillID = MY.Game.GetSkillByName(dwSkillID).dwSkillID else return false end end
 	local me, box = GetClientPlayer(), _C.hBox
 	if me and box then
 		if not dwLevel then
@@ -1927,13 +1927,13 @@ function MY.GetSkillName(dwSkillID, dwLevel)
 	if not _C.tSkillCache[dwSkillID] then
 		local tLine = Table_GetSkill(dwSkillID, dwLevel)
 		if tLine and tLine.dwSkillID > 0 and tLine.bShow
-			and (StringFindW(tLine.szDesc, "_") == nil  or StringFindW(tLine.szDesc, "<") ~= nil)
+			and (StringFindW(tLine.szDesc, '_') == nil  or StringFindW(tLine.szDesc, '<') ~= nil)
 		then
 			_C.tSkillCache[dwSkillID] = { tLine.szName, tLine.dwIconID }
 		else
-			local szName = "SKILL#" .. dwSkillID
+			local szName = 'SKILL#' .. dwSkillID
 			if dwLevel then
-				szName = szName .. ":" .. dwLevel
+				szName = szName .. ':' .. dwLevel
 			end
 			_C.tSkillCache[dwSkillID] = { szName, 13 }
 		end
@@ -1962,7 +1962,7 @@ function MY.GetChannelSkillFrame(dwSkillID)
 	end
 end
 -- Load skill extend data
-_C.tSkillEx = MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. "data/skill_ex.jx3dat") or {}
+_C.tSkillEx = MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/skill_ex.jx3dat') or {}
 
 function MY.IsMarker()
 	return GetClientTeam().GetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK) == UI_GetClientPlayerID()
@@ -2033,7 +2033,7 @@ function MY.Game.IsInPubg()
 end
 MY.IsInPubg = MY.Game.IsInPubg
 
-do local MARK_NAME = { _L["Cloud"], _L["Sword"], _L["Ax"], _L["Hook"], _L["Drum"], _L["Shear"], _L["Stick"], _L["Jade"], _L["Dart"], _L["Fan"] }
+do local MARK_NAME = { _L['Cloud'], _L['Sword'], _L['Ax'], _L['Hook'], _L['Drum'], _L['Shear'], _L['Stick'], _L['Jade'], _L['Dart'], _L['Fan'] }
 -- 获取标记中文名
 -- (string) MY.GetMarkName([number nIndex])
 function MY.GetMarkName(nIndex)
@@ -2086,11 +2086,11 @@ end
 local function SyncMember(team, dwID, szName, state)
 	if state.bForm then --如果这货之前有阵眼
 		team.SetTeamFormationLeader(dwID, state.nGroup) -- 阵眼给他
-		MY.Sysmsg({_L("restore formation of %d group: %s", state.nGroup + 1, szName)})
+		MY.Sysmsg({_L('restore formation of %d group: %s', state.nGroup + 1, szName)})
 	end
 	if state.nMark then -- 如果这货之前有标记
 		team.SetTeamMark(state.nMark, dwID) -- 标记给他
-		MY.Sysmsg({_L("restore player marked as [%s]: %s", MARK_NAME[state.nMark], szName)})
+		MY.Sysmsg({_L('restore player marked as [%s]: %s', MARK_NAME[state.nMark], szName)})
 	end
 end
 -- 恢复团队信息
@@ -2106,7 +2106,7 @@ function MY.SetTeamInfo(tTeamInfo)
 	if team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER) ~= me.dwID then
 		local nGroup = team.GetMemberGroupIndex(me.dwID) + 1
 		local szLeader = team.GetClientTeamMemberName(team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER))
-		return MY.Sysmsg({_L["You are not team leader, permission denied"]})
+		return MY.Sysmsg({_L['You are not team leader, permission denied']})
 	end
 
 	if team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK) ~= me.dwID then
@@ -2121,18 +2121,18 @@ function MY.SetTeamInfo(tTeamInfo)
 		for _, dwID in pairs(tGroupInfo.MemberList) do
 			local szName = team.GetClientTeamMemberName(dwID)
 			if not szName then
-				MY.Sysmsg({_L("unable get player of %d group: #%d", nGroup + 1, dwID)})
+				MY.Sysmsg({_L('unable get player of %d group: #%d', nGroup + 1, dwID)})
 			else
 				if not tSaved[szName] then
-					szName = string.gsub(szName, "@.*", "")
+					szName = string.gsub(szName, '@.*', '')
 				end
 				local state = tSaved[szName]
 				if not state then
 					table.insert(tWrong[nGroup], { dwID = dwID, szName = szName, state = nil })
-					MY.Sysmsg({_L("unknown status: %s", szName)})
+					MY.Sysmsg({_L('unknown status: %s', szName)})
 				elseif state.nGroup == nGroup then
 					SyncMember(team, dwID, szName, state)
-					MY.Sysmsg({_L("need not adjust: %s", szName)})
+					MY.Sysmsg({_L('need not adjust: %s', szName)})
 				else
 					table.insert(tWrong[nGroup], { dwID = dwID, szName = szName, state = state })
 				end
@@ -2144,7 +2144,7 @@ function MY.SetTeamInfo(tTeamInfo)
 				end
 				if szName == tTeamInfo.szDistribute and dwID ~= team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE) then
 					team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE, dwID)
-					MY.Sysmsg({_L("restore distributor: %s", szName)})
+					MY.Sysmsg({_L('restore distributor: %s', szName)})
 				end
 			end
 		end
@@ -2167,11 +2167,11 @@ function MY.SetTeamInfo(tTeamInfo)
 				if not dst.state or dst.state.nGroup ~= nGroup then
 					table.insert(tWrong[nGroup], dst)
 				else -- bingo
-					MY.Sysmsg({_L("change group of [%s] to %d", dst.szName, nGroup + 1)})
+					MY.Sysmsg({_L('change group of [%s] to %d', dst.szName, nGroup + 1)})
 					SyncMember(team, dst.dwID, dst.szName, dst.state)
 				end
 			end
-			MY.Sysmsg({_L("change group of [%s] to %d", src.szName, src.state.nGroup + 1)})
+			MY.Sysmsg({_L('change group of [%s] to %d', src.szName, src.state.nGroup + 1)})
 			SyncMember(team, src.dwID, src.szName, src.state)
 			nIndex = GetWrongIndex(tWrong[nGroup], true) -- update nIndex
 		end
@@ -2182,18 +2182,18 @@ function MY.SetTeamInfo(tTeamInfo)
 	end
 	if dwLeader ~= 0 and dwLeader ~= me.dwID then
 		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER, dwLeader)
-		MY.Sysmsg({_L("restore team leader: %s", tTeamInfo.szLeader)})
+		MY.Sysmsg({_L('restore team leader: %s', tTeamInfo.szLeader)})
 	end
 	if dwMark  ~= 0 and dwMark ~= me.dwID then
 		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK, dwMark)
-		MY.Sysmsg({_L("restore team marker: %s", tTeamInfo.szMark)})
+		MY.Sysmsg({_L('restore team marker: %s', tTeamInfo.szMark)})
 	end
-	MY.Sysmsg({_L["Team list restored"]})
+	MY.Sysmsg({_L['Team list restored']})
 end
 end
 
 function MY.UpdateItemBoxExtend(box, nQuality)
-	local szImage = "ui/Image/Common/Box.UITex"
+	local szImage = 'ui/Image/Common/Box.UITex'
 	local nFrame
 	if nQuality == 2 then
 		nFrame = 13

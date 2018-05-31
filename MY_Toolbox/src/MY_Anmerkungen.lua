@@ -6,7 +6,7 @@
 -- @Last modified by:   tinymins
 -- @Last modified time: 2016-12-13 15:23:48
 -----------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Toolbox/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Toolbox/lang/')
 local _C = {}
 local PUBLIC_PLAYER_IDS = {}
 local PUBLIC_PLAYER_NOTES = {}
@@ -23,7 +23,7 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 	local note = MY_Anmerkungen.GetPlayerNote(dwID) or {}
 
 	local w, h = 340, 300
-	local ui = MY.UI.CreateFrame("MY_Anmerkungen_PlayerNoteEdit_" .. (dwID or 0), {
+	local ui = MY.UI.CreateFrame('MY_Anmerkungen_PlayerNoteEdit_' .. (dwID or 0), {
 		w = w, h = h, anchor = {},
 		text = _L['my anmerkungen - player note edit'],
 	})
@@ -44,99 +44,99 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 	ui:remove(onRemove)
 
 	local x, y = 35 , 50
-	ui:append("Text", { x = x, y = y, text = _L['Name:'] })
-	ui:append("WndEditBox", {
-		name = "WndEditBox_Name",
+	ui:append('Text', { x = x, y = y, text = _L['Name:'] })
+	ui:append('WndEditBox', {
+		name = 'WndEditBox_Name',
 		x = x + 60, y = y, w = 200, h = 25,
-		multiline = false, text = szName or note.szName or "",
+		multiline = false, text = szName or note.szName or '',
 		onchange = function(szName)
 			local rec = MY_Anmerkungen.GetPlayerNote(szName) or {}
 			local info = MY_Farbnamen.GetAusName(szName)
 			if info and rec.dwID ~= info.dwID then
 				rec.dwID = info.dwID
-				rec.szContent = ""
+				rec.szContent = ''
 				rec.bTipWhenGroup = true
 				rec.bAlertWhenGroup = false
 			end
 			if rec.dwID then
-				ui:children("#WndButton_Submit"):enable(true)
-				ui:children("#WndEditBox_ID"):text(rec.dwID)
-				ui:children("#WndEditBox_Content"):text(rec.szContent)
-				ui:children("#WndCheckBox_TipWhenGroup"):check(rec.bTipWhenGroup)
-				ui:children("#WndCheckBox_AlertWhenGroup"):check(rec.bAlertWhenGroup)
+				ui:children('#WndButton_Submit'):enable(true)
+				ui:children('#WndEditBox_ID'):text(rec.dwID)
+				ui:children('#WndEditBox_Content'):text(rec.szContent)
+				ui:children('#WndCheckBox_TipWhenGroup'):check(rec.bTipWhenGroup)
+				ui:children('#WndCheckBox_AlertWhenGroup'):check(rec.bAlertWhenGroup)
 			else
-				ui:children("#WndButton_Submit"):enable(false)
-				ui:children("#WndEditBox_ID"):text(_L['Not found in local store'])
+				ui:children('#WndButton_Submit'):enable(false)
+				ui:children('#WndEditBox_ID'):text(_L['Not found in local store'])
 			end
 		end,
 	})
 	y = y + 30
 
-	ui:append("Text", { x = x, y = y, text = _L['ID:'] })
-	ui:append("WndEditBox", {
-		name = "WndEditBox_ID", x = x + 60, y = y, w = 200, h = 25,
-		text = dwID or note.dwID or "",
+	ui:append('Text', { x = x, y = y, text = _L['ID:'] })
+	ui:append('WndEditBox', {
+		name = 'WndEditBox_ID', x = x + 60, y = y, w = 200, h = 25,
+		text = dwID or note.dwID or '',
 		multiline = false, enable = false, color = {200,200,200},
 	})
 	y = y + 30
 
-	ui:append("Text", { x = x, y = y, text = _L['Content:'] })
-	ui:append("WndEditBox", {
-		name = "WndEditBox_Content",
+	ui:append('Text', { x = x, y = y, text = _L['Content:'] })
+	ui:append('WndEditBox', {
+		name = 'WndEditBox_Content',
 		x = x + 60, y = y, w = 200, h = 80,
-		multiline = true, text = note.szContent or "",
+		multiline = true, text = note.szContent or '',
 	})
 	y = y + 90
 
-	ui:append("WndCheckBox", {
-		name = "WndCheckBox_AlertWhenGroup",
+	ui:append('WndCheckBox', {
+		name = 'WndCheckBox_AlertWhenGroup',
 		x = x + 58, y = y, w = 200,
 		text = _L['alert when group'],
 		checked = note.bAlertWhenGroup,
 	})
 	y = y + 20
 
-	ui:append("WndCheckBox", {
-		name = "WndCheckBox_TipWhenGroup",
+	ui:append('WndCheckBox', {
+		name = 'WndCheckBox_TipWhenGroup',
 		x = x + 58, y = y, w = 200,
 		text = _L['tip when group'],
 		checked = note.bTipWhenGroup,
 	})
 	y = y + 30
 
-	ui:append("WndButton", {
-		name = "WndButton_Submit",
+	ui:append('WndButton', {
+		name = 'WndButton_Submit',
 		x = x + 58, y = y, w = 80,
 		text = _L['sure'],
 		onclick = function()
 			MY_Anmerkungen.SetPlayerNote(
-				ui:children("#WndEditBox_ID"):text(),
-				ui:children("#WndEditBox_Name"):text(),
-				ui:children("#WndEditBox_Content"):text(),
-				ui:children("#WndCheckBox_TipWhenGroup"):check(),
-				ui:children("#WndCheckBox_AlertWhenGroup"):check()
+				ui:children('#WndEditBox_ID'):text(),
+				ui:children('#WndEditBox_Name'):text(),
+				ui:children('#WndEditBox_Content'):text(),
+				ui:children('#WndCheckBox_TipWhenGroup'):check(),
+				ui:children('#WndCheckBox_AlertWhenGroup'):check()
 			)
 			ui:remove()
 		end,
 	})
-	ui:append("WndButton", {
+	ui:append('WndButton', {
 		x = x + 143, y = y, w = 80,
 		text = _L['cancel'],
 		onclick = function() ui:remove() end,
 	})
-	ui:append("Text", {
+	ui:append('Text', {
 		x = x + 230, y = y - 3, w = 80, alpha = 200,
 		text = _L['delete'], color = {255,0,0},
 		onhover = function(bIn) MY.UI(this):alpha((bIn and 255) or 200) end,
 		onclick = function()
-			MY_Anmerkungen.SetPlayerNote(ui:children("#WndEditBox_ID"):text())
+			MY_Anmerkungen.SetPlayerNote(ui:children('#WndEditBox_ID'):text())
 			ui:remove()
 		end,
 	})
 
 	-- init
 	Station.SetFocusWindow(ui[1])
-	ui:children("#WndEditBox_Name"):change()
+	ui:children('#WndEditBox_Name'):change()
 	PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 end
 
@@ -155,18 +155,18 @@ local function onMenu()
 		}
 	end
 end
-MY.RegisterTargetAddonMenu("MY_Anmerkungen_PlayerNotes", onMenu)
+MY.RegisterTargetAddonMenu('MY_Anmerkungen_PlayerNotes', onMenu)
 end
 
 do
 local menu = {
-	szOption = _L["View anmerkungen"],
+	szOption = _L['View anmerkungen'],
 	fnAction = function()
 		MY.OpenPanel()
-		MY.SwitchTab("MY_Anmerkungen")
+		MY.SwitchTab('MY_Anmerkungen')
 	end,
 }
-MY.RegisterAddonMenu("MY_Anmerkungen_PlayerNotes", menu)
+MY.RegisterAddonMenu('MY_Anmerkungen_PlayerNotes', menu)
 end
 
 -- 获取一个玩家的记录
@@ -223,7 +223,7 @@ function MY_Anmerkungen.SetPlayerNote(dwID, szName, szContent, bTipWhenGroup, bA
 			PUBLIC_PLAYER_IDS[szName] = dwID
 		end
 		if _C.list then
-			_C.list:listbox('update', 'id', dwID, {"text", "data"}, { _L('[%s] %s', t.szName, t.szContent), t })
+			_C.list:listbox('update', 'id', dwID, {'text', 'data'}, { _L('[%s] %s', t.szName, t.szContent), t })
 		end
 	elseif _C.list then
 		_C.list:listbox('delete', 'id', dwID)
@@ -243,29 +243,29 @@ local function OnPartyAddMember()
 	if t then
 		if t.bAlertWhenGroup then
 			MessageBox({
-				szName = "MY_Anmerkungen_PlayerNotes_"..t.dwID,
-				szMessage = _L("Tip: [%s] is in your team.\nNote: %s\n", t.szName, t.szContent),
+				szName = 'MY_Anmerkungen_PlayerNotes_'..t.dwID,
+				szMessage = _L('Tip: [%s] is in your team.\nNote: %s\n', t.szName, t.szContent),
 				{szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function() end},
 			})
 		end
 		if t.bTipWhenGroup then
-			MY.Sysmsg({_L("Tip: [%s] is in your team.\nNote: %s", t.szName, t.szContent)})
+			MY.Sysmsg({_L('Tip: [%s] is in your team.\nNote: %s', t.szName, t.szContent)})
 		end
 	end
 end
-MY.RegisterEvent("PARTY_ADD_MEMBER", OnPartyAddMember)
--- MY.RegisterEvent("PARTY_SYNC_MEMBER_DATA", OnPartyAddMember)
+MY.RegisterEvent('PARTY_ADD_MEMBER', OnPartyAddMember)
+-- MY.RegisterEvent('PARTY_SYNC_MEMBER_DATA', OnPartyAddMember)
 end
 
 -- 读取公共数据
 function MY_Anmerkungen.LoadConfig()
-	local data = MY.LoadLUAData({"config/anmerkungen.jx3dat", MY_DATA_PATH.SERVER})
+	local data = MY.LoadLUAData({'config/anmerkungen.jx3dat', MY_DATA_PATH.SERVER})
 	if data then
 		PUBLIC_PLAYER_IDS = data.ids or {}
 		PUBLIC_PLAYER_NOTES = data.data or {}
 	end
-	local szOrgFile = MY.GetLUADataPath("config/PLAYER_NOTES/$relserver.$lang.jx3dat")
-	local szFilePath = MY.GetLUADataPath({"config/playernotes.jx3dat", MY_DATA_PATH.SERVER})
+	local szOrgFile = MY.GetLUADataPath('config/PLAYER_NOTES/$relserver.$lang.jx3dat')
+	local szFilePath = MY.GetLUADataPath({'config/playernotes.jx3dat', MY_DATA_PATH.SERVER})
 	if IsLocalFileExist(szOrgFile) then
 		CPath.Move(szOrgFile, szFilePath)
 	end
@@ -275,7 +275,7 @@ function MY_Anmerkungen.LoadConfig()
 			data = MY.Json.Decode(data)
 		end
 		for k, v in pairs(data) do
-			if type(v) == "table" then
+			if type(v) == 'table' then
 				k = tonumber(k)
 				v.dwID = tonumber(v.dwID)
 				PUBLIC_PLAYER_NOTES[k] = v
@@ -287,13 +287,13 @@ function MY_Anmerkungen.LoadConfig()
 		MY_Anmerkungen.SaveConfig()
 	end
 
-	local data = MY.LoadLUAData({"config/anmerkungen.jx3dat", MY_DATA_PATH.ROLE})
+	local data = MY.LoadLUAData({'config/anmerkungen.jx3dat', MY_DATA_PATH.ROLE})
 	if data then
 		PRIVATE_PLAYER_IDS = data.ids or {}
 		PRIVATE_PLAYER_NOTES = data.data or {}
 	end
-	local szOrgFile = MY.GetLUADataPath("config/PLAYER_NOTES/$uid.$lang.jx3dat")
-	local szFilePath = MY.GetLUADataPath({"config/playernotes.jx3dat", MY_DATA_PATH.ROLE})
+	local szOrgFile = MY.GetLUADataPath('config/PLAYER_NOTES/$uid.$lang.jx3dat')
+	local szFilePath = MY.GetLUADataPath({'config/playernotes.jx3dat', MY_DATA_PATH.ROLE})
 	if IsLocalFileExist(szOrgFile) then
 		CPath.Move(szOrgFile, szFilePath)
 	end
@@ -303,7 +303,7 @@ function MY_Anmerkungen.LoadConfig()
 			data = MY.Json.Decode(data)
 		end
 		for k, v in pairs(data) do
-			if type(v) == "table" then
+			if type(v) == 'table' then
 				k = tonumber(k)
 				v.dwID = tonumber(v.dwID)
 				PRIVATE_PLAYER_NOTES[k] = v
@@ -321,13 +321,13 @@ function MY_Anmerkungen.SaveConfig()
 		ids = PUBLIC_PLAYER_IDS,
 		data = PUBLIC_PLAYER_NOTES,
 	}
-	MY.SaveLUAData({"config/anmerkungen.jx3dat", MY_DATA_PATH.SERVER}, data)
+	MY.SaveLUAData({'config/anmerkungen.jx3dat', MY_DATA_PATH.SERVER}, data)
 
 	local data = {
 		ids = PRIVATE_PLAYER_IDS,
 		data = PRIVATE_PLAYER_NOTES,
 	}
-	MY.SaveLUAData({"config/anmerkungen.jx3dat", MY_DATA_PATH.ROLE}, data)
+	MY.SaveLUAData({'config/anmerkungen.jx3dat', MY_DATA_PATH.ROLE}, data)
 end
 MY.RegisterInit('MY_ANMERKUNGEN', MY_Anmerkungen.LoadConfig)
 
@@ -337,7 +337,7 @@ function PS.OnPanelActive(wnd)
 	local w, h = ui:size()
 	local x, y = 0, 0
 
-	ui:append("WndButton2", {
+	ui:append('WndButton2', {
 		x = x, y = y, w = 110,
 		text = _L['Create'],
 		onclick = function()
@@ -345,7 +345,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 
-	ui:append("WndButton2", {
+	ui:append('WndButton2', {
 		x = w - 230, y = y, w = 110,
 		text = _L['Import'],
 		onclick = function()
@@ -357,7 +357,7 @@ function PS.OnPanelActive(wnd)
 					end
 					local function Next(usenew)
 						for k, v in pairs(config.public) do
-							if type(v) == "table" then
+							if type(v) == 'table' then
 								k = tonumber(k)
 								if not PUBLIC_PLAYER_NOTES[k] or usenew then
 									v.dwID = tonumber(v.dwID)
@@ -379,7 +379,7 @@ function PS.OnPanelActive(wnd)
 							end
 						end
 						for k, v in pairs(config.private) do
-							if type(v) == "table" then
+							if type(v) == 'table' then
 								k = tonumber(k)
 								if not PRIVATE_PLAYER_NOTES[k] or usenew then
 									v.dwID = tonumber(v.dwID)
@@ -401,18 +401,18 @@ function PS.OnPanelActive(wnd)
 							end
 						end
 						MY_Anmerkungen.SaveConfig()
-						MY.SwitchTab("MY_Anmerkungen_Player_Note", true)
+						MY.SwitchTab('MY_Anmerkungen_Player_Note', true)
 					end
 					MY.Confirm(_L['Prefer old data or new data?'], function() Next(false) end,
 						function() Next(true) end, _L['Old data'], _L['New data'])
 				else
 					MY.Alert(_L['Decode data failed!'])
 				end
-			end, function() end, function() end, nil, "" )
+			end, function() end, function() end, nil, '' )
 		end,
 	})
 
-	ui:append("WndButton2", {
+	ui:append('WndButton2', {
 		x = w - 110, y = y, w = 110,
 		text = _L['Export'],
 		onclick = function()
@@ -427,7 +427,7 @@ function PS.OnPanelActive(wnd)
 	})
 
 	y = y + 30
-	local list = ui:append("WndListBox", {
+	local list = ui:append('WndListBox', {
 		x = x, y = y,
 		w = w, h = h - 30,
 		listbox = {{
@@ -448,4 +448,4 @@ end
 function PS.OnPanelDeactive()
 	_C.list = nil
 end
-MY.RegisterPanel( "MY_Anmerkungen_Player_Note", _L["player note"], _L['Target'], "ui/Image/button/ShopButton.UITex|12", {255,255,0,200}, PS)
+MY.RegisterPanel( 'MY_Anmerkungen_Player_Note', _L['player note'], _L['Target'], 'ui/Image/button/ShopButton.UITex|12', {255,255,0,200}, PS)

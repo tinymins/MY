@@ -4,15 +4,15 @@
 -- @Author: 茗伊 @tinymins
 -- @Date  : 2015-03-02 10:08:35
 -- @Email : admin@derzh.com
--- @Last Modified by:   茗伊 @tinymins
--- @Last Modified time: 2015-05-14 10:27:36
+-- @Last Modified by:   Emil Zhai (root@derzh.com)
+-- @Last Modified time: 2018-05-31 11:13:06
 --------------------------------------------
 local HP = class()
-local CACHE = setmetatable({}, {__mode = "v"})
+local CACHE = setmetatable({}, {__mode = 'v'})
 
 function HP:ctor(dwType, dwID) -- KGobject
-	local hList = XGUI.GetShadowHandle("MY_LifeBar")
-	local szName = dwType .. "_" .. dwID
+	local hList = XGUI.GetShadowHandle('MY_LifeBar')
+	local szName = dwType .. '_' .. dwID
 	self.szName = szName
 	self.dwType = dwType
 	self.dwID = dwID
@@ -23,7 +23,7 @@ end
 -- 创建
 function HP:Create()
 	if not self.handle then
-		local hList = XGUI.GetShadowHandle("MY_LifeBar")
+		local hList = XGUI.GetShadowHandle('MY_LifeBar')
 		hList:AppendItemFromString(FormatHandle(string.format('name="%s"', self.szName)))
 		local hItem = hList:Lookup(self.szName)
 		hItem:AppendItemFromString('<shadow>name="hp_bg"</shadow>')
@@ -43,7 +43,7 @@ end
 -- 删除
 function HP:Remove()
 	if self.handle then
-		local hList = XGUI.GetShadowHandle("MY_LifeBar")
+		local hList = XGUI.GetShadowHandle('MY_LifeBar')
 		hList:RemoveItem(self.handle)
 		self.handle = nil
 	end
@@ -65,12 +65,12 @@ function HP:DrawTexts(aTexts, nY, nLineHeight, r, g, b, a, f)
 	if self.handle then
 		nY = nY * Station.GetUIScale()
 		nLineHeight = nLineHeight * Station.GetUIScale()
-		local sha = self.handle:Lookup("lines")
+		local sha = self.handle:Lookup('lines')
 		sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
 		sha:ClearTriangleFanPoint()
 
 		for _, szText in ipairs(aTexts) do
-			if szText ~= "" then
+			if szText ~= '' then
 				sha:AppendCharacterID(self.dwID, true, r, g, b, a, {0, 0, 0, 0, -nY}, f, szText, 1, 1)
 				nY =  nY + nLineHeight
 			end
@@ -84,7 +84,7 @@ function HP:DrawLifeText(text, x, y, r, g, b, a, f)
 	if self.handle then
 		x = x * Station.GetUIScale()
 		y = y * Station.GetUIScale()
-		local sha = self.handle:Lookup("hp_title")
+		local sha = self.handle:Lookup('hp_title')
 		sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
 		sha:ClearTriangleFanPoint()
 		sha:AppendCharacterID(self.dwID, true, r, g, b, a, {0, 0, 0, x, -y}, f, text, 1, 1)
@@ -93,7 +93,7 @@ function HP:DrawLifeText(text, x, y, r, g, b, a, f)
 end
 
 function HP:ClearLifeText()
-	return self:ClearShadow("hp_title")
+	return self:ClearShadow('hp_title')
 end
 
 -- 填充边框 默认200的nAlpha
@@ -135,11 +135,11 @@ end
 
 -- 填充血条边框 默认200的nAlpha
 function HP:DrawLifeBorder(nWidth, nHeight, nOffsetX, nOffsetY, nAlpha)
-	return self:DrawBorder("hp_bg", "hp_bg2", nWidth, nHeight, nOffsetX, nOffsetY, nAlpha)
+	return self:DrawBorder('hp_bg', 'hp_bg2', nWidth, nHeight, nOffsetX, nOffsetY, nAlpha)
 end
 function HP:ClearLifeBorder()
-	self:ClearShadow("hp_bg")
-	self:ClearShadow("hp_bg2")
+	self:ClearShadow('hp_bg')
+	self:ClearShadow('hp_bg2')
 	return self
 end
 
@@ -164,18 +164,18 @@ function HP:DrawRect(szShadowName, nWidth, nHeight, nOffsetX, nOffsetY, r, g, b,
 
 		-- 计算实际绘制宽度高度起始位置
 		local bcX, bcY = -(nWidth / 2 - 2) + nOffsetX, (-(nHeight - 2)) - nOffsetY
-		if d == "TOP_BOTTOM" then
+		if d == 'TOP_BOTTOM' then
 			nWidth = nWidth - 4
 			nHeight = (nHeight - 4) * p
-		elseif d == "BOTTOM_TOP" then
+		elseif d == 'BOTTOM_TOP' then
 			bcY = bcY + (nHeight - 4) * (1 - p)
 			nWidth = nWidth - 4
 			nHeight = (nHeight - 4) * p
-		elseif d == "RIGHT_LEFT" then
+		elseif d == 'RIGHT_LEFT' then
 			bcX = bcX + (nWidth - 4) * (1 - p)
 			nWidth = (nWidth - 4) * p
 			nHeight = nHeight - 4
-		else -- if d == "LEFT_RIGHT" then
+		else -- if d == 'LEFT_RIGHT' then
 			nWidth = (nWidth - 4) * p
 			nHeight = nHeight - 4
 		end
@@ -190,19 +190,19 @@ end
 
 -- 填充血条
 function HP:DrawLifeBar(nWidth, nHeight, nOffsetX, nOffsetY, r, g, b, a, p, d)
-	return self:DrawRect("hp", nWidth, nHeight, nOffsetX, nOffsetY, r, g, b, a, p, d)
+	return self:DrawRect('hp', nWidth, nHeight, nOffsetX, nOffsetY, r, g, b, a, p, d)
 end
 
 function HP:ClearLifeBar()
-	return self:ClearShadow("hp")
+	return self:ClearShadow('hp')
 end
 
 function MY_LifeBar_HP(dwType, dwID)
-	if dwType == "clear" then
+	if dwType == 'clear' then
 		CACHE = {}
-		XGUI.GetShadowHandle("MY_LifeBar"):Clear()
+		XGUI.GetShadowHandle('MY_LifeBar'):Clear()
 	else
-		local szName = dwType .. "_" .. dwID
+		local szName = dwType .. '_' .. dwID
 		if not CACHE[szName] then
 			CACHE[szName] = HP.new(dwType, dwID)
 		end

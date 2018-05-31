@@ -65,7 +65,7 @@ local SZ_SKILL_RESULT = {
 	[SKILL_RESULT.CRITICAL] = g_tStrings.STR_CS_NAME      ,
 	[SKILL_RESULT.INSIGHT ] = g_tStrings.STR_MSG_INSIGHT  ,
 }
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Recount/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Recount/lang/')
 local _C = {
 	szCssFile   = 'config/MY_RECOUNT/style.jx3dat',
 	szIniRoot   = MY.GetAddonInfo().szRoot .. 'MY_Recount/ui/',
@@ -114,39 +114,39 @@ local _C = {
 			},
 		}, {
 			['Bar'] = {
-				[-1                  ] = { image = "ui/Image/Common/Money.UITex", frame = 215 }, -- NPC
-				[FORCE_TYPE.JIANG_HU ] = { image = "ui/Image/Common/Money.UITex", frame = 210 }, -- ´óÏÀ
-				[FORCE_TYPE.SHAO_LIN ] = { image = "ui/Image/Common/Money.UITex", frame = 203 }, -- ÉÙÁÖ
-				[FORCE_TYPE.WAN_HUA  ] = { image = "ui/Image/Common/Money.UITex", frame = 205 }, -- Íò»¨
-				[FORCE_TYPE.TIAN_CE  ] = { image = "ui/Image/Common/Money.UITex", frame = 206 }, -- Ìì²ß
-				[FORCE_TYPE.CHUN_YANG] = { image = "ui/Image/Common/Money.UITex", frame = 209 }, -- ´¿Ñô
-				[FORCE_TYPE.QI_XIU   ] = { image = "ui/Image/Common/Money.UITex", frame = 204 }, -- ÆßÐã
-				[FORCE_TYPE.WU_DU    ] = { image = "ui/Image/Common/Money.UITex", frame = 208 }, -- Îå¶¾
-				[FORCE_TYPE.TANG_MEN ] = { image = "ui/Image/Common/Money.UITex", frame = 207 }, -- ÌÆÃÅ
-				[FORCE_TYPE.CANG_JIAN] = { image = "ui/Image/Common/Money.UITex", frame = 168 }, -- ²Ø½£
-				[FORCE_TYPE.GAI_BANG ] = { image = "ui/Image/Common/Money.UITex", frame = 234 }, -- Ø¤°ï
-				[FORCE_TYPE.MING_JIAO] = { image = "ui/Image/Common/Money.UITex", frame = 232 }, -- Ã÷½Ì
-				[FORCE_TYPE.CANG_YUN ] = { image = "ui/Image/Common/Money.UITex", frame = 26  }, -- ²ÔÔÆ
-				[FORCE_TYPE.CHANG_GE ] = { image = "ui/Image/Common/Money.UITex", frame = 30  }, -- ³¤¸è
-				[FORCE_TYPE.BA_DAO   ] = { image = "ui/Image/Common/Money.UITex", frame = 35  }, -- °Ôµ¶
+				[-1                  ] = { image = 'ui/Image/Common/Money.UITex', frame = 215 }, -- NPC
+				[FORCE_TYPE.JIANG_HU ] = { image = 'ui/Image/Common/Money.UITex', frame = 210 }, -- ´óÏÀ
+				[FORCE_TYPE.SHAO_LIN ] = { image = 'ui/Image/Common/Money.UITex', frame = 203 }, -- ÉÙÁÖ
+				[FORCE_TYPE.WAN_HUA  ] = { image = 'ui/Image/Common/Money.UITex', frame = 205 }, -- Íò»¨
+				[FORCE_TYPE.TIAN_CE  ] = { image = 'ui/Image/Common/Money.UITex', frame = 206 }, -- Ìì²ß
+				[FORCE_TYPE.CHUN_YANG] = { image = 'ui/Image/Common/Money.UITex', frame = 209 }, -- ´¿Ñô
+				[FORCE_TYPE.QI_XIU   ] = { image = 'ui/Image/Common/Money.UITex', frame = 204 }, -- ÆßÐã
+				[FORCE_TYPE.WU_DU    ] = { image = 'ui/Image/Common/Money.UITex', frame = 208 }, -- Îå¶¾
+				[FORCE_TYPE.TANG_MEN ] = { image = 'ui/Image/Common/Money.UITex', frame = 207 }, -- ÌÆÃÅ
+				[FORCE_TYPE.CANG_JIAN] = { image = 'ui/Image/Common/Money.UITex', frame = 168 }, -- ²Ø½£
+				[FORCE_TYPE.GAI_BANG ] = { image = 'ui/Image/Common/Money.UITex', frame = 234 }, -- Ø¤°ï
+				[FORCE_TYPE.MING_JIAO] = { image = 'ui/Image/Common/Money.UITex', frame = 232 }, -- Ã÷½Ì
+				[FORCE_TYPE.CANG_YUN ] = { image = 'ui/Image/Common/Money.UITex', frame = 26  }, -- ²ÔÔÆ
+				[FORCE_TYPE.CHANG_GE ] = { image = 'ui/Image/Common/Money.UITex', frame = 30  }, -- ³¤¸è
+				[FORCE_TYPE.BA_DAO   ] = { image = 'ui/Image/Common/Money.UITex', frame = 35  }, -- °Ôµ¶
 			},
 		}, {
 			['Bar'] = {
-				[-1                  ] = { image = "ui/Image/Common/Money.UITex", frame = 220 }, -- NPC
-				[FORCE_TYPE.JIANG_HU ] = { image = "ui/Image/Common/Money.UITex", frame = 220 }, -- ´óÏÀ
-				[FORCE_TYPE.SHAO_LIN ] = { image = "ui/Image/Common/Money.UITex", frame = 216 }, -- ÉÙÁÖ
-				[FORCE_TYPE.WAN_HUA  ] = { image = "ui/Image/Common/Money.UITex", frame = 212 }, -- Íò»¨
-				[FORCE_TYPE.TIAN_CE  ] = { image = "ui/Image/Common/Money.UITex", frame = 215 }, -- Ìì²ß
-				[FORCE_TYPE.CHUN_YANG] = { image = "ui/Image/Common/Money.UITex", frame = 218 }, -- ´¿Ñô
-				[FORCE_TYPE.QI_XIU   ] = { image = "ui/Image/Common/Money.UITex", frame = 211 }, -- ÆßÐã
-				[FORCE_TYPE.WU_DU    ] = { image = "ui/Image/Common/Money.UITex", frame = 213 }, -- Îå¶¾
-				[FORCE_TYPE.TANG_MEN ] = { image = "ui/Image/Common/Money.UITex", frame = 214 }, -- ÌÆÃÅ
-				[FORCE_TYPE.CANG_JIAN] = { image = "ui/Image/Common/Money.UITex", frame = 217 }, -- ²Ø½£
-				[FORCE_TYPE.GAI_BANG ] = { image = "ui/Image/Common/Money.UITex", frame = 233 }, -- Ø¤°ï
-				[FORCE_TYPE.MING_JIAO] = { image = "ui/Image/Common/Money.UITex", frame = 228 }, -- Ã÷½Ì
-				[FORCE_TYPE.CANG_YUN ] = { image = "ui/Image/Common/Money.UITex", frame = 219 }, -- ²ÔÔÆ
-				[FORCE_TYPE.CHANG_GE ] = { image = "ui/Image/Common/Money.UITex", frame = 30  }, -- ³¤¸è
-				[FORCE_TYPE.BA_DAO   ] = { image = "ui/Image/Common/Money.UITex", frame = 35  }, -- °Ôµ¶
+				[-1                  ] = { image = 'ui/Image/Common/Money.UITex', frame = 220 }, -- NPC
+				[FORCE_TYPE.JIANG_HU ] = { image = 'ui/Image/Common/Money.UITex', frame = 220 }, -- ´óÏÀ
+				[FORCE_TYPE.SHAO_LIN ] = { image = 'ui/Image/Common/Money.UITex', frame = 216 }, -- ÉÙÁÖ
+				[FORCE_TYPE.WAN_HUA  ] = { image = 'ui/Image/Common/Money.UITex', frame = 212 }, -- Íò»¨
+				[FORCE_TYPE.TIAN_CE  ] = { image = 'ui/Image/Common/Money.UITex', frame = 215 }, -- Ìì²ß
+				[FORCE_TYPE.CHUN_YANG] = { image = 'ui/Image/Common/Money.UITex', frame = 218 }, -- ´¿Ñô
+				[FORCE_TYPE.QI_XIU   ] = { image = 'ui/Image/Common/Money.UITex', frame = 211 }, -- ÆßÐã
+				[FORCE_TYPE.WU_DU    ] = { image = 'ui/Image/Common/Money.UITex', frame = 213 }, -- Îå¶¾
+				[FORCE_TYPE.TANG_MEN ] = { image = 'ui/Image/Common/Money.UITex', frame = 214 }, -- ÌÆÃÅ
+				[FORCE_TYPE.CANG_JIAN] = { image = 'ui/Image/Common/Money.UITex', frame = 217 }, -- ²Ø½£
+				[FORCE_TYPE.GAI_BANG ] = { image = 'ui/Image/Common/Money.UITex', frame = 233 }, -- Ø¤°ï
+				[FORCE_TYPE.MING_JIAO] = { image = 'ui/Image/Common/Money.UITex', frame = 228 }, -- Ã÷½Ì
+				[FORCE_TYPE.CANG_YUN ] = { image = 'ui/Image/Common/Money.UITex', frame = 219 }, -- ²ÔÔÆ
+				[FORCE_TYPE.CHANG_GE ] = { image = 'ui/Image/Common/Money.UITex', frame = 30  }, -- ³¤¸è
+				[FORCE_TYPE.BA_DAO   ] = { image = 'ui/Image/Common/Money.UITex', frame = 35  }, -- °Ôµ¶
 			},
 		},
 	},
@@ -173,19 +173,19 @@ MY_Recount.nDisplayMode  = DISPLAY_MODE.BOTH    -- Í³¼ÆÏÔÊ¾Ä£Ê½£¨ÏÔÊ¾NPC/Íæ¼ÒÊý¾
 MY_Recount.nPublishMode  = PUBLISH_MODE.EFFECT  -- ·¢²¼Ä£Ê½
 MY_Recount.nDrawInterval = GLOBAL.GAME_FPS / 2  -- UIÖØ»æÖÜÆÚ£¨Ö¡£©
 MY_Recount.bShowNodataTeammate = false  -- ÏÔÊ¾Ã»ÓÐÊý¾ÝµÄ¶ÓÓÑ
-MY_Recount.anchor = { x=0, y=-70, s="BOTTOMRIGHT", r="BOTTOMRIGHT" } -- Ä¬ÈÏ×ø±ê
-RegisterCustomData("MY_Recount.nCss")
-RegisterCustomData("MY_Recount.nChannel")
-RegisterCustomData("MY_Recount.bAwayMode")
-RegisterCustomData("MY_Recount.bSysTimeMode")
-RegisterCustomData("MY_Recount.bShowPerSec")
-RegisterCustomData("MY_Recount.bShowEffect")
-RegisterCustomData("MY_Recount.bSaveRecount")
-RegisterCustomData("MY_Recount.nDisplayMode")
-RegisterCustomData("MY_Recount.nPublishMode")
-RegisterCustomData("MY_Recount.nDrawInterval")
-RegisterCustomData("MY_Recount.bShowNodataTeammate")
-RegisterCustomData("MY_Recount.anchor")
+MY_Recount.anchor = { x=0, y=-70, s='BOTTOMRIGHT', r='BOTTOMRIGHT' } -- Ä¬ÈÏ×ø±ê
+RegisterCustomData('MY_Recount.nCss')
+RegisterCustomData('MY_Recount.nChannel')
+RegisterCustomData('MY_Recount.bAwayMode')
+RegisterCustomData('MY_Recount.bSysTimeMode')
+RegisterCustomData('MY_Recount.bShowPerSec')
+RegisterCustomData('MY_Recount.bShowEffect')
+RegisterCustomData('MY_Recount.bSaveRecount')
+RegisterCustomData('MY_Recount.nDisplayMode')
+RegisterCustomData('MY_Recount.nPublishMode')
+RegisterCustomData('MY_Recount.nDrawInterval')
+RegisterCustomData('MY_Recount.bShowNodataTeammate')
+RegisterCustomData('MY_Recount.anchor')
 
 local D, MY_Recount = {}, MY_Recount
 
@@ -195,7 +195,7 @@ function MY_Recount.Open()
 	m_frame = Wnd.OpenWindow(_C.szIniFile, 'MY_Recount')
 	-- pos
 	local anchor = MY.GetStorage('FrameAnchor.MY_Recount')
-		or { x = 0, y = -70, s = "BOTTOMRIGHT", r = "BOTTOMRIGHT" }
+		or { x = 0, y = -70, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' }
 	MY.UI(m_frame):anchor(anchor)
 	MY.RegisterEvent('UI_SCALED.MY_RECOUNT', function()
 		MY.UI(m_frame):anchor(anchor)
@@ -306,7 +306,7 @@ function MY_Recount.UpdateUI(data)
 	local nTimeCount = MY_Recount.Data.GeneFightTime(data, nil, MY_Recount.bSysTimeMode and SZ_CHANNEL_KEY[MY_Recount.nChannel])
 	local szTimeCount = MY.FormatTimeCount('M:ss', nTimeCount)
 	if MY.IsInArena() then
-		szTimeCount = MY.GetFightTime("M:ss")
+		szTimeCount = MY.GetFightTime('M:ss')
 	end
 	-- ×Ô¼ºµÄ¼ÇÂ¼
 	local tMyRec
@@ -314,7 +314,7 @@ function MY_Recount.UpdateUI(data)
 	-- ÕûÀíÊý¾Ý Éú³ÉÒªÏÔÊ¾µÄÁÐ±í
 	local nMaxValue, aResult, tIDs = 0, {}, {}
 	for id, rec in pairs(tRecord) do
-		if (MY_Recount.bShowZeroVal or rec[MY_Recount.bShowEffect and "nTotalEffect" or "nTotal"] > 0)
+		if (MY_Recount.bShowZeroVal or rec[MY_Recount.bShowEffect and 'nTotalEffect' or 'nTotal'] > 0)
 		and (
 			MY_Recount.nDisplayMode == DISPLAY_MODE.BOTH or  -- È·¶¨ÏÔÊ¾Ä£Ê½£¨ÏÔÊ¾NPC/ÏÔÊ¾Íæ¼Ò/È«²¿ÏÔÊ¾£©
 			(MY_Recount.nDisplayMode == DISPLAY_MODE.NPC    and type(id) == 'string') or
@@ -410,7 +410,7 @@ function MY_Recount.UpdateUI(data)
 			hItem:Lookup('Image_PerBack'):SetAlpha((css.a or 255) / 255 * 100)
 			hItem:Lookup('Shadow_PerFore'):SetAlpha(css.a or 255)
 			hItem:Lookup('Shadow_PerBack'):SetAlpha((css.a or 255) / 255 * 100)
-			hItem:Lookup('Text_L'):SetText((p.szName:gsub("#.*", "")))
+			hItem:Lookup('Text_L'):SetText((p.szName:gsub('#.*', '')))
 			hItem.id = p.id
 		end
 		if hItem:GetIndex() ~= i - 1 then
@@ -592,8 +592,8 @@ function MY_Recount.OnItemLButtonClick()
 		id = UI_GetClientPlayerID()
 		name = 'Handle_LI_' .. UI_GetClientPlayerID()
 	end
-	if id and name:find("Handle_LI_") == 1 then
-		Wnd.OpenWindow(_C.szIniDetail, "MY_Recount_Detail#" .. id .. "_" .. MY_Recount.nChannel)
+	if id and name:find('Handle_LI_') == 1 then
+		Wnd.OpenWindow(_C.szIniDetail, 'MY_Recount_Detail#' .. id .. '_' .. MY_Recount.nChannel)
 	end
 end
 
@@ -612,7 +612,7 @@ function MY_Recount.OnItemRefreshTip()
 		local w, h = this:GetSize()
 		local tRec = DataDisplay[SZ_CHANNEL_KEY[MY_Recount.nChannel]].Statistics[id]
 		if tRec then
-			local szXml = GetFormatText((DataDisplay.Namelist[id] or id) .. "\n", 60, 255, 45, 255)
+			local szXml = GetFormatText((DataDisplay.Namelist[id] or id) .. '\n', 60, 255, 45, 255)
 			local szColon = g_tStrings.STR_COLON
 			local t = {}
 			for szSkillName, p in pairs(tRec.Skill) do
@@ -623,8 +623,8 @@ function MY_Recount.OnItemRefreshTip()
 			end)
 			for _, p in ipairs(t) do
 				if MY_Recount.bShowZeroVal or p.rec.nTotal > 0 then
-					szXml = szXml .. GetFormatText(p.szName .. "\n", nil, 255, 150, 0)
-					szXml = szXml .. GetFormatText(_L['total: '] .. p.rec.nTotal .. ' ' .. _L['effect: '] .. p.rec.nTotalEffect .. "\n")
+					szXml = szXml .. GetFormatText(p.szName .. '\n', nil, 255, 150, 0)
+					szXml = szXml .. GetFormatText(_L['total: '] .. p.rec.nTotal .. ' ' .. _L['effect: '] .. p.rec.nTotalEffect .. '\n')
 					for _, nSkillResult in ipairs({
 						SKILL_RESULT.HIT     ,
 						SKILL_RESULT.INSIGHT ,
@@ -721,7 +721,7 @@ MY_Recount_Detail = class()
 
 function MY_Recount_Detail.OnFrameCreate()
 	local frame = this
-	local id, nChannel = this:GetName():match("^MY_Recount_Detail#([^_]+)_(%d+)$")
+	local id, nChannel = this:GetName():match('^MY_Recount_Detail#([^_]+)_(%d+)$')
 	frame.id = tonumber(id) or id
 	frame.nChannel = tonumber(nChannel)
 	frame.bFirstRendering = true
@@ -731,7 +731,7 @@ function MY_Recount_Detail.OnFrameCreate()
 	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_5'):SetText(g_tStrings.STR_HIT_NAME)
 	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_6'):SetText(g_tStrings.STR_CS_NAME)
 	frame:Lookup('WndScroll_Target', 'Handle_TargetTitle/Text_TargetTitle_7'):SetText(g_tStrings.STR_MSG_MISS)
-	frame:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
+	frame:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 
 	local function canEsc()
 		if frame and frame:IsValid() then
@@ -835,7 +835,7 @@ function MY_Recount_Detail.OnFrameBreathe()
 	for i, p in ipairs(aResult) do
 		local hItem = hList:Lookup(i - 1) or hList:AppendItemFromIni(_C.szIniDetail, 'Handle_SkillItem')
 		hItem:Lookup('Text_SkillNo'):SetText(i)
-		hItem:Lookup('Text_SkillName'):SetText((p.szName:gsub("#.*", "")))
+		hItem:Lookup('Text_SkillName'):SetText((p.szName:gsub('#.*', '')))
 		hItem:Lookup('Text_SkillCount'):SetText(not MY_Recount.bShowZeroVal and p.nNzCount or p.nCount)
 		hItem:Lookup('Text_SkillTotal'):SetText(p.nTotal)
 		hItem:Lookup('Text_SkillPercentage'):SetText(nTotal > 0 and _L('%.1f%%', (i == 1 and ceil or floor)(p.nTotal / nTotal * 1000) / 10) or ' - ')
@@ -859,7 +859,7 @@ function MY_Recount_Detail.OnFrameBreathe()
 		--------------- ¶þ¡¢¼¼ÄÜÊÍ·Å½á¹ûÁÐ±í¸üÐÂ -----------------
 		-- Êý¾ÝÊÕ¼¯
 		local aResult, nCountSum = {}, not MY_Recount.bShowZeroVal and tData[szPrimarySort][szSelected].nNzCount or tData[szPrimarySort][szSelected].nCount
-		local nTotal = tData[szPrimarySort][szSelected][MY_Recount.bShowEffect and "nTotalEffect" or "nTotal"]
+		local nTotal = tData[szPrimarySort][szSelected][MY_Recount.bShowEffect and 'nTotalEffect' or 'nTotal']
 		for nSkillResult, p in pairs(tData[szPrimarySort][szSelected].Detail) do
 			table.insert(aResult, {
 				nCount = not MY_Recount.bShowZeroVal and p.nNzCount or p.nCount,
@@ -903,7 +903,7 @@ function MY_Recount_Detail.OnFrameBreathe()
 
 		--------------- Èý¡¢¼¼ÄÜÊÍ·Å½á¹ûÁÐ±í¸üÐÂ -----------------
 		-- Êý¾ÝÊÕ¼¯
-		local aResult, nTotal = {}, tData[szPrimarySort][szSelected][MY_Recount.bShowEffect and "nTotalEffect" or "nTotal"]
+		local aResult, nTotal = {}, tData[szPrimarySort][szSelected][MY_Recount.bShowEffect and 'nTotalEffect' or 'nTotal']
 		if szPrimarySort == 'Skill' then
 			for id, p in pairs(tData.Skill[szSelectedSkill].Target) do
 				local rec = {
@@ -941,7 +941,7 @@ function MY_Recount_Detail.OnFrameBreathe()
 		for i, p in ipairs(aResult) do
 			local hItem = hList:Lookup(i - 1) or hList:AppendItemFromIni(_C.szIniDetail, 'Handle_TargetItem')
 			hItem:Lookup('Text_TargetNo'):SetText(i)
-			hItem:Lookup('Text_TargetName'):SetText((p.szName:gsub("#.*", "")))
+			hItem:Lookup('Text_TargetName'):SetText((p.szName:gsub('#.*', '')))
 			hItem:Lookup('Text_TargetTotal'):SetText(p.nTotal)
 			hItem:Lookup('Text_TargetMax'):SetText(p.nMax)
 			hItem:Lookup('Text_TargetHit'):SetText(p.nHitCount)
@@ -1011,7 +1011,7 @@ function MY_Recount_Detail.OnItemRButtonClick()
 			insert(menu, {
 				szOption = SZ_CHANNEL[nChannel],
 				fnAction = function()
-					Wnd.OpenWindow(_C.szIniDetail, "MY_Recount_Detail#" .. szKey .. "_" .. nChannel)
+					Wnd.OpenWindow(_C.szIniDetail, 'MY_Recount_Detail#' .. szKey .. '_' .. nChannel)
 				end,
 			})
 		end
@@ -1023,7 +1023,7 @@ function MY_Recount_Detail.OnItemLButtonDBClick()
 	local name = this:GetName()
 	if (name == 'Handle_SkillItem' and this:GetRoot().szPrimarySort == 'Target')
 	or (name == 'Handle_TargetItem' and this:GetRoot().szPrimarySort == 'Skill') then
-		Wnd.OpenWindow(_C.szIniDetail, "MY_Recount_Detail#" .. this.szKey .. "_" .. this:GetRoot().nChannel)
+		Wnd.OpenWindow(_C.szIniDetail, 'MY_Recount_Detail#' .. this.szKey .. '_' .. this:GetRoot().nChannel)
 	end
 end
 
@@ -1044,7 +1044,7 @@ end
 -- »ñÈ¡ÉèÖÃ²Ëµ¥
 function MY_Recount.GetMenu()
 	local t = {
-		szOption = _L["fight recount"],
+		szOption = _L['fight recount'],
 		{
 			szOption = _L['enable'],
 			bCheck = true,
@@ -1299,7 +1299,7 @@ end
 -- »ñÈ¡ÀúÊ·¼ÇÂ¼²Ëµ¥
 function MY_Recount.GetHistoryMenu()
 	local t = {{
-		szOption = _L["current fight"],
+		szOption = _L['current fight'],
 		rgb = (MY_Recount.Data.Get(0) == DataDisplay and {255, 255, 0}) or nil,
 		fnAction = function()
 			MY_Recount.DisplayData(0)
@@ -1309,17 +1309,17 @@ function MY_Recount.GetHistoryMenu()
 	for _, data in ipairs(MY_Recount.Data.Get()) do
 		if data.UUID and data.nTimeDuring then
 			local t1 = {
-				szOption = (data.szBossName or ''):gsub("#.*", "") .. ' (' .. MY.FormatTimeCount('M:ss', data.nTimeDuring) .. ')',
+				szOption = (data.szBossName or ''):gsub('#.*', '') .. ' (' .. MY.FormatTimeCount('M:ss', data.nTimeDuring) .. ')',
 				rgb = (data == DataDisplay and {255, 255, 0}) or nil,
 				fnAction = function()
 					MY_Recount.DisplayData(data)
 				end,
-				szIcon = "ui/Image/UICommon/CommonPanel2.UITex",
+				szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
 				nFrame = 49,
 				nMouseOverFrame = 51,
 				nIconWidth = 17,
 				nIconHeight = 17,
-				szLayer = "ICON_RIGHTMOST",
+				szLayer = 'ICON_RIGHTMOST',
 				fnClickIcon = function()
 					MY_Recount.Data.Del(data)
 					Wnd.CloseWindow('PopupMenuPanel')
@@ -1400,7 +1400,7 @@ function MY_Recount.GetPublishMenu()
 		end
 		if not MY_Recount.bShowPerSec then
 			nTimeCount = 1
-			szUnit = ""
+			szUnit = ''
 		end
 		-- ·¢²¼Êý¾Ý
 		for i, p in ipairs(aResult) do
@@ -1438,7 +1438,7 @@ function MY_Recount.GetPublishMenu()
 			bCheck = true, -- ²»ÉèÖÃ³É¿ÉÑ¡¿ò²»ÄÜµã¨q¡É¨r(¦á¦ä¦á£©¨q¡É¨rÀ¬»ø
 			fnAction = function()
 				Publish(nChannel, huge)
-				Wnd.CloseWindow("PopupMenuPanel")
+				Wnd.CloseWindow('PopupMenuPanel')
 			end,
 			rgb = GetMsgFontColor(szChannel, true),
 		}
@@ -1458,7 +1458,7 @@ function D.InsertFromText(aTabTalk, h)
 	local aText = {}
 	for i = 0, h:GetItemCount() - 1 do
 		local p = h:Lookup(i)
-		if p:GetType() == "Text" then
+		if p:GetType() == 'Text' then
 			table.insert(aText, p:GetText())
 		end
 	end
@@ -1468,7 +1468,7 @@ end
 function MY_Recount.GetDetailMenu(frame)
 	local t = {}
 	local function Publish(nChannel, nLimit)
-		local bDetail = frame:Lookup("", "Handle_Spliter"):IsVisible()
+		local bDetail = frame:Lookup('', 'Handle_Spliter'):IsVisible()
 		MY.Talk(
 			nChannel,
 			'[' .. _L['mingyi plugin'] .. ']'
@@ -1487,7 +1487,7 @@ function MY_Recount.GetDetailMenu(frame)
 		if bDetail then
 			for i = 0, hList:GetItemCount() - 1 do
 				local hItem = hList:Lookup(i)
-				if hItem:Lookup("Shadow_SkillEntry"):IsVisible() then
+				if hItem:Lookup('Shadow_SkillEntry'):IsVisible() then
 					D.InsertFromText(aTabTalk, hItem)
 					break
 				end
@@ -1497,7 +1497,7 @@ function MY_Recount.GetDetailMenu(frame)
 				D.InsertFromText(aTabTalk, hList:Lookup(i))
 			end
 		end
-		MY.TabTalk(nChannel, aTabTalk, {"L", "L", "R", "R", "R"})
+		MY.TabTalk(nChannel, aTabTalk, {'L', 'L', 'R', 'R', 'R'})
 		MY.Talk(nChannel, '------------------------------')
 
 		if bDetail then
@@ -1507,7 +1507,7 @@ function MY_Recount.GetDetailMenu(frame)
 			for i = 0, hList:GetItemCount() - 1 do
 				D.InsertFromText(aTabTalk, hList:Lookup(i))
 			end
-			MY.TabTalk(nChannel, aTabTalk, {"L", "L", "R", "R", "R", "R", "R"})
+			MY.TabTalk(nChannel, aTabTalk, {'L', 'L', 'R', 'R', 'R', 'R', 'R'})
 			MY.Talk(nChannel, '------------------------------')
 
 			local aTabTalk = {}
@@ -1516,7 +1516,7 @@ function MY_Recount.GetDetailMenu(frame)
 			for i = 0, min(hList:GetItemCount(), nLimit) - 1 do
 				D.InsertFromText(aTabTalk, hList:Lookup(i))
 			end
-			MY.TabTalk(nChannel, aTabTalk, {"L", "L", "R", "R", "R", "R", "R", "R"})
+			MY.TabTalk(nChannel, aTabTalk, {'L', 'L', 'R', 'R', 'R', 'R', 'R', 'R'})
 			MY.Talk(nChannel, '------------------------------')
 		end
 	end
@@ -1530,7 +1530,7 @@ function MY_Recount.GetDetailMenu(frame)
 			bCheck = true, -- ²»ÉèÖÃ³É¿ÉÑ¡¿ò²»ÄÜµã¨q¡É¨r(¦á¦ä¦á£©¨q¡É¨rÀ¬»ø
 			fnAction = function()
 				Publish(nChannel, huge)
-				Wnd.CloseWindow("PopupMenuPanel")
+				Wnd.CloseWindow('PopupMenuPanel')
 			end,
 			rgb = GetMsgFontColor(szChannel, true),
 		}

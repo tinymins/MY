@@ -1319,7 +1319,7 @@ function XGUI:text(arg0)
 					if raw.GetTextStruct then
 						return raw:GetTextStruct()
 					elseif raw.GetText then
-						return { type = "text", text = raw:GetText() }
+						return { type = 'text', text = raw:GetText() }
 					end
 				elseif raw.GetText then
 					return raw:GetText()
@@ -1661,9 +1661,9 @@ function XGUI:listbox(method, arg1, arg2, arg3, arg4)
 						if (mode == 'id' and data.id == search)
 						or (mode == 'text' and data.text == search) then
 							for i, k in ipairs(argk) do
-								if k == "data" then
+								if k == 'data' then
 									data.data = argv[i]
-								elseif k == "text" then
+								elseif k == 'text' then
 									hItem:Lookup('Text_Default'):SetText(argv[i])
 								end
 							end
@@ -2174,7 +2174,7 @@ function XGUI:anchor(anchor)
 	if IsTable(anchor) then
 		for _, raw in ipairs(self.raws) do
 			if raw:GetType() == 'WndFrame' then
-				raw:SetPoint(anchor.s or "CENTER", 0, 0, anchor.r or "CENTER", anchor.x or 0, anchor.y or 0)
+				raw:SetPoint(anchor.s or 'CENTER', 0, 0, anchor.r or 'CENTER', anchor.x or 0, anchor.y or 0)
 				raw:CorrectPos()
 			end
 		end
@@ -2399,7 +2399,7 @@ function XGUI:size(arg0, arg1, arg2, arg3)
 				local nRawHeight = min(nHeight, arg3 or sld:GetH())
 				wnd:SetSize(nWidth, nHeight)
 				sld:SetSize(nRawWidth, nRawHeight)
-				sld:Lookup("Btn_Track"):SetSize(min(34, nRawWidth * 0.6), nRawHeight)
+				sld:Lookup('Btn_Track'):SetSize(min(34, nRawWidth * 0.6), nRawHeight)
 				hdl:SetSize(nWidth, nHeight)
 				hdl:Lookup('Image_BG'):SetSize(nRawWidth, nRawHeight - 2)
 				txt:SetRelX(nRawWidth + 5)
@@ -2435,12 +2435,12 @@ function XGUI:size(arg0, arg1, arg2, arg3)
 				raw = GetComponentElement(raw, 'MAIN_WINDOW') or raw
 			end
 			if raw.IsDummyWnd and raw:IsDummyWnd() then
-				raw = raw:Lookup("", "")
+				raw = raw:Lookup('', '')
 			end
 			if raw.GetSize then
 				w, h = raw:GetSize()
 			end
-			raw = GetComponentElement(raw, "SLIDER")
+			raw = GetComponentElement(raw, 'SLIDER')
 			if raw then
 				rw, rh = raw:GetSize()
 			end
@@ -3541,7 +3541,7 @@ function HandlePool:Free(item)
 	if item:IsValid() then
 		self.handle.nFreeCount = self.handle.nFreeCount + 1
 		item.bFree = true
-		item:SetName("")
+		item:SetName('')
 		item:Hide()
 	end
 end
@@ -4346,7 +4346,7 @@ function XGUI.GetShadowHandle(szName)
 	end
 	local sh = Station.Lookup('Lowest/MY_Shadows') or Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. 'ui/MY_Shadows.ini', 'MY_Shadows')
 	if not sh:Lookup('', szName) then
-		sh:Lookup('', ''):AppendItemFromString(format('<handle> name="%s" </handle>', szName))
+		sh:Lookup('', ''):AppendItemFromString(format('<handle> name='%s' </handle>', szName))
 	end
 	MY.Debug({'Create sh # ' .. szName}, 'XGUI', MY_DEBUG.LOG)
 	return sh:Lookup('', szName)

@@ -24,11 +24,11 @@ end
 
 --================================= breathe call ================================================
 -- DelayCall(szKey, nInterval, fnAction, oArg)
--- DelayCall("CASTING") -- 获取名称为CASTING的DelayCall的信息
--- DelayCall("CASTING", false) -- 注销名称为CASTING的DelayCall
--- DelayCall("CASTING", function() end, oArg) -- 注册名称为CASTING调用间隔为最小值的DelayCall
--- DelayCall("CASTING", 100, function() end, oArg) -- 注册名称为CASTING调用间隔为100的DelayCall
--- DelayCall("CASTING", 200) -- 把名称为CASTING的DelayCall调用时间改为200毫秒
+-- DelayCall('CASTING') -- 获取名称为CASTING的DelayCall的信息
+-- DelayCall('CASTING', false) -- 注销名称为CASTING的DelayCall
+-- DelayCall('CASTING', function() end, oArg) -- 注册名称为CASTING调用间隔为最小值的DelayCall
+-- DelayCall('CASTING', 100, function() end, oArg) -- 注册名称为CASTING调用间隔为100的DelayCall
+-- DelayCall('CASTING', 200) -- 把名称为CASTING的DelayCall调用时间改为200毫秒
 --===============================================================================================
 local _tDelayCall = {} -- bc表 键值对集合
 local _delaycalls = {} -- a mirror table to avoid error: invalid key to 'next'
@@ -72,7 +72,7 @@ function MY.DelayCall(szKey, nInterval, fnAction, oArg)
 	elseif type(nInterval) == 'boolean' then
 		-- DelayCall(szKey, false)
 		nInterval, bUnreg = nil, true
-	elseif nInterval and type(fnAction) ~= "function" then
+	elseif nInterval and type(fnAction) ~= 'function' then
 		-- DelayCall(szKey, nInterval)
 		fnAction = nil
 	end
@@ -122,12 +122,12 @@ end
 
 --================================= breathe call ================================================
 -- BreatheCall(szKey, nInterval, fnAction, oArg)
--- BreatheCall("CASTING") -- 获取名称为CASTING的BreatheCall的信息
--- BreatheCall("CASTING", false) -- 注销名称为CASTING的BreatheCall
--- BreatheCall("CASTING", function() end, oArg) -- 注册名称为CASTING调用间隔为最小值的BreatheCall
--- BreatheCall("CASTING", 100, function() end, oArg) -- 注册名称为CASTING调用间隔为100的BreatheCall
--- BreatheCall("CASTING", 200) -- 把名称为CASTING的BreatheCall调用间隔改为200毫秒
--- BreatheCall("CASTING", 200, true) -- 把名称为CASTING的BreatheCall下次调用延迟改为200毫秒
+-- BreatheCall('CASTING') -- 获取名称为CASTING的BreatheCall的信息
+-- BreatheCall('CASTING', false) -- 注销名称为CASTING的BreatheCall
+-- BreatheCall('CASTING', function() end, oArg) -- 注册名称为CASTING调用间隔为最小值的BreatheCall
+-- BreatheCall('CASTING', 100, function() end, oArg) -- 注册名称为CASTING调用间隔为100的BreatheCall
+-- BreatheCall('CASTING', 200) -- 把名称为CASTING的BreatheCall调用间隔改为200毫秒
+-- BreatheCall('CASTING', 200, true) -- 把名称为CASTING的BreatheCall下次调用延迟改为200毫秒
 -- 注：fnAction返回0表示从BreatheCall中移除自己
 --===============================================================================================
 local _tBreatheCall = {} -- bc表 键值对集合
@@ -174,7 +174,7 @@ function MY.BreatheCall(szKey, nInterval, fnAction, oArg)
 	elseif type(nInterval) == 'boolean' then
 		-- BreatheCall(szKey, false)
 		nInterval, bUnreg = nil, true
-	elseif nInterval and type(fnAction) ~= "function" then
+	elseif nInterval and type(fnAction) ~= 'function' then
 		-- BreatheCall(szKey, nInterval, bOnce)
 		fnAction, bOnce = nil, fnAction
 	end
@@ -226,12 +226,12 @@ end
 
 --================================= frame call ==================================================
 -- FrameCall(szKey, nInterval, fnAction, oArg)
--- FrameCall("CASTING") -- 获取名称为CASTING的FrameCall的信息
--- FrameCall("CASTING", false) -- 注销名称为CASTING的FrameCall
--- FrameCall("CASTING", function() end, oArg) -- 注册名称为CASTING调用间隔为最小值的FrameCall
--- FrameCall("CASTING", 10, function() end, oArg) -- 注册名称为CASTING调用间隔为100帧的FrameCall
--- FrameCall("CASTING", 20) -- 把名称为CASTING的FrameCall调用间隔改为20帧
--- FrameCall("CASTING", 20, true) -- 把名称为CASTING的FrameCall下次调用延迟改为20帧
+-- FrameCall('CASTING') -- 获取名称为CASTING的FrameCall的信息
+-- FrameCall('CASTING', false) -- 注销名称为CASTING的FrameCall
+-- FrameCall('CASTING', function() end, oArg) -- 注册名称为CASTING调用间隔为最小值的FrameCall
+-- FrameCall('CASTING', 10, function() end, oArg) -- 注册名称为CASTING调用间隔为100帧的FrameCall
+-- FrameCall('CASTING', 20) -- 把名称为CASTING的FrameCall调用间隔改为20帧
+-- FrameCall('CASTING', 20, true) -- 把名称为CASTING的FrameCall下次调用延迟改为20帧
 -- 注：fnAction返回0表示从FrameCall中移除自己
 --===============================================================================================
 local _tFrameCall = {} -- fc表 键值对集合
@@ -279,7 +279,7 @@ function MY.FrameCall(szKey, nInterval, fnAction, oArg)
 	elseif type(nInterval) == 'boolean' then
 		-- FrameCall(szKey, false)
 		nInterval, bUnreg = nil, true
-	elseif nInterval and type(fnAction) ~= "function" then
+	elseif nInterval and type(fnAction) ~= 'function' then
 		-- FrameCall(szKey, nInterval, bOnce)
 		fnAction, bOnce = nil, fnAction
 	end
@@ -331,12 +331,12 @@ end
 
 --================================= render call ===============================================
 -- RenderCall(szKey, nInterval, fnAction, oArg)
--- RenderCall("CASTING") -- 获取名称为CASTING的RenderCall的信息
--- RenderCall("CASTING", false) -- 注销名称为CASTING的RenderCall
--- RenderCall("CASTING", function() end, oArg) -- 注册名称为CASTING调用间隔为最小值的RenderCall
--- RenderCall("CASTING", 100, function() end, oArg) -- 注册名称为CASTING调用间隔为100的RenderCall
--- RenderCall("CASTING", 200) -- 把名称为CASTING的RenderCall调用间隔改为200毫秒
--- RenderCall("CASTING", 200, true) -- 把名称为CASTING的RenderCall下次调用延迟改为200毫秒
+-- RenderCall('CASTING') -- 获取名称为CASTING的RenderCall的信息
+-- RenderCall('CASTING', false) -- 注销名称为CASTING的RenderCall
+-- RenderCall('CASTING', function() end, oArg) -- 注册名称为CASTING调用间隔为最小值的RenderCall
+-- RenderCall('CASTING', 100, function() end, oArg) -- 注册名称为CASTING调用间隔为100的RenderCall
+-- RenderCall('CASTING', 200) -- 把名称为CASTING的RenderCall调用间隔改为200毫秒
+-- RenderCall('CASTING', 200, true) -- 把名称为CASTING的RenderCall下次调用延迟改为200毫秒
 -- 注：fnAction返回0表示从RenderCall中移除自己
 --=============================================================================================
 local _tRenderCall = {} -- rc表 键值对集合
@@ -363,7 +363,7 @@ local function onRenderCall()
 				_rendercall_t = _tRenderCall[szKey]
 				_tRenderCall[szKey] = nil
 				if _rendercall_c == 0 then
-					UnRegisterEvent("RENDER_FRAME_UPDATE", _rendercall_ref)
+					UnRegisterEvent('RENDER_FRAME_UPDATE', _rendercall_ref)
 					_rendercall_ref = nil
 				end
 			end
@@ -386,7 +386,7 @@ function MY.RenderCall(szKey, nInterval, fnAction, oArg)
 	elseif type(nInterval) == 'boolean' then
 		-- RenderCall(szKey, false)
 		nInterval, bUnreg = nil, true
-	elseif nInterval and type(fnAction) ~= "function" then
+	elseif nInterval and type(fnAction) ~= 'function' then
 		-- RenderCall(szKey, nInterval, bOnce)
 		fnAction, bOnce = nil, fnAction
 	end
@@ -409,7 +409,7 @@ function MY.RenderCall(szKey, nInterval, fnAction, oArg)
 		rc.nNext = GetTime()
 		rc.nInterval = nInterval or 0
 		if not _rendercall_ref then
-			_rendercall_ref = RegisterEvent("RENDER_FRAME_UPDATE", onRenderCall)
+			_rendercall_ref = RegisterEvent('RENDER_FRAME_UPDATE', onRenderCall)
 		end
 	elseif nInterval then -- modify
 		local rc = _tRenderCall[szKey]
@@ -425,7 +425,7 @@ function MY.RenderCall(szKey, nInterval, fnAction, oArg)
 			_rendercall_t = _tRenderCall[szKey]
 			_tRenderCall[szKey] = nil
 			if _rendercall_c == 0 then
-				UnRegisterEvent("RENDER_FRAME_UPDATE", _rendercall_ref)
+				UnRegisterEvent('RENDER_FRAME_UPDATE', _rendercall_ref)
 				_rendercall_ref = nil
 			end
 		end
@@ -450,7 +450,7 @@ local function __OnActive()
 	onFrameCall()
 	onBreatheCall()
 end
-XGUI(MY):uievent("OnFrameBreathe", __OnActive)
+XGUI(MY):uievent('OnFrameBreathe', __OnActive)
 
 LuaActive_Enable(false)
 

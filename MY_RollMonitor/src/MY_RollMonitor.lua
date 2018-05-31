@@ -1,7 +1,7 @@
 -------------------------------------------
 -- ROLL点监控
 -------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_RollMonitor/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_RollMonitor/lang/')
 local SORT_TYPE = {
 	FIRST = 1,  -- 只记录第一次
 	LAST  = 2,  -- 只记录最后一次
@@ -77,21 +77,21 @@ local SORT_TYPE_INFO = {
 	},
 }
 local PUBLISH_CHANNELS = {
-	{ nChannel = PLAYER_TALK_CHANNEL.TEAM, szName = _L['team channel'], rgb = GetMsgFontColor("MSG_TEAM"  , true) },
-	{ nChannel = PLAYER_TALK_CHANNEL.RAID, szName = _L['raid channel'], rgb = GetMsgFontColor("MSG_TEAM"  , true) },
-	{ nChannel = PLAYER_TALK_CHANNEL.TONG, szName = _L['tong channel'], rgb = GetMsgFontColor("MSG_GUILD" , true) },
+	{ nChannel = PLAYER_TALK_CHANNEL.TEAM, szName = _L['team channel'], rgb = GetMsgFontColor('MSG_TEAM'  , true) },
+	{ nChannel = PLAYER_TALK_CHANNEL.RAID, szName = _L['raid channel'], rgb = GetMsgFontColor('MSG_TEAM'  , true) },
+	{ nChannel = PLAYER_TALK_CHANNEL.TONG, szName = _L['tong channel'], rgb = GetMsgFontColor('MSG_GUILD' , true) },
 }
 local TIME_LIMIT = {-1, 60, 120, 180, 300, 600, 1200, 1800, 3600}
 local TIME_LIMIT_TITLE = {
 	 [-1  ] = _L['unlimited time'],
-	 [60  ] = _L("last %d minute(s)", 1),
-	 [120 ] = _L("last %d minute(s)", 2),
-	 [180 ] = _L("last %d minute(s)", 3),
-	 [300 ] = _L("last %d minute(s)", 5),
-	 [600 ] = _L("last %d minute(s)", 10),
-	 [1200] = _L("last %d minute(s)", 20),
-	 [1800] = _L("last %d minute(s)", 30),
-	 [3600] = _L("last %d minute(s)", 60),
+	 [60  ] = _L('last %d minute(s)', 1),
+	 [120 ] = _L('last %d minute(s)', 2),
+	 [180 ] = _L('last %d minute(s)', 3),
+	 [300 ] = _L('last %d minute(s)', 5),
+	 [600 ] = _L('last %d minute(s)', 10),
+	 [1200] = _L('last %d minute(s)', 20),
+	 [1800] = _L('last %d minute(s)', 30),
+	 [3600] = _L('last %d minute(s)', 60),
 }
 local PS = {}
 local m_uiBoard       -- 面板ui控件
@@ -99,8 +99,8 @@ local m_tRecords = {} -- 历史ROLL点详细记录
 local m_aRecTime = {} -- 新纪录的时间戳（用来重绘面板）
 --[[
 m_tRecords = {
-	["茗伊"] = {
-		szName = "茗伊",
+	['茗伊'] = {
+		szName = '茗伊',
 		{nTime = 1446516554, nRoll = 100},
 		{nTime = 1446516577, nRoll = 50 },
 	}, ...
@@ -154,7 +154,7 @@ function MY_RollMonitor.GetPersonResult(szName, nSortType, nTimeLimit)
 		nStartTime = GetCurrentTime() - nTimeLimit
 	end
 	local aRecord
-	if type(szName) == "table" then
+	if type(szName) == 'table' then
 		aRecord = szName
 	else
 		aRecord = m_tRecords[szName] or EMPTY_TABLE
@@ -217,7 +217,7 @@ function MY_RollMonitor.Echo(nSortType, nLimit, nChannel, bShowUnroll)
 	nChannel  = nChannel  or MY_RollMonitor.nPublishChannel
 
 	MY.Talk(nChannel, ('[%s][%s][%s]%s\n'):format(
-		_L['mingyi plugin'], _L["roll monitor"],
+		_L['mingyi plugin'], _L['roll monitor'],
 		TIME_LIMIT_TITLE[MY_RollMonitor.nTimeLimit],
 		SORT_TYPE_INFO[nSortType].szName
 	), nil, true)
@@ -239,7 +239,7 @@ function MY_RollMonitor.Echo(nSortType, nLimit, nChannel, bShowUnroll)
 			end
 		end
 		if szUnrolledNames~='' then
-			MY.Talk(nChannel, szUnrolledNames .. _L["haven't roll yet."]..'\n')
+			MY.Talk(nChannel, szUnrolledNames .. _L['haven\'t roll yet.']..'\n')
 		end
 	end
 	MY.Talk(nChannel, _L['-------------------------------'] .. '\n')
@@ -278,7 +278,7 @@ function MY_RollMonitor.DrawBoard(ui)
 			if szUnrolledNames ~= '' then
 				szHTML = szHTML ..
 				MY.Chat.GetCopyLinkText() ..
-				szUnrolledNames .. GetFormatText(_L["haven't roll yet."])
+				szUnrolledNames .. GetFormatText(_L['haven\'t roll yet.'])
 			end
 		end
 		szHTML = MY.Chat.RenderLink(szHTML)
@@ -321,14 +321,14 @@ local function OnMsgArrive(szMsg, nFont, bRich, r, g, b)
 	end
 	MY_RollMonitor.DrawBoard()
 end
-RegisterMsgMonitor(OnMsgArrive, {"MSG_SYS"})
+RegisterMsgMonitor(OnMsgArrive, {'MSG_SYS'})
 
 -- 标签激活响应函数
 function PS.OnPanelActive(wnd)
 	local ui = MY.UI(wnd)
 	local w, h = ui:size()
 	-- 记录模式
-	ui:append("WndComboBox", {
+	ui:append('WndComboBox', {
 		x = 20, y = 10, w = 180,
 		text = SORT_TYPE_INFO[MY_RollMonitor.nSortType].szName,
 		menu = function(raw)
@@ -347,7 +347,7 @@ function PS.OnPanelActive(wnd)
 		end
 	})
 	-- 有效时间
-	ui:append("WndComboBox", {
+	ui:append('WndComboBox', {
 		x = 210, y = 10, w = 120,
 		text = TIME_LIMIT_TITLE[MY_RollMonitor.nTimeLimit],
 		menu = function(raw)
@@ -366,7 +366,7 @@ function PS.OnPanelActive(wnd)
 		end
 	})
 	-- 清空
-	ui:append("WndButton", {
+	ui:append('WndButton', {
 		x = w - 176, y = 10, w = 90, text = _L['restart'],
 		onlclick = function(nButton) MY_RollMonitor.Clear() end,
 		rmenu = function()
@@ -391,7 +391,7 @@ function PS.OnPanelActive(wnd)
 		tippostype = MY.Const.UI.Tip.POS_TOP,
 	})
 	-- 发布
-	ui:append("WndButton", {
+	ui:append('WndButton', {
 		x = w - 86, y = 10, w = 80, text = _L['publish'],
 		onlclick = function() MY_RollMonitor.Echo() end,
 		rmenu = function()
@@ -435,7 +435,7 @@ function PS.OnPanelActive(wnd)
 		tipoffset = { x = -80 },
 	})
 	-- 输出板
-	m_uiBoard = ui:append("WndScrollBox",{
+	m_uiBoard = ui:append('WndScrollBox',{
 		x = 20,  y = 40, w = w - 26, h = h - 60,
 		handlestyle = 3, text = _L['average score with out pole']
 	}, true)
@@ -448,4 +448,4 @@ function PS.OnPanelDeactive()
 	MY.BreatheCall('MY_RollMonitorRedraw', false)
 end
 
-MY.RegisterPanel("RollMonitor", _L["roll monitor"], _L['General'], "UI/Image/UICommon/LoginCommon.UITex|30", {255,255,0,200}, PS)
+MY.RegisterPanel('RollMonitor', _L['roll monitor'], _L['General'], 'UI/Image/UICommon/LoginCommon.UITex|30', {255,255,0,200}, PS)

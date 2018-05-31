@@ -287,7 +287,7 @@ end)
 MY.BreatheCall('MY_Recount_FightTime', 1000, function()
 	if MY.IsFighting() then
 		Data.nTimeDuring = GetCurrentTime() - Data.nTimeBegin
-		for _, szRecordType in ipairs({"Damage", "Heal", "BeDamage", "BeHeal"}) do
+		for _, szRecordType in ipairs({'Damage', 'Heal', 'BeDamage', 'BeHeal'}) do
 			local tInfo = Data[szRecordType]
 			local tSnapshot = {
 				nTimeDuring  = Data.nTimeDuring,
@@ -447,14 +447,14 @@ function MY_Recount.Data.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffect
 		if not MY_Recount.Data.bRecAnonymous then
 			return
 		end
-		szEffectName = "#" .. dwEffectID
+		szEffectName = '#' .. dwEffectID
 	elseif Data.bDistinctEffectID then
-		szEffectName = szEffectName .. "#" .. dwEffectID
+		szEffectName = szEffectName .. '#' .. dwEffectID
 	end
 	local szDamageEffectName, szHealEffectName = szEffectName, szEffectName
 	if nEffectType == SKILL_EFFECT_TYPE.BUFF then
-		szHealEffectName = szHealEffectName .. "(HOT)"
-		szDamageEffectName = szDamageEffectName .. "(DOT)"
+		szHealEffectName = szHealEffectName .. '(HOT)'
+		szDamageEffectName = szDamageEffectName .. '(DOT)'
 	end
 
 	-- 过滤掉不是队友的以及不是BOSS的
@@ -549,7 +549,7 @@ end
 function _Cache.AddRecord(data, szRecordType, idRecord, idTarget, szEffectName, nValue, nEffectValue, nSkillResult)
 	local tInfo   = data[szRecordType]
 	local tRecord = tInfo.Statistics[idRecord]
-	if not szEffectName or szEffectName == "" then
+	if not szEffectName or szEffectName == '' then
 		return
 	end
 	------------------------
@@ -823,7 +823,7 @@ local function GetObjectKeyID(obj)
 	end
 	local id = MY.GetObjectName(obj) or g_tStrings.STR_NAME_UNKNOWN
 	if Data.bDistinctTargetID then
-		id = id .. "#" .. obj.dwID
+		id = id .. '#' .. obj.dwID
 	end
 	return id
 end
@@ -968,16 +968,16 @@ end
 
 -- 系统日志监控（数据源）
 MY.RegisterEvent('SYS_MSG', function()
-	if arg0 == "UI_OME_SKILL_CAST_LOG" then
+	if arg0 == 'UI_OME_SKILL_CAST_LOG' then
 		-- 技能施放日志；
 		-- (arg1)dwCaster：技能施放者 (arg2)dwSkillID：技能ID (arg3)dwLevel：技能等级
 		-- MY_Recount.OnSkillCast(arg1, arg2, arg3)
-	elseif arg0 == "UI_OME_SKILL_CAST_RESPOND_LOG" then
+	elseif arg0 == 'UI_OME_SKILL_CAST_RESPOND_LOG' then
 		-- 技能施放结果日志；
 		-- (arg1)dwCaster：技能施放者 (arg2)dwSkillID：技能ID
 		-- (arg3)dwLevel：技能等级 (arg4)nRespond：见枚举型[[SKILL_RESULT_CODE]]
 		-- MY_Recount.OnSkillCastRespond(arg1, arg2, arg3, arg4)
-	elseif arg0 == "UI_OME_SKILL_EFFECT_LOG" then
+	elseif arg0 == 'UI_OME_SKILL_EFFECT_LOG' then
 		-- if not MY.IsInArena() then
 		-- 技能最终产生的效果（生命值的变化）；
 		-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标 (arg3)bReact：是否为反击 (arg4)nType：Effect类型 (arg5)dwID:Effect的ID
@@ -989,32 +989,32 @@ MY.RegisterEvent('SYS_MSG', function()
 			MY_Recount.Data.OnSkillEffect(arg1, arg2, arg4, arg5, arg6, SKILL_RESULT.HIT, arg8, arg9)
 		end
 		-- end
-	elseif arg0 == "UI_OME_SKILL_BLOCK_LOG" then
+	elseif arg0 == 'UI_OME_SKILL_BLOCK_LOG' then
 		-- 格挡日志；
 		-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标 (arg3)nType：Effect的类型
 		-- (arg4)dwID：Effect的ID (arg5)dwLevel：Effect的等级 (arg6)nDamageType：伤害类型，见枚举型[[SKILL_RESULT_TYPE]]
 		MY_Recount.Data.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, SKILL_RESULT.BLOCK, nil, {})
-	elseif arg0 == "UI_OME_SKILL_SHIELD_LOG" then
+	elseif arg0 == 'UI_OME_SKILL_SHIELD_LOG' then
 		-- 技能被屏蔽日志；
 		-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标
 		-- (arg3)nType：Effect的类型 (arg4)dwID：Effect的ID (arg5)dwLevel：Effect的等级
 		MY_Recount.Data.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, SKILL_RESULT.SHIELD, nil, {})
-	elseif arg0 == "UI_OME_SKILL_MISS_LOG" then
+	elseif arg0 == 'UI_OME_SKILL_MISS_LOG' then
 		-- 技能未命中目标日志；
 		-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标
 		-- (arg3)nType：Effect的类型 (arg4)dwID：Effect的ID (arg5)dwLevel：Effect的等级
 		MY_Recount.Data.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, SKILL_RESULT.MISS, nil, {})
-	elseif arg0 == "UI_OME_SKILL_HIT_LOG" then
+	elseif arg0 == 'UI_OME_SKILL_HIT_LOG' then
 		-- 技能命中目标日志；
 		-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标
 		-- (arg3)nType：Effect的类型 (arg4)dwID：Effect的ID (arg5)dwLevel：Effect的等级
 		-- MY_Recount.Data.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, SKILL_RESULT.HIT, nil, {})
-	elseif arg0 == "UI_OME_SKILL_DODGE_LOG" then
+	elseif arg0 == 'UI_OME_SKILL_DODGE_LOG' then
 		-- 技能被闪避日志；
 		-- (arg1)dwCaster：施放者 (arg2)dwTarget：目标
 		-- (arg3)nType：Effect的类型 (arg4)dwID：Effect的ID (arg5)dwLevel：Effect的等级
 		MY_Recount.Data.OnSkillEffect(arg1, arg2, arg3, arg4, arg5, SKILL_RESULT.DODGE, nil, {})
-	elseif arg0 == "UI_OME_COMMON_HEALTH_LOG" then
+	elseif arg0 == 'UI_OME_COMMON_HEALTH_LOG' then
 		-- 普通治疗日志；
 		-- (arg1)dwCharacterID：承疗玩家ID (arg2)nDeltaLife：增加血量值
 		-- MY_Recount.OnCommonHealth(arg1, arg2)
@@ -1022,7 +1022,7 @@ MY.RegisterEvent('SYS_MSG', function()
 end)
 
 -- JJC中使用的数据源（不能记录溢出数据）
--- MY.RegisterEvent("SKILL_EFFECT_TEXT", function(event)
+-- MY.RegisterEvent('SKILL_EFFECT_TEXT', function(event)
 --     if MY.IsInArena() then
 --         local dwCasterID      = arg0
 --         local dwTargetID      = arg1

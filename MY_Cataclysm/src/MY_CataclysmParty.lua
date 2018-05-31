@@ -2,7 +2,7 @@
 -- @Date:   2015-01-21 15:21:19
 -- @Last Modified by:   Administrator
 -- @Last Modified time: 2016-12-14 21:45:47
-local _L, D = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/lang/"), {}
+local _L, D = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/lang/'), {}
 -----------------------------------------------
 -- 重构 @ 2015 赶时间 很多东西写的很粗略
 -----------------------------------------------
@@ -47,7 +47,7 @@ local CTM_DRAG_ID
 local CTM_CLICK_DISMISS
 local CTM_TARGET  -- 注意这个是UI逻辑选中目标 不一定是真实的当前目标
 local CTM_TTARGET -- 注意这个是UI逻辑目标选中的目标 不一定是真实的当前目标
-local CTM_CACHE              = setmetatable({}, { __mode = "v" })
+local CTM_CACHE              = setmetatable({}, { __mode = 'v' })
 local CTM_LIFE_CACHE         = {} -- 当前帧队友血量缓存
 local CTM_BUFF_CACHE         = {} -- 附近记录到的需要显示的BUFF缓存
 local CTM_BOSS_CACHE         = {} -- 附近的BOSS缓存
@@ -80,7 +80,7 @@ local function onNpcEnterScene()
 		CHANGGE_REAL_SHADOW_CACHE[arg0] = npc.dwEmployer
 	end
 end
-MY.RegisterEvent("NPC_ENTER_SCENE", onNpcEnterScene)
+MY.RegisterEvent('NPC_ENTER_SCENE', onNpcEnterScene)
 
 local function onNpcLeaveScene()
 	local npc = GetNpc(arg0)
@@ -96,7 +96,7 @@ local function onNpcLeaveScene()
 	end
 	CTM_BOSS_CACHE[npc.dwID] = nil
 end
-MY.RegisterEvent("NPC_LEAVE_SCENE", onNpcLeaveScene)
+MY.RegisterEvent('NPC_LEAVE_SCENE', onNpcLeaveScene)
 end
 
 do
@@ -109,7 +109,7 @@ local function onBossSet()
 		end
 	end
 end
-MY.RegisterEvent("MY_SET_BOSS", onBossSet)
+MY.RegisterEvent('MY_SET_BOSS', onBossSet)
 end
 
 local function SetTarget(dwType, dwID)
@@ -184,23 +184,23 @@ local function OpenRaidDragPanel(dwMemberID)
 	if not tMemberInfo then
 		return
 	end
-	local hFrame = Wnd.OpenWindow("RaidDragPanel")
+	local hFrame = Wnd.OpenWindow('RaidDragPanel')
 
 	local nX, nY = Cursor.GetPos()
 	hFrame:SetAbsPos(nX, nY)
 	hFrame:StartMoving()
 
 	hFrame.dwID = dwMemberID
-	local hMember = hFrame:Lookup("", "")
+	local hMember = hFrame:Lookup('', '')
 
 	local szPath, nFrame = GetForceImage(tMemberInfo.dwForceID)
-	hMember:Lookup("Image_Force"):FromUITex(szPath, nFrame)
+	hMember:Lookup('Image_Force'):FromUITex(szPath, nFrame)
 
-	local txtName = hMember:Lookup("Text_Name")
+	local txtName = hMember:Lookup('Text_Name')
 	txtName:SetText(tMemberInfo.szName)
 
-	local hImageLife = hMember:Lookup("Image_Health")
-	local hImageMana = hMember:Lookup("Image_Mana")
+	local hImageLife = hMember:Lookup('Image_Health')
+	local hImageMana = hMember:Lookup('Image_Mana')
 	if tMemberInfo.bIsOnLine then
 		if tMemberInfo.nMaxLife > 0 then
 			hImageLife:SetPercentage(tMemberInfo.nCurrentLife / tMemberInfo.nMaxLife)
@@ -218,7 +218,7 @@ local function OpenRaidDragPanel(dwMemberID)
 end
 
 local function CloseRaidDragPanel()
-	local hFrame = Station.Lookup("Normal/RaidDragPanel")
+	local hFrame = Station.Lookup('Normal/RaidDragPanel')
 	if hFrame then
 		hFrame:EndMoving()
 		Wnd.CloseWindow(hFrame)
@@ -231,7 +231,7 @@ local function OutputTeamMemberTip(dwID, rc)
 	if not tMemberInfo then
 		return
 	end
-	local r, g, b = MY.GetForceColor(tMemberInfo.dwForceID, "foreground")
+	local r, g, b = MY.GetForceColor(tMemberInfo.dwForceID, 'foreground')
 	local szPath, nFrame = GetForceImage(tMemberInfo.dwForceID)
 	local xml = {}
 	table.insert(xml, GetFormatImage(szPath, nFrame, 22, 22))
@@ -240,19 +240,19 @@ local function OutputTeamMemberTip(dwID, rc)
 		local p = GetPlayer(dwID)
 		if p and p.dwTongID > 0 then
 			if GetTongClient().ApplyGetTongName(p.dwTongID) then
-				table.insert(xml, GetFormatText("[" .. GetTongClient().ApplyGetTongName(p.dwTongID) .. "]\n", 41))
+				table.insert(xml, GetFormatText('[' .. GetTongClient().ApplyGetTongName(p.dwTongID) .. ']\n', 41))
 			end
 		end
 		table.insert(xml, GetFormatText(FormatString(g_tStrings.STR_PLAYER_H_WHAT_LEVEL, tMemberInfo.nLevel), 82))
-		table.insert(xml, GetFormatText(MY.GetSkillName(tMemberInfo.dwMountKungfuID, 1) .. "\n", 82))
+		table.insert(xml, GetFormatText(MY.GetSkillName(tMemberInfo.dwMountKungfuID, 1) .. '\n', 82))
 		local szMapName = Table_GetMapName(tMemberInfo.dwMapID)
 		if szMapName then
-			table.insert(xml, GetFormatText(szMapName .. "\n", 82))
+			table.insert(xml, GetFormatText(szMapName .. '\n', 82))
 		end
 		local nCamp = tMemberInfo.nCamp
-		table.insert(xml, GetFormatText(g_tStrings.STR_GUILD_CAMP_NAME[nCamp] .. "\n", 82))
+		table.insert(xml, GetFormatText(g_tStrings.STR_GUILD_CAMP_NAME[nCamp] .. '\n', 82))
 	else
-		table.insert(xml, GetFormatText(g_tStrings.STR_FRIEND_NOT_ON_LINE .. "\n", 82, 128, 128, 128))
+		table.insert(xml, GetFormatText(g_tStrings.STR_FRIEND_NOT_ON_LINE .. '\n', 82, 128, 128, 128))
 	end
 	if IsCtrlKeyDown() then
 		table.insert(xml, GetFormatText(FormatString(g_tStrings.TIP_PLAYER_ID, dwID), 102))
@@ -287,32 +287,32 @@ end
 
 -- 有各个版本之间的文本差异，所以做到翻译中
 local CTM_KUNGFU_TEXT = {
-	[10080] = _L["KUNGFU_10080"], -- "云",
-	[10081] = _L["KUNGFU_10081"], -- "冰",
-	[10021] = _L["KUNGFU_10021"], -- "花",
-	[10028] = _L["KUNGFU_10028"], -- "离",
-	[10026] = _L["KUNGFU_10026"], -- "傲",
-	[10062] = _L["KUNGFU_10062"], -- "铁",
-	[10002] = _L["KUNGFU_10002"], -- "洗",
-	[10003] = _L["KUNGFU_10003"], -- "易",
-	[10014] = _L["KUNGFU_10014"], -- "气",
-	[10015] = _L["KUNGFU_10015"], -- "剑",
-	[10144] = _L["KUNGFU_10144"], -- "问",
-	[10145] = _L["KUNGFU_10145"], -- "山",
-	[10175] = _L["KUNGFU_10175"], -- "毒",
-	[10176] = _L["KUNGFU_10176"], -- "补",
-	[10224] = _L["KUNGFU_10224"], -- "羽",
-	[10225] = _L["KUNGFU_10225"], -- "诡",
-	[10242] = _L["KUNGFU_10242"], -- "焚",
-	[10243] = _L["KUNGFU_10243"], -- "尊",
-	[10268] = _L["KUNGFU_10268"], -- "丐",
-	[10390] = _L["KUNGFU_10390"], -- "分",
-	[10389] = _L["KUNGFU_10389"], -- "衣",
-	[10448] = _L["KUNGFU_10448"], -- "相",
-	[10447] = _L["KUNGFU_10447"], -- "莫",
-	[10464] = _L["KUNGFU_10464"], -- "刀",
+	[10080] = _L['KUNGFU_10080'], -- '云',
+	[10081] = _L['KUNGFU_10081'], -- '冰',
+	[10021] = _L['KUNGFU_10021'], -- '花',
+	[10028] = _L['KUNGFU_10028'], -- '离',
+	[10026] = _L['KUNGFU_10026'], -- '傲',
+	[10062] = _L['KUNGFU_10062'], -- '铁',
+	[10002] = _L['KUNGFU_10002'], -- '洗',
+	[10003] = _L['KUNGFU_10003'], -- '易',
+	[10014] = _L['KUNGFU_10014'], -- '气',
+	[10015] = _L['KUNGFU_10015'], -- '剑',
+	[10144] = _L['KUNGFU_10144'], -- '问',
+	[10145] = _L['KUNGFU_10145'], -- '山',
+	[10175] = _L['KUNGFU_10175'], -- '毒',
+	[10176] = _L['KUNGFU_10176'], -- '补',
+	[10224] = _L['KUNGFU_10224'], -- '羽',
+	[10225] = _L['KUNGFU_10225'], -- '诡',
+	[10242] = _L['KUNGFU_10242'], -- '焚',
+	[10243] = _L['KUNGFU_10243'], -- '尊',
+	[10268] = _L['KUNGFU_10268'], -- '丐',
+	[10390] = _L['KUNGFU_10390'], -- '分',
+	[10389] = _L['KUNGFU_10389'], -- '衣',
+	[10448] = _L['KUNGFU_10448'], -- '相',
+	[10447] = _L['KUNGFU_10447'], -- '莫',
+	[10464] = _L['KUNGFU_10464'], -- '刀',
 }
-setmetatable(CTM_KUNGFU_TEXT, { __index = function() return _L["KUNGFU_0"] end, __metatable = true })
+setmetatable(CTM_KUNGFU_TEXT, { __index = function() return _L['KUNGFU_0'] end, __metatable = true })
 
 -- CODE --
 local CTM = {}
@@ -320,16 +320,16 @@ local CTM = {}
 CTM_Party_Base = class()
 
 function CTM_Party_Base.OnFrameCreate()
-	this:Lookup("", "Handle_BG/Shadow_BG"):SetAlpha(CFG.nAlpha)
-	this:RegisterEvent("CTM_SET_ALPHA")
-	this:RegisterEvent("CTM_SET_FOLD")
+	this:Lookup('', 'Handle_BG/Shadow_BG'):SetAlpha(CFG.nAlpha)
+	this:RegisterEvent('CTM_SET_ALPHA')
+	this:RegisterEvent('CTM_SET_FOLD')
 	this:SetVisible(not MY_Cataclysm.bFold)
 end
 
 function CTM_Party_Base.OnEvent(szEvent)
-	if szEvent == "CTM_SET_ALPHA" then
-		this:Lookup("", "Handle_BG/Shadow_BG"):SetAlpha(CFG.nAlpha)
-	elseif szEvent == "CTM_SET_FOLD" then
+	if szEvent == 'CTM_SET_ALPHA' then
+		this:Lookup('', 'Handle_BG/Shadow_BG'):SetAlpha(CFG.nAlpha)
+	elseif szEvent == 'CTM_SET_FOLD' then
 		this:SetVisible(not MY_Cataclysm.bFold)
 	end
 end
@@ -390,7 +390,7 @@ function D.SetTargetTeammate(dwID, info)
 		BattleField_MatchPlayer(dwID)
 	elseif info.bIsOnLine and CanTarget(dwID) then -- 有待考证
 		if CFG.bTempTargetEnable then
-			MY.DelayCall("MY_Cataclysm_TempTarget", false)
+			MY.DelayCall('MY_Cataclysm_TempTarget', false)
 			CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = nil
 		end
 		SetTarget(TARGET.PLAYER, dwID)
@@ -433,7 +433,7 @@ function CTM_Party_Base.OnItemLButtonClick()
 			MY.Talk(
 				PLAYER_TALK_CHANNEL.RAID,
 				_L(
-					"[%s] got buff [%s]x%d, remaining %ds.",
+					'[%s] got buff [%s]x%d, remaining %ds.',
 					info.szName,
 					MY.GetBuffName(this.dwID, this.nLevel),
 					this.nStackNum or 1,
@@ -473,8 +473,8 @@ end
 CTM_Party_Base.OnItemRefreshTip = OnItemRefreshTip
 
 function CTM_Party_Base.OnItemMouseEnter()
-	if CTM_DRAG and this:Lookup("Image_Slot") and this:Lookup("Image_Slot"):IsValid() then
-		this:Lookup("Image_Slot"):Show()
+	if CTM_DRAG and this:Lookup('Image_Slot') and this:Lookup('Image_Slot'):IsValid() then
+		this:Lookup('Image_Slot'):Show()
 	end
 	OnItemRefreshTip()
 	local dwID = (this.bBuff and this:GetParent():GetParent().dwID) or (this.bRole and this.dwID)
@@ -486,7 +486,7 @@ function CTM_Party_Base.OnItemMouseEnter()
 		return
 	end
 	if info.bIsOnLine and CanTarget(dwID) and CFG.bTempTargetEnable then
-		MY.DelayCall("MY_Cataclysm_TempTarget", false)
+		MY.DelayCall('MY_Cataclysm_TempTarget', false)
 		local function fnAction()
 			if not CTM_TEMP_TARGET_TYPE then
 				CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = MY.GetTarget()
@@ -496,7 +496,7 @@ function CTM_Party_Base.OnItemMouseEnter()
 		if CFG.nTempTargetDelay == 0 then
 			fnAction()
 		else
-			MY.DelayCall("MY_Cataclysm_TempTarget", CFG.nTempTargetDelay, fnAction)
+			MY.DelayCall('MY_Cataclysm_TempTarget', CFG.nTempTargetDelay, fnAction)
 		end
 	end
 end
@@ -508,8 +508,8 @@ local function ResumeTempTarget()
 	CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = nil
 end
 function CTM_Party_Base.OnItemMouseLeave(dst)
-	if CTM_DRAG and this:Lookup("Image_Slot") and this:Lookup("Image_Slot"):IsValid() then
-		this:Lookup("Image_Slot"):Hide()
+	if CTM_DRAG and this:Lookup('Image_Slot') and this:Lookup('Image_Slot'):IsValid() then
+		this:Lookup('Image_Slot'):Hide()
 	end
 	HideTip()
 	local dwID
@@ -533,9 +533,9 @@ function CTM_Party_Base.OnItemMouseLeave(dst)
 		return
 	end
 	if CFG.bTempTargetEnable then
-		MY.DelayCall("MY_Cataclysm_TempTarget", false)
+		MY.DelayCall('MY_Cataclysm_TempTarget', false)
 		if CTM_TEMP_TARGET_TYPE then
-			MY.DelayCall("MY_Cataclysm_TempTarget", ResumeTempTarget) -- 延迟到下一帧 因为可能当前帧临时选中另外一个玩家 那么不需要切回目标
+			MY.DelayCall('MY_Cataclysm_TempTarget', ResumeTempTarget) -- 延迟到下一帧 因为可能当前帧临时选中另外一个玩家 那么不需要切回目标
 		end
 	end
 end
@@ -552,8 +552,8 @@ function CTM_Party_Base.OnItemRButtonClick()
 	local szPath, nFrame = GetForceImage(info.dwForceID)
 	table.insert(menu, {
 		szOption = info.szName,
-		szLayer = "ICON_RIGHT",
-		rgb = { MY.GetForceColor(info.dwForceID, "foreground") },
+		szLayer = 'ICON_RIGHT',
+		rgb = { MY.GetForceColor(info.dwForceID, 'foreground') },
 		szIcon = szPath,
 		nFrame = nFrame
 	})
@@ -610,7 +610,7 @@ function CTM_Party_Base.OnItemRButtonClick()
 		if MY.IsLeader() then
 			table.insert(menu, { bDevide = true })
 			table.insert(menu, {
-				szOption = _L["Take back all permissions"],
+				szOption = _L['Take back all permissions'],
 				rgb = { 255, 255, 0 },
 				fnAction = function()
 					local team = GetClientTeam()
@@ -621,34 +621,34 @@ function CTM_Party_Base.OnItemRButtonClick()
 		elseif MY_Cataclysm.bDebug then
 			table.insert(menu, { bDevide = true })
 			table.insert(menu, {
-				szOption = _L["Take back permissions"],
+				szOption = _L['Take back permissions'],
 				rgb = { 255, 255, 0 },
 				{
-					szOption = _L["Take back all permissions"],
+					szOption = _L['Take back all permissions'],
 					rgb = { 255, 255, 0 },
 					fnAction = function()
-						MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "MY_ABOUT", "TeamAuth")
+						MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', 'TeamAuth')
 					end,
 				},
 				{
-					szOption = _L["Take back leader permission"],
+					szOption = _L['Take back leader permission'],
 					rgb = { 255, 255, 0 },
 					fnAction = function()
-						MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "MY_ABOUT", "TeamLeader")
+						MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', 'TeamLeader')
 					end,
 				},
 				{
-					szOption = _L["Take back mark permission"],
+					szOption = _L['Take back mark permission'],
 					rgb = { 255, 255, 0 },
 					fnAction = function()
-						MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "MY_ABOUT", "TeamMark")
+						MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', 'TeamMark')
 					end,
 				},
 				{
-					szOption = _L["Take back distribute permission"],
+					szOption = _L['Take back distribute permission'],
 					rgb = { 255, 255, 0 },
 					fnAction = function()
-						MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "MY_ABOUT", "TeamDistribute")
+						MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', 'TeamDistribute')
 					end,
 				}
 			})
@@ -660,7 +660,7 @@ function CTM_Party_Base.OnItemRButtonClick()
 end
 
 function CTM:GetPartyFrame(nIndex) -- 获得组队面板
-	return Station.Lookup("Normal/Cataclysm_Party_" .. nIndex)
+	return Station.Lookup('Normal/Cataclysm_Party_' .. nIndex)
 end
 
 function CTM:BringToTop()
@@ -675,7 +675,7 @@ end
 function CTM:GetMemberHandle(nGroup, nIndex)
 	local frame = self:GetPartyFrame(nGroup)
 	if frame then
-		return frame:Lookup("", "Handle_Cols/Handle_Roles"):Lookup(nIndex)
+		return frame:Lookup('', 'Handle_Cols/Handle_Roles'):Lookup(nIndex)
 	end
 end
 
@@ -685,8 +685,8 @@ function CTM:CreatePanel(nIndex)
 	local frame = self:GetPartyFrame(nIndex)
 	if not frame then
 		frame = Wnd.OpenWindow(
-			MY.GetAddonInfo().szRoot .. "MY_Cataclysm/ui/Cataclysm_Party" .. CFG.nCss .. ".ini",
-			"Cataclysm_Party_" .. nIndex
+			MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/ui/Cataclysm_Party' .. CFG.nCss .. '.ini',
+			'Cataclysm_Party_' .. nIndex
 		)
 		frame:Scale(CFG.fScaleX, CFG.fScaleY)
 		frame:SetVisible(not MY_Cataclysm.bFold)
@@ -702,7 +702,7 @@ function CTM:RefreshGroupText()
 	for i = 0, team.nGroupNum - 1 do
 		local frame = self:GetPartyFrame(i)
 		if frame then
-			local txtGroup, szGroup = frame:Lookup("", "Handle_Cols/Handle_Title/Text_Title")
+			local txtGroup, szGroup = frame:Lookup('', 'Handle_Cols/Handle_Title/Text_Title')
 			if me.IsInRaid() then
 				if CFG.nCss == CTM_STYLE.CATACLYSM then
 					txtGroup:SetFontScheme(7)
@@ -780,9 +780,9 @@ local function HideTarget()
 	if CTM_TARGET
 	and CTM_CACHE[CTM_TARGET]
 	and CTM_CACHE[CTM_TARGET]:IsValid()
-	and CTM_CACHE[CTM_TARGET]:Lookup("Image_Selected")
-	and CTM_CACHE[CTM_TARGET]:Lookup("Image_Selected"):IsValid() then
-		CTM_CACHE[CTM_TARGET]:Lookup("Image_Selected"):Hide()
+	and CTM_CACHE[CTM_TARGET]:Lookup('Image_Selected')
+	and CTM_CACHE[CTM_TARGET]:Lookup('Image_Selected'):IsValid() then
+		CTM_CACHE[CTM_TARGET]:Lookup('Image_Selected'):Hide()
 	end
 end
 
@@ -799,9 +799,9 @@ function CTM:RefreshTarget(dwOldID, nOldType, dwNewID, nNewType)
 	if nNewType == TARGET.PLAYER
 	and CTM_CACHE[dwNewID]
 	and CTM_CACHE[dwNewID]:IsValid()
-	and CTM_CACHE[dwNewID]:Lookup("Image_Selected")
-	and CTM_CACHE[dwNewID]:Lookup("Image_Selected"):IsValid() then
-		CTM_CACHE[dwNewID]:Lookup("Image_Selected"):Show()
+	and CTM_CACHE[dwNewID]:Lookup('Image_Selected')
+	and CTM_CACHE[dwNewID]:Lookup('Image_Selected'):IsValid() then
+		CTM_CACHE[dwNewID]:Lookup('Image_Selected'):Show()
 	end
 	CTM_TARGET = dwNewID
 end
@@ -811,9 +811,9 @@ local function HideTTarget()
 	if CTM_TTARGET
 	and CTM_CACHE[CTM_TTARGET]
 	and CTM_CACHE[CTM_TTARGET]:IsValid()
-	and CTM_CACHE[CTM_TTARGET]:Lookup("Handle_TargetTarget")
-	and CTM_CACHE[CTM_TTARGET]:Lookup("Handle_TargetTarget"):IsValid() then
-		CTM_CACHE[CTM_TTARGET]:Lookup("Handle_TargetTarget"):Hide()
+	and CTM_CACHE[CTM_TTARGET]:Lookup('Handle_TargetTarget')
+	and CTM_CACHE[CTM_TTARGET]:Lookup('Handle_TargetTarget'):IsValid() then
+		CTM_CACHE[CTM_TTARGET]:Lookup('Handle_TargetTarget'):Hide()
 	end
 end
 function CTM:RefreshTTarget()
@@ -832,9 +832,9 @@ function CTM:RefreshTTarget()
 				if dwTarID and dwTarID ~= 0 and dwTarType == TARGET.PLAYER
 				and CTM_CACHE[dwTarID]
 				and CTM_CACHE[dwTarID]:IsValid()
-				and CTM_CACHE[dwTarID]:Lookup("Handle_TargetTarget")
-				and CTM_CACHE[dwTarID]:Lookup("Handle_TargetTarget"):IsValid() then
-					CTM_CACHE[dwTarID]:Lookup("Handle_TargetTarget"):Show()
+				and CTM_CACHE[dwTarID]:Lookup('Handle_TargetTarget')
+				and CTM_CACHE[dwTarID]:Lookup('Handle_TargetTarget'):IsValid() then
+					CTM_CACHE[dwTarID]:Lookup('Handle_TargetTarget'):Show()
 				end
 				CTM_TTARGET = dwTarID
 				return
@@ -849,9 +849,9 @@ do
 local function HideBossTarget(dwTarID)
 	if CTM_CACHE[dwTarID]
 	and CTM_CACHE[dwTarID]:IsValid()
-	and CTM_CACHE[dwTarID]:Lookup("Image_Threat")
-	and CTM_CACHE[dwTarID]:Lookup("Image_Threat"):IsValid() then
-		CTM_CACHE[dwTarID]:Lookup("Image_Threat"):Hide()
+	and CTM_CACHE[dwTarID]:Lookup('Image_Threat')
+	and CTM_CACHE[dwTarID]:Lookup('Image_Threat'):IsValid() then
+		CTM_CACHE[dwTarID]:Lookup('Image_Threat'):Hide()
 	end
 end
 function CTM:RefreshBossTarget()
@@ -866,9 +866,9 @@ function CTM:RefreshBossTarget()
 					HideBossTarget(CTM_BOSS_TARGET[dwNpcID])
 					if CTM_CACHE[dwTarID]
 					and CTM_CACHE[dwTarID]:IsValid()
-					and CTM_CACHE[dwTarID]:Lookup("Image_Threat")
-					and CTM_CACHE[dwTarID]:Lookup("Image_Threat"):IsValid() then
-						CTM_CACHE[dwTarID]:Lookup("Image_Threat"):Show()
+					and CTM_CACHE[dwTarID]:Lookup('Image_Threat')
+					and CTM_CACHE[dwTarID]:Lookup('Image_Threat'):IsValid() then
+						CTM_CACHE[dwTarID]:Lookup('Image_Threat'):Show()
 					end
 					CTM_BOSS_TARGET[dwNpcID] = dwTarID
 				end
@@ -900,10 +900,10 @@ function CTM:RefreshAttention()
 			if CTM_CACHE[dwTarID] and CTM_CACHE[dwTarID]:IsValid() then
 				if p and not empty(CTM_ATTENTION_STACK[dwTarID]) then
 					local r, g, b = MY.HumanColor2RGB(CTM_ATTENTION_STACK[dwTarID][1].col)
-					CTM_CACHE[dwTarID]:Lookup("Shadow_Attention"):SetColorRGB(r, g, b)
-					CTM_CACHE[dwTarID]:Lookup("Shadow_Attention"):Show()
+					CTM_CACHE[dwTarID]:Lookup('Shadow_Attention'):SetColorRGB(r, g, b)
+					CTM_CACHE[dwTarID]:Lookup('Shadow_Attention'):Show()
 				else
-					CTM_CACHE[dwTarID]:Lookup("Shadow_Attention"):Hide()
+					CTM_CACHE[dwTarID]:Lookup('Shadow_Attention'):Hide()
 				end
 			end
 			tCheck[dwTarID] = true
@@ -917,7 +917,7 @@ function CTM:RefreshAttention()
 	else
 		for dwTarID, _ in pairs(CTM_ATTENTION_BUFF) do
 			if CTM_CACHE[dwTarID] and CTM_CACHE[dwTarID]:IsValid() then
-				CTM_CACHE[dwTarID]:Lookup("Shadow_Attention"):Hide()
+				CTM_CACHE[dwTarID]:Lookup('Shadow_Attention'):Hide()
 			end
 		end
 	end
@@ -931,7 +931,7 @@ function CTM:RefreshCaution()
 		for _, dwTarID in ipairs(team.GetTeamMemberList()) do
 			local p = GetPlayer(dwTarID)
 			if CTM_CACHE[dwTarID] and CTM_CACHE[dwTarID]:IsValid() then
-				CTM_CACHE[dwTarID]:Lookup("Handle_Caution"):SetVisible(
+				CTM_CACHE[dwTarID]:Lookup('Handle_Caution'):SetVisible(
 					p and (
 						(CFG.bShowCaution and not empty(CTM_CAUTION_BUFF[dwTarID]))
 						or (CFG.bShowBossFocus and CTM_BOSS_FOCUSED_STATE[dwTarID])
@@ -957,12 +957,12 @@ function CTM:RefreshCaution()
 	else
 		for dwTarID, _ in pairs(CTM_CAUTION_BUFF) do
 			if CTM_CACHE[dwTarID] and CTM_CACHE[dwTarID]:IsValid() then
-				CTM_CACHE[dwTarID]:Lookup("Handle_Caution"):Hide()
+				CTM_CACHE[dwTarID]:Lookup('Handle_Caution'):Hide()
 			end
 		end
 		for dwTarID, _ in pairs(CTM_BOSS_FOCUSED_STATE) do
 			if CTM_CACHE[dwTarID] and CTM_CACHE[dwTarID]:IsValid() then
-				CTM_CACHE[dwTarID]:Lookup("Handle_Caution"):Hide()
+				CTM_CACHE[dwTarID]:Lookup('Handle_Caution'):Hide()
 			end
 		end
 	end
@@ -981,12 +981,12 @@ function CTM:RefreshMark()
 					-- assert(nMarkID > 0 and nMarkID <= #PARTY_MARK_ICON_FRAME_LIST)
 					nIconFrame = PARTY_MARK_ICON_FRAME_LIST[nMarkID]
 				end
-				v:Lookup("Image_MarkImage"):FromUITex(PARTY_MARK_ICON_PATH, nIconFrame)
-				v:Lookup("Image_MarkImage"):Show()
+				v:Lookup('Image_MarkImage'):FromUITex(PARTY_MARK_ICON_PATH, nIconFrame)
+				v:Lookup('Image_MarkImage'):Show()
 				local fScale = (CFG.fScaleY + CFG.fScaleX) / 2
-				v:Lookup("Image_MarkImage"):SetSize(24 * fScale, 24 * fScale)
+				v:Lookup('Image_MarkImage'):SetSize(24 * fScale, 24 * fScale)
 			else
-				v:Lookup("Image_MarkImage"):Hide()
+				v:Lookup('Image_MarkImage'):Hide()
 			end
 		end
 	end
@@ -1004,13 +1004,13 @@ function CTM:RefreshSFX()
 	local fUIX, fUIY -- UI当前状态下对应1.0的缩放比
 	for dwID, h in pairs(CTM_CACHE) do
 		if h:IsValid() then
-			for _, szID in ipairs({ "TargetTarget", "Caution" }) do
-				hDest = h:Lookup("Handle_" .. szID)
-				hScale = hDest:Lookup("Handle_" .. szID .. "_Scale")
-				hFixed = hDest:Lookup("Handle_" .. szID .. "_Fixed")
+			for _, szID in ipairs({ 'TargetTarget', 'Caution' }) do
+				hDest = h:Lookup('Handle_' .. szID)
+				hScale = hDest:Lookup('Handle_' .. szID .. '_Scale')
+				hFixed = hDest:Lookup('Handle_' .. szID .. '_Fixed')
 				fUIX, fUIY = hScale:GetW() / hFixed:GetW(), hScale:GetH() / hFixed:GetH()
 				fSFXX, fSFXY = hDest:GetW() / hFixed:GetW(), hDest:GetH() / hFixed:GetH()
-				hDest:Lookup("SFX_" .. szID):Get3DModel():SetScaling(fSFXX, fSFXY, fSFXX)
+				hDest:Lookup('SFX_' .. szID):Get3DModel():SetScaling(fSFXX, fSFXY, fSFXX)
 			end
 		end
 	end
@@ -1023,24 +1023,24 @@ function CTM:RefreshGVoice()
 	for dwID, h in pairs(CTM_CACHE) do
 		if h:IsValid() then
 			local fScale = min(CFG.fScaleY, CFG.fScaleX)
-			local hSpeaker = h:Lookup("Handle_Speaker")
+			local hSpeaker = h:Lookup('Handle_Speaker')
 			if bInRoom and GVoiceBase_IsMemberForbid(dwID) then
 				hSpeaker:Show()
 				hSpeaker:SetRelX(h:GetW() - hSpeaker:GetW())
 				hSpeaker:SetAbsX(h:GetAbsX() + h:GetW() - 30 * fScale)
-				hSpeaker:Lookup("Shadow_SpeakerBg"):SetSize(30 * fScale, 22 * fScale)
-				hSpeaker:Lookup("Handle_ForbidSpeaker"):Show()
-				hSpeaker:Lookup("Animate_SpeakerEffect"):Hide()
-				hSpeaker:Lookup("Handle_ForbidSpeaker/Image_Speaker"):SetSize(11 * fScale, 16 * fScale)
-				hSpeaker:Lookup("Handle_ForbidSpeaker/Image_ForbidSpeaker"):SetSize(16 * fScale, 16 * fScale)
+				hSpeaker:Lookup('Shadow_SpeakerBg'):SetSize(30 * fScale, 22 * fScale)
+				hSpeaker:Lookup('Handle_ForbidSpeaker'):Show()
+				hSpeaker:Lookup('Animate_SpeakerEffect'):Hide()
+				hSpeaker:Lookup('Handle_ForbidSpeaker/Image_Speaker'):SetSize(11 * fScale, 16 * fScale)
+				hSpeaker:Lookup('Handle_ForbidSpeaker/Image_ForbidSpeaker'):SetSize(16 * fScale, 16 * fScale)
 			elseif bInRoom and GVoiceBase_IsMemberSaying(dwID, sayingInfo) then
 				hSpeaker:Show()
 				hSpeaker:SetRelX(h:GetW() - hSpeaker:GetW())
 				hSpeaker:SetAbsX(h:GetAbsX() + h:GetW() - 30 * fScale)
-				hSpeaker:Lookup("Shadow_SpeakerBg"):SetSize(30 * fScale, 22 * fScale)
-				hSpeaker:Lookup("Handle_ForbidSpeaker"):Hide()
-				hSpeaker:Lookup("Animate_SpeakerEffect"):Show()
-				hSpeaker:Lookup("Animate_SpeakerEffect"):SetSize(32 * fScale, 24 * fScale)
+				hSpeaker:Lookup('Shadow_SpeakerBg'):SetSize(30 * fScale, 22 * fScale)
+				hSpeaker:Lookup('Handle_ForbidSpeaker'):Hide()
+				hSpeaker:Lookup('Animate_SpeakerEffect'):Show()
+				hSpeaker:Lookup('Animate_SpeakerEffect'):SetSize(32 * fScale, 24 * fScale)
 			else
 				hSpeaker:Hide()
 			end
@@ -1049,7 +1049,7 @@ function CTM:RefreshGVoice()
 end
 
 function CTM:CallRefreshImages(dwID, ...)
-	if type(dwID) == "number" then
+	if type(dwID) == 'number' then
 		local info = self:GetMemberInfo(dwID)
 		if info and CTM_CACHE[dwID] and CTM_CACHE[dwID]:IsValid() then
 			self:RefreshImages(CTM_CACHE[dwID], dwID, info, ...)
@@ -1068,8 +1068,8 @@ function CTM:KungFuSwitch(dwID)
 	local handle = CTM_CACHE[dwID]
 	if handle and handle:IsValid() then
 		if GetPlayer(dwID) then
-			local key = "CTM_KUNFU_" .. dwID
-			local img = handle:Lookup("Image_Icon")
+			local key = 'CTM_KUNFU_' .. dwID
+			local img = handle:Lookup('Image_Icon')
 			MY.BreatheCall(key, function()
 				local player = GetPlayer(dwID)
 				if player and img and img:IsValid() then
@@ -1095,12 +1095,12 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bLa
 	-- assert(info)
 	if not info then return end
 	-- 刷新团队权限标记
-	if type(tSetting) ~= "nil" then
+	if type(tSetting) ~= 'nil' then
 		local fnAction = function(t)
 			local hTotal = {
-				[TEAM_AUTHORITY_TYPE.LEADER]     = h:Lookup("Handle_Icons/Image_Leader"),
-				[TEAM_AUTHORITY_TYPE.MARK]       = h:Lookup("Handle_Icons/Image_Marker"),
-				[TEAM_AUTHORITY_TYPE.DISTRIBUTE] = h:Lookup("Handle_Icons/Image_Looter"),
+				[TEAM_AUTHORITY_TYPE.LEADER]     = h:Lookup('Handle_Icons/Image_Leader'),
+				[TEAM_AUTHORITY_TYPE.MARK]       = h:Lookup('Handle_Icons/Image_Marker'),
+				[TEAM_AUTHORITY_TYPE.DISTRIBUTE] = h:Lookup('Handle_Icons/Image_Looter'),
 			}
 			for k, v in pairs(hTotal) do
 				if t[k] == dwID then
@@ -1113,28 +1113,28 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bLa
 			end
 		end
 
-		if type(tSetting) == "table" then -- 根据表的内容刷新标记队长等信息
+		if type(tSetting) == 'table' then -- 根据表的内容刷新标记队长等信息
 			fnAction(tSetting)
-		elseif type(tSetting) == "boolean" and tSetting then
+		elseif type(tSetting) == 'boolean' and tSetting then
 			fnAction(self:GetTeamInfo())
 		end
 	end
 	-- 刷新阵眼
-	if type(bFormationLeader) == "boolean" then
+	if type(bFormationLeader) == 'boolean' then
 		if bFormationLeader then
 			local fScale = (CFG.fScaleY + CFG.fScaleX) / 2
-			h:Lookup("Handle_Icons/Image_Matrix"):SetSize(14 * fScale, 14 * fScale)
-			h:Lookup("Handle_Icons/Image_Matrix"):Show()
+			h:Lookup('Handle_Icons/Image_Matrix'):SetSize(14 * fScale, 14 * fScale)
+			h:Lookup('Handle_Icons/Image_Matrix'):Show()
 		else
-			h:Lookup("Handle_Icons/Image_Matrix"):Hide()
+			h:Lookup('Handle_Icons/Image_Matrix'):Hide()
 		end
 	end
 	-- 刷新内功
 	if bIcon then -- 刷新icon
-		local img = h:Lookup("Image_Icon")
+		local img = h:Lookup('Image_Icon')
 		if CFG.nShowIcon ~= 4 then
 			if CFG.nShowIcon == 2 and info.dwMountKungfuID == 0 then
-				img:FromUITex("ui/image/TargetPanel/Target.UITex", 21)
+				img:FromUITex('ui/image/TargetPanel/Target.UITex', 21)
 			elseif CFG.nShowIcon == 2 then
 				local _, nIconID = MY.GetSkillName(info.dwMountKungfuID, 1)
 				if nIconID == 1435 then nIconID = 889 end
@@ -1142,7 +1142,7 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bLa
 			elseif CFG.nShowIcon == 1 then
 				img:FromUITex(GetForceImage(info.dwForceID))
 			elseif CFG.nShowIcon == 3 then
-				img:FromUITex("ui/Image/UICommon/CommonPanel2.UITex", GetCampImageFrame(info.nCamp, false) or -1)
+				img:FromUITex('ui/Image/UICommon/CommonPanel2.UITex', GetCampImageFrame(info.nCamp, false) or -1)
 			end
 			local fScale = (CFG.fScaleY + CFG.fScaleX) / 2
 			if fScale * 0.9 > 1 then
@@ -1157,18 +1157,18 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bLa
 	end
 	-- 刷新名字
 	if bLayout then
-		local txtName = h:Lookup("Text_Name")
-		local txtLife = h:Lookup("Text_Life")
-		local txtDeath = h:Lookup("Text_Death")
-		local txtOffLine = h:Lookup("Text_OffLine")
-		local txtSchool = h:Lookup("Text_School_Name")
+		local txtName = h:Lookup('Text_Name')
+		local txtLife = h:Lookup('Text_Life')
+		local txtDeath = h:Lookup('Text_Death')
+		local txtOffLine = h:Lookup('Text_OffLine')
+		local txtSchool = h:Lookup('Text_School_Name')
 		local r, g, b = 255, 255, 255
 		if CFG.nColoredName == 1 then
-			r, g, b = MY.GetForceColor(info.dwForceID, "foreground")
+			r, g, b = MY.GetForceColor(info.dwForceID, 'foreground')
 		elseif CFG.nColoredName == 0 then
 			r, b, b = 255, 255, 255
 		elseif CFG.nColoredName == 2 then
-			r, g, b = MY.GetCampColor(info.nCamp, "foreground")
+			r, g, b = MY.GetCampColor(info.nCamp, 'foreground')
 		end
 		txtName:SetText(info.szName)
 		txtName:SetVAlign(CFG.nNameVAlignment)
@@ -1187,7 +1187,7 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bLa
 			fScale = fScale * 0.9
 		end
 		if CFG.nShowIcon == 4 then
-			local r, g, b = MY.GetForceColor(info.dwForceID, "foreground")
+			local r, g, b = MY.GetForceColor(info.dwForceID, 'foreground')
 			txtSchool:SetText(CTM_KUNGFU_TEXT[info.dwMountKungfuID])
 			txtSchool:SetFontScheme(CFG.nNameFont)
 			txtSchool:SetFontColor(r, g, b)
@@ -1196,13 +1196,13 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bLa
 			txtSchool:Show()
 			nRelX = txtSchool:GetRelX() + txtSchool:GetW() + 5
 		else
-			local img = h:Lookup("Image_Icon")
+			local img = h:Lookup('Image_Icon')
 			txtSchool:Hide()
 			nRelX = img:GetRelX() + img:GetW()
 		end
 		-- 刷新名字血量位置
 		local nMargin = CFG.nCss == CTM_STYLE.OFFICIAL and 7 or 5
-		for _, szItemName in ipairs({"Text_Name", "Text_Life", "Text_Death", "Text_OffLine"}) do
+		for _, szItemName in ipairs({'Text_Name', 'Text_Life', 'Text_Death', 'Text_OffLine'}) do
 			local txt = h:Lookup(szItemName)
 			local nVAlign = txt:GetVAlign()
 			local nHAlign = txt:GetHAlign()
@@ -1219,8 +1219,8 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bLa
 		end
 		-- 刷新BUFF位置
 		if CFG.bBuffAboveMana then
-			local hMana = h:Lookup("Handle_Mana")
-			local hBoxes = h:Lookup("Handle_Buff_Boxes")
+			local hMana = h:Lookup('Handle_Mana')
+			local hBoxes = h:Lookup('Handle_Buff_Boxes')
 			hBoxes:SetRelPos(hMana:GetRelX() - 1, hMana:GetRelY() - hBoxes:GetH() + hMana:GetH() / 2)
 			hBoxes:SetAbsPos(hMana:GetAbsX() - 1, hMana:GetAbsY() - hBoxes:GetH() + hMana:GetH() / 2)
 		end
@@ -1294,7 +1294,7 @@ function CTM:DrawParty(nIndex)
 	local team = GetClientTeam()
 	local tGroup = team.GetGroupInfo(nIndex)
 	local frame = self:GetPartyFrame(nIndex)
-	local handle = frame:Lookup("", "Handle_Cols/Handle_Roles")
+	local handle = frame:Lookup('', 'Handle_Cols/Handle_Roles')
 	local tSetting = self:GetTeamInfo()
 	local hMember = Cataclysm_Main.GetFrame().hMember
 	handle:Clear()
@@ -1306,7 +1306,7 @@ function CTM:DrawParty(nIndex)
 			h.dwID = dwID
 			CTM_CACHE[dwID] = h
 			local info = self:GetMemberInfo(dwID)
-			h:Lookup("Image_MemberBg"):Show()
+			h:Lookup('Image_MemberBg'):Show()
 			self:RefreshImages(h, dwID, info, tSetting, true, dwID == tGroup.dwFormationLeader, true)
 		end
 		h.nGroup = nIndex
@@ -1353,32 +1353,32 @@ end
 function CTM:FormatFrame(frame, nMemberCount)
 	local fX, fY = CFG.fScaleX, CFG.fScaleY
 	local height, nGroupHeight = (CFG.fScaleY - 1) * 18, 0
-	local h = frame:Lookup("", "")
+	local h = frame:Lookup('', '')
 	local nRolesH = 0
 	if CTM_DRAG or CFG.bShowAllGrid then
 		nMemberCount = CTM_MEMBER_COUNT
-		local handle = h:Lookup("Handle_Cols/Handle_Roles")
+		local handle = h:Lookup('Handle_Cols/Handle_Roles')
 		for i = 0, handle:GetItemCount() - 1 do
 			local h = handle:Lookup(i)
 			if not h.dwID then
 				if CTM_DRAG then
-					h:Lookup("Image_SlotBg"):Show()
+					h:Lookup('Image_SlotBg'):Show()
 				end
-				h:Lookup("Image_MemberBg"):Show()
+				h:Lookup('Image_MemberBg'):Show()
 			end
 			nRolesH = nRolesH + h:GetH()
 		end
 		handle:SetH(nRolesH)
 	else
 		nMemberCount = frame.nMemberCount or CTM_MEMBER_COUNT
-		local handle = h:Lookup("Handle_Cols/Handle_Roles")
+		local handle = h:Lookup('Handle_Cols/Handle_Roles')
 		for i = 0, handle:GetItemCount() - 1 do
 			local h = handle:Lookup(i)
 			if h.dwID then
 				nRolesH = nRolesH + h:GetH()
 			end
-			h:Lookup("Image_SlotBg"):Hide()
-			h:Lookup("Image_MemberBg"):SetVisible(not not h.dwID)
+			h:Lookup('Image_SlotBg'):Hide()
+			h:Lookup('Image_MemberBg'):SetVisible(not not h.dwID)
 		end
 		handle:SetH(nRolesH)
 	end
@@ -1386,27 +1386,27 @@ function CTM:FormatFrame(frame, nMemberCount)
 		nGroupHeight = 23
 	end
 	frame:SetSize(128 * fX, 25 * fY + nRolesH - height - nGroupHeight)
-	h:Lookup("Handle_BG/Shadow_BG"):SetSize(120 * fX, nRolesH + 20 * fY - height - nGroupHeight)
-	h:Lookup("Handle_BG/Image_BG_L"):SetSize(18 * fX, nRolesH + nMemberCount * 3 * fY - height - nGroupHeight)
-	h:Lookup("Handle_BG/Image_BG_R"):SetSize(18 * fX, nRolesH + nMemberCount * 3 * fY - height - nGroupHeight)
-	h:Lookup("Handle_BG/Image_BG_BL"):SetRelPos(0, nRolesH + 11 * fY - height - nGroupHeight)
-	h:Lookup("Handle_BG/Image_BG_T"):SetSize(110 * fX, 18 * fY)
-	h:Lookup("Handle_BG/Image_BG_B"):SetSize(110 * fX, 18 * fY)
-	h:Lookup("Handle_BG/Image_BG_B"):SetRelPos(14 * fX, nRolesH + 11 * fY - height - nGroupHeight)
-	h:Lookup("Handle_BG/Image_BG_BR"):SetRelPos(112 * fX, nRolesH + 11 * fY - height - nGroupHeight)
-	h:Lookup("Handle_BG"):FormatAllItemPos()
-	h:Lookup("Handle_Cols/Handle_Title"):SetVisible(CFG.bShowGroupNumber)
-	h:Lookup("Handle_Cols/Handle_Title"):SetH(23)
-	h:Lookup("Handle_Cols/Handle_Title/Text_Title"):SetH(23)
-	h:Lookup("Handle_Cols/Handle_Title/Image_TitleBg"):SetH(23)
-	h:Lookup("Handle_Cols"):FormatAllItemPos()
+	h:Lookup('Handle_BG/Shadow_BG'):SetSize(120 * fX, nRolesH + 20 * fY - height - nGroupHeight)
+	h:Lookup('Handle_BG/Image_BG_L'):SetSize(18 * fX, nRolesH + nMemberCount * 3 * fY - height - nGroupHeight)
+	h:Lookup('Handle_BG/Image_BG_R'):SetSize(18 * fX, nRolesH + nMemberCount * 3 * fY - height - nGroupHeight)
+	h:Lookup('Handle_BG/Image_BG_BL'):SetRelPos(0, nRolesH + 11 * fY - height - nGroupHeight)
+	h:Lookup('Handle_BG/Image_BG_T'):SetSize(110 * fX, 18 * fY)
+	h:Lookup('Handle_BG/Image_BG_B'):SetSize(110 * fX, 18 * fY)
+	h:Lookup('Handle_BG/Image_BG_B'):SetRelPos(14 * fX, nRolesH + 11 * fY - height - nGroupHeight)
+	h:Lookup('Handle_BG/Image_BG_BR'):SetRelPos(112 * fX, nRolesH + 11 * fY - height - nGroupHeight)
+	h:Lookup('Handle_BG'):FormatAllItemPos()
+	h:Lookup('Handle_Cols/Handle_Title'):SetVisible(CFG.bShowGroupNumber)
+	h:Lookup('Handle_Cols/Handle_Title'):SetH(23)
+	h:Lookup('Handle_Cols/Handle_Title/Text_Title'):SetH(23)
+	h:Lookup('Handle_Cols/Handle_Title/Image_TitleBg'):SetH(23)
+	h:Lookup('Handle_Cols'):FormatAllItemPos()
 end
 
 -- 注册buff
 function CTM:RecBuff(dwMemberID, data)
-	local szKey = ("%d,%d,%s%d"):format(
+	local szKey = ('%d,%d,%s%d'):format(
 		data.dwID, data.nLevel,
-		data.szStackOp or "",
+		data.szStackOp or '',
 		data.nStackNum or 0
 	)
 	CTM_BUFF_CACHE[szKey] = data
@@ -1416,7 +1416,7 @@ function CTM:ClearBuff(dwMemberID)
 	local team = GetClientTeam()
 	for k, v in ipairs(team.GetTeamMemberList()) do
 		if CTM_CACHE[v] and CTM_CACHE[v]:IsValid() then
-			CTM_CACHE[v]:Lookup("Handle_Buff_Boxes"):Clear()
+			CTM_CACHE[v]:Lookup('Handle_Buff_Boxes'):Clear()
 		end
 		if CTM_CAUTION_BUFF[v] then
 			CTM_CAUTION_BUFF[v] = nil
@@ -1442,7 +1442,7 @@ function CTM:RefreshBuff()
 	for k, v in ipairs(team.GetTeamMemberList()) do
 		local p = GetPlayer(v)
 		if CTM_CACHE[v] and CTM_CACHE[v]:IsValid() and p then
-			local handle = CTM_CACHE[v]:Lookup("Handle_Buff_Boxes")
+			local handle = CTM_CACHE[v]:Lookup('Handle_Buff_Boxes')
 			for key, data in pairs(CTM_BUFF_CACHE) do
 				local KBuff = MY_GetBuff(p, data.dwID, data.nLevel)
 				local item = handle:Lookup(key)
@@ -1461,13 +1461,13 @@ function CTM:RefreshBuff()
 					end
 				end
 				if nStackNum and data.nStackNum then
-					local szStackOp = data.szStackOp or ">="
-					if (szStackOp == "=" and nStackNum ~= data.nStackNum)
-					or (szStackOp == "!=" and nStackNum == data.nStackNum)
-					or (szStackOp == "<" and nStackNum >= data.nStackNum)
-					or (szStackOp == "<=" and nStackNum > data.nStackNum)
-					or (szStackOp == ">" and nStackNum <= data.nStackNum)
-					or (szStackOp == ">=" and nStackNum < data.nStackNum)
+					local szStackOp = data.szStackOp or '>='
+					if (szStackOp == '=' and nStackNum ~= data.nStackNum)
+					or (szStackOp == '!=' and nStackNum == data.nStackNum)
+					or (szStackOp == '<' and nStackNum >= data.nStackNum)
+					or (szStackOp == '<=' and nStackNum > data.nStackNum)
+					or (szStackOp == '>' and nStackNum <= data.nStackNum)
+					or (szStackOp == '>=' and nStackNum < data.nStackNum)
 					then
 						nEndFrame = nil
 					end
@@ -1498,17 +1498,17 @@ function CTM:RefreshBuff()
 							r, g, b, a = MY.HumanColor2RGB(data.col)
 						end
 						if not data.col then
-							item:Lookup("Handle_RbgBorders"):Hide()
-							item:Lookup("Handle_InnerBorders"):Hide()
+							item:Lookup('Handle_RbgBorders'):Hide()
+							item:Lookup('Handle_InnerBorders'):Hide()
 						else
-							local hSha, sha = item:Lookup("Handle_RbgBorders")
+							local hSha, sha = item:Lookup('Handle_RbgBorders')
 							for i = 0, hSha:GetItemCount() - 1 do
 								sha = hSha:Lookup(i)
 								sha:SetAlpha(a or data.nColAlpha or 192)
 								sha:SetColorRGB(r or 255, g or 255, b or 0)
 							end
-							item:Lookup("Handle_RbgBorders"):Show()
-							item:Lookup("Handle_InnerBorders"):Show()
+							item:Lookup('Handle_RbgBorders'):Show()
+							item:Lookup('Handle_InnerBorders'):Show()
 						end
 						-- 排序
 						local fromIndex, toIndex = handle:GetItemCount() - 1
@@ -1549,7 +1549,7 @@ function CTM:RefreshBuff()
 							icon = data.nIcon
 						end
 						item.szName = szName
-						local box = item:Lookup("Box")
+						local box = item:Lookup('Box')
 						box:SetObject(UI_OBJECT_NOT_NEED_KNOWN, data.dwID, data.nLevelEx)
 						box:SetObjectIcon(icon)
 						box:SetObjectStaring(CFG.bStaring)
@@ -1563,13 +1563,13 @@ function CTM:RefreshBuff()
 							fScale = CFG.fBuffScale
 						end
 						item:Scale(fScale, fScale)
-						local txtTime = item:Lookup("Text_Time")
+						local txtTime = item:Lookup('Text_Time')
 						local fFontScale = fScale * 0.9 / (1 + Font.GetOffset() * 0.07)
 						txtTime:SetFontScale(fFontScale * (item:GetH() / txtTime:GetH()) * 0.6)
-						local txtStackNum = item:Lookup("Text_StackNum")
+						local txtStackNum = item:Lookup('Text_StackNum')
 						txtStackNum:SetFontScale(fFontScale * (item:GetH() / txtStackNum:GetH()) * 0.55)
 						txtStackNum:SetFontColor(255, 255, 255)
-						local txtReminder = item:Lookup("Text_Reminder")
+						local txtReminder = item:Lookup('Text_Reminder')
 						txtReminder:SetText(data.szReminder)
 						txtReminder:SetVisible(CFG.bShowBuffReminder)
 						txtReminder:SetFontScale(fFontScale * (item:GetH() / txtReminder:GetH()) * 0.6)
@@ -1584,7 +1584,7 @@ function CTM:RefreshBuff()
 						item.nEndFrame = nEndFrame
 						item.nStackNum = nStackNum
 						-- buff time
-						local txtTime = item:Lookup("Text_Time")
+						local txtTime = item:Lookup('Text_Time')
 						if CFG.bShowBuffTime then
 							local nTime, r, g, b = GetEndTime(nEndFrame)
 							if nTime <= 5 then
@@ -1595,19 +1595,19 @@ function CTM:RefreshBuff()
 								r, g, b = 255, 255, 0
 							end
 							if r and g and b then
-								txtTime:SetText(floor(nTime) .. "'")
+								txtTime:SetText(floor(nTime) .. '"')
 								txtTime:SetFontColor(r, g, b)
 							else
-								txtTime:SetText("")
+								txtTime:SetText('')
 							end
 						end
 						txtTime:SetVisible(CFG.bShowBuffTime)
 						-- buff stack number
-						local txtStackNum = item:Lookup("Text_StackNum")
+						local txtStackNum = item:Lookup('Text_StackNum')
 						if CFG.bShowBuffNum and nStackNum > 1 then
 							txtStackNum:SetText(nStackNum)
 						else
-							txtStackNum:SetText("")
+							txtStackNum:SetText('')
 						end
 						txtStackNum:SetVisible(CFG.bShowBuffNum)
 					end
@@ -1621,7 +1621,7 @@ function CTM:RefreshBuff()
 						end
 						if not CTM_ATTENTION_BUFF[v][key] then
 							local rec = {
-								col = data.col or "yellow",
+								col = data.col or 'yellow',
 							}
 							CTM_ATTENTION_BUFF[v][key] = rec
 							insert(CTM_ATTENTION_STACK[v], 1, rec)
@@ -1640,10 +1640,10 @@ function CTM:RefreshBuff()
 							CTM_SCREEN_HEAD[v] = {}
 						end
 						if not CTM_SCREEN_HEAD[v][key] then
-							FireUIEvent("MY_SA_CREATE", KBuff.bCanCancel and "BUFF" or "DEBUFF", v, {
+							FireUIEvent('MY_SA_CREATE', KBuff.bCanCancel and 'BUFF' or 'DEBUFF', v, {
 								dwID = item.dwID,
-								col = data.col or "yellow",
-								text = item.szName .. "_" .. p.szName,
+								col = data.col or 'yellow',
+								text = item.szName .. '_' .. p.szName,
 							})
 							CTM_SCREEN_HEAD[v][key] = true
 						end
@@ -1673,7 +1673,7 @@ function CTM:RefreshBuff()
 				end
 			end
 		elseif CTM_CACHE[v] and CTM_CACHE[v]:IsValid() then
-			local handle = CTM_CACHE[v]:Lookup("Handle_Buff_Boxes")
+			local handle = CTM_CACHE[v]:Lookup('Handle_Buff_Boxes')
 			handle:Clear()
 		end
 	end
@@ -1686,7 +1686,7 @@ function CTM:RefreshBuff()
 end
 
 function CTM:RecBossFocusBuff(dwMemberID, data)
-	CTM_BOSS_FOCUS_BUFF[data.dwID .. "#" .. data.nLevel] = data
+	CTM_BOSS_FOCUS_BUFF[data.dwID .. '#' .. data.nLevel] = data
 end
 
 function CTM:RefreshBossFocus()
@@ -1738,14 +1738,14 @@ function CTM:RefreshDistance()
 					v.nDistanceLevel = 1
 				end
 				if CFG.bShowDistance then
-					v:Lookup("Text_Distance"):SetText(string.format("%.1f", nDistance))
-					v:Lookup("Text_Distance"):SetFontColor(255, math.max(0, 255 - nDistance * 8), math.max(0, 255 - nDistance * 8))
+					v:Lookup('Text_Distance'):SetText(string.format('%.1f', nDistance))
+					v:Lookup('Text_Distance'):SetFontColor(255, math.max(0, 255 - nDistance * 8), math.max(0, 255 - nDistance * 8))
 				else
-					v:Lookup("Text_Distance"):SetText("")
+					v:Lookup('Text_Distance'):SetText('')
 				end
 			else
 				if CFG.bShowDistance then
-					v:Lookup("Text_Distance"):SetText("")
+					v:Lookup('Text_Distance'):SetText('')
 				end
 				if v.nDistance or v.nDistanceLevel then
 					v.nDistance = nil
@@ -1759,7 +1759,7 @@ end
 
 -- 血量 / 内力
 function CTM:CallDrawHPMP(dwID, ...)
-	if type(dwID) == "number" then
+	if type(dwID) == 'number' then
 		local info = self:GetMemberInfo(dwID)
 		if info and CTM_CACHE[dwID] and CTM_CACHE[dwID]:IsValid() then
 			self:DrawHPMP(CTM_CACHE[dwID], dwID, info, ...)
@@ -1780,13 +1780,13 @@ end
 function CTM:DrawHPMP(h, dwID, info, bRefresh)
 	if not info then return end
 	local bSha = CFG.nBGColorMode ~= CTM_BG_COLOR_MODE.OFFICIAL
-	local hLife = h:Lookup("Handle_Life")
-	local hMana = h:Lookup("Handle_Mana")
-	local Lsha = hLife:Lookup("Shadow_Life")
-	local Limg = hLife:Lookup("Image_Life")
-	local Ledg = hLife:Lookup("Image_LifeLine")
-	local Msha = hMana:Lookup("Shadow_Mana")
-	local Mimg = hMana:Lookup("Image_Mana")
+	local hLife = h:Lookup('Handle_Life')
+	local hMana = h:Lookup('Handle_Mana')
+	local Lsha = hLife:Lookup('Shadow_Life')
+	local Limg = hLife:Lookup('Image_Life')
+	local Ledg = hLife:Lookup('Image_LifeLine')
+	local Msha = hMana:Lookup('Shadow_Mana')
+	local Mimg = hMana:Lookup('Image_Mana')
 	local player, npc, dwMountType
 	if CHANGGE_REAL_SHADOW_CACHE[dwID] then
 		npc = GetNpc(CHANGGE_REAL_SHADOW_CACHE[dwID])
@@ -1847,12 +1847,12 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 	-- 内力
 	if not bDeathFlag then
 		local nPercentage, nManaShow = 1, 1
-		local mana = h:Lookup("Text_Mana")
+		local mana = h:Lookup('Text_Mana')
 		if not IsPlayerManaHide(info.dwForceID, dwMountType) then -- 内力不需要那么准
 			nPercentage = info.nMaxMana ~= 0 and (info.nCurrentMana / info.nMaxMana)
 			nManaShow = info.nCurrentMana
 			if not CFG.nShowMP then
-				mana:SetText("")
+				mana:SetText('')
 			else
 				mana:SetText(nManaShow)
 			end
@@ -1884,7 +1884,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 	end
 	-- 掉血警告 必须早于血条绘制
 	if CFG.bHPHitAlert then
-		local lifeFade = hLife:Lookup("Shadow_Life_Fade")
+		local lifeFade = hLife:Lookup('Shadow_Life_Fade')
 		if CTM_LIFE_CACHE[dwID] and CTM_LIFE_CACHE[dwID] > nLifePercentage then
 			local nAlpha, nW, nH = lifeFade:GetAlpha(), 0, 0
 			if nAlpha == 0 then
@@ -1898,7 +1898,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			lifeFade:SetAlpha(240)
 			lifeFade:Show()
 
-			local key = "CTM_HIT_" .. dwID
+			local key = 'CTM_HIT_' .. dwID
 			MY.BreatheCall(key, false)
 			MY.BreatheCall(key, function()
 				if lifeFade:IsValid() then
@@ -1913,7 +1913,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			end)
 		end
 	else
-		hLife:Lookup("Shadow_Life_Fade"):Hide()
+		hLife:Lookup('Shadow_Life_Fade'):Hide()
 	end
 	-- 缓存
 	if not CFG.bFasterHP or bRefresh or (CFG.bFasterHP and CTM_LIFE_CACHE[dwID] ~= nLifePercentage) then
@@ -1935,7 +1935,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 				elseif CFG.nBGColorMode == CTM_BG_COLOR_MODE.SAME_COLOR then
 					r, g, b = unpack(CFG.tDistanceCol[1]) -- 使用用户配色1
 				elseif CFG.nBGColorMode == CTM_BG_COLOR_MODE.BY_FORCE then
-					r, g, b = MY.GetForceColor(info.dwForceID, "background")
+					r, g, b = MY.GetForceColor(info.dwForceID, 'background')
 				end
 			end
 			self:DrawShadow(Lsha, nNewW, Lsha:GetH(), r, g, b, nAlpha, CFG.bLifeGradient)
@@ -1962,7 +1962,7 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 			CTM_LIFE_CACHE[dwID] = nLifePercentage
 		end
 		-- 数值绘制
-		local life = h:Lookup("Text_Life")
+		local life = h:Lookup('Text_Life')
 		local nFontAlpha = min(nAlpha * 0.4 + 255 * 0.6, 255)
 		if not info.bIsOnLine then
 			nFontAlpha = nFontAlpha * 0.8
@@ -1970,20 +1970,20 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 		life:SetAlpha(nAlpha == 0 and 0 or nFontAlpha)
 		life:SetFontScheme(CFG.nLifeFont)
 		life:SetFontScale(CFG.fLifeFontScale)
-		h:Lookup("Text_Name"):SetAlpha(nFontAlpha)
+		h:Lookup('Text_Name'):SetAlpha(nFontAlpha)
 
 		if not bDeathFlag and info.bIsOnLine then
 			life:SetFontColor(255, 255, 255)
 			if CFG.nHPShownMode2 == 0 then
-				life:SetText("")
+				life:SetText('')
 			else
 				local fnAction = function(val, max)
 					if CFG.nHPShownNumMode == 1 then
 						if val > 9999 then
-							val = (CFG.bShowHPDecimal and "%.1fw" or "%dw"):format(val / 10000)
+							val = (CFG.bShowHPDecimal and '%.1fw' or '%dw'):format(val / 10000)
 						end
 					elseif CFG.nHPShownNumMode == 2 then
-						val = (CFG.bShowHPDecimal and "%.1f%%" or "%d%%"):format(val / max * 100)
+						val = (CFG.bShowHPDecimal and '%.1f%%' or '%d%%'):format(val / max * 100)
 					end
 					return val
 				end
@@ -1992,28 +1992,28 @@ function CTM:DrawHPMP(h, dwID, info, bRefresh)
 				elseif CFG.nHPShownMode2 == 1 then
 					local nShownLife = nMaxLife - nCurrentLife
 					if nShownLife > 0 then
-						life:SetText("-" .. fnAction(nShownLife, nMaxLife))
+						life:SetText('-' .. fnAction(nShownLife, nMaxLife))
 					else
-						life:SetText("")
+						life:SetText('')
 					end
 				end
 			end
 		elseif not info.bIsOnLine then
-			life:SetText("")
+			life:SetText('')
 		elseif bDeathFlag then
-			life:SetText("")
+			life:SetText('')
 		else
 			life:SetFontColor(128, 128, 128)
 			life:SetText(COINSHOP_SOURCE_NULL)
 		end
 		-- if info.dwMountKungfuID == 0 then -- 没有同步成功时显示的内容
-			-- life:SetText("sync ...")
+			-- life:SetText('sync ...')
 		-- end
-		h:Lookup("Text_Death"):SetVisible(bDeathFlag)
-		h:Lookup("Text_OffLine"):SetVisible(not info.bIsOnLine)
-		h:Lookup("Text_Death"):SetFontScale(CFG.fLifeFontScale)
-		h:Lookup("Text_OffLine"):SetFontScale(CFG.fLifeFontScale)
-		h:Lookup("Image_PlayerBg"):SetVisible(info.bIsOnLine)
+		h:Lookup('Text_Death'):SetVisible(bDeathFlag)
+		h:Lookup('Text_OffLine'):SetVisible(not info.bIsOnLine)
+		h:Lookup('Text_Death'):SetFontScale(CFG.fLifeFontScale)
+		h:Lookup('Text_OffLine'):SetFontScale(CFG.fLifeFontScale)
+		h:Lookup('Image_PlayerBg'):SetVisible(info.bIsOnLine)
 	end
 end
 
@@ -2040,7 +2040,7 @@ function CTM:Send_RaidReadyConfirm(bDisable)
 			if v:IsValid() then
 				local info = self:GetMemberInfo(k)
 				if info.bIsOnLine and k ~= UI_GetClientPlayerID() then
-					v:Lookup("Image_ReadyCover"):Show()
+					v:Lookup('Image_ReadyCover'):Show()
 				end
 			end
 		end
@@ -2049,8 +2049,8 @@ function CTM:Send_RaidReadyConfirm(bDisable)
 			MY.DelayCall(5000, function()
 				for k, v in pairs(CTM_CACHE) do
 					if v:IsValid() then
-						if v:Lookup("Image_ReadyCover"):IsVisible() or v:Lookup("Image_NotReady"):IsVisible() then
-							MY.Confirm(g_tStrings.STR_RAID_READY_CONFIRM_RESET .. "?", function()
+						if v:Lookup('Image_ReadyCover'):IsVisible() or v:Lookup('Image_NotReady'):IsVisible() then
+							MY.Confirm(g_tStrings.STR_RAID_READY_CONFIRM_RESET .. '?', function()
 								self:Clear_RaidReadyConfirm()
 							end)
 							break
@@ -2065,9 +2065,9 @@ end
 function CTM:Clear_RaidReadyConfirm()
 	for k, v in pairs(CTM_CACHE) do
 		if v:IsValid() then
-			v:Lookup("Image_ReadyCover"):Hide()
-			v:Lookup("Image_NotReady"):Hide()
-			v:Lookup("Animate_Ready"):Hide()
+			v:Lookup('Image_ReadyCover'):Hide()
+			v:Lookup('Image_NotReady'):Hide()
+			v:Lookup('Animate_Ready'):Hide()
 		end
 	end
 end
@@ -2075,32 +2075,32 @@ end
 function CTM:ChangeReadyConfirm(dwID, status)
 	if CTM_CACHE[dwID] and CTM_CACHE[dwID]:IsValid() then
 		local h = CTM_CACHE[dwID]
-		h:Lookup("Image_ReadyCover"):Hide()
+		h:Lookup('Image_ReadyCover'):Hide()
 		if status then
-			local key = "CTM_READY_" .. dwID
-			h:Lookup("Animate_Ready"):Show()
-			h:Lookup("Animate_Ready"):SetAlpha(240)
+			local key = 'CTM_READY_' .. dwID
+			h:Lookup('Animate_Ready'):Show()
+			h:Lookup('Animate_Ready'):SetAlpha(240)
 			MY.BreatheCall(key, function()
-				if h:Lookup("Animate_Ready"):IsValid() then
-					local nAlpha = math.max(h:Lookup("Animate_Ready"):GetAlpha() - 15, 0)
-					h:Lookup("Animate_Ready"):SetAlpha(nAlpha)
+				if h:Lookup('Animate_Ready'):IsValid() then
+					local nAlpha = math.max(h:Lookup('Animate_Ready'):GetAlpha() - 15, 0)
+					h:Lookup('Animate_Ready'):SetAlpha(nAlpha)
 					if nAlpha <= 0 then
 						MY.BreatheCall(key, false)
 					end
 				end
 			end)
 		else
-			h:Lookup("Image_NotReady"):Show()
+			h:Lookup('Image_NotReady'):Show()
 		end
 	end
 end
 
 function CTM:CallEffect(dwTargetID, nDelay)
 	if CTM_CACHE[dwTargetID] and CTM_CACHE[dwTargetID]:IsValid() then
-		CTM_CACHE[dwTargetID]:Lookup("Image_Effect"):Show()
+		CTM_CACHE[dwTargetID]:Lookup('Image_Effect'):Show()
 		MY.DelayCall(nDelay, function()
 			if CTM_CACHE[dwTargetID] and CTM_CACHE[dwTargetID]:IsValid() then
-				CTM_CACHE[dwTargetID]:Lookup("Image_Effect"):Hide()
+				CTM_CACHE[dwTargetID]:Lookup('Image_Effect'):Hide()
 			end
 		end)
 	end

@@ -36,7 +36,7 @@ data = {
     ['unlock focus'] = '取消鎖定目標',
     ['Can not use in pubg map!'] = '孤城瀚海中，禁止使用。',
 
-    ["Loop target in focus"] = "焦點列表循環選擇",
+    ['Loop target in focus'] = '焦點列表循環選擇',
 
     ['Target type'] = '目標類型',
     ['Target life percentage'] = '目標血量百分比',

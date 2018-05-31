@@ -3,40 +3,40 @@
 -- By 茗伊@双梦镇@荻花宫
 -- 2014年5月19日05:07:02
 --
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Farbnamen/lang/")
-local _SUB_ADDON_FOLDER_NAME_ = "MY_Farbnamen"
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot..'MY_Farbnamen/lang/')
+local _SUB_ADDON_FOLDER_NAME_ = 'MY_Farbnamen'
 local XML_LINE_BREAKER = XML_LINE_BREAKER
 local tinsert, tconcat, tremove = table.insert, table.concat, table.remove
 ---------------------------------------------------------------
 -- 设置和数据
 ---------------------------------------------------------------
 MY.CreateDataRoot(MY_DATA_PATH.SERVER)
-local SZ_DB_PATH = MY.FormatPath({"cache/player_info.db", MY_DATA_PATH.SERVER})
+local SZ_DB_PATH = MY.FormatPath({'cache/player_info.db', MY_DATA_PATH.SERVER})
 local DB = SQLite3_Open(SZ_DB_PATH)
 if not DB then
-	return MY.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L["MY_Farbnamen"])
+	return MY.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L['MY_Farbnamen'])
 end
-DB:Execute("CREATE TABLE IF NOT EXISTS InfoCache (id INTEGER PRIMARY KEY, name VARCHAR(20) NOT NULL, force INTEGER, role INTEGER, level INTEGER, title VARCHAR(20), camp INTEGER, tong INTEGER)")
-DB:Execute("CREATE INDEX IF NOT EXISTS info_cache_name_idx ON InfoCache(name)")
-local DBI_W  = DB:Prepare("REPLACE INTO InfoCache (id, name, force, role, level, title, camp, tong) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
-local DBI_RI = DB:Prepare("SELECT id, name, force, role, level, title, camp, tong FROM InfoCache WHERE id = ?")
-local DBI_RN = DB:Prepare("SELECT id, name, force, role, level, title, camp, tong FROM InfoCache WHERE name = ?")
-DB:Execute("CREATE TABLE IF NOT EXISTS TongCache (id INTEGER PRIMARY KEY, name VARCHAR(20))")
-local DBT_W  = DB:Prepare("REPLACE INTO TongCache (id, name) VALUES (?, ?)")
-local DBT_RI = DB:Prepare("SELECT id, name FROM InfoCache WHERE id = ?")
+DB:Execute('CREATE TABLE IF NOT EXISTS InfoCache (id INTEGER PRIMARY KEY, name VARCHAR(20) NOT NULL, force INTEGER, role INTEGER, level INTEGER, title VARCHAR(20), camp INTEGER, tong INTEGER)')
+DB:Execute('CREATE INDEX IF NOT EXISTS info_cache_name_idx ON InfoCache(name)')
+local DBI_W  = DB:Prepare('REPLACE INTO InfoCache (id, name, force, role, level, title, camp, tong) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+local DBI_RI = DB:Prepare('SELECT id, name, force, role, level, title, camp, tong FROM InfoCache WHERE id = ?')
+local DBI_RN = DB:Prepare('SELECT id, name, force, role, level, title, camp, tong FROM InfoCache WHERE name = ?')
+DB:Execute('CREATE TABLE IF NOT EXISTS TongCache (id INTEGER PRIMARY KEY, name VARCHAR(20))')
+local DBT_W  = DB:Prepare('REPLACE INTO TongCache (id, name) VALUES (?, ?)')
+local DBT_RI = DB:Prepare('SELECT id, name FROM InfoCache WHERE id = ?')
 
 MY_Farbnamen = MY_Farbnamen or {
 	bEnabled = true,
 }
-RegisterCustomData("MY_Farbnamen.bEnabled")
+RegisterCustomData('MY_Farbnamen.bEnabled')
 
 do if IsDebugClient() then -- 旧版缓存转换
-	local SZ_IC_PATH = MY.FormatPath("cache/PLAYER_INFO/$relserver/")
+	local SZ_IC_PATH = MY.FormatPath('cache/PLAYER_INFO/$relserver/')
 	if IsLocalFileExist(SZ_IC_PATH) then
-		MY.Debug({"Farbnamen info cache trans from file to sqlite start!"}, "MY_Farbnamen", MY_DEBUG.LOG)
-		DB:Execute("BEGIN TRANSACTION")
+		MY.Debug({'Farbnamen info cache trans from file to sqlite start!'}, 'MY_Farbnamen', MY_DEBUG.LOG)
+		DB:Execute('BEGIN TRANSACTION')
 		for i = 0, 999 do
-			local data = MY.LoadLUAData("cache/PLAYER_INFO/$relserver/DAT2/" .. i .. ".$lang.jx3dat")
+			local data = MY.LoadLUAData('cache/PLAYER_INFO/$relserver/DAT2/' .. i .. '.$lang.jx3dat')
 			if data then
 				for id, p in pairs(data) do
 					DBI_W:ClearBindings()
@@ -45,14 +45,14 @@ do if IsDebugClient() then -- 旧版缓存转换
 				end
 			end
 		end
-		DB:Execute("END TRANSACTION")
-		MY.Debug({"Farbnamen info cache trans from file to sqlite finished!"}, "MY_Farbnamen", MY_DEBUG.LOG)
+		DB:Execute('END TRANSACTION')
+		MY.Debug({'Farbnamen info cache trans from file to sqlite finished!'}, 'MY_Farbnamen', MY_DEBUG.LOG)
 
-		MY.Debug({"Farbnamen tong cache trans from file to sqlite start!"}, "MY_Farbnamen", MY_DEBUG.LOG)
-		DB:Execute("BEGIN TRANSACTION")
+		MY.Debug({'Farbnamen tong cache trans from file to sqlite start!'}, 'MY_Farbnamen', MY_DEBUG.LOG)
+		DB:Execute('BEGIN TRANSACTION')
 		for i = 0, 128 do
 			for j = 0, 128 do
-				local data = MY.LoadLUAData("cache/PLAYER_INFO/$relserver/TONG/" .. i .. "-" .. j .. ".$lang.jx3dat")
+				local data = MY.LoadLUAData('cache/PLAYER_INFO/$relserver/TONG/' .. i .. '-' .. j .. '.$lang.jx3dat')
 				if data then
 					for id, name in pairs(data) do
 						DBT_W:ClearBindings()
@@ -62,12 +62,12 @@ do if IsDebugClient() then -- 旧版缓存转换
 				end
 			end
 		end
-		DB:Execute("END TRANSACTION")
-		MY.Debug({"Farbnamen tong cache trans from file to sqlite finished!"}, "MY_Farbnamen", MY_DEBUG.LOG)
+		DB:Execute('END TRANSACTION')
+		MY.Debug({'Farbnamen tong cache trans from file to sqlite finished!'}, 'MY_Farbnamen', MY_DEBUG.LOG)
 
-		MY.Debug({"Farbnamen cleaning file cache start: " .. SZ_IC_PATH}, "MY_Farbnamen", MY_DEBUG.LOG)
+		MY.Debug({'Farbnamen cleaning file cache start: ' .. SZ_IC_PATH}, 'MY_Farbnamen', MY_DEBUG.LOG)
 		CPath.DelDir(SZ_IC_PATH)
-		MY.Debug({"Farbnamen cleaning file cache finished!"}, "MY_Farbnamen", MY_DEBUG.LOG)
+		MY.Debug({'Farbnamen cleaning file cache finished!'}, 'MY_Farbnamen', MY_DEBUG.LOG)
 	end
 end end
 
@@ -86,7 +86,7 @@ local _MY_Farbnamen = {
 -- 聊天复制和时间显示相关
 ---------------------------------------------------------------
 -- 插入聊天内容的 HOOK （过滤、加入时间 ）
-MY.HookChatPanel("MY_FARBNAMEN", function(h, szChannel, szMsg, dwTime)
+MY.HookChatPanel('MY_FARBNAMEN', function(h, szChannel, szMsg, dwTime)
 	return szMsg, h:GetItemCount()
 end, function(h, nCount, szChannel, szMsg, dwTime)
 	if MY_Farbnamen.bEnabled then
@@ -104,7 +104,7 @@ end)
 -- (string) MY_Farbnamen.Render(string szMsg)           格式化szMsg 处理里面的名字
 function MY_Farbnamen.Render(szMsg)
 	if type(szMsg) == 'string' then
-		-- <text>text="[就是个阵眼]" font=10 r=255 g=255 b=255  name="namelink_4662931" eventid=515</text><text>text="说：" font=10 r=255 g=255 b=255 </text><text>text="[茗伊]" font=10 r=255 g=255 b=255  name="namelink_4662931" eventid=771</text><text>text="\n" font=10 r=255 g=255 b=255 </text>
+		-- <text>text='[就是个阵眼]' font=10 r=255 g=255 b=255  name='namelink_4662931' eventid=515</text><text>text='说：' font=10 r=255 g=255 b=255 </text><text>text='[茗伊]' font=10 r=255 g=255 b=255  name='namelink_4662931' eventid=771</text><text>text='\n' font=10 r=255 g=255 b=255 </text>
 		local xml = MY.Xml.Decode(szMsg)
 		if xml then
 			for _, ele in ipairs(xml) do
@@ -122,7 +122,7 @@ function MY_Farbnamen.Render(szMsg)
 			end
 			szMsg = MY.Xml.Encode(xml)
 		end
-		-- szMsg = string.gsub( szMsg, '<text>([^<]-)text="([^<]-)"([^<]-name="namelink_%d-"[^<]-)</text>', function (szExtra1, szName, szExtra2)
+		-- szMsg = string.gsub( szMsg, '<text>([^<]-)text='([^<]-)'([^<]-name='namelink_%d-'[^<]-)</text>', function (szExtra1, szName, szExtra2)
 		--     szName = string.gsub(szName, '[%[%]]', '')
 		--     local tInfo = MY_Farbnamen.GetAusName(szName)
 		--     if tInfo then
@@ -131,7 +131,7 @@ function MY_Farbnamen.Render(szMsg)
 		--         szExtra1 = string.gsub(szExtra1, 'eventid=%d+', '')
 		--         szExtra2 = string.gsub(szExtra2, 'eventid=%d+', '')
 		--         return string.format(
-		--             '<text>%stext="[%s]"%s eventid=883 script="this.OnItemMouseEnter=function() MY_Farbnamen.ShowTip(this) end\nthis.OnItemMouseLeave=function() HideTip() end" r=%d g=%d b=%d</text>',
+		--             '<text>%stext='[%s]'%s eventid=883 script='this.OnItemMouseEnter=function() MY_Farbnamen.ShowTip(this) end\nthis.OnItemMouseLeave=function() HideTip() end' r=%d g=%d b=%d</text>',
 		--             szExtra1, szName, szExtra2, tInfo.rgb[1], tInfo.rgb[2], tInfo.rgb[3]
 		--         )
 		--     end
@@ -186,7 +186,7 @@ function MY_Farbnamen.GetTip(szName)
 		-- 随身便笺
 		if MY_Anmerkungen and MY_Anmerkungen.GetPlayerNote then
 			local note = MY_Anmerkungen.GetPlayerNote(tInfo.dwID)
-			if note and note.szContent ~= "" then
+			if note and note.szContent ~= '' then
 				tinsert(tTip, GetFormatText(note.szContent, 0))
 				tinsert(tTip, XML_LINE_BREAKER)
 			end
@@ -194,7 +194,7 @@ function MY_Farbnamen.GetTip(szName)
 		-- 调试信息
 		if IsCtrlKeyDown() then
 			tinsert(tTip, XML_LINE_BREAKER)
-			tinsert(tTip, GetFormatText(_L("Player ID: %d", tInfo.dwID), 102))
+			tinsert(tTip, GetFormatText(_L('Player ID: %d', tInfo.dwID), 102))
 		end
 		-- 组装Tip
 		return tconcat(tTip)
@@ -202,7 +202,7 @@ function MY_Farbnamen.GetTip(szName)
 end
 
 function MY_Farbnamen.ShowTip(namelink)
-	if type(namelink) ~= "table" then
+	if type(namelink) ~= 'table' then
 		namelink = this
 	end
 	if not namelink then
@@ -243,35 +243,35 @@ local function GetTongName(dwID)
 end
 
 local function OnExit()
-	DB:Execute("BEGIN TRANSACTION")
+	DB:Execute('BEGIN TRANSACTION')
 	for i, p in pairs(l_infocache_w) do
 		DBI_W:ClearBindings()
 		DBI_W:BindAll(p.id, p.name, p.force, p.role, p.level, p.title, p.camp, p.tong)
 		DBI_W:Execute()
 	end
-	DB:Execute("END TRANSACTION")
+	DB:Execute('END TRANSACTION')
 
-	DB:Execute("BEGIN TRANSACTION")
+	DB:Execute('BEGIN TRANSACTION')
 	for id, name in pairs(l_tongnames_w) do
 		DBT_W:ClearBindings()
 		DBT_W:BindAll(id, name)
 		DBT_W:Execute()
 	end
-	DB:Execute("END TRANSACTION")
+	DB:Execute('END TRANSACTION')
 
 	DB:Release()
 end
-MY.RegisterExit("MY_Farbnamen_Save", OnExit)
+MY.RegisterExit('MY_Farbnamen_Save', OnExit)
 
 -- 通过szName获取信息
 function MY_Farbnamen.Get(szKey)
 	local info = l_remoteinfocache[szKey] or l_infocache[szKey]
 	if not info then
-		if type(szKey) == "string" then
+		if type(szKey) == 'string' then
 			DBI_RN:ClearBindings()
 			DBI_RN:BindAll(szKey)
 			info = DBI_RN:GetNext()
-		elseif type(szKey) == "number" then
+		elseif type(szKey) == 'number' then
 			DBI_RI:ClearBindings()
 			DBI_RI:BindAll(szKey)
 			info = DBI_RI:GetNext()
@@ -290,8 +290,8 @@ function MY_Farbnamen.Get(szKey)
 			nLevel    = info.level,
 			szTitle   = info.title,
 			nCamp     = info.camp,
-			szTongID  = GetTongName(info.tong) or "",
-			rgb       = { MY.GetForceColor(info.force, "forecolor") },
+			szTongID  = GetTongName(info.tong) or '',
+			rgb       = { MY.GetForceColor(info.force, 'forecolor') },
 		}
 	end
 end
@@ -306,7 +306,7 @@ end
 -- 保存指定dwID的玩家
 function MY_Farbnamen.AddAusID(dwID)
 	local player = GetPlayer(dwID)
-	if not player or not player.szName or player.szName == "" then
+	if not player or not player.szName or player.szName == '' then
 		return false
 	else
 		local info = l_infocache[player.dwID] or {}
@@ -326,7 +326,7 @@ function MY_Farbnamen.AddAusID(dwID)
 			local dwTongID = player.dwTongID
 			if dwTongID and dwTongID ~= 0 then
 				local szTong = GetTongClient().ApplyGetTongName(dwTongID, 254)
-				if szTong and szTong ~= "" then
+				if szTong and szTong ~= '' then
 					l_tongnames[dwTongID] = szTong
 					l_tongnames_w[dwTongID] = szTong
 				end
@@ -345,7 +345,7 @@ end
 function MY_Farbnamen.GetMenu()
 	local t = {szOption = _L['Farbnamen']}
 	table.insert(t, {
-		szOption = _L["enable"],
+		szOption = _L['enable'],
 		fnAction = function()
 			MY_Farbnamen.bEnabled = not MY_Farbnamen.bEnabled
 		end,
@@ -356,16 +356,16 @@ function MY_Farbnamen.GetMenu()
 		szOption = _L['customize color'],
 		fnAction = function()
 			MY.OpenPanel()
-			MY.SwitchTab("GlobalColor")
+			MY.SwitchTab('GlobalColor')
 		end,
 		fnDisable = function()
 			return not MY_Farbnamen.bEnabled
 		end,
 	})
 	table.insert(t, {
-		szOption = _L["reset data"],
+		szOption = _L['reset data'],
 		fnAction = function()
-			DB:Execute("DELETE FROM InfoCache")
+			DB:Execute('DELETE FROM InfoCache')
 			MY.Sysmsg({_L['cache data deleted.']}, _L['Farbnamen'])
 		end,
 		fnDisable = function()
@@ -396,7 +396,7 @@ local function OnPeekPlayer()
 		l_peeklist[arg1] = 0
 	end
 end
-MY.RegisterEvent("PEEK_OTHER_PLAYER", OnPeekPlayer)
-MY.RegisterEvent("PLAYER_ENTER_SCENE", function() l_peeklist[arg0] = 0 end)
-MY.RegisterEvent("ON_GET_TONG_NAME_NOTIFY", function() l_tongnames[arg1], l_tongnames_w[arg1] = arg2, arg2 end)
+MY.RegisterEvent('PEEK_OTHER_PLAYER', OnPeekPlayer)
+MY.RegisterEvent('PLAYER_ENTER_SCENE', function() l_peeklist[arg0] = 0 end)
+MY.RegisterEvent('ON_GET_TONG_NAME_NOTIFY', function() l_tongnames[arg1], l_tongnames_w[arg1] = arg2, arg2 end)
 end

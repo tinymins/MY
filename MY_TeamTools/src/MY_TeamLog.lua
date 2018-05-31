@@ -3,7 +3,7 @@
 -- @Last modified by:   Emil Zhai
 -- @Last modified time: 2016-12-08 17:55:51
 
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_TeamTools/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TeamTools/lang/')
 
 local pairs, ipairs = pairs, ipairs
 local GetCurrentTime = GetCurrentTime
@@ -47,9 +47,9 @@ local function OnSkillEffectLog(dwCaster, dwTarget, nEffectType, dwSkillID, dwLe
 				szCaster = MY.GetObjectName(KCaster)
 			end
 		else
-			szCaster = _L["OUTER GUEST"]
+			szCaster = _L['OUTER GUEST']
 		end
-		local key = dwTarget == PLAYER_ID and "self" or dwTarget
+		local key = dwTarget == PLAYER_ID and 'self' or dwTarget
 		if not DAMAGE_LOG[key] then
 			DAMAGE_LOG[key] = {}
 		elseif DAMAGE_LOG[key][MAX_COUNT] then
@@ -58,7 +58,7 @@ local function OnSkillEffectLog(dwCaster, dwTarget, nEffectType, dwSkillID, dwLe
 		tinsert(DAMAGE_LOG[key], 1, {
 			nCurrentTime    = GetCurrentTime(),
 			szKiller        = szCaster,
-			szSkill         = szSkill .. (nEffectType == SKILL_EFFECT_TYPE.BUFF and "(BUFF)" or ""),
+			szSkill         = szSkill .. (nEffectType == SKILL_EFFECT_TYPE.BUFF and '(BUFF)' or ''),
 			tResult         = tResult,
 			bCriticalStrike = bCriticalStrike,
 		})
@@ -73,10 +73,10 @@ local function OnSkillEffectLog(dwCaster, dwTarget, nEffectType, dwSkillID, dwLe
 				szTarget = MY.GetObjectName(KTarget)
 			end
 		else
-			szTarget = _L["OUTER GUEST"]
+			szTarget = _L['OUTER GUEST']
 		end
 
-		local key = dwCaster == PLAYER_ID and "self" or dwCaster
+		local key = dwCaster == PLAYER_ID and 'self' or dwCaster
 		if not DAMAGE_LOG[key] then
 			DAMAGE_LOG[key] = {}
 		elseif DAMAGE_LOG[key][MAX_COUNT] then
@@ -85,7 +85,7 @@ local function OnSkillEffectLog(dwCaster, dwTarget, nEffectType, dwSkillID, dwLe
 		tinsert(DAMAGE_LOG[key], 1, {
 			nCurrentTime    = GetCurrentTime(),
 			szKiller        = szTarget,
-			szSkill         = szSkill .. (nEffectType == SKILL_EFFECT_TYPE.BUFF and "(BUFF)" or ""),
+			szSkill         = szSkill .. (nEffectType == SKILL_EFFECT_TYPE.BUFF and '(BUFF)' or ''),
 			tResult         = tResult,
 			bCriticalStrike = bCriticalStrike,
 		})
@@ -103,7 +103,7 @@ local function OnCommonHealthLog(dwCharacterID, nDeltaLife)
 		return
 	end
 	if MY_IsParty(dwCharacterID) or dwCharacterID == PLAYER_ID then
-		local key = dwCharacterID == PLAYER_ID and "self" or dwCharacterID
+		local key = dwCharacterID == PLAYER_ID and 'self' or dwCharacterID
 		if not DAMAGE_LOG[key] then
 			DAMAGE_LOG[key] = {}
 		elseif DAMAGE_LOG[key][MAX_COUNT] then
@@ -117,7 +117,7 @@ local function OnSkill(dwCaster, dwSkillID, dwLevel)
 	local p = GetPlayer(dwCaster)
 	if not p then return end
 
-	local key = dwCaster == PLAYER_ID and "self" or dwCaster
+	local key = dwCaster == PLAYER_ID and 'self' or dwCaster
 	if not DAMAGE_LOG[key] then
 		DAMAGE_LOG[key] = {}
 	elseif DAMAGE_LOG[key][MAX_COUNT] then
@@ -134,10 +134,10 @@ end
 -- 这就特别郁闷
 local function OnDeath(dwCharacterID, dwKiller)
 	if IsPlayer(dwCharacterID) and (MY_IsParty(dwCharacterID) or dwCharacterID == PLAYER_ID) then
-		dwCharacterID = dwCharacterID == PLAYER_ID and "self" or dwCharacterID
+		dwCharacterID = dwCharacterID == PLAYER_ID and 'self' or dwCharacterID
 		DEATH_LOG[dwCharacterID] = DEATH_LOG[dwCharacterID] or {}
 		local killer = (IsPlayer(dwKiller) and GetPlayer(dwKiller)) or (not IsPlayer(dwKiller) and GetNpc(dwKiller))
-		local szKiller = killer and MY.GetObjectName(killer, true) or ""
+		local szKiller = killer and MY.GetObjectName(killer, true) or ''
 		if DAMAGE_LOG[dwCharacterID] then
 			tinsert(DEATH_LOG[dwCharacterID], {
 				nCurrentTime = GetCurrentTime(),
@@ -152,26 +152,26 @@ local function OnDeath(dwCharacterID, dwKiller)
 			})
 		end
 		DAMAGE_LOG[dwCharacterID] = nil
-		FireUIEvent("MY_RAIDTOOLS_DEATH", dwCharacterID)
+		FireUIEvent('MY_RAIDTOOLS_DEATH', dwCharacterID)
 	end
 end
 
-RegisterEvent("LOADING_END", function()
+RegisterEvent('LOADING_END', function()
 	DAMAGE_LOG = {}
 	PLAYER_ID  = UI_GetClientPlayerID()
 end)
 
-RegisterEvent("SYS_MSG", function()
-	if arg0 == "UI_OME_DEATH_NOTIFY" then -- 死亡记录
+RegisterEvent('SYS_MSG', function()
+	if arg0 == 'UI_OME_DEATH_NOTIFY' then -- 死亡记录
 		OnDeath(arg1, arg2)
-	elseif arg0 == "UI_OME_SKILL_EFFECT_LOG" then -- 技能记录
+	elseif arg0 == 'UI_OME_SKILL_EFFECT_LOG' then -- 技能记录
 		OnSkillEffectLog(arg1, arg2, arg4, arg5, arg6, arg7, arg8, arg9)
-	elseif arg0 == "UI_OME_COMMON_HEALTH_LOG" then
+	elseif arg0 == 'UI_OME_COMMON_HEALTH_LOG' then
 		OnCommonHealthLog(arg1, arg2)
 	end
 end)
 
-RegisterEvent("DO_SKILL_CAST", function()
+RegisterEvent('DO_SKILL_CAST', function()
 	if arg1 == 608 and IsPlayer(arg0) then -- 自觉经脉
 		OnSkill(arg0, arg1, arg2)
 	end
@@ -183,5 +183,5 @@ end
 
 function MY_RaidTools.ClearDeathLog()
 	DEATH_LOG = {}
-	FireUIEvent("MY_RAIDTOOLS_DEATH")
+	FireUIEvent('MY_RAIDTOOLS_DEATH')
 end

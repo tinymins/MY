@@ -22,86 +22,86 @@ local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 -----------------------------------------------------------------------------------------
 
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_TargetMon/lang/")
-local INI_PATH = MY.GetAddonInfo().szRoot .. "MY_TargetMon/ui/MY_TargetMon.ini"
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TargetMon/lang/')
+local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/ui/MY_TargetMon.ini'
 local ROLE_CONFIG_FILE = {'config/my_targetmon.jx3dat', MY_DATA_PATH.ROLE}
-local TEMPLATE_CONFIG_FILE = MY.GetAddonInfo().szRoot .. "MY_TargetMon/data/template/$lang.jx3dat"
-local EMBEDDED_CONFIG_FILE = MY.GetAddonInfo().szRoot .. "MY_TargetMon/data/embedded/$lang.jx3dat"
+local TEMPLATE_CONFIG_FILE = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/data/template/$lang.jx3dat'
+local EMBEDDED_CONFIG_FILE = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/data/embedded/$lang.jx3dat'
 local CUSTOM_DEFAULT_CONFIG_FILE = {'config/my_targetmon.jx3dat', MY_DATA_PATH.GLOBAL}
 local CUSTOM_BOXBG_STYLES = {
-	"UI/Image/Common/Box.UITex|0",
-	"UI/Image/Common/Box.UITex|1",
-	"UI/Image/Common/Box.UITex|2",
-	"UI/Image/Common/Box.UITex|3",
-	"UI/Image/Common/Box.UITex|4",
-	"UI/Image/Common/Box.UITex|5",
-	"UI/Image/Common/Box.UITex|6",
-	"UI/Image/Common/Box.UITex|7",
-	"UI/Image/Common/Box.UITex|8",
-	"UI/Image/Common/Box.UITex|9",
-	"UI/Image/Common/Box.UITex|10",
-	"UI/Image/Common/Box.UITex|11",
-	"UI/Image/Common/Box.UITex|12",
-	"UI/Image/Common/Box.UITex|13",
-	"UI/Image/Common/Box.UITex|14",
-	"UI/Image/Common/Box.UITex|34",
-	"UI/Image/Common/Box.UITex|35",
-	"UI/Image/Common/Box.UITex|42",
-	"UI/Image/Common/Box.UITex|43",
-	"UI/Image/Common/Box.UITex|44",
-	"UI/Image/Common/Box.UITex|45",
-	"UI/Image/Common/Box.UITex|77",
-	"UI/Image/Common/Box.UITex|78",
+	'UI/Image/Common/Box.UITex|0',
+	'UI/Image/Common/Box.UITex|1',
+	'UI/Image/Common/Box.UITex|2',
+	'UI/Image/Common/Box.UITex|3',
+	'UI/Image/Common/Box.UITex|4',
+	'UI/Image/Common/Box.UITex|5',
+	'UI/Image/Common/Box.UITex|6',
+	'UI/Image/Common/Box.UITex|7',
+	'UI/Image/Common/Box.UITex|8',
+	'UI/Image/Common/Box.UITex|9',
+	'UI/Image/Common/Box.UITex|10',
+	'UI/Image/Common/Box.UITex|11',
+	'UI/Image/Common/Box.UITex|12',
+	'UI/Image/Common/Box.UITex|13',
+	'UI/Image/Common/Box.UITex|14',
+	'UI/Image/Common/Box.UITex|34',
+	'UI/Image/Common/Box.UITex|35',
+	'UI/Image/Common/Box.UITex|42',
+	'UI/Image/Common/Box.UITex|43',
+	'UI/Image/Common/Box.UITex|44',
+	'UI/Image/Common/Box.UITex|45',
+	'UI/Image/Common/Box.UITex|77',
+	'UI/Image/Common/Box.UITex|78',
 }
 local CUSTOM_CDBAR_STYLES = {
-	MY.GetAddonInfo().szUITexST .. "|" .. 0,
-	MY.GetAddonInfo().szUITexST .. "|" .. 1,
-	MY.GetAddonInfo().szUITexST .. "|" .. 2,
-	MY.GetAddonInfo().szUITexST .. "|" .. 3,
-	MY.GetAddonInfo().szUITexST .. "|" .. 4,
-	MY.GetAddonInfo().szUITexST .. "|" .. 5,
-	MY.GetAddonInfo().szUITexST .. "|" .. 6,
-	MY.GetAddonInfo().szUITexST .. "|" .. 7,
-	MY.GetAddonInfo().szUITexST .. "|" .. 8,
-	"/ui/Image/Common/Money.UITex|168",
-	"/ui/Image/Common/Money.UITex|203",
-	"/ui/Image/Common/Money.UITex|204",
-	"/ui/Image/Common/Money.UITex|205",
-	"/ui/Image/Common/Money.UITex|206",
-	"/ui/Image/Common/Money.UITex|207",
-	"/ui/Image/Common/Money.UITex|208",
-	"/ui/Image/Common/Money.UITex|209",
-	"/ui/Image/Common/Money.UITex|210",
-	"/ui/Image/Common/Money.UITex|211",
-	"/ui/Image/Common/Money.UITex|212",
-	"/ui/Image/Common/Money.UITex|213",
-	"/ui/Image/Common/Money.UITex|214",
-	"/ui/Image/Common/Money.UITex|215",
-	"/ui/Image/Common/Money.UITex|216",
-	"/ui/Image/Common/Money.UITex|217",
-	"/ui/Image/Common/Money.UITex|218",
-	"/ui/Image/Common/Money.UITex|219",
-	"/ui/Image/Common/Money.UITex|220",
-	"/ui/Image/Common/Money.UITex|228",
-	"/ui/Image/Common/Money.UITex|232",
-	"/ui/Image/Common/Money.UITex|233",
-	"/ui/Image/Common/Money.UITex|234",
+	MY.GetAddonInfo().szUITexST .. '|' .. 0,
+	MY.GetAddonInfo().szUITexST .. '|' .. 1,
+	MY.GetAddonInfo().szUITexST .. '|' .. 2,
+	MY.GetAddonInfo().szUITexST .. '|' .. 3,
+	MY.GetAddonInfo().szUITexST .. '|' .. 4,
+	MY.GetAddonInfo().szUITexST .. '|' .. 5,
+	MY.GetAddonInfo().szUITexST .. '|' .. 6,
+	MY.GetAddonInfo().szUITexST .. '|' .. 7,
+	MY.GetAddonInfo().szUITexST .. '|' .. 8,
+	'/ui/Image/Common/Money.UITex|168',
+	'/ui/Image/Common/Money.UITex|203',
+	'/ui/Image/Common/Money.UITex|204',
+	'/ui/Image/Common/Money.UITex|205',
+	'/ui/Image/Common/Money.UITex|206',
+	'/ui/Image/Common/Money.UITex|207',
+	'/ui/Image/Common/Money.UITex|208',
+	'/ui/Image/Common/Money.UITex|209',
+	'/ui/Image/Common/Money.UITex|210',
+	'/ui/Image/Common/Money.UITex|211',
+	'/ui/Image/Common/Money.UITex|212',
+	'/ui/Image/Common/Money.UITex|213',
+	'/ui/Image/Common/Money.UITex|214',
+	'/ui/Image/Common/Money.UITex|215',
+	'/ui/Image/Common/Money.UITex|216',
+	'/ui/Image/Common/Money.UITex|217',
+	'/ui/Image/Common/Money.UITex|218',
+	'/ui/Image/Common/Money.UITex|219',
+	'/ui/Image/Common/Money.UITex|220',
+	'/ui/Image/Common/Money.UITex|228',
+	'/ui/Image/Common/Money.UITex|232',
+	'/ui/Image/Common/Money.UITex|233',
+	'/ui/Image/Common/Money.UITex|234',
 }
 local TARGET_TYPE_LIST = {
 	'CLIENT_PLAYER'  ,
 	'CONTROL_PLAYER' ,
 	'TARGET'         ,
 	'TTARGET'        ,
-	"TEAM_MARK_CLOUD",
-	"TEAM_MARK_SWORD",
-	"TEAM_MARK_AX"   ,
-	"TEAM_MARK_HOOK" ,
-	"TEAM_MARK_DRUM" ,
-	"TEAM_MARK_SHEAR",
-	"TEAM_MARK_STICK",
-	"TEAM_MARK_JADE" ,
-	"TEAM_MARK_DART" ,
-	"TEAM_MARK_FAN"  ,
+	'TEAM_MARK_CLOUD',
+	'TEAM_MARK_SWORD',
+	'TEAM_MARK_AX'   ,
+	'TEAM_MARK_HOOK' ,
+	'TEAM_MARK_DRUM' ,
+	'TEAM_MARK_SHEAR',
+	'TEAM_MARK_STICK',
+	'TEAM_MARK_JADE' ,
+	'TEAM_MARK_DART' ,
+	'TEAM_MARK_FAN'  ,
 }
 local Config, ConfigEmbedded, ConfigTemplate, ConfigDefault = {}, {}
 
@@ -111,11 +111,11 @@ local Config, ConfigEmbedded, ConfigTemplate, ConfigDefault = {}, {}
 local D = {}
 
 function D.GetFrame(config)
-	return Station.Lookup("Normal/MY_TargetMon#" .. tostring(config):sub(8))
+	return Station.Lookup('Normal/MY_TargetMon#' .. tostring(config):sub(8))
 end
 
 function D.OpenFrame(config)
-	Wnd.OpenWindow(INI_PATH, "MY_TargetMon#" .. tostring(config):sub(8))
+	Wnd.OpenWindow(INI_PATH, 'MY_TargetMon#' .. tostring(config):sub(8))
 end
 
 function D.CloseFrame(config)
@@ -124,14 +124,14 @@ function D.CloseFrame(config)
 			D.CloseFrame(config)
 		end
 	else
-		Wnd.CloseWindow("MY_TargetMon#" .. tostring(config):sub(8))
+		Wnd.CloseWindow('MY_TargetMon#' .. tostring(config):sub(8))
 	end
 end
 
 function D.CheckFrame(config)
 	if config.enable then
 		if D.GetFrame(config) then
-			FireUIEvent("MY_TARGET_MON_RELOAD", config)
+			FireUIEvent('MY_TARGET_MON_RELOAD', config)
 		else
 			D.OpenFrame(config)
 		end
@@ -156,25 +156,25 @@ end
 
 do
 local TEAM_MARK = {
-	["TEAM_MARK_CLOUD"] = 1,
-	["TEAM_MARK_SWORD"] = 2,
-	["TEAM_MARK_AX"   ] = 3,
-	["TEAM_MARK_HOOK" ] = 4,
-	["TEAM_MARK_DRUM" ] = 5,
-	["TEAM_MARK_SHEAR"] = 6,
-	["TEAM_MARK_STICK"] = 7,
-	["TEAM_MARK_JADE" ] = 8,
-	["TEAM_MARK_DART" ] = 9,
-	["TEAM_MARK_FAN"  ] = 10,
+	['TEAM_MARK_CLOUD'] = 1,
+	['TEAM_MARK_SWORD'] = 2,
+	['TEAM_MARK_AX'   ] = 3,
+	['TEAM_MARK_HOOK' ] = 4,
+	['TEAM_MARK_DRUM' ] = 5,
+	['TEAM_MARK_SHEAR'] = 6,
+	['TEAM_MARK_STICK'] = 7,
+	['TEAM_MARK_JADE' ] = 8,
+	['TEAM_MARK_DART' ] = 9,
+	['TEAM_MARK_FAN'  ] = 10,
 }
 function D.GetTarget(eTarType, eMonType)
-	if eMonType == "SKILL" or eTarType == "CONTROL_PLAYER" then
+	if eMonType == 'SKILL' or eTarType == 'CONTROL_PLAYER' then
 		return TARGET.PLAYER, GetControlPlayerID()
-	elseif eTarType == "CLIENT_PLAYER" then
+	elseif eTarType == 'CLIENT_PLAYER' then
 		return TARGET.PLAYER, UI_GetClientPlayerID()
-	elseif eTarType == "TARGET" then
+	elseif eTarType == 'TARGET' then
 		return MY.GetTarget()
-	elseif eTarType == "TTARGET" then
+	elseif eTarType == 'TTARGET' then
 		local KTarget = MY.GetObject(MY.GetTarget())
 		if KTarget then
 			return MY.GetTarget(KTarget)
@@ -184,7 +184,7 @@ function D.GetTarget(eTarType, eMonType)
 		if mark then
 			for dwID, nMark in pairs(mark) do
 				if TEAM_MARK[eTarType] == nMark then
-					return TARGET[IsPlayer(dwID) and "PLAYER" or "NPC"], dwID
+					return TARGET[IsPlayer(dwID) and 'PLAYER' or 'NPC'], dwID
 				end
 			end
 		end
@@ -243,8 +243,8 @@ function D.FormatConfigStructure(config)
 		if config.monitors.common then
 			local monitors = {}
 			for dwKungfuID, aMonList in pairs(config.monitors) do
-				if dwKungfuID == "common" then
-					dwKungfuID = "all"
+				if dwKungfuID == 'common' then
+					dwKungfuID = 'all'
 				end
 				for _, mon in ipairs(aMonList) do
 					mon.kungfus = { [dwKungfuID] = true }
@@ -260,7 +260,7 @@ function D.FormatConfigStructure(config)
 		if embedded.uuid == config.uuid then
 			-- 设置内嵌数据默认属性
 			for k, v in pairs(embedded) do
-				if k ~= "monitors" and config[k] == nil then
+				if k ~= 'monitors' and config[k] == nil then
 					config[k] = v
 				end
 			end
@@ -309,7 +309,7 @@ function D.FormatSavingConfig(config)
 			local cfg = { uuid = config.uuid, monitors = {} }
 			-- 保存修改的全局属性
 			for k, v in pairs(config) do
-				if k ~= "uuid" and k ~= "monitors" and v ~= embedded[k] then
+				if k ~= 'uuid' and k ~= 'monitors' and v ~= embedded[k] then
 					cfg[k] = v
 				end
 			end
@@ -370,7 +370,7 @@ function D.LoadConfig(bDefault, bOriginal)
 	if Embedded then
 		for _, config in ipairs(clone(ConfigEmbedded)) do
 			for k, v in pairs(Embedded[config.caption] or {}) do
-				if k ~= "caption" and k ~= "target" and k ~= "monitors" then
+				if k ~= 'caption' and k ~= 'target' and k ~= 'monitors' then
 					config[k] = v
 				end
 			end
@@ -406,12 +406,12 @@ local function OnInit()
 	ConfigEmbedded = MY.LoadLUAData(EMBEDDED_CONFIG_FILE) or {}
 	D.LoadConfig()
 end
-MY.RegisterInit("MY_TargetMon", OnInit)
+MY.RegisterInit('MY_TargetMon', OnInit)
 
 local function OnExit()
 	MY.SaveLUAData(ROLE_CONFIG_FILE, D.FormatSavingConfigs(Config))
 end
-MY.RegisterExit("MY_TargetMon", OnExit)
+MY.RegisterExit('MY_TargetMon', OnExit)
 end
 
 ----------------------------------------------------------------------------------------------
@@ -421,12 +421,12 @@ do
 for i = 1, 5 do
 	for j = 1, 10 do
 		Hotkey.AddBinding(
-			"MY_TargetMon_" .. i .. "_" .. j, _L("Cancel buff %d - %d", i, j),
-			i == 1 and j == 1 and _L["MY Buff Monitor"] or "",
+			'MY_TargetMon_' .. i .. '_' .. j, _L('Cancel buff %d - %d', i, j),
+			i == 1 and j == 1 and _L['MY Buff Monitor'] or '',
 			function()
 				if MY.IsShieldedVersion() and not MY.IsInDungeon(true) then
 					if not IsDebugClient() then
-						OutputMessage("MSG_ANNOUNCE_YELLOW", _L['Cancel buff is disabled outside dungeon.'])
+						OutputMessage('MSG_ANNOUNCE_YELLOW', _L['Cancel buff is disabled outside dungeon.'])
 					end
 					return
 				end
@@ -438,7 +438,7 @@ for i = 1, 5 do
 				if not frame then
 					return
 				end
-				local hItem = frame:Lookup("", "Handle_List"):Lookup(j - 1)
+				local hItem = frame:Lookup('', 'Handle_List'):Lookup(j - 1)
 				if not hItem then
 					return
 				end
@@ -457,20 +457,20 @@ end
 ----------------------------------------------------------------------------------------------
 local PS = {}
 local function GenePS(ui, config, x, y, w, h, OpenConfig)
-	ui:append("Text", {
+	ui:append('Text', {
 		x = x, y = y - 3, w = 20,
 		r = 255, g = 255, b = 0,
-		text = _L["*"],
+		text = _L['*'],
 	})
-	ui:append("WndEditBox", {
+	ui:append('WndEditBox', {
 		x = x + 20, y = y, w = w - 290, h = 22,
 		r = 255, g = 255, b = 0, text = config.caption,
 		onchange = function(val) config.caption = val end,
 	})
-	ui:append("WndButton2", {
+	ui:append('WndButton2', {
 		x = w - 180, y = y,
 		w = 50, h = 25,
-		text = _L["Move Up"],
+		text = _L['Move Up'],
 		onclick = function()
 			for i = 1, #Config do
 				if Config[i] == config then
@@ -478,16 +478,16 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 						Config[i], Config[i - 1] = Config[i - 1], Config[i]
 						D.CheckFrame(Config[i])
 						D.CheckFrame(Config[i - 1])
-						return MY.SwitchTab("MY_TargetMon", true)
+						return MY.SwitchTab('MY_TargetMon', true)
 					end
 				end
 			end
 		end,
 	})
-	ui:append("WndButton2", {
+	ui:append('WndButton2', {
 		x = w - 125, y = y,
 		w = 50, h = 25,
-		text = _L["Move Down"],
+		text = _L['Move Down'],
 		onclick = function()
 			for i = 1, #Config do
 				if Config[i] == config then
@@ -495,16 +495,16 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 						Config[i], Config[i + 1] = Config[i + 1], Config[i]
 						D.CheckFrame(Config[i])
 						D.CheckFrame(Config[i + 1])
-						return MY.SwitchTab("MY_TargetMon", true)
+						return MY.SwitchTab('MY_TargetMon', true)
 					end
 				end
 			end
 		end,
 	})
-	ui:append("WndButton2", {
+	ui:append('WndButton2', {
 		x = w - 70, y = y,
 		w = 60, h = 25,
-		text = _L["Delete"],
+		text = _L['Delete'],
 		onclick = function()
 			for i, c in ipairs_r(Config) do
 				if config == c then
@@ -512,12 +512,12 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 				end
 			end
 			D.CloseFrame(config)
-			MY.SwitchTab("MY_TargetMon", true)
+			MY.SwitchTab('MY_TargetMon', true)
 		end,
 	})
 	y = y + 30
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x + 20, y = y,
 		text = _L['Enable'],
 		checked = config.enable,
@@ -527,7 +527,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		end,
 	})
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x + 110, y = y, w = 200,
 		text = _L['Hide others buff'],
 		tip = _L['Hide others buff TIP'],
@@ -542,7 +542,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		end,
 	})
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x + 200, y = y, w = 180,
 		text = _L['Hide void'],
 		checked = config.hideVoid,
@@ -553,7 +553,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		autoenable = function() return config.enable end,
 	})
 
-	ui:append("WndComboBox", {
+	ui:append('WndComboBox', {
 		x = w - 250, y = y, w = 135,
 		text = _L['Set target'],
 		menu = function()
@@ -562,9 +562,9 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 				insert(t, {
 					szOption = _L.TARGET[eType],
 					bCheck = true, bMCheck = true,
-					bChecked = eType == (config.type == "SKILL" and "CONTROL_PLAYER" or config.target),
+					bChecked = eType == (config.type == 'SKILL' and 'CONTROL_PLAYER' or config.target),
 					fnDisable = function()
-						return config.type == "SKILL" and eType ~= "CONTROL_PLAYER"
+						return config.type == 'SKILL' and eType ~= 'CONTROL_PLAYER'
 					end,
 					fnAction = function()
 						config.target = eType
@@ -598,7 +598,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		end,
 		autoenable = function() return config.enable end,
 	})
-	ui:append("WndButton2", {
+	ui:append('WndButton2', {
 		x = w - 110, y = y, w = 102,
 		text = _L['Set monitor'],
 		onclick = function() OpenConfig(config) end,
@@ -606,7 +606,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 	})
 	y = y + 30
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x + 20, y = y, w = 90,
 		text = _L['Penetrable'],
 		checked = config.penetrable,
@@ -617,7 +617,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		autoenable = function() return config.enable end,
 	})
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x + 110, y = y, w = 100,
 		text = _L['Undragable'],
 		checked = not config.dragable,
@@ -628,7 +628,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		autoenable = function() return config.enable and not config.penetrable end,
 	})
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x + 200, y = y, w = 120,
 		text = _L['Ignore system ui scale'],
 		checked = config.ignoreSystemUIScale,
@@ -639,12 +639,12 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		autoenable = function() return config.enable end,
 	})
 
-	ui:append("WndSliderBox", {
+	ui:append('WndSliderBox', {
 		x = w - 250, y = y,
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		range = {1, 32},
 		value = config.maxLineCount,
-		textfmt = function(val) return _L("Display %d eachline.", val) end,
+		textfmt = function(val) return _L('Display %d eachline.', val) end,
 		onchange = function(val)
 			config.maxLineCount = val
 			D.CheckFrame(config)
@@ -653,7 +653,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 	})
 	y = y + 30
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x + 20, y = y, w = 200,
 		text = _L['Show cd circle'],
 		checked = config.cdCircle,
@@ -664,7 +664,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		autoenable = function() return config.enable end,
 	})
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x + 110, y = y, w = 200,
 		text = _L['Show cd flash'],
 		checked = config.cdFlash,
@@ -675,7 +675,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		autoenable = function() return config.enable end,
 	})
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x + 200, y = y, w = 200,
 		text = _L['Show cd ready spark'],
 		checked = config.cdReadySpark,
@@ -686,12 +686,12 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		autoenable = function() return config.enable end,
 	})
 
-	ui:append("WndSliderBox", {
+	ui:append('WndSliderBox', {
 		x = w - 250, y = y,
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		range = {1, 300},
 		value = config.scale * 100,
-		textfmt = function(val) return _L("Scale %d%%.", val) end,
+		textfmt = function(val) return _L('Scale %d%%.', val) end,
 		onchange = function(val)
 			config.scale = val / 100
 			D.CheckFrame(config)
@@ -700,7 +700,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 	})
 	y = y + 30
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x + 20, y = y, w = 120,
 		text = _L['Show cd bar'],
 		checked = config.cdBar,
@@ -711,7 +711,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		autoenable = function() return config.enable end,
 	})
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x + 110, y = y, w = 120,
 		text = _L['Show name'],
 		checked = config.showName,
@@ -722,7 +722,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		autoenable = function() return config.enable end,
 	})
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x + 200, y = y, w = 120,
 		text = _L['Show time'],
 		checked = config.showTime,
@@ -733,12 +733,12 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		autoenable = function() return config.enable end,
 	})
 
-	ui:append("WndSliderBox", {
+	ui:append('WndSliderBox', {
 		x = w - 250, y = y,
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		range = {50, 1000},
 		value = config.cdBarWidth,
-		textfmt = function(val) return _L("CD width %dpx.", val) end,
+		textfmt = function(val) return _L('CD width %dpx.', val) end,
 		onchange = function(val)
 			config.cdBarWidth = val
 			D.CheckFrame(config)
@@ -747,13 +747,13 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 	})
 	y = y + 30
 
-	ui:append("WndComboBox", {
+	ui:append('WndComboBox', {
 		x = 40, y = y, w = (w - 250 - 30 - 30 - 10) / 2,
 		text = _L['Select background style'],
 		menu = function()
 			local t, subt, szIcon, nFrame = {}
 			for _, text in ipairs(CUSTOM_BOXBG_STYLES) do
-				szIcon, nFrame = unpack(text:split("|"))
+				szIcon, nFrame = unpack(text:split('|'))
 				subt = {
 					szOption = text,
 					fnAction = function()
@@ -764,7 +764,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 					nFrame = nFrame,
 					nIconMarginLeft = -3,
 					nIconMarginRight = -3,
-					szLayer = "ICON_RIGHTMOST",
+					szLayer = 'ICON_RIGHTMOST',
 				}
 				if text == config.boxBgUITex then
 					subt.rgb = {255, 255, 0}
@@ -775,13 +775,13 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		end,
 		autoenable = function() return config.enable end,
 	})
-	ui:append("WndComboBox", {
+	ui:append('WndComboBox', {
 		x = 40 + (w - 250 - 30 - 30 - 10) / 2 + 10, y = y, w = (w - 250 - 30 - 30 - 10) / 2,
 		text = _L['Select countdown style'],
 		menu = function()
 			local t, subt, szIcon, nFrame = {}
 			for _, text in ipairs(CUSTOM_CDBAR_STYLES) do
-				szIcon, nFrame = unpack(text:split("|"))
+				szIcon, nFrame = unpack(text:split('|'))
 				subt = {
 					szOption = text,
 					fnAction = function()
@@ -790,7 +790,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 					end,
 					szIcon = szIcon,
 					nFrame = nFrame,
-					szLayer = "ICON_FILL",
+					szLayer = 'ICON_FILL',
 				}
 				if text == config.cdBarUITex then
 					subt.rgb = {255, 255, 0}
@@ -802,7 +802,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		autoenable = function() return config.enable end,
 	})
 
-	ui:append("WndSliderBox", {
+	ui:append('WndSliderBox', {
 		x = w - 250, y = y,
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		range = {-1, 30},
@@ -813,7 +813,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 			elseif val == 0 then
 				return _L['Never show decimal time.']
 			else
-				return _L("Show decimal time left in %ds.", val)
+				return _L('Show decimal time left in %ds.', val)
 			end
 		end,
 		onchange = function(val)
@@ -843,13 +843,13 @@ function PS.OnPanelActive(wnd)
 		local x0, y0 = 20, 20
 		local w0, h0 = w - 40, h - 30
 		local w1, x1 = w0 - 5, x0
-		local list = uiWrapper:append("WndListBox", { x = x1, y = y0 + 30, w = w1, h = h0 - 35 - 30 }, true)
+		local list = uiWrapper:append('WndListBox', { x = x1, y = y0 + 30, w = w1, h = h0 - 35 - 30 }, true)
 
 		local function Search()
 			list:listbox('clear')
 			local aMonList = l_config.monitors or {}
 			for i, mon in ipairs(aMonList) do
-				if not l_search or l_search == ""
+				if not l_search or l_search == ''
 				or (mon.name and wfind(mon.name, l_search))
 				or (mon.longAlias and wfind(mon.longAlias, l_search))
 				or (mon.shortAlias and wfind(mon.shortAlias, l_search)) then
@@ -865,8 +865,8 @@ function PS.OnPanelActive(wnd)
 
 		local function InsertMonitor(index)
 			GetUserInput(_L['Please input name:'], function(szVal)
-				szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
-				if szVal ~= "" then
+				szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
+				if szVal ~= '' then
 					local aMonList = l_config.monitors
 					local mon = MY_TargetMon.FormatMonStructure({
 						name = szVal,
@@ -891,7 +891,7 @@ function PS.OnPanelActive(wnd)
 					)
 					D.CheckFrame(l_config)
 				end
-			end, function() end, function() end, nil, "")
+			end, function() end, function() end, nil, '')
 		end
 
 		uiWrapper:append('WndEditBox', {
@@ -902,17 +902,17 @@ function PS.OnPanelActive(wnd)
 				Search()
 			end,
 		})
-		uiWrapper:append("WndButton2", {
+		uiWrapper:append('WndButton2', {
 			x = x1 + w1 - 60, y = y0 - 1, w = 60, h = 28,
 			text = _L['Add'], onclick = function() InsertMonitor() end,
-			autoenable = function() return not l_search or l_search == "" end,
+			autoenable = function() return not l_search or l_search == '' end,
 		})
 
 		-- 初始化list控件
 		local function onMenu(hItem, szText, szID, data)
 			local mon = data.mon
 			local monlist = data.monlist
-			local search = l_search and l_search ~= ""
+			local search = l_search and l_search ~= ''
 			local t1 = {
 				{
 					szOption = _L['Enable'],
@@ -933,7 +933,7 @@ function PS.OnPanelActive(wnd)
 								remove(monlist, i)
 							end
 						end
-						Wnd.CloseWindow("PopupMenuPanel")
+						Wnd.CloseWindow('PopupMenuPanel')
 						D.CheckFrame(l_config)
 					end,
 				},
@@ -988,12 +988,12 @@ function PS.OnPanelActive(wnd)
 					szOption = _L['Rename'],
 					fnAction = function()
 						GetUserInput(_L['Please input name:'], function(szVal)
-							szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
-							if szVal ~= "" then
+							szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
+							if szVal ~= '' then
 								list:listbox(
 									'update',
 									'id', mon,
-									{ "text" }, { szVal }
+									{ 'text' }, { szVal }
 								)
 								mon.name = szVal
 								mon.manually = true
@@ -1007,7 +1007,7 @@ function PS.OnPanelActive(wnd)
 					szOption = _L('Long alias: %s', mon.longAlias or _L['Not set']),
 					fnAction = function()
 						GetUserInput(_L['Please input long alias:'], function(szVal)
-							szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
+							szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
 							mon.longAlias = szVal
 							mon.manually = true
 							D.CheckFrame(l_config)
@@ -1025,7 +1025,7 @@ function PS.OnPanelActive(wnd)
 					szOption = _L('Short alias: %s', mon.shortAlias or _L['Not set']),
 					fnAction = function()
 						GetUserInput(_L['Please input short alias:'], function(szVal)
-							szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
+							szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
 							mon.shortAlias = szVal
 							mon.manually = true
 							D.CheckFrame(l_config)
@@ -1044,7 +1044,7 @@ function PS.OnPanelActive(wnd)
 			local t2 = {
 				szOption = _L['Self kungfu'],
 				{
-					szOption = _L["All kungfus"],
+					szOption = _L['All kungfus'],
 					rgb = {255, 255, 0},
 					bCheck = true,
 					bChecked = mon.kungfus.all,
@@ -1059,7 +1059,7 @@ function PS.OnPanelActive(wnd)
 				for i, dwKungfuID in ipairs(ForceIDToKungfuIDs(dwForceID) or {}) do
 					insert(t2, {
 						szOption = MY.GetSkillName(dwKungfuID, 1),
-						rgb = {MY.GetForceColor(dwForceID, "foreground")},
+						rgb = {MY.GetForceColor(dwForceID, 'foreground')},
 						bCheck = true,
 						bChecked = mon.kungfus[dwKungfuID],
 						fnAction = function()
@@ -1076,7 +1076,7 @@ function PS.OnPanelActive(wnd)
 			local t2 = {
 				szOption = _L['Target kungfu'],
 				{
-					szOption = _L["All kungfus"],
+					szOption = _L['All kungfus'],
 					rgb = {255, 255, 0},
 					bCheck = true,
 					bChecked = mon.tarkungfus.all,
@@ -1086,7 +1086,7 @@ function PS.OnPanelActive(wnd)
 					end,
 				},
 				{
-					szOption = _L["NPC"],
+					szOption = _L['NPC'],
 					rgb = {255, 255, 0},
 					bCheck = true,
 					bChecked = mon.tarkungfus.npc,
@@ -1101,7 +1101,7 @@ function PS.OnPanelActive(wnd)
 				for i, dwKungfuID in ipairs(ForceIDToKungfuIDs(dwForceID) or {}) do
 					insert(t2, {
 						szOption = MY.GetSkillName(dwKungfuID, 1),
-						rgb = {MY.GetForceColor(dwForceID, "foreground")},
+						rgb = {MY.GetForceColor(dwForceID, 'foreground')},
 						bCheck = true,
 						bChecked = mon.tarkungfus[dwKungfuID],
 						fnAction = function()
@@ -1117,7 +1117,7 @@ function PS.OnPanelActive(wnd)
 			local t2 = {
 				szOption = _L['Play sound when appear'],
 				fnMouseEnter = function()
-					if mon.soundAppear == "" then
+					if mon.soundAppear == '' then
 						return
 					end
 					OutputTip(GetFormatText(mon.soundAppear, nil, 255, 255, 0), 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
@@ -1133,12 +1133,12 @@ function PS.OnPanelActive(wnd)
 					end
 					file = MY.GetRelativePath(file, { 'audio/', MY_DATA_PATH.GLOBAL })
 					if not file then
-						return MY.Alert(_L('File path error! Not in "%s"!', MY.FormatPath({ 'audio/', MY_DATA_PATH.GLOBAL })))
+						return MY.Alert(_L('File path error! Not in '%s'!', MY.FormatPath({ 'audio/', MY_DATA_PATH.GLOBAL })))
 					end
 					mon.soundAppear = file
 				end,
 			}
-			if mon.soundAppear ~= "" then
+			if mon.soundAppear ~= '' then
 				t2.szIcon = 'ui/Image/UICommon/CommonPanel2.UITex'
 				t2.nFrame = 49
 				t2.nMouseOverFrame = 51
@@ -1146,8 +1146,8 @@ function PS.OnPanelActive(wnd)
 				t2.nIconHeight = 17
 				t2.szLayer = 'ICON_RIGHTMOST'
 				t2.fnClickIcon = function()
-					mon.soundAppear = ""
-					Wnd.CloseWindow("PopupMenuPanel")
+					mon.soundAppear = ''
+					Wnd.CloseWindow('PopupMenuPanel')
 				end
 			end
 			insert(t1, t2)
@@ -1155,7 +1155,7 @@ function PS.OnPanelActive(wnd)
 			local t2 = {
 				szOption = _L['Play sound when disappear'],
 				fnMouseEnter = function()
-					if mon.soundDisappear == "" then
+					if mon.soundDisappear == '' then
 						return
 					end
 					OutputTip(GetFormatText(mon.soundDisappear, nil, 255, 255, 0), 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
@@ -1171,12 +1171,12 @@ function PS.OnPanelActive(wnd)
 					end
 					file = MY.GetRelativePath(file, { 'audio/', MY_DATA_PATH.GLOBAL })
 					if not file then
-						return MY.Alert(_L('File path error! Not in "%s"!', MY.FormatPath({ 'audio/', MY_DATA_PATH.GLOBAL })))
+						return MY.Alert(_L('File path error! Not in '%s'!', MY.FormatPath({ 'audio/', MY_DATA_PATH.GLOBAL })))
 					end
 					mon.soundDisappear = file
 				end,
 			}
-			if mon.soundDisappear ~= "" then
+			if mon.soundDisappear ~= '' then
 				t2.szIcon = 'ui/Image/UICommon/CommonPanel2.UITex'
 				t2.nFrame = 49
 				t2.nMouseOverFrame = 51
@@ -1184,8 +1184,8 @@ function PS.OnPanelActive(wnd)
 				t2.nIconHeight = 17
 				t2.szLayer = 'ICON_RIGHTMOST'
 				t2.fnClickIcon = function()
-					mon.soundDisappear = ""
-					Wnd.CloseWindow("PopupMenuPanel")
+					mon.soundDisappear = ''
+					Wnd.CloseWindow('PopupMenuPanel')
 				end
 			end
 			insert(t1, t2)
@@ -1202,17 +1202,17 @@ function PS.OnPanelActive(wnd)
 						mon.manually = true
 						D.CheckFrame(l_config)
 					end,
-					szIcon = "fromiconid",
+					szIcon = 'fromiconid',
 					nFrame = mon.iconid,
 					nIconWidth = 22,
 					nIconHeight = 22,
-					szLayer = "ICON_RIGHTMOST",
+					szLayer = 'ICON_RIGHTMOST',
 					fnClickIcon = function()
 						XGUI.OpenIconPanel(function(dwIcon)
 							mon.manually = true
 							mon.iconid = dwIcon
 						end)
-						Wnd.CloseWindow("PopupMenuPanel")
+						Wnd.CloseWindow('PopupMenuPanel')
 					end,
 				})
 				for dwID, info in pairs(mon.ids) do
@@ -1228,11 +1228,11 @@ function PS.OnPanelActive(wnd)
 						fnDisable = function()
 							return mon.ignoreId
 						end,
-						szIcon = "fromiconid",
+						szIcon = 'fromiconid',
 						nFrame = info.iconid,
 						nIconWidth = 22,
 						nIconHeight = 22,
-						szLayer = "ICON_RIGHTMOST",
+						szLayer = 'ICON_RIGHTMOST',
 						fnClickIcon = function()
 							if mon.ignoreId then
 								return
@@ -1242,7 +1242,7 @@ function PS.OnPanelActive(wnd)
 								mon.manually = true
 								D.CheckFrame(l_config)
 							end)
-							Wnd.CloseWindow("PopupMenuPanel")
+							Wnd.CloseWindow('PopupMenuPanel')
 						end,
 					}
 					if not empty(info.levels) then
@@ -1257,11 +1257,11 @@ function PS.OnPanelActive(wnd)
 								mon.manually = true
 								D.CheckFrame(l_config)
 							end,
-							szIcon = "fromiconid",
+							szIcon = 'fromiconid',
 							nFrame = info.iconid,
 							nIconWidth = 22,
 							nIconHeight = 22,
-							szLayer = "ICON_RIGHTMOST",
+							szLayer = 'ICON_RIGHTMOST',
 							fnClickIcon = function()
 								if mon.ignoreId or info.ignoreLevel then
 									return
@@ -1270,7 +1270,7 @@ function PS.OnPanelActive(wnd)
 									info.iconid = dwIcon
 									mon.manually = true
 								end)
-								Wnd.CloseWindow("PopupMenuPanel")
+								Wnd.CloseWindow('PopupMenuPanel')
 							end,
 						})
 						local tLevels = {}
@@ -1288,18 +1288,18 @@ function PS.OnPanelActive(wnd)
 									fnDisable = function()
 										return mon.ignoreId or info.ignoreLevel
 									end,
-									szIcon = "fromiconid",
+									szIcon = 'fromiconid',
 									nFrame = infoLevel.iconid,
 									nIconWidth = 22,
 									nIconHeight = 22,
-									szLayer = "ICON_RIGHTMOST",
+									szLayer = 'ICON_RIGHTMOST',
 									fnClickIcon = function()
 										XGUI.OpenIconPanel(function(dwIcon)
 											infoLevel.iconid = dwIcon
 											mon.manually = true
 											D.CheckFrame(l_config)
 										end)
-										Wnd.CloseWindow("PopupMenuPanel")
+										Wnd.CloseWindow('PopupMenuPanel')
 									end,
 								}
 							})
@@ -1314,13 +1314,13 @@ function PS.OnPanelActive(wnd)
 						szOption = _L['Manual add level'],
 						fnAction = function()
 							GetUserInput(_L['Please input level:'], function(szVal)
-								local nLevel = tonumber(string.gsub(szVal, "^%s*(.-)%s*$", "%1"), 10)
+								local nLevel = tonumber(string.gsub(szVal, '^%s*(.-)%s*$', '%1'), 10)
 								if nLevel then
 									if info.levels[nLevel] then
 										return
 									end
 									local dwIconID = 13
-									if l_config.type == "SKILL" then
+									if l_config.type == 'SKILL' then
 										dwIconID = Table_GetSkillIconID(dwID, nLevel) or dwIconID
 									else
 										dwIconID = Table_GetBuffIconID(dwID, nLevel) or dwIconID
@@ -1357,13 +1357,13 @@ function PS.OnPanelActive(wnd)
 				szOption = _L['Manual add id'],
 				fnAction = function()
 					GetUserInput(_L['Please input id:'], function(szVal)
-						local dwID = tonumber(string.gsub(szVal, "^%s*(.-)%s*$", "%1"), 10)
+						local dwID = tonumber(string.gsub(szVal, '^%s*(.-)%s*$', '%1'), 10)
 						if dwID then
 							if mon.ids[dwID] then
 								return
 							end
 							local dwIconID = 13
-							if l_config.type == "SKILL" then
+							if l_config.type == 'SKILL' then
 								local dwLevel = GetClientPlayer().GetSkillLevel(dwID) or 1
 								dwIconID = Table_GetSkillIconID(dwID, dwLevel) or dwIconID
 							else
@@ -1405,22 +1405,22 @@ function PS.OnPanelActive(wnd)
 	y = y + 10
 
 	x = (w - 380) / 2
-	ui:append("WndButton2", {
+	ui:append('WndButton2', {
 		x = x, y = y,
 		w = 60, h = 30,
-		text = _L["Create"],
+		text = _L['Create'],
 		onclick = function()
 			local config = MY.FormatDataStructure(nil, ConfigTemplate)
 			insert(Config, config)
 			D.CheckFrame(config)
-			MY.SwitchTab("MY_TargetMon", true)
+			MY.SwitchTab('MY_TargetMon', true)
 		end,
 	})
 	x = x + 70
-	ui:append("WndButton2", {
+	ui:append('WndButton2', {
 		x = x, y = y,
 		w = 60, h = 30,
-		text = _L["Import"],
+		text = _L['Import'],
 		onclick = function()
 			local file = GetOpenFileName(
 				_L['Please select import target monitor data file.'],
@@ -1450,20 +1450,20 @@ function PS.OnPanelActive(wnd)
 				end
 			end
 			D.CheckAllFrame()
-			MY.SwitchTab("MY_TargetMon", true)
+			MY.SwitchTab('MY_TargetMon', true)
 			MY.Sysmsg({ _L('Import successed, %d imported and %d replaced.', importCount, replaceCount) })
 			OutputMessage('MSG_ANNOUNCE_YELLOW', _L('Import successed, %d imported and %d replaced.', importCount, replaceCount))
 		end,
 	})
 	x = x + 70
-	ui:append("WndButton2", {
+	ui:append('WndButton2', {
 		x = x, y = y,
 		w = 60, h = 30,
-		text = _L["Export"],
+		text = _L['Export'],
 		menu = function()
 			local configs = {}
 			local menu = {}
-			local indent = IsCtrlKeyDown() and "\t" or nil
+			local indent = IsCtrlKeyDown() and '\t' or nil
 			for _, config in ipairs(Config) do
 				insert(menu, {
 					bCheck = true,
@@ -1486,9 +1486,9 @@ function PS.OnPanelActive(wnd)
 				szOption = _L['Ensure export'],
 				fnAction = function()
 					local file = MY.FormatPath({
-						"export/TargetMon/$name@$server@"
-							.. MY.FormatTime("yyyyMMddhhmmss")
-							.. ".jx3dat",
+						'export/TargetMon/$name@$server@'
+							.. MY.FormatTime('yyyyMMddhhmmss')
+							.. '.jx3dat',
 						MY_DATA_PATH.GLOBAL,
 					})
 					local cfgs = {}
@@ -1507,10 +1507,10 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	x = x + 70
-	ui:append("WndButton2", {
+	ui:append('WndButton2', {
 		x = x, y = y,
 		w = 80, h = 30,
-		text = _L["Save As Default"],
+		text = _L['Save As Default'],
 		onclick = function()
 			MY.Confirm(_L['Sure to save as default?'], function()
 				MY.SaveLUAData(CUSTOM_DEFAULT_CONFIG_FILE, D.FormatSavingConfigs(Config))
@@ -1518,17 +1518,17 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	x = x + 90
-	ui:append("WndButton2", {
+	ui:append('WndButton2', {
 		x = x, y = y,
 		w = 80, h = 30,
-		text = _L["Reset Default"],
+		text = _L['Reset Default'],
 		tip = _L['Hold ctrl to reset original default.'],
 		tippostype = MY.Const.UI.Tip.POS_TOP,
 		onclick = function()
 			local ctrl = IsCtrlKeyDown()
 			MY.Confirm(_L[ctrl and 'Sure to reset original default?' or 'Sure to reset default?'], function()
 				D.LoadConfig(true, ctrl)
-				MY.SwitchTab("MY_TargetMon", true)
+				MY.SwitchTab('MY_TargetMon', true)
 			end)
 		end,
 	})
@@ -1541,7 +1541,7 @@ end
 function PS.OnPanelScroll(wnd, scrollX, scrollY)
 	wnd:Lookup('WndWindow_Wrapper'):SetRelPos(scrollX, scrollY)
 end
-MY.RegisterPanel("MY_TargetMon", _L["Target monitor"], _L['Target'], "ui/Image/ChannelsPanel/NewChannels.UITex|141", { 255, 255, 0, 200 }, PS)
+MY.RegisterPanel('MY_TargetMon', _L['Target monitor'], _L['Target'], 'ui/Image/ChannelsPanel/NewChannels.UITex|141', { 255, 255, 0, 200 }, PS)
 
 
 local ui = {

@@ -6,7 +6,7 @@
 -- @Last modified by:   tinymins
 -- @Last modified time: 2016-12-13 14:46:58
 --------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot..'MY_Toolbox/lang/')
 local _C = { Data = {} }
 MY_AutoChat = {}
 MY_AutoChat.bEnable = false
@@ -16,21 +16,21 @@ MY_AutoChat.bEnableShift = true
 MY_AutoChat.bAutoSelect1 = false
 MY_AutoChat.Conents = nil
 MY_AutoChat.CurrentWindow = 0
-RegisterCustomData("MY_AutoChat.bEnable")
-RegisterCustomData("MY_AutoChat.bEchoOn", 1)
-RegisterCustomData("MY_AutoChat.bAutoClose", 1)
-RegisterCustomData("MY_AutoChat.bEnableShift")
-RegisterCustomData("MY_AutoChat.bAutoSelect1")
+RegisterCustomData('MY_AutoChat.bEnable')
+RegisterCustomData('MY_AutoChat.bEchoOn', 1)
+RegisterCustomData('MY_AutoChat.bAutoClose', 1)
+RegisterCustomData('MY_AutoChat.bEnableShift')
+RegisterCustomData('MY_AutoChat.bAutoSelect1')
 
 function MY_AutoChat.LoadData()
-	local szOrgPath = MY.GetLUADataPath("config/AUTO_CHAT/data.$lang.jx3dat")
-	local szFilePath = MY.GetLUADataPath({"config/autochat.jx3dat", MY_DATA_PATH.GLOBAL})
+	local szOrgPath = MY.GetLUADataPath('config/AUTO_CHAT/data.$lang.jx3dat')
+	local szFilePath = MY.GetLUADataPath({'config/autochat.jx3dat', MY_DATA_PATH.GLOBAL})
 	if IsLocalFileExist(szOrgPath) then
 		CPath.Move(szOrgPath, szFilePath)
 	end
-	_C.Data = MY.LoadLUAData(szFilePath) or MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_ToolBox/data/interact/$lang.jx3dat") or _C.Data
+	_C.Data = MY.LoadLUAData(szFilePath) or MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_ToolBox/data/interact/$lang.jx3dat') or _C.Data
 end
-function MY_AutoChat.SaveData() MY.SaveLUAData({"config/autochat.jx3dat", MY_DATA_PATH.GLOBAL}, _C.Data) end
+function MY_AutoChat.SaveData() MY.SaveLUAData({'config/autochat.jx3dat', MY_DATA_PATH.GLOBAL}, _C.Data) end
 function MY_AutoChat.GetName(dwType, dwID)
 	if dwID == UI_GetClientPlayerID() then
 		return _L['Common'], _L['Common']
@@ -83,24 +83,24 @@ function MY_AutoChat.DelData(szMap, szName, szKey)
 end
 
 local function WindowSelect(dwIndex, dwID)
-	MY.Debug({"WindowSelect " .. dwIndex .. "," .. dwID}, "AUTO_CHAT", MY_DEBUG.LOG)
+	MY.Debug({'WindowSelect ' .. dwIndex .. ',' .. dwID}, 'AUTO_CHAT', MY_DEBUG.LOG)
 	return GetClientPlayer().WindowSelect(dwIndex, dwID)
 end
 
 local function GetDialogueInfo(v, dwTargetType, dwTargetId)
 	local id, context, image, imageframe
-	if v.name == "$" or v.name == "W" or v.name == "T" then
-		if v.name == "T" then
-			for iconid in string.gmatch(v.context, "%$ (%d+)") do
-				image = "fromiconid"
+	if v.name == '$' or v.name == 'W' or v.name == 'T' then
+		if v.name == 'T' then
+			for iconid in string.gmatch(v.context, '%$ (%d+)') do
+				image = 'fromiconid'
 				imageframe = iconid
 			end
 		end
 		id = v.attribute.id
 		context = v.context
-	elseif v.name == "M" then -- 商店
+	elseif v.name == 'M' then -- 商店
 		context = v.context
-	elseif v.name == "Q" then -- 任务对话
+	elseif v.name == 'Q' then -- 任务对话
 		local dwQuestId = tonumber(v.attribute.questid)
 		local tQuestInfo = Table_GetQuestStringInfo(dwQuestId)
 		if tQuestInfo then
@@ -135,7 +135,7 @@ function MY_AutoChat.Choose(dwType, dwID, dwIndex, aInfo)
 					WindowSelect(dwIndex, info.id)
 				end
 				if MY_AutoChat.bEchoOn then
-					MY.Sysmsg({_L("Conversation with [%s] auto chose: %s", szName, info.context)})
+					MY.Sysmsg({_L('Conversation with [%s] auto chose: %s', szName, info.context)})
 				end
 				return true
 			else
@@ -151,7 +151,7 @@ function MY_AutoChat.Choose(dwType, dwID, dwIndex, aInfo)
 	if MY_AutoChat.bAutoSelect1 and dwID and nCount == 1 and not MY.IsInDungeon() then
 		WindowSelect(dwIndex, dwID)
 		if MY_AutoChat.bEchoOn then
-			MY.Sysmsg({_L("Conversation with [%s] auto chose: %s", szName, szContext)})
+			MY.Sysmsg({_L('Conversation with [%s] auto chose: %s', szName, szContext)})
 		end
 		return true
 	end
@@ -160,10 +160,10 @@ end
 function MY_AutoChat.DoSomething()
 	-- Output(MY_AutoChat.Conents, MY_AutoChat.CurrentWindow)
 	if MY_AutoChat.bEnableShift and IsShiftKeyDown() then
-		MY.Sysmsg({_L["Auto interact disabled due to SHIFT key pressed."]})
+		MY.Sysmsg({_L['Auto interact disabled due to SHIFT key pressed.']})
 		return
 	end
-	local frame = Station.Lookup("Normal/DialoguePanel")
+	local frame = Station.Lookup('Normal/DialoguePanel')
 	if frame and frame:IsVisible() then
 		if MY_AutoChat.Choose(frame.dwTargetType, frame.dwTargetId, frame.dwIndex, frame.aInfo)
 		and MY_AutoChat.bAutoClose then
@@ -228,7 +228,7 @@ local function GetDialoguePanelMenuItem(szMap, szName, dialogueInfo)
 		szIcon = 'ui/Image/UICommon/Feedanimials.UITex'
 		nFrame = 86
 		nMouseOverFrame = 87
-		szLayer = "ICON_RIGHT"
+		szLayer = 'ICON_RIGHT'
 		fnClickIcon = function()
 			MY_AutoChat.DelData(szMap, szName, dialogueInfo.context)
 			Wnd.CloseWindow('PopupMenuPanel')
@@ -243,16 +243,16 @@ local function GetDialoguePanelMenuItem(szMap, szName, dialogueInfo)
 	else
 		fnAction = function() MY_AutoChat.AddData(szMap, szName, dialogueInfo.context) end
 	end
-	if dialogueInfo.name == "T" then
-		for szIconID in string.gmatch(dialogueInfo.context, "%$ (%d+)") do
-			szIcon = "fromiconid"
+	if dialogueInfo.name == 'T' then
+		for szIconID in string.gmatch(dialogueInfo.context, '%$ (%d+)') do
+			szIcon = 'fromiconid'
 			nFrame = szIconID
-			szLayer = "ICON_RIGHT"
+			szLayer = 'ICON_RIGHT'
 		end
 	end
 	return {
 		r = r, g = g, b = b,
-		szOption =  (IsCtrlKeyDown() and dialogueInfo.id and ("(" .. dialogueInfo.id .. ") ") or "") .. dialogueInfo.context,
+		szOption =  (IsCtrlKeyDown() and dialogueInfo.id and ('(' .. dialogueInfo.id .. ') ') or '') .. dialogueInfo.context,
 		fnAction = fnAction,
 		szIcon = szIcon, nFrame = nFrame, nMouseOverFrame = nMouseOverFrame,
 		szLayer = szLayer, fnClickIcon = fnClickIcon,
@@ -260,7 +260,7 @@ local function GetDialoguePanelMenuItem(szMap, szName, dialogueInfo)
 end
 
 local function GetDialoguePanelMenu()
-	local frame = Station.Lookup("Normal/DialoguePanel")
+	local frame = Station.Lookup('Normal/DialoguePanel')
 	if not frame then
 		return
 	end
@@ -268,7 +268,7 @@ local function GetDialoguePanelMenu()
 	local szName, szMap = MY_AutoChat.GetName(dwType, dwID)
 	if szName and szMap then
 		if frame.aInfo then
-			local t = { {szOption = szName .. (IsCtrlKeyDown() and (" (" .. dwIdx .. ")") or ""), bDisable = true}, { bDevide = true } }
+			local t = { {szOption = szName .. (IsCtrlKeyDown() and (' (' .. dwIdx .. ')') or ''), bDisable = true}, { bDevide = true } }
 			local tChat = {}
 			-- 面板上的对话
 			for i, v in ipairs(frame.aInfo) do
@@ -282,7 +282,7 @@ local function GetDialoguePanelMenu()
 			if _C.Data[szMap] and _C.Data[szMap][szName] then
 				for szContext, nCount in pairs(_C.Data[szMap][szName]) do
 					if not tChat[szContext] then
-						table.insert(t, GetDialoguePanelMenuItem(szMap, szName, { name = "$", context = szContext }))
+						table.insert(t, GetDialoguePanelMenuItem(szMap, szName, { name = '$', context = szContext }))
 						tChat[szContext] = true
 					end
 				end
@@ -296,7 +296,7 @@ local function HookDialoguePanel()
 	if MY.IsShieldedVersion() then
 		return
 	end
-	local frame = Station.Lookup("Normal/DialoguePanel")
+	local frame = Station.Lookup('Normal/DialoguePanel')
 	if frame and frame:IsVisible() and not frame.bMYHooked then
 		MY.UI(frame):append('WndButton', {
 			name = 'WndButton_AutoChat',
@@ -309,7 +309,7 @@ local function HookDialoguePanel()
 		frame.bMYHooked = true
 	end
 end
-MY.RegisterInit("MY_AutoChat", HookDialoguePanel)
+MY.RegisterInit('MY_AutoChat', HookDialoguePanel)
 
 local function onOpenWindow()
 	if MY.IsShieldedVersion() then
@@ -326,13 +326,13 @@ local function onOpenWindow()
 	MY_AutoChat.Conents = arg1
 	MY_AutoChat.DoSomething()
 end
-MY.RegisterEvent("OPEN_WINDOW.MY_AutoChat", onOpenWindow)
+MY.RegisterEvent('OPEN_WINDOW.MY_AutoChat', onOpenWindow)
 
 local function UnhookDialoguePanel()
-	local frame = Station.Lookup("Normal/DialoguePanel")
+	local frame = Station.Lookup('Normal/DialoguePanel')
 	if frame and frame.bMYHooked then
 		MY.UI(frame):children('#WndButton_AutoChat'):remove()
 		frame.bMYHooked = false
 	end
 end
-MY.RegisterReload("MY_AutoChat", UnhookDialoguePanel)
+MY.RegisterReload('MY_AutoChat', UnhookDialoguePanel)

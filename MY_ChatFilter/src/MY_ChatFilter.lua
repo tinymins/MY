@@ -1,6 +1,6 @@
 MY_ChatFilter = {}
 local _C = {}
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_ChatFilter/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_ChatFilter/lang/')
 local MY_ChatFilter = MY_ChatFilter
 local MAX_CHAT_RECORD = 10
 local MAX_UUID_RECORD = 10
@@ -8,50 +8,50 @@ MY_ChatFilter.bFilterDuplicate           = true   -- 屏蔽重复聊天
 MY_ChatFilter.bFilterDuplicateIgnoreID   = false  -- 不同玩家重复聊天也屏蔽
 MY_ChatFilter.bFilterDuplicateContinuous = true   -- 仅屏蔽连续的重复聊天
 MY_ChatFilter.bFilterDuplicateAddonTalk  = true   -- 屏蔽UUID相同的插件消息
-RegisterCustomData("MY_ChatFilter.bFilterDuplicate")
-RegisterCustomData("MY_ChatFilter.bFilterDuplicateIgnoreID")
-RegisterCustomData("MY_ChatFilter.bFilterDuplicateContinuous")
-RegisterCustomData("MY_ChatFilter.bFilterDuplicateAddonTalk")
+RegisterCustomData('MY_ChatFilter.bFilterDuplicate')
+RegisterCustomData('MY_ChatFilter.bFilterDuplicateIgnoreID')
+RegisterCustomData('MY_ChatFilter.bFilterDuplicateContinuous')
+RegisterCustomData('MY_ChatFilter.bFilterDuplicateAddonTalk')
 
 MY_ChatFilter.tApplyDuplicateChannels = {
-	["MSG_SYS"           ] = false,
-	["MSG_NORMAL"        ] = true,
-	["MSG_PARTY"         ] = false,
-	["MSG_MAP"           ] = true,
-	["MSG_BATTLE_FILED"  ] = true,
-	["MSG_GUILD"         ] = true,
-	["MSG_GUILD_ALLIANCE"] = true,
-	["MSG_SCHOOL"        ] = true,
-	["MSG_WORLD"         ] = true,
-	["MSG_TEAM"          ] = false,
-	["MSG_CAMP"          ] = true,
-	["MSG_GROUP"         ] = true,
-	["MSG_WHISPER"       ] = false,
-	["MSG_SEEK_MENTOR"   ] = true,
-	["MSG_FRIEND"        ] = false,
+	['MSG_SYS'           ] = false,
+	['MSG_NORMAL'        ] = true,
+	['MSG_PARTY'         ] = false,
+	['MSG_MAP'           ] = true,
+	['MSG_BATTLE_FILED'  ] = true,
+	['MSG_GUILD'         ] = true,
+	['MSG_GUILD_ALLIANCE'] = true,
+	['MSG_SCHOOL'        ] = true,
+	['MSG_WORLD'         ] = true,
+	['MSG_TEAM'          ] = false,
+	['MSG_CAMP'          ] = true,
+	['MSG_GROUP'         ] = true,
+	['MSG_WHISPER'       ] = false,
+	['MSG_SEEK_MENTOR'   ] = true,
+	['MSG_FRIEND'        ] = false,
 }
 for k, _ in pairs(MY_ChatFilter.tApplyDuplicateChannels) do
-	RegisterCustomData("MY_ChatFilter.tApplyDuplicateChannels." .. k)
+	RegisterCustomData('MY_ChatFilter.tApplyDuplicateChannels.' .. k)
 end
 
 local l_tChannelHeader = {
-	["MSG_WHISPER"] = g_tStrings.STR_TALK_HEAD_SAY,
-	["MSG_NORMAL"] = g_tStrings.STR_TALK_HEAD_SAY,
-	["MSG_NPC_NEARBY"] = g_tStrings.STR_TALK_HEAD_SAY,
-	["MSG_PARTY"] = g_tStrings.STR_TALK_HEAD_SAY1,
-	["MSG_GUILD"] = g_tStrings.STR_TALK_HEAD_SAY1,
-	["MSG_GUILD_ALLIANCE"] = g_tStrings.STR_TALK_HEAD_SAY1,
-	["MSG_WORLD"] = g_tStrings.STR_TALK_HEAD_SAY1,
-	["MSG_SCHOOL"] = g_tStrings.STR_TALK_HEAD_SAY1,
-	["MSG_CAMP"] = g_tStrings.STR_TALK_HEAD_SAY1,
-	["MSG_FRIEND"] = g_tStrings.STR_TALK_HEAD_SAY1,
-	["MSG_TEAM"] = g_tStrings.STR_TALK_HEAD_SAY1,
-	["MSG_MAP"] = g_tStrings.STR_TALK_HEAD_SAY1,
-	["MSG_BATTLE_FILED"] = g_tStrings.STR_TALK_HEAD_SAY1,
-	["MSG_NPC_PARTY"] = g_tStrings.STR_TALK_HEAD_SAY1,
+	['MSG_WHISPER'] = g_tStrings.STR_TALK_HEAD_SAY,
+	['MSG_NORMAL'] = g_tStrings.STR_TALK_HEAD_SAY,
+	['MSG_NPC_NEARBY'] = g_tStrings.STR_TALK_HEAD_SAY,
+	['MSG_PARTY'] = g_tStrings.STR_TALK_HEAD_SAY1,
+	['MSG_GUILD'] = g_tStrings.STR_TALK_HEAD_SAY1,
+	['MSG_GUILD_ALLIANCE'] = g_tStrings.STR_TALK_HEAD_SAY1,
+	['MSG_WORLD'] = g_tStrings.STR_TALK_HEAD_SAY1,
+	['MSG_SCHOOL'] = g_tStrings.STR_TALK_HEAD_SAY1,
+	['MSG_CAMP'] = g_tStrings.STR_TALK_HEAD_SAY1,
+	['MSG_FRIEND'] = g_tStrings.STR_TALK_HEAD_SAY1,
+	['MSG_TEAM'] = g_tStrings.STR_TALK_HEAD_SAY1,
+	['MSG_MAP'] = g_tStrings.STR_TALK_HEAD_SAY1,
+	['MSG_BATTLE_FILED'] = g_tStrings.STR_TALK_HEAD_SAY1,
+	['MSG_NPC_PARTY'] = g_tStrings.STR_TALK_HEAD_SAY1,
 }
 
-MY.HookChatPanel("MY_ChatFilter", function(h, szChannel, szMsg, dwTime)
+MY.HookChatPanel('MY_ChatFilter', function(h, szChannel, szMsg, dwTime)
 	-- 插件消息UUID过滤
 	if MY_ChatFilter.bFilterDuplicateAddonTalk then
 		local me = GetClientPlayer()
@@ -60,7 +60,7 @@ MY.HookChatPanel("MY_ChatFilter", function(h, szChannel, szMsg, dwTime)
 			h.MY_tDuplicateUUID = {}
 		end
 		for _, element in ipairs(tSay) do
-			if element.type == "eventlink" and element.name == "" then
+			if element.type == 'eventlink' and element.name == '' then
 				local data = MY.JsonDecode(element.linkinfo)
 				if data and data.uuid then
 					local szUUID = data.uuid
@@ -86,23 +86,23 @@ MY.HookChatPanel("MY_ChatFilter", function(h, szChannel, szMsg, dwTime)
 	if MY_ChatFilter.bFilterDuplicate
 	and MY_ChatFilter.tApplyDuplicateChannels[szChannel] then
 		-- 计算过滤记录
-		local szText, szName = GetPureText(szMsg), ""
+		local szText, szName = GetPureText(szMsg), ''
 		if l_tChannelHeader[szChannel] then
 			local nS, nE = wstring.find(szText, l_tChannelHeader[szChannel])
 			if nS and nE then
-				szName = ""
-				szText:sub(1, nE):gsub("(%[[^%[%]]-%])", function(s)
+				szName = ''
+				szText:sub(1, nE):gsub('(%[[^%[%]]-%])', function(s)
 					szName = szName .. s
 				end)
 				szText = szText:sub(nE + 1)
 			end
 		end
-		szText = szText:gsub("[ \n]", "")
-		if szText == "" then -- 纯表情纯链接就不屏蔽了
+		szText = szText:gsub('[ \n]', '')
+		if szText == '' then -- 纯表情纯链接就不屏蔽了
 			return
 		end
 		if not MY_ChatFilter.bFilterDuplicateIgnoreID then
-			szText = szName .. ":" .. szText
+			szText = szName .. ':' .. szText
 		end
 		-- 判断是否需要过滤
 		if not h.MY_tDuplicateLog then
@@ -129,13 +129,13 @@ MY.HookChatPanel("MY_ChatFilter", function(h, szChannel, szMsg, dwTime)
 	end
 end)
 
-MY.RegisterPanel("MY_DuplicateChatFilter", _L["duplicate chat filter"], _L['Chat'],
-"ui/Image/UICommon/yirong3.UITex|104", {255,255,0,200}, {OnPanelActive = function(wnd)
+MY.RegisterPanel('MY_DuplicateChatFilter', _L['duplicate chat filter'], _L['Chat'],
+'ui/Image/UICommon/yirong3.UITex|104', {255,255,0,200}, {OnPanelActive = function(wnd)
 	local ui = MY.UI(wnd)
 	local w, h = ui:size()
 	local x, y = 20, 30
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		text = _L['filter duplicate chat'],
 		x = x, y = y, w = 400,
 		checked = MY_ChatFilter.bFilterDuplicate,
@@ -145,7 +145,7 @@ MY.RegisterPanel("MY_DuplicateChatFilter", _L["duplicate chat filter"], _L['Chat
 	})
 	y = y + 30
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		text = _L['filter duplicate chat ignore id'],
 		x = x, y = y, w = 400,
 		checked = MY_ChatFilter.bFilterDuplicateIgnoreID,
@@ -155,7 +155,7 @@ MY.RegisterPanel("MY_DuplicateChatFilter", _L["duplicate chat filter"], _L['Chat
 	})
 	y = y + 30
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		text = _L['only filter continuous duplicate chat'],
 		x = x, y = y, w = 400,
 		checked = MY_ChatFilter.bFilterDuplicateContinuous,
@@ -165,7 +165,7 @@ MY.RegisterPanel("MY_DuplicateChatFilter", _L["duplicate chat filter"], _L['Chat
 	})
 	y = y + 30
 
-	ui:append("WndComboBox", {
+	ui:append('WndComboBox', {
 		x = x, y = y, w = 330, h = 25,
 		menu = function()
 			local t = {}
@@ -185,7 +185,7 @@ MY.RegisterPanel("MY_DuplicateChatFilter", _L["duplicate chat filter"], _L['Chat
 	})
 	y = y + 50
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		text = _L['filter duplicate addon message'],
 		x = x, y = y, w = 400,
 		checked = MY_ChatFilter.bFilterDuplicateAddonTalk,

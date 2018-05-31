@@ -10,7 +10,7 @@ data = {
     ['tong member headtop tips nav'] = '启用场景追踪点',
 
     ['check nearby gongzhan'] = '检测附近共战',
-    ['Detected [%s] has Gongzhan BUFF for %d second(s).'] = "检测到[%s]共战BUFF剩余%d秒。",
+    ['Detected [%s] has Gongzhan BUFF for %d second(s).'] = '检测到[%s]共战BUFF剩余%d秒。',
 
     ['* infomation tips'] = '※ 信息条（SHIFT+U移动位置）',
 
@@ -91,10 +91,10 @@ data = {
     ['Type to search, use comma to split.'] = '输入文字进行搜索，半角逗号分隔多个搜索项。\n如：皇竹草,甜象草',
 
     ['exam tip'] = '科举助手',
-    ["Querying, please wait..."] = '查询中，请稍后……',
+    ['Querying, please wait...'] = '查询中，请稍后……',
     ['Local exam data matched.'] = '匹配到本地题库。',
-    ["No result found."] = '没有搜索到匹配的结果。',
-    ["No result found, here's from open search engine:"] = '没有搜索到匹配的结果，以下数据来自开放搜索引擎：',
+    ['No result found.'] = '没有搜索到匹配的结果。',
+    ['No result found, here\'s from open search engine:'] = '没有搜索到匹配的结果，以下数据来自开放搜索引擎：',
     ['No result matched, here\'s similar answers:'] = '没有搜索到匹配的结果，以下为类似题目：',
     ['Question: %s\nAnswer: %s'] = '问：%s\n答：%s',
     ['Loading failed.'] = '加载失败。',
@@ -128,6 +128,6 @@ data = {
     ['auto restore team info in arena'] = '竞技场中自动恢复上次组队信息',
     ['auto cancel hide player in arena and battlefield'] = '竞技场与战场中自动取消屏蔽玩家与NPC',
 
-    ["Loop target between me and target"] = "循环选择自己和目标",
-    ["%%.1f/%d meter(s)"] = "%%.1f/%d 尺",
+    ['Loop target between me and target'] = '循环选择自己和目标',
+    ['%%.1f/%d meter(s)'] = '%%.1f/%d 尺',
 }

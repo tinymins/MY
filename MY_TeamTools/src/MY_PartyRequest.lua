@@ -22,10 +22,10 @@ local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 -----------------------------------------------------------------------------------------
 
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_TeamTools/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TeamTools/lang/')
 local PR = {}
 local PR_MAX_LEVEL = 95
-local PR_INI_PATH = MY.GetAddonInfo().szRoot .. "MY_TeamTools/ui/MY_PartyRequest.ini"
+local PR_INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_TeamTools/ui/MY_PartyRequest.ini'
 local PR_EQUIP_REQUEST = {}
 local PR_MT = { __call = function(me, szName)
 	for k, v in ipairs(me) do
@@ -40,29 +40,29 @@ MY_PartyRequest = {
 	bEnable     = true,
 	bAutoCancel = false,
 }
-MY.RegisterCustomData("MY_PartyRequest")
+MY.RegisterCustomData('MY_PartyRequest')
 
 function MY_PartyRequest.OnFrameCreate()
-	this:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
-	this:Lookup("", "Text_Title"):SetText(g_tStrings.STR_ARENA_INVITE)
-	MY.RegisterEsc("MY_PartyRequest", PR.GetFrame, PR.ClosePanel)
+	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
+	this:Lookup('', 'Text_Title'):SetText(g_tStrings.STR_ARENA_INVITE)
+	MY.RegisterEsc('MY_PartyRequest', PR.GetFrame, PR.ClosePanel)
 end
 
 function MY_PartyRequest.OnLButtonClick()
 	local name = this:GetName()
-	if name == "Btn_Setting" then
+	if name == 'Btn_Setting' then
 		local menu = {}
 		table.insert(menu, {
-			szOption = _L["Auto Refuse No full level Player"],
+			szOption = _L['Auto Refuse No full level Player'],
 			bCheck = true, bChecked = MY_PartyRequest.bAutoCancel,
 			fnAction = function()
 				MY_PartyRequest.bAutoCancel = not MY_PartyRequest.bAutoCancel
 			end,
 		})
 		PopupMenu(menu)
-	elseif name == "Btn_Close" then
+	elseif name == 'Btn_Close' then
 		PR.ClosePanel()
-	elseif name == "Btn_Accept" then
+	elseif name == 'Btn_Accept' then
 		local info = this:GetParent().info
 		info.fnAction()
 		for i, v in ipairs_r(PR_PARTY_REQUEST) do
@@ -71,7 +71,7 @@ function MY_PartyRequest.OnLButtonClick()
 			end
 		end
 		PR.UpdateFrame()
-	elseif name == "Btn_Refuse" then
+	elseif name == 'Btn_Refuse' then
 		local info = this:GetParent().info
 		info.fnCancelAction()
 		for i, v in ipairs_r(PR_PARTY_REQUEST) do
@@ -80,15 +80,15 @@ function MY_PartyRequest.OnLButtonClick()
 			end
 		end
 		PR.UpdateFrame()
-	elseif name == "Btn_Lookup" then
+	elseif name == 'Btn_Lookup' then
 		local info = this:GetParent().info
 		if info.bDetail or (info.dwID and IsAltKeyDown()) then
 			ViewInviteToPlayer(info.dwID)
 		else
-			MY.BgTalk(info.szName, "RL", "ASK")
+			MY.BgTalk(info.szName, 'RL', 'ASK')
 			this:Enable(false)
-			this:Lookup("", "Text_Lookup"):SetText(_L["loading..."])
-			MY.Sysmsg({_L["If it is always loading, the target may not install plugin or refuse."]})
+			this:Lookup('', 'Text_Lookup'):SetText(_L['loading...'])
+			MY.Sysmsg({_L['If it is always loading, the target may not install plugin or refuse.']})
 		end
 	elseif this.info then
 		if IsCtrlKeyDown() then
@@ -118,12 +118,12 @@ end
 
 function MY_PartyRequest.OnMouseEnter()
 	local name = this:GetName()
-	if name == "Btn_Lookup" then
+	if name == 'Btn_Lookup' then
 		local info = this:GetParent().info
 		if not info.bDetail and info.dwID then
 			local x, y = this:GetAbsPos()
 			local w, h = this:GetSize()
-			local szTip = GetFormatText(_L["Press alt and click to view equipment."])
+			local szTip = GetFormatText(_L['Press alt and click to view equipment.'])
 			OutputTip(szTip, 450, {x, y, w, h}, MY.Const.UI.Tip.POS_TOP)
 		end
 	elseif this.info then
@@ -143,14 +143,14 @@ function MY_PartyRequest.OnMouseLeave()
 end
 
 function PR.GetFrame()
-	return Station.Lookup("Normal2/MY_PartyRequest")
+	return Station.Lookup('Normal2/MY_PartyRequest')
 end
 
 function PR.OpenPanel()
 	if PR.GetFrame() then
 		return
 	end
-	Wnd.OpenWindow(PR_INI_PATH, "MY_PartyRequest")
+	Wnd.OpenWindow(PR_INI_PATH, 'MY_PartyRequest')
 end
 
 function PR.ClosePanel(bCompulsory)
@@ -161,7 +161,7 @@ function PR.ClosePanel(bCompulsory)
 	if bCompulsory then
 		fnAction()
 	else
-		MY.Confirm(_L["Clear list and close?"], fnAction)
+		MY.Confirm(_L['Clear list and close?'], fnAction)
 	end
 end
 
@@ -187,10 +187,10 @@ function PR.OnApplyRequest()
 	if not MY_PartyRequest.bEnable then
 		return
 	end
-	local hMsgBox = Station.Lookup("Topmost/MB_ATMP_" .. arg0) or Station.Lookup("Topmost/MB_IMTP_" .. arg0)
+	local hMsgBox = Station.Lookup('Topmost/MB_ATMP_' .. arg0) or Station.Lookup('Topmost/MB_IMTP_' .. arg0)
 	if hMsgBox then
-		local btn  = hMsgBox:Lookup("Wnd_All/Btn_Option1")
-		local btn2 = hMsgBox:Lookup("Wnd_All/Btn_Option2")
+		local btn  = hMsgBox:Lookup('Wnd_All/Btn_Option1')
+		local btn2 = hMsgBox:Lookup('Wnd_All/Btn_Option2')
 		if btn and btn:IsEnabled() then
 			if not PR_PARTY_REQUEST(arg0) then
 				local tab = {
@@ -208,7 +208,7 @@ function PR.OnApplyRequest()
 				if not MY_PartyRequest.bAutoCancel or MY_PartyRequest.bAutoCancel and arg3 == PR_MAX_LEVEL then
 					table.insert(PR_PARTY_REQUEST, tab)
 				else
-					MY.Sysmsg({_L("Auto Refuse %s(%s %d%s) Party request", arg0, g_tStrings.tForceTitle[arg2], arg3, g_tStrings.STR_LEVEL)})
+					MY.Sysmsg({_L('Auto Refuse %s(%s %d%s) Party request', arg0, g_tStrings.tForceTitle[arg2], arg3, g_tStrings.STR_LEVEL)})
 					pcall(btn2.fnAction)
 				end
 			end
@@ -249,41 +249,41 @@ function PR.UpdateFrame()
 	if #PR_PARTY_REQUEST == 0 then
 		return PR.ClosePanel(true)
 	end
-	local container, nH = frame:Lookup("WndContainer_Request"), 0
+	local container, nH = frame:Lookup('WndContainer_Request'), 0
 	container:Clear()
 	for k, v in ipairs(PR_PARTY_REQUEST) do
-		local wnd = container:AppendContentFromIni(PR_INI_PATH, "WndWindow_Item", k)
-		local hItem = wnd:Lookup("", "")
-		hItem:Lookup("Image_Hover"):SetFrame(2)
+		local wnd = container:AppendContentFromIni(PR_INI_PATH, 'WndWindow_Item', k)
+		local hItem = wnd:Lookup('', '')
+		hItem:Lookup('Image_Hover'):SetFrame(2)
 
 		if v.dwKungfuID then
-			hItem:Lookup("Image_Icon"):FromIconID(Table_GetSkillIconID(v.dwKungfuID, 1))
+			hItem:Lookup('Image_Icon'):FromIconID(Table_GetSkillIconID(v.dwKungfuID, 1))
 		else
-			hItem:Lookup("Image_Icon"):FromUITex(GetForceImage(v.dwForce))
+			hItem:Lookup('Image_Icon'):FromUITex(GetForceImage(v.dwForce))
 		end
-		hItem:Lookup("Handle_Status/Handle_Gongzhan"):SetVisible(v.nGongZhan == 1)
+		hItem:Lookup('Handle_Status/Handle_Gongzhan'):SetVisible(v.nGongZhan == 1)
 
 		local nCampFrame = GetCampImageFrame(v.nCamp)
 		if nCampFrame then
-			hItem:Lookup("Handle_Status/Handle_Camp/Image_Camp"):SetFrame(nCampFrame)
+			hItem:Lookup('Handle_Status/Handle_Camp/Image_Camp'):SetFrame(nCampFrame)
 		end
-		hItem:Lookup("Handle_Status/Handle_Camp"):SetVisible(not not nCampFrame)
+		hItem:Lookup('Handle_Status/Handle_Camp'):SetVisible(not not nCampFrame)
 
-		if v.bDetail and v.bEx == "Author" then
-			hItem:Lookup("Text_Name"):SetFontColor(255, 255, 0)
+		if v.bDetail and v.bEx == 'Author' then
+			hItem:Lookup('Text_Name'):SetFontColor(255, 255, 0)
 		end
-		hItem:Lookup("Text_Name"):SetText(v.szName)
-		hItem:Lookup("Text_Level"):SetText(v.nLevel)
+		hItem:Lookup('Text_Name'):SetText(v.szName)
+		hItem:Lookup('Text_Level'):SetText(v.nLevel)
 
-		wnd:Lookup("Btn_Accept", "Text_Accept"):SetText(g_tStrings.STR_ACCEPT)
-		wnd:Lookup("Btn_Refuse", "Text_Refuse"):SetText(g_tStrings.STR_REFUSE)
-		wnd:Lookup("Btn_Lookup", "Text_Lookup"):SetText(v.bDetail and g_tStrings.STR_LOOKUP or _L["Details"])
+		wnd:Lookup('Btn_Accept', 'Text_Accept'):SetText(g_tStrings.STR_ACCEPT)
+		wnd:Lookup('Btn_Refuse', 'Text_Refuse'):SetText(g_tStrings.STR_REFUSE)
+		wnd:Lookup('Btn_Lookup', 'Text_Lookup'):SetText(v.bDetail and g_tStrings.STR_LOOKUP or _L['Details'])
 		wnd.info = v
 		nH = nH + wnd:GetH()
 	end
 	container:SetH(nH)
 	container:FormatAllContentPos()
-	frame:Lookup("", "Image_Bg"):SetH(nH)
+	frame:Lookup('', 'Image_Bg'):SetH(nH)
 	frame:SetH(nH + 30)
 	frame:SetDragArea(0, 0, frame:GetW(), frame:GetH())
 end
@@ -302,14 +302,14 @@ function PR.Feedback(szName, data, bDetail)
 	PR.UpdateFrame()
 end
 
-MY.RegisterEvent("PEEK_OTHER_PLAYER.MY_PartyRequest"   , PR.OnPeekPlayer  )
-MY.RegisterEvent("PARTY_INVITE_REQUEST.MY_PartyRequest", PR.OnApplyRequest)
-MY.RegisterEvent("PARTY_APPLY_REQUEST.MY_PartyRequest" , PR.OnApplyRequest)
+MY.RegisterEvent('PEEK_OTHER_PLAYER.MY_PartyRequest'   , PR.OnPeekPlayer  )
+MY.RegisterEvent('PARTY_INVITE_REQUEST.MY_PartyRequest', PR.OnApplyRequest)
+MY.RegisterEvent('PARTY_APPLY_REQUEST.MY_PartyRequest' , PR.OnApplyRequest)
 
-MY.RegisterBgMsg("RL", function(_, nChannel, dwID, szName, bIsSelf, ...)
+MY.RegisterBgMsg('RL', function(_, nChannel, dwID, szName, bIsSelf, ...)
 	local data = {...}
 	if not bIsSelf then
-		if data[1] == "Feedback" then
+		if data[1] == 'Feedback' then
 			PR.Feedback(szName, data, true)
 		end
 	end

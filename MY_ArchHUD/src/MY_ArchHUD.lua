@@ -3,29 +3,29 @@
 -- By ÜøÒÁ@Ë«ÃÎÕò@Ý¶»¨¹¬
 -- 2015-12-11 09:54:01
 -------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_ArchHUD/lang/")
-local DefaultAnchor = {s = "CENTER", r = "CENTER",  x = 0, y = 0}
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_ArchHUD/lang/')
+local DefaultAnchor = {s = 'CENTER', r = 'CENTER',  x = 0, y = 0}
 MY_ArchHUD = {}
 MY_ArchHUD.bOn = false
 MY_ArchHUD.Anchor = clone(DefaultAnchor)
 MY_ArchHUD.bFightShow = true
 MY_ArchHUD.bShowCastingBar = true
 MY_ArchHUD.nAlpha = 60
-local IMG_DIR = MY.GetAddonInfo().szRoot .. "MY_ArchHUD/img/"
-local INI_PATH = MY.GetAddonInfo().szRoot .. "MY_ArchHUD/ui/MY_ArchHUD.ini"
+local IMG_DIR = MY.GetAddonInfo().szRoot .. 'MY_ArchHUD/img/'
+local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_ArchHUD/ui/MY_ArchHUD.ini'
 
-RegisterCustomData("MY_ArchHUD.bOn")
-RegisterCustomData("MY_ArchHUD.bFightShow")
-RegisterCustomData("MY_ArchHUD.bShowCastingBar")
-RegisterCustomData("MY_ArchHUD.nAlpha")
+RegisterCustomData('MY_ArchHUD.bOn')
+RegisterCustomData('MY_ArchHUD.bFightShow')
+RegisterCustomData('MY_ArchHUD.bShowCastingBar')
+RegisterCustomData('MY_ArchHUD.nAlpha')
 
 function MY_ArchHUD.Reload()
-	Wnd.CloseWindow("MY_ArchHUD")
+	Wnd.CloseWindow('MY_ArchHUD')
 	if MY_ArchHUD.bOn then
-		Wnd.OpenWindow(INI_PATH, "MY_ArchHUD")
+		Wnd.OpenWindow(INI_PATH, 'MY_ArchHUD')
 	end
 end
-MY.RegisterInit("MY_ArchHUD", MY_ArchHUD.Reload)
+MY.RegisterInit('MY_ArchHUD', MY_ArchHUD.Reload)
 
 function MY_ArchHUD.UpdateAnchor(hFrame)
 	hFrame:SetPoint(MY_ArchHUD.Anchor.s, 0, 0, MY_ArchHUD.Anchor.r, MY_ArchHUD.Anchor.x, MY_ArchHUD.Anchor.y)
@@ -45,59 +45,59 @@ local function UpdatePlayerData(hFrame, KSelf)
 	local szExtra, szExtraImage, nExtraFrame
 	if KSelf.dwForceID == FORCE_TYPE.SHAO_LIN then
 		local nAccumulate = math.min(KSelf.nAccumulateValue, 3)
-		szExtra = _L["ChanNa:"] .. tostring(nAccumulate)
+		szExtra = _L['ChanNa:'] .. tostring(nAccumulate)
 		nCurrentExtra, nMaxExtra = nAccumulate, 3
-		szExtraImage, nExtraFrame = "rRing_T.UITex", 0
+		szExtraImage, nExtraFrame = 'rRing_T.UITex', 0
 		nCurrentMana, nMaxMana = KSelf.nCurrentMana, KSelf.nMaxMana
 	elseif KSelf.dwForceID == FORCE_TYPE.CHUN_YANG then
 		local nAccumulate = math.min(KSelf.nAccumulateValue, 10) / 2
-		szExtra = _L["Qi:"] .. tostring(nAccumulate)
+		szExtra = _L['Qi:'] .. tostring(nAccumulate)
 		nCurrentExtra, nMaxExtra = nAccumulate, 5
-		szExtraImage, nExtraFrame = "rRing.UITex", 0
+		szExtraImage, nExtraFrame = 'rRing.UITex', 0
 		nCurrentMana, nMaxMana = KSelf.nCurrentMana, KSelf.nMaxMana
 	elseif KSelf.dwForceID == FORCE_TYPE.QI_XIU then
 		local nAccumulate = math.min(KSelf.nAccumulateValue, 10)
-		szExtra = _L["JianWu:"] .. tostring(nAccumulate)
+		szExtra = _L['JianWu:'] .. tostring(nAccumulate)
 		nCurrentExtra, nMaxExtra = nAccumulate, 10
-		szExtraImage, nExtraFrame = "rRing.UITex", 2
+		szExtraImage, nExtraFrame = 'rRing.UITex', 2
 		nCurrentMana, nMaxMana = KSelf.nCurrentMana, KSelf.nMaxMana
 	elseif KSelf.dwForceID == FORCE_TYPE.TANG_MEN then
 		nManaR, nManaG, nManaB = 255, 255, 0
-		szManaImage, nManaFrame = "rRing.UITex", 2
+		szManaImage, nManaFrame = 'rRing.UITex', 2
 		nCurrentMana, nMaxMana = KSelf.nCurrentEnergy, KSelf.nMaxEnergy
 	elseif KSelf.dwForceID == FORCE_TYPE.CANG_JIAN then
 		nManaR, nManaG, nManaB = 255, 150, 0
-		szManaImage, nManaFrame = "rRing.UITex", 1
+		szManaImage, nManaFrame = 'rRing.UITex', 1
 		nCurrentMana, nMaxMana = KSelf.nCurrentRage, KSelf.nMaxRage
 	elseif KSelf.dwForceID == FORCE_TYPE.MING_JIAO then
 		nManaR, nManaG, nManaB = 255, 255, 0
 		if KSelf.nSunPowerValue == 1 then
-			szMana = _L["ManRi!"]
-			szManaImage, nManaFrame = "rRing.UITex", 1
-			szExtraImage, nExtraFrame = "rRing.UITex", 1
+			szMana = _L['ManRi!']
+			szManaImage, nManaFrame = 'rRing.UITex', 1
+			szExtraImage, nExtraFrame = 'rRing.UITex', 1
 			nCurrentMana, nMaxMana = KSelf.nMaxSunEnergy, KSelf.nMaxSunEnergy
 		elseif KSelf.nMoonPowerValue == 1 then
-			szMana = _L["ManYue!"]
-			szManaImage, nManaFrame = "rRing.UITex", 3
-			szExtraImage, nExtraFrame = "rRing.UITex", 3
+			szMana = _L['ManYue!']
+			szManaImage, nManaFrame = 'rRing.UITex', 3
+			szExtraImage, nExtraFrame = 'rRing.UITex', 3
 			nCurrentMana, nMaxMana = KSelf.nMaxMoonEnergy, KSelf.nMaxMoonEnergy
 		else
-			szManaImage, nManaFrame = "rRing.UITex", 3
-			szExtraImage, nExtraFrame = "rRing.UITex", 1
+			szManaImage, nManaFrame = 'rRing.UITex', 3
+			szExtraImage, nExtraFrame = 'rRing.UITex', 1
 			nCurrentMana, nMaxMana = KSelf.nCurrentMoonEnergy, KSelf.nMaxMoonEnergy
 			nCurrentExtra, nMaxExtra = KSelf.nCurrentSunEnergy, KSelf.nMaxSunEnergy
-			szMana = _L["Ri:"] .. tostring(KSelf.nCurrentSunEnergy / 100) .. " " .. _L["Yue:"] .. tostring(KSelf.nCurrentMoonEnergy / 100)
+			szMana = _L['Ri:'] .. tostring(KSelf.nCurrentSunEnergy / 100) .. ' ' .. _L['Yue:'] .. tostring(KSelf.nCurrentMoonEnergy / 100)
 		end
-		szExtra = ""
+		szExtra = ''
 	elseif KSelf.dwForceID == FORCE_TYPE.CANG_YUN then
 		nManaR, nManaG, nManaB = 191, 63, 31
-		szManaImage, nManaFrame = "rRing.UITex", 1
+		szManaImage, nManaFrame = 'rRing.UITex', 1
 		nCurrentMana, nMaxMana = KSelf.nCurrentRage, KSelf.nMaxRage
 	elseif KSelf.dwForceID == FORCE_TYPE.CHANG_GE then
 		local nAccumulate = math.min(KSelf.nAccumulateValue, 5)
-		szExtra = _L["Qu:"] .. tostring(nAccumulate)
+		szExtra = _L['Qu:'] .. tostring(nAccumulate)
 		nCurrentExtra, nMaxExtra = nAccumulate, 5
-		szExtraImage, nExtraFrame = "rRing.UITex", 2
+		szExtraImage, nExtraFrame = 'rRing.UITex', 2
 		nCurrentMana, nMaxMana = KSelf.nCurrentMana, KSelf.nMaxMana
 	elseif KSelf.dwForceID == FORCE_TYPE.BA_DAO then
 		if KSelf.nPoseState == POSE_TYPE.BROADSWORD then
@@ -112,7 +112,7 @@ local function UpdatePlayerData(hFrame, KSelf)
 	end
 
 	hFrame.hSelfHealth:Show()
-	hFrame.hTextSelfHealth:SetText(tostring(KSelf.nCurrentLife) .. "(" .. KeepTwoByteFloat(KSelf.nCurrentLife / KSelf.nMaxLife * 100) .. "%)")
+	hFrame.hTextSelfHealth:SetText(tostring(KSelf.nCurrentLife) .. '(' .. KeepTwoByteFloat(KSelf.nCurrentLife / KSelf.nMaxLife * 100) .. '%)')
 	hFrame.hImageSelfHealth:SetPercentage(KSelf.nCurrentLife / KSelf.nMaxLife)
 
 	hFrame.hSelfMana:Show()
@@ -123,7 +123,7 @@ local function UpdatePlayerData(hFrame, KSelf)
 		hFrame.hImageSelfMana:FromUITex(IMG_DIR .. szManaImage, nManaFrame)
 	end
 	if not szMana then
-		szMana = "(" .. KeepTwoByteFloat(nCurrentMana / nMaxMana * 100) .. "%)" .. nCurrentMana
+		szMana = '(' .. KeepTwoByteFloat(nCurrentMana / nMaxMana * 100) .. '%)' .. nCurrentMana
 	end
 	hFrame.hTextSelfMana:SetText(szMana)
 	hFrame.hImageSelfMana:SetPercentage(nCurrentMana / nMaxMana)
@@ -134,9 +134,9 @@ local function UpdatePlayerData(hFrame, KSelf)
 			hFrame.hImageSelfExtra:FromUITex(IMG_DIR .. szExtraImage, nExtraFrame)
 		end
 		if not szExtra and nCurrentExtra then
-			szExtra = "(" .. KeepTwoByteFloat(nCurrentExtra / nMaxExtra * 100) .. "%)" .. nCurrentExtra
+			szExtra = '(' .. KeepTwoByteFloat(nCurrentExtra / nMaxExtra * 100) .. '%)' .. nCurrentExtra
 		end
-		hFrame.hTextSelfExtra:SetText(szExtra or "")
+		hFrame.hTextSelfExtra:SetText(szExtra or '')
 		hFrame.hImageSelfExtra:SetPercentage(nCurrentExtra / nMaxExtra)
 	else
 		hFrame.hSelfExtra:Hide()
@@ -147,15 +147,15 @@ local function UpdateTargetData(hFrame, KTarget)
 	if KTarget and KTarget.dwID ~= UI_GetClientPlayerID() then
 		hFrame.hTargetHealth:Show()
 		hFrame.hImageTargetHealth:SetPercentage(KTarget.nCurrentLife / KTarget.nMaxLife)
-		local szLife = ""
+		local szLife = ''
 		if KTarget.nCurrentLife >= 100000000 then
-			szLife = ("%.2f"):format(KTarget.nCurrentLife / 100000000) .. _L['One hundred million']
+			szLife = ('%.2f'):format(KTarget.nCurrentLife / 100000000) .. _L['One hundred million']
 		elseif KTarget.nCurrentLife >= 100000 then
-			szLife = ("%.2f"):format(KTarget.nCurrentLife / 10000) .. _L['Ten thousand']
+			szLife = ('%.2f'):format(KTarget.nCurrentLife / 10000) .. _L['Ten thousand']
 		else
 			szLife = tonumber(KTarget.nCurrentLife)
 		end
-		hFrame.hTextTargetHealth:SetText(szLife .. "(" .. KeepTwoByteFloat(KTarget.nCurrentLife / KTarget.nMaxLife * 100) .. "%)")
+		hFrame.hTextTargetHealth:SetText(szLife .. '(' .. KeepTwoByteFloat(KTarget.nCurrentLife / KTarget.nMaxLife * 100) .. '%)')
 	else
 		hFrame.hTargetHealth:Hide()
 	end
@@ -185,20 +185,20 @@ end
 
 function MY_ArchHUD.OnFrameCreate()
 	if MY_ArchHUD.bShowCastingBar then
-		this:RegisterEvent("RENDER_FRAME_UPDATE")
+		this:RegisterEvent('RENDER_FRAME_UPDATE')
 	end
-	this:RegisterEvent("UI_SCALED")
-	this:RegisterEvent("PLAYER_STATE_UPDATE")
-	this:RegisterEvent("NPC_STATE_UPDATE")
-	this:RegisterEvent("ON_ENTER_CUSTOM_UI_MODE")
-	this:RegisterEvent("ON_LEAVE_CUSTOM_UI_MODE")
-	this:RegisterEvent("CUSTOM_UI_MODE_SET_DEFAULT")
+	this:RegisterEvent('UI_SCALED')
+	this:RegisterEvent('PLAYER_STATE_UPDATE')
+	this:RegisterEvent('NPC_STATE_UPDATE')
+	this:RegisterEvent('ON_ENTER_CUSTOM_UI_MODE')
+	this:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
+	this:RegisterEvent('CUSTOM_UI_MODE_SET_DEFAULT')
 	-- Handle
-	this.hSelfHealth    = this:Lookup("", "Handle_SelfHealth")
-	this.hSelfMana      = this:Lookup("", "Handle_SelfMana")
-	this.hSelfExtra     = this:Lookup("", "Handle_SelfExtra")
-	this.hTargetHealth  = this:Lookup("", "Handle_TargetHealth")
-	this.hTargetCasting = this:Lookup("", "Handle_TargetCasting")
+	this.hSelfHealth    = this:Lookup('', 'Handle_SelfHealth')
+	this.hSelfMana      = this:Lookup('', 'Handle_SelfMana')
+	this.hSelfExtra     = this:Lookup('', 'Handle_SelfExtra')
+	this.hTargetHealth  = this:Lookup('', 'Handle_TargetHealth')
+	this.hTargetCasting = this:Lookup('', 'Handle_TargetCasting')
 	-- Text
 	this.hTextSelfHealth    = this.hSelfHealth:Lookup(2)
 	this.hTextSelfMana      = this.hSelfMana:Lookup(2)
@@ -252,13 +252,13 @@ function MY_ArchHUD.OnFrameBreathe()
 end
 
 function MY_ArchHUD.OnEvent(event)
-	if event == "RENDER_FRAME_UPDATE" then
+	if event == 'RENDER_FRAME_UPDATE' then
 		local KSelf = GetClientPlayer()
 		if not KSelf then
 			return
 		end
 		UpdateTargetCasting(this, GetTargetHandle(KSelf.GetTarget()))
-	elseif event == "PLAYER_STATE_UPDATE" then
+	elseif event == 'PLAYER_STATE_UPDATE' then
 		local KSelf = GetClientPlayer()
 		if not KSelf then
 			return
@@ -270,7 +270,7 @@ function MY_ArchHUD.OnEvent(event)
 		if arg0 == dwID and dwType == TARGET.PLAYER then
 			UpdateTargetData(this, GetTargetHandle(dwType, dwID))
 		end
-	elseif event == "NPC_STATE_UPDATE" then
+	elseif event == 'NPC_STATE_UPDATE' then
 		local KSelf = GetClientPlayer()
 		if not KSelf then
 			return
@@ -279,14 +279,14 @@ function MY_ArchHUD.OnEvent(event)
 		if arg0 == dwID and dwType == TARGET.NPC then
 			UpdateTargetData(this, GetTargetHandle(dwType, dwID))
 		end
-	elseif event == "UI_SCALED" then
+	elseif event == 'UI_SCALED' then
 		MY_ArchHUD.UpdateAnchor(this)
-	elseif event == "ON_ENTER_CUSTOM_UI_MODE" then
+	elseif event == 'ON_ENTER_CUSTOM_UI_MODE' then
 		UpdateCustomModeWindow(this, _L['MY_ArchHUD'], true)
-	elseif event == "ON_LEAVE_CUSTOM_UI_MODE" then
+	elseif event == 'ON_LEAVE_CUSTOM_UI_MODE' then
 		MY_ArchHUD.Anchor = GetFrameAnchor(this)
 		UpdateCustomModeWindow(this, _L['MY_ArchHUD'], true)
-	elseif event == "CUSTOM_UI_MODE_SET_DEFAULT" then
+	elseif event == 'CUSTOM_UI_MODE_SET_DEFAULT' then
 		MY_ArchHUD.Anchor = clone(DefaultAnchor)
 		MY_ArchHUD.UpdateAnchor(this)
 	end
@@ -298,7 +298,7 @@ function PS.OnPanelActive(wnd)
 	local x, y = 30, 30
 	local w, h = ui:size()
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x, y = y, w = 120,
 		text = _L['enable'],
 		checked = MY_ArchHUD.bOn,
@@ -309,7 +309,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + 45
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x, y = y, w = 200,
 		text = _L['hide when unfight'],
 		checked = MY_ArchHUD.bFightShow,
@@ -320,7 +320,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + 45
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x, y = y, w = 200,
 		text = _L['display target casting'],
 		checked = MY_ArchHUD.bShowCastingBar,
@@ -331,15 +331,15 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + 45
 
-	ui:append("WndSliderBox", {
+	ui:append('WndSliderBox', {
 		x = x, y = y, w = 200,
 		text = _L('current alpha is %d%%.', MY_ArchHUD.nAlpha),
-		textfmt = function(val) return _L("current alpha is %d%%.", val) end,
+		textfmt = function(val) return _L('current alpha is %d%%.', val) end,
 		range = {0, 100},
 		value = MY_ArchHUD.nAlpha,
 		onchange = function(val)
 			MY_ArchHUD.nAlpha = val
-			local frame = Station.Lookup("Lowest/MY_ArchHUD")
+			local frame = Station.Lookup('Lowest/MY_ArchHUD')
 			if frame then
 				frame:SetAlpha(MY_ArchHUD.nAlpha * 2.55)
 			end
@@ -347,9 +347,9 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + 45
 
-	ui:append("Text", {
+	ui:append('Text', {
 		x = x, y = y, w = 120,
 		text = _L['origin author: Sulian Yi'],
 	})
 end
-MY.RegisterPanel("MY_ArchHUD", _L["MY_ArchHUD"], _L['General'], 6767, {255,255,0,200}, PS)
+MY.RegisterPanel('MY_ArchHUD', _L['MY_ArchHUD'], _L['General'], 6767, {255,255,0,200}, PS)

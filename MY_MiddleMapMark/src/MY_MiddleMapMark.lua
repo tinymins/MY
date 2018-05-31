@@ -8,29 +8,29 @@
 -- @Last modified time: 2017-02-08 17:59:40
 -----------------------------------------------
 MY.CreateDataRoot(MY_DATA_PATH.GLOBAL)
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_MiddleMapMark/lang/")
-local l_szKeyword, l_dwMapID, l_nMapIndex = ""
-local SZ_DB_PATH = MY.FormatPath({"cache/npc_doodad_rec.v2.db", MY_DATA_PATH.GLOBAL})
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_MiddleMapMark/lang/')
+local l_szKeyword, l_dwMapID, l_nMapIndex = ''
+local SZ_DB_PATH = MY.FormatPath({'cache/npc_doodad_rec.v2.db', MY_DATA_PATH.GLOBAL})
 local DB = SQLite3_Open(SZ_DB_PATH)
 if not DB then
-	return MY.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L["MY_MiddleMapMark"])
+	return MY.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L['MY_MiddleMapMark'])
 end
-DB:Execute("CREATE TABLE IF NOT EXISTS NpcInfo (templateid INTEGER, poskey INTEGER, mapid INTEGER, x INTEGER, y INTEGER, name VARCHAR(20) NOT NULL, title VARCHAR(20) NOT NULL, level INTEGER, PRIMARY KEY(templateid, poskey))")
-DB:Execute("CREATE INDEX IF NOT EXISTS mmm_name_idx ON NpcInfo(name, mapid)")
-DB:Execute("CREATE INDEX IF NOT EXISTS mmm_title_idx ON NpcInfo(title, mapid)")
-DB:Execute("CREATE INDEX IF NOT EXISTS mmm_template_idx ON NpcInfo(templateid, mapid)")
-local DBN_W  = DB:Prepare("REPLACE INTO NpcInfo (templateid, poskey, mapid, x, y, name, title, level) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
-local DBN_DM  = DB:Prepare("DELETE FROM NpcInfo WHERE mapid = ?")
-local DBN_RI = DB:Prepare("SELECT templateid, poskey, mapid, x, y, name, title, level FROM NpcInfo WHERE templateid = ?")
-local DBN_RN = DB:Prepare("SELECT templateid, poskey, mapid, x, y, name, title, level FROM NpcInfo WHERE name LIKE ? OR title LIKE ?")
-local DBN_RNM = DB:Prepare("SELECT templateid, poskey, mapid, x, y, name, title, level FROM NpcInfo WHERE (name LIKE ? AND mapid = ?) OR (title LIKE ? AND mapid = ?)")
-DB:Execute("CREATE TABLE IF NOT EXISTS DoodadInfo (templateid INTEGER, poskey INTEGER, mapid INTEGER, x INTEGER, y INTEGER, name VARCHAR(20) NOT NULL, PRIMARY KEY (templateid, poskey))")
-DB:Execute("CREATE INDEX IF NOT EXISTS mmm_name_idx ON DoodadInfo(name, mapid)")
-local DBD_W  = DB:Prepare("REPLACE INTO DoodadInfo (templateid, poskey, mapid, x, y, name) VALUES (?, ?, ?, ?, ?, ?)")
-local DBD_DM  = DB:Prepare("DELETE FROM DoodadInfo WHERE mapid = ?")
-local DBD_RI = DB:Prepare("SELECT templateid, poskey, mapid, x, y, name FROM DoodadInfo WHERE templateid = ?")
-local DBD_RN = DB:Prepare("SELECT templateid, poskey, mapid, x, y, name FROM DoodadInfo WHERE name LIKE ?")
-local DBD_RNM = DB:Prepare("SELECT templateid, poskey, mapid, x, y, name FROM DoodadInfo WHERE name LIKE ? AND mapid = ?")
+DB:Execute('CREATE TABLE IF NOT EXISTS NpcInfo (templateid INTEGER, poskey INTEGER, mapid INTEGER, x INTEGER, y INTEGER, name VARCHAR(20) NOT NULL, title VARCHAR(20) NOT NULL, level INTEGER, PRIMARY KEY(templateid, poskey))')
+DB:Execute('CREATE INDEX IF NOT EXISTS mmm_name_idx ON NpcInfo(name, mapid)')
+DB:Execute('CREATE INDEX IF NOT EXISTS mmm_title_idx ON NpcInfo(title, mapid)')
+DB:Execute('CREATE INDEX IF NOT EXISTS mmm_template_idx ON NpcInfo(templateid, mapid)')
+local DBN_W  = DB:Prepare('REPLACE INTO NpcInfo (templateid, poskey, mapid, x, y, name, title, level) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+local DBN_DM  = DB:Prepare('DELETE FROM NpcInfo WHERE mapid = ?')
+local DBN_RI = DB:Prepare('SELECT templateid, poskey, mapid, x, y, name, title, level FROM NpcInfo WHERE templateid = ?')
+local DBN_RN = DB:Prepare('SELECT templateid, poskey, mapid, x, y, name, title, level FROM NpcInfo WHERE name LIKE ? OR title LIKE ?')
+local DBN_RNM = DB:Prepare('SELECT templateid, poskey, mapid, x, y, name, title, level FROM NpcInfo WHERE (name LIKE ? AND mapid = ?) OR (title LIKE ? AND mapid = ?)')
+DB:Execute('CREATE TABLE IF NOT EXISTS DoodadInfo (templateid INTEGER, poskey INTEGER, mapid INTEGER, x INTEGER, y INTEGER, name VARCHAR(20) NOT NULL, PRIMARY KEY (templateid, poskey))')
+DB:Execute('CREATE INDEX IF NOT EXISTS mmm_name_idx ON DoodadInfo(name, mapid)')
+local DBD_W  = DB:Prepare('REPLACE INTO DoodadInfo (templateid, poskey, mapid, x, y, name) VALUES (?, ?, ?, ?, ?, ?)')
+local DBD_DM  = DB:Prepare('DELETE FROM DoodadInfo WHERE mapid = ?')
+local DBD_RI = DB:Prepare('SELECT templateid, poskey, mapid, x, y, name FROM DoodadInfo WHERE templateid = ?')
+local DBD_RN = DB:Prepare('SELECT templateid, poskey, mapid, x, y, name FROM DoodadInfo WHERE name LIKE ?')
+local DBD_RNM = DB:Prepare('SELECT templateid, poskey, mapid, x, y, name FROM DoodadInfo WHERE name LIKE ? AND mapid = ?')
 
 MY_MiddleMapMark = {}
 do
@@ -54,11 +54,11 @@ local function GeneDoodadInfoPosKey(mapid, x, y)
 	return mapid * L32 + math.floor(x / DOODAD_MAX_DISTINCT_DISTANCE) * L16 + math.floor(y / DOODAD_MAX_DISTINCT_DISTANCE)
 end
 
-local SZ_CACHE_PATH = "cache/NPC_DOODAD_REC/"
+local SZ_CACHE_PATH = 'cache/NPC_DOODAD_REC/'
 if IsLocalFileExist(MY.FormatPath(SZ_CACHE_PATH)) then
-	DB:Execute("BEGIN TRANSACTION")
+	DB:Execute('BEGIN TRANSACTION')
 	for _, dwMapID in ipairs(GetMapList()) do
-		local data = MY.LoadLUAData(SZ_CACHE_PATH .. dwMapID .. ".$lang.jx3dat")
+		local data = MY.LoadLUAData(SZ_CACHE_PATH .. dwMapID .. '.$lang.jx3dat')
 		if type(data) == 'string' then
 			data = MY.JsonDecode(data)
 		end
@@ -73,10 +73,10 @@ if IsLocalFileExist(MY.FormatPath(SZ_CACHE_PATH)) then
 				DBD_W:BindAll(p.dwTemplateID, GeneDoodadInfoPosKey(dwMapID, p.nX, p.nY), dwMapID, p.nX, p.nY, AnsiToUTF8(p.szName))
 				DBD_W:Execute()
 			end
-			MY.Debug({"MiddleMapMark cache trans from file to sqlite finished!"}, "MY_MiddleMapMark", MY_DEBUG.LOG)
+			MY.Debug({'MiddleMapMark cache trans from file to sqlite finished!'}, 'MY_MiddleMapMark', MY_DEBUG.LOG)
 		end
 	end
-	DB:Execute("END TRANSACTION")
+	DB:Execute('END TRANSACTION')
 	CPath.DelDir(MY.FormatPath(SZ_CACHE_PATH))
 end
 
@@ -92,7 +92,7 @@ local function PushDB()
 	if empty(l_npc) and empty(l_doodad) then
 		return
 	end
-	DB:Execute("BEGIN TRANSACTION")
+	DB:Execute('BEGIN TRANSACTION')
 
 	for i, p in pairs(l_npc) do
 		if not p.temp then
@@ -112,7 +112,7 @@ local function PushDB()
 	end
 	l_doodad = {}
 
-	DB:Execute("END TRANSACTION")
+	DB:Execute('END TRANSACTION')
 end
 local function onLoadingEnding()
 	l_tempMap = MY.IsInPubg() or MY.IsInArena() or MY.IsInBattleField() or false
@@ -133,7 +133,7 @@ local function OnExit()
 	PushDB()
 	DB:Release()
 end
-MY.RegisterExit("MY_MiddleMapMark_Save", OnExit)
+MY.RegisterExit('MY_MiddleMapMark_Save', OnExit)
 
 local function Rerender()
 	MY_MiddleMapMark.Search(l_szKeyword)
@@ -142,13 +142,13 @@ end
 local function AutomaticRerender()
 	if GetTime() - l_renderTime > MAX_RENDER_INTERVAL then
 		Rerender()
-	elseif not MY.DelayCall("MY_MiddleMapMark_Refresh") then
-		MY.DelayCall("MY_MiddleMapMark_Refresh", MAX_RENDER_INTERVAL, Rerender)
+	elseif not MY.DelayCall('MY_MiddleMapMark_Refresh') then
+		MY.DelayCall('MY_MiddleMapMark_Refresh', MAX_RENDER_INTERVAL, Rerender)
 	end
 end
 
-local NpcTpl = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_MiddleMapMark/data/npc/$lang.jx3dat")
-local DoodadTpl = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_MiddleMapMark/data/doodad/$lang.jx3dat")
+local NpcTpl = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_MiddleMapMark/data/npc/$lang.jx3dat')
+local DoodadTpl = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_MiddleMapMark/data/doodad/$lang.jx3dat')
 local function OnNpcEnterScene()
 	if l_tempMap and MY.IsShieldedVersion() then
 		return
@@ -176,7 +176,7 @@ local function OnNpcEnterScene()
 	local dwPosKey = GeneNpcInfoPosKey(dwMapID, npc.nX, npc.nY)
 
 	-- add rec
-	l_npc[npc.dwTemplateID .. "," .. dwPosKey] = {
+	l_npc[npc.dwTemplateID .. ',' .. dwPosKey] = {
 		decoded = true,
 		temp = l_tempMap,
 		x = npc.nX,
@@ -191,7 +191,7 @@ local function OnNpcEnterScene()
 	-- redraw ui
 	AutomaticRerender()
 end
-MY.RegisterEvent("NPC_ENTER_SCENE.MY_MIDDLEMAPMARK", OnNpcEnterScene)
+MY.RegisterEvent('NPC_ENTER_SCENE.MY_MIDDLEMAPMARK', OnNpcEnterScene)
 
 local REC_DOODAD_TYPES = {
 	[DOODAD_KIND.INVALID     ] = false,
@@ -237,7 +237,7 @@ local function OnDoodadEnterScene()
 	local dwPosKey = GeneDoodadInfoPosKey(dwMapID, doodad.nX, doodad.nY)
 
 	-- add rec
-	l_doodad[doodad.dwTemplateID .. "," .. dwPosKey] = {
+	l_doodad[doodad.dwTemplateID .. ',' .. dwPosKey] = {
 		decoded = true,
 		temp = l_tempMap,
 		x = doodad.nX,
@@ -250,11 +250,11 @@ local function OnDoodadEnterScene()
 	-- redraw ui
 	AutomaticRerender()
 end
-MY.RegisterEvent("DOODAD_ENTER_SCENE.MY_MIDDLEMAPMARK", OnDoodadEnterScene)
+MY.RegisterEvent('DOODAD_ENTER_SCENE.MY_MIDDLEMAPMARK', OnDoodadEnterScene)
 
 function MY_MiddleMapMark.SearchNpc(szText, dwMapID)
 	local aInfos
-	local szSearch = AnsiToUTF8("%" .. szText .. "%")
+	local szSearch = AnsiToUTF8('%' .. szText .. '%')
 	if dwMapID then
 		DBN_RNM:ClearBindings()
 		DBN_RNM:BindAll(szSearch, dwMapID, szSearch, dwMapID)
@@ -267,7 +267,7 @@ function MY_MiddleMapMark.SearchNpc(szText, dwMapID)
 	for i = #aInfos, 1, -1 do
 		local p = aInfos[i]
 		if (not dwMapID or p.mapid == dwMapID)
-		and l_npc[p.templateid .. "," .. p.poskey] then
+		and l_npc[p.templateid .. ',' .. p.poskey] then
 			table.remove(aInfos, i)
 		end
 	end
@@ -282,7 +282,7 @@ end
 
 function MY_MiddleMapMark.SearchDoodad(szText, dwMapID)
 	local aInfos
-	local szSearch = AnsiToUTF8("%" .. szText .. "%")
+	local szSearch = AnsiToUTF8('%' .. szText .. '%')
 	if dwMapID then
 		DBD_RNM:ClearBindings()
 		DBD_RNM:BindAll(szSearch, dwMapID)
@@ -295,7 +295,7 @@ function MY_MiddleMapMark.SearchDoodad(szText, dwMapID)
 	for i = #aInfos, 1, -1 do
 		local p = aInfos[i]
 		if (not dwMapID or p.mapid == dwMapID)
-		and l_doodad[p.templateid .. "," .. p.poskey] then
+		and l_doodad[p.templateid .. ',' .. p.poskey] then
 			table.remove(aInfos, i)
 		end
 	end
@@ -411,7 +411,7 @@ local function OnMMMItemMouseLeave()
 	HideTip()
 end
 function MY_MiddleMapMark.Search(szKeyword)
-	local frame = Station.Lookup("Topmost1/MiddleMap")
+	local frame = Station.Lookup('Topmost1/MiddleMap')
 	local player = GetClientPlayer()
 	if not player or not frame or not frame:IsVisible() then
 		return
@@ -425,12 +425,12 @@ function MY_MiddleMapMark.Search(szKeyword)
 	l_renderTime = GetTime()
 	l_dwMapID, l_nMapIndex, l_szKeyword = dwMapID, nMapIndex, szKeyword
 
-	local hInner = frame:Lookup("", "Handle_Inner")
+	local hInner = frame:Lookup('', 'Handle_Inner')
 	local nW, nH = hInner:GetSize()
-	local hMMM = hInner:Lookup("Handle_MY_MMM")
+	local hMMM = hInner:Lookup('Handle_MY_MMM')
 	if not hMMM then
 		hInner:AppendItemFromString('<handle>firstpostype=0 name="Handle_MY_MMM" w=' .. nW .. ' h=' .. nH .. '</handle>')
-		hMMM = hInner:Lookup("Handle_MY_MMM")
+		hMMM = hInner:Lookup('Handle_MY_MMM')
 		hInner:FormatAllItemPos()
 	end
 	local nCount = 0
@@ -442,7 +442,7 @@ function MY_MiddleMapMark.Search(szKeyword)
 		local i = 1
 		for _, szSearch in ipairs(MY.String.Split(szKeyword, ',')) do
 			szSearch = MY.String.Trim(szSearch)
-			if szSearch ~= "" then
+			if szSearch ~= '' then
 				aKeywords[i] = szSearch
 				i = i + 1
 			end
@@ -465,7 +465,7 @@ function MY_MiddleMapMark.Search(szKeyword)
 					item:Show()
 					item:SetRelPos(nX, nY)
 					item.decoded = info.decoded
-					item.type = "Npc"
+					item.type = 'Npc'
 					item.name = info.name
 					item.title = info.title
 					item.level = info.level
@@ -492,7 +492,7 @@ function MY_MiddleMapMark.Search(szKeyword)
 					item:Show()
 					item:SetRelPos(nX, nY)
 					item.decoded = info.decoded
-					item.type = "Doodad"
+					item.type = 'Doodad'
 					item.name = info.name
 					item.title = info.title
 					item.level = info.level
@@ -519,7 +519,7 @@ function PS.OnPanelActive(wnd)
 	local x, y = ui:pos()
 	local w, h = ui:size()
 
-	local list = ui:append("WndListBox", "WndListBox_1"):children('#WndListBox_1')
+	local list = ui:append('WndListBox', 'WndListBox_1'):children('#WndListBox_1')
 	  :pos(20, 35)
 	  :size(w - 32, h - 50)
 	  :listbox('onlclick', function(hItem, text, id, data, selected)
@@ -531,7 +531,7 @@ function PS.OnPanelActive(wnd)
 	  	end
 	  end)
 
-	local muProgress = ui:append("Image", "Image_Progress"):children('#Image_Progress')
+	local muProgress = ui:append('Image', 'Image_Progress'):children('#Image_Progress')
 	  :pos(20, 31)
 	  :size(w - 30, 4)
 	  :image('ui/Image/UICommon/RaidTotal.UITex|45')
@@ -600,4 +600,4 @@ function PS.OnPanelResize(wnd)
 	ui:children('#WndEdit_Search'):size(w - 26, 25)
 end
 
-MY.RegisterPanel("MY_MiddleMapMark", _L["middle map mark"], _L['General'], "ui/Image/MiddleMap/MapWindow2.UITex|4", {255,255,0,200}, PS)
+MY.RegisterPanel('MY_MiddleMapMark', _L['middle map mark'], _L['General'], 'ui/Image/MiddleMap/MapWindow2.UITex|4', {255,255,0,200}, PS)

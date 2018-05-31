@@ -6,22 +6,22 @@
 -- @Last modified by:   tinymins
 -- @Last modified time: 2017-05-06 02:52:18
 --------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot.."MY_Toolbox/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot..'MY_Toolbox/lang/')
 local _C = {}
-local INI_PATH = MY.GetAddonInfo().szRoot .. "MY_ToolBox/ui/MY_VisualSkill.ini"
+local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_ToolBox/ui/MY_VisualSkill.ini'
 local BOX_W = 55
 local ANI_TIME = 450
 local OUT_DISTANCE = 200
-local defaultAnchor = {x = 0, y = -220, s = "BOTTOMCENTER", r = "BOTTOMCENTER"}
+local defaultAnchor = {x = 0, y = -220, s = 'BOTTOMCENTER', r = 'BOTTOMCENTER'}
 MY_VisualSkill = {}
 MY_VisualSkill.bEnable = false
 MY_VisualSkill.bPenetrable = true
 MY_VisualSkill.anchor = defaultAnchor
 MY_VisualSkill.nVisualSkillBoxCount = 5
-RegisterCustomData("MY_VisualSkill.bEnable")
-RegisterCustomData("MY_VisualSkill.bPenetrable")
-RegisterCustomData("MY_VisualSkill.anchor")
-RegisterCustomData("MY_VisualSkill.nVisualSkillBoxCount")
+RegisterCustomData('MY_VisualSkill.bEnable')
+RegisterCustomData('MY_VisualSkill.bPenetrable')
+RegisterCustomData('MY_VisualSkill.anchor')
+RegisterCustomData('MY_VisualSkill.nVisualSkillBoxCount')
 
 local function ApplyAnchor(frame)
 	local anchor = MY_VisualSkill.anchor
@@ -35,7 +35,7 @@ end
 
 local function UpdateUI(frame, during)
 	local percentage = math.min(math.max(during / ANI_TIME, 0), 1)
-	local hList = frame:Lookup("", "Handle_Boxes")
+	local hList = frame:Lookup('', 'Handle_Boxes')
 	local nCount = hList:GetItemCount()
 
 	local hItem = hList:Lookup(GetRealIndex(0, frame.nIndexBase, nCount))
@@ -64,7 +64,7 @@ local function UpdateUI(frame, during)
 end
 
 local function StartAnimation(frame)
-	local hList = frame:Lookup("", "Handle_Boxes")
+	local hList = frame:Lookup('', 'Handle_Boxes')
 	local nCount = hList:GetItemCount()
 	for i = 0, nCount - 1 do
 		local hItem = hList:Lookup(i)
@@ -74,13 +74,13 @@ local function StartAnimation(frame)
 end
 
 local function DrawUI(frame)
-	local hList = frame:Lookup("", "Handle_Boxes")
+	local hList = frame:Lookup('', 'Handle_Boxes')
 	local nOffset = MY_VisualSkill.nVisualSkillBoxCount - hList:GetItemCount() + 1
 	if nOffset == 0 then
 		return
 	elseif nOffset > 0 then
 		for i = 1, nOffset do
-			hList:AppendItemFromIni(INI_PATH, "Handle_Box"):Lookup("Box_Skill"):Hide()
+			hList:AppendItemFromIni(INI_PATH, 'Handle_Box'):Lookup('Box_Skill'):Hide()
 			for i = hList:GetItemCount() - 1, frame.nIndexBase + 1 do
 				hList:ExchangeItemIndex(i, i - 1)
 			end
@@ -92,9 +92,9 @@ local function DrawUI(frame)
 		end
 	end
 	local nBoxesW = BOX_W * MY_VisualSkill.nVisualSkillBoxCount
-	frame:Lookup("", "Handle_Bg/Image_Bg_11"):SetW(nBoxesW - 34)
-	frame:Lookup("", "Handle_Bg"):FormatAllItemPos()
-	frame:Lookup("", ""):FormatAllItemPos()
+	frame:Lookup('', 'Handle_Bg/Image_Bg_11'):SetW(nBoxesW - 34)
+	frame:Lookup('', 'Handle_Bg'):FormatAllItemPos()
+	frame:Lookup('', ''):FormatAllItemPos()
 	frame:SetW(nBoxesW + 176)
 	hList:SetW(nBoxesW)
 	UpdateUI(frame, ANI_TIME)
@@ -147,16 +147,16 @@ local function OnSkillCast(frame, dwSkillID, dwSkillLevel)
 		or dwIconID  == 533        -- 打坐
 		or dwIconID  == 13         -- 子技能
 		or not szSkillName
-		or szSkillName == ""
+		or szSkillName == ''
 	then
 		return
 	end
 
-	local hList = frame:Lookup("", "Handle_Boxes")
+	local hList = frame:Lookup('', 'Handle_Boxes')
 	local hItem = hList:Lookup(frame.nIndexBase)
 	frame.nIndexBase = (frame.nIndexBase + 1) % hList:GetItemCount()
 
-	local box = hItem:Lookup("Box_Skill")
+	local box = hItem:Lookup('Box_Skill')
 	box:SetObject(UI_OBJECT_SKILL, dwSkillID, dwSkillLevel)
 	box:SetObjectIcon(dwIconID)
 	box:Show()
@@ -167,17 +167,17 @@ end
 function MY_VisualSkill.OnFrameCreate()
 	this.nIndexBase = 0
 	DrawUI(this)
-	this:RegisterEvent("RENDER_FRAME_UPDATE")
-	this:RegisterEvent("UI_SCALED")
-	this:RegisterEvent("DO_SKILL_CAST")
-	this:RegisterEvent("ON_ENTER_CUSTOM_UI_MODE")
-	this:RegisterEvent("ON_LEAVE_CUSTOM_UI_MODE")
-	this:RegisterEvent("CUSTOM_UI_MODE_SET_DEFAULT")
-	MY_VisualSkill.OnEvent("UI_SCALED")
+	this:RegisterEvent('RENDER_FRAME_UPDATE')
+	this:RegisterEvent('UI_SCALED')
+	this:RegisterEvent('DO_SKILL_CAST')
+	this:RegisterEvent('ON_ENTER_CUSTOM_UI_MODE')
+	this:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
+	this:RegisterEvent('CUSTOM_UI_MODE_SET_DEFAULT')
+	MY_VisualSkill.OnEvent('UI_SCALED')
 end
 
 function MY_VisualSkill.OnEvent(event)
-	if event == "RENDER_FRAME_UPDATE" then
+	if event == 'RENDER_FRAME_UPDATE' then
 		if not this.nTickStart then
 			return
 		end
@@ -186,34 +186,34 @@ function MY_VisualSkill.OnEvent(event)
 			this.nTickStart = nil
 		end
 		UpdateUI(this, nTickDuring)
-	elseif event == "UI_SCALED" then
+	elseif event == 'UI_SCALED' then
 		ApplyAnchor(this)
-	elseif event == "DO_SKILL_CAST" then
+	elseif event == 'DO_SKILL_CAST' then
 		local dwID, dwSkillID, dwSkillLevel = arg0, arg1, arg2
 		if dwID == GetControlPlayer().dwID then
 			OnSkillCast(this, dwSkillID, dwSkillLevel)
 		end
-	elseif event == "ON_ENTER_CUSTOM_UI_MODE" then
+	elseif event == 'ON_ENTER_CUSTOM_UI_MODE' then
 		UpdateCustomModeWindow(this, szTip, MY_VisualSkill.bPenetrable)
-	elseif event == "ON_LEAVE_CUSTOM_UI_MODE" then
+	elseif event == 'ON_LEAVE_CUSTOM_UI_MODE' then
 		UpdateCustomModeWindow(this, szTip, MY_VisualSkill.bPenetrable)
 		MY_VisualSkill.anchor = GetFrameAnchor(this)
-	elseif event == "CUSTOM_UI_MODE_SET_DEFAULT" then
+	elseif event == 'CUSTOM_UI_MODE_SET_DEFAULT' then
 		MY_VisualSkill.anchor = defaultAnchor
 		ApplyAnchor(this)
 	end
 end
 
 function MY_VisualSkill.Open()
-	Wnd.OpenWindow(INI_PATH, "MY_VisualSkill")
+	Wnd.OpenWindow(INI_PATH, 'MY_VisualSkill')
 end
 
 function MY_VisualSkill.GetFrame()
-	return Station.Lookup("Normal/MY_VisualSkill")
+	return Station.Lookup('Normal/MY_VisualSkill')
 end
 
 function MY_VisualSkill.Close()
-	Wnd.CloseWindow("MY_VisualSkill")
+	Wnd.CloseWindow('MY_VisualSkill')
 end
 
 function MY_VisualSkill.Reload()

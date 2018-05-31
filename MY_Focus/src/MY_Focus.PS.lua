@@ -28,7 +28,7 @@ local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local IsNil, IsNumber, IsFunction = MY.IsNil, MY.IsNumber, MY.IsFunction
 local IsBoolean, IsString, IsTable = MY.IsBoolean, MY.IsString, MY.IsTable
 -----------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Focus/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Focus/lang/')
 
 local PS = {}
 function PS.OnPanelActive(wnd)
@@ -40,7 +40,7 @@ function PS.OnPanelActive(wnd)
 
 	-- ×ó²à
 	local x, y = xl, yl
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x, y = y, w = 250, text = _L['enable'],
 		r = 255, g = 255, b = 0, checked = MY_Focus.bEnable,
 		oncheck = function(bChecked)
@@ -61,10 +61,10 @@ function PS.OnPanelActive(wnd)
 	y = y + 25
 
 	-- <hr />
-	ui:append("Image", {x = x, y = y, w = wl, h = 1, image = 'UI/Image/UICommon/ScienceTreeNode.UITex', imageframe = 62})
+	ui:append('Image', {x = x, y = y, w = wl, h = 1, image = 'UI/Image/UICommon/ScienceTreeNode.UITex', imageframe = 62})
 	y = y + 5
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x, y = y, text = _L['auto focus'], checked = MY_Focus.bAutoFocus,
 		oncheck = function(bChecked)
 			MY_Focus.bAutoFocus = bChecked
@@ -88,7 +88,7 @@ function PS.OnPanelActive(wnd)
 		end
 		return v.szPattern .. ' (' .. szType .. ')'
 	end
-	local list = ui:append("WndListBox", {
+	local list = ui:append('WndListBox', {
 		x = x, y = y + 30, w = wl - x + xl, h = h - y - 40,
 		autoenable = function() return MY_Focus.IsEnabled() end,
 	}, true)
@@ -163,7 +163,7 @@ function PS.OnPanelActive(wnd)
 			end), {
 				szOption = _L['Value'],
 				fnMouseEnter = function()
-					OutputTip(GetFormatText(tData.tLife.nValue .. "%", nil, 255, 255, 0), 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
+					OutputTip(GetFormatText(tData.tLife.nValue .. '%', nil, 255, 255, 0), 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
 				end,
 				fnAction = function()
 					GetUserInputNumber(tData.tLife.nValue, 100, nil, function(val)
@@ -195,9 +195,9 @@ function PS.OnPanelActive(wnd)
 		return t
 	end)
 	-- add
-	ui:append("WndButton", {
+	ui:append('WndButton', {
 		x = wl - 160, y = y, w = 80,
-		text = _L["add"],
+		text = _L['add'],
 		onclick = function()
 			GetUserInput(_L['add auto focus'], function(szText)
 				local tData = MY_Focus.SetFocusPattern(szText)
@@ -210,9 +210,9 @@ function PS.OnPanelActive(wnd)
 		autoenable = function() return MY_Focus.IsEnabled() end,
 	})
 	-- del
-	ui:append("WndButton", {
+	ui:append('WndButton', {
 		x = wl - 80, y = y, w = 80,
-		text = _L["delete"],
+		text = _L['delete'],
 		onclick = function()
 			for _, v in ipairs(list:listbox('select', 'selected')) do
 				MY_Focus.RemoveFocusPattern(v.szPattern)
@@ -225,7 +225,7 @@ function PS.OnPanelActive(wnd)
 	-- ÓÒ²à
 	local x, y = xr, yr
 	local deltaY = (h - y * 2) / 19
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['hide when empty'],
 		checked = MY_Focus.bAutoHide,
 		oncheck = function(bChecked)
@@ -235,7 +235,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['auto focus very important npc'],
 		tip = _L['boss list is always been collecting and updating'],
 		tippostype = MY.Const.UI.Tip.POS_TOP,
@@ -248,7 +248,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['auto focus friend'],
 		checked = MY_Focus.bFocusFriend,
 		oncheck = function(bChecked)
@@ -259,14 +259,14 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	ui:append("Image", {
+	ui:append('Image', {
 		x = x + 5, y = y - 3, w = 10, h = 8,
-		image = "ui/Image/UICommon/ScienceTree.UITex",
+		image = 'ui/Image/UICommon/ScienceTree.UITex',
 		imageframe = 10,
 		autoenable = function() return MY_Focus.IsEnabled() end,
 	})
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['auto focus tong'],
 		checked = MY_Focus.bFocusTong,
 		oncheck = function(bChecked)
@@ -277,19 +277,19 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	ui:append("Image", {
+	ui:append('Image', {
 		x = x + 5, y = y, w = 10, h = 10,
-		image = "ui/Image/UICommon/ScienceTree.UITex",
+		image = 'ui/Image/UICommon/ScienceTree.UITex',
 		imageframe = 10,
 		autoenable = function() return MY_Focus.IsEnabled() end,
 	})
-	ui:append("Image", {
+	ui:append('Image', {
 		x = x + 10, y = y + 5, w = 10, h = 10,
-		image = "ui/Image/UICommon/ScienceTree.UITex",
+		image = 'ui/Image/UICommon/ScienceTree.UITex',
 		imageframe = 8,
 		autoenable = function() return MY_Focus.IsEnabled() end,
 	})
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x + 20, y = y, w = wr, text = _L['auto focus only in public map'],
 		checked = MY_Focus.bOnlyPublicMap,
 		oncheck = function(bChecked)
@@ -300,7 +300,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['auto focus enemy'],
 		checked = MY_Focus.bFocusEnemy,
 		oncheck = function(bChecked)
@@ -311,7 +311,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['jjc auto focus party'],
 		checked = MY_Focus.bFocusJJCParty,
 		oncheck = function(bChecked)
@@ -322,7 +322,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['jjc auto focus enemy'],
 		checked = MY_Focus.bFocusJJCEnemy,
 		oncheck = function(bChecked)
@@ -333,7 +333,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['show focus\'s target'],
 		checked = MY_Focus.bShowTarget,
 		oncheck = function(bChecked)
@@ -344,7 +344,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['show 3d distance'],
 		checked = MY_Focus.bDistanceZ,
 		oncheck = function(bChecked)
@@ -354,7 +354,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x, y = y,w = wr, text = _L['traversal object'],
 		tip = _L['may cause some problem in dungeon map'],
 		tippostype = MY.Const.UI.Tip.POS_BOTTOM,
@@ -366,7 +366,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['hide dead object'],
 		checked = MY_Focus.bHideDeath,
 		oncheck = function(bChecked)
@@ -377,7 +377,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['display kungfu icon instead of location'],
 		checked = MY_Focus.bDisplayKungfuIcon,
 		oncheck = function(bChecked)
@@ -412,7 +412,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x, y = y, w = wr, text = _L['heal healper'],
 		tip = _L['select target when mouse enter'],
 		tippostype = MY.Const.UI.Tip.POS_BOTTOM,
@@ -424,9 +424,9 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	ui:append("WndSliderBox", {
+	ui:append('WndSliderBox', {
 		x = x, y = y, w = 150,
-		textfmt = function(val) return _L("max display count %d.", val) end,
+		textfmt = function(val) return _L('max display count %d.', val) end,
 		range = {1, 20},
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		value = MY_Focus.nMaxDisplay,
@@ -437,9 +437,9 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	ui:append("WndSliderBox", {
+	ui:append('WndSliderBox', {
 		x = x, y = y, w = 150,
-		textfmt = function(val) return _L("current scale-x is %d%%.", val) end,
+		textfmt = function(val) return _L('current scale-x is %d%%.', val) end,
 		range = {10, 300},
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		value = MY_Focus.fScaleX * 100,
@@ -450,9 +450,9 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 
-	ui:append("WndSliderBox", {
+	ui:append('WndSliderBox', {
 		x = x, y = y, w = 150,
-		textfmt = function(val) return _L("current scale-y is %d%%.", val) end,
+		textfmt = function(val) return _L('current scale-y is %d%%.', val) end,
 		range = {10, 300},
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		value = MY_Focus.fScaleY * 100,
@@ -463,4 +463,4 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + deltaY
 end
-MY.RegisterPanel("MY_Focus", _L["focus list"], _L['Target'], "ui/Image/button/SystemButton_1.UITex|9", {255,255,0,200}, PS)
+MY.RegisterPanel('MY_Focus', _L['focus list'], _L['Target'], 'ui/Image/button/SystemButton_1.UITex|9', {255,255,0,200}, PS)

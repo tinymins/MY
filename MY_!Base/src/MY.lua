@@ -108,7 +108,7 @@ function MY.IsFunction(var) return type(var) == 'function' end
 --------------------------------------------------------------------------------------------------------------------------------------------
 -- 本地函数变量
 --------------------------------------------------------------------------------------------------------------------------------------------
-local _BUILD_ = "20180509"
+local _BUILD_ = '20180509'
 local _VERSION_ = 0x2010200
 local _DEBUGLV_ = tonumber(LoadLUAData('interface/my.debug.level') or nil) or 4
 local _DELOGLV_ = tonumber(LoadLUAData('interface/my.delog.level') or nil) or 4
@@ -116,30 +116,30 @@ local _NORESTM_ = tonumber(LoadLUAData('interface/my.nrtim.level') or nil) or -1
 local _INTERFACE_ROOT_ = './Interface/'
 local _ADDON_ROOT_     = _INTERFACE_ROOT_ .. 'MY/'
 local _FRAMEWORK_ROOT_ = _INTERFACE_ROOT_ .. 'MY/MY_!Base/'
-local _PSS_ST_         = _FRAMEWORK_ROOT_ .. "image/ST.pss"
-local _UITEX_ST_       = _FRAMEWORK_ROOT_ .. "image/ST_UI.UITex"
-local _UITEX_POSTER_   = _FRAMEWORK_ROOT_ .. "image/Poster.UITex"
-local _UITEX_COMMON_   = _FRAMEWORK_ROOT_ .. "image/UICommon.UITex"
+local _PSS_ST_         = _FRAMEWORK_ROOT_ .. 'image/ST.pss'
+local _UITEX_ST_       = _FRAMEWORK_ROOT_ .. 'image/ST_UI.UITex'
+local _UITEX_POSTER_   = _FRAMEWORK_ROOT_ .. 'image/Poster.UITex'
+local _UITEX_COMMON_   = _FRAMEWORK_ROOT_ .. 'image/UICommon.UITex'
 local IsNil, IsNumber, IsFunction = MY.IsNil, MY.IsNumber, MY.IsFunction
 local IsBoolean, IsString, IsTable = MY.IsBoolean, MY.IsString, MY.IsTable
-Log("[MY] Debug level " .. _DEBUGLV_ .. " / delog level " .. _DELOGLV_)
+Log('[MY] Debug level ' .. _DEBUGLV_ .. ' / delog level ' .. _DELOGLV_)
 
 -- 多语言处理
 -- (table) MY.LoadLangPack(void)
 function MY.LoadLangPack(szLangFolder)
 	local _, _, szLang = GetVersion()
-	local t0 = LoadLUAData(_FRAMEWORK_ROOT_.."lang/default") or {}
-	local t1 = LoadLUAData(_FRAMEWORK_ROOT_.."lang/" .. szLang) or {}
+	local t0 = LoadLUAData(_FRAMEWORK_ROOT_..'lang/default') or {}
+	local t1 = LoadLUAData(_FRAMEWORK_ROOT_..'lang/' .. szLang) or {}
 	for k, v in pairs(t1) do
 		t0[k] = v
 	end
-	if type(szLangFolder)=="string" then
-		szLangFolder = string.gsub(szLangFolder,"[/\\]+$","")
-		local t2 = LoadLUAData(szLangFolder.."/default") or {}
+	if type(szLangFolder)=='string' then
+		szLangFolder = string.gsub(szLangFolder,'[/\\]+$','')
+		local t2 = LoadLUAData(szLangFolder..'/default') or {}
 		for k, v in pairs(t2) do
 			t0[k] = v
 		end
-		local t3 = LoadLUAData(szLangFolder.."/" .. szLang) or {}
+		local t3 = LoadLUAData(szLangFolder..'/' .. szLang) or {}
 		for k, v in pairs(t3) do
 			t0[k] = v
 		end
@@ -151,13 +151,13 @@ function MY.LoadLangPack(szLangFolder)
 	return t0
 end
 local _L = MY.LoadLangPack()
-local _NAME_       = _L["mingyi plugins"]
-local _SHORT_NAME_ = _L["mingyi plugin"]
+local _NAME_       = _L['mingyi plugins']
+local _SHORT_NAME_ = _L['mingyi plugin']
 local _AUTHOR_     = _L['MingYi @ Double Dream Town']
 -----------------------------------------------
 -- 私有函数
 -----------------------------------------------
-local INI_PATH = _FRAMEWORK_ROOT_.."ui/MY.ini"
+local INI_PATH = _FRAMEWORK_ROOT_..'ui/MY.ini'
 local _MY = {}
 
 do local AddonInfo = SetmetaReadonly({
@@ -203,11 +203,11 @@ local function createInstance(c, ins, ...)
 	return c
 end
 function MY.class(className, super)
-	if type(super) == "string" then
+	if type(super) == 'string' then
 		className, super = super
 	end
 	if not className then
-		className = "Unnamed Class"
+		className = 'Unnamed Class'
 	end
 	local classPrototype = (function ()
 		local proxys = {}
@@ -217,11 +217,11 @@ function MY.class(className, super)
 		end
 		return setmetatable({}, {
 			__index = proxys,
-			__tostring = function(t) return className .. " (class prototype)" end,
+			__tostring = function(t) return className .. ' (class prototype)' end,
 			__call = function (...)
 				return createInstance(setmetatable({}, {
 					__index = classPrototype,
-					__tostring = function(t) return className .. " (class instance)" end,
+					__tostring = function(t) return className .. ' (class instance)' end,
 				}), nil, ...)
 			end,
 		})
@@ -259,7 +259,7 @@ function MY.ClosePanel(bMute, bRealClose, bNoAnimate)
 			MY.SwitchTab()
 			Wnd.CloseWindow(hFrame)
 		end
-		Wnd.CloseWindow("PopupMenuPanel")
+		Wnd.CloseWindow('PopupMenuPanel')
 		if not bMute then
 			PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 		end
@@ -272,17 +272,17 @@ function MY.OpenPanel(bMute, bNoFocus, bNoAnimate)
 	local frame = MY.GetFrame()
 	local bNoAnimate = bNoAnimate or (frame and frame:IsVisible())
 	if not frame then
-		frame = Wnd.OpenWindow(INI_PATH, "MY")
+		frame = Wnd.OpenWindow(INI_PATH, 'MY')
 		frame.intact = true
-		frame:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
+		frame:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 		frame:CorrectPos()
 
 		-- update some ui handle
-		frame:Lookup("", "Text_Title"):SetText(_L['mingyi plugins'] .. " v" .. MY.GetVersion() .. ' Build ' .. _BUILD_)
-		MY.UI(frame):size(_MY.OnSizeChanged):event("ON_SCALED", _MY.OnSizeChanged)
+		frame:Lookup('', 'Text_Title'):SetText(_L['mingyi plugins'] .. ' v' .. MY.GetVersion() .. ' Build ' .. _BUILD_)
+		MY.UI(frame):size(_MY.OnSizeChanged):event('ON_SCALED', _MY.OnSizeChanged)
 		-- update author infomation button
-		frame:Lookup("", "Text_Author"):SetText(_L['author\'s signature'])
-		frame:Lookup("Wnd_Total/Btn_Weibo", "Text_Default"):SetText(_L['author\'s weibo'])
+		frame:Lookup('', 'Text_Author'):SetText(_L['author\'s signature'])
+		frame:Lookup('Wnd_Total/Btn_Weibo', 'Text_Default'):SetText(_L['author\'s weibo'])
 		MY.UI(frame):event('UI_SCALED', function()
 			local fn = frame:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel').OnScrollBarPosChanged
 			if fn then
@@ -350,7 +350,7 @@ end
 
 -- if panel visible
 function MY.IsPanelOpened()
-	return Station.Lookup("Normal/MY")
+	return Station.Lookup('Normal/MY')
 end
 
 -- 获取主窗体句柄
@@ -361,10 +361,10 @@ end
 
 -- (string, number) MY.GetVersion()
 function MY.GetVersion()
-	local szVersion = string.format("%X.%X.%02X", _VERSION_ / 0x1000000,
+	local szVersion = string.format('%X.%X.%02X', _VERSION_ / 0x1000000,
 		math.floor(_VERSION_ / 0x10000) % 0x100, math.floor(_VERSION_ / 0x100) % 0x100)
 	if  _VERSION_ % 0x100 ~= 0 then
-		szVersion = szVersion .. "b" .. tostring(_VERSION_ % 0x100)
+		szVersion = szVersion .. 'b' .. tostring(_VERSION_ % 0x100)
 	end
 	return szVersion, _VERSION_
 end
@@ -385,7 +385,7 @@ local function OnInit()
 		local nStartTick = GetTickCount()
 		local status, err = pcall(fnAction)
 		if not status then
-			MY.Debug({err}, "INIT_FUNC_LIST#" .. szKey)
+			MY.Debug({err}, 'INIT_FUNC_LIST#' .. szKey)
 		end
 		MY.Debug({_L('Initial function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], MY_DEBUG.LOG)
 	end
@@ -396,9 +396,9 @@ local function OnInit()
 	MY.ResizePanel(780 * fScale, 540 * fScale)
 	MY.ClosePanel(true, false, true)
 	-- 显示欢迎信息
-	MY.Sysmsg({_L("%s, welcome to use mingyi plugins!", GetClientPlayer().szName) .. " v" .. MY.GetVersion() .. ' Build ' .. _BUILD_})
+	MY.Sysmsg({_L('%s, welcome to use mingyi plugins!', GetClientPlayer().szName) .. ' v' .. MY.GetVersion() .. ' Build ' .. _BUILD_})
 end
-RegisterEvent("LOADING_ENDING", OnInit) -- 不能用FIRST_LOADING_END 不然注册快捷键就全跪了
+RegisterEvent('LOADING_ENDING', OnInit) -- 不能用FIRST_LOADING_END 不然注册快捷键就全跪了
 
 -- 注册初始化函数
 -- RegisterInit(string id, function fn) -- 注册
@@ -434,7 +434,7 @@ local function OnExit()
 		local nStartTick = GetTickCount()
 		local status, err = pcall(fnAction)
 		if not status then
-			MY.Debug({err}, "EXIT_FUNC_LIST#" .. szKey)
+			MY.Debug({err}, 'EXIT_FUNC_LIST#' .. szKey)
 		end
 		MY.Debug({_L('Exit function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], MY_DEBUG.LOG)
 	end
@@ -474,7 +474,7 @@ local function OnReload()
 		local nStartTick = GetTickCount()
 		local status, err = pcall(fnAction)
 		if not status then
-			MY.Debug({err}, "RELOAD_FUNC_LIST#" .. szKey)
+			MY.Debug({err}, 'RELOAD_FUNC_LIST#' .. szKey)
 		end
 		MY.Debug({_L('Reload function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], MY_DEBUG.LOG)
 	end
@@ -519,20 +519,20 @@ local function EventHandler(szEvent, ...)
 		for k, v in pairs(tEvent) do
 			local res, err = pcall(v, szEvent, ...)
 			if not res then
-				MY.Debug({err}, 'OnEvent#' .. szEvent .. "." .. k, MY_DEBUG.ERROR)
+				MY.Debug({err}, 'OnEvent#' .. szEvent .. '.' .. k, MY_DEBUG.ERROR)
 			end
 		end
 	end
 end
 
 function MY.RegisterEvent(szEvent, fnAction)
-	if type(szEvent) == "table" then
+	if type(szEvent) == 'table' then
 		for _, szEvent in ipairs(szEvent) do
 			MY.RegisterEvent(szEvent, fnAction)
 		end
-	elseif type(szEvent) == "string" then
+	elseif type(szEvent) == 'string' then
 		local szKey = nil
-		local nPos = StringFindW(szEvent, ".")
+		local nPos = StringFindW(szEvent, '.')
 		if nPos then
 			szKey = string.sub(szEvent, nPos + 1)
 			szEvent = string.sub(szEvent, 1, nPos - 1)
@@ -577,27 +577,27 @@ local function OnBgMsg()
 		for szKey, fnAction in pairs(BG_MSG_LIST[szMsgID]) do
 			local status, err = pcall(fnAction, szMsgID, nChannel, dwID, szName, bSelf, unpack(aParam))
 			if not status then
-				MY.Debug({err}, "BG_EVENT#" .. szMsgID .. "." .. szKey, MY_DEBUG.ERROR)
+				MY.Debug({err}, 'BG_EVENT#' .. szMsgID .. '.' .. szKey, MY_DEBUG.ERROR)
 			end
 		end
 	end
 end
-RegisterEvent("ON_BG_CHANNEL_MSG", OnBgMsg)
+RegisterEvent('ON_BG_CHANNEL_MSG', OnBgMsg)
 
 
--- MY.RegisterBgMsg("MY_CHECK_INSTALL", function(nChannel, dwTalkerID, szTalkerName, bSelf, oDatas...) MY.BgTalk(szTalkerName, "MY_CHECK_INSTALL_REPLY", oData) end) -- 注册
--- MY.RegisterBgMsg("MY_CHECK_INSTALL") -- 注销
--- MY.RegisterBgMsg("MY_CHECK_INSTALL.RECEIVER_01", function(nChannel, dwTalkerID, szTalkerName, bSelf, oDatas...) MY.BgTalk(szTalkerName, "MY_CHECK_INSTALL_REPLY", oData) end) -- 注册
--- MY.RegisterBgMsg("MY_CHECK_INSTALL.RECEIVER_01") -- 注销
+-- MY.RegisterBgMsg('MY_CHECK_INSTALL', function(nChannel, dwTalkerID, szTalkerName, bSelf, oDatas...) MY.BgTalk(szTalkerName, 'MY_CHECK_INSTALL_REPLY', oData) end) -- 注册
+-- MY.RegisterBgMsg('MY_CHECK_INSTALL') -- 注销
+-- MY.RegisterBgMsg('MY_CHECK_INSTALL.RECEIVER_01', function(nChannel, dwTalkerID, szTalkerName, bSelf, oDatas...) MY.BgTalk(szTalkerName, 'MY_CHECK_INSTALL_REPLY', oData) end) -- 注册
+-- MY.RegisterBgMsg('MY_CHECK_INSTALL.RECEIVER_01') -- 注销
 function MY.RegisterBgMsg(szMsgID, fnAction)
-	if type(szMsgID) == "table" then
+	if type(szMsgID) == 'table' then
 		for _, szMsgID in ipairs(szMsgID) do
 			MY.RegisterBgMsg(szMsgID, fnAction)
 		end
 		return
 	end
 	local szKey = nil
-	local nPos = StringFindW(szMsgID, ".")
+	local nPos = StringFindW(szMsgID, '.')
 	if nPos then
 		szKey = string.sub(szMsgID, nPos + 1)
 		szMsgID = string.sub(szMsgID, 1, nPos - 1)
@@ -624,12 +624,12 @@ end
 -- MY.BgTalk(szName, szMsgID, ...)
 -- MY.BgTalk(nChannel, szMsgID, ...)
 function MY.BgTalk(nChannel, szMsgID, ...)
-	local szTarget, me = "", GetClientPlayer()
+	local szTarget, me = '', GetClientPlayer()
 	if not (me and nChannel) then
 		return
 	end
 	-- channel
-	if type(nChannel) == "string" then
+	if type(nChannel) == 'string' then
 		szTarget = nChannel
 		nChannel = PLAYER_TALK_CHANNEL.WHISPER
 	end
@@ -639,63 +639,63 @@ function MY.BgTalk(nChannel, szMsgID, ...)
 		nChannel = PLAYER_TALK_CHANNEL.BATTLE_FIELD
 	end
 	-- talk
-	local tSay = {{ type = "eventlink", name = "BG_CHANNEL_MSG", linkinfo = szMsgID }}
+	local tSay = {{ type = 'eventlink', name = 'BG_CHANNEL_MSG', linkinfo = szMsgID }}
 	local tArg = {...}
-	local nCount = select("#", ...) -- 这里有个坑 如果直接ipairs({...})可能会掉进坑： for遇到nil就中断了导致后续参数丢失
+	local nCount = select('#', ...) -- 这里有个坑 如果直接ipairs({...})可能会掉进坑： for遇到nil就中断了导致后续参数丢失
 	for i = 1, nCount do
-		table.insert(tSay, { type = "eventlink", name = "", linkinfo = var2str(tArg[i]) })
+		table.insert(tSay, { type = 'eventlink', name = '', linkinfo = var2str(tArg[i]) })
 	end
 	me.Talk(nChannel, szTarget, tSay)
 end
 -- 测试用（请求共享位置）
-MY.RegisterBgMsg("ASK_CURRENT_LOC", function(_, nChannel, dwTalkerID, szTalkerName, bSelf)
+MY.RegisterBgMsg('ASK_CURRENT_LOC', function(_, nChannel, dwTalkerID, szTalkerName, bSelf)
 	if bSelf then
 		return
 	end
 	MessageBox({
-		szName = "ASK_CURRENT_LOC" .. dwTalkerID,
-		szMessage = _L("[%s] wants to get your location, would you like to share?", szTalkerName), {
+		szName = 'ASK_CURRENT_LOC' .. dwTalkerID,
+		szMessage = _L('[%s] wants to get your location, would you like to share?', szTalkerName), {
 			szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function()
 				local me = GetClientPlayer()
-				MY.BgTalk(szTalkerName, "REPLY_CURRENT_LOC", { me.GetMapID(), me.nX, me.nY, me.nZ })
+				MY.BgTalk(szTalkerName, 'REPLY_CURRENT_LOC', { me.GetMapID(), me.nX, me.nY, me.nZ })
 			end
 		}, { szOption = g_tStrings.STR_HOTKEY_CANCEL },
 	})
 end)
 -- 测试用（查看版本信息）
-MY.RegisterBgMsg("MY_VERSION_CHECK", function(_, nChannel, dwTalkerID, szTalkerName, bSelf, bSilent)
+MY.RegisterBgMsg('MY_VERSION_CHECK', function(_, nChannel, dwTalkerID, szTalkerName, bSelf, bSilent)
 	if bSelf then
 		return
 	end
 	if not bSilent and MY.IsInParty() then
-		MY.Talk(PLAYER_TALK_CHANNEL.RAID, _L("I've installed MY plugins v%s", MY.GetVersion()))
+		MY.Talk(PLAYER_TALK_CHANNEL.RAID, _L('I\'ve installed MY plugins v%s', MY.GetVersion()))
 	end
-	MY.BgTalk(szTalkerName, "MY_VERSION_REPLY", MY.GetVersion())
+	MY.BgTalk(szTalkerName, 'MY_VERSION_REPLY', MY.GetVersion())
 end)
 -- 查看属性
-MY.RegisterBgMsg("RL", function(_, nChannel, dwID, szName, bIsSelf, ...)
+MY.RegisterBgMsg('RL', function(_, nChannel, dwID, szName, bIsSelf, ...)
 	local data = {...}
 	if not bIsSelf then
-		if data[1] == "ASK" then
-			MY.Confirm(_L("[%s] want to see your info, OK?", szName), function()
+		if data[1] == 'ASK' then
+			MY.Confirm(_L('[%s] want to see your info, OK?', szName), function()
 				local me = GetClientPlayer()
 				local nGongZhan = MY.GetBuff(3219) and 1 or 0
-				local bEx = MY.GetAddonInfo().tAuthor[me.dwID] == me.szName and "Author" or "Player"
-				MY.BgTalk(szName, "RL", "Feedback", me.dwID, UI_GetPlayerMountKungfuID(), nGongZhan, bEx)
+				local bEx = MY.GetAddonInfo().tAuthor[me.dwID] == me.szName and 'Author' or 'Player'
+				MY.BgTalk(szName, 'RL', 'Feedback', me.dwID, UI_GetPlayerMountKungfuID(), nGongZhan, bEx)
 			end)
 		end
 	end
 end)
 -- 搬运JH_ABOUT
-MY.RegisterBgMsg("MY_ABOUT", function(_, nChannel, dwID, szName, bIsSelf, ...)
+MY.RegisterBgMsg('MY_ABOUT', function(_, nChannel, dwID, szName, bIsSelf, ...)
 	local data = {...}
-	if data[1] == "Author" then -- 版本检查 自用 可以绘制详细表格
-		local me, szTong = GetClientPlayer(), ""
+	if data[1] == 'Author' then -- 版本检查 自用 可以绘制详细表格
+		local me, szTong = GetClientPlayer(), ''
 		if me.dwTongID > 0 then
-			szTong = GetTongClient().ApplyGetTongName(me.dwTongID) or "Failed"
+			szTong = GetTongClient().ApplyGetTongName(me.dwTongID) or 'Failed'
 		end
 		local szServer = select(2, GetUserServer())
-		MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, "JH_ABOUT", "info",
+		MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'JH_ABOUT', 'info',
 			me.GetTotalEquipScore(),
 			me.GetMapID(),
 			szTong,
@@ -704,16 +704,16 @@ MY.RegisterBgMsg("MY_ABOUT", function(_, nChannel, dwID, szName, bIsSelf, ...)
 			szServer,
 			MY.GetBuff(3219)
 		)
-	elseif data[1] == "TeamAuth" then -- 防止有人睡着 遇到了不止一次了
+	elseif data[1] == 'TeamAuth' then -- 防止有人睡着 遇到了不止一次了
 		local team = GetClientTeam()
 		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER, dwID)
 		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK, dwID)
 		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE, dwID)
-	elseif data[1] == "TeamLeader" then
+	elseif data[1] == 'TeamLeader' then
 		GetClientTeam().SetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER, dwID)
-	elseif data[1] == "TeamMark" then
+	elseif data[1] == 'TeamMark' then
 		GetClientTeam().SetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK, dwID)
-	elseif data[1] == "TeamDistribute" then
+	elseif data[1] == 'TeamDistribute' then
 		GetClientTeam().SetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE, dwID)
 	end
 end)
@@ -721,13 +721,13 @@ end)
 -- 选项卡
 --------------------------------------------------------------------------------------------------------------------------------------------
 do local TABS_LIST = {
-	{ id = _L["General"] },
-	{ id = _L["Target"] },
-	{ id = _L["Chat"] },
-	{ id = _L["Battle"] },
-	{ id = _L["Raid"] },
-	{ id = _L["System"] },
-	{ id = _L["Others"] },
+	{ id = _L['General'] },
+	{ id = _L['Target'] },
+	{ id = _L['Chat'] },
+	{ id = _L['Battle'] },
+	{ id = _L['Raid'] },
+	{ id = _L['System'] },
+	{ id = _L['Others'] },
 }
 --[[ tTabs:
 	{
@@ -759,7 +759,7 @@ function MY.RedrawCategory(szCategory)
 			end
 		end
 		if nCount > 0 then
-			local chkCategory = wndCategoryList:AppendContentFromIni(INI_PATH, "CheckBox_Category")
+			local chkCategory = wndCategoryList:AppendContentFromIni(INI_PATH, 'CheckBox_Category')
 			chkCategory.szCategory = ctg.id
 			chkCategory:Lookup('', 'Text_Category'):SetText(ctg.id)
 			chkCategory.OnCheckBoxCheck = function()
@@ -822,10 +822,10 @@ function MY.RedrawTab(szCategory)
 		if ctg.id == szCategory then
 			for i, tab in ipairs(ctg) do
 				if not (tab.bShielded and MY.IsShieldedVersion()) then
-					local hTab = hTabs:AppendItemFromIni(INI_PATH, "Handle_Tab")
+					local hTab = hTabs:AppendItemFromIni(INI_PATH, 'Handle_Tab')
 					hTab.szID = tab.szID
 					hTab:Lookup('Text_Tab'):SetText(tab.szTitle)
-					if tab.szIconTex == "FromIconID" then
+					if tab.szIconTex == 'FromIconID' then
 						hTab:Lookup('Image_TabIcon'):FromIconID(tab.dwIconFrame)
 					elseif tab.dwIconFrame then
 						hTab:Lookup('Image_TabIcon'):FromUITex(tab.szIconTex, tab.dwIconFrame)
@@ -902,10 +902,10 @@ function MY.SwitchTab(szID, bForceUpdate)
 		local hTabs = hTab:GetParent()
 		for i = 0, hTabs:GetItemCount() - 1 do
 			hTabs:Lookup(i).bActived = false
-			hTabs:Lookup(i):Lookup("Image_Bg_Active"):Hide()
+			hTabs:Lookup(i):Lookup('Image_Bg_Active'):Hide()
 		end
 		hTab.bActived = true
-		hTab:Lookup("Image_Bg_Active"):Show()
+		hTab:Lookup('Image_Bg_Active'):Show()
 	end
 
 	-- get main panel
@@ -933,45 +933,45 @@ function MY.SwitchTab(szID, bForceUpdate)
 		-- 欢迎页
 		local ui = MY.UI(wnd)
 		local w, h = ui:size()
-		ui:append("Image", { name = 'Image_Adv', x = 0, y = 0, image = _UITEX_POSTER_, imageframe = (GetTime() % 2) })
-		ui:append("Text", { name = 'Text_Adv', x = 10, y = 300, w = 557, font = 200 })
-		ui:append("Text", { name = 'Text_Svr', x = 10, y = 345, w = 557, font = 204, text = MY.GetServer() .. " (" .. MY.GetRealServer() .. ")", alpha = 220 })
+		ui:append('Image', { name = 'Image_Adv', x = 0, y = 0, image = _UITEX_POSTER_, imageframe = (GetTime() % 2) })
+		ui:append('Text', { name = 'Text_Adv', x = 10, y = 300, w = 557, font = 200 })
+		ui:append('Text', { name = 'Text_Svr', x = 10, y = 345, w = 557, font = 204, text = MY.GetServer() .. ' (' .. MY.GetRealServer() .. ')', alpha = 220 })
 		local x = 7
-		x = x + ui:append("WndCheckBox", {
+		x = x + ui:append('WndCheckBox', {
 			x = x, y = 375,
-			name = "WndCheckBox_SerendipityNotify",
-			text = _L["Show share notify."],
+			name = 'WndCheckBox_SerendipityNotify',
+			text = _L['Show share notify.'],
 			checked = MY_Serendipity.bEnable,
 			oncheck = function()
 				MY_Serendipity.bEnable = not MY_Serendipity.bEnable
 			end,
-			tip = _L["Monitor serendipity and show share notify."],
+			tip = _L['Monitor serendipity and show share notify.'],
 			tippostype = MY.Const.UI.Tip.POS_BOTTOM,
 		}, true):autoWidth():width()
-		x = x + ui:append("WndCheckBox", {
+		x = x + ui:append('WndCheckBox', {
 			x = x, y = 375,
-			name = "WndCheckBox_SerendipityNotifyTip",
-			text = _L["Show notify tip."],
+			name = 'WndCheckBox_SerendipityNotifyTip',
+			text = _L['Show notify tip.'],
 			checked = MY_Serendipity.bPreview,
 			oncheck = function()
 				MY_Serendipity.bPreview = not MY_Serendipity.bPreview
 			end,
 			autoenable = function() return not MY_Serendipity.bAutoShare end,
 		}, true):autoWidth():width()
-		x = x + ui:append("WndCheckBox", {
+		x = x + ui:append('WndCheckBox', {
 			x = x, y = 375,
-			name = "WndCheckBox_SerendipityNotifySound",
-			text = _L["Play notify sound."],
+			name = 'WndCheckBox_SerendipityNotifySound',
+			text = _L['Play notify sound.'],
 			checked = MY_Serendipity.bSound,
 			oncheck = function()
 				MY_Serendipity.bSound = not MY_Serendipity.bSound
 			end,
 			autoenable = function() return not MY_Serendipity.bAutoShare end,
 		}, true):autoWidth():width()
-		x = x + ui:append("WndCheckBox", {
+		x = x + ui:append('WndCheckBox', {
 			x = x, y = 375,
-			name = "WndCheckBox_SerendipityAutoShare",
-			text = _L["Auto share."],
+			name = 'WndCheckBox_SerendipityAutoShare',
+			text = _L['Auto share.'],
 			checked = MY_Serendipity.bAutoShare,
 			oncheck = function()
 				if not MY_Serendipity.bAutoShare then
@@ -1035,7 +1035,7 @@ end
 -- 	options.OnPanelDeactive(wnd)    选项卡取消激活
 -- 	options.bShielded               国服和谐的选项卡
 -- }
--- Ex： MY.RegisterPanel( "Test", "测试标签", "测试", "UI/Image/UICommon/ScienceTreeNode.UITex|123", {255,255,0,200}, { OnPanelActive = function(wnd) end } )
+-- Ex： MY.RegisterPanel( 'Test', '测试标签', '测试', 'UI/Image/UICommon/ScienceTreeNode.UITex|123', {255,255,0,200}, { OnPanelActive = function(wnd) end } )
 function MY.RegisterPanel(szID, szTitle, szCategory, szIconTex, rgbaTitleColor, options)
 	local category
 	for _, ctg in ipairs(TABS_LIST) do
@@ -1059,9 +1059,9 @@ function MY.RegisterPanel(szID, szTitle, szCategory, szIconTex, rgbaTitleColor, 
 		category = TABS_LIST[#TABS_LIST]
 	end
 	-- format szIconTex
-	if type(szIconTex) == "number" then
-		szIconTex = "FromIconID|" .. szIconTex
-	elseif type(szIconTex) ~= "string" then
+	if type(szIconTex) == 'number' then
+		szIconTex = 'FromIconID|' .. szIconTex
+	elseif type(szIconTex) ~= 'string' then
 		szIconTex = 'UI/Image/Common/Logo.UITex|6'
 	end
 	local dwIconFrame = string.gsub(szIconTex, '.*%|(%d+)', '%1')
@@ -1071,12 +1071,12 @@ function MY.RegisterPanel(szID, szTitle, szCategory, szIconTex, rgbaTitleColor, 
 	szIconTex = string.gsub(szIconTex, '%|.*', '')
 
 	-- format other params
-	if type(options)~="table" then options = {} end
-	if type(rgbaTitleColor)~="table" then rgbaTitleColor = { 255, 255, 255, 255 } end
-	if type(rgbaTitleColor[1])~="number" then rgbaTitleColor[1] = 255 end
-	if type(rgbaTitleColor[2])~="number" then rgbaTitleColor[2] = 255 end
-	if type(rgbaTitleColor[3])~="number" then rgbaTitleColor[3] = 255 end
-	if type(rgbaTitleColor[4])~="number" then rgbaTitleColor[4] = 200 end
+	if type(options)~='table' then options = {} end
+	if type(rgbaTitleColor)~='table' then rgbaTitleColor = { 255, 255, 255, 255 } end
+	if type(rgbaTitleColor[1])~='number' then rgbaTitleColor[1] = 255 end
+	if type(rgbaTitleColor[2])~='number' then rgbaTitleColor[2] = 255 end
+	if type(rgbaTitleColor[3])~='number' then rgbaTitleColor[3] = 255 end
+	if type(rgbaTitleColor[4])~='number' then rgbaTitleColor[4] = 200 end
 	table.insert( category, {
 		szID        = szID       ,
 		szTitle     = szTitle    ,
@@ -1105,15 +1105,15 @@ end
 --------------------------------------------------------------------------------------------------------------------------------------------
 function MY.OnItemLButtonDBClick()
 	local name = this:GetName()
-	if name == "Handle_DBClick" then
-		this:GetRoot():Lookup("CheckBox_Maximize"):ToggleCheck()
+	if name == 'Handle_DBClick' then
+		this:GetRoot():Lookup('CheckBox_Maximize'):ToggleCheck()
 	end
 end
 
 function MY.OnMouseWheel()
 	local p = this
 	while p do
-		if p:GetType() == "WndContainer" then
+		if p:GetType() == 'WndContainer' then
 			return
 		end
 		p = p:GetParent()
@@ -1123,16 +1123,16 @@ end
 
 function MY.OnLButtonClick()
 	local name = this:GetName()
-	if name == "Btn_Close" then
+	if name == 'Btn_Close' then
 		MY.ClosePanel()
-	elseif name == "Btn_Weibo" then
-		XGUI.OpenBrowser("https://weibo.com/zymah")
+	elseif name == 'Btn_Weibo' then
+		XGUI.OpenBrowser('https://weibo.com/zymah')
 	end
 end
 
 function MY.OnCheckBoxCheck()
 	local name = this:GetName()
-	if name == "CheckBox_Maximize" then
+	if name == 'CheckBox_Maximize' then
 		local ui = MY.UI(this:GetRoot())
 		_MY.anchor = ui:anchor()
 		_MY.w, _MY.h = ui:size()
@@ -1145,7 +1145,7 @@ end
 
 function MY.OnCheckBoxUncheck()
 	local name = this:GetName()
-	if name == "CheckBox_Maximize" then
+	if name == 'CheckBox_Maximize' then
 		MY.ResizePanel(_MY.w, _MY.h)
 		MY.UI(this:GetRoot())
 			:event('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
@@ -1156,7 +1156,7 @@ end
 
 function MY.OnDragButtonBegin()
 	local name = this:GetName()
-	if name == "Btn_Drag" then
+	if name == 'Btn_Drag' then
 		this.fDragX, this.fDragY = Station.GetMessagePos()
 		this.fDragW, this.fDragH = XGUI(this:GetRoot()):size()
 	end
@@ -1164,7 +1164,7 @@ end
 
 function MY.OnDragButton()
 	local name = this:GetName()
-	if name == "Btn_Drag" then
+	if name == 'Btn_Drag' then
 		HideTip()
 		local nX, nY = Station.GetMessagePos()
 		local nDeltaX, nDeltaY = nX - this.fDragX, nY - this.fDragY
@@ -1187,7 +1187,7 @@ function MY.OnFrameCreate()
 		scrollY = scrollY == 0 and 0 or -scrollY / scale
 		wnd.OnPanelScroll(wnd, scrollX, scrollY)
 	end
-	this:Lookup("Btn_Drag"):RegisterLButtonDrag()
+	this:Lookup('Btn_Drag'):RegisterLButtonDrag()
 end
 
 function _MY.OnSizeChanged()
@@ -1262,13 +1262,13 @@ end
 ---------------------------------------------------
 if _DEBUGLV_ < 3 then
 	if not (IsDebugClient and IsDebugClient()) then
-		RegisterEvent("CALL_LUA_ERROR", function()
+		RegisterEvent('CALL_LUA_ERROR', function()
 			print(arg0)
-			OutputMessage("MSG_SYS", arg0)
+			OutputMessage('MSG_SYS', arg0)
 		end)
 	end
 	TraceButton_AppendAddonMenu({{
-		szOption = "ReloadUIAddon",
+		szOption = 'ReloadUIAddon',
 		fnAction = function()
 			ReloadUIAddon()
 		end,
@@ -1281,19 +1281,19 @@ if _NORESTM_ >= 0 then
 	local function OnExit()
 		debug.sethook()
 	end
-	MY.RegisterExit("_NORESTM_", OnExit)
+	MY.RegisterExit('_NORESTM_', OnExit)
 
 	local function OnBreathe()
 		time = GetTime()
 	end
-	BreatheCall("_NORESTM_", OnBreathe)
+	BreatheCall('_NORESTM_', OnBreathe)
 
 	local function trace_line(event, line)
 		local delay = GetTime() - time
 		if delay < _NORESTM_ then
 			return
 		end
-		Log("Response over " .. delay .. ", " .. debug.getinfo(2).short_src .. ":" .. line)
+		Log('Response over ' .. delay .. ', ' .. debug.getinfo(2).short_src .. ':' .. line)
 	end
-	debug.sethook(trace_line, "l")
+	debug.sethook(trace_line, 'l')
 end

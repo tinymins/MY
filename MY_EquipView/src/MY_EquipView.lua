@@ -3,11 +3,11 @@
 -- @Author: ‹¯“¡ @tinymins
 -- @Date  : 2015-4-20 09:04:25
 -- @Email : admin@derzh.com
--- @Last Modified by:   ‹¯“¡ @tinymins
--- @Last Modified time: 2015-04-20 12:09:59
+-- @Last Modified by:   Emil Zhai (root@derzh.com)
+-- @Last Modified time: 2018-05-31 10:12:13
 --------------------------------------------
 local _C = {}
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_EquipView/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_EquipView/lang/')
 
 _C.tEquipPos = {
 	EQUIPMENT_INVENTORY.BANGLE       , -- ª§±€
@@ -32,7 +32,7 @@ _C.GetSuitIndex = function(me, nLogicIndex)
 	if nSuitIndex == 0 then
 		dwBox = INVENTORY_INDEX.EQUIP
 	else
-		dwBox = INVENTORY_INDEX["EQUIP_BACKUP"..nSuitIndex]
+		dwBox = INVENTORY_INDEX['EQUIP_BACKUP'..nSuitIndex]
 	end
 	return nSuitIndex, dwBox
 end
@@ -52,7 +52,7 @@ _C.UpdateAllEquipBox = function() -- update boxes
 		end
 	end
 end
-MY.RegisterEvent("BAG_ITEM_UPDATE", _C.UpdateAllEquipBox)
+MY.RegisterEvent('BAG_ITEM_UPDATE', _C.UpdateAllEquipBox)
 
 _C.PS = {
 	OnPanelActive = function(wnd) -- append ui items
@@ -89,4 +89,4 @@ _C.PS = {
 	end
 }
 
-MY.RegisterPanel("MY_EquipView", _L["equip view"], _L['General'], "ui/Image/UICommon/CommonPanel7.UITex|23", {255,127,0,200}, _C.PS)
+MY.RegisterPanel('MY_EquipView', _L['equip view'], _L['General'], 'ui/Image/UICommon/CommonPanel7.UITex|23', {255,127,0,200}, _C.PS)

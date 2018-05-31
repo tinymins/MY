@@ -22,8 +22,8 @@
 ]]
 local D = {}
 local _C = {}
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_ChatMonitor/lang/")
-local DATA_FILE = "userdata/chatmonitor.jx3dat"
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_ChatMonitor/lang/')
+local DATA_FILE = 'userdata/chatmonitor.jx3dat'
 local RECORD_LIST, RECORD_HASH = {}, {}
 MY_ChatMonitor = {}
 MY_ChatMonitor.szKeyWords          = _L.CHAT_MONITOR_KEYWORDS_SAMPLE
@@ -37,11 +37,11 @@ MY_ChatMonitor.bBlockWords         = true
 MY_ChatMonitor.bIgnoreSame         = true
 MY_ChatMonitor.bRealtimeSave       = false
 MY_ChatMonitor.bDistinctServer     = false
-MY_ChatMonitor.szTimestrap         = "[hh:mm:ss]"
-MY_ChatMonitor.anchor              = { x = -100, y = -150, s = "BOTTOMRIGHT", r = "BOTTOMRIGHT" }
+MY_ChatMonitor.szTimestrap         = '[hh:mm:ss]'
+MY_ChatMonitor.anchor              = { x = -100, y = -150, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' }
 MY_ChatMonitor.tChannels           = {
-    ["MSG_NORMAL"] = true, ["MSG_CAMP" ] = true, ["MSG_WORLD" ] = true, ["MSG_MAP"     ] = true,
-    ["MSG_SCHOOL"] = true, ["MSG_GUILD"] = true, ["MSG_FRIEND"] = true, ["MSG_IDENTITY"] = true,
+    ['MSG_NORMAL'] = true, ['MSG_CAMP' ] = true, ['MSG_WORLD' ] = true, ['MSG_MAP'     ] = true,
+    ['MSG_SCHOOL'] = true, ['MSG_GUILD'] = true, ['MSG_FRIEND'] = true, ['MSG_IDENTITY'] = true,
 }
 RegisterCustomData('MY_ChatMonitor.szKeyWords')
 RegisterCustomData('MY_ChatMonitor.bIsRegexp')
@@ -70,34 +70,34 @@ _C.tChannelGroups = {
     {
         szCaption = g_tStrings.CHANNEL_CHANNEL,
         tChannels = {
-            "MSG_NORMAL", "MSG_PARTY", "MSG_MAP", "MSG_BATTLE_FILED", "MSG_GUILD", "MSG_GUILD_ALLIANCE", "MSG_SCHOOL", "MSG_WORLD",
-            "MSG_TEAM", "MSG_CAMP", "MSG_GROUP", "MSG_WHISPER", "MSG_SEEK_MENTOR", "MSG_FRIEND", "MSG_IDENTITY", "MSG_SYS",
+            'MSG_NORMAL', 'MSG_PARTY', 'MSG_MAP', 'MSG_BATTLE_FILED', 'MSG_GUILD', 'MSG_GUILD_ALLIANCE', 'MSG_SCHOOL', 'MSG_WORLD',
+            'MSG_TEAM', 'MSG_CAMP', 'MSG_GROUP', 'MSG_WHISPER', 'MSG_SEEK_MENTOR', 'MSG_FRIEND', 'MSG_IDENTITY', 'MSG_SYS',
         },
     }, {
         szCaption = g_tStrings.FIGHT_CHANNEL,
         tChannels = {
             [g_tStrings.STR_NAME_OWN] = {
-                "MSG_SKILL_SELF_HARMFUL_SKILL", "MSG_SKILL_SELF_BENEFICIAL_SKILL", "MSG_SKILL_SELF_BUFF",
-                "MSG_SKILL_SELF_BE_HARMFUL_SKILL", "MSG_SKILL_SELF_BE_BENEFICIAL_SKILL", "MSG_SKILL_SELF_DEBUFF",
-                "MSG_SKILL_SELF_SKILL", "MSG_SKILL_SELF_MISS", "MSG_SKILL_SELF_FAILED", "MSG_SELF_DEATH",
+                'MSG_SKILL_SELF_HARMFUL_SKILL', 'MSG_SKILL_SELF_BENEFICIAL_SKILL', 'MSG_SKILL_SELF_BUFF',
+                'MSG_SKILL_SELF_BE_HARMFUL_SKILL', 'MSG_SKILL_SELF_BE_BENEFICIAL_SKILL', 'MSG_SKILL_SELF_DEBUFF',
+                'MSG_SKILL_SELF_SKILL', 'MSG_SKILL_SELF_MISS', 'MSG_SKILL_SELF_FAILED', 'MSG_SELF_DEATH',
             },
             [g_tStrings.TEAMMATE] = {
-                "MSG_SKILL_PARTY_HARMFUL_SKILL", "MSG_SKILL_PARTY_BENEFICIAL_SKILL", "MSG_SKILL_PARTY_BUFF",
-                "MSG_SKILL_PARTY_BE_HARMFUL_SKILL", "MSG_SKILL_PARTY_BE_BENEFICIAL_SKILL", "MSG_SKILL_PARTY_DEBUFF",
-                "MSG_SKILL_PARTY_SKILL", "MSG_SKILL_PARTY_MISS", "MSG_PARTY_DEATH",
+                'MSG_SKILL_PARTY_HARMFUL_SKILL', 'MSG_SKILL_PARTY_BENEFICIAL_SKILL', 'MSG_SKILL_PARTY_BUFF',
+                'MSG_SKILL_PARTY_BE_HARMFUL_SKILL', 'MSG_SKILL_PARTY_BE_BENEFICIAL_SKILL', 'MSG_SKILL_PARTY_DEBUFF',
+                'MSG_SKILL_PARTY_SKILL', 'MSG_SKILL_PARTY_MISS', 'MSG_PARTY_DEATH',
             },
-            [g_tStrings.OTHER_PLAYER] = {"MSG_SKILL_OTHERS_SKILL", "MSG_SKILL_OTHERS_MISS", "MSG_OTHERS_DEATH"},
-            ["NPC"] = {"MSG_SKILL_NPC_SKILL", "MSG_SKILL_NPC_MISS", "MSG_NPC_DEATH"},
-            [g_tStrings.OTHER] = {"MSG_OTHER_ENCHANT", "MSG_OTHER_SCENE"},
+            [g_tStrings.OTHER_PLAYER] = {'MSG_SKILL_OTHERS_SKILL', 'MSG_SKILL_OTHERS_MISS', 'MSG_OTHERS_DEATH'},
+            ['NPC'] = {'MSG_SKILL_NPC_SKILL', 'MSG_SKILL_NPC_MISS', 'MSG_NPC_DEATH'},
+            [g_tStrings.OTHER] = {'MSG_OTHER_ENCHANT', 'MSG_OTHER_SCENE'},
         },
     }, {
         szCaption = g_tStrings.CHANNEL_COMMON,
         tChannels = {
-            [g_tStrings.ENVIROMENT] = {"MSG_NPC_NEARBY", "MSG_NPC_YELL", "MSG_NPC_PARTY", "MSG_NPC_WHISPER"},
+            [g_tStrings.ENVIROMENT] = {'MSG_NPC_NEARBY', 'MSG_NPC_YELL', 'MSG_NPC_PARTY', 'MSG_NPC_WHISPER'},
             [g_tStrings.EARN] = {
-                "MSG_MONEY", "MSG_EXP", "MSG_ITEM", "MSG_REPUTATION", "MSG_CONTRIBUTE",
-                "MSG_ATTRACTION", "MSG_PRESTIGE", "MSG_TRAIN", "MSG_DESGNATION",
-                "MSG_ACHIEVEMENT", "MSG_MENTOR_VALUE", "MSG_THEW_STAMINA", "MSG_TONG_FUND"
+                'MSG_MONEY', 'MSG_EXP', 'MSG_ITEM', 'MSG_REPUTATION', 'MSG_CONTRIBUTE',
+                'MSG_ATTRACTION', 'MSG_PRESTIGE', 'MSG_TRAIN', 'MSG_DESGNATION',
+                'MSG_ACHIEVEMENT', 'MSG_MENTOR_VALUE', 'MSG_THEW_STAMINA', 'MSG_TONG_FUND'
             },
         },
     }
@@ -136,8 +136,8 @@ end
 
 function D.OnNotifyCB()
     MY.OpenPanel()
-    MY.SwitchTab("MY_ChatMonitor")
-    MY.DismissNotify("MY_ChatMonitor")
+    MY.SwitchTab('MY_ChatMonitor')
+    MY.DismissNotify('MY_ChatMonitor')
 end
 
 -- 插入聊天内容时监控聊天信息
@@ -157,20 +157,20 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
         -- 格式化消息
         local tMsgContent = MY.Chat.FormatContent(szMsg)
         -- 检测消息是否是插件自己产生的
-        if tMsgContent[1].type == "text" and tMsgContent[1].displayText == "" then
+        if tMsgContent[1].type == 'text' and tMsgContent[1].displayText == '' then
             return
         end
         -- 拼接消息
-        if szChannel == "MSG_SYS" then -- 系统消息
+        if szChannel == 'MSG_SYS' then -- 系统消息
             for i, v in ipairs(tMsgContent) do
                 rec.text = rec.text .. v.text
             end
         else -- 如果不是系统信息则舍弃第一个名字之前的东西 类似“[阵营][浩气盟][茗伊]说：”
-            -- STR_TALK_HEAD_WHISPER = "悄悄地说：",
-            -- STR_TALK_HEAD_WHISPER_REPLY = "你悄悄地对",
-            -- STR_TALK_HEAD_SAY = "说：",
-            -- STR_TALK_HEAD_SAY1 = "：",
-            -- STR_TALK_HEAD_SAY2 = "大声喊：",
+            -- STR_TALK_HEAD_WHISPER = '悄悄地说：',
+            -- STR_TALK_HEAD_WHISPER_REPLY = '你悄悄地对',
+            -- STR_TALK_HEAD_SAY = '说：',
+            -- STR_TALK_HEAD_SAY1 = '：',
+            -- STR_TALK_HEAD_SAY2 = '大声喊：',
             local bSkiped = false
             for i, v in ipairs(tMsgContent) do
                 if (i < 4 and not bSkiped) and (
@@ -188,7 +188,7 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
         end
     else
         rec.text = szMsg
-        rec.html = GetFormatText(szMsg, nil, GetMsgFontColor("MSG_SYS"))
+        rec.html = GetFormatText(szMsg, nil, GetMsgFontColor('MSG_SYS'))
     end
 
     if not MY_ChatMonitor.bIsRegexp then
@@ -218,11 +218,11 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
     rec.time = GetCurrentTime()
     local html = D.GetHTML(rec)
     -- 如果设置重定向到系统消息则输出（输出时加个标记防止又被自己捕捉了死循环）
-    if MY_ChatMonitor.bRedirectSysChannel and szChannel ~= "MSG_SYS" then
-        OutputMessage("MSG_SYS", GetFormatText("", nil, 255,255,0) .. szMsg, true)
+    if MY_ChatMonitor.bRedirectSysChannel and szChannel ~= 'MSG_SYS' then
+        OutputMessage('MSG_SYS', GetFormatText('', nil, 255,255,0) .. szMsg, true)
     end
     -- 广播消息
-    OutputMessage("MSG_MY_MONITOR", szMsg, true)
+    OutputMessage('MSG_MY_MONITOR', szMsg, true)
     -- 更新UI
     if _C.uiBoard then
         local nPos = _C.uiBoard:scroll()
@@ -232,12 +232,12 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
         end
     end
     MY.CreateNotify({
-        szKey = "MY_ChatMonitor",
+        szKey = 'MY_ChatMonitor',
         szMsg = html,
         fnAction = D.OnNotifyCB,
         bPlaySound = MY_ChatMonitor.bPlaySound,
-        szSound = MY.GetAddonInfo().szRoot .. "MY_ChatMonitor/audio/MsgArrive.ogg",
-        szCustomSound = "MsgArrive.ogg",
+        szSound = MY.GetAddonInfo().szRoot .. 'MY_ChatMonitor/audio/MsgArrive.ogg',
+        szCustomSound = 'MsgArrive.ogg',
         bPopupPreview = MY_ChatMonitor.bShowPreview,
     })
     --------------------------------------------------------------------------------------
@@ -272,15 +272,15 @@ _C.OnPanelActive = function(wnd)
     local ui = XGUI(wnd)
     local w, h = ui:size()
 
-    ui:append("Text", { x = 22, y = 15, w = 100, h = 25, text = _L['key words:'] })
+    ui:append('Text', { x = 22, y = 15, w = 100, h = 25, text = _L['key words:'] })
 
-    ui:append("WndAutocomplete", {
+    ui:append('WndAutocomplete', {
         x = 80, y = 15, w = w - 226, h = 25, text = MY_ChatMonitor.szKeyWords,
         onchange = function(szText) MY_ChatMonitor.szKeyWords = szText end,
         onfocus = function(self)
             local source = {}
             for _, szOpt in ipairs(MY.LoadLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}) or {}) do
-                if type(szOpt) == "string" then
+                if type(szOpt) == 'string' then
                     table.insert(source, szOpt)
                 end
             end
@@ -292,7 +292,7 @@ _C.OnPanelActive = function(wnd)
             else
                 local source = {}
                 for _, szOpt in ipairs(MY.LoadLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}) or {}) do
-                    if type(szOpt) == "string" then
+                    if type(szOpt) == 'string' then
                         table.insert(source, szOpt)
                     end
                 end
@@ -308,9 +308,9 @@ _C.OnPanelActive = function(wnd)
                         table.insert(menu, { bDevide = true })
                     end
                     table.insert(menu, { szOption = _L['add'], fnAction = function()
-                        GetUserInput("", function(szVal)
-                            szVal = (string.gsub(szVal, "^%s*(.-)%s*$", "%1"))
-                            if szVal~="" then
+                        GetUserInput('', function(szVal)
+                            szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
+                            if szVal~='' then
                                 local t = MY.LoadLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}) or {}
                                 for i = #t, 1, -1 do
                                     if t[i] == szVal then return end
@@ -336,19 +336,19 @@ _C.OnPanelActive = function(wnd)
         },
     })
 
-    ui:append("Image", {
+    ui:append('Image', {
         image = 'UI/Image/UICommon/Commonpanel2.UITex', imageframe = 48,
         x = 8, y = 10, w = 25, h = 25, alpha = 180,
         onhover = function(bIn) this:SetAlpha( (bIn and 255 ) or 180) end,
         onclick = function()
-            local szText = "<image>path=\"ui/Image/UICommon/Talk_Face.UITex\" frame=25 w=24 h=24</image> <text>text=" .. EncodeComponentsString(_L['CHAT_MONITOR_TIP']) .." font=207 </text>"
+            local szText = '<image>path="ui/Image/UICommon/Talk_Face.UITex" frame=25 w=24 h=24</image> <text>text=' .. EncodeComponentsString(_L['CHAT_MONITOR_TIP']) ..' font=207 </text>'
             local x, y = Cursor.GetPos()
             local w, h = this:GetSize()
             OutputTip(szText, 450, {x, y, w, h})
         end,
     })
 
-    ui:append("Image", {
+    ui:append('Image', {
         x = w - 26, y = 13,
         image = 'UI/Image/UICommon/Commonpanel.UITex', imageframe = 18,
         w = 30, h = 30, alpha = 200,
@@ -399,23 +399,23 @@ _C.OnPanelActive = function(wnd)
                 table.insert(t, { bDevide = true })
                 table.insert(t,{
                     szOption = _L['timestrap format'], {
-                        szOption = "[hh:mm:ss]",
+                        szOption = '[hh:mm:ss]',
                         fnAction = function()
-                            MY_ChatMonitor.szTimestrap = "[hh:mm:ss]"
+                            MY_ChatMonitor.szTimestrap = '[hh:mm:ss]'
                         end,
                         bCheck = true, bMCheck = true,
-                        bChecked = MY_ChatMonitor.szTimestrap == "[hh:mm:ss]"
+                        bChecked = MY_ChatMonitor.szTimestrap == '[hh:mm:ss]'
                     }, {
-                        szOption = "[MM/dd hh:mm:ss]",
+                        szOption = '[MM/dd hh:mm:ss]',
                         fnAction = function()
-                            MY_ChatMonitor.szTimestrap = "[MM/dd hh:mm:ss]"
+                            MY_ChatMonitor.szTimestrap = '[MM/dd hh:mm:ss]'
                         end,
                         bCheck = true, bMCheck = true,
-                        bChecked = MY_ChatMonitor.szTimestrap == "[MM/dd hh:mm:ss]"
+                        bChecked = MY_ChatMonitor.szTimestrap == '[MM/dd hh:mm:ss]'
                     }, {
                         szOption = _L['custom'],
                         fnAction = function()
-                            GetUserInput(_L["custom timestrap (eg:[yyyy/MM/dd_hh:mm:ss])"], function(szText)
+                            GetUserInput(_L['custom timestrap (eg:[yyyy/MM/dd_hh:mm:ss])'], function(szText)
                                 MY_ChatMonitor.szTimestrap = szText
                             end, nil, nil, nil, MY_ChatMonitor.szTimestrap)
                         end,
@@ -475,7 +475,7 @@ _C.OnPanelActive = function(wnd)
                         fnAction = function()
                             MY_ChatMonitor.bDistinctServer = not MY_ChatMonitor.bDistinctServer
                             D.LoadData()
-                            MY.SwitchTab("MY_ChatMonitor", true)
+                            MY.SwitchTab('MY_ChatMonitor', true)
                         end,
                         bCheck = true,
                         bChecked = MY_ChatMonitor.bDistinctServer
@@ -491,7 +491,7 @@ _C.OnPanelActive = function(wnd)
                         bChecked = MY_ChatMonitor.bBlockWords, {
                             szOption = _L['edit'],
                             fnAction = function()
-                                MY.SwitchTab("MY_ChatBlock")
+                                MY.SwitchTab('MY_ChatBlock')
                             end,
                         }
                     })
@@ -504,8 +504,8 @@ _C.OnPanelActive = function(wnd)
                             MY_ChatMonitor.bIsRegexp = not MY_ChatMonitor.bIsRegexp
                         else
                             MessageBox({
-                                szName = "MY_ChatMonitor_Regexp",
-                                szMessage = _L["Are you sure you want to turn on regex mode?\nRegex is something advanced, make sure you know what you are doing."],
+                                szName = 'MY_ChatMonitor_Regexp',
+                                szMessage = _L['Are you sure you want to turn on regex mode?\nRegex is something advanced, make sure you know what you are doing.'],
                                 {szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function() MY_ChatMonitor.bIsRegexp = not MY_ChatMonitor.bIsRegexp end},
                                 {szOption = g_tStrings.STR_HOTKEY_CANCEL, fnAction = function() end},
                             })
@@ -519,8 +519,8 @@ _C.OnPanelActive = function(wnd)
         end,
     })
 
-    ui:append("WndButton", {
-        name = "Button_ChatMonitor_Switcher",
+    ui:append('WndButton', {
+        name = 'Button_ChatMonitor_Switcher',
         x = w - 136, y = 15, w = 50,
         text = (MY_ChatMonitor.bCapture and _L['stop']) or _L['start'],
         onclick = function()
@@ -534,7 +534,7 @@ _C.OnPanelActive = function(wnd)
         end,
     })
 
-    ui:append("WndButton", {
+    ui:append('WndButton', {
         x = w - 81, y = 15, w = 50,
         text = _L['clear'],
         onclick = function()
@@ -544,8 +544,8 @@ _C.OnPanelActive = function(wnd)
         end,
     })
 
-    _C.uiBoard = ui:append("WndScrollBox", {
-        name = "WndScrollBox_TalkList",
+    _C.uiBoard = ui:append('WndScrollBox', {
+        name = 'WndScrollBox_TalkList',
         x = 20, y = 50, w = w - 21, h = h - 70, handlestyle = 3,
     }, true)
 
@@ -575,7 +575,7 @@ _C.RegisterMsgMonitor = function()
     RegisterMsgMonitor(_C.OnMsgArrive, t)
 end
 
-MY.Game.RegisterHotKey("MY_ChatMonitor_Hotkey", _L["chat monitor"],
+MY.Game.RegisterHotKey('MY_ChatMonitor_Hotkey', _L['chat monitor'],
     function()
         if MY_ChatMonitor.bCapture then
             MY.UI(MY.GetFrame()):find('#Button_ChatMonitor_Switcher'):text(_L['start'])
@@ -587,7 +587,7 @@ MY.Game.RegisterHotKey("MY_ChatMonitor_Hotkey", _L["chat monitor"],
     end
 , nil)
 
-MY.RegisterPanel("MY_ChatMonitor", _L["chat monitor"], _L['Chat'], "UI/Image/Minimap/Minimap.UITex|197", {255,127,0,200}, {
+MY.RegisterPanel('MY_ChatMonitor', _L['chat monitor'], _L['Chat'], 'UI/Image/Minimap/Minimap.UITex|197', {255,127,0,200}, {
     OnPanelActive = _C.OnPanelActive,
     OnPanelDeactive = function()
         _C.uiBoard = nil

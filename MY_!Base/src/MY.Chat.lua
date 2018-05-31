@@ -33,7 +33,7 @@ local EMPTY_TABLE = SetmetaReadonly({})
 -- 海鳗里面抠出来的
 -- 聊天复制并发布
 function MY.Chat.RepeatChatLine(hTime)
-	local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
+	local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
 	if not edit then
 		return
 	end
@@ -44,7 +44,7 @@ function MY.Chat.RepeatChatLine(hTime)
 	end
 	local nChannel, szName = EditBox_GetChannel()
 	if MY.CanTalk(nChannel) then
-		GetClientPlayer().Talk(nChannel, szName or "", tMsg)
+		GetClientPlayer().Talk(nChannel, szName or '', tMsg)
 		edit:ClearText()
 	end
 end
@@ -58,7 +58,7 @@ function MY.Chat.RemoveChatLine(hTime)
 	local bCurrent = true
 	for i = nIndex, nCount - 1 do
 		local hItem = hHandle:Lookup(nIndex)
-		if hItem:GetType() == "Text" and
+		if hItem:GetType() == 'Text' and
 		(hItem:GetName() == 'timelink' or
 		 hItem:GetName() == 'copylink' or
 		 hItem:GetName() == 'copy') then
@@ -125,8 +125,8 @@ function MY.Chat.GetCopyLinkText(szText, rgbf)
 	rgbf   = rgbf   or { f = 10 }
 
 	return GetFormatText(szText, rgbf.f, rgbf.r, rgbf.g, rgbf.b, 82691,
-		"this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.ChatLinkEventHandlers.OnCopyLClick\nthis.OnItemMButtonDown=MY.ChatLinkEventHandlers.OnCopyMClick\nthis.OnItemRButtonDown=MY.ChatLinkEventHandlers.OnCopyRClick\nthis.OnItemMouseEnter=MY.ChatLinkEventHandlers.OnCopyMouseEnter\nthis.OnItemMouseLeave=MY.ChatLinkEventHandlers.OnCopyMouseLeave",
-		"copylink")
+		'this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.ChatLinkEventHandlers.OnCopyLClick\nthis.OnItemMButtonDown=MY.ChatLinkEventHandlers.OnCopyMClick\nthis.OnItemRButtonDown=MY.ChatLinkEventHandlers.OnCopyRClick\nthis.OnItemMouseEnter=MY.ChatLinkEventHandlers.OnCopyMouseEnter\nthis.OnItemMouseLeave=MY.ChatLinkEventHandlers.OnCopyMouseLeave',
+		'copylink')
 end
 MY.GetCopyLinkText = MY.Chat.GetCopyLinkText
 
@@ -139,66 +139,66 @@ function MY.Chat.GetTimeLinkText(rgbfs, dwTime)
 	return GetFormatText(
 		MY.FormatTime(rgbfs.s or '[hh:mm.ss]', dwTime),
 		rgbfs.f, rgbfs.r, rgbfs.g, rgbfs.b, 82691,
-		"this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.ChatLinkEventHandlers.OnCopyLClick\nthis.OnItemMButtonDown=MY.ChatLinkEventHandlers.OnCopyMClick\nthis.OnItemRButtonDown=MY.ChatLinkEventHandlers.OnCopyRClick\nthis.OnItemMouseEnter=MY.ChatLinkEventHandlers.OnCopyMouseEnter\nthis.OnItemMouseLeave=MY.ChatLinkEventHandlers.OnCopyMouseLeave",
-		"timelink"
+		'this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.ChatLinkEventHandlers.OnCopyLClick\nthis.OnItemMButtonDown=MY.ChatLinkEventHandlers.OnCopyMClick\nthis.OnItemRButtonDown=MY.ChatLinkEventHandlers.OnCopyRClick\nthis.OnItemMouseEnter=MY.ChatLinkEventHandlers.OnCopyMouseEnter\nthis.OnItemMouseLeave=MY.ChatLinkEventHandlers.OnCopyMouseLeave',
+		'timelink'
 	)
 end
 MY.GetTimeLinkText = MY.Chat.GetTimeLinkText
 
 -- 复制聊天行
 function MY.Chat.CopyChatLine(hTime, bTextEditor)
-	local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
+	local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
 	if bTextEditor then
-		edit = MY.UI.OpenTextEditor():find(".WndEdit")[1]
+		edit = MY.UI.OpenTextEditor():find('.WndEdit')[1]
 	end
 	if not edit then
 		return
 	end
-	Station.Lookup("Lowest2/EditBox"):Show()
+	Station.Lookup('Lowest2/EditBox'):Show()
 	edit:ClearText()
 	local h, i, bBegin, bContent = hTime:GetParent(), hTime:GetIndex(), nil, false
 	-- loop
 	for i = i + 1, h:GetItemCount() - 1 do
 		local p = h:Lookup(i)
-		if p:GetType() == "Text" then
+		if p:GetType() == 'Text' then
 			local szName = p:GetName()
-			if szName ~= "timelink" and szName ~= "copylink" and szName ~= "msglink" and szName ~= "time" then
+			if szName ~= 'timelink' and szName ~= 'copylink' and szName ~= 'msglink' and szName ~= 'time' then
 				local szText, bEnd = p:GetText(), false
-				if not bTextEditor and StringFindW(szText, "\n") then
-					szText = StringReplaceW(szText, "\n", "")
+				if not bTextEditor and StringFindW(szText, '\n') then
+					szText = StringReplaceW(szText, '\n', '')
 					bEnd = true
 				end
 				bContent = true
-				if szName == "itemlink" then
-					edit:InsertObj(szText, { type = "item", text = szText, item = p:GetUserData() })
-				elseif szName == "iteminfolink" then
-					edit:InsertObj(szText, { type = "iteminfo", text = szText, version = p.nVersion, tabtype = p.dwTabType, index = p.dwIndex })
-				elseif string.sub(szName, 1, 8) == "namelink" then
+				if szName == 'itemlink' then
+					edit:InsertObj(szText, { type = 'item', text = szText, item = p:GetUserData() })
+				elseif szName == 'iteminfolink' then
+					edit:InsertObj(szText, { type = 'iteminfo', text = szText, version = p.nVersion, tabtype = p.dwTabType, index = p.dwIndex })
+				elseif string.sub(szName, 1, 8) == 'namelink' then
 					if bBegin == nil then
 						bBegin = false
 					end
-					edit:InsertObj(szText, { type = "name", text = szText, name = string.match(szText, "%[(.*)%]") })
-				elseif szName == "questlink" then
-					edit:InsertObj(szText, { type = "quest", text = szText, questid = p:GetUserData() })
-				elseif szName == "recipelink" then
-					edit:InsertObj(szText, { type = "recipe", text = szText, craftid = p.dwCraftID, recipeid = p.dwRecipeID })
-				elseif szName == "enchantlink" then
-					edit:InsertObj(szText, { type = "enchant", text = szText, proid = p.dwProID, craftid = p.dwCraftID, recipeid = p.dwRecipeID })
-				elseif szName == "skilllink" then
+					edit:InsertObj(szText, { type = 'name', text = szText, name = string.match(szText, '%[(.*)%]') })
+				elseif szName == 'questlink' then
+					edit:InsertObj(szText, { type = 'quest', text = szText, questid = p:GetUserData() })
+				elseif szName == 'recipelink' then
+					edit:InsertObj(szText, { type = 'recipe', text = szText, craftid = p.dwCraftID, recipeid = p.dwRecipeID })
+				elseif szName == 'enchantlink' then
+					edit:InsertObj(szText, { type = 'enchant', text = szText, proid = p.dwProID, craftid = p.dwCraftID, recipeid = p.dwRecipeID })
+				elseif szName == 'skilllink' then
 					local o = clone(p.skillKey)
-					o.type, o.text = "skill", szText
+					o.type, o.text = 'skill', szText
 					edit:InsertObj(szText, o)
-				elseif szName =="skillrecipelink" then
-					edit:InsertObj(szText, { type = "skillrecipe", text = szText, id = p.dwID, level = p.dwLevelD })
-				elseif szName =="booklink" then
-					edit:InsertObj(szText, { type = "book", text = szText, tabtype = p.dwTabType, index = p.dwIndex, bookinfo = p.nBookRecipeID, version = p.nVersion })
-				elseif szName =="achievementlink" then
-					edit:InsertObj(szText, { type = "achievement", text = szText, id = p.dwID })
-				elseif szName =="designationlink" then
-					edit:InsertObj(szText, { type = "designation", text = szText, id = p.dwID, prefix = p.bPrefix })
-				elseif szName =="eventlink" then
+				elseif szName =='skillrecipelink' then
+					edit:InsertObj(szText, { type = 'skillrecipe', text = szText, id = p.dwID, level = p.dwLevelD })
+				elseif szName =='booklink' then
+					edit:InsertObj(szText, { type = 'book', text = szText, tabtype = p.dwTabType, index = p.dwIndex, bookinfo = p.nBookRecipeID, version = p.nVersion })
+				elseif szName =='achievementlink' then
+					edit:InsertObj(szText, { type = 'achievement', text = szText, id = p.dwID })
+				elseif szName =='designationlink' then
+					edit:InsertObj(szText, { type = 'designation', text = szText, id = p.dwID, prefix = p.bPrefix })
+				elseif szName =='eventlink' then
 					if szText and #szText > 0 then -- 过滤插件消息
-						edit:InsertObj(szText, { type = "eventlink", text = szText, name = p.szName, linkinfo = p.szLinkInfo })
+						edit:InsertObj(szText, { type = 'eventlink', text = szText, name = p.szName, linkinfo = p.szLinkInfo })
 					end
 				else
 					if bBegin == false then
@@ -210,22 +210,22 @@ function MY.Chat.CopyChatLine(hTime, bTextEditor)
 							end
 						end
 					end
-					if szText ~= "" and (table.getn(edit:GetTextStruct()) > 0 or szText ~= g_tStrings.STR_FACE) then
+					if szText ~= '' and (table.getn(edit:GetTextStruct()) > 0 or szText ~= g_tStrings.STR_FACE) then
 						edit:InsertText(szText)
 					end
 				end
 				if bEnd then
 					break
 				end
-			elseif bTextEditor and bContent and (szName == "timelink" or szName == "copylink" or szName == "msglink" or szName == "time") then
+			elseif bTextEditor and bContent and (szName == 'timelink' or szName == 'copylink' or szName == 'msglink' or szName == 'time') then
 				break
 			end
-		elseif p:GetType() == "Image" or p:GetType() == "Animate" then
-			local dwID = tonumber((p:GetName():gsub("^emotion_", "")))
+		elseif p:GetType() == 'Image' or p:GetType() == 'Animate' then
+			local dwID = tonumber((p:GetName():gsub('^emotion_', '')))
 			if dwID then
 				local emo = MY.Chat.GetEmotion(dwID)
 				if emo then
-					edit:InsertObj(emo.szCmd, { type = "emotion", text = emo.szCmd, id = emo.dwID })
+					edit:InsertObj(emo.szCmd, { type = 'emotion', text = emo.szCmd, id = emo.dwID })
 				end
 			end
 		end
@@ -235,18 +235,18 @@ end
 MY.CopyChatLine = MY.Chat.CopyChatLine
 
 do local ChatLinkEvents = {}
-MY.RegisterEvent("PEEK_OTHER_PLAYER", function()
+MY.RegisterEvent('PEEK_OTHER_PLAYER', function()
 	if not _C.tPeekPlayer[arg1] then
 		return
 	end
 	if arg0 == PEEK_OTHER_PLAYER_RESPOND.INVALID then
-		OutputMessage("MSG_ANNOUNCE_RED", _L['Invalid player ID!'])
+		OutputMessage('MSG_ANNOUNCE_RED', _L['Invalid player ID!'])
 	elseif arg0 == PEEK_OTHER_PLAYER_RESPOND.FAILED then
-		OutputMessage("MSG_ANNOUNCE_RED", _L['Peek other player failed!'])
+		OutputMessage('MSG_ANNOUNCE_RED', _L['Peek other player failed!'])
 	elseif arg0 == PEEK_OTHER_PLAYER_RESPOND.CAN_NOT_FIND_PLAYER then
-		OutputMessage("MSG_ANNOUNCE_RED", _L['Can not find player to peek!'])
+		OutputMessage('MSG_ANNOUNCE_RED', _L['Can not find player to peek!'])
 	elseif arg0 == PEEK_OTHER_PLAYER_RESPOND.TOO_FAR then
-		OutputMessage("MSG_ANNOUNCE_RED", _L['Player is too far to peek!'])
+		OutputMessage('MSG_ANNOUNCE_RED', _L['Player is too far to peek!'])
 	end
 	_C.tPeekPlayer[arg1] = nil
 end)
@@ -256,7 +256,7 @@ function ChatLinkEvents.OnNameLClick(element, link)
 	end
 	if IsCtrlKeyDown() and IsAltKeyDown() then
 		local menu = {}
-		InsertInviteTeamMenu(menu, (MY.UI(link):text():gsub("[%[%]]", "")))
+		InsertInviteTeamMenu(menu, (MY.UI(link):text():gsub('[%[%]]', '')))
 		menu[1].fnAction()
 	elseif IsCtrlKeyDown() then
 		MY.Chat.CopyChatItem(link)
@@ -264,7 +264,7 @@ function ChatLinkEvents.OnNameLClick(element, link)
 		MY.SetTarget(TARGET.PLAYER, MY.UI(link):text())
 	elseif IsAltKeyDown() then
 		if MY_Farbnamen and MY_Farbnamen.Get then
-			local info = MY_Farbnamen.Get((MY.UI(link):text():gsub("[%[%]]", "")))
+			local info = MY_Farbnamen.Get((MY.UI(link):text():gsub('[%[%]]', '')))
 			if info then
 				_C.tPeekPlayer[info.dwID] = true
 				ViewInviteToPlayer(info.dwID)
@@ -272,7 +272,7 @@ function ChatLinkEvents.OnNameLClick(element, link)
 		end
 	else
 		MY.SwitchChat(MY.UI(link):text())
-		local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
+		local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
 		if edit then
 			Station.SetFocusWindow(edit)
 		end
@@ -358,7 +358,7 @@ function MY.Chat.RenderLink(arg1, arg2)
 		local xmls = MY.Xml.Decode(szMsg)
 		if xmls then
 			for i, xml in ipairs(xmls) do
-				if xml and xml['.'] == "text" and xml[''] and xml[''].name then
+				if xml and xml['.'] == 'text' and xml[''] and xml[''].name then
 					local name, script = xml[''].name, xml[''].script
 					if script then
 						script = script .. '\n'
@@ -411,38 +411,38 @@ end
 
 -- 复制Item到输入框
 function MY.Chat.CopyChatItem(p)
-	local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
+	local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
 	if not edit then
 		return
 	end
-	if p:GetType() == "Text" then
+	if p:GetType() == 'Text' then
 		local szText, szName = p:GetText(), p:GetName()
-		if szName == "itemlink" then
-			edit:InsertObj(szText, { type = "item", text = szText, item = p:GetUserData() })
-		elseif szName == "iteminfolink" then
-			edit:InsertObj(szText, { type = "iteminfo", text = szText, version = p.nVersion, tabtype = p.dwTabType, index = p.dwIndex })
-		elseif string.sub(szName, 1, 8) == "namelink" then
-			edit:InsertObj(szText, { type = "name", text = szText, name = string.match(szText, "%[(.*)%]") })
-		elseif szName == "questlink" then
-			edit:InsertObj(szText, { type = "quest", text = szText, questid = p:GetUserData() })
-		elseif szName == "recipelink" then
-			edit:InsertObj(szText, { type = "recipe", text = szText, craftid = p.dwCraftID, recipeid = p.dwRecipeID })
-		elseif szName == "enchantlink" then
-			edit:InsertObj(szText, { type = "enchant", text = szText, proid = p.dwProID, craftid = p.dwCraftID, recipeid = p.dwRecipeID })
-		elseif szName == "skilllink" then
+		if szName == 'itemlink' then
+			edit:InsertObj(szText, { type = 'item', text = szText, item = p:GetUserData() })
+		elseif szName == 'iteminfolink' then
+			edit:InsertObj(szText, { type = 'iteminfo', text = szText, version = p.nVersion, tabtype = p.dwTabType, index = p.dwIndex })
+		elseif string.sub(szName, 1, 8) == 'namelink' then
+			edit:InsertObj(szText, { type = 'name', text = szText, name = string.match(szText, '%[(.*)%]') })
+		elseif szName == 'questlink' then
+			edit:InsertObj(szText, { type = 'quest', text = szText, questid = p:GetUserData() })
+		elseif szName == 'recipelink' then
+			edit:InsertObj(szText, { type = 'recipe', text = szText, craftid = p.dwCraftID, recipeid = p.dwRecipeID })
+		elseif szName == 'enchantlink' then
+			edit:InsertObj(szText, { type = 'enchant', text = szText, proid = p.dwProID, craftid = p.dwCraftID, recipeid = p.dwRecipeID })
+		elseif szName == 'skilllink' then
 			local o = clone(p.skillKey)
-			o.type, o.text = "skill", szText
+			o.type, o.text = 'skill', szText
 			edit:InsertObj(szText, o)
-		elseif szName =="skillrecipelink" then
-			edit:InsertObj(szText, { type = "skillrecipe", text = szText, id = p.dwID, level = p.dwLevelD })
-		elseif szName =="booklink" then
-			edit:InsertObj(szText, { type = "book", text = szText, tabtype = p.dwTabType, index = p.dwIndex, bookinfo = p.nBookRecipeID, version = p.nVersion })
-		elseif szName =="achievementlink" then
-			edit:InsertObj(szText, { type = "achievement", text = szText, id = p.dwID })
-		elseif szName =="designationlink" then
-			edit:InsertObj(szText, { type = "designation", text = szText, id = p.dwID, prefix = p.bPrefix })
-		elseif szName =="eventlink" then
-			edit:InsertObj(szText, { type = "eventlink", text = szText, name = p.szName, linkinfo = p.szLinkInfo })
+		elseif szName =='skillrecipelink' then
+			edit:InsertObj(szText, { type = 'skillrecipe', text = szText, id = p.dwID, level = p.dwLevelD })
+		elseif szName =='booklink' then
+			edit:InsertObj(szText, { type = 'book', text = szText, tabtype = p.dwTabType, index = p.dwIndex, bookinfo = p.nBookRecipeID, version = p.nVersion })
+		elseif szName =='achievementlink' then
+			edit:InsertObj(szText, { type = 'achievement', text = szText, id = p.dwID })
+		elseif szName =='designationlink' then
+			edit:InsertObj(szText, { type = 'designation', text = szText, id = p.dwID, prefix = p.bPrefix })
+		elseif szName =='eventlink' then
+			edit:InsertObj(szText, { type = 'eventlink', text = szText, name = p.szName, linkinfo = p.szLinkInfo })
 		end
 		Station.SetFocusWindow(edit)
 	end
@@ -458,84 +458,84 @@ function MY.Chat.FormatContent(szMsg)
 		local ntype = MY.Xml.GetNodeType(node)
 		local ndata = MY.Xml.GetNodeData(node)
 		-- 静态表情
-		if ntype == "image" then
+		if ntype == 'image' then
 			local emo = MY.Chat.GetEmotion(ndata.path, ndata.frame, 'image')
 			if emo then
-				table.insert(t2, {type = "emotion", text = emo.szCmd, innerText = emo.szCmd, id = emo.dwID})
+				table.insert(t2, {type = 'emotion', text = emo.szCmd, innerText = emo.szCmd, id = emo.dwID})
 			end
 		-- 动态表情
-		elseif ntype == "animate" then
+		elseif ntype == 'animate' then
 			local emo = MY.Chat.GetEmotion(ndata.path, ndata.group, 'animate')
 			if emo then
-				table.insert(t2, {type = "emotion", text = emo.szCmd, innerText = emo.szCmd, id = emo.dwID})
+				table.insert(t2, {type = 'emotion', text = emo.szCmd, innerText = emo.szCmd, id = emo.dwID})
 			end
 		-- 文字内容
-		elseif ntype == "text" then
+		elseif ntype == 'text' then
 			local is_normaltext = false
 			-- 普通文字
 			if not ndata.name then
 				is_normaltext = true
 			-- 物品链接
-			elseif ndata.name == "itemlink" then
-				table.insert(t2, {type = "item", text = ndata.text, innerText = ndata.text:sub(2, -2), item = ndata.userdata})
+			elseif ndata.name == 'itemlink' then
+				table.insert(t2, {type = 'item', text = ndata.text, innerText = ndata.text:sub(2, -2), item = ndata.userdata})
 			-- 物品信息
-			elseif ndata.name == "iteminfolink" then
-				local version, tab, index = string.match(ndata.script, "this.nVersion=(%d+)%s*this.dwTabType=(%d+)%s*this.dwIndex=(%d+)")
-				table.insert(t2, {type = "iteminfo", text = ndata.text, innerText = ndata.text:sub(2, -2), version = version, tabtype = tab, index = index})
+			elseif ndata.name == 'iteminfolink' then
+				local version, tab, index = string.match(ndata.script, 'this.nVersion=(%d+)%s*this.dwTabType=(%d+)%s*this.dwIndex=(%d+)')
+				table.insert(t2, {type = 'iteminfo', text = ndata.text, innerText = ndata.text:sub(2, -2), version = version, tabtype = tab, index = index})
 			-- 姓名
-			elseif ndata.name:sub(1, 9) == "namelink_" then
-				table.insert(t2, {type = "name", text = ndata.text, innerText = ndata.text, name = ndata.text:sub(2, -2)})
+			elseif ndata.name:sub(1, 9) == 'namelink_' then
+				table.insert(t2, {type = 'name', text = ndata.text, innerText = ndata.text, name = ndata.text:sub(2, -2)})
 			-- 任务
-			elseif ndata.name == "questlink" then
-				table.insert(t2, {type = "quest", text = ndata.text, innerText = ndata.text:sub(2, -2), questid = ndata.userdata})
+			elseif ndata.name == 'questlink' then
+				table.insert(t2, {type = 'quest', text = ndata.text, innerText = ndata.text:sub(2, -2), questid = ndata.userdata})
 			-- 生活技艺
-			elseif ndata.name == "recipelink" then
-				local craft, recipe = string.match(ndata.script, "this.dwCraftID=(%d+)%s*this.dwRecipeID=(%d+)")
-				table.insert(t2, {type = "recipe", text = ndata.text, innerText = ndata.text:sub(2, -2), craftid = craft, recipeid = recipe})
+			elseif ndata.name == 'recipelink' then
+				local craft, recipe = string.match(ndata.script, 'this.dwCraftID=(%d+)%s*this.dwRecipeID=(%d+)')
+				table.insert(t2, {type = 'recipe', text = ndata.text, innerText = ndata.text:sub(2, -2), craftid = craft, recipeid = recipe})
 			-- 技能
-			elseif ndata.name == "skilllink" then
-				local skillinfo = string.match(ndata.script, "this.skillKey=%{(.-)%}")
+			elseif ndata.name == 'skilllink' then
+				local skillinfo = string.match(ndata.script, 'this.skillKey=%{(.-)%}')
 				local skillKey = {}
-				for w in string.gfind(skillinfo, "(.-)%,") do
-					local k, v  = string.match(w, "(.-)=(%w+)")
+				for w in string.gfind(skillinfo, '(.-)%,') do
+					local k, v  = string.match(w, '(.-)=(%w+)')
 					skillKey[k] = v
 				end
 				skillKey.text = ndata.text
 				skillKey.innerText = ndata.text:sub(2, -2)
 				table.insert(t2, skillKey)
 			-- 称号
-			elseif ndata.name == "designationlink" then
-				local id, fix = string.match(ndata.script, "this.dwID=(%d+)%s*this.bPrefix=(.-)")
-				table.insert(t2, {type = "designation", text = ndata.text, innerText = ndata.text:sub(2, -2), id = id, prefix = fix})
+			elseif ndata.name == 'designationlink' then
+				local id, fix = string.match(ndata.script, 'this.dwID=(%d+)%s*this.bPrefix=(.-)')
+				table.insert(t2, {type = 'designation', text = ndata.text, innerText = ndata.text:sub(2, -2), id = id, prefix = fix})
 			-- 技能秘籍
-			elseif ndata.name == "skillrecipelink" then
-				local id, level = string.match(ndata.script, "this.dwID=(%d+)%s*this.dwLevel=(%d+)")
-				table.insert(t2, {type = "skillrecipe", text = ndata.text, innerText = ndata.text:sub(2, -2), id = id, level = level})
+			elseif ndata.name == 'skillrecipelink' then
+				local id, level = string.match(ndata.script, 'this.dwID=(%d+)%s*this.dwLevel=(%d+)')
+				table.insert(t2, {type = 'skillrecipe', text = ndata.text, innerText = ndata.text:sub(2, -2), id = id, level = level})
 			-- 书籍
-			elseif ndata.name == "booklink" then
-				local version, tab, index, id = string.match(ndata.script, "this.nVersion=(%d+)%s*this.dwTabType=(%d+)%s*this.dwIndex=(%d+)%s*this.nBookRecipeID=(%d+)")
-				table.insert(t2, {type = "book", text = ndata.text, innerText = ndata.text:sub(2, -2), version = version, tabtype = tab, index = index, bookinfo = id})
+			elseif ndata.name == 'booklink' then
+				local version, tab, index, id = string.match(ndata.script, 'this.nVersion=(%d+)%s*this.dwTabType=(%d+)%s*this.dwIndex=(%d+)%s*this.nBookRecipeID=(%d+)')
+				table.insert(t2, {type = 'book', text = ndata.text, innerText = ndata.text:sub(2, -2), version = version, tabtype = tab, index = index, bookinfo = id})
 			-- 成就
-			elseif ndata.name == "achievementlink" then
-				local id = string.match(ndata.script, "this.dwID=(%d+)")
-				table.insert(t2, {type = "achievement", text = ndata.text, innerText = ndata.text:sub(2, -2), id = id})
+			elseif ndata.name == 'achievementlink' then
+				local id = string.match(ndata.script, 'this.dwID=(%d+)')
+				table.insert(t2, {type = 'achievement', text = ndata.text, innerText = ndata.text:sub(2, -2), id = id})
 			-- 强化
-			elseif ndata.name == "enchantlink" then
-				local pro, craft, recipe = string.match(ndata.script, "this.dwProID=(%d+)%s*this.dwCraftID=(%d+)%s*this.dwRecipeID=(%d+)")
-				table.insert(t2, {type = "enchant", text = ndata.text, innerText = ndata.text:sub(2, -2), proid = pro, craftid = craft, recipeid = recipe})
+			elseif ndata.name == 'enchantlink' then
+				local pro, craft, recipe = string.match(ndata.script, 'this.dwProID=(%d+)%s*this.dwCraftID=(%d+)%s*this.dwRecipeID=(%d+)')
+				table.insert(t2, {type = 'enchant', text = ndata.text, innerText = ndata.text:sub(2, -2), proid = pro, craftid = craft, recipeid = recipe})
 			-- 事件
-			elseif ndata.name == "eventlink" then
+			elseif ndata.name == 'eventlink' then
 				local eventname, linkinfo = string.match(ndata.script, 'this.szName="(.-)"%s*this.szLinkInfo="(.-)"$')
 				if not eventname then
 					eventname, linkinfo = string.match(ndata.script, 'this.szName="(.-)"%s*this.szLinkInfo="(.-)"')
 				end
-				table.insert(t2, {type = "eventlink", text = ndata.text, innerText = ndata.text:sub(2, -2), name = eventname, linkinfo = linkinfo:gsub("\\(.)", "%1")})
+				table.insert(t2, {type = 'eventlink', text = ndata.text, innerText = ndata.text:sub(2, -2), name = eventname, linkinfo = linkinfo:gsub('\\(.)', '%1')})
 			-- 未知类型的字符串
 			elseif ndata.text then
 				is_normaltext = true
 			end
 			if is_normaltext then
-				table.insert(t2, {type = "text", text = ndata.text, innerText = ndata.text})
+				table.insert(t2, {type = 'text', text = ndata.text, innerText = ndata.text})
 			end
 		end
 	end
@@ -556,7 +556,7 @@ MY.StringfyChatContent = MY.Chat.StringfyContent
 -- 判断某个频道能否发言
 -- (bool) MY.CanTalk(number nChannel)
 function MY.Chat.CanTalk(nChannel)
-	for _, v in ipairs({"WHISPER", "TEAM", "RAID", "BATTLE_FIELD", "NEARBY", "TONG", "TONG_ALLIANCE" }) do
+	for _, v in ipairs({'WHISPER', 'TEAM', 'RAID', 'BATTLE_FIELD', 'NEARBY', 'TONG', 'TONG_ALLIANCE' }) do
 		if nChannel == PLAYER_TALK_CHANNEL[v] then
 			return true
 		end
@@ -567,17 +567,17 @@ MY.CanTalk = MY.Chat.CanTalk
 
 -- get channel header
 _C.tTalkChannelHeader = {
-	[PLAYER_TALK_CHANNEL.NEARBY] = "/s ",
-	[PLAYER_TALK_CHANNEL.FRIENDS] = "/o ",
-	[PLAYER_TALK_CHANNEL.TONG_ALLIANCE] = "/a ",
-	[PLAYER_TALK_CHANNEL.TEAM] = "/p ",
-	[PLAYER_TALK_CHANNEL.RAID] = "/t ",
-	[PLAYER_TALK_CHANNEL.BATTLE_FIELD] = "/b ",
-	[PLAYER_TALK_CHANNEL.TONG] = "/g ",
-	[PLAYER_TALK_CHANNEL.SENCE] = "/y ",
-	[PLAYER_TALK_CHANNEL.FORCE] = "/f ",
-	[PLAYER_TALK_CHANNEL.CAMP] = "/c ",
-	[PLAYER_TALK_CHANNEL.WORLD] = "/h ",
+	[PLAYER_TALK_CHANNEL.NEARBY] = '/s ',
+	[PLAYER_TALK_CHANNEL.FRIENDS] = '/o ',
+	[PLAYER_TALK_CHANNEL.TONG_ALLIANCE] = '/a ',
+	[PLAYER_TALK_CHANNEL.TEAM] = '/p ',
+	[PLAYER_TALK_CHANNEL.RAID] = '/t ',
+	[PLAYER_TALK_CHANNEL.BATTLE_FIELD] = '/b ',
+	[PLAYER_TALK_CHANNEL.TONG] = '/g ',
+	[PLAYER_TALK_CHANNEL.SENCE] = '/y ',
+	[PLAYER_TALK_CHANNEL.FORCE] = '/f ',
+	[PLAYER_TALK_CHANNEL.CAMP] = '/c ',
+	[PLAYER_TALK_CHANNEL.WORLD] = '/h ',
 }
 -- 切换聊天频道
 -- (void) MY.SwitchChat(number nChannel)
@@ -588,20 +588,20 @@ function MY.Chat.SwitchChat(nChannel)
 	if szHeader then
 		SwitchChatChannel(szHeader)
 	elseif nChannel == PLAYER_TALK_CHANNEL.WHISPER then
-		Station.Lookup("Lowest2/EditBox"):Show()
-		Station.Lookup("Lowest2/EditBox/Edit_Input"):SetText("/w ")
-		Station.SetFocusWindow("Lowest2/EditBox/Edit_Input")
-	elseif type(nChannel) == "string" then
-		if string.sub(nChannel, 1, 1) == "/" then
+		Station.Lookup('Lowest2/EditBox'):Show()
+		Station.Lookup('Lowest2/EditBox/Edit_Input'):SetText('/w ')
+		Station.SetFocusWindow('Lowest2/EditBox/Edit_Input')
+	elseif type(nChannel) == 'string' then
+		if string.sub(nChannel, 1, 1) == '/' then
 			if nChannel == '/cafk' or nChannel == '/catr' then
 				SwitchChatChannel(nChannel)
 				MY.Chat.Talk(nil, nChannel, nil, nil, nil, true)
-				Station.Lookup("Lowest2/EditBox"):Show()
+				Station.Lookup('Lowest2/EditBox'):Show()
 			else
-				SwitchChatChannel(nChannel.." ")
+				SwitchChatChannel(nChannel..' ')
 			end
 		else
-			SwitchChatChannel("/w " .. string.gsub(nChannel,'[%[%]]','') .. " ")
+			SwitchChatChannel('/w ' .. string.gsub(nChannel,'[%[%]]','') .. ' ')
 		end
 	end
 end
@@ -609,7 +609,7 @@ MY.SwitchChat = MY.Chat.SwitchChat
 
 -- 将焦点设置到聊天栏
 function MY.Chat.FocusChatBox()
-	Station.SetFocusWindow("Lowest2/EditBox/Edit_Input")
+	Station.SetFocusWindow('Lowest2/EditBox/Edit_Input')
 end
 MY.FocusChatBox = MY.Chat.FocusChatBox
 
@@ -618,9 +618,9 @@ function MY.Chat.ParseFaceIcon(t)
 	_C.InitEmotion()
 	local t2 = {}
 	for _, v in ipairs(t) do
-		if v.type ~= "text" then
-			if v.type == "emotion" then
-				v.type = "text"
+		if v.type ~= 'text' then
+			if v.type == 'emotion' then
+				v.type = 'text'
 			end
 			table.insert(t2, v)
 		else
@@ -628,7 +628,7 @@ function MY.Chat.ParseFaceIcon(t)
 			local szLeft = ''
 			while szText and #szText > 0 do
 				local szFace, dwFaceID = nil, nil
-				local nPos = StringFindW(szText, "#")
+				local nPos = StringFindW(szText, '#')
 				if not nPos then
 					szLeft = szLeft .. szText
 					szText = ''
@@ -646,10 +646,10 @@ function MY.Chat.ParseFaceIcon(t)
 					end
 					if szFace then -- emotion cmd matched
 						if #szLeft > 0 then
-							table.insert(t2, { type = "text", text = szLeft })
+							table.insert(t2, { type = 'text', text = szLeft })
 							szLeft = ''
 						end
-						table.insert(t2, { type = "emotion", text = szFace, id = dwFaceID })
+						table.insert(t2, { type = 'emotion', text = szFace, id = dwFaceID })
 					elseif nPos then -- find '#' but not match emotion
 						szLeft = szLeft .. szText:sub(1, 1)
 						szText = szText:sub(2)
@@ -657,7 +657,7 @@ function MY.Chat.ParseFaceIcon(t)
 				end
 			end
 			if #szLeft > 0 then
-				table.insert(t2, { type = "text", text = szLeft })
+				table.insert(t2, { type = 'text', text = szLeft })
 				szLeft = ''
 			end
 		end
@@ -669,18 +669,18 @@ function MY.Chat.ParseName(t)
 	local me = GetClientPlayer()
 	local tar = MY.GetObject(me.GetTarget())
 	for i, v in ipairs(t) do
-		if v.type == "text" then
-			v.text = string.gsub(v.text, "%$zj", '[' .. me.szName .. ']')
+		if v.type == 'text' then
+			v.text = string.gsub(v.text, '%$zj', '[' .. me.szName .. ']')
 			if tar then
-				v.text = string.gsub(v.text, "%$mb", '[' .. tar.szName .. ']')
+				v.text = string.gsub(v.text, '%$mb', '[' .. tar.szName .. ']')
 			end
 		end
 	end
 	local t2 = {}
 	for _, v in ipairs(t) do
-		if v.type ~= "text" then
-			if v.type == "name" then
-				v = { type = "text", text = "["..v.name.."]" }
+		if v.type ~= 'text' then
+			if v.type == 'name' then
+				v = { type = 'text', text = '['..v.name..']' }
 			end
 			table.insert(t2, v)
 		else
@@ -695,11 +695,11 @@ function MY.Chat.ParseName(t)
 					nPos1 = nPos1 - 1
 				end
 				if nPos1 >= nOff then
-					table.insert(t2, { type = "text", text = string.sub(v.text, nOff, nPos1) })
+					table.insert(t2, { type = 'text', text = string.sub(v.text, nOff, nPos1) })
 					nOff = nPos1 + 1
 				end
 				if szName then
-					table.insert(t2, { type = "name", text = '[' .. szName .. ']', name = szName })
+					table.insert(t2, { type = 'name', text = '[' .. szName .. ']', name = szName })
 					nOff = nPos2 + 1
 				end
 			end
@@ -722,7 +722,7 @@ function MY.Chat.ParseAntiSWS(t)
 	local tSensitiveWord = MY.Chat.tSensitiveWord
 	local t2 = {}
 	for _, v in ipairs(t) do
-		if v.type == "text" then
+		if v.type == 'text' then
 			local szText = v.text
 			while szText and #szText > 0 do
 				local nSensitiveWordEndLen = 1 -- 最后一个字符（要裁剪掉的字符）大小
@@ -737,7 +737,7 @@ function MY.Chat.ParseAntiSWS(t)
 				end
 
 				table.insert(t2, {
-					type = "text",
+					type = 'text',
 					text = string.sub(szText, 1, nSensitiveWordEndPos - nSensitiveWordEndLen)
 				})
 				szText = string.sub(szText, nSensitiveWordEndPos + 1 - nSensitiveWordEndLen)
@@ -760,15 +760,15 @@ end
 -- bPushToChatBox -- *可选* 仅推送到聊天框，默认为 false
 -- 特别注意：nChannel, szText 两者的参数顺序可以调换，战场/团队聊天频道智能切换
 function MY.Chat.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox)
-	local szTarget, me = "", GetClientPlayer()
+	local szTarget, me = '', GetClientPlayer()
 	-- channel
 	if not nChannel then
 		nChannel = PLAYER_TALK_CHANNEL.NEARBY
-	elseif type(nChannel) == "string" then
+	elseif type(nChannel) == 'string' then
 		if not szText then
 			szText = nChannel
 			nChannel = PLAYER_TALK_CHANNEL.NEARBY
-		elseif type(szText) == "number" then
+		elseif type(szText) == 'number' then
 			szText, nChannel = nChannel, szText
 		else
 			szTarget = nChannel
@@ -781,10 +781,10 @@ function MY.Chat.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToCha
 	end
 	-- say body
 	local tSay = nil
-	if type(szText) == "table" then
+	if type(szText) == 'table' then
 		tSay = szText
 	else
-		tSay = {{ type = "text", text = szText}}
+		tSay = {{ type = 'text', text = szText}}
 	end
 	if not bNoEscape then
 		tSay = MY.Chat.ParseFaceIcon(tSay)
@@ -807,7 +807,7 @@ function MY.Chat.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToCha
 		end
 	end
 	if bPushToChatBox or (bSaveDeny and not MY.CanTalk(nChannel)) then
-		local edit = Station.Lookup("Lowest2/EditBox/Edit_Input")
+		local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
 		edit:ClearText()
 		for _, v in ipairs(tSay) do
 			edit:InsertObj(v.text, v)
@@ -818,12 +818,12 @@ function MY.Chat.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToCha
 		Station.SetFocusWindow(edit)
 	else
 		if not tSay[1]
-		or tSay[1].name ~= ""
-		or tSay[1].type ~= "eventlink" then
+		or tSay[1].name ~= ''
+		or tSay[1].type ~= 'eventlink' then
 			table.insert(tSay, 1, {
-				type = "eventlink", name = "",
+				type = 'eventlink', name = '',
 				linkinfo = MY.Json.Encode({
-					via = "MY",
+					via = 'MY',
 					uuid = szUUID and tostring(szUUID),
 				})
 			})
@@ -834,11 +834,11 @@ end
 MY.Talk = MY.Chat.Talk
 
 do
-local SPACE = " "
+local SPACE = ' '
 local W_SPACE = g_tStrings.STR_ONE_CHINESE_SPACE
-local metaAlignment = { __index = function() return "L" end }
+local metaAlignment = { __index = function() return 'L' end }
 local function MergeHW(s)
-	return s:gsub(W_SPACE, "W"):gsub(" (W*) ", W_SPACE .. "%1"):gsub("W", W_SPACE)
+	return s:gsub(W_SPACE, 'W'):gsub(' (W*) ', W_SPACE .. '%1'):gsub('W', W_SPACE)
 end
 function MY.TabTalk(nChannel, aTable, aAlignment)
 	local aLenHW, aMaxLenHW = {}, {}
@@ -861,16 +861,16 @@ function MY.TabTalk(nChannel, aTable, aAlignment)
 			nFixLenHW = aMaxLenHW[j] - (aLenHW[i][j] + nFixLenFW * 2)
 			szFixL = W_SPACE:rep(ceil(nFixLenFW / 2)) .. SPACE:rep(ceil(nFixLenHW / 2))
 			szFixR = W_SPACE:rep(floor(nFixLenFW / 2)) .. SPACE:rep(floor(nFixLenHW / 2))
-			if aAlignment[j] == "M" then
+			if aAlignment[j] == 'M' then
 				aTalk[j] = szFixL .. szText .. szFixR
-			elseif aAlignment[j] == "R" then
+			elseif aAlignment[j] == 'R' then
 				aTalk[j] = MergeHW(szFixL .. szFixR) .. szText
 			else
 				aTalk[j] = szText .. MergeHW(szFixL .. szFixR)
 			end
 		end
-		-- MY.Sysmsg({(concat(aTalk, "|"))})
-		MY.Talk(nChannel, (concat(aTalk, " ")))
+		-- MY.Sysmsg({(concat(aTalk, '|'))})
+		MY.Talk(nChannel, (concat(aTalk, ' ')))
 	end
 end
 end
@@ -882,77 +882,77 @@ local function GetRegisterChannelLimitTable()
 		if not me then
 			return false
 		end
-		local path = ("settings\\LevelUpData\\%s.tab"):format(({
-			[ROLE_TYPE.STANDARD_MALE  ] = "StandardMale"  ,
-			[ROLE_TYPE.STANDARD_FEMALE] = "StandardFemale",
-			[ROLE_TYPE.STRONG_MALE    ] = "StrongMale"    ,
-			[ROLE_TYPE.SEXY_FEMALE    ] = "SexyFemale"    ,
-			[ROLE_TYPE.LITTLE_BOY     ] = "LittleBoy"     ,
-			[ROLE_TYPE.LITTLE_GIRL    ] = "LittleGirl"    ,
+		local path = ('settings\\LevelUpData\\%s.tab'):format(({
+			[ROLE_TYPE.STANDARD_MALE  ] = 'StandardMale'  ,
+			[ROLE_TYPE.STANDARD_FEMALE] = 'StandardFemale',
+			[ROLE_TYPE.STRONG_MALE    ] = 'StrongMale'    ,
+			[ROLE_TYPE.SEXY_FEMALE    ] = 'SexyFemale'    ,
+			[ROLE_TYPE.LITTLE_BOY     ] = 'LittleBoy'     ,
+			[ROLE_TYPE.LITTLE_GIRL    ] = 'LittleGirl'    ,
 		})[me.nRoleType])
 		local tTitle = {
-			{f = "i", t = "Level"},
-			{f = "i", t = "Experience"},
-			{f = "i", t = "Strength"},
-			{f = "i", t = "Agility"},
-			{f = "i", t = "Vigor"},
-			{f = "i", t = "Spirit"},
-			{f = "i", t = "Spunk"},
-			{f = "i", t = "MaxLife"},
-			{f = "i", t = "MaxMana"},
-			{f = "i", t = "MaxStamina"},
-			{f = "i", t = "MaxThew"},
-			{f = "i", t = "MaxAssistExp"},
-			{f = "i", t = "MaxAssistTimes"},
-			{f = "i", t = "RunSpeed"},
-			{f = "i", t = "JumpSpeed"},
-			{f = "i", t = "Height"},
-			{f = "i", t = "LifeReplenish"},
-			{f = "i", t = "LifeReplenishPercent"},
-			{f = "i", t = "LifeReplenishExt"},
-			{f = "i", t = "ManaReplenish"},
-			{f = "i", t = "ManaReplenishPercent"},
-			{f = "i", t = "ManaReplenishExt"},
-			{f = "i", t = "HitBase"},
-			{f = "i", t = "ParryBaseRate"},
-			{f = "i", t = "PhysicsCriticalStrike"},
-			{f = "i", t = "SolarCriticalStrike"},
-			{f = "i", t = "NeutralCriticalStrike"},
-			{f = "i", t = "LunarCriticalStrike"},
-			{f = "i", t = "PoisonCriticalStrike"},
-			{f = "i", t = "NoneWeaponAttackSpeedBase"},
-			{f = "i", t = "MaxPhysicsDefence"},
-			{f = "i", t = "WorldChannelDailyLimit"},
-			{f = "i", t = "ForceChannelDailyLimit"},
-			{f = "i", t = "CampChannelDailyLimit"},
-			{f = "i", t = "MaxContribution"},
-			{f = "i", t = "WhisperDailyLimit"},
-			{f = "i", t = "IdentityChannelDailyLimit"},
-			{f = "i", t = "SprintPowerMax"},
-			{f = "i", t = "SprintPowerCost"},
-			{f = "i", t = "SprintPowerRevive"},
-			{f = "i", t = "SprintPowerCostOnWall"},
-			{f = "i", t = "SprintPowerCostStandOnWall"},
-			{f = "i", t = "SprintPowerCostRunOnWallExtra"},
-			{f = "i", t = "HorseSprintPowerMax"},
-			{f = "i", t = "HorseSprintPowerCost"},
-			{f = "i", t = "HorseSprintPowerRevive"},
-			{f = "i", t = "SceneChannelDailyLimit"},
-			{f = "i", t = "NearbyChannelDailyLimit"},
-			{f = "i", t = "WorldChannelDailyLimitByVIP"},
-			{f = "i", t = "WorldChannelDailyLimitBySuperVIP"},
+			{f = 'i', t = 'Level'},
+			{f = 'i', t = 'Experience'},
+			{f = 'i', t = 'Strength'},
+			{f = 'i', t = 'Agility'},
+			{f = 'i', t = 'Vigor'},
+			{f = 'i', t = 'Spirit'},
+			{f = 'i', t = 'Spunk'},
+			{f = 'i', t = 'MaxLife'},
+			{f = 'i', t = 'MaxMana'},
+			{f = 'i', t = 'MaxStamina'},
+			{f = 'i', t = 'MaxThew'},
+			{f = 'i', t = 'MaxAssistExp'},
+			{f = 'i', t = 'MaxAssistTimes'},
+			{f = 'i', t = 'RunSpeed'},
+			{f = 'i', t = 'JumpSpeed'},
+			{f = 'i', t = 'Height'},
+			{f = 'i', t = 'LifeReplenish'},
+			{f = 'i', t = 'LifeReplenishPercent'},
+			{f = 'i', t = 'LifeReplenishExt'},
+			{f = 'i', t = 'ManaReplenish'},
+			{f = 'i', t = 'ManaReplenishPercent'},
+			{f = 'i', t = 'ManaReplenishExt'},
+			{f = 'i', t = 'HitBase'},
+			{f = 'i', t = 'ParryBaseRate'},
+			{f = 'i', t = 'PhysicsCriticalStrike'},
+			{f = 'i', t = 'SolarCriticalStrike'},
+			{f = 'i', t = 'NeutralCriticalStrike'},
+			{f = 'i', t = 'LunarCriticalStrike'},
+			{f = 'i', t = 'PoisonCriticalStrike'},
+			{f = 'i', t = 'NoneWeaponAttackSpeedBase'},
+			{f = 'i', t = 'MaxPhysicsDefence'},
+			{f = 'i', t = 'WorldChannelDailyLimit'},
+			{f = 'i', t = 'ForceChannelDailyLimit'},
+			{f = 'i', t = 'CampChannelDailyLimit'},
+			{f = 'i', t = 'MaxContribution'},
+			{f = 'i', t = 'WhisperDailyLimit'},
+			{f = 'i', t = 'IdentityChannelDailyLimit'},
+			{f = 'i', t = 'SprintPowerMax'},
+			{f = 'i', t = 'SprintPowerCost'},
+			{f = 'i', t = 'SprintPowerRevive'},
+			{f = 'i', t = 'SprintPowerCostOnWall'},
+			{f = 'i', t = 'SprintPowerCostStandOnWall'},
+			{f = 'i', t = 'SprintPowerCostRunOnWallExtra'},
+			{f = 'i', t = 'HorseSprintPowerMax'},
+			{f = 'i', t = 'HorseSprintPowerCost'},
+			{f = 'i', t = 'HorseSprintPowerRevive'},
+			{f = 'i', t = 'SceneChannelDailyLimit'},
+			{f = 'i', t = 'NearbyChannelDailyLimit'},
+			{f = 'i', t = 'WorldChannelDailyLimitByVIP'},
+			{f = 'i', t = 'WorldChannelDailyLimitBySuperVIP'},
 		}
 		m_LevelUpData = KG_Table.Load(path, tTitle, FILE_OPEN_MODE.NORMAL)
 	end
 	return m_LevelUpData
 end
 local DAILY_LIMIT_TABLE_KEY = {
-	[PLAYER_TALK_CHANNEL.WORLD  ] = "WorldChannelDailyLimit",
-	[PLAYER_TALK_CHANNEL.FORCE  ] = "ForceChannelDailyLimit",
-	[PLAYER_TALK_CHANNEL.CAMP   ] = "CampChannelDailyLimit",
-	[PLAYER_TALK_CHANNEL.SENCE  ] = "SceneChannelDailyLimit",
-	[PLAYER_TALK_CHANNEL.NEARBY ] = "NearbyChannelDailyLimit",
-	[PLAYER_TALK_CHANNEL.WHISPER] = "WhisperDailyLimit",
+	[PLAYER_TALK_CHANNEL.WORLD  ] = 'WorldChannelDailyLimit',
+	[PLAYER_TALK_CHANNEL.FORCE  ] = 'ForceChannelDailyLimit',
+	[PLAYER_TALK_CHANNEL.CAMP   ] = 'CampChannelDailyLimit',
+	[PLAYER_TALK_CHANNEL.SENCE  ] = 'SceneChannelDailyLimit',
+	[PLAYER_TALK_CHANNEL.NEARBY ] = 'NearbyChannelDailyLimit',
+	[PLAYER_TALK_CHANNEL.WHISPER] = 'WhisperDailyLimit',
 }
 function MY.Chat.GetChannelDailyLimit(nLevel, nChannel)
 	local LevelUpData = GetRegisterChannelLimitTable()
@@ -993,7 +993,7 @@ function MY.Chat.RegisterMsgMonitor(arg0, arg1, arg2)
 	if fnAction and tChannels then
 		_C.tMsgMonitorFun[szKey] = { fn = function(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szName)
 			-- filter addon comm.
-			if StringFindW(szMsg, "eventlink") and StringFindW(szMsg, _L["Addon comm."]) then
+			if StringFindW(szMsg, 'eventlink') and StringFindW(szMsg, _L['Addon comm.']) then
 				return
 			end
 			fnAction(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szName)
@@ -1008,7 +1008,7 @@ _C.tHookChat = {}
 -- 注：如果fnOnActive存在则没有激活的聊天栏不会执行fnBefore、fnAfter
 --     同时在聊天栏切换时会触发fnOnActive
 function MY.Chat.HookChatPanel(szKey, fnBefore, fnAfter, fnOnActive)
-	if type(szKey) == "function" then
+	if type(szKey) == 'function' then
 		szKey, fnBefore, fnAfter, fnOnActive = GetTickCount(), szKey, fnBefore, fnAfter
 		while _C.tHookChat[szKey] do
 			szKey = szKey + 0.1
@@ -1026,7 +1026,7 @@ MY.HookChatPanel = MY.Chat.HookChatPanel
 
 function _C.OnChatPanelActive(h)
 	for szKey, hc in pairs(_C.tHookChat) do
-		if type(hc.fnOnActive) == "function" then
+		if type(hc.fnOnActive) == 'function' then
 			local status, err = pcall(hc.fnOnActive, h)
 			if not status then
 				MY.Debug({err}, 'HookChatPanelOnActive#' .. szKey, MY_DEBUG.ERROR)
@@ -1046,13 +1046,13 @@ function _C.OnChatPanelAppendItemFromString(h, szMsg, szChannel, dwTime, nR, nG,
 	for szKey, hc in pairs(_C.tHookChat) do
 		hc.param = EMPTY_TABLE
 		-- if fnBefore exist and ChatPanel[i] actived or fnOnActive not defined
-		if type(hc.fnBefore) == "function" and (bActived or not hc.fnOnActive) then
+		if type(hc.fnBefore) == 'function' and (bActived or not hc.fnOnActive) then
 			-- try to execute fnBefore and get return values
 			local status, msg, ret = pcall(hc.fnBefore, h, szChannel, szMsg, dwTime, nR, nG, nB, ...)
 			-- when fnBefore execute succeed
 			if status then
 				-- set msg if returned string
-				if type(msg) == "string" then
+				if type(msg) == 'string' then
 					szMsg = msg
 				end
 				-- save fnAfter's param
@@ -1068,7 +1068,7 @@ function _C.OnChatPanelAppendItemFromString(h, szMsg, szChannel, dwTime, nR, nG,
 	-- hook namelink lbutton down
 	for i = h:GetItemCount() - 1, nIndex, -1 do
 		local hItem = h:Lookup(i)
-		if hItem:GetName():find("^namelink_%d+$") then
+		if hItem:GetName():find('^namelink_%d+$') then
 			hItem.bMyChatRendered = true
 			if hItem.OnItemLButtonDown then
 				hItem.__MY_OnItemLButtonDown = hItem.OnItemLButtonDown
@@ -1081,7 +1081,7 @@ function _C.OnChatPanelAppendItemFromString(h, szMsg, szChannel, dwTime, nR, nG,
 	-- deal with fnAfter
 	for szKey, hc in pairs(_C.tHookChat) do
 		-- if fnAfter exist and ChatPanel[i] actived or fnOnActive not defined
-		if type(hc.fnAfter) == "function" and (bActived or not hc.fnOnActive) then
+		if type(hc.fnAfter) == 'function' and (bActived or not hc.fnOnActive) then
 			local status, err = pcall(hc.fnAfter, h, hc.param, szChannel, szMsg, dwTime, nR, nG, nB, ...)
 			if not status then
 				MY.Debug({err}, 'HookChatPanel.After#' .. szKey, MY_DEBUG.ERROR)
@@ -1092,8 +1092,8 @@ end
 
 do
 local function Hook(i)
-	local h = Station.Lookup("Lowest2/ChatPanel" .. i .. "/Wnd_Message", "Handle_Message")
-	-- local ttl = Station.Lookup("Lowest2/ChatPanel" .. i .. "/CheckBox_Title", "Text_TitleName")
+	local h = Station.Lookup('Lowest2/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message')
+	-- local ttl = Station.Lookup('Lowest2/ChatPanel' .. i .. '/CheckBox_Title', 'Text_TitleName')
 	-- if h and (not ttl or ttl:GetText() ~= g_tStrings.CHANNEL_MENTOR) then
 	if h and not h._AppendItemFromString_MY then
 		h:GetRoot():Lookup('CheckBox_Title').OnCheckBoxCheck = function()
@@ -1105,7 +1105,7 @@ local function Hook(i)
 end
 
 local function Unhook(i)
-	local h = Station.Lookup("Lowest2/ChatPanel" .. i .. "/Wnd_Message", "Handle_Message")
+	local h = Station.Lookup('Lowest2/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message')
 	if h and h._AppendItemFromString_MY then
 		h.AppendItemFromString = _C._AppendItemFromString_MY
 		h._AppendItemFromString_MY = nil
@@ -1117,8 +1117,8 @@ local function HookAll()
 		Hook(i)
 	end
 end
-MY.RegisterEvent("CHAT_PANEL_INIT.ChatPanelHook", HookAll)
-MY.RegisterEvent("CHAT_PANEL_OPEN.ChatPanelHook", function(event) Hook(arg0) end)
+MY.RegisterEvent('CHAT_PANEL_INIT.ChatPanelHook', HookAll)
+MY.RegisterEvent('CHAT_PANEL_OPEN.ChatPanelHook', function(event) Hook(arg0) end)
 MY.RegisterEvent('RELOAD_UI_ADDON_END.ChatPanelHook', HookAll)
 
 local function UnhookAll()
@@ -1126,6 +1126,6 @@ local function UnhookAll()
 		Unhook(i)
 	end
 end
-MY.RegisterExit("ChatPanelHook", UnhookAll)
-MY.RegisterReload("ChatPanelHook", UnhookAll)
+MY.RegisterExit('ChatPanelHook', UnhookAll)
+MY.RegisterReload('ChatPanelHook', UnhookAll)
 end

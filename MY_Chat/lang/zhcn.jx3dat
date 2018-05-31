@@ -24,8 +24,8 @@ data = {
     ['Max log: %d'] = '最大记录：%d',
 
     ['clear chat panel'] = '清空聊天栏',
-    ["Are you sure you want to clear current message panel?\nPress CTRL when click can clear without alert.\nPress ALT when click can clear all window."] = "你确定要清空当前聊天栏消息吗？\n按住CTRL点击可以跳过该警告。\n按住ALT点击可以清空所有聊天栏。",
-    ["Are you sure you want to clear all message panel?"] = "你确定要清空所有聊天栏消息吗？",
+    ['Are you sure you want to clear current message panel?\nPress CTRL when click can clear without alert.\nPress ALT when click can clear all window.'] = '你确定要清空当前聊天栏消息吗？\n按住CTRL点击可以跳过该警告。\n按住ALT点击可以清空所有聊天栏。',
+    ['Are you sure you want to clear all message panel?'] = '你确定要清空所有聊天栏消息吗？',
 
     ['about...'] = '关于',
     ['display panel'] = '显示聊天频道快速切换面板',
@@ -54,5 +54,5 @@ data = {
     ['part mosaics C (mosaics except last character)'        ] = '打码模式C（最后一个字不打码）',
     ['part mosaics D (mosaics all character)'                ] = '打码模式D（所有字打码）',
     ['mosaics character'] = '输入马赛克字符',
-    ['unmosaics names (split by comma)'] = '不打码的名字（英文半角逗号","分隔多个名字）',
+    ['unmosaics names (split by comma)'] = '不打码的名字（英文半角逗号','分隔多个名字）',
 }

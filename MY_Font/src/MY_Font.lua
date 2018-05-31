@@ -6,7 +6,7 @@
 -- @Last modified by:   tinymins
 -- @Last modified time: 2016-12-13 14:56:23
 --------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Font/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Font/lang/')
 local C = {
 	tFontList = Font.GetFontPathList() or {},
 	aFontPath = {},
@@ -19,9 +19,9 @@ local C = {
 }
 local OBJ = {}
 -- 加载字体配置
-local CONFIG_PATH = {"config/fontconfig.jx3dat", MY_DATA_PATH.GLOBAL}
+local CONFIG_PATH = {'config/fontconfig.jx3dat', MY_DATA_PATH.GLOBAL}
 do
-	local szOrgFile = MY.GetLUADataPath("config/MY_FONT/$lang.jx3dat")
+	local szOrgFile = MY.GetLUADataPath('config/MY_FONT/$lang.jx3dat')
 	local szFilePath = MY.GetLUADataPath(CONFIG_PATH)
 	if IsLocalFileExist(szOrgFile) then
 		CPath.Move(szOrgFile, szFilePath)
@@ -29,7 +29,7 @@ do
 	C.tFontConfig = MY.LoadLUAData(szFilePath) or {}
 end
 -- 加载字体列表
-local FONT_PATH = MY.GetAddonInfo().szRoot .. "MY_Font/font/$lang.jx3dat"
+local FONT_PATH = MY.GetAddonInfo().szRoot .. 'MY_Font/font/$lang.jx3dat'
 for _, v in ipairs(MY.LoadLUAData(FONT_PATH) or {}) do
 	table.insert(C.tFontList, v)
 end
@@ -53,20 +53,20 @@ function OBJ.SetFont(tIDs, szName, szFile, nSize, tStyle)
 	-- szFile: 字体路径
 	-- nSize : 字体大小
 	-- tStyle: {
-	--     ["vertical"] = (bool),
-	--     ["border"  ] = (bool),
-	--     ["shadow"  ] = (bool),
-	--     ["mono"    ] = (bool),
-	--     ["mipmap"  ] = (bool),
+	--     ['vertical'] = (bool),
+	--     ['border'  ] = (bool),
+	--     ['shadow'  ] = (bool),
+	--     ['mono'    ] = (bool),
+	--     ['mipmap'  ] = (bool),
 	-- }
-	-- Ex: SetFont(Font.GetChatFontID(), "黑体", "\\UI\\Font\\方正黑体_GBK.ttf", 16, {["shadow"] = true})
+	-- Ex: SetFont(Font.GetChatFontID(), '黑体', '\\UI\\Font\\方正黑体_GBK.ttf', 16, {['shadow'] = true})
 	for _, dwID in ipairs(tIDs) do
 		local szName1, szFile1, nSize1, tStyle1 = Font.GetFont(dwID)
 		Font.SetFont(dwID, szName or szName1, szFile or szFile1, nSize or nSize1, tStyle or tStyle1)
 		Station.SetUIScale(Station.GetUIScale(), true)
 		if dwID == Font.GetChatFontID() then
-			Wnd.OpenWindow("ChatSettingPanel")
-			OutputWarningMessage("MSG_REWARD_GREEN", _L['please click apply or sure button to save change!'], 10)
+			Wnd.OpenWindow('ChatSettingPanel')
+			OutputWarningMessage('MSG_REWARD_GREEN', _L['please click apply or sure button to save change!'], 10)
 		end
 		C.tFontConfig[dwID] = {szName or szName1, szFile or szFile1, nSize or nSize1, tStyle or tStyle1}
 	end
@@ -74,8 +74,8 @@ function OBJ.SetFont(tIDs, szName, szFile, nSize, tStyle)
 end
 
 MY.RegisterPanel(
-"MY_Font", _L["MY_Font"], _L['System'],
-"ui/Image/UICommon/CommonPanel7.UITex|36", {255,127,0,200}, {
+'MY_Font', _L['MY_Font'], _L['System'],
+'ui/Image/UICommon/CommonPanel7.UITex|36', {255,127,0,200}, {
 OnPanelActive = function(wnd)
 	local ui = MY.UI(wnd)
 	local x, y = 10, 30
@@ -84,7 +84,7 @@ OnPanelActive = function(wnd)
 	for _, p in ipairs(C.tFontType) do
 		local szName, szFile, nSize, tStyle = Font.GetFont(p.tIDs[1])
 		if tStyle then
-			-- local ui = ui:append("WndWindow", { w = w, h = 60 }, true)
+			-- local ui = ui:append('WndWindow', { w = w, h = 60 }, true)
 			local acFile, acName, btnSure
 			local function UpdateBtnEnable()
 				local szNewFile = acFile:text()
@@ -93,10 +93,10 @@ OnPanelActive = function(wnd)
 				btnSure:enable(bFileExist and szNewFile ~= szFile)
 			end
 			x = 10
-			ui:append("Text", { text = _L[" * "] .. p.szName, x = x, y = y })
+			ui:append('Text', { text = _L[' * '] .. p.szName, x = x, y = y })
 			y = y + 40
 
-			acFile = ui:append("WndAutocomplete", {
+			acFile = ui:append('WndAutocomplete', {
 				x = x, y = y, w = w - 180 - 30,
 				text = szFile,
 				onchange = function(szText)
@@ -118,14 +118,14 @@ OnPanelActive = function(wnd)
 						MY.UI(this):autocomplete('search', '')
 					end
 				end,
-				autocomplete = {{"option", "source", C.aFontPath}},
+				autocomplete = {{'option', 'source', C.aFontPath}},
 			}, true)
 
-			ui:append("WndButton", {
+			ui:append('WndButton', {
 				x = w - 180 - x - 10, y = y, w = 25,
-				text = "...",
+				text = '...',
 				onclick = function()
-					local file = GetOpenFileName(_L['Please select your font file.'], "Font File(*.ttf;*.fon)\0*.ttf;*.fon\0All Files(*.*)\0*.*\0\0")
+					local file = GetOpenFileName(_L['Please select your font file.'], 'Font File(*.ttf;*.fon)\0*.ttf;*.fon\0All Files(*.*)\0*.*\0\0')
 					if not empty(file) then
 						local szRoot = GetRootPath()
 						if file:sub(1, #szRoot) == szRoot then
@@ -136,7 +136,7 @@ OnPanelActive = function(wnd)
 				end,
 			})
 
-			acName = ui:append("WndAutocomplete", {
+			acName = ui:append('WndAutocomplete', {
 				w = 100, h = 25, x = w - 180 + x, y = y,
 				text = szName,
 				onchange = function(szText)
@@ -157,10 +157,10 @@ OnPanelActive = function(wnd)
 						MY.UI(this):autocomplete('search', '')
 					end
 				end,
-				autocomplete = {{"option", "source", C.aFontName}},
+				autocomplete = {{'option', 'source', C.aFontName}},
 			}, true)
 
-			btnSure = ui:append("WndButton", {
+			btnSure = ui:append('WndButton', {
 				w = 60, h = 25, x = w - 60, y = y,
 				text = _L['apply' ], enable = false,
 				onclick = function()

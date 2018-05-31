@@ -30,7 +30,7 @@ local IsBoolean, IsString, IsTable = MY.IsBoolean, MY.IsString, MY.IsTable
 -----------------------------------------------------------------------------------------
 local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Focus/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Focus/lang/')
 local FOCUS_LIST = {}
 local l_tTempFocusList = {
 	[TARGET.PLAYER] = {},   -- dwID
@@ -68,32 +68,32 @@ MY_Focus.tFocusList = {     -- 永久焦点
 	[TARGET.NPC]    = {},   -- dwTemplateID
 	[TARGET.DOODAD] = {},   -- dwTemplateID
 }
-MY_Focus.anchor = { x=-300, y=220, s="TOPRIGHT", r="TOPRIGHT" } -- 默认坐标
-RegisterCustomData("MY_Focus.bEnable", 1)
-RegisterCustomData("MY_Focus.bMinimize")
-RegisterCustomData("MY_Focus.bFocusBoss")
-RegisterCustomData("MY_Focus.bFocusFriend")
-RegisterCustomData("MY_Focus.bFocusTong")
-RegisterCustomData("MY_Focus.bOnlyPublicMap")
-RegisterCustomData("MY_Focus.bSortByDistance")
-RegisterCustomData("MY_Focus.bFocusEnemy")
-RegisterCustomData("MY_Focus.bAutoHide")
-RegisterCustomData("MY_Focus.nMaxDisplay")
-RegisterCustomData("MY_Focus.bAutoFocus")
-RegisterCustomData("MY_Focus.bHideDeath")
-RegisterCustomData("MY_Focus.bDisplayKungfuIcon")
-RegisterCustomData("MY_Focus.bFocusJJCParty")
-RegisterCustomData("MY_Focus.bFocusJJCEnemy")
-RegisterCustomData("MY_Focus.bShowTarget")
-RegisterCustomData("MY_Focus.bDistanceZ")
-RegisterCustomData("MY_Focus.bTraversal")
-RegisterCustomData("MY_Focus.bHealHelper")
-RegisterCustomData("MY_Focus.bEnableSceneNavi")
-RegisterCustomData("MY_Focus.tAutoFocus")
-RegisterCustomData("MY_Focus.tFocusList")
-RegisterCustomData("MY_Focus.anchor")
-RegisterCustomData("MY_Focus.fScaleX")
-RegisterCustomData("MY_Focus.fScaleY")
+MY_Focus.anchor = { x=-300, y=220, s='TOPRIGHT', r='TOPRIGHT' } -- 默认坐标
+RegisterCustomData('MY_Focus.bEnable', 1)
+RegisterCustomData('MY_Focus.bMinimize')
+RegisterCustomData('MY_Focus.bFocusBoss')
+RegisterCustomData('MY_Focus.bFocusFriend')
+RegisterCustomData('MY_Focus.bFocusTong')
+RegisterCustomData('MY_Focus.bOnlyPublicMap')
+RegisterCustomData('MY_Focus.bSortByDistance')
+RegisterCustomData('MY_Focus.bFocusEnemy')
+RegisterCustomData('MY_Focus.bAutoHide')
+RegisterCustomData('MY_Focus.nMaxDisplay')
+RegisterCustomData('MY_Focus.bAutoFocus')
+RegisterCustomData('MY_Focus.bHideDeath')
+RegisterCustomData('MY_Focus.bDisplayKungfuIcon')
+RegisterCustomData('MY_Focus.bFocusJJCParty')
+RegisterCustomData('MY_Focus.bFocusJJCEnemy')
+RegisterCustomData('MY_Focus.bShowTarget')
+RegisterCustomData('MY_Focus.bDistanceZ')
+RegisterCustomData('MY_Focus.bTraversal')
+RegisterCustomData('MY_Focus.bHealHelper')
+RegisterCustomData('MY_Focus.bEnableSceneNavi')
+RegisterCustomData('MY_Focus.tAutoFocus')
+RegisterCustomData('MY_Focus.tFocusList')
+RegisterCustomData('MY_Focus.anchor')
+RegisterCustomData('MY_Focus.fScaleX')
+RegisterCustomData('MY_Focus.fScaleY')
 
 local function FormatAutoFocusData(data)
 	local ds = {
@@ -121,12 +121,12 @@ function MY_Focus.IsEnabled() return MY_Focus.bEnable and not MY_Focus.IsShielde
 function MY_Focus.SetScale(fScaleX, fScaleY)
 	MY_Focus.fScaleX = fScaleX
 	MY_Focus.fScaleY = fScaleY
-	FireUIEvent("MY_FOCUS_SCALE_UPDATE")
+	FireUIEvent('MY_FOCUS_SCALE_UPDATE')
 end
 
 function MY_Focus.SetMaxDisplay(nMaxDisplay)
 	MY_Focus.nMaxDisplay = nMaxDisplay
-	FireUIEvent("MY_FOCUS_MAX_DISPLAY_UPDATE")
+	FireUIEvent('MY_FOCUS_MAX_DISPLAY_UPDATE')
 end
 
 -- 添加默认焦点
@@ -216,10 +216,10 @@ end
 -- 清空焦点列表
 function MY_Focus.ClearFocus()
 	if Navigator_Remove then
-		Navigator_Remove("MY_FOCUS")
+		Navigator_Remove('MY_FOCUS')
 	end
 	FOCUS_LIST = {}
-	FireUIEvent("MY_FOCUS_UPDATE")
+	FireUIEvent('MY_FOCUS_UPDATE')
 end
 
 -- 重新扫描附近对象更新焦点列表（只增不减）
@@ -406,9 +406,9 @@ function D.OnSetFocus(dwType, dwID, szName, tRule)
 		nIndex = #FOCUS_LIST
 	end
 	if MY_Focus.bEnableSceneNavi and Navigator_SetID then
-		Navigator_SetID("MY_FOCUS." .. dwType .. '_' .. dwID, dwType, dwID, szName)
+		Navigator_SetID('MY_FOCUS.' .. dwType .. '_' .. dwID, dwType, dwID, szName)
 	end
-	FireUIEvent("MY_FOCUS_UPDATE")
+	FireUIEvent('MY_FOCUS_UPDATE')
 end
 
 -- 目标移除焦点列表
@@ -422,9 +422,9 @@ function D.OnRemoveFocus(dwType, dwID)
 		end
 	end
 	if MY_Focus.bEnableSceneNavi and Navigator_Remove then
-		Navigator_Remove("MY_FOCUS." .. dwType .. '_' .. dwID)
+		Navigator_Remove('MY_FOCUS.' .. dwType .. '_' .. dwID)
 	end
-	FireUIEvent("MY_FOCUS_UPDATE")
+	FireUIEvent('MY_FOCUS_UPDATE')
 end
 
 -- 排序
@@ -517,8 +517,8 @@ local function onInit()
 		end
 	end
 end
-MY.RegisterInit("MY_Focus", onInit)
-MY.RegisterEvent("CUSTOM_DATA_LOADED", onInit)
+MY.RegisterInit('MY_Focus', onInit)
+MY.RegisterEvent('CUSTOM_DATA_LOADED', onInit)
 end
 
 do
@@ -544,5 +544,5 @@ local function onHotKey()
 	end
 	MY.SetTarget(t.dwType, t.dwID)
 end
-MY.RegisterHotKey("MY_Focus_LoopTarget", _L["Loop target in focus"], onHotKey)
+MY.RegisterHotKey('MY_Focus_LoopTarget', _L['Loop target in focus'], onHotKey)
 end

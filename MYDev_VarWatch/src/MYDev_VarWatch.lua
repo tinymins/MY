@@ -7,53 +7,53 @@
 -- @Last modified time: 2017-01-05 18:25:03
 --------------------------------------------
 local _C = {}
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MYDev_VarWatch/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MYDev_VarWatch/lang/')
 local XML_LINE_BREAKER = XML_LINE_BREAKER
 local srep, tostring, string2byte = string.rep, tostring, string.byte
 local tconcat, tinsert, tremove = table.concat, table.insert, table.remove
 local type, next, print, pairs, ipairs = type, next, print, pairs, ipairs
-local DATA_PATH = {"config/dev_varwatch.jx3dat", MY_DATA_PATH.GLOBAL}
+local DATA_PATH = {'config/dev_varwatch.jx3dat', MY_DATA_PATH.GLOBAL}
 _C.tVarList = MY.LoadLUAData(DATA_PATH) or {}
 
 local function var2str_x(var, indent, level) -- 只解析一层table且不解析方法
 	local function table_r(var, level, indent)
 		local t = {}
 		local szType = type(var)
-		if szType == "nil" then
-			tinsert(t, "nil")
-		elseif szType == "number" then
+		if szType == 'nil' then
+			tinsert(t, 'nil')
+		elseif szType == 'number' then
 			tinsert(t, tostring(var))
-		elseif szType == "string" then
-			tinsert(t, string.format("%q", var))
-		elseif szType == "boolean" then
+		elseif szType == 'string' then
+			tinsert(t, string.format('%q', var))
+		elseif szType == 'boolean' then
 			tinsert(t, tostring(var))
-		elseif szType == "table" then
-			tinsert(t, "{")
-			local s_tab_equ = "]="
+		elseif szType == 'table' then
+			tinsert(t, '{')
+			local s_tab_equ = ']='
 			if indent then
-				s_tab_equ = "] = "
+				s_tab_equ = '] = '
 				if not empty(var) then
-					tinsert(t, "\n")
+					tinsert(t, '\n')
 				end
 			end
 			for key, val in pairs(var) do
 				if indent then
 					tinsert(t, srep(indent, level + 1))
 				end
-				tinsert(t, "[")
+				tinsert(t, '[')
 				tinsert(t, tostring(key))
-				tinsert(t, s_tab_equ) --"] = "
+				tinsert(t, s_tab_equ) --'] = '
 				tinsert(t, tostring(val))
-				tinsert(t, ",")
+				tinsert(t, ',')
 				if indent then
-					tinsert(t, "\n")
+					tinsert(t, '\n')
 				end
 			end
 			if indent and not empty(var) then
 				tinsert(t, srep(indent, level))
 			end
-			tinsert(t, "}")
-		else --if (szType == "userdata") then
+			tinsert(t, '}')
+		else --if (szType == 'userdata') then
 			tinsert(t, '"')
 			tinsert(t, tostring(var))
 			tinsert(t, '"')
@@ -64,8 +64,8 @@ local function var2str_x(var, indent, level) -- 只解析一层table且不解析方法
 end
 
 MY.RegisterPanel(
-"Dev_VarWatch", _L["VarWatch"], _L['Development'],
-"ui/Image/UICommon/BattleFiled.UITex|7", {255,127,0,200}, {
+'Dev_VarWatch', _L['VarWatch'], _L['Development'],
+'ui/Image/UICommon/BattleFiled.UITex|7', {255,127,0,200}, {
 	OnPanelActive = function(wnd)
 		local ui = MY.UI(wnd)
 		local x, y = 10, 10
@@ -76,8 +76,8 @@ MY.RegisterPanel(
 		local tWndEditV = {}
 
 		for i = 1, nLimit do
-			tWndEditK[i] = ui:append("WndEditBox", {
-				name = "WndEditBox_K" .. i,
+			tWndEditK[i] = ui:append('WndEditBox', {
+				name = 'WndEditBox_K' .. i,
 				text = _C.tVarList[i],
 				x = x, y = y + (i - 1) * 25,
 				w = 150, h = 25,
@@ -86,17 +86,17 @@ MY.RegisterPanel(
 					_C.tVarList[i] = MY.String.Trim(text)
 					MY.SaveLUAData(DATA_PATH, _C.tVarList)
 				end,
-			}):children("#WndEditBox_K" .. i)
+			}):children('#WndEditBox_K' .. i)
 
-			tWndEditV[i] = ui:append("WndEditBox", {
-				name = "WndEditBox_V" .. i,
+			tWndEditV[i] = ui:append('WndEditBox', {
+				name = 'WndEditBox_V' .. i,
 				x = x + 150, y = y + (i - 1) * 25,
 				w = w - 2 * x - 150, h = 25,
 				color = {255, 255, 255},
-			}):children("#WndEditBox_V" .. i)
+			}):children('#WndEditBox_V' .. i)
 		end
 
-		MY.BreatheCall("DEV_VARWATCH", function()
+		MY.BreatheCall('DEV_VARWATCH', function()
 			for i = 1, nLimit do
 				local szKey = _C.tVarList[i]
 				local hFocus = Station.GetFocusWindow()
@@ -108,11 +108,11 @@ MY.RegisterPanel(
 					)
 				) then
 					if loadstring then
-						local t = {select(2, pcall(loadstring("return " .. szKey)))}
+						local t = {select(2, pcall(loadstring('return ' .. szKey)))}
 						for k, v in pairs(t) do
 							t[k] = tostring(v)
 						end
-						tWndEditV[i]:text(tconcat(t, ", "))
+						tWndEditV[i]:text(tconcat(t, ', '))
 					else
 						tWndEditV[i]:text(var2str_x(MY.GetGlobalValue(szKey)))
 					end
@@ -121,6 +121,6 @@ MY.RegisterPanel(
 		end)
 	end,
 	OnPanelDeactive = function()
-		MY.BreatheCall("DEV_VARWATCH", false)
+		MY.BreatheCall('DEV_VARWATCH', false)
 	end,
 })

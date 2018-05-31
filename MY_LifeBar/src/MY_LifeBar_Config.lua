@@ -25,13 +25,13 @@ local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local IsNil, IsNumber, IsFunction = MY.IsNil, MY.IsNumber, MY.IsFunction
 local IsBoolean, IsString, IsTable = MY.IsBoolean, MY.IsString, MY.IsTable
 -----------------------------------------------------------------------------------------
-local _L, D = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_LifeBar/lang/"), {}
-local Config_Default = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_LifeBar/config/$lang.jx3dat")
+local _L, D = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/lang/'), {}
+local Config_Default = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/config/$lang.jx3dat')
 if not Config_Default then
-    return MY.Debug({_L["Default config cannot be loaded, please reinstall!!!"]}, _L["x lifebar"], MY_DEBUG.ERROR)
+    return MY.Debug({_L['Default config cannot be loaded, please reinstall!!!']}, _L['x lifebar'], MY_DEBUG.ERROR)
 end
 local Config, ConfigLoaded = clone(Config_Default), false
-local CONFIG_PATH = "config/xlifebar/%s.jx3dat"
+local CONFIG_PATH = 'config/xlifebar/%s.jx3dat'
 
 function D.GetConfigPath()
 	return (CONFIG_PATH:format(MY_LifeBar.szConfig))
@@ -45,7 +45,7 @@ function D.LoadConfig(szConfig)
 	Config = MY.LoadLUAData({ D.GetConfigPath(), MY_DATA_PATH.GLOBAL })
 	Config = MY.FormatDataStructure(Config, Config_Default, true)
 	ConfigLoaded = true
-	FireUIEvent("MY_LIFEBAR_CONFIG_LOADED")
+	FireUIEvent('MY_LIFEBAR_CONFIG_LOADED')
 end
 MY.RegisterInit(D.LoadConfig)
 
@@ -59,9 +59,9 @@ MY.RegisterExit(D.SaveConfig)
 
 MY_LifeBar_Config = setmetatable({}, {
 	__call = function(t, op, ...)
-		local argc = select("#", ...)
+		local argc = select('#', ...)
 		local argv = {...}
-		if op == "get" then
+		if op == 'get' then
 			local config = Config
 			for i = 1, argc do
 				if not IsTable(config) then
@@ -70,7 +70,7 @@ MY_LifeBar_Config = setmetatable({}, {
 				config = config[argv[i]]
 			end
 			return config
-		elseif op == "set" then
+		elseif op == 'set' then
 			local config = Config
 			for i = 1, argc - 2 do
 				if not IsTable(config) then
@@ -82,11 +82,11 @@ MY_LifeBar_Config = setmetatable({}, {
 				return
 			end
 			config[argv[argc - 1]] = argv[argc]
-		elseif op == "reset" then
+		elseif op == 'reset' then
 			Config = clone(Config_Default)
-		elseif op == "save" then
+		elseif op == 'save' then
 			return D.SaveConfig(...)
-		elseif op == "load" then
+		elseif op == 'load' then
 			return D.LoadConfig(...)
 		end
 	end,

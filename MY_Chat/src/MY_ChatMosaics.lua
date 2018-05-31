@@ -12,35 +12,35 @@
 --------------------------------------------
 MY_ChatMosaics = {}
 local _C = {}
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Chat/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Chat/lang/')
 local MY_ChatMosaics = MY_ChatMosaics
 MY_ChatMosaics.bEnabled = false            -- 启用状态
 MY_ChatMosaics.szMosaics = _L.MOSAICS_CHAR -- 马赛克字符
 MY_ChatMosaics.tIgnoreNames = {}           -- 忽略名单
 MY_ChatMosaics.nMosaicsMode = 1            -- 局部打码模式
 MY_ChatMosaics.bIgnoreOwnName = false      -- 不打码自己的名字
-RegisterCustomData("MY_ChatMosaics.tIgnoreNames")
-RegisterCustomData("MY_ChatMosaics.nMosaicsMode")
-RegisterCustomData("MY_ChatMosaics.bIgnoreOwnName")
+RegisterCustomData('MY_ChatMosaics.tIgnoreNames')
+RegisterCustomData('MY_ChatMosaics.nMosaicsMode')
+RegisterCustomData('MY_ChatMosaics.bIgnoreOwnName')
 
 MY_ChatMosaics.ResetMosaics = function()
 	-- re mosaics
 	_C.bForceUpdate = true
 	for i = 1, 10 do
-		_C.Mosaics(Station.Lookup("Lowest2/ChatPanel" .. i .. "/Wnd_Message", "Handle_Message"))
+		_C.Mosaics(Station.Lookup('Lowest2/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message'))
 	end
 	_C.bForceUpdate = nil
 	-- hook chat panel
 	if MY_ChatMosaics.bEnabled then
-		MY.HookChatPanel("MY_ChatMosaics", function(h, szChannel, szMsg, dwTime)
+		MY.HookChatPanel('MY_ChatMosaics', function(h, szChannel, szMsg, dwTime)
 			return szMsg, h:GetItemCount()
 		end, function(h, nCount, szChannel, szMsg, dwTime)
 			_C.Mosaics(h, nCount)
 		end)
 	else
-		MY.HookChatPanel("MY_ChatMosaics")
+		MY.HookChatPanel('MY_ChatMosaics')
 	end
-	FireUIEvent("ON_MY_MOSAICS_RESET")
+	FireUIEvent('ON_MY_MOSAICS_RESET')
 end
 
 _C.NameLink_GetText = function(h, ...)
@@ -52,7 +52,7 @@ _C.Mosaics = function(h, nPos, nLen)
 		local nEndPos = (nLen and (nPos + nLen)) or (h:GetItemCount() - 1)
 		for i = nPos or 0, nEndPos do
 			local hItem = h:Lookup(i)
-			if hItem and (hItem:GetName():sub(0, 9)) == "namelink_" then
+			if hItem and (hItem:GetName():sub(0, 9)) == 'namelink_' then
 				if MY_ChatMosaics.bEnabled then
 					-- re mosaics
 					if _C.bForceUpdate and hItem.__MY_szText then
@@ -98,14 +98,14 @@ _C.Mosaics = function(h, nPos, nLen)
 end
 MY_ChatMosaics.Mosaics = _C.Mosaics
 
-MY.RegisterPanel("MY_Chat_ChatMosaics", _L["chat mosaics"], _L['Chat'],
-"ui/Image/UICommon/yirong3.UITex|50", {255,255,0,200}, {
+MY.RegisterPanel('MY_Chat_ChatMosaics', _L['chat mosaics'], _L['Chat'],
+'ui/Image/UICommon/yirong3.UITex|50', {255,255,0,200}, {
 OnPanelActive = function(wnd)
 	local ui = MY.UI(wnd)
 	local w, h = ui:size()
 	local x, y = 20, 30
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		text = _L['chat mosaics (mosaics names in chat panel)'],
 		x = x, y = y, w = 400,
 		checked = MY_ChatMosaics.bEnabled,
@@ -116,7 +116,7 @@ OnPanelActive = function(wnd)
 	})
 	y = y + 30
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		text = _L['no mosaics on my own name'],
 		x = x, y = y, w = 400,
 		checked = MY_ChatMosaics.bIgnoreOwnName,
@@ -127,10 +127,10 @@ OnPanelActive = function(wnd)
 	})
 	y = y + 30
 
-	ui:append("WndRadioBox", {
+	ui:append('WndRadioBox', {
 		text = _L['part mosaics A (mosaics except 1st and last character)'],
 		x = x, y = y, w = 400,
-		group = "PART_MOSAICS",
+		group = 'PART_MOSAICS',
 		checked = MY_ChatMosaics.nMosaicsMode == 1,
 		oncheck = function(bCheck)
 			if bCheck then
@@ -141,10 +141,10 @@ OnPanelActive = function(wnd)
 	})
 	y = y + 30
 
-	ui:append("WndRadioBox", {
+	ui:append('WndRadioBox', {
 		text = _L['part mosaics B (mosaics except 1st character)'],
 		x = x, y = y, w = 400,
-		group = "PART_MOSAICS",
+		group = 'PART_MOSAICS',
 		checked = MY_ChatMosaics.nMosaicsMode == 2,
 		oncheck = function(bCheck)
 			if bCheck then
@@ -155,10 +155,10 @@ OnPanelActive = function(wnd)
 	})
 	y = y + 30
 
-	ui:append("WndRadioBox", {
+	ui:append('WndRadioBox', {
 		text = _L['part mosaics C (mosaics except last character)'],
 		x = x, y = y, w = 400,
-		group = "PART_MOSAICS",
+		group = 'PART_MOSAICS',
 		checked = MY_ChatMosaics.nMosaicsMode == 3,
 		oncheck = function(bCheck)
 			if bCheck then
@@ -169,10 +169,10 @@ OnPanelActive = function(wnd)
 	})
 	y = y + 30
 
-	ui:append("WndRadioBox", {
+	ui:append('WndRadioBox', {
 		text = _L['part mosaics D (mosaics all character)'],
 		x = x, y = y, w = 400,
-		group = "PART_MOSAICS",
+		group = 'PART_MOSAICS',
 		checked = MY_ChatMosaics.nMosaicsMode == 4,
 		oncheck = function(bCheck)
 			if bCheck then
@@ -183,12 +183,12 @@ OnPanelActive = function(wnd)
 	})
 	y = y + 30
 
-	ui:append("WndEditBox", {
+	ui:append('WndEditBox', {
 		placeholder = _L['mosaics character'],
 		x = x, y = y, w = w - 2 * x, h = 25,
 		text = MY_ChatMosaics.szMosaics,
 		onchange = function(szText)
-			if szText == "" then
+			if szText == '' then
 				MY_ChatMosaics.szMosaics = _L.MOSAICS_CHAR
 			else
 				MY_ChatMosaics.szMosaics = szText
@@ -198,7 +198,7 @@ OnPanelActive = function(wnd)
 	})
 	y = y + 30
 
-	ui:append("WndEditBox", {
+	ui:append('WndEditBox', {
 		placeholder = _L['unmosaics names (split by comma)'],
 		x = x, y = y, w = w - 2 * x, h = h - y - 50,
 		text = (function()
@@ -206,11 +206,11 @@ OnPanelActive = function(wnd)
 			for szName, _ in pairs(MY_ChatMosaics.tIgnoreNames) do
 				table.insert(t, szName)
 			end
-			table.concat(t, ",")
+			table.concat(t, ',')
 		end)(),
 		onchange = function(szText)
 			MY_ChatMosaics.tIgnoreNames = {}
-			for _, szName in ipairs(MY.String.Split(szText, ",")) do
+			for _, szName in ipairs(MY.String.Split(szText, ',')) do
 				MY_ChatMosaics.tIgnoreNames[szName] = true
 			end
 			MY_ChatMosaics.ResetMosaics()

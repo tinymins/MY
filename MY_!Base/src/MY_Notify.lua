@@ -27,14 +27,14 @@ local IsBoolean, IsString, IsTable = MY.IsBoolean, MY.IsString, MY.IsTable
 -----------------------------------------------------------------------------------------
 
 MY_Notify = {}
-MY_Notify.anchor = { x = -100, y = -150, s = "BOTTOMRIGHT", r = "BOTTOMRIGHT" }
+MY_Notify.anchor = { x = -100, y = -150, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' }
 RegisterCustomData('MY_Notify.anchor')
 
 local _L = MY.LoadLangPack()
 local D = {}
 local NOTIFY_LIST = {}
-local INI_PATH = MY.GetAddonInfo().szFrameworkRoot .. "ui/MY_Notify.ini"
-local ENTRY_INI_PATH = MY.GetAddonInfo().szFrameworkRoot .. "ui/MY_NotifyIcon.ini"
+local INI_PATH = MY.GetAddonInfo().szFrameworkRoot .. 'ui/MY_Notify.ini'
+local ENTRY_INI_PATH = MY.GetAddonInfo().szFrameworkRoot .. 'ui/MY_NotifyIcon.ini'
 
 function MY_Notify.Create(opt)
 	insert(NOTIFY_LIST, {
@@ -50,7 +50,7 @@ function MY_Notify.Create(opt)
 		D.ShowTip(opt.szMsg)
 	end
 	if opt.bPlaySound then
-		MY.PlaySound(opt.szSound or "Notify.ogg", opt.szCustomSound)
+		MY.PlaySound(opt.szSound or 'Notify.ogg', opt.szCustomSound)
 	end
 	return szKey
 end
@@ -60,7 +60,7 @@ function MY_Notify.Dismiss(szKey, bOnlyData)
 	for i, v in ipairs_r(NOTIFY_LIST) do
 		if v.szKey == szKey then
 			remove(NOTIFY_LIST, i)
-			FireUIEvent("MY_NOTIFY_DISMISS", szKey)
+			FireUIEvent('MY_NOTIFY_DISMISS', szKey)
 		end
 	end
 	if bOnlyData then
@@ -72,11 +72,11 @@ end
 MY.DismissNotify = MY_Notify.Dismiss
 
 function MY_Notify.OpenPanel()
-	Wnd.OpenWindow(INI_PATH, "MY_Notify")
+	Wnd.OpenWindow(INI_PATH, 'MY_Notify')
 end
 
 function D.UpdateEntry()
-	local container = Station.Lookup("Normal/TopMenu/WndContainer_ListOther")
+	local container = Station.Lookup('Normal/TopMenu/WndContainer_ListOther')
 	if not container then
 		return
 	end
@@ -86,7 +86,7 @@ function D.UpdateEntry()
 			nUnread = nUnread + 1
 		end
 	end
-	local wItem = container:Lookup("Wnd_News_XJ")
+	local wItem = container:Lookup('Wnd_News_XJ')
 	if #NOTIFY_LIST == 0 then
 		-- if wItem then
 		-- 	-- container:SetW(container:GetW() - wItem:GetW())
@@ -97,52 +97,52 @@ function D.UpdateEntry()
 		container:FormatAllContentPos()
 	else
 		-- if not wItem then
-		-- 	wItem = container:AppendContentFromIni(ENTRY_INI_PATH, "Wnd_MY_NotifyIcon")
+		-- 	wItem = container:AppendContentFromIni(ENTRY_INI_PATH, 'Wnd_MY_NotifyIcon')
 		-- 	-- container:SetW(container:GetW() + wItem:GetW())
-		-- 	local h = wItem:Lookup("Wnd_MY_NotifyIcon_Inner", "")
-		-- 	h:Lookup("Image_MY_NotifyIcon"):SetAlpha(230)
-		-- 	h.OnItemMouseEnter = function() this:Lookup("Image_MY_NotifyIcon"):SetAlpha(255) end
-		-- 	h.OnItemMouseLeave = function() this:Lookup("Image_MY_NotifyIcon"):SetAlpha(230) end
-		-- 	h.OnItemLButtonDown = function() this:Lookup("Image_MY_NotifyIcon"):SetAlpha(230) end
-		-- 	h.OnItemLButtonUp = function() this:Lookup("Image_MY_NotifyIcon"):SetAlpha(255) end
+		-- 	local h = wItem:Lookup('Wnd_MY_NotifyIcon_Inner', '')
+		-- 	h:Lookup('Image_MY_NotifyIcon'):SetAlpha(230)
+		-- 	h.OnItemMouseEnter = function() this:Lookup('Image_MY_NotifyIcon'):SetAlpha(255) end
+		-- 	h.OnItemMouseLeave = function() this:Lookup('Image_MY_NotifyIcon'):SetAlpha(230) end
+		-- 	h.OnItemLButtonDown = function() this:Lookup('Image_MY_NotifyIcon'):SetAlpha(230) end
+		-- 	h.OnItemLButtonUp = function() this:Lookup('Image_MY_NotifyIcon'):SetAlpha(255) end
 		-- 	h.OnItemLButtonClick = function() MY_Notify.OpenPanel() end
 		-- 	container:FormatAllContentPos()
 		-- end
-		-- wItem:Lookup("Wnd_MY_NotifyIcon_Inner", "Handle_MY_NotifyIcon_Num"):SetVisible(nUnread > 0)
-		-- wItem:Lookup("Wnd_MY_NotifyIcon_Inner", "Handle_MY_NotifyIcon_Num/Text_MY_NotifyIcon_Num"):SetText(nUnread)
+		-- wItem:Lookup('Wnd_MY_NotifyIcon_Inner', 'Handle_MY_NotifyIcon_Num'):SetVisible(nUnread > 0)
+		-- wItem:Lookup('Wnd_MY_NotifyIcon_Inner', 'Handle_MY_NotifyIcon_Num/Text_MY_NotifyIcon_Num'):SetText(nUnread)
 		wItem:Show()
-		wItem:Lookup("Btn_News_XJ", "Image_Red_Pot"):SetVisible(nUnread > 0)
-		wItem:Lookup("Btn_News_XJ").OnLButtonClick = function() MY_Notify.OpenPanel() end
+		wItem:Lookup('Btn_News_XJ', 'Image_Red_Pot'):SetVisible(nUnread > 0)
+		wItem:Lookup('Btn_News_XJ').OnLButtonClick = function() MY_Notify.OpenPanel() end
 		container:FormatAllContentPos()
 	end
 end
-MY.RegisterInit("MY_Notify", D.UpdateEntry)
+MY.RegisterInit('MY_Notify', D.UpdateEntry)
 
 function D.RemoveEntry()
-	local container = Station.Lookup("Normal/TopMenu/WndContainer_List")
+	local container = Station.Lookup('Normal/TopMenu/WndContainer_List')
 	if not container then
 		return
 	end
-	local wItem = container:Lookup("Wnd_MY_NotifyIcon")
+	local wItem = container:Lookup('Wnd_MY_NotifyIcon')
 	if wItem then
 		wItem:Destroy()
 		container:FormatAllContentPos()
 	end
 end
-MY.RegisterReload("MY_Notify", D.RemoveEntry)
+MY.RegisterReload('MY_Notify', D.RemoveEntry)
 
 function D.DrawNotifies(bAutoClose)
 	if bAutoClose and #NOTIFY_LIST == 0 then
-		return Wnd.CloseWindow("MY_Notify")
+		return Wnd.CloseWindow('MY_Notify')
 	end
-	local hList = Station.Lookup("Normal/MY_Notify/Window_Main/WndScroll_Notify", "Handle_Notifies")
+	local hList = Station.Lookup('Normal/MY_Notify/Window_Main/WndScroll_Notify', 'Handle_Notifies')
 	if not hList then
 		return
 	end
 	hList:Clear()
 	for i, notify in ipairs(NOTIFY_LIST) do
-		local hItem = hList:AppendItemFromIni(INI_PATH, "Handle_Notify")
-		local hMsg = hItem:Lookup("Handle_Notify_Msg")
+		local hItem = hList:AppendItemFromIni(INI_PATH, 'Handle_Notify')
+		local hMsg = hItem:Lookup('Handle_Notify_Msg')
 		local nDeltaH = hMsg:GetH()
 		hMsg:AppendItemFromString(notify.szMsg)
 		hMsg:FormatAllItemPos()
@@ -150,12 +150,12 @@ function D.DrawNotifies(bAutoClose)
 		hMsg:SetH(hMsg:GetH() + nDeltaH)
 		hItem:SetH(hItem:GetH() + nDeltaH)
 		for _, v in ipairs({
-			{ name = "Shadow_NotifyHover", scaleH = 1 },
-			{ name = "Shadow_NotifySelect", scaleH = 1 },
-			{ name = "Image_Notify_Spliter", scaleY = 1 },
-			{ name = "Image_Notify_Unread", scaleY = 0.5 },
-			{ name = "Handle_Notify_View", scaleY = 0.5 },
-			{ name = "Handle_Notify_Dismiss", scaleY = 0.5 },
+			{ name = 'Shadow_NotifyHover', scaleH = 1 },
+			{ name = 'Shadow_NotifySelect', scaleH = 1 },
+			{ name = 'Image_Notify_Spliter', scaleY = 1 },
+			{ name = 'Image_Notify_Unread', scaleY = 0.5 },
+			{ name = 'Handle_Notify_View', scaleY = 0.5 },
+			{ name = 'Handle_Notify_Dismiss', scaleY = 0.5 },
 		}) do
 			local p = hItem:Lookup(v.name)
 			if p then
@@ -167,8 +167,8 @@ function D.DrawNotifies(bAutoClose)
 				end
 			end
 		end
-		hItem:Lookup("Handle_Notify_View"):SetVisible(not not notify.fnAction)
-		hItem:Lookup("Image_Notify_Unread"):SetVisible(notify.bUnread)
+		hItem:Lookup('Handle_Notify_View'):SetVisible(not not notify.fnAction)
+		hItem:Lookup('Image_Notify_Unread'):SetVisible(notify.bUnread)
 		hItem:FormatAllItemPos()
 		hItem.notify = notify
 	end
@@ -177,22 +177,22 @@ end
 
 function MY_Notify.OnFrameCreate()
 	D.DrawNotifies()
-	this:SetPoint("CENTER", 0, 0, "CENTER", 0, 0)
+	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 end
 
 function MY_Notify.OnItemLButtonClick()
 	local name = this:GetName()
-	if name == "Handle_Notify"
-	or name == "Handle_Notify_View"
-	or name == "Handle_Notify_Dismiss" then
+	if name == 'Handle_Notify'
+	or name == 'Handle_Notify_View'
+	or name == 'Handle_Notify_Dismiss' then
 		local bDismiss, notify
-		if name == "Handle_Notify" then
+		if name == 'Handle_Notify' then
 			notify = this.notify
 			bDismiss = not notify.fnAction or notify.fnAction(notify.szKey)
-		elseif name == "Handle_Notify_View" then
+		elseif name == 'Handle_Notify_View' then
 			notify = this:GetParent().notify
 			bDismiss = not notify.fnAction or notify.fnAction(notify.szKey)
-		elseif name == "Handle_Notify_Dismiss" then
+		elseif name == 'Handle_Notify_Dismiss' then
 			notify = this:GetParent().notify
 			if notify.fnCancel then
 				notify.fnCancel(notify.szKey)
@@ -210,7 +210,7 @@ end
 
 function MY_Notify.OnLButtonClick()
 	local name = this:GetName()
-	if name == "Btn_Close" then
+	if name == 'Btn_Close' then
 		Wnd.CloseWindow(this:GetRoot())
 	end
 end
@@ -238,9 +238,9 @@ local function OnInit()
 	l_uiFrame = MY.UI.CreateFrame('MY_NotifyTip', {
 		level = 'Topmost', empty = true,
 		w = 250, h = 150, visible = false,
-		events = {{ "UI_SCALED", function() l_uiFrame:anchor(MY_Notify.anchor) end }},
+		events = {{ 'UI_SCALED', function() l_uiFrame:anchor(MY_Notify.anchor) end }},
 	})
-	:customMode(_L["MY_Notify"], function()
+	:customMode(_L['MY_Notify'], function()
 		MY.DelayCall('MY_NotifyTip_Hide')
 		l_uiFrame:show():alpha(255)
 	end, function()
@@ -249,7 +249,7 @@ local function OnInit()
 	end)
 	:anchor(MY_Notify.anchor)
 	-- init tip panel handle and bind animation function
-	l_uiTipBoard = l_uiFrame:append("WndScrollBox", {
+	l_uiTipBoard = l_uiFrame:append('WndScrollBox', {
 		handlestyle = 3, x = 0, y = 0, w = 250, h = 150,
 		onclick = function()
 			if MY.IsInCustomUIMode() then

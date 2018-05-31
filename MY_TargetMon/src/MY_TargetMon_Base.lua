@@ -22,25 +22,25 @@ local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 
 local D = {}
 local BOX_SPARKING_FRAME = GLOBAL.GAME_FPS * 2 / 3
-local INI_PATH = MY.GetAddonInfo().szRoot .. "MY_TargetMon/ui/MY_TargetMon.ini"
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_TargetMon/lang/")
+local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/ui/MY_TargetMon.ini'
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TargetMon/lang/')
 
 function D.UpdateHotkey(frame)
 	local i = this.index
 	if not i then
 		return
 	end
-	local hList = frame:Lookup("", "Handle_List")
+	local hList = frame:Lookup('', 'Handle_List')
 	for j = 0, hList:GetItemCount() - 1 do
 		local hItem = hList:Lookup(j)
-		local nKey, bShift, bCtrl, bAlt = Hotkey.Get("MY_TargetMon_" .. i .. "_" .. (j + 1))
+		local nKey, bShift, bCtrl, bAlt = Hotkey.Get('MY_TargetMon_' .. i .. '_' .. (j + 1))
 		hItem.txtHotkey:SetText(GetKeyShow(nKey, bShift, bCtrl, bAlt, true))
 	end
 end
 
 function D.SaveAnchor(frame)
 	frame.config.anchor = frame.config.hideVoid
-		and GetFrameAnchor(frame, "TOPLEFT")
+		and GetFrameAnchor(frame, 'TOPLEFT')
 		or GetFrameAnchor(frame)
 end
 
@@ -64,14 +64,14 @@ function D.UpdateScale(frame)
 	end
 	if frame.uiscale ~= uiscale then
 		if frame.config.ignoreSystemUIScale and frame.uiscale then
-			local hList, hItem, txt = frame:Lookup("", "Handle_List")
+			local hList, hItem, txt = frame:Lookup('', 'Handle_List')
 			for i = 0, hList:GetItemCount() - 1 do
 				hItem = hList:Lookup(i)
-				txt = hItem:Lookup("Handle_Box/Text_ShortName")
+				txt = hItem:Lookup('Handle_Box/Text_ShortName')
 				txt:SetFontScale(txt:GetFontScale() * frame.uiscale / uiscale)
-				txt = hItem:Lookup("Handle_Bar/Text_Name")
+				txt = hItem:Lookup('Handle_Bar/Text_Name')
 				txt:SetFontScale(txt:GetFontScale() * frame.uiscale / uiscale)
-				txt = hItem:Lookup("Handle_Bar/Text_Process")
+				txt = hItem:Lookup('Handle_Bar/Text_Process')
 				txt:SetFontScale(txt:GetFontScale() * frame.uiscale / uiscale)
 			end
 			frame:Scale(frame.uiscale / uiscale, frame.uiscale / uiscale)
@@ -99,7 +99,7 @@ local function GetScale(config)
 end
 
 local function ReloadFrame(frame)
-	local config, index = MY_TargetMon.GetFrameData(frame:GetName():sub(#"MY_TargetMon#" + 1))
+	local config, index = MY_TargetMon.GetFrameData(frame:GetName():sub(#'MY_TargetMon#' + 1))
 	if not config then
 		return Wnd.CloseWindow(frame)
 	end
@@ -118,18 +118,18 @@ local function ReloadFrame(frame)
 			return
 		end
 		nCount = nCount + 1
-		local hItem        = hList:AppendItemFromIni(INI_PATH, "Handle_Item")
-		local hBox         = hItem:Lookup("Handle_Box")
-		local box          = hBox:Lookup("Box_Default")
-		local imgBoxBg     = hBox:Lookup("Image_BoxBg")
-		local txtTime      = hBox:Lookup("Text_Time")
-		local txtHotkey    = hBox:Lookup("Text_Hotkey")
-		local txtStackNum  = hBox:Lookup("Text_StackNum")
-		local txtShortName = hBox:Lookup("Text_ShortName")
-		local hCDBar       = hItem:Lookup("Handle_Bar")
-		local txtProcess   = hCDBar:Lookup("Text_Process")
-		local imgProcess   = hCDBar:Lookup("Image_Process")
-		local txtName      = hCDBar:Lookup("Text_Name")
+		local hItem        = hList:AppendItemFromIni(INI_PATH, 'Handle_Item')
+		local hBox         = hItem:Lookup('Handle_Box')
+		local box          = hBox:Lookup('Box_Default')
+		local imgBoxBg     = hBox:Lookup('Image_BoxBg')
+		local txtTime      = hBox:Lookup('Text_Time')
+		local txtHotkey    = hBox:Lookup('Text_Hotkey')
+		local txtStackNum  = hBox:Lookup('Text_StackNum')
+		local txtShortName = hBox:Lookup('Text_ShortName')
+		local hCDBar       = hItem:Lookup('Handle_Bar')
+		local txtProcess   = hCDBar:Lookup('Text_Process')
+		local imgProcess   = hCDBar:Lookup('Image_Process')
+		local txtName      = hCDBar:Lookup('Text_Name')
 
 		-- 建立高速索引
 		hItem.box = box
@@ -190,10 +190,10 @@ local function ReloadFrame(frame)
 		-- 快捷键
 		txtHotkey:SetFontScheme(7)
 		-- Box背景图
-		if config.boxBgUITex ~= "" then
+		if config.boxBgUITex ~= '' then
 			XGUI(imgBoxBg):image(config.boxBgUITex)
 		end
-		imgBoxBg:SetVisible(config.boxBgUITex ~= "")
+		imgBoxBg:SetVisible(config.boxBgUITex ~= '')
 
 		if config.type == 'SKILL' then
 			box.__SetCoolDownPercentage = box.SetCoolDownPercentage
@@ -234,7 +234,7 @@ local function ReloadFrame(frame)
 		txtStackNum:SetFontScale(fontScale)
 		if config.cdBar then
 			txtProcess:SetW(config.cdBarWidth - 10)
-			txtProcess:SetText("")
+			txtProcess:SetText('')
 			txtProcess:SetFontScale(fontScale)
 			txtProcess:SetVisible(config.showTime)
 
@@ -338,16 +338,16 @@ end
 MY_TargetMon_Base = class()
 
 function MY_TargetMon_Base.OnFrameCreate()
-	this.hTotal = this:Lookup("", "")
-	this.hList = this:Lookup("", "Handle_List")
+	this.hTotal = this:Lookup('', '')
+	this.hList = this:Lookup('', 'Handle_List')
 	this.hList.FormatAllItemPosExt = FormatAllItemPosExt
-	this:RegisterEvent("UI_SCALED")
-	this:RegisterEvent("SYS_MSG")
-	this:RegisterEvent("HOT_KEY_RELOADED")
-	this:RegisterEvent("SKILL_MOUNT_KUNG_FU")
-	this:RegisterEvent("ON_ENTER_CUSTOM_UI_MODE")
-	this:RegisterEvent("ON_LEAVE_CUSTOM_UI_MODE")
-	this:RegisterEvent("MY_TARGET_MON_RELOAD")
+	this:RegisterEvent('UI_SCALED')
+	this:RegisterEvent('SYS_MSG')
+	this:RegisterEvent('HOT_KEY_RELOADED')
+	this:RegisterEvent('SKILL_MOUNT_KUNG_FU')
+	this:RegisterEvent('ON_ENTER_CUSTOM_UI_MODE')
+	this:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
+	this:RegisterEvent('MY_TARGET_MON_RELOAD')
 	ReloadFrame(this)
 end
 
@@ -362,7 +362,7 @@ end
 
 do
 local needFormatItemPos
-local l_tBuffTime = setmetatable({}, { __mode = "v" })
+local l_tBuffTime = setmetatable({}, { __mode = 'v' })
 local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCount, targetChanged, dwOwnerID, dwKungfuID, dwTarKungfuID)
 	if not (hItem.mon.kungfus.all or hItem.mon.kungfus[dwKungfuID])
 	or not (hItem.mon.tarkungfus.all or hItem.mon.tarkungfus[dwTarKungfuID]) then
@@ -386,7 +386,7 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 					})
 				end
 				local id = buff.dwID
-				local level = (hItem.mon.ignoreId or hItem.mon.ids[id].ignoreLevel) and "all" or buff.nLevel
+				local level = (hItem.mon.ignoreId or hItem.mon.ids[id].ignoreLevel) and 'all' or buff.nLevel
 				if not tItem[id] then
 					tItem[id] = {}
 				end
@@ -437,20 +437,20 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 			hItem.box:SetObjectIcon(iconid)
 			-- 计算BUFF时间
 			local nTimeLeft = math.max(0, buff.nEndFrame - nFrameCount) / 16
-			local szTimeLeft = ""
+			local szTimeLeft = ''
 			if nTimeLeft <= 3600 then
 				if nTimeLeft > 60 then
 					if config.decimalTime == -1 or nTimeLeft < config.decimalTime then
-						szTimeLeft = "%d'%.1f"
+						szTimeLeft = '%d\'%.1f'
 					else
-						szTimeLeft = "%d'%d"
+						szTimeLeft = '%d\'%d'
 					end
 					szTimeLeft = szTimeLeft:format(floor(nTimeLeft / 60), nTimeLeft % 60)
 				else
 					if config.decimalTime == -1 or nTimeLeft < config.decimalTime then
-						szTimeLeft = "%.1f"
+						szTimeLeft = '%.1f'
 					else
-						szTimeLeft = "%d"
+						szTimeLeft = '%d'
 					end
 					szTimeLeft = szTimeLeft:format(nTimeLeft)
 				end
@@ -469,7 +469,7 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 			-- 倒计时 与 BUFF层数堆叠
 			hItem.txtProcess:SetText(szTimeLeft)
 			hItem.txtTime:SetText(szTimeLeft)
-			hItem.txtStackNum:SetText(buff.nStackNum == 1 and "" or buff.nStackNum)
+			hItem.txtStackNum:SetText(buff.nStackNum == 1 and '' or buff.nStackNum)
 			-- CD百分比
 			local fPercent = nTimeLeft / nBuffTime
 			hItem.imgProcess:SetPercentage(fPercent)
@@ -482,12 +482,12 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 				elseif fPercent < 0.3 and fPercent > 0.1 then
 					if hItem.fPercent ~= 0.3 then
 						hItem.fPercent = 0.3
-						hItem.box:SetExtentAnimate("ui\\Image\\Common\\Box.UITex", 17)
+						hItem.box:SetExtentAnimate('ui\\Image\\Common\\Box.UITex', 17)
 					end
 				elseif fPercent < 0.1 then
 					if hItem.fPercent ~= 0.1 then
 						hItem.fPercent = 0.1
-						hItem.box:SetExtentAnimate("ui\\Image\\Common\\Box.UITex", 20)
+						hItem.box:SetExtentAnimate('ui\\Image\\Common\\Box.UITex', 20)
 					end
 				else
 					hItem.box:SetObjectStaring(false)
@@ -521,10 +521,10 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 		end
 		if not hItem.bExist then
 			local szSound = hItem.dwID and hItem.mon.ids[hItem.dwID] and hItem.mon.ids[hItem.dwID].soundAppear
-			if not szSound or szSound == "" then
+			if not szSound or szSound == '' then
 				szSound = hItem.mon.soundAppear
 			end
-			if szSound and szSound ~= "" then
+			if szSound and szSound ~= '' then
 				MY.PlaySound(szSound)
 			end
 			hItem.bExist = true
@@ -535,15 +535,15 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 			hItem.box:SetObjectCoolDown(true)
 			hItem.box:SetCoolDownPercentage(0)
 			hItem.box:SetObjectStaring(false)
-			hItem.txtTime:SetText("")
-			hItem.txtStackNum:SetText("")
+			hItem.txtTime:SetText('')
+			hItem.txtStackNum:SetText('')
 			hItem.box:ClearExtentAnimate()
 		elseif config.type == 'SKILL' then
 			UpdateBoxObject(hItem.box, UI_OBJECT.SKILL)
-			hItem.box:SetOverText(3, "")
+			hItem.box:SetOverText(3, '')
 			hItem.box:SetObjectCoolDown(false)
 		end
-		hItem.txtProcess:SetText("")
+		hItem.txtProcess:SetText('')
 		hItem.imgProcess:SetPercentage(0)
 		-- 如果目标没有改变过 且 之前存在 则显示刷新动画
 		if config.cdReadySpark and hItem.nRenderFrame and hItem.nRenderFrame >= 0 and hItem.nRenderFrame ~= nFrameCount and not targetChanged then
@@ -561,10 +561,10 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 		end
 		if hItem.bExist then
 			local szSound = hItem.dwID and hItem.mon.ids[hItem.dwID] and hItem.mon.ids[hItem.dwID].soundDisappear
-			if not szSound or szSound == "" then
+			if not szSound or szSound == '' then
 				szSound = hItem.mon.soundDisappear
 			end
-			if szSound and szSound ~= "" then
+			if szSound and szSound ~= '' then
 				MY.PlaySound(szSound)
 			end
 			hItem.bExist = false
@@ -614,7 +614,7 @@ function D.UpdateFrame(frame, force)
 			local dwControlPlayerID = GetControlPlayerID()
 			for _, buff in ipairs(MY.GetBuffList(KTarget)) do
 				if not config.hideOthers or buff.dwSkillSrcID == dwClientPlayerID or buff.dwSkillSrcID == dwControlPlayerID then
-					local szName = Table_GetBuffName(buff.dwID, buff.nLevel) or ""
+					local szName = Table_GetBuffName(buff.dwID, buff.nLevel) or ''
 					-- 先按ID和等级严格匹配（顺序不可颠倒）
 					local tItems = frame.tItem[buff.dwID] and frame.tItem[buff.dwID][buff.nLevel]
 					if tItems then
@@ -623,7 +623,7 @@ function D.UpdateFrame(frame, force)
 						end
 					end
 					-- 再按照ID匹配
-					local tItems = frame.tItem[buff.dwID] and frame.tItem[buff.dwID]["all"]
+					local tItems = frame.tItem[buff.dwID] and frame.tItem[buff.dwID]['all']
 					if tItems then
 						for hItem, _ in pairs(tItems) do
 							UpdateItem(hItem, KTarget, buff, szName, frame.tItem, config, nFrameCount, targetChanged, nil, dwKungfuID, dwTarKungfuID)
@@ -764,7 +764,7 @@ local function OnSkill(this, dwID, dwLevel)
 	if tItems then
 		OnSkillItem(tItems, dwID, dwLevel)
 	end
-	local tItems = this.tItem[dwID] and this.tItem[dwID]["all"]
+	local tItems = this.tItem[dwID] and this.tItem[dwID]['all']
 	if tItems then
 		OnSkillItem(tItems, dwID, dwLevel)
 	end
@@ -775,44 +775,44 @@ local function OnSkill(this, dwID, dwLevel)
 end
 
 function MY_TargetMon_Base.OnEvent(event)
-	if event == "HOT_KEY_RELOADED" then
+	if event == 'HOT_KEY_RELOADED' then
 		D.UpdateHotkey(this)
-	elseif event == "SYS_MSG" then
+	elseif event == 'SYS_MSG' then
 		if this.config.type ~= 'SKILL' then
 			return
 		end
-		if arg0 == "UI_OME_SKILL_CAST_LOG" then
+		if arg0 == 'UI_OME_SKILL_CAST_LOG' then
 			-- 技能施放日志；
 			-- (arg1)dwCaster：技能施放者 (arg2)dwSkillID：技能ID (arg3)dwLevel：技能等级
 			-- MY_Recount.OnSkillCast(arg1, arg2, arg3)
 			if arg1 == this.dwID then
 				OnSkill(this, arg2, arg3)
 			end
-		elseif arg0 == "UI_OME_SKILL_HIT_LOG" then
+		elseif arg0 == 'UI_OME_SKILL_HIT_LOG' then
 			if arg1 == this.dwID then
 				OnSkill(this, arg4, arg5)
 			end
 		end
-	elseif event == "SKILL_MOUNT_KUNG_FU" then
+	elseif event == 'SKILL_MOUNT_KUNG_FU' then
 		D.UpdateFrame(this, true)
-	elseif event == "ON_ENTER_CUSTOM_UI_MODE" then
+	elseif event == 'ON_ENTER_CUSTOM_UI_MODE' then
 		this:SetH(this.dragH)
 		this:Lookup('', 'Handle_List'):SetAlpha(90)
-		UpdateCustomModeWindow(this, _L["[MY TargetMon] "] .. this.config.caption, this.config.penetrable)
-	elseif event == "ON_LEAVE_CUSTOM_UI_MODE" then
+		UpdateCustomModeWindow(this, _L['[MY TargetMon] '] .. this.config.caption, this.config.penetrable)
+	elseif event == 'ON_LEAVE_CUSTOM_UI_MODE' then
 		this:SetH(this.h)
 		this:Lookup('', 'Handle_List'):SetAlpha(255)
-		UpdateCustomModeWindow(this, _L["[MY TargetMon] "] .. this.config.caption, this.config.penetrable)
+		UpdateCustomModeWindow(this, _L['[MY TargetMon] '] .. this.config.caption, this.config.penetrable)
 		if this.config.dragable then
 			this:EnableDrag(true)
 		end
 		D.SaveAnchor(this)
-	elseif event == "MY_TARGET_MON_RELOAD" then
+	elseif event == 'MY_TARGET_MON_RELOAD' then
 		if this.config ~= arg0 then
 			return
 		end
 		ReloadFrame(this)
-	elseif event == "UI_SCALED" then
+	elseif event == 'UI_SCALED' then
 		D.UpdateScale(this)
 		D.UpdateAnchor(this)
 	end

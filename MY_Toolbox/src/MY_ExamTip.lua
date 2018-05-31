@@ -6,9 +6,9 @@
 -- @Last modified by:   tinymins
 -- @Last modified time: 2016-12-13 14:49:52
 -----------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Toolbox/lang/")
-local QUERY_URL = "http://data.jx3.derzh.com/api/exam?l=%s&q=%s"
-local SUBMIT_URL = "http://data.jx3.derzh.com/api/exam"
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Toolbox/lang/')
+local QUERY_URL = 'http://data.jx3.derzh.com/api/exam?l=%s&q=%s'
+local SUBMIT_URL = 'http://data.jx3.derzh.com/api/exam'
 local l_tLocal -- 本地题库
 local l_tCached = {} -- 玩家答题缓存
 local l_tAccept = {} -- 从服务器获取到的数据缓存
@@ -23,7 +23,7 @@ local function IsCurrentQuestion(szQues)
 	if not frame then
 		return
 	end
-	return frame:Lookup("", "Handle_ExamContents"):Lookup(0):GetText() == szQues
+	return frame:Lookup('', 'Handle_ExamContents'):Lookup(0):GetText() == szQues
 end
 
 local function ResolveAnswer(szAnsw)
@@ -49,15 +49,15 @@ local function QueryData(szQues)
 		return
 	end
 	l_szLastQueryQues = szQues
-	DisplayMessage(_L["Querying, please wait..."])
+	DisplayMessage(_L['Querying, please wait...'])
 
 	if not l_tLocal then
-		l_tLocal = MY.LoadLUAData({"config/examtip.jx3dat", MY_DATA_PATH.GLOBAL}) or {}
+		l_tLocal = MY.LoadLUAData({'config/examtip.jx3dat', MY_DATA_PATH.GLOBAL}) or {}
 	end
 	if l_tLocal[szQues] then
 		for _, szAnsw in ipairs(l_tLocal[szQues]) do
 			if ResolveAnswer(szAnsw) then
-				return DisplayMessage(_L["Local exam data matched."])
+				return DisplayMessage(_L['Local exam data matched.'])
 			end
 		end
 	end
@@ -74,9 +74,9 @@ local function QueryData(szQues)
 
 			if #res.data == 0 then
 				if res.more then
-					DisplayMessage(_L["No result found, here's from open search engine:"] .. "\n" .. res.more)
+					DisplayMessage(_L['No result found, here\'s from open search engine:'] .. '\n' .. res.more)
 				else
-					DisplayMessage(_L["No result found."])
+					DisplayMessage(_L['No result found.'])
 				end
 			else
 				for _, rec in ipairs(res.data) do
@@ -95,7 +95,7 @@ local function QueryData(szQues)
 		end,
 		error = function(html, status, connected)
 			if not connected then
-				l_szLastQueryQues = ""
+				l_szLastQueryQues = ''
 			end
 			DisplayMessage(_L['Loading failed.'])
 		end,
@@ -136,11 +136,11 @@ end
 do
 local l_nExamPrintRemainSpace = 0
 local function OnFrameBreathe()
-	local frame = Station.Lookup("Normal/ExaminationPanel")
+	local frame = Station.Lookup('Normal/ExaminationPanel')
 	if not (frame and frame:IsVisible()) then
 		return
 	end
-	local txtQues = frame:Lookup("", "Handle_ExamContents"):Lookup(0)
+	local txtQues = frame:Lookup('', 'Handle_ExamContents'):Lookup(0)
 	if not txtQues then
 		return
 	end
@@ -162,7 +162,7 @@ local function OnFrameBreathe()
 end
 
 local function OnFrameCreate()
-	if arg0:GetName() == "ExaminationPanel" then
+	if arg0:GetName() == 'ExaminationPanel' then
 		arg0.OnFrameBreathe = OnFrameBreathe
 	end
 end
@@ -179,5 +179,5 @@ local function OnLoot()
 		end, 2000)
 	end
 end
-MY.RegisterEvent("LOOT_ITEM.MY_EXAMTIP", OnLoot)
+MY.RegisterEvent('LOOT_ITEM.MY_EXAMTIP', OnLoot)
 end

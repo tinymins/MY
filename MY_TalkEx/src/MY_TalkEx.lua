@@ -12,7 +12,7 @@
 --------------------------------------------
 MY_TalkEx = MY_TalkEx or {}
 local _C = {}
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_TalkEx/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TalkEx/lang/')
 MY_TalkEx.tTalkChannels     = {}
 MY_TalkEx.szTalk            = ''
 MY_TalkEx.szTrickFilter     = 'RAID'
@@ -31,11 +31,11 @@ RegisterCustomData('MY_TalkEx.szTrickText')
 RegisterCustomData('MY_TalkEx.szTrickTextEnd')
 
 _C.tTalkChannels = {
-	{ nChannel = PLAYER_TALK_CHANNEL.NEARBY       , szID = "MSG_NORMAL"         },
-	{ nChannel = PLAYER_TALK_CHANNEL.TEAM         , szID = "MSG_PARTY"          },
-	{ nChannel = PLAYER_TALK_CHANNEL.RAID         , szID = "MSG_TEAM"           },
-	{ nChannel = PLAYER_TALK_CHANNEL.TONG         , szID = "MSG_GUILD"          },
-	{ nChannel = PLAYER_TALK_CHANNEL.TONG_ALLIANCE, szID = "MSG_GUILD_ALLIANCE" },
+	{ nChannel = PLAYER_TALK_CHANNEL.NEARBY       , szID = 'MSG_NORMAL'         },
+	{ nChannel = PLAYER_TALK_CHANNEL.TEAM         , szID = 'MSG_PARTY'          },
+	{ nChannel = PLAYER_TALK_CHANNEL.RAID         , szID = 'MSG_TEAM'           },
+	{ nChannel = PLAYER_TALK_CHANNEL.TONG         , szID = 'MSG_GUILD'          },
+	{ nChannel = PLAYER_TALK_CHANNEL.TONG_ALLIANCE, szID = 'MSG_GUILD_ALLIANCE' },
 }
 _C.tForceTitle = { [-1] = _L['all force'] }
 for i, v in pairs(g_tStrings.tForceTitle) do
@@ -43,16 +43,16 @@ for i, v in pairs(g_tStrings.tForceTitle) do
 end
 _C.tTrickFilter = { ['NEARBY'] = _L['nearby players where'], ['RAID'] = _L['teammates where'], }
 _C.tTrickChannels = {
-	[PLAYER_TALK_CHANNEL.TEAM         ] = { szName = _L['team channel'         ], tCol = GetMsgFontColor("MSG_TEAM"          , true) },
-	[PLAYER_TALK_CHANNEL.RAID         ] = { szName = _L['raid channel'         ], tCol = GetMsgFontColor("MSG_TEAM"          , true) },
-	[PLAYER_TALK_CHANNEL.TONG         ] = { szName = _L['tong channel'         ], tCol = GetMsgFontColor("MSG_GUILD"         , true) },
-	[PLAYER_TALK_CHANNEL.TONG_ALLIANCE] = { szName = _L['tong alliance channel'], tCol = GetMsgFontColor("MSG_GUILD_ALLIANCE", true) },
+	[PLAYER_TALK_CHANNEL.TEAM         ] = { szName = _L['team channel'         ], tCol = GetMsgFontColor('MSG_TEAM'          , true) },
+	[PLAYER_TALK_CHANNEL.RAID         ] = { szName = _L['raid channel'         ], tCol = GetMsgFontColor('MSG_TEAM'          , true) },
+	[PLAYER_TALK_CHANNEL.TONG         ] = { szName = _L['tong channel'         ], tCol = GetMsgFontColor('MSG_GUILD'         , true) },
+	[PLAYER_TALK_CHANNEL.TONG_ALLIANCE] = { szName = _L['tong alliance channel'], tCol = GetMsgFontColor('MSG_GUILD_ALLIANCE', true) },
 }
 
 local _dwTalkTick = 0
 _C.Talk = function()
 	if #MY_TalkEx.szTalk == 0 then
-		return MY.Sysmsg({_L["please input something."], r=255, g=0, b=0})
+		return MY.Sysmsg({_L['please input something.'], r=255, g=0, b=0})
 	end
 
 	if not MY.IsShieldedVersion() and MY.ProcessCommand
@@ -61,7 +61,7 @@ _C.Talk = function()
 	else
 		-- 防止刷屏
 		if GetTime() - _dwTalkTick < 1000 then
-			return OutputMessage("MSG_ANNOUNCE_YELLOW", _L['You are talking too quick!'])
+			return OutputMessage('MSG_ANNOUNCE_YELLOW', _L['You are talking too quick!'])
 		end
 		_dwTalkTick = GetTime()
 		-- 近聊不放在第一个会导致发不出去
@@ -76,11 +76,11 @@ _C.Talk = function()
 		end
 	end
 end
-MY.Game.RegisterHotKey("MY_TalkEx_Talk", _L["TalkEx Talk"], _C.Talk, nil)
+MY.Game.RegisterHotKey('MY_TalkEx_Talk', _L['TalkEx Talk'], _C.Talk, nil)
 
 _C.Trick = function()
 	if #MY_TalkEx.szTrickText == 0 then
-		return MY.Sysmsg({_L["please input something."], r=255, g=0, b=0})
+		return MY.Sysmsg({_L['please input something.'], r=255, g=0, b=0})
 	end
 	local t = {}
 	if MY_TalkEx.szTrickFilter == 'RAID' then
@@ -109,28 +109,28 @@ _C.Trick = function()
 	end
 	-- none target
 	if #t == 0 then
-		return MY.Sysmsg({_L["no trick target found."], r=255, g=0, b=0},nil)
+		return MY.Sysmsg({_L['no trick target found.'], r=255, g=0, b=0},nil)
 	end
 	-- start tricking
 	if #MY_TalkEx.szTrickTextBegin > 0 then
 		MY.Talk(MY_TalkEx.nTrickChannel, MY_TalkEx.szTrickTextBegin)
 	end
 	for _, szName in ipairs(t) do
-		MY.Talk(MY_TalkEx.nTrickChannel, (MY_TalkEx.szTrickText:gsub("%$mb", '[' .. szName .. ']')))
+		MY.Talk(MY_TalkEx.nTrickChannel, (MY_TalkEx.szTrickText:gsub('%$mb', '[' .. szName .. ']')))
 	end
 	if #MY_TalkEx.szTrickTextEnd > 0 then
 		MY.Talk(MY_TalkEx.nTrickChannel, MY_TalkEx.szTrickTextEnd)
 	end
 end
 
-MY.RegisterPanel("TalkEx", _L["talk ex"], _L['Chat'], "UI/Image/UICommon/ScienceTreeNode.UITex|123", {255,255,0,200}, { OnPanelActive = function(wnd)
+MY.RegisterPanel('TalkEx', _L['talk ex'], _L['Chat'], 'UI/Image/UICommon/ScienceTreeNode.UITex|123', {255,255,0,200}, { OnPanelActive = function(wnd)
 	local ui = MY.UI(wnd)
 	local w, h = ui:size()
 	-------------------------------------
 	-- 喊话部分
 	-------------------------------------
 	-- 喊话输入框
-	ui:append("WndEditBox", "WndEdit_Talk"):children('#WndEdit_Talk'):pos(25,15)
+	ui:append('WndEditBox', 'WndEdit_Talk'):children('#WndEdit_Talk'):pos(25,15)
 	  :size(w-136,208):multiLine(true)
 	  :text(MY_TalkEx.szTalk)
 	  :change(function(text) MY_TalkEx.szTalk = text end)
@@ -148,7 +148,7 @@ MY.RegisterPanel("TalkEx", _L["talk ex"], _L['Chat'], "UI/Image/UICommon/Science
 		  :check(MY_TalkEx.tTalkChannels[p.nChannel] or false)
 	end
 	-- 喊话按钮
-	ui:append("WndButton", "WndButton_Talk"):children('#WndButton_Talk')
+	ui:append('WndButton', 'WndButton_Talk'):children('#WndButton_Talk')
 	  :pos(w-110,200):width(90)
 	  :text(_L['send'],{255,255,255})
 	  :click(function()
@@ -170,20 +170,20 @@ MY.RegisterPanel("TalkEx", _L["talk ex"], _L['Chat'], "UI/Image/UICommon/Science
 	-- 调侃部分
 	-------------------------------------
 	-- <hr />
-	ui:append("Image", "Image_TalkEx_Spliter"):find('#Image_TalkEx_Spliter')
+	ui:append('Image', 'Image_TalkEx_Spliter'):find('#Image_TalkEx_Spliter')
 	  :pos(5, 235):size(w-10, 1):image('UI/Image/UICommon/ScienceTreeNode.UITex',62)
 	-- 文本标题
-	ui:append("Text", "Text_Trick_With"):find("#Text_Trick_With")
+	ui:append('Text', 'Text_Trick_With'):find('#Text_Trick_With')
 	  :pos(27, 240):text(_L['have a trick with'])
 	-- 调侃对象范围过滤器
-	ui:append("WndComboBox", "WndComboBox_Trick_Filter"):find("#WndComboBox_Trick_Filter")
+	ui:append('WndComboBox', 'WndComboBox_Trick_Filter'):find('#WndComboBox_Trick_Filter')
 	  :pos(95, 241):size(80,25):menu(function()
 	  	local t = {}
 	  	for szFilterId,szTitle in pairs(_C.tTrickFilter) do
 	  		table.insert(t,{
 	  			szOption = szTitle,
 	  			fnAction = function()
-	  				ui:find("#WndComboBox_Trick_Filter"):text(szTitle)
+	  				ui:find('#WndComboBox_Trick_Filter'):text(szTitle)
 	  				MY_TalkEx.szTrickFilter = szFilterId
 	  			end,
 	  		})
@@ -192,7 +192,7 @@ MY.RegisterPanel("TalkEx", _L["talk ex"], _L['Chat'], "UI/Image/UICommon/Science
 	  end)
 	  :text(_C.tTrickFilter[MY_TalkEx.szTrickFilter] or '')
 	-- 调侃门派过滤器
-	ui:append("WndComboBox", "WndComboBox_Trick_Force"):children('#WndComboBox_Trick_Force')
+	ui:append('WndComboBox', 'WndComboBox_Trick_Force'):children('#WndComboBox_Trick_Force')
 	  :pos(175, 241):size(80,25)
 	  :text(_C.tForceTitle[MY_TalkEx.nTrickForce])
 	  :menu(function()
@@ -201,7 +201,7 @@ MY.RegisterPanel("TalkEx", _L["talk ex"], _L['Chat'], "UI/Image/UICommon/Science
 	  		table.insert(t,{
 	  			szOption = szTitle,
 	  			fnAction = function()
-	  				ui:find("#WndComboBox_Trick_Force"):text(szTitle)
+	  				ui:find('#WndComboBox_Trick_Force'):text(szTitle)
 	  				MY_TalkEx.nTrickForce = szFilterId
 	  			end,
 	  		})
@@ -209,24 +209,24 @@ MY.RegisterPanel("TalkEx", _L["talk ex"], _L['Chat'], "UI/Image/UICommon/Science
 	  	return t
 	  end)
 	-- 调侃内容输入框：第一句
-	ui:append("WndEditBox", "WndEdit_TrickBegin"):children('#WndEdit_TrickBegin')
+	ui:append('WndEditBox', 'WndEdit_TrickBegin'):children('#WndEdit_TrickBegin')
 	  :pos(25, 269):size(w-136, 25):text(MY_TalkEx.szTrickTextBegin)
 	  :change(function() MY_TalkEx.szTrickTextBegin = this:GetText() end)
 	-- 调侃内容输入框：调侃内容
-	ui:append("WndEditBox", "WndEdit_Trick"):children('#WndEdit_Trick')
+	ui:append('WndEditBox', 'WndEdit_Trick'):children('#WndEdit_Trick')
 	  :pos(25, 294):size(w-136, 55)
 	  :multiLine(true):text(MY_TalkEx.szTrickText)
 	  :change(function() MY_TalkEx.szTrickText = this:GetText() end)
 	-- 调侃内容输入框：最后一句
-	ui:append("WndEditBox", "WndEdit_TrickEnd"):children('#WndEdit_TrickEnd')
+	ui:append('WndEditBox', 'WndEdit_TrickEnd'):children('#WndEdit_TrickEnd')
 	  :pos(25, 349):size(w-136, 25)
 	  :text(MY_TalkEx.szTrickTextEnd)
 	  :change(function() MY_TalkEx.szTrickTextEnd = this:GetText() end)
 	-- 调侃发送频道提示框
-	ui:append("Text", "Text_Trick_Sendto"):find('#Text_Trick_Sendto')
+	ui:append('Text', 'Text_Trick_Sendto'):find('#Text_Trick_Sendto')
 	  :pos(27, 379):size(100, 26):text(_L['send to'])
 	-- 调侃发送频道
-	ui:append("WndComboBox", "WndComboBox_Trick_Sendto_Filter"):children('#WndComboBox_Trick_Sendto_Filter')
+	ui:append('WndComboBox', 'WndComboBox_Trick_Sendto_Filter'):children('#WndComboBox_Trick_Sendto_Filter')
 	  :pos(80, 379):size(100, 25)
 	  :menu(function()
 	  	local t = {}
@@ -236,7 +236,7 @@ MY.RegisterPanel("TalkEx", _L["talk ex"], _L['Chat'], "UI/Image/UICommon/Science
 	  			szOption = tChannel.szName,
 	  			fnAction = function()
 	  				MY_TalkEx.nTrickChannel = nTrickChannel
-	  				ui:find("#WndComboBox_Trick_Sendto_Filter"):text(tChannel.szName):color(tChannel.tCol)
+	  				ui:find('#WndComboBox_Trick_Sendto_Filter'):text(tChannel.szName):color(tChannel.tCol)
 	  			end,
 	  		})
 	  	end
@@ -245,7 +245,7 @@ MY.RegisterPanel("TalkEx", _L["talk ex"], _L['Chat'], "UI/Image/UICommon/Science
 	  :text(_C.tTrickChannels[MY_TalkEx.nTrickChannel].szName or '')
 	  :color(_C.tTrickChannels[MY_TalkEx.nTrickChannel].tCol)
 	-- 调侃按钮
-	ui:append("WndButton", "WndButton_Trick"):children('#WndButton_Trick')
+	ui:append('WndButton', 'WndButton_Trick'):children('#WndButton_Trick')
 	  :pos(435, 379):color({255,255,255})
 	  :text(_L['have a trick with'])
 	  :click(_C.Trick)

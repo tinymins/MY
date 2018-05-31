@@ -36,21 +36,21 @@ local D = {
 	IsEnabled = MY_LifeBar.IsEnabled,
 	IsShielded = MY_LifeBar.IsShielded,
 }
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_LifeBar/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/lang/')
 
 local PS = {}
 local function LoadUI(ui)
-	ui:children("#WndSliderBox_LifeBarWidth"):value(Config.nLifeWidth)
-	ui:children("#WndSliderBox_LifeBarHeight"):value(Config.nLifeHeight)
-	ui:children("#WndSliderBox_LifeBarOffsetX"):value(Config.nLifeOffsetX)
-	ui:children("#WndSliderBox_LifeBarOffsetY"):value(Config.nLifeOffsetY)
-	ui:children("#WndSliderBox_TextOffsetY"):value(Config.nTextOffsetY)
-	ui:children("#WndSliderBox_TextLineHeight"):value(Config.nTextLineHeight)
-	ui:children("#WndSliderBox_LifePerOffsetX"):value(Config.nLifePerOffsetX)
-	ui:children("#WndSliderBox_LifePerOffsetY"):value(Config.nLifePerOffsetY)
-	ui:children("#WndSliderBox_Distance"):value(math.sqrt(Config.nDistance) / 64)
-	ui:children("#WndSliderBox_Alpha"):value(Config.nAlpha)
-	ui:children("#WndCheckBox_ShowSpecialNpc"):check(Config.bShowSpecialNpc)
+	ui:children('#WndSliderBox_LifeBarWidth'):value(Config.nLifeWidth)
+	ui:children('#WndSliderBox_LifeBarHeight'):value(Config.nLifeHeight)
+	ui:children('#WndSliderBox_LifeBarOffsetX'):value(Config.nLifeOffsetX)
+	ui:children('#WndSliderBox_LifeBarOffsetY'):value(Config.nLifeOffsetY)
+	ui:children('#WndSliderBox_TextOffsetY'):value(Config.nTextOffsetY)
+	ui:children('#WndSliderBox_TextLineHeight'):value(Config.nTextLineHeight)
+	ui:children('#WndSliderBox_LifePerOffsetX'):value(Config.nLifePerOffsetX)
+	ui:children('#WndSliderBox_LifePerOffsetY'):value(Config.nLifePerOffsetY)
+	ui:children('#WndSliderBox_Distance'):value(math.sqrt(Config.nDistance) / 64)
+	ui:children('#WndSliderBox_Alpha'):value(Config.nAlpha)
+	ui:children('#WndCheckBox_ShowSpecialNpc'):check(Config.bShowSpecialNpc)
 end
 function PS.OnPanelActive(wnd)
 	local ui = MY.UI(wnd)
@@ -59,8 +59,8 @@ function PS.OnPanelActive(wnd)
 	local x, y = 10, 15
 	local offsety = 45
 	-- 开启
-	ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Enable"],
+	ui:append('WndCheckBox', {
+		x = x, y = y, text = _L['Enable'],
 		checked = MY_LifeBar.bEnabled,
 		oncheck = function(bChecked)
 			MY_LifeBar.bEnabled = bChecked
@@ -75,28 +75,28 @@ function PS.OnPanelActive(wnd)
 	})
 	x = x + 80
 	-- 配置文件名称
-	ui:append("WndEditBox", {
+	ui:append('WndEditBox', {
 		x = x, y = y, w = 200, h = 25,
 		placeholder = _L['Configure name'],
 		text = MY_LifeBar.szConfig,
 		onblur = function()
-			local szConfig = XGUI(this):text():gsub("%s", "")
-			if szConfig == "" then
+			local szConfig = XGUI(this):text():gsub('%s', '')
+			if szConfig == '' then
 				return
 			end
-			Config("load", szConfig)
+			Config('load', szConfig)
 			LoadUI(ui)
 			D.Reset()
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
 	x = x + 235
-	ui:append("Text", {
+	ui:append('Text', {
 		x = x + 3, y = y - 16,
 		text = _L['only enable in those maps below'],
 		autoenable = function() return D.IsEnabled() end,
 	})
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x, y = y + 9, w = 80, text = _L['arena'],
 		checked = Config.bOnlyInArena,
 		oncheck = function(bChecked)
@@ -106,7 +106,7 @@ function PS.OnPanelActive(wnd)
 		autoenable = function() return D.IsEnabled() end,
 	})
 	x = x + 80
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x, y = y + 9, w = 70, text = _L['battlefield'],
 		checked = Config.bOnlyInBattleField,
 		oncheck = function(bChecked)
@@ -116,7 +116,7 @@ function PS.OnPanelActive(wnd)
 		autoenable = function() return D.IsEnabled() end,
 	})
 	x = x + 70
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x, y = y + 9, w = 70, text = _L['dungeon'],
 		checked = Config.bOnlyInDungeon,
 		oncheck = function(bChecked)
@@ -127,14 +127,14 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + offsety
 	-- <hr />
-	ui:append("Image", "Image_Spliter"):find('#Image_Spliter'):pos(10, y-7):size(w - 20, 2):image('UI/Image/UICommon/ScienceTreeNode.UITex',62)
+	ui:append('Image', 'Image_Spliter'):find('#Image_Spliter'):pos(10, y-7):size(w - 20, 2):image('UI/Image/UICommon/ScienceTreeNode.UITex',62)
 
 	x, y = 15, 70
 	offsety = 32
-	ui:append("WndSliderBox", {
-		name = "WndSliderBox_LifeBarWidth",
+	ui:append('WndSliderBox', {
+		name = 'WndSliderBox_LifeBarWidth',
 		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 5, 150 },
-		text = function(value) return _L("lifebar width: %s px.", value) end, -- 血条宽度
+		text = function(value) return _L('lifebar width: %s px.', value) end, -- 血条宽度
 		value = Config.nLifeWidth,
 		onchange = function(value)
 			Config.nLifeWidth = value
@@ -144,10 +144,10 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + offsety
 
-	ui:append("WndSliderBox", {
-		name = "WndSliderBox_LifeBarHeight",
+	ui:append('WndSliderBox', {
+		name = 'WndSliderBox_LifeBarHeight',
 		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 5, 150 },
-		text = function(value) return _L("lifebar height: %s px.", value) end, -- 血条高度
+		text = function(value) return _L('lifebar height: %s px.', value) end, -- 血条高度
 		value = Config.nLifeHeight,
 		onchange = function(value)
 			Config.nLifeHeight = value
@@ -157,10 +157,10 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + offsety
 
-	ui:append("WndSliderBox", {
-		name = "WndSliderBox_LifeBarOffsetX",
+	ui:append('WndSliderBox', {
+		name = 'WndSliderBox_LifeBarOffsetX',
 		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { -150, 150 },
-		text = function(value) return _L("lifebar offset-x: %d px.", value) end, -- 血条水平偏移
+		text = function(value) return _L('lifebar offset-x: %d px.', value) end, -- 血条水平偏移
 		value = Config.nLifeOffsetX,
 		onchange = function(value)
 			Config.nLifeOffsetX = value
@@ -170,10 +170,10 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + offsety
 
-	ui:append("WndSliderBox", {
-		name = "WndSliderBox_LifeBarOffsetY",
+	ui:append('WndSliderBox', {
+		name = 'WndSliderBox_LifeBarOffsetY',
 		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
-		text = function(value) return _L("lifebar offset-y: %d px.", value) end, -- 血条竖直偏移
+		text = function(value) return _L('lifebar offset-y: %d px.', value) end, -- 血条竖直偏移
 		value = Config.nLifeOffsetY,
 		onchange = function(value)
 			Config.nLifeOffsetY = value
@@ -183,10 +183,10 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + offsety
 
-	ui:append("WndSliderBox", {
-		name = "WndSliderBox_LifePerOffsetX",
+	ui:append('WndSliderBox', {
+		name = 'WndSliderBox_LifePerOffsetX',
 		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { -150, 150 },
-		text = function(value) return _L("life percentage offset-x: %d px.", value) end, -- 血量百分比水平偏移
+		text = function(value) return _L('life percentage offset-x: %d px.', value) end, -- 血量百分比水平偏移
 		value = Config.nLifePerOffsetX,
 		onchange = function(value)
 			Config.nLifePerOffsetX = value
@@ -196,10 +196,10 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + offsety
 
-	ui:append("WndSliderBox", {
-		name = "WndSliderBox_LifePerOffsetY",
+	ui:append('WndSliderBox', {
+		name = 'WndSliderBox_LifePerOffsetY',
 		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
-		text = function(value) return _L("life percentage offset-y: %d px.", value) end, -- 血量百分比竖直偏移
+		text = function(value) return _L('life percentage offset-y: %d px.', value) end, -- 血量百分比竖直偏移
 		value = Config.nLifePerOffsetY,
 		onchange = function(value)
 			Config.nLifePerOffsetY = value
@@ -209,10 +209,10 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + offsety
 
-	ui:append("WndSliderBox", {
-		name = "WndSliderBox_TextOffsetY",
+	ui:append('WndSliderBox', {
+		name = 'WndSliderBox_TextOffsetY',
 		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
-		text = function(value) return _L("text offset-y: %d px.", value) end, -- 第一行字高度
+		text = function(value) return _L('text offset-y: %d px.', value) end, -- 第一行字高度
 		value = Config.nTextOffsetY,
 		onchange = function(value)
 			Config.nTextOffsetY = value
@@ -222,10 +222,10 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + offsety
 
-	ui:append("WndSliderBox", {
-		name = "WndSliderBox_TextLineHeight",
+	ui:append('WndSliderBox', {
+		name = 'WndSliderBox_TextLineHeight',
 		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 150 },
-		text = function(value) return _L("text line height: %d px.", value) end, -- 字行高度
+		text = function(value) return _L('text line height: %d px.', value) end, -- 字行高度
 		value = Config.nTextLineHeight,
 		onchange = function(value)
 			Config.nTextLineHeight = value
@@ -235,10 +235,10 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + offsety
 
-	ui:append("WndSliderBox", {
-		name = "WndSliderBox_Distance",
+	ui:append('WndSliderBox', {
+		name = 'WndSliderBox_Distance',
 		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 300 },
-		text = function(value) return value == 0 and _L["Max Distance: Unlimited."] or _L("Max Distance: %s foot.", value) end,
+		text = function(value) return value == 0 and _L['Max Distance: Unlimited.'] or _L('Max Distance: %s foot.', value) end,
 		value = math.sqrt(Config.nDistance) / 64,
 		onchange = function(value)
 			Config.nDistance = value * value * 64 * 64
@@ -248,10 +248,10 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + offsety
 
-	ui:append("WndSliderBox", {
-		name = "WndSliderBox_Alpha",
+	ui:append('WndSliderBox', {
+		name = 'WndSliderBox_Alpha',
 		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_PERCENT, range = { 0, 255 },
-		text = function(value) return _L("alpha: %.0f%%.", value) end, -- 透明度
+		text = function(value) return _L('alpha: %.0f%%.', value) end, -- 透明度
 		value = Config.nAlpha,
 		onchange = function(value)
 			Config.nAlpha = value * 255 / 100
@@ -272,7 +272,7 @@ function PS.OnPanelActive(wnd)
 			cfg[tartype] = { r, g, b }
 			D.Reset()
 		end
-		if tartype == "Player" then
+		if tartype == 'Player' then
 			table.insert(opt, {
 				szOption = _L['Unified force color'],
 				bCheck = true, bMCheck = true,
@@ -284,7 +284,7 @@ function PS.OnPanelActive(wnd)
 				rgb = cfg[tartype],
 				szIcon = 'ui/Image/button/CommonButton_1.UITex',
 				nFrame = 69, nMouseOverFrame = 70,
-				szLayer = "ICON_RIGHT",
+				szLayer = 'ICON_RIGHT',
 				fnClickIcon = function()
 					XGUI.OpenColorPicker(function(r, g, b)
 						cfg[tartype] = { r, g, b }
@@ -308,7 +308,7 @@ function PS.OnPanelActive(wnd)
 					rgb = cfg[dwForceID],
 					szIcon = 'ui/Image/button/CommonButton_1.UITex',
 					nFrame = 69, nMouseOverFrame = 70,
-					szLayer = "ICON_RIGHT",
+					szLayer = 'ICON_RIGHT',
 					fnClickIcon = function()
 						XGUI.OpenColorPicker(function(r, g, b)
 							cfg[dwForceID] = { r, g, b }
@@ -337,7 +337,7 @@ function PS.OnPanelActive(wnd)
 							cfg.Player = not cfg.Player
 							D.Reset()
 						end,
-					}, relation, "Player"))
+					}, relation, 'Player'))
 				end
 			end
 		end
@@ -356,52 +356,52 @@ function PS.OnPanelActive(wnd)
 							cfg.Npc = not cfg.Npc
 							D.Reset()
 						end,
-					}, relation, "Npc"))
+					}, relation, 'Npc'))
 				end
 			end
 		end
 		return t
 	end
 	-- 显示名字
-	ui:append("WndComboBox", {
-		x = x, y = y, text = _L["name display config"],
+	ui:append('WndComboBox', {
+		x = x, y = y, text = _L['name display config'],
 		menu = function()
-			return GeneBooleanPopupMenu(Config.ShowName, _L["player name display"], _L["npc name display"])
+			return GeneBooleanPopupMenu(Config.ShowName, _L['player name display'], _L['npc name display'])
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
 	y = y + offsety
 
 	-- 称号
-	ui:append("WndComboBox", {
-		x = x, y = y, text = _L["title display config"],
+	ui:append('WndComboBox', {
+		x = x, y = y, text = _L['title display config'],
 		menu = function()
-			return GeneBooleanPopupMenu(Config.ShowTitle, _L["player title display"], _L["npc title display"])
+			return GeneBooleanPopupMenu(Config.ShowTitle, _L['player title display'], _L['npc title display'])
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
 	y = y + offsety
 
 	-- 帮会
-	ui:append("WndComboBox", {
-		x = x, y = y, text = _L["tong display config"],
+	ui:append('WndComboBox', {
+		x = x, y = y, text = _L['tong display config'],
 		menu = function()
-			return GeneBooleanPopupMenu(Config.ShowTong, _L["player tong display"])
+			return GeneBooleanPopupMenu(Config.ShowTong, _L['player tong display'])
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
 	y = y + offsety
 
 	-- 血条设置
-	ui:append("WndComboBox", {
-		x = x, y = y, text = _L["lifebar display config"],
+	ui:append('WndComboBox', {
+		x = x, y = y, text = _L['lifebar display config'],
 		menu = function()
-			local t = GeneBooleanPopupMenu(Config.ShowLife, _L["player lifebar display"], _L["npc lifebar display"])
+			local t = GeneBooleanPopupMenu(Config.ShowLife, _L['player lifebar display'], _L['npc lifebar display'])
 			table.insert(t, { bDevide = true })
 			local t1 = {
 				szOption = _L['Draw direction'],
 			}
-			for _, szDirection in ipairs({ "LEFT_RIGHT", "RIGHT_LEFT", "TOP_BOTTOM", "BOTTOM_TOP" }) do
+			for _, szDirection in ipairs({ 'LEFT_RIGHT', 'RIGHT_LEFT', 'TOP_BOTTOM', 'BOTTOM_TOP' }) do
 				table.insert(t1, {
 					szOption = _L.DIRECTION[szDirection],
 					bCheck = true, bMCheck = true,
@@ -420,10 +420,10 @@ function PS.OnPanelActive(wnd)
 	y = y + offsety
 
 	-- 显示血量%
-	ui:append("WndComboBox", {
-		x = x, y = y, text = _L["lifepercentage display config"],
+	ui:append('WndComboBox', {
+		x = x, y = y, text = _L['lifepercentage display config'],
 		menu = function()
-			local t = GeneBooleanPopupMenu(Config.ShowLifePer, _L["player lifepercentage display"], _L["npc lifepercentage display"])
+			local t = GeneBooleanPopupMenu(Config.ShowLifePer, _L['player lifepercentage display'], _L['npc lifepercentage display'])
 			table.insert(t, { bDevide = true })
 			table.insert(t, {
 				szOption = _L['hide when unfight'],
@@ -450,8 +450,8 @@ function PS.OnPanelActive(wnd)
 	y = y + offsety
 
 	-- 当前阵营
-	ui:append("WndComboBox", {
-		x = x, y = y, text = _L["set current camp"],
+	ui:append('WndComboBox', {
+		x = x, y = y, text = _L['set current camp'],
 		menu = function()
 			return {{
 				szOption = _L['auto detect'],
@@ -492,7 +492,7 @@ function PS.OnPanelActive(wnd)
 	y = y + offsety
 	offsety = 32
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x, y = y, text = _L['show special npc'],
 		checked = Config.bShowSpecialNpc,
 		oncheck = function(bChecked)
@@ -503,7 +503,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + offsety - 10
 
-	-- ui:append("WndCheckBox", {
+	-- ui:append('WndCheckBox', {
 	-- 	x = x, y = y, text = _L['adjust index'],
 	-- 	checked = Config.bAdjustIndex,
 	-- 	oncheck = function(bChecked)
@@ -514,7 +514,7 @@ function PS.OnPanelActive(wnd)
 	-- })
 	-- y = y + offsety - 10
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x, y = y, text = _L['show kungfu'],
 		checked = Config.bShowKungfu,
 		oncheck = function(bChecked)
@@ -524,7 +524,7 @@ function PS.OnPanelActive(wnd)
 		autoenable = function() return D.IsEnabled() end,
 	})
 
-	ui:append("WndCheckBox", {
+	ui:append('WndCheckBox', {
 		x = x + 90, y = y, text = _L['show distance'],
 		checked = Config.bShowDistance,
 		oncheck = function(bChecked)
@@ -535,8 +535,8 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + offsety
 
-	ui:append("WndButton", {
-		x = x, y = y, w = 65, text = _L["Font"],
+	ui:append('WndButton', {
+		x = x, y = y, w = 65, text = _L['Font'],
 		onclick = function()
 			MY.UI.OpenFontPicker(function(nFont)
 				Config.nFont = nFont
@@ -546,14 +546,14 @@ function PS.OnPanelActive(wnd)
 		autoenable = function() return D.IsEnabled() end,
 	})
 
-	ui:append("WndButton", {
+	ui:append('WndButton', {
 		x = x + 65, y = y, w = 120, text = _L['reset config'],
 		onclick = function()
 			MessageBox({
-				szName = "XLifeBar_Reset",
+				szName = 'XLifeBar_Reset',
 				szMessage = _L['Are you sure to reset config?'], {
 					szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function()
-						Config("reset")
+						Config('reset')
 						D.Reset()
 						LoadUI(ui)
 					end
@@ -564,4 +564,4 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + offsety
 end
-MY.RegisterPanel("MY_LifeBar", _L["MY_LifeBar"], _L['General'], "UI/Image/LootPanel/LootPanel.UITex|74", {255,127,0,200}, PS)
+MY.RegisterPanel('MY_LifeBar', _L['MY_LifeBar'], _L['General'], 'UI/Image/LootPanel/LootPanel.UITex|74', {255,127,0,200}, PS)

@@ -21,17 +21,17 @@ local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 -----------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/lang/")
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/lang/')
 local Station, UI_GetClientPlayerID, Table_BuffIsVisible = Station, UI_GetClientPlayerID, Table_BuffIsVisible
 local GetBuffName = MY.GetBuffName
 
 local CTM_BUFF_OFFICIAL = {}
-local INI_ROOT = MY.GetAddonInfo().szRoot .. "MY_Cataclysm/ui/"
-local CTM_CONFIG_DEFAULT = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/config/default/$lang.jx3dat")
-local CTM_CONFIG_CATACLYSM = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/config/cataclysm/$lang.jx3dat")
-local CTM_BUFF_NGB_BASE = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/data/nangongbo/base/$lang.jx3dat") or {}
-local CTM_BUFF_NGB_CMD = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/data/nangongbo/cmd/$lang.jx3dat") or {}
-local CTM_BUFF_NGB_HEAL = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. "MY_Cataclysm/data/nangongbo/heal/$lang.jx3dat") or {}
+local INI_ROOT = MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/ui/'
+local CTM_CONFIG_DEFAULT = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/config/default/$lang.jx3dat')
+local CTM_CONFIG_CATACLYSM = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/config/cataclysm/$lang.jx3dat')
+local CTM_BUFF_NGB_BASE = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/data/nangongbo/base/$lang.jx3dat') or {}
+local CTM_BUFF_NGB_CMD = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/data/nangongbo/cmd/$lang.jx3dat') or {}
+local CTM_BUFF_NGB_HEAL = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/data/nangongbo/heal/$lang.jx3dat') or {}
 
 local CTM_STYLE = {
 	OFFICIAL = 1,
@@ -51,10 +51,10 @@ local DEBUG = false
 
 MY_Cataclysm = {}
 MY_Cataclysm.bDebug = false
-MY_Cataclysm.szConfigName = "common"
+MY_Cataclysm.szConfigName = 'common'
 MY_Cataclysm.STYLE = CTM_STYLE
 MY_Cataclysm.BG_COLOR_MODE = CTM_BG_COLOR_MODE
-RegisterCustomData("MY_Cataclysm.szConfigName")
+RegisterCustomData('MY_Cataclysm.szConfigName')
 
 local UpdateBuffListCache
 do
@@ -77,7 +77,7 @@ local function InsertBuffListCache(aBuffList)
 		local id = tab.dwID or tab.szName
 		if id then
 			for iid, aList in pairs(BUFF_LIST) do
-				if iid == id or (tab.szName and type(iid) == "number" and Table_GetBuffName(iid, 1) == tab.szName) then
+				if iid == id or (tab.szName and type(iid) == 'number' and Table_GetBuffName(iid, 1) == tab.szName) then
 					for i, p in ipairs_r(aList) do
 						if (not tab.nLevel or p.nLevel == tab.nLevel)
 						and (not tab.szStackOp or p.szStackOp == tab.szStackOp)
@@ -115,12 +115,12 @@ function UpdateBuffListCache()
 		end
 	end
 	InsertBuffListCache(Cataclysm_Main.aBuffList)
-	FireUIEvent("CTM_BUFF_LIST_CACHE_UPDATE")
+	FireUIEvent('CTM_BUFF_LIST_CACHE_UPDATE')
 end
 end
 
 local function GetConfigurePath()
-	return {"config/cataclysm/" .. MY_Cataclysm.szConfigName .. ".jx3dat", MY_DATA_PATH.GLOBAL}
+	return {'config/cataclysm/' .. MY_Cataclysm.szConfigName .. '.jx3dat', MY_DATA_PATH.GLOBAL}
 end
 
 local function SaveConfigure()
@@ -148,13 +148,13 @@ local function SetConfig(Config)
 	-- options fixed
 	if Config.nCss == CTM_STYLE.CATACLYSM then
 		for k, v in pairs(CTM_CONFIG_CATACLYSM) do
-			if type(CTM_CONFIG_PLAYER[k]) == "nil" then
+			if type(CTM_CONFIG_PLAYER[k]) == 'nil' then
 				CTM_CONFIG_PLAYER[k] = v
 			end
 		end
 	end
 	for k, v in pairs(CTM_CONFIG_DEFAULT) do
-		if type(CTM_CONFIG_PLAYER[k]) == "nil" then
+		if type(CTM_CONFIG_PLAYER[k]) == 'nil' then
 			CTM_CONFIG_PLAYER[k] = v
 		end
 	end
@@ -177,14 +177,14 @@ local function SetConfigureName(szConfigName)
 end
 
 local function GetFrame()
-	return Station.Lookup("Normal/Cataclysm_Main")
+	return Station.Lookup('Normal/Cataclysm_Main')
 end
 
 local CTM_LOOT_MODE = {
-	[PARTY_LOOT_MODE.FREE_FOR_ALL] = {"ui/Image/TargetPanel/Target.UITex", 60},
-	[PARTY_LOOT_MODE.DISTRIBUTE]   = {"ui/Image/UICommon/CommonPanel2.UITex", 92},
-	[PARTY_LOOT_MODE.GROUP_LOOT]   = {"ui/Image/UICommon/LoginCommon.UITex", 29},
-	[PARTY_LOOT_MODE.BIDDING]      = {"ui/Image/UICommon/GoldTeam.UITex", 6},
+	[PARTY_LOOT_MODE.FREE_FOR_ALL] = {'ui/Image/TargetPanel/Target.UITex', 60},
+	[PARTY_LOOT_MODE.DISTRIBUTE]   = {'ui/Image/UICommon/CommonPanel2.UITex', 92},
+	[PARTY_LOOT_MODE.GROUP_LOOT]   = {'ui/Image/UICommon/LoginCommon.UITex', 29},
+	[PARTY_LOOT_MODE.BIDDING]      = {'ui/Image/UICommon/GoldTeam.UITex', 6},
 }
 local CTM_LOOT_QUALITY = {
 	[0] = 2399,
@@ -216,11 +216,11 @@ local function InsertForceCountMenu(tMenu)
 	for dwForceID, nCount in pairs(tForceList) do
 		local szPath, nFrame = GetForceImage(dwForceID)
 		table.insert(tSubMenu, {
-			szOption = g_tStrings.tForceTitle[dwForceID] .. "   " .. nCount,
+			szOption = g_tStrings.tForceTitle[dwForceID] .. '   ' .. nCount,
 			rgb = { MY.GetForceColor(dwForceID) },
 			szIcon = szPath,
 			nFrame = nFrame,
-			szLayer = "ICON_LEFT"
+			szLayer = 'ICON_LEFT'
 		})
 	end
 	table.insert(tMenu, tSubMenu)
@@ -252,11 +252,11 @@ local function InsertDistributeMenu(tMenu)
 end
 
 local function GetTeammateFrame()
-	return Station.Lookup("Normal/Teammate")
+	return Station.Lookup('Normal/Teammate')
 end
 
 local function RaidPanel_Switch(bOpen)
-	local frame = Station.Lookup("Normal/RaidPanel_Main")
+	local frame = Station.Lookup('Normal/RaidPanel_Main')
 	if bOpen then
 		if not frame then
 			OpenRaidPanel()
@@ -265,10 +265,10 @@ local function RaidPanel_Switch(bOpen)
 		if frame then
 			-- 有一点问题 会被加呼吸 根据判断
 			if not GetTeammateFrame() then
-				Wnd.OpenWindow("Teammate")
+				Wnd.OpenWindow('Teammate')
 			end
 			CloseRaidPanel()
-			Wnd.CloseWindow("Teammate")
+			Wnd.CloseWindow('Teammate')
 		end
 	end
 end
@@ -305,12 +305,12 @@ local function UpdatePrepareBarPos()
 	if not frame then
 		return
 	end
-	local hTotal = frame:Lookup("", "")
-	local hPrepare = hTotal:Lookup("Handle_Prepare")
+	local hTotal = frame:Lookup('', '')
+	local hPrepare = hTotal:Lookup('Handle_Prepare')
 	if MY_Cataclysm.bFold or GetGroupTotal() < 3 then
 		hPrepare:SetRelPos(0, -18)
 	else
-		local container = frame:Lookup("Container_Main")
+		local container = frame:Lookup('Container_Main')
 		hPrepare:SetRelPos(container:GetRelX() + container:GetW(), 3)
 	end
 	hTotal:FormatAllItemPos()
@@ -324,7 +324,7 @@ local function SetFrameSize(bEnter)
 		if Cataclysm_Main.nAutoLinkMode ~= 5 then
 			nGroupEx = 1
 		end
-		local container = frame:Lookup("Container_Main")
+		local container = frame:Lookup('Container_Main')
 		local fScaleX = math.max(nGroupEx == 1 and 1 or 0, Cataclysm_Main.fScaleX)
 		local minW = container:GetRelX() + container:GetW()
 		local w = max(128 * nGroupEx * fScaleX, minW + 30)
@@ -334,7 +334,7 @@ local function SetFrameSize(bEnter)
 			w = max(128 * fScaleX, minW)
 		end
 		frame:SetDragArea(0, 0, w, h)
-		frame:Lookup("", "Handle_BG/Image_Title_BG"):SetW(w)
+		frame:Lookup('', 'Handle_BG/Image_Title_BG'):SetW(w)
 		UpdatePrepareBarPos()
 	end
 end
@@ -345,46 +345,46 @@ local function CreateControlBar()
 	local nLootMode    = team.nLootMode
 	local nRollQuality = team.nRollQuality
 	local frame        = GetFrame()
-	local container    = frame:Lookup("Container_Main")
-	local szIniFile    = INI_ROOT .. "Cataclysm_Button.ini"
+	local container    = frame:Lookup('Container_Main')
+	local szIniFile    = INI_ROOT .. 'Cataclysm_Button.ini'
 	container:Clear()
 	-- 团队工具 团队告示
 	if me.IsInRaid() then
-		container:AppendContentFromIni(szIniFile, "Wnd_TeamTools")
-		container:AppendContentFromIni(szIniFile, "Wnd_TeamNotice")
+		container:AppendContentFromIni(szIniFile, 'Wnd_TeamTools')
+		container:AppendContentFromIni(szIniFile, 'Wnd_TeamNotice')
 	end
 	-- 分配模式
-	local hLootMode = container:AppendContentFromIni(szIniFile, "WndButton_LootMode")
-	hLootMode:Lookup("", "Image_LootMode"):FromUITex(unpack(CTM_LOOT_MODE[nLootMode]))
+	local hLootMode = container:AppendContentFromIni(szIniFile, 'WndButton_LootMode')
+	hLootMode:Lookup('', 'Image_LootMode'):FromUITex(unpack(CTM_LOOT_MODE[nLootMode]))
 	if nLootMode == PARTY_LOOT_MODE.DISTRIBUTE then
-		container:AppendContentFromIni(szIniFile, "WndButton_LootQuality")
-			:Lookup("", "Image_LootQuality"):FromIconID(CTM_LOOT_QUALITY[nRollQuality])
-		container:AppendContentFromIni(szIniFile, "WndButton_GKP")
+		container:AppendContentFromIni(szIniFile, 'WndButton_LootQuality')
+			:Lookup('', 'Image_LootQuality'):FromIconID(CTM_LOOT_QUALITY[nRollQuality])
+		container:AppendContentFromIni(szIniFile, 'WndButton_GKP')
 	end
 	-- 世界标记
 	if MY.IsLeader() then
-		container:AppendContentFromIni(szIniFile, "WndButton_WorldMark")
+		container:AppendContentFromIni(szIniFile, 'WndButton_WorldMark')
 	end
 	-- 语音按钮
 	if GVoiceBase_IsOpen() then --MY.IsInBattleField() or MY.IsInArena() or MY.IsInPubg() or MY.IsInDungeon() then
 		local nSpeakerState = GVoiceBase_GetSpeakerState()
-		container:AppendContentFromIni(szIniFile, "Wnd_Speaker")
-			:Lookup("WndButton_Speaker").nSpeakerState = nSpeakerState
-		container:Lookup("Wnd_Speaker/WndButton_Speaker", "Image_Normal")
+		container:AppendContentFromIni(szIniFile, 'Wnd_Speaker')
+			:Lookup('WndButton_Speaker').nSpeakerState = nSpeakerState
+		container:Lookup('Wnd_Speaker/WndButton_Speaker', 'Image_Normal')
 			:SetVisible(nSpeakerState == SPEAKER_STATE.OPEN)
-		container:Lookup("Wnd_Speaker/WndButton_Speaker", "Image_Close_Speaker")
+		container:Lookup('Wnd_Speaker/WndButton_Speaker', 'Image_Close_Speaker')
 			:SetVisible(nSpeakerState == SPEAKER_STATE.CLOSE)
 		local nMicState = GVoiceBase_GetMicState()
-		container:AppendContentFromIni(szIniFile, "Wnd_Microphone")
-			:Lookup("WndButton_Microphone").nMicState = nMicState
-		container:Lookup("Wnd_Microphone/WndButton_Microphone", "Animate_Input_Mic")
+		container:AppendContentFromIni(szIniFile, 'Wnd_Microphone')
+			:Lookup('WndButton_Microphone').nMicState = nMicState
+		container:Lookup('Wnd_Microphone/WndButton_Microphone', 'Animate_Input_Mic')
 			:SetVisible(nMicState == MIC_STATE.FREE)
-		container:Lookup("Wnd_Microphone/WndButton_Microphone", "Image_UnInsert_Mic")
+		container:Lookup('Wnd_Microphone/WndButton_Microphone', 'Image_UnInsert_Mic')
 			:SetVisible(nMicState == MIC_STATE.NOT_AVIAL)
-		container:Lookup("Wnd_Microphone/WndButton_Microphone", "Image_Close_Mic")
+		container:Lookup('Wnd_Microphone/WndButton_Microphone', 'Image_Close_Mic')
 			:SetVisible(nMicState == MIC_STATE.CLOSE_NOT_IN_ROOM or nMicState == MIC_STATE.CLOSE_IN_ROOM)
-		local hMicFree = container:Lookup("Wnd_Microphone/WndButton_Microphone", "Handle_Free_Mic")
-		local hMicHotKey = container:Lookup("Wnd_Microphone/WndButton_Microphone", "Handle_HotKey")
+		local hMicFree = container:Lookup('Wnd_Microphone/WndButton_Microphone', 'Handle_Free_Mic')
+		local hMicHotKey = container:Lookup('Wnd_Microphone/WndButton_Microphone', 'Handle_HotKey')
 		hMicFree:SetVisible(nMicState == MIC_STATE.FREE)
 		hMicHotKey:SetVisible(nMicState == MIC_STATE.KEY)
 		-- 自动调整语音按钮宽度
@@ -394,12 +394,12 @@ local function CreateControlBar()
 		elseif nMicState == MIC_STATE.KEY then
 			nMicWidth = hMicHotKey:GetRelX() + hMicHotKey:GetW()
 		end
-		container:Lookup("Wnd_Microphone"):SetW(nMicWidth)
+		container:Lookup('Wnd_Microphone'):SetW(nMicWidth)
 	end
 	-- 最小化
 	if me.IsInRaid() then
-		container:AppendContentFromIni(szIniFile, "Wnd_Fold")
-			:Lookup("CheckBox_Fold"):Check(MY_Cataclysm.bFold, WNDEVENT_FIRETYPE.PREVENT)
+		container:AppendContentFromIni(szIniFile, 'Wnd_Fold')
+			:Lookup('CheckBox_Fold'):Check(MY_Cataclysm.bFold, WNDEVENT_FIRETYPE.PREVENT)
 	end
 	local nW, wnd = 0
 	for i = 0, container:GetAllContentCount() - 1 do
@@ -419,8 +419,8 @@ local function CreateItemData()
 		return
 	end
 	for _, p in ipairs({
-		{"hMember", "Cataclysm_Item" .. Cataclysm_Main.nCss .. ".ini", "Handle_RoleDummy"},
-		{"hBuff", "Cataclysm_Item" .. Cataclysm_Main.nCss .. ".ini", "Handle_Buff"},
+		{'hMember', 'Cataclysm_Item' .. Cataclysm_Main.nCss .. '.ini', 'Handle_RoleDummy'},
+		{'hBuff', 'Cataclysm_Item' .. Cataclysm_Main.nCss .. '.ini', 'Handle_Buff'},
 	}) do
 		if frame[p[1]] then
 			frame:RemoveItemData(frame[p[1]])
@@ -431,7 +431,7 @@ end
 
 local function OpenCataclysmPanel()
 	if not GetFrame() then
-		Wnd.OpenWindow(INI_ROOT .. "Cataclysm_Main.ini", "Cataclysm_Main")
+		Wnd.OpenWindow(INI_ROOT .. 'Cataclysm_Main.ini', 'Cataclysm_Main')
 	end
 end
 
@@ -440,7 +440,7 @@ local function CloseCataclysmPanel()
 		Wnd.CloseWindow(GetFrame())
 		Grid_CTM:CloseParty()
 		MY_Cataclysm.bFold = false
-		FireUIEvent("CTM_SET_FOLD")
+		FireUIEvent('CTM_SET_FOLD')
 	end
 end
 
@@ -476,7 +476,7 @@ local function UpdateAnchor(frame)
 	if not IsEmpty(a) then
 		frame:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
 	else
-		frame:SetPoint("LEFTCENTER", 0, 0, "LEFTCENTER", 100, -200)
+		frame:SetPoint('LEFTCENTER', 0, 0, 'LEFTCENTER', 100, -200)
 	end
 end
 
@@ -491,46 +491,46 @@ Cataclysm_Main = {
 local Cataclysm_Main = Cataclysm_Main
 function Cataclysm_Main.OnFrameCreate()
 	if Cataclysm_Main.bFasterHP then
-		this:RegisterEvent("RENDER_FRAME_UPDATE")
+		this:RegisterEvent('RENDER_FRAME_UPDATE')
 	end
-	this:RegisterEvent("PARTY_SYNC_MEMBER_DATA")
-	this:RegisterEvent("PARTY_ADD_MEMBER")
-	this:RegisterEvent("PARTY_DISBAND")
-	this:RegisterEvent("PARTY_DELETE_MEMBER")
-	this:RegisterEvent("PARTY_UPDATE_MEMBER_INFO")
-	this:RegisterEvent("PARTY_UPDATE_MEMBER_LMR")
-	this:RegisterEvent("PARTY_LEVEL_UP_RAID")
-	this:RegisterEvent("PARTY_SET_MEMBER_ONLINE_FLAG")
-	this:RegisterEvent("PLAYER_STATE_UPDATE")
-	this:RegisterEvent("UPDATE_PLAYER_SCHOOL_ID")
-	this:RegisterEvent("RIAD_READY_CONFIRM_RECEIVE_ANSWER")
-	-- this:RegisterEvent("RIAD_READY_CONFIRM_RECEIVE_QUESTION")
-	this:RegisterEvent("UI_SCALED")
-	this:RegisterEvent("PARTY_SET_MARK")
-	this:RegisterEvent("TEAM_AUTHORITY_CHANGED")
-	this:RegisterEvent("TEAM_CHANGE_MEMBER_GROUP")
-	this:RegisterEvent("PARTY_SET_FORMATION_LEADER")
-	this:RegisterEvent("PARTY_LOOT_MODE_CHANGED")
-	this:RegisterEvent("PARTY_ROLL_QUALITY_CHANGED")
-	this:RegisterEvent("LOADING_END")
-	this:RegisterEvent("TARGET_CHANGE")
-	this:RegisterEvent("CHARACTER_THREAT_RANKLIST")
-	this:RegisterEvent("BUFF_UPDATE")
-	this:RegisterEvent("PLAYER_ENTER_SCENE")
-	this:RegisterEvent("CTM_BUFF_LIST_CACHE_UPDATE")
-	this:RegisterEvent("CTM_SET_FOLD")
+	this:RegisterEvent('PARTY_SYNC_MEMBER_DATA')
+	this:RegisterEvent('PARTY_ADD_MEMBER')
+	this:RegisterEvent('PARTY_DISBAND')
+	this:RegisterEvent('PARTY_DELETE_MEMBER')
+	this:RegisterEvent('PARTY_UPDATE_MEMBER_INFO')
+	this:RegisterEvent('PARTY_UPDATE_MEMBER_LMR')
+	this:RegisterEvent('PARTY_LEVEL_UP_RAID')
+	this:RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG')
+	this:RegisterEvent('PLAYER_STATE_UPDATE')
+	this:RegisterEvent('UPDATE_PLAYER_SCHOOL_ID')
+	this:RegisterEvent('RIAD_READY_CONFIRM_RECEIVE_ANSWER')
+	-- this:RegisterEvent('RIAD_READY_CONFIRM_RECEIVE_QUESTION')
+	this:RegisterEvent('UI_SCALED')
+	this:RegisterEvent('PARTY_SET_MARK')
+	this:RegisterEvent('TEAM_AUTHORITY_CHANGED')
+	this:RegisterEvent('TEAM_CHANGE_MEMBER_GROUP')
+	this:RegisterEvent('PARTY_SET_FORMATION_LEADER')
+	this:RegisterEvent('PARTY_LOOT_MODE_CHANGED')
+	this:RegisterEvent('PARTY_ROLL_QUALITY_CHANGED')
+	this:RegisterEvent('LOADING_END')
+	this:RegisterEvent('TARGET_CHANGE')
+	this:RegisterEvent('CHARACTER_THREAT_RANKLIST')
+	this:RegisterEvent('BUFF_UPDATE')
+	this:RegisterEvent('PLAYER_ENTER_SCENE')
+	this:RegisterEvent('CTM_BUFF_LIST_CACHE_UPDATE')
+	this:RegisterEvent('CTM_SET_FOLD')
 	-- 拍团部分 arg0 0=T人 1=分工资
-	this:RegisterEvent("TEAM_VOTE_REQUEST")
+	this:RegisterEvent('TEAM_VOTE_REQUEST')
 	-- arg0 回应状态 arg1 dwID arg2 同意=1 反对=0
-	this:RegisterEvent("TEAM_VOTE_RESPOND")
-	-- this:RegisterEvent("TEAM_INCOMEMONEY_CHANGE_NOTIFY")
-	this:RegisterEvent("SYS_MSG")
-	this:RegisterEvent("MY_RAID_REC_BUFF")
-	this:RegisterEvent("MY_CAMP_COLOR_UPDATE")
-	this:RegisterEvent("MY_FORCE_COLOR_UPDATE")
-	this:RegisterEvent("GKP_RECORD_TOTAL")
-	this:RegisterEvent("GVOICE_MIC_STATE_CHANGED")
-	this:RegisterEvent("GVOICE_SPEAKER_STATE_CHANGED")
+	this:RegisterEvent('TEAM_VOTE_RESPOND')
+	-- this:RegisterEvent('TEAM_INCOMEMONEY_CHANGE_NOTIFY')
+	this:RegisterEvent('SYS_MSG')
+	this:RegisterEvent('MY_RAID_REC_BUFF')
+	this:RegisterEvent('MY_CAMP_COLOR_UPDATE')
+	this:RegisterEvent('MY_FORCE_COLOR_UPDATE')
+	this:RegisterEvent('GKP_RECORD_TOTAL')
+	this:RegisterEvent('GVOICE_MIC_STATE_CHANGED')
+	this:RegisterEvent('GVOICE_SPEAKER_STATE_CHANGED')
 	if GetClientPlayer() then
 		UpdateAnchor(this)
 		Grid_CTM:AutoLinkAllPanel()
@@ -551,7 +551,7 @@ end
 
 function Cataclysm_Main.OnFrameDragEnd()
 	this:CorrectPos()
-	Cataclysm_Main.tAnchor = GetFrameAnchor(this, "TOPLEFT")
+	Cataclysm_Main.tAnchor = GetFrameAnchor(this, 'TOPLEFT')
 	Grid_CTM:AutoLinkAllPanel() -- fix screen pos
 end
 
@@ -588,22 +588,22 @@ local function OnBuffUpdate(dwOwnerID, dwID, nLevel, nStackNum, dwSrcID)
 	end
 end
 function Cataclysm_Main.OnEvent(szEvent)
-	if szEvent == "RENDER_FRAME_UPDATE" then
+	if szEvent == 'RENDER_FRAME_UPDATE' then
 		Grid_CTM:CallDrawHPMP(true)
-	elseif szEvent == "SYS_MSG" then
-		if arg0 == "UI_OME_SKILL_CAST_LOG" and arg2 == 13165 then
+	elseif szEvent == 'SYS_MSG' then
+		if arg0 == 'UI_OME_SKILL_CAST_LOG' and arg2 == 13165 then
 			Grid_CTM:KungFuSwitch(arg1)
 		end
 		if Cataclysm_Main.bShowEffect then
-			if arg0 == "UI_OME_SKILL_EFFECT_LOG" and arg5 == 6252
+			if arg0 == 'UI_OME_SKILL_EFFECT_LOG' and arg5 == 6252
 			and arg1 == UI_GetClientPlayerID() and arg9[SKILL_RESULT_TYPE.THERAPY] then
 				Grid_CTM:CallEffect(arg2, 500)
 			end
 		end
-	elseif szEvent == "PARTY_SYNC_MEMBER_DATA" then
+	elseif szEvent == 'PARTY_SYNC_MEMBER_DATA' then
 		Grid_CTM:CallRefreshImages(arg1, true, true, nil, true)
 		Grid_CTM:CallDrawHPMP(arg1, true)
-	elseif szEvent == "PARTY_ADD_MEMBER" then
+	elseif szEvent == 'PARTY_ADD_MEMBER' then
 		if Grid_CTM:GetPartyFrame(arg2) then
 			Grid_CTM:DrawParty(arg2)
 		else
@@ -615,7 +615,7 @@ function Cataclysm_Main.OnEvent(szEvent)
 			Grid_CTM:AutoLinkAllPanel()
 		end
 		UpdatePrepareBarPos()
-	elseif szEvent == "PARTY_DELETE_MEMBER" then
+	elseif szEvent == 'PARTY_DELETE_MEMBER' then
 		local me = GetClientPlayer()
 		if me.dwID == arg1 then
 			CloseCataclysmPanel()
@@ -634,47 +634,47 @@ function Cataclysm_Main.OnEvent(szEvent)
 		end
 		SetFrameSize()
 		UpdatePrepareBarPos()
-	elseif szEvent == "PARTY_DISBAND" then
+	elseif szEvent == 'PARTY_DISBAND' then
 		CloseCataclysmPanel()
-	elseif szEvent == "PARTY_UPDATE_MEMBER_LMR" then
+	elseif szEvent == 'PARTY_UPDATE_MEMBER_LMR' then
 		Grid_CTM:CallDrawHPMP(arg1, true)
-	elseif szEvent == "PARTY_UPDATE_MEMBER_INFO" then
+	elseif szEvent == 'PARTY_UPDATE_MEMBER_INFO' then
 		Grid_CTM:CallRefreshImages(arg1, false, true, nil, true)
 		Grid_CTM:CallDrawHPMP(arg1, true)
-	elseif szEvent == "UPDATE_PLAYER_SCHOOL_ID" then
+	elseif szEvent == 'UPDATE_PLAYER_SCHOOL_ID' then
 		if MY.IsParty(arg0) then
 			Grid_CTM:CallRefreshImages(arg0, false, true)
 		end
-	elseif szEvent == "PLAYER_STATE_UPDATE" then
+	elseif szEvent == 'PLAYER_STATE_UPDATE' then
 		if MY.IsParty(arg0) then
 			Grid_CTM:CallDrawHPMP(arg0, true)
 		end
-	elseif szEvent == "PARTY_SET_MEMBER_ONLINE_FLAG" then
+	elseif szEvent == 'PARTY_SET_MEMBER_ONLINE_FLAG' then
 		Grid_CTM:CallDrawHPMP(arg1, true)
-	elseif szEvent == "TEAM_AUTHORITY_CHANGED" then
+	elseif szEvent == 'TEAM_AUTHORITY_CHANGED' then
 		Grid_CTM:CallRefreshImages(arg2, true)
 		Grid_CTM:CallRefreshImages(arg3, true)
 		CreateControlBar()
-	elseif szEvent == "PARTY_SET_FORMATION_LEADER" then
+	elseif szEvent == 'PARTY_SET_FORMATION_LEADER' then
 		Grid_CTM:RefreshFormation()
-	elseif szEvent == "PARTY_SET_MARK" then
+	elseif szEvent == 'PARTY_SET_MARK' then
 		Grid_CTM:RefreshMark()
-	-- elseif szEvent == "RIAD_READY_CONFIRM_RECEIVE_QUESTION" then
-	elseif szEvent == "TEAM_VOTE_REQUEST" then
+	-- elseif szEvent == 'RIAD_READY_CONFIRM_RECEIVE_QUESTION' then
+	elseif szEvent == 'TEAM_VOTE_REQUEST' then
 		if arg0 == 1 then
 			if MY.IsLeader() then
 				Grid_CTM:Send_RaidReadyConfirm(true)
 			end
 		end
-	elseif szEvent == "TEAM_VOTE_RESPOND" then
+	elseif szEvent == 'TEAM_VOTE_RESPOND' then
 		if arg0 == 1 then
 			if MY.IsLeader() then
 				Grid_CTM:ChangeReadyConfirm(arg1, arg2 == 1)
 			end
 		end
-	elseif szEvent == "RIAD_READY_CONFIRM_RECEIVE_ANSWER" then
+	elseif szEvent == 'RIAD_READY_CONFIRM_RECEIVE_ANSWER' then
 		Grid_CTM:ChangeReadyConfirm(arg0, arg1 == 1)
-	elseif szEvent == "TEAM_CHANGE_MEMBER_GROUP" then
+	elseif szEvent == 'TEAM_CHANGE_MEMBER_GROUP' then
 		local me = GetClientPlayer()
 		local team = GetClientTeam()
 		local tSrcGropu = team.GetGroupInfo(arg1)
@@ -696,27 +696,27 @@ function Cataclysm_Main.OnEvent(szEvent)
 			Grid_CTM:AutoLinkAllPanel()
 		end
 		SetFrameSize()
-	elseif szEvent == "PARTY_LEVEL_UP_RAID" then
+	elseif szEvent == 'PARTY_LEVEL_UP_RAID' then
 		Grid_CTM:RefreshGroupText()
-	elseif szEvent == "PARTY_LOOT_MODE_CHANGED" then
+	elseif szEvent == 'PARTY_LOOT_MODE_CHANGED' then
 		CreateControlBar()
-	elseif szEvent == "PARTY_ROLL_QUALITY_CHANGED" then
+	elseif szEvent == 'PARTY_ROLL_QUALITY_CHANGED' then
 		CreateControlBar()
-	elseif szEvent == "TARGET_CHANGE" then
+	elseif szEvent == 'TARGET_CHANGE' then
 		-- oldid， oldtype, newid, newtype
 		Grid_CTM:RefreshTarget(arg0, arg1, arg2, arg3)
-	elseif szEvent == "CHARACTER_THREAT_RANKLIST" then
+	elseif szEvent == 'CHARACTER_THREAT_RANKLIST' then
 		Grid_CTM:RefreshThreat(arg0, arg1)
-	elseif szEvent == "MY_RAID_REC_BUFF" then
+	elseif szEvent == 'MY_RAID_REC_BUFF' then
 		Grid_CTM:RecBuff(arg0, arg1)
-	elseif szEvent == "BUFF_UPDATE" then
+	elseif szEvent == 'BUFF_UPDATE' then
 		-- local owner, bdelete, index, cancancel, id  , stacknum, endframe, binit, level, srcid, isvalid, leftframe
 		--     = arg0 , arg1   , arg2 , arg3     , arg4, arg5    , arg6    , arg7 , arg8 , arg9 , arg10  , arg11
 		if arg1 then
 			return
 		end
 		OnBuffUpdate(arg0, arg4, arg8, arg5, arg9)
-	elseif szEvent == "PLAYER_ENTER_SCENE" then
+	elseif szEvent == 'PLAYER_ENTER_SCENE' then
 		local me = GetClientPlayer()
 		if not me then
 			return
@@ -739,7 +739,7 @@ function Cataclysm_Main.OnEvent(szEvent)
 			end
 		end
 		MY.DelayCall(update, 75)
-	elseif szEvent == "CTM_BUFF_LIST_CACHE_UPDATE" then
+	elseif szEvent == 'CTM_BUFF_LIST_CACHE_UPDATE' then
 		local team = GetClientTeam()
 		if not team then
 			return
@@ -753,21 +753,21 @@ function Cataclysm_Main.OnEvent(szEvent)
 				end
 			end
 		end
-	elseif szEvent == "CTM_SET_FOLD" then
+	elseif szEvent == 'CTM_SET_FOLD' then
 		UpdatePrepareBarPos()
-	elseif szEvent == "MY_CAMP_COLOR_UPDATE"
-	or szEvent == "MY_FORCE_COLOR_UPDATE" then
+	elseif szEvent == 'MY_CAMP_COLOR_UPDATE'
+	or szEvent == 'MY_FORCE_COLOR_UPDATE' then
 		ReloadCataclysmPanel()
-	elseif szEvent == "GKP_RECORD_TOTAL" then
+	elseif szEvent == 'GKP_RECORD_TOTAL' then
 		GKP_RECORD_TOTAL = arg0
-	elseif szEvent == "GVOICE_MIC_STATE_CHANGED" then
+	elseif szEvent == 'GVOICE_MIC_STATE_CHANGED' then
 		CreateControlBar()
-	elseif szEvent == "GVOICE_SPEAKER_STATE_CHANGED" then
+	elseif szEvent == 'GVOICE_SPEAKER_STATE_CHANGED' then
 		CreateControlBar()
-	elseif szEvent == "UI_SCALED" then
+	elseif szEvent == 'UI_SCALED' then
 		UpdateAnchor(this)
 		Grid_CTM:AutoLinkAllPanel()
-	elseif szEvent == "LOADING_END" then -- 勿删
+	elseif szEvent == 'LOADING_END' then -- 勿删
 		ReloadCataclysmPanel()
 		RaidPanel_Switch(DEBUG)
 		TeammatePanel_Switch(false)
@@ -790,13 +790,13 @@ function Cataclysm_Main.OnFrameBreathe()
 	local fPrepare, szPrepare, nAlpha
 	local dwType, dwID = me.GetTarget()
 	if dwType == TARGET.NPC then
-		local h = Station.Lookup("Normal/Target", "Handle_Bar")
+		local h = Station.Lookup('Normal/Target', 'Handle_Bar')
 		if h and h:IsVisible() then
-			local txt = h:Lookup("Text_Name")
+			local txt = h:Lookup('Text_Name')
 			if txt then
 				szPrepare = txt:GetText()
 			end
-			local img = h:Lookup("Image_Progress")
+			local img = h:Lookup('Image_Progress')
 			if img then
 				fPrepare = img:GetPercentage()
 			end
@@ -806,13 +806,13 @@ function Cataclysm_Main.OnFrameBreathe()
 		local tar = GetPlayer(dwID)
 		local dwType, dwID = tar.GetTarget()
 		if dwType == TARGET.NPC then
-			local h = Station.Lookup("Normal/TargetTarget", "Handle_Bar")
+			local h = Station.Lookup('Normal/TargetTarget', 'Handle_Bar')
 			if h and h:IsVisible() then
-				local txt = h:Lookup("Text_Name")
+				local txt = h:Lookup('Text_Name')
 				if txt then
 					szPrepare = txt:GetText()
 				end
-				local img = h:Lookup("Image_Progress")
+				local img = h:Lookup('Image_Progress')
 				if img then
 					fPrepare = img:GetPercentage()
 				end
@@ -820,10 +820,10 @@ function Cataclysm_Main.OnFrameBreathe()
 			end
 		end
 	end
-	local hPrepare = this:Lookup("", "Handle_Prepare")
+	local hPrepare = this:Lookup('', 'Handle_Prepare')
 	if fPrepare and szPrepare and nAlpha then
-		hPrepare:Lookup("Text_Prepare"):SetText(szPrepare)
-		hPrepare:Lookup("Image_Prepare"):SetPercentage(fPrepare)
+		hPrepare:Lookup('Text_Prepare'):SetText(szPrepare)
+		hPrepare:Lookup('Image_Prepare'):SetPercentage(fPrepare)
 		hPrepare:SetAlpha(nAlpha)
 	else
 		hPrepare:SetAlpha(0)
@@ -842,7 +842,7 @@ end
 
 function Cataclysm_Main.OnLButtonClick()
 	local szName = this:GetName()
-	if szName == "Btn_Option" then
+	if szName == 'Btn_Option' then
 		local me = GetClientPlayer()
 		local menu = {}
 		if me.IsInRaid() then
@@ -858,7 +858,7 @@ function Cataclysm_Main.OnLButtonClick()
 		table.insert(menu, { bDevide = true })
 		if me.IsInRaid() then
 			-- 编辑模式
-			table.insert(menu, { szOption = string.gsub(g_tStrings.STR_RAID_MENU_RAID_EDIT, "Ctrl", "Alt"), bDisable = not MY.IsLeader() or not me.IsInRaid(), bCheck = true, bChecked = Cataclysm_Main.bEditMode, fnAction = function()
+			table.insert(menu, { szOption = string.gsub(g_tStrings.STR_RAID_MENU_RAID_EDIT, 'Ctrl', 'Alt'), bDisable = not MY.IsLeader() or not me.IsInRaid(), bCheck = true, bChecked = Cataclysm_Main.bEditMode, fnAction = function()
 				Cataclysm_Main.bEditMode = not Cataclysm_Main.bEditMode
 				GetPopupMenu():Hide()
 			end })
@@ -867,53 +867,53 @@ function Cataclysm_Main.OnLButtonClick()
 			InsertForceCountMenu(menu)
 			table.insert(menu, { bDevide = true })
 		end
-		table.insert(menu, { szOption = _L["Interface settings"], rgb = { 255, 255, 0 }, fnAction = function()
-			MY.SwitchTab("MY_Cataclysm")
+		table.insert(menu, { szOption = _L['Interface settings'], rgb = { 255, 255, 0 }, fnAction = function()
+			MY.SwitchTab('MY_Cataclysm')
 			MY.OpenPanel()
 		end })
 		if MY_Cataclysm.bDebug then
 			table.insert(menu, { bDevide = true })
-			table.insert(menu, { szOption = "DEBUG", bCheck = true, bChecked = DEBUG, fnAction = function()
+			table.insert(menu, { szOption = 'DEBUG', bCheck = true, bChecked = DEBUG, fnAction = function()
 				DEBUG = not DEBUG
 			end	})
 		end
 		local nX, nY = Cursor.GetPos(true)
 		menu.x, menu.y = nX, nY
 		PopupMenu(menu)
-	elseif szName == "WndButton_WorldMark" then
+	elseif szName == 'WndButton_WorldMark' then
 		local me  = GetClientPlayer()
 		local dwMapID = me.GetMapID()
 		local nMapType = select(2, GetMapParams(dwMapID))
 	    if not nMapType or nMapType ~= MAP_TYPE.DUNGEON then
-			OutputMessage("MSG_ANNOUNCE_RED", g_tStrings.STR_WORLD_MARK)
+			OutputMessage('MSG_ANNOUNCE_RED', g_tStrings.STR_WORLD_MARK)
 			return
 		end
-		Wnd.ToggleWindow("WorldMark")
-	elseif szName == "WndButton_GKP" then
+		Wnd.ToggleWindow('WorldMark')
+	elseif szName == 'WndButton_GKP' then
 		if not MY_GKP then
-			return MY.Alert(_L["Please install and load GKP addon first."])
+			return MY.Alert(_L['Please install and load GKP addon first.'])
 		end
 		return MY_GKP.TogglePanel()
-	elseif szName == "Wnd_TeamTools" then
+	elseif szName == 'Wnd_TeamTools' then
 		MY_RaidTools.TogglePanel()
-	elseif szName == "Wnd_TeamNotice" then
+	elseif szName == 'Wnd_TeamNotice' then
 		MY_TeamNotice.OpenFrame()
-	elseif szName == "WndButton_LootMode" or szName == "WndButton_LootQuality" then
+	elseif szName == 'WndButton_LootMode' or szName == 'WndButton_LootQuality' then
 		if MY.IsDistributer() then
 			local menu = {}
-			if szName == "WndButton_LootMode" then
+			if szName == 'WndButton_LootMode' then
 				InsertDistributeMenu(menu, not MY.IsDistributer())
 				PopupMenu(menu[1])
-			elseif szName == "WndButton_LootQuality" then
+			elseif szName == 'WndButton_LootQuality' then
 				InsertDistributeMenu(menu, not MY.IsDistributer())
 				PopupMenu(menu[2])
 			end
 		else
-			return MY.Sysmsg({_L["You are not the distrubutor."]})
+			return MY.Sysmsg({_L['You are not the distrubutor.']})
 		end
-	elseif szName == "WndButton_Speaker" then
+	elseif szName == 'WndButton_Speaker' then
 		GVoiceBase_SwitchSpeakerState()
-	elseif szName == "WndButton_Microphone" then
+	elseif szName == 'WndButton_Microphone' then
 		GVoiceBase_SwitchMicState()
 	end
 end
@@ -928,30 +928,30 @@ end
 
 function Cataclysm_Main.OnCheckBoxCheck()
 	local name = this:GetName()
-	if name == "CheckBox_Fold" then
+	if name == 'CheckBox_Fold' then
 		MY_Cataclysm.bFold = true
-		FireUIEvent("CTM_SET_FOLD")
+		FireUIEvent('CTM_SET_FOLD')
 	end
 end
 
 function Cataclysm_Main.OnCheckBoxUncheck()
 	local name = this:GetName()
-	if name == "CheckBox_Fold" then
+	if name == 'CheckBox_Fold' then
 		MY_Cataclysm.bFold = false
-		FireUIEvent("CTM_SET_FOLD")
+		FireUIEvent('CTM_SET_FOLD')
 	end
 end
 
 function Cataclysm_Main.OnMouseLeave()
 	local szName = this:GetName()
-	if szName == "WndButton_GKP"
-	or szName == "WndButton_LootMode"
-	or szName == "WndButton_LootQuality"
-	or szName == "Wnd_TeamTools"
-	or szName == "Wnd_TeamNotice" then
+	if szName == 'WndButton_GKP'
+	or szName == 'WndButton_LootMode'
+	or szName == 'WndButton_LootQuality'
+	or szName == 'Wnd_TeamTools'
+	or szName == 'Wnd_TeamNotice' then
 		this:SetAlpha(220)
 	end
-	if not IsKeyDown("LButton") then
+	if not IsKeyDown('LButton') then
 		SetFrameSize()
 	end
 	HideTip()
@@ -969,9 +969,9 @@ local MIC_TIP = setmetatable({
 }, {
 	__index = function(t, k)
 		if k == MIC_STATE.KEY then
-			if MY.GetHotKey("TOGGLE_GVOCIE_SAY") then
+			if MY.GetHotKey('TOGGLE_GVOCIE_SAY') then
 				return (g_tStrings.GVOICE_MIC_FREE_STATE_TIP
-					:format(MY.GetHotKeyDisplay("TOGGLE_GVOCIE_SAY")))
+					:format(MY.GetHotKeyDisplay('TOGGLE_GVOCIE_SAY')))
 			else
 				return g_tStrings.GVOICE_MIC_FREE_STATE_TIP2
 			end
@@ -981,18 +981,18 @@ local MIC_TIP = setmetatable({
 
 function Cataclysm_Main.OnMouseEnter()
 	local szName = this:GetName()
-	if szName == "WndButton_GKP"
-	or szName == "WndButton_LootMode"
-	or szName == "WndButton_LootQuality"
-	or szName == "Wnd_TeamTools"
-	or szName == "Wnd_TeamNotice" then
+	if szName == 'WndButton_GKP'
+	or szName == 'WndButton_LootMode'
+	or szName == 'WndButton_LootQuality'
+	or szName == 'Wnd_TeamTools'
+	or szName == 'Wnd_TeamNotice' then
 		this:SetAlpha(255)
 	end
-	if szName == "WndButton_Speaker" then
+	if szName == 'WndButton_Speaker' then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		OutputTip(GetFormatText(SPEAKER_TIP[this.nSpeakerState]), 400, { x, y, w, h }, ALW.TOP_BOTTOM)
-	elseif szName == "WndButton_Microphone" then
+	elseif szName == 'WndButton_Microphone' then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
 		OutputTip(GetFormatText(MIC_TIP[this.nMicState]), 400, { x, y, w, h }, ALW.TOP_BOTTOM)
@@ -1007,9 +1007,9 @@ local function CheckEnableTeamPanel()
 	if not Cataclysm_Main.bRaidEnable then
 		local me = GetClientPlayer()
 		if me.IsInRaid() then
-			FireUIEvent("CTM_PANEL_RAID", true)
+			FireUIEvent('CTM_PANEL_RAID', true)
 		elseif me.IsInParty() then
-			FireUIEvent("CTM_PANEL_TEAMATE", true)
+			FireUIEvent('CTM_PANEL_TEAMATE', true)
 		end
 	end
 end
@@ -1027,12 +1027,12 @@ function PS.OnPanelActive(frame)
 	local x, y = X, Y
 
 	x = X
-	y = y + ui:append("Text", { x = x, y = y, text = _L["configure"], font = 27 }, true):height()
+	y = y + ui:append('Text', { x = x, y = y, text = _L['configure'], font = 27 }, true):height()
 
 	x = X + 10
-	x = x + ui:append("Text", { x = x, y = y, text = _L["Configuration name"] }, true):autoWidth():width() + 5
+	x = x + ui:append('Text', { x = x, y = y, text = _L['Configuration name'] }, true):autoWidth():width() + 5
 
-	x = x + ui:append("WndEditBox", {
+	x = x + ui:append('WndEditBox', {
 		x = x, y = y + 3, w = 200, h = 25,
 		text = MY_Cataclysm.szConfigName,
 		onchange = function(txt)
@@ -1040,36 +1040,36 @@ function PS.OnPanelActive(frame)
 		end,
 		onblur = function()
 			CheckEnableTeamPanel()
-			MY.SwitchTab("MY_Cataclysm", true)
+			MY.SwitchTab('MY_Cataclysm', true)
 		end,
 	}, true):width() + 5
 
 	-- 恢复默认
-	y = y + ui:append("WndButton2", {
-		x = x, y = y + 3, text = _L["Restore default"],
+	y = y + ui:append('WndButton2', {
+		x = x, y = y + 3, text = _L['Restore default'],
 		onclick = function()
 			MessageBox({
-				szName = "MY_Cataclysm Restore default",
-				szAlignment = "CENTER",
-				szMessage = _L["Sure to restore default?"],
+				szName = 'MY_Cataclysm Restore default',
+				szAlignment = 'CENTER',
+				szMessage = _L['Sure to restore default?'],
 				{
-					szOption = _L["Restore official"],
+					szOption = _L['Restore official'],
 					fnAction = function()
 						local Config = clone(CTM_CONFIG_DEFAULT)
 						Config.aBuffList = CTM_CONFIG_PLAYER.aBuffList
 						SetConfig(Config)
 						CheckEnableTeamPanel()
-						MY.SwitchTab("MY_Cataclysm", true)
+						MY.SwitchTab('MY_Cataclysm', true)
 					end,
 				},
 				{
-					szOption = _L["Restore cataclysm"],
+					szOption = _L['Restore cataclysm'],
 					fnAction = function()
 						local Config = clone(CTM_CONFIG_CATACLYSM)
 						Config.aBuffList = CTM_CONFIG_PLAYER.aBuffList
 						SetConfig(Config)
 						CheckEnableTeamPanel()
-						MY.SwitchTab("MY_Cataclysm", true)
+						MY.SwitchTab('MY_Cataclysm', true)
 					end,
 				},
 				{ szOption = g_tStrings.STR_HOTKEY_CANCEL },
@@ -1078,16 +1078,16 @@ function PS.OnPanelActive(frame)
 	}, true):height() + 20
 
 	x = X
-	y = y + ui:append("Text", { x = x, y = y, text = _L["Cataclysm Team Panel"], font = 27 }, true):autoWidth():height()
+	y = y + ui:append('Text', { x = x, y = y, text = _L['Cataclysm Team Panel'], font = 27 }, true):autoWidth():height()
 
 	x = x + 10
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Enable Cataclysm Team Panel"],
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y, text = _L['Enable Cataclysm Team Panel'],
 		oncheck = ToggleTeamPanel, checked = Cataclysm_Main.bRaidEnable,
 	}, true):autoWidth():width() + 5
 
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Only in team"],
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y, text = _L['Only in team'],
 		checked = Cataclysm_Main.bShowInRaid,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowInRaid = bCheck
@@ -1096,12 +1096,12 @@ function PS.OnPanelActive(frame)
 			end
 			local me = GetClientPlayer()
 			if me.IsInParty() and not me.IsInRaid() then
-				FireUIEvent("CTM_PANEL_TEAMATE", Cataclysm_Main.bShowInRaid)
+				FireUIEvent('CTM_PANEL_TEAMATE', Cataclysm_Main.bShowInRaid)
 			end
 		end,
 	}, true):autoWidth():width() + 5
 
-	y = y + ui:append("WndCheckBox", {
+	y = y + ui:append('WndCheckBox', {
 		x = x, y = y, text = g_tStrings.WINDOW_LOCK,
 		checked = not Cataclysm_Main.bDrag,
 		oncheck = function(bCheck)
@@ -1114,27 +1114,27 @@ function PS.OnPanelActive(frame)
 
 	-- 提醒框
 	x = X
-	y = y + ui:append("Text", { x = x, y = y, text = g_tStrings.STR_RAID_TIP_IMAGE, font = 27 }, true):height()
+	y = y + ui:append('Text', { x = x, y = y, text = g_tStrings.STR_RAID_TIP_IMAGE, font = 27 }, true):height()
 
 	x = X + 10
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Show attention shadow"],
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y, text = _L['Show attention shadow'],
 		checked = Cataclysm_Main.bShowAttention,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowAttention = bCheck
 		end,
 	}, true):autoWidth():width() + 5
 
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Show caution animate"],
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y, text = _L['Show caution animate'],
 		checked = Cataclysm_Main.bShowCaution,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowCaution = bCheck
 		end,
 	}, true):autoWidth():width() + 5
 
-	y = y + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Show screen head"],
+	y = y + ui:append('WndCheckBox', {
+		x = x, y = y, text = _L['Show screen head'],
 		checked = Cataclysm_Main.bShowScreenHead,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowScreenHead = bCheck
@@ -1142,8 +1142,8 @@ function PS.OnPanelActive(frame)
 	}, true):autoWidth():height()
 
 	x = X + 10
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Attack Warning"],
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y, text = _L['Attack Warning'],
 		checked = Cataclysm_Main.bHPHitAlert,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bHPHitAlert = bCheck
@@ -1153,8 +1153,8 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():width() + 5
 
-	y = y + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Show distance"],
+	y = y + ui:append('WndCheckBox', {
+		x = x, y = y, text = _L['Show distance'],
 		checked = Cataclysm_Main.bShowDistance,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowDistance = bCheck
@@ -1163,8 +1163,8 @@ function PS.OnPanelActive(frame)
 
 	-- local me = GetClientPlayer()
 	-- if me.dwForceID == 6 then
-	-- 	x = x + ui:append("WndCheckBox", {
-	-- 		x = x, y = y, text = _L["ZuiWu Effect"],
+	-- 	x = x + ui:append('WndCheckBox', {
+	-- 		x = x, y = y, text = _L['ZuiWu Effect'],
 	-- 		color = { MY.GetForceColor(6) },
 	-- 		checked = Cataclysm_Main.bShowEffect,
 	-- 		oncheck = function(bCheck)
@@ -1174,8 +1174,8 @@ function PS.OnPanelActive(frame)
 	-- end
 
 	x = X + 10
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Show target's target"],
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y, text = _L['Show target\'s target'],
 		checked = Cataclysm_Main.bShowTargetTargetAni,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowTargetTargetAni = bCheck
@@ -1185,16 +1185,16 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():width() + 5
 
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Show Boss target"],
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y, text = _L['Show Boss target'],
 		checked = Cataclysm_Main.bShowBossTarget,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowBossTarget = bCheck
 		end,
 	}, true):autoWidth():width() + 5
 
-	y = y + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Show Boss focus"],
+	y = y + ui:append('WndCheckBox', {
+		x = x, y = y, text = _L['Show Boss focus'],
 		checked = Cataclysm_Main.bShowBossFocus,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowBossFocus = bCheck
@@ -1204,18 +1204,18 @@ function PS.OnPanelActive(frame)
 	-- 其他
 	x = X
 	y = y + 4
-	y = y + ui:append("Text", { x = x, y = y, text = g_tStrings.OTHER, font = 27 }, true):height()
+	y = y + ui:append('Text', { x = x, y = y, text = g_tStrings.OTHER, font = 27 }, true):height()
 
 	x = X + 10
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Don't show Tip in fight"],
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y, text = _L['Don\'t show Tip in fight'],
 		checked = Cataclysm_Main.bHideTipInFight,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bHideTipInFight = bCheck
 		end,
 	}, true):autoWidth():width() + 5
 
-	x = x + ui:append("WndCheckBox", {
+	x = x + ui:append('WndCheckBox', {
 		x = x, y = y, text = g_tStrings.STR_RAID_TARGET_ASSIST,
 		checked = Cataclysm_Main.bTempTargetEnable,
 		oncheck = function(bCheck)
@@ -1223,7 +1223,7 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():width() + 5
 
-	x = x + ui:append("WndSliderBox", {
+	x = x + ui:append('WndSliderBox', {
 		x = x, y = y - 1,
 		value = Cataclysm_Main.nTempTargetDelay / 75,
 		range = {0, 8},
@@ -1234,40 +1234,40 @@ function PS.OnPanelActive(frame)
 		textfmt = function(val)
 			return val == 0
 				and _L['Target assist no delay.']
-				or _L("Target assist delay %dms.", val * 75)
+				or _L('Target assist delay %dms.', val * 75)
 		end,
 	}):autoWidth():width()
 
 	x = X + 10
 	y = y + 25
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Alt view player"],
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y, text = _L['Alt view player'],
 		checked = Cataclysm_Main.bAltView,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bAltView = bCheck
 		end,
 	}, true):autoWidth():width() + 5
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Disable in fight"],
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y, text = _L['Disable in fight'],
 		checked = not Cataclysm_Main.bAltViewInFight,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bAltViewInFight = not bCheck
 		end,
 	}, true):autoWidth():width() + 5
-	-- y = y + ui:append("WndCheckBox", { x = 10, y = nY, text = _L["Faster Refresh HP(Greater performance loss)"], checked = Cataclysm_Main.bFasterHP, enable = false })
+	-- y = y + ui:append('WndCheckBox', { x = 10, y = nY, text = _L['Faster Refresh HP(Greater performance loss)'], checked = Cataclysm_Main.bFasterHP, enable = false })
 	-- :Click(function(bCheck)
 	-- 	Cataclysm_Main.bFasterHP = bCheck
 	-- 	if GetFrame() then
 	-- 		if bCheck then
-	-- 			GetFrame():RegisterEvent("RENDER_FRAME_UPDATE")
+	-- 			GetFrame():RegisterEvent('RENDER_FRAME_UPDATE')
 	-- 		else
-	-- 			GetFrame():UnRegisterEvent("RENDER_FRAME_UPDATE")
+	-- 			GetFrame():UnRegisterEvent('RENDER_FRAME_UPDATE')
 	-- 		end
 	-- 	end
 	-- end, true):Pos_()
 	y = y + 25
 end
-MY.RegisterPanel("MY_Cataclysm", _L["Cataclysm"], _L["Raid"], "ui/Image/UICommon/RaidTotal.uitex|62", {255, 255, 0}, PS)
+MY.RegisterPanel('MY_Cataclysm', _L['Cataclysm'], _L['Raid'], 'ui/Image/UICommon/RaidTotal.uitex|62', {255, 255, 0}, PS)
 end
 
 do
@@ -1277,13 +1277,13 @@ function PS.OnPanelActive(frame)
 	local X, Y = 20, 20
 	local x, y = X, Y
 
-	y = y + ui:append("Text", { x = x, y = y, text = _L["Grid Style"], font = 27 }, true):height()
+	y = y + ui:append('Text', { x = x, y = y, text = _L['Grid Style'], font = 27 }, true):height()
 
 	y = y + 5
 
 	x = X + 10
-	y = y + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Show AllGrid"],
+	y = y + ui:append('WndCheckBox', {
+		x = x, y = y, text = _L['Show AllGrid'],
 		checked = Cataclysm_Main.bShowAllGrid,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowAllGrid = bCheck
@@ -1296,19 +1296,19 @@ function PS.OnPanelActive(frame)
 
 	-- 名字、图标、内力和血量显示方案
 	x = X
-	y = y + ui:append("Text", { x = x, y = y, text = _L["Name/Icon/Mana/Life Display"], font = 27 }, true):height()
+	y = y + ui:append('Text', { x = x, y = y, text = _L['Name/Icon/Mana/Life Display'], font = 27 }, true):height()
 
 	-- 名字
 	x = X + 10
 	y = y + 5
 	for _, p in ipairs({
-		{ 1, _L["Name colored by force"] },
-		{ 2, _L["Name colored by camp"] },
-		{ 0, _L["Name without color"] },
+		{ 1, _L['Name colored by force'] },
+		{ 2, _L['Name colored by camp'] },
+		{ 0, _L['Name without color'] },
 	}) do
-		x = x + ui:append("WndRadioBox", {
+		x = x + ui:append('WndRadioBox', {
 			x = x, y = y, text = p[2],
-			group = "namecolor", checked = Cataclysm_Main.nColoredName == p[1],
+			group = 'namecolor', checked = Cataclysm_Main.nColoredName == p[1],
 			oncheck = function()
 				Cataclysm_Main.nColoredName = p[1]
 				if GetFrame() then
@@ -1319,12 +1319,12 @@ function PS.OnPanelActive(frame)
 		}, true):autoWidth():width() + 5
 	end
 
-	y = y + ui:append("WndSliderBox", {
+	y = y + ui:append('WndSliderBox', {
 		x = x, y = y - 1,
 		value = Cataclysm_Main.fNameFontScale * 100,
 		range = {1, 400},
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
-		textfmt = function(val) return _L("Scale %d%%", val) end,
+		textfmt = function(val) return _L('Scale %d%%', val) end,
 		onchange = function(val)
 			Cataclysm_Main.fNameFontScale = val / 100
 			if GetFrame() then
@@ -1335,13 +1335,13 @@ function PS.OnPanelActive(frame)
 
 	x = X + 10
 	for _, p in ipairs({
-		{ 0, _L["Top"] },
-		{ 1, _L["Middle"] },
-		{ 2, _L["Bottom"] },
+		{ 0, _L['Top'] },
+		{ 1, _L['Middle'] },
+		{ 2, _L['Bottom'] },
 	}) do
-		x = x + ui:append("WndRadioBox", {
+		x = x + ui:append('WndRadioBox', {
 			x = x, y = y, text = p[2],
-			group = "namevali", checked = Cataclysm_Main.nNameVAlignment == p[1],
+			group = 'namevali', checked = Cataclysm_Main.nNameVAlignment == p[1],
 			oncheck = function()
 				Cataclysm_Main.nNameVAlignment = p[1]
 				Grid_CTM:CallRefreshImages(true, false, true, nil, true)
@@ -1349,13 +1349,13 @@ function PS.OnPanelActive(frame)
 		}, true):autoWidth():width() + 5
 	end
 	for _, p in ipairs({
-		{ 0, _L["Left"] },
-		{ 1, _L["Center"] },
-		{ 2, _L["Right"] },
+		{ 0, _L['Left'] },
+		{ 1, _L['Center'] },
+		{ 2, _L['Right'] },
 	}) do
-		x = x + ui:append("WndRadioBox", {
+		x = x + ui:append('WndRadioBox', {
 			x = x, y = y, text = p[2],
-			group = "namehali", checked = Cataclysm_Main.nNameHAlignment == p[1],
+			group = 'namehali', checked = Cataclysm_Main.nNameHAlignment == p[1],
 			oncheck = function()
 				Cataclysm_Main.nNameHAlignment = p[1]
 				Grid_CTM:CallRefreshImages(true, false, true, nil, true)
@@ -1363,8 +1363,8 @@ function PS.OnPanelActive(frame)
 		}, true):autoWidth():width() + 5
 	end
 	-- 名字字体修改
-	x = x + ui:append("WndButton2", {
-		x = x, y = y - 3, text = _L["Name font"],
+	x = x + ui:append('WndButton2', {
+		x = x, y = y - 3, text = _L['Name font'],
 		onclick = function()
 			XGUI.OpenFontPicker(function(nFont)
 				Cataclysm_Main.nNameFont = nFont
@@ -1385,9 +1385,9 @@ function PS.OnPanelActive(frame)
 		{ 1, g_tStrings.STR_RAID_LIFE_LOSE },
 		{ 0, g_tStrings.STR_RAID_LIFE_HIDE },
 	}) do
-		x = x + ui:append("WndRadioBox", {
+		x = x + ui:append('WndRadioBox', {
 			x = x, y = y, text = p[2],
-			group = "lifemode", checked = Cataclysm_Main.nHPShownMode2 == p[1],
+			group = 'lifemode', checked = Cataclysm_Main.nHPShownMode2 == p[1],
 			oncheck = function()
 				Cataclysm_Main.nHPShownMode2 = p[1]
 				if GetFrame() then
@@ -1397,12 +1397,12 @@ function PS.OnPanelActive(frame)
 		}, true):autoWidth():width() + 5
 	end
 
-	ui:append("WndSliderBox", {
+	ui:append('WndSliderBox', {
 		x = x, y = y - 1,
 		value = Cataclysm_Main.fLifeFontScale * 100,
 		range = {1, 400},
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
-		textfmt = function(val) return _L("Scale %d%%", val) end,
+		textfmt = function(val) return _L('Scale %d%%', val) end,
 		onchange = function(val)
 			Cataclysm_Main.fLifeFontScale = val / 100
 			if GetFrame() then
@@ -1416,13 +1416,13 @@ function PS.OnPanelActive(frame)
 	-- 血量数值显示方案
 	x = X + 10
 	for _, p in ipairs({
-		{ 1, _L["Show Format value"] },
-		{ 2, _L["Show Percentage value"] },
-		{ 3, _L["Show full value"] },
+		{ 1, _L['Show Format value'] },
+		{ 2, _L['Show Percentage value'] },
+		{ 3, _L['Show full value'] },
 	}) do
-		x = x + ui:append("WndRadioBox", {
+		x = x + ui:append('WndRadioBox', {
 			x = x, y = y, text = p[2],
-			group = "lifval", checked = Cataclysm_Main.nHPShownNumMode == p[1],
+			group = 'lifval', checked = Cataclysm_Main.nHPShownNumMode == p[1],
 			autoenable = function() return Cataclysm_Main.nHPShownMode2 ~= 0 end,
 			oncheck = function()
 				Cataclysm_Main.nHPShownNumMode = p[1]
@@ -1433,8 +1433,8 @@ function PS.OnPanelActive(frame)
 		}, true):autoWidth():width() + 5
 	end
 
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Show Decimal"],
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y, text = _L['Show Decimal'],
 		checked = Cataclysm_Main.bShowHPDecimal,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowHPDecimal = bCheck
@@ -1447,13 +1447,13 @@ function PS.OnPanelActive(frame)
 
 	x = X + 10
 	for _, p in ipairs({
-		{ 0, _L["Top"] },
-		{ 1, _L["Middle"] },
-		{ 2, _L["Bottom"] },
+		{ 0, _L['Top'] },
+		{ 1, _L['Middle'] },
+		{ 2, _L['Bottom'] },
 	}) do
-		x = x + ui:append("WndRadioBox", {
+		x = x + ui:append('WndRadioBox', {
 			x = x, y = y, text = p[2],
-			group = "lifvali", checked = Cataclysm_Main.nHPVAlignment == p[1],
+			group = 'lifvali', checked = Cataclysm_Main.nHPVAlignment == p[1],
 			autoenable = function() return Cataclysm_Main.nHPShownMode2 ~= 0 end,
 			oncheck = function()
 				Cataclysm_Main.nHPVAlignment = p[1]
@@ -1462,13 +1462,13 @@ function PS.OnPanelActive(frame)
 		}, true):autoWidth():width() + 5
 	end
 	for _, p in ipairs({
-		{ 0, _L["Left"] },
-		{ 1, _L["Center"] },
-		{ 2, _L["Right"] },
+		{ 0, _L['Left'] },
+		{ 1, _L['Center'] },
+		{ 2, _L['Right'] },
 	}) do
-		x = x + ui:append("WndRadioBox", {
+		x = x + ui:append('WndRadioBox', {
 			x = x, y = y, text = p[2],
-			group = "lifhali", checked = Cataclysm_Main.nHPHAlignment == p[1],
+			group = 'lifhali', checked = Cataclysm_Main.nHPHAlignment == p[1],
 			autoenable = function() return Cataclysm_Main.nHPShownMode2 ~= 0 end,
 			oncheck = function()
 				Cataclysm_Main.nHPHAlignment = p[1]
@@ -1476,8 +1476,8 @@ function PS.OnPanelActive(frame)
 			end,
 		}, true):autoWidth():width() + 5
 	end
-	ui:append("WndButton2", {
-		x = x, y = y - 1, text = _L["Life font"],
+	ui:append('WndButton2', {
+		x = x, y = y - 1, text = _L['Life font'],
 		onclick = function()
 			XGUI.OpenFontPicker(function(nFont)
 				Cataclysm_Main.nLifeFont = nFont
@@ -1494,14 +1494,14 @@ function PS.OnPanelActive(frame)
 	x = X + 10
 	y = y + 10
 	for _, p in ipairs({
-		{ 1, _L["Show Force Icon"] },
+		{ 1, _L['Show Force Icon'] },
 		{ 2, g_tStrings.STR_SHOW_KUNGFU },
-		{ 3, _L["Show Camp Icon"] },
-		{ 4, _L["Show Text Force"] },
+		{ 3, _L['Show Camp Icon'] },
+		{ 4, _L['Show Text Force'] },
 	}) do
-		x = x + ui:append("WndRadioBox", {
+		x = x + ui:append('WndRadioBox', {
 			x = x, y = y, text = p[2],
-			group = "icon", checked = Cataclysm_Main.nShowIcon == p[1],
+			group = 'icon', checked = Cataclysm_Main.nShowIcon == p[1],
 			oncheck = function()
 				Cataclysm_Main.nShowIcon = p[1]
 				if GetFrame() then
@@ -1515,8 +1515,8 @@ function PS.OnPanelActive(frame)
 
 	-- 内力显示
 	x = X + 10
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Show ManaCount"],
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y, text = _L['Show ManaCount'],
 		checked = Cataclysm_Main.nShowMP,
 		oncheck = function(bCheck)
 			Cataclysm_Main.nShowMP = bCheck
@@ -1526,7 +1526,7 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():width() + 5
 
-	x = x + ui:append("WndButton2", {
+	x = x + ui:append('WndButton2', {
 		x = x, y = y, text = g_tStrings.STR_SKILL_MANA .. g_tStrings.FONT,
 		onclick = function()
 			XGUI.OpenFontPicker(function(nFont)
@@ -1539,12 +1539,12 @@ function PS.OnPanelActive(frame)
 		autoenable = function() return Cataclysm_Main.nShowMP end,
 	}, true):width() + 5
 
-	ui:append("WndSliderBox", {
+	ui:append('WndSliderBox', {
 		x = x, y = y - 1,
 		value = Cataclysm_Main.fManaFontScale * 100,
 		range = {1, 400},
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
-		textfmt = function(val) return _L("Scale %d%%", val) end,
+		textfmt = function(val) return _L('Scale %d%%', val) end,
 		onchange = function(val)
 			Cataclysm_Main.fManaFontScale = val / 100
 			if GetFrame() then
@@ -1555,7 +1555,7 @@ function PS.OnPanelActive(frame)
 	}, true)
 	y = y + 25
 end
-MY.RegisterPanel("MY_Cataclysm_GridStyle", _L["Grid Style"], _L["Raid"], "ui/Image/UICommon/RaidTotal.uitex|68", {255, 255, 0}, PS)
+MY.RegisterPanel('MY_Cataclysm_GridStyle', _L['Grid Style'], _L['Raid'], 'ui/Image/UICommon/RaidTotal.uitex|68', {255, 255, 0}, PS)
 end
 
 do
@@ -1565,13 +1565,13 @@ function PS.OnPanelActive(frame)
 	local X, Y = 20, 20
 	local x, y = X, Y
 
-	y = y + ui:append("Text", { x = x, y = y, text = g_tStrings.BACK_COLOR, font = 27 }, true):height()
+	y = y + ui:append('Text', { x = x, y = y, text = g_tStrings.BACK_COLOR, font = 27 }, true):height()
 
 	x = x + 10
 	y = y + 5
-	x = x + ui:append("WndRadioBox", {
-		x = x, y = y, text = _L["Colored as official team frame"],
-		group = "BACK_COLOR", checked = Cataclysm_Main.nBGColorMode == CTM_BG_COLOR_MODE.OFFICIAL,
+	x = x + ui:append('WndRadioBox', {
+		x = x, y = y, text = _L['Colored as official team frame'],
+		group = 'BACK_COLOR', checked = Cataclysm_Main.nBGColorMode == CTM_BG_COLOR_MODE.OFFICIAL,
 		oncheck = function(bChecked)
 			if not bChecked then
 				return
@@ -1580,13 +1580,13 @@ function PS.OnPanelActive(frame)
 			if GetFrame() then
 				Grid_CTM:CallDrawHPMP(true, true)
 			end
-			MY.SwitchTab("MY_Cataclysm_GridColor", true)
+			MY.SwitchTab('MY_Cataclysm_GridColor', true)
 		end,
 	}, true):autoWidth():width()
 
-	x = x + ui:append("WndRadioBox", {
-		x = x, y = y, text = _L["Colored all the same"],
-		group = "BACK_COLOR", checked = Cataclysm_Main.nBGColorMode == CTM_BG_COLOR_MODE.SAME_COLOR,
+	x = x + ui:append('WndRadioBox', {
+		x = x, y = y, text = _L['Colored all the same'],
+		group = 'BACK_COLOR', checked = Cataclysm_Main.nBGColorMode == CTM_BG_COLOR_MODE.SAME_COLOR,
 		oncheck = function(bChecked)
 			if not bChecked then
 				return
@@ -1595,13 +1595,13 @@ function PS.OnPanelActive(frame)
 			if GetFrame() then
 				Grid_CTM:CallDrawHPMP(true, true)
 			end
-			MY.SwitchTab("MY_Cataclysm_GridColor", true)
+			MY.SwitchTab('MY_Cataclysm_GridColor', true)
 		end,
 	}, true):autoWidth():width() + 5
 
-	x = x + ui:append("WndRadioBox", {
-		x = x, y = y, text = _L["Colored according to the distance"],
-		group = "BACK_COLOR", checked = Cataclysm_Main.nBGColorMode == CTM_BG_COLOR_MODE.BY_DISTANCE,
+	x = x + ui:append('WndRadioBox', {
+		x = x, y = y, text = _L['Colored according to the distance'],
+		group = 'BACK_COLOR', checked = Cataclysm_Main.nBGColorMode == CTM_BG_COLOR_MODE.BY_DISTANCE,
 		oncheck = function(bChecked)
 			if not bChecked then
 				return
@@ -1610,13 +1610,13 @@ function PS.OnPanelActive(frame)
 			if GetFrame() then
 				Grid_CTM:CallDrawHPMP(true, true)
 			end
-			MY.SwitchTab("MY_Cataclysm_GridColor", true)
+			MY.SwitchTab('MY_Cataclysm_GridColor', true)
 		end,
 	}, true):autoWidth():width() + 5
 
-	x = x + ui:append("WndRadioBox", {
+	x = x + ui:append('WndRadioBox', {
 		x = x, y = y, text = g_tStrings.STR_RAID_COLOR_NAME_SCHOOL,
-		group = "BACK_COLOR", checked = Cataclysm_Main.nBGColorMode == CTM_BG_COLOR_MODE.BY_FORCE,
+		group = 'BACK_COLOR', checked = Cataclysm_Main.nBGColorMode == CTM_BG_COLOR_MODE.BY_FORCE,
 		oncheck = function(bChecked)
 			if not bChecked then
 				return
@@ -1625,11 +1625,11 @@ function PS.OnPanelActive(frame)
 			if GetFrame() then
 				Grid_CTM:CallDrawHPMP(true, true)
 			end
-			MY.SwitchTab("MY_Cataclysm_GridColor", true)
+			MY.SwitchTab('MY_Cataclysm_GridColor', true)
 		end,
 	}, true):autoWidth():width() + 5
 
-	y = y + ui:append("WndCheckBox", {
+	y = y + ui:append('WndCheckBox', {
 		x = x, y = y, text = g_tStrings.STR_RAID_DISTANCE,
 		checked = Cataclysm_Main.bEnableDistance,
 		oncheck = function(bCheck)
@@ -1637,18 +1637,18 @@ function PS.OnPanelActive(frame)
 			if GetFrame() then
 				Grid_CTM:CallDrawHPMP(true, true)
 			end
-			MY.SwitchTab("MY_Cataclysm_GridColor", true)
+			MY.SwitchTab('MY_Cataclysm_GridColor', true)
 		end,
 	}, true):autoWidth():height() + 5
 
 	-- 设置分段距离等级
 	x = X + 10
 	if Cataclysm_Main.bEnableDistance then
-		y = y + ui:append("WndButton3", {
-			x = x, y = y, text = _L["Edit Distance Level"],
+		y = y + ui:append('WndButton3', {
+			x = x, y = y, text = _L['Edit Distance Level'],
 			onclick = function()
-				GetUserInput(_L["distance, distance, ..."], function(szText)
-					local t = MY.Split(MY.Trim(szText), ",")
+				GetUserInput(_L['distance, distance, ...'], function(szText)
+					local t = MY.Split(MY.Trim(szText), ',')
 					local tt = {}
 					for k, v in ipairs(t) do
 						if not tonumber(v) then
@@ -1667,7 +1667,7 @@ function PS.OnPanelActive(frame)
 							table.insert(Cataclysm_Main.tDistanceCol, tDistanceCol[i] or { 255, 255, 255 })
 							table.insert(Cataclysm_Main.tDistanceAlpha, tDistanceAlpha[i] or 255)
 						end
-						MY.SwitchTab("MY_Cataclysm_GridColor", true)
+						MY.SwitchTab('MY_Cataclysm_GridColor', true)
 					end
 				end)
 			end,
@@ -1678,9 +1678,9 @@ function PS.OnPanelActive(frame)
 	if not Cataclysm_Main.bEnableDistance
 	or Cataclysm_Main.nBGColorMode == CTM_BG_COLOR_MODE.SAME_COLOR then
 		x = X + 20
-		ui:append("Text", { x = x, y = y, text = g_tStrings.BACK_COLOR }):autoWidth()
+		ui:append('Text', { x = x, y = y, text = g_tStrings.BACK_COLOR }):autoWidth()
 		x = 280
-		x = x + ui:append("Shadow", {
+		x = x + ui:append('Shadow', {
 			w = 22, h = 22, x = x, y = y + 3, color = Cataclysm_Main.tDistanceCol[1],
 			onclick = function()
 				local this = this
@@ -1701,13 +1701,13 @@ function PS.OnPanelActive(frame)
 		x = X + 20
 		for i = 1, #Cataclysm_Main.tDistanceLevel do
 			local n = Cataclysm_Main.tDistanceLevel[i - 1] or 0
-			local text = n .. g_tStrings.STR_METER .. " - "
+			local text = n .. g_tStrings.STR_METER .. ' - '
 				.. Cataclysm_Main.tDistanceLevel[i]
 				.. g_tStrings.STR_METER .. g_tStrings.BACK_COLOR
-			ui:append("Text", { x = x, y = y, text = text }):autoWidth()
+			ui:append('Text', { x = x, y = y, text = text }):autoWidth()
 			local x = 280
 			if Cataclysm_Main.nBGColorMode == CTM_BG_COLOR_MODE.BY_DISTANCE then
-				x = x + ui:append("Shadow", {
+				x = x + ui:append('Shadow', {
 					w = 22, h = 22, x = x, y = y + 3, color = Cataclysm_Main.tDistanceCol[i],
 					onclick = function()
 						local this = this
@@ -1721,7 +1721,7 @@ function PS.OnPanelActive(frame)
 					end,
 				}, true):width() + 5
 			else
-				x = x + ui:append("WndSliderBox", {
+				x = x + ui:append('WndSliderBox', {
 					x = x, y = y + 3, h = 22,
 					range = {0, 255},
 					value = Cataclysm_Main.tDistanceAlpha[i],
@@ -1732,7 +1732,7 @@ function PS.OnPanelActive(frame)
 							Grid_CTM:CallDrawHPMP(true, true)
 						end
 					end,
-					textfmt = function(val) return _L("Alpha: %d.", val) end,
+					textfmt = function(val) return _L('Alpha: %d.', val) end,
 				}, true):width() + 5
 			end
 			y = y + 30
@@ -1741,16 +1741,16 @@ function PS.OnPanelActive(frame)
 
 	-- 出同步范围背景
 	x = X + 20
-	ui:append("Text", {
+	ui:append('Text', {
 		x = x, y = y,
 		text = Cataclysm_Main.bEnableDistance
-			and _L("More than %d meter", Cataclysm_Main.tDistanceLevel[#Cataclysm_Main.tDistanceLevel])
+			and _L('More than %d meter', Cataclysm_Main.tDistanceLevel[#Cataclysm_Main.tDistanceLevel])
 			or g_tStrings.STR_RAID_DISTANCE_M4,
 	}):autoWidth()
 	x = 280
 	if Cataclysm_Main.nBGColorMode ~= CTM_BG_COLOR_MODE.BY_FORCE
 	and Cataclysm_Main.nBGColorMode ~= CTM_BG_COLOR_MODE.OFFICIAL then
-		x = x + ui:append("Shadow", {
+		x = x + ui:append('Shadow', {
 			w = 22, h = 22, x = x, y = y + 3,
 			color = Cataclysm_Main.tOtherCol[3],
 			onclick = function()
@@ -1763,11 +1763,11 @@ function PS.OnPanelActive(frame)
 					XGUI(this):color(r, g, b)
 				end)
 			end,
-			textfmt = function(val) return _L("Alpha: %d.", val) end,
+			textfmt = function(val) return _L('Alpha: %d.', val) end,
 		}, true):width() + 5
 	end
 	if Cataclysm_Main.nBGColorMode ~= CTM_BG_COLOR_MODE.BY_DISTANCE then
-		x = x + ui:append("WndSliderBox", {
+		x = x + ui:append('WndSliderBox', {
 			x = x, y = y + 3, h = 22,
 			range = {0, 255},
 			value = Cataclysm_Main.tOtherAlpha[3],
@@ -1778,17 +1778,17 @@ function PS.OnPanelActive(frame)
 					Grid_CTM:CallDrawHPMP(true, true)
 				end
 			end,
-			textfmt = function(val) return _L("Alpha: %d.", val) end,
+			textfmt = function(val) return _L('Alpha: %d.', val) end,
 		}, true):width() + 5
 	end
 	y = y + 30
 
 	-- 离线背景
 	x = X + 20
-	ui:append("Text", { x = x, y = y, text = g_tStrings.STR_GUILD_OFFLINE .. g_tStrings.BACK_COLOR }, true):autoWidth()
+	ui:append('Text', { x = x, y = y, text = g_tStrings.STR_GUILD_OFFLINE .. g_tStrings.BACK_COLOR }, true):autoWidth()
 	x = 280
 	if Cataclysm_Main.nBGColorMode ~= CTM_BG_COLOR_MODE.OFFICIAL then
-		x = x + ui:append("Shadow", {
+		x = x + ui:append('Shadow', {
 			w = 22, h = 22, x = x, y = y + 3, color = Cataclysm_Main.tOtherCol[2],
 			onclick = function()
 				local this = this
@@ -1803,7 +1803,7 @@ function PS.OnPanelActive(frame)
 		}, true):width() + 5
 	end
 	if Cataclysm_Main.nBGColorMode ~= CTM_BG_COLOR_MODE.BY_DISTANCE then
-		x = x + ui:append("WndSliderBox", {
+		x = x + ui:append('WndSliderBox', {
 			x = x, y = y + 3, h = 22,
 			range = {0, 255},
 			value = Cataclysm_Main.tOtherAlpha[2],
@@ -1814,7 +1814,7 @@ function PS.OnPanelActive(frame)
 					Grid_CTM:CallDrawHPMP(true, true)
 				end
 			end,
-			textfmt = function(val) return _L("Alpha: %d.", val) end,
+			textfmt = function(val) return _L('Alpha: %d.', val) end,
 		}, true):width() + 5
 	end
 	y = y + 30
@@ -1822,8 +1822,8 @@ function PS.OnPanelActive(frame)
 	-- 内力
 	x = X + 20
 	if Cataclysm_Main.nBGColorMode ~= CTM_BG_COLOR_MODE.OFFICIAL then
-		ui:append("Text", { x = x, y = y, text = g_tStrings.STR_SKILL_MANA .. g_tStrings.BACK_COLOR }, true):autoWidth()
-		y = y + ui:append("Shadow", {
+		ui:append('Text', { x = x, y = y, text = g_tStrings.STR_SKILL_MANA .. g_tStrings.BACK_COLOR }, true):autoWidth()
+		y = y + ui:append('Shadow', {
 			w = 22, h = 22, x = 280, y = y + 3, color = Cataclysm_Main.tManaColor,
 			onclick = function()
 				local this = this
@@ -1842,8 +1842,8 @@ function PS.OnPanelActive(frame)
 	x = X + 10
 	y = y + 5
 	if Cataclysm_Main.nBGColorMode ~= CTM_BG_COLOR_MODE.OFFICIAL then
-		x = x + ui:append("WndCheckBox", {
-			x = x, y = y, text = _L["LifeBar Gradient"],
+		x = x + ui:append('WndCheckBox', {
+			x = x, y = y, text = _L['LifeBar Gradient'],
 			checked = Cataclysm_Main.bLifeGradient,
 			oncheck = function(bCheck)
 				Cataclysm_Main.bLifeGradient = bCheck
@@ -1853,8 +1853,8 @@ function PS.OnPanelActive(frame)
 			end,
 		}, true):autoWidth():width() + 5
 
-		x = x + ui:append("WndCheckBox", {
-			x = x, y = y, text = _L["ManaBar Gradient"],
+		x = x + ui:append('WndCheckBox', {
+			x = x, y = y, text = _L['ManaBar Gradient'],
 			checked = Cataclysm_Main.bManaGradient,
 			oncheck = function(bCheck)
 				Cataclysm_Main.bManaGradient = bCheck
@@ -1865,7 +1865,7 @@ function PS.OnPanelActive(frame)
 		}, true):autoWidth():width() + 5
 	end
 end
-MY.RegisterPanel("MY_Cataclysm_GridColor", _L["Grid Color"], _L["Raid"], "ui/Image/UICommon/RaidTotal.uitex|71", {255, 255, 0}, PS)
+MY.RegisterPanel('MY_Cataclysm_GridColor', _L['Grid Color'], _L['Raid'], 'ui/Image/UICommon/RaidTotal.uitex|71', {255, 255, 0}, PS)
 end
 
 do
@@ -1875,13 +1875,13 @@ function PS.OnPanelActive(frame)
 	local X, Y = 20, 20
 	local x, y = X, Y
 
-	y = y + ui:append("Text", { x = x, y = y, text = _L["Interface settings"], font = 27 }, true):height()
+	y = y + ui:append('Text', { x = x, y = y, text = _L['Interface settings'], font = 27 }, true):height()
 
 	x = X + 10
 	y = y + 3
-	x = x + ui:append("WndRadioBox", {
-		x = x, y = y, text = _L["Official team frame style"],
-		group = "CSS", checked = Cataclysm_Main.nCss == CTM_STYLE.OFFICIAL,
+	x = x + ui:append('WndRadioBox', {
+		x = x, y = y, text = _L['Official team frame style'],
+		group = 'CSS', checked = Cataclysm_Main.nCss == CTM_STYLE.OFFICIAL,
 		oncheck = function(bChecked)
 			if not bChecked then
 				return
@@ -1891,9 +1891,9 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():width() + 5
 
-	y = y + ui:append("WndRadioBox", {
-		x = x, y = y, text = _L["Cataclysm team frame style"],
-		group = "CSS", checked = Cataclysm_Main.nCss == CTM_STYLE.CATACLYSM,
+	y = y + ui:append('WndRadioBox', {
+		x = x, y = y, text = _L['Cataclysm team frame style'],
+		group = 'CSS', checked = Cataclysm_Main.nCss == CTM_STYLE.CATACLYSM,
 		oncheck = function(bChecked)
 			if not bChecked then
 				return
@@ -1904,8 +1904,8 @@ function PS.OnPanelActive(frame)
 	}, true):autoWidth():height()
 
 	x = X + 10
-	x = x + ui:append("Text", { x = x, y = y, text = _L["Interface Width"]}, true):autoWidth():width() + 5
-	y = y + ui:append("WndSliderBox", {
+	x = x + ui:append('Text', { x = x, y = y, text = _L['Interface Width']}, true):autoWidth():width() + 5
+	y = y + ui:append('WndSliderBox', {
 		x = x, y = y + 3, h = 25, w = 250,
 		range = {50, 250},
 		value = Cataclysm_Main.fScaleX * 100,
@@ -1918,12 +1918,12 @@ function PS.OnPanelActive(frame)
 				Grid_CTM:Scale(nNewX, nNewY)
 			end
 		end,
-		textfmt = function(val) return _L("%d%%", val) end,
+		textfmt = function(val) return _L('%d%%', val) end,
 	}, true):height()
 
 	x = X + 10
-	x = x + ui:append("Text", { x = x, y = y, text = _L["Interface Height"]}, true):autoWidth():width() + 5
-	y = y + ui:append("WndSliderBox", {
+	x = x + ui:append('Text', { x = x, y = y, text = _L['Interface Height']}, true):autoWidth():width() + 5
+	y = y + ui:append('WndSliderBox', {
 		x = x, y = y + 3, h = 25, w = 250,
 		range = {50, 250},
 		value = Cataclysm_Main.fScaleY * 100,
@@ -1936,16 +1936,16 @@ function PS.OnPanelActive(frame)
 				Grid_CTM:Scale(nNewX, nNewY)
 			end
 		end,
-		textfmt = function(val) return _L("%d%%", val) end,
+		textfmt = function(val) return _L('%d%%', val) end,
 	}, true):height()
 
 	x = X
 	y = y + 10
-	y = y + ui:append("Text", { x = x, y = y, text = g_tStrings.OTHER, font = 27 }, true):height()
+	y = y + ui:append('Text', { x = x, y = y, text = g_tStrings.OTHER, font = 27 }, true):height()
 
 	x = x + 10
-	y = y + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Show Group Number"],
+	y = y + ui:append('WndCheckBox', {
+		x = x, y = y, text = _L['Show Group Number'],
 		checked = Cataclysm_Main.bShowGroupNumber,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowGroupNumber = bCheck
@@ -1954,8 +1954,8 @@ function PS.OnPanelActive(frame)
 	}, true):height()
 
 	if Cataclysm_Main.nBGColorMode ~= CTM_BG_COLOR_MODE.OFFICIAL then
-		x = x + ui:append("Text", { x = x, y = y, text = g_tStrings.STR_ALPHA }, true):autoWidth():width() + 5
-		y = y + ui:append("WndSliderBox", {
+		x = x + ui:append('Text', { x = x, y = y, text = g_tStrings.STR_ALPHA }, true):autoWidth():width() + 5
+		y = y + ui:append('WndSliderBox', {
 			x = x, y = y + 3,
 			range = {0, 255},
 			value = Cataclysm_Main.nAlpha,
@@ -1963,22 +1963,22 @@ function PS.OnPanelActive(frame)
 			onchange = function(nVal)
 				Cataclysm_Main.nAlpha = nVal
 				if GetFrame() then
-					FireUIEvent("CTM_SET_ALPHA")
+					FireUIEvent('CTM_SET_ALPHA')
 				end
 			end,
-			textfmt = function(val) return _L("%d%%", val / 255 * 100) end,
+			textfmt = function(val) return _L('%d%%', val / 255 * 100) end,
 		}, true):height()
 	end
 
 	x = X
 	y = y + 10
-	y = y + ui:append("Text", { x = x, y = y, text = _L["Arrangement"], font = 27 }, true):height()
+	y = y + ui:append('Text', { x = x, y = y, text = _L['Arrangement'], font = 27 }, true):height()
 
 	x = x + 10
 	y = y + 3
-	y = y + ui:append("WndRadioBox", {
-		x = x, y = y, text = _L["One lines: 5/0"],
-		group = "Arrangement", checked = Cataclysm_Main.nAutoLinkMode == 5,
+	y = y + ui:append('WndRadioBox', {
+		x = x, y = y, text = _L['One lines: 5/0'],
+		group = 'Arrangement', checked = Cataclysm_Main.nAutoLinkMode == 5,
 		oncheck = function(bChecked)
 			if not bChecked then
 				return
@@ -1991,9 +1991,9 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():height() + 3
 
-	y = y + ui:append("WndRadioBox", {
-		x = x, y = y, text = _L["Two lines: 1/4"],
-		group = "Arrangement", checked = Cataclysm_Main.nAutoLinkMode == 1,
+	y = y + ui:append('WndRadioBox', {
+		x = x, y = y, text = _L['Two lines: 1/4'],
+		group = 'Arrangement', checked = Cataclysm_Main.nAutoLinkMode == 1,
 		oncheck = function(bChecked)
 			if not bChecked then
 				return
@@ -2006,9 +2006,9 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():height() + 3
 
-	y = y + ui:append("WndRadioBox", {
-		x = x, y = y, text = _L["Two lines: 2/3"],
-		group = "Arrangement", checked = Cataclysm_Main.nAutoLinkMode == 2,
+	y = y + ui:append('WndRadioBox', {
+		x = x, y = y, text = _L['Two lines: 2/3'],
+		group = 'Arrangement', checked = Cataclysm_Main.nAutoLinkMode == 2,
 		oncheck = function(bChecked)
 			if not bChecked then
 				return
@@ -2021,9 +2021,9 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():height() + 3
 
-	y = y + ui:append("WndRadioBox", {
-		x = x, y = y, text = _L["Two lines: 3/2"],
-		group = "Arrangement", checked = Cataclysm_Main.nAutoLinkMode == 3,
+	y = y + ui:append('WndRadioBox', {
+		x = x, y = y, text = _L['Two lines: 3/2'],
+		group = 'Arrangement', checked = Cataclysm_Main.nAutoLinkMode == 3,
 		oncheck = function(bChecked)
 			if not bChecked then
 				return
@@ -2036,9 +2036,9 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():height() + 3
 
-	y = y + ui:append("WndRadioBox", {
-		x = x, y = y, text = _L["Two lines: 4/1"],
-		group = "Arrangement", checked = Cataclysm_Main.nAutoLinkMode == 4,
+	y = y + ui:append('WndRadioBox', {
+		x = x, y = y, text = _L['Two lines: 4/1'],
+		group = 'Arrangement', checked = Cataclysm_Main.nAutoLinkMode == 4,
 		oncheck = function(bChecked)
 			if not bChecked then
 				return
@@ -2051,7 +2051,7 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():height() + 3
 end
-MY.RegisterPanel("MY_Cataclysm_InterfaceSettings", _L["Interface settings"], _L["Raid"], "ui/Image/UICommon/RaidTotal.uitex|74", {255, 255, 0}, PS)
+MY.RegisterPanel('MY_Cataclysm_InterfaceSettings', _L['Interface settings'], _L['Raid'], 'ui/Image/UICommon/RaidTotal.uitex|74', {255, 255, 0}, PS)
 end
 
 do
@@ -2062,69 +2062,69 @@ local function GetListText(aBuffList)
 		local a = {}
 		insert(a, v.szName or v.dwID)
 		if v.nLevel then
-			insert(a, "lv" .. v.nLevel)
+			insert(a, 'lv' .. v.nLevel)
 		end
 		if v.nStackNum then
-			insert(a, "sn" .. (v.szStackOp or ">=") .. v.nStackNum)
+			insert(a, 'sn' .. (v.szStackOp or '>=') .. v.nStackNum)
 		end
 		if v.bOnlySelf or v.bSelf then
-			insert(a, "self")
+			insert(a, 'self')
 		end
-		a = { concat(a, "|") }
+		a = { concat(a, '|') }
 
 		if v.col then
 			local cols = { v.col }
-			if v.nColAlpha and v.col:sub(1, 1) ~= "#" then
+			if v.nColAlpha and v.col:sub(1, 1) ~= '#' then
 				insert(cols, v.nColAlpha)
 			end
-			insert(a, "[" .. concat(cols, "|") .. "]")
+			insert(a, '[' .. concat(cols, '|') .. ']')
 		end
 		if v.szReminder then
-			insert(a, "(" .. v.szReminder .. ")")
+			insert(a, '(' .. v.szReminder .. ')')
 		end
 		if v.nPriority then
-			insert(a, "#" .. v.nPriority)
+			insert(a, '#' .. v.nPriority)
 		end
 		if v.bAttention then
-			insert(a, "!!")
+			insert(a, '!!')
 		end
 		if v.bCaution then
-			insert(a, "!!!")
+			insert(a, '!!!')
 		end
 		if v.bScreenHead then
-			insert(a, "!!!!")
+			insert(a, '!!!!')
 		end
 		if v.bDelete then
-			insert(a, "-")
+			insert(a, '-')
 		end
-		insert(aName, (concat(a, ",")))
+		insert(aName, (concat(a, ',')))
 	end
-	return concat(aName, "\n")
+	return concat(aName, '\n')
 end
 
 local function GetTextList(szText)
 	local t = {}
-	for _, line in ipairs(MY.Split(szText, "\n")) do
+	for _, line in ipairs(MY.Split(szText, '\n')) do
 		line = MY.Trim(line)
-		if line ~= "" then
+		if line ~= '' then
 			local tab = {}
-			local vals = MY.Split(line, ",")
+			local vals = MY.Split(line, ',')
 			for i, val in ipairs(vals) do
 				if i == 1 then
-					local vs = MY.Split(val, "|")
+					local vs = MY.Split(val, '|')
 					for j, v in ipairs(vs) do
 						v = MY.Trim(v)
-						if v ~= "" then
+						if v ~= '' then
 							if j == 1 then
 								tab.dwID = tonumber(v)
 								if not tab.dwID then
 									tab.szName = v
 								end
-							elseif v == "self" then
+							elseif v == 'self' then
 								tab.bOnlySelf = true
-							elseif v:sub(1, 2) == "lv" then
+							elseif v:sub(1, 2) == 'lv' then
 								tab.nLevel = tonumber((v:sub(3)))
-							elseif v:sub(1, 2) == "sn" then
+							elseif v:sub(1, 2) == 'sn' then
 								if tonumber(v:sub(4, 4)) then
 									tab.szStackOp = v:sub(3, 3)
 									tab.nStackNum = tonumber((v:sub(4)))
@@ -2135,26 +2135,26 @@ local function GetTextList(szText)
 							end
 						end
 					end
-				elseif val == "!!" then
+				elseif val == '!!' then
 					tab.bAttention = true
-				elseif val == "!!!" then
+				elseif val == '!!!' then
 					tab.bCaution = true
-				elseif val == "!!!!" then
+				elseif val == '!!!!' then
 					tab.bScreenHead = true
-				elseif val == "-" then
+				elseif val == '-' then
 					tab.bDelete = true
-				elseif val:sub(1, 1) == "#" then
+				elseif val:sub(1, 1) == '#' then
 					tab.nPriority = tonumber((val:sub(2)))
-				elseif val:sub(1, 1) == "[" and val:sub(-1, -1) == "]" then
+				elseif val:sub(1, 1) == '[' and val:sub(-1, -1) == ']' then
 					val = val:sub(2, -2)
-					if val:sub(1, 1) == "#" then
+					if val:sub(1, 1) == '#' then
 						tab.col = val
 					else
-						local vs = MY.Split(val, "|")
+						local vs = MY.Split(val, '|')
 						tab.col = vs[1]
 						tab.nColAlpha = vs[2] and tonumber(vs[2])
 					end
-				elseif val:sub(1, 1) == "(" and val:sub(-1, -1) == ")" then
+				elseif val:sub(1, 1) == '(' and val:sub(-1, -1) == ')' then
 					tab.szReminder = val:sub(2, -2)
 				end
 			end
@@ -2169,16 +2169,16 @@ end
 local PS, l_list = {}
 function OpenBuffEditPanel(rec)
 	local w, h = 320, 320
-	local ui = XGUI.CreateFrame("MY_Cataclysm_BuffConfig", {
+	local ui = XGUI.CreateFrame('MY_Cataclysm_BuffConfig', {
 		w = w, h = h,
-		text = _L["Edit buff"],
+		text = _L['Edit buff'],
 		close = true, anchor = {},
 	}):remove(function()
-		if not rec.dwID and (not rec.szName or rec.szName == "") then
+		if not rec.dwID and (not rec.szName or rec.szName == '') then
 			for i, p in ipairs(Cataclysm_Main.aBuffList) do
 				if p == rec then
 					if l_list then
-						l_list:listbox("delete", "id", rec)
+						l_list:listbox('delete', 'id', rec)
 					end
 					remove(Cataclysm_Main.aBuffList, i)
 					UpdateBuffListCache()
@@ -2192,15 +2192,15 @@ function OpenBuffEditPanel(rec)
 		if not l_list then
 			return
 		end
-		l_list:listbox("update", "id", rec, {"text"}, {GetListText({rec})})
+		l_list:listbox('update', 'id', rec, {'text'}, {GetListText({rec})})
 	end
 	local X, Y = 25, 60
 	local x, y = X, Y
-	x = x + ui:append("Text", {
+	x = x + ui:append('Text', {
 		x = x, y = y, h = 25,
 		text = _L['Name or id'],
 	}, true):autoWidth():width() + 5
-	x = x + ui:append("WndEditBox", {
+	x = x + ui:append('WndEditBox', {
 		x = x, y = y, w = 105, h = 25,
 		text = rec.dwID or rec.szName,
 		onchange = function(text)
@@ -2215,11 +2215,11 @@ function OpenBuffEditPanel(rec)
 		end,
 	}, true):width() + 15
 
-	x = x + ui:append("Text", {
+	x = x + ui:append('Text', {
 		x = x, y = y, h = 25,
 		text = _L['Level'],
 	}, true):autoWidth():width() + 5
-	x = x + ui:append("WndEditBox", {
+	x = x + ui:append('WndEditBox', {
 		x = x, y = y, w = 60, h = 25,
 		placeholder = _L['No limit'],
 		edittype = 0, text = rec.nLevel,
@@ -2231,26 +2231,26 @@ function OpenBuffEditPanel(rec)
 	y = y + 30
 
 	x = X
-	x = x + ui:append("Text", {
+	x = x + ui:append('Text', {
 		x = x, y = y, h = 25,
 		text = _L['Stacknum'],
 	}, true):autoWidth():width() + 5
-	x = x + ui:append("WndComboBox", {
-		name = "WndComboBox_StackOp",
+	x = x + ui:append('WndComboBox', {
+		name = 'WndComboBox_StackOp',
 		x = x, y = y, w = 90, h = 25,
-		text = rec.szStackOp or (rec.nStackNum and ">=" or _L['No limit']),
+		text = rec.szStackOp or (rec.nStackNum and '>=' or _L['No limit']),
 		menu = function()
 			local this = this
 			local menu = {{
 				szOption = _L['No limit'],
 				fnAction = function()
 					rec.szStackOp = nil
-					ui:children("#WndEditBox_StackNum"):text("")
+					ui:children('#WndEditBox_StackNum'):text('')
 					update()
 					XGUI(this):text(_L['No limit'])
 				end,
 			}}
-			for _, op in ipairs({ ">=", "=", "!=", "<", "<=", ">", ">=" }) do
+			for _, op in ipairs({ '>=', '=', '!=', '<', '<=', '>', '>=' }) do
 				insert(menu, {
 					szOption = op,
 					fnAction = function()
@@ -2263,8 +2263,8 @@ function OpenBuffEditPanel(rec)
 			return menu
 		end,
 	}, true):width() + 5
-	x = x + ui:append("WndEditBox", {
-		name = "WndEditBox_StackNum",
+	x = x + ui:append('WndEditBox', {
+		name = 'WndEditBox_StackNum',
 		x = x, y = y, w = 30, h = 25,
 		edittype = 0,
 		text = rec.nStackNum,
@@ -2272,14 +2272,14 @@ function OpenBuffEditPanel(rec)
 			rec.nStackNum = tonumber(text)
 			if rec.nStackNum then
 				if not rec.szStackOp then
-					rec.szStackOp = ">="
-					ui:children("#WndComboBox_StackOp"):text(">=")
+					rec.szStackOp = '>='
+					ui:children('#WndComboBox_StackOp'):text('>=')
 				end
 			end
 			update()
 		end,
 	}, true):width() + 10
-	x = x + ui:append("WndCheckBox", {
+	x = x + ui:append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Only self'],
 		checked = rec.bOnlySelf,
@@ -2292,7 +2292,7 @@ function OpenBuffEditPanel(rec)
 
 	x = X
 	y = y + 10
-	x = x + ui:append("WndCheckBox", {
+	x = x + ui:append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Hide (Can Modify Default Data)'],
 		checked = rec.bDelete,
@@ -2305,12 +2305,12 @@ function OpenBuffEditPanel(rec)
 	x = X
 	y = y + 30
 	y = y + 10
-	x = x + ui:append("Text", {
+	x = x + ui:append('Text', {
 		x = x, y = y, h = 25,
 		text = _L['Reminder'],
 		autoenable = function() return not rec.bDelete end,
 	}, true):autoWidth():width() + 5
-	x = x + ui:append("WndEditBox", {
+	x = x + ui:append('WndEditBox', {
 		x = x, y = y, w = 30, h = 25,
 		text = rec.szReminder,
 		onchange = function(text)
@@ -2319,12 +2319,12 @@ function OpenBuffEditPanel(rec)
 		end,
 		autoenable = function() return not rec.bDelete end,
 	}, true):width() + 5
-	x = x + ui:append("Text", {
+	x = x + ui:append('Text', {
 		x = x, y = y, h = 25,
 		text = _L['Priority'],
 		autoenable = function() return not rec.bDelete end,
 	}, true):autoWidth():width() + 5
-	x = x + ui:append("WndEditBox", {
+	x = x + ui:append('WndEditBox', {
 		x = x, y = y, w = 40, h = 25,
 		edittype = 0,
 		text = rec.nPriority,
@@ -2334,8 +2334,8 @@ function OpenBuffEditPanel(rec)
 		end,
 		autoenable = function() return not rec.bDelete end,
 	}, true):width() + 5
-	x = x + ui:append("Shadow", {
-		name = "Shadow_Color",
+	x = x + ui:append('Shadow', {
+		name = 'Shadow_Color',
 		x = x, y = y + 2, w = 22, h = 22,
 		color = rec.col and {MY.HumanColor2RGB(rec.col)} or {255, 255, 0},
 		onclick = function()
@@ -2350,11 +2350,11 @@ function OpenBuffEditPanel(rec)
 		end,
 		autoenable = function() return not rec.bDelete end,
 	}, true):autoWidth():width() + 5
-	x = x + ui:append("WndButton2", {
+	x = x + ui:append('WndButton2', {
 		x = x, y = y, h = 25, w = 80,
 		text = _L['Clear color'],
 		onclick = function()
-			ui:children("#Shadow_Color"):color(255, 255, 0)
+			ui:children('#Shadow_Color'):color(255, 255, 0)
 			rec.col = nil
 			update()
 		end,
@@ -2363,13 +2363,13 @@ function OpenBuffEditPanel(rec)
 	y = y + 30
 
 	x = X
-	x = x + ui:append("Text", {
+	x = x + ui:append('Text', {
 		x = x, y = y, h = 25,
 		text = _L['Border alpha'],
 		autoenable = function() return not rec.bDelete end,
 	}, true):autoWidth():width() + 5
-	x = x + ui:append("WndSliderBox", {
-		x = x, y = y, text = "",
+	x = x + ui:append('WndSliderBox', {
+		x = x, y = y, text = '',
 		range = {0, 255},
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		value = rec.col and select(4, MY.HumanColor2RGB(rec.col)) or rec.nColAlpha or 255,
@@ -2388,7 +2388,7 @@ function OpenBuffEditPanel(rec)
 	y = y + 30
 
 	x = X
-	x = x + ui:append("WndCheckBox", {
+	x = x + ui:append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Attention'],
 		checked = rec.bAttention,
@@ -2398,7 +2398,7 @@ function OpenBuffEditPanel(rec)
 		end,
 		autoenable = function() return not rec.bDelete end,
 	}, true):autoWidth():width() + 5
-	x = x + ui:append("WndCheckBox", {
+	x = x + ui:append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Caution'],
 		checked = rec.bCaution,
@@ -2408,7 +2408,7 @@ function OpenBuffEditPanel(rec)
 		end,
 		autoenable = function() return not rec.bDelete end,
 	}, true):autoWidth():width() + 5
-	x = x + ui:append("WndCheckBox", {
+	x = x + ui:append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Screen Head'],
 		checked = rec.bScreenHead,
@@ -2419,7 +2419,7 @@ function OpenBuffEditPanel(rec)
 		autoenable = function() return not rec.bDelete end,
 	}, true):autoWidth():width() + 5
 
-	ui:append("WndButton2", {
+	ui:append('WndButton2', {
 		x = (w - 120) / 2, y = h - 50, w = 120,
 		text = _L['Delete'], color = {223, 63, 95},
 		onclick = function()
@@ -2427,7 +2427,7 @@ function OpenBuffEditPanel(rec)
 				for i, p in ipairs(Cataclysm_Main.aBuffList) do
 					if p == rec then
 						if l_list then
-							l_list:listbox("delete", "id", rec)
+							l_list:listbox('delete', 'id', rec)
 						end
 						remove(Cataclysm_Main.aBuffList, i)
 						UpdateBuffListCache()
@@ -2436,8 +2436,8 @@ function OpenBuffEditPanel(rec)
 				end
 				ui:remove()
 			end
-			if rec.dwID or (rec.szName and rec.szName ~= "") then
-				MY.Confirm(_L("Delete [%s]?", rec.szName or rec.dwID), fnAction)
+			if rec.dwID or (rec.szName and rec.szName ~= '') then
+				MY.Confirm(_L('Delete [%s]?', rec.szName or rec.dwID), fnAction)
 			else
 				fnAction()
 			end
@@ -2452,9 +2452,9 @@ function PS.OnPanelActive(frame)
 	local w, h = ui:size()
 
 	x = X
-	x = x + ui:append("WndButton2", {
+	x = x + ui:append('WndButton2', {
 		x = x, y = y, w = 100,
-		text = _L["Add"],
+		text = _L['Add'],
 		onclick = function()
 			local rec = {}
 			insert(Cataclysm_Main.aBuffList, rec)
@@ -2462,32 +2462,32 @@ function PS.OnPanelActive(frame)
 			OpenBuffEditPanel(rec, l_list)
 		end,
 	}, true):autoHeight():width() + 5
-	x = x + ui:append("WndButton2", {
+	x = x + ui:append('WndButton2', {
 		x = x, y = y, w = 100,
-		text = _L["Edit"],
+		text = _L['Edit'],
 		onclick = function()
-			local ui = XGUI.CreateFrame("MY_Cataclysm_BuffConfig", {
+			local ui = XGUI.CreateFrame('MY_Cataclysm_BuffConfig', {
 				w = 350, h = 550,
-				text = _L["Edit buff"],
+				text = _L['Edit buff'],
 				close = true, anchor = {},
 			})
 			local X, Y = 20, 60
 			local x, y = X, Y
-			local edit = ui:append("WndEditBox",{
+			local edit = ui:append('WndEditBox',{
 				x = x, y = y, w = 310, h = 440, limit = 4096, multiline = true,
 				text = GetListText(Cataclysm_Main.aBuffList),
 			}, true)
 			y = y + edit:height() + 5
 
-			ui:append("WndButton2", {
+			ui:append('WndButton2', {
 				x = x, y = y, w = 310,
-				text = _L["Sure"],
+				text = _L['Sure'],
 				onclick = function()
 					Cataclysm_Main.aBuffList = GetTextList(edit:text())
 					UpdateBuffListCache()
 					ui:remove()
-					MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
-					MY.SwitchTab("MY_Cataclysm_BuffSettings", true)
+					MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
+					MY.SwitchTab('MY_Cataclysm_BuffSettings', true)
 				end,
 			})
 		end,
@@ -2495,7 +2495,7 @@ function PS.OnPanelActive(frame)
 	x = X
 	y = y + 30
 
-	l_list = ui:append("WndListBox", {
+	l_list = ui:append('WndListBox', {
 		x = x, y = y,
 		w = w - 240 - 20, h = h - y - 5,
 		listbox = {{
@@ -2514,16 +2514,16 @@ function PS.OnPanelActive(frame)
 	X = w - 240
 	x = X
 	y = Y + 25
-	x = x + ui:append("WndCheckBox", {
+	x = x + ui:append('WndCheckBox', {
 		x = x, y = y,
-		text = _L["Auto scale"],
+		text = _L['Auto scale'],
 		checked = Cataclysm_Main.bAutoBuffSize,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bAutoBuffSize = bCheck
-			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
+			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width() + 5
-	x = x + ui:append("WndSliderBox", {
+	x = x + ui:append('WndSliderBox', {
 		x = x, y = y, h = 25, rw = 80,
 		enable = not Cataclysm_Main.bAutoBuffSize,
 		autoenable = function() return not Cataclysm_Main.bAutoBuffSize end,
@@ -2532,88 +2532,88 @@ function PS.OnPanelActive(frame)
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		onchange = function(nVal)
 			Cataclysm_Main.fBuffScale = nVal / 100
-			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
+			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
-		textfmt = function(val) return _L("%d%%", val) end,
+		textfmt = function(val) return _L('%d%%', val) end,
 	}, true):autoWidth():width() + 10
 
 	x = X
 	y = y + 30
-	x = x + ui:append("Text", { x = x, y = y, text = _L["Max count"]}, true):autoWidth():width() + 5
-	x = x + ui:append("WndSliderBox", {
-		x = x, y = y + 3, rw = 80, text = "",
+	x = x + ui:append('Text', { x = x, y = y, text = _L['Max count']}, true):autoWidth():width() + 5
+	x = x + ui:append('WndSliderBox', {
+		x = x, y = y + 3, rw = 80, text = '',
 		range = {0, 10},
 		value = Cataclysm_Main.nMaxShowBuff,
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
 		onchange = function(nVal)
 			Cataclysm_Main.nMaxShowBuff = nVal
-			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
+			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width() + 8
 
 	x = X
 	y = y + 30
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Show Official Buff"],
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y, text = _L['Show Official Buff'],
 		checked = Cataclysm_Main.bBuffDataOfficial,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bBuffDataOfficial = bCheck
 			UpdateBuffListCache()
-			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
+			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width() + 5
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Buff Staring"],
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y, text = _L['Buff Staring'],
 		checked = Cataclysm_Main.bStaring,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bStaring = bCheck
-			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
+			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width() + 5
 
 	x = X
 	y = y + 30
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Show Buff Time"],
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y, text = _L['Show Buff Time'],
 		checked = Cataclysm_Main.bShowBuffTime,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowBuffTime = bCheck
-			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
+			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width() + 5
-	x = x + ui:append("WndCheckBox", {
+	x = x + ui:append('WndCheckBox', {
 		x = x, y = y,
-		text = _L["Over mana bar"],
+		text = _L['Over mana bar'],
 		checked = not Cataclysm_Main.bBuffAboveMana,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bBuffAboveMana = not bCheck
-			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
+			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width() + 5
 
 	x = X
 	y = y + 30
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Show Buff Num"],
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y, text = _L['Show Buff Num'],
 		checked = Cataclysm_Main.bShowBuffNum,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowBuffNum = bCheck
-			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
+			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width() + 5
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Show Buff Reminder"],
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y, text = _L['Show Buff Reminder'],
 		checked = Cataclysm_Main.bShowBuffReminder,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowBuffReminder = bCheck
-			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
+			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width() + 5
 
 	x = X
 	y = y + 30
-	x = x + ui:append("WndCheckBox", {
-		x = x, y = y, text = _L["Alt Click Publish"],
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y, text = _L['Alt Click Publish'],
 		checked = Cataclysm_Main.bBuffAltPublish,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bBuffAltPublish = bCheck
@@ -2622,52 +2622,52 @@ function PS.OnPanelActive(frame)
 	y = y + 30
 
 	x = X
-	x = x + ui:append("WndCheckBox", {
+	x = x + ui:append('WndCheckBox', {
 		x = x, y = y,
-		text = _L["Enable default data"], tip = _L["Default data TIP"],
+		text = _L['Enable default data'], tip = _L['Default data TIP'],
 		tippostype = MY.Const.UI.Tip.POS_BOTTOM,
 		checked = Cataclysm_Main.bBuffDataNangongbo,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bBuffDataNangongbo = bCheck
 			UpdateBuffListCache()
-			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
+			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
 	}, true):autoWidth():width() + 5
 	y = y + 30
 
 	x = X
-	x = x + ui:append("WndCheckBox", {
+	x = x + ui:append('WndCheckBox', {
 		x = x, y = y,
-		text = _L["Cmd data"], tip = _L["Cmd data TIP"],
+		text = _L['Cmd data'], tip = _L['Cmd data TIP'],
 		tippostype = MY.Const.UI.Tip.POS_BOTTOM,
 		checked = Cataclysm_Main.bBuffDataNangongboCmd,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bBuffDataNangongboCmd = bCheck
 			UpdateBuffListCache()
-			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
+			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
 		autoenable = function() return Cataclysm_Main.bBuffDataNangongbo end,
 	}, true):autoWidth():width() + 5
-	x = x + ui:append("WndCheckBox", {
+	x = x + ui:append('WndCheckBox', {
 		x = x, y = y,
-		text = _L["Heal data"], tip = _L["Heal data TIP"],
+		text = _L['Heal data'], tip = _L['Heal data TIP'],
 		tippostype = MY.Const.UI.Tip.POS_BOTTOM,
 		checked = Cataclysm_Main.bBuffDataNangongboHeal,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bBuffDataNangongboHeal = bCheck
 			UpdateBuffListCache()
-			MY.DelayCall("MY_Cataclysm_Reload", 300, ReloadCataclysmPanel)
+			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
 		autoenable = function() return Cataclysm_Main.bBuffDataNangongbo end,
 	}, true):autoWidth():width() + 5
 
 	x = X
 	y = y + 30
-	x = x + ui:append("WndButton2", {
+	x = x + ui:append('WndButton2', {
 		x = x, y = y, w = 220,
-		text = _L["Feedback @nangongbo"],
+		text = _L['Feedback @nangongbo'],
 		onclick = function()
-			XGUI.OpenBrowser("https://weibo.com/nangongbo")
+			XGUI.OpenBrowser('https://weibo.com/nangongbo')
 		end,
 	}, true):autoHeight():width()
 	y = y + 28
@@ -2675,13 +2675,13 @@ end
 function PS.OnPanelDeactive()
 	l_list = nil
 end
-MY.RegisterPanel("MY_Cataclysm_BuffSettings", _L["Buff settings"], _L["Raid"], "ui/Image/UICommon/RaidTotal.uitex|65", {255, 255, 0}, PS)
+MY.RegisterPanel('MY_Cataclysm_BuffSettings', _L['Buff settings'], _L['Raid'], 'ui/Image/UICommon/RaidTotal.uitex|65', {255, 255, 0}, PS)
 end
 
-MY.RegisterEvent("CTM_PANEL_TEAMATE", function()
+MY.RegisterEvent('CTM_PANEL_TEAMATE', function()
 	TeammatePanel_Switch(arg0)
 end)
-MY.RegisterEvent("CTM_PANEL_RAID", function()
+MY.RegisterEvent('CTM_PANEL_RAID', function()
 	RaidPanel_Switch(arg0)
 end)
 
@@ -2699,24 +2699,24 @@ end)
 --    利用UI注册的[LOADING_END]来刷新
 --    避免多次重复刷新面板浪费开销
 
-MY.RegisterEvent("PARTY_UPDATE_BASE_INFO", function()
+MY.RegisterEvent('PARTY_UPDATE_BASE_INFO', function()
 	CheckCataclysmEnable()
 	ReloadCataclysmPanel()
 	PlaySound(SOUND.UI_SOUND, g_sound.Gift)
 end)
 
-MY.RegisterEvent("PARTY_LEVEL_UP_RAID", function()
+MY.RegisterEvent('PARTY_LEVEL_UP_RAID', function()
 	CheckCataclysmEnable()
 	ReloadCataclysmPanel()
 end)
-MY.RegisterEvent("LOADING_END", CheckCataclysmEnable)
+MY.RegisterEvent('LOADING_END', CheckCataclysmEnable)
 
 -- 保存和读取配置
 MY.RegisterExit(SaveConfigure)
 
-MY.RegisterInit("MY_Cataclysm", function() SetConfigureName() end)
+MY.RegisterInit('MY_Cataclysm', function() SetConfigureName() end)
 
 
 MY.RegisterAddonMenu(function()
-	return { szOption = _L["Cataclysm Team Panel"], bCheck = true, bChecked = Cataclysm_Main.bRaidEnable, fnAction = ToggleTeamPanel }
+	return { szOption = _L['Cataclysm Team Panel'], bCheck = true, bChecked = Cataclysm_Main.bRaidEnable, fnAction = ToggleTeamPanel }
 end)
