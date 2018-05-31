@@ -1133,7 +1133,7 @@ function PS.OnPanelActive(wnd)
 					end
 					file = MY.GetRelativePath(file, { 'audio/', MY_DATA_PATH.GLOBAL })
 					if not file then
-						return MY.Alert(_L('File path error! Not in '%s'!', MY.FormatPath({ 'audio/', MY_DATA_PATH.GLOBAL })))
+						return MY.Alert(_L('File path error! Not in "%s"!', MY.FormatPath({ 'audio/', MY_DATA_PATH.GLOBAL })))
 					end
 					mon.soundAppear = file
 				end,
