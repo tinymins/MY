@@ -1131,7 +1131,11 @@ function PS.OnPanelActive(wnd)
 					if file == '' then
 						return
 					end
-					mon.soundAppear = MY.GetRelativePath(file, { 'audio/', MY_DATA_PATH.GLOBAL })
+					file = MY.GetRelativePath(file, { 'audio/', MY_DATA_PATH.GLOBAL })
+					if not file then
+						return MY.Alert(_L('File path error! Not in "%s"!', MY.FormatPath({ 'audio/', MY_DATA_PATH.GLOBAL })))
+					end
+					mon.soundAppear = file
 				end,
 			}
 			if mon.soundAppear ~= "" then
@@ -1165,7 +1169,11 @@ function PS.OnPanelActive(wnd)
 					if file == '' then
 						return
 					end
-					mon.soundDisappear = MY.GetRelativePath(file, { 'audio/', MY_DATA_PATH.GLOBAL })
+					file = MY.GetRelativePath(file, { 'audio/', MY_DATA_PATH.GLOBAL })
+					if not file then
+						return MY.Alert(_L('File path error! Not in "%s"!', MY.FormatPath({ 'audio/', MY_DATA_PATH.GLOBAL })))
+					end
+					mon.soundDisappear = file
 				end,
 			}
 			if mon.soundDisappear ~= "" then

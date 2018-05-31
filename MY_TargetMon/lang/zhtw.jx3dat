@@ -101,6 +101,7 @@ data = {
     ['Play sound when appear'] = '設置出現提示音',
     ['Play sound when disappear'] = '設置消失提示音',
     ['Please select sound file.'] = '請選擇聲音文件',
+    ['File path error! Not in "%s"!'] = '文件路徑錯誤！不在目錄“%s”中！',
     ['Self kungfu'] = '自身心法要求',
     ['Target kungfu'] = '目標心法要求',
     ['All kungfus'] = '全部心法',
