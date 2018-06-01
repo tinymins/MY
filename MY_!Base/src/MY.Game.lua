@@ -16,8 +16,9 @@ local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
 local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
-local floor, min, max, ceil = math.floor, math.min, math.max, math.ceil
-local huge, pi, sin, cos, tan = math.huge, math.pi, math.sin, math.cos, math.tan
+local huge, pi = math.huge, math.pi
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
 local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
 local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
 -- jx3 apis caching
@@ -25,6 +26,8 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local IsNil, IsNumber, IsFunction = MY.IsNil, MY.IsNumber, MY.IsFunction
+local IsBoolean, IsString, IsTable = MY.IsBoolean, MY.IsString, MY.IsTable
 -----------------------------------------------------------------------------------------
 -----------------------------------------------
 -- 本地函数和变量
@@ -1794,14 +1797,18 @@ function MY.GetBuffList(KObject)
 end
 
 -- 获取对象的buff
--- (table) MY.GetBuff([KObject, ]dwID[, nLevel])
-function MY.Game.GetBuff(KObject, dwID, nLevel)
+-- tBuff: {[dwID1] = nLevel1, [dwID2] = nLevel2}
+-- (table) MY.GetBuff(dwID[, nLevel[, dwSkillSrcID]])
+-- (table) MY.GetBuff(KObject, dwID[, nLevel[, dwSkillSrcID]])
+-- (table) MY.GetBuff(tBuff[, dwSkillSrcID])
+-- (table) MY.GetBuff(KObject, tBuff[, dwSkillSrcID])
+function MY.Game.GetBuff(KObject, dwID, nLevel, dwSkillSrcID)
 	local tBuff = {}
 	if type(KObject) ~= 'userdata' then
-		KObject, dwID, nLevel = GetClientPlayer(), KObject, dwID
+		KObject, dwID, nLevel, dwSkillSrcID = GetClientPlayer(), KObject, dwID, nLevel
 	end
 	if type(dwID) == 'table' then
-		tBuff = dwID
+		tBuff, dwSkillSrcID = dwID, nLevel
 	elseif type(dwID) == 'number' then
 		if type(nLevel) == 'number' then
 			tBuff[dwID] = nLevel
@@ -1809,13 +1816,25 @@ function MY.Game.GetBuff(KObject, dwID, nLevel)
 			tBuff[dwID] = 0
 		end
 	end
-	if not KObject.GetBuff then
-		return MY.Debug({'KObject do not have a function named GetBuff.'}, 'MY.Game.GetBuff', MY_DEBUG.ERROR)
-	end
-	for k, v in pairs(tBuff) do
-		local KBuff = KObject.GetBuff(k, v)
-		if KBuff then
-			return KBuff
+	if IsNumber(dwSkillSrcID) and dwSkillSrcID > 0 then
+		if not KObject.GetBuffByOwner then
+			return MY.Debug({'KObject do not have a function named GetBuffByOwner.'}, 'MY.Game.GetBuff', MY_DEBUG.ERROR)
+		end
+		for k, v in pairs(tBuff) do
+			local KBuff = KObject.GetBuffByOwner(k, v, dwSkillSrcID)
+			if KBuff then
+				return KBuff
+			end
+		end
+	else
+		if not KObject.GetBuff then
+			return MY.Debug({'KObject do not have a function named GetBuff.'}, 'MY.Game.GetBuff', MY_DEBUG.ERROR)
+		end
+		for k, v in pairs(tBuff) do
+			local KBuff = KObject.GetBuff(k, v)
+			if KBuff then
+				return KBuff
+			end
 		end
 	end
 end
