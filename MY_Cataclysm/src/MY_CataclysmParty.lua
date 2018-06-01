@@ -855,7 +855,7 @@ local function HideBossTarget(dwTarID)
 	end
 end
 function CTM:RefreshBossTarget()
-	local tCheck = {}
+	local tKeep = {}
 	if CFG.bShowBossTarget then
 		for dwNpcID, npc in pairs(CTM_BOSS_CACHE) do
 			local dwTarID = (IsEnemy(UI_GetClientPlayerID(), dwNpcID) and npc.bFightState)
@@ -872,12 +872,12 @@ function CTM:RefreshBossTarget()
 					end
 					CTM_BOSS_TARGET[dwNpcID] = dwTarID
 				end
-				tCheck[dwTarID] = true
+				tKeep[dwTarID] = true
 			end
 		end
 	end
 	for dwNpcID, dwTarID in pairs(CTM_BOSS_TARGET) do
-		if not tCheck[dwTarID] then
+		if not tKeep[dwTarID] then
 			HideBossTarget(dwTarID)
 			CTM_BOSS_TARGET[dwNpcID] = nil
 		end
@@ -894,7 +894,7 @@ end
 function CTM:RefreshAttention()
 	if CFG.bShowAttention then
 		local team, me = GetClientTeam(), GetClientPlayer()
-		local tCheck = {}
+		local tKeep = {}
 		for _, dwTarID in ipairs(team.GetTeamMemberList()) do
 			local p = GetPlayer(dwTarID)
 			if CTM_CACHE[dwTarID] and CTM_CACHE[dwTarID]:IsValid() then
@@ -906,10 +906,10 @@ function CTM:RefreshAttention()
 					CTM_CACHE[dwTarID]:Lookup('Shadow_Attention'):Hide()
 				end
 			end
-			tCheck[dwTarID] = true
+			tKeep[dwTarID] = p and true or false
 		end
 		for dwTarID, _ in pairs(CTM_ATTENTION_BUFF) do
-			if not tCheck[dwTarID] then
+			if not tKeep[dwTarID] then
 				CTM_ATTENTION_BUFF[dwTarID] = nil
 				CTM_ATTENTION_STACK[dwTarID] = nil
 			end
@@ -927,7 +927,7 @@ end
 function CTM:RefreshCaution()
 	if CFG.bShowCaution or CFG.bShowBossFocus then
 		local team, me = GetClientTeam(), GetClientPlayer()
-		local tCheck = {}
+		local tKeep = {}
 		for _, dwTarID in ipairs(team.GetTeamMemberList()) do
 			local p = GetPlayer(dwTarID)
 			if CTM_CACHE[dwTarID] and CTM_CACHE[dwTarID]:IsValid() then
@@ -938,18 +938,18 @@ function CTM:RefreshCaution()
 					)
 				)
 			end
-			tCheck[dwTarID] = true
+			tKeep[dwTarID] = p and true or false
 		end
 		if CFG.bShowCaution then
 			for dwTarID, _ in pairs(CTM_CAUTION_BUFF) do
-				if not tCheck[dwTarID] then
+				if not tKeep[dwTarID] then
 					CTM_CAUTION_BUFF[dwTarID] = nil
 				end
 			end
 		end
 		if CFG.bShowBossFocus then
 			for dwTarID, _ in pairs(CTM_BOSS_FOCUSED_STATE) do
-				if not tCheck[dwTarID] then
+				if not tKeep[dwTarID] then
 					CTM_BOSS_FOCUSED_STATE[dwTarID] = nil
 				end
 			end
@@ -1647,7 +1647,7 @@ end
 
 function CTM:RefreshBuff()
 	local team, me = GetClientTeam(), GetClientPlayer()
-	local tCheck = {}
+	local tKeep = {}
 	for k, v in ipairs(team.GetTeamMemberList()) do
 		local p = GetPlayer(v)
 		if CTM_CACHE[v] and CTM_CACHE[v]:IsValid() and p then
@@ -1660,7 +1660,7 @@ function CTM:RefreshBuff()
 					and not MY.JudgeOperator(data.szStackOp or '>=', KBuff.nStackNum, data.nStackNum) then
 						KBuff = nil
 					end
-					tCheck[key] = true
+					tKeep[key] = true
 				end
 				D.UpdateCharaterBuff(p, handle, key, data, KBuff)
 			end
@@ -1670,7 +1670,7 @@ function CTM:RefreshBuff()
 		end
 	end
 	for k, v in pairs(CTM_BUFF_CACHE) do
-		if not tCheck[k] then
+		if not tKeep[k] then
 			CTM_BUFF_CACHE[k] = nil
 		end
 	end
@@ -1683,7 +1683,6 @@ end
 
 function CTM:RefreshBossFocus()
 	local team, me = GetClientTeam(), GetClientPlayer()
-	local tCheck = {}
 	for k, v in ipairs(team.GetTeamMemberList()) do
 		if CTM_CACHE[v] and CTM_CACHE[v]:IsValid() then
 			local p, bFocus = GetPlayer(v), nil
