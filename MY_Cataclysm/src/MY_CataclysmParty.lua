@@ -1432,8 +1432,217 @@ function CTM:ClearBuff(dwMemberID)
 			end
 			CTM_ATTENTION_BUFF[v] = nil
 		end
+		if CTM_CAUTION_BUFF[v] then
+			CTM_CAUTION_BUFF[v] = nil
+		end
+		if CTM_SCREEN_HEAD[v] then
+			CTM_SCREEN_HEAD[v] = nil
+		end
 	end
 	CTM_BUFF_CACHE = {}
+end
+
+function D.UpdateCharaterBuff(p, handle, key, data, KBuff)
+	local item = handle:Lookup(key)
+	if KBuff then
+		local nEndFrame, nStackNum = KBuff.GetEndTime(), KBuff.nStackNum
+		-- check priority
+		local nPriority = data.nPriority
+		if not nPriority then
+			if data.bCaution then
+				nPriority = 0
+			elseif data.bAttention then
+				nPriority = 1
+			end
+		end
+		if nPriority and handle:GetItemCount() == CFG.nMaxShowBuff then
+			local item = handle:Lookup(CFG.nMaxShowBuff - 1)
+			if not item.nPriority or nPriority < item.nPriority then
+				handle:RemoveItem(item)
+			end
+		end
+		-- create
+		if not item and handle:GetItemCount() <= CFG.nMaxShowBuff then
+			item = handle:AppendItemFromData(Cataclysm_Main.GetFrame().hBuff, key)
+			item.bBuff = true
+			-- 描边
+			local r, g, b, a
+			if data.col then
+				r, g, b, a = MY.HumanColor2RGB(data.col)
+			end
+			if not data.col then
+				item:Lookup('Handle_RbgBorders'):Hide()
+				item:Lookup('Handle_InnerBorders'):Hide()
+			else
+				local hSha, sha = item:Lookup('Handle_RbgBorders')
+				for i = 0, hSha:GetItemCount() - 1 do
+					sha = hSha:Lookup(i)
+					sha:SetAlpha(a or data.nColAlpha or 192)
+					sha:SetColorRGB(r or 255, g or 255, b or 0)
+				end
+				item:Lookup('Handle_RbgBorders'):Show()
+				item:Lookup('Handle_InnerBorders'):Show()
+			end
+			-- 排序
+			local fromIndex, toIndex = handle:GetItemCount() - 1
+			if not nPriority then
+				for i = 0, fromIndex - 1 do
+					local item = handle:Lookup(i)
+					if item.nPriority and item.nPriority < 0 then
+						toIndex = i
+						break
+					end
+				end
+			elseif nPriority >= 0 then
+				for i = 0, fromIndex - 1 do
+					local item = handle:Lookup(i)
+					if not item.nPriority or item.nPriority < 0 or nPriority < item.nPriority then
+						toIndex = i
+						break
+					end
+				end
+			else
+				for i = 0, fromIndex - 1 do
+					local item = handle:Lookup(i)
+					if item.nPriority and item.nPriority < 0 and nPriority > item.nPriority then
+						toIndex = i
+						break
+					end
+				end
+			end
+			if toIndex then
+				for i = fromIndex, toIndex + 1, -1 do
+					handle:ExchangeItemIndex(i, i - 1)
+				end
+			end
+			item.nPriority = nPriority
+			-- 文字大小
+			local szName, icon = MY.GetBuffName(data.dwID, data.nLevelEx)
+			if data.nIcon and tonumber(data.nIcon) then
+				icon = data.nIcon
+			end
+			item.szName = szName
+			local box = item:Lookup('Box')
+			box:SetObject(UI_OBJECT_NOT_NEED_KNOWN, data.dwID, data.nLevelEx)
+			box:SetObjectIcon(icon)
+			box:SetObjectStaring(CFG.bStaring)
+			local fScale = 1
+			if CFG.bAutoBuffSize then
+				if CFG.fScaleY > 1 then
+					fScale = CFG.fScaleY
+				end
+				fScale = fScale * 0.8 -- INI画大了不好调 这里调整下吧
+			else
+				fScale = CFG.fBuffScale
+			end
+			item:Scale(fScale, fScale)
+			local txtTime = item:Lookup('Text_Time')
+			local fFontScale = fScale * 0.9 / (1 + Font.GetOffset() * 0.07)
+			txtTime:SetFontScale(fFontScale * (item:GetH() / txtTime:GetH()) * 0.6)
+			local txtStackNum = item:Lookup('Text_StackNum')
+			txtStackNum:SetFontScale(fFontScale * (item:GetH() / txtStackNum:GetH()) * 0.55)
+			txtStackNum:SetFontColor(255, 255, 255)
+			local txtReminder = item:Lookup('Text_Reminder')
+			txtReminder:SetText(data.szReminder)
+			txtReminder:SetVisible(CFG.bShowBuffReminder)
+			txtReminder:SetFontScale(fFontScale * (item:GetH() / txtReminder:GetH()) * 0.6)
+			txtReminder:SetFontColor(r or 255, g or 255, b or 255)
+			handle:FormatAllItemPos()
+		end
+		-- revise
+		if item then
+			-- update data
+			item.dwID = KBuff.dwID
+			item.nLevel = KBuff.nLevel
+			item.nEndFrame = nEndFrame
+			item.nStackNum = nStackNum
+			-- buff time
+			local txtTime = item:Lookup('Text_Time')
+			if CFG.bShowBuffTime then
+				local nTime, r, g, b = GetEndTime(nEndFrame)
+				if nTime <= 5 then
+					if nTime >= 0 then
+						r, g, b = 255, 0, 0
+					end
+				elseif nTime <= 30 then
+					r, g, b = 255, 255, 0
+				end
+				if r and g and b then
+					txtTime:SetText(floor(nTime) .. '"')
+					txtTime:SetFontColor(r, g, b)
+				else
+					txtTime:SetText('')
+				end
+			end
+			txtTime:SetVisible(CFG.bShowBuffTime)
+			-- buff stack number
+			local txtStackNum = item:Lookup('Text_StackNum')
+			if CFG.bShowBuffNum and nStackNum > 1 then
+				txtStackNum:SetText(nStackNum)
+			else
+				txtStackNum:SetText('')
+			end
+			txtStackNum:SetVisible(CFG.bShowBuffNum)
+		end
+		-- update attention
+		if data.bAttention then
+			if not CTM_ATTENTION_BUFF[v] then
+				CTM_ATTENTION_BUFF[v] = {}
+			end
+			if not CTM_ATTENTION_STACK[v] then
+				CTM_ATTENTION_STACK[v] = {}
+			end
+			if not CTM_ATTENTION_BUFF[v][key] then
+				local rec = {
+					col = data.col or 'yellow',
+				}
+				CTM_ATTENTION_BUFF[v][key] = rec
+				insert(CTM_ATTENTION_STACK[v], 1, rec)
+			end
+		end
+		-- update caution
+		if data.bCaution then
+			if not CTM_CAUTION_BUFF[v] then
+				CTM_CAUTION_BUFF[v] = {}
+			end
+			CTM_CAUTION_BUFF[v][key] = true
+		end
+		-- update screen head
+		if data.bScreenHead then
+			if not CTM_SCREEN_HEAD[v] then
+				CTM_SCREEN_HEAD[v] = {}
+			end
+			if not CTM_SCREEN_HEAD[v][key] then
+				FireUIEvent('MY_SA_CREATE', KBuff.bCanCancel and 'BUFF' or 'DEBUFF', v, {
+					dwID = item.dwID,
+					col = data.col or 'yellow',
+					text = item.szName .. '_' .. p.szName,
+				})
+				CTM_SCREEN_HEAD[v][key] = true
+			end
+		end
+	else
+		if item then
+			handle:RemoveItem(item)
+			handle:FormatAllItemPos() -- 格式化buff的位置
+		end
+		local rec = CTM_ATTENTION_BUFF[v] and CTM_ATTENTION_BUFF[v][key]
+		if rec then
+			for i, vv in ipairs_r(CTM_ATTENTION_STACK[v]) do
+				if vv == rec then
+					remove(CTM_ATTENTION_STACK[v], i)
+					break
+				end
+			end
+			CTM_ATTENTION_BUFF[v][key] = nil
+		end
+		if CTM_CAUTION_BUFF[v] then
+			CTM_CAUTION_BUFF[v][key] = nil
+		end
+		if CTM_SCREEN_HEAD[v] then
+			CTM_SCREEN_HEAD[v][key] = nil
+		end
+	end
 end
 
 function CTM:RefreshBuff()
@@ -1444,233 +1653,16 @@ function CTM:RefreshBuff()
 		if CTM_CACHE[v] and CTM_CACHE[v]:IsValid() and p then
 			local handle = CTM_CACHE[v]:Lookup('Handle_Buff_Boxes')
 			for key, data in pairs(CTM_BUFF_CACHE) do
-				local KBuff = MY_GetBuff(p, data.dwID, data.nLevel)
+				local KBuff = MY_GetBuff(p, data.dwID, data.nLevel, data.bOnlySelf and me.dwID)
 				local item = handle:Lookup(key)
-				local nEndFrame, _, nStackNum
-				-- init check
 				if KBuff then
-					if not data.bOnlySelf then
-						nEndFrame, nStackNum = KBuff.GetEndTime(), KBuff.nStackNum
-					else
-						for kk, vv in ipairs(MY.GetBuffList(p)) do
-							if vv.dwID == data.dwID and vv.dwSkillSrcID == me.dwID and (data.nLevel == 0 or data.nLevel == vv.nLevel) then
-								nEndFrame, _, nStackNum = select(4, p.GetBuff(vv.nCount - 1))
-								break
-							end
-						end
-					end
-				end
-				if nStackNum and data.nStackNum then
-					local szStackOp = data.szStackOp or '>='
-					if (szStackOp == '=' and nStackNum ~= data.nStackNum)
-					or (szStackOp == '!=' and nStackNum == data.nStackNum)
-					or (szStackOp == '<' and nStackNum >= data.nStackNum)
-					or (szStackOp == '<=' and nStackNum > data.nStackNum)
-					or (szStackOp == '>' and nStackNum <= data.nStackNum)
-					or (szStackOp == '>=' and nStackNum < data.nStackNum)
-					then
-						nEndFrame = nil
-					end
-				end
-				if nEndFrame then
-					-- check priority
-					local nPriority = data.nPriority
-					if not nPriority then
-						if data.bCaution then
-							nPriority = 0
-						elseif data.bAttention then
-							nPriority = 1
-						end
-					end
-					if nPriority and handle:GetItemCount() == CFG.nMaxShowBuff then
-						local item = handle:Lookup(CFG.nMaxShowBuff - 1)
-						if not item.nPriority or nPriority < item.nPriority then
-							handle:RemoveItem(item)
-						end
-					end
-					-- create
-					if not item and handle:GetItemCount() <= CFG.nMaxShowBuff then
-						item = handle:AppendItemFromData(Cataclysm_Main.GetFrame().hBuff, key)
-						item.bBuff = true
-						-- 描边
-						local r, g, b, a
-						if data.col then
-							r, g, b, a = MY.HumanColor2RGB(data.col)
-						end
-						if not data.col then
-							item:Lookup('Handle_RbgBorders'):Hide()
-							item:Lookup('Handle_InnerBorders'):Hide()
-						else
-							local hSha, sha = item:Lookup('Handle_RbgBorders')
-							for i = 0, hSha:GetItemCount() - 1 do
-								sha = hSha:Lookup(i)
-								sha:SetAlpha(a or data.nColAlpha or 192)
-								sha:SetColorRGB(r or 255, g or 255, b or 0)
-							end
-							item:Lookup('Handle_RbgBorders'):Show()
-							item:Lookup('Handle_InnerBorders'):Show()
-						end
-						-- 排序
-						local fromIndex, toIndex = handle:GetItemCount() - 1
-						if not nPriority then
-							for i = 0, fromIndex - 1 do
-								local item = handle:Lookup(i)
-								if item.nPriority and item.nPriority < 0 then
-									toIndex = i
-									break
-								end
-							end
-						elseif nPriority >= 0 then
-							for i = 0, fromIndex - 1 do
-								local item = handle:Lookup(i)
-								if not item.nPriority or item.nPriority < 0 or nPriority < item.nPriority then
-									toIndex = i
-									break
-								end
-							end
-						else
-							for i = 0, fromIndex - 1 do
-								local item = handle:Lookup(i)
-								if item.nPriority and item.nPriority < 0 and nPriority > item.nPriority then
-									toIndex = i
-									break
-								end
-							end
-						end
-						if toIndex then
-							for i = fromIndex, toIndex + 1, -1 do
-								handle:ExchangeItemIndex(i, i - 1)
-							end
-						end
-						item.nPriority = nPriority
-						-- 文字大小
-						local szName, icon = MY.GetBuffName(data.dwID, data.nLevelEx)
-						if data.nIcon and tonumber(data.nIcon) then
-							icon = data.nIcon
-						end
-						item.szName = szName
-						local box = item:Lookup('Box')
-						box:SetObject(UI_OBJECT_NOT_NEED_KNOWN, data.dwID, data.nLevelEx)
-						box:SetObjectIcon(icon)
-						box:SetObjectStaring(CFG.bStaring)
-						local fScale = 1
-						if CFG.bAutoBuffSize then
-							if CFG.fScaleY > 1 then
-								fScale = CFG.fScaleY
-							end
-							fScale = fScale * 0.8 -- INI画大了不好调 这里调整下吧
-						else
-							fScale = CFG.fBuffScale
-						end
-						item:Scale(fScale, fScale)
-						local txtTime = item:Lookup('Text_Time')
-						local fFontScale = fScale * 0.9 / (1 + Font.GetOffset() * 0.07)
-						txtTime:SetFontScale(fFontScale * (item:GetH() / txtTime:GetH()) * 0.6)
-						local txtStackNum = item:Lookup('Text_StackNum')
-						txtStackNum:SetFontScale(fFontScale * (item:GetH() / txtStackNum:GetH()) * 0.55)
-						txtStackNum:SetFontColor(255, 255, 255)
-						local txtReminder = item:Lookup('Text_Reminder')
-						txtReminder:SetText(data.szReminder)
-						txtReminder:SetVisible(CFG.bShowBuffReminder)
-						txtReminder:SetFontScale(fFontScale * (item:GetH() / txtReminder:GetH()) * 0.6)
-						txtReminder:SetFontColor(r or 255, g or 255, b or 255)
-						handle:FormatAllItemPos()
-					end
-					-- revise
-					if item then
-						-- update data
-						item.dwID = KBuff.dwID
-						item.nLevel = KBuff.nLevel
-						item.nEndFrame = nEndFrame
-						item.nStackNum = nStackNum
-						-- buff time
-						local txtTime = item:Lookup('Text_Time')
-						if CFG.bShowBuffTime then
-							local nTime, r, g, b = GetEndTime(nEndFrame)
-							if nTime <= 5 then
-								if nTime >= 0 then
-									r, g, b = 255, 0, 0
-								end
-							elseif nTime <= 30 then
-								r, g, b = 255, 255, 0
-							end
-							if r and g and b then
-								txtTime:SetText(floor(nTime) .. '"')
-								txtTime:SetFontColor(r, g, b)
-							else
-								txtTime:SetText('')
-							end
-						end
-						txtTime:SetVisible(CFG.bShowBuffTime)
-						-- buff stack number
-						local txtStackNum = item:Lookup('Text_StackNum')
-						if CFG.bShowBuffNum and nStackNum > 1 then
-							txtStackNum:SetText(nStackNum)
-						else
-							txtStackNum:SetText('')
-						end
-						txtStackNum:SetVisible(CFG.bShowBuffNum)
-					end
-					-- update attention
-					if data.bAttention then
-						if not CTM_ATTENTION_BUFF[v] then
-							CTM_ATTENTION_BUFF[v] = {}
-						end
-						if not CTM_ATTENTION_STACK[v] then
-							CTM_ATTENTION_STACK[v] = {}
-						end
-						if not CTM_ATTENTION_BUFF[v][key] then
-							local rec = {
-								col = data.col or 'yellow',
-							}
-							CTM_ATTENTION_BUFF[v][key] = rec
-							insert(CTM_ATTENTION_STACK[v], 1, rec)
-						end
-					end
-					-- update caution
-					if data.bCaution then
-						if not CTM_CAUTION_BUFF[v] then
-							CTM_CAUTION_BUFF[v] = {}
-						end
-						CTM_CAUTION_BUFF[v][key] = true
-					end
-					-- update screen head
-					if data.bScreenHead then
-						if not CTM_SCREEN_HEAD[v] then
-							CTM_SCREEN_HEAD[v] = {}
-						end
-						if not CTM_SCREEN_HEAD[v][key] then
-							FireUIEvent('MY_SA_CREATE', KBuff.bCanCancel and 'BUFF' or 'DEBUFF', v, {
-								dwID = item.dwID,
-								col = data.col or 'yellow',
-								text = item.szName .. '_' .. p.szName,
-							})
-							CTM_SCREEN_HEAD[v][key] = true
-						end
+					if KBuff.nStackNum and data.nStackNum
+					and not MY.JudgeOperator(data.szStackOp or '>=', KBuff.nStackNum, data.nStackNum) then
+						KBuff = nil
 					end
 					tCheck[key] = true
-				else
-					if item then
-						handle:RemoveItem(item)
-						handle:FormatAllItemPos() -- 格式化buff的位置
-					end
-					local rec = CTM_ATTENTION_BUFF[v] and CTM_ATTENTION_BUFF[v][key]
-					if rec then
-						for i, vv in ipairs_r(CTM_ATTENTION_STACK[v]) do
-							if vv == rec then
-								remove(CTM_ATTENTION_STACK[v], i)
-								break
-							end
-						end
-						CTM_ATTENTION_BUFF[v][key] = nil
-					end
-					if CTM_CAUTION_BUFF[v] then
-						CTM_CAUTION_BUFF[v][key] = nil
-					end
-					if CTM_SCREEN_HEAD[v] then
-						CTM_SCREEN_HEAD[v][key] = nil
-					end
 				end
+				D.UpdateCharaterBuff(p, handle, key, data, KBuff)
 			end
 		elseif CTM_CACHE[v] and CTM_CACHE[v]:IsValid() then
 			local handle = CTM_CACHE[v]:Lookup('Handle_Buff_Boxes')
