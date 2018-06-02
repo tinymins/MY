@@ -1443,6 +1443,7 @@ function CTM:ClearBuff(dwMemberID)
 end
 
 function D.UpdateCharaterBuff(p, handle, key, data, KBuff)
+	local dwCharID = p.dwID
 	local item = handle:Lookup(key)
 	if KBuff then
 		local nEndFrame, nStackNum = KBuff.GetEndTime(), KBuff.nStackNum
@@ -1586,39 +1587,39 @@ function D.UpdateCharaterBuff(p, handle, key, data, KBuff)
 		end
 		-- update attention
 		if data.bAttention then
-			if not CTM_ATTENTION_BUFF[v] then
-				CTM_ATTENTION_BUFF[v] = {}
+			if not CTM_ATTENTION_BUFF[dwCharID] then
+				CTM_ATTENTION_BUFF[dwCharID] = {}
 			end
-			if not CTM_ATTENTION_STACK[v] then
-				CTM_ATTENTION_STACK[v] = {}
+			if not CTM_ATTENTION_STACK[dwCharID] then
+				CTM_ATTENTION_STACK[dwCharID] = {}
 			end
-			if not CTM_ATTENTION_BUFF[v][key] then
+			if not CTM_ATTENTION_BUFF[dwCharID][key] then
 				local rec = {
 					col = data.col or 'yellow',
 				}
-				CTM_ATTENTION_BUFF[v][key] = rec
-				insert(CTM_ATTENTION_STACK[v], 1, rec)
+				CTM_ATTENTION_BUFF[dwCharID][key] = rec
+				insert(CTM_ATTENTION_STACK[dwCharID], 1, rec)
 			end
 		end
 		-- update caution
 		if data.bCaution then
-			if not CTM_CAUTION_BUFF[v] then
-				CTM_CAUTION_BUFF[v] = {}
+			if not CTM_CAUTION_BUFF[dwCharID] then
+				CTM_CAUTION_BUFF[dwCharID] = {}
 			end
-			CTM_CAUTION_BUFF[v][key] = true
+			CTM_CAUTION_BUFF[dwCharID][key] = true
 		end
 		-- update screen head
 		if data.bScreenHead then
-			if not CTM_SCREEN_HEAD[v] then
-				CTM_SCREEN_HEAD[v] = {}
+			if not CTM_SCREEN_HEAD[dwCharID] then
+				CTM_SCREEN_HEAD[dwCharID] = {}
 			end
-			if not CTM_SCREEN_HEAD[v][key] then
-				FireUIEvent('MY_SA_CREATE', KBuff.bCanCancel and 'BUFF' or 'DEBUFF', v, {
+			if not CTM_SCREEN_HEAD[dwCharID][key] then
+				FireUIEvent('MY_SA_CREATE', KBuff.bCanCancel and 'BUFF' or 'DEBUFF', dwCharID, {
 					dwID = item.dwID,
 					col = data.col or 'yellow',
 					text = item.szName .. '_' .. p.szName,
 				})
-				CTM_SCREEN_HEAD[v][key] = true
+				CTM_SCREEN_HEAD[dwCharID][key] = true
 			end
 		end
 	else
@@ -1626,21 +1627,21 @@ function D.UpdateCharaterBuff(p, handle, key, data, KBuff)
 			handle:RemoveItem(item)
 			handle:FormatAllItemPos() -- 格式化buff的位置
 		end
-		local rec = CTM_ATTENTION_BUFF[v] and CTM_ATTENTION_BUFF[v][key]
+		local rec = CTM_ATTENTION_BUFF[dwCharID] and CTM_ATTENTION_BUFF[dwCharID][key]
 		if rec then
-			for i, vv in ipairs_r(CTM_ATTENTION_STACK[v]) do
+			for i, vv in ipairs_r(CTM_ATTENTION_STACK[dwCharID]) do
 				if vv == rec then
-					remove(CTM_ATTENTION_STACK[v], i)
+					remove(CTM_ATTENTION_STACK[dwCharID], i)
 					break
 				end
 			end
-			CTM_ATTENTION_BUFF[v][key] = nil
+			CTM_ATTENTION_BUFF[dwCharID][key] = nil
 		end
-		if CTM_CAUTION_BUFF[v] then
-			CTM_CAUTION_BUFF[v][key] = nil
+		if CTM_CAUTION_BUFF[dwCharID] then
+			CTM_CAUTION_BUFF[dwCharID][key] = nil
 		end
-		if CTM_SCREEN_HEAD[v] then
-			CTM_SCREEN_HEAD[v][key] = nil
+		if CTM_SCREEN_HEAD[dwCharID] then
+			CTM_SCREEN_HEAD[dwCharID][key] = nil
 		end
 	end
 end
