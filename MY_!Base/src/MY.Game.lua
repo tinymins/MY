@@ -1817,14 +1817,34 @@ function MY.Game.GetBuff(KObject, dwID, nLevel, dwSkillSrcID)
 		end
 	end
 	if IsNumber(dwSkillSrcID) and dwSkillSrcID > 0 then
-		if not KObject.GetBuffByOwner then
-			return MY.Debug({'KObject do not have a function named GetBuffByOwner.'}, 'MY.Game.GetBuff', MY_DEBUG.ERROR)
-		end
-		for k, v in pairs(tBuff) do
-			local KBuff = KObject.GetBuffByOwner(k, v, dwSkillSrcID)
-			if KBuff then
-				return KBuff
+		if KObject.GetBuffByOwner then
+			for k, v in pairs(tBuff) do
+				local KBuff = KObject.GetBuffByOwner(k, v, dwSkillSrcID)
+				if KBuff then
+					return KBuff
+				end
 			end
+		else
+			if not KObject.GetBuff then
+				return MY.Debug({'KObject neither has a function named GetBuffByOwner nor named GetBuff.'}, 'MY.Game.GetBuff', MY_DEBUG.ERROR)
+			end
+			for _, buff in ipairs(MY.GetBuffList(KObject)) do
+				if (tBuff[buff.dwID] == buff.nLevel or tBuff[buff.dwID] == 0) and buff.dwSkillSrcID == dwSkillSrcID then
+					return {
+						dwID         = buff.dwID        ,
+						nLevel       = buff.nLevel      ,
+						bCanCancel   = buff.bCanCancel  ,
+						nEndFrame    = buff.nEndFrame   ,
+						nIndex       = buff.nIndex      ,
+						nStackNum    = buff.nStackNum   ,
+						dwSkillSrcID = buff.dwSkillSrcID,
+						bValid       = buff.bValid      ,
+						nCount       = buff.nCount      ,
+						GetEndTime = function() return buff.nEndFrame end,
+					}
+				end
+			end
+			-- return MY.Debug({'KObject do not have a function named GetBuffByOwner.'}, 'MY.Game.GetBuff', MY_DEBUG.ERROR)
 		end
 	else
 		if not KObject.GetBuff then
