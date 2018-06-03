@@ -215,7 +215,6 @@ function MY.String.SimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIg
 		szText = StringLowerW(szText)
 	end
 	if not bDistinctEnEm then
-		szFind = StringEnerW(szFind)
 		szText = StringEnerW(szText)
 	end
 	if bIgnoreSpace then
@@ -238,12 +237,19 @@ function MY.String.SimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIg
 	local tFind = m_simpleMatchCache[szFind]
 	if not tFind then
 		tFind = {}
-		for _, szKeyWordsLine in ipairs(MY.String.Split(szFind, ';', true)) do
+		for _, szKeywordsLine in ipairs(MY.String.Split(szFind, ';', true)) do
 			local tKeyWordsLine = {}
-			for _, szKeyWords in ipairs(MY.String.Split(szKeyWordsLine, ',', true)) do
+			for _, szKeywords in ipairs(MY.String.Split(szKeywordsLine, ',', true)) do
 				local tKeyWords = {}
-				for _, szKeyWord in ipairs(MY.String.Split(szKeyWords, '|', true)) do
-					tinsert(tKeyWords, szKeyWord)
+				for _, szKeyword in ipairs(MY.String.Split(szKeywords, '|', true)) do
+					local bNegative = szKeyword:sub(1, 1) == '!'
+					if bNegative then
+						szKeyword = szKeyword:sub(2)
+					end
+					if not bDistinctEnEm then
+						szKeyword = StringEnerW(szKeyword)
+					end
+					tinsert(tKeyWords, { szKeyword = szKeyword, bNegative = bNegative })
 				end
 				tinsert(tKeyWordsLine, tKeyWords)
 			end
@@ -259,15 +265,14 @@ function MY.String.SimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIg
 		for _, tKeyWords in ipairs(tKeyWordsLine) do -- 必须全部符合
 			-- 10|十人
 			local bKeyWord = false
-			for _, szKeyWord in ipairs(tKeyWords) do  -- 符合一个即可
-				-- szKeyWord = MY.String.PatternEscape(szKeyWord) -- 用了wstring还Escape个捷豹
-				if szKeyWord:sub(1, 1) == '!' then              -- !小铁被吃了
-					szKeyWord = szKeyWord:sub(2)
-					if not wstring.find(szText, szKeyWord) then
+			for _, info in ipairs(tKeyWords) do      -- 符合一个即可
+				-- szKeyword = MY.String.PatternEscape(szKeyword) -- 用了wstring还Escape个捷豹
+				if info.bNegative then               -- !小铁被吃了
+					if not wstring.find(szText, info.szKeyword) then
 						bKeyWord = true
 					end
 				else                                                    -- 十人   -- 10
-					if wstring.find(szText, szKeyWord) then
+					if wstring.find(szText, info.szKeyword) then
 						bKeyWord = true
 					end
 				end
@@ -287,3 +292,4 @@ function MY.String.SimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIg
 	end
 	return bKeyWordsLine
 end
+MY.StringSimpleMatch = MY.String.SimpleMatch
