@@ -1654,7 +1654,9 @@ function CTM:RefreshBuff()
 		if CTM_CACHE[v] and CTM_CACHE[v]:IsValid() and p then
 			local handle = CTM_CACHE[v]:Lookup('Handle_Buff_Boxes')
 			for key, data in pairs(CTM_BUFF_CACHE) do
-				local KBuff = MY_GetBuff(p, data.dwID, data.nLevel, data.bOnlySelf and me.dwID)
+				local KBuff = (not data.bOnlyMe or p.dwID == me.dwID)
+					and MY_GetBuff(p, data.dwID, data.nLevel, data.bOnlyMine and me.dwID)
+					or nil
 				local item = handle:Lookup(key)
 				if KBuff then
 					if KBuff.nStackNum and data.nStackNum

@@ -82,7 +82,8 @@ local function InsertBuffListCache(aBuffList)
 						if (not tab.nLevel or p.nLevel == tab.nLevel)
 						and (not tab.szStackOp or p.szStackOp == tab.szStackOp)
 						and (not tab.nStackNum or p.nStackNum == tab.nStackNum)
-						and (not tab.bOnlySelf or p.bOnlySelf == tab.bOnlySelf) then
+						and (not tab.bOnlyMe or p.bOnlyMe == tab.bOnlyMe)
+						and (not tab.bOnlyMine or p.bOnlyMine == tab.bOnlyMine) then
 							remove(aList, i)
 						end
 					end
@@ -564,11 +565,11 @@ local function RecBuffWithTabs(tabs, dwOwnerID, dwBuffID, dwSrcID)
 		return
 	end
 	for _, tab in ipairs(tabs) do
-		if not tab.bOnlySelf or dwSrcID == UI_GetClientPlayerID() then
+		if not tab.bOnlyMine or dwSrcID == UI_GetClientPlayerID() then
 			Grid_CTM:RecBuff(dwOwnerID, setmetatable({
 				dwID      = dwBuffID,
 				nLevel    = tab.nLevel or 0,
-				bOnlySelf = tab.bOnlySelf or tab.bSelf,
+				bOnlyMine = tab.bOnlyMine or tab.bOnlySelf or tab.bSelf,
 			}, { __index = tab }))
 		end
 	end
@@ -2067,8 +2068,11 @@ local function GetListText(aBuffList)
 		if v.nStackNum then
 			insert(a, 'sn' .. (v.szStackOp or '>=') .. v.nStackNum)
 		end
-		if v.bOnlySelf or v.bSelf then
-			insert(a, 'self')
+		if v.bOnlyMe then
+			insert(a, 'me')
+		end
+		if v.bOnlyMine or v.bOnlySelf or v.bSelf then
+			insert(a, 'mine')
 		end
 		a = { concat(a, '|') }
 
@@ -2120,8 +2124,8 @@ local function GetTextList(szText)
 								if not tab.dwID then
 									tab.szName = v
 								end
-							elseif v == 'self' then
-								tab.bOnlySelf = true
+							elseif v == 'self' or v == 'mine' then
+								tab.bOnlyMine = true
 							elseif v:sub(1, 2) == 'lv' then
 								tab.nLevel = tonumber((v:sub(3)))
 							elseif v:sub(1, 2) == 'sn' then
@@ -2229,6 +2233,7 @@ function OpenBuffEditPanel(rec)
 		end,
 	}, true):width() + 5
 	y = y + 30
+	y = y + 10
 
 	x = X
 	x = x + ui:append('Text', {
@@ -2279,16 +2284,27 @@ function OpenBuffEditPanel(rec)
 			update()
 		end,
 	}, true):width() + 10
-	x = x + ui:append('WndCheckBox', {
-		x = x, y = y,
-		text = _L['Only self'],
-		checked = rec.bOnlySelf,
+
+	ui:append('WndCheckBox', {
+		x = x, y = y - 10,
+		text = _L['Only mine'],
+		checked = rec.bOnlyMine,
 		oncheck = function(bChecked)
-			rec.bOnlySelf = bChecked
+			rec.bOnlyMine = bChecked
 			update()
 		end,
-	}, true):autoWidth():width() + 5
+	}, true):autoWidth()
+	ui:append('WndCheckBox', {
+		x = x, y = y + 10,
+		text = _L['Only me'],
+		checked = rec.bOnlyMe,
+		oncheck = function(bChecked)
+			rec.bOnlyMe = bChecked
+			update()
+		end,
+	}, true):autoWidth()
 	y = y + 30
+	y = y + 10
 
 	x = X
 	y = y + 10
@@ -2419,8 +2435,9 @@ function OpenBuffEditPanel(rec)
 		autoenable = function() return not rec.bDelete end,
 	}, true):autoWidth():width() + 5
 
+	y = y + 50
 	ui:append('WndButton2', {
-		x = (w - 120) / 2, y = h - 50, w = 120,
+		x = (w - 120) / 2, y = y, w = 120,
 		text = _L['Delete'], color = {223, 63, 95},
 		onclick = function()
 			local function fnAction()
@@ -2443,6 +2460,10 @@ function OpenBuffEditPanel(rec)
 			end
 		end,
 	}, true)
+	y = y + 30
+
+	h = y + 15
+	ui:height(h)
 end
 
 function PS.OnPanelActive(frame)
