@@ -29,9 +29,9 @@ local IsNil, IsNumber, IsFunction = MY.IsNil, MY.IsNumber, MY.IsFunction
 local IsBoolean, IsString, IsTable = MY.IsBoolean, MY.IsString, MY.IsTable
 -----------------------------------------------------------------------------------------
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Focus/lang/')
+local _L, D = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Focus/lang/'), {}
+local TEMP_TARGET_TYPE, TEMP_TARGET_ID
 local l_dwLockType, l_dwLockID, l_lockInDisplay
-local D = {}
 
 function D.Scale(frame)
 	if frame.fScaleX and frame.fScaleY then
@@ -448,8 +448,8 @@ function MY_Focus.OnItemMouseEnter()
 	if name == 'Handle_Info' then
 		this:Lookup('Image_Hover'):Show()
 		if MY_Focus.bHealHelper then
-			this.dwLastType, this.dwLastID = MY.GetTarget()
-			MY_Focus.OnItemLButtonClick()
+			TEMP_TARGET_TYPE, TEMP_TARGET_ID = MY.GetTarget()
+			SetTarget(this.dwType, this.dwID)
 		end
 	end
 end
@@ -458,11 +458,11 @@ function MY_Focus.OnItemMouseLeave()
 	local name = this:GetName()
 	if name == 'Handle_Info' then
 		if this:Lookup('Image_Hover') then
-			this:Lookup('Image_Hover'):Hide()
-			if MY_Focus.bHealHelper then
-				MY.SetTarget(this.dwLastType, this.dwLastID)
-				this.dwLastType, this.dwLastID = nil
+			if MY_Focus.bHealHelper and TEMP_TARGET_TYPE and TEMP_TARGET_ID then
+				MY.SetTarget(TEMP_TARGET_TYPE, TEMP_TARGET_ID)
+				TEMP_TARGET_TYPE, TEMP_TARGET_ID = nil
 			end
+			this:Lookup('Image_Hover'):Hide()
 		end
 	end
 end
@@ -471,7 +471,7 @@ function MY_Focus.OnItemLButtonClick()
 	local name = this:GetName()
 	if name == 'Handle_Info' then
 		if MY_Focus.bHealHelper then
-			this.dwLastType, this.dwLastID = this.dwType, this.dwID
+			TEMP_TARGET_TYPE, TEMP_TARGET_ID = nil
 		end
 		SetTarget(this.dwType, this.dwID)
 	end
