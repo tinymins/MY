@@ -51,7 +51,7 @@ MY_Focus.bFocusEnemy        = false -- 焦点敌对玩家
 MY_Focus.bAutoHide          = true  -- 无焦点时隐藏
 MY_Focus.nMaxDisplay        = 5     -- 最大显示数量
 MY_Focus.bAutoFocus         = true  -- 启用默认焦点
-MY_Focus.bEmbededFocus      = true  -- 启用内嵌默认焦点
+MY_Focus.bEmbeddedFocus     = true  -- 启用内嵌默认焦点
 MY_Focus.bHideDeath         = false -- 隐藏死亡目标
 MY_Focus.bDisplayKungfuIcon = false -- 显示心法图标
 MY_Focus.bFocusJJCParty     = false -- 焦竞技场队友
@@ -63,7 +63,7 @@ MY_Focus.bHealHelper        = false -- 辅助治疗模式
 MY_Focus.bEnableSceneNavi   = false -- 场景追踪点
 MY_Focus.fScaleX            = 1     -- 缩放比例
 MY_Focus.fScaleY            = 1     -- 缩放比例
-MY_Focus.tEmbededFocus = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Focus/data/embeded/') or {}
+MY_Focus.tEmbeddedFocus = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Focus/data/embedded/') or {}
 MY_Focus.tAutoFocus = {}    -- 默认焦点
 MY_Focus.tFocusList = {     -- 永久焦点
 	[TARGET.PLAYER] = {},   -- dwID
@@ -82,7 +82,7 @@ RegisterCustomData('MY_Focus.bFocusEnemy')
 RegisterCustomData('MY_Focus.bAutoHide')
 RegisterCustomData('MY_Focus.nMaxDisplay')
 RegisterCustomData('MY_Focus.bAutoFocus')
-RegisterCustomData('MY_Focus.bEmbededFocus')
+RegisterCustomData('MY_Focus.bEmbeddedFocus')
 RegisterCustomData('MY_Focus.bHideDeath')
 RegisterCustomData('MY_Focus.bDisplayKungfuIcon')
 RegisterCustomData('MY_Focus.bFocusJJCParty')
@@ -319,8 +319,8 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 			end
 		end
 		-- 判断内嵌默认焦点
-		if not bFocus and MY_Focus.bEmbededFocus then
-			tRule = D.GetEligibleRule(MY_Focus.tEmbededFocus, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
+		if not bFocus and MY_Focus.bEmbeddedFocus then
+			tRule = D.GetEligibleRule(MY_Focus.tEmbeddedFocus, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
 			if tRule then
 				bFocus = true
 			end
@@ -511,11 +511,11 @@ end
 do
 local function onInit()
 	-- 内嵌默认焦点
-	if not MY_Focus.tEmbededFocus then
-		MY_Focus.tEmbededFocus = {}
+	if not MY_Focus.tEmbeddedFocus then
+		MY_Focus.tEmbeddedFocus = {}
 	end
-	for i, v in ipairs(MY_Focus.tEmbededFocus) do
-		MY_Focus.tEmbededFocus[i] = FormatAutoFocusData(v)
+	for i, v in ipairs(MY_Focus.tEmbeddedFocus) do
+		MY_Focus.tEmbeddedFocus[i] = FormatAutoFocusData(v)
 	end
 	-- 用户自定义默认焦点
 	if not MY_Focus.tAutoFocus then
