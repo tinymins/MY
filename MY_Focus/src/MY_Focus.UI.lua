@@ -309,9 +309,11 @@ function D.UpdateItem(hItem, p)
 end
 
 -- 更新列表
+local NAVIGATOR_CACHE = {}
 function D.UpdateList(frame)
 	l_lockInDisplay = false
 	local nCount = 0
+	local tKeep = {}
 	local hList = frame:Lookup('', 'Handle_List')
 	local aList = MY_Focus.GetDisplayList()
 	for i = 1, hList:GetItemCount() do
@@ -322,6 +324,13 @@ function D.UpdateList(frame)
 				hItem:Show()
 			end
 			D.UpdateItem(hItem, p)
+			if MY_Focus.bEnableSceneNavi and Navigator_SetID then
+				local szKey = 'MY_FOCUS.' .. p.dwType .. '_' .. p.dwID
+				if not NAVIGATOR_CACHE[szKey] then
+					Navigator_SetID(szKey, p.dwType, p.dwID, p.tRule and p.tRule.szDisplay ~= '' and p.tRule.szDisplay or p.szName)
+				end
+				tKeep[szKey] = true
+			end
 			nCount = nCount + 1
 		elseif hItem:IsVisible() then
 			hItem:Hide()
@@ -331,6 +340,14 @@ function D.UpdateList(frame)
 		D.AutosizeUI(frame)
 		frame.nCount = nCount
 	end
+	if Navigator_Remove then
+		for szKey, _ in pairs(NAVIGATOR_CACHE) do
+			if not tKeep[szKey] then
+				Navigator_Remove(szKey)
+			end
+		end
+	end
+	NAVIGATOR_CACHE = tKeep
 end
 
 -- ########################################################################## --
@@ -381,6 +398,15 @@ function MY_Focus.OnFrameCreate()
 	D.CreateList(this)
 	MY_Focus.OnEvent('UI_SCALED')
 	MY_Focus.RescanNearby()
+end
+
+function MY_Focus.OnFrameDestroy()
+	if Navigator_Remove then
+		for szKey, _ in pairs(NAVIGATOR_CACHE) do
+			Navigator_Remove(szKey)
+		end
+		NAVIGATOR_CACHE = {}
+	end
 end
 
 function MY_Focus.OnEvent(event)

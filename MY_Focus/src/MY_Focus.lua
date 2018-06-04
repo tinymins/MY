@@ -219,9 +219,6 @@ end
 
 -- 清空焦点列表
 function MY_Focus.ClearFocus()
-	if Navigator_Remove then
-		Navigator_Remove('MY_FOCUS')
-	end
 	FOCUS_LIST = {}
 	FireUIEvent('MY_FOCUS_UPDATE')
 end
@@ -417,9 +414,6 @@ function D.OnSetFocus(dwType, dwID, szName, tRule)
 		table.insert(FOCUS_LIST, {dwType = dwType, dwID = dwID, szName = szName, tRule = tRule})
 		nIndex = #FOCUS_LIST
 	end
-	if MY_Focus.bEnableSceneNavi and Navigator_SetID then
-		Navigator_SetID('MY_FOCUS.' .. dwType .. '_' .. dwID, dwType, dwID, szName)
-	end
 	FireUIEvent('MY_FOCUS_UPDATE')
 end
 
@@ -432,9 +426,6 @@ function D.OnRemoveFocus(dwType, dwID)
 			table.remove(FOCUS_LIST, i)
 			break
 		end
-	end
-	if MY_Focus.bEnableSceneNavi and Navigator_Remove then
-		Navigator_Remove('MY_FOCUS.' .. dwType .. '_' .. dwID)
 	end
 	FireUIEvent('MY_FOCUS_UPDATE')
 end
