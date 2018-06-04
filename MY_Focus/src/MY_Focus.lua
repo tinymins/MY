@@ -115,6 +115,7 @@ local function FormatAutoFocusData(data)
 			szOperator = '>',
 			nValue = 0,
 		},
+		nMaxDistance = 0,
 	}
 	return MY.FormatDataStructure(data, ds)
 end
@@ -246,7 +247,7 @@ end
 
 function D.GetEligibleRule(tRules, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
 	for _, v in ipairs(tRules) do
-		if (v.tType.all or v.tType[dwType])
+		if (v.tType.bAll or v.tType[dwType])
 		and (v.dwMapID == -1 or v.dwMapID == dwMapID)
 		and (
 			(v.szMethod == 'NAME' and v.szPattern == szName)
@@ -464,7 +465,8 @@ end
 -- 获取当前显示的焦点列表
 function MY_Focus.GetDisplayList()
 	local t = {}
-	if not MY_Focus.IsShielded() then
+	local me = GetClientPlayer()
+	if not MY_Focus.IsShielded() and me then
 		for _, p in ipairs(FOCUS_LIST) do
 			if #t >= MY_Focus.nMaxDisplay then
 				break
@@ -476,8 +478,10 @@ function MY_Focus.GetDisplayList()
 				or (p.dwType == TARGET.DOODAD and KObject.nKind == DOODAD_KIND.CORPSE)
 			))
 			and (
-				not p.tRule or not p.tRule.tLife.bEnable
-				or MY.JudgeOperator(p.tRule.tLife.szOperator, KObject.nCurrentLife / KObject.nMaxLife * 100, p.tRule.tLife.nValue)
+				not p.tRule or (
+					(not p.tRule.tLife.bEnable or MY.JudgeOperator(p.tRule.tLife.szOperator, KObject.nCurrentLife / KObject.nMaxLife * 100, p.tRule.tLife.nValue))
+					and (p.tRule.nMaxDistance == 0 or (p.tRule.nMaxDistance * 64) ^ 2 > (me.nX - KObject.nX) ^ 2 + (me.nY - KObject.nY) ^ 2)
+				)
 			) then
 				table.insert(t, p)
 			end

@@ -175,6 +175,23 @@ function PS.OnPanelActive(wnd)
 			},
 		}
 		insert(t, t1)
+		-- ◊Ó‘∂æ‡¿Î
+		local t1 = {
+			szOption = _L['Max distance'],
+			fnMouseEnter = function()
+				if tData.nMaxDistance == 0 then
+					return
+				end
+				OutputTip(GetFormatText(tData.nMaxDistance .. g_tStrings.STR_METER , nil, 255, 255, 0), 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
+			end,
+			fnAction = function()
+				GetUserInput(_L['Please input max distance, leave blank to disable:'], function(val)
+					tData.nMaxDistance = tonumber(val) or 0
+					MY_Focus.RescanNearby()
+				end, nil, function() return not MY.IsPanelVisible() end, nil, tData.szDisplay)
+			end,
+		}
+		insert(t, t1)
 		-- √˚≥∆œ‘ æ
 		local t1 = {
 			szOption = _L['Name display'],

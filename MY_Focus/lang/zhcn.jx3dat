@@ -62,5 +62,7 @@ data = {
     ['Operator'] = '运算符',
     ['Value'] = '数值',
     ['Name display'] = '名称显示',
+    ['Max distance'] = '最大距离',
+    ['Please input max distance, leave blank to disable:'] = '请输入最大距离（尺），留空禁用距离限制：',
     ['Please input display name, leave blank to use its own name:'] = '请输入显示名称，留空显示目标默认名称：',
 }
