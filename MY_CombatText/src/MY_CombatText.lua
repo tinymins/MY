@@ -1162,7 +1162,7 @@ end
 MY.RegisterPanel('MY_CombatText', _L['CombatText'], _L['System'], 2041, {255, 255, 0}, PS)
 
 local function GetPlayerID()
-	local me = GetClientPlayer()
+	local me = GetControlPlayer()
 	if me then
 		COMBAT_TEXT_PLAYERID = me.dwID
 		-- MY.Debug('CombatText get player id ' .. me.dwID, MY_DEBUG.LOG)
@@ -1172,6 +1172,8 @@ local function GetPlayerID()
 	end
 end
 MY.RegisterEvent('LOADING_END.MY_CombatText', GetPlayerID) -- 很重要的优化
+MY.RegisterEvent('ON_NEW_PROXY_SKILL_LIST_NOTIFY.MY_CombatText', GetPlayerID) -- 长歌控制主体ID切换
+MY.RegisterEvent('ON_CLEAR_PROXY_SKILL_LIST_NOTIFY.MY_CombatText', GetPlayerID) -- 长歌控制主体ID切换
 MY.RegisterEvent('ON_PVP_SHOW_SELECT_PLAYER.MY_CombatText', function()
 	COMBAT_TEXT_PLAYERID = arg0
 end)
