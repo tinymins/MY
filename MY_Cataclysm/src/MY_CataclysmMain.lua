@@ -767,6 +767,7 @@ function Cataclysm_Main.OnEvent(szEvent)
 		CreateControlBar()
 	elseif szEvent == 'UI_SCALED' then
 		UpdateAnchor(this)
+		Grid_CTM:RefreshSFX()
 		Grid_CTM:AutoLinkAllPanel()
 	elseif szEvent == 'LOADING_END' then -- ÎðÉ¾
 		ReloadCataclysmPanel()
