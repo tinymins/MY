@@ -36,7 +36,7 @@ function MY_AutoChat.GetName(dwType, dwID)
 		return _L['Common'], _L['Common']
 	else
 		local szMap  = _L['Common']
-		local szName = MY.GetObjectName(MY.GetObject(dwType, dwID)) or _L['Common']
+		local szName = MY.GetObjectName(MY.GetObject(dwType, dwID), 'never') or _L['Common']
 		if dwType ~= TARGET.ITEM then
 			szMap = Table_GetMapName(GetClientPlayer().GetMapID())
 		end

@@ -821,7 +821,7 @@ local function GetObjectKeyID(obj)
 	if IsPlayer(obj.dwID) then
 		return obj.dwID
 	end
-	local id = MY.GetObjectName(obj) or g_tStrings.STR_NAME_UNKNOWN
+	local id = MY.GetObjectName(obj, 'never') or g_tStrings.STR_NAME_UNKNOWN
 	if Data.bDistinctTargetID then
 		id = id .. '#' .. obj.dwID
 	end
@@ -860,8 +860,8 @@ end
 function _Cache.InitObjectData(data, obj, szChannel)
 	local id = GetObjectKeyID(obj)
 	if IsPlayer(obj.dwID) and not data.Namelist[id] then
-		data.Namelist[id]  = MY.Game.GetObjectName(obj) -- Ãû³Æ»º´æ
-		data.Forcelist[id] = obj.dwForceID or 0         -- ÊÆÁ¦»º´æ
+		data.Namelist[id]  = MY.GetObjectName(obj, 'never') -- Ãû³Æ»º´æ
+		data.Forcelist[id] = obj.dwForceID or 0           -- ÊÆÁ¦»º´æ
 	end
 
 	if not data[szChannel].Statistics[id] then

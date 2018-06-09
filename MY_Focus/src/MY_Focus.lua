@@ -170,7 +170,7 @@ function MY_Focus.RemoveFocusPattern(szPattern)
 			local p = FOCUS_LIST[i]
 			local KObject = MY.GetObject(p.dwType, p.dwID)
 			local dwTemplateID = p.dwType == TARGET.PLAYER and p.dwID or KObject.dwTemplateID
-			if KObject and MY.GetObjectName(KObject) == szPattern
+			if KObject and MY.GetObjectName(KObject, 'never') == szPattern
 			and not l_tTempFocusList[p.dwType][p.dwID]
 			and not MY_Focus.tFocusList[p.dwType][dwTemplateID] then
 				MY_Focus.OnObjectLeaveScene(p.dwType, p.dwID)
@@ -270,7 +270,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		return
 	end
 
-	local szName = MY.GetObjectName(KObject)
+	local szName = MY.GetObjectName(KObject, false)
 	-- 解决玩家刚进入视野时名字为空的问题
 	if (dwType == TARGET.PLAYER and not szName) or not me then -- 解决自身刚进入场景的时候的问题
 		MY.DelayCall(300, function()
@@ -394,7 +394,7 @@ function MY_Focus.OnObjectLeaveScene(dwType, dwID)
 			if MY_Focus.bFocusJJCParty
 			and KObject.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
 			and MY.IsInArena() and not (IsEnemy(UI_GetClientPlayerID(), dwID) and MY.IsShieldedVersion()) then
-				D.OnSetFocus(TARGET.PLAYER, KObject.dwEmployer, MY.GetObjectName(KObject))
+				D.OnSetFocus(TARGET.PLAYER, KObject.dwEmployer, MY.GetObjectName(KObject, false))
 			end
 		end
 	end

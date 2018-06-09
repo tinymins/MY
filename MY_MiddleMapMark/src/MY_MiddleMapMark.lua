@@ -167,7 +167,7 @@ local function OnNpcEnterScene()
 		return
 	end
 	-- avoid full number named npc
-	local szName = MY.GetObjectName(npc)
+	local szName = MY.GetObjectName(npc, 'never')
 	if not szName or MY.String.Trim(szName) == '' then
 		return
 	end
@@ -228,7 +228,7 @@ local function OnDoodadEnterScene()
 		return
 	end
 	-- avoid full number named doodad
-	local szName = MY.GetObjectName(doodad)
+	local szName = MY.GetObjectName(doodad, 'never')
 	if not szName or MY.String.Trim(szName) == '' then
 		return
 	end

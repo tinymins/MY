@@ -137,7 +137,7 @@ local function OnDeath(dwCharacterID, dwKiller)
 		dwCharacterID = dwCharacterID == PLAYER_ID and 'self' or dwCharacterID
 		DEATH_LOG[dwCharacterID] = DEATH_LOG[dwCharacterID] or {}
 		local killer = (IsPlayer(dwKiller) and GetPlayer(dwKiller)) or (not IsPlayer(dwKiller) and GetNpc(dwKiller))
-		local szKiller = killer and MY.GetObjectName(killer, true) or ''
+		local szKiller = killer and MY.GetObjectName(killer)
 		if DAMAGE_LOG[dwCharacterID] then
 			tinsert(DEATH_LOG[dwCharacterID], {
 				nCurrentTime = GetCurrentTime(),

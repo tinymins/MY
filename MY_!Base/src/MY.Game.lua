@@ -26,8 +26,8 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local IsNil, IsNumber, IsFunction = MY.IsNil, MY.IsNumber, MY.IsFunction
-local IsBoolean, IsString, IsTable = MY.IsBoolean, MY.IsString, MY.IsTable
+local IsNumber, IsBoolean, IsFunction = MY.IsNumber, MY.IsBoolean, MY.IsFunction
+local IsNil, IsString, IsTable, IsEmpty = MY.IsNil, MY.IsString, MY.IsTable, MY.IsEmpty
 -----------------------------------------------------------------------------------------
 -----------------------------------------------
 -- 本地函数和变量
@@ -335,46 +335,63 @@ end
 MY.GetObject = MY.Game.GetObject
 
 -- 获取指定对象的名字
-function MY.Game.GetObjectName(obj)
+-- MY.GetObjectName(obj, bRetID)
+-- (KObject) obj    要获取名字的对象
+-- (string)  eRetID 是否返回对象ID信息
+--    'auto'   名字为空时返回 -- 默认值
+--    'always' 总是返回
+--    'never'  总是不返回
+function MY.Game.GetObjectName(obj, eRetID)
 	if not obj then
 		return nil
 	end
-
-	local szName = obj.szName
+	if not eRetID then
+		eRetID = 'auto'
+	end
+	local szType, szName = 'UNKNOWN', obj.szName
 	if IsPlayer(obj.dwID) then  -- PLAYER
-		if szName == '' then
-			szName = nil
-		end
-		return szName
+		szType = 'PLAYER'
 	elseif obj.nMaxLife then    -- NPC
-		if szName == '' then
-			szName = string.gsub(Table_GetNpcTemplateName(obj.dwTemplateID), '^%s*(.-)%s*$', '%1')
-			if szName == '' then
-				if obj.dwEmployer and obj.dwEmployer ~= 0 then
-					return MY.GetObjectName(GetPlayer(obj.dwEmployer)) -- 长歌影子
-				else
-					szName = nil
-				end
+		szType = 'NPC'
+		if IsEmpty(szName) then
+			szName = Table_GetNpcTemplateName(obj.dwTemplateID)
+			if szName then
+				szName = szName:gsub('^%s*(.-)%s*$', '%1')
+			end
+			if IsEmpty(szName) and obj.dwEmployer and obj.dwEmployer ~= 0 then
+				szName = MY.GetObjectName(GetPlayer(obj.dwEmployer), eRetID) -- 长歌影子
 			end
 		end
-		if szName and obj.dwEmployer and obj.dwEmployer ~= 0 then
+		if not IsEmpty(szName) and obj.dwEmployer and obj.dwEmployer ~= 0 then
 			local szEmpName = MY.GetObjectName(
-				(IsPlayer(obj.dwEmployer) and GetPlayer(obj.dwEmployer)) or GetNpc(obj.dwEmployer)
+				(IsPlayer(obj.dwEmployer) and GetPlayer(obj.dwEmployer)) or GetNpc(obj.dwEmployer),
+				false
 			) or g_tStrings.STR_SOME_BODY
-
-			szName =  szEmpName .. g_tStrings.STR_PET_SKILL_LOG .. (szName or '')
+			szName =  szEmpName .. g_tStrings.STR_PET_SKILL_LOG .. szName
 		end
-		return szName
 	elseif obj.CanLoot then -- DOODAD
-		if szName == '' then
-			szName = string.gsub(Table_GetDoodadTemplateName(obj.dwTemplateID), '^%s*(.-)%s*$', '%1')
-			if szName == '' then
-				szName = nil
+		szType = 'DOODAD'
+		if IsEmpty(szName) then
+			szName = Table_GetDoodadTemplateName(obj.dwTemplateID)
+			if szName then
+				szName = szName:gsub('^%s*(.-)%s*$', '%1')
 			end
 		end
 	elseif obj.IsRepairable then -- ITEM
-		return GetItemNameByItem(obj)
+		szType = 'ITEM'
+		szName = GetItemNameByItem(obj)
 	end
+	if IsEmpty(szName) and eRetID ~= 'never' or eRetID == 'always' then
+		local szDispID = szType .. '#' .. obj.dwID
+		if szType == 'NPC' then
+			szDispID = szDispID .. '@' .. obj.dwTemplateID
+		end
+		szName = IsEmpty(szName) and szDispID or (szName .. '(' .. szDispID .. ')')
+	end
+	if IsEmpty(szName) then
+		szName = nil
+	end
+	return szName
 end
 MY.GetObjectName = MY.Game.GetObjectName
 

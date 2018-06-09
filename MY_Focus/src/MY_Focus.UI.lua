@@ -106,7 +106,7 @@ function D.UpdateItem(hItem, p)
 	local KObject, info, bInfo = MY.Game.GetObject(dwType, dwID)
 	local szName = p.tRule and p.tRule.szDisplay
 	if not szName or szName == '' then
-		szName = MY.Game.GetObjectName(KObject)
+		szName = MY.GetObjectName(KObject)
 	end
 	local player = GetClientPlayer()
 	if not KObject then
@@ -292,7 +292,7 @@ function D.UpdateItem(hItem, p)
 		local tp, id = KObject.GetTarget()
 		local tar = MY.Game.GetObject(tp, id)
 		if tar then
-			hItem:Lookup('Handle_Progress/Text_Target'):SetText(MY.Game.GetObjectName(tar) or tar.dwID)
+			hItem:Lookup('Handle_Progress/Text_Target'):SetText(MY.GetObjectName(tar))
 		else
 			hItem:Lookup('Handle_Progress/Text_Target'):SetText('')
 		end

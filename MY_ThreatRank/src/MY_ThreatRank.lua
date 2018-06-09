@@ -372,10 +372,7 @@ function _TS.UpdateThreatBars(tList, dwTargetID, dwApplyID)
 			else
 				local p = GetNpc(v.id)
 				if p then
-					szName = MY.GetObjectName(p, true)
-					if tonumber(szName) then
-						szName = v.id
-					end
+					szName = MY.GetObjectName(p)
 				end
 			end
 			item:Lookup('Text_ThreatName'):SetText(v.sort .. '.' .. szName)
