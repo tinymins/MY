@@ -1496,3 +1496,26 @@ function MY.JudgeOperator(opt, lval, rval, ...)
 		return lval ~= rval
 	end
 end
+
+
+function MY.IsEmpty(var)
+	local szType = type(var)
+	if szType == 'nil' then
+		return true
+	elseif szType == 'boolean' then
+		return var
+	elseif szType == 'number' then
+		return var == 0
+	elseif szType == 'string' then
+		return var == ''
+	elseif szType == 'function' then
+		return false
+	elseif szType == 'table' then
+		for _, _ in pairs(var) do
+			return false
+		end
+		return true
+	else
+		return false
+	end
+end
