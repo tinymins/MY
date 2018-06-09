@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-05-26 02:45:52
+-- @Last Modified time: 2018-06-10 00:55:59
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -300,7 +300,7 @@ local function CheckInvalidRect(dwType, dwID, me)
 		local dwTarType, dwTarID = me.GetTarget()
 		local relation = D.GetRelation(dwID)
 		local force = D.GetForce(dwID)
-		local szName = MY.GetObjectName(object)
+		local szName = MY.GetObjectName(object, (Config.bShowAllObjectID and 'always') or (Config.bShowUnnamedObjectID and 'auto') or 'never')
 		-- ÅäÉ«
 		local r, g, b = unpack(GetConfigValue('Color', relation, force))
 		lb:SetColor(r, g, b, Config.nAlpha, Config.nFont)

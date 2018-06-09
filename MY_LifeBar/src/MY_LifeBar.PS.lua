@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 10:36:40
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-03-30 15:59:21
+-- @Last Modified time: 2018-06-10 01:13:07
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -51,12 +51,15 @@ local function LoadUI(ui)
 	ui:children('#WndSliderBox_Distance'):value(math.sqrt(Config.nDistance) / 64)
 	ui:children('#WndSliderBox_Alpha'):value(Config.nAlpha)
 	ui:children('#WndCheckBox_ShowSpecialNpc'):check(Config.bShowSpecialNpc)
+	ui:children('#WndCheckBox_ShowUnnamedObjectID'):check(Config.bShowUnnamedObjectID)
+	ui:children('#WndCheckBox_ShowAllObjectID'):check(Config.bShowAllObjectID)
 end
 function PS.OnPanelActive(wnd)
 	local ui = MY.UI(wnd)
 	local w, h = ui:size()
 
-	local x, y = 10, 15
+	local X, Y = 10, 15
+	local x, y = X, Y
 	local offsety = 45
 	-- ¿ªÆô
 	ui:append('WndCheckBox', {
@@ -129,8 +132,9 @@ function PS.OnPanelActive(wnd)
 	-- <hr />
 	ui:append('Image', 'Image_Spliter'):find('#Image_Spliter'):pos(10, y-7):size(w - 20, 2):image('UI/Image/UICommon/ScienceTreeNode.UITex',62)
 
-	x, y = 15, 70
-	offsety = 32
+	X, Y = 15, 70
+	x, y = X, Y
+	offsety = 34
 	ui:append('WndSliderBox', {
 		name = 'WndSliderBox_LifeBarWidth',
 		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 5, 150 },
@@ -262,7 +266,8 @@ function PS.OnPanelActive(wnd)
 	y = y + offsety
 
 	-- ÓÒ°ë±ß
-	x, y = 350, 75
+	X, Y = 350, 75
+	x, y = X, Y
 	offsety = 35
 	local function FillColorTable(opt, relation, tartype)
 		local cfg = Config.Color[relation]
@@ -501,6 +506,29 @@ function PS.OnPanelActive(wnd)
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
+	y = y + offsety - 10
+
+	ui:append('WndCheckBox', {
+		x = x, y = y, text = _L['show unnamed object id'],
+		checked = Config.bShowUnnamedObjectID,
+		oncheck = function(bChecked)
+			Config.bShowUnnamedObjectID = bChecked
+			D.Reset()
+		end,
+		autoenable = function() return D.IsEnabled() end,
+	}, true):autoWidth():width()
+
+	y = y + offsety - 10
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y, text = _L['show all object id'],
+		checked = Config.bShowAllObjectID,
+		oncheck = function(bChecked)
+			Config.bShowAllObjectID = bChecked
+			D.Reset()
+		end,
+		autoenable = function() return D.IsEnabled() end,
+	}, true):autoWidth():width()
+	x = X
 	y = y + offsety - 10
 
 	-- ui:append('WndCheckBox', {

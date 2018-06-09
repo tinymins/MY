@@ -8,6 +8,8 @@ data = {
 	nTextLineHeight = 24,
 
 	bShowSpecialNpc = false,
+	bShowUnnamedObjectID = false,
+	bShowAllObjectID = false,
 	bShowKungfu = false,
 	bShowDistance = false,
 

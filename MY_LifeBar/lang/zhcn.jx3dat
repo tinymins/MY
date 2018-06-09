@@ -34,6 +34,8 @@ data = {
     ['npc skillpercentage display'] = 'Npc读条显示',
 
     ['show special npc'] = '显示特殊Npc',
+    ['show unnamed object id'] = '无名目标显示ID',
+    ['show all object id'] = '所有目标显示ID',
     ['adjust index'] = '自适应遮挡顺序',
 
     ['Max Distance: %s foot.'] = '最大显示距离：%s尺。',
