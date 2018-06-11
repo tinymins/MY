@@ -170,6 +170,7 @@ function MY_VisualSkill.OnFrameCreate()
 	this:RegisterEvent('RENDER_FRAME_UPDATE')
 	this:RegisterEvent('UI_SCALED')
 	this:RegisterEvent('DO_SKILL_CAST')
+	this:RegisterEvent('DO_SKILL_CHANNEL_PROGRESS')
 	this:RegisterEvent('ON_ENTER_CUSTOM_UI_MODE')
 	this:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
 	this:RegisterEvent('CUSTOM_UI_MODE_SET_DEFAULT')
@@ -190,6 +191,11 @@ function MY_VisualSkill.OnEvent(event)
 		ApplyAnchor(this)
 	elseif event == 'DO_SKILL_CAST' then
 		local dwID, dwSkillID, dwSkillLevel = arg0, arg1, arg2
+		if dwID == GetControlPlayer().dwID then
+			OnSkillCast(this, dwSkillID, dwSkillLevel)
+		end
+	elseif event == 'DO_SKILL_CHANNEL_PROGRESS' then
+		local dwID, dwSkillID, dwSkillLevel = arg3, arg1, arg2
 		if dwID == GetControlPlayer().dwID then
 			OnSkillCast(this, dwSkillID, dwSkillLevel)
 		end
