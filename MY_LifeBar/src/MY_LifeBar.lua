@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-06-10 00:55:59
+-- @Last Modified time: 2018-06-12 20:23:04
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -266,8 +266,10 @@ local function CheckInvalidRect(dwType, dwID, me)
 	local lb = LB_CACHE[dwID]
 	local object, info = MY.GetObject(dwType, dwID)
 	if not object then
-		lb:Remove()
-		LB_CACHE[dwID] = nil
+		if lb then
+			lb:Remove()
+			LB_CACHE[dwID] = nil
+		end
 		return
 	end
 	local bVisible = Config.nDistance <= 0
