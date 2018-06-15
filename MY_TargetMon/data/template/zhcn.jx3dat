@@ -41,16 +41,32 @@ return {
 				rgbLongAlias = {255, 255, 0},
 				shortAlias = {__META__, {"nil", "string"}, nil},
 				rgbShortAlias = {255, 255, 0},
-				soundAppear = "",
-				soundDisappear = "",
+				soundAppear = {
+					__META__,
+					__VALUE__ = {},
+					__CHILD_TEMPLATE__ = "",
+				},
+				soundDisappear = {
+					__META__,
+					__VALUE__ = {},
+					__CHILD_TEMPLATE__ = "",
+				},
 				ids = {
 					__META__,
 					__VALUE__ = {},
 					__CHILD_TEMPLATE__ = { -- monid
 						enable = true,
 						iconid = 13,
-						soundAppear = "",
-						soundDisappear = "",
+						soundAppear = {
+							__META__,
+							__VALUE__ = {},
+							__CHILD_TEMPLATE__ = "",
+						},
+						soundDisappear = {
+							__META__,
+							__VALUE__ = {},
+							__CHILD_TEMPLATE__ = "",
+						},
 						levels = {
 							__META__,
 							__VALUE__ = {},

@@ -20,6 +20,8 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local IsNumber, IsBoolean, IsFunction = MY.IsNumber, MY.IsBoolean, MY.IsFunction
+local IsNil, IsString, IsTable, IsEmpty = MY.IsNil, MY.IsString, MY.IsTable, MY.IsEmpty
 -----------------------------------------------------------------------------------------
 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TargetMon/lang/')
@@ -197,7 +199,7 @@ end
 -- 数据存储
 ----------------------------------------------------------------------------------------------
 do
-
+-- 新建数据时调用
 function D.FormatMonItemLevelStructure(config)
 	return MY.FormatDataStructure(config, ConfigTemplate.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__.levels.__CHILD_TEMPLATE__, true)
 end
@@ -221,13 +223,20 @@ local function FormatMonitorData(mon)
 	end
 	return mon
 end
-function D.FormatMonStructure(config)
-	if not config.uuid then
-		config.uuid = tostring(config):sub(8)
+function D.FormatMonStructure(mon)
+	if not mon.uuid then
+		mon.uuid = tostring(mon):sub(8)
 	end
-	return FormatMonitorData(MY.FormatDataStructure(config, ConfigTemplate.monitors.__CHILD_TEMPLATE__, true))
+	if IsString(mon.soundAppear) then
+		mon.soundAppear = {mon.soundAppear}
+	end
+	if IsString(mon.soundDisappear) then
+		mon.soundDisappear = {mon.soundDisappear}
+	end
+	return FormatMonitorData(MY.FormatDataStructure(mon, ConfigTemplate.monitors.__CHILD_TEMPLATE__, true))
 end
 
+-- 新建数据和处理已有数据都会调用
 local function FormatConfigData(config)
 	for _, mon in ipairs(config.monitors) do
 		FormatMonitorData(mon)
@@ -300,9 +309,28 @@ function D.FormatConfigStructure(config)
 	if not config.uuid then
 		config.uuid = tostring(config):sub(8)
 	end
+	for _, mon in ipairs(config.monitors) do
+		if mon.ids then
+			for _, idmon in ipairs(mon.ids) do
+				if IsString(idmon.soundAppear) then
+					idmon.soundAppear = {idmon.soundAppear}
+				end
+				if IsString(idmon.soundDisappear) then
+					idmon.soundDisappear = {idmon.soundDisappear}
+				end
+			end
+		end
+		if IsString(mon.soundAppear) then
+			mon.soundAppear = {mon.soundAppear}
+		end
+		if IsString(mon.soundDisappear) then
+			mon.soundDisappear = {mon.soundDisappear}
+		end
+	end
 	return FormatConfigData(MY.FormatDataStructure(config, ConfigTemplate, true))
 end
 
+-- 保存数据时候会调用
 function D.FormatSavingConfig(config)
 	for _, embedded in ipairs(ConfigEmbedded) do
 		if embedded.uuid == config.uuid then
@@ -1114,14 +1142,24 @@ function PS.OnPanelActive(wnd)
 			end
 			insert(t1, t2)
 			-- 出现声音
-			local t2 = {
-				szOption = _L['Play sound when appear'],
-				fnMouseEnter = function()
-					if mon.soundAppear == '' then
-						return
-					end
-					OutputTip(GetFormatText(mon.soundAppear, nil, 255, 255, 0), 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
-				end,
+			local t2 = { szOption = _L['Play sound when appear'] }
+			for i, szSound in ipairs(mon.soundAppear) do
+				insert(t2, {
+					szOption = szSound,
+					szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
+					nFrame = 49,
+					nMouseOverFrame = 51,
+					nIconWidth = 17,
+					nIconHeight = 17,
+					szLayer = 'ICON_RIGHTMOST',
+					fnClickIcon = function()
+						remove(mon.soundAppear, i)
+						Wnd.CloseWindow('PopupMenuPanel')
+					end,
+				})
+			end
+			insert(t2, {
+				szOption = _L['Add'],
 				fnAction = function()
 					local file = GetOpenFileName(
 						_L['Please select sound file.'],
@@ -1135,31 +1173,29 @@ function PS.OnPanelActive(wnd)
 					if not file then
 						return MY.Alert(_L('File path error! Not in "%s"!', MY.FormatPath({ 'audio/', MY_DATA_PATH.GLOBAL })))
 					end
-					mon.soundAppear = file
+					insert(mon.soundAppear, file)
 				end,
-			}
-			if mon.soundAppear ~= '' then
-				t2.szIcon = 'ui/Image/UICommon/CommonPanel2.UITex'
-				t2.nFrame = 49
-				t2.nMouseOverFrame = 51
-				t2.nIconWidth = 17
-				t2.nIconHeight = 17
-				t2.szLayer = 'ICON_RIGHTMOST'
-				t2.fnClickIcon = function()
-					mon.soundAppear = ''
-					Wnd.CloseWindow('PopupMenuPanel')
-				end
-			end
+			})
 			insert(t1, t2)
 			-- 消失声音
-			local t2 = {
-				szOption = _L['Play sound when disappear'],
-				fnMouseEnter = function()
-					if mon.soundDisappear == '' then
-						return
-					end
-					OutputTip(GetFormatText(mon.soundDisappear, nil, 255, 255, 0), 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
-				end,
+			local t2 = { szOption = _L['Play sound when disappear'] }
+			for i, szSound in ipairs(mon.soundDisappear) do
+				insert(t2, {
+					szOption = szSound,
+					szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
+					nFrame = 49,
+					nMouseOverFrame = 51,
+					nIconWidth = 17,
+					nIconHeight = 17,
+					szLayer = 'ICON_RIGHTMOST',
+					fnClickIcon = function()
+						remove(mon.soundDisappear, i)
+						Wnd.CloseWindow('PopupMenuPanel')
+					end,
+				})
+			end
+			insert(t2, {
+				szOption = _L['Add'],
 				fnAction = function()
 					local file = GetOpenFileName(
 						_L['Please select sound file.'],
@@ -1171,23 +1207,11 @@ function PS.OnPanelActive(wnd)
 					end
 					file = MY.GetRelativePath(file, { 'audio/', MY_DATA_PATH.GLOBAL })
 					if not file then
-						return MY.Alert(_L('File path error! Not in '%s'!', MY.FormatPath({ 'audio/', MY_DATA_PATH.GLOBAL })))
+						return MY.Alert(_L('File path error! Not in "%s"!', MY.FormatPath({ 'audio/', MY_DATA_PATH.GLOBAL })))
 					end
-					mon.soundDisappear = file
+					insert(mon.soundDisappear, file)
 				end,
-			}
-			if mon.soundDisappear ~= '' then
-				t2.szIcon = 'ui/Image/UICommon/CommonPanel2.UITex'
-				t2.nFrame = 49
-				t2.nMouseOverFrame = 51
-				t2.nIconWidth = 17
-				t2.nIconHeight = 17
-				t2.szLayer = 'ICON_RIGHTMOST'
-				t2.fnClickIcon = function()
-					mon.soundDisappear = ''
-					Wnd.CloseWindow('PopupMenuPanel')
-				end
-			end
+			})
 			insert(t1, t2)
 			-- ID设置
 			if not empty(mon.ids) then
