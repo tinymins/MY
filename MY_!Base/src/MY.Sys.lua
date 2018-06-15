@@ -371,11 +371,24 @@ function MY.CreateDataRoot(ePathType)
 end
 
 -- 播放声音
--- MY.PlaySound(szFilePath[, szCustomPath])
--- szFilePath   音频文件地址
--- szCustomPath 个性化音频文件地址
+-- MY.PlaySound([nType, ]szFilePath[, szCustomPath])
+--   nType        声音类型
+--     SOUND.BG_MUSIC = 0,    // 背景音乐
+--     SOUND.UI_SOUND,        // 界面音效    -- 默认值
+--     SOUND.UI_ERROR_SOUND,  // 错误提示音
+--     SOUND.SCENE_SOUND,     // 环境音效
+--     SOUND.CHARACTER_SOUND, // 角色音效,包括打击，特效的音效
+--     SOUND.CHARACTER_SPEAK, // 角色对话
+--     SOUND.FRESHER_TIP,     // 新手提示音
+--     SOUND.SYSTEM_TIP,      // 系统提示音
+--     SOUND.TREATYANI_SOUND, // 协议动画声音
+--   szFilePath   音频文件地址
+--   szCustomPath 个性化音频文件地址
 -- 注：优先播放szCustomPath, szCustomPath不存在才会播放szFilePath
-function MY.PlaySound(szFilePath, szCustomPath)
+function MY.PlaySound(nType, szFilePath, szCustomPath)
+	if not IsNumber(nType) then
+		nType, szFilePath, szCustomPath = SOUND.UI_SOUND, nType, szFilePath
+	end
 	if not szCustomPath then
 		szCustomPath = szFilePath
 	end
