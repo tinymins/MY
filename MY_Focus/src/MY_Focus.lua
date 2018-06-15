@@ -133,6 +133,11 @@ function MY_Focus.SetMaxDisplay(nMaxDisplay)
 	FireUIEvent('MY_FOCUS_MAX_DISPLAY_UPDATE')
 end
 
+function MY_Focus.SetAutoHide(bAutoHide)
+	MY_Focus.bAutoHide = bAutoHide
+	FireUIEvent('MY_FOCUS_AUTO_HIDE_UPDATE')
+end
+
 -- Ìí¼ÓÄ¬ÈÏ½¹µã
 function MY_Focus.SetFocusPattern(szName)
 	szName = MY.Trim(szName)

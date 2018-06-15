@@ -394,6 +394,7 @@ function MY_Focus.OnFrameCreate()
 	this:RegisterEvent('MY_FOCUS_LOCK_UPDATE')
 	this:RegisterEvent('MY_FOCUS_SCALE_UPDATE')
 	this:RegisterEvent('MY_FOCUS_MAX_DISPLAY_UPDATE')
+	this:RegisterEvent('MY_FOCUS_AUTO_HIDE_UPDATE')
 
 	D.Scale(this)
 	D.CreateList(this)
@@ -435,6 +436,8 @@ function MY_Focus.OnEvent(event)
 		D.Scale(this)
 	elseif event == 'MY_FOCUS_MAX_DISPLAY_UPDATE' then
 		D.CreateList(this)
+	elseif event == 'MY_FOCUS_AUTO_HIDE_UPDATE' then
+		D.AutosizeUI(this)
 	end
 end
 

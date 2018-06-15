@@ -246,7 +246,7 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = wr, text = _L['hide when empty'],
 		checked = MY_Focus.bAutoHide,
 		oncheck = function(bChecked)
-			MY_Focus.bAutoHide = bChecked
+			MY_Focus.SetAutoHide(bChecked)
 		end,
 		autoenable = function() return MY_Focus.IsEnabled() end,
 	})
