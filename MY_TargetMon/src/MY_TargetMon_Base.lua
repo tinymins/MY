@@ -525,7 +525,7 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 				szSound = hItem.mon.soundAppear
 			end
 			if szSound and szSound ~= '' then
-				MY.PlaySound(szSound)
+				MY.PlaySound(SOUND.CHARACTER_SOUND, szSound)
 			end
 			hItem.bExist = true
 		end
@@ -565,7 +565,7 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 				szSound = hItem.mon.soundDisappear
 			end
 			if szSound and szSound ~= '' then
-				MY.PlaySound(szSound)
+				MY.PlaySound(SOUND.CHARACTER_SOUND, szSound)
 			end
 			hItem.bExist = false
 		end
