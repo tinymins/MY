@@ -358,16 +358,17 @@ function MY.Game.GetObjectName(obj, eRetID)
 			if szName then
 				szName = szName:gsub('^%s*(.-)%s*$', '%1')
 			end
-			if IsEmpty(szName) and obj.dwEmployer and obj.dwEmployer ~= 0 then
-				szName = MY.GetObjectName(GetPlayer(obj.dwEmployer), eRetID) -- 长歌影子
-			end
 		end
-		if not IsEmpty(szName) and obj.dwEmployer and obj.dwEmployer ~= 0 then
-			local szEmpName = MY.GetObjectName(
-				(IsPlayer(obj.dwEmployer) and GetPlayer(obj.dwEmployer)) or GetNpc(obj.dwEmployer),
-				false
-			) or g_tStrings.STR_SOME_BODY
-			szName =  szEmpName .. g_tStrings.STR_PET_SKILL_LOG .. szName
+		if obj.dwEmployer and obj.dwEmployer ~= 0 then
+			if IsEmpty(szName) then
+				szName = MY.GetObjectName(GetPlayer(obj.dwEmployer), eRetID) -- 长歌影子
+			else
+				local szEmpName = MY.GetObjectName(
+					(IsPlayer(obj.dwEmployer) and GetPlayer(obj.dwEmployer)) or GetNpc(obj.dwEmployer),
+					false
+				) or g_tStrings.STR_SOME_BODY
+				szName =  szEmpName .. g_tStrings.STR_PET_SKILL_LOG .. szName
+			end
 		end
 	elseif obj.CanLoot then -- DOODAD
 		szType = 'DOODAD'
