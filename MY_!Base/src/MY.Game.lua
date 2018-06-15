@@ -2070,12 +2070,13 @@ end
 MY.IsInDungeon = MY.Game.IsInDungeon
 
 -- 判断地图是不是PUBG
--- (bool) MY.Game.IsInPubg(dwMapID)
+-- (bool) MY.Game.IsPubgMap(dwMapID)
 do
 local PUBG_MAP = {}
 function MY.Game.IsPubgMap(dwMapID)
 	if PUBG_MAP[dwMapID] == nil then
-		PUBG_MAP[dwMapID] = Table_IsTreasureBattleFieldMap(dwMapID)
+		PUBG_MAP[dwMapID] = Table_IsTreasureBattleFieldMap
+			and Table_IsTreasureBattleFieldMap(dwMapID) or false
 	end
 	return PUBG_MAP[dwMapID]
 end
@@ -2089,6 +2090,43 @@ function MY.Game.IsInPubg()
 	return me and MY.IsPubgMap(me.GetMapID())
 end
 MY.IsInPubg = MY.Game.IsInPubg
+
+-- 判断地图是不是僵尸地图
+-- (bool) MY.Game.IsZombieMap(dwMapID)
+do
+local ZOMBIE_MAP = {}
+function MY.Game.IsZombieMap(dwMapID)
+	if ZOMBIE_MAP[dwMapID] == nil then
+		ZOMBIE_MAP[dwMapID] = Table_IsZombieBattleFieldMap
+			and Table_IsZombieBattleFieldMap(dwMapID) or false
+	end
+	return ZOMBIE_MAP[dwMapID]
+end
+MY.IsZombieMap = MY.Game.IsZombieMap
+end
+
+-- 判断当前地图是不是僵尸地图
+-- (bool) MY.Game.IsInZombieMap()
+function MY.Game.IsInZombieMap()
+	local me = GetClientPlayer()
+	return me and MY.IsZombieMap(me.GetMapID())
+end
+MY.IsInZombieMap = MY.Game.IsInZombieMap
+
+-- 判断地图是不是功能屏蔽地图
+-- (bool) MY.Game.IsShieldedMap(dwMapID)
+function MY.Game.IsShieldedMap(dwMapID)
+	return MY.IsPubgMap(dwMapID) or MY.IsZombieMap(dwMapID)
+end
+MY.IsShieldedMap = MY.Game.IsShieldedMap
+
+-- 判断当前地图是不是PUBG
+-- (bool) MY.Game.IsInShieldedMap()
+function MY.Game.IsInShieldedMap()
+	local me = GetClientPlayer()
+	return me and MY.IsShieldedMap(me.GetMapID())
+end
+MY.IsInShieldedMap = MY.Game.IsInShieldedMap
 
 do local MARK_NAME = { _L['Cloud'], _L['Sword'], _L['Ax'], _L['Hook'], _L['Drum'], _L['Shear'], _L['Stick'], _L['Jade'], _L['Dart'], _L['Fan'] }
 -- 获取标记中文名

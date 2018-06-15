@@ -115,7 +115,7 @@ local function PushDB()
 	DB:Execute('END TRANSACTION')
 end
 local function onLoadingEnding()
-	l_tempMap = MY.IsInPubg() or MY.IsInArena() or MY.IsInBattleField() or false
+	l_tempMap = MY.IsInZombieMap() or MY.IsInPubg() or MY.IsInArena() or MY.IsInBattleField() or false
 	if l_tempMap then
 		local dwMapID = GetClientPlayer().GetMapID()
 		DBN_DM:ClearBindings()

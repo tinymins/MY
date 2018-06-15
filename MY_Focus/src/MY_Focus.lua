@@ -119,7 +119,7 @@ local function FormatAutoFocusData(data)
 	}
 	return MY.FormatDataStructure(data, ds)
 end
-function MY_Focus.IsShielded() return MY.IsShieldedVersion() and MY.IsInPubg() end
+function MY_Focus.IsShielded() return MY.IsShieldedVersion() and MY.IsInShieldedMap() end
 function MY_Focus.IsEnabled() return MY_Focus.bEnable and not MY_Focus.IsShielded() end
 
 function MY_Focus.SetScale(fScaleX, fScaleY)

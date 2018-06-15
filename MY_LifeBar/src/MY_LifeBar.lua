@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-06-12 20:23:04
+-- @Last Modified time: 2018-06-16 00:48:05
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -62,7 +62,7 @@ MY_LifeBar.szConfig = 'common'
 RegisterCustomData('MY_LifeBar.bEnabled')
 RegisterCustomData('MY_LifeBar.szConfig')
 
-function D.IsShielded() return MY.IsShieldedVersion() and MY.IsInPubg() end
+function D.IsShielded() return MY.IsShieldedVersion() and MY.IsInShieldedMap() end
 function D.IsEnabled() return MY_LifeBar.bEnabled and not D.IsShielded() end
 function D.IsMapEnabled()
 	return D.IsEnabled() and (
@@ -73,7 +73,7 @@ function D.IsMapEnabled()
 		) or (
 			(Config.bOnlyInDungeon     and MY.IsInDungeon()) or
 			(Config.bOnlyInArena       and MY.IsInArena()) or
-			(Config.bOnlyInBattleField and (MY.IsInBattleField() or MY.IsInPubg()))
+			(Config.bOnlyInBattleField and (MY.IsInBattleField() or MY.IsInPubg() or MY.IsInZombieMap()))
 		)
 	)
 end
