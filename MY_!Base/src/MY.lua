@@ -98,6 +98,26 @@
 -- : ............ ... ,,,.,..         .:;i:rir7rr;rii::..          k@BF :O@J. . ........................................................................  --
 -- ###################################################################################################################################################### --
 
+-----------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+-----------------------------------------------------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local huge, pi, random = math.huge, math.pi, math.random
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+-----------------------------------------------------------------------------------------
 MY = {}
 function MY.IsEmpty(var)
 	local szType = type(var)
@@ -120,15 +140,23 @@ function MY.IsEmpty(var)
 		return false
 	end
 end
+function MY.RandomChild(var)
+	if type(var) == 'table' and #var > 0 then
+		return var[random(1, #var)]
+	end
+end
 function MY.IsNil     (var) return type(var) == 'nil'      end
 function MY.IsTable   (var) return type(var) == 'table'    end
 function MY.IsNumber  (var) return type(var) == 'number'   end
 function MY.IsString  (var) return type(var) == 'string'   end
 function MY.IsBoolean (var) return type(var) == 'boolean'  end
 function MY.IsFunction(var) return type(var) == 'function' end
---------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+local IsNumber, IsBoolean, IsFunction = MY.IsNumber, MY.IsBoolean, MY.IsFunction
+local IsNil, IsString, IsTable, IsEmpty = MY.IsNil, MY.IsString, MY.IsTable, MY.IsEmpty
+-----------------------------------------------------------------------------------------
 -- 本地函数变量
---------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
 local _BUILD_ = '20180509'
 local _VERSION_ = 0x2010200
 local _DEBUGLV_ = tonumber(LoadLUAData('interface/my.debug.level') or nil) or 4
