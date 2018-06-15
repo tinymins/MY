@@ -110,9 +110,9 @@ function PS.OnPanelActive(wnd)
 			insert(t1, {
 				szOption = _L.JUDGE_METHOD[eType],
 				bCheck = true, bMCheck = true,
-				bChecked = tData.method == eType,
+				bChecked = tData.szMethod == eType,
 				fnAction = function()
-					tData.method = eType
+					tData.szMethod = eType
 					MY_Focus.RescanNearby()
 				end,
 			})
