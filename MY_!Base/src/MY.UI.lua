@@ -974,11 +974,12 @@ function XGUI:append(arg0, arg1, arg2)
 		for _, raw in ipairs(self.raws) do
 			local parentWnd = GetComponentElement(raw, 'MAIN_WINDOW')
 			local parentHandle = GetComponentElement(raw, 'MAIN_HANDLE')
-			if parentWnd and (sub(szType, 1, 3) == 'Wnd' or sub(szType, -4) == '.ini') then
-				local szFile = szType
-				if sub(szType, -4) == '.ini' then
-					szType = gsub(szType,'.*[/\\]','')
-					szType = sub(szType, 0, -5)
+			if parentWnd and (sub(szType, 1, 3) == 'Wnd' or find(szType, '^[^<>?:]*%.ini:%w+$')) then
+				local szFile, szComponet = szType, szType
+				if find(szFile, '^[^<>?:]*%.ini:%w+$') then
+					szType = gsub(szFile, '^[^<>?]*%.ini:', '')
+					szFile = sub(szFile, 0, -#szType - 2)
+					szComponet = szFile:gsub('$.*[/\\]', ''):gsub('^[^<>?]*[/\\]', ''):sub(0, -5)
 				else
 					szFile = MY.GetAddonInfo().szFrameworkRoot .. 'ui\\' .. szFile .. '.ini'
 				end
@@ -986,9 +987,9 @@ function XGUI:append(arg0, arg1, arg2)
 				if not frame then
 					return MY.Debug({ _L('unable to open ini file [%s]', szFile) }, 'MY#UI#append', MY_DEBUG.ERROR)
 				end
-				local raw = frame:Lookup(szType)
+				local raw = frame:Lookup(szComponet)
 				if not raw then
-					MY.Debug({_L('can not find wnd component [%s]', szType)}, 'MY#UI#append', MY_DEBUG.ERROR)
+					MY.Debug({_L('can not find wnd component [%s:%s]', szFile, szComponet)}, 'MY#UI#append', MY_DEBUG.ERROR)
 				else
 					InitComponent(raw, szType)
 					raw:ChangeRelation(parentWnd, true, true)
