@@ -44,7 +44,7 @@ MY_AutoHideChat.ShowChatPanel = function(nShowFrame, nDelayFrame, callback)
         end
     elseif m_nState == STATE.HIDDING then
         -- unregister hide animate
-        MY.BreatheCall('MY_AutoHideChat_Hide')
+        MY.BreatheCall('MY_AutoHideChat_Hide', false)
     end
     m_nState = STATE.SHOWING
 
@@ -98,7 +98,7 @@ MY_AutoHideChat.HideChatPanel = function(nHideFrame, nDelayFrame, callback)
         return
     elseif m_nState == STATE.HIDDING then
         -- unregister hide animate
-        MY.BreatheCall('MY_AutoHideChat_Hide')
+        MY.BreatheCall('MY_AutoHideChat_Hide', false)
     end
     m_nState = STATE.HIDDING
 
