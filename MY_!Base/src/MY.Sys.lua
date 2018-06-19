@@ -7,17 +7,18 @@
 -- @Last modified time: 2017-02-08 17:56:29
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
 local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
-local floor, min, max, ceil = math.floor, math.min, math.max, math.ceil
-local huge, pi, sin, cos, tan = math.huge, math.pi, math.sin, math.cos, math.tan
+local huge, pi, random = math.huge, math.pi, math.random
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
 local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
 local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
 -- jx3 apis caching
@@ -25,9 +26,9 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local IsNil, IsNumber, IsFunction = MY.IsNil, MY.IsNumber, MY.IsFunction
-local IsBoolean, IsString, IsTable = MY.IsBoolean, MY.IsString, MY.IsTable
------------------------------------------------------------------------------------------
+local IsNil, IsBoolean, IsEmpty, RandomChild = MY.IsNil, MY.IsBoolean, MY.IsEmpty, MY.RandomChild
+local IsNumber, IsString, IsTable, IsFunction = MY.IsNumber, MY.IsString, MY.IsTable, MY.IsFunction
+---------------------------------------------------------------------------------------------------
 MY = MY or {}
 MY.Sys = MY.Sys or {}
 MY.Sys.bShieldedVersion = false -- 屏蔽被河蟹的功能（国服启用）
@@ -1239,6 +1240,29 @@ function MY.FormatTime(szFormat, nTimestamp)
 	szFormat = szFormat:gsub('m', t.minute)
 	szFormat = szFormat:gsub('s', t.second)
 	return szFormat
+end
+
+-- 格式化数字小数点
+-- (string) MY.FormatNumberDot(nValue, nDot, bDot, bSimple)
+-- nValue  要格式化的数字
+-- nDot    小数点位数
+-- bDot    小数点不足补位0
+-- bSimple 是否显示精简数值
+function MY.FormatNumberDot(nValue, nDot, bDot, bSimple)
+	if not nDot then
+		nDot = 0
+	end
+	local szUnit = ''
+	if bSimple then
+		if nValue >= 100000000 then
+			nValue = nValue / 100000000
+			szUnit = g_tStrings.DIGTABLE.tCharDiH[3]
+		elseif nValue > 100000 then
+			nValue = nValue / 10000
+			szUnit = g_tStrings.DIGTABLE.tCharDiH[2]
+		end
+	end
+	return floor(nValue * pow(2, nDot)) / pow(2, nDot) .. szUnit
 end
 
 -- register global esc key down action
