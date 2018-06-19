@@ -2091,12 +2091,12 @@ end
 
 function CTM:CallEffect(dwTargetID, nDelay)
 	if CTM_CACHE[dwTargetID] and CTM_CACHE[dwTargetID]:IsValid() then
-		CTM_CACHE[dwTargetID]:Lookup('Image_Effect'):Show()
-		MY.DelayCall(nDelay, function()
+		MY.DelayCall('MY_Cataclysm_' .. dwTargetID, nDelay, function()
 			if CTM_CACHE[dwTargetID] and CTM_CACHE[dwTargetID]:IsValid() then
 				CTM_CACHE[dwTargetID]:Lookup('Image_Effect'):Hide()
 			end
 		end)
+		CTM_CACHE[dwTargetID]:Lookup('Image_Effect'):Show()
 	end
 end
 

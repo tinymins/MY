@@ -597,7 +597,7 @@ function Cataclysm_Main.OnEvent(szEvent)
 		end
 		if Cataclysm_Main.bShowEffect then
 			if arg0 == 'UI_OME_SKILL_EFFECT_LOG' and arg5 == 6252
-			and arg1 == UI_GetClientPlayerID() and arg9[SKILL_RESULT_TYPE.THERAPY] then
+			and arg1 == GetControlPlayerID() and arg9[SKILL_RESULT_TYPE.THERAPY] then
 				Grid_CTM:CallEffect(arg2, 500)
 			end
 		end
@@ -1135,15 +1135,16 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():width() + 5
 
-	y = y + ui:append('WndCheckBox', {
+	x = x + ui:append('WndCheckBox', {
 		x = x, y = y, text = _L['Show screen head'],
 		checked = Cataclysm_Main.bShowScreenHead,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowScreenHead = bCheck
 		end,
-	}, true):autoWidth():height()
+	}, true):autoWidth():width() + 5
 
 	x = X + 10
+	y = y + 25
 	x = x + ui:append('WndCheckBox', {
 		x = x, y = y, text = _L['Attack Warning'],
 		checked = Cataclysm_Main.bHPHitAlert,
@@ -1155,27 +1156,28 @@ function PS.OnPanelActive(frame)
 		end,
 	}, true):autoWidth():width() + 5
 
-	y = y + ui:append('WndCheckBox', {
+	x = x + ui:append('WndCheckBox', {
 		x = x, y = y, text = _L['Show distance'],
 		checked = Cataclysm_Main.bShowDistance,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowDistance = bCheck
 		end,
-	}, true):autoWidth():height()
+	}, true):autoWidth():width() + 5
 
-	-- local me = GetClientPlayer()
-	-- if me.dwForceID == 6 then
-	-- 	x = x + ui:append('WndCheckBox', {
-	-- 		x = x, y = y, text = _L['ZuiWu Effect'],
-	-- 		color = { MY.GetForceColor(6) },
-	-- 		checked = Cataclysm_Main.bShowEffect,
-	-- 		oncheck = function(bCheck)
-	-- 			Cataclysm_Main.bShowEffect = bCheck
-	-- 		end,
-	-- 	}, true):autoWidth():width() + 5
-	-- end
+	local me = GetClientPlayer()
+	if me.dwForceID == FORCE_TYPE.WU_DU then
+		x = x + ui:append('WndCheckBox', {
+			x = x, y = y, text = _L['ZuiWu Effect'],
+			color = { MY.GetForceColor(6) },
+			checked = Cataclysm_Main.bShowEffect,
+			oncheck = function(bCheck)
+				Cataclysm_Main.bShowEffect = bCheck
+			end,
+		}, true):autoWidth():width() + 5
+	end
 
 	x = X + 10
+	y = y + 25
 	x = x + ui:append('WndCheckBox', {
 		x = x, y = y, text = _L['Show target\'s target'],
 		checked = Cataclysm_Main.bShowTargetTargetAni,
