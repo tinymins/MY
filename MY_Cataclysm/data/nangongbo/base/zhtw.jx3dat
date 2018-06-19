@@ -232,7 +232,7 @@ data = {
     {dwID=8905,col="#FFFFFFFF",szReminder="土",nPriority=2,bScreenHead=true},--混沌·土---璨翠海廳
     {dwID=8912,col="#0096FF00",szReminder="重",nPriority=7},--黑岩重水---璨翠海廳
     {dwID=8948,col="#FF00FF00",szReminder="截",nPriority=7},--一指截脈---璨翠海廳
-   {dwID=8776,col="#00FFFFFF",szReminder="魄",nPriority=2,bScreenHead=true},--冰魄---天泣林
+    {dwID=8776,col="#00FFFFFF",szReminder="魄",nPriority=2,bScreenHead=true},--冰魄---天泣林
     {dwID=8781,col="#00FFFFFF",szReminder="凍",nPriority=5,bAttention=true},--凍結---天泣林
     {dwID=8734,szStackOp=">=",nStackNum=4},--劇毒---天泣林
     {dwID=8752,col="#00FFFFFF",szReminder="傾",nPriority=6},--傾湖雷音---徽山書院
@@ -252,6 +252,7 @@ data = {
     {dwID=12866,nLevel=1,col="#FF3232FF",nPriority=6},--血月---輝天塹
     {dwID=12866,nLevel=2,col="#FF3232FF",nPriority=6},--血月---輝天塹
     {dwID=12891,col="#FF00FFFF",szReminder="侵",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true},--月影侵入---輝天塹
+    {dwID=12950},--月影心法---輝天塹
     {dwID=12901,col="#00FFFFFF",szReminder="禁",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true},--暗月幽禁---輝天塹
     {dwID=12860},--亡魂遊毒---輝天塹
     {dwID=12903,col="#FF3232FF",szReminder="葬",nPriority=4,bCaution=true},--葬棺之火---輝天塹

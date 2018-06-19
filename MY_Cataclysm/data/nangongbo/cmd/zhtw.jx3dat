@@ -147,7 +147,6 @@ data = {
     {dwID=12911,nLevel=1,nPriority=5,bAttention=true},--肉體枯竭---輝天塹
     {dwID=12911,nLevel=2,nPriority=5,bAttention=true},--肉體枯竭---輝天塹
     {dwID=12912,nPriority=5,bAttention=true},--冰髓毒發---輝天塹
-    {dwID=12893},--月影心法---輝天塹
     {dwID=12894,col="#FF3232FF",szReminder="刻",nPriority=6},--暗月銘刻---輝天塹
     {dwID=12924,col="#FF3232FF",szReminder="附",nPriority=6},--心魔附體---輝天塹
     {dwID=12969,col="#FF3232FF",szReminder="遲",nPriority=6,szStackOp=">=",nStackNum=4},--心遲---輝天塹

@@ -147,7 +147,6 @@ data = {
     {dwID=12911,nLevel=1,nPriority=5,bAttention=true},--肉体枯竭---辉天堑
     {dwID=12911,nLevel=2,nPriority=5,bAttention=true},--肉体枯竭---辉天堑
     {dwID=12912,nPriority=5,bAttention=true},--冰髓毒发---辉天堑
-    {dwID=12893},--月影心法---辉天堑
     {dwID=12894,col="#FF3232FF",szReminder="刻",nPriority=6},--暗月铭刻---辉天堑
     {dwID=12924,col="#FF3232FF",szReminder="附",nPriority=6},--心魔附体---辉天堑
     {dwID=12969,col="#FF3232FF",szReminder="迟",nPriority=6,szStackOp=">=",nStackNum=4},--心迟---辉天堑
