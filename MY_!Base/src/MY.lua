@@ -98,10 +98,10 @@
 -- : ............ ... ,,,.,..         .:;i:rir7rr;rii::..          k@BF :O@J. . ........................................................................  --
 -- ###################################################################################################################################################### --
 
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
@@ -117,9 +117,8 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
------------------------------------------------------------------------------------------
-MY = {}
-function MY.IsEmpty(var)
+---------------------------------------------------------------------------------------------
+local function IsEmpty(var)
 	local szType = type(var)
 	if szType == 'nil' then
 		return true
@@ -140,23 +139,24 @@ function MY.IsEmpty(var)
 		return false
 	end
 end
-function MY.RandomChild(var)
+local function RandomChild(var)
 	if type(var) == 'table' and #var > 0 then
 		return var[random(1, #var)]
 	end
 end
-function MY.IsNil     (var) return type(var) == 'nil'      end
-function MY.IsTable   (var) return type(var) == 'table'    end
-function MY.IsNumber  (var) return type(var) == 'number'   end
-function MY.IsString  (var) return type(var) == 'string'   end
-function MY.IsBoolean (var) return type(var) == 'boolean'  end
-function MY.IsFunction(var) return type(var) == 'function' end
------------------------------------------------------------------------------------------
-local IsNumber, IsBoolean, IsFunction = MY.IsNumber, MY.IsBoolean, MY.IsFunction
-local IsNil, IsString, IsTable, IsEmpty = MY.IsNil, MY.IsString, MY.IsTable, MY.IsEmpty
------------------------------------------------------------------------------------------
+local function IsNil     (var) return type(var) == 'nil'      end
+local function IsTable   (var) return type(var) == 'table'    end
+local function IsNumber  (var) return type(var) == 'number'   end
+local function IsString  (var) return type(var) == 'string'   end
+local function IsBoolean (var) return type(var) == 'boolean'  end
+local function IsFunction(var) return type(var) == 'function' end
+---------------------------------------------------------------------------------------------
+MY = {}
+MY.IsNil, MY.IsBoolean, MY.IsEmpty, MY.RandomChild = IsNil, IsBoolean, IsEmpty, RandomChild
+MY.IsNumber, MY.IsString, MY.IsTable, MY.IsFunction = IsNumber, IsString, IsTable, IsFunction
+---------------------------------------------------------------------------------------------
 -- 本地函数变量
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------
 local _BUILD_ = '20180509'
 local _VERSION_ = 0x2010200
 local _DEBUGLV_ = tonumber(LoadLUAData('interface/my.debug.level') or nil) or 4
@@ -169,9 +169,8 @@ local _PSS_ST_         = _FRAMEWORK_ROOT_ .. 'image/ST.pss'
 local _UITEX_ST_       = _FRAMEWORK_ROOT_ .. 'image/ST_UI.UITex'
 local _UITEX_POSTER_   = _FRAMEWORK_ROOT_ .. 'image/Poster.UITex'
 local _UITEX_COMMON_   = _FRAMEWORK_ROOT_ .. 'image/UICommon.UITex'
-local IsNil, IsNumber, IsFunction = MY.IsNil, MY.IsNumber, MY.IsFunction
-local IsBoolean, IsString, IsTable = MY.IsBoolean, MY.IsString, MY.IsTable
 Log('[MY] Debug level ' .. _DEBUGLV_ .. ' / delog level ' .. _DELOGLV_)
+---------------------------------------------------------------------------------------------
 
 -- 多语言处理
 -- (table) MY.LoadLangPack(void)
@@ -281,9 +280,9 @@ end
 end
 
 
---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------
 -- 界面开关
---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------
 -- close window
 function MY.ClosePanel(bMute, bRealClose, bNoAnimate)
 	local hFrame = MY.GetFrame()
@@ -418,9 +417,9 @@ function MY.GetVersion()
 	return szVersion, _VERSION_
 end
 
---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------
 -- 事件注册
---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------
 do local INIT_FUNC_LIST = {}
 local function OnInit()
 	if not INIT_FUNC_LIST then
@@ -766,9 +765,9 @@ MY.RegisterBgMsg('MY_ABOUT', function(_, nChannel, dwID, szName, bIsSelf, ...)
 		GetClientTeam().SetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE, dwID)
 	end
 end)
---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------
 -- 选项卡
---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------
 do local TABS_LIST = {
 	{ id = _L['General'] },
 	{ id = _L['Target'] },
@@ -1149,9 +1148,9 @@ function MY.RegisterPanel(szID, szTitle, szCategory, szIconTex, rgbaTitleColor, 
 end
 end
 
---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------
 -- 窗口函数
---------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------
 function MY.OnItemLButtonDBClick()
 	local name = this:GetName()
 	if name == 'Handle_DBClick' then
