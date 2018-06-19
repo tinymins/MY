@@ -236,12 +236,7 @@ function D.UpdateItem(hItem, p)
 	if dwType ~= TARGET.DOODAD then
 		local nCurrentLife, nMaxLife = info.nCurrentLife, info.nMaxLife
 		local nCurrentMana, nMaxMana = info.nCurrentMana, info.nMaxMana
-		local szLife = ''
-		if nCurrentLife > 10000 then
-			szLife = szLife .. FormatString(g_tStrings.MPNEY_TENTHOUSAND, floor(nCurrentLife / 1000) / 10)
-		else
-			szLife = szLife .. nCurrentLife
-		end
+		local szLife = MY.FormatNumberDot(nCurrentLife, 1, false, true)
 		if nMaxLife > 0 then
 			local nPercent = floor(nCurrentLife / nMaxLife * 100)
 			if nPercent > 100 then
@@ -253,7 +248,7 @@ function D.UpdateItem(hItem, p)
 		end
 		if nMaxMana > 0 then
 			hItem:Lookup('Handle_LMN/Image_Mana'):SetPercentage(nCurrentMana / nMaxMana)
-			hItem:Lookup('Handle_LMN/Text_Mana'):SetText(nCurrentMana .. '/' .. nMaxMana)
+			hItem:Lookup('Handle_LMN/Text_Mana'):SetText(MY.FormatNumberDot(nCurrentMana, 1, false, true) .. '/' .. MY.FormatNumberDot(nMaxMana, 1, false, true))
 		end
 	end
 	-- ∂¡Ãı
