@@ -4,23 +4,28 @@
 --@Last Modified by:   tinymins (root@derzh.com)
 --@Last Modified time: 2018-01-08 21:19:32
 ------------------------------------------------
-------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
-------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
-local insert, remove, concat = table.insert, table.remove, table.concat
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
 local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
-local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local type, tonumber, tostring = type, tonumber, tostring
+local huge, pi, random = math.huge, math.pi, math.random
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
-local floor, min, max, ceil = math.floor, math.min, math.max, math.ceil
 local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local IsNumber, IsBoolean, IsFunction = MY.IsNumber, MY.IsBoolean, MY.IsFunction
-local IsNil, IsString, IsTable, IsEmpty = MY.IsNil, MY.IsString, MY.IsTable, MY.IsEmpty
+local IsNil, IsBoolean, IsEmpty, RandomChild = MY.IsNil, MY.IsBoolean, MY.IsEmpty, MY.RandomChild
+local IsNumber, IsString, IsTable, IsFunction = MY.IsNumber, MY.IsString, MY.IsTable, MY.IsFunction
+---------------------------------------------------------------------------------------------------
 
 local D = {}
 local BOX_SPARKING_FRAME = GLOBAL.GAME_FPS * 2 / 3
@@ -522,9 +527,9 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 			hItem:Show()
 		end
 		if not hItem.bExist then
-			local szSound = hItem.dwID and hItem.mon.ids[hItem.dwID] and MY.RandomChild(hItem.mon.ids[hItem.dwID].soundAppear)
+			local szSound = hItem.dwID and hItem.mon.ids[hItem.dwID] and RandomChild(hItem.mon.ids[hItem.dwID].soundAppear)
 			if not szSound or szSound == '' then
-				szSound = MY.RandomChild(hItem.mon.soundAppear)
+				szSound = RandomChild(hItem.mon.soundAppear)
 			end
 			if szSound and szSound ~= '' then
 				MY.PlaySound(SOUND.CHARACTER_SOUND, szSound)
@@ -562,9 +567,9 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 			needFormatItemPos = true
 		end
 		if hItem.bExist then
-			local szSound = hItem.dwID and hItem.mon.ids[hItem.dwID] and MY.RandomChild(hItem.mon.ids[hItem.dwID].soundDisappear)
+			local szSound = hItem.dwID and hItem.mon.ids[hItem.dwID] and RandomChild(hItem.mon.ids[hItem.dwID].soundDisappear)
 			if not szSound or szSound == '' then
-				szSound = MY.RandomChild(hItem.mon.soundDisappear)
+				szSound = RandomChild(hItem.mon.soundDisappear)
 			end
 			if szSound and szSound ~= '' then
 				MY.PlaySound(SOUND.CHARACTER_SOUND, szSound)
