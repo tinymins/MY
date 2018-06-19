@@ -130,4 +130,7 @@ data = {
 
     ['Loop target between me and target'] = '循環選擇自己和目標',
     ['%%.1f/%d meter(s)'] = '%%.1f/%d 尺',
+
+    ['Click to enable MY player view magnifier'] = '點擊開啓茗伊試衣間',
+    ['Click to disable MY player view magnifier'] = '點擊關閉茗伊試衣間',
 }
