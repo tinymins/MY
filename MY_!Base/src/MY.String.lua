@@ -7,26 +7,34 @@
 -- @Last modified time: 2016-09-22 11:58:22
 -- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
 --------------------------------------------
-------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
-------------------------------------------------------------------------
-local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
-local tinsert, tremove, tconcat = table.insert, table.remove, table.concat
-local ssub, slen, schar, srep, sbyte, sformat, sgsub =
-	  string.sub, string.len, string.char, string.rep, string.byte, string.format, string.gsub
-local type, tonumber, tostring = type, tonumber, tostring
-local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
-local floor, mmin, mmax, mceil = math.floor, math.min, math.max, math.ceil
-local GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID = GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID
-local UrlEncodeString, UrlDecodeString = UrlEncode, UrlDecode
-local AnsiToUTF8 = AnsiToUTF8 or ansi_to_utf8
+---------------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local huge, pi, random = math.huge, math.pi, math.random
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local IsNil, IsBoolean, IsEmpty, RandomChild = MY.IsNil, MY.IsBoolean, MY.IsEmpty, MY.RandomChild
+local IsNumber, IsString, IsTable, IsFunction = MY.IsNumber, MY.IsString, MY.IsTable, MY.IsFunction
+---------------------------------------------------------------------------------------------------
+local AnsiToUTF8 = AnsiToUTF8 or ansi_to_utf8
+local UrlEncodeString, UrlDecodeString = UrlEncode, UrlDecode
 --------------------------------------------
 -- 本地函数和变量
 --------------------------------------------
-MY = MY or {}
-MY.String = MY.String or {}
+MY.String = {}
 
 -- 分隔字符串
 -- (table) MY.String.Split(string szText, string szSpliter, bool bIgnoreEmptyPart)
@@ -38,17 +46,17 @@ function MY.String.Split(szText, szSep, bIgnoreEmptyPart)
 	while true do
 		local nEnd = StringFindW(szText, szSep, nOff)
 		if not nEnd then
-			szPart = string.sub(szText, nOff, string.len(szText))
+			szPart = sub(szText, nOff, len(szText))
 			if not bIgnoreEmptyPart or szPart ~= '' then
-				table.insert(tResult, szPart)
+				insert(tResult, szPart)
 			end
 			break
 		else
-			szPart = string.sub(szText, nOff, nEnd - 1)
+			szPart = sub(szText, nOff, nEnd - 1)
 			if not bIgnoreEmptyPart or szPart ~= '' then
-				table.insert(tResult, szPart)
+				insert(tResult, szPart)
 			end
-			nOff = nEnd + string.len(szSep)
+			nOff = nEnd + len(szSep)
 		end
 	end
 	return tResult
@@ -57,7 +65,7 @@ MY.Split = MY.String.Split
 
 -- 转义正则表达式特殊字符
 -- (string) MY.String.PatternEscape(string szText)
-function MY.String.PatternEscape(s) return (string.gsub(s, '([%(%)%.%%%+%-%*%?%[%^%$%]])', '%%%1')) end
+function MY.String.PatternEscape(s) return (gsub(s, '([%(%)%.%%%+%-%*%?%[%^%$%]])', '%%%1')) end
 
 -- 清除字符串首尾的空白字符
 -- (string) MY.String.Trim(string szText)
@@ -65,26 +73,26 @@ function MY.String.Trim(szText)
 	if not szText or szText == '' then
 		return ''
 	end
-	return (string.gsub(szText, '^%s*(.-)%s*$', '%1'))
+	return (gsub(szText, '^%s*(.-)%s*$', '%1'))
 end
 MY.Trim = MY.String.Trim
 
 function MY.String.LenW(str)
-	return wstring.len(str)
+	return wlen(str)
 end
 
 function MY.String.SubW(str,s,e)
 	if s < 0 then
-		s = wstring.len(str) + s
+		s = wlen(str) + s
 	end
 	if e < 0 then
-		e = wstring.len(str) + e
+		e = wlen(str) + e
 	end
-	return wstring.sub(str, s, e)
+	return wsub(str, s, e)
 end
 
 function MY.String.SimpleEncrypt(szText)
-	return szText:gsub('.', function (c) return string.format ('%02X', (string.byte(c) + 13) % 256) end):gsub(' ', '+')
+	return szText:gsub('.', function (c) return format ('%02X', (byte(c) + 13) % 256) end):gsub(' ', '+')
 end
 MY.SimpleEncrypt = MY.String.SimpleEncrypt
 
@@ -95,7 +103,7 @@ local function EncodePostData(data, t, prefix)
 			if first then
 				first = false
 			else
-				tinsert(t, '&')
+				insert(t, '&')
 			end
 			if prefix == '' then
 				EncodePostData(v, t, k)
@@ -105,17 +113,17 @@ local function EncodePostData(data, t, prefix)
 		end
 	else
 		if prefix ~= '' then
-			tinsert(t, prefix)
-			tinsert(t, '=')
+			insert(t, prefix)
+			insert(t, '=')
 		end
-		tinsert(t, data)
+		insert(t, data)
 	end
 end
 
 function MY.EncodePostData(data)
 	local t = {}
 	EncodePostData(data, t, '')
-	local text = table.concat(t)
+	local text = concat(t)
 	return text
 end
 
@@ -159,13 +167,13 @@ MY.ConvertToAnsi = ConvertToAnsi
 
 if not UrlEncodeString then
 function UrlEncodeString(szText)
-	return szText:gsub('([^0-9a-zA-Z ])', function (c) return string.format ('%%%02X', string.byte(c)) end):gsub(' ', '+')
+	return szText:gsub('([^0-9a-zA-Z ])', function (c) return format ('%%%02X', byte(c)) end):gsub(' ', '+')
 end
 end
 
 if not UrlDecodeString then
 function UrlDecodeString(szText)
-	return szText:gsub('+', ' '):gsub('%%(%x%x)', function(h) return string.char(tonumber(h, 16)) end)
+	return szText:gsub('+', ' '):gsub('%%(%x%x)', function(h) return char(tonumber(h, 16)) end)
 end
 end
 
@@ -249,11 +257,11 @@ function MY.String.SimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIg
 					if not bDistinctEnEm then
 						szKeyword = StringEnerW(szKeyword)
 					end
-					tinsert(tKeyWords, { szKeyword = szKeyword, bNegative = bNegative })
+					insert(tKeyWords, { szKeyword = szKeyword, bNegative = bNegative })
 				end
-				tinsert(tKeyWordsLine, tKeyWords)
+				insert(tKeyWordsLine, tKeyWords)
 			end
-			tinsert(tFind, tKeyWordsLine)
+			insert(tFind, tKeyWordsLine)
 		end
 		m_simpleMatchCache[szFind] = tFind
 	end
@@ -268,11 +276,11 @@ function MY.String.SimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIg
 			for _, info in ipairs(tKeyWords) do      -- 符合一个即可
 				-- szKeyword = MY.String.PatternEscape(szKeyword) -- 用了wstring还Escape个捷豹
 				if info.bNegative then               -- !小铁被吃了
-					if not wstring.find(szText, info.szKeyword) then
+					if not wfind(szText, info.szKeyword) then
 						bKeyWord = true
 					end
 				else                                                    -- 十人   -- 10
-					if wstring.find(szText, info.szKeyword) then
+					if wfind(szText, info.szKeyword) then
 						bKeyWord = true
 					end
 				end
