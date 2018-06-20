@@ -28,6 +28,9 @@ function TI.GetFrame()
 end
 
 function TI.CreateFrame(a, b)
+	if MY.IsInZombieMap() then
+		return
+	end
 	local ui = TI.GetFrame()
 	if ui then
 		ui = XGUI(ui)
@@ -167,6 +170,9 @@ function TI.CreateFrame(a, b)
 end
 
 function TI.OpenFrame()
+	if MY.IsInZombieMap() then
+		return MY.Topmsg(_L['TeamNotice is disabled in this map.'])
+	end
 	local me = GetClientPlayer()
 	MY_TeamNotice.bEnable = true
 	if me.IsInRaid() then
@@ -181,6 +187,9 @@ function TI.OpenFrame()
 end
 
 MY.RegisterEvent('PARTY_LEVEL_UP_RAID.TEAM_NOTICE', function()
+	if MY.IsInZombieMap() then
+		return
+	end
 	if MY.IsLeader() then
 		MY.Confirm(_L['Edit team info?'], function()
 			MY_TeamNotice.bEnable = true
@@ -196,6 +205,13 @@ MY.RegisterEvent('FIRST_LOADING_END.TEAM_NOTICE', function()
 	local me = GetClientPlayer()
 	if me.IsInRaid() then
 		MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'TI', 'ASK')
+	end
+end)
+MY.RegisterEvent('LOADING_END.TEAM_NOTICE', function()
+	local frame = TI.GetFrame()
+	if frame and MY.IsInZombieMap() then
+		Wnd.CloseWindow(frame)
+		MY.Topmsg(_L['TeamNotice is disabled in this map.'])
 	end
 end)
 

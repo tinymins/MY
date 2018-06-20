@@ -67,4 +67,6 @@ data = {
 	['GKP Golden Team Record'] = '金团记录',
 	['You haven\'t had MY_GKP installed and loaded yet.'] = '喂！你并没有安装和加载茗伊金团记录！小退检查下插件吧╭(╯^╰)╮',
 	['Import Data'] = '导入数据',
+
+	['TeamNotice is disabled in this map.'] = '本地图禁止使用团队告示',
 }
