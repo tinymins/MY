@@ -698,7 +698,7 @@ local function GenerateList(bForceRefresh)
 end
 
 -- 获取指定地图指定模板ID的NPC是不是重要NPC
--- (boolean) MY.IsImportantNpc(dwMapID, dwTem)
+-- (boolean) MY.IsImportantNpc(dwMapID, dwTemplateID, bNoBoss)
 function MY.IsImportantNpc(dwMapID, dwTemplateID, bNoBoss)
 	GenerateList()
 	return (
@@ -707,6 +707,12 @@ function MY.IsImportantNpc(dwMapID, dwTemplateID, bNoBoss)
 			and not (INPC_LIST_CUSTOM[dwMapID] and INPC_LIST_CUSTOM[dwMapID].DEL[dwTemplateID])
 		) or (INPC_LIST_CUSTOM[dwMapID] and INPC_LIST_CUSTOM[dwMapID].ADD[dwTemplateID])
 	) and true or (not bNoBoss and MY.IsBoss(dwMapID, dwTemplateID) or false)
+end
+
+-- 获取指定模板ID的NPC是不是被屏蔽的NPC
+-- (boolean) MY.IsShieldedNpc(dwTemplateID)
+function MY.IsShieldedNpc(dwTemplateID)
+	return Table_IsShieldedNpc and Table_IsShieldedNpc(dwTemplateID)
 end
 
 MY.RegisterTargetAddonMenu('MY.Game.ImportantNpclist', function()
