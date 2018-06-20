@@ -4029,10 +4029,61 @@ function XGUI.OpenFontPicker(callback, t)
 	return ui
 end
 
-local ICON_PAGE
+do local ICON_PAGE, MAX_ICON
 -- icon选择器
 function XGUI.OpenIconPanel(fnAction)
-	local nMaxIcon, boxs, txts = 8587, {}, {}
+	if not MAX_ICON then
+		local szPath = 'ui\\Scheme\\Case\\icon.txt'
+		local tTitle = {
+			{ f = 'i', t = 'dwID'       },
+			{ f = 's', t = 'szFileName' },
+			{ f = 'i', t = 'nFrame'     },
+			{ f = 's', t = 'szKind'     },
+			{ f = 's', t = 'szSubKind'  },
+			{ f = 's', t = 'szTag1'     },
+			{ f = 's', t = 'szTag2'     },
+		}
+		local tInfo = KG_Table.Load(szPath, tTitle, FILE_OPEN_MODE.NORMAL)
+		if tInfo then
+			local nMaxL, nMaxR = 7500, 15000  -- 折半查找两端数值
+			local bMaxL = tInfo:Search(nMaxL) -- 折半查找左端结果
+			local bMaxR = tInfo:Search(nMaxR) -- 折半查找右端结果
+			local nCount, nMaxCount = 0, 1000 -- 折半次数统计 1000次折半查找还没找到多半是BUG了 判断上限防止死循环
+			while true do
+				if nMaxL < 1 then
+					break
+				elseif bMaxL and bMaxR then
+					nMaxR = nMaxR * 2
+				elseif not bMaxL and not bMaxR then
+					nMaxL = floor(nMaxL / 2)
+				else
+					if bMaxL and not bMaxR then
+						if nMaxL + 1 == nMaxR then
+							MAX_ICON = nMaxL
+							break
+						else
+							local nCur = floor(nMaxR - (nMaxR - nMaxL) / 2)
+							local bCur = tInfo:Search(nCur)
+							if bCur then
+								nMaxL = nCur
+							else
+								nMaxR = nCur
+							end
+						end
+					elseif not bMaxL and bMaxR then
+						MY.Debug('ERROR CALC MAX_ICON!', MY_DEBUG.ERROR)
+						break
+					end
+				end
+				if nCount >= nMaxCount then
+					break
+				end
+				nCount = nCount + 1
+			end
+		end
+		MAX_ICON = MAX_ICON or 10000
+	end
+	local nMaxIcon, boxs, txts = MAX_ICON, {}, {}
 	local ui = XGUI.CreateFrame('MY_IconPanel', { w = 920, h = 650, text = _L['Icon Picker'], simple = true, close = true, esc = true })
 	local function GetPage(nPage, bInit)
 		if nPage == ICON_PAGE and not bInit then
@@ -4096,6 +4147,7 @@ function XGUI.OpenIconPanel(fnAction)
 		end,
 	})
 	GetPage(ICON_PAGE or 21, true)
+end
 end
 
 -- 打开文本编辑器
