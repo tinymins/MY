@@ -4045,7 +4045,9 @@ function XGUI.OpenIconPanel(fnAction)
 		}
 		local tInfo = KG_Table.Load(szPath, tTitle, FILE_OPEN_MODE.NORMAL)
 		if tInfo then
-			local nMaxL, nMaxR = 7500, 15000  -- 折半查找两端数值
+			local nRowCount = tInfo:GetRowCount()
+			local nMaxL = nRowCount - 256     -- 折半查找左端数值
+			local nMaxR = nRowCount + 256     -- 折半查找右端数值
 			local bMaxL = tInfo:Search(nMaxL) -- 折半查找左端结果
 			local bMaxR = tInfo:Search(nMaxR) -- 折半查找右端结果
 			local nCount, nMaxCount = 0, 1000 -- 折半次数统计 1000次折半查找还没找到多半是BUG了 判断上限防止死循环
@@ -4054,8 +4056,10 @@ function XGUI.OpenIconPanel(fnAction)
 					break
 				elseif bMaxL and bMaxR then
 					nMaxR = nMaxR * 2
+					bMaxR = tInfo:Search(nMaxR)
 				elseif not bMaxL and not bMaxR then
 					nMaxL = floor(nMaxL / 2)
+					bMaxL = tInfo:Search(nMaxL)
 				else
 					if bMaxL and not bMaxR then
 						if nMaxL + 1 == nMaxR then
