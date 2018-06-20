@@ -384,6 +384,11 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 			bFocus = true
 		end
 
+		-- 判断屏蔽的NPC
+		if bFocus and dwType == TARGET.NPC and MY.IsShieldedNpc(dwTemplateID) and MY.IsShieldedVersion() then
+			bFocus = false
+		end
+
 		-- 加入焦点
 		if bFocus then
 			D.OnSetFocus(dwType, dwID, szName, tRule)
