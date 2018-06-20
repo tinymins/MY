@@ -71,7 +71,7 @@ function PS.OnPanelActive(wnd)
 		end,
 		tip = function()
 			if D.IsShielded() then
-				return _L['Can not use in pubg map!']
+				return _L['Can not use in shielded map!']
 			end
 		end,
 		autoenable = function() return not D.IsShielded() end,

@@ -53,7 +53,7 @@ function PS.OnPanelActive(wnd)
 		end,
 		tip = function()
 			if MY_Focus.IsShielded() then
-				return _L['Can not use in pubg map!']
+				return _L['Can not use in shielded map!']
 			end
 		end,
 		autoenable = function() return not MY_Focus.IsShielded() end,
