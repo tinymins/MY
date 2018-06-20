@@ -4403,7 +4403,7 @@ function XGUI.GetShadowHandle(szName)
 	end
 	local sh = Station.Lookup('Lowest/MY_Shadows') or Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. 'ui/MY_Shadows.ini', 'MY_Shadows')
 	if not sh:Lookup('', szName) then
-		sh:Lookup('', ''):AppendItemFromString(format('<handle> name='%s' </handle>', szName))
+		sh:Lookup('', ''):AppendItemFromString(format('<handle> name="%s" </handle>', szName))
 	end
 	MY.Debug({'Create sh # ' .. szName}, 'XGUI', MY_DEBUG.LOG)
 	return sh:Lookup('', szName)
