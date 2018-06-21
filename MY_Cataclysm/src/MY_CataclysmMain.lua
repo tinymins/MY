@@ -1141,6 +1141,7 @@ function PS.OnPanelActive(frame)
 		oncheck = function(bCheck)
 			Cataclysm_Main.bShowScreenHead = bCheck
 		end,
+		tip = _L['Requires MY_LifeBar loaded.'],
 	}, true):autoWidth():width() + 5
 
 	x = X + 10
@@ -2435,6 +2436,7 @@ function OpenBuffEditPanel(rec)
 			rec.bScreenHead = bChecked
 			update()
 		end,
+		tip = _L['Requires MY_LifeBar loaded.'],
 		autoenable = function() return not rec.bDelete end,
 	}, true):autoWidth():width() + 5
 

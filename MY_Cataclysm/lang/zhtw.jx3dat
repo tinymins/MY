@@ -142,6 +142,7 @@ data = {
 	['Attention'] = '蒙版警告',
 	['Caution'] = '特效警告',
 	['Screen Head'] = '頭頂警告',
+	['Requires MY_LifeBar loaded.'] = '需加載並啓用扁平血條',
 	['Add'] = '添加',
 	['Edit'] = '編輯',
 	['Sure'] = '確定',
