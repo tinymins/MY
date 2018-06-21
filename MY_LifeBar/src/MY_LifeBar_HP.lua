@@ -7,6 +7,28 @@
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
 -- @Last Modified time: 2018-05-31 11:13:06
 --------------------------------------------
+---------------------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+---------------------------------------------------------------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local huge, pi, random = math.huge, math.pi, math.random
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local IsNil, IsBoolean, IsEmpty, RandomChild = MY.IsNil, MY.IsBoolean, MY.IsEmpty, MY.RandomChild
+local IsNumber, IsString, IsTable, IsFunction = MY.IsNumber, MY.IsString, MY.IsTable, MY.IsFunction
+---------------------------------------------------------------------------------------------------
 local HP = class()
 local CACHE = setmetatable({}, {__mode = 'v'})
 
@@ -97,7 +119,7 @@ function HP:ClearLifeText()
 end
 
 -- 填充边框 默认200的nAlpha
-function HP:DrawBorder(szShadowName, szShadowName2, nWidth, nHeight, nOffsetX, nOffsetY, nAlpha)
+function HP:DrawBorder(szShadowName, szShadowName2, nWidth, nHeight, nOffsetX, nOffsetY, nBorder, nR, nG, nB, nAlpha)
 	if self.handle then
 		nAlpha = nAlpha or 200
 		nWidth = nWidth * Station.GetUIScale()
@@ -111,31 +133,31 @@ function HP:DrawBorder(szShadowName, szShadowName2, nWidth, nHeight, nOffsetX, n
 		sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
 		sha:SetD3DPT(D3DPT.TRIANGLEFAN)
 		sha:ClearTriangleFanPoint()
-		local bcX, bcY = -nWidth / 2 + nOffsetX, (-nHeight) - nOffsetY
+		local bcX, bcY = -(nWidth / 2 + nBorder) + nOffsetX, -(nHeight / 2 + nBorder) - nOffsetY
 
-		sha:AppendCharacterID(self.dwID, true, 180, 180, 180, nAlpha, {0, 0, 0, bcX, bcY})
-		sha:AppendCharacterID(self.dwID, true, 180, 180, 180, nAlpha, {0, 0, 0, bcX + nWidth, bcY})
-		sha:AppendCharacterID(self.dwID, true, 180, 180, 180, nAlpha, {0, 0, 0, bcX + nWidth, bcY + nHeight})
-		sha:AppendCharacterID(self.dwID, true, 180, 180, 180, nAlpha, {0, 0, 0, bcX, bcY + nHeight})
+		sha:AppendCharacterID(self.dwID, true, nR, nG, nB, nAlpha, {0, 0, 0, bcX, bcY})
+		sha:AppendCharacterID(self.dwID, true, nR, nG, nB, nAlpha, {0, 0, 0, bcX + nWidth + nBorder * 2, bcY})
+		sha:AppendCharacterID(self.dwID, true, nR, nG, nB, nAlpha, {0, 0, 0, bcX + nWidth + nBorder * 2, bcY + nHeight + nBorder * 2})
+		sha:AppendCharacterID(self.dwID, true, nR, nG, nB, nAlpha, {0, 0, 0, bcX, bcY + nHeight + nBorder * 2})
 
 		-- 绘制内边框
 		local sha = handle:Lookup(szShadowName2)
 		sha:SetTriangleFan(GEOMETRY_TYPE.TRIANGLE)
 		sha:SetD3DPT(D3DPT.TRIANGLEFAN)
 		sha:ClearTriangleFanPoint()
-		local bcX, bcY = -(nWidth / 2 - 1) + nOffsetX, (-(nHeight - 1)) - nOffsetY
+		local bcX, bcY = -nWidth / 2 + nOffsetX, -nHeight / 2 - nOffsetY
 
 		sha:AppendCharacterID(self.dwID, true, 30, 30, 30, nAlpha, {0, 0, 0, bcX, bcY})
-		sha:AppendCharacterID(self.dwID, true, 30, 30, 30, nAlpha, {0, 0, 0, bcX + (nWidth - 2), bcY})
-		sha:AppendCharacterID(self.dwID, true, 30, 30, 30, nAlpha, {0, 0, 0, bcX + (nWidth - 2), bcY + (nHeight - 2)})
-		sha:AppendCharacterID(self.dwID, true, 30, 30, 30, nAlpha, {0, 0, 0, bcX, bcY + (nHeight - 2)})
+		sha:AppendCharacterID(self.dwID, true, 30, 30, 30, nAlpha, {0, 0, 0, bcX + nWidth, bcY})
+		sha:AppendCharacterID(self.dwID, true, 30, 30, 30, nAlpha, {0, 0, 0, bcX + nWidth, bcY + nHeight})
+		sha:AppendCharacterID(self.dwID, true, 30, 30, 30, nAlpha, {0, 0, 0, bcX, bcY + nHeight})
 	end
 	return self
 end
 
 -- 填充血条边框 默认200的nAlpha
-function HP:DrawLifeBorder(nWidth, nHeight, nOffsetX, nOffsetY, nAlpha)
-	return self:DrawBorder('hp_bg', 'hp_bg2', nWidth, nHeight, nOffsetX, nOffsetY, nAlpha)
+function HP:DrawLifeBorder(nWidth, nHeight, nOffsetX, nOffsetY, nBorder, nR, nG, nB, nAlpha)
+	return self:DrawBorder('hp_bg', 'hp_bg2', nWidth, nHeight, nOffsetX, nOffsetY, nBorder, nR, nG, nB, nAlpha)
 end
 function HP:ClearLifeBorder()
 	self:ClearShadow('hp_bg')
@@ -145,10 +167,10 @@ end
 
 -- 填充矩形（进度条/血条）
 -- rgbap: 红,绿,蓝,透明度,进度,绘制方向
-function HP:DrawRect(szShadowName, nWidth, nHeight, nOffsetX, nOffsetY, r, g, b, a, p, d)
+function HP:DrawRect(szShadowName, nWidth, nHeight, nOffsetX, nOffsetY, nPadding, r, g, b, a, p, d)
 	if self.handle then
-		nWidth = nWidth * Station.GetUIScale()
-		nHeight = nHeight * Station.GetUIScale()
+		nWidth = nWidth * Station.GetUIScale() - nPadding * 2
+		nHeight = nHeight * Station.GetUIScale() - nPadding * 2
 		nOffsetX = nOffsetX * Station.GetUIScale()
 		nOffsetY = nOffsetY * Station.GetUIScale()
 		if not p or p > 1 then
@@ -163,21 +185,21 @@ function HP:DrawRect(szShadowName, nWidth, nHeight, nOffsetX, nOffsetY, r, g, b,
 		sha:ClearTriangleFanPoint()
 
 		-- 计算实际绘制宽度高度起始位置
-		local bcX, bcY = -(nWidth / 2 - 2) + nOffsetX, (-(nHeight - 2)) - nOffsetY
+		local bcX, bcY = -nWidth / 2 + nOffsetX, -nHeight / 2 - nOffsetY
 		if d == 'TOP_BOTTOM' then
-			nWidth = nWidth - 4
-			nHeight = (nHeight - 4) * p
+			nWidth = nWidth
+			nHeight = nHeight * p
 		elseif d == 'BOTTOM_TOP' then
-			bcY = bcY + (nHeight - 4) * (1 - p)
-			nWidth = nWidth - 4
-			nHeight = (nHeight - 4) * p
+			bcY = bcY + nHeight * (1 - p)
+			nWidth = nWidth
+			nHeight = nHeight * p
 		elseif d == 'RIGHT_LEFT' then
-			bcX = bcX + (nWidth - 4) * (1 - p)
-			nWidth = (nWidth - 4) * p
-			nHeight = nHeight - 4
+			bcX = bcX + nWidth * (1 - p)
+			nWidth = nWidth * p
+			nHeight = nHeight
 		else -- if d == 'LEFT_RIGHT' then
-			nWidth = (nWidth - 4) * p
-			nHeight = nHeight - 4
+			nWidth = nWidth * p
+			nHeight = nHeight
 		end
 
 		sha:AppendCharacterID(self.dwID, true, r, g, b, a, {0, 0, 0, bcX, bcY})
@@ -189,8 +211,8 @@ function HP:DrawRect(szShadowName, nWidth, nHeight, nOffsetX, nOffsetY, r, g, b,
 end
 
 -- 填充血条
-function HP:DrawLifeBar(nWidth, nHeight, nOffsetX, nOffsetY, r, g, b, a, p, d)
-	return self:DrawRect('hp', nWidth, nHeight, nOffsetX, nOffsetY, r, g, b, a, p, d)
+function HP:DrawLifeBar(nWidth, nHeight, nOffsetX, nOffsetY, nPadding, r, g, b, a, p, d)
+	return self:DrawRect('hp', nWidth, nHeight, nOffsetX, nOffsetY, nPadding, r, g, b, a, p, d)
 end
 
 function HP:ClearLifeBar()

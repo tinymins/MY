@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-06-22 02:09:52
+-- @Last Modified time: 2018-06-22 03:15:10
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -374,7 +374,8 @@ local function CheckInvalidRect(dwType, dwID, me)
 		lb:SetLife(info.nCurrentLife, info.nMaxLife)
 		local bShowLife = szName ~= '' and GetConfigValue('ShowLife', relation, force)
 		if bShowLife then
-			lb:SetLifeBar(Config.nLifeOffsetX, Config.nLifeOffsetY, Config.nLifeWidth, Config.nLifeHeight)
+			lb:SetLifeBar(Config.nLifeOffsetX, Config.nLifeOffsetY, Config.nLifeWidth, Config.nLifeHeight, Config.nLifePadding)
+			lb:SetLifeBarBorder(Config.nLifeBorder, Config.nLifeBorderR, Config.nLifeBorderG, Config.nLifeBorderB)
 		end
 		lb:SetLifeBarVisible(bShowLife)
 		-- 血量数值部分

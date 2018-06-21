@@ -45,6 +45,9 @@ data = {
     ['lifebar height: %s px.'] = '血条高度%spx。',
     ['lifebar offset-x: %d px.'] = '血条水平偏移%spx。',
     ['lifebar offset-y: %d px.'] = '血条竖直偏移%spx。',
+    ['lifebar padding: %d px.'] = '血条内边框宽度%spx。',
+    ['lifebar border: %d px.'] = '血条外边框宽度%spx。',
+    ['lifebar border color'] = '血条边框颜色',
     ['life percentage offset-x: %d px.'] = '血量百分比水平偏移%spx。',
     ['life percentage offset-y: %d px.'] = '血量百分比竖直偏移%spx。',
 

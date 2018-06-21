@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 12:50:01
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-06-22 02:02:17
+-- @Last Modified time: 2018-06-22 03:37:36
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -72,8 +72,13 @@ local function InitConfigData(self)
 	self.life_bar_y = 0
 	self.life_bar_w = 0
 	self.life_bar_h = 0
+	self.life_bar_padding = 0
 	self.life_bar_direction = 'LEFT_RIGHT'
 	self.life_bar_invalid = true
+	self.life_bar_border = 0
+	self.life_bar_border_r = 0
+	self.life_bar_border_g = 0
+	self.life_bar_border_b = 0
 	self.life_bar_border_invalid = true
 end
 
@@ -340,13 +345,25 @@ function LB:SetLifeBarVisible(life_bar_visible)
 	return self
 end
 
-function LB:SetLifeBar(x, y, w, h)
-	if self.life_bar_x ~= x or self.life_bar_y ~= y or self.life_bar_w ~= w or self.life_bar_h ~= h then
+function LB:SetLifeBar(x, y, w, h, padding)
+	if self.life_bar_x ~= x or self.life_bar_y ~= y or self.life_bar_w ~= w or self.life_bar_h ~= h or self.life_bar_padding ~= padding then
 		self.life_bar_x = x
 		self.life_bar_y = y
 		self.life_bar_w = w
 		self.life_bar_h = h
+		self.life_bar_padding = padding
 		self:SetInvalid('life_bar', true)
+	end
+	return self
+end
+
+function LB:SetLifeBarBorder(n, r, g, b)
+	if self.life_bar_border ~= n or self.life_bar_border_r ~= r or self.life_bar_border_g ~= g or self.life_bar_border_b ~= b then
+		self.life_bar_border = n
+		self.life_bar_border_r = r
+		self.life_bar_border_g = g
+		self.life_bar_border_b = b
+		self:SetInvalid('life_bar_border', true)
 	end
 	return self
 end
@@ -373,7 +390,7 @@ end
 function LB:DrawLifeBorder(force)
 	if self.life_bar_border_invalid or force then
 		if self.life_bar_visible then
-			self.hp:DrawLifeBorder(self.life_bar_w, self.life_bar_h, self.life_bar_x, self.life_bar_y, self.a)
+			self.hp:DrawLifeBorder(self.life_bar_w, self.life_bar_h, self.life_bar_x, self.life_bar_y, self.life_bar_border, self.life_bar_border_r, self.life_bar_border_g, self.life_bar_border_b, self.a)
 		else
 			self.hp:ClearLifeBorder()
 		end
@@ -390,7 +407,7 @@ function LB:DrawLife(force)
 		end
 		if self.life_bar_invalid or force then
 			if self.life_bar_visible then
-				self.hp:DrawLifeBar(self.life_bar_w, self.life_bar_h, self.life_bar_x, self.life_bar_y, r, g, b, a, self.life / self.max_life, self.life_bar_direction)
+				self.hp:DrawLifeBar(self.life_bar_w, self.life_bar_h, self.life_bar_x, self.life_bar_y, self.life_bar_padding, r, g, b, a, self.life / self.max_life, self.life_bar_direction)
 			else
 				self.hp:ClearLifeBar()
 			end

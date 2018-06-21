@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 10:36:40
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-06-22 02:22:57
+-- @Last Modified time: 2018-06-22 04:01:02
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -44,10 +44,13 @@ local function LoadUI(ui)
 	ui:children('#WndSliderBox_LifeBarHeight'):value(Config.nLifeHeight)
 	ui:children('#WndSliderBox_LifeBarOffsetX'):value(Config.nLifeOffsetX)
 	ui:children('#WndSliderBox_LifeBarOffsetY'):value(Config.nLifeOffsetY)
+	ui:children('#WndSliderBox_LifeBarPadding'):value(Config.nLifePadding)
+	ui:children('#WndSliderBox_LifeBarBorder'):value(Config.nLifeBorder)
+	ui:children('#Shadow_LifeBarBorderRGB'):color(Config.nLifeBorderR, Config.nLifeBorderG, Config.nLifeBorderB)
 	ui:children('#WndSliderBox_TextOffsetY'):value(Config.nTextOffsetY)
 	ui:children('#WndSliderBox_TextLineHeight'):value(Config.nTextLineHeight)
-	ui:children('#WndSliderBox_TextScale'):value(Config.fTextScale)
-	ui:children('#WndSliderBox_TextSpacing'):value(Config.fTextSpacing)
+	ui:children('#WndSliderBox_TextScale'):value(Config.fTextScale * 40)
+	ui:children('#WndSliderBox_TextSpacing'):value(Config.fTextSpacing * 10)
 	ui:children('#WndSliderBox_LifePerOffsetX'):value(Config.nLifePerOffsetX)
 	ui:children('#WndSliderBox_LifePerOffsetY'):value(Config.nLifePerOffsetY)
 	ui:children('#WndSliderBox_Distance'):value(math.sqrt(Config.nDistance) / 64)
@@ -136,7 +139,7 @@ function PS.OnPanelActive(wnd)
 
 	X, Y = 15, 70
 	x, y = X, Y
-	offsety = 30
+	offsety = 26
 	ui:append('WndSliderBox', {
 		name = 'WndSliderBox_LifeBarWidth',
 		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 5, 150 },
@@ -152,7 +155,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndSliderBox', {
 		name = 'WndSliderBox_LifeBarHeight',
-		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 5, 150 },
+		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 1, 150 },
 		text = function(value) return _L('lifebar height: %s px.', value) end, -- 血条高度
 		value = Config.nLifeHeight,
 		onchange = function(value)
@@ -183,6 +186,32 @@ function PS.OnPanelActive(wnd)
 		value = Config.nLifeOffsetY,
 		onchange = function(value)
 			Config.nLifeOffsetY = value
+			D.Reset()
+		end,
+		autoenable = function() return D.IsEnabled() end,
+	})
+	y = y + offsety
+
+	ui:append('WndSliderBox', {
+		name = 'WndSliderBox_LifeBarPadding',
+		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 10 },
+		text = function(value) return _L('lifebar padding: %d px.', value) end, -- 血条边框宽度
+		value = Config.nLifePadding,
+		onchange = function(value)
+			Config.nLifePadding = value
+			D.Reset()
+		end,
+		autoenable = function() return D.IsEnabled() end,
+	})
+	y = y + offsety
+
+	ui:append('WndSliderBox', {
+		name = 'WndSliderBox_LifeBarBorder',
+		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 10 },
+		text = function(value) return _L('lifebar border: %d px.', value) end, -- 血条边框宽度
+		value = Config.nLifeBorder,
+		onchange = function(value)
+			Config.nLifeBorder = value
 			D.Reset()
 		end,
 		autoenable = function() return D.IsEnabled() end,
@@ -524,6 +553,25 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + offsety
 	offsety = 32
+
+	ui:append('Shadow', {
+		name = 'Shadow_LifeBarBorderRGB', -- 血条边框颜色
+		x = x + 4, y = y + 6,
+		r = Config.nLifeBorderR,
+		g = Config.nLifeBorderG,
+		b = Config.nLifeBorderB,
+		onclick = function()
+			local this = this
+			XGUI.OpenColorPicker(function(r, g, b)
+				Config.nLifeBorderR = r
+				Config.nLifeBorderG = g
+				Config.nLifeBorderB = b
+				XGUI(this):color(r, g, b)
+			end)
+		end,
+	})
+	ui:append('Text', { text = _L['lifebar border color'], x = x + 27, y = y - 2 })
+	y = y + offsety - 10
 
 	ui:append('WndCheckBox', {
 		x = x, y = y, text = _L['show special npc'],
