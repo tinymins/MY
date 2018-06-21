@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 12:50:01
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-03-30 00:48:15
+-- @Last Modified time: 2018-06-22 01:29:54
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -38,7 +38,9 @@ local function InitConfigData(self)
 	self.a = 0
 	self.cfx = nil
 	self.font = 10
-	-- 名字/帮会/称号部分
+	-- 倒计时/名字/帮会/称号部分
+	self.cd_visible = true
+	self.cd_text = ''
 	self.name_visible = true
 	self.name_text = ''
 	self.kungfu_visible = true
@@ -167,6 +169,16 @@ function LB:SetNameVisible(visible)
 	return self
 end
 
+function LB:SetCD(text)
+	if self.cd_text ~= text then
+		self.cd_text = text
+		self:SetInvalid('texts', true)
+		self:SetInvalid('life_bar', true)
+		self:SetInvalid('life_bar_border', true)
+	end
+	return self
+end
+
 function LB:SetName(text)
 	if self.name_text ~= text then
 		self.name_text = text
@@ -280,6 +292,9 @@ function LB:DrawTexts(force)
 				text = text .. self.distance_fmt:format(self.distance)
 			end
 			insert(aTexts, text)
+		end
+		if self.cd_visible and self.cd_text ~= '' then
+			insert(aTexts, self.cd_text)
 		end
 		self.hp:DrawTexts(aTexts, self.texts_y, self.texts_height, r, g, b, a, f)
 		self.texts_invalid = false

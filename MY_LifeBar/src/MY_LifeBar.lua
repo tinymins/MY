@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-06-16 00:48:05
+-- @Last Modified time: 2018-06-22 01:37:36
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -51,6 +51,7 @@ local LB_CACHE = {}
 local TONG_NAME_CACHE = {}
 local NPC_CACHE = {}
 local PLAYER_CACHE = {}
+local COUNTDOWN_CACHE = {}
 local LAST_FIGHT_STATE = false
 local SYS_HEAD_TOP_STATE
 local LB = MY_LifeBar_LB
@@ -303,22 +304,38 @@ local function CheckInvalidRect(dwType, dwID, me)
 		local relation = D.GetRelation(dwID)
 		local force = D.GetForce(dwID)
 		local szName = MY.GetObjectName(object, (Config.bShowAllObjectID and 'always') or (Config.bShowUnnamedObjectID and 'auto') or 'never')
-		-- 配色
+		-- 常规配色
 		local r, g, b = unpack(GetConfigValue('Color', relation, force))
-		lb:SetColor(r, g, b, Config.nAlpha, Config.nFont)
-		lb:SetColorFx(
-			object.nMoveState == MOVE_STATE.ON_DEATH
-			and (dwID == dwTarID and fxDeathTarget or fxDeath)
-			or (dwID == dwTarID and fxTarget or nil)
-		)
-		-- 名字/帮会/称号部分
+		-- 倒计时/名字/帮会/称号部分
+		local cd = COUNTDOWN_CACHE[dwID]
+		if cd then
+			if cd.szType ~= 'BUFF' or object.GetBuff(cd.dwID) then
+				local nSec
+				if cd.nLFC then
+					nSec = (cd.nLFC - GetLogicFrameCount()) / GLOBAL.GAME_FPS
+				else
+					nSec = (cd.nTime - GetTime()) / 1000
+				end
+				if cd.col then
+					local cr, cg, cb = MY.HumanColor2RGB(cd.col)
+					if cr and cg and cb then
+						r, g, b = cr, cg, cb
+					end
+				end
+				lb:SetCD(cd.szText .. '_' .. MY.FormatTimeCount(nSec >= 60 and 'M\'ss"' or 'ss"', min(nSec, 5999)))
+			else
+				COUNTDOWN_CACHE[dwID] = nil
+			end
+		else
+			lb:SetCD('')
+		end
 		-- 名字
 		local bShowName = GetConfigValue('ShowName', relation, force)
 		if bShowName then
 			lb:SetName(szName)
 		end
 		lb:SetNameVisible(bShowName)
-		-- 名字
+		-- 心法
 		local bShowKungfu = Config.bShowKungfu and dwType == TARGET.PLAYER and dwID ~= me.dwID
 		if bShowKungfu then
 			local kunfu = object.GetKungfuMount()
@@ -364,6 +381,13 @@ local function CheckInvalidRect(dwType, dwID, me)
 			lb:SetLifeText(Config.nLifePerOffsetX, Config.nLifePerOffsetY, Config.bHideLifePercentageDecimal and '%.0f' or '%.1f')
 		end
 		lb:SetLifeTextVisible(bShowLifePercent)
+		-- 配色生效
+		lb:SetColor(r, g, b, Config.nAlpha, Config.nFont)
+		lb:SetColorFx(
+			object.nMoveState == MOVE_STATE.ON_DEATH
+			and (dwID == dwTarID and fxDeathTarget or fxDeath)
+			or (dwID == dwTarID and fxTarget or nil)
+		)
 		lb:Create():Paint()
 	elseif lb then
 		lb:Remove()
@@ -416,6 +440,20 @@ RegisterEvent('PLAYER_LEAVE_SCENE',function()
 		LB_CACHE[arg0] = nil
 	end
 	PLAYER_CACHE[arg0] = nil
+end)
+
+RegisterEvent('MY_LIFEBAR_COUNTDOWN', function()
+	if arg1 then
+		COUNTDOWN_CACHE[arg0] = {
+			dwID = arg1,
+			szType = arg2,
+			szText = arg3,
+			nLFC = arg4,
+			col = arg5,
+		}
+	else
+		COUNTDOWN_CACHE[arg0] = nil
+	end
 end)
 
 local function onSwitch()
