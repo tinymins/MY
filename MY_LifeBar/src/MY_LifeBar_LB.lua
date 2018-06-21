@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 12:50:01
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-06-22 01:29:54
+-- @Last Modified time: 2018-06-22 02:02:17
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -54,6 +54,8 @@ local function InitConfigData(self)
 	self.title_text = ''
 	self.texts_y = 100
 	self.texts_height = 20
+	self.texts_scale = 1
+	self.texts_spacing = 1
 	self.texts_invalid = true
 	-- ÑªÁ¿²¿·Ö
 	self.life = 1
@@ -156,6 +158,22 @@ function LB:SetTextsPos(y, height)
 	if self.texts_y ~= y or self.texts_height ~= height then
 		self.texts_y = y
 		self.texts_height = height
+		self:SetInvalid('texts', true)
+	end
+	return self
+end
+
+function LB:SetTextsScale(scale)
+	if self.texts_scale ~= scale then
+		self.texts_scale = scale
+		self:SetInvalid('texts', true)
+	end
+	return self
+end
+
+function LB:SetTextsSpacing(spacing)
+	if self.texts_spacing ~= spacing then
+		self.texts_spacing = spacing
 		self:SetInvalid('texts', true)
 	end
 	return self
@@ -296,7 +314,7 @@ function LB:DrawTexts(force)
 		if self.cd_visible and self.cd_text ~= '' then
 			insert(aTexts, self.cd_text)
 		end
-		self.hp:DrawTexts(aTexts, self.texts_y, self.texts_height, r, g, b, a, f)
+		self.hp:DrawTexts(aTexts, self.texts_y, self.texts_height, r, g, b, a, f, self.texts_spacing, self.texts_scale)
 		self.texts_invalid = false
 	end
 	return self
@@ -380,7 +398,7 @@ function LB:DrawLife(force)
 		end
 		if self.life_text_invalid or force then
 			if self.life_text_visible then
-				self.hp:DrawLifeText(self.life_text_fmt:format(100 * self.life / self.max_life), self.life_text_x, self.life_text_y, r, g, b, a, f)
+				self.hp:DrawLifeText(self.life_text_fmt:format(100 * self.life / self.max_life), self.life_text_x, self.life_text_y, r, g, b, a, f, self.texts_spacing, self.texts_scale)
 			else
 				self.hp:ClearLifeText()
 			end

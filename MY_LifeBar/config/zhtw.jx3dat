@@ -6,6 +6,8 @@ data = {
 
 	nTextOffsetY = 60,
 	nTextLineHeight = 24,
+	fTextScale = 1,
+	fTextSpacing = 1,
 
 	bShowSpecialNpc = false,
 	bShowUnnamedObjectID = false,

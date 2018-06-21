@@ -61,7 +61,7 @@ function HP:ClearShadow(szShadowName)
 end
 
 -- 绘制名字/帮会/称号 等等 行文字
-function HP:DrawTexts(aTexts, nY, nLineHeight, r, g, b, a, f)
+function HP:DrawTexts(aTexts, nY, nLineHeight, r, g, b, a, f, spacing, scale)
 	if self.handle then
 		nY = nY * Station.GetUIScale()
 		nLineHeight = nLineHeight * Station.GetUIScale()
@@ -71,7 +71,7 @@ function HP:DrawTexts(aTexts, nY, nLineHeight, r, g, b, a, f)
 
 		for _, szText in ipairs(aTexts) do
 			if szText ~= '' then
-				sha:AppendCharacterID(self.dwID, true, r, g, b, a, {0, 0, 0, 0, -nY}, f, szText, 1, 1)
+				sha:AppendCharacterID(self.dwID, true, r, g, b, a, {0, 0, 0, 0, -nY}, f, szText, spacing, scale)
 				nY =  nY + nLineHeight
 			end
 		end
@@ -80,14 +80,14 @@ function HP:DrawTexts(aTexts, nY, nLineHeight, r, g, b, a, f)
 end
 
 -- 绘制血量百分比文字（减少重绘次数所以和Wordlines分离）
-function HP:DrawLifeText(text, x, y, r, g, b, a, f)
+function HP:DrawLifeText(text, x, y, r, g, b, a, f, spacing, scale)
 	if self.handle then
 		x = x * Station.GetUIScale()
 		y = y * Station.GetUIScale()
 		local sha = self.handle:Lookup('hp_title')
 		sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
 		sha:ClearTriangleFanPoint()
-		sha:AppendCharacterID(self.dwID, true, r, g, b, a, {0, 0, 0, x, -y}, f, text, 1, 1)
+		sha:AppendCharacterID(self.dwID, true, r, g, b, a, {0, 0, 0, x, -y}, f, text, spacing, scale)
 	end
 	return self
 end

@@ -50,6 +50,8 @@ data = {
 
     ['text offset-y: %d px.'] = '文字高度偏移%spx。',
     ['text line height: %d px.'] = '文字行高%spx。',
+    ['text scale: %.1f%%.'] = '文字縮放：%.1f%%。',
+    ['text spacing: %.1f.'] = '文字間距：%.1f。',
     ['alpha: %.0f%%.'] = '透明度%.0f%%。',
 
     ['set current camp'] = '設置當前陣營',

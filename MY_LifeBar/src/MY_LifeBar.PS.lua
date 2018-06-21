@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 10:36:40
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-06-10 01:13:07
+-- @Last Modified time: 2018-06-22 02:22:57
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -46,6 +46,8 @@ local function LoadUI(ui)
 	ui:children('#WndSliderBox_LifeBarOffsetY'):value(Config.nLifeOffsetY)
 	ui:children('#WndSliderBox_TextOffsetY'):value(Config.nTextOffsetY)
 	ui:children('#WndSliderBox_TextLineHeight'):value(Config.nTextLineHeight)
+	ui:children('#WndSliderBox_TextScale'):value(Config.fTextScale)
+	ui:children('#WndSliderBox_TextSpacing'):value(Config.fTextSpacing)
 	ui:children('#WndSliderBox_LifePerOffsetX'):value(Config.nLifePerOffsetX)
 	ui:children('#WndSliderBox_LifePerOffsetY'):value(Config.nLifePerOffsetY)
 	ui:children('#WndSliderBox_Distance'):value(math.sqrt(Config.nDistance) / 64)
@@ -134,7 +136,7 @@ function PS.OnPanelActive(wnd)
 
 	X, Y = 15, 70
 	x, y = X, Y
-	offsety = 34
+	offsety = 30
 	ui:append('WndSliderBox', {
 		name = 'WndSliderBox_LifeBarWidth',
 		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 5, 150 },
@@ -233,6 +235,32 @@ function PS.OnPanelActive(wnd)
 		value = Config.nTextLineHeight,
 		onchange = function(value)
 			Config.nTextLineHeight = value
+			D.Reset()
+		end,
+		autoenable = function() return D.IsEnabled() end,
+	})
+	y = y + offsety
+
+	ui:append('WndSliderBox', {
+		name = 'WndSliderBox_TextScale',
+		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 200 },
+		text = function(value) return _L('text scale: %.1f%%.', value / 40 * 100) end, -- ×ÖËõ·Å
+		value = Config.fTextScale * 40,
+		onchange = function(value)
+			Config.fTextScale = value / 40
+			D.Reset()
+		end,
+		autoenable = function() return D.IsEnabled() end,
+	})
+	y = y + offsety
+
+	ui:append('WndSliderBox', {
+		name = 'WndSliderBox_TextSpacing',
+		x = x, y = y, sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = { 0, 300 },
+		text = function(value) return _L('text spacing: %.1f.', value / 10) end, -- ×Ö¼ä¾à
+		value = Config.fTextSpacing * 10,
+		onchange = function(value)
+			Config.fTextSpacing = value / 10
 			D.Reset()
 		end,
 		autoenable = function() return D.IsEnabled() end,
