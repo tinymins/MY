@@ -1614,11 +1614,7 @@ function D.UpdateCharaterBuff(p, handle, key, data, KBuff)
 				CTM_SCREEN_HEAD[dwCharID] = {}
 			end
 			if not CTM_SCREEN_HEAD[dwCharID][key] then
-				FireUIEvent('MY_SA_CREATE', KBuff.bCanCancel and 'BUFF' or 'DEBUFF', dwCharID, {
-					dwID = item.dwID,
-					col = data.col or 'yellow',
-					text = item.szName .. '_' .. p.szName,
-				})
+				FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwCharID, 'BUFF', item.dwID, item.szName, item.nEndFrame, data.col)
 				CTM_SCREEN_HEAD[dwCharID][key] = true
 			end
 		end
@@ -1641,6 +1637,7 @@ function D.UpdateCharaterBuff(p, handle, key, data, KBuff)
 			CTM_CAUTION_BUFF[dwCharID][key] = nil
 		end
 		if CTM_SCREEN_HEAD[dwCharID] then
+			FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwCharID, false)
 			CTM_SCREEN_HEAD[dwCharID][key] = nil
 		end
 	end
