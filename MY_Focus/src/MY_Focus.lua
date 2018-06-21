@@ -275,7 +275,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		return
 	end
 
-	local szName = MY.GetObjectName(KObject, false)
+	local szName = MY.GetObjectName(KObject, 'never')
 	-- 解决玩家刚进入视野时名字为空的问题
 	if (dwType == TARGET.PLAYER and not szName) or not me then -- 解决自身刚进入场景的时候的问题
 		MY.DelayCall(300, function()
@@ -331,7 +331,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 
 		-- 判断竞技场
 		if not bFocus then
-			if MY.IsInArena() or MY.IsInPubg() then
+			if MY.IsInArena() or MY.IsInPubg() or MY.IsInZombieMap() then
 				if dwType == TARGET.PLAYER then
 					if MY_Focus.bFocusJJCEnemy and MY_Focus.bFocusJJCParty then
 						bFocus = true
@@ -404,7 +404,7 @@ function MY_Focus.OnObjectLeaveScene(dwType, dwID)
 			if MY_Focus.bFocusJJCParty
 			and KObject.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
 			and MY.IsInArena() and not (IsEnemy(UI_GetClientPlayerID(), dwID) and MY.IsShieldedVersion()) then
-				D.OnSetFocus(TARGET.PLAYER, KObject.dwEmployer, MY.GetObjectName(KObject, false))
+				D.OnSetFocus(TARGET.PLAYER, KObject.dwEmployer, MY.GetObjectName(KObject, 'never'))
 			end
 		end
 	end
