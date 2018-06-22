@@ -15,8 +15,8 @@ data = {
 	bShowKungfu = false,
 	bShowDistance = false,
 
-	nLifeWidth = 80,
-	nLifeHeight = 6,
+	nLifeWidth = 100,
+	nLifeHeight = 8,
 	nLifePadding = 1,
 	nLifeOffsetX = 0,
 	nLifeOffsetY = 27,
