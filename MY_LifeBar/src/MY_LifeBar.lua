@@ -1,8 +1,8 @@
 ---------------------------------------------------
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
--- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-06-22 03:15:10
+-- @Last Modified by:   Emine Zhai (root@derzh.com)
+-- @Last Modified time: 2018-06-22 10:28:12
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -309,28 +309,28 @@ local function CheckInvalidRect(dwType, dwID, me)
 		-- 常规配色
 		local r, g, b = unpack(GetConfigValue('Color', relation, force))
 		-- 倒计时/名字/帮会/称号部分
-		local cd = COUNTDOWN_CACHE[dwID]
-		if cd then
-			if cd.szType ~= 'BUFF' or object.GetBuff(cd.dwID) then
-				local nSec
-				if cd.nLFC then
-					nSec = (cd.nLFC - GetLogicFrameCount()) / GLOBAL.GAME_FPS
-				else
-					nSec = (cd.nTime - GetTime()) / 1000
+		local aCountDown, szCountDown = COUNTDOWN_CACHE[dwID], ''
+		while aCountDown and #aCountDown > 0 do
+			local tData, szText, nSec = aCountDown[1]
+			if tData.szType ~= 'BUFF' or object.GetBuff(tData.dwBuffID, 0) then
+				if tData.nLogicFrame then
+					nSec = (tData.nLogicFrame - GetLogicFrameCount()) / GLOBAL.GAME_FPS
+				elseif tData.nTime then
+					nSec = (tData.nTime - GetTime()) / 1000
 				end
-				if cd.col then
-					local cr, cg, cb = MY.HumanColor2RGB(cd.col)
-					if cr and cg and cb then
-						r, g, b = cr, cg, cb
-					end
-				end
-				lb:SetCD(cd.szText .. '_' .. MY.FormatTimeCount(nSec >= 60 and 'M\'ss"' or 'ss"', min(nSec, 5999)))
-			else
-				COUNTDOWN_CACHE[dwID] = nil
+				szText = tData.szText
 			end
-		else
-			lb:SetCD('')
+			if nSec and nSec >= 0 and szText and szText ~= '' then
+				if tData.tColor then
+					r, g, b = unpack(tData.tColor)
+				end
+				szCountDown = tData.szText .. '_' .. MY.FormatTimeCount(nSec >= 60 and 'M\'ss"' or 'ss"', min(nSec, 5999))
+				break
+			else
+				remove(aCountDown, 1)
+			end
 		end
+		lb:SetCD(szCountDown)
 		-- 名字
 		local bShowName = GetConfigValue('ShowName', relation, force)
 		if bShowName then
@@ -446,16 +446,29 @@ RegisterEvent('PLAYER_LEAVE_SCENE',function()
 end)
 
 RegisterEvent('MY_LIFEBAR_COUNTDOWN', function()
-	if arg1 then
-		COUNTDOWN_CACHE[arg0] = {
-			dwID = arg1,
-			szType = arg2,
-			szText = arg3,
-			nLFC = arg4,
-			col = arg5,
-		}
-	else
-		COUNTDOWN_CACHE[arg0] = nil
+	local dwID, szType, szKey, tData = arg0, arg1, arg2, arg3
+	if not COUNTDOWN_CACHE[dwID] then
+		COUNTDOWN_CACHE[dwID] = {}
+	end
+	for i, p in ipairs_r(COUNTDOWN_CACHE[dwID]) do
+		if p.szType == szType and p.szKey == szKey then
+			remove(COUNTDOWN_CACHE[dwID], i)
+		end
+	end
+	if tData then
+		local tData = clone(tData)
+		if tData.col then
+			local r, g, b = MY.HumanColor2RGB(tData.col)
+			if r and g and b then
+				tData.tColor = {r, g, b}
+			end
+			tData.col = nil
+		end
+		tData.szType = szType
+		tData.szKey = szKey
+		insert(COUNTDOWN_CACHE[dwID], 1, tData)
+	elseif #COUNTDOWN_CACHE[dwID] == 0 then
+		COUNTDOWN_CACHE[dwID] = nil
 	end
 end)
 
