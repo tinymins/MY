@@ -57,7 +57,9 @@ function HP:Create()
 		hItem:AppendItemFromString('<shadow>name="lines"</shadow>')
 		hItem:AppendItemFromString('<shadow>name="hp_title"</shadow>')
 		hItem:AppendItemFromString('<shadow>name="ot_title"</shadow>')
+		hItem:SetUserData(self.dwID == UI_GetClientPlayerID() and 1 or 0)
 		self.handle = hItem
+		hList:Sort()
 	end
 	return self
 end
