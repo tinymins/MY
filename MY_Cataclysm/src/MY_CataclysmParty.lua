@@ -1620,7 +1620,7 @@ function D.UpdateCharaterBuff(p, handle, key, data, KBuff)
 					nLogicFrame = item.nEndFrame,
 					col = data.col,
 				})
-				CTM_SCREEN_HEAD[dwCharID][key] = true
+				CTM_SCREEN_HEAD[dwCharID][key] = item.dwID
 			end
 		end
 	else
@@ -1641,8 +1641,8 @@ function D.UpdateCharaterBuff(p, handle, key, data, KBuff)
 		if CTM_CAUTION_BUFF[dwCharID] then
 			CTM_CAUTION_BUFF[dwCharID][key] = nil
 		end
-		if CTM_SCREEN_HEAD[dwCharID] then
-			FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwCharID, 'BUFF', item.dwID, false)
+		if CTM_SCREEN_HEAD[dwCharID] and CTM_SCREEN_HEAD[dwCharID][key] then
+			FireUIEvent('MY_LIFEBAR_COUNTDOWN', dwCharID, 'BUFF', CTM_SCREEN_HEAD[dwCharID][key], false)
 			CTM_SCREEN_HEAD[dwCharID][key] = nil
 		end
 	end
