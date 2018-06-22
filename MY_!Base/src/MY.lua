@@ -1028,6 +1028,20 @@ function MY.SwitchTab(szID, bForceUpdate)
 				MY_Serendipity.bAutoShare = not MY_Serendipity.bAutoShare
 			end,
 		}, true):autoWidth():width()
+		ui:append('WndButton', {
+			x = 7, y = 405, w = 130,
+			name = 'WndButton_UserPreferenceFolder',
+			text = _L['Open user preference folder'],
+			onclick = function()
+				local szRoot = MY.FormatPath({'', MY_DATA_PATH.ROLE})
+				if OpenFolder then
+					OpenFolder(szRoot)
+				else
+					XGUI.OpenTextEditor(szRoot)
+				end
+					XGUI.OpenTextEditor(szRoot)
+			end,
+		}, true):autoWidth()
 		wnd.OnPanelResize = function(wnd)
 			local w, h = MY.UI(wnd):size()
 			local scaleH = w / 557 * 278
@@ -1045,6 +1059,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 			ui:children('#WndCheckBox_SerendipityNotifyTip'):top(scaleH + 65)
 			ui:children('#WndCheckBox_SerendipityNotifySound'):top(scaleH + 65)
 			ui:children('#WndCheckBox_SerendipityAutoShare'):top(scaleH + 65)
+			ui:children('#WndButton_UserPreferenceFolder'):top(scaleH + 95)
 		end
 		wnd.OnPanelResize(wnd)
 		MY.BreatheCall(500, function()
