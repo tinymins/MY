@@ -2,7 +2,7 @@
 -- @Author: ChenWei-31027
 -- @Date:   2015-06-19 16:31:21
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-06-24 04:09:09
+-- @Last Modified time: 2018-06-24 04:25:46
 ---------------------------------------------------
 ---------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -140,6 +140,7 @@ function RaidTools.OnFrameCreate()
 	this:RegisterEvent('PARTY_DISBAND')
 	this:RegisterEvent('PARTY_DELETE_MEMBER')
 	this:RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG')
+	this:RegisterEvent('ON_APPLY_PLAYER_SAVED_COPY_RESPOND')
 	this:RegisterEvent('LOADING_END')
 	-- 团长变更 重新请求标签
 	this:RegisterEvent('TEAM_AUTHORITY_CHANGED')
@@ -291,6 +292,9 @@ function RaidTools.OnEvent(szEvent)
 		if MY.IsDungeonMap(RT_MAPID) and not MY.IsDungeonRoleProgressMap(RT_MAPID) then
 			MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID_REQUEST', RT_MAPID) -- 地图变化刷新
 		end
+		local hDungeon = this.hPageSet:Lookup('Page_Info', 'Handle_Dungeon')
+		RT.UpdateDungeonInfo(hDungeon)
+	elseif szEvent == 'ON_APPLY_PLAYER_SAVED_COPY_RESPOND' then
 		local hDungeon = this.hPageSet:Lookup('Page_Info', 'Handle_Dungeon')
 		RT.UpdateDungeonInfo(hDungeon)
 	elseif szEvent == 'UI_SCALED' then
@@ -475,6 +479,11 @@ function RT.UpdateDungeonInfo(hDungeon)
 	local szText = Table_GetMapName(RT_MAPID)
 	if me.GetMapID() == RT_MAPID and MY.IsDungeonMap(RT_MAPID) then
 		szText = szText .. '\n' .. 'ID:(' .. me.GetScene().nCopyIndex  ..')'
+	else
+		local tCD = MY.GetMapSaveCopy()
+		if tCD and tCD[RT_MAPID] then
+			szText = szText .. '\n' .. 'ID:(' .. tCD[RT_MAPID][1]  ..')'
+		end
 	end
 	hDungeon:Lookup('Text_Dungeon'):SetText(szText)
 end
