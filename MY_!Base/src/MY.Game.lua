@@ -555,35 +555,6 @@ function MY.GetDungeonMenu(fnAction, bOnlyRaid)
 end
 end
 
--- 判断一个地图是不是副本
--- (bool) MY.Game.IsDungeonMap(szMapName, bRaid)
--- (bool) MY.Game.IsDungeonMap(dwMapID, bRaid)
-function MY.Game.IsDungeonMap(dwMapID, bRaid)
-	if not _Cache.tMapList then
-		_Cache.tMapList = {}
-		for _, dwMapID in ipairs(GetMapList()) do
-			local map          = { dwMapID = dwMapID }
-			local szName       = Table_GetMapName(dwMapID)
-			local tDungeonInfo = g_tTable.DungeonInfo:Search(dwMapID)
-			if tDungeonInfo and tDungeonInfo.dwClassID == 3 then
-				map.bDungeon = true
-			end
-			_Cache.tMapList[szName] = map
-			_Cache.tMapList[dwMapID] = map
-		end
-	end
-	local map = _Cache.tMapList[dwMapID]
-	if map then
-		dwMapID = map.dwMapID
-	end
-	if bRaid then -- 严格判断25人本
-		return map and map.bDungeon
-	else -- 只判断地图的类型
-		return select(2, GetMapParams(dwMapID)) == MAP_TYPE.DUNGEON
-	end
-end
-MY.IsDungeonMap = MY.Game.IsDungeonMap
-
 -- 获取副本CD列表（异步）
 -- (table) MY.GetMapSaveCopy(fnAction)
 do
@@ -2136,6 +2107,35 @@ function MY.Game.IsInBattleField()
 	return me and me.GetScene().nType == MAP_TYPE.BATTLE_FIELD and not MY.Game.IsInArena()
 end
 MY.IsInBattleField = MY.Game.IsInBattleField
+
+-- 判断一个地图是不是副本
+-- (bool) MY.Game.IsDungeonMap(szMapName, bRaid)
+-- (bool) MY.Game.IsDungeonMap(dwMapID, bRaid)
+function MY.Game.IsDungeonMap(dwMapID, bRaid)
+	if not _Cache.tMapList then
+		_Cache.tMapList = {}
+		for _, dwMapID in ipairs(GetMapList()) do
+			local map          = { dwMapID = dwMapID }
+			local szName       = Table_GetMapName(dwMapID)
+			local tDungeonInfo = g_tTable.DungeonInfo:Search(dwMapID)
+			if tDungeonInfo and tDungeonInfo.dwClassID == 3 then
+				map.bDungeon = true
+			end
+			_Cache.tMapList[szName] = map
+			_Cache.tMapList[dwMapID] = map
+		end
+	end
+	local map = _Cache.tMapList[dwMapID]
+	if map then
+		dwMapID = map.dwMapID
+	end
+	if bRaid then -- 严格判断25人本
+		return map and map.bDungeon
+	else -- 只判断地图的类型
+		return select(2, GetMapParams(dwMapID)) == MAP_TYPE.DUNGEON
+	end
+end
+MY.IsDungeonMap = MY.Game.IsDungeonMap
 
 -- 判断当前地图是不是副本
 -- (bool) MY.Game.IsInDungeon(bool bRaid)
