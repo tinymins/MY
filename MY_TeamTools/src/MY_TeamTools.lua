@@ -2,7 +2,7 @@
 -- @Author: ChenWei-31027
 -- @Date:   2015-06-19 16:31:21
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-06-24 04:25:46
+-- @Last Modified time: 2018-06-24 04:33:46
 ---------------------------------------------------
 ---------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -523,13 +523,17 @@ end
 function RT.CalculateSort(tInfo)
 	local nCount = -2
 	if RT_SORT_FIELD == 'tBossKill' then
-		nCount = 0
-		for _, p in ipairs(tInfo[RT_SORT_FIELD]) do
-			if p then
-				nCount = nCount + 100
-			else
-				nCount = nCount + 1
+		if MY.IsDungeonRoleProgressMap(RT_MAPID) then
+			nCount = 0
+			for _, p in ipairs(tInfo[RT_SORT_FIELD]) do
+				if p then
+					nCount = nCount + 100
+				else
+					nCount = nCount + 1
+				end
 			end
+		else
+			nCount = tInfo.nCopyID or huge
 		end
 	elseif tInfo[RT_SORT_FIELD] then
 		if type(tInfo[RT_SORT_FIELD]) == 'table' then
@@ -820,7 +824,7 @@ function RT.UpdateList()
 			end
 			local hCopyID = h:Lookup('Text_CopyID')
 			local hBossKills = h:Lookup('Handle_BossKills')
-			if v.tBossKill and #v.tBossKill > 0 then
+			if MY.IsDungeonRoleProgressMap(RT_MAPID) then
 				for nIndex, bKill in ipairs(v.tBossKill) do
 					local szName = tostring(nIndex)
 					local hBossKill = hBossKills:Lookup(szName)
