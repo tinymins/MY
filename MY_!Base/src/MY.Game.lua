@@ -515,6 +515,46 @@ function MY.Game.GetTargetContextMenu(dwType, szName, dwID)
 end
 MY.GetTargetContextMenu = MY.Game.GetTargetContextMenu
 
+-- 获取副本选择菜单
+-- (table) MY.GetDungeonMenu(fnAction, bOnlyRaid)
+do
+local function RecruitItemToDungeonMenu(p, fnAction)
+	if p.bParent then
+		local t = { szOption = p.TypeName or p.SubTypeName }
+		for _, pp in ipairs(p) do
+			insert(t, RecruitItemToDungeonMenu(pp, fnAction))
+		end
+		if #t > 0 then
+			return t
+		end
+	else
+		-- 不限阵营 有地图ID 7点开始 持续24小时 基本就是副本了
+		if p.nCamp == 7
+		and p.nStartTime == 7 and p.nLastTime == 24
+		and p.dwMapID and MY.IsDungeonMap(p.dwMapID) then
+			return {
+				szOption = p.szName,
+				bChecked = false,
+				bDisable = false,
+				UserData = {
+					dwID = p.dwMapID,
+					szName = p.szName,
+				},
+				fnAction = fnAction,
+			}
+		end
+	end
+	return nil
+end
+function MY.GetDungeonMenu(fnAction, bOnlyRaid)
+	local t = {}
+	for _, p in ipairs(Table_GetTeamRecruit() or {}) do
+		insert(t, RecruitItemToDungeonMenu(p, fnAction))
+	end
+	return t
+end
+end
+
 -- 判断一个地图是不是副本
 -- (bool) MY.Game.IsDungeonMap(szMapName, bRaid)
 -- (bool) MY.Game.IsDungeonMap(dwMapID, bRaid)
