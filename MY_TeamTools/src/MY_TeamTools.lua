@@ -1,18 +1,35 @@
+---------------------------------------------------
 -- @Author: ChenWei-31027
 -- @Date:   2015-06-19 16:31:21
--- @Last Modified by:   Administrator
--- @Last Modified time: 2016-12-13 01:10:00
-
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TeamTools/lang/')
-
-local pairs, ipairs = pairs, ipairs
-local GetClientTeam, GetClientPlayer = GetClientTeam, GetClientPlayer
-local tinsert = table.insert
+-- @Last Modified by:   Emil Zhai (root@derzh.com)
+-- @Last Modified time: 2018-06-24 04:09:09
+---------------------------------------------------
+---------------------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+---------------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
-local GetPlayer, GetNpc, IsPlayer = GetPlayer, GetNpc, IsPlayer
-local UI_GetClientPlayerID = UI_GetClientPlayerID
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local huge, pi, random = math.huge, math.pi, math.random
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local IsNil, IsBoolean, IsEmpty, RandomChild = MY.IsNil, MY.IsBoolean, MY.IsEmpty, MY.RandomChild
+local IsNumber, IsString, IsTable, IsFunction = MY.IsNumber, MY.IsString, MY.IsTable, MY.IsFunction
+---------------------------------------------------------------------------------------------------
 local SKILL_RESULT_TYPE = SKILL_RESULT_TYPE
 local MY_IsParty, MY_GetSkillName, MY_GetBuffName = MY.IsParty, MY.GetSkillName, MY.GetBuffName
+
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TeamTools/lang/')
 local RT_INIFILE = MY.GetAddonInfo().szRoot .. 'MY_TeamTools/ui/RaidTools2.ini'
 local RT_EQUIP_TOTAL = {
 	'MELEE_WEAPON', -- 轻剑 藏剑取 BIG_SWORD 重剑
@@ -96,6 +113,8 @@ local RT_GONGZHAN_ID = 3219
 -- default sort
 local RT_SORT_MODE    = 'DESC'
 local RT_SORT_FIELD   = 'nEquipScore'
+local RT_MAPID = 0
+local RT_PLAYER_MAP_COPYID = {}
 local RT_SELECT_PAGE  = 0
 local RT_SELECT_KUNGFU
 local RT_SELECT_DEATH
@@ -127,6 +146,7 @@ function RaidTools.OnFrameCreate()
 	-- 自定义事件
 	this:RegisterEvent('MY_RAIDTOOLS_SUCCESS')
 	this:RegisterEvent('MY_RAIDTOOLS_DEATH')
+	this:RegisterEvent('MY_RAIDTOOLS_MAPID_CHANGE')
 	-- 重置心法选择
 	RT_SELECT_KUNGFU = nil
 	-- 注册关闭
@@ -149,7 +169,7 @@ function RaidTools.OnFrameCreate()
 	this.tScore       = {}
 	-- 排序
 	local hTitle  = this.hPageSet:Lookup('Page_Info', 'Handle_Player_BG')
-	for k, v in ipairs({ 'dwForceID', 'tFood', 'tBuff', 'tEquip', 'nEquipScore', 'nFightState' }) do
+	for k, v in ipairs({ 'dwForceID', 'tFood', 'tBuff', 'tEquip', 'nEquipScore', 'tBossKill', 'nFightState' }) do
 		local txt = hTitle:Lookup('Text_Title_' .. k)
 		txt.nFont = txt:GetFontScheme()
 		txt.OnItemMouseEnter = function()
@@ -219,6 +239,10 @@ function RaidTools.OnFrameCreate()
 	-- ui 临时变量
 	this.tViewInvite = {} -- 请求装备队列
 	this.tDataCache  = {} -- 临时数据
+	-- 请求数据
+	if MY.IsDungeonMap(RT_MAPID) and not MY.IsDungeonRoleProgressMap(RT_MAPID) then
+		MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID_REQUEST', RT_MAPID) -- 打开界面刷新
+	end
 	-- 追加呼吸
 	this.hPageSet:ActivePage(RT_SELECT_PAGE)
 	RT.UpdateAnchor(this)
@@ -228,7 +252,8 @@ function RaidTools.OnFrameCreate()
 	this.hPageSet:Lookup('Page_Death/Btn_Clear', 'Text_BtnClear'):SetText(_L['Clear Record'])
 	this.hPageSet:Lookup('Page_Info'):Lookup('', 'Handle_Player_BG/Text_Title_3'):SetText(_L['BUFF'])
 	this.hPageSet:Lookup('Page_Info'):Lookup('', 'Handle_Player_BG/Text_Title_4'):SetText(_L['Equip'])
-	this.hPageSet:Lookup('Page_Info'):Lookup('', 'Handle_Player_BG/Text_Title_6'):SetText(_L['Fight'])
+	this.hPageSet:Lookup('Page_Info'):Lookup('', 'Handle_Player_BG/Text_Title_6'):SetText(_L['Dungeon CD'])
+	this.hPageSet:Lookup('Page_Info'):Lookup('', 'Handle_Player_BG/Text_Title_7'):SetText(_L['Fight'])
 	if RaidTools.nStyle == 1 then
 		this.hPageSet:Lookup('Page_Info'):Lookup('', 'Handle_Progress/Text_Progress_Title'):SetText(_L['Team Members'])
 	end
@@ -262,10 +287,16 @@ function RaidTools.OnEvent(szEvent)
 		-- 副本信息
 		local hDungeon = this.hPageSet:Lookup('Page_Info', 'Handle_Dungeon')
 		RT.UpdateDungeonInfo(hDungeon)
+	elseif szEvent == 'MY_RAIDTOOLS_MAPID_CHANGE' then
+		if MY.IsDungeonMap(RT_MAPID) and not MY.IsDungeonRoleProgressMap(RT_MAPID) then
+			MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID_REQUEST', RT_MAPID) -- 地图变化刷新
+		end
+		local hDungeon = this.hPageSet:Lookup('Page_Info', 'Handle_Dungeon')
+		RT.UpdateDungeonInfo(hDungeon)
 	elseif szEvent == 'UI_SCALED' then
 		RT.UpdateAnchor(this)
 	elseif szEvent == 'MY_RAIDTOOLS_SUCCESS' then
-		if RT_SORT_FIELD   == 'nEquipScore' then
+		if RT_SORT_FIELD == 'nEquipScore' then
 			RT.UpdateList()
 			this.hList:Sort()
 			this.hList:FormatAllItemPos()
@@ -336,10 +367,10 @@ function RaidTools.OnItemMouseEnter()
 		img:SetFrame(23)
 		local nScore = this:Lookup('Text_TotalScore'):GetText()
 		local xml = {}
-		tinsert(xml, GetFormatText(g_tStrings.STR_SCORE .. g_tStrings.STR_COLON .. nScore ..'\n', 65))
+		insert(xml, GetFormatText(g_tStrings.STR_SCORE .. g_tStrings.STR_COLON .. nScore ..'\n', 65))
 		for k, v in pairs(frame.tScore) do
-			tinsert(xml, GetFormatText(RT_SCORE[k] .. g_tStrings.STR_COLON, 67))
-			tinsert(xml, GetFormatText(v ..'\n', 44))
+			insert(xml, GetFormatText(RT_SCORE[k] .. g_tStrings.STR_COLON, 67))
+			insert(xml, GetFormatText(v ..'\n', 44))
 		end
 		local x, y = img:GetAbsPos()
 		local w, h = img:GetSize()
@@ -378,7 +409,11 @@ end
 
 function RaidTools.OnItemLButtonClick()
 	local szName = this:GetName()
-	if tonumber(szName:find('P(%d+)')) then
+	if szName == 'Handle_Dungeon' then
+		local menu = MY.GetDungeonMenu(function(p) RT.SetMapID(p.dwID) end)
+		menu.x, menu.y = Cursor.GetPos(true)
+		PopupMenu(menu)
+	elseif tonumber(szName:find('P(%d+)')) then
 		local dwID = tonumber(szName:match('P(%d+)'))
 		if IsCtrlKeyDown() then
 			EditBox_AppendLinkPlayer(this.szName)
@@ -437,13 +472,11 @@ end
 
 function RT.UpdateDungeonInfo(hDungeon)
 	local me = GetClientPlayer()
-	if MY.IsInDungeon() then
-		local scene = me.GetScene()
-		hDungeon:Lookup('Text_Dungeon'):SetText(Table_GetMapName(me.GetMapID()) .. '\n' .. 'ID:(' .. scene.nCopyIndex  ..')')
-		hDungeon:Show()
-	else
-		hDungeon:Hide()
+	local szText = Table_GetMapName(RT_MAPID)
+	if me.GetMapID() == RT_MAPID and MY.IsDungeonMap(RT_MAPID) then
+		szText = szText .. '\n' .. 'ID:(' .. me.GetScene().nCopyIndex  ..')'
 	end
+	hDungeon:Lookup('Text_Dungeon'):SetText(szText)
 end
 
 function RT.GetPlayerView()
@@ -477,6 +510,40 @@ function RT.CountScore(tab, tScore)
 		end
 	end
 end
+-- 排序计算
+function RT.CalculateSort(tInfo)
+	local nCount = -2
+	if RT_SORT_FIELD == 'tBossKill' then
+		nCount = 0
+		for _, p in ipairs(tInfo[RT_SORT_FIELD]) do
+			if p then
+				nCount = nCount + 100
+			else
+				nCount = nCount + 1
+			end
+		end
+	elseif tInfo[RT_SORT_FIELD] then
+		if type(tInfo[RT_SORT_FIELD]) == 'table' then
+			nCount = #tInfo[RT_SORT_FIELD]
+		else
+			nCount = tInfo[RT_SORT_FIELD]
+		end
+	end
+	if nCount == 0 and not tInfo.bIsOnLine then
+		nCount = -2
+	end
+	return nCount
+end
+function RT.Sorter(a, b)
+	local nCountA = RT.CalculateSort(a)
+	local nCountB = RT.CalculateSort(b)
+
+	if RT_SORT_MODE == 'ASC' then -- 升序
+		return nCountA < nCountB
+	else
+		return nCountA > nCountB
+	end
+end
 -- 更新UI 没什么特殊情况 不要clear
 function RT.UpdateList()
 	local me = GetClientPlayer()
@@ -489,41 +556,12 @@ function RT.UpdateList()
 		Enchant = 0,
 		Special = 0,
 	}
-
-	table.sort(aTeam, function(a, b)
-		local nCountA, nCountB = -2, -2
-		if a[RT_SORT_FIELD] then
-			if type(a[RT_SORT_FIELD]) == 'table' then
-				nCountA = #a[RT_SORT_FIELD]
-			else
-				nCountA = a[RT_SORT_FIELD]
-			end
-		end
-		if b[RT_SORT_FIELD] then
-			if type(b[RT_SORT_FIELD]) == 'table' then
-				nCountB = #b[RT_SORT_FIELD]
-			else
-				nCountB = b[RT_SORT_FIELD]
-			end
-		end
-		if nCountA == 0 and not a.bIsOnLine then
-			nCountA = -2
-		end
-		if nCountB == 0 and not b.bIsOnLine then
-			nCountB = -2
-		end
-
-		if RT_SORT_MODE == 'ASC' then -- 升序
-			return nCountA < nCountB
-		else
-			return nCountA > nCountB
-		end
-	end)
+	table.sort(aTeam, RT.Sorter)
 
 	for k, v in ipairs(aTeam) do
 		-- 心法统计
 		tKungfu[v.dwMountKungfuID] = tKungfu[v.dwMountKungfuID] or {}
-		tinsert(tKungfu[v.dwMountKungfuID], v)
+		insert(tKungfu[v.dwMountKungfuID], v)
 		RT.CountScore(v, tScore)
 		if not RT_SELECT_KUNGFU or (RT_SELECT_KUNGFU and v.dwMountKungfuID == RT_SELECT_KUNGFU) then
 			local szName = 'P' .. v.dwID
@@ -535,6 +573,7 @@ function RT.UpdateList()
 			h:SetName(szName)
 			h.dwID   = v.dwID
 			h.szName = v.szName
+			-- 心法名字
 			if v.dwMountKungfuID and v.dwMountKungfuID ~= 0 then
 				local nIcon = select(2, MY_GetSkillName(v.dwMountKungfuID, 1))
 				h:Lookup('Image_Icon'):FromIconID(nIcon)
@@ -543,28 +582,18 @@ function RT.UpdateList()
 			end
 			h:Lookup('Text_Name'):SetText(v.szName)
 			h:Lookup('Text_Name'):SetFontColor(MY.GetForceColor(v.dwForceID))
-			local hScore = h:Lookup('Text_Score')
-			if v.nEquipScore then
-				hScore:SetText(v.nEquipScore)
-			else
-				if v.bIsOnLine then
-					hScore:SetText(_L['Loading'])
-				else
-					hScore:SetText(g_tStrings.STR_GUILD_OFFLINE)
-				end
+			-- 药品和BUFF
+			if not h['hHandle_Food'] then
+				h['hHandle_Food'] = {
+					self = h:Lookup('Handle_Food'),
+					Pool = XGUI.HandlePool(h:Lookup('Handle_Food'), '<box>w=29 h=29 eventid=784</box>')
+				}
 			end
-			if v.nFightState == 1 then
-				h:Lookup('Image_Fight'):Show()
-			else
-				h:Lookup('Image_Fight'):Hide()
-			end
-			for kk, vv in ipairs({ 'Handle_Food', 'Handle_Equip' }) do
-				if not h['h' .. vv] then
-					h['h' .. vv] = {
-						self = h:Lookup(vv),
-						Pool = XGUI.HandlePool(h:Lookup(vv), '<box>w=29 h=29 eventid=784</box>')
-					}
-				end
+			if not h['hHandle_Equip'] then
+				h['hHandle_Equip'] = {
+					self = h:Lookup('Handle_Equip'),
+					Pool = XGUI.HandlePool(h:Lookup('Handle_Equip'), '<box>w=29 h=29 eventid=784</box>')
+				}
 			end
 			local hBuff = h:Lookup('Box_Buff')
 			local hBox = h:Lookup('Box_Grandpa')
@@ -573,8 +602,7 @@ function RT.UpdateList()
 				h:Lookup('Text_Toofar1'):Show()
 				h:Lookup('Text_Toofar1'):SetText(g_tStrings.STR_GUILD_OFFLINE)
 			end
-
-			if not v.p then
+			if not v.KPlayer then
 				h.hHandle_Food.Pool:Clear()
 				h:Lookup('Text_Toofar1'):Show()
 				if v.bIsOnLine then
@@ -618,7 +646,7 @@ function RT.UpdateList()
 					if item and not item.bFree then
 						local dwID, nLevel, nEndFrame = select(2, item:GetObject())
 						if dwID and nLevel then
-							if not MY.GetBuff(v.p, dwID, nLevel) then
+							if not MY.GetBuff(v.KPlayer, dwID, nLevel) then
 								h.hHandle_Food.Pool:Remove(item)
 							end
 						end
@@ -639,7 +667,7 @@ function RT.UpdateList()
 							local nIcon = select(2, MY_GetBuffName(v.dwID, v.nLevel))
 							local nTime = (v.nEndFrame - GetLogicFrameCount()) / 16
 							local nAlpha = nTime < 600 and 80 or 255
-							tinsert(xml, '<image> path="fromiconid" frame=' .. nIcon ..' alpha=' .. nAlpha ..  ' w=30 h=30 </image>')
+							insert(xml, '<image> path="fromiconid" frame=' .. nIcon ..' alpha=' .. nAlpha ..  ' w=30 h=30 </image>')
 						end
 						OutputTip(table.concat(xml), 250, { x, y, w, h })
 					end
@@ -652,7 +680,7 @@ function RT.UpdateList()
 					hBox.OnItemMouseEnter = function()
 						local x, y = this:GetAbsPos()
 						local w, h = this:GetSize()
-						local kBuff = MY.GetBuff(v.p, RT_GONGZHAN_ID)
+						local kBuff = MY.GetBuff(v.KPlayer, RT_GONGZHAN_ID)
 						if kBuff then
 							MY.OutputBuffTip(kBuff.dwID, kBuff.nLevel, { x, y, w, h })
 						end
@@ -660,6 +688,7 @@ function RT.UpdateList()
 				end
 				hBox:EnableObject(v.bGrandpa)
 			end
+			-- 药品：大附魔
 			if v.tTemporaryEnchant and #v.tTemporaryEnchant > 0 then
 				local vv = v.tTemporaryEnchant[1]
 				local box = h:Lookup('Box_Enchant')
@@ -715,7 +744,7 @@ function RT.UpdateList()
 			else
 				h:Lookup('Box_Enchant'):Hide()
 			end
-			-- 装备处理
+			-- 装备
 			if v.tEquip and #v.tEquip > 0 then
 				local handle_equip = h.hHandle_Equip.self
 				for kk, vv in ipairs(v.tEquip) do
@@ -762,6 +791,69 @@ function RT.UpdateList()
 				end
 				handle_equip:FormatAllItemPos()
 			end
+			-- 装备分
+			local hScore = h:Lookup('Text_Score')
+			if v.nEquipScore then
+				hScore:SetText(v.nEquipScore)
+			else
+				if v.bIsOnLine then
+					hScore:SetText(_L['Loading'])
+				else
+					hScore:SetText(g_tStrings.STR_GUILD_OFFLINE)
+				end
+			end
+			-- 副本CD
+			if not h.hHandle_BossKills then
+				h.hHandle_BossKills = {
+					self = h:Lookup('Handle_BossKills'),
+					Pool = XGUI.HandlePool(h:Lookup('Handle_BossKills'), '<handle>postype=8 eventid=784 w=16 h=14 <image>name="Image_BossKilled" w=14 h=14 path="ui/Image/UITga/FBcdPanel01.UITex" frame=20</image><image>name="Image_BossAlive" w=14 h=14 path="ui/Image/UITga/FBcdPanel01.UITex" frame=21</image></handle>')
+				}
+			end
+			local hCopyID = h:Lookup('Text_CopyID')
+			local hBossKills = h:Lookup('Handle_BossKills')
+			if v.tBossKill and #v.tBossKill > 0 then
+				for nIndex, bKill in ipairs(v.tBossKill) do
+					local szName = tostring(nIndex)
+					local hBossKill = hBossKills:Lookup(szName)
+					if not hBossKill then
+						hBossKill = h.hHandle_BossKills.Pool:New()
+						hBossKill:SetName(szName)
+					end
+					hBossKill:Lookup('Image_BossAlive'):SetVisible(not bKill)
+					hBossKill:Lookup('Image_BossKilled'):SetVisible(bKill)
+					hBossKill.OnItemRefreshTip = function()
+						local x, y = this:GetAbsPos()
+						local w, h = this:GetSize()
+						local texts = {}
+						for i, boss in ipairs(Table_GetCDProcessBoss(RT_MAPID)) do
+							insert(texts, boss.szName .. '\t' .. _L[v.tBossKill[i] and 'x' or 'r'])
+						end
+						OutputTip(GetFormatText(concat(texts, '\n')), 400, { x, y, w, h })
+					end
+					hBossKill:Show()
+				end
+				for i = 0, hBossKills:GetItemCount() - 1, 1 do
+					local item = hBossKills:Lookup(i)
+					if item and not item.bFree then
+						if tonumber(item:GetName()) > #v.tBossKill then
+							h.hHandle_BossKills.Pool:Remove(item)
+						end
+					end
+				end
+				hBossKills:FormatAllItemPos()
+				hCopyID:Hide()
+				hBossKills:Show()
+			else
+				hCopyID:SetText(v.nCopyID == -1 and _L['None'] or v.nCopyID or _L['Unknown'])
+				hCopyID:Show()
+				hBossKills:Hide()
+			end
+			-- 战斗状态
+			if v.nFightState == 1 then
+				h:Lookup('Image_Fight'):Show()
+			else
+				h:Lookup('Image_Fight'):Hide()
+			end
 		end
 	end
 	frame.hList:FormatAllItemPos()
@@ -804,7 +896,7 @@ function RT.UpdateList()
 			h.OnItemMouseEnter = function()
 				this:Lookup('Text_Num'):SetFontScheme(101)
 				local xml = {}
-				tinsert(xml, GetFormatText(szName .. g_tStrings.STR_COLON .. nCount .. g_tStrings.STR_PERSON ..'\n', 157))
+				insert(xml, GetFormatText(szName .. g_tStrings.STR_COLON .. nCount .. g_tStrings.STR_PERSON ..'\n', 157))
 				table.sort(tKungfu[v[1]], function(a, b)
 					local nCountA = a.nEquipScore or -1
 					local nCountB = b.nEquipScore or -1
@@ -812,9 +904,9 @@ function RT.UpdateList()
 				end)
 				for k, v in ipairs(tKungfu[v[1]]) do
 					if v.nEquipScore then
-						tinsert(xml, GetFormatText(v.szName .. g_tStrings.STR_COLON ..  v.nEquipScore  ..'\n', 106))
+						insert(xml, GetFormatText(v.szName .. g_tStrings.STR_COLON ..  v.nEquipScore  ..'\n', 106))
 					else
-						tinsert(xml, GetFormatText(v.szName ..'\n', 106))
+						insert(xml, GetFormatText(v.szName ..'\n', 106))
 					end
 				end
 				local x, y = img:GetAbsPos()
@@ -841,8 +933,8 @@ local function CreateItemTable(item, dwBox, dwX)
 	}
 end
 
-function RT.GetEquipCache(p)
-	if not p then return end
+function RT.GetEquipCache(KPlayer)
+	if not KPlayer then return end
 	local me = GetClientPlayer()
 	local frame = RT.GetFrame()
 	local aInfo = {
@@ -854,26 +946,26 @@ function RT.GetEquipCache(p)
 	for _, equip in ipairs(RT_EQUIP_TOTAL) do
 		-- if #aInfo.tEquip >= 3 then break end
 		-- 藏剑只看重剑
-		if p.dwForceID == 8 and EQUIPMENT_INVENTORY[equip] == EQUIPMENT_INVENTORY.MELEE_WEAPON then
+		if KPlayer.dwForceID == 8 and EQUIPMENT_INVENTORY[equip] == EQUIPMENT_INVENTORY.MELEE_WEAPON then
 			equip = 'BIG_SWORD'
 		end
 		local dwBox, dwX = INVENTORY_INDEX.EQUIP, EQUIPMENT_INVENTORY[equip]
-		local item = p.GetItem(dwBox, dwX)
+		local item = KPlayer.GetItem(dwBox, dwX)
 		if item then
 			if RT_EQUIP_SPECIAL[equip] then
 				if equip == 'PENDANT' then
 					local desc = Table_GetItemDesc(item.nUiId)
 					if desc and (desc:find(_L['use'] .. g_tStrings.STR_COLON) or desc:find(_L['Use:']) or desc:find('15' .. g_tStrings.STR_TIME_SECOND)) then
-						tinsert(aInfo.tEquip, CreateItemTable(item, dwBox, dwX))
+						insert(aInfo.tEquip, CreateItemTable(item, dwBox, dwX))
 					end
 				-- elseif item.nQuality == 5 then -- 橙色装备
-				-- 	tinsert(aInfo.tEquip, CreateItemTable(item))
+				-- 	insert(aInfo.tEquip, CreateItemTable(item))
 				else
 					-- 黄字装备
 					local aMagicAttrib = item.GetMagicAttrib()
 					for _, tAttrib in ipairs(aMagicAttrib) do
 						if tAttrib.nID == ATTRIBUTE_TYPE.SKILL_EVENT_HANDLER then
-							tinsert(aInfo.tEquip, CreateItemTable(item, dwBox, dwX))
+							insert(aInfo.tEquip, CreateItemTable(item, dwBox, dwX))
 							break
 						end
 					end
@@ -881,7 +973,7 @@ function RT.GetEquipCache(p)
 			end
 			-- 永久的附魔 用于评分
 			if item.dwPermanentEnchantID and item.dwPermanentEnchantID ~= 0 then
-				tinsert(aInfo.tPermanentEnchant, {
+				insert(aInfo.tPermanentEnchant, {
 					dwPermanentEnchantID = item.dwPermanentEnchantID,
 				})
 			end
@@ -894,20 +986,20 @@ function RT.GetEquipCache(p)
 				if Table_GetCommonEnchantDesc(item.dwTemporaryEnchantID) then
 					dat.CommonEnchant = true
 				end
-				tinsert(aInfo.tTemporaryEnchant, dat)
+				insert(aInfo.tTemporaryEnchant, dat)
 			end
 		end
 	end
 	-- 这些都是一次性的缓存数据
-	frame.tDataCache[p.dwID] = {
+	frame.tDataCache[KPlayer.dwID] = {
 		tEquip            = aInfo.tEquip,
 		tPermanentEnchant = aInfo.tPermanentEnchant,
 		tTemporaryEnchant = aInfo.tTemporaryEnchant,
-		nEquipScore       = p.GetTotalEquipScore()
+		nEquipScore       = KPlayer.GetTotalEquipScore()
 	}
-	frame.tViewInvite[p.dwID] = nil
+	frame.tViewInvite[KPlayer.dwID] = nil
 	if IsEmpty(frame.tViewInvite) then
-		if p.dwID ~= me.dwID then
+		if KPlayer.dwID ~= me.dwID then
 			FireUIEvent('MY_RAIDTOOLS_SUCCESS') -- 装备请求完毕
 		end
 	else
@@ -930,14 +1022,18 @@ function RT.GetTeam()
 	local aList = {}
 	local frame = RT.GetFrame()
 	local bIsInParty = MY.IsInParty()
-	for k, v in ipairs(RT.GetTeamMemberList()) do
-		local p = GetPlayer(v)
-		local info = bIsInParty and team.GetMemberInfo(v) or {}
+	local bIsDungeonRoleProgressMap = MY.IsDungeonRoleProgressMap(RT_MAPID)
+	local aProgressMapBoss = bIsDungeonRoleProgressMap and Table_GetCDProcessBoss(RT_MAPID)
+	local aRequestMapCopyID = {}
+	local aTeamMemberList = RT.GetTeamMemberList()
+	for _, dwID in ipairs(aTeamMemberList) do
+		local KPlayer = GetPlayer(dwID)
+		local info = bIsInParty and team.GetMemberInfo(dwID) or {}
 		local aInfo = {
-			p                 = p,
-			szName            = p and p.szName or info.szName or _L['Loading...'],
-			dwID              = v,  -- ID
-			dwForceID         = p and p.dwForceID or info.dwForceID, -- 门派ID
+			KPlayer           = KPlayer,
+			szName            = KPlayer and KPlayer.szName or info.szName or _L['Loading...'],
+			dwID              = dwID,  -- ID
+			dwForceID         = KPlayer and KPlayer.dwForceID or info.dwForceID, -- 门派ID
 			dwMountKungfuID   = info and info.dwMountKungfuID or UI_GetPlayerMountKungfuID(), -- 内功
 			-- tPermanentEnchant = {}, -- 附魔
 			-- tTemporaryEnchant = {}, -- 临时附魔
@@ -945,33 +1041,63 @@ function RT.GetTeam()
 			tBuff             = {}, -- 增益BUFF
 			tFood             = {}, -- 小吃和附魔
 			-- nEquipScore       = -1,  -- 装备分
-			nFightState       = p and p.bFightState and 1 or 0, -- 战斗状态
+			nCopyID           = RT_PLAYER_MAP_COPYID[dwID] and RT_PLAYER_MAP_COPYID[dwID][RT_MAPID] and RT_PLAYER_MAP_COPYID[dwID][RT_MAPID].nID, -- 副本ID
+			tBossKill         = {}, -- 副本进度
+			nFightState       = KPlayer and KPlayer.bFightState and 1 or 0, -- 战斗状态
 			bIsOnLine         = true,
 			bGrandpa          = false, -- 大爷
 		}
 		if info and info.bIsOnLine ~= nil then
 			aInfo.bIsOnLine = info.bIsOnLine
 		end
-		if p then
+		if KPlayer then
 			-- 小吃和buff
-			for _, tBuff in ipairs(MY.GetBuffList(p)) do
+			for _, tBuff in ipairs(MY.GetBuffList(KPlayer)) do
 				local nType = GetBuffInfo(tBuff.dwID, tBuff.nLevel, {}).nDetachType or 0
 				if RT_FOOD_TYPE[nType] then
-					tinsert(aInfo.tFood, tBuff)
+					insert(aInfo.tFood, tBuff)
 				end
 				if RT_BUFF_ID[tBuff.dwID] then
-					tinsert(aInfo.tBuff, tBuff)
+					insert(aInfo.tBuff, tBuff)
 				end
 				if tBuff.dwID == RT_GONGZHAN_ID then -- grandpa
 					aInfo.bGrandpa = true
 				end
 			end
-			if me.dwID == p.dwID then
+			if me.dwID == KPlayer.dwID then
 				RT.GetEquipCache(me)
 			end
 		end
-		setmetatable(aInfo, { __index = frame.tDataCache[v] })
-		tinsert(aList, aInfo)
+		-- 副本CDID
+		if aInfo.bIsOnLine and not bIsDungeonRoleProgressMap and MY.IsDungeonMap(RT_MAPID) then
+			if not RT_PLAYER_MAP_COPYID[dwID] then
+				RT_PLAYER_MAP_COPYID[dwID] = {}
+			end
+			if not RT_PLAYER_MAP_COPYID[dwID][RT_MAPID] then
+				RT_PLAYER_MAP_COPYID[dwID][RT_MAPID] = {}
+			end
+			local tCopyID = RT_PLAYER_MAP_COPYID[dwID][RT_MAPID]
+			if (not tCopyID.nRequestTime or GetCurrentTime() - tCopyID.nRequestTime > 10)
+			and (not tCopyID.nReceiveTime or GetCurrentTime() - tCopyID.nReceiveTime > 60) then
+				insert(aRequestMapCopyID, dwID)
+				tCopyID.nRequestTime = GetCurrentTime()
+			end
+		end
+		-- 副本进度
+		if aInfo.bIsOnLine and bIsDungeonRoleProgressMap then
+			for i, boss in ipairs(aProgressMapBoss) do
+				ApplyDungeonRoleProgress(RT_MAPID, dwID) -- 成功回调 UPDATE_DUNGEON_ROLE_PROGRESS(dwMapID, dwPlayerID)
+				aInfo.tBossKill[i] = GetDungeonRoleProgress(RT_MAPID, dwID, boss.dwProgressID)
+			end
+		end
+		setmetatable(aInfo, { __index = frame.tDataCache[dwID] })
+		insert(aList, aInfo)
+	end
+	if #aRequestMapCopyID > 0 then
+		if #aRequestMapCopyID == #aTeamMemberList then
+			aRequestMapCopyID = nil
+		end
+		MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID_REQUEST', RT_MAPID, aRequestMapCopyID) -- 周期刷新
 	end
 	return aList
 end
@@ -1005,7 +1131,7 @@ function RT.GetTeamMemberList(bIsOnLine)
 			for k, v in ipairs(team.GetTeamMemberList()) do
 				local info = team.GetMemberInfo(v)
 				if info and info.bIsOnLine then
-					tinsert(tTeam, v)
+					insert(tTeam, v)
 				end
 			end
 			return tTeam
@@ -1025,7 +1151,7 @@ function RT.UpdatetDeathPage()
 	frame.hDeatList:Clear()
 	local tList = {}
 	for k, v in pairs(RaidTools.GetDeathLog()) do
-		tinsert(tList, {
+		insert(tList, {
 			dwID   = k,
 			nCount = #v
 		})
@@ -1063,30 +1189,30 @@ function RaidTools.OnShowDeathInfo()
 	if tDeath[dwID] and tDeath[dwID][i] then
 		local tab = tDeath[dwID][i]
 		local xml = {}
-		tinsert(xml, GetFormatText(_L['last 5 skill damage'] .. '\n\n' , 59))
+		insert(xml, GetFormatText(_L['last 5 skill damage'] .. '\n\n' , 59))
 		for k, v in ipairs(tab.data) do
 			if v.szKiller then
-				tinsert(xml, GetFormatText(v.szKiller .. g_tStrings.STR_COLON, 41, 255, 128, 0))
+				insert(xml, GetFormatText(v.szKiller .. g_tStrings.STR_COLON, 41, 255, 128, 0))
 			else
-				tinsert(xml, GetFormatText(_L['OUTER GUEST'] .. g_tStrings.STR_COLON, 41, 255, 128, 0))
+				insert(xml, GetFormatText(_L['OUTER GUEST'] .. g_tStrings.STR_COLON, 41, 255, 128, 0))
 			end
 			if v.szSkill then
-				tinsert(xml, GetFormatText(v.szSkill .. (v.bCriticalStrike and g_tStrings.STR_SKILL_CRITICALSTRIKE or ''), 41, 255, 128, 0))
+				insert(xml, GetFormatText(v.szSkill .. (v.bCriticalStrike and g_tStrings.STR_SKILL_CRITICALSTRIKE or ''), 41, 255, 128, 0))
 			else
-				tinsert(xml, GetFormatText(g_tStrings.STR_UNKOWN_SKILL, 41, 255, 128, 0))
+				insert(xml, GetFormatText(g_tStrings.STR_UNKOWN_SKILL, 41, 255, 128, 0))
 			end
 			local t = TimeToDate(v.nCurrentTime)
-			tinsert(xml, GetFormatText('\t' .. string.format('%02d:%02d:%02d', t.hour, t.minute, t.second), 41))
+			insert(xml, GetFormatText('\t' .. string.format('%02d:%02d:%02d', t.hour, t.minute, t.second), 41))
 			if v.tResult then
 				for kk, vv in pairs(v.tResult) do
 					if vv > 0 then
-						tinsert(xml, GetFormatText(_L[RT_SKILL_TYPE[kk]] .. g_tStrings.STR_COLON, 157))
-						tinsert(xml, GetFormatText(vv .. '\n', 41))
+						insert(xml, GetFormatText(_L[RT_SKILL_TYPE[kk]] .. g_tStrings.STR_COLON, 157))
+						insert(xml, GetFormatText(vv .. '\n', 41))
 					end
 				end
 			elseif v.nCount then
-				tinsert(xml, GetFormatText(_L['EFFECTIVE_DAMAGE'] .. g_tStrings.STR_COLON, 157))
-				tinsert(xml, GetFormatText(v.nCount .. '\n', 41))
+				insert(xml, GetFormatText(_L['EFFECTIVE_DAMAGE'] .. g_tStrings.STR_COLON, 157))
+				insert(xml, GetFormatText(v.nCount .. '\n', 41))
 			end
 		end
 		local x, y = this:GetAbsPos()
@@ -1130,7 +1256,7 @@ function RT.UpdatetDeathMsg(dwID)
 					vv.dwID = k
 				end
 				vv.nIndex = kk
-				tinsert(data, vv)
+				insert(data, vv)
 			end
 		end
 	else
@@ -1141,7 +1267,7 @@ function RT.UpdatetDeathMsg(dwID)
 				v.dwID = key
 			end
 			v.nIndex = k
-			tinsert(data, v)
+			insert(data, v)
 		end
 	end
 	table.sort(data, function(a, b) return a.nCurrentTime > b.nCurrentTime end)
@@ -1152,17 +1278,17 @@ function RT.UpdatetDeathMsg(dwID)
 			local key = v.dwID == me.dwID and 'self' or v.dwID
 			local t = TimeToDate(v.nCurrentTime)
 			local xml = {}
-			tinsert(xml, GetFormatText(_L[' * '] .. string.format('[%02d:%02d:%02d]', t.hour, t.minute, t.second), 10, 255, 255, 255, 16, 'this.OnItemLButtonClick = MY_RaidTools.OnAppendEdit'))
+			insert(xml, GetFormatText(_L[' * '] .. string.format('[%02d:%02d:%02d]', t.hour, t.minute, t.second), 10, 255, 255, 255, 16, 'this.OnItemLButtonClick = MY_RaidTools.OnAppendEdit'))
 			local r, g, b = MY.GetForceColor(info and info.dwForceID or me.dwForceID)
-			tinsert(xml, GetFormatText('[' .. (info and info.szName or me.szName) ..']', 10, r, g, b, 16, 'this.OnItemLButtonClick = function() OnItemLinkDown(this) end', 'namelink'))
-			tinsert(xml, GetFormatText(g_tStrings.TRADE_BE, 10, 255, 255, 255))
+			insert(xml, GetFormatText('[' .. (info and info.szName or me.szName) ..']', 10, r, g, b, 16, 'this.OnItemLButtonClick = function() OnItemLinkDown(this) end', 'namelink'))
+			insert(xml, GetFormatText(g_tStrings.TRADE_BE, 10, 255, 255, 255))
 			if szKiller == '' and v.data[1].szKiller ~= '' then
-				tinsert(xml, GetFormatText('[' .. _L['OUTER GUEST'] .. g_tStrings.STR_OR .. v.data[1].szKiller ..']', 10, 13, 150, 70, 256, 'this.OnItemMouseEnter = MY_RaidTools.OnShowDeathInfo', key .. '_' .. v.nIndex))
+				insert(xml, GetFormatText('[' .. _L['OUTER GUEST'] .. g_tStrings.STR_OR .. v.data[1].szKiller ..']', 10, 13, 150, 70, 256, 'this.OnItemMouseEnter = MY_RaidTools.OnShowDeathInfo', key .. '_' .. v.nIndex))
 			else
-				tinsert(xml, GetFormatText('[' .. (v.szKiller ~= '' and v.szKiller or  _L['OUTER GUEST']) ..']', 10, 255, 128, 0, 256, 'this.OnItemMouseEnter = MY_RaidTools.OnShowDeathInfo', key .. '_' .. v.nIndex))
+				insert(xml, GetFormatText('[' .. (v.szKiller ~= '' and v.szKiller or  _L['OUTER GUEST']) ..']', 10, 255, 128, 0, 256, 'this.OnItemMouseEnter = MY_RaidTools.OnShowDeathInfo', key .. '_' .. v.nIndex))
 			end
-			tinsert(xml, GetFormatText(g_tStrings.STR_KILL .. g_tStrings.STR_FULL_STOP, 10, 255, 255, 255))
-			tinsert(xml, GetFormatText('\n'))
+			insert(xml, GetFormatText(g_tStrings.STR_KILL .. g_tStrings.STR_FULL_STOP, 10, 255, 255, 255))
+			insert(xml, GetFormatText('\n'))
 			frame.hDeatMsg:AppendItemFromString(table.concat(xml))
 		end
 	end
@@ -1172,6 +1298,14 @@ end
 -- UI操作 惯例
 function RT.SetStyle()
 	RT_INIFILE = MY.GetAddonInfo().szRoot .. 'MY_TeamTools/ui/MY_RaidTools' .. RaidTools.nStyle .. '.ini'
+end
+
+function RT.SetMapID(dwMapID)
+	if RT_MAPID == dwMapID then
+		return
+	end
+	RT_MAPID = dwMapID
+	FireUIEvent('MY_RAIDTOOLS_MAPID_CHANGE')
 end
 
 function RT.GetFrame()
@@ -1207,6 +1341,23 @@ function RT.TogglePanel()
 end
 
 MY.RegisterEvent('LOGIN_GAME', RT.SetStyle)
+
+local function onLoadingEnd()
+	RT.SetMapID(GetClientPlayer().GetMapID())
+end
+MY.RegisterEvent('LOADING_END', onLoadingEnd)
+
+local function onBgMsgMapCopyID(_, nChannel, dwID, szName, bIsSelf, dwMapID, aCopyID)
+	if not RT_PLAYER_MAP_COPYID[dwID] then
+		RT_PLAYER_MAP_COPYID[dwID] = {}
+	end
+	if not RT_PLAYER_MAP_COPYID[dwID][dwMapID] then
+		RT_PLAYER_MAP_COPYID[dwID][dwMapID] = {}
+	end
+	RT_PLAYER_MAP_COPYID[dwID][dwMapID].nID = IsTable(aCopyID) and aCopyID[1] or -1
+	RT_PLAYER_MAP_COPYID[dwID][dwMapID].nReceiveTime = GetCurrentTime()
+end
+MY.RegisterBgMsg('MY_MAP_COPY_ID', onBgMsgMapCopyID)
 
 MY.RegisterAddonMenu({ szOption = _L['Raid Tools Panel'], fnAction = RT.TogglePanel })
 MY.Game.RegisterHotKey('MY_RaidTools', _L['Open/Close Raid Tools Panel'], RT.TogglePanel)

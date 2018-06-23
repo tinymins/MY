@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-06-24 01:26:40
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-06-24 01:30:23
+-- @Last Modified time: 2018-06-24 03:24:55
 ---------------------------------------------------
 ---------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -77,12 +77,12 @@ MY.RegisterBgMsg('MY_ABOUT', function(_, nChannel, dwID, szName, bIsSelf, ...)
 			szTong = GetTongClient().ApplyGetTongName(me.dwTongID) or 'Failed'
 		end
 		local szServer = select(2, GetUserServer())
-		MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'JH_ABOUT', 'info',
+		MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', 'info',
 			me.GetTotalEquipScore(),
 			me.GetMapID(),
 			szTong,
 			me.nRoleType,
-			_VERSION_,
+			MY.GetAddonInfo().dwVersion,
 			szServer,
 			MY.GetBuff(3219)
 		)
@@ -99,3 +99,29 @@ MY.RegisterBgMsg('MY_ABOUT', function(_, nChannel, dwID, szName, bIsSelf, ...)
 		GetClientTeam().SetAuthorityInfo(TEAM_AUTHORITY_TYPE.DISTRIBUTE, dwID)
 	end
 end)
+
+-- 团队副本CD
+do local LAST_TIME = {}
+MY.RegisterBgMsg('MY_MAP_COPY_ID_REQUEST', function(_, nChannel, dwID, szName, bIsSelf, dwMapID, aPlayerID)
+	if LAST_TIME[dwMapID] and GetCurrentTime() - LAST_TIME[dwMapID] < 5 then
+		return
+	end
+	if aPlayerID then
+		local bResponse = false
+		for _, dwID in ipairs(aPlayerID) do
+			if dwID == UI_GetClientPlayerID() then
+				bResponse = true
+				break
+			end
+		end
+		if not bResponse then
+			return
+		end
+	end
+	local function fnAction(tMapID)
+		MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID', dwMapID, tMapID[dwMapID] or -1)
+	end
+	MY.GetMapSaveCopy(fnAction)
+	LAST_TIME[dwMapID] = GetCurrentTime()
+end)
+end

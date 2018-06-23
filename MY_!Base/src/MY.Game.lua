@@ -562,11 +562,16 @@ local QUEUE = {}
 local SAVED_COPY_CACHE
 function MY.GetMapSaveCopy(fnAction)
 	if SAVED_COPY_CACHE then
-		fnAction(SAVED_COPY_CACHE)
+		if IsFunction(fnAction) then
+			fnAction(SAVED_COPY_CACHE)
+		end
 	else
-		insert(QUEUE, fnAction)
+		if IsFunction(fnAction) then
+			insert(QUEUE, fnAction)
+		end
 		ApplyMapSaveCopy()
 	end
+	return SAVED_COPY_CACHE
 end
 
 local function onApplyPlayerSavedCopyRespond()
