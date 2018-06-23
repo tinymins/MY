@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-06-23 01:01:53
+-- @Last Modified time: 2018-06-23 16:22:15
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -293,15 +293,16 @@ local function CheckInvalidRect(dwType, dwID, me)
 	end
 	if bVisible then
 		if not lb then
+			-- 不会改变的东西
 			lb = LB(dwType, dwID)
 				:SetFont(Config.nFont)
 				:SetTextsPos(Config.nTextOffsetY, Config.nTextLineHeight)
-				:SetTextsScale(Config.fTextScale)
 				:SetTextsSpacing(Config.fTextSpacing)
 				:SetDistanceFmt('%d' .. g_tStrings.STR_METER)
 				:Create()
 			LB_CACHE[dwID] = lb
 		end
+		local fTextScale = Config.fTextScale
 		local dwTarType, dwTarID = me.GetTarget()
 		local relation = D.GetRelation(dwID)
 		local force = D.GetForce(dwID)
@@ -324,6 +325,7 @@ local function CheckInvalidRect(dwType, dwID, me)
 				if tData.tColor then
 					r, g, b = unpack(tData.tColor)
 				end
+				fTextScale = fTextScale * 1.15
 				szCountDown = tData.szText .. '_' .. MY.FormatTimeCount(nSec >= 60 and 'M\'ss"' or 'ss"', min(nSec, 5999))
 				break
 			else
@@ -348,11 +350,6 @@ local function CheckInvalidRect(dwType, dwID, me)
 			end
 		end
 		lb:SetKungfuVisible(bShowKungfu)
-		-- 距离
-		if Config.bShowDistance then
-			lb:SetDistance(GetCharacterDistance(me.dwID, dwID) / 64)
-		end
-		lb:SetDistanceVisible(Config.bShowDistance)
 		-- 距离
 		if Config.bShowDistance then
 			lb:SetDistance(GetCharacterDistance(me.dwID, dwID) / 64)
@@ -391,6 +388,7 @@ local function CheckInvalidRect(dwType, dwID, me)
 			and (dwID == dwTarID and fxDeathTarget or fxDeath)
 			or (dwID == dwTarID and fxTarget or nil)
 		)
+		lb:SetTextsScale(fTextScale)
 		lb:Create():Paint()
 	elseif lb then
 		lb:Remove()
