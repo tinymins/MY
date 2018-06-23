@@ -26,8 +26,8 @@ data = {
 	nLifeBorderB = 0,
 	szLifeDirection = "LEFT_RIGHT",
 
-	nLifePerOffsetX = 0,
-	nLifePerOffsetY = 42,
+	nLifePerOffsetX = 85,
+	nLifePerOffsetY = 37,
 
 	nAlpha = 200,
 	nFont = 16,
