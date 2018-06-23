@@ -2137,6 +2137,13 @@ function MY.Game.IsDungeonMap(dwMapID, bRaid)
 end
 MY.IsDungeonMap = MY.Game.IsDungeonMap
 
+-- 判断一个地图是不是个人CD副本
+-- (bool) MY.IsDungeonRoleProgressMap(dwMapID)
+function MY.Game.IsDungeonRoleProgressMap(dwMapID)
+	return (select(8, GetMapParams(dwMapID)))
+end
+MY.IsDungeonRoleProgressMap = MY.Game.IsDungeonRoleProgressMap
+
 -- 判断当前地图是不是副本
 -- (bool) MY.Game.IsInDungeon(bool bRaid)
 function MY.Game.IsInDungeon(bRaid)
