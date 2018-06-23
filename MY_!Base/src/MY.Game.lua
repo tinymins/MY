@@ -584,6 +584,36 @@ function MY.Game.IsDungeonMap(dwMapID, bRaid)
 end
 MY.IsDungeonMap = MY.Game.IsDungeonMap
 
+-- 获取副本CD列表（异步）
+-- (table) MY.GetMapSaveCopy(fnAction)
+do
+local QUEUE = {}
+local SAVED_COPY_CACHE
+function MY.GetMapSaveCopy(fnAction)
+	if SAVED_COPY_CACHE then
+		fnAction(SAVED_COPY_CACHE)
+	else
+		insert(QUEUE, fnAction)
+		ApplyMapSaveCopy()
+	end
+end
+
+local function onApplyPlayerSavedCopyRespond()
+	SAVED_COPY_CACHE = arg0
+	for _, fnAction in ipairs(QUEUE) do
+		fnAction(SAVED_COPY_CACHE)
+	end
+	QUEUE = {}
+end
+MY.RegisterEvent('ON_APPLY_PLAYER_SAVED_COPY_RESPOND', onApplyPlayerSavedCopyRespond)
+
+local function onCopyUpdated()
+	SAVED_COPY_CACHE = nil
+end
+MY.RegisterEvent('ON_RESET_MAP_RESPOND', onCopyUpdated)
+MY.RegisterEvent('ON_MAP_COPY_PROGRESS_UPDATE', onCopyUpdated)
+end
+
 -- 地图BOSS列表
 do local BOSS_LIST, BOSS_LIST_CUSTOM
 local function LoadCustomList()
