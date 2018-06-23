@@ -559,7 +559,7 @@ end
 -- (table) MY.GetMapSaveCopy(fnAction)
 do
 local QUEUE = {}
-local SAVED_COPY_CACHE
+local SAVED_COPY_CACHE, REQUEST_FRAME
 function MY.GetMapSaveCopy(fnAction)
 	if SAVED_COPY_CACHE then
 		if IsFunction(fnAction) then
@@ -569,7 +569,10 @@ function MY.GetMapSaveCopy(fnAction)
 		if IsFunction(fnAction) then
 			insert(QUEUE, fnAction)
 		end
-		ApplyMapSaveCopy()
+		if REQUEST_FRAME ~= GetLogicFrameCount() then
+			ApplyMapSaveCopy()
+			REQUEST_FRAME = GetLogicFrameCount()
+		end
 	end
 	return SAVED_COPY_CACHE
 end
