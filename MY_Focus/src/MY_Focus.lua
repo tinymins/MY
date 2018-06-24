@@ -281,7 +281,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		MY.DelayCall(300, function()
 			MY_Focus.OnObjectEnterScene(dwType, dwID, (nRetryCount or 0) + 1)
 		end)
-	elseif szName then -- 判断是否需要焦点
+	else-- if szName then -- 判断是否需要焦点
 		local bFocus, tRule = false, nil
 		local dwMapID = me.GetMapID()
 		local dwTemplateID, szTong = -1, ''
