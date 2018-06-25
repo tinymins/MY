@@ -22,6 +22,7 @@ return {
 	decimalTime         = -1    , -- 倒计时出现小数点时间
 	cdBar               = false , -- 显示倒计时条
 	cdBarWidth          = 240   , -- 倒计时条宽度
+	playSound           = true  , -- 是否播放声音
 	cdBarUITex          = "./Interface/MY/MY_!Base/image/ST_UI.UITex|7",  -- 倒计时条图素
 	boxBgUITex          = "UI/Image/Common/Box.UITex|44",  -- Box背景图素
 	anchor = { y = 152, x = -343, s = "TOPLEFT", r = "CENTER" },

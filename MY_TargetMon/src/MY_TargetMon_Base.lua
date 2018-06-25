@@ -527,12 +527,14 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 			hItem:Show()
 		end
 		if not hItem.bExist then
-			local szSound = hItem.dwID and hItem.mon.ids[hItem.dwID] and RandomChild(hItem.mon.ids[hItem.dwID].soundAppear)
-			if not szSound or szSound == '' then
-				szSound = RandomChild(hItem.mon.soundAppear)
-			end
-			if szSound and szSound ~= '' then
-				MY.PlaySound(SOUND.CHARACTER_SOUND, szSound)
+			if config.playSound then
+				local szSound = hItem.dwID and hItem.mon.ids[hItem.dwID] and RandomChild(hItem.mon.ids[hItem.dwID].soundAppear)
+				if not szSound or szSound == '' then
+					szSound = RandomChild(hItem.mon.soundAppear)
+				end
+				if szSound and szSound ~= '' then
+					MY.PlaySound(SOUND.CHARACTER_SOUND, szSound)
+				end
 			end
 			hItem.bExist = true
 		end
@@ -567,12 +569,14 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 			needFormatItemPos = true
 		end
 		if hItem.bExist then
-			local szSound = hItem.dwID and hItem.mon.ids[hItem.dwID] and RandomChild(hItem.mon.ids[hItem.dwID].soundDisappear)
-			if not szSound or szSound == '' then
-				szSound = RandomChild(hItem.mon.soundDisappear)
-			end
-			if szSound and szSound ~= '' then
-				MY.PlaySound(SOUND.CHARACTER_SOUND, szSound)
+			if config.playSound then
+				local szSound = hItem.dwID and hItem.mon.ids[hItem.dwID] and RandomChild(hItem.mon.ids[hItem.dwID].soundDisappear)
+				if not szSound or szSound == '' then
+					szSound = RandomChild(hItem.mon.soundDisappear)
+				end
+				if szSound and szSound ~= '' then
+					MY.PlaySound(SOUND.CHARACTER_SOUND, szSound)
+				end
 			end
 			hItem.bExist = false
 		end

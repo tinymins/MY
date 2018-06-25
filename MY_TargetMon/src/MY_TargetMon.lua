@@ -775,9 +775,20 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 	})
 	y = y + 30
 
+	ui:append('WndCheckBox', {
+		x = 40, y = y, w = 90,
+		text = _L['Play sound'],
+		checked = config.playSound,
+		oncheck = function(bCheck)
+			config.playSound = bCheck
+			D.CheckFrame(config)
+		end,
+		autoenable = function() return config.enable end,
+	})
+
 	ui:append('WndComboBox', {
-		x = 40, y = y, w = (w - 250 - 30 - 30 - 10) / 2,
-		text = _L['Select background style'],
+		x = 40 + 90, y = y, w = (w - 250 - 30 - 30 - 80) / 2,
+		text = _L['Icon style'],
 		menu = function()
 			local t, subt, szIcon, nFrame = {}
 			for _, text in ipairs(CUSTOM_BOXBG_STYLES) do
@@ -804,8 +815,8 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		autoenable = function() return config.enable end,
 	})
 	ui:append('WndComboBox', {
-		x = 40 + (w - 250 - 30 - 30 - 10) / 2 + 10, y = y, w = (w - 250 - 30 - 30 - 10) / 2,
-		text = _L['Select countdown style'],
+		x = 40 + 90 + (w - 250 - 30 - 30 - 80) / 2, y = y, w = (w - 250 - 30 - 30 - 80) / 2,
+		text = _L['Countdown style'],
 		menu = function()
 			local t, subt, szIcon, nFrame = {}
 			for _, text in ipairs(CUSTOM_CDBAR_STYLES) do
