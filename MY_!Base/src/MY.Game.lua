@@ -348,11 +348,11 @@ function MY.Game.GetObjectName(obj, eRetID)
 	if not eRetID then
 		eRetID = 'auto'
 	end
-	local szType, szName = 'UNKNOWN', obj.szName
+	local szType, szName = '?', obj.szName
 	if IsPlayer(obj.dwID) then  -- PLAYER
-		szType = 'PLAYER'
+		szType = 'P'
 	elseif obj.nMaxLife then    -- NPC
-		szType = 'NPC'
+		szType = 'N'
 		if IsEmpty(szName) then
 			szName = Table_GetNpcTemplateName(obj.dwTemplateID)
 			if szName then
@@ -371,7 +371,7 @@ function MY.Game.GetObjectName(obj, eRetID)
 			end
 		end
 	elseif obj.CanLoot then -- DOODAD
-		szType = 'DOODAD'
+		szType = 'D'
 		if IsEmpty(szName) then
 			szName = Table_GetDoodadTemplateName(obj.dwTemplateID)
 			if szName then
@@ -379,12 +379,12 @@ function MY.Game.GetObjectName(obj, eRetID)
 			end
 		end
 	elseif obj.IsRepairable then -- ITEM
-		szType = 'ITEM'
+		szType = 'I'
 		szName = GetItemNameByItem(obj)
 	end
 	if IsEmpty(szName) and eRetID ~= 'never' or eRetID == 'always' then
-		local szDispID = szType .. '#' .. obj.dwID
-		if szType == 'NPC' then
+		local szDispID = szType .. obj.dwID
+		if szType == 'N' then
 			szDispID = szDispID .. '@' .. obj.dwTemplateID
 		end
 		szName = IsEmpty(szName) and szDispID or (szName .. '(' .. szDispID .. ')')
