@@ -292,6 +292,25 @@ function MY.Game.GetRealServer(nIndex)
 end
 MY.GetRealServer = MY.Game.GetRealServer
 
+do
+local S2L_CACHE = setmetatable({}, { __mode = 'k' })
+local L2S_CACHE = setmetatable({}, { __mode = 'k' })
+function MY.Game.ConvertNpcID(dwID, eType)
+	if IsPlayer(dwID) then
+		if not S2L_CACHE[dwID] then
+			S2L_CACHE[dwID] = { dwID + 0x40000000 }
+		end
+		return eType == 'short' and dwID or S2L_CACHE[dwID][1]
+	else
+		if not L2S_CACHE[dwID] then
+			L2S_CACHE[dwID] = { dwID - 0x40000000 }
+		end
+		return eType == 'long' and dwID or L2S_CACHE[dwID][1]
+	end
+end
+MY.ConvertNpcID = MY.Game.ConvertNpcID
+end
+
 -- 获取指定对象
 -- (KObject, info, bIsInfo) MY.GetObject([number dwType, ]number dwID)
 -- dwType: [可选]对象类型枚举 TARGET.*
@@ -383,9 +402,11 @@ function MY.Game.GetObjectName(obj, eRetID)
 		szName = GetItemNameByItem(obj)
 	end
 	if IsEmpty(szName) and eRetID ~= 'never' or eRetID == 'always' then
-		local szDispID = szType .. obj.dwID
+		local szDispID = szType
 		if szType == 'N' then
-			szDispID = szDispID .. '@' .. obj.dwTemplateID
+			szDispID = szDispID .. MY.ConvertNpcID(obj.dwID) .. '@' .. obj.dwTemplateID
+		else
+			szDispID = szDispID .. obj.dwID
 		end
 		szName = IsEmpty(szName) and szDispID or (szName .. '(' .. szDispID .. ')')
 	end
