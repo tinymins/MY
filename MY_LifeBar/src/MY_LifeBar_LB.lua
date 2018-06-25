@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 12:50:01
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-06-22 03:37:36
+-- @Last Modified time: 2018-06-26 01:40:42
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -38,6 +38,8 @@ local function InitConfigData(self)
 	self.a = 0
 	self.cfx = nil
 	self.font = 10
+	self.priority = 0
+	self.priority_invalid = false
 	-- 倒计时/名字/帮会/称号部分
 	self.cd_visible = true
 	self.cd_text = ''
@@ -122,6 +124,7 @@ function LB:Paint(force)
 		self:DrawLifeBorder(force)
 		self:DrawLife(force)
 		self:DrawTexts(force)
+		self:ApplyPriority()
 	end
 	return self
 end
@@ -136,6 +139,22 @@ function LB:SetColor(r, g, b, a)
 		self:SetInvalid('life_bar')
 		self:SetInvalid('life_text')
 		self:SetInvalid('texts', true)
+	end
+	return self
+end
+
+function LB:SetPriority(priority)
+	if self.priority ~= priority then
+		self.priority = priority
+		self:SetInvalid('priority')
+	end
+	return self
+end
+
+function LB:ApplyPriority()
+	if self.priority_invalid then
+		self.hp:SetPriority(self.priority)
+		self.priority_invalid = false
 	end
 	return self
 end

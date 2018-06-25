@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-06-23 23:15:46
+-- @Last Modified time: 2018-06-26 01:49:48
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -306,6 +306,7 @@ local function CheckInvalidRect(dwType, dwID, me)
 		local dwTarType, dwTarID = me.GetTarget()
 		local relation = D.GetRelation(dwID)
 		local force = D.GetForce(dwID)
+		local nPriority = dwType == TARGET.PLAYER and dwID == me.dwID and 1 or 0
 		local szName = MY.GetObjectName(object, (Config.bShowAllObjectID and 'always') or (Config.bShowUnnamedObjectID and 'auto') or 'never')
 		-- ³£¹æÅäÉ«
 		local r, g, b = unpack(GetConfigValue('Color', relation, force))
@@ -325,6 +326,7 @@ local function CheckInvalidRect(dwType, dwID, me)
 				if tData.tColor then
 					r, g, b = unpack(tData.tColor)
 				end
+				nPriority = nPriority + 100
 				fTextScale = fTextScale * 1.15
 				szCountDown = tData.szText .. '_' .. MY.FormatTimeCount(nSec >= 60 and 'M\'ss"' or 'ss"', min(nSec, 5999))
 				break
@@ -389,6 +391,7 @@ local function CheckInvalidRect(dwType, dwID, me)
 			or (dwID == dwTarID and fxTarget or nil)
 		)
 		lb:SetTextsScale(fTextScale)
+		lb:SetPriority(nPriority)
 		lb:Create():Paint()
 	elseif lb then
 		lb:Remove()

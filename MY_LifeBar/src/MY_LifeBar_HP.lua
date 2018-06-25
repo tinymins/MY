@@ -31,6 +31,7 @@ local IsNumber, IsString, IsTable, IsFunction = MY.IsNumber, MY.IsString, MY.IsT
 ---------------------------------------------------------------------------------------------------
 local HP = class()
 local CACHE = setmetatable({}, {__mode = 'v'})
+local REQUIRE_SORT = false
 
 function HP:ctor(dwType, dwID) -- KGobject
 	local hList = XGUI.GetShadowHandle('MY_LifeBar')
@@ -57,9 +58,8 @@ function HP:Create()
 		hItem:AppendItemFromString('<shadow>name="lines"</shadow>')
 		hItem:AppendItemFromString('<shadow>name="hp_title"</shadow>')
 		hItem:AppendItemFromString('<shadow>name="ot_title"</shadow>')
-		hItem:SetUserData(self.dwID == UI_GetClientPlayerID() and 1 or 0)
+		REQUIRE_SORT = true
 		self.handle = hItem
-		hList:Sort()
 	end
 	return self
 end
@@ -70,6 +70,14 @@ function HP:Remove()
 		local hList = XGUI.GetShadowHandle('MY_LifeBar')
 		hList:RemoveItem(self.handle)
 		self.handle = nil
+	end
+	return self
+end
+
+function HP:SetPriority(nPriority)
+	if self.handle then
+		self.handle:SetUserData(nPriority)
+		REQUIRE_SORT = true
 	end
 	return self
 end
@@ -232,4 +240,17 @@ function MY_LifeBar_HP(dwType, dwID)
 		end
 		return CACHE[szName]
 	end
+end
+
+do local hList
+local function onBreathe()
+	if REQUIRE_SORT then
+		if not (hList and hList:IsValid()) then
+			hList = XGUI.GetShadowHandle('MY_LifeBar')
+		end
+		hList:Sort()
+		REQUIRE_SORT = false
+	end
+end
+MY.BreatheCall('MY_LifeBar_HP', onBreathe)
 end
