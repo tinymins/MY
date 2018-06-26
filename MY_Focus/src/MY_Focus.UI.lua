@@ -96,8 +96,9 @@ function D.AutosizeUI(frame)
 		end
 	end
 	hList:SetH(nHeight)
+	hList:SetVisible(not MY_Focus.bMinimize)
 	frame:SetVisible(nHeight > 0 or not MY_Focus.bAutoHide)
-	frame:SetH(nHeight + frame:Lookup('', 'Image_Title'):GetH())
+	frame:SetH((MY_Focus.bMinimize and 0 or nHeight) + frame:Lookup('', 'Image_Title'):GetH())
 end
 
 -- 绘制指定的焦点Handle
@@ -390,6 +391,7 @@ function MY_Focus.OnFrameCreate()
 	this:RegisterEvent('MY_FOCUS_SCALE_UPDATE')
 	this:RegisterEvent('MY_FOCUS_MAX_DISPLAY_UPDATE')
 	this:RegisterEvent('MY_FOCUS_AUTO_HIDE_UPDATE')
+	this:RegisterEvent('MY_FOCUS_MINIMIZE_UPDATE')
 
 	D.Scale(this)
 	D.CreateList(this)
@@ -432,6 +434,8 @@ function MY_Focus.OnEvent(event)
 	elseif event == 'MY_FOCUS_MAX_DISPLAY_UPDATE' then
 		D.CreateList(this)
 	elseif event == 'MY_FOCUS_AUTO_HIDE_UPDATE' then
+		D.AutosizeUI(this)
+	elseif event == 'MY_FOCUS_MINIMIZE_UPDATE' then
 		D.AutosizeUI(this)
 	end
 end
@@ -521,6 +525,7 @@ function MY_Focus.OnCheckBoxCheck()
 	local name = this:GetName()
 	if name == 'CheckBox_Minimize' then
 		MY_Focus.bMinimize = true
+		FireUIEvent('MY_FOCUS_MINIMIZE_UPDATE')
 	end
 end
 
@@ -528,6 +533,7 @@ function MY_Focus.OnCheckBoxUncheck()
 	local name = this:GetName()
 	if name == 'CheckBox_Minimize' then
 		MY_Focus.bMinimize = false
+		FireUIEvent('MY_FOCUS_MINIMIZE_UPDATE')
 	end
 end
 
