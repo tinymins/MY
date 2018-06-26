@@ -18,7 +18,7 @@ data = {
 
 	nLifeWidth = 100,
 	nLifeHeight = 8,
-	nLifePadding = 1,
+	nLifePadding = 0,
 	nLifeOffsetX = 0,
 	nLifeOffsetY = 27,
 	nLifeBorder = 1,
