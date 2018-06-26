@@ -82,9 +82,7 @@ end
 local function ApplyUIArguments(ui, arg)
 	if ui and arg then
 		-- properties
-		if arg.w ~= nil or arg.h ~= nil or arg.rw ~= nil or arg.rh ~= nil then ui:size(arg.w, arg.h, arg.rw, arg.rh) end
 		if arg.x ~= nil or arg.y ~= nil  then ui:pos             (arg.x, arg.y  ) end
-		if arg.halign or arg.valign      then ui:align   (arg.halign, arg.valign) end -- must after :size()
 		if arg.anchor             ~= nil then ui:anchor         (arg.anchor     ) end
 		if arg.alpha              ~= nil then ui:alpha          (arg.alpha      ) end
 		if arg.font               ~= nil then ui:font           (arg.font       ) end -- must before color
@@ -116,6 +114,8 @@ local function ApplyUIArguments(ui, arg)
 		if arg.name               ~= nil then ui:name           (arg.name       ) end
 		if arg.dragable           ~= nil then ui:drag           (arg.dragable   ) end
 		if arg.dragarea           ~= nil then ui:drag      (unpack(arg.dragarea)) end
+		if arg.w ~= nil or arg.h ~= nil or arg.rw ~= nil or arg.rh ~= nil then ui:size(arg.w, arg.h, arg.rw, arg.rh) end -- must after :text() because w/h can be 'auto'
+		if arg.halign or arg.valign      then ui:align   (arg.halign, arg.valign) end -- must after :size()
 		-- event handlers
 		if arg.onscroll           ~= nil then ui:scroll         (arg.onscroll   ) end
 		if arg.onhover            ~= nil then ui:hover          (arg.onhover    ) end
@@ -132,6 +132,10 @@ local function ApplyUIArguments(ui, arg)
 		if arg.uievents           ~= nil then for _, v in ipairs(arg.uievents) do ui:uievent(unpack(v)) end end
 		if arg.listbox            ~= nil then for _, v in ipairs(arg.listbox) do ui:listbox(unpack(v)) end end
 		if arg.autocomplete       ~= nil then for _, v in ipairs(arg.autocomplete) do ui:autocomplete(unpack(v)) end end
+		-- auto size
+		if arg.autosize                  then ui:autoSize()                       end
+		if arg.autowidth                 then ui:autoWidth()                      end
+		if arg.autoheight                then ui:autoHeight()                     end
 	end
 	return ui
 end
@@ -2215,6 +2219,15 @@ end
 -- (self) Instance:size(OnSizeChanged)
 function XGUI:size(arg0, arg1, arg2, arg3)
 	self:_checksum()
+	if arg0 == 'auto' and arg1 == 'auto' then
+		return self:autoSize()
+	elseif arg0 == 'auto' then
+		arg0 = nil
+		self:autoWidth()
+	elseif arg1 == 'auto' then
+		arg1 = nil
+		self:autoHeight()
+	end
 	if IsFunction(arg0) then
 		for _, raw in ipairs(self.raws) do
 			XGUI(raw):uievent('OnSizeChanged', arg0)
