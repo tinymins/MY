@@ -26,6 +26,7 @@ local IsNil, IsString, IsTable, IsEmpty = MY.IsNil, MY.IsString, MY.IsTable, MY.
 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TargetMon/lang/')
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/ui/MY_TargetMon.ini'
+local ADDON_ROOT = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/'
 local ROLE_CONFIG_FILE = {'config/my_targetmon.jx3dat', MY_DATA_PATH.ROLE}
 local TEMPLATE_CONFIG_FILE = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/data/template/$lang.jx3dat'
 local EMBEDDED_CONFIG_FILE = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/data/embedded/$lang.jx3dat'
@@ -105,6 +106,9 @@ local TARGET_TYPE_LIST = {
 	'TEAM_MARK_DART' ,
 	'TEAM_MARK_FAN'  ,
 }
+local SOUNDS = {
+	{ dwID = 1, szName = _L['Default alert sound'], szPath = ADDON_ROOT .. 'audio/alert_sound.ogg' },
+}
 local Config, ConfigEmbedded, ConfigTemplate, ConfigDefault = {}, {}
 
 ----------------------------------------------------------------------------------------------
@@ -154,6 +158,20 @@ function D.GetFrameData(id)
 			return config, index
 		end
 	end
+end
+
+do local CACHE = {}
+function D.GetSound(dwID)
+	if not CACHE[dwID] then
+		for _, sound in ipairs(SOUNDS) do
+			if sound.dwID == dwID then
+				CACHE[dwID] = sound
+				break
+			end
+		end
+	end
+	return CACHE[dwID]
+end
 end
 
 do
@@ -315,16 +333,44 @@ function D.FormatConfigStructure(config)
 				if IsString(idmon.soundAppear) then
 					idmon.soundAppear = {idmon.soundAppear}
 				end
+				if IsTable(idmon.soundAppear) then
+					for i, v in ipairs_r(idmon.soundAppear) do
+						if v == '' then
+							remove(idmon.soundAppear, i)
+						end
+					end
+				end
 				if IsString(idmon.soundDisappear) then
 					idmon.soundDisappear = {idmon.soundDisappear}
+				end
+				if IsTable(idmon.soundDisappear) then
+					for i, v in ipairs_r(idmon.soundDisappear) do
+						if v == '' then
+							remove(idmon.soundDisappear, i)
+						end
+					end
 				end
 			end
 		end
 		if IsString(mon.soundAppear) then
 			mon.soundAppear = {mon.soundAppear}
 		end
+		if IsTable(mon.soundAppear) then
+			for i, v in ipairs_r(mon.soundAppear) do
+				if v == '' then
+					remove(mon.soundAppear, i)
+				end
+			end
+		end
 		if IsString(mon.soundDisappear) then
 			mon.soundDisappear = {mon.soundDisappear}
+		end
+		if IsTable(mon.soundDisappear) then
+			for i, v in ipairs_r(mon.soundDisappear) do
+				if v == '' then
+					remove(mon.soundDisappear, i)
+				end
+			end
 		end
 	end
 	return FormatConfigData(MY.FormatDataStructure(config, ConfigTemplate, true))
@@ -1154,75 +1200,59 @@ function PS.OnPanelActive(wnd)
 			insert(t1, t2)
 			-- 出现声音
 			local t2 = { szOption = _L['Play sound when appear'] }
-			for i, szSound in ipairs(mon.soundAppear) do
+			for _, sound in ipairs(SOUNDS) do
+				local bChecked = false
+				for _, v in ipairs(mon.soundAppear) do
+					if v == sound.dwID then
+						bChecked = true
+						break
+					end
+				end
 				insert(t2, {
-					szOption = szSound,
-					szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
-					nFrame = 49,
-					nMouseOverFrame = 51,
-					nIconWidth = 17,
-					nIconHeight = 17,
-					szLayer = 'ICON_RIGHTMOST',
-					fnClickIcon = function()
-						remove(mon.soundAppear, i)
-						Wnd.CloseWindow('PopupMenuPanel')
+					szOption = sound.szName,
+					bCheck = true,
+					bChecked = bChecked,
+					fnAction = function()
+						if bChecked then
+							for i, v in ipairs_r(mon.soundAppear) do
+								if v == sound.dwID then
+									remove(mon.soundAppear, i)
+								end
+							end
+						else
+							insert(mon.soundAppear, sound.dwID)
+						end
 					end,
 				})
 			end
-			insert(t2, {
-				szOption = _L['Add'],
-				fnAction = function()
-					local file = GetOpenFileName(
-						_L['Please select sound file.'],
-						'Sound Files(*.wav,*.ogg)\0*.wav;*.ogg\0All Files(*.*)\0*.*\0\0',
-						MY.FormatPath({ 'audio/', MY_DATA_PATH.GLOBAL })
-					)
-					if file == '' then
-						return
-					end
-					file = MY.GetRelativePath(file, { 'audio/', MY_DATA_PATH.GLOBAL })
-					if not file then
-						return MY.Alert(_L('File path error! Not in "%s"!', MY.FormatPath({ 'audio/', MY_DATA_PATH.GLOBAL })))
-					end
-					insert(mon.soundAppear, file)
-				end,
-			})
 			insert(t1, t2)
 			-- 消失声音
 			local t2 = { szOption = _L['Play sound when disappear'] }
-			for i, szSound in ipairs(mon.soundDisappear) do
+			for _, sound in ipairs(SOUNDS) do
+				local bChecked = false
+				for _, v in ipairs(mon.soundDisappear) do
+					if v == sound.dwID then
+						bChecked = true
+						break
+					end
+				end
 				insert(t2, {
-					szOption = szSound,
-					szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
-					nFrame = 49,
-					nMouseOverFrame = 51,
-					nIconWidth = 17,
-					nIconHeight = 17,
-					szLayer = 'ICON_RIGHTMOST',
-					fnClickIcon = function()
-						remove(mon.soundDisappear, i)
-						Wnd.CloseWindow('PopupMenuPanel')
+					szOption = sound.szName,
+					bCheck = true,
+					bChecked = bChecked,
+					fnAction = function()
+						if bChecked then
+							for i, v in ipairs_r(mon.soundDisappear) do
+								if v == sound.dwID then
+									remove(mon.soundDisappear, i)
+								end
+							end
+						else
+							insert(mon.soundDisappear, sound.dwID)
+						end
 					end,
 				})
 			end
-			insert(t2, {
-				szOption = _L['Add'],
-				fnAction = function()
-					local file = GetOpenFileName(
-						_L['Please select sound file.'],
-						'Sound Files(*.wav,*.ogg)\0*.wav;*.ogg\0All Files(*.*)\0*.*\0\0',
-						MY.FormatPath({ 'audio/', MY_DATA_PATH.GLOBAL })
-					)
-					if file == '' then
-						return
-					end
-					file = MY.GetRelativePath(file, { 'audio/', MY_DATA_PATH.GLOBAL })
-					if not file then
-						return MY.Alert(_L('File path error! Not in "%s"!', MY.FormatPath({ 'audio/', MY_DATA_PATH.GLOBAL })))
-					end
-					insert(mon.soundDisappear, file)
-				end,
-			})
 			insert(t1, t2)
 			-- ID设置
 			if not empty(mon.ids) then
@@ -1580,6 +1610,7 @@ MY.RegisterPanel('MY_TargetMon', _L['Target monitor'], _L['Target'], 'ui/Image/C
 
 
 local ui = {
+	GetSound                     = D.GetSound,
 	GetTarget                    = D.GetTarget,
 	GetFrameData                 = D.GetFrameData,
 	FormatConfigStructure        = D.FormatConfigStructure,

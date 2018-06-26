@@ -45,12 +45,12 @@ return {
 				soundAppear = {
 					__META__,
 					__VALUE__ = {},
-					__CHILD_TEMPLATE__ = "",
+					__CHILD_TEMPLATE__ = 1,
 				},
 				soundDisappear = {
 					__META__,
 					__VALUE__ = {},
-					__CHILD_TEMPLATE__ = "",
+					__CHILD_TEMPLATE__ = 1,
 				},
 				ids = {
 					__META__,
@@ -61,12 +61,12 @@ return {
 						soundAppear = {
 							__META__,
 							__VALUE__ = {},
-							__CHILD_TEMPLATE__ = "",
+							__CHILD_TEMPLATE__ = 1,
 						},
 						soundDisappear = {
 							__META__,
 							__VALUE__ = {},
-							__CHILD_TEMPLATE__ = "",
+							__CHILD_TEMPLATE__ = 1,
 						},
 						levels = {
 							__META__,
