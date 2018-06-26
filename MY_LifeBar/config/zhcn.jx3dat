@@ -10,6 +10,7 @@ data = {
 	fTextSpacing = 1,
 
 	bShowSpecialNpc = false,
+	bShowSpecialNpcOnlyEnemy = true,
 	bShowUnnamedObjectID = false,
 	bShowAllObjectID = false,
 	bShowKungfu = false,

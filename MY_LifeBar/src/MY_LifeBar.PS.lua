@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 10:36:40
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-06-22 04:01:02
+-- @Last Modified time: 2018-06-27 01:17:24
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -573,7 +573,7 @@ function PS.OnPanelActive(wnd)
 	ui:append('Text', { text = _L['lifebar border color'], x = x + 27, y = y - 2 })
 	y = y + offsety - 10
 
-	ui:append('WndCheckBox', {
+	local x = x + ui:append('WndCheckBox', {
 		x = x, y = y, text = _L['show special npc'],
 		checked = Config.bShowSpecialNpc,
 		oncheck = function(bChecked)
@@ -581,7 +581,18 @@ function PS.OnPanelActive(wnd)
 			D.Reset()
 		end,
 		autoenable = function() return D.IsEnabled() end,
+	}, true):autoWidth():width() + 5
+	ui:append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
+		text = _L['only enemy'],
+		checked = Config.bShowSpecialNpcOnlyEnemy,
+		oncheck = function(bChecked)
+			Config.bShowSpecialNpcOnlyEnemy = bChecked
+			D.Reset()
+		end,
+		autoenable = function() return D.IsEnabled() and Config.bShowSpecialNpc end,
 	})
+	x = X
 	y = y + offsety - 10
 
 	ui:append('WndCheckBox', {
@@ -619,7 +630,8 @@ function PS.OnPanelActive(wnd)
 	-- y = y + offsety - 10
 
 	ui:append('WndCheckBox', {
-		x = x, y = y, text = _L['show kungfu'],
+		x = x, y = y, w = 'auto',
+		text = _L['show kungfu'],
 		checked = Config.bShowKungfu,
 		oncheck = function(bChecked)
 			Config.bShowKungfu = bChecked
@@ -629,7 +641,8 @@ function PS.OnPanelActive(wnd)
 	})
 
 	ui:append('WndCheckBox', {
-		x = x + 90, y = y, text = _L['show distance'],
+		x = x + 90, y = y, w = 'auto',
+		text = _L['show distance'],
 		checked = Config.bShowDistance,
 		oncheck = function(bChecked)
 			Config.bShowDistance = bChecked
@@ -640,7 +653,8 @@ function PS.OnPanelActive(wnd)
 	y = y + offsety
 
 	ui:append('WndButton', {
-		x = x, y = y, w = 65, text = _L['Font'],
+		x = x, y = y, w = 65,
+		text = _L['Font'],
 		onclick = function()
 			MY.UI.OpenFontPicker(function(nFont)
 				Config.nFont = nFont

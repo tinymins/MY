@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-06-26 01:49:48
+-- @Last Modified time: 2018-06-27 00:41:26
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -288,7 +288,7 @@ local function CheckInvalidRect(dwType, dwID, me)
 	and (
 		object.dwTemplateID ~= CHANGGE_REAL_SHADOW_TPLID
 		or (IsEnemy(me.dwID, dwID) and MY.IsShieldedVersion())
-	) and not Config.bShowSpecialNpc then
+	) and not (Config.bShowSpecialNpc and (not Config.bShowSpecialNpcOnlyEnemy or IsEnemy(me.dwID, dwID))) then
 		bVisible = false
 	end
 	if bVisible then
