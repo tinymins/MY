@@ -33,6 +33,7 @@ data = {
 	nAlpha = 200,
 	nFont = 16,
 	nDistance = 72 * 72 * 64 * 64,
+	nVerticalDistance = 50 * 8 * 64,
 
 	bHideLifePercentageWhenFight = false,
 	bHideLifePercentageDecimal = false,

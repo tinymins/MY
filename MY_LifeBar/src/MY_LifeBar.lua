@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-06-27 00:41:26
+-- @Last Modified time: 2018-06-27 01:32:36
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -273,10 +273,15 @@ local function CheckInvalidRect(dwType, dwID, me)
 		end
 		return
 	end
-	local bVisible = Config.nDistance <= 0
-	if not bVisible then
+	local bVisible = true
+	-- 距离判断
+	if bVisible and Config.nDistance > 0 then
 		local nDisX, nDisY, nDisZ = me.nX - object.nX, me.nY - object.nY, (me.nZ - object.nZ) * 0.125
 		bVisible = nDisX * nDisX + nDisY * nDisY + nDisZ * nDisZ < Config.nDistance
+	end
+	-- 高度差判断
+	if bVisible and Config.nVerticalDistance > 0 then
+		bVisible = me.nZ - object.nZ < Config.nVerticalDistance
 	end
 	-- 这是镜头补偿判断 但是不好用先不加
 	-- if bVisible then
