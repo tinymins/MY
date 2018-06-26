@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 10:36:40
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-06-27 01:50:12
+-- @Last Modified time: 2018-06-27 01:53:18
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -136,9 +136,9 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + offsety
 	-- <hr />
-	ui:append('Image', 'Image_Spliter'):find('#Image_Spliter'):pos(10, y-7):size(w - 20, 2):image('UI/Image/UICommon/ScienceTreeNode.UITex',62)
+	ui:append('Image', 'Image_Spliter'):find('#Image_Spliter'):pos(10, y-7):size(w - 20, 1):image('UI/Image/UICommon/ScienceTreeNode.UITex',62)
 
-	X, Y = 15, 70
+	X, Y = 15, 60
 	x, y = X, Y
 	offsety = 24
 	ui:append('WndSliderBox', {
@@ -337,7 +337,7 @@ function PS.OnPanelActive(wnd)
 	y = y + offsety
 
 	-- ”“∞Î±ﬂ
-	X, Y = 350, 75
+	X, Y = 350, 65
 	x, y = X, Y
 	offsety = 35
 	local function FillColorTable(opt, relation, tartype)
