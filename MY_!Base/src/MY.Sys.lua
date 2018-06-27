@@ -401,7 +401,7 @@ function MY.PlaySound(nType, szFilePath, szCustomPath)
 		}) do
 			local szPath = MY.FormatPath({ 'audio/' .. szCustomPath, ePathType })
 			if IsFileExist(szPath) then
-				return PlaySound(SOUND.UI_SOUND, szPath)
+				return PlaySound(nType, szPath)
 			end
 		end
 	end
@@ -413,7 +413,7 @@ function MY.PlaySound(nType, szFilePath, szCustomPath)
 	if not IsFileExist(szPath) then
 		return
 	end
-	PlaySound(SOUND.UI_SOUND, szPath)
+	PlaySound(nType, szPath)
 end
 -- МгдизЂВсЪ§Он
 MY.RegisterInit('MYLIB#INITDATA', function()
