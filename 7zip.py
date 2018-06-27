@@ -1,6 +1,18 @@
 # -*- coding: GBK -*-
 import time, os, re
 
+# 读取Git分支
+name_list = os.popen('git branch').read().strip().split("\n")
+branch_name = ''
+for name in name_list:
+	if name[0:1] == '*':
+		branch_name = name[2:]
+
+# 判断是否忘记切换分支
+if branch_name != 'publish':
+	print 'Error: current branch(%s) is not on git publish!' % (branch_name)
+	exit()
+
 # 读取MY.lua文件中的插件版本号
 str_version = "0x0000000"
 for line in open("MY_!Base/src/MY.lua"):
@@ -37,7 +49,7 @@ for path in paths:
 print ''
 
 # 拼接字符串开始压缩文件
-dst_file = "!src-dist/releases/MY." + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "v" + str_version + ".7z"
+dst_file = "!src-dist/releases/MY_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_v" + str_version + ".7z"
 print "zippping..."
 cmd = "7z a -t7z " + dst_file + " -xr!manifest.dat -xr!manifest.key -xr!publisher.key -x@7zipignore.txt"
 for path in paths:

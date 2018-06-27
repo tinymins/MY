@@ -1,6 +1,18 @@
 # -*- coding: GBK -*-
 import time, os, re
 
+# 读取Git分支
+name_list = os.popen('git branch').read().strip().split("\n")
+branch_name = ''
+for name in name_list:
+	if name[0:1] == '*':
+		branch_name = name[2:]
+
+# 判断是否忘记切换分支
+if branch_name != 'publish':
+	print 'Error: current branch(%s) is not on git publish!' % (branch_name)
+	exit()
+
 # 读取MY.lua文件中的插件版本号
 str_version = "0x0000000"
 for line in open("MY_!Base/src/MY.lua"):
