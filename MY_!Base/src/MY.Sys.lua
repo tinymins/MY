@@ -394,13 +394,15 @@ function MY.PlaySound(nType, szFilePath, szCustomPath)
 		szCustomPath = szFilePath
 	end
 	-- 播放自定义声音
-	for _, ePathType in ipairs({
-		MY_DATA_PATH.ROLE,
-		MY_DATA_PATH.GLOBAL,
-	}) do
-		local szPath = MY.FormatPath({ 'audio/' .. szCustomPath, ePathType })
-		if IsFileExist(szPath) then
-			return PlaySound(SOUND.UI_SOUND, szPath)
+	if szCustomPath ~= '' then
+		for _, ePathType in ipairs({
+			MY_DATA_PATH.ROLE,
+			MY_DATA_PATH.GLOBAL,
+		}) do
+			local szPath = MY.FormatPath({ 'audio/' .. szCustomPath, ePathType })
+			if IsFileExist(szPath) then
+				return PlaySound(SOUND.UI_SOUND, szPath)
+			end
 		end
 	end
 	-- 播放默认声音
