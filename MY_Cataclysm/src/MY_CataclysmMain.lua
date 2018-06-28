@@ -664,17 +664,17 @@ function Cataclysm_Main.OnEvent(szEvent)
 	elseif szEvent == 'TEAM_VOTE_REQUEST' then
 		if arg0 == 1 then
 			if MY.IsLeader() then
-				Grid_CTM:StartRaidReadyConfirm()
+				Grid_CTM:StartTeamVote('raid_ready')
 			end
 		end
 	elseif szEvent == 'TEAM_VOTE_RESPOND' then
 		if arg0 == 1 then
 			if MY.IsLeader() then
-				Grid_CTM:ChangeReadyConfirm(arg1, arg2 == 1)
+				Grid_CTM:ChangeTeamVoteState('raid_ready', arg1, arg2 == 1)
 			end
 		end
 	elseif szEvent == 'RIAD_READY_CONFIRM_RECEIVE_ANSWER' then
-		Grid_CTM:ChangeReadyConfirm(arg0, arg1 == 1)
+		Grid_CTM:ChangeTeamVoteState('raid_ready', arg0, arg1 == 1)
 	elseif szEvent == 'TEAM_CHANGE_MEMBER_GROUP' then
 		local me = GetClientPlayer()
 		local team = GetClientTeam()
@@ -856,12 +856,12 @@ function Cataclysm_Main.OnLButtonClick()
 					bDisable = not MY.IsLeader(),
 					fnAction = function()
 						Send_RaidReadyConfirm()
-						Grid_CTM:StartRaidReadyConfirm()
+						Grid_CTM:StartTeamVote('raid_ready')
 					end,
 				},
 				{
 					szOption = g_tStrings.STR_RAID_READY_CONFIRM_RESET,
-					fnAction = function() Grid_CTM:ClearRaidReadyConfirm() end,
+					fnAction = function() Grid_CTM:ClearTeamVote('raid_ready') end,
 				}
 			})
 			table.insert(menu, { bDevide = true })

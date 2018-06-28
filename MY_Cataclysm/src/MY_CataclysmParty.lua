@@ -2029,63 +2029,80 @@ function CTM:DrawShadow(sha, x, y, r, g, b, a, bGradient) -- ÷ÿªÊ»˝Ω«…»
 	end
 end
 
-function CTM:StartRaidReadyConfirm()
-	if MY.IsLeader() then
-		self:ClearRaidReadyConfirm()
+do
+local UI_NAMES = {
+	['raid_ready'] = {'Image_ReadyCover', 'Image_NotReady', 'Animate_Ready'},
+}
+function CTM:StartTeamVote(eType)
+	local names = UI_NAMES[eType]
+	if not names then
+		return
+	end
+	self:ClearTeamVote(eType)
+	for k, v in pairs(CTM_CACHE) do
+		if v:IsValid() then
+			local info = self:GetMemberInfo(k)
+			if info.bIsOnLine and k ~= UI_GetClientPlayerID() then
+				v:Lookup(names[1]):Show()
+			end
+		end
+	end
+	MY.DelayCall(5000, function()
 		for k, v in pairs(CTM_CACHE) do
 			if v:IsValid() then
-				local info = self:GetMemberInfo(k)
-				if info.bIsOnLine and k ~= UI_GetClientPlayerID() then
-					v:Lookup('Image_ReadyCover'):Show()
+				if v:Lookup(names[1]):IsVisible() or v:Lookup(names[2]):IsVisible() then
+					MY.Confirm(g_tStrings.STR_RAID_READY_CONFIRM_RESET .. '?', function()
+						self:ClearTeamVote(eType)
+					end)
+					break
 				end
 			end
 		end
-		MY.DelayCall(5000, function()
-			for k, v in pairs(CTM_CACHE) do
-				if v:IsValid() then
-					if v:Lookup('Image_ReadyCover'):IsVisible() or v:Lookup('Image_NotReady'):IsVisible() then
-						MY.Confirm(g_tStrings.STR_RAID_READY_CONFIRM_RESET .. '?', function()
-							self:ClearRaidReadyConfirm()
-						end)
-						break
-					end
-				end
-			end
-		end)
-	end
+	end)
 end
 
-function CTM:ChangeReadyConfirm(dwID, status)
+function CTM:ChangeTeamVoteState(eType, dwID, status)
+	local names = UI_NAMES[eType]
+	if not names then
+		return
+	end
 	if CTM_CACHE[dwID] and CTM_CACHE[dwID]:IsValid() then
 		local h = CTM_CACHE[dwID]
-		h:Lookup('Image_ReadyCover'):Hide()
-		if status then
-			local key = 'CTM_READY_' .. dwID
-			h:Lookup('Animate_Ready'):Show()
-			h:Lookup('Animate_Ready'):SetAlpha(240)
+		h:Lookup(names[1]):Hide()
+		if status == 'resolve' and names[3] then
+			local key = 'CTM_READY_' .. eType .. '_' .. dwID
+			h:Lookup(names[3]):Show()
+			h:Lookup(names[3]):SetAlpha(240)
 			MY.BreatheCall(key, function()
-				if h:Lookup('Animate_Ready'):IsValid() then
-					local nAlpha = math.max(h:Lookup('Animate_Ready'):GetAlpha() - 15, 0)
-					h:Lookup('Animate_Ready'):SetAlpha(nAlpha)
+				if h:Lookup(names[3]):IsValid() then
+					local nAlpha = math.max(h:Lookup(names[3]):GetAlpha() - 15, 0)
+					h:Lookup(names[3]):SetAlpha(nAlpha)
 					if nAlpha <= 0 then
 						MY.BreatheCall(key, false)
 					end
 				end
 			end)
-		else
-			h:Lookup('Image_NotReady'):Show()
+		elseif status == 'reject' then
+			h:Lookup(names[2]):Show()
 		end
 	end
 end
 
-function CTM:ClearRaidReadyConfirm()
+function CTM:ClearTeamVote(eType)
+	local names = UI_NAMES[eType]
+	if not names then
+		return
+	end
 	for k, v in pairs(CTM_CACHE) do
 		if v:IsValid() then
-			v:Lookup('Image_ReadyCover'):Hide()
-			v:Lookup('Image_NotReady'):Hide()
-			v:Lookup('Animate_Ready'):Hide()
+			for i, name in ipairs(names) do
+				if v:Lookup(name) then
+					v:Lookup(name):Hide()
+				end
+			end
 		end
 	end
+end
 end
 
 function CTM:CallEffect(dwTargetID, nDelay)
