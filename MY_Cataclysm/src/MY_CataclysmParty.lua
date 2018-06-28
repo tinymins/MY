@@ -2029,9 +2029,9 @@ function CTM:DrawShadow(sha, x, y, r, g, b, a, bGradient) -- ÷ÿªÊ»˝Ω«…»
 	end
 end
 
-function CTM:Send_RaidReadyConfirm(bDisable)
+function CTM:StartRaidReadyConfirm()
 	if MY.IsLeader() then
-		self:Clear_RaidReadyConfirm()
+		self:ClearRaidReadyConfirm()
 		for k, v in pairs(CTM_CACHE) do
 			if v:IsValid() then
 				local info = self:GetMemberInfo(k)
@@ -2040,31 +2040,18 @@ function CTM:Send_RaidReadyConfirm(bDisable)
 				end
 			end
 		end
-		if not bDisable then
-			Send_RaidReadyConfirm()
-			MY.DelayCall(5000, function()
-				for k, v in pairs(CTM_CACHE) do
-					if v:IsValid() then
-						if v:Lookup('Image_ReadyCover'):IsVisible() or v:Lookup('Image_NotReady'):IsVisible() then
-							MY.Confirm(g_tStrings.STR_RAID_READY_CONFIRM_RESET .. '?', function()
-								self:Clear_RaidReadyConfirm()
-							end)
-							break
-						end
+		MY.DelayCall(5000, function()
+			for k, v in pairs(CTM_CACHE) do
+				if v:IsValid() then
+					if v:Lookup('Image_ReadyCover'):IsVisible() or v:Lookup('Image_NotReady'):IsVisible() then
+						MY.Confirm(g_tStrings.STR_RAID_READY_CONFIRM_RESET .. '?', function()
+							self:ClearRaidReadyConfirm()
+						end)
+						break
 					end
 				end
-			end)
-		end
-	end
-end
-
-function CTM:Clear_RaidReadyConfirm()
-	for k, v in pairs(CTM_CACHE) do
-		if v:IsValid() then
-			v:Lookup('Image_ReadyCover'):Hide()
-			v:Lookup('Image_NotReady'):Hide()
-			v:Lookup('Animate_Ready'):Hide()
-		end
+			end
+		end)
 	end
 end
 
@@ -2087,6 +2074,16 @@ function CTM:ChangeReadyConfirm(dwID, status)
 			end)
 		else
 			h:Lookup('Image_NotReady'):Show()
+		end
+	end
+end
+
+function CTM:ClearRaidReadyConfirm()
+	for k, v in pairs(CTM_CACHE) do
+		if v:IsValid() then
+			v:Lookup('Image_ReadyCover'):Hide()
+			v:Lookup('Image_NotReady'):Hide()
+			v:Lookup('Animate_Ready'):Hide()
 		end
 	end
 end

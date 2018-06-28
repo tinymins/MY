@@ -664,7 +664,7 @@ function Cataclysm_Main.OnEvent(szEvent)
 	elseif szEvent == 'TEAM_VOTE_REQUEST' then
 		if arg0 == 1 then
 			if MY.IsLeader() then
-				Grid_CTM:Send_RaidReadyConfirm(true)
+				Grid_CTM:StartRaidReadyConfirm()
 			end
 		end
 	elseif szEvent == 'TEAM_VOTE_RESPOND' then
@@ -849,9 +849,20 @@ function Cataclysm_Main.OnLButtonClick()
 		local menu = {}
 		if me.IsInRaid() then
 			-- 团队就位
-			table.insert(menu, { szOption = g_tStrings.STR_RAID_MENU_READY_CONFIRM,
-				{ szOption = g_tStrings.STR_RAID_READY_CONFIRM_START, bDisable = not MY.IsLeader(), fnAction = function() Grid_CTM:Send_RaidReadyConfirm() end },
-				{ szOption = g_tStrings.STR_RAID_READY_CONFIRM_RESET, bDisable = not MY.IsLeader(), fnAction = function() Grid_CTM:Clear_RaidReadyConfirm() end }
+			table.insert(menu, {
+				szOption = g_tStrings.STR_RAID_MENU_READY_CONFIRM,
+				{
+					szOption = g_tStrings.STR_RAID_READY_CONFIRM_START,
+					bDisable = not MY.IsLeader(),
+					fnAction = function()
+						Send_RaidReadyConfirm()
+						Grid_CTM:StartRaidReadyConfirm()
+					end,
+				},
+				{
+					szOption = g_tStrings.STR_RAID_READY_CONFIRM_RESET,
+					fnAction = function() Grid_CTM:ClearRaidReadyConfirm() end,
+				}
 			})
 			table.insert(menu, { bDevide = true })
 		end
