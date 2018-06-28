@@ -46,6 +46,7 @@ local CTM_BG_COLOR_MODE = {
 local TEAM_VOTE_REQUEST = {}
 local BUFF_LIST = {}
 local GKP_RECORD_TOTAL = 0
+local CTM_CAPTION = ''
 local CTM_CONFIG_PLAYER, CTM_CONFIG_LOADED
 local DEBUG = false
 
@@ -317,6 +318,16 @@ local function UpdatePrepareBarPos()
 	hTotal:FormatAllItemPos()
 end
 
+local function SetFrameCaption(szText)
+	local frame = GetFrame()
+	if szText then
+		CTM_CAPTION = szText
+	end
+	if frame then
+		frame:Lookup('', 'Handle_BG/Text_Caption'):SetText(CTM_CAPTION)
+	end
+end
+
 local function SetFrameSize(bEnter)
 	local frame = GetFrame()
 	if frame then
@@ -411,6 +422,7 @@ local function CreateControlBar()
 	container:SetW(nW)
 	container:FormatAllContentPos()
 	SetFrameSize(false)
+	SetFrameCaption()
 end
 
 -- 创建中间层数据 常用的
@@ -504,8 +516,8 @@ function Cataclysm_Main.OnFrameCreate()
 	this:RegisterEvent('PARTY_SET_MEMBER_ONLINE_FLAG')
 	this:RegisterEvent('PLAYER_STATE_UPDATE')
 	this:RegisterEvent('UPDATE_PLAYER_SCHOOL_ID')
-	this:RegisterEvent('RIAD_READY_CONFIRM_RECEIVE_ANSWER')
 	-- this:RegisterEvent('RIAD_READY_CONFIRM_RECEIVE_QUESTION')
+	this:RegisterEvent('RIAD_READY_CONFIRM_RECEIVE_ANSWER')
 	this:RegisterEvent('UI_SCALED')
 	this:RegisterEvent('PARTY_SET_MARK')
 	this:RegisterEvent('TEAM_AUTHORITY_CHANGED')
@@ -524,7 +536,7 @@ function Cataclysm_Main.OnFrameCreate()
 	this:RegisterEvent('TEAM_VOTE_REQUEST')
 	-- arg0 回应状态 arg1 dwID arg2 同意=1 反对=0
 	this:RegisterEvent('TEAM_VOTE_RESPOND')
-	-- this:RegisterEvent('TEAM_INCOMEMONEY_CHANGE_NOTIFY')
+	this:RegisterEvent('TEAM_INCOMEMONEY_CHANGE_NOTIFY')
 	this:RegisterEvent('SYS_MSG')
 	this:RegisterEvent('MY_RAID_REC_BUFF')
 	this:RegisterEvent('MY_CAMP_COLOR_UPDATE')
@@ -537,6 +549,7 @@ function Cataclysm_Main.OnFrameCreate()
 		Grid_CTM:AutoLinkAllPanel()
 	end
 	SetFrameSize()
+	SetFrameCaption()
 	CreateItemData()
 	CreateControlBar()
 	this:EnableDrag(Cataclysm_Main.bDrag)
@@ -660,21 +673,38 @@ function Cataclysm_Main.OnEvent(szEvent)
 		Grid_CTM:RefreshFormation()
 	elseif szEvent == 'PARTY_SET_MARK' then
 		Grid_CTM:RefreshMark()
-	-- elseif szEvent == 'RIAD_READY_CONFIRM_RECEIVE_QUESTION' then
 	elseif szEvent == 'TEAM_VOTE_REQUEST' then
+        -- arg0 nVoteType
+        -- arg1 nArg0
+        -- arg2 nArg1
 		if arg0 == 1 then
-			if MY.IsLeader() then
-				Grid_CTM:StartTeamVote('raid_ready')
+			Grid_CTM:StartTeamVote('wage_agree')
+			local nTime = GetCurrentTime()
+			local function fnAction()
+				SetFrameCaption(_L('Wage await %ds...', 30 - (GetCurrentTime() - nTime)))
 			end
+			fnAction()
+			MY.BreatheCall('MY_Cataclysm_Wage', 1000, fnAction)
 		end
 	elseif szEvent == 'TEAM_VOTE_RESPOND' then
+        -- arg0 nVoteType
+        -- arg1 dwAnswerID
+        -- arg2 bYes
+        -- arg3 nArg0
+        -- arg4 nArg1
 		if arg0 == 1 then
-			if MY.IsLeader() then
-				Grid_CTM:ChangeTeamVoteState('raid_ready', arg1, arg2 == 1)
-			end
+			Grid_CTM:ChangeTeamVoteState('wage_agree', arg1, arg2 == 1 and 'resolve' or 'reject')
 		end
+	elseif szEvent == 'TEAM_INCOMEMONEY_CHANGE_NOTIFY' then
+		local nTotalRaidMoney = GetClientTeam().nInComeMoney
+		if nTotalRaidMoney and nTotalRaidMoney == 0 then
+			Grid_CTM:ClearTeamVote('wage_agree')
+			SetFrameCaption('')
+			MY.BreatheCall('MY_Cataclysm_Wage', false)
+		end
+	-- elseif szEvent == 'RIAD_READY_CONFIRM_RECEIVE_QUESTION' then
 	elseif szEvent == 'RIAD_READY_CONFIRM_RECEIVE_ANSWER' then
-		Grid_CTM:ChangeTeamVoteState('raid_ready', arg0, arg1 == 1)
+		Grid_CTM:ChangeTeamVoteState('raid_ready', arg0, arg1 == 1 and 'resolve' or 'reject')
 	elseif szEvent == 'TEAM_CHANGE_MEMBER_GROUP' then
 		local me = GetClientPlayer()
 		local team = GetClientTeam()
@@ -774,6 +804,7 @@ function Cataclysm_Main.OnEvent(szEvent)
 		RaidPanel_Switch(DEBUG)
 		TeammatePanel_Switch(false)
 		SetFrameSize()
+		SetFrameCaption()
 	end
 end
 

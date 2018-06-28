@@ -2030,74 +2030,90 @@ function CTM:DrawShadow(sha, x, y, r, g, b, a, bGradient) -- ÷ÿªÊ»˝Ω«…»
 end
 
 do
-local UI_NAMES = {
-	['raid_ready'] = {'Image_ReadyCover', 'Image_NotReady', 'Animate_Ready'},
+local VOTE_OPTIONS = {
+	['raid_ready'] = { awaitPath = 'Image_ReadyCover', rejectPath = 'Image_NotReady', resolvePath = 'Animate_Ready', timeoutAlert = 5000 },
+	['wage_agree'] = { awaitPath = 'Handle_TeamVoteWait', rejectPath = 'Handle_TeamVoteReject', timeout = 30000 },
 }
 function CTM:StartTeamVote(eType)
-	local names = UI_NAMES[eType]
-	if not names then
+	local opt = VOTE_OPTIONS[eType]
+	if not opt then
 		return
 	end
 	self:ClearTeamVote(eType)
 	for k, v in pairs(CTM_CACHE) do
 		if v:IsValid() then
 			local info = self:GetMemberInfo(k)
-			if info.bIsOnLine and k ~= UI_GetClientPlayerID() then
-				v:Lookup(names[1]):Show()
+			local bAwait = info.bIsOnLine
+			if k == UI_GetClientPlayerID() then
+				if eType == 'raid_ready' then
+					bAwait = false
+				elseif eType == 'wage_agree' then
+					bAwait = not MY.IsDistributer()
+				end
+			end
+			if bAwait then
+				v:Lookup(opt.awaitPath):Show()
 			end
 		end
 	end
-	MY.DelayCall(5000, function()
-		for k, v in pairs(CTM_CACHE) do
-			if v:IsValid() then
-				if v:Lookup(names[1]):IsVisible() or v:Lookup(names[2]):IsVisible() then
-					MY.Confirm(g_tStrings.STR_RAID_READY_CONFIRM_RESET .. '?', function()
-						self:ClearTeamVote(eType)
-					end)
-					break
+	if opt.timeoutAlert then
+		MY.DelayCall(opt.timeoutAlert, function()
+			for k, v in pairs(CTM_CACHE) do
+				if v:IsValid() then
+					if v:Lookup(opt.awaitPath):IsVisible() or v:Lookup(opt.rejectPath):IsVisible() then
+						MY.Confirm(g_tStrings.STR_RAID_READY_CONFIRM_RESET .. '?', function()
+							self:ClearTeamVote(eType)
+						end)
+						break
+					end
 				end
 			end
-		end
-	end)
+		end)
+	end
+	if opt.timeout then
+		MY.DelayCall(opt.timeout, function()
+			self:ClearTeamVote(eType)
+		end)
+	end
 end
 
 function CTM:ChangeTeamVoteState(eType, dwID, status)
-	local names = UI_NAMES[eType]
-	if not names then
+	local opt = VOTE_OPTIONS[eType]
+	if not opt then
 		return
 	end
 	if CTM_CACHE[dwID] and CTM_CACHE[dwID]:IsValid() then
 		local h = CTM_CACHE[dwID]
-		h:Lookup(names[1]):Hide()
-		if status == 'resolve' and names[3] then
+		h:Lookup(opt.awaitPath):Hide()
+		if status == 'resolve' and opt.resolvePath then
 			local key = 'CTM_READY_' .. eType .. '_' .. dwID
-			h:Lookup(names[3]):Show()
-			h:Lookup(names[3]):SetAlpha(240)
+			h:Lookup(opt.resolvePath):Show()
+			h:Lookup(opt.resolvePath):SetAlpha(240)
 			MY.BreatheCall(key, function()
-				if h:Lookup(names[3]):IsValid() then
-					local nAlpha = math.max(h:Lookup(names[3]):GetAlpha() - 15, 0)
-					h:Lookup(names[3]):SetAlpha(nAlpha)
+				if h:Lookup(opt.resolvePath):IsValid() then
+					local nAlpha = math.max(h:Lookup(opt.resolvePath):GetAlpha() - 15, 0)
+					h:Lookup(opt.resolvePath):SetAlpha(nAlpha)
 					if nAlpha <= 0 then
 						MY.BreatheCall(key, false)
 					end
 				end
 			end)
 		elseif status == 'reject' then
-			h:Lookup(names[2]):Show()
+			h:Lookup(opt.rejectPath):Show()
 		end
 	end
 end
 
 function CTM:ClearTeamVote(eType)
-	local names = UI_NAMES[eType]
-	if not names then
+	local opt = VOTE_OPTIONS[eType]
+	if not opt then
 		return
 	end
 	for k, v in pairs(CTM_CACHE) do
 		if v:IsValid() then
-			for i, name in ipairs(names) do
-				if v:Lookup(name) then
-					v:Lookup(name):Hide()
+			for _, k in ipairs({ 'resolvePath', 'rejectPath', 'awaitPath' }) do
+				if opt[k] and v:Lookup(opt[k]) then
+					v:Lookup(opt[k]):Hide()
 				end
 			end
 		end
