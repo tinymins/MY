@@ -518,6 +518,8 @@ function MY_Focus.OnLButtonClick()
 	if name == 'Btn_Setting' then
 		MY.OpenPanel()
 		MY.SwitchTab('MY_Focus')
+	elseif name == 'Btn_Close' then
+		MY_Focus.Close()
 	end
 end
 
