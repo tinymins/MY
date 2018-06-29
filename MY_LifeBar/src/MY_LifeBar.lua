@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-06-27 01:32:36
+-- @Last Modified time: 2018-06-30 02:18:49
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -319,7 +319,13 @@ local function CheckInvalidRect(dwType, dwID, me)
 		local aCountDown, szCountDown = COUNTDOWN_CACHE[dwID], ''
 		while aCountDown and #aCountDown > 0 do
 			local tData, szText, nSec = aCountDown[1]
-			if tData.szType ~= 'BUFF' or object.GetBuff(tData.dwBuffID, 0) then
+			if tData.szType == 'BUFF' then
+				local KBuff = object.GetBuff(tData.dwBuffID, 0)
+				if KBuff then
+					nSec = (KBuff.GetEndTime() - GetLogicFrameCount()) / GLOBAL.GAME_FPS
+					szText = tData.szText
+				end
+			else
 				if tData.nLogicFrame then
 					nSec = (tData.nLogicFrame - GetLogicFrameCount()) / GLOBAL.GAME_FPS
 				elseif tData.nTime then
