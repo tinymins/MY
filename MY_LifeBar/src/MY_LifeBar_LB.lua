@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 12:50:01
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-06-26 01:40:42
+-- @Last Modified time: 2018-06-30 02:41:41
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -98,6 +98,7 @@ function LB:Create()
 	if not self.hp.handle then
 		self.hp:Create()
 		self:SetInvalid('texts', true)
+		self:SetInvalid('priority', true)
 		self:SetInvalid('life_text', true)
 		self:SetInvalid('life_bar', true)
 		self:SetInvalid('life_bar_border', true)
@@ -146,7 +147,7 @@ end
 function LB:SetPriority(priority)
 	if self.priority ~= priority then
 		self.priority = priority
-		self:SetInvalid('priority')
+		self:SetInvalid('priority', true)
 	end
 	return self
 end
