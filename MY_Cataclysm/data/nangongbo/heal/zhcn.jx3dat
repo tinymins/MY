@@ -99,6 +99,7 @@ data = {
     {dwID=12924,col="#FF3232FF",szReminder="附",nPriority=6},--心魔附体---狼牙堡·辉天堑
     {dwID=12969,col="#FF3232FF",szReminder="迟",nPriority=6,szStackOp=">=",nStackNum=4},--心迟---狼牙堡·辉天堑
     {dwID=12865,col="#0050FF00",szReminder="风",nPriority=7},--剑风---狼牙堡·辉天堑
+    {dwID=13034,nLevel=1,col="#FF00FFFF",szReminder="猎",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true},--迦楼罗猎物---狼牙堡·辉天堑
     {dwID=2313},--凤凰蛊---五毒
     {dwID=377},--镇山河---纯阳
     {dwID=4439},--贪魔体---明教
@@ -146,5 +147,5 @@ data = {
     {dwID=9336,bOnlyMine=true,col="#00FF0000",szReminder="寒",nPriority=8},--寒梅---长歌
     {dwID=9337,bOnlyMine=true,col="#00FF0000",szReminder="寒",nPriority=8},--寒梅---长歌
     {dwID=9335,bOnlyMine=true,col="#FF323200",szReminder="落",nPriority=8},--落梅---长歌
-    --【南宫伯是帅咩】
+--【南宫伯是帅咩】
 }

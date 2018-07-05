@@ -99,6 +99,7 @@ data = {
     {dwID=12924,col="#FF3232FF",szReminder="附",nPriority=6},--心魔附體---狼牙堡·輝天塹
     {dwID=12969,col="#FF3232FF",szReminder="遲",nPriority=6,szStackOp=">=",nStackNum=4},--心遲---狼牙堡·輝天塹
     {dwID=12865,col="#0050FF00",szReminder="風",nPriority=7},--劍風---狼牙堡·輝天塹
+    {dwID=13034,nLevel=1,col="#FF00FFFF",szReminder="獵",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true},--迦樓羅獵物---狼牙堡·輝天塹
     {dwID=2313},--鳳凰蠱---五毒
     {dwID=377},--鎮山河---純陽
     {dwID=4439},--貪魔體---明教
@@ -146,5 +147,5 @@ data = {
     {dwID=9336,bOnlyMine=true,col="#00FF0000",szReminder="寒",nPriority=8},--寒梅---長歌
     {dwID=9337,bOnlyMine=true,col="#00FF0000",szReminder="寒",nPriority=8},--寒梅---長歌
     {dwID=9335,bOnlyMine=true,col="#FF323200",szReminder="落",nPriority=8},--落梅---長歌
-    --【南宮伯是帥咩】
+--【南宮伯是帥咩】
 }

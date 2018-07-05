@@ -118,7 +118,7 @@ data = {
     {dwID=8312},--腐血狂亂---太原之戰·逐虎驅狼
     {dwID=8215},--氣血翻湧---太原之戰·逐虎驅狼
     {dwID=8042},--凍結---太原之戰·逐虎驅狼
-    {dwID=8196,col="#00FFFFFF",szReminder="冰",nPriority=0,bCaution=true,bScreenHead=true},--冰霜一指---太原之戰·逐虎驅狼
+    {dwID=8196,col="#00FFFFFF",szReminder="冰",nPriority=1,bCaution=true,bScreenHead=true},--冰霜一指---太原之戰·逐虎驅狼
     {dwID=8199,col="#8055FFFF",szReminder="霜",nPriority=6},--冰霜氣勁---太原之戰·逐虎驅狼
     {dwID=8822},--音波之殇·陽---太原之戰·逐虎驅狼
     {dwID=8823},--音波之殇·陰---太原之戰·逐虎驅狼
@@ -151,6 +151,7 @@ data = {
     {dwID=12924,col="#FF3232FF",szReminder="附",nPriority=6},--心魔附體---狼牙堡·輝天塹
     {dwID=12969,col="#FF3232FF",szReminder="遲",nPriority=6,szStackOp=">=",nStackNum=4},--心遲---狼牙堡·輝天塹
     {dwID=12865,col="#0050FF00",szReminder="風",nPriority=7},--劍風---狼牙堡·輝天塹
+    {dwID=13034,nLevel=1,col="#FF00FFFF",szReminder="獵",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true},--迦樓羅獵物---狼牙堡·輝天塹
     {dwID=1263},--經脈暢行---通用
     {dwID=3678},--重禦---通用
     {dwID=5034,col="#00FF0000",szReminder="修",nPriority=7},--寵物寶寶的寶貝---通用
@@ -175,5 +176,5 @@ data = {
     {dwID=9544,col="#00FF00FF",szReminder="笑",nPriority=6},--笑傲光陰---長歌
     {dwID=9265,col="#00FF00FF",szReminder="雲",nPriority=6},--雲生結海---長歌
     {dwID=9299,col="#FF8000FF",szReminder="杯",nPriority=6},--杯水留影---長歌
-    --【南宮伯是帥咩】
+--【南宮伯是帥咩】
 }
