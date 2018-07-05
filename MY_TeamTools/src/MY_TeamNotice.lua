@@ -43,7 +43,7 @@ function TI.CreateFrame(a, b)
 			anchor = MY_TeamNotice.anchor,
 			simple = true, close = true, close = true,
 			setting = function() MY.OpenPanel() MY.SwitchTab('MY_TeamTools') end,
-		}):drag(function() MY_TeamNotice.anchor = GetFrameAnchor(TI.GetFrame()) end)
+		})
 		local x, y = 10, 5
 		x = x + ui:append('Text', { x = x, y = y - 3, text = _L['YY:'], font = 48 }, true):autoWidth():width() + 5
 		x = x + ui:append('WndAutocomplete', {
@@ -150,6 +150,7 @@ function TI.CreateFrame(a, b)
 		frame:RegisterEvent('PARTY_DISBAND')
 		frame:RegisterEvent('PARTY_DELETE_MEMBER')
 		frame:RegisterEvent('PARTY_ADD_MEMBER')
+		frame:RegisterEvent('UI_SCALED')
 		frame.OnEvent = function(szEvent)
 			if szEvent == 'PARTY_DISBAND' then
 				ui:remove()
@@ -161,7 +162,13 @@ function TI.CreateFrame(a, b)
 				if MY.IsLeader() then
 					MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'TI', 'reply', arg1, TI.szYY, TI.szNote)
 				end
+			elseif szEvent == 'UI_SCALED' then
+				ui:anchor(MY_TeamNotice.anchor)
 			end
+		end
+		frame.OnFrameDragSetPosEnd = function()
+			this:CorrectPos()
+			MY_TeamNotice.anchor = GetFrameAnchor(this)
 		end
 		PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 	end
