@@ -22,6 +22,7 @@ data = {
     ['enable scene navi'] = '启用场景目标追踪',
     ['heal healper'] = '治疗辅助',
     ['select target when mouse enter'] = '鼠标移入时即选中目标',
+    ['Right click list to delete'] = '右键点击列表可删除',
 
     ['auto focus'              ] = '启用默认焦点',
     ['add auto focus'          ] = '添加默认焦点',

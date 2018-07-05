@@ -213,7 +213,7 @@ function PS.OnPanelActive(wnd)
 	end)
 	-- add
 	ui:append('WndButton', {
-		x = wl - 160, y = y, w = 80,
+		x = wl - 80, y = y, w = 80,
 		text = _L['add'],
 		onclick = function()
 			GetUserInput(_L['add auto focus'], function(szText)
@@ -224,18 +224,7 @@ function PS.OnPanelActive(wnd)
 				list:listbox('insert', GeneItemText(tData), tData, tData)
 			end, function() end, function() end, nil, '')
 		end,
-		autoenable = function() return MY_Focus.IsEnabled() end,
-	})
-	-- del
-	ui:append('WndButton', {
-		x = wl - 80, y = y, w = 80,
-		text = _L['delete'],
-		onclick = function()
-			for _, v in ipairs(list:listbox('select', 'selected')) do
-				MY_Focus.RemoveFocusPattern(v.szPattern)
-				list:listbox('delete', 'id', v.id)
-			end
-		end,
+		tip = _L['Right click list to delete'],
 		autoenable = function() return MY_Focus.IsEnabled() end,
 	})
 
