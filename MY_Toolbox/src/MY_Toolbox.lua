@@ -548,8 +548,9 @@ end)
 
 -- auto restore team authourity info in arena
 do local l_tTeamInfo, l_bConfigEnd
+MY.RegisterEvent('ARENA_START', function() l_bConfigEnd = true end)
 MY.RegisterEvent('LOADING_ENDING', function() l_bConfigEnd = false end)
-MY.RegisterEvent('ARENA_START', function() l_bConfigEnd = true  end)
+MY.RegisterEvent('PARTY_DELETE_MEMBER', function() l_bConfigEnd = false end)
 local function RestoreTeam()
 	local me, team = GetClientPlayer(), GetClientTeam()
 	if not l_tTeamInfo
