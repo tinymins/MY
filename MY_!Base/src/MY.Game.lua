@@ -2387,13 +2387,13 @@ function MY.SetTeamInfo(tTeamInfo)
 	if team.nLootMode ~= tTeamInfo.nLootMode then
 		team.SetTeamLootMode(tTeamInfo.nLootMode)
 	end
+	if dwMark ~= 0 and dwMark ~= me.dwID then
+		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK, dwMark)
+		MY.Sysmsg({_L('restore team marker: %s', tTeamInfo.szMark)})
+	end
 	if dwLeader ~= 0 and dwLeader ~= me.dwID then
 		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER, dwLeader)
 		MY.Sysmsg({_L('restore team leader: %s', tTeamInfo.szLeader)})
-	end
-	if dwMark  ~= 0 and dwMark ~= me.dwID then
-		team.SetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK, dwMark)
-		MY.Sysmsg({_L('restore team marker: %s', tTeamInfo.szMark)})
 	end
 	MY.Sysmsg({_L['Team list restored']})
 end
