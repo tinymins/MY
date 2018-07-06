@@ -554,6 +554,7 @@ local function RestoreTeam()
 	local me, team = GetClientPlayer(), GetClientTeam()
 	if not l_tTeamInfo
 	or not MY_ToolBox.bRestoreAuthorityInfo
+	or not MY.IsLeader()
 	or not me.IsInParty() or not MY.IsInArena() then
 		return
 	end
