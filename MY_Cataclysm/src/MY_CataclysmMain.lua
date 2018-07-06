@@ -409,10 +409,9 @@ local function CreateControlBar()
 		container:Lookup('Wnd_Microphone'):SetW(nMicWidth)
 	end
 	-- 最小化
-	if me.IsInRaid() then
-		container:AppendContentFromIni(szIniFile, 'Wnd_Fold')
-			:Lookup('CheckBox_Fold'):Check(MY_Cataclysm.bFold, WNDEVENT_FIRETYPE.PREVENT)
-	end
+	container:AppendContentFromIni(szIniFile, 'Wnd_Fold')
+		:Lookup('CheckBox_Fold'):Check(MY_Cataclysm.bFold, WNDEVENT_FIRETYPE.PREVENT)
+	-- 自动计算宽度
 	local nW, wnd = 0
 	for i = 0, container:GetAllContentCount() - 1 do
 		wnd = container:LookupContent(i)
