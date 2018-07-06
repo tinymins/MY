@@ -50,6 +50,7 @@ data = {
     ['Nearby GongZhan Total Count: %d.'] = '附近共战数量：%d。',
     ['------------------------------------'] = '————————————————————————',
     ['auto hide chat panel'] = '自动隐藏聊天栏',
+    ['Redirect metion to whisper'] = '记录其他频道提及我的点名内容到密聊频道',
 
     ['visual skill'] = '显示历史技能列表',
     ['display %d skills.'] = '显示%d格。',

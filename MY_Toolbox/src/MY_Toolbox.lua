@@ -34,6 +34,8 @@ MY_ToolBox.bRestoreAuthorityInfo = true
 RegisterCustomData('MY_ToolBox.bRestoreAuthorityInfo')
 MY_ToolBox.bAutoShowInArena = true
 RegisterCustomData('MY_ToolBox.bAutoShowInArena')
+MY_ToolBox.bWhisperMetion = true
+RegisterCustomData('MY_ToolBox.bWhisperMetion')
 MY_ToolBox.ApplyConfig = function()
 	-- 好友高亮
 	do
@@ -373,6 +375,29 @@ MY_ToolBox.ApplyConfig = function()
 			XGUI.GetShadowHandle('MY_ChangGeShadow'):Hide()
 		end
 	end
+
+	-- 记录点名到密聊频道
+	do
+		if MY_ToolBox.bWhisperMetion then
+			MY.RegisterMsgMonitor('MY_RedirectMetionToWhisper', function(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szName)
+				local me = GetClientPlayer()
+				if not me or me.dwID == dwTalkerID then
+					return
+				end
+				local szText = "text=" .. EncodeComponentsString("[" .. me.szName .. "]")
+				local nPos = StringFindW(szMsg, g_tStrings.STR_TALK_HEAD_SAY1)
+				if nPos and StringFindW(szMsg, szText, nPos) then
+					OutputMessage('MSG_WHISPER', szMsg, bRich, nFont, {r, g, b}, dwTalkerID, szName)
+				end
+			end, {
+				'MSG_NORMAL', 'MSG_PARTY', 'MSG_MAP', 'MSG_BATTLE_FILED', 'MSG_GUILD', 'MSG_GUILD_ALLIANCE', 'MSG_SCHOOL', 'MSG_WORLD',
+				'MSG_TEAM', 'MSG_CAMP', 'MSG_GROUP', 'MSG_SEEK_MENTOR', 'MSG_FRIEND', 'MSG_IDENTITY', 'MSG_SYS',
+				'MSG_NPC_NEARBY', 'MSG_NPC_YELL', 'MSG_NPC_PARTY', 'MSG_NPC_WHISPER',
+			})
+		else
+			MY.RegisterMsgMonitor('MY_RedirectMetionToWhisper')
+		end
+	end
 end
 MY.RegisterInit('MY_TOOLBOX', MY_ToolBox.ApplyConfig)
 -- 密码锁解锁提醒
@@ -701,18 +726,18 @@ function PS.OnPanelActive(wnd)
 	end
 
 	-- 显示历史技能列表
-	ui:append('WndCheckBox', {
-		x = x, y = y, w = 160,
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
 		text = _L['visual skill'],
 		checked = MY_VisualSkill.bEnable,
 		oncheck = function(bChecked)
 			MY_VisualSkill.bEnable = bChecked
 			MY_VisualSkill.Reload()
 		end,
-	})
+	}, true):width() + 5
 
 	ui:append('WndSliderBox', {
-		x = x + 160, y = y,
+		x = x, y = y,
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = {1, 32},
 		value = MY_VisualSkill.nVisualSkillBoxCount,
 		text = _L('display %d skills.', MY_VisualSkill.nVisualSkillBoxCount),
@@ -722,11 +747,12 @@ function PS.OnPanelActive(wnd)
 			MY_VisualSkill.Reload()
 		end,
 	})
+	x = X
 	y = y + 30
 
 	-- 防止神行CD被黑
 	ui:append('WndCheckBox', {
-		x = x, y = y, w = 150,
+		x = x, y = y, w = 'auto',
 		text = _L['avoid blacking shenxing cd'],
 		checked = MY_ToolBox.bAvoidBlackShenxingCD,
 		oncheck = function(bChecked)
@@ -738,7 +764,7 @@ function PS.OnPanelActive(wnd)
 
 	-- 自动隐藏聊天栏
 	ui:append('WndCheckBox', {
-		x = x, y = y, w = 150,
+		x = x, y = y, w = 'auto',
 		text = _L['auto hide chat panel'],
 		checked = MY_AutoHideChat.bAutoHideChatPanel,
 		oncheck = function(bChecked)
@@ -748,9 +774,21 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + 30
 
+	-- 记录点名到密聊频道
+	ui:append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
+		text = _L['Redirect metion to whisper'],
+		checked = MY_ToolBox.bWhisperMetion,
+		oncheck = function(bChecked)
+			MY_ToolBox.bWhisperMetion = bChecked
+			MY_ToolBox.ApplyConfig()
+		end,
+	})
+	y = y + 30
+
 	-- 竞技场频道切换
 	ui:append('WndCheckBox', {
-		x = x, y = y, w = 300,
+		x = x, y = y, w = 'auto',
 		text = _L['auto switch talk channel when into battle field'],
 		checked = MY_ToolBox.bJJCAutoSwitchTalkChannel,
 		oncheck = function(bChecked)
@@ -762,7 +800,7 @@ function PS.OnPanelActive(wnd)
 
 	-- 竞技场自动恢复队伍信息
 	ui:append('WndCheckBox', {
-		x = x, y = y, w = 300,
+		x = x, y = y, w = 'auto',
 		text = _L['auto restore team info in arena'],
 		checked = MY_ToolBox.bRestoreAuthorityInfo,
 		oncheck = function(bChecked)
@@ -771,9 +809,9 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + 30
 
-	-- 竞技场自动恢复队伍信息
+	-- 竞技场战场自动取消屏蔽
 	ui:append('WndCheckBox', {
-		x = x, y = y, w = 300,
+		x = x, y = y, w = 'auto',
 		text = _L['auto cancel hide player in arena and battlefield'],
 		checked = MY_ToolBox.bAutoShowInArena,
 		oncheck = function(bChecked)
@@ -783,8 +821,8 @@ function PS.OnPanelActive(wnd)
 	y = y + 30
 
 	-- 长歌影子顺序
-	ui:append('WndCheckBox', {
-		x = x, y = y, w = 150,
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
 		text = _L['show changge shadow index'],
 		checked = MY_ToolBox.bChangGeShadow,
 		oncheck = function(bChecked)
@@ -801,9 +839,9 @@ function PS.OnPanelActive(wnd)
 			local me = GetClientPlayer()
 			return me and me.dwForceID == FORCE_TYPE.CHANG_GE
 		end,
-	})
-	ui:append('WndCheckBox', {
-		x = x + 150, y = y, w = 100,
+	}, true):width() + 5
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
 		text = _L['show distance'],
 		checked = MY_ToolBox.bChangGeShadowDis,
 		oncheck = function(bChecked)
@@ -820,9 +858,9 @@ function PS.OnPanelActive(wnd)
 			local me = GetClientPlayer()
 			return me and me.dwForceID == FORCE_TYPE.CHANG_GE
 		end,
-	})
-	ui:append('WndCheckBox', {
-		x = x + 250, y = y, w = 100,
+	}, true):width() + 5
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
 		text = _L['show countdown'],
 		checked = MY_ToolBox.bChangGeShadowCD,
 		oncheck = function(bChecked)
@@ -839,9 +877,9 @@ function PS.OnPanelActive(wnd)
 			local me = GetClientPlayer()
 			return me and me.dwForceID == FORCE_TYPE.CHANG_GE
 		end,
-	})
+	}, true):width() + 5
 	ui:append('WndSliderBox', {
-		x = x + 350, y = y, w = 150,
+		x = x, y = y, w = 150,
 		textfmt = function(val) return _L('scale: %d%%.', val) end,
 		range = {10, 800},
 		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
@@ -854,6 +892,7 @@ function PS.OnPanelActive(wnd)
 			return me and me.dwForceID == FORCE_TYPE.CHANG_GE
 		end,
 	})
+	x = X
 	y = y + 30
 
 	-- 随身便笺
