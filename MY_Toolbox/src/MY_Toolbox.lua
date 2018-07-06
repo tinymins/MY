@@ -36,24 +36,99 @@ MY_ToolBox.bAutoShowInArena = true
 RegisterCustomData('MY_ToolBox.bAutoShowInArena')
 MY_ToolBox.ApplyConfig = function()
 	-- 好友高亮
-	if Navigator_Remove then
-		Navigator_Remove('MY_FRIEND_TIP')
-	end
-	if MY_ToolBox.bFriendHeadTip then
-		local hShaList = XGUI.GetShadowHandle('MY_FriendHeadTip')
-		if not hShaList.freeShadows then
-			hShaList.freeShadows = {}
+	do
+		if Navigator_Remove then
+			Navigator_Remove('MY_FRIEND_TIP')
 		end
-		hShaList:Show()
-		local function OnPlayerEnter(dwID)
-			local tar = GetPlayer(dwID)
-			if not tar then
-				return
+		if MY_ToolBox.bFriendHeadTip then
+			local hShaList = XGUI.GetShadowHandle('MY_FriendHeadTip')
+			if not hShaList.freeShadows then
+				hShaList.freeShadows = {}
 			end
-			local p = MY.GetFriend(dwID)
-			if p then
-				if MY_ToolBox.bFriendHeadTipNav and Navigator_SetID then
-					Navigator_SetID('MY_FRIEND_TIP.' .. dwID, TARGET.PLAYER, dwID, p.name)
+			hShaList:Show()
+			local function OnPlayerEnter(dwID)
+				local tar = GetPlayer(dwID)
+				if not tar then
+					return
+				end
+				local p = MY.GetFriend(dwID)
+				if p then
+					if MY_ToolBox.bFriendHeadTipNav and Navigator_SetID then
+						Navigator_SetID('MY_FRIEND_TIP.' .. dwID, TARGET.PLAYER, dwID, p.name)
+					else
+						local sha = hShaList:Lookup(tostring(dwID))
+						if not sha then
+							hShaList:AppendItemFromString('<shadow>name="' .. dwID .. '"</shadow>')
+							sha = hShaList:Lookup(tostring(dwID))
+						end
+						local r, g, b, a = 255,255,255,255
+						local szTip = '>> ' .. p.name .. ' <<'
+						sha:ClearTriangleFanPoint()
+						sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
+						sha:AppendCharacterID(dwID, false, r, g, b, a, 0, 40, szTip, 0, 1)
+						sha:Show()
+					end
+				end
+			end
+			local function OnPlayerLeave(dwID)
+				if MY_ToolBox.bFriendHeadTipNav and Navigator_Remove then
+					Navigator_Remove('MY_FRIEND_TIP.' .. dwID)
+				else
+					local sha = hShaList:Lookup(tostring(dwID))
+					if sha then
+						sha:Hide()
+						table.insert(hShaList.freeShadows, sha)
+					end
+				end
+			end
+			local function RescanNearby()
+				for _, p in pairs(MY.GetNearPlayer()) do
+					OnPlayerEnter(p.dwID)
+				end
+			end
+			RescanNearby()
+			MY.RegisterEvent('PLAYER_ENTER_SCENE.MY_FRIEND_TIP', function(event) OnPlayerEnter(arg0) end)
+			MY.RegisterEvent('PLAYER_LEAVE_SCENE.MY_FRIEND_TIP', function(event) OnPlayerLeave(arg0) end)
+			MY.RegisterEvent('DELETE_FELLOWSHIP.MY_FRIEND_TIP', function(event) RescanNearby() end)
+			MY.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE.MY_FRIEND_TIP', function(event) RescanNearby() end)
+			MY.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE.MY_FRIEND_TIP', function(event) RescanNearby() end)
+		else
+			MY.RegisterEvent('PLAYER_ENTER_SCENE.MY_FRIEND_TIP')
+			MY.RegisterEvent('PLAYER_LEAVE_SCENE.MY_FRIEND_TIP')
+			MY.RegisterEvent('DELETE_FELLOWSHIP.MY_FRIEND_TIP')
+			MY.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE.MY_FRIEND_TIP')
+			MY.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE.MY_FRIEND_TIP')
+			XGUI.GetShadowHandle('MY_FriendHeadTip'):Hide()
+		end
+	end
+	-- 帮会成员高亮
+	do
+		if Navigator_Remove then
+			Navigator_Remove('MY_GUILDMEMBER_TIP')
+		end
+		if MY_ToolBox.bTongMemberHeadTip then
+			local hShaList = XGUI.GetShadowHandle('MY_TongMemberHeadTip')
+			if not hShaList.freeShadows then
+				hShaList.freeShadows = {}
+			end
+			hShaList:Show()
+			local function OnPlayerEnter(dwID, nRetryCount)
+				nRetryCount = nRetryCount or 0
+				if nRetryCount > 5 then
+					return
+				end
+				local tar = GetPlayer(dwID)
+				local me = GetClientPlayer()
+				if not tar or not me or me.dwTongID == 0
+				or me.dwID == tar.dwID or tar.dwTongID ~= me.dwTongID then
+					return
+				end
+				if tar.szName == '' then
+					MY.DelayCall(500, function() OnPlayerEnter(dwID, nRetryCount + 1) end)
+					return
+				end
+				if MY_ToolBox.bTongMemberHeadTipNav and Navigator_SetID then
+					Navigator_SetID('MY_GUILDMEMBER_TIP.' .. dwID, TARGET.PLAYER, dwID, tar.szName)
 				else
 					local sha = hShaList:Lookup(tostring(dwID))
 					if not sha then
@@ -61,303 +136,242 @@ MY_ToolBox.ApplyConfig = function()
 						sha = hShaList:Lookup(tostring(dwID))
 					end
 					local r, g, b, a = 255,255,255,255
-					local szTip = '>> ' .. p.name .. ' <<'
+					local szTip = '> ' .. tar.szName .. ' <'
 					sha:ClearTriangleFanPoint()
 					sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
 					sha:AppendCharacterID(dwID, false, r, g, b, a, 0, 40, szTip, 0, 1)
 					sha:Show()
 				end
 			end
-		end
-		local function OnPlayerLeave(dwID)
-			if MY_ToolBox.bFriendHeadTipNav and Navigator_Remove then
-				Navigator_Remove('MY_FRIEND_TIP.' .. dwID)
-			else
-				local sha = hShaList:Lookup(tostring(dwID))
-				if sha then
-					sha:Hide()
-					table.insert(hShaList.freeShadows, sha)
+			local function OnPlayerLeave(dwID)
+				if MY_ToolBox.bTongMemberHeadTipNav and Navigator_Remove then
+					Navigator_Remove('MY_GUILDMEMBER_TIP.' .. dwID)
+				else
+					local sha = hShaList:Lookup(tostring(dwID))
+					if sha then
+						sha:Hide()
+						table.insert(hShaList.freeShadows, sha)
+					end
 				end
 			end
-		end
-		local function RescanNearby()
 			for _, p in pairs(MY.GetNearPlayer()) do
 				OnPlayerEnter(p.dwID)
 			end
+			MY.RegisterEvent('PLAYER_ENTER_SCENE.MY_GUILDMEMBER_TIP', function(event) OnPlayerEnter(arg0) end)
+			MY.RegisterEvent('PLAYER_LEAVE_SCENE.MY_GUILDMEMBER_TIP', function(event) OnPlayerLeave(arg0) end)
+		else
+			MY.RegisterEvent('PLAYER_ENTER_SCENE.MY_GUILDMEMBER_TIP')
+			MY.RegisterEvent('PLAYER_LEAVE_SCENE.MY_GUILDMEMBER_TIP')
+			XGUI.GetShadowHandle('MY_TongMemberHeadTip'):Hide()
 		end
-		RescanNearby()
-		MY.RegisterEvent('PLAYER_ENTER_SCENE.MY_FRIEND_TIP', function(event) OnPlayerEnter(arg0) end)
-		MY.RegisterEvent('PLAYER_LEAVE_SCENE.MY_FRIEND_TIP', function(event) OnPlayerLeave(arg0) end)
-		MY.RegisterEvent('DELETE_FELLOWSHIP.MY_FRIEND_TIP', function(event) RescanNearby() end)
-		MY.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE.MY_FRIEND_TIP', function(event) RescanNearby() end)
-		MY.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE.MY_FRIEND_TIP', function(event) RescanNearby() end)
-	else
-		MY.RegisterEvent('PLAYER_ENTER_SCENE.MY_FRIEND_TIP')
-		MY.RegisterEvent('PLAYER_LEAVE_SCENE.MY_FRIEND_TIP')
-		MY.RegisterEvent('DELETE_FELLOWSHIP.MY_FRIEND_TIP')
-		MY.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE.MY_FRIEND_TIP')
-		MY.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE.MY_FRIEND_TIP')
-		XGUI.GetShadowHandle('MY_FriendHeadTip'):Hide()
-	end
-
-	-- 帮会成员高亮
-	if Navigator_Remove then
-		Navigator_Remove('MY_GUILDMEMBER_TIP')
-	end
-	if MY_ToolBox.bTongMemberHeadTip then
-		local hShaList = XGUI.GetShadowHandle('MY_TongMemberHeadTip')
-		if not hShaList.freeShadows then
-			hShaList.freeShadows = {}
-		end
-		hShaList:Show()
-		local function OnPlayerEnter(dwID, nRetryCount)
-			nRetryCount = nRetryCount or 0
-			if nRetryCount > 5 then
-				return
-			end
-			local tar = GetPlayer(dwID)
-			local me = GetClientPlayer()
-			if not tar or not me or me.dwTongID == 0
-			or me.dwID == tar.dwID or tar.dwTongID ~= me.dwTongID then
-				return
-			end
-			if tar.szName == '' then
-				MY.DelayCall(500, function() OnPlayerEnter(dwID, nRetryCount + 1) end)
-				return
-			end
-			if MY_ToolBox.bTongMemberHeadTipNav and Navigator_SetID then
-				Navigator_SetID('MY_GUILDMEMBER_TIP.' .. dwID, TARGET.PLAYER, dwID, tar.szName)
-			else
-				local sha = hShaList:Lookup(tostring(dwID))
-				if not sha then
-					hShaList:AppendItemFromString('<shadow>name="' .. dwID .. '"</shadow>')
-					sha = hShaList:Lookup(tostring(dwID))
-				end
-				local r, g, b, a = 255,255,255,255
-				local szTip = '> ' .. tar.szName .. ' <'
-				sha:ClearTriangleFanPoint()
-				sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
-				sha:AppendCharacterID(dwID, false, r, g, b, a, 0, 40, szTip, 0, 1)
-				sha:Show()
-			end
-		end
-		local function OnPlayerLeave(dwID)
-			if MY_ToolBox.bTongMemberHeadTipNav and Navigator_Remove then
-				Navigator_Remove('MY_GUILDMEMBER_TIP.' .. dwID)
-			else
-				local sha = hShaList:Lookup(tostring(dwID))
-				if sha then
-					sha:Hide()
-					table.insert(hShaList.freeShadows, sha)
-				end
-			end
-		end
-		for _, p in pairs(MY.GetNearPlayer()) do
-			OnPlayerEnter(p.dwID)
-		end
-		MY.RegisterEvent('PLAYER_ENTER_SCENE.MY_GUILDMEMBER_TIP', function(event) OnPlayerEnter(arg0) end)
-		MY.RegisterEvent('PLAYER_LEAVE_SCENE.MY_GUILDMEMBER_TIP', function(event) OnPlayerLeave(arg0) end)
-	else
-		MY.RegisterEvent('PLAYER_ENTER_SCENE.MY_GUILDMEMBER_TIP')
-		MY.RegisterEvent('PLAYER_LEAVE_SCENE.MY_GUILDMEMBER_TIP')
-		XGUI.GetShadowHandle('MY_TongMemberHeadTip'):Hide()
 	end
 
 	-- 玩家名字变成link方便组队
-	MY.RegisterEvent('OPEN_WINDOW.NAMELINKER', function(event)
-		local h = Station.Lookup('Normal/DialoguePanel', 'Handle_Message')
-		for i = 0, h:GetItemCount() - 1 do
-			local hItem = h:Lookup(i)
-			if hItem:GetType() == 'Text' then
-				local szText = hItem:GetText()
-				for _, szPattern in ipairs(_L.NAME_PATTERN_LIST) do
-					local _, _, szName = szText:find(szPattern)
-					if szName then
-						local nPos1, nPos2 = szText:find(szName)
-						h:InsertItemFromString(i, true, GetFormatText(szText:sub(nPos2 + 1), hItem:GetFontScheme()))
-						h:InsertItemFromString(i, true, GetFormatText('[' .. szText:sub(nPos1, nPos2) .. ']', nil, nil, nil, nil, nil, nil, 'namelink'))
-						MY.Chat.RenderLink(h:Lookup(i + 1))
-						if MY_Farbnamen and MY_Farbnamen.Render then
-							MY_Farbnamen.Render(h:Lookup(i + 1))
+	do
+		MY.RegisterEvent('OPEN_WINDOW.NAMELINKER', function(event)
+			local h = Station.Lookup('Normal/DialoguePanel', 'Handle_Message')
+			for i = 0, h:GetItemCount() - 1 do
+				local hItem = h:Lookup(i)
+				if hItem:GetType() == 'Text' then
+					local szText = hItem:GetText()
+					for _, szPattern in ipairs(_L.NAME_PATTERN_LIST) do
+						local _, _, szName = szText:find(szPattern)
+						if szName then
+							local nPos1, nPos2 = szText:find(szName)
+							h:InsertItemFromString(i, true, GetFormatText(szText:sub(nPos2 + 1), hItem:GetFontScheme()))
+							h:InsertItemFromString(i, true, GetFormatText('[' .. szText:sub(nPos1, nPos2) .. ']', nil, nil, nil, nil, nil, nil, 'namelink'))
+							MY.Chat.RenderLink(h:Lookup(i + 1))
+							if MY_Farbnamen and MY_Farbnamen.Render then
+								MY_Farbnamen.Render(h:Lookup(i + 1))
+							end
+							hItem:SetText(szText:sub(1, nPos1 - 1))
+							hItem:SetFontColor(0, 0, 0)
+							hItem:AutoSize()
+							break
 						end
-						hItem:SetText(szText:sub(1, nPos1 - 1))
-						hItem:SetFontColor(0, 0, 0)
-						hItem:AutoSize()
-						break
 					end
 				end
 			end
-		end
-		h:FormatAllItemPos()
-	end)
-
-	-- 试炼之地九宫助手
-	MY.RegisterEvent('OPEN_WINDOW.JIUGONG_HELPER', function(event)
-		if MY.IsShieldedVersion() then
-			return
-		end
-		-- 确定当前对话对象是醉逍遥（18707）
-		local target = GetTargetHandle(GetClientPlayer().GetTarget())
-		if target and target.dwTemplateID ~= 18707 then
-			return
-		end
-		local szText = arg1
-		-- 匹配字符串
-		string.gsub(szText, '<T1916><(T%d+)><T1926><(T%d+)><T1928><(T%d+)><T1924>.+<T1918><(T%d+)><T1931><(T%d+)><T1933><(T%d+)><T1935>.+<T1920><(T%d+)><T1937><(T%d+)><T1938><(T%d+)><T1939>', function(n1,n2,n3,n4,n5,n6,n7,n8,n9)
-			local tNumList = {
-				T1925 = 1, T1927 = 2, T1929 = 3,
-				T1930 = 4, T1932 = 5, T1934 = 6,
-				T1936 = 7, T1922 = 8, T1923 = 9,
-				T1940 = false,
-			}
-			local tDefaultSolution = {
-				{8,1,6,3,5,7,4,9,2},
-				{6,1,8,7,5,3,2,9,4},
-				{4,9,2,3,5,7,8,1,6},
-				{2,9,4,7,5,3,6,1,8},
-				{6,7,2,1,5,9,8,3,4},
-				{8,3,4,1,5,9,6,7,2},
-				{2,7,6,9,5,1,4,3,8},
-				{4,3,8,9,5,1,2,7,6},
-			}
-
-			n1,n2,n3,n4,n5,n6,n7,n8,n9 = tNumList[n1],tNumList[n2],tNumList[n3],tNumList[n4],tNumList[n5],tNumList[n6],tNumList[n7],tNumList[n8],tNumList[n9]
-			local tQuestion = {n1,n2,n3,n4,n5,n6,n7,n8,n9}
-			local tSolution
-			for _, solution in ipairs(tDefaultSolution) do
-				local bNotMatch = false
-				for i, v in ipairs(solution) do
-					if tQuestion[i] and tQuestion[i] ~= v then
-						bNotMatch = true
-						break
-					end
-				end
-				if not bNotMatch then
-					tSolution = solution
-					break
-				end
-			end
-			local szText = _L['The kill sequence is: ']
-			if tSolution then
-				for i, v in ipairs(tQuestion) do
-					if not tQuestion[i] then
-						szText = szText .. NumberToChinese(tSolution[i]) .. ' '
-					end
-				end
-			else
-				szText = szText .. _L['failed to calc.']
-			end
-			MY.Sysmsg({szText})
-			OutputWarningMessage('MSG_WARNING_RED', szText, 10)
+			h:FormatAllItemPos()
 		end)
-	end)
-
-	-- 防止神行CD被吃
-	if MY_ToolBox.bAvoidBlackShenxingCD then
-		MY.RegisterEvent('DO_SKILL_CAST.MY_TOOLBOX_AVOIDBLACKSHENXINGCD', function()
-			local dwID, dwSkillID, dwSkillLevel = arg0, arg1, arg2
-			if not(UI_GetClientPlayerID() == dwID and
-			Table_IsSkillFormationCaster(dwSkillID, dwSkillLevel)) then
-				return
-			end
-			local player = GetClientPlayer()
-			if not player then
-				return
-			end
-
-			local nType, dwSkillID, dwSkillLevel, fProgress = player.GetSkillOTActionState()
-			if not ((
-				nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
-				or nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
-			) and dwSkillID == 3691) then
-				return
-			end
-			MY.Sysmsg({_L['Shenxing has been cancelled, cause you got the zhenyan.']})
-			player.StopCurrentAction()
-		end)
-	else
-		MY.RegisterEvent('DO_SKILL_CAST.MY_TOOLBOX_AVOIDBLACKSHENXINGCD')
 	end
 
-	if MY_ToolBox.bJJCAutoSwitchTalkChannel then
-		MY.RegisterEvent('LOADING_ENDING.MY_TOOLBOX_JJCAUTOSWITCHTALKCHANNEL', function()
-			local bIsBattleField = (GetClientPlayer().GetScene().nType == MAP_TYPE.BATTLE_FIELD)
-			local nChannel, szName = EditBox_GetChannel()
-			if bIsBattleField and (nChannel == PLAYER_TALK_CHANNEL.RAID or nChannel == PLAYER_TALK_CHANNEL.TEAM) then
-				_C.JJCAutoSwitchTalkChannel_OrgChannel = nChannel
-				MY.Chat.SwitchChat(PLAYER_TALK_CHANNEL.BATTLE_FIELD)
-			elseif not bIsBattleField and nChannel == PLAYER_TALK_CHANNEL.BATTLE_FIELD then
-				MY.Chat.SwitchChat(_C.JJCAutoSwitchTalkChannel_OrgChannel or PLAYER_TALK_CHANNEL.RAID)
+	-- 试炼之地九宫助手
+	do
+		MY.RegisterEvent('OPEN_WINDOW.JIUGONG_HELPER', function(event)
+			if MY.IsShieldedVersion() then
+				return
 			end
+			-- 确定当前对话对象是醉逍遥（18707）
+			local target = GetTargetHandle(GetClientPlayer().GetTarget())
+			if target and target.dwTemplateID ~= 18707 then
+				return
+			end
+			local szText = arg1
+			-- 匹配字符串
+			string.gsub(szText, '<T1916><(T%d+)><T1926><(T%d+)><T1928><(T%d+)><T1924>.+<T1918><(T%d+)><T1931><(T%d+)><T1933><(T%d+)><T1935>.+<T1920><(T%d+)><T1937><(T%d+)><T1938><(T%d+)><T1939>', function(n1,n2,n3,n4,n5,n6,n7,n8,n9)
+				local tNumList = {
+					T1925 = 1, T1927 = 2, T1929 = 3,
+					T1930 = 4, T1932 = 5, T1934 = 6,
+					T1936 = 7, T1922 = 8, T1923 = 9,
+					T1940 = false,
+				}
+				local tDefaultSolution = {
+					{8,1,6,3,5,7,4,9,2},
+					{6,1,8,7,5,3,2,9,4},
+					{4,9,2,3,5,7,8,1,6},
+					{2,9,4,7,5,3,6,1,8},
+					{6,7,2,1,5,9,8,3,4},
+					{8,3,4,1,5,9,6,7,2},
+					{2,7,6,9,5,1,4,3,8},
+					{4,3,8,9,5,1,2,7,6},
+				}
+
+				n1,n2,n3,n4,n5,n6,n7,n8,n9 = tNumList[n1],tNumList[n2],tNumList[n3],tNumList[n4],tNumList[n5],tNumList[n6],tNumList[n7],tNumList[n8],tNumList[n9]
+				local tQuestion = {n1,n2,n3,n4,n5,n6,n7,n8,n9}
+				local tSolution
+				for _, solution in ipairs(tDefaultSolution) do
+					local bNotMatch = false
+					for i, v in ipairs(solution) do
+						if tQuestion[i] and tQuestion[i] ~= v then
+							bNotMatch = true
+							break
+						end
+					end
+					if not bNotMatch then
+						tSolution = solution
+						break
+					end
+				end
+				local szText = _L['The kill sequence is: ']
+				if tSolution then
+					for i, v in ipairs(tQuestion) do
+						if not tQuestion[i] then
+							szText = szText .. NumberToChinese(tSolution[i]) .. ' '
+						end
+					end
+				else
+					szText = szText .. _L['failed to calc.']
+				end
+				MY.Sysmsg({szText})
+				OutputWarningMessage('MSG_WARNING_RED', szText, 10)
+			end)
 		end)
-	else
-		MY.RegisterEvent('LOADING_ENDING.MY_TOOLBOX_JJCAUTOSWITCHTALKCHANNEL')
+	end
+
+	-- 防止神行CD被吃
+	do
+		if MY_ToolBox.bAvoidBlackShenxingCD then
+			MY.RegisterEvent('DO_SKILL_CAST.MY_TOOLBOX_AVOIDBLACKSHENXINGCD', function()
+				local dwID, dwSkillID, dwSkillLevel = arg0, arg1, arg2
+				if not(UI_GetClientPlayerID() == dwID and
+				Table_IsSkillFormationCaster(dwSkillID, dwSkillLevel)) then
+					return
+				end
+				local player = GetClientPlayer()
+				if not player then
+					return
+				end
+
+				local nType, dwSkillID, dwSkillLevel, fProgress = player.GetSkillOTActionState()
+				if not ((
+					nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
+					or nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL
+				) and dwSkillID == 3691) then
+					return
+				end
+				MY.Sysmsg({_L['Shenxing has been cancelled, cause you got the zhenyan.']})
+				player.StopCurrentAction()
+			end)
+		else
+			MY.RegisterEvent('DO_SKILL_CAST.MY_TOOLBOX_AVOIDBLACKSHENXINGCD')
+		end
+	end
+
+	-- 竞技场自动切换团队频道
+	do
+		if MY_ToolBox.bJJCAutoSwitchTalkChannel then
+			MY.RegisterEvent('LOADING_ENDING.MY_TOOLBOX_JJCAUTOSWITCHTALKCHANNEL', function()
+				local bIsBattleField = (GetClientPlayer().GetScene().nType == MAP_TYPE.BATTLE_FIELD)
+				local nChannel, szName = EditBox_GetChannel()
+				if bIsBattleField and (nChannel == PLAYER_TALK_CHANNEL.RAID or nChannel == PLAYER_TALK_CHANNEL.TEAM) then
+					_C.JJCAutoSwitchTalkChannel_OrgChannel = nChannel
+					MY.Chat.SwitchChat(PLAYER_TALK_CHANNEL.BATTLE_FIELD)
+				elseif not bIsBattleField and nChannel == PLAYER_TALK_CHANNEL.BATTLE_FIELD then
+					MY.Chat.SwitchChat(_C.JJCAutoSwitchTalkChannel_OrgChannel or PLAYER_TALK_CHANNEL.RAID)
+				end
+			end)
+		else
+			MY.RegisterEvent('LOADING_ENDING.MY_TOOLBOX_JJCAUTOSWITCHTALKCHANNEL')
+		end
 	end
 
 	-- 长歌影子头顶次序
-	if MY_ToolBox.bChangGeShadow then
-		local MAX_LIMIT_TIME = 25
-		local hList, hItem, nCount, sha, r, g, b, nDis, szText, fPer
-		local hShaList = XGUI.GetShadowHandle('MY_ChangGeShadow')
-		local MAX_SHADOW_COUNT = 10
-		local nInterval = (MY_ToolBox.bChangGeShadowDis or MY_ToolBox.bChangGeShadowCD) and 50 or 400
-		MY.BreatheCall('CHANGGE_SHADOW', nInterval, function()
-			local frame = Station.Lookup('Lowest1/ChangGeShadow')
-			if not frame then
-				if nCount and nCount > 0 then
-					for i = 0, nCount - 1 do
+	do
+		if MY_ToolBox.bChangGeShadow then
+			local MAX_LIMIT_TIME = 25
+			local hList, hItem, nCount, sha, r, g, b, nDis, szText, fPer
+			local hShaList = XGUI.GetShadowHandle('MY_ChangGeShadow')
+			local MAX_SHADOW_COUNT = 10
+			local nInterval = (MY_ToolBox.bChangGeShadowDis or MY_ToolBox.bChangGeShadowCD) and 50 or 400
+			MY.BreatheCall('CHANGGE_SHADOW', nInterval, function()
+				local frame = Station.Lookup('Lowest1/ChangGeShadow')
+				if not frame then
+					if nCount and nCount > 0 then
+						for i = 0, nCount - 1 do
+							sha = hShaList:Lookup(i)
+							if sha then
+								sha:Hide()
+							end
+						end
+						nCount = 0
+					end
+					return
+				end
+				hList = frame:Lookup('Wnd_Bar', 'Handle_Skill')
+				nCount = hList:GetItemCount()
+				for i = 0, nCount - 1 do
+					hItem = hList:Lookup(i)
+					sha = hShaList:Lookup(i)
+					if not sha then
+						hShaList:AppendItemFromString('<shadow></shadow>')
 						sha = hShaList:Lookup(i)
-						if sha then
-							sha:Hide()
+					end
+					nDis = GetCharacterDistance(UI_GetClientPlayerID(), hItem.nNpcID) / 64
+					if hItem.szState == 'disable' then
+						r, g, b = 191, 31, 31
+					else
+						if nDis > 25 then
+							r, g, b = 255, 255, 31
+						else
+							r, g, b = 63, 255, 31
 						end
 					end
-					nCount = 0
+					fPer = hItem:Lookup('Image_CD'):GetPercentage()
+					szText = tostring(i + 1)
+					if MY_ToolBox.bChangGeShadowDis and nDis >= 0 then
+						szText = szText .. g_tStrings.STR_CONNECT .. KeepOneByteFloat(nDis) .. g_tStrings.STR_METER
+					end
+					if MY_ToolBox.bChangGeShadowCD then
+						szText = szText .. g_tStrings.STR_CONNECT .. math.floor(fPer * MAX_LIMIT_TIME) .. '"'
+					end
+					sha:Show()
+					sha:ClearTriangleFanPoint()
+					sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
+					sha:AppendCharacterID(hItem.nNpcID, true, r, g, b, 200, 0, 40, szText, 0, MY_ToolBox.fChangeGeShadowScale)
 				end
-				return
-			end
-			hList = frame:Lookup('Wnd_Bar', 'Handle_Skill')
-			nCount = hList:GetItemCount()
-			for i = 0, nCount - 1 do
-				hItem = hList:Lookup(i)
-				sha = hShaList:Lookup(i)
-				if not sha then
-					hShaList:AppendItemFromString('<shadow></shadow>')
+				for i = nCount, MAX_SHADOW_COUNT do
 					sha = hShaList:Lookup(i)
-				end
-				nDis = GetCharacterDistance(UI_GetClientPlayerID(), hItem.nNpcID) / 64
-				if hItem.szState == 'disable' then
-					r, g, b = 191, 31, 31
-				else
-					if nDis > 25 then
-						r, g, b = 255, 255, 31
-					else
-						r, g, b = 63, 255, 31
+					if sha then
+						sha:Hide()
 					end
 				end
-				fPer = hItem:Lookup('Image_CD'):GetPercentage()
-				szText = tostring(i + 1)
-				if MY_ToolBox.bChangGeShadowDis and nDis >= 0 then
-					szText = szText .. g_tStrings.STR_CONNECT .. KeepOneByteFloat(nDis) .. g_tStrings.STR_METER
-				end
-				if MY_ToolBox.bChangGeShadowCD then
-					szText = szText .. g_tStrings.STR_CONNECT .. math.floor(fPer * MAX_LIMIT_TIME) .. '"'
-				end
-				sha:Show()
-				sha:ClearTriangleFanPoint()
-				sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
-				sha:AppendCharacterID(hItem.nNpcID, true, r, g, b, 200, 0, 40, szText, 0, MY_ToolBox.fChangeGeShadowScale)
-			end
-			for i = nCount, MAX_SHADOW_COUNT do
-				sha = hShaList:Lookup(i)
-				if sha then
-					sha:Hide()
-				end
-			end
-		end)
-		hShaList:Show()
-	else
-		MY.BreatheCall('CHANGGE_SHADOW', false)
-		XGUI.GetShadowHandle('MY_ChangGeShadow'):Hide()
+			end)
+			hShaList:Show()
+		else
+			MY.BreatheCall('CHANGGE_SHADOW', false)
+			XGUI.GetShadowHandle('MY_ChangGeShadow'):Hide()
+		end
 	end
 end
 MY.RegisterInit('MY_TOOLBOX', MY_ToolBox.ApplyConfig)
