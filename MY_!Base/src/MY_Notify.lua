@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-04-10 09:46:03
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-05-03 23:48:25
+-- @Last Modified time: 2018-07-08 21:27:36
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -146,7 +146,7 @@ function D.DrawNotifies(bAutoClose)
 		local nDeltaH = hMsg:GetH()
 		hMsg:AppendItemFromString(notify.szMsg)
 		hMsg:FormatAllItemPos()
-		nDeltaH = max(select(2, hMsg:GetAllItemSize()) - 10, 25) - nDeltaH
+		nDeltaH = max(select(2, hMsg:GetAllItemSize()), 25) - nDeltaH
 		hMsg:SetH(hMsg:GetH() + nDeltaH)
 		hItem:SetH(hItem:GetH() + nDeltaH)
 		for _, v in ipairs({
