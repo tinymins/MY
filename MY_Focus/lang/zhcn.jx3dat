@@ -2,6 +2,7 @@
 data = {
     ['focus list'] = '焦点列表',
     ['enable'] = '启用',
+    ['Option'] = '设置',
     ['hide when empty'] = '无焦点时自动隐藏界面',
     ['auto focus very important npc'] = '自动焦点重要NPC',
     ['boss list is always been collecting and updating'] = '重要NPC列表不定时自动更新\n选中目标按住SHIFT右键点击目标头像可手动添加删除',

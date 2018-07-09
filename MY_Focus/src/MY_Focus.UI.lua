@@ -105,6 +105,7 @@ end
 function D.UpdateItem(hItem, p)
 	local dwType, dwID = p.dwType, p.dwID
 	local szVia, tRule = p.szVia, p.tRule
+	local bDeletable = p.bDeletable
 	local KObject, info, bInfo = MY.Game.GetObject(dwType, dwID)
 	local szName = tRule and tRule.szDisplay
 	if not szName or szName == '' then
@@ -117,6 +118,7 @@ function D.UpdateItem(hItem, p)
 	hItem.dwType = dwType
 	hItem.dwID = dwID
 	hItem.szVia = szVia
+	hItem.bDeletable = bDeletable
 
 	---------- 左侧 ----------
 	-- 小图标列表
@@ -496,16 +498,26 @@ function MY_Focus.OnItemRButtonClick()
 	if name == 'Handle_Info' then
 		local dwType, dwID = this.dwType, this.dwID
 		local t = MY.Game.GetTargetContextMenu(dwType, this:Lookup('Handle_LMN/Text_Name'):GetText(), dwID)
-		table.insert(t, 1, {
-			szOption = _L['delete focus'],
-			fnAction = function()
-				if l_dwLockType == dwType and l_dwLockID == dwID then
-					l_dwLockType = nil
-					l_dwLockID = nil
-				end
-				MY_Focus.RemoveFocusID(dwType, dwID)
-			end,
-		})
+		if this.bDeletable then
+			table.insert(t, 1, {
+				szOption = _L['delete focus'],
+				fnAction = function()
+					if l_dwLockType == dwType and l_dwLockID == dwID then
+						l_dwLockType = nil
+						l_dwLockID = nil
+					end
+					MY_Focus.RemoveFocusID(dwType, dwID)
+				end,
+			})
+		else
+			table.insert(t, 1, {
+				szOption = _L['Option'],
+				fnAction = function()
+					MY.OpenPanel()
+					MY.SwitchTab('MY_Focus')
+				end,
+			})
+		end
 		local bLock = dwType == l_dwLockType and dwID == l_dwLockID
 		table.insert(t, {
 			szOption = bLock and _L['unlock focus'] or _L['lock focus'],
