@@ -607,6 +607,17 @@ function Table_GetProfessionName(dwProfessionID)
 end
 end
 
+if not Table_GetDoodadTemplateName then
+function Table_GetDoodadTemplateName(dwTemplateID)
+	local szName = ""
+	local tDoodad = g_tTable.DoodadTemplate:Search(dwTemplateID)
+	if tDoodad then
+		szName = tDoodad.szName
+	end
+	return szName
+end
+end
+
 if not EditBox_AppendLinkPlayer then
 function EditBox_AppendLinkPlayer(szName)
 	local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
