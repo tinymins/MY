@@ -156,6 +156,22 @@ function MY.GetLUADataPath(oFilePath)
 	return szFilePath
 end
 
+function MY.ConcatPath(...)
+	local aPath = {...}
+	local szPath = ''
+	for _, s in ipairs(aPath) do
+		s = tostring(s):gsub('^[\/]+', '')
+		if s ~= '' then
+			szPath = szPath:gsub('[\/]+$', '')
+			if szPath ~= '' then
+				szPath = szPath .. '/'
+			end
+			szPath = szPath .. s
+		end
+	end
+	return szPath
+end
+
 -- 保存数据文件
 -- MY.SaveLUAData(oFilePath, tData, indent, crc)
 -- oFilePath           数据文件路径(1)
