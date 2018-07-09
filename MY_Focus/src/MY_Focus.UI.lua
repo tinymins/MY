@@ -104,8 +104,9 @@ end
 -- 绘制指定的焦点Handle
 function D.UpdateItem(hItem, p)
 	local dwType, dwID = p.dwType, p.dwID
+	local szVia, tRule = p.szVia, p.tRule
 	local KObject, info, bInfo = MY.Game.GetObject(dwType, dwID)
-	local szName = p.tRule and p.tRule.szDisplay
+	local szName = tRule and tRule.szDisplay
 	if not szName or szName == '' then
 		szName = MY.GetObjectName(KObject)
 	end
@@ -115,6 +116,7 @@ function D.UpdateItem(hItem, p)
 	end
 	hItem.dwType = dwType
 	hItem.dwID = dwID
+	hItem.szVia = szVia
 
 	---------- 左侧 ----------
 	-- 小图标列表
@@ -462,7 +464,7 @@ function MY_Focus.OnItemRefreshTip()
 	if name == 'Handle_Info' then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
-		MY.OutputObjectTip(this.dwType, this.dwID, {x, y, w, h})
+		MY.OutputObjectTip(this.dwType, this.dwID, {x, y, w, h}, GetFormatText('\n' .. _L['Via:'] .. this.szVia, 82))
 	end
 end
 

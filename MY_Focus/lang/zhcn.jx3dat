@@ -66,4 +66,17 @@ data = {
     ['Max distance'] = '最大距离',
     ['Please input max distance, leave blank to disable:'] = '请输入最大距离（尺），留空禁用距离限制：',
     ['Please input display name, leave blank to use its own name:'] = '请输入显示名称，留空显示目标默认名称：',
+
+    ['Via:'] = '来源：',
+    ['Temp focus'] = '临时焦点',
+    ['Static focus'] = '永久焦点',
+    ['Auto focus'] = '默认焦点',
+    ['Embedded focus'] = '副本默认NPC焦点',
+    ['JJC focus'] = '竞技场自动焦点',
+    ['JJC focus party'] = '竞技场自动焦点队友',
+    ['JJC focus enemy'] = '竞技场自动焦点敌对',
+    ['Friend focus'] = '好友自动焦点',
+    ['Tong member focus'] = '帮会自动焦点',
+    ['Enemy focus'] = '敌对玩家自动焦点',
+    ['Important npc focus'] = '重要NPC自动焦点',
 }

@@ -282,7 +282,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 			MY_Focus.OnObjectEnterScene(dwType, dwID, (nRetryCount or 0) + 1)
 		end)
 	else-- if szName then -- 判断是否需要焦点
-		local bFocus, tRule = false, nil
+		local bFocus, szVia, tRule = false, '', nil
 		local dwMapID = me.GetMapID()
 		local dwTemplateID, szTong = -1, ''
 		if dwType == TARGET.PLAYER then
@@ -300,6 +300,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		-- 判断临时焦点
 		if l_tTempFocusList[dwType][dwID] then
 			bFocus = true
+			szVia = _L['Temp focus']
 		end
 		-- 判断永久焦点
 		if not bFocus then
@@ -312,6 +313,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 				and MY.IsShieldedVersion()
 			) then
 				bFocus = true
+				szVia = _L['Static focus']
 			end
 		end
 		-- 判断默认焦点
@@ -319,6 +321,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 			tRule = D.GetEligibleRule(MY_Focus.tAutoFocus, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
 			if tRule then
 				bFocus = true
+				szVia = _L['Auto focus'] .. ' ' .. tRule.szPattern
 			end
 		end
 		-- 判断内嵌默认焦点
@@ -326,6 +329,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 			tRule = D.GetEligibleRule(MY_Focus.tEmbeddedFocus, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
 			if tRule then
 				bFocus = true
+				szVia = _L['Embedded focus']
 			end
 		end
 
@@ -335,13 +339,16 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 				if dwType == TARGET.PLAYER then
 					if MY_Focus.bFocusJJCEnemy and MY_Focus.bFocusJJCParty then
 						bFocus = true
+						szVia = _L['JJC focus']
 					elseif MY_Focus.bFocusJJCParty then
 						if not IsEnemy(UI_GetClientPlayerID(), dwID) then
 							bFocus = true
+							szVia = _L['JJC focus party']
 						end
 					elseif MY_Focus.bFocusJJCEnemy then
 						if IsEnemy(UI_GetClientPlayerID(), dwID) then
 							bFocus = true
+							szVia = _L['JJC focus enemy']
 						end
 					end
 				elseif dwType == TARGET.NPC then
@@ -350,6 +357,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 					and not (IsEnemy(UI_GetClientPlayerID(), dwID) and MY.IsShieldedVersion()) then
 						D.OnRemoveFocus(TARGET.PLAYER, KObject.dwEmployer)
 						bFocus = true
+						szVia = _L['JJC focus party']
 					end
 				end
 			else
@@ -359,6 +367,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 					and MY_Focus.bFocusFriend
 					and MY.GetFriend(dwID) then
 						bFocus = true
+						szVia = _L['Friend focus']
 					end
 					-- 判断同帮会
 					if dwType == TARGET.PLAYER
@@ -366,6 +375,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 					and dwID ~= MY.GetClientInfo().dwID
 					and MY.GetTongMember(dwID) then
 						bFocus = true
+						szVia = _L['Tong member focus']
 					end
 				end
 				-- 判断敌对玩家
@@ -373,6 +383,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 				and MY_Focus.bFocusEnemy
 				and IsEnemy(UI_GetClientPlayerID(), dwID) then
 					bFocus = true
+					szVia = _L['Enemy focus']
 				end
 			end
 		end
@@ -382,6 +393,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		and dwType == TARGET.NPC
 		and MY.IsImportantNpc(me.GetMapID(), KObject.dwTemplateID) then
 			bFocus = true
+			szVia = _L['Important npc focus']
 		end
 
 		-- 判断屏蔽的NPC
@@ -391,7 +403,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 
 		-- 加入焦点
 		if bFocus then
-			D.OnSetFocus(dwType, dwID, szName, tRule)
+			D.OnSetFocus(dwType, dwID, szName, szVia, tRule)
 		end
 	end
 end
@@ -404,7 +416,7 @@ function MY_Focus.OnObjectLeaveScene(dwType, dwID)
 			if MY_Focus.bFocusJJCParty
 			and KObject.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
 			and MY.IsInArena() and not (IsEnemy(UI_GetClientPlayerID(), dwID) and MY.IsShieldedVersion()) then
-				D.OnSetFocus(TARGET.PLAYER, KObject.dwEmployer, MY.GetObjectName(KObject, 'never'))
+				D.OnSetFocus(TARGET.PLAYER, KObject.dwEmployer, MY.GetObjectName(KObject, 'never'), _L['JJC focus party'])
 			end
 		end
 	end
@@ -412,7 +424,7 @@ function MY_Focus.OnObjectLeaveScene(dwType, dwID)
 end
 
 -- 目标加入焦点列表
-function D.OnSetFocus(dwType, dwID, szName, tRule)
+function D.OnSetFocus(dwType, dwID, szName, szVia, tRule)
 	local nIndex
 	for i, p in ipairs(FOCUS_LIST) do
 		if p.dwType == dwType and p.dwID == dwID then
@@ -421,7 +433,13 @@ function D.OnSetFocus(dwType, dwID, szName, tRule)
 		end
 	end
 	if not nIndex then
-		table.insert(FOCUS_LIST, {dwType = dwType, dwID = dwID, szName = szName, tRule = tRule})
+		table.insert(FOCUS_LIST, {
+			dwType = dwType,
+			dwID = dwID,
+			szName = szName,
+			szVia = szVia,
+			tRule = tRule,
+		})
 		nIndex = #FOCUS_LIST
 	end
 	FireUIEvent('MY_FOCUS_UPDATE')

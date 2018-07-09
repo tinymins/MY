@@ -66,4 +66,17 @@ data = {
     ['Max distance'] = '最大距離',
     ['Please input max distance, leave blank to disable:'] = '請輸入最大距離（尺），留空禁用距離限制：',
     ['Please input display name, leave blank to use its own name:'] = '請輸入顯示名稱，留空顯示目標默認名稱：',
+
+    ['Via:'] = '來源：',
+    ['Temp focus'] = '臨時焦點',
+    ['Static focus'] = '永久焦點',
+    ['Auto focus'] = '默認焦點',
+    ['Embedded focus'] = '副本默認NPC焦點',
+    ['JJC focus'] = '競技場自動焦點',
+    ['JJC focus party'] = '競技場自動焦點隊友',
+    ['JJC focus enemy'] = '競技場自動焦點敵對',
+    ['Friend focus'] = '好友自動焦點',
+    ['Tong member focus'] = '幫會自動焦點',
+    ['Enemy focus'] = '敵對玩家自動焦點',
+    ['Important npc focus'] = '重要NPC自動焦點',
 }
