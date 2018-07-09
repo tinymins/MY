@@ -224,41 +224,6 @@ local function CloseRaidDragPanel()
 		Wnd.CloseWindow(hFrame)
 	end
 end
--- OutputTeamMemberTip 系统的API不好用所以这是改善版
-local function OutputTeamMemberTip(dwID, rc)
-	local team = GetClientTeam()
-	local tMemberInfo = team.GetMemberInfo(dwID)
-	if not tMemberInfo then
-		return
-	end
-	local r, g, b = MY.GetForceColor(tMemberInfo.dwForceID, 'foreground')
-	local szPath, nFrame = GetForceImage(tMemberInfo.dwForceID)
-	local xml = {}
-	table.insert(xml, GetFormatImage(szPath, nFrame, 22, 22))
-	table.insert(xml, GetFormatText(FormatString(g_tStrings.STR_NAME_PLAYER, tMemberInfo.szName), 80, r, g, b))
-	if tMemberInfo.bIsOnLine then
-		local p = GetPlayer(dwID)
-		if p and p.dwTongID > 0 then
-			if GetTongClient().ApplyGetTongName(p.dwTongID) then
-				table.insert(xml, GetFormatText('[' .. GetTongClient().ApplyGetTongName(p.dwTongID) .. ']\n', 41))
-			end
-		end
-		table.insert(xml, GetFormatText(FormatString(g_tStrings.STR_PLAYER_H_WHAT_LEVEL, tMemberInfo.nLevel), 82))
-		table.insert(xml, GetFormatText(MY.GetSkillName(tMemberInfo.dwMountKungfuID, 1) .. '\n', 82))
-		local szMapName = Table_GetMapName(tMemberInfo.dwMapID)
-		if szMapName then
-			table.insert(xml, GetFormatText(szMapName .. '\n', 82))
-		end
-		local nCamp = tMemberInfo.nCamp
-		table.insert(xml, GetFormatText(g_tStrings.STR_GUILD_CAMP_NAME[nCamp] .. '\n', 82))
-	else
-		table.insert(xml, GetFormatText(g_tStrings.STR_FRIEND_NOT_ON_LINE .. '\n', 82, 128, 128, 128))
-	end
-	if IsCtrlKeyDown() then
-		table.insert(xml, GetFormatText(FormatString(g_tStrings.TIP_PLAYER_ID, dwID), 102))
-	end
-	OutputTip(table.concat(xml), 345, rc)
-end
 
 local function InsertChangeGroupMenu(tMenu, dwMemberID)
 	local hTeam = GetClientTeam()
@@ -467,7 +432,7 @@ local function OnItemRefreshTip()
 	if this.bBuff then
 		MY.OutputBuffTip(this.dwID, this.nLevel, { nX, nY + 5, nW, nH }, GetEndTime(this.nEndFrame))
 	elseif this.bRole then
-		OutputTeamMemberTip(this.dwID, { nX, nY + 5, nW, nH })
+		MY.OutputTeamMemberTip(this.dwID, { nX, nY + 5, nW, nH })
 	end
 end
 CTM_Party_Base.OnItemRefreshTip = OnItemRefreshTip
