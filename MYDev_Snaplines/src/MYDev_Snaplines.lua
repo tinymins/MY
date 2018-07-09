@@ -1,11 +1,29 @@
---------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 -- 开发者工具
 -- by 茗伊 @ 双梦镇 @ 荻花宫
 -- Build 20140730
---------------------------------------------------------------------------
-local tostring, string2byte = tostring, string.byte
-local srep, tconcat, tinsert = string.rep, table.concat, table.insert
-local type, next, print, pairs, ipairs = type, next, print, pairs, ipairs
+---------------------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+---------------------------------------------------------------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local huge, pi, random = math.huge, math.pi, math.random
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local IsNil, IsBoolean, IsEmpty, RandomChild = MY.IsNil, MY.IsBoolean, MY.IsEmpty, MY.RandomChild
+local IsNumber, IsString, IsTable, IsFunction = MY.IsNumber, MY.IsString, MY.IsTable, MY.IsFunction
+---------------------------------------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot..'MYDev_Snaplines/lang/')
 --------------------------------------------------------------------------
 -- 数据存储
@@ -45,53 +63,53 @@ local function var2str(var, indent, level)
 		local t = {}
 		local szType = type(var)
 		if szType == 'nil' then
-			tinsert(t, 'nil')
+			insert(t, 'nil')
 		elseif szType == 'number' then
-			tinsert(t, tostring(var))
+			insert(t, tostring(var))
 		elseif szType == 'string' then
-			tinsert(t, string.format('%q', var))
+			insert(t, string.format('%q', var))
 		-- elseif szType == 'function' then
 			-- local s = string.dump(var)
-			-- tinsert(t, 'loadstring('')
+			-- insert(t, 'loadstring('')
 			-- -- 'string slice too long'
 			-- for i = 1, #s, 2000 do
-			--	 tinsert(t, tconcat({'', string2byte(s, i, i + 2000 - 1)}, '\\'))
+			--	 insert(t, concat({'', byte(s, i, i + 2000 - 1)}, '\\'))
 			-- end
-			-- tinsert(t, '')')
+			-- insert(t, '')')
 		elseif szType == 'boolean' then
-			tinsert(t, tostring(var))
+			insert(t, tostring(var))
 		elseif szType == 'table' then
-			tinsert(t, '{')
+			insert(t, '{')
 			local s_tab_equ = ']='
 			if indent then
 				s_tab_equ = '] = '
-				if not empty(var) then
-					tinsert(t, '\n')
+				if not IsEmpty(var) then
+					insert(t, '\n')
 				end
 			end
 			for key, val in pairs(var) do
 				if indent then
-					tinsert(t, srep(indent, level + 1))
+					insert(t, rep(indent, level + 1))
 				end
-				tinsert(t, '[')
-				tinsert(t, table_r(key, level + 1, indent))
-				tinsert(t, s_tab_equ) --'] = '
-				tinsert(t, table_r(val, level + 1, indent))
-				tinsert(t, ',')
+				insert(t, '[')
+				insert(t, table_r(key, level + 1, indent))
+				insert(t, s_tab_equ) --'] = '
+				insert(t, table_r(val, level + 1, indent))
+				insert(t, ',')
 				if indent then
-					tinsert(t, '\n')
+					insert(t, '\n')
 				end
 			end
-			if indent and not empty(var) then
-				tinsert(t, srep(indent, level))
+			if indent and not IsEmpty(var) then
+				insert(t, rep(indent, level))
 			end
-			tinsert(t, '}')
+			insert(t, '}')
 		else --if (szType == 'userdata') then
-			tinsert(t, '"')
-			tinsert(t, tostring(var))
-			tinsert(t, '"')
+			insert(t, '"')
+			insert(t, tostring(var))
+			insert(t, '"')
 		end
-		return tconcat(t)
+		return concat(t)
 	end
 	return table_r(var, level or 0, indent)
 end
@@ -101,80 +119,80 @@ local function InsertElementBasicTip(hElem, tTip)
 	local x, y = hElem:GetRelPos()
 	local w, h = hElem:GetSize()
 
-	tinsert(tTip, _L('Name: %s', hElem:GetName()))
-	tinsert(tTip, _L('Type: %s', hElem:GetType()))
-	tinsert(tTip, _L('Path: %s', MY.UI.GetTreePath(hElem)))
-	tinsert(tTip, _L('X: %s, %s', x, X))
-	tinsert(tTip, _L('Y: %s, %s', y, Y))
-	tinsert(tTip, _L('W: %s', w))
-	tinsert(tTip, _L('H: %s', h))
+	insert(tTip, _L('Name: %s', hElem:GetName()))
+	insert(tTip, _L('Type: %s', hElem:GetType()))
+	insert(tTip, _L('Path: %s', MY.UI.GetTreePath(hElem)))
+	insert(tTip, _L('X: %s, %s', x, X))
+	insert(tTip, _L('Y: %s, %s', y, Y))
+	insert(tTip, _L('W: %s', w))
+	insert(tTip, _L('H: %s', h))
 end
 
 local function InsertElementDetailTip(hElem, tTip)
 	local szType = hElem:GetType()
 	if szType == 'Text' then
-		tinsert(tTip, _L('FontScheme: %s', hElem:GetFontScheme()))
-		tinsert(tTip, _L('Text: %s', hElem:GetText()))
-		tinsert(tTip, _L('TextLen: %s', hElem:GetTextLen()))
-		tinsert(tTip, _L('VAlign: %s', hElem:GetVAlign()))
-		tinsert(tTip, _L('HAlign: %s', hElem:GetHAlign()))
-		tinsert(tTip, _L('RowSpacing: %s', hElem:GetRowSpacing()))
-		tinsert(tTip, _L('IsMultiLine: %s', tostring(hElem:IsMultiLine())))
-		tinsert(tTip, _L('IsCenterEachLine: %s', tostring(hElem:IsCenterEachLine())))
-		tinsert(tTip, _L('FontSpacing: %s', hElem:GetFontSpacing()))
-		tinsert(tTip, _L('IsRichText: %s', tostring(hElem:IsRichText())))
-		tinsert(tTip, _L('FontScale: %s', hElem:GetFontScale()))
-		tinsert(tTip, _L('FontID: %s', hElem:GetFontID()))
-		tinsert(tTip, _L('FontColor: %s', hElem:GetFontColor()))
-		tinsert(tTip, _L('FontBoder: %s', hElem:GetFontBoder()))
-		tinsert(tTip, _L('FontProjection: %s', hElem:GetFontProjection()))
-		tinsert(tTip, _L('TextExtent: %s', hElem:GetTextExtent()))
-		tinsert(tTip, _L('TextPosExtent: %s', hElem:GetTextPosExtent()))
-		tinsert(tTip, _L('Index: %s', hElem:GetIndex()))
+		insert(tTip, _L('FontScheme: %s', hElem:GetFontScheme()))
+		insert(tTip, _L('Text: %s', hElem:GetText()))
+		insert(tTip, _L('TextLen: %s', hElem:GetTextLen()))
+		insert(tTip, _L('VAlign: %s', hElem:GetVAlign()))
+		insert(tTip, _L('HAlign: %s', hElem:GetHAlign()))
+		insert(tTip, _L('RowSpacing: %s', hElem:GetRowSpacing()))
+		insert(tTip, _L('IsMultiLine: %s', tostring(hElem:IsMultiLine())))
+		insert(tTip, _L('IsCenterEachLine: %s', tostring(hElem:IsCenterEachLine())))
+		insert(tTip, _L('FontSpacing: %s', hElem:GetFontSpacing()))
+		insert(tTip, _L('IsRichText: %s', tostring(hElem:IsRichText())))
+		insert(tTip, _L('FontScale: %s', hElem:GetFontScale()))
+		insert(tTip, _L('FontID: %s', hElem:GetFontID()))
+		insert(tTip, _L('FontColor: %s', hElem:GetFontColor()))
+		insert(tTip, _L('FontBoder: %s', hElem:GetFontBoder()))
+		insert(tTip, _L('FontProjection: %s', hElem:GetFontProjection()))
+		insert(tTip, _L('TextExtent: %s', hElem:GetTextExtent()))
+		insert(tTip, _L('TextPosExtent: %s', hElem:GetTextPosExtent()))
+		insert(tTip, _L('Index: %s', hElem:GetIndex()))
 	elseif szType == 'Image' then
 		local szPath, nFrame = hElem:GetImagePath()
-		tinsert(tTip, _L('Image: %s', szPath or ''))
+		insert(tTip, _L('Image: %s', szPath or ''))
 		if nFrame then
-			tinsert(tTip, _L('Frame: %s', nFrame))
+			insert(tTip, _L('Frame: %s', nFrame))
 		end
-		tinsert(tTip, _L('ImageType: %s', hElem:GetImageType()))
-		tinsert(tTip, _L('ImageID: %s', hElem:GetImageID()))
-		tinsert(tTip, _L('Index: %s', hElem:GetIndex()))
+		insert(tTip, _L('ImageType: %s', hElem:GetImageType()))
+		insert(tTip, _L('ImageID: %s', hElem:GetImageID()))
+		insert(tTip, _L('Index: %s', hElem:GetIndex()))
 	elseif szType == 'Shadow' then
-		tinsert(tTip, _L('ShadowColor: %s', hElem:GetShadowColor()))
-		tinsert(tTip, _L('ColorRGB: %s, %s, %s', hElem:GetColorRGB()))
-		tinsert(tTip, _L('IsTriangleFan: %s', tostring(hElem:IsTriangleFan())))
-		tinsert(tTip, _L('Index: %s', hElem:GetIndex()))
+		insert(tTip, _L('ShadowColor: %s', hElem:GetShadowColor()))
+		insert(tTip, _L('ColorRGB: %s, %s, %s', hElem:GetColorRGB()))
+		insert(tTip, _L('IsTriangleFan: %s', tostring(hElem:IsTriangleFan())))
+		insert(tTip, _L('Index: %s', hElem:GetIndex()))
 	elseif szType == 'Animate' then
-		tinsert(tTip, _L('IsFinished: %s', tostring(hElem:IsFinished())))
-		tinsert(tTip, _L('Index: %s', hElem:GetIndex()))
+		insert(tTip, _L('IsFinished: %s', tostring(hElem:IsFinished())))
+		insert(tTip, _L('Index: %s', hElem:GetIndex()))
 	elseif szType == 'Box' then
-		tinsert(tTip, _L('BoxIndex: %s', hElem:GetBoxIndex()))
-		-- tinsert(tTip, _L('Object: %s', hElem:GetObject()))
-		tinsert(tTip, _L('ObjectType: %s', hElem:GetObjectType()))
-		tinsert(tTip, _L('ObjectData: %s', tconcat({hElem:GetObjectData()}, ', ')))
-		tinsert(tTip, _L('IsEmpty: %s', tostring(hElem:IsEmpty())))
+		insert(tTip, _L('BoxIndex: %s', hElem:GetBoxIndex()))
+		-- insert(tTip, _L('Object: %s', hElem:GetObject()))
+		insert(tTip, _L('ObjectType: %s', hElem:GetObjectType()))
+		insert(tTip, _L('ObjectData: %s', concat({hElem:GetObjectData()}, ', ')))
+		insert(tTip, _L('IsEmpty: %s', tostring(hElem:IsEmpty())))
 		if not hElem:IsEmpty() then
-			tinsert(tTip, _L('IsObjectEnable: %s', tostring(hElem:IsObjectEnable())))
-			tinsert(tTip, _L('IsObjectCoolDown: %s', tostring(hElem:IsObjectCoolDown())))
-			tinsert(tTip, _L('IsObjectSelected: %s', tostring(hElem:IsObjectSelected())))
-			tinsert(tTip, _L('IsObjectMouseOver: %s', tostring(hElem:IsObjectMouseOver())))
-			tinsert(tTip, _L('IsObjectPressed: %s', tostring(hElem:IsObjectPressed())))
-			tinsert(tTip, _L('CoolDownPercentage: %s', hElem:GetCoolDownPercentage()))
-			tinsert(tTip, _L('ObjectIcon: %s', hElem:GetObjectIcon()))
-			tinsert(tTip, _L('OverText%s: [Font]%s [Pos]%s [Text]%s', 0, hElem:GetOverTextFontScheme(0), hElem:GetOverTextPosition(0), hElem:GetOverText(0)))
-			tinsert(tTip, _L('OverText%s: [Font]%s [Pos]%s [Text]%s', 1, hElem:GetOverTextFontScheme(1), hElem:GetOverTextPosition(1), hElem:GetOverText(1)))
-			tinsert(tTip, _L('OverText%s: [Font]%s [Pos]%s [Text]%s', 2, hElem:GetOverTextFontScheme(2), hElem:GetOverTextPosition(2), hElem:GetOverText(2)))
-			tinsert(tTip, _L('OverText%s: [Font]%s [Pos]%s [Text]%s', 3, hElem:GetOverTextFontScheme(3), hElem:GetOverTextPosition(3), hElem:GetOverText(3)))
-			tinsert(tTip, _L('OverText%s: [Font]%s [Pos]%s [Text]%s', 4, hElem:GetOverTextFontScheme(4), hElem:GetOverTextPosition(4), hElem:GetOverText(4)))
+			insert(tTip, _L('IsObjectEnable: %s', tostring(hElem:IsObjectEnable())))
+			insert(tTip, _L('IsObjectCoolDown: %s', tostring(hElem:IsObjectCoolDown())))
+			insert(tTip, _L('IsObjectSelected: %s', tostring(hElem:IsObjectSelected())))
+			insert(tTip, _L('IsObjectMouseOver: %s', tostring(hElem:IsObjectMouseOver())))
+			insert(tTip, _L('IsObjectPressed: %s', tostring(hElem:IsObjectPressed())))
+			insert(tTip, _L('CoolDownPercentage: %s', hElem:GetCoolDownPercentage()))
+			insert(tTip, _L('ObjectIcon: %s', hElem:GetObjectIcon()))
+			insert(tTip, _L('OverText%s: [Font]%s [Pos]%s [Text]%s', 0, hElem:GetOverTextFontScheme(0), hElem:GetOverTextPosition(0), hElem:GetOverText(0)))
+			insert(tTip, _L('OverText%s: [Font]%s [Pos]%s [Text]%s', 1, hElem:GetOverTextFontScheme(1), hElem:GetOverTextPosition(1), hElem:GetOverText(1)))
+			insert(tTip, _L('OverText%s: [Font]%s [Pos]%s [Text]%s', 2, hElem:GetOverTextFontScheme(2), hElem:GetOverTextPosition(2), hElem:GetOverText(2)))
+			insert(tTip, _L('OverText%s: [Font]%s [Pos]%s [Text]%s', 3, hElem:GetOverTextFontScheme(3), hElem:GetOverTextPosition(3), hElem:GetOverText(3)))
+			insert(tTip, _L('OverText%s: [Font]%s [Pos]%s [Text]%s', 4, hElem:GetOverTextFontScheme(4), hElem:GetOverTextPosition(4), hElem:GetOverText(4)))
 		end
-		tinsert(tTip, _L('Index: %s', hElem:GetIndex()))
+		insert(tTip, _L('Index: %s', hElem:GetIndex()))
 	elseif szType == 'WndButton' then
-		tinsert(tTip, _L('ImagePath: %s', hElem:GetAnimatePath()))
-		tinsert(tTip, _L('Normal: %d', hElem:GetAnimateGroupNormal()))
-		tinsert(tTip, _L('Over: %d', hElem:GetAnimateGroupMouseOver()))
-		tinsert(tTip, _L('Down: %d', hElem:GetAnimateGroupMouseDown()))
-		tinsert(tTip, _L('Disable: %d', hElem:GetAnimateGroupDisable()))
+		insert(tTip, _L('ImagePath: %s', hElem:GetAnimatePath()))
+		insert(tTip, _L('Normal: %d', hElem:GetAnimateGroupNormal()))
+		insert(tTip, _L('Over: %d', hElem:GetAnimateGroupMouseOver()))
+		insert(tTip, _L('Down: %d', hElem:GetAnimateGroupMouseDown()))
+		insert(tTip, _L('Disable: %d', hElem:GetAnimateGroupDisable()))
 	end
 end
 
@@ -185,7 +203,7 @@ local function InsertElementDataTip(hElem, tTip)
 			data[k] = v
 		end
 	end
-	tinsert(tTip, _L('data: %s', var2str(data, '  ')))
+	insert(tTip, _L('data: %s', var2str(data, '  ')))
 end
 
 local function InsertElementTip(hElem, tTip)
@@ -242,8 +260,8 @@ function MYDev_Snaplines.OnFrameBreathe()
 		local hText = this:Lookup('', 'Handle_Tip/Text_HoverTip')
 		-- Wnd信息
 		local tTip = {}
-		tinsert(tTip, _L('CursorX: %s', nCursorX))
-		tinsert(tTip, _L('CursorY: %s', nCursorY))
+		insert(tTip, _L('CursorX: %s', nCursorX))
+		insert(tTip, _L('CursorY: %s', nCursorY))
 		if MYDev_Snaplines.bShowWndTip then
 			InsertElementTip(hWnd, tTip)
 		end
@@ -258,7 +276,7 @@ function MYDev_Snaplines.OnFrameBreathe()
 		if MYDev_Snaplines.bDetectBox and not (hItem and hItem:GetType() == 'Box') then
 			MY.UI(hWnd):find('.Box'):each(function()
 				if this:PtInItem(nCursorX, nCursorY) then
-					tinsert(tTip, '---------------------')
+					insert(tTip, '---------------------')
 					InsertElementTip(this, tTip)
 				end
 			end)
@@ -268,7 +286,7 @@ function MYDev_Snaplines.OnFrameBreathe()
 			-- Item信息
 			local nItemX, nItemY = hItem:GetAbsPos()
 			local nItemW, nItemH = hItem:GetSize()
-			tinsert(tTip, _L['-------------------'])
+			insert(tTip, _L['-------------------'])
 			if MYDev_Snaplines.bShowItemTip then
 				InsertElementTip(hItem, tTip)
 			end
