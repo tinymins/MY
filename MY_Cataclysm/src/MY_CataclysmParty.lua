@@ -1583,7 +1583,7 @@ function D.UpdateCharaterBuff(p, handle, key, data, KBuff)
 					dwBuffID = item.dwID,
 					szText = item.szName,
 					nLogicFrame = item.nEndFrame,
-					col = data.col,
+					col = data.colScreenHead or data.col,
 				})
 				CTM_SCREEN_HEAD[dwCharID][key] = item.dwID
 			end

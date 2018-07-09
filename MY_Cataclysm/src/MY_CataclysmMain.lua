@@ -2141,7 +2141,11 @@ local function GetListText(aBuffList)
 			insert(a, '!!!')
 		end
 		if v.bScreenHead then
-			insert(a, '!!!!')
+			if v.colScreenHead then
+				insert(a, '!!!!|[' .. v.colScreenHead .. ']')
+			else
+				insert(a, '!!!!')
+			end
 		end
 		if v.bDelete then
 			insert(a, '-')
@@ -2188,8 +2192,14 @@ local function GetTextList(szText)
 					tab.bAttention = true
 				elseif val == '!!!' then
 					tab.bCaution = true
-				elseif val == '!!!!' then
+				elseif val == '!!!!' or val:sub(1, 5) == '!!!!|' then
 					tab.bScreenHead = true
+					local vs = MY.Split(val, '|')
+					for _, v in ipairs(vs) do
+						if v:sub(1, 1) == '[' and v:sub(-1, -1) == ']' then
+							tab.colScreenHead = v:sub(2, -2)
+						end
+					end
 				elseif val == '-' then
 					tab.bDelete = true
 				elseif val:sub(1, 1) == '#' then
@@ -2395,11 +2405,15 @@ function OpenBuffEditPanel(rec)
 		end,
 		autoenable = function() return not rec.bDelete end,
 	}, true):width() + 5
+	x = x + ui:append('Text', {
+		x = x, y = y, h = 25,
+		text = _L['Color'],
+		autoenable = function() return not rec.bDelete end,
+	}, true):autoWidth():width() + 5
 	x = x + ui:append('Shadow', {
-		name = 'Shadow_Color',
 		x = x, y = y + 2, w = 22, h = 22,
 		color = rec.col and {MY.HumanColor2RGB(rec.col)} or {255, 255, 0},
-		onclick = function()
+		onlclick = function()
 			local this = this
 			XGUI.OpenColorPicker(function(r, g, b)
 				local a = rec.col and select(4, MY.Hex2RGB(rec.col)) or 255
@@ -2409,16 +2423,33 @@ function OpenBuffEditPanel(rec)
 				update()
 			end)
 		end,
-		autoenable = function() return not rec.bDelete end,
-	}, true):autoWidth():width() + 5
-	x = x + ui:append('WndButton2', {
-		x = x, y = y, h = 25, w = 80,
-		text = _L['Clear color'],
-		onclick = function()
-			ui:children('#Shadow_Color'):color(255, 255, 0)
+		onrclick = function()
+			XGUI(this):color(255, 255, 0)
 			rec.col = nil
 			update()
 		end,
+		tip = _L['Left click to change color, right click to clear color'],
+		tippostype = ALW.TOP_BOTTOM,
+		autoenable = function() return not rec.bDelete end,
+	}, true):width() + 5
+	x = x + ui:append('Shadow', {
+		x = x, y = y + 2, w = 22, h = 22,
+		color = rec.colScreenHead and {MY.HumanColor2RGB(rec.colScreenHead)} or {255, 255, 0},
+		onlclick = function()
+			local this = this
+			XGUI.OpenColorPicker(function(r, g, b)
+				rec.colScreenHead = MY.RGB2Hex(r, g, b)
+				XGUI(this):color(r, g, b)
+				update()
+			end)
+		end,
+		onrclick = function()
+			XGUI(this):color(255, 255, 0)
+			rec.colScreenHead = nil
+			update()
+		end,
+		tip = _L['Left click to change screen head color, right click to clear color'],
+		tippostype = ALW.TOP_BOTTOM,
 		autoenable = function() return not rec.bDelete end,
 	}, true):width() + 5
 	y = y + 30
