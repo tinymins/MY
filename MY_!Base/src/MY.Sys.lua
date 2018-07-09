@@ -1399,6 +1399,273 @@ function MY.OutputBuffTip(dwID, nLevel, Rect, nTime)
 	OutputTip(concat(t), 300, Rect)
 end
 
+function MY.OutputTeamMemberTip(dwID, Rect, szExtraXml)
+	local team = GetClientTeam()
+	local tMemberInfo = team.GetMemberInfo(dwID)
+	if not tMemberInfo then
+		return
+	end
+	local r, g, b = MY.GetForceColor(tMemberInfo.dwForceID, 'foreground')
+	local szPath, nFrame = GetForceImage(tMemberInfo.dwForceID)
+	local xml = {}
+	insert(xml, GetFormatImage(szPath, nFrame, 22, 22))
+	insert(xml, GetFormatText(FormatString(g_tStrings.STR_NAME_PLAYER, tMemberInfo.szName), 80, r, g, b))
+	if tMemberInfo.bIsOnLine then
+		local p = GetPlayer(dwID)
+		if p and p.dwTongID > 0 then
+			if GetTongClient().ApplyGetTongName(p.dwTongID) then
+				insert(xml, GetFormatText('[' .. GetTongClient().ApplyGetTongName(p.dwTongID) .. ']\n', 41))
+			end
+		end
+		insert(xml, GetFormatText(FormatString(g_tStrings.STR_PLAYER_H_WHAT_LEVEL, tMemberInfo.nLevel), 82))
+		insert(xml, GetFormatText(MY.GetSkillName(tMemberInfo.dwMountKungfuID, 1) .. '\n', 82))
+		local szMapName = Table_GetMapName(tMemberInfo.dwMapID)
+		if szMapName then
+			insert(xml, GetFormatText(szMapName .. '\n', 82))
+		end
+		insert(xml, GetFormatText(g_tStrings.STR_GUILD_CAMP_NAME[tMemberInfo.nCamp] .. '\n', 82))
+	else
+		insert(xml, GetFormatText(g_tStrings.STR_FRIEND_NOT_ON_LINE .. '\n', 82, 128, 128, 128))
+	end
+	if szExtraXml then
+		insert(xml, szExtraXml)
+	end
+	if IsCtrlKeyDown() then
+		insert(xml, GetFormatText(FormatString(g_tStrings.TIP_PLAYER_ID, dwID), 102))
+	end
+	OutputTip(concat(xml), 345, Rect)
+end
+
+function MY.OutputPlayerTip(dwID, Rect, szExtraXml)
+	local player = GetPlayer(dwID)
+	if not player then
+		return
+	end
+	local me, t = GetClientPlayer(), {}
+	local r, g, b = GetForceFontColor(dwID, me.dwID)
+
+	-- 名字
+	insert(t, GetFormatText(FormatString(g_tStrings.STR_NAME_PLAYER, player.szName), 80, r, g, b))
+	-- 称号
+	if player.szTitle ~= '' then
+		insert(t, GetFormatText('<' .. player.szTitle .. '>\n', 0))
+	end
+	-- 帮会
+	if player.dwTongID ~= 0 then
+		local szName = GetTongClient().ApplyGetTongName(player.dwTongID, 1)
+		if szName and szName ~= '' then
+			insert(t, GetFormatText('[' .. szName .. ']\n', 0))
+		end
+	end
+	-- 等级
+	if player.nLevel - me.nLevel > 10 and not me.IsPlayerInMyParty(dwID) then
+		insert(t, GetFormatText(g_tStrings.STR_PLAYER_H_UNKNOWN_LEVEL, 82))
+	else
+		insert(t, GetFormatText(FormatString(g_tStrings.STR_PLAYER_H_WHAT_LEVEL, player.nLevel), 82))
+	end
+	-- 声望
+	if g_tStrings.tForceTitle[player.dwForceID] then
+		insert(t, GetFormatText(g_tStrings.tForceTitle[player.dwForceID] .. '\n', 82))
+	end
+	-- 所在地图
+	if IsParty(dwID, me.dwID) then
+		local team = GetClientTeam()
+		local tMemberInfo = team.GetMemberInfo(dwID)
+		if tMemberInfo then
+			local szMapName = Table_GetMapName(tMemberInfo.dwMapID)
+			if szMapName then
+				insert(t, GetFormatText(szMapName .. '\n', 82))
+			end
+		end
+	end
+	-- 阵营
+	if player.bCampFlag then
+		insert(t, GetFormatText(g_tStrings.STR_TIP_CAMP_FLAG, 163))
+	end
+	insert(t, GetFormatText(g_tStrings.STR_GUILD_CAMP_NAME[player.nCamp], 82))
+	-- 自定义项
+	if szExtraXml then
+		insert(t, szExtraXml)
+	end
+	-- 调试信息
+	if IsCtrlKeyDown() then
+		insert(t, GetFormatText('\n'))
+		insert(t, GetFormatText(FormatString(g_tStrings.TIP_PLAYER_ID, player.dwID), 102))
+		insert(t, GetFormatText(FormatString(g_tStrings.TIP_REPRESENTID_ID, player.dwModelID), 102))
+		insert(t, GetFormatText(var2str(player.GetRepresentID(), '  '), 102))
+	end
+	-- 格式化输出
+	OutputTip(concat(t), 345, Rect)
+end
+
+function MY.OutputNpcTip(dwID, Rect, szExtraXml)
+	local npc = GetNpc(dwID)
+	if not npc then
+		return
+	end
+
+	local me = GetClientPlayer()
+	local r, g, b = GetForceFontColor(dwID, me.dwID)
+	local t = {}
+
+	-- 名字
+	local szName = MY.GetObjectName(npc)
+	insert(t, GetFormatText(szName .. "\n", 80, r, g, b))
+	-- 称号
+	if npc.szTitle ~= "" then
+		insert(t, GetFormatText("<" .. npc.szTitle .. ">\n", 0))
+	end
+	-- 等级
+	if npc.nLevel - me.nLevel > 10 then
+		insert(t, GetFormatText(g_tStrings.STR_PLAYER_H_UNKNOWN_LEVEL, 82))
+	elseif npc.nLevel > 0 then
+		insert(t, GetFormatText(FormatString(g_tStrings.STR_NPC_H_WHAT_LEVEL, npc.nLevel), 0))
+	end
+	-- 势力
+	if g_tReputation and g_tReputation.tReputationTable[npc.dwForceID] then
+		insert(t, GetFormatText(g_tReputation.tReputationTable[npc.dwForceID].szName .. "\n", 0))
+	end
+	-- 任务信息
+	if GetNpcQuestTip then
+		insert(t, GetNpcQuestTip(npc.dwTemplateID))
+	end
+	-- 自定义项
+	if szExtraXml then
+		insert(t, szExtraXml)
+	end
+	-- 调试信息
+	if IsCtrlKeyDown() then
+		insert(t, GetFormatText(FormatString(g_tStrings.TIP_NPC_ID, npc.dwID), 102))
+		insert(t, GetFormatText(FormatString(g_tStrings.TIP_TEMPLATE_ID_NPC_INTENSITY, npc.dwTemplateID, npc.nIntensity), 102))
+		insert(t, GetFormatText(FormatString(g_tStrings.TIP_REPRESENTID_ID, npc.dwModelID), 102))
+		if IsShiftKeyDown() and GetNpcQuestState then
+			local tState = GetNpcQuestState(npc, true)
+			for szKey, tQuestList in pairs(tState) do
+				tState[szKey] = concat(tQuestList, ",")
+			end
+			insert(t, GetFormatText(var2str(tState, "  "), 102))
+		end
+	end
+	-- 格式化输出
+	OutputTip(concat(t), 345, Rect)
+end
+
+function MY.OutputDoodadTip(dwDoodadID, Rect, szExtraXml)
+	local doodad = GetDoodad(dwDoodadID)
+	if not doodad then
+		return
+	end
+
+	local player, t = GetClientPlayer(), {}
+	-- 名字
+	local szDoodadName = Table_GetDoodadName(doodad.dwTemplateID, doodad.dwNpcTemplateID)
+	if doodad.nKind == DOODAD_KIND.CORPSE then
+		szName = szDoodadName .. g_tStrings.STR_DOODAD_CORPSE
+	end
+	insert(t, GetFormatText(szDoodadName .. "\n", 37))
+	-- 采集信息
+	if (doodad.nKind == DOODAD_KIND.CORPSE and not doodad.CanLoot(player.dwID)) or doodad.nKind == DOODAD_KIND.CRAFT_TARGET then
+		local doodadTemplate = GetDoodadTemplate(doodad.dwTemplateID)
+		if doodadTemplate.dwCraftID ~= 0 then
+			local dwRecipeID = doodad.GetRecipeID()
+			local recipe = GetRecipe(doodadTemplate.dwCraftID, dwRecipeID)
+			if recipe then
+				--生活技能等级--
+				local profession = GetProfession(recipe.dwProfessionID)
+				local requireLevel = recipe.dwRequireProfessionLevel
+				--local playMaxLevel               = player.GetProfessionMaxLevel(recipe.dwProfessionID)
+				local playerLevel                = player.GetProfessionLevel(recipe.dwProfessionID)
+				--local playExp                    = player.GetProfessionProficiency(recipe.dwProfessionID)
+				local nDis = playerLevel - requireLevel
+				local nFont = 101
+				if not player.IsProfessionLearnedByCraftID(doodadTemplate.dwCraftID) then
+					nFont = 102
+				end
+
+				if doodadTemplate.dwCraftID == 1 or doodadTemplate.dwCraftID == 2 or doodadTemplate.dwCraftID == 3 then --采金 神农 庖丁
+					insert(t, GetFormatText(FormatString(g_tStrings.STR_MSG_NEED_BEST_CRAFT, Table_GetProfessionName(recipe.dwProfessionID), requireLevel), nFont))
+				elseif doodadTemplate.dwCraftID ~= 8 then --8 读碑文
+					insert(t, GetFormatText(FormatString(g_tStrings.STR_MSG_NEED_CRAFT, Table_GetProfessionName(recipe.dwProfessionID), requireLevel), nFont))
+				end
+
+				if recipe.nCraftType == ALL_CRAFT_TYPE.READ then
+					if recipe.dwProfessionIDExt ~= 0 then
+						local nBookID, nSegmentID = GlobelRecipeID2BookID(dwRecipeID)
+						if player.IsBookMemorized(nBookID, nSegmentID) then
+							insert(t, GetFormatText(g_tStrings.TIP_ALREADY_READ, 108))
+						else
+							insert(t, GetFormatText(g_tStrings.TIP_UNREAD, 105))
+						end
+					end
+				end
+
+				if recipe.dwToolItemType ~= 0 and recipe.dwToolItemIndex ~= 0 and doodadTemplate.dwCraftID ~= 8 then
+					local hasItem = player.GetItemAmount(recipe.dwToolItemType, recipe.dwToolItemIndex)
+					local hasCommonItem = player.GetItemAmount(recipe.dwPowerfulToolItemType, recipe.dwPowerfulToolItemIndex)
+					local toolItemInfo = GetItemInfo(recipe.dwToolItemType, recipe.dwToolItemIndex)
+					local toolCommonItemInfo = GetItemInfo(recipe.dwPowerfulToolItemType, recipe.dwPowerfulToolItemIndex)
+					local szText, nFont = '', 102
+					if hasItem > 0 or hasCommonItem > 0 then
+						nFont = 106
+					end
+
+					if toolCommonItemInfo then
+						szText = FormatString(g_tStrings.STR_MSG_NEED_TOOL, GetItemNameByItemInfo(toolItemInfo)
+							.. g_tStrings.STR_OR .. GetItemNameByItemInfo(toolCommonItemInfo))
+					else
+						szText = FormatString(g_tStrings.STR_MSG_NEED_TOOL, GetItemNameByItemInfo(toolItemInfo))
+					end
+					insert(t, GetFormatText(szText, nFont))
+				end
+
+				if recipe.nCraftType == ALL_CRAFT_TYPE.COLLECTION then
+					local nFont = 102
+					if player.nCurrentThew >= recipe.nThew  then
+						nFont = 106
+					end
+					insert(t, GetFormatText(FormatString(g_tStrings.STR_MSG_NEED_COST_THEW, recipe.nThew), nFont))
+				elseif recipe.nCraftType == ALL_CRAFT_TYPE.PRODUCE  or recipe.nCraftType == ALL_CRAFT_TYPE.READ or recipe.nCraftType == ALL_CRAFT_TYPE.ENCHANT then
+					local nFont = 102
+					if player.nCurrentStamina >= recipe.nStamina then
+						nFont = 106
+					end
+					insert(t, GetFormatText(FormatString(g_tStrings.STR_MSG_NEED_COST_STAMINA, recipe.nStamina), nFont))
+				end
+			end
+		end
+	end
+	-- 任务信息
+	if GetDoodadQuestTip then
+		insert(t, GetDoodadQuestTip(doodad.dwTemplateID))
+	end
+	-- 自定义项
+	if szExtraXml then
+		insert(t, szExtraXml)
+	end
+	-- 调试信息
+	if IsCtrlKeyDown() then
+		insert(t, GetFormatText(FormatString(g_tStrings.TIP_DOODAD_ID, doodad.dwID)), 102)
+		insert(t, GetFormatText(FormatString(g_tStrings.TIP_TEMPLATE_ID, doodad.dwTemplateID)), 102)
+		insert(t, GetFormatText(FormatString(g_tStrings.TIP_REPRESENTID_ID, doodad.dwRepresentID)), 102)
+	end
+
+	if doodad.nKind == DOODAD_KIND.GUIDE and not Rect then
+		local x, y = Cursor.GetPos()
+		local w, h = 40, 40
+		Rect = {x, y, w, h}
+	end
+	OutputTip(concat(t), 345, Rect)
+end
+
+function MY.OutputObjectTip(dwType, dwID, Rect, szExtraXml)
+	if dwType == TARGET.PLAYER then
+		MY.OutputPlayerTip(dwID, Rect, szExtraXml)
+	elseif dwType == TARGET.NPC then
+		MY.OutputNpcTip(dwID, Rect, szExtraXml)
+	elseif dwType == TARGET.DOODAD then
+		MY.OutputDoodadTip(dwID, Rect, szExtraXml)
+	end
+end
 
 function MY.Alert(szMsg, fnAction, szSure)
 	local nW, nH = Station.GetClientSize()
