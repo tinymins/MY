@@ -379,12 +379,12 @@ function MY.Game.GetObjectName(obj, eRetID)
 			end
 		end
 		if obj.dwEmployer and obj.dwEmployer ~= 0 then
-			if IsEmpty(szName) then
-				szName = MY.GetObjectName(GetPlayer(obj.dwEmployer), eRetID) -- 长歌影子
-			else
+			if Table_IsSimplePlayer(obj.dwTemplateID) then -- 长歌影子
+				szName = MY.GetObjectName(GetPlayer(obj.dwEmployer), eRetID)
+			elseif not IsEmpty(szName) then
 				local szEmpName = MY.GetObjectName(
 					(IsPlayer(obj.dwEmployer) and GetPlayer(obj.dwEmployer)) or GetNpc(obj.dwEmployer),
-					false
+					'never'
 				) or g_tStrings.STR_SOME_BODY
 				szName =  szEmpName .. g_tStrings.STR_PET_SKILL_LOG .. szName
 			end

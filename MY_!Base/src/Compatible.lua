@@ -712,6 +712,16 @@ function Table_IsTreasureBattleFieldMap()
 end
 end
 
+if not Table_IsSimplePlayer then
+function Table_IsSimplePlayer(dwTemplateID)
+	local tLine = g_tTable.SimplePlayer:Search(dwTemplateID)
+	if tLine then
+		return true
+	end
+	return false
+end
+end
+
 if not ForceIDToKungfuIDs then
 -- * 获取门派对应心法ID列表
 local m_tForceToKungfu
