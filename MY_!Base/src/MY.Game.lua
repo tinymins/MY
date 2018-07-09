@@ -368,9 +368,9 @@ function MY.Game.GetObjectName(obj, eRetID)
 		eRetID = 'auto'
 	end
 	local szType, szName = '?', obj.szName
-	if IsPlayer(obj.dwID) then  -- PLAYER
+	if obj.GetGlobalID then -- PLAYER
 		szType = 'P'
-	elseif obj.nMaxLife then    -- NPC
+	elseif obj.GetTarget then -- NPC
 		szType = 'N'
 		if IsEmpty(szName) then
 			szName = Table_GetNpcTemplateName(obj.dwTemplateID)
