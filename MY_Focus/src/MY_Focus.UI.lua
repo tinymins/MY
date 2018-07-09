@@ -453,6 +453,16 @@ function MY_Focus.OnItemMouseEnter()
 			TEMP_TARGET_TYPE, TEMP_TARGET_ID = MY.GetTarget()
 			SetTarget(this.dwType, this.dwID)
 		end
+		MY_Focus.OnItemRefreshTip()
+	end
+end
+
+function MY_Focus.OnItemRefreshTip()
+	local name = this:GetName()
+	if name == 'Handle_Info' then
+		local x, y = this:GetAbsPos()
+		local w, h = this:GetSize()
+		MY.OutputObjectTip(this.dwType, this.dwID, {x, y, w, h})
 	end
 end
 
