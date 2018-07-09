@@ -2894,7 +2894,7 @@ end
 -- (self) XGUI:sliderStyle(nSliderStyle)
 function XGUI:sliderStyle(nSliderStyle)
 	self:_checksum()
-	local bShowPercentage = nSliderStyle == MY.Const.UI.Slider.SHOW_PERCENT
+	local bShowPercentage = nSliderStyle == MY_SLIDER_DISPTYPE.SHOW_PERCENT
 	for _, raw in ipairs(self.raws) do
 		if GetComponentType(raw) == 'WndSliderBox' then
 			SetComponentProp(raw, 'bShowPercentage', bShowPercentage)
@@ -3169,7 +3169,7 @@ function XGUI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 		end
 		for _, raw in ipairs(self.raws) do
 			if IsFunction(fnLClick) then
-				local fnAction = function() MY.ExecuteWithThis(raw, fnLClick, MY.Const.Event.Mouse.LBUTTON) end
+				local fnAction = function() MY.ExecuteWithThis(raw, fnLClick, MY_MOUSE_EVENT.LBUTTON) end
 				if GetComponentType(raw) == 'WndScrollBox' then
 					XGUI(GetComponentElement(raw, 'MAIN_HANDLE')):uievent('OnItemLButtonClick', fnAction)
 				else
@@ -3194,7 +3194,7 @@ function XGUI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 
 			end
 			if IsFunction(fnRClick) then
-				local fnAction = function() MY.ExecuteWithThis(raw, fnRClick, MY.Const.Event.Mouse.RBUTTON) end
+				local fnAction = function() MY.ExecuteWithThis(raw, fnRClick, MY_MOUSE_EVENT.RBUTTON) end
 				if GetComponentType(raw) == 'WndScrollBox' then
 					XGUI(GetComponentElement(raw, 'MAIN_HANDLE')):uievent('OnItemRButtonClick', fnAction)
 				else
@@ -3217,17 +3217,17 @@ function XGUI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 			end
 		end
 	else
-		local nFlag = fnLClick or fnMClick or fnRClick or MY.Const.Event.Mouse.LBUTTON
-		if nFlag == MY.Const.Event.Mouse.LBUTTON then
+		local nFlag = fnLClick or fnMClick or fnRClick or MY_MOUSE_EVENT.LBUTTON
+		if nFlag == MY_MOUSE_EVENT.LBUTTON then
 			for _, raw in ipairs(self.raws) do
 				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 				local itm = GetComponentElement(raw, 'ITEM')
 				if wnd then local _this = this this = wnd pcall(wnd.OnLButtonClick) this = _this end
 				if itm then local _this = this this = itm pcall(itm.OnItemLButtonClick) this = _this end
 			end
-		elseif nFlag==MY.Const.Event.Mouse.MBUTTON then
+		elseif nFlag==MY_MOUSE_EVENT.MBUTTON then
 
-		elseif nFlag==MY.Const.Event.Mouse.RBUTTON then
+		elseif nFlag==MY_MOUSE_EVENT.RBUTTON then
 			for _, raw in ipairs(self.raws) do
 				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 				local itm = GetComponentElement(raw, 'ITEM')
@@ -3244,7 +3244,7 @@ end
 -- :lclick(fnAction) 绑定
 -- :lclick()         触发
 function XGUI:lclick(fnLClick)
-	return self:click(fnLClick or MY.Const.Event.Mouse.LBUTTON, nil, nil, true)
+	return self:click(fnLClick or MY_MOUSE_EVENT.LBUTTON, nil, nil, true)
 end
 
 -- rclick 鼠标右键单击事件
@@ -3252,7 +3252,7 @@ end
 -- :rclick(fnAction) 绑定
 -- :rclick()         触发
 function XGUI:rclick(fnRClick)
-	return self:click(nil, fnRClick or MY.Const.Event.Mouse.RBUTTON, nil, true)
+	return self:click(nil, fnRClick or MY_MOUSE_EVENT.RBUTTON, nil, true)
 end
 
 -- mclick 鼠标右键单击事件
@@ -3260,7 +3260,7 @@ end
 -- :mclick(fnAction) 绑定
 -- :mclick()         触发
 function XGUI:mclick(fnMClick)
-	return self:click(nil, nil, fnMClick or MY.Const.Event.Mouse.MBUTTON, true)
+	return self:click(nil, nil, fnMClick or MY_MOUSE_EVENT.MBUTTON, true)
 end
 
 -- complete 加载完成事件
@@ -3320,21 +3320,21 @@ end
 -- tip 鼠标悬停提示
 -- (self) Instance:tip( tip[, nPosType[, tOffset[, bNoEncode] ] ] ) 绑定tip事件
 -- string|function tip:要提示的文字文本或序列化的DOM文本或返回前述文本的函数
--- number nPosType:    提示位置 有效值为MY.Const.UI.Tip.枚举
--- table tOffset:      提示框偏移量等附加信息{ x = x, y = y, hide = MY.Const.UI.Tip.Hide枚举, nFont = 字体, r, g, b = 字颜色 }
+-- number nPosType:    提示位置 有效值为MY_TIP_HIDEWAY.枚举
+-- table tOffset:      提示框偏移量等附加信息{ x = x, y = y, hide = MY_TIP_HIDEWAY.Hide枚举, nFont = 字体, r, g, b = 字颜色 }
 -- boolean bNoEncode:  当szTip为纯文本时保持这个参数为false 当szTip为格式化的DOM字符串时设置该参数为true
 function XGUI:tip(tip, nPosType, tOffset, bNoEncode)
 	tOffset = tOffset or {}
 	tOffset.x = tOffset.x or 0
 	tOffset.y = tOffset.y or 0
 	tOffset.w = tOffset.w or 450
-	tOffset.hide = tOffset.hide or MY.Const.UI.Tip.HIDE
+	tOffset.hide = tOffset.hide or MY_TIP_HIDEWAY.HIDE
 	tOffset.nFont = tOffset.nFont or 136
-	nPosType = nPosType or MY.Const.UI.Tip.POS_FOLLOW_MOUSE
+	nPosType = nPosType or MY_TIP_POSTYPE.FOLLOW_MOUSE
 	return self:hover(function()
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
-		if nPosType == MY.Const.UI.Tip.POS_FOLLOW_MOUSE then
+		if nPosType == MY_TIP_POSTYPE.FOLLOW_MOUSE then
 			x, y = Cursor.GetPos()
 			x, y = x - 0, y - 40
 		end
@@ -3351,9 +3351,9 @@ function XGUI:tip(tip, nPosType, tOffset, bNoEncode)
 		end
 		OutputTip(szTip, tOffset.w, {x, y, w, h}, nPosType)
 	end, function()
-		if tOffset.hide == MY.Const.UI.Tip.HIDE then
+		if tOffset.hide == MY_TIP_HIDEWAY.HIDE then
 			HideTip(false)
-		elseif tOffset.hide == MY.Const.UI.Tip.ANIMATE_HIDE then
+		elseif tOffset.hide == MY_TIP_HIDEWAY.ANIMATE_HIDE then
 			HideTip(true)
 		end
 	end, true)
@@ -3577,30 +3577,29 @@ XGUI.HandlePool = setmetatable({}, { __call = function(me, ...) return HandlePoo
 -----------------------------------------------------------
 -- 枚举
 -----------------------------------------------------------
-
-MY = MY or {}
-MY.Const = MY.Const or {}
-MY.Const.Event = MY.Const.Event or {}
-MY.Const.Event.Mouse = MY.Const.Event.Mouse or {}
-MY.Const.Event.Mouse.LBUTTON = 1
-MY.Const.Event.Mouse.MBUTTON = 0
-MY.Const.Event.Mouse.RBUTTON = -1
-MY.Const.UI = MY.Const.UI or {}
-MY.Const.UI.Tip = MY.Const.UI.Tip or {}
-MY.Const.UI.Tip.POS_FOLLOW_MOUSE = -1
-MY.Const.UI.Tip.CENTER           = ALW.CENTER
-MY.Const.UI.Tip.POS_LEFT         = ALW.LEFT_RIGHT
-MY.Const.UI.Tip.POS_RIGHT        = ALW.RIGHT_LEFT
-MY.Const.UI.Tip.POS_TOP          = ALW.TOP_BOTTOM
-MY.Const.UI.Tip.POS_BOTTOM       = ALW.BOTTOM_TOP
-MY.Const.UI.Tip.POS_RIGHT_BOTTOM = ALW.RIGHT_LEFT_AND_BOTTOM_TOP
-MY.Const.UI.Slider = MY.Const.UI.Slider or {}
-MY.Const.UI.Slider.SHOW_VALUE    = false
-MY.Const.UI.Slider.SHOW_PERCENT  = true
-
-MY.Const.UI.Tip.NO_HIDE      = 100
-MY.Const.UI.Tip.HIDE         = 101
-MY.Const.UI.Tip.ANIMATE_HIDE = 102
+MY_MOUSE_EVENT = SetmetaReadonly({
+	LBUTTON = 1,
+	MBUTTON = 0,
+	RBUTTON = -1,
+})
+MY_TIP_POSTYPE = SetmetaReadonly({
+	FOLLOW_MOUSE              = -1,
+	CENTER                    = ALW.CENTER,
+	LEFT_RIGHT                = ALW.LEFT_RIGHT,
+	RIGHT_LEFT                = ALW.RIGHT_LEFT,
+	TOP_BOTTOM                = ALW.TOP_BOTTOM,
+	BOTTOM_TOP                = ALW.BOTTOM_TOP,
+	RIGHT_LEFT_AND_BOTTOM_TOP = ALW.RIGHT_LEFT_AND_BOTTOM_TOP,
+})
+MY_TIP_HIDEWAY = SetmetaReadonly({
+	NO_HIDE      = 100,
+	HIDE         = 101,
+	ANIMATE_HIDE = 102,
+})
+MY_SLIDER_DISPTYPE = SetmetaReadonly({
+	SHOW_VALUE    = false,
+	SHOW_PERCENT  = true,
+})
 
 ---------------------------------------------------
 -- create new frame
@@ -3996,7 +3995,7 @@ function XGUI.OpenColorPickerEx(fnAction)
 	wnd:append('WndSliderBox', {
 		x = 20, y = 35, h = 25, w = 306, rw = 272,
 		textfmt = function(val) return ('%d H'):format(val) end,
-		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		value = COLOR_HUE, range = {0, 360},
 		onchange = function(nVal)
 			COLOR_HUE = nVal
@@ -4158,7 +4157,7 @@ function XGUI.OpenIconPanel(fnAction)
 	ui:append('WndSliderBox', {
 		x = 10, y = 580, h = 25, w = 500, textfmt = ' Page: %d',
 		range = {1, math.ceil(nMaxIcon / 144)}, value = ICON_PAGE or 21,
-		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		onchange = function(nVal)
 			MY.DelayCall(function() GetPage(nVal) end)
 		end,
@@ -4203,7 +4202,7 @@ function XGUI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 				XGUI(this):fadeTo(500,0)
 			end
 		end):click(function(nButton)
-			if nButton == MY.Const.Event.Mouse.RBUTTON then
+			if nButton == MY_MOUSE_EVENT.RBUTTON then
 				hHandle.Selected = true
 				PopupMenu({{
 					szOption = _L['delete'],

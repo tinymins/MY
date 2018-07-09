@@ -740,7 +740,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('WndSliderBox', {
 		x = x, y = y,
-		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE, range = {1, 32},
+		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE, range = {1, 32},
 		value = MY_VisualSkill.nVisualSkillBoxCount,
 		text = _L('display %d skills.', MY_VisualSkill.nVisualSkillBoxCount),
 		textfmt = function(val) return _L('display %d skills.', val) end,
@@ -836,7 +836,7 @@ function PS.OnPanelActive(wnd)
 				return _L['changge force only']
 			end
 		end,
-		tippos = ALW.TOP_BOTTOM,
+		tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
 		autoenable = function()
 			local me = GetClientPlayer()
 			return me and me.dwForceID == FORCE_TYPE.CHANG_GE
@@ -855,7 +855,7 @@ function PS.OnPanelActive(wnd)
 				return _L['changge force only']
 			end
 		end,
-		tippos = ALW.TOP_BOTTOM,
+		tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
 		autoenable = function()
 			local me = GetClientPlayer()
 			return me and me.dwForceID == FORCE_TYPE.CHANG_GE
@@ -874,7 +874,7 @@ function PS.OnPanelActive(wnd)
 				return _L['changge force only']
 			end
 		end,
-		tippos = ALW.TOP_BOTTOM,
+		tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
 		autoenable = function()
 			local me = GetClientPlayer()
 			return me and me.dwForceID == FORCE_TYPE.CHANG_GE
@@ -884,7 +884,7 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = 150,
 		textfmt = function(val) return _L('scale: %d%%.', val) end,
 		range = {10, 800},
-		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		value = MY_ToolBox.fChangeGeShadowScale * 100,
 		onchange = function(val)
 			MY_ToolBox.fChangeGeShadowScale = val / 100

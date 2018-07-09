@@ -385,7 +385,7 @@ function MY_GKP.OnFrameCreate()
 		x = 240, y = 660, text = _L['Manual SYNC'],
 		lmenu = _GKP.OnSyncFromMenu, rmenu = _GKP.OnSyncToMenu,
 		tip = _L['Left click to sync from others, right click to sync to others'],
-		tippostype = MY.Const.UI.Tip.POS_TOP,
+		tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
 	})
 
 	local hPageSet = ui:children('#PageSet_Menu')

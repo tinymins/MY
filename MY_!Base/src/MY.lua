@@ -924,7 +924,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 				MY_Serendipity.bEnable = not MY_Serendipity.bEnable
 			end,
 			tip = _L['Monitor serendipity and show share notify.'],
-			tippostype = MY.Const.UI.Tip.POS_BOTTOM,
+			tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
 		}, true):autoWidth():width()
 		x = x + ui:append('WndCheckBox', {
 			x = x, y = 375,

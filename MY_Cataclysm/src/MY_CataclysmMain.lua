@@ -1273,7 +1273,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y - 1,
 		value = Cataclysm_Main.nTempTargetDelay / 75,
 		range = {0, 8},
-		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		onchange = function(val)
 			Cataclysm_Main.nTempTargetDelay = val * 75
 		end,
@@ -1369,7 +1369,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y - 1,
 		value = Cataclysm_Main.fNameFontScale * 100,
 		range = {1, 400},
-		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		textfmt = function(val) return _L('Scale %d%%', val) end,
 		onchange = function(val)
 			Cataclysm_Main.fNameFontScale = val / 100
@@ -1447,7 +1447,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y - 1,
 		value = Cataclysm_Main.fLifeFontScale * 100,
 		range = {1, 400},
-		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		textfmt = function(val) return _L('Scale %d%%', val) end,
 		onchange = function(val)
 			Cataclysm_Main.fLifeFontScale = val / 100
@@ -1589,7 +1589,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y - 1,
 		value = Cataclysm_Main.fManaFontScale * 100,
 		range = {1, 400},
-		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		textfmt = function(val) return _L('Scale %d%%', val) end,
 		onchange = function(val)
 			Cataclysm_Main.fManaFontScale = val / 100
@@ -1771,7 +1771,7 @@ function PS.OnPanelActive(frame)
 					x = x, y = y + 3, h = 22,
 					range = {0, 255},
 					value = Cataclysm_Main.tDistanceAlpha[i],
-					sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+					sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 					onchange = function(val)
 						Cataclysm_Main.tDistanceAlpha[i] = val
 						if GetFrame() then
@@ -1817,7 +1817,7 @@ function PS.OnPanelActive(frame)
 			x = x, y = y + 3, h = 22,
 			range = {0, 255},
 			value = Cataclysm_Main.tOtherAlpha[3],
-			sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+			sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 			onchange = function(val)
 				Cataclysm_Main.tOtherAlpha[3] = val
 				if GetFrame() then
@@ -1853,7 +1853,7 @@ function PS.OnPanelActive(frame)
 			x = x, y = y + 3, h = 22,
 			range = {0, 255},
 			value = Cataclysm_Main.tOtherAlpha[2],
-			sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+			sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 			onchange = function(val)
 				Cataclysm_Main.tOtherAlpha[2] = val
 				if GetFrame() then
@@ -1955,7 +1955,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y + 3, h = 25, w = 250,
 		range = {50, 250},
 		value = Cataclysm_Main.fScaleX * 100,
-		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		onchange = function(nVal)
 			nVal = nVal / 100
 			local nNewX, nNewY = nVal / Cataclysm_Main.fScaleX, Cataclysm_Main.fScaleY / Cataclysm_Main.fScaleY
@@ -1973,7 +1973,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y + 3, h = 25, w = 250,
 		range = {50, 250},
 		value = Cataclysm_Main.fScaleY * 100,
-		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		onchange = function(nVal)
 			nVal = nVal / 100
 			local nNewX, nNewY = Cataclysm_Main.fScaleX / Cataclysm_Main.fScaleX, nVal / Cataclysm_Main.fScaleY
@@ -2005,7 +2005,7 @@ function PS.OnPanelActive(frame)
 			x = x, y = y + 3,
 			range = {0, 255},
 			value = Cataclysm_Main.nAlpha,
-			sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+			sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 			onchange = function(nVal)
 				Cataclysm_Main.nAlpha = nVal
 				if GetFrame() then
@@ -2429,7 +2429,7 @@ function OpenBuffEditPanel(rec)
 			update()
 		end,
 		tip = _L['Left click to change color, right click to clear color'],
-		tippostype = ALW.TOP_BOTTOM,
+		tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
 		autoenable = function() return not rec.bDelete end,
 	}, true):width() + 5
 	x = x + ui:append('Shadow', {
@@ -2463,7 +2463,7 @@ function OpenBuffEditPanel(rec)
 	x = x + ui:append('WndSliderBox', {
 		x = x, y = y, text = '',
 		range = {0, 255},
-		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		value = rec.col and select(4, MY.HumanColor2RGB(rec.col)) or rec.nColAlpha or 255,
 		onchange = function(nVal)
 			if rec.col then
@@ -2627,7 +2627,7 @@ function PS.OnPanelActive(frame)
 		autoenable = function() return not Cataclysm_Main.bAutoBuffSize end,
 		range = {50, 200},
 		value = Cataclysm_Main.fBuffScale * 100,
-		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		onchange = function(nVal)
 			Cataclysm_Main.fBuffScale = nVal / 100
 			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
@@ -2642,7 +2642,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y + 3, rw = 80, text = '',
 		range = {0, 10},
 		value = Cataclysm_Main.nMaxShowBuff,
-		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		onchange = function(nVal)
 			Cataclysm_Main.nMaxShowBuff = nVal
 			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
@@ -2723,7 +2723,7 @@ function PS.OnPanelActive(frame)
 	x = x + ui:append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Enable default data'], tip = _L['Default data TIP'],
-		tippostype = MY.Const.UI.Tip.POS_BOTTOM,
+		tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
 		checked = Cataclysm_Main.bBuffDataNangongbo,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bBuffDataNangongbo = bCheck
@@ -2737,7 +2737,7 @@ function PS.OnPanelActive(frame)
 	x = x + ui:append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Cmd data'], tip = _L['Cmd data TIP'],
-		tippostype = MY.Const.UI.Tip.POS_BOTTOM,
+		tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
 		checked = Cataclysm_Main.bBuffDataNangongboCmd,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bBuffDataNangongboCmd = bCheck
@@ -2749,7 +2749,7 @@ function PS.OnPanelActive(frame)
 	x = x + ui:append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Heal data'], tip = _L['Heal data TIP'],
-		tippostype = MY.Const.UI.Tip.POS_BOTTOM,
+		tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
 		checked = Cataclysm_Main.bBuffDataNangongboHeal,
 		oncheck = function(bCheck)
 			Cataclysm_Main.bBuffDataNangongboHeal = bCheck

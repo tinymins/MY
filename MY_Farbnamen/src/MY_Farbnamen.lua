@@ -214,7 +214,7 @@ function MY_Farbnamen.ShowTip(namelink)
 
 	local szTip = MY_Farbnamen.GetTip(szName)
 	if szTip then
-		OutputTip(szTip, 450, {x, y, w, h}, MY.Const.UI.Tip.POS_TOP)
+		OutputTip(szTip, 450, {x, y, w, h}, MY_TIP_POSTYPE.TOP_BOTTOM)
 	end
 end
 ---------------------------------------------------------------

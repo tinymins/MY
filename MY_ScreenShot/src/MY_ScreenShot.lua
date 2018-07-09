@@ -139,7 +139,7 @@ _MY_ScreenShot.OnPanelActive = function(wnd)
         szValue = szValue..((#szValue>0 and '/') or '')
         MY_ScreenShot.SetConfig('szFilePath', szValue)
       end)
-      :tip(_L['Set destination folder which screenshot file will be saved. Absolute path required.\nEx: D:/JX3_ScreenShot/\nAttention: let it blank will save screenshot to default folder.'],MY.Const.UI.Tip.POS_TOP)
+      :tip(_L['Set destination folder which screenshot file will be saved. Absolute path required.\nEx: D:/JX3_ScreenShot/\nAttention: let it blank will save screenshot to default folder.'],MY_TIP_POSTYPE.TOP_BOTTOM)
 
     ui:append('WndButton', 'WndButton_HotkeyCheck'):children('#WndButton_HotkeyCheck'):pos(w-180, 30):width(170)
       :text(_L['set default screenshot tool'])

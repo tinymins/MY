@@ -358,7 +358,7 @@ MiddleMap.OnMouseEnter = function()
 			GetFormatText(_L['Type to search, use comma to split.'], nil, 255, 255, 0),
 			w,
 			{x - 10, y, w, h},
-			MY.Const.UI.Tip.POS_TOP
+			MY_TIP_POSTYPE.TOP_BOTTOM
 		)
 	end
 	if MiddleMap._MY_MMM_OnMouseEnter then

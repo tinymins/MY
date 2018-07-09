@@ -114,7 +114,7 @@ function PS.OnPanelActive(wnd)
 		x = x + 70, y = y, w = 150,
 		textfmt = function(val) return _L('Auto logoff when keep idle for %dmin.', val) end,
 		range = {1, 1440},
-		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		value = MY_Logoff.nIdleOffTime,
 		onchange = function(val)
 			MY_Logoff.nIdleOffTime = val

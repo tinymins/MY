@@ -309,7 +309,7 @@ function ChatLinkEvents.OnCopyMouseEnter(element, link)
 	local x, y = element:GetAbsPos()
 	local w, h = element:GetSize()
 	local szText = GetFormatText(_L['LClick to copy to editbox.\nMClick to remove this line.\nRClick to repeat this line.'], 136)
-	OutputTip(szText, 450, {x, y, w, h}, MY.Const.UI.Tip.POS_TOP)
+	OutputTip(szText, 450, {x, y, w, h}, MY_TIP_POSTYPE.TOP_BOTTOM)
 end
 function ChatLinkEvents.OnCopyMouseLeave(element, link)
 	if not link then

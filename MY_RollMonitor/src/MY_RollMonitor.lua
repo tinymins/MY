@@ -388,7 +388,7 @@ function PS.OnPanelActive(wnd)
 			return t
 		end,
 		tip = _L['left click to restart, right click to open setting.'],
-		tippostype = MY.Const.UI.Tip.POS_TOP,
+		tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
 	})
 	-- ·¢²¼
 	ui:append('WndButton', {
@@ -431,7 +431,7 @@ function PS.OnPanelActive(wnd)
 			return t
 		end,
 		tip = _L['left click to publish, right click to open setting.'],
-		tippostype = MY.Const.UI.Tip.POS_TOP,
+		tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
 		tipoffset = { x = -80 },
 	})
 	-- Êä³ö°å

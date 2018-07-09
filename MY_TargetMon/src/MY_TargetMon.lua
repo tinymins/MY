@@ -605,7 +605,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 		x = x + 110, y = y, w = 200,
 		text = _L['Hide others buff'],
 		tip = _L['Hide others buff TIP'],
-		tippostype = MY.Const.UI.Tip.POS_TOP,
+		tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
 		checked = config.hideOthers,
 		oncheck = function(bChecked)
 			config.hideOthers = bChecked
@@ -715,7 +715,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 
 	ui:append('WndSliderBox', {
 		x = w - 250, y = y,
-		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		range = {1, 32},
 		value = config.maxLineCount,
 		textfmt = function(val) return _L('Display %d eachline.', val) end,
@@ -762,7 +762,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 
 	ui:append('WndSliderBox', {
 		x = w - 250, y = y,
-		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		range = {1, 300},
 		value = config.scale * 100,
 		textfmt = function(val) return _L('Scale %d%%.', val) end,
@@ -809,7 +809,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 
 	ui:append('WndSliderBox', {
 		x = w - 250, y = y,
-		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		range = {50, 1000},
 		value = config.cdBarWidth,
 		textfmt = function(val) return _L('CD width %dpx.', val) end,
@@ -889,7 +889,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 
 	ui:append('WndSliderBox', {
 		x = w - 250, y = y,
-		sliderstyle = MY.Const.UI.Slider.SHOW_VALUE,
+		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		range = {-1, 30},
 		value = config.decimalTime,
 		textfmt = function(val)
@@ -1588,7 +1588,7 @@ function PS.OnPanelActive(wnd)
 		w = 80, h = 30,
 		text = _L['Reset Default'],
 		tip = _L['Hold ctrl to reset original default.'],
-		tippostype = MY.Const.UI.Tip.POS_TOP,
+		tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
 		onclick = function()
 			local ctrl = IsCtrlKeyDown()
 			MY.Confirm(_L[ctrl and 'Sure to reset original default?' or 'Sure to reset default?'], function()

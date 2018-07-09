@@ -302,7 +302,7 @@ local function HookDialoguePanel()
 			name = 'WndButton_AutoChat',
 			x = 53, y = 4, w = 80, text = _L['autochat'],
 			tip = _L['Left click to config autochat.\nRight click to edit global config.'],
-			tippostype = MY.Const.UI.Tip.POS_TOP,
+			tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
 			lmenu = GetDialoguePanelMenu,
 			rmenu = GetSettingMenu,
 		})
