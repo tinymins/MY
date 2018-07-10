@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 10:36:40
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-10 02:39:33
+-- @Last Modified time: 2018-07-10 17:48:52
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -339,7 +339,7 @@ function PS.OnPanelActive(wnd)
 	-- ”“∞Î±ﬂ
 	X, Y = 350, 65
 	x, y = X, Y
-	offsety = 35
+	offsety = 32
 	local function FillColorTable(opt, relation, tartype)
 		local cfg = Config.Color[relation]
 		opt.rgb = cfg[tartype]
@@ -632,16 +632,17 @@ function PS.OnPanelActive(wnd)
 	x = X
 	y = y + offsety - 10
 
-	-- ui:append('WndCheckBox', {
-	-- 	x = x, y = y, text = _L['adjust index'],
-	-- 	checked = Config.bAdjustIndex,
-	-- 	oncheck = function(bChecked)
-	-- 		Config.bAdjustIndex = bChecked
-	-- 		D.Reset()
-	-- 	end,
-	-- 	autoenable = function() return D.IsEnabled() end,
-	-- })
-	-- y = y + offsety - 10
+	ui:append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
+		text = _L['Sort by screen pos'],
+		checked = Config.bScreenPosSort,
+		oncheck = function(bChecked)
+			Config.bScreenPosSort = bChecked
+			D.Reset()
+		end,
+		autoenable = function() return D.IsEnabled() end,
+	})
+	y = y + offsety - 10
 
 	ui:append('WndCheckBox', {
 		x = x, y = y, w = 'auto',

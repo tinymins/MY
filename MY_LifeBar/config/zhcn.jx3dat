@@ -38,7 +38,7 @@ data = {
 	bHideLifePercentageWhenFight = false,
 	bHideLifePercentageDecimal = false,
 
-	bAdjustIndex = false,
+	bScreenPosSort = true,
 
 	Color = {
 		Self = { -- ×Ô¼º

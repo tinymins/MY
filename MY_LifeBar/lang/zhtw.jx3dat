@@ -37,7 +37,7 @@ data = {
     ['only enemy'] = '僅敵對',
     ['show unnamed object id'] = '無名目標顯示ID',
     ['show all object id'] = '所有目標顯示ID',
-    ['adjust index'] = '自適應遮擋順序',
+    ['Sort by screen pos'] = '根據位置調整遮擋順序',
 
     ['Max Distance: %s foot.'] = '最大顯示距離：%s尺。',
     ['Max Distance: Unlimited.'] = '最大顯示距離：不限制。',

@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-10 17:13:23
+-- @Last Modified time: 2018-07-10 17:44:14
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -57,11 +57,14 @@ local SYS_HEAD_TOP_STATE
 local LB = MY_LifeBar_LB
 local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子
 local PARTY_MARK, OVERWRITE_MARK = {}, {}
+local OBJECT_SCREEN_POS_Y_CACHE = {}
 do
 local function onPartySetMark()
+	OVERWRITE_MARK = {}
 	PARTY_MARK = GetClientTeam().GetTeamMark() or {}
 end
-MY.RegisterEvent('PARTY_SET_MARK', onPartySetMark)
+MY.RegisterInit('PARTY_SET_MARK.MY_LifeBar', onPartySetMark)
+MY.RegisterEvent('PARTY_SET_MARK.MY_LifeBar', onPartySetMark)
 end
 
 MY_LifeBar = {}
@@ -240,35 +243,27 @@ function D.Reset()
 		end
 	end
 	OVERWRITE_MARK = {}
-	-- -- auto adjust index
-	-- if MY_LifeBar.bEnabled and Config.bAdjustIndex then
-	-- 	MY.BreatheCall('MY_LifeBar_AdjustIndex', function()
-	-- 		local n = 0
-	-- 		local t = {}
-	-- 		-- refresh current index data
-	-- 		for dwID, lb in pairs(LB_CACHE) do
-	-- 			n = n + 1
-	-- 			if n > 200 then
-	-- 				break
-	-- 			end
-	-- 			PostThreadCall(function(info, xScreen, yScreen)
-	-- 				info.nIndex = yScreen or 0
-	-- 			end, lb.info, 'Scene_GetCharacterTopScreenPos', dwID)
-
-	-- 			insert(t, { handle = lb.info.handle, index = lb.info.nIndex })
-	-- 		end
-	-- 		-- sort
-	-- 		table.sort(t, function(a, b) return a.index < b.index end)
-	-- 		-- adjust
-	-- 		for i = #t, 1, -1 do
-	-- 			if t[i].handle and t[i].handle:GetIndex() ~= i - 1 then
-	-- 				t[i].handle:ExchangeIndex(i - 1)
-	-- 			end
-	-- 		end
-	-- 	end, 500)
-	-- else
-	-- 	MY.BreatheCall('MY_LifeBar_AdjustIndex', false)
-	-- end
+	-- 自适应遮挡顺序
+	if MY_LifeBar.bEnabled and Config.bScreenPosSort then
+		local dwID, dwLastID, nCount
+		local function onGetCharacterTopScreenPos(dwID, xScreen, yScreen)
+			OBJECT_SCREEN_POS_Y_CACHE[dwID] = yScreen or 0
+		end
+		local function onBreathe()
+			nCount = 0
+			repeat
+				dwID = next(LB_CACHE, dwID)
+				if dwID then
+					PostThreadCall(onGetCharacterTopScreenPos, dwID, 'Scene_GetCharacterTopScreenPos', dwID)
+				end
+				nCount = nCount + 1
+			until nCount > 30 or dwID == dwLastID
+			dwLastID = dwID
+		end
+		MY.BreatheCall('MY_LifeBar_ScreenPosSort', onBreathe)
+	else
+		MY.BreatheCall('MY_LifeBar_ScreenPosSort', false)
+	end
 	D.AutoSwitchSysHeadTop()
 end
 MY.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED', D.Reset)
@@ -326,7 +321,10 @@ local function CheckInvalidRect(dwType, dwID, me)
 		local dwTarType, dwTarID = me.GetTarget()
 		local relation = D.GetRelation(dwID)
 		local force = D.GetForce(dwID)
-		local nPriority = dwType == TARGET.PLAYER and dwID == me.dwID and 1 or 0
+		local nPriority = OBJECT_SCREEN_POS_Y_CACHE[dwID] or 0 -- 默认根据屏幕坐标排序
+		if dwType == TARGET.PLAYER and dwID == me.dwID then -- 自身永远最前
+			nPriority = nPriority + 10000
+		end
 		local szName = MY.GetObjectName(object, (Config.bShowAllObjectID and 'always') or (Config.bShowUnnamedObjectID and 'auto') or 'never')
 		-- 常规配色
 		local r, g, b = unpack(GetConfigValue('Color', relation, force))
@@ -352,7 +350,7 @@ local function CheckInvalidRect(dwType, dwID, me)
 				if tData.tColor then
 					r, g, b = unpack(tData.tColor)
 				end
-				nPriority = nPriority + 100
+				nPriority = nPriority + 100000
 				fTextScale = fTextScale * 1.15
 				szCountDown = tData.szText .. '_' .. MY.FormatTimeCount(nSec >= 60 and 'M\'ss"' or 'ss"', min(nSec, 5999))
 				break
