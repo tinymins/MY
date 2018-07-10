@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-06-30 02:18:49
+-- @Last Modified time: 2018-07-10 17:13:23
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -56,6 +56,13 @@ local LAST_FIGHT_STATE = false
 local SYS_HEAD_TOP_STATE
 local LB = MY_LifeBar_LB
 local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子
+local PARTY_MARK, OVERWRITE_MARK = {}, {}
+do
+local function onPartySetMark()
+	PARTY_MARK = GetClientTeam().GetTeamMark() or {}
+end
+MY.RegisterEvent('PARTY_SET_MARK', onPartySetMark)
+end
 
 MY_LifeBar = {}
 MY_LifeBar.bEnabled = false
@@ -223,8 +230,16 @@ end
 MY.RegisterEvent('UI_SCALED', D.Repaint)
 
 function D.Reset()
+	-- 重置缓存
 	LB_CACHE = {}
 	LB('clear')
+	-- 恢复官方标记
+	for dwID, _ in pairs(OVERWRITE_MARK) do
+		if PARTY_MARK[dwID] then
+			SceneObject_SetTitleEffect(IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC, dwID, PARTY_TITLE_MARK_EFFECT_LIST[PARTY_MARK[dwID]])
+		end
+	end
+	OVERWRITE_MARK = {}
 	-- -- auto adjust index
 	-- if MY_LifeBar.bEnabled and Config.bAdjustIndex then
 	-- 	MY.BreatheCall('MY_LifeBar_AdjustIndex', function()
@@ -402,11 +417,22 @@ local function CheckInvalidRect(dwType, dwID, me)
 			or (dwID == dwTarID and fxTarget or nil)
 		)
 		lb:SetTextsScale(fTextScale)
+		lb:SetMark(PARTY_MARK[dwID])
 		lb:SetPriority(nPriority)
 		lb:Create():Paint()
 	elseif lb then
 		lb:Remove()
 		LB_CACHE[dwID] = nil
+	end
+	-- 屏蔽官方标记
+	if PARTY_MARK[dwID] and not OVERWRITE_MARK[dwID] and lb then
+		OVERWRITE_MARK[dwID] = true
+		SceneObject_SetTitleEffect(dwType, dwID, TITLE_EFFECT_NONE)
+	elseif OVERWRITE_MARK[dwID] and not lb then
+		if PARTY_MARK[dwID] then
+			SceneObject_SetTitleEffect(dwType, dwID, PARTY_TITLE_MARK_EFFECT_LIST[PARTY_MARK[dwID]])
+		end
+		OVERWRITE_MARK[dwID] = nil
 	end
 end
 

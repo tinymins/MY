@@ -52,12 +52,9 @@ function HP:Create()
 		hItem:AppendItemFromString('<shadow>name="hp_bg"</shadow>')
 		hItem:AppendItemFromString('<shadow>name="hp_bg2"</shadow>')
 		hItem:AppendItemFromString('<shadow>name="hp"</shadow>')
-		hItem:AppendItemFromString('<shadow>name="ot_bg"</shadow>')
-		hItem:AppendItemFromString('<shadow>name="ot_bg2"</shadow>')
-		hItem:AppendItemFromString('<shadow>name="ot"</shadow>')
 		hItem:AppendItemFromString('<shadow>name="lines"</shadow>')
 		hItem:AppendItemFromString('<shadow>name="hp_title"</shadow>')
-		hItem:AppendItemFromString('<shadow>name="ot_title"</shadow>')
+		hItem:AppendItemFromString('<image>name="mark"</image>')
 		REQUIRE_SORT = true
 		self.handle = hItem
 	end
@@ -227,6 +224,46 @@ end
 
 function HP:ClearLifeBar()
 	return self:ClearShadow('hp')
+end
+
+function HP:SetMark(nMarkID, nOffsetY)
+	if self.handle then
+		local nFrame = nMarkID and PARTY_MARK_ICON_FRAME_LIST[nMarkID]
+		local nOffsetY = nOffsetY * Station.GetUIScale()
+		local nMinW = 60 * Station.GetUIScale()
+		local image = self.handle:Lookup('mark')
+		local szKey = 'MY_LIFEBAR_HP_' .. self.dwType .. '_' .. self.dwID
+		local dwCtcType = self.dwType == TARGET.DOODAD and CTCT.DOODAD_POS_2_SCREEN_POS or CTCT.CHARACTER_TOP_2_SCREEN_POS
+		if nFrame then
+			image:FromUITex(PARTY_MARK_ICON_PATH, nFrame)
+			image:SetSize(0, 0)
+			image:AutoSize()
+			image:Show()
+			MY.RenderCall(szKey, function()
+				if image and image:IsValid() then
+					local nW, nH = image:GetSize()
+					if nW > 0 and nW < nMinW then
+						nH = nH / nW * nMinW
+						nW = nMinW
+						image:SetSize(nW, nH)
+					end
+					local nX, nY, bFront = MY.CThreadCoor(dwCtcType, self.dwID)
+					nX, nY = Station.AdjustToOriginalPos(nX, nY)
+					nX, nY = nX - nW / 2, nY - nH
+					image:SetAbsPos(nX, nY - nOffsetY)
+				else
+					MY.CThreadCoor(dwCtcType, self.dwID, szKey, false)
+					MY.RenderCall(szKey, false)
+				end
+			end)
+			MY.CThreadCoor(dwCtcType, self.dwID, szKey, true)
+		else
+			image:Hide()
+			MY.RenderCall(szKey, false)
+			MY.CThreadCoor(dwCtcType, self.dwID, szKey, false)
+		end
+	end
+	return self
 end
 
 function MY_LifeBar_HP(dwType, dwID)

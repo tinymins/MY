@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 12:50:01
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-06-30 02:41:41
+-- @Last Modified time: 2018-07-10 17:14:59
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -59,6 +59,7 @@ local function InitConfigData(self)
 	self.texts_scale = 1
 	self.texts_spacing = 1
 	self.texts_invalid = true
+	self.texts_lines = 0
 	-- 血量部分
 	self.life = 1
 	self.max_life = 1
@@ -82,6 +83,9 @@ local function InitConfigData(self)
 	self.life_bar_border_g = 0
 	self.life_bar_border_b = 0
 	self.life_bar_border_invalid = true
+	-- 标记
+	self.mark = nil
+	self.mark_invalid = true
 end
 
 -- 构造函数
@@ -125,6 +129,7 @@ function LB:Paint(force)
 		self:DrawLifeBorder(force)
 		self:DrawLife(force)
 		self:DrawTexts(force)
+		self:ApplyMark()
 		self:ApplyPriority()
 	end
 	return self
@@ -140,6 +145,22 @@ function LB:SetColor(r, g, b, a)
 		self:SetInvalid('life_bar')
 		self:SetInvalid('life_text')
 		self:SetInvalid('texts', true)
+	end
+	return self
+end
+
+function LB:SetMark(mark)
+	if self.mark ~= mark then
+		self.mark = mark
+		self:SetInvalid('mark', true)
+	end
+	return self
+end
+
+function LB:ApplyMark()
+	if self.mark_invalid then
+		self.hp:SetMark(self.mark, self.texts_y + self.texts_height * self.texts_lines)
+		self.mark_invalid = false
 	end
 	return self
 end
@@ -183,6 +204,7 @@ function LB:SetTextsPos(y, height)
 	if self.texts_y ~= y or self.texts_height ~= height then
 		self.texts_y = y
 		self.texts_height = height
+		self:SetInvalid('mark', true)
 		self:SetInvalid('texts', true)
 	end
 	return self
@@ -340,6 +362,12 @@ function LB:DrawTexts(force)
 			insert(aTexts, self.cd_text)
 		end
 		self.hp:DrawTexts(aTexts, self.texts_y, self.texts_height, r, g, b, a, f, self.texts_spacing, self.texts_scale)
+		-- 刷新与文本行数有关的东西
+		local texts_lines = #aTexts
+		if self.texts_lines ~= texts_lines then
+			self.texts_lines = texts_lines
+			self:SetInvalid('mark', true)
+		end
 		self.texts_invalid = false
 	end
 	return self
