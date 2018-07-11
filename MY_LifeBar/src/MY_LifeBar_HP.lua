@@ -176,8 +176,8 @@ end
 -- rgbap: 红,绿,蓝,透明度,进度,绘制方向
 function HP:DrawRect(szShadowName, nWidth, nHeight, nOffsetX, nOffsetY, nPadding, r, g, b, a, p, d)
 	if self.handle then
-		nWidth = nWidth * Station.GetUIScale() - nPadding * 2
-		nHeight = nHeight * Station.GetUIScale() - nPadding * 2
+		nWidth = max(0, nWidth * Station.GetUIScale() - nPadding * 2)
+		nHeight = max(0, nHeight * Station.GetUIScale() - nPadding * 2)
 		nOffsetX = nOffsetX * Station.GetUIScale()
 		nOffsetY = nOffsetY * Station.GetUIScale()
 		if not p or p > 1 then
