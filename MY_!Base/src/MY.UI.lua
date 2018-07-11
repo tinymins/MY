@@ -1181,6 +1181,7 @@ function XGUI:enable(...)
 						return 0
 					end
 				end)
+				SetComponentEnable(raw, bEnable())
 			else
 				SetComponentEnable(raw, bEnable)
 			end
