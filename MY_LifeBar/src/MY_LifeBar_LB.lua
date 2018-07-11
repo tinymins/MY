@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 12:50:01
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-11 14:41:17
+-- @Last Modified time: 2018-07-11 15:26:35
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -212,6 +212,7 @@ function LB:SetTextsScale(scale)
 	if self.texts_scale ~= scale then
 		self.texts_scale = scale
 		self:SetInvalid('texts', true)
+		self:SetInvalid('life_text', true)
 	end
 	return self
 end
