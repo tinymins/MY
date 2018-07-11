@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 10:36:40
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-11 15:17:54
+-- @Last Modified time: 2018-07-11 15:31:05
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -343,7 +343,7 @@ function PS.OnPanelActive(wnd)
 	-- ”“∞Î±ﬂ
 	X, Y = 350, 65
 	x, y = X, Y
-	offsety = 31
+	offsety = 32
 	local function FillColorTable(opt, relation, tartype)
 		local cfg = Config.Color[relation]
 		opt.rgb = cfg[tartype]
