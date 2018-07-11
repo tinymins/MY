@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-11 12:30:53
+-- @Last Modified time: 2018-07-11 14:31:52
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -403,7 +403,8 @@ local function CheckInvalidRect(dwType, dwID, me)
 			lb:SetLifeText(Config.nLifePerOffsetX, Config.nLifePerOffsetY, Config.bHideLifePercentageDecimal and '%.0f' or '%.1f')
 		end
 		lb:SetLifeTextVisible(bShowLifePercent)
-		-- 配色生效
+		-- 各种数据生效
+		lb:SetScale(Config.fUIScale == 0 and Station.GetUIScale() or Config.fUIScale)
 		lb:SetColor(r, g, b, Config.nAlpha, Config.nFont)
 		lb:SetColorFx(
 			object.nMoveState == MOVE_STATE.ON_DEATH

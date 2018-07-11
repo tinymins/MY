@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 10:36:40
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-11 12:59:15
+-- @Last Modified time: 2018-07-11 14:44:34
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -40,6 +40,7 @@ local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/lang/')
 
 local PS = {}
 local function LoadUI(ui)
+	ui:children('#WndSliderBox_UIScale'):value(Config.fUIScale)
 	ui:children('#WndSliderBox_LifeBarWidth'):value(Config.nLifeWidth)
 	ui:children('#WndSliderBox_LifeBarHeight'):value(Config.nLifeHeight)
 	ui:children('#WndSliderBox_LifeBarOffsetX'):value(Config.nLifeOffsetX)
@@ -56,10 +57,15 @@ local function LoadUI(ui)
 	ui:children('#WndSliderBox_Distance'):value(math.sqrt(Config.nDistance) / 64)
 	ui:children('#WndSliderBox_VerticalDistance'):value(Config.nVerticalDistance / 8 / 64)
 	ui:children('#WndSliderBox_Alpha'):value(Config.nAlpha)
-	ui:children('#WndCheckBox_ShowSpecialNpc'):check(Config.bShowSpecialNpc)
-	ui:children('#WndCheckBox_ShowSpecialNpcOnlyEnemy'):check(Config.bShowSpecialNpcOnlyEnemy)
+	ui:children('#WndCheckBox_IgnoreUIScale'):check(Config.bIgnoreUIScale)
 	ui:children('#WndCheckBox_ShowObjectID'):check(Config.bShowObjectID)
 	ui:children('#WndCheckBox_ShowObjectIDOnlyUnnamed'):check(Config.bShowObjectIDOnlyUnnamed)
+	ui:children('#WndCheckBox_ShowSpecialNpc'):check(Config.bShowSpecialNpc)
+	ui:children('#WndCheckBox_ShowSpecialNpcOnlyEnemy'):check(Config.bShowSpecialNpcOnlyEnemy)
+	ui:children('#WndCheckBox_ShowKungfu'):check(Config.bShowKungfu)
+	ui:children('#WndCheckBox_ShowDistance'):check(Config.bShowDistance)
+	ui:children('#WndCheckBox_ScreenPosSort'):check(Config.bScreenPosSort)
+	ui:children('#WndCheckBox_MineOnTop'):check(Config.bMineOnTop)
 end
 function PS.OnPanelActive(wnd)
 	local ui = MY.UI(wnd)
@@ -140,7 +146,8 @@ function PS.OnPanelActive(wnd)
 
 	X, Y = 15, 60
 	x, y = X, Y
-	offsety = 24
+	offsety = 23
+
 	ui:append('WndSliderBox', {
 		name = 'WndSliderBox_LifeBarWidth',
 		x = x, y = y, sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE, range = { 5, 150 },
@@ -321,10 +328,22 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + offsety
 
+	ui:append('WndSliderBox', {
+		name = 'WndSliderBox_UIScale',
+		x = x, y = y, sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE, range = { 49, 200 },
+		text = function(value) return value == 49 and _L['UI scale: Follow system.'] or _L('UI scale: %.1f.', value / 100) end, -- ×ÖËõ·Å
+		value = Config.fUIScale * 100,
+		onchange = function(value)
+			Config.fUIScale = value == 49 and 0 or (value / 100)
+		end,
+		autoenable = function() return D.IsEnabled() end,
+	})
+	y = y + offsety
+
 	-- ÓÒ°ë±ß
 	X, Y = 350, 65
 	x, y = X, Y
-	offsety = 32
+	offsety = 30
 	local function FillColorTable(opt, relation, tartype)
 		local cfg = Config.Color[relation]
 		opt.rgb = cfg[tartype]
@@ -608,6 +627,7 @@ function PS.OnPanelActive(wnd)
 	x = X
 	y = y + offsety - 10
 	ui:append('WndCheckBox', {
+		name = 'WndCheckBox_ShowKungfu',
 		x = x, y = y, w = 'auto',
 		text = _L['show kungfu'],
 		checked = Config.bShowKungfu,
@@ -618,6 +638,7 @@ function PS.OnPanelActive(wnd)
 	})
 
 	ui:append('WndCheckBox', {
+		name = 'WndCheckBox_ShowDistance',
 		x = x + 90, y = y, w = 'auto',
 		text = _L['show distance'],
 		checked = Config.bShowDistance,
@@ -629,6 +650,7 @@ function PS.OnPanelActive(wnd)
 
 	y = y + offsety - 10
 	ui:append('WndCheckBox', {
+		name = 'WndCheckBox_ScreenPosSort',
 		x = x, y = y, w = 'auto',
 		text = _L['Sort by screen pos'],
 		checked = Config.bScreenPosSort,
@@ -640,6 +662,7 @@ function PS.OnPanelActive(wnd)
 
 	y = y + offsety - 10
 	ui:append('WndCheckBox', {
+		name = 'WndCheckBox_MineOnTop',
 		x = x, y = y, w = 'auto',
 		text = _L['Self always on top'],
 		checked = Config.bMineOnTop,

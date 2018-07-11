@@ -92,15 +92,13 @@ end
 -- 绘制名字/帮会/称号 等等 行文字
 function HP:DrawTexts(aTexts, nY, nLineHeight, r, g, b, a, f, spacing, scale)
 	if self.handle then
-		nY = nY * Station.GetUIScale()
-		nLineHeight = nLineHeight * Station.GetUIScale()
 		local sha = self.handle:Lookup('lines')
 		sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
 		sha:ClearTriangleFanPoint()
 
 		for _, szText in ipairs(aTexts) do
 			if szText ~= '' then
-				sha:AppendCharacterID(self.dwID, true, r, g, b, a, {0, 0, 0, 0, -nY}, f, szText, spacing, scale)
+				sha:AppendCharacterID(self.dwID, true, r, g, b, a, {0, 0, 0, 0, -nY}, f, szText, spacing, scale / Station.GetUIScale())
 				nY =  nY + nLineHeight
 			end
 		end
@@ -111,12 +109,10 @@ end
 -- 绘制血量百分比文字（减少重绘次数所以和Wordlines分离）
 function HP:DrawLifeText(text, x, y, r, g, b, a, f, spacing, scale)
 	if self.handle then
-		x = x * Station.GetUIScale()
-		y = y * Station.GetUIScale()
 		local sha = self.handle:Lookup('hp_title')
 		sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
 		sha:ClearTriangleFanPoint()
-		sha:AppendCharacterID(self.dwID, true, r, g, b, a, {0, 0, 0, x, -y}, f, text, spacing, scale)
+		sha:AppendCharacterID(self.dwID, true, r, g, b, a, {0, 0, 0, x, -y}, f, text, spacing, scale / Station.GetUIScale())
 	end
 	return self
 end
@@ -129,10 +125,6 @@ end
 function HP:DrawBorder(szShadowName, szShadowName2, nWidth, nHeight, nOffsetX, nOffsetY, nBorder, nR, nG, nB, nAlpha)
 	if self.handle then
 		nAlpha = nAlpha or 200
-		nWidth = nWidth * Station.GetUIScale()
-		nHeight = nHeight * Station.GetUIScale()
-		nOffsetX = nOffsetX * Station.GetUIScale()
-		nOffsetY = nOffsetY * Station.GetUIScale()
 		local handle = self.handle
 
 		-- 绘制外边框
@@ -176,10 +168,8 @@ end
 -- rgbap: 红,绿,蓝,透明度,进度,绘制方向
 function HP:DrawRect(szShadowName, nWidth, nHeight, nOffsetX, nOffsetY, nPadding, r, g, b, a, p, d)
 	if self.handle then
-		nWidth = max(0, nWidth * Station.GetUIScale() - nPadding * 2)
-		nHeight = max(0, nHeight * Station.GetUIScale() - nPadding * 2)
-		nOffsetX = nOffsetX * Station.GetUIScale()
-		nOffsetY = nOffsetY * Station.GetUIScale()
+		nWidth = max(0, nWidth - nPadding * 2)
+		nHeight = max(0, nHeight - nPadding * 2)
 		if not p or p > 1 then
 			p = 1
 		elseif p < 0 then
@@ -226,12 +216,10 @@ function HP:ClearLifeBar()
 	return self:ClearShadow('hp')
 end
 
-function HP:SetMark(nMarkID, nOffsetY)
+function HP:SetMark(nMarkID, nWidth, nOffsetY)
 	if self.handle then
-		local nFrame = nMarkID and PARTY_MARK_ICON_FRAME_LIST[nMarkID]
-		local nOffsetY = nOffsetY * Station.GetUIScale()
-		local nMinW = 60 * Station.GetUIScale()
 		local image = self.handle:Lookup('mark')
+		local nFrame = nMarkID and PARTY_MARK_ICON_FRAME_LIST[nMarkID]
 		local szKey = 'MY_LIFEBAR_HP_' .. self.dwType .. '_' .. self.dwID
 		local dwCtcType = self.dwType == TARGET.DOODAD and CTCT.DOODAD_POS_2_SCREEN_POS or CTCT.CHARACTER_TOP_2_SCREEN_POS
 		if nFrame then
@@ -242,9 +230,9 @@ function HP:SetMark(nMarkID, nOffsetY)
 			MY.RenderCall(szKey, function()
 				if image and image:IsValid() then
 					local nW, nH = image:GetSize()
-					if nW > 0 and nW < nMinW then
-						nH = nH / nW * nMinW
-						nW = nMinW
+					if nW > 0 and nW ~= nWidth then
+						nH = nH / nW * nWidth
+						nW = nWidth
 						image:SetSize(nW, nH)
 					end
 					local nX, nY, bFront = MY.CThreadCoor(dwCtcType, self.dwID)

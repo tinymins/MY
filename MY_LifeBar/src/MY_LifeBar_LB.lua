@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 12:50:01
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-11 11:59:25
+-- @Last Modified time: 2018-07-11 14:41:17
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -38,6 +38,7 @@ local function InitConfigData(self)
 	self.a = 0
 	self.cfx = nil
 	self.font = 10
+	self.scale = 1
 	self.priority = 0
 	self.priority_invalid = false
 	-- 倒计时/名字/帮会/称号部分
@@ -101,6 +102,7 @@ end
 function LB:Create()
 	if not self.hp.handle then
 		self.hp:Create()
+		self:SetInvalid('mark', true)
 		self:SetInvalid('texts', true)
 		self:SetInvalid('priority', true)
 		self:SetInvalid('life_text', true)
@@ -149,18 +151,24 @@ function LB:SetColor(r, g, b, a)
 	return self
 end
 
-function LB:SetMark(mark)
-	if self.mark ~= mark then
-		self.mark = mark
-		self:SetInvalid('mark', true)
+function LB:SetColorFx(cfx)
+	if self.cfx ~= cfx then
+		self.cfx = cfx
+		self:SetInvalid('life_bar')
+		self:SetInvalid('life_text')
+		self:SetInvalid('texts', true)
 	end
 	return self
 end
 
-function LB:ApplyMark()
-	if self.mark_invalid then
-		self.hp:SetMark(self.mark, self.texts_y + self.texts_height * self.texts_lines)
-		self.mark_invalid = false
+function LB:SetScale(scale)
+	if self.scale ~= scale then
+		self.scale = scale
+		self:SetInvalid('mark', true)
+		self:SetInvalid('texts', true)
+		self:SetInvalid('life_text', true)
+		self:SetInvalid('life_bar', true)
+		self:SetInvalid('life_bar_border', true)
 	end
 	return self
 end
@@ -177,16 +185,6 @@ function LB:ApplyPriority()
 	if self.priority_invalid then
 		self.hp:SetPriority(self.priority)
 		self.priority_invalid = false
-	end
-	return self
-end
-
-function LB:SetColorFx(cfx)
-	if self.cfx ~= cfx then
-		self.cfx = cfx
-		self:SetInvalid('life_bar')
-		self:SetInvalid('life_text')
-		self:SetInvalid('texts', true)
 	end
 	return self
 end
@@ -361,7 +359,7 @@ function LB:DrawTexts(force)
 		if self.cd_visible and self.cd_text ~= '' then
 			insert(aTexts, self.cd_text)
 		end
-		self.hp:DrawTexts(aTexts, self.texts_y, self.texts_height, r, g, b, a, f, self.texts_spacing, self.texts_scale)
+		self.hp:DrawTexts(aTexts, self.texts_y * self.scale, self.texts_height * self.scale, r, g, b, a, f, self.texts_spacing, self.texts_scale * self.scale)
 		-- 刷新与文本行数有关的东西
 		local texts_lines = #aTexts
 		if self.texts_lines ~= texts_lines then
@@ -439,7 +437,12 @@ end
 function LB:DrawLifeBorder(force)
 	if self.life_bar_border_invalid or force then
 		if self.life_bar_visible then
-			self.hp:DrawLifeBorder(self.life_bar_w, self.life_bar_h, self.life_bar_x, self.life_bar_y, self.life_bar_border, self.life_bar_border_r, self.life_bar_border_g, self.life_bar_border_b, self.a)
+			self.hp:DrawLifeBorder(
+				self.life_bar_w * self.scale, self.life_bar_h * self.scale,
+				self.life_bar_x * self.scale, self.life_bar_y * self.scale,
+				self.life_bar_border,
+				self.life_bar_border_r, self.life_bar_border_g, self.life_bar_border_b, self.a
+			)
 		else
 			self.hp:ClearLifeBorder()
 		end
@@ -456,7 +459,12 @@ function LB:DrawLife(force)
 		end
 		if self.life_bar_invalid or force then
 			if self.life_bar_visible then
-				self.hp:DrawLifeBar(self.life_bar_w, self.life_bar_h, self.life_bar_x, self.life_bar_y, self.life_bar_padding, r, g, b, a, self.life / self.max_life, self.life_bar_direction)
+				self.hp:DrawLifeBar(
+					self.life_bar_w * self.scale, self.life_bar_h * self.scale,
+					self.life_bar_x * self.scale, self.life_bar_y * self.scale,
+					self.life_bar_padding, r, g, b, a,
+					self.life / self.max_life, self.life_bar_direction
+				)
 			else
 				self.hp:ClearLifeBar()
 			end
@@ -464,12 +472,33 @@ function LB:DrawLife(force)
 		end
 		if self.life_text_invalid or force then
 			if self.life_text_visible then
-				self.hp:DrawLifeText(self.life_text_fmt:format(100 * self.life / self.max_life), self.life_text_x, self.life_text_y, r, g, b, a, f, self.texts_spacing, self.texts_scale)
+				self.hp:DrawLifeText(
+					self.life_text_fmt:format(100 * self.life / self.max_life),
+					self.life_text_x * self.scale, self.life_text_y * self.scale,
+					r, g, b, a, f,
+					self.texts_spacing, self.texts_scale * self.scale
+				)
 			else
 				self.hp:ClearLifeText()
 			end
 			self.life_text_invalid = false
 		end
+	end
+	return self
+end
+
+function LB:SetMark(mark)
+	if self.mark ~= mark then
+		self.mark = mark
+		self:SetInvalid('mark', true)
+	end
+	return self
+end
+
+function LB:ApplyMark()
+	if self.mark_invalid then
+		self.hp:SetMark(self.mark, 60 * self.scale, (self.texts_y + self.texts_height * self.texts_lines) * self.scale)
+		self.mark_invalid = false
 	end
 	return self
 end

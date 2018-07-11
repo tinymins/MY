@@ -40,6 +40,8 @@ data = {
     ['Sort by screen pos'] = '根據位置調整遮擋順序',
     ['Self always on top'] = '總是置頂顯示我的頭頂',
 
+    ['UI scale: %.1f.'] = '界面縮放：%.1f。',
+    ['UI scale: Follow system.'] = '界面縮放：跟隨系統。',
     ['Max Distance: %s foot.'] = '最大顯示距離：%s尺。',
     ['Max Distance: Unlimited.'] = '最大顯示距離：不限制。',
     ['Max Vertical Distance: %s foot.'] = '最大高度差：%s尺。',

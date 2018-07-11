@@ -38,6 +38,8 @@ data = {
 	bHideLifePercentageWhenFight = false,
 	bHideLifePercentageDecimal = false,
 
+	fUIScale = 0,
+	bMineOnTop = true,
 	bScreenPosSort = true,
 
 	Color = {
