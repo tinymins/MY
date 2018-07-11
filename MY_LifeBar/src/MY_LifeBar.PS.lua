@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 10:36:40
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-11 14:44:34
+-- @Last Modified time: 2018-07-11 15:17:54
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -343,13 +343,18 @@ function PS.OnPanelActive(wnd)
 	-- ”“∞Î±ﬂ
 	X, Y = 350, 65
 	x, y = X, Y
-	offsety = 30
+	offsety = 31
 	local function FillColorTable(opt, relation, tartype)
 		local cfg = Config.Color[relation]
 		opt.rgb = cfg[tartype]
-		opt.bColorTable = true
-		opt.fnChangeColor = function(_, r, g, b)
-			cfg[tartype] = { r, g, b }
+		opt.szIcon = 'ui/Image/button/CommonButton_1.UITex'
+		opt.nFrame = 69
+		opt.nMouseOverFrame = 70
+		opt.szLayer = 'ICON_RIGHT'
+		opt.fnClickIcon = function()
+			XGUI.OpenColorPicker(function(r, g, b)
+				cfg[tartype] = { r, g, b }
+			end)
 		end
 		if tartype == 'Player' then
 			table.insert(opt, {
