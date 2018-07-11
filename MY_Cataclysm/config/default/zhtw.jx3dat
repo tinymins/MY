@@ -1,7 +1,6 @@
 data = {
 	nCss                   = 1, -- INI樣式 1 系統樣式 2 Cataclysm樣式
 	bDrag                  = true,
-	bRaidEnable            = false,
 	bShowInRaid            = false,
 	bEditMode              = false,
 	bShowAllGrid           = false,

@@ -55,9 +55,11 @@ local DEBUG = false
 
 MY_Cataclysm = {}
 MY_Cataclysm.bDebug = false
+MY_Cataclysm.bEnable = true
 MY_Cataclysm.szConfigName = 'common'
 MY_Cataclysm.STYLE = CTM_STYLE
 MY_Cataclysm.BG_COLOR_MODE = CTM_BG_COLOR_MODE
+RegisterCustomData('MY_Cataclysm.bEnable')
 RegisterCustomData('MY_Cataclysm.szConfigName')
 
 local UpdateBuffListCache
@@ -461,7 +463,7 @@ end
 
 local function CheckCataclysmEnable(szEvent)
 	local me = GetClientPlayer()
-	if not Cataclysm_Main.bRaidEnable then
+	if not MY_Cataclysm.bEnable then
 		CloseCataclysmPanel()
 		return false
 	end
@@ -1050,7 +1052,7 @@ local function CheckEnableTeamPanel()
 	if CheckCataclysmEnable() then
 		ReloadCataclysmPanel()
 	end
-	if not Cataclysm_Main.bRaidEnable then
+	if not MY_Cataclysm.bEnable then
 		local me = GetClientPlayer()
 		if me.IsInRaid() then
 			FireUIEvent('CTM_PANEL_RAID', true)
@@ -1061,7 +1063,7 @@ local function CheckEnableTeamPanel()
 end
 
 local function ToggleTeamPanel()
-	Cataclysm_Main.bRaidEnable = not Cataclysm_Main.bRaidEnable
+	MY_Cataclysm.bEnable = not MY_Cataclysm.bEnable
 	CheckEnableTeamPanel()
 end
 
@@ -1129,7 +1131,7 @@ function PS.OnPanelActive(frame)
 	x = x + 10
 	x = x + ui:append('WndCheckBox', {
 		x = x, y = y, text = _L['Enable Cataclysm Team Panel'],
-		oncheck = ToggleTeamPanel, checked = Cataclysm_Main.bRaidEnable,
+		oncheck = ToggleTeamPanel, checked = MY_Cataclysm.bEnable,
 	}, true):autoWidth():width() + 5
 
 	x = x + ui:append('WndCheckBox', {
@@ -2819,5 +2821,5 @@ MY.RegisterInit('MY_Cataclysm', function() SetConfigureName() end)
 
 
 MY.RegisterAddonMenu(function()
-	return { szOption = _L['Cataclysm Team Panel'], bCheck = true, bChecked = Cataclysm_Main.bRaidEnable, fnAction = ToggleTeamPanel }
+	return { szOption = _L['Cataclysm Team Panel'], bCheck = true, bChecked = MY_Cataclysm.bEnable, fnAction = ToggleTeamPanel }
 end)
