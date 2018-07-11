@@ -4011,34 +4011,32 @@ end
 
 -- 打开字体选择
 function XGUI.OpenFontPicker(callback, t)
-	local w, h = 820, 700
-	local ui = XGUI.CreateFrame('_MY_Color_Picker', { simple = true, close = true, esc = true })
-	  :size(w, h):text(_L['color picker']):anchor({s='CENTER', r='CENTER', x=0, y=0})
-
-	for i = 0, 255 do
+	local ui, i = XGUI.CreateFrame('MY_Font_Picker', { simple = true, close = true, esc = true, text = _L['Font picker'] }), 0
+	while 1 do
+		local font = i
 		local txt = ui:append('Text', {
-			name = 'Text_'..i,
-			w = 70, x = i % 10 * 80 + 20, y = math.floor(i / 10) * 25,
-			font = i, alpha = 200, text = _L('Font %d', i)
-		}):children('#Text_'..i)
-		  :click(function()
-		  	if callback then callback(i) end
-			if not IsCtrlKeyDown() then
-		  		ui:remove()
-			end
-		  end)
-		  :hover(function()
-		  	XGUI(this):alpha(255)
-		  end,function()
-		  	XGUI(this):alpha(200)
-		  end)
+			w = 70, x = i % 10 * 80 + 20, y = floor(i / 10) * 25,
+			font = font, alpha = 200, text = _L('Font %d', font),
+			onclick = function()
+				if callback then
+					callback(font)
+				end
+				if not IsCtrlKeyDown() then
+					ui:remove()
+				end
+			end,
+			onhover = function(bIn)
+				XGUI(this):alpha(bIn and 255 or 200)
+			end,
+		}, true)
 		-- remove unexist font
-		if txt:font() ~= i then
+		if txt:font() ~= font then
 			txt:remove()
+			break
 		end
+		i = i + 1
 	end
-	Station.SetFocusWindow(ui[1])
-	return ui
+	return ui:size(820, 70 + floor(i / 10) * 25):anchor({ s = 'CENTER', r = 'CENTER', x = 0, y = 0 }):focus()
 end
 
 do local ICON_PAGE, MAX_ICON
