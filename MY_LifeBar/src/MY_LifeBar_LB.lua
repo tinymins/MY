@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 12:50:01
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-10 17:14:59
+-- @Last Modified time: 2018-07-11 11:59:25
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -401,6 +401,7 @@ function LB:SetLifeBar(x, y, w, h, padding)
 		self.life_bar_h = h
 		self.life_bar_padding = padding
 		self:SetInvalid('life_bar', true)
+		self:SetInvalid('life_bar_border', true)
 	end
 	return self
 end
