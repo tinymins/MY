@@ -21,6 +21,7 @@ data = {
     {dwID=12601},--眩晕---狼牙堡·战兽山
     {dwID=12423},--骨刺---狼牙堡·战兽山
     {dwID=12395,szStackOp=">=",nStackNum=2},--骨髓血毒---狼牙堡·战兽山
+    {dwID=12249},--荆棘毒刺---狼牙堡·战兽山
     {dwID=12253,col="#FFFF00FF",szReminder="擒",nPriority=6},--被擒---狼牙堡·战兽山
     {dwID=12142},--地陷吸收---狼牙堡·燕然峰
     {dwID=12132},--蚀体---狼牙堡·燕然峰
@@ -30,7 +31,7 @@ data = {
     {dwID=10657},--刺骨---上阳宫·观风殿
     {dwID=10557,col="#FF3232FF",szReminder="妒",nPriority=6},--妒夫人---上阳宫·观风殿
     {dwID=10570,col="#FF00FFFF",szReminder="命",nPriority=6},--命闇---上阳宫·观风殿
-    {dwID=10631,col="#FF3232FF",szReminder="破",nPriority=2,bScreenHead=true},--破甲---上阳宫·观风殿
+    {dwID=10631,col="#FF3232FF",szReminder="破",nPriority=2,bScreenHead=true,colScreenHead="#FF3232"},--破甲---上阳宫·观风殿
     {dwID=10632},--封脉---上阳宫·观风殿
     {dwID=10638},--索敌---上阳宫·观风殿
     {dwID=10645},--噬心---上阳宫·观风殿
@@ -40,7 +41,7 @@ data = {
     {dwID=10585,col="#FF00FFFF",szReminder="花",nPriority=6,szStackOp=">=",nStackNum=1},--花毒---上阳宫·双曜亭
     {dwID=10584,col="#8055FFFF",szReminder="蛛",nPriority=6,szStackOp=">=",nStackNum=3},--蛛毒---上阳宫·双曜亭
     {dwID=11230},--裂足---上阳宫·双曜亭
-    {dwID=11215,col="#00FFFFFF",szReminder="穿",nPriority=2,bScreenHead=true},--穿体---上阳宫·双曜亭
+    {dwID=11215,col="#00FFFFFF",szReminder="穿",nPriority=2,bScreenHead=true,colScreenHead="#00FFFF"},--穿体---上阳宫·双曜亭
     {dwID=10871},--裂骨---上阳宫·双曜亭
     {dwID=10920,col="#FFFF00FF",szReminder="破",nPriority=6},--破甲---上阳宫·双曜亭
     {dwID=10870,szStackOp=">=",nStackNum=2},--暗伤---上阳宫·双曜亭
@@ -48,21 +49,21 @@ data = {
     {dwID=9371,col="#8055FFFF",szReminder="意",nPriority=6,szStackOp=">=",nStackNum=10},--青冥意---永王行宫·仙侣庭园
     {dwID=9778},--入八荒---永王行宫·仙侣庭园
     {dwID=9420},--经脉麻痹---永王行宫·仙侣庭园
-    {dwID=9213,col="#FF00FFFF",szReminder="镇",nPriority=2,bScreenHead=true},--紫金钵·镇---永王行宫·仙侣庭园
+    {dwID=9213,col="#FF00FFFF",szReminder="镇",nPriority=2,bScreenHead=true,colScreenHead="#FF00FF"},--紫金钵·镇---永王行宫·仙侣庭园
     {dwID=9635,col="#8055FFFF",szReminder="灭",nPriority=6},--紫金钵·灭---永王行宫·仙侣庭园
     {dwID=9203,col="#FF3232FF",szReminder="割",nPriority=6},--割裂---永王行宫·仙侣庭园
     {dwID=9196},--狙目---永王行宫·仙侣庭园
     {dwID=10238},--血肉撕裂---永王行宫·仙侣庭园
     {dwID=9122},--盾击---永王行宫·仙侣庭园
-    {dwID=9239,col="#FF00FFFF",szReminder="破",nPriority=2,bScreenHead=true},--破敌---永王行宫·仙侣庭园
+    {dwID=9239,col="#FF00FFFF",szReminder="破",nPriority=2,bScreenHead=true,colScreenHead="#FF00FF"},--破敌---永王行宫·仙侣庭园
     {dwID=9429},--锁定---永王行宫·仙侣庭园
     {dwID=9189,col="#FFFF00FF",szReminder="绝",nPriority=6,szStackOp=">=",nStackNum=4},--绝脉劲---永王行宫·仙侣庭园
     {dwID=9661},--落英锁定---永王行宫·花月别院
     {dwID=9664},--幻魔附体---永王行宫·花月别院
     {dwID=8885},--错筋---永王行宫·花月别院
-    {dwID=9662,col="#0050FFFF",szReminder="缠",nPriority=2,szStackOp=">=",nStackNum=5,bScreenHead=true},--音缠---永王行宫·花月别院
-    {dwID=8981,col="#FFFF00FF",szReminder="月",nPriority=2,bScreenHead=true},--月满---永王行宫·花月别院
-    {dwID=8975,col="#FF3232FF",szReminder="烈",nPriority=2,bScreenHead=true},--烈明---永王行宫·花月别院
+    {dwID=9662,col="#0050FFFF",szReminder="缠",nPriority=2,szStackOp=">=",nStackNum=5,bScreenHead=true,colScreenHead="#0050FF"},--音缠---永王行宫·花月别院
+    {dwID=8981,col="#FFFF00FF",szReminder="月",nPriority=2,bScreenHead=true,colScreenHead="#FFFF00"},--月满---永王行宫·花月别院
+    {dwID=8975,col="#FF3232FF",szReminder="烈",nPriority=2,bScreenHead=true,colScreenHead="#FF3232"},--烈明---永王行宫·花月别院
     {dwID=8896},--灼君---永王行宫·花月别院
     {dwID=1866},--碎星辰---宫中神武遗迹
     {dwID=5195},--虚弱---南诏皇宫
@@ -71,7 +72,7 @@ data = {
     {dwID=6549,col="#FF3232FF",szReminder="怒",nPriority=6},--天怒---血战天策
     {dwID=6936},--闪舞刺---血战天策
     {dwID=8346},--火燎---太原之战·夜守孤城
-    {dwID=8343,col="#FF3232FF",szReminder="瞄",nPriority=2,bScreenHead=true},--瞄准---太原之战·夜守孤城
+    {dwID=8343,col="#FF3232FF",szReminder="瞄",nPriority=2,bScreenHead=true,colScreenHead="#FF3232"},--瞄准---太原之战·夜守孤城
     {dwID=8084,col="#FF3232FF",szReminder="威",nPriority=6},--威慑---太原之战·夜守孤城
     {dwID=8028,col="#FF800000",szReminder="碎",nPriority=7,szStackOp=">=",nStackNum=2},--碎甲---太原之战·逐虎驱狼
     {dwID=8319},--回龙碎甲---太原之战·逐虎驱狼
@@ -99,13 +100,12 @@ data = {
     {dwID=12924,col="#FF3232FF",szReminder="附",nPriority=6},--心魔附体---狼牙堡·辉天堑
     {dwID=12969,col="#FF3232FF",szReminder="迟",nPriority=6,szStackOp=">=",nStackNum=4},--心迟---狼牙堡·辉天堑
     {dwID=12865,col="#0050FF00",szReminder="风",nPriority=7},--剑风---狼牙堡·辉天堑
-    {dwID=13034,nLevel=1,col="#FF00FFFF",szReminder="猎",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true},--迦楼罗猎物---狼牙堡·辉天堑
+    {dwID=13034,nLevel=1,col="#FF00FFFF",szReminder="猎",nPriority=2,bScreenHead=true,colScreenHead="#FF00FF"},--迦楼罗猎物---狼牙堡·辉天堑
     {dwID=2313},--凤凰蛊---五毒
     {dwID=377},--镇山河---纯阳
     {dwID=4439},--贪魔体---明教
     {dwID=1242,col="#00FF00FF",szReminder="舍",nPriority=6},--舍身---少林
     {dwID=10208,col="#00FF00FF",szReminder="弘",nPriority=6},--弘法---少林
-    {dwID=12488},--狮啸---少林
     {dwID=2778},--渊---天策
     {dwID=367},--守如山---天策
     {dwID=6163},--守如山---天策
@@ -147,5 +147,5 @@ data = {
     {dwID=9336,bOnlyMine=true,col="#00FF0000",szReminder="寒",nPriority=8},--寒梅---长歌
     {dwID=9337,bOnlyMine=true,col="#00FF0000",szReminder="寒",nPriority=8},--寒梅---长歌
     {dwID=9335,bOnlyMine=true,col="#FF323200",szReminder="落",nPriority=8},--落梅---长歌
---【南宫伯是帅咩】
+   --【南宫伯是帅咩】
 }

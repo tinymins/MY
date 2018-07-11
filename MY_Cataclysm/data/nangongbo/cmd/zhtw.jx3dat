@@ -27,6 +27,7 @@ data = {
     {dwID=12395,szStackOp=">=",nStackNum=2},--骨髓血毒---狼牙堡·戰獸山
     {dwID=12222,szStackOp=">=",nStackNum=4},--荊棘之地---狼牙堡·戰獸山
     {dwID=12223},--荊棘裹身---狼牙堡·戰獸山
+    {dwID=12249},--荊棘毒刺---狼牙堡·戰獸山
     {dwID=12258,szStackOp=">=",nStackNum=3},--屍毒---狼牙堡·戰獸山
     {dwID=12253,col="#FFFF00FF",szReminder="擒",nPriority=6},--被擒---狼牙堡·戰獸山
     {dwID=12261,col="#00ffffFF",szReminder="緩",nPriority=6,szStackOp=">=",nStackNum=6},--冰塞川·緩---狼牙堡·燕然峰
@@ -43,9 +44,9 @@ data = {
     {dwID=10570,col="#FF00FFFF",szReminder="命",nPriority=6},--命闇---上陽宮·觀風殿
     {dwID=10560,szStackOp=">=",nStackNum=90},--魅惑---上陽宮·觀風殿
     {dwID=10813},--神識泯滅---上陽宮·觀風殿
-    {dwID=10631,col="#FF3232FF",szReminder="破",nPriority=2,bScreenHead=true},--破甲---上陽宮·觀風殿
+    {dwID=10631,col="#FF3232FF",szReminder="破",nPriority=2,bScreenHead=true,colScreenHead="#FF3232"},--破甲---上陽宮·觀風殿
     {dwID=10632},--封脈---上陽宮·觀風殿
-    {dwID=10634,col="#8055FFFF",szReminder="笑",nPriority=2,bScreenHead=true},--笑裏藏刀---上陽宮·觀風殿
+    {dwID=10634,col="#8055FFFF",szReminder="笑",nPriority=2,bScreenHead=true,colScreenHead="#8055FF"},--笑裏藏刀---上陽宮·觀風殿
     {dwID=10645},--噬心---上陽宮·觀風殿
     {dwID=10653,col="#FFFF00FF",szReminder="挑",nPriority=6},--挑釁---上陽宮·觀風殿
     {dwID=10547,col="#FFFFFFFF",szReminder="箭",nPriority=6},--箭氣---上陽宮·觀風殿
@@ -56,7 +57,7 @@ data = {
     {dwID=10584,col="#8055FFFF",szReminder="蛛",nPriority=6,szStackOp=">=",nStackNum=3},--蛛毒---上陽宮·雙曜亭
     {dwID=11063},--格擋---上陽宮·雙曜亭
     {dwID=11230},--裂足---上陽宮·雙曜亭
-    {dwID=11215,col="#00FFFFFF",szReminder="穿",nPriority=2,bScreenHead=true},--穿體---上陽宮·雙曜亭
+    {dwID=11215,col="#00FFFFFF",szReminder="穿",nPriority=2,bScreenHead=true,colScreenHead="#00FFFF"},--穿體---上陽宮·雙曜亭
     {dwID=10866},--屍毒---上陽宮·雙曜亭
     {dwID=10871},--裂骨---上陽宮·雙曜亭
     {dwID=10874},--震懾---上陽宮·雙曜亭
@@ -64,10 +65,10 @@ data = {
     {dwID=9535,col="#FF00FFFF",szReminder="縛",nPriority=6},--舞天縛---永王行宮·仙侶庭園
     {dwID=9371,col="#8055FFFF",szReminder="意",nPriority=6,szStackOp=">=",nStackNum=10},--青冥意---永王行宮·仙侶庭園
     {dwID=9778},--入八荒---永王行宮·仙侶庭園
-    {dwID=9537,col="#0050FFFF",szReminder="殘",nPriority=2,bScreenHead=true},--劍氣殘意---永王行宮·仙侶庭園
-    {dwID=9536,col="#FF00FFFF",szReminder="殘",nPriority=2,bScreenHead=true},--劍氣殘意---永王行宮·仙侶庭園
+    {dwID=9537,col="#0050FFFF",szReminder="殘",nPriority=2,bScreenHead=true,colScreenHead="#0050FF"},--劍氣殘意---永王行宮·仙侶庭園
+    {dwID=9536,col="#FF00FFFF",szReminder="殘",nPriority=2,bScreenHead=true,colScreenHead="#FF00FF"},--劍氣殘意---永王行宮·仙侶庭園
     {dwID=9420},--經脈麻痹---永王行宮·仙侶庭園
-    {dwID=9213,col="#FF00FFFF",szReminder="鎮",nPriority=2,bScreenHead=true},--紫金缽·鎮---永王行宮·仙侶庭園
+    {dwID=9213,col="#FF00FFFF",szReminder="鎮",nPriority=2,bScreenHead=true,colScreenHead="#FF00FF"},--紫金缽·鎮---永王行宮·仙侶庭園
     {dwID=9762,szStackOp=">=",nStackNum=8},--禅心---永王行宮·仙侶庭園
     {dwID=9635,col="#8055FFFF",szReminder="滅",nPriority=6},--紫金缽·滅---永王行宮·仙侶庭園
     {dwID=9325},--撼地---永王行宮·仙侶庭園
@@ -77,18 +78,18 @@ data = {
     {dwID=9122},--盾擊---永王行宮·仙侶庭園
     {dwID=9245},--衝倒---永王行宮·仙侶庭園
     {dwID=9240},--劍氣引爆---永王行宮·仙侶庭園
-    {dwID=9239,col="#FF00FFFF",szReminder="破",nPriority=2,bScreenHead=true},--破敵---永王行宮·仙侶庭園
+    {dwID=9239,col="#FF00FFFF",szReminder="破",nPriority=2,bScreenHead=true,colScreenHead="#FF00FF"},--破敵---永王行宮·仙侶庭園
     {dwID=9429},--鎖定---永王行宮·仙侶庭園
     {dwID=9189,col="#FFFF00FF",szReminder="絕",nPriority=6,szStackOp=">=",nStackNum=4},--絕脈勁---永王行宮·仙侶庭園
-    {dwID=9195,col="#0050FFFF",szReminder="追",nPriority=2,bScreenHead=true},--追魂訣---永王行宮·仙侶庭園
+    {dwID=9195,col="#0050FFFF",szReminder="追",nPriority=2,bScreenHead=true,colScreenHead="#0050FF"},--追魂訣---永王行宮·仙侶庭園
     {dwID=8969},--鎖---永王行宮·花月別院
     {dwID=8895},--鎮獄眼---永王行宮·花月別院
     {dwID=9661},--落英鎖定---永王行宮·花月別院
     {dwID=9664},--幻魔附體---永王行宮·花月別院
     {dwID=8885},--錯筋---永王行宮·花月別院
-    {dwID=9662,col="#0050FFFF",szReminder="纏",nPriority=2,szStackOp=">=",nStackNum=5,bScreenHead=true},--音纏---永王行宮·花月別院
-    {dwID=8981,col="#FFFF00FF",szReminder="月",nPriority=2,bScreenHead=true},--月滿---永王行宮·花月別院
-    {dwID=8975,col="#FF3232FF",szReminder="烈",nPriority=2,bScreenHead=true},--烈明---永王行宮·花月別院
+    {dwID=9662,col="#0050FFFF",szReminder="纏",nPriority=2,szStackOp=">=",nStackNum=5,bScreenHead=true,colScreenHead="#0050FF"},--音纏---永王行宮·花月別院
+    {dwID=8981,col="#FFFF00FF",szReminder="月",nPriority=2,bScreenHead=true,colScreenHead="#FFFF00"},--月滿---永王行宮·花月別院
+    {dwID=8975,col="#FF3232FF",szReminder="烈",nPriority=2,bScreenHead=true,colScreenHead="#FF3232"},--烈明---永王行宮·花月別院
     {dwID=8978},--青焱---永王行宮·花月別院
     {dwID=8896},--灼君---永王行宮·花月別院
     {dwID=8917},--無暇劍璧·陰---永王行宮·花月別院
@@ -106,7 +107,7 @@ data = {
     {dwID=8013,col="#8055FF00",szReminder="油",nPriority=7},--油膩---太原之戰·夜守孤城
     {dwID=8346},--火燎---太原之戰·夜守孤城
     {dwID=7942},--殘廢---太原之戰·夜守孤城
-    {dwID=8343,col="#FF3232FF",szReminder="瞄",nPriority=2,bScreenHead=true},--瞄准---太原之戰·夜守孤城
+    {dwID=8343,col="#FF3232FF",szReminder="瞄",nPriority=2,bScreenHead=true,colScreenHead="#FF3232"},--瞄准---太原之戰·夜守孤城
     {dwID=8380},--眩暈---太原之戰·夜守孤城
     {dwID=7360},--無法移動---太原之戰·夜守孤城
     {dwID=8084,col="#FF3232FF",szReminder="威",nPriority=6},--威懾---太原之戰·夜守孤城
@@ -118,7 +119,7 @@ data = {
     {dwID=8312},--腐血狂亂---太原之戰·逐虎驅狼
     {dwID=8215},--氣血翻湧---太原之戰·逐虎驅狼
     {dwID=8042},--凍結---太原之戰·逐虎驅狼
-    {dwID=8196,col="#00FFFFFF",szReminder="冰",nPriority=1,bCaution=true,bScreenHead=true},--冰霜一指---太原之戰·逐虎驅狼
+    {dwID=8196,col="#00FFFFFF",szReminder="冰",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#00FFFF"},--冰霜一指---太原之戰·逐虎驅狼
     {dwID=8199,col="#8055FFFF",szReminder="霜",nPriority=6},--冰霜氣勁---太原之戰·逐虎驅狼
     {dwID=8822},--音波之殇·陽---太原之戰·逐虎驅狼
     {dwID=8823},--音波之殇·陰---太原之戰·逐虎驅狼
@@ -131,8 +132,8 @@ data = {
     {dwID=8027},--音波衝擊---太原之戰·逐虎驅狼
     {dwID=8047},--散魄---太原之戰·逐虎驅狼
     {dwID=8046},--失血---太原之戰·逐虎驅狼
-    {dwID=8044,col="#FF3232FF",szReminder="鮮",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true},--鮮血獻祭---太原之戰·逐虎驅狼
-    {dwID=8045,col="#FF00FFFF",szReminder="靈",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true},--靈魂獻祭---太原之戰·逐虎驅狼
+    {dwID=8044,col="#FF3232FF",szReminder="鮮",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--鮮血獻祭---太原之戰·逐虎驅狼
+    {dwID=8045,col="#FF00FFFF",szReminder="靈",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--靈魂獻祭---太原之戰·逐虎驅狼
     {dwID=8036,col="#FFFF0000",szReminder="瞄",nPriority=7},--瞄准---太原之戰·逐虎驅狼
     {dwID=8029,col="#FF323200",szReminder="流",nPriority=7,szStackOp=">=",nStackNum=2},--流血---太原之戰·逐虎驅狼
     {dwID=8010},--戰鬥標記---太原之戰·逐虎驅狼
@@ -151,16 +152,16 @@ data = {
     {dwID=12924,col="#FF3232FF",szReminder="附",nPriority=6},--心魔附體---狼牙堡·輝天塹
     {dwID=12969,col="#FF3232FF",szReminder="遲",nPriority=6,szStackOp=">=",nStackNum=4},--心遲---狼牙堡·輝天塹
     {dwID=12865,col="#0050FF00",szReminder="風",nPriority=7},--劍風---狼牙堡·輝天塹
-    {dwID=13034,nLevel=1,col="#FF00FFFF",szReminder="獵",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true},--迦樓羅獵物---狼牙堡·輝天塹
+    {dwID=13034,nLevel=1,col="#FF00FFFF",szReminder="獵",nPriority=2,bScreenHead=true,colScreenHead="#FF00FF"},--迦樓羅獵物---狼牙堡·輝天塹
     {dwID=1263},--經脈暢行---通用
     {dwID=3678},--重禦---通用
     {dwID=5034,col="#00FF0000",szReminder="修",nPriority=7},--寵物寶寶的寶貝---通用
     {dwID=2313},--鳳凰蠱---五毒
     {dwID=377},--鎮山河---純陽
+    {dwID=4487},--極樂---明教
     {dwID=4439},--貪魔體---明教
     {dwID=1242,col="#00FF00FF",szReminder="舍",nPriority=6},--舍身---少林
     {dwID=10208,col="#00FF00FF",szReminder="弘",nPriority=6},--弘法---少林
-    {dwID=12488},--獅嘯---少林
     {dwID=2778},--淵---天策
     {dwID=367},--守如山---天策
     {dwID=6163},--守如山---天策
@@ -176,5 +177,5 @@ data = {
     {dwID=9544,col="#00FF00FF",szReminder="笑",nPriority=6},--笑傲光陰---長歌
     {dwID=9265,col="#00FF00FF",szReminder="雲",nPriority=6},--雲生結海---長歌
     {dwID=9299,col="#FF8000FF",szReminder="杯",nPriority=6},--杯水留影---長歌
---【南宮伯是帥咩】
+   --【南宮伯是帥咩】
 }
