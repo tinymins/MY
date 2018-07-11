@@ -35,9 +35,10 @@ data = {
 
     ['show special npc'] = '显示特殊Npc',
     ['only enemy'] = '仅敌对',
-    ['show unnamed object id'] = '无名目标显示ID',
-    ['show all object id'] = '所有目标显示ID',
+    ['Show object id'] = '显示ID',
+    ['Only unnamed'] = '仅无名目标',
     ['Sort by screen pos'] = '根据位置调整遮挡顺序',
+    ['Self always on top'] = '总是置顶显示我的头顶',
 
     ['Max Distance: %s foot.'] = '最大显示距离：%s尺。',
     ['Max Distance: Unlimited.'] = '最大显示距离：不限制。',

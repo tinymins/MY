@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-10 17:44:14
+-- @Last Modified time: 2018-07-11 12:30:53
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -308,13 +308,9 @@ local function CheckInvalidRect(dwType, dwID, me)
 	end
 	if bVisible then
 		if not lb then
-			-- 不会改变的东西
+			-- 创建和设置不会改变的东西
 			lb = LB(dwType, dwID)
-				:SetFont(Config.nFont)
-				:SetTextsPos(Config.nTextOffsetY, Config.nTextLineHeight)
-				:SetTextsSpacing(Config.fTextSpacing)
-				:SetDistanceFmt('%d' .. g_tStrings.STR_METER)
-				:Create()
+			lb:SetDistanceFmt('%d' .. g_tStrings.STR_METER)
 			LB_CACHE[dwID] = lb
 		end
 		local fTextScale = Config.fTextScale
@@ -322,10 +318,10 @@ local function CheckInvalidRect(dwType, dwID, me)
 		local relation = D.GetRelation(dwID)
 		local force = D.GetForce(dwID)
 		local nPriority = OBJECT_SCREEN_POS_Y_CACHE[dwID] or 0 -- 默认根据屏幕坐标排序
-		if dwType == TARGET.PLAYER and dwID == me.dwID then -- 自身永远最前
+		if Config.bMineOnTop and dwType == TARGET.PLAYER and dwID == me.dwID then -- 自身永远最前
 			nPriority = nPriority + 10000
 		end
-		local szName = MY.GetObjectName(object, (Config.bShowAllObjectID and 'always') or (Config.bShowUnnamedObjectID and 'auto') or 'never')
+		local szName = MY.GetObjectName(object, (Config.bShowObjectID and (Config.bShowObjectIDOnlyUnnamed and 'auto' or 'always') or 'never'))
 		-- 常规配色
 		local r, g, b = unpack(GetConfigValue('Color', relation, force))
 		-- 倒计时/名字/帮会/称号部分
@@ -414,7 +410,10 @@ local function CheckInvalidRect(dwType, dwID, me)
 			and (dwID == dwTarID and fxDeathTarget or fxDeath)
 			or (dwID == dwTarID and fxTarget or nil)
 		)
+		lb:SetFont(Config.nFont)
+		lb:SetTextsPos(Config.nTextOffsetY, Config.nTextLineHeight)
 		lb:SetTextsScale(fTextScale)
+		lb:SetTextsSpacing(Config.fTextSpacing)
 		lb:SetMark(PARTY_MARK[dwID])
 		lb:SetPriority(nPriority)
 		lb:Create():Paint()

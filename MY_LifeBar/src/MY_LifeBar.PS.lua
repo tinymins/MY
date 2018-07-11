@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 10:36:40
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-10 17:48:52
+-- @Last Modified time: 2018-07-11 12:59:15
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -57,8 +57,9 @@ local function LoadUI(ui)
 	ui:children('#WndSliderBox_VerticalDistance'):value(Config.nVerticalDistance / 8 / 64)
 	ui:children('#WndSliderBox_Alpha'):value(Config.nAlpha)
 	ui:children('#WndCheckBox_ShowSpecialNpc'):check(Config.bShowSpecialNpc)
-	ui:children('#WndCheckBox_ShowUnnamedObjectID'):check(Config.bShowUnnamedObjectID)
-	ui:children('#WndCheckBox_ShowAllObjectID'):check(Config.bShowAllObjectID)
+	ui:children('#WndCheckBox_ShowSpecialNpcOnlyEnemy'):check(Config.bShowSpecialNpcOnlyEnemy)
+	ui:children('#WndCheckBox_ShowObjectID'):check(Config.bShowObjectID)
+	ui:children('#WndCheckBox_ShowObjectIDOnlyUnnamed'):check(Config.bShowObjectIDOnlyUnnamed)
 end
 function PS.OnPanelActive(wnd)
 	local ui = MY.UI(wnd)
@@ -95,7 +96,6 @@ function PS.OnPanelActive(wnd)
 			end
 			Config('load', szConfig)
 			LoadUI(ui)
-			D.Reset()
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -148,7 +148,6 @@ function PS.OnPanelActive(wnd)
 		value = Config.nLifeWidth,
 		onchange = function(value)
 			Config.nLifeWidth = value
-			D.Reset()
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -161,7 +160,6 @@ function PS.OnPanelActive(wnd)
 		value = Config.nLifeHeight,
 		onchange = function(value)
 			Config.nLifeHeight = value
-			D.Reset()
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -174,7 +172,6 @@ function PS.OnPanelActive(wnd)
 		value = Config.nLifeOffsetX,
 		onchange = function(value)
 			Config.nLifeOffsetX = value
-			D.Reset()
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -187,7 +184,6 @@ function PS.OnPanelActive(wnd)
 		value = Config.nLifeOffsetY,
 		onchange = function(value)
 			Config.nLifeOffsetY = value
-			D.Reset()
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -200,7 +196,6 @@ function PS.OnPanelActive(wnd)
 		value = Config.nLifePadding,
 		onchange = function(value)
 			Config.nLifePadding = value
-			D.Reset()
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -213,7 +208,6 @@ function PS.OnPanelActive(wnd)
 		value = Config.nLifeBorder,
 		onchange = function(value)
 			Config.nLifeBorder = value
-			D.Reset()
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -226,7 +220,6 @@ function PS.OnPanelActive(wnd)
 		value = Config.nLifePerOffsetX,
 		onchange = function(value)
 			Config.nLifePerOffsetX = value
-			D.Reset()
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -239,7 +232,6 @@ function PS.OnPanelActive(wnd)
 		value = Config.nLifePerOffsetY,
 		onchange = function(value)
 			Config.nLifePerOffsetY = value
-			D.Reset()
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -252,7 +244,6 @@ function PS.OnPanelActive(wnd)
 		value = Config.nTextOffsetY,
 		onchange = function(value)
 			Config.nTextOffsetY = value
-			D.Reset()
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -265,7 +256,6 @@ function PS.OnPanelActive(wnd)
 		value = Config.nTextLineHeight,
 		onchange = function(value)
 			Config.nTextLineHeight = value
-			D.Reset()
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -278,7 +268,6 @@ function PS.OnPanelActive(wnd)
 		value = Config.fTextScale * 40,
 		onchange = function(value)
 			Config.fTextScale = value / 40
-			D.Reset()
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -291,7 +280,6 @@ function PS.OnPanelActive(wnd)
 		value = Config.fTextSpacing * 10,
 		onchange = function(value)
 			Config.fTextSpacing = value / 10
-			D.Reset()
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -304,7 +292,6 @@ function PS.OnPanelActive(wnd)
 		value = math.sqrt(Config.nDistance) / 64,
 		onchange = function(value)
 			Config.nDistance = value * value * 64 * 64
-			D.Reset()
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -317,7 +304,6 @@ function PS.OnPanelActive(wnd)
 		value = Config.nVerticalDistance / 8 / 64,
 		onchange = function(value)
 			Config.nVerticalDistance = value * 8 * 64
-			D.Reset()
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -330,7 +316,6 @@ function PS.OnPanelActive(wnd)
 		value = Config.nAlpha,
 		onchange = function(value)
 			Config.nAlpha = value * 255 / 100
-			D.Reset()
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -346,7 +331,6 @@ function PS.OnPanelActive(wnd)
 		opt.bColorTable = true
 		opt.fnChangeColor = function(_, r, g, b)
 			cfg[tartype] = { r, g, b }
-			D.Reset()
 		end
 		if tartype == 'Player' then
 			table.insert(opt, {
@@ -355,7 +339,6 @@ function PS.OnPanelActive(wnd)
 				bChecked = not cfg.DifferentiateForce,
 				fnAction = function(_, r, g, b)
 					cfg.DifferentiateForce = false
-					D.Reset()
 				end,
 				rgb = cfg[tartype],
 				szIcon = 'ui/Image/button/CommonButton_1.UITex',
@@ -364,7 +347,6 @@ function PS.OnPanelActive(wnd)
 				fnClickIcon = function()
 					XGUI.OpenColorPicker(function(r, g, b)
 						cfg[tartype] = { r, g, b }
-						D.Reset()
 					end)
 				end,
 			})
@@ -374,7 +356,6 @@ function PS.OnPanelActive(wnd)
 				bChecked = cfg.DifferentiateForce,
 				fnAction = function(_, r, g, b)
 					cfg.DifferentiateForce = true
-					D.Reset()
 				end,
 			})
 			table.insert(opt,{ bDevide = true } )
@@ -388,7 +369,6 @@ function PS.OnPanelActive(wnd)
 					fnClickIcon = function()
 						XGUI.OpenColorPicker(function(r, g, b)
 							cfg[dwForceID] = { r, g, b }
-							D.Reset()
 						end)
 					end,
 					fnDisable = function()
@@ -484,7 +464,6 @@ function PS.OnPanelActive(wnd)
 					bChecked = Config.szLifeDirection == szDirection,
 					fnAction = function()
 						Config.szLifeDirection = szDirection
-						D.Reset()
 					end,
 				})
 			end
@@ -507,7 +486,6 @@ function PS.OnPanelActive(wnd)
 				bChecked = Config.bHideLifePercentageWhenFight,
 				fnAction = function()
 					Config.bHideLifePercentageWhenFight = not Config.bHideLifePercentageWhenFight
-					D.Reset()
 				end,
 			})
 			table.insert(t, {
@@ -516,7 +494,6 @@ function PS.OnPanelActive(wnd)
 				bChecked = Config.bHideLifePercentageDecimal,
 				fnAction = function()
 					Config.bHideLifePercentageDecimal = not Config.bHideLifePercentageDecimal
-					D.Reset()
 				end,
 			})
 			return t
@@ -535,7 +512,6 @@ function PS.OnPanelActive(wnd)
 				bChecked = Config.nCamp == -1,
 				fnAction = function()
 					Config.nCamp = -1
-					D.Reset()
 				end,
 			}, {
 				szOption = g_tStrings.STR_CAMP_TITLE[CAMP.GOOD],
@@ -543,7 +519,6 @@ function PS.OnPanelActive(wnd)
 				bChecked = Config.nCamp == CAMP.GOOD,
 				fnAction = function()
 					Config.nCamp = CAMP.GOOD
-					D.Reset()
 				end,
 			}, {
 				szOption = g_tStrings.STR_CAMP_TITLE[CAMP.EVIL],
@@ -551,7 +526,6 @@ function PS.OnPanelActive(wnd)
 				bChecked = Config.nCamp == CAMP.EVIL,
 				fnAction = function()
 					Config.nCamp = CAMP.EVIL
-					D.Reset()
 				end,
 			}, {
 				szOption = g_tStrings.STR_CAMP_TITLE[CAMP.NEUTRAL],
@@ -559,7 +533,6 @@ function PS.OnPanelActive(wnd)
 				bChecked = Config.nCamp == CAMP.NEUTRAL,
 				fnAction = function()
 					Config.nCamp = CAMP.NEUTRAL
-					D.Reset()
 				end,
 			}}
 		end,
@@ -585,9 +558,33 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 	ui:append('Text', { text = _L['lifebar border color'], x = x + 27, y = y - 2 })
-	y = y + offsety - 10
 
-	local x = x + ui:append('WndCheckBox', {
+	x = X
+	y = y + offsety - 10
+	x = x + ui:append('WndCheckBox', {
+		name = 'WndCheckBox_ShowObjectID',
+		x = x, y = y, text = _L['Show object id'],
+		checked = Config.bShowObjectID,
+		oncheck = function(bChecked)
+			Config.bShowObjectID = bChecked
+		end,
+		autoenable = function() return D.IsEnabled() end,
+	}, true):autoWidth():width()
+
+	x = x + ui:append('WndCheckBox', {
+		name = 'WndCheckBox_ShowObjectIDOnlyUnnamed',
+		x = x, y = y, text = _L['Only unnamed'],
+		checked = Config.bShowObjectIDOnlyUnnamed,
+		oncheck = function(bChecked)
+			Config.bShowObjectIDOnlyUnnamed = bChecked
+		end,
+		autoenable = function() return D.IsEnabled() and Config.bShowObjectID end,
+	}, true):autoWidth():width()
+
+	x = X
+	y = y + offsety - 10
+	x = x + ui:append('WndCheckBox', {
+		name = 'WndCheckBox_ShowSpecialNpc',
 		x = x, y = y, text = _L['show special npc'],
 		checked = Config.bShowSpecialNpc,
 		oncheck = function(bChecked)
@@ -597,6 +594,7 @@ function PS.OnPanelActive(wnd)
 		autoenable = function() return D.IsEnabled() end,
 	}, true):autoWidth():width() + 5
 	ui:append('WndCheckBox', {
+		name = 'WndCheckBox_ShowSpecialNpcOnlyEnemy',
 		x = x, y = y, w = 'auto',
 		text = _L['only enemy'],
 		checked = Config.bShowSpecialNpcOnlyEnemy,
@@ -606,51 +604,15 @@ function PS.OnPanelActive(wnd)
 		end,
 		autoenable = function() return D.IsEnabled() and Config.bShowSpecialNpc end,
 	})
+
 	x = X
 	y = y + offsety - 10
-
-	ui:append('WndCheckBox', {
-		x = x, y = y, text = _L['show unnamed object id'],
-		checked = Config.bShowUnnamedObjectID,
-		oncheck = function(bChecked)
-			Config.bShowUnnamedObjectID = bChecked
-			D.Reset()
-		end,
-		autoenable = function() return D.IsEnabled() end,
-	}, true):autoWidth():width()
-
-	y = y + offsety - 10
-	x = x + ui:append('WndCheckBox', {
-		x = x, y = y, text = _L['show all object id'],
-		checked = Config.bShowAllObjectID,
-		oncheck = function(bChecked)
-			Config.bShowAllObjectID = bChecked
-			D.Reset()
-		end,
-		autoenable = function() return D.IsEnabled() end,
-	}, true):autoWidth():width()
-	x = X
-	y = y + offsety - 10
-
-	ui:append('WndCheckBox', {
-		x = x, y = y, w = 'auto',
-		text = _L['Sort by screen pos'],
-		checked = Config.bScreenPosSort,
-		oncheck = function(bChecked)
-			Config.bScreenPosSort = bChecked
-			D.Reset()
-		end,
-		autoenable = function() return D.IsEnabled() end,
-	})
-	y = y + offsety - 10
-
 	ui:append('WndCheckBox', {
 		x = x, y = y, w = 'auto',
 		text = _L['show kungfu'],
 		checked = Config.bShowKungfu,
 		oncheck = function(bChecked)
 			Config.bShowKungfu = bChecked
-			D.Reset()
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -661,19 +623,39 @@ function PS.OnPanelActive(wnd)
 		checked = Config.bShowDistance,
 		oncheck = function(bChecked)
 			Config.bShowDistance = bChecked
-			D.Reset()
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
-	y = y + offsety
 
+	y = y + offsety - 10
+	ui:append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
+		text = _L['Sort by screen pos'],
+		checked = Config.bScreenPosSort,
+		oncheck = function(bChecked)
+			Config.bScreenPosSort = bChecked
+		end,
+		autoenable = function() return D.IsEnabled() end,
+	})
+
+	y = y + offsety - 10
+	ui:append('WndCheckBox', {
+		x = x, y = y, w = 'auto',
+		text = _L['Self always on top'],
+		checked = Config.bMineOnTop,
+		oncheck = function(bChecked)
+			Config.bMineOnTop = bChecked
+		end,
+		autoenable = function() return D.IsEnabled() end,
+	})
+
+	y = y + offsety
 	ui:append('WndButton', {
 		x = x, y = y, w = 65,
 		text = _L['Font'],
 		onclick = function()
 			MY.UI.OpenFontPicker(function(nFont)
 				Config.nFont = nFont
-				D.Reset()
 			end)
 		end,
 		autoenable = function() return D.IsEnabled() end,

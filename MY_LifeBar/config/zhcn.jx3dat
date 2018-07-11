@@ -11,8 +11,8 @@ data = {
 
 	bShowSpecialNpc = false,
 	bShowSpecialNpcOnlyEnemy = true,
-	bShowUnnamedObjectID = false,
-	bShowAllObjectID = false,
+	bShowObjectID = false,
+	bShowObjectIDOnlyUnnamed = true,
 	bShowKungfu = false,
 	bShowDistance = false,
 
