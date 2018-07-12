@@ -103,9 +103,9 @@ do
 local function onBossSet()
 	CTM_BOSS_CACHE = {}
 	local dwMapID = GetClientPlayer().GetMapID()
-	for dwID, npc in pairs(MY.GetNearNpc()) do
+	for _, npc in ipairs(MY.GetNearNpc()) do
 		if MY.IsBoss(dwMapID, npc.dwTemplateID) then
-			CTM_BOSS_CACHE[dwID] = npc
+			CTM_BOSS_CACHE[npc.dwID] = npc
 		end
 	end
 end

@@ -95,7 +95,7 @@ _C.Trick = function()
 			end
 		end
 	elseif MY_TalkEx.szTrickFilter == 'NEARBY' then
-		for dwID, p in pairs(MY.GetNearPlayer()) do
+		for _, p in ipairs(MY.GetNearPlayer()) do
 			if MY_TalkEx.nTrickForce == -1 or MY_TalkEx.nTrickForce == p.dwForceID then
 				table.insert(t, p.szName)
 			end

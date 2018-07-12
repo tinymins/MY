@@ -230,13 +230,13 @@ end
 
 -- 重新扫描附近对象更新焦点列表（只增不减）
 function MY_Focus.ScanNearby()
-	for dwID, _ in pairs(MY.GetNearPlayer()) do
+	for _, dwID in ipairs(MY.GetNearPlayerID()) do
 		MY_Focus.OnObjectEnterScene(TARGET.PLAYER, dwID)
 	end
-	for dwID, _ in pairs(MY.GetNearNpc()) do
+	for _, dwID in ipairs(MY.GetNearNpcID()) do
 		MY_Focus.OnObjectEnterScene(TARGET.NPC, dwID)
 	end
-	for dwID, _ in pairs(MY.GetNearDoodad()) do
+	for _, dwID in ipairs(MY.GetNearDoodadID()) do
 		MY_Focus.OnObjectEnterScene(TARGET.DOODAD, dwID)
 	end
 end

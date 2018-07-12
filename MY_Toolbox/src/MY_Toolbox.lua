@@ -84,7 +84,7 @@ MY_ToolBox.ApplyConfig = function()
 				end
 			end
 			local function RescanNearby()
-				for _, p in pairs(MY.GetNearPlayer()) do
+				for _, p in ipairs(MY.GetNearPlayer()) do
 					OnPlayerEnter(p.dwID)
 				end
 			end
@@ -156,7 +156,7 @@ MY_ToolBox.ApplyConfig = function()
 					end
 				end
 			end
-			for _, p in pairs(MY.GetNearPlayer()) do
+			for _, p in ipairs(MY.GetNearPlayer()) do
 				OnPlayerEnter(p.dwID)
 			end
 			MY.RegisterEvent('PLAYER_ENTER_SCENE.MY_GUILDMEMBER_TIP', function(event) OnPlayerEnter(arg0) end)
@@ -643,7 +643,7 @@ function PS.OnPanelActive(wnd)
 	  :text(_L['check nearby gongzhan'])
 	  :lclick(function()
 	  	local tGongZhans = {}
-	  	for _, p in pairs(MY.GetNearPlayer()) do
+	  	for _, p in ipairs(MY.GetNearPlayer()) do
 	  		for _, buff in pairs(MY.GetBuffList(p)) do
 	  			if (not buff.bCanCancel) and string.find(Table_GetBuffName(buff.dwID, buff.nLevel), _L['GongZhan']) ~= nil then
 	  				table.insert(tGongZhans, {p = p, time = (buff.nEndFrame - GetLogicFrameCount()) / 16})

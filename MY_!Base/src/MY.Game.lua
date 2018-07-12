@@ -1218,60 +1218,90 @@ MY_NEARBY_DOODAD = {}   -- 附近的玩家
 
 -- 获取附近NPC列表
 -- (table) MY.GetNearNpc(void)
-function MY.Game.GetNearNpc(nLimit)
-	local tNpc, i = {}, 0
-	for dwID, _ in pairs(MY_NEARBY_NPC) do
-		local npc = GetNpc(dwID)
+function MY.GetNearNpc(nLimit)
+	local aNpc = {}
+	for k, _ in pairs(MY_NEARBY_NPC) do
+		local npc = GetNpc(k)
 		if not npc then
-			MY_NEARBY_NPC[dwID] = nil
+			MY_NEARBY_NPC[k] = nil
 		else
-			i = i + 1
-			if npc.szName=='' then
-				npc.szName = string.gsub(Table_GetNpcTemplateName(npc.dwTemplateID), '^%s*(.-)%s*$', '%1')
+			insert(aNpc, npc)
+			if nLimit and #aNpc == nLimit then
+				break
 			end
-			tNpc[dwID] = npc
-			if nLimit and i == nLimit then break end
 		end
 	end
-	return tNpc, i
+	return aNpc
 end
-MY.GetNearNpc = MY.Game.GetNearNpc
+
+function MY.GetNearNpcID(nLimit)
+	local aNpcID = {}
+	for k, _ in pairs(MY_NEARBY_NPC) do
+		insert(aNpcID, k)
+		if nLimit and #aNpcID == nLimit then
+			break
+		end
+	end
+	return aNpcID
+end
 
 -- 获取附近玩家列表
 -- (table) MY.GetNearPlayer(void)
-function MY.Game.GetNearPlayer(nLimit)
-	local tPlayer, i = {}, 0
-	for dwID, _ in pairs(MY_NEARBY_PLAYER) do
-		local player = GetPlayer(dwID)
-		if not player then
-			MY_NEARBY_PLAYER[dwID] = nil
+function MY.GetNearPlayer(nLimit)
+	local aPlayer = {}
+	for k, _ in pairs(MY_NEARBY_PLAYER) do
+		local p = GetPlayer(k)
+		if not p then
+			MY_NEARBY_PLAYER[k] = nil
 		else
-			i = i + 1
-			tPlayer[dwID] = player
-			if nLimit and i == nLimit then break end
+			insert(aPlayer, p)
+			if nLimit and #aPlayer == nLimit then
+				break
+			end
 		end
 	end
-	return tPlayer, i
+	return aPlayer
 end
-MY.GetNearPlayer = MY.Game.GetNearPlayer
+
+function MY.GetNearPlayerID(nLimit)
+	local aPlayerID = {}
+	for k, _ in pairs(MY_NEARBY_PLAYER) do
+		insert(aPlayerID, k)
+		if nLimit and #aPlayerID == nLimit then
+			break
+		end
+	end
+	return aPlayerID
+end
 
 -- 获取附近物品列表
 -- (table) MY.GetNearPlayer(void)
-function MY.Game.GetNearDoodad(nLimit)
-	local tDoodad, i = {}, 0
+function MY.GetNearDoodad(nLimit)
+	local aDoodad = {}
 	for dwID, _ in pairs(MY_NEARBY_DOODAD) do
-		local dooded = GetDoodad(dwID)
-		if not dooded then
+		local doodad = GetDoodad(dwID)
+		if not doodad then
 			MY_NEARBY_DOODAD[dwID] = nil
 		else
-			i = i + 1
-			tDoodad[dwID] = dooded
-			if nLimit and i == nLimit then break end
+			insert(aDoodad, doodad)
+			if nLimit and #aDoodad == nLimit then
+				break
+			end
 		end
 	end
-	return tDoodad, i
+	return aDoodad
 end
-MY.GetNearDoodad = MY.Game.GetNearDoodad
+
+function MY.GetNearDoodadID(nLimit)
+	local aDoodadID = {}
+	for dwID, _ in pairs(MY_NEARBY_DOODAD) do
+		insert(aDoodadID, dwID)
+		if nLimit and #aDoodadID == nLimit then
+			break
+		end
+	end
+	return aDoodadID
+end
 
 RegisterEvent('NPC_ENTER_SCENE',    function() MY_NEARBY_NPC[arg0]    = true end)
 RegisterEvent('NPC_LEAVE_SCENE',    function() MY_NEARBY_NPC[arg0]    = nil  end)
@@ -1651,15 +1681,15 @@ function MY.IsFighting()
 	elseif not bFightState and MY.Game.IsInDungeon() then
 		-- 在副本且附近队友进战且附近敌对NPC进战则判断处于战斗状态
 		local bPlayerFighting, bNpcFighting
-		for dwID, p in pairs(MY.Game.GetNearPlayer()) do
-			if me.IsPlayerInMyParty(dwID) and p.bFightState then
+		for _, p in ipairs(MY.GetNearPlayer()) do
+			if me.IsPlayerInMyParty(p.dwID) and p.bFightState then
 				bPlayerFighting = true
 				break
 			end
 		end
 		if bPlayerFighting then
-			for dwID, p in pairs(MY.Game.GetNearNpc()) do
-				if IsEnemy(me.dwID, dwID) and p.bFightState then
+			for _, p in ipairs(MY.GetNearNpc()) do
+				if IsEnemy(me.dwID, p.dwID) and p.bFightState then
 					bNpcFighting = true
 					break
 				end
@@ -1720,7 +1750,7 @@ function MY.Game.SetTarget(dwType, dwID)
 		end
 		dwID = nil
 		if not dwID and dwType ~= TARGET.PLAYER then
-			for _, p in pairs(MY.GetNearNpc()) do
+			for _, p in ipairs(MY.GetNearNpc()) do
 				if tTarget[p.szName] then
 					dwType, dwID = TARGET.NPC, p.dwID
 					break
@@ -1728,7 +1758,7 @@ function MY.Game.SetTarget(dwType, dwID)
 			end
 		end
 		if not dwID and dwType ~= TARGET.NPC then
-			for _, p in pairs(MY.GetNearPlayer()) do
+			for _, p in ipairs(MY.GetNearPlayer()) do
 				if tTarget[p.szName] then
 					dwType, dwID = TARGET.PLAYER, p.dwID
 					break

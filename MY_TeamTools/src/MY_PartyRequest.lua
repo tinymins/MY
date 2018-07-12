@@ -224,7 +224,7 @@ function PR.OnApplyRequest()
 				end
 			end
 			if not data then
-				for k, v in pairs(MY.GetNearPlayer()) do
+				for _, v in ipairs(MY.GetNearPlayer()) do
 					if v.szName == arg0 then
 						fnGetEqueip(v.dwID)
 						break
