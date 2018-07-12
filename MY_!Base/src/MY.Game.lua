@@ -2449,3 +2449,24 @@ function MY.UpdateItemBoxExtend(box, nQuality)
 		box:SetExtentAnimate(szImage, nFrame, -1)
 	end
 end
+
+do
+local l_tGlobalEffect
+function MY.GetGlobalEffect(nID)
+	if not l_tGlobalEffect then
+		local szPath = 'represent\\common\\global_effect.txt'
+		local tTitle = {
+			{ f = 'i', t = 'nID'        },
+			{ f = 's', t = 'Desc'       },
+			{ f = 'i', t = 'nPlayType'  },
+			{ f = 'f', t = 'fPlaySpeed' },
+			{ f = 'f', t = 'fScale'     },
+			{ f = 's', t = 'szFilePath' },
+			{ f = 'i', t = 'nWidth'     },
+			{ f = 'i', t = 'nHeight'    },
+		}
+		l_tGlobalEffect = KG_Table.Load(szPath, tTitle, FILE_OPEN_MODE.NORMAL)
+	end
+	return tInfo:Search(nID)
+end
+end
