@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 12:50:01
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-12 18:27:27
+-- @Last Modified time: 2018-07-12 22:51:09
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -512,9 +512,11 @@ function LB:ApplySFX()
 	if self.sfx_invalid then
 		if self.sfx_file then
 			self.hp:SetSFX(
-				self.sfx_file, self.sfx_scale / Station.GetUIScale() * self.scale,
-				self.sfx_w * self.scale, self.sfx_h * self.scale,
-				(self.texts_y + self.texts_height * self.texts_lines + self.sfx_y) * self.scale
+				self.sfx_file,
+				self.sfx_scale / Station.GetUIScale() * self.scale,
+				self.sfx_w * self.sfx_scale / Station.GetUIScale() * self.scale,
+				self.sfx_h * self.sfx_scale / Station.GetUIScale() * self.scale,
+				(self.texts_y + self.texts_height * self.texts_lines + self.sfx_y) / Station.GetUIScale() * self.scale
 			)
 		else
 			self.hp:ClearSFX()

@@ -228,15 +228,14 @@ function HP:SetSFX(szFile, fScale, nWidth, nHeight, nOffsetY)
 		local dwCtcType = self.dwType == TARGET.DOODAD and CTCT.DOODAD_POS_2_SCREEN_POS or CTCT.CHARACTER_TOP_2_SCREEN_POS
 		if szFile then
 			sfx:LoadSFX(szFile)
-			sfx:Get3DModel():SetScaling(fScale, fScale, fScale)
+			sfx:SetModelScale(fScale)
 			sfx:Play(true)
 			sfx:Show()
 			MY.RenderCall(szKey, function()
 				if sfx and sfx:IsValid() then
 					local nX, nY, bFront = MY.CThreadCoor(dwCtcType, self.dwID)
 					nX, nY = Station.AdjustToOriginalPos(nX, nY)
-					nX, nY = nX - nWidth / 2, nY - nHeight
-					sfx:SetAbsPos(nX, nY - nOffsetY)
+					sfx:SetAbsPos(nX, nY - nHeight / 2 - nOffsetY)
 				else
 					MY.CThreadCoor(dwCtcType, self.dwID, szKey, false)
 					MY.RenderCall(szKey, false)
