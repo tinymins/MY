@@ -61,6 +61,9 @@ data = {
     ['text line height: %d px.'] = '文字行高%spx。',
     ['text scale: %.1f%%.'] = '文字缩放：%.1f%%。',
     ['text spacing: %.1f.'] = '文字间距：%.1f。',
+    ['Title effect scale: %.1f%%.'] = '标记与任务卷轴缩放：%.1f。',
+    ['Title effect offset y: %d px.'] = '标记与任务卷轴竖直偏移%dpx。',
+
     ['alpha: %.0f%%.'] = '透明度%.0f%%。',
 
     ['set current camp'] = '设置当前阵营',

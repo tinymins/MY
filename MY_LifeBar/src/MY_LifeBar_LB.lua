@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 12:50:01
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-11 15:26:35
+-- @Last Modified time: 2018-07-12 18:27:27
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -84,9 +84,12 @@ local function InitConfigData(self)
 	self.life_bar_border_g = 0
 	self.life_bar_border_b = 0
 	self.life_bar_border_invalid = true
-	-- 标记
-	self.mark = nil
-	self.mark_invalid = true
+	-- 特效
+	self.sfx_file = nil
+	self.sfx_scale = 1
+	self.sfx_w = 0
+	self.sfx_h = 0
+	self.sfx_invalid = true
 end
 
 -- 构造函数
@@ -102,7 +105,7 @@ end
 function LB:Create()
 	if not self.hp.handle then
 		self.hp:Create()
-		self:SetInvalid('mark', true)
+		self:SetInvalid('sfx', true)
 		self:SetInvalid('texts', true)
 		self:SetInvalid('priority', true)
 		self:SetInvalid('life_text', true)
@@ -131,7 +134,7 @@ function LB:Paint(force)
 		self:DrawLifeBorder(force)
 		self:DrawLife(force)
 		self:DrawTexts(force)
-		self:ApplyMark()
+		self:ApplySFX()
 		self:ApplyPriority()
 	end
 	return self
@@ -164,7 +167,7 @@ end
 function LB:SetScale(scale)
 	if self.scale ~= scale then
 		self.scale = scale
-		self:SetInvalid('mark', true)
+		self:SetInvalid('sfx', true)
 		self:SetInvalid('texts', true)
 		self:SetInvalid('life_text', true)
 		self:SetInvalid('life_bar', true)
@@ -202,7 +205,7 @@ function LB:SetTextsPos(y, height)
 	if self.texts_y ~= y or self.texts_height ~= height then
 		self.texts_y = y
 		self.texts_height = height
-		self:SetInvalid('mark', true)
+		self:SetInvalid('sfx', true)
 		self:SetInvalid('texts', true)
 	end
 	return self
@@ -365,7 +368,7 @@ function LB:DrawTexts(force)
 		local texts_lines = #aTexts
 		if self.texts_lines ~= texts_lines then
 			self.texts_lines = texts_lines
-			self:SetInvalid('mark', true)
+			self:SetInvalid('sfx', true)
 		end
 		self.texts_invalid = false
 	end
@@ -488,18 +491,35 @@ function LB:DrawLife(force)
 	return self
 end
 
-function LB:SetMark(mark)
-	if self.mark ~= mark then
-		self.mark = mark
-		self:SetInvalid('mark', true)
+function LB:SetSFX(file, scale, y, w, h)
+	if self.sfx_file ~= file or self.sfx_y ~= y
+	or self.sfx_scale ~= scale or self.sfx_w ~= w or self.sfx_h ~= h then
+		self.sfx_file = file
+		self.sfx_scale = scale
+		self.sfx_y = y
+		self.sfx_w = w
+		self.sfx_h = h
+		self:SetInvalid('sfx', true)
 	end
 	return self
 end
 
-function LB:ApplyMark()
-	if self.mark_invalid then
-		self.hp:SetMark(self.mark, 60 * self.scale, (self.texts_y + self.texts_height * self.texts_lines) * self.scale)
-		self.mark_invalid = false
+function LB:ClearSFX()
+	return self:SetSFX()
+end
+
+function LB:ApplySFX()
+	if self.sfx_invalid then
+		if self.sfx_file then
+			self.hp:SetSFX(
+				self.sfx_file, self.sfx_scale / Station.GetUIScale() * self.scale,
+				self.sfx_w * self.scale, self.sfx_h * self.scale,
+				(self.texts_y + self.texts_height * self.texts_lines + self.sfx_y) * self.scale
+			)
+		else
+			self.hp:ClearSFX()
+		end
+		self.sfx_invalid = false
 	end
 	return self
 end

@@ -30,6 +30,9 @@ data = {
 	nLifePerOffsetX = 85,
 	nLifePerOffsetY = 37,
 
+	fTitleEffectScale = 0.6,
+	nTitleEffectOffsetY = 0.6,
+
 	nAlpha = 200,
 	nFont = 16,
 	nDistance = 72 * 72 * 64 * 64,

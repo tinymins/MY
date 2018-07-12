@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-11 14:31:52
+-- @Last Modified time: 2018-07-12 18:19:11
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -56,14 +56,105 @@ local LAST_FIGHT_STATE = false
 local SYS_HEAD_TOP_STATE
 local LB = MY_LifeBar_LB
 local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子
-local PARTY_MARK, OVERWRITE_MARK = {}, {}
 local OBJECT_SCREEN_POS_Y_CACHE = {}
-do
-local function onPartySetMark()
-	OVERWRITE_MARK = {}
-	PARTY_MARK = GetClientTeam().GetTeamMark() or {}
+local OBJECT_TITLE_EFFECT, OVERWRITE_TITLE_EFFECT = {}
+do -- 头顶特效数据刷新
+local QUEST_TITLE_EFFECT = {
+	["normal_unaccept_proper"] = 1,
+	["repeat_unaccept_proper"] = 2,
+	["activity_unaccept_proper"] = 45,
+	["unaccept_high"] = 5,
+	["unaccept_low"] = 6,
+	["unaccept_lower"] = 43,
+	["accpeted"] = 44,
+	["normal_finished"] = 3,
+	["repeat_finished"] = 4,
+	["activity_finished"] = 46,
+	["normal_notneedaccept"] = 44,
+	["repeat_notneedaccept"] = 4,
+	["activity_notneedaccept"] = 46,
+	["lishijie_unaccept"] = 55,
+	["lishijie_finished"] = 54,
+}
+local function UpdateTitleEffect(dwType, dwID)
+	local nEffectID = nil
+	if dwType == TARGET.PLAYER then
+		local nMark = MY.GetMarkIndex(dwID)
+		if nMark and PARTY_TITLE_MARK_EFFECT_LIST[nMark] then
+			nEffectID = PARTY_TITLE_MARK_EFFECT_LIST[nMark]
+		end
+	elseif dwType == TARGET.NPC then
+		local npc = GetNpc(dwID)
+		if npc then
+			local aQuestState = GetNpcQuestState(npc) or {}
+			if aQuestState.normal_finished_proper or aQuestState.normal_finished_high or aQuestState.normal_finished_higher
+			or aQuestState.normal_finished_low or aQuestState.normal_finished_lower or aQuestState.repeat_finished_proper
+			or aQuestState.repeat_finished_high or aQuestState.repeat_finished_higher or aQuestState.repeat_finished_low
+			or aQuestState.repeat_finished_lower or aQuestState.activity_finished_proper or aQuestState.activity_finished_high
+			or aQuestState.activity_finished_higher or aQuestState.activity_finished_low or aQuestState.activity_finished_lower then
+				nEffectID = QUEST_TITLE_EFFECT.normal_finished
+			elseif aQuestState.activity_unaccept_proper then
+				nEffectID = QUEST_TITLE_EFFECT.activity_unaccept_proper
+			elseif aQuestState.normal_unaccept_proper then
+				nEffectID = QUEST_TITLE_EFFECT.normal_unaccept_proper
+			elseif aQuestState.repeat_unaccept_proper then
+				nEffectID = QUEST_TITLE_EFFECT.repeat_unaccept_proper
+			elseif aQuestState.activity_notneedaccept_proper or aQuestState.activity_notneedaccept_low or aQuestState.activity_notneedaccept_lower
+			or aQuestState.activity_notneedaccept_high or aQuestState.activity_notneedaccept_higher then
+				nEffectID = QUEST_TITLE_EFFECT.activity_notneedaccept
+			elseif aQuestState.repeat_notneedaccept_proper or aQuestState.repeat_notneedaccept_low or aQuestState.repeat_notneedaccept_lower
+			or aQuestState.repeat_notneedaccept_high or aQuestState.repeat_notneedaccept_higher then
+				nEffectID = QUEST_TITLE_EFFECT.repeat_notneedaccept
+			elseif aQuestState.normal_notneedaccept_proper then
+			-- or aQuestState.normal_notneedaccept_low or aQuestState.normal_notneedaccept_lower
+			-- or aQuestState.normal_notneedaccept_high or aQuestState.normal_notneedaccept_higher
+				nEffectID = QUEST_TITLE_EFFECT.normal_notneedaccept
+			elseif MY.GetMarkIndex(dwID) and PARTY_TITLE_MARK_EFFECT_LIST[MY.GetMarkIndex(dwID)] then -- party mark
+				nEffectID = PARTY_TITLE_MARK_EFFECT_LIST[MY.GetMarkIndex(dwID)]
+			elseif aQuestState.normal_unaccept_high or aQuestState.repeat_unaccept_high or aQuestState.activity_unaccept_high then
+				nEffectID = QUEST_TITLE_EFFECT.unaccept_high
+			elseif aQuestState.normal_unaccept_low or aQuestState.repeat_unaccept_low or aQuestState.activity_unaccept_low then
+				nEffectID = QUEST_TITLE_EFFECT.unaccept_low
+			elseif aQuestState.normal_unaccept_lower or aQuestState.repeat_unaccept_lower or aQuestState.activity_unaccept_lower then
+				nEffectID = QUEST_TITLE_EFFECT.unaccept_lower
+			elseif aQuestState.normal_accepted_proper or aQuestState.normal_accepted_low
+			or aQuestState.normal_accepted_lower or aQuestState.normal_accepted_high -- or aQuestState.normal_accepted_higher
+			or aQuestState.repeat_accepted_proper or aQuestState.repeat_accepted_high -- or aQuestState.repeat_accepted_higher
+			or aQuestState.repeat_accepted_low or aQuestState.repeat_accepted_lower or aQuestState.activity_accepted_proper
+			or aQuestState.activity_accepted_low or aQuestState.activity_accepted_lower or aQuestState.activity_accepted_high then
+				nEffectID = QUEST_TITLE_EFFECT.accpeted
+			end
+		end
+	end
+	OBJECT_TITLE_EFFECT[dwID] = nEffectID and MY.GetGlobalEffect(nEffectID)
 end
-MY.RegisterInit('PARTY_SET_MARK.MY_LifeBar', onPartySetMark)
+local function onNpcQuestMarkUpdate()
+	UpdateTitleEffect(TARGET.NPC, arg0)
+end
+MY.RegisterEvent('QUEST_MARK_UPDATE.MY_LifeBar', onNpcQuestMarkUpdate)
+MY.RegisterEvent('NPC_DISPLAY_DATA_UPDATE.MY_LifeBar', onNpcQuestMarkUpdate)
+
+local function onNpcQuestMarkUpdateAll()
+	for _, dwID in ipairs(MY.GetNearNpcID()) do
+		UpdateTitleEffect(TARGET.NPC, dwID)
+	end
+end
+MY.RegisterInit('MY_LifeBar_onNpcQuestMarkUpdateAll', onNpcQuestMarkUpdateAll)
+
+local function onPartySetMark()
+	local tID = {}
+	for dwID, _ in pairs(OBJECT_TITLE_EFFECT) do
+		tID[dwID] = true
+	end
+	for dwID, _ in pairs(GetClientTeam().GetTeamMark() or {}) do
+		tID[dwID] = true
+	end
+	for dwID, _ in pairs(tID) do
+		UpdateTitleEffect(IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC, dwID)
+	end
+	OVERWRITE_TITLE_EFFECT = {}
+end
+MY.RegisterInit('MY_LifeBar_onPartySetMark', onPartySetMark)
 MY.RegisterEvent('PARTY_SET_MARK.MY_LifeBar', onPartySetMark)
 end
 
@@ -237,12 +328,12 @@ function D.Reset()
 	LB_CACHE = {}
 	LB('clear')
 	-- 恢复官方标记
-	for dwID, _ in pairs(OVERWRITE_MARK) do
-		if PARTY_MARK[dwID] then
-			SceneObject_SetTitleEffect(IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC, dwID, PARTY_TITLE_MARK_EFFECT_LIST[PARTY_MARK[dwID]])
+	for dwID, _ in pairs(OVERWRITE_TITLE_EFFECT) do
+		if OBJECT_TITLE_EFFECT[dwID] then
+			SceneObject_SetTitleEffect(IsPlayer(dwID) and TARGET.PLAYER or TARGET.NPC, dwID, OBJECT_TITLE_EFFECT[dwID].nID)
 		end
 	end
-	OVERWRITE_MARK = {}
+	OVERWRITE_TITLE_EFFECT = {}
 	-- 自适应遮挡顺序
 	if MY_LifeBar.bEnabled and Config.bScreenPosSort then
 		local dwID, dwLastID, nCount
@@ -403,6 +494,13 @@ local function CheckInvalidRect(dwType, dwID, me)
 			lb:SetLifeText(Config.nLifePerOffsetX, Config.nLifePerOffsetY, Config.bHideLifePercentageDecimal and '%.0f' or '%.1f')
 		end
 		lb:SetLifeTextVisible(bShowLifePercent)
+		-- 头顶特效
+		local tEffect = OBJECT_TITLE_EFFECT[dwID]
+		if tEffect then
+			lb:SetSFX(tEffect.szFilePath, tEffect.fScale * Config.fTitleEffectScale, Config.nTitleEffectOffsetY, tEffect.nWidth, tEffect.nHeight)
+		else
+			lb:ClearSFX()
+		end
 		-- 各种数据生效
 		lb:SetScale(Config.fUIScale == 0 and Station.GetUIScale() or Config.fUIScale)
 		lb:SetColor(r, g, b, Config.nAlpha, Config.nFont)
@@ -415,7 +513,6 @@ local function CheckInvalidRect(dwType, dwID, me)
 		lb:SetTextsPos(Config.nTextOffsetY, Config.nTextLineHeight)
 		lb:SetTextsScale(fTextScale)
 		lb:SetTextsSpacing(Config.fTextSpacing)
-		lb:SetMark(PARTY_MARK[dwID])
 		lb:SetPriority(nPriority)
 		lb:Create():Paint()
 	elseif lb then
@@ -423,14 +520,14 @@ local function CheckInvalidRect(dwType, dwID, me)
 		LB_CACHE[dwID] = nil
 	end
 	-- 屏蔽官方标记
-	if PARTY_MARK[dwID] and not OVERWRITE_MARK[dwID] and lb then
-		OVERWRITE_MARK[dwID] = true
+	if OBJECT_TITLE_EFFECT[dwID] and not OVERWRITE_TITLE_EFFECT[dwID] and lb then
+		OVERWRITE_TITLE_EFFECT[dwID] = true
 		SceneObject_SetTitleEffect(dwType, dwID, TITLE_EFFECT_NONE)
-	elseif OVERWRITE_MARK[dwID] and not lb then
-		if PARTY_MARK[dwID] then
-			SceneObject_SetTitleEffect(dwType, dwID, PARTY_TITLE_MARK_EFFECT_LIST[PARTY_MARK[dwID]])
+	elseif OVERWRITE_TITLE_EFFECT[dwID] and not lb then
+		if OBJECT_TITLE_EFFECT[dwID] then
+			SceneObject_SetTitleEffect(dwType, dwID, OBJECT_TITLE_EFFECT[dwID].nID)
 		end
-		OVERWRITE_MARK[dwID] = nil
+		OVERWRITE_TITLE_EFFECT[dwID] = nil
 	end
 end
 

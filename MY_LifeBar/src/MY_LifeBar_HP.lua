@@ -54,7 +54,7 @@ function HP:Create()
 		hItem:AppendItemFromString('<shadow>name="hp"</shadow>')
 		hItem:AppendItemFromString('<shadow>name="lines"</shadow>')
 		hItem:AppendItemFromString('<shadow>name="hp_title"</shadow>')
-		hItem:AppendItemFromString('<image>name="mark"</image>')
+		hItem:AppendItemFromString('<sfx>name="sfx"</sfx>')
 		REQUIRE_SORT = true
 		self.handle = hItem
 	end
@@ -216,29 +216,27 @@ function HP:ClearLifeBar()
 	return self:ClearShadow('hp')
 end
 
-function HP:SetMark(nMarkID, nWidth, nOffsetY)
+-- 设置头顶特效
+-- szFile 特效文件
+-- fScale 特效缩放
+-- nWidth 缩放后的特效UI宽度
+-- nHeight 缩放后的特效UI高度
+function HP:SetSFX(szFile, fScale, nWidth, nHeight, nOffsetY)
 	if self.handle then
-		local image = self.handle:Lookup('mark')
-		local nFrame = nMarkID and PARTY_MARK_ICON_FRAME_LIST[nMarkID]
-		local szKey = 'MY_LIFEBAR_HP_' .. self.dwType .. '_' .. self.dwID
+		local sfx = self.handle:Lookup('sfx')
+		local szKey = 'MY_LIFEBAR_HP_SFX_' .. self.dwType .. '_' .. self.dwID
 		local dwCtcType = self.dwType == TARGET.DOODAD and CTCT.DOODAD_POS_2_SCREEN_POS or CTCT.CHARACTER_TOP_2_SCREEN_POS
-		if nFrame then
-			image:FromUITex(PARTY_MARK_ICON_PATH, nFrame)
-			image:SetSize(0, 0)
-			image:AutoSize()
-			image:Show()
+		if szFile then
+			sfx:LoadSFX(szFile)
+			sfx:Get3DModel():SetScaling(fScale, fScale, fScale)
+			sfx:Play(true)
+			sfx:Show()
 			MY.RenderCall(szKey, function()
-				if image and image:IsValid() then
-					local nW, nH = image:GetSize()
-					if nW > 0 and nW ~= nWidth then
-						nH = nH / nW * nWidth
-						nW = nWidth
-						image:SetSize(nW, nH)
-					end
+				if sfx and sfx:IsValid() then
 					local nX, nY, bFront = MY.CThreadCoor(dwCtcType, self.dwID)
 					nX, nY = Station.AdjustToOriginalPos(nX, nY)
-					nX, nY = nX - nW / 2, nY - nH
-					image:SetAbsPos(nX, nY - nOffsetY)
+					nX, nY = nX - nWidth / 2, nY - nHeight
+					sfx:SetAbsPos(nX, nY - nOffsetY)
 				else
 					MY.CThreadCoor(dwCtcType, self.dwID, szKey, false)
 					MY.RenderCall(szKey, false)
@@ -246,12 +244,16 @@ function HP:SetMark(nMarkID, nWidth, nOffsetY)
 			end)
 			MY.CThreadCoor(dwCtcType, self.dwID, szKey, true)
 		else
-			image:Hide()
+			sfx:Hide()
 			MY.RenderCall(szKey, false)
 			MY.CThreadCoor(dwCtcType, self.dwID, szKey, false)
 		end
 	end
 	return self
+end
+
+function HP:ClearSFX()
+	return self:SetSFX()
 end
 
 function MY_LifeBar_HP(dwType, dwID)

@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 10:36:40
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-11 15:31:05
+-- @Last Modified time: 2018-07-12 18:31:56
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -52,6 +52,8 @@ local function LoadUI(ui)
 	ui:children('#WndSliderBox_TextLineHeight'):value(Config.nTextLineHeight)
 	ui:children('#WndSliderBox_TextScale'):value(Config.fTextScale * 40)
 	ui:children('#WndSliderBox_TextSpacing'):value(Config.fTextSpacing * 10)
+	ui:children('#WndSliderBox_TitleEffectScale'):value(Config.fTitleEffectScale * 100)
+	ui:children('#WndSliderBox_TitleEffectOffsetY'):value(Config.nTitleEffectOffsetY)
 	ui:children('#WndSliderBox_LifePerOffsetX'):value(Config.nLifePerOffsetX)
 	ui:children('#WndSliderBox_LifePerOffsetY'):value(Config.nLifePerOffsetY)
 	ui:children('#WndSliderBox_Distance'):value(math.sqrt(Config.nDistance) / 64)
@@ -146,7 +148,7 @@ function PS.OnPanelActive(wnd)
 
 	X, Y = 15, 60
 	x, y = X, Y
-	offsety = 23
+	offsety = 20
 
 	ui:append('WndSliderBox', {
 		name = 'WndSliderBox_LifeBarWidth',
@@ -287,6 +289,30 @@ function PS.OnPanelActive(wnd)
 		value = Config.fTextSpacing * 10,
 		onchange = function(value)
 			Config.fTextSpacing = value / 10
+		end,
+		autoenable = function() return D.IsEnabled() end,
+	})
+	y = y + offsety
+
+	ui:append('WndSliderBox', {
+		name = 'WndSliderBox_TitleEffectScale',
+		x = x, y = y, sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE, range = { 0, 200 },
+		text = function(value) return _L('Title effect scale: %.1f%%.', value / 100) end, -- 头顶特效缩放
+		value = Config.fTitleEffectScale * 100,
+		onchange = function(value)
+			Config.fTitleEffectScale = value / 100
+		end,
+		autoenable = function() return D.IsEnabled() end,
+	})
+	y = y + offsety
+
+	ui:append('WndSliderBox', {
+		name = 'WndSliderBox_TitleEffectOffsetY',
+		x = x, y = y, sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE, range = { -150, 150 },
+		text = function(value) return _L('Title effect offset y: %d px.', value) end, -- 头顶特效间距
+		value = Config.nTitleEffectOffsetY,
+		onchange = function(value)
+			Config.nTitleEffectOffsetY = value
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
