@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 12:50:01
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-12 22:51:09
+-- @Last Modified time: 2018-07-12 22:55:11
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -134,8 +134,8 @@ function LB:Paint(force)
 		self:DrawLifeBorder(force)
 		self:DrawLife(force)
 		self:DrawTexts(force)
-		self:ApplySFX()
-		self:ApplyPriority()
+		self:ApplySFX(force)
+		self:ApplyPriority(force)
 	end
 	return self
 end
@@ -184,8 +184,8 @@ function LB:SetPriority(priority)
 	return self
 end
 
-function LB:ApplyPriority()
-	if self.priority_invalid then
+function LB:ApplyPriority(force)
+	if self.priority_invalid or force then
 		self.hp:SetPriority(self.priority)
 		self.priority_invalid = false
 	end
@@ -508,8 +508,8 @@ function LB:ClearSFX()
 	return self:SetSFX()
 end
 
-function LB:ApplySFX()
-	if self.sfx_invalid then
+function LB:ApplySFX(force)
+	if self.sfx_invalid or force then
 		if self.sfx_file then
 			self.hp:SetSFX(
 				self.sfx_file,
