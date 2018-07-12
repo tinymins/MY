@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-12 21:57:25
+-- @Last Modified time: 2018-07-13 00:09:43
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -127,6 +127,7 @@ local function UpdateTitleEffect(dwType, dwID)
 		end
 	end
 	OBJECT_TITLE_EFFECT[dwID] = nEffectID and MY.GetGlobalEffect(nEffectID)
+	OVERWRITE_TITLE_EFFECT[dwID] = not OBJECT_TITLE_EFFECT[dwID] -- 强刷系统头顶
 end
 local function onNpcQuestMarkUpdate()
 	UpdateTitleEffect(TARGET.NPC, arg0)
