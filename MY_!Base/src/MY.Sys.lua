@@ -1480,7 +1480,7 @@ function MY.OutputPlayerTip(dwID, Rect, szExtraXml)
 	end
 	-- 阵营
 	if player.bCampFlag then
-		insert(t, GetFormatText(g_tStrings.STR_TIP_CAMP_FLAG, 163))
+		insert(t, GetFormatText(g_tStrings.STR_TIP_CAMP_FLAG .. '\n', 163))
 	end
 	insert(t, GetFormatText(g_tStrings.STR_GUILD_CAMP_NAME[player.nCamp], 82))
 	-- 自定义项
@@ -1489,7 +1489,6 @@ function MY.OutputPlayerTip(dwID, Rect, szExtraXml)
 	end
 	-- 调试信息
 	if IsCtrlKeyDown() then
-		insert(t, GetFormatText('\n'))
 		insert(t, GetFormatText(FormatString(g_tStrings.TIP_PLAYER_ID, player.dwID), 102))
 		insert(t, GetFormatText(FormatString(g_tStrings.TIP_REPRESENTID_ID, player.dwModelID), 102))
 		insert(t, GetFormatText(var2str(player.GetRepresentID(), '  '), 102))

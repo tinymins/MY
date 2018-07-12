@@ -464,7 +464,7 @@ end
 function MY_Focus.OnItemRefreshTip()
 	local name = this:GetName()
 	if name == 'Handle_Info' then
-		MY.OutputObjectTip(this.dwType, this.dwID, nil, GetFormatText('\n' .. _L['Via:'] .. this.szVia, 82))
+		MY.OutputObjectTip(this.dwType, this.dwID, nil, GetFormatText(_L['Via:'] .. this.szVia .. '\n', 82))
 	end
 end
 
