@@ -2281,6 +2281,13 @@ function MY.GetMarkName(nIndex)
 	end
 end
 
+function MY.GetMarkIndex(dwID)
+	if not MY.IsInParty() then
+		return
+	end
+	return GetClientTeam().GetMarkIndex(dwID)
+end
+
 -- 保存当前团队信息
 -- (table) MY.GetTeamInfo([table tTeamInfo])
 function MY.GetTeamInfo(tTeamInfo)
