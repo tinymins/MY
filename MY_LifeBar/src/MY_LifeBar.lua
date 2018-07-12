@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-12 18:19:11
+-- @Last Modified time: 2018-07-12 21:57:25
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -57,7 +57,7 @@ local SYS_HEAD_TOP_STATE
 local LB = MY_LifeBar_LB
 local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子
 local OBJECT_SCREEN_POS_Y_CACHE = {}
-local OBJECT_TITLE_EFFECT, OVERWRITE_TITLE_EFFECT = {}
+local OBJECT_TITLE_EFFECT, OVERWRITE_TITLE_EFFECT = {}, {}
 do -- 头顶特效数据刷新
 local QUEST_TITLE_EFFECT = {
 	["normal_unaccept_proper"] = 1,
