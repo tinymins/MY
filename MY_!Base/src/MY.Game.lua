@@ -2460,11 +2460,11 @@ end
 do
 local l_tGlobalEffect
 function MY.GetGlobalEffect(nID)
-	if not l_tGlobalEffect then
+	if l_tGlobalEffect == nil then
 		local szPath = 'represent\\common\\global_effect.txt'
 		local tTitle = {
 			{ f = 'i', t = 'nID'        },
-			{ f = 's', t = 'Desc'       },
+			{ f = 's', t = 'szDesc'     },
 			{ f = 'i', t = 'nPlayType'  },
 			{ f = 'f', t = 'fPlaySpeed' },
 			{ f = 'f', t = 'fScale'     },
@@ -2472,8 +2472,20 @@ function MY.GetGlobalEffect(nID)
 			{ f = 'i', t = 'nWidth'     },
 			{ f = 'i', t = 'nHeight'    },
 		}
-		l_tGlobalEffect = KG_Table.Load(szPath, tTitle, FILE_OPEN_MODE.NORMAL)
+		l_tGlobalEffect = KG_Table.Load(szPath, tTitle, FILE_OPEN_MODE.NORMAL) or false
 	end
-	return tInfo:Search(nID)
+	if not l_tGlobalEffect then
+		return
+	end
+	local tLine = l_tGlobalEffect:Search(nID)
+	if tLine then
+		if not tLine.nWidth then
+			tLine.nWidth = 0
+		end
+		if not tLine.nHeight then
+			tLine.nHeight = 0
+		end
+	end
+	return tLine
 end
 end
