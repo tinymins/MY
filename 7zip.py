@@ -33,7 +33,9 @@ if int(str_version) <= max_version:
 	exit()
 
 # 读取Git中最大的版本号 到最新版修改文件
-paths = {}
+paths = {
+	'package.ini': True,
+}
 print 'File change list:'
 if git_tag != '':
 	filelist = os.popen('git diff ' + git_tag + ' --name-status').read().strip().split("\n")
