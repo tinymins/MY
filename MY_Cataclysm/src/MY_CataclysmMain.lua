@@ -33,6 +33,7 @@ local CTM_BUFF_OFFICIAL = {}
 local CTM_BUFF_NGB_BASE = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/data/nangongbo/base/$lang.jx3dat') or {}
 local CTM_BUFF_NGB_CMD = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/data/nangongbo/cmd/$lang.jx3dat') or {}
 local CTM_BUFF_NGB_HEAL = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/data/nangongbo/heal/$lang.jx3dat') or {}
+local CTM_CONFIG_DEFAULT = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/config/default/$lang.jx3dat')
 local CTM_CONFIG_OFFICIAL = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/config/official/$lang.jx3dat')
 local CTM_CONFIG_CATACLYSM = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/config/cataclysm/$lang.jx3dat')
 
@@ -139,19 +140,26 @@ function D.SetConfig(Config)
 				CTM_CONFIG_PLAYER[k] = v
 			end
 		end
-	else -- if Config.eCss == 'CATACLYSM' then -- Ä¬ÈÏCATACLYSM·ç¸ñ
+	elseif Config.eCss == 'CATACLYSM' then
 		for k, v in pairs(CTM_CONFIG_CATACLYSM) do
 			if type(CTM_CONFIG_PLAYER[k]) == 'nil' then
 				CTM_CONFIG_PLAYER[k] = v
 			end
 		end
+	else
+		for k, v in pairs(CTM_CONFIG_DEFAULT) do
+			if type(CTM_CONFIG_PLAYER[k]) == 'nil' then
+				CTM_CONFIG_PLAYER[k] = v
+			end
+		end
 	end
+	CTM_CONFIG_PLAYER.bFasterHP = false
 	setmetatable(CFG, {
 		__index = CTM_CONFIG_PLAYER,
 		__newindex = CTM_CONFIG_PLAYER,
 	})
 	D.UpdateBuffListCache()
-	CTM_CONFIG_PLAYER.bFasterHP = false
+	D.ReloadCataclysmPanel()
 end
 
 function D.SetConfigureName(szConfigName)
@@ -161,7 +169,7 @@ function D.SetConfigureName(szConfigName)
 		end
 		MY_Cataclysm.szConfigName = szConfigName
 	end
-	D.SetConfig(MY.LoadLUAData(D.GetConfigurePath()) or clone(CTM_CONFIG_CATACLYSM))
+	D.SetConfig(MY.LoadLUAData(D.GetConfigurePath()) or clone(CTM_CONFIG_DEFAULT))
 end
 
 function D.GetFrame()

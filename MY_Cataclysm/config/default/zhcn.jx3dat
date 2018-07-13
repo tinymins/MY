@@ -1,0 +1,88 @@
+data = {
+	eCss                   = '',
+	eFrameStyle            = 'CATACLYSM',
+	bDrag                  = true,
+	bShowInRaid            = false,
+	bEditMode              = false,
+	bShowAllGrid           = false,
+	tAnchor                = {},
+	nAutoLinkMode          = 5,
+	nBGColorMode           = 1, -- 0 不着色 1 根据距离 2 根据门派
+	nColoredName           = 1,
+	nNameVAlignment        = 0,
+	nNameHAlignment        = 0,
+	nHPShownMode2          = 2,
+	nHPShownNumMode        = 3,
+	nHPVAlignment          = 2,
+	nHPHAlignment          = 2,
+	bShowHPDecimal         = true,
+	bBuffAboveMana         = true,
+	nShowMP                = false,
+	bHPHitAlert            = true,
+	nShowIcon              = 2,
+	bShowDistance          = false,
+	bShowBossTarget        = true,
+	bShowBossFocus         = true,
+	bEnableDistance        = true,
+	bShowTargetTargetAni   = false,
+	nNameFont              = 40,
+	nLifeFont              = 15,
+	nManaFont              = 190,
+	fNameFontScale         = 1.05,
+	fLifeFontScale         = 1.05,
+	fManaFontScale         = 1,
+	nMaxShowBuff           = 4,
+	bLifeGradient          = true,
+	bManaGradient          = true,
+	nAlpha                 = 220,
+	fBuffScale             = 1,
+	bAutoBuffSize          = true,
+	bAltView               = false,
+	bAltViewInFight        = false,
+	bHideTipInFight        = false,
+	bTempTargetEnable      = false,
+	nTempTargetDelay       = 0,
+	fScaleX                = 1.1,
+	fScaleY                = 1.0,
+	bFasterHP              = false,
+	bStaring               = false,
+	bShowBuffTime          = true,
+	bShowBuffNum           = true,
+	bShowBuffReminder      = true,
+	bBuffAltPublish        = true,
+	bBuffDataOfficial      = false,
+	bBuffDataNangongbo     = true,
+	bBuffDataNangongboCmd  = false,
+	bBuffDataNangongboHeal = false,
+	bShowAttention         = true,
+	bShowCaution           = true,
+	bShowScreenHead        = true,
+	bShowGroupNumber       = true,
+	bShowEffect            = false, -- 五毒醉舞提示 万花距离提示 晚点做
+	aBuffList              = {},
+	tDistanceLevel         = { 20, 22, 200 },
+	tManaColor             = { 0, 96, 255 },
+	tDistanceCol = {
+		{ 0,   180, 52  }, -- 绿
+		{ 0,   180, 52  }, -- 绿
+		-- 免得被说乱
+		-- { 230, 170, 40  }, -- 黄
+		{ 230, 80,  80  }, -- 红
+		{ 230, 80,  80  }, -- 红
+	},
+	tOtherCol = {
+		{ 255, 255, 255 },
+		{ 110, 110, 110 },
+		{ 192, 192, 192 },
+	},
+	tDistanceAlpha = {
+		255,
+		255,
+		110,
+	},
+	tOtherAlpha = {
+		0,
+		255, -- 不在线
+		110, -- 出同步范围
+	},
+}
