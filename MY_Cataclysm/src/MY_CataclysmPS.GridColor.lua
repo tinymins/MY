@@ -22,7 +22,7 @@ local IsNil, IsBoolean, IsEmpty, RandomChild = MY.IsNil, MY.IsBoolean, MY.IsEmpt
 local IsNumber, IsString, IsTable, IsFunction = MY.IsNumber, MY.IsString, MY.IsTable, MY.IsFunction
 ---------------------------------------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/lang/')
-local CFG, PS = Cataclysm_Main, {}
+local CFG, PS = MY_Cataclysm.CFG, {}
 local CTM_BG_COLOR_MODE = MY_Cataclysm.BG_COLOR_MODE
 
 function PS.OnPanelActive(frame)

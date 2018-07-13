@@ -28,7 +28,7 @@ local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local Station, SetTarget = Station, SetTarget
 local Target_GetTargetData, Table_BuffIsVisible = Target_GetTargetData, Table_BuffIsVisible
 local MY_GetDistance, MY_GetBuff, GetEndTime, MY_GetObject = MY.GetDistance, MY.GetBuff, MY.GetEndTime, MY.GetObject
-local CFG                    = Cataclysm_Main
+local CFG                    = MY_Cataclysm.CFG
 local CTM_BG_COLOR_MODE      = MY_Cataclysm.BG_COLOR_MODE
 -- global STR cache
 local COINSHOP_SOURCE_NULL   = g_tStrings.COINSHOP_SOURCE_NULL

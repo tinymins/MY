@@ -24,38 +24,24 @@ local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer,
 local IsNil, IsBoolean, IsEmpty, RandomChild = MY.IsNil, MY.IsBoolean, MY.IsEmpty, MY.RandomChild
 local IsNumber, IsString, IsTable, IsFunction = MY.IsNumber, MY.IsString, MY.IsTable, MY.IsFunction
 ---------------------------------------------------------------------------------------------------
+local Station, Table_BuffIsVisible, MY_GetBuffName = Station, Table_BuffIsVisible,  MY.GetBuffName
+---------------------------------------------------------------------------------------------------
 local _L, D = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/lang/'), {}
-local Station, UI_GetClientPlayerID, Table_BuffIsVisible = Station, UI_GetClientPlayerID, Table_BuffIsVisible
-local GetBuffName = MY.GetBuffName
-
-local CTM_BUFF_OFFICIAL = {}
 local INI_ROOT = MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/ui/'
-local CTM_CONFIG_OFFICIAL = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/config/official/$lang.jx3dat')
-local CTM_CONFIG_CATACLYSM = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/config/cataclysm/$lang.jx3dat')
+local CFG = MY_Cataclysm.CFG
+local CTM_BUFF_OFFICIAL = {}
 local CTM_BUFF_NGB_BASE = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/data/nangongbo/base/$lang.jx3dat') or {}
 local CTM_BUFF_NGB_CMD = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/data/nangongbo/cmd/$lang.jx3dat') or {}
 local CTM_BUFF_NGB_HEAL = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/data/nangongbo/heal/$lang.jx3dat') or {}
+local CTM_CONFIG_OFFICIAL = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/config/official/$lang.jx3dat')
+local CTM_CONFIG_CATACLYSM = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/config/cataclysm/$lang.jx3dat')
 
-local CTM_BG_COLOR_MODE = {
-	SAME_COLOR = 0,
-	BY_DISTANCE = 1,
-	BY_FORCE = 2,
-	OFFICIAL = 3,
-}
 local TEAM_VOTE_REQUEST = {}
 local BUFF_LIST = {}
 local GKP_RECORD_TOTAL = 0
 local CTM_CAPTION = ''
 local CTM_CONFIG_PLAYER, CTM_CONFIG_LOADED
 local DEBUG = false
-
-MY_Cataclysm = {}
-MY_Cataclysm.bDebug = false
-MY_Cataclysm.bEnable = true
-MY_Cataclysm.szConfigName = 'common'
-MY_Cataclysm.BG_COLOR_MODE = CTM_BG_COLOR_MODE
-RegisterCustomData('MY_Cataclysm.bEnable')
-RegisterCustomData('MY_Cataclysm.szConfigName')
 
 do
 local _Raid_MonitorBuffs = Raid_MonitorBuffs
@@ -66,7 +52,7 @@ function Raid_MonitorBuffs(tBuffs, ...)
 			insert(CTM_BUFF_OFFICIAL, { dwID = dwID })
 		end
 	end
-	if Cataclysm_Main.bBuffDataOfficial then
+	if CFG.bBuffDataOfficial then
 		D.UpdateBuffListCache()
 	end
 	_Raid_MonitorBuffs(tBuffs, ...)
@@ -103,19 +89,19 @@ local function InsertBuffListCache(aBuffList)
 end
 function D.UpdateBuffListCache()
 	BUFF_LIST = {}
-	if Cataclysm_Main.bBuffDataOfficial then
+	if CFG.bBuffDataOfficial then
 		InsertBuffListCache(CTM_BUFF_OFFICIAL)
 	end
-	if Cataclysm_Main.bBuffDataNangongbo then
+	if CFG.bBuffDataNangongbo then
 		InsertBuffListCache(CTM_BUFF_NGB_BASE)
-		if Cataclysm_Main.bBuffDataNangongboCmd then
+		if CFG.bBuffDataNangongboCmd then
 			InsertBuffListCache(CTM_BUFF_NGB_CMD)
 		end
-		if Cataclysm_Main.bBuffDataNangongboHeal then
+		if CFG.bBuffDataNangongboHeal then
 			InsertBuffListCache(CTM_BUFF_NGB_HEAL)
 		end
 	end
-	InsertBuffListCache(Cataclysm_Main.aBuffList)
+	InsertBuffListCache(CFG.aBuffList)
 	FireUIEvent('CTM_BUFF_LIST_CACHE_UPDATE')
 end
 end
@@ -160,7 +146,7 @@ function D.SetConfig(Config)
 			end
 		end
 	end
-	setmetatable(Cataclysm_Main, {
+	setmetatable(CFG, {
 		__index = CTM_CONFIG_PLAYER,
 		__newindex = CTM_CONFIG_PLAYER,
 	})
@@ -332,11 +318,11 @@ function D.SetFrameSize(bEnter)
 	if frame then
 		local nGroup = D.GetGroupTotal()
 		local nGroupEx = nGroup
-		if Cataclysm_Main.nAutoLinkMode ~= 5 then
+		if CFG.nAutoLinkMode ~= 5 then
 			nGroupEx = 1
 		end
 		local container = frame:Lookup('Container_Main')
-		local fScaleX = math.max(nGroupEx == 1 and 1 or 0, Cataclysm_Main.fScaleX)
+		local fScaleX = math.max(nGroupEx == 1 and 1 or 0, CFG.fScaleX)
 		local minW = container:GetRelX() + container:GetW()
 		local w = max(128 * nGroupEx * fScaleX, minW + 30)
 		local h = select(2, frame:GetSize())
@@ -430,8 +416,8 @@ function D.CreateItemData()
 		return
 	end
 	for _, p in ipairs({
-		{'hMember', 'Cataclysm_Item_' .. Cataclysm_Main.eFrameStyle .. '.ini', 'Handle_RoleDummy'},
-		{'hBuff', 'Cataclysm_Item_' .. Cataclysm_Main.eFrameStyle .. '.ini', 'Handle_Buff'},
+		{'hMember', 'Cataclysm_Item_' .. CFG.eFrameStyle .. '.ini', 'Handle_RoleDummy'},
+		{'hBuff', 'Cataclysm_Item_' .. CFG.eFrameStyle .. '.ini', 'Handle_Buff'},
 	}) do
 		if frame[p[1]] then
 			frame:RemoveItemData(frame[p[1]])
@@ -442,7 +428,7 @@ end
 
 function D.OpenCataclysmPanel()
 	if not D.GetFrame() then
-		if Cataclysm_Main.eCss == '' then
+		if CFG.eCss == '' then
 			D.ConfirmRestoreConfig()
 		end
 		Wnd.OpenWindow(INI_ROOT .. 'Cataclysm_Main.ini', 'Cataclysm_Main')
@@ -458,13 +444,13 @@ function D.CloseCataclysmPanel()
 	end
 end
 
-function D.CheckCataclysmEnable(szEvent)
+function D.CheckCataclysmEnable()
 	local me = GetClientPlayer()
 	if not MY_Cataclysm.bEnable then
 		D.CloseCataclysmPanel()
 		return false
 	end
-	if Cataclysm_Main.bShowInRaid and not me.IsInRaid() then
+	if CFG.bShowInRaid and not me.IsInRaid() then
 		D.CloseCataclysmPanel()
 		return false
 	end
@@ -486,7 +472,7 @@ function D.ReloadCataclysmPanel()
 end
 
 function D.UpdateAnchor(frame)
-	local a = Cataclysm_Main.tAnchor
+	local a = CFG.tAnchor
 	if not IsEmpty(a) then
 		frame:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
 	else
@@ -498,9 +484,8 @@ end
 -- 界面创建 事件注册
 -------------------------------------------------
 Cataclysm_Main = {}
-local Cataclysm_Main = Cataclysm_Main
 function Cataclysm_Main.OnFrameCreate()
-	if Cataclysm_Main.bFasterHP then
+	if CFG.bFasterHP then
 		this:RegisterEvent('RENDER_FRAME_UPDATE')
 	end
 	this:RegisterEvent('PARTY_SYNC_MEMBER_DATA')
@@ -549,7 +534,7 @@ function Cataclysm_Main.OnFrameCreate()
 	D.SetFrameCaption()
 	D.CreateItemData()
 	D.CreateControlBar()
-	this:EnableDrag(Cataclysm_Main.bDrag)
+	this:EnableDrag(CFG.bDrag)
 end
 
 -------------------------------------------------
@@ -562,7 +547,7 @@ end
 
 function Cataclysm_Main.OnFrameDragEnd()
 	this:CorrectPos()
-	Cataclysm_Main.tAnchor = GetFrameAnchor(this, 'TOPLEFT')
+	CFG.tAnchor = GetFrameAnchor(this, 'TOPLEFT')
 	Grid_CTM:AutoLinkAllPanel() -- fix screen pos
 end
 
@@ -593,7 +578,7 @@ local function OnBuffUpdate(dwOwnerID, dwID, nLevel, nStackNum, dwSrcID)
 		})
 	end
 	if Table_BuffIsVisible(dwID, nLevel) then
-		local szName = GetBuffName(dwID, nLevel)
+		local szName = MY_GetBuffName(dwID, nLevel)
 		RecBuffWithTabs(BUFF_LIST[dwID], dwOwnerID, dwID, dwSrcID)
 		RecBuffWithTabs(BUFF_LIST[szName], dwOwnerID, dwID, dwSrcID)
 	end
@@ -605,7 +590,7 @@ function Cataclysm_Main.OnEvent(szEvent)
 		if arg0 == 'UI_OME_SKILL_CAST_LOG' and arg2 == 13165 then
 			Grid_CTM:KungFuSwitch(arg1)
 		end
-		if Cataclysm_Main.bShowEffect then
+		if CFG.bShowEffect then
 			if arg0 == 'UI_OME_SKILL_EFFECT_LOG' and arg5 == 6252
 			and arg1 == GetControlPlayerID() and arg9[SKILL_RESULT_TYPE.THERAPY] then
 				Grid_CTM:CallEffect(arg2, 500)
@@ -622,7 +607,7 @@ function Cataclysm_Main.OnEvent(szEvent)
 			Grid_CTM:DrawParty(arg2)
 			D.SetFrameSize()
 		end
-		if Cataclysm_Main.nAutoLinkMode ~= 5 then
+		if CFG.nAutoLinkMode ~= 5 then
 			Grid_CTM:AutoLinkAllPanel()
 		end
 		D.UpdatePrepareBarPos()
@@ -639,7 +624,7 @@ function Cataclysm_Main.OnEvent(szEvent)
 			else
 				Grid_CTM:DrawParty(arg3)
 			end
-			if Cataclysm_Main.nAutoLinkMode ~= 5 then
+			if CFG.nAutoLinkMode ~= 5 then
 				Grid_CTM:AutoLinkAllPanel()
 			end
 		end
@@ -720,7 +705,7 @@ function Cataclysm_Main.OnEvent(szEvent)
 		Grid_CTM:DrawParty(arg2)
 		Grid_CTM:RefreshGroupText()
 		Grid_CTM:RefreshMark()
-		if Cataclysm_Main.nAutoLinkMode ~= 5 then
+		if CFG.nAutoLinkMode ~= 5 then
 			Grid_CTM:AutoLinkAllPanel()
 		end
 		D.SetFrameSize()
@@ -899,8 +884,8 @@ function Cataclysm_Main.OnLButtonClick()
 		table.insert(menu, { bDevide = true })
 		if me.IsInRaid() then
 			-- 编辑模式
-			table.insert(menu, { szOption = string.gsub(g_tStrings.STR_RAID_MENU_RAID_EDIT, 'Ctrl', 'Alt'), bDisable = not MY.IsLeader() or not me.IsInRaid(), bCheck = true, bChecked = Cataclysm_Main.bEditMode, fnAction = function()
-				Cataclysm_Main.bEditMode = not Cataclysm_Main.bEditMode
+			table.insert(menu, { szOption = string.gsub(g_tStrings.STR_RAID_MENU_RAID_EDIT, 'Ctrl', 'Alt'), bDisable = not MY.IsLeader() or not me.IsInRaid(), bCheck = true, bChecked = CFG.bEditMode, fnAction = function()
+				CFG.bEditMode = not CFG.bEditMode
 				GetPopupMenu():Hide()
 			end })
 			-- 人数统计
