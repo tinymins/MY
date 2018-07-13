@@ -165,7 +165,8 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
             for i, v in ipairs(tMsgContent) do
                 rec.text = rec.text .. v.text
             end
-        else -- 如果不是系统信息则舍弃第一个名字之前的东西 类似“[阵营][浩气盟][茗伊]说：”
+            rec.hash = rec.text
+        else -- 如果不是系统信息则在哈希中舍弃第一个名字之前的东西 类似“[阵营][浩气盟][茗伊]说：”
             -- STR_TALK_HEAD_WHISPER = '悄悄地说：',
             -- STR_TALK_HEAD_WHISPER_REPLY = '你悄悄地对',
             -- STR_TALK_HEAD_SAY = '说：',
@@ -180,21 +181,23 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
                     v.text == g_tStrings.STR_TALK_HEAD_SAY2
                 ) then
                     bSkiped = true
-                    rec.text = ''
+                    rec.hash = ''
                 else
                     rec.text = rec.text .. v.text
+                    rec.hash = rec.hash .. v.text
                 end
             end
         end
     else
         rec.text = szMsg
+        rec.hash = szMsg
         rec.html = GetFormatText(szMsg, nil, GetMsgFontColor('MSG_SYS'))
     end
 
     if not MY_ChatMonitor.bIsRegexp then
         rec.text = StringLowerW(rec.text)
     end
-    rec.hash = string.gsub(rec.text, '[\n%s]+', '')
+    rec.hash = string.gsub(rec.hash, '[\n%s]+', '')
     --------------------------------------------------------------------------------------
     -- 开始计算是否符合过滤器要求
     if MY_ChatMonitor.bIsRegexp then -- regexp
