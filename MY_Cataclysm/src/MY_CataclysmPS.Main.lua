@@ -35,17 +35,23 @@ function PS.OnPanelActive(frame)
 	x = X + 10
 	x = x + ui:append('Text', { x = x, y = y, text = _L['Configuration name'] }, true):autoWidth():width() + 5
 
+	do local szConfigName = MY_Cataclysm.szConfigName
 	x = x + ui:append('WndEditBox', {
 		x = x, y = y + 3, w = 200, h = 25,
 		text = MY_Cataclysm.szConfigName,
 		onchange = function(txt)
-			MY_Cataclysm.SetConfigureName(txt)
+			szConfigName = MY.Trim(txt)
 		end,
 		onblur = function()
+			if szConfigName == MY_Cataclysm.szConfigName then
+				return
+			end
+			MY_Cataclysm.SetConfigureName(szConfigName)
 			MY_Cataclysm.CheckEnableTeamPanel()
 			MY.SwitchTab('MY_Cataclysm', true)
 		end,
 	}, true):width() + 5
+	end
 
 	-- »Ö¸´Ä¬ÈÏ
 	y = y + ui:append('WndButton2', {
