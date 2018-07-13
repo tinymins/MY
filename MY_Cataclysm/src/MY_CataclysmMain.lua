@@ -24,7 +24,7 @@ local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer,
 local IsNil, IsBoolean, IsEmpty, RandomChild = MY.IsNil, MY.IsBoolean, MY.IsEmpty, MY.RandomChild
 local IsNumber, IsString, IsTable, IsFunction = MY.IsNumber, MY.IsString, MY.IsTable, MY.IsFunction
 ---------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/lang/')
+local _L, D = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/lang/'), {}
 local Station, UI_GetClientPlayerID, Table_BuffIsVisible = Station, UI_GetClientPlayerID, Table_BuffIsVisible
 local GetBuffName = MY.GetBuffName
 
@@ -57,7 +57,6 @@ MY_Cataclysm.BG_COLOR_MODE = CTM_BG_COLOR_MODE
 RegisterCustomData('MY_Cataclysm.bEnable')
 RegisterCustomData('MY_Cataclysm.szConfigName')
 
-local UpdateBuffListCache
 do
 local _Raid_MonitorBuffs = Raid_MonitorBuffs
 function Raid_MonitorBuffs(tBuffs, ...)
@@ -68,7 +67,7 @@ function Raid_MonitorBuffs(tBuffs, ...)
 		end
 	end
 	if Cataclysm_Main.bBuffDataOfficial then
-		UpdateBuffListCache()
+		D.UpdateBuffListCache()
 	end
 	_Raid_MonitorBuffs(tBuffs, ...)
 end
@@ -102,7 +101,7 @@ local function InsertBuffListCache(aBuffList)
 		end
 	end
 end
-function UpdateBuffListCache()
+function D.UpdateBuffListCache()
 	BUFF_LIST = {}
 	if Cataclysm_Main.bBuffDataOfficial then
 		InsertBuffListCache(CTM_BUFF_OFFICIAL)
@@ -121,18 +120,18 @@ function UpdateBuffListCache()
 end
 end
 
-local function GetConfigurePath()
+function D.GetConfigurePath()
 	return {'config/cataclysm/' .. MY_Cataclysm.szConfigName .. '.jx3dat', MY_DATA_PATH.GLOBAL}
 end
 
-local function SaveConfigure()
+function D.SaveConfigure()
 	if not CTM_CONFIG_LOADED then
 		return
 	end
-	MY.SaveLUAData(GetConfigurePath(), CTM_CONFIG_PLAYER)
+	MY.SaveLUAData(D.GetConfigurePath(), CTM_CONFIG_PLAYER)
 end
 
-local function SetConfig(Config)
+function D.SetConfig(Config)
 	CTM_CONFIG_LOADED = true
 	CTM_CONFIG_PLAYER = Config
 	-- update version
@@ -165,21 +164,21 @@ local function SetConfig(Config)
 		__index = CTM_CONFIG_PLAYER,
 		__newindex = CTM_CONFIG_PLAYER,
 	})
-	UpdateBuffListCache()
+	D.UpdateBuffListCache()
 	CTM_CONFIG_PLAYER.bFasterHP = false
 end
 
-local function SetConfigureName(szConfigName)
+function D.SetConfigureName(szConfigName)
 	if szConfigName then
 		if MY_Cataclysm.szConfigName then
-			SaveConfigure()
+			D.SaveConfigure()
 		end
 		MY_Cataclysm.szConfigName = szConfigName
 	end
-	SetConfig(MY.LoadLUAData(GetConfigurePath()) or clone(CTM_CONFIG_CATACLYSM))
+	D.SetConfig(MY.LoadLUAData(D.GetConfigurePath()) or clone(CTM_CONFIG_CATACLYSM))
 end
 
-local function GetFrame()
+function D.GetFrame()
 	return Station.Lookup('Normal/Cataclysm_Main')
 end
 
@@ -198,7 +197,7 @@ local CTM_LOOT_QUALITY = {
 	[5] = 2400,
 }
 
-local function InsertForceCountMenu(tMenu)
+function D.InsertForceCountMenu(tMenu)
 	local tForceList = {}
 	local hTeam = GetClientTeam()
 	local nCount = 0
@@ -229,10 +228,9 @@ local function InsertForceCountMenu(tMenu)
 	table.insert(tMenu, tSubMenu)
 end
 
-local _InsertDistributeMenu = InsertDistributeMenu
-local function InsertDistributeMenu(tMenu)
+function D.InsertDistributeMenu(tMenu)
 	local aDistributeMenu = {}
-	_InsertDistributeMenu(aDistributeMenu, not MY.IsDistributer())
+	InsertDistributeMenu(aDistributeMenu, not MY.IsDistributer())
 	for _, menu in ipairs(aDistributeMenu) do
 		if menu.szOption == g_tStrings.STR_LOOT_LEVEL then
 			insert(menu, 1, {
@@ -254,11 +252,11 @@ local function InsertDistributeMenu(tMenu)
 	end
 end
 
-local function GetTeammateFrame()
+function D.GetTeammateFrame()
 	return Station.Lookup('Normal/Teammate')
 end
 
-local function RaidPanel_Switch(bOpen)
+function D.RaidPanel_Switch(bOpen)
 	local frame = Station.Lookup('Normal/RaidPanel_Main')
 	if bOpen then
 		if not frame then
@@ -267,7 +265,7 @@ local function RaidPanel_Switch(bOpen)
 	else
 		if frame then
 			-- 有一点问题 会被加呼吸 根据判断
-			if not GetTeammateFrame() then
+			if not D.GetTeammateFrame() then
 				Wnd.OpenWindow('Teammate')
 			end
 			CloseRaidPanel()
@@ -276,8 +274,8 @@ local function RaidPanel_Switch(bOpen)
 	end
 end
 
-local function TeammatePanel_Switch(bOpen)
-	local hFrame = GetTeammateFrame()
+function D.TeammatePanel_Switch(bOpen)
+	local hFrame = D.GetTeammateFrame()
 	if hFrame then
 		if bOpen then
 			hFrame:Show()
@@ -287,7 +285,7 @@ local function TeammatePanel_Switch(bOpen)
 	end
 end
 
-local function GetGroupTotal()
+function D.GetGroupTotal()
 	local me, team = GetClientPlayer(), GetClientTeam()
 	local nGroup = 0
 	if me.IsInRaid() then
@@ -303,14 +301,14 @@ local function GetGroupTotal()
 	return nGroup
 end
 
-local function UpdatePrepareBarPos()
-	local frame = GetFrame()
+function D.UpdatePrepareBarPos()
+	local frame = D.GetFrame()
 	if not frame then
 		return
 	end
 	local hTotal = frame:Lookup('', '')
 	local hPrepare = hTotal:Lookup('Handle_Prepare')
-	if MY_Cataclysm.bFold or GetGroupTotal() < 3 then
+	if MY_Cataclysm.bFold or D.GetGroupTotal() < 3 then
 		hPrepare:SetRelPos(0, -18)
 	else
 		local container = frame:Lookup('Container_Main')
@@ -319,8 +317,8 @@ local function UpdatePrepareBarPos()
 	hTotal:FormatAllItemPos()
 end
 
-local function SetFrameCaption(szText)
-	local frame = GetFrame()
+function D.SetFrameCaption(szText)
+	local frame = D.GetFrame()
 	if szText then
 		CTM_CAPTION = szText
 	end
@@ -329,10 +327,10 @@ local function SetFrameCaption(szText)
 	end
 end
 
-local function SetFrameSize(bEnter)
-	local frame = GetFrame()
+function D.SetFrameSize(bEnter)
+	local frame = D.GetFrame()
 	if frame then
-		local nGroup = GetGroupTotal()
+		local nGroup = D.GetGroupTotal()
 		local nGroupEx = nGroup
 		if Cataclysm_Main.nAutoLinkMode ~= 5 then
 			nGroupEx = 1
@@ -348,16 +346,16 @@ local function SetFrameSize(bEnter)
 		end
 		frame:SetDragArea(0, 0, w, h)
 		frame:Lookup('', 'Handle_BG/Image_Title_BG'):SetW(w)
-		UpdatePrepareBarPos()
+		D.UpdatePrepareBarPos()
 	end
 end
 
-local function CreateControlBar()
+function D.CreateControlBar()
 	local me           = GetClientPlayer()
 	local team         = GetClientTeam()
 	local nLootMode    = team.nLootMode
 	local nRollQuality = team.nRollQuality
-	local frame        = GetFrame()
+	local frame        = D.GetFrame()
 	local container    = frame:Lookup('Container_Main')
 	local szIniFile    = INI_ROOT .. 'Cataclysm_Button.ini'
 	container:Clear()
@@ -421,13 +419,13 @@ local function CreateControlBar()
 	end
 	container:SetW(nW)
 	container:FormatAllContentPos()
-	SetFrameSize(false)
-	SetFrameCaption()
+	D.SetFrameSize(false)
+	D.SetFrameCaption()
 end
 
 -- 创建中间层数据 常用的
-local function CreateItemData()
-	local frame = GetFrame()
+function D.CreateItemData()
+	local frame = D.GetFrame()
 	if not frame then
 		return
 	end
@@ -442,49 +440,52 @@ local function CreateItemData()
 	end
 end
 
-local function OpenCataclysmPanel()
-	if not GetFrame() then
+function D.OpenCataclysmPanel()
+	if not D.GetFrame() then
+		if Cataclysm_Main.eCss == '' then
+			D.ConfirmRestoreConfig()
+		end
 		Wnd.OpenWindow(INI_ROOT .. 'Cataclysm_Main.ini', 'Cataclysm_Main')
 	end
 end
 
-local function CloseCataclysmPanel()
-	if GetFrame() then
-		Wnd.CloseWindow(GetFrame())
+function D.CloseCataclysmPanel()
+	if D.GetFrame() then
+		Wnd.CloseWindow(D.GetFrame())
 		Grid_CTM:CloseParty()
 		MY_Cataclysm.bFold = false
 		FireUIEvent('CTM_SET_FOLD')
 	end
 end
 
-local function CheckCataclysmEnable(szEvent)
+function D.CheckCataclysmEnable(szEvent)
 	local me = GetClientPlayer()
 	if not MY_Cataclysm.bEnable then
-		CloseCataclysmPanel()
+		D.CloseCataclysmPanel()
 		return false
 	end
 	if Cataclysm_Main.bShowInRaid and not me.IsInRaid() then
-		CloseCataclysmPanel()
+		D.CloseCataclysmPanel()
 		return false
 	end
 	if not me.IsInParty() then
-		CloseCataclysmPanel()
+		D.CloseCataclysmPanel()
 		return false
 	end
-	OpenCataclysmPanel()
+	D.OpenCataclysmPanel()
 	return true
 end
 
-local function ReloadCataclysmPanel()
-	if GetFrame() then
-		CreateItemData()
-		CreateControlBar()
+function D.ReloadCataclysmPanel()
+	if D.GetFrame() then
+		D.CreateItemData()
+		D.CreateControlBar()
 		Grid_CTM:CloseParty()
 		Grid_CTM:ReloadParty()
 	end
 end
 
-local function UpdateAnchor(frame)
+function D.UpdateAnchor(frame)
 	local a = Cataclysm_Main.tAnchor
 	if not IsEmpty(a) then
 		frame:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
@@ -496,11 +497,7 @@ end
 -------------------------------------------------
 -- 界面创建 事件注册
 -------------------------------------------------
-Cataclysm_Main = {
-	GetFrame            = GetFrame,
-	CloseCataclysmPanel = CloseCataclysmPanel,
-	OpenCataclysmPanel  = OpenCataclysmPanel,
-}
+Cataclysm_Main = {}
 local Cataclysm_Main = Cataclysm_Main
 function Cataclysm_Main.OnFrameCreate()
 	if Cataclysm_Main.bFasterHP then
@@ -545,13 +542,13 @@ function Cataclysm_Main.OnFrameCreate()
 	this:RegisterEvent('GVOICE_MIC_STATE_CHANGED')
 	this:RegisterEvent('GVOICE_SPEAKER_STATE_CHANGED')
 	if GetClientPlayer() then
-		UpdateAnchor(this)
+		D.UpdateAnchor(this)
 		Grid_CTM:AutoLinkAllPanel()
 	end
-	SetFrameSize()
-	SetFrameCaption()
-	CreateItemData()
-	CreateControlBar()
+	D.SetFrameSize()
+	D.SetFrameCaption()
+	D.CreateItemData()
+	D.CreateControlBar()
 	this:EnableDrag(Cataclysm_Main.bDrag)
 end
 
@@ -623,16 +620,16 @@ function Cataclysm_Main.OnEvent(szEvent)
 		else
 			Grid_CTM:CreatePanel(arg2)
 			Grid_CTM:DrawParty(arg2)
-			SetFrameSize()
+			D.SetFrameSize()
 		end
 		if Cataclysm_Main.nAutoLinkMode ~= 5 then
 			Grid_CTM:AutoLinkAllPanel()
 		end
-		UpdatePrepareBarPos()
+		D.UpdatePrepareBarPos()
 	elseif szEvent == 'PARTY_DELETE_MEMBER' then
 		local me = GetClientPlayer()
 		if me.dwID == arg1 then
-			CloseCataclysmPanel()
+			D.CloseCataclysmPanel()
 		else
 			local team = GetClientTeam()
 			local tGropu = team.GetGroupInfo(arg3)
@@ -646,10 +643,10 @@ function Cataclysm_Main.OnEvent(szEvent)
 				Grid_CTM:AutoLinkAllPanel()
 			end
 		end
-		SetFrameSize()
-		UpdatePrepareBarPos()
+		D.SetFrameSize()
+		D.UpdatePrepareBarPos()
 	elseif szEvent == 'PARTY_DISBAND' then
-		CloseCataclysmPanel()
+		D.CloseCataclysmPanel()
 	elseif szEvent == 'PARTY_UPDATE_MEMBER_LMR' then
 		Grid_CTM:CallDrawHPMP(arg1, true)
 	elseif szEvent == 'PARTY_UPDATE_MEMBER_INFO' then
@@ -668,7 +665,7 @@ function Cataclysm_Main.OnEvent(szEvent)
 	elseif szEvent == 'TEAM_AUTHORITY_CHANGED' then
 		Grid_CTM:CallRefreshImages(arg2, true)
 		Grid_CTM:CallRefreshImages(arg3, true)
-		CreateControlBar()
+		D.CreateControlBar()
 	elseif szEvent == 'PARTY_SET_FORMATION_LEADER' then
 		Grid_CTM:RefreshFormation()
 	elseif szEvent == 'PARTY_SET_MARK' then
@@ -681,7 +678,7 @@ function Cataclysm_Main.OnEvent(szEvent)
 			Grid_CTM:StartTeamVote('wage_agree')
 			local nTime = GetCurrentTime()
 			local function fnAction()
-				SetFrameCaption(_L('Wage await %ds...', 30 - (GetCurrentTime() - nTime)))
+				D.SetFrameCaption(_L('Wage await %ds...', 30 - (GetCurrentTime() - nTime)))
 			end
 			fnAction()
 			MY.BreatheCall('MY_Cataclysm_Wage', 1000, fnAction)
@@ -699,7 +696,7 @@ function Cataclysm_Main.OnEvent(szEvent)
 		local nTotalRaidMoney = GetClientTeam().nInComeMoney
 		if nTotalRaidMoney and nTotalRaidMoney == 0 then
 			Grid_CTM:ClearTeamVote('wage_agree')
-			SetFrameCaption('')
+			D.SetFrameCaption('')
 			MY.BreatheCall('MY_Cataclysm_Wage', false)
 		end
 	-- elseif szEvent == 'RIAD_READY_CONFIRM_RECEIVE_QUESTION' then
@@ -726,13 +723,13 @@ function Cataclysm_Main.OnEvent(szEvent)
 		if Cataclysm_Main.nAutoLinkMode ~= 5 then
 			Grid_CTM:AutoLinkAllPanel()
 		end
-		SetFrameSize()
+		D.SetFrameSize()
 	elseif szEvent == 'PARTY_LEVEL_UP_RAID' then
 		Grid_CTM:RefreshGroupText()
 	elseif szEvent == 'PARTY_LOOT_MODE_CHANGED' then
-		CreateControlBar()
+		D.CreateControlBar()
 	elseif szEvent == 'PARTY_ROLL_QUALITY_CHANGED' then
-		CreateControlBar()
+		D.CreateControlBar()
 	elseif szEvent == 'TARGET_CHANGE' then
 		-- oldid， oldtype, newid, newtype
 		Grid_CTM:RefreshTarget(arg0, arg1, arg2, arg3)
@@ -785,26 +782,26 @@ function Cataclysm_Main.OnEvent(szEvent)
 			end
 		end
 	elseif szEvent == 'CTM_SET_FOLD' then
-		UpdatePrepareBarPos()
+		D.UpdatePrepareBarPos()
 	elseif szEvent == 'MY_CAMP_COLOR_UPDATE'
 	or szEvent == 'MY_FORCE_COLOR_UPDATE' then
-		ReloadCataclysmPanel()
+		D.ReloadCataclysmPanel()
 	elseif szEvent == 'GKP_RECORD_TOTAL' then
 		GKP_RECORD_TOTAL = arg0
 	elseif szEvent == 'GVOICE_MIC_STATE_CHANGED' then
-		CreateControlBar()
+		D.CreateControlBar()
 	elseif szEvent == 'GVOICE_SPEAKER_STATE_CHANGED' then
-		CreateControlBar()
+		D.CreateControlBar()
 	elseif szEvent == 'UI_SCALED' then
-		UpdateAnchor(this)
+		D.UpdateAnchor(this)
 		Grid_CTM:RefreshSFX()
 		Grid_CTM:AutoLinkAllPanel()
 	elseif szEvent == 'LOADING_END' then -- 勿删
-		ReloadCataclysmPanel()
-		RaidPanel_Switch(DEBUG)
-		TeammatePanel_Switch(false)
-		SetFrameSize()
-		SetFrameCaption()
+		D.ReloadCataclysmPanel()
+		D.RaidPanel_Switch(DEBUG)
+		D.TeammatePanel_Switch(false)
+		D.SetFrameSize()
+		D.SetFrameCaption()
 	end
 end
 
@@ -862,8 +859,8 @@ function Cataclysm_Main.OnFrameBreathe()
 		hPrepare:SetAlpha(0)
 	end
 	-- kill System Panel
-	RaidPanel_Switch(DEBUG)
-	TeammatePanel_Switch(false)
+	D.RaidPanel_Switch(DEBUG)
+	D.TeammatePanel_Switch(false)
 	-- 官方代码太容易报错 放最后
 	if not this.nBreatheTime or GetTime() - this.nBreatheTime >= 300 then -- 语音最短刷新间隔300ms
 		Grid_CTM:RefreshGVoice()
@@ -898,7 +895,7 @@ function Cataclysm_Main.OnLButtonClick()
 			table.insert(menu, { bDevide = true })
 		end
 		-- 分配
-		InsertDistributeMenu(menu, not MY.IsDistributer())
+		D.InsertDistributeMenu(menu, not MY.IsDistributer())
 		table.insert(menu, { bDevide = true })
 		if me.IsInRaid() then
 			-- 编辑模式
@@ -908,7 +905,7 @@ function Cataclysm_Main.OnLButtonClick()
 			end })
 			-- 人数统计
 			table.insert(menu, { bDevide = true })
-			InsertForceCountMenu(menu)
+			D.InsertForceCountMenu(menu)
 			table.insert(menu, { bDevide = true })
 		end
 		table.insert(menu, { szOption = _L['Interface settings'], rgb = { 255, 255, 0 }, fnAction = function()
@@ -946,10 +943,10 @@ function Cataclysm_Main.OnLButtonClick()
 		if MY.IsDistributer() then
 			local menu = {}
 			if szName == 'WndButton_LootMode' then
-				InsertDistributeMenu(menu, not MY.IsDistributer())
+				D.InsertDistributeMenu(menu, not MY.IsDistributer())
 				PopupMenu(menu[1])
 			elseif szName == 'WndButton_LootQuality' then
-				InsertDistributeMenu(menu, not MY.IsDistributer())
+				D.InsertDistributeMenu(menu, not MY.IsDistributer())
 				PopupMenu(menu[2])
 			end
 		else
@@ -996,7 +993,7 @@ function Cataclysm_Main.OnMouseLeave()
 		this:SetAlpha(220)
 	end
 	if not IsKeyDown('LButton') then
-		SetFrameSize()
+		D.SetFrameSize()
 	end
 	HideTip()
 end
@@ -1041,12 +1038,12 @@ function Cataclysm_Main.OnMouseEnter()
 		local w, h = this:GetSize()
 		OutputTip(GetFormatText(MIC_TIP[this.nMicState]), 400, { x, y, w, h }, ALW.TOP_BOTTOM)
 	end
-	SetFrameSize(true)
+	D.SetFrameSize(true)
 end
 
-local function CheckEnableTeamPanel()
-	if CheckCataclysmEnable() then
-		ReloadCataclysmPanel()
+function D.CheckEnableTeamPanel()
+	if D.CheckCataclysmEnable() then
+		D.ReloadCataclysmPanel()
 	end
 	if not MY_Cataclysm.bEnable then
 		local me = GetClientPlayer()
@@ -1058,12 +1055,12 @@ local function CheckEnableTeamPanel()
 	end
 end
 
-local function ToggleTeamPanel()
+function D.ToggleTeamPanel()
 	MY_Cataclysm.bEnable = not MY_Cataclysm.bEnable
-	CheckEnableTeamPanel()
+	D.CheckEnableTeamPanel()
 end
 
-local function ConfirmRestoreConfig()
+function D.ConfirmRestoreConfig()
 	MessageBox({
 		szName = 'MY_Cataclysm Restore default',
 		szAlignment = 'CENTER',
@@ -1073,8 +1070,8 @@ local function ConfirmRestoreConfig()
 			fnAction = function()
 				local Config = clone(CTM_CONFIG_OFFICIAL)
 				Config.aBuffList = CTM_CONFIG_PLAYER.aBuffList
-				SetConfig(Config)
-				CheckEnableTeamPanel()
+				D.SetConfig(Config)
+				D.CheckEnableTeamPanel()
 				MY.SwitchTab('MY_Cataclysm', true)
 			end,
 		},
@@ -1083,8 +1080,8 @@ local function ConfirmRestoreConfig()
 			fnAction = function()
 				local Config = clone(CTM_CONFIG_CATACLYSM)
 				Config.aBuffList = CTM_CONFIG_PLAYER.aBuffList
-				SetConfig(Config)
-				CheckEnableTeamPanel()
+				D.SetConfig(Config)
+				D.CheckEnableTeamPanel()
 				MY.SwitchTab('MY_Cataclysm', true)
 			end,
 		},
@@ -1093,24 +1090,26 @@ local function ConfirmRestoreConfig()
 end
 
 local ui = {
-	GetFrame             = GetFrame,
-	SetConfigureName     = SetConfigureName,
-	SetFrameSize         = SetFrameSize,
-	UpdateBuffListCache  = UpdateBuffListCache,
-	CheckEnableTeamPanel = CheckEnableTeamPanel,
-	ToggleTeamPanel      = ToggleTeamPanel,
-	CheckCataclysmEnable = CheckCataclysmEnable,
-	ReloadCataclysmPanel = ReloadCataclysmPanel,
-	ConfirmRestoreConfig = ConfirmRestoreConfig,
+	GetFrame             = D.GetFrame,
+	OpenCataclysmPanel   = D.OpenCataclysmPanel,
+	CloseCataclysmPanel  = D.CloseCataclysmPanel,
+	SetConfigureName     = D.SetConfigureName,
+	SetFrameSize         = D.SetFrameSize,
+	UpdateBuffListCache  = D.UpdateBuffListCache,
+	CheckEnableTeamPanel = D.CheckEnableTeamPanel,
+	ToggleTeamPanel      = D.ToggleTeamPanel,
+	CheckCataclysmEnable = D.CheckCataclysmEnable,
+	ReloadCataclysmPanel = D.ReloadCataclysmPanel,
+	ConfirmRestoreConfig = D.ConfirmRestoreConfig,
 }
 setmetatable(MY_Cataclysm, { __index = ui, __newindex = function() end, __metatable = true })
 
 
 MY.RegisterEvent('CTM_PANEL_TEAMATE', function()
-	TeammatePanel_Switch(arg0)
+	D.TeammatePanel_Switch(arg0)
 end)
 MY.RegisterEvent('CTM_PANEL_RAID', function()
-	RaidPanel_Switch(arg0)
+	D.RaidPanel_Switch(arg0)
 end)
 
 -- 关于界面打开和刷新面板的时机
@@ -1128,23 +1127,23 @@ end)
 --    避免多次重复刷新面板浪费开销
 
 MY.RegisterEvent('PARTY_UPDATE_BASE_INFO', function()
-	CheckCataclysmEnable()
-	ReloadCataclysmPanel()
+	D.CheckCataclysmEnable()
+	D.ReloadCataclysmPanel()
 	PlaySound(SOUND.UI_SOUND, g_sound.Gift)
 end)
 
 MY.RegisterEvent('PARTY_LEVEL_UP_RAID', function()
-	CheckCataclysmEnable()
-	ReloadCataclysmPanel()
+	D.CheckCataclysmEnable()
+	D.ReloadCataclysmPanel()
 end)
-MY.RegisterEvent('LOADING_END', CheckCataclysmEnable)
+MY.RegisterEvent('LOADING_END', D.CheckCataclysmEnable)
 
 -- 保存和读取配置
-MY.RegisterExit(SaveConfigure)
+MY.RegisterExit(D.SaveConfigure)
 
-MY.RegisterInit('MY_Cataclysm', function() SetConfigureName() end)
+MY.RegisterInit('MY_Cataclysm', function() D.SetConfigureName() end)
 
 
 MY.RegisterAddonMenu(function()
-	return { szOption = _L['Cataclysm Team Panel'], bCheck = true, bChecked = MY_Cataclysm.bEnable, fnAction = ToggleTeamPanel }
+	return { szOption = _L['Cataclysm Team Panel'], bCheck = true, bChecked = MY_Cataclysm.bEnable, fnAction = D.ToggleTeamPanel }
 end)

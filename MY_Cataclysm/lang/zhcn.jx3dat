@@ -1,6 +1,5 @@
 -- language data (zhcn) updated at 2015/02/23 10:11:27
 data = {
-	-- Cataclysm_Main.lua --
 	['Interface settings'] = '界面设置',
 	['Cataclysm'] = '团队面板',
 	['Please hold down Ctrl, change it'] = '请按住Ctrl来更改分配模式。',

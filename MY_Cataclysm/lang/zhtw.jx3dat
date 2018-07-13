@@ -1,6 +1,5 @@
 -- language data (zhtw) updated at 2015/02/23 10:11:27
 data = {
-	-- Cataclysm_Main.lua --
 	['Interface settings'] = '界面設置',
 	['Cataclysm'] = '團隊面板',
 	['Please hold down Ctrl, change it'] = '請按住Ctrl來更改分配模式。',
