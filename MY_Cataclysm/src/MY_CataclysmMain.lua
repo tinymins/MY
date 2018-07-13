@@ -30,16 +30,12 @@ local GetBuffName = MY.GetBuffName
 
 local CTM_BUFF_OFFICIAL = {}
 local INI_ROOT = MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/ui/'
-local CTM_CONFIG_DEFAULT = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/config/default/$lang.jx3dat')
+local CTM_CONFIG_OFFICIAL = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/config/official/$lang.jx3dat')
 local CTM_CONFIG_CATACLYSM = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/config/cataclysm/$lang.jx3dat')
 local CTM_BUFF_NGB_BASE = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/data/nangongbo/base/$lang.jx3dat') or {}
 local CTM_BUFF_NGB_CMD = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/data/nangongbo/cmd/$lang.jx3dat') or {}
 local CTM_BUFF_NGB_HEAL = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/data/nangongbo/heal/$lang.jx3dat') or {}
 
-local CTM_STYLE = {
-	OFFICIAL = 1,
-	CATACLYSM = 2,
-}
 local CTM_BG_COLOR_MODE = {
 	SAME_COLOR = 0,
 	BY_DISTANCE = 1,
@@ -57,7 +53,6 @@ MY_Cataclysm = {}
 MY_Cataclysm.bDebug = false
 MY_Cataclysm.bEnable = true
 MY_Cataclysm.szConfigName = 'common'
-MY_Cataclysm.STYLE = CTM_STYLE
 MY_Cataclysm.BG_COLOR_MODE = CTM_BG_COLOR_MODE
 RegisterCustomData('MY_Cataclysm.bEnable')
 RegisterCustomData('MY_Cataclysm.szConfigName')
@@ -153,16 +148,17 @@ local function SetConfig(Config)
 		Config.tBuffList = nil
 	end
 	-- options fixed
-	if Config.nCss == CTM_STYLE.CATACLYSM then
-		for k, v in pairs(CTM_CONFIG_CATACLYSM) do
+	if Config.eCss == 'OFFICIAL' then
+		for k, v in pairs(CTM_CONFIG_OFFICIAL) do
 			if type(CTM_CONFIG_PLAYER[k]) == 'nil' then
 				CTM_CONFIG_PLAYER[k] = v
 			end
 		end
-	end
-	for k, v in pairs(CTM_CONFIG_DEFAULT) do
-		if type(CTM_CONFIG_PLAYER[k]) == 'nil' then
-			CTM_CONFIG_PLAYER[k] = v
+	else -- if Config.eCss == 'CATACLYSM' then -- Ä¬ÈÏCATACLYSM·ç¸ñ
+		for k, v in pairs(CTM_CONFIG_CATACLYSM) do
+			if type(CTM_CONFIG_PLAYER[k]) == 'nil' then
+				CTM_CONFIG_PLAYER[k] = v
+			end
 		end
 	end
 	setmetatable(Cataclysm_Main, {
@@ -436,8 +432,8 @@ local function CreateItemData()
 		return
 	end
 	for _, p in ipairs({
-		{'hMember', 'Cataclysm_Item' .. Cataclysm_Main.nCss .. '.ini', 'Handle_RoleDummy'},
-		{'hBuff', 'Cataclysm_Item' .. Cataclysm_Main.nCss .. '.ini', 'Handle_Buff'},
+		{'hMember', 'Cataclysm_Item_' .. Cataclysm_Main.eFrameStyle .. '.ini', 'Handle_RoleDummy'},
+		{'hBuff', 'Cataclysm_Item_' .. Cataclysm_Main.eFrameStyle .. '.ini', 'Handle_Buff'},
 	}) do
 		if frame[p[1]] then
 			frame:RemoveItemData(frame[p[1]])
@@ -1099,11 +1095,11 @@ function PS.OnPanelActive(frame)
 			MessageBox({
 				szName = 'MY_Cataclysm Restore default',
 				szAlignment = 'CENTER',
-				szMessage = _L['Sure to restore default?'],
+				szMessage = _L['Please choose your favorite raid style.\nYou can rechoose in setting panel.'],
 				{
-					szOption = _L['Restore official'],
+					szOption = _L['Official style'],
 					fnAction = function()
-						local Config = clone(CTM_CONFIG_DEFAULT)
+						local Config = clone(CTM_CONFIG_OFFICIAL)
 						Config.aBuffList = CTM_CONFIG_PLAYER.aBuffList
 						SetConfig(Config)
 						CheckEnableTeamPanel()
@@ -1111,7 +1107,7 @@ function PS.OnPanelActive(frame)
 					end,
 				},
 				{
-					szOption = _L['Restore cataclysm'],
+					szOption = _L['Cataclysm style'],
 					fnAction = function()
 						local Config = clone(CTM_CONFIG_CATACLYSM)
 						Config.aBuffList = CTM_CONFIG_PLAYER.aBuffList
@@ -1120,7 +1116,7 @@ function PS.OnPanelActive(frame)
 						MY.SwitchTab('MY_Cataclysm', true)
 					end,
 				},
-				{ szOption = g_tStrings.STR_HOTKEY_CANCEL },
+				{ szOption = _L['Keep current'] },
 			})
 		end,
 	}, true):height() + 20
@@ -1932,24 +1928,24 @@ function PS.OnPanelActive(frame)
 	y = y + 3
 	x = x + ui:append('WndRadioBox', {
 		x = x, y = y, text = _L['Official team frame style'],
-		group = 'CSS', checked = Cataclysm_Main.nCss == CTM_STYLE.OFFICIAL,
+		group = 'CSS', checked = Cataclysm_Main.eFrameStyle == 'OFFICIAL',
 		oncheck = function(bChecked)
 			if not bChecked then
 				return
 			end
-			Cataclysm_Main.nCss = CTM_STYLE.OFFICIAL
+			Cataclysm_Main.eFrameStyle = 'OFFICIAL'
 			ReloadCataclysmPanel()
 		end,
 	}, true):autoWidth():width() + 5
 
 	y = y + ui:append('WndRadioBox', {
 		x = x, y = y, text = _L['Cataclysm team frame style'],
-		group = 'CSS', checked = Cataclysm_Main.nCss == CTM_STYLE.CATACLYSM,
+		group = 'CSS', checked = Cataclysm_Main.eFrameStyle == 'CATACLYSM',
 		oncheck = function(bChecked)
 			if not bChecked then
 				return
 			end
-			Cataclysm_Main.nCss = CTM_STYLE.CATACLYSM
+			Cataclysm_Main.eFrameStyle = 'CATACLYSM'
 			ReloadCataclysmPanel()
 		end,
 	}, true):autoWidth():height()

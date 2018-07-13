@@ -29,7 +29,6 @@ local Station, SetTarget = Station, SetTarget
 local Target_GetTargetData, Table_BuffIsVisible = Target_GetTargetData, Table_BuffIsVisible
 local MY_GetDistance, MY_GetBuff, GetEndTime, MY_GetObject = MY.GetDistance, MY.GetBuff, MY.GetEndTime, MY.GetObject
 local CFG                    = Cataclysm_Main
-local CTM_STYLE              = MY_Cataclysm.STYLE
 local CTM_BG_COLOR_MODE      = MY_Cataclysm.BG_COLOR_MODE
 -- global STR cache
 local COINSHOP_SOURCE_NULL   = g_tStrings.COINSHOP_SOURCE_NULL
@@ -650,7 +649,7 @@ function CTM:CreatePanel(nIndex)
 	local frame = self:GetPartyFrame(nIndex)
 	if not frame then
 		frame = Wnd.OpenWindow(
-			MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/ui/Cataclysm_Party' .. CFG.nCss .. '.ini',
+			MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/ui/Cataclysm_Party_' .. CFG.eFrameStyle .. '.ini',
 			'Cataclysm_Party_' .. nIndex
 		)
 		frame:Scale(CFG.fScaleX, CFG.fScaleY)
@@ -669,7 +668,7 @@ function CTM:RefreshGroupText()
 		if frame then
 			local txtGroup, szGroup = frame:Lookup('', 'Handle_Cols/Handle_Title/Text_Title')
 			if me.IsInRaid() then
-				if CFG.nCss == CTM_STYLE.CATACLYSM then
+				if CFG.eFrameStyle == 'CATACLYSM' then
 					txtGroup:SetFontScheme(7)
 				end
 				local tGroup = team.GetGroupInfo(i)
@@ -682,7 +681,7 @@ function CTM:RefreshGroupText()
 						end
 					end
 				end
-				szGroup = CFG.nCss == CTM_STYLE.CATACLYSM and g_tStrings.STR_NUMBER[i + 1] or tostring(i + 1)
+				szGroup = CFG.eFrameStyle == 'CATACLYSM' and g_tStrings.STR_NUMBER[i + 1] or tostring(i + 1)
 			else
 				szGroup = g_tStrings.STR_TEAM
 			end
@@ -1166,7 +1165,7 @@ function CTM:RefreshImages(h, dwID, info, tSetting, bIcon, bFormationLeader, bLa
 			nRelX = img:GetRelX() + img:GetW()
 		end
 		-- 刷新名字血量位置
-		local nMargin = CFG.nCss == CTM_STYLE.OFFICIAL and 7 or 5
+		local nMargin = CFG.eFrameStyle == 'OFFICIAL' and 7 or 5
 		for _, szItemName in ipairs({'Text_Name', 'Text_Life', 'Text_Death', 'Text_OffLine'}) do
 			local txt = h:Lookup(szItemName)
 			local nVAlign = txt:GetVAlign()

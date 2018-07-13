@@ -1,11 +1,14 @@
 data = {
-	nCss                   = 1, -- INI样式 1 系统样式 2 Cataclysm样式
+	eCss                   = 'OFFICIAL',
+	eFrameStyle            = 'OFFICIAL',
 	bDrag                  = true,
 	bShowInRaid            = false,
 	bEditMode              = false,
 	bShowAllGrid           = false,
 	tAnchor                = {},
 	nAutoLinkMode          = 5,
+	nBGColorMode           = 3, -- 0 不着色 1 根据距离 2 根据门派 3官方着色
+	nColoredName           = 0,
 	nNameVAlignment        = 0,
 	nNameHAlignment        = 1,
 	nHPShownMode2          = 2,
@@ -16,13 +19,11 @@ data = {
 	bBuffAboveMana         = true,
 	nShowMP                = false,
 	bHPHitAlert            = true,
-	nColoredName           = 0,
 	nShowIcon              = 2,
 	bShowDistance          = false,
 	bShowBossTarget        = true,
 	bShowBossFocus         = true,
 	bEnableDistance        = true,
-	nBGColorMode           = 3, -- 0 不着色 1 根据距离 2 根据门派 3官方着色
 	bShowTargetTargetAni   = false,
 	nNameFont              = 234,
 	nLifeFont              = 212,
@@ -43,8 +44,6 @@ data = {
 	nTempTargetDelay       = 0,
 	fScaleX                = 0.8,
 	fScaleY                = 0.85,
-	tDistanceLevel         = { 20, 22, 200 },
-	tManaColor             = { 0, 96, 255 },
 	bFasterHP              = false,
 	bStaring               = false,
 	bShowBuffTime          = true,
@@ -60,9 +59,9 @@ data = {
 	bShowScreenHead        = true,
 	bShowGroupNumber       = true,
 	bShowEffect            = false, -- 五毒醉舞提示 万花距离提示 晚点做
-	aBuffList = { -- 结构的话 就这样吧不过颜色不让设置
-		-- { szName = "调息", bSelf = true, col = 255, 255, 255}
-	},
+	aBuffList              = {},
+	tDistanceLevel         = { 20, 22, 200 },
+	tManaColor             = { 0, 96, 255 },
 	tDistanceCol = {
 		{ 0,   180, 52  }, -- 绿
 		{ 0,   180, 52  }, -- 绿
