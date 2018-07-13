@@ -43,7 +43,7 @@ function PS.OnPanelActive(frame)
 			end
 			CFG.nBGColorMode = CTM_BG_COLOR_MODE.OFFICIAL
 			if MY_Cataclysm.GetFrame() then
-				Grid_CTM:CallDrawHPMP(true, true)
+				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
 			MY.SwitchTab('MY_Cataclysm_GridColor', true)
 		end,
@@ -58,7 +58,7 @@ function PS.OnPanelActive(frame)
 			end
 			CFG.nBGColorMode = CTM_BG_COLOR_MODE.SAME_COLOR
 			if MY_Cataclysm.GetFrame() then
-				Grid_CTM:CallDrawHPMP(true, true)
+				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
 			MY.SwitchTab('MY_Cataclysm_GridColor', true)
 		end,
@@ -73,7 +73,7 @@ function PS.OnPanelActive(frame)
 			end
 			CFG.nBGColorMode = CTM_BG_COLOR_MODE.BY_DISTANCE
 			if MY_Cataclysm.GetFrame() then
-				Grid_CTM:CallDrawHPMP(true, true)
+				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
 			MY.SwitchTab('MY_Cataclysm_GridColor', true)
 		end,
@@ -88,7 +88,7 @@ function PS.OnPanelActive(frame)
 			end
 			CFG.nBGColorMode = CTM_BG_COLOR_MODE.BY_FORCE
 			if MY_Cataclysm.GetFrame() then
-				Grid_CTM:CallDrawHPMP(true, true)
+				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
 			MY.SwitchTab('MY_Cataclysm_GridColor', true)
 		end,
@@ -100,7 +100,7 @@ function PS.OnPanelActive(frame)
 		oncheck = function(bCheck)
 			CFG.bEnableDistance = bCheck
 			if MY_Cataclysm.GetFrame() then
-				Grid_CTM:CallDrawHPMP(true, true)
+				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
 			MY.SwitchTab('MY_Cataclysm_GridColor', true)
 		end,
@@ -152,7 +152,7 @@ function PS.OnPanelActive(frame)
 				XGUI.OpenColorPicker(function(r, g, b)
 					CFG.tDistanceCol[1] = { r, g, b }
 					if MY_Cataclysm.GetFrame() then
-						Grid_CTM:CallDrawHPMP(true, true)
+						MY_CataclysmParty:CallDrawHPMP(true, true)
 					end
 					XGUI(this):color(r, g, b)
 				end)
@@ -179,7 +179,7 @@ function PS.OnPanelActive(frame)
 						XGUI.OpenColorPicker(function(r, g, b)
 							CFG.tDistanceCol[i] = { r, g, b }
 							if MY_Cataclysm.GetFrame() then
-								Grid_CTM:CallDrawHPMP(true, true)
+								MY_CataclysmParty:CallDrawHPMP(true, true)
 							end
 							XGUI(this):color(r, g, b)
 						end)
@@ -194,7 +194,7 @@ function PS.OnPanelActive(frame)
 					onchange = function(val)
 						CFG.tDistanceAlpha[i] = val
 						if MY_Cataclysm.GetFrame() then
-							Grid_CTM:CallDrawHPMP(true, true)
+							MY_CataclysmParty:CallDrawHPMP(true, true)
 						end
 					end,
 					textfmt = function(val) return _L('Alpha: %d.', val) end,
@@ -223,7 +223,7 @@ function PS.OnPanelActive(frame)
 				XGUI.OpenColorPicker(function(r, g, b)
 					CFG.tOtherCol[3] = { r, g, b }
 					if MY_Cataclysm.GetFrame() then
-						Grid_CTM:CallDrawHPMP(true, true)
+						MY_CataclysmParty:CallDrawHPMP(true, true)
 					end
 					XGUI(this):color(r, g, b)
 				end)
@@ -240,7 +240,7 @@ function PS.OnPanelActive(frame)
 			onchange = function(val)
 				CFG.tOtherAlpha[3] = val
 				if MY_Cataclysm.GetFrame() then
-					Grid_CTM:CallDrawHPMP(true, true)
+					MY_CataclysmParty:CallDrawHPMP(true, true)
 				end
 			end,
 			textfmt = function(val) return _L('Alpha: %d.', val) end,
@@ -260,7 +260,7 @@ function PS.OnPanelActive(frame)
 				XGUI.OpenColorPicker(function(r, g, b)
 					CFG.tOtherCol[2] = { r, g, b }
 					if MY_Cataclysm.GetFrame() then
-						Grid_CTM:CallDrawHPMP(true, true)
+						MY_CataclysmParty:CallDrawHPMP(true, true)
 					end
 					XGUI(this):color(r, g, b)
 				end)
@@ -276,7 +276,7 @@ function PS.OnPanelActive(frame)
 			onchange = function(val)
 				CFG.tOtherAlpha[2] = val
 				if MY_Cataclysm.GetFrame() then
-					Grid_CTM:CallDrawHPMP(true, true)
+					MY_CataclysmParty:CallDrawHPMP(true, true)
 				end
 			end,
 			textfmt = function(val) return _L('Alpha: %d.', val) end,
@@ -295,7 +295,7 @@ function PS.OnPanelActive(frame)
 				XGUI.OpenColorPicker(function(r, g, b)
 					CFG.tManaColor = { r, g, b }
 					if MY_Cataclysm.GetFrame() then
-						Grid_CTM:CallDrawHPMP(true, true)
+						MY_CataclysmParty:CallDrawHPMP(true, true)
 					end
 					XGUI(this):color(r, g, b)
 				end)
@@ -313,7 +313,7 @@ function PS.OnPanelActive(frame)
 			oncheck = function(bCheck)
 				CFG.bLifeGradient = bCheck
 				if MY_Cataclysm.GetFrame() then
-					Grid_CTM:CallDrawHPMP(true, true)
+					MY_CataclysmParty:CallDrawHPMP(true, true)
 				end
 			end,
 		}, true):autoWidth():width() + 5
@@ -324,7 +324,7 @@ function PS.OnPanelActive(frame)
 			oncheck = function(bCheck)
 				CFG.bManaGradient = bCheck
 				if MY_Cataclysm.GetFrame() then
-					Grid_CTM:CallDrawHPMP(true, true)
+					MY_CataclysmParty:CallDrawHPMP(true, true)
 				end
 			end,
 		}, true):autoWidth():width() + 5

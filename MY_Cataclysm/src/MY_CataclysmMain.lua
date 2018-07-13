@@ -165,7 +165,7 @@ function D.SetConfigureName(szConfigName)
 end
 
 function D.GetFrame()
-	return Station.Lookup('Normal/Cataclysm_Main')
+	return Station.Lookup('Normal/MY_CataclysmMain')
 end
 
 local CTM_LOOT_MODE = {
@@ -343,7 +343,7 @@ function D.CreateControlBar()
 	local nRollQuality = team.nRollQuality
 	local frame        = D.GetFrame()
 	local container    = frame:Lookup('Container_Main')
-	local szIniFile    = INI_ROOT .. 'Cataclysm_Button.ini'
+	local szIniFile    = INI_ROOT .. 'MY_CataclysmMain_Button.ini'
 	container:Clear()
 	-- 团队工具 团队告示
 	if me.IsInRaid() then
@@ -416,8 +416,8 @@ function D.CreateItemData()
 		return
 	end
 	for _, p in ipairs({
-		{'hMember', 'Cataclysm_Item_' .. CFG.eFrameStyle .. '.ini', 'Handle_RoleDummy'},
-		{'hBuff', 'Cataclysm_Item_' .. CFG.eFrameStyle .. '.ini', 'Handle_Buff'},
+		{'hMember', 'MY_CataclysmParty_Item.' .. CFG.eFrameStyle .. '.ini', 'Handle_RoleDummy'},
+		{'hBuff', 'MY_CataclysmParty_Item.' .. CFG.eFrameStyle .. '.ini', 'Handle_Buff'},
 	}) do
 		if frame[p[1]] then
 			frame:RemoveItemData(frame[p[1]])
@@ -431,14 +431,14 @@ function D.OpenCataclysmPanel()
 		if CFG.eCss == '' then
 			D.ConfirmRestoreConfig()
 		end
-		Wnd.OpenWindow(INI_ROOT .. 'Cataclysm_Main.ini', 'Cataclysm_Main')
+		Wnd.OpenWindow(INI_ROOT .. 'MY_CataclysmMain.ini', 'MY_CataclysmMain')
 	end
 end
 
 function D.CloseCataclysmPanel()
 	if D.GetFrame() then
 		Wnd.CloseWindow(D.GetFrame())
-		Grid_CTM:CloseParty()
+		MY_CataclysmParty:CloseParty()
 		MY_Cataclysm.bFold = false
 		FireUIEvent('CTM_SET_FOLD')
 	end
@@ -466,8 +466,8 @@ function D.ReloadCataclysmPanel()
 	if D.GetFrame() then
 		D.CreateItemData()
 		D.CreateControlBar()
-		Grid_CTM:CloseParty()
-		Grid_CTM:ReloadParty()
+		MY_CataclysmParty:CloseParty()
+		MY_CataclysmParty:ReloadParty()
 	end
 end
 
@@ -483,8 +483,8 @@ end
 -------------------------------------------------
 -- 界面创建 事件注册
 -------------------------------------------------
-Cataclysm_Main = {}
-function Cataclysm_Main.OnFrameCreate()
+MY_CataclysmMain = {}
+function MY_CataclysmMain.OnFrameCreate()
 	if CFG.bFasterHP then
 		this:RegisterEvent('RENDER_FRAME_UPDATE')
 	end
@@ -528,7 +528,7 @@ function Cataclysm_Main.OnFrameCreate()
 	this:RegisterEvent('GVOICE_SPEAKER_STATE_CHANGED')
 	if GetClientPlayer() then
 		D.UpdateAnchor(this)
-		Grid_CTM:AutoLinkAllPanel()
+		MY_CataclysmParty:AutoLinkAllPanel()
 	end
 	D.SetFrameSize()
 	D.SetFrameCaption()
@@ -541,14 +541,14 @@ end
 -- 拖动窗体 OnFrameDrag
 -------------------------------------------------
 
-function Cataclysm_Main.OnFrameDragSetPosEnd()
-	Grid_CTM:AutoLinkAllPanel()
+function MY_CataclysmMain.OnFrameDragSetPosEnd()
+	MY_CataclysmParty:AutoLinkAllPanel()
 end
 
-function Cataclysm_Main.OnFrameDragEnd()
+function MY_CataclysmMain.OnFrameDragEnd()
 	this:CorrectPos()
 	CFG.tAnchor = GetFrameAnchor(this, 'TOPLEFT')
-	Grid_CTM:AutoLinkAllPanel() -- fix screen pos
+	MY_CataclysmParty:AutoLinkAllPanel() -- fix screen pos
 end
 
 -------------------------------------------------
@@ -561,7 +561,7 @@ local function RecBuffWithTabs(tabs, dwOwnerID, dwBuffID, dwSrcID)
 	end
 	for _, tab in ipairs(tabs) do
 		if not tab.bOnlyMine or dwSrcID == UI_GetClientPlayerID() then
-			Grid_CTM:RecBuff(dwOwnerID, setmetatable({
+			MY_CataclysmParty:RecBuff(dwOwnerID, setmetatable({
 				dwID      = dwBuffID,
 				nLevel    = tab.nLevel or 0,
 				bOnlyMine = tab.bOnlyMine or tab.bOnlySelf or tab.bSelf,
@@ -571,7 +571,7 @@ local function RecBuffWithTabs(tabs, dwOwnerID, dwBuffID, dwSrcID)
 end
 local function OnBuffUpdate(dwOwnerID, dwID, nLevel, nStackNum, dwSrcID)
 	if MY.IsBossFocusBuff(dwID, nLevel, nStackNum) then
-		Grid_CTM:RecBossFocusBuff(dwOwnerID, {
+		MY_CataclysmParty:RecBossFocusBuff(dwOwnerID, {
 			dwID      = dwID     ,
 			nLevel    = nLevel   ,
 			nStackNum = nStackNum,
@@ -583,32 +583,32 @@ local function OnBuffUpdate(dwOwnerID, dwID, nLevel, nStackNum, dwSrcID)
 		RecBuffWithTabs(BUFF_LIST[szName], dwOwnerID, dwID, dwSrcID)
 	end
 end
-function Cataclysm_Main.OnEvent(szEvent)
+function MY_CataclysmMain.OnEvent(szEvent)
 	if szEvent == 'RENDER_FRAME_UPDATE' then
-		Grid_CTM:CallDrawHPMP(true)
+		MY_CataclysmParty:CallDrawHPMP(true)
 	elseif szEvent == 'SYS_MSG' then
 		if arg0 == 'UI_OME_SKILL_CAST_LOG' and arg2 == 13165 then
-			Grid_CTM:KungFuSwitch(arg1)
+			MY_CataclysmParty:KungFuSwitch(arg1)
 		end
 		if CFG.bShowEffect then
 			if arg0 == 'UI_OME_SKILL_EFFECT_LOG' and arg5 == 6252
 			and arg1 == GetControlPlayerID() and arg9[SKILL_RESULT_TYPE.THERAPY] then
-				Grid_CTM:CallEffect(arg2, 500)
+				MY_CataclysmParty:CallEffect(arg2, 500)
 			end
 		end
 	elseif szEvent == 'PARTY_SYNC_MEMBER_DATA' then
-		Grid_CTM:CallRefreshImages(arg1, true, true, nil, true)
-		Grid_CTM:CallDrawHPMP(arg1, true)
+		MY_CataclysmParty:CallRefreshImages(arg1, true, true, nil, true)
+		MY_CataclysmParty:CallDrawHPMP(arg1, true)
 	elseif szEvent == 'PARTY_ADD_MEMBER' then
-		if Grid_CTM:GetPartyFrame(arg2) then
-			Grid_CTM:DrawParty(arg2)
+		if MY_CataclysmParty:GetPartyFrame(arg2) then
+			MY_CataclysmParty:DrawParty(arg2)
 		else
-			Grid_CTM:CreatePanel(arg2)
-			Grid_CTM:DrawParty(arg2)
+			MY_CataclysmParty:CreatePanel(arg2)
+			MY_CataclysmParty:DrawParty(arg2)
 			D.SetFrameSize()
 		end
 		if CFG.nAutoLinkMode ~= 5 then
-			Grid_CTM:AutoLinkAllPanel()
+			MY_CataclysmParty:AutoLinkAllPanel()
 		end
 		D.UpdatePrepareBarPos()
 	elseif szEvent == 'PARTY_DELETE_MEMBER' then
@@ -619,13 +619,13 @@ function Cataclysm_Main.OnEvent(szEvent)
 			local team = GetClientTeam()
 			local tGropu = team.GetGroupInfo(arg3)
 			if #tGropu.MemberList == 0 then
-				Grid_CTM:CloseParty(arg3)
-				Grid_CTM:AutoLinkAllPanel()
+				MY_CataclysmParty:CloseParty(arg3)
+				MY_CataclysmParty:AutoLinkAllPanel()
 			else
-				Grid_CTM:DrawParty(arg3)
+				MY_CataclysmParty:DrawParty(arg3)
 			end
 			if CFG.nAutoLinkMode ~= 5 then
-				Grid_CTM:AutoLinkAllPanel()
+				MY_CataclysmParty:AutoLinkAllPanel()
 			end
 		end
 		D.SetFrameSize()
@@ -633,34 +633,34 @@ function Cataclysm_Main.OnEvent(szEvent)
 	elseif szEvent == 'PARTY_DISBAND' then
 		D.CloseCataclysmPanel()
 	elseif szEvent == 'PARTY_UPDATE_MEMBER_LMR' then
-		Grid_CTM:CallDrawHPMP(arg1, true)
+		MY_CataclysmParty:CallDrawHPMP(arg1, true)
 	elseif szEvent == 'PARTY_UPDATE_MEMBER_INFO' then
-		Grid_CTM:CallRefreshImages(arg1, false, true, nil, true)
-		Grid_CTM:CallDrawHPMP(arg1, true)
+		MY_CataclysmParty:CallRefreshImages(arg1, false, true, nil, true)
+		MY_CataclysmParty:CallDrawHPMP(arg1, true)
 	elseif szEvent == 'UPDATE_PLAYER_SCHOOL_ID' then
 		if MY.IsParty(arg0) then
-			Grid_CTM:CallRefreshImages(arg0, false, true)
+			MY_CataclysmParty:CallRefreshImages(arg0, false, true)
 		end
 	elseif szEvent == 'PLAYER_STATE_UPDATE' then
 		if MY.IsParty(arg0) then
-			Grid_CTM:CallDrawHPMP(arg0, true)
+			MY_CataclysmParty:CallDrawHPMP(arg0, true)
 		end
 	elseif szEvent == 'PARTY_SET_MEMBER_ONLINE_FLAG' then
-		Grid_CTM:CallDrawHPMP(arg1, true)
+		MY_CataclysmParty:CallDrawHPMP(arg1, true)
 	elseif szEvent == 'TEAM_AUTHORITY_CHANGED' then
-		Grid_CTM:CallRefreshImages(arg2, true)
-		Grid_CTM:CallRefreshImages(arg3, true)
+		MY_CataclysmParty:CallRefreshImages(arg2, true)
+		MY_CataclysmParty:CallRefreshImages(arg3, true)
 		D.CreateControlBar()
 	elseif szEvent == 'PARTY_SET_FORMATION_LEADER' then
-		Grid_CTM:RefreshFormation()
+		MY_CataclysmParty:RefreshFormation()
 	elseif szEvent == 'PARTY_SET_MARK' then
-		Grid_CTM:RefreshMark()
+		MY_CataclysmParty:RefreshMark()
 	elseif szEvent == 'TEAM_VOTE_REQUEST' then
         -- arg0 nVoteType
         -- arg1 nArg0
         -- arg2 nArg1
 		if arg0 == 1 then
-			Grid_CTM:StartTeamVote('wage_agree')
+			MY_CataclysmParty:StartTeamVote('wage_agree')
 			local nTime = GetCurrentTime()
 			local function fnAction()
 				D.SetFrameCaption(_L('Wage await %ds...', 30 - (GetCurrentTime() - nTime)))
@@ -675,53 +675,53 @@ function Cataclysm_Main.OnEvent(szEvent)
         -- arg3 nArg0
         -- arg4 nArg1
 		if arg0 == 1 then
-			Grid_CTM:ChangeTeamVoteState('wage_agree', arg1, arg2 == 1 and 'resolve' or 'reject')
+			MY_CataclysmParty:ChangeTeamVoteState('wage_agree', arg1, arg2 == 1 and 'resolve' or 'reject')
 		end
 	elseif szEvent == 'TEAM_INCOMEMONEY_CHANGE_NOTIFY' then
 		local nTotalRaidMoney = GetClientTeam().nInComeMoney
 		if nTotalRaidMoney and nTotalRaidMoney == 0 then
-			Grid_CTM:ClearTeamVote('wage_agree')
+			MY_CataclysmParty:ClearTeamVote('wage_agree')
 			D.SetFrameCaption('')
 			MY.BreatheCall('MY_Cataclysm_Wage', false)
 		end
 	-- elseif szEvent == 'RIAD_READY_CONFIRM_RECEIVE_QUESTION' then
 	elseif szEvent == 'RIAD_READY_CONFIRM_RECEIVE_ANSWER' then
-		Grid_CTM:ChangeTeamVoteState('raid_ready', arg0, arg1 == 1 and 'resolve' or 'reject')
+		MY_CataclysmParty:ChangeTeamVoteState('raid_ready', arg0, arg1 == 1 and 'resolve' or 'reject')
 	elseif szEvent == 'TEAM_CHANGE_MEMBER_GROUP' then
 		local me = GetClientPlayer()
 		local team = GetClientTeam()
 		local tSrcGropu = team.GetGroupInfo(arg1)
 		-- SrcGroup
 		if #tSrcGropu.MemberList == 0 then
-			Grid_CTM:CloseParty(arg1)
-			Grid_CTM:AutoLinkAllPanel()
+			MY_CataclysmParty:CloseParty(arg1)
+			MY_CataclysmParty:AutoLinkAllPanel()
 		else
-			Grid_CTM:DrawParty(arg1)
+			MY_CataclysmParty:DrawParty(arg1)
 		end
 		-- DstGroup
-		if not Grid_CTM:GetPartyFrame(arg2) then
-			Grid_CTM:CreatePanel(arg2)
+		if not MY_CataclysmParty:GetPartyFrame(arg2) then
+			MY_CataclysmParty:CreatePanel(arg2)
 		end
-		Grid_CTM:DrawParty(arg2)
-		Grid_CTM:RefreshGroupText()
-		Grid_CTM:RefreshMark()
+		MY_CataclysmParty:DrawParty(arg2)
+		MY_CataclysmParty:RefreshGroupText()
+		MY_CataclysmParty:RefreshMark()
 		if CFG.nAutoLinkMode ~= 5 then
-			Grid_CTM:AutoLinkAllPanel()
+			MY_CataclysmParty:AutoLinkAllPanel()
 		end
 		D.SetFrameSize()
 	elseif szEvent == 'PARTY_LEVEL_UP_RAID' then
-		Grid_CTM:RefreshGroupText()
+		MY_CataclysmParty:RefreshGroupText()
 	elseif szEvent == 'PARTY_LOOT_MODE_CHANGED' then
 		D.CreateControlBar()
 	elseif szEvent == 'PARTY_ROLL_QUALITY_CHANGED' then
 		D.CreateControlBar()
 	elseif szEvent == 'TARGET_CHANGE' then
 		-- oldid， oldtype, newid, newtype
-		Grid_CTM:RefreshTarget(arg0, arg1, arg2, arg3)
+		MY_CataclysmParty:RefreshTarget(arg0, arg1, arg2, arg3)
 	elseif szEvent == 'CHARACTER_THREAT_RANKLIST' then
-		Grid_CTM:RefreshThreat(arg0, arg1)
+		MY_CataclysmParty:RefreshThreat(arg0, arg1)
 	elseif szEvent == 'MY_RAID_REC_BUFF' then
-		Grid_CTM:RecBuff(arg0, arg1)
+		MY_CataclysmParty:RecBuff(arg0, arg1)
 	elseif szEvent == 'BUFF_UPDATE' then
 		-- local owner, bdelete, index, cancancel, id  , stacknum, endframe, binit, level, srcid, isvalid, leftframe
 		--     = arg0 , arg1   , arg2 , arg3     , arg4, arg5    , arg6    , arg7 , arg8 , arg9 , arg10  , arg11
@@ -757,7 +757,7 @@ function Cataclysm_Main.OnEvent(szEvent)
 		if not team then
 			return
 		end
-		Grid_CTM:ClearBuff()
+		MY_CataclysmParty:ClearBuff()
 		for _, dwID in ipairs(team.GetTeamMemberList()) do
 			local tar = GetPlayer(dwID)
 			if tar then
@@ -779,8 +779,8 @@ function Cataclysm_Main.OnEvent(szEvent)
 		D.CreateControlBar()
 	elseif szEvent == 'UI_SCALED' then
 		D.UpdateAnchor(this)
-		Grid_CTM:RefreshSFX()
-		Grid_CTM:AutoLinkAllPanel()
+		MY_CataclysmParty:RefreshSFX()
+		MY_CataclysmParty:AutoLinkAllPanel()
 	elseif szEvent == 'LOADING_END' then -- 勿删
 		D.ReloadCataclysmPanel()
 		D.RaidPanel_Switch(DEBUG)
@@ -790,18 +790,18 @@ function Cataclysm_Main.OnEvent(szEvent)
 	end
 end
 
-function Cataclysm_Main.OnFrameBreathe()
+function MY_CataclysmMain.OnFrameBreathe()
 	local me = GetClientPlayer()
 	if not me then
 		return
 	end
-	Grid_CTM:RefreshDistance()
-	Grid_CTM:RefreshBuff()
-	Grid_CTM:RefreshAttention()
-	Grid_CTM:RefreshCaution()
-	Grid_CTM:RefreshTTarget()
-	Grid_CTM:RefreshBossTarget()
-	Grid_CTM:RefreshBossFocus()
+	MY_CataclysmParty:RefreshDistance()
+	MY_CataclysmParty:RefreshBuff()
+	MY_CataclysmParty:RefreshAttention()
+	MY_CataclysmParty:RefreshCaution()
+	MY_CataclysmParty:RefreshTTarget()
+	MY_CataclysmParty:RefreshBossTarget()
+	MY_CataclysmParty:RefreshBossFocus()
 	local fPrepare, szPrepare, nAlpha
 	local dwType, dwID = me.GetTarget()
 	if dwType == TARGET.NPC then
@@ -848,14 +848,14 @@ function Cataclysm_Main.OnFrameBreathe()
 	D.TeammatePanel_Switch(false)
 	-- 官方代码太容易报错 放最后
 	if not this.nBreatheTime or GetTime() - this.nBreatheTime >= 300 then -- 语音最短刷新间隔300ms
-		Grid_CTM:RefreshGVoice()
+		MY_CataclysmParty:RefreshGVoice()
 		this.nBreatheTime = GetTime()
 	end
 	GVoiceBase_CheckMicState()
 end
 end
 
-function Cataclysm_Main.OnLButtonClick()
+function MY_CataclysmMain.OnLButtonClick()
 	local szName = this:GetName()
 	if szName == 'Btn_Option' then
 		local me = GetClientPlayer()
@@ -869,12 +869,12 @@ function Cataclysm_Main.OnLButtonClick()
 					bDisable = not MY.IsLeader(),
 					fnAction = function()
 						Send_RaidReadyConfirm()
-						Grid_CTM:StartTeamVote('raid_ready')
+						MY_CataclysmParty:StartTeamVote('raid_ready')
 					end,
 				},
 				{
 					szOption = g_tStrings.STR_RAID_READY_CONFIRM_RESET,
-					fnAction = function() Grid_CTM:ClearTeamVote('raid_ready') end,
+					fnAction = function() MY_CataclysmParty:ClearTeamVote('raid_ready') end,
 				}
 			})
 			table.insert(menu, { bDevide = true })
@@ -944,15 +944,15 @@ function Cataclysm_Main.OnLButtonClick()
 	end
 end
 
-function Cataclysm_Main.OnLButtonDown()
-	Grid_CTM:BringToTop()
+function MY_CataclysmMain.OnLButtonDown()
+	MY_CataclysmParty:BringToTop()
 end
 
-function Cataclysm_Main.OnRButtonDown()
-	Grid_CTM:BringToTop()
+function MY_CataclysmMain.OnRButtonDown()
+	MY_CataclysmParty:BringToTop()
 end
 
-function Cataclysm_Main.OnCheckBoxCheck()
+function MY_CataclysmMain.OnCheckBoxCheck()
 	local name = this:GetName()
 	if name == 'CheckBox_Fold' then
 		MY_Cataclysm.bFold = true
@@ -960,7 +960,7 @@ function Cataclysm_Main.OnCheckBoxCheck()
 	end
 end
 
-function Cataclysm_Main.OnCheckBoxUncheck()
+function MY_CataclysmMain.OnCheckBoxUncheck()
 	local name = this:GetName()
 	if name == 'CheckBox_Fold' then
 		MY_Cataclysm.bFold = false
@@ -968,7 +968,7 @@ function Cataclysm_Main.OnCheckBoxUncheck()
 	end
 end
 
-function Cataclysm_Main.OnMouseLeave()
+function MY_CataclysmMain.OnMouseLeave()
 	local szName = this:GetName()
 	if szName == 'WndButton_GKP'
 	or szName == 'WndButton_LootMode'
@@ -1005,7 +1005,7 @@ local MIC_TIP = setmetatable({
 	end,
 })
 
-function Cataclysm_Main.OnMouseEnter()
+function MY_CataclysmMain.OnMouseEnter()
 	local szName = this:GetName()
 	if szName == 'WndButton_GKP'
 	or szName == 'WndButton_LootMode'

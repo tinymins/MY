@@ -70,7 +70,7 @@ function PS.OnPanelActive(frame)
 			local nNewX, nNewY = nVal / CFG.fScaleX, CFG.fScaleY / CFG.fScaleY
 			CFG.fScaleX = nVal
 			if MY_Cataclysm.GetFrame() then
-				Grid_CTM:Scale(nNewX, nNewY)
+				MY_CataclysmParty:Scale(nNewX, nNewY)
 			end
 		end,
 		textfmt = function(val) return _L('%d%%', val) end,
@@ -88,7 +88,7 @@ function PS.OnPanelActive(frame)
 			local nNewX, nNewY = CFG.fScaleX / CFG.fScaleX, nVal / CFG.fScaleY
 			CFG.fScaleY = nVal
 			if MY_Cataclysm.GetFrame() then
-				Grid_CTM:Scale(nNewX, nNewY)
+				MY_CataclysmParty:Scale(nNewX, nNewY)
 			end
 		end,
 		textfmt = function(val) return _L('%d%%', val) end,
@@ -140,7 +140,7 @@ function PS.OnPanelActive(frame)
 			end
 			CFG.nAutoLinkMode = 5
 			if MY_Cataclysm.GetFrame() then
-				Grid_CTM:AutoLinkAllPanel()
+				MY_CataclysmParty:AutoLinkAllPanel()
 				MY_Cataclysm.SetFrameSize()
 			end
 		end,
@@ -155,7 +155,7 @@ function PS.OnPanelActive(frame)
 			end
 			CFG.nAutoLinkMode = 1
 			if MY_Cataclysm.GetFrame() then
-				Grid_CTM:AutoLinkAllPanel()
+				MY_CataclysmParty:AutoLinkAllPanel()
 				MY_Cataclysm.SetFrameSize()
 			end
 		end,
@@ -170,7 +170,7 @@ function PS.OnPanelActive(frame)
 			end
 			CFG.nAutoLinkMode = 2
 			if MY_Cataclysm.GetFrame() then
-				Grid_CTM:AutoLinkAllPanel()
+				MY_CataclysmParty:AutoLinkAllPanel()
 				MY_Cataclysm.SetFrameSize()
 			end
 		end,
@@ -185,7 +185,7 @@ function PS.OnPanelActive(frame)
 			end
 			CFG.nAutoLinkMode = 3
 			if MY_Cataclysm.GetFrame() then
-				Grid_CTM:AutoLinkAllPanel()
+				MY_CataclysmParty:AutoLinkAllPanel()
 				MY_Cataclysm.SetFrameSize()
 			end
 		end,
@@ -200,7 +200,7 @@ function PS.OnPanelActive(frame)
 			end
 			CFG.nAutoLinkMode = 4
 			if MY_Cataclysm.GetFrame() then
-				Grid_CTM:AutoLinkAllPanel()
+				MY_CataclysmParty:AutoLinkAllPanel()
 				MY_Cataclysm.SetFrameSize()
 			end
 		end,

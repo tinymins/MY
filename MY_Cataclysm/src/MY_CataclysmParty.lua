@@ -281,16 +281,16 @@ setmetatable(CTM_KUNGFU_TEXT, { __index = function() return _L['KUNGFU_0'] end, 
 -- CODE --
 local CTM = {}
 
-CTM_Party_Base = class()
+MY_CataclysmParty_Base = class()
 
-function CTM_Party_Base.OnFrameCreate()
+function MY_CataclysmParty_Base.OnFrameCreate()
 	this:Lookup('', 'Handle_BG/Shadow_BG'):SetAlpha(CFG.nAlpha)
 	this:RegisterEvent('CTM_SET_ALPHA')
 	this:RegisterEvent('CTM_SET_FOLD')
 	this:SetVisible(not MY_Cataclysm.bFold)
 end
 
-function CTM_Party_Base.OnEvent(szEvent)
+function MY_CataclysmParty_Base.OnEvent(szEvent)
 	if szEvent == 'CTM_SET_ALPHA' then
 		this:Lookup('', 'Handle_BG/Shadow_BG'):SetAlpha(CFG.nAlpha)
 	elseif szEvent == 'CTM_SET_FOLD' then
@@ -298,15 +298,15 @@ function CTM_Party_Base.OnEvent(szEvent)
 	end
 end
 
-function CTM_Party_Base.OnLButtonDown()
+function MY_CataclysmParty_Base.OnLButtonDown()
 	CTM:BringToTop()
 end
 
-function CTM_Party_Base.OnRButtonDown()
+function MY_CataclysmParty_Base.OnRButtonDown()
 	CTM:BringToTop()
 end
 
-function CTM_Party_Base.OnItemLButtonDrag()
+function MY_CataclysmParty_Base.OnItemLButtonDrag()
 	local dwID = (this.bBuff and this:GetParent():GetParent().dwID) or (this.bRole and this.dwID)
 	if not dwID then
 		return
@@ -325,7 +325,7 @@ function CTM_Party_Base.OnItemLButtonDrag()
 end
 
 -- DragEnd bug fix
-function CTM_Party_Base.OnItemLButtonUp()
+function MY_CataclysmParty_Base.OnItemLButtonUp()
 	MY.DelayCall(50, function()
 		if CTM_DRAG then
 			CTM_DRAG, CTM_DRAG_ID = false, nil
@@ -336,7 +336,7 @@ function CTM_Party_Base.OnItemLButtonUp()
 	end)
 end
 
-function CTM_Party_Base.OnItemLButtonDragEnd()
+function MY_CataclysmParty_Base.OnItemLButtonDragEnd()
 	local dwID = (this.bBuff and this:GetParent():GetParent().dwID) or (this.bRole and this.dwID)
 	if CTM_DRAG and dwID ~= CTM_DRAG_ID then
 		local team = GetClientTeam()
@@ -361,7 +361,7 @@ function D.SetTargetTeammate(dwID, info)
 	end
 end
 
-function CTM_Party_Base.OnItemLButtonDown()
+function MY_CataclysmParty_Base.OnItemLButtonDown()
 	local dwID = (this.bBuff and this:GetParent():GetParent().dwID) or (this.bRole and this.dwID)
 	if not dwID then
 		return
@@ -376,7 +376,7 @@ function CTM_Party_Base.OnItemLButtonDown()
 	CTM_CLICK_DISMISS = false
 end
 
-function CTM_Party_Base.OnItemLButtonClick()
+function MY_CataclysmParty_Base.OnItemLButtonClick()
 	if CTM_CLICK_DISMISS then
 		return
 	end
@@ -434,9 +434,9 @@ local function OnItemRefreshTip()
 		MY.OutputTeamMemberTip(this.dwID, { nX, nY + 5, nW, nH })
 	end
 end
-CTM_Party_Base.OnItemRefreshTip = OnItemRefreshTip
+MY_CataclysmParty_Base.OnItemRefreshTip = OnItemRefreshTip
 
-function CTM_Party_Base.OnItemMouseEnter()
+function MY_CataclysmParty_Base.OnItemMouseEnter()
 	if CTM_DRAG and this:Lookup('Image_Slot') and this:Lookup('Image_Slot'):IsValid() then
 		this:Lookup('Image_Slot'):Show()
 	end
@@ -471,7 +471,7 @@ local function ResumeTempTarget()
 	SetTarget(CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID)
 	CTM_TEMP_TARGET_TYPE, CTM_TEMP_TARGET_ID = nil
 end
-function CTM_Party_Base.OnItemMouseLeave(dst)
+function MY_CataclysmParty_Base.OnItemMouseLeave(dst)
 	if CTM_DRAG and this:Lookup('Image_Slot') and this:Lookup('Image_Slot'):IsValid() then
 		this:Lookup('Image_Slot'):Hide()
 	end
@@ -505,7 +505,7 @@ function CTM_Party_Base.OnItemMouseLeave(dst)
 end
 end
 
-function CTM_Party_Base.OnItemRButtonClick()
+function MY_CataclysmParty_Base.OnItemRButtonClick()
 	if not this.dwID then
 		return
 	end
@@ -624,7 +624,7 @@ function CTM_Party_Base.OnItemRButtonClick()
 end
 
 function CTM:GetPartyFrame(nIndex) -- 获得组队面板
-	return Station.Lookup('Normal/Cataclysm_Party_' .. nIndex)
+	return Station.Lookup('Normal/MY_CataclysmParty_' .. nIndex)
 end
 
 function CTM:BringToTop()
@@ -649,8 +649,8 @@ function CTM:CreatePanel(nIndex)
 	local frame = self:GetPartyFrame(nIndex)
 	if not frame then
 		frame = Wnd.OpenWindow(
-			MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/ui/Cataclysm_Party_' .. CFG.eFrameStyle .. '.ini',
-			'Cataclysm_Party_' .. nIndex
+			MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/ui/MY_CataclysmParty.' .. CFG.eFrameStyle .. '.ini',
+			'MY_CataclysmParty_' .. nIndex
 		)
 		frame:Scale(CFG.fScaleX, CFG.fScaleY)
 		frame:SetVisible(not MY_Cataclysm.bFold)
@@ -2096,10 +2096,13 @@ function CTM:CallEffect(dwTargetID, nDelay)
 	end
 end
 
-Grid_CTM = setmetatable({}, { __index = CTM, __newindex = function() end, __metatable = true })
--- public
-function CTM_GetMemberHandle(dwID)
+local function GetMemberHandle(dwID)
 	if CTM_CACHE[dwID] and CTM_CACHE[dwID]:IsValid() then
 		return CTM_CACHE[dwID]
 	end
 end
+
+local ui = {
+	GetMemberHandle = GetMemberHandle,
+}
+MY_CataclysmParty = setmetatable(ui, { __index = CTM, __newindex = function() end, __metatable = true })

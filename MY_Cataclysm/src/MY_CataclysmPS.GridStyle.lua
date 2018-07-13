@@ -64,8 +64,8 @@ function PS.OnPanelActive(frame)
 			oncheck = function()
 				CFG.nColoredName = p[1]
 				if MY_Cataclysm.GetFrame() then
-					Grid_CTM:CallRefreshImages(true, false, false, nil, true)
-					Grid_CTM:CallDrawHPMP(true ,true)
+					MY_CataclysmParty:CallRefreshImages(true, false, false, nil, true)
+					MY_CataclysmParty:CallDrawHPMP(true ,true)
 				end
 			end,
 		}, true):autoWidth():width() + 5
@@ -80,7 +80,7 @@ function PS.OnPanelActive(frame)
 		onchange = function(val)
 			CFG.fNameFontScale = val / 100
 			if MY_Cataclysm.GetFrame() then
-				Grid_CTM:CallRefreshImages(nil, nil, nil, nil, true)
+				MY_CataclysmParty:CallRefreshImages(nil, nil, nil, nil, true)
 			end
 		end,
 	}, true):height()
@@ -96,7 +96,7 @@ function PS.OnPanelActive(frame)
 			group = 'namevali', checked = CFG.nNameVAlignment == p[1],
 			oncheck = function()
 				CFG.nNameVAlignment = p[1]
-				Grid_CTM:CallRefreshImages(true, false, true, nil, true)
+				MY_CataclysmParty:CallRefreshImages(true, false, true, nil, true)
 			end,
 		}, true):autoWidth():width() + 5
 	end
@@ -110,7 +110,7 @@ function PS.OnPanelActive(frame)
 			group = 'namehali', checked = CFG.nNameHAlignment == p[1],
 			oncheck = function()
 				CFG.nNameHAlignment = p[1]
-				Grid_CTM:CallRefreshImages(true, false, true, nil, true)
+				MY_CataclysmParty:CallRefreshImages(true, false, true, nil, true)
 			end,
 		}, true):autoWidth():width() + 5
 	end
@@ -121,8 +121,8 @@ function PS.OnPanelActive(frame)
 			XGUI.OpenFontPicker(function(nFont)
 				CFG.nNameFont = nFont
 				if MY_Cataclysm.GetFrame() then
-					Grid_CTM:CallRefreshImages(true, false, false, nil, true)
-					Grid_CTM:CallDrawHPMP(true, true)
+					MY_CataclysmParty:CallRefreshImages(true, false, false, nil, true)
+					MY_CataclysmParty:CallDrawHPMP(true, true)
 				end
 			end)
 		end,
@@ -143,7 +143,7 @@ function PS.OnPanelActive(frame)
 			oncheck = function()
 				CFG.nHPShownMode2 = p[1]
 				if MY_Cataclysm.GetFrame() then
-					Grid_CTM:CallDrawHPMP(true, true)
+					MY_CataclysmParty:CallDrawHPMP(true, true)
 				end
 			end,
 		}, true):autoWidth():width() + 5
@@ -158,7 +158,7 @@ function PS.OnPanelActive(frame)
 		onchange = function(val)
 			CFG.fLifeFontScale = val / 100
 			if MY_Cataclysm.GetFrame() then
-				Grid_CTM:CallDrawHPMP(true, true)
+				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
 		end,
 		autoenable = function() return CFG.nHPShownMode2 ~= 0 end,
@@ -179,7 +179,7 @@ function PS.OnPanelActive(frame)
 			oncheck = function()
 				CFG.nHPShownNumMode = p[1]
 				if MY_Cataclysm.GetFrame() then
-					Grid_CTM:CallDrawHPMP(true, true)
+					MY_CataclysmParty:CallDrawHPMP(true, true)
 				end
 			end,
 		}, true):autoWidth():width() + 5
@@ -191,7 +191,7 @@ function PS.OnPanelActive(frame)
 		oncheck = function(bCheck)
 			CFG.bShowHPDecimal = bCheck
 			if MY_Cataclysm.GetFrame() then
-				Grid_CTM:CallDrawHPMP(true, true)
+				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
 		end,
 	}, true):autoWidth():width() + 5
@@ -209,7 +209,7 @@ function PS.OnPanelActive(frame)
 			autoenable = function() return CFG.nHPShownMode2 ~= 0 end,
 			oncheck = function()
 				CFG.nHPVAlignment = p[1]
-				Grid_CTM:CallRefreshImages(true, false, true, nil, true)
+				MY_CataclysmParty:CallRefreshImages(true, false, true, nil, true)
 			end,
 		}, true):autoWidth():width() + 5
 	end
@@ -224,7 +224,7 @@ function PS.OnPanelActive(frame)
 			autoenable = function() return CFG.nHPShownMode2 ~= 0 end,
 			oncheck = function()
 				CFG.nHPHAlignment = p[1]
-				Grid_CTM:CallRefreshImages(true, false, true, nil, true)
+				MY_CataclysmParty:CallRefreshImages(true, false, true, nil, true)
 			end,
 		}, true):autoWidth():width() + 5
 	end
@@ -234,7 +234,7 @@ function PS.OnPanelActive(frame)
 			XGUI.OpenFontPicker(function(nFont)
 				CFG.nLifeFont = nFont
 				if MY_Cataclysm.GetFrame() then
-					Grid_CTM:CallDrawHPMP(true, true)
+					MY_CataclysmParty:CallDrawHPMP(true, true)
 				end
 			end)
 		end,
@@ -257,8 +257,8 @@ function PS.OnPanelActive(frame)
 			oncheck = function()
 				CFG.nShowIcon = p[1]
 				if MY_Cataclysm.GetFrame() then
-					Grid_CTM:CallRefreshImages(true, false, true, nil, true)
-					Grid_CTM:CallDrawHPMP(true, true)
+					MY_CataclysmParty:CallRefreshImages(true, false, true, nil, true)
+					MY_CataclysmParty:CallDrawHPMP(true, true)
 				end
 			end,
 		}, true):autoWidth():width() + 5
@@ -273,7 +273,7 @@ function PS.OnPanelActive(frame)
 		oncheck = function(bCheck)
 			CFG.nShowMP = bCheck
 			if MY_Cataclysm.GetFrame() then
-				Grid_CTM:CallDrawHPMP(true, true)
+				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
 		end,
 	}, true):autoWidth():width() + 5
@@ -284,7 +284,7 @@ function PS.OnPanelActive(frame)
 			XGUI.OpenFontPicker(function(nFont)
 				CFG.nManaFont = nFont
 				if MY_Cataclysm.GetFrame() then
-					Grid_CTM:CallDrawHPMP(true, true)
+					MY_CataclysmParty:CallDrawHPMP(true, true)
 				end
 			end)
 		end,
@@ -300,7 +300,7 @@ function PS.OnPanelActive(frame)
 		onchange = function(val)
 			CFG.fManaFontScale = val / 100
 			if MY_Cataclysm.GetFrame() then
-				Grid_CTM:CallDrawHPMP(true, true)
+				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
 		end,
 		autoenable = function() return CFG.nShowMP end,

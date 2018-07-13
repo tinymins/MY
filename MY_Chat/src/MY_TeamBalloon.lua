@@ -55,8 +55,8 @@ local function AppendBalloon(hFrame, dwID, szMsg)
 				x, y = x + 205, y - h - 2
 			end
 		end
-	elseif CTM_GetMemberHandle then
-		local hTotal = CTM_GetMemberHandle(dwID)
+	elseif MY_CataclysmParty and MY_CataclysmParty.GetMemberHandle then
+		local hTotal = MY_CataclysmParty.GetMemberHandle(dwID)
 		if hTotal then
 			_, h = hContent:GetSize()
 			w, _ = hTotal:GetSize()

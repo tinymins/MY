@@ -128,7 +128,7 @@ function PS.OnPanelActive(frame)
 		oncheck = function(bCheck)
 			CFG.bHPHitAlert = bCheck
 			if MY_Cataclysm.GetFrame() then
-				Grid_CTM:CallDrawHPMP(true, true)
+				MY_CataclysmParty:CallDrawHPMP(true, true)
 			end
 		end,
 	}, true):autoWidth():width() + 5
@@ -161,7 +161,7 @@ function PS.OnPanelActive(frame)
 		oncheck = function(bCheck)
 			CFG.bShowTargetTargetAni = bCheck
 			if MY_Cataclysm.GetFrame() then
-				Grid_CTM:RefreshTTarget()
+				MY_CataclysmParty:RefreshTTarget()
 			end
 		end,
 	}, true):autoWidth():width() + 5

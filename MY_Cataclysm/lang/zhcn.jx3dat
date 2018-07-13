@@ -1,5 +1,6 @@
 -- language data (zhcn) updated at 2015/02/23 10:11:27
 data = {
+	-- MY_CataclysmMain.lua --
 	['Interface settings'] = '界面设置',
 	['Cataclysm'] = '团队面板',
 	['Please hold down Ctrl, change it'] = '请按住Ctrl来更改分配模式。',
@@ -67,7 +68,7 @@ data = {
 	['Team Members: %d, %d agree %d%%'] = '团队共%d人，%d人已同意发放工资，当前比率%d%%。',
 	['Wage await %ds...'] = '工资等待确认中…(%ds)',
 	['Cataclysm Team Panel'] = '团队面板',
-	-- Cataclysm_Party.lua --
+	-- MY_CataclysmParty.lua --
 	['KUNGFU_10080'] = '云',
 	['KUNGFU_10081'] = '冰',
 	['KUNGFU_10021'] = '花',
