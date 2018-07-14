@@ -498,7 +498,7 @@ for i = 1, 5 do
 			'MY_TargetMon_' .. i .. '_' .. j, _L('Cancel buff %d - %d', i, j),
 			i == 1 and j == 1 and _L['MY Buff Monitor'] or '',
 			function()
-				if MY.IsShieldedVersion() and not MY.IsInDungeon(true) then
+				if MY.IsShieldedVersion() and not MY.IsInDungeon() then
 					if not IsDebugClient() then
 						OutputMessage('MSG_ANNOUNCE_YELLOW', _L['Cancel buff is disabled outside dungeon.'])
 					end
