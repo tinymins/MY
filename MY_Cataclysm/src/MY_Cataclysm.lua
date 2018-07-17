@@ -28,6 +28,7 @@ MY_Cataclysm.CFG = {}
 MY_Cataclysm.bDebug = false
 MY_Cataclysm.bEnable = true
 MY_Cataclysm.szConfigName = 'common'
+MY_Cataclysm.bFold = false
 MY_Cataclysm.BG_COLOR_MODE = {
 	SAME_COLOR = 0,
 	BY_DISTANCE = 1,
