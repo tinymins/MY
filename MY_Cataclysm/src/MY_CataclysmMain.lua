@@ -1078,7 +1078,14 @@ function D.ConfirmRestoreConfig()
 				MY.SwitchTab('MY_Cataclysm', true)
 			end,
 		},
-		{ szOption = _L['Keep current'] },
+		{
+			szOption = _L['Keep current'],
+			fnAction = function()
+				if CFG.eCss == '' then
+					CFG.eCss = 'DEFAULT'
+				end
+			end,
+		},
 	})
 end
 
