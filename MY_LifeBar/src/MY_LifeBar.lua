@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-13 00:09:43
+-- @Last Modified time: 2018-07-17 10:38:05
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -157,6 +157,14 @@ local function onPartySetMark()
 end
 MY.RegisterInit('MY_LifeBar_onPartySetMark', onPartySetMark)
 MY.RegisterEvent('PARTY_SET_MARK.MY_LifeBar', onPartySetMark)
+MY.RegisterEvent('PARTY_DELETE_MEMBER.MY_LifeBar', function()
+	local me = GetClientPlayer()
+	if me.dwID == arg1 then
+		onPartySetMark()
+	end
+end)
+MY.RegisterEvent('PARTY_DISBAND.MY_LifeBar', onPartySetMark)
+MY.RegisterEvent('PARTY_UPDATE_BASE_INFO.MY_LifeBar', onPartySetMark)
 end
 
 MY_LifeBar = {}
