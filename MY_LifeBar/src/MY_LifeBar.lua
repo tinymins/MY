@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-18 13:41:58
+-- @Last Modified time: 2018-07-18 15:47:07
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -292,6 +292,7 @@ function D.HideSysHeadTop()
 	SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_TITLE, false)
 	SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_LIFE , false)
 	SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_GUILD, false)
+	SetGlobalTopIntelligenceLife(false)
 end
 function D.SaveSysHeadTop()
 	if SYS_HEAD_TOP_STATE then
@@ -309,6 +310,7 @@ function D.SaveSysHeadTop()
 		['GLOBAL_HEAD_CLIENTPLAYER_TITLE'] = GetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_TITLE),
 		['GLOBAL_HEAD_CLIENTPLAYER_LIFE' ] = GetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_LIFE ),
 		['GLOBAL_HEAD_CLIENTPLAYER_GUILD'] = GetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_GUILD),
+		['GLOBAL_TOP_INTELLIGENCE_LIFE'  ] = GetGlobalTopIntelligenceLife(),
 	}
 end
 function D.ResumeSysHeadTop()
@@ -326,6 +328,7 @@ function D.ResumeSysHeadTop()
 	SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_TITLE, SYS_HEAD_TOP_STATE['GLOBAL_HEAD_CLIENTPLAYER_TITLE'])
 	SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_LIFE , SYS_HEAD_TOP_STATE['GLOBAL_HEAD_CLIENTPLAYER_LIFE'])
 	SetGlobalTopHeadFlag(GLOBAL_HEAD_CLIENTPLAYER, GLOBAL_HEAD_GUILD, SYS_HEAD_TOP_STATE['GLOBAL_HEAD_CLIENTPLAYER_GUILD'])
+	SetGlobalTopIntelligenceLife(SYS_HEAD_TOP_STATE['GLOBAL_TOP_INTELLIGENCE_LIFE'])
 	SYS_HEAD_TOP_STATE = nil
 end
 MY.RegisterExit(D.ResumeSysHeadTop)
