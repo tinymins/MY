@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-17 10:38:05
+-- @Last Modified time: 2018-07-18 13:41:58
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -165,6 +165,11 @@ MY.RegisterEvent('PARTY_DELETE_MEMBER.MY_LifeBar', function()
 end)
 MY.RegisterEvent('PARTY_DISBAND.MY_LifeBar', onPartySetMark)
 MY.RegisterEvent('PARTY_UPDATE_BASE_INFO.MY_LifeBar', onPartySetMark)
+
+local function onLoadingEnd()
+	OVERWRITE_TITLE_EFFECT = {}
+end
+MY.RegisterEvent('LOADING_END', onLoadingEnd)
 end
 
 MY_LifeBar = {}
