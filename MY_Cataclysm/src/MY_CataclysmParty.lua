@@ -429,7 +429,7 @@ local function OnItemRefreshTip()
 	local nX, nY = this:GetRoot():GetAbsPos()
 	local nW, nH = this:GetRoot():GetSize()
 	if this.bBuff then
-		MY.OutputBuffTip(this.dwID, this.nLevel, { nX, nY + 5, nW, nH }, GetEndTime(this.nEndFrame))
+		MY.OutputBuffTip(this.dwID, this.nLevel, { nX, nY + 5, nW, nH }, GetEndTime(this.nEndFrame), this.szVia)
 	elseif this.bRole then
 		MY.OutputTeamMemberTip(this.dwID, { nX, nY + 5, nW, nH })
 	end
@@ -1521,6 +1521,7 @@ function D.UpdateCharaterBuff(p, handle, key, data, KBuff)
 			item.nLevel = KBuff.nLevel
 			item.nEndFrame = nEndFrame
 			item.nStackNum = nStackNum
+			item.szVia = data.szVia
 			-- buff time
 			local txtTime = item:Lookup('Text_Time')
 			if CFG.bShowBuffTime then

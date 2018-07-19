@@ -59,7 +59,7 @@ function Raid_MonitorBuffs(tBuffs, ...)
 	_Raid_MonitorBuffs(tBuffs, ...)
 end
 
-local function InsertBuffListCache(aBuffList)
+local function InsertBuffListCache(aBuffList, szVia)
 	for _, tab in ipairs(aBuffList) do
 		local id = tab.dwID or tab.szName
 		if id then
@@ -83,7 +83,7 @@ local function InsertBuffListCache(aBuffList)
 				if not BUFF_LIST[id] then
 					BUFF_LIST[id] = {}
 				end
-				insert(BUFF_LIST[id], 1, tab)
+				insert(BUFF_LIST[id], 1, setmetatable({ szVia = szVia }, { __index = tab }))
 			end
 		end
 	end
@@ -91,18 +91,18 @@ end
 function D.UpdateBuffListCache()
 	BUFF_LIST = {}
 	if CFG.bBuffDataOfficial then
-		InsertBuffListCache(CTM_BUFF_OFFICIAL)
+		InsertBuffListCache(CTM_BUFF_OFFICIAL, _L['From official channel'])
 	end
 	if CFG.bBuffDataNangongbo then
-		InsertBuffListCache(CTM_BUFF_NGB_BASE)
+		InsertBuffListCache(CTM_BUFF_NGB_BASE, _L['From nangongbo base data'])
 		if CFG.bBuffDataNangongboCmd then
-			InsertBuffListCache(CTM_BUFF_NGB_CMD)
+			InsertBuffListCache(CTM_BUFF_NGB_CMD, _L['From nangongbo cmd data'])
 		end
 		if CFG.bBuffDataNangongboHeal then
-			InsertBuffListCache(CTM_BUFF_NGB_HEAL)
+			InsertBuffListCache(CTM_BUFF_NGB_HEAL, _L['From nangongbo heal data'])
 		end
 	end
-	InsertBuffListCache(CFG.aBuffList)
+	InsertBuffListCache(CFG.aBuffList, _L['From custom data'])
 	FireUIEvent('CTM_BUFF_LIST_CACHE_UPDATE')
 end
 end

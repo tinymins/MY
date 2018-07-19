@@ -152,4 +152,10 @@ data = {
 	['Sure'] = '確定',
 	['Delete'] = '刪除',
 	['Delete [%s]?'] = '刪除[%s]？',
+
+	['From official channel'] = '來自其它插件聯動官方面板數據',
+	['From nangongbo base data'] = '來自南宮伯基礎數據',
+	['From nangongbo cmd data'] = '來自南宮伯指揮數據',
+	['From nangongbo heal data'] = '來自南宮伯治療數據',
+	['From custom data'] = '來自用戶自定義數據',
 }
