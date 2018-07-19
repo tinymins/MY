@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 10:36:40
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-12 18:31:56
+-- @Last Modified time: 2018-07-19 19:19:39
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -40,7 +40,7 @@ local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/lang/')
 
 local PS = {}
 local function LoadUI(ui)
-	ui:children('#WndSliderBox_UIScale'):value(Config.fUIScale)
+	ui:children('#WndSliderBox_GlobalUIScale'):value(Config.fGlobalUIScale * 100)
 	ui:children('#WndSliderBox_LifeBarWidth'):value(Config.nLifeWidth)
 	ui:children('#WndSliderBox_LifeBarHeight'):value(Config.nLifeHeight)
 	ui:children('#WndSliderBox_LifeBarOffsetX'):value(Config.nLifeOffsetX)
@@ -59,7 +59,7 @@ local function LoadUI(ui)
 	ui:children('#WndSliderBox_Distance'):value(math.sqrt(Config.nDistance) / 64)
 	ui:children('#WndSliderBox_VerticalDistance'):value(Config.nVerticalDistance / 8 / 64)
 	ui:children('#WndSliderBox_Alpha'):value(Config.nAlpha)
-	ui:children('#WndCheckBox_IgnoreUIScale'):check(Config.bIgnoreUIScale)
+	ui:children('#WndCheckBox_IgnoreUIScale'):check(not Config.bSystemUIScale)
 	ui:children('#WndCheckBox_ShowObjectID'):check(Config.bShowObjectID)
 	ui:children('#WndCheckBox_ShowObjectIDOnlyUnnamed'):check(Config.bShowObjectIDOnlyUnnamed)
 	ui:children('#WndCheckBox_ShowSpecialNpc'):check(Config.bShowSpecialNpc)
@@ -355,12 +355,12 @@ function PS.OnPanelActive(wnd)
 	y = y + offsety
 
 	ui:append('WndSliderBox', {
-		name = 'WndSliderBox_UIScale',
-		x = x, y = y, sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE, range = { 49, 200 },
-		text = function(value) return value == 49 and _L['UI scale: Follow system.'] or _L('UI scale: %.1f.', value / 100) end, -- ×ÖËõ·Å
-		value = Config.fUIScale * 100,
+		name = 'WndSliderBox_GlobalUIScale',
+		x = x, y = y, sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE, range = { 1, 200 },
+		text = function(value) return _L('Global UI scale: %.2f.', value / 100) end, -- ×ÖËõ·Å
+		value = Config.fGlobalUIScale * 100,
 		onchange = function(value)
-			Config.fUIScale = value == 49 and 0 or (value / 100)
+			Config.fGlobalUIScale = value / 100
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
@@ -369,7 +369,7 @@ function PS.OnPanelActive(wnd)
 	-- ÓÒ°ë±ß
 	X, Y = 350, 65
 	x, y = X, Y
-	offsety = 32
+	offsety = 29
 	local function FillColorTable(opt, relation, tartype)
 		local cfg = Config.Color[relation]
 		opt.rgb = cfg[tartype]
@@ -606,8 +606,21 @@ function PS.OnPanelActive(wnd)
 				XGUI(this):color(r, g, b)
 			end)
 		end,
+		autoenable = function() return D.IsEnabled() end,
 	})
 	ui:append('Text', { text = _L['lifebar border color'], x = x + 27, y = y - 2 })
+
+	x = X
+	y = y + offsety - 10
+	x = x + ui:append('WndCheckBox', {
+		name = 'WndCheckBox_IgnoreUIScale',
+		x = x, y = y, text = _L['Ignore ui scale'],
+		checked = not Config.bSystemUIScale,
+		oncheck = function(bChecked)
+			Config.bSystemUIScale = not bChecked
+		end,
+		autoenable = function() return D.IsEnabled() end,
+	}, true):autoWidth():width()
 
 	x = X
 	y = y + offsety - 10

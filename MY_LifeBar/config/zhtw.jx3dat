@@ -41,7 +41,8 @@ data = {
 	bHideLifePercentageWhenFight = false,
 	bHideLifePercentageDecimal = false,
 
-	fUIScale = 0,
+	fGlobalUIScale = 1,
+	bSystemUIScale = true,
 	bMineOnTop = true,
 	bScreenPosSort = true,
 

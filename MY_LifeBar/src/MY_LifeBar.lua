@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-18 15:47:07
+-- @Last Modified time: 2018-07-19 19:03:11
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -519,7 +519,7 @@ local function CheckInvalidRect(dwType, dwID, me)
 			lb:ClearSFX()
 		end
 		-- 各种数据生效
-		lb:SetScale(Config.fUIScale == 0 and Station.GetUIScale() or Config.fUIScale)
+		lb:SetScale((Config.bSystemUIScale and Station.GetUIScale() or 1) * Config.fGlobalUIScale)
 		lb:SetColor(r, g, b, Config.nAlpha, Config.nFont)
 		lb:SetColorFx(
 			object.nMoveState == MOVE_STATE.ON_DEATH

@@ -40,8 +40,7 @@ data = {
     ['Sort by screen pos'] = '根據位置調整遮擋順序',
     ['Self always on top'] = '總是置頂顯示我的頭頂',
 
-    ['UI scale: %.1f.'] = '界面縮放：%.1f。',
-    ['UI scale: Follow system.'] = '界面縮放：跟隨系統。',
+    ['Global UI scale: %.2f.'] = '整體縮放：%.2f。',
     ['Max Distance: %s foot.'] = '最大顯示距離：%s尺。',
     ['Max Distance: Unlimited.'] = '最大顯示距離：不限制。',
     ['Max Vertical Distance: %s foot.'] = '最大高度差：%s尺。',
@@ -69,6 +68,7 @@ data = {
     ['set current camp'] = '設置當前陣營',
     ['auto detect'] = '自動獲取',
 
+    ['Ignore ui scale'] = '無視系統界面縮放',
     ['show kungfu'] = '顯示心法',
     ['show distance'] = '顯示距離',
 
