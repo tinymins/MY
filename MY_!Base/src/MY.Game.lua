@@ -353,6 +353,19 @@ function MY.Game.GetObject(dwType, dwID)
 end
 MY.GetObject = MY.Game.GetObject
 
+function MY.GetObjectType(obj)
+	if GetPlayer(obj.dwID) == obj then
+		return 'PLAYER'
+	elseif GetNpc(obj.dwID) == obj then
+		return 'NPC'
+	elseif GetDoodad(obj.dwID) == obj then
+		return 'DOODAD'
+	elseif GetItem(obj.dwID) == obj then
+		return 'ITEM'
+	end
+	return 'UNKNOWN'
+end
+
 -- 获取指定对象的名字
 -- MY.GetObjectName(obj, bRetID)
 -- (KObject) obj    要获取名字的对象
@@ -367,10 +380,10 @@ function MY.Game.GetObjectName(obj, eRetID)
 	if not eRetID then
 		eRetID = 'auto'
 	end
-	local szType, szName = '?', obj.szName
-	if obj.GetGlobalID then -- PLAYER
+	local szType, szName = MY.GetObjectType(obj), obj.szName
+	if szType == 'PLAYER' then -- PLAYER
 		szType = 'P'
-	elseif obj.GetTarget then -- NPC
+	elseif szType == 'NPC' then -- NPC
 		szType = 'N'
 		if IsEmpty(szName) then
 			szName = Table_GetNpcTemplateName(obj.dwTemplateID)
@@ -389,7 +402,7 @@ function MY.Game.GetObjectName(obj, eRetID)
 				szName =  szEmpName .. g_tStrings.STR_PET_SKILL_LOG .. szName
 			end
 		end
-	elseif obj.CanLoot then -- DOODAD
+	elseif szType == 'DOODAD' then -- DOODAD
 		szType = 'D'
 		if IsEmpty(szName) then
 			szName = Table_GetDoodadTemplateName(obj.dwTemplateID)
@@ -397,9 +410,11 @@ function MY.Game.GetObjectName(obj, eRetID)
 				szName = szName:gsub('^%s*(.-)%s*$', '%1')
 			end
 		end
-	elseif obj.IsRepairable then -- ITEM
+	elseif szType == 'ITEM' then -- ITEM
 		szType = 'I'
 		szName = GetItemNameByItem(obj)
+	else
+		szType = '?'
 	end
 	if IsEmpty(szName) and eRetID ~= 'never' or eRetID == 'always' then
 		local szDispID = szType
