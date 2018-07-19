@@ -1346,7 +1346,7 @@ function MY.DoMessageBox(szName, i)
 	end
 end
 
-function MY.OutputBuffTip(dwID, nLevel, Rect, nTime)
+function MY.OutputBuffTip(dwID, nLevel, Rect, nTime, szExtraXml)
 	local t = {}
 
 	insert(t, GetFormatText(Table_GetBuffName(dwID, nLevel) .. '\t', 65))
@@ -1385,6 +1385,10 @@ function MY.OutputBuffTip(dwID, nLevel, Rect, nTime)
 		end
 	end
 
+	if szExtraXml then
+		insert(t, XML_LINE_BREAKER)
+		insert(t, szExtraXml)
+	end
 	-- For test
 	if IsCtrlKeyDown() then
 		insert(t, XML_LINE_BREAKER)
