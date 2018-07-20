@@ -45,7 +45,7 @@ data = {
     {dwID=12202,col="#FF00FFFF",szReminder="寄",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--寄生之種---狼牙堡·戰獸山
     {dwID=12193,col="#FF3232FF",szReminder="荊",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF3232"},--荊棘之種---狼牙堡·戰獸山
     {dwID=12194,col="#8055FFFF",szReminder="潛",nPriority=7},--潛伏之種---狼牙堡·戰獸山
-    {dwID=12259,col="#FF00FFFF",szReminder="纏",nPriority=5,bAttention=true,bScreenHead=true,colScreenHead="#FF00FF"},--屍毒纏繞---狼牙堡·戰獸山
+    {dwID=12259,col="#FF00FFFF",szReminder="纏",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF00FF"},--屍毒纏繞---狼牙堡·戰獸山
     {dwID=12254,col="#FF3232FF",szReminder="狂",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--狂屍蔓藤---狼牙堡·戰獸山
     {dwID=12264,col="#FF00FFFF",szReminder="幽",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--幽寒境---狼牙堡·燕然峰
     {dwID=12150,col="#FFFF00FF",szReminder="汲",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFF00"},--汲取---狼牙堡·燕然峰
@@ -79,14 +79,13 @@ data = {
     {dwID=10239,col="#FF00FFFF",szReminder="笠",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF00FF"},--鬥笠·破魔---永王行宮·仙侶庭園
     {dwID=9761},--浴火---永王行宮·仙侶庭園
     {dwID=9155,col="#FFFF00FF",szReminder="住",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--住相---永王行宮·仙侶庭園
-    {dwID=9423,col="#0050FFFF",szReminder="喉",nPriority=7},--見血封喉---永王行宮·仙侶庭園
-    {dwID=9422,col="#0050FFFF",szReminder="寒",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#0050FF"},--寒氣刺骨---永王行宮·仙侶庭園
+    {dwID=9422,col="#00FFFFFF",szReminder="寒",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#00FFFF"},--寒氣刺骨---永王行宮·仙侶庭園
     {dwID=9402,col="#FFFFFFFF",szReminder="一",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFFFF"},--叫陣---永王行宮·仙侶庭園
     {dwID=9403,col="#FFFF00FF",szReminder="二",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--叫陣---永王行宮·仙侶庭園
     {dwID=9404,col="#0050FFFF",szReminder="三",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#0050FF"},--叫陣---永王行宮·仙侶庭園
     {dwID=9405,col="#00FF00FF",szReminder="四",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#00FF00"},--叫陣---永王行宮·仙侶庭園
     {dwID=9406,col="#FF3232FF",szReminder="五",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--叫陣---永王行宮·仙侶庭園
-    {dwID=9412,col="#FFFF00FF",szReminder="步",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFF00"},--步步緊逼---永王行宮·仙侶庭園
+    {dwID=9412,col="#FFFF00FF",szReminder="步",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--步步緊逼---永王行宮·仙侶庭園
     {dwID=9193,col="#FF3232FF",szReminder="血",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF3232"},--血咒---永王行宮·仙侶庭園
     {dwID=9652,col="#FF3232FF",szReminder="封",nPriority=3,bScreenHead=true,colScreenHead="#FF3232"},--點穴封脈---永王行宮·花月別院
     {dwID=8970},--清流---永王行宮·花月別院
@@ -268,12 +267,18 @@ data = {
     {dwID=13355,col="#00FF00FF",szReminder="定",nPriority=7},--定氣心法---狼牙堡·輝天塹
     {dwID=13358,col="#00FF00FF",szReminder="無",nPriority=7},--無冬草味---狼牙堡·輝天塹
     {dwID=13359,col="#00FF00FF",szReminder="遊",nPriority=7},--遊龍身法---狼牙堡·輝天塹
-    {dwID=13369,col="#FF323200",nPriority=8},--梅雨呱呱---狼牙堡·狼神殿
-    {dwID=13370,col="#FFFF00FF",szReminder="絕",nPriority=5,bCaution=true},--絕命視線---狼牙堡·狼神殿
-    {dwID=13374,col="#8055FF00",szReminder="毒",nPriority=6,bAttention=true},--毒腺劇毒---狼牙堡·狼神殿
-    {dwID=13375,szReminder="咒"},--咒死---狼牙堡·狼神殿
-    {dwID=13376,col="#FF323200",szReminder="敗",nPriority=8,szStackOp=">=",nStackNum=3},--敗血---狼牙堡·狼神殿
-    {dwID=13377,col="#FF00FFFF",szReminder="腐",nPriority=5,bCaution=true},--腐血---狼牙堡·狼神殿
+    {dwID=13443,col="#FFFF00FF",szReminder="弓",nPriority=6,bAttention=true},--弓狼的凝視---狼牙堡·狼神殿
+    {dwID=13392,col="#FF00FFFF",szReminder="咬",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--狂狼撕咬---狼牙堡·狼神殿
+    {dwID=13363,col="#00FFFF00",szReminder="粘",nPriority=8},--粘液---狼牙堡·狼神殿
+    {dwID=13368,col="#FFFF00FF",szReminder="屍",nPriority=3,bScreenHead=true,colScreenHead="#FFFF00"},--屍骨---狼牙堡·狼神殿
+    {dwID=13369,col="#FF323200",szReminder="呱",nPriority=8},--梅雨呱呱---狼牙堡·狼神殿
+    {dwID=13370,col="#00FFFFFF",szReminder="絕",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#00FFFF"},--絕命視線---狼牙堡·狼神殿
+    {dwID=13374,col="#8055FFFF",szReminder="毒",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#8055FF"},--毒腺劇毒---狼牙堡·狼神殿
+    {dwID=13375,col="#FFFFFF00",szReminder="咒",nPriority=8},--咒死---狼牙堡·狼神殿
+    {dwID=13378,col="#FF3232FF",szReminder="黏",nPriority=6,bAttention=true},--黏液---狼牙堡·狼神殿
+    {dwID=13372,col="#FFFF00FF",szReminder="掌",nPriority=7},--回龍掌法---狼牙堡·狼神殿
+    {dwID=13376,col="#FF3232FF",szReminder="敗",nPriority=7,szStackOp=">=",nStackNum=3},--敗血---狼牙堡·狼神殿
+    {dwID=13377,col="#FF00FFFF",szReminder="腐",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--腐血---狼牙堡·狼神殿
     {dwID=12788,col="#FFFF00FF",szReminder="圖",nPriority=7},--圖蘭的挑唆---龍門絕境
     {dwID=12724},--狂沙---龍門絕境
     {dwID=12787},--追命---龍門絕境
@@ -296,5 +301,5 @@ data = {
     {dwID=9744},--朝聖---明教
     {dwID=9745},--朝聖---明教
     {dwID=4244},--渡厄---明教
-   --【南宮伯是帥咩】
+
 }

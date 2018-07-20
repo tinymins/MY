@@ -62,15 +62,15 @@ data = {
     {dwID=10871},--裂骨---上阳宫·双曜亭
     {dwID=10874},--震慑---上阳宫·双曜亭
     {dwID=10870,szStackOp=">=",nStackNum=2},--暗伤---上阳宫·双曜亭
-    {dwID=9535,col="#FF00FFFF",szReminder="缚",nPriority=7},--舞天缚---永王行宫·仙侣庭园
+    {dwID=9535,col="#FF00FFFF",szReminder="缚",nPriority=6,bAttention=true},--舞天缚---永王行宫·仙侣庭园
     {dwID=9371,col="#8055FFFF",szReminder="意",nPriority=7,szStackOp=">=",nStackNum=10},--青冥意---永王行宫·仙侣庭园
     {dwID=9778},--入八荒---永王行宫·仙侣庭园
     {dwID=9537,col="#0050FFFF",szReminder="残",nPriority=3,bScreenHead=true,colScreenHead="#0050FF"},--剑气残意---永王行宫·仙侣庭园
     {dwID=9536,col="#FF00FFFF",szReminder="残",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--剑气残意---永王行宫·仙侣庭园
     {dwID=9420},--经脉麻痹---永王行宫·仙侣庭园
-    {dwID=9213,col="#FF00FFFF",szReminder="镇",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--紫金钵·镇---永王行宫·仙侣庭园
+    {dwID=9213,col="#FF00FFFF",szReminder="镇",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF00FF"},--紫金钵·镇---永王行宫·仙侣庭园
     {dwID=9762,szStackOp=">=",nStackNum=8},--禅心---永王行宫·仙侣庭园
-    {dwID=9635,col="#8055FFFF",szReminder="灭",nPriority=7},--紫金钵·灭---永王行宫·仙侣庭园
+    {dwID=9635,col="#8055FFFF",szReminder="灭",nPriority=6,bAttention=true},--紫金钵·灭---永王行宫·仙侣庭园
     {dwID=9325},--撼地---永王行宫·仙侣庭园
     {dwID=9203,col="#FF3232FF",szReminder="割",nPriority=7},--割裂---永王行宫·仙侣庭园
     {dwID=9196},--狙目---永王行宫·仙侣庭园
@@ -78,9 +78,9 @@ data = {
     {dwID=9122},--盾击---永王行宫·仙侣庭园
     {dwID=9245},--冲倒---永王行宫·仙侣庭园
     {dwID=9240},--剑气引爆---永王行宫·仙侣庭园
-    {dwID=9239,col="#FF00FFFF",szReminder="破",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--破敌---永王行宫·仙侣庭园
+    {dwID=9239,col="#FF00FFFF",szReminder="破",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--破敌---永王行宫·仙侣庭园
     {dwID=9429},--锁定---永王行宫·仙侣庭园
-    {dwID=9189,col="#FFFF00FF",szReminder="绝",nPriority=7,szStackOp=">=",nStackNum=4},--绝脉劲---永王行宫·仙侣庭园
+    {dwID=9189,col="#FF00FFFF",szReminder="绝",nPriority=3,szStackOp=">=",nStackNum=4,bScreenHead=true,colScreenHead="#FF00FF"},--绝脉劲---永王行宫·仙侣庭园
     {dwID=9195,col="#0050FFFF",szReminder="追",nPriority=3,bScreenHead=true,colScreenHead="#0050FF"},--追魂诀---永王行宫·仙侣庭园
     {dwID=8969},--锁---永王行宫·花月别院
     {dwID=8895},--镇狱眼---永王行宫·花月别院
@@ -177,5 +177,5 @@ data = {
     {dwID=9544,col="#00FF00FF",szReminder="笑",nPriority=7},--笑傲光阴---长歌
     {dwID=9265,col="#00FF00FF",szReminder="云",nPriority=7},--云生结海---长歌
     {dwID=9299,col="#FF8000FF",szReminder="杯",nPriority=7},--杯水留影---长歌
-   --【南宫伯是帅咩】
+
 }
