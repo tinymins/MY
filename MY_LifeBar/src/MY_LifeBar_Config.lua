@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 11:00:29
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-20 12:35:34
+-- @Last Modified time: 2018-07-20 13:56:48
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -42,14 +42,48 @@ function D.GetConfigPath()
 	return (CONFIG_PATH:format(MY_LifeBar.szConfig))
 end
 
-function D.LoadConfig(szConfig)
-	if szConfig and MY_LifeBar.szConfig ~= szConfig then
-		D.SaveConfig()
-		MY_LifeBar.szConfig = szConfig
+-- 根据玩家自定义界面缩放设置反向缩放 实现默认设置不受用户缩放影响
+function D.AutoAdjustScale()
+	local fUIScale = MY.GetOriginUIScale()
+	if Config.fDesignUIScale ~= fUIScale then
+		local fScale = Config.fDesignUIScale / fUIScale
+		Config.fGlobalUIScale = Config.fGlobalUIScale * fScale
+		Config.fTextScale = Config.fTextScale * fScale
+		Config.fDesignUIScale = fUIScale
 	end
-	Config = MY.LoadLUAData({ D.GetConfigPath(), MY_DATA_PATH.GLOBAL })
+	local nFontOffset = Font.GetOffset()
+	if Config.nDesignFontOffset ~= nFontOffset then
+		local fScale = MY.GetFontScale(Config.nDesignFontOffset) / MY.GetFontScale()
+		Config.fTextScale = Config.fTextScale * fScale
+		Config.nDesignFontOffset = nFontOffset
+	end
+end
+
+do
+local function onUIScaled()
+	D.AutoAdjustScale()
+	FireUIEvent('MY_LIFEBAR_CONFIG_LOADED')
+end
+MY.RegisterEvent('UI_SCALED.MY_LifeBar_Config', onUIScaled)
+end
+
+function D.LoadConfig(szConfig)
+	if IsString(szConfig) then
+		if szConfig and MY_LifeBar.szConfig ~= szConfig then
+			D.SaveConfig()
+			MY_LifeBar.szConfig = szConfig
+		end
+		Config = MY.LoadLUAData({ D.GetConfigPath(), MY_DATA_PATH.GLOBAL })
+	elseif IsTable(szConfig) then
+		Config = szConfig
+	end
+	if Config and not Config.fDesignUIScale then -- 兼容老数据
+		Config.fDesignUIScale = MY.GetOriginUIScale()
+		Config.fMatchedFontOffset = Font.GetOffset()
+	end
 	Config = MY.FormatDataStructure(Config, CONFIG_DEFAULTS[Config and Config.eCss or ''], true)
 	ConfigLoaded = true
+	D.AutoAdjustScale()
 	FireUIEvent('MY_LIFEBAR_CONFIG_LOADED')
 end
 MY.RegisterInit(D.LoadConfig)
@@ -96,22 +130,19 @@ MY_LifeBar_Config = setmetatable({}, {
 					{
 						szOption = _L['Official default style'],
 						fnAction = function()
-							Config = clone(CONFIG_DEFAULTS.DEFAULT)
-							FireUIEvent('MY_LIFEBAR_CONFIG_RESET')
+							D.LoadConfig(clone(CONFIG_DEFAULTS.DEFAULT))
 						end,
 					},
 					{
 						szOption = _L['Official clear style'],
 						fnAction = function()
-							Config = clone(CONFIG_DEFAULTS.CLEAR)
-							FireUIEvent('MY_LIFEBAR_CONFIG_RESET')
+							D.LoadConfig(clone(CONFIG_DEFAULTS.CLEAR))
 						end,
 					},
 					{
 						szOption = _L['XLifeBar style'],
 						fnAction = function()
-							Config = clone(CONFIG_DEFAULTS.XLIFEBAR)
-							FireUIEvent('MY_LIFEBAR_CONFIG_RESET')
+							D.LoadConfig(clone(CONFIG_DEFAULTS.XLIFEBAR))
 						end,
 					},
 					{
@@ -119,14 +150,12 @@ MY_LifeBar_Config = setmetatable({}, {
 						fnAction = function()
 							if Config.eCss == '' then
 								Config.eCss = 'DEFAULT'
-								FireUIEvent('MY_LIFEBAR_CONFIG_RESET')
 							end
 						end,
 					},
 				})
 			else
-				Config = clone(CONFIG_DEFAULTS[argv[1]])
-				FireUIEvent('MY_LIFEBAR_CONFIG_RESET')
+				D.LoadConfig(clone(CONFIG_DEFAULTS[argv[1]]))
 			end
 		elseif op == 'save' then
 			return D.SaveConfig(...)

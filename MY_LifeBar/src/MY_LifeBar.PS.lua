@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 10:36:40
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-20 11:36:53
+-- @Last Modified time: 2018-07-20 13:25:48
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -740,10 +740,10 @@ function PS.OnPanelActive(wnd)
 	local function onReset()
 		LoadUI(ui)
 	end
-	MY.RegisterEvent('MY_LIFEBAR_CONFIG_RESET.MY_LifeBarPS', onReset)
+	MY.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED.MY_LifeBarPS', onReset)
 end
 
 function PS.OnPanelDeactive()
-	MY.RegisterEvent('MY_LIFEBAR_CONFIG_RESET.MY_LifeBarPS')
+	MY.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED.MY_LifeBarPS')
 end
 MY.RegisterPanel('MY_LifeBar', _L['MY_LifeBar'], _L['General'], 'UI/Image/LootPanel/LootPanel.UITex|74', {255,127,0,200}, PS)

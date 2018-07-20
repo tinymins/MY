@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-20 11:16:46
+-- @Last Modified time: 2018-07-20 13:25:38
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -374,7 +374,6 @@ function D.Reset()
 	end
 	D.AutoSwitchSysHeadTop()
 end
-MY.RegisterEvent('MY_LIFEBAR_CONFIG_RESET', D.Reset)
 MY.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED', D.Reset)
 MY.RegisterEvent('LOADING_END', D.AutoSwitchSysHeadTop)
 

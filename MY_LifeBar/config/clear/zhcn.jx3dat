@@ -1,5 +1,8 @@
 data = {
 	eCss = 'CLEAR',
+	fDesignUIScale = 0.95,
+	nDesignFontOffset = 0,
+
 	nCamp = -1,
 	bOnlyInArena = false,
 	bOnlyInDungeon = false,
