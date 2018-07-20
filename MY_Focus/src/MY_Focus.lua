@@ -517,7 +517,7 @@ function MY_Focus.GetDisplayList()
 			and (
 				not p.tRule or (
 					(not p.tRule.tLife.bEnable or MY.JudgeOperator(p.tRule.tLife.szOperator, KObject.nCurrentLife / KObject.nMaxLife * 100, p.tRule.tLife.nValue))
-					and (p.tRule.nMaxDistance == 0 or (p.tRule.nMaxDistance * 64) ^ 2 > (me.nX - KObject.nX) ^ 2 + (me.nY - KObject.nY) ^ 2)
+					and (p.tRule.nMaxDistance == 0 or pow(p.tRule.nMaxDistance * 64, 2) > pow(me.nX - KObject.nX, 2) + pow(me.nY - KObject.nY, 2) + (MY_Focus.bDistanceZ and pow((me.nZ - KObject.nZ) / 8, 2) or 0))
 				)
 			) then
 				table.insert(t, p)
