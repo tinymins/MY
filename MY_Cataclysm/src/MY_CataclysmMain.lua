@@ -1046,7 +1046,7 @@ end
 
 function D.ConfirmRestoreConfig()
 	MessageBox({
-		szName = 'MY_Cataclysm Restore default',
+		szName = 'MY_Cataclysm_Restore_Default',
 		szAlignment = 'CENTER',
 		szMessage = _L['Please choose your favorite raid style.\nYou can rechoose in setting panel.'],
 		{
