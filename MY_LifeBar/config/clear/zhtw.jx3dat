@@ -1,0 +1,204 @@
+data = {
+	eCss = 'CLEAR',
+	nCamp = -1,
+	bOnlyInArena = false,
+	bOnlyInDungeon = false,
+	bOnlyInBattleField = false,
+
+	nTextOffsetY = 60,
+	nTextLineHeight = 24,
+	fTextScale = 1.2,
+	fTextSpacing = 1,
+
+	bShowSpecialNpc = false,
+	bShowSpecialNpcOnlyEnemy = true,
+	bShowObjectID = false,
+	bShowObjectIDOnlyUnnamed = true,
+	bShowKungfu = false,
+	bShowDistance = false,
+
+	nLifeWidth = 100,
+	nLifeHeight = 8,
+	nLifePadding = 0,
+	nLifeOffsetX = 0,
+	nLifeOffsetY = 27,
+	nLifeBorder = 1,
+	nLifeBorderR = 0,
+	nLifeBorderG = 0,
+	nLifeBorderB = 0,
+	szLifeDirection = "LEFT_RIGHT",
+
+	nLifePerOffsetX = 85,
+	nLifePerOffsetY = 37,
+
+	fTitleEffectScale = 0.7,
+	nTitleEffectOffsetY = 0.6,
+
+	nAlpha = 200,
+	nFont = 16,
+	nDistance = 72 * 72 * 64 * 64,
+	nVerticalDistance = 50 * 8 * 64,
+
+	bHideLifePercentageWhenFight = false,
+	bHideLifePercentageDecimal = false,
+
+	fGlobalUIScale = 1,
+	bSystemUIScale = true,
+	bMineOnTop = true,
+	bScreenPosSort = true,
+
+	Color = {
+		Self = { -- 自己
+			DifferentiateForce = false,
+			Player = { 30 , 140, 220 },
+			[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
+			[FORCE_TYPE.SHAO_LIN ] = { 210, 180, 0   }, -- 少林
+			[FORCE_TYPE.WAN_HUA  ] = { 127, 31 , 223 }, -- 萬花
+			[FORCE_TYPE.TIAN_CE  ] = { 160, 0  , 0   }, -- 天策
+			[FORCE_TYPE.CHUN_YANG] = { 56 , 175, 255 }, -- 純陽 56,175,255
+			[FORCE_TYPE.QI_XIU   ] = { 255, 127, 255 }, -- 七秀
+			[FORCE_TYPE.WU_DU    ] = { 63 , 31 , 159 }, -- 五毒
+			[FORCE_TYPE.TANG_MEN ] = { 0  , 133, 144 }, -- 唐門
+			[FORCE_TYPE.CANG_JIAN] = { 255, 255, 0   }, -- 藏劍
+			[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐幫
+			[FORCE_TYPE.MING_JIAO] = { 253, 84 , 0   }, -- 明教
+			[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 蒼雲
+			[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 長歌
+			[FORCE_TYPE.BA_DAO   ] = { 71 , 73 , 166 }, -- 霸刀
+		},
+		Party = { -- 團隊
+			DifferentiateForce = false,
+			Player = { 30, 140, 220 },
+			Npc    = { 30, 140, 220 },
+			[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
+			[FORCE_TYPE.SHAO_LIN ] = { 210, 180, 0   }, -- 少林
+			[FORCE_TYPE.WAN_HUA  ] = { 127, 31 , 223 }, -- 萬花
+			[FORCE_TYPE.TIAN_CE  ] = { 160, 0  , 0   }, -- 天策
+			[FORCE_TYPE.CHUN_YANG] = { 56 , 175, 255 }, -- 純陽 56,175,255
+			[FORCE_TYPE.QI_XIU   ] = { 255, 127, 255 }, -- 七秀
+			[FORCE_TYPE.WU_DU    ] = { 63 , 31 , 159 }, -- 五毒
+			[FORCE_TYPE.TANG_MEN ] = { 0  , 133, 144 }, -- 唐門
+			[FORCE_TYPE.CANG_JIAN] = { 255, 255, 0   }, -- 藏劍
+			[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐幫
+			[FORCE_TYPE.MING_JIAO] = { 253, 84 , 0   }, -- 明教
+			[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 蒼雲
+			[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 長歌
+			[FORCE_TYPE.BA_DAO   ] = { 71 , 73 , 166 }, -- 霸刀
+		},
+		Enemy = { -- 敵對
+			DifferentiateForce = false,
+			Player = { 255, 30, 30 },
+			Npc    = { 255, 30, 30 },
+			[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
+			[FORCE_TYPE.SHAO_LIN ] = { 210, 180, 0   }, -- 少林
+			[FORCE_TYPE.WAN_HUA  ] = { 127, 31 , 223 }, -- 萬花
+			[FORCE_TYPE.TIAN_CE  ] = { 160, 0  , 0   }, -- 天策
+			[FORCE_TYPE.CHUN_YANG] = { 56 , 175, 255 }, -- 純陽 56,175,255
+			[FORCE_TYPE.QI_XIU   ] = { 255, 127, 255 }, -- 七秀
+			[FORCE_TYPE.WU_DU    ] = { 63 , 31 , 159 }, -- 五毒
+			[FORCE_TYPE.TANG_MEN ] = { 0  , 133, 144 }, -- 唐門
+			[FORCE_TYPE.CANG_JIAN] = { 255, 255, 0   }, -- 藏劍
+			[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐幫
+			[FORCE_TYPE.MING_JIAO] = { 253, 84 , 0   }, -- 明教
+			[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 蒼雲
+			[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 長歌
+			[FORCE_TYPE.BA_DAO   ] = { 71 , 73 , 166 }, -- 霸刀
+		},
+		Neutrality = { -- 中立
+			DifferentiateForce = false,
+			Player = { 255, 255, 0 },
+			Npc    = { 255, 255, 0 },
+			[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
+			[FORCE_TYPE.SHAO_LIN ] = { 210, 180, 0   }, -- 少林
+			[FORCE_TYPE.WAN_HUA  ] = { 127, 31 , 223 }, -- 萬花
+			[FORCE_TYPE.TIAN_CE  ] = { 160, 0  , 0   }, -- 天策
+			[FORCE_TYPE.CHUN_YANG] = { 56 , 175, 255 }, -- 純陽 56,175,255
+			[FORCE_TYPE.QI_XIU   ] = { 255, 127, 255 }, -- 七秀
+			[FORCE_TYPE.WU_DU    ] = { 63 , 31 , 159 }, -- 五毒
+			[FORCE_TYPE.TANG_MEN ] = { 0  , 133, 144 }, -- 唐門
+			[FORCE_TYPE.CANG_JIAN] = { 255, 255, 0   }, -- 藏劍
+			[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐幫
+			[FORCE_TYPE.MING_JIAO] = { 253, 84 , 0   }, -- 明教
+			[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 蒼雲
+			[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 長歌
+			[FORCE_TYPE.BA_DAO   ] = { 71 , 73 , 166 }, -- 霸刀
+		},
+		Ally = { -- 相同陣營
+			DifferentiateForce = false,
+			Player = { 30 , 255, 30 },
+			Npc    = { 30 , 255, 30 },
+			[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
+			[FORCE_TYPE.SHAO_LIN ] = { 210, 180, 0   }, -- 少林
+			[FORCE_TYPE.WAN_HUA  ] = { 127, 31 , 223 }, -- 萬花
+			[FORCE_TYPE.TIAN_CE  ] = { 160, 0  , 0   }, -- 天策
+			[FORCE_TYPE.CHUN_YANG] = { 56 , 175, 255 }, -- 純陽 56,175,255
+			[FORCE_TYPE.QI_XIU   ] = { 255, 127, 255 }, -- 七秀
+			[FORCE_TYPE.WU_DU    ] = { 63 , 31 , 159 }, -- 五毒
+			[FORCE_TYPE.TANG_MEN ] = { 0  , 133, 144 }, -- 唐門
+			[FORCE_TYPE.CANG_JIAN] = { 255, 255, 0   }, -- 藏劍
+			[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐幫
+			[FORCE_TYPE.MING_JIAO] = { 253, 84 , 0   }, -- 明教
+			[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 蒼雲
+			[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 長歌
+			[FORCE_TYPE.BA_DAO   ] = { 71 , 73 , 166 }, -- 霸刀
+		},
+		Foe = { -- 仇人
+			DifferentiateForce = false,
+			Player = { 255, 128, 255 },
+			[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
+			[FORCE_TYPE.SHAO_LIN ] = { 210, 180, 0   }, -- 少林
+			[FORCE_TYPE.WAN_HUA  ] = { 127, 31 , 223 }, -- 萬花
+			[FORCE_TYPE.TIAN_CE  ] = { 160, 0  , 0   }, -- 天策
+			[FORCE_TYPE.CHUN_YANG] = { 56 , 175, 255 }, -- 純陽 56,175,255
+			[FORCE_TYPE.QI_XIU   ] = { 255, 127, 255 }, -- 七秀
+			[FORCE_TYPE.WU_DU    ] = { 63 , 31 , 159 }, -- 五毒
+			[FORCE_TYPE.TANG_MEN ] = { 0  , 133, 144 }, -- 唐門
+			[FORCE_TYPE.CANG_JIAN] = { 255, 255, 0   }, -- 藏劍
+			[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐幫
+			[FORCE_TYPE.MING_JIAO] = { 253, 84 , 0   }, -- 明教
+			[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 蒼雲
+			[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 長歌
+			[FORCE_TYPE.BA_DAO   ] = { 71 , 73 , 166 }, -- 霸刀
+		},
+	},
+	ShowName = {
+		Party = { Npc = true, Player = true },
+		Self = { Player = true },
+		Neutrality = { Npc = true, Player = true },
+		Ally = { Npc = true, Player = true },
+		Foe = { Player = true },
+		Enemy = { Npc = true, Player = true },
+	},
+	ShowTong = {
+		Party = { Player = false },
+		Self = { Player = false },
+		Neutrality = { Player = false },
+		Ally = { Player = false },
+		Enemy = { Player = false },
+		Foe = { Player = false },
+	},
+	ShowTitle = {
+		Party = { Npc = false, Player = false },
+		Self = { Player = false },
+		Neutrality = { Npc = false, Player = false },
+		Ally = { Npc = false, Player = false },
+		Foe = { Player = false },
+		Enemy = { Npc = false, Player = false },
+	},
+	ShowLifePer = {
+		Party = { Npc = false, Player = false },
+		Self = { Player = true },
+		Neutrality = { Npc = false, Player = false },
+		Ally = { Npc = false, Player = false },
+		Foe = { Player = false },
+		Enemy = { Npc = true, Player = false },
+	},
+	ShowLife = {
+		Party = { Npc = false, Player = false },
+		Self = { Player = true },
+		Neutrality = { Npc = false, Player = false },
+		Ally = { Npc = false, Player = false },
+		Foe = { Player = false },
+		Enemy = { Npc = true, Player = false },
+	},
+}

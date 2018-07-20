@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 11:00:29
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-03-19 17:17:06
+-- @Last Modified time: 2018-07-20 12:35:34
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -26,11 +26,16 @@ local IsNil, IsNumber, IsFunction = MY.IsNil, MY.IsNumber, MY.IsFunction
 local IsBoolean, IsString, IsTable = MY.IsBoolean, MY.IsString, MY.IsTable
 -----------------------------------------------------------------------------------------
 local _L, D = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/lang/'), {}
-local Config_Default = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/config/$lang.jx3dat')
-if not Config_Default then
+local CONFIG_DEFAULTS = setmetatable({
+	DEFAULT  = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/config/default/$lang.jx3dat'),
+	CLEAR    = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/config/clear/$lang.jx3dat'),
+	XLIFEBAR = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/config/xlifebar/$lang.jx3dat'),
+}, { __index = function(t, k) return t.DEFAULT end })
+
+if not CONFIG_DEFAULTS.DEFAULT then
     return MY.Debug({_L['Default config cannot be loaded, please reinstall!!!']}, _L['x lifebar'], MY_DEBUG.ERROR)
 end
-local Config, ConfigLoaded = clone(Config_Default), false
+local Config, ConfigLoaded = clone(CONFIG_DEFAULTS.DEFAULT), false
 local CONFIG_PATH = 'config/xlifebar/%s.jx3dat'
 
 function D.GetConfigPath()
@@ -43,7 +48,7 @@ function D.LoadConfig(szConfig)
 		MY_LifeBar.szConfig = szConfig
 	end
 	Config = MY.LoadLUAData({ D.GetConfigPath(), MY_DATA_PATH.GLOBAL })
-	Config = MY.FormatDataStructure(Config, Config_Default, true)
+	Config = MY.FormatDataStructure(Config, CONFIG_DEFAULTS[Config and Config.eCss or ''], true)
 	ConfigLoaded = true
 	FireUIEvent('MY_LIFEBAR_CONFIG_LOADED')
 end
@@ -83,7 +88,46 @@ MY_LifeBar_Config = setmetatable({}, {
 			end
 			config[argv[argc - 1]] = argv[argc]
 		elseif op == 'reset' then
-			Config = clone(Config_Default)
+			if not argv[1] then
+				MessageBox({
+					szName = 'MY_LifeBar restore default',
+					szAlignment = 'CENTER',
+					szMessage = _L['Please choose your favorite lifebar style.\nYou can rechoose in setting panel.'],
+					{
+						szOption = _L['Official default style'],
+						fnAction = function()
+							Config = clone(CONFIG_DEFAULTS.DEFAULT)
+							FireUIEvent('MY_LIFEBAR_CONFIG_RESET')
+						end,
+					},
+					{
+						szOption = _L['Official clear style'],
+						fnAction = function()
+							Config = clone(CONFIG_DEFAULTS.CLEAR)
+							FireUIEvent('MY_LIFEBAR_CONFIG_RESET')
+						end,
+					},
+					{
+						szOption = _L['XLifeBar style'],
+						fnAction = function()
+							Config = clone(CONFIG_DEFAULTS.XLIFEBAR)
+							FireUIEvent('MY_LIFEBAR_CONFIG_RESET')
+						end,
+					},
+					{
+						szOption = _L['Keep current'],
+						fnAction = function()
+							if Config.eCss == '' then
+								Config.eCss = 'DEFAULT'
+								FireUIEvent('MY_LIFEBAR_CONFIG_RESET')
+							end
+						end,
+					},
+				})
+			else
+				Config = clone(CONFIG_DEFAULTS[argv[1]])
+				FireUIEvent('MY_LIFEBAR_CONFIG_RESET')
+			end
 		elseif op == 'save' then
 			return D.SaveConfig(...)
 		elseif op == 'load' then

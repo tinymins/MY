@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 10:36:40
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-19 19:19:39
+-- @Last Modified time: 2018-07-20 11:36:53
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -731,19 +731,19 @@ function PS.OnPanelActive(wnd)
 	ui:append('WndButton', {
 		x = x + 65, y = y, w = 120, text = _L['reset config'],
 		onclick = function()
-			MessageBox({
-				szName = 'XLifeBar_Reset',
-				szMessage = _L['Are you sure to reset config?'], {
-					szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function()
-						Config('reset')
-						D.Reset()
-						LoadUI(ui)
-					end
-				}, {szOption = g_tStrings.STR_HOTKEY_CANCEL,fnAction = function() end},
-			})
+			Config('reset')
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
 	y = y + offsety
+
+	local function onReset()
+		LoadUI(ui)
+	end
+	MY.RegisterEvent('MY_LIFEBAR_CONFIG_RESET.MY_LifeBarPS', onReset)
+end
+
+function PS.OnPanelDeactive()
+	MY.RegisterEvent('MY_LIFEBAR_CONFIG_RESET.MY_LifeBarPS')
 end
 MY.RegisterPanel('MY_LifeBar', _L['MY_LifeBar'], _L['General'], 'UI/Image/LootPanel/LootPanel.UITex|74', {255,127,0,200}, PS)

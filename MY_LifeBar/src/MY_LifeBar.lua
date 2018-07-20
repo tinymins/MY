@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-19 19:03:11
+-- @Last Modified time: 2018-07-20 11:16:46
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -374,6 +374,7 @@ function D.Reset()
 	end
 	D.AutoSwitchSysHeadTop()
 end
+MY.RegisterEvent('MY_LIFEBAR_CONFIG_RESET', D.Reset)
 MY.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED', D.Reset)
 MY.RegisterEvent('LOADING_END', D.AutoSwitchSysHeadTop)
 
@@ -519,7 +520,7 @@ local function CheckInvalidRect(dwType, dwID, me)
 			lb:ClearSFX()
 		end
 		-- 各种数据生效
-		lb:SetScale((Config.bSystemUIScale and Station.GetUIScale() or 1) * Config.fGlobalUIScale)
+		lb:SetScale((Config.bSystemUIScale and MY.GetUIScale() or 1) * Config.fGlobalUIScale)
 		lb:SetColor(r, g, b, Config.nAlpha, Config.nFont)
 		lb:SetColorFx(
 			object.nMoveState == MOVE_STATE.ON_DEATH
@@ -528,7 +529,7 @@ local function CheckInvalidRect(dwType, dwID, me)
 		)
 		lb:SetFont(Config.nFont)
 		lb:SetTextsPos(Config.nTextOffsetY, Config.nTextLineHeight)
-		lb:SetTextsScale(fTextScale)
+		lb:SetTextsScale((Config.bSystemUIScale and MY.GetFontScale() or 1) * fTextScale)
 		lb:SetTextsSpacing(Config.fTextSpacing)
 		lb:SetPriority(nPriority)
 		lb:Create():Paint()
