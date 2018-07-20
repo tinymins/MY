@@ -1871,3 +1871,11 @@ function MY.CThreadCoor(arg0, arg1, arg2, arg3, arg4, arg5)
 	end
 end
 end
+
+function MY.GetUIScale()
+	return Station.GetUIScale()
+end
+
+function MY.GetFontScale()
+	return (1 + Font.GetOffset() * 0.07) * MY.GetUIScale()
+end
