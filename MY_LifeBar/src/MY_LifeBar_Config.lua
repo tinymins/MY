@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 11:00:29
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-20 14:16:13
+-- @Last Modified time: 2018-07-20 18:15:52
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -70,7 +70,7 @@ end
 
 function D.LoadConfig(szConfig)
 	if IsString(szConfig) then
-		if szConfig and MY_LifeBar.szConfig ~= szConfig then
+		if MY_LifeBar.szConfig ~= szConfig then
 			D.SaveConfig()
 			MY_LifeBar.szConfig = szConfig
 		end
@@ -125,7 +125,7 @@ MY_LifeBar_Config = setmetatable({}, {
 		elseif op == 'reset' then
 			if not argv[1] then
 				MessageBox({
-					szName = 'MY_LifeBar restore default',
+					szName = 'MY_LifeBar_Restore_Default',
 					szAlignment = 'CENTER',
 					szMessage = _L['Please choose your favorite lifebar style.\nYou can rechoose in setting panel.'],
 					{
@@ -162,6 +162,8 @@ MY_LifeBar_Config = setmetatable({}, {
 			return D.SaveConfig(...)
 		elseif op == 'load' then
 			return D.LoadConfig(...)
+		elseif op == 'loaded' then
+			return ConfigLoaded
 		end
 	end,
 	__index = function(t, k) return Config[k] end,
