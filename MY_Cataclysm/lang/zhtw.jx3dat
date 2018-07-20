@@ -63,7 +63,7 @@ data = {
 	['Show Buff Time'] = '顯示剩余時間',
 	['Show Buff Num'] = '顯示層數',
 	['Show Buff Reminder'] = '顯示備注',
-	['Show Official Buff'] = '顯示官方數據',
+	['Push buff to official'] = '聯動官方面板',
 	['Show Group Number'] = '顯示分組編號',
 	['Team Members: %d, %d agree %d%%'] = '團隊共%d人，%d人已同意發放工資，當前比率%d%%。',
 	['Wage await %ds...'] = '工資等待確認中…(%ds)',
@@ -153,7 +153,6 @@ data = {
 	['Delete'] = '刪除',
 	['Delete [%s]?'] = '刪除[%s]？',
 
-	['From official channel'] = '來自其它插件聯動官方面板數據',
 	['From nangongbo base data'] = '來自南宮伯基礎數據',
 	['From nangongbo cmd data'] = '來自南宮伯指揮數據',
 	['From nangongbo heal data'] = '來自南宮伯治療數據',

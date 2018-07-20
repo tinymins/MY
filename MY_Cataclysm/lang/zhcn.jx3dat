@@ -63,7 +63,7 @@ data = {
 	['Show Buff Time'] = '显示剩余时间',
 	['Show Buff Num'] = '显示层数',
 	['Show Buff Reminder'] = '显示备注',
-	['Show Official Buff'] = '显示官方数据',
+	['Push buff to official'] = '联动官方面板',
 	['Show Group Number'] = '显示分组编号',
 	['Team Members: %d, %d agree %d%%'] = '团队共%d人，%d人已同意发放工资，当前比率%d%%。',
 	['Wage await %ds...'] = '工资等待确认中…(%ds)',
@@ -153,7 +153,6 @@ data = {
 	['Delete'] = '删除',
 	['Delete [%s]?'] = '删除[%s]？',
 
-	['From official channel'] = '来自其它插件联动官方面板数据',
 	['From nangongbo base data'] = '来自南宫伯基础数据',
 	['From nangongbo cmd data'] = '来自南宫伯指挥数据',
 	['From nangongbo heal data'] = '来自南宫伯治疗数据',

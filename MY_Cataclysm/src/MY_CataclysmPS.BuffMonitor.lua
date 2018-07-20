@@ -575,10 +575,10 @@ function PS.OnPanelActive(frame)
 	x = X
 	y = y + 30
 	x = x + ui:append('WndCheckBox', {
-		x = x, y = y, text = _L['Show Official Buff'],
-		checked = CFG.bBuffDataOfficial,
+		x = x, y = y, text = _L['Push buff to official'],
+		checked = CFG.bBuffPushToOfficial,
 		oncheck = function(bCheck)
-			CFG.bBuffDataOfficial = bCheck
+			CFG.bBuffPushToOfficial = bCheck
 			MY_Cataclysm.UpdateBuffListCache()
 			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,

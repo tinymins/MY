@@ -29,7 +29,6 @@ local Station, Table_BuffIsVisible, MY_GetBuffName = Station, Table_BuffIsVisibl
 local _L, D = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/lang/'), {}
 local INI_ROOT = MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/ui/'
 local CFG = MY_Cataclysm.CFG
-local CTM_BUFF_OFFICIAL = {}
 local CTM_BUFF_NGB_BASE = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/data/nangongbo/base/$lang.jx3dat') or {}
 local CTM_BUFF_NGB_CMD = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/data/nangongbo/cmd/$lang.jx3dat') or {}
 local CTM_BUFF_NGB_HEAL = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/data/nangongbo/heal/$lang.jx3dat') or {}
@@ -45,20 +44,6 @@ local CTM_CONFIG_PLAYER, CTM_CONFIG_LOADED
 local DEBUG = false
 
 do
-local _Raid_MonitorBuffs = Raid_MonitorBuffs
-function Raid_MonitorBuffs(tBuffs, ...)
-	CTM_BUFF_OFFICIAL = {}
-	if tBuffs then
-		for _, dwID in pairs(tBuffs) do
-			insert(CTM_BUFF_OFFICIAL, { dwID = dwID })
-		end
-	end
-	if CFG.bBuffDataOfficial then
-		D.UpdateBuffListCache()
-	end
-	_Raid_MonitorBuffs(tBuffs, ...)
-end
-
 local function InsertBuffListCache(aBuffList, szVia)
 	for _, tab in ipairs(aBuffList) do
 		local id = tab.dwID or tab.szName
@@ -90,9 +75,6 @@ local function InsertBuffListCache(aBuffList, szVia)
 end
 function D.UpdateBuffListCache()
 	BUFF_LIST = {}
-	if CFG.bBuffDataOfficial then
-		InsertBuffListCache(CTM_BUFF_OFFICIAL, _L['From official channel'])
-	end
 	if CFG.bBuffDataNangongbo then
 		InsertBuffListCache(CTM_BUFF_NGB_BASE, _L['From nangongbo base data'])
 		if CFG.bBuffDataNangongboCmd then
@@ -103,6 +85,15 @@ function D.UpdateBuffListCache()
 		end
 	end
 	InsertBuffListCache(CFG.aBuffList, _L['From custom data'])
+	if CFG.bBuffPushToOfficial then
+		local aBuff = {}
+		for _, dwID in pairs(BUFF_LIST) do
+			if IsNumber(dwID) then
+				insert(aBuff, dwID)
+			end
+		end
+		Raid_MonitorBuffs(aBuff)
+	end
 	FireUIEvent('CTM_BUFF_LIST_CACHE_UPDATE')
 end
 end
