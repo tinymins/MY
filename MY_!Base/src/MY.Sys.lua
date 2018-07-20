@@ -1876,6 +1876,18 @@ function MY.GetUIScale()
 	return Station.GetUIScale()
 end
 
-function MY.GetFontScale()
-	return (1 + Font.GetOffset() * 0.07) * MY.GetUIScale()
+function MY.GetOriginUIScale()
+	-- 线性拟合出来的公式 -- 不知道不同机器会不会不一样
+	-- 源数据
+	-- 0.63, 0.7
+	-- 0.666, 0.75
+	-- 0.711, 0.8
+	-- 0.756, 0.85
+	-- 0.846, 0.95
+	-- 0.89, 1
+	return floor((1.13726 * Station.GetUIScale() / Station.GetMaxUIScale() - 0.011) * 100 + 0.5) / 100 -- +0.5为了四舍五入
+end
+
+function MY.GetFontScale(nOffset)
+	return (1 + (nOffset or Font.GetOffset()) * 0.07) * MY.GetUIScale()
 end
