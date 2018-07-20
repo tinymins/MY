@@ -394,7 +394,15 @@ MY_ToolBox.ApplyConfig = function()
 				'MSG_TEAM', 'MSG_CAMP', 'MSG_GROUP', 'MSG_SEEK_MENTOR', 'MSG_FRIEND', 'MSG_IDENTITY', 'MSG_SYS',
 				'MSG_NPC_NEARBY', 'MSG_NPC_YELL', 'MSG_NPC_PARTY', 'MSG_NPC_WHISPER',
 			})
+			MY.HookChatPanel('MY_RedirectMetionToWhisper', function(h, szChannel, szMsg, dwTime)
+				if h.__MY_LastMsg == szMsg and h.__MY_LastMsgChannel ~= szChannel and szChannel == 'MSG_WHISPER' then
+					return ''
+				end
+				h.__MY_LastMsg = szMsg
+				h.__MY_LastMsgChannel = szChannel
+			end)
 		else
+			MY.HookChatPanel('MY_RedirectMetionToWhisper', false)
 			MY.RegisterMsgMonitor('MY_RedirectMetionToWhisper')
 		end
 	end
