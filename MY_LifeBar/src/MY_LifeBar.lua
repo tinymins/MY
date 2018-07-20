@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-20 13:25:38
+-- @Last Modified time: 2018-07-20 14:02:10
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -274,6 +274,9 @@ end
 
 function D.AutoSwitchSysHeadTop()
 	if D.IsMapEnabled() then
+		if Config.eCss == '' then
+			Config('reset')
+		end
 		D.SaveSysHeadTop()
 		D.HideSysHeadTop()
 	else

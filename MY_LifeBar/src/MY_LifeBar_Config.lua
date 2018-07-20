@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 11:00:29
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-20 13:56:48
+-- @Last Modified time: 2018-07-20 14:16:13
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -28,6 +28,7 @@ local IsBoolean, IsString, IsTable = MY.IsBoolean, MY.IsString, MY.IsTable
 local _L, D = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/lang/'), {}
 local CONFIG_DEFAULTS = setmetatable({
 	DEFAULT  = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/config/default/$lang.jx3dat'),
+	OFFICIAL = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/config/official/$lang.jx3dat'),
 	CLEAR    = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/config/clear/$lang.jx3dat'),
 	XLIFEBAR = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/config/xlifebar/$lang.jx3dat'),
 }, { __index = function(t, k) return t.DEFAULT end })
@@ -130,7 +131,7 @@ MY_LifeBar_Config = setmetatable({}, {
 					{
 						szOption = _L['Official default style'],
 						fnAction = function()
-							D.LoadConfig(clone(CONFIG_DEFAULTS.DEFAULT))
+							D.LoadConfig(clone(CONFIG_DEFAULTS.OFFICIAL))
 						end,
 					},
 					{
