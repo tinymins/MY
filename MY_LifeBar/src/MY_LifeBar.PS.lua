@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 10:36:40
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-22 03:57:00
+-- @Last Modified time: 2018-07-22 06:29:53
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -297,7 +297,7 @@ function PS.OnPanelActive(wnd)
 	ui:append('WndSliderBox', {
 		name = 'WndSliderBox_TitleEffectScale',
 		x = x, y = y, sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE, range = { 0, 200 },
-		text = function(value) return _L('Title effect scale: %.1f%%.', value / 100) end, -- 头顶特效缩放
+		text = function(value) return _L('Title effect scale: %.2f%%.', value / 100) end, -- 头顶特效缩放
 		value = Config.fTitleEffectScale * 100,
 		onchange = function(value)
 			Config.fTitleEffectScale = value / 100

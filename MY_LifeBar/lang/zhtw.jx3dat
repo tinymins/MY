@@ -60,7 +60,7 @@ data = {
     ['text line height: %d px.'] = '文字行高%spx。',
     ['text scale: %.1f%%.'] = '文字縮放：%.1f%%。',
     ['text spacing: %.1f.'] = '文字間距：%.1f。',
-    ['Title effect scale: %.1f%%.'] = '標記與任務卷軸縮放：%.1f。',
+    ['Title effect scale: %.2f%%.'] = '標記與任務卷軸縮放：%.2f。',
     ['Title effect offset y: %d px.'] = '標記與任務卷軸豎直偏移%dpx。',
 
     ['alpha: %.0f%%.'] = '透明度%.0f%%。',
