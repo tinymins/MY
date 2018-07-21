@@ -1891,5 +1891,5 @@ function MY.GetOriginUIScale()
 end
 
 function MY.GetFontScale(nOffset)
-	return (1 + (nOffset or Font.GetOffset()) * 0.07) * MY.GetUIScale()
+	return 1 + (nOffset or Font.GetOffset()) * 0.07
 end

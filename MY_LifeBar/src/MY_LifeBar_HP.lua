@@ -98,7 +98,7 @@ function HP:DrawTexts(aTexts, nY, nLineHeight, r, g, b, a, f, spacing, scale)
 
 		for _, szText in ipairs(aTexts) do
 			if szText ~= '' then
-				sha:AppendCharacterID(self.dwID, true, r, g, b, a, {0, 0, 0, 0, -nY}, f, szText, spacing, scale / MY.GetFontScale())
+				sha:AppendCharacterID(self.dwID, true, r, g, b, a, {0, 0, 0, 0, -nY}, f, szText, spacing, scale / MY.GetFontScale() / MY.GetUIScale())
 				nY =  nY + nLineHeight
 			end
 		end
@@ -112,7 +112,7 @@ function HP:DrawLifeText(text, x, y, r, g, b, a, f, spacing, scale)
 		local sha = self.handle:Lookup('hp_title')
 		sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
 		sha:ClearTriangleFanPoint()
-		sha:AppendCharacterID(self.dwID, true, r, g, b, a, {0, 0, 0, x, -y}, f, text, spacing, scale / MY.GetFontScale())
+		sha:AppendCharacterID(self.dwID, true, r, g, b, a, {0, 0, 0, x, -y}, f, text, spacing, scale / MY.GetFontScale() / MY.GetUIScale())
 	end
 	return self
 end
