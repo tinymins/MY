@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 11:00:29
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-20 18:15:52
+-- @Last Modified time: 2018-07-22 06:04:40
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -62,8 +62,11 @@ end
 
 do
 local function onUIScaled()
+	if not ConfigLoaded then
+		return
+	end
 	D.AutoAdjustScale()
-	FireUIEvent('MY_LIFEBAR_CONFIG_LOADED')
+	FireUIEvent('MY_LIFEBAR_CONFIG_UPDATE')
 end
 MY.RegisterEvent('UI_SCALED.MY_LifeBar_Config', onUIScaled)
 end
