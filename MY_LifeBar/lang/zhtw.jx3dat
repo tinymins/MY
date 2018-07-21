@@ -97,7 +97,7 @@ data = {
 
     ['Please choose your favorite lifebar style.\nYou can rechoose in setting panel.'] = '請選擇您喜歡的血條面板樣式：\n注：您可以隨時前往面板設置界面重新選擇。',
     ['Official default style'] = '官方風格',
-    ['Official clear style'] = '清爽風格',
+    ['Official clear style'] = '清晰風格',
     ['XLifeBar style'] = '扁平風格',
     ['Keep current'] = '保持現狀',
 }
