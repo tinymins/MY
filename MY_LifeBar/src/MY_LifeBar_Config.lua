@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 11:00:29
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-22 06:05:24
+-- @Last Modified time: 2018-07-22 06:28:27
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -72,22 +72,26 @@ MY.RegisterEvent('UI_SCALED.MY_LifeBar_Config', onUIScaled)
 end
 
 function D.LoadConfig(szConfig)
-	if IsString(szConfig) then
-		if MY_LifeBar.szConfig ~= szConfig then
-			D.SaveConfig()
-			MY_LifeBar.szConfig = szConfig
+	if IsTable(szConfig) then
+		Config = szConfig
+	else
+		if IsString(szConfig) then
+			if MY_LifeBar.szConfig ~= szConfig then
+				if ConfigLoaded then
+					D.SaveConfig()
+				end
+				MY_LifeBar.szConfig = szConfig
+			end
 		end
 		Config = MY.LoadLUAData({ D.GetConfigPath(), MY_DATA_PATH.GLOBAL })
-	elseif IsTable(szConfig) then
-		Config = szConfig
 	end
 	if Config and not Config.fDesignUIScale then -- ºÊ»›¿œ ˝æ›
 		Config.fDesignUIScale = MY.GetOriginUIScale()
 		Config.fMatchedFontOffset = Font.GetOffset()
 	end
 	Config = MY.FormatDataStructure(Config, CONFIG_DEFAULTS[Config and Config.eCss or ''], true)
-	ConfigLoaded = true
 	D.AutoAdjustScale()
+	ConfigLoaded = true
 	FireUIEvent('MY_LIFEBAR_CONFIG_LOADED')
 end
 MY.RegisterInit(D.LoadConfig)
