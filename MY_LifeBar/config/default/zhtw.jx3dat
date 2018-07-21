@@ -9,7 +9,7 @@ data = {
 	bOnlyInBattleField = false,
 
 	nTextOffsetY = 38,
-	nTextLineHeight = 22,
+	nTextLineHeight = 20,
 	fTextScale = 1.2,
 	fTextSpacing = 0,
 

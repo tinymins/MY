@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 12:50:01
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-12 22:55:11
+-- @Last Modified time: 2018-07-22 06:47:02
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -363,7 +363,7 @@ function LB:DrawTexts(force)
 		if self.cd_visible and self.cd_text ~= '' then
 			insert(aTexts, self.cd_text)
 		end
-		self.hp:DrawTexts(aTexts, self.texts_y * self.scale, self.texts_height * self.scale, r, g, b, a, f, self.texts_spacing, self.texts_scale * self.scale)
+		self.hp:DrawTexts(aTexts, self.texts_y * self.scale, self.texts_height * self.texts_scale * self.scale, r, g, b, a, f, self.texts_spacing, self.texts_scale * self.scale)
 		-- 刷新与文本行数有关的东西
 		local texts_lines = #aTexts
 		if self.texts_lines ~= texts_lines then
@@ -516,7 +516,7 @@ function LB:ApplySFX(force)
 				self.sfx_scale / Station.GetUIScale() * self.scale,
 				self.sfx_w * self.sfx_scale / Station.GetUIScale() * self.scale,
 				self.sfx_h * self.sfx_scale / Station.GetUIScale() * self.scale,
-				(self.texts_y + self.texts_height * self.texts_lines + self.sfx_y) / Station.GetUIScale() * self.scale
+				(self.texts_y + self.texts_height * self.texts_scale * self.texts_lines + self.sfx_y) / Station.GetUIScale() * self.scale
 			)
 		else
 			self.hp:ClearSFX()
