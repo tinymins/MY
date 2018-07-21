@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 11:00:29
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-22 06:04:40
+-- @Last Modified time: 2018-07-22 06:05:24
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -49,13 +49,13 @@ function D.AutoAdjustScale()
 	if Config.fDesignUIScale ~= fUIScale then
 		local fScale = Config.fDesignUIScale / fUIScale
 		Config.fGlobalUIScale = Config.fGlobalUIScale * fScale
-		Config.fTextScale = Config.fTextScale * fScale
+		Config.nTextLineHeight = floor(Config.nTextLineHeight * fScale + 0.5)
 		Config.fDesignUIScale = fUIScale
 	end
 	local nFontOffset = Font.GetOffset()
 	if Config.nDesignFontOffset ~= nFontOffset then
 		local fScale = MY.GetFontScale(Config.nDesignFontOffset) / MY.GetFontScale()
-		Config.fTextScale = Config.fTextScale * fScale
+		Config.nTextLineHeight = floor(Config.nTextLineHeight * fScale + 0.5)
 		Config.nDesignFontOffset = nFontOffset
 	end
 end
