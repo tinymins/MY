@@ -1885,7 +1885,9 @@ function MY.GetOriginUIScale()
 	-- 0.756, 0.85
 	-- 0.846, 0.95
 	-- 0.89, 1
-	return floor((1.13726 * Station.GetUIScale() / Station.GetMaxUIScale() - 0.011) * 100 + 0.5) / 100 -- +0.5为了四舍五入
+	-- return floor((1.13726 * Station.GetUIScale() / Station.GetMaxUIScale() - 0.011) * 100 + 0.5) / 100 -- +0.5为了四舍五入
+	-- 不同显示器GetMaxUIScale都不一样 太麻烦了 放弃 直接读配置项
+	return GetUserPreferences(3775, 'c') / 100
 end
 
 function MY.GetFontScale(nOffset)
