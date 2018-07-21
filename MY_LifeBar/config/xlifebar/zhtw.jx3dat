@@ -9,7 +9,7 @@ data = {
 	bOnlyInBattleField = false,
 
 	nTextOffsetY = 60,
-	nTextLineHeight = 22,
+	nTextLineHeight = 23,
 	fTextScale = 1.2,
 	fTextSpacing = 0,
 
@@ -34,8 +34,8 @@ data = {
 	nLifePerOffsetX = 0,
 	nLifePerOffsetY = 42,
 
-	fTitleEffectScale = 0.7,
-	nTitleEffectOffsetY = 0.7,
+	fTitleEffectScale = 0.6,
+	nTitleEffectOffsetY = 0,
 
 	nAlpha = 200,
 	nFont = 16,
