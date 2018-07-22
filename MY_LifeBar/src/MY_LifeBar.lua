@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-22 06:05:06
+-- @Last Modified time: 2018-07-22 13:50:16
 ---------------------------------------------------
 ---------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -351,6 +351,7 @@ function D.Reset()
 	-- 重置缓存
 	LB_CACHE = {}
 	LB('clear')
+	XGUI.SetShadowHandleParam('MY_LifeBar', { bShowWhenUIHide = true })
 	-- 恢复官方标记
 	for dwID, _ in pairs(OVERWRITE_TITLE_EFFECT) do
 		if OBJECT_TITLE_EFFECT[dwID] then
