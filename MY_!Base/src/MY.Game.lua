@@ -541,6 +541,7 @@ function MY.Game.GetTargetContextMenu(dwType, szName, dwID)
 			or v.szOption == g_tStrings.STR_ADD_SHANG           -- 发布悬赏
 			or v.szOption == g_tStrings.STR_MARK_TARGET         -- 标记目标
 			or v.szOption == g_tStrings.STR_MAKE_TRADDING       -- 交易
+			or v.szOption == g_tStrings.REPORT_RABOT            -- 举报外挂
 			then
 				table.insert(t, v)
 			end

@@ -101,18 +101,7 @@ end
 
 function MY_PartyRequest.OnRButtonClick()
 	if this.info then
-		local menu = {}
-		InsertPlayerCommonMenu(menu, 0, this.info.szName)
-		menu[4] = nil
-		if this.info.dwID then
-			table.insert(menu, {
-				szOption = g_tStrings.STR_LOOKUP,
-				fnAction = function()
-					ViewInviteToPlayer(this.info.dwID)
-				end,
-			})
-		end
-		PopupMenu(menu)
+		PopupMenu(MY.GetTargetContextMenu(TARGET.PLAYER, this.info.szName, this.info.dwID))
 	end
 end
 
