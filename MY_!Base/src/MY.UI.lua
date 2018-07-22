@@ -2916,6 +2916,24 @@ function XGUI:bringToTop()
 	return self
 end
 
+-- (self) Instance:bringToBottom()
+function XGUI:bringToBottom()
+	self:_checksum()
+	for _, raw in ipairs(self.raws) do
+		raw = GetComponentElement(raw, 'MAIN_WINDOW')
+		if raw then
+			local parent = raw:GetParent()
+			if parent then
+				local child = parent:GetFirstChild()
+				if child then
+					raw:ChangeRelation(child, true, false)
+				end
+			end
+		end
+	end
+	return self
+end
+
 -- (self) Instance:refresh()
 function XGUI:refresh()
 	self:_checksum()
@@ -4436,6 +4454,7 @@ function XGUI.GetShadowHandle(szName)
 	if not frame then
 		frame = Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. 'ui/MY_Shadows.ini', 'MY_Shadows')
 		frame.OnFrameBreathe = onFrameBreathe
+		XGUI(frame):bringToBottom()
 	end
 	local sh = frame:Lookup('', szName)
 	if not sh then
