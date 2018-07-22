@@ -4408,16 +4408,50 @@ function XGUI.GetTreePath(raw)
 	return concat(tTreePath, '/')
 end
 
+do
+local VISIBLE = true
+function onFrameBreathe()
+	if Station.IsVisible() then
+		if not VISIBLE then
+			local h = this:Lookup('', '')
+			for i = 0, h:GetItemCount() - 1 do
+				h:Lookup(i):SetVisible(true)
+			end
+			VISIBLE = true
+		end
+	else
+		if VISIBLE then
+			local h, hh = this:Lookup('', '')
+			for i = 0, h:GetItemCount() - 1 do
+				hh = h:Lookup(i)
+				hh:SetVisible(hh.bShowWhenUIHide or false)
+			end
+			VISIBLE = false
+		end
+	end
+end
+
 function XGUI.GetShadowHandle(szName)
-	if JH and JH.GetShadowHandle then
-		return JH.GetShadowHandle(szName)
+	local frame = Station.Lookup('Lowest/MY_Shadows')
+	if not frame then
+		frame = Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. 'ui/MY_Shadows.ini', 'MY_Shadows')
+		frame.OnFrameBreathe = onFrameBreathe
 	end
-	local sh = Station.Lookup('Lowest/MY_Shadows') or Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. 'ui/MY_Shadows.ini', 'MY_Shadows')
-	if not sh:Lookup('', szName) then
-		sh:Lookup('', ''):AppendItemFromString(format('<handle> name="%s" </handle>', szName))
+	local sh = frame:Lookup('', szName)
+	if not sh then
+		frame:Lookup('', ''):AppendItemFromString(format('<handle> name="%s" </handle>', szName))
+		MY.Debug({'Create sh # ' .. szName}, 'XGUI', MY_DEBUG.LOG)
+		sh = frame:Lookup('', szName)
 	end
-	MY.Debug({'Create sh # ' .. szName}, 'XGUI', MY_DEBUG.LOG)
-	return sh:Lookup('', szName)
+	return sh
+end
+
+function XGUI.SetShadowHandleParam(szName, tParam)
+	local sh = XGUI.GetShadowHandle(szName)
+	for k, v in pairs(tParam) do
+		sh[k] = v
+	end
+end
 end
 
 MY.UI = XGUI
