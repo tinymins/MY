@@ -267,15 +267,19 @@ data = {
     {dwID=13355,col="#00FF00FF",szReminder="定",nPriority=7},--定氣心法---狼牙堡·輝天塹
     {dwID=13358,col="#00FF00FF",szReminder="無",nPriority=7},--無冬草味---狼牙堡·輝天塹
     {dwID=13359,col="#00FF00FF",szReminder="遊",nPriority=7},--遊龍身法---狼牙堡·輝天塹
-    {dwID=13443,col="#FFFF00FF",szReminder="弓",nPriority=6,bAttention=true},--弓狼的凝視---狼牙堡·狼神殿
+    {dwID=13444,col="#FF3232FF",szReminder="血",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--血之氣息---狼牙堡·狼神殿
     {dwID=13392,col="#FF00FFFF",szReminder="咬",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--狂狼撕咬---狼牙堡·狼神殿
+    {dwID=13453,col="#FFFF00FF",szReminder="箭",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--一箭一個---狼牙堡·狼神殿
+    {dwID=13460,col="#FF8000FF",szReminder="火",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF8000"},--火雨襲來---狼牙堡·狼神殿
     {dwID=13363,col="#00FFFF00",szReminder="粘",nPriority=8},--粘液---狼牙堡·狼神殿
-    {dwID=13368,col="#FFFF00FF",szReminder="屍",nPriority=3,bScreenHead=true,colScreenHead="#FFFF00"},--屍骨---狼牙堡·狼神殿
-    {dwID=13369,col="#FF323200",szReminder="呱",nPriority=8},--梅雨呱呱---狼牙堡·狼神殿
-    {dwID=13370,col="#00FFFFFF",szReminder="絕",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#00FFFF"},--絕命視線---狼牙堡·狼神殿
+    {dwID=13368,col="#FF3232FF",szReminder="屍",nPriority=3,bScreenHead=true,colScreenHead="#FF3232"},--屍骨---狼牙堡·狼神殿
+    {dwID=13369,szReminder="呱",nPriority=8},--梅雨呱呱---狼牙堡·狼神殿
+    {dwID=13370,col="#FFFF00FF",szReminder="絕",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--絕命視線---狼牙堡·狼神殿
     {dwID=13374,col="#8055FFFF",szReminder="毒",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#8055FF"},--毒腺劇毒---狼牙堡·狼神殿
     {dwID=13375,col="#FFFFFF00",szReminder="咒",nPriority=8},--咒死---狼牙堡·狼神殿
     {dwID=13378,col="#FF3232FF",szReminder="黏",nPriority=6,bAttention=true},--黏液---狼牙堡·狼神殿
+    {dwID=13458,szReminder="懼"},--恐懼---狼牙堡·狼神殿
+    {dwID=13356,szReminder="暈"},--暈眩---狼牙堡·狼神殿
     {dwID=13372,col="#FFFF00FF",szReminder="掌",nPriority=7},--回龍掌法---狼牙堡·狼神殿
     {dwID=13376,col="#FF3232FF",szReminder="敗",nPriority=7,szStackOp=">=",nStackNum=3},--敗血---狼牙堡·狼神殿
     {dwID=13377,col="#FF00FFFF",szReminder="腐",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--腐血---狼牙堡·狼神殿
@@ -301,5 +305,4 @@ data = {
     {dwID=9744},--朝聖---明教
     {dwID=9745},--朝聖---明教
     {dwID=4244},--渡厄---明教
-
 }
