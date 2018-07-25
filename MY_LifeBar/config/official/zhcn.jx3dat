@@ -34,7 +34,7 @@ data = {
 	nLifePerOffsetX = 0,
 	nLifePerOffsetY = 8,
 
-	fTitleEffectScale = 0.6,
+	fTitleEffectScale = 0.7,
 	nTitleEffectOffsetY = 0,
 
 	nAlpha = 255,
