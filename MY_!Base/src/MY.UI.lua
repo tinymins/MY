@@ -4486,4 +4486,26 @@ function XGUI.SetShadowHandleParam(szName, tParam)
 	end
 end
 
+do local VISIBLES = {}
+function XGUI.TempSetShadowHandleVisible(bVisible)
+	local frame = Station.Lookup('Lowest/MY_Shadows')
+	if not frame then
+		return insert(VISIBLES, true)
+	end
+	insert(VISIBLES, frame:IsVisible() or false)
+	frame:SetVisible(bVisible)
+end
+
+function XGUI.RevertShadowHandleVisible()
+	if #VISIBLES == 0 then
+		return
+	end
+	local bVisible = remove(VISIBLES)
+	local frame = Station.Lookup('Lowest/MY_Shadows')
+	if frame then
+		frame:SetVisible(bVisible)
+	end
+end
+end
+
 MY.UI = XGUI
