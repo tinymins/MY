@@ -1108,10 +1108,10 @@ function XGUI:hide()
 end
 
 -- visible
-function XGUI:visible(bVisiable)
+function XGUI:visible(bVisible)
 	self:_checksum()
-	if IsBoolean(bVisiable) then
-		return self:toggle(bVisiable)
+	if IsBoolean(bVisible) then
+		return self:toggle(bVisible)
 	else
 		local raw = self.raws[1]
 		if raw and raw.IsVisible then
