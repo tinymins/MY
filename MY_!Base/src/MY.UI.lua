@@ -4426,9 +4426,16 @@ function XGUI.GetTreePath(raw)
 	return concat(tTreePath, '/')
 end
 
+MY_Shadows = {}
+function MY_Shadows.OnFrameCreate()
+	this:RegisterEvent('COINSHOP_ON_OPEN')
+	this:RegisterEvent('COINSHOP_ON_CLOSE')
+	XGUI(this):bringToBottom()
+end
+
 do
 local VISIBLE = true
-function onFrameBreathe()
+function MY_Shadows.OnFrameBreathe()
 	if Station.IsVisible() then
 		if not VISIBLE then
 			local h = this:Lookup('', '')
@@ -4448,13 +4455,20 @@ function onFrameBreathe()
 		end
 	end
 end
+end
+
+function MY_Shadows.OnEvent(event)
+	if event == 'COINSHOP_ON_OPEN' then
+		this:Hide()
+	elseif event == 'COINSHOP_ON_CLOSE' then
+		this:Show()
+	end
+end
 
 function XGUI.GetShadowHandle(szName)
 	local frame = Station.Lookup('Lowest/MY_Shadows')
 	if not frame then
 		frame = Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. 'ui/MY_Shadows.ini', 'MY_Shadows')
-		frame.OnFrameBreathe = onFrameBreathe
-		XGUI(frame):bringToBottom()
 	end
 	local sh = frame:Lookup('', szName)
 	if not sh then
@@ -4470,7 +4484,6 @@ function XGUI.SetShadowHandleParam(szName, tParam)
 	for k, v in pairs(tParam) do
 		sh[k] = v
 	end
-end
 end
 
 MY.UI = XGUI
