@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-02-08 10:06:25
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-22 13:50:16
+-- @Last Modified time: 2018-07-27 16:23:18
 ---------------------------------------------------
 ---------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -347,11 +347,15 @@ function D.Repaint()
 end
 MY.RegisterEvent('UI_SCALED', D.Repaint)
 
+function D.UpdateShadowHandleParam()
+	XGUI.SetShadowHandleParam('MY_LifeBar', { bShowWhenUIHide = Config.bShowWhenUIHide })
+end
+
 function D.Reset()
 	-- 重置缓存
 	LB_CACHE = {}
 	LB('clear')
-	XGUI.SetShadowHandleParam('MY_LifeBar', { bShowWhenUIHide = true })
+	D.UpdateShadowHandleParam()
 	-- 恢复官方标记
 	for dwID, _ in pairs(OVERWRITE_TITLE_EFFECT) do
 		if OBJECT_TITLE_EFFECT[dwID] then
@@ -642,6 +646,7 @@ setmetatable(MY_LifeBar, {
 		Repaint = D.Repaint,
 		IsEnabled = D.IsEnabled,
 		IsShielded = D.IsShielded,
+		UpdateShadowHandleParam = D.UpdateShadowHandleParam,
 	},
 	__metatable = true,
 })

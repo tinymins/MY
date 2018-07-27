@@ -47,6 +47,7 @@ data = {
 
 	fGlobalUIScale = 1,
 	bSystemUIScale = true,
+	bShowWhenUIHide = true,
 	bMineOnTop = true,
 	bScreenPosSort = true,
 

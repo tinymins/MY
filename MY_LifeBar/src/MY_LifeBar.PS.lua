@@ -2,7 +2,7 @@
 -- @Author: Emil Zhai (root@derzh.com)
 -- @Date:   2018-03-19 10:36:40
 -- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-22 06:29:53
+-- @Last Modified time: 2018-07-27 16:26:24
 ---------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
@@ -35,6 +35,7 @@ local D = {
 	Repaint = MY_LifeBar.Repaint,
 	IsEnabled = MY_LifeBar.IsEnabled,
 	IsShielded = MY_LifeBar.IsShielded,
+	UpdateShadowHandleParam = MY_LifeBar.UpdateShadowHandleParam,
 }
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/lang/')
 
@@ -60,6 +61,7 @@ local function LoadUI(ui)
 	ui:children('#WndSliderBox_VerticalDistance'):value(Config.nVerticalDistance / 8 / 64)
 	ui:children('#WndSliderBox_Alpha'):value(Config.nAlpha)
 	ui:children('#WndCheckBox_IgnoreUIScale'):check(not Config.bSystemUIScale)
+	ui:children('#WndCheckBox_ShowWhenUIHide'):check(Config.bShowWhenUIHide)
 	ui:children('#WndCheckBox_ShowObjectID'):check(Config.bShowObjectID)
 	ui:children('#WndCheckBox_ShowObjectIDOnlyUnnamed'):check(Config.bShowObjectIDOnlyUnnamed)
 	ui:children('#WndCheckBox_ShowSpecialNpc'):check(Config.bShowSpecialNpc)
@@ -369,7 +371,7 @@ function PS.OnPanelActive(wnd)
 	-- ÓÒ°ë±ß
 	X, Y = 350, 65
 	x, y = X, Y
-	offsety = 29
+	offsety = 27
 	local function FillColorTable(opt, relation, tartype)
 		local cfg = Config.Color[relation]
 		opt.rgb = cfg[tartype]
@@ -589,7 +591,7 @@ function PS.OnPanelActive(wnd)
 		autoenable = function() return D.IsEnabled() end,
 	})
 	y = y + offsety
-	offsety = 32
+	offsety = 31
 
 	ui:append('Shadow', {
 		name = 'Shadow_LifeBarBorderRGB', -- ÑªÌõ±ß¿òÑÕÉ«
@@ -618,6 +620,19 @@ function PS.OnPanelActive(wnd)
 		checked = not Config.bSystemUIScale,
 		oncheck = function(bChecked)
 			Config.bSystemUIScale = not bChecked
+		end,
+		autoenable = function() return D.IsEnabled() end,
+	}, true):autoWidth():width()
+
+	x = X
+	y = y + offsety - 10
+	x = x + ui:append('WndCheckBox', {
+		name = 'WndCheckBox_ShowWhenUIHide',
+		x = x, y = y, text = _L['Show when ui hide'],
+		checked = Config.bShowWhenUIHide,
+		oncheck = function(bChecked)
+			Config.bShowWhenUIHide = bChecked
+			D.UpdateShadowHandleParam()
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	}, true):autoWidth():width()

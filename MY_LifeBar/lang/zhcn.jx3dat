@@ -69,6 +69,7 @@ data = {
     ['auto detect'] = '自动获取',
 
     ['Ignore ui scale'] = '无视系统界面缩放',
+    ['Show when ui hide'] = '界面隐藏时仍然显示',
     ['show kungfu'] = '显示心法',
     ['show distance'] = '显示距离',
 
