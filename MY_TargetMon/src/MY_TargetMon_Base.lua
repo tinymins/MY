@@ -535,7 +535,7 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 				if dwSoundID then
 					local sound = MY_TargetMon.GetSound(dwSoundID)
 					if sound then
-						MY.PlaySound(SOUND.CHARACTER_SOUND, sound.szPath, '')
+						MY.PlaySound(SOUND.UI_SOUND, sound.szPath, '')
 					end
 				end
 			end
@@ -580,7 +580,7 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 				if dwSoundID then
 					local sound = MY_TargetMon.GetSound(dwSoundID)
 					if sound then
-						MY.PlaySound(SOUND.CHARACTER_SOUND, sound.szPath, '')
+						MY.PlaySound(SOUND.UI_SOUND, sound.szPath, '')
 					end
 				end
 			end
