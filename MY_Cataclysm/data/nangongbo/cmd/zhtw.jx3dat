@@ -53,7 +53,7 @@ data = {
     {dwID=10940,col="#FF3232FF",szReminder="碧",nPriority=7},--碧落斬---上陽宮·觀風殿
     {dwID=10950},--青薔墜---上陽宮·觀風殿
     {dwID=10956},--壯志淩雲---上陽宮·觀風殿
-    {dwID=10585,col="#FF00FFFF",szReminder="花",nPriority=7,szStackOp=">=",nStackNum=1},--花毒---上陽宮·雙曜亭
+    {dwID=10585,col="#FF00FFFF",szReminder="花",nPriority=3,szStackOp=">=",nStackNum=1,bScreenHead=true,colScreenHead="#FF00FF"},--花毒---上陽宮·雙曜亭
     {dwID=10584,col="#8055FFFF",szReminder="蛛",nPriority=7,szStackOp=">=",nStackNum=3},--蛛毒---上陽宮·雙曜亭
     {dwID=11063},--格擋---上陽宮·雙曜亭
     {dwID=11230},--裂足---上陽宮·雙曜亭
@@ -153,7 +153,9 @@ data = {
     {dwID=12969,col="#FF3232FF",szReminder="遲",nPriority=7,szStackOp=">=",nStackNum=4},--心遲---狼牙堡·輝天塹
     {dwID=12865,col="#0050FF00",szReminder="風",nPriority=8},--劍風---狼牙堡·輝天塹
     {dwID=13034,nLevel=1,col="#FF00FFFF",szReminder="獵",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--迦樓羅獵物---狼牙堡·輝天塹
-    {dwID=13443},--弓狼的凝視---狼牙堡·狼神殿
+    {dwID=13443,col="#FFFF00FF",szReminder="弓",nPriority=7},--弓狼的凝視---狼牙堡·狼神殿
+    {dwID=13363,col="#00FFFF00",szReminder="粘",nPriority=8},--粘液---狼牙堡·狼神殿
+    {dwID=13378,col="#FF3232FF",szReminder="黏",nPriority=6,bAttention=true},--黏液---狼牙堡·狼神殿
     {dwID=1263},--經脈暢行---通用
     {dwID=3678},--重禦---通用
     {dwID=5034,col="#00FF0000",szReminder="修",nPriority=8},--寵物寶寶的寶貝---通用

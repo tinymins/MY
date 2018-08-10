@@ -267,22 +267,22 @@ data = {
     {dwID=13355,col="#00FF00FF",szReminder="定",nPriority=7},--定气心法---狼牙堡·辉天堑
     {dwID=13358,col="#00FF00FF",szReminder="无",nPriority=7},--无冬草味---狼牙堡·辉天堑
     {dwID=13359,col="#00FF00FF",szReminder="游",nPriority=7},--游龙身法---狼牙堡·辉天堑
-    {dwID=13444,col="#FF3232FF",szReminder="血",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--血之气息---狼牙堡·狼神殿
+    {dwID=13444,col="#FF323200",szReminder="血",nPriority=8},--血之气息---狼牙堡·狼神殿
     {dwID=13392,col="#FF00FFFF",szReminder="咬",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--狂狼撕咬---狼牙堡·狼神殿
     {dwID=13453,col="#FFFF00FF",szReminder="箭",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--一箭一个---狼牙堡·狼神殿
-    {dwID=13460,col="#FF8000FF",szReminder="火",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF8000"},--火雨袭来---狼牙堡·狼神殿
-    {dwID=13363,col="#00FFFF00",szReminder="粘",nPriority=8},--粘液---狼牙堡·狼神殿
+    {dwID=13460,col="#FF3232FF",szReminder="火",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--火雨袭来---狼牙堡·狼神殿
     {dwID=13368,col="#FF3232FF",szReminder="尸",nPriority=3,bScreenHead=true,colScreenHead="#FF3232"},--尸骨---狼牙堡·狼神殿
-    {dwID=13369,szReminder="呱",nPriority=8},--梅雨呱呱---狼牙堡·狼神殿
-    {dwID=13370,col="#FFFF00FF",szReminder="绝",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--绝命视线---狼牙堡·狼神殿
+    {dwID=13369,col="#FF323200",szReminder="呱",nPriority=8},--梅雨呱呱---狼牙堡·狼神殿
+    {dwID=13370,col="#FFFF00FF",szReminder="绝",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFF00"},--绝命视线---狼牙堡·狼神殿
     {dwID=13374,col="#8055FFFF",szReminder="毒",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#8055FF"},--毒腺剧毒---狼牙堡·狼神殿
     {dwID=13375,col="#FFFFFF00",szReminder="咒",nPriority=8},--咒死---狼牙堡·狼神殿
-    {dwID=13378,col="#FF3232FF",szReminder="黏",nPriority=6,bAttention=true},--黏液---狼牙堡·狼神殿
-    {dwID=13458,szReminder="惧"},--恐惧---狼牙堡·狼神殿
     {dwID=13356,szReminder="晕"},--晕眩---狼牙堡·狼神殿
+    {dwID=13412,col="#FF323200",szReminder="共",nPriority=8},--共鸣血印---狼牙堡·狼神殿
+    {dwID=13371,col="#FF8000FF",szReminder="黄",nPriority=7},--黄泉.回龙掌法---狼牙堡·狼神殿
     {dwID=13372,col="#FFFF00FF",szReminder="掌",nPriority=7},--回龙掌法---狼牙堡·狼神殿
-    {dwID=13376,col="#FF3232FF",szReminder="败",nPriority=7,szStackOp=">=",nStackNum=3},--败血---狼牙堡·狼神殿
-    {dwID=13377,col="#FF00FFFF",szReminder="腐",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--腐血---狼牙堡·狼神殿
+    {dwID=13403,col="#FF00FFFF",szReminder="染",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--血疫感染---狼牙堡·狼神殿
+    {dwID=13376,col="#FF3232FF",szReminder="败",nPriority=7,szStackOp=">=",nStackNum=2},--败血---狼牙堡·狼神殿
+    {dwID=13377,col="#8055FFFF",szReminder="腐",nPriority=6,bAttention=true},--腐血---狼牙堡·狼神殿
     {dwID=12788,col="#FFFF00FF",szReminder="图",nPriority=7},--图兰的挑唆---龙门绝境
     {dwID=12724},--狂沙---龙门绝境
     {dwID=12787},--追命---龙门绝境
