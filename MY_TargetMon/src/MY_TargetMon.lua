@@ -30,7 +30,7 @@ local ADDON_ROOT = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/'
 local RES_ROOT = MY.GetAddonInfo().szRoot .. 'MY_Resource/'
 local ROLE_CONFIG_FILE = {'config/my_targetmon.jx3dat', MY_DATA_PATH.ROLE}
 local TEMPLATE_CONFIG_FILE = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/data/template/$lang.jx3dat'
-local EMBEDDED_CONFIG_FILE = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/data/embedded/$lang.jx3dat'
+local EMBEDDED_CONFIG_ROOT = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/data/embedded/'
 local CUSTOM_DEFAULT_CONFIG_FILE = {'config/my_targetmon.jx3dat', MY_DATA_PATH.GLOBAL}
 local CUSTOM_BOXBG_STYLES = {
 	'UI/Image/Common/Box.UITex|0',
@@ -519,7 +519,14 @@ end
 do
 local function OnInit()
 	ConfigTemplate = MY.LoadLUAData(TEMPLATE_CONFIG_FILE)
-	ConfigEmbedded = MY.LoadLUAData(EMBEDDED_CONFIG_FILE) or {}
+	ConfigEmbedded = {}
+	for _, file in ipairs(CPath.GetFileList(EMBEDDED_CONFIG_ROOT)) do
+		if wfind(file, MY.GetLang() .. '.jx3dat') then
+			for _, config in ipairs(MY.LoadLUAData(EMBEDDED_CONFIG_ROOT .. file) or {}) do
+				insert(ConfigEmbedded, config)
+			end
+		end
+	end
 	D.LoadConfig()
 end
 MY.RegisterInit('MY_TargetMon', OnInit)
