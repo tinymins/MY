@@ -1,32 +1,10 @@
 # -*- coding: UTF-8 -*-
-from lang_mapping import map_zhcn2zhtw, map_zhtw2zhcn
+from l_convert import zhcn2zhtw, zhtw2zhcn
 import os
 import os.path # 遍历文件所需库
 import codecs  # 保存UTF-8编码所需库
 import re      # 正则匹配
 import time    # 获取时间
-
-def zhcn2zhtw(source):
-    dest = ""
-    pattern = re.compile(".", re.S) #u"([\u4e00-\u9fa5])"
-    results = pattern.findall(source)
-    for result in results :
-        if map_zhcn2zhtw.has_key(result):
-            dest = dest + map_zhcn2zhtw[result]
-        else:
-            dest = dest + result
-    return dest
-
-def zhtw2zhcn(source):
-    dest = ""
-    pattern = re.compile(".", re.S) #u"([\u4e00-\u9fa5])"
-    results =  pattern.findall(source)
-    for result in results :
-        if map_zhtw2zhcn.has_key(result):
-            dest = dest + map_zhtw2zhcn[result]
-        else:
-            dest = dest + result
-    return dest
 
 if __name__ == '__main__':
     from sys import argv

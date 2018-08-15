@@ -1,17 +1,6 @@
 # -*- coding: GBK -*-
-from lang_mapping import map_zhcn2zhtw
 import sys, os, codecs, re, time
-
-def zhcn2zhtw(source):
-	dest = ""
-	pattern = re.compile(".", re.S) #u"([\u4e00-\u9fa5])"
-	results =  pattern.findall(source)
-	for result in results :
-		if map_zhcn2zhtw.has_key(result):
-			dest = dest + map_zhcn2zhtw[result]
-		else:
-			dest = dest + result
-	return dest
+from l_convert import zhcn2zhtw
 
 root = os.path.dirname(os.path.abspath(__file__))
 excludes = [".git", "@DATA"]
