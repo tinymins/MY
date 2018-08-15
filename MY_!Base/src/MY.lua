@@ -157,8 +157,8 @@ MY.IsNumber, MY.IsString, MY.IsTable, MY.IsFunction = IsNumber, IsString, IsTabl
 ---------------------------------------------------------------------------------------------
 -- 本地函数变量
 ---------------------------------------------------------------------------------------------
-local _BUILD_ = '20180727'
-local _VERSION_ = 0x2011100
+local _BUILD_ = '20180810'
+local _VERSION_ = 0x2011200
 local _DEBUGLV_ = tonumber(LoadLUAData('interface/my.debug.level') or nil) or 4
 local _DELOGLV_ = tonumber(LoadLUAData('interface/my.delog.level') or nil) or 4
 local _NORESTM_ = tonumber(LoadLUAData('interface/my.nrtim.level') or nil) or -1
