@@ -523,6 +523,10 @@ local function OnInit()
 	for _, file in ipairs(CPath.GetFileList(EMBEDDED_CONFIG_ROOT)) do
 		if wfind(file, MY.GetLang() .. '.jx3dat') then
 			for _, config in ipairs(MY.LoadLUAData(EMBEDDED_CONFIG_ROOT .. file) or {}) do
+				config.enable = false
+				for _, mon in ipairs(config.monitors) do
+					mon.manually = false
+				end
 				insert(ConfigEmbedded, config)
 			end
 		end
