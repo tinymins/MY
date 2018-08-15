@@ -30,8 +30,6 @@ data = {
     {dwID=12249},--荆棘毒刺---狼牙堡·战兽山
     {dwID=12258,szStackOp=">=",nStackNum=3},--尸毒---狼牙堡·战兽山
     {dwID=12253,col="#FFFF00FF",szReminder="擒",nPriority=7},--被擒---狼牙堡·战兽山
-    {dwID=12261,col="#00ffffFF",szReminder="缓",nPriority=7,szStackOp=">=",nStackNum=6},--冰塞川·缓---狼牙堡·燕然峰
-    {dwID=12262},--冰塞川·冻凝---狼牙堡·燕然峰
     {dwID=12132},--蚀体---狼牙堡·燕然峰
     {dwID=12151},--寒绝剑---狼牙堡·燕然峰
     {dwID=12399},--天剑破体·强---狼牙堡·燕然峰

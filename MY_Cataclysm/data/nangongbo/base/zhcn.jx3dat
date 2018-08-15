@@ -47,6 +47,8 @@ data = {
     {dwID=12194,col="#8055FFFF",szReminder="Ç±",nPriority=7},--Ç±·üÖ®ÖÖ---ÀÇÑÀ±¤¡¤Õ½ÊÞÉ½
     {dwID=12259,col="#FF00FFFF",szReminder="²ø",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF00FF"},--Ê¬¶¾²øÈÆ---ÀÇÑÀ±¤¡¤Õ½ÊÞÉ½
     {dwID=12254,col="#FF3232FF",szReminder="¿ñ",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--¿ñÊ¬ÂûÌÙ---ÀÇÑÀ±¤¡¤Õ½ÊÞÉ½
+    {dwID=12261,col="#00ffffFF",szReminder="»º",nPriority=7},--±ùÈû´¨¡¤»º---ÀÇÑÀ±¤¡¤ÑàÈ»·å
+    {dwID=12262,col="#0050FFFF",nPriority=7},--±ùÈû´¨¡¤¶³Äý---ÀÇÑÀ±¤¡¤ÑàÈ»·å
     {dwID=12264,col="#FF00FFFF",szReminder="ÓÄ",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--ÓÄº®¾³---ÀÇÑÀ±¤¡¤ÑàÈ»·å
     {dwID=12150,col="#FFFF00FF",szReminder="¼³",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFF00"},--¼³È¡---ÀÇÑÀ±¤¡¤ÑàÈ»·å
     {dwID=12137,col="#00FFFFFF",szReminder="Óò",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#00FFFF"},--Ìì½£Óò---ÀÇÑÀ±¤¡¤ÑàÈ»·å

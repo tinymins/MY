@@ -10,7 +10,7 @@ data = {
     {dwID=10780,col="#FFFF00FF",szReminder="冰",nPriority=5,bCaution=true},--冰結---白帝水宮
     {dwID=10778,col="#FF00FFFF",szReminder="霜",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--大道一心·霜印---白帝水宮
     {dwID=10853,col="#00FFFFFF",szReminder="極",nPriority=7},--極寒---白帝水宮
-    {dwID=11092},--楓之傷---夕顔閣
+    {dwID=11092},--楓之傷---夕顏閣
     {dwID=11848},--烈陽---刀輪海廳
     {dwID=11616},--亂---刀輪海廳
     {dwID=11617},--合---刀輪海廳
@@ -28,7 +28,7 @@ data = {
     {dwID=12220,col="#FF00FFFF",szReminder="注",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--被哈桑注視---銀霧湖
     {dwID=12180},--被撲倒---銀霧湖
     {dwID=12179},--劇毒---銀霧湖
-    {dwID=12199},--余毒---銀霧湖
+    {dwID=12199},--餘毒---銀霧湖
     {dwID=12187},--毒刺---銀霧湖
     {dwID=12198},--蠱毒---銀霧湖
     {dwID=12272},--傷口開裂---銀霧湖
@@ -47,14 +47,16 @@ data = {
     {dwID=12194,col="#8055FFFF",szReminder="潛",nPriority=7},--潛伏之種---狼牙堡·戰獸山
     {dwID=12259,col="#FF00FFFF",szReminder="纏",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF00FF"},--屍毒纏繞---狼牙堡·戰獸山
     {dwID=12254,col="#FF3232FF",szReminder="狂",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--狂屍蔓藤---狼牙堡·戰獸山
+    {dwID=12261,col="#00ffffFF",szReminder="緩",nPriority=7},--冰塞川·緩---狼牙堡·燕然峰
+    {dwID=12262,col="#0050FFFF",nPriority=7},--冰塞川·凍凝---狼牙堡·燕然峰
     {dwID=12264,col="#FF00FFFF",szReminder="幽",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--幽寒境---狼牙堡·燕然峰
     {dwID=12150,col="#FFFF00FF",szReminder="汲",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFF00"},--汲取---狼牙堡·燕然峰
     {dwID=12137,col="#00FFFFFF",szReminder="域",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#00FFFF"},--天劍域---狼牙堡·燕然峰
     {dwID=12139,col="#8055FFFF",szReminder="絕",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#8055FF"},--天劍絕式---狼牙堡·燕然峰
     {dwID=12146,col="#00FFFFFF",szReminder="凝",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#00FFFF"},--冰凝---狼牙堡·燕然峰
-    {dwID=12117,col="#FF00FFFF",szReminder="瞄",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--瞄准---狼牙堡·燕然峰
+    {dwID=12117,col="#FF00FFFF",szReminder="瞄",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--瞄準---狼牙堡·燕然峰
     {dwID=11371,col="#FFFFFFFF",szReminder="墩",nPriority=6,bAttention=true},--破甲---上陽宮·觀風殿
-    {dwID=10552,col="#FFFFFFFF",szReminder="鈎",nPriority=6,bAttention=true},--鈎吻---上陽宮·觀風殿
+    {dwID=10552,col="#FFFFFFFF",szReminder="鉤",nPriority=6,bAttention=true},--鉤吻---上陽宮·觀風殿
     {dwID=11290,col="#FFFF00FF",szReminder="擾",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFF00"},--擾心---上陽宮·觀風殿
     {dwID=11292,col="#FFFF00FF",szReminder="擾",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFF00"},--擾心---上陽宮·觀風殿
     {dwID=11293,col="#FFFF00FF",szReminder="擾",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFF00"},--擾心---上陽宮·觀風殿
@@ -65,7 +67,7 @@ data = {
     {dwID=10963},--秋露---上陽宮·觀風殿
     {dwID=11064,col="#FF3232FF",szReminder="暴",nPriority=3,bScreenHead=true,colScreenHead="#FF3232"},--暴露---上陽宮·雙曜亭
     {dwID=11050,col="#FF3232FF",szReminder="暴",nPriority=3,bScreenHead=true,colScreenHead="#FF3232"},--暴露---上陽宮·雙曜亭
-    {dwID=11065},--瞄准---上陽宮·雙曜亭
+    {dwID=11065},--瞄準---上陽宮·雙曜亭
     {dwID=10884,col="#FFFF00FF",szReminder="定",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--定身---上陽宮·雙曜亭
     {dwID=10885,col="#FFFFFFFF",szReminder="六",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFFFF"},--六合---上陽宮·雙曜亭
     {dwID=10886,col="#FF00FFFF",szReminder="六",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--六合---上陽宮·雙曜亭
@@ -75,8 +77,8 @@ data = {
     {dwID=9899,col="#0050FFFF",szReminder="鎖",nPriority=7},--青冥鎖---永王行宮·仙侶庭園
     {dwID=9898,col="#FFFFFFFF",szReminder="飛",nPriority=7},--飛花纏足---永王行宮·仙侶庭園
     {dwID=9409,col="#FF3232FF",szReminder="震",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--經脈震擊---永王行宮·仙侶庭園
-    {dwID=9642,col="#FF00FFFF",szReminder="笠",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF00FF"},--鬥笠·破魔---永王行宮·仙侶庭園
-    {dwID=10239,col="#FF00FFFF",szReminder="笠",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF00FF"},--鬥笠·破魔---永王行宮·仙侶庭園
+    {dwID=9642,col="#FF00FFFF",szReminder="笠",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF00FF"},--斗笠·破魔---永王行宮·仙侶庭園
+    {dwID=10239,col="#FF00FFFF",szReminder="笠",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF00FF"},--斗笠·破魔---永王行宮·仙侶庭園
     {dwID=9761},--浴火---永王行宮·仙侶庭園
     {dwID=9155,col="#FFFF00FF",szReminder="住",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--住相---永王行宮·仙侶庭園
     {dwID=9422,col="#00FFFFFF",szReminder="寒",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#00FFFF"},--寒氣刺骨---永王行宮·仙侶庭園
@@ -91,7 +93,7 @@ data = {
     {dwID=8970},--清流---永王行宮·花月別院
     {dwID=9653},--經脈俱斷---永王行宮·花月別院
     {dwID=8986,col="#FF00FFFF",szReminder="纏",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--纏---永王行宮·花月別院
-    {dwID=2134,col="#FF00FFFF",szReminder="咒",nPriority=7},--梵音輪回咒---戰寶迦蘭
+    {dwID=2134,col="#FF00FFFF",szReminder="咒",nPriority=7},--梵音輪迴咒---戰寶迦蘭
     {dwID=2632,col="#FF323200",szReminder="千",nPriority=8},--千針暗沼---荻花聖殿
     {dwID=2628,col="#FF00FFFF",szReminder="誅",nPriority=4,bAttention=true,bCaution=true},--誅心咒---荻花聖殿
     {dwID=3877,col="#FFFF00FF",szReminder="原",nPriority=5,bCaution=true},--原罪縛穴術點名---荻花聖殿
@@ -113,36 +115,36 @@ data = {
     {dwID=4008,col="#FF323200",szReminder="封",nPriority=8},--封鎖---燭龍殿
     {dwID=3976,col="#00FFFF00",szReminder="吸",nPriority=8},--吸魂功---燭龍殿
     {dwID=4066,col="#8055FFFF",szReminder="毒",nPriority=7},--毒蠱---燭龍殿
-    {dwID=3799,col="#FF3232FF",szReminder="瞄",nPriority=5,bCaution=true},--瞄准---會戰唐門
+    {dwID=3799,col="#FF3232FF",szReminder="瞄",nPriority=5,bCaution=true},--瞄準---會戰唐門
     {dwID=3808,col="#00FFFFFF",szReminder="煞",nPriority=7},--狼煞---會戰唐門
     {dwID=3807,col="#FFFF00FF",szReminder="嘯",nPriority=7},--狼嘯---會戰唐門
     {dwID=3781,col="#FF323200",szReminder="雷",nPriority=8},--雷動四方---會戰唐門
-    {dwID=3780,col="#FFFF00FF",szReminder="天",nPriority=7},--天雲挂雷---會戰唐門
+    {dwID=3780,col="#FFFF00FF",szReminder="天",nPriority=7},--天雲掛雷---會戰唐門
     {dwID=5491,col="#FF323200",szReminder="騎",nPriority=8},--騎手---大明宮
     {dwID=6006,col="#00FFFF00",szReminder="疲",nPriority=8},--疲勞---大明宮
     {dwID=5599,col="#FFFF00FF",szReminder="沙",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--沙暴---大明宮
-    {dwID=5581,col="#FF00FFFF",szReminder="饑",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF00FF"},--餓鬼·饑---大明宮
+    {dwID=5581,col="#FF00FFFF",szReminder="飢",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF00FF"},--餓鬼·飢---大明宮
     {dwID=5576,col="#FFFF00FF",szReminder="離",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFF00"},--離愁---大明宮
     {dwID=5579,col="#8055FF00",szReminder="百",nPriority=3,bScreenHead=true,colScreenHead="#8055FF"},--百生---大明宮
     {dwID=5592,col="#0050FFFF",szReminder="障",nPriority=7},--餓鬼·外障---大明宮
     {dwID=5717,col="#FF323200",szReminder="獄",nPriority=8},--無明煉獄---大明宮
     {dwID=5513,col="#FFFF00FF",szReminder="追",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--追擊---大明宮
-    {dwID=5701,col="#00FFFF00",szReminder="殇",nPriority=8},--夜殇---大明宮
+    {dwID=5701,col="#00FFFF00",szReminder="殤",nPriority=8},--夜殤---大明宮
     {dwID=5522,col="#FF3232FF",szReminder="血",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--血重樓---大明宮
     {dwID=5632,col="#00FF0000",szReminder="火",nPriority=8},--火把---大明宮
-    {dwID=5084,col="#FFFF00FF",szReminder="牢",nPriority=6,bAttention=true},--牢籠被鎖---南诏皇宮
-    {dwID=5081},--魁龍氣---南诏皇宮
-    {dwID=5096,nLevel=2,col="#FF3232FF",szReminder="精",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--精確射殺---南诏皇宮
-    {dwID=5096,nLevel=1,col="#00FFFFFF",szReminder="散",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#00FFFF"},--致死散射---南诏皇宮
-    {dwID=4378,col="#FFFF00FF",szReminder="鍾",nPriority=5,bCaution=true},--點名撞鍾---南诏皇宮
-    {dwID=4314,col="#00FFFFFF",szReminder="霜",nPriority=7,szStackOp=">=",nStackNum=6},--冰霜---南诏皇宮
-    {dwID=4637,col="#FF3232FF",szReminder="追",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--追擊---南诏皇宮
-    {dwID=4310},--龍象波諾---南诏皇宮
-    {dwID=4899,col="#FF00FF00",szReminder="盾",nPriority=8},--封魔盾---南诏皇宮
-    {dwID=4318,col="#FFFF0000",szReminder="無",nPriority=8},--無盡折磨---南诏皇宮
-    {dwID=4658,col="#00FFFFFF",szReminder="冰",nPriority=7},--冰棺---南诏皇宮
-    {dwID=4250,col="#00FFFFFF",szReminder="冰",nPriority=3,bScreenHead=true,colScreenHead="#00FFFF"},--冰棺---南诏皇宮
-    {dwID=4249,col="#FF3232FF",szReminder="點",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF3232"},--點燃---南诏皇宮
+    {dwID=5084,col="#FFFF00FF",szReminder="牢",nPriority=6,bAttention=true},--牢籠被鎖---南詔皇宮
+    {dwID=5081},--魁龍氣---南詔皇宮
+    {dwID=5096,nLevel=2,col="#FF3232FF",szReminder="精",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--精確射殺---南詔皇宮
+    {dwID=5096,nLevel=1,col="#00FFFFFF",szReminder="散",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#00FFFF"},--致死散射---南詔皇宮
+    {dwID=4378,col="#FFFF00FF",szReminder="鐘",nPriority=5,bCaution=true},--點名撞鐘---南詔皇宮
+    {dwID=4314,col="#00FFFFFF",szReminder="霜",nPriority=7,szStackOp=">=",nStackNum=6},--冰霜---南詔皇宮
+    {dwID=4637,col="#FF3232FF",szReminder="追",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--追擊---南詔皇宮
+    {dwID=4310},--龍象波諾---南詔皇宮
+    {dwID=4899,col="#FF00FF00",szReminder="盾",nPriority=8},--封魔盾---南詔皇宮
+    {dwID=4318,col="#FFFF0000",szReminder="無",nPriority=8},--無盡折磨---南詔皇宮
+    {dwID=4658,col="#00FFFFFF",szReminder="冰",nPriority=7},--冰棺---南詔皇宮
+    {dwID=4250,col="#00FFFFFF",szReminder="冰",nPriority=3,bScreenHead=true,colScreenHead="#00FFFF"},--冰棺---南詔皇宮
+    {dwID=4249,col="#FF3232FF",szReminder="點",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF3232"},--點燃---南詔皇宮
     {dwID=6976},--穿心劫---血戰天策
     {dwID=6975},--穿心劫---血戰天策
     {dwID=6564},--天罰·紅雷---血戰天策
@@ -160,7 +162,7 @@ data = {
     {dwID=8340,col="#FF3232FF",szReminder="注",nPriority=6,bAttention=true},--注目---太原之戰·逐虎驅狼
     {dwID=8313,col="#00FFFFFF",szReminder="魔",nPriority=6,bAttention=true},--魔血化生---太原之戰·逐虎驅狼
     {dwID=8307,col="#FFFFFFFF",szReminder="閻",nPriority=6,bAttention=true},--閻羅附體---太原之戰·逐虎驅狼
-    {dwID=8305,col="#FF3232FF",szReminder="毒",nPriority=5,bCaution=true},--毒血湧動---太原之戰·逐虎驅狼
+    {dwID=8305,col="#FF3232FF",szReminder="毒",nPriority=5,bCaution=true},--毒血涌動---太原之戰·逐虎驅狼
     {dwID=8039,col="#FF3232FF",szReminder="聖",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--聖炎---太原之戰·逐虎驅狼
     {dwID=8040,col="#00FFFFFF",szReminder="寒",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#00FFFF"},--寒意---太原之戰·逐虎驅狼
     {dwID=8014,col="#FF323200",szReminder="恐",nPriority=8},--恐懼---太原之戰·逐虎驅狼
@@ -172,8 +174,8 @@ data = {
     {dwID=5871,col="#FF00FFFF",szReminder="孤",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--孤雁唳---戰寶軍械庫
     {dwID=5872,col="#FF00FFFF",szReminder="孤",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--孤雁唳---戰寶軍械庫
     {dwID=5880,col="#0050FFFF",szReminder="乘",nPriority=7},--乘風箭---戰寶軍械庫
-    {dwID=7376,col="#FF00FF00",szReminder="情",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--癡斷情腸·情---風雪稻香村
-    {dwID=7377,col="#FF00FF00",szReminder="癡",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--癡斷情腸·癡---風雪稻香村
+    {dwID=7376,col="#FF00FF00",szReminder="情",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--痴斷情腸·情---風雪稻香村
+    {dwID=7377,col="#FF00FF00",szReminder="痴",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--痴斷情腸·痴---風雪稻香村
     {dwID=7380,col="#FF3232FF",szReminder="狡",nPriority=7},--狡兔三窟---風雪稻香村
     {dwID=7367,col="#8055FF00",szReminder="疾",nPriority=8},--疾風怒羽·風怒---風雪稻香村
     {dwID=7369,col="#FFFF00FF",szReminder="骨",nPriority=7},--恨貫肌骨---風雪稻香村
@@ -184,7 +186,7 @@ data = {
     {dwID=7295,col="#FF00FFFF",szReminder="寒",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF00FF"},--寒雪---風雪稻香村
     {dwID=7296,col="#FF00FFFF",szReminder="夜",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF00FF"},--夜雪---風雪稻香村
     {dwID=7297,col="#FF323200",szReminder="索",nPriority=8},--索敵---風雪稻香村
-    {dwID=7285,col="#8055FFFF",szReminder="毒",nPriority=7},--毒鸩---風雪稻香村
+    {dwID=7285,col="#8055FFFF",szReminder="毒",nPriority=7},--毒鴆---風雪稻香村
     {dwID=6666,col="#FF800000",szReminder="牽",nPriority=3,bScreenHead=true,colScreenHead="#FF8000"},--牽引---風雪稻香村
     {dwID=6681,col="#00FF0000",szReminder="乾",nPriority=3,bScreenHead=true,colScreenHead="#00FF00"},--卦勁·乾---風雪稻香村
     {dwID=6682,col="#00FF0000",szReminder="坤",nPriority=3,bScreenHead=true,colScreenHead="#00FF00"},--卦勁·坤---風雪稻香村
@@ -206,7 +208,7 @@ data = {
     {dwID=7476,col="#FF00FFFF",szReminder="牢",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--火牢花雨---秦皇陵
     {dwID=7583,col="#FF00FFFF",szReminder="魅",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--魅惑---秦皇陵
     {dwID=7472,col="#FF800000",szReminder="種",nPriority=8},--火種---秦皇陵
-    {dwID=7639,col="#FF00FFFF",szReminder="優",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--優豔火花---秦皇陵
+    {dwID=7639,col="#FF00FFFF",szReminder="優",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--優艷火花---秦皇陵
     {dwID=7720,col="#FFFF0000",szReminder="虛",nPriority=8},--虛實---秦皇陵
     {dwID=7721,col="#FFFF00FF",szReminder="虛",nPriority=7},--虛實---秦皇陵
     {dwID=6940},--秘劍·金蛇---秦皇陵
@@ -216,7 +218,7 @@ data = {
     {dwID=7607,col="#FF3232FF",szReminder="破",nPriority=7},--破天---墨家秘殿
     {dwID=7895,col="#FF3232FF",szReminder="車",nPriority=3,bScreenHead=true,colScreenHead="#FF3232"},--戰車鎖定---春明門
     {dwID=7896,col="#FF00FFFF",szReminder="射",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--射擊鎖定---春明門
-    {dwID=7874,col="#00FFFFFF",szReminder="牢",nPriority=7},--畫地爲牢---春明門
+    {dwID=7874,col="#00FFFFFF",szReminder="牢",nPriority=7},--畫地為牢---春明門
     {dwID=7972,col="#FF3232FF",szReminder="刺",nPriority=7,szStackOp=">=",nStackNum=2},--地刺---藏寶洞·野人谷
     {dwID=7962},--怒天刀---藏寶洞·夜狼山
     {dwID=7973},--火引---藏寶洞·夜狼山
@@ -235,16 +237,16 @@ data = {
     {dwID=8781,col="#00FFFFFF",szReminder="凍",nPriority=6,bAttention=true},--凍結---天泣林
     {dwID=8734,szStackOp=">=",nStackNum=4},--劇毒---天泣林
     {dwID=8752,col="#00FFFFFF",szReminder="傾",nPriority=7},--傾湖雷音---微山書院
-    {dwID=8773,col="#FF323200",szReminder="牢",nPriority=8},--畫地爲牢---微山書院
+    {dwID=8773,col="#FF323200",szReminder="牢",nPriority=8},--畫地為牢---微山書院
     {dwID=9024,col="#FF00FFFF",szReminder="毒",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--刀毒---陰山聖泉
     {dwID=8834},--震懾---陰山聖泉
     {dwID=8828},--寄生之種---陰山聖泉
-    {dwID=8789,col="#FFFF00FF",szReminder="禅",nPriority=5,bCaution=true},--禅定---梵空禅院
-    {dwID=8790,col="#FFFF00FF",szReminder="佛",nPriority=6,bAttention=true},--佛心---梵空禅院
-    {dwID=8791,col="#FF800000",szReminder="雙",nPriority=8},--雙針定陽---梵空禅院
-    {dwID=8817,col="#FF3232FF",szReminder="畏",nPriority=7},--劍畏---梵空禅院
+    {dwID=8789,col="#FFFF00FF",szReminder="禪",nPriority=5,bCaution=true},--禪定---梵空禪院
+    {dwID=8790,col="#FFFF00FF",szReminder="佛",nPriority=6,bAttention=true},--佛心---梵空禪院
+    {dwID=8791,col="#FF800000",szReminder="雙",nPriority=8},--雙針定陽---梵空禪院
+    {dwID=8817,col="#FF3232FF",szReminder="畏",nPriority=7},--劍畏---梵空禪院
     {dwID=9188},--仇恨---引仙水榭
-    {dwID=9032,col="#FF3232FF",szReminder="連",nPriority=7},--連斬之殇---引仙水榭
+    {dwID=9032,col="#FF3232FF",szReminder="連",nPriority=7},--連斬之殤---引仙水榭
     {dwID=12909,col="#FF3232FF",szReminder="沸",nPriority=7},--沸血散---狼牙堡·輝天塹
     {dwID=12910,col="#00FFFFFF",szReminder="冰",nPriority=7},--冰髓骨毒---狼牙堡·輝天塹
     {dwID=12918,col="#FFFF00FF",szReminder="壓",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--壓制---狼牙堡·輝天塹
@@ -253,7 +255,7 @@ data = {
     {dwID=12891,col="#FF00FFFF",szReminder="侵",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--月影侵入---狼牙堡·輝天塹
     {dwID=12950},--月影心法---狼牙堡·輝天塹
     {dwID=12901,col="#00FFFFFF",szReminder="禁",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#00FFFF"},--暗月幽禁---狼牙堡·輝天塹
-    {dwID=12860},--亡魂遊毒---狼牙堡·輝天塹
+    {dwID=12860},--亡魂游毒---狼牙堡·輝天塹
     {dwID=12903,col="#FF3232FF",szReminder="葬",nPriority=5,bCaution=true},--葬棺之火---狼牙堡·輝天塹
     {dwID=12939},--鐵針穿刺---狼牙堡·輝天塹
     {dwID=12861,col="#00FFFFFF",szReminder="陰",nPriority=3,bScreenHead=true,colScreenHead="#00FFFF"},--星宇劍威---狼牙堡·輝天塹
@@ -263,10 +265,10 @@ data = {
     {dwID=13126,col="#FF00FFFF",szReminder="鎮",nPriority=4,bAttention=true,bCaution=true},--鎮壓---狼牙堡·輝天塹
     {dwID=12988,col="#FFFF0000",szReminder="炫",nPriority=8},--劍的炫光---狼牙堡·輝天塹
     {dwID=13034,nLevel=1,bOnlyMe=true,col="#FF00FFFF",szReminder="獵",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--迦樓羅獵物---狼牙堡·輝天塹
-    {dwID=13145,col="#FF3232FF",szReminder="複",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--複仇之炎---狼牙堡·輝天塹
+    {dwID=13145,col="#FF3232FF",szReminder="復",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--復仇之炎---狼牙堡·輝天塹
     {dwID=13355,col="#00FF00FF",szReminder="定",nPriority=7},--定氣心法---狼牙堡·輝天塹
     {dwID=13358,col="#00FF00FF",szReminder="無",nPriority=7},--無冬草味---狼牙堡·輝天塹
-    {dwID=13359,col="#00FF00FF",szReminder="遊",nPriority=7},--遊龍身法---狼牙堡·輝天塹
+    {dwID=13359,col="#00FF00FF",szReminder="游",nPriority=7},--游龍身法---狼牙堡·輝天塹
     {dwID=13444,col="#FF323200",szReminder="血",nPriority=8},--血之氣息---狼牙堡·狼神殿
     {dwID=13392,col="#FF00FFFF",szReminder="咬",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--狂狼撕咬---狼牙堡·狼神殿
     {dwID=13453,col="#FFFF00FF",szReminder="箭",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--一箭一個---狼牙堡·狼神殿
@@ -297,7 +299,7 @@ data = {
     {dwID=11048},--身體不適---其他
     {dwID=11607},--戰意---其他
     {dwID=2426},--嘔吐物---其他
-    {dwID=8880},--鳄魚的泡泡---其他
+    {dwID=8880},--鱷魚的泡泡---其他
     {dwID=11956},--網縛---其他
     {dwID=12651},--藏匿---其他
     {dwID=208},--彈跳---通用

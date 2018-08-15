@@ -7,7 +7,7 @@ return {
 	target              = "CLIENT_PLAYER",
 	scale               = 0.8   , -- 縮放比
 	ignoreSystemUIScale = false , -- 禁止系統縮放
-	enable              = false , -- 啓用標記
+	enable              = false , -- 啟用標記
 	penetrable          = true  , -- 是否穿透
 	dragable            = false , -- 是否可拖拽
 	alignment           = "LEFT", -- 對齊方式

@@ -2,7 +2,7 @@ data = {
     {dwID=11742},--雷擊---風雷刀谷·鍛刀廳
     {dwID=11657,szStackOp=">=",nStackNum=3},--浴火---風雷刀谷·鍛刀廳
     {dwID=11658,szStackOp=">=",nStackNum=3},--浸寒---風雷刀谷·鍛刀廳
-    {dwID=11652,col="#FFFF00FF",szReminder="禦",nPriority=7},--禦海刀氣---風雷刀谷·鍛刀廳
+    {dwID=11652,col="#FFFF00FF",szReminder="御",nPriority=7},--御海刀氣---風雷刀谷·鍛刀廳
     {dwID=11756,szStackOp=">=",nStackNum=15},--慢性毒藥---風雷刀谷·鍛刀廳
     {dwID=11606},--劇毒---風雷刀谷·鍛刀廳
     {dwID=11694,col="#FFFF00FF",szReminder="喋",nPriority=7},--喋骨---風雷刀谷·鍛刀廳
@@ -65,14 +65,14 @@ data = {
     {dwID=8981,col="#FFFF00FF",szReminder="月",nPriority=3,bScreenHead=true,colScreenHead="#FFFF00"},--月滿---永王行宮·花月別院
     {dwID=8975,col="#FF3232FF",szReminder="烈",nPriority=3,bScreenHead=true,colScreenHead="#FF3232"},--烈明---永王行宮·花月別院
     {dwID=8896},--灼君---永王行宮·花月別院
-    {dwID=1866},--碎星辰---宮中神武遺迹
-    {dwID=5195},--虛弱---南诏皇宮
-    {dwID=5157},--絞喉---南诏皇宮
+    {dwID=1866},--碎星辰---宮中神武遺跡
+    {dwID=5195},--虛弱---南詔皇宮
+    {dwID=5157},--絞喉---南詔皇宮
     {dwID=7184,szStackOp=">=",nStackNum=10},--風暴之眼---血戰天策
     {dwID=6549,col="#FF3232FF",szReminder="怒",nPriority=7},--天怒---血戰天策
     {dwID=6936},--閃舞刺---血戰天策
     {dwID=8346},--火燎---太原之戰·夜守孤城
-    {dwID=8343,col="#FF3232FF",szReminder="瞄",nPriority=3,bScreenHead=true,colScreenHead="#FF3232"},--瞄准---太原之戰·夜守孤城
+    {dwID=8343,col="#FF3232FF",szReminder="瞄",nPriority=3,bScreenHead=true,colScreenHead="#FF3232"},--瞄準---太原之戰·夜守孤城
     {dwID=8084,col="#FF3232FF",szReminder="威",nPriority=7},--威懾---太原之戰·夜守孤城
     {dwID=8028,col="#FF800000",szReminder="碎",nPriority=8,szStackOp=">=",nStackNum=2},--碎甲---太原之戰·逐虎驅狼
     {dwID=8319},--回龍碎甲---太原之戰·逐虎驅狼
@@ -80,13 +80,13 @@ data = {
     {dwID=8312},--腐血狂亂---太原之戰·逐虎驅狼
     {dwID=8215},--氣血翻湧---太原之戰·逐虎驅狼
     {dwID=7993,col="#FF323200",szReminder="聲",nPriority=8,szStackOp=">=",nStackNum=9},--聲嘯九天---太原之戰·逐虎驅狼
-    {dwID=7992,col="#0050FF00",szReminder="弦",nPriority=8,szStackOp=">=",nStackNum=9},--弦音天籁---太原之戰·逐虎驅狼
+    {dwID=7992,col="#0050FF00",szReminder="弦",nPriority=8,szStackOp=">=",nStackNum=9},--弦音天籟---太原之戰·逐虎驅狼
     {dwID=8170,col="#FF323200",szReminder="蓮",nPriority=8},--蓮花指---太原之戰·逐虎驅狼
     {dwID=8172,col="#0050FF00",szReminder="蓮",nPriority=8},--蓮花指---太原之戰·逐虎驅狼
     {dwID=8174},--音波衝擊---太原之戰·逐虎驅狼
     {dwID=8027},--音波衝擊---太原之戰·逐虎驅狼
     {dwID=8046},--失血---太原之戰·逐虎驅狼
-    {dwID=8036,col="#FFFF0000",szReminder="瞄",nPriority=8},--瞄准---太原之戰·逐虎驅狼
+    {dwID=8036,col="#FFFF0000",szReminder="瞄",nPriority=8},--瞄準---太原之戰·逐虎驅狼
     {dwID=8029,col="#FF323200",szReminder="流",nPriority=8,szStackOp=">=",nStackNum=2},--流血---太原之戰·逐虎驅狼
     {dwID=8010},--戰鬥標記---太原之戰·逐虎驅狼
     {dwID=7554,col="#00FFFFFF",szReminder="轉",nPriority=7},--陰陽易轉---風雪稻香村
@@ -107,15 +107,15 @@ data = {
     {dwID=2313},--鳳凰蠱---五毒
     {dwID=377},--鎮山河---純陽
     {dwID=4439},--貪魔體---明教
-    {dwID=1242,col="#00FF00FF",szReminder="舍",nPriority=7},--舍身---少林
+    {dwID=1242,col="#00FF00FF",szReminder="舍",nPriority=7},--捨身---少林
     {dwID=10208,col="#00FF00FF",szReminder="弘",nPriority=7},--弘法---少林
     {dwID=2778},--淵---天策
     {dwID=367},--守如山---天策
     {dwID=6163},--守如山---天策
     {dwID=203},--嘯如虎---天策
-    {dwID=360},--禦---天策
+    {dwID=360},--御---天策
     {dwID=6636,col="#00FF0000",szReminder="聖",nPriority=8},--聖手織天---五毒
-    {dwID=2316,bOnlyMine=true,col="#FF323200",szReminder="惑",nPriority=9},--蠱惑衆生---五毒
+    {dwID=2316,bOnlyMine=true,col="#FF323200",szReminder="惑",nPriority=9},--蠱惑眾生---五毒
     {dwID=681,bOnlyMine=true,nPriority=9},--上元點鬟---七秀
     {dwID=676,bOnlyMine=true,nPriority=9},--雨霖鈴---七秀
     {dwID=680,bOnlyMine=true,nPriority=9},--翔舞---七秀
