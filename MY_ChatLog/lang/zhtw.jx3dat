@@ -23,7 +23,7 @@ data = {
     ['%d chatlogs imported!'] = '成功導入%d條聊天記錄',
     ['import chatlog'] = '導入聊天記錄',
     ['Fix finished!'] = '修複完成！',
-    ['preparing'] = '准備中',
+    ['preparing'] = '準備中',
     ['Export succeed'] = '導出完成！',
     ['Already exporting, please wait.'] = '聊天記錄正在導出中，請稍後。',
     ['Error: open file error %s [%s]'] = '打開文件%s失敗：[%s]',
@@ -34,7 +34,7 @@ data = {
 
     ['total %d pages'] = '共%d頁',
     ['delete record'] = '刪除該條記錄',
-    ['copy this record'] = '複制該條消息',
+    ['copy this record'] = '複製該條消息',
     ['open chatlog'] = '打開聊天記錄',
     ['MY - MY_ChatLog'] = '茗伊插件集 - 聊天記錄',
     ['press enter to search ...'] = '輸入回車鍵搜索...',

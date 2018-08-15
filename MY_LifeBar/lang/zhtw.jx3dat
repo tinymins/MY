@@ -2,10 +2,10 @@
 data = {
     ['MY_LifeBar'] = '扁平血條',
 
-	['Enable'] = '啓用',
+	['Enable'] = '啟用',
     ['Configure name'] = '配置文件名稱',
 
-    ['only enable in those maps below'] = '√ 僅在以下地圖啓用扁平血條',
+    ['only enable in those maps below'] = '√ 僅在以下地圖啟用扁平血條',
     ['arena'] = '競技場',
     ['battlefield'] = '戰場',
     ['dungeon'] = '副本',
@@ -52,7 +52,7 @@ data = {
     ['lifebar offset-y: %d px.'] = '血條豎直偏移%spx。',
     ['lifebar padding: %d px.'] = '血條內邊框寬度%spx。',
     ['lifebar border: %d px.'] = '血條外邊框寬度%spx。',
-    ['lifebar border color'] = '血條邊框顔色',
+    ['lifebar border color'] = '血條邊框顏色',
     ['life percentage offset-x: %d px.'] = '血量百分比水平偏移%spx。',
     ['life percentage offset-y: %d px.'] = '血量百分比豎直偏移%spx。',
 
@@ -73,12 +73,12 @@ data = {
     ['show kungfu'] = '顯示心法',
     ['show distance'] = '顯示距離',
 
-    ['Neutrality'] = '中立關系',
-    ['Enemy'] = '敵對關系',
-    ['Ally'] = '友好關系',
-    ['Party'] = '隊友關系',
+    ['Neutrality'] = '中立關係',
+    ['Enemy'] = '敵對關係',
+    ['Ally'] = '友好關係',
+    ['Party'] = '隊友關係',
     ['Self'] = '自己',
-    ['Foe'] = '仇人關系',
+    ['Foe'] = '仇人關係',
 
     ['hide when unfight'] = '脫戰時隱藏',
     ['hide decimal'] = '不顯示小數',
@@ -87,7 +87,7 @@ data = {
     ['Unified force color'] = '統一染色',
     ['Differentiate force color'] = '門派染色',
 
-    ['Draw direction'] = '繪制方向',
+    ['Draw direction'] = '繪製方向',
     ['DIRECTION'] = {
         ['LEFT_RIGHT'] = '從左至右',
         ['RIGHT_LEFT'] = '從右至左',
@@ -96,7 +96,7 @@ data = {
     },
     ['Can not use in shielded map!'] = '當前地圖，禁止使用。',
 
-    ['Please choose your favorite lifebar style.\nYou can rechoose in setting panel.'] = '請選擇您喜歡的血條面板樣式：\n注：您可以隨時前往面板設置界面重新選擇。',
+    ['Please choose your favorite lifebar style.\nYou can rechoose in setting panel.'] = '請選擇您喜歡的血條面板樣式：\n註：您可以隨時前往面板設置界面重新選擇。',
     ['Official default style'] = '官方風格',
     ['Official clear style'] = '清晰風格',
     ['XLifeBar style'] = '扁平風格',

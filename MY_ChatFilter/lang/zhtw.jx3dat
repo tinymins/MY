@@ -27,11 +27,11 @@ data = {
     ['%s channel' ] = '%s頻道',
 
     ['duplicate chat filter'                ] = '刷屏屏蔽',
-    ['filter duplicate chat'                ] = '開啓刷屏屏蔽（相同聊天內容只顯示第一條）',
+    ['filter duplicate chat'                ] = '開啟刷屏屏蔽（相同聊天內容只顯示第一條）',
     ['filter duplicate chat ignore id'      ] = '刷屏屏蔽不同玩家發送的相同聊天內容也屏蔽',
     ['only filter continuous duplicate chat'] = '刷屏屏蔽只屏蔽連續發送的刷屏聊天記錄',
-    ['select duplicate channels'            ] = '選擇啓用刷屏屏蔽的頻道',
-    ['filter duplicate addon message'       ] = '屏蔽相同內容的插件喊話（如海鳗BOSS倒計時）',
+    ['select duplicate channels'            ] = '選擇啟用刷屏屏蔽的頻道',
+    ['filter duplicate addon message'       ] = '屏蔽相同內容的插件喊話（如海鰻BOSS倒計時）',
 
     ['MOSAICS_CHAR'] = '…',
     ['chat mosaics'] = '聊天打碼',

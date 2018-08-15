@@ -5,7 +5,7 @@ data = {
     ['[author]'] = '〔插件君〕',
     ['[teammate]'] = '〔隊友〕',
     ['cache data deleted.'] = '緩存已清除。',
-    ['customize color'] = '自定義顔色',
-    ['load default setting'] = '恢複默認設置',
+    ['customize color'] = '自定義顏色',
+    ['load default setting'] = '恢復默認設置',
     ['Player ID: %d'] = '玩家ID：%d',
 }

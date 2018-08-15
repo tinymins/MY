@@ -5,21 +5,21 @@ data = {
     ['infotip'] = '信息顯示',
     ['package searcher'] = '背包搜索',
     ['friend headtop tips'] = '附近好友高亮',
-    ['friend headtop tips nav'] = '啓用場景追蹤點',
+    ['friend headtop tips nav'] = '啟用場景追蹤點',
     ['tong member headtop tips'] = '附近幫會成員高亮',
-    ['tong member headtop tips nav'] = '啓用場景追蹤點',
+    ['tong member headtop tips nav'] = '啟用場景追蹤點',
 
     ['check nearby gongzhan'] = '檢測附近共戰',
-    ['Detected [%s] has Gongzhan BUFF for %d second(s).'] = '檢測到[%s]共戰BUFF剩余%d秒。',
+    ['Detected [%s] has Gongzhan BUFF for %d second(s).'] = '檢測到[%s]共戰BUFF剩餘%d秒。',
 
     ['* infomation tips'] = '※ 信息條（SHIFT+U移動位置）',
 
     ['ping monitor'   ] = '網絡延遲',
     ['GPS'            ] = '當前位置',
-    ['fps monitor'    ] = '遊戲幀數',
+    ['fps monitor'    ] = '游戲幀數',
     ['target distance'] = '目標距離',
     ['system time'    ] = '系統時間',
-    ['time machine'   ] = '遊戲速率',
+    ['time machine'   ] = '游戲速率',
     ['speedometer'    ] = '角色速度',
     ['fight clock'    ] = '戰鬥計時',
     ['lotus clock'    ] = '藕和桂花',
@@ -46,17 +46,17 @@ data = {
     ['%d:%d:%d'      ] = '%d:%d:%d',
 
     ['GongZhan'] = '共戰',
-    ['Detected [%s] has GongZhan buff for %d sec(s).'] = '檢測到[%s]共戰BUFF剩余%d秒。',
+    ['Detected [%s] has GongZhan buff for %d sec(s).'] = '檢測到[%s]共戰BUFF剩餘%d秒。',
     ['Nearby GongZhan Total Count: %d.'] = '附近共戰數量：%d。',
     ['------------------------------------'] = '————————————————————————',
     ['auto hide chat panel'] = '自動隱藏聊天欄',
     ['Redirect metion to whisper'] = '記錄其他頻道提及我的點名內容到密聊頻道',
 
-    ['visual skill'] = '顯示曆史技能列表',
+    ['visual skill'] = '顯示歷史技能列表',
     ['display %d skills.'] = '顯示%d格。',
 
     ['avoid blacking shenxing cd'] = '防止神行CD被吃',
-    ['Shenxing has been cancelled, cause you got the zhenyan.'] = '您獲取到陣眼，爲防止神行千裏CD被黑，讀條已自動打斷。',
+    ['Shenxing has been cancelled, cause you got the zhenyan.'] = '您獲取到陣眼，為防止神行千里CD被黑，讀條已自動打斷。',
 
     ['auto switch talk channel when into battle field'] = '進出戰場JJC時自動切換團隊/戰場頻道',
 
@@ -70,7 +70,7 @@ data = {
     ['player note'] = '管理小本本',
     ['Create'] = '添加',
     ['View anmerkungen'] = '管理本本',
-    ['edit player note'] = '記到小本本裏',
+    ['edit player note'] = '記到小本本里',
     ['my anmerkungen - player note edit'] = '把TA記進小本本',
     ['MY_Farbnamen not detected! Please check addon load!'] = '未能識別到依賴項[門派染色]子插件，請到插件加載界面檢查插件安裝狀態！',
     ['Name:'] = '名稱：',
@@ -78,8 +78,8 @@ data = {
     ['Content:'] = '內容：',
     ['alert when group'] = 'TA進組時對話框警告我。',
     ['tip when group'] = 'TA進組時聊天欄提示我。',
-    ['Tip: [%s] is in your team.\nNote: %s'] = '提示：[%s]進入你所在的隊伍。\n備注：%s',
-    ['Tip: [%s] is in your team.\nNote: %s\n'] = '提示：[%s]進入你所在的隊伍。\n備注：%s\n',
+    ['Tip: [%s] is in your team.\nNote: %s'] = '提示：[%s]進入你所在的隊伍。\n備註：%s',
+    ['Tip: [%s] is in your team.\nNote: %s\n'] = '提示：[%s]進入你所在的隊伍。\n備註：%s\n',
     ['Import'] = '導入',
     ['please input import data:'] = '請輸入導入的數據：',
     ['Server not match!'] = '服務器不匹配！',
@@ -96,10 +96,10 @@ data = {
     ['Local exam data matched.'] = '匹配到本地題庫。',
     ['No result found.'] = '沒有搜索到匹配的結果。',
     ['No result found, here\'s from open search engine:'] = '沒有搜索到匹配的結果，以下數據來自開放搜索引擎：',
-    ['No result matched, here\'s similar answers:'] = '沒有搜索到匹配的結果，以下爲類似題目：',
+    ['No result matched, here\'s similar answers:'] = '沒有搜索到匹配的結果，以下為類似題目：',
     ['Question: %s\nAnswer: %s'] = '問：%s\n答：%s',
     ['Loading failed.'] = '加載失敗。',
-    ['%s record(s) commited, %s record(s) accepted!'] = '已爲您自動提交了%s條題庫數據，其中%s條已被系統通過采納！',
+    ['%s record(s) commited, %s record(s) accepted!'] = '已為您自動提交了%s條題庫數據，其中%s條已被系統通過採納！',
 
     ['autochat'                                        ] = '自動對話',
     ['Common'                                          ] = '通用',
@@ -115,7 +115,7 @@ data = {
         '它的主人是(.-)。',
     },
 
-    ['You have been loged in for 2min, you can unlock bag locker now.'] = '你已登入遊戲兩分鍾，可以愉快的解除倉庫鎖啦！',
+    ['You have been loged in for 2min, you can unlock bag locker now.'] = '你已登入游戲兩分鐘，可以愉快的解除倉庫鎖啦！',
     LOCK_TIP = {},
 
     ['Warning: Bigwar has been finished but not handed yet!'] = '茗伊提示：大戰還沒交！',
@@ -126,12 +126,12 @@ data = {
     ['scale: %d%%.'] = '縮放: %d%%',
     ['changge force only'] = '僅長歌可用',
 
-    ['auto restore team info in arena'] = '競技場中自動恢複上次組隊信息',
+    ['auto restore team info in arena'] = '競技場中自動恢覆上次組隊信息',
     ['auto cancel hide player in arena and battlefield'] = '競技場與戰場中自動取消屏蔽玩家與NPC',
 
     ['Loop target between me and target'] = '循環選擇自己和目標',
     ['%%.1f/%d meter(s)'] = '%%.1f/%d 尺',
 
-    ['Click to enable MY player view magnifier'] = '點擊開啓茗伊試衣間',
+    ['Click to enable MY player view magnifier'] = '點擊開啟茗伊試衣間',
     ['Click to disable MY player view magnifier'] = '點擊關閉茗伊試衣間',
 }

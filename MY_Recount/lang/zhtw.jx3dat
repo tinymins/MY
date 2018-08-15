@@ -1,6 +1,6 @@
 -- language data (zhtw) updated at 2014-12-27 22:15:14
 data = {
-    ['enable'] = '啓用',
+    ['enable'] = '啟用',
     ['current fight'] = '當前統計',
     ['fight recount'] = '戰鬥統計',
 
@@ -8,7 +8,7 @@ data = {
     ['filter short fight'] = '過濾短時戰鬥',
     ['no time limit'] = '無時間限制',
     ['less than %d second'] = '不足%d秒',
-    ['less than %d minute'] = '不足%d分鍾',
+    ['less than %d minute'] = '不足%d分鐘',
     ['less than %d minute and a half'] = '不足%d分半',
 
     ['redraw interval'] = '數值刷新周期',
@@ -19,7 +19,7 @@ data = {
     ['display only player record'] = '只顯示玩家記錄',
     ['display all record'] = '顯示所有記錄',
 
-    ['auto save data while exit game'] = '退出遊戲時保存數據',
+    ['auto save data while exit game'] = '退出游戲時保存數據',
 
     ['display as per second'            ] = '顯示每秒平均數值',
     ['display effective value'          ] = '顯示戰鬥有效數值',
@@ -31,7 +31,7 @@ data = {
     ['record anonymous effect'          ] = '顯示沒名字的記錄',
     ['show zero value effect'           ] = '顯示零數值的記錄',
     ['theme'                            ] = '自定界面風格選擇',
-    ['max history'                      ] = '最大曆史記錄設置',
+    ['max history'                      ] = '最大歷史記錄設置',
 
     ['publish limit'] = '發佈數量',
     ['top %d'] = '前%d名',
