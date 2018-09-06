@@ -354,11 +354,11 @@ end
 MY.GetObject = MY.Game.GetObject
 
 function MY.GetObjectType(obj)
-	if GetPlayer(obj.dwID) == obj then
+	if MY_NEARBY_PLAYER[obj.dwID] == obj then
 		return 'PLAYER'
-	elseif GetNpc(obj.dwID) == obj then
+	elseif MY_NEARBY_NPC[obj.dwID] == obj then
 		return 'NPC'
-	elseif GetDoodad(obj.dwID) == obj then
+	elseif MY_NEARBY_DOODAD[obj.dwID] == obj then
 		return 'DOODAD'
 	elseif GetItem(obj.dwID) == obj then
 		return 'ITEM'
@@ -1319,11 +1319,11 @@ function MY.GetNearDoodadID(nLimit)
 	return aDoodadID
 end
 
-RegisterEvent('NPC_ENTER_SCENE',    function() MY_NEARBY_NPC[arg0]    = true end)
+RegisterEvent('NPC_ENTER_SCENE',    function() MY_NEARBY_NPC[arg0]    = GetNpc(arg0) end)
 RegisterEvent('NPC_LEAVE_SCENE',    function() MY_NEARBY_NPC[arg0]    = nil  end)
-RegisterEvent('PLAYER_ENTER_SCENE', function() MY_NEARBY_PLAYER[arg0] = true end)
+RegisterEvent('PLAYER_ENTER_SCENE', function() MY_NEARBY_PLAYER[arg0] = GetPlayer(arg0) end)
 RegisterEvent('PLAYER_LEAVE_SCENE', function() MY_NEARBY_PLAYER[arg0] = nil  end)
-RegisterEvent('DOODAD_ENTER_SCENE', function() MY_NEARBY_DOODAD[arg0] = true end)
+RegisterEvent('DOODAD_ENTER_SCENE', function() MY_NEARBY_DOODAD[arg0] = GetDoodad(arg0) end)
 RegisterEvent('DOODAD_LEAVE_SCENE', function() MY_NEARBY_DOODAD[arg0] = nil  end)
 end
 
