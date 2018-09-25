@@ -278,7 +278,7 @@ data = {
     {dwID=13370,col="#FFFF00FF",szReminder="絕",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFF00"},--絕命視線---狼牙堡·狼神殿
     {dwID=13374,col="#8055FFFF",szReminder="毒",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#8055FF"},--毒腺劇毒---狼牙堡·狼神殿
     {dwID=13375,col="#FFFFFF00",szReminder="咒",nPriority=8},--咒死---狼牙堡·狼神殿
-    {dwID=13356,szReminder="暈"},--暈眩---狼牙堡·狼神殿
+    {dwID=13356,col="#FF323200",szReminder="暈",nPriority=8},--暈眩---狼牙堡·狼神殿
     {dwID=13412,col="#FF323200",szReminder="共",nPriority=8},--共鳴血印---狼牙堡·狼神殿
     {dwID=13371,col="#FF8000FF",szReminder="黃",nPriority=7},--黃泉.回龍掌法---狼牙堡·狼神殿
     {dwID=13372,col="#FFFF00FF",szReminder="掌",nPriority=7},--回龍掌法---狼牙堡·狼神殿
@@ -307,4 +307,5 @@ data = {
     {dwID=9744},--朝聖---明教
     {dwID=9745},--朝聖---明教
     {dwID=4244},--渡厄---明教
+    --【南宮伯是帥咩】更新日期0924
 }

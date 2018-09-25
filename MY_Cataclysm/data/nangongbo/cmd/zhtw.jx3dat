@@ -178,4 +178,5 @@ data = {
     {dwID=9544,col="#00FF00FF",szReminder="笑",nPriority=7},--笑傲光陰---長歌
     {dwID=9265,col="#00FF00FF",szReminder="雲",nPriority=7},--雲生結海---長歌
     {dwID=9299,col="#FF8000FF",szReminder="杯",nPriority=7},--杯水留影---長歌
+    --【南宮伯是帥咩】更新日期0924
 }
