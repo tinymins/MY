@@ -107,6 +107,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.handlestyle        ~= nil then ui:handleStyle    (arg.handlestyle) end
 		if arg.edittype           ~= nil then ui:editType       (arg.edittype   ) end
 		if arg.visible            ~= nil then ui:visible        (arg.visible    ) end
+		if arg.autovisible        ~= nil then ui:visible        (arg.autovisible) end
 		if arg.enable             ~= nil then ui:enable         (arg.enable     ) end
 		if arg.autoenable         ~= nil then ui:enable         (arg.autoenable ) end
 		if arg.image              ~= nil then ui:image(arg.image, arg.imageframe) end
@@ -1112,6 +1113,18 @@ function XGUI:visible(bVisible)
 	self:_checksum()
 	if IsBoolean(bVisible) then
 		return self:toggle(bVisible)
+	elseif IsFunction(bVisible) then
+		for _, raw in ipairs(self.raws) do
+			raw = GetComponentElement(raw, 'CHECKBOX') or GetComponentElement(raw, 'MAIN_WINDOW') or raw
+			MY.BreatheCall('XGUI_VISIBLE_CHECK#' .. tostring(raw), function()
+				if IsElement(raw) then
+					raw:SetVisible(bVisible())
+				else
+					return 0
+				end
+			end)
+			raw:SetVisible(bVisible())
+		end
 	else
 		local raw = self.raws[1]
 		if raw and raw.IsVisible then
