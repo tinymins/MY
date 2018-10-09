@@ -38,10 +38,11 @@ local SERENDIPITY_STATUS = {
 local SERENDIPITY_LIST = {}
 do
 local Xtra = {
-	bEnable    = MY.FormatDataStructure(MY.LoadLUAData({'config/show_notify.jx3dat'          , MY_DATA_PATH.GLOBAL}), false),
-	bSound     = MY.FormatDataStructure(MY.LoadLUAData({'config/serendipity_sound.jx3dat'    , MY_DATA_PATH.GLOBAL}), true ),
-	bPreview   = MY.FormatDataStructure(MY.LoadLUAData({'config/serendipity_preview.jx3dat'  , MY_DATA_PATH.GLOBAL}), true ),
-	bAutoShare = MY.FormatDataStructure(MY.LoadLUAData({'config/serendipity_autoshare.jx3dat', MY_DATA_PATH.GLOBAL}), false),
+	bEnable     = MY.FormatDataStructure(MY.LoadLUAData({'config/show_notify.jx3dat'           , MY_DATA_PATH.GLOBAL}), false),
+	bSound      = MY.FormatDataStructure(MY.LoadLUAData({'config/serendipity_sound.jx3dat'     , MY_DATA_PATH.GLOBAL}), true ),
+	bPreview    = MY.FormatDataStructure(MY.LoadLUAData({'config/serendipity_preview.jx3dat'   , MY_DATA_PATH.GLOBAL}), true ),
+	bAutoShare  = MY.FormatDataStructure(MY.LoadLUAData({'config/serendipity_autoshare.jx3dat' , MY_DATA_PATH.GLOBAL}), false),
+	bSilentMode = MY.FormatDataStructure(MY.LoadLUAData({'config/serendipity_silentmode.jx3dat', MY_DATA_PATH.GLOBAL}), true ),
 }
 MY_Serendipity = setmetatable({}, {
 	__index = function(t, k)
@@ -74,6 +75,8 @@ MY_Serendipity = setmetatable({}, {
 			MY.SaveLUAData({'config/serendipity_preview.jx3dat', MY_DATA_PATH.GLOBAL}, v)
 		elseif k == 'bAutoShare' then
 			MY.SaveLUAData({'config/serendipity_autoshare.jx3dat', MY_DATA_PATH.GLOBAL}, v)
+		elseif k == 'bSilentMode' then
+			MY.SaveLUAData({'config/serendipity_silentmode.jx3dat', MY_DATA_PATH.GLOBAL}, v)
 		end
 		Xtra[k] = v
 	end,
@@ -111,7 +114,7 @@ function D.GetSerendipityShareName(fnAction, bNoConfirm)
 end
 MY_Serendipity.GetSerendipityShareName = D.GetSerendipityShareName
 
-function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTime, bAuto)
+function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTime, szMode)
 	local szKey = szName .. '_' .. szSerendipity .. '_' .. dwTime
 	local szNameU = AnsiToUTF8(szName)
 	local szNameCRC = ('%x%x%x'):format(szNameU:byte(), GetStringCRC(szNameU), szNameU:byte(-1))
@@ -119,14 +122,16 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 		if szReporter == '' and nMethod ~= 1 then
 			szName = ''
 		end
-		local h = bAuto and 200 or 400
-		local w = bAuto and 255 or 400
+		local h = szMode == 'auto' and 200 or 400
+		local w = szMode == 'auto' and 255 or 400
 		local ui = XGUI.CreateFrame('MY_Serendipity#' .. szKey, {
 			w = w, h = h, close = true, text = '',
 		})
-		if bAuto then
+		if szMode == 'auto' then
 			ui:alpha(200)
 			ui:anchor({ x = 0, y = -60, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' })
+		elseif szMode == 'silent' then
+			ui:hide()
 		end
 		ui:append('WndWebCef', {
 			x = 0, y = 0, w = w, h = h,
@@ -137,13 +142,13 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 				n = szName, N = szNameCRC, R = szReporter,
 				S = MY.GetRealServer(1), s = MY.GetRealServer(2),
 				a = szSerendipity, f = nStatus, t = dwTime,
-				w = w, h = h, c = Station.GetUIScale(),
+				w = w, h = h, c = szMode == 'silent' and 0 or Station.GetUIScale(),
 			})),
 			oncomplete = function() MY.DelayCall(5000, function() ui:remove() end) end,
 		})
 		MY.DismissNotify(szKey)
 	end
-	D.GetSerendipityShareName(fnAction, bAuto)
+	D.GetSerendipityShareName(fnAction, szMode ~= 'manual')
 end
 
 function D.OnSerendipity(szName, szSerendipity, nMethod, nStatus, dwTime)
@@ -152,7 +157,7 @@ function D.OnSerendipity(szName, szSerendipity, nMethod, nStatus, dwTime)
 	end
 	local szKey = szName .. '_' .. szSerendipity .. '_' .. dwTime
 	if MY_Serendipity.bAutoShare then
-		D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTime, true)
+		D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTime, MY_Serendipity.bSilentMode and 'silent' or 'auto')
 	else
 		local szXml = GetFormatText(szName == GetClientPlayer().szName
 			and _L(nStatus == SERENDIPITY_STATUS.START
@@ -163,7 +168,7 @@ function D.OnSerendipity(szName, szSerendipity, nMethod, nStatus, dwTime)
 				or '[%s] finished %s, would you like to share?', szName, szSerendipity)
 		)
 		local function fnAction()
-			D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTime, false)
+			D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTime, 'manual')
 		end
 		if MY_Serendipity.bEnable then
 			MY.CreateNotify({
@@ -214,6 +219,9 @@ MY.RegisterMsgMonitor('QIYU', function(szMsg, nFont, bRich, r, g, b, szChannel)
 		szMsg = GetPureText(szMsg)
 	end
 	szMsg:gsub(_L.ADVENTURE_PATT, function(szName, szSerendipity)
+		D.OnSerendipity(szName, szSerendipity, 1, 0, GetCurrentTime())
+	end)
+	szMsg:gsub(_L.ADVENTURE_PATT2, function(szName, szSerendipity)
 		D.OnSerendipity(szName, szSerendipity, 1, 0, GetCurrentTime())
 	end)
 end, {'MSG_SYS'})

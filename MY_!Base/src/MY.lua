@@ -915,6 +915,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 		ui:append('Text', { name = 'Text_Adv', x = 10, y = 300, w = 557, font = 200 })
 		ui:append('Text', { name = 'Text_Svr', x = 10, y = 345, w = 557, font = 204, text = MY.GetServer() .. ' (' .. MY.GetRealServer() .. ')', alpha = 220 })
 		local x = 7
+		-- 奇遇分享
 		x = x + ui:append('WndCheckBox', {
 			x = x, y = 375,
 			name = 'WndCheckBox_SerendipityNotify',
@@ -926,6 +927,43 @@ function MY.SwitchTab(szID, bForceUpdate)
 			tip = _L['Monitor serendipity and show share notify.'],
 			tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
 		}, true):autoWidth():width()
+		local xS0 = x + ui:append('WndCheckBox', {
+			x = x, y = 375,
+			name = 'WndCheckBox_SerendipityAutoShare',
+			text = _L['Auto share.'],
+			checked = MY_Serendipity.bAutoShare,
+			oncheck = function()
+				MY_Serendipity.bAutoShare = not MY_Serendipity.bAutoShare
+			end,
+		}, true):autoWidth():width()
+		-- 自动分享子项
+		x = xS0
+		x = x + ui:append('WndCheckBox', {
+			x = x, y = 375,
+			name = 'WndCheckBox_SerendipitySilentMode',
+			text = _L['Silent mode.'],
+			checked = MY_Serendipity.bSilentMode,
+			oncheck = function()
+				MY_Serendipity.bSilentMode = not MY_Serendipity.bSilentMode
+			end,
+			autovisible = function() return MY_Serendipity.bAutoShare end,
+		}, true):autoWidth():width()
+		x = x + 5
+		x = x + ui:append('WndEditBox', {
+			x = x, y = 375, w = 150, h = 25,
+			name = 'WndEditBox_SerendipitySilentMode',
+			placeholder = _L['Realname, leave blank for anonymous.'],
+			tip = _L['Realname, leave blank for anonymous.'],
+			tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
+			limit = 6,
+			text = MY.LoadLUAData({'config/realname.jx3dat', MY_DATA_PATH.ROLE}) or GetClientPlayer().szName:gsub('@.-$', ''),
+			onchange = function(szText)
+				MY.SaveLUAData({'config/realname.jx3dat', MY_DATA_PATH.ROLE}, szText)
+			end,
+			autovisible = function() return MY_Serendipity.bAutoShare end,
+		}, true):autoWidth():width()
+		-- 手动分享子项
+		x = xS0
 		x = x + ui:append('WndCheckBox', {
 			x = x, y = 375,
 			name = 'WndCheckBox_SerendipityNotifyTip',
@@ -934,7 +972,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 			oncheck = function()
 				MY_Serendipity.bPreview = not MY_Serendipity.bPreview
 			end,
-			autoenable = function() return not MY_Serendipity.bAutoShare end,
+			autovisible = function() return not MY_Serendipity.bAutoShare end,
 		}, true):autoWidth():width()
 		x = x + ui:append('WndCheckBox', {
 			x = x, y = 375,
@@ -945,19 +983,9 @@ function MY.SwitchTab(szID, bForceUpdate)
 				MY_Serendipity.bSound = not MY_Serendipity.bSound
 			end,
 			autoenable = function() return not MY_Serendipity.bAutoShare end,
+			autovisible = function() return not MY_Serendipity.bAutoShare end,
 		}, true):autoWidth():width()
-		x = x + ui:append('WndCheckBox', {
-			x = x, y = 375,
-			name = 'WndCheckBox_SerendipityAutoShare',
-			text = _L['Auto share.'],
-			checked = MY_Serendipity.bAutoShare,
-			oncheck = function()
-				if not MY_Serendipity.bAutoShare then
-					MY_Serendipity.GetSerendipityShareName()
-				end
-				MY_Serendipity.bAutoShare = not MY_Serendipity.bAutoShare
-			end,
-		}, true):autoWidth():width()
+		-- 用户设置
 		ui:append('WndButton', {
 			x = 7, y = 405, w = 130,
 			name = 'WndButton_UserPreferenceFolder',
@@ -986,9 +1014,11 @@ function MY.SwitchTab(szID, bForceUpdate)
 				ui:children('#Text_Svr'):pos(10, scaleH + 35)
 			end
 			ui:children('#WndCheckBox_SerendipityNotify'):top(scaleH + 65)
+			ui:children('#WndCheckBox_SerendipityAutoShare'):top(scaleH + 65)
+			ui:children('#WndCheckBox_SerendipitySilentMode'):top(scaleH + 65)
+			ui:children('#WndEditBox_SerendipitySilentMode'):top(scaleH + 65)
 			ui:children('#WndCheckBox_SerendipityNotifyTip'):top(scaleH + 65)
 			ui:children('#WndCheckBox_SerendipityNotifySound'):top(scaleH + 65)
-			ui:children('#WndCheckBox_SerendipityAutoShare'):top(scaleH + 65)
 			ui:children('#WndButton_UserPreferenceFolder'):top(scaleH + 95)
 		end
 		wnd.OnPanelResize(wnd)

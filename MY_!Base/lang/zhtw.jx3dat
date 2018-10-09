@@ -160,6 +160,7 @@ data = {
 	['Stop cast skill'] = '打斷自身讀條',
 
 	['ADVENTURE_PATT'] = '“(.-)”[女俠在].-觸發奇遇【(.-)】',
+	['ADVENTURE_PATT2'] = '恭喜俠士(.-)在.-中獲得稀有掉落%[(.-)%]',
 
 	['Cloud'] = '白雲',
 	['Sword'] = '小劍',
@@ -349,6 +350,8 @@ data = {
 	['Show notify tip.'] = '顯示提示框',
 	['Play notify sound.'] = '播放提示音',
 	['Auto share.'] = '自動分享',
+	['Silent mode.'] = '靜默模式',
+	['Realname, leave blank for anonymous.'] = '分享者名稱(匿名請留空)',
 	['Monitor serendipity and show share notify.'] = '監控系統公告和自身奇遇事件等，便於有分享精神的俠士在觸發時可以手動通過網頁上傳分享。',
 	['You got %s, would you like to share?'] = '你觸發了%s，是否願意點擊分享到公共數據查詢中？',
 	['[%s] got %s, would you like to share?'] = '[%s]觸發了%s，是否願意點擊分享到公共數據查詢中？',
