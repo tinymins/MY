@@ -93,6 +93,9 @@ data = {
     {dwID=8970},--清流---永王行宫·花月别院
     {dwID=9653},--经脉俱断---永王行宫·花月别院
     {dwID=8986,col="#FF00FFFF",szReminder="缠",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--缠---永王行宫·花月别院
+    {dwID=1609,col="#FF3232FF",nPriority=7},--王眼镇魂---战宝迦兰
+    {dwID=1269,col="#FF3232FF",nPriority=7},--王眼镇魂---战宝迦兰
+    {dwID=1297,col="#00FFFFFF",nPriority=7},--破冰真气---战宝迦兰
     {dwID=2134,col="#FF00FFFF",szReminder="咒",nPriority=7},--梵音轮回咒---战宝迦兰
     {dwID=2632,col="#FF323200",szReminder="千",nPriority=8},--千针暗沼---荻花圣殿
     {dwID=2628,col="#FF00FFFF",szReminder="诛",nPriority=4,bAttention=true,bCaution=true},--诛心咒---荻花圣殿
@@ -113,7 +116,7 @@ data = {
     {dwID=3974,szStackOp=">=",nStackNum=5},--腐蚀---烛龙殿
     {dwID=3978},--淬毒---烛龙殿
     {dwID=4008,col="#FF323200",szReminder="封",nPriority=8},--封锁---烛龙殿
-    {dwID=3976,col="#00FFFF00",szReminder="吸",nPriority=8},--吸魂功---烛龙殿
+    {dwID=3976,col="#FF00FFFF",szReminder="吸",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--吸魂功---烛龙殿
     {dwID=4066,col="#8055FFFF",szReminder="毒",nPriority=7},--毒蛊---烛龙殿
     {dwID=3799,col="#FF3232FF",szReminder="瞄",nPriority=5,bCaution=true},--瞄准---会战唐门
     {dwID=3808,col="#00FFFFFF",szReminder="煞",nPriority=7},--狼煞---会战唐门
@@ -181,7 +184,7 @@ data = {
     {dwID=7369,col="#FFFF00FF",szReminder="骨",nPriority=7},--恨贯肌骨---风雪稻香村
     {dwID=7370,col="#FF800000",szReminder="恨",nPriority=8},--恨意---风雪稻香村
     {dwID=7371,col="#0050FF00",szReminder="雪",nPriority=8},--雪舞惧散---风雪稻香村
-    {dwID=7374,col="#00FFFFFF",szReminder="坐",nPriority=7},--坐困愁城---风雪稻香村
+    {dwID=7374,col="#00FFFFFF",szReminder="坐",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#00FFFF"},--坐困愁城---风雪稻香村
     {dwID=7452,col="#FF3232FF",szReminder="注",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--注视---风雪稻香村
     {dwID=7295,col="#FF00FFFF",szReminder="寒",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF00FF"},--寒雪---风雪稻香村
     {dwID=7296,col="#FF00FFFF",szReminder="夜",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF00FF"},--夜雪---风雪稻香村
@@ -205,10 +208,10 @@ data = {
     {dwID=7481,col="#00FF00FF",szReminder="绿",nPriority=3,bScreenHead=true,colScreenHead="#00FF00"},--绿舞---秦皇陵
     {dwID=7483,col="#00FFFFFF",szReminder="蓝",nPriority=3,bScreenHead=true,colScreenHead="#00FFFF"},--蓝舞---秦皇陵
     {dwID=7485,col="#FFFFFFFF",szReminder="灰",nPriority=3,bScreenHead=true,colScreenHead="#FFFFFF"},--灰舞---秦皇陵
-    {dwID=7476,col="#FF00FFFF",szReminder="牢",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--火牢花雨---秦皇陵
-    {dwID=7583,col="#FF00FFFF",szReminder="魅",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--魅惑---秦皇陵
-    {dwID=7472,col="#FF800000",szReminder="种",nPriority=8},--火种---秦皇陵
-    {dwID=7639,col="#FF00FFFF",szReminder="优",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--优艳火花---秦皇陵
+    {dwID=7476,col="#FF00FFFF",szReminder="牢",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--火牢花雨---秦皇陵
+    {dwID=7583,col="#FF00FFFF",szReminder="魅",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--魅惑---秦皇陵
+    {dwID=7472,col="#FFFF00FF",szReminder="种",nPriority=7},--火种---秦皇陵
+    {dwID=7639,col="#FF00FFFF",szReminder="优",nPriority=7},--优艳火花---秦皇陵
     {dwID=7720,col="#FFFF0000",szReminder="虚",nPriority=8},--虚实---秦皇陵
     {dwID=7721,col="#FFFF00FF",szReminder="虚",nPriority=7},--虚实---秦皇陵
     {dwID=6940},--秘剑·金蛇---秦皇陵
@@ -307,5 +310,5 @@ data = {
     {dwID=9744},--朝圣---明教
     {dwID=9745},--朝圣---明教
     {dwID=4244},--渡厄---明教
-    --【南宫伯是帅咩】更新日期0924
+    --【南宫伯是帅咩】更新日期1003
 }

@@ -136,6 +136,7 @@ data = {
     {dwID=8029,col="#FF323200",szReminder="流",nPriority=8,szStackOp=">=",nStackNum=2},--流血---太原之戰·逐虎驅狼
     {dwID=8010},--戰鬥標記---太原之戰·逐虎驅狼
     {dwID=7554,col="#00FFFFFF",szReminder="轉",nPriority=7},--陰陽易轉---風雪稻香村
+    {dwID=7779,col="#FF8000FF",szReminder="撞",nPriority=7},--橫衝直撞---秦皇陵
     {dwID=6954,col="#FFFF0000",szReminder="鎖",nPriority=8},--地顫---秦皇陵
     {dwID=6955,col="#FF323200",szReminder="暈",nPriority=8},--地顫---秦皇陵
     {dwID=6927,szStackOp=">=",nStackNum=2},--金蛇毒---秦皇陵
@@ -178,5 +179,5 @@ data = {
     {dwID=9544,col="#00FF00FF",szReminder="笑",nPriority=7},--笑傲光陰---長歌
     {dwID=9265,col="#00FF00FF",szReminder="雲",nPriority=7},--雲生結海---長歌
     {dwID=9299,col="#FF8000FF",szReminder="杯",nPriority=7},--杯水留影---長歌
-    --【南宮伯是帥咩】更新日期0924
+    --【南宮伯是帥咩】更新日期1003
 }
