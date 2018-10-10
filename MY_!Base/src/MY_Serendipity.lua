@@ -288,7 +288,9 @@ MY.RegisterInit(function()
 	MY.RegisterTutorial({
 		szKey = 'MY_Serendipity',
 		szMessage = _L['Would you like to share serendipity?'],
-		fnRequire = function() return not MY_Serendipity.bEnable end,
+		fnRequire = function()
+			return not MY.IsInDevMode() and not MY_Serendipity.bEnable
+		end,
 		{
 			szOption = _L['Yes'],
 			bDefault = true,
@@ -309,7 +311,11 @@ MY.RegisterInit(function()
 	MY.RegisterTutorial({
 		szKey = 'MY_Serendipity_Auto',
 		szMessage = _L['Would you like to auto share serendipity?'],
-		fnRequire = function() return MY_Serendipity.bEnable and not MY_Serendipity.bAutoShare end,
+		fnRequire = function()
+			return not MY.IsInDevMode()
+				and MY_Serendipity.bEnable
+				and not MY_Serendipity.bAutoShare
+		end,
 		{
 			szOption = _L['Yes'],
 			bDefault = true,
@@ -330,7 +336,12 @@ MY.RegisterInit(function()
 	MY.RegisterTutorial({
 		szKey = 'MY_Serendipity_Silent',
 		szMessage = _L['Would you like to share serendipity silently?'],
-		fnRequire = function() return MY_Serendipity.bEnable and MY_Serendipity.bAutoShare and not MY_Serendipity.bSilentMode end,
+		fnRequire = function()
+			return not MY.IsInDevMode()
+				and MY_Serendipity.bEnable
+				and MY_Serendipity.bAutoShare
+				and not MY_Serendipity.bSilentMode
+		end,
 		{
 			szOption = _L['Yes'],
 			bDefault = true,
