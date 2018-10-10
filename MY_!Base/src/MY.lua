@@ -554,6 +554,70 @@ function MY.RegisterReload(arg1, arg2)
 end
 end
 
+do local IDLE_FUNC_LIST, TIME = {}, 0
+local function OnIdle()
+	local nTime = GetTime()
+	if nTime - TIME < 20000 then
+		return
+	end
+	for szKey, fnAction in pairs(IDLE_FUNC_LIST) do
+		local nStartTick = GetTickCount()
+		local status, err = pcall(fnAction)
+		if not status then
+			MY.Debug({err}, 'IDLE_FUNC_LIST#' .. szKey)
+		end
+		MY.Debug({_L('Idle function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], MY_DEBUG.LOG)
+	end
+	TIME = nTime
+end
+RegisterEvent('ON_FRAME_CREATE', function()
+	if arg0:GetName() == 'OptionPanel' then
+		OnIdle()
+	end
+end)
+RegisterEvent('BUFF_UPDATE', function()
+	if arg1 then
+		return
+	end
+	if arg0 == UI_GetClientPlayerID() and arg4 == 103 then
+		DelayCall('MY_ON_IDLE', math.random(0, 10000), function()
+			local me = GetClientPlayer()
+			if me and me.GetBuff(103, 0) then
+				OnIdle()
+			end
+		end)
+	end
+end)
+BreatheCall('MY_ON_IDLE', function()
+	if Station.GetIdleTime() > 300000 then
+		OnIdle()
+	end
+end)
+
+-- 注册游戏空闲函数 -- 用户存储数据等操作
+-- RegisterIdle(string id, function fn) -- 注册
+-- RegisterIdle(function fn)            -- 注册
+-- RegisterIdle(string id)              -- 注销
+function MY.RegisterIdle(arg1, arg2)
+	local szKey, fnAction
+	if type(arg1) == 'string' then
+		szKey = arg1
+		fnAction = arg2
+	elseif type(arg1) == 'function' then
+		fnAction = arg1
+	end
+	if fnAction then
+		if szKey then
+			IDLE_FUNC_LIST[szKey] = fnAction
+		else
+			table.insert(IDLE_FUNC_LIST, fnAction)
+		end
+	elseif szKey then
+		IDLE_FUNC_LIST[szKey] = nil
+	end
+end
+end
+
 -- 注册游戏事件监听
 -- MY.RegisterEvent(szEvent, fnAction) -- 注册
 -- MY.RegisterEvent(szEvent) -- 注销
