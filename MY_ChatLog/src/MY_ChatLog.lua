@@ -623,6 +623,7 @@ local function InitMsgMon()
 	end
 	MY.RegisterMsgMonitor('MY_ChatLog', OnMsg, aChannels)
 	MY.RegisterEvent('LOADING_ENDING.MY_ChatLog_Save', PushDB)
+	MY.RegisterIdle('MY_ChatLog_Save', PushDB)
 end
 MY.RegisterInit('MY_ChatLog_InitMon', InitMsgMon)
 
