@@ -157,4 +157,8 @@ data = {
 	['From nangongbo cmd data'] = '来自南宫伯指挥数据',
 	['From nangongbo heal data'] = '来自南宫伯治疗数据',
 	['From custom data'] = '来自用户自定义数据',
+
+	['Would you like to use MY cataclysm?'] = '是否使用茗伊团队面板？',
+	['Use'] = '使用',
+	['Not use'] = '不使用',
 }

@@ -1139,3 +1139,26 @@ MY.RegisterInit('MY_Cataclysm', function() D.SetConfigureName() end)
 MY.RegisterAddonMenu(function()
 	return { szOption = _L['Cataclysm Team Panel'], bCheck = true, bChecked = MY_Cataclysm.bEnable, fnAction = D.ToggleTeamPanel }
 end)
+
+MY.RegisterTutorial({
+	szKey = 'MY_Cataclysm',
+	szMessage = _L['Would you like to use MY cataclysm?'],
+	fnRequire = function() return not MY_Cataclysm.bEnable end,
+	{
+		szOption = _L['Use'],
+		bDefault = true,
+		fnAction = function()
+			MY_Cataclysm.bEnable = true
+			D.CheckEnableTeamPanel()
+			MY.RedrawTab('MY_Cataclysm')
+		end,
+	},
+	{
+		szOption = _L['Not use'],
+		fnAction = function()
+			MY_Cataclysm.bEnable = false
+			D.CheckEnableTeamPanel()
+			MY.RedrawTab('MY_Cataclysm')
+		end,
+	},
+})
