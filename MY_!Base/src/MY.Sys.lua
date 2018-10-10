@@ -242,6 +242,8 @@ local function clone(var)
 		return var
 	end
 end
+MY.FullClone = clone
+
 local defaultParams = { keepNewChild = false }
 local function FormatDataStructure(data, struct, assign, metaFlag)
 	if metaFlag == nil then
