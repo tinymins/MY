@@ -231,6 +231,17 @@ end
 
 -- Format data's structure as struct descripted.
 do
+local function clone(var)
+	if type(var) == 'table' then
+		local ret = {}
+		for k, v in pairs(var) do
+			ret[clone(k)] = clone(v)
+		end
+		return ret
+	else
+		return var
+	end
+end
 local defaultParams = { keepNewChild = false }
 local function FormatDataStructure(data, struct, assign, metaFlag)
 	if metaFlag == nil then
@@ -1670,10 +1681,14 @@ function MY.OutputObjectTip(dwType, dwID, Rect, szExtraXml)
 	end
 end
 
-function MY.Alert(szMsg, fnAction, szSure)
+function MY.Alert(szMsg, fnAction, szSure, fnCancelAction)
 	local nW, nH = Station.GetClientSize()
 	local tMsg = {
-		x = nW / 2, y = nH / 3, szMessage = szMsg, szName = 'MY_Alert', szAlignment = 'CENTER',
+		x = nW / 2, y = nH / 3,
+		szName = 'MY_Alert',
+		szMessage = szMsg,
+		szAlignment = 'CENTER',
+		fnCancelAction = fnCancelAction,
 		{
 			szOption = szSure or g_tStrings.STR_HOTKEY_SURE,
 			fnAction = fnAction,
@@ -1682,10 +1697,14 @@ function MY.Alert(szMsg, fnAction, szSure)
 	MessageBox(tMsg)
 end
 
-function MY.Confirm(szMsg, fnAction, fnCancel, szSure, szCancel)
+function MY.Confirm(szMsg, fnAction, fnCancel, szSure, szCancel, fnCancelAction)
 	local nW, nH = Station.GetClientSize()
 	local tMsg = {
-		x = nW / 2, y = nH / 3, szMessage = szMsg, szName = 'MY_Confirm', szAlignment = 'CENTER',
+		x = nW / 2, y = nH / 3,
+		szName = 'MY_Confirm',
+		szMessage = szMsg,
+		szAlignment = 'CENTER',
+		fnCancelAction = fnCancelAction,
 		{
 			szOption = szSure or g_tStrings.STR_HOTKEY_SURE,
 			fnAction = fnAction,
