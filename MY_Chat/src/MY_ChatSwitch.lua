@@ -376,7 +376,8 @@ end
 function MY_ChatSwitch.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Option' then
-		MY.OpenPanel()
+		MY.ShowPanel()
+		MY.FocusPanel()
 		MY.SwitchTab('MY_ChatSwitch')
 	end
 end

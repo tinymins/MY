@@ -355,7 +355,8 @@ function MY_Farbnamen.GetMenu()
 	table.insert(t, {
 		szOption = _L['customize color'],
 		fnAction = function()
-			MY.OpenPanel()
+			MY.ShowPanel()
+			MY.FocusPanel()
 			MY.SwitchTab('GlobalColor')
 		end,
 		fnDisable = function()

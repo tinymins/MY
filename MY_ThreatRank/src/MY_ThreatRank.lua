@@ -189,7 +189,8 @@ end
 function TS.OnLButtonClick()
 	local szName = this:GetName()
 	if szName == 'Btn_Setting' then
-		MY.OpenPanel()
+		MY.ShowPanel()
+		MY.FocusPanel()
 		MY.SwitchTab('MY_ThreatRank')
 	end
 end

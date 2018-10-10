@@ -893,8 +893,9 @@ function MY_CataclysmMain.OnLButtonClick()
 			table.insert(menu, { bDevide = true })
 		end
 		table.insert(menu, { szOption = _L['Interface settings'], rgb = { 255, 255, 0 }, fnAction = function()
+			MY.ShowPanel()
+			MY.FocusPanel()
 			MY.SwitchTab('MY_Cataclysm')
-			MY.OpenPanel()
 		end })
 		if MY_Cataclysm.bDebug then
 			table.insert(menu, { bDevide = true })

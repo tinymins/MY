@@ -511,7 +511,8 @@ function MY_Focus.OnItemRButtonClick()
 			table.insert(t, 1, {
 				szOption = _L['Option'],
 				fnAction = function()
-					MY.OpenPanel()
+					MY.ShowPanel()
+					MY.FocusPanel()
 					MY.SwitchTab('MY_Focus')
 				end,
 			})
@@ -538,7 +539,8 @@ end
 function MY_Focus.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Setting' then
-		MY.OpenPanel()
+		MY.ShowPanel()
+		MY.FocusPanel()
 		MY.SwitchTab('MY_Focus')
 	elseif name == 'Btn_Close' then
 		MY_Focus.Close()

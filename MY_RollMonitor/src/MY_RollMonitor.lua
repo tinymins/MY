@@ -118,7 +118,8 @@ local _C = {}
 -- ´ò¿ªÃæ°å
 -- (void) MY_RollMonitor.OpenPanel()
 function MY_RollMonitor.OpenPanel()
-	MY.OpenPanel()
+	MY.ShowPanel()
+	MY.FocusPanel()
 	MY.SwitchTab('RollMonitor')
 end
 

@@ -1128,7 +1128,8 @@ function PS.OnPanelActive(frame)
 		x = x, y = y, text = _L['Critical Color'], checked = MY_CombatText.bCritical and true or false,
 		oncheck = function(bCheck)
 			MY_CombatText.bCritical = bCheck
-			MY.OpenPanel()
+			MY.ShowPanel()
+			MY.FocusPanel()
 			MY.SwitchTab('MY_CombatText', true)
 		end,
 		autoenable = IsEnabled,

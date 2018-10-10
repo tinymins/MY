@@ -162,7 +162,8 @@ do
 local menu = {
 	szOption = _L['View anmerkungen'],
 	fnAction = function()
-		MY.OpenPanel()
+		MY.ShowPanel()
+		MY.FocusPanel()
 		MY.SwitchTab('MY_Anmerkungen')
 	end,
 }

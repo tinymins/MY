@@ -42,7 +42,11 @@ function TI.CreateFrame(a, b)
 			text = _L['Team Message'],
 			anchor = MY_TeamNotice.anchor,
 			simple = true, close = true, close = true,
-			setting = function() MY.OpenPanel() MY.SwitchTab('MY_TeamTools') end,
+			setting = function()
+				MY.ShowPanel()
+				MY.FocusPanel()
+				MY.SwitchTab('MY_TeamTools')
+			end,
 		})
 		local x, y = 10, 5
 		x = x + ui:append('Text', { x = x, y = y - 3, text = _L['YY:'], font = 48 }, true):autoWidth():width() + 5

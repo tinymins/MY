@@ -135,7 +135,8 @@ function D.GetHTML(rec)
 end
 
 function D.OnNotifyCB()
-    MY.OpenPanel()
+    MY.ShowPanel()
+    MY.FocusPanel()
     MY.SwitchTab('MY_ChatMonitor')
     MY.DismissNotify('MY_ChatMonitor')
 end

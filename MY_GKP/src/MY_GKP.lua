@@ -381,7 +381,8 @@ function MY_GKP.OnFrameCreate()
 		x = 875, y = 48, w = 100, h = 35,
 		text = g_tStrings.STR_LOG_SET,
 		onclick = function()
-			MY.OpenPanel()
+			MY.ShowPanel()
+			MY.FocusPanel()
 			MY.SwitchTab('MY_GKP')
 		end,
 	})

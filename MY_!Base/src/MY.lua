@@ -206,7 +206,7 @@ local _AUTHOR_     = _L['MingYi @ Double Dream Town']
 -- 私有函数
 -----------------------------------------------
 local INI_PATH = _FRAMEWORK_ROOT_..'ui/MY.ini'
-local _MY = {}
+local C, D = {}, {}
 
 do local AddonInfo = SetmetaReadonly({
 	szName          = _NAME_          ,
@@ -227,7 +227,7 @@ do local AddonInfo = SetmetaReadonly({
 		[3007396 ] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 枫泾古镇
 		[1600498 ] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 追风蹑影
 		[4664780 ] = string.char( 0xDC, 0xF8, 0xD2, 0xC1 ), -- 日月明尊
-		[12617467] = string.char( 0xDC, 0xF8, 0xD2, 0xC1, 0x40, 0xB0, 0xD7, 0xB5, 0xDB, 0xB3, 0xC7 ), -- 唯我独尊
+		[17796954] = string.char( 0xDC, 0xF8, 0xD2, 0xC1, 0x40, 0xB0, 0xD7, 0xB5, 0xDB, 0xB3, 0xC7 ), -- 唯我独尊->枫泾古镇
 		[385183  ] = string.char( 0xE8, 0x8C, 0x97, 0xE4, 0xBC, 0x8A ), -- 傲血戰意
 		[1452025 ] = string.char( 0xE8, 0x8C, 0x97, 0xE4, 0xBC, 0x8A, 0xE4, 0xBC, 0x8A ), -- 巔峰再起
 		[3627405 ] = string.char( 0xC1, 0xFA, 0xB5, 0xA8, 0xC9, 0xDF, 0x40, 0xDD, 0xB6, 0xBB, 0xA8, 0xB9, 0xAC ), -- 白帝
@@ -283,106 +283,118 @@ end
 ---------------------------------------------------------------------------------------------
 -- 界面开关
 ---------------------------------------------------------------------------------------------
--- close window
-function MY.ClosePanel(bMute, bRealClose, bNoAnimate)
-	local hFrame = MY.GetFrame()
-	if hFrame then
-		if not bRealClose then
-			if not hFrame.bToggling then
-				if bNoAnimate then
-					hFrame:Hide()
-				else
-					local nY = hFrame:GetRelY()
-					local nAlpha = hFrame:GetAlpha()
-					tweenlite.to(300, hFrame, {relY = nY + 10, alpha = 0, complete = function()
-						hFrame:SetRelY(nY)
-						hFrame:SetAlpha(nAlpha)
-						hFrame:Hide()
-						hFrame.bToggling = false
-					end})
-					hFrame.bToggling = true
-				end
-			end
-		else
-			MY.SwitchTab()
-			Wnd.CloseWindow(hFrame)
-		end
-		Wnd.CloseWindow('PopupMenuPanel')
-		if not bMute then
-			PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
-		end
-	end
-	MY.RegisterEsc('MY')
+function MY.GetFrame()
+	return Station.Lookup('Normal/MY')
 end
 
--- open window
-function MY.OpenPanel(bMute, bNoFocus, bNoAnimate)
+function MY.OpenPanel()
 	local frame = MY.GetFrame()
-	local bNoAnimate = bNoAnimate or (frame and frame:IsVisible())
 	if not frame then
 		frame = Wnd.OpenWindow(INI_PATH, 'MY')
-		frame.intact = true
-		frame:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
-		frame:CorrectPos()
+		frame:Hide()
+		frame.bVisible = false
+	end
+	return frame
+end
 
-		-- update some ui handle
-		frame:Lookup('', 'Text_Title'):SetText(_L['mingyi plugins'] .. ' v' .. MY.GetVersion() .. ' Build ' .. _BUILD_)
-		MY.UI(frame):size(_MY.OnSizeChanged):event('ON_SCALED', _MY.OnSizeChanged)
-		-- update author infomation button
-		frame:Lookup('', 'Text_Author'):SetText(_L['author\'s signature'])
-		frame:Lookup('Wnd_Total/Btn_Weibo', 'Text_Default'):SetText(_L['author\'s weibo'])
-		MY.UI(frame):event('UI_SCALED', function()
-			local fn = frame:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel').OnScrollBarPosChanged
-			if fn then
-				fn()
-			end
-		end)
-		-- updaet logo image
-		MY.UI(MY.GetFrame()):children('#Image_Icon')
-		  :size(30, 30)
-		  :image(_UITEX_COMMON_, 0)
-		-- update category
-		MY.RedrawCategory()
+function MY.ClosePanel()
+	local frame = MY.GetFrame()
+	if not frame then
+		return
 	end
-	frame:Show()
+	MY.SwitchTab()
+	MY.HidePanel(false, true)
+	Wnd.CloseWindow(frame)
+end
+
+function MY.ReopenPanel()
+	if not MY.IsPanelOpened() then
+		return
+	end
+	local bVisible = MY.IsPanelVisible()
+	MY.ClosePanel()
+	MY.OpenPanel()
+	MY.TogglePanel(bVisible, true, true)
+end
+
+function MY.ShowPanel(bMute, bNoAnimate)
+	local frame = MY.OpenPanel()
+	if not frame:IsVisible() then
+		frame:Show()
+		frame.bVisible = true
+		if not bNoAnimate then
+			frame.bToggling = true
+			tweenlite.from(300, frame, {
+				relY = frame:GetRelY() - 10,
+				alpha = 0,
+				complete = function()
+					frame.bToggling = false
+				end,
+			})
+		end
+		if not bMute then
+			PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
+		end
+	end
 	frame:BringToTop()
-	if not bNoFocus and Cursor.IsVisible() then
-		Station.SetFocusWindow(frame)
+	MY.RegisterEsc('MY', MY.IsPanelVisible, function() MY.HidePanel() end)
+end
+
+function MY.HidePanel(bMute, bNoAnimate)
+	local frame = MY.GetFrame()
+	if not frame then
+		return
 	end
-	if not bNoAnimate then
-		frame.bToggling = true
-		tweenlite.from(300, frame, {relY = frame:GetRelY() - 10, alpha = 0, complete = function()
-			frame.bToggling = false
-		end})
+	if not frame.bToggling then
+		if bNoAnimate then
+			frame:Hide()
+		else
+			local nY = frame:GetRelY()
+			local nAlpha = frame:GetAlpha()
+			tweenlite.to(300, frame, {relY = nY + 10, alpha = 0, complete = function()
+				frame:SetRelY(nY)
+				frame:SetAlpha(nAlpha)
+				frame:Hide()
+				frame.bToggling = false
+			end})
+			frame.bToggling = true
+		end
+		frame.bVisible = false
 	end
 	if not bMute then
-		PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
+		PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 	end
-	MY.RegisterEsc('MY', MY.IsPanelVisible, function() MY.ClosePanel() end)
+	MY.RegisterEsc('MY')
+	Wnd.CloseWindow('PopupMenuPanel')
 end
 
--- toggle panel
-function MY.TogglePanel()
-	if MY.IsPanelVisible() then
-		MY.ClosePanel()
+function MY.TogglePanel(bVisible, ...)
+	if bVisible == nil then
+		if MY.IsPanelVisible() then
+			MY.HidePanel()
+		else
+			MY.ShowPanel()
+			MY.FocusPanel()
+		end
+	elseif bVisible then
+		MY.ShowPanel(...)
+		MY.FocusPanel()
 	else
-		MY.OpenPanel()
+		MY.HidePanel(...)
 	end
 end
 
--- reopen panel
-function MY.ReopenPanel()
-	local bVisible = MY.IsPanelVisible()
-	MY.ClosePanel(true)
-	MY.ClosePanel(true, true)
-	MY.OpenPanel(true, true)
-	MY.ResizePanel(780, 540)
-	if not bVisible then
-		MY.ClosePanel(true)
+function MY.FocusPanel(bForce)
+	local frame = MY.OpenPanel()
+	if not frame then
+		return
 	end
+	if not bForce and not Cursor.IsVisible() then
+		return
+	end
+	Station.SetFocusWindow(frame)
 end
 
--- resize panel
 function MY.ResizePanel(nWidth, nHeight)
 	local hFrame = MY.GetFrame()
 	if not hFrame then
@@ -391,19 +403,12 @@ function MY.ResizePanel(nWidth, nHeight)
 	MY.UI(hFrame):size(nWidth, nHeight)
 end
 
--- if panel visible
 function MY.IsPanelVisible()
 	return MY.GetFrame() and MY.GetFrame():IsVisible()
 end
 
 -- if panel visible
 function MY.IsPanelOpened()
-	return Station.Lookup('Normal/MY')
-end
-
--- 获取主窗体句柄
--- (frame) MY.GetFrame()
-function MY.GetFrame()
 	return Station.Lookup('Normal/MY')
 end
 
@@ -438,11 +443,6 @@ local function OnInit()
 		MY.Debug({_L('Initial function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], MY_DEBUG.LOG)
 	end
 	INIT_FUNC_LIST = nil
-	-- 加载主窗体
-	local fScale = 1 + math.max(Font.GetOffset() * 0.03, 0)
-	MY.OpenPanel(true, true, true)
-	MY.ResizePanel(780 * fScale, 540 * fScale)
-	MY.ClosePanel(true, false, true)
 	-- 显示欢迎信息
 	MY.Sysmsg({_L('%s, welcome to use mingyi plugins!', GetClientPlayer().szName) .. ' v' .. MY.GetVersion() .. ' Build ' .. _BUILD_})
 end
@@ -1157,8 +1157,8 @@ function MY.OnCheckBoxCheck()
 	local name = this:GetName()
 	if name == 'CheckBox_Maximize' then
 		local ui = MY.UI(this:GetRoot())
-		_MY.anchor = ui:anchor()
-		_MY.w, _MY.h = ui:size()
+		C.anchor = ui:anchor()
+		C.w, C.h = ui:size()
 		ui:pos(0, 0):event('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
 			ui:size(Station.GetClientSize())
 		end):drag(false)
@@ -1169,11 +1169,11 @@ end
 function MY.OnCheckBoxUncheck()
 	local name = this:GetName()
 	if name == 'CheckBox_Maximize' then
-		MY.ResizePanel(_MY.w, _MY.h)
+		MY.ResizePanel(C.w, C.h)
 		MY.UI(this:GetRoot())
 			:event('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
 			:drag(true)
-			:anchor(_MY.anchor)
+			:anchor(C.anchor)
 	end
 end
 
@@ -1198,9 +1198,34 @@ function MY.OnDragButton()
 end
 
 function MY.OnFrameCreate()
-	local wnd = this:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel')
-	local scroll = this:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel')
-	scroll.OnScrollBarPosChanged = function()
+	local fScale = 1 + math.max(Font.GetOffset() * 0.03, 0)
+	this:Lookup('', 'Text_Title'):SetText(_L['mingyi plugins'] .. ' v' .. MY.GetVersion() .. ' Build ' .. _BUILD_)
+	this:Lookup('', 'Text_Author'):SetText(_L['author\'s signature'])
+	this:Lookup('', 'Image_Icon'):SetSize(30, 30)
+	this:Lookup('', 'Image_Icon'):FromUITex(_UITEX_COMMON_, 0)
+	this:Lookup('Wnd_Total/Btn_Weibo', 'Text_Default'):SetText(_L['author\'s weibo'])
+	this:Lookup('Btn_Drag'):RegisterLButtonDrag()
+	this.intact = true
+	MY.RedrawCategory()
+	MY.ResizePanel(780 * fScale, 540 * fScale)
+	MY.ExecuteWithThis(this, D.OnSizeChanged)
+	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
+	this:CorrectPos()
+	this:RegisterEvent('UI_SCALED')
+	XGUI(this):size(D.OnSizeChanged)
+end
+
+function MY.OnEvent(event)
+	if event == 'UI_SCALED' then
+		MY.ExecuteWithThis(this:Lookup('Wnd_Total/WndScroll_MainPanel/ScrollBar_MainPanel'), MY.OnScrollBarPosChanged)
+		D.OnSizeChanged()
+	end
+end
+
+function MY.OnScrollBarPosChanged()
+	local name = this:GetName()
+	if name == 'ScrollBar_MainPanel' then
+		local wnd = this:GetParent():Lookup('WndContainer_MainPanel')
 		if not wnd.OnPanelScroll then
 			return
 		end
@@ -1210,10 +1235,9 @@ function MY.OnFrameCreate()
 		scrollY = scrollY == 0 and 0 or -scrollY / scale
 		wnd.OnPanelScroll(wnd, scrollX, scrollY)
 	end
-	this:Lookup('Btn_Drag'):RegisterLButtonDrag()
 end
 
-function _MY.OnSizeChanged()
+function D.OnSizeChanged()
 	local frame = this
 	if not frame then
 		return
