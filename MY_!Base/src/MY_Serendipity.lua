@@ -283,3 +283,68 @@ MY.RegisterEvent('QUEST_FINISHED', function()
 	end
 end)
 end
+
+MY.RegisterInit(function()
+	MY.RegisterTutorial({
+		szKey = 'MY_Serendipity',
+		szMessage = _L['Would you like to share serendipity?'],
+		fnRequire = function() return not MY_Serendipity.bEnable end,
+		{
+			szOption = _L['Yes'],
+			bDefault = true,
+			fnAction = function()
+				MY_Serendipity.bEnable = true
+				MY.RedrawTab(nil)
+			end,
+		},
+		{
+			szOption = _L['No'],
+			fnAction = function()
+				MY_Serendipity.bEnable = false
+				MY.RedrawTab(nil)
+			end,
+		},
+	})
+
+	MY.RegisterTutorial({
+		szKey = 'MY_Serendipity_Auto',
+		szMessage = _L['Would you like to auto share serendipity?'],
+		fnRequire = function() return MY_Serendipity.bEnable and not MY_Serendipity.bAutoShare end,
+		{
+			szOption = _L['Yes'],
+			bDefault = true,
+			fnAction = function()
+				MY_Serendipity.bAutoShare = true
+				MY.RedrawTab(nil)
+			end,
+		},
+		{
+			szOption = _L['No'],
+			fnAction = function()
+				MY_Serendipity.bAutoShare = false
+				MY.RedrawTab(nil)
+			end,
+		},
+	})
+
+	MY.RegisterTutorial({
+		szKey = 'MY_Serendipity_Silent',
+		szMessage = _L['Would you like to share serendipity silently?'],
+		fnRequire = function() return MY_Serendipity.bEnable and MY_Serendipity.bAutoShare and not MY_Serendipity.bSilentMode end,
+		{
+			szOption = _L['Yes'],
+			bDefault = true,
+			fnAction = function()
+				MY_Serendipity.bSilentMode = true
+				MY.RedrawTab(nil)
+			end,
+		},
+		{
+			szOption = _L['No'],
+			fnAction = function()
+				MY_Serendipity.bSilentMode = false
+				MY.RedrawTab(nil)
+			end,
+		},
+	})
+end)

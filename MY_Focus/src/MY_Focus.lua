@@ -607,3 +607,26 @@ local function onHotKey()
 end
 MY.RegisterHotKey('MY_Focus_LoopTarget', _L['Loop target in focus'], onHotKey)
 end
+
+MY.RegisterTutorial({
+	szKey = 'MY_Focus',
+	szMessage = _L['Would you like to use MY focus?'],
+	fnRequire = function() return not MY_Focus.bEnable end,
+	{
+		szOption = _L['Use'],
+		bDefault = true,
+		fnAction = function()
+			MY_Focus.bEnable = true
+			MY_Focus.Open()
+			MY.RedrawTab('MY_Focus')
+		end,
+	},
+	{
+		szOption = _L['Not use'],
+		fnAction = function()
+			MY_Focus.bEnable = false
+			MY_Focus.Close()
+			MY.RedrawTab('MY_Focus')
+		end,
+	},
+})

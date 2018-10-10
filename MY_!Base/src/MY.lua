@@ -288,11 +288,15 @@ function MY.GetFrame()
 end
 
 function MY.OpenPanel()
+	if not MY.IsInitialized() then
+		return
+	end
 	local frame = MY.GetFrame()
 	if not frame then
 		frame = Wnd.OpenWindow(INI_PATH, 'MY')
 		frame:Hide()
 		frame.bVisible = false
+		D.CheckTutorial()
 	end
 	return frame
 end
@@ -385,7 +389,7 @@ function MY.TogglePanel(bVisible, ...)
 end
 
 function MY.FocusPanel(bForce)
-	local frame = MY.OpenPanel()
+	local frame = MY.GetFrame()
 	if not frame then
 		return
 	end
@@ -672,6 +676,93 @@ function MY.RegisterEvent(szEvent, fnAction)
 end
 end
 
+do
+local TUTORIAL_LIST = {}
+function MY.RegisterTutorial(tOptions)
+	if type(tOptions) ~= 'table' or not tOptions.szKey or not tOptions.szMessage then
+		return
+	end
+	insert(TUTORIAL_LIST, MY.FullClone(tOptions))
+end
+
+local CHECKED = {}
+local function GetNextTutorial()
+	for _, p in ipairs(TUTORIAL_LIST) do
+		if not CHECKED[p.szKey] and (not p.fnRequire or p.fnRequire()) then
+			return p
+		end
+	end
+end
+MY.RegisterInit(function()
+	CHECKED = MY.FormatDataStructure(MY.LoadLUAData({'config/tutorialed.jx3dat', MY_DATA_PATH.ROLE}), {}, 1)
+end)
+MY.RegisterExit(function() MY.SaveLUAData({'config/tutorialed.jx3dat', MY_DATA_PATH.ROLE}, CHECKED) end)
+
+local function StepNext(bQuick)
+	local tutorial = GetNextTutorial()
+	if not tutorial then
+		return
+	end
+	if bQuick then
+		local menu = tutorial[1]
+		for i, p in ipairs(tutorial) do
+			if p.bDefault then
+				menu = p
+			end
+		end
+		if menu and menu.fnAction then
+			menu.fnAction()
+		end
+		CHECKED[tutorial.szKey] = true
+		return StepNext(bQuick)
+	end
+	local nW, nH = Station.GetClientSize()
+	local tMsg = {
+		x = nW / 2, y = nH / 3,
+		szName = 'MY_Tutorial',
+		szMessage = tutorial.szMessage,
+		szAlignment = 'CENTER',
+	}
+	for _, p in ipairs(tutorial) do
+		local menu = MY.FullClone(p)
+		menu.fnAction = function()
+			if p.fnAction then
+				p.fnAction()
+			end
+			CHECKED[tutorial.szKey] = true
+			StepNext()
+		end
+		insert(tMsg, menu)
+	end
+	MessageBox(tMsg)
+end
+
+function D.CheckTutorial()
+	if not GetNextTutorial() then
+		return
+	end
+	local nW, nH = Station.GetClientSize()
+	local tMsg = {
+		x = nW / 2, y = nH / 3,
+		szName = 'MY_Tutorial',
+		szMessage = _L['Welcome to use MY plugin, would you like to start quick tutorial now?'],
+		szAlignment = 'CENTER',
+		{
+			szOption = _L['Quickset'],
+			fnAction = function() StepNext(true) end,
+		},
+		{
+			szOption = _L['Manually'],
+			fnAction = function() StepNext() end,
+		},
+		{
+			szOption = _L['Later'],
+		},
+	}
+	MessageBox(tMsg)
+end
+end
+
 do local BG_MSG_LIST = {}
 ------------------------------------
 --            背景通讯             --
@@ -819,7 +910,7 @@ function MY.RedrawCategory(szCategory)
 					end
 					p = p:GetNext()
 				end
-				MY.RedrawTab(chkCategory.szCategory)
+				MY.RedrawTabs(chkCategory.szCategory)
 			end
 			szCategory = szCategory or ctg.id
 		end
@@ -850,7 +941,7 @@ function MY.SwitchCategory(szCategory)
 	end
 end
 
-function MY.RedrawTab(szCategory)
+function MY.RedrawTabs(szCategory)
 	local frame = MY.GetFrame()
 	if not (frame and szCategory) then
 		return
@@ -1108,6 +1199,20 @@ function MY.SwitchTab(szID, bForceUpdate)
 		wnd.OnPanelScroll   = tab.fn.OnPanelScroll
 	end
 	wnd.szID = szID
+end
+
+function MY.RedrawTab(szID)
+	if MY.GetCurrentTabID() == szID then
+		MY.SwitchTab(szID, true)
+	end
+end
+
+function MY.GetCurrentTabID()
+	local frame = MY.GetFrame()
+	if not frame then
+		return
+	end
+	return frame:Lookup('Wnd_Total/WndScroll_MainPanel/WndContainer_MainPanel').szID
 end
 
 -- 注册选项卡

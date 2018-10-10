@@ -359,4 +359,15 @@ data = {
 	['[%s] finished %s, would you like to share?'] = '[%s]获得了%s，是否愿意点击分享到公共数据查询中？',
 	['Please input your realname, left blank for anonymous report:'] = '输入您希望显示的分享者名称，匿名分享请留空：',
 	['Open user preference folder'] = '角色数据文件夹',
+
+	['Welcome to use MY plugin, would you like to start quick tutorial now?'] = '欢迎使用茗伊插件集，部分设置尚未初始化，是否立即开始个性化向导？',
+	['Quickset'] = '一键设置',
+	['Manually'] = '手动设置',
+	['Later'] = '以后再说',
+
+	['Would you like to share serendipity?'] = '是否希望分享世界奇遇公告和自身奇遇到茗伊公共查询？',
+	['Would you like to auto share serendipity?'] = '是否希望自动分享奇遇到茗伊公共查询？',
+	['Would you like to share serendipity silently?'] = '是否希望开启自动分享奇遇静默模式？',
+	['Yes'] = '是',
+	['No'] = '否',
 }

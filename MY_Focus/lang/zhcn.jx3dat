@@ -80,4 +80,8 @@ data = {
     ['Tong member focus'] = '帮会自动焦点',
     ['Enemy focus'] = '敌对玩家自动焦点',
     ['Important npc focus'] = '重要NPC自动焦点',
+
+    ['Would you like to use MY focus?'] = '是否启用焦点列表？',
+    ['Use'] = '使用',
+    ['Not use'] = '不使用',
 }
