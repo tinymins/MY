@@ -83,9 +83,9 @@ local function ApplyUIArguments(ui, arg)
 	if ui and arg then
 		-- properties
 		if arg.x ~= nil or arg.y ~= nil  then ui:pos             (arg.x, arg.y  ) end
-		if arg.anchor             ~= nil then ui:anchor         (arg.anchor     ) end
 		if arg.alpha              ~= nil then ui:alpha          (arg.alpha      ) end
 		if arg.font               ~= nil then ui:font           (arg.font       ) end -- must before color
+		if arg.fontscale          ~= nil then ui:fontScale      (arg.fontscale  ) end -- must before color
 		if arg.color              ~= nil then ui:color          (arg.color      ) end
 		if arg.r or arg.g or arg.b       then ui:color      (arg.r, arg.g, arg.b) end
 		if arg.multiline          ~= nil then ui:multiLine      (arg.multiline  ) end -- must before :text()
@@ -117,6 +117,7 @@ local function ApplyUIArguments(ui, arg)
 		if arg.dragarea           ~= nil then ui:drag      (unpack(arg.dragarea)) end
 		if arg.w ~= nil or arg.h ~= nil or arg.rw ~= nil or arg.rh ~= nil then ui:size(arg.w, arg.h, arg.rw, arg.rh) end -- must after :text() because w/h can be 'auto'
 		if arg.halign or arg.valign      then ui:align   (arg.halign, arg.valign) end -- must after :size()
+		if arg.anchor             ~= nil then ui:anchor         (arg.anchor     ) end -- must after :size() :pos()
 		-- event handlers
 		if arg.onscroll           ~= nil then ui:scroll         (arg.onscroll   ) end
 		if arg.onhover            ~= nil then ui:hover          (arg.onhover    ) end
@@ -2881,6 +2882,7 @@ function XGUI:align(halign, valign)
 	if valign or halign then
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'TEXT')
+				or GetComponentElement(raw, 'MAIN_HANDLE')
 			if raw then
 				if halign and raw.SetHAlign then
 					raw:SetHAlign(halign)
@@ -2912,6 +2914,19 @@ function XGUI:sliderStyle(nSliderStyle)
 	for _, raw in ipairs(self.raws) do
 		if GetComponentType(raw) == 'WndSliderBox' then
 			SetComponentProp(raw, 'bShowPercentage', bShowPercentage)
+		end
+	end
+	return self
+end
+
+-- (self) XGUI:formatChildrenPos()
+function XGUI:formatChildrenPos()
+	self:_checksum()
+	for _, raw in ipairs(self.raws) do
+		if GetComponentType(raw) == 'Handle' then
+			raw:FormatAllItemPos()
+		elseif GetComponentType(raw) == 'WndContainer' then
+			raw:FormatAllContentPos()
 		end
 	end
 	return self
