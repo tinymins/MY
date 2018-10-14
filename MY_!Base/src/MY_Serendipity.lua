@@ -245,7 +245,11 @@ MY.RegisterMsgMonitor('QIYU', function(szMsg, nFont, bRich, r, g, b, szChannel)
 	szMsg:gsub(_L.ADVENTURE_PATT, function(szName, szSerendipity)
 		D.OnSerendipity(szName, szSerendipity, 1, 0, GetCurrentTime())
 	end)
+	-- 恭喜侠士江阙阙在25人英雄会战唐门中获得稀有掉落[夜话·白鹭]！
 	szMsg:gsub(_L.ADVENTURE_PATT2, function(szName, szSerendipity)
+		if not IsDebugClient() and not MY.IsParty(szName) and not MY.IsFriend(szName) then
+			return
+		end
 		D.OnSerendipity(szName, szSerendipity, 1, 0, GetCurrentTime())
 	end)
 end, {'MSG_SYS'})
