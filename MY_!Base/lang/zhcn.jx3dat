@@ -370,4 +370,8 @@ data = {
 	['Would you like to share serendipity silently?'] = '是否希望开启自动分享奇遇静默模式？',
 	['Yes'] = '是',
 	['No'] = '否',
+
+	['Anonymous'] = '匿名侠士',
+	['JX3 is pround of you!'] = '剑网3幸甚有你！',
+	['Thanks for your kindness!'] = '感谢各位无私付出的小可爱！',
 }

@@ -122,31 +122,56 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 		if szReporter == '' and nMethod ~= 1 then
 			szName = ''
 		end
-		local h = szMode == 'auto' and 200 or 400
-		local w = szMode == 'auto' and 255 or 400
-		local ui = XGUI.CreateFrame('MY_Serendipity#' .. szKey, {
-			w = w, h = h, close = true, text = '',
-		})
-		if szMode == 'auto' then
-			ui:alpha(200)
-			ui:anchor({ x = 0, y = -60, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' })
-		elseif szMode == 'silent' then
-			ui:hide()
+		-- 战斗中移动中免打扰防止卡住
+		MY.BreatheCall(function()
+			if not Cursor.IsVisible()
+			or not me or me.bFightState
+			or (
+				me.nMoveState ~= MOVE_STATE.ON_STAND
+				and me.nMoveState ~= MOVE_STATE.ON_FLOAT
+				and me.nMoveState ~= MOVE_STATE.ON_SIT
+				and me.nMoveState ~= MOVE_STATE.ON_FREEZE
+				and me.nMoveState ~= MOVE_STATE.ON_ENTRAP
+				and me.nMoveState ~= MOVE_STATE.ON_DEATH
+				and me.nMoveState ~= MOVE_STATE.ON_AUTO_FLY
+				and me.nMoveState ~= MOVE_STATE.ON_START_AUTO_FLY
+			) then
+				return
+			end
+			MY.Ajax({
+				driver = 'webcef',
+				url = 'http://data.jx3.derzh.com/serendipity/?l='
+				.. MY.GetLang() .. '&m=' .. nMethod
+				.. '&data=' .. MY.SimpleEncrypt(MY.JsonEncode({
+					n = szName, N = szNameCRC, R = szReporter,
+					S = MY.GetRealServer(1), s = MY.GetRealServer(2),
+					a = szSerendipity, f = nStatus, t = dwTime,
+					w = w, h = h, c = szMode == 'silent' and 0 or Station.GetUIScale(),
+				})),
+			})
+			return 0
+		end)
+		if szMode ~= 'silent' then
+			local w, h = 270, 180
+			local ui = XGUI.CreateFrame('MY_Serendipity#' .. szKey, {
+				w = w, h = h, close = true, text = '', anchor = {},
+			})
+			if szMode == 'auto' then
+				ui:alpha(200)
+				ui:anchor({ x = 0, y = -60, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' })
+			end
+			ui:append('Handle', { x = 10, y = (h - 90) / 2, w = w - 20, h = h, valign = 1, halign = 1, handlestyle = 3 }, true)
+				:append('Text', {
+					text = (szName == '' and _L['Anonymous'] or szName)
+						.. '\n' .. szSerendipity .. ' - ' .. MY.FormatTime('hh:mm:ss', dwTime)
+						.. '\n' .. (szReporter == '' and '' or (szReporter .. _L[','])) .. _L['JX3 is pround of you!']
+						.. '\n' .. _L['Thanks for your kindness!'],
+					fontscale = 1.2,
+				})
+				:formatChildrenPos()
+			MY.DelayCall(10000, function() ui:remove() end)
+			MY.DismissNotify(szKey)
 		end
-		ui:append('WndWebCef', {
-			x = 0, y = 0, w = w, h = h,
-			-- navigate = 'http://127.0.0.1/serendipity/?l='
-			navigate = 'https://jx3.derzh.com/serendipity/?l='
-			.. MY.GetLang() .. '&m=' .. nMethod
-			.. '&data=' .. MY.SimpleEncrypt(MY.JsonEncode({
-				n = szName, N = szNameCRC, R = szReporter,
-				S = MY.GetRealServer(1), s = MY.GetRealServer(2),
-				a = szSerendipity, f = nStatus, t = dwTime,
-				w = w, h = h, c = szMode == 'silent' and 0 or Station.GetUIScale(),
-			})),
-			oncomplete = function() MY.DelayCall(5000, function() ui:remove() end) end,
-		})
-		MY.DismissNotify(szKey)
 	end
 	D.GetSerendipityShareName(fnAction, szMode ~= 'manual')
 end
@@ -184,7 +209,6 @@ function D.OnSerendipity(szName, szSerendipity, nMethod, nStatus, dwTime)
 end
 
 MY.RegisterMsgMonitor('QIYU', function(szMsg, nFont, bRich, r, g, b, szChannel)
-	-- 战斗中移动中免打扰
 	local me = GetClientPlayer()
 	if not me then
 		return
