@@ -1499,6 +1499,10 @@ function MY.Game.GetFriend(arg0)
 end
 MY.GetFriend = MY.Game.GetFriend
 
+function MY.IsFriend(arg0)
+	return MY.GetFriend(arg0) and true or false
+end
+
 function _C.GeneFoeListCache()
 	if not _C.tFoeList then
 		local me = GetClientPlayer()
@@ -1586,6 +1590,10 @@ function MY.Game.GetTongMember(arg0)
 	return GetTongClient().GetMemberInfo(arg0)
 end
 MY.GetTongMember = MY.Game.GetTongMember
+
+function MY.IsTongMember(arg0)
+	return MY.GetTongMember(arg0) and true or false
+end
 
 -- 判断是不是队友
 function MY.Game.IsParty(dwID)
