@@ -468,7 +468,6 @@ end)
 --   #                   #   # #       # # # # #       # #   #         #               #         #
 --   #               # # #             #       #       #     #       # #             # #
 -- ##################################################################################################
-_C.tFreeWebPages = {}
 -- (void) MY.RemoteRequest(string szUrl, func fnAction)       -- 发起远程 HTTP 请求
 -- szUrl        -- 请求的完整 URL（包含 http:// 或 https://）
 -- fnAction     -- 请求完成后的回调函数，回调原型：function(szTitle, szContent)]]
@@ -495,6 +494,8 @@ local function pcall_this(context, fn, ...)
 end
 
 do
+local MY_RRWP_FREE = {}
+local MY_RRWC_FREE = {}
 local MY_CALL_AJAX = {}
 local MY_AJAX_TAG = 'MY_AJAX#'
 local l_ajaxsettingsmeta = {
@@ -595,19 +596,71 @@ function MY.Ajax(settings)
 		curl:OnError(settings.error)
 		curl:SetConnTimeout(settings.timeout)
 		curl:Perform()
-	elseif settings.driver == 'webbrowser' then
-		assert(method == 'get', '[MY_AJAX] Webbrowser only support get method, got ' .. method)
+	elseif settings.driver == 'webcef' then
+		assert(method == 'get', '[MY_AJAX] Webcef only support get method, got ' .. method)
 		local RequestID, hFrame
-		local nFreeWebPages = #_C.tFreeWebPages
+		local nFreeWebPages = #MY_RRWC_FREE
 		if nFreeWebPages > 0 then
-			RequestID = _C.tFreeWebPages[nFreeWebPages]
-			hFrame = Station.Lookup('Lowest/MYRR_' .. RequestID)
-			table.remove(_C.tFreeWebPages)
+			RequestID = MY_RRWC_FREE[nFreeWebPages]
+			hFrame = Station.Lookup('Lowest/MYRRWC_' .. RequestID)
+			table.remove(MY_RRWC_FREE)
 		end
 		-- create page
 		if not hFrame then
 			RequestID = ('%X_%X'):format(GetTickCount(), math.floor(math.random() * 65536))
-			hFrame = Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. 'ui/WndWebPage.ini', 'MYRR_' .. RequestID)
+			hFrame = Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. 'ui/WndWebCef.ini', 'MYRRWC_' .. RequestID)
+			hFrame:Hide()
+		end
+		local wWebCef = hFrame:Lookup('WndWebCef')
+
+		-- bind callback function
+		wWebCef.OnWebLoadEnd = function()
+			-- local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
+			-- MY.Debug({string.format('%s - %s', szTitle, szUrl)}, 'MYRRWC::OnDocumentComplete', MY_DEBUG.LOG)
+			-- 注销超时处理时钟
+			MY.DelayCall('MYRRWC_TO_' .. RequestID, false)
+			-- 成功回调函数
+			-- if settings.success then
+			-- 	local status, err = pcall_this(settings.context, settings.success, settings, szContent)
+			-- 	if not status then
+			-- 		MY.Debug({err}, 'MYRRWC::OnDocumentComplete::Callback', MY_DEBUG.ERROR)
+			-- 	end
+			-- end
+			table.insert(MY_RRWC_FREE, RequestID)
+		end
+
+		-- do with this remote request
+		MY.Debug({settings.url}, 'MYRRWC', MY_DEBUG.LOG)
+		-- register request timeout clock
+		if settings.timeout > 0 then
+			MY.DelayCall('MYRRWC_TO_' .. RequestID, settings.timeout, function()
+				MY.Debug({settings.url}, 'MYRRWC::Timeout', MY_DEBUG.WARNING) -- log
+				-- request timeout, call timeout function.
+				if settings.error then
+					local status, err = pcall_this(settings.context, settings.error, settings, 'timeout')
+					if not status then
+						MY.Debug({err}, 'MYRRWC::TIMEOUT', MY_DEBUG.ERROR)
+					end
+				end
+				table.insert(MY_RRWC_FREE, RequestID)
+			end)
+		end
+
+		-- start chrome navigate
+		wWebCef:Navigate(url)
+	elseif settings.driver == 'webbrowser' then
+		assert(method == 'get', '[MY_AJAX] Webbrowser only support get method, got ' .. method)
+		local RequestID, hFrame
+		local nFreeWebPages = #MY_RRWP_FREE
+		if nFreeWebPages > 0 then
+			RequestID = MY_RRWP_FREE[nFreeWebPages]
+			hFrame = Station.Lookup('Lowest/MYRRWP_' .. RequestID)
+			table.remove(MY_RRWP_FREE)
+		end
+		-- create page
+		if not hFrame then
+			RequestID = ('%X_%X'):format(GetTickCount(), math.floor(math.random() * 65536))
+			hFrame = Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. 'ui/WndWebPage.ini', 'MYRRWP_' .. RequestID)
 			hFrame:Hide()
 		end
 		local wWebPage = hFrame:Lookup('WndWebPage')
@@ -616,34 +669,34 @@ function MY.Ajax(settings)
 		wWebPage.OnDocumentComplete = function()
 			local szUrl, szTitle, szContent = this:GetLocationURL(), this:GetLocationName(), this:GetDocument()
 			if szUrl ~= szTitle or szContent ~= '' then
-				MY.Debug({string.format('%s - %s', szTitle, szUrl)}, 'MYRR::OnDocumentComplete', MY_DEBUG.LOG)
+				MY.Debug({string.format('%s - %s', szTitle, szUrl)}, 'MYRRWP::OnDocumentComplete', MY_DEBUG.LOG)
 				-- 注销超时处理时钟
-				MY.DelayCall('MYRR_TO_' .. RequestID, false)
+				MY.DelayCall('MYRRWP_TO_' .. RequestID, false)
 				-- 成功回调函数
 				if settings.success then
 					local status, err = pcall_this(settings.context, settings.success, settings, szContent)
 					if not status then
-						MY.Debug({err}, 'MYRR::OnDocumentComplete::Callback', MY_DEBUG.ERROR)
+						MY.Debug({err}, 'MYRRWP::OnDocumentComplete::Callback', MY_DEBUG.ERROR)
 					end
 				end
-				table.insert(_C.tFreeWebPages, RequestID)
+				table.insert(MY_RRWP_FREE, RequestID)
 			end
 		end
 
 		-- do with this remote request
-		MY.Debug({settings.url}, 'MYRR', MY_DEBUG.LOG)
+		MY.Debug({settings.url}, 'MYRRWP', MY_DEBUG.LOG)
 		-- register request timeout clock
 		if settings.timeout > 0 then
-			MY.DelayCall('MYRR_TO_' .. RequestID, settings.timeout, function()
-				MY.Debug({settings.url}, 'MYRR::Timeout', MY_DEBUG.WARNING) -- log
+			MY.DelayCall('MYRRWP_TO_' .. RequestID, settings.timeout, function()
+				MY.Debug({settings.url}, 'MYRRWP::Timeout', MY_DEBUG.WARNING) -- log
 				-- request timeout, call timeout function.
 				if settings.error then
 					local status, err = pcall_this(settings.context, settings.error, settings, 'timeout')
 					if not status then
-						MY.Debug({err}, 'MYRR::TIMEOUT', MY_DEBUG.ERROR)
+						MY.Debug({err}, 'MYRRWP::TIMEOUT', MY_DEBUG.ERROR)
 					end
 				end
-				table.insert(_C.tFreeWebPages, RequestID)
+				table.insert(MY_RRWP_FREE, RequestID)
 			end)
 		end
 
