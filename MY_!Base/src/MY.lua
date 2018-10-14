@@ -694,7 +694,10 @@ local function GetNextTutorial()
 	end
 end
 MY.RegisterInit(function()
-	CHECKED = MY.FormatDataStructure(MY.LoadLUAData({'config/tutorialed.jx3dat', MY_DATA_PATH.ROLE}), {}, 1)
+	CHECKED = MY.LoadLUAData({'config/tutorialed.jx3dat', MY_DATA_PATH.ROLE})
+	if not IsTable(CHECKED) then
+		CHECKED = {}
+	end
 end)
 MY.RegisterExit(function() MY.SaveLUAData({'config/tutorialed.jx3dat', MY_DATA_PATH.ROLE}, CHECKED) end)
 
