@@ -213,52 +213,6 @@ function D.OnSerendipity(szName, szSerendipity, nMethod, nStatus, dwTime)
 	end
 end
 
-MY.RegisterMsgMonitor('QIYU', function(szMsg, nFont, bRich, r, g, b, szChannel)
-	local me = GetClientPlayer()
-	if not me then
-		return
-	end
-	-- if not me or me.bFightState
-	-- or (
-	-- 	me.nMoveState ~= MOVE_STATE.ON_STAND    and
-	-- 	me.nMoveState ~= MOVE_STATE.ON_FLOAT    and
-	-- 	me.nMoveState ~= MOVE_STATE.ON_SIT      and
-	-- 	me.nMoveState ~= MOVE_STATE.ON_FREEZE   and
-	-- 	me.nMoveState ~= MOVE_STATE.ON_ENTRAP   and
-	-- 	me.nMoveState ~= MOVE_STATE.ON_DEATH    and
-	-- 	me.nMoveState ~= MOVE_STATE.ON_AUTO_FLY and
-	-- 	me.nMoveState ~= MOVE_STATE.ON_START_AUTO_FLY
-	-- ) then
-	-- 	return
-	-- end
-	-- local hWnd = Station.GetFocusWindow()
-	-- if hWnd and hWnd:GetType() == 'WndEdit' then
-	-- 	return
-	-- end
-	-- 跨服中免打扰
-	if IsRemotePlayer(me.dwID) then
-		return
-	end
-	-- 确认是真实系统消息
-	if not StringLowerW(szMsg):find('ui/image/minimap/minimap.uitex') then
-		return
-	end
-	-- “醉戈止战”侠士福缘非浅，触发奇遇【阴阳两界】，此千古奇缘将开启怎样的奇妙际遇，令人神往！
-	if bRich then
-		szMsg = GetPureText(szMsg)
-	end
-	szMsg:gsub(_L.ADVENTURE_PATT, function(szName, szSerendipity)
-		D.OnSerendipity(szName, szSerendipity, 1, 0, GetCurrentTime())
-	end)
-	-- 恭喜侠士江阙阙在25人英雄会战唐门中获得稀有掉落[夜话·白鹭]！
-	szMsg:gsub(_L.ADVENTURE_PATT2, function(szName, szSerendipity)
-		if not IsDebugClient() and not MY.IsParty(szName) and not MY.IsFriend(szName) then
-			return
-		end
-		D.OnSerendipity(szName, szSerendipity, 1, 0, GetCurrentTime())
-	end)
-end, {'MSG_SYS'})
-
 do
 local function GetSerendipityName(nID)
 	for i = 2, g_tTable.Adventure:GetRowCount() do
@@ -283,6 +237,23 @@ local l_serendipities
 local function GetSerendipityInfo(dwTabType, dwIndex)
 	if not l_serendipities then
 		l_serendipities = MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/serendipities/$lang.jx3dat')
+		l_serendipities.name = {}
+		for dwTabType, tList in pairs(l_serendipities) do
+			if dwTabType ~= 'name' then
+				for dwID, p in pairs(tList) do
+					if IsNumber(dwTabType) then
+						local KItemInfo = GetItemInfo(dwTabType, dwID)
+						if KItemInfo then
+							l_serendipities.name[KItemInfo.szName] = p
+						end
+					end
+					local KItemInfo = GetItemInfo(p[1], p[2])
+					if KItemInfo then
+						l_serendipities.name[KItemInfo.szName] = p
+					end
+				end
+			end
+		end
 	end
 	local serendipity = l_serendipities[dwTabType] and l_serendipities[dwTabType][dwIndex]
 	if serendipity then
@@ -292,6 +263,42 @@ local function GetSerendipityInfo(dwTabType, dwIndex)
 		end
 	end
 end
+
+MY.RegisterMsgMonitor('QIYU', function(szMsg, nFont, bRich, r, g, b, szChannel)
+	local me = GetClientPlayer()
+	if not me then
+		return
+	end
+	-- local hWnd = Station.GetFocusWindow()
+	-- if hWnd and hWnd:GetType() == 'WndEdit' then
+	-- 	return
+	-- end
+	-- 跨服中免打扰
+	if IsRemotePlayer(me.dwID) then
+		return
+	end
+	-- 确认是真实系统消息
+	if not StringLowerW(szMsg):find('ui/image/minimap/minimap.uitex') then
+		return
+	end
+	-- “醉戈止战”侠士福缘非浅，触发奇遇【阴阳两界】，此千古奇缘将开启怎样的奇妙际遇，令人神往！
+	if bRich then
+		szMsg = GetPureText(szMsg)
+	end
+	szMsg:gsub(_L.ADVENTURE_PATT, function(szName, szSerendipity)
+		D.OnSerendipity(szName, szSerendipity, 1, 0, GetCurrentTime())
+	end)
+	-- 恭喜侠士江阙阙在25人英雄会战唐门中获得稀有掉落[夜话·白鹭]！
+	szMsg:gsub(_L.ADVENTURE_PATT2, function(szName, szSerendipity)
+		if not IsDebugClient() and MY.IsParty(szName) and not MY.IsFriend(szName) then
+			return
+		end
+		if not GetSerendipityInfo('name', szSerendipity) then -- 太多了筛选下…
+			return
+		end
+		D.OnSerendipity(szName, szSerendipity, 1, 0, GetCurrentTime())
+	end)
+end, {'MSG_SYS'})
 
 MY.RegisterEvent('LOOT_ITEM', function()
 	local player = GetPlayer(arg0)
