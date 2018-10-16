@@ -113,6 +113,10 @@ function TI.CreateFrame(a, b)
 						MY.Talk(PLAYER_TALK_CHANNEL.RAID, yy)
 					end
 				end
+				local message = ui:children('#Message'):text():gsub('\n', ' ')
+				if message ~= '' then
+					MY.Talk(PLAYER_TALK_CHANNEL.RAID, message)
+				end
 			end,
 		}, true):height() + 5
 		ui:append('WndEditBox', {
