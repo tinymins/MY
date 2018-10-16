@@ -131,7 +131,6 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 					n = szName, N = szNameCRC, R = szReporter,
 					S = MY.GetRealServer(1), s = MY.GetRealServer(2),
 					a = szSerendipity, f = nStatus, t = dwTime,
-					w = w, h = h, c = szMode == 'silent' and 0 or Station.GetUIScale(),
 				})),
 			})
 		end
