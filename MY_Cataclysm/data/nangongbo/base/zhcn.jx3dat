@@ -123,18 +123,18 @@ data = {
     {dwID=3807,col="#FFFF00FF",szReminder="啸",nPriority=7},--狼啸---会战唐门
     {dwID=3781,col="#FF323200",szReminder="雷",nPriority=8},--雷动四方---会战唐门
     {dwID=3780,col="#FFFF00FF",szReminder="天",nPriority=7},--天云挂雷---会战唐门
+    {dwID=5483},--截架---大明宫
     {dwID=5491,col="#FF323200",szReminder="骑",nPriority=8},--骑手---大明宫
     {dwID=6006,col="#00FFFF00",szReminder="疲",nPriority=8},--疲劳---大明宫
-    {dwID=5599,col="#FFFF00FF",szReminder="沙",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--沙暴---大明宫
+    {dwID=5599,col="#FF00FFFF",szReminder="沙",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--沙暴---大明宫
     {dwID=5581,col="#FF00FFFF",szReminder="饥",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF00FF"},--饿鬼·饥---大明宫
     {dwID=5576,col="#FFFF00FF",szReminder="离",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFF00"},--离愁---大明宫
     {dwID=5579,col="#8055FF00",szReminder="百",nPriority=3,bScreenHead=true,colScreenHead="#8055FF"},--百生---大明宫
     {dwID=5592,col="#0050FFFF",szReminder="障",nPriority=7},--饿鬼·外障---大明宫
-    {dwID=5717,col="#FF323200",szReminder="狱",nPriority=8},--无明炼狱---大明宫
     {dwID=5513,col="#FFFF00FF",szReminder="追",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--追击---大明宫
     {dwID=5701,col="#00FFFF00",szReminder="殇",nPriority=8},--夜殇---大明宫
     {dwID=5522,col="#FF3232FF",szReminder="血",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--血重楼---大明宫
-    {dwID=5632,col="#00FF0000",szReminder="火",nPriority=8},--火把---大明宫
+    {dwID=5632,col="#00FF0000",szReminder="火",nPriority=8,bScreenHead=true,colScreenHead="#00FF00"},--火把---大明宫
     {dwID=5084,col="#FFFF00FF",szReminder="牢",nPriority=6,bAttention=true},--牢笼被锁---南诏皇宫
     {dwID=5081},--魁龙气---南诏皇宫
     {dwID=5096,nLevel=2,col="#FF3232FF",szReminder="精",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--精确射杀---南诏皇宫
@@ -310,5 +310,5 @@ data = {
     {dwID=9744},--朝圣---明教
     {dwID=9745},--朝圣---明教
     {dwID=4244},--渡厄---明教
-    --【南宫伯是帅咩】更新日期1003
+    --【南宫伯是帅咩】更新日期1017
 }

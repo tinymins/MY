@@ -123,18 +123,18 @@ data = {
     {dwID=3807,col="#FFFF00FF",szReminder="嘯",nPriority=7},--狼嘯---會戰唐門
     {dwID=3781,col="#FF323200",szReminder="雷",nPriority=8},--雷動四方---會戰唐門
     {dwID=3780,col="#FFFF00FF",szReminder="天",nPriority=7},--天雲掛雷---會戰唐門
+    {dwID=5483},--截架---大明宮
     {dwID=5491,col="#FF323200",szReminder="騎",nPriority=8},--騎手---大明宮
     {dwID=6006,col="#00FFFF00",szReminder="疲",nPriority=8},--疲勞---大明宮
-    {dwID=5599,col="#FFFF00FF",szReminder="沙",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--沙暴---大明宮
+    {dwID=5599,col="#FF00FFFF",szReminder="沙",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--沙暴---大明宮
     {dwID=5581,col="#FF00FFFF",szReminder="飢",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF00FF"},--餓鬼·飢---大明宮
     {dwID=5576,col="#FFFF00FF",szReminder="離",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFF00"},--離愁---大明宮
     {dwID=5579,col="#8055FF00",szReminder="百",nPriority=3,bScreenHead=true,colScreenHead="#8055FF"},--百生---大明宮
     {dwID=5592,col="#0050FFFF",szReminder="障",nPriority=7},--餓鬼·外障---大明宮
-    {dwID=5717,col="#FF323200",szReminder="獄",nPriority=8},--無明煉獄---大明宮
     {dwID=5513,col="#FFFF00FF",szReminder="追",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--追擊---大明宮
     {dwID=5701,col="#00FFFF00",szReminder="殤",nPriority=8},--夜殤---大明宮
     {dwID=5522,col="#FF3232FF",szReminder="血",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--血重樓---大明宮
-    {dwID=5632,col="#00FF0000",szReminder="火",nPriority=8},--火把---大明宮
+    {dwID=5632,col="#00FF0000",szReminder="火",nPriority=8,bScreenHead=true,colScreenHead="#00FF00"},--火把---大明宮
     {dwID=5084,col="#FFFF00FF",szReminder="牢",nPriority=6,bAttention=true},--牢籠被鎖---南詔皇宮
     {dwID=5081},--魁龍氣---南詔皇宮
     {dwID=5096,nLevel=2,col="#FF3232FF",szReminder="精",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--精確射殺---南詔皇宮
@@ -310,5 +310,5 @@ data = {
     {dwID=9744},--朝聖---明教
     {dwID=9745},--朝聖---明教
     {dwID=4244},--渡厄---明教
-    --【南宮伯是帥咩】更新日期1003
+    --【南宮伯是帥咩】更新日期1017
 }
