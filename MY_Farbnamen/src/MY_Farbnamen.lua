@@ -23,7 +23,7 @@ local DBI_RI = DB:Prepare('SELECT id, name, force, role, level, title, camp, ton
 local DBI_RN = DB:Prepare('SELECT id, name, force, role, level, title, camp, tong FROM InfoCache WHERE name = ?')
 DB:Execute('CREATE TABLE IF NOT EXISTS TongCache (id INTEGER PRIMARY KEY, name VARCHAR(20))')
 local DBT_W  = DB:Prepare('REPLACE INTO TongCache (id, name) VALUES (?, ?)')
-local DBT_RI = DB:Prepare('SELECT id, name FROM InfoCache WHERE id = ?')
+local DBT_RI = DB:Prepare('SELECT id, name FROM TongCache WHERE id = ?')
 
 MY_Farbnamen = MY_Farbnamen or {
 	bEnabled = true,
