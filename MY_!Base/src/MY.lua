@@ -118,6 +118,26 @@ local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 ---------------------------------------------------------------------------------------------
+local function Get(var, keys, dft)
+	if type(keys) == 'string' then
+		local ks = {}
+		for k in string.gmatch(keys, '[^%.]+') do
+			insert(ak, k)
+		end
+		keys = ks
+	end
+	if type(keys) == 'table' then
+		for _, k in ipairs(keys) do
+			if type(var) == 'table' then
+				var = var[k]
+			else
+				var = dft
+				break
+			end
+		end
+	end
+	return var
+end
 local function IsEmpty(var)
 	local szType = type(var)
 	if szType == 'nil' then
@@ -152,6 +172,7 @@ local function IsBoolean (var) return type(var) == 'boolean'  end
 local function IsFunction(var) return type(var) == 'function' end
 ---------------------------------------------------------------------------------------------
 MY = {}
+MY.Get = Get
 MY.IsNil, MY.IsBoolean, MY.IsEmpty, MY.RandomChild = IsNil, IsBoolean, IsEmpty, RandomChild
 MY.IsNumber, MY.IsString, MY.IsTable, MY.IsFunction = IsNumber, IsString, IsTable, IsFunction
 ---------------------------------------------------------------------------------------------
