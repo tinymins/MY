@@ -11,8 +11,7 @@ local tinsert, tconcat, tremove = table.insert, table.concat, table.remove
 -- 设置和数据
 ---------------------------------------------------------------
 MY.CreateDataRoot(MY_DATA_PATH.SERVER)
-local SZ_DB_PATH = MY.FormatPath({'cache/player_info.db', MY_DATA_PATH.SERVER})
-local DB = SQLite3_Open(SZ_DB_PATH)
+local DB = MY.ConnectDatabase(_L['MY_Farbnamen'], {'cache/player_info.v2.db', MY_DATA_PATH.SERVER})
 if not DB then
 	return MY.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L['MY_Farbnamen'])
 end

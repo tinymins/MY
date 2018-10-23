@@ -89,7 +89,7 @@ local MSGTYPE_COLOR = setmetatable({
 	['MSG_MY_MONITOR'] = {255, 255, 0},
 }, {__index = function(t, k) return GetMsgFontColor(k, true) end})
 
-local DB, InitDB, InsertMsg, DeleteMsg, PushDB, GetChatLogCount, GetChatLog, OptimizeDB, FixSearchDB, ImportDB
+local DB, ConnectDB, InsertMsg, DeleteMsg, PushDB, GetChatLogCount, GetChatLog, OptimizeDB, FixSearchDB, ImportDB
 do
 local STMT = {}
 local l_globalid
@@ -136,66 +136,12 @@ local function CreateTable()
 	return name
 end
 
-function InitDB(force)
-	if DB and l_initialized then
-		return true
-	end
-	local DB_PATH = MY.FormatPath({'userdata/chat_log.db', MY_DATA_PATH.ROLE})
-	local SZ_OLD_PATH = MY.FormatPath('userdata/CHAT_LOG/$uid.db')
-	if IsLocalFileExist(SZ_OLD_PATH) then
-		CPath.Move(SZ_OLD_PATH, DB_PATH)
-	end
-	if not DB then
-		DB = SQLite3_Open(DB_PATH)
-	end
-	if not DB then
-		return MY.Debug({'Cannot connect to database!!!'}, 'MY_ChatLog', MY_DEBUG.ERROR) and false
-	end
+local function InitDB(force)
 	MY.Debug({'Initializing database...'}, 'MY_ChatLog', MY_DEBUG.LOG)
 
 	-- 数据库写入基本信息
 	DB:Execute('CREATE TABLE IF NOT EXISTS ChatLogInfo (key NVARCHAR(128), value NVARCHAR(4096), PRIMARY KEY (key))')
 	DB:Execute('REPLACE INTO ChatLogInfo (key, value) VALUES (\'userguid\', \'' .. l_globalid .. '\')')
-
-	-- 测试数据库完整性
-	do local testvalue = 'testmalformed_' .. GetCurrentTime()
-		DB:Execute('CREATE TABLE ' .. testvalue .. '(a)')
-		local result = DB:Execute('SELECT * FROM ' .. testvalue .. ' LIMIT 1')
-		DB:Execute('DROP TABLE IF EXISTS ' .. testvalue)
-		if not result then
-			MY.Debug({'Malformed database detected...'}, 'MY_ChatLog', MY_DEBUG.LOG)
-			if not force then
-				MY.Confirm(_L['Database is malformed, do you want to repair database now? Repair database may take a long time and cause a disconnection.'], function()
-					MY.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
-						InitDB(true)
-						MY.Alert(_L['Fix finished!'])
-					end)
-				end)
-				return false
-			else
-				MY.Debug({'Fixing malformed database...'}, 'MY_ChatLog', MY_DEBUG.LOG)
-				DB:Release()
-				DB = nil
-				local i = 0
-				local MALFORMED_DB_PATH
-				repeat
-					MALFORMED_DB_PATH = DB_PATH .. '.' .. i ..  '.malformed'
-					i = i + 1
-				until not IsLocalFileExist(MALFORMED_DB_PATH)
-				CPath.Move(DB_PATH, MALFORMED_DB_PATH)
-				if not IsLocalFileExist(MALFORMED_DB_PATH) then
-					MY.Debug({'Fixing malformed database failed... Move file failed...'}, 'MY_ChatLog', MY_DEBUG.LOG)
-					MY.Alert(_L('Database file locked, repair database failed! : %s -> %s', DB_PATH, MALFORMED_DB_PATH))
-					return false
-				end
-				local ret = InitDB(true)
-				ImportDB(MALFORMED_DB_PATH)
-				CPath.DelFile(MALFORMED_DB_PATH)
-				MY.Debug({'Fixing malformed database finished...'}, 'MY_ChatLog', MY_DEBUG.LOG)
-				return ret
-			end
-		end
-	end
 
 	-- 初始化聊天记录索引表
 	if DB:Execute('SELECT count(*) AS count FROM sqlite_master WHERE type = \'table\' AND name = \'ChatLogIndex\'')[1].count == 0 then
@@ -208,15 +154,14 @@ function InitDB(force)
 			else
 				local result = DB:Execute('SELECT count(*) AS count FROM ChatLog')
 				if result and result[1] and result[1].count then
-					_L('You have %d chatlogs requires to be transformed before use ChatLog, this may take a few minutes and may cause a disconnection, continue?', result[1].count)
+					confirmtext = _L('You have %d chatlogs requires to be transformed before use ChatLog, this may take a few minutes and may cause a disconnection, continue?', result[1].count)
 				end
 			end
 			if confirmtext then
 				MY.Confirm(confirmtext, function()
 					OptimizeDB(true)
 				end)
-				MY.Debug({'Initializing database performance alert...'}, 'MY_ChatLog', MY_DEBUG.LOG)
-				return false
+				return MY.Debug({'Initializing database performance alert...'}, 'MY_ChatLog', MY_DEBUG.LOG)
 			end
 		end
 		-- 开始初始化
@@ -284,11 +229,30 @@ function InitDB(force)
 		CPath.DelDir(SZ_OLD_PATH)
 		MY.Debug({'Importing old data finished...'}, 'MY_ChatLog', MY_DEBUG.LOG)
 	end
-	return true
+end
+
+function ConnectDB(force)
+	if not DB then
+		local DB_PATH = MY.FormatPath({'userdata/chat_log.db', MY_DATA_PATH.ROLE})
+		local SZ_OLD_PATH = MY.FormatPath('userdata/CHAT_LOG/$uid.db')
+		if IsLocalFileExist(SZ_OLD_PATH) then
+			CPath.Move(SZ_OLD_PATH, DB_PATH)
+		end
+		MY.ConnectDatabase(_L['chat log'], DB_PATH, function(arg0)
+			DB = arg0
+			if not DB then
+				return MY.Debug({'Cannot connect to database!!!'}, 'MY_ChatLog', MY_DEBUG.ERROR)
+			end
+			InitDB(force)
+		end)
+	elseif not l_initialized then
+		InitDB(force)
+	end
+	return l_initialized
 end
 
 function ImportDB(file)
-	if not (IsLocalFileExist(file) and InitDB(true)) then
+	if not (IsLocalFileExist(file) and ConnectDB(true)) then
 		return
 	end
 	local amount, count = 0
@@ -310,7 +274,7 @@ function ImportDB(file)
 end
 
 function FixSearchDB(deep)
-	if not InitDB(true) then
+	if not ConnectDB(true) then
 		return
 	end
 	MY.Debug({'Fixing chatlog search indexes...'}, 'MY_ChatLog', MY_DEBUG.LOG)
@@ -333,7 +297,7 @@ function FixSearchDB(deep)
 end
 
 function OptimizeDB(deep)
-	if not InitDB(true) then
+	if not ConnectDB(true) then
 		return
 	end
 	DB:Execute('BEGIN TRANSACTION')
@@ -420,7 +384,7 @@ end
 function PushDB()
 	if #aInsQueue == 0 and #aDelQueue == 0 then
 		return MY.Debug({'Pushing to database skipped due to empty queue...'}, 'MY_ChatLog', MY_DEBUG.LOG)
-	elseif not InitDB() then
+	elseif not ConnectDB() then
 		return MY.Debug({'Database has not been initialized yet, PushDB failed.'}, 'MY_ChatLog', MY_DEBUG.ERROR)
 	end
 	MY.Debug({'Pushing to database...'}, 'MY_ChatLog', MY_DEBUG.LOG)
@@ -628,7 +592,7 @@ end
 MY.RegisterInit('MY_ChatLog_InitMon', InitMsgMon)
 
 local function ReleaseDB()
-	if not InitDB(true) then
+	if not ConnectDB(true) then
 		return
 	end
 	PushDB()
@@ -640,7 +604,7 @@ MY.RegisterEvent('DISCONNECT.MY_Chat_Release', ReleaseDB)
 end
 
 function MY_ChatLog.Open()
-	if not InitDB() then
+	if not ConnectDB() then
 		return
 	end
 	Wnd.OpenWindow(SZ_INI, 'MY_ChatLog'):BringToTop()
@@ -1189,7 +1153,7 @@ function MY_ChatLog.Export(szExportFile, aChannels, nPerSec, onProgress)
 	if l_bExporting then
 		return MY.Sysmsg({_L['Already exporting, please wait.']})
 	end
-	if not InitDB(true) then
+	if not ConnectDB(true) then
 		return
 	end
 	if onProgress then

@@ -10,8 +10,7 @@
 MY.CreateDataRoot(MY_DATA_PATH.GLOBAL)
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_MiddleMapMark/lang/')
 local l_szKeyword, l_dwMapID, l_nMapIndex = ''
-local SZ_DB_PATH = MY.FormatPath({'cache/npc_doodad_rec.v2.db', MY_DATA_PATH.GLOBAL})
-local DB = SQLite3_Open(SZ_DB_PATH)
+local DB = MY.ConnectDatabase(_L['MY_MiddleMapMark'], {'cache/npc_doodad_rec.v2.db', MY_DATA_PATH.GLOBAL})
 if not DB then
 	return MY.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L['MY_MiddleMapMark'])
 end

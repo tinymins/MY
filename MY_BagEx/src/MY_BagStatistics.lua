@@ -21,7 +21,7 @@ local GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID = 
 local setmetatable = setmetatable
 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_BagEx/lang/')
-local DB = SQLite3_Open(MY.FormatPath({'userdata/bagstatistics.db', MY_DATA_PATH.GLOBAL}))
+local DB = MY.ConnectDatabase(_L['MY_BagStatistics'], {'userdata/bagstatistics.db', MY_DATA_PATH.GLOBAL})
 if not DB then
 	return MY.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L['MY_BagStatistics'])
 end
