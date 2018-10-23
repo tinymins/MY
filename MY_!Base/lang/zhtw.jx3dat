@@ -374,4 +374,10 @@ data = {
 	['Anonymous'] = '匿名俠士',
 	['JX3 is pround of you!'] = '劍網3幸甚有你！',
 	['Thanks for your kindness!'] = '感謝各位無私付出的小可愛！',
+
+
+	['%s Database is malformed, do you want to repair database now? Repair database may take a long time and cause a disconnection.'] = '%s數據庫已損壞，需要修複後方可使用，但是修複可能造成臨時頓卡掉線,是否立即修複？',
+	['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'] = '接下來如有頓卡請耐心等待，不要結束進程，否則您的數據庫可能造成不可逆的數據損壞，點擊確認開始操作。',
+	['Database file locked, repair database failed! : %s'] = '數據庫文件被占用，修複失敗！(%s)',
+	['%s Database repair finished!'] = '%s數據庫修複完成！',
 }

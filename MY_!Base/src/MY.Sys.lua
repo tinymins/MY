@@ -26,6 +26,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local Get = MY.Get
 local IsNil, IsBoolean, IsEmpty, RandomChild = MY.IsNil, MY.IsBoolean, MY.IsEmpty, MY.RandomChild
 local IsNumber, IsString, IsTable, IsFunction = MY.IsNumber, MY.IsString, MY.IsTable, MY.IsFunction
 ---------------------------------------------------------------------------------------------------
@@ -1966,4 +1967,128 @@ end
 
 function MY.GetFontScale(nOffset)
 	return 1 + (nOffset or Font.GetOffset()) * 0.07
+end
+
+do
+local function RenameDatabase(szCaption, szPath)
+	local i = 0
+	local szMalformedPath
+	repeat
+		szMalformedPath = szPath .. '.' .. i ..  '.malformed'
+		i = i + 1
+	until not IsLocalFileExist(szMalformedPath)
+	CPath.Move(szPath, szMalformedPath)
+	if not IsLocalFileExist(szMalformedPath) then
+		return
+	end
+	return szMalformedPath
+end
+
+local function DuplicateDatabase(DB_SRC, DB_DST)
+	MY.Debug({'Duplicate database start.'}, szCaption, MY_DEBUG.LOG)
+	-- 运行 DDL 语句 创建表和索引等
+	for _, rec in ipairs(DB_SRC:Execute('SELECT sql FROM sqlite_master')) do
+		DB_DST:Execute(rec.sql)
+		MY.Debug({'Duplicating database: ' .. rec.sql}, szCaption, MY_DEBUG.LOG)
+	end
+	-- 读取表名 依次复制
+	for _, rec in ipairs(DB_SRC:Execute('SELECT name FROM sqlite_master WHERE type=\'table\'')) do
+		-- 读取列名
+		local szTableName, aColumns, aPlaceholders = rec.name, {}, {}
+		for _, rec in ipairs(DB_SRC:Execute('PRAGMA table_info(' .. szTableName .. ')')) do
+			insert(aColumns, rec.name)
+			insert(aPlaceholders, '?')
+		end
+		local szColumns, szPlaceholders = concat(aColumns, ', '), concat(aPlaceholders, ', ')
+		local nCount, nPageSize = Get(DB_SRC:Execute('SELECT COUNT(*) AS count FROM ' .. szTableName), {1, 'count'}, 0), 10000
+		local DB_W = DB_DST:Prepare('REPLACE INTO ' .. szTableName .. ' (' .. szColumns .. ') VALUES (' .. szPlaceholders .. ')')
+		MY.Debug({'Duplicating table: ' .. szTableName .. ' (cols)' .. szColumns .. ' (count)' .. nCount}, szCaption, MY_DEBUG.LOG)
+		-- 开始读取和写入数据
+		DB_DST:Execute('BEGIN TRANSACTION')
+		for i = 0, nCount / nPageSize do
+			for _, rec in ipairs(DB_SRC:Execute('SELECT ' .. szColumns .. ' FROM ' .. szTableName .. ' LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))) do
+				local aVals = {}
+				for i, szKey in ipairs(aColumns) do
+					aVals[i] = rec[szKey]
+				end
+				DB_W:ClearBindings()
+				DB_W:BindAll(unpack(aVals))
+				DB_W:Execute()
+			end
+		end
+		DB_DST:Execute('END TRANSACTION')
+		MY.Debug({'Duplicating table finished: ' .. szTableName}, szCaption, MY_DEBUG.LOG)
+	end
+end
+
+local function ConnectMalformedDatabase(szCaption, szPath, bAlert)
+	MY.Debug({'Fixing malformed database...'}, szCaption, MY_DEBUG.LOG)
+	local szMalformedPath = RenameDatabase(szCaption, szPath)
+	if not szMalformedPath then
+		MY.Debug({'Fixing malformed database failed... Move file failed...'}, szCaption, MY_DEBUG.LOG)
+		return 'FILE_LOCKED'
+	else
+		local DB_DST = SQLite3_Open(szPath)
+		local DB_SRC = SQLite3_Open(szMalformedPath)
+		if DB_DST and DB_SRC then
+			DuplicateDatabase(DB_SRC, DB_DST)
+			DB_SRC:Release()
+			CPath.DelFile(szMalformedPath)
+			MY.Debug({'Fixing malformed database finished...'}, szCaption, MY_DEBUG.LOG)
+			return 'SUCCESS', DB_DST
+		elseif not DB_SRC then
+			MY.Debug({'Connect malformed database failed...'}, szCaption, MY_DEBUG.LOG)
+			return 'TRANSFER_FAILED', DB_DST
+		end
+	end
+end
+
+function MY.ConnectDatabase(szCaption, oPath, fnAction)
+	-- 尝试连接数据库
+	local szPath = MY.FormatPath(oPath)
+	MY.Debug({'Connect database: ' .. szPath}, szCaption, MY_DEBUG.LOG)
+	local DB = SQLite3_Open(szPath)
+	if not DB then
+		-- 连不上直接重命名原始文件并重新连接
+		if IsLocalFileExist(szPath) and RenameDatabase(szCaption, szPath) then
+			DB = SQLite3_Open(szPath)
+		end
+		if not DB then
+			MY.Debug({'Cannot connect to database!!!'}, szCaption, MY_DEBUG.ERROR)
+			if fnAction then
+				fnAction()
+			end
+			return
+		end
+	end
+
+	-- 测试数据库完整性
+	local szTest = 'testmalformed_' .. GetCurrentTime()
+	DB:Execute('CREATE TABLE ' .. szTest .. '(a)')
+	if DB:Execute('SELECT * FROM ' .. szTest .. ' LIMIT 1') then
+		DB:Execute('DROP TABLE IF EXISTS ' .. szTest)
+		if fnAction then
+			fnAction(DB)
+		end
+		return DB
+	else
+		MY.Debug({'Malformed database detected...'}, szCaption, MY_DEBUG.LOG)
+		DB:Release()
+		if fnAction then
+			MY.Confirm(_L('%s Database is malformed, do you want to repair database now? Repair database may take a long time and cause a disconnection.', szCaption), function()
+				MY.Confirm(_L['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'], function()
+					local szStatus, DB = ConnectMalformedDatabase(szCaption, szPath)
+					if szStatus == 'FILE_LOCKED' then
+						MY.Alert(_L('Database file locked, repair database failed! : %s', szPath))
+					else
+						MY.Alert(_L('%s Database repair finished!', szCaption))
+					end
+					fnAction(DB)
+				end)
+			end)
+		else
+			return select(2, ConnectMalformedDatabase(szCaption, szPath))
+		end
+	end
+end
 end
