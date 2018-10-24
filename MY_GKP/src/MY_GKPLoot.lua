@@ -1,7 +1,11 @@
--- @Author: Webster
--- @Date:   2016-01-20 09:31:57
--- @Last Modified by:   Administrator
--- @Last Modified time: 2016-12-13 01:08:57
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 金团记录 拾取界面
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local insert, remove, concat = table.insert, table.remove, table.concat

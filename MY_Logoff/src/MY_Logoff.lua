@@ -1,11 +1,11 @@
---
--- 快速登出
--- by 茗伊 @ 双梦镇 @ 荻花宫
--- Build 20140411
---
--- 主要功能:
--- 1.指定条件退队/下线
---
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 快速登出 指定条件退队/下线
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Logoff/lang/')
 
 MY_Logoff = {}

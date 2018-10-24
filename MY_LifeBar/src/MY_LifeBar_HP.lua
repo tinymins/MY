@@ -1,12 +1,11 @@
---------------------------------------------
--- @Desc  : 扁平血条UI操作类
---          只做UI操作 不做任何逻辑判断
--- @Author: 茗伊 @tinymins
--- @Date  : 2015-03-02 10:08:35
--- @Email : admin@derzh.com
--- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-05-31 11:13:06
---------------------------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 扁平血条UI操作类 只做UI操作 不做任何逻辑判断
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort

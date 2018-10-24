@@ -1,11 +1,11 @@
------------------------------------------------
--- @Desc  : 键值对文件分隔快速存储模块
--- @Author: 茗伊 @双梦镇 @追风蹑影
--- @Date  : 2015-11-3 16:24:28
--- @Email : admin@derzh.com
--- @Last Modified by:   茗伊 @tinymins
--- @Last Modified time: 2015-11-3 16:24:40
------------------------------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 键值对文件分隔快速存储模块
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 local tconcat = table.concat
 local tremove = table.remove
 local tinsert = table.insert

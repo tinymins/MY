@@ -1,12 +1,11 @@
------------------------------------------------
--- @Desc  : 中地图标记
---  记录所有NPC和Doodad位置 提供搜索和显示
--- @Author: 茗伊 @ 双梦镇 @ 荻花宫
--- @Date  : 2014-12-04 11:51:31
--- @Email : admin@derzh.com
--- @Last modified by:   tinymins
--- @Last modified time: 2017-02-08 17:59:40
------------------------------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 中地图标记 记录所有NPC和Doodad位置 提供搜索
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 MY.CreateDataRoot(MY_DATA_PATH.GLOBAL)
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_MiddleMapMark/lang/')
 local l_szKeyword, l_dwMapID, l_nMapIndex = ''

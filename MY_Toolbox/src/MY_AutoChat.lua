@@ -1,11 +1,11 @@
---------------------------------------------
--- @Desc  : 自动对话（for 台服）
--- @Author: 茗伊 @tinymins
--- @Date  : 2015-03-09 21:26:52
--- @Email : admin@derzh.com
--- @Last modified by:   tinymins
--- @Last modified time: 2016-12-13 14:46:58
---------------------------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 自动对话（for 台服）
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot..'MY_Toolbox/lang/')
 local _C = { Data = {} }
 MY_AutoChat = {}

@@ -1,9 +1,11 @@
----------------------------------------------------
--- @Author: ChenWei-31027
--- @Date:   2015-06-19 16:31:21
--- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-06-24 04:33:46
----------------------------------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 团队工具
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort

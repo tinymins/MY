@@ -1,11 +1,11 @@
---------------------------------------------
--- @Desc  : адлЛещещ
--- @Author: эЬра @tinymins
--- @Date  : 2016-02-5 11:35:53
--- @Email : admin@derzh.com
--- @Last modified by:   tinymins
--- @Last modified time: 2016-11-11 10:04:55
---------------------------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : адлЛещещ
+-- @author   : эЬра @к╚цнуР @в╥╥ГУФс╟
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Chat/ui/MY_TeamBalloon.ini'
 local DISPLAY_TIME = 5000
 local ANIMATE_SHOW_TIME = 500

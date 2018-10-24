@@ -1,9 +1,11 @@
----------------------------------------------------
--- @Author: Emil Zhai (root@derzh.com)
--- @Date:   2018-02-02 10:28:37
--- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-10 02:54:14
----------------------------------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 金团记录 发放投票相关
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort

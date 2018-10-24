@@ -1,9 +1,11 @@
----------------------------------------------------
--- @Author: Emil Zhai (root@derzh.com)
--- @Date:   2018-02-08 16:49:55
--- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-02-08 17:05:32
----------------------------------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 团队工具界面
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TeamTools/lang/')
 local PS = {}
 function PS.OnPanelActive(wnd)

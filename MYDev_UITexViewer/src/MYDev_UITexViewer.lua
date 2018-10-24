@@ -1,8 +1,11 @@
---
--- 开发者工具
--- by 茗伊 @ 双梦镇 @ 荻花宫
--- Build 20140730
---
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 开发者工具
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot..'MYDev_UITexViewer/lang/')
 local _Cache = {}
 MYDev_UITexViewer = {}

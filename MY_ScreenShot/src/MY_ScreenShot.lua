@@ -1,8 +1,11 @@
-----------------------------------------------------
--- 茗伊截图助手 ver 0.2 Build 20140717
--- Code by: 茗伊 @tinymins
--- 电五·双梦镇·茗伊
----------------------------------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 截图助手
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 local _GLOBAL_CONFIG_ = {'config/screenshot.jx3dat', MY_DATA_PATH.GLOBAL}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_ScreenShot/lang/')
 local _MY_ScreenShot = {}

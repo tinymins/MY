@@ -1,12 +1,11 @@
---------------------------------------------
--- @Desc  : 茗伊插件兼容性全局函数
--- @Author: 茗伊 @双梦镇 @追风蹑影
--- @Date  : 2014-11-24 08:40:30
--- @Email : admin@derzh.com
--- @Last modified by:   tinymins
--- @Last modified time: 2017-01-24 15:44:51
--- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
---------------------------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 茗伊插件兼容性全局函数
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 EMPTY_TABLE = SetmetaReadonly({})
 XML_LINE_BREAKER = GetFormatText('\n')
 MENU_DIVIDER = { bDevide = true }

@@ -1,12 +1,11 @@
---------------------------------------------
--- @Desc  : 茗伊插件 - 字符串处理
--- @Author: 茗伊 @双梦镇 @追风蹑影
--- @Date  : 2015-01-25 15:35:26
--- @Email : admin@derzh.com
--- @Last modified by:   tinymins
--- @Last modified time: 2016-09-22 11:58:22
--- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
---------------------------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 字符串处理
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort

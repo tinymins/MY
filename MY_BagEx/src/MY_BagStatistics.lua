@@ -1,11 +1,11 @@
---
--- @Author: tinymins
--- @Date:   2017-01-22 18:30:42
--- @Email:  root@derzh.com
--- @Project: JX3 UI
--- @Last modified by:   tinymins
--- @Last modified time: 2017-05-18 15:27:52
---
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 背包统计
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 MY.CreateDataRoot(MY_DATA_PATH.GLOBAL)

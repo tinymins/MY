@@ -1,11 +1,11 @@
---------------------------------------------
--- @Desc  : 技能显示 - 战斗可视化
--- @Author: 茗伊 @tinymins
--- @Date  : 2015-03-02 10:08:45
--- @Email : admin@derzh.com
--- @Last modified by:   tinymins
--- @Last modified time: 2017-05-06 02:52:18
---------------------------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 技能显示 - 战斗可视化
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot..'MY_Toolbox/lang/')
 local _C = {}
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_ToolBox/ui/MY_VisualSkill.ini'

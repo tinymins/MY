@@ -1,15 +1,11 @@
---------------------------------------------
--- @File  : MY_ChatMosaics.lua
--- @Desc  : 聊天栏姓名一键打码
--- @Author: 茗伊 (tinymins) @ derzh.com
--- @Date  : 2015-05-21 10:34:08
--- @Email : admin@derzh.com
--- @Last modified by:   tinymins
--- @Last modified time: 2016-11-11 10:04:36
--- @Version: 1.0
--- @ChangeLog:
---  + v1.0 File founded. -- via茗伊
---------------------------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 聊天栏姓名一键打码
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 MY_ChatMosaics = {}
 local _C = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Chat/lang/')

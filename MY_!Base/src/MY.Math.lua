@@ -1,12 +1,11 @@
---------------------------------------------
--- @Desc  : 茗伊插件 - 数学库
--- @Author: 茗伊 @双梦镇 @追风蹑影
--- @Date  : 2015-02-15 09:36:13
--- @Email : admin@derzh.com
--- @Last Modified by:   茗伊 @tinymins
--- @Last Modified time: 2016-02-02 16:47:28
--- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
---------------------------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 数学库
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 MY = MY or {}
 MY.Math = MY.Math or {}
 local _C = {}

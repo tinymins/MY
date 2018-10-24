@@ -1,11 +1,11 @@
---------------------------------------------
--- @Desc  : 我的装备一览
--- @Author: 茗伊 @tinymins
--- @Date  : 2015-4-20 09:04:25
--- @Email : admin@derzh.com
--- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-05-31 10:12:13
---------------------------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 我的装备一览
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 local _C = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_EquipView/lang/')
 

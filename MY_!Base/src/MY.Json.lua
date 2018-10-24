@@ -1,3 +1,11 @@
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : Json 处理模块
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 ---------------------------------------------------------------------------
 -- local lua_value = MY.Json.Decode(raw_json_text)
 -- local raw_json_text = MY.Json.Encode(lua_table_or_value)

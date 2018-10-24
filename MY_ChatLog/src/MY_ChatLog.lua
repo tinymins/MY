@@ -1,10 +1,11 @@
---
--- 聊天记录
--- 记录团队/好友/帮会/密聊 供日后查询
--- 作者：茗伊 @ tinymins
--- 网站：jx3.derzh.com
---
-
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 聊天记录 记录团队/好友/帮会/密聊 供日后查询
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
 local XML_LINE_BREAKER = XML_LINE_BREAKER

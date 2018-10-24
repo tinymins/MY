@@ -1,8 +1,11 @@
--------------------------
--- 弧形血条 -- 重构
--- By 茗伊@双梦镇@荻花宫
--- 2015-12-11 09:54:01
--------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 弧形血条 -- 重构
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_ArchHUD/lang/')
 local DefaultAnchor = {s = 'CENTER', r = 'CENTER',  x = 0, y = 0}
 MY_ArchHUD = {}

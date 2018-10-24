@@ -1,11 +1,11 @@
---------------------------------------------
--- @Desc  : 聊天频道切换
--- @Author: 茗伊 @tinymins
--- @Date  : 2016-02-5 11:35:53
--- @Email : admin@derzh.com
--- @Last modified by:   tinymins
--- @Last modified time: 2017-02-08 20:25:53
---------------------------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 聊天频道切换
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Chat/lang/')
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Chat/ui/MY_ChatSwitch.ini'
 local CD_REFRESH_OFFSET = 7 * 60 * 60 -- 7点更新CD

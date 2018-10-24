@@ -1,8 +1,11 @@
---
--- 自动隐藏聊天栏
--- by 茗伊 @ 双梦镇 @ 荻花宫
--- Build 20150105
---
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 自动隐藏聊天栏
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 local STATE = {
     SHOW    = 1, -- 已显示
     HIDE    = 2, -- 已隐藏

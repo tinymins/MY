@@ -1,11 +1,11 @@
------------------------------------------------
--- @Desc  : 角色小本本
--- @Author: 茗伊 @tinymins
--- @Date  : 2014-11-25 12:31:03
--- @Email : admin@derzh.com
--- @Last modified by:   tinymins
--- @Last modified time: 2016-12-13 15:23:48
------------------------------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 角色小本本
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Toolbox/lang/')
 local _C = {}
 local PUBLIC_PLAYER_IDS = {}

@@ -1,8 +1,11 @@
--- @Author: Webster
--- @Date:   2015-12-06 02:44:30
--- @Last Modified by:   William Chan
--- @Last Modified time: 2017-04-21 15:32:37
-
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 战斗浮动文字
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 -- 战斗浮动文字设计思路
 --[[
 	停留时间：使用（总帧数 * 每帧时间）来决定总停留时间，

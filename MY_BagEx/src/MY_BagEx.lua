@@ -1,11 +1,11 @@
------------------------------------------------
--- @Desc  : 仓库背包增强（搜索/对比）
--- @Author: 茗伊 @tinymins
--- @Date  : 2014-11-25 10:40:14
--- @Email : admin@derzh.com
--- @Last modified by:   tinymins
--- @Last modified time: 2017-01-23 11:18:00
------------------------------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 仓库背包增强（搜索/对比）
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_BagEx/lang/')
 
 MY_BagEx = {}

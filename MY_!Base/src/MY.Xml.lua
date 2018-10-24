@@ -1,8 +1,12 @@
 ---------------------------------------------------------
--- Simple JX3 XML decoding and encoding in pure Lua.
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : XML 处理函数库
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 ---------------------------------------------------------
--- @author 茗伊 @tinymins
--- @refer http://jx3.derzh.com/
+-- Simple JX3 XML decoding and encoding in pure Lua.
 ---------------------------------------------------------
 -- local lua_value = MY.Xml.Decode(raw_xml_text)
 -- local raw_xml_text = MY.Xml.Encode(lua_table_or_value)

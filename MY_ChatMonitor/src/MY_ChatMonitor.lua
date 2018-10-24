@@ -1,10 +1,11 @@
---
--- 聊天监控
--- by 茗伊 @ 双梦镇 @ 荻花宫
--- Build 20140411
---
--- 主要功能: 按关键字过滤获取聊天消息
---
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 聊天监控 按关键字过滤获取聊天消息
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 --[[
     RECORD_LIST = {
         -- （数组部分）监控记录

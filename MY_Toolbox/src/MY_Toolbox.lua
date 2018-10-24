@@ -1,11 +1,11 @@
------------------------------------------------
--- @Desc  : 茗伊插件 - 常用工具
--- @Author: 茗伊 @ 双梦镇 @ 荻花宫
--- @Date  : 2014-05-10 08:40:30
--- @Email : admin@derzh.com
--- @Last modified by:   tinymins
--- @Last modified time: 2017-05-08 17:30:11
------------------------------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 常用工具
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot..'MY_Toolbox/lang/')
 local _C = {}
 MY_ToolBox = {}

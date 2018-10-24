@@ -1,15 +1,11 @@
---------------------------------------------
--- @File  : MY_TalkEx.lua
--- @Desc  : º°»°¸¨Öú
--- @Author: ÜøÒÁ (tinymins) @ derzh.com
--- @Date  : 2015-05-18 10:30:29
--- @Email : admin@derzh.com
--- @Last modified by:   tinymins
--- @Last modified time: 2016-11-11 10:06:00
--- @Version: 1.0
--- @ChangeLog:
---  + v1.0 File founded. -- viaÜøÒÁ
---------------------------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : º°»°¸¨Öú
+-- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 MY_TalkEx = MY_TalkEx or {}
 local _C = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TalkEx/lang/')

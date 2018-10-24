@@ -1,11 +1,11 @@
------------------------------------------------
--- @Desc  : 科举助手 (台服用)
--- @Author: 茗伊 @ 双梦镇 @ 荻花宫
--- @Date  : 2014-07-30 09:21:13
--- @Email : admin@derzh.com
--- @Last modified by:   tinymins
--- @Last modified time: 2016-12-13 14:49:52
------------------------------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 科举助手 (台服用)
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Toolbox/lang/')
 local QUERY_URL = 'http://data.jx3.derzh.com/api/exam?l=%s&q=%s'
 local SUBMIT_URL = 'http://data.jx3.derzh.com/api/exam'

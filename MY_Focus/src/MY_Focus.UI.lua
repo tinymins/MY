@@ -1,11 +1,11 @@
---------------------------------------------
--- @Desc  : 焦点列表
--- @Author: 茗伊 @ 双梦镇 @ 荻花宫
--- @Date  : 2014-07-30 19:22:10
--- @Email : admin@derzh.com
--- @Last modified by:   tinymins
--- @Last modified time: 2017-05-27 10:59:42
---------------------------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 焦点列表
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 -----------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort

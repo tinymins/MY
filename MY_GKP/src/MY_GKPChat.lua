@@ -1,7 +1,11 @@
--- @Author: Webster
--- @Date:   2016-01-20 06:22:04
--- @Last Modified by:   Administrator
--- @Last Modified time: 2016-12-13 01:08:50
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 金团记录
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 local PATH_ROOT = MY.GetAddonInfo().szRoot .. 'MY_GKP/'
 local _L = MY.LoadLangPack(PATH_ROOT .. 'lang/')
 

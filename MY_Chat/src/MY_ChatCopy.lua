@@ -1,11 +1,11 @@
---------------------------------------------
--- @Desc  : ÁÄÌì¸¨Öú
--- @Author: ÜøÒÁ @tinymins
--- @Date  : 2016-02-5 11:35:53
--- @Email : admin@derzh.com
--- @Last modified by:   tinymins
--- @Last modified time: 2016-12-13 10:40:35
---------------------------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : ÁÄÌì¸¨Öú
+-- @author   : ÜøÒÁ @Ë«ÃÎÕò @×··çõæÓ°
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_ChatCopy/lang/')
 MY_ChatCopy = {}
 MY_ChatCopy.bChatCopy = true

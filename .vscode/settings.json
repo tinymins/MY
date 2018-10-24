@@ -6,5 +6,34 @@
   "files.eol": "\n",
   "files.trimTrailingWhitespace": true,
   "files.trimFinalNewlines": true,
-  "lua.targetVersion": "5.1"
+  "lua.targetVersion": "5.1",
+  "psi-header.changes-tracking": {
+    "isActive": true,
+    "exclude": [
+      "markdown",
+      "json",
+      "html",
+      "vue",
+      "jx3dat"
+    ],
+    "autoHeader": "off"
+  },
+  "psi-header.lang-config": [{
+    "language": "lua",
+    "begin": "--------------------------------------------------------",
+    "prefix": "-- ",
+    "end": "--------------------------------------------------------",
+    "blankLinesAfter": 0
+  }],
+  "psi-header.templates": [{
+    "language": "*",
+    "template": [
+      "This file is part of the JX3 Mingyi Plugin.",
+      "@link     : https://jx3.derzh.com/",
+      "@desc     : ",
+      "@author   : 茗伊 @双梦镇 @追风蹑影",
+      "@modifier : <<author>> (<<authoremail>>)",
+      "@copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.",
+    ]
+  }],
 }

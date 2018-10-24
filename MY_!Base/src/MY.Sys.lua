@@ -1,12 +1,11 @@
---------------------------------------------
--- @Desc  : 茗伊插件 - 系统函数库
--- @Author: 茗伊 @双梦镇 @追风蹑影
--- @Date  : 2014-12-17 17:24:48
--- @Email : admin@derzh.com
--- @Last modified by:   tinymins
--- @Last modified time: 2017-02-08 17:56:29
--- @Ref: 借鉴大量海鳗源码 @haimanchajian.com
---------------------------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 系统函数库
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort

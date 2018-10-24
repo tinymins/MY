@@ -1,11 +1,11 @@
---------------------------------------------
--- @Desc  : UI事件ID计算
--- @Author: 茗伊 @tinymins
--- @Date  : 2015-02-28 17:37:53
--- @Email : admin@derzh.com
--- @Last modified by:   tinymins
--- @Last modified time: 2017-01-05 18:25:03
---------------------------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 变量监控
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 local _C = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MYDev_VarWatch/lang/')
 local XML_LINE_BREAKER = XML_LINE_BREAKER

@@ -1,9 +1,11 @@
----------------------------------------------------
--- @Author: Emil Zhai (root@derzh.com)
--- @Date:   2018-02-08 10:06:25
--- @Last Modified by:   Emil Zhai (root@derzh.com)
--- @Last Modified time: 2018-07-27 16:23:18
----------------------------------------------------
+--------------------------------------------------------
+-- This file is part of the JX3 Mingyi Plugin.
+-- @link     : https://jx3.derzh.com/
+-- @desc     : 扁平血条
+-- @author   : 茗伊 @双梦镇 @追风蹑影
+-- @modifier : Emil Zhai (root@derzh.com)
+-- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
+--------------------------------------------------------
 ---------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
