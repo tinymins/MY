@@ -450,7 +450,7 @@ end
 function MY.AssertVersion(szKey, szCaption, dwMinVersion)
 	if _VERSION_ < dwMinVersion then
 		MY.Sysmsg({
-			_L('%s requires base library version upper than %s, current at %s.',
+			_L('%s requires base library version upper than v%s, current at v%s.',
 			szCaption, MY.GetVersion(dwMinVersion), MY.GetVersion()
 		)})
 		return false
