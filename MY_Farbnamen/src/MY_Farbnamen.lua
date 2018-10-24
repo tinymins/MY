@@ -3,10 +3,31 @@
 -- By 茗伊@双梦镇@荻花宫
 -- 2014年5月19日05:07:02
 --
+---------------------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+---------------------------------------------------------------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local huge, pi, random = math.huge, math.pi, math.random
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local Get = MY.Get
+local IsNil, IsBoolean, IsEmpty, RandomChild = MY.IsNil, MY.IsBoolean, MY.IsEmpty, MY.RandomChild
+local IsNumber, IsString, IsTable, IsFunction = MY.IsNumber, MY.IsString, MY.IsTable, MY.IsFunction
+---------------------------------------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot..'MY_Farbnamen/lang/')
-local _SUB_ADDON_FOLDER_NAME_ = 'MY_Farbnamen'
 local XML_LINE_BREAKER = XML_LINE_BREAKER
-local tinsert, tconcat, tremove = table.insert, table.concat, table.remove
 ---------------------------------------------------------------
 -- 设置和数据
 ---------------------------------------------------------------
@@ -153,50 +174,50 @@ function MY_Farbnamen.GetTip(szName)
 		local tTip = {}
 		-- author info
 		if tInfo.dwID and tInfo.szName and tInfo.szName == MY.GetAddonInfo().tAuthor[tInfo.dwID] then
-			tinsert(tTip, GetFormatText(_L['mingyi plugins'], 8, 89, 224, 232))
-			tinsert(tTip, GetFormatText(' ', 136, 89, 224, 232))
-			tinsert(tTip, GetFormatText(_L['[author]'], 8, 89, 224, 232))
-			tinsert(tTip, XML_LINE_BREAKER)
+			insert(tTip, GetFormatText(_L['mingyi plugins'], 8, 89, 224, 232))
+			insert(tTip, GetFormatText(' ', 136, 89, 224, 232))
+			insert(tTip, GetFormatText(_L['[author]'], 8, 89, 224, 232))
+			insert(tTip, XML_LINE_BREAKER)
 		end
 		-- 名称 等级
-		tinsert(tTip, GetFormatText(('%s(%d)'):format(tInfo.szName, tInfo.nLevel), 136))
+		insert(tTip, GetFormatText(('%s(%d)'):format(tInfo.szName, tInfo.nLevel), 136))
 		-- 是否同队伍
 		if UI_GetClientPlayerID() ~= tInfo.dwID and MY.IsParty(tInfo.dwID) then
-			tinsert(tTip, GetFormatText(_L['[teammate]'], nil, 0, 255, 0))
+			insert(tTip, GetFormatText(_L['[teammate]'], nil, 0, 255, 0))
 		end
-		tinsert(tTip, XML_LINE_BREAKER)
+		insert(tTip, XML_LINE_BREAKER)
 		-- 称号
 		if tInfo.szTitle and #tInfo.szTitle > 0 then
-			tinsert(tTip, GetFormatText('<' .. tInfo.szTitle .. '>', 136))
-			tinsert(tTip, XML_LINE_BREAKER)
+			insert(tTip, GetFormatText('<' .. tInfo.szTitle .. '>', 136))
+			insert(tTip, XML_LINE_BREAKER)
 		end
 		-- 帮会
 		if tInfo.szTongID and #tInfo.szTongID > 0 then
-			tinsert(tTip, GetFormatText('[' .. tInfo.szTongID .. ']', 136))
-			tinsert(tTip, XML_LINE_BREAKER)
+			insert(tTip, GetFormatText('[' .. tInfo.szTongID .. ']', 136))
+			insert(tTip, XML_LINE_BREAKER)
 		end
 		-- 门派 体型 阵营
-		tinsert(tTip, GetFormatText(
+		insert(tTip, GetFormatText(
 			(_MY_Farbnamen.tForceString[tInfo.dwForceID] or tInfo.dwForceID) .. _L.STR_SPLIT_DOT ..
 			(_MY_Farbnamen.tRoleType[tInfo.nRoleType] or tInfo.nRoleType)    .. _L.STR_SPLIT_DOT ..
 			(_MY_Farbnamen.tCampString[tInfo.nCamp] or tInfo.nCamp), 136
 		))
-		tinsert(tTip, XML_LINE_BREAKER)
+		insert(tTip, XML_LINE_BREAKER)
 		-- 随身便笺
 		if MY_Anmerkungen and MY_Anmerkungen.GetPlayerNote then
 			local note = MY_Anmerkungen.GetPlayerNote(tInfo.dwID)
 			if note and note.szContent ~= '' then
-				tinsert(tTip, GetFormatText(note.szContent, 0))
-				tinsert(tTip, XML_LINE_BREAKER)
+				insert(tTip, GetFormatText(note.szContent, 0))
+				insert(tTip, XML_LINE_BREAKER)
 			end
 		end
 		-- 调试信息
 		if IsCtrlKeyDown() then
-			tinsert(tTip, XML_LINE_BREAKER)
-			tinsert(tTip, GetFormatText(_L('Player ID: %d', tInfo.dwID), 102))
+			insert(tTip, XML_LINE_BREAKER)
+			insert(tTip, GetFormatText(_L('Player ID: %d', tInfo.dwID), 102))
 		end
 		-- 组装Tip
-		return tconcat(tTip)
+		return concat(tTip)
 	end
 end
 
