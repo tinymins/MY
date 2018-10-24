@@ -438,13 +438,25 @@ function MY.IsPanelOpened()
 end
 
 -- (string, number) MY.GetVersion()
-function MY.GetVersion()
-	local szVersion = string.format('%X.%X.%02X', _VERSION_ / 0x1000000,
-		math.floor(_VERSION_ / 0x10000) % 0x100, math.floor(_VERSION_ / 0x100) % 0x100)
-	if  _VERSION_ % 0x100 ~= 0 then
-		szVersion = szVersion .. 'b' .. tostring(_VERSION_ % 0x100)
+function MY.GetVersion(dwVersion)
+	local dwVersion = dwVersion or _VERSION_
+	local szVersion = string.format('%X.%X.%02X', dwVersion / 0x1000000,
+		math.floor(dwVersion / 0x10000) % 0x100, math.floor(dwVersion / 0x100) % 0x100)
+	if  dwVersion % 0x100 ~= 0 then
+		szVersion = szVersion .. 'b' .. tostring(dwVersion % 0x100)
 	end
-	return szVersion, _VERSION_
+	return szVersion, dwVersion
+end
+
+function MY.AssertVersion(szKey, szCaption, dwMinVersion)
+	if _VERSION_ >= dwMinVersion then
+		MY.Sysmsg({
+			_L('%s requires base library version upper than %s, current at %s.',
+			szCaption, MY.GetVersion(dwMinVersion), MY.GetVersion()
+		)})
+		return false
+	end
+	return true
 end
 
 ---------------------------------------------------------------------------------------------
