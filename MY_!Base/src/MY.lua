@@ -1190,6 +1190,34 @@ function MY.SwitchTab(szID, bForceUpdate)
 					XGUI.OpenTextEditor(szRoot)
 			end,
 		}, true):autoWidth()
+		ui:append('WndButton', {
+			x = 142, y = 405, w = 130,
+			name = 'WndButton_ServerPreferenceFolder',
+			text = _L['Open server preference folder'],
+			onclick = function()
+				local szRoot = MY.FormatPath({'', MY_DATA_PATH.SERVER})
+				if OpenFolder then
+					OpenFolder(szRoot)
+				else
+					XGUI.OpenTextEditor(szRoot)
+				end
+					XGUI.OpenTextEditor(szRoot)
+			end,
+		}, true):autoWidth()
+		ui:append('WndButton', {
+			x = 277, y = 405, w = 130,
+			name = 'WndButton_GlobalPreferenceFolder',
+			text = _L['Open global preference folder'],
+			onclick = function()
+				local szRoot = MY.FormatPath({'', MY_DATA_PATH.GLOBAL})
+				if OpenFolder then
+					OpenFolder(szRoot)
+				else
+					XGUI.OpenTextEditor(szRoot)
+				end
+					XGUI.OpenTextEditor(szRoot)
+			end,
+		}, true):autoWidth()
 		wnd.OnPanelResize = function(wnd)
 			local w, h = MY.UI(wnd):size()
 			local scaleH = w / 557 * 278
@@ -1210,6 +1238,8 @@ function MY.SwitchTab(szID, bForceUpdate)
 			ui:children('#WndCheckBox_SerendipityNotifyTip'):top(scaleH + 65)
 			ui:children('#WndCheckBox_SerendipityNotifySound'):top(scaleH + 65)
 			ui:children('#WndButton_UserPreferenceFolder'):top(scaleH + 95)
+			ui:children('#WndButton_ServerPreferenceFolder'):top(scaleH + 95)
+			ui:children('#WndButton_GlobalPreferenceFolder'):top(scaleH + 95)
 		end
 		wnd.OnPanelResize(wnd)
 		MY.BreatheCall(500, function()
