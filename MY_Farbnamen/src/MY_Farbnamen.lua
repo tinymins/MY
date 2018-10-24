@@ -45,6 +45,40 @@ DB:Execute('CREATE TABLE IF NOT EXISTS TongCache (id INTEGER PRIMARY KEY, name V
 local DBT_W  = DB:Prepare('REPLACE INTO TongCache (id, name) VALUES (?, ?)')
 local DBT_RI = DB:Prepare('SELECT id, name FROM TongCache WHERE id = ?')
 
+do -- ×ªÒÆ¾É°æÊý¾Ý
+local DB_V1_PATH = MY.FormatPath({'cache/player_info.db', MY_DATA_PATH.SERVER})
+if IsLocalFileExist(DB_V1_PATH) then
+	local DB_V1 = SQLite3_Open(DB_V1_PATH)
+	if DB_V1 then
+		-- ½ÇÉ«»º´æ
+		local nCount, nPageSize = Get(DB_V1:Execute('SELECT COUNT(*) AS count FROM InfoCache'), {1, 'count'}, 0), 10000
+		DB:Execute('BEGIN TRANSACTION')
+		for i = 0, nCount / nPageSize do
+			for _, p in ipairs(DB_V1:Execute('SELECT id, name, force, role, level, title, camp, tong FROM InfoCache LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))) do
+				DBI_W:ClearBindings()
+				DBI_W:BindAll(p.id, p.name, p.force, p.role, p.level, p.title, p.camp, p.tong)
+				DBI_W:Execute()
+			end
+		end
+		DB:Execute('END TRANSACTION')
+		-- °ï»á»º´æ
+		local nCount, nPageSize = Get(DB_V1:Execute('SELECT COUNT(*) AS count FROM TongCache'), {1, 'count'}, 0), 10000
+		DB:Execute('BEGIN TRANSACTION')
+		for i = 0, nCount / nPageSize do
+			for _, p in ipairs(DB_V1:Execute('SELECT id, name FROM TongCache LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))) do
+				DBI_W:ClearBindings()
+				DBI_W:BindAll(p.id, p.name)
+				DBI_W:Execute()
+			end
+		end
+		DB:Execute('END TRANSACTION')
+		DB_V1:Release()
+	end
+	MY.Sysmsg({_L['Upgrade database finished!']}, _L['MY_Farbnamen'])
+	CPath.DelFile(DB_V1_PATH)
+end
+end
+
 MY_Farbnamen = MY_Farbnamen or {
 	bEnabled = true,
 }
@@ -363,7 +397,7 @@ end
 -- ²Ëµ¥
 --------------------------------------------------------------
 function MY_Farbnamen.GetMenu()
-	local t = {szOption = _L['Farbnamen']}
+	local t = {szOption = _L['MY_Farbnamen']}
 	table.insert(t, {
 		szOption = _L['enable'],
 		fnAction = function()
@@ -387,7 +421,7 @@ function MY_Farbnamen.GetMenu()
 		szOption = _L['reset data'],
 		fnAction = function()
 			DB:Execute('DELETE FROM InfoCache')
-			MY.Sysmsg({_L['cache data deleted.']}, _L['Farbnamen'])
+			MY.Sysmsg({_L['cache data deleted.']}, _L['MY_Farbnamen'])
 		end,
 		fnDisable = function()
 			return not MY_Farbnamen.bEnabled
