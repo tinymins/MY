@@ -483,6 +483,22 @@ function D.UpdateAnchor(frame)
 	end
 end
 
+function D.OnWageStart()
+	MY_CataclysmParty:StartTeamVote('wage_agree')
+	local nTime = GetCurrentTime()
+	local function fnAction()
+		D.SetFrameCaption(_L('Wage await %ds...', 30 - (GetCurrentTime() - nTime)))
+	end
+	fnAction()
+	MY.BreatheCall('MY_Cataclysm_Wage', 1000, fnAction)
+end
+
+function D.OnWageFinish()
+	MY_CataclysmParty:ClearTeamVote('wage_agree')
+	D.SetFrameCaption('')
+	MY.BreatheCall('MY_Cataclysm_Wage', false)
+end
+
 -------------------------------------------------
 -- 界面创建 事件注册
 -------------------------------------------------
@@ -617,6 +633,7 @@ function MY_CataclysmMain.OnEvent(szEvent)
 	elseif szEvent == 'PARTY_DELETE_MEMBER' then
 		local me = GetClientPlayer()
 		if me.dwID == arg1 then
+			D.OnWageFinish()
 			D.CloseCataclysmPanel()
 		else
 			local team = GetClientTeam()
@@ -634,6 +651,7 @@ function MY_CataclysmMain.OnEvent(szEvent)
 		D.SetFrameSize()
 		D.UpdatePrepareBarPos()
 	elseif szEvent == 'PARTY_DISBAND' then
+		D.OnWageFinish()
 		D.CloseCataclysmPanel()
 	elseif szEvent == 'PARTY_UPDATE_MEMBER_LMR' then
 		MY_CataclysmParty:CallDrawHPMP(arg1, true)
@@ -663,13 +681,7 @@ function MY_CataclysmMain.OnEvent(szEvent)
         -- arg1 nArg0
         -- arg2 nArg1
 		if arg0 == 1 then
-			MY_CataclysmParty:StartTeamVote('wage_agree')
-			local nTime = GetCurrentTime()
-			local function fnAction()
-				D.SetFrameCaption(_L('Wage await %ds...', 30 - (GetCurrentTime() - nTime)))
-			end
-			fnAction()
-			MY.BreatheCall('MY_Cataclysm_Wage', 1000, fnAction)
+			D.OnWageStart()
 		end
 	elseif szEvent == 'TEAM_VOTE_RESPOND' then
         -- arg0 nVoteType
@@ -683,9 +695,7 @@ function MY_CataclysmMain.OnEvent(szEvent)
 	elseif szEvent == 'TEAM_INCOMEMONEY_CHANGE_NOTIFY' then
 		local nTotalRaidMoney = GetClientTeam().nInComeMoney
 		if nTotalRaidMoney and nTotalRaidMoney == 0 then
-			MY_CataclysmParty:ClearTeamVote('wage_agree')
-			D.SetFrameCaption('')
-			MY.BreatheCall('MY_Cataclysm_Wage', false)
+			D.OnWageFinish()
 		end
 	-- elseif szEvent == 'RIAD_READY_CONFIRM_RECEIVE_QUESTION' then
 	elseif szEvent == 'RIAD_READY_CONFIRM_RECEIVE_ANSWER' then
@@ -785,6 +795,7 @@ function MY_CataclysmMain.OnEvent(szEvent)
 		MY_CataclysmParty:RefreshSFX()
 		MY_CataclysmParty:AutoLinkAllPanel()
 	elseif szEvent == 'LOADING_END' then -- 勿删
+		D.OnWageFinish()
 		D.ReloadCataclysmPanel()
 		D.RaidPanel_Switch(DEBUG)
 		D.TeammatePanel_Switch(false)
