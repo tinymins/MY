@@ -374,6 +374,9 @@ function D.Reset()
 		local function onBreathe()
 			nCount = 0
 			repeat
+				if LB_CACHE[dwID] == nil then
+					dwID = nil
+				end
 				dwID = next(LB_CACHE, dwID)
 				if dwID then
 					PostThreadCall(onGetCharacterTopScreenPos, dwID, 'Scene_GetCharacterTopScreenPos', dwID)
