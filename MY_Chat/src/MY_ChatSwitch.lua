@@ -127,7 +127,7 @@ end
 local function OnWhisperCheck()
 	local t = {}
 	for i, whisper in ipairs(MY_ChatSwitch.aWhisper) do
-		local info = MY_Farbnamen.Get(whisper[1])
+		local info = MY_Farbnamen and MY_Farbnamen.Get(whisper[1])
 		table.insert(t, {
 			szOption = whisper[1],
 			rgb = info and info.rgb or {202, 126, 255},
