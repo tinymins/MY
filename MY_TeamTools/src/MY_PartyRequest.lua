@@ -122,7 +122,7 @@ function MY_PartyRequest.OnMouseEnter()
 	elseif this.info then
 		local x, y = this:GetAbsPos()
 		local w, h = this:GetSize()
-		local szTip = MY_Farbnamen.GetTip(this.info.szName)
+		local szTip = MY_Farbnamen and MY_Farbnamen.GetTip(this.info.szName)
 		if szTip then
 			OutputTip(szTip, 450, {x, y, w, h}, MY_TIP_POSTYPE.TOP_BOTTOM)
 		end
