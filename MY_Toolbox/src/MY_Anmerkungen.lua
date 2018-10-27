@@ -51,7 +51,7 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 		multiline = false, text = szName or note.szName or '',
 		onchange = function(szName)
 			local rec = MY_Anmerkungen.GetPlayerNote(szName) or {}
-			local info = MY_Farbnamen.GetAusName(szName)
+			local info = MY_Farbnamen and MY_Farbnamen.GetAusName(szName)
 			if info and rec.dwID ~= info.dwID then
 				rec.dwID = info.dwID
 				rec.szContent = ''
