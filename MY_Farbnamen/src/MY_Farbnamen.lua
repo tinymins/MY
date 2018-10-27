@@ -35,59 +35,53 @@ local XML_LINE_BREAKER = XML_LINE_BREAKER
 -- 设置和数据
 ---------------------------------------------------------------
 MY.CreateDataRoot(MY_DATA_PATH.SERVER)
-local DB = MY.ConnectDatabase(_L['MY_Farbnamen'], {'cache/player_info.v2.db', MY_DATA_PATH.SERVER})
-if not DB then
-	return MY.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L['MY_Farbnamen'])
-end
-DB:Execute('CREATE TABLE IF NOT EXISTS InfoCache (id INTEGER PRIMARY KEY, name VARCHAR(20) NOT NULL, force INTEGER, role INTEGER, level INTEGER, title VARCHAR(20), camp INTEGER, tong INTEGER)')
-DB:Execute('CREATE UNIQUE INDEX IF NOT EXISTS info_cache_name_uidx ON InfoCache(name)')
-local DBI_W  = DB:Prepare('REPLACE INTO InfoCache (id, name, force, role, level, title, camp, tong) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
-local DBI_RI = DB:Prepare('SELECT id, name, force, role, level, title, camp, tong FROM InfoCache WHERE id = ?')
-local DBI_RN = DB:Prepare('SELECT id, name, force, role, level, title, camp, tong FROM InfoCache WHERE name = ?')
-DB:Execute('CREATE TABLE IF NOT EXISTS TongCache (id INTEGER PRIMARY KEY, name VARCHAR(20))')
-local DBT_W  = DB:Prepare('REPLACE INTO TongCache (id, name) VALUES (?, ?)')
-local DBT_RI = DB:Prepare('SELECT id, name FROM TongCache WHERE id = ?')
-
-do -- 转移旧版数据
-local DB_V1_PATH = MY.FormatPath({'cache/player_info.db', MY_DATA_PATH.SERVER})
-if IsLocalFileExist(DB_V1_PATH) then
-	local DB_V1 = SQLite3_Open(DB_V1_PATH)
-	if DB_V1 then
-		-- 角色缓存
-		local nCount, nPageSize = Get(DB_V1:Execute('SELECT COUNT(*) AS count FROM InfoCache'), {1, 'count'}, 0), 10000
-		DB:Execute('BEGIN TRANSACTION')
-		for i = 0, nCount / nPageSize do
-			for _, p in ipairs(DB_V1:Execute('SELECT id, name, force, role, level, title, camp, tong FROM InfoCache LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))) do
-				DBI_W:ClearBindings()
-				DBI_W:BindAll(p.id, p.name, p.force, p.role, p.level, p.title, p.camp, p.tong)
-				DBI_W:Execute()
-			end
-		end
-		DB:Execute('END TRANSACTION')
-		-- 帮会缓存
-		local nCount, nPageSize = Get(DB_V1:Execute('SELECT COUNT(*) AS count FROM TongCache'), {1, 'count'}, 0), 10000
-		DB:Execute('BEGIN TRANSACTION')
-		for i = 0, nCount / nPageSize do
-			for _, p in ipairs(DB_V1:Execute('SELECT id, name FROM TongCache LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))) do
-				DBI_W:ClearBindings()
-				DBI_W:BindAll(p.id, p.name)
-				DBI_W:Execute()
-			end
-		end
-		DB:Execute('END TRANSACTION')
-		DB_V1:Release()
-	end
-	MY.Sysmsg({_L['Upgrade database finished!']}, _L['MY_Farbnamen'])
-	CPath.DelFile(DB_V1_PATH)
-end
-end
 
 MY_Farbnamen = MY_Farbnamen or {
 	bEnabled = true,
 }
 RegisterCustomData('MY_Farbnamen.bEnabled')
 
-do if IsDebugClient() then -- 旧版缓存转换
+local _MY_Farbnamen = {
+	tForceString = clone(g_tStrings.tForceTitle),
+	tRoleType    = {
+		[ROLE_TYPE.STANDARD_MALE  ] = _L['man'],
+		[ROLE_TYPE.STANDARD_FEMALE] = _L['woman'],
+		[ROLE_TYPE.LITTLE_BOY     ] = _L['boy'],
+		[ROLE_TYPE.LITTLE_GIRL    ] = _L['girl'],
+	},
+	tCampString  = clone(g_tStrings.STR_GUILD_CAMP_NAME),
+	aPlayerQueu = {},
+}
+local DB_ERR_COUNT, DB_MAX_ERR_COUNT = 0, 5
+local DB, DBI_W, DBI_RI, DBI_RN, DBT_W, DBT_RI
+
+local function InitDB()
+	if DB then
+		return true
+	end
+	if DB_ERR_COUNT > DB_MAX_ERR_COUNT then
+		return false
+	end
+	DB = MY.ConnectDatabase(_L['MY_Farbnamen'], {'cache/player_info.v2.db', MY_DATA_PATH.SERVER})
+	if not DB then
+		local szMsg = _L['Cannot connect to database!!!']
+		if DB_ERR_COUNT > 0 then
+			szMsg = szMsg .. _L(' Retry time: ', DB_ERR_COUNT)
+		end
+		DB_ERR_COUNT = DB_ERR_COUNT + 1
+		MY.Sysmsg({szMsg, r = 255, g = 0, b = 0}, _L['MY_Farbnamen'])
+		return false
+	end
+	DB:Execute('CREATE TABLE IF NOT EXISTS InfoCache (id INTEGER PRIMARY KEY, name VARCHAR(20) NOT NULL, force INTEGER, role INTEGER, level INTEGER, title VARCHAR(20), camp INTEGER, tong INTEGER)')
+	DB:Execute('CREATE UNIQUE INDEX IF NOT EXISTS info_cache_name_uidx ON InfoCache(name)')
+	DBI_W  = DB:Prepare('REPLACE INTO InfoCache (id, name, force, role, level, title, camp, tong) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+	DBI_RI = DB:Prepare('SELECT id, name, force, role, level, title, camp, tong FROM InfoCache WHERE id = ?')
+	DBI_RN = DB:Prepare('SELECT id, name, force, role, level, title, camp, tong FROM InfoCache WHERE name = ?')
+	DB:Execute('CREATE TABLE IF NOT EXISTS TongCache (id INTEGER PRIMARY KEY, name VARCHAR(20))')
+	DBT_W  = DB:Prepare('REPLACE INTO TongCache (id, name) VALUES (?, ?)')
+	DBT_RI = DB:Prepare('SELECT id, name FROM TongCache WHERE id = ?')
+
+	-- 旧版文件缓存转换
 	local SZ_IC_PATH = MY.FormatPath('cache/PLAYER_INFO/$relserver/')
 	if IsLocalFileExist(SZ_IC_PATH) then
 		MY.Debug({'Farbnamen info cache trans from file to sqlite start!'}, 'MY_Farbnamen', MY_DEBUG.LOG)
@@ -126,19 +120,42 @@ do if IsDebugClient() then -- 旧版缓存转换
 		CPath.DelDir(SZ_IC_PATH)
 		MY.Debug({'Farbnamen cleaning file cache finished!'}, 'MY_Farbnamen', MY_DEBUG.LOG)
 	end
-end end
 
-local _MY_Farbnamen = {
-	tForceString = clone(g_tStrings.tForceTitle),
-	tRoleType    = {
-		[ROLE_TYPE.STANDARD_MALE  ] = _L['man'],
-		[ROLE_TYPE.STANDARD_FEMALE] = _L['woman'],
-		[ROLE_TYPE.LITTLE_BOY     ] = _L['boy'],
-		[ROLE_TYPE.LITTLE_GIRL    ] = _L['girl'],
-	},
-	tCampString  = clone(g_tStrings.STR_GUILD_CAMP_NAME),
-	aPlayerQueu = {},
-}
+	-- 转移V1旧版数据
+	local DB_V1_PATH = MY.FormatPath({'cache/player_info.db', MY_DATA_PATH.SERVER})
+	if IsLocalFileExist(DB_V1_PATH) then
+		local DB_V1 = SQLite3_Open(DB_V1_PATH)
+		if DB_V1 then
+			-- 角色缓存
+			local nCount, nPageSize = Get(DB_V1:Execute('SELECT COUNT(*) AS count FROM InfoCache'), {1, 'count'}, 0), 10000
+			DB:Execute('BEGIN TRANSACTION')
+			for i = 0, nCount / nPageSize do
+				for _, p in ipairs(DB_V1:Execute('SELECT id, name, force, role, level, title, camp, tong FROM InfoCache LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))) do
+					DBI_W:ClearBindings()
+					DBI_W:BindAll(p.id, p.name, p.force, p.role, p.level, p.title, p.camp, p.tong)
+					DBI_W:Execute()
+				end
+			end
+			DB:Execute('END TRANSACTION')
+			-- 帮会缓存
+			local nCount, nPageSize = Get(DB_V1:Execute('SELECT COUNT(*) AS count FROM TongCache'), {1, 'count'}, 0), 10000
+			DB:Execute('BEGIN TRANSACTION')
+			for i = 0, nCount / nPageSize do
+				for _, p in ipairs(DB_V1:Execute('SELECT id, name FROM TongCache LIMIT ' .. nPageSize .. ' OFFSET ' .. (i * nPageSize))) do
+					DBI_W:ClearBindings()
+					DBI_W:BindAll(p.id, p.name)
+					DBI_W:Execute()
+				end
+			end
+			DB:Execute('END TRANSACTION')
+			DB_V1:Release()
+		end
+		MY.Sysmsg({_L['Upgrade database finished!']}, _L['MY_Farbnamen'])
+		CPath.DelFile(DB_V1_PATH)
+	end
+	return true
+end
+
 ---------------------------------------------------------------
 -- 聊天复制和时间显示相关
 ---------------------------------------------------------------
@@ -287,7 +304,7 @@ local function GetTongName(dwID)
 		return
 	end
 	local szTong = l_tongnames[dwID]
-	if not szTong then
+	if not szTong and InitDB() then
 		DBT_RI:ClearBindings()
 		DBT_RI:BindAll(dwID)
 		local data = DBT_RI:GetNext()
@@ -300,21 +317,28 @@ local function GetTongName(dwID)
 end
 
 local function OnExit()
-	DB:Execute('BEGIN TRANSACTION')
-	for i, p in pairs(l_infocache_w) do
-		DBI_W:ClearBindings()
-		DBI_W:BindAll(p.id, p.name, p.force, p.role, p.level, p.title, p.camp, p.tong)
-		DBI_W:Execute()
+	if not InitDB() then
+		return
 	end
-	DB:Execute('END TRANSACTION')
+	if DBI_W then
+		DB:Execute('BEGIN TRANSACTION')
+		for i, p in pairs(l_infocache_w) do
+			DBI_W:ClearBindings()
+			DBI_W:BindAll(p.id, p.name, p.force, p.role, p.level, p.title, p.camp, p.tong)
+			DBI_W:Execute()
+		end
+		DB:Execute('END TRANSACTION')
+	end
 
-	DB:Execute('BEGIN TRANSACTION')
-	for id, name in pairs(l_tongnames_w) do
-		DBT_W:ClearBindings()
-		DBT_W:BindAll(id, name)
-		DBT_W:Execute()
+	if DBT_W then
+		DB:Execute('BEGIN TRANSACTION')
+		for id, name in pairs(l_tongnames_w) do
+			DBT_W:ClearBindings()
+			DBT_W:BindAll(id, name)
+			DBT_W:Execute()
+		end
+		DB:Execute('END TRANSACTION')
 	end
-	DB:Execute('END TRANSACTION')
 
 	DB:Release()
 end
@@ -325,13 +349,17 @@ function MY_Farbnamen.Get(szKey)
 	local info = l_remoteinfocache[szKey] or l_infocache[szKey]
 	if not info then
 		if type(szKey) == 'string' then
-			DBI_RN:ClearBindings()
-			DBI_RN:BindAll(szKey)
-			info = DBI_RN:GetNext()
+			if InitDB() then
+				DBI_RN:ClearBindings()
+				DBI_RN:BindAll(szKey)
+				info = DBI_RN:GetNext()
+			end
 		elseif type(szKey) == 'number' then
-			DBI_RI:ClearBindings()
-			DBI_RI:BindAll(szKey)
-			info = DBI_RI:GetNext()
+			if InitDB() then
+				DBI_RI:ClearBindings()
+				DBI_RI:BindAll(szKey)
+				info = DBI_RI:GetNext()
+			end
 		end
 		if info then
 			l_infocache[info.id] = info
@@ -423,6 +451,9 @@ function MY_Farbnamen.GetMenu()
 	table.insert(t, {
 		szOption = _L['reset data'],
 		fnAction = function()
+			if not InitDB() then
+				return
+			end
 			DB:Execute('DELETE FROM InfoCache')
 			MY.Sysmsg({_L['cache data deleted.']}, _L['MY_Farbnamen'])
 		end,
