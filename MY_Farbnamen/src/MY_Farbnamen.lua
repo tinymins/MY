@@ -29,8 +29,12 @@ local Get = MY.Get
 local IsNil, IsBoolean, IsEmpty, RandomChild = MY.IsNil, MY.IsBoolean, MY.IsEmpty, MY.RandomChild
 local IsNumber, IsString, IsTable, IsFunction = MY.IsNumber, MY.IsString, MY.IsTable, MY.IsFunction
 ---------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot..'MY_Farbnamen/lang/')
 local XML_LINE_BREAKER = XML_LINE_BREAKER
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot..'MY_Farbnamen/lang/')
+---------------------------------------------------------------------------------------------------
+if not MY.AssertVersion('MY_Farbnamen', _L['MY_Farbnamen'], 0x2011600) then
+	return
+end
 ---------------------------------------------------------------
 -- 设置和数据
 ---------------------------------------------------------------
@@ -155,6 +159,7 @@ local function InitDB()
 	end
 	return true
 end
+InitDB()
 
 ---------------------------------------------------------------
 -- 聊天复制和时间显示相关
