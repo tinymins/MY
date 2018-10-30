@@ -70,7 +70,7 @@ local function InitDB()
 	if not DB then
 		local szMsg = _L['Cannot connect to database!!!']
 		if DB_ERR_COUNT > 0 then
-			szMsg = szMsg .. _L(' Retry time: ', DB_ERR_COUNT)
+			szMsg = szMsg .. _L(' Retry time: %d', DB_ERR_COUNT)
 		end
 		DB_ERR_COUNT = DB_ERR_COUNT + 1
 		MY.Sysmsg({szMsg, r = 255, g = 0, b = 0}, _L['MY_Farbnamen'])

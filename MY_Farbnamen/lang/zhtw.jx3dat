@@ -8,4 +8,6 @@ data = {
     ['load default setting'] = '恢復默認設置',
     ['Player ID: %d'] = '玩家ID：%d',
     ['Upgrade database finished!'] = '數據庫升級完成！',
+    ['Cannot connect to database!!!'] = '無法連接到角色數據庫！',
+    ['Retry time: %d'] = '第%d次重試連接……',
 }
