@@ -2062,16 +2062,17 @@ function MY.ConnectDatabase(szCaption, oPath, fnAction)
 	end
 
 	-- 测试数据库完整性
-	local szTest = 'testmalformed_' .. GetCurrentTime()
-	DB:Execute('CREATE TABLE ' .. szTest .. '(a)')
-	if DB:Execute('SELECT * FROM ' .. szTest .. ' LIMIT 1') then
-		DB:Execute('DROP TABLE IF EXISTS ' .. szTest)
+	local aRes = DB:Execute('PRAGMA QUICK_CHECK')
+	if Get(aRes, {1, 'integrity_check'}) == 'ok' then
 		if fnAction then
 			fnAction(DB)
 		end
 		return DB
 	else
-		MY.Debug({'Malformed database detected...'}, szCaption, MY_DEBUG.LOG)
+		MY.Debug({'Malformed database detected...'}, szCaption, MY_DEBUG.ERROR)
+		for _, rec in ipairs(aRes or {}) do
+			MY.Debug({var2str(rec)}, szCaption, MY_DEBUG.ERROR)
+		end
 		DB:Release()
 		if fnAction then
 			MY.Confirm(_L('%s Database is malformed, do you want to repair database now? Repair database may take a long time and cause a disconnection.', szCaption), function()
