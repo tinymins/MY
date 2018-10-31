@@ -101,8 +101,8 @@ data = {
     {dwID=2628,col="#FF00FFFF",szReminder="诛",nPriority=4,bAttention=true,bCaution=true},--诛心咒---荻花圣殿
     {dwID=3877,col="#FFFF00FF",szReminder="原",nPriority=5,bCaution=true},--原罪缚穴术点名---荻花圣殿
     {dwID=2631,col="#00FFFF00",szReminder="逐",nPriority=8},--逐莲升华---荻花圣殿
-    {dwID=3093,col="#FF3232FF",szReminder="灼",nPriority=7},--灼烧---龙渊泽
-    {dwID=3092,col="#00FFFFFF",szReminder="冰",nPriority=7},--冰魄---龙渊泽
+    {dwID=3093,col="#FF3232FF",szReminder="灼",nPriority=7},--(3093)(1)龙渊泽_南诏双雄_刺客_阳性易伤---龙渊泽
+    {dwID=3092,col="#00FFFFFF",szReminder="冰",nPriority=7},--(3092)(1)龙渊泽_南诏双雄_刺客_阴性易伤---龙渊泽
     {dwID=2676,col="#FFFF00FF",szReminder="重",nPriority=4,bAttention=true,bCaution=true},--重击---龙渊泽
     {dwID=2636,col="#FF00FFFF",szReminder="金",nPriority=4,bAttention=true,bCaution=true},--金刚---龙渊泽
     {dwID=6451,col="#FF3232FF",szReminder="叶",nPriority=7},--叶落飞花---神剑冢
@@ -131,10 +131,14 @@ data = {
     {dwID=5576,col="#FFFF00FF",szReminder="离",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFF00"},--离愁---大明宫
     {dwID=5579,col="#8055FF00",szReminder="百",nPriority=3,bScreenHead=true,colScreenHead="#8055FF"},--百生---大明宫
     {dwID=5592,col="#0050FFFF",szReminder="障",nPriority=7},--饿鬼·外障---大明宫
+    {dwID=5405,col="#FF3232FF",szReminder="焰",nPriority=7},--圣焰---大明宫
+    {dwID=5406,col="#00FFFFFF",szReminder="寒",nPriority=7},--寒火---大明宫
+    {dwID=5403,col="#FF3232FF",szReminder="红",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF3232"},--红莲浴---大明宫
+    {dwID=5404,col="#00FFFFFF",szReminder="碧",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#00FFFF"},--碧落烧---大明宫
     {dwID=5513,col="#FFFF00FF",szReminder="追",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--追击---大明宫
     {dwID=5701,col="#00FFFF00",szReminder="殇",nPriority=8},--夜殇---大明宫
     {dwID=5522,col="#FF3232FF",szReminder="血",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--血重楼---大明宫
-    {dwID=5632,col="#00FF0000",szReminder="火",nPriority=8,bScreenHead=true,colScreenHead="#00FF00"},--火把---大明宫
+    {dwID=5632,col="#00FF0000",szReminder="火",nPriority=3,bScreenHead=true,colScreenHead="#00FF00"},--火把---大明宫
     {dwID=5084,col="#FFFF00FF",szReminder="牢",nPriority=6,bAttention=true},--牢笼被锁---南诏皇宫
     {dwID=5081},--魁龙气---南诏皇宫
     {dwID=5096,nLevel=2,col="#FF3232FF",szReminder="精",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--精确射杀---南诏皇宫
@@ -243,9 +247,11 @@ data = {
     {dwID=8773,col="#FF323200",szReminder="牢",nPriority=8},--画地为牢---微山书院
     {dwID=9024,col="#FF00FFFF",szReminder="毒",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--刀毒---阴山圣泉
     {dwID=8834},--震慑---阴山圣泉
-    {dwID=8828},--寄生之种---阴山圣泉
-    {dwID=8789,col="#FFFF00FF",szReminder="禅",nPriority=5,bCaution=true},--禅定---梵空禅院
-    {dwID=8790,col="#FFFF00FF",szReminder="佛",nPriority=6,bAttention=true},--佛心---梵空禅院
+    {dwID=8828,col="#FF00FFFF",szReminder="寄",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--寄生之种---阴山圣泉
+    {dwID=8833,col="#FF3232FF",szReminder="缠",nPriority=7},--缠绕---阴山圣泉
+    {dwID=8848,col="#FF323200",nPriority=8},--气血不畅---阴山圣泉
+    {dwID=8789,col="#00FFFFFF",szReminder="禅",nPriority=7},--禅定---梵空禅院
+    {dwID=8790,col="#FFFF00FF",szReminder="佛",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFF00"},--佛心---梵空禅院
     {dwID=8791,col="#FF800000",szReminder="双",nPriority=8},--双针定阳---梵空禅院
     {dwID=8817,col="#FF3232FF",szReminder="畏",nPriority=7},--剑畏---梵空禅院
     {dwID=9188},--仇恨---引仙水榭
@@ -288,6 +294,37 @@ data = {
     {dwID=13403,col="#FF00FFFF",szReminder="染",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--血疫感染---狼牙堡·狼神殿
     {dwID=13376,col="#FF3232FF",szReminder="败",nPriority=7,szStackOp=">=",nStackNum=2},--败血---狼牙堡·狼神殿
     {dwID=13377,col="#8055FFFF",szReminder="腐",nPriority=6,bAttention=true},--腐血---狼牙堡·狼神殿
+    {dwID=13448,col="#FF00FFFF",szReminder="寒",nPriority=5,bCaution=true},--寒刃烈风---镜泊湖
+    {dwID=13510,nLevel=1,col="#FFFF00FF",szReminder="眩",nPriority=7},--眩晕---迷渊岛
+    {dwID=13510,nLevel=2,col="#FFFF00FF",szReminder="眩",nPriority=7},--眩晕---迷渊岛
+    {dwID=13534,col="#FF00FFFF",szReminder="乾",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--乾坤一掷目标---迷渊岛
+    {dwID=13504,col="#FFFF00FF",szReminder="剑",nPriority=6,bAttention=true},--剑意---迷渊岛
+    {dwID=14054,col="#FF00FFFF",szReminder="追",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--追魂---迷渊岛
+    {dwID=13521,col="#FF00FFFF",szReminder="断",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--断骨散---九辩馆
+    {dwID=13762,col="#FFFF00FF",szReminder="缠",nPriority=7},--缠绕---九辩馆
+    {dwID=13440,col="#FF00FFFF",szReminder="禁",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--星体禁锢---九辩馆
+    {dwID=13638,col="#0050FFFF",szReminder="愧",nPriority=7},--愧疚---九辩馆
+    {dwID=14015,col="#FF00FFFF",szReminder="蛮",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--蛮熊劲---大衍盘丝洞
+    {dwID=13765,col="#00FFFF00",szReminder="溢",nPriority=8},--真气溢出---大衍盘丝洞
+    {dwID=13501,col="#FFFF00FF",szReminder="冲",nPriority=7},--冲击---大衍盘丝洞
+    {dwID=13502,col="#FF00FFFF",szReminder="目",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--目标---大衍盘丝洞
+    {dwID=13505,col="#8055FFFF",szReminder="噪",nPriority=6,bAttention=true},--噪音---大衍盘丝洞
+    {dwID=13518,col="#FF3232FF",szReminder="失",nPriority=6,bAttention=true},--失智---大衍盘丝洞
+    {dwID=13650,col="#00FFFFFF",szReminder="静",nPriority=6,bAttention=true},--静谧---冰火岛·荒血路
+    {dwID=13497,col="#FF3232FF",szReminder="破",nPriority=7},--破---冰火岛·荒血路
+    {dwID=13574,col="#FF3232FF",szReminder="残",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF3232"},--残火---冰火岛·荒血路
+    {dwID=13649,col="#FF00FFFF",szReminder="裂",nPriority=6,bAttention=true},--裂伤---冰火岛·荒血路
+    {dwID=13757,col="#FF3232FF",szReminder="沉",nPriority=7},--乐器沉默---冰火岛·荒血路
+    {dwID=13543,col="#FF323200",szReminder="阴",nPriority=8},--阴火---冰火岛·荒血路
+    {dwID=13498,col="#FFFF00FF",szReminder="火",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--火焰掌---冰火岛·荒血路
+    {dwID=13606,col="#00FF0000",szReminder="守",nPriority=8},--信仰守护---冰火岛·荒血路
+    {dwID=13570,col="#FF00FFFF",szReminder="标",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--标记---冰火岛·荒血路
+    {dwID=13604,nLevel=1,col="#FF3232FF",szReminder="考",nPriority=6,bAttention=true},--信仰考验---冰火岛·荒血路
+    {dwID=13604,nLevel=2,col="#FF3232FF",szReminder="考",nPriority=6,bAttention=true},--信仰考验---冰火岛·荒血路
+    {dwID=13572,nLevel=1,col="#8055FFFF",szReminder="灼",nPriority=7},--信仰灼烧---冰火岛·荒血路
+    {dwID=13572,nLevel=2,col="#8055FFFF",szReminder="灼",nPriority=7},--信仰灼烧---冰火岛·荒血路
+    {dwID=13902,szReminder="重"},--重峦剑气---冰火岛·荒血路
+    {dwID=13627,col="#00FFFFFF",szReminder="月",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#00FFFF"},--月下对决---冰火岛·荒血路
     {dwID=12788,col="#FFFF00FF",szReminder="图",nPriority=7},--图兰的挑唆---龙门绝境
     {dwID=12724},--狂沙---龙门绝境
     {dwID=12787},--追命---龙门绝境
@@ -310,5 +347,6 @@ data = {
     {dwID=9744},--朝圣---明教
     {dwID=9745},--朝圣---明教
     {dwID=4244},--渡厄---明教
-    --【南宫伯是帅咩】更新日期1017
+    {dwID=13771},--疾电叱羽---蓬莱
+    --【南宫伯是帅咩】更新日期1030
 }
