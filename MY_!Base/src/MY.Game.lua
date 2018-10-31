@@ -631,22 +631,23 @@ end
 
 -- µØÍ¼BOSSÁÐ±í
 do local BOSS_LIST, BOSS_LIST_CUSTOM
+local CACHE_PATH = {'temporary/bosslist.jx3dat', MY_DATA_PATH.GLOBAL}
+local CUSTOM_PATH = {'config/bosslist.jx3dat', MY_DATA_PATH.GLOBAL}
 local function LoadCustomList()
 	if not BOSS_LIST_CUSTOM then
-		BOSS_LIST_CUSTOM = MY.LoadLUAData({'config/bosslist.jx3dat', MY_DATA_PATH.GLOBAL}) or {}
+		BOSS_LIST_CUSTOM = MY.LoadLUAData(CUSTOM_PATH) or {}
 	end
 end
 local function SaveCustomList()
-	MY.SaveLUAData({'config/bosslist.jx3dat', MY_DATA_PATH.GLOBAL}, BOSS_LIST_CUSTOM, IsDebugClient() and '\t' or nil)
+	MY.SaveLUAData(CUSTOM_PATH, BOSS_LIST_CUSTOM, IsDebugClient() and '\t' or nil)
 end
 local function GenerateList(bForceRefresh)
 	LoadCustomList()
 	if BOSS_LIST and not bForceRefresh then
 		return
 	end
-	local VERSION = select(2, GetVersion())
-	local CACHE_PATH = 'cache/bosslist/' .. VERSION .. '.jx3dat'
-	BOSS_LIST = MY.LoadLUAData({CACHE_PATH, MY_DATA_PATH.GLOBAL})
+	MY.CreateDataRoot(MY_DATA_PATH.GLOBAL)
+	BOSS_LIST = MY.LoadLUAData(CACHE_PATH)
 	if bForceRefresh or not BOSS_LIST then
 		BOSS_LIST = {}
 		local nCount = g_tTable.DungeonBoss:GetRowCount()
@@ -664,7 +665,7 @@ local function GenerateList(bForceRefresh)
 				end
 			end
 		end
-		MY.SaveLUAData({CACHE_PATH, MY_DATA_PATH.GLOBAL}, BOSS_LIST)
+		MY.SaveLUAData(CACHE_PATH, BOSS_LIST)
 		MY.Sysmsg({_L('Boss list updated to v%s.', VERSION)})
 	end
 
