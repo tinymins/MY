@@ -115,6 +115,10 @@ function MY.FormatPath(oFilePath, tParams)
 	if string.find(szFilePath, '%$lang') then
 		szFilePath = szFilePath:gsub('%$lang', tParams['lang'] or string.lower(MY.GetLang()))
 	end
+	-- if exist $version then add version identity
+	if string.find(szFilePath, '%$version') then
+		szFilePath = szFilePath:gsub('%$version', tParams['version'] or select(2, GetVersion()))
+	end
 	-- if exist $date then add date identity
 	if string.find(szFilePath, '%$date') then
 		szFilePath = szFilePath:gsub('%$date', tParams['date'] or MY.FormatTime('yyyyMMdd', GetCurrentTime()))
@@ -388,16 +392,28 @@ function MY.GetGlobalValue(szVarPath)
 	return tVariable
 end
 
+do local CREATED = {}
 function MY.CreateDataRoot(ePathType)
+	if CREATED[ePathType] then
+		return
+	end
+	CREATED[ePathType] = true
 	-- 创建目录
 	if ePathType == MY_DATA_PATH.ROLE then
 		CPath.MakeDir(MY.FormatPath({'$name/', MY_DATA_PATH.ROLE}))
 	end
+	-- 版本更新时删除旧的临时目录
+	if IsLocalFileExist(MY.FormatPath({'temporary/', ePathType}))
+	and not IsLocalFileExist(MY.FormatPath({'temporary/$version', ePathType})) then
+		CPath.DelDir(MY.FormatPath({'temporary/', ePathType}))
+	end
+	CPath.MakeDir(MY.FormatPath({'temporary/$version/', ePathType}))
 	CPath.MakeDir(MY.FormatPath({'audio/', ePathType}))
 	CPath.MakeDir(MY.FormatPath({'cache/', ePathType}))
 	CPath.MakeDir(MY.FormatPath({'config/', ePathType}))
 	CPath.MakeDir(MY.FormatPath({'export/', ePathType}))
 	CPath.MakeDir(MY.FormatPath({'userdata/', ePathType}))
+end
 end
 
 -- 播放声音
