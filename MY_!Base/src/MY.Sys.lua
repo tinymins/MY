@@ -1208,48 +1208,84 @@ TraceButton_AppendAddonMenu( { _C.GetTraceButtonAddonMenu } )
 --   #       # #         #           #         # #       #   #   #     # #                       #
 -- ##################################################################################################
 -- 显示本地信息
--- MY.Sysmsg(oContent, oTitle)
--- szContent    要显示的主体消息
--- szTitle      消息头部
--- tContentRgbF 主体消息文字颜色rgbf[可选，为空使用默认颜色字体。]
--- tTitleRgbF   消息头部文字颜色rgbf[可选，为空和主体消息文字颜色相同。]
-function MY.Sysmsg(arg0, arg1, arg2)
-	local szType, szMsg = arg2 or 'MSG_SYS', ''
-	local r, g, b = GetMsgFontColor(szType)
-	local f = GetMsgFont(szType)
-	local ac, at, sc, st = {}, {}
-
-	if IsTable(arg0) then
-		for _, v in ipairs(arg0) do
-			insert(ac, tostring(v))
-		end
-		ac.r, ac.g, ac.b, ac.f = arg0.r, arg0.g, arg0.b, arg0.f
+-- MY.Sysmsg(oContent, oTitle, szType)
+-- MY.Sysmsg({'Error!', wrap = true}, 'MY', 'MSG_SYS.ERROR')
+-- MY.Sysmsg({'New message', r = 0, g = 0, b = 0, wrap = true}, 'MY')
+-- MY.Sysmsg({{'New message', r = 0, g = 0, b = 0, rich = false}, wrap = true}, 'MY')
+-- MY.Sysmsg('New message', {'MY', 'DB', r = 0, g = 0, b = 0})
+do local THEME_LIST = {
+	['ERROR'] = { r = 255, g = 0, b = 0 },
+}
+local function StringifySysmsgObject(aMsg, oContent, cfg, bTitle)
+	local cfgContent = setmetatable({}, { __index = cfg })
+	if IsTable(oContent) then
+		cfgContent.rich, cfgContent.wrap = oContent.rich, oContent.wrap
+		cfgContent.r, cfgContent.g, cfgContent.b, cfgContent.f = oContent.r, oContent.g, oContent.b, oContent.f
 	else
-		insert(ac, tostring(arg0))
-		ac.bNoWrap = true
+		oContent = {oContent}
 	end
-	if IsTable(arg1) then
-		for _, v in ipairs(arg1) do
-			insert(at, tostring(v))
+	-- 格式化输出正文
+	for _, v in ipairs(oContent) do
+		local tContent, aPart = setmetatable(IsTable(v) and clone(v) or {v}, { __index = cfgContent }), {}
+		for _, oPart in ipairs(tContent) do
+			insert(aPart, tostring(oPart))
 		end
-		at.r, at.g, at.b, at.f = arg1.r, arg1.g, arg1.b, arg1.f
-	else
-		insert(at, tostring(arg1 or MY.GetAddonInfo().szShortName))
+		if tContent.rich then
+			insert(aMsg, concat(aPart))
+		else
+			local szContent = concat(aPart, bTitle and '][' or '')
+			if szContent ~= '' and bTitle then
+				szContent = '[' .. szContent .. ']'
+			end
+			insert(aMsg, GetFormatText(szContent, tContent.f, tContent.r, tContent.g, tContent.b))
+		end
+	end
+	if cfgContent.wrap and not bTitle then
+		insert(aMsg, GetFormatText('\n', cfgContent.f, cfgContent.r, cfgContent.g, cfgContent.b))
+	end
+end
+function MY.Sysmsg(oContent, oTitle, szType)
+	if not szType then
+		szType = 'MSG_SYS'
+	end
+	if not oTitle then
+		oTitle = MY.GetAddonInfo().szShortName
+	end
+	local nPos, szTheme = (StringFindW(szType, '.'))
+	if nPos then
+		szTheme = sub(szType, nPos + 1)
+		szType = sub(szType, 1, nPos - 1)
+	end
+	local aMsg = {}
+	-- 字体颜色优先级：单个节点 > 根节点定义 > 预设样式 > 频道设置
+	-- 频道设置
+	local cfg = {
+		rich = false,
+		wrap = true,
+		f = GetMsgFont(szType),
+	}
+	cfg.r, cfg.g, cfg.b = GetMsgFontColor(szType)
+	-- 预设样式
+	local tTheme = szTheme and THEME_LIST[szTheme]
+	if tTheme then
+		cfg.r = tTheme.r or cfg.r
+		cfg.g = tTheme.g or cfg.g
+		cfg.b = tTheme.b or cfg.b
+		cfg.f = tTheme.f or cfg.f
+	end
+	-- 根节点定义
+	if IsTable(oContent) then
+		cfg.r = oContent.r or cfg.r
+		cfg.g = oContent.g or cfg.g
+		cfg.b = oContent.b or cfg.b
+		cfg.f = oContent.f or cfg.f
 	end
 
-	sc = concat(ac, ac.bNoWrap and '' or '\n')
-	if not ac.bNoWrap then
-		sc = sc .. '\n'
-	end
-	szMsg = szMsg .. GetFormatText(sc, ac.f or f, ac.r or r, ac.g or g, ac.b or b)
-
-	st = concat(at, '][')
-	if st ~= '' then
-		st = '[' .. st .. '] '
-	end
-	szMsg = GetFormatText(st, at.f or ac.f or f, at.r or ac.r or r, at.g or ac.g or g, at.b or ac.b or b) .. szMsg
-
-	OutputMessage(szType, szMsg, true)
+	-- 处理数据
+	StringifySysmsgObject(aMsg, oTitle, cfg, true)
+	StringifySysmsgObject(aMsg, oContent, cfg, false)
+	OutputMessage(szType, concat(aMsg), true)
+end
 end
 
 -- 没有头的中央信息 也可以用于系统信息
