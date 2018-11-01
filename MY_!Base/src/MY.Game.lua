@@ -1762,7 +1762,7 @@ MY.GetTarget = MY.Game.GetTarget
 function MY.Game.SetTarget(dwType, dwID)
 	-- check dwType
 	if type(dwType) == 'userdata' then
-		dwType, dwID = ( IsPlayer(dwType) and TARGET.PLAYER ) or TARGET.NPC, dwType.dwID
+		dwType, dwID = (IsPlayer(dwType.dwID) and TARGET.PLAYER) or TARGET.NPC, dwType.dwID
 	elseif type(dwType) == 'string' then
 		dwType, dwID = nil, dwType
 	end
