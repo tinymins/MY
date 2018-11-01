@@ -101,7 +101,7 @@ function PushDB()
 	local time = GetCurrentTime()
 	local ownerkey = AnsiToUTF8(me.GetGlobalID() ~= '0' and me.GetGlobalID() or me.szName)
 	local ownername = AnsiToUTF8(me.szName)
-	local servername = AnsiToUTF8(MY.Game.GetRealServer(2))
+	local servername = AnsiToUTF8(MY.GetRealServer(2))
 	DB:Execute('BEGIN TRANSACTION')
 
 	-- 背包
@@ -460,4 +460,4 @@ local menu = {
 }
 MY.RegisterAddonMenu('MY_BAGSTATISTICS_MENU', menu)
 end
-MY.Game.RegisterHotKey('MY_BagStatistics', _L['MY_BagStatistics'], MY_BagStatistics.Toggle, nil)
+MY.RegisterHotKey('MY_BagStatistics', _L['MY_BagStatistics'], MY_BagStatistics.Toggle, nil)

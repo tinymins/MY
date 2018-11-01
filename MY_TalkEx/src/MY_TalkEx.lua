@@ -72,7 +72,7 @@ _C.Talk = function()
 		end
 	end
 end
-MY.Game.RegisterHotKey('MY_TalkEx_Talk', _L['TalkEx Talk'], _C.Talk, nil)
+MY.RegisterHotKey('MY_TalkEx_Talk', _L['TalkEx Talk'], _C.Talk, nil)
 
 _C.Trick = function()
 	if #MY_TalkEx.szTrickText == 0 then

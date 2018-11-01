@@ -643,7 +643,7 @@ local function onSwitch()
 	MY_LifeBar.bEnabled = not MY_LifeBar.bEnabled
 	D.Reset(true)
 end
-MY.Game.RegisterHotKey('MY_LifeBar_S', _L['x lifebar'], onSwitch)
+MY.RegisterHotKey('MY_LifeBar_S', _L['x lifebar'], onSwitch)
 
 setmetatable(MY_LifeBar, {
 	__index = {

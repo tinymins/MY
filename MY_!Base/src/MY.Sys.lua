@@ -125,11 +125,11 @@ function MY.FormatPath(oFilePath, tParams)
 	end
 	-- if exist $server then add server identity
 	if string.find(szFilePath, '%$server') then
-		szFilePath = szFilePath:gsub('%$server', tParams['server'] or ((MY.Game.GetServer()):gsub('[/\\|:%*%?"<>]', '')))
+		szFilePath = szFilePath:gsub('%$server', tParams['server'] or ((MY.GetServer()):gsub('[/\\|:%*%?"<>]', '')))
 	end
 	-- if exist $relserver then add relserver identity
 	if string.find(szFilePath, '%$relserver') then
-		szFilePath = szFilePath:gsub('%$relserver', tParams['relserver'] or ((MY.Game.GetRealServer()):gsub('[/\\|:%*%?"<>]', '')))
+		szFilePath = szFilePath:gsub('%$relserver', tParams['relserver'] or ((MY.GetRealServer()):gsub('[/\\|:%*%?"<>]', '')))
 	end
 	local rootPath = GetRootPath():gsub('\\', '/')
 	if szFilePath:find(rootPath) == 1 then

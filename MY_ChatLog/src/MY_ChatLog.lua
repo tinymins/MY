@@ -1204,7 +1204,7 @@ local menu = {
 }
 MY.RegisterAddonMenu('MY_CHATLOG_MENU', menu)
 end
-MY.Game.RegisterHotKey('MY_ChatLog', _L['chat log'], MY_ChatLog.Toggle, nil)
+MY.RegisterHotKey('MY_ChatLog', _L['chat log'], MY_ChatLog.Toggle, nil)
 
 local PS = {}
 function PS.OnPanelActive(wnd)

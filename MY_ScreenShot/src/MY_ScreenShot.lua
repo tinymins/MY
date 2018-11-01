@@ -150,17 +150,17 @@ _MY_ScreenShot.OnPanelActive = function(wnd)
 
     ui:append('WndButton', 'WndButton_HotkeyCheck'):children('#WndButton_HotkeyCheck'):pos(w-180, 30):width(170)
       :text(_L['set default screenshot tool'])
-      :click(function() MY.Game.SetHotKey('MY_ScreenShot_Hotkey',1,44,false,false,false) end)
+      :click(function() MY.SetHotKey('MY_ScreenShot_Hotkey',1,44,false,false,false) end)
 
     ui:append('Text', 'Text_SetHotkey'):find('#Text_SetHotkey'):pos(w-140, 60):color(255,255,0)
       :text(_L['>> set hotkey <<'])
-      :click(function() MY.Game.SetHotKey() end)
+      :click(function() MY.SetHotKey() end)
 
     fnRefreshPanel(ui)
 
     -- 注册默认工具检查
     MY.BreatheCall('MY_ScreenShot_Hotkey_Check', 1000, function()
-        local nKey, nShift, nCtrl, nAlt = MY.Game.GetHotKey('MY_ScreenShot_Hotkey')
+        local nKey, nShift, nCtrl, nAlt = MY.GetHotKey('MY_ScreenShot_Hotkey')
         if type(nKey)=='nil' or nKey==0 then
             ui:children('#WndButton_HotkeyCheck'):text(_L['set default screenshot tool']):enable(true)
         else
@@ -173,7 +173,7 @@ _MY_ScreenShot.OnPanelDeactive = function( ... )
 end
 -- 快捷键绑定
 -----------------------------------------------
-MY.Game.RegisterHotKey('MY_ScreenShot_Hotkey', _L['shotscreen'], function() MY_ScreenShot.ShotScreen((MY_ScreenShot.GetConfig('bAutoHideUI') and MY_ScreenShot.Const.HIDE_UI) or nil) end, nil)
-MY.Game.RegisterHotKey('MY_ScreenShot_Hotkey_HideUI', _L['shotscreen without ui'], function() MY_ScreenShot.ShotScreen(MY_ScreenShot.Const.HIDE_UI) end, nil)
-MY.Game.RegisterHotKey('MY_ScreenShot_Hotkey_ShowUI', _L['shotscreen with ui'], function() MY_ScreenShot.ShotScreen(MY_ScreenShot.Const.SHOW_UI) end, nil)
+MY.RegisterHotKey('MY_ScreenShot_Hotkey', _L['shotscreen'], function() MY_ScreenShot.ShotScreen((MY_ScreenShot.GetConfig('bAutoHideUI') and MY_ScreenShot.Const.HIDE_UI) or nil) end, nil)
+MY.RegisterHotKey('MY_ScreenShot_Hotkey_HideUI', _L['shotscreen without ui'], function() MY_ScreenShot.ShotScreen(MY_ScreenShot.Const.HIDE_UI) end, nil)
+MY.RegisterHotKey('MY_ScreenShot_Hotkey_ShowUI', _L['shotscreen with ui'], function() MY_ScreenShot.ShotScreen(MY_ScreenShot.Const.SHOW_UI) end, nil)
 MY.RegisterPanel( 'ScreenShot', _L['screenshot helper'], _L['System'], 'UI/Image/UICommon/Commonpanel.UITex|9', {255,127,0,200}, { OnPanelActive = _MY_ScreenShot.OnPanelActive, OnPanelDeactive = _MY_ScreenShot.OnPanelDeactive } )

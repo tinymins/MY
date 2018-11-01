@@ -145,7 +145,7 @@ function PS.OnPanelActive(wnd)
 
 	ui:append('Text', {
 		x = 330, y = y, r = 255, g = 255, b = 0, text = _L['* hotkey setting'],
-		onclick = function() MY.Game.SetHotKey() end,
+		onclick = function() MY.SetHotKey() end,
 	})
 	y = y + 30
 
@@ -189,16 +189,16 @@ local menu = {
 	}, {
 		szOption = _L['set hotkey'],
 		fnAction = function()
-			MY.Game.SetHotKey()
+			MY.SetHotKey()
 		end,
 	},
 }
 MY.RegisterAddonMenu('MY_LOGOFF_MENU', menu)
 end
 
-MY.Game.RegisterHotKey('MY_LogOff_RUI', _L['return to role list'], function() Logoff(false) end, nil)
-MY.Game.RegisterHotKey('MY_LogOff_RRL', _L['return to game login'], function() Logoff(true) end, nil)
-MY.Game.RegisterHotKey('MY_LogOff_RUI_UNFIGHT', _L['return to role list while not fight'], function() Logoff(false, true) end, nil)
-MY.Game.RegisterHotKey('MY_LogOff_RRL_UNFIGHT', _L['return to game login while not fight'], function() Logoff(true, true) end, nil)
-MY.Game.RegisterHotKey('MY_LogOff_RUI_UNFIGHT_ALIVE', _L['return to role list while not fight and not dead'], function() Logoff(false, true, true) end, nil)
-MY.Game.RegisterHotKey('MY_LogOff_RRL_UNFIGHT_ALIVE', _L['return to game login while not fight and not dead'], function() Logoff(true, true, true) end, nil)
+MY.RegisterHotKey('MY_LogOff_RUI', _L['return to role list'], function() Logoff(false) end, nil)
+MY.RegisterHotKey('MY_LogOff_RRL', _L['return to game login'], function() Logoff(true) end, nil)
+MY.RegisterHotKey('MY_LogOff_RUI_UNFIGHT', _L['return to role list while not fight'], function() Logoff(false, true) end, nil)
+MY.RegisterHotKey('MY_LogOff_RRL_UNFIGHT', _L['return to game login while not fight'], function() Logoff(true, true) end, nil)
+MY.RegisterHotKey('MY_LogOff_RUI_UNFIGHT_ALIVE', _L['return to role list while not fight and not dead'], function() Logoff(false, true, true) end, nil)
+MY.RegisterHotKey('MY_LogOff_RRL_UNFIGHT_ALIVE', _L['return to game login while not fight and not dead'], function() Logoff(true, true, true) end, nil)

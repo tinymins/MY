@@ -31,10 +31,10 @@ local IsNil, IsString, IsTable, IsEmpty = MY.IsNil, MY.IsString, MY.IsTable, MY.
 -----------------------------------------------
 -- 本地函数和变量
 -----------------------------------------------
-MY = MY or {}
-MY.Game = MY.Game or {}
-local _Cache, _L = {}, MY.LoadLangPack()
-local _C = {}
+if not MY then
+	return OutputMessage('MSG_SYS', '[MYLIB#GAME] Fatal error! MY namespace does not exist!\n')
+end
+local _L = MY.LoadLangPack()
 
 -- #######################################################################################################
 --       #       #               #         #           #           #
@@ -50,17 +50,16 @@ local _C = {}
 --       #   #       #           #     #   #           # #   #     #
 --       # #           # #     # #   #   # # # # #     #   #   # # # # # #
 -- #######################################################################################################
-_Cache.tHotkey = {}
+do local HOTKEY_CACHE = {}
 -- 增加系统快捷键
 -- (void) MY.RegisterHotKey(string szName, string szTitle, func fnAction)   -- 增加系统快捷键
-function MY.Game.RegisterHotKey(szName, szTitle, fnAction)
-	insert(_Cache.tHotkey, { szName = szName, szTitle = szTitle, fnAction = fnAction })
+function MY.RegisterHotKey(szName, szTitle, fnAction)
+	insert(HOTKEY_CACHE, { szName = szName, szTitle = szTitle, fnAction = fnAction })
 end
-MY.RegisterHotKey = MY.Game.RegisterHotKey
 
 -- 获取快捷键名称
 -- (string) MY.GetHotKeyDisplay(string szName, boolean bBracket, boolean bShort)      -- 取得快捷键名称
-function MY.Game.GetHotKeyDisplay(szName, bBracket, bShort)
+function MY.GetHotKeyDisplay(szName, bBracket, bShort)
 	local nKey, bShift, bCtrl, bAlt = Hotkey.Get(szName)
 	local szDisplay = GetKeyShow(nKey, bShift, bCtrl, bAlt, bShort == true)
 	if szDisplay ~= '' and bBracket then
@@ -68,12 +67,11 @@ function MY.Game.GetHotKeyDisplay(szName, bBracket, bShort)
 	end
 	return szDisplay
 end
-MY.GetHotKeyDisplay = MY.Game.GetHotKeyDisplay
 
 -- 获取快捷键
 -- (table) MY.GetHotKey(string szName, true , true )       -- 取得快捷键
 -- (number nKey, boolean bShift, boolean bCtrl, boolean bAlt) MY.GetHotKey(string szName, true , fasle)        -- 取得快捷键
-function MY.Game.GetHotKey(szName, bBracket, bShort)
+function MY.GetHotKey(szName, bBracket, bShort)
 	local nKey, bShift, bCtrl, bAlt = Hotkey.Get(szName)
 	if nKey==0 then return nil end
 	if bBracket then
@@ -82,14 +80,13 @@ function MY.Game.GetHotKey(szName, bBracket, bShort)
 		return nKey, bShift, bCtrl, bAlt
 	end
 end
-MY.GetHotKey = MY.Game.GetHotKey
 
 -- 设置快捷键/打开快捷键设置面板    -- HM里面抠出来的
 -- (void) MY.SetHotKey()                               -- 打开快捷键设置面板
 -- (void) MY.SetHotKey(string szGroup)     -- 打开快捷键设置面板并定位到 szGroup 分组（不可用）
 -- (void) MY.SetHotKey(string szCommand, number nKey )     -- 设置快捷键
 -- (void) MY.SetHotKey(string szCommand, number nIndex, number nKey [, boolean bShift [, boolean bCtrl [, boolean bAlt] ] ])       -- 设置快捷键
-function MY.Game.SetHotKey(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
+function MY.SetHotKey(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
 	if nIndex then
 		if not nKey then
 			nIndex, nKey = 1, nIndex
@@ -221,19 +218,20 @@ function MY.Game.SetHotKey(szCommand, nIndex, nKey, bShift, bCtrl, bAlt)
 		end
 	end
 end
-MY.SetHotKey = MY.Game.SetHotKey
 
 MY.RegisterInit('MYLIB#BIND_HOTKEY', function()
 	-- hotkey
 	Hotkey.AddBinding('MY_Total', _L['Open/Close main panel'], MY.GetAddonInfo().szName, MY.TogglePanel, nil)
-	for _, v in ipairs(_Cache.tHotkey) do
+	for _, v in ipairs(HOTKEY_CACHE) do
 		Hotkey.AddBinding(v.szName, v.szTitle, '', v.fnAction, nil)
 	end
 	for i = 1, 5 do
 		Hotkey.AddBinding('MY_HotKey_Null_'..i, _L['none-function hotkey'], '', function() end, nil)
 	end
 end)
-MY.Game.RegisterHotKey('MY_STOP_CASTING', _L['Stop cast skill'], function() GetClientPlayer().StopCurrentAction() end)
+MY.RegisterHotKey('MY_STOP_CASTING', _L['Stop cast skill'], function() GetClientPlayer().StopCurrentAction() end)
+end
+
 -- #######################################################################################################
 --                                 #                   # # # #   # # # #
 --     # # # #   # # # # #       # # # # # # #         #     #   #     #
@@ -249,7 +247,7 @@ MY.Game.RegisterHotKey('MY_STOP_CASTING', _L['Stop cast skill'], function() GetC
 --   #     # #   # #     #     #         # #           # # # #   # # # #
 -- #######################################################################################################
 -- 获取当前服务器名称
-function MY.Game.GetServer(nIndex)
+function MY.GetServer(nIndex)
 	local display_region, display_server, region, server = GetUserServer()
 	region = region or display_region
 	server = server or display_server
@@ -261,10 +259,9 @@ function MY.Game.GetServer(nIndex)
 		return region .. '_' .. server, {region, server}
 	end
 end
-MY.GetServer = MY.Game.GetServer
 
 -- 获取当前服务器显示名称
-function MY.Game.GetDisplayServer(nIndex)
+function MY.GetDisplayServer(nIndex)
 	local display_region, display_server = GetUserServer()
 	if nIndex == 1 then
 		return display_region
@@ -274,10 +271,9 @@ function MY.Game.GetDisplayServer(nIndex)
 		return display_region .. '_' .. display_server, {display_region, display_server}
 	end
 end
-MY.GetDisplayServer = MY.Game.GetDisplayServer
 
 -- 获取数据互通主服务器名称
-function MY.Game.GetRealServer(nIndex)
+function MY.GetRealServer(nIndex)
 	local display_region, display_server, _, _, real_region, real_server = GetUserServer()
 	real_region = real_region or display_region
 	real_server = real_server or display_server
@@ -289,12 +285,11 @@ function MY.Game.GetRealServer(nIndex)
 		return real_region .. '_' .. real_server, {real_region, real_server}
 	end
 end
-MY.GetRealServer = MY.Game.GetRealServer
 
 do
 local S2L_CACHE = setmetatable({}, { __mode = 'k' })
 local L2S_CACHE = setmetatable({}, { __mode = 'k' })
-function MY.Game.ConvertNpcID(dwID, eType)
+function MY.ConvertNpcID(dwID, eType)
 	if IsPlayer(dwID) then
 		if not S2L_CACHE[dwID] then
 			S2L_CACHE[dwID] = { dwID + 0x40000000 }
@@ -307,7 +302,6 @@ function MY.Game.ConvertNpcID(dwID, eType)
 		return eType == 'long' and dwID or L2S_CACHE[dwID][1]
 	end
 end
-MY.ConvertNpcID = MY.Game.ConvertNpcID
 end
 
 -- 获取指定对象
@@ -316,7 +310,7 @@ end
 -- dwID  : 对象ID
 -- return: 根据 dwType 类型和 dwID 取得操作对象
 --         不存在时返回nil, nil
-function MY.Game.GetObject(dwType, dwID)
+function MY.GetObject(dwType, dwID)
 	if not dwID then
 		dwType, dwID = nil, dwType
 	end
@@ -350,20 +344,6 @@ function MY.Game.GetObject(dwType, dwID)
 	end
 	return p, info, b
 end
-MY.GetObject = MY.Game.GetObject
-
-function MY.GetObjectType(obj)
-	if MY_NEARBY_PLAYER[obj.dwID] == obj then
-		return 'PLAYER'
-	elseif MY_NEARBY_NPC[obj.dwID] == obj then
-		return 'NPC'
-	elseif MY_NEARBY_DOODAD[obj.dwID] == obj then
-		return 'DOODAD'
-	elseif GetItem(obj.dwID) == obj then
-		return 'ITEM'
-	end
-	return 'UNKNOWN'
-end
 
 -- 获取指定对象的名字
 -- MY.GetObjectName(obj, bRetID)
@@ -372,7 +352,7 @@ end
 --    'auto'   名字为空时返回 -- 默认值
 --    'always' 总是返回
 --    'never'  总是不返回
-function MY.Game.GetObjectName(obj, eRetID)
+function MY.GetObjectName(obj, eRetID)
 	if not obj then
 		return nil
 	end
@@ -429,7 +409,6 @@ function MY.Game.GetObjectName(obj, eRetID)
 	end
 	return szName
 end
-MY.GetObjectName = MY.Game.GetObjectName
 
 function MY.GetDistance(nX, nY, nZ)
 	local me = GetClientPlayer()
@@ -442,25 +421,25 @@ function MY.GetDistance(nX, nY, nZ)
 	return floor(((me.nX - nX) ^ 2 + (me.nY - nY) ^ 2 + (me.nZ/8 - nZ/8) ^ 2) ^ 0.5)/64
 end
 
-do local MY_CACHE_BUFF = {}
+do local BUFF_CACHE = {}
 function MY.GetBuffName(dwBuffID, dwLevel)
 	local xKey = dwBuffID
 	if dwLevel then
 		xKey = dwBuffID .. '_' .. dwLevel
 	end
-	if not MY_CACHE_BUFF[xKey] then
+	if not BUFF_CACHE[xKey] then
 		local tLine = Table_GetBuff(dwBuffID, dwLevel or 1)
 		if tLine then
-			MY_CACHE_BUFF[xKey] = { tLine.szName, tLine.dwIconID }
+			BUFF_CACHE[xKey] = { tLine.szName, tLine.dwIconID }
 		else
 			local szName = 'BUFF#' .. dwBuffID
 			if dwLevel then
 				szName = szName .. ':' .. dwLevel
 			end
-			MY_CACHE_BUFF[xKey] = { szName, 1436 }
+			BUFF_CACHE[xKey] = { szName, 1436 }
 		end
 	end
-	return unpack(MY_CACHE_BUFF[xKey])
+	return unpack(BUFF_CACHE[xKey])
 end
 end
 
@@ -469,7 +448,7 @@ function MY.GetEndTime(nEndFrame)
 end
 
 -- 获取指定名字的右键菜单
-function MY.Game.GetTargetContextMenu(dwType, szName, dwID)
+function MY.GetTargetContextMenu(dwType, szName, dwID)
 	local t = {}
 	if dwType == TARGET.PLAYER then
 		-- 复制
@@ -549,7 +528,6 @@ function MY.Game.GetTargetContextMenu(dwType, szName, dwID)
 
 	return t
 end
-MY.GetTargetContextMenu = MY.Game.GetTargetContextMenu
 
 -- 获取副本选择菜单
 -- (table) MY.GetDungeonMenu(fnAction, bOnlyRaid)
@@ -694,7 +672,7 @@ function MY.IsBoss(dwMapID, dwTemplateID)
 	) and true or false
 end
 
-MY.RegisterTargetAddonMenu('MY.Game.Bosslist', function()
+MY.RegisterTargetAddonMenu('MYLIB#Game#Bosslist', function()
 	local dwType, dwID = MY.GetTarget()
 	if dwType == TARGET.NPC and (IsCtrlKeyDown() or IsAltKeyDown() or IsShiftKeyDown()) then
 		GenerateList()
@@ -801,7 +779,7 @@ function MY.IsShieldedNpc(dwTemplateID)
 	return Table_IsShieldedNpc and Table_IsShieldedNpc(dwTemplateID)
 end
 
-MY.RegisterTargetAddonMenu('MY.Game.ImportantNpclist', function()
+MY.RegisterTargetAddonMenu('MYLIB#Game#ImportantNpclist', function()
 	local dwType, dwID = MY.GetTarget()
 	if dwType == TARGET.NPC and (IsCtrlKeyDown() or IsAltKeyDown() or IsShiftKeyDown()) then
 		GenerateList()
@@ -1134,7 +1112,7 @@ end
 
 do
 -- skillid, uitex, frame
-local MY_KUNGFU_LIST = setmetatable({
+local KUNGFU_LIST = setmetatable({
 	-- MT
 	{ 10062, 'ui/Image/icon/skill_tiance01.UITex',     0 }, -- 铁牢
 	{ 10243, 'ui/Image/icon/mingjiao_taolu_7.UITex',   0 }, -- 明尊
@@ -1175,9 +1153,9 @@ local MY_KUNGFU_LIST = setmetatable({
 
 function MY.GetKungfuInfo(dwKungfuID)
 	if dwKungfuID == 'all' then
-		return MY_KUNGFU_LIST
+		return KUNGFU_LIST
 	end
-	return unpack(MY_KUNGFU_LIST[dwKungfuID])
+	return unpack(KUNGFU_LIST[dwKungfuID])
 end
 end
 
@@ -1198,18 +1176,18 @@ end
 end
 
 do
-local MY_CACHE_ITEM = {}
+local ITEM_CACHE = {}
 function MY.GetItemName(nUiId)
-	if not MY_CACHE_ITEM[nUiId] then
+	if not ITEM_CACHE[nUiId] then
 		local szName = Table_GetItemName(nUiId)
 		local nIcon = Table_GetItemIconID(nUiId)
 		if szName ~= '' and nIocn ~= -1 then
-			MY_CACHE_ITEM[nUiId] = { szName, nIcon }
+			ITEM_CACHE[nUiId] = { szName, nIcon }
 		else
-			MY_CACHE_ITEM[nUiId] = { 'ITEM#' .. nUiId, 1435 }
+			ITEM_CACHE[nUiId] = { 'ITEM#' .. nUiId, 1435 }
 		end
 	end
-	return unpack(MY_CACHE_ITEM[nUiId])
+	return unpack(ITEM_CACHE[nUiId])
 end
 end
 
@@ -1228,18 +1206,31 @@ end
 --   #         #     # #     #       # # # # # # #     #             # # #         # #         # #   --
 -------------------------------------------------------------------------------------------------------
 do
-MY_NEARBY_NPC = {}      -- 附近的NPC
-MY_NEARBY_PLAYER = {}   -- 附近的物品
-MY_NEARBY_DOODAD = {}   -- 附近的玩家
+local NEARBY_NPC = {}      -- 附近的NPC
+local NEARBY_PLAYER = {}   -- 附近的物品
+local NEARBY_DOODAD = {}   -- 附近的玩家
+
+function MY.GetObjectType(obj)
+	if NEARBY_PLAYER[obj.dwID] == obj then
+		return 'PLAYER'
+	elseif NEARBY_NPC[obj.dwID] == obj then
+		return 'NPC'
+	elseif NEARBY_DOODAD[obj.dwID] == obj then
+		return 'DOODAD'
+	elseif GetItem(obj.dwID) == obj then
+		return 'ITEM'
+	end
+	return 'UNKNOWN'
+end
 
 -- 获取附近NPC列表
 -- (table) MY.GetNearNpc(void)
 function MY.GetNearNpc(nLimit)
 	local aNpc = {}
-	for k, _ in pairs(MY_NEARBY_NPC) do
+	for k, _ in pairs(NEARBY_NPC) do
 		local npc = GetNpc(k)
 		if not npc then
-			MY_NEARBY_NPC[k] = nil
+			NEARBY_NPC[k] = nil
 		else
 			insert(aNpc, npc)
 			if nLimit and #aNpc == nLimit then
@@ -1252,7 +1243,7 @@ end
 
 function MY.GetNearNpcID(nLimit)
 	local aNpcID = {}
-	for k, _ in pairs(MY_NEARBY_NPC) do
+	for k, _ in pairs(NEARBY_NPC) do
 		insert(aNpcID, k)
 		if nLimit and #aNpcID == nLimit then
 			break
@@ -1265,10 +1256,10 @@ end
 -- (table) MY.GetNearPlayer(void)
 function MY.GetNearPlayer(nLimit)
 	local aPlayer = {}
-	for k, _ in pairs(MY_NEARBY_PLAYER) do
+	for k, _ in pairs(NEARBY_PLAYER) do
 		local p = GetPlayer(k)
 		if not p then
-			MY_NEARBY_PLAYER[k] = nil
+			NEARBY_PLAYER[k] = nil
 		else
 			insert(aPlayer, p)
 			if nLimit and #aPlayer == nLimit then
@@ -1281,7 +1272,7 @@ end
 
 function MY.GetNearPlayerID(nLimit)
 	local aPlayerID = {}
-	for k, _ in pairs(MY_NEARBY_PLAYER) do
+	for k, _ in pairs(NEARBY_PLAYER) do
 		insert(aPlayerID, k)
 		if nLimit and #aPlayerID == nLimit then
 			break
@@ -1294,10 +1285,10 @@ end
 -- (table) MY.GetNearPlayer(void)
 function MY.GetNearDoodad(nLimit)
 	local aDoodad = {}
-	for dwID, _ in pairs(MY_NEARBY_DOODAD) do
+	for dwID, _ in pairs(NEARBY_DOODAD) do
 		local doodad = GetDoodad(dwID)
 		if not doodad then
-			MY_NEARBY_DOODAD[dwID] = nil
+			NEARBY_DOODAD[dwID] = nil
 		else
 			insert(aDoodad, doodad)
 			if nLimit and #aDoodad == nLimit then
@@ -1310,7 +1301,7 @@ end
 
 function MY.GetNearDoodadID(nLimit)
 	local aDoodadID = {}
-	for dwID, _ in pairs(MY_NEARBY_DOODAD) do
+	for dwID, _ in pairs(NEARBY_DOODAD) do
 		insert(aDoodadID, dwID)
 		if nLimit and #aDoodadID == nLimit then
 			break
@@ -1319,17 +1310,17 @@ function MY.GetNearDoodadID(nLimit)
 	return aDoodadID
 end
 
-RegisterEvent('NPC_ENTER_SCENE',    function() MY_NEARBY_NPC[arg0]    = GetNpc(arg0) end)
-RegisterEvent('NPC_LEAVE_SCENE',    function() MY_NEARBY_NPC[arg0]    = nil  end)
-RegisterEvent('PLAYER_ENTER_SCENE', function() MY_NEARBY_PLAYER[arg0] = GetPlayer(arg0) end)
-RegisterEvent('PLAYER_LEAVE_SCENE', function() MY_NEARBY_PLAYER[arg0] = nil  end)
-RegisterEvent('DOODAD_ENTER_SCENE', function() MY_NEARBY_DOODAD[arg0] = GetDoodad(arg0) end)
-RegisterEvent('DOODAD_LEAVE_SCENE', function() MY_NEARBY_DOODAD[arg0] = nil  end)
+RegisterEvent('NPC_ENTER_SCENE',    function() NEARBY_NPC[arg0]    = GetNpc(arg0) end)
+RegisterEvent('NPC_LEAVE_SCENE',    function() NEARBY_NPC[arg0]    = nil  end)
+RegisterEvent('PLAYER_ENTER_SCENE', function() NEARBY_PLAYER[arg0] = GetPlayer(arg0) end)
+RegisterEvent('PLAYER_LEAVE_SCENE', function() NEARBY_PLAYER[arg0] = nil  end)
+RegisterEvent('DOODAD_ENTER_SCENE', function() NEARBY_DOODAD[arg0] = GetDoodad(arg0) end)
+RegisterEvent('DOODAD_LEAVE_SCENE', function() NEARBY_DOODAD[arg0] = nil  end)
 end
 
 -- 获取玩家自身信息（缓存）
 do local m_ClientInfo
-function MY.Game.GetClientInfo(bForceRefresh)
+function MY.GetClientInfo(bForceRefresh)
 	if bForceRefresh or not (m_ClientInfo and m_ClientInfo.dwID) then
 		local me = GetClientPlayer()
 		if me then -- 确保获取到玩家
@@ -1401,8 +1392,7 @@ function MY.Game.GetClientInfo(bForceRefresh)
 
 	return m_ClientInfo or {}
 end
-MY.GetClientInfo = MY.Game.GetClientInfo
-MY.RegisterEvent('LOADING_ENDING', MY.Game.GetClientInfo)
+MY.RegisterEvent('LOADING_ENDING', MY.GetClientInfo)
 end
 
 -- 获取唯一标识符
@@ -1413,30 +1403,32 @@ function MY.GetClientUUID()
 		if me.GetGlobalID and me.GetGlobalID() ~= '0' then
 			m_szUUID = me.GetGlobalID()
 		else
-			m_szUUID = (MY.Game.GetRealServer()):gsub('[/\\|:%*%?"<>]', '') .. '_' .. MY.Game.GetClientInfo().dwID
+			m_szUUID = (MY.GetRealServer()):gsub('[/\\|:%*%?"<>]', '') .. '_' .. MY.GetClientInfo().dwID
 		end
 	end
 	return m_szUUID
 end
 end
 
-function _C.GeneFriendListCache()
-	if not _C.tFriendListByGroup then
+do
+local FRIEND_LIST_BY_ID, FRIEND_LIST_BY_NAME, FRIEND_LIST_BY_GROUP
+local function GeneFriendListCache()
+	if not FRIEND_LIST_BY_GROUP then
 		local me = GetClientPlayer()
 		if me then
 			local infos = me.GetFellowshipGroupInfo()
 			if infos then
-				_C.tFriendListByID = {}
-				_C.tFriendListByName = {}
-				_C.tFriendListByGroup = {{ id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND or '' }} -- 默认分组
+				FRIEND_LIST_BY_ID = {}
+				FRIEND_LIST_BY_NAME = {}
+				FRIEND_LIST_BY_GROUP = {{ id = 0, name = g_tStrings.STR_FRIEND_GOOF_FRIEND or '' }} -- 默认分组
 				for _, group in ipairs(infos) do
-					table.insert(_C.tFriendListByGroup, group)
+					table.insert(FRIEND_LIST_BY_GROUP, group)
 				end
-				for _, group in ipairs(_C.tFriendListByGroup) do
+				for _, group in ipairs(FRIEND_LIST_BY_GROUP) do
 					for _, p in ipairs(me.GetFellowshipInfo(group.id) or {}) do
 						table.insert(group, p)
-						_C.tFriendListByID[p.id] = p
-						_C.tFriendListByName[p.name] = p
+						FRIEND_LIST_BY_ID[p.id] = p
+						FRIEND_LIST_BY_NAME[p.name] = p
 					end
 				end
 				return true
@@ -1446,36 +1438,36 @@ function _C.GeneFriendListCache()
 	end
 	return true
 end
-function _C.OnFriendListChange()
-	_C.tFriendListByID = nil
-	_C.tFriendListByName = nil
-	_C.tFriendListByGroup = nil
+local function OnFriendListChange()
+	FRIEND_LIST_BY_ID = nil
+	FRIEND_LIST_BY_NAME = nil
+	FRIEND_LIST_BY_GROUP = nil
 end
-MY.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE'     , _C.OnFriendListChange)
-MY.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE'     , _C.OnFriendListChange)
-MY.RegisterEvent('PLAYER_FELLOWSHIP_LOGIN'      , _C.OnFriendListChange)
-MY.RegisterEvent('PLAYER_FOE_UPDATE'            , _C.OnFriendListChange)
-MY.RegisterEvent('PLAYER_BLACK_LIST_UPDATE'     , _C.OnFriendListChange)
-MY.RegisterEvent('DELETE_FELLOWSHIP'            , _C.OnFriendListChange)
-MY.RegisterEvent('FELLOWSHIP_TWOWAY_FLAG_CHANGE', _C.OnFriendListChange)
+MY.RegisterEvent('PLAYER_FELLOWSHIP_UPDATE'     , OnFriendListChange)
+MY.RegisterEvent('PLAYER_FELLOWSHIP_CHANGE'     , OnFriendListChange)
+MY.RegisterEvent('PLAYER_FELLOWSHIP_LOGIN'      , OnFriendListChange)
+MY.RegisterEvent('PLAYER_FOE_UPDATE'            , OnFriendListChange)
+MY.RegisterEvent('PLAYER_BLACK_LIST_UPDATE'     , OnFriendListChange)
+MY.RegisterEvent('DELETE_FELLOWSHIP'            , OnFriendListChange)
+MY.RegisterEvent('FELLOWSHIP_TWOWAY_FLAG_CHANGE', OnFriendListChange)
 -- 获取好友列表
--- MY.Game.GetFriendList()         获取所有好友列表
--- MY.Game.GetFriendList(1)        获取第一个分组好友列表
--- MY.Game.GetFriendList('挽月堂') 获取分组名称为挽月堂的好友列表
-function MY.Game.GetFriendList(arg0)
+-- MY.GetFriendList()         获取所有好友列表
+-- MY.GetFriendList(1)        获取第一个分组好友列表
+-- MY.GetFriendList('挽月堂') 获取分组名称为挽月堂的好友列表
+function MY.GetFriendList(arg0)
 	local t = {}
 	local tGroup = {}
-	if _C.GeneFriendListCache() then
+	if GeneFriendListCache() then
 		if type(arg0) == 'number' then
-			table.insert(tGroup, _C.tFriendListByGroup[arg0])
+			table.insert(tGroup, FRIEND_LIST_BY_GROUP[arg0])
 		elseif type(arg0) == 'string' then
-			for _, group in ipairs(_C.tFriendListByGroup) do
+			for _, group in ipairs(FRIEND_LIST_BY_GROUP) do
 				if group.name == arg0 then
 					table.insert(tGroup, clone(group))
 				end
 			end
 		else
-			tGroup = _C.tFriendListByGroup
+			tGroup = FRIEND_LIST_BY_GROUP
 		end
 		local n = 0
 		for _, group in ipairs(tGroup) do
@@ -1488,35 +1480,37 @@ function MY.Game.GetFriendList(arg0)
 end
 
 -- 获取好友
-function MY.Game.GetFriend(arg0)
-	if arg0 and _C.GeneFriendListCache() then
+function MY.GetFriend(arg0)
+	if arg0 and GeneFriendListCache() then
 		if type(arg0) == 'number' then
-			return clone(_C.tFriendListByID[arg0])
+			return clone(FRIEND_LIST_BY_ID[arg0])
 		elseif type(arg0) == 'string' then
-			return clone(_C.tFriendListByName[arg0])
+			return clone(FRIEND_LIST_BY_NAME[arg0])
 		end
 	end
 end
-MY.GetFriend = MY.Game.GetFriend
 
 function MY.IsFriend(arg0)
 	return MY.GetFriend(arg0) and true or false
 end
+end
 
-function _C.GeneFoeListCache()
-	if not _C.tFoeList then
+do
+local FOE_LIST, FOE_LIST_BY_ID, FOE_LIST_BY_NAME
+local function GeneFoeListCache()
+	if not FOE_LIST then
 		local me = GetClientPlayer()
 		if me then
-			_C.tFoeList = {}
-			_C.tFoeListByID = {}
-			_C.tFoeListByName = {}
+			FOE_LIST = {}
+			FOE_LIST_BY_ID = {}
+			FOE_LIST_BY_NAME = {}
 			if me.GetFoeInfo then
 				local infos = me.GetFoeInfo()
 				if infos then
 					for i, p in ipairs(infos) do
-						_C.tFoeListByID[p.id] = p
-						_C.tFoeListByName[p.name] = p
-						table.insert(_C.tFoeList, p)
+						FOE_LIST_BY_ID[p.id] = p
+						FOE_LIST_BY_NAME[p.name] = p
+						table.insert(FOE_LIST, p)
 					end
 					return true
 				end
@@ -1526,32 +1520,32 @@ function _C.GeneFoeListCache()
 	end
 	return true
 end
-function _C.OnFoeListChange()
-	_C.tFoeList = nil
-	_C.tFoeListByID = nil
-	_C.tFoeListByName = nil
+local function OnFoeListChange()
+	FOE_LIST = nil
+	FOE_LIST_BY_ID = nil
+	FOE_LIST_BY_NAME = nil
 end
-MY.RegisterEvent('PLAYER_FOE_UPDATE', _C.OnFoeListChange)
+MY.RegisterEvent('PLAYER_FOE_UPDATE', OnFoeListChange)
 -- 获取仇人列表
-function MY.Game.GetFoeList()
-	if _C.GeneFoeListCache() then
-		return clone(_C.tFoeList)
+function MY.GetFoeList()
+	if GeneFoeListCache() then
+		return clone(FOE_LIST)
 	end
 end
 -- 获取仇人
-function MY.Game.GetFoe(arg0)
-	if arg0 and _C.GeneFoeListCache() then
+function MY.GetFoe(arg0)
+	if arg0 and GeneFoeListCache() then
 		if type(arg0) == 'number' then
-			return _C.tFoeListByID[arg0]
+			return FOE_LIST_BY_ID[arg0]
 		elseif type(arg0) == 'string' then
-			return _C.tFoeListByName[arg0]
+			return FOE_LIST_BY_NAME[arg0]
 		end
 	end
 end
-MY.GetFoe = MY.Game.GetFoe
+end
 
 -- 获取好友列表
-function MY.Game.GetTongMemberList(bShowOffLine, szSorter, bAsc)
+function MY.GetTongMemberList(bShowOffLine, szSorter, bAsc)
 	if bShowOffLine == nil then bShowOffLine = false  end
 	if szSorter     == nil then szSorter     = 'name' end
 	if bAsc         == nil then bAsc         = true   end
@@ -1582,24 +1576,22 @@ function MY.GetTongName(dwTongID)
 end
 
 -- 获取帮会成员
-function MY.Game.GetTongMember(arg0)
+function MY.GetTongMember(arg0)
 	if not arg0 then
 		return
 	end
 
 	return GetTongClient().GetMemberInfo(arg0)
 end
-MY.GetTongMember = MY.Game.GetTongMember
 
 function MY.IsTongMember(arg0)
 	return MY.GetTongMember(arg0) and true or false
 end
 
 -- 判断是不是队友
-function MY.Game.IsParty(dwID)
+function MY.IsParty(dwID)
 	return GetClientPlayer().IsPlayerInMyParty(dwID)
 end
-MY.IsParty = MY.Game.IsParty
 
 -------------------------------------------------------------------------------------------------------
 --       #         #   #                   #             #         #                   #             --
@@ -1615,44 +1607,46 @@ MY.IsParty = MY.Game.IsParty
 --   #           #     # #                 #             #     #       #     #     #         #   #   --
 --             #         #                 #             #   #           #           # # # # #       --
 -------------------------------------------------------------------------------------------------------
-_C.nLastFightUUID  = nil
-_C.nFightUUID      = nil
-_C.nFightBeginTick = -1
-_C.nFightEndTick   = -1
-function _C.OnFightStateChange()
+do
+local LAST_FIGHT_UUID  = nil
+local FIGHT_UUID       = nil
+local FIGHT_BEGIN_TICK = -1
+local FIGHT_END_TICK   = -1
+local FIGHTING         = false
+local function ListenFightStateChange()
 	-- 判定战斗边界
 	if MY.IsFighting() then
 		-- 进入战斗判断
-		if not _C.bFighting then
-			_C.bFighting = true
+		if not FIGHTING then
+			FIGHTING = true
 			-- 5秒脱战判定缓冲 防止明教隐身错误判定
-			if not _C.nFightUUID
-			or GetTickCount() - _C.nFightEndTick > 5000 then
+			if not FIGHT_UUID
+			or GetTickCount() - FIGHT_END_TICK > 5000 then
 				-- 新的一轮战斗开始
-				_C.nFightBeginTick = GetTickCount()
-				_C.nFightUUID = _C.nFightBeginTick
+				FIGHT_BEGIN_TICK = GetTickCount()
+				FIGHT_UUID = FIGHT_BEGIN_TICK
 				FireUIEvent('MY_FIGHT_HINT', true)
 			end
 		end
 	else
 		-- 退出战斗判定
-		if _C.bFighting then
-			_C.nFightEndTick, _C.bFighting = GetTickCount(), false
-		elseif _C.nFightUUID and GetTickCount() - _C.nFightEndTick > 5000 then
-			_C.nLastFightUUID, _C.nFightUUID = _C.nFightUUID, nil
+		if FIGHTING then
+			FIGHT_END_TICK, FIGHTING = GetTickCount(), false
+		elseif FIGHT_UUID and GetTickCount() - FIGHT_END_TICK > 5000 then
+			LAST_FIGHT_UUID, FIGHT_UUID = FIGHT_UUID, nil
 			FireUIEvent('MY_FIGHT_HINT', false)
 		end
 	end
 end
-MY.BreatheCall(_C.OnFightStateChange)
+MY.BreatheCall('MYLIB#ListenFightStateChange', ListenFightStateChange)
 
 -- 获取当前战斗时间
-function MY.Game.GetFightTime(szFormat)
+function MY.GetFightTime(szFormat)
 	local nTick = 0
 	if MY.IsFighting() then -- 战斗状态
-		nTick = GetTickCount() - _C.nFightBeginTick
+		nTick = GetTickCount() - FIGHT_BEGIN_TICK
 	else  -- 脱战状态
-		nTick = _C.nFightEndTick - _C.nFightBeginTick
+		nTick = FIGHT_END_TICK - FIGHT_BEGIN_TICK
 	end
 
 	if szFormat then
@@ -1680,29 +1674,30 @@ function MY.Game.GetFightTime(szFormat)
 	end
 	return szFormat
 end
-MY.GetFightTime = MY.Game.GetFightTime
 
 -- 获取当前战斗唯一标示符
 function MY.GetFightUUID()
-	return _C.nFightUUID
+	return FIGHT_UUID
 end
 
 -- 获取上次战斗唯一标示符
 function MY.GetLastFightUUID()
-	return _C.nLastFightUUID
+	return LAST_FIGHT_UUID
+end
 end
 
 -- 获取自身是否处于逻辑战斗状态
 -- (bool) MY.IsFighting()
+do local ARENA_START = false
 function MY.IsFighting()
 	local me = GetClientPlayer()
 	if not me then
 		return
 	end
 	local bFightState = me.bFightState
-	if not bFightState and MY.Game.IsInArena() and _C.bJJCStart then
+	if not bFightState and MY.IsInArena() and ARENA_START then
 		bFightState = true
-	elseif not bFightState and MY.Game.IsInDungeon() then
+	elseif not bFightState and MY.IsInDungeon() then
 		-- 在副本且附近队友进战且附近敌对NPC进战则判断处于战斗状态
 		local bPlayerFighting, bNpcFighting
 		for _, p in ipairs(MY.GetNearPlayer()) do
@@ -1723,8 +1718,9 @@ function MY.IsFighting()
 	end
 	return bFightState
 end
-MY.RegisterEvent('LOADING_ENDING.MY-PLAYER', function() _C.bJJCStart = nil end)
-MY.RegisterEvent('ARENA_START.MY-PLAYER', function() _C.bJJCStart = true end)
+MY.RegisterEvent('LOADING_ENDING.MY-PLAYER', function() ARENA_START = nil end)
+MY.RegisterEvent('ARENA_START.MY-PLAYER', function() ARENA_START = true end)
+end
 
 -------------------------------------------------------------------------------------------------------------------
 --                                   #                                                       #                   --
@@ -1743,7 +1739,7 @@ MY.RegisterEvent('ARENA_START.MY-PLAYER', function() _C.bJJCStart = true end)
 -- 取得目标类型和ID
 -- (dwType, dwID) MY.GetTarget()       -- 取得自己当前的目标类型和ID
 -- (dwType, dwID) MY.GetTarget(object) -- 取得指定操作对象当前的目标类型和ID
-function MY.Game.GetTarget(object)
+function MY.GetTarget(object)
 	if not object then
 		object = GetClientPlayer()
 	end
@@ -1753,13 +1749,12 @@ function MY.Game.GetTarget(object)
 		return TARGET.NO_TARGET, 0
 	end
 end
-MY.GetTarget = MY.Game.GetTarget
 
 -- 根据 dwType 类型和 dwID 设置目标
 -- (void) MY.SetTarget([number dwType, ]number dwID)
 -- dwType   -- *可选* 目标类型
 -- dwID     -- 目标 ID
-function MY.Game.SetTarget(dwType, dwID)
+function MY.SetTarget(dwType, dwID)
 	-- check dwType
 	if type(dwType) == 'userdata' then
 		dwType, dwID = (IsPlayer(dwType.dwID) and TARGET.PLAYER) or TARGET.NPC, dwType.dwID
@@ -1800,62 +1795,64 @@ function MY.Game.SetTarget(dwType, dwID)
 	end
 	SetTarget(dwType, dwID)
 end
-MY.SetTarget = MY.Game.SetTarget
 
 -- 设置/取消 临时目标
--- MY.Game.SetTempTarget(dwType, dwID)
--- MY.Game.ResumeTarget()
-_C.pTempTarget = { TARGET.NO_TARGET, 0 }
-function MY.Game.SetTempTarget(dwType, dwID)
+-- MY.SetTempTarget(dwType, dwID)
+-- MY.ResumeTarget()
+do
+local TEMP_TARGET = { TARGET.NO_TARGET, 0 }
+function MY.SetTempTarget(dwType, dwID)
 	TargetPanel_SetOpenState(true)
-	_C.pTempTarget = { GetClientPlayer().GetTarget() }
-	MY.Game.SetTarget(dwType, dwID)
+	TEMP_TARGET = { GetClientPlayer().GetTarget() }
+	MY.SetTarget(dwType, dwID)
 	TargetPanel_SetOpenState(false)
 end
-MY.SetTempTarget = MY.Game.SetTempTarget
-function MY.Game.ResumeTarget()
+
+function MY.ResumeTarget()
 	TargetPanel_SetOpenState(true)
 	-- 当之前的目标不存在时，切到空目标
-	if _C.pTempTarget[1] ~= TARGET.NO_TARGET and not MY.GetObject(unpack(_C.pTempTarget)) then
-		_C.pTempTarget = { TARGET.NO_TARGET, 0 }
+	if TEMP_TARGET[1] ~= TARGET.NO_TARGET and not MY.GetObject(unpack(TEMP_TARGET)) then
+		TEMP_TARGET = { TARGET.NO_TARGET, 0 }
 	end
-	MY.Game.SetTarget(unpack(_C.pTempTarget))
-	_C.pTempTarget = { TARGET.NO_TARGET, 0 }
+	MY.SetTarget(unpack(TEMP_TARGET))
+	TEMP_TARGET = { TARGET.NO_TARGET, 0 }
 	TargetPanel_SetOpenState(false)
 end
-MY.ResumeTarget = MY.Game.ResumeTarget
+end
 
 -- 临时设置目标为指定目标并执行函数
--- (void) MY.Game.WithTarget(dwType, dwID, callback)
-_C.tWithTarget = {}
-_C.lockWithTarget = false
-function _C.WithTargetHandle()
-	if _C.lockWithTarget or
-	#_C.tWithTarget == 0 then
+-- (void) MY.WithTarget(dwType, dwID, callback)
+do
+local WITH_TARGET_LIST = {}
+local LOCK_WITH_TARGET = false
+local function WithTargetHandle()
+	if LOCK_WITH_TARGET or
+	#WITH_TARGET_LIST == 0 then
 		return
 	end
 
-	_C.lockWithTarget = true
-	local r = table.remove(_C.tWithTarget, 1)
+	LOCK_WITH_TARGET = true
+	local r = table.remove(WITH_TARGET_LIST, 1)
 
-	MY.Game.SetTempTarget(r.dwType, r.dwID)
+	MY.SetTempTarget(r.dwType, r.dwID)
 	local status, err = pcall(r.callback)
 	if not status then
-		MY.Debug({err}, 'MY.Game.lua#WithTargetHandle', MY_DEBUG.ERROR)
+		MY.Debug({err}, 'MYLIB#WithTarget', MY_DEBUG.ERROR)
 	end
-	MY.Game.ResumeTarget()
+	MY.ResumeTarget()
 
-	_C.lockWithTarget = false
-	_C.WithTargetHandle()
+	LOCK_WITH_TARGET = false
+	WithTargetHandle()
 end
 function MY.WithTarget(dwType, dwID, callback)
 	-- 因为客户端多线程 所以加上资源锁 防止设置临时目标冲突
-	table.insert(_C.tWithTarget, {
+	table.insert(WITH_TARGET_LIST, {
 		dwType   = dwType  ,
 		dwID     = dwID    ,
 		callback = callback,
 	})
-	_C.WithTargetHandle()
+	WithTargetHandle()
+end
 end
 
 -- 求N2在N1的面向角  --  重载+2
@@ -1871,7 +1868,7 @@ end
 -- @param oN2   N2对象
 -- @return nil    参数错误
 -- @return number 面向角(-180, 180]
-function MY.Game.GetFaceAngel(nX, nY, nFace, nTX, nTY, bAbs)
+function MY.GetFaceAngel(nX, nY, nFace, nTX, nTY, bAbs)
 	if type(nY) == 'userdata' and type(nX) == 'userdata' then
 		nX, nY, nFace, nTX, nTY, bAbs = nX.nX, nX.nY, nX.nFaceDirection, nY.nX, nY.nY, nFace
 	end
@@ -1886,12 +1883,11 @@ function MY.Game.GetFaceAngel(nX, nY, nFace, nTX, nTY, bAbs)
 		return nAngel
 	end
 end
-MY.GetFaceAngel = MY.Game.GetFaceAngel
 
 -- 装备名为szName的装备
 -- (void) MY.Equip(szName)
 -- szName  装备名称
-function MY.Game.Equip(szName)
+function MY.Equip(szName)
 	local me = GetClientPlayer()
 	for i=1,6 do
 		if me.GetBoxSize(i)>0 then
@@ -1950,7 +1946,7 @@ end
 -- (table) MY.GetBuff(KObject, dwID[, nLevel[, dwSkillSrcID]])
 -- (table) MY.GetBuff(tBuff[, dwSkillSrcID])
 -- (table) MY.GetBuff(KObject, tBuff[, dwSkillSrcID])
-function MY.Game.GetBuff(KObject, dwID, nLevel, dwSkillSrcID)
+function MY.GetBuff(KObject, dwID, nLevel, dwSkillSrcID)
 	local tBuff = {}
 	if type(KObject) ~= 'userdata' then
 		KObject, dwID, nLevel, dwSkillSrcID = GetClientPlayer(), KObject, dwID, nLevel
@@ -1974,7 +1970,7 @@ function MY.Game.GetBuff(KObject, dwID, nLevel, dwSkillSrcID)
 			end
 		else
 			if not KObject.GetBuff then
-				return MY.Debug({'KObject neither has a function named GetBuffByOwner nor named GetBuff.'}, 'MY.Game.GetBuff', MY_DEBUG.ERROR)
+				return MY.Debug({'KObject neither has a function named GetBuffByOwner nor named GetBuff.'}, 'MY.GetBuff', MY_DEBUG.ERROR)
 			end
 			for _, buff in ipairs(MY.GetBuffList(KObject)) do
 				if (tBuff[buff.dwID] == buff.nLevel or tBuff[buff.dwID] == 0) and buff.dwSkillSrcID == dwSkillSrcID then
@@ -1992,11 +1988,11 @@ function MY.Game.GetBuff(KObject, dwID, nLevel, dwSkillSrcID)
 					}
 				end
 			end
-			-- return MY.Debug({'KObject do not have a function named GetBuffByOwner.'}, 'MY.Game.GetBuff', MY_DEBUG.ERROR)
+			-- return MY.Debug({'KObject do not have a function named GetBuffByOwner.'}, 'MY.GetBuff', MY_DEBUG.ERROR)
 		end
 	else
 		if not KObject.GetBuff then
-			return MY.Debug({'KObject do not have a function named GetBuff.'}, 'MY.Game.GetBuff', MY_DEBUG.ERROR)
+			return MY.Debug({'KObject do not have a function named GetBuff.'}, 'MY.GetBuff', MY_DEBUG.ERROR)
 		end
 		for k, v in pairs(tBuff) do
 			local KBuff = KObject.GetBuff(k, v)
@@ -2006,9 +2002,8 @@ function MY.Game.GetBuff(KObject, dwID, nLevel, dwSkillSrcID)
 		end
 	end
 end
-MY.GetBuff = MY.Game.GetBuff
 
--- 点到自己的buff
+-- 点掉自己的buff
 -- (table) MY.CancelBuff([KObject = me, ]dwID[, nLevel = 0])
 function MY.CancelBuff(KObject, dwID, nLevel)
 	if type(KObject) ~= 'userdata' then
@@ -2046,49 +2041,57 @@ end
 end
 
 -- 获取对象是否无敌
--- (mixed) MY.Game.IsInvincible([object KObject])
+-- (mixed) MY.IsInvincible([object KObject])
 -- @return <nil >: invalid KObject
 -- @return <bool>: object invincible state
-function MY.Game.IsInvincible(KObject)
+function MY.IsInvincible(KObject)
 	KObject = KObject or GetClientPlayer()
 	if not KObject then
 		return nil
-	elseif MY.Game.GetBuff(KObject, 961) then
+	elseif MY.GetBuff(KObject, 961) then
 		return true
 	else
 		return false
 	end
 end
-MY.IsInvincible = MY.Game.IsInvincible
 
-_C.tPlayerSkills = {}   -- 玩家技能列表[缓存]   -- 技能名反查ID
-_C.tSkillCache = {}     -- 技能列表缓存         -- 技能ID查技能名称图标
 -- 通过技能名称获取技能对象
 -- (table) MY.GetSkillByName(szName)
-function MY.Game.GetSkillByName(szName)
-	if table.getn(_C.tPlayerSkills)==0 then
+do local PLAYER_SKILL_CACHE = {} -- 玩家技能列表[缓存] 技能名反查ID
+function MY.GetSkillByName(szName)
+	if table.getn(PLAYER_SKILL_CACHE)==0 then
 		for i = 1, g_tTable.Skill:GetRowCount() do
 			local tLine = g_tTable.Skill:GetRow(i)
-			if tLine~=nil and tLine.dwIconID~=nil and tLine.fSortOrder~=nil and tLine.szName~=nil and tLine.dwIconID~=13 and ( (not _C.tPlayerSkills[tLine.szName]) or tLine.fSortOrder>_C.tPlayerSkills[tLine.szName].fSortOrder) then
-				_C.tPlayerSkills[tLine.szName] = tLine
+			if tLine~=nil and tLine.dwIconID~=nil and tLine.fSortOrder~=nil and tLine.szName~=nil and tLine.dwIconID~=13 and ( (not PLAYER_SKILL_CACHE[tLine.szName]) or tLine.fSortOrder>PLAYER_SKILL_CACHE[tLine.szName].fSortOrder) then
+				PLAYER_SKILL_CACHE[tLine.szName] = tLine
 			end
 		end
 	end
-	return _C.tPlayerSkills[szName]
+	return PLAYER_SKILL_CACHE[szName]
+end
 end
 
 -- 判断技能名称是否有效
 -- (bool) MY.IsValidSkill(szName)
-function MY.Game.IsValidSkill(szName)
-	if MY.Game.GetSkillByName(szName)==nil then return false else return true end
+function MY.IsValidSkill(szName)
+	if MY.GetSkillByName(szName)==nil then return false else return true end
 end
 
 -- 判断当前用户是否可用某个技能
 -- (bool) MY.CanUseSkill(number dwSkillID[, dwLevel])
-function MY.Game.CanUseSkill(dwSkillID, dwLevel)
+do local BOX
+function MY.CanUseSkill(dwSkillID, dwLevel)
 	-- 判断技能是否有效 并将中文名转换为技能ID
-	if type(dwSkillID) == 'string' then if MY.IsValidSkill(dwSkillID) then dwSkillID = MY.Game.GetSkillByName(dwSkillID).dwSkillID else return false end end
-	local me, box = GetClientPlayer(), _C.hBox
+	if type(dwSkillID) == 'string' then
+		if not MY.IsValidSkill(dwSkillID) then
+			return false
+		end
+		dwSkillID = MY.GetSkillByName(dwSkillID).dwSkillID
+	end
+	if not BOX then
+		BOX = XGUI.CreateFrame('MY_SKILL', { w = 0, h = 0, empty = true }):hide():append('Box', {}, true)
+	end
+	local me, box = GetClientPlayer(), BOX
 	if me and box then
 		if not dwLevel then
 			if dwSkillID ~= 9007 then
@@ -2107,49 +2110,51 @@ function MY.Game.CanUseSkill(dwSkillID, dwLevel)
 	end
 	return false
 end
+end
 
 -- 根据技能 ID 及等级获取技能的名称及图标 ID（内置缓存处理）
--- (string, number) MY.Game.GetSkillName(number dwSkillID[, number dwLevel])
+-- (string, number) MY.GetSkillName(number dwSkillID[, number dwLevel])
+do local SKILL_CACHE = {} -- 技能列表缓存 技能ID查技能名称图标
 function MY.GetSkillName(dwSkillID, dwLevel)
-	if not _C.tSkillCache[dwSkillID] then
+	if not SKILL_CACHE[dwSkillID] then
 		local tLine = Table_GetSkill(dwSkillID, dwLevel)
 		if tLine and tLine.dwSkillID > 0 and tLine.bShow
 			and (StringFindW(tLine.szDesc, '_') == nil  or StringFindW(tLine.szDesc, '<') ~= nil)
 		then
-			_C.tSkillCache[dwSkillID] = { tLine.szName, tLine.dwIconID }
+			SKILL_CACHE[dwSkillID] = { tLine.szName, tLine.dwIconID }
 		else
 			local szName = 'SKILL#' .. dwSkillID
 			if dwLevel then
 				szName = szName .. ':' .. dwLevel
 			end
-			_C.tSkillCache[dwSkillID] = { szName, 13 }
+			SKILL_CACHE[dwSkillID] = { szName, 13 }
 		end
 	end
-	return unpack(_C.tSkillCache[dwSkillID])
+	return unpack(SKILL_CACHE[dwSkillID])
+end
 end
 
 -- 登出游戏
 -- (void) MY.Logout(bCompletely)
 -- bCompletely 为true返回登陆页 为false返回角色页 默认为false
-function MY.Game.Logout(bCompletely)
+function MY.Logout(bCompletely)
 	if bCompletely then
 		ReInitUI(LOAD_LOGIN_REASON.RETURN_GAME_LOGIN)
 	else
 		ReInitUI(LOAD_LOGIN_REASON.RETURN_ROLE_LIST)
 	end
 end
-MY.Logout = MY.Game.Logout
 
 -- 根据技能 ID 获取引导帧数，非引导技能返回 nil
 -- (number) MY.GetChannelSkillFrame(number dwSkillID)
+do local SKILL_EX = MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/skill_ex.jx3dat') or {}
 function MY.GetChannelSkillFrame(dwSkillID)
-	local t = _C.tSkillEx[dwSkillID]
+	local t = SKILL_EX[dwSkillID]
 	if t then
 		return t.nChannelFrame
 	end
 end
--- Load skill extend data
-_C.tSkillEx = MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/skill_ex.jx3dat') or {}
+end
 
 function MY.IsMarker()
 	return GetClientTeam().GetAuthorityInfo(TEAM_AUTHORITY_TYPE.MARK) == UI_GetClientPlayerID()
@@ -2164,16 +2169,15 @@ function MY.IsDistributer()
 end
 
 -- 判断自己在不在队伍里
--- (bool) MY.Game.IsInParty()
-function MY.Game.IsInParty()
+-- (bool) MY.IsInParty()
+function MY.IsInParty()
 	local me = GetClientPlayer()
 	return me and me.IsInParty()
 end
-MY.IsInParty = MY.Game.IsInParty
 
 -- 判断当前地图是不是竞技场
--- (bool) MY.Game.IsInArena()
-function MY.Game.IsInArena()
+-- (bool) MY.IsInArena()
+function MY.IsInArena()
 	local me = GetClientPlayer()
 	return me and (
 		me.GetScene().bIsArenaMap or -- JJC
@@ -2181,22 +2185,22 @@ function MY.Game.IsInArena()
 		me.GetMapID() == 181         -- 狼影殿
 	)
 end
-MY.IsInArena = MY.Game.IsInArena
+MY.IsInArena = MY.IsInArena
 
 -- 判断当前地图是不是战场
--- (bool) MY.Game.IsInBattleField()
-function MY.Game.IsInBattleField()
+-- (bool) MY.IsInBattleField()
+function MY.IsInBattleField()
 	local me = GetClientPlayer()
-	return me and me.GetScene().nType == MAP_TYPE.BATTLE_FIELD and not MY.Game.IsInArena()
+	return me and me.GetScene().nType == MAP_TYPE.BATTLE_FIELD and not MY.IsInArena()
 end
-MY.IsInBattleField = MY.Game.IsInBattleField
 
 -- 判断一个地图是不是副本
--- (bool) MY.Game.IsDungeonMap(szMapName, bRaid)
--- (bool) MY.Game.IsDungeonMap(dwMapID, bRaid)
-function MY.Game.IsDungeonMap(dwMapID, bRaid)
-	if not _Cache.tMapList then
-		_Cache.tMapList = {}
+-- (bool) MY.IsDungeonMap(szMapName, bRaid)
+-- (bool) MY.IsDungeonMap(dwMapID, bRaid)
+do local MAP_LIST
+function MY.IsDungeonMap(dwMapID, bRaid)
+	if not MAP_LIST then
+		MAP_LIST = {}
 		for _, dwMapID in ipairs(GetMapList()) do
 			local map          = { dwMapID = dwMapID }
 			local szName       = Table_GetMapName(dwMapID)
@@ -2204,11 +2208,11 @@ function MY.Game.IsDungeonMap(dwMapID, bRaid)
 			if tDungeonInfo and tDungeonInfo.dwClassID == 3 then
 				map.bDungeon = true
 			end
-			_Cache.tMapList[szName] = map
-			_Cache.tMapList[dwMapID] = map
+			MAP_LIST[szName] = map
+			MAP_LIST[dwMapID] = map
 		end
 	end
-	local map = _Cache.tMapList[dwMapID]
+	local map = MAP_LIST[dwMapID]
 	if map then
 		dwMapID = map.dwMapID
 	end
@@ -2218,81 +2222,74 @@ function MY.Game.IsDungeonMap(dwMapID, bRaid)
 		return select(2, GetMapParams(dwMapID)) == MAP_TYPE.DUNGEON
 	end
 end
-MY.IsDungeonMap = MY.Game.IsDungeonMap
+end
 
 -- 判断一个地图是不是个人CD副本
 -- (bool) MY.IsDungeonRoleProgressMap(dwMapID)
-function MY.Game.IsDungeonRoleProgressMap(dwMapID)
+function MY.IsDungeonRoleProgressMap(dwMapID)
 	return (select(8, GetMapParams(dwMapID)))
 end
-MY.IsDungeonRoleProgressMap = MY.Game.IsDungeonRoleProgressMap
+MY.IsDungeonRoleProgressMap = MY.IsDungeonRoleProgressMap
 
 -- 判断当前地图是不是副本
--- (bool) MY.Game.IsInDungeon(bool bRaid)
-function MY.Game.IsInDungeon(bRaid)
+-- (bool) MY.IsInDungeon(bool bRaid)
+function MY.IsInDungeon(bRaid)
 	local me = GetClientPlayer()
 	return me and MY.IsDungeonMap(me.GetMapID(), bRaid)
 end
-MY.IsInDungeon = MY.Game.IsInDungeon
 
 -- 判断地图是不是PUBG
--- (bool) MY.Game.IsPubgMap(dwMapID)
+-- (bool) MY.IsPubgMap(dwMapID)
 do
 local PUBG_MAP = {}
-function MY.Game.IsPubgMap(dwMapID)
+function MY.IsPubgMap(dwMapID)
 	if PUBG_MAP[dwMapID] == nil then
 		PUBG_MAP[dwMapID] = Table_IsTreasureBattleFieldMap
 			and Table_IsTreasureBattleFieldMap(dwMapID) or false
 	end
 	return PUBG_MAP[dwMapID]
 end
-MY.IsPubgMap = MY.Game.IsPubgMap
 end
 
 -- 判断当前地图是不是PUBG
--- (bool) MY.Game.IsInPubg()
-function MY.Game.IsInPubg()
+-- (bool) MY.IsInPubg()
+function MY.IsInPubg()
 	local me = GetClientPlayer()
 	return me and MY.IsPubgMap(me.GetMapID())
 end
-MY.IsInPubg = MY.Game.IsInPubg
 
 -- 判断地图是不是僵尸地图
--- (bool) MY.Game.IsZombieMap(dwMapID)
+-- (bool) MY.IsZombieMap(dwMapID)
 do
 local ZOMBIE_MAP = {}
-function MY.Game.IsZombieMap(dwMapID)
+function MY.IsZombieMap(dwMapID)
 	if ZOMBIE_MAP[dwMapID] == nil then
 		ZOMBIE_MAP[dwMapID] = Table_IsZombieBattleFieldMap
 			and Table_IsZombieBattleFieldMap(dwMapID) or false
 	end
 	return ZOMBIE_MAP[dwMapID]
 end
-MY.IsZombieMap = MY.Game.IsZombieMap
 end
 
 -- 判断当前地图是不是僵尸地图
--- (bool) MY.Game.IsInZombieMap()
-function MY.Game.IsInZombieMap()
+-- (bool) MY.IsInZombieMap()
+function MY.IsInZombieMap()
 	local me = GetClientPlayer()
 	return me and MY.IsZombieMap(me.GetMapID())
 end
-MY.IsInZombieMap = MY.Game.IsInZombieMap
 
 -- 判断地图是不是功能屏蔽地图
--- (bool) MY.Game.IsShieldedMap(dwMapID)
-function MY.Game.IsShieldedMap(dwMapID)
+-- (bool) MY.IsShieldedMap(dwMapID)
+function MY.IsShieldedMap(dwMapID)
 	return MY.IsPubgMap(dwMapID) or MY.IsZombieMap(dwMapID)
 end
-MY.IsShieldedMap = MY.Game.IsShieldedMap
 
 -- 判断当前地图是不是PUBG
--- (bool) MY.Game.IsInShieldedMap()
-function MY.Game.IsInShieldedMap()
+-- (bool) MY.IsInShieldedMap()
+function MY.IsInShieldedMap()
 	local me = GetClientPlayer()
 	return me and MY.IsShieldedMap(me.GetMapID())
 end
-MY.IsInShieldedMap = MY.Game.IsInShieldedMap
 
 do local MARK_NAME = { _L['Cloud'], _L['Sword'], _L['Ax'], _L['Hook'], _L['Drum'], _L['Shear'], _L['Stick'], _L['Jade'], _L['Dart'], _L['Fan'] }
 -- 获取标记中文名

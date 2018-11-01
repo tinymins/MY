@@ -281,7 +281,7 @@ function ChatLinkEvents.OnNameRClick(element, link)
 	if not link then
 		link = element
 	end
-	PopupMenu(MY.Game.GetTargetContextMenu(TARGET.PLAYER, (MY.UI(link):text():gsub('[%[%]]', ''))))
+	PopupMenu(MY.GetTargetContextMenu(TARGET.PLAYER, (MY.UI(link):text():gsub('[%[%]]', ''))))
 end
 function ChatLinkEvents.OnCopyLClick(element, link)
 	if not link then

@@ -1375,7 +1375,7 @@ end
 MY.RegisterBgMsg('MY_MAP_COPY_ID', onBgMsgMapCopyID)
 
 MY.RegisterAddonMenu({ szOption = _L['Raid Tools Panel'], fnAction = RT.TogglePanel })
-MY.Game.RegisterHotKey('MY_RaidTools', _L['Open/Close Raid Tools Panel'], RT.TogglePanel)
+MY.RegisterHotKey('MY_RaidTools', _L['Open/Close Raid Tools Panel'], RT.TogglePanel)
 
 local ui = {
 	TogglePanel = RT.TogglePanel

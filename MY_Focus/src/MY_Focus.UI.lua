@@ -106,7 +106,7 @@ function D.UpdateItem(hItem, p)
 	local dwType, dwID = p.dwType, p.dwID
 	local szVia, tRule = p.szVia, p.tRule
 	local bDeletable = p.bDeletable
-	local KObject, info, bInfo = MY.Game.GetObject(dwType, dwID)
+	local KObject, info, bInfo = MY.GetObject(dwType, dwID)
 	local szName = tRule and tRule.szDisplay
 	if not szName or szName == '' then
 		szName = MY.GetObjectName(KObject)
@@ -290,7 +290,7 @@ function D.UpdateItem(hItem, p)
 	-- 目标的目标
 	if MY_Focus.bShowTarget and dwType ~= TARGET.DOODAD then
 		local tp, id = KObject.GetTarget()
-		local tar = MY.Game.GetObject(tp, id)
+		local tar = MY.GetObject(tp, id)
 		if tar then
 			hItem:Lookup('Handle_Progress/Text_Target'):SetText(MY.GetObjectName(tar))
 		else
@@ -495,7 +495,7 @@ function MY_Focus.OnItemRButtonClick()
 	local name = this:GetName()
 	if name == 'Handle_Info' then
 		local dwType, dwID = this.dwType, this.dwID
-		local t = MY.Game.GetTargetContextMenu(dwType, this:Lookup('Handle_LMN/Text_Name'):GetText(), dwID)
+		local t = MY.GetTargetContextMenu(dwType, this:Lookup('Handle_LMN/Text_Name'):GetText(), dwID)
 		if this.bDeletable then
 			table.insert(t, 1, {
 				szOption = _L['delete focus'],
