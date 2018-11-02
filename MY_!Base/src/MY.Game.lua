@@ -15,7 +15,7 @@ local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
 local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
-local huge, pi, random = math.huge, math.pi, math.random
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
 local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
 local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
 local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
@@ -305,15 +305,72 @@ function MY.ConvertNpcID(dwID, eType)
 end
 end
 
-function MY.GetDistance(nX, nY, nZ)
-	local me = GetClientPlayer()
-	if not nY and not nZ then
-		local tar = nX
-		nX, nY, nZ = tar.nX, tar.nY, tar.nZ
-	elseif not nZ then
-		return floor(((me.nX - nX) ^ 2 + (me.nY - nY) ^ 2) ^ 0.5)/64
+-- OObject: KObject | {nType, dwID} | {dwID} | {nType, szName} | {szName}
+-- MY.GetDistance(OObject[, szType])
+-- MY.GetDistance(nX, nY)
+-- MY.GetDistance(nX, nY, nZ[, szType])
+-- MY.GetDistance(OObject1, OObject2[, szType])
+-- MY.GetDistance(OObject1, nX2, nY2)
+-- MY.GetDistance(OObject1, nX2, nY2, nZ2[, szType])
+-- MY.GetDistance(nX1, nY1, nX2, nY2)
+-- MY.GetDistance(nX1, nY1, nZ1, nX2, nY2, nZ2[, szType])
+-- szType: 'euclidean': ≈∑ œæ‡¿Î (default)
+--         'plane'    : ∆Ω√Êæ‡¿Î
+--         'gwwean'   : π˘ œæ‡¿Î
+function MY.GetDistance(arg0, arg1, arg2, arg3, arg4, arg5, arg6)
+	local szType = 'euclidean'
+	local nX1, nY1, nZ1 = 0, 0, 0
+	local nX2, nY2, nZ2 = 0, 0, 0
+	if IsTable(arg0) then
+		arg0 = MY.GetObject(unpack(arg0))
+		if not arg0 then
+			return
+		end
 	end
-	return floor(((me.nX - nX) ^ 2 + (me.nY - nY) ^ 2 + (me.nZ/8 - nZ/8) ^ 2) ^ 0.5)/64
+	if IsTable(arg1) then
+		arg1 = MY.GetObject(unpack(arg1))
+		if not arg1 then
+			return
+		end
+	end
+	if IsUserdata(arg0) then -- OObject -
+		nX1, nY1, nZ1 = arg0.nX, arg0.nY, arg0.nZ
+		if IsUserdata(arg1) then -- OObject1, OObject2
+			nX2, nY2, nZ2, szType = arg1.nX, arg1.nY, arg1.nZ, arg2
+		elseif IsNumber(arg1) and IsNumber(arg2) then -- OObject1, nX2, nY2
+			if IsNumber(arg3) then -- OObject1, nX2, nY2, nZ2[, szType]
+				nX2, nY2, nZ2, szType = arg1, arg2, arg3, arg4
+			else -- OObject1, nX2, nY2[, szType]
+				nX2, nY2, szType = arg1, arg2, arg3
+			end
+		else -- OObject[, szType]
+			local me = GetClientPlayer()
+			nX2, nY2, nZ2, szType = me.nX, me.nY, me.nZ, arg1
+		end
+	elseif IsNumber(arg0) and IsNumber(arg1) then -- nX1, nY1 -
+		if IsNumber(arg2) then
+			if IsNumber(arg3) then
+				if IsNumber(arg4) and IsNumber(arg5) then -- nX1, nY1, nZ1, nX2, nY2, nZ2[, szType]
+					nX1, nY1, nZ1, nX2, nY2, nZ2, szType = arg0, arg1, arg2, arg3, arg4, arg5, arg6
+				else -- nX1, nY1, nX2, nY2[, szType]
+					nX1, nY1, nX2, nY2, szType = arg0, arg1, arg2, arg3, arg4
+				end
+			else -- nX1, nY1, nZ1[, szType]
+				local me = GetClientPlayer()
+				nX1, nY1, nZ1, nX2, nY2, nZ2, szType = me.nX, me.nY, me.nZ, arg0, arg1, arg2, arg3
+			end
+		else -- nX1, nY1
+			local me = GetClientPlayer()
+			nX1, nY1, nX2, nY2 = me.nX, me.nY, arg0, arg1
+		end
+	end
+	if szType == 'plane' then
+		return floor(((nX1 - nX2) ^ 2 + (nY1 - nY2) ^ 2) ^ 0.5) / 64
+	end
+	if szType == 'gwwean' then
+		return max(floor(((nX1 - nX2) ^ 2 + (nY1 - nY2) ^ 2) ^ 0.5) / 64, floor(abs(nZ1 / 8 - nZ2 / 8)) / 64)
+	end
+	return floor(((nX1 - nX) ^ 2 + (nY1 - nY) ^ 2 + (nZ1 / 8 - nZ2 / 8) ^ 2) ^ 0.5) / 64
 end
 
 do local BUFF_CACHE = {}
