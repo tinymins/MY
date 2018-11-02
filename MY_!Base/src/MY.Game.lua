@@ -1774,23 +1774,33 @@ end
 
 -- 根据 dwType 类型和 dwID 设置目标
 -- (void) MY.SetTarget([number dwType, ]number dwID)
+-- (void) MY.SetTarget([number dwType, ]string szName)
 -- dwType   -- *可选* 目标类型
 -- dwID     -- 目标 ID
-function MY.SetTarget(dwType, dwID)
-	-- check dwType
-	if type(dwType) == 'userdata' then
-		dwType, dwID = (IsPlayer(dwType.dwID) and TARGET.PLAYER) or TARGET.NPC, dwType.dwID
-	elseif type(dwType) == 'string' then
-		dwType, dwID = nil, dwType
+function MY.SetTarget(arg0, arg1)
+	local dwType, dwID, szName
+	if IsUserdata(arg0) then
+		dwType, dwID = TARGET[MY.GetObjectType(arg0)], arg0.dwID
+	elseif IsString(arg0) then
+		szName = arg0
+	elseif IsNumber(arg0) then
+		if IsNil(arg1) then
+			dwID = arg0
+		elseif IsString(arg1) then
+			dwType, szName = arg0, arg1
+		elseif IsNumber(arg1) then
+			dwType, dwID = arg0, arg1
+		end
 	end
-	-- conv if dwID is string
-	if type(dwID) == 'string' then
+	if not dwID and not szName then
+		return
+	end
+	if szName then
 		local tTarget = {}
-		for _, szName in pairs(MY.String.Split(dwID:gsub('[%[%]]', ''), '|')) do
+		for _, szName in pairs(MY.Split(dwID:gsub('[%[%]]', ''), '|')) do
 			tTarget[szName] = true
 		end
-		dwID = nil
-		if not dwID and dwType ~= TARGET.PLAYER then
+		if not dwID and (not dwType or dwType == TARGET.NPC) then
 			for _, p in ipairs(MY.GetNearNpc()) do
 				if tTarget[p.szName] then
 					dwType, dwID = TARGET.NPC, p.dwID
@@ -1798,7 +1808,7 @@ function MY.SetTarget(dwType, dwID)
 				end
 			end
 		end
-		if not dwID and dwType ~= TARGET.NPC then
+		if not dwID and (not dwType or dwType == TARGET.PLAYER) then
 			for _, p in ipairs(MY.GetNearPlayer()) do
 				if tTarget[p.szName] then
 					dwType, dwID = TARGET.PLAYER, p.dwID
@@ -1807,15 +1817,11 @@ function MY.SetTarget(dwType, dwID)
 			end
 		end
 	end
-	if not dwType or dwType <= 0 then
-		dwType, dwID = TARGET.NO_TARGET, 0
-	elseif not dwID then
-		dwID, dwType = dwType, TARGET.NPC
-		if IsPlayer(dwID) then
-			dwType = TARGET.PLAYER
-		end
+	if not dwType or not dwID then
+		return false
 	end
 	SetTarget(dwType, dwID)
+	return true
 end
 
 -- 设置/取消 临时目标
