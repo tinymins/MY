@@ -2083,6 +2083,16 @@ function MY.IsInvincible(KObject)
 	end
 end
 
+-- 获取对象当前是否可读条
+-- (bool) LM.CanOTAction([object KObject])
+function MY.CanOTAction(KObject)
+	KObject = KObject or GetClientPlayer()
+	if not KObject then
+		return
+	end
+	return KObject.nMoveState == MOVE_STATE.ON_STAND or KObject.nMoveState == MOVE_STATE.ON_FLOAT
+end
+
 -- 通过技能名称获取技能对象
 -- (table) MY.GetSkillByName(szName)
 do local PLAYER_SKILL_CACHE = {} -- 玩家技能列表[缓存] 技能名反查ID
