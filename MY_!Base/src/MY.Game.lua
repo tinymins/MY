@@ -6,16 +6,16 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
 local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
-local huge, pi = math.huge, math.pi
+local huge, pi, random = math.huge, math.pi, math.random
 local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
 local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
 local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
@@ -23,11 +23,12 @@ local pack, unpack = table.pack or function(...) return {...} end, table.unpack 
 -- jx3 apis caching
 local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
-local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local IsNumber, IsBoolean, IsFunction = MY.IsNumber, MY.IsBoolean, MY.IsFunction
-local IsNil, IsString, IsTable, IsEmpty = MY.IsNil, MY.IsString, MY.IsTable, MY.IsEmpty
------------------------------------------------------------------------------------------
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local Get, RandomChild = MY.Get, MY.RandomChild
+local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
+---------------------------------------------------------------------------------------------------
 -----------------------------------------------
 -- 本地函数和变量
 -----------------------------------------------
@@ -302,112 +303,6 @@ function MY.ConvertNpcID(dwID, eType)
 		return eType == 'long' and dwID or L2S_CACHE[dwID][1]
 	end
 end
-end
-
--- 获取指定对象
--- (KObject, info, bIsInfo) MY.GetObject([number dwType, ]number dwID)
--- dwType: [可选]对象类型枚举 TARGET.*
--- dwID  : 对象ID
--- return: 根据 dwType 类型和 dwID 取得操作对象
---         不存在时返回nil, nil
-function MY.GetObject(dwType, dwID)
-	if not dwID then
-		dwType, dwID = nil, dwType
-	end
-	local p, info, b
-
-	if not dwType then
-		if IsPlayer(dwID) then
-			dwType = TARGET.PLAYER
-		elseif GetDoodad(dwID) then
-			dwType = TARGET.DOODAD
-		else
-			dwType = TARGET.NPC
-		end
-	end
-
-	if dwType == TARGET.PLAYER then
-		local me = GetClientPlayer()
-		if me and dwID == me.dwID then
-			p, info, b = me, me, false
-		elseif me and me.IsPlayerInMyParty(dwID) then
-			p, info, b = GetPlayer(dwID), GetClientTeam().GetMemberInfo(dwID), true
-		else
-			p, info, b = GetPlayer(dwID), GetPlayer(dwID), false
-		end
-	elseif dwType == TARGET.NPC then
-		p, info, b = GetNpc(dwID), GetNpc(dwID), false
-	elseif dwType == TARGET.DOODAD then
-		p, info, b = GetDoodad(dwID), GetDoodad(dwID), false
-	elseif dwType == TARGET.ITEM then
-		p, info, b = GetItem(dwID), GetItem(dwID), GetItem(dwID)
-	end
-	return p, info, b
-end
-
--- 获取指定对象的名字
--- MY.GetObjectName(obj, bRetID)
--- (KObject) obj    要获取名字的对象
--- (string)  eRetID 是否返回对象ID信息
---    'auto'   名字为空时返回 -- 默认值
---    'always' 总是返回
---    'never'  总是不返回
-function MY.GetObjectName(obj, eRetID)
-	if not obj then
-		return nil
-	end
-	if not eRetID then
-		eRetID = 'auto'
-	end
-	local szType, szName = MY.GetObjectType(obj), obj.szName
-	if szType == 'PLAYER' then -- PLAYER
-		szType = 'P'
-	elseif szType == 'NPC' then -- NPC
-		szType = 'N'
-		if IsEmpty(szName) then
-			szName = Table_GetNpcTemplateName(obj.dwTemplateID)
-			if szName then
-				szName = szName:gsub('^%s*(.-)%s*$', '%1')
-			end
-		end
-		if obj.dwEmployer and obj.dwEmployer ~= 0 then
-			if Table_IsSimplePlayer(obj.dwTemplateID) then -- 长歌影子
-				szName = MY.GetObjectName(GetPlayer(obj.dwEmployer), eRetID)
-			elseif not IsEmpty(szName) then
-				local szEmpName = MY.GetObjectName(
-					(IsPlayer(obj.dwEmployer) and GetPlayer(obj.dwEmployer)) or GetNpc(obj.dwEmployer),
-					'never'
-				) or g_tStrings.STR_SOME_BODY
-				szName =  szEmpName .. g_tStrings.STR_PET_SKILL_LOG .. szName
-			end
-		end
-	elseif szType == 'DOODAD' then -- DOODAD
-		szType = 'D'
-		if IsEmpty(szName) then
-			szName = Table_GetDoodadTemplateName(obj.dwTemplateID)
-			if szName then
-				szName = szName:gsub('^%s*(.-)%s*$', '%1')
-			end
-		end
-	elseif szType == 'ITEM' then -- ITEM
-		szType = 'I'
-		szName = GetItemNameByItem(obj)
-	else
-		szType = '?'
-	end
-	if IsEmpty(szName) and eRetID ~= 'never' or eRetID == 'always' then
-		local szDispID = szType
-		if szType == 'N' then
-			szDispID = szDispID .. MY.ConvertNpcID(obj.dwID) .. '@' .. obj.dwTemplateID
-		else
-			szDispID = szDispID .. obj.dwID
-		end
-		szName = IsEmpty(szName) and szDispID or (szName .. '(' .. szDispID .. ')')
-	end
-	if IsEmpty(szName) then
-		szName = nil
-	end
-	return szName
 end
 
 function MY.GetDistance(nX, nY, nZ)
@@ -1209,6 +1104,114 @@ do
 local NEARBY_NPC = {}      -- 附近的NPC
 local NEARBY_PLAYER = {}   -- 附近的物品
 local NEARBY_DOODAD = {}   -- 附近的玩家
+
+-- 获取指定对象
+-- (KObject, info, bIsInfo) MY.GetObject([number dwType, ]number dwID)
+-- dwType: [可选]对象类型枚举 TARGET.*
+-- dwID  : 对象ID
+-- return: 根据 dwType 类型和 dwID 取得操作对象
+--         不存在时返回nil, nil
+function MY.GetObject(dwType, dwID)
+	if not dwID then
+		dwType, dwID = nil, dwType
+	end
+	if dwID and not dwType then
+		if NEARBY_PLAYER[dwID] then
+			dwType = TARGET.PLAYER
+		elseif NEARBY_DOODAD[dwID] then
+			dwType = TARGET.DOODAD
+		elseif NEARBY_NPC[dwID] then
+			dwType = TARGET.NPC
+		end
+	end
+	if not dwType or not dwID then
+		return
+	end
+
+	local p, info, b
+	if dwType == TARGET.PLAYER then
+		local me = GetClientPlayer()
+		if me and dwID == me.dwID then
+			p, info, b = me, me, false
+		elseif me and me.IsPlayerInMyParty(dwID) then
+			p, info, b = GetPlayer(dwID), GetClientTeam().GetMemberInfo(dwID), true
+		else
+			p, info, b = GetPlayer(dwID), GetPlayer(dwID), false
+		end
+	elseif dwType == TARGET.NPC then
+		p, info, b = GetNpc(dwID), GetNpc(dwID), false
+	elseif dwType == TARGET.DOODAD then
+		p, info, b = GetDoodad(dwID), GetDoodad(dwID), false
+	elseif dwType == TARGET.ITEM then
+		p, info, b = GetItem(dwID), GetItem(dwID), GetItem(dwID)
+	end
+	return p, info, b
+end
+
+-- 获取指定对象的名字
+-- MY.GetObjectName(obj, bRetID)
+-- (KObject) obj    要获取名字的对象
+-- (string)  eRetID 是否返回对象ID信息
+--    'auto'   名字为空时返回 -- 默认值
+--    'always' 总是返回
+--    'never'  总是不返回
+function MY.GetObjectName(obj, eRetID)
+	if not obj then
+		return nil
+	end
+	if not eRetID then
+		eRetID = 'auto'
+	end
+	local szType, szName = MY.GetObjectType(obj), obj.szName
+	if szType == 'PLAYER' then -- PLAYER
+		szType = 'P'
+	elseif szType == 'NPC' then -- NPC
+		szType = 'N'
+		if IsEmpty(szName) then
+			szName = Table_GetNpcTemplateName(obj.dwTemplateID)
+			if szName then
+				szName = szName:gsub('^%s*(.-)%s*$', '%1')
+			end
+		end
+		if obj.dwEmployer and obj.dwEmployer ~= 0 then
+			if Table_IsSimplePlayer(obj.dwTemplateID) then -- 长歌影子
+				szName = MY.GetObjectName(GetPlayer(obj.dwEmployer), eRetID)
+			elseif not IsEmpty(szName) then
+				local szEmpName = MY.GetObjectName(
+					(IsPlayer(obj.dwEmployer) and GetPlayer(obj.dwEmployer)) or GetNpc(obj.dwEmployer),
+					'never'
+				) or g_tStrings.STR_SOME_BODY
+				szName =  szEmpName .. g_tStrings.STR_PET_SKILL_LOG .. szName
+			end
+		end
+	elseif szType == 'DOODAD' then -- DOODAD
+		szType = 'D'
+		if IsEmpty(szName) then
+			szName = Table_GetDoodadTemplateName(obj.dwTemplateID)
+			if szName then
+				szName = szName:gsub('^%s*(.-)%s*$', '%1')
+			end
+		end
+	elseif szType == 'ITEM' then -- ITEM
+		szType = 'I'
+		szName = GetItemNameByItem(obj)
+	else
+		szType = '?'
+	end
+	if IsEmpty(szName) and eRetID ~= 'never' or eRetID == 'always' then
+		local szDispID = szType
+		if szType == 'N' then
+			szDispID = szDispID .. MY.ConvertNpcID(obj.dwID) .. '@' .. obj.dwTemplateID
+		else
+			szDispID = szDispID .. obj.dwID
+		end
+		szName = IsEmpty(szName) and szDispID or (szName .. '(' .. szDispID .. ')')
+	end
+	if IsEmpty(szName) then
+		szName = nil
+	end
+	return szName
+end
 
 function MY.GetObjectType(obj)
 	if NEARBY_PLAYER[obj.dwID] == obj then
