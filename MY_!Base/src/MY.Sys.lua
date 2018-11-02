@@ -873,7 +873,7 @@ function MY.StorageData(szKey, oData)
 			type = 'post/json',
 			url = 'http://data.jx3.derzh.com/api/storage',
 			data = {
-				data =  MY.SimpleEncrypt(MY.Json.Encode({
+				data =  MY.SimpleEncrypt(MY.JsonEncode({
 					g = me.GetGlobalID(), f = me.dwForceID, r = me.nRoleType,
 					n = GetUserRoleName(), i = UI_GetClientPlayerID(),
 					S = MY.GetRealServer(1), s = MY.GetRealServer(2),

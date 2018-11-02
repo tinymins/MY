@@ -7,18 +7,18 @@
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
 ---------------------------------------------------------------------------
--- local lua_value = MY.Json.Decode(raw_json_text)
--- local raw_json_text = MY.Json.Encode(lua_table_or_value)
--- local pretty_json_text = MY.Json.Encode(lua_table_or_value, true)
+-- local lua_value = MY.JsonDecode(raw_json_text)
+-- local raw_json_text = MY.JsonEncode(lua_table_or_value)
+-- local pretty_json_text = MY.JsonEncode(lua_table_or_value, true)
 ---------------------------------------------------------------------------
 MY = MY or {}
 MY.Json = MY.Json or {}
 
 -- if JsonEncode and JsonDecode then
 -- 	MY.JsonEncode  = JsonEncode
--- 	MY.Json.Encode = JsonEncode
+-- 	MY.JsonEncode = JsonEncode
 -- 	MY.JsonDecode  = JsonDecode
--- 	MY.Json.Decode = JsonDecode
+-- 	MY.JsonDecode = JsonDecode
 -- else
 --
 -- Simple JSON encoding and decoding in pure Lua.
@@ -26,9 +26,9 @@ MY.Json = MY.Json or {}
 -- @author hightman, Jeffrey Friedl
 -- @refer http://regex.info/blog/
 --
--- local lua_value = MY.Json.Decode(raw_json_text)
--- local raw_json_text = MY.Json.Encode(lua_table_or_value)
--- local pretty_json_text = MY.Json.Encode(lua_table_or_value, true)
+-- local lua_value = MY.JsonDecode(raw_json_text)
+-- local raw_json_text = MY.JsonEncode(lua_table_or_value)
+-- local pretty_json_text = MY.JsonEncode(lua_table_or_value, true)
 ---------------------------------------------------------------------------
 local pairs, ipairs = pairs, ipairs
 local char, srep = string.char, string.rep
@@ -465,24 +465,18 @@ local function encode_value(value, parents, indent)
 	end
 end
 
--- public API
-MY = MY or {}
-MY.Json = MY.Json or {}
-
 -- 编码 JSON 数据，成功返回 JSON 字符串，失败返回 nil
 -- (string) MY.JsonEncode(vData[, bPretty])
 -- vData 变量数据，支持字符串、数字、Table/Userdata
 -- bPretty 是否增加缩进美化，默认为 false
-function MY.Json.Encode(vData, bPretty)
+function MY.JsonEncode(vData, bPretty)
 	return encode_value(vData, {}, bPretty and '')
 end
-MY.JsonEncode = MY.Json.Encode
 
 -- 解析 JSON 数据，成功返回数据，失败返回 nil 加错误信息
 -- (mixed) MY.JsonDecode(string szData)
-function MY.Json.Decode(value)
+function MY.JsonDecode(value)
 	return decode_value(value)
 end
-MY.JsonDecode = MY.Json.Decode
 
 -- end

@@ -808,7 +808,7 @@ function MY.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox)
 		or tSay[1].type ~= 'eventlink' then
 			table.insert(tSay, 1, {
 				type = 'eventlink', name = '',
-				linkinfo = MY.Json.Encode({
+				linkinfo = MY.JsonEncode({
 					via = 'MY',
 					uuid = szUUID and tostring(szUUID),
 				})
