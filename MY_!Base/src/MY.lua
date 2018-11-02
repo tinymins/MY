@@ -169,11 +169,12 @@ local function IsNumber  (var) return type(var) == 'number'   end
 local function IsString  (var) return type(var) == 'string'   end
 local function IsBoolean (var) return type(var) == 'boolean'  end
 local function IsFunction(var) return type(var) == 'function' end
+local function IsUserdata(var) return type(var) == 'userdata' end
 ---------------------------------------------------------------------------------------------
 MY = {}
-MY.Get = Get
-MY.IsNil, MY.IsBoolean, MY.IsEmpty, MY.RandomChild = IsNil, IsBoolean, IsEmpty, RandomChild
-MY.IsNumber, MY.IsString, MY.IsTable, MY.IsFunction = IsNumber, IsString, IsTable, IsFunction
+MY.Get, MY.RandomChild = Get, RandomChild
+MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsUserdata = IsNil, IsBoolean, IsNumber, IsUserdata
+MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsFunction = IsEmpty, IsString, IsTable, IsFunction
 ---------------------------------------------------------------------------------------------
 -- 本地函数变量
 ---------------------------------------------------------------------------------------------
