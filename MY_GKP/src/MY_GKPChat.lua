@@ -39,8 +39,8 @@ function Chat.OnMsgArrive(szMsg)
 			return GetFormatText(string.format(' %02d:%02d:%02d ', t.hour, t.minute, t.second), 10, 255, 255, 255)
 		end
 		szMsg = AppendText() .. szMsg
-		if MY and MY.Chat and MY.Chat.RenderLink then
-			szMsg =  MY.Chat.RenderLink(szMsg)
+		if MY and MY.Chat and MY.RenderChatLink then
+			szMsg =  MY.RenderChatLink(szMsg)
 		end
 		if MY_Farbnamen and MY_Farbnamen.Render then
 			szMsg = MY_Farbnamen.Render(szMsg)

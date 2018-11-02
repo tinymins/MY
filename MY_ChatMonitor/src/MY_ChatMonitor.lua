@@ -123,12 +123,12 @@ MY.RegisterInit(D.LoadData)
 
 function D.GetHTML(rec)
     -- render link event
-    local html = MY.Chat.RenderLink(rec.html)
+    local html = MY.RenderChatLink(rec.html)
     -- render player name color
     if MY_Farbnamen and MY_Farbnamen.Render then
         html = MY_Farbnamen.Render(html)
     end
-    html = MY.Chat.GetTimeLinkText({
+    html = MY.GetTimeLinkText({
         r = rec.r, g = rec.g, b = rec.b,
         f = rec.font, s = MY_ChatMonitor.szTimestrap,
     }, rec.time) .. html
@@ -157,7 +157,7 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
     if bRich then
         rec.html = szMsg
         -- 格式化消息
-        local tMsgContent = MY.Chat.FormatContent(szMsg)
+        local tMsgContent = MY.FormatChatContent(szMsg)
         -- 检测消息是否是插件自己产生的
         if tMsgContent[1].type == 'text' and tMsgContent[1].displayText == '' then
             return

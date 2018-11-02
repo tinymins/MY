@@ -182,7 +182,7 @@ MY_ToolBox.ApplyConfig = function()
 							local nPos1, nPos2 = szText:find(szName)
 							h:InsertItemFromString(i, true, GetFormatText(szText:sub(nPos2 + 1), hItem:GetFontScheme()))
 							h:InsertItemFromString(i, true, GetFormatText('[' .. szText:sub(nPos1, nPos2) .. ']', nil, nil, nil, nil, nil, nil, 'namelink'))
-							MY.Chat.RenderLink(h:Lookup(i + 1))
+							MY.RenderChatLink(h:Lookup(i + 1))
 							if MY_Farbnamen and MY_Farbnamen.Render then
 								MY_Farbnamen.Render(h:Lookup(i + 1))
 							end
@@ -298,9 +298,9 @@ MY_ToolBox.ApplyConfig = function()
 				local nChannel, szName = EditBox_GetChannel()
 				if bIsBattleField and (nChannel == PLAYER_TALK_CHANNEL.RAID or nChannel == PLAYER_TALK_CHANNEL.TEAM) then
 					_C.JJCAutoSwitchTalkChannel_OrgChannel = nChannel
-					MY.Chat.SwitchChat(PLAYER_TALK_CHANNEL.BATTLE_FIELD)
+					MY.SwitchChat(PLAYER_TALK_CHANNEL.BATTLE_FIELD)
 				elseif not bIsBattleField and nChannel == PLAYER_TALK_CHANNEL.BATTLE_FIELD then
-					MY.Chat.SwitchChat(_C.JJCAutoSwitchTalkChannel_OrgChannel or PLAYER_TALK_CHANNEL.RAID)
+					MY.SwitchChat(_C.JJCAutoSwitchTalkChannel_OrgChannel or PLAYER_TALK_CHANNEL.RAID)
 				end
 			end)
 		else

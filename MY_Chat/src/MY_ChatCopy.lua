@@ -38,15 +38,15 @@ end, function(h, i, szChannel, szMsg, dwTime, nR, nG, nB)
 			if MY_ChatCopy.bChatCopyAlwaysWhite then
 				_r, _g, _b = 255, 255, 255
 			end
-			szTime = MY.Chat.GetCopyLinkText(_L[' * '], { r = _r, g = _g, b = _b })
+			szTime = MY.GetCopyLinkText(_L[' * '], { r = _r, g = _g, b = _b })
 		elseif MY_ChatCopy.bChatCopyAlwaysWhite then
 			nR, nG, nB = 255, 255, 255
 		end
 		if MY_ChatCopy.bChatTime then
 			if MY_ChatCopy.eChatTime == 'HOUR_MIN_SEC' then
-				szTime = szTime .. MY.Chat.GetTimeLinkText({r = nR, g = nG, b = nB, f = 10, s = '[hh:mm:ss]'}, dwTime)
+				szTime = szTime .. MY.GetTimeLinkText({r = nR, g = nG, b = nB, f = 10, s = '[hh:mm:ss]'}, dwTime)
 			else
-				szTime = szTime .. MY.Chat.GetTimeLinkText({r = nR, g = nG, b = nB, f = 10, s = '[hh:mm]'}, dwTime)
+				szTime = szTime .. MY.GetTimeLinkText({r = nR, g = nG, b = nB, f = 10, s = '[hh:mm]'}, dwTime)
 			end
 		end
 		-- insert timestrap text

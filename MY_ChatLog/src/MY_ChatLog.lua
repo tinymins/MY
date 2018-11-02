@@ -794,7 +794,7 @@ function MY_ChatLog.OnItemRButtonClick()
 			}, {
 				szOption = _L['copy this record'],
 				fnAction = function()
-					MY.Chat.CopyChatLine(this:Lookup('Handle_ChatLog_Msg'):Lookup(0), true)
+					MY.CopyChatLine(this:Lookup('Handle_ChatLog_Msg'):Lookup(0), true)
 				end,
 			}
 		}

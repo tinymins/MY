@@ -396,7 +396,7 @@ end
 
 local function OnChatSetAFK()
 	if type(arg0) == 'table' then
-		MY_ChatSwitch.szAway = MY.Chat.StringfyContent(arg0)
+		MY_ChatSwitch.szAway = MY.StringfyChatContent(arg0)
 	else
 		MY_ChatSwitch.szAway = arg0 and tostring(arg0)
 	end
@@ -405,7 +405,7 @@ MY.RegisterEvent('ON_CHAT_SET_AFK', OnChatSetAFK)
 
 local function OnChatSetATR()
 	if type(arg0) == 'table' then
-		MY_ChatSwitch.szBusy = MY.Chat.StringfyContent(arg0):sub(4)
+		MY_ChatSwitch.szBusy = MY.StringfyChatContent(arg0):sub(4)
 	else
 		MY_ChatSwitch.szBusy = arg0 and tostring(arg0)
 	end

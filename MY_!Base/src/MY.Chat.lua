@@ -24,19 +24,17 @@ local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 -----------------------------------------------
 -- 本地函数和变量
 -----------------------------------------------
-MY = MY or {}
-MY.Chat = MY.Chat or {}
-local _C, _L = {tPeekPlayer = {}}, MY.LoadLangPack()
+local _L = MY.LoadLangPack()
 local EMPTY_TABLE = SetmetaReadonly({})
 
 -- 海鳗里面抠出来的
 -- 聊天复制并发布
-function MY.Chat.RepeatChatLine(hTime)
+function MY.RepeatChatLine(hTime)
 	local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
 	if not edit then
 		return
 	end
-	MY.Chat.CopyChatLine(hTime)
+	MY.CopyChatLine(hTime)
 	local tMsg = edit:GetTextStruct()
 	if #tMsg == 0 then
 		return
@@ -47,10 +45,9 @@ function MY.Chat.RepeatChatLine(hTime)
 		edit:ClearText()
 	end
 end
-MY.RepeatChatLine = MY.Chat.RepeatChatLine
 
 -- 聊天删除行
-function MY.Chat.RemoveChatLine(hTime)
+function MY.RemoveChatLine(hTime)
 	local nIndex   = hTime:GetIndex()
 	local hHandle  = hTime:GetParent()
 	local nCount   = hHandle:GetItemCount()
@@ -73,53 +70,9 @@ function MY.Chat.RemoveChatLine(hTime)
 	end
 	hHandle:FormatAllItemPos()
 end
-MY.RemoveChatLine = MY.Chat.RemoveChatLine
-
--- 聊天表情初始化
-_C.nMaxEmotionLen = 0
-function _C.InitEmotion()
-	if not _C.tEmotion then
-		local t = {}
-		for i = 1, g_tTable.FaceIcon:GetRowCount() do
-			local tLine = g_tTable.FaceIcon:GetRow(i)
-			local t1 = {
-				nFrame = tLine.nFrame,
-				dwID   = tLine.dwID or (10000 + i),
-				szCmd  = tLine.szCommand,
-				szType = tLine.szType,
-				szImageFile = tLine.szImageFile or 'ui/Image/UICommon/Talk_face.UITex'
-			}
-			t[t1.dwID] = t1
-			t[t1.szCmd] = t1
-			t[t1.szImageFile..','..t1.nFrame..','..t1.szType] = t1
-			_C.nMaxEmotionLen = math.max(_C.nMaxEmotionLen, wstring.len(t1.szCmd))
-		end
-		_C.tEmotion = t
-	end
-end
-
--- 获取聊天表情列表
--- typedef emo table
--- (emo[]) MY.Chat.GetEmotion()                             -- 返回所有表情列表
--- (emo)   MY.Chat.GetEmotion(szCommand)                    -- 返回指定Cmd的表情
--- (emo)   MY.Chat.GetEmotion(szImageFile, nFrame, szType)  -- 返回指定图标的表情
-function MY.Chat.GetEmotion(arg0, arg1, arg2)
-	_C.InitEmotion()
-	local t
-	if not arg0 then
-		t = _C.tEmotion
-	elseif not arg1 then
-		t = _C.tEmotion[arg0]
-	elseif arg2 then
-		arg0 = string.gsub(arg0, '\\\\', '\\')
-		t = _C.tEmotion[arg0..','..arg1..','..arg2]
-	end
-	return clone(t)
-end
-MY.GetEmotion = MY.Chat.GetEmotion
 
 -- 获取复制聊天行Text
-function MY.Chat.GetCopyLinkText(szText, rgbf)
+function MY.GetCopyLinkText(szText, rgbf)
 	szText = szText or _L[' * ']
 	rgbf   = rgbf   or { f = 10 }
 
@@ -127,10 +80,9 @@ function MY.Chat.GetCopyLinkText(szText, rgbf)
 		'this.bMyChatRendered=true\nthis.OnItemLButtonDown=MY.ChatLinkEventHandlers.OnCopyLClick\nthis.OnItemMButtonDown=MY.ChatLinkEventHandlers.OnCopyMClick\nthis.OnItemRButtonDown=MY.ChatLinkEventHandlers.OnCopyRClick\nthis.OnItemMouseEnter=MY.ChatLinkEventHandlers.OnCopyMouseEnter\nthis.OnItemMouseLeave=MY.ChatLinkEventHandlers.OnCopyMouseLeave',
 		'copylink')
 end
-MY.GetCopyLinkText = MY.Chat.GetCopyLinkText
 
 -- 获取复制聊天行Text
-function MY.Chat.GetTimeLinkText(rgbfs, dwTime)
+function MY.GetTimeLinkText(rgbfs, dwTime)
 	if not dwTime then
 		dwTime = GetCurrentTime()
 	end
@@ -142,10 +94,9 @@ function MY.Chat.GetTimeLinkText(rgbfs, dwTime)
 		'timelink'
 	)
 end
-MY.GetTimeLinkText = MY.Chat.GetTimeLinkText
 
 -- 复制聊天行
-function MY.Chat.CopyChatLine(hTime, bTextEditor)
+function MY.CopyChatLine(hTime, bTextEditor)
 	local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
 	if bTextEditor then
 		edit = MY.UI.OpenTextEditor():find('.WndEdit')[1]
@@ -222,7 +173,7 @@ function MY.Chat.CopyChatLine(hTime, bTextEditor)
 		elseif p:GetType() == 'Image' or p:GetType() == 'Animate' then
 			local dwID = tonumber((p:GetName():gsub('^emotion_', '')))
 			if dwID then
-				local emo = MY.Chat.GetEmotion(dwID)
+				local emo = MY.GetChatEmotion(dwID)
 				if emo then
 					edit:InsertObj(emo.szCmd, { type = 'emotion', text = emo.szCmd, id = emo.dwID })
 				end
@@ -231,11 +182,10 @@ function MY.Chat.CopyChatLine(hTime, bTextEditor)
 	end
 	Station.SetFocusWindow(edit)
 end
-MY.CopyChatLine = MY.Chat.CopyChatLine
 
-do local ChatLinkEvents = {}
+do local ChatLinkEvents, PEEK_PLAYER = {}, {}
 MY.RegisterEvent('PEEK_OTHER_PLAYER', function()
-	if not _C.tPeekPlayer[arg1] then
+	if not PEEK_PLAYER[arg1] then
 		return
 	end
 	if arg0 == PEEK_OTHER_PLAYER_RESPOND.INVALID then
@@ -247,7 +197,7 @@ MY.RegisterEvent('PEEK_OTHER_PLAYER', function()
 	elseif arg0 == PEEK_OTHER_PLAYER_RESPOND.TOO_FAR then
 		OutputMessage('MSG_ANNOUNCE_RED', _L['Player is too far to peek!'])
 	end
-	_C.tPeekPlayer[arg1] = nil
+	PEEK_PLAYER[arg1] = nil
 end)
 function ChatLinkEvents.OnNameLClick(element, link)
 	if not link then
@@ -258,14 +208,14 @@ function ChatLinkEvents.OnNameLClick(element, link)
 		InsertInviteTeamMenu(menu, (MY.UI(link):text():gsub('[%[%]]', '')))
 		menu[1].fnAction()
 	elseif IsCtrlKeyDown() then
-		MY.Chat.CopyChatItem(link)
+		MY.CopyChatItem(link)
 	elseif IsShiftKeyDown() then
 		MY.SetTarget(TARGET.PLAYER, MY.UI(link):text())
 	elseif IsAltKeyDown() then
 		if MY_Farbnamen and MY_Farbnamen.Get then
 			local info = MY_Farbnamen.Get((MY.UI(link):text():gsub('[%[%]]', '')))
 			if info then
-				_C.tPeekPlayer[info.dwID] = true
+				PEEK_PLAYER[info.dwID] = true
 				ViewInviteToPlayer(info.dwID)
 			end
 		end
@@ -287,19 +237,19 @@ function ChatLinkEvents.OnCopyLClick(element, link)
 	if not link then
 		link = element
 	end
-	MY.Chat.CopyChatLine(link, IsCtrlKeyDown())
+	MY.CopyChatLine(link, IsCtrlKeyDown())
 end
 function ChatLinkEvents.OnCopyMClick(element, link)
 	if not link then
 		link = element
 	end
-	MY.Chat.RemoveChatLine(link)
+	MY.RemoveChatLine(link)
 end
 function ChatLinkEvents.OnCopyRClick(element, link)
 	if not link then
 		link = element
 	end
-	MY.Chat.RepeatChatLine(link)
+	MY.RepeatChatLine(link)
 end
 function ChatLinkEvents.OnCopyMouseEnter(element, link)
 	if not link then
@@ -327,7 +277,7 @@ function ChatLinkEvents.OnItemRClick(element, link)
 		link = element
 	end
 	if IsCtrlKeyDown() then
-		MY.Chat.CopyChatItem(link)
+		MY.CopyChatItem(link)
 	end
 end
 MY.ChatLinkEvents = ChatLinkEvents
@@ -345,13 +295,13 @@ function ChatLinkEventHandlers.OnItemRClick() ChatLinkEvents.OnItemRClick(this) 
 MY.ChatLinkEventHandlers = ChatLinkEventHandlers
 
 -- 绑定link事件响应
--- (userdata) MY.Chat.RenderLink(userdata link)                   处理link的各种事件绑定 namelink是一个超链接Text元素
--- (userdata) MY.Chat.RenderLink(userdata element, userdata link) 处理element的各种事件绑定 数据源是link
--- (string) MY.Chat.RenderLink(string szMsg)                      格式化szMsg 处理里面的超链接 添加时间相应
+-- (userdata) MY.RenderChatLink(userdata link)                   处理link的各种事件绑定 namelink是一个超链接Text元素
+-- (userdata) MY.RenderChatLink(userdata element, userdata link) 处理element的各种事件绑定 数据源是link
+-- (string) MY.RenderChatLink(string szMsg)                      格式化szMsg 处理里面的超链接 添加时间相应
 -- link   : 一个超链接Text元素
 -- element: 一个可以挂鼠标消息响应的UI元素
 -- szMsg  : 格式化的UIXML消息
-function MY.Chat.RenderLink(arg1, arg2)
+function MY.RenderChatLink(arg1, arg2)
 	if type(arg1) == 'string' then -- szMsg
 		local szMsg = arg1
 		local xmls = MY.Xml.Decode(szMsg)
@@ -405,11 +355,10 @@ function MY.Chat.RenderLink(arg1, arg2)
 		return element
 	end
 end
-MY.RenderChatLink = MY.Chat.RenderLink
 end
 
 -- 复制Item到输入框
-function MY.Chat.CopyChatItem(p)
+function MY.CopyChatItem(p)
 	local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
 	if not edit then
 		return
@@ -446,10 +395,9 @@ function MY.Chat.CopyChatItem(p)
 		Station.SetFocusWindow(edit)
 	end
 end
-MY.CopyChatItem = MY.Chat.CopyChatItem
 
 --解析消息
-function MY.Chat.FormatContent(szMsg)
+function MY.FormatChatContent(szMsg)
 	local t = MY.Xml.Decode(szMsg)
 	-- Output(t)
 	local t2 = {}
@@ -458,13 +406,13 @@ function MY.Chat.FormatContent(szMsg)
 		local ndata = MY.Xml.GetNodeData(node)
 		-- 静态表情
 		if ntype == 'image' then
-			local emo = MY.Chat.GetEmotion(ndata.path, ndata.frame, 'image')
+			local emo = MY.GetChatEmotion(ndata.path, ndata.frame, 'image')
 			if emo then
 				table.insert(t2, {type = 'emotion', text = emo.szCmd, innerText = emo.szCmd, id = emo.dwID})
 			end
 		-- 动态表情
 		elseif ntype == 'animate' then
-			local emo = MY.Chat.GetEmotion(ndata.path, ndata.group, 'animate')
+			local emo = MY.GetChatEmotion(ndata.path, ndata.group, 'animate')
 			if emo then
 				table.insert(t2, {type = 'emotion', text = emo.szCmd, innerText = emo.szCmd, id = emo.dwID})
 			end
@@ -540,21 +488,19 @@ function MY.Chat.FormatContent(szMsg)
 	end
 	return t2
 end
-MY.FormatChatContent = MY.Chat.FormatContent
 
 -- 字符串化一个聊天table结构体
-function MY.Chat.StringfyContent(t)
+function MY.StringfyChatContent(t)
 	local t1 = {}
 	for _, v in ipairs(t) do
 		table.insert(t1, v.text)
 	end
 	return table.concat(t1)
 end
-MY.StringfyChatContent = MY.Chat.StringfyContent
 
 -- 判断某个频道能否发言
 -- (bool) MY.CanTalk(number nChannel)
-function MY.Chat.CanTalk(nChannel)
+function MY.CanTalk(nChannel)
 	for _, v in ipairs({'WHISPER', 'TEAM', 'RAID', 'BATTLE_FIELD', 'NEARBY', 'TONG', 'TONG_ALLIANCE' }) do
 		if nChannel == PLAYER_TALK_CHANNEL[v] then
 			return true
@@ -562,10 +508,10 @@ function MY.Chat.CanTalk(nChannel)
 	end
 	return false
 end
-MY.CanTalk = MY.Chat.CanTalk
 
+do
 -- get channel header
-_C.tTalkChannelHeader = {
+local TALK_CHANNEL_HEADER = {
 	[PLAYER_TALK_CHANNEL.NEARBY] = '/s ',
 	[PLAYER_TALK_CHANNEL.FRIENDS] = '/o ',
 	[PLAYER_TALK_CHANNEL.TONG_ALLIANCE] = '/a ',
@@ -582,8 +528,8 @@ _C.tTalkChannelHeader = {
 -- (void) MY.SwitchChat(number nChannel)
 -- (void) MY.SwitchChat(string szHeader)
 -- (void) MY.SwitchChat(string szName)
-function MY.Chat.SwitchChat(nChannel)
-	local szHeader = _C.tTalkChannelHeader[nChannel]
+function MY.SwitchChat(nChannel)
+	local szHeader = TALK_CHANNEL_HEADER[nChannel]
 	if szHeader then
 		SwitchChatChannel(szHeader)
 	elseif nChannel == PLAYER_TALK_CHANNEL.WHISPER then
@@ -594,7 +540,7 @@ function MY.Chat.SwitchChat(nChannel)
 		if string.sub(nChannel, 1, 1) == '/' then
 			if nChannel == '/cafk' or nChannel == '/catr' then
 				SwitchChatChannel(nChannel)
-				MY.Chat.Talk(nil, nChannel, nil, nil, nil, true)
+				MY.Talk(nil, nChannel, nil, nil, nil, true)
 				Station.Lookup('Lowest2/EditBox'):Show()
 			else
 				SwitchChatChannel(nChannel..' ')
@@ -604,17 +550,59 @@ function MY.Chat.SwitchChat(nChannel)
 		end
 	end
 end
-MY.SwitchChat = MY.Chat.SwitchChat
+end
 
 -- 将焦点设置到聊天栏
-function MY.Chat.FocusChatBox()
+function MY.FocusChatBox()
 	Station.SetFocusWindow('Lowest2/EditBox/Edit_Input')
 end
-MY.FocusChatBox = MY.Chat.FocusChatBox
+
+do
+-- 聊天表情初始化
+local MAX_EMOTION_LEN, EMOTION_CACHE = 0
+local function InitEmotion()
+	if not EMOTION_CACHE then
+		local t = {}
+		for i = 1, g_tTable.FaceIcon:GetRowCount() do
+			local tLine = g_tTable.FaceIcon:GetRow(i)
+			local t1 = {
+				nFrame = tLine.nFrame,
+				dwID   = tLine.dwID or (10000 + i),
+				szCmd  = tLine.szCommand,
+				szType = tLine.szType,
+				szImageFile = tLine.szImageFile or 'ui/Image/UICommon/Talk_face.UITex'
+			}
+			t[t1.dwID] = t1
+			t[t1.szCmd] = t1
+			t[t1.szImageFile..','..t1.nFrame..','..t1.szType] = t1
+			MAX_EMOTION_LEN = math.max(MAX_EMOTION_LEN, wstring.len(t1.szCmd))
+		end
+		EMOTION_CACHE = t
+	end
+end
+
+-- 获取聊天表情列表
+-- typedef emo table
+-- (emo[]) MY.GetChatEmotion()                             -- 返回所有表情列表
+-- (emo)   MY.GetChatEmotion(szCommand)                    -- 返回指定Cmd的表情
+-- (emo)   MY.GetChatEmotion(szImageFile, nFrame, szType)  -- 返回指定图标的表情
+function MY.GetChatEmotion(arg0, arg1, arg2)
+	InitEmotion()
+	local t
+	if not arg0 then
+		t = EMOTION_CACHE
+	elseif not arg1 then
+		t = EMOTION_CACHE[arg0]
+	elseif arg2 then
+		arg0 = string.gsub(arg0, '\\\\', '\\')
+		t = EMOTION_CACHE[arg0..','..arg1..','..arg2]
+	end
+	return clone(t)
+end
 
 -- parse faceicon in talking message
-function MY.Chat.ParseFaceIcon(t)
-	_C.InitEmotion()
+local function ParseFaceIcon(t)
+	InitEmotion()
 	local t2 = {}
 	for _, v in ipairs(t) do
 		if v.type ~= 'text' then
@@ -634,9 +622,9 @@ function MY.Chat.ParseFaceIcon(t)
 				else
 					szLeft = szLeft .. string.sub(szText, 1, nPos - 1)
 					szText = string.sub(szText, nPos)
-					for i = math.min(_C.nMaxEmotionLen, wstring.len(szText)), 2, -1 do
+					for i = math.min(MAX_EMOTION_LEN, wstring.len(szText)), 2, -1 do
 						local szTest = wstring.sub(szText, 1, i)
-						local emo = MY.Chat.GetEmotion(szTest)
+						local emo = MY.GetChatEmotion(szTest)
 						if emo then
 							szFace, dwFaceID = szTest, emo.dwID
 							szText = szText:sub(szFace:len() + 1)
@@ -664,7 +652,7 @@ function MY.Chat.ParseFaceIcon(t)
 	return t2
 end
 -- parse name in talking message
-function MY.Chat.ParseName(t)
+local function ParseName(t)
 	local me = GetClientPlayer()
 	local tar = MY.GetObject(me.GetTarget())
 	for i, v in ipairs(t) do
@@ -706,7 +694,7 @@ function MY.Chat.ParseName(t)
 	end
 	return t2
 end
-MY.Chat.tSensitiveWord = {
+local SENSITIVE_WORD = {
 	'   ',
 	'  ' .. g_tStrings.STR_ONE_CHINESE_SPACE,
 	' '  .. g_tStrings.STR_ONE_CHINESE_SPACE:rep(2),
@@ -717,8 +705,7 @@ MY.Chat.tSensitiveWord = {
 	g_tStrings.STR_ONE_CHINESE_SPACE .. ' ' .. g_tStrings.STR_ONE_CHINESE_SPACE,
 }
 -- anti sensitive word shielding in talking message
-function MY.Chat.ParseAntiSWS(t)
-	local tSensitiveWord = MY.Chat.tSensitiveWord
+local function ParseAntiSWS(t)
 	local t2 = {}
 	for _, v in ipairs(t) do
 		if v.type == 'text' then
@@ -726,7 +713,7 @@ function MY.Chat.ParseAntiSWS(t)
 			while szText and #szText > 0 do
 				local nSensitiveWordEndLen = 1 -- 最后一个字符（要裁剪掉的字符）大小
 				local nSensitiveWordEndPos = #szText + 1
-				for _, szSensitiveWord in ipairs(tSensitiveWord) do
+				for _, szSensitiveWord in ipairs(SENSITIVE_WORD) do
 					local _, nEndPos = wstring.find(szText, szSensitiveWord)
 					if nEndPos and nEndPos < nSensitiveWordEndPos then
 						local nSensitiveWordLenW = wstring.len(szSensitiveWord)
@@ -758,7 +745,7 @@ end
 -- bSaveDeny      -- *可选* 在聊天输入栏保留不可发言的频道内容，默认为 false
 -- bPushToChatBox -- *可选* 仅推送到聊天框，默认为 false
 -- 特别注意：nChannel, szText 两者的参数顺序可以调换，战场/团队聊天频道智能切换
-function MY.Chat.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox)
+function MY.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox)
 	local szTarget, me = '', GetClientPlayer()
 	-- channel
 	if not nChannel then
@@ -786,10 +773,10 @@ function MY.Chat.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToCha
 		tSay = {{ type = 'text', text = szText}}
 	end
 	if not bNoEscape then
-		tSay = MY.Chat.ParseFaceIcon(tSay)
-		tSay = MY.Chat.ParseName(tSay)
+		tSay = ParseFaceIcon(tSay)
+		tSay = ParseName(tSay)
 	end
-	tSay = MY.Chat.ParseAntiSWS(tSay)
+	tSay = ParseAntiSWS(tSay)
 	if MY.IsShieldedVersion() then
 		local nLen = 0
 		for i, v in ipairs(tSay) do
@@ -830,7 +817,7 @@ function MY.Chat.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToCha
 		me.Talk(nChannel, szTarget, tSay)
 	end
 end
-MY.Talk = MY.Chat.Talk
+end
 
 do
 local SPACE = ' '
@@ -874,6 +861,7 @@ function MY.TabTalk(nChannel, aTable, aAlignment)
 end
 end
 
+do
 local m_LevelUpData
 local function GetRegisterChannelLimitTable()
 	if not m_LevelUpData then
@@ -953,7 +941,7 @@ local DAILY_LIMIT_TABLE_KEY = {
 	[PLAYER_TALK_CHANNEL.NEARBY ] = 'NearbyChannelDailyLimit',
 	[PLAYER_TALK_CHANNEL.WHISPER] = 'WhisperDailyLimit',
 }
-function MY.Chat.GetChannelDailyLimit(nLevel, nChannel)
+function MY.GetChannelDailyLimit(nLevel, nChannel)
 	local LevelUpData = GetRegisterChannelLimitTable()
 	if not LevelUpData then
 		return false
@@ -968,13 +956,13 @@ function MY.Chat.GetChannelDailyLimit(nLevel, nChannel)
 	end
 	return tUpData[szKey] or -1
 end
-MY.GetChannelDailyLimit = MY.Chat.GetChannelDailyLimit
+end
 
-_C.tMsgMonitorFun = {}
--- Register:   MY.Chat.RegisterMsgMonitor(string szKey, function fnAction, table tChannels)
---             MY.Chat.RegisterMsgMonitor(function fnAction, table tChannels)
--- Unregister: MY.Chat.RegisterMsgMonitor(string szKey)
-function MY.Chat.RegisterMsgMonitor(arg0, arg1, arg2)
+-- Register:   MY.RegisterMsgMonitor(string szKey, function fnAction, table tChannels)
+--             MY.RegisterMsgMonitor(function fnAction, table tChannels)
+-- Unregister: MY.RegisterMsgMonitor(string szKey)
+do local MSG_MONITOR_FUNC = {}
+function MY.RegisterMsgMonitor(arg0, arg1, arg2)
 	local szKey, fnAction, tChannels
 	local tp0, tp1, tp2 = type(arg0), type(arg1), type(arg2)
 	if tp0 == 'string' and tp1 == 'function' and tp2 == 'table' then
@@ -985,46 +973,46 @@ function MY.Chat.RegisterMsgMonitor(arg0, arg1, arg2)
 		szKey = arg0
 	end
 
-	if szKey and _C.tMsgMonitorFun[szKey] then
-		UnRegisterMsgMonitor(_C.tMsgMonitorFun[szKey].fn)
-		_C.tMsgMonitorFun[szKey] = nil
+	if szKey and MSG_MONITOR_FUNC[szKey] then
+		UnRegisterMsgMonitor(MSG_MONITOR_FUNC[szKey].fn)
+		MSG_MONITOR_FUNC[szKey] = nil
 	end
 	if fnAction and tChannels then
-		_C.tMsgMonitorFun[szKey] = { fn = function(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szName)
+		MSG_MONITOR_FUNC[szKey] = { fn = function(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szName)
 			-- filter addon comm.
 			if StringFindW(szMsg, 'eventlink') and StringFindW(szMsg, _L['Addon comm.']) then
 				return
 			end
 			fnAction(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szName)
 		end, ch = tChannels }
-		RegisterMsgMonitor(_C.tMsgMonitorFun[szKey].fn, _C.tMsgMonitorFun[szKey].ch)
+		RegisterMsgMonitor(MSG_MONITOR_FUNC[szKey].fn, MSG_MONITOR_FUNC[szKey].ch)
 	end
 end
-MY.RegisterMsgMonitor = MY.Chat.RegisterMsgMonitor
+end
 
-_C.tHookChat = {}
+do
+local CHAT_HOOK = {}
 -- HOOK聊天栏
 -- 注：如果fnOnActive存在则没有激活的聊天栏不会执行fnBefore、fnAfter
 --     同时在聊天栏切换时会触发fnOnActive
-function MY.Chat.HookChatPanel(szKey, fnBefore, fnAfter, fnOnActive)
+function MY.HookChatPanel(szKey, fnBefore, fnAfter, fnOnActive)
 	if type(szKey) == 'function' then
 		szKey, fnBefore, fnAfter, fnOnActive = GetTickCount(), szKey, fnBefore, fnAfter
-		while _C.tHookChat[szKey] do
+		while CHAT_HOOK[szKey] do
 			szKey = szKey + 0.1
 		end
 	end
 	if fnBefore or fnAfter or fnOnActive then
-		_C.tHookChat[szKey] = {
+		CHAT_HOOK[szKey] = {
 			fnBefore = fnBefore, fnAfter = fnAfter, fnOnActive = fnOnActive
 		}
 	else
-		_C.tHookChat[szKey] = nil
+		CHAT_HOOK[szKey] = nil
 	end
 end
-MY.HookChatPanel = MY.Chat.HookChatPanel
 
-function _C.OnChatPanelActive(h)
-	for szKey, hc in pairs(_C.tHookChat) do
+local function OnChatPanelActive(h)
+	for szKey, hc in pairs(CHAT_HOOK) do
 		if type(hc.fnOnActive) == 'function' then
 			local status, err = pcall(hc.fnOnActive, h)
 			if not status then
@@ -1034,15 +1022,15 @@ function _C.OnChatPanelActive(h)
 	end
 end
 
-function _C.OnChatPanelNamelinkLButtonDown(...)
+local function OnChatPanelNamelinkLButtonDown(...)
 	this.__MY_OnItemLButtonDown(...)
 	MY.ChatLinkEventHandlers.OnNameLClick(...)
 end
 
-function _C.OnChatPanelAppendItemFromString(h, szMsg, szChannel, dwTime, nR, nG, nB, ...)
+local function OnChatPanelAppendItemFromString(h, szMsg, szChannel, dwTime, nR, nG, nB, ...)
 	local bActived = h:GetRoot():Lookup('CheckBox_Title'):IsCheckBoxChecked()
 	-- deal with fnBefore
-	for szKey, hc in pairs(_C.tHookChat) do
+	for szKey, hc in pairs(CHAT_HOOK) do
 		hc.param = EMPTY_TABLE
 		-- if fnBefore exist and ChatPanel[i] actived or fnOnActive not defined
 		if type(hc.fnBefore) == 'function' and (bActived or not hc.fnOnActive) then
@@ -1071,14 +1059,14 @@ function _C.OnChatPanelAppendItemFromString(h, szMsg, szChannel, dwTime, nR, nG,
 			hItem.bMyChatRendered = true
 			if hItem.OnItemLButtonDown then
 				hItem.__MY_OnItemLButtonDown = hItem.OnItemLButtonDown
-				hItem.OnItemLButtonDown = _C.OnChatPanelNamelinkLButtonDown
+				hItem.OnItemLButtonDown = OnChatPanelNamelinkLButtonDown
 			else
 				hItem.OnItemLButtonDown = MY.ChatLinkEventHandlers.OnNameLClick
 			end
 		end
 	end
 	-- deal with fnAfter
-	for szKey, hc in pairs(_C.tHookChat) do
+	for szKey, hc in pairs(CHAT_HOOK) do
 		-- if fnAfter exist and ChatPanel[i] actived or fnOnActive not defined
 		if type(hc.fnAfter) == 'function' and (bActived or not hc.fnOnActive) then
 			local status, err = pcall(hc.fnAfter, h, hc.param, szChannel, szMsg, dwTime, nR, nG, nB, ...)
@@ -1089,24 +1077,23 @@ function _C.OnChatPanelAppendItemFromString(h, szMsg, szChannel, dwTime, nR, nG,
 	end
 end
 
-do
 local function Hook(i)
 	local h = Station.Lookup('Lowest2/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message')
 	-- local ttl = Station.Lookup('Lowest2/ChatPanel' .. i .. '/CheckBox_Title', 'Text_TitleName')
 	-- if h and (not ttl or ttl:GetText() ~= g_tStrings.CHANNEL_MENTOR) then
 	if h and not h._AppendItemFromString_MY then
 		h:GetRoot():Lookup('CheckBox_Title').OnCheckBoxCheck = function()
-			_C.OnChatPanelActive(h)
+			OnChatPanelActive(h)
 		end
 		h._AppendItemFromString_MY = h.AppendItemFromString
-		h.AppendItemFromString = _C.OnChatPanelAppendItemFromString
+		h.AppendItemFromString = OnChatPanelAppendItemFromString
 	end
 end
 
 local function Unhook(i)
 	local h = Station.Lookup('Lowest2/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message')
 	if h and h._AppendItemFromString_MY then
-		h.AppendItemFromString = _C._AppendItemFromString_MY
+		h.AppendItemFromString = h._AppendItemFromString_MY
 		h._AppendItemFromString_MY = nil
 	end
 end

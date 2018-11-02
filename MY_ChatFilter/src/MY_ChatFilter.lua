@@ -55,7 +55,7 @@ MY.HookChatPanel('MY_ChatFilter', function(h, szChannel, szMsg, dwTime)
 	-- 插件消息UUID过滤
 	if MY_ChatFilter.bFilterDuplicateAddonTalk then
 		local me = GetClientPlayer()
-		local tSay = MY.Chat.FormatContent(szMsg)
+		local tSay = MY.FormatChatContent(szMsg)
 		if not h.MY_tDuplicateUUID then
 			h.MY_tDuplicateUUID = {}
 		end

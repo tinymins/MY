@@ -218,7 +218,7 @@ MY_AutoHideChat.ApplyConfig = function()
             hEditInput.OnKillFocus = nil
         end
         hEditInput._MY_T_AHCP_OnKillFocus = nil
-        MY.Chat.HookChatPanel('MY_AutoHideChat')
+        MY.HookChatPanel('MY_AutoHideChat')
 
         MY_AutoHideChat.ShowChatPanel()
     end
