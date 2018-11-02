@@ -1159,6 +1159,7 @@ end
 -------------------------------------------------------------------------------------------------------
 do
 local NEARBY_NPC = {}      -- 附近的NPC
+local NEARBY_PET = {}      -- 附近的PET
 local NEARBY_PLAYER = {}   -- 附近的物品
 local NEARBY_DOODAD = {}   -- 附近的玩家
 
@@ -1318,6 +1319,41 @@ function MY.GetNearNpcTable()
 end
 end
 
+-- 获取附近PET列表
+-- (table) MY.GetNearPet(void)
+function MY.GetNearPet(nLimit)
+	local aPet = {}
+	for k, _ in pairs(NEARBY_PET) do
+		local npc = GetPet(k)
+		if not npc then
+			NEARBY_PET[k] = nil
+		else
+			insert(aPet, npc)
+			if nLimit and #aPet == nLimit then
+				break
+			end
+		end
+	end
+	return aPet
+end
+
+function MY.GetNearPetID(nLimit)
+	local aPetID = {}
+	for k, _ in pairs(NEARBY_PET) do
+		insert(aPetID, k)
+		if nLimit and #aPetID == nLimit then
+			break
+		end
+	end
+	return aPetID
+end
+
+if IsDebugClient() then
+function MY.GetNearPetTable()
+	return NEARBY_PET
+end
+end
+
 -- 获取附近玩家列表
 -- (table) MY.GetNearPlayer(void)
 function MY.GetNearPlayer(nLimit)
@@ -1388,12 +1424,21 @@ function MY.GetNearDoodadTable()
 end
 end
 
-RegisterEvent('NPC_ENTER_SCENE',    function() NEARBY_NPC[arg0]    = GetNpc(arg0) end)
-RegisterEvent('NPC_LEAVE_SCENE',    function() NEARBY_NPC[arg0]    = nil  end)
+RegisterEvent('NPC_ENTER_SCENE', function()
+	local npc = GetNpc(arg0)
+	if npc.dwOwnerID ~= 0 then
+		NEARBY_PET[arg0] = npc
+	end
+	NEARBY_NPC[arg0] = npc
+end)
+RegisterEvent('NPC_LEAVE_SCENE', function()
+	NEARBY_PET[arg0] = nil
+	NEARBY_NPC[arg0] = nil
+end)
 RegisterEvent('PLAYER_ENTER_SCENE', function() NEARBY_PLAYER[arg0] = GetPlayer(arg0) end)
-RegisterEvent('PLAYER_LEAVE_SCENE', function() NEARBY_PLAYER[arg0] = nil  end)
+RegisterEvent('PLAYER_LEAVE_SCENE', function() NEARBY_PLAYER[arg0] = nil end)
 RegisterEvent('DOODAD_ENTER_SCENE', function() NEARBY_DOODAD[arg0] = GetDoodad(arg0) end)
-RegisterEvent('DOODAD_LEAVE_SCENE', function() NEARBY_DOODAD[arg0] = nil  end)
+RegisterEvent('DOODAD_LEAVE_SCENE', function() NEARBY_DOODAD[arg0] = nil end)
 end
 
 -- 获取玩家自身信息（缓存）
