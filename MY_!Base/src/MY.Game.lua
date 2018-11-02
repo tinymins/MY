@@ -1312,6 +1312,12 @@ function MY.GetNearNpcID(nLimit)
 	return aNpcID
 end
 
+if IsDebugClient() then
+function MY.GetNearNpcTable()
+	return NEARBY_NPC
+end
+end
+
 -- 获取附近玩家列表
 -- (table) MY.GetNearPlayer(void)
 function MY.GetNearPlayer(nLimit)
@@ -1341,6 +1347,12 @@ function MY.GetNearPlayerID(nLimit)
 	return aPlayerID
 end
 
+if IsDebugClient() then
+function MY.GetNearPlayerTable()
+	return NEARBY_PLAYER
+end
+end
+
 -- 获取附近物品列表
 -- (table) MY.GetNearPlayer(void)
 function MY.GetNearDoodad(nLimit)
@@ -1368,6 +1380,12 @@ function MY.GetNearDoodadID(nLimit)
 		end
 	end
 	return aDoodadID
+end
+
+if IsDebugClient() then
+function MY.GetNearDoodadTable()
+	return NEARBY_DOODAD
+end
 end
 
 RegisterEvent('NPC_ENTER_SCENE',    function() NEARBY_NPC[arg0]    = GetNpc(arg0) end)
