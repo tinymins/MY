@@ -1760,6 +1760,18 @@ function MY.GetTarget(object)
 	end
 end
 
+-- 取得目标的目标类型和ID
+-- (dwType, dwID) MY.GetTargetTarget()       -- 取得自己当前的目标的目标类型和ID
+-- (dwType, dwID) MY.GetTargetTarget(object) -- 取得指定操作对象当前的目标的目标类型和ID
+function MY.GetTargetTarget(object)
+    local nTarType, dwTarID = LM.GetTarget(object)
+    local KTar = LM.GetObject(nTarType, dwTarID)
+    if not KTar then
+        return
+    end
+    return MY.GetTarget(KTar)
+end
+
 -- 根据 dwType 类型和 dwID 设置目标
 -- (void) MY.SetTarget([number dwType, ]number dwID)
 -- dwType   -- *可选* 目标类型
