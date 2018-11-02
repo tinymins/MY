@@ -1320,8 +1320,8 @@ end
 
 -- 获取玩家自身信息（缓存）
 do local m_ClientInfo
-function MY.GetClientInfo(bForceRefresh)
-	if bForceRefresh or not (m_ClientInfo and m_ClientInfo.dwID) then
+function MY.GetClientInfo(arg0)
+	if arg0 == true or not (m_ClientInfo and m_ClientInfo.dwID) then
 		local me = GetClientPlayer()
 		if me then -- 确保获取到玩家
 			if not m_ClientInfo then
@@ -1387,10 +1387,17 @@ function MY.GetClientInfo(bForceRefresh)
 			m_ClientInfo.nTitle            = me.nTitle
 			m_ClientInfo.nTitlePoint       = me.nTitlePoint
 			m_ClientInfo.dwPetID           = me.dwPetID
+			m_ClientInfo.dwMapID           = me.GetMapID()
+			m_ClientInfo.szMapName         = Table_GetMapName(me.GetMapID())
 		end
 	end
-
-	return m_ClientInfo or {}
+	if not m_ClientInfo then
+		return {}
+	end
+	if IsString(arg0) then
+		return m_ClientInfo[arg0]
+	end
+	return m_ClientInfo
 end
 MY.RegisterEvent('LOADING_ENDING', MY.GetClientInfo)
 end
