@@ -1898,26 +1898,26 @@ end
 -- dwType   -- *可选* 目标类型
 -- dwID     -- 目标 ID
 function MY.SetTarget(arg0, arg1)
-	local dwType, dwID, szName
+	local dwType, dwID, szNames
 	if IsUserdata(arg0) then
 		dwType, dwID = TARGET[MY.GetObjectType(arg0)], arg0.dwID
 	elseif IsString(arg0) then
-		szName = arg0
+		szNames = arg0
 	elseif IsNumber(arg0) then
 		if IsNil(arg1) then
 			dwID = arg0
 		elseif IsString(arg1) then
-			dwType, szName = arg0, arg1
+			dwType, szNames = arg0, arg1
 		elseif IsNumber(arg1) then
 			dwType, dwID = arg0, arg1
 		end
 	end
-	if not dwID and not szName then
+	if not dwID and not szNames then
 		return
 	end
-	if szName then
+	if szNames then
 		local tTarget = {}
-		for _, szName in pairs(MY.SplitString(dwID:gsub('[%[%]]', ''), '|')) do
+		for _, szName in pairs(MY.SplitString(szNames:gsub('[%[%]]', ''), '|')) do
 			tTarget[szName] = true
 		end
 		if not dwID and (not dwType or dwType == TARGET.NPC) then
