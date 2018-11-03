@@ -678,7 +678,7 @@ function _GKP.GetSubsidiesMenu()
 		rgb = { 255, 255, 0 },
 		fnAction = function()
 			GetUserInput(_L['New Protocol  Format: Protocol\'s Name, Money'], function(txt)
-				local t = MY.Split(txt, ',')
+				local t = MY.SplitString(txt, ',')
 				table.insert(_GKP.Config.Subsidies, { t[1], tonumber(t[2]) or '', true })
 				_GKP.SaveConfig()
 			end)
@@ -708,7 +708,7 @@ function _GKP.GetSchemeMenu()
 		rgb = { 255, 255, 0 },
 		fnAction = function()
 			GetUserInput(_L['New Protocol Format: Money, Money, Money'], function(txt)
-				local t = MY.Split(txt, ',')
+				local t = MY.SplitString(txt, ',')
 				_GKP.Config.Scheme = {}
 				for k, v in ipairs(t) do
 					table.insert(_GKP.Config.Scheme, { tonumber(v) or 0, true })

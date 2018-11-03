@@ -87,16 +87,16 @@ end
 
 local function GetTextList(szText)
 	local t = {}
-	for _, line in ipairs(MY.Split(szText, '\n')) do
-		line = MY.Trim(line)
+	for _, line in ipairs(MY.SplitString(szText, '\n')) do
+		line = MY.TrimString(line)
 		if line ~= '' then
 			local tab = {}
-			local vals = MY.Split(line, ',')
+			local vals = MY.SplitString(line, ',')
 			for i, val in ipairs(vals) do
 				if i == 1 then
-					local vs = MY.Split(val, '|')
+					local vs = MY.SplitString(val, '|')
 					for j, v in ipairs(vs) do
-						v = MY.Trim(v)
+						v = MY.TrimString(v)
 						if v ~= '' then
 							if j == 1 then
 								tab.dwID = tonumber(v)
@@ -124,7 +124,7 @@ local function GetTextList(szText)
 					tab.bCaution = true
 				elseif val == '!!!!' or val:sub(1, 5) == '!!!!|' then
 					tab.bScreenHead = true
-					local vs = MY.Split(val, '|')
+					local vs = MY.SplitString(val, '|')
 					for _, v in ipairs(vs) do
 						if v:sub(1, 1) == '[' and v:sub(-1, -1) == ']' then
 							tab.colScreenHead = v:sub(2, -2)
@@ -139,7 +139,7 @@ local function GetTextList(szText)
 					if val:sub(1, 1) == '#' then
 						tab.col = val
 					else
-						local vs = MY.Split(val, '|')
+						local vs = MY.SplitString(val, '|')
 						tab.col = vs[1]
 						tab.nColAlpha = vs[2] and tonumber(vs[2])
 					end

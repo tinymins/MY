@@ -366,7 +366,7 @@ MY.FormatDataStructure = FormatDataStructure
 end
 
 function MY.SetGlobalValue(szVarPath, Val)
-	local t = MY.String.Split(szVarPath, '.')
+	local t = MY.SplitString(szVarPath, '.')
 	local tab = _G
 	for k, v in ipairs(t) do
 		if type(tab[v]) == 'nil' then
@@ -565,7 +565,7 @@ function MY.Ajax(settings)
 	end
 
 	local ssl = url:sub(1, 6) == 'https:'
-	local method, payload = unpack(MY.Split(settings.type, '/'))
+	local method, payload = unpack(MY.SplitString(settings.type, '/'))
 	if (method == 'get' or method == 'delete') and data then
 		if not url:find('?') then
 			url = url .. '?'
@@ -746,7 +746,7 @@ local function OnCurlRequestResult()
 	local dwBufferSize = arg3
 	if MY_CALL_AJAX[szKey] then
 		local settings = MY_CALL_AJAX[szKey]
-		local method, payload = unpack(MY.Split(settings.type, '/'))
+		local method, payload = unpack(MY.SplitString(settings.type, '/'))
 		local status = bSuccess and 200 or 500
 		if settings.complete then
 			local status, err = pcall(settings.complete, html, status, bSuccess or dwBufferSize > 0)
@@ -813,7 +813,7 @@ MY.BreatheCall('MYLIB#STORAGE_DATA', 200, function()
 		type = 'post/json',
 		url = 'http://data.jx3.derzh.com/api/storage',
 		data = {
-			data = MY.SimpleEncrypt(MY.ConvertToUTF8(MY.JsonEncode({
+			data = MY.EncryptString(MY.ConvertToUTF8(MY.JsonEncode({
 				g = me.GetGlobalID(), f = me.dwForceID, e = me.GetTotalEquipScore(),
 				n = GetUserRoleName(), i = UI_GetClientPlayerID(), c = me.nCamp,
 				S = MY.GetRealServer(1), s = MY.GetRealServer(2), r = me.nRoleType,
@@ -873,7 +873,7 @@ function MY.StorageData(szKey, oData)
 			type = 'post/json',
 			url = 'http://data.jx3.derzh.com/api/storage',
 			data = {
-				data =  MY.SimpleEncrypt(MY.JsonEncode({
+				data =  MY.EncryptString(MY.JsonEncode({
 					g = me.GetGlobalID(), f = me.dwForceID, r = me.nRoleType,
 					n = GetUserRoleName(), i = UI_GetClientPlayerID(),
 					S = MY.GetRealServer(1), s = MY.GetRealServer(2),

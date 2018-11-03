@@ -258,7 +258,7 @@ MY.RegisterBgMsg('TI', function(_, nChannel, dwID, szName, bIsSelf, ...)
 			elseif data[1] == 'Edit' then
 				TI.CreateFrame(data[2], data[3])
 			elseif data[1] == 'reply' and (tonumber(data[2]) == UI_GetClientPlayerID() or data[2] == me.szName) then
-				if MY.Trim(data[3]) ~= '' or MY.Trim(data[4]) ~= '' then
+				if MY.TrimString(data[3]) ~= '' or MY.TrimString(data[4]) ~= '' then
 					TI.CreateFrame(data[3], data[4])
 				end
 			end

@@ -207,7 +207,7 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
             return
         end
     else -- normal
-        if not MY.String.SimpleMatch(rec.text, MY_ChatMonitor.szKeyWords) then
+        if not MY.StringSimpleMatch(rec.text, MY_ChatMonitor.szKeyWords) then
             return
         end
     end

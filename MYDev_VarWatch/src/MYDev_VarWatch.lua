@@ -83,7 +83,7 @@ MY.RegisterPanel(
 				w = 150, h = 25,
 				color = {255, 255, 255},
 				onchange = function(text)
-					_C.tVarList[i] = MY.String.Trim(text)
+					_C.tVarList[i] = MY.TrimString(text)
 					MY.SaveLUAData(DATA_PATH, _C.tVarList)
 				end,
 			}):children('#WndEditBox_K' .. i)

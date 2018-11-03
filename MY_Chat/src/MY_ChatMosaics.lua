@@ -206,7 +206,7 @@ OnPanelActive = function(wnd)
 		end)(),
 		onchange = function(szText)
 			MY_ChatMosaics.tIgnoreNames = {}
-			for _, szName in ipairs(MY.String.Split(szText, ',')) do
+			for _, szName in ipairs(MY.SplitString(szText, ',')) do
 				MY_ChatMosaics.tIgnoreNames[szName] = true
 			end
 			MY_ChatMosaics.ResetMosaics()

@@ -166,7 +166,7 @@ local function OnNpcEnterScene()
 	end
 	-- avoid full number named npc
 	local szName = MY.GetObjectName(npc, 'never')
-	if not szName or MY.String.Trim(szName) == '' then
+	if not szName or MY.TrimString(szName) == '' then
 		return
 	end
 	-- switch map
@@ -227,7 +227,7 @@ local function OnDoodadEnterScene()
 	end
 	-- avoid full number named doodad
 	local szName = MY.GetObjectName(doodad, 'never')
-	if not szName or MY.String.Trim(szName) == '' then
+	if not szName or MY.TrimString(szName) == '' then
 		return
 	end
 	-- switch map
@@ -438,8 +438,8 @@ function MY_MiddleMapMark.Search(szKeyword)
 	local aKeywords = {}
 	do
 		local i = 1
-		for _, szSearch in ipairs(MY.String.Split(szKeyword, ',')) do
-			szSearch = MY.String.Trim(szSearch)
+		for _, szSearch in ipairs(MY.SplitString(szKeyword, ',')) do
+			szSearch = MY.TrimString(szSearch)
 			if szSearch ~= '' then
 				aKeywords[i] = szSearch
 				i = i + 1
@@ -522,7 +522,7 @@ function PS.OnPanelActive(wnd)
 	  :size(w - 32, h - 50)
 	  :listbox('onlclick', function(hItem, text, id, data, selected)
 	  	OpenMiddleMap(data.dwMapID, 0)
-	  	MY.UI('Topmost1/MiddleMap/Wnd_Tool/Edit_Search'):text(MY.String.PatternEscape(data.szName))
+	  	MY.UI('Topmost1/MiddleMap/Wnd_Tool/Edit_Search'):text(MY.EscapeString(data.szName))
 	  	Station.SetFocusWindow('Topmost1/MiddleMap')
 	  	if not selected then -- avoid unselect
 	  		return false

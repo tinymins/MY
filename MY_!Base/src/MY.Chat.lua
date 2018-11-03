@@ -781,10 +781,10 @@ function MY.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox)
 		local nLen = 0
 		for i, v in ipairs(tSay) do
 			if nLen <= 64 then
-				nLen = nLen + MY.String.LenW(v.text or v.name or '')
+				nLen = nLen + MY.StringLenW(v.text or v.name or '')
 				if nLen > 64 then
-					if v.text then v.text = MY.String.SubW(v.text, 1, 64 - nLen ) end
-					if v.name then v.name = MY.String.SubW(v.name, 1, 64 - nLen ) end
+					if v.text then v.text = MY.StringSubW(v.text, 1, 64 - nLen ) end
+					if v.name then v.name = MY.StringSubW(v.name, 1, 64 - nLen ) end
 					for j=#tSay, i+1, -1 do
 						table.remove(tSay, j)
 					end

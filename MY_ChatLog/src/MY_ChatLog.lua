@@ -33,9 +33,9 @@ RegisterCustomData('MY_ChatLog.tUncheckedChannel')
 ------------------------------------------------------------------------------------------------------
 -- 数据采集
 ------------------------------------------------------------------------------------------------------
-local TONG_ONLINE_MSG        = '^' .. MY.String.PatternEscape(g_tStrings.STR_TALK_HEAD_TONG .. g_tStrings.STR_GUILD_ONLINE_MSG)
-local TONG_MEMBER_LOGIN_MSG  = '^' .. MY.String.PatternEscape(g_tStrings.STR_GUILD_MEMBER_LOGIN):gsub('<link 0>', '.-') .. '$'
-local TONG_MEMBER_LOGOUT_MSG = '^' .. MY.String.PatternEscape(g_tStrings.STR_GUILD_MEMBER_LOGOUT):gsub('<link 0>', '.-') .. '$'
+local TONG_ONLINE_MSG        = '^' .. MY.EscapeString(g_tStrings.STR_TALK_HEAD_TONG .. g_tStrings.STR_GUILD_ONLINE_MSG)
+local TONG_MEMBER_LOGIN_MSG  = '^' .. MY.EscapeString(g_tStrings.STR_GUILD_MEMBER_LOGIN):gsub('<link 0>', '.-') .. '$'
+local TONG_MEMBER_LOGOUT_MSG = '^' .. MY.EscapeString(g_tStrings.STR_GUILD_MEMBER_LOGOUT):gsub('<link 0>', '.-') .. '$'
 
 ------------------------------------------------------------------------------------------------------
 -- 数据库核心

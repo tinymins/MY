@@ -140,7 +140,7 @@ end
 
 -- Ìí¼ÓÄ¬ÈÏ½¹µã
 function MY_Focus.SetFocusPattern(szName)
-	szName = MY.Trim(szName)
+	szName = MY.TrimString(szName)
 	for _, v in ipairs(MY_Focus.tAutoFocus) do
 		if v.szPattern == szName then
 			return

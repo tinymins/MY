@@ -40,7 +40,7 @@ local function GetItemText(item)
 	end
 end
 
-local SimpleMatch = MY.String.SimpleMatch
+local SimpleMatch = MY.StringSimpleMatch
 local function FilterBags(szTreePath, szFilter, bTimeLtd)
 	if szFilter then
 		szFilter = szFilter:gsub('[%[%]]', '')

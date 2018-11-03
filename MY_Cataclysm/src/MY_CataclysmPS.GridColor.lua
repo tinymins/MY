@@ -120,7 +120,7 @@ function PS.OnPanelActive(frame)
 			x = x, y = y, text = _L['Edit Distance Level'],
 			onclick = function()
 				GetUserInput(_L['distance, distance, ...'], function(szText)
-					local t = MY.Split(MY.Trim(szText), ',')
+					local t = MY.SplitString(MY.TrimString(szText), ',')
 					local tt = {}
 					for k, v in ipairs(t) do
 						if not tonumber(v) then

@@ -47,7 +47,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y + 3, w = 200, h = 25,
 		text = MY_Cataclysm.szConfigName,
 		onchange = function(txt)
-			szConfigName = MY.Trim(txt)
+			szConfigName = MY.TrimString(txt)
 		end,
 		onblur = function()
 			if szConfigName == MY_Cataclysm.szConfigName then

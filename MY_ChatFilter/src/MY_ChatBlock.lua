@@ -196,7 +196,7 @@ function MY_ChatBlock.MatchBlockWord(talkData, talkType, dwTalkerID)
 			end
 		end
 		if hasfilter and not (bw.ignoreAcquaintance and bAcquaintance)
-		and MY.String.SimpleMatch(szText, bw.keyword, not bw.ignoreCase, not bw.ignoreEnEm, bw.ignoreSpace) then
+		and MY.StringSimpleMatch(szText, bw.keyword, not bw.ignoreCase, not bw.ignoreEnEm, bw.ignoreSpace) then
 			return true
 		end
 	end

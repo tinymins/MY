@@ -1917,7 +1917,7 @@ function MY.SetTarget(arg0, arg1)
 	end
 	if szName then
 		local tTarget = {}
-		for _, szName in pairs(MY.Split(dwID:gsub('[%[%]]', ''), '|')) do
+		for _, szName in pairs(MY.SplitString(dwID:gsub('[%[%]]', ''), '|')) do
 			tTarget[szName] = true
 		end
 		if not dwID and (not dwType or dwType == TARGET.NPC) then

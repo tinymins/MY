@@ -126,7 +126,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 				driver = 'webcef',
 				url = 'http://data.jx3.derzh.com/serendipity/?l='
 				.. MY.GetLang() .. '&m=' .. nMethod
-				.. '&data=' .. MY.SimpleEncrypt(MY.JsonEncode({
+				.. '&data=' .. MY.EncryptString(MY.JsonEncode({
 					n = szName, N = szNameCRC, R = szReporter,
 					S = MY.GetRealServer(1), s = MY.GetRealServer(2),
 					a = szSerendipity, f = nStatus, t = dwTime,

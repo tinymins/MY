@@ -33,14 +33,13 @@ local UrlEncodeString, UrlDecodeString = UrlEncode, UrlDecode
 --------------------------------------------
 -- 本地函数和变量
 --------------------------------------------
-MY.String = {}
 
 -- 分隔字符串
--- (table) MY.String.Split(string szText, string szSpliter, bool bIgnoreEmptyPart)
+-- (table) MY.SplitString(string szText, string szSpliter, bool bIgnoreEmptyPart)
 -- szText           原始字符串
 -- szSpliter        分隔符
 -- bIgnoreEmptyPart 是否忽略空字符串，即'123;234;'被';'分成{'123','234'}还是{'123','234',''}
-function MY.String.Split(szText, szSep, bIgnoreEmptyPart)
+function MY.SplitString(szText, szSep, bIgnoreEmptyPart)
 	local nOff, tResult, szPart = 1, {}
 	while true do
 		local nEnd = StringFindW(szText, szSep, nOff)
@@ -60,27 +59,23 @@ function MY.String.Split(szText, szSep, bIgnoreEmptyPart)
 	end
 	return tResult
 end
-MY.Split = MY.String.Split
 
--- 转义正则表达式特殊字符
--- (string) MY.String.PatternEscape(string szText)
-function MY.String.PatternEscape(s) return (gsub(s, '([%(%)%.%%%+%-%*%?%[%^%$%]])', '%%%1')) end
+function MY.EscapeString(s)
+	return (gsub(s, '([%(%)%.%%%+%-%*%?%[%^%$%]])', '%%%1'))
+end
 
--- 清除字符串首尾的空白字符
--- (string) MY.String.Trim(string szText)
-function MY.String.Trim(szText)
+function MY.TrimString(szText)
 	if not szText or szText == '' then
 		return ''
 	end
 	return (gsub(szText, '^%s*(.-)%s*$', '%1'))
 end
-MY.Trim = MY.String.Trim
 
-function MY.String.LenW(str)
+function MY.StringLenW(str)
 	return wlen(str)
 end
 
-function MY.String.SubW(str,s,e)
+function MY.StringSubW(str,s,e)
 	if s < 0 then
 		s = wlen(str) + s
 	end
@@ -90,10 +85,9 @@ function MY.String.SubW(str,s,e)
 	return wsub(str, s, e)
 end
 
-function MY.String.SimpleEncrypt(szText)
+function MY.EncryptString(szText)
 	return szText:gsub('.', function (c) return format ('%02X', (byte(c) + 13) % 256) end):gsub(' ', '+')
 end
-MY.SimpleEncrypt = MY.String.SimpleEncrypt
 
 local function EncodePostData(data, t, prefix)
 	if type(data) == 'table' then
@@ -214,9 +208,8 @@ local function UrlDecode(data)
 end
 MY.UrlDecode = UrlDecode
 
-
 local m_simpleMatchCache = setmetatable({}, { __mode = 'v' })
-function MY.String.SimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIgnoreSpace)
+function MY.StringSimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIgnoreSpace)
 	if not bDistinctCase then
 		szFind = StringLowerW(szFind)
 		szText = StringLowerW(szText)
@@ -244,11 +237,11 @@ function MY.String.SimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIg
 	local tFind = m_simpleMatchCache[szFind]
 	if not tFind then
 		tFind = {}
-		for _, szKeywordsLine in ipairs(MY.String.Split(szFind, ';', true)) do
+		for _, szKeywordsLine in ipairs(MY.SplitString(szFind, ';', true)) do
 			local tKeyWordsLine = {}
-			for _, szKeywords in ipairs(MY.String.Split(szKeywordsLine, ',', true)) do
+			for _, szKeywords in ipairs(MY.SplitString(szKeywordsLine, ',', true)) do
 				local tKeyWords = {}
-				for _, szKeyword in ipairs(MY.String.Split(szKeywords, '|', true)) do
+				for _, szKeyword in ipairs(MY.SplitString(szKeywords, '|', true)) do
 					local bNegative = szKeyword:sub(1, 1) == '!'
 					if bNegative then
 						szKeyword = szKeyword:sub(2)
@@ -273,7 +266,7 @@ function MY.String.SimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIg
 			-- 10|十人
 			local bKeyWord = false
 			for _, info in ipairs(tKeyWords) do      -- 符合一个即可
-				-- szKeyword = MY.String.PatternEscape(szKeyword) -- 用了wstring还Escape个捷豹
+				-- szKeyword = MY.EscapeString(szKeyword) -- 用了wstring还Escape个捷豹
 				if info.bNegative then               -- !小铁被吃了
 					if not wfind(szText, info.szKeyword) then
 						bKeyWord = true
@@ -299,4 +292,3 @@ function MY.String.SimpleMatch(szText, szFind, bDistinctCase, bDistinctEnEm, bIg
 	end
 	return bKeyWordsLine
 end
-MY.StringSimpleMatch = MY.String.SimpleMatch
