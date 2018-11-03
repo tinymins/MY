@@ -6,21 +6,29 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
-----------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
+---------------------------------------------------------------------------------------------------
+local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
-local insert, remove, concat, unpack = table.insert, table.remove, table.concat, table.unpack
-local sub, len, char, rep = string.sub, string.len, string.char, string.rep
-local byte, format, gsub = string.byte, string.format, string.gsub
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
-local floor, min, max, ceil = math.floor, math.min, math.max, math.ceil
+local huge, pi, random = math.huge, math.pi, math.random
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
 -- jx3 apis caching
 local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
-local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-----------------------------------------------------------------------------------------------
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local Get, RandomChild = MY.Get, MY.RandomChild
+local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
+---------------------------------------------------------------------------------------------------
 -----------------------------------------------
 -- 本地函数和变量
 -----------------------------------------------
@@ -991,110 +999,91 @@ end
 end
 
 do
-local CHAT_HOOK = {}
 -- HOOK聊天栏
--- 注：如果fnOnActive存在则没有激活的聊天栏不会执行fnBefore、fnAfter
---     同时在聊天栏切换时会触发fnOnActive
-function MY.HookChatPanel(szKey, fnBefore, fnAfter, fnOnActive)
-	if type(szKey) == 'function' then
-		szKey, fnBefore, fnAfter, fnOnActive = GetTickCount(), szKey, fnBefore, fnAfter
-		while CHAT_HOOK[szKey] do
+local CHAT_HOOK = {
+	BEFORE = {},
+	AFTER = {},
+	FILTER = {},
+}
+function MY.HookChatPanel(szType, fnAction)
+	local szKey = nil
+	local nPos = StringFindW(szType, '.')
+	if nPos then
+		szKey = sub(szType, nPos + 1)
+		szType = sub(szType, 1, nPos - 1)
+	end
+	if not CHAT_HOOK[szType] then
+		return
+	end
+	if not szKey then
+		szKey = GetTickCount()
+		while CHAT_HOOK[szType][tostring(szKey)] do
 			szKey = szKey + 0.1
 		end
+		szKey = tostring(szKey)
 	end
-	if fnBefore or fnAfter or fnOnActive then
-		CHAT_HOOK[szKey] = {
-			fnBefore = fnBefore, fnAfter = fnAfter, fnOnActive = fnOnActive
-		}
-	else
-		CHAT_HOOK[szKey] = nil
+	if IsNil(fnAction) then
+		return CHAT_HOOK[szType][szKey]
 	end
+	if not IsFunction(fnAction) then
+		fnAction = nil
+	end
+	CHAT_HOOK[szType][szKey] = fnAction
+	return szKey
 end
 
-local function OnChatPanelActive(h)
-	for szKey, hc in pairs(CHAT_HOOK) do
-		if type(hc.fnOnActive) == 'function' then
-			local status, err = pcall(hc.fnOnActive, h)
-			if not status then
-				MY.Debug({err}, 'HookChatPanelOnActive#' .. szKey, MY_DEBUG.ERROR)
+local APPEND_START_INDEX = 0
+local function BeforeChatAppendItemFromString(h, szMsg, ...) -- h, szMsg, szChannel, dwTime, nR, nG, nB, ...
+	for szKey, fnAction in pairs(CHAT_HOOK.FILTER) do
+		local status, invalid = pcall(fnAction, h, szMsg, ...)
+		if status then
+			if not invalid then
+				return h, '', ...
 			end
+		else
+			MY.Debug({msg}, 'HookChatPanel.FILTER#' .. szKey, MY_DEBUG.ERROR)
+		end
+	end
+	for szKey, fnAction in pairs(CHAT_HOOK.BEFORE) do
+		local status = pcall(fnAction, h, szMsg, ...)
+		if not status then
+			MY.Debug({msg}, 'HookChatPanel.BEFORE#' .. szKey, MY_DEBUG.ERROR)
+		end
+	end
+	APPEND_START_INDEX = h:GetItemCount()
+	return h, szMsg, ...
+end
+
+local function AfterChatAppendItemFromString(h, ...)
+	local nCount = h:GetItemCount()
+	if nCount < APPEND_START_INDEX then
+		return
+	end
+	for szKey, fnAction in pairs(CHAT_HOOK.AFTER) do
+		local status = pcall(fnAction, h, APPEND_START_INDEX, ...)
+		if not status then
+			MY.Debug({msg}, 'HookChatPanel.AFTER#' .. szKey, MY_DEBUG.ERROR)
 		end
 	end
 end
 
-local function OnChatPanelNamelinkLButtonDown(...)
-	this.__MY_OnItemLButtonDown(...)
-	MY.ChatLinkEventHandlers.OnNameLClick(...)
-end
-
-local function OnChatPanelAppendItemFromString(h, szMsg, szChannel, dwTime, nR, nG, nB, ...)
-	local bActived = h:GetRoot():Lookup('CheckBox_Title'):IsCheckBoxChecked()
-	-- deal with fnBefore
-	for szKey, hc in pairs(CHAT_HOOK) do
-		hc.param = EMPTY_TABLE
-		-- if fnBefore exist and ChatPanel[i] actived or fnOnActive not defined
-		if type(hc.fnBefore) == 'function' and (bActived or not hc.fnOnActive) then
-			-- try to execute fnBefore and get return values
-			local status, msg, ret = pcall(hc.fnBefore, h, szChannel, szMsg, dwTime, nR, nG, nB, ...)
-			-- when fnBefore execute succeed
-			if status then
-				-- set msg if returned string
-				if type(msg) == 'string' then
-					szMsg = msg
-				end
-				-- save fnAfter's param
-				hc.param = ret
-			else
-				MY.Debug({msg}, 'HookChatPanel.Before#' .. szKey, MY_DEBUG.ERROR)
-			end
-		end
-	end
-	local nIndex = h:GetItemCount()
-	-- call ori append
-	h:_AppendItemFromString_MY(szMsg, szChannel, dwTime, nR, nG, nB, ...)
-	-- hook namelink lbutton down
-	for i = h:GetItemCount() - 1, nIndex, -1 do
-		local hItem = h:Lookup(i)
-		if hItem:GetName():find('^namelink_%d+$') then
-			hItem.bMyChatRendered = true
-			if hItem.OnItemLButtonDown then
-				hItem.__MY_OnItemLButtonDown = hItem.OnItemLButtonDown
-				hItem.OnItemLButtonDown = OnChatPanelNamelinkLButtonDown
-			else
-				hItem.OnItemLButtonDown = MY.ChatLinkEventHandlers.OnNameLClick
-			end
-		end
-	end
-	-- deal with fnAfter
-	for szKey, hc in pairs(CHAT_HOOK) do
-		-- if fnAfter exist and ChatPanel[i] actived or fnOnActive not defined
-		if type(hc.fnAfter) == 'function' and (bActived or not hc.fnOnActive) then
-			local status, err = pcall(hc.fnAfter, h, hc.param, szChannel, szMsg, dwTime, nR, nG, nB, ...)
-			if not status then
-				MY.Debug({err}, 'HookChatPanel.After#' .. szKey, MY_DEBUG.ERROR)
-			end
-		end
-	end
-end
-
+local HOOKED_UI = setmetatable({}, { __mode = 'k' })
 local function Hook(i)
 	local h = Station.Lookup('Lowest2/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message')
-	-- local ttl = Station.Lookup('Lowest2/ChatPanel' .. i .. '/CheckBox_Title', 'Text_TitleName')
-	-- if h and (not ttl or ttl:GetText() ~= g_tStrings.CHANNEL_MENTOR) then
-	if h and not h._AppendItemFromString_MY then
-		h:GetRoot():Lookup('CheckBox_Title').OnCheckBoxCheck = function()
-			OnChatPanelActive(h)
-		end
-		h._AppendItemFromString_MY = h.AppendItemFromString
-		h.AppendItemFromString = OnChatPanelAppendItemFromString
+	if h and not HOOKED_UI[h] then
+		HOOKED_UI[h] = true
+		HookTableFunc(h, 'AppendItemFromString', BeforeChatAppendItemFromString, false, false, false, false, true)
+		HookTableFunc(h, 'AppendItemFromString', AfterChatAppendItemFromString, true, false, false, false, true)
 	end
 end
+MY.RegisterEvent('CHAT_PANEL_OPEN.ChatPanelHook', function(event) Hook(arg0) end)
 
 local function Unhook(i)
 	local h = Station.Lookup('Lowest2/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message')
-	if h and h._AppendItemFromString_MY then
-		h.AppendItemFromString = h._AppendItemFromString_MY
-		h._AppendItemFromString_MY = nil
+	if h and HOOKED_UI[h] then
+		HOOKED_UI[h] = nil
+		UnhookTableFunc(h, 'AppendItemFromString', BeforeChatAppendItemFromString)
+		UnhookTableFunc(h, 'AppendItemFromString', AfterChatAppendItemFromString)
 	end
 end
 
@@ -1103,8 +1092,8 @@ local function HookAll()
 		Hook(i)
 	end
 end
+HookAll()
 MY.RegisterEvent('CHAT_PANEL_INIT.ChatPanelHook', HookAll)
-MY.RegisterEvent('CHAT_PANEL_OPEN.ChatPanelHook', function(event) Hook(arg0) end)
 MY.RegisterEvent('RELOAD_UI_ADDON_END.ChatPanelHook', HookAll)
 
 local function UnhookAll()
@@ -1114,4 +1103,26 @@ local function UnhookAll()
 end
 MY.RegisterExit('ChatPanelHook', UnhookAll)
 MY.RegisterReload('ChatPanelHook', UnhookAll)
+end
+
+do
+local function OnChatPanelNamelinkLButtonDown(...)
+	if this.__MY_OnItemLButtonDown then
+		this.__MY_OnItemLButtonDown(...)
+	end
+	MY.ChatLinkEventHandlers.OnNameLClick(...)
+end
+
+MY.HookChatPanel('AFTER.MYLIB_HOOKNAME', function(h, nIndex)
+	for i = nIndex, h:GetItemCount() - 1 do
+		local hItem = h:Lookup(i)
+		if hItem:GetName():find('^namelink_%d+$') then
+			hItem.bMyChatRendered = true
+			if hItem.OnItemLButtonDown then
+				hItem.__MY_OnItemLButtonDown = hItem.OnItemLButtonDown
+			end
+			hItem.OnItemLButtonDown = OnChatPanelNamelinkLButtonDown
+		end
+	end
+end)
 end

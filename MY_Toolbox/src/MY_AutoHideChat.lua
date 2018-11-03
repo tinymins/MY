@@ -162,11 +162,7 @@ MY_AutoHideChat.ApplyConfig = function()
             _Cache.bAhAnimate = _Cache.bAhAnimate or false
         end
         -- hook chat panel as event listener
-        MY.HookChatPanel('MY_AutoHideChat', nil, function(h, channel, param, msg)
-            -- if msg is empty (means nothing appended) then return
-            if not (msg and #msg > 0) then
-                return
-            end
+        MY.HookChatPanel('AFTER.MY_AutoHideChat', function(h)
             -- if input box get focus then return
             local focus = Station.GetFocusWindow()
             if focus and focus:GetTreePath() == 'Lowest2/EditBox/Edit_Input/' then
@@ -218,7 +214,7 @@ MY_AutoHideChat.ApplyConfig = function()
             hEditInput.OnKillFocus = nil
         end
         hEditInput._MY_T_AHCP_OnKillFocus = nil
-        MY.HookChatPanel('MY_AutoHideChat')
+        MY.HookChatPanel('AFTER.MY_AutoHideChat', false)
 
         MY_AutoHideChat.ShowChatPanel()
     end

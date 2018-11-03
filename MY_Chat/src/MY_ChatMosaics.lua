@@ -28,13 +28,11 @@ MY_ChatMosaics.ResetMosaics = function()
 	_C.bForceUpdate = nil
 	-- hook chat panel
 	if MY_ChatMosaics.bEnabled then
-		MY.HookChatPanel('MY_ChatMosaics', function(h, szChannel, szMsg, dwTime)
-			return szMsg, h:GetItemCount()
-		end, function(h, nCount, szChannel, szMsg, dwTime)
-			_C.Mosaics(h, nCount)
+		MY.HookChatPanel('AFTER.MY_ChatMosaics', function(h, nIndex)
+			_C.Mosaics(h, nIndex)
 		end)
 	else
-		MY.HookChatPanel('MY_ChatMosaics')
+		MY.HookChatPanel('AFTER.MY_ChatMosaics', false)
 	end
 	FireUIEvent('ON_MY_MOSAICS_RESET')
 end

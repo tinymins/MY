@@ -21,10 +21,7 @@ RegisterCustomData('MY_ChatCopy.bChatCopyAlwaysShowMask')
 RegisterCustomData('MY_ChatCopy.bChatCopyAlwaysWhite')
 RegisterCustomData('MY_ChatCopy.bChatCopyNoCopySysmsg')
 
--- hook chat panel
-MY.HookChatPanel('MY_ChatCopy', function(h, szChannel, szMsg, dwTime, nR, nG, nB, dwTime, dwTalkerID, szName)
-	return szMsg, h:GetItemCount()
-end, function(h, i, szChannel, szMsg, dwTime, nR, nG, nB)
+local function onNewChatLine(h, i, szMsg, szChannel, dwTime, nR, nG, nB)
 	if szMsg and i and h:GetItemCount() > i and (MY_ChatCopy.bChatTime or MY_ChatCopy.bChatCopy) then
 		-- chat time
 		-- check if timestrap can insert
@@ -52,4 +49,5 @@ end, function(h, i, szChannel, szMsg, dwTime, nR, nG, nB)
 		-- insert timestrap text
 		h:InsertItemFromString(i, false, szTime)
 	end
-end)
+end
+MY.HookChatPanel('AFTER.MY_ChatCopy', onNewChatLine)

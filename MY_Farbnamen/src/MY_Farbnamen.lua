@@ -165,17 +165,11 @@ InitDB()
 -- 聊天复制和时间显示相关
 ---------------------------------------------------------------
 -- 插入聊天内容的 HOOK （过滤、加入时间 ）
-MY.HookChatPanel('MY_FARBNAMEN', function(h, szChannel, szMsg, dwTime)
-	return szMsg, h:GetItemCount()
-end, function(h, nCount, szChannel, szMsg, dwTime)
+MY.HookChatPanel('AFTER.MY_FARBNAMEN', function(h, nIndex)
 	if MY_Farbnamen.bEnabled then
-		for i = h:GetItemCount() - 1, nCount or 0, -1 do
+		for i = nIndex, h:GetItemCount() - 1 do
 			MY_Farbnamen.Render(h:Lookup(i))
 		end
-	end
-end, function(h)
-	for i = h:GetItemCount() - 1, 0, -1 do
-		MY_Farbnamen.Render(h:Lookup(i))
 	end
 end)
 -- 开放的名称染色接口

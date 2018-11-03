@@ -51,7 +51,7 @@ local l_tChannelHeader = {
 	['MSG_NPC_PARTY'] = g_tStrings.STR_TALK_HEAD_SAY1,
 }
 
-MY.HookChatPanel('MY_ChatFilter', function(h, szChannel, szMsg, dwTime)
+MY.HookChatPanel('FILTER.MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
 	-- 插件消息UUID过滤
 	if MY_ChatFilter.bFilterDuplicateAddonTalk then
 		local me = GetClientPlayer()
@@ -67,7 +67,7 @@ MY.HookChatPanel('MY_ChatFilter', function(h, szChannel, szMsg, dwTime)
 					if szUUID then
 						for k, uuid in pairs(h.MY_tDuplicateUUID) do
 							if uuid == szUUID then
-								return ''
+								return false
 							end
 						end
 						table.insert(h.MY_tDuplicateUUID, 1, szUUID)
@@ -99,7 +99,7 @@ MY.HookChatPanel('MY_ChatFilter', function(h, szChannel, szMsg, dwTime)
 		end
 		szText = szText:gsub('[ \n]', '')
 		if szText == '' then -- 纯表情纯链接就不屏蔽了
-			return
+			return true
 		end
 		if not MY_ChatFilter.bFilterDuplicateIgnoreID then
 			szText = szName .. ':' .. szText
@@ -109,13 +109,13 @@ MY.HookChatPanel('MY_ChatFilter', function(h, szChannel, szMsg, dwTime)
 			h.MY_tDuplicateLog = {}
 		elseif MY_ChatFilter.bFilterDuplicateContinuous then
 			if h.MY_tDuplicateLog[1] == szText then
-				return ''
+				return false
 			end
 			h.MY_tDuplicateLog[1] = szText
 		else
 			for i, szRecord in ipairs(h.MY_tDuplicateLog) do
 				if szRecord == szText then
-					return ''
+					return false
 				end
 			end
 			table.insert(h.MY_tDuplicateLog, 1, szText)
@@ -127,6 +127,7 @@ MY.HookChatPanel('MY_ChatFilter', function(h, szChannel, szMsg, dwTime)
 			end
 		end
 	end
+	return true
 end)
 
 MY.RegisterPanel('MY_DuplicateChatFilter', _L['duplicate chat filter'], _L['Chat'],
