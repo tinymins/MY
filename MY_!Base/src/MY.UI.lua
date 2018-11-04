@@ -1280,7 +1280,7 @@ function XGUI:drag(...)
 end
 
 -- get/set ui object text
-function XGUI:text(arg0)
+function XGUI:text(arg0, arg1)
 	self:_checksum()
 	if not IsNil(arg0) and not IsBoolean(arg0) then
 		local componentType, element
@@ -1294,6 +1294,7 @@ function XGUI:text(arg0)
 			elseif IsTable(arg0) then
 				if componentType == 'WndEditBox' or componentType == 'WndAutocomplete' then
 					element = GetComponentElement(raw, 'EDIT')
+					SetComponentProp(element, 'WNDEVENT_FIRETYPE', arg1)
 					for k, v in ipairs(arg0) do
 						if v.type == 'text' then
 							element:InsertText(v.text)
@@ -1324,6 +1325,7 @@ function XGUI:text(arg0)
 					end
 					element = GetComponentElement(raw, 'EDIT')
 					if element then
+						SetComponentProp(element, 'WNDEVENT_FIRETYPE', arg1)
 						element:SetText(arg0)
 					end
 				end
@@ -3077,11 +3079,26 @@ function XGUI:uievent(szEvent, fnEvent)
 										'XGUI:uievent#' .. szEvent .. ':' .. (p.id or 'Unnamed'), MY_DEBUG.WARNING
 									)
 								else
-									res = t
+									rets = res
 								end
 							end
 						end
 						return unpack(rets)
+					end
+					-- 特殊控件的一些HOOK
+					if szEvent == 'OnEditChanged' and raw.GetText then
+						local fnHookEvent = raw[szEvent]
+						raw[szEvent] = function(...)
+							local nFireType = GetComponentProp(raw, 'WNDEVENT_FIRETYPE') or WNDEVENT_FIRETYPE.AUTO
+							local szText = raw:GetText()
+							local szLastText = GetComponentProp(raw, 'LAST_TEXT')
+							if nFireType == WNDEVENT_FIRETYPE.PREVENT or (nFireType == WNDEVENT_FIRETYPE.AUTO and szText == szLastText) then
+								return
+							end
+							SetComponentProp(raw, 'WNDEVENT_FIRETYPE', nil)
+							SetComponentProp(raw, 'LAST_TEXT', szText)
+							return fnHookEvent(...)
+						end
 					end
 				end
 				insert(uievents[szEvent], { id = szKey, fn = fnEvent })
