@@ -169,16 +169,16 @@ do local l_prop = setmetatable({}, { __mode = 'k' })
 			l_prop[raw] = {}
 		end
 		local prop = l_prop[raw]
-		local k = { ... }
-		local v = remove(k)
+		local ks = { ... } -- { k1, k2, ..., kn, v }
 		local kc = select('#', ...) - 1
+		local v = ks[kc + 1]
 		for i = 1, kc - 1, 1 do
-			if not prop[k[i]] then
-				prop[k[i]] = {}
+			if not prop[ks[i]] then
+				prop[ks[i]] = {}
 			end
-			prop = prop[k[i]]
+			prop = prop[ks[i]]
 		end
-		prop[k[kc]] = v
+		prop[ks[kc]] = v
 	end
 end
 
