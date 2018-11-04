@@ -37,8 +37,8 @@ function TI.CreateFrame(a, b)
 	local ui = TI.GetFrame()
 	if ui then
 		ui = XGUI(ui)
-		ui:children('#YY'):text(a)
-		ui:children('#Message'):text(b)
+		ui:children('#YY'):text(a, WNDEVENT_FIRETYPE.PREVENT)
+		ui:children('#Message'):text(b, WNDEVENT_FIRETYPE.PREVENT)
 	else
 		ui = XGUI.CreateFrame('MY_TeamNotice', {
 			w = 320, h = 195,
@@ -64,7 +64,7 @@ function TI.CreateFrame(a, b)
 					XGUI(this):autocomplete('search', '')
 				end
 			end,
-			onchange = function(szText)
+			onchange = function(szText)Output(szText)
 				if TI.szYY == szText then
 					return
 				end
@@ -72,7 +72,7 @@ function TI.CreateFrame(a, b)
 					TI.szYY = szText
 					MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'TI', 'Edit', szText, ui:children('#Message'):text())
 				else
-					ui:children('#YY'):text(TI.szYY, true)
+					ui:children('#YY'):text(TI.szYY, WNDEVENT_FIRETYPE.PREVENT)
 				end
 			end,
 			autocomplete = {
@@ -135,7 +135,7 @@ function TI.CreateFrame(a, b)
 					TI.szNote = szText
 					MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'TI', 'Edit', ui:children('#YY'):text(), szText)
 				else
-					ui:children('#Message'):text(TI.szNote)
+					ui:children('#Message'):text(TI.szNote, WNDEVENT_FIRETYPE.PREVENT)
 				end
 			end,
 		})
@@ -183,8 +183,8 @@ function TI.CreateFrame(a, b)
 		end
 		PlaySound(SOUND.UI_SOUND, g_sound.OpenFrame)
 	end
-	TI.szYY   = a
-	TI.szNote = b
+	TI.szYY   = a or TI.szYY
+	TI.szNote = b or TI.szNote
 end
 
 function TI.OpenFrame()
