@@ -1165,14 +1165,28 @@ local NEARBY_DOODAD = {}   -- 附近的玩家
 
 -- 获取指定对象
 -- (KObject, info, bIsInfo) MY.GetObject([number dwType, ]number dwID)
+-- (KObject, info, bIsInfo) MY.GetObject([number dwType, ]string szName)
 -- dwType: [可选]对象类型枚举 TARGET.*
 -- dwID  : 对象ID
 -- return: 根据 dwType 类型和 dwID 取得操作对象
 --         不存在时返回nil, nil
-function MY.GetObject(dwType, dwID)
-	if not dwID then
-		dwType, dwID = nil, dwType
+function MY.GetObject(arg0, arg1, arg2)
+	local dwType, dwID, szName
+	if IsNumber(arg0) then
+		if IsNumber(arg1) then
+			dwType, dwID = arg0, arg1
+		elseif IsString(arg1) then
+			dwType, szName = arg0, arg1
+		elseif IsNil(arg1) then
+			dwID = arg0
+		end
+	elseif IsString(arg0) then
+		szName = arg0
 	end
+	if not dwID and not szName then
+		return
+	end
+
 	if dwID and not dwType then
 		if NEARBY_PLAYER[dwID] then
 			dwType = TARGET.PLAYER
@@ -1180,6 +1194,27 @@ function MY.GetObject(dwType, dwID)
 			dwType = TARGET.DOODAD
 		elseif NEARBY_NPC[dwID] then
 			dwType = TARGET.NPC
+		end
+	elseif not dwID and szName then
+		local tSearch = {}
+		if dwType == TARGET.PLAYER then
+			tSearch[TARGET.PLAYER] = NEARBY_PLAYER
+		elseif dwType == TARGET.NPC then
+			tSearch[TARGET.NPC] = NEARBY_NPC
+		elseif dwType == TARGET.DOODAD then
+			tSearch[TARGET.DOODAD] = NEARBY_DOODAD
+		else
+			tSearch[TARGET.PLAYER] = NEARBY_PLAYER
+			tSearch[TARGET.NPC] = NEARBY_NPC
+			tSearch[TARGET.DOODAD] = NEARBY_DOODAD
+		end
+		for dwObjectType, NEARBY_OBJECT in pairs(tSearch) do
+			for dwObjectID, KObject in pairs(NEARBY_OBJECT) do
+				if MY.GetObjectName(KObject) == szName then
+					dwType, dwID = dwObjectType, dwObjectID
+					break
+				end
+			end
 		end
 	end
 	if not dwType or not dwID then
@@ -1884,8 +1919,8 @@ end
 -- (dwType, dwID) MY.GetTargetTarget()       -- 取得自己当前的目标的目标类型和ID
 -- (dwType, dwID) MY.GetTargetTarget(object) -- 取得指定操作对象当前的目标的目标类型和ID
 function MY.GetTargetTarget(object)
-    local nTarType, dwTarID = LM.GetTarget(object)
-    local KTar = LM.GetObject(nTarType, dwTarID)
+    local nTarType, dwTarID = MY.GetTarget(object)
+    local KTar = MY.GetObject(nTarType, dwTarID)
     if not KTar then
         return
     end
@@ -2204,7 +2239,7 @@ function MY.IsInvincible(KObject)
 end
 
 -- 获取对象当前是否可读条
--- (bool) LM.CanOTAction([object KObject])
+-- (bool) MY.CanOTAction([object KObject])
 function MY.CanOTAction(KObject)
 	KObject = KObject or GetClientPlayer()
 	if not KObject then
