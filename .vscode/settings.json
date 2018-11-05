@@ -6,6 +6,10 @@
   "files.eol": "\n",
   "files.trimTrailingWhitespace": true,
   "files.trimFinalNewlines": true,
+  "files.associations": {
+    "*.lang": "lua",
+    "*.jx3dat": "lua"
+  },
   "lua.targetVersion": "5.1",
   "psi-header.changes-tracking": {
     "isActive": true,
