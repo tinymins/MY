@@ -256,7 +256,7 @@ local function FormatDataStructure(data, struct, assign, metaFlag)
 	-- 标准化参数
 	local params = setmetatable({}, defaultParams)
 	local structTypes, defaultData, defaultDataType
-	local keyTemplate, childTemplate, arrayTemplate, dictTemplate
+	local keyTemplate, childTemplate, arrayTemplate, dictionaryTemplate
 	if type(struct) == 'table' and struct[1] == metaFlag then
 		-- 处理有META标记的数据项
 		-- 允许类型和默认值

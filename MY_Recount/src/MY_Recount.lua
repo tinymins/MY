@@ -190,7 +190,8 @@ RegisterCustomData('MY_Recount.nDrawInterval')
 RegisterCustomData('MY_Recount.bShowNodataTeammate')
 RegisterCustomData('MY_Recount.anchor')
 
-local D, MY_Recount = {}, MY_Recount
+local MY_Recount = MY_Recount
+local D, DataDisplay = {}
 
 local m_frame
 function MY_Recount.Open()
@@ -323,7 +324,7 @@ function MY_Recount.UpdateUI(data)
 			(MY_Recount.nDisplayMode == DISPLAY_MODE.NPC    and type(id) == 'string') or
 			(MY_Recount.nDisplayMode == DISPLAY_MODE.PLAYER and type(id) == 'number')
 		) then
-			tRec = {
+			local tRec = {
 				id           = id                                    ,
 				szMD5        = rec.szMD5                             ,
 				szName       = MY_Recount.Data.GetNameAusID(id, data),
