@@ -123,58 +123,65 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 		end
 		local function DoUpload()
 			MY.Ajax({
-				driver = 'webcef',
+				driver = 'origin',
+				type = "post",
 				url = 'http://data.jx3.derzh.com/serendipity/?l='
-				.. MY.GetLang() .. '&m=' .. nMethod
-				.. '&data=' .. MY.EncryptString(MY.JsonEncode({
+				.. MY.GetLang() .. "&m=" .. nMethod
+				.. "&data=" .. MY.EncryptString(MY.JsonEncode({
 					n = szName, N = szNameCRC, R = szReporter,
 					S = MY.GetRealServer(1), s = MY.GetRealServer(2),
 					a = szSerendipity, f = nStatus, t = dwTime,
 				})),
+				success = function(html, status) end,
 			})
 		end
-		if szMode == 'manual' then
+		if szMode == 'manual' or nMethod ~= 1 then
 			DoUpload()
 		else
-			-- 战斗中移动中免打扰防止卡住
-			MY.BreatheCall(function()
-				if Cursor.IsVisible()
-				and me and not me.bFightState
-				and (
-					me.nMoveState == MOVE_STATE.ON_STAND
-					or me.nMoveState == MOVE_STATE.ON_FLOAT
-					or me.nMoveState == MOVE_STATE.ON_SIT
-					or me.nMoveState == MOVE_STATE.ON_FREEZE
-					or me.nMoveState == MOVE_STATE.ON_ENTRAP
-					or me.nMoveState == MOVE_STATE.ON_DEATH
-					or me.nMoveState == MOVE_STATE.ON_AUTO_FLY
-					or me.nMoveState == MOVE_STATE.ON_START_AUTO_FLY
-				) then
-					DoUpload()
-					return 0
-				end
-			end)
-			if szMode ~= 'silent' then
-				local w, h = 270, 180
-				local ui = XGUI.CreateFrame('MY_Serendipity#' .. szKey, {
-					w = w, h = h, close = true, text = '', anchor = {},
-				})
-				if szMode == 'auto' then
-					ui:alpha(200)
-					ui:anchor({ x = 0, y = -60, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' })
-				end
-				ui:append('Handle', { x = 10, y = (h - 90) / 2, w = w - 20, h = h, valign = 1, halign = 1, handlestyle = 3 }, true)
-					:append('Text', {
-						text = (szName == '' and _L['Anonymous'] or szName)
-							.. '\n' .. szSerendipity .. ' - ' .. MY.FormatTime('hh:mm:ss', dwTime)
-							.. '\n' .. (szReporter == '' and '' or (szReporter .. _L[','])) .. _L['JX3 is pround of you!']
-							.. '\n' .. _L['Thanks for your kindness!'],
-						fontscale = 1.2,
-					})
-					:formatChildrenPos()
-				MY.DelayCall(10000, function() ui:remove() end)
-				MY.DismissNotify(szKey)
+			MY.DelayCall(math.random(0, 10000), DoUpload)
+		end
+		-- if szMode == 'manual' then
+		-- 	DoUpload()
+		-- else
+		-- 	-- 战斗中移动中免打扰防止卡住
+		-- 	MY.BreatheCall(function()
+		-- 		if Cursor.IsVisible()
+		-- 		and me and not me.bFightState
+		-- 		and (
+		-- 			me.nMoveState == MOVE_STATE.ON_STAND
+		-- 			or me.nMoveState == MOVE_STATE.ON_FLOAT
+		-- 			or me.nMoveState == MOVE_STATE.ON_SIT
+		-- 			or me.nMoveState == MOVE_STATE.ON_FREEZE
+		-- 			or me.nMoveState == MOVE_STATE.ON_ENTRAP
+		-- 			or me.nMoveState == MOVE_STATE.ON_DEATH
+		-- 			or me.nMoveState == MOVE_STATE.ON_AUTO_FLY
+		-- 			or me.nMoveState == MOVE_STATE.ON_START_AUTO_FLY
+		-- 		) then
+		-- 			DoUpload()
+		-- 			return 0
+		-- 		end
+		-- 	end)
+		-- end
+		if szMode ~= 'silent' then
+			local w, h = 270, 180
+			local ui = XGUI.CreateFrame('MY_Serendipity#' .. szKey, {
+				w = w, h = h, close = true, text = '', anchor = {},
+			})
+			if szMode == 'auto' then
+				ui:alpha(200)
+				ui:anchor({ x = 0, y = -60, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' })
 			end
+			ui:append('Handle', { x = 10, y = (h - 90) / 2, w = w - 20, h = h, valign = 1, halign = 1, handlestyle = 3 }, true)
+				:append('Text', {
+					text = (szName == '' and _L['Anonymous'] or szName)
+						.. '\n' .. szSerendipity .. ' - ' .. MY.FormatTime('hh:mm:ss', dwTime)
+						.. '\n' .. (szReporter == '' and '' or (szReporter .. _L[','])) .. _L['JX3 is pround of you!']
+						.. '\n' .. _L['Thanks for your kindness!'],
+					fontscale = 1.2,
+				})
+				:formatChildrenPos()
+			MY.DelayCall(10000, function() ui:remove() end)
+			MY.DismissNotify(szKey)
 		end
 	end
 	D.GetSerendipityShareName(fnAction, szMode ~= 'manual')
