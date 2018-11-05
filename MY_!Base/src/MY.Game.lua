@@ -370,7 +370,7 @@ function MY.GetDistance(arg0, arg1, arg2, arg3, arg4, arg5, arg6)
 	if szType == 'gwwean' then
 		return max(floor(((nX1 - nX2) ^ 2 + (nY1 - nY2) ^ 2) ^ 0.5) / 64, floor(abs(nZ1 / 8 - nZ2 / 8)) / 64)
 	end
-	return floor(((nX1 - nX1) ^ 2 + (nY1 - nY1) ^ 2 + (nZ1 / 8 - nZ2 / 8) ^ 2) ^ 0.5) / 64
+	return floor(((nX1 - nX2) ^ 2 + (nY1 - nY2) ^ 2 + (nZ1 / 8 - nZ2 / 8) ^ 2) ^ 0.5) / 64
 end
 
 do local BUFF_CACHE = {}

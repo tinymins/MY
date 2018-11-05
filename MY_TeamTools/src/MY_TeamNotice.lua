@@ -64,7 +64,7 @@ function TI.CreateFrame(a, b)
 					XGUI(this):autocomplete('search', '')
 				end
 			end,
-			onchange = function(szText)Output(szText)
+			onchange = function(szText)
 				if TI.szYY == szText then
 					return
 				end
