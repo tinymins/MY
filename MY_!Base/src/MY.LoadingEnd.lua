@@ -6,10 +6,16 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
-local ns = MY
+local MY_ORG = MY
+if IsDebugClient() then
+function MY_DebugSetVal(szKey, oVal)
+	MY_ORG[szKey] = oVal
+end
+end
+
 MY = setmetatable({}, {
 	__metatable = true,
-	__index = ns,
+	__index = MY_ORG,
 	__newindex = function() assert(false, 'DO NOT modify MY after initialized!!!') end
 })
 
