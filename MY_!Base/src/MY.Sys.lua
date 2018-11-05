@@ -554,6 +554,7 @@ local function serialize(data)
 	return text
 end
 
+local CURL_HttpPost = CURL_HttpPostEx or CURL_HttpPost
 function MY.Ajax(settings)
 	assert(settings and settings.url)
 	setmetatable(settings, l_ajaxsettingsmeta)
@@ -735,7 +736,7 @@ function MY.Ajax(settings)
 			end
 			CURL_HttpRqst(szKey, url, ssl, settings.timeout)
 		end
-		MY_CALL_AJAX[szKey] = settings
+		MY_CALL_AJAX['__addon_' .. szKey] = settings
 	end
 end
 
