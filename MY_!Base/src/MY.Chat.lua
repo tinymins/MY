@@ -1032,7 +1032,7 @@ function MY.HookChatPanel(szType, fnAction)
 	return szKey
 end
 
-local APPEND_START_INDEX = 0
+local l_hPrevItem
 local function BeforeChatAppendItemFromString(h, szMsg, ...) -- h, szMsg, szChannel, dwTime, nR, nG, nB, ...
 	for szKey, fnAction in pairs(CHAT_HOOK.FILTER) do
 		local status, invalid = pcall(fnAction, h, szMsg, ...)
@@ -1050,17 +1050,28 @@ local function BeforeChatAppendItemFromString(h, szMsg, ...) -- h, szMsg, szChan
 			MY.Debug({msg}, 'HookChatPanel.BEFORE#' .. szKey, MY_DEBUG.ERROR)
 		end
 	end
-	APPEND_START_INDEX = h:GetItemCount()
+	local nCount = h:GetItemCount()
+	if nCount == 0 then
+		l_hPrevItem = 0
+	else
+		l_hPrevItem = h:Lookup(nCount - 1)
+	end
 	return h, szMsg, ...
 end
 
 local function AfterChatAppendItemFromString(h, ...)
 	local nCount = h:GetItemCount()
-	if nCount < APPEND_START_INDEX then
+	local nStart = -1
+	if l_hPrevItem == 0 then
+		nStart = 0
+	elseif l_hPrevItem and l_hPrevItem:IsValid() then
+		nStart = l_hPrevItem:GetIndex() + 1
+	end
+	if nStart < 0 or nStart >= nCount then
 		return
 	end
 	for szKey, fnAction in pairs(CHAT_HOOK.AFTER) do
-		local status = pcall(fnAction, h, APPEND_START_INDEX, ...)
+		local status = pcall(fnAction, h, nStart, ...)
 		if not status then
 			MY.Debug({msg}, 'HookChatPanel.AFTER#' .. szKey, MY_DEBUG.ERROR)
 		end
