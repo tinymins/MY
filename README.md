@@ -1,62 +1,62 @@
-�����ڹ�������3D���Ρ�����3����ʹ�õĸ����������ѭ��ʵ��ԭ�򣬲����� PVE ����ȫ����Դ��ѡ�
+这是在国产大型3D网游《剑网3》中使用的辅助插件，遵循简单实用原则，侧重于 PVE 并且全部开源免费。
 
-����
+捐助
 -----
 
 <https://jx3.derzh.com/donate/>
 
 <a href="https://jx3.derzh.com/donate/">![Donate](https://cdn.jsdelivr.net/gh/tinymins/donate@master/combine.jpg)</a>
 
-����
+链接
 -----
 
-  * [�ƾ����� - ����ȫ��׼ȷ�Ľ����ƾٲ�ѯ����](https://jx3.derzh.com/exam/)
-  * [������ѯ - ��ע���������ڷ�����һ�������¼�](https://jx3.derzh.com/serendipity/)
-  * [������¼ - ��ѯ��������ά����ɿ���ʱ��](https://jx3.derzh.com/onlinetime/)
-  * [��ɫ�ֿ� - �������õĽ�ɫ���ֿ�](https://jx3.derzh.com/char.txt)
+  * [科举助手 - 做最全最准确的剑三科举查询利器](https://jx3.derzh.com/exam/)
+  * [奇遇查询 - 关注您身边正在发生的一切奇遇事件](https://jx3.derzh.com/serendipity/)
+  * [开服记录 - 查询各服务器维护完成开服时间](https://jx3.derzh.com/onlinetime/)
+  * [角色字库 - 完整可用的角色名字库](https://jx3.derzh.com/char.txt)
 
-����
+下载
 -----
 
-  * ���°汾��[���ص�ַ](https://jx3.derzh.com/down/)
-  * ��װ�������ڽ�ɫ��½ҳ�����ε��`�������`,`�������`��Ȼ����`����`��ť���ظ������
-  * �ٷ���վ��<https://jx3.derzh.com/>
-  * ������־��<https://github.com/tinymins/jx3my/commits/master>
-  * ����&BUG���棺[��һ��լ����](https://zhaiyiming.com/index.php/jx3-my) [��΢�����ԡ�](https://weibo.com/zymah)
+  * 最新版本：[下载地址](https://jx3.derzh.com/down/)
+  * 安装方法：在角色登陆页，依次点击`插件管理`,`插件下载`，然后点击`下载`按钮下载各组件。
+  * 官方网站：<https://jx3.derzh.com/>
+  * 更新日志：<https://github.com/tinymins/jx3my/commits/master>
+  * 建议&BUG报告：[【一名宅。】](https://zhaiyiming.com/index.php/jx3-my) [【微博留言】](https://weibo.com/zymah)
 
-��Ҫ����
+主要功能
 ---------
 
-  * ���츨���������л�Ƶ������չ��ʾ����������ݡ�
-  * ����������ͬʱ�ڶ��Ƶ����������٩���ѡ�
-  * �����أ����ָ������ָ��Ƶ������������
-  * ְҵȾɫ�����������ְҵȾɫ�ͻ�����Ϣ��ʾ��
-  * ������أ����ַ�ʽͳ�����ROLL�����ݡ�
-  * ��ͼ���֣��ṩ���ָ�ʽ��ѹ���ʵĽ�ͼ���ߡ�
-  * ��ƽѪ����������˵�ͷ��Ѫ����֧�ֶ�����ʾ��
-  * ���ù��ߣ�ϵͳ��Ϣ�������ܿ��ӻ�����ս��飬�ֿⱳ�������ȹ��ܡ�
-  * ���ٵǳ������ٷ��ص�½ҳ����ս�����˵ȹ��ܡ�
+  * 聊天辅助：快速切换频道和扩展显示组队聊天泡泡。
+  * 喊话辅助：同时在多个频道喊话，调侃队友。
+  * 聊天监控：监控指定规则指定频道的聊天结果。
+  * 职业染色：聊天栏玩家职业染色和基本信息显示。
+  * 点数监控：多种方式统计玩家ROLL点数据。
+  * 截图助手：提供多种格式和压缩率的截图工具。
+  * 扁平血条：简洁明了的头顶血条，支持读条显示。
+  * 常用工具：系统信息条，技能可视化，共战检查，仓库背包搜索等功能。
+  * 快速登出：快速返回登陆页，脱战后秒退等功能。
 
 
-wiki & �ĵ�
+wiki & 文档
 ------------
 
-  * [���ɾ������Ҫ�Ĺ���ģ��](https://github.com/tinymins/JX3MY/wiki/%E5%88%A0%E9%99%A4%E6%8C%87%E5%AE%9A%E7%9A%84%E5%8A%9F%E8%83%BD%E6%A8%A1%E5%9D%97)
-  * [����](https://github.com/tinymins/JX3MY/wiki/_pages)
+  * [如何删除不必要的功能模块](https://github.com/tinymins/JX3MY/wiki/%E5%88%A0%E9%99%A4%E6%8C%87%E5%AE%9A%E7%9A%84%E5%8A%9F%E8%83%BD%E6%A8%A1%E5%9D%97)
+  * [更多](https://github.com/tinymins/JX3MY/wiki/_pages)
 
 
-��װ&ʹ��
+安装&使用
 ----------
 
-  * ��ѹ���ص� `zip` �� _JX3��ϷĿ¼_ �µ� `bin/zhcn/interface` Ŀ¼
-  * С�˿��ڲ���������濴��Ĭ�ϴ򹴵ġ�����������������ִ򹴽�����Ϸ
-  * ������Ϸ�������ͷ��˵��򹤾���˵����Կ��������������ѡ�����������������
-  * ESC �����ݼ����ã���һ�����顰�����������������ϸ������ؿ�ݼ�
+  * 解压下载的 `zip` 到 _JX3游戏目录_ 下的 `bin/zhcn/interface` 目录
+  * 小退可在插件管理界面看到默认打勾的“茗伊插件集”，保持打勾进入游戏
+  * 进入游戏后在玩家头像菜单或工具箱菜单可以看到茗伊插件集的选项，点击可以做插件设置
+  * ESC 进入快捷键设置，有一个分组“茗伊插件集”，可详细设置相关快捷键
 
 
-����
+其它
 -----
 
-  * �������Դ��ѣ����˳�����Ȥ����������������[����](http://weibo.com/zymah)������Markdown��ʽ���Ǵ�[`HM`](https://haimanchajian.com)�����ġ�<a target="_blank" href="http://sighttp.qq.com/authd?IDKEY=4034035048535db36d3ae3964df9944a890dbafc89852a46"><img border="0"  src="https://pub.idqqimg.com/qconn/wpa/button/button_111.gif" alt="��һ��լ������ʱ�Ự" title="��һ��լ������ʱ�Ự"/></a>
-  * �������ѭ��ʵ��ԭ����ȫ���ذ�����API���ռ�������ҽ�ɫ������Ϣ�����ID����ɫ���ͣ�������ƣ�װ�������ȹ�����������Ϣ�����ƫ������ͳ�ơ�
-  * ��װʹ����Ϊ _ͬ����������_ ��
+  * 本插件开源免费，本人出于兴趣和朋友需求制作，[作者](http://weibo.com/zymah)很懒，Markdown格式都是从[`HM`](https://haimanchajian.com)搬来的。<a target="_blank" href="http://sighttp.qq.com/authd?IDKEY=4034035048535db36d3ae3964df9944a890dbafc89852a46"><img border="0"  src="https://pub.idqqimg.com/qconn/wpa/button/button_111.gif" alt="与一名宅发起临时会话" title="与一名宅发起临时会话"/></a>
+  * 本插件遵循简单实用原则，完全遵守白名单API，收集部分玩家角色公开信息如玩家ID，角色体型，帮会名称，装备分数等公开非敏感信息做玩家偏好数据统计。
+  * 安装使用视为 _同意以上内容_ 。
