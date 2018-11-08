@@ -143,6 +143,7 @@ local function onNpcQuestMarkUpdateAll()
 		UpdateTitleEffect(TARGET.NPC, dwID)
 	end
 end
+MY.RegisterEvent('LEAVE_STORY_MODE.MY_LifeBar', onNpcQuestMarkUpdateAll)
 MY.RegisterInit('MY_LifeBar_onNpcQuestMarkUpdateAll', onNpcQuestMarkUpdateAll)
 
 local function onPartySetMark()
