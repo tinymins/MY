@@ -1116,7 +1116,7 @@ end
 MY.HookChatPanel('AFTER.MYLIB_HOOKNAME', function(h, nIndex)
 	for i = nIndex, h:GetItemCount() - 1 do
 		local hItem = h:Lookup(i)
-		if hItem:GetName():find('^namelink_%d+$') then
+		if hItem:GetName():find('^namelink_%d+$') and not hItem.bMyChatRendered then
 			hItem.bMyChatRendered = true
 			if hItem.OnItemLButtonDown then
 				hItem.__MY_OnItemLButtonDown = hItem.OnItemLButtonDown
