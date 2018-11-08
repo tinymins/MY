@@ -1,25 +1,26 @@
-# -*- coding: GBK -*-
+# -*- coding: utf-8 -*-
+
 import time, os, re
 
-# ¶ÁÈ¡Git·ÖÖ§
+# è¯»å–Gitåˆ†æ”¯
 name_list = os.popen('git branch').read().strip().split("\n")
 branch_name = ''
 for name in name_list:
 	if name[0:1] == '*':
 		branch_name = name[2:]
 
-# ÅĞ¶ÏÊÇ·ñÍü¼ÇÇĞ»»·ÖÖ§
+# åˆ¤æ–­æ˜¯å¦å¿˜è®°åˆ‡æ¢åˆ†æ”¯
 if branch_name != 'publish':
-	print 'Error: current branch(%s) is not on git publish!' % (branch_name)
+	print('Error: current branch(%s) is not on git publish!' % (branch_name))
 	exit()
 
-# ¶ÁÈ¡MY.luaÎÄ¼şÖĞµÄ²å¼ş°æ±¾ºÅ
+# è¯»å–MY.luaæ–‡ä»¶ä¸­çš„æ’ä»¶ç‰ˆæœ¬å·
 str_version = "0x0000000"
 for line in open("MY_!Base/src/MY.lua"):
 	if line[6:15] == "_VERSION_":
 		str_version = line[22:25]
 
-# ¶ÁÈ¡GitÖĞ×î´óµÄ°æ±¾ºÅ
+# è¯»å–Gitä¸­æœ€å¤§çš„ç‰ˆæœ¬å·
 version_list = os.popen('git tag').read().strip().split("\n")
 max_version, git_tag = 0, ''
 for version in version_list:
@@ -27,17 +28,17 @@ for version in version_list:
 		git_tag = version
 		max_version = int(version[1:])
 
-# ÅĞ¶ÏÊÇ·ñÍü¼ÇÌáÉı°æ±¾ºÅ
+# åˆ¤æ–­æ˜¯å¦å¿˜è®°æå‡ç‰ˆæœ¬å·
 if int(str_version) <= max_version:
-	print 'Error: current version(%s) is smaller than or equals with last git published version(%d)!' % (str_version, max_version)
+	print('Error: current version(%s) is smaller than or equals with last git published version(%d)!' % (str_version, max_version))
 	exit()
 
-# Æ´½Ó×Ö·û´®¿ªÊ¼Ñ¹ËõÎÄ¼ş
+# æ‹¼æ¥å­—ç¬¦ä¸²å¼€å§‹å‹ç¼©æ–‡ä»¶
 dst_file = "!src-dist/releases/MY_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_v" + str_version + ".7z"
-print "zippping..."
+print("zippping...")
 os.system("7z a -t7z " + dst_file + " -xr!manifest.dat -xr!manifest.key -xr!publisher.key -x@7zipignore.txt")
-print "File(s) compressing acomplete!"
-print "Url: " + dst_file
+print("File(s) compressing acomplete!")
+print("Url: " + dst_file)
 
 time.sleep(5)
 print('Exiting...')

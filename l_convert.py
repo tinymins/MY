@@ -4,16 +4,16 @@ from l_converter import *
 
 def zhcn2zhtw(sentence):
     '''
-    ½«sentenceÖĞµÄ¼òÌå×Ö×ªÎª·±Ìå×Ö
-    :param sentence: ´ı×ª»»µÄ¾ä×Ó
-    :return: ½«¾ä×ÓÖĞ¼òÌå×Ö×ª»»Îª·±Ìå×ÖÖ®ºóµÄ¾ä×Ó
+    å°†sentenceä¸­çš„ç®€ä½“å­—è½¬ä¸ºç¹ä½“å­—
+    :param sentence: å¾…è½¬æ¢çš„å¥å­
+    :return: å°†å¥å­ä¸­ç®€ä½“å­—è½¬æ¢ä¸ºç¹ä½“å­—ä¹‹åçš„å¥å­
     '''
     return Converter('zh-hant').convert(sentence)
 
 def zhtw2zhcn(sentence):
     '''
-    ½«sentenceÖĞµÄ·±Ìå×Ö×ªÎª¼òÌå×Ö
-    :param sentence: ´ı×ª»»µÄ¾ä×Ó
-    :return: ½«¾ä×ÓÖĞ·±Ìå×Ö×ª»»Îª¼òÌå×ÖÖ®ºóµÄ¾ä×Ó
+    å°†sentenceä¸­çš„ç¹ä½“å­—è½¬ä¸ºç®€ä½“å­—
+    :param sentence: å¾…è½¬æ¢çš„å¥å­
+    :return: å°†å¥å­ä¸­ç¹ä½“å­—è½¬æ¢ä¸ºç®€ä½“å­—ä¹‹åçš„å¥å­
     '''
     return Converter('zh-hans').convert(sentence)
