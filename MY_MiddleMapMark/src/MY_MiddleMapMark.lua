@@ -8,7 +8,7 @@
 --------------------------------------------------------
 MY.CreateDataRoot(MY_DATA_PATH.GLOBAL)
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_MiddleMapMark/lang/')
-local l_szKeyword, l_dwMapID, l_nMapIndex = ''
+local l_szKeyword, l_dwMapID, l_nMapIndex, l_renderTime = '', nil, nil, 0
 local DB = MY.ConnectDatabase(_L['MY_MiddleMapMark'], {'cache/npc_doodad_rec.v2.db', MY_DATA_PATH.GLOBAL})
 if not DB then
 	return MY.Sysmsg({_L['Cannot connect to database!!!'], r = 255, g = 0, b = 0}, _L['MY_MiddleMapMark'])
@@ -84,7 +84,6 @@ end
 local l_npc = {}
 local l_doodad = {}
 local l_tempMap = false
-local l_renderTime = 0
 local MAX_RENDER_INTERVAL = GLOBAL.GAME_FPS * 5
 local function PushDB()
 	if empty(l_npc) and empty(l_doodad) then
