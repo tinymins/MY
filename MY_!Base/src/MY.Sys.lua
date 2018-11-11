@@ -1465,6 +1465,52 @@ function MY.DoMessageBox(szName, i)
 	end
 end
 
+do -- 二次封装 MessageBox 相关事件
+local function OnMessageBoxOpen()
+	local szName, frame, aMsg = arg0, arg1, {}
+	local wndAll = frame:Lookup("Wnd_All")
+
+	for i = 1, 5 do
+		local btn = wndAll:Lookup("Btn_Option" .. i)
+		if btn and btn.IsVisible and btn:IsVisible() then
+			local nIndex, szOption = btn.nIndex, btn.szOption
+			if btn.fnAction then
+				HookTableFunc(btn, 'fnAction', function()
+					FireUIEvent('MY_MESSAGE_BOX_ACTION', szName, 'ACTION', szOption, nIndex)
+				end, true, false, false, false, false)
+			end
+			if btn.fnCountDownEnd then
+				HookTableFunc(btn, 'fnCountDownEnd', function()
+					FireUIEvent('MY_MESSAGE_BOX_ACTION', szName, 'TIME_OUT', szOption, nIndex)
+				end, true, false, false, false, false)
+			end
+			aMsg[i] = { nIndex = nIndex, szOption = szOption }
+		end
+	end
+
+	HookTableFunc(frame, 'fnAction', function(i)
+		local msg = aMsg[i]
+		if not msg then
+			return
+		end
+		FireUIEvent('MY_MESSAGE_BOX_ACTION', szName, 'ACTION', msg.szOption, msg.nIndex)
+	end, true, true, false, false, false)
+
+	HookTableFunc(frame, 'fnCancelAction', function()
+		FireUIEvent('MY_MESSAGE_BOX_ACTION', szName, 'CANCEL')
+	end, true, true, false, false, false)
+
+	if frame.fnAutoClose then
+		HookTableFunc(frame, 'fnAutoClose', function()
+			FireUIEvent('MY_MESSAGE_BOX_ACTION', szName, 'AUTO_CLOSE')
+		end, true, true, false, false, false)
+	end
+
+	FireUIEvent('MY_MESSAGE_BOX_OPEN', arg0, arg1)
+end
+MY.RegisterEvent('ON_MESSAGE_BOX_OPEN', OnMessageBoxOpen)
+end
+
 function MY.OutputBuffTip(dwID, nLevel, Rect, nTime, szExtraXml)
 	local t = {}
 
