@@ -523,24 +523,51 @@ end
 
 -- 获取副本CD列表（异步）
 -- (table) MY.GetMapSaveCopy(fnAction)
+-- (number|nil) MY.GetMapSaveCopy(dwMapID, fnAction)
 do
 local QUEUE = {}
 local SAVED_COPY_CACHE, REQUEST_FRAME
-function MY.GetMapSaveCopy(fnAction)
+function MY.GetMapSaveCopy(arg0, arg1)
+	local dwMapID, fnAction
+	if IsFunction(arg0) then
+		fnAction = arg0
+	elseif IsNumber(arg0) then
+		if IsFunction(arg1) then
+			fnAction = arg1
+		end
+		dwMapID = arg0
+	end
 	if SAVED_COPY_CACHE then
-		if IsFunction(fnAction) then
-			fnAction(SAVED_COPY_CACHE)
+		if dwMapID then
+			if fnAction then
+				fnAction(SAVED_COPY_CACHE[dwMapID])
+			end
+			return SAVED_COPY_CACHE[dwMapID]
+		else
+			if fnAction then
+				fnAction(SAVED_COPY_CACHE)
+			end
+			return SAVED_COPY_CACHE
 		end
 	else
-		if IsFunction(fnAction) then
-			insert(QUEUE, fnAction)
+		if fnAction then
+			insert(QUEUE, { dwMapID = dwMapID, fnAction = fnAction })
 		end
 		if REQUEST_FRAME ~= GetLogicFrameCount() then
 			ApplyMapSaveCopy()
 			REQUEST_FRAME = GetLogicFrameCount()
 		end
 	end
-	return SAVED_COPY_CACHE
+end
+
+function MY.IsDungeonResetable(dwMapID)
+	if not SAVED_COPY_CACHE then
+		return
+	end
+	if not MY.IsDungeonMap(dwMapID, false) then
+		return false
+	end
+	return SAVED_COPY_CACHE[dwMapID]
 end
 
 local function onApplyPlayerSavedCopyRespond()
@@ -2409,8 +2436,10 @@ function MY.IsDungeonMap(dwMapID, bRaid)
 	if map then
 		dwMapID = map.dwMapID
 	end
-	if bRaid then -- 严格判断25人本
+	if bRaid == true then -- 严格判断25人本
 		return map and map.bDungeon
+	elseif bRaid == false then -- 严格判断5人本
+		return select(2, GetMapParams(dwMapID)) == MAP_TYPE.DUNGEON and not (map and map.bDungeon)
 	else -- 只判断地图的类型
 		return select(2, GetMapParams(dwMapID)) == MAP_TYPE.DUNGEON
 	end
