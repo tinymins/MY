@@ -623,7 +623,7 @@ local function GenerateList(bForceRefresh)
 			end
 		end
 		MY.SaveLUAData(CACHE_PATH, BOSS_LIST)
-		MY.Sysmsg({_L('Boss list updated to v%s.', VERSION)})
+		MY.Sysmsg({_L('Boss list updated to v%s.', select(2, GetVersion()))})
 	end
 
 	for dwMapID, tInfo in pairs(MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/bosslist/$lang.jx3dat') or {}) do
@@ -706,6 +706,7 @@ end
 
 -- 地图重要NPC列表
 do local INPC_LIST, INPC_LIST_CUSTOM
+local CACHE_PATH = {'temporary/inpclist.jx3dat', MY_DATA_PATH.GLOBAL}
 local function LoadCustomList()
 	if not INPC_LIST_CUSTOM then
 		INPC_LIST_CUSTOM = MY.LoadLUAData({'config/inpclist.jx3dat', MY_DATA_PATH.GLOBAL}) or {}
@@ -719,13 +720,11 @@ local function GenerateList(bForceRefresh)
 	if INPC_LIST and not bForceRefresh then
 		return
 	end
-	local VERSION = select(2, GetVersion())
-	local CACHE_PATH = 'cache/inpclist/' .. VERSION .. '.jx3dat'
-	INPC_LIST = MY.LoadLUAData({CACHE_PATH, MY_DATA_PATH.GLOBAL})
+	INPC_LIST = MY.LoadLUAData(CACHE_PATH)
 	if bForceRefresh or not INPC_LIST then
 		INPC_LIST = {}
-		MY.SaveLUAData({CACHE_PATH, MY_DATA_PATH.GLOBAL}, INPC_LIST)
-		MY.Sysmsg({_L('Important Npc list updated to v%s.', VERSION)})
+		MY.SaveLUAData(CACHE_PATH, INPC_LIST)
+		MY.Sysmsg({_L('Important Npc list updated to v%s.', select(2, GetVersion()))})
 	end
 	for dwMapID, tInfo in pairs(MY.LoadLUAData(MY.GetAddonInfo().szFrameworkRoot .. 'data/inpclist/$lang.jx3dat') or {}) do
 		if not INPC_LIST[dwMapID] then
