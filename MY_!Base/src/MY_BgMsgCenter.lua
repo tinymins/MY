@@ -131,6 +131,9 @@ end
 -- 进入团队副本
 do local MSG_MAP_ID
 local function OnGoFB(dwMapID)
+	if not MY.IsInParty() then
+		return
+	end
 	MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_ENTER_DUNGEON', dwMapID, MY.GetMapSaveCopy(dwMapID))
 	MY.Debug({'Switch dungeon :' .. dwMapID}, 'MYLIB', MY_DEBUG.LOG)
 end
