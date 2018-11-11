@@ -127,3 +127,55 @@ MY.RegisterBgMsg('MY_MAP_COPY_ID_REQUEST', function(_, nChannel, dwID, szName, b
 	LAST_TIME[dwMapID] = GetCurrentTime()
 end)
 end
+
+-- 进入团队副本
+do local MSG_MAP_ID
+local function OnGoFB(dwMapID)
+	MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_ENTER_DUNGEON', dwMapID, MY.GetMapSaveCopy(dwMapID))
+	MY.Debug({'Switch dungeon :' .. dwMapID}, 'MYLIB', MY_DEBUG.LOG)
+end
+
+local function OnCrossMapGoFB()
+	local dwMapID = this.tInfo.MapID
+	if not MY.IsDungeonResetable(dwMapID) or (MY.IsInParty() and not MY.IsLeader()) then
+		OnGoFB(dwMapID)
+	else
+		MSG_MAP_ID = dwMapID
+	end
+	return FORMAT_WMSG_RET(true, true)
+end
+
+local function OnFBAppendItemFromIni(hList)
+	for i = 0, hList:GetItemCount() - 1 do
+		local hItem = hList:Lookup(i)
+		UnhookTableFunc(hItem, 'OnItemLButtonDBClick', OnCrossMapGoFB)
+		HookTableFunc(hItem, 'OnItemLButtonDBClick', OnCrossMapGoFB, true, true, false, false, false)
+	end
+end
+
+MY.RegisterEvent('ON_FRAME_CREATE.MYLIB#CD', function()
+	if arg0:GetName() ~= 'CrossMap' then
+		return
+	end
+	local hList = arg0:Lookup('Wnd_CrossFB', 'Handle_DifficultyList')
+	if hList then
+		OnFBAppendItemFromIni(hList)
+		HookTableFunc(hList, 'AppendItemFromIni', OnFBAppendItemFromIni, true, false, false, false, false)
+	end
+	local btn = arg0:Lookup('Wnd_CrossFB/Btn_GoGoGo')
+	if btn then
+		HookTableFunc(btn, 'OnLButtonClick', OnCrossMapGoFB, true, true, false, false, false)
+	end
+	MY.Debug({'Cross panel hooked.'}, 'MYLIB', MY_DEBUG.LOG)
+end)
+
+MY.RegisterEvent('MY_MESSAGE_BOX_ACTION.MYLIB#CD', function()
+	if arg0 ~= 'crossmap_dungeon_reset' then
+		return
+	end
+	if arg1 == 'ACTION' and arg2 == g_tStrings.STR_HOTKEY_SURE and MSG_MAP_ID then
+		OnGoFB(MSG_MAP_ID)
+	end
+	MSG_MAP_ID = nil
+end)
+end
