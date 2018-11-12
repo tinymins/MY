@@ -30,8 +30,6 @@ local IsNil, IsBoolean, IsEmpty, RandomChild = MY.IsNil, MY.IsBoolean, MY.IsEmpt
 local IsNumber, IsString, IsTable, IsFunction = MY.IsNumber, MY.IsString, MY.IsTable, MY.IsFunction
 ---------------------------------------------------------------------------------------------------
 MY = MY or {}
-MY.Sys = MY.Sys or {}
-MY.Sys.bShieldedVersion = false -- 屏蔽被河蟹的功能（国服启用）
 local _L, _C = MY.LoadLangPack(), {}
 
 -- 获取游戏语言
@@ -41,17 +39,19 @@ function MY.GetLang()
 end
 
 -- 获取功能屏蔽状态
+do
+local SHIELDED_VERSION = MY.GetLang() == 'zhcn' -- 屏蔽被河蟹的功能（国服启用）
 function MY.IsShieldedVersion(bShieldedVersion)
 	if bShieldedVersion == nil then
-		return MY.Sys.bShieldedVersion
+		return SHIELDED_VERSION
 	else
-		MY.Sys.bShieldedVersion = bShieldedVersion
+		SHIELDED_VERSION = bShieldedVersion
 		if not bShieldedVersion and MY.IsPanelOpened() then
 			MY.ReopenPanel()
 		end
 	end
 end
-MY.Sys.bShieldedVersion = MY.GetLang() == 'zhcn'
+end
 
 -- Save & Load Lua Data
 -- ##################################################################################################
@@ -1333,7 +1333,7 @@ function MY.StartDebugMode()
 	if JH then
 		JH.bDebugClient = true
 	end
-	MY.Sys.IsShieldedVersion(false)
+	MY.IsShieldedVersion(false)
 end
 
 -- 格式化计时时间
