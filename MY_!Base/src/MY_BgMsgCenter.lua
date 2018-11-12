@@ -129,21 +129,21 @@ end)
 end
 
 -- 进入团队副本
-do local MSG_MAP_ID
-local function OnGoFB(dwMapID)
+do local MSG_MAP_ID, MSG_ID
+local function OnSwitchMap(dwMapID, dwID, dwCopyID)
 	if not MY.IsInParty() then
 		return
 	end
-	MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_ENTER_DUNGEON', dwMapID, MY.GetMapSaveCopy(dwMapID))
 	MY.Debug({'Switch dungeon :' .. dwMapID}, 'MYLIB', MY_DEBUG.LOG)
+	MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_SWITCH_MAP', dwMapID, dwID, dwCopyID)
 end
 
 local function OnCrossMapGoFB()
-	local dwMapID = this.tInfo.MapID
+	local dwMapID, dwID = this.tInfo.MapID, this.tInfo.ID
 	if not MY.IsDungeonResetable(dwMapID) or (MY.IsInParty() and not MY.IsLeader()) then
-		OnGoFB(dwMapID)
+		OnSwitchMap(dwMapID, dwID, MY.GetMapSaveCopy(dwMapID))
 	else
-		MSG_MAP_ID = dwMapID
+		MSG_MAP_ID, MSG_ID = dwMapID, dwID
 	end
 	return FORMAT_WMSG_RET(true, true)
 end
@@ -177,7 +177,7 @@ MY.RegisterEvent('MY_MESSAGE_BOX_ACTION.MYLIB#CD', function()
 		return
 	end
 	if arg1 == 'ACTION' and arg2 == g_tStrings.STR_HOTKEY_SURE and MSG_MAP_ID then
-		OnGoFB(MSG_MAP_ID)
+		OnSwitchMap(MSG_MAP_ID, MSG_ID, nil)
 	end
 	MSG_MAP_ID = nil
 end)
