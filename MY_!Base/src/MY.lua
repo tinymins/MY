@@ -824,9 +824,9 @@ end
 RegisterEvent('ON_BG_CHANNEL_MSG', OnBgMsg)
 
 
--- MY.RegisterBgMsg('MY_CHECK_INSTALL', function(nChannel, dwTalkerID, szTalkerName, bSelf, oDatas...) MY.BgTalk(szTalkerName, 'MY_CHECK_INSTALL_REPLY', oData) end) -- ×¢²á
+-- MY.RegisterBgMsg('MY_CHECK_INSTALL', function(szMsgID, nChannel, dwTalkerID, szTalkerName, bSelf, oDatas...) MY.BgTalk(szTalkerName, 'MY_CHECK_INSTALL_REPLY', oData) end) -- ×¢²á
 -- MY.RegisterBgMsg('MY_CHECK_INSTALL') -- ×¢Ïú
--- MY.RegisterBgMsg('MY_CHECK_INSTALL.RECEIVER_01', function(nChannel, dwTalkerID, szTalkerName, bSelf, oDatas...) MY.BgTalk(szTalkerName, 'MY_CHECK_INSTALL_REPLY', oData) end) -- ×¢²á
+-- MY.RegisterBgMsg('MY_CHECK_INSTALL.RECEIVER_01', function(szMsgID, nChannel, dwTalkerID, szTalkerName, bSelf, oDatas...) MY.BgTalk(szTalkerName, 'MY_CHECK_INSTALL_REPLY', oData) end) -- ×¢²á
 -- MY.RegisterBgMsg('MY_CHECK_INSTALL.RECEIVER_01') -- ×¢Ïú
 function MY.RegisterBgMsg(szMsgID, fnAction)
 	if type(szMsgID) == 'table' then
