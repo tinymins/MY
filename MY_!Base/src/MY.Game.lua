@@ -1487,7 +1487,7 @@ end
 
 RegisterEvent('NPC_ENTER_SCENE', function()
 	local npc = GetNpc(arg0)
-	if npc.dwOwnerID ~= 0 then
+	if npc.dwEmployer ~= 0 then
 		NEARBY_PET[arg0] = npc
 	end
 	NEARBY_NPC[arg0] = npc
