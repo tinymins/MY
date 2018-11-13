@@ -1587,7 +1587,11 @@ function MY.GetClientInfo(arg0)
 	end
 	return m_ClientInfo
 end
-MY.RegisterEvent('LOADING_ENDING', MY.GetClientInfo)
+
+local function onLoadingEnding()
+	MY.GetClientInfo(true)
+end
+MY.RegisterEvent('LOADING_ENDING', onLoadingEnding)
 end
 
 -- 获取唯一标识符
