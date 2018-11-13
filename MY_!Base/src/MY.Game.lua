@@ -572,8 +572,12 @@ end
 
 local function onApplyPlayerSavedCopyRespond()
 	SAVED_COPY_CACHE = arg0
-	for _, fnAction in ipairs(QUEUE) do
-		fnAction(SAVED_COPY_CACHE)
+	for _, v in ipairs(QUEUE) do
+		if v.dwMapID then
+			v.fnAction(SAVED_COPY_CACHE[v.dwMapID])
+		else
+			v.fnAction(SAVED_COPY_CACHE)
+		end
 	end
 	QUEUE = {}
 end
