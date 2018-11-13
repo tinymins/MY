@@ -1248,6 +1248,27 @@ function _GKP.RecoveryMenu()
 			year, month, day = filename:match('^(%d+)%-(%d+)%-(%d+)%.gkp.jx3dat')
 		end
 		if year then
+			if year then
+				year = tonumber(year)
+			end
+			if month then
+				month = tonumber(month)
+			end
+			if day then
+				day = tonumber(day)
+			end
+			if hour then
+				hour = tonumber(hour)
+			end
+			if minute then
+				minute = tonumber(minute)
+			end
+			if second then
+				second = tonumber(second)
+			end
+			if index then
+				index = tonumber(index)
+			end
 			table.insert(aFiles, {year, month, day, hour, minute, second, index, filename = filename:sub(1, -12)})
 		end
 	end
@@ -1258,7 +1279,7 @@ function _GKP.RecoveryMenu()
 				return true
 			elseif not b[i] then
 				return false
-			else
+			elseif a[i] ~= b[i] then
 				return a[i] > b[i]
 			end
 		end
