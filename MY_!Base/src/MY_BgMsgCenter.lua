@@ -167,7 +167,7 @@ MY.RegisterEvent('ON_FRAME_CREATE.MYLIB#CD', function()
 	end
 	local btn = arg0:Lookup('Wnd_CrossFB/Btn_GoGoGo')
 	if btn then
-		HookTableFunc(btn, 'OnLButtonClick', OnCrossMapGoFB, true, true, false, false, false)
+		HookTableFunc(btn, 'OnLButtonUp', OnCrossMapGoFB, true, true, false, false, false)
 	end
 	MY.Debug({'Cross panel hooked.'}, 'MYLIB', MY_DEBUG.LOG)
 end)
