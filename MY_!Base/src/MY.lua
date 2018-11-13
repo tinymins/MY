@@ -1186,9 +1186,9 @@ function MY.SwitchTab(szID, bForceUpdate)
 				if OpenFolder then
 					OpenFolder(szRoot)
 				else
-					XGUI.OpenTextEditor(szRoot)
+					MY.UI.OpenTextEditor(szRoot)
 				end
-					XGUI.OpenTextEditor(szRoot)
+					MY.UI.OpenTextEditor(szRoot)
 			end,
 		}, true):autoWidth()
 		ui:append('WndButton', {
@@ -1200,9 +1200,9 @@ function MY.SwitchTab(szID, bForceUpdate)
 				if OpenFolder then
 					OpenFolder(szRoot)
 				else
-					XGUI.OpenTextEditor(szRoot)
+					MY.UI.OpenTextEditor(szRoot)
 				end
-					XGUI.OpenTextEditor(szRoot)
+					MY.UI.OpenTextEditor(szRoot)
 			end,
 		}, true):autoWidth()
 		ui:append('WndButton', {
@@ -1214,9 +1214,9 @@ function MY.SwitchTab(szID, bForceUpdate)
 				if OpenFolder then
 					OpenFolder(szRoot)
 				else
-					XGUI.OpenTextEditor(szRoot)
+					MY.UI.OpenTextEditor(szRoot)
 				end
-					XGUI.OpenTextEditor(szRoot)
+					MY.UI.OpenTextEditor(szRoot)
 			end,
 		}, true):autoWidth()
 		wnd.OnPanelResize = function(wnd)
@@ -1384,7 +1384,7 @@ function MY.OnLButtonClick()
 	if name == 'Btn_Close' then
 		MY.ClosePanel()
 	elseif name == 'Btn_Weibo' then
-		XGUI.OpenBrowser('https://weibo.com/zymah')
+		MY.UI.OpenBrowser('https://weibo.com/zymah')
 	end
 end
 
@@ -1416,7 +1416,7 @@ function MY.OnDragButtonBegin()
 	local name = this:GetName()
 	if name == 'Btn_Drag' then
 		this.fDragX, this.fDragY = Station.GetMessagePos()
-		this.fDragW, this.fDragH = XGUI(this:GetRoot()):size()
+		this.fDragW, this.fDragH = MY.UI(this:GetRoot()):size()
 	end
 end
 
@@ -1447,7 +1447,7 @@ function MY.OnFrameCreate()
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 	this:CorrectPos()
 	this:RegisterEvent('UI_SCALED')
-	XGUI(this):size(D.OnSizeChanged)
+	MY.UI(this):size(D.OnSizeChanged)
 end
 
 function MY.OnEvent(event)

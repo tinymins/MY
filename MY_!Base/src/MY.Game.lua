@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local Get, RandomChild = MY.Get, MY.RandomChild
+local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
 local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
@@ -943,7 +943,7 @@ end
 
 local PS = {}
 function PS.OnPanelActive(wnd)
-	local ui = XGUI(wnd)
+	local ui = UI(wnd)
 	local w, h = ui:size()
 	local X, Y = 20, 20
 	local x, y = X, Y
@@ -972,11 +972,11 @@ function PS.OnPanelActive(wnd)
 			color = { MY.GetForceColor(dwForceID, 'foreground') },
 			onclick = function()
 				local this = this
-				XGUI.OpenColorPicker(function(r, g, b)
+				UI.OpenColorPicker(function(r, g, b)
 					MY_FORCE_COLOR_FG_CUSTOM[dwForceID] = { r, g, b }
 					MY.SaveLUAData({SZ_FORCE_COLOR_FG, MY_DATA_PATH.ROLE}, MY_FORCE_COLOR_FG_CUSTOM)
 					txt:color(r, g, b)
-					XGUI(this):color(r, g, b)
+					UI(this):color(r, g, b)
 					FireUIEvent('MY_FORCE_COLOR_UPDATE')
 				end)
 			end,
@@ -987,11 +987,11 @@ function PS.OnPanelActive(wnd)
 			color = { MY.GetForceColor(dwForceID, 'background') },
 			onclick = function()
 				local this = this
-				XGUI.OpenColorPicker(function(r, g, b)
+				UI.OpenColorPicker(function(r, g, b)
 					MY_FORCE_COLOR_BG_CUSTOM[dwForceID] = { r, g, b }
 					MY.SaveLUAData({SZ_FORCE_COLOR_BG, MY_DATA_PATH.ROLE}, MY_FORCE_COLOR_BG_CUSTOM)
 					sha:color(r, g, b)
-					XGUI(this):color(r, g, b)
+					UI(this):color(r, g, b)
 					FireUIEvent('MY_FORCE_COLOR_UPDATE')
 				end)
 			end,
@@ -1041,11 +1041,11 @@ function PS.OnPanelActive(wnd)
 			color = { MY.GetCampColor(nCamp, 'foreground') },
 			onclick = function()
 				local this = this
-				XGUI.OpenColorPicker(function(r, g, b)
+				UI.OpenColorPicker(function(r, g, b)
 					MY_CAMP_COLOR_FG_CUSTOM[nCamp] = { r, g, b }
 					MY.SaveLUAData({SZ_CAMP_COLOR_FG, MY_DATA_PATH.ROLE}, MY_CAMP_COLOR_FG_CUSTOM)
 					txt:color(r, g, b)
-					XGUI(this):color(r, g, b)
+					UI(this):color(r, g, b)
 					FireUIEvent('MY_CAMP_COLOR_UPDATE')
 				end)
 			end,
@@ -1056,11 +1056,11 @@ function PS.OnPanelActive(wnd)
 			color = { MY.GetCampColor(nCamp, 'background') },
 			onclick = function()
 				local this = this
-				XGUI.OpenColorPicker(function(r, g, b)
+				UI.OpenColorPicker(function(r, g, b)
 					MY_CAMP_COLOR_BG_CUSTOM[nCamp] = { r, g, b }
 					MY.SaveLUAData({SZ_CAMP_COLOR_BG, MY_DATA_PATH.ROLE}, MY_CAMP_COLOR_BG_CUSTOM)
 					sha:color(r, g, b)
-					XGUI(this):color(r, g, b)
+					UI(this):color(r, g, b)
 					FireUIEvent('MY_CAMP_COLOR_UPDATE')
 				end)
 			end,
@@ -2308,7 +2308,7 @@ function MY.CanUseSkill(dwSkillID, dwLevel)
 		dwSkillID = MY.GetSkillByName(dwSkillID).dwSkillID
 	end
 	if not BOX then
-		BOX = XGUI.CreateFrame('MY_SKILL', { w = 0, h = 0, empty = true }):hide():append('Box', {}, true)
+		BOX = UI.CreateFrame('MY_SKILL', { w = 0, h = 0, empty = true }):hide():append('Box', {}, true)
 	end
 	local me, box = GetClientPlayer(), BOX
 	if me and box then

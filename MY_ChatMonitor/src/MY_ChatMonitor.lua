@@ -6,6 +6,29 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+---------------------------------------------------------------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
+local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
+---------------------------------------------------------------------------------------------------
 --[[
     RECORD_LIST = {
         -- （数组部分）监控记录
@@ -274,7 +297,7 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
 end
 
 _C.OnPanelActive = function(wnd)
-    local ui = XGUI(wnd)
+    local ui = UI(wnd)
     local w, h = ui:size()
 
     ui:append('Text', { x = 22, y = 15, w = 100, h = 25, text = _L['key words:'] })
@@ -293,7 +316,7 @@ _C.OnPanelActive = function(wnd)
         end,
         onclick = function()
             if IsPopupMenuOpened() then
-                XGUI(this):autocomplete('close')
+                UI(this):autocomplete('close')
             else
                 local source = {}
                 for _, szOpt in ipairs(MY.LoadLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}) or {}) do
@@ -301,8 +324,8 @@ _C.OnPanelActive = function(wnd)
                         table.insert(source, szOpt)
                     end
                 end
-                XGUI(this):autocomplete('option', 'source', source)
-                XGUI(this):autocomplete('search', '')
+                UI(this):autocomplete('option', 'source', source)
+                UI(this):autocomplete('search', '')
             end
         end,
         autocomplete = {
@@ -323,7 +346,7 @@ _C.OnPanelActive = function(wnd)
                                 table.insert(t, szVal)
                                 MY.SaveLUAData({_C.szLuaData, MY_DATA_PATH.GLOBAL}, t)
                             end
-                        end, function() end, function() end, nil, XGUI(wnd):text() )
+                        end, function() end, function() end, nil, UI(wnd):text() )
                     end })
                 end,
             },
@@ -530,10 +553,10 @@ _C.OnPanelActive = function(wnd)
         text = (MY_ChatMonitor.bCapture and _L['stop']) or _L['start'],
         onclick = function()
             if MY_ChatMonitor.bCapture then
-                MY.UI(this):text(_L['start'])
+                UI(this):text(_L['start'])
                 MY_ChatMonitor.bCapture = false
             else
-                MY.UI(this):text(_L['stop'])
+                UI(this):text(_L['stop'])
                 MY_ChatMonitor.bCapture = true
             end
         end,
@@ -558,7 +581,7 @@ _C.OnPanelActive = function(wnd)
         _C.uiBoard:append(D.GetHTML(RECORD_LIST[i]))
     end
     _C.uiBoard:scroll(100)
-    _C.ui = MY.UI(wnd)
+    _C.ui = UI(wnd)
     _C.Init()
 end
 
@@ -583,10 +606,10 @@ end
 MY.RegisterHotKey('MY_ChatMonitor_Hotkey', _L['chat monitor'],
     function()
         if MY_ChatMonitor.bCapture then
-            MY.UI(MY.GetFrame()):find('#Button_ChatMonitor_Switcher'):text(_L['start'])
+            UI(MY.GetFrame()):find('#Button_ChatMonitor_Switcher'):text(_L['start'])
             MY_ChatMonitor.bCapture = false
         else
-            MY.UI(MY.GetFrame()):find('#Button_ChatMonitor_Switcher'):text(_L['stop'])
+            UI(MY.GetFrame()):find('#Button_ChatMonitor_Switcher'):text(_L['stop'])
             MY_ChatMonitor.bCapture = true
         end
     end

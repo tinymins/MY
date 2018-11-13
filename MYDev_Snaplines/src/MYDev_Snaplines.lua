@@ -15,7 +15,7 @@ local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
 local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
-local huge, pi, random = math.huge, math.pi, math.random
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
 local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
 local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
 local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
@@ -25,8 +25,9 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local IsNil, IsBoolean, IsEmpty, RandomChild = MY.IsNil, MY.IsBoolean, MY.IsEmpty, MY.RandomChild
-local IsNumber, IsString, IsTable, IsFunction = MY.IsNumber, MY.IsString, MY.IsTable, MY.IsFunction
+local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
+local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot..'MYDev_Snaplines/lang/')
 --------------------------------------------------------------------------
@@ -125,7 +126,7 @@ local function InsertElementBasicTip(hElem, tTip)
 
 	insert(tTip, _L('Name: %s', hElem:GetName()))
 	insert(tTip, _L('Type: %s', hElem:GetType()))
-	insert(tTip, _L('Path: %s', MY.UI.GetTreePath(hElem)))
+	insert(tTip, _L('Path: %s', UI.GetTreePath(hElem)))
 	insert(tTip, _L('X: %s, %s', x, X))
 	insert(tTip, _L('Y: %s, %s', y, Y))
 	insert(tTip, _L('W: %s', w))
@@ -278,7 +279,7 @@ function MYDev_Snaplines.OnFrameBreathe()
 		end
 		-- 检测鼠标所在Box信息
 		if MYDev_Snaplines.bDetectBox and not (hItem and hItem:GetType() == 'Box') then
-			MY.UI(hWnd):find('.Box'):each(function()
+			UI(hWnd):find('.Box'):each(function()
 				if this:PtInItem(nCursorX, nCursorY) then
 					insert(tTip, '---------------------')
 					InsertElementTip(this, tTip)
@@ -385,7 +386,7 @@ MY.RegisterPanel(
 	'Dev_Snaplines', _L['Snaplines'], _L['Development'],
 	'ui/Image/UICommon/PlugIn.UITex|1', {255,127,0,200}, {
 	OnPanelActive = function(wnd)
-		local ui = MY.UI(wnd)
+		local ui = UI(wnd)
 		local w, h = ui:size()
 		local x, y = 20, 20
 
@@ -410,8 +411,8 @@ MY.RegisterPanel(
 		  :size(20, 20):color(MYDev_Snaplines.rgbTip or {255,255,255})
 		  :click(function()
 			local me = this
-			MY.UI.OpenColorPicker(function(r, g, b)
-				MY.UI(me):color(r, g, b)
+			UI.OpenColorPicker(function(r, g, b)
+				UI(me):color(r, g, b)
 				MYDev_Snaplines.rgbTip = { r, g, b }
 				MYDev_Snaplines.ReloadUI()
 			end)
@@ -420,7 +421,7 @@ MY.RegisterPanel(
 		ui:append('WndButton', 'WndButton_TipFont'):children('#WndButton_TipFont'):pos(x, y)
 		  :width(50):text(_L['font'])
 		  :click(function()
-			MY.UI.OpenFontPicker(function(f)
+			UI.OpenFontPicker(function(f)
 				MYDev_Snaplines.nTipFont = f
 				MYDev_Snaplines.ReloadUI()
 			end)
@@ -465,8 +466,8 @@ MY.RegisterPanel(
 		  :size(20, 20):color(MYDev_Snaplines.rgbWndSnaplines or {255,255,255})
 		  :click(function()
 			local me = this
-			MY.UI.OpenColorPicker(function(r, g, b)
-				MY.UI(me):color(r, g, b)
+			UI.OpenColorPicker(function(r, g, b)
+				UI(me):color(r, g, b)
 				MYDev_Snaplines.rgbWndSnaplines = { r, g, b }
 				MYDev_Snaplines.ReloadUI()
 			end)
@@ -486,8 +487,8 @@ MY.RegisterPanel(
 		  :size(20, 20):color(MYDev_Snaplines.rgbItemSnaplines or {255,255,255})
 		  :click(function()
 			local me = this
-			MY.UI.OpenColorPicker(function(r, g, b)
-				MY.UI(me):color(r, g, b)
+			UI.OpenColorPicker(function(r, g, b)
+				UI(me):color(r, g, b)
 				MYDev_Snaplines.rgbItemSnaplines = { r, g, b }
 				MYDev_Snaplines.ReloadUI()
 			end)

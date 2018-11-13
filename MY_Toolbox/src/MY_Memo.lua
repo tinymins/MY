@@ -6,6 +6,29 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+---------------------------------------------------------------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
+local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
+---------------------------------------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Toolbox/lang/')
 local ROLE_MEMO = {
 	bEnable = false,
@@ -36,7 +59,7 @@ function D.Reload(bGlobal)
 	})
 	local NAME = bGlobal and 'MY_MemoGlobal' or 'MY_MemoRole'
 	local TITLE = bGlobal and _L['MY Memo (Global)'] or _L['MY Memo (Role)']
-	MY.UI('Normal/' .. NAME):remove()
+	UI('Normal/' .. NAME):remove()
 	if CFG.bEnable then
 		if not bGlobal and CFG.szContent == ''
 		and MY_Anmerkungen and MY_Anmerkungen.szNotePanelContent then
@@ -44,31 +67,31 @@ function D.Reload(bGlobal)
 			D.SaveConfig()
 			MY_Anmerkungen.szNotePanelContent = nil
 		end
-		XGUI.CreateFrame(NAME, {
+		UI.CreateFrame(NAME, {
 			simple = true, alpha = 140,
 			maximize = true, minimize = true, dragresize = true,
 			minwidth = 180, minheight = 100,
 			onmaximize = function(wnd)
-				local ui = MY.UI(wnd)
+				local ui = UI(wnd)
 				ui:children('#WndEditBox_Memo'):size(ui:size())
 			end,
 			onrestore = function(wnd)
-				local ui = MY.UI(wnd)
+				local ui = UI(wnd)
 				ui:children('#WndEditBox_Memo'):size(ui:size())
 			end,
 			ondragresize = function(wnd)
-				local ui = MY.UI(wnd:GetRoot())
+				local ui = UI(wnd:GetRoot())
 				CFG.nWidth  = ui:width()
 				CFG.anchor  = ui:anchor()
 				CFG.nHeight = ui:height()
-				local ui = MY.UI(wnd)
+				local ui = UI(wnd)
 				ui:children('#WndEditBox_Memo'):size(ui:size())
 			end,
 			w = CFG.nWidth, h = CFG.nHeight, text = TITLE,
 			dragable = true, dragarea = {0, 0, CFG.nWidth, 30},
 			anchor = CFG.anchor,
-			events = {{ 'UI_SCALED', function() XGUI(this):anchor(CFG.anchor) end }},
-			uievents = {{ 'OnFrameDragEnd', function() CFG.anchor = XGUI('Normal/' .. NAME):anchor() end }},
+			events = {{ 'UI_SCALED', function() UI(this):anchor(CFG.anchor) end }},
+			uievents = {{ 'OnFrameDragEnd', function() CFG.anchor = UI('Normal/' .. NAME):anchor() end }},
 		}):append('WndEditBox', {
 			name = 'WndEditBox_Memo',
 			x = 0, y = 0, w = CFG.nWidth, h = CFG.nHeight - 30,

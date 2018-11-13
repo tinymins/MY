@@ -15,7 +15,7 @@ local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
 local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
-local huge, pi, random = math.huge, math.pi, math.random
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
 local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
 local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
 local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
@@ -23,17 +23,18 @@ local pack, unpack = table.pack or function(...) return {...} end, table.unpack 
 -- jx3 apis caching
 local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
-local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local IsNil, IsBoolean, IsEmpty, RandomChild = MY.IsNil, MY.IsBoolean, MY.IsEmpty, MY.RandomChild
-local IsNumber, IsString, IsTable, IsFunction = MY.IsNumber, MY.IsString, MY.IsTable, MY.IsFunction
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
+local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
 local HP = class()
 local CACHE = setmetatable({}, {__mode = 'v'})
 local REQUIRE_SORT = false
 
 function HP:ctor(dwType, dwID) -- KGobject
-	local hList = XGUI.GetShadowHandle('MY_LifeBar')
+	local hList = UI.GetShadowHandle('MY_LifeBar')
 	local szName = dwType .. '_' .. dwID
 	self.szName = szName
 	self.dwType = dwType
@@ -45,7 +46,7 @@ end
 -- ´´½¨
 function HP:Create()
 	if not self.handle then
-		local hList = XGUI.GetShadowHandle('MY_LifeBar')
+		local hList = UI.GetShadowHandle('MY_LifeBar')
 		hList:AppendItemFromString(FormatHandle(string.format('name="%s"', self.szName)))
 		local hItem = hList:Lookup(self.szName)
 		hItem:AppendItemFromString('<shadow>name="hp_bg"</shadow>')
@@ -63,7 +64,7 @@ end
 -- É¾³ý
 function HP:Remove()
 	if self.handle then
-		local hList = XGUI.GetShadowHandle('MY_LifeBar')
+		local hList = UI.GetShadowHandle('MY_LifeBar')
 		hList:RemoveItem(self.handle)
 		self.handle = nil
 	end
@@ -257,7 +258,7 @@ end
 function MY_LifeBar_HP(dwType, dwID)
 	if dwType == 'clear' then
 		CACHE = {}
-		XGUI.GetShadowHandle('MY_LifeBar'):Clear()
+		UI.GetShadowHandle('MY_LifeBar'):Clear()
 	else
 		local szName = dwType .. '_' .. dwID
 		if not CACHE[szName] then
@@ -271,7 +272,7 @@ do local hList
 local function onBreathe()
 	if REQUIRE_SORT then
 		if not (hList and hList:IsValid()) then
-			hList = XGUI.GetShadowHandle('MY_LifeBar')
+			hList = UI.GetShadowHandle('MY_LifeBar')
 		end
 		hList:Sort()
 		REQUIRE_SORT = false

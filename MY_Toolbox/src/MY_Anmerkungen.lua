@@ -6,6 +6,29 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+---------------------------------------------------------------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
+local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
+---------------------------------------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Toolbox/lang/')
 local _C = {}
 local PUBLIC_PLAYER_IDS = {}
@@ -23,7 +46,7 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 	local note = MY_Anmerkungen.GetPlayerNote(dwID) or {}
 
 	local w, h = 340, 300
-	local ui = MY.UI.CreateFrame('MY_Anmerkungen_PlayerNoteEdit_' .. (dwID or 0), {
+	local ui = UI.CreateFrame('MY_Anmerkungen_PlayerNoteEdit_' .. (dwID or 0), {
 		w = w, h = h, anchor = {},
 		text = _L['my anmerkungen - player note edit'],
 	})
@@ -127,7 +150,7 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 	ui:append('Text', {
 		x = x + 230, y = y - 3, w = 80, alpha = 200,
 		text = _L['delete'], color = {255,0,0},
-		onhover = function(bIn) MY.UI(this):alpha((bIn and 255) or 200) end,
+		onhover = function(bIn) UI(this):alpha((bIn and 255) or 200) end,
 		onclick = function()
 			MY_Anmerkungen.SetPlayerNote(ui:children('#WndEditBox_ID'):text())
 			ui:remove()
@@ -334,7 +357,7 @@ MY.RegisterInit('MY_ANMERKUNGEN', MY_Anmerkungen.LoadConfig)
 
 local PS = {}
 function PS.OnPanelActive(wnd)
-	local ui = MY.UI(wnd)
+	local ui = UI(wnd)
 	local w, h = ui:size()
 	local x, y = 0, 0
 
@@ -417,7 +440,7 @@ function PS.OnPanelActive(wnd)
 		x = w - 110, y = y, w = 110,
 		text = _L['Export'],
 		onclick = function()
-			XGUI.OpenTextEditor(var2str({
+			UI.OpenTextEditor(var2str({
 				server   = MY.GetRealServer(),
 				publici  = PUBLIC_PLAYER_IDS,
 				publicd  = PUBLIC_PLAYER_NOTES,

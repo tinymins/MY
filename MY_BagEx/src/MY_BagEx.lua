@@ -6,6 +6,29 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+---------------------------------------------------------------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
+local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
+---------------------------------------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_BagEx/lang/')
 
 MY_BagEx = {}
@@ -50,9 +73,9 @@ local function FilterBags(szTreePath, szFilter, bTimeLtd)
 	end
 	local me = GetClientPlayer()
 	if not szFilter and not bTimeLtd then
-		XGUI(szTreePath):find('.Box'):alpha(255)
+		UI(szTreePath):find('.Box'):alpha(255)
 	else
-		XGUI(szTreePath):find('.Box'):each(function(ui)
+		UI(szTreePath):find('.Box'):each(function(ui)
 			if this.bBag then
 				return
 			end
@@ -157,8 +180,8 @@ local function DoCompareBank(bForce)
 		local frmBank = Station.Lookup('Normal/BigBankPanel')
 
 		if frmBag and frmBank and frmBank:IsVisible() then
-			MY.UI('Normal/BigBagPanel/CheckBox_Totle'):check(true):check(false)
-			DoCompare(MY.UI(frmBag), MY.UI(frmBank))
+			UI('Normal/BigBagPanel/CheckBox_Totle'):check(true):check(false)
+			DoCompare(UI(frmBag), UI(frmBank))
 		end
 	else
 		DoFilterBag(bForce)
@@ -172,8 +195,8 @@ local function DoCompareGuildBank(bForce)
 		local frmGuildBank = Station.Lookup('Normal/GuildBankPanel')
 
 		if frmBag and frmGuildBank and frmGuildBank:IsVisible() then
-			MY.UI('Normal/BigBagPanel/CheckBox_Totle'):check(true):check(false)
-			DoCompare(MY.UI(frmBag), MY.UI(frmGuildBank))
+			UI('Normal/BigBagPanel/CheckBox_Totle'):check(true):check(false)
+			DoCompare(UI(frmBag), UI(frmGuildBank))
 		end
 	else
 		DoFilterBag(bForce)
@@ -194,7 +217,7 @@ local function Hook()
 	local frame = Station.Lookup('Normal/BigBagPanel')
 	if frame and not frame.bMYBagExHook then
 		frame.bMYBagExHook = true
-		MY.UI(frame):append('WndEditBox', {
+		UI(frame):append('WndEditBox', {
 			name = 'WndEditBox_KeyWord',
 			w = 100, h = 21, x = 60, y = 30,
 			text = l_szBagFilter,
@@ -203,7 +226,7 @@ local function Hook()
 				local nLen = txt:len()
 				nLen = math.max(nLen, 10)
 				nLen = math.min(nLen, 20)
-				XGUI(this):width(nLen * 10)
+				UI(this):width(nLen * 10)
 				l_szBagFilter = txt
 				DoFilterBag()
 			end,
@@ -215,7 +238,7 @@ local function Hook()
 	local frame = Station.Lookup('Normal/BigBankPanel')
 	if frame and not frame.bMYBagExHook then
 		frame.bMYBagExHook = true
-		MY.UI(frame):append('WndEditBox', {
+		UI(frame):append('WndEditBox', {
 			name = 'WndEditBox_KeyWord',
 			w = 150, h = 21, x = 280, y = 80,
 			text = l_szBankFilter,
@@ -224,34 +247,34 @@ local function Hook()
 				local nLen = txt:len()
 				nLen = math.max(nLen, 15)
 				nLen = math.min(nLen, 25)
-				XGUI(this):width(nLen * 10)
+				UI(this):width(nLen * 10)
 				l_szBankFilter = txt
 				DoFilterBank(true)
 			end,
 		})
 
-		MY.UI(frame):append('WndCheckBox', {
+		UI(frame):append('WndCheckBox', {
 			name = 'WndCheckBox_Compare',
 			w = 100, x = 340, y = 56,
 			text = _L['compare with bag'],
 			checked = l_bCompareBank,
 			oncheck = function(bChecked)
 				if bChecked then
-					MY.UI('Normal/BigBankPanel/CheckBox_TimeLtd'):check(false)
+					UI('Normal/BigBankPanel/CheckBox_TimeLtd'):check(false)
 				end
 				l_bCompareBank = bChecked
 				DoCompareBank(true)
 			end
 		})
 
-		MY.UI(frame):append('WndCheckBox', {
+		UI(frame):append('WndCheckBox', {
 			name = 'CheckBox_TimeLtd',
 			w = 60, x = 277, y = 56, alpha = 200,
 			text = _L['Time Limited'],
 			checked = l_bBankTimeLtd,
 			oncheck = function(bChecked)
 				if bChecked then
-					MY.UI('Normal/BigBankPanel/WndCheckBox_Compare'):check(false)
+					UI('Normal/BigBankPanel/WndCheckBox_Compare'):check(false)
 				end
 				l_bBankTimeLtd = bChecked
 				DoFilterBank(true)
@@ -264,7 +287,7 @@ local function Hook()
 	local frame = Station.Lookup('Normal/GuildBankPanel')
 	if frame and not frame.bMYBagExHook then
 		frame.bMYBagExHook = true
-		MY.UI('Normal/GuildBankPanel'):append('WndEditBox', {
+		UI('Normal/GuildBankPanel'):append('WndEditBox', {
 			name = 'WndEditBox_KeyWord',
 			w = 100, h = 21, x = 60, y = 25,
 			text = l_szGuildBankFilter,
@@ -273,13 +296,13 @@ local function Hook()
 				local nLen = txt:len()
 				nLen = math.max(nLen, 10)
 				nLen = math.min(nLen, 25)
-				XGUI(this):width(nLen * 10)
+				UI(this):width(nLen * 10)
 				l_szGuildBankFilter = txt
 				DoFilterGuildBank(true)
 			end,
 		})
 
-		MY.UI('Normal/GuildBankPanel'):append('WndCheckBox', {
+		UI('Normal/GuildBankPanel'):append('WndCheckBox', {
 			name = 'WndCheckBox_Compare',
 			w = 100, x = 20, y = 475,
 			text = _L['compare with bag'],

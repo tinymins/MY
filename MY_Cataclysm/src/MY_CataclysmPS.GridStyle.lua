@@ -15,7 +15,7 @@ local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
 local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
-local huge, pi, random = math.huge, math.pi, math.random
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
 local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
 local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
 local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
@@ -25,14 +25,15 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local IsNil, IsBoolean, IsEmpty, RandomChild = MY.IsNil, MY.IsBoolean, MY.IsEmpty, MY.RandomChild
-local IsNumber, IsString, IsTable, IsFunction = MY.IsNumber, MY.IsString, MY.IsTable, MY.IsFunction
+local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
+local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/lang/')
 local CFG, PS = MY_Cataclysm.CFG, {}
 
 function PS.OnPanelActive(frame)
-	local ui = XGUI(frame)
+	local ui = UI(frame)
 	local X, Y = 20, 20
 	local x, y = X, Y
 
@@ -125,7 +126,7 @@ function PS.OnPanelActive(frame)
 	x = x + ui:append('WndButton2', {
 		x = x, y = y - 3, text = _L['Name font'],
 		onclick = function()
-			XGUI.OpenFontPicker(function(nFont)
+			UI.OpenFontPicker(function(nFont)
 				CFG.nNameFont = nFont
 				if MY_Cataclysm.GetFrame() then
 					MY_CataclysmParty:CallRefreshImages(true, false, false, nil, true)
@@ -238,7 +239,7 @@ function PS.OnPanelActive(frame)
 	ui:append('WndButton2', {
 		x = x, y = y - 1, text = _L['Life font'],
 		onclick = function()
-			XGUI.OpenFontPicker(function(nFont)
+			UI.OpenFontPicker(function(nFont)
 				CFG.nLifeFont = nFont
 				if MY_Cataclysm.GetFrame() then
 					MY_CataclysmParty:CallDrawHPMP(true, true)
@@ -288,7 +289,7 @@ function PS.OnPanelActive(frame)
 	x = x + ui:append('WndButton2', {
 		x = x, y = y, text = g_tStrings.STR_SKILL_MANA .. g_tStrings.FONT,
 		onclick = function()
-			XGUI.OpenFontPicker(function(nFont)
+			UI.OpenFontPicker(function(nFont)
 				CFG.nManaFont = nFont
 				if MY_Cataclysm.GetFrame() then
 					MY_CataclysmParty:CallDrawHPMP(true, true)

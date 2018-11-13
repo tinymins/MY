@@ -6,27 +6,29 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
 local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
-local floor, min, max, ceil = math.floor, math.min, math.max, math.ceil
-local huge, pi, sin, cos, tan = math.huge, math.pi, math.sin, math.cos, math.tan
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
 local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
 local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
 -- jx3 apis caching
 local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
-local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local IsNumber, IsBoolean, IsFunction = MY.IsNumber, MY.IsBoolean, MY.IsFunction
-local IsNil, IsString, IsTable, IsEmpty = MY.IsNil, MY.IsString, MY.IsTable, MY.IsEmpty
------------------------------------------------------------------------------------------
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
+local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
+---------------------------------------------------------------------------------------------------
 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TargetMon/lang/')
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/ui/MY_TargetMon.ini'
@@ -970,7 +972,7 @@ local function GenePS(ui, config, x, y, w, h, OpenConfig)
 end
 
 function PS.OnPanelActive(wnd)
-	local ui = MY.UI(wnd)
+	local ui = UI(wnd)
 	local w, h = ui:size()
 	local X, Y = 20, 20
 	local x, y = X, Y
@@ -1330,7 +1332,7 @@ function PS.OnPanelActive(wnd)
 					nIconHeight = 22,
 					szLayer = 'ICON_RIGHTMOST',
 					fnClickIcon = function()
-						XGUI.OpenIconPanel(function(dwIcon)
+						UI.OpenIconPanel(function(dwIcon)
 							mon.manually = true
 							mon.iconid = dwIcon
 						end)
@@ -1359,7 +1361,7 @@ function PS.OnPanelActive(wnd)
 							if mon.ignoreId then
 								return
 							end
-							XGUI.OpenIconPanel(function(dwIcon)
+							UI.OpenIconPanel(function(dwIcon)
 								info.iconid = dwIcon
 								mon.manually = true
 								D.CheckFrame(l_config)
@@ -1388,7 +1390,7 @@ function PS.OnPanelActive(wnd)
 								if mon.ignoreId or info.ignoreLevel then
 									return
 								end
-								XGUI.OpenIconPanel(function(dwIcon)
+								UI.OpenIconPanel(function(dwIcon)
 									info.iconid = dwIcon
 									mon.manually = true
 								end)
@@ -1416,7 +1418,7 @@ function PS.OnPanelActive(wnd)
 									nIconHeight = 22,
 									szLayer = 'ICON_RIGHTMOST',
 									fnClickIcon = function()
-										XGUI.OpenIconPanel(function(dwIcon)
+										UI.OpenIconPanel(function(dwIcon)
 											infoLevel.iconid = dwIcon
 											mon.manually = true
 											D.CheckFrame(l_config)

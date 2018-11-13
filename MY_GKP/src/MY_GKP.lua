@@ -15,7 +15,7 @@ local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
 local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
-local huge, pi, random = math.huge, math.pi, math.random
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
 local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
 local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
 local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
@@ -25,8 +25,9 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local IsNil, IsBoolean, IsEmpty, RandomChild = MY.IsNil, MY.IsBoolean, MY.IsEmpty, MY.RandomChild
-local IsNumber, IsString, IsTable, IsFunction = MY.IsNumber, MY.IsString, MY.IsTable, MY.IsFunction
+local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
+local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
 -- 早期代码 需要重写
 ---------------------------------------------------------------------------------------------------
@@ -379,7 +380,7 @@ function MY_GKP.OnFrameCreate()
 	_GKP.frame = this
 	_GKP.hRecordContainer = this:Lookup('PageSet_Menu/Page_GKP_Record/WndScroll_GKP_Record/WndContainer_Record_List')
 	_GKP.hAccountContainer = this:Lookup('PageSet_Menu/Page_GKP_Account/WndScroll_GKP_Account/WndContainer_Account_List')
-	local ui = XGUI(this)
+	local ui = UI(this)
 	ui:text(_L['GKP Golden Team Record']):anchor({})
 	ui:append('WndButton', {
 		x = 875, y = 48, w = 100, h = 35,
@@ -560,7 +561,7 @@ end
 
 local PS = {}
 function PS.OnPanelActive(wnd)
-	local ui = XGUI(wnd)
+	local ui = UI(wnd)
 	local X, Y = 10, 10
 	local x, y = X, Y
 	local w, h = ui:size()
@@ -1066,7 +1067,7 @@ MY.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 				if data[3] == 'Information on Debt' and szName ~= me.szName then -- 欠债记录只自己看
 					return
 				end
-				local ui = XGUI.CreateFrame(szFrameName, { w = 800, h = 400, text = _L['GKP Golden Team Record'], close = true, anchor = {} })
+				local ui = UI.CreateFrame(szFrameName, { w = 800, h = 400, text = _L['GKP Golden Team Record'], close = true, anchor = {} })
 				local x, y = 20, 50
 				ui:append('Text', { x = x, y = y, w = 760, h = 30, text = _L[data[3]], halign = 1, font = 236, color = { 255, 255, 0 } })
 				ui:append('WndButton3', { name = 'ScreenShot', x = x + 590, y = y, text = _L['Print Ticket'] }, true):toggle(false):click(function()
@@ -1102,7 +1103,7 @@ MY.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 				if frm then
 					if not frm.n then frm.n = 0 end
 					local n = frm.n
-					local ui = XGUI(frm)
+					local ui = UI(frm)
 					local x, y = 20, 50
 					if n % 2 == 0 then
 						ui:append('Image', { w = 760, h = 30, x = x, y = y + 70 + 30 * n, image = 'ui/Image/button/ShopButton.UITex', imageframe = 75 })
@@ -1161,7 +1162,7 @@ MY.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 				local frm = Station.Lookup('Normal/' .. szFrameName)
 				if frm then
 					if data[4] then
-						local ui = XGUI(frm)
+						local ui = UI(frm)
 						local x, y = 20, 50
 						local n = frm.n or 0
 						local handle = ui:append('Handle', { w = 230, h = 20, x = x + 30, y = y + 70 + 30 * n + 5, handlestyle = 3 }, true)[1]
@@ -1179,7 +1180,7 @@ MY.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 							local nTime = tonumber(data[5])
 							ui:append('Text', { w = 725, h = 30, x = x + 0, y = y + 70 + 30 * n + 5, text = _L('Spend time approx %d:%d', nTime / 3600, nTime % 3600 / 60), halign = 1 })
 						end
-						XGUI(frm):children('#ScreenShot'):toggle(true)
+						UI(frm):children('#ScreenShot'):toggle(true)
 						if n >= 4 then
 							local nMoney = tonumber(data[4]) or 0
 							local t = {
@@ -1530,10 +1531,10 @@ end
 function _GKP.Record(tab, item, bEnter)
 	-- CreateFrame
 	if _GKP.GetRecordWindow() then
-		local wnd = XGUI(_GKP.GetRecordWindow())
+		local wnd = UI(_GKP.GetRecordWindow())
 		wnd:children('#Btn_Close'):click()
 	end
-	local ui = XGUI.CreateFrame('GKP_Record', { h = 380, w = 400, text = _L['GKP Golden Team Record'], close = true, focus = true })
+	local ui = UI.CreateFrame('GKP_Record', { h = 380, w = 400, text = _L['GKP Golden Team Record'], close = true, focus = true })
 	local x, y = 10, 55
 	local nAuto = 0
 	local dwForceID
@@ -1587,9 +1588,9 @@ function _GKP.Record(tab, item, bEnter)
 		},
 		onclick = function()
 			if IsPopupMenuOpened() then
-				XGUI(this):autocomplete('close')
+				UI(this):autocomplete('close')
 			else
-				XGUI(this):autocomplete('search', '')
+				UI(this):autocomplete('search', '')
 			end
 		end,
 	}, true)
@@ -1623,7 +1624,7 @@ function _GKP.Record(tab, item, bEnter)
 			},
 		},
 		onchange = function(szText)
-			local ui = XGUI(this)
+			local ui = UI(this)
 			if tonumber(szText) or szText == '' or szText == '-' then
 				this.szText = szText
 				ui:color(_GKP.GetMoneyCol(szText))

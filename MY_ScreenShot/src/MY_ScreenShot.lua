@@ -6,6 +6,29 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+---------------------------------------------------------------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
+local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
+---------------------------------------------------------------------------------------------------
 local _GLOBAL_CONFIG_ = {'config/screenshot.jx3dat', MY_DATA_PATH.GLOBAL}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_ScreenShot/lang/')
 local _MY_ScreenShot = {}
@@ -75,22 +98,22 @@ MY_ScreenShot.ShotScreen = function(nShowUI)
     local bStationVisible = Station.IsVisible()
     if nShowUI == MY_ScreenShot.Const.HIDE_UI and bStationVisible then
         Station.Hide()
-        XGUI.TempSetShadowHandleVisible(false)
+        UI.TempSetShadowHandleVisible(false)
         MY.DelayCall(100, function()
             _MY_ScreenShot.ShotScreen(szFilePath, MY_ScreenShot.GetConfig('nQuality'))
             MY.DelayCall(300, function()
                 Station.Show()
-                XGUI.RevertShadowHandleVisible()
+                UI.RevertShadowHandleVisible()
             end)
         end)
     elseif nShowUI == MY_ScreenShot.Const.SHOW_UI and not bStationVisible then
         Station.Show()
-        XGUI.TempSetShadowHandleVisible(true)
+        UI.TempSetShadowHandleVisible(true)
         MY.DelayCall(100, function()
             _MY_ScreenShot.ShotScreen(szFilePath, MY_ScreenShot.GetConfig('nQuality'))
             MY.DelayCall(300, function()
                 Station.Hide()
-                XGUI.RevertShadowHandleVisible()
+                UI.RevertShadowHandleVisible()
             end)
         end)
     else
@@ -99,7 +122,7 @@ MY_ScreenShot.ShotScreen = function(nShowUI)
 end
 -- ±Í«©¿∏º§ªÓ
 _MY_ScreenShot.OnPanelActive = function(wnd)
-    local ui = MY.UI(wnd)
+    local ui = UI(wnd)
     local w, h = ui:size()
     local fnRefreshPanel = function(ui)
         ui:children('#WndCheckBox_HideUI'):check(MY_ScreenShot.GetConfig('bAutoHideUI'))

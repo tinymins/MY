@@ -6,27 +6,29 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
 local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
-local floor, min, max, ceil = math.floor, math.min, math.max, math.ceil
-local huge, pi, sin, cos, tan = math.huge, math.pi, math.sin, math.cos, math.tan
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
 local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
 local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
 -- jx3 apis caching
 local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
-local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local IsNil, IsNumber, IsFunction = MY.IsNil, MY.IsNumber, MY.IsFunction
-local IsBoolean, IsString, IsTable = MY.IsBoolean, MY.IsString, MY.IsTable
------------------------------------------------------------------------------------------
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
+local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
+---------------------------------------------------------------------------------------------------
 local _L, D = MY.LoadLangPack(), {}
 local SERENDIPITY_STATUS = {
 	START = 0,
@@ -164,7 +166,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 		-- end
 		if szMode ~= 'silent' then
 			local w, h = 270, 180
-			local ui = XGUI.CreateFrame('MY_Serendipity#' .. szKey, {
+			local ui = UI.CreateFrame('MY_Serendipity#' .. szKey, {
 				w = w, h = h, close = true, text = '', anchor = {},
 			})
 			if szMode == 'auto' then

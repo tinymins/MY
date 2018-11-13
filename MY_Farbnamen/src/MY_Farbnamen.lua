@@ -15,7 +15,7 @@ local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
 local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
-local huge, pi, random = math.huge, math.pi, math.random
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
 local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
 local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
 local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
@@ -25,9 +25,9 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local Get = MY.Get
-local IsNil, IsBoolean, IsEmpty, RandomChild = MY.IsNil, MY.IsBoolean, MY.IsEmpty, MY.RandomChild
-local IsNumber, IsString, IsTable, IsFunction = MY.IsNumber, MY.IsString, MY.IsTable, MY.IsFunction
+local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
+local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
 local XML_LINE_BREAKER = XML_LINE_BREAKER
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot..'MY_Farbnamen/lang/')
@@ -211,7 +211,7 @@ function MY_Farbnamen.Render(szMsg)
 		-- end)
 	elseif type(szMsg) == 'table' and type(szMsg.GetName) == 'function' and szMsg:GetName():sub(1, 8) == 'namelink' then
 		local namelink = szMsg
-		local ui = MY.UI(namelink):hover(MY_Farbnamen.ShowTip, HideTip, true)
+		local ui = UI(namelink):hover(MY_Farbnamen.ShowTip, HideTip, true)
 		local szName = string.gsub(namelink:GetText(), '[%[%]]', '')
 		local tInfo = MY_Farbnamen.GetAusName(szName)
 		if tInfo then

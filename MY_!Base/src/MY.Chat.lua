@@ -15,7 +15,7 @@ local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
 local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
-local huge, pi, random = math.huge, math.pi, math.random
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
 local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
 local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
 local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local Get, RandomChild = MY.Get, MY.RandomChild
+local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
 local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
@@ -107,7 +107,7 @@ end
 function MY.CopyChatLine(hTime, bTextEditor)
 	local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
 	if bTextEditor then
-		edit = MY.UI.OpenTextEditor():find('.WndEdit')[1]
+		edit = UI.OpenTextEditor():find('.WndEdit')[1]
 	end
 	if not edit then
 		return
@@ -213,22 +213,22 @@ function ChatLinkEvents.OnNameLClick(element, link)
 	end
 	if IsCtrlKeyDown() and IsAltKeyDown() then
 		local menu = {}
-		InsertInviteTeamMenu(menu, (MY.UI(link):text():gsub('[%[%]]', '')))
+		InsertInviteTeamMenu(menu, (UI(link):text():gsub('[%[%]]', '')))
 		menu[1].fnAction()
 	elseif IsCtrlKeyDown() then
 		MY.CopyChatItem(link)
 	elseif IsShiftKeyDown() then
-		MY.SetTarget(TARGET.PLAYER, MY.UI(link):text())
+		MY.SetTarget(TARGET.PLAYER, UI(link):text())
 	elseif IsAltKeyDown() then
 		if MY_Farbnamen and MY_Farbnamen.Get then
-			local info = MY_Farbnamen.Get((MY.UI(link):text():gsub('[%[%]]', '')))
+			local info = MY_Farbnamen.Get((UI(link):text():gsub('[%[%]]', '')))
 			if info then
 				PEEK_PLAYER[info.dwID] = true
 				ViewInviteToPlayer(info.dwID)
 			end
 		end
 	else
-		MY.SwitchChat(MY.UI(link):text())
+		MY.SwitchChat(UI(link):text())
 		local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
 		if edit then
 			Station.SetFocusWindow(edit)
@@ -239,7 +239,7 @@ function ChatLinkEvents.OnNameRClick(element, link)
 	if not link then
 		link = element
 	end
-	PopupMenu(MY.GetTargetContextMenu(TARGET.PLAYER, (MY.UI(link):text():gsub('[%[%]]', ''))))
+	PopupMenu(MY.GetTargetContextMenu(TARGET.PLAYER, (UI(link):text():gsub('[%[%]]', ''))))
 end
 function ChatLinkEvents.OnCopyLClick(element, link)
 	if not link then
@@ -346,7 +346,7 @@ function MY.RenderChatLink(arg1, arg2)
 		if element.bMyChatRendered then
 			return
 		end
-		local ui = XGUI(element)
+		local ui = UI(element)
 		local name = ui:name()
 		if name:sub(1, 8) == 'namelink' then
 			ui:lclick(function() ChatLinkEvents.OnNameLClick(element, link) end)

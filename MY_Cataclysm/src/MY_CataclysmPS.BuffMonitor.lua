@@ -15,7 +15,7 @@ local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
 local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
-local huge, pi, random = math.huge, math.pi, math.random
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
 local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
 local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
 local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
@@ -25,8 +25,9 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local IsNil, IsBoolean, IsEmpty, RandomChild = MY.IsNil, MY.IsBoolean, MY.IsEmpty, MY.RandomChild
-local IsNumber, IsString, IsTable, IsFunction = MY.IsNumber, MY.IsString, MY.IsTable, MY.IsFunction
+local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
+local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/lang/')
 local CFG, PS = MY_Cataclysm.CFG, {}
@@ -158,7 +159,7 @@ end
 local l_list
 function OpenBuffEditPanel(rec)
 	local w, h = 320, 320
-	local ui = XGUI.CreateFrame('MY_Cataclysm_BuffConfig', {
+	local ui = UI.CreateFrame('MY_Cataclysm_BuffConfig', {
 		w = w, h = h,
 		text = _L['Edit buff'],
 		close = true, anchor = {},
@@ -237,7 +238,7 @@ function OpenBuffEditPanel(rec)
 					rec.szStackOp = nil
 					ui:children('#WndEditBox_StackNum'):text('')
 					update()
-					XGUI(this):text(_L['No limit'])
+					UI(this):text(_L['No limit'])
 				end,
 			}}
 			for _, op in ipairs({ '>=', '=', '!=', '<', '<=', '>', '>=' }) do
@@ -246,7 +247,7 @@ function OpenBuffEditPanel(rec)
 					fnAction = function()
 						rec.szStackOp = op
 						update()
-						XGUI(this):text(op)
+						UI(this):text(op)
 					end,
 				})
 			end
@@ -345,16 +346,16 @@ function OpenBuffEditPanel(rec)
 		color = rec.col and {MY.HumanColor2RGB(rec.col)} or {255, 255, 0},
 		onlclick = function()
 			local this = this
-			XGUI.OpenColorPicker(function(r, g, b)
+			UI.OpenColorPicker(function(r, g, b)
 				local a = rec.col and select(4, MY.Hex2RGB(rec.col)) or 255
 				rec.nColAlpha = a
 				rec.col = MY.RGB2Hex(r, g, b, a)
-				XGUI(this):color(r, g, b)
+				UI(this):color(r, g, b)
 				update()
 			end)
 		end,
 		onrclick = function()
-			XGUI(this):color(255, 255, 0)
+			UI(this):color(255, 255, 0)
 			rec.col = nil
 			update()
 		end,
@@ -367,14 +368,14 @@ function OpenBuffEditPanel(rec)
 		color = rec.colScreenHead and {MY.HumanColor2RGB(rec.colScreenHead)} or {255, 255, 0},
 		onlclick = function()
 			local this = this
-			XGUI.OpenColorPicker(function(r, g, b)
+			UI.OpenColorPicker(function(r, g, b)
 				rec.colScreenHead = MY.RGB2Hex(r, g, b)
-				XGUI(this):color(r, g, b)
+				UI(this):color(r, g, b)
 				update()
 			end)
 		end,
 		onrclick = function()
-			XGUI(this):color(255, 255, 0)
+			UI(this):color(255, 255, 0)
 			rec.colScreenHead = nil
 			update()
 		end,
@@ -474,7 +475,7 @@ function OpenBuffEditPanel(rec)
 end
 
 function PS.OnPanelActive(frame)
-	local ui = XGUI(frame)
+	local ui = UI(frame)
 	local X, Y = 10, 10
 	local x, y = X, Y
 	local w, h = ui:size()
@@ -494,7 +495,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y, w = 100,
 		text = _L['Edit'],
 		onclick = function()
-			local ui = XGUI.CreateFrame('MY_Cataclysm_BuffConfig', {
+			local ui = UI.CreateFrame('MY_Cataclysm_BuffConfig', {
 				w = 350, h = 550,
 				text = _L['Edit buff'],
 				close = true, anchor = {},
@@ -695,7 +696,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y, w = 220,
 		text = _L['Feedback @nangongbo'],
 		onclick = function()
-			XGUI.OpenBrowser('https://weibo.com/nangongbo')
+			UI.OpenBrowser('https://weibo.com/nangongbo')
 		end,
 	}, true):autoHeight():width()
 	y = y + 28

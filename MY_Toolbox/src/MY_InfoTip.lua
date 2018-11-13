@@ -6,6 +6,29 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+---------------------------------------------------------------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
+local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
+---------------------------------------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Toolbox/lang/')
 local _Cache = {
     bFighting = false,
@@ -180,13 +203,13 @@ end)
 MY_InfoTip.Reload = function()
     for id, cache in pairs(MY_InfoTip.Cache) do
         local cfg = MY_InfoTip.Config[id]
-        local frm = MY.UI('Normal/MY_InfoTip_'..id)
+        local frm = UI('Normal/MY_InfoTip_'..id)
         if cfg.bEnable then
             if frm:count()==0 then
-                frm = MY.UI.CreateFrame('MY_InfoTip_'..id, {empty = true}):size(220,30):event('UI_SCALED', function()
-                    MY.UI(this):anchor(cfg.anchor)
+                frm = UI.CreateFrame('MY_InfoTip_'..id, {empty = true}):size(220,30):event('UI_SCALED', function()
+                    UI(this):anchor(cfg.anchor)
                 end):customMode(cache.title, function(anchor)
-                    MY.UI(this):bringToTop()
+                    UI(this):bringToTop()
                     cfg.anchor = anchor
                     SaveConfig()
                 end, function(anchor)
@@ -224,7 +247,7 @@ end)
 
 
 MY.RegisterPanel( 'MY_InfoTip', _L['infotip'], _L['System'], 'ui/Image/UICommon/ActivePopularize2.UITex|22', {255,255,0,200}, { OnPanelActive = function(wnd)
-    local ui = MY.UI(wnd)
+    local ui = UI(wnd)
     local w, h = ui:size()
     local x, y = 50, 20
 
@@ -261,7 +284,7 @@ MY.RegisterPanel( 'MY_InfoTip', _L['infotip'], _L['System'], 'ui/Image/UICommon/
         ui:append('WndButton', 'WndButton_InfoTipFont_'..id):children('#WndButton_InfoTipFont_'..id):pos(x, y)
           :width(50):text(_L['font'])
           :click(function()
-            MY.UI.OpenFontPicker(function(f)
+            UI.OpenFontPicker(function(f)
                 cfg.nFont = f
                 MY_InfoTip.Reload()
             end)
@@ -271,8 +294,8 @@ MY.RegisterPanel( 'MY_InfoTip', _L['infotip'], _L['System'], 'ui/Image/UICommon/
           :size(20, 20):color(cfg.rgb or {255,255,255})
           :click(function()
             local me = this
-            MY.UI.OpenColorPicker(function(r, g, b)
-                MY.UI(me):color(r, g, b)
+            UI.OpenColorPicker(function(r, g, b)
+                UI(me):color(r, g, b)
                 cfg.rgb = { r, g, b }
                 MY_InfoTip.Reload()
             end)

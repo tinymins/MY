@@ -6,22 +6,29 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
-----------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
+---------------------------------------------------------------------------------------------------
+local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
-local insert, remove, concat, unpack = table.insert, table.remove, table.concat, table.unpack
-local sub, len, char, rep = string.sub, string.len, string.char, string.rep
-local byte, format, gsub = string.byte, string.format, string.gsub
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
-local floor, min, max, ceil = math.floor, math.min, math.max, math.ceil
-local huge, pi, sin, cos, tan = math.huge, math.pi, math.sin, math.cos, math.tan
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
 -- jx3 apis caching
 local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
-local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-----------------------------------------------------------------------------------------------
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
+local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
+---------------------------------------------------------------------------------------------------
 local CHANNEL = { -- 统计类型
 	DPS  = 1, -- 输出统计
 	HPS  = 2, -- 治疗统计
@@ -200,9 +207,9 @@ function MY_Recount.Open()
 	-- pos
 	local anchor = MY.GetStorage('FrameAnchor.MY_Recount')
 		or { x = 0, y = -70, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' }
-	MY.UI(m_frame):anchor(anchor)
+	UI(m_frame):anchor(anchor)
 	MY.RegisterEvent('UI_SCALED.MY_RECOUNT', function()
-		MY.UI(m_frame):anchor(anchor)
+		UI(m_frame):anchor(anchor)
 	end)
 	-- draw
 	MY_Recount.DrawUI()

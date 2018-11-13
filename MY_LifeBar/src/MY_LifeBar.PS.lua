@@ -6,27 +6,29 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
 local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
-local floor, min, max, ceil = math.floor, math.min, math.max, math.ceil
-local huge, pi, sin, cos, tan = math.huge, math.pi, math.sin, math.cos, math.tan
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
 local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
 local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
 -- jx3 apis caching
 local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
-local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local IsNil, IsNumber, IsFunction = MY.IsNil, MY.IsNumber, MY.IsFunction
-local IsBoolean, IsString, IsTable = MY.IsBoolean, MY.IsString, MY.IsTable
------------------------------------------------------------------------------------------
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
+local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
+---------------------------------------------------------------------------------------------------
 local Config = MY_LifeBar_Config
 if not Config then
     return
@@ -74,7 +76,7 @@ local function LoadUI(ui)
 	ui:children('#WndCheckBox_MineOnTop'):check(Config.bMineOnTop)
 end
 function PS.OnPanelActive(wnd)
-	local ui = MY.UI(wnd)
+	local ui = UI(wnd)
 	local w, h = ui:size()
 
 	local X, Y = 10, 15
@@ -102,7 +104,7 @@ function PS.OnPanelActive(wnd)
 		placeholder = _L['Configure name'],
 		text = MY_LifeBar.szConfig,
 		onblur = function()
-			local szConfig = XGUI(this):text():gsub('%s', '')
+			local szConfig = UI(this):text():gsub('%s', '')
 			if szConfig == '' then
 				return
 			end
@@ -382,7 +384,7 @@ function PS.OnPanelActive(wnd)
 		opt.nMouseOverFrame = 70
 		opt.szLayer = 'ICON_RIGHT'
 		opt.fnClickIcon = function()
-			XGUI.OpenColorPicker(function(r, g, b)
+			UI.OpenColorPicker(function(r, g, b)
 				cfg[tartype] = { r, g, b }
 			end)
 		end
@@ -399,7 +401,7 @@ function PS.OnPanelActive(wnd)
 				nFrame = 69, nMouseOverFrame = 70,
 				szLayer = 'ICON_RIGHT',
 				fnClickIcon = function()
-					XGUI.OpenColorPicker(function(r, g, b)
+					UI.OpenColorPicker(function(r, g, b)
 						cfg[tartype] = { r, g, b }
 					end)
 				end,
@@ -421,7 +423,7 @@ function PS.OnPanelActive(wnd)
 					nFrame = 69, nMouseOverFrame = 70,
 					szLayer = 'ICON_RIGHT',
 					fnClickIcon = function()
-						XGUI.OpenColorPicker(function(r, g, b)
+						UI.OpenColorPicker(function(r, g, b)
 							cfg[dwForceID] = { r, g, b }
 						end)
 					end,
@@ -603,11 +605,11 @@ function PS.OnPanelActive(wnd)
 		b = Config.nLifeBorderB,
 		onclick = function()
 			local this = this
-			XGUI.OpenColorPicker(function(r, g, b)
+			UI.OpenColorPicker(function(r, g, b)
 				Config.nLifeBorderR = r
 				Config.nLifeBorderG = g
 				Config.nLifeBorderB = b
-				XGUI(this):color(r, g, b)
+				UI(this):color(r, g, b)
 			end)
 		end,
 		autoenable = function() return D.IsEnabled() end,
@@ -738,7 +740,7 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = 65,
 		text = _L['Font'],
 		onclick = function()
-			MY.UI.OpenFontPicker(function(nFont)
+			UI.OpenFontPicker(function(nFont)
 				Config.nFont = nFont
 			end)
 		end,

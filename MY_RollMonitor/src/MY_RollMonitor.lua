@@ -6,6 +6,29 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+---------------------------------------------------------------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
+local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
+---------------------------------------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_RollMonitor/lang/')
 local SORT_TYPE = {
 	FIRST = 1,  -- 只记录第一次
@@ -331,7 +354,7 @@ RegisterMsgMonitor(OnMsgArrive, {'MSG_SYS'})
 
 -- 标签激活响应函数
 function PS.OnPanelActive(wnd)
-	local ui = MY.UI(wnd)
+	local ui = UI(wnd)
 	local w, h = ui:size()
 	-- 记录模式
 	ui:append('WndComboBox', {
@@ -345,7 +368,7 @@ function PS.OnPanelActive(wnd)
 					fnAction = function()
 						MY_RollMonitor.nSortType = nSortType
 						MY_RollMonitor.DrawBoard()
-						MY.UI(raw):text(SORT_TYPE_INFO[nSortType].szName)
+						UI(raw):text(SORT_TYPE_INFO[nSortType].szName)
 					end,
 				})
 			end
@@ -362,7 +385,7 @@ function PS.OnPanelActive(wnd)
 				table.insert(t, {
 					szOption = TIME_LIMIT_TITLE[nSec],
 					fnAction = function()
-						MY.UI(raw):text(TIME_LIMIT_TITLE[nSec])
+						UI(raw):text(TIME_LIMIT_TITLE[nSec])
 						MY_RollMonitor.nTimeLimit = nSec
 						MY_RollMonitor.DrawBoard()
 					end,

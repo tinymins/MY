@@ -458,7 +458,10 @@ local function __OnActive()
 	onFrameCall()
 	onBreatheCall()
 end
-XGUI(MY):uievent('OnFrameBreathe', __OnActive)
+
+local frame = Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. 'ui/WndFrameEmpty.ini', 'MYLIB_Interval')
+frame.OnFrameBreathe = __OnActive
+frame:Hide()
 
 LuaActive_Enable(false)
 

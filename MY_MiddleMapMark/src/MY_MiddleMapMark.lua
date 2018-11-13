@@ -6,6 +6,29 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+---------------------------------------------------------------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
+local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
+---------------------------------------------------------------------------------------------------
 MY.CreateDataRoot(MY_DATA_PATH.GLOBAL)
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_MiddleMapMark/lang/')
 local l_szKeyword, l_dwMapID, l_nMapIndex, l_renderTime = '', nil, nil, 0
@@ -512,7 +535,7 @@ end
 ---------------------------------------------------------------
 local PS = {}
 function PS.OnPanelActive(wnd)
-	local ui = MY.UI(wnd)
+	local ui = UI(wnd)
 	local x, y = ui:pos()
 	local w, h = ui:size()
 
@@ -521,7 +544,7 @@ function PS.OnPanelActive(wnd)
 	  :size(w - 32, h - 50)
 	  :listbox('onlclick', function(hItem, text, id, data, selected)
 	  	OpenMiddleMap(data.dwMapID, 0)
-	  	MY.UI('Topmost1/MiddleMap/Wnd_Tool/Edit_Search'):text(MY.EscapeString(data.szName))
+	  	UI('Topmost1/MiddleMap/Wnd_Tool/Edit_Search'):text(MY.EscapeString(data.szName))
 	  	Station.SetFocusWindow('Topmost1/MiddleMap')
 	  	if not selected then -- avoid unselect
 	  		return false
@@ -588,7 +611,7 @@ function PS.OnPanelActive(wnd)
 end
 
 function PS.OnPanelResize(wnd)
-	local ui = MY.UI(wnd)
+	local ui = UI(wnd)
 	local x, y = ui:pos()
 	local w, h = ui:size()
 

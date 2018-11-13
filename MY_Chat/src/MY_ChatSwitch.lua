@@ -6,6 +6,29 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+---------------------------------------------------------------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
+local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
+---------------------------------------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Chat/lang/')
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Chat/ui/MY_ChatSwitch.ini'
 local CD_REFRESH_OFFSET = 7 * 60 * 60 -- 7µã¸üÐÂCD
@@ -44,7 +67,7 @@ local function UpdateChannelDailyLimit(hRadio, bPlus)
 			end
 		end
 	end
-	XGUI(shaCount):drawCircle(nil, nil, nil, info.color[1], info.color[2], info.color[3], 100, math.pi / 2, math.pi * 2 * dwPercent)
+	UI(shaCount):drawCircle(nil, nil, nil, info.color[1], info.color[2], info.color[3], 100, math.pi / 2, math.pi * 2 * dwPercent)
 end
 
 local function OnClsCheck()
@@ -79,7 +102,7 @@ local function OnClsCheck()
 			}, { szOption = g_tStrings.STR_HOTKEY_CANCEL },
 		})
 	end
-	MY.UI(this):check(false)
+	UI(this):check(false)
 end
 
 local function OnAwayCheck()
@@ -279,7 +302,7 @@ function MY_ChatSwitch.OnFrameCreate()
 				this.tRadios[v.channel] = chk
 			end
 			if v.tip then
-				XGUI(chk):tip(v.tip, MY_TIP_POSTYPE.CENTER)
+				UI(chk):tip(v.tip, MY_TIP_POSTYPE.CENTER)
 			end
 			if txtTitle then
 				txtTitle:SetText(v.title)
@@ -292,7 +315,7 @@ function MY_ChatSwitch.OnFrameCreate()
 				txtCooldown:SetFontColor(unpack(v.color or {255, 255, 255}))
 			end
 			if shaCount then
-				XGUI(shaCount):drawCircle(0, 0, 0)
+				UI(shaCount):drawCircle(0, 0, 0)
 			end
 			chk.info = v
 			UpdateChannelDailyLimit(chk)
@@ -423,7 +446,7 @@ MY.RegisterStorageInit('MY_CHAT', MY_ChatSwitch.ReInitUI)
 
 local PS = {}
 function PS.OnPanelActive(wnd)
-	local ui = MY.UI(wnd)
+	local ui = UI(wnd)
 	local w , h  = ui:size()
 	local x0, y0 = 30, 30
 	local x , y  = x0, y0

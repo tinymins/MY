@@ -15,7 +15,7 @@ local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
 local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
-local huge, pi, random = math.huge, math.pi, math.random
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
 local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
 local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
 local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
@@ -23,10 +23,11 @@ local pack, unpack = table.pack or function(...) return {...} end, table.unpack 
 -- jx3 apis caching
 local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
-local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local IsNil, IsBoolean, IsEmpty, RandomChild = MY.IsNil, MY.IsBoolean, MY.IsEmpty, MY.RandomChild
-local IsNumber, IsString, IsTable, IsFunction = MY.IsNumber, MY.IsString, MY.IsTable, MY.IsFunction
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
+local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
 
 local D = {}
@@ -200,7 +201,7 @@ local function ReloadFrame(frame)
 		txtHotkey:SetFontScheme(7)
 		-- Box±³¾°Í¼
 		if config.boxBgUITex ~= '' then
-			XGUI(imgBoxBg):image(config.boxBgUITex)
+			UI(imgBoxBg):image(config.boxBgUITex)
 		end
 		imgBoxBg:SetVisible(config.boxBgUITex ~= '')
 
@@ -253,7 +254,7 @@ local function ReloadFrame(frame)
 			txtName:SetFontColor(unpack(mon.rgbLongAlias))
 			txtName:SetFontScale(fontScale)
 
-			XGUI(imgProcess):image(config.cdBarUITex)
+			UI(imgProcess):image(config.cdBarUITex)
 			imgProcess:SetW(config.cdBarWidth)
 			imgProcess:SetPercentage(0)
 

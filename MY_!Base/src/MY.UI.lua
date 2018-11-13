@@ -42,9 +42,9 @@ local function createInstance(c, ins, ...)
 	end
 	return c
 end
-XGUI = setmetatable({}, {
+local UI = setmetatable({}, {
 	__index = {},
-	__tostring = function(t) return 'XGUI (class prototype)' end,
+	__tostring = function(t) return 'MY_UI (class prototype)' end,
 	__call = function (...)
 		local store = {}
 		return createInstance(setmetatable({}, {
@@ -55,7 +55,7 @@ XGUI = setmetatable({}, {
 					end
 					return store.raws[k]
 				else
-					return store[k] or XGUI[k]
+					return store[k] or UI[k]
 				end
 			end,
 			__newindex = function(t, k, v)
@@ -65,12 +65,12 @@ XGUI = setmetatable({}, {
 					store[k] = v
 				end
 			end,
-			__tostring = function(t) return 'XGUI (class instance)' end,
+			__tostring = function(t) return 'MY_UI (class instance)' end,
 		}), nil, ...)
 	end,
 })
 end
-local _L, XGUI = MY.LoadLangPack(), XGUI
+local _L = MY.LoadLangPack()
 
 -----------------------------------------------------------
 -- my ui common functions
@@ -141,7 +141,7 @@ local function ApplyUIArguments(ui, arg)
 	end
 	return ui
 end
-XGUI.ApplyUIArguments = ApplyUIArguments
+UI.ApplyUIArguments = ApplyUIArguments
 
 local GetComponentProp, SetComponentProp -- 组件私有属性 仅本文件内使用
 do local l_prop = setmetatable({}, { __mode = 'k' })
@@ -350,7 +350,7 @@ local function InitComponent(raw, szType)
 			if opt.disabled or opt.disabledTmp then
 				return
 			end
-			XGUI(raw):autocomplete('search')
+			UI(raw):autocomplete('search')
 		end
 		edt.OnEditChanged = function()
 			local opt = GetComponentProp(raw, 'autocompleteOptions')
@@ -363,12 +363,12 @@ local function InitComponent(raw, szType)
 			if len >= opt.minLength then
 				-- delay search
 				MY.DelayCall(opt.delay, function()
-					XGUI(raw):autocomplete('search')
+					UI(raw):autocomplete('search')
 					-- for compatible
 					Station.SetFocusWindow(edt)
 				end)
 			else
-				XGUI(raw):autocomplete('close')
+				UI(raw):autocomplete('close')
 			end
 		end
 		edt.OnKillFocus = function()
@@ -411,7 +411,7 @@ local function InitComponent(raw, szType)
 			source       = {}   ,  -- option list
 		})
 	elseif szType == 'WndRadioBox' then
-		XGUI(raw):uievent('OnLButtonUp', function()
+		UI(raw):uievent('OnLButtonUp', function()
 			local group = GetComponentProp(raw, 'group')
 			local p = raw:GetParent():GetFirstChild()
 			while p do
@@ -427,10 +427,10 @@ local function InitComponent(raw, szType)
 	elseif szType == 'WndListBox' then
 		local scroll = raw:Lookup('', 'Handle_Scroll')
 		SetComponentProp(raw, 'OnListItemHandleMouseEnter', function()
-			XGUI(this:Lookup('Image_Bg')):fadeIn(100)
+			UI(this:Lookup('Image_Bg')):fadeIn(100)
 		end)
 		SetComponentProp(raw, 'OnListItemHandleMouseLeave', function()
-			XGUI(this:Lookup('Image_Bg')):fadeTo(500,0)
+			UI(this:Lookup('Image_Bg')):fadeTo(500,0)
 		end)
 		SetComponentProp(raw, 'OnListItemHandleLButtonClick', function()
 			local data = GetComponentProp(this, 'listboxItemData')
@@ -490,7 +490,7 @@ end
 --
 -- ui object creator
 -- same as jQuery.$()
-function XGUI:ctor(super, mixed)
+function UI:ctor(super, mixed)
 	self.raws = {}
 	if IsTable(mixed) then
 		if IsTable(mixed.raws) then
@@ -517,7 +517,7 @@ end
 
 --  del bad raws
 -- (self) _checksum()
-function XGUI:_checksum()
+function UI:_checksum()
 	for i, raw in ipairs_r(self.raws) do
 		if not IsElement(raw) then
 			remove(self.raws, i)
@@ -528,7 +528,7 @@ end
 
 -- add a element to object
 -- same as jQuery.add()
-function XGUI:add(mixed)
+function UI:add(mixed)
 	self:_checksum()
 	local raws = {}
 	for i, raw in ipairs(self.raws) do
@@ -540,12 +540,12 @@ function XGUI:add(mixed)
 	if IsElement(mixed) then
 		insert(raws, mixed)
 	end
-	return XGUI(raws)
+	return UI(raws)
 end
 
 -- delete elements from object
 -- same as jQuery.not()
-function XGUI:del(mixed)
+function UI:del(mixed)
 	self:_checksum()
 	local raws = {}
 	for i, raw in ipairs(self.raws) do
@@ -597,12 +597,12 @@ function XGUI:del(mixed)
 			end
 		end
 	end
-	return XGUI(raws)
+	return UI(raws)
 end
 
 -- filter elements from object
 -- same as jQuery.filter()
-function XGUI:filter(mixed)
+function UI:filter(mixed)
 	self:_checksum()
 	local raws = {}
 	for i, raw in ipairs(self.raws) do
@@ -654,12 +654,12 @@ function XGUI:filter(mixed)
 			end
 		end
 	end
-	return XGUI(raws)
+	return UI(raws)
 end
 
 -- get parent
 -- same as jQuery.parent()
-function XGUI:parent()
+function UI:parent()
 	self:_checksum()
 	local raws, hash, path, parent = {}, {}
 	for _, raw in ipairs(self.raws) do
@@ -672,12 +672,12 @@ function XGUI:parent()
 			end
 		end
 	end
-	return XGUI(raws)
+	return UI(raws)
 end
 
 -- get children
 -- same as jQuery.children()
-function XGUI:children(filter)
+function UI:children(filter)
 	self:_checksum()
 	if IsString(filter) and sub(filter, 1, 1) == '#' and sub(filter, 2, 2) ~= '^' then
 		local raws, hash, name, child, path = {}, {}, sub(filter, 2)
@@ -703,7 +703,7 @@ function XGUI:children(filter)
 				end
 			end
 		end
-		return XGUI(raws)
+		return UI(raws)
 	else
 		local raws, hash, child, path = {}, {}
 		for _, raw in ipairs(self.raws) do
@@ -740,13 +740,13 @@ function XGUI:children(filter)
 				end
 			end
 		end
-		return XGUI(raws):filter(filter)
+		return UI(raws):filter(filter)
 	end
 end
 
 -- find element
 -- same as jQuery.find()
-function XGUI:find(filter)
+function UI:find(filter)
 	self:_checksum()
 	local top, raw, ruid, child
 	local raws, hash, stack, children = {}, {}, {}, {}
@@ -794,11 +794,11 @@ function XGUI:find(filter)
 		-- 因为是求子元素 所以移除第一个压栈的元素（父元素）
 		remove(raws, top + 1)
 	end
-	return XGUI(raws):filter(filter)
+	return UI(raws):filter(filter)
 end
 
 -- filter mouse in component
-function XGUI:ptIn()
+function UI:ptIn()
 	self:_checksum()
 	local raws = {}
 	local cX, cY = Cursor.GetPos()
@@ -813,23 +813,23 @@ function XGUI:ptIn()
 			end
 		end
 	end
-	return XGUI(raws)
+	return UI(raws)
 end
 
 -- each
 -- same as jQuery.each(function(){})
--- :each(XGUI each_self)  -- you can use 'this' to visit raw element likes jQuery
-function XGUI:each(fn)
+-- :each(UI each_self)  -- you can use 'this' to visit raw element likes jQuery
+function UI:each(fn)
 	self:_checksum()
 	for _, raw in pairs(self.raws) do
-		MY.ExecuteWithThis(raw, fn, XGUI(raw))
+		MY.ExecuteWithThis(raw, fn, UI(raw))
 	end
 	return self
 end
 
 -- slice -- index starts from 1
 -- same as jQuery.slice(selector, pos)
-function XGUI:slice(startpos, endpos)
+function UI:slice(startpos, endpos)
 	self:_checksum()
 	startpos = startpos or 1
 	if startpos < 0 then
@@ -843,12 +843,12 @@ function XGUI:slice(startpos, endpos)
 	for i = startpos, endpos, 1 do
 		insert(raws, self.raws[i])
 	end
-	return XGUI(raws)
+	return UI(raws)
 end
 
 -- eq
 -- same as jQuery.eq(pos)
-function XGUI:eq(pos)
+function UI:eq(pos)
 	if pos then
 		return self:slice(pos, pos)
 	end
@@ -857,18 +857,18 @@ end
 
 -- first
 -- same as jQuery.first()
-function XGUI:first()
+function UI:first()
 	return self:slice(1, 1)
 end
 
 -- last
 -- same as jQuery.last()
-function XGUI:last()
+function UI:last()
 	return self:slice(-1, -1)
 end
 
 -- get count
-function XGUI:count()
+function UI:count()
 	self:_checksum()
 	return #self.raws
 end
@@ -881,7 +881,7 @@ end
 -- same as jQuery.remove()
 -- (void) Instance:remove()
 -- (self) Instance:remove(function onRemove)
-function XGUI:remove(onRemove)
+function UI:remove(onRemove)
 	self:_checksum()
 	if onRemove then
 		for _, raw in ipairs(self.raws) do
@@ -949,14 +949,14 @@ local _szItemINI = MY.GetAddonInfo().szFrameworkRoot .. 'ui\\HandleItems.ini'
 -- similar as jQuery.append()
 -- Instance:append(szXml[, bReturnNewItem])
 -- Instance:append(szType[, tArg | szName[, bReturnNewItem]])
-function XGUI:append(arg0, arg1, arg2)
+function UI:append(arg0, arg1, arg2)
 	assert(IsString(arg0))
 	if #arg0 == 0 then
 		return
 	end
 	self:_checksum()
 
-	local ui, szXml, szType, tArg, bReturnNewItem = XGUI()
+	local ui, szXml, szType, tArg, bReturnNewItem = UI()
 	if arg0:find('%<') then
 		szXml, bReturnNewItem = arg0, arg1
 	else
@@ -1000,7 +1000,7 @@ function XGUI:append(arg0, arg1, arg2)
 					InitComponent(raw, szType)
 					raw:ChangeRelation(parentWnd, true, true)
 					ui = ui:add(raw)
-					XGUI(raw):hover(OnCommonComponentMouseEnter, OnCommonComponentMouseLeave):change(OnCommonComponentMouseEnter)
+					UI(raw):hover(OnCommonComponentMouseEnter, OnCommonComponentMouseLeave):change(OnCommonComponentMouseEnter)
 				end
 				Wnd.CloseWindow(frame)
 			elseif sub(szType, 1, 3) ~= 'Wnd' and parentHandle then
@@ -1034,7 +1034,7 @@ end
 -- clear
 -- clear handle
 -- (self) Instance:clear()
-function XGUI:clear()
+function UI:clear()
 	self:_checksum()
 	for _, raw in ipairs(self.raws) do
 		if raw.Clear then
@@ -1051,7 +1051,7 @@ end
 
 -- remove child item until new line
 -- (self) Instance:removeItemUntilNewLine()
-function XGUI:removeItemUntilNewLine()
+function UI:removeItemUntilNewLine()
 	self:_checksum()
 	for _, raw in ipairs(self.raws) do
 		if raw.Clear then
@@ -1072,7 +1072,7 @@ end
 
 -- data set/get
 do local l_data = setmetatable({}, { __mode = 'k' })
-function XGUI:data(key, value)
+function UI:data(key, value)
 	self:_checksum()
 	if key and value then -- set
 		for _, raw in ipairs(self.raws) do
@@ -1092,7 +1092,7 @@ end
 end
 
 -- show
-function XGUI:show()
+function UI:show()
 	self:_checksum()
 	for _, raw in ipairs(self.raws) do
 		raw:Show()
@@ -1101,7 +1101,7 @@ function XGUI:show()
 end
 
 -- hide
-function XGUI:hide()
+function UI:hide()
 	self:_checksum()
 	for _, raw in ipairs(self.raws) do
 		raw:Hide()
@@ -1110,14 +1110,14 @@ function XGUI:hide()
 end
 
 -- visible
-function XGUI:visible(bVisible)
+function UI:visible(bVisible)
 	self:_checksum()
 	if IsBoolean(bVisible) then
 		return self:toggle(bVisible)
 	elseif IsFunction(bVisible) then
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'CHECKBOX') or GetComponentElement(raw, 'MAIN_WINDOW') or raw
-			MY.BreatheCall('XGUI_VISIBLE_CHECK#' .. tostring(raw), function()
+			MY.BreatheCall('MY_UI_VISIBLE_CHECK#' .. tostring(raw), function()
 				if IsElement(raw) then
 					raw:SetVisible(bVisible())
 				else
@@ -1180,7 +1180,7 @@ local function SetComponentEnable(raw, bEnable)
 	SetComponentProp(raw, 'bEnable', bEnable)
 end
 
-function XGUI:enable(...)
+function UI:enable(...)
 	self:_checksum()
 	local argc = select('#', ...)
 	if argc == 1 then
@@ -1188,7 +1188,7 @@ function XGUI:enable(...)
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'CHECKBOX') or GetComponentElement(raw, 'MAIN_WINDOW') or raw
 			if IsFunction(bEnable) then
-				MY.BreatheCall('XGUI_ENABLE_CHECK#' .. tostring(raw), function()
+				MY.BreatheCall('MY_UI_ENABLE_CHECK#' .. tostring(raw), function()
 					if IsElement(raw) then
 						SetComponentEnable(raw, bEnable())
 					else
@@ -1215,7 +1215,7 @@ end
 end
 
 -- show/hide raws
-function XGUI:toggle(bShow)
+function UI:toggle(bShow)
 	self:_checksum()
 	for _, raw in ipairs(self.raws) do
 		if bShow == false or (bShow == nil and raw:IsVisible()) then
@@ -1231,7 +1231,7 @@ end
 -- (self) drag(boolean bEnableDrag) -- enable/disable drag
 -- (self) drag(number nX, number y, number w, number h) -- set drag positon and area
 -- (self) drag(function fnOnDrag, function fnOnDragEnd)-- bind frame/item frag event handle
-function XGUI:drag(...)
+function UI:drag(...)
 	self:_checksum()
 	local argc = select('#', ...)
 	local arg0, arg1, arg2, arg3 = ...
@@ -1256,17 +1256,17 @@ function XGUI:drag(...)
 		for _, raw in ipairs(self.raws) do
 			if raw:GetType() == 'WndFrame' then
 				if arg0 then
-					XGUI(raw):uievent('OnFrameDragSetPosEnd', arg0)
+					UI(raw):uievent('OnFrameDragSetPosEnd', arg0)
 				end
 				if arg1 then
-					XGUI(raw):uievent('OnFrameDragEnd', arg1)
+					UI(raw):uievent('OnFrameDragEnd', arg1)
 				end
 			elseif raw:GetBaseType() == 'Item' then
 				if arg0 then
-					XGUI(raw):uievent('OnItemLButtonDrag', arg0)
+					UI(raw):uievent('OnItemLButtonDrag', arg0)
 				end
 				if arg1 then
-					XGUI(raw):uievent('OnItemLButtonDragEnd', arg1)
+					UI(raw):uievent('OnItemLButtonDragEnd', arg1)
 				end
 			end
 		end
@@ -1280,7 +1280,7 @@ function XGUI:drag(...)
 end
 
 -- get/set ui object text
-function XGUI:text(arg0, arg1)
+function UI:text(arg0, arg1)
 	self:_checksum()
 	if not IsNil(arg0) and not IsBoolean(arg0) then
 		local componentType, element
@@ -1352,7 +1352,7 @@ function XGUI:text(arg0, arg1)
 end
 
 -- get/set ui object text
-function XGUI:placeholder(szText)
+function UI:placeholder(szText)
 	self:_checksum()
 	if szText then
 		for _, raw in ipairs(self.raws) do
@@ -1374,7 +1374,7 @@ function XGUI:placeholder(szText)
 end
 
 -- ui autocomplete interface
-function XGUI:autocomplete(method, arg1, arg2)
+function UI:autocomplete(method, arg1, arg2)
 	self:_checksum()
 	if method == 'option' and (IsNil(arg1) or (IsString(arg1) and IsNil(arg2))) then -- get
 		-- try to get its option
@@ -1485,7 +1485,7 @@ function XGUI:autocomplete(method, arg1, arg2)
 												remove(opt.source, i)
 											end
 										end
-										XGUI(raw):autocomplete('search')
+										UI(raw):autocomplete('search')
 									end
 									if opt.beforeDelete then
 										bSure = opt.beforeDelete(src, fnDoDelete, opt)
@@ -1567,7 +1567,7 @@ function XGUI:autocomplete(method, arg1, arg2)
 end
 
 -- ui listbox interface
-function XGUI:listbox(method, arg1, arg2, arg3, arg4)
+function UI:listbox(method, arg1, arg2, arg3, arg4)
 	self:_checksum()
 	if method == 'option' and (IsNil(arg1) or (IsString(arg1) and IsNil(arg2))) then -- get
 		-- try to get its option
@@ -1738,7 +1738,7 @@ function XGUI:listbox(method, arg1, arg2, arg3, arg4)
 end
 
 -- get/set ui object name
-function XGUI:name(szText)
+function UI:name(szText)
 	self:_checksum()
 	if szText then -- set name
 		for _, raw in ipairs(self.raws) do
@@ -1754,7 +1754,7 @@ function XGUI:name(szText)
 end
 
 -- get/set ui object group
-function XGUI:group(szText)
+function UI:group(szText)
 	self:_checksum()
 	if szText then -- set group
 		for _, raw in ipairs(self.raws) do
@@ -1770,7 +1770,7 @@ function XGUI:group(szText)
 end
 
 -- set ui penetrable
-function XGUI:penetrable(bPenetrable)
+function UI:penetrable(bPenetrable)
 	self:_checksum()
 	if IsBoolean(bPenetrable) then -- set penetrable
 		for _, raw in ipairs(self.raws) do
@@ -1789,7 +1789,7 @@ function XGUI:penetrable(bPenetrable)
 end
 
 -- get/set ui alpha
-function XGUI:alpha(nAlpha)
+function UI:alpha(nAlpha)
 	self:_checksum()
 	if nAlpha then -- set name
 		for _, raw in ipairs(self.raws) do
@@ -1805,7 +1805,7 @@ function XGUI:alpha(nAlpha)
 end
 
 -- (self) Instance:fadeTo(nTime, nOpacity, callback)
-function XGUI:fadeTo(nTime, nOpacity, callback)
+function UI:fadeTo(nTime, nOpacity, callback)
 	self:_checksum()
 	if nTime and nOpacity then
 		for i, raw in ipairs(self.raws) do
@@ -1835,7 +1835,7 @@ function XGUI:fadeTo(nTime, nOpacity, callback)
 end
 
 -- (self) Instance:fadeIn(nTime, callback)
-function XGUI:fadeIn(nTime, callback)
+function UI:fadeIn(nTime, callback)
 	self:_checksum()
 	nTime = nTime or 300
 	for i, raw in ipairs(self.raws) do
@@ -1845,7 +1845,7 @@ function XGUI:fadeIn(nTime, callback)
 end
 
 -- (self) Instance:fadeOut(nTime, callback)
-function XGUI:fadeOut(nTime, callback)
+function UI:fadeOut(nTime, callback)
 	self:_checksum()
 	nTime = nTime or 300
 	for i, raw in ipairs(self.raws) do
@@ -1862,7 +1862,7 @@ function XGUI:fadeOut(nTime, callback)
 end
 
 -- (self) Instance:slideTo(nTime, nHeight, callback)
-function XGUI:slideTo(nTime, nHeight, callback)
+function UI:slideTo(nTime, nHeight, callback)
 	self:_checksum()
 	if nTime and nHeight then
 		for i, raw in ipairs(self.raws) do
@@ -1892,7 +1892,7 @@ function XGUI:slideTo(nTime, nHeight, callback)
 end
 
 -- (self) Instance:slideUp(nTime, callback)
-function XGUI:slideUp(nTime, callback)
+function UI:slideUp(nTime, callback)
 	self:_checksum()
 	nTime = nTime or 300
 	for i, raw in ipairs(self.raws) do
@@ -1906,7 +1906,7 @@ function XGUI:slideUp(nTime, callback)
 end
 
 -- (self) Instance:slideDown(nTime, callback)
-function XGUI:slideDown(nTime, callback)
+function UI:slideDown(nTime, callback)
 	self:_checksum()
 	nTime = nTime or 300
 	for i, raw in ipairs(self.raws) do
@@ -1917,7 +1917,7 @@ end
 
 -- (number) Instance:font()
 -- (self) Instance:font(number nFont)
-function XGUI:font(nFont)
+function UI:font(nFont)
 	self:_checksum()
 	if nFont then -- set name
 		local element
@@ -1943,7 +1943,7 @@ end
 
 -- (number, number, number) Instance:color()
 -- (self) Instance:color(number r, number g, number b)
-function XGUI:color(r, g, b)
+function UI:color(r, g, b)
 	self:_checksum()
 	if IsTable(r) then
 		r, g, b = unpack(r)
@@ -1980,7 +1980,7 @@ function XGUI:color(r, g, b)
 	end
 end
 
-function XGUI:drawEclipse(nX, nY, nMajorAxis, nMinorAxis, nR, nG, nB, nA, dwRotate, dwPitch, dwRad, nAccuracy)
+function UI:drawEclipse(nX, nY, nMajorAxis, nMinorAxis, nR, nG, nB, nA, dwRotate, dwPitch, dwRad, nAccuracy)
 	nR, nG, nB, nA = nR or 255, nG or 255, nB or 255, nA or 255
 	dwRotate, dwPitch, dwRad = dwRotate or 0, dwPitch or 0, dwRad or (2 * math.pi)
 	nAccuracy = nAccuracy or 32
@@ -2019,7 +2019,7 @@ function XGUI:drawEclipse(nX, nY, nMajorAxis, nMinorAxis, nR, nG, nB, nA, dwRota
 	return self
 end
 
-function XGUI:drawCircle(nX, nY, nRadius, nR, nG, nB, nA, dwPitch, dwRad, nAccuracy)
+function UI:drawCircle(nX, nY, nRadius, nR, nG, nB, nA, dwPitch, dwRad, nAccuracy)
 	nR, nG, nB, nA = nR or 255, nG or 255, nB or 255, nA or 255
 	dwPitch, dwRad = dwPitch or 0, dwRad or (2 * math.pi)
 	nAccuracy = nAccuracy or 32
@@ -2047,7 +2047,7 @@ function XGUI:drawCircle(nX, nY, nRadius, nR, nG, nB, nA, dwPitch, dwRad, nAccur
 	return self
 end
 
-function XGUI:drawGwText(szText, nX ,nY, nZ, nR, nG, nB, nA, nFont, fFontScale, fSpacing)
+function UI:drawGwText(szText, nX ,nY, nZ, nR, nG, nB, nA, nFont, fFontScale, fSpacing)
 	local sha
 	for _, raw in ipairs(self.raws) do
 		sha = GetComponentElement(raw, 'SHADOW')
@@ -2069,7 +2069,7 @@ function XGUI:drawGwText(szText, nX ,nY, nZ, nR, nG, nB, nA, nFont, fFontScale, 
 	return self
 end
 
-function XGUI:drawGwCircle(nX, nY, nZ, nRadius, nR, nG, nB, nA, dwPitch, dwRad)
+function UI:drawGwCircle(nX, nY, nZ, nRadius, nR, nG, nB, nA, dwPitch, dwRad)
 	nRadius, dwPitch, dwRad = nRadius or 64 * 3, dwPitch or 0, dwRad or (2 * pi)
 	nR, nG, nB, nA = nR or 255, nG or 255, nB or 255, nA or 120
 	local sha, dwRad1, dwRad2, nSceneX, nSceneZ, nSceneXD, nSceneZD
@@ -2095,7 +2095,7 @@ end
 
 -- (number) Instance:left()
 -- (self) Instance:left(number)
-function XGUI:left(nLeft)
+function UI:left(nLeft)
 	if nLeft then
 		return self:pos(nLeft, nil)
 	else
@@ -2106,7 +2106,7 @@ end
 
 -- (number) Instance:top()
 -- (self) Instance:top(number)
-function XGUI:top(nTop)
+function UI:top(nTop)
 	if nTop then
 		return self:pos(nil, nTop)
 	else
@@ -2117,7 +2117,7 @@ end
 
 -- (number, number) Instance:pos()
 -- (self) Instance:pos(nLeft, nTop)
-function XGUI:pos(nLeft, nTop)
+function UI:pos(nLeft, nTop)
 	self:_checksum()
 	if nLeft or nTop then
 		for _, raw in ipairs(self.raws) do
@@ -2140,14 +2140,14 @@ function XGUI:pos(nLeft, nTop)
 end
 
 -- (self) Instance:shake(xrange, yrange, maxspeed, time)
-function XGUI:shake(xrange, yrange, maxspeed, time)
+function UI:shake(xrange, yrange, maxspeed, time)
 	self:_checksum()
 	if xrange and yrange and maxspeed and time then
 		local starttime = GetTime()
 		local xspeed, yspeed = maxspeed, - maxspeed
 		local xhalfrange, yhalfrange = xrange / 2, yrange / 2
 		for _, raw in ipairs(self.raws) do
-			local ui = XGUI(raw)
+			local ui = UI(raw)
 			local xoffset, yoffset = 0, 0
 			MY.RenderCall(tostring(raw) .. ' shake', function()
 				if ui:count() == 0 then
@@ -2191,7 +2191,7 @@ end
 
 -- (anchor) Instance:anchor()
 -- (self) Instance:anchor(anchor)
-function XGUI:anchor(anchor)
+function UI:anchor(anchor)
 	self:_checksum()
 	if IsTable(anchor) then
 		for _, raw in ipairs(self.raws) do
@@ -2211,7 +2211,7 @@ end
 
 -- (number) Instance:width()
 -- (self) Instance:width(number)
-function XGUI:width(nWidth, nRawWidth)
+function UI:width(nWidth, nRawWidth)
 	if nWidth then
 		return self:size(nWidth, nil, nRawWidth, nil)
 	else
@@ -2222,7 +2222,7 @@ end
 
 -- (number) Instance:height()
 -- (self) Instance:height(number)
-function XGUI:height(nHeight, nRawHeight)
+function UI:height(nHeight, nRawHeight)
 	if nHeight then
 		return self:size(nil, nHeight, nil, nRawHeight)
 	else
@@ -2234,7 +2234,7 @@ end
 -- (number, number) Instance:size(bInnerSize)
 -- (self) Instance:size(nLeft, nTop)
 -- (self) Instance:size(OnSizeChanged)
-function XGUI:size(arg0, arg1, arg2, arg3)
+function UI:size(arg0, arg1, arg2, arg3)
 	self:_checksum()
 	if arg0 == 'auto' and arg1 == 'auto' then
 		return self:autoSize()
@@ -2247,7 +2247,7 @@ function XGUI:size(arg0, arg1, arg2, arg3)
 	end
 	if IsFunction(arg0) then
 		for _, raw in ipairs(self.raws) do
-			XGUI(raw):uievent('OnSizeChanged', arg0)
+			UI(raw):uievent('OnSizeChanged', arg0)
 		end
 		return self
 	elseif IsNumber(arg0) or IsNumber(arg1) or IsNumber(arg2) or IsNumber(arg3) then
@@ -2499,7 +2499,7 @@ local function AutoSize(raw, bAutoWidth, bAutoHeight)
 		or componentType == 'WndSliderBox' then
 			local txt = GetComponentElement(raw, 'TEXT')
 			if txt then
-				local ui = XGUI(raw)
+				local ui = UI(raw)
 				local W, H, RW, RH = ui:size()
 				local ow, oh = txt:GetSize()
 				txt:AutoSize()
@@ -2525,7 +2525,7 @@ end
 
 -- Auto set width of element by text
 -- (self) Instance:autoWidth()
-function XGUI:autoWidth()
+function UI:autoWidth()
 	self:_checksum()
 	for _, raw in ipairs(self.raws) do
 		AutoSize(raw, true, false)
@@ -2535,7 +2535,7 @@ end
 
 -- Auto set height of element by text
 -- (self) Instance:autoHeight()
-function XGUI:autoHeight()
+function UI:autoHeight()
 	self:_checksum()
 	for _, raw in ipairs(self.raws) do
 		AutoSize(raw, false, true)
@@ -2545,7 +2545,7 @@ end
 
 -- (self) Instance:autoSize() -- resize Text element by autoSize
 -- (self) Instance:autoSize(bool bAutoSize) -- set if Text is autoSize
-function XGUI:autoSize(arg0, arg1)
+function UI:autoSize(arg0, arg1)
 	self:_checksum()
 	if IsNil(arg0) then
 		for _, raw in ipairs(self.raws) do
@@ -2564,7 +2564,7 @@ end
 
 -- (number) Instance:fontScale()
 -- (self) Instance:fontScale(bool nScale)
-function XGUI:fontScale(nScale)
+function UI:fontScale(nScale)
 	self:_checksum()
 	if IsNumber(nScale) then
 		for _, raw in ipairs(self.raws) do
@@ -2588,7 +2588,7 @@ end
 -- (number) Instance:scroll() -- get current scroll percentage (none scroll will return -1)
 -- (self) Instance:scroll(number nPercentage) -- set scroll percentage
 -- (self) Instance:scroll(function OnScrollBarPosChanged) -- bind scroll event handle
-function XGUI:scroll(mixed)
+function UI:scroll(mixed)
 	self:_checksum()
 	if mixed then -- set
 		if IsNumber(mixed) then
@@ -2602,7 +2602,7 @@ function XGUI:scroll(mixed)
 			for _, raw in ipairs(self.raws) do
 				local raw = raw:Lookup('WndScrollBar')
 				if raw then
-					XGUI(raw):uievent('OnScrollBarPosChanged', function()
+					UI(raw):uievent('OnScrollBarPosChanged', function()
 						local nDistance = Station.GetMessageWheelDelta()
 						local nScrollPos = raw:GetScrollPos()
 						local nStepCount = raw:GetStepCount()
@@ -2633,7 +2633,7 @@ end
 
 -- (number, number) Instance:range()
 -- (self) Instance:range(nMin, nMax)
-function XGUI:range(nMin, nMax)
+function UI:range(nMin, nMax)
 	self:_checksum()
 	if IsNumber(nMin) and IsNumber(nMax) and nMax > nMin then
 		for _, raw in ipairs(self.raws) do
@@ -2656,7 +2656,7 @@ end
 
 -- (number, number) Instance:value()
 -- (self) Instance:value(nValue)
-function XGUI:value(nValue)
+function UI:value(nValue)
 	self:_checksum()
 	if nValue then
 		for _, raw in ipairs(self.raws) do
@@ -2676,7 +2676,7 @@ end
 
 -- (boolean) Instance:multiLine()
 -- (self) Instance:multiLine(bMultiLine)
-function XGUI:multiLine(bMultiLine)
+function UI:multiLine(bMultiLine)
 	self:_checksum()
 	if IsBoolean(bMultiLine) then
 		local element
@@ -2705,7 +2705,7 @@ end
 
 -- (self) Instance:image(szImageAndFrame)
 -- (self) Instance:image(szImage, nFrame)
-function XGUI:image(szImage, nFrame)
+function UI:image(szImage, nFrame)
 	self:_checksum()
 	if szImage then
 		if IsString(szImage) and IsNil(nFrame) then
@@ -2735,7 +2735,7 @@ end
 
 -- (self) Instance:frame(nFrame)
 -- (number) Instance:frame()
-function XGUI:frame(nFrame)
+function UI:frame(nFrame)
 	self:_checksum()
 	if nFrame then
 		nFrame = tonumber(nFrame)
@@ -2757,7 +2757,7 @@ end
 
 -- (self) Instance:itemInfo(...)
 -- NOTICE：only for Box
-function XGUI:itemInfo(...)
+function UI:itemInfo(...)
 	local data = { ... }
 	for _, raw in ipairs(self.raws) do
 		raw = GetComponentElement(raw, 'BOX')
@@ -2781,7 +2781,7 @@ end
 
 -- (self) Instance:boxInfo(nType, ...)
 -- NOTICE：only for Box
-function XGUI:boxInfo(nType, ...)
+function UI:boxInfo(nType, ...)
 	for _, raw in ipairs(self.raws) do
 		raw = GetComponentElement(raw, 'BOX')
 		if raw then
@@ -2801,7 +2801,7 @@ end
 -- (self) Instance:icon(dwIcon)
 -- (number) Instance:icon()
 -- NOTICE：only for Box
-function XGUI:icon(dwIconID)
+function UI:icon(dwIconID)
 	self:_checksum()
 	if IsNumber(dwIconID) then
 		local element
@@ -2829,7 +2829,7 @@ function XGUI:icon(dwIconID)
 end
 
 -- (self) Instance:handleStyle(dwStyle)
-function XGUI:handleStyle(dwStyle)
+function UI:handleStyle(dwStyle)
 	self:_checksum()
 	if dwStyle then
 		for _, raw in ipairs(self.raws) do
@@ -2843,7 +2843,7 @@ function XGUI:handleStyle(dwStyle)
 end
 
 -- (self) Instance:editType(dwType)
-function XGUI:editType(dwType)
+function UI:editType(dwType)
 	self:_checksum()
 	if dwType then
 		for _, raw in ipairs(self.raws) do
@@ -2856,8 +2856,8 @@ function XGUI:editType(dwType)
 	return self
 end
 
--- (self) XGUI:limit(nLimit)
-function XGUI:limit(nLimit)
+-- (self) UI:limit(nLimit)
+function UI:limit(nLimit)
 	self:_checksum()
 	if nLimit then
 		for _, raw in ipairs(self.raws) do
@@ -2878,8 +2878,8 @@ function XGUI:limit(nLimit)
 	end
 end
 
--- (self) XGUI:align(halign, valign)
-function XGUI:align(halign, valign)
+-- (self) UI:align(halign, valign)
+function UI:align(halign, valign)
 	self:_checksum()
 	if valign or halign then
 		for _, raw in ipairs(self.raws) do
@@ -2909,8 +2909,8 @@ function XGUI:align(halign, valign)
 	end
 end
 
--- (self) XGUI:sliderStyle(nSliderStyle)
-function XGUI:sliderStyle(nSliderStyle)
+-- (self) UI:sliderStyle(nSliderStyle)
+function UI:sliderStyle(nSliderStyle)
 	self:_checksum()
 	local bShowPercentage = nSliderStyle == MY_SLIDER_DISPTYPE.SHOW_PERCENT
 	for _, raw in ipairs(self.raws) do
@@ -2921,8 +2921,8 @@ function XGUI:sliderStyle(nSliderStyle)
 	return self
 end
 
--- (self) XGUI:formatChildrenPos()
-function XGUI:formatChildrenPos()
+-- (self) UI:formatChildrenPos()
+function UI:formatChildrenPos()
 	self:_checksum()
 	for _, raw in ipairs(self.raws) do
 		if GetComponentType(raw) == 'Handle' then
@@ -2935,7 +2935,7 @@ function XGUI:formatChildrenPos()
 end
 
 -- (self) Instance:bringToTop()
-function XGUI:bringToTop()
+function UI:bringToTop()
 	self:_checksum()
 	for _, raw in ipairs(self.raws) do
 		raw = GetComponentElement(raw, 'MAIN_WINDOW')
@@ -2947,7 +2947,7 @@ function XGUI:bringToTop()
 end
 
 -- (self) Instance:bringToBottom()
-function XGUI:bringToBottom()
+function UI:bringToBottom()
 	self:_checksum()
 	for _, raw in ipairs(self.raws) do
 		raw = GetComponentElement(raw, 'MAIN_WINDOW')
@@ -2965,7 +2965,7 @@ function XGUI:bringToBottom()
 end
 
 -- (self) Instance:refresh()
-function XGUI:refresh()
+function UI:refresh()
 	self:_checksum()
 	for _, raw in ipairs(self.raws) do
 		raw = GetComponentElement(raw, 'MAIN_HANDLE')
@@ -2981,7 +2981,7 @@ end
 -----------------------------------------------------------
 
 -- 绑定Frame的事件
-function XGUI:event(szEvent, fnEvent)
+function UI:event(szEvent, fnEvent)
 	self:_checksum()
 	if IsString(szEvent) then
 		local nPos, szKey = (StringFindW(szEvent, '.'))
@@ -3047,7 +3047,7 @@ function XGUI:event(szEvent, fnEvent)
 end
 
 -- 绑定ele的UI事件
-function XGUI:uievent(szEvent, fnEvent)
+function UI:uievent(szEvent, fnEvent)
 	self:_checksum()
 	if IsString(szEvent) then
 		local nPos, szKey = (StringFindW(szEvent, '.'))
@@ -3075,8 +3075,8 @@ function XGUI:uievent(szEvent, fnEvent)
 							if #res > 0 then
 								if #rets > 0 then
 									MY.Debug(
-										{ _L('Set return value failed, cause another hook has alreay take a returnval. [Path] %s', XGUI.GetTreePath(raw)) },
-										'XGUI:uievent#' .. szEvent .. ':' .. (p.id or 'Unnamed'), MY_DEBUG.WARNING
+										{ _L('Set return value failed, cause another hook has alreay take a returnval. [Path] %s', UI.GetTreePath(raw)) },
+										'UI:uievent#' .. szEvent .. ':' .. (p.id or 'Unnamed'), MY_DEBUG.WARNING
 									)
 								else
 									rets = res
@@ -3127,7 +3127,7 @@ end
 
 -- customMode 设置Frame的CustomMode
 -- (self) Instance:customMode(string szTip, function fnOnEnterCustomMode, function fnOnLeaveCustomMode)
-function XGUI:customMode(szTip, fnOnEnterCustomMode, fnOnLeaveCustomMode, szPoint)
+function UI:customMode(szTip, fnOnEnterCustomMode, fnOnLeaveCustomMode, szPoint)
 	self:_checksum()
 	if IsString(szTip) then
 		self:event('ON_ENTER_CUSTOM_UI_MODE', function()
@@ -3151,12 +3151,12 @@ end
 
 -- breathe 设置Frame的breathe
 -- (self) Instance:breathe(function fnOnFrameBreathe)
-function XGUI:breathe(fnOnFrameBreathe)
+function UI:breathe(fnOnFrameBreathe)
 	self:_checksum()
 	if IsFunction(fnOnFrameBreathe) then
 		for _, raw in ipairs(self.raws) do
 			if raw:GetType() == 'WndFrame' then
-				XGUI(raw):uievent('OnFrameBreathe', fnOnFrameBreathe)
+				UI(raw):uievent('OnFrameBreathe', fnOnFrameBreathe)
 			end
 		end
 	end
@@ -3166,7 +3166,7 @@ end
 -- menu 弹出菜单
 -- :menu(table menu)  弹出菜单menu
 -- :menu(function fn)  弹出菜单function返回值table
-function XGUI:menu(lmenu, rmenu, bNoAutoBind)
+function UI:menu(lmenu, rmenu, bNoAutoBind)
 	self:_checksum()
 	if not bNoAutoBind then
 		rmenu = rmenu or lmenu
@@ -3205,14 +3205,14 @@ end
 -- lmenu 弹出左键菜单
 -- :lmenu(table menu)  弹出菜单menu
 -- :lmenu(function fn)  弹出菜单function返回值table
-function XGUI:lmenu(menu)
+function UI:lmenu(menu)
 	return self:menu(menu, nil, true)
 end
 
 -- rmenu 弹出右键菜单
 -- :lmenu(table menu)  弹出菜单menu
 -- :lmenu(function fn)  弹出菜单function返回值table
-function XGUI:rmenu(menu)
+function UI:rmenu(menu)
 	return self:menu(nil, menu, true)
 end
 
@@ -3224,7 +3224,7 @@ end
 -- n: 1    左键
 --    0    中键
 --   -1    右键
-function XGUI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
+function UI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 	self:_checksum()
 	if IsFunction(fnLClick) or IsFunction(fnMClick) or IsFunction(fnRClick) then
 		if not bNoAutoBind then
@@ -3235,22 +3235,22 @@ function XGUI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 			if IsFunction(fnLClick) then
 				local fnAction = function() MY.ExecuteWithThis(raw, fnLClick, MY_MOUSE_EVENT.LBUTTON) end
 				if GetComponentType(raw) == 'WndScrollBox' then
-					XGUI(GetComponentElement(raw, 'MAIN_HANDLE')):uievent('OnItemLButtonClick', fnAction)
+					UI(GetComponentElement(raw, 'MAIN_HANDLE')):uievent('OnItemLButtonClick', fnAction)
 				else
 					local cmb = GetComponentElement(raw, 'COMBOBOX')
 					local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 					local itm = GetComponentElement(raw, 'ITEM')
 					local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
 					if cmb then
-						XGUI(cmb):uievent('OnLButtonClick', fnAction)
+						UI(cmb):uievent('OnLButtonClick', fnAction)
 					elseif wnd then
-						XGUI(wnd):uievent('OnLButtonClick', fnAction)
+						UI(wnd):uievent('OnLButtonClick', fnAction)
 					elseif itm then
 						itm:RegisterEvent(16)
-						XGUI(itm):uievent('OnItemLButtonClick', fnAction)
+						UI(itm):uievent('OnItemLButtonClick', fnAction)
 					elseif hdl then
 						hdl:RegisterEvent(16)
-						XGUI(hdl):uievent('OnItemLButtonClick', fnAction)
+						UI(hdl):uievent('OnItemLButtonClick', fnAction)
 					end
 				end
 			end
@@ -3260,22 +3260,22 @@ function XGUI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 			if IsFunction(fnRClick) then
 				local fnAction = function() MY.ExecuteWithThis(raw, fnRClick, MY_MOUSE_EVENT.RBUTTON) end
 				if GetComponentType(raw) == 'WndScrollBox' then
-					XGUI(GetComponentElement(raw, 'MAIN_HANDLE')):uievent('OnItemRButtonClick', fnAction)
+					UI(GetComponentElement(raw, 'MAIN_HANDLE')):uievent('OnItemRButtonClick', fnAction)
 				else
 					local cmb = GetComponentElement(raw, 'COMBOBOX')
 					local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
 					local itm = GetComponentElement(raw, 'ITEM')
 					local hdl = GetComponentElement(raw, 'MAIN_HANDLE')
 					if cmb then
-						XGUI(cmb):uievent('OnRButtonClick', fnAction)
+						UI(cmb):uievent('OnRButtonClick', fnAction)
 					elseif wnd then
-						XGUI(wnd):uievent('OnRButtonClick', fnAction)
+						UI(wnd):uievent('OnRButtonClick', fnAction)
 					elseif itm then
 						itm:RegisterEvent(32)
-						XGUI(itm):uievent('OnItemRButtonClick', fnAction)
+						UI(itm):uievent('OnItemRButtonClick', fnAction)
 					elseif hdl then
 						hdl:RegisterEvent(32)
-						XGUI(hdl):uievent('OnItemRButtonClick', fnAction)
+						UI(hdl):uievent('OnItemRButtonClick', fnAction)
 					end
 				end
 			end
@@ -3307,7 +3307,7 @@ end
 -- same as jQuery.lclick()
 -- :lclick(fnAction) 绑定
 -- :lclick()         触发
-function XGUI:lclick(fnLClick)
+function UI:lclick(fnLClick)
 	return self:click(fnLClick or MY_MOUSE_EVENT.LBUTTON, nil, nil, true)
 end
 
@@ -3315,7 +3315,7 @@ end
 -- same as jQuery.rclick()
 -- :rclick(fnAction) 绑定
 -- :rclick()         触发
-function XGUI:rclick(fnRClick)
+function UI:rclick(fnRClick)
 	return self:click(nil, fnRClick or MY_MOUSE_EVENT.RBUTTON, nil, true)
 end
 
@@ -3323,23 +3323,23 @@ end
 -- same as jQuery.mclick()
 -- :mclick(fnAction) 绑定
 -- :mclick()         触发
-function XGUI:mclick(fnMClick)
+function UI:mclick(fnMClick)
 	return self:click(nil, nil, fnMClick or MY_MOUSE_EVENT.MBUTTON, true)
 end
 
 -- complete 加载完成事件
 -- :complete(fnOnComplete) 绑定
-function XGUI:complete(fnOnComplete)
+function UI:complete(fnOnComplete)
 	self:_checksum()
 	if fnOnComplete then
 		for _, raw in ipairs(self.raws) do
 			local wnd = GetComponentElement(raw, 'WEBPAGE')
 			if wnd then
-				XGUI(wnd):uievent('OnDocumentComplete', fnOnComplete)
+				UI(wnd):uievent('OnDocumentComplete', fnOnComplete)
 			end
 			local wnd = GetComponentElement(raw, 'WEBCEF')
 			if wnd then
-				XGUI(wnd):uievent('OnWebLoadEnd', fnOnComplete)
+				UI(wnd):uievent('OnWebLoadEnd', fnOnComplete)
 			end
 		end
 	end
@@ -3349,7 +3349,7 @@ end
 -- hover 鼠标悬停事件
 -- same as jQuery.hover()
 -- :hover(fnHover[, fnLeave]) 绑定
-function XGUI:hover(fnHover, fnLeave, bNoAutoBind)
+function UI:hover(fnHover, fnLeave, bNoAutoBind)
 	self:_checksum()
 	if not bNoAutoBind then
 		fnLeave = fnLeave or fnHover
@@ -3359,10 +3359,10 @@ function XGUI:hover(fnHover, fnLeave, bNoAutoBind)
 			local wnd = GetComponentElement(raw, 'EDIT') or GetComponentElement(raw, 'MAIN_WINDOW')
 			local itm = GetComponentElement(raw, 'ITEM')
 			if wnd then
-				XGUI(wnd):uievent('OnMouseIn', function() fnHover(true) end)
+				UI(wnd):uievent('OnMouseIn', function() fnHover(true) end)
 			elseif itm then
 				itm:RegisterEvent(256)
-				XGUI(itm):uievent('OnItemMouseIn', function() fnHover(true) end)
+				UI(itm):uievent('OnItemMouseIn', function() fnHover(true) end)
 			end
 		end
 	end
@@ -3371,10 +3371,10 @@ function XGUI:hover(fnHover, fnLeave, bNoAutoBind)
 			local wnd = GetComponentElement(raw, 'EDIT') or GetComponentElement(raw, 'MAIN_WINDOW')
 			local itm = GetComponentElement(raw, 'ITEM')
 			if wnd then
-				XGUI(wnd):uievent('OnMouseOut', function() fnLeave(false) end)
+				UI(wnd):uievent('OnMouseOut', function() fnLeave(false) end)
 			elseif itm then
 				itm:RegisterEvent(256)
-				XGUI(itm):uievent('OnItemMouseOut', function() fnLeave(false) end)
+				UI(itm):uievent('OnItemMouseOut', function() fnLeave(false) end)
 			end
 		end
 	end
@@ -3387,7 +3387,7 @@ end
 -- number nPosType:    提示位置 有效值为MY_TIP_HIDEWAY.枚举
 -- table tOffset:      提示框偏移量等附加信息{ x = x, y = y, hide = MY_TIP_HIDEWAY.Hide枚举, nFont = 字体, r, g, b = 字颜色 }
 -- boolean bNoEncode:  当szTip为纯文本时保持这个参数为false 当szTip为格式化的DOM字符串时设置该参数为true
-function XGUI:tip(tip, nPosType, tOffset, bNoEncode)
+function UI:tip(tip, nPosType, tOffset, bNoEncode)
 	tOffset = tOffset or {}
 	tOffset.x = tOffset.x or 0
 	tOffset.y = tOffset.y or 0
@@ -3427,7 +3427,7 @@ end
 -- :check(fnOnCheckBoxCheck[, fnOnCheckBoxUncheck]) 绑定
 -- :check()                返回是否已勾选
 -- :check(bool bChecked)   勾选/取消勾选
-function XGUI:check(fnCheck, fnUncheck, bNoAutoBind)
+function UI:check(fnCheck, fnUncheck, bNoAutoBind)
 	self:_checksum()
 	if not bNoAutoBind then
 		fnUncheck = fnUncheck or fnCheck
@@ -3437,10 +3437,10 @@ function XGUI:check(fnCheck, fnUncheck, bNoAutoBind)
 			local chk = GetComponentElement(raw, 'CHECKBOX')
 			if chk then
 				if IsFunction(fnCheck) then
-					XGUI(chk):uievent('OnCheckBoxCheck', function() fnCheck(true) end)
+					UI(chk):uievent('OnCheckBoxCheck', function() fnCheck(true) end)
 				end
 				if IsFunction(fnUncheck) then
-					XGUI(chk):uievent('OnCheckBoxUncheck', function() fnUncheck(false) end)
+					UI(chk):uievent('OnCheckBoxUncheck', function() fnUncheck(false) end)
 				end
 			end
 		end
@@ -3462,20 +3462,20 @@ function XGUI:check(fnCheck, fnUncheck, bNoAutoBind)
 			end
 		end
 	else
-		MY.Debug({'fnCheck:'..type(fnCheck)..' fnUncheck:'..type(fnUncheck)}, 'ERROR XGUI:check', MY_DEBUG.ERROR)
+		MY.Debug({'fnCheck:'..type(fnCheck)..' fnUncheck:'..type(fnUncheck)}, 'ERROR UI:check', MY_DEBUG.ERROR)
 	end
 end
 
 -- change 输入框文字变化
 -- :change(fnOnChange) 绑定
 -- :change()   调用处理函数
-function XGUI:change(fnOnChange)
+function UI:change(fnOnChange)
 	self:_checksum()
 	if IsFunction(fnOnChange) then
 		for _, raw in ipairs(self.raws) do
 			local edt = GetComponentElement(raw, 'EDIT')
 			if edt then
-				XGUI(edt):uievent('OnEditChanged', function() MY.ExecuteWithThis(raw, fnOnChange, edt:GetText()) end)
+				UI(edt):uievent('OnEditChanged', function() MY.ExecuteWithThis(raw, fnOnChange, edt:GetText()) end)
 			end
 			if GetComponentType(raw) == 'WndSliderBox' then
 				insert(GetComponentProp(raw, 'onChangeEvents'), fnOnChange)
@@ -3503,7 +3503,7 @@ function XGUI:change(fnOnChange)
 	end
 end
 
-function XGUI:navigate(szURL)
+function UI:navigate(szURL)
 	self:_checksum()
 	for _, raw in ipairs(self.raws) do
 		raw = GetComponentElement(raw, 'WEB')
@@ -3517,13 +3517,13 @@ end
 -- focus （输入框）获得焦点 -- 好像只有输入框能获得焦点
 -- :focus(fnOnSetFocus) 绑定
 -- :focus()   使获得焦点
-function XGUI:focus(fnOnSetFocus)
+function UI:focus(fnOnSetFocus)
 	self:_checksum()
 	if fnOnSetFocus then
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'EDIT')
 			if raw then
-				XGUI(raw):uievent('OnSetFocus', function() pcall(fnOnSetFocus, self) end)
+				UI(raw):uievent('OnSetFocus', function() pcall(fnOnSetFocus, self) end)
 			end
 		end
 		return self
@@ -3542,13 +3542,13 @@ end
 -- blur （输入框）失去焦点
 -- :blur(fnOnKillFocus) 绑定
 -- :blur()   使获得焦点
-function XGUI:blur(fnOnKillFocus)
+function UI:blur(fnOnKillFocus)
 	self:_checksum()
 	if fnOnKillFocus then
 		for _, raw in ipairs(self.raws) do
 			raw = GetComponentElement(raw, 'EDIT')
 			if raw then
-				XGUI(raw):uievent('OnKillFocus', function() MY.ExecuteWithThis(raw, fnOnKillFocus) end)
+				UI(raw):uievent('OnKillFocus', function() MY.ExecuteWithThis(raw, fnOnKillFocus) end)
 			end
 		end
 		return self
@@ -3635,8 +3635,8 @@ function HandlePool:GetAllItem(bShow)
 	return t
 end
 -- public api, create pool
--- (class) XGUI.HandlePool(userdata handle, string szXml)
-XGUI.HandlePool = setmetatable({}, { __call = function(me, ...) return HandlePool:ctor( ... ) end, __metatable = true, __newindex = function() end })
+-- (class) UI.HandlePool(userdata handle, string szXml)
+UI.HandlePool = setmetatable({}, { __call = function(me, ...) return HandlePool:ctor( ... ) end, __metatable = true, __newindex = function() end })
 
 -----------------------------------------------------------
 -- 枚举
@@ -3667,11 +3667,11 @@ MY_SLIDER_DISPTYPE = SetmetaReadonly({
 
 ---------------------------------------------------
 -- create new frame
--- (ui) XGUI.CreateFrame(string szName, table opt)
+-- (ui) UI.CreateFrame(string szName, table opt)
 -- @param string szName: the ID of frame
 -- @param table  opt   : options
 ---------------------------------------------------
-function  XGUI.CreateFrame(szName, opt)
+function  UI.CreateFrame(szName, opt)
 	if not IsTable(opt) then
 		opt = {}
 	end
@@ -3698,7 +3698,7 @@ function  XGUI.CreateFrame(szName, opt)
 	frm = Wnd.OpenWindow(szIniFile, szName)
 	frm:ChangeRelation(opt.level)
 	frm:Show()
-	local ui = XGUI(frm)
+	local ui = UI(frm)
 	-- init frame
 	if opt.esc then
 		MY.RegisterEsc('Frame_Close_' .. szName, function()
@@ -3722,7 +3722,7 @@ function  XGUI.CreateFrame(szName, opt)
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close'):Destroy()
 		else
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Close/Btn_Close').OnLButtonClick = function()
-				if XGUI(frm):remove():count() == 0 then
+				if UI(frm):remove():count() == 0 then
 					PlaySound(SOUND.UI_SOUND, g_sound.CloseFrame)
 				end
 			end
@@ -3733,13 +3733,13 @@ function  XGUI.CreateFrame(szName, opt)
 			frm:Lookup('Btn_Setting').OnLButtonClick = opt.setting
 		end
 		if opt.onrestore then
-			XGUI(frm):uievent('OnRestore', opt.onrestore)
+			UI(frm):uievent('OnRestore', opt.onrestore)
 		end
 		if not opt.minimize then
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize'):Destroy()
 		else
 			if opt.onminimize then
-				XGUI(frm):uievent('OnMinimize', opt.onminimize)
+				UI(frm):uievent('OnMinimize', opt.onminimize)
 			end
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Minimize/CheckBox_Minimize').OnCheckBoxCheck = function()
 				if frm.bMaximize then
@@ -3781,7 +3781,7 @@ function  XGUI.CreateFrame(szName, opt)
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize'):Destroy()
 		else
 			if opt.onmaximize then
-				XGUI(frm):uievent('OnMaximize', opt.onmaximize)
+				UI(frm):uievent('OnMaximize', opt.onmaximize)
 			end
 			frm:Lookup('WndContainer_TitleBtnR').OnLButtonDBClick = function()
 				frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize'):ToggleCheck()
@@ -3794,9 +3794,9 @@ function  XGUI.CreateFrame(szName, opt)
 					frm.w, frm.h = frm:GetSize()
 				end
 				local w, h = Station.GetClientSize()
-				XGUI(frm):pos(0, 0):drag(false):size(w, h):event('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
+				UI(frm):pos(0, 0):drag(false):size(w, h):event('UI_SCALED.FRAME_MAXIMIZE_RESIZE', function()
 					local w, h = Station.GetClientSize()
-					XGUI(frm):pos(0, 0):size(w, h)
+					UI(frm):pos(0, 0):size(w, h)
 				end)
 				if select(2, MY.ExecuteWithThis(frm, frm.OnMaximize, frm:Lookup('Wnd_Total'))) then
 					return
@@ -3807,7 +3807,7 @@ function  XGUI.CreateFrame(szName, opt)
 				frm.bMaximize = true
 			end
 			frm:Lookup('WndContainer_TitleBtnR/Wnd_Maximize/CheckBox_Maximize').OnCheckBoxUncheck = function()
-				XGUI(frm)
+				UI(frm)
 				  :event('UI_SCALED.FRAME_MAXIMIZE_RESIZE')
 				  :size(frm.w, frm.h)
 				  :anchor(frm.anchor)
@@ -3826,7 +3826,7 @@ function  XGUI.CreateFrame(szName, opt)
 			frm:Lookup('Btn_Drag'):Hide()
 		else
 			if opt.ondragresize then
-				XGUI(frm):uievent('OnDragResize', opt.ondragresize)
+				UI(frm):uievent('OnDragResize', opt.ondragresize)
 			end
 			frm:Lookup('Btn_Drag').OnDragButton = function()
 				local x, y = Station.GetMessagePos()
@@ -3848,7 +3848,7 @@ function  XGUI.CreateFrame(szName, opt)
 				local w, h = this:GetRelPos()
 				w = math.max(w + 16, opt.minwidth)
 				h = math.max(h + 16, opt.minheight)
-				XGUI(frm):size(w, h)
+				UI(frm):size(w, h)
 				if frm.OnDragResize then
 					local status, res = pcall(frm.OnDragResize, frm:Lookup('Wnd_Total'))
 					if status and res then
@@ -3866,7 +3866,7 @@ function  XGUI.CreateFrame(szName, opt)
 	elseif not opt.empty then
 		SetComponentProp(frm, 'intact', true)
 		frm:Lookup('Btn_Close').OnLButtonClick = function()
-			XGUI(frm):remove()
+			UI(frm):remove()
 		end
 	end
 	if not opt.anchor then
@@ -3876,11 +3876,11 @@ function  XGUI.CreateFrame(szName, opt)
 end
 
 -- 打开取色板
-function XGUI.OpenColorPicker(callback, t)
+function UI.OpenColorPicker(callback, t)
 	if t then
 		return OpenColorTablePanel(callback,nil,nil,t)
 	end
-	local ui = XGUI.CreateFrame('_MY_ColorTable', { simple = true, close = true, esc = true })
+	local ui = UI.CreateFrame('_MY_ColorTable', { simple = true, close = true, esc = true })
 	  :size(900, 500):text(_L['color picker']):anchor({s='CENTER', r='CENTER', x=0, y=0})
 	local fnHover = function(bHover, r, g, b)
 		if bHover then
@@ -3965,7 +3965,7 @@ function XGUI.OpenColorPicker(callback, t)
 	end})
 	x = x + 50
 	ui:append('WndButton', { text = _L['color picker ex'], x = x + 5, y = y + 3, w = 50, h = 30, onclick = function()
-		XGUI.OpenColorPickerEx(callback):pos(ui:pos())
+		UI.OpenColorPickerEx(callback):pos(ui:pos())
 		ui:remove()
 	end})
 	Station.SetFocusWindow(ui[1])
@@ -3984,7 +3984,7 @@ end
 
 -- 调色板
 local COLOR_HUE = 0
-function XGUI.OpenColorPickerEx(fnAction)
+function UI.OpenColorPickerEx(fnAction)
 	local fX, fY = Cursor.GetPos(true)
 	local tUI = {}
 	local function hsv2rgb(h, s, v)
@@ -4013,7 +4013,7 @@ function XGUI.OpenColorPickerEx(fnAction)
 		return floor(r * 255), floor(g * 255), floor(b * 255)
 	end
 
-	local wnd = XGUI.CreateFrame('MY_ColorPickerEx', { w = 346, h = 430, text = _L['color picker ex'], simple = true, close = true, esc = true, x = fX + 15, y = fY + 15 }, true)
+	local wnd = UI.CreateFrame('MY_ColorPickerEx', { w = 346, h = 430, text = _L['color picker ex'], simple = true, close = true, esc = true, x = fX + 15, y = fY + 15 }, true)
 	local fnHover = function(bHover, r, g, b)
 		if bHover then
 			wnd:children('#Select'):color(r, g, b)
@@ -4074,8 +4074,8 @@ function XGUI.OpenColorPickerEx(fnAction)
 end
 
 -- 打开字体选择
-function XGUI.OpenFontPicker(callback, t)
-	local ui, i = XGUI.CreateFrame('MY_Font_Picker', { simple = true, close = true, esc = true, text = _L['Font picker'] }), 0
+function UI.OpenFontPicker(callback, t)
+	local ui, i = UI.CreateFrame('MY_Font_Picker', { simple = true, close = true, esc = true, text = _L['Font picker'] }), 0
 	while 1 do
 		local font = i
 		local txt = ui:append('Text', {
@@ -4090,7 +4090,7 @@ function XGUI.OpenFontPicker(callback, t)
 				end
 			end,
 			onhover = function(bIn)
-				XGUI(this):alpha(bIn and 255 or 200)
+				UI(this):alpha(bIn and 255 or 200)
 			end,
 		}, true)
 		-- remove unexist font
@@ -4105,7 +4105,7 @@ end
 
 do local ICON_PAGE, MAX_ICON
 -- icon选择器
-function XGUI.OpenIconPanel(fnAction)
+function UI.OpenIconPanel(fnAction)
 	if not MAX_ICON then
 		local szPath = 'ui\\Scheme\\Case\\icon.txt'
 		local tTitle = {
@@ -4162,7 +4162,7 @@ function XGUI.OpenIconPanel(fnAction)
 		MAX_ICON = MAX_ICON or 10000
 	end
 	local nMaxIcon, boxs, txts = MAX_ICON, {}, {}
-	local ui = XGUI.CreateFrame('MY_IconPanel', { w = 920, h = 650, text = _L['Icon Picker'], simple = true, close = true, esc = true })
+	local ui = UI.CreateFrame('MY_IconPanel', { w = 920, h = 650, text = _L['Icon Picker'], simple = true, close = true, esc = true })
 	local function GetPage(nPage, bInit)
 		if nPage == ICON_PAGE and not bInit then
 			return
@@ -4229,7 +4229,7 @@ end
 end
 
 -- 打开文本编辑器
-function XGUI.OpenTextEditor(szText, szFrameName)
+function UI.OpenTextEditor(szText, szFrameName)
 	if not szFrameName then
 		szFrameName = 'MY_DefaultTextEditor'
 	end
@@ -4237,7 +4237,7 @@ function XGUI.OpenTextEditor(szText, szFrameName)
 	local function OnResize()
 		ui:children('.WndEditBox'):size(ui:size(true))
 	end
-	ui = XGUI.CreateFrame(szFrameName, {
+	ui = UI.CreateFrame(szFrameName, {
 		w = w, h = h, text = _L['text editor'], alpha = 180,
 		anchor = { s='CENTER', r='CENTER', x=0, y=0 },
 		simple = true, close = true, esc = true,
@@ -4249,7 +4249,7 @@ function XGUI.OpenTextEditor(szText, szFrameName)
 end
 
 -- 打开文本列表编辑器
-function XGUI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
+function UI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 	local muDel
 	local AddListItem = function(muList, szText)
 		local muItem = muList:append('<handle><image>w=300 h=25 eventid=371 name="Image_Bg" </image><text>name="Text_Default" </text></handle>'):children():last()
@@ -4259,9 +4259,9 @@ function XGUI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 		muItem:children('#Image_Bg'):image('UI/Image/Common/TextShadow.UITex',5):alpha(0):hover(function(bIn)
 			if hHandle.Selected then return nil end
 			if bIn then
-				XGUI(this):fadeIn(100)
+				UI(this):fadeIn(100)
 			else
-				XGUI(this):fadeTo(500,0)
+				UI(this):fadeTo(500,0)
 			end
 		end):click(function(nButton)
 			if nButton == MY_MOUSE_EVENT.RBUTTON then
@@ -4276,13 +4276,13 @@ function XGUI.OpenListEditor(szFrameName, tTextList, OnAdd, OnDel)
 				hHandle.Selected = not hHandle.Selected
 			end
 			if hHandle.Selected then
-				XGUI(this):image('UI/Image/Common/TextShadow.UITex',2)
+				UI(this):image('UI/Image/Common/TextShadow.UITex',2)
 			else
-				XGUI(this):image('UI/Image/Common/TextShadow.UITex',5)
+				UI(this):image('UI/Image/Common/TextShadow.UITex',5)
 			end
 		end)
 	end
-	local ui = XGUI.CreateFrame(szFrameName)
+	local ui = UI.CreateFrame(szFrameName)
 	ui:append('Image', { x = -10, y = 25, w = 360, h = 10, image = 'UI/Image/UICommon/Commonpanel.UITex', imageframe = 42 })
 	local muEditBox = ui:append('WndEditBox', { x = 0, y = 0, w = 170, h = 25 }, true)
 	local muList = ui:append('WndScrollBox', { handlestyle = 3, x = 0, y = 30, w = 340, h = 380 }, true)
@@ -4357,7 +4357,7 @@ local function IE_GetNewIEFramePos()
 end
 
 -- 打开浏览器
-function XGUI.OpenIE(szAddr, bDisableSound, w, h)
+function UI.OpenIE(szAddr, bDisableSound, w, h)
 	local nIndex, nLast = nil, nil
 	for i = 1, 10, 1 do
 		if not IsInternetExplorerOpened(i) then
@@ -4377,7 +4377,7 @@ function XGUI.OpenIE(szAddr, bDisableSound, w, h)
 	frame.nIndex = nIndex
 
 	if w and h then
-		XGUI.ResizeIE(frame, w, h)
+		UI.ResizeIE(frame, w, h)
 	end
 	frame:BringToTop()
 	if nLast then
@@ -4400,11 +4400,11 @@ function XGUI.OpenIE(szAddr, bDisableSound, w, h)
 	return webPage
 end
 
-function XGUI.OpenBrowser(szAddr)
+function UI.OpenBrowser(szAddr)
 	OpenBrowser(szAddr)
 end
 
-function XGUI.ResizeIE(frame, w, h)
+function UI.ResizeIE(frame, w, h)
 	if w < 400 then w = 400 end
 	if h < 200 then h = 200 end
 	local handle = frame:Lookup('', '')
@@ -4444,15 +4444,15 @@ function XGUI.ResizeIE(frame, w, h)
 end
 
 -- append an item to parent
--- XGUI.Append(hParent, szType,[ szName,] tArg)
--- hParent     -- an Window, Handle or XGUI object
+-- UI.Append(hParent, szType,[ szName,] tArg)
+-- hParent     -- an Window, Handle or UI object
 -- szName      -- name of the object inserted
 -- tArg        -- param like width, height, left, right, etc.
-function XGUI.Append(hParent, szType, szName, tArg)
-	return XGUI(hParent):append(szType, szName, tArg)
+function UI.Append(hParent, szType, szName, tArg)
+	return UI(hParent):append(szType, szName, tArg)
 end
 
-function XGUI.GetTreePath(raw)
+function UI.GetTreePath(raw)
 	local tTreePath = {}
 	if IsTable(raw) and raw.GetTreePath then
 		insert(tTreePath, (raw:GetTreePath()):sub(1, -2))
@@ -4475,7 +4475,7 @@ MY_Shadows = {}
 function MY_Shadows.OnFrameCreate()
 	this:RegisterEvent('COINSHOP_ON_OPEN')
 	this:RegisterEvent('COINSHOP_ON_CLOSE')
-	XGUI(this):bringToBottom()
+	UI(this):bringToBottom()
 end
 
 do
@@ -4510,7 +4510,7 @@ function MY_Shadows.OnEvent(event)
 	end
 end
 
-function XGUI.GetShadowHandle(szName)
+function UI.GetShadowHandle(szName)
 	local frame = Station.Lookup('Lowest/MY_Shadows')
 	if not frame then
 		frame = Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. 'ui/MY_Shadows.ini', 'MY_Shadows')
@@ -4518,21 +4518,21 @@ function XGUI.GetShadowHandle(szName)
 	local sh = frame:Lookup('', szName)
 	if not sh then
 		frame:Lookup('', ''):AppendItemFromString(format('<handle> name="%s" </handle>', szName))
-		MY.Debug({'Create sh # ' .. szName}, 'XGUI', MY_DEBUG.LOG)
+		MY.Debug({'Create sh # ' .. szName}, 'UI', MY_DEBUG.LOG)
 		sh = frame:Lookup('', szName)
 	end
 	return sh
 end
 
-function XGUI.SetShadowHandleParam(szName, tParam)
-	local sh = XGUI.GetShadowHandle(szName)
+function UI.SetShadowHandleParam(szName, tParam)
+	local sh = UI.GetShadowHandle(szName)
 	for k, v in pairs(tParam) do
 		sh[k] = v
 	end
 end
 
 do local VISIBLES = {}
-function XGUI.TempSetShadowHandleVisible(bVisible)
+function UI.TempSetShadowHandleVisible(bVisible)
 	local frame = Station.Lookup('Lowest/MY_Shadows')
 	if not frame then
 		return insert(VISIBLES, true)
@@ -4541,7 +4541,7 @@ function XGUI.TempSetShadowHandleVisible(bVisible)
 	frame:SetVisible(bVisible)
 end
 
-function XGUI.RevertShadowHandleVisible()
+function UI.RevertShadowHandleVisible()
 	if #VISIBLES == 0 then
 		return
 	end
@@ -4553,4 +4553,4 @@ function XGUI.RevertShadowHandleVisible()
 end
 end
 
-MY.UI = XGUI
+MY.UI = UI
