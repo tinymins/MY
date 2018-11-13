@@ -394,6 +394,7 @@ function D.Reset()
 end
 MY.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED', D.Reset)
 MY.RegisterEvent('LOADING_END', D.AutoSwitchSysHeadTop)
+MY.RegisterEvent('COINSHOP_ON_CLOSE', D.AutoSwitchSysHeadTop)
 
 do
 local function fxTarget(r, g, b, a) return 255 - (255 - r) * 0.3, 255 - (255 - g) * 0.3, 255 - (255 - b) * 0.3, a end
