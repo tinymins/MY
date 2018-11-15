@@ -35,14 +35,25 @@ local UrlEncodeString, UrlDecodeString = UrlEncode, UrlDecode
 --------------------------------------------
 
 -- 分隔字符串
+-- (table) MY.SplitString(string szText, table aSpliter, bool bIgnoreEmptyPart)
 -- (table) MY.SplitString(string szText, string szSpliter, bool bIgnoreEmptyPart)
 -- szText           原始字符串
 -- szSpliter        分隔符
+-- aSpliter         多个分隔符
 -- bIgnoreEmptyPart 是否忽略空字符串，即'123;234;'被';'分成{'123','234'}还是{'123','234',''}
-function MY.SplitString(szText, szSep, bIgnoreEmptyPart)
+function MY.SplitString(szText, aSpliter, bIgnoreEmptyPart)
+	if IsString(aSpliter) then
+		aSpliter = {aSpliter}
+	end
 	local nOff, tResult, szPart = 1, {}
 	while true do
-		local nEnd = StringFindW(szText, szSep, nOff)
+		local nEnd, szEnd
+		for _, szSpliter in ipairs(aSpliter) do
+			local nPos = StringFindW(szText, szSpliter, nOff)
+			if nPos and (not nEnd or nPos < nEnd) then
+				nEnd, szEnd = nPos, szSpliter
+			end
+		end
 		if not nEnd then
 			szPart = sub(szText, nOff, len(szText))
 			if not bIgnoreEmptyPart or szPart ~= '' then
@@ -54,7 +65,7 @@ function MY.SplitString(szText, szSep, bIgnoreEmptyPart)
 			if not bIgnoreEmptyPart or szPart ~= '' then
 				insert(tResult, szPart)
 			end
-			nOff = nEnd + len(szSep)
+			nOff = nEnd + len(szEnd)
 		end
 	end
 	return tResult
