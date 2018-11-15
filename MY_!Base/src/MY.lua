@@ -1289,9 +1289,9 @@ end
 -- szIconTex       选项卡图标文件|图标帧
 -- rgbaTitleColor  选项卡文字rgba
 -- options         选项卡各种响应函数 {
--- 	options.OnPanelActive(wnd)      选项卡激活    wnd为当前MainPanel
--- 	options.OnPanelDeactive(wnd)    选项卡取消激活
--- 	options.bShielded               国服和谐的选项卡
+--   options.OnPanelActive(wnd)      选项卡激活    wnd为当前MainPanel
+--   options.OnPanelDeactive(wnd)    选项卡取消激活
+--   options.bShielded               国服和谐的选项卡
 -- }
 -- Ex： MY.RegisterPanel( 'Test', '测试标签', '测试', 'UI/Image/UICommon/ScienceTreeNode.UITex|123', {255,255,0,200}, { OnPanelActive = function(wnd) end } )
 function MY.RegisterPanel(szID, szTitle, szCategory, szIconTex, rgbaTitleColor, options)
