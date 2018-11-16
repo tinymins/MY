@@ -1477,12 +1477,12 @@ local function OnMessageBoxOpen()
 			if btn.fnAction then
 				HookTableFunc(btn, 'fnAction', function()
 					FireUIEvent('MY_MESSAGE_BOX_ACTION', szName, 'ACTION', szOption, nIndex)
-				end, true, false, false, false, false)
+				end, { bAfterOrigin = true })
 			end
 			if btn.fnCountDownEnd then
 				HookTableFunc(btn, 'fnCountDownEnd', function()
 					FireUIEvent('MY_MESSAGE_BOX_ACTION', szName, 'TIME_OUT', szOption, nIndex)
-				end, true, false, false, false, false)
+				end, { bAfterOrigin = true })
 			end
 			aMsg[i] = { nIndex = nIndex, szOption = szOption }
 		end
@@ -1494,16 +1494,16 @@ local function OnMessageBoxOpen()
 			return
 		end
 		FireUIEvent('MY_MESSAGE_BOX_ACTION', szName, 'ACTION', msg.szOption, msg.nIndex)
-	end, true, true, false, false, false)
+	end, { bAfterOrigin = true })
 
 	HookTableFunc(frame, 'fnCancelAction', function()
 		FireUIEvent('MY_MESSAGE_BOX_ACTION', szName, 'CANCEL')
-	end, true, true, false, false, false)
+	end, { bAfterOrigin = true })
 
 	if frame.fnAutoClose then
 		HookTableFunc(frame, 'fnAutoClose', function()
 			FireUIEvent('MY_MESSAGE_BOX_ACTION', szName, 'AUTO_CLOSE')
-		end, true, true, false, false, false)
+		end, { bAfterOrigin = true })
 	end
 
 	FireUIEvent('MY_MESSAGE_BOX_OPEN', arg0, arg1)

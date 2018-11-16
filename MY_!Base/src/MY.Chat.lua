@@ -1086,8 +1086,8 @@ local function Hook(i)
 	local h = Station.Lookup('Lowest2/ChatPanel' .. i .. '/Wnd_Message', 'Handle_Message')
 	if h and not HOOKED_UI[h] then
 		HOOKED_UI[h] = true
-		HookTableFunc(h, 'AppendItemFromString', BeforeChatAppendItemFromString, false, false, false, false, true)
-		HookTableFunc(h, 'AppendItemFromString', AfterChatAppendItemFromString, true, false, false, false, true)
+		HookTableFunc(h, 'AppendItemFromString', BeforeChatAppendItemFromString, { bHookParams = true })
+		HookTableFunc(h, 'AppendItemFromString', AfterChatAppendItemFromString, { bAfterOrigin = true, bHookParams = true })
 	end
 end
 MY.RegisterEvent('CHAT_PANEL_OPEN.ChatPanelHook', function(event) Hook(arg0) end)

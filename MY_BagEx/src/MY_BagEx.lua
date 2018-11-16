@@ -232,7 +232,7 @@ local function Hook()
 			end,
 		})
 
-		HookTableFunc(frame, 'OnFrameKeyDown', OnFrameKeyDown, false, true)
+		HookTableFunc(frame, 'OnFrameKeyDown', OnFrameKeyDown, { bHookReturn = true })
 	end
 
 	local frame = Station.Lookup('Normal/BigBankPanel')
@@ -281,7 +281,7 @@ local function Hook()
 			end
 		})
 
-		HookTableFunc(frame, 'OnFrameKeyDown', OnFrameKeyDown, false, true)
+		HookTableFunc(frame, 'OnFrameKeyDown', OnFrameKeyDown, { bHookReturn = true })
 	end
 
 	local frame = Station.Lookup('Normal/GuildBankPanel')
@@ -313,7 +313,7 @@ local function Hook()
 			end
 		})
 
-		HookTableFunc(frame, 'OnFrameKeyDown', OnFrameKeyDown, false, true)
+		HookTableFunc(frame, 'OnFrameKeyDown', OnFrameKeyDown, { bHookReturn = true })
 	end
 
 	MY.RegisterEvent('EXECUTE_BINDING.MY_BAGEX', function(e)

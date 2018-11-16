@@ -152,7 +152,7 @@ local function OnFBAppendItemFromIni(hList)
 	for i = 0, hList:GetItemCount() - 1 do
 		local hItem = hList:Lookup(i)
 		UnhookTableFunc(hItem, 'OnItemLButtonDBClick', OnCrossMapGoFB)
-		HookTableFunc(hItem, 'OnItemLButtonDBClick', OnCrossMapGoFB, true, true, false, false, false)
+		HookTableFunc(hItem, 'OnItemLButtonDBClick', OnCrossMapGoFB, { bAfterOrigin = true })
 	end
 end
 
@@ -163,11 +163,11 @@ MY.RegisterEvent('ON_FRAME_CREATE.MYLIB#CD', function()
 	local hList = arg0:Lookup('Wnd_CrossFB', 'Handle_DifficultyList')
 	if hList then
 		OnFBAppendItemFromIni(hList)
-		HookTableFunc(hList, 'AppendItemFromIni', OnFBAppendItemFromIni, true, false, false, false, false)
+		HookTableFunc(hList, 'AppendItemFromIni', OnFBAppendItemFromIni, { bAfterOrigin = true })
 	end
 	local btn = arg0:Lookup('Wnd_CrossFB/Btn_GoGoGo')
 	if btn then
-		HookTableFunc(btn, 'OnLButtonUp', OnCrossMapGoFB, true, true, false, false, false)
+		HookTableFunc(btn, 'OnLButtonUp', OnCrossMapGoFB, { bAfterOrigin = true })
 	end
 	MY.Debug({'Cross panel hooked.'}, 'MYLIB', MY_DEBUG.LOG)
 end)
