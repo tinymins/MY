@@ -2232,6 +2232,51 @@ function UI:height(nHeight, nRawHeight)
 	end
 end
 
+do
+local function ResizeBgImages(hnd, nWidth, nHeight) -- 处理窗口背景自适应缩放
+	local imgBgTLConner = hnd:Lookup('Image_BgTL_Conner')
+	local imgBgTRConner = hnd:Lookup('Image_BgTR_Conner')
+	local imgBgTLFlex = hnd:Lookup('Image_BgTL_Flex')
+	local imgBgTRFlex = hnd:Lookup('Image_BgTR_Flex')
+	local imgBgTLCenter = hnd:Lookup('Image_BgTL_Center')
+	local imgBgTRCenter = hnd:Lookup('Image_BgTR_Center')
+	local imgBgBL = hnd:Lookup('Image_BgBL')
+	local imgBgBC = hnd:Lookup('Image_BgBC')
+	local imgBgBR = hnd:Lookup('Image_BgBR')
+	local imgBgCL = hnd:Lookup('Image_BgCL')
+	local imgBgCC = hnd:Lookup('Image_BgCC')
+	local imgBgCR = hnd:Lookup('Image_BgCR')
+	if not imgBgTLConner or not imgBgTLFlex or not imgBgTLCenter
+	or not imgBgTRConner or not imgBgTRFlex or not imgBgTRCenter
+	or not imgBgBL or not imgBgBC or not imgBgBR or not imgBgCL or not imgBgCC or not imgBgCR then
+		return
+	end
+	local fScale = nWidth < 426 and (nWidth / 426) or 1
+	local nTH = 70 * fScale
+	local nTConnerW = 213 * fScale
+	imgBgTLConner:SetSize(nTConnerW, nTH)
+	imgBgTRConner:SetSize(nTConnerW, nTH)
+	local nTFlexW = max(0, (nWidth - (nWidth >= 674 and 674 or 426)) / 2)
+	imgBgTLFlex:SetSize(nTFlexW, nTH)
+	imgBgTRFlex:SetSize(nTFlexW, nTH)
+	local nTCenterW = nWidth >= 674 and (124 * fScale) or 0
+	imgBgTLCenter:SetSize(nTCenterW, nTH)
+	imgBgTRCenter:SetSize(nTCenterW, nTH)
+	local nBLW, nBRW = ceil(124 * fScale), ceil(8 * fScale)
+	local nBCW, nBH = nWidth - nBLW - nBRW + 1, 85 * fScale -- 不知道为什么差一像素 但是加上就好了
+	imgBgBL:SetSize(nBLW, nBH)
+	imgBgBC:SetSize(nBCW, nBH)
+	imgBgBR:SetSize(nBRW, nBH)
+	local nCEdgeW = ceil(8 * fScale)
+	local nCCW, nCH = nWidth - 2 * nCEdgeW + 1, nHeight - nTH - nBH -- 不知道为什么差一像素 但是加上就好了
+	imgBgCL:SetSize(nCEdgeW, nCH)
+	imgBgCC:SetSize(nCCW, nCH)
+	imgBgCR:SetSize(nCEdgeW, nCH)
+	imgBgCL:SetRelY(nTH)
+	imgBgBL:SetRelY(nTH + nCH)
+	hnd:FormatAllItemPos()
+end
+
 -- (number, number) Instance:size(bInnerSize)
 -- (self) Instance:size(nLeft, nTop)
 -- (self) Instance:size(OnSizeChanged)
@@ -2279,36 +2324,12 @@ function UI:size(arg0, arg1, arg2, arg3)
 				elseif GetComponentProp(raw, 'intact') or raw == MY.GetFrame() then
 					if nWidth  < 128 then nWidth  = 128 end
 					if nHeight < 160 then nHeight = 160 end
-					-- 处理窗口背景自适应缩放
 					hnd:SetSize(nWidth, nHeight)
-					local fScale = nWidth < 426 and (nWidth / 426) or 1
-					local nTH = 70 * fScale
-					local nTConnerW = 213 * fScale
-					hnd:Lookup('Image_BgTL_Conner'):SetSize(nTConnerW, nTH)
-					hnd:Lookup('Image_BgTR_Conner'):SetSize(nTConnerW, nTH)
-					local nTFlexW = max(0, (nWidth - (nWidth >= 674 and 674 or 426)) / 2)
-					hnd:Lookup('Image_BgTL_Flex'):SetSize(nTFlexW, nTH)
-					hnd:Lookup('Image_BgTR_Flex'):SetSize(nTFlexW, nTH)
-					local nTCenterW = nWidth >= 674 and (124 * fScale) or 0
-					hnd:Lookup('Image_BgTL_Center'):SetSize(nTCenterW, nTH)
-					hnd:Lookup('Image_BgTR_Center'):SetSize(nTCenterW, nTH)
-					local nBLW, nBRW = ceil(124 * fScale), ceil(8 * fScale)
-					local nBCW, nBH = nWidth - nBLW - nBRW + 1, 85 * fScale -- 不知道为什么差一像素 但是加上就好了
-					hnd:Lookup('Image_BgBL'):SetSize(nBLW, nBH)
-					hnd:Lookup('Image_BgBC'):SetSize(nBCW, nBH)
-					hnd:Lookup('Image_BgBR'):SetSize(nBRW, nBH)
-					local nCEdgeW = ceil(8 * fScale)
-					local nCCW, nCH = nWidth - 2 * nCEdgeW + 1, nHeight - nTH - nBH -- 不知道为什么差一像素 但是加上就好了
-					hnd:Lookup('Image_BgCL'):SetSize(nCEdgeW, nCH)
-					hnd:Lookup('Image_BgCC'):SetSize(nCCW, nCH)
-					hnd:Lookup('Image_BgCR'):SetSize(nCEdgeW, nCH)
-					hnd:Lookup('Image_BgCL'):SetRelY(nTH)
-					hnd:Lookup('Image_BgBL'):SetRelY(nTH + nCH)
-					-- 处理窗口其它组件
 					hnd:Lookup('Text_Title'):SetW(nWidth - 90)
 					hnd:Lookup('Text_Author'):SetW(nWidth - 31)
 					hnd:Lookup('Text_Author'):SetRelY(nHeight - 41)
-					hnd:FormatAllItemPos()
+					ResizeBgImages(hnd, nWidth, nHeight)
+					-- 处理窗口其它组件
 					local btnClose = raw:Lookup('Btn_Close')
 					if btnClose then
 						btnClose:SetRelPos(nWidth - 35, 15)
@@ -2333,6 +2354,7 @@ function UI:size(arg0, arg1, arg2, arg3)
 				else
 					raw:SetSize(nWidth, nHeight)
 					hnd:SetSize(nWidth, nHeight)
+					ResizeBgImages(hnd, nWidth, nHeight)
 				end
 			elseif componentType == 'WndCheckBox' then
 				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
@@ -2479,6 +2501,7 @@ function UI:size(arg0, arg1, arg2, arg3)
 		end
 		return w, h, rw, rh
 	end
+end
 end
 
 do
