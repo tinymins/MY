@@ -200,13 +200,17 @@ function MY_Web.Open(url, options)
 	if options.title then
 		frame:Lookup('', 'Text_Title'):SetText(options.title)
 	end
+	ui:minSize(290, 150)
+	ui:size(OnResizePanel)
+	ui:size(options.w or 500, options.h or 600)
+	ui:anchor(options.anchor or {})
 	url = FormatURL(url)
 	frame.forwards = {}
 	frame.backwards = {}
 	GoToURL(frame, url)
 	UpdateControls(frame)
-	WINDOWS[szKey] = frame
-	ui:size(OnResizePanel):minSize(290, 150):size(500, 600)
+
+	return szKey
 end
 
 function MY_Web.Close(szKey)
