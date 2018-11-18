@@ -134,4 +134,6 @@ data = {
 
     ['Click to enable MY player view magnifier'] = '点击开启茗伊试衣间',
     ['Click to disable MY player view magnifier'] = '点击关闭茗伊试衣间',
+
+    ['Click for achievement wiki'] = '点击查看成就百科',
 }
