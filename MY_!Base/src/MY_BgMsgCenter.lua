@@ -152,7 +152,7 @@ local function OnFBAppendItemFromIni(hList)
 	for i = 0, hList:GetItemCount() - 1 do
 		local hItem = hList:Lookup(i)
 		UnhookTableFunc(hItem, 'OnItemLButtonDBClick', OnCrossMapGoFB)
-		HookTableFunc(hItem, 'OnItemLButtonDBClick', OnCrossMapGoFB, { bAfterOrigin = true })
+		HookTableFunc(hItem, 'OnItemLButtonDBClick', OnCrossMapGoFB, { bAfterOrigin = true, bHookReturn = true })
 	end
 end
 
