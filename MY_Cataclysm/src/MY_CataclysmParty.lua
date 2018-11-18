@@ -944,7 +944,7 @@ function CTM:RefreshMark()
 	for k, v in pairs(CTM_CACHE) do
 		if v:IsValid() then
 			if tPartyMark[k] then
-				local nMarkID = tPartyMark[k]
+				local nMarkID, nIconFrame = tPartyMark[k], 0
 				if nMarkID and PARTY_MARK_ICON_FRAME_LIST[nMarkID] then
 					-- assert(nMarkID > 0 and nMarkID <= #PARTY_MARK_ICON_FRAME_LIST)
 					nIconFrame = PARTY_MARK_ICON_FRAME_LIST[nMarkID]
