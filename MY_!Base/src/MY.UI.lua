@@ -2300,6 +2300,14 @@ function UI:size(arg0, arg1, arg2, arg3)
 		local componentType, element
 		for _, raw in ipairs(self.raws) do
 			local nWidth, nHeight = arg0 or raw:GetW(), arg1 or raw:GetH()
+			local nMinWidth = GetComponentProp(raw, 'minWidth')
+			local nMinHeight = GetComponentProp(raw, 'minHeight')
+			if nMinWidth and nWidth < nMinWidth then
+				nWidth = nMinWidth
+			end
+			if nMinHeight and nHeight < nMinHeight then
+				nHeight = nMinHeight
+			end
 			componentType = GetComponentType(raw)
 			if componentType == 'WndFrame' then
 				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
@@ -2322,8 +2330,6 @@ function UI:size(arg0, arg1, arg2, arg3)
 					hnd:SetSize(nWidth, nHeight)
 					wnd:SetSize(nWidth, nHeight - 30)
 				elseif GetComponentProp(raw, 'intact') or raw == MY.GetFrame() then
-					if nWidth  < 128 then nWidth  = 128 end
-					if nHeight < 160 then nHeight = 160 end
 					hnd:SetSize(nWidth, nHeight)
 					hnd:Lookup('Text_Title'):SetW(nWidth - 90)
 					hnd:Lookup('Text_Author'):SetW(nWidth - 31)
@@ -2502,6 +2508,68 @@ function UI:size(arg0, arg1, arg2, arg3)
 		return w, h, rw, rh
 	end
 end
+end
+
+-- (self) Instance:minSize() -- Get element min size
+-- (self) Instance:minSize(number nW, number nH) -- Set element min size
+function UI:minSize(nW, nH)
+	self:_checksum()
+	if IsNumber(nW) or IsNumber(nH) then -- set
+		for _, raw in ipairs(self.raws) do
+			SetComponentProp(raw, 'minWidth', nW)
+			SetComponentProp(raw, 'minHeight', nH)
+		end
+		return self
+	elseif IsNumber(nW) then -- set
+		for _, raw in ipairs(self.raws) do
+			SetComponentProp(raw, 'minWidth', nW)
+		end
+		return self
+	elseif IsNumber(nH) then -- set
+		for _, raw in ipairs(self.raws) do
+			SetComponentProp(raw, 'minHeight', nH)
+		end
+		return self
+	else -- get
+		local raw = self.raws[1]
+		if raw then
+			return GetComponentProp(raw, 'minWidth'), GetComponentProp(raw, 'minHeight')
+		end
+	end
+end
+
+-- (self) Instance:minWidth() -- Get element min width
+-- (self) Instance:minWidth(number nW) -- Set element min width
+function UI:minWidth(nW)
+	self:_checksum()
+	if IsNumber(nW) then -- set
+		for _, raw in ipairs(self.raws) do
+			SetComponentProp(raw, 'minWidth', nW)
+		end
+		return self
+	else -- get
+		local raw = self.raws[1]
+		if raw then
+			return GetComponentProp(raw, 'minWidth')
+		end
+	end
+end
+
+-- (self) Instance:minHeight() -- Get element min height
+-- (self) Instance:minHeight(number nH) -- Set element min height
+function UI:minHeight(nH)
+	self:_checksum()
+	if IsNumber(nH) then -- set
+		for _, raw in ipairs(self.raws) do
+			SetComponentProp(raw, 'minHeight', nH)
+		end
+		return self
+	else -- get
+		local raw = self.raws[1]
+		if raw then
+			return GetComponentProp(raw, 'minHeight')
+		end
+	end
 end
 
 do
@@ -3889,6 +3957,8 @@ function  UI.CreateFrame(szName, opt)
 		end
 	elseif not opt.empty then
 		SetComponentProp(frm, 'intact', true)
+		SetComponentProp(frm, 'minWidth', 128)
+		SetComponentProp(frm, 'minHeight', 160)
 		frm:Lookup('Btn_Close').OnLButtonClick = function()
 			UI(frm):remove()
 		end
