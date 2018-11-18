@@ -2191,3 +2191,7 @@ function MY.ConnectDatabase(szCaption, oPath, fnAction)
 	end
 end
 end
+
+function MY.OpenBrowser(szAddr)
+	OpenBrowser(szAddr)
+end

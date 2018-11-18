@@ -696,7 +696,7 @@ function PS.OnPanelActive(frame)
 		x = x, y = y, w = 220,
 		text = _L['Feedback @nangongbo'],
 		onclick = function()
-			UI.OpenBrowser('https://weibo.com/nangongbo')
+			MY.OpenBrowser('https://weibo.com/nangongbo')
 		end,
 	}, true):autoHeight():width()
 	y = y + 28

@@ -1384,7 +1384,7 @@ function MY.OnLButtonClick()
 	if name == 'Btn_Close' then
 		MY.ClosePanel()
 	elseif name == 'Btn_Weibo' then
-		MY.UI.OpenBrowser('https://weibo.com/zymah')
+		MY.OpenBrowser('https://weibo.com/zymah')
 	end
 end
 

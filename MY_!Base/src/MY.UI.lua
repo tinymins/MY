@@ -4494,10 +4494,6 @@ function UI.OpenIE(szAddr, bDisableSound, w, h)
 	return webPage
 end
 
-function UI.OpenBrowser(szAddr)
-	OpenBrowser(szAddr)
-end
-
 function UI.ResizeIE(frame, w, h)
 	if w < 400 then w = 400 end
 	if h < 200 then h = 200 end
