@@ -2195,3 +2195,18 @@ end
 function MY.OpenBrowser(szAddr)
 	OpenBrowser(szAddr)
 end
+
+function MY.ArrayToObject(arr)
+	if not arr then
+		return
+	end
+    local t = {}
+	for k, v in pairs(arr) do
+		if IsTable(v) and v[1] then
+			t[v[1]] = v[2]
+		else
+			t[v] = true
+		end
+    end
+    return t
+end
