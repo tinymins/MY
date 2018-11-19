@@ -29,7 +29,7 @@ local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
 local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
-local _L = MY.LoadLangPack()
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Toolbox/lang/')
 
 local function OnItemMouseEnter()
 	this:SetObjectMouseOver(true)
@@ -93,14 +93,30 @@ local function HookHandle(h)
 	HookTableFunc(h, 'AppendItemFromData', OnAppendItem, { bAfterOrigin = true, bPassReturn = true })
 end
 
+local function HookFrame(frame)
+	HookHandle(frame:Lookup('PageSet_Achievement/Page_Achievement/WndScroll_AShow', ''))
+	HookHandle(frame:Lookup('PageSet_Achievement/Page_TopRecord/WndScroll_TRShow', ''))
+	HookHandle(frame:Lookup('PageSet_Achievement/Page_Summary/WndContainer_AchiPanel/PageSet_Achi/Page_Chi/PageSet_RecentAchi/Page_Scene', ''))
+	HookHandle(frame:Lookup('PageSet_Achievement/Page_Summary/WndContainer_AchiPanel/PageSet_Achi/Page_Chi/PageSet_RecentAchi/Page_AlmostFinish', ''))
+end
+
+do
+local function OnInit()
+	local frame = Station.Lookup('Normal/AchievementPanel')
+	if not frame then
+		return
+	end
+	HookFrame(frame)
+end
+MY.RegisterInit('MY_AchievementWiki', OnInit)
+end
+
+do
 local function OnFrameCreate()
 	if arg0:GetName() ~= 'AchievementPanel' then
 		return
 	end
-	HookHandle(arg0:Lookup('PageSet_Achievement/Page_Achievement/WndScroll_AShow', ''))
-	HookHandle(arg0:Lookup('PageSet_Achievement/Page_TopRecord/WndScroll_TRShow', ''))
-	HookHandle(arg0:Lookup('PageSet_Achievement/Page_Summary/WndContainer_AchiPanel/PageSet_Achi/Page_Chi/PageSet_RecentAchi/Page_Scene', ''))
-	HookHandle(arg0:Lookup('PageSet_Achievement/Page_Summary/WndContainer_AchiPanel/PageSet_Achi/Page_Chi/PageSet_RecentAchi/Page_AlmostFinish', ''))
+	HookFrame(arg0)
 end
-
 MY.RegisterEvent('ON_FRAME_CREATE.MY_AchievementWiki', OnFrameCreate)
+end
