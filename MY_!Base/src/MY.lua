@@ -118,6 +118,7 @@ local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 ---------------------------------------------------------------------------------------------
 local function Get(var, keys, dft)
+	local res = false
 	if type(keys) == 'string' then
 		local ks = {}
 		for k in string.gmatch(keys, '[^%.]+') do
@@ -128,14 +129,14 @@ local function Get(var, keys, dft)
 	if type(keys) == 'table' then
 		for _, k in ipairs(keys) do
 			if type(var) == 'table' then
-				var = var[k]
+				var, res = var[k], true
 			else
-				var = dft
+				var, res = dft, false
 				break
 			end
 		end
 	end
-	return var
+	return var, res
 end
 local function IsEmpty(var)
 	local szType = type(var)
