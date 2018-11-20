@@ -2210,3 +2210,61 @@ function MY.ArrayToObject(arr)
     end
     return t
 end
+
+
+-- Global exports
+function MY.GeneGlobalNS(options)
+	local exports = Get(options, 'exports', {})
+	local function getter(_, k)
+		local found, v, trigger, getter = false
+		for _, export in ipairs(exports) do
+			trigger = Get(export, {'triggers', k})
+			if trigger then
+				trigger(k)
+			end
+			if not found then
+				getter, found = Get(export, {'getters', k})
+				if getter then
+					v = getter(k)
+				end
+			end
+			if not found then
+				v, found = Get(export, {'fields', k})
+				if v and export.root then
+					v = export.root[k]
+				end
+			end
+			if found then
+				return v
+			end
+		end
+	end
+
+	local imports = Get(options, 'imports', {})
+	local function setter(_, k, v)
+		local found, trigger, setter, res = false
+		for _, import in ipairs(imports) do
+			if not found then
+				setter, found = Get(import, {'setters', k})
+				if setter then
+					setter(k, v)
+					found = true
+				end
+			end
+			if not found then
+				res, found = Get(import, {'fields', k})
+				if res and import.root then
+					import.root[k] = v
+				end
+			end
+			trigger = Get(import, {'triggers', k})
+			if trigger then
+				trigger(k, v)
+			end
+			if found then
+				return
+			end
+		end
+	end
+	return setmetatable({}, { __index = getter, __newindex = setter })
+end
