@@ -45,6 +45,9 @@ local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTab
 ]]
 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_CombatText/lang/')
+if not MY.AssertVersion('MY_CombatText', _L['MY_CombatText'], 0x2011800) then
+	return
+end
 local Table_GetBuffName, Table_GetSkillName, Table_BuffIsVisible = Table_GetBuffName, Table_GetSkillName, Table_BuffIsVisible
 local GetUserRoleName = GetUserRoleName
 local pairs, ipairs, unpack = pairs, ipairs, unpack

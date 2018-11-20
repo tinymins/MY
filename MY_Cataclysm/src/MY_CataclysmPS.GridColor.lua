@@ -30,6 +30,9 @@ local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumb
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/lang/')
+if not MY.AssertVersion('MY_Cataclysm', _L['MY_Cataclysm'], 0x2011800) then
+	return
+end
 local CFG, PS = MY_Cataclysm.CFG, {}
 local CTM_BG_COLOR_MODE = MY_Cataclysm.BG_COLOR_MODE
 

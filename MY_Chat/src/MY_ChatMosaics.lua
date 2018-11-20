@@ -29,9 +29,12 @@ local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
 local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Chat/lang/')
+if not MY.AssertVersion('MY_ChatMosaics', _L['MY_ChatMosaics'], 0x2011800) then
+	return
+end
 MY_ChatMosaics = {}
 local _C = {}
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Chat/lang/')
 local MY_ChatMosaics = MY_ChatMosaics
 MY_ChatMosaics.bEnabled = false            -- 启用状态
 MY_ChatMosaics.szMosaics = _L.MOSAICS_CHAR -- 马赛克字符

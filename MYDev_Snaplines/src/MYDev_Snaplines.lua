@@ -30,6 +30,9 @@ local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumb
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot..'MYDev_Snaplines/lang/')
+if not MY.AssertVersion('MYDev_Snaplines', _L['MYDev_Snaplines'], 0x2011800) then
+	return
+end
 --------------------------------------------------------------------------
 -- Êý¾Ý´æ´¢
 --------------------------------------------------------------------------

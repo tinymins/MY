@@ -454,7 +454,9 @@ function MY.AssertVersion(szKey, szCaption, dwMinVersion)
 			_L('%s requires base library version upper than v%s, current at v%s.',
 			szCaption, MY.GetVersion(dwMinVersion), MY.GetVersion()
 		)})
-		return false
+		if not IsDebugClient() then
+			return false
+		end
 	end
 	return true
 end

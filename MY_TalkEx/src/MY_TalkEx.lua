@@ -29,9 +29,12 @@ local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
 local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TalkEx/lang/')
+if not MY.AssertVersion('MY_TalkEx', _L['MY_TalkEx'], 0x2011800) then
+	return
+end
 MY_TalkEx = MY_TalkEx or {}
 local _C = {}
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TalkEx/lang/')
 MY_TalkEx.tTalkChannels     = {}
 MY_TalkEx.szTalk            = ''
 MY_TalkEx.szTrickFilter     = 'RAID'

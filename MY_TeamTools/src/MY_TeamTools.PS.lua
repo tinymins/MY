@@ -30,6 +30,9 @@ local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumb
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TeamTools/lang/')
+if not MY.AssertVersion('MY_TeamTools', _L['MY_TeamTools'], 0x2011800) then
+	return
+end
 local PS = {}
 function PS.OnPanelActive(wnd)
 	local ui = UI(wnd)

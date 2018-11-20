@@ -31,6 +31,9 @@ local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTab
 ---------------------------------------------------------------------------------------------------
 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TargetMon/lang/')
+if not MY.AssertVersion('MY_TargetMon', _L['MY_TargetMon'], 0x2011800) then
+	return
+end
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/ui/MY_TargetMon.ini'
 local ADDON_ROOT = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/'
 local RES_ROOT = MY.GetAddonInfo().szRoot .. 'MY_Resource/'

@@ -30,6 +30,9 @@ local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumb
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Toolbox/lang/')
+if not MY.AssertVersion('MY_Anmerkungen', _L['MY_Anmerkungen'], 0x2011800) then
+	return
+end
 local _C = {}
 local PUBLIC_PLAYER_IDS = {}
 local PUBLIC_PLAYER_NOTES = {}

@@ -29,6 +29,11 @@ local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
 local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/lang/')
+if not MY.AssertVersion('MY_LifeBar', _L['MY_LifeBar'], 0x2011800) then
+	return
+end
+
 local Config = MY_LifeBar_Config
 if not Config then
     return
@@ -41,7 +46,6 @@ local D = {
 	IsShielded = MY_LifeBar.IsShielded,
 	UpdateShadowHandleParam = MY_LifeBar.UpdateShadowHandleParam,
 }
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/lang/')
 
 local PS = {}
 local function LoadUI(ui)

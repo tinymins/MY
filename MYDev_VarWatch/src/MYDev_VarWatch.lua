@@ -29,8 +29,11 @@ local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
 local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
-local _C = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MYDev_VarWatch/lang/')
+if not MY.AssertVersion('MYDev_VarWatch', _L['MYDev_VarWatch'], 0x2011800) then
+	return
+end
+local _C = {}
 local XML_LINE_BREAKER = XML_LINE_BREAKER
 local srep, tostring, string2byte = string.rep, tostring, string.byte
 local tconcat, tinsert, tremove = table.concat, table.insert, table.remove

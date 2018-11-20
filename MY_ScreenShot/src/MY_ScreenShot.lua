@@ -29,8 +29,11 @@ local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
 local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
-local _GLOBAL_CONFIG_ = {'config/screenshot.jx3dat', MY_DATA_PATH.GLOBAL}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_ScreenShot/lang/')
+if not MY.AssertVersion('MY_ScreenShot', _L['MY_ScreenShot'], 0x2011800) then
+	return
+end
+local _GLOBAL_CONFIG_ = {'config/screenshot.jx3dat', MY_DATA_PATH.GLOBAL}
 local _MY_ScreenShot = {}
 MY_ScreenShot = MY_ScreenShot or {}
 MY_ScreenShot.Const = {}

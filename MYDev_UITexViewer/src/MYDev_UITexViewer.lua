@@ -30,6 +30,9 @@ local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumb
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot..'MYDev_UITexViewer/lang/')
+if not MY.AssertVersion('MYDev_UITexViewer', _L['MYDev_UITexViewer'], 0x2011800) then
+	return
+end
 local _Cache = {}
 MYDev_UITexViewer = {}
 MYDev_UITexViewer.szUITexPath = ''

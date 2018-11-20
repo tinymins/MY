@@ -30,6 +30,9 @@ local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumb
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Toolbox/lang/')
+if not MY.AssertVersion('MY_InfoTip', _L['MY_InfoTip'], 0x2011800) then
+	return
+end
 local _Cache = {
     bFighting = false,
     nLastFightStartTimestarp = 0,

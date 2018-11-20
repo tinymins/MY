@@ -30,6 +30,9 @@ local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumb
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_ChatFilter/lang/')
+if not MY.AssertVersion('MY_ChatBlock', _L['MY_ChatBlock'], 0x2011800) then
+	return
+end
 local TYPE_LIST = {
 	'NEARBY', 'SENCE', 'WORLD', 'TEAM', 'RAID', 'BATTLE_FIELD', 'TONG',
 	'FORCE', 'CAMP', 'WHISPER', 'FRIENDS', 'TONG_ALLIANCE', 'SYSTEM',

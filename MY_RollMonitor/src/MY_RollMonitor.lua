@@ -30,6 +30,9 @@ local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumb
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_RollMonitor/lang/')
+if not MY.AssertVersion('MY_RollMonitor', _L['MY_RollMonitor'], 0x2011800) then
+	return
+end
 local SORT_TYPE = {
 	FIRST = 1,  -- 只记录第一次
 	LAST  = 2,  -- 只记录最后一次

@@ -43,6 +43,9 @@ local GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID = 
 local setmetatable = setmetatable
 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_ChatLog/lang/')
+if not MY.AssertVersion('MY_ChatLog', _L['MY_ChatLog'], 0x2011800) then
+	return
+end
 MY_ChatLog = MY_ChatLog or {}
 MY_ChatLog.bIgnoreTongOnlineMsg    = true -- 帮会上线通知
 MY_ChatLog.bIgnoreTongMemberLogMsg = true -- 帮会成员上线下线提示

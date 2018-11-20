@@ -30,6 +30,9 @@ local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumb
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_ArchHUD/lang/')
+if not MY.AssertVersion('MY_ArchHUD', _L['MY_ArchHUD'], 0x2011800) then
+	return
+end
 local DefaultAnchor = {s = 'CENTER', r = 'CENTER',  x = 0, y = 0}
 MY_ArchHUD = {}
 MY_ArchHUD.bOn = false

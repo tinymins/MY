@@ -33,6 +33,9 @@ local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTab
 ---------------------------------------------------------------------------------------------------
 local PATH_ROOT = MY.GetAddonInfo().szRoot .. 'MY_GKP/'
 local _L = MY.LoadLangPack(PATH_ROOT .. 'lang/')
+if not MY.AssertVersion('MY_GKP', _L['MY_GKP'], 0x2011800) then
+	return
+end
 
 MY_GKP = {
 	bDebug               = false,

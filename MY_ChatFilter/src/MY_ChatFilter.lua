@@ -29,9 +29,12 @@ local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
 local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_ChatFilter/lang/')
+if not MY.AssertVersion('MY_ChatFilter', _L['MY_ChatFilter'], 0x2011800) then
+	return
+end
 MY_ChatFilter = {}
 local _C = {}
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_ChatFilter/lang/')
 local MY_ChatFilter = MY_ChatFilter
 local MAX_CHAT_RECORD = 10
 local MAX_UUID_RECORD = 10

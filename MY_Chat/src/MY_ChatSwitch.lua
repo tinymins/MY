@@ -30,6 +30,9 @@ local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumb
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Chat/lang/')
+if not MY.AssertVersion('MY_ChatSwitch', _L['MY_ChatSwitch'], 0x2011800) then
+	return
+end
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Chat/ui/MY_ChatSwitch.ini'
 local CD_REFRESH_OFFSET = 7 * 60 * 60 -- 7µã¸üÐÂCD
 MY_ChatSwitch = {}

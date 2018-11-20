@@ -44,9 +44,12 @@ local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTab
         ...
     }
 ]]
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_ChatMonitor/lang/')
+if not MY.AssertVersion('MY_ChatMonitor', _L['MY_ChatMonitor'], 0x2011800) then
+	return
+end
 local D = {}
 local _C = {}
-local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_ChatMonitor/lang/')
 local DATA_FILE = 'userdata/chatmonitor.jx3dat'
 local RECORD_LIST, RECORD_HASH = {}, {}
 MY_ChatMonitor = {}

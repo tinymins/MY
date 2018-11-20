@@ -29,8 +29,11 @@ local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
 local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
-local _C = {}
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MYDev_UIEventID/lang/')
+if not MY.AssertVersion('MYDev_UIEventID', _L['MYDev_UIEventID'], 0x2011800) then
+	return
+end
+local _C = {}
 _C.tEventIndex = {
 	{ text = _L['OnKeyDown'        ], bit = 13 },
 	{ text = _L['OnKeyUp'          ], bit = 14 },

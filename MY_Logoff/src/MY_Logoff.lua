@@ -30,6 +30,9 @@ local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumb
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Logoff/lang/')
+if not MY.AssertVersion('MY_Logoff', _L['MY_Logoff'], 0x2011800) then
+	return
+end
 
 MY_Logoff = {}
 MY_Logoff.bIdleOff = false
