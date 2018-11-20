@@ -1,4 +1,19 @@
 data = {
     ['MY_TargetDirection'] = '目標指示',
     ['%.1f feet'] = '%.1f 尺',
+
+    ['MY_TargetFace'] = '目標面向',
+    ['Options'] = '功能選項',
+	['Display the sector of target facing, change color'] = '顯示目標的扇形面向，設置顏色',
+	['The sector angle'] = '扇形的角度',
+	['%d degree'] = '%d度',
+	['The sector radius'] = '扇形的半徑',
+	['%d feet'] = '%d尺',
+	['The sector transparency'] = '扇形透明度',
+	['Target face'] = '目標扇形面向',
+	['Display the sector of target target facing, change color'] = '顯示目標的目標的扇形面向，設置顏色',
+	['Display the foot shape of target, change color'] = '顯示目標底部的圈圈，設置顏色',
+	['Display the foot shape of target target, change color'] = '顯示目標的目標底部的圈圈，設置顏色',
+	['The foot shape radius'] = '圈圈半徑',
+	['The foot shape transparency'] = '圈圈透明度',
 }
