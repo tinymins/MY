@@ -317,6 +317,7 @@ end
 -- szType: 'euclidean': 欧氏距离 (default)
 --         'plane'    : 平面距离
 --         'gwwean'   : 郭氏距离
+--         'global'   : 使用全局配置
 function MY.GetDistance(arg0, arg1, arg2, arg3, arg4, arg5, arg6)
 	local szType = 'euclidean'
 	local nX1, nY1, nZ1 = 0, 0, 0
@@ -1938,8 +1939,9 @@ end
 -- 取得目标类型和ID
 -- (dwType, dwID) MY.GetTarget()       -- 取得自己当前的目标类型和ID
 -- (dwType, dwID) MY.GetTarget(object) -- 取得指定操作对象当前的目标类型和ID
-function MY.GetTarget(object)
-	if not object then
+function MY.GetTarget(...)
+	local object = ...
+	if select('#', ...) == 0 then
 		object = GetClientPlayer()
 	end
 	if object then
