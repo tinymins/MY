@@ -1030,6 +1030,7 @@ _C.tTraceMenu  = {}   -- ¹¤¾ßÀ¸²Ëµ¥
 function _C.GetMainMenu()
 	return {
 		szOption = _L['mingyi plugins'],
+		rgb = {255, 255, 0},
 		fnAction = MY.TogglePanel,
 		bCheck = true,
 		bChecked = MY.IsPanelVisible(),
@@ -1037,7 +1038,7 @@ function _C.GetMainMenu()
 		szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
 		nFrame = 105, nMouseOverFrame = 106,
 		szLayer = 'ICON_RIGHT',
-		fnClickIcon = MY.TogglePanel
+		fnClickIcon = MY.TogglePanel,
 	}
 end
 -- get target addon menu
