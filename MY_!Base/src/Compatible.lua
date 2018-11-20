@@ -608,7 +608,7 @@ end
 
 if not Table_GetDoodadTemplateName then
 function Table_GetDoodadTemplateName(dwTemplateID)
-	local szName = ""
+	local szName = ''
 	local tDoodad = g_tTable.DoodadTemplate:Search(dwTemplateID)
 	if tDoodad then
 		szName = tDoodad.szName

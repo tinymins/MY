@@ -1257,7 +1257,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 			if player then
 				ui:children('#Text_Adv'):text(_L('%s, welcome to use mingyi plugins!', player.szName) .. 'v' .. MY.GetVersion())
 			end
-			ui:children('#Text_Memory'):text(format("Memory:%.1fMB", collectgarbage("count") / 1024))
+			ui:children('#Text_Memory'):text(format('Memory:%.1fMB', collectgarbage('count') / 1024))
 		end)
 		wnd.OnPanelDeactive = function()
 			MY.BreatheCall('MYLIB#TAB#DEFAULT', false)

@@ -139,22 +139,22 @@ end
 function D.CheckEnable()
 	if not MY.IsShieldedVersion() and (O.bTargetFace or O.bTTargetFace or O.bTargetShape or O.bTTargetShape) then
 		local hShaList = UI.GetShadowHandle('MY_TargetFace')
-		for _, v in ipairs({ "TargetFace", "TargetShape", "TTargetFace", "TTargetShape" }) do
+		for _, v in ipairs({'TargetFace', 'TargetShape', 'TTargetFace', 'TTargetShape'}) do
 			local sha = hShaList:Lookup(v)
 			if not sha then
 				hShaList:AppendItemFromString('<shadow>name="' .. v .. '"</shadow>')
 				sha = hShaList:Lookup(v)
 			end
-			C["sha" .. v] = sha
+			C['sha' .. v] = sha
 		end
 		MY.BreatheCall('MY_TargetFace', onBreathe)
 	else
-		for _, v in ipairs({ "TargetFace", "TargetShape", "TTargetFace", "TTargetShape" }) do
-			local sha = C["sha" .. v]
+		for _, v in ipairs({'TargetFace', 'TargetShape', 'TTargetFace', 'TTargetShape'}) do
+			local sha = C['sha' .. v]
 			if sha and sha:IsValid() then
 				sha:Hide()
 			end
-			C["sha" .. v] = nil
+			C['sha' .. v] = nil
 		end
 		MY.BreatheCall('MY_TargetFace', false)
 	end
@@ -172,20 +172,20 @@ function PS.OnPanelActive(wnd)
 	local X, Y = 20, 20
 	local x, y = X, Y
 	local deltaY = 32
-	ui:append("Text", { x = x, y = y, text = _L["Options"], font = 27 })
+	ui:append('Text', { x = x, y = y, text = _L['Options'], font = 27 })
 
 	-- target face
 	x, y = X + 10, y + deltaY
-	x = x + ui:append("WndCheckBox", {
+	x = x + ui:append('WndCheckBox', {
 		x = x, y = y,
-		text = _L["Display the sector of target facing, change color"],
+		text = _L['Display the sector of target facing, change color'],
 		checked = MY_TargetFace.bTargetFace,
 		oncheck = function(bChecked)
 			MY_TargetFace.bTargetFace = bChecked
 		end,
 	}, true):autoWidth():width()
 
-	ui:append("Shadow", {
+	ui:append('Shadow', {
 		x = x + 2, y = y + 4, w = 18, h = 18,
 		color = MY_TargetFace.tTargetFaceColor,
 		onclick = function()
@@ -199,16 +199,16 @@ function PS.OnPanelActive(wnd)
 
 	-- target target face
 	x, y = X + 10, y + deltaY
-	x = x + ui:append("WndCheckBox", {
+	x = x + ui:append('WndCheckBox', {
 		x = x, y = y,
-		text = _L["Display the sector of target target facing, change color"],
+		text = _L['Display the sector of target target facing, change color'],
 		checked = MY_TargetFace.bTTargetFace,
 		oncheck = function(bChecked)
 			MY_TargetFace.bTTargetFace = bChecked
 		end,
 	}, true):autoWidth():width()
 
-	ui:append("Shadow", {
+	ui:append('Shadow', {
 		x = x + 2, y = y + 4, w = 18, h = 18,
 		color = MY_TargetFace.tTTargetFaceColor,
 		onclick = function()
@@ -221,9 +221,9 @@ function PS.OnPanelActive(wnd)
 	})
 
 	x, y = X + 37, y + deltaY
-	x = x + ui:append("Text", { text = _L["The sector angle"], x = x, y = y }, true):autoWidth():width()
+	x = x + ui:append('Text', { text = _L['The sector angle'], x = x, y = y }, true):autoWidth():width()
 
-	ui:append("WndSliderBox", {
+	ui:append('WndSliderBox', {
 		x = x + 2, y = y + 4,
 		value = MY_TargetFace.nSectorDegree,
 		range = {30, 180},
@@ -233,9 +233,9 @@ function PS.OnPanelActive(wnd)
 	})
 
 	x, y = X + 37, y + deltaY
-	x = x + ui:append("Text", { text = _L["The sector radius"], x = x, y = y }, true):autoWidth():width()
+	x = x + ui:append('Text', { text = _L['The sector radius'], x = x, y = y }, true):autoWidth():width()
 
-	ui:append("WndSliderBox", {
+	ui:append('WndSliderBox', {
 		x = x + 2, y = y + 4,
 		value = MY_TargetFace.nSectorRadius,
 		range = {1, 26},
@@ -245,9 +245,9 @@ function PS.OnPanelActive(wnd)
 	})
 
 	x, y = X + 37, y + deltaY
-	x = x + ui:append("Text", { text = _L["The sector transparency"], x = x, y = y }, true):autoWidth():width()
+	x = x + ui:append('Text', { text = _L['The sector transparency'], x = x, y = y }, true):autoWidth():width()
 
-	ui:append("WndSliderBox", {
+	ui:append('WndSliderBox', {
 		x = x + 2, y = y + 4,
 		value = ceil((200 - MY_TargetFace.nSectorAlpha) / 2),
 		range = {0, 100},
@@ -258,14 +258,14 @@ function PS.OnPanelActive(wnd)
 
 	-- foot shape
 	x, y = X, y + deltaY
-	x = x + ui:append("WndCheckBox", {
+	x = x + ui:append('WndCheckBox', {
 		x = x, y = y,
-		text = _L["Display the foot shape of target, change color"],
+		text = _L['Display the foot shape of target, change color'],
 		checked = MY_TargetFace.bTargetShape,
 		oncheck = function(bChecked) MY_TargetFace.bTargetShape = bChecked end,
 	}, true):autoWidth():width()
 
-	ui:append("Shadow", {
+	ui:append('Shadow', {
 		x = x + 2, y = y + 4, w = 18, h = 18,
 		color = MY_TargetFace.tTargetShapeColor,
 		onclick = function()
@@ -278,14 +278,14 @@ function PS.OnPanelActive(wnd)
 	})
 
 	x, y = X, y + deltaY
-	x = x + ui:append("WndCheckBox", {
+	x = x + ui:append('WndCheckBox', {
 		x = x, y = y,
-		text = _L["Display the foot shape of target target, change color"],
+		text = _L['Display the foot shape of target target, change color'],
 		checked = MY_TargetFace.bTTargetShape,
 		oncheck = function(bChecked) MY_TargetFace.bTTargetShape = bChecked end,
 	}, true):autoWidth():width()
 
-	ui:append("Shadow", {
+	ui:append('Shadow', {
 		x = x + 2, y = y + 4, w = 18, h = 18,
 		color = MY_TargetFace.tTTargetShapeColor,
 		onclick = function()
@@ -298,9 +298,9 @@ function PS.OnPanelActive(wnd)
 	})
 
 	x, y = X + 37, y + deltaY
-	x = x + ui:append("Text", { text = _L["The foot shape radius"], x = x, y = y }, true):autoWidth():width()
+	x = x + ui:append('Text', { text = _L['The foot shape radius'], x = x, y = y }, true):autoWidth():width()
 
-	ui:append("WndSliderBox", {
+	ui:append('WndSliderBox', {
 		x = x + 2, y = y + 4,
 		value = MY_TargetFace.nShapeRadius,
 		range = {1, 26},
@@ -310,9 +310,9 @@ function PS.OnPanelActive(wnd)
 	})
 
 	x, y = X + 37, y + deltaY
-	x = x + ui:append("Text", { text = _L["The foot shape transparency"], x = x, y = y }, true):autoWidth():width()
+	x = x + ui:append('Text', { text = _L['The foot shape transparency'], x = x, y = y }, true):autoWidth():width()
 
-	ui:append("WndSliderBox", {
+	ui:append('WndSliderBox', {
 		x = x + 2, y = y + 4,
 		value = ceil((200 - MY_TargetFace.nShapeAlpha) / 2),
 		range = {0, 100},

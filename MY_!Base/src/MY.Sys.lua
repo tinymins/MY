@@ -1470,10 +1470,10 @@ end
 do -- 二次封装 MessageBox 相关事件
 local function OnMessageBoxOpen()
 	local szName, frame, aMsg = arg0, arg1, {}
-	local wndAll = frame:Lookup("Wnd_All")
+	local wndAll = frame:Lookup('Wnd_All')
 
 	for i = 1, 5 do
-		local btn = wndAll:Lookup("Btn_Option" .. i)
+		local btn = wndAll:Lookup('Btn_Option' .. i)
 		if btn and btn.IsVisible and btn:IsVisible() then
 			local nIndex, szOption = btn.nIndex, btn.szOption
 			if btn.fnAction then
@@ -1680,10 +1680,10 @@ function MY.OutputNpcTip(dwID, Rect, szExtraXml)
 
 	-- 名字
 	local szName = MY.GetObjectName(npc)
-	insert(t, GetFormatText(szName .. "\n", 80, r, g, b))
+	insert(t, GetFormatText(szName .. '\n', 80, r, g, b))
 	-- 称号
-	if npc.szTitle ~= "" then
-		insert(t, GetFormatText("<" .. npc.szTitle .. ">\n", 0))
+	if npc.szTitle ~= '' then
+		insert(t, GetFormatText('<' .. npc.szTitle .. '>\n', 0))
 	end
 	-- 等级
 	if npc.nLevel - me.nLevel > 10 then
@@ -1693,7 +1693,7 @@ function MY.OutputNpcTip(dwID, Rect, szExtraXml)
 	end
 	-- 势力
 	if g_tReputation and g_tReputation.tReputationTable[npc.dwForceID] then
-		insert(t, GetFormatText(g_tReputation.tReputationTable[npc.dwForceID].szName .. "\n", 0))
+		insert(t, GetFormatText(g_tReputation.tReputationTable[npc.dwForceID].szName .. '\n', 0))
 	end
 	-- 任务信息
 	if GetNpcQuestTip then
@@ -1711,9 +1711,9 @@ function MY.OutputNpcTip(dwID, Rect, szExtraXml)
 		if IsShiftKeyDown() and GetNpcQuestState then
 			local tState = GetNpcQuestState(npc, true)
 			for szKey, tQuestList in pairs(tState) do
-				tState[szKey] = concat(tQuestList, ",")
+				tState[szKey] = concat(tQuestList, ',')
 			end
-			insert(t, GetFormatText(var2str(tState, "  "), 102))
+			insert(t, GetFormatText(var2str(tState, '  '), 102))
 		end
 	end
 	-- 格式化输出
@@ -1732,7 +1732,7 @@ function MY.OutputDoodadTip(dwDoodadID, Rect, szExtraXml)
 	if doodad.nKind == DOODAD_KIND.CORPSE then
 		szName = szDoodadName .. g_tStrings.STR_DOODAD_CORPSE
 	end
-	insert(t, GetFormatText(szDoodadName .. "\n", 37))
+	insert(t, GetFormatText(szDoodadName .. '\n', 37))
 	-- 采集信息
 	if (doodad.nKind == DOODAD_KIND.CORPSE and not doodad.CanLoot(player.dwID)) or doodad.nKind == DOODAD_KIND.CRAFT_TARGET then
 		local doodadTemplate = GetDoodadTemplate(doodad.dwTemplateID)

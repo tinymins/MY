@@ -64,21 +64,21 @@ local OBJECT_SCREEN_POS_Y_CACHE = {}
 local OBJECT_TITLE_EFFECT, OVERWRITE_TITLE_EFFECT = {}, {}
 do -- 头顶特效数据刷新
 local QUEST_TITLE_EFFECT = {
-	["normal_unaccept_proper"] = 1,
-	["repeat_unaccept_proper"] = 2,
-	["activity_unaccept_proper"] = 45,
-	["unaccept_high"] = 5,
-	["unaccept_low"] = 6,
-	["unaccept_lower"] = 43,
-	["accpeted"] = 44,
-	["normal_finished"] = 3,
-	["repeat_finished"] = 4,
-	["activity_finished"] = 46,
-	["normal_notneedaccept"] = 44,
-	["repeat_notneedaccept"] = 4,
-	["activity_notneedaccept"] = 46,
-	["lishijie_unaccept"] = 55,
-	["lishijie_finished"] = 54,
+	['normal_unaccept_proper'] = 1,
+	['repeat_unaccept_proper'] = 2,
+	['activity_unaccept_proper'] = 45,
+	['unaccept_high'] = 5,
+	['unaccept_low'] = 6,
+	['unaccept_lower'] = 43,
+	['accpeted'] = 44,
+	['normal_finished'] = 3,
+	['repeat_finished'] = 4,
+	['activity_finished'] = 46,
+	['normal_notneedaccept'] = 44,
+	['repeat_notneedaccept'] = 4,
+	['activity_notneedaccept'] = 46,
+	['lishijie_unaccept'] = 55,
+	['lishijie_finished'] = 54,
 }
 local function UpdateTitleEffect(dwType, dwID)
 	local nEffectID = nil
