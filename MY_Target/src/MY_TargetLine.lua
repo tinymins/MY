@@ -40,8 +40,8 @@ local IMG_PATH = MY.GetAddonInfo().szRoot .. 'MY_Target/img/MY_TargetLine.uitex'
 local O = {
 	bTarget       = false,         -- 启用目标追踪线
 	bTTarget      = false,         -- 显示目标与目标的目标连接线
-	nConnWidth    = 3,             -- 连接线宽度
-	nConnAlpha    = 150,           -- 连接线不透明度
+	nLineWidth    = 3,             -- 连接线宽度
+	nLineAlpha    = 150,           -- 连接线不透明度
 	tTargetColor  = { 0, 255, 0 }, -- 颜色
 	tTTargetColor = { 255, 0, 0 }, -- 颜色
 }
@@ -49,8 +49,8 @@ local C, D = {}, {}
 
 RegisterCustomData('MY_TargetLine.bTarget')
 RegisterCustomData('MY_TargetLine.bTTarget')
-RegisterCustomData('MY_TargetLine.nConnWidth')
-RegisterCustomData('MY_TargetLine.nConnAlpha')
+RegisterCustomData('MY_TargetLine.nLineWidth')
+RegisterCustomData('MY_TargetLine.nLineAlpha')
 RegisterCustomData('MY_TargetLine.tTargetColor')
 RegisterCustomData('MY_TargetLine.tTTargetColor')
 
@@ -60,7 +60,7 @@ end
 
 do
 local function DrawLine(tar, ttar, sha, col, nAlpha)
-	sha:SetTriangleFan(GEOMETRY_TYPE.LINE, O.nConnWidth)
+	sha:SetTriangleFan(GEOMETRY_TYPE.LINE, O.nLineWidth)
 	sha:ClearTriangleFanPoint()
 	local r, g, b = unpack(col)
 	sha:AppendCharacterID(tar.dwID, true, r, g, b, nAlpha)
@@ -82,7 +82,7 @@ local function onBreathe()
 		or C.dwTarID ~= tar.dwID
 		or (ttar and C.dwTTarID ~= ttar.dwID)
 		or (not ttar and C.dwTTarID ~= 0) then
-			DrawLine(me, tar, C.shaTLine, O.tTargetColor, O.nConnAlpha)
+			DrawLine(me, tar, C.shaTLine, O.tTargetColor, O.nLineAlpha)
 		end
 	else
 		C.shaTLine:Hide()
@@ -91,7 +91,7 @@ local function onBreathe()
 
 	if O.bTTarget and tar and ttar then
 		if C.bReRender or C.dwTTarID ~= ttar.dwID then
-			DrawLine(tar, ttar, C.shaTTLine, O.tTTargetColor, O.nConnAlpha)
+			DrawLine(tar, ttar, C.shaTTLine, O.tTTargetColor, O.nLineAlpha)
 		end
 	else
 		C.shaTTLine:Hide()
@@ -138,8 +138,8 @@ local settings = {
 			fields = {
 				bTarget       = true,
 				bTTarget      = true,
-				nConnWidth    = true,
-				nConnAlpha    = true,
+				nLineWidth    = true,
+				nLineAlpha    = true,
 				tTargetColor  = true,
 				tTTargetColor = true,
 			},
@@ -151,16 +151,16 @@ local settings = {
 			fields = {
 				bTarget       = true,
 				bTTarget      = true,
-				nConnWidth    = true,
-				nConnAlpha    = true,
+				nLineWidth    = true,
+				nLineAlpha    = true,
 				tTargetColor  = true,
 				tTTargetColor = true,
 			},
 			triggers = {
 				bTarget       = D.CheckEnable,
 				bTTarget      = D.CheckEnable,
-				nConnWidth    = D.RequireRerender,
-				nConnAlpha    = D.RequireRerender,
+				nLineWidth    = D.RequireRerender,
+				nLineAlpha    = D.RequireRerender,
 				tTargetColor  = D.RequireRerender,
 				tTTargetColor = D.RequireRerender,
 			},
