@@ -122,7 +122,7 @@ local function Get(var, keys, dft)
 	if type(keys) == 'string' then
 		local ks = {}
 		for k in string.gmatch(keys, '[^%.]+') do
-			insert(ak, k)
+			insert(ks, k)
 		end
 		keys = ks
 	end
