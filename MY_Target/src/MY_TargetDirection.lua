@@ -37,7 +37,7 @@ end
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Target/ui/MY_TargetDirection.ini'
 local IMG_PATH = MY.GetAddonInfo().szRoot .. 'MY_Target/img/MY_TargetDirection.uitex'
 
-local C = {
+local O = {
 	bEnable = false,
 	tAnchor = {},
 	eDistanceType = 'global',
@@ -69,7 +69,7 @@ function D.UpdateAnchor()
 	if not frame then
 		return
 	end
-	local a = C.tAnchor
+	local a = O.tAnchor
 	if not IsEmpty(a) then
 		frame:SetPoint(a.s, 0, 0, a.r, a.x, a.y)
 	else
@@ -79,7 +79,7 @@ function D.UpdateAnchor()
 end
 
 function D.CheckEnable()
-	if C.bEnable then
+	if O.bEnable then
 		D.OpenPanel()
 	else
 		D.ClosePanel()
@@ -147,7 +147,7 @@ function D.OnFrameBreathe()
 		end
 		this:Lookup('', 'Handle_Main/Image_Arrow'):SetFrame(nFrame)
 		-- æ‡¿Î
-		this:Lookup('', 'Handle_Main/Text_Distance'):SetText(_L('%.1f feet', MY.GetDistance(me, tar, C.eDistanceType)))
+		this:Lookup('', 'Handle_Main/Text_Distance'):SetText(_L('%.1f feet', MY.GetDistance(me, tar, O.eDistanceType)))
 		this:Show()
 	else
 		this:Hide()
@@ -165,7 +165,7 @@ end
 
 function D.OnFrameDragEnd()
 	this:CorrectPos()
-	C.tAnchor = GetFrameAnchor(this)
+	O.tAnchor = GetFrameAnchor(this)
 end
 
 -- Global exports
@@ -178,7 +178,7 @@ local settings = {
 				tAnchor = true,
 				eDistanceType = true,
 			},
-			root = C,
+			root = O,
 		},
 		{
 			fields = {
@@ -200,7 +200,7 @@ local settings = {
 				bEnable = D.CheckEnable,
 				tAnchor = D.UpdateAnchor,
 			},
-			root = C,
+			root = O,
 		},
 	},
 }
