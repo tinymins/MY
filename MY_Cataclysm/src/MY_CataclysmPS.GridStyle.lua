@@ -315,4 +315,4 @@ function PS.OnPanelActive(frame)
 	}, true)
 	y = y + 25
 end
-MY.RegisterPanel('MY_Cataclysm_GridStyle', _L['Grid Style'], _L['Raid'], 'ui/Image/UICommon/RaidTotal.uitex|68', {255, 255, 0}, PS)
+MY.RegisterPanel('MY_Cataclysm_GridStyle', _L['Grid Style'], _L['Raid'], 'ui/Image/UICommon/RaidTotal.uitex|68', PS)

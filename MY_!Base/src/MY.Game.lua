@@ -1089,7 +1089,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 end
-MY.RegisterPanel('GlobalColor', _L['GlobalColor'], _L['System'], 2673, {255,255,0,200}, PS)
+MY.RegisterPanel('GlobalColor', _L['GlobalColor'], _L['System'], 2673, PS)
 end
 
 do

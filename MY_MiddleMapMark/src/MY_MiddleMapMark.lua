@@ -620,4 +620,4 @@ function PS.OnPanelResize(wnd)
 	ui:children('#WndEdit_Search'):size(w - 26, 25)
 end
 
-MY.RegisterPanel('MY_MiddleMapMark', _L['middle map mark'], _L['General'], 'ui/Image/MiddleMap/MapWindow2.UITex|4', {255,255,0,200}, PS)
+MY.RegisterPanel('MY_MiddleMapMark', _L['middle map mark'], _L['General'], 'ui/Image/MiddleMap/MapWindow2.UITex|4', PS)

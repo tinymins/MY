@@ -112,4 +112,4 @@ _C.PS = {
 	end
 }
 
-MY.RegisterPanel('MY_EquipView', _L['equip view'], _L['General'], 'ui/Image/UICommon/CommonPanel7.UITex|23', {255,127,0,200}, _C.PS)
+MY.RegisterPanel('MY_EquipView', _L['equip view'], _L['General'], 'ui/Image/UICommon/CommonPanel7.UITex|23', _C.PS)

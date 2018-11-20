@@ -101,6 +101,6 @@ _Cache.OnPanelDeactive = function(wnd)
     collectgarbage('collect')
 end
 
-MY.RegisterPanel( 'Dev_UITexViewer', _L['UITexViewer'], _L['Development'], 'ui/Image/UICommon/BattleFiled.UITex|7', {255,127,0,200}, {
+MY.RegisterPanel( 'Dev_UITexViewer', _L['UITexViewer'], _L['Development'], 'ui/Image/UICommon/BattleFiled.UITex|7', {
     OnPanelActive = _Cache.OnPanelActive, OnPanelDeactive = _Cache.OnPanelDeactive
 })

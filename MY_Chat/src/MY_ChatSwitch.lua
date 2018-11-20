@@ -626,4 +626,4 @@ function PS.OnPanelActive(wnd)
 		y = y + deltaY
 	end
 end
-MY.RegisterPanel('MY_ChatSwitch', _L['chat helper'], _L['Chat'], 'UI/Image/UICommon/ActivePopularize2.UITex|20', {255,255,0,200}, PS)
+MY.RegisterPanel('MY_ChatSwitch', _L['chat helper'], _L['Chat'], 'UI/Image/UICommon/ActivePopularize2.UITex|20', PS)

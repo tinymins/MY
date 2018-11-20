@@ -667,7 +667,7 @@ function PS.OnPanelActive(wnd)
 		y = y + 28
 	end
 end
-MY.RegisterPanel('MY_GKP', _L['GKP Golden Team Record'], _L['General'], 2490, {255,255,0,200}, PS)
+MY.RegisterPanel('MY_GKP', _L['GKP Golden Team Record'], _L['General'], 2490, PS)
 
 ---------------------------------------------------------------------->
 -- 获取补贴方案菜单

@@ -951,7 +951,7 @@ function PS.OnPanelActive(wnd)
 
 	x = X
 end
-MY.RegisterPanel( 'MY_ToolBox', _L['toolbox'], _L['General'], 'UI/Image/Common/Money.UITex|243', { 255, 255, 0, 200 }, PS)
+MY.RegisterPanel( 'MY_ToolBox', _L['toolbox'], _L['General'], 'UI/Image/Common/Money.UITex|243', PS)
 
 do
 local TARGET_TYPE, TARGET_ID

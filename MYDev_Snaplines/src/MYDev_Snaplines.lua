@@ -384,7 +384,7 @@ MY.RegisterInit('MYDEV_SNAPLINES', MYDev_Snaplines.ReloadUI)
 -- ×¢²áÃæ°å
 MY.RegisterPanel(
 	'Dev_Snaplines', _L['Snaplines'], _L['Development'],
-	'ui/Image/UICommon/PlugIn.UITex|1', {255,127,0,200}, {
+	'ui/Image/UICommon/PlugIn.UITex|1', {
 	OnPanelActive = function(wnd)
 		local ui = UI(wnd)
 		local w, h = ui:size()

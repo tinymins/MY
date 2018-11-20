@@ -378,4 +378,4 @@ function PS.OnPanelActive(wnd)
 		text = _L['origin author: Sulian Yi'],
 	})
 end
-MY.RegisterPanel('MY_ArchHUD', _L['MY_ArchHUD'], _L['General'], 6767, {255,255,0,200}, PS)
+MY.RegisterPanel('MY_ArchHUD', _L['MY_ArchHUD'], _L['General'], 6767, PS)

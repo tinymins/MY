@@ -598,7 +598,7 @@ function PS.OnPanelActive(frame)
 		autoenable = IsEnabled,
 	})
 end
-MY.RegisterPanel('MY_ThreatRank', g_tStrings.HATRED_COLLECT, _L['Target'], 632, {255, 255, 0}, PS)
+MY.RegisterPanel('MY_ThreatRank', g_tStrings.HATRED_COLLECT, _L['Target'], 632, PS)
 
 do
 local function GetMenu()

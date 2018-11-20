@@ -1288,19 +1288,18 @@ function MY.GetCurrentTabID()
 end
 
 -- 注册选项卡
--- (void) MY.RegisterPanel( szID, szTitle, szCategory, szIconTex, rgbaTitleColor, options )
+-- (void) MY.RegisterPanel( szID, szTitle, szCategory, szIconTex, options )
 -- szID            选项卡唯一ID
 -- szTitle         选项卡按钮标题
 -- szCategory      选项卡所在分类
 -- szIconTex       选项卡图标文件|图标帧
--- rgbaTitleColor  选项卡文字rgba
 -- options         选项卡各种响应函数 {
 --   options.OnPanelActive(wnd)      选项卡激活    wnd为当前MainPanel
 --   options.OnPanelDeactive(wnd)    选项卡取消激活
 --   options.bShielded               国服和谐的选项卡
 -- }
 -- Ex： MY.RegisterPanel( 'Test', '测试标签', '测试', 'UI/Image/UICommon/ScienceTreeNode.UITex|123', {255,255,0,200}, { OnPanelActive = function(wnd) end } )
-function MY.RegisterPanel(szID, szTitle, szCategory, szIconTex, rgbaTitleColor, options)
+function MY.RegisterPanel(szID, szTitle, szCategory, szIconTex, options)
 	local category
 	for _, ctg in ipairs(TABS_LIST) do
 		for i = #ctg, 1, -1 do
@@ -1335,12 +1334,9 @@ function MY.RegisterPanel(szID, szTitle, szCategory, szIconTex, rgbaTitleColor, 
 	szIconTex = string.gsub(szIconTex, '%|.*', '')
 
 	-- format other params
-	if type(options)~='table' then options = {} end
-	if type(rgbaTitleColor)~='table' then rgbaTitleColor = { 255, 255, 255, 255 } end
-	if type(rgbaTitleColor[1])~='number' then rgbaTitleColor[1] = 255 end
-	if type(rgbaTitleColor[2])~='number' then rgbaTitleColor[2] = 255 end
-	if type(rgbaTitleColor[3])~='number' then rgbaTitleColor[3] = 255 end
-	if type(rgbaTitleColor[4])~='number' then rgbaTitleColor[4] = 200 end
+	if not IsTable(options) then
+		options = {}
+	end
 	table.insert( category, {
 		szID        = szID       ,
 		szTitle     = szTitle    ,
@@ -1348,8 +1344,6 @@ function MY.RegisterPanel(szID, szTitle, szCategory, szIconTex, rgbaTitleColor, 
 		szIconTex   = szIconTex  ,
 		dwIconFrame = dwIconFrame,
 		bShielded   = options.bShielded,
-		rgbTitle    = { rgbaTitleColor[1], rgbaTitleColor[2], rgbaTitleColor[3] },
-		alpha       = rgbaTitleColor[4],
 		fn          = {
 			OnPanelResize   = options.OnPanelResize  ,
 			OnPanelActive   = options.OnPanelActive  ,

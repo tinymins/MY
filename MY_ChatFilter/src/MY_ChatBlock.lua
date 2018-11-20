@@ -431,4 +431,4 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 end
-MY.RegisterPanel( 'MY_ChatBlock', _L['chat filter'], _L['Chat'], 'UI/Image/Common/Money.UITex|243', {255,255,0,200}, PS)
+MY.RegisterPanel( 'MY_ChatBlock', _L['chat filter'], _L['Chat'], 'UI/Image/Common/Money.UITex|243', PS)

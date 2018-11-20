@@ -477,4 +477,4 @@ function PS.OnPanelDeactive()
 	MY.BreatheCall('MY_RollMonitorRedraw', false)
 end
 
-MY.RegisterPanel('RollMonitor', _L['roll monitor'], _L['General'], 'UI/Image/UICommon/LoginCommon.UITex|30', {255,255,0,200}, PS)
+MY.RegisterPanel('RollMonitor', _L['roll monitor'], _L['General'], 'UI/Image/UICommon/LoginCommon.UITex|30', PS)

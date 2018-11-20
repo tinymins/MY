@@ -1339,4 +1339,4 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + dy
 end
-MY.RegisterPanel( 'ChatLog', _L['chat log'], _L['Chat'], 'ui/Image/button/SystemButton.UITex|43', {255,127,0,200}, PS)
+MY.RegisterPanel( 'ChatLog', _L['chat log'], _L['Chat'], 'ui/Image/button/SystemButton.UITex|43', PS)

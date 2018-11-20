@@ -1186,7 +1186,7 @@ function PS.OnPanelActive(frame)
 		ui:append('WndButton3', { x = 350, y = 0, text = _L['Load CombatText Config'] }):Click(CombatText.CheckEnable)
 	end
 end
-MY.RegisterPanel('MY_CombatText', _L['CombatText'], _L['System'], 2041, {255, 255, 0}, PS)
+MY.RegisterPanel('MY_CombatText', _L['CombatText'], _L['System'], 2041, PS)
 
 local function GetPlayerID()
 	local me = GetControlPlayer()

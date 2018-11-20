@@ -615,7 +615,7 @@ MY.RegisterHotKey('MY_ChatMonitor_Hotkey', _L['chat monitor'],
     end
 , nil)
 
-MY.RegisterPanel('MY_ChatMonitor', _L['chat monitor'], _L['Chat'], 'UI/Image/Minimap/Minimap.UITex|197', {255,127,0,200}, {
+MY.RegisterPanel('MY_ChatMonitor', _L['chat monitor'], _L['Chat'], 'UI/Image/Minimap/Minimap.UITex|197', {
     OnPanelActive = _C.OnPanelActive,
     OnPanelDeactive = function()
         _C.uiBoard = nil

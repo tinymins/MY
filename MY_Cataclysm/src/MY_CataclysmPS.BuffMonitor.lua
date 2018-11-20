@@ -704,4 +704,4 @@ end
 function PS.OnPanelDeactive()
 	l_list = nil
 end
-MY.RegisterPanel('MY_Cataclysm_BuffMonitor', _L['Buff settings'], _L['Raid'], 'ui/Image/UICommon/RaidTotal.uitex|65', {255, 255, 0}, PS)
+MY.RegisterPanel('MY_Cataclysm_BuffMonitor', _L['Buff settings'], _L['Raid'], 'ui/Image/UICommon/RaidTotal.uitex|65', PS)

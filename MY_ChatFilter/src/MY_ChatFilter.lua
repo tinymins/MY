@@ -162,7 +162,7 @@ MY.HookChatPanel('FILTER.MY_ChatFilter', function(h, szMsg, szChannel, dwTime)
 end)
 
 MY.RegisterPanel('MY_DuplicateChatFilter', _L['duplicate chat filter'], _L['Chat'],
-'ui/Image/UICommon/yirong3.UITex|104', {255,255,0,200}, {OnPanelActive = function(wnd)
+'ui/Image/UICommon/yirong3.UITex|104', {OnPanelActive = function(wnd)
 	local ui = UI(wnd)
 	local w, h = ui:size()
 	local x, y = 20, 30

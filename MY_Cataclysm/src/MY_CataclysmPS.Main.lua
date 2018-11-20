@@ -262,4 +262,4 @@ function PS.OnPanelActive(frame)
 	-- end, true):Pos_()
 	y = y + 25
 end
-MY.RegisterPanel('MY_Cataclysm', _L['Cataclysm'], _L['Raid'], 'ui/Image/UICommon/RaidTotal.uitex|62', {255, 255, 0}, PS)
+MY.RegisterPanel('MY_Cataclysm', _L['Cataclysm'], _L['Raid'], 'ui/Image/UICommon/RaidTotal.uitex|62', PS)

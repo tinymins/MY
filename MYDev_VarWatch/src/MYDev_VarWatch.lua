@@ -88,7 +88,7 @@ end
 
 MY.RegisterPanel(
 'Dev_VarWatch', _L['VarWatch'], _L['Development'],
-'ui/Image/UICommon/BattleFiled.UITex|7', {255,127,0,200}, {
+'ui/Image/UICommon/BattleFiled.UITex|7', {
 	OnPanelActive = function(wnd)
 		local ui = UI(wnd)
 		local x, y = 10, 10

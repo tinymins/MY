@@ -182,7 +182,7 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + 30
 end
-MY.RegisterPanel('Logoff', _L['express logoff'], _L['General'], 'UI/Image/UICommon/LoginSchool.UITex|24', {255,0,0,200}, PS)
+MY.RegisterPanel('Logoff', _L['express logoff'], _L['General'], 'UI/Image/UICommon/LoginSchool.UITex|24', PS)
 
 do
 local menu = {

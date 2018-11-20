@@ -98,7 +98,7 @@ end
 
 MY.RegisterPanel(
 'MY_Font', _L['MY_Font'], _L['System'],
-'ui/Image/UICommon/CommonPanel7.UITex|36', {255,127,0,200}, {
+'ui/Image/UICommon/CommonPanel7.UITex|36', {
 OnPanelActive = function(wnd)
 	local ui = UI(wnd)
 	local x, y = 10, 30

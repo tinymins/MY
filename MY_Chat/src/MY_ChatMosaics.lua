@@ -116,7 +116,7 @@ end
 MY_ChatMosaics.Mosaics = _C.Mosaics
 
 MY.RegisterPanel('MY_Chat_ChatMosaics', _L['chat mosaics'], _L['Chat'],
-'ui/Image/UICommon/yirong3.UITex|50', {255,255,0,200}, {
+'ui/Image/UICommon/yirong3.UITex|50', {
 OnPanelActive = function(wnd)
 	local ui = UI(wnd)
 	local w, h = ui:size()

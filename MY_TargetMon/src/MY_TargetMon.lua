@@ -1665,7 +1665,7 @@ end
 function PS.OnPanelScroll(wnd, scrollX, scrollY)
 	wnd:Lookup('WndWindow_Wrapper'):SetRelPos(scrollX, scrollY)
 end
-MY.RegisterPanel('MY_TargetMon', _L['Target monitor'], _L['Target'], 'ui/Image/ChannelsPanel/NewChannels.UITex|141', { 255, 255, 0, 200 }, PS)
+MY.RegisterPanel('MY_TargetMon', _L['Target monitor'], _L['Target'], 'ui/Image/ChannelsPanel/NewChannels.UITex|141', PS)
 
 
 local ui = {

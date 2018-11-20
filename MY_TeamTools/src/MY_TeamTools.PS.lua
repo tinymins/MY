@@ -77,4 +77,4 @@ function PS.OnPanelActive(wnd)
 		end,
 	}, true):autoWidth():width()
 end
-MY.RegisterPanel('MY_TeamTools', _L['MY_TeamTools'], _L['Raid'], 5962, {255, 255, 0}, PS)
+MY.RegisterPanel('MY_TeamTools', _L['MY_TeamTools'], _L['Raid'], 5962, PS)

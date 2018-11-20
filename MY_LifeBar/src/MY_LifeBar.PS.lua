@@ -767,4 +767,4 @@ function PS.OnPanelDeactive()
 	MY.RegisterEvent('MY_LIFEBAR_CONFIG_LOADED.MY_LifeBarPS')
 	MY.RegisterEvent('MY_LIFEBAR_CONFIG_UPDATE.MY_LifeBarPS')
 end
-MY.RegisterPanel('MY_LifeBar', _L['MY_LifeBar'], _L['General'], 'UI/Image/LootPanel/LootPanel.UITex|74', {255,127,0,200}, PS)
+MY.RegisterPanel('MY_LifeBar', _L['MY_LifeBar'], _L['General'], 'UI/Image/LootPanel/LootPanel.UITex|74', PS)
