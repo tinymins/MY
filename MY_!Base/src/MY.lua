@@ -136,6 +136,9 @@ local function Get(var, keys, dft)
 			end
 		end
 	end
+	if var == nil then
+		var, res = dft, false
+	end
 	return var, res
 end
 local function IsEmpty(var)
