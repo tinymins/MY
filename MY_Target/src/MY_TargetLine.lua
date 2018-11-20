@@ -47,9 +47,12 @@ local O = {
 }
 local C, D = {}, {}
 
-RegisterCustomData('MY_TargetLine.bEnable')
-RegisterCustomData('MY_TargetLine.tAnchor')
-RegisterCustomData('MY_TargetLine.eDistanceType')
+RegisterCustomData('MY_TargetLine.bTarget')
+RegisterCustomData('MY_TargetLine.bTTarget')
+RegisterCustomData('MY_TargetLine.nConnWidth')
+RegisterCustomData('MY_TargetLine.nConnAlpha')
+RegisterCustomData('MY_TargetLine.tTargetColor')
+RegisterCustomData('MY_TargetLine.tTTargetColor')
 
 function D.RequireRerender()
 	C.bReRender = true
