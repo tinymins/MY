@@ -114,7 +114,29 @@ local TARGET_TYPE_LIST = {
 	'TEAM_MARK_DART' ,
 	'TEAM_MARK_FAN'  ,
 }
-local Config, ConfigEmbedded, ConfigTemplate, ConfigDefault = {}, {}
+local CONFIG_TEMPLATE = MY.LoadLUAData(TEMPLATE_CONFIG_FILE)
+local EMBEDDED_CONFIG_LIST, EMBEDDED_CONFIG_HASH, EMBEDDED_MONITOR_HASH = {}, {}, {}
+for _, file in ipairs(CPath.GetFileList(EMBEDDED_CONFIG_ROOT)) do
+	if wfind(file, MY.GetLang() .. '.jx3dat') then
+		for _, config in ipairs(MY.LoadLUAData(EMBEDDED_CONFIG_ROOT .. file) or {}) do
+			if config.uuid and config.monitors then
+				-- 默认禁用
+				config.enable = false
+				-- 配置项和监控项高速缓存
+				local mons = {}
+				for _, mon in ipairs(config.monitors) do
+					mon.manually = false
+					mons[mon.uuid] = mon
+				end
+				EMBEDDED_MONITOR_HASH[config.uuid] = mons
+				EMBEDDED_CONFIG_HASH[config.uuid] = config
+				-- 插入结果集
+				insert(EMBEDDED_CONFIG_LIST, config)
+			end
+		end
+	end
+end
+local Config = {}
 
 ----------------------------------------------------------------------------------------------
 -- 通用逻辑
@@ -210,11 +232,11 @@ end
 do
 -- 新建数据时调用
 function D.FormatMonItemLevelStructure(config)
-	return MY.FormatDataStructure(config, ConfigTemplate.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__.levels.__CHILD_TEMPLATE__, true)
+	return MY.FormatDataStructure(config, CONFIG_TEMPLATE.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__.levels.__CHILD_TEMPLATE__, true)
 end
 
 function D.FormatMonItemStructure(config)
-	return MY.FormatDataStructure(config, ConfigTemplate.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__, true)
+	return MY.FormatDataStructure(config, CONFIG_TEMPLATE.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__, true)
 end
 
 local function FormatMonitorData(mon)
@@ -242,7 +264,7 @@ function D.FormatMonStructure(mon)
 	if IsString(mon.soundDisappear) then
 		mon.soundDisappear = {mon.soundDisappear}
 	end
-	return FormatMonitorData(MY.FormatDataStructure(mon, ConfigTemplate.monitors.__CHILD_TEMPLATE__, true))
+	return FormatMonitorData(MY.FormatDataStructure(mon, CONFIG_TEMPLATE.monitors.__CHILD_TEMPLATE__, true))
 end
 
 -- 新建数据和处理已有数据都会调用
@@ -257,6 +279,11 @@ function D.FormatConfigStructure(config)
 	if config.delete then
 		return
 	end
+	-- 确认唯一ID存在
+	if not config.uuid then
+		config.uuid = tostring(config):sub(8)
+	end
+	-- 格式化监控项数据以及历史版本兼容
 	if config.monitors then
 		if config.monitors.common then
 			local monitors = {}
@@ -271,136 +298,115 @@ function D.FormatConfigStructure(config)
 			end
 			config.monitors = monitors
 		end
+		for _, mon in ipairs(config.monitors) do
+			if mon.ids then
+				for _, idmon in ipairs(mon.ids) do
+					if IsString(idmon.soundAppear) then
+						idmon.soundAppear = {idmon.soundAppear}
+					end
+					if IsTable(idmon.soundAppear) then
+						for i, v in ipairs_r(idmon.soundAppear) do
+							if v == '' then
+								remove(idmon.soundAppear, i)
+							end
+						end
+					end
+					if IsString(idmon.soundDisappear) then
+						idmon.soundDisappear = {idmon.soundDisappear}
+					end
+					if IsTable(idmon.soundDisappear) then
+						for i, v in ipairs_r(idmon.soundDisappear) do
+							if v == '' then
+								remove(idmon.soundDisappear, i)
+							end
+						end
+					end
+				end
+			end
+			if IsString(mon.soundAppear) then
+				mon.soundAppear = {mon.soundAppear}
+			end
+			if IsTable(mon.soundAppear) then
+				for i, v in ipairs_r(mon.soundAppear) do
+					if v == '' then
+						remove(mon.soundAppear, i)
+					end
+				end
+			end
+			if IsString(mon.soundDisappear) then
+				mon.soundDisappear = {mon.soundDisappear}
+			end
+			if IsTable(mon.soundDisappear) then
+				for i, v in ipairs_r(mon.soundDisappear) do
+					if v == '' then
+						remove(mon.soundDisappear, i)
+					end
+				end
+			end
+		end
 	else
 		config.monitors = {}
 	end
-	for _, embedded in ipairs(ConfigEmbedded) do
-		if embedded.uuid == config.uuid then
-			-- 设置内嵌数据默认属性
-			for k, v in pairs(embedded) do
-				if k ~= 'monitors' and config[k] == nil then
-					config[k] = v
-				end
+	-- 合并未修改的内嵌数据
+	local embedded = EMBEDDED_CONFIG_HASH[config.uuid]
+	if embedded then
+		-- 设置内嵌数据默认属性
+		for k, v in pairs(embedded) do
+			if k ~= 'monitors' and config[k] == nil then
+				config[k] = clone(v)
 			end
-			-- 设置内嵌数据删除项和自定义项
-			for _, p in ipairs(embedded.monitors) do
-				local exist = false
-				for i, mon in ipairs_r(config.monitors) do
-					if mon.uuid == p.uuid then
-						if mon.delete then
-							remove(config.monitors, i)
-						elseif not mon.manually then
-							config.monitors[i] = clone(p)
-						end
-						exist = true
-						break
-					end
-				end
-				if not exist then
-					insert(config.monitors, clone(p))
-				end
-			end
-			-- 删除上版本存在当前版本不存在的内嵌数据
-			for i, mon in ipairs_r(config.monitors) do
-				local exist = false
-				for _, p in ipairs(embedded.monitors) do
-					if mon.uuid == p.uuid then
-						exist = true
-						break
-					end
-				end
-				if not exist and not mon.manually then
+		end
+		-- 设置内嵌数据删除项和自定义项
+		local mons = {}
+		for i, mon in ipairs_r(config.monitors) do
+			if mon.delete then
+				remove(config.monitors, i)
+			elseif not mon.manually then
+				local monEmbedded = EMBEDDED_MONITOR_HASH[config.uuid][mon.uuid]
+				if monEmbedded then -- 复制内嵌数据
+					config.monitors[i] = clone(p)
+				else -- 删除当前版本不存在的内嵌数据
 					remove(config.monitors, i)
 				end
 			end
+			mons[mon.uuid] = true
+		end
+		-- 插入新的内嵌数据
+		for _, p in ipairs(embedded.monitors) do
+			insert(config.monitors, clone(p))
 		end
 	end
-	if not config.uuid then
-		config.uuid = tostring(config):sub(8)
-	end
-	for _, mon in ipairs(config.monitors) do
-		if mon.ids then
-			for _, idmon in ipairs(mon.ids) do
-				if IsString(idmon.soundAppear) then
-					idmon.soundAppear = {idmon.soundAppear}
-				end
-				if IsTable(idmon.soundAppear) then
-					for i, v in ipairs_r(idmon.soundAppear) do
-						if v == '' then
-							remove(idmon.soundAppear, i)
-						end
-					end
-				end
-				if IsString(idmon.soundDisappear) then
-					idmon.soundDisappear = {idmon.soundDisappear}
-				end
-				if IsTable(idmon.soundDisappear) then
-					for i, v in ipairs_r(idmon.soundDisappear) do
-						if v == '' then
-							remove(idmon.soundDisappear, i)
-						end
-					end
-				end
-			end
-		end
-		if IsString(mon.soundAppear) then
-			mon.soundAppear = {mon.soundAppear}
-		end
-		if IsTable(mon.soundAppear) then
-			for i, v in ipairs_r(mon.soundAppear) do
-				if v == '' then
-					remove(mon.soundAppear, i)
-				end
-			end
-		end
-		if IsString(mon.soundDisappear) then
-			mon.soundDisappear = {mon.soundDisappear}
-		end
-		if IsTable(mon.soundDisappear) then
-			for i, v in ipairs_r(mon.soundDisappear) do
-				if v == '' then
-					remove(mon.soundDisappear, i)
-				end
-			end
-		end
-	end
-	return FormatConfigData(MY.FormatDataStructure(config, ConfigTemplate, true))
+	return FormatConfigData(MY.FormatDataStructure(config, CONFIG_TEMPLATE, true))
 end
 
 -- 保存数据时候会调用
 function D.FormatSavingConfig(config)
-	for _, embedded in ipairs(ConfigEmbedded) do
-		if embedded.uuid == config.uuid then
-			local cfg = { uuid = config.uuid, monitors = {} }
-			-- 保存修改的全局属性
-			for k, v in pairs(config) do
-				if k ~= 'uuid' and k ~= 'monitors' and v ~= embedded[k] then
-					cfg[k] = v
-				end
+	local embedded = EMBEDDED_CONFIG_HASH[config.uuid]
+	if embedded then
+		local cfg = { uuid = config.uuid, monitors = {} }
+		-- 保存修改的全局属性
+		for k, v in pairs(config) do
+			if k ~= 'uuid' and k ~= 'monitors' and v ~= embedded[k] then
+				cfg[k] = v
 			end
-			-- 保存添加以及排序修改的部分
-			for i, mon in ipairs(config.monitors) do
-				if not mon.manually and mon.uuid then
-					insert(cfg.monitors, { uuid = mon.uuid })
-				else
-					insert(cfg.monitors, mon)
-				end
-			end
-			-- 保存删减的部分
-			for _, p in ipairs(embedded.monitors) do
-				local exist = false
-				for _, mon in ipairs(config.monitors) do
-					if mon.uuid == p.uuid then
-						exist = true
-						break
-					end
-				end
-				if not exist then
-					insert(cfg.monitors, { uuid = p.uuid, delete = true })
-				end
-			end
-			return cfg
 		end
+		local mons = {}
+		-- 保存添加以及排序修改的部分
+		for i, mon in ipairs(config.monitors) do
+			if not mon.manually and mon.uuid then
+				insert(cfg.monitors, { uuid = mon.uuid })
+			else
+				insert(cfg.monitors, mon)
+			end
+			mons[mon.uuid] = true
+		end
+		-- 保存删减的部分
+		for _, p in ipairs(embedded.monitors) do
+			if not mons[p.uuid] then
+				insert(cfg.monitors, { uuid = p.uuid, delete = true })
+			end
+		end
+		return cfg
 	end
 	return config
 end
@@ -410,7 +416,7 @@ function D.FormatSavingConfigs(Config)
 	for _, config in ipairs(Config) do
 		insert(cfgs, D.FormatSavingConfig(config))
 	end
-	for _, embedded in ipairs_r(ConfigEmbedded) do
+	for _, embedded in ipairs_r(EMBEDDED_CONFIG_LIST) do
 		local exist = false
 		for _, config in ipairs(Config) do
 			if config.uuid == embedded.uuid then
@@ -433,7 +439,7 @@ function D.LoadConfig(bDefault, bOriginal)
 	-- 兼容旧数据
 	local Embedded = Config.Embedded
 	if Embedded then
-		for _, config in ipairs(clone(ConfigEmbedded)) do
+		for _, config in ipairs(clone(EMBEDDED_CONFIG_LIST)) do
 			for k, v in pairs(Embedded[config.caption] or {}) do
 				if k ~= 'caption' and k ~= 'target' and k ~= 'monitors' then
 					config[k] = v
@@ -444,7 +450,7 @@ function D.LoadConfig(bDefault, bOriginal)
 		Config.Embedded = nil
 	end
 	-- 插入内建数据
-	for _, embedded in ipairs_r(ConfigEmbedded) do
+	for _, embedded in ipairs_r(EMBEDDED_CONFIG_LIST) do
 		local exist = false
 		for _, config in ipairs(Config) do
 			if config.uuid == embedded.uuid then
@@ -467,19 +473,6 @@ end
 
 do
 local function OnInit()
-	ConfigTemplate = MY.LoadLUAData(TEMPLATE_CONFIG_FILE)
-	ConfigEmbedded = {}
-	for _, file in ipairs(CPath.GetFileList(EMBEDDED_CONFIG_ROOT)) do
-		if wfind(file, MY.GetLang() .. '.jx3dat') then
-			for _, config in ipairs(MY.LoadLUAData(EMBEDDED_CONFIG_ROOT .. file) or {}) do
-				config.enable = false
-				for _, mon in ipairs(config.monitors) do
-					mon.manually = false
-				end
-				insert(ConfigEmbedded, config)
-			end
-		end
-	end
 	D.LoadConfig()
 end
 MY.RegisterInit('MY_TargetMon', OnInit)
@@ -1449,7 +1442,7 @@ function PS.OnPanelActive(wnd)
 		w = 60, h = 30,
 		text = _L['Create'],
 		onclick = function()
-			local config = MY.FormatDataStructure(nil, ConfigTemplate)
+			local config = MY.FormatDataStructure(nil, CONFIG_TEMPLATE)
 			insert(Config, config)
 			D.CheckFrame(config)
 			MY.SwitchTab('MY_TargetMon', true)
