@@ -57,9 +57,9 @@ for cwd, dirs, files in os.walk(root):
                 all_the_text = zhcn2zhtw(all_the_text)
 
                 print('file saving...')
-                with codecs.open(os.path.join(cwd,"zhtw.jx3dat"),'w',encoding='utf8') as f:
+                with codecs.open(os.path.join(cwd, "zhtw" + extname),'w',encoding='utf8') as f:
                     f.write(all_the_text)
-                    print('file saved: zhtw.jx3dat')
+                    print('file saved: zhtw' + extname)
 
                 crcs[filepath] = crc_text
             print('-----------------------')
