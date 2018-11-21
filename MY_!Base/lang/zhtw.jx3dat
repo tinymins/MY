@@ -383,4 +383,8 @@ data = {
 	['DO NOT KILL PROCESS BY FORCE, OR YOUR DATABASE MAY GOT A DAMAE, PRESS OK TO CONTINUE.'] = '接下來如有頓卡請耐心等待，不要結束進程，否則您的數據庫可能造成不可逆的數據損壞，點擊確認開始操作。',
 	['Database file locked, repair database failed! : %s'] = '數據庫文件被占用，修複失敗！(%s)',
 	['%s Database repair finished!'] = '%s數據庫修複完成！',
+
+	['Default'] = '默認',
+	['Bing.ogg'] = '呯',
+	['Notify.ogg'] = '叮咚',
 }
