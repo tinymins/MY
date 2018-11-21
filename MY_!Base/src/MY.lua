@@ -168,17 +168,12 @@ local function IsEquals(o1, o2)
 	elseif type(o1) ~= type(o2) then
 		return false
 	elseif type(o1) == 'table' then
-		local eq, t = true, {}
+		local t = {}
 		for k, v in pairs(o1) do
-			if not eq then
-				break
-			end
-			if not t[k] then
-				if IsEquals(o1[k], o2[k]) then
-					t[k] = true
-				else
-					eq = false
-				end
+			if IsEquals(o1[k], o2[k]) then
+				t[k] = true
+			else
+				return false
 			end
 		end
 		for k, v in pairs(o2) do
@@ -186,14 +181,10 @@ local function IsEquals(o1, o2)
 				break
 			end
 			if not t[k] then
-				if IsEquals(o1[k], o2[k]) then
-					t[k] = true
-				else
-					eq = false
-				end
+				return false
 			end
 		end
-		return eq
+		return true
 	end
 	return false
 end
@@ -202,6 +193,32 @@ local function RandomChild(var)
 		return var[random(1, #var)]
 	end
 end
+local function IsArray(var)
+	if type(var) ~= 'table' then
+		return false
+	end
+	local i = 1
+	for k, _ in pairs(var) do
+		if k ~= i then
+			return false
+		end
+		i = i + 1
+	end
+	return true
+end
+local function IsDictionary(var)
+	if type(var) ~= 'table' then
+		return false
+	end
+	local i = 1
+	for k, _ in pairs(var) do
+		if k ~= i then
+			return true
+		end
+		i = i + 1
+	end
+	return false
+end
 local function IsNil     (var) return type(var) == 'nil'      end
 local function IsTable   (var) return type(var) == 'table'    end
 local function IsNumber  (var) return type(var) == 'number'   end
@@ -209,11 +226,83 @@ local function IsString  (var) return type(var) == 'string'   end
 local function IsBoolean (var) return type(var) == 'boolean'  end
 local function IsFunction(var) return type(var) == 'function' end
 local function IsUserdata(var) return type(var) == 'userdata' end
+local function GetPatch(oBase, oData)
+	-- dictionary patch
+	if IsDictionary(oData) or (IsDictionary(oBase) and IsTable(oData) and IsEmpty(oData)) then
+		if not IsTable(oBase) then
+			oBase = {}
+		end
+		local tKeys, bDiff = {}, false
+		local oPatch = {}
+		for k, v in pairs(oData) do
+			local patch = GetPatch(oBase[k], v)
+			if not IsNil(patch) then
+				bDiff = true
+				insert(oPatch, { k = k, v = patch })
+			end
+			tKeys[k] = true
+		end
+		for k, v in pairs(oBase) do
+			if not tKeys[k] then
+				bDiff = true
+				insert(oPatch, { k = k, v = nil })
+			end
+		end
+		if not bDiff then
+			return
+		end
+		return oPatch
+	end
+	if not IsEquals(oBase, oData) then
+		-- nil value patch
+		if IsNil(oData) then
+			return { v = 'nil' }
+		end
+		-- other patch value
+		return oData
+	end
+	-- empty patch
+	return nil
+end
+local function ApplyPatch(oBase, oPatch, bNew)
+	if bNew ~= false then
+		oBase = clone(oBase)
+		oPatch = clone(oPatch)
+	end
+	-- patch in dictionary type can only be a special value patch
+	if IsDictionary(oPatch) then
+		-- nil value patch
+		if oPatch.v == 'nil' then
+			return nil
+		end
+	end
+	-- dictionary patch
+	if IsTable(oPatch) and IsDictionary(oPatch[1]) then
+		if not IsTable(oBase) then
+			oBase = {}
+		end
+		for _, patch in ipairs(oPatch) do
+			if IsNil(patch.v) then
+				oBase[patch.k] = nil
+			else
+				oBase[patch.k] = ApplyPatch(oBase[patch.k], patch.v, false)
+			end
+		end
+		return oBase
+	end
+	-- empty patch
+	if IsNil(oPatch) then
+		return oBase
+	end
+	-- other patch value
+	return oPatch
+end
 ---------------------------------------------------------------------------------------------
 MY = {}
-MY.Get, MY.IsEquals, MY.RandomChild = Get, IsEquals, RandomChild
+MY.IsArray, MY.IsDictionary, MY.IsEquals = IsArray, IsDictionary, IsEquals
 MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsUserdata = IsNil, IsBoolean, IsNumber, IsUserdata
 MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsFunction = IsEmpty, IsString, IsTable, IsFunction
+MY.Get, MY.GetPatch, MY.ApplyPatch, MY.RandomChild = Get, GetPatch, ApplyPatch, RandomChild
 ---------------------------------------------------------------------------------------------
 -- 本地函数变量
 ---------------------------------------------------------------------------------------------
