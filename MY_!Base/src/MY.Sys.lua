@@ -417,6 +417,111 @@ function MY.CreateDataRoot(ePathType)
 end
 end
 
+do
+local SOUND_ROOT = MY.GetAddonInfo().szFrameworkRoot .. 'audio/'
+local SOUNDS, CACHE = {
+	{
+		szType = _L['Default'],
+		{ dwID = 1, szName = _L['Bing.ogg'], szPath = SOUND_ROOT .. 'Bing.ogg' },
+		{ dwID = 88001, szName = _L['Notify.ogg'], szPath = SOUND_ROOT .. 'Notify.ogg' },
+	},
+}
+local function GetSoundList()
+	local a = { szOption = _L['Sound'] }
+	for _, v in ipairs(SOUNDS) do
+		insert(a, v)
+	end
+	if MY_Resource then
+		for _, v in ipairs(MY_Resource.GetSoundList()) do
+			insert(a, v)
+		end
+	end
+	return a
+end
+local function GetSoundMenu(tSound, fnAction, tCheck, bMultiple)
+	local t = {}
+	if tSound.szType then
+		t.szOption = tSound.szType
+	elseif tSound.dwID then
+		t.szOption = tSound.szName
+		t.bCheck = true
+		t.bChecked = tCheck[tSound.dwID]
+		t.bMCheck = not bMultiple
+		t.UserData = tSound
+		t.fnAction = fnAction
+	end
+	for _, v in ipairs(tSound) do
+		local t1 = GetSoundMenu(v, fnAction, tCheck, bMultiple)
+		if t1 then
+			insert(t, t1)
+		end
+	end
+	if t.dwID and not IsLocalFileExist(t.szPath) then
+		return
+	end
+	return t
+end
+
+function MY.GetSoundMenu(fnAction, tCheck, bMultiple)
+	local function fnMenuAction(tSound, bCheck)
+		fnAction(tSound.dwID, bCheck)
+	end
+	return GetSoundMenu(GetSoundList(), fnMenuAction, tCheck, bMultiple)
+end
+
+local function Cache(tSound)
+	if not IsTable(tSound) then
+		return
+	end
+	if tSound.dwID then
+		CACHE[tSound.dwID] = {
+			dwID = tSound.dwID,
+			szName = tSound.szName,
+			szPath = tSound.szPath,
+		}
+	end
+	for _, t in ipairs(tSound) do
+		Cache(t)
+	end
+end
+
+local function GeneCache()
+	if not CACHE then
+		CACHE = {}
+		if MY_Resource then
+			local tSound = MY_Resource.GetSoundList()
+			if tSound then
+				Cache(tSound)
+			end
+		end
+		Cache(SOUNDS)
+	end
+	return true
+end
+
+function MY.GetSoundName(dwID)
+	if not GeneCache() then
+		return
+	end
+	local tSound = CACHE[dwID]
+	if not tSound then
+		return
+	end
+	return tSound.szName
+end
+
+function MY.GetSoundPath(dwID)
+	if not GeneCache() then
+		return
+	end
+	local tSound = CACHE[dwID]
+	if not tSound then
+		return
+	end
+	return tSound.szPath
+end
+end
+
 -- ≤•∑≈…˘“Ù
 -- MY.PlaySound([nType, ]szFilePath[, szCustomPath])
 --   nType        …˘“Ù¿‡–Õ
@@ -2212,7 +2317,6 @@ function MY.ArrayToObject(arr)
     end
     return t
 end
-
 
 -- Global exports
 function MY.GeneGlobalNS(options)
