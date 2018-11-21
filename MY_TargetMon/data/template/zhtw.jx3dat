@@ -36,7 +36,6 @@ return {
 				iconid = 13,
 				name = "",
 				uuid = {__META__, {"nil", "string"}, nil},
-				manually = {__META__, {"nil", "boolean"}, nil},
 				capture = true,
 				longAlias = {__META__, {"nil", "string"}, nil},
 				rgbLongAlias = {255, 255, 0},

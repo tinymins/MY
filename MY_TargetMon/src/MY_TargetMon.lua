@@ -25,9 +25,11 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
+local MY, UI = MY, MY.UI
+local IsArray, IsDictionary, IsEquals = MY.IsArray, MY.IsDictionary, MY.IsEquals
 local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
+local Get, GetPatch, ApplyPatch, RandomChild = MY.Get, MY.GetPatch, MY.ApplyPatch, MY.RandomChild
 ---------------------------------------------------------------------------------------------------
 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TargetMon/lang/')
@@ -116,26 +118,6 @@ local TARGET_TYPE_LIST = {
 }
 local CONFIG_TEMPLATE = MY.LoadLUAData(TEMPLATE_CONFIG_FILE)
 local EMBEDDED_CONFIG_LIST, EMBEDDED_CONFIG_HASH, EMBEDDED_MONITOR_HASH = {}, {}, {}
-for _, file in ipairs(CPath.GetFileList(EMBEDDED_CONFIG_ROOT)) do
-	if wfind(file, MY.GetLang() .. '.jx3dat') then
-		for _, config in ipairs(MY.LoadLUAData(EMBEDDED_CONFIG_ROOT .. file) or {}) do
-			if config.uuid and config.monitors then
-				-- 默认禁用
-				config.enable = false
-				-- 配置项和监控项高速缓存
-				local mons = {}
-				for _, mon in ipairs(config.monitors) do
-					mon.manually = false
-					mons[mon.uuid] = mon
-				end
-				EMBEDDED_MONITOR_HASH[config.uuid] = mons
-				EMBEDDED_CONFIG_HASH[config.uuid] = config
-				-- 插入结果集
-				insert(EMBEDDED_CONFIG_LIST, config)
-			end
-		end
-	end
-end
 local Config = {}
 
 ----------------------------------------------------------------------------------------------
@@ -361,22 +343,50 @@ function D.FormatConfigStructure(config)
 		for i, mon in ipairs_r(config.monitors) do
 			if mon.delete then
 				remove(config.monitors, i)
-			elseif not mon.manually then
+			else
 				local monEmbedded = EMBEDDED_MONITOR_HASH[config.uuid][mon.uuid]
 				if monEmbedded then -- 复制内嵌数据
-					config.monitors[i] = clone(p)
-				else -- 删除当前版本不存在的内嵌数据
+					if mon.patch then
+						config.monitors[i] = ApplyPatch(monEmbedded, mon.patch)
+					else
+						config.monitors[i] = clone(monEmbedded)
+					end
+				elseif mon.patch or mon.manually == false then -- 删除当前版本不存在的内嵌数据
 					remove(config.monitors, i)
 				end
 			end
 			mons[mon.uuid] = true
 		end
 		-- 插入新的内嵌数据
-		for _, p in ipairs(embedded.monitors) do
-			insert(config.monitors, clone(p))
+		for _, monEmbedded in ipairs(embedded.monitors) do
+			if not mons[monEmbedded.uuid] then
+				insert(config.monitors, clone(monEmbedded))
+			end
 		end
 	end
 	return FormatConfigData(MY.FormatDataStructure(config, CONFIG_TEMPLATE, true))
+end
+
+-- 加载内联数据
+for _, file in ipairs(CPath.GetFileList(EMBEDDED_CONFIG_ROOT)) do
+	if wfind(file, MY.GetLang() .. '.jx3dat') then
+		for _, config in ipairs(MY.LoadLUAData(EMBEDDED_CONFIG_ROOT .. file) or {}) do
+			if config.uuid and config.monitors then
+				config = MY.FormatDataStructure(config, CONFIG_TEMPLATE)
+				-- 默认禁用
+				config.enable = false
+				-- 配置项和监控项高速缓存
+				local mons = {}
+				for _, mon in ipairs(config.monitors) do
+					mons[mon.uuid] = D.FormatMonStructure(mon)
+				end
+				EMBEDDED_MONITOR_HASH[config.uuid] = mons
+				EMBEDDED_CONFIG_HASH[config.uuid] = config
+				-- 插入结果集
+				insert(EMBEDDED_CONFIG_LIST, config)
+			end
+		end
+	end
 end
 
 -- 保存数据时候会调用
@@ -386,16 +396,22 @@ function D.FormatSavingConfig(config)
 		local cfg = { uuid = config.uuid, monitors = {} }
 		-- 保存修改的全局属性
 		for k, v in pairs(config) do
-			if k ~= 'uuid' and k ~= 'monitors' and v ~= embedded[k] then
+			if k ~= 'uuid' and k ~= 'monitors' and not IsEquals(v, embedded[k]) then
 				cfg[k] = v
 			end
 		end
 		local mons = {}
 		-- 保存添加以及排序修改的部分
 		for i, mon in ipairs(config.monitors) do
-			if not mon.manually and mon.uuid then
-				insert(cfg.monitors, { uuid = mon.uuid })
+			local monEmbedded = EMBEDDED_MONITOR_HASH[embedded.uuid][mon.uuid]
+			if monEmbedded then
+				-- 内嵌的监控计算Patch
+				insert(cfg.monitors, {
+					uuid = monEmbedded.uuid,
+					patch = GetPatch(monEmbedded, mon),
+				})
 			else
+				-- 自己添加的监控
 				insert(cfg.monitors, mon)
 			end
 			mons[mon.uuid] = true
@@ -950,7 +966,6 @@ function PS.OnPanelActive(wnd)
 					local aMonList = l_config.monitors
 					local mon = MY_TargetMon.FormatMonStructure({
 						name = szVal,
-						manually = true,
 						ignoreId = not tonumber(szVal),
 					})
 					if not mon.ignoreId then
@@ -999,7 +1014,6 @@ function PS.OnPanelActive(wnd)
 					bCheck = true, bChecked = mon.enable,
 					fnAction = function()
 						mon.enable = not mon.enable
-						mon.manually = true
 						D.CheckFrame(l_config)
 					end,
 				},
@@ -1076,7 +1090,6 @@ function PS.OnPanelActive(wnd)
 									{ 'text' }, { szVal }
 								)
 								mon.name = szVal
-								mon.manually = true
 								D.CheckFrame(l_config)
 							end
 						end, function() end, function() end, nil, mon.name)
@@ -1089,7 +1102,6 @@ function PS.OnPanelActive(wnd)
 						GetUserInput(_L['Please input long alias:'], function(szVal)
 							szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
 							mon.longAlias = szVal
-							mon.manually = true
 							D.CheckFrame(l_config)
 						end, function() end, function() end, nil, mon.longAlias or mon.name)
 					end,
@@ -1097,7 +1109,6 @@ function PS.OnPanelActive(wnd)
 					bColorTable = true,
 					fnChangeColor = function(_, r, g, b)
 						mon.rgbLongAlias = { r, g, b }
-						mon.manually = true
 						D.CheckFrame(l_config)
 					end,
 				},
@@ -1107,7 +1118,6 @@ function PS.OnPanelActive(wnd)
 						GetUserInput(_L['Please input short alias:'], function(szVal)
 							szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
 							mon.shortAlias = szVal
-							mon.manually = true
 							D.CheckFrame(l_config)
 						end, function() end, function() end, nil, mon.shortAlias or mon.name)
 					end,
@@ -1115,7 +1125,6 @@ function PS.OnPanelActive(wnd)
 					bColorTable = true,
 					fnChangeColor = function(_, r, g, b)
 						mon.rgbShortAlias = { r, g, b }
-						mon.manually = true
 						D.CheckFrame(l_config)
 					end,
 				},
@@ -1130,7 +1139,6 @@ function PS.OnPanelActive(wnd)
 					bChecked = mon.kungfus.all,
 					fnAction = function()
 						mon.kungfus.all = not mon.kungfus.all
-						mon.manually = true
 						D.CheckFrame(l_config)
 					end,
 				},
@@ -1144,7 +1152,6 @@ function PS.OnPanelActive(wnd)
 						bChecked = mon.kungfus[dwKungfuID],
 						fnAction = function()
 							mon.kungfus[dwKungfuID] = not mon.kungfus[dwKungfuID]
-							mon.manually = true
 							D.CheckFrame(l_config)
 						end,
 						fnDisable = function() return mon.kungfus.all end,
@@ -1231,7 +1238,6 @@ function PS.OnPanelActive(wnd)
 					bChecked = mon.ignoreId,
 					fnAction = function()
 						mon.ignoreId = not mon.ignoreId
-						mon.manually = true
 						D.CheckFrame(l_config)
 					end,
 					szIcon = 'fromiconid',
@@ -1241,7 +1247,6 @@ function PS.OnPanelActive(wnd)
 					szLayer = 'ICON_RIGHTMOST',
 					fnClickIcon = function()
 						UI.OpenIconPanel(function(dwIcon)
-							mon.manually = true
 							mon.iconid = dwIcon
 						end)
 						Wnd.CloseWindow('PopupMenuPanel')
@@ -1254,7 +1259,6 @@ function PS.OnPanelActive(wnd)
 						bChecked = info.enable,
 						fnAction = function()
 							info.enable = not info.enable
-							mon.manually = true
 							D.CheckFrame(l_config)
 						end,
 						fnDisable = function()
@@ -1271,7 +1275,6 @@ function PS.OnPanelActive(wnd)
 							end
 							UI.OpenIconPanel(function(dwIcon)
 								info.iconid = dwIcon
-								mon.manually = true
 								D.CheckFrame(l_config)
 							end)
 							Wnd.CloseWindow('PopupMenuPanel')
@@ -1286,7 +1289,6 @@ function PS.OnPanelActive(wnd)
 							bChecked = info.ignoreLevel,
 							fnAction = function()
 								info.ignoreLevel = not info.ignoreLevel
-								mon.manually = true
 								D.CheckFrame(l_config)
 							end,
 							szIcon = 'fromiconid',
@@ -1300,7 +1302,6 @@ function PS.OnPanelActive(wnd)
 								end
 								UI.OpenIconPanel(function(dwIcon)
 									info.iconid = dwIcon
-									mon.manually = true
 								end)
 								Wnd.CloseWindow('PopupMenuPanel')
 							end,
@@ -1314,7 +1315,6 @@ function PS.OnPanelActive(wnd)
 									bChecked = infoLevel.enable,
 									fnAction = function()
 										infoLevel.enable = not infoLevel.enable
-										mon.manually = true
 										D.CheckFrame(l_config)
 									end,
 									fnDisable = function()
@@ -1328,7 +1328,6 @@ function PS.OnPanelActive(wnd)
 									fnClickIcon = function()
 										UI.OpenIconPanel(function(dwIcon)
 											infoLevel.iconid = dwIcon
-											mon.manually = true
 											D.CheckFrame(l_config)
 										end)
 										Wnd.CloseWindow('PopupMenuPanel')
@@ -1358,7 +1357,6 @@ function PS.OnPanelActive(wnd)
 										dwIconID = Table_GetBuffIconID(dwID, nLevel) or dwIconID
 									end
 									info.levels[nLevel] = D.FormatMonItemLevelStructure({ iconid = dwIconID })
-									mon.manually = true
 									D.CheckFrame(l_config)
 								end
 							end, function() end, function() end, nil, nil)
@@ -1368,7 +1366,6 @@ function PS.OnPanelActive(wnd)
 						szOption = _L['Delete'],
 						fnAction = function()
 							mon.ids[dwID] = nil
-							mon.manually = true
 							D.CheckFrame(l_config)
 						end,
 					})
@@ -1381,7 +1378,6 @@ function PS.OnPanelActive(wnd)
 				bCheck = true, bChecked = mon.capture,
 				fnAction = function()
 					mon.capture = not mon.capture
-					mon.manually = true
 					D.CheckFrame(l_config)
 				end,
 			})
@@ -1402,7 +1398,6 @@ function PS.OnPanelActive(wnd)
 								dwIconID = Table_GetBuffIconID(dwID, 1) or 13
 							end
 							mon.ids[dwID] = D.FormatMonItemStructure({ iconid = dwIconID })
-							mon.manually = true
 							D.CheckFrame(l_config)
 						end
 					end, function() end, function() end, nil, nil)
@@ -1443,6 +1438,7 @@ function PS.OnPanelActive(wnd)
 		text = _L['Create'],
 		onclick = function()
 			local config = MY.FormatDataStructure(nil, CONFIG_TEMPLATE)
+			config.uuid = tostring(config):sub(8)
 			insert(Config, config)
 			D.CheckFrame(config)
 			MY.SwitchTab('MY_TargetMon', true)
