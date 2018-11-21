@@ -153,59 +153,90 @@ end
 end
 
 if not var2str then
-function var2str(var, indent, level)
-	local function table_r(var, level, indent)
-		local t = {}
-		local szType = type(var)
-		if szType == 'nil' then
-			insert(t, 'nil')
-		elseif szType == 'number' then
-			insert(t, tostring(var))
-		elseif szType == 'string' then
-			insert(t, string.format('%q', var))
-		elseif szType == 'function' then
-			local s = string.dump(var)
-			insert(t, 'loadstring("')
-			-- 'string slice too long'
-			for i = 1, #s, 2000 do
-				insert(t, concat({'', byte(s, i, i + 2000 - 1)}, '\\'))
+local function table_r(var, level, indent)
+	local t = {}
+	local szType = type(var)
+	if szType == 'nil' then
+		insert(t, 'nil')
+	elseif szType == 'number' then
+		insert(t, tostring(var))
+	elseif szType == 'string' then
+		insert(t, string.format('%q', var))
+	elseif szType == 'function' then
+		local s = string.dump(var)
+		insert(t, 'loadstring("')
+		-- 'string slice too long'
+		for i = 1, #s, 2000 do
+			insert(t, concat({'', byte(s, i, i + 2000 - 1)}, '\\'))
+		end
+		insert(t, '")')
+	elseif szType == 'boolean' then
+		insert(t, tostring(var))
+	elseif szType == 'table' then
+		insert(t, '{')
+		local s_tab_equ = '='
+		if indent then
+			s_tab_equ = ' = '
+			if not empty(var) then
+				insert(t, '\n')
 			end
-			insert(t, '")')
-		elseif szType == 'boolean' then
-			insert(t, tostring(var))
-		elseif szType == 'table' then
-			insert(t, '{')
-			local s_tab_equ = ']='
-			if indent then
-				s_tab_equ = '] = '
-				if not empty(var) then
-					insert(t, '\n')
+		end
+		local nohash = true
+		local key, val, lastkey, lastval, hasval
+		local tlist, thash = {}, {}
+		repeat
+			key, val = next(var, lastkey)
+			if key then
+				-- judge if this is a pure list table
+				if nohash and (
+					type(key) ~= 'number'
+					or (lastval == nil and key ~= 1) -- first loop and index is not 1 : hash table
+					or (lastkey and lastkey + 1 ~= key)
+				) then
+					nohash = false
 				end
-			end
-			for key, val in pairs(var) do
+				-- process to insert to table
+				-- insert indent
 				if indent then
 					insert(t, rep(indent, level + 1))
 				end
-				insert(t, '[')
-				insert(t, table_r(key, level + 1, indent))
-				insert(t, s_tab_equ) --'] = '
+				-- insert key
+				if nohash then -- pure list: do not need a key
+				elseif type(key) == 'string' and key:find('^[a-zA-Z_][a-zA-Z0-9_]*$') then -- a = val
+					insert(t, key)
+					insert(t, s_tab_equ)
+				else -- [10010] = val -- ['.start with or contains special char'] = val
+					insert(t, '[')
+					insert(t, table_r(key, level + 1, indent))
+					insert(t, ']')
+					insert(t, s_tab_equ)
+				end
+				-- insert value
 				insert(t, table_r(val, level + 1, indent))
 				insert(t, ',')
 				if indent then
 					insert(t, '\n')
 				end
+				lastkey, lastval, hasval = key, val, true
 			end
-			if indent and not empty(var) then
-				insert(t, rep(indent, level))
-			end
-			insert(t, '}')
-		else --if (szType == 'userdata') then
-			insert(t, '"')
-			insert(t, tostring(var))
-			insert(t, '"')
+		until not key
+		-- remove last `,` if no indent
+		if not indent and hasval then
+			remove(t)
 		end
-		return concat(t)
+		-- insert `}` with indent
+		if indent and not empty(var) then
+			insert(t, rep(indent, level))
+		end
+		insert(t, '}')
+	else --if (szType == 'userdata') then
+		insert(t, '"')
+		insert(t, tostring(var))
+		insert(t, '"')
 	end
+	return concat(t)
+end
+function var2str(var, indent, level)
 	return table_r(var, level or 0, indent)
 end
 end
