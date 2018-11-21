@@ -177,9 +177,6 @@ local function IsEquals(o1, o2)
 			end
 		end
 		for k, v in pairs(o2) do
-			if not eq then
-				break
-			end
 			if not t[k] then
 				return false
 			end
