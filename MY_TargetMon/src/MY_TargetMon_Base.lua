@@ -536,9 +536,9 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 					dwSoundID = RandomChild(hItem.mon.soundAppear)
 				end
 				if dwSoundID then
-					local sound = MY_TargetMon.GetSound(dwSoundID)
-					if sound then
-						MY.PlaySound(SOUND.UI_SOUND, sound.szPath, '')
+					local szSoundPath = MY.GetSoundPath(dwSoundID)
+					if szSoundPath then
+						MY.PlaySound(SOUND.UI_SOUND, szSoundPath, '')
 					end
 				end
 			end
@@ -581,9 +581,9 @@ local function UpdateItem(hItem, KTarget, buff, szName, tItem, config, nFrameCou
 					dwSoundID = RandomChild(hItem.mon.soundDisappear)
 				end
 				if dwSoundID then
-					local sound = MY_TargetMon.GetSound(dwSoundID)
-					if sound then
-						MY.PlaySound(SOUND.UI_SOUND, sound.szPath, '')
+					local szSoundPath = MY.GetSoundPath(dwSoundID)
+					if szSoundPath then
+						MY.PlaySound(SOUND.UI_SOUND, szSoundPath, '')
 					end
 				end
 			end

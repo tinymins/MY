@@ -35,8 +35,6 @@ if not MY.AssertVersion('MY_TargetMon', _L['MY_TargetMon'], 0x2011800) then
 	return
 end
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/ui/MY_TargetMon.ini'
-local ADDON_ROOT = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/'
-local RES_ROOT = MY.GetAddonInfo().szRoot .. 'MY_Resource/'
 local ROLE_CONFIG_FILE = {'config/my_targetmon.jx3dat', MY_DATA_PATH.ROLE}
 local TEMPLATE_CONFIG_FILE = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/data/template/$lang.jx3dat'
 local EMBEDDED_CONFIG_ROOT = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/data/embedded/'
@@ -116,50 +114,6 @@ local TARGET_TYPE_LIST = {
 	'TEAM_MARK_DART' ,
 	'TEAM_MARK_FAN'  ,
 }
-local SOUNDS = {
-	{ dwID = 1, szName = _L['Default alert sound'], szPath = ADDON_ROOT .. 'audio/alert_sound.ogg' },
-	{ dwID = 2, szName = _L.VOICE['voice-52001'], szPath = RES_ROOT .. 'audio/voice-52001.ogg' },
-	{ dwID = 3, szName = _L.VOICE['voice-52002'], szPath = RES_ROOT .. 'audio/voice-52002.ogg' },
-	{ dwID = 4, szName = _L.VOICE['voice-52003'], szPath = RES_ROOT .. 'audio/voice-52003.ogg' },
-	{ dwID = 5, szName = _L.VOICE['voice-52004'], szPath = RES_ROOT .. 'audio/voice-52004.ogg' },
-	{ dwID = 6, szName = _L.VOICE['voice-52005'], szPath = RES_ROOT .. 'audio/voice-52005.ogg' },
-	{ dwID = 7, szName = _L.VOICE['voice-52006'], szPath = RES_ROOT .. 'audio/voice-52006.ogg' },
-	{ dwID = 8, szName = _L.VOICE['voice-52007'], szPath = RES_ROOT .. 'audio/voice-52007.ogg' },
-	{ dwID = 9, szName = _L.VOICE['voice-52008'], szPath = RES_ROOT .. 'audio/voice-52008.ogg' },
-	{ dwID = 10, szName = _L.VOICE['voice-52009'], szPath = RES_ROOT .. 'audio/voice-52009.ogg' },
-	{ dwID = 11, szName = _L.VOICE['voice-52010'], szPath = RES_ROOT .. 'audio/voice-52010.ogg' },
-	{ dwID = 12, szName = _L.VOICE['voice-52011'], szPath = RES_ROOT .. 'audio/voice-52011.ogg' },
-	{ dwID = 13, szName = _L.VOICE['voice-52012'], szPath = RES_ROOT .. 'audio/voice-52012.ogg' },
-	{ dwID = 14, szName = _L.VOICE['voice-52013'], szPath = RES_ROOT .. 'audio/voice-52013.ogg' },
-	{ dwID = 15, szName = _L.VOICE['voice-52014'], szPath = RES_ROOT .. 'audio/voice-52014.ogg' },
-	{ dwID = 16, szName = _L.VOICE['voice-52015'], szPath = RES_ROOT .. 'audio/voice-52015.ogg' },
-	{ dwID = 17, szName = _L.VOICE['voice-52016'], szPath = RES_ROOT .. 'audio/voice-52016.ogg' },
-	{ dwID = 18, szName = _L.VOICE['voice-52017'], szPath = RES_ROOT .. 'audio/voice-52017.ogg' },
-	{ dwID = 19, szName = _L.VOICE['voice-52018'], szPath = RES_ROOT .. 'audio/voice-52018.ogg' },
-	{ dwID = 20, szName = _L.VOICE['voice-52019'], szPath = RES_ROOT .. 'audio/voice-52019.ogg' },
-	{ dwID = 21, szName = _L.VOICE['voice-52020'], szPath = RES_ROOT .. 'audio/voice-52020.ogg' },
-	{ dwID = 22, szName = _L.VOICE['voice-52021'], szPath = RES_ROOT .. 'audio/voice-52021.ogg' },
-	{ dwID = 23, szName = _L.VOICE['voice-52023'], szPath = RES_ROOT .. 'audio/voice-52023.ogg' },
-	{ dwID = 24, szName = _L.VOICE['voice-52024'], szPath = RES_ROOT .. 'audio/voice-52024.ogg' },
-	{ dwID = 25, szName = _L.VOICE['voice-52025'], szPath = RES_ROOT .. 'audio/voice-52025.ogg' },
-	{ dwID = 26, szName = _L.VOICE['voice-52026'], szPath = RES_ROOT .. 'audio/voice-52026.ogg' },
-	{ dwID = 27, szName = _L.VOICE['voice-52027'], szPath = RES_ROOT .. 'audio/voice-52027.ogg' },
-	{ dwID = 28, szName = _L.VOICE['voice-52028'], szPath = RES_ROOT .. 'audio/voice-52028.ogg' },
-	{ dwID = 29, szName = _L.VOICE['voice-52029'], szPath = RES_ROOT .. 'audio/voice-52029.ogg' },
-	{ dwID = 30, szName = _L.VOICE['voice-52030'], szPath = RES_ROOT .. 'audio/voice-52030.ogg' },
-	{ dwID = 31, szName = _L.VOICE['voice-52031'], szPath = RES_ROOT .. 'audio/voice-52031.ogg' },
-	{ dwID = 32, szName = _L.VOICE['voice-52032'], szPath = RES_ROOT .. 'audio/voice-52032.ogg' },
-	{ dwID = 33, szName = _L.VOICE['voice-52033'], szPath = RES_ROOT .. 'audio/voice-52033.ogg' },
-	{ dwID = 34, szName = _L.VOICE['voice-52034'], szPath = RES_ROOT .. 'audio/voice-52034.ogg' },
-	{ dwID = 35, szName = _L.VOICE['voice-52035'], szPath = RES_ROOT .. 'audio/voice-52035.ogg' },
-	{ dwID = 36, szName = _L.VOICE['voice-53001'], szPath = RES_ROOT .. 'audio/voice-53001.ogg' },
-	{ dwID = 37, szName = _L.VOICE['voice-53002'], szPath = RES_ROOT .. 'audio/voice-53002.ogg' },
-	{ dwID = 38, szName = _L.VOICE['voice-53003'], szPath = RES_ROOT .. 'audio/voice-53003.ogg' },
-	{ dwID = 39, szName = _L.VOICE['voice-53004'], szPath = RES_ROOT .. 'audio/voice-53004.ogg' },
-	{ dwID = 40, szName = _L.VOICE['voice-53005'], szPath = RES_ROOT .. 'audio/voice-53005.ogg' },
-	{ dwID = 41, szName = _L.VOICE['voice-53006'], szPath = RES_ROOT .. 'audio/voice-53006.ogg' },
-	{ dwID = 42, szName = _L.VOICE['voice-53007'], szPath = RES_ROOT .. 'audio/voice-53007.ogg' },
-}
 local Config, ConfigEmbedded, ConfigTemplate, ConfigDefault = {}, {}
 
 ----------------------------------------------------------------------------------------------
@@ -209,20 +163,6 @@ function D.GetFrameData(id)
 			return config, index
 		end
 	end
-end
-
-do local CACHE = {}
-function D.GetSound(dwID)
-	if not CACHE[dwID] then
-		for _, sound in ipairs(SOUNDS) do
-			if sound.dwID == dwID then
-				CACHE[dwID] = sound
-				break
-			end
-		end
-	end
-	return CACHE[dwID]
-end
 end
 
 do
@@ -1261,60 +1201,32 @@ function PS.OnPanelActive(wnd)
 			end
 			insert(t1, t2)
 			-- 出现声音
-			local t2 = { szOption = _L['Play sound when appear'] }
-			for _, sound in ipairs(SOUNDS) do
-				local bChecked = false
-				for _, v in ipairs(mon.soundAppear) do
-					if v == sound.dwID then
-						bChecked = true
-						break
-					end
-				end
-				insert(t2, {
-					szOption = sound.szName,
-					bCheck = true,
-					bChecked = bChecked,
-					fnAction = function()
-						if bChecked then
-							for i, v in ipairs_r(mon.soundAppear) do
-								if v == sound.dwID then
-									remove(mon.soundAppear, i)
-								end
-							end
-						else
-							insert(mon.soundAppear, sound.dwID)
+			local t2 = MY.GetSoundMenu(function(dwID, bCheck)
+				if not bCheck then
+					for i, v in ipairs_r(mon.soundAppear) do
+						if v == dwID then
+							remove(mon.soundAppear, i)
 						end
-					end,
-				})
-			end
+					end
+				else
+					insert(mon.soundAppear, dwID)
+				end
+			end, MY.ArrayToObject(mon.soundAppear), true)
+			t2.szOption = _L['Play sound when appear']
 			insert(t1, t2)
 			-- 消失声音
-			local t2 = { szOption = _L['Play sound when disappear'] }
-			for _, sound in ipairs(SOUNDS) do
-				local bChecked = false
-				for _, v in ipairs(mon.soundDisappear) do
-					if v == sound.dwID then
-						bChecked = true
-						break
-					end
-				end
-				insert(t2, {
-					szOption = sound.szName,
-					bCheck = true,
-					bChecked = bChecked,
-					fnAction = function()
-						if bChecked then
-							for i, v in ipairs_r(mon.soundDisappear) do
-								if v == sound.dwID then
-									remove(mon.soundDisappear, i)
-								end
-							end
-						else
-							insert(mon.soundDisappear, sound.dwID)
+			local t2 = MY.GetSoundMenu(function(dwID, bCheck)
+				if not bCheck then
+					for i, v in ipairs_r(mon.soundDisappear) do
+						if v == dwID then
+							remove(mon.soundDisappear, i)
 						end
-					end,
-				})
-			end
+					end
+				else
+					insert(mon.soundDisappear, dwID)
+				end
+			end, MY.ArrayToObject(mon.soundDisappear), true)
+			t2.szOption = _L['Play sound when disappear']
 			insert(t1, t2)
 			-- ID设置
 			if not empty(mon.ids) then
@@ -1672,7 +1584,6 @@ MY.RegisterPanel('MY_TargetMon', _L['Target monitor'], _L['Target'], 'ui/Image/C
 
 
 local ui = {
-	GetSound                     = D.GetSound,
 	GetTarget                    = D.GetTarget,
 	GetFrameData                 = D.GetFrameData,
 	FormatConfigStructure        = D.FormatConfigStructure,
