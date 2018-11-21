@@ -226,9 +226,11 @@ local function IsUserdata(var) return type(var) == 'userdata' end
 local function GetPatch(oBase, oData)
 	-- dictionary patch
 	if IsDictionary(oData) or (IsDictionary(oBase) and IsTable(oData) and IsEmpty(oData)) then
+		-- dictionary raw value patch
 		if not IsTable(oBase) then
-			oBase = {}
+			return { v = oData }
 		end
+		-- dictionary children patch
 		local tKeys, bDiff = {}, false
 		local oPatch = {}
 		for k, v in pairs(oData) do
@@ -246,14 +248,14 @@ local function GetPatch(oBase, oData)
 			end
 		end
 		if not bDiff then
-			return
+			return nil
 		end
 		return oPatch
 	end
 	if not IsEquals(oBase, oData) then
 		-- nil value patch
 		if IsNil(oData) then
-			return { v = 'nil' }
+			return { t = 'nil' }
 		end
 		-- other patch value
 		return oData
@@ -269,8 +271,12 @@ local function ApplyPatch(oBase, oPatch, bNew)
 	-- patch in dictionary type can only be a special value patch
 	if IsDictionary(oPatch) then
 		-- nil value patch
-		if oPatch.v == 'nil' then
+		if oPatch.t == 'nil' then
 			return nil
+		end
+		-- raw value patch
+		if oPatch.v then
+			return oPatch.v
 		end
 	end
 	-- dictionary patch
