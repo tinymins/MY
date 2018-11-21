@@ -4,5 +4,6 @@
 */manifest.key
 */publisher.key
 /@DATA
+/__pycache__
 \!src-dist/releases/
 \!src-dist/tools/targetmon-format/*.jx3dat
