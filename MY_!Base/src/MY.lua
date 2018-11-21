@@ -162,6 +162,41 @@ local function IsEmpty(var)
 		return false
 	end
 end
+local function IsEquals(o1, o2)
+	if o1 == o2 then
+		return true
+	elseif type(o1) ~= type(o2) then
+		return false
+	elseif type(o1) == 'table' then
+		local eq, t = true, {}
+		for k, v in pairs(o1) do
+			if not eq then
+				break
+			end
+			if not t[k] then
+				if IsEquals(o1[k], o2[k]) then
+					t[k] = true
+				else
+					eq = false
+				end
+			end
+		end
+		for k, v in pairs(o2) do
+			if not eq then
+				break
+			end
+			if not t[k] then
+				if IsEquals(o1[k], o2[k]) then
+					t[k] = true
+				else
+					eq = false
+				end
+			end
+		end
+		return eq
+	end
+	return false
+end
 local function RandomChild(var)
 	if type(var) == 'table' and #var > 0 then
 		return var[random(1, #var)]
@@ -176,7 +211,7 @@ local function IsFunction(var) return type(var) == 'function' end
 local function IsUserdata(var) return type(var) == 'userdata' end
 ---------------------------------------------------------------------------------------------
 MY = {}
-MY.Get, MY.RandomChild = Get, RandomChild
+MY.Get, MY.IsEquals, MY.RandomChild = Get, IsEquals, RandomChild
 MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsUserdata = IsNil, IsBoolean, IsNumber, IsUserdata
 MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsFunction = IsEmpty, IsString, IsTable, IsFunction
 ---------------------------------------------------------------------------------------------
