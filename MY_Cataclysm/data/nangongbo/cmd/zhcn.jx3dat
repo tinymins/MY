@@ -164,11 +164,13 @@ data = {
     {dwID=4439},--贪魔体---明教
     {dwID=1242,col="#00FF00FF",szReminder="舍",nPriority=7},--舍身---少林
     {dwID=10208,col="#00FF00FF",szReminder="弘",nPriority=7},--弘法---少林
+    {dwID=4101},--引羌笛---天策
     {dwID=2778},--渊---天策
     {dwID=367},--守如山---天策
     {dwID=6163},--守如山---天策
     {dwID=203},--啸如虎---天策
     {dwID=360},--御---天策
+    {dwID=8422},--肆意---苍云
     {dwID=6636,col="#00FF0000",szReminder="圣",nPriority=8},--圣手织天---五毒
     {dwID=113,col="#00FF0000",szReminder="碧",nPriority=8},--碧水滔天---万花
     {dwID=122},--春泥护花---万花
@@ -179,5 +181,5 @@ data = {
     {dwID=9544,col="#00FF00FF",szReminder="笑",nPriority=7},--笑傲光阴---长歌
     {dwID=9265,col="#00FF00FF",szReminder="云",nPriority=7},--云生结海---长歌
     {dwID=9299,col="#FF8000FF",szReminder="杯",nPriority=7},--杯水留影---长歌
-    --【南宫伯是帅咩】更新日期1031
+    --【南宫伯是帅咩】更新日期1120
 }
