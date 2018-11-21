@@ -6,13 +6,30 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+-- these global functions are accessed all the time by the event handler
+-- so caching them is worth the effort
+---------------------------------------------------------------------------------------------------
+local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+---------------------------------------------------------------------------------------------------
+MENU_DIVIDER = { bDevide = true }
 EMPTY_TABLE = SetmetaReadonly({})
 XML_LINE_BREAKER = GetFormatText('\n')
-MENU_DIVIDER = { bDevide = true }
-local XML_LINE_BREAKER = XML_LINE_BREAKER
-local srep, tostring, string2byte = string.rep, tostring, string.byte
-local tconcat, tinsert, tremove = table.concat, table.insert, table.remove
-local type, next, print, pairs, ipairs = type, next, print, pairs, ipairs
+
 if not GetCampImageFrame then
 	function GetCampImageFrame(eCamp, bFight)	-- ui\Image\UICommon\CommonPanel2.UITex
 		local nFrame = nil
@@ -141,53 +158,53 @@ function var2str(var, indent, level)
 		local t = {}
 		local szType = type(var)
 		if szType == 'nil' then
-			tinsert(t, 'nil')
+			insert(t, 'nil')
 		elseif szType == 'number' then
-			tinsert(t, tostring(var))
+			insert(t, tostring(var))
 		elseif szType == 'string' then
-			tinsert(t, string.format('%q', var))
+			insert(t, string.format('%q', var))
 		elseif szType == 'function' then
 			local s = string.dump(var)
-			tinsert(t, 'loadstring("')
+			insert(t, 'loadstring("')
 			-- 'string slice too long'
 			for i = 1, #s, 2000 do
-				tinsert(t, tconcat({'', string2byte(s, i, i + 2000 - 1)}, '\\'))
+				insert(t, concat({'', byte(s, i, i + 2000 - 1)}, '\\'))
 			end
-			tinsert(t, '")')
+			insert(t, '")')
 		elseif szType == 'boolean' then
-			tinsert(t, tostring(var))
+			insert(t, tostring(var))
 		elseif szType == 'table' then
-			tinsert(t, '{')
+			insert(t, '{')
 			local s_tab_equ = ']='
 			if indent then
 				s_tab_equ = '] = '
 				if not empty(var) then
-					tinsert(t, '\n')
+					insert(t, '\n')
 				end
 			end
 			for key, val in pairs(var) do
 				if indent then
-					tinsert(t, srep(indent, level + 1))
+					insert(t, rep(indent, level + 1))
 				end
-				tinsert(t, '[')
-				tinsert(t, table_r(key, level + 1, indent))
-				tinsert(t, s_tab_equ) --'] = '
-				tinsert(t, table_r(val, level + 1, indent))
-				tinsert(t, ',')
+				insert(t, '[')
+				insert(t, table_r(key, level + 1, indent))
+				insert(t, s_tab_equ) --'] = '
+				insert(t, table_r(val, level + 1, indent))
+				insert(t, ',')
 				if indent then
-					tinsert(t, '\n')
+					insert(t, '\n')
 				end
 			end
 			if indent and not empty(var) then
-				tinsert(t, srep(indent, level))
+				insert(t, rep(indent, level))
 			end
-			tinsert(t, '}')
+			insert(t, '}')
 		else --if (szType == 'userdata') then
-			tinsert(t, '"')
-			tinsert(t, tostring(var))
-			tinsert(t, '"')
+			insert(t, '"')
+			insert(t, tostring(var))
+			insert(t, '"')
 		end
-		return tconcat(t)
+		return concat(t)
 	end
 	return table_r(var, level or 0, indent)
 end
