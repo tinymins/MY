@@ -50,7 +50,9 @@ local O = {
 local C, D = {}, {}
 
 RegisterCustomData('MY_TargetLine.bTarget')
+RegisterCustomData('MY_TargetLine.bTargetRL')
 RegisterCustomData('MY_TargetLine.bTTarget')
+RegisterCustomData('MY_TargetLine.bTTargetRL')
 RegisterCustomData('MY_TargetLine.nLineWidth')
 RegisterCustomData('MY_TargetLine.nLineAlpha')
 RegisterCustomData('MY_TargetLine.tTargetColor')
