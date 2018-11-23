@@ -54,23 +54,28 @@ function PS.OnPanelActive(wnd)
 		end,
 	}, true):autoWidth():width()
 
-	if MY.IsShieldedVersion() then
-		return
-	end
-
 	-- target line
 	x, y = X + 10, y + deltaY
 	x = x + ui:append('WndCheckBox', {
 		x = x, y = y,
-		text = _L['Display the line from self to target, change color'],
+		text = _L['Display the line from self to target'],
 		checked = MY_TargetLine.bTarget,
 		oncheck = function(bChecked)
 			MY_TargetLine.bTarget = bChecked
 		end,
 	}, true):autoWidth():width()
 
-	ui:append('Shadow', {
-		x = x + 2, y = y + 2, w = 18, h = 18,
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y,
+		text = _L['New style'],
+		checked = MY_TargetLine.bTargetRL,
+		oncheck = function(bChecked)
+			MY_TargetLine.bTargetRL = bChecked
+		end,
+	}, true):autoWidth():width() + 10
+
+	x = x + ui:append('Shadow', {
+		x = x + 2, y = y + 4, w = 18, h = 18,
 		color = MY_TargetLine.tTargetColor,
 		onclick = function()
 			local ui = UI(this)
@@ -79,20 +84,36 @@ function PS.OnPanelActive(wnd)
 				MY_TargetLine.tTargetColor = { r, g, b }
 			end)
 		end,
-	})
+		autoenable = function() return not MY_TargetLine.bTargetRL end,
+	}, true):width() + 5
+
+	x = x + ui:append('Text', {
+		x = x, y = y - 2,
+		text = _L['Change color'],
+		autoenable = function() return not MY_TargetLine.bTargetRL end,
+	}, true):autoWidth():width()
 
 	x, y = X + 10, y + deltaY
 	x = x + ui:append('WndCheckBox', {
 		x = x, y = y,
-		text = _L['Display the line target self to target target, change color'],
+		text = _L['Display the line target self to target target'],
 		checked = MY_TargetLine.bTTarget,
 		oncheck = function(bChecked)
 			MY_TargetLine.bTTarget = bChecked
 		end,
 	}, true):autoWidth():width()
 
-	ui:append('Shadow', {
-		x = x + 2, y = y + 2, w = 18, h = 18,
+	x = x + ui:append('WndCheckBox', {
+		x = x, y = y,
+		text = _L['New style'],
+		checked = MY_TargetLine.bTTargetRL,
+		oncheck = function(bChecked)
+			MY_TargetLine.bTTargetRL = bChecked
+		end,
+	}, true):autoWidth():width() + 10
+
+	x = x + ui:append('Shadow', {
+		x = x + 2, y = y + 4, w = 18, h = 18,
 		color = MY_TargetLine.tTTargetColor,
 		onclick = function()
 			local ui = UI(this)
@@ -101,10 +122,20 @@ function PS.OnPanelActive(wnd)
 				MY_TargetLine.tTTargetColor = { r, g, b }
 			end)
 		end,
-	})
+		autoenable = function() return not MY_TargetLine.bTTargetRL end,
+	}, true):width() + 5
+
+	x = x + ui:append('Text', {
+		x = x, y = y - 2,
+		text = _L['Change color'],
+		autoenable = function() return not MY_TargetLine.bTTargetRL end,
+	}, true):autoWidth():width()
 
 	x, y = X + 37, y + deltaY
-	x = x + ui:append('Text', { text = _L['Line width'], x = x, y = y }, true):autoWidth():width()
+	x = x + ui:append('Text', {
+		text = _L['Line width'], x = x, y = y,
+		autoenable = function() return not MY_TargetLine.bTargetRL or not MY_TargetLine.bTTargetRL end,
+	}, true):autoWidth():width()
 
 	ui:append('WndSliderBox', {
 		x = x + 2, y = y + 2,
@@ -113,10 +144,14 @@ function PS.OnPanelActive(wnd)
 		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		textfmt = function(val) return _L('%d px', val) end,
 		onchange = function(val) MY_TargetLine.nLineWidth = val end,
+		autoenable = function() return not MY_TargetLine.bTargetRL or not MY_TargetLine.bTTargetRL end,
 	})
 
 	x, y = X + 37, y + deltaY
-	x = x + ui:append('Text', { text = _L['Line alpha'], x = x, y = y }, true):autoWidth():width()
+	x = x + ui:append('Text', {
+		text = _L['Line alpha'], x = x, y = y,
+		autoenable = function() return not MY_TargetLine.bTargetRL or not MY_TargetLine.bTTargetRL end,
+	}, true):autoWidth():width()
 
 	ui:append('WndSliderBox', {
 		x = x + 2, y = y + 2,
@@ -124,7 +159,12 @@ function PS.OnPanelActive(wnd)
 		range = {1, 255},
 		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		onchange = function(val) MY_TargetLine.nLineAlpha = val end,
+		autoenable = function() return not MY_TargetLine.bTargetRL or not MY_TargetLine.bTTargetRL end,
 	})
+
+	if MY.IsShieldedVersion() then
+		return
+	end
 
 	-- target face
 	x, y = X + 10, y + deltaY

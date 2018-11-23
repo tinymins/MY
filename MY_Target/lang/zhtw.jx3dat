@@ -20,8 +20,10 @@ data = {
 	['The foot shape transparency'] = '圈圈透明度',
 
 	['MY_TargetLine'] = '目標連線',
-	['Display the line from self to target, change color'] = '顯示自己到目標的連線，設置顏色',
-	['Display the line target self to target target, change color'] = '顯示目標的目標的連線，設置顏色',
+	['Display the line from self to target'] = '顯示自己到目標的連線',
+	['Display the line target self to target target'] = '顯示目標的目標的連線',
+	['New style'] = '新版樣式',
+	['Change color'] = '設置顏色',
 	['%d px'] = '%d像素',
 	['Line width'] = '連線的寬度',
 	['Line alpha'] = '連線透明度',

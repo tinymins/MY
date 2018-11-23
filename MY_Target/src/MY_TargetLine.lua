@@ -39,7 +39,9 @@ local IMG_PATH = MY.GetAddonInfo().szRoot .. 'MY_Target/img/MY_TargetLine.uitex'
 
 local O = {
 	bTarget       = false,         -- 启用目标追踪线
+	bTargetRL     = true,          -- 启用新版连线
 	bTTarget      = false,         -- 显示目标与目标的目标连接线
+	bTTargetRL    = true,          -- 启用新版连线
 	nLineWidth    = 3,             -- 连接线宽度
 	nLineAlpha    = 150,           -- 连接线不透明度
 	tTargetColor  = { 0, 255, 0 }, -- 颜色
@@ -55,6 +57,18 @@ RegisterCustomData('MY_TargetLine.tTargetColor')
 RegisterCustomData('MY_TargetLine.tTTargetColor')
 
 function D.RequireRerender()
+	for _, v in ipairs({'TLine', 'TTLine', 'Name'}) do
+		local sha = C['sha' .. v]
+		if sha and sha:IsValid() then
+			sha:Hide()
+		end
+	end
+	if C.dwTarID then
+		rlcmd(('set target sfx connection %s %s %s'):format(C.dwTarID, 0, 1))
+	end
+	if C.dwTTarID then
+		rlcmd(('set target sfx connection %s %s %s'):format(C.dwTTarID, 0, 2))
+	end
 	C.bReRender = true
 end
 
@@ -82,18 +96,32 @@ local function onBreathe()
 		or C.dwTarID ~= tar.dwID
 		or (ttar and C.dwTTarID ~= ttar.dwID)
 		or (not ttar and C.dwTTarID ~= 0) then
-			DrawLine(me, tar, C.shaTLine, O.tTargetColor, O.nLineAlpha)
+			if O.bTargetRL then
+				rlcmd(('set target sfx connection %s %s %s'):format(me.dwID, tar.dwID, 1))
+			else
+				DrawLine(me, tar, C.shaTLine, O.tTargetColor, O.nLineAlpha)
+			end
 		end
 	else
+		if C.dwTarID then
+			rlcmd(('set target sfx connection %s %s %s'):format(C.dwTarID, 0, 1))
+		end
 		C.shaTLine:Hide()
 	end
 	C.dwTarID = dwTTarID
 
 	if O.bTTarget and tar and ttar then
 		if C.bReRender or C.dwTTarID ~= ttar.dwID then
-			DrawLine(tar, ttar, C.shaTTLine, O.tTTargetColor, O.nLineAlpha)
+			if O.bTTargetRL then
+				rlcmd(('set target sfx connection %s %s %s'):format(tar.dwID, ttar.dwID, 2))
+			else
+				DrawLine(tar, ttar, C.shaTTLine, O.tTTargetColor, O.nLineAlpha)
+			end
 		end
 	else
+		if C.dwTTarID then
+			rlcmd(('set target sfx connection %s %s %s'):format(C.dwTTarID, 0, 2))
+		end
 		C.shaTTLine:Hide()
 	end
 	C.dwTTarID = dwTTarID
@@ -102,7 +130,7 @@ local function onBreathe()
 end
 
 function D.CheckEnable()
-	if not MY.IsShieldedVersion() and (O.bTarget or O.bTTarget) then
+	if O.bTarget or O.bTTarget then
 		local hShaList = UI.GetShadowHandle('MY_TargetLine')
 		for _, v in ipairs({'TLine', 'TTLine', 'Name'}) do
 			local sha = hShaList:Lookup(v)
@@ -137,7 +165,9 @@ local settings = {
 		{
 			fields = {
 				bTarget       = true,
+				bTargetRL     = true,
 				bTTarget      = true,
+				bTTargetRL    = true,
 				nLineWidth    = true,
 				nLineAlpha    = true,
 				tTargetColor  = true,
@@ -150,7 +180,9 @@ local settings = {
 		{
 			fields = {
 				bTarget       = true,
+				bTargetRL     = true,
 				bTTarget      = true,
+				bTTargetRL    = true,
 				nLineWidth    = true,
 				nLineAlpha    = true,
 				tTargetColor  = true,
@@ -158,7 +190,9 @@ local settings = {
 			},
 			triggers = {
 				bTarget       = D.CheckEnable,
+				bTargetRL     = D.RequireRerender,
 				bTTarget      = D.CheckEnable,
+				bTTargetRL    = D.RequireRerender,
 				nLineWidth    = D.RequireRerender,
 				nLineAlpha    = D.RequireRerender,
 				tTargetColor  = D.RequireRerender,
