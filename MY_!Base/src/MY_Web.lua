@@ -32,33 +32,22 @@ local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTab
 MY_Web = {}
 MY_WebBase = class()
 
-local function UpdateControls(frame)
-	frame:Lookup('Wnd_Controls/Btn_GoBack'):Enable(#frame.backwards > 0)
-	frame:Lookup('Wnd_Controls/Btn_GoForward'):Enable(#frame.forwards > 0)
-end
-
-local function FormatURL(url)
-	if not url:find('://') then
-		url = 'http://' .. url
+local function UpdateControls(frame, action, url)
+	local wndWeb = frame:Lookup('Wnd_Web/WndWeb')
+	if action == 'refresh' then
+		wndWeb:Refresh()
+	elseif action == 'back' then
+		wndWeb:GoBack()
+	elseif action == 'forward' then
+		wndWeb:GoForward()
+	elseif action == 'go' then
+		if not url then
+			url = frame:Lookup('Wnd_Controls/Edit_Input'):GetText()
+		end
+		wndWeb:Navigate(url)
 	end
-	return url
-end
-
-local function GoToURL(frame, url)
-	frame.url = url
-	frame:Lookup('Wnd_Web/WndWeb'):Navigate(url)
-	frame:Lookup('Wnd_Controls/Edit_Input'):SetText(url)
-end
-
-local function GoToInputURL(frame)
-	local url = FormatURL(frame:Lookup('Wnd_Controls/Edit_Input'):GetText())
-	if frame.url == url then
-		return
-	end
-	insert(frame.backwards, frame.url)
-	frame.forwards = {}
-	GoToURL(frame, url)
-	UpdateControls(frame)
+	frame:Lookup('Wnd_Controls/Btn_GoBack'):Enable(wndWeb:CanGoBack())
+	frame:Lookup('Wnd_Controls/Btn_GoForward'):Enable(wndWeb:CanGoForward())
 end
 
 function MY_WebBase.OnFrameCreate()
@@ -69,25 +58,13 @@ function MY_WebBase.OnLButtonClick()
 	local name = this:GetName()
 	local frame = this:GetRoot()
 	if name == 'Btn_Refresh' or name == 'Btn_Refresh2' then
-		frame:Lookup('Wnd_Web/WndWeb'):Navigate(frame.url)
+		UpdateControls(frame, 'refresh')
 	elseif name == 'Btn_GoBack' then
-		local url = remove(frame.backwards)
-		if not url then
-			return
-		end
-		insert(frame.forwards, frame.url)
-		GoToURL(frame, url)
-		UpdateControls(frame)
+		UpdateControls(frame, 'back')
 	elseif name == 'Btn_GoForward' then
-		local url = remove(frame.forwards)
-		if not url then
-			return
-		end
-		insert(frame.backwards, frame.url)
-		GoToURL(frame, url)
-		UpdateControls(frame)
+		UpdateControls(frame, 'forward')
 	elseif name == 'Btn_GoTo' then
-		GoToInputURL(frame)
+		UpdateControls(frame, 'go')
 	elseif name == 'Btn_OuterOpen' then
 		MY.OpenBrowser(frame.url)
 	elseif name == 'Btn_Close' then
@@ -134,9 +111,21 @@ function MY_WebBase.OnEditSpecialKeyDown()
 	local frame = this:GetRoot()
 	local szKey = GetKeyName(Station.GetMessageKey())
 	if szKey == 'Enter' then
-		GoToInputURL(frame)
+		UpdateControls(frame, 'go')
 		return 1
 	end
+end
+
+function MY_WebBase.OnWebLoadEnd()
+	this:GetRoot():Lookup('Wnd_Controls/Edit_Input'):SetText(this:GetLocationURL())
+end
+
+function MY_WebBase.OnTitleChanged()
+	this:GetRoot():Lookup('', 'Text_Title'):SetText(this:GetLocationName())
+end
+
+function MY_WebBase.OnHistoryChanged()
+	UpdateControls(this:GetRoot())
 end
 
 do
@@ -200,15 +189,12 @@ function MY_Web.Open(url, options)
 	if options.title then
 		frame:Lookup('', 'Text_Title'):SetText(options.title)
 	end
+	frame:Lookup('Wnd_Controls/Edit_Input'):SetText(url)
 	ui:minSize(290, 150)
 	ui:size(OnResizePanel)
 	ui:size(options.w or 500, options.h or 600)
 	ui:anchor(options.anchor or {})
-	url = FormatURL(url)
-	frame.forwards = {}
-	frame.backwards = {}
-	GoToURL(frame, url)
-	UpdateControls(frame)
+	UpdateControls(frame, 'go')
 
 	return szKey
 end
