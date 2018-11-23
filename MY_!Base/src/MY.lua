@@ -354,6 +354,7 @@ local _L = MY.LoadLangPack()
 local _NAME_       = _L['mingyi plugins']
 local _SHORT_NAME_ = _L['mingyi plugin']
 local _AUTHOR_     = _L['MingYi @ Double Dream Town']
+local _MENU_COLOR_ = {35, 180, 246}
 -----------------------------------------------
 -- 私有函数
 -----------------------------------------------
@@ -386,6 +387,7 @@ do local AddonInfo = SetmetaReadonly({
 		-- [4662931] = string.char( 0xBE, 0xCD, 0xCA, 0xC7, 0xB8, 0xF6, 0xD5, 0xF3, 0xD1, 0xDB ), -- 日月明尊
 		-- [3438030] = string.char( 0xB4, 0xE5, 0xBF, 0xDA, 0xB5, 0xC4, 0xCD, 0xF5, 0xCA, 0xA6, 0xB8, 0xB5 ), -- 枫泾古镇
 	},
+	tMenuColor     = _MENU_COLOR_,
 })
 function MY.GetAddonInfo()
 	return AddonInfo
