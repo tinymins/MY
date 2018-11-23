@@ -27,4 +27,9 @@ data = {
 	['%d px'] = '%d像素',
 	['Line width'] = '连线的宽度',
 	['Line alpha'] = '连线透明度',
+	['Move'] = '位移',
+	['Entrap'] = '锁足',
+	['Slower'] = '减速',
+	["Halt"] = "眩晕",
+	["Freeze"] = "定身",
 }

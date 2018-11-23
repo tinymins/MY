@@ -27,4 +27,9 @@ data = {
 	['%d px'] = '%d像素',
 	['Line width'] = '連線的寬度',
 	['Line alpha'] = '連線透明度',
+	['Move'] = '位移',
+	['Entrap'] = '鎖足',
+	['Slower'] = '減速',
+	["Halt"] = "眩暈",
+	["Freeze"] = "定身",
 }

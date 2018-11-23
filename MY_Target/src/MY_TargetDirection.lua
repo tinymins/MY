@@ -86,9 +86,34 @@ function D.CheckEnable()
 	end
 end
 
+function D.GetState(tar)
+	if tar.nMoveState == MOVE_STATE.ON_SIT then
+		return 533, g_tStrings.tPlayerMoveState[tar.nMoveState]
+	elseif tar.nMoveState == MOVE_STATE.ON_DEATH then
+		return 2215, g_tStrings.tPlayerMoveState[tar.nMoveState]
+	elseif tar.nMoveState == MOVE_STATE.ON_KNOCKED_DOWN then
+		return 2027, g_tStrings.tPlayerMoveState[tar.nMoveState]
+	elseif tar.nMoveState == MOVE_STATE.ON_DASH then
+		return 2030, g_tStrings.tPlayerMoveState[tar.nMoveState]
+	elseif tar.nMoveState == MOVE_STATE.ON_SKILL_MOVE_DST then
+		return 1487, _L["Move"]
+	else
+		-- check other movestate
+		if tar.nMoveState == MOVE_STATE.ON_HALT then
+			return 2019, g_tStrings.tPlayerMoveState[tar.nMoveState]
+		elseif tar.nMoveState == MOVE_STATE.ON_FREEZE then
+			return 2038, g_tStrings.tPlayerMoveState[tar.nMoveState]
+		elseif tar.nMoveState == MOVE_STATE.ON_ENTRAP then
+			return 2020, _L["Entrap"]
+		end
+		-- check speed
+		if IsPlayer(tar.dwID) and tar.nRunSpeed < 20 then
+			return 348, _L["Slower"]
+		end
+	end
+end
+
 function D.OnFrameCreate()
-	-- this:Lookup('', 'Handle_Main/Image_Arrow'):FromUITex(IMG_PATH, 0)
-	-- this:Lookup('', 'Handle_Main/Image_Player'):FromUITex(IMG_PATH, 1)
 	this:RegisterEvent('UI_SCALED')
 	this:RegisterEvent('ON_ENTER_CUSTOM_UI_MODE')
 	this:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
@@ -145,7 +170,17 @@ function D.OnFrameBreathe()
 		elseif IsAlly(me.dwID, tar.dwID) then
 			nFrame = 2
 		end
-		this:Lookup('', 'Handle_Main/Image_Arrow'):SetFrame(nFrame)
+		-- ×´Ì¬
+		local dwIcon, szState = D.GetState(tar)
+		local boxState = this:Lookup('', 'Handle_Main/Box_State')
+		local txtState = this:Lookup('', 'Handle_Main/Text_State')
+		if dwIcon then
+			boxState:Show()
+			boxState:SetObjectIcon(dwIcon)
+		else
+			boxState:Hide()
+		end
+		txtState:SetText(szState or '')
 		-- ¾àÀë
 		this:Lookup('', 'Handle_Main/Text_Distance'):SetText(_L('%.1f feet', MY.GetDistance(me, tar, O.eDistanceType)))
 		this:Show()
