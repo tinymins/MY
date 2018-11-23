@@ -1161,6 +1161,16 @@ local function SetComponentEnable(raw, bEnable)
 		end
 		txt:SetFontColor(ceil(r * ratio), ceil(g * ratio), ceil(b * ratio))
 	end
+	-- make gray
+	local sha = GetComponentElement(raw, 'SHADOW')
+	if sha then
+		local r, g, b = sha:GetColorRGB()
+		local ratio = bEnable and 2.2 or (1 / 2.2)
+		if max(r, g, b) * ratio > 255 then
+			ratio = 255 / max(r, g, b)
+		end
+		sha:SetColorRGB(ceil(r * ratio), ceil(g * ratio), ceil(b * ratio))
+	end
 	-- set sub elements enable
 	local combo = GetComponentElement(raw, 'COMBOBOX')
 	if combo then
@@ -3325,7 +3335,12 @@ function UI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 		end
 		for _, raw in ipairs(self.raws) do
 			if IsFunction(fnLClick) then
-				local fnAction = function() MY.ExecuteWithThis(raw, fnLClick, MY_MOUSE_EVENT.LBUTTON) end
+				local fnAction = function()
+					if GetComponentProp(raw, 'bEnable') == false then
+						return
+					end
+					MY.ExecuteWithThis(raw, fnLClick, MY_MOUSE_EVENT.LBUTTON)
+				end
 				if GetComponentType(raw) == 'WndScrollBox' then
 					UI(GetComponentElement(raw, 'MAIN_HANDLE')):uievent('OnItemLButtonClick', fnAction)
 				else
@@ -3350,7 +3365,12 @@ function UI:click(fnLClick, fnRClick, fnMClick, bNoAutoBind)
 
 			end
 			if IsFunction(fnRClick) then
-				local fnAction = function() MY.ExecuteWithThis(raw, fnRClick, MY_MOUSE_EVENT.RBUTTON) end
+				local fnAction = function()
+					if GetComponentProp(raw, 'bEnable') == false then
+						return
+					end
+					MY.ExecuteWithThis(raw, fnRClick, MY_MOUSE_EVENT.RBUTTON)
+				end
 				if GetComponentType(raw) == 'WndScrollBox' then
 					UI(GetComponentElement(raw, 'MAIN_HANDLE')):uievent('OnItemRButtonClick', fnAction)
 				else
