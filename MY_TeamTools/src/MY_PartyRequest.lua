@@ -31,18 +31,12 @@ local PR = {}
 local PR_MAX_LEVEL = 95
 local PR_INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_TeamTools/ui/MY_PartyRequest.ini'
 local PR_EQUIP_REQUEST = {}
-local PR_MT = { __call = function(me, szName)
-	for k, v in ipairs(me) do
-		if v.szName == szName then
-			return true
-		end
-	end
-end }
-local PR_PARTY_REQUEST  = setmetatable({}, PR_MT)
+local PR_PARTY_REQUEST = {}
 
 MY_PartyRequest = {
 	bEnable     = true,
 	bAutoCancel = false,
+	bRefuseRobot = false,
 }
 MY.RegisterCustomData('MY_PartyRequest')
 
@@ -57,32 +51,31 @@ function MY_PartyRequest.OnLButtonClick()
 	if name == 'Btn_Setting' then
 		local menu = {}
 		table.insert(menu, {
-			szOption = _L['Auto Refuse No full level Player'],
+			szOption = _L['Auto refuse low level player'],
 			bCheck = true, bChecked = MY_PartyRequest.bAutoCancel,
 			fnAction = function()
 				MY_PartyRequest.bAutoCancel = not MY_PartyRequest.bAutoCancel
+			end,
+		})
+		table.insert(menu, {
+			szOption = _L['Auto refuse robot player'],
+			bCheck = true, bChecked = MY_PartyRequest.bRefuseRobot,
+			fnAction = function()
+				MY_PartyRequest.bRefuseRobot = not MY_PartyRequest.bRefuseRobot
+			end,
+			fnMouseEnter = function()
+				local szXml = GetFormatText(_L['Full level and equip score less than 2/3 of yours'], nil, 255, 255, 0)
+				OutputTip(szXml, 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
 			end,
 		})
 		PopupMenu(menu)
 	elseif name == 'Btn_Close' then
 		PR.ClosePanel()
 	elseif name == 'Btn_Accept' then
-		local info = this:GetParent().info
-		info.fnAction()
-		for i, v in ipairs_r(PR_PARTY_REQUEST) do
-			if v == info then
-				remove(PR_PARTY_REQUEST, i)
-			end
-		end
+		PR.AcceptRequest(this:GetParent().info)
 		PR.UpdateFrame()
 	elseif name == 'Btn_Refuse' then
-		local info = this:GetParent().info
-		info.fnCancelAction()
-		for i, v in ipairs_r(PR_PARTY_REQUEST) do
-			if v == info then
-				remove(PR_PARTY_REQUEST, i)
-			end
-		end
+		PR.RefuseRequest(this:GetParent().info)
 		PR.UpdateFrame()
 	elseif name == 'Btn_Lookup' then
 		local info = this:GetParent().info
@@ -149,7 +142,7 @@ end
 function PR.ClosePanel(bCompulsory)
 	local fnAction = function()
 		Wnd.CloseWindow(PR.GetFrame())
-		PR_PARTY_REQUEST  = setmetatable({}, PR_MT)
+		PR_PARTY_REQUEST = {}
 	end
 	if bCompulsory then
 		fnAction()
@@ -171,8 +164,63 @@ function PR.OnPeekPlayer()
 				local data = { nil, arg1, mnt and mnt.dwSkillID or nil, false }
 				PR.Feedback(p.szName, data, false)
 			end
+			local info = PR.GetRequestInfo(arg1)
+			if info and PR.CheckAutoRefuse(info) then
+				PR.UpdateFrame()
+			end
 		end
 		PR_EQUIP_REQUEST[arg1] = nil
+	end
+end
+
+function PR.PeekPlayer(dwID)
+	PR_EQUIP_REQUEST[dwID] = true
+	ViewInviteToPlayer(dwID, true)
+end
+
+function PR.AcceptRequest(info)
+	for i, v in ipairs_r(PR_PARTY_REQUEST) do
+		if v == info then
+			remove(PR_PARTY_REQUEST, i)
+		end
+	end
+	info.fnAction()
+end
+
+function PR.RefuseRequest(info)
+	for i, v in ipairs_r(PR_PARTY_REQUEST) do
+		if v == info then
+			remove(PR_PARTY_REQUEST, i)
+		end
+	end
+	info.fnCancelAction()
+end
+
+function PR.CheckAutoRefuse(info)
+	if not info.bFriend then
+		if MY_PartyRequest.bRefuseRobot and info.dwID then
+			local me = GetClientPlayer()
+			local tar = GetPlayer(info.dwID)
+			if tar and tar.GetTotalEquipScore() < me.GetTotalEquipScore() * 2 / 3 then
+				PR.RefuseRequest(info)
+				MY.Sysmsg({_L('Auto refuse %s(%s %d%s) party request, equip score: %d', info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL, tar.GetTotalEquipScore())})
+				return true
+			end
+		end
+		if MY_PartyRequest.bAutoCancel and info.nLevel < PR_MAX_LEVEL then
+			PR.RefuseRequest(info)
+			MY.Sysmsg({_L('Auto refuse %s(%s %d%s) party request', info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)})
+			return true
+		end
+	end
+	return false
+end
+
+function PR.GetRequestInfo(key)
+	for k, v in ipairs(PR_PARTY_REQUEST) do
+		if v.szName == key or v.dwID == key then
+			return v
+		end
 	end
 end
 
@@ -185,45 +233,41 @@ function PR.OnApplyRequest()
 		local btn  = hMsgBox:Lookup('Wnd_All/Btn_Option1')
 		local btn2 = hMsgBox:Lookup('Wnd_All/Btn_Option2')
 		if btn and btn:IsEnabled() then
-			if not PR_PARTY_REQUEST(arg0) then
-				local tab = {
+			-- 判断对方是否已在进组列表中
+			local info = PR.GetRequestInfo(arg0)
+			if not info then
+				info = {
 					szName  = arg0,
 					nCamp   = arg1,
 					dwForce = arg2,
 					nLevel  = arg3,
+					bFriend = MY.IsFriend(arg0),
 					fnAction = function()
 						pcall(btn.fnAction)
 					end,
 					fnCancelAction = function()
 						pcall(btn2.fnAction)
-					end
+					end,
 				}
-				if not MY_PartyRequest.bAutoCancel or MY_PartyRequest.bAutoCancel and arg3 == PR_MAX_LEVEL then
-					table.insert(PR_PARTY_REQUEST, tab)
-				else
-					MY.Sysmsg({_L('Auto Refuse %s(%s %d%s) Party request', arg0, g_tStrings.tForceTitle[arg2], arg3, g_tStrings.STR_LEVEL)})
-					pcall(btn2.fnAction)
-				end
+				insert(PR_PARTY_REQUEST, info)
 			end
-			local data
-			local fnGetEqueip = function(dwID)
-				PR_EQUIP_REQUEST[dwID] = true
-				ViewInviteToPlayer(dwID, true)
+			-- 获取dwID
+			local me = GetClientPlayer()
+			local tar = MY.GetObject(TARGET.PLAYER, arg0)
+			if not info.dwID and tar then
+				info.dwID = tar.dwID
 			end
-			if MY_Farbnamen and MY_Farbnamen.Get then
-				data = MY_Farbnamen.Get(arg0)
+			if not info.dwID and MY_Farbnamen and MY_Farbnamen.Get then
+				local data = MY_Farbnamen.Get(arg0)
 				if data then
-					fnGetEqueip(data.dwID)
+					info.dwID = data.dwID
 				end
 			end
-			if not data then
-				for _, v in ipairs(MY.GetNearPlayer()) do
-					if v.szName == arg0 then
-						fnGetEqueip(v.dwID)
-						break
-					end
-				end
+			-- 自动拒绝 没拒绝的自动申请装备
+			if info.dwID and not PR.CheckAutoRefuse(info) then
+				PR.PeekPlayer(info.dwID)
 			end
+			-- 关闭对话框 更新界面
 			hMsgBox.fnAutoClose = nil
 			hMsgBox.fnCancelAction = nil
 			hMsgBox.szCloseSound = nil
