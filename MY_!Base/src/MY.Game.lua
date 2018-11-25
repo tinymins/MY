@@ -2136,24 +2136,31 @@ end
 
 -- 获取对象的buff列表
 -- (table) MY.GetBuffList(KObject)
-function MY.GetBuffList(KObject)
-	KObject = KObject or GetClientPlayer()
+function MY.GetBuffList(...)
+	local KObject
+	if select('#', ...) == 0 then
+		KObject = GetClientPlayer()
+	else
+		KObject = ...
+	end
 	local aBuffTable = {}
-	local nCount = KObject.GetBuffCount() or 0
-	for i = 1, nCount do
-		local dwID, nLevel, bCanCancel, nEndFrame, nIndex, nStackNum, dwSkillSrcID, bValid = KObject.GetBuff(i - 1)
-		if dwID then
-			table.insert(aBuffTable, {
-				dwID         = dwID        ,
-				nLevel       = nLevel      ,
-				bCanCancel   = bCanCancel  ,
-				nEndFrame    = nEndFrame   ,
-				nIndex       = nIndex      ,
-				nStackNum    = nStackNum   ,
-				dwSkillSrcID = dwSkillSrcID,
-				bValid       = bValid      ,
-				nCount       = i           ,
-			})
+	if KObject then
+		local nCount = KObject.GetBuffCount() or 0
+		for i = 1, nCount do
+			local dwID, nLevel, bCanCancel, nEndFrame, nIndex, nStackNum, dwSkillSrcID, bValid = KObject.GetBuff(i - 1)
+			if dwID then
+				table.insert(aBuffTable, {
+					dwID         = dwID        ,
+					nLevel       = nLevel      ,
+					bCanCancel   = bCanCancel  ,
+					nEndFrame    = nEndFrame   ,
+					nIndex       = nIndex      ,
+					nStackNum    = nStackNum   ,
+					dwSkillSrcID = dwSkillSrcID,
+					bValid       = bValid      ,
+					nCount       = i           ,
+				})
+			end
 		end
 	end
 	return aBuffTable
