@@ -165,7 +165,7 @@ function PR.OnPeekPlayer()
 				PR.Feedback(p.szName, data, false)
 			end
 			local info = PR.GetRequestInfo(arg1)
-			if info and PR.CheckAutoRefuse(info) then
+			if info and PR.DoAutoAction(info) then
 				PR.UpdateFrame()
 			end
 		end
@@ -196,24 +196,45 @@ function PR.RefuseRequest(info)
 	info.fnCancelAction()
 end
 
-function PR.CheckAutoRefuse(info)
+function PR.GetRequestStatus(info)
+	local szStatus, szMsg = 'normal'
 	if not info.bFriend then
 		if MY_PartyRequest.bRefuseRobot and info.dwID then
 			local me = GetClientPlayer()
 			local tar = GetPlayer(info.dwID)
-			if tar and tar.GetTotalEquipScore() > 0 and tar.GetTotalEquipScore() < me.GetTotalEquipScore() * 2 / 3 then
-				PR.RefuseRequest(info)
-				MY.Sysmsg({_L('Auto refuse %s(%s %d%s) party request, equip score: %d', info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL, tar.GetTotalEquipScore())})
-				return true
+			if tar then
+				local nScore = tar.GetTotalEquipScore()
+				if nScore == 0 then
+					szStatus = 'suspicious'
+				elseif tar.GetTotalEquipScore() < me.GetTotalEquipScore() * 2 / 3 then
+					szStatus = 'refuse'
+					szMsg = _L('Auto refuse %s(%s %d%s) party request, equip score: %d',
+						info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL, nScore)
+				end
 			end
 		end
 		if MY_PartyRequest.bAutoCancel and info.nLevel < PR_MAX_LEVEL then
-			PR.RefuseRequest(info)
-			MY.Sysmsg({_L('Auto refuse %s(%s %d%s) party request', info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)})
-			return true
+			szStatus = 'refuse'
+			szMsg = _L('Auto refuse %s(%s %d%s) party request', info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
 		end
 	end
-	return false
+	return szStatus, szMsg
+end
+
+function PR.DoAutoAction(info)
+	local bAction = false
+	local szStatus, szMsg = PR.GetRequestStatus(info)
+	if szStatus == 'refuse' then
+		bAction = true
+		PR.RefuseRequest(info)
+	elseif szStatus == 'accept' then
+		bAction = true
+		PR.AcceptRequest(info)
+	end
+	if szMsg then
+		MY.Sysmsg(szMsg)
+	end
+	return bAction, szStatus, szMsg
 end
 
 function PR.GetRequestInfo(key)
@@ -264,7 +285,11 @@ function PR.OnApplyRequest()
 				end
 			end
 			-- 自动拒绝 没拒绝的自动申请装备
-			if info.dwID and not PR.CheckAutoRefuse(info) then
+			local bAction, szStatus = PR.DoAutoAction(info)
+			if szStatus == 'suspicious' then
+				info.dwDelayTime = GetTime() + 2000
+			end
+			if not bAction and info.dwID then
 				PR.PeekPlayer(info.dwID)
 			end
 			-- 关闭对话框 更新界面
@@ -286,37 +311,45 @@ function PR.UpdateFrame()
 	if #PR_PARTY_REQUEST == 0 then
 		return PR.ClosePanel(true)
 	end
+	local dwTime, dwDelayTime = GetTime(), nil
 	local container, nH = frame:Lookup('WndContainer_Request'), 0
 	container:Clear()
-	for k, v in ipairs(PR_PARTY_REQUEST) do
-		local wnd = container:AppendContentFromIni(PR_INI_PATH, 'WndWindow_Item', k)
-		local hItem = wnd:Lookup('', '')
-		hItem:Lookup('Image_Hover'):SetFrame(2)
-
-		if v.dwKungfuID then
-			hItem:Lookup('Image_Icon'):FromIconID(Table_GetSkillIconID(v.dwKungfuID, 1))
+	for _, info in ipairs(PR_PARTY_REQUEST) do
+		if info.dwDelayTime and info.dwDelayTime > dwTime then
+			dwDelayTime = min(dwDelayTime or huge, info.dwDelayTime)
 		else
-			hItem:Lookup('Image_Icon'):FromUITex(GetForceImage(v.dwForce))
-		end
-		hItem:Lookup('Handle_Status/Handle_Gongzhan'):SetVisible(v.nGongZhan == 1)
+			local wnd = container:AppendContentFromIni(PR_INI_PATH, 'WndWindow_Item')
+			local hItem = wnd:Lookup('', '')
+			hItem:Lookup('Image_Hover'):SetFrame(2)
 
-		local nCampFrame = GetCampImageFrame(v.nCamp)
-		if nCampFrame then
-			hItem:Lookup('Handle_Status/Handle_Camp/Image_Camp'):SetFrame(nCampFrame)
-		end
-		hItem:Lookup('Handle_Status/Handle_Camp'):SetVisible(not not nCampFrame)
+			if info.dwKungfuID then
+				hItem:Lookup('Image_Icon'):FromIconID(Table_GetSkillIconID(info.dwKungfuID, 1))
+			else
+				hItem:Lookup('Image_Icon'):FromUITex(GetForceImage(info.dwForce))
+			end
+			hItem:Lookup('Handle_Status/Handle_Gongzhan'):SetVisible(info.nGongZhan == 1)
 
-		if v.bDetail and v.bEx == 'Author' then
-			hItem:Lookup('Text_Name'):SetFontColor(255, 255, 0)
-		end
-		hItem:Lookup('Text_Name'):SetText(v.szName)
-		hItem:Lookup('Text_Level'):SetText(v.nLevel)
+			local nCampFrame = GetCampImageFrame(info.nCamp)
+			if nCampFrame then
+				hItem:Lookup('Handle_Status/Handle_Camp/Image_Camp'):SetFrame(nCampFrame)
+			end
+			hItem:Lookup('Handle_Status/Handle_Camp'):SetVisible(not not nCampFrame)
 
-		wnd:Lookup('Btn_Accept', 'Text_Accept'):SetText(g_tStrings.STR_ACCEPT)
-		wnd:Lookup('Btn_Refuse', 'Text_Refuse'):SetText(g_tStrings.STR_REFUSE)
-		wnd:Lookup('Btn_Lookup', 'Text_Lookup'):SetText(v.dwID and g_tStrings.STR_LOOKUP or _L['Ask details'])
-		wnd.info = v
-		nH = nH + wnd:GetH()
+			if info.bDetail and info.bEx == 'Author' then
+				hItem:Lookup('Text_Name'):SetFontColor(255, 255, 0)
+			end
+			hItem:Lookup('Text_Name'):SetText(info.szName)
+			hItem:Lookup('Text_Level'):SetText(info.nLevel)
+
+			wnd:Lookup('Btn_Accept', 'Text_Accept'):SetText(g_tStrings.STR_ACCEPT)
+			wnd:Lookup('Btn_Refuse', 'Text_Refuse'):SetText(g_tStrings.STR_REFUSE)
+			wnd:Lookup('Btn_Lookup', 'Text_Lookup'):SetText(info.dwID and g_tStrings.STR_LOOKUP or _L['Ask details'])
+			wnd.info = info
+			nH = nH + wnd:GetH()
+		end
+	end
+	if dwDelayTime then
+		MY.DelayCall('MY_PartyRequest', dwDelayTime - dwTime, PR.UpdateFrame)
 	end
 	container:SetH(nH)
 	container:FormatAllContentPos()
