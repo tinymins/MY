@@ -201,7 +201,7 @@ function PR.CheckAutoRefuse(info)
 		if MY_PartyRequest.bRefuseRobot and info.dwID then
 			local me = GetClientPlayer()
 			local tar = GetPlayer(info.dwID)
-			if tar and tar.GetTotalEquipScore() < me.GetTotalEquipScore() * 2 / 3 then
+			if tar and tar.GetTotalEquipScore() > 0 and tar.GetTotalEquipScore() < me.GetTotalEquipScore() * 2 / 3 then
 				PR.RefuseRequest(info)
 				MY.Sysmsg({_L('Auto refuse %s(%s %d%s) party request, equip score: %d', info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL, tar.GetTotalEquipScore())})
 				return true
