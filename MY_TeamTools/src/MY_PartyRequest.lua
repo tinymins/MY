@@ -27,7 +27,7 @@ local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 -----------------------------------------------------------------------------------------
 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TeamTools/lang/')
-local PR = {}
+local D = {}
 local PR_MAX_LEVEL = 95
 local PR_INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_TeamTools/ui/MY_PartyRequest.ini'
 local PR_EQUIP_REQUEST = {}
@@ -43,7 +43,7 @@ MY.RegisterCustomData('MY_PartyRequest')
 function MY_PartyRequest.OnFrameCreate()
 	this:SetPoint('CENTER', 0, 0, 'CENTER', 0, 0)
 	this:Lookup('', 'Text_Title'):SetText(g_tStrings.STR_ARENA_INVITE)
-	MY.RegisterEsc('MY_PartyRequest', PR.GetFrame, PR.ClosePanel)
+	MY.RegisterEsc('MY_PartyRequest', D.GetFrame, D.ClosePanel)
 end
 
 function MY_PartyRequest.OnLButtonClick()
@@ -70,13 +70,13 @@ function MY_PartyRequest.OnLButtonClick()
 		})
 		PopupMenu(menu)
 	elseif name == 'Btn_Close' then
-		PR.ClosePanel()
+		D.ClosePanel()
 	elseif name == 'Btn_Accept' then
-		PR.AcceptRequest(this:GetParent().info)
-		PR.UpdateFrame()
+		D.AcceptRequest(this:GetParent().info)
+		D.UpdateFrame()
 	elseif name == 'Btn_Refuse' then
-		PR.RefuseRequest(this:GetParent().info)
-		PR.UpdateFrame()
+		D.RefuseRequest(this:GetParent().info)
+		D.UpdateFrame()
 	elseif name == 'Btn_Lookup' then
 		local info = this:GetParent().info
 		if not info.dwID or (not info.bDetail and IsCtrlKeyDown()) then
@@ -128,20 +128,20 @@ function MY_PartyRequest.OnMouseLeave()
 	end
 end
 
-function PR.GetFrame()
+function D.GetFrame()
 	return Station.Lookup('Normal2/MY_PartyRequest')
 end
 
-function PR.OpenPanel()
-	if PR.GetFrame() then
+function D.OpenPanel()
+	if D.GetFrame() then
 		return
 	end
 	Wnd.OpenWindow(PR_INI_PATH, 'MY_PartyRequest')
 end
 
-function PR.ClosePanel(bCompulsory)
+function D.ClosePanel(bCompulsory)
 	local fnAction = function()
-		Wnd.CloseWindow(PR.GetFrame())
+		Wnd.CloseWindow(D.GetFrame())
 		PR_PARTY_REQUEST = {}
 	end
 	if bCompulsory then
@@ -151,7 +151,7 @@ function PR.ClosePanel(bCompulsory)
 	end
 end
 
-function PR.OnPeekPlayer()
+function D.OnPeekPlayer()
 	if PR_EQUIP_REQUEST[arg1] then
 		if arg0 == PEEK_OTHER_PLAYER_RESPOND.SUCCESS then
 			local me = GetClientPlayer()
@@ -162,23 +162,23 @@ function PR.OnPeekPlayer()
 			if p then
 				local mnt = p.GetKungfuMount()
 				local data = { nil, arg1, mnt and mnt.dwSkillID or nil, false }
-				PR.Feedback(p.szName, data, false)
+				D.Feedback(p.szName, data, false)
 			end
-			local info = PR.GetRequestInfo(arg1)
-			if info and PR.DoAutoAction(info) then
-				PR.UpdateFrame()
+			local info = D.GetRequestInfo(arg1)
+			if info and D.DoAutoAction(info) then
+				D.UpdateFrame()
 			end
 		end
 		PR_EQUIP_REQUEST[arg1] = nil
 	end
 end
 
-function PR.PeekPlayer(dwID)
+function D.PeekPlayer(dwID)
 	PR_EQUIP_REQUEST[dwID] = true
 	ViewInviteToPlayer(dwID, true)
 end
 
-function PR.AcceptRequest(info)
+function D.AcceptRequest(info)
 	for i, v in ipairs_r(PR_PARTY_REQUEST) do
 		if v == info then
 			remove(PR_PARTY_REQUEST, i)
@@ -187,7 +187,7 @@ function PR.AcceptRequest(info)
 	info.fnAction()
 end
 
-function PR.RefuseRequest(info)
+function D.RefuseRequest(info)
 	for i, v in ipairs_r(PR_PARTY_REQUEST) do
 		if v == info then
 			remove(PR_PARTY_REQUEST, i)
@@ -196,7 +196,7 @@ function PR.RefuseRequest(info)
 	info.fnCancelAction()
 end
 
-function PR.GetRequestStatus(info)
+function D.GetRequestStatus(info)
 	local szStatus, szMsg = 'normal'
 	if not info.bFriend then
 		if MY_PartyRequest.bRefuseRobot and info.dwID then
@@ -221,15 +221,15 @@ function PR.GetRequestStatus(info)
 	return szStatus, szMsg
 end
 
-function PR.DoAutoAction(info)
+function D.DoAutoAction(info)
 	local bAction = false
-	local szStatus, szMsg = PR.GetRequestStatus(info)
+	local szStatus, szMsg = D.GetRequestStatus(info)
 	if szStatus == 'refuse' then
 		bAction = true
-		PR.RefuseRequest(info)
+		D.RefuseRequest(info)
 	elseif szStatus == 'accept' then
 		bAction = true
-		PR.AcceptRequest(info)
+		D.AcceptRequest(info)
 	end
 	if szMsg then
 		MY.Sysmsg(szMsg)
@@ -237,7 +237,7 @@ function PR.DoAutoAction(info)
 	return bAction, szStatus, szMsg
 end
 
-function PR.GetRequestInfo(key)
+function D.GetRequestInfo(key)
 	for k, v in ipairs(PR_PARTY_REQUEST) do
 		if v.szName == key or v.dwID == key then
 			return v
@@ -245,7 +245,7 @@ function PR.GetRequestInfo(key)
 	end
 end
 
-function PR.OnApplyRequest()
+function D.OnApplyRequest()
 	if not MY_PartyRequest.bEnable then
 		return
 	end
@@ -255,7 +255,7 @@ function PR.OnApplyRequest()
 		local btn2 = hMsgBox:Lookup('Wnd_All/Btn_Option2')
 		if btn and btn:IsEnabled() then
 			-- 判断对方是否已在进组列表中
-			local info = PR.GetRequestInfo(arg0)
+			local info = D.GetRequestInfo(arg0)
 			if not info then
 				info = {
 					szName  = arg0,
@@ -285,31 +285,31 @@ function PR.OnApplyRequest()
 				end
 			end
 			-- 自动拒绝 没拒绝的自动申请装备
-			local bAction, szStatus = PR.DoAutoAction(info)
+			local bAction, szStatus = D.DoAutoAction(info)
 			if szStatus == 'suspicious' then
 				info.dwDelayTime = GetTime() + 2000
 			end
 			if not bAction and info.dwID then
-				PR.PeekPlayer(info.dwID)
+				D.PeekPlayer(info.dwID)
 			end
 			-- 关闭对话框 更新界面
 			hMsgBox.fnAutoClose = nil
 			hMsgBox.fnCancelAction = nil
 			hMsgBox.szCloseSound = nil
 			Wnd.CloseWindow(hMsgBox)
-			PR.UpdateFrame()
+			D.UpdateFrame()
 		end
 	end
 end
 
-function PR.UpdateFrame()
-	if not PR.GetFrame() then
-		PR.OpenPanel()
+function D.UpdateFrame()
+	if not D.GetFrame() then
+		D.OpenPanel()
 	end
-	local frame = PR.GetFrame()
+	local frame = D.GetFrame()
 	-- update
 	if #PR_PARTY_REQUEST == 0 then
-		return PR.ClosePanel(true)
+		return D.ClosePanel(true)
 	end
 	local dwTime, dwDelayTime = GetTime(), nil
 	local container, nH = frame:Lookup('WndContainer_Request'), 0
@@ -349,7 +349,7 @@ function PR.UpdateFrame()
 		end
 	end
 	if dwDelayTime then
-		MY.DelayCall('MY_PartyRequest', dwDelayTime - dwTime, PR.UpdateFrame)
+		MY.DelayCall('MY_PartyRequest', dwDelayTime - dwTime, D.UpdateFrame)
 	end
 	container:SetH(nH)
 	container:FormatAllContentPos()
@@ -358,7 +358,7 @@ function PR.UpdateFrame()
 	frame:SetDragArea(0, 0, frame:GetW(), frame:GetH())
 end
 
-function PR.Feedback(szName, data, bDetail)
+function D.Feedback(szName, data, bDetail)
 	for k, v in ipairs(PR_PARTY_REQUEST) do
 		if v.szName == szName then
 			v.bDetail    = bDetail
@@ -369,18 +369,18 @@ function PR.Feedback(szName, data, bDetail)
 			break
 		end
 	end
-	PR.UpdateFrame()
+	D.UpdateFrame()
 end
 
-MY.RegisterEvent('PEEK_OTHER_PLAYER.MY_PartyRequest'   , PR.OnPeekPlayer  )
-MY.RegisterEvent('PARTY_INVITE_REQUEST.MY_PartyRequest', PR.OnApplyRequest)
-MY.RegisterEvent('PARTY_APPLY_REQUEST.MY_PartyRequest' , PR.OnApplyRequest)
+MY.RegisterEvent('PEEK_OTHER_PLAYER.MY_PartyRequest'   , D.OnPeekPlayer  )
+MY.RegisterEvent('PARTY_INVITE_REQUEST.MY_PartyRequest', D.OnApplyRequest)
+MY.RegisterEvent('PARTY_APPLY_REQUEST.MY_PartyRequest' , D.OnApplyRequest)
 
 MY.RegisterBgMsg('RL', function(_, nChannel, dwID, szName, bIsSelf, ...)
 	local data = {...}
 	if not bIsSelf then
 		if data[1] == 'Feedback' then
-			PR.Feedback(szName, data, true)
+			D.Feedback(szName, data, true)
 		end
 	end
 end)
