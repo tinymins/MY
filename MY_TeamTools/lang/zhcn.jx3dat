@@ -50,11 +50,10 @@ data = {
 
 	['Party Request'] = '优化入队申请列表',
 	['Clear list and close?'] = '清空列表并关闭？',
-	['Details'] = '询问详情',
-	['Press alt and click to view equipment.'] = '按住ALT点击左键可查看装备',
+	['Ask details'] = '询问详情',
+	['Press ctrl and click to ask detail.'] = '按住CTRL点击左键可询问详情',
 	['loading...'] = '读取中..',
 	['If it is always loading, the target may not install plugin or refuse.'] = '如果一直提示加载中，可能是对方没有安装插件或者拒绝了您的请求',
-	['[%s] want to see your char info, OK?'] = '[%s] 想知晓您的当前属性是否告知？',
 	['Allow view charinfo'] = '允许其他人查看属性',
 	['Auto refuse low level player'] = '自动拒绝未满级玩家',
 	['Auto refuse %s(%s %d%s) party request'] = '自动拒绝了 %s(%s %d%s) 的组队请求',

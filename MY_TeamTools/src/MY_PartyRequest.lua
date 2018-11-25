@@ -79,13 +79,13 @@ function MY_PartyRequest.OnLButtonClick()
 		PR.UpdateFrame()
 	elseif name == 'Btn_Lookup' then
 		local info = this:GetParent().info
-		if info.bDetail or (info.dwID and IsAltKeyDown()) then
-			ViewInviteToPlayer(info.dwID)
-		else
+		if not info.dwID or (not info.bDetail and IsCtrlKeyDown()) then
 			MY.BgTalk(info.szName, 'RL', 'ASK')
 			this:Enable(false)
 			this:Lookup('', 'Text_Lookup'):SetText(_L['loading...'])
 			MY.Sysmsg({_L['If it is always loading, the target may not install plugin or refuse.']})
+		elseif info.dwID then
+			ViewInviteToPlayer(info.dwID)
 		end
 	elseif this.info then
 		if IsCtrlKeyDown() then
@@ -106,10 +106,10 @@ function MY_PartyRequest.OnMouseEnter()
 	local name = this:GetName()
 	if name == 'Btn_Lookup' then
 		local info = this:GetParent().info
-		if not info.bDetail and info.dwID then
+		if info.dwID and not info.bDetail then
 			local x, y = this:GetAbsPos()
 			local w, h = this:GetSize()
-			local szTip = GetFormatText(_L['Press alt and click to view equipment.'])
+			local szTip = GetFormatText(_L['Press ctrl and click to ask detail.'])
 			OutputTip(szTip, 450, {x, y, w, h}, MY_TIP_POSTYPE.TOP_BOTTOM)
 		end
 	elseif this.info then
@@ -314,7 +314,7 @@ function PR.UpdateFrame()
 
 		wnd:Lookup('Btn_Accept', 'Text_Accept'):SetText(g_tStrings.STR_ACCEPT)
 		wnd:Lookup('Btn_Refuse', 'Text_Refuse'):SetText(g_tStrings.STR_REFUSE)
-		wnd:Lookup('Btn_Lookup', 'Text_Lookup'):SetText(v.bDetail and g_tStrings.STR_LOOKUP or _L['Details'])
+		wnd:Lookup('Btn_Lookup', 'Text_Lookup'):SetText(v.dwID and g_tStrings.STR_LOOKUP or _L['Ask details'])
 		wnd.info = v
 		nH = nH + wnd:GetH()
 	end

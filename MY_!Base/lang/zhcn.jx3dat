@@ -387,4 +387,6 @@ data = {
 	['Default'] = '默认',
 	['Bing.ogg'] = '呯',
 	['Notify.ogg'] = '叮咚',
+
+	['[%s] want to see your char info, OK?'] = '[%s] 想知晓您的当前属性是否告知？',
 }
