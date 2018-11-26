@@ -845,6 +845,53 @@ end
 end
 
 do
+local MODULE_LIST = {}
+function MY.RegisterModuleEvent(arg0, arg1)
+	local szModule = arg0
+	if arg1 == false then
+		local tEvent, nCount = MODULE_LIST[szModule], 0
+		for szKey, info in pairs(tEvent) do
+			if info.szEvent == "#BREATHE" then
+				MY.BreatheCall(szKey, false)
+			else
+				MY.RegisterEvent(szKey, false)
+			end
+			nCount = nCount + 1
+		end
+		MODULE_LIST[szModule] = nil
+		MY.Debug({"Uninit # "  .. szModule .. " # Events Removed # " .. nCount}, MY_DEBUG.LOG)
+	elseif IsTable(arg1) then
+		local nCount = 0
+		local tEvent = MODULE_LIST[szModule]
+		if not tEvent then
+			tEvent = {}
+			MODULE_LIST[szModule] = tEvent
+		end
+		for _, aParams in ipairs(arg1) do
+			local szEvent = remove(aParams, 1)
+			local nPos, szSubKey = StringFindW(szEvent, '.')
+			if nPos then
+				szSubKey = sub(szEvent, nPos + 1)
+				szEvent = sub(szEvent, 1, nPos - 1)
+			end
+			local szKey = szEvent .. '.' .. szModule
+			if szSubKey then
+				szKey = szKey .. '#' .. szSubKey
+			end
+			if szEvent == "#BREATHE" then
+				MY.BreatheCall(szKey, unpack(aParams))
+			else
+				MY.RegisterEvent(szKey, unpack(aParams))
+			end
+			nCount = nCount + 1
+			tEvent[szKey] = { szEvent = szEvent }
+		end
+		MY.Debug({"Init # "  .. szModule .. " # Events Added # " .. nCount}, MY_DEBUG.LOG)
+	end
+end
+end
+
+do
 local TUTORIAL_LIST = {}
 function MY.RegisterTutorial(tOptions)
 	if type(tOptions) ~= 'table' or not tOptions.szKey or not tOptions.szMessage then
