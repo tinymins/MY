@@ -50,14 +50,27 @@ function PS.OnPanelActive(wnd)
 		end,
 	}, true):autoWidth():width() + 5
 
-	y = y + ui:append('WndCheckBox', {
+	x = x + ui:append('WndCheckBox', {
 		x = x, y = y,
 		checked = MY_CharInfo.bEnable,
 		text = _L['Allow view charinfo'],
 		oncheck = function(bChecked)
 			MY_CharInfo.bEnable = bChecked
 		end,
-	}, true):autoWidth():height()
+	}, true):autoWidth():width() + 5
+
+	if not MY.IsShieldedVersion() then
+		x = x + ui:append('WndCheckBox', {
+			x = x, y = y,
+			checked = MY_WorldMark.bEnable,
+			text = _L['World mark enhance'],
+			oncheck = function(bChecked)
+				MY_WorldMark.bEnable = bChecked
+				MY_WorldMark.CheckEnable()
+			end,
+		}, true):autoWidth():width() + 5
+	end
+	y = y + 20
 
 	x = X
 	y = y + 20
@@ -72,7 +85,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	}, true):autoWidth()
 	x = x + 10
-	y = y + 20
+	y = y + 25
 	ui:append('WndCheckBox', {
 		x = x, y = y,
 		checked = MY_PartyRequest.bRefuseLowLv,
@@ -82,7 +95,7 @@ function PS.OnPanelActive(wnd)
 		end,
 		autoenable = function() return MY_PartyRequest.bEnable end,
 	}, true):autoWidth()
-	y = y + 20
+	y = y + 25
 	ui:append('WndCheckBox', {
 		x = x, y = y,
 		checked = MY_PartyRequest.bRefuseRobot,
@@ -94,7 +107,7 @@ function PS.OnPanelActive(wnd)
 		end,
 		autoenable = function() return MY_PartyRequest.bEnable end,
 	}, true):autoWidth()
-	y = y + 20
+	y = y + 25
 	ui:append('WndCheckBox', {
 		x = x, y = y,
 		checked = MY_PartyRequest.bAcceptFriend,
@@ -104,7 +117,7 @@ function PS.OnPanelActive(wnd)
 		end,
 		autoenable = function() return MY_PartyRequest.bEnable end,
 	}, true):autoWidth()
-	y = y + 20
+	y = y + 25
 	ui:append('WndCheckBox', {
 		x = x, y = y,
 		checked = MY_PartyRequest.bAcceptTong,
@@ -114,7 +127,7 @@ function PS.OnPanelActive(wnd)
 		end,
 		autoenable = function() return MY_PartyRequest.bEnable end,
 	}, true):autoWidth()
-	y = y + 20
+	y = y + 25
 	ui:append('WndCheckBox', {
 		x = x, y = y,
 		checked = MY_PartyRequest.bAcceptAll,
@@ -124,6 +137,6 @@ function PS.OnPanelActive(wnd)
 		end,
 		autoenable = function() return MY_PartyRequest.bEnable end,
 	}, true):autoWidth()
-	y = y + 20
+	y = y + 25
 end
 MY.RegisterPanel('MY_TeamTools', _L['MY_TeamTools'], _L['Raid'], 5962, PS)

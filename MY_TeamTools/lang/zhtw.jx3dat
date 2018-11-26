@@ -55,6 +55,7 @@ data = {
 	['loading...'] = '讀取中..',
 	['If it is always loading, the target may not install plugin or refuse.'] = '如果一直提示加載中，可能是對方沒有安裝插件或者拒絕了您的請求',
 	['Allow view charinfo'] = '允許其他人查看屬性',
+	['World mark enhance'] = '世界標記增強',
 	['Auto refuse low level player'] = '自動拒絕未滿級玩家',
 	['Auto refuse robot player'] = '自動拒絕疑似工作室玩家',
 	['Full level and equip score less than 2/3 of yours'] = '非好友、非幫會成員、滿級且裝備分數低於你的裝備分數的三分之二',
