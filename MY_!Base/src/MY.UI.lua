@@ -4663,4 +4663,35 @@ function UI.RevertShadowHandleVisible()
 end
 end
 
+do
+local ui, cache
+function UI.GetTempElement(szType)
+	if not IsString(szType) then
+		return
+	end
+	local szKey = nil
+	local nPos = StringFindW(szType, '.')
+	if nPos then
+		szKey = sub(szType, nPos + 1)
+		szType = sub(szType, 1, nPos - 1)
+	end
+	if not IsString(szKey) then
+		szKey = 'Default'
+	end
+	if not cache or not ui or ui:count() == 0 then
+		cache = {}
+		ui = UI.CreateFrame('MYLIB_TempElement', { empty = true }):hide()
+	end
+	local szName = szType .. '_' .. szKey
+	local raw = cache[szName]
+	if not raw then
+		raw = ui:append(szType, {
+			name = szName,
+		}, true)[1]
+		cache[szName] = raw
+	end
+	return raw
+end
+end
+
 MY.UI = UI

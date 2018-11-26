@@ -2315,7 +2315,8 @@ end
 
 -- 判断当前用户是否可用某个技能
 -- (bool) MY.CanUseSkill(number dwSkillID[, dwLevel])
-do local BOX
+do
+local box
 function MY.CanUseSkill(dwSkillID, dwLevel)
 	-- 判断技能是否有效 并将中文名转换为技能ID
 	if type(dwSkillID) == 'string' then
@@ -2324,10 +2325,10 @@ function MY.CanUseSkill(dwSkillID, dwLevel)
 		end
 		dwSkillID = MY.GetSkillByName(dwSkillID).dwSkillID
 	end
-	if not BOX then
-		BOX = UI.CreateFrame('MY_SKILL', { w = 0, h = 0, empty = true }):hide():append('Box', {}, true)
+	if not box or not box:IsValid() then
+		box = UI.GetTempElement('Box.MYLib_Skill')
 	end
-	local me, box = GetClientPlayer(), BOX
+	local me = GetClientPlayer()
 	if me and box then
 		if not dwLevel then
 			if dwSkillID ~= 9007 then
