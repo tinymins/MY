@@ -34,8 +34,8 @@ local PR_EQUIP_REQUEST = {}
 local PR_PARTY_REQUEST = {}
 
 MY_PartyRequest = {
-	bEnable     = true,
-	bAutoCancel = false,
+	bEnable      = true,
+	bRefuseLowLv = false,
 	bRefuseRobot = false,
 }
 MY.RegisterCustomData('MY_PartyRequest')
@@ -52,9 +52,9 @@ function MY_PartyRequest.OnLButtonClick()
 		local menu = {}
 		table.insert(menu, {
 			szOption = _L['Auto refuse low level player'],
-			bCheck = true, bChecked = MY_PartyRequest.bAutoCancel,
+			bCheck = true, bChecked = MY_PartyRequest.bRefuseLowLv,
 			fnAction = function()
-				MY_PartyRequest.bAutoCancel = not MY_PartyRequest.bAutoCancel
+				MY_PartyRequest.bRefuseLowLv = not MY_PartyRequest.bRefuseLowLv
 			end,
 		})
 		table.insert(menu, {
@@ -213,7 +213,7 @@ function D.GetRequestStatus(info)
 				end
 			end
 		end
-		if MY_PartyRequest.bAutoCancel and info.nLevel < PR_MAX_LEVEL then
+		if MY_PartyRequest.bRefuseLowLv and info.nLevel < PR_MAX_LEVEL then
 			szStatus = 'refuse'
 			szMsg = _L('Auto refuse %s(%s %d%s) party request', info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
 		end
