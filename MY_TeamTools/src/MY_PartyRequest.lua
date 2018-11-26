@@ -6,25 +6,31 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
 local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
 local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
-local floor, min, max, ceil = math.floor, math.min, math.max, math.ceil
-local huge, pi, sin, cos, tan = math.huge, math.pi, math.sin, math.cos, math.tan
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
 local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
 local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
 -- jx3 apis caching
 local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
-local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
------------------------------------------------------------------------------------------
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local MY, UI = MY, MY.UI
+local IsArray, IsDictionary, IsEquals = MY.IsArray, MY.IsDictionary, MY.IsEquals
+local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
+local Get, GetPatch, ApplyPatch, RandomChild = MY.Get, MY.GetPatch, MY.ApplyPatch, MY.RandomChild
+---------------------------------------------------------------------------------------------------
 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TeamTools/lang/')
 local D = {}
@@ -34,9 +40,12 @@ local PR_EQUIP_REQUEST = {}
 local PR_PARTY_REQUEST = {}
 
 MY_PartyRequest = {
-	bEnable      = true,
-	bRefuseLowLv = false,
-	bRefuseRobot = false,
+	bEnable       = true,
+	bRefuseLowLv  = false,
+	bRefuseRobot  = false,
+	bAcceptTong   = false,
+	bAcceptFriend = false,
+	bAcceptAll    = false,
 }
 MY.RegisterCustomData('MY_PartyRequest')
 
@@ -49,25 +58,47 @@ end
 function MY_PartyRequest.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Setting' then
-		local menu = {}
-		table.insert(menu, {
-			szOption = _L['Auto refuse low level player'],
-			bCheck = true, bChecked = MY_PartyRequest.bRefuseLowLv,
-			fnAction = function()
-				MY_PartyRequest.bRefuseLowLv = not MY_PartyRequest.bRefuseLowLv
-			end,
-		})
-		table.insert(menu, {
-			szOption = _L['Auto refuse robot player'],
-			bCheck = true, bChecked = MY_PartyRequest.bRefuseRobot,
-			fnAction = function()
-				MY_PartyRequest.bRefuseRobot = not MY_PartyRequest.bRefuseRobot
-			end,
-			fnMouseEnter = function()
-				local szXml = GetFormatText(_L['Full level and equip score less than 2/3 of yours'], nil, 255, 255, 0)
-				OutputTip(szXml, 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
-			end,
-		})
+		local menu = {
+			{
+				szOption = _L['Auto refuse low level player'],
+				bCheck = true, bChecked = MY_PartyRequest.bRefuseLowLv,
+				fnAction = function()
+					MY_PartyRequest.bRefuseLowLv = not MY_PartyRequest.bRefuseLowLv
+				end,
+			},
+			{
+				szOption = _L['Auto refuse robot player'],
+				bCheck = true, bChecked = MY_PartyRequest.bRefuseRobot,
+				fnAction = function()
+					MY_PartyRequest.bRefuseRobot = not MY_PartyRequest.bRefuseRobot
+				end,
+				fnMouseEnter = function()
+					local szXml = GetFormatText(_L['Full level and equip score less than 2/3 of yours'], nil, 255, 255, 0)
+					OutputTip(szXml, 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
+				end,
+			},
+			{
+				szOption = _L['Auto accept friend'],
+				bCheck = true, bChecked = MY_PartyRequest.bAcceptFriend,
+				fnAction = function()
+					MY_PartyRequest.bAcceptFriend = not MY_PartyRequest.bAcceptFriend
+				end,
+			},
+			{
+				szOption = _L['Auto accept tong member'],
+				bCheck = true, bChecked = MY_PartyRequest.bAcceptTong,
+				fnAction = function()
+					MY_PartyRequest.bAcceptTong = not MY_PartyRequest.bAcceptTong
+				end,
+			},
+			{
+				szOption = _L['Auto accept all'],
+				bCheck = true, bChecked = MY_PartyRequest.bAcceptAll,
+				fnAction = function()
+					MY_PartyRequest.bAcceptAll = not MY_PartyRequest.bAcceptAll
+				end,
+			},
+		}
 		PopupMenu(menu)
 	elseif name == 'Btn_Close' then
 		D.ClosePanel()
@@ -198,7 +229,7 @@ end
 
 function D.GetRequestStatus(info)
 	local szStatus, szMsg = 'normal'
-	if not info.bFriend then
+	if not info.bFriend and not info.bTongMember then
 		if MY_PartyRequest.bRefuseRobot and info.dwID then
 			local me = GetClientPlayer()
 			local tar = GetPlayer(info.dwID)
@@ -208,14 +239,30 @@ function D.GetRequestStatus(info)
 					szStatus = 'suspicious'
 				elseif tar.GetTotalEquipScore() < me.GetTotalEquipScore() * 2 / 3 then
 					szStatus = 'refuse'
-					szMsg = _L('Auto refuse %s(%s %d%s) party request, equip score: %d',
+					szMsg = _L('Auto refuse %s(%s %d%s) party request, equip score: %d, go to MY/raid/teamtools panel if you want to turn off this feature.',
 						info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL, nScore)
 				end
 			end
 		end
 		if MY_PartyRequest.bRefuseLowLv and info.nLevel < PR_MAX_LEVEL then
 			szStatus = 'refuse'
-			szMsg = _L('Auto refuse %s(%s %d%s) party request', info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
+			szMsg = _L('Auto refuse %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.',
+				info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
+		end
+	end
+	if szStatus == 'normal' then
+		if info.bAcceptAll then
+			szStatus = 'accept'
+			szMsg = _L('Auto accept %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.',
+				info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
+		elseif info.bFriend and MY_PartyRequest.bAcceptFriend then
+			szStatus = 'accept'
+			szMsg = _L('Auto accept friend %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.',
+				info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
+		elseif info.bTongMember and MY_PartyRequest.bAcceptTong then
+			szStatus = 'accept'
+			szMsg = _L('Auto tong member friend %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.',
+				info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
 		end
 	end
 	return szStatus, szMsg
@@ -258,11 +305,12 @@ function D.OnApplyRequest()
 			local info = D.GetRequestInfo(arg0)
 			if not info then
 				info = {
-					szName  = arg0,
-					nCamp   = arg1,
-					dwForce = arg2,
-					nLevel  = arg3,
-					bFriend = MY.IsFriend(arg0),
+					szName      = arg0,
+					nCamp       = arg1,
+					dwForce     = arg2,
+					nLevel      = arg3,
+					bFriend     = MY.IsFriend(arg0),
+					bTongMember = MY.IsTongMember(arg0),
 					fnAction = function()
 						pcall(btn.fnAction)
 					end,

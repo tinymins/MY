@@ -63,21 +63,67 @@ function PS.OnPanelActive(wnd)
 	y = y + 20
 	y = y + ui:append('Text', { x = x, y = y, text = _L['Party Request'], font = 27 }, true):height() + 5
 	x = X + 10
-	x = x + ui:append('WndCheckBox', {
+	ui:append('WndCheckBox', {
 		x = x, y = y,
 		checked = MY_PartyRequest.bEnable,
 		text = _L['Party Request'],
 		oncheck = function(bChecked)
 			MY_PartyRequest.bEnable = bChecked
 		end,
-	}, true):autoWidth():width() + 5
-	x = x + ui:append('WndCheckBox', {
+	}, true):autoWidth()
+	x = x + 10
+	y = y + 20
+	ui:append('WndCheckBox', {
 		x = x, y = y,
-		checked = MY_PartyRequest.bAutoCancel,
-		text = _L['Auto Refuse No full level Player'],
+		checked = MY_PartyRequest.bRefuseLowLv,
+		text = _L['Auto refuse low level player'],
 		oncheck = function(bChecked)
-			MY_PartyRequest.bAutoCancel = bChecked
+			MY_PartyRequest.bRefuseLowLv = bChecked
 		end,
-	}, true):autoWidth():width()
+		autoenable = function() return MY_PartyRequest.bEnable end,
+	}, true):autoWidth()
+	y = y + 20
+	ui:append('WndCheckBox', {
+		x = x, y = y,
+		checked = MY_PartyRequest.bRefuseRobot,
+		text = _L['Auto refuse robot player'],
+		tip = _L['Full level and equip score less than 2/3 of yours'],
+		tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
+		oncheck = function(bChecked)
+			MY_PartyRequest.bRefuseRobot = bChecked
+		end,
+		autoenable = function() return MY_PartyRequest.bEnable end,
+	}, true):autoWidth()
+	y = y + 20
+	ui:append('WndCheckBox', {
+		x = x, y = y,
+		checked = MY_PartyRequest.bAcceptFriend,
+		text = _L['Auto accept friend'],
+		oncheck = function(bChecked)
+			MY_PartyRequest.bAcceptFriend = bChecked
+		end,
+		autoenable = function() return MY_PartyRequest.bEnable end,
+	}, true):autoWidth()
+	y = y + 20
+	ui:append('WndCheckBox', {
+		x = x, y = y,
+		checked = MY_PartyRequest.bAcceptTong,
+		text = _L['Auto accept tong member'],
+		oncheck = function(bChecked)
+			MY_PartyRequest.bAcceptTong = bChecked
+		end,
+		autoenable = function() return MY_PartyRequest.bEnable end,
+	}, true):autoWidth()
+	y = y + 20
+	ui:append('WndCheckBox', {
+		x = x, y = y,
+		checked = MY_PartyRequest.bAcceptAll,
+		text = _L['Auto accept all'],
+		oncheck = function(bChecked)
+			MY_PartyRequest.bAcceptAll = bChecked
+		end,
+		autoenable = function() return MY_PartyRequest.bEnable end,
+	}, true):autoWidth()
+	y = y + 20
 end
 MY.RegisterPanel('MY_TeamTools', _L['MY_TeamTools'], _L['Raid'], 5962, PS)
