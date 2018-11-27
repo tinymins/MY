@@ -300,8 +300,76 @@ local function ApplyPatch(oBase, oPatch, bNew)
 	-- other patch value
 	return oPatch
 end
+local spairs, sipairs, spairs_r, sipairs_r
+do -- 类型安全选代器
+local function SafeIter(a, i)
+	i = i + 1
+	if a[i] then
+		return i, a[i][1], a[i][2], a[i][3]
+	end
+end
+function sipairs(...)
+	local argc = select('#', ...)
+	local argv = {...}
+	local iters = {}
+	for i = 1, argc do
+		if IsTable(argv[i]) then
+			for j, v in ipairs(argv[i]) do
+				insert(iters, {argv[i], j, v})
+			end
+		end
+	end
+	return SafeIter, iters, 0
+end
+function spairs(...)
+	local argc = select('#', ...)
+	local argv = {...}
+	local iters = {}
+	for i = 1, argc do
+		if IsTable(argv[i]) then
+			for j, v in pairs(argv[i]) do
+				insert(iters, {argv[i], j, v})
+			end
+		end
+	end
+	return SafeIter, iters, 0
+end
+local function SafeIterR(a, i)
+	i = i - 1
+	if i > 0 then
+		return i, a[i][1], a[i][2], a[i][3]
+	end
+end
+function sipairs_r(...)
+	local argc = select('#', ...)
+	local argv = {...}
+	local iters = {}
+	for i = 1, argc do
+		if IsTable(argv[i]) then
+			for j, v in ipairs(argv[i]) do
+				insert(iters, {argv[i], j, v})
+			end
+		end
+	end
+	return SafeIterR, iters, 0
+end
+function spairs_r(...)
+	local argc = select('#', ...)
+	local argv = {...}
+	local iters = {}
+	for i = 1, argc do
+		if IsTable(argv[i]) then
+			for j, v in pairs(argv[i]) do
+				insert(iters, {argv[i], j, v})
+			end
+		end
+	end
+	return SafeIterR, iters, 0
+end
+end
 ---------------------------------------------------------------------------------------------
 MY = {}
+MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r = spairs, spairs_r, sipairs, sipairs_r
 MY.IsArray, MY.IsDictionary, MY.IsEquals = IsArray, IsDictionary, IsEquals
 MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsUserdata = IsNil, IsBoolean, IsNumber, IsUserdata
 MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsFunction = IsEmpty, IsString, IsTable, IsFunction
