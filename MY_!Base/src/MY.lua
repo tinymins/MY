@@ -315,7 +315,7 @@ function sipairs(...)
 	for i = 1, argc do
 		if IsTable(argv[i]) then
 			for j, v in ipairs(argv[i]) do
-				insert(iters, {argv[i], j, v})
+				insert(iters, {v, argv[i], j})
 			end
 		end
 	end
@@ -328,7 +328,7 @@ function spairs(...)
 	for i = 1, argc do
 		if IsTable(argv[i]) then
 			for j, v in pairs(argv[i]) do
-				insert(iters, {argv[i], j, v})
+				insert(iters, {v, argv[i], j})
 			end
 		end
 	end
@@ -347,7 +347,7 @@ function sipairs_r(...)
 	for i = 1, argc do
 		if IsTable(argv[i]) then
 			for j, v in ipairs(argv[i]) do
-				insert(iters, {argv[i], j, v})
+				insert(iters, {v, argv[i], j})
 			end
 		end
 	end
@@ -360,7 +360,7 @@ function spairs_r(...)
 	for i = 1, argc do
 		if IsTable(argv[i]) then
 			for j, v in pairs(argv[i]) do
-				insert(iters, {argv[i], j, v})
+				insert(iters, {v, argv[i], j})
 			end
 		end
 	end
