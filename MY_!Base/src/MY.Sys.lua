@@ -1433,25 +1433,31 @@ end
 -- szTitle  Debug头
 -- nLevel   Debug级别[低于当前设置值将不会输出]
 function MY.Debug(oContent, szTitle, nLevel)
-	if type(nLevel)~='number'  then nLevel = MY_DEBUG.WARNING end
-	if type(szTitle)~='string' then szTitle = 'MY DEBUG' end
-	if type(oContent)~='table' then oContent = { oContent, bNoWrap = true } end
+	if not IsNumber(nLevel) then
+		nLevel = MY_DEBUG.WARNING
+	end
+	if not IsString(szTitle) then
+		szTitle = 'MY DEBUG'
+	end
+	if not IsTable(oContent) then
+		oContent = { oContent }
+	end
 	if not oContent.r then
-		if nLevel == 0 then
+		if nLevel == MY_DEBUG.LOG then
 			oContent.r, oContent.g, oContent.b =   0, 255, 127
-		elseif nLevel == 1 then
+		elseif nLevel == MY_DEBUG.WARNING then
 			oContent.r, oContent.g, oContent.b = 255, 170, 170
-		elseif nLevel == 2 then
+		elseif nLevel == MY_DEBUG.ERROR then
 			oContent.r, oContent.g, oContent.b = 255,  86,  86
 		else
 			oContent.r, oContent.g, oContent.b = 255, 255, 0
 		end
 	end
 	if nLevel >= MY.GetAddonInfo().nDebugLevel then
-		Log('[MY_DEBUG][LEVEL_' .. nLevel .. ']' .. '[' .. szTitle .. ']' .. table.concat(oContent, '\n'))
+		Log('[MY_DEBUG][LEVEL_' .. nLevel .. '][' .. szTitle .. ']' .. concat(oContent, '\n'))
 		MY.Sysmsg(oContent, szTitle)
 	elseif nLevel >= MY.GetAddonInfo().nLogLevel then
-		Log('[MY_DEBUG][LEVEL_' .. nLevel .. ']' .. '[' .. szTitle .. ']' .. table.concat(oContent, '\n'))
+		Log('[MY_DEBUG][LEVEL_' .. nLevel .. '][' .. szTitle .. ']' .. concat(oContent, '\n'))
 	end
 end
 
