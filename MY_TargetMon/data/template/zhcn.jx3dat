@@ -33,7 +33,7 @@ return {
 			__META__,
 			__VALUE__ = {
 				enable = true,
-				iconid = 13,
+				iconid = {__META__, {"nil", "number"}, nil},
 				name = "",
 				uuid = {__META__, {"nil", "string"}, nil},
 				capture = true,
@@ -41,6 +41,7 @@ return {
 				rgbLongAlias = {255, 255, 0},
 				shortAlias = {__META__, {"nil", "string"}, nil},
 				rgbShortAlias = {255, 255, 0},
+				hideVoid = true, -- 当和主配置hideVoid字段不一致时则一定显示
 				soundAppear = {
 					__META__,
 					__VALUE__ = {},
@@ -56,7 +57,7 @@ return {
 					__VALUE__ = {},
 					__CHILD_TEMPLATE__ = { -- monid
 						enable = true,
-						iconid = 13,
+						iconid = {__META__, {"nil", "number"}, nil},
 						soundAppear = {
 							__META__,
 							__VALUE__ = {},
@@ -71,7 +72,7 @@ return {
 							__META__,
 							__VALUE__ = {},
 							__KEY_TEMPLATE__ = {__META__, {"number"}, nil},
-							__CHILD_TEMPLATE__ = { enable = true, iconid = 13 },
+							__CHILD_TEMPLATE__ = { enable = true, iconid = {__META__, {"nil", "number"}, nil} },
 						},
 						ignoreLevel = true,
 					},
