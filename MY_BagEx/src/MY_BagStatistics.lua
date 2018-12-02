@@ -59,7 +59,8 @@ local l_tItemText = {}
 function GetItemText(KItem)
 	if KItem then
 		if GetItemTip then
-			local szKey = KItem.dwTabType .. ',' .. KItem.dwIndex
+			local nBookID = KItem.nGenre == ITEM_GENRE.BOOK and KItem.nBookID or -1
+			local szKey = KItem.dwTabType .. ',' .. KItem.dwIndex .. ',' .. nBookID
 			if not l_tItemText[szKey] then
 				l_tItemText[szKey] = ''
 				l_tItemText[szKey] = MY.Xml.GetPureText(GetItemTip(KItem))
@@ -104,7 +105,7 @@ function PushDB()
 	local servername = AnsiToUTF8(MY.GetRealServer(2))
 	DB:Execute('BEGIN TRANSACTION')
 
-	-- ËÉåÂåÖ
+	-- ±≥∞¸
 	for boxtype = INVENTORY_INDEX.PACKAGE, INVENTORY_INDEX.PACKAGE + 6 - 1 do
 		local count = me.GetBoxSize(boxtype)
 		for boxindex = 0, count - 1 do
@@ -128,7 +129,7 @@ function PushDB()
 	DB_OwnerInfoW:BindAll(ownerkey, ownername, servername, time)
 	DB_OwnerInfoW:Execute()
 
-	-- ‰ªìÂ∫ì
+	-- ≤÷ø‚
 	for boxtype = INVENTORY_INDEX.BANK, INVENTORY_INDEX.BANK + me.GetBankPackageCount() - 1 do
 		local count = me.GetBoxSize(boxtype)
 		for boxindex = 0, count - 1 do
@@ -149,7 +150,7 @@ function PushDB()
 		DB_ItemsDL:Execute()
 	end
 
-	-- Â∏Æ‰ºö‰ªìÂ∫ì
+	-- ∞Ôª·≤÷ø‚
 	if not empty(l_guildcache) then
 		local ownerkey = 'tong' .. me.dwTongID
 		local ownername = AnsiToUTF8('[' .. MY.GetTongName(me.dwTongID) .. ']')
@@ -236,7 +237,7 @@ function MY_BagStatistics.UpdateItems(frame)
 	sql  = sql  .. sqlwhere .. sqlgroup .. ' LIMIT ' .. nPageSize .. ' OFFSET ' .. ((frame.nCurrentPage - 1) * nPageSize)
 	sqlc = sqlc .. sqlwhere .. sqlgroup
 
-	-- ÁªòÂà∂È°µÁ†Å
+	-- ªÊ÷∆“≥¬Î
 	local DB_CountR = DB:Prepare(sqlc)
 	DB_CountR:ClearBindings()
 	DB_CountR:BindAll(AnsiToUTF8('%' .. searchitem .. '%'), AnsiToUTF8('%' .. searchitem .. '%'), unpack(ownerkeys))
@@ -287,7 +288,7 @@ function MY_BagStatistics.UpdateItems(frame)
 	handle:SetSizeByAllItemSize()
 	hOuter:FormatAllItemPos()
 
-	-- ÁªòÂà∂ÂàóË°®
+	-- ªÊ÷∆¡–±Ì
 	local DB_ItemInfoR = DB:Prepare(sql)
 	DB_ItemInfoR:ClearBindings()
 	DB_ItemInfoR:BindAll(AnsiToUTF8('%' .. searchitem .. '%'), AnsiToUTF8('%' .. searchitem .. '%'), unpack(ownerkeys))
