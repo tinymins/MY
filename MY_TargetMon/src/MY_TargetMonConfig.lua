@@ -26,10 +26,12 @@ local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
 local MY, UI = MY, MY.UI
+local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
+local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
+local Get, Set, RandomChild = MY.Get, MY.Set, MY.RandomChild
 local IsArray, IsDictionary, IsEquals = MY.IsArray, MY.IsDictionary, MY.IsEquals
 local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
-local Get, GetPatch, ApplyPatch, RandomChild = MY.Get, MY.GetPatch, MY.ApplyPatch, MY.RandomChild
 ---------------------------------------------------------------------------------------------------
 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TargetMon/lang/')
@@ -42,65 +44,6 @@ local ROLE_CONFIG_FILE = {'config/my_targetmon.jx3dat', MY_DATA_PATH.ROLE}
 local TEMPLATE_CONFIG_FILE = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/data/template/$lang.jx3dat'
 local EMBEDDED_CONFIG_ROOT = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/data/embedded/'
 local CUSTOM_DEFAULT_CONFIG_FILE = {'config/my_targetmon.jx3dat', MY_DATA_PATH.GLOBAL}
-local CUSTOM_BOXBG_STYLES = {
-	'UI/Image/Common/Box.UITex|0',
-	'UI/Image/Common/Box.UITex|1',
-	'UI/Image/Common/Box.UITex|2',
-	'UI/Image/Common/Box.UITex|3',
-	'UI/Image/Common/Box.UITex|4',
-	'UI/Image/Common/Box.UITex|5',
-	'UI/Image/Common/Box.UITex|6',
-	'UI/Image/Common/Box.UITex|7',
-	'UI/Image/Common/Box.UITex|8',
-	'UI/Image/Common/Box.UITex|9',
-	'UI/Image/Common/Box.UITex|10',
-	'UI/Image/Common/Box.UITex|11',
-	'UI/Image/Common/Box.UITex|12',
-	'UI/Image/Common/Box.UITex|13',
-	'UI/Image/Common/Box.UITex|14',
-	'UI/Image/Common/Box.UITex|34',
-	'UI/Image/Common/Box.UITex|35',
-	'UI/Image/Common/Box.UITex|42',
-	'UI/Image/Common/Box.UITex|43',
-	'UI/Image/Common/Box.UITex|44',
-	'UI/Image/Common/Box.UITex|45',
-	'UI/Image/Common/Box.UITex|77',
-	'UI/Image/Common/Box.UITex|78',
-}
-local CUSTOM_CDBAR_STYLES = {
-	MY.GetAddonInfo().szUITexST .. '|' .. 0,
-	MY.GetAddonInfo().szUITexST .. '|' .. 1,
-	MY.GetAddonInfo().szUITexST .. '|' .. 2,
-	MY.GetAddonInfo().szUITexST .. '|' .. 3,
-	MY.GetAddonInfo().szUITexST .. '|' .. 4,
-	MY.GetAddonInfo().szUITexST .. '|' .. 5,
-	MY.GetAddonInfo().szUITexST .. '|' .. 6,
-	MY.GetAddonInfo().szUITexST .. '|' .. 7,
-	MY.GetAddonInfo().szUITexST .. '|' .. 8,
-	'/ui/Image/Common/Money.UITex|168',
-	'/ui/Image/Common/Money.UITex|203',
-	'/ui/Image/Common/Money.UITex|204',
-	'/ui/Image/Common/Money.UITex|205',
-	'/ui/Image/Common/Money.UITex|206',
-	'/ui/Image/Common/Money.UITex|207',
-	'/ui/Image/Common/Money.UITex|208',
-	'/ui/Image/Common/Money.UITex|209',
-	'/ui/Image/Common/Money.UITex|210',
-	'/ui/Image/Common/Money.UITex|211',
-	'/ui/Image/Common/Money.UITex|212',
-	'/ui/Image/Common/Money.UITex|213',
-	'/ui/Image/Common/Money.UITex|214',
-	'/ui/Image/Common/Money.UITex|215',
-	'/ui/Image/Common/Money.UITex|216',
-	'/ui/Image/Common/Money.UITex|217',
-	'/ui/Image/Common/Money.UITex|218',
-	'/ui/Image/Common/Money.UITex|219',
-	'/ui/Image/Common/Money.UITex|220',
-	'/ui/Image/Common/Money.UITex|228',
-	'/ui/Image/Common/Money.UITex|232',
-	'/ui/Image/Common/Money.UITex|233',
-	'/ui/Image/Common/Money.UITex|234',
-}
 local TARGET_TYPE_LIST = {
 	'CLIENT_PLAYER'  ,
 	'CONTROL_PLAYER' ,
@@ -117,7 +60,7 @@ local TARGET_TYPE_LIST = {
 	'TEAM_MARK_DART' ,
 	'TEAM_MARK_FAN'  ,
 }
-local CONFIG, CONFIG_CHANGED
+local CONFIG, CONFIG_HASH, CONFIG_CHANGED
 local CONFIG_TEMPLATE = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_TargetMon/data/template/$lang.jx3dat')
 local EMBEDDED_CONFIG_LIST, EMBEDDED_CONFIG_HASH, EMBEDDED_MONITOR_HASH = {}, {}, {}
 
@@ -139,7 +82,7 @@ function D.LoadEmbeddedConfig()
 						-- 配置项和监控项高速缓存
 						local tMon = {}
 						for _, mon in ipairs(embedded.monitors) do
-							mon.manually = false
+							mon.manually = nil
 							tMon[mon.uuid] = mon
 						end
 						-- 插入结果集
@@ -223,7 +166,6 @@ function D.ConfigToPatch(config)
 	-- 计算修改的内嵌数据
 	local embedded, patch = EMBEDDED_CONFIG_HASH[config.uuid], {}
 	if embedded then
-		local monitors = {}
 		-- 保存修改的全局属性
 		for k, v in pairs(config) do
 			if k ~= 'monitors' and not IsEquals(v, embedded[k]) then
@@ -255,6 +197,7 @@ function D.ConfigToPatch(config)
 			existMon[monEmbedded.uuid] = true
 		end
 		patch.uuid = config.uuid
+		patch.monitors = monitors
 	else
 		for k, v in pairs(config) do
 			patch[k] = clone(v)
@@ -263,11 +206,11 @@ function D.ConfigToPatch(config)
 	return patch
 end
 
-function D.SetConfigChanged(bChange)
-	CONFIG_CHANGED = bChange ~= false
+function D.MarkConfigChanged()
+	CONFIG_CHANGED = true
 end
 
-function D.HasConfigChanged(bChange)
+function D.HasConfigChanged()
 	return CONFIG_CHANGED
 end
 
@@ -285,29 +228,29 @@ function D.LoadConfig(bDefault, bOriginal, bReloadEmbedded)
 	if not aPatch then
 		aPatch = MY.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE) or {}
 	end
-	local aConfig = {}
-	local existConfig = {}
+	local aConfig, tConfig = {}, {}
 	for i, patch in ipairs(aPatch) do
-		if not existConfig[patch.uuid] then
+		if not tConfig[patch.uuid] then
 			local config = D.PatchToConfig(patch)
 			if config then
 				insert(aConfig, config)
-				existConfig[config.uuid] = true
+				tConfig[config.uuid] = config
 			end
 		end
 	end
 	for i, embedded in ipairs(EMBEDDED_CONFIG_LIST) do
-		if not existConfig[embedded.uuid] then
+		if not tConfig[embedded.uuid] then
 			local config = D.FormatConfig(embedded)
 			if config then
-				insert(aConfig, D.FormatConfig(config))
-				existConfig[config.uuid] = true
+				insert(aConfig, config)
+				tConfig[config.uuid] = config
 			end
 		end
 	end
 	CONFIG = aConfig
-	D.SetConfigChanged(true)
-	FireUIEvent('MY_TARGET_MON_RELOAD')
+	CONFIG_HASH = tConfig
+	CONFIG_CHANGED = bDefault and true or false
+	FireUIEvent('MY_TARGET_MON_CONFIG_INIT')
 end
 
 function D.SaveConfig(bDefault)
@@ -322,7 +265,7 @@ function D.SaveConfig(bDefault)
 		MY.SaveLUAData(CUSTOM_DEFAULT_CONFIG_FILE, aPatch)
 	else
 		MY.SaveLUAData(ROLE_CONFIG_FILE, aPatch)
-		D.SetConfigChanged(false)
+		CONFIG_CHANGED = false
 	end
 end
 
@@ -333,7 +276,7 @@ local function onInit()
 	end
 	D.LoadConfig()
 end
-MY.RegisterInit('MY_TargetMon', onInit)
+MY.RegisterInit('MY_TargetMonConfig', onInit)
 
 local function onExit()
 	if not D.HasConfigChanged() then
@@ -341,15 +284,52 @@ local function onExit()
 	end
 	D.SaveConfig()
 end
-MY.RegisterExit('MY_TargetMon', onExit)
+MY.RegisterExit('MY_TargetMonConfig', onExit)
 end
 
-function D.GetConfig()
+function D.GetConfig(nIndex)
+	if nIndex then
+		return CONFIG[nIndex]
+	end
 	return CONFIG
 end
 
-MY_TargetMon = {}
-MY_TargetMon.GetConfig = D.GetConfig
-MY_TargetMon.LoadConfig = D.LoadConfig
-MY_TargetMon.GetNewConfig = D.GetNewConfig
-MY_TargetMon.GetNewMonitor = D.GetNewMonitor
+function D.GetTargetTypeList()
+	return TARGET_TYPE_LIST
+end
+
+function D.SetData(szUuid, aKey, oVal)
+	local config = CONFIG_HASH[szUuid]
+	if not config then
+		return
+	end
+	if not Set(config, aKey, oVal) then
+		return
+	end
+	if aKey[1] == 'enable' and oVal then
+		FireUIEvent('MY_TARGET_MON_CONFIG_INIT')
+	end
+	D.MarkConfigChanged()
+end
+
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				GetConfig         = D.GetConfig        ,
+				LoadConfig        = D.LoadConfig       ,
+				MarkConfigChanged = D.MarkConfigChanged,
+				GetNewConfig      = D.GetNewConfig     ,
+				GetNewMon         = D.GetNewMon        ,
+				GetNewMonId       = D.GetNewMonId      ,
+				GetNewMonLevel    = D.GetNewMonLevel   ,
+				GetTargetTypeList = D.GetTargetTypeList,
+				SetData           = D.SetData          ,
+			},
+		},
+	},
+}
+MY_TargetMonConfig = MY.GeneGlobalNS(settings)
+end
