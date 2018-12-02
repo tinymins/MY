@@ -872,7 +872,7 @@ function MY_Recount_Detail.OnFrameBreathe()
 		local aResult, nCountSum = {}, not MY_Recount.bShowZeroVal and tData[szPrimarySort][szSelected].nNzCount or tData[szPrimarySort][szSelected].nCount
 		local nTotal = tData[szPrimarySort][szSelected][MY_Recount.bShowEffect and 'nTotalEffect' or 'nTotal']
 		for nSkillResult, p in pairs(tData[szPrimarySort][szSelected].Detail) do
-			table.insert(aResult, {
+			local res = {
 				nCount = not MY_Recount.bShowZeroVal and p.nNzCount or p.nCount,
 				nMin   = not MY_Recount.bShowEffect
 					and (not MY_Recount.bShowZeroVal and p.nNzMin or p.nMin)
@@ -883,7 +883,10 @@ function MY_Recount_Detail.OnFrameBreathe()
 				nMax   = MY_Recount.bShowEffect and p.nMaxEffect or p.nMax,
 				nTotal = MY_Recount.bShowEffect and p.nTotalEffect or p.nTotal,
 				szSkillResult = SZ_SKILL_RESULT[nSkillResult],
-			})
+			}
+			if res.nCount > 0 then
+				table.insert(aResult, res)
+			end
 		end
 		table.sort(aResult, function(p1, p2) return p1.nAvg > p2.nAvg end)
 		-- ΩÁ√Ê÷ÿªÊ
