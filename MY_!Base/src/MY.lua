@@ -141,6 +141,35 @@ local function Get(var, keys, dft)
 	end
 	return var, res
 end
+local function Set(var, keys, val)
+	local res = false
+	if type(keys) == 'string' then
+		local ks = {}
+		for k in string.gmatch(keys, '[^%.]+') do
+			insert(ks, k)
+		end
+		keys = ks
+	end
+	if type(keys) == 'table' then
+		local n = #keys
+		for i = 1, n do
+			local k = keys[i]
+			if type(var) == 'table' then
+				if i == n then
+					var[k], res = val, true
+				else
+					if var[k] == nil then
+						var[k] = {}
+					end
+					var = var[k]
+				end
+			else
+				break
+			end
+		end
+	end
+	return res
+end
 local function IsEmpty(var)
 	local szType = type(var)
 	if szType == 'nil' then
@@ -368,12 +397,28 @@ function spairs_r(...)
 end
 end
 ---------------------------------------------------------------------------------------------
-MY = {}
-MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r = spairs, spairs_r, sipairs, sipairs_r
-MY.IsArray, MY.IsDictionary, MY.IsEquals = IsArray, IsDictionary, IsEquals
-MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsUserdata = IsNil, IsBoolean, IsNumber, IsUserdata
-MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsFunction = IsEmpty, IsString, IsTable, IsFunction
-MY.Get, MY.GetPatch, MY.ApplyPatch, MY.RandomChild = Get, GetPatch, ApplyPatch, RandomChild
+MY = {
+	spairs       = spairs      ,
+	spairs_r     = spairs_r    ,
+	sipairs      = sipairs     ,
+	sipairs_r    = sipairs_r   ,
+	IsArray      = IsArray     ,
+	IsDictionary = IsDictionary,
+	IsEquals     = IsEquals    ,
+	IsNil        = IsNil       ,
+	IsBoolean    = IsBoolean   ,
+	IsNumber     = IsNumber    ,
+	IsUserdata   = IsUserdata  ,
+	IsEmpty      = IsEmpty     ,
+	IsString     = IsString    ,
+	IsTable      = IsTable     ,
+	IsFunction   = IsFunction  ,
+	Set          = Set         ,
+	Get          = Get         ,
+	GetPatch     = GetPatch    ,
+	ApplyPatch   = ApplyPatch  ,
+	RandomChild  = RandomChild ,
+}
 ---------------------------------------------------------------------------------------------
 -- 本地函数变量
 ---------------------------------------------------------------------------------------------
@@ -1346,6 +1391,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 	scroll:SetScrollPos(0)
 	wnd:Clear()
 	wnd:Lookup('', ''):Clear()
+	wnd:SetContainerType(WND_CONTAINER_STYLE.WND_CONTAINER_STYLE_CUSTOM)
 
 	-- ready to draw
 	if not tab then
