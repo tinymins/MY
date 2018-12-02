@@ -2149,9 +2149,13 @@ function MY.GetBuffList(...)
 		for i = 1, nCount do
 			local dwID, nLevel, bCanCancel, nEndFrame, nIndex, nStackNum, dwSkillSrcID, bValid = KObject.GetBuff(i - 1)
 			if dwID then
+				local szName, nIcon = MY.GetBuffName(dwID, nLevel)
 				table.insert(aBuffTable, {
+					szKey        = dwID .. ',' .. nLevel,
 					dwID         = dwID        ,
 					nLevel       = nLevel      ,
+					szName       = szName      ,
+					nIcon        = nIcon       ,
 					bCanCancel   = bCanCancel  ,
 					nEndFrame    = nEndFrame   ,
 					nIndex       = nIndex      ,
