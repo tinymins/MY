@@ -2944,6 +2944,19 @@ function UI:handleStyle(dwStyle)
 	return self
 end
 
+-- (self) Instance:containerType(dwType)
+function UI:containerType(dwType)
+	self:_checksum()
+	if dwType then
+		for _, raw in ipairs(self.raws) do
+			if GetComponentType(raw) == 'WndContainer' then
+				raw:SetContainerType(dwType)
+			end
+		end
+	end
+	return self
+end
+
 -- (self) Instance:editType(dwType)
 function UI:editType(dwType)
 	self:_checksum()
