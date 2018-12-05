@@ -555,11 +555,12 @@ function GetChatLog(channels, search, offset, limit)
 				count = count + info.detailcountcache.cache[search][channel]
 			end
 		end
-		if index <= offset and index + count > offset then
+		offset = mmax(offset - count, 0)
+		if index >= offset and count > 0 then
 			DB_R = DB:Prepare('SELECT * FROM ' .. info.name .. sql)
 			DB_R:ClearBindings()
 			values[#values - 1] = limit
-			values[#values] = mmax(offset - index, 0)
+			values[#values] = offset
 			DB_R:BindAll(unpack(values))
 			data = DB_R:GetAll()
 			for _, rec in ipairs(data) do
@@ -567,7 +568,7 @@ function GetChatLog(channels, search, offset, limit)
 					tinsert(result, rec)
 				end
 			end
-			limit = limit - #data
+			limit = mmax(limit - #data, 0)
 		end
 		index = index + count
 	end
