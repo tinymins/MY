@@ -25,22 +25,15 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
+local MY, UI = MY, MY.UI
+local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
+local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
+local Get, Set, RandomChild = MY.Get, MY.Set, MY.RandomChild
+local IsArray, IsDictionary, IsEquals = MY.IsArray, MY.IsDictionary, MY.IsEquals
 local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
--- these global functions are accessed all the time by the event handler
--- so caching them is worth the effort
 local XML_LINE_BREAKER = XML_LINE_BREAKER
-local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
-local tinsert, tremove, tconcat = table.insert, table.remove, table.concat
-local ssub, slen, schar, srep, sbyte, sformat, sgsub =
-	  string.sub, string.len, string.char, string.rep, string.byte, string.format, string.gsub
-local type, tonumber, tostring = type, tonumber, tostring
-local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
-local floor, mmin, mmax, mceil = math.floor, math.min, math.max, math.ceil
-local GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID = GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID
-local setmetatable = setmetatable
 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_ChatLog/lang/')
 if not MY.AssertVersion('MY_ChatLog', _L['MY_ChatLog'], 0x2011800) then
@@ -141,7 +134,7 @@ function InsertMsg(channel, text, msg, talker, time)
 	if not channel or not time or empty(msg) or not text or empty(hash) then
 		return
 	end
-	tinsert(aInsQueue, {hash, channel, time, talker, text, msg})
+	insert(aInsQueue, {hash, channel, time, talker, text, msg})
 end
 
 function DeleteMsg(hash, time)
@@ -290,7 +283,7 @@ function ImportDB(file)
 		for index = 0, count, 100000 do
 			local result = DBI:Execute('SELECT * FROM ' .. rec.name .. ' ORDER BY time ASC LIMIT 100000 OFFSET ' .. index)
 			for _, rec in ipairs(result) do
-				tinsert(aInsQueue, {rec.hash, rec.channel, rec.time, rec.talker, rec.text, rec.msg})
+				insert(aInsQueue, {rec.hash, rec.channel, rec.time, rec.talker, rec.text, rec.msg})
 			end
 			amount = amount + #result
 			PushDB()
@@ -342,10 +335,10 @@ function OptimizeDB(deep)
 			end
 		end
 		for szChannel, _ in pairs(tChannels) do
-			tinsert(aWheres, 'channel <> ' .. CHANNELS_R[szChannel])
+			insert(aWheres, 'channel <> ' .. CHANNELS_R[szChannel])
 		end
 		if #aWheres > 0 then
-			where = ' WHERE ' .. tconcat(aWheres, ' AND ')
+			where = ' WHERE ' .. concat(aWheres, ' AND ')
 		end
 		for i, info in ipairs(tables) do
 			DB:Execute('DELETE FROM ' .. info.name .. where)
@@ -367,7 +360,7 @@ function OptimizeDB(deep)
 				stime = info.stime,
 				etime = etime,
 			}
-			tinsert(tables, i, newinfo)
+			insert(tables, i, newinfo)
 			info.stime = newinfo.etime + 1
 			-- 转移数据
 			DB:Execute('REPLACE INTO ' .. newinfo.name .. ' SELECT * FROM ' .. info.name .. ' WHERE time <= ' .. etime)
@@ -394,7 +387,7 @@ function OptimizeDB(deep)
 				DB:Execute('DROP TABLE ' .. nextinfo.name)
 				DB:Execute('UPDATE ChatLogIndex SET count = (SELECT count(*) FROM ' .. info.name .. '), detailcount = \'\', etime = ' .. nextinfo.etime .. ' WHERE name = \'' .. info.name .. '\'')
 				DB:Execute('DELETE FROM ChatLogIndex WHERE name = \'' .. nextinfo.name .. '\'')
-				tremove(tables, i + 1)
+				remove(tables, i + 1)
 				MY.Debug({'Merging small chatlog table (' .. info.name .. ', ' .. nextinfo.name .. ') finished...'}, 'MY_ChatLog', MY_DEBUG.LOG)
 			end
 		end
@@ -470,7 +463,7 @@ local function GetChatLogTableCount(channels, search)
 		end
 		if not info.detailcountcache.cache[search] then
 			-- 创建缓存
-			tinsert(info.detailcountcache.list, 1, search)
+			insert(info.detailcountcache.list, 1, search)
 			info.detailcountcache.cache[search] = {}
 			local result
 			if search == '' then
@@ -488,7 +481,7 @@ local function GetChatLogTableCount(channels, search)
 			while info.detailcountcache.list[6] do
 				local index = info.detailcountcache.list[6] == '' and 5 or 6
 				info.detailcountcache.cache[info.detailcountcache.list[index]] = nil
-				tremove(info.detailcountcache.list, index)
+				remove(info.detailcountcache.list, index)
 			end
 			-- 保存缓存
 			if not stmtUpd then
@@ -518,13 +511,13 @@ end
 function GetChatLog(channels, search, offset, limit)
 	local DB_R, wheres, values = nil, {}, {}
 	for _, channel in ipairs(channels) do
-		tinsert(wheres, 'channel = ?')
-		tinsert(values, channel)
+		insert(wheres, 'channel = ?')
+		insert(values, channel)
 	end
 	local sql  = ''
 	local where = ''
 	if #wheres > 0 then
-		where = where .. ' (' .. tconcat(wheres, ' OR ') .. ')'
+		where = where .. ' (' .. concat(wheres, ' OR ') .. ')'
 	else
 		where = ' 1 = 0'
 	end
@@ -533,14 +526,14 @@ function GetChatLog(channels, search, offset, limit)
 			where = where .. ' AND'
 		end
 		where = where .. ' (talker LIKE ? OR text LIKE ?)'
-		tinsert(values, AnsiToUTF8('%' .. search .. '%'))
-		tinsert(values, AnsiToUTF8('%' .. search .. '%'))
+		insert(values, AnsiToUTF8('%' .. search .. '%'))
+		insert(values, AnsiToUTF8('%' .. search .. '%'))
 	end
 	if #where > 0 then
 		sql  = sql .. ' WHERE' .. where
 	end
-	tinsert(values, limit)
-	tinsert(values, offset)
+	insert(values, limit)
+	insert(values, offset)
 	sql = sql .. ' ORDER BY time ASC LIMIT ? OFFSET ?'
 
 	local index, count, result, data = 0, 0, {}, nil
@@ -555,7 +548,7 @@ function GetChatLog(channels, search, offset, limit)
 				count = count + info.detailcountcache.cache[search][channel]
 			end
 		end
-		offset = mmax(offset - count, 0)
+		offset = max(offset - count, 0)
 		if index >= offset and count > 0 then
 			DB_R = DB:Prepare('SELECT * FROM ' .. info.name .. sql)
 			DB_R:ClearBindings()
@@ -565,10 +558,10 @@ function GetChatLog(channels, search, offset, limit)
 			data = DB_R:GetAll()
 			for _, rec in ipairs(data) do
 				if rec.hash == GetStringCRC(rec.msg) then
-					tinsert(result, rec)
+					insert(result, rec)
 				end
 			end
-			limit = mmax(limit - #data, 0)
+			limit = max(limit - #data, 0)
 		end
 		index = index + count
 	end
@@ -587,7 +580,7 @@ local function InitMsgMon()
 		end
 	end
 	for szChannel, _ in pairs(tChannels) do
-		tinsert(aChannels, szChannel)
+		insert(aChannels, szChannel)
 	end
 	local function OnMsg(szMsg, nFont, bRich, r, g, b, szChannel, dwTalkerID, szTalker)
 		local szText = szMsg
@@ -839,7 +832,7 @@ function MY_ChatLog.UpdatePage(frame, noscroll, nopushdb)
 		local wnd = container:LookupContent(i)
 		if wnd:Lookup('CheckBox_ChatChannel'):IsCheckBoxChecked() then
 			for _, szChannel in ipairs(wnd.aChannels) do
-				tinsert(channels, CHANNELS_R[szChannel])
+				insert(channels, CHANNELS_R[szChannel])
 			end
 			MY_ChatLog.tUncheckedChannel[wnd.id] = nil
 		else
@@ -849,12 +842,12 @@ function MY_ChatLog.UpdatePage(frame, noscroll, nopushdb)
 	local search = frame:Lookup('Window_Main/Wnd_Search/Edit_Search'):GetText()
 
 	local nCount = GetChatLogCount(channels, search)
-	local nPageCount = mceil(nCount / PAGE_AMOUNT)
+	local nPageCount = ceil(nCount / PAGE_AMOUNT)
 	local bInit = not frame.nCurrentPage
 	if bInit then
 		frame.nCurrentPage = nPageCount
 	else
-		frame.nCurrentPage = mmin(mmax(frame.nCurrentPage, 1), nPageCount)
+		frame.nCurrentPage = min(max(frame.nCurrentPage, 1), nPageCount)
 	end
 	frame:Lookup('Window_Main/Wnd_Index/Wnd_IndexEdit/WndEdit_Index'):SetText(frame.nCurrentPage)
 	frame:Lookup('Window_Main/Wnd_Index', 'Handle_IndexCount/Text_IndexCount'):SprintfText(_L['total %d pages'], nPageCount)
@@ -883,12 +876,12 @@ function MY_ChatLog.UpdatePage(frame, noscroll, nopushdb)
 		hItem:Show()
 
 		local nStartPage
-		if frame.nCurrentPage + mceil((PAGE_DISPLAY - 2) / 2) > nPageCount then
+		if frame.nCurrentPage + ceil((PAGE_DISPLAY - 2) / 2) > nPageCount then
 			nStartPage = nPageCount - (PAGE_DISPLAY - 2)
-		elseif frame.nCurrentPage - mceil((PAGE_DISPLAY - 2) / 2) < 2 then
+		elseif frame.nCurrentPage - ceil((PAGE_DISPLAY - 2) / 2) < 2 then
 			nStartPage = 2
 		else
-			nStartPage = frame.nCurrentPage - mceil((PAGE_DISPLAY - 2) / 2)
+			nStartPage = frame.nCurrentPage - ceil((PAGE_DISPLAY - 2) / 2)
 		end
 		for i = 1, PAGE_DISPLAY - 2 do
 			local hItem = handle:Lookup(i)
@@ -1084,33 +1077,33 @@ local function convertXml2Html(szXml)
 			if text then
 				local force
 				text = htmlEncode(text)
-				tinsert(t, '<a')
+				insert(t, '<a')
 				if name and name:sub(1, 9) == 'namelink_' then
-					tinsert(t, ' class="namelink')
+					insert(t, ' class="namelink')
 					if MY_Farbnamen and MY_Farbnamen.Get then
 						local info = MY_Farbnamen.Get((text:gsub('[%[%]]', '')))
 						if info then
 							force = info.dwForceID
-							tinsert(t, ' force-')
-							tinsert(t, info.dwForceID)
+							insert(t, ' force-')
+							insert(t, info.dwForceID)
 						end
 					end
-					tinsert(t, '"')
+					insert(t, '"')
 				end
 				if not force and xml[''].r and xml[''].g and xml[''].b then
-					tinsert(t, (' style="color:#%02X%02X%02X"'):format(xml[''].r, xml[''].g, xml[''].b))
+					insert(t, (' style="color:#%02X%02X%02X"'):format(xml[''].r, xml[''].g, xml[''].b))
 				end
-				tinsert(t, '>')
-				tinsert(t, text)
-				tinsert(t, '</a>')
+				insert(t, '>')
+				insert(t, text)
+				insert(t, '</a>')
 			elseif name and name:sub(1, 8) == 'emotion_' then
-				tinsert(t, '<span class="')
-				tinsert(t, name)
-				tinsert(t, '"></span>')
+				insert(t, '<span class="')
+				insert(t, name)
+				insert(t, '"></span>')
 			end
 		end
 	end
-	return tconcat(t)
+	return concat(t)
 end
 
 local l_bExporting
@@ -1193,7 +1186,7 @@ function MY_ChatLog.Export(szExportFile, aChannels, nPerSec, onProgress)
 	end
 	l_bExporting = true
 
-	local nPage, nPageCount = 0, mceil(GetChatLogCount(aChannels, '') / EXPORT_SLICE)
+	local nPage, nPageCount = 0, ceil(GetChatLogCount(aChannels, '') / EXPORT_SLICE)
 	local function Export()
 		if nPage > nPageCount then
 			l_bExporting = false
