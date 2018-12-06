@@ -193,16 +193,16 @@ local function UpdateView()
 							buff = tBuff[dwID]
 							if buff then
 								if not config.hideOthers or buff.dwSkillSrcID == dwClientPlayerID or buff.dwSkillSrcID == dwControlPlayerID then
-									if mon.ignoreId then
+									if mon.iconid then
 										nIcon = mon.iconid
 										break
 									end
-									if tMonId.enable and tMonId.ignoreLevel then
+									if tMonId.enable and mon.iconid then
 										nIcon = tMonId.iconid or mon.iconid
 										break
 									end
 									if tMonId.levels[buff.nLevel] and tMonId.levels[buff.nLevel].enable then
-										nIcon = tMonId.levels[buff.nLevel].iconid or tMonId.iconid or mon.iconid
+										nIcon = tMonId.levels[buff.nLevel].iconid
 										break
 									end
 								end
