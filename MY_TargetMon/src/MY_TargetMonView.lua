@@ -150,7 +150,8 @@ function D.UpdateFrame(frame)
 			bRequireFormatPos = true
 		end
 		if hItem.fUIScale ~= tViewData.fUIScale then
-			hItem:Scale(tViewData.fUIScale / hItem.fUIScale)
+			local fRelativeScale = tViewData.fUIScale / hItem.fUIScale
+			hItem:Scale(fRelativeScale, fRelativeScale)
 			hItem.fUIScale = tViewData.fUIScale
 		end
 		if hItem.bCdBar ~= tViewData.bCdBar
@@ -210,7 +211,7 @@ function D.UpdateFrame(frame)
 		if hItem.szBoxExtentAnimate ~= item.aExtentAnimate[1]
 		or hItem.nBoxExtentAnimate ~= item.aExtentAnimate[2] then
 			if hItem.szBoxExtentAnimate then
-				hItem.box:SetExtentAnimate(hItem.szBoxExtentAnimate, hItem.nBoxExtentAnimate)
+				hItem.box:SetExtentAnimate(unpack(item.aExtentAnimate))
 			else
 				hItem.box:ClearExtentAnimate()
 			end
@@ -228,7 +229,7 @@ function D.UpdateFrame(frame)
 		if hItem.nLongAliasR ~= item.aLongAliasRGB[1]
 		or hItem.nLongAliasG ~= item.aLongAliasRGB[2]
 		or hItem.nLongAliasB ~= item.aLongAliasRGB[3] then
-			hItem.txtLongName:SetFontColor(hItem.nLongAliasR, hItem.nLongAliasG, hItem.nLongAliasB)
+			hItem.txtLongName:SetFontColor(unpack(item.aLongAliasRGB))
 			hItem.nLongAliasR, hItem.nLongAliasG, hItem.nLongAliasB = unpack(item.aLongAliasRGB)
 		end
 		if hItem.szLongName ~= item.szLongName then
@@ -238,7 +239,7 @@ function D.UpdateFrame(frame)
 		if hItem.nShortAliasR ~= item.aShortAliasRGB[1]
 		or hItem.nShortAliasG ~= item.aShortAliasRGB[2]
 		or hItem.nShortAliasB ~= item.aShortAliasRGB[3] then
-			hItem.txtShortName:SetFontColor(hItem.nShortAliasR, hItem.nShortAliasG, hItem.nShortAliasB)
+			hItem.txtShortName:SetFontColor(unpack(item.aShortAliasRGB))
 			hItem.nShortAliasR, hItem.nShortAliasG, hItem.nShortAliasB = unpack(item.aShortAliasRGB)
 		end
 		if hItem.szShortName ~= item.szShortName then
