@@ -61,6 +61,11 @@ data = {
         [TARGET.PLAYER] = '玩家',
         [TARGET.DOODAD] = '交互物件',
     },
+    ['Target relation'] = '目标关系',
+    RELATION = {
+        Enemy = '敌对目标',
+        Ally = '非敌对目标',
+    },
     ['Operator'] = '运算符',
     ['Value'] = '数值',
     ['Name display'] = '名称显示',

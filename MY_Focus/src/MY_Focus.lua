@@ -110,6 +110,11 @@ local function FormatAutoFocusData(data)
 			[TARGET.PLAYER] = false,
 			[TARGET.DOODAD] = false,
 		},
+		tRelation = {
+			bAll = true,
+			bEnemy = false,
+			bAlly = false,
+		},
 		tLife = {
 			bEnable = false,
 			szOperator = '>',
@@ -508,19 +513,36 @@ function MY_Focus.GetDisplayList()
 			if #t >= MY_Focus.nMaxDisplay then
 				break
 			end
-			local KObject = MY.GetObject(p.dwType, p.dwID)
-			if KObject
-			and (not MY_Focus.bHideDeath or not (
-				((p.dwType == TARGET.NPC or p.dwType == TARGET.PLAYER) and KObject.nMoveState == MOVE_STATE.ON_DEATH)
-				or (p.dwType == TARGET.DOODAD and KObject.nKind == DOODAD_KIND.CORPSE)
-			))
-			and (
-				not p.tRule or (
-					(not p.tRule.tLife.bEnable or MY.JudgeOperator(p.tRule.tLife.szOperator, KObject.nCurrentLife / KObject.nMaxLife * 100, p.tRule.tLife.nValue))
-					and (p.tRule.nMaxDistance == 0 or pow(p.tRule.nMaxDistance * 64, 2) > pow(me.nX - KObject.nX, 2) + pow(me.nY - KObject.nY, 2) + (MY_Focus.bDistanceZ and pow((me.nZ - KObject.nZ) / 8, 2) or 0))
-				)
-			) then
-				table.insert(t, p)
+			local KObject, bFocus = MY.GetObject(p.dwType, p.dwID), true
+			if not KObject then
+				bFocus = false
+			end
+			if bFocus and MY_Focus.bHideDeath then
+				if p.dwType == TARGET.NPC or p.dwType == TARGET.PLAYER then
+					bFocus = KObject.nMoveState ~= MOVE_STATE.ON_DEATH
+				else--if p.dwType == TARGET.DOODAD then
+					bFocus = KObject.nKind ~= DOODAD_KIND.CORPSE
+				end
+			end
+			if bFocus and p.tRule then
+				if bFocus and p.tRule.tLife.bEnable
+				and not MY.JudgeOperator(p.tRule.tLife.szOperator, KObject.nCurrentLife / KObject.nMaxLife * 100, p.tRule.tLife.nValue) then
+					bFocus = false
+				end
+				if bFocus and p.tRule.nMaxDistance ~= 0
+				and pow(p.tRule.nMaxDistance * 64, 2) < pow(me.nX - KObject.nX, 2) + pow(me.nY - KObject.nY, 2) + (MY_Focus.bDistanceZ and pow((me.nZ - KObject.nZ) / 8, 2) or 0) then
+					bFocus = false
+				end
+				if bFocus and not p.tRule.tRelation.bAll then
+					if IsEnemy(me.dwID, KObject.dwID) then
+						bFocus = p.tRule.tRelation.bEnemy
+					else
+						bFocus = p.tRule.tRelation.bAlly
+					end
+				end
+			end
+			if bFocus then
+				insert(t, p)
 			end
 		end
 	end

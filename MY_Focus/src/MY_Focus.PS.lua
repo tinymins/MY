@@ -88,6 +88,11 @@ function PS.OnPanelActive(wnd)
 					insert(aText, _L.TARGET[eType])
 				end
 			end
+			for _, szRelation in ipairs({ 'Enemy', 'Ally' }) do
+				if v.tRelation['b' .. szRelation] then
+					insert(aText, _L.RELATION[szRelation])
+				end
+			end
 			szType = #aText == 0 and _L['None'] or concat(aText, ',')
 		end
 		return v.szPattern .. ' (' .. szType .. ')'
@@ -145,6 +150,32 @@ function PS.OnPanelActive(wnd)
 				end,
 				fnDisable = function()
 					return tData.tType.bAll
+				end,
+			})
+		end
+		-- 目标关系
+		local t1 = {
+			szOption = _L['Target relation'], {
+				szOption = _L['All'],
+				bCheck = true, bChecked = tData.tRelation.bAll,
+				fnAction = function()
+					tData.tRelation.bAll = not tData.tRelation.bAll
+					MY_Focus.RescanNearby()
+					list:listbox('update', 'id', oID, {'text'}, {GeneItemText(tData)})
+				end,
+			}
+		}
+		for _, szRelation in ipairs({ 'Enemy', 'Ally' }) do
+			insert(t1, {
+				szOption = _L.RELATION[szRelation],
+				bCheck = true, bChecked = tData.tRelation['b' .. szRelation],
+				fnAction = function()
+					tData.tRelation['b' .. szRelation] = not tData.tRelation['b' .. szRelation]
+					MY_Focus.RescanNearby()
+					list:listbox('update', 'id', oID, {'text'}, {GeneItemText(tData)})
+				end,
+				fnDisable = function()
+					return tData.tRelation.bAll
 				end,
 			})
 		end
