@@ -731,7 +731,7 @@ local function OnInit()
 	-- 显示欢迎信息
 	MY.Sysmsg({_L('%s, welcome to use mingyi plugins!', GetClientPlayer().szName) .. ' v' .. MY.GetVersion() .. ' Build ' .. _BUILD_})
 end
-RegisterEvent('LOADING_ENDING', OnInit) -- 不能用FIRST_LOADING_END 不然注册快捷键就全跪了
+MY.RegisterEvent('LOADING_ENDING', OnInit) -- 不能用FIRST_LOADING_END 不然注册快捷键就全跪了
 
 -- 注册初始化函数
 -- RegisterInit(string id, function fn) -- 注册
@@ -773,9 +773,9 @@ local function OnExit()
 	end
 	EXIT_FUNC_LIST = nil
 end
-RegisterEvent('GAME_EXIT', OnExit)
-RegisterEvent('PLAYER_EXIT_GAME', OnExit)
-RegisterEvent('RELOAD_UI_ADDON_BEGIN', OnExit)
+MY.RegisterEvent('GAME_EXIT', OnExit)
+MY.RegisterEvent('PLAYER_EXIT_GAME', OnExit)
+MY.RegisterEvent('RELOAD_UI_ADDON_BEGIN', OnExit)
 
 -- 注册游戏结束函数
 -- RegisterExit(string id, function fn) -- 注册
@@ -813,7 +813,7 @@ local function OnReload()
 	end
 	RELOAD_FUNC_LIST = nil
 end
-RegisterEvent('RELOAD_UI_ADDON_BEGIN', OnReload)
+MY.RegisterEvent('RELOAD_UI_ADDON_BEGIN', OnReload)
 
 -- 注册插件重载函数
 -- RegisterReload(string id, function fn) -- 注册
@@ -855,12 +855,12 @@ local function OnIdle()
 	end
 	TIME = nTime
 end
-RegisterEvent('ON_FRAME_CREATE', function()
+MY.RegisterEvent('ON_FRAME_CREATE', function()
 	if arg0:GetName() == 'OptionPanel' then
 		OnIdle()
 	end
 end)
-RegisterEvent('BUFF_UPDATE', function()
+MY.RegisterEvent('BUFF_UPDATE', function()
 	if arg1 then
 		return
 	end
@@ -873,7 +873,7 @@ RegisterEvent('BUFF_UPDATE', function()
 		end)
 	end
 end)
-BreatheCall('MY_ON_IDLE', function()
+MY.BreatheCall('MY_ON_IDLE', function()
 	if Station.GetIdleTime() > 300000 then
 		OnIdle()
 	end
@@ -1116,7 +1116,7 @@ local function OnBgMsg()
 		end
 	end
 end
-RegisterEvent('ON_BG_CHANNEL_MSG', OnBgMsg)
+MY.RegisterEvent('ON_BG_CHANNEL_MSG', OnBgMsg)
 
 
 -- MY.RegisterBgMsg('MY_CHECK_INSTALL', function(szMsgID, nChannel, dwTalkerID, szTalkerName, bSelf, oDatas...) MY.BgTalk(szTalkerName, 'MY_CHECK_INSTALL_REPLY', oData) end) -- 注册

@@ -159,12 +159,12 @@ local function OnDeath(dwCharacterID, dwKiller)
 	end
 end
 
-RegisterEvent('LOADING_END', function()
+MY.RegisterEvent('LOADING_END', function()
 	DAMAGE_LOG = {}
 	PLAYER_ID  = UI_GetClientPlayerID()
 end)
 
-RegisterEvent('SYS_MSG', function()
+MY.RegisterEvent('SYS_MSG', function()
 	if arg0 == 'UI_OME_DEATH_NOTIFY' then -- 死亡记录
 		OnDeath(arg1, arg2)
 	elseif arg0 == 'UI_OME_SKILL_EFFECT_LOG' then -- 技能记录
@@ -174,7 +174,7 @@ RegisterEvent('SYS_MSG', function()
 	end
 end)
 
-RegisterEvent('DO_SKILL_CAST', function()
+MY.RegisterEvent('DO_SKILL_CAST', function()
 	if arg1 == 608 and IsPlayer(arg0) then -- 自觉经脉
 		OnSkill(arg0, arg1, arg2)
 	end

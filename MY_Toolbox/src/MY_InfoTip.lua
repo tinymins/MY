@@ -196,7 +196,7 @@ local LoadConfig = function()
         end
     end
 end
-RegisterEvent('CUSTOM_UI_MODE_SET_DEFAULT', function()
+MY.RegisterEvent('CUSTOM_UI_MODE_SET_DEFAULT', function()
     for k, v in pairs(Config_Default) do
         MY_InfoTip.Config[k].anchor = v.anchor
     end

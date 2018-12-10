@@ -417,7 +417,7 @@ function MY.RenderCall(szKey, nInterval, fnAction, oArg)
 		rc.nNext = GetTime()
 		rc.nInterval = nInterval or 0
 		if not _rendercall_ref then
-			_rendercall_ref = RegisterEvent('RENDER_FRAME_UPDATE', onRenderCall)
+			_rendercall_ref = MY.RegisterEvent('RENDER_FRAME_UPDATE', onRenderCall)
 		end
 	elseif nInterval then -- modify
 		local rc = _tRenderCall[szKey]

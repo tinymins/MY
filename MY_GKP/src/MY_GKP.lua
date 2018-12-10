@@ -1845,20 +1845,20 @@ function _GKP.DrawAccount(key,sort)
 	_GKP.hAccountContainer:FormatAllContentPos()
 end
 
-RegisterEvent('TRADING_OPEN_NOTIFY',function() -- 交易开始
+MY.RegisterEvent('TRADING_OPEN_NOTIFY',function() -- 交易开始
 	_GKP.TradingTarget = GetPlayer(arg0)
 end)
-RegisterEvent('TRADING_CLOSE',function() -- 交易结束
+MY.RegisterEvent('TRADING_CLOSE',function() -- 交易结束
 	_GKP.TradingTarget = {}
 end)
-RegisterEvent('MONEY_UPDATE',function() --金钱变动
+MY.RegisterEvent('MONEY_UPDATE',function() --金钱变动
 	_GKP.MoneyUpdate(arg0, arg1, arg2)
 end)
 
 MY.RegisterHotKey('MY_GKP', _L['Open/Close Golden Team Record'], _GKP.TogglePanel)
 MY.RegisterAddonMenu({ szOption = _L['Golden Team Record'], fnAction = _GKP.OpenPanel })
 
-RegisterEvent('LOADING_END',function()
+MY.RegisterEvent('LOADING_END',function()
 	if not IsEmpty(MY_GKP('GKP_Record')) or not IsEmpty(MY_GKP('GKP_Account')) then
 		if MY.IsInDungeon() and MY_GKP.bAlertMessage then
 			MY.Confirm(_L['Do you want to wipe the previous data when you enter the dungeon\'s map?'],function() _GKP.ClearData(true) end)

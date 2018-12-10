@@ -589,11 +589,11 @@ end
 MY.BreatheCall('MY_LifeBar', onBreathe)
 end
 
-RegisterEvent('NPC_ENTER_SCENE',function()
+MY.RegisterEvent('NPC_ENTER_SCENE',function()
 	NPC_CACHE[arg0] = true
 end)
 
-RegisterEvent('NPC_LEAVE_SCENE',function()
+MY.RegisterEvent('NPC_LEAVE_SCENE',function()
 	local lb = LB_CACHE[arg0]
 	if lb then
 		lb:Remove()
@@ -602,11 +602,11 @@ RegisterEvent('NPC_LEAVE_SCENE',function()
 	NPC_CACHE[arg0] = nil
 end)
 
-RegisterEvent('PLAYER_ENTER_SCENE',function()
+MY.RegisterEvent('PLAYER_ENTER_SCENE',function()
 	PLAYER_CACHE[arg0] = true
 end)
 
-RegisterEvent('PLAYER_LEAVE_SCENE',function()
+MY.RegisterEvent('PLAYER_LEAVE_SCENE',function()
 	local lb = LB_CACHE[arg0]
 	if lb then
 		lb:Remove()
@@ -615,7 +615,7 @@ RegisterEvent('PLAYER_LEAVE_SCENE',function()
 	PLAYER_CACHE[arg0] = nil
 end)
 
-RegisterEvent('MY_LIFEBAR_COUNTDOWN', function()
+MY.RegisterEvent('MY_LIFEBAR_COUNTDOWN', function()
 	local dwID, szType, szKey, tData = arg0, arg1, arg2, arg3
 	if not COUNTDOWN_CACHE[dwID] then
 		COUNTDOWN_CACHE[dwID] = {}

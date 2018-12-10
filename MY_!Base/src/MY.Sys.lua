@@ -1568,8 +1568,8 @@ local bCustomMode = false
 function MY.IsInCustomUIMode()
 	return bCustomMode
 end
-RegisterEvent('ON_ENTER_CUSTOM_UI_MODE', function() bCustomMode = true  end)
-RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE', function() bCustomMode = false end)
+MY.RegisterEvent('ON_ENTER_CUSTOM_UI_MODE', function() bCustomMode = true  end)
+MY.RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE', function() bCustomMode = false end)
 end
 
 function MY.DoMessageBox(szName, i)

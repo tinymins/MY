@@ -1490,21 +1490,21 @@ function MY.GetNearDoodadTable()
 end
 end
 
-RegisterEvent('NPC_ENTER_SCENE', function()
+MY.RegisterEvent('NPC_ENTER_SCENE', function()
 	local npc = GetNpc(arg0)
 	if npc.dwEmployer ~= 0 then
 		NEARBY_PET[arg0] = npc
 	end
 	NEARBY_NPC[arg0] = npc
 end)
-RegisterEvent('NPC_LEAVE_SCENE', function()
+MY.RegisterEvent('NPC_LEAVE_SCENE', function()
 	NEARBY_PET[arg0] = nil
 	NEARBY_NPC[arg0] = nil
 end)
-RegisterEvent('PLAYER_ENTER_SCENE', function() NEARBY_PLAYER[arg0] = GetPlayer(arg0) end)
-RegisterEvent('PLAYER_LEAVE_SCENE', function() NEARBY_PLAYER[arg0] = nil end)
-RegisterEvent('DOODAD_ENTER_SCENE', function() NEARBY_DOODAD[arg0] = GetDoodad(arg0) end)
-RegisterEvent('DOODAD_LEAVE_SCENE', function() NEARBY_DOODAD[arg0] = nil end)
+MY.RegisterEvent('PLAYER_ENTER_SCENE', function() NEARBY_PLAYER[arg0] = GetPlayer(arg0) end)
+MY.RegisterEvent('PLAYER_LEAVE_SCENE', function() NEARBY_PLAYER[arg0] = nil end)
+MY.RegisterEvent('DOODAD_ENTER_SCENE', function() NEARBY_DOODAD[arg0] = GetDoodad(arg0) end)
+MY.RegisterEvent('DOODAD_LEAVE_SCENE', function() NEARBY_DOODAD[arg0] = nil end)
 end
 
 -- 获取玩家自身信息（缓存）
