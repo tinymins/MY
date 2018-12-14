@@ -212,8 +212,11 @@ local function UpdateView()
 						if buff or config.hideVoid ~= mon.hideVoid then
 							local item = aItem[nItemIndex]
 							if not item then
-								item = { nIcon = nIcon }
+								item = {}
 								aItem[nItemIndex] = item
+							end
+							if nIcon then
+								item.nIcon = nIcon
 							end
 							if buff then
 								if not item.nIcon then
