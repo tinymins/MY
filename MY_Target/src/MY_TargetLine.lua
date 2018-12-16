@@ -59,76 +59,89 @@ RegisterCustomData('MY_TargetLine.tTargetColor')
 RegisterCustomData('MY_TargetLine.tTTargetColor')
 
 function D.RequireRerender()
-	for _, v in ipairs({'TLine', 'TTLine', 'Name'}) do
-		local sha = C['sha' .. v]
-		if sha and sha:IsValid() then
-			sha:Hide()
-		end
-	end
-	if C.dwTarID then
-		rlcmd(('set target sfx connection %s %s %s'):format(C.dwTarID, 0, 1))
-	end
-	if C.dwTTarID then
-		rlcmd(('set target sfx connection %s %s %s'):format(C.dwTTarID, 0, 2))
-	end
 	C.bReRender = true
 end
 
 do
-local function DrawLine(tar, ttar, sha, col, nAlpha)
-	sha:SetTriangleFan(GEOMETRY_TYPE.LINE, O.nLineWidth)
+local function DrawShadowLine(sha, dwSrcID, dwDstID, aCol, nAlpha, nWidth)
+	local r, g, b = unpack(aCol)
+	sha:SetTriangleFan(GEOMETRY_TYPE.LINE, nWidth)
 	sha:ClearTriangleFanPoint()
-	local r, g, b = unpack(col)
-	sha:AppendCharacterID(tar.dwID, true, r, g, b, nAlpha)
-	sha:AppendCharacterID(ttar.dwID, true, r, g, b, nAlpha)
+	sha:AppendCharacterID(dwSrcID, true, r, g, b, nAlpha)
+	sha:AppendCharacterID(dwDstID, true, r, g, b, nAlpha)
 	sha:Show()
 end
-
-local function onBreathe()
+local bCurTargetRL, dwCurTarLineSrcID, dwCurTarLineDstID
+local bCurTTargetRL, dwCurTTarLineSrcID, dwCurTTarLineDstID
+function D.UpdateLine()
 	local me = GetClientPlayer()
-	local dwTarType, dwTarID = MY.GetTarget()
-	local tar = MY.GetObject(dwTarType, dwTarID)
-	local dwTTarType, dwTTarID = MY.GetTarget(tar)
-	local ttar = MY.GetObject(dwTTarType, dwTTarID)
+	local tar = MY.GetObject(MY.GetTarget(me))
+	local ttar = MY.GetObject(MY.GetTarget(tar))
+	local dwTarLineSrcID, dwTarLineDstID, dwTTarLineSrcID, dwTTarLineDstID
+	if me and tar and (not ttar or ttar.dwID ~= me.dwID) then
+		dwTarLineSrcID = me.dwID
+		dwTarLineDstID = tar.dwID
+	end
+	if me and tar and ttar then
+		dwTTarLineSrcID = tar.dwID
+		dwTTarLineDstID = ttar.dwID
+	end
 
 	-- show connect
-	if O.bTarget and me and tar and tar.dwID ~= me.dwID
-	and (not ttar or not O.bTTarget or (ttar and ttar.dwID ~= me.dwID)) then
-		if C.bReRender
-		or C.dwTarID ~= tar.dwID
-		or (ttar and C.dwTTarID ~= ttar.dwID)
-		or (not ttar and C.dwTTarID ~= 0) then
+	if dwCurTarLineSrcID ~= dwTarLineSrcID or dwCurTarLineDstID ~= dwTarLineDstID or bCurTargetRL ~= O.bTargetRL or C.bReRender then
+		if bCurTargetRL ~= O.bTargetRL then
+			if dwCurTarLineSrcID and dwCurTarLineDstID then
+				if bCurTargetRL then
+					rlcmd(('set target sfx connection %s %s %s'):format(dwCurTarLineSrcID, 0, 1))
+				else
+					C.shaTLine:Hide()
+				end
+			end
+			bCurTargetRL = O.bTargetRL
+		end
+		if O.bTarget and dwTarLineSrcID and dwTarLineDstID then
 			if O.bTargetRL then
-				rlcmd(('set target sfx connection %s %s %s'):format(me.dwID, tar.dwID, 1))
+				rlcmd(('set target sfx connection %s %s %s'):format(dwTarLineSrcID, dwTarLineDstID, 1))
 			else
-				DrawLine(me, tar, C.shaTLine, O.tTargetColor, O.nLineAlpha)
+				DrawShadowLine(C.shaTLine, dwTarLineSrcID, dwTarLineDstID, O.tTargetColor, O.nLineAlpha, O.nLineWidth)
 			end
+		else
+			if dwCurTarLineSrcID then
+				rlcmd(('set target sfx connection %s %s %s'):format(dwCurTarLineSrcID, 0, 1))
+			end
+			C.shaTLine:Hide()
 		end
-	else
-		if C.dwTarID then
-			rlcmd(('set target sfx connection %s %s %s'):format(C.dwTarID, 0, 1))
-		end
-		C.shaTLine:Hide()
+		bCurTargetRL, dwCurTarLineSrcID, dwCurTarLineDstID = O.bTargetRL, dwTarLineSrcID, dwTarLineDstID
 	end
-	C.dwTarID = dwTTarID
 
-	if O.bTTarget and tar and ttar then
-		if C.bReRender or C.dwTTarID ~= ttar.dwID then
-			if O.bTTargetRL then
-				rlcmd(('set target sfx connection %s %s %s'):format(tar.dwID, ttar.dwID, 2))
-			else
-				DrawLine(tar, ttar, C.shaTTLine, O.tTTargetColor, O.nLineAlpha)
+	if dwCurTTarLineSrcID ~= dwTTarLineSrcID or dwCurTTarLineDstID ~= dwTTarLineDstID or bCurTTargetRL ~= O.bTTargetRL or C.bReRender then
+		if bCurTTargetRL ~= O.bTTargetRL then
+			if dwCurTTarLineSrcID and dwCurTTarLineDstID then
+				if bCurTTargetRL then
+					rlcmd(('set target sfx connection %s %s %s'):format(dwCurTTarLineSrcID, 0, 1))
+				else
+					C.shaTTLine:Hide()
+				end
 			end
+			bCurTTargetRL = O.bTTargetRL
 		end
-	else
-		if C.dwTTarID then
-			rlcmd(('set target sfx connection %s %s %s'):format(C.dwTTarID, 0, 2))
+		if O.bTTarget and dwTTarLineSrcID and dwTTarLineDstID then
+			if O.bTTargetRL then
+				rlcmd(('set target sfx connection %s %s %s'):format(dwTTarLineSrcID, dwTTarLineDstID, 2))
+			else
+				DrawShadowLine(C.shaTTLine, dwTTarLineSrcID, dwTTarLineDstID, O.tTTargetColor, O.nLineAlpha, O.nLineWidth)
+			end
+		else
+			if dwCurTTarLineSrcID then
+				rlcmd(('set target sfx connection %s %s %s'):format(dwCurTTarLineSrcID, 0, 2))
+			end
+			C.shaTTLine:Hide()
 		end
-		C.shaTTLine:Hide()
+		bCurTTargetRL, dwCurTTarLineSrcID, dwCurTTarLineDstID = O.bTTargetRL, dwTTarLineSrcID, dwTTarLineDstID
 	end
-	C.dwTTarID = dwTTarID
 
 	C.bReRender = false
+end
 end
 
 function D.CheckEnable()
@@ -142,23 +155,18 @@ function D.CheckEnable()
 			end
 			C['sha' .. v] = sha
 		end
-		MY.BreatheCall('MY_TargetLine', onBreathe)
+		MY.BreatheCall('MY_TargetLine', D.UpdateLine)
 	else
 		for _, v in ipairs({'TLine', 'TTLine', 'Name'}) do
-			local sha = C['sha' .. v]
-			if sha and sha:IsValid() then
-				sha:Hide()
-			end
 			C['sha' .. v] = nil
 		end
 		MY.BreatheCall('MY_TargetLine', false)
 	end
 	D.RequireRerender()
+	D.UpdateLine()
 end
-
 MY.RegisterInit('MY_TargetLine', D.CheckEnable)
 MY.RegisterEvent('MY_SHIELDED_VERSION.MY_TargetLine', D.CheckEnable)
-end
 
 -- Global exports
 do
