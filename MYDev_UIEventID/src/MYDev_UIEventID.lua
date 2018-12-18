@@ -73,7 +73,7 @@ _C.GetEventID = function(ui)
 			t[event.bit] = 0
 		end
 	end
-	return MY.Math.Bitmap2Number(t)
+	return MY.Bitmap2Number(t)
 end
 
 _C.SetEventID = function(ui, nEventID)
