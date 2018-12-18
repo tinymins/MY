@@ -77,7 +77,7 @@ _C.GetEventID = function(ui)
 end
 
 _C.SetEventID = function(ui, nEventID)
-	local t = MY.Math.Number2Bitmap(nEventID)
+	local t = MY.Number2Bitmap(nEventID)
 	for i, event in ipairs(_C.tEventIndex) do
 		ui:children('#Event_' .. event.bit):check(t[event.bit] == 1)
 	end
