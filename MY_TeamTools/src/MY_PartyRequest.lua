@@ -34,7 +34,6 @@ local Get, GetPatch, ApplyPatch, RandomChild = MY.Get, MY.GetPatch, MY.ApplyPatc
 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TeamTools/lang/')
 local D = {}
-local PR_MAX_LEVEL = 95
 local PR_INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_TeamTools/ui/MY_PartyRequest.ini'
 local PR_EQUIP_REQUEST = {}
 local PR_PARTY_REQUEST = {}
@@ -244,7 +243,7 @@ function D.GetRequestStatus(info)
 				end
 			end
 		end
-		if MY_PartyRequest.bRefuseLowLv and info.nLevel < PR_MAX_LEVEL then
+		if MY_PartyRequest.bRefuseLowLv and info.nLevel < MY.GetAddonInfo().dwMaxPlayerLevel then
 			szStatus = 'refuse'
 			szMsg = _L('Auto refuse %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.',
 				info.szName, g_tStrings.tForceTitle[info.dwForce], info.nLevel, g_tStrings.STR_LEVEL)
