@@ -154,7 +154,9 @@ function D.UpdateFrame(frame)
 		end
 		if hItem.fUIScale ~= tViewData.fUIScale then
 			local fRelativeScale = tViewData.fUIScale / hItem.fUIScale
+			hItem:EnableScale(true)
 			hItem:Scale(fRelativeScale, fRelativeScale)
+			hItem:EnableScale(false)
 			hItem.fUIScale = tViewData.fUIScale
 		end
 		if hItem.bCdBar ~= tViewData.bCdBar
