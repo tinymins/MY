@@ -38,15 +38,18 @@ if not MY.AssertVersion('MY_TargetMon', _L['MY_TargetMon'], 0x2011800) then
 	return
 end
 local C, D = {}, {
-	GetConfig = MY_TargetMonConfig.GetConfig,
-	GetNewMonId = MY_TargetMonConfig.GetNewMonId,
-	GetNewMonLevel = MY_TargetMonConfig.GetNewMonLevel,
-	MarkConfigChanged = MY_TargetMonConfig.MarkConfigChanged,
 	GetTargetTypeList = MY_TargetMonConfig.GetTargetTypeList,
+	GetConfig = MY_TargetMonConfig.GetConfig,
+	ModifyMonitor = MY_TargetMonConfig.ModifyMonitor,
+	CreateMonitorId = MY_TargetMonConfig.CreateMonitorId,
+	ModifyMonitorId = MY_TargetMonConfig.ModifyMonitorId,
+	CreateMonitorLevel = MY_TargetMonConfig.CreateMonitorLevel,
+	ModifyMonitorLevel = MY_TargetMonConfig.ModifyMonitorLevel,
 }
 local BUFF_CACHE = {} -- 下标为目标ID的目标BUFF缓存数组 反正ID不可能是doodad不会冲突
 local BUFF_INFO = {}
 local BUFF_TIME = {}
+local SKILL_CACHE = {}
 local SKILL_INFO = {}
 local VIEW_LIST = {}
 local BOX_SPARKING_FRAME = GLOBAL.GAME_FPS * 2 / 3
@@ -92,17 +95,27 @@ end
 
 -- 更新技能反向索引
 do
-local function OnSkill(dwID, dwLevel)
-	local szName = Table_GetSkillName(dwID, dwLevel)
+local function OnSkill(dwID, nLevel)
+	local szName = Table_GetSkillName(dwID, nLevel)
 	if not szName then
 		return
 	end
-	SKILL_INFO[szName] = dwID
+	local KSkill, skill = MY.GetSkill(dwID, nLevel)
+	if not KSkill or not skill then
+		return
+	end
+	SKILL_INFO[szName][skill.szKey] = skill
 end
 local function OnSysMsg(event)
 	if arg0 == 'UI_OME_SKILL_CAST_LOG' then
+		if arg1 ~= UI_GetClientPlayerID() then
+			return
+		end
 		OnSkill(arg2, arg3)
 	elseif arg0 == 'UI_OME_SKILL_HIT_LOG' then
+		if arg1 ~= UI_GetClientPlayerID() then
+			return
+		end
 		OnSkill(arg4, arg5)
 	end
 end
@@ -124,7 +137,7 @@ local function UpdateView()
 	local dwClientPlayerID = UI_GetClientPlayerID()
 	local dwControlPlayerID = GetControlPlayerID()
 	local nViewIndex, nViewCount = 1, #VIEW_LIST
-	local bChange, nLogicFrame = false, GetLogicFrameCount()
+	local nLogicFrame = GetLogicFrameCount()
 	for _, config in ipairs(D.GetConfig()) do
 		if config.enable then
 			local KObject = MY.GetObject(D.GetTarget(config.target, config.type))
@@ -167,32 +180,31 @@ local function UpdateView()
 						if mon.capture then
 							for _, buff in spairs(BUFF_INFO[mon.name]) do
 								if not mon.iconid then
-									mon.iconid, bChange = buff.nIcon, true
+									D.ModifyMonitor(mon, 'iconid', buff.nIcon)
 								end
 								local tMonId = mon.ids[buff.dwID]
 								if not tMonId then
-									tMonId = D.GetNewMonId(buff.dwID)
-									mon.ids[buff.dwID], bChange = tMonId, true
+									tMonId = D.CreateMonitorId(mon, buff.dwID)
 								end
 								if not tMonId.iconid then
-									tMonId.iconid, bChange = buff.nIcon, true
+									D.ModifyMonitorId(tMonId, 'iconid', buff.nIcon)
 								end
 								local tMonLevel = tMonId.levels[buff.nLevel]
 								if not tMonLevel then
-									tMonLevel = D.GetNewMonLevel(buff.nLevel)
-									tMonId.levels[buff.nLevel], bChange = tMonLevel, true
+									tMonLevel = D.CreateMonitorLevel(tMonId, buff.nLevel)
 								end
 								if not tMonLevel.iconid then
-									tMonLevel.iconid, bChange = buff.nIcon, true
+									D.ModifyMonitorLevel(tMonLevel, 'iconid', buff.nIcon)
 								end
 							end
 						end
 						-- 通过监控项生成视图列表
 						local buff, nIcon = nil, mon.iconid
 						for dwID, tMonId in pairs(mon.ids) do
-							buff = tBuff[dwID]
-							if buff then
-								if not config.hideOthers or buff.dwSkillSrcID == dwClientPlayerID or buff.dwSkillSrcID == dwControlPlayerID then
+							local info = tBuff[dwID]
+							if info and info.nEndFrame - nLogicFrame >= 0 then
+								if not config.hideOthers or info.dwSkillSrcID == dwClientPlayerID or info.dwSkillSrcID == dwControlPlayerID then
+									buff = info
 									if mon.iconid then
 										nIcon = mon.iconid
 										break
@@ -218,7 +230,7 @@ local function UpdateView()
 							if nIcon then
 								item.nIcon = nIcon
 							end
-							if buff then
+							if buff and buff.nEndFrame - nLogicFrame >= 0 then
 								if not item.nIcon then
 									item.nIcon = buff.nIcon
 								end
@@ -245,7 +257,96 @@ local function UpdateView()
 								item.fCd = 1
 								item.bSparking = true
 								item.dwID = next(mon.ids) or -1
-								item.nLevel = item.dwID and next(mon.ids[item.dwID].levels) or -1
+								item.nLevel = item.dwID and mon.ids[item.dwID] and next(mon.ids[item.dwID].levels) or -1
+								item.szStackNum = ''
+								item.szLongName = mon.longAlias or mon.name
+								item.szShortName = mon.shortAlias or mon.name
+							end
+							item.aLongAliasRGB = mon.rgbLongAlias
+							item.aShortAliasRGB = mon.rgbShortAlias
+							nItemIndex = nItemIndex + 1
+						end
+					end
+				end
+			elseif config.type == 'SKILL' then
+				local tSkill = KObject and SKILL_CACHE[KObject.dwID] or EMPTY_TABLE
+				for _, mon in ipairs(config.monitors) do
+					if mon.enable then
+						-- 如果开启了捕获 从BUFF索引中捕获新的BUFF
+						if mon.capture then
+							for _, skill in spairs(SKILL_INFO[mon.name]) do
+								if not mon.iconid then
+									D.ModifyMonitor(mon, 'iconid', skill.nIcon)
+								end
+								local tMonId = mon.ids[skill.dwID]
+								if not tMonId then
+									tMonId = D.CreateMonitorId(mon, skill.dwID)
+								end
+								if not tMonId.iconid then
+									D.ModifyMonitorId(tMonId, 'iconid', skill.nIcon)
+								end
+								local tMonLevel = tMonId.levels[skill.nLevel]
+								if not tMonLevel then
+									tMonLevel = D.CreateMonitorLevel(tMonId, skill.nLevel)
+								end
+								if not tMonLevel.iconid then
+									D.ModifyMonitorLevel(tMonLevel, 'iconid', skill.nIcon)
+								end
+							end
+						end
+						-- 通过监控项生成视图列表
+						local skill, nIcon = nil, mon.iconid
+						for dwID, tMonId in pairs(mon.ids) do
+							local info = tSkill[dwID]
+							if info and info.bCool then
+								skill = info
+								if mon.iconid then
+									nIcon = mon.iconid
+									break
+								end
+								if tMonId.enable and mon.iconid then
+									nIcon = tMonId.iconid or mon.iconid
+									break
+								end
+								if tMonId.levels[skill.nLevel] and tMonId.levels[skill.nLevel].enable then
+									nIcon = tMonId.levels[skill.nLevel].iconid
+									break
+								end
+								skill = nil
+							end
+						end
+						if skill or config.hideVoid ~= mon.hideVoid then
+							local item = aItem[nItemIndex]
+							if not item then
+								item = {}
+								aItem[nItemIndex] = item
+							end
+							if nIcon then
+								item.nIcon = nIcon
+							end
+							if skill and skill.bCool then
+								if not item.nIcon then
+									item.nIcon = skill.nIcon
+								end
+								local nTimeLeft = skill.nCdLeft * 0.0625
+								local nTimeTotal = skill.nCdTotal * 0.0625
+								local nStackNum = skill.nCdMaxCount - skill.nCdCount
+								item.bCd = true
+								item.fCd = 1 - nTimeLeft / nTimeTotal
+								item.bSparking = false
+								item.dwID = skill.dwID
+								item.nLevel = skill.nLevel
+								item.nTimeLeft = nTimeLeft
+								item.szStackNum = nStackNum > 0 and nStackNum or ''
+								item.nTimeTotal = nTimeTotal
+								item.szLongName = mon.longAlias or skill.szName
+								item.szShortName = mon.shortAlias or skill.szName
+							else
+								item.bCd = false
+								item.fCd = 1
+								item.bSparking = true
+								item.dwID = next(mon.ids) or -1
+								item.nLevel = item.dwID and mon.ids[item.dwID] and next(mon.ids[item.dwID].levels) or -1
 								item.szStackNum = ''
 								item.szLongName = mon.longAlias or mon.name
 								item.szShortName = mon.shortAlias or mon.name
@@ -262,7 +363,7 @@ local function UpdateView()
 			end
 			-- 格式化完善视图列表信息
 			for _, item in ipairs(aItem) do
-				if config.showTime and item.nTimeLeft then
+				if config.showTime and item.bCd and item.nTimeLeft then
 					local nTimeLeft, szTimeLeft = item.nTimeLeft, ''
 					if nTimeLeft <= 3600 then
 						if nTimeLeft > 60 then
@@ -315,9 +416,6 @@ local function UpdateView()
 	for i = nViewIndex, nViewCount do
 		VIEW_LIST[i] = nil
 	end
-	if bChange then
-		D.MarkConfigChanged()
-	end
 end
 
 local function OnBreathe()
@@ -338,13 +436,13 @@ local function OnBreathe()
 				BUFF_INFO[buff.szName][buff.szKey] = buff
 			end
 			-- 处理消失的buff
-			local tLastBuff = BUFF_CACHE[eType]
+			local tLastBuff = BUFF_CACHE[KObject.dwID]
 			if tLastBuff then
 				local nLogicFrame = GetLogicFrameCount()
 				for k, buff in pairs(tLastBuff) do
 					if not tBuff[k] then
-						if v.nEndFrame > nLogicFrame then
-							v.nEndFrame = nLogicFrame
+						if buff.nEndFrame > nLogicFrame then
+							buff.nEndFrame = nLogicFrame
 						end
 						tBuff[k] = buff
 					end
@@ -352,6 +450,56 @@ local function OnBreathe()
 			end
 			BUFF_CACHE[KObject.dwID] = tBuff
 		end
+	end
+	local me = GetClientPlayer()
+	if me then
+		local tSkill = {}
+		local aSkill = MY.GetTargetSkillIDs(me)
+		-- 遍历所有技能
+		for _, dwID in ipairs(aSkill) do
+			local nLevel = me.GetSkillLevel(dwID)
+			local KSkill, info = MY.GetSkill(dwID, nLevel)
+			if KSkill and info then
+				local bCool, szType, nLeft, nInterval, nTotal, nCount, nMaxCount, nSurfaceNum = MY.GetSkillCDProgress(me, dwID, nLevel, true)
+				local skill = {
+					dwID = dwID,
+					nLevel = info.nLevel,
+					szKey = dwID,
+					bCool = bCool or nCount > 0,
+					szCdType = szType,
+					nCdLeft = nLeft,
+					nCdInterval = nInterval,
+					nCdTotal = nTotal,
+					nCdCount = nCount,
+					nCdMaxCount = nMaxCount,
+					nSurfaceNum = nSurfaceNum,
+					nIcon = info.nIcon,
+					szName = MY.GetSkillName(dwID),
+				}
+				tSkill[skill.szName] = skill
+				tSkill[skill.dwID] = skill
+				tSkill[skill.szKey] = skill
+				if not SKILL_INFO[skill.szName] then
+					SKILL_INFO[skill.szName] = {}
+				end
+				SKILL_INFO[skill.szName][skill.szKey] = skill
+			end
+		end
+		-- 处理消失的buff
+		local tLastSkill = SKILL_CACHE[me.dwID]
+		if tLastSkill then
+			for k, skill in pairs(tLastSkill) do
+				if not tSkill[k] then
+					if skill.bCool then
+						skill.bCool = false
+						skill.nLeft = 0
+						skill.nCount = 0
+					end
+					tSkill[k] = skill
+				end
+			end
+		end
+		SKILL_CACHE[me.dwID] = tSkill
 	end
 	UpdateView()
 end
