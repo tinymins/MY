@@ -2198,6 +2198,32 @@ function MY.Confirm(szMsg, fnAction, fnCancel, szSure, szCancel, fnCancelAction)
 	MessageBox(tMsg)
 end
 
+function MY.Dialog(szMsg, aOptions, fnCancelAction)
+	local nW, nH = Station.GetClientSize()
+	local tMsg = {
+		x = nW / 2, y = nH / 3,
+		szName = 'MY_Dialog',
+		szMessage = szMsg,
+		szAlignment = 'CENTER',
+		fnCancelAction = fnCancelAction,
+	}
+	for i, p in ipairs(aOptions) do
+		local tOption = {
+			szOption = p.szOption,
+			fnAction = p.fnAction,
+		}
+		if not tOption.szOption then
+			if i == 1 then
+				tOption.szOption = g_tStrings.STR_HOTKEY_SURE
+			elseif i == #aOptions then
+				tOption.szOption = g_tStrings.STR_HOTKEY_CANCEL
+			end
+		end
+		insert(tMsg, tOption)
+	end
+	MessageBox(tMsg)
+end
+
 do
 function MY.Hex2RGB(hex)
 	local s, r, g, b, a = (hex:gsub('#', ''))
