@@ -2065,6 +2065,168 @@ function MY.GetSkillName(dwSkillID, dwLevel)
 end
 end
 
+do local CACHE = {}
+function MY.GetKungfuSkillIDs(dwKungfuID)
+	if not CACHE[dwKungfuID] then
+		local aSubKungfuID, aList = Table_GetMKungfuList(dwKungfuID), {}
+		for _, dwSubKungfuID in ipairs(aSubKungfuID) do
+			local aSub = { dwSubKungfuID = dwSubKungfuID }
+			local aSkillID = Table_GetNewKungfuSkill(dwKungfuID, dwSubKungfuID)
+			if not aSkillID then
+				aSkillID = Table_GetKungfuSkillList(dwSubKungfuID)
+			end
+			for _, dwSkillID in ipairs(aSkillID) do
+				insert(aSub, dwSkillID)
+			end
+			insert(aList, aSub)
+		end
+		CACHE[dwKungfuID] = aList
+	end
+	return CACHE[dwKungfuID]
+end
+end
+
+do local CACHE = {}
+function MY.GetForceKungfuList(dwForceID)
+	if not CACHE[dwForceID] then
+		CACHE[dwForceID] = Table_GetSkillSchoolKungfu(dwForceID)
+	end
+	return CACHE[dwForceID]
+end
+end
+
+do local CACHE = {}
+function MY.GetSchoolForceID(dwSchoolID)
+	if not CACHE[dwSchoolID] then
+		CACHE[dwSchoolID] = Table_SchoolToForce(dwSchoolID)
+	end
+	return CACHE[dwSchoolID]
+end
+end
+
+function MY.GetTargetSkillIDs(tar)
+	local aSchoolID, aSkillID = tar.GetSchoolList(), {}
+	for _, dwSchoolID in ipairs(aSchoolID) do
+		local dwForceID = MY.GetSchoolForceID(dwSchoolID)
+		local aKungfuID = MY.GetForceKungfuList(dwForceID)
+		for _, dwKungfuID in ipairs(aKungfuID) do
+			for _, aGroup in ipairs(MY.GetKungfuSkillIDs(dwKungfuID)) do
+				for _, dwSkillID in ipairs(aGroup) do
+					insert(aSkillID, dwSkillID)
+				end
+			end
+		end
+	end
+	return aSkillID
+end
+
+function MY.GetSkill(dwID, nLevel)
+	local KSkill = GetSkill(dwID, nLevel)
+	if not KSkill then
+		return
+	end
+	local info = {
+		szKey = dwID .. '#' .. nLevel,
+		szName = MY.GetSkillName(dwID, nLevel),
+		dwID = dwID,
+		nLevel = nLevel,
+		bLearned = nLevel > 0,
+		nIcon = Table_GetSkillIconID(dwID, nLevel),
+		dwExtID = Table_GetSkillExtCDID(dwID),
+		bFormation = Table_IsSkillFormation(dwID, nLevel),
+	}
+	return KSkill, info
+end
+
+do
+local SKILL_SURFACE_NUM = {}
+local function OnChangeSkillSurfaceNum()
+	SKILL_SURFACE_NUM[arg0] = arg1
+end
+RegisterEvent("CHANGE_SKILL_SURFACE_NUM", OnChangeSkillSurfaceNum)
+local function GetSkillCDProgress(dwID, nLevel, dwCDID, KObject)
+	if dwCDID then
+		return KObject.GetSkillCDProgress(dwID, nLevel, dwCDID)
+	else
+		return KObject.GetSkillCDProgress(dwID, nLevel)
+	end
+end
+function MY.GetSkillCDProgress(KObject, dwID, nLevel, bIgnorePublic)
+	if not IsUserdata(KObject) then
+		KObject, dwID, nLevel = GetClientPlayer(), KObject, dwID
+	end
+	if not nLevel then
+		nLevel = KObject.GetSkillLevel(dwID)
+	end
+	if not nLevel then
+		return
+	end
+	local KSkill, info = MY.GetSkill(dwID, nLevel)
+	if not KSkill or not info then
+		return
+	end
+	-- # 更新CD相关的所有东西
+	-- -- 附加技能CD
+	-- if info.dwExtID then
+	-- 	info.skillExt = MY.GetTargetSkill(KObject, info.dwExtID)
+	-- end
+	-- 充能和透支技能CD刷新
+	local nCDMaxCount, dwCDID = KObject.GetCDMaxCount(dwID)
+	local nODMaxCount, dwODID = KObject.GetCDMaxOverDraftCount(dwID)
+	local bCool, szType, nLeft, nInterval, nTotal, nCount, nMaxCount, nSurfaceNum, bPublic
+	if nCDMaxCount > 1 then -- 充能技能CD刷新
+		szType = 'CHARGE'
+		nLeft, nTotal, nCount, bPublic = select(2, GetSkillCDProgress(dwID, nLevel, dwCDID, KObject))
+		nInterval = KObject.GetCDInterval(dwCDID)
+		nTotal = nInterval
+		nLeft, nCount = KObject.GetCDLeft(dwCDID)
+		bCool = nLeft > 0
+		nCount = nCDMaxCount - nCount
+		nMaxCount = nCDMaxCount
+	elseif nODMaxCount > 1 then -- 透支技能CD刷新
+		szType = 'OVERDRAFT'
+		bCool, nLeft, nTotal, nCount, bPublic = GetSkillCDProgress(dwID, nLevel, dwODID, KObject)
+		nInterval = KObject.GetCDInterval(dwODID)
+		nMaxCount, nCount = KObject.GetOverDraftCoolDown(dwODID)
+		if nCount == nMaxCount then -- 透支用完了显示CD
+			bCool, nLeft, nTotal, nCount, bPublic = GetSkillCDProgress(dwID, nLevel, nil, KObject)
+		else
+			bCool, nLeft, nTotal = false, select(2, GetSkillCDProgress(dwID, nLevel, nil, KObject))
+		end
+	else -- 普通技能CD刷新
+		szType = 'NORMAL'
+		if bIgnorePublic then
+			nLeft, nTotal, nCount, bPublic = select(2, GetSkillCDProgress(dwID, nLevel, dwCDID, KObject))
+		else
+			nLeft, nTotal, nCount, bPublic = select(2, GetSkillCDProgress(dwID, nLevel, nil, KObject))
+		end
+		bCool = nLeft > 0
+		nInterval = nTotal
+		nCount, nMaxCount = bCool and 1 or 0, 1
+	end
+	if bPublic then
+		szType = 'PUBLIC'
+	end
+	nSurfaceNum = SKILL_SURFACE_NUM[dwID]
+
+	-- -- 指定BUFF存在时技能显示特定特效的需求
+	-- local tLine = Table_GetSkillEffectBySkill(dwID)
+	-- if tLine then
+	-- 	local bShow = not not KObject.GetBuff(tLine.dwBuffID, 0)
+	-- 	if bShow then
+	-- 		if tLine.bAnimate then
+	-- 			hBox:SetExtentAnimate(tLine.szUITex, tLine.nFrame)
+	-- 		else
+	-- 			hBox:SetExtentImage(tLine.szUITex, tLine.nFrame)
+	-- 		end
+	-- 	else
+	-- 		hBox:ClearExtentAnimate()
+	-- 	end
+	-- end
+	return bCool, szType, nLeft, nInterval, nTotal, nCount, nMaxCount, nSurfaceNum
+end
+end
+
 -- 登出游戏
 -- (void) MY.Logout(bCompletely)
 -- bCompletely 为true返回登陆页 为false返回角色页 默认为false

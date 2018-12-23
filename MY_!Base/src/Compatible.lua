@@ -817,3 +817,106 @@ end
 end
 
 UpdateItemInfoBoxObject = UpdataItemInfoBoxObject
+
+if not Table_SchoolToForce then
+function Table_SchoolToForce(dwSchoolID)
+	local nCount = g_tTable.ForceToSchool:GetRowCount()
+	local dwForceID = 0
+	for i = 1, nCount do
+		tLine = g_tTable.ForceToSchool:GetRow(i)
+		if dwSchoolID == tLine.dwSchoolID then
+			dwForceID = tLine.dwForceID
+		end
+	end
+	return dwForceID
+end
+end
+
+if not Table_GetSkillSchoolKungfu then
+function Table_GetSkillSchoolKungfu(dwSchoolID)
+	local tKungFungList = {}
+	local tLine = g_tTable.SkillSchoolKungfu:Search(dwSchoolID)
+	if tLine then
+		local szKungfu = tLine.szKungfu
+		for s in string.gmatch(szKungfu, "%d+") do
+			local dwID = tonumber(s)
+			if dwID then
+				table.insert(tKungFungList, dwID)
+			end
+		end
+	end
+	return tKungFungList
+end
+end
+
+
+if not Table_GetMKungfuList then
+function Table_GetMKungfuList(dwKungfuID)
+	local tLine = g_tTable.MKungfuKungfu:Search(dwKungfuID)
+	local tKungfu = {}
+	if tLine and tLine.szKungfu then
+		local szKungfu = tLine.szKungfu
+		for s in string.gmatch(szKungfu, "%d+") do
+			local dwID = tonumber(s)
+			if dwID then
+				table.insert(tKungfu, dwID)
+			end
+		end
+	end
+	return tKungfu
+end
+end
+
+
+if not Table_GetNewKungfuSkill then
+function Table_GetNewKungfuSkill(dwMountKungfu, dwKungfuID)
+	local tLine = g_tTable.SkillKungFuShow:Search(dwMountKungfu) or {}
+	if empty(tLine) then
+		return nil
+	end
+	if tLine.dwKungfu ~= dwKungfuID then
+		return nil
+	end
+	local tSkill = {}
+	local szSkill = tLine.szNewSkillID
+	for s in string.gmatch(szSkill, "%d+") do
+		local dwID = tonumber(s)
+		if dwID then
+			table.insert(tSkill, dwID)
+		end
+	end
+	if tSkill and not empty(tSkill) then
+		return tSkill
+	end
+	return nil
+end
+end
+
+if not Table_GetKungfuSkillList then
+function Table_GetKungfuSkillList(dwKungfuID)
+	local tSkill = {}
+	local tLine = g_tTable.KungfuSkill:Search(dwKungfuID)
+	if tLine then
+		local szSkill = tLine.szSkill
+		for s in string.gmatch(szSkill, "%d+") do
+			local dwID = tonumber(s)
+			if dwID then
+				table.insert(tSkill, dwID)
+			end
+		end
+	end
+	return tSkill
+end
+end
+
+if not Table_GetSkillExtCDID then
+do local cache = {}
+function Table_GetSkillExtCDID(dwID)
+	if cache[dwID] == nil then
+		local tLine = g_tTable.SkillExtCDID:Search(dwID)
+		cache[dwID] = tLine and tLine.dwExtID or false
+	end
+	return cache[dwID] and cache[dwID] or nil
+end
+end
+end
