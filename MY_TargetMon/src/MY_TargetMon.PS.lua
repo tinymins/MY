@@ -309,9 +309,9 @@ local function DrawDetail(ui)
 				szOption = _L['All kungfus'],
 				rgb = {255, 255, 0},
 				bCheck = true,
-				bChecked = mon.kungfus.all,
-				fnAction = function()
-					D.ModifyMonitor(mon, 'kungfus.all', not mon.kungfus.all)
+				bChecked = mon.kungfus.all or IsEmpty(mon.kungfus),
+				fnAction = function(_, bChecked)
+					D.ModifyMonitor(mon, 'kungfus.all', bChecked)
 				end,
 			},
 		}
@@ -337,9 +337,9 @@ local function DrawDetail(ui)
 				szOption = _L['All kungfus'],
 				rgb = {255, 255, 0},
 				bCheck = true,
-				bChecked = mon.tarkungfus.all,
-				fnAction = function()
-					D.ModifyMonitor(mon, 'tarkungfus.all', not mon.tarkungfus.all)
+				bChecked = mon.tarkungfus.all or IsEmpty(mon.tarkungfus),
+				fnAction = function(_, bChecked)
+					D.ModifyMonitor(mon, 'tarkungfus.all', bChecked)
 				end,
 			},
 			{
