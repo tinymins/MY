@@ -123,7 +123,7 @@ local PS = {}
 -- 绘制详细监控项设置界面
 local function DrawDetail(ui)
 	local w, h = ui:size()
-	local l_config, l_search
+	local l_config, l_search, uiSearch
 	local uiWrapper = ui:append('WndWindow', { name = 'WndWindow_Wrapper', x = 0, y = 0, w = w, h = h }, true)
 	uiWrapper:append('Shadow', { x = 0, y = 0, w = w, h = h, r = 0, g = 0, b = 0, alpha = 150 })
 	uiWrapper:append('Shadow', { x = 10, y = 10, w = w - 20, h = h - 20, r = 255, g = 255, b = 255, alpha = 40 })
@@ -170,22 +170,22 @@ local function DrawDetail(ui)
 					{ mon = mon },
 					index
 				)
+				uiSearch:text('')
 			end
-		end, function() end, function() end, nil, '')
+		end, function() end, function() end, nil, l_search or '')
 	end
 
-	uiWrapper:append('WndEditBox', {
+	uiSearch = uiWrapper:append('WndEditBox', {
 		x = x0, y = y0,
 		w = 200, h = 30, placeholder = _L['Search'],
 		onchange = function(text)
 			l_search = text
 			Search()
 		end,
-	})
+	}, true)
 	uiWrapper:append('WndButton2', {
 		x = x1 + w1 - 60, y = y0 - 1, w = 60, h = 28,
 		text = _L['Add'], onclick = function() InsertMonitor() end,
-		autoenable = function() return not l_search or l_search == '' end,
 	})
 
 	-- 初始化list控件
@@ -829,6 +829,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	y = y + 30
 
 	y = Y + 30
+	local deltaY = 24
 	ui:append('WndComboBox', {
 		x = w - 250, y = y, w = 135,
 		text = _L['Set target'],
@@ -877,7 +878,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		onclick = function() OpenDetail(config) end,
 		autoenable = function() return config.enable end,
 	})
-	y = y + 25
+	y = y + deltaY
 
 	ui:append('WndSliderBox', {
 		x = w - 250, y = y,
@@ -890,7 +891,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		end,
 		autoenable = function() return config.enable end,
 	})
-	y = y + 25
+	y = y + deltaY
 
 	ui:append('WndSliderBox', {
 		x = w - 250, y = y,
@@ -903,7 +904,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		end,
 		autoenable = function() return config.enable end,
 	})
-	y = y + 25
+	y = y + deltaY
 
 	ui:append('WndSliderBox', {
 		x = w - 250, y = y,
@@ -916,7 +917,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		end,
 		autoenable = function() return config.enable end,
 	})
-	y = y + 25
+	y = y + deltaY
 
 	ui:append('WndSliderBox', {
 		x = w - 250, y = y,
@@ -929,7 +930,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		end,
 		autoenable = function() return config.enable end,
 	})
-	y = y + 25
+	y = y + deltaY
 
 	ui:append('WndSliderBox', {
 		x = w - 250, y = y,
@@ -950,7 +951,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		end,
 		autoenable = function() return config.enable end,
 	})
-	y = y + 25
+	y = y + deltaY
 
 	return x, y
 end
