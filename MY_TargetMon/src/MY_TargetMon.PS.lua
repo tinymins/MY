@@ -134,8 +134,7 @@ local function DrawDetail(ui)
 
 	local function Search()
 		list:listbox('clear')
-		local aMonList = l_config.monitors or {}
-		for i, mon in ipairs(aMonList) do
+		for i, mon in ipairs(l_config.monitors) do
 			if not l_search or l_search == ''
 			or (mon.name and wfind(mon.name, l_search))
 			or (mon.longAlias and wfind(mon.longAlias, l_search))
@@ -144,7 +143,7 @@ local function DrawDetail(ui)
 					'insert',
 					mon.name or mon.id,
 					mon,
-					{ mon = mon, monlist = aMonList }
+					{ mon = mon }
 				)
 			end
 		end
@@ -154,7 +153,6 @@ local function DrawDetail(ui)
 		GetUserInput(_L['Please input name:'], function(szVal)
 			szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
 			if szVal ~= '' then
-				local aMonList = l_config.monitors
 				local mon = D.CreateMonitor(l_config, szVal)
 				D.ModifyMonitor(mon, 'ignoreId', not tonumber(szVal))
 				if not mon.ignoreId then
@@ -162,13 +160,13 @@ local function DrawDetail(ui)
 					D.ModifyMonitorId(monid, 'enable', true)
 				end
 				if index then
-					D.MoveMonitor(l_config, mon, #aMonList - index)
+					D.MoveMonitor(l_config, mon, #l_config.monitors - index)
 				end
 				list:listbox(
 					'insert',
 					mon.name or mon.id,
 					mon,
-					{ mon = mon, monlist = aMonList },
+					{ mon = mon },
 					index
 				)
 			end
@@ -192,36 +190,29 @@ local function DrawDetail(ui)
 	-- ³õÊ¼»¯list¿Ø¼þ
 	local function onMenu(hItem, szText, szID, data)
 		local mon = data.mon
-		local monlist = data.monlist
 		local search = l_search and l_search ~= ''
 		local t1 = {
 			{
 				szOption = _L['Enable'],
 				bCheck = true, bChecked = mon.enable,
 				fnAction = function()
-					mon.enable = not mon.enable
-					D.CheckFrame(l_config)
+					D.ModifyMonitor(mon, 'enable', not mon.enable)
 				end,
 			},
 			{ bDevide = true },
 			{
 				szOption = _L['Delete'],
 				fnAction = function()
+					D.DeleteMonitor(l_config, mon)
 					list:listbox('delete', 'id', mon)
-					for i, m in ipairs_r(monlist) do
-						if m == mon then
-							remove(monlist, i)
-						end
-					end
 					Wnd.CloseWindow('PopupMenuPanel')
-					D.CheckFrame(l_config)
 				end,
 			},
 			{
 				szOption = _L['Insert'],
 				fnAction = function()
-					local index = #monlist
-					for i, m in ipairs_r(monlist) do
+					local index = #l_config.monitors
+					for i, m in ipairs_r(l_config.monitors) do
 						if m == mon then
 							index = i
 						end
@@ -233,8 +224,8 @@ local function DrawDetail(ui)
 			{
 				szOption = _L['Move up'],
 				fnAction = function()
-					local index = #monlist
-					for i, m in ipairs_r(monlist) do
+					local index = #l_config.monitors
+					for i, m in ipairs_r(l_config.monitors) do
 						if m == mon then
 							index = i
 						end
@@ -242,7 +233,7 @@ local function DrawDetail(ui)
 					if index < 2 then
 						return
 					end
-					insert(monlist, index - 1, remove(monlist, index))
+					D.MoveMonitor(l_config, mon, -1)
 					list:listbox('exchange', 'index', index - 1, index)
 				end,
 				bDisable = search,
@@ -250,16 +241,16 @@ local function DrawDetail(ui)
 			{
 				szOption = _L['Move down'],
 				fnAction = function()
-					local index = #monlist
-					for i, m in ipairs_r(monlist) do
+					local index = #l_config.monitors
+					for i, m in ipairs_r(l_config.monitors) do
 						if m == mon then
 							index = i
 						end
 					end
-					if index == #monlist then
+					if index == #l_config.monitors then
 						return
 					end
-					insert(monlist, index + 1, remove(monlist, index))
+					D.MoveMonitor(l_config, mon, 1)
 					list:listbox('exchange', 'index', index + 1, index)
 				end,
 				bDisable = search,
@@ -275,8 +266,7 @@ local function DrawDetail(ui)
 								'id', mon,
 								{ 'text' }, { szVal }
 							)
-							mon.name = szVal
-							D.CheckFrame(l_config)
+							D.ModifyMonitor(mon, 'name', szVal)
 						end
 					end, function() end, function() end, nil, mon.name)
 				end,
@@ -287,15 +277,13 @@ local function DrawDetail(ui)
 				fnAction = function()
 					GetUserInput(_L['Please input long alias:'], function(szVal)
 						szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
-						mon.longAlias = szVal
-						D.CheckFrame(l_config)
+						D.ModifyMonitor(mon, 'longAlias', szVal)
 					end, function() end, function() end, nil, mon.longAlias or mon.name)
 				end,
 				rgb = mon.rgbLongAlias,
 				bColorTable = true,
 				fnChangeColor = function(_, r, g, b)
-					mon.rgbLongAlias = { r, g, b }
-					D.CheckFrame(l_config)
+					D.ModifyMonitor(mon, 'rgbLongAlias', { r, g, b })
 				end,
 			},
 			{
@@ -303,15 +291,13 @@ local function DrawDetail(ui)
 				fnAction = function()
 					GetUserInput(_L['Please input short alias:'], function(szVal)
 						szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
-						mon.shortAlias = szVal
-						D.CheckFrame(l_config)
+						D.ModifyMonitor(mon, 'shortAlias', szVal)
 					end, function() end, function() end, nil, mon.shortAlias or mon.name)
 				end,
 				rgb = mon.rgbShortAlias,
 				bColorTable = true,
 				fnChangeColor = function(_, r, g, b)
-					mon.rgbShortAlias = { r, g, b }
-					D.CheckFrame(l_config)
+					D.ModifyMonitor(mon, 'rgbShortAlias', { r, g, b })
 				end,
 			},
 		}
@@ -324,8 +310,7 @@ local function DrawDetail(ui)
 				bCheck = true,
 				bChecked = mon.kungfus.all,
 				fnAction = function()
-					mon.kungfus.all = not mon.kungfus.all
-					D.CheckFrame(l_config)
+					D.ModifyMonitor(mon, 'kungfus.all', not mon.kungfus.all)
 				end,
 			},
 		}
@@ -337,8 +322,7 @@ local function DrawDetail(ui)
 					bCheck = true,
 					bChecked = mon.kungfus[dwKungfuID],
 					fnAction = function()
-						mon.kungfus[dwKungfuID] = not mon.kungfus[dwKungfuID]
-						D.CheckFrame(l_config)
+						D.ModifyMonitor(mon, {'kungfus', dwKungfuID}, not mon.kungfus[dwKungfuID])
 					end,
 					fnDisable = function() return mon.kungfus.all end,
 				})
@@ -354,8 +338,7 @@ local function DrawDetail(ui)
 				bCheck = true,
 				bChecked = mon.tarkungfus.all,
 				fnAction = function()
-					mon.tarkungfus.all = not mon.tarkungfus.all
-					D.CheckFrame(l_config)
+					D.ModifyMonitor(mon, 'tarkungfus.all', not mon.tarkungfus.all)
 				end,
 			},
 			{
@@ -364,8 +347,7 @@ local function DrawDetail(ui)
 				bCheck = true,
 				bChecked = mon.tarkungfus.npc,
 				fnAction = function()
-					mon.tarkungfus.npc = not mon.tarkungfus.npc
-					D.CheckFrame(l_config)
+					D.ModifyMonitor(mon, 'tarkungfus.npc', not mon.tarkungfus.npc)
 				end,
 				fnDisable = function() return mon.tarkungfus.all end,
 			},
@@ -378,8 +360,7 @@ local function DrawDetail(ui)
 					bCheck = true,
 					bChecked = mon.tarkungfus[dwKungfuID],
 					fnAction = function()
-						mon.tarkungfus[dwKungfuID] = not mon.tarkungfus[dwKungfuID]
-						D.CheckFrame(l_config)
+						D.ModifyMonitor(mon, {'tarkungfus', dwKungfuID}, not mon.tarkungfus[dwKungfuID])
 					end,
 					fnDisable = function() return mon.tarkungfus.all end,
 				})
@@ -423,8 +404,7 @@ local function DrawDetail(ui)
 				bCheck = true,
 				bChecked = mon.ignoreId,
 				fnAction = function()
-					mon.ignoreId = not mon.ignoreId
-					D.CheckFrame(l_config)
+					D.ModifyMonitor(mon, 'ignoreId', not mon.ignoreId)
 				end,
 				szIcon = 'fromiconid',
 				nFrame = mon.iconid,
@@ -444,8 +424,7 @@ local function DrawDetail(ui)
 					bCheck = true,
 					bChecked = info.enable,
 					fnAction = function()
-						info.enable = not info.enable
-						D.CheckFrame(l_config)
+						D.ModifyMonitorId(info, 'enable', not info.enable)
 					end,
 					fnDisable = function()
 						return mon.ignoreId
@@ -460,8 +439,7 @@ local function DrawDetail(ui)
 							return
 						end
 						UI.OpenIconPanel(function(dwIcon)
-							info.iconid = dwIcon
-							D.CheckFrame(l_config)
+							D.ModifyMonitorId(info, 'iconid', dwIcon)
 						end)
 						Wnd.CloseWindow('PopupMenuPanel')
 					end,
@@ -474,8 +452,7 @@ local function DrawDetail(ui)
 						bCheck = true,
 						bChecked = info.ignoreLevel,
 						fnAction = function()
-							info.ignoreLevel = not info.ignoreLevel
-							D.CheckFrame(l_config)
+							D.ModifyMonitorId(info, 'ignoreLevel', not info.ignoreLevel)
 						end,
 						szIcon = 'fromiconid',
 						nFrame = info.iconid,
@@ -500,8 +477,7 @@ local function DrawDetail(ui)
 								bCheck = true,
 								bChecked = infoLevel.enable,
 								fnAction = function()
-									infoLevel.enable = not infoLevel.enable
-									D.CheckFrame(l_config)
+									D.ModifyMonitorLevel(infoLevel, 'enable', not infoLevel.enable)
 								end,
 								fnDisable = function()
 									return mon.ignoreId or info.ignoreLevel
@@ -513,8 +489,7 @@ local function DrawDetail(ui)
 								szLayer = 'ICON_RIGHTMOST',
 								fnClickIcon = function()
 									UI.OpenIconPanel(function(dwIcon)
-										infoLevel.iconid = dwIcon
-										D.CheckFrame(l_config)
+										D.ModifyMonitorLevel(infoLevel, 'iconid', dwIcon)
 									end)
 									Wnd.CloseWindow('PopupMenuPanel')
 								end,
@@ -542,8 +517,8 @@ local function DrawDetail(ui)
 								else
 									dwIconID = Table_GetBuffIconID(dwID, nLevel) or dwIconID
 								end
-								info.levels[nLevel] = D.FormatMonItemLevelStructure({ iconid = dwIconID })
-								D.CheckFrame(l_config)
+								local infoLevel = D.CreateMonitorLevel(info, nLevel)
+								D.ModifyMonitorLevel(infoLevel, 'iconid', dwIconID)
 							end
 						end, function() end, function() end, nil, nil)
 					end,
@@ -551,8 +526,7 @@ local function DrawDetail(ui)
 				insert(t2, {
 					szOption = _L['Delete'],
 					fnAction = function()
-						mon.ids[dwID] = nil
-						D.CheckFrame(l_config)
+						D.DeleteMonitorId(mon, dwID)
 					end,
 				})
 				insert(t1, t2)
@@ -563,8 +537,7 @@ local function DrawDetail(ui)
 			szOption = _L['Auto capture by name'],
 			bCheck = true, bChecked = mon.capture,
 			fnAction = function()
-				mon.capture = not mon.capture
-				D.CheckFrame(l_config)
+				D.ModifyMonitor(mon, 'capture', not mon.capture)
 			end,
 		})
 		insert(t1, {
@@ -583,8 +556,8 @@ local function DrawDetail(ui)
 						else
 							dwIconID = Table_GetBuffIconID(dwID, 1) or 13
 						end
-						mon.ids[dwID] = D.FormatMonItemStructure({ iconid = dwIconID })
-						D.CheckFrame(l_config)
+						local info = D.CreateMonitorId(mon, dwID)
+						D.ModifyMonitorId(info, 'iconid', dwIconID)
 					end
 				end, function() end, function() end, nil, nil)
 			end,
@@ -780,8 +753,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		value = config.maxLineCount,
 		textfmt = function(val) return _L('Display %d eachline.', val) end,
 		onchange = function(val)
-			config.maxLineCount = val
-			D.CheckFrame(config)
+			D.ModifyConfig(config, 'maxLineCount', val)
 		end,
 		autoenable = function() return config.enable end,
 	})
@@ -825,8 +797,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		value = config.scale * 100,
 		textfmt = function(val) return _L('Scale %d%%.', val) end,
 		onchange = function(val)
-			config.scale = val / 100
-			D.CheckFrame(config)
+			D.ModifyConfig(config, 'scale', val / 100)
 		end,
 		autoenable = function() return config.enable end,
 	})
@@ -870,8 +841,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		value = config.cdBarWidth,
 		textfmt = function(val) return _L('CD width %dpx.', val) end,
 		onchange = function(val)
-			config.cdBarWidth = val
-			D.CheckFrame(config)
+			D.ModifyConfig(config, 'cdBarWidth', val)
 		end,
 		autoenable = function() return config.enable end,
 	})
@@ -898,8 +868,7 @@ local function DrawPreview(ui, config, OpenDetail)
 				subt = {
 					szOption = text,
 					fnAction = function()
-						config.boxBgUITex = text
-						D.CheckFrame(config)
+						D.ModifyConfig(config, 'boxBgUITex', text)
 					end,
 					szIcon = szIcon,
 					nFrame = nFrame,
@@ -926,8 +895,7 @@ local function DrawPreview(ui, config, OpenDetail)
 				subt = {
 					szOption = text,
 					fnAction = function()
-						config.cdBarUITex = text
-						D.CheckFrame(config)
+						D.ModifyConfig(config, 'cdBarUITex', text)
 					end,
 					szIcon = szIcon,
 					nFrame = nFrame,
@@ -958,8 +926,7 @@ local function DrawPreview(ui, config, OpenDetail)
 			end
 		end,
 		onchange = function(val)
-			config.decimalTime = val
-			D.CheckFrame(config)
+			D.ModifyConfig(config, 'decimalTime', val)
 		end,
 		autoenable = function() return config.enable end,
 	})

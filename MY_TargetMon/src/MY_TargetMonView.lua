@@ -35,7 +35,7 @@ local Get, GetPatch, ApplyPatch, RandomChild = MY.Get, MY.GetPatch, MY.ApplyPatc
 local D = {
 	GetTarget = MY_TargetMonData.GetTarget,
 	GetViewData = MY_TargetMonData.GetViewData,
-	SetConfigData = MY_TargetMonConfig.SetData,
+	ModifyConfig = MY_TargetMonConfig.ModifyConfig,
 }
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/ui/MY_TargetMon.ini'
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TargetMon/lang/')
@@ -56,7 +56,7 @@ end
 function D.SaveAnchor(frame)
 	local szAnchorBase = frame.tViewData.szAnchorBase
 	local tAnchor = GetFrameAnchor(frame, szAnchorBase)
-	D.SetConfigData(frame.tViewData.szUuid, {'anchor'}, tAnchor)
+	D.ModifyConfig(frame.tViewData.szUuid, 'anchor', tAnchor)
 end
 
 function D.UpdateAnchor(frame)
@@ -122,7 +122,10 @@ function D.UpdateFrame(frame)
 		frame.nHeight = 50
 		D.UpdateHotkey(frame)
 		D.UpdateScale(frame)
-		D.UpdateAnchor(frame)
+	end
+	if frame.nMaxLineCount ~= tViewData.nMaxLineCount then
+		bRequireFormatPos = true
+		frame.nMaxLineCount = tViewData.nMaxLineCount
 	end
 	local hTotal, hList, nIndex, hItem = frame.hTotal, frame.hList, 0
 	for _, item in ipairs(tViewData.aItem) do
@@ -179,6 +182,7 @@ function D.UpdateFrame(frame)
 			hItem.bCdBar = tViewData.bCdBar
 			hItem.nCdBarWidth = tViewData.nCdBarWidth
 			hItem.fFontScale = tViewData.fFontScale
+			bRequireFormatPos = true
 		end
 		if hItem.nIcon ~= item.nIcon then
 			hItem.box:SetObjectIcon(item.nIcon)
@@ -196,9 +200,13 @@ function D.UpdateFrame(frame)
 			hItem.imgProcess:SetPercentage(1 - item.fCd)
 			hItem.fProgress = item.fCd
 		end
-		if hItem.szCdBarUITex ~= item.szCdBarUITex and tViewData.bCdBar then
+		if hItem.szCdBarUITex ~= tViewData.szCdBarUITex and tViewData.bCdBar then
 			UI(hItem.imgProcess):image(tViewData.szCdBarUITex)
-			hItem.szCdBarUITex = item.szCdBarUITex
+			hItem.szCdBarUITex = tViewData.szCdBarUITex
+		end
+		if hItem.szBoxBgUITex ~= tViewData.szBoxBgUITex then
+			UI(hItem.imgBoxBg):image(tViewData.szBoxBgUITex)
+			hItem.szBoxBgUITex = tViewData.szBoxBgUITex
 		end
 		if hItem.bStaring ~= item.bStaring then
 			hItem.box:SetObjectStaring(item.bStaring)
@@ -210,7 +218,7 @@ function D.UpdateFrame(frame)
 		end
 		if hItem.szBoxExtentAnimate ~= item.aExtentAnimate[1]
 		or hItem.nBoxExtentAnimate ~= item.aExtentAnimate[2] then
-			if hItem.szBoxExtentAnimate then
+			if item.aExtentAnimate[1] then
 				hItem.box:SetExtentAnimate(unpack(item.aExtentAnimate))
 			else
 				hItem.box:ClearExtentAnimate()
@@ -268,6 +276,7 @@ function D.UpdateFrame(frame)
 		hTotal:SetSize(frame.nWidth, frame.nHeight)
 		frame:SetSize(frame.nWidth, frame.nHeight)
 		frame:SetDragArea(0, 0, frame.nWidth, frame.nHeight)
+		D.UpdateAnchor(frame)
 	end
 	if frame.bPenetrable ~= tViewData.bPenetrable
 	or frame.bDragable ~= tViewData.bDragable then
