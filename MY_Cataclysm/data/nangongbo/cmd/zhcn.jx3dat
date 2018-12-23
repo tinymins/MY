@@ -155,6 +155,11 @@ data = {
     {dwID=13443,col="#FFFF00FF",szReminder="弓",nPriority=7},--弓狼的凝视---狼牙堡·狼神殿
     {dwID=13363,col="#00FFFF00",szReminder="粘",nPriority=8},--粘液---狼牙堡·狼神殿
     {dwID=13378,col="#FF3232FF",szReminder="黏",nPriority=6,bAttention=true},--黏液---狼牙堡·狼神殿
+    {dwID=4398,col="#FFFF00FF",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--点名测试1---测试
+    {dwID=12674,col="#FFFF00FF",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--点名测试2---测试
+    {dwID=13167,col="#FFFF00FF",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--命运的纠缠---测试
+    {dwID=13177,col="#FFFF00FF",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--双人点名充能---测试
+    {dwID=13191,col="#FFFF00FF",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--点名---测试
     {dwID=1263},--经脉畅行---通用
     {dwID=3678},--重御---通用
     {dwID=5034,col="#00FF0000",szReminder="修",nPriority=8},--宠物宝宝的宝贝---通用
@@ -181,5 +186,5 @@ data = {
     {dwID=9544,col="#00FF00FF",szReminder="笑",nPriority=7},--笑傲光阴---长歌
     {dwID=9265,col="#00FF00FF",szReminder="云",nPriority=7},--云生结海---长歌
     {dwID=9299,col="#FF8000FF",szReminder="杯",nPriority=7},--杯水留影---长歌
-    --【南宫伯是帅咩】更新日期1120
+    --【南宫伯是帅咩】更新日期1220
 }

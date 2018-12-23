@@ -22,7 +22,8 @@ data = {
 
     ['Please input name:'] = '請輸入名稱：',
     ['Display %d eachline.'] = '每行%d個',
-    ['Scale %d%%.'] = '縮放%d%%',
+    ['UI scale %d%%.'] = '界面縮放%d%%',
+    ['Font scale %d%%.'] = '文字縮放%d%%',
     ['CD width %dpx.'] = '倒計時寬%dpx',
     ['Select style'] = '選擇風格',
     ['Countdown style'] = '計時風格',

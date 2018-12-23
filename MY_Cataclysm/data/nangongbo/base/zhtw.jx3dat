@@ -175,12 +175,13 @@ data = {
     {dwID=8014,col="#FF323200",szReminder="恐",nPriority=8},--恐懼---太原之戰·逐虎驅狼
     {dwID=5343,col="#FF00FFFF",szReminder="龍",nPriority=7},--龍相氣勁---戰寶軍械庫
     {dwID=5475,col="#00FFFFFF",szReminder="雁",nPriority=7},--雁返疊雲---戰寶軍械庫
-    {dwID=5441,col="#0050FF00",szReminder="乘",nPriority=8},--乘風箭---戰寶軍械庫
+    {dwID=5441,col="#00FFFFFF",szReminder="乘",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#00FFFF"},--乘風箭---戰寶軍械庫
     {dwID=5331,col="#FF3232FF",szReminder="紅",nPriority=7},--紅塵落英掌---戰寶軍械庫
     {dwID=5476,col="#FFFF00FF",szReminder="枯",nPriority=3,bScreenHead=true,colScreenHead="#FFFF00"},--枯火---戰寶軍械庫
+    {dwID=5439,col="#FFFF00FF",nPriority=7},--碎骨---戰寶軍械庫
     {dwID=5871,col="#FF00FFFF",szReminder="孤",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--孤雁唳---戰寶軍械庫
     {dwID=5872,col="#FF00FFFF",szReminder="孤",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--孤雁唳---戰寶軍械庫
-    {dwID=5880,col="#0050FFFF",szReminder="乘",nPriority=7},--乘風箭---戰寶軍械庫
+    {dwID=4934,col="#00FF00FF",szReminder="令",nPriority=7},--軍令---戰寶軍械庫
     {dwID=7376,col="#FF00FF00",szReminder="情",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--痴斷情腸·情---風雪稻香村
     {dwID=7377,col="#FF00FF00",szReminder="痴",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--痴斷情腸·痴---風雪稻香村
     {dwID=7380,col="#FF3232FF",szReminder="狡",nPriority=7},--狡兔三窟---風雪稻香村
@@ -190,10 +191,10 @@ data = {
     {dwID=7371,col="#0050FF00",szReminder="雪",nPriority=8},--雪舞懼散---風雪稻香村
     {dwID=7374,col="#00FFFFFF",szReminder="坐",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#00FFFF"},--坐困愁城---風雪稻香村
     {dwID=7452,col="#FF3232FF",szReminder="注",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--注視---風雪稻香村
-    {dwID=7295,col="#FF00FFFF",szReminder="寒",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF00FF"},--寒雪---風雪稻香村
+    {dwID=7295,col="#8055FFFF",szReminder="寒",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#8055FF"},--寒雪---風雪稻香村
     {dwID=7296,col="#FF00FFFF",szReminder="夜",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF00FF"},--夜雪---風雪稻香村
-    {dwID=7297,col="#FF323200",szReminder="索",nPriority=8},--索敵---風雪稻香村
-    {dwID=7285,col="#8055FFFF",szReminder="毒",nPriority=7},--毒鴆---風雪稻香村
+    {dwID=7297,col="#FF3232FF",szReminder="索",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--索敵---風雪稻香村
+    {dwID=7285,col="#FFFF00FF",szReminder="毒",nPriority=6,bAttention=true},--毒鴆---風雪稻香村
     {dwID=6666,col="#FF800000",szReminder="牽",nPriority=3,bScreenHead=true,colScreenHead="#FF8000"},--牽引---風雪稻香村
     {dwID=6681,col="#00FF0000",szReminder="乾",nPriority=3,bScreenHead=true,colScreenHead="#00FF00"},--卦勁·乾---風雪稻香村
     {dwID=6682,col="#00FF0000",szReminder="坤",nPriority=3,bScreenHead=true,colScreenHead="#00FF00"},--卦勁·坤---風雪稻香村
@@ -307,6 +308,7 @@ data = {
     {dwID=13638,col="#0050FFFF",szReminder="愧",nPriority=7},--愧疚---九辯館
     {dwID=14017,nLevel=1,col="#FFFF00FF",szReminder="連",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--水月連影---九辯館
     {dwID=14017,nLevel=2,col="#FFFF00FF",szReminder="連",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--水月連影---九辯館
+    {dwID=14461,col="#FF00FFFF",szReminder="玄",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--玄陰殘照的目標---九辯館
     {dwID=14018,col="#FF3232FF",szReminder="崩",nPriority=6,bAttention=true},--水月連影-崩---九辯館
     {dwID=14015,col="#FF00FFFF",szReminder="蠻",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--蠻熊勁---大衍盤絲洞
     {dwID=13765,col="#00FFFF00",szReminder="溢",nPriority=8},--真氣溢出---大衍盤絲洞
@@ -364,18 +366,29 @@ data = {
     {dwID=13608,col="#00FF00FF",szReminder="信",nPriority=7},--紅衣教信仰---冰火島·荒血路
     {dwID=13609,col="#FF3232FF",szReminder="仇",nPriority=7},--紅衣教仇恨---冰火島·荒血路
     {dwID=13624,col="#FF3232FF",szReminder="律",nPriority=6,bAttention=true},--紅衣律制---冰火島·荒血路
-    {dwID=13724,col="#FFFF0000",szReminder="戒",nPriority=7},--戒律---冰火島·荒血路
-    {dwID=13639,col="#FF00FFFF",szReminder="惑",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF00FF"},--幻惑---冰火島·荒血路
+    {dwID=13724,col="#FFFF0000",szReminder="戒",nPriority=8},--戒律---冰火島·荒血路
+    {dwID=13639,col="#FF00FFFF",szReminder="惑",nPriority=6,bAttention=true},--幻惑---冰火島·荒血路
     {dwID=13896,col="#00FF00FF",szReminder="夢",nPriority=7},--夢境同調---冰火島·荒血路
     {dwID=13835,col="#FF3232FF",szReminder="傷",nPriority=7},--受傷---冰火島·荒血路
     {dwID=14233,col="#8055FFFF",szReminder="錯",nPriority=7},--月下對決·經脈錯亂---冰火島·荒血路
     {dwID=13645,col="#8055FF00",szReminder="祭",nPriority=5,bCaution=true},--祭祀---冰火島·荒血路
     {dwID=13713,col="#8055FF00",szReminder="祭",nPriority=5,bCaution=true},--祭祀---冰火島·荒血路
-    {dwID=13819,col="#FF323200",szReminder="裂",nPriority=8},--傷口裂開---冰火島·荒血路
-    {dwID=13800,col="#FFFF0000",szReminder="摧",nPriority=7},--摧形元火---冰火島·青蓮獄
+    {dwID=13721,col="#FF00FFFF",szReminder="審",nPriority=6,bAttention=true},--審判傷痕---冰火島·荒血路
+    {dwID=14031,col="#FF3232FF",szReminder="搬",nPriority=7},--搬運負重---冰火島·荒血路
+    {dwID=13819,col="#FF3232FF",szReminder="裂",nPriority=7},--傷口裂開---冰火島·荒血路
+    {dwID=13800,col="#FFFF0000",szReminder="摧",nPriority=8},--摧形元火---冰火島·青蓮獄
     {dwID=13959,col="#FF3232FF",szReminder="熱",nPriority=7},--永燃之火·熱度---冰火島·青蓮獄
     {dwID=13960,col="#00FFFFFF",szReminder="寒",nPriority=7},--寒玉裂片·寒意---冰火島·青蓮獄
-    {dwID=14123,col="#FF800000",szReminder="流",nPriority=7},--游刃流火---冰火島·青蓮獄
+    {dwID=14123,col="#FF800000",szReminder="流",nPriority=8},--游刃流火---冰火島·青蓮獄
+    {dwID=14345,col="#FF8000FF",nPriority=7},--斷火餘溫---冰火島·青蓮獄
+    {dwID=14347,col="#0050FFFF",szReminder="裂",nPriority=7},--寒玉裂片·皸裂---冰火島·青蓮獄
+    {dwID=13928,col="#FFFF0000",szReminder="炮",nPriority=8},--青蓮獄火炮---冰火島·青蓮獄
+    {dwID=13929,col="#FFFF0000",szReminder="炮",nPriority=8},--青蓮獄火炮---冰火島·青蓮獄
+    {dwID=13930,col="#FFFF0000",szReminder="炮",nPriority=8},--青蓮獄火炮---冰火島·青蓮獄
+    {dwID=13931,col="#FFFF0000",szReminder="炮",nPriority=8},--青蓮獄火炮---冰火島·青蓮獄
+    {dwID=14389,col="#FFFF0000",szReminder="痕",nPriority=8},--火流星痕---冰火島·青蓮獄
+    {dwID=14386,col="#00FF0000",szReminder="怒",nPriority=8},--天鷲震怒---冰火島·青蓮獄
+    {dwID=14374,col="#FF00FFFF",szReminder="預",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--星隕預兆---冰火島·青蓮獄
     {dwID=12788,col="#FFFF00FF",szReminder="圖",nPriority=7},--圖蘭的挑唆---龍門絕境
     {dwID=12724},--狂沙---龍門絕境
     {dwID=12787},--追命---龍門絕境
@@ -394,10 +407,12 @@ data = {
     {dwID=11956},--網縛---其他
     {dwID=12651},--藏匿---其他
     {dwID=208},--彈跳---通用
+    {dwID=13584,col="#FF3232FF",nPriority=7},--狂犬病---通用
+    {dwID=13587,col="#FF00FFFF",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--破傷風---其他
     {dwID=4246},--朝聖---明教
     {dwID=9744},--朝聖---明教
     {dwID=9745},--朝聖---明教
     {dwID=4244},--渡厄---明教
     {dwID=13771},--疾電叱羽---蓬萊
-    --【南宮伯是帥咩】更新日期1120
+    --【南宮伯是帥咩】更新日期1220
 }
