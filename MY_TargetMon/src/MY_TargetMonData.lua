@@ -47,10 +47,11 @@ local C, D = {}, {
 	ModifyMonitorLevel = MY_TargetMonConfig.ModifyMonitorLevel,
 }
 local BUFF_CACHE = {} -- 下标为目标ID的目标BUFF缓存数组 反正ID不可能是doodad不会冲突
-local BUFF_INFO = {}
-local BUFF_TIME = {}
-local SKILL_CACHE = {}
-local SKILL_INFO = {}
+local BUFF_INFO = {} -- BUFF反向索引
+local BUFF_TIME = {} -- BUFF最长持续时间
+local SKILL_EXTRA = {} -- 缓存自己放过的技能用于扫描
+local SKILL_CACHE = {} -- 下标为目标ID的目标技能缓存数组 反正ID不可能是doodad不会冲突
+local SKILL_INFO = {} -- 技能反向索引
 local VIEW_LIST = {}
 local BOX_SPARKING_FRAME = GLOBAL.GAME_FPS * 2 / 3
 
@@ -93,18 +94,9 @@ function D.GetTarget(eTarType, eMonType)
 end
 end
 
--- 更新技能反向索引
 do
 local function OnSkill(dwID, nLevel)
-	local szName = Table_GetSkillName(dwID, nLevel)
-	if not szName then
-		return
-	end
-	local KSkill, skill = MY.GetSkill(dwID, nLevel)
-	if not KSkill or not skill then
-		return
-	end
-	SKILL_INFO[szName][skill.szKey] = skill
+	SKILL_EXTRA[dwID] = dwID
 end
 local function OnSysMsg(event)
 	if arg0 == 'UI_OME_SKILL_CAST_LOG' then
@@ -117,6 +109,11 @@ local function OnSysMsg(event)
 			return
 		end
 		OnSkill(arg4, arg5)
+	elseif arg0 == 'UI_OME_SKILL_EFFECT_LOG' then
+		if arg4 ~= SKILL_EFFECT_TYPE.SKILL or arg1 ~= UI_GetClientPlayerID() then
+			return
+		end
+		OnSkill(arg5, arg6)
 	end
 end
 MY.RegisterEvent('SYS_MSG.MY_TargetMon_SKILL', OnSysMsg)
@@ -455,34 +452,36 @@ local function OnBreathe()
 	if me then
 		local tSkill = {}
 		local aSkill = MY.GetTargetSkillIDs(me)
-		-- 遍历所有技能
-		for _, dwID in ipairs(aSkill) do
-			local nLevel = me.GetSkillLevel(dwID)
-			local KSkill, info = MY.GetSkill(dwID, nLevel)
-			if KSkill and info then
-				local bCool, szType, nLeft, nInterval, nTotal, nCount, nMaxCount, nSurfaceNum = MY.GetSkillCDProgress(me, dwID, nLevel, true)
-				local skill = {
-					dwID = dwID,
-					nLevel = info.nLevel,
-					szKey = dwID,
-					bCool = bCool or nCount > 0,
-					szCdType = szType,
-					nCdLeft = nLeft,
-					nCdInterval = nInterval,
-					nCdTotal = nTotal,
-					nCdCount = nCount,
-					nCdMaxCount = nMaxCount,
-					nSurfaceNum = nSurfaceNum,
-					nIcon = info.nIcon,
-					szName = MY.GetSkillName(dwID),
-				}
-				tSkill[skill.szName] = skill
-				tSkill[skill.dwID] = skill
-				tSkill[skill.szKey] = skill
-				if not SKILL_INFO[skill.szName] then
-					SKILL_INFO[skill.szName] = {}
+		-- 遍历所有技能 生成反向索引
+		for _, dwID in spairs(aSkill, SKILL_EXTRA) do
+			if not tSkill[dwID] then
+				local nLevel = me.GetSkillLevel(dwID)
+				local KSkill, info = MY.GetSkill(dwID, nLevel)
+				if KSkill and info then
+					local bCool, szType, nLeft, nInterval, nTotal, nCount, nMaxCount, nSurfaceNum = MY.GetSkillCDProgress(me, dwID, nLevel, true)
+					local skill = {
+						dwID = dwID,
+						nLevel = info.nLevel,
+						szKey = dwID,
+						bCool = bCool or nCount > 0,
+						szCdType = szType,
+						nCdLeft = nLeft,
+						nCdInterval = nInterval,
+						nCdTotal = nTotal,
+						nCdCount = nCount,
+						nCdMaxCount = nMaxCount,
+						nSurfaceNum = nSurfaceNum,
+						nIcon = info.nIcon,
+						szName = MY.GetSkillName(dwID),
+					}
+					tSkill[skill.szName] = skill
+					tSkill[skill.dwID] = skill
+					tSkill[skill.szKey] = skill
+					if not SKILL_INFO[skill.szName] then
+						SKILL_INFO[skill.szName] = {}
+					end
+					SKILL_INFO[skill.szName][skill.szKey] = skill
 				end
-				SKILL_INFO[skill.szName][skill.szKey] = skill
 			end
 		end
 		-- 处理消失的buff
