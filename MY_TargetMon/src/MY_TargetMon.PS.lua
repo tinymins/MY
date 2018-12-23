@@ -665,55 +665,6 @@ local function DrawPreview(ui, config, OpenDetail)
 		end,
 		autoenable = function() return config.enable end,
 	})
-
-	ui:append('WndComboBox', {
-		x = w - 250, y = y, w = 135,
-		text = _L['Set target'],
-		menu = function()
-			local t = {}
-			for _, eType in ipairs(D.GetTargetTypeList()) do
-				insert(t, {
-					szOption = _L.TARGET[eType],
-					bCheck = true, bMCheck = true,
-					bChecked = eType == (config.type == 'SKILL' and 'CONTROL_PLAYER' or config.target),
-					fnDisable = function()
-						return config.type == 'SKILL' and eType ~= 'CONTROL_PLAYER'
-					end,
-					fnAction = function()
-						config.target = eType
-					end,
-				})
-			end
-			insert(t, { bDevide = true })
-			for _, eType in ipairs({'BUFF', 'SKILL'}) do
-				insert(t, {
-					szOption = _L.TYPE[eType],
-					bCheck = true, bMCheck = true, bChecked = eType == config.type,
-					fnAction = function()
-						config.type = eType
-					end,
-				})
-			end
-			insert(t, { bDevide = true })
-			for _, eType in ipairs({'LEFT', 'RIGHT', 'CENTER'}) do
-				insert(t, {
-					szOption = _L.ALIGNMENT[eType],
-					bCheck = true, bMCheck = true, bChecked = eType == config.alignment,
-					fnAction = function()
-						config.alignment = eType
-					end,
-				})
-			end
-			return t
-		end,
-		autoenable = function() return config.enable end,
-	})
-	ui:append('WndButton2', {
-		x = w - 110, y = y, w = 102,
-		text = _L['Set monitor'],
-		onclick = function() OpenDetail(config) end,
-		autoenable = function() return config.enable end,
-	})
 	y = y + 30
 
 	x = X + 20
@@ -743,18 +694,6 @@ local function DrawPreview(ui, config, OpenDetail)
 		checked = config.ignoreSystemUIScale,
 		oncheck = function(bChecked)
 			D.ModifyConfig(config, 'ignoreSystemUIScale', bChecked)
-		end,
-		autoenable = function() return config.enable end,
-	})
-
-	ui:append('WndSliderBox', {
-		x = w - 250, y = y,
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
-		range = {1, 32},
-		value = config.maxLineCount,
-		textfmt = function(val) return _L('Display %d eachline.', val) end,
-		onchange = function(val)
-			D.ModifyConfig(config, 'maxLineCount', val)
 		end,
 		autoenable = function() return config.enable end,
 	})
@@ -790,18 +729,6 @@ local function DrawPreview(ui, config, OpenDetail)
 		end,
 		autoenable = function() return config.enable and not config.hideVoid end,
 	})
-
-	ui:append('WndSliderBox', {
-		x = w - 250, y = y,
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
-		range = {1, 300},
-		value = config.scale * 100,
-		textfmt = function(val) return _L('Scale %d%%.', val) end,
-		onchange = function(val)
-			D.ModifyConfig(config, 'scale', val / 100)
-		end,
-		autoenable = function() return config.enable end,
-	})
 	y = y + 30
 
 	x = X + 20
@@ -831,18 +758,6 @@ local function DrawPreview(ui, config, OpenDetail)
 		checked = config.showTime,
 		oncheck = function(bChecked)
 			D.ModifyConfig(config, 'showTime', bChecked)
-		end,
-		autoenable = function() return config.enable end,
-	})
-
-	ui:append('WndSliderBox', {
-		x = w - 250, y = y,
-		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
-		range = {50, 1000},
-		value = config.cdBarWidth,
-		textfmt = function(val) return _L('CD width %dpx.', val) end,
-		onchange = function(val)
-			D.ModifyConfig(config, 'cdBarWidth', val)
 		end,
 		autoenable = function() return config.enable end,
 	})
@@ -911,6 +826,110 @@ local function DrawPreview(ui, config, OpenDetail)
 		end,
 		autoenable = function() return config.enable end,
 	})
+	y = y + 30
+
+	y = Y + 30
+	ui:append('WndComboBox', {
+		x = w - 250, y = y, w = 135,
+		text = _L['Set target'],
+		menu = function()
+			local t = {}
+			for _, eType in ipairs(D.GetTargetTypeList()) do
+				insert(t, {
+					szOption = _L.TARGET[eType],
+					bCheck = true, bMCheck = true,
+					bChecked = eType == (config.type == 'SKILL' and 'CONTROL_PLAYER' or config.target),
+					fnDisable = function()
+						return config.type == 'SKILL' and eType ~= 'CONTROL_PLAYER'
+					end,
+					fnAction = function()
+						config.target = eType
+					end,
+				})
+			end
+			insert(t, { bDevide = true })
+			for _, eType in ipairs({'BUFF', 'SKILL'}) do
+				insert(t, {
+					szOption = _L.TYPE[eType],
+					bCheck = true, bMCheck = true, bChecked = eType == config.type,
+					fnAction = function()
+						config.type = eType
+					end,
+				})
+			end
+			insert(t, { bDevide = true })
+			for _, eType in ipairs({'LEFT', 'RIGHT', 'CENTER'}) do
+				insert(t, {
+					szOption = _L.ALIGNMENT[eType],
+					bCheck = true, bMCheck = true, bChecked = eType == config.alignment,
+					fnAction = function()
+						config.alignment = eType
+					end,
+				})
+			end
+			return t
+		end,
+		autoenable = function() return config.enable end,
+	})
+	ui:append('WndButton2', {
+		x = w - 110, y = y, w = 102,
+		text = _L['Set monitor'],
+		onclick = function() OpenDetail(config) end,
+		autoenable = function() return config.enable end,
+	})
+	y = y + 25
+
+	ui:append('WndSliderBox', {
+		x = w - 250, y = y,
+		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		range = {1, 32},
+		value = config.maxLineCount,
+		textfmt = function(val) return _L('Display %d eachline.', val) end,
+		onchange = function(val)
+			D.ModifyConfig(config, 'maxLineCount', val)
+		end,
+		autoenable = function() return config.enable end,
+	})
+	y = y + 25
+
+	ui:append('WndSliderBox', {
+		x = w - 250, y = y,
+		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		range = {1, 300},
+		value = config.scale * 100,
+		textfmt = function(val) return _L('UI scale %d%%.', val) end,
+		onchange = function(val)
+			D.ModifyConfig(config, 'scale', val / 100)
+		end,
+		autoenable = function() return config.enable end,
+	})
+	y = y + 25
+
+	ui:append('WndSliderBox', {
+		x = w - 250, y = y,
+		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		range = {1, 300},
+		value = config.fontScale * 100,
+		textfmt = function(val) return _L('Font scale %d%%.', val) end,
+		onchange = function(val)
+			D.ModifyConfig(config, 'fontScale', val / 100)
+		end,
+		autoenable = function() return config.enable end,
+	})
+	y = y + 25
+
+	ui:append('WndSliderBox', {
+		x = w - 250, y = y,
+		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		range = {50, 1000},
+		value = config.cdBarWidth,
+		textfmt = function(val) return _L('CD width %dpx.', val) end,
+		onchange = function(val)
+			D.ModifyConfig(config, 'cdBarWidth', val)
+		end,
+		autoenable = function() return config.enable end,
+	})
+	y = y + 25
 
 	ui:append('WndSliderBox', {
 		x = w - 250, y = y,
@@ -931,7 +950,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		end,
 		autoenable = function() return config.enable end,
 	})
-	y = y + 30
+	y = y + 25
 
 	return x, y
 end

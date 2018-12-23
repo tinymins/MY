@@ -5,7 +5,8 @@ return {
 	caption             = "新建目標監控",
 	type                = "BUFF",
 	target              = "CLIENT_PLAYER",
-	scale               = 0.8   , -- 縮放比
+	scale               = 0.8   , -- 界面縮放比
+	fontScale           = 1     , -- 文字縮放比
 	ignoreSystemUIScale = false , -- 禁止系統縮放
 	enable              = false , -- 啟用標記
 	penetrable          = true  , -- 是否穿透

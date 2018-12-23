@@ -150,7 +150,7 @@ local function UpdateView()
 			view.tAnchor              = config.anchor
 			view.szAnchorBase         = config.hideVoid and 'TOPLEFT' or nil
 			view.fUIScale             = config.ignoreSystemUIScale and (config.scale / Station.GetUIScale()) or config.scale
-			view.fFontScale           = (config.ignoreSystemUIScale and 1 or Station.GetUIScale()) * MY.GetFontScale() * config.scale
+			view.fFontScale           = (config.ignoreSystemUIScale and 1 or Station.GetUIScale()) * MY.GetFontScale() * config.scale * config.fontScale
 			view.bPenetrable          = config.penetrable
 			view.bDragable            = config.dragable
 			view.szAlignment          = config.alignment
