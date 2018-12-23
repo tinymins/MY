@@ -157,6 +157,8 @@ function D.UpdateFrame(frame)
 			hItem:EnableScale(true)
 			hItem:Scale(fRelativeScale, fRelativeScale)
 			hItem:EnableScale(false)
+			hItem.nBoxW = hItem.imgBoxBg:GetW()
+			hItem.nBoxH = hItem.imgBoxBg:GetH()
 			hItem.fUIScale = tViewData.fUIScale
 		end
 		if hItem.bCdBar ~= tViewData.bCdBar
