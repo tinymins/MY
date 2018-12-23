@@ -60,9 +60,20 @@ local TARGET_TYPE_LIST = {
 	'TEAM_MARK_DART' ,
 	'TEAM_MARK_FAN'  ,
 }
-local CONFIG, CONFIG_HASH, CONFIG_CHANGED
+local CONFIG, CONFIG_CHANGED
 local CONFIG_TEMPLATE = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_TargetMon/data/template/$lang.jx3dat')
+local MON_TEMPLATE = CONFIG_TEMPLATE.monitors.__CHILD_TEMPLATE__
+local MONID_TEMPLATE = CONFIG_TEMPLATE.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__
+local MONLEVEL_TEMPLATE = CONFIG_TEMPLATE.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__.levels.__CHILD_TEMPLATE__
 local EMBEDDED_CONFIG_LIST, EMBEDDED_CONFIG_HASH, EMBEDDED_MONITOR_HASH = {}, {}, {}
+
+function D.GetTargetTypeList()
+	return TARGET_TYPE_LIST
+end
+
+function D.GeneUUID()
+	return MY.GetUUID():gsub('-', '')
+end
 
 -- 格式化监控项数据
 function D.FormatConfig(config)
@@ -248,7 +259,6 @@ function D.LoadConfig(bDefault, bOriginal, bReloadEmbedded)
 		end
 	end
 	CONFIG = aConfig
-	CONFIG_HASH = tConfig
 	CONFIG_CHANGED = bDefault and true or false
 	FireUIEvent('MY_TARGET_MON_CONFIG_INIT')
 end
@@ -294,21 +304,147 @@ function D.GetConfig(nIndex)
 	return CONFIG
 end
 
-function D.GetTargetTypeList()
-	return TARGET_TYPE_LIST
+------------------------------------------------------------------------------------------------------
+-- 监控设置条操作
+------------------------------------------------------------------------------------------------------
+function D.CreateConfig()
+	local config = MY.FormatDataStructure({
+		uuid = D.GeneUUID(),
+	}, CONFIG_TEMPLATE)
+	insert(CONFIG, config)
+	D.MarkConfigChanged()
+	FireUIEvent('MY_TARGET_MON_CONFIG_INIT')
+	return config
 end
 
-function D.SetData(szUuid, aKey, oVal)
-	local config = CONFIG_HASH[szUuid]
-	if not config then
+function D.MoveConfig(config, offset)
+	for i, v in ipairs(CONFIG) do
+		if v == config then
+			local j = min(max(i + offset, 1), #CONFIG)
+			if j ~= i then
+				remove(CONFIG, i)
+				insert(CONFIG, j, config)
+			end
+			D.MarkConfigChanged()
+			FireUIEvent('MY_TARGET_MON_CONFIG_INIT')
+			break
+		end
+	end
+end
+
+function D.ModifyConfig(config, szKey, oVal)
+	if IsString(config) then
+		for _, v in ipairs(CONFIG) do
+			if v.uuid == config then
+				config = v
+				break
+			end
+		end
+	end
+	if not Set(config, szKey, oVal) then
 		return
 	end
-	if not Set(config, aKey, oVal) then
-		return
-	end
-	if aKey[1] == 'enable' and oVal then
+	if szKey == 'enable' and oVal then
 		FireUIEvent('MY_TARGET_MON_CONFIG_INIT')
 	end
+	D.MarkConfigChanged()
+end
+
+function D.DeleteConfig(config)
+	for i, v in ipairs_r(CONFIG) do
+		if v == config then
+			remove(CONFIG, i)
+			D.MarkConfigChanged()
+			FireUIEvent('MY_TARGET_MON_CONFIG_INIT')
+		end
+	end
+end
+
+------------------------------------------------------------------------------------------------------
+-- 监控内容数据项操作
+------------------------------------------------------------------------------------------------------
+function D.CreateMonitor(config, name)
+	local mon = MY.FormatDataStructure({
+		name = name,
+		uuid = D.GeneUUID(),
+	}, MON_TEMPLATE)
+	insert(config.monitors, mon)
+	D.MarkConfigChanged()
+	return mon
+end
+
+function D.MoveMonitor(config, mon, offset)
+	for i, v in ipairs(config.monitors) do
+		if v == mon then
+			local j = min(max(i + offset, 1), #CONFIG)
+			if j ~= i then
+				remove(config.monitors, i)
+				insert(config.monitors, j, mon)
+			end
+			D.MarkConfigChanged()
+			break
+		end
+	end
+end
+
+function D.ModifyMonitor(mon, szKey, oVal)
+	if not Set(mon, szKey, oVal) then
+		return
+	end
+	D.MarkConfigChanged()
+end
+
+function D.DeleteMonitor(config, mon)
+	for i, v in ipairs(config.monitors) do
+		if v == mon then
+			remove(config.monitors, i)
+			D.MarkConfigChanged()
+			break
+		end
+	end
+end
+
+------------------------------------------------------------------------------------------------------
+-- 监控内容数据项ID列表
+------------------------------------------------------------------------------------------------------
+function D.CreateMonitorId(mon, dwID)
+	local monid = MY.FormatDataStructure(nil, MONID_TEMPLATE)
+	mon.ids[dwID] = monid
+	D.MarkConfigChanged()
+	return monid
+end
+
+function D.ModifyMonitorId(monid, szKey, oVal)
+	if not Set(monid, szKey, oVal) then
+		return
+	end
+	D.MarkConfigChanged()
+end
+
+function D.DeleteMonitorId(mon, dwID)
+	mon.ids[dwID] = nil
+	D.MarkConfigChanged()
+end
+
+------------------------------------------------------------------------------------------------------
+-- 监控内容数据项ID等级列表
+------------------------------------------------------------------------------------------------------
+function D.CreateMonitorLevel(monid, nLevel)
+	local monlevel = MY.FormatDataStructure(nil, MONLEVEL_TEMPLATE)
+	monid.levels[nLevel] = monlevel
+	D.MarkConfigChanged()
+	return monlevel
+end
+
+function D.ModifyMonitorLevel(monlevel, szKey, oVal)
+	if not Set(monlevel, szKey, oVal) then
+		return
+	end
+	D.MarkConfigChanged()
+end
+
+function D.DeleteMonitorLevel(monid, nLevel)
+	monid.levels[nLevel] = nil
 	D.MarkConfigChanged()
 end
 
@@ -318,15 +454,24 @@ local settings = {
 	exports = {
 		{
 			fields = {
-				GetConfig         = D.GetConfig        ,
-				LoadConfig        = D.LoadConfig       ,
-				MarkConfigChanged = D.MarkConfigChanged,
-				GetNewConfig      = D.GetNewConfig     ,
-				GetNewMon         = D.GetNewMon        ,
-				GetNewMonId       = D.GetNewMonId      ,
-				GetNewMonLevel    = D.GetNewMonLevel   ,
-				GetTargetTypeList = D.GetTargetTypeList,
-				SetData           = D.SetData          ,
+				GetTargetTypeList  = D.GetTargetTypeList ,
+				GetConfig          = D.GetConfig         ,
+				LoadConfig         = D.LoadConfig        ,
+				MarkConfigChanged  = D.MarkConfigChanged ,
+				CreateConfig       = D.CreateConfig      ,
+				MoveConfig         = D.MoveConfig        ,
+				ModifyConfig       = D.ModifyConfig      ,
+				DeleteConfig       = D.DeleteConfig      ,
+				CreateMonitor      = D.CreateMonitor     ,
+				MoveMonitor        = D.MoveMonitor       ,
+				ModifyMonitor      = D.ModifyMonitor     ,
+				DeleteMonitor      = D.DeleteMonitor     ,
+				CreateMonitorId    = D.CreateMonitorId   ,
+				ModifyMonitorId    = D.ModifyMonitorId   ,
+				DeleteMonitorId    = D.DeleteMonitorId   ,
+				CreateMonitorLevel = D.CreateMonitorLevel,
+				ModifyMonitorLevel = D.ModifyMonitorLevel,
+				DeleteMonitorLevel = D.DeleteMonitorLevel,
 			},
 		},
 	},

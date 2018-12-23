@@ -37,8 +37,22 @@ if not MY.AssertVersion('MY_TargetMon', _L['MY_TargetMon'], 0x2011800) then
 	return
 end
 local C, D = {}, {
-	GetConfig = MY_TargetMonConfig.GetConfig,
-	SetData = MY_TargetMonConfig.SetData,
+	GetTargetTypeList  = MY_TargetMonConfig.GetTargetTypeList ,
+	GetConfig          = MY_TargetMonConfig.GetConfig         ,
+	CreateConfig       = MY_TargetMonConfig.CreateConfig      ,
+	MoveConfig         = MY_TargetMonConfig.MoveConfig        ,
+	ModifyConfig       = MY_TargetMonConfig.ModifyConfig      ,
+	DeleteConfig       = MY_TargetMonConfig.DeleteConfig      ,
+	CreateMonitor      = MY_TargetMonConfig.CreateMonitor     ,
+	MoveMonitor        = MY_TargetMonConfig.MoveMonitor       ,
+	ModifyMonitor      = MY_TargetMonConfig.ModifyMonitor     ,
+	DeleteMonitor      = MY_TargetMonConfig.DeleteMonitor     ,
+	CreateMonitorId    = MY_TargetMonConfig.CreateMonitorId   ,
+	ModifyMonitorId    = MY_TargetMonConfig.ModifyMonitorId   ,
+	DeleteMonitorId    = MY_TargetMonConfig.DeleteMonitorId   ,
+	CreateMonitorLevel = MY_TargetMonConfig.CreateMonitorLevel,
+	ModifyMonitorLevel = MY_TargetMonConfig.ModifyMonitorLevel,
+	DeleteMonitorLevel = MY_TargetMonConfig.DeleteMonitorLevel,
 }
 local CUSTOM_BOXBG_STYLES = {
 	'UI/Image/Common/Box.UITex|0',
@@ -141,19 +155,15 @@ local function DrawDetail(ui)
 			szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
 			if szVal ~= '' then
 				local aMonList = l_config.monitors
-				local mon = MY_TargetMon.FormatMonStructure({
-					name = szVal,
-					ignoreId = not tonumber(szVal),
-				})
+				local mon = D.CreateMonitor(l_config, szVal)
+				D.ModifyMonitor(mon, 'ignoreId', not tonumber(szVal))
 				if not mon.ignoreId then
-					mon.ids[tonumber(szVal)] = MY_TargetMon.FormatMonItemStructure({
-						enable = true,
-					})
+					local monid = D.CreateMonitorId(mon, tonumber(szVal))
+					D.ModifyMonitorId(monid, 'enable', true)
 				end
-				if not index then
-					index = #aMonList + 1
+				if index then
+					D.MoveMonitor(l_config, mon, #aMonList - index)
 				end
-				insert(aMonList, index, mon)
 				list:listbox(
 					'insert',
 					mon.name or mon.id,
@@ -161,7 +171,6 @@ local function DrawDetail(ui)
 					{ mon = mon, monlist = aMonList },
 					index
 				)
-				D.CheckFrame(l_config)
 			end
 		end, function() end, function() end, nil, '')
 	end
@@ -618,23 +627,15 @@ local function DrawPreview(ui, config, OpenDetail)
 	ui:append('WndEditBox', {
 		x = x + 20, y = y, w = w - 290, h = 22,
 		r = 255, g = 255, b = 0, text = config.caption,
-		onchange = function(val) D.SetData(config.uuid, {'caption'}, val) end,
+		onchange = function(val) D.ModifyConfig(config, 'caption', val) end,
 	})
 	ui:append('WndButton2', {
 		x = w - 180, y = y,
 		w = 50, h = 25,
 		text = _L['Move Up'],
 		onclick = function()
-			for i = 1, #Config do
-				if Config[i] == config then
-					if Config[i - 1] then
-						Config[i], Config[i - 1] = Config[i - 1], Config[i]
-						D.CheckFrame(Config[i])
-						D.CheckFrame(Config[i - 1])
-						return MY.SwitchTab('MY_TargetMon', true)
-					end
-				end
-			end
+			D.MoveConfig(config, -1)
+			MY.SwitchTab('MY_TargetMon', true)
 		end,
 	})
 	ui:append('WndButton2', {
@@ -642,16 +643,8 @@ local function DrawPreview(ui, config, OpenDetail)
 		w = 50, h = 25,
 		text = _L['Move Down'],
 		onclick = function()
-			for i = 1, #Config do
-				if Config[i] == config then
-					if Config[i + 1] then
-						Config[i], Config[i + 1] = Config[i + 1], Config[i]
-						D.CheckFrame(Config[i])
-						D.CheckFrame(Config[i + 1])
-						return MY.SwitchTab('MY_TargetMon', true)
-					end
-				end
-			end
+			D.MoveConfig(config, 1)
+			MY.SwitchTab('MY_TargetMon', true)
 		end,
 	})
 	ui:append('WndButton2', {
@@ -659,12 +652,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		w = 60, h = 25,
 		text = _L['Delete'],
 		onclick = function()
-			for i, c in ipairs_r(Config) do
-				if config == c then
-					remove(Config, i)
-				end
-			end
-			D.CloseFrame(config)
+			D.DeleteConfig(config)
 			MY.SwitchTab('MY_TargetMon', true)
 		end,
 	})
@@ -676,7 +664,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		text = _L['Enable'],
 		checked = config.enable,
 		oncheck = function(bChecked)
-			D.SetData(config.uuid, {'enable'}, bChecked)
+			D.ModifyConfig(config, 'enable', bChecked)
 		end,
 	})
 
@@ -687,7 +675,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
 		checked = config.hideOthers,
 		oncheck = function(bChecked)
-			D.SetData(config.uuid, {'hideOthers'}, bChecked)
+			D.ModifyConfig(config, 'hideOthers', bChecked)
 		end,
 		autoenable = function()
 			return config.enable and config.type == 'BUFF'
@@ -699,7 +687,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		text = _L['Hide void'],
 		checked = config.hideVoid,
 		oncheck = function(bChecked)
-			D.SetData(config.uuid, {'hideVoid'}, bChecked)
+			D.ModifyConfig(config, 'hideVoid', bChecked)
 		end,
 		autoenable = function() return config.enable end,
 	})
@@ -709,7 +697,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		text = _L['Set target'],
 		menu = function()
 			local t = {}
-			for _, eType in ipairs(TARGET_TYPE_LIST) do
+			for _, eType in ipairs(D.GetTargetTypeList()) do
 				insert(t, {
 					szOption = _L.TARGET[eType],
 					bCheck = true, bMCheck = true,
@@ -719,7 +707,6 @@ local function DrawPreview(ui, config, OpenDetail)
 					end,
 					fnAction = function()
 						config.target = eType
-						D.CheckFrame(config)
 					end,
 				})
 			end
@@ -730,7 +717,6 @@ local function DrawPreview(ui, config, OpenDetail)
 					bCheck = true, bMCheck = true, bChecked = eType == config.type,
 					fnAction = function()
 						config.type = eType
-						D.CheckFrame(config)
 					end,
 				})
 			end
@@ -741,7 +727,6 @@ local function DrawPreview(ui, config, OpenDetail)
 					bCheck = true, bMCheck = true, bChecked = eType == config.alignment,
 					fnAction = function()
 						config.alignment = eType
-						D.CheckFrame(config)
 					end,
 				})
 			end
@@ -763,7 +748,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		text = _L['Penetrable'],
 		checked = config.penetrable,
 		oncheck = function(bChecked)
-			D.SetData(config.uuid, {'penetrable'}, bChecked)
+			D.ModifyConfig(config, 'penetrable', bChecked)
 		end,
 		autoenable = function() return config.enable end,
 	})
@@ -773,7 +758,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		text = _L['Undragable'],
 		checked = not config.dragable,
 		oncheck = function(bChecked)
-			D.SetData(config.uuid, {'dragable'}, not bChecked)
+			D.ModifyConfig(config, 'dragable', not bChecked)
 		end,
 		autoenable = function() return config.enable and not config.penetrable end,
 	})
@@ -783,7 +768,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		text = _L['Ignore system ui scale'],
 		checked = config.ignoreSystemUIScale,
 		oncheck = function(bChecked)
-			D.SetData(config.uuid, {'ignoreSystemUIScale'}, bChecked)
+			D.ModifyConfig(config, 'ignoreSystemUIScale', bChecked)
 		end,
 		autoenable = function() return config.enable end,
 	})
@@ -808,7 +793,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		text = _L['Show cd circle'],
 		checked = config.cdCircle,
 		oncheck = function(bChecked)
-			D.SetData(config.uuid, {'cdCircle'}, bChecked)
+			D.ModifyConfig(config, 'cdCircle', bChecked)
 		end,
 		autoenable = function() return config.enable end,
 	})
@@ -818,7 +803,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		text = _L['Show cd flash'],
 		checked = config.cdFlash,
 		oncheck = function(bChecked)
-			D.SetData(config.uuid, {'cdFlash'}, bChecked)
+			D.ModifyConfig(config, 'cdFlash', bChecked)
 		end,
 		autoenable = function() return config.enable end,
 	})
@@ -828,7 +813,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		text = _L['Show cd ready spark'],
 		checked = config.cdReadySpark,
 		oncheck = function(bChecked)
-			D.SetData(config.uuid, {'cdReadySpark'}, bChecked)
+			D.ModifyConfig(config, 'cdReadySpark', bChecked)
 		end,
 		autoenable = function() return config.enable and not config.hideVoid end,
 	})
@@ -853,7 +838,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		text = _L['Show cd bar'],
 		checked = config.cdBar,
 		oncheck = function(bChecked)
-			D.SetData(config.uuid, {'cdBar'}, bChecked)
+			D.ModifyConfig(config, 'cdBar', bChecked)
 		end,
 		autoenable = function() return config.enable end,
 	})
@@ -863,7 +848,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		text = _L['Show name'],
 		checked = config.showName,
 		oncheck = function(bChecked)
-			D.SetData(config.uuid, {'showName'}, bChecked)
+			D.ModifyConfig(config, 'showName', bChecked)
 		end,
 		autoenable = function() return config.enable end,
 	})
@@ -873,7 +858,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		text = _L['Show time'],
 		checked = config.showTime,
 		oncheck = function(bChecked)
-			D.SetData(config.uuid, {'showTime'}, bChecked)
+			D.ModifyConfig(config, 'showTime', bChecked)
 		end,
 		autoenable = function() return config.enable end,
 	})
@@ -898,7 +883,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		text = _L['Play sound'],
 		checked = config.playSound,
 		oncheck = function(bChecked)
-			D.SetData(config.uuid, {'playSound'}, bChecked)
+			D.ModifyConfig(config, 'playSound', bChecked)
 		end,
 		autoenable = function() return config.enable end,
 	})
@@ -1002,10 +987,8 @@ function PS.OnPanelActive(wnd)
 		w = 60, h = 30,
 		text = _L['Create'],
 		onclick = function()
-			local config = MY.FormatDataStructure(nil, CONFIG_TEMPLATE)
-			config.uuid = tostring(config):sub(8)
-			insert(Config, config)
-			D.CheckFrame(config)
+			local config = D.CreateConfig()
+			DrawPreview(ui, config, OpenDetail)
 			MY.SwitchTab('MY_TargetMon', true)
 		end,
 	})
