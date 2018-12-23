@@ -2065,7 +2065,24 @@ function MY.GetSkillName(dwSkillID, dwLevel)
 end
 end
 
-do local CACHE = {}
+do
+local CACHE = {}
+local REPLACE = {}
+local function OnSkillReplace()
+	for _, aList in pairs(CACHE) do
+		for _, group in ipairs(aList) do
+			for i, v in ipairs(group) do
+				if v == arg0 then
+					group[i] = arg1
+				end
+			end
+		end
+	end
+	REPLACE[arg0] = arg1
+	REPLACE[arg1] = nil
+end
+RegisterEvent("ON_SKILL_REPLACE", OnSkillReplace)
+RegisterEvent("CHANGE_SKILL_ICON", OnSkillReplace)
 function MY.GetKungfuSkillIDs(dwKungfuID)
 	if not CACHE[dwKungfuID] then
 		local aSubKungfuID, aList = Table_GetMKungfuList(dwKungfuID), {}
@@ -2076,7 +2093,10 @@ function MY.GetKungfuSkillIDs(dwKungfuID)
 				aSkillID = Table_GetKungfuSkillList(dwSubKungfuID)
 			end
 			for _, dwSkillID in ipairs(aSkillID) do
-				insert(aSub, dwSkillID)
+				if REPLACE[dwSkillID] then
+					Output(REPLACE, dwSkillID)
+				end
+				insert(aSub, REPLACE[dwSkillID] or dwSkillID)
 			end
 			insert(aList, aSub)
 		end
