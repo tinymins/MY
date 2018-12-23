@@ -239,23 +239,23 @@ function D.LoadConfig(bDefault, bOriginal, bReloadEmbedded)
 	if not aPatch then
 		aPatch = MY.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE) or {}
 	end
-	local aConfig, tConfig = {}, {}
+	local aConfig, tLoaded = {}, {}
 	for i, patch in ipairs(aPatch) do
-		if not tConfig[patch.uuid] then
+		if not tLoaded[patch.uuid] then
 			local config = D.PatchToConfig(patch)
 			if config then
 				insert(aConfig, config)
-				tConfig[config.uuid] = config
 			end
+			tLoaded[patch.uuid] = true
 		end
 	end
 	for i, embedded in ipairs(EMBEDDED_CONFIG_LIST) do
-		if not tConfig[embedded.uuid] then
+		if not tLoaded[embedded.uuid] then
 			local config = D.FormatConfig(embedded)
 			if config then
 				insert(aConfig, config)
-				tConfig[config.uuid] = config
 			end
+			tLoaded[config.uuid] = true
 		end
 	end
 	CONFIG = aConfig
@@ -264,11 +264,21 @@ function D.LoadConfig(bDefault, bOriginal, bReloadEmbedded)
 end
 
 function D.SaveConfig(bDefault)
-	local aPatch = {}
+	local aPatch, tLoaded = {}, {}
 	for i, config in ipairs(CONFIG) do
 		local patch = D.ConfigToPatch(config)
 		if patch then
 			insert(aPatch, patch)
+		end
+		tLoaded[config.uuid] = true
+	end
+	for i, embedded in ipairs(EMBEDDED_CONFIG_LIST) do
+		if not tLoaded[embedded.uuid] then
+			insert(aPatch, {
+				uuid = embedded.uuid,
+				delete = true,
+			})
+			tLoaded[embedded.uuid] = true
 		end
 	end
 	if bDefault then
