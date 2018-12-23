@@ -38,6 +38,7 @@ if not MY.AssertVersion('MY_TargetMon', _L['MY_TargetMon'], 0x2011800) then
 end
 local C, D = {}, {
 	GetTargetTypeList  = MY_TargetMonConfig.GetTargetTypeList ,
+	LoadConfig         = MY_TargetMonConfig.LoadConfig        ,
 	GetConfig          = MY_TargetMonConfig.GetConfig         ,
 	CreateConfig       = MY_TargetMonConfig.CreateConfig      ,
 	MoveConfig         = MY_TargetMonConfig.MoveConfig        ,
@@ -1065,14 +1066,24 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y,
 		w = 80, h = 30,
 		text = _L['Reset Default'],
-		tip = _L['Hold ctrl to reset original default.'],
-		tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
 		onclick = function()
-			local ctrl = IsCtrlKeyDown()
-			MY.Confirm(_L[ctrl and 'Sure to reset original default?' or 'Sure to reset default?'], function()
-				D.LoadConfig(true, ctrl)
-				MY.SwitchTab('MY_TargetMon', true)
-			end)
+			MY.Dialog(_L['Sure to reset default?'], {
+				{
+					szOption = _L['Origin config'],
+					fnAction = function()
+						D.LoadConfig(true, true)
+						MY.SwitchTab('MY_TargetMon', true)
+					end,
+				},
+				{
+					szOption = _L['Default config'],
+					fnAction = function()
+						D.LoadConfig(true, false)
+						MY.SwitchTab('MY_TargetMon', true)
+					end,
+				},
+				{ szOption = g_tStrings.STR_HOTKEY_CANCEL },
+			})
 		end,
 	})
 	x = x + 90
