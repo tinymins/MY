@@ -2193,7 +2193,7 @@ function MY.GetSkillCDProgress(KObject, dwID, nLevel, bIgnorePublic)
 	-- 充能和透支技能CD刷新
 	local nCDMaxCount, dwCDID = KObject.GetCDMaxCount(dwID)
 	local nODMaxCount, dwODID = KObject.GetCDMaxOverDraftCount(dwID)
-	local bCool, szType, nLeft, nInterval, nTotal, nCount, nMaxCount, nSurfaceNum, bPublic
+	local _, bCool, szType, nLeft, nInterval, nTotal, nCount, nMaxCount, nSurfaceNum, bPublic
 	if nCDMaxCount > 1 then -- 充能技能CD刷新
 		szType = 'CHARGE'
 		nLeft, nTotal, nCount, bPublic = select(2, GetSkillCDProgress(dwID, nLevel, dwCDID, KObject))
@@ -2209,7 +2209,7 @@ function MY.GetSkillCDProgress(KObject, dwID, nLevel, bIgnorePublic)
 		nInterval = KObject.GetCDInterval(dwODID)
 		nMaxCount, nCount = KObject.GetOverDraftCoolDown(dwODID)
 		if nCount == nMaxCount then -- 透支用完了显示CD
-			bCool, nLeft, nTotal, nCount, bPublic = GetSkillCDProgress(dwID, nLevel, nil, KObject)
+			bCool, nLeft, nTotal, _, bPublic = GetSkillCDProgress(dwID, nLevel, nil, KObject)
 		else
 			bCool, nLeft, nTotal = false, select(2, GetSkillCDProgress(dwID, nLevel, nil, KObject))
 		end
