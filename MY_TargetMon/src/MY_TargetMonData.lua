@@ -242,6 +242,7 @@ local function Buff_MatchMon(tBuff, mon, config, dwKungfuID, dwTarKungfuID)
 			end
 		end
 	end
+	return nil, mon.iconid
 end
 local function Buff_MonToView(mon, buff, item, KObject, nIcon, config, tMonExist, tMonLast)
 	if nIcon then
@@ -321,6 +322,7 @@ local function Skill_MatchMon(tSkill, mon, config, dwKungfuID, dwTarKungfuID)
 			end
 		end
 	end
+	return nil, mon.iconid
 end
 local function Skill_MonToView(mon, skill, item, KObject, nIcon, config, tMonExist, tMonLast)
 	if nIcon then
