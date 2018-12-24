@@ -325,7 +325,7 @@ local function DrawDetail(ui)
 					fnAction = function()
 						D.ModifyMonitor(mon, {'kungfus', dwKungfuID}, not mon.kungfus[dwKungfuID])
 					end,
-					fnDisable = function() return mon.kungfus.all end,
+					fnDisable = function() return mon.kungfus.all or IsEmpty(mon.kungfus) end,
 				})
 			end
 		end
@@ -350,7 +350,7 @@ local function DrawDetail(ui)
 				fnAction = function()
 					D.ModifyMonitor(mon, 'tarkungfus.npc', not mon.tarkungfus.npc)
 				end,
-				fnDisable = function() return mon.tarkungfus.all end,
+				fnDisable = function() return mon.tarkungfus.all or IsEmpty(mon.tarkungfus) end,
 			},
 		}
 		for _, dwForceID in pairs_c(FORCE_TYPE) do
@@ -363,7 +363,7 @@ local function DrawDetail(ui)
 					fnAction = function()
 						D.ModifyMonitor(mon, {'tarkungfus', dwKungfuID}, not mon.tarkungfus[dwKungfuID])
 					end,
-					fnDisable = function() return mon.tarkungfus.all end,
+					fnDisable = function() return mon.tarkungfus.all or IsEmpty(mon.tarkungfus) end,
 				})
 			end
 		end
