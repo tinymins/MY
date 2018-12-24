@@ -645,6 +645,14 @@ local function GetSoundMenu(tSound, fnAction, tCheck, bMultiple)
 		t.bMCheck = not bMultiple
 		t.UserData = tSound
 		t.fnAction = fnAction
+		t.fnMouseEnter = function()
+			if IsCtrlKeyDown() then
+				MY.PlaySound(SOUND.UI_SOUND, tSound.szPath, '')
+			else
+				local szXml = GetFormatText(_L['Hold ctrl when move in to preview.'], nil, 255, 255, 0)
+				OutputTip(szXml, 600, {this:GetAbsX(), this:GetAbsY(), this:GetW(), this:GetH()}, ALW.RIGHT_LEFT)
+			end
+		end
 	end
 	for _, v in ipairs(tSound) do
 		local t1 = GetSoundMenu(v, fnAction, tCheck, bMultiple)

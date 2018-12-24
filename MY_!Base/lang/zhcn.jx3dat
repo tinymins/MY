@@ -387,6 +387,7 @@ data = {
 	['Default'] = '默认',
 	['Bing.ogg'] = '呯',
 	['Notify.ogg'] = '叮咚',
+	['Hold ctrl when move in to preview.'] = '按住CTRL滑入可试听。',
 
 	['[%s] want to see your char info, OK?'] = '[%s] 想知晓您的当前属性是否告知？',
 }
