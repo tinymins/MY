@@ -121,6 +121,12 @@ end
 
 -- 更新BUFF数据 更新监控条
 do
+local EXTENT_ANIMATE = {
+	['[0.7,0.9)'] = {'ui\\Image\\Common\\Box.UITex', 17},
+	['[0.9,1]'] = {'ui\\Image\\Common\\Box.UITex', 20},
+	NONE = {},
+}
+local MON_EXIST_CACHE = {}
 local function Base_MatchMon(mon, dwKungfuID, dwTarKungfuID)
 	if not mon.enable then
 		return
@@ -132,6 +138,67 @@ local function Base_MatchMon(mon, dwKungfuID, dwTarKungfuID)
 		return
 	end
 	return true
+end
+local function Base_MonToView(mon, info, item, KObject, nIcon, config, tMonExist, tMonLast)
+	-- 格式化完善视图列表信息
+	if config.showTime and item.bCd and item.nTimeLeft then
+		local nTimeLeft, szTimeLeft = item.nTimeLeft, ''
+		if nTimeLeft <= 3600 then
+			if nTimeLeft > 60 then
+				if config.decimalTime == -1 or nTimeLeft < config.decimalTime then
+					szTimeLeft = '%d\'%.1f'
+				else
+					szTimeLeft = '%d\'%d'
+				end
+				szTimeLeft = szTimeLeft:format(floor(nTimeLeft / 60), nTimeLeft % 60)
+			else
+				if config.decimalTime == -1 or nTimeLeft < config.decimalTime then
+					szTimeLeft = '%.1f'
+				else
+					szTimeLeft = '%d'
+				end
+				szTimeLeft = szTimeLeft:format(nTimeLeft)
+			end
+		end
+		item.szTimeLeft = szTimeLeft
+	else
+		item.szTimeLeft = ''
+	end
+	if not config.showName then
+		item.szLongName = ''
+		item.szShortName = ''
+	end
+	if not item.nIcon then
+		item.nIcon = 13
+	end
+	if config.cdFlash and item.bCd then
+		if item.fCd >= 0.9 then
+			item.aExtentAnimate = EXTENT_ANIMATE['[0.9,1]']
+		elseif item.fCd >= 0.7 then
+			item.aExtentAnimate = EXTENT_ANIMATE['[0.7,0.9)']
+		else
+			item.aExtentAnimate = EXTENT_ANIMATE.NONE
+		end
+		item.bStaring = item.fCd > 0.5
+	else
+		item.bStaring = false
+		item.aExtentAnimate = EXTENT_ANIMATE.NONE
+	end
+	if not config.cdCircle then
+		item.bCd = false
+	end
+	if info and info.bCool then
+		if tMonLast and not tMonLast[mon.uuid] and config.playSound then
+			local dwSoundID = RandomChild(mon.soundAppear)
+			if dwSoundID then
+				local szSoundPath = MY.GetSoundPath(dwSoundID)
+				if szSoundPath then
+					MY.PlaySound(SOUND.UI_SOUND, szSoundPath, '')
+				end
+			end
+		end
+		tMonExist[mon.uuid] = mon
+	end
 end
 local function Buff_CaptureMon(mon)
 	for _, buff in spairs(BUFF_INFO[mon.name]) do
@@ -176,6 +243,46 @@ local function Buff_MatchMon(tBuff, mon, config, dwKungfuID, dwTarKungfuID)
 		end
 	end
 end
+local function Buff_MonToView(mon, buff, item, KObject, nIcon, config, tMonExist, tMonLast)
+	if nIcon then
+		item.nIcon = nIcon
+	end
+	if buff and buff.bCool then
+		if not item.nIcon then
+			item.nIcon = buff.nIcon
+		end
+		local nTimeLeft = buff.nLeft * 0.0625
+		if not BUFF_TIME[KObject.dwID] then
+			BUFF_TIME[KObject.dwID] = {}
+		end
+		if not BUFF_TIME[KObject.dwID][buff.szKey] or BUFF_TIME[KObject.dwID][buff.szKey] < nTimeLeft then
+			BUFF_TIME[KObject.dwID][buff.szKey] = nTimeLeft
+		end
+		local nTimeTotal = BUFF_TIME[KObject.dwID][buff.szKey]
+		item.bCd = true
+		item.fCd = 1 - nTimeLeft / nTimeTotal
+		item.bSparking = false
+		item.dwID = buff.dwID
+		item.nLevel = buff.nLevel
+		item.nTimeLeft = nTimeLeft
+		item.szStackNum = buff.nStackNum > 1 and buff.nStackNum or ''
+		item.nTimeTotal = nTimeTotal
+		item.szLongName = mon.longAlias or buff.szName
+		item.szShortName = mon.shortAlias or buff.szName
+	else
+		item.bCd = false
+		item.fCd = 1
+		item.bSparking = true
+		item.dwID = next(mon.ids) or -1
+		item.nLevel = item.dwID and mon.ids[item.dwID] and next(mon.ids[item.dwID].levels) or -1
+		item.szStackNum = ''
+		item.szLongName = mon.longAlias or mon.name
+		item.szShortName = mon.shortAlias or mon.name
+	end
+	item.aLongAliasRGB = mon.rgbLongAlias
+	item.aShortAliasRGB = mon.rgbShortAlias
+	Base_MonToView(mon, buff, item, KObject, nIcon, config, tMonExist, tMonLast)
+end
 local function Skill_CaptureMon(mon)
 	for _, skill in spairs(SKILL_INFO[mon.name]) do
 		if not mon.iconid then
@@ -215,12 +322,41 @@ local function Skill_MatchMon(tSkill, mon, config, dwKungfuID, dwTarKungfuID)
 		end
 	end
 end
--- 更新监控条
-local EXTENT_ANIMATE = {
-	['[0.7,0.9)'] = {'ui\\Image\\Common\\Box.UITex', 17},
-	['[0.9,1]'] = {'ui\\Image\\Common\\Box.UITex', 20},
-	NONE = {},
-}
+local function Skill_MonToView(mon, skill, item, KObject, nIcon, config, tMonExist, tMonLast)
+	if nIcon then
+		item.nIcon = nIcon
+	end
+	if skill and skill.bCool then
+		if not item.nIcon then
+			item.nIcon = skill.nIcon
+		end
+		local nTimeLeft = skill.nCdLeft * 0.0625
+		local nTimeTotal = skill.nCdTotal * 0.0625
+		local nStackNum = skill.nCdMaxCount - skill.nCdCount
+		item.bCd = true
+		item.fCd = 1 - nTimeLeft / nTimeTotal
+		item.bSparking = false
+		item.dwID = skill.dwID
+		item.nLevel = skill.nLevel
+		item.nTimeLeft = nTimeLeft
+		item.szStackNum = nStackNum > 0 and nStackNum or ''
+		item.nTimeTotal = nTimeTotal
+		item.szLongName = mon.longAlias or skill.szName
+		item.szShortName = mon.shortAlias or skill.szName
+	else
+		item.bCd = false
+		item.fCd = 1
+		item.bSparking = true
+		item.dwID = next(mon.ids) or -1
+		item.nLevel = item.dwID and mon.ids[item.dwID] and next(mon.ids[item.dwID].levels) or -1
+		item.szStackNum = ''
+		item.szLongName = mon.longAlias or mon.name
+		item.szShortName = mon.shortAlias or mon.name
+	end
+	item.aLongAliasRGB = mon.rgbLongAlias
+	item.aShortAliasRGB = mon.rgbShortAlias
+	Base_MonToView(mon, skill, item, KObject, nIcon, config, tMonExist, tMonLast)
+end
 local function UpdateView()
 	local me = GetClientPlayer()
 	local dwKungfuID = me.GetKungfuMountID() or 0
@@ -260,6 +396,7 @@ local function UpdateView()
 				view.aItem = aItem
 			end
 			local nItemIndex, nItemCount = 1, #aItem
+			local tMonExist, tMonLast = {}, MON_EXIST_CACHE[config.uuid]
 			if config.type == 'BUFF' then
 				local tBuff = KObject and BUFF_CACHE[KObject.dwID] or EMPTY_TABLE
 				for _, mon in ipairs(config.monitors) do
@@ -276,43 +413,7 @@ local function UpdateView()
 								item = {}
 								aItem[nItemIndex] = item
 							end
-							if nIcon then
-								item.nIcon = nIcon
-							end
-							if buff and buff.bCool then
-								if not item.nIcon then
-									item.nIcon = buff.nIcon
-								end
-								local nTimeLeft = buff.nLeft * 0.0625
-								if not BUFF_TIME[KObject.dwID] then
-									BUFF_TIME[KObject.dwID] = {}
-								end
-								if not BUFF_TIME[KObject.dwID][buff.szKey] or BUFF_TIME[KObject.dwID][buff.szKey] < nTimeLeft then
-									BUFF_TIME[KObject.dwID][buff.szKey] = nTimeLeft
-								end
-								local nTimeTotal = BUFF_TIME[KObject.dwID][buff.szKey]
-								item.bCd = true
-								item.fCd = 1 - nTimeLeft / nTimeTotal
-								item.bSparking = false
-								item.dwID = buff.dwID
-								item.nLevel = buff.nLevel
-								item.nTimeLeft = nTimeLeft
-								item.szStackNum = buff.nStackNum > 1 and buff.nStackNum or ''
-								item.nTimeTotal = nTimeTotal
-								item.szLongName = mon.longAlias or buff.szName
-								item.szShortName = mon.shortAlias or buff.szName
-							else
-								item.bCd = false
-								item.fCd = 1
-								item.bSparking = true
-								item.dwID = next(mon.ids) or -1
-								item.nLevel = item.dwID and mon.ids[item.dwID] and next(mon.ids[item.dwID].levels) or -1
-								item.szStackNum = ''
-								item.szLongName = mon.longAlias or mon.name
-								item.szShortName = mon.shortAlias or mon.name
-							end
-							item.aLongAliasRGB = mon.rgbLongAlias
-							item.aShortAliasRGB = mon.rgbShortAlias
+							Buff_MonToView(mon, buff, item, KObject, nIcon, config, tMonExist, tMonLast)
 							nItemIndex = nItemIndex + 1
 						end
 					end
@@ -333,38 +434,7 @@ local function UpdateView()
 								item = {}
 								aItem[nItemIndex] = item
 							end
-							if nIcon then
-								item.nIcon = nIcon
-							end
-							if skill and skill.bCool then
-								if not item.nIcon then
-									item.nIcon = skill.nIcon
-								end
-								local nTimeLeft = skill.nCdLeft * 0.0625
-								local nTimeTotal = skill.nCdTotal * 0.0625
-								local nStackNum = skill.nCdMaxCount - skill.nCdCount
-								item.bCd = true
-								item.fCd = 1 - nTimeLeft / nTimeTotal
-								item.bSparking = false
-								item.dwID = skill.dwID
-								item.nLevel = skill.nLevel
-								item.nTimeLeft = nTimeLeft
-								item.szStackNum = nStackNum > 0 and nStackNum or ''
-								item.nTimeTotal = nTimeTotal
-								item.szLongName = mon.longAlias or skill.szName
-								item.szShortName = mon.shortAlias or skill.szName
-							else
-								item.bCd = false
-								item.fCd = 1
-								item.bSparking = true
-								item.dwID = next(mon.ids) or -1
-								item.nLevel = item.dwID and mon.ids[item.dwID] and next(mon.ids[item.dwID].levels) or -1
-								item.szStackNum = ''
-								item.szLongName = mon.longAlias or mon.name
-								item.szShortName = mon.shortAlias or mon.name
-							end
-							item.aLongAliasRGB = mon.rgbLongAlias
-							item.aShortAliasRGB = mon.rgbShortAlias
+							Skill_MonToView(mon, skill, item, KObject, nIcon, config, tMonExist, tMonLast)
 							nItemIndex = nItemIndex + 1
 						end
 					end
@@ -373,55 +443,20 @@ local function UpdateView()
 			for i = nItemIndex, nItemCount do
 				aItem[i] = nil
 			end
-			-- 格式化完善视图列表信息
-			for _, item in ipairs(aItem) do
-				if config.showTime and item.bCd and item.nTimeLeft then
-					local nTimeLeft, szTimeLeft = item.nTimeLeft, ''
-					if nTimeLeft <= 3600 then
-						if nTimeLeft > 60 then
-							if config.decimalTime == -1 or nTimeLeft < config.decimalTime then
-								szTimeLeft = '%d\'%.1f'
-							else
-								szTimeLeft = '%d\'%d'
+			if tMonLast then
+				for uuid, mon in pairs(tMonLast) do
+					if not tMonExist[uuid] and config.playSound then
+						local dwSoundID = RandomChild(mon.soundDisappear)
+						if dwSoundID then
+							local szSoundPath = MY.GetSoundPath(dwSoundID)
+							if szSoundPath then
+								MY.PlaySound(SOUND.UI_SOUND, szSoundPath, '')
 							end
-							szTimeLeft = szTimeLeft:format(floor(nTimeLeft / 60), nTimeLeft % 60)
-						else
-							if config.decimalTime == -1 or nTimeLeft < config.decimalTime then
-								szTimeLeft = '%.1f'
-							else
-								szTimeLeft = '%d'
-							end
-							szTimeLeft = szTimeLeft:format(nTimeLeft)
 						end
 					end
-					item.szTimeLeft = szTimeLeft
-				else
-					item.szTimeLeft = ''
-				end
-				if not config.showName then
-					item.szLongName = ''
-					item.szShortName = ''
-				end
-				if not item.nIcon then
-					item.nIcon = 13
-				end
-				if config.cdFlash and item.bCd then
-					if item.fCd >= 0.9 then
-						item.aExtentAnimate = EXTENT_ANIMATE['[0.9,1]']
-					elseif item.fCd >= 0.7 then
-						item.aExtentAnimate = EXTENT_ANIMATE['[0.7,0.9)']
-					else
-						item.aExtentAnimate = EXTENT_ANIMATE.NONE
-					end
-					item.bStaring = item.fCd > 0.5
-				else
-					item.bStaring = false
-					item.aExtentAnimate = EXTENT_ANIMATE.NONE
-				end
-				if not config.cdCircle then
-					item.bCd = false
 				end
 			end
+			MON_EXIST_CACHE[config.uuid] = tMonExist
 			nViewIndex = nViewIndex + 1
 		end
 	end
