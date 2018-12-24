@@ -379,6 +379,7 @@ local function DrawDetail(ui)
 			else
 				insert(mon.soundAppear, dwID)
 			end
+			D.ModifyMonitor(mon, 'soundAppear', mon.soundAppear)
 		end, MY.ArrayToObject(mon.soundAppear), true)
 		t2.szOption = _L['Play sound when appear']
 		insert(t1, t2)
@@ -393,6 +394,7 @@ local function DrawDetail(ui)
 			else
 				insert(mon.soundDisappear, dwID)
 			end
+			D.ModifyMonitor(mon, 'soundDisappear', mon.soundDisappear)
 		end, MY.ArrayToObject(mon.soundDisappear), true)
 		t2.szOption = _L['Play sound when disappear']
 		insert(t1, t2)
