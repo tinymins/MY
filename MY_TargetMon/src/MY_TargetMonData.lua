@@ -121,9 +121,88 @@ end
 
 -- 更新BUFF数据 更新监控条
 do
-local function BuffMonitorToView()
+local function Buff_CaptureMon(mon)
+	for _, buff in spairs(BUFF_INFO[mon.name]) do
+		if not mon.iconid then
+			D.ModifyMonitor(mon, 'iconid', buff.nIcon)
+		end
+		local tMonId = mon.ids[buff.dwID]
+		if not tMonId then
+			tMonId = D.CreateMonitorId(mon, buff.dwID)
+		end
+		if not tMonId.iconid then
+			D.ModifyMonitorId(tMonId, 'iconid', buff.nIcon)
+		end
+		local tMonLevel = tMonId.levels[buff.nLevel]
+		if not tMonLevel then
+			tMonLevel = D.CreateMonitorLevel(tMonId, buff.nLevel)
+		end
+		if not tMonLevel.iconid then
+			D.ModifyMonitorLevel(tMonLevel, 'iconid', buff.nIcon)
+		end
+	end
 end
-
+local function Buff_MatchMon(tBuff, mon, config)
+	for dwID, tMonId in pairs(mon.ids) do
+		local buff = tBuff[dwID]
+		if buff and buff.nEndFrame - nLogicFrame >= 0 then
+			if mon.enable and (
+				not config.hideOthers
+				or buff.dwSkillSrcID == UI_GetClientPlayerID()
+				or buff.dwSkillSrcID == GetControlPlayerID()
+			) then
+				if mon.iconid then
+					return buff, mon.iconid
+				elseif tMonId.enable then
+					if tMonId.iconid then
+						return buff, tMonId.iconid
+					elseif tMonId.levels[buff.nLevel] and tMonId.levels[buff.nLevel].enable then
+						return buff, tMonId.levels[buff.nLevel].iconid
+					end
+				end
+			end
+		end
+	end
+end
+local function Skill_CaptureMon(mon)
+	for _, skill in spairs(SKILL_INFO[mon.name]) do
+		if not mon.iconid then
+			D.ModifyMonitor(mon, 'iconid', skill.nIcon)
+		end
+		local tMonId = mon.ids[skill.dwID]
+		if not tMonId then
+			tMonId = D.CreateMonitorId(mon, skill.dwID)
+		end
+		if not tMonId.iconid then
+			D.ModifyMonitorId(tMonId, 'iconid', skill.nIcon)
+		end
+		local tMonLevel = tMonId.levels[skill.nLevel]
+		if not tMonLevel then
+			tMonLevel = D.CreateMonitorLevel(tMonId, skill.nLevel)
+		end
+		if not tMonLevel.iconid then
+			D.ModifyMonitorLevel(tMonLevel, 'iconid', skill.nIcon)
+		end
+	end
+end
+local function Skill_MatchMon(tSkill, mon, config)
+	for dwID, tMonId in pairs(mon.ids) do
+		local skill = tSkill[dwID]
+		if skill and skill.bCool then
+			if mon.enable then
+				if mon.iconid then
+					return skill, mon.iconid
+				elseif tMonId.enable then
+					if tMonId.iconid then
+						return skill, tMonId.iconid
+					elseif tMonId.levels[skill.nLevel] and tMonId.levels[skill.nLevel].enable then
+						return skill, tMonId.levels[skill.nLevel].iconid
+					end
+				end
+			end
+		end
+	end
+end
 -- 更新监控条
 local EXTENT_ANIMATE = {
 	['[0.7,0.9)'] = {'ui\\Image\\Common\\Box.UITex', 17},
@@ -131,8 +210,6 @@ local EXTENT_ANIMATE = {
 	NONE = {},
 }
 local function UpdateView()
-	local dwClientPlayerID = UI_GetClientPlayerID()
-	local dwControlPlayerID = GetControlPlayerID()
 	local nViewIndex, nViewCount = 1, #VIEW_LIST
 	local nLogicFrame = GetLogicFrameCount()
 	for _, config in ipairs(D.GetConfig()) do
@@ -175,49 +252,10 @@ local function UpdateView()
 					if mon.enable then
 						-- 如果开启了捕获 从BUFF索引中捕获新的BUFF
 						if mon.capture then
-							for _, buff in spairs(BUFF_INFO[mon.name]) do
-								if not mon.iconid then
-									D.ModifyMonitor(mon, 'iconid', buff.nIcon)
-								end
-								local tMonId = mon.ids[buff.dwID]
-								if not tMonId then
-									tMonId = D.CreateMonitorId(mon, buff.dwID)
-								end
-								if not tMonId.iconid then
-									D.ModifyMonitorId(tMonId, 'iconid', buff.nIcon)
-								end
-								local tMonLevel = tMonId.levels[buff.nLevel]
-								if not tMonLevel then
-									tMonLevel = D.CreateMonitorLevel(tMonId, buff.nLevel)
-								end
-								if not tMonLevel.iconid then
-									D.ModifyMonitorLevel(tMonLevel, 'iconid', buff.nIcon)
-								end
-							end
+							Buff_CaptureMon(mon)
 						end
 						-- 通过监控项生成视图列表
-						local buff, nIcon = nil, mon.iconid
-						for dwID, tMonId in pairs(mon.ids) do
-							local info = tBuff[dwID]
-							if info and info.nEndFrame - nLogicFrame >= 0 then
-								if not config.hideOthers or info.dwSkillSrcID == dwClientPlayerID or info.dwSkillSrcID == dwControlPlayerID then
-									buff = info
-									if mon.iconid then
-										nIcon = mon.iconid
-										break
-									end
-									if tMonId.enable and mon.iconid then
-										nIcon = tMonId.iconid or mon.iconid
-										break
-									end
-									if tMonId.levels[buff.nLevel] and tMonId.levels[buff.nLevel].enable then
-										nIcon = tMonId.levels[buff.nLevel].iconid
-										break
-									end
-								end
-								buff = nil
-							end
-						end
+						local buff, nIcon = Buff_MatchMon(tBuff, mon, config)
 						if buff or config.hideVoid ~= mon.hideVoid then
 							local item = aItem[nItemIndex]
 							if not item then
@@ -271,47 +309,10 @@ local function UpdateView()
 					if mon.enable then
 						-- 如果开启了捕获 从BUFF索引中捕获新的BUFF
 						if mon.capture then
-							for _, skill in spairs(SKILL_INFO[mon.name]) do
-								if not mon.iconid then
-									D.ModifyMonitor(mon, 'iconid', skill.nIcon)
-								end
-								local tMonId = mon.ids[skill.dwID]
-								if not tMonId then
-									tMonId = D.CreateMonitorId(mon, skill.dwID)
-								end
-								if not tMonId.iconid then
-									D.ModifyMonitorId(tMonId, 'iconid', skill.nIcon)
-								end
-								local tMonLevel = tMonId.levels[skill.nLevel]
-								if not tMonLevel then
-									tMonLevel = D.CreateMonitorLevel(tMonId, skill.nLevel)
-								end
-								if not tMonLevel.iconid then
-									D.ModifyMonitorLevel(tMonLevel, 'iconid', skill.nIcon)
-								end
-							end
+							Skill_CaptureMon(mon)
 						end
 						-- 通过监控项生成视图列表
-						local skill, nIcon = nil, mon.iconid
-						for dwID, tMonId in pairs(mon.ids) do
-							local info = tSkill[dwID]
-							if info and info.bCool then
-								skill = info
-								if mon.iconid then
-									nIcon = mon.iconid
-									break
-								end
-								if tMonId.enable and mon.iconid then
-									nIcon = tMonId.iconid or mon.iconid
-									break
-								end
-								if tMonId.levels[skill.nLevel] and tMonId.levels[skill.nLevel].enable then
-									nIcon = tMonId.levels[skill.nLevel].iconid
-									break
-								end
-								skill = nil
-							end
-						end
+						local skill, nIcon = Skill_MatchMon(tSkill, mon, config)
 						if skill or config.hideVoid ~= mon.hideVoid then
 							local item = aItem[nItemIndex]
 							if not item then
