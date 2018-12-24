@@ -121,6 +121,18 @@ end
 
 -- 更新BUFF数据 更新监控条
 do
+local function Base_MatchMon(mon, dwKungfuID, dwTarKungfuID)
+	if not mon.enable then
+		return
+	end
+	if next(mon.kungfus) and not mon.kungfus.all and not mon.kungfus[dwKungfuID] then
+		return
+	end
+	if next(mon.tarkungfus) and not mon.tarkungfus.all and not mon.tarkungfus[dwTarKungfuID] then
+		return
+	end
+	return true
+end
 local function Buff_CaptureMon(mon)
 	for _, buff in spairs(BUFF_INFO[mon.name]) do
 		if not mon.iconid then
@@ -142,11 +154,11 @@ local function Buff_CaptureMon(mon)
 		end
 	end
 end
-local function Buff_MatchMon(tBuff, mon, config)
+local function Buff_MatchMon(tBuff, mon, config, dwKungfuID, dwTarKungfuID)
 	for dwID, tMonId in pairs(mon.ids) do
 		local buff = tBuff[dwID]
-		if buff and buff.nEndFrame - nLogicFrame >= 0 then
-			if mon.enable and (
+		if buff and buff.bCool then
+			if Base_MatchMon(mon, dwKungfuID, dwTarKungfuID) and (
 				not config.hideOthers
 				or buff.dwSkillSrcID == UI_GetClientPlayerID()
 				or buff.dwSkillSrcID == GetControlPlayerID()
@@ -185,11 +197,11 @@ local function Skill_CaptureMon(mon)
 		end
 	end
 end
-local function Skill_MatchMon(tSkill, mon, config)
+local function Skill_MatchMon(tSkill, mon, config, dwKungfuID, dwTarKungfuID)
 	for dwID, tMonId in pairs(mon.ids) do
 		local skill = tSkill[dwID]
 		if skill and skill.bCool then
-			if mon.enable then
+			if Base_MatchMon(mon, dwKungfuID, dwTarKungfuID) then
 				if mon.iconid then
 					return skill, mon.iconid
 				elseif tMonId.enable then
@@ -210,11 +222,13 @@ local EXTENT_ANIMATE = {
 	NONE = {},
 }
 local function UpdateView()
+	local me = GetClientPlayer()
+	local dwKungfuID = me.GetKungfuMountID() or 0
 	local nViewIndex, nViewCount = 1, #VIEW_LIST
-	local nLogicFrame = GetLogicFrameCount()
 	for _, config in ipairs(D.GetConfig()) do
 		if config.enable then
 			local KObject = MY.GetObject(D.GetTarget(config.target, config.type))
+			local dwTarKungfuID = KObject and KObject.GetKungfuMountID() or 0
 			local view = VIEW_LIST[nViewIndex]
 			if not view then
 				view = {}
@@ -255,7 +269,7 @@ local function UpdateView()
 							Buff_CaptureMon(mon)
 						end
 						-- 通过监控项生成视图列表
-						local buff, nIcon = Buff_MatchMon(tBuff, mon, config)
+						local buff, nIcon = Buff_MatchMon(tBuff, mon, config, dwKungfuID, dwTarKungfuID)
 						if buff or config.hideVoid ~= mon.hideVoid then
 							local item = aItem[nItemIndex]
 							if not item then
@@ -265,11 +279,11 @@ local function UpdateView()
 							if nIcon then
 								item.nIcon = nIcon
 							end
-							if buff and buff.nEndFrame - nLogicFrame >= 0 then
+							if buff and buff.bCool then
 								if not item.nIcon then
 									item.nIcon = buff.nIcon
 								end
-								local nTimeLeft = max((buff.nEndFrame - nLogicFrame) * 0.0625, 0)
+								local nTimeLeft = buff.nLeft * 0.0625
 								if not BUFF_TIME[KObject.dwID] then
 									BUFF_TIME[KObject.dwID] = {}
 								end
@@ -312,7 +326,7 @@ local function UpdateView()
 							Skill_CaptureMon(mon)
 						end
 						-- 通过监控项生成视图列表
-						local skill, nIcon = Skill_MatchMon(tSkill, mon, config)
+						local skill, nIcon = Skill_MatchMon(tSkill, mon, config, dwKungfuID, dwTarKungfuID)
 						if skill or config.hideVoid ~= mon.hideVoid then
 							local item = aItem[nItemIndex]
 							if not item then
@@ -418,6 +432,7 @@ end
 
 local function OnBreathe()
 	-- 更新各目标BUFF数据
+	local nLogicFrame = GetLogicFrameCount()
 	for _, eType in ipairs(D.GetTargetTypeList()) do
 		local KObject = MY.GetObject(D.GetTarget(eType, 'BUFF'))
 		if KObject then
@@ -425,6 +440,8 @@ local function OnBreathe()
 			local aBuff = MY.GetBuffList(KObject)
 			-- 当前身上的buff
 			for _, buff in ipairs(aBuff) do
+				buff.nLeft = max(buff.nEndFrame - nLogicFrame, 0)
+				buff.bCool = true
 				tBuff[buff.szName] = buff
 				tBuff[buff.dwID] = buff
 				tBuff[buff.szKey] = buff
@@ -436,11 +453,11 @@ local function OnBreathe()
 			-- 处理消失的buff
 			local tLastBuff = BUFF_CACHE[KObject.dwID]
 			if tLastBuff then
-				local nLogicFrame = GetLogicFrameCount()
 				for k, buff in pairs(tLastBuff) do
 					if not tBuff[k] then
-						if buff.nEndFrame > nLogicFrame then
-							buff.nEndFrame = nLogicFrame
+						if buff.bCool then
+							buff.nLeft = 0
+							buff.bCool = false
 						end
 						tBuff[k] = buff
 					end
