@@ -3,7 +3,7 @@ data = {
     {dwID=11657,szStackOp=">=",nStackNum=3},--浴火---风雷刀谷·锻刀厅
     {dwID=11658,szStackOp=">=",nStackNum=3},--浸寒---风雷刀谷·锻刀厅
     {dwID=11652,col="#FFFF00FF",szReminder="御",nPriority=7},--御海刀气---风雷刀谷·锻刀厅
-    {dwID=11756,szStackOp=">=",nStackNum=15},--慢性毒药---风雷刀谷·锻刀厅
+    {dwID=11756},--慢性毒药---风雷刀谷·锻刀厅
     {dwID=11606},--剧毒---风雷刀谷·锻刀厅
     {dwID=11608,col="#FF00FFFF",szReminder="牵",nPriority=7},--牵丝曼罗---风雷刀谷·锻刀厅
     {dwID=11694,col="#FFFF00FF",szReminder="喋",nPriority=7},--喋骨---风雷刀谷·锻刀厅
@@ -35,22 +35,25 @@ data = {
     {dwID=12399},--天剑破体·强---狼牙堡·燕然峰
     {dwID=12141},--天剑破体---狼牙堡·燕然峰
     {dwID=12095},--体内---狼牙堡·燕然峰
-    {dwID=11073,szStackOp=">=",nStackNum=7},--奇毒---上阳宫·观风殿
+    {dwID=11073,szStackOp=">=",nStackNum=5},--奇毒---上阳宫·观风殿
     {dwID=11075},--缠丝---上阳宫·观风殿
     {dwID=10657},--刺骨---上阳宫·观风殿
-    {dwID=10557,col="#FF3232FF",szReminder="妒",nPriority=7},--妒夫人---上阳宫·观风殿
+    {dwID=10557,col="#FF3232FF",szReminder="妒",nPriority=3,bScreenHead=true,colScreenHead="#FF3232"},--妒夫人---上阳宫·观风殿
     {dwID=10570,col="#FF00FFFF",szReminder="命",nPriority=7},--命闇---上阳宫·观风殿
     {dwID=10560,szStackOp=">=",nStackNum=90},--魅惑---上阳宫·观风殿
     {dwID=10813},--神识泯灭---上阳宫·观风殿
-    {dwID=10631,col="#FF3232FF",szReminder="破",nPriority=3,bScreenHead=true,colScreenHead="#FF3232"},--破甲---上阳宫·观风殿
-    {dwID=10632},--封脉---上阳宫·观风殿
+    {dwID=11122},--胭脂笑---上阳宫·观风殿
+    {dwID=10566},--胭脂笑---上阳宫·观风殿
+    {dwID=10631,col="#FF3232FF",szReminder="破",nPriority=7},--破甲---上阳宫·观风殿
+    {dwID=10632,col="#00FFFFFF",szReminder="封",nPriority=7},--封脉---上阳宫·观风殿
+    {dwID=10633,col="#FF323200",nPriority=8},--折骨---上阳宫·观风殿
     {dwID=10634,col="#8055FFFF",szReminder="笑",nPriority=3,bScreenHead=true,colScreenHead="#8055FF"},--笑里藏刀---上阳宫·观风殿
     {dwID=10645},--噬心---上阳宫·观风殿
-    {dwID=10653,col="#FFFF00FF",szReminder="挑",nPriority=7},--挑衅---上阳宫·观风殿
     {dwID=10547,col="#FFFFFFFF",szReminder="箭",nPriority=7},--箭气---上阳宫·观风殿
-    {dwID=10940,col="#FF3232FF",szReminder="碧",nPriority=7},--碧落斩---上阳宫·观风殿
+    {dwID=10940,col="#FF3232FF",szReminder="碧",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--碧落斩---上阳宫·观风殿
     {dwID=10950},--青蔷坠---上阳宫·观风殿
     {dwID=10956},--壮志凌云---上阳宫·观风殿
+    {dwID=10770,nPriority=5,bCaution=true},--被墩---上阳宫·观风殿
     {dwID=10585,col="#FF00FFFF",szReminder="花",nPriority=3,szStackOp=">=",nStackNum=1,bScreenHead=true,colScreenHead="#FF00FF"},--花毒---上阳宫·双曜亭
     {dwID=10584,col="#8055FFFF",szReminder="蛛",nPriority=7,szStackOp=">=",nStackNum=3},--蛛毒---上阳宫·双曜亭
     {dwID=11063},--格挡---上阳宫·双曜亭
@@ -186,5 +189,5 @@ data = {
     {dwID=9544,col="#00FF00FF",szReminder="笑",nPriority=7},--笑傲光阴---长歌
     {dwID=9265,col="#00FF00FF",szReminder="云",nPriority=7},--云生结海---长歌
     {dwID=9299,col="#FF8000FF",szReminder="杯",nPriority=7},--杯水留影---长歌
-    --【南宫伯是帅咩】更新日期1220
+    --【南宫伯是帅咩】更新日期1224
 }

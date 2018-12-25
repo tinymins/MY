@@ -3,7 +3,7 @@ data = {
     {dwID=11657,szStackOp=">=",nStackNum=3},--浴火---风雷刀谷·锻刀厅
     {dwID=11658,szStackOp=">=",nStackNum=3},--浸寒---风雷刀谷·锻刀厅
     {dwID=11652,col="#FFFF00FF",szReminder="御",nPriority=7},--御海刀气---风雷刀谷·锻刀厅
-    {dwID=11756,szStackOp=">=",nStackNum=15},--慢性毒药---风雷刀谷·锻刀厅
+    {dwID=11756},--慢性毒药---风雷刀谷·锻刀厅
     {dwID=11606},--剧毒---风雷刀谷·锻刀厅
     {dwID=11694,col="#FFFF00FF",szReminder="喋",nPriority=7},--喋骨---风雷刀谷·锻刀厅
     {dwID=11612},--封髓劲---风雷刀谷·千雷殿
@@ -29,15 +29,18 @@ data = {
     {dwID=12399},--天剑破体·强---狼牙堡·燕然峰
     {dwID=12141},--天剑破体---狼牙堡·燕然峰
     {dwID=10657},--刺骨---上阳宫·观风殿
-    {dwID=10557,col="#FF3232FF",szReminder="妒",nPriority=7},--妒夫人---上阳宫·观风殿
+    {dwID=10557,col="#FF3232FF",szReminder="妒",nPriority=3,bScreenHead=true,colScreenHead="#FF3232"},--妒夫人---上阳宫·观风殿
     {dwID=10570,col="#FF00FFFF",szReminder="命",nPriority=7},--命闇---上阳宫·观风殿
-    {dwID=10631,col="#FF3232FF",szReminder="破",nPriority=3,bScreenHead=true,colScreenHead="#FF3232"},--破甲---上阳宫·观风殿
-    {dwID=10632},--封脉---上阳宫·观风殿
-    {dwID=10638},--索敌---上阳宫·观风殿
+    {dwID=11122},--胭脂笑---上阳宫·观风殿
+    {dwID=10566},--胭脂笑---上阳宫·观风殿
+    {dwID=10631,col="#FF3232FF",szReminder="破",nPriority=7},--破甲---上阳宫·观风殿
+    {dwID=10632,col="#00FFFFFF",szReminder="封",nPriority=7},--封脉---上阳宫·观风殿
+    {dwID=10633,col="#FF323200",nPriority=8},--折骨---上阳宫·观风殿
+    {dwID=10638,col="#FF323200",nPriority=8},--索敌---上阳宫·观风殿
     {dwID=10645},--噬心---上阳宫·观风殿
-    {dwID=10653,col="#FFFF00FF",szReminder="挑",nPriority=7},--挑衅---上阳宫·观风殿
     {dwID=10547,col="#FFFFFFFF",szReminder="箭",nPriority=7},--箭气---上阳宫·观风殿
-    {dwID=10940,col="#FF3232FF",szReminder="碧",nPriority=7},--碧落斩---上阳宫·观风殿
+    {dwID=10940,col="#FF3232FF",szReminder="碧",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--碧落斩---上阳宫·观风殿
+    {dwID=10770,nPriority=5,bCaution=true},--被墩---上阳宫·观风殿
     {dwID=10585,col="#FF00FFFF",szReminder="花",nPriority=3,szStackOp=">=",nStackNum=1,bScreenHead=true,colScreenHead="#FF00FF"},--花毒---上阳宫·双曜亭
     {dwID=10584,col="#8055FFFF",szReminder="蛛",nPriority=7,szStackOp=">=",nStackNum=3},--蛛毒---上阳宫·双曜亭
     {dwID=11230},--裂足---上阳宫·双曜亭
@@ -150,5 +153,5 @@ data = {
     {dwID=9336,bOnlyMine=true,col="#00FF0000",szReminder="寒",nPriority=9},--寒梅---长歌
     {dwID=9337,bOnlyMine=true,col="#00FF0000",szReminder="寒",nPriority=9},--寒梅---长歌
     {dwID=9335,bOnlyMine=true,col="#FF323200",szReminder="落",nPriority=9},--落梅---长歌
-    --【南宫伯是帅咩】更新日期1220
+    --【南宫伯是帅咩】更新日期1224
 }

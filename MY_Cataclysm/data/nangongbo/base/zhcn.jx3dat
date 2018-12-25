@@ -55,16 +55,22 @@ data = {
     {dwID=12139,col="#8055FFFF",szReminder="绝",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#8055FF"},--天剑绝式---狼牙堡·燕然峰
     {dwID=12146,col="#00FFFFFF",szReminder="凝",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#00FFFF"},--冰凝---狼牙堡·燕然峰
     {dwID=12117,col="#FF00FFFF",szReminder="瞄",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--瞄准---狼牙堡·燕然峰
-    {dwID=11371,col="#FFFFFFFF",szReminder="墩",nPriority=6,bAttention=true},--破甲---上阳宫·观风殿
+    {dwID=11119,col="#FF00FFFF",nPriority=7},--媚眼镇魂---上阳宫·观风殿
+    {dwID=11371,col="#FFFFFFFF",szReminder="墩",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFFFF"},--破甲---上阳宫·观风殿
     {dwID=10552,col="#FFFFFFFF",szReminder="钩",nPriority=6,bAttention=true},--钩吻---上阳宫·观风殿
+    {dwID=10562,col="#8055FFFF",nPriority=3,bScreenHead=true,colScreenHead="#8055FF"},--红颜---上阳宫·观风殿
     {dwID=11290,col="#FFFF00FF",szReminder="扰",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFF00"},--扰心---上阳宫·观风殿
     {dwID=11292,col="#FFFF00FF",szReminder="扰",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFF00"},--扰心---上阳宫·观风殿
     {dwID=11293,col="#FFFF00FF",szReminder="扰",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFF00"},--扰心---上阳宫·观风殿
     {dwID=10771,col="#FFFF00FF",szReminder="盾",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFF00"},--扰心盾---上阳宫·观风殿
     {dwID=10636,col="#FFFFFFFF",szReminder="追",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFFFF"},--追击---上阳宫·观风殿
     {dwID=10647,col="#FF00FFFF",szReminder="问",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--问心---上阳宫·观风殿
+    {dwID=10653,col="#FFFF00FF",szReminder="挑",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFF00"},--挑衅---上阳宫·观风殿
     {dwID=11041},--黄泉幻影·乱---上阳宫·观风殿
+    {dwID=10875,col="#FFFF0000",nPriority=8},--黄泉浊浪---上阳宫·观风殿
     {dwID=10963},--秋露---上阳宫·观风殿
+    {dwID=10554,col="#00FF00FF",nPriority=7},--身轻如燕---上阳宫·观风殿
+    {dwID=10572,col="#00FFFF00",szReminder="风",nPriority=8},--风力---上阳宫·观风殿
     {dwID=11064,col="#FF3232FF",szReminder="暴",nPriority=3,bScreenHead=true,colScreenHead="#FF3232"},--暴露---上阳宫·双曜亭
     {dwID=11050,col="#FF3232FF",szReminder="暴",nPriority=3,bScreenHead=true,colScreenHead="#FF3232"},--暴露---上阳宫·双曜亭
     {dwID=11065},--瞄准---上阳宫·双曜亭
@@ -245,7 +251,7 @@ data = {
     {dwID=8781,col="#00FFFFFF",szReminder="冻",nPriority=6,bAttention=true},--冻结---天泣林
     {dwID=8734,szStackOp=">=",nStackNum=4},--剧毒---天泣林
     {dwID=8752,col="#00FFFFFF",szReminder="倾",nPriority=7},--倾湖雷音---微山书院
-    {dwID=8773,col="#FF323200",szReminder="牢",nPriority=8},--画地为牢---微山书院
+    {dwID=8773,col="#FF3232FF",szReminder="牢",nPriority=0,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--画地为牢---微山书院
     {dwID=9024,col="#FF00FFFF",szReminder="毒",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--刀毒---阴山圣泉
     {dwID=8834},--震慑---阴山圣泉
     {dwID=8828,col="#FF00FFFF",szReminder="寄",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--寄生之种---阴山圣泉
@@ -375,6 +381,7 @@ data = {
     {dwID=13713,col="#8055FF00",szReminder="祭",nPriority=5,bCaution=true},--祭祀---冰火岛·荒血路
     {dwID=13721,col="#FF00FFFF",szReminder="审",nPriority=6,bAttention=true},--审判伤痕---冰火岛·荒血路
     {dwID=14031,col="#FF3232FF",szReminder="搬",nPriority=7},--搬运负重---冰火岛·荒血路
+    {dwID=14529,col="#FF8000FF",szReminder="灼",nPriority=7},--灼伤---冰火岛·荒血路
     {dwID=13819,col="#FF3232FF",szReminder="裂",nPriority=7},--伤口裂开---冰火岛·荒血路
     {dwID=13800,col="#FFFF0000",szReminder="摧",nPriority=8},--摧形元火---冰火岛·青莲狱
     {dwID=13959,col="#FF3232FF",szReminder="热",nPriority=7},--永燃之火·热度---冰火岛·青莲狱
@@ -414,5 +421,5 @@ data = {
     {dwID=9745},--朝圣---明教
     {dwID=4244},--渡厄---明教
     {dwID=13771},--疾电叱羽---蓬莱
-    --【南宫伯是帅咩】更新日期1220
+    --【南宫伯是帅咩】更新日期1224
 }
