@@ -472,10 +472,8 @@ function MY.SwitchTab(szID, bForceUpdate)
 				local szRoot = MY.FormatPath({'', MY_DATA_PATH.ROLE})
 				if OpenFolder then
 					OpenFolder(szRoot)
-				else
-					MY.UI.OpenTextEditor(szRoot)
 				end
-					MY.UI.OpenTextEditor(szRoot)
+				MY.UI.OpenTextEditor(szRoot)
 			end,
 		}, true):autoWidth()
 		ui:append('WndButton', {
@@ -486,10 +484,8 @@ function MY.SwitchTab(szID, bForceUpdate)
 				local szRoot = MY.FormatPath({'', MY_DATA_PATH.SERVER})
 				if OpenFolder then
 					OpenFolder(szRoot)
-				else
-					MY.UI.OpenTextEditor(szRoot)
 				end
-					MY.UI.OpenTextEditor(szRoot)
+				MY.UI.OpenTextEditor(szRoot)
 			end,
 		}, true):autoWidth()
 		ui:append('WndButton', {
@@ -500,10 +496,8 @@ function MY.SwitchTab(szID, bForceUpdate)
 				local szRoot = MY.FormatPath({'', MY_DATA_PATH.GLOBAL})
 				if OpenFolder then
 					OpenFolder(szRoot)
-				else
-					MY.UI.OpenTextEditor(szRoot)
 				end
-					MY.UI.OpenTextEditor(szRoot)
+				MY.UI.OpenTextEditor(szRoot)
 			end,
 		}, true):autoWidth()
 		wnd.OnPanelResize = function(wnd)
