@@ -287,7 +287,7 @@ local function GetPatch(oBase, oData)
 			return { t = 'nil' }
 		end
 		-- other patch value
-		return oData
+		return { v= oData }
 	end
 	-- empty patch
 	return nil
