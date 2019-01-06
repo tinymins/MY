@@ -365,8 +365,9 @@ local function UpdateView()
 	local nViewIndex, nViewCount = 1, #VIEW_LIST
 	for _, config in ipairs(D.GetConfig()) do
 		if config.enable then
-			local KObject = MY.GetObject(D.GetTarget(config.target, config.type))
-			local dwTarKungfuID = KObject and KObject.GetKungfuMountID() or 0
+			local dwTarType, dwTarID = D.GetTarget(config.target, config.type)
+			local KObject = MY.GetObject(dwTarType, dwTarID)
+			local dwTarKungfuID = KObject and dwTarType == TARGET.PLAYER and KObject.GetKungfuMountID() or 0
 			local view = VIEW_LIST[nViewIndex]
 			if not view then
 				view = {}
