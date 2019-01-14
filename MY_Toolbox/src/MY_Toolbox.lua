@@ -550,7 +550,7 @@ MY.BreatheCall('MY_Toolbox#OpenAllMap', 130, openAllMap)
 end
 
 -- 大战没交
-local m_aBigWars = {17816, 17817, 17818, 17819, 17820}
+local m_aBigWars = { 19191, 19192, 19195, 19196, 19197 }
 MY.RegisterEvent('ON_FRAME_CREATE.BIG_WAR_CHECK', function()
 	local me = GetClientPlayer()
 	if me and arg0:GetName() == 'ExitPanel' then
