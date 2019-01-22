@@ -82,12 +82,10 @@ data = {
     {dwID=8352},--锯骨---太原之战·逐虎驱狼
     {dwID=8312},--腐血狂乱---太原之战·逐虎驱狼
     {dwID=8215},--气血翻涌---太原之战·逐虎驱狼
-    {dwID=7993,col="#FF323200",szReminder="声",nPriority=8,szStackOp=">=",nStackNum=9},--声啸九天---太原之战·逐虎驱狼
-    {dwID=7992,col="#0050FF00",szReminder="弦",nPriority=8,szStackOp=">=",nStackNum=9},--弦音天籁---太原之战·逐虎驱狼
+    {dwID=7993,col="#FF323200",szReminder="声",nPriority=8},--声啸九天---太原之战·逐虎驱狼
+    {dwID=7992,col="#00FFFF00",szReminder="弦",nPriority=8},--弦音天籁---太原之战·逐虎驱狼
     {dwID=8170,col="#FF323200",szReminder="莲",nPriority=8},--莲花指---太原之战·逐虎驱狼
     {dwID=8172,col="#0050FF00",szReminder="莲",nPriority=8},--莲花指---太原之战·逐虎驱狼
-    {dwID=8174},--音波冲击---太原之战·逐虎驱狼
-    {dwID=8027},--音波冲击---太原之战·逐虎驱狼
     {dwID=8046},--失血---太原之战·逐虎驱狼
     {dwID=8036,col="#FFFF0000",szReminder="瞄",nPriority=8},--瞄准---太原之战·逐虎驱狼
     {dwID=8029,col="#FF323200",szReminder="流",nPriority=8,szStackOp=">=",nStackNum=2},--流血---太原之战·逐虎驱狼
@@ -153,5 +151,5 @@ data = {
     {dwID=9336,bOnlyMine=true,col="#00FF0000",szReminder="寒",nPriority=9},--寒梅---长歌
     {dwID=9337,bOnlyMine=true,col="#00FF0000",szReminder="寒",nPriority=9},--寒梅---长歌
     {dwID=9335,bOnlyMine=true,col="#FF323200",szReminder="落",nPriority=9},--落梅---长歌
-    --【南宫伯是帅咩】更新日期1224
+    --【南宫伯是帅咩】更新日期0122
 }

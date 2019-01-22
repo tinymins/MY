@@ -30,6 +30,7 @@ data = {
     {dwID=12249},--荊棘毒刺---狼牙堡·戰獸山
     {dwID=12258,szStackOp=">=",nStackNum=3},--屍毒---狼牙堡·戰獸山
     {dwID=12253,col="#FFFF00FF",szReminder="擒",nPriority=7},--被擒---狼牙堡·戰獸山
+    {dwID=12142},--地陷吸收---狼牙堡·燕然峰
     {dwID=12132},--蝕體---狼牙堡·燕然峰
     {dwID=12151},--寒絕劍---狼牙堡·燕然峰
     {dwID=12399},--天劍破體·強---狼牙堡·燕然峰
@@ -124,13 +125,11 @@ data = {
     {dwID=8199,col="#8055FFFF",szReminder="霜",nPriority=7},--冰霜氣勁---太原之戰·逐虎驅狼
     {dwID=8822},--音波之殤·陽---太原之戰·逐虎驅狼
     {dwID=8823},--音波之殤·陰---太原之戰·逐虎驅狼
-    {dwID=7993,col="#FF323200",szReminder="聲",nPriority=8,szStackOp=">=",nStackNum=9},--聲嘯九天---太原之戰·逐虎驅狼
-    {dwID=7992,col="#0050FF00",szReminder="弦",nPriority=8,szStackOp=">=",nStackNum=9},--弦音天籟---太原之戰·逐虎驅狼
+    {dwID=7993,col="#FF323200",szReminder="聲",nPriority=8},--聲嘯九天---太原之戰·逐虎驅狼
+    {dwID=7992,col="#00FFFF00",szReminder="弦",nPriority=8},--弦音天籟---太原之戰·逐虎驅狼
     {dwID=7996},--夢境纏繞---太原之戰·逐虎驅狼
     {dwID=8170,col="#FF323200",szReminder="蓮",nPriority=8},--蓮花指---太原之戰·逐虎驅狼
     {dwID=8172,col="#0050FF00",szReminder="蓮",nPriority=8},--蓮花指---太原之戰·逐虎驅狼
-    {dwID=8174},--音波衝擊---太原之戰·逐虎驅狼
-    {dwID=8027},--音波衝擊---太原之戰·逐虎驅狼
     {dwID=8047},--散魄---太原之戰·逐虎驅狼
     {dwID=8046},--失血---太原之戰·逐虎驅狼
     {dwID=8044,col="#FF3232FF",szReminder="鮮",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--鮮血獻祭---太原之戰·逐虎驅狼
@@ -188,6 +187,5 @@ data = {
     {dwID=9933,col="#00FF00FF",szReminder="籠",nPriority=7},--籠花---萬花
     {dwID=9544,col="#00FF00FF",szReminder="笑",nPriority=7},--笑傲光陰---長歌
     {dwID=9265,col="#00FF00FF",szReminder="雲",nPriority=7},--雲生結海---長歌
-    {dwID=9299,col="#FF8000FF",szReminder="杯",nPriority=7},--杯水留影---長歌
-    --【南宮伯是帥咩】更新日期1224
+    --【南宮伯是帥咩】更新日期0122
 }

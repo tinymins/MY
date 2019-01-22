@@ -11,6 +11,7 @@ data = {
     {dwID=10778,col="#FF00FFFF",szReminder="霜",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--大道一心·霜印---白帝水宫
     {dwID=10853,col="#00FFFFFF",szReminder="极",nPriority=7},--极寒---白帝水宫
     {dwID=11092},--枫之伤---夕颜阁
+    {dwID=1524,col="#FF00FFFF",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--激怒---日轮山城
     {dwID=11848},--烈阳---刀轮海厅
     {dwID=11616},--乱---刀轮海厅
     {dwID=11617},--合---刀轮海厅
@@ -102,11 +103,15 @@ data = {
     {dwID=1609,col="#FF3232FF",nPriority=7},--王眼镇魂---战宝迦兰
     {dwID=1269,col="#FF3232FF",nPriority=7},--王眼镇魂---战宝迦兰
     {dwID=1297,col="#00FFFFFF",nPriority=7},--破冰真气---战宝迦兰
-    {dwID=2134,col="#FF00FFFF",szReminder="咒",nPriority=7},--梵音轮回咒---战宝迦兰
+    {dwID=2135,col="#FF3232FF",szReminder="六",nPriority=7},--六道之外---战宝迦兰
+    {dwID=2133,col="#00FFFFFF",szReminder="追",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#00FFFF"},--追击---战宝迦兰
+    {dwID=2131,col="#FFFF00FF",szReminder="禁",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--禁锢咒---战宝迦兰
+    {dwID=2134,col="#FF00FFFF",szReminder="梵",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--梵音轮回咒---战宝迦兰
     {dwID=2632,col="#FF323200",szReminder="千",nPriority=8},--千针暗沼---荻花圣殿
     {dwID=2628,col="#FF00FFFF",szReminder="诛",nPriority=4,bAttention=true,bCaution=true},--诛心咒---荻花圣殿
     {dwID=3877,col="#FFFF00FF",szReminder="原",nPriority=5,bCaution=true},--原罪缚穴术点名---荻花圣殿
     {dwID=2631,col="#00FFFF00",szReminder="逐",nPriority=8},--逐莲升华---荻花圣殿
+    {dwID=2973,col="#FF323200",nPriority=8},--黑影瞬刀---荻花圣殿
     {dwID=3093,col="#FF3232FF",szReminder="灼",nPriority=7},--(3093)(1)龙渊泽_南诏双雄_刺客_阳性易伤---龙渊泽
     {dwID=3092,col="#00FFFFFF",szReminder="冰",nPriority=7},--(3092)(1)龙渊泽_南诏双雄_刺客_阴性易伤---龙渊泽
     {dwID=2676,col="#FFFF00FF",szReminder="重",nPriority=4,bAttention=true,bCaution=true},--重击---龙渊泽
@@ -175,7 +180,10 @@ data = {
     {dwID=8340,col="#FF3232FF",szReminder="注",nPriority=6,bAttention=true},--注目---太原之战·逐虎驱狼
     {dwID=8313,col="#00FFFFFF",szReminder="魔",nPriority=6,bAttention=true},--魔血化生---太原之战·逐虎驱狼
     {dwID=8307,col="#FFFFFFFF",szReminder="阎",nPriority=6,bAttention=true},--阎罗附体---太原之战·逐虎驱狼
-    {dwID=8305,col="#FF3232FF",szReminder="毒",nPriority=5,bCaution=true},--毒血涌动---太原之战·逐虎驱狼
+    {dwID=8224,col="#FF00FFFF",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--嗅觉追踪---太原之战·逐虎驱狼
+    {dwID=8305,col="#FFFF00FF",szReminder="毒",nPriority=4,bAttention=true,bCaution=true},--毒血涌动---太原之战·逐虎驱狼
+    {dwID=8174,col="#00FFFFFF",szReminder="阴",nPriority=3,bScreenHead=true,colScreenHead="#00FFFF"},--音波冲击---太原之战·逐虎驱狼
+    {dwID=8027,col="#FF3232FF",szReminder="阳",nPriority=3,bScreenHead=true,colScreenHead="#FF3232"},--音波冲击---太原之战·逐虎驱狼
     {dwID=8039,col="#FF3232FF",szReminder="圣",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--圣炎---太原之战·逐虎驱狼
     {dwID=8040,col="#00FFFFFF",szReminder="寒",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#00FFFF"},--寒意---太原之战·逐虎驱狼
     {dwID=8014,col="#FF323200",szReminder="恐",nPriority=8},--恐惧---太原之战·逐虎驱狼
@@ -233,9 +241,9 @@ data = {
     {dwID=7895,col="#FF3232FF",szReminder="车",nPriority=3,bScreenHead=true,colScreenHead="#FF3232"},--战车锁定---春明门
     {dwID=7896,col="#FF00FFFF",szReminder="射",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--射击锁定---春明门
     {dwID=7874,col="#00FFFFFF",szReminder="牢",nPriority=7},--画地为牢---春明门
-    {dwID=7972,col="#FF3232FF",szReminder="刺",nPriority=7,szStackOp=">=",nStackNum=2},--地刺---藏宝洞·野人谷
+    {dwID=7972,col="#FF3232FF",szReminder="刺",nPriority=7},--地刺---藏宝洞·野人谷
     {dwID=7962},--怒天刀---藏宝洞·夜狼山
-    {dwID=7973},--火引---藏宝洞·夜狼山
+    {dwID=7973,col="#FF3232FF",nPriority=7,bScreenHead=true,colScreenHead="#FF3232"},--火引---藏宝洞·夜狼山
     {dwID=8322,col="#8055FF00",szReminder="毒",nPriority=8},--中毒---雁门关之役
     {dwID=8332},--缴械---雁门关之役
     {dwID=8308},--音波·眩晕---雁门关之役
@@ -251,7 +259,7 @@ data = {
     {dwID=8781,col="#00FFFFFF",szReminder="冻",nPriority=6,bAttention=true},--冻结---天泣林
     {dwID=8734,szStackOp=">=",nStackNum=4},--剧毒---天泣林
     {dwID=8752,col="#00FFFFFF",szReminder="倾",nPriority=7},--倾湖雷音---微山书院
-    {dwID=8773,col="#FF3232FF",szReminder="牢",nPriority=0,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--画地为牢---微山书院
+    {dwID=8773,col="#FF3232FF",szReminder="牢",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--画地为牢---微山书院
     {dwID=9024,col="#FF00FFFF",szReminder="毒",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--刀毒---阴山圣泉
     {dwID=8834},--震慑---阴山圣泉
     {dwID=8828,col="#FF00FFFF",szReminder="寄",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--寄生之种---阴山圣泉
@@ -359,14 +367,15 @@ data = {
     {dwID=13537,col="#FF3232FF",szReminder="耀",nPriority=7},--烈日光耀---冰火岛·荒血路
     {dwID=13538,col="#00FF0000",szReminder="蔽",nPriority=8},--石块的阴影遮蔽---冰火岛·荒血路
     {dwID=13552,col="#FF00FFFF",szReminder="网",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--火网---冰火岛·荒血路
+    {dwID=14281,col="#FFFF00FF",szReminder="躁",nPriority=6,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--内力躁动---冰火岛·荒血路
     {dwID=13902,col="#FF3232FF",szReminder="重",nPriority=7},--重峦剑气---冰火岛·荒血路
     {dwID=13627,col="#00FFFFFF",szReminder="月",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#00FFFF"},--月下对决---冰火岛·荒血路
     {dwID=13625,col="#FF00FFFF",szReminder="缠",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF00FF"},--强风缠足---冰火岛·荒血路
     {dwID=13686,col="#00FF00FF",szReminder="脉",nPriority=7},--黄金气脉---冰火岛·荒血路
     {dwID=13848,col="#FF00FFFF",szReminder="发",nPriority=6,bAttention=true},--被发现---冰火岛·荒血路
     {dwID=13856,col="#FF3232FF",szReminder="饿",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF3232"},--饥饿---冰火岛·荒血路
-    {dwID=13854,col="#FF3232FF",szReminder="冷",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF3232"},--寒冷---冰火岛·荒血路
-    {dwID=13858,col="#FF3232FF",szReminder="渴",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF3232"},--口渴---冰火岛·荒血路
+    {dwID=13854,col="#FF323200",szReminder="冷",nPriority=8},--寒冷---冰火岛·荒血路
+    {dwID=13858,col="#FF323200",szReminder="渴",nPriority=8},--口渴---冰火岛·荒血路
     {dwID=13862,col="#8055FFFF",szReminder="陷",nPriority=7},--陷阱锁足---冰火岛·荒血路
     {dwID=14255,col="#FF00FFFF",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--猛兽的凝视---冰火岛·荒血路
     {dwID=13608,col="#00FF00FF",szReminder="信",nPriority=7},--红衣教信仰---冰火岛·荒血路
@@ -376,6 +385,7 @@ data = {
     {dwID=13639,col="#FF00FFFF",szReminder="惑",nPriority=6,bAttention=true},--幻惑---冰火岛·荒血路
     {dwID=13896,col="#00FF00FF",szReminder="梦",nPriority=7},--梦境同调---冰火岛·荒血路
     {dwID=13835,col="#FF3232FF",szReminder="伤",nPriority=7},--受伤---冰火岛·荒血路
+    {dwID=13782,col="#00FF0000",nPriority=8},--勇猛---冰火岛·荒血路
     {dwID=14233,col="#8055FFFF",szReminder="错",nPriority=7},--月下对决·经脉错乱---冰火岛·荒血路
     {dwID=13645,col="#8055FF00",szReminder="祭",nPriority=5,bCaution=true},--祭祀---冰火岛·荒血路
     {dwID=13713,col="#8055FF00",szReminder="祭",nPriority=5,bCaution=true},--祭祀---冰火岛·荒血路
@@ -420,6 +430,8 @@ data = {
     {dwID=9744},--朝圣---明教
     {dwID=9745},--朝圣---明教
     {dwID=4244},--渡厄---明教
+    {dwID=9395,col="#00FF00FF",szReminder="风",nPriority=7},--风入松---长歌
+    {dwID=9299,col="#FF8000FF",szReminder="杯",nPriority=7},--杯水留影---长歌
     {dwID=13771},--疾电叱羽---蓬莱
-    --【南宫伯是帅咩】更新日期1224
+    --【南宫伯是帅咩】更新日期0122
 }
