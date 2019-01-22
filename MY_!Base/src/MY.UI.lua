@@ -2394,7 +2394,7 @@ function UI:size(arg0, arg1, arg2, arg3)
 				wnd:SetSize(nWidth, nHeight)
 				hdl:SetSize(nWidth, nHeight)
 				img:SetSize(nWidth, nHeight)
-				txt:SetSize(nWidth - 10, nHeight)
+				txt:SetSize(nWidth - w - 5 - 10, nHeight)
 				hdl:FormatAllItemPos()
 			elseif componentType == 'WndEditComboBox' or componentType == 'WndAutocomplete' then
 				local wnd = GetComponentElement(raw, 'MAIN_WINDOW')
@@ -2606,7 +2606,7 @@ local function AutoSize(raw, bAutoWidth, bAutoHeight)
 				local ow, oh = txt:GetSize()
 				txt:AutoSize()
 				ow = txt:GetW() - ow
-				oh = txt:GetW() - oh
+				oh = txt:GetH() - oh
 				if bAutoWidth then
 					if RW then
 						RW = RW + ow
