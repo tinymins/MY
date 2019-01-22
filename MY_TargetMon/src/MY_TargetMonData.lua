@@ -603,6 +603,9 @@ for i = 1, 5 do
 				if not KTarget then
 					return
 				end
+				if MY.IsShieldedVersion() and not Table_GetBuff(item.dwID, item.nLevel) then
+					return
+				end
 				MY.CancelBuff(KTarget, item.dwID, item.nLevel)
 			end, nil)
 	end
