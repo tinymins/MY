@@ -229,7 +229,7 @@ local function Buff_MatchMon(tBuff, mon, config, dwKungfuID, dwTarKungfuID)
 				not config.hideOthers
 				or buff.dwSkillSrcID == UI_GetClientPlayerID()
 				or buff.dwSkillSrcID == GetControlPlayerID()
-			) then
+			) and (not MY.IsInArena() or Table_GetBuff(buff.dwID, buff.nLevel)) then
 				if mon.iconid then
 					return buff, mon.iconid
 				elseif tMonId.enable then
