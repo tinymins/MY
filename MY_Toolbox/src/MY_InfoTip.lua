@@ -114,7 +114,7 @@ MY_InfoTip.Cache = {
         GetContent = function()
             local p, s = MY.GetObject(MY.GetTarget()), _L['No Target']
             if p then
-                s = string.format(MY_InfoTip.Cache.Distance.formatString, GetCharacterDistance(GetClientPlayer().dwID, p.dwID)/64)
+                s = string.format(MY_InfoTip.Cache.Distance.formatString, MY.GetDistance(p))
             end
             return s
         end

@@ -109,6 +109,60 @@ function MY.ConvertNpcID(dwID, eType)
 end
 end
 
+do
+local DISTANCE_TYPE
+local PATH = {'config/distance_type.jx3dat', MY_DATA_PATH.ROLE}
+function MY.GetGlobalDistanceType()
+	if not DISTANCE_TYPE then
+		DISTANCE_TYPE = MY.LoadLUAData(PATH) or 'gwwean'
+	end
+	return DISTANCE_TYPE
+end
+
+function MY.SetGlobalDistanceType(szType)
+	DISTANCE_TYPE = szType
+	MY.SaveLUAData(PATH, DISTANCE_TYPE)
+end
+
+function MY.GetDistanceTypeList(bGlobal)
+	local t = {
+		{ szType = 'gwwean', szText = _L.DISTANCE_TYPE['gwwean'] },
+		{ szType = 'euclidean', szText = _L.DISTANCE_TYPE['euclidean'] },
+		{ szType = 'plane', szText = _L.DISTANCE_TYPE['plane'] },
+	}
+	if (bGlobal) then
+		insert(t, { szType = 'global', szText = _L.DISTANCE_TYPE['global'] })
+	end
+	return t
+end
+
+function MY.GetDistanceTypeMenu(bGlobal, eValue, fnAction)
+	local t = {}
+	for _, p in ipairs(MY.GetDistanceTypeList(true)) do
+		local t1 = {
+			szOption = p.szText,
+			bCheck = true, bMCheck = true,
+			bChecked = p.szType == eValue,
+			UserData = p,
+			fnAction = fnAction,
+		}
+		if p.szType == 'global' then
+			t1.szIcon = 'ui/Image/UICommon/CommonPanel2.UITex'
+			t1.nFrame = 105
+			t1.nMouseOverFrame = 106
+			t1.szLayer = 'ICON_RIGHTMOST'
+			t1.fnClickIcon = function()
+				MY.OpenPanel()
+				MY.SwitchTab('GlobalConfig')
+				Wnd.CloseWindow('PopupMenuPanel')
+			end
+		end
+		insert(t, t1)
+	end
+	return t
+end
+end
+
 -- OObject: KObject | {nType, dwID} | {dwID} | {nType, szName} | {szName}
 -- MY.GetDistance(OObject[, szType])
 -- MY.GetDistance(nX, nY)
@@ -123,7 +177,7 @@ end
 --         'gwwean'   : 郭氏距离
 --         'global'   : 使用全局配置
 function MY.GetDistance(arg0, arg1, arg2, arg3, arg4, arg5, arg6)
-	local szType = 'euclidean'
+	local szType
 	local nX1, nY1, nZ1 = 0, 0, 0
 	local nX2, nY2, nZ2 = 0, 0, 0
 	if IsTable(arg0) then
@@ -168,6 +222,9 @@ function MY.GetDistance(arg0, arg1, arg2, arg3, arg4, arg5, arg6)
 			local me = GetClientPlayer()
 			nX1, nY1, nX2, nY2 = me.nX, me.nY, arg0, arg1
 		end
+	end
+	if not szType or szType == 'global' then
+		szType = MY.GetGlobalDistanceType()
 	end
 	if szType == 'plane' then
 		return floor(((nX1 - nX2) ^ 2 + (nY1 - nY2) ^ 2) ^ 0.5) / 64

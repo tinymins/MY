@@ -175,7 +175,7 @@ function D.UpdateItem(hItem, p)
 	-- Ä¿±ê¾àÀë
 	local nDistance = 0
 	if player then
-		nDistance = floor(sqrt(pow(player.nX - KObject.nX, 2) + pow(player.nY - KObject.nY, 2) + (MY_Focus.bDistanceZ and pow((player.nZ - KObject.nZ) / 8, 2) or 0)) * 10 / 64) / 10
+		nDistance = floor(MY.GetDistance(player, KObject, MY_Focus.szDistanceType) * 10) / 10
 	end
 	hItem:Lookup('Handle_Compass/Compass_Distance'):SetText(nDistance)
 	hItem:Lookup('Handle_School/School_Distance'):SetText(nDistance)

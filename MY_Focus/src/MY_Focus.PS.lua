@@ -399,16 +399,6 @@ function PS.OnPanelActive(wnd)
 	y = y + deltaY
 
 	ui:append('WndCheckBox', {
-		x = x, y = y, w = wr, text = _L['show 3d distance'],
-		checked = MY_Focus.bDistanceZ,
-		oncheck = function(bChecked)
-			MY_Focus.bDistanceZ = bChecked
-		end,
-		autoenable = function() return MY_Focus.IsEnabled() end,
-	})
-	y = y + deltaY
-
-	ui:append('WndCheckBox', {
 		x = x, y = y,w = wr, text = _L['traversal object'],
 		tip = _L['may cause some problem in dungeon map'],
 		tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
@@ -476,6 +466,17 @@ function PS.OnPanelActive(wnd)
 		end,
 		autoenable = function() return MY_Focus.IsEnabled() end,
 	})
+	y = y + deltaY
+
+	ui:append('WndComboBox', {
+		x = x, y = y, w = wr, text = _L['Distance type'],
+		menu = function()
+			return MY.GetDistanceTypeMenu(true, MY_Focus.szDistanceType, function(p)
+				MY_Focus.szDistanceType = p.szType
+			end)
+		end,
+		autoenable = function() return MY_Focus.IsEnabled() end,
+	}, true):autoWidth()
 	y = y + deltaY
 
 	ui:append('WndSliderBox', {

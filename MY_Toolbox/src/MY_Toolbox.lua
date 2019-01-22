@@ -365,7 +365,7 @@ MY_ToolBox.ApplyConfig = function()
 						hShaList:AppendItemFromString('<shadow></shadow>')
 						sha = hShaList:Lookup(i)
 					end
-					nDis = GetCharacterDistance(UI_GetClientPlayerID(), hItem.nNpcID) / 64
+					nDis = MY.GetDistance(GetNpc(hItem.nNpcID))
 					if hItem.szState == 'disable' then
 						r, g, b = 191, 31, 31
 					else

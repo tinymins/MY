@@ -1680,7 +1680,7 @@ function CTM:RefreshDistance()
 		if v:IsValid() then
 			local p = GetPlayer(k) -- info.nPoX 刷新太慢了 对于治疗来说 这个太重要了
 			if p then
-				local nDistance = MY_GetDistance(p.nX, p.nY, p.nZ) -- 只计算平面 --??
+				local nDistance = MY_GetDistance(p) -- 只计算平面 --??
 				if CFG.bEnableDistance then
 					local find
 					for kk, vv in ipairs(CFG.tDistanceLevel) do

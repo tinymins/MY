@@ -2603,22 +2603,24 @@ local function AutoSize(raw, bAutoWidth, bAutoHeight)
 			if txt then
 				local ui = UI(raw)
 				local W, H, RW, RH = ui:size()
-				local ow, oh = txt:GetSize()
+				local oW, oH = txt:GetSize()
+				txt:SetSize(1000, 1000)
 				txt:AutoSize()
-				ow = txt:GetW() - ow
-				oh = txt:GetH() - oh
+				local deltaW = txt:GetW() - oW
+				local deltaH = txt:GetH() - oH
 				if bAutoWidth then
 					if RW then
-						RW = RW + ow
+						RW = RW + deltaW
 					end
-					W = W + ow
+					W = W + deltaW
 				end
 				if bAutoHeight then
 					if RH then
-						RH = RH + oh
+						RH = RH + deltaH
 					end
-					H = H + oh
+					H = H + deltaH
 				end
+				txt:SetSize(oW, oH)
 				ui:size(W, H, RW, RH)
 			end
 		end

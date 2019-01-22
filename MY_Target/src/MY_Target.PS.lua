@@ -45,7 +45,7 @@ function PS.OnPanelActive(wnd)
 
 	-- target direction
 	x, y = X + 10, y + deltaY
-	ui:append('WndCheckBox', {
+	x = x + ui:append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Show target direction'],
 		checked = MY_TargetDirection.bEnable,
@@ -53,6 +53,15 @@ function PS.OnPanelActive(wnd)
 			MY_TargetDirection.bEnable = bChecked
 		end,
 	}, true):autoWidth():width()
+
+	ui:append('WndComboBox', {
+		x = x, y = y, w = 200, text = _L['Distance type'],
+		menu = function()
+			return MY.GetDistanceTypeMenu(true, MY_TargetDirection.eDistanceType, function(p)
+				MY_TargetDirection.eDistanceType = p.szType
+			end)
+		end,
+	}, true):autoWidth()
 
 	-- target line
 	x, y = X + 10, y + deltaY

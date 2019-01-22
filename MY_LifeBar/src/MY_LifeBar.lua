@@ -502,7 +502,7 @@ local function CheckInvalidRect(dwType, dwID, me)
 		lb:SetKungfuVisible(bShowKungfu)
 		-- æ‡¿Î
 		if Config.bShowDistance then
-			lb:SetDistance(GetCharacterDistance(me.dwID, dwID) / 64)
+			lb:SetDistance(MY.GetDistance(object))
 		end
 		lb:SetDistanceVisible(Config.bShowDistance)
 		-- ∞Ôª·

@@ -57,7 +57,7 @@ MY_Focus.bDisplayKungfuIcon = false -- 显示心法图标
 MY_Focus.bFocusJJCParty     = false -- 焦竞技场队友
 MY_Focus.bFocusJJCEnemy     = true  -- 焦竞技场敌队
 MY_Focus.bShowTarget        = false -- 显示目标目标
-MY_Focus.bDistanceZ         = false -- 显示三维坐标距离
+MY_Focus.szDistanceType     = 'global' -- 坐标距离计算方式
 MY_Focus.bTraversal         = false -- 遍历焦点列表
 MY_Focus.bHealHelper        = false -- 辅助治疗模式
 MY_Focus.bEnableSceneNavi   = false -- 场景追踪点
@@ -88,7 +88,7 @@ RegisterCustomData('MY_Focus.bDisplayKungfuIcon')
 RegisterCustomData('MY_Focus.bFocusJJCParty')
 RegisterCustomData('MY_Focus.bFocusJJCEnemy')
 RegisterCustomData('MY_Focus.bShowTarget')
-RegisterCustomData('MY_Focus.bDistanceZ')
+RegisterCustomData('MY_Focus.szDistanceType')
 RegisterCustomData('MY_Focus.bTraversal')
 RegisterCustomData('MY_Focus.bHealHelper')
 RegisterCustomData('MY_Focus.bEnableSceneNavi')
@@ -530,7 +530,7 @@ function MY_Focus.GetDisplayList()
 					bFocus = false
 				end
 				if bFocus and p.tRule.nMaxDistance ~= 0
-				and pow(p.tRule.nMaxDistance * 64, 2) < pow(me.nX - KObject.nX, 2) + pow(me.nY - KObject.nY, 2) + (MY_Focus.bDistanceZ and pow((me.nZ - KObject.nZ) / 8, 2) or 0) then
+				and MY.GetDistance(me, KObject, MY_Focus.szDistanceType) > p.tRule.nMaxDistance * 64 then
 					bFocus = false
 				end
 				if bFocus and not p.tRule.tRelation.bAll then

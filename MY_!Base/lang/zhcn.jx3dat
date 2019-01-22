@@ -390,4 +390,13 @@ data = {
 	['Hold ctrl when move in to preview.'] = '按住CTRL滑入可试听。',
 
 	['[%s] want to see your char info, OK?'] = '[%s] 想知晓您的当前属性是否告知？',
+
+	['GlobalConfig'] = '全局设置',
+	['Distance type'] = '默认距离计算方式',
+	DISTANCE_TYPE = {
+		['gwwean'] = '郭氏距离',
+		['euclidean'] = '欧氏距离',
+		['plane'] = '平面距离',
+		['global'] = '全局默认',
+	},
 }

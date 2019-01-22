@@ -956,3 +956,36 @@ function PS.OnPanelActive(wnd)
 end
 MY.RegisterPanel('GlobalColor', _L['GlobalColor'], _L['System'], 2673, PS)
 end
+
+-- 全局杂项设置
+do
+local PS = {}
+function PS.OnPanelActive(wnd)
+	local ui = UI(wnd)
+	local w, h = ui:size()
+	local X, Y = 20, 20
+	local x, y = X, Y
+
+	ui:append('Text', {
+		x = X - 10, y = y,
+		text = _L['Distance type'],
+		color = { 255, 255, 0 },
+	}, true):autoWidth()
+	x, y = X, y + 30
+
+	for _, p in ipairs(MY.GetDistanceTypeList()) do
+		x = x + ui:append('WndRadioBox', {
+			x = x, y = y, w = 100, h = 25, group = 'distance type',
+			text = p.szText,
+			checked = MY.GetGlobalDistanceType() == p.szType,
+			oncheck = function(bChecked)
+				if not bChecked then
+					return
+				end
+				MY.SetGlobalDistanceType(p.szType)
+			end,
+		}, true):autoWidth():width() + 10
+	end
+end
+MY.RegisterPanel('GlobalConfig', _L['GlobalConfig'], _L['System'], 164, PS)
+end
