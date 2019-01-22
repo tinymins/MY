@@ -428,7 +428,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 		}, true):autoWidth():width()
 		x = x + 5
 		x = x + ui:append('WndEditBox', {
-			x = x, y = 375, w = 150, h = 25,
+			x = x, y = 375, w = 105, h = 25,
 			name = 'WndEditBox_SerendipitySilentMode',
 			placeholder = _L['Realname, leave blank for anonymous.'],
 			tip = _L['Realname, leave blank for anonymous.'],
@@ -439,7 +439,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 				MY.SaveLUAData({'config/realname.jx3dat', MY_DATA_PATH.ROLE}, szText)
 			end,
 			autovisible = function() return MY_Serendipity.bAutoShare end,
-		}, true):autoWidth():width()
+		}, true):width()
 		-- 手动分享子项
 		x = xS0
 		x = x + ui:append('WndCheckBox', {
@@ -462,6 +462,14 @@ function MY.SwitchTab(szID, bForceUpdate)
 			end,
 			autoenable = function() return not MY_Serendipity.bAutoShare end,
 			autovisible = function() return not MY_Serendipity.bAutoShare end,
+		}, true):autoWidth():width()
+		x = x + ui:append('WndButton', {
+			x = x, y = 375,
+			name = 'WndButton_SerendipitySearch',
+			text = _L['serendipity'],
+			onclick = function()
+				MY.OpenBrowser('https://j3cx.com/serendipity')
+			end,
 		}, true):autoWidth():width()
 		-- 用户设置
 		ui:append('WndButton', {
@@ -521,6 +529,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 			ui:children('#WndEditBox_SerendipitySilentMode'):top(scaleH + 65)
 			ui:children('#WndCheckBox_SerendipityNotifyTip'):top(scaleH + 65)
 			ui:children('#WndCheckBox_SerendipityNotifySound'):top(scaleH + 65)
+			ui:children('#WndButton_SerendipitySearch'):top(scaleH + 65)
 			ui:children('#WndButton_UserPreferenceFolder'):top(scaleH + 95)
 			ui:children('#WndButton_ServerPreferenceFolder'):top(scaleH + 95)
 			ui:children('#WndButton_GlobalPreferenceFolder'):top(scaleH + 95)
