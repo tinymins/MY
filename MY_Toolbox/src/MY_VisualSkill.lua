@@ -141,6 +141,7 @@ local function OnSkillCast(frame, dwSkillID, dwSkillLevel)
 		or dwSkillID == 13039      -- (13039) 普通攻击_盾刀攻击  卷雪刀
 		or dwSkillID == 14063      -- (14063) 普通攻击_琴攻击  五音六律
 		or dwSkillID == 16010      -- (16010) 普通攻击_傲霜刀攻击  霜风刀法
+		or dwSkillID == 19712      -- (19712) 普通攻击_蓬莱伞攻击  飘遥伞击
 		or dwSkillID == 17         -- (17)    江湖-防身武艺-打坐 打坐
 		or dwSkillID == 18         -- (18)    踏云 踏云
 		or dwIconID  == 1817       -- 闭阵
