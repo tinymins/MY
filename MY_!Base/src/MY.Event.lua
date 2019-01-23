@@ -290,16 +290,18 @@ function MY.RegisterModuleEvent(arg0, arg1)
 	local szModule = arg0
 	if arg1 == false then
 		local tEvent, nCount = MODULE_LIST[szModule], 0
-		for szKey, info in pairs(tEvent) do
-			if info.szEvent == "#BREATHE" then
-				MY.BreatheCall(szKey, false)
-			else
-				MY.RegisterEvent(szKey, false)
+		if tEvent then
+			for szKey, info in pairs(tEvent) do
+				if info.szEvent == "#BREATHE" then
+					MY.BreatheCall(szKey, false)
+				else
+					MY.RegisterEvent(szKey, false)
+				end
+				nCount = nCount + 1
 			end
-			nCount = nCount + 1
+			MODULE_LIST[szModule] = nil
+			MY.Debug({"Uninit # "  .. szModule .. " # Events Removed # " .. nCount}, MY_DEBUG.LOG)
 		end
-		MODULE_LIST[szModule] = nil
-		MY.Debug({"Uninit # "  .. szModule .. " # Events Removed # " .. nCount}, MY_DEBUG.LOG)
 	elseif IsTable(arg1) then
 		local nCount = 0
 		local tEvent = MODULE_LIST[szModule]
