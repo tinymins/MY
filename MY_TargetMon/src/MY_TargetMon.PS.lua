@@ -56,29 +56,30 @@ local C, D = {}, {
 	DeleteMonitorLevel = MY_TargetMonConfig.DeleteMonitorLevel,
 }
 local CUSTOM_BOXBG_STYLES = {
-	'UI/Image/Common/Box.UITex|0',
-	'UI/Image/Common/Box.UITex|1',
-	'UI/Image/Common/Box.UITex|2',
-	'UI/Image/Common/Box.UITex|3',
-	'UI/Image/Common/Box.UITex|4',
-	'UI/Image/Common/Box.UITex|5',
-	'UI/Image/Common/Box.UITex|6',
-	'UI/Image/Common/Box.UITex|7',
-	'UI/Image/Common/Box.UITex|8',
-	'UI/Image/Common/Box.UITex|9',
-	'UI/Image/Common/Box.UITex|10',
-	'UI/Image/Common/Box.UITex|11',
-	'UI/Image/Common/Box.UITex|12',
-	'UI/Image/Common/Box.UITex|13',
-	'UI/Image/Common/Box.UITex|14',
-	'UI/Image/Common/Box.UITex|34',
-	'UI/Image/Common/Box.UITex|35',
-	'UI/Image/Common/Box.UITex|42',
-	'UI/Image/Common/Box.UITex|43',
-	'UI/Image/Common/Box.UITex|44',
-	'UI/Image/Common/Box.UITex|45',
-	'UI/Image/Common/Box.UITex|77',
-	'UI/Image/Common/Box.UITex|78',
+	{'', _L['None']},
+	{'UI/Image/Common/Box.UITex|0'},
+	{'UI/Image/Common/Box.UITex|1'},
+	{'UI/Image/Common/Box.UITex|2'},
+	{'UI/Image/Common/Box.UITex|3'},
+	{'UI/Image/Common/Box.UITex|4'},
+	{'UI/Image/Common/Box.UITex|5'},
+	{'UI/Image/Common/Box.UITex|6'},
+	{'UI/Image/Common/Box.UITex|7'},
+	{'UI/Image/Common/Box.UITex|8'},
+	{'UI/Image/Common/Box.UITex|9'},
+	{'UI/Image/Common/Box.UITex|10'},
+	{'UI/Image/Common/Box.UITex|11'},
+	{'UI/Image/Common/Box.UITex|12'},
+	{'UI/Image/Common/Box.UITex|13'},
+	{'UI/Image/Common/Box.UITex|14'},
+	{'UI/Image/Common/Box.UITex|34'},
+	{'UI/Image/Common/Box.UITex|35'},
+	{'UI/Image/Common/Box.UITex|42'},
+	{'UI/Image/Common/Box.UITex|43'},
+	{'UI/Image/Common/Box.UITex|44'},
+	{'UI/Image/Common/Box.UITex|45'},
+	{'UI/Image/Common/Box.UITex|77'},
+	{'UI/Image/Common/Box.UITex|78'},
 }
 local CUSTOM_CDBAR_STYLES = {
 	MY.GetAddonInfo().szUITexST .. '|' .. 0,
@@ -781,10 +782,10 @@ local function DrawPreview(ui, config, OpenDetail)
 		text = _L['Icon style'],
 		menu = function()
 			local t, subt, szIcon, nFrame = {}
-			for _, text in ipairs(CUSTOM_BOXBG_STYLES) do
-				szIcon, nFrame = unpack(text:split('|'))
+			for _, p in ipairs(CUSTOM_BOXBG_STYLES) do
+				szIcon, nFrame = unpack(p[1]:split('|'))
 				subt = {
-					szOption = text,
+					szOption = p[2] or p[1],
 					fnAction = function()
 						D.ModifyConfig(config, 'boxBgUITex', text)
 					end,
@@ -794,7 +795,7 @@ local function DrawPreview(ui, config, OpenDetail)
 					nIconMarginRight = -3,
 					szLayer = 'ICON_RIGHTMOST',
 				}
-				if text == config.boxBgUITex then
+				if p[1] == config.boxBgUITex then
 					subt.rgb = {255, 255, 0}
 				end
 				insert(t, subt)
