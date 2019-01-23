@@ -103,7 +103,7 @@ local _C = {
 				[FORCE_TYPE.CANG_YUN ] = { r = 180, g = 60 , b = 0  , a = 255 }, -- ≤‘‘∆
 				[FORCE_TYPE.CHANG_GE ] = { r = 100, g = 250, b = 180, a = 100 }, -- ≥§∏Ë
 				[FORCE_TYPE.BA_DAO   ] = { r = 71 , g = 73 , b = 166, a = 128 }, -- ∞‘µ∂
-				[FORCE_TYPE.PENG_LAI ] = { r = 195, g = 210, b = 225, a = 128 }, -- ∞‘µ∂
+				[FORCE_TYPE.PENG_LAI ] = { r = 195, g = 210, b = 225, a = 128 }, -- ≈Ó¿≥
 			},
 		}, {
 			['Bar'] = {
@@ -122,7 +122,7 @@ local _C = {
 				[FORCE_TYPE.CANG_YUN ] = { r = 180, g = 60 , b = 0  , a = 255 }, -- ≤‘‘∆
 				[FORCE_TYPE.CHANG_GE ] = { r = 100, g = 250, b = 180, a = 150 }, -- ≥§∏Ë
 				[FORCE_TYPE.BA_DAO   ] = { r = 71 , g = 73 , b = 166, a = 128 }, -- ∞‘µ∂
-				[FORCE_TYPE.PENG_LAI ] = { r = 195, g = 210, b = 225, a = 128 }, -- ∞‘µ∂
+				[FORCE_TYPE.PENG_LAI ] = { r = 195, g = 210, b = 225, a = 128 }, -- ≈Ó¿≥
 			},
 		}, {
 			['Bar'] = {
@@ -141,6 +141,7 @@ local _C = {
 				[FORCE_TYPE.CANG_YUN ] = { image = 'ui/Image/Common/Money.UITex', frame = 26  }, -- ≤‘‘∆
 				[FORCE_TYPE.CHANG_GE ] = { image = 'ui/Image/Common/Money.UITex', frame = 30  }, -- ≥§∏Ë
 				[FORCE_TYPE.BA_DAO   ] = { image = 'ui/Image/Common/Money.UITex', frame = 35  }, -- ∞‘µ∂
+				[FORCE_TYPE.PENG_LAI ] = { image = 'ui/Image/Common/Money.UITex', frame = 42  }, -- ≈Ó¿≥
 			},
 		}, {
 			['Bar'] = {
@@ -159,6 +160,7 @@ local _C = {
 				[FORCE_TYPE.CANG_YUN ] = { image = 'ui/Image/Common/Money.UITex', frame = 219 }, -- ≤‘‘∆
 				[FORCE_TYPE.CHANG_GE ] = { image = 'ui/Image/Common/Money.UITex', frame = 30  }, -- ≥§∏Ë
 				[FORCE_TYPE.BA_DAO   ] = { image = 'ui/Image/Common/Money.UITex', frame = 35  }, -- ∞‘µ∂
+				[FORCE_TYPE.PENG_LAI ] = { image = 'ui/Image/Common/Money.UITex', frame = 42  }, -- ≈Ó¿≥
 			},
 		},
 	},
