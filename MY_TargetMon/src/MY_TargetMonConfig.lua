@@ -109,10 +109,26 @@ function D.LoadEmbeddedConfig()
 end
 D.LoadEmbeddedConfig()
 
+local SHIELDED_UUID = MY.ArrayToObject({
+	'00000223B5B291D0',
+	'00000223B5FD2010',
+	'00mu02rong04youMB',
+	'00mu02rong04youZS',
+	'00mu02rong04youMBC',
+	'00mu02rong04youZSC',
+	'00mu02rong04youMBMZB',
+	'00mu02rong04youZSMZB',
+	'00000000D7D31AB0',
+	'000000009AB91DB0',
+	'000001B68EE82B00',
+	'000001B68EE79EB0',
+	'000001B5FA8F1880',
+	'000001B6A2BCF6F0',
+})
 -- 通过内嵌数据将监控项转为Patch
 function D.PatchToConfig(patch)
 	-- 处理用户删除的内建数据和不合法的数据
-	if patch.delete or not patch.uuid then
+	if patch.delete or not patch.uuid or SHIELDED_UUID[patch.uuid] then
 		return
 	end
 	-- 合并未修改的内嵌数据
