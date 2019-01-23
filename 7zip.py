@@ -10,8 +10,8 @@ for name in name_list:
 		branch_name = name[2:]
 
 # 判断是否忘记切换分支
-if branch_name != 'publish':
-	print('Error: current branch(%s) is not on git publish!' % (branch_name))
+if branch_name != 'stable':
+	print('Error: current branch(%s) is not on git stable!' % (branch_name))
 	exit()
 
 # 读取MY.lua文件中的插件版本号
@@ -30,7 +30,7 @@ for version in version_list:
 
 # 判断是否忘记提升版本号
 if int(str_version) <= max_version:
-	print('Error: current version(%s) is smaller than or equals with last git published version(%d)!' % (str_version, max_version))
+	print('Error: current version(%s) is smaller than or equals with last git tagged version(%d)!' % (str_version, max_version))
 	exit()
 
 # 读取Git中最大的版本号 到最新版修改文件
