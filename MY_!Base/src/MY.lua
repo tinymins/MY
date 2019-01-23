@@ -461,8 +461,8 @@ MY = {
 ---------------------------------------------------------------------------------------------
 -- 本地函数变量
 ---------------------------------------------------------------------------------------------
-local _BUILD_ = '20181031'
-local _VERSION_ = 0x2011700
+local _BUILD_ = '20190123'
+local _VERSION_ = 0x2011800
 local _DEBUGLV_ = tonumber(LoadLUAData('interface/my.debug.level') or nil) or 4
 local _DELOGLV_ = tonumber(LoadLUAData('interface/my.delog.level') or nil) or 4
 local _NORESTM_ = tonumber(LoadLUAData('interface/my.nrtim.level') or nil) or -1
