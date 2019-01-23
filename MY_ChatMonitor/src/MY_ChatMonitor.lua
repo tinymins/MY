@@ -386,47 +386,10 @@ _C.OnPanelActive = function(wnd)
         onhover = function(bIn) this:SetAlpha((bIn and 255) or 200) end,
         onclick = function()
             PopupMenu((function()
-                local t = {}
-                for _, cg in ipairs(_C.tChannelGroups) do
-                    local _t = { szOption = cg.szCaption }
-                    if cg.tChannels[1] then
-                        for _, szChannel in ipairs(cg.tChannels) do
-                            table.insert(_t,{
-                                szOption = g_tStrings.tChannelName[szChannel],
-                                rgb = GetMsgFontColor(szChannel, true),
-                                fnAction = function()
-                                    MY_ChatMonitor.tChannels[szChannel] = not MY_ChatMonitor.tChannels[szChannel]
-                                    _C.RegisterMsgMonitor()
-                                end,
-                                bCheck = true,
-                                bChecked = MY_ChatMonitor.tChannels[szChannel]
-                            })
-                        end
-                    else
-                        for szPrefix, tChannels in pairs(cg.tChannels) do
-                            if #_t > 0 then
-                                table.insert(_t,{ bDevide = true })
-                            end
-                            table.insert(_t,{
-                                szOption = szPrefix,
-                                bDisable = true,
-                            })
-                            for _, szChannel in ipairs(tChannels) do
-                                table.insert(_t,{
-                                    szOption = g_tStrings.tChannelName[szChannel],
-                                    rgb = GetMsgFontColor(szChannel, true),
-                                    fnAction = function()
-                                        MY_ChatMonitor.tChannels[szChannel] = not MY_ChatMonitor.tChannels[szChannel]
-                                        _C.RegisterMsgMonitor()
-                                    end,
-                                    bCheck = true,
-                                    bChecked = MY_ChatMonitor.tChannels[szChannel]
-                                })
-                            end
-                        end
-                    end
-                    table.insert(t, _t)
-                end
+                local t = MY.GetChatChannelMenu(function(szChannel)
+                    MY_ChatMonitor.tChannels[szChannel] = not MY_ChatMonitor.tChannels[szChannel]
+                    _C.RegisterMsgMonitor()
+                end, MY_ChatMonitor.tChannels)
                 table.insert(t, { bDevide = true })
                 table.insert(t,{
                     szOption = _L['timestrap format'], {

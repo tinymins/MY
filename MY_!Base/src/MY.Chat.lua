@@ -966,6 +966,82 @@ function MY.GetChannelDailyLimit(nLevel, nChannel)
 end
 end
 
+do
+local CHANNEL_GROUP = {
+    {
+        szCaption = g_tStrings.CHANNEL_CHANNEL,
+        tChannels = {
+            'MSG_NORMAL', 'MSG_PARTY', 'MSG_MAP', 'MSG_BATTLE_FILED', 'MSG_GUILD', 'MSG_GUILD_ALLIANCE', 'MSG_SCHOOL', 'MSG_WORLD',
+            'MSG_TEAM', 'MSG_CAMP', 'MSG_GROUP', 'MSG_WHISPER', 'MSG_SEEK_MENTOR', 'MSG_FRIEND', 'MSG_IDENTITY', 'MSG_SYS',
+        },
+    }, {
+        szCaption = g_tStrings.FIGHT_CHANNEL,
+        tChannels = {
+            [g_tStrings.STR_NAME_OWN] = {
+                'MSG_SKILL_SELF_HARMFUL_SKILL', 'MSG_SKILL_SELF_BENEFICIAL_SKILL', 'MSG_SKILL_SELF_BUFF',
+                'MSG_SKILL_SELF_BE_HARMFUL_SKILL', 'MSG_SKILL_SELF_BE_BENEFICIAL_SKILL', 'MSG_SKILL_SELF_DEBUFF',
+                'MSG_SKILL_SELF_SKILL', 'MSG_SKILL_SELF_MISS', 'MSG_SKILL_SELF_FAILED', 'MSG_SELF_DEATH',
+            },
+            [g_tStrings.TEAMMATE] = {
+                'MSG_SKILL_PARTY_HARMFUL_SKILL', 'MSG_SKILL_PARTY_BENEFICIAL_SKILL', 'MSG_SKILL_PARTY_BUFF',
+                'MSG_SKILL_PARTY_BE_HARMFUL_SKILL', 'MSG_SKILL_PARTY_BE_BENEFICIAL_SKILL', 'MSG_SKILL_PARTY_DEBUFF',
+                'MSG_SKILL_PARTY_SKILL', 'MSG_SKILL_PARTY_MISS', 'MSG_PARTY_DEATH',
+            },
+            [g_tStrings.OTHER_PLAYER] = {'MSG_SKILL_OTHERS_SKILL', 'MSG_SKILL_OTHERS_MISS', 'MSG_OTHERS_DEATH'},
+            ['NPC'] = {'MSG_SKILL_NPC_SKILL', 'MSG_SKILL_NPC_MISS', 'MSG_NPC_DEATH'},
+            [g_tStrings.OTHER] = {'MSG_OTHER_ENCHANT', 'MSG_OTHER_SCENE'},
+        },
+    }, {
+        szCaption = g_tStrings.CHANNEL_COMMON,
+        tChannels = {
+            [g_tStrings.ENVIROMENT] = {'MSG_NPC_NEARBY', 'MSG_NPC_YELL', 'MSG_NPC_PARTY', 'MSG_NPC_WHISPER'},
+            [g_tStrings.EARN] = {
+                'MSG_MONEY', 'MSG_EXP', 'MSG_ITEM', 'MSG_REPUTATION', 'MSG_CONTRIBUTE',
+                'MSG_ATTRACTION', 'MSG_PRESTIGE', 'MSG_TRAIN', 'MSG_DESGNATION',
+                'MSG_ACHIEVEMENT', 'MSG_MENTOR_VALUE', 'MSG_THEW_STAMINA', 'MSG_TONG_FUND'
+            },
+        },
+    }
+}
+function MY.GetChatChannelMenu(fnAction, tChecked)
+	local t = {}
+	for _, cg in ipairs(CHANNEL_GROUP) do
+		local t1 = { szOption = cg.szCaption }
+		if cg.tChannels[1] then
+			for _, szChannel in ipairs(cg.tChannels) do
+				insert(t1,{
+					szOption = g_tStrings.tChannelName[szChannel],
+					rgb = GetMsgFontColor(szChannel, true),
+					UserData = szChannel,
+					fnAction = fnAction,
+					bCheck = true,
+					bChecked = tChecked[szChannel]
+				})
+			end
+		else
+			for szPrefix, tChannels in pairs(cg.tChannels) do
+				if #t1 > 0 then
+					insert(t1,{ bDevide = true })
+				end
+				insert(t1,{ szOption = szPrefix, bDisable = true })
+				for _, szChannel in ipairs(tChannels) do
+					insert(t1,{
+						szOption = g_tStrings.tChannelName[szChannel],
+						rgb = GetMsgFontColor(szChannel, true),
+						UserData = szChannel,
+						fnAction = fnAction,
+						bCheck = true,
+						bChecked = tChecked[szChannel]
+					})
+				end
+			end
+		end
+		insert(t, t1)
+	end
+	return t
+end
+end
+
 -- Register:   MY.RegisterMsgMonitor(string szKey, function fnAction, table tChannels)
 --             MY.RegisterMsgMonitor(function fnAction, table tChannels)
 -- Unregister: MY.RegisterMsgMonitor(string szKey)
