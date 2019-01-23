@@ -94,6 +94,20 @@ function D.GetTarget(eTarType, eMonType)
 end
 end
 
+function D.IsShielded()
+	return MY.IsShieldedVersion() and MY.IsInArena()
+end
+
+function D.IsShieldedBuff(dwID, nLevel)
+	if D.IsShielded() then
+		local info = Table_GetBuff(dwID, nLevel)
+		if not info or info.bShow == 0 then
+			return true
+		end
+	end
+	return false
+end
+
 do
 local function OnSkill(dwID, nLevel)
 	SKILL_EXTRA[dwID] = dwID
@@ -229,7 +243,7 @@ local function Buff_MatchMon(tBuff, mon, config, dwKungfuID, dwTarKungfuID)
 				not config.hideOthers
 				or buff.dwSkillSrcID == UI_GetClientPlayerID()
 				or buff.dwSkillSrcID == GetControlPlayerID()
-			) and (not MY.IsInArena() or Table_GetBuff(buff.dwID, buff.nLevel)) then
+			) and (not D.IsShieldedBuff(dwID, buff.nLevel)) then
 				if mon.iconid then
 					return buff, mon.iconid
 				elseif tMonId.enable then
@@ -268,8 +282,8 @@ local function Buff_MonToView(mon, buff, item, KObject, nIcon, config, tMonExist
 		item.nTimeLeft = nTimeLeft
 		item.szStackNum = buff.nStackNum > 1 and buff.nStackNum or ''
 		item.nTimeTotal = nTimeTotal
-		item.szLongName = mon.longAlias or buff.szName
-		item.szShortName = mon.shortAlias or buff.szName
+		item.szLongName = (not D.IsShielded()) and mon.longAlias or buff.szName
+		item.szShortName = (not D.IsShielded()) and mon.shortAlias or buff.szName
 	else
 		item.bCd = false
 		item.fCd = 1
@@ -603,7 +617,7 @@ for i = 1, 5 do
 				if not KTarget then
 					return
 				end
-				if MY.IsShieldedVersion() and not Table_GetBuff(item.dwID, item.nLevel) then
+				if D.IsShieldedBuff(item.dwID, item.nLevel) then
 					return
 				end
 				MY.CancelBuff(KTarget, item.dwID, item.nLevel)
