@@ -253,7 +253,7 @@ function D.LoadConfig(bDefault, bOriginal, bReloadEmbedded)
 		aPatch = MY.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE)
 	end
 	if not aPatch then
-		aPatch = MY.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE) or {}
+		aPatch = {}
 	end
 	local aConfig, tLoaded = {}, {}
 	for i, patch in ipairs(aPatch) do
