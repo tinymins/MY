@@ -186,14 +186,14 @@ local function Base_MonToView(mon, info, item, KObject, nIcon, config, tMonExist
 		item.nIcon = 13
 	end
 	if config.cdFlash and item.bCd then
-		if item.fPercentage >= 0.9 then
+		if item.fProgress >= 0.9 then
 			item.aExtentAnimate = EXTENT_ANIMATE['[0.9,1]']
-		elseif item.fPercentage >= 0.7 then
+		elseif item.fProgress >= 0.7 then
 			item.aExtentAnimate = EXTENT_ANIMATE['[0.7,0.9)']
 		else
 			item.aExtentAnimate = EXTENT_ANIMATE.NONE
 		end
-		item.bStaring = item.fPercentage > 0.5
+		item.bStaring = item.fProgress > 0.5
 	else
 		item.bStaring = false
 		item.aExtentAnimate = EXTENT_ANIMATE.NONE
@@ -276,7 +276,7 @@ local function Buff_MonToView(mon, buff, item, KObject, nIcon, config, tMonExist
 		local nTimeTotal = BUFF_TIME[KObject.dwID][buff.szKey]
 		item.bCd = true
 		item.fCd = nTimeLeft / nTimeTotal
-		item.fPercentage = 1 - item.fCd
+		item.fProgress = 1 - item.fCd
 		item.bSparking = false
 		item.dwID = buff.dwID
 		item.nLevel = buff.nLevel
@@ -288,7 +288,7 @@ local function Buff_MonToView(mon, buff, item, KObject, nIcon, config, tMonExist
 	else
 		item.bCd = true
 		item.fCd = 0
-		item.fPercentage = 0
+		item.fProgress = 0
 		item.nTimeLeft = -1
 		item.bSparking = true
 		item.dwID = next(mon.ids) or -1
@@ -354,7 +354,7 @@ local function Skill_MonToView(mon, skill, item, KObject, nIcon, config, tMonExi
 		local nStackNum = skill.nCdMaxCount - skill.nCdCount
 		item.bCd = true
 		item.fCd = 1 - nTimeLeft / nTimeTotal
-		item.fPercentage = item.fCd
+		item.fProgress = item.fCd
 		item.bSparking = false
 		item.dwID = skill.dwID
 		item.nLevel = skill.nLevel
@@ -366,7 +366,7 @@ local function Skill_MonToView(mon, skill, item, KObject, nIcon, config, tMonExi
 	else
 		item.bCd = false
 		item.fCd = 1
-		item.fPercentage = 0
+		item.fProgress = 0
 		item.bSparking = true
 		item.dwID = next(mon.ids) or -1
 		item.nLevel = item.dwID and mon.ids[item.dwID] and next(mon.ids[item.dwID].levels) or -1
