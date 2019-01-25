@@ -827,7 +827,7 @@ local MY_AJAX_TAG = 'MY_AJAX#'
 local l_ajaxsettingsmeta = {
 	__index = {
 		type = 'get',
-		driver = 'curl',
+		driver = 'auto',
 		timeout = 60000,
 		charset = 'utf8',
 	}
@@ -887,6 +887,21 @@ function MY.Ajax(settings)
 	end
 	assert(method == 'post' or method == 'get' or method == 'put' or method == 'delete', '[MY_AJAX] Unknown http request type: ' .. method)
 
+	local driver = settings.driver
+	if driver == 'auto' then
+		if Curl_Create then
+			driver = 'curl'
+		elseif CURL_HttpRqst and method == 'get' then
+			driver = 'origin'
+		elseif CURL_HttpPost and method == 'post' then
+			driver = 'origin'
+		elseif settings.success then
+			driver = 'webbrowser'
+		else
+			driver = 'webcef'
+		end
+	end
+
 	if not settings.success then
 		settings.success = function(html, status)
 			MY.Debug({settings.url .. ' - SUCCESS'}, 'AJAX', MY_DEBUG.LOG)
@@ -898,7 +913,7 @@ function MY.Ajax(settings)
 		end
 	end
 
-	if settings.driver == 'curl' then
+	if driver == 'curl' then
 		if not Curl_Create then
 			return settings.error()
 		end
@@ -923,7 +938,7 @@ function MY.Ajax(settings)
 		curl:OnError(settings.error)
 		curl:SetConnTimeout(settings.timeout)
 		curl:Perform()
-	elseif settings.driver == 'webcef' then
+	elseif driver == 'webcef' then
 		assert(method == 'get', '[MY_AJAX] Webcef only support get method, got ' .. method)
 		local RequestID, hFrame
 		local nFreeWebPages = #MY_RRWC_FREE
@@ -975,7 +990,7 @@ function MY.Ajax(settings)
 
 		-- start chrome navigate
 		wWebCef:Navigate(url)
-	elseif settings.driver == 'webbrowser' then
+	elseif driver == 'webbrowser' then
 		assert(method == 'get', '[MY_AJAX] Webbrowser only support get method, got ' .. method)
 		local RequestID, hFrame
 		local nFreeWebPages = #MY_RRWP_FREE
@@ -1029,7 +1044,7 @@ function MY.Ajax(settings)
 
 		-- start ie navigate
 		wWebPage:Navigate(url)
-	else -- if settings.driver == 'origin' then
+	else -- if driver == 'origin' then
 		local szKey = GetTickCount() * 100
 		while MY_CALL_AJAX[MY_AJAX_TAG .. szKey] do
 			szKey = szKey + 1

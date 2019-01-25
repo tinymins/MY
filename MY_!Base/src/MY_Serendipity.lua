@@ -125,7 +125,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 		end
 		local function DoUpload()
 			MY.Ajax({
-				driver = 'origin',
+				driver = 'auto',
 				type = 'post',
 				url = 'http://data.jx3.derzh.com/serendipity/?l='
 				.. MY.GetLang() .. '&m=' .. nMethod
