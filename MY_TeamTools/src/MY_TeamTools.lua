@@ -204,10 +204,10 @@ function RaidTools.OnFrameCreate()
 	this.hKungfuList = this.hPageSet:Lookup('Page_Info', 'Handle_Kungfu/Handle_Kungfu_List')
 	this.hKungfu     = this:CreateItemData(RT_INIFILE, 'Handle_Kungfu_Item')
 	this.hKungfuList:Clear()
-	for k, v in pairs(MY.GetKungfuInfo('all')) do
-		local h = this.hKungfuList:AppendItemFromData(this.hKungfu, v[1])
+	for k, dwKungfuID in pairs(MY.GetKungfuList()) do
+		local h = this.hKungfuList:AppendItemFromData(this.hKungfu, dwKungfuID)
 		local img = h:Lookup('Image_Force')
-		img:FromIconID(select(2, MY_GetSkillName(v[1])))
+		img:FromIconID(select(2, MY_GetSkillName(dwKungfuID)))
 		h:Lookup('Text_Num'):SetText(0)
 		h.nFont = h:Lookup('Text_Num'):GetFontScheme()
 		h.OnItemMouseLeave = function()
@@ -894,17 +894,17 @@ function RT.UpdateList()
 	frame.hProgress:Lookup('Image_Progress'):SetPercentage(nAvgScore / RT_SCORE_FULL)
 	frame.hProgress:Lookup('Text_Progress'):SetText(_L('Team strength(%d/%d)', math.floor(nAvgScore), RT_SCORE_FULL))
 	-- 心法统计
-	for k, v in pairs(MY.GetKungfuInfo('all')) do
+	for k, dwKungfuID in pairs(MY.GetKungfuList()) do
 		local h = frame.hKungfuList:Lookup(k - 1)
 		local img = h:Lookup('Image_Force')
 		local nCount = 0
-		if tKungfu[v[1]] then
-			nCount = #tKungfu[v[1]]
+		if tKungfu[dwKungfuID] then
+			nCount = #tKungfu[dwKungfuID]
 		end
-		local szName, nIcon = MY_GetSkillName(v[1])
+		local szName, nIcon = MY_GetSkillName(dwKungfuID)
 		img:FromIconID(nIcon)
 		h:Lookup('Text_Num'):SetText(nCount)
-		if not tKungfu[v[1]] then
+		if not tKungfu[dwKungfuID] then
 			h:SetAlpha(60)
 			h.OnItemMouseEnter = nil
 		else
@@ -913,12 +913,12 @@ function RT.UpdateList()
 				this:Lookup('Text_Num'):SetFontScheme(101)
 				local xml = {}
 				insert(xml, GetFormatText(szName .. g_tStrings.STR_COLON .. nCount .. g_tStrings.STR_PERSON ..'\n', 157))
-				table.sort(tKungfu[v[1]], function(a, b)
+				table.sort(tKungfu[dwKungfuID], function(a, b)
 					local nCountA = a.nEquipScore or -1
 					local nCountB = b.nEquipScore or -1
 					return nCountA > nCountB
 				end)
-				for k, v in ipairs(tKungfu[v[1]]) do
+				for k, v in ipairs(tKungfu[dwKungfuID]) do
 					if v.nEquipScore then
 						insert(xml, GetFormatText(v.szName .. g_tStrings.STR_COLON ..  v.nEquipScore  ..'\n', 106))
 					else
