@@ -519,6 +519,7 @@ local settings = {
 				GetTargetTypeList  = D.GetTargetTypeList ,
 				GetConfig          = D.GetConfig         ,
 				LoadConfig         = D.LoadConfig        ,
+				SaveConfig         = D.SaveConfig        ,
 				ImportPatches      = D.ImportPatches     ,
 				ExportPatches      = D.ExportPatches     ,
 				MarkConfigChanged  = D.MarkConfigChanged ,

@@ -39,6 +39,7 @@ end
 local C, D = {}, {
 	GetTargetTypeList  = MY_TargetMonConfig.GetTargetTypeList ,
 	LoadConfig         = MY_TargetMonConfig.LoadConfig        ,
+	SaveConfig         = MY_TargetMonConfig.SaveConfig        ,
 	ImportPatches      = MY_TargetMonConfig.ImportPatches     ,
 	ExportPatches      = MY_TargetMonConfig.ExportPatches     ,
 	GetConfig          = MY_TargetMonConfig.GetConfig         ,
@@ -1066,7 +1067,7 @@ function PS.OnPanelActive(wnd)
 		text = _L['Save As Default'],
 		onclick = function()
 			MY.Confirm(_L['Sure to save as default?'], function()
-				MY.SaveLUAData(CUSTOM_DEFAULT_CONFIG_FILE, D.FormatSavingConfigs(Config))
+				D.SaveConfig(true)
 			end)
 		end,
 	})
