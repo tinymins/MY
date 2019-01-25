@@ -20,7 +20,7 @@ data = {
     ['Show name'] = '顯示名稱',
     ['Show time'] = '顯示時間',
 
-    ['Please input name:'] = '請輸入名稱：',
+    ['Please input name/id:'] = '請輸入名稱/ID：',
     ['Display %d eachline.'] = '每行%d個',
     ['UI scale %d%%.'] = '界面縮放%d%%',
     ['Font scale %d%%.'] = '文字縮放%d%%',

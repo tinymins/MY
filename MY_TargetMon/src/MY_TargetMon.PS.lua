@@ -155,7 +155,7 @@ local function DrawDetail(ui)
 	end
 
 	local function InsertMonitor(index)
-		GetUserInput(_L['Please input name:'], function(szVal)
+		GetUserInput(_L['Please input name/id:'], function(szVal)
 			szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
 			if szVal ~= '' then
 				local mon = D.CreateMonitor(l_config, szVal)
@@ -263,7 +263,7 @@ local function DrawDetail(ui)
 			{
 				szOption = _L['Rename'],
 				fnAction = function()
-					GetUserInput(_L['Please input name:'], function(szVal)
+					GetUserInput(_L['Please input name/id:'], function(szVal)
 						szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
 						if szVal ~= '' then
 							list:listbox(
