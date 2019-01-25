@@ -305,6 +305,42 @@ function D.SaveConfig(bDefault)
 	end
 end
 
+function D.ImportPatches(aPatch)
+	local nImportCount = 0
+	local nReplaceCount = 0
+	for _, patch in ipairs(aPatch) do
+		local config = D.PatchToConfig(patch)
+		if config then
+			for i, cfg in ipairs_r(CONFIG) do
+				if config.uuid and config.uuid == cfg.uuid then
+					remove(CONFIG, i)
+					nReplaceCount = nReplaceCount + 1
+				end
+			end
+			nImportCount = nImportCount + 1
+			insert(CONFIG, config)
+		end
+	end
+	if nImportCount > 0 then
+		CONFIG_CHANGED = true
+		FireUIEvent('MY_TARGET_MON_CONFIG_INIT')
+	end
+	return nImportCount, nReplaceCount
+end
+
+function D.ExportPatches(aUUID)
+	local aPatch = {}
+	for i, uuid in ipairs(aUUID) do
+		for i, config in ipairs(CONFIG) do
+			local patch = config.uuid == uuid and D.ConfigToPatch(config)
+			if patch then
+				insert(aPatch, patch)
+			end
+		end
+	end
+	return aPatch
+end
+
 do
 local function onInit()
 	if CONFIG then
@@ -483,6 +519,8 @@ local settings = {
 				GetTargetTypeList  = D.GetTargetTypeList ,
 				GetConfig          = D.GetConfig         ,
 				LoadConfig         = D.LoadConfig        ,
+				ImportPatches      = D.ImportPatches     ,
+				ExportPatches      = D.ExportPatches     ,
 				MarkConfigChanged  = D.MarkConfigChanged ,
 				CreateConfig       = D.CreateConfig      ,
 				MoveConfig         = D.MoveConfig        ,

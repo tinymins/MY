@@ -39,6 +39,8 @@ end
 local C, D = {}, {
 	GetTargetTypeList  = MY_TargetMonConfig.GetTargetTypeList ,
 	LoadConfig         = MY_TargetMonConfig.LoadConfig        ,
+	ImportPatches      = MY_TargetMonConfig.ImportPatches     ,
+	ExportPatches      = MY_TargetMonConfig.ExportPatches     ,
 	GetConfig          = MY_TargetMonConfig.GetConfig         ,
 	CreateConfig       = MY_TargetMonConfig.CreateConfig      ,
 	MoveConfig         = MY_TargetMonConfig.MoveConfig        ,
@@ -997,27 +999,14 @@ function PS.OnPanelActive(wnd)
 			if file == '' then
 				return
 			end
-			local configs = MY.LoadLUAData(file)
-			if not configs then
+			local aPatch = MY.LoadLUAData(file)
+			if not aPatch then
 				return
 			end
-			local importCount = 0
-			local replaceCount = 0
-			for _, config in ipairs(configs) do
-				if D.FormatConfigStructure(config) then
-					for i, cfg in ipairs_r(Config) do
-						if config.uuid and config.uuid == cfg.uuid then
-							D.CloseFrame(cfg)
-							remove(Config, i)
-							replaceCount = replaceCount + 1
-						end
-					end
-					insert(Config, config)
-					importCount = importCount + 1
-				end
+			local importCount, replaceCount = D.ImportPatches(aPatch)
+			if importCount > 0 then
+				MY.SwitchTab('MY_TargetMon', true)
 			end
-			D.CheckAllFrame()
-			MY.SwitchTab('MY_TargetMon', true)
 			MY.Sysmsg({ _L('Import successed, %d imported and %d replaced.', importCount, replaceCount) })
 			OutputMessage('MSG_ANNOUNCE_YELLOW', _L('Import successed, %d imported and %d replaced.', importCount, replaceCount))
 		end,
@@ -1028,21 +1017,21 @@ function PS.OnPanelActive(wnd)
 		w = 60, h = 30,
 		text = _L['Export'],
 		menu = function()
-			local configs = {}
+			local aUUID = {}
 			local menu = {}
 			local indent = IsCtrlKeyDown() and '\t' or nil
-			for _, config in ipairs(Config) do
+			for _, config in ipairs(D.GetConfig()) do
 				insert(menu, {
 					bCheck = true,
 					szOption = config.caption,
 					fnAction = function()
-						for i, cfg in ipairs_r(configs) do
-							if cfg == config then
-								remove(configs, i)
+						for i, uuid in ipairs_r(aUUID) do
+							if uuid == config.uuid then
+								remove(aUUID, i)
 								return
 							end
 						end
-						insert(configs, config)
+						insert(aUUID, config.uuid)
 					end,
 				})
 			end
@@ -1058,16 +1047,13 @@ function PS.OnPanelActive(wnd)
 							.. '.jx3dat',
 						MY_DATA_PATH.GLOBAL,
 					})
-					local cfgs = {}
-					for i, config in ipairs(configs) do
-						insert(cfgs, D.FormatSavingConfig(config))
-					end
-					MY.SaveLUAData(file, cfgs, indent)
+					local aPatch = D.ExportPatches(aUUID)
+					MY.SaveLUAData(file, aPatch, indent)
 					MY.Sysmsg({ _L('Data exported, file saved at %s.', file) })
 					OutputMessage('MSG_ANNOUNCE_YELLOW', _L('Data exported, file saved at %s.', file))
 				end,
 				fnDisable = function()
-					return not next(configs)
+					return not next(aUUID)
 				end,
 			})
 			return menu
