@@ -155,7 +155,7 @@ local function Base_MatchMon(mon, dwKungfuID, dwTarKungfuID)
 end
 local function Base_MonToView(mon, info, item, KObject, nIcon, config, tMonExist, tMonLast)
 	-- 格式化完善视图列表信息
-	if config.showTime and item.bCd and item.nTimeLeft then
+	if config.showTime and item.bCd and item.nTimeLeft and item.nTimeLeft > 0 then
 		local nTimeLeft, szTimeLeft = item.nTimeLeft, ''
 		if nTimeLeft <= 3600 then
 			if nTimeLeft > 60 then
@@ -186,14 +186,14 @@ local function Base_MonToView(mon, info, item, KObject, nIcon, config, tMonExist
 		item.nIcon = 13
 	end
 	if config.cdFlash and item.bCd then
-		if item.fCd >= 0.9 then
+		if item.fPercentage >= 0.9 then
 			item.aExtentAnimate = EXTENT_ANIMATE['[0.9,1]']
-		elseif item.fCd >= 0.7 then
+		elseif item.fPercentage >= 0.7 then
 			item.aExtentAnimate = EXTENT_ANIMATE['[0.7,0.9)']
 		else
 			item.aExtentAnimate = EXTENT_ANIMATE.NONE
 		end
-		item.bStaring = item.fCd > 0.5
+		item.bStaring = item.fPercentage > 0.5
 	else
 		item.bStaring = false
 		item.aExtentAnimate = EXTENT_ANIMATE.NONE
@@ -275,7 +275,8 @@ local function Buff_MonToView(mon, buff, item, KObject, nIcon, config, tMonExist
 		end
 		local nTimeTotal = BUFF_TIME[KObject.dwID][buff.szKey]
 		item.bCd = true
-		item.fCd = 1 - nTimeLeft / nTimeTotal
+		item.fCd = nTimeLeft / nTimeTotal
+		item.fPercentage = 1 - item.fCd
 		item.bSparking = false
 		item.dwID = buff.dwID
 		item.nLevel = buff.nLevel
@@ -285,8 +286,10 @@ local function Buff_MonToView(mon, buff, item, KObject, nIcon, config, tMonExist
 		item.szLongName = (not D.IsShielded()) and mon.longAlias or buff.szName
 		item.szShortName = (not D.IsShielded()) and mon.shortAlias or buff.szName
 	else
-		item.bCd = false
-		item.fCd = 1
+		item.bCd = true
+		item.fCd = 0
+		item.fPercentage = 0
+		item.nTimeLeft = -1
 		item.bSparking = true
 		item.dwID = next(mon.ids) or -1
 		item.nLevel = item.dwID and mon.ids[item.dwID] and next(mon.ids[item.dwID].levels) or -1
@@ -351,6 +354,7 @@ local function Skill_MonToView(mon, skill, item, KObject, nIcon, config, tMonExi
 		local nStackNum = skill.nCdMaxCount - skill.nCdCount
 		item.bCd = true
 		item.fCd = 1 - nTimeLeft / nTimeTotal
+		item.fPercentage = item.fCd
 		item.bSparking = false
 		item.dwID = skill.dwID
 		item.nLevel = skill.nLevel
@@ -362,6 +366,7 @@ local function Skill_MonToView(mon, skill, item, KObject, nIcon, config, tMonExi
 	else
 		item.bCd = false
 		item.fCd = 1
+		item.fPercentage = 0
 		item.bSparking = true
 		item.dwID = next(mon.ids) or -1
 		item.nLevel = item.dwID and mon.ids[item.dwID] and next(mon.ids[item.dwID].levels) or -1
