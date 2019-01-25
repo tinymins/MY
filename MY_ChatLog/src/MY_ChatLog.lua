@@ -602,7 +602,7 @@ local function InitMsgMon()
 		end
 		InsertMsg(CHANNELS_R[szChannel], szText, szMsg, szTalker, GetCurrentTime())
 
-		if MY_ChatLog.bRealtimeCommit then
+		if MY_ChatLog.bRealtimeCommit and not MY.IsShieldedVersion() then
 			PushDB()
 		end
 	end
@@ -1254,15 +1254,17 @@ function PS.OnPanelActive(wnd)
 	})
 	y = y + dy
 
-	ui:append('WndCheckBox', {
-		x = x, y = y, w = wr,
-		text = _L['realtime database commit'],
-		checked = MY_ChatLog.bRealtimeCommit,
-		oncheck = function(bChecked)
-			MY_ChatLog.bRealtimeCommit = bChecked
-		end
-	})
-	y = y + dy
+	if not MY.IsShieldedVersion() then
+		ui:append('WndCheckBox', {
+			x = x, y = y, w = wr,
+			text = _L['realtime database commit'],
+			checked = MY_ChatLog.bRealtimeCommit,
+			oncheck = function(bChecked)
+				MY_ChatLog.bRealtimeCommit = bChecked
+			end
+		})
+		y = y + dy
+	end
 
 	ui:append('WndButton', {
 		x = x, y = y, w = 150,

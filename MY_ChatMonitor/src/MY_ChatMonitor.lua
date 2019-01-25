@@ -62,7 +62,7 @@ MY_ChatMonitor.bRedirectSysChannel = false
 MY_ChatMonitor.bCapture            = false
 MY_ChatMonitor.bBlockWords         = true
 MY_ChatMonitor.bIgnoreSame         = true
-MY_ChatMonitor.bRealtimeSave       = false
+-- MY_ChatMonitor.bRealtimeSave       = false
 MY_ChatMonitor.bDistinctServer     = false
 MY_ChatMonitor.szTimestrap         = '[hh:mm:ss]'
 MY_ChatMonitor.anchor              = { x = -100, y = -150, s = 'BOTTOMRIGHT', r = 'BOTTOMRIGHT' }
@@ -81,7 +81,7 @@ RegisterCustomData('MY_ChatMonitor.bPlaySound')
 RegisterCustomData('MY_ChatMonitor.bRedirectSysChannel')
 RegisterCustomData('MY_ChatMonitor.anchor')
 RegisterCustomData('MY_ChatMonitor.bIgnoreSame')
-RegisterCustomData('MY_ChatMonitor.bRealtimeSave')
+-- RegisterCustomData('MY_ChatMonitor.bRealtimeSave')
 RegisterCustomData('MY_ChatMonitor.bDistinctServer')
 RegisterCustomData('MY_ChatMonitor.szTimestrap')
 _C.bInited = false
@@ -294,9 +294,9 @@ _C.OnMsgArrive = function(szMsg, nFont, bRich, r, g, b, szChannel)
             table.remove(RECORD_LIST, 1)
         end
     end
-    if MY_ChatMonitor.bRealtimeSave then
-        D.SaveData()
-    end
+    -- if MY_ChatMonitor.bRealtimeSave then
+    --     D.SaveData()
+    -- end
 end
 
 _C.OnPanelActive = function(wnd)
@@ -456,14 +456,14 @@ _C.OnPanelActive = function(wnd)
                     bChecked = MY_ChatMonitor.bIgnoreSame
                 })
                 if IsCtrlKeyDown() then
-                    table.insert(t, {
-                        szOption = _L['Realtime save'],
-                        fnAction = function()
-                            MY_ChatMonitor.bRealtimeSave = not MY_ChatMonitor.bRealtimeSave
-                        end,
-                        bCheck = true,
-                        bChecked = MY_ChatMonitor.bRealtimeSave
-                    })
+                    -- table.insert(t, {
+                    --     szOption = _L['Realtime save'],
+                    --     fnAction = function()
+                    --         MY_ChatMonitor.bRealtimeSave = not MY_ChatMonitor.bRealtimeSave
+                    --     end,
+                    --     bCheck = true,
+                    --     bChecked = MY_ChatMonitor.bRealtimeSave
+                    -- })
                     table.insert(t, {
                         szOption = _L['Distinct server'],
                         fnAction = function()
