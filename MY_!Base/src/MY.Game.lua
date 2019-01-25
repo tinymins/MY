@@ -843,51 +843,73 @@ end
 end
 
 do
--- skillid, uitex, frame
-local KUNGFU_LIST = setmetatable({
+local FORCE_LIST
+function MY.GetForceList()
+	FORCE_LIST = {}
+	for _, dwForceID in pairs_c(FORCE_TYPE) do
+		if dwForceID ~= FORCE_TYPE.JIANG_HU then
+			insert(FORCE_LIST, dwForceID)
+		end
+	end
+	return FORCE_LIST
+end
+end
+
+do
+local ORDER = {
 	-- MT
-	{ 10062, 'ui/Image/icon/skill_tiance01.UITex',     0 }, -- 铁牢
-	{ 10243, 'ui/Image/icon/mingjiao_taolu_7.UITex',   0 }, -- 明尊
-	{ 10389, 'ui/Image/icon/Skill_CangY_33.UITex',     0 }, -- 铁骨
-	{ 10002, 'ui/Image/icon/skill_shaolin14.UITex',    0 }, -- 少林
+	10062, --[[ 铁牢 ]]
+	10243, --[[ 明尊 ]]
+	10389, --[[ 铁骨 ]]
+	10002, --[[ 少林 ]]
 	-- 治疗
-	{ 10080, 'ui/Image/icon/skill_qixiu02.UITex',      0 }, -- 云裳
-	{ 10176, 'ui/Image/icon/wudu_neigong_2.UITex',     0 }, -- 补天
-	{ 10028, 'ui/Image/icon/skill_wanhua23.UITex',     0 }, -- 离经
-	{ 10448, 'ui/Image/icon/skill_0514_23.UITex',      0 }, -- 相知
+	10080, --[[ 云裳 ]]
+	10176, --[[ 补天 ]]
+	10028, --[[ 离经 ]]
+	10448, --[[ 相知 ]]
 	-- 内功
-	{ 10225, 'ui/Image/icon/skill_tangm_20.UITex',     0 }, -- 天罗
-	{ 10081, 'ui/Image/icon/skill_qixiu03.UITex',      0 }, -- 冰心
-	{ 10175, 'ui/Image/icon/wudu_neigong_1.UITex',     0 }, -- 毒经
-	{ 10242, 'ui/Image/icon/mingjiao_taolu_8.UITex',   0 }, -- 焚影
-	{ 10014, 'ui/Image/icon/skill_chunyang21.UITex',   0 }, -- 紫霞
-	{ 10021, 'ui/Image/icon/skill_wanhua17.UITex',     0 }, -- 花间
-	{ 10003, 'ui/Image/icon/skill_shaolin10.UITex',    0 }, -- 易经
-	{ 10447, 'ui/Image/icon/skill_0514_27.UITex',      0 }, -- 莫问
+	10225, --[[ 天罗 ]]
+	10081, --[[ 冰心 ]]
+	10175, --[[ 毒经 ]]
+	10242, --[[ 焚影 ]]
+	10014, --[[ 紫霞 ]]
+	10021, --[[ 花间 ]]
+	10003, --[[ 易经 ]]
+	10447, --[[ 莫问 ]]
 	-- 外功
-	{ 10390, 'ui/Image/icon/Skill_CangY_32.UITex',     0 }, -- 分山
-	{ 10224, 'ui/Image/icon/skill_tangm_01.UITex',     0 }, -- 鲸鱼
-	{ 10144, 'ui/Image/icon/cangjian_neigong_1.UITex', 0 }, -- 问水
-	{ 10145, 'ui/Image/icon/cangjian_neigong_2.UITex', 0 }, -- 山居
-	{ 10015, 'ui/Image/icon/skill_chunyang13.UITex',   0 }, -- 备胎剑意
-	{ 10026, 'ui/Image/icon/skill_tiance02.UITex',     0 }, -- 傲雪
-	{ 10268, 'ui/Image/icon/skill_GB_30.UITex',        0 }, -- 笑尘
-	{ 10464, 'ui/Image/icon/daoj_16_8_25_16.UITex',    0 }, -- 霸刀
-}, {
-	__index = function(me, key)
-		for k, v in pairs(me) do
-			if v[1] == key then
-				return v
+	10390, --[[ 分山 ]]
+	10224, --[[ 鲸鱼 ]]
+	10144, --[[ 问水 ]]
+	10145, --[[ 山居 ]]
+	10015, --[[ 剑纯 ]]
+	10026, --[[ 傲血 ]]
+	10268, --[[ 笑尘 ]]
+	10464, --[[ 霸刀 ]]
+	10533, --[[ 蓬莱 ]]
+}
+local KUNGFU_LIST
+function MY.GetKungfuList()
+	if not KUNGFU_LIST then
+		KUNGFU_LIST = {}
+		for _, dwForceID in pairs_c(MY.GetForceList()) do
+			for _, dwKungfuID in ipairs(MY.GetForceKungfuList(dwForceID)) do
+				insert(KUNGFU_LIST, dwKungfuID)
 			end
 		end
-	end,
-})
-
-function MY.GetKungfuInfo(dwKungfuID)
-	if dwKungfuID == 'all' then
-		return KUNGFU_LIST
+		sort(KUNGFU_LIST, function(p1, p2)
+			local i1, i2 = #ORDER + 1, #ORDER + 1
+			for i, v in ipairs(ORDER) do
+				if v == p1 then
+					i1 = i
+				end
+				if v == p2 then
+					i2 = i
+				end
+			end
+			return i1 < i2
+		end)
 	end
-	return unpack(KUNGFU_LIST[dwKungfuID])
+	return KUNGFU_LIST
 end
 end
 
