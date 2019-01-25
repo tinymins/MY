@@ -141,7 +141,7 @@ local EXTENT_ANIMATE = {
 	NONE = {},
 }
 local MON_EXIST_CACHE = {}
-local function Base_MatchMon(mon, dwKungfuID, dwTarKungfuID)
+local function Base_ShowMon(mon, dwKungfuID, dwTarKungfuID)
 	if not mon.enable then
 		return
 	end
@@ -235,11 +235,14 @@ local function Buff_CaptureMon(mon)
 		end
 	end
 end
-local function Buff_MatchMon(tBuff, mon, config, dwKungfuID, dwTarKungfuID)
+local function Buff_ShowMon(mon, dwKungfuID, dwTarKungfuID)
+	return Base_ShowMon(mon, dwKungfuID, dwTarKungfuID)
+end
+local function Buff_MatchMon(tBuff, mon, config)
 	for dwID, tMonId in pairs(mon.ids) do
 		local buff = tBuff[dwID]
 		if buff and buff.bCool then
-			if Base_MatchMon(mon, dwKungfuID, dwTarKungfuID) and (
+			if (
 				not config.hideOthers
 				or buff.dwSkillSrcID == UI_GetClientPlayerID()
 				or buff.dwSkillSrcID == GetControlPlayerID()
@@ -322,11 +325,14 @@ local function Skill_CaptureMon(mon)
 		end
 	end
 end
-local function Skill_MatchMon(tSkill, mon, config, dwKungfuID, dwTarKungfuID)
+local function Skill_ShowMon(mon, dwKungfuID, dwTarKungfuID)
+	return Skill_ShowMon(mon, dwKungfuID, dwTarKungfuID)
+end
+local function Skill_MatchMon(tSkill, mon, config)
 	for dwID, tMonId in pairs(mon.ids) do
 		local skill = tSkill[dwID]
 		if skill and skill.bCool then
-			if Base_MatchMon(mon, dwKungfuID, dwTarKungfuID) then
+			-- if Base_MatchMon(mon) then
 				if mon.iconid then
 					return skill, mon.iconid
 				elseif tMonId.enable then
@@ -336,7 +342,7 @@ local function Skill_MatchMon(tSkill, mon, config, dwKungfuID, dwTarKungfuID)
 						return skill, tMonId.levels[skill.nLevel].iconid
 					end
 				end
-			end
+			-- end
 		end
 	end
 	return nil, mon.iconid
@@ -422,13 +428,13 @@ local function UpdateView()
 			if config.type == 'BUFF' then
 				local tBuff = KObject and BUFF_CACHE[KObject.dwID] or EMPTY_TABLE
 				for _, mon in ipairs(config.monitors) do
-					if mon.enable then
+					if Buff_ShowMon(mon, dwKungfuID, dwTarKungfuID) then
 						-- 如果开启了捕获 从BUFF索引中捕获新的BUFF
 						if mon.capture then
 							Buff_CaptureMon(mon)
 						end
 						-- 通过监控项生成视图列表
-						local buff, nIcon = Buff_MatchMon(tBuff, mon, config, dwKungfuID, dwTarKungfuID)
+						local buff, nIcon = Buff_MatchMon(tBuff, mon, config)
 						if buff or config.hideVoid ~= mon.hideVoid then
 							local item = aItem[nItemIndex]
 							if not item then
@@ -443,13 +449,13 @@ local function UpdateView()
 			elseif config.type == 'SKILL' then
 				local tSkill = KObject and SKILL_CACHE[KObject.dwID] or EMPTY_TABLE
 				for _, mon in ipairs(config.monitors) do
-					if mon.enable then
+					if Skill_ShowMon(mon, dwKungfuID, dwTarKungfuID) then
 						-- 如果开启了捕获 从BUFF索引中捕获新的BUFF
 						if mon.capture then
 							Skill_CaptureMon(mon)
 						end
 						-- 通过监控项生成视图列表
-						local skill, nIcon = Skill_MatchMon(tSkill, mon, config, dwKungfuID, dwTarKungfuID)
+						local skill, nIcon = Skill_MatchMon(tSkill, mon, config)
 						if skill or config.hideVoid ~= mon.hideVoid then
 							local item = aItem[nItemIndex]
 							if not item then
