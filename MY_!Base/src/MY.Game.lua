@@ -346,11 +346,11 @@ end
 -- 获取副本选择菜单
 -- (table) MY.GetDungeonMenu(fnAction, bOnlyRaid)
 do
-local function RecruitItemToDungeonMenu(p, fnAction)
+local function RecruitItemToDungeonMenu(p, fnAction, tChecked)
 	if p.bParent then
 		local t = { szOption = p.TypeName or p.SubTypeName }
 		for _, pp in ipairs(p) do
-			insert(t, RecruitItemToDungeonMenu(pp, fnAction))
+			insert(t, RecruitItemToDungeonMenu(pp, fnAction, tChecked))
 		end
 		if #t > 0 then
 			return t
@@ -362,7 +362,8 @@ local function RecruitItemToDungeonMenu(p, fnAction)
 		and p.dwMapID and MY.IsDungeonMap(p.dwMapID) then
 			return {
 				szOption = p.szName,
-				bChecked = false,
+				bCheck = tChecked and true or false,
+				bChecked = tChecked and tChecked[p.dwMapID] or false,
 				bDisable = false,
 				UserData = {
 					dwID = p.dwMapID,
@@ -374,10 +375,10 @@ local function RecruitItemToDungeonMenu(p, fnAction)
 	end
 	return nil
 end
-function MY.GetDungeonMenu(fnAction, bOnlyRaid)
+function MY.GetDungeonMenu(fnAction, bOnlyRaid, tChecked)
 	local t = {}
 	for _, p in ipairs(Table_GetTeamRecruit() or {}) do
-		insert(t, RecruitItemToDungeonMenu(p, fnAction))
+		insert(t, RecruitItemToDungeonMenu(p, fnAction, tChecked))
 	end
 	return t
 end
