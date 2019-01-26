@@ -60,14 +60,20 @@ local TARGET_TYPE_LIST = {
 	'TEAM_MARK_DART' ,
 	'TEAM_MARK_FAN'  ,
 }
-local CONFIG, CONFIG_CHANGED
+local CONFIG, CONFIG_CHANGED, CONFIG_BUFF_TARGET_LIST, CONFIG_SKILL_TARGET_LIST
 local CONFIG_TEMPLATE = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_TargetMon/data/template/$lang.jx3dat')
 local MON_TEMPLATE = CONFIG_TEMPLATE.monitors.__CHILD_TEMPLATE__
 local MONID_TEMPLATE = CONFIG_TEMPLATE.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__
 local MONLEVEL_TEMPLATE = CONFIG_TEMPLATE.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__.levels.__CHILD_TEMPLATE__
 local EMBEDDED_CONFIG_LIST, EMBEDDED_CONFIG_HASH, EMBEDDED_MONITOR_HASH = {}, {}, {}
 
-function D.GetTargetTypeList()
+function D.GetTargetTypeList(szType)
+	if szType == 'BUFF' then
+		return CONFIG_BUFF_TARGET_LIST
+	end
+	if szType == 'SKILL' then
+		return CONFIG_SKILL_TARGET_LIST
+	end
 	return TARGET_TYPE_LIST
 end
 
@@ -241,6 +247,29 @@ function D.HasConfigChanged()
 	return CONFIG_CHANGED
 end
 
+function D.UpdateTargetList()
+	local tBuffTargetExist, tSkillTargetExist = {}, {}
+	for _, config in ipairs(CONFIG) do
+		if config.enable then
+			if config.type == 'BUFF' then
+				tBuffTargetExist[config.target] = true
+			elseif config.type == 'SKILL' then
+				tSkillTargetExist[config.target] = true
+			end
+		end
+	end
+	local aBuffTarget, aSkillTarget = {}, {}
+	for _, szType in ipairs(TARGET_TYPE_LIST) do
+		if tBuffTargetExist[szType] then
+			insert(aBuffTarget, szType)
+		end
+		if tSkillTargetExist[szType] then
+			insert(aSkillTarget, szType)
+		end
+	end
+	CONFIG_BUFF_TARGET_LIST, CONFIG_SKILL_TARGET_LIST = aBuffTarget, aSkillTarget
+end
+
 function D.LoadConfig(bDefault, bOriginal, bReloadEmbedded)
 	if bReloadEmbedded then
 		D.LoadEmbeddedConfig()
@@ -276,6 +305,7 @@ function D.LoadConfig(bDefault, bOriginal, bReloadEmbedded)
 	end
 	CONFIG = aConfig
 	CONFIG_CHANGED = bDefault and true or false
+	D.UpdateTargetList()
 	FireUIEvent('MY_TARGET_MON_CONFIG_INIT')
 end
 
@@ -323,6 +353,7 @@ function D.ImportPatches(aPatch)
 	end
 	if nImportCount > 0 then
 		CONFIG_CHANGED = true
+		D.UpdateTargetList()
 		FireUIEvent('MY_TARGET_MON_CONFIG_INIT')
 	end
 	return nImportCount, nReplaceCount
@@ -406,6 +437,9 @@ function D.ModifyConfig(config, szKey, oVal)
 	if not Set(config, szKey, oVal) then
 		return
 	end
+	if szKey == 'enable' or szKey == 'target' then
+		D.UpdateTargetList()
+	end
 	if szKey == 'enable' and oVal then
 		FireUIEvent('MY_TARGET_MON_CONFIG_INIT')
 	end
@@ -416,6 +450,7 @@ function D.DeleteConfig(config)
 	for i, v in ipairs_r(CONFIG) do
 		if v == config then
 			remove(CONFIG, i)
+			D.UpdateTargetList()
 			D.MarkConfigChanged()
 			FireUIEvent('MY_TARGET_MON_CONFIG_INIT')
 		end

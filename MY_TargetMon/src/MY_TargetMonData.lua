@@ -573,7 +573,7 @@ end
 local function OnBreathe()
 	-- 更新各目标BUFF数据
 	local nLogicFrame = GetLogicFrameCount()
-	for _, eType in ipairs(D.GetTargetTypeList()) do
+	for _, eType in ipairs(D.GetTargetTypeList('BUFF')) do
 		local KObject = MY.GetObject(D.GetTarget(eType, 'BUFF'))
 		if KObject then
 			local tBuff = {}
@@ -606,57 +606,59 @@ local function OnBreathe()
 			BUFF_CACHE[KObject.dwID] = tBuff
 		end
 	end
-	local me = GetClientPlayer()
-	if me then
-		local tSkill = {}
-		local aSkill = MY.GetSkillMountList()
-		-- 遍历所有技能 生成反向索引
-		for _, dwID in spairs(aSkill, SKILL_EXTRA) do
-			if not tSkill[dwID] then
-				local nLevel = me.GetSkillLevel(dwID)
-				local KSkill, info = MY.GetSkill(dwID, nLevel)
-				if KSkill and info then
-					local bCool, szType, nLeft, nInterval, nTotal, nCount, nMaxCount, nSurfaceNum = MY.GetSkillCDProgress(me, dwID, nLevel, true)
-					local skill = {
-						dwID = dwID,
-						nLevel = info.nLevel,
-						szKey = dwID,
-						bCool = bCool or nCount > 0,
-						szCdType = szType,
-						nCdLeft = nLeft,
-						nCdInterval = nInterval,
-						nCdTotal = nTotal,
-						nCdCount = nCount,
-						nCdMaxCount = nMaxCount,
-						nSurfaceNum = nSurfaceNum,
-						nIcon = info.nIcon,
-						szName = MY.GetSkillName(dwID),
-					}
-					tSkill[skill.szName] = skill
-					tSkill[skill.dwID] = skill
-					tSkill[skill.szKey] = skill
-					if not SKILL_INFO[skill.szName] then
-						SKILL_INFO[skill.szName] = {}
+	for _, eType in ipairs(D.GetTargetTypeList('SKILL')) do
+		local KObject = MY.GetObject(D.GetTarget(eType, 'SKILL'))
+		if KObject then
+			local tSkill = {}
+			local aSkill = MY.GetSkillMountList()
+			-- 遍历所有技能 生成反向索引
+			for _, dwID in spairs(aSkill, SKILL_EXTRA) do
+				if not tSkill[dwID] then
+					local nLevel = KObject.GetSkillLevel(dwID)
+					local KSkill, info = MY.GetSkill(dwID, nLevel)
+					if KSkill and info then
+						local bCool, szType, nLeft, nInterval, nTotal, nCount, nMaxCount, nSurfaceNum = MY.GetSkillCDProgress(KObject, dwID, nLevel, true)
+						local skill = {
+							dwID = dwID,
+							nLevel = info.nLevel,
+							szKey = dwID,
+							bCool = bCool or nCount > 0,
+							szCdType = szType,
+							nCdLeft = nLeft,
+							nCdInterval = nInterval,
+							nCdTotal = nTotal,
+							nCdCount = nCount,
+							nCdMaxCount = nMaxCount,
+							nSurfaceNum = nSurfaceNum,
+							nIcon = info.nIcon,
+							szName = MY.GetSkillName(dwID),
+						}
+						tSkill[skill.szName] = skill
+						tSkill[skill.dwID] = skill
+						tSkill[skill.szKey] = skill
+						if not SKILL_INFO[skill.szName] then
+							SKILL_INFO[skill.szName] = {}
+						end
+						SKILL_INFO[skill.szName][skill.szKey] = skill
 					end
-					SKILL_INFO[skill.szName][skill.szKey] = skill
 				end
 			end
-		end
-		-- 处理消失的buff
-		local tLastSkill = SKILL_CACHE[me.dwID]
-		if tLastSkill then
-			for k, skill in pairs(tLastSkill) do
-				if not tSkill[k] then
-					if skill.bCool then
-						skill.bCool = false
-						skill.nLeft = 0
-						skill.nCount = 0
+			-- 处理消失的buff
+			local tLastSkill = SKILL_CACHE[KObject.dwID]
+			if tLastSkill then
+				for k, skill in pairs(tLastSkill) do
+					if not tSkill[k] then
+						if skill.bCool then
+							skill.bCool = false
+							skill.nLeft = 0
+							skill.nCount = 0
+						end
+						tSkill[k] = skill
 					end
-					tSkill[k] = skill
 				end
 			end
+			SKILL_CACHE[KObject.dwID] = tSkill
 		end
-		SKILL_CACHE[me.dwID] = tSkill
 	end
 	UpdateView()
 end
