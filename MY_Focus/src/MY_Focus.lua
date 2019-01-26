@@ -530,7 +530,7 @@ function MY_Focus.GetDisplayList()
 					bFocus = false
 				end
 				if bFocus and p.tRule.nMaxDistance ~= 0
-				and MY.GetDistance(me, KObject, MY_Focus.szDistanceType) > p.tRule.nMaxDistance * 64 then
+				and MY.GetDistance(me, KObject, MY_Focus.szDistanceType) > p.tRule.nMaxDistance then
 					bFocus = false
 				end
 				if bFocus and not p.tRule.tRelation.bAll then
