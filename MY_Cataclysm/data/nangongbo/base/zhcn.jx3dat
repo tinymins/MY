@@ -112,8 +112,8 @@ data = {
     {dwID=3877,col="#FFFF00FF",szReminder="原",nPriority=5,bCaution=true},--原罪缚穴术点名---荻花圣殿
     {dwID=2631,col="#00FFFF00",szReminder="逐",nPriority=8},--逐莲升华---荻花圣殿
     {dwID=2973,col="#FF323200",nPriority=8},--黑影瞬刀---荻花圣殿
-    {dwID=3093,col="#FF3232FF",szReminder="灼",nPriority=7},--(3093)(1)龙渊泽_南诏双雄_刺客_阳性易伤---龙渊泽
-    {dwID=3092,col="#00FFFFFF",szReminder="冰",nPriority=7},--(3092)(1)龙渊泽_南诏双雄_刺客_阴性易伤---龙渊泽
+    {dwID=3093,col="#FF3232FF",szReminder="灼",nPriority=7},--灼烧---龙渊泽
+    {dwID=3092,col="#00FFFFFF",szReminder="冰",nPriority=7},--冰魄---龙渊泽
     {dwID=2676,col="#FFFF00FF",szReminder="重",nPriority=4,bAttention=true,bCaution=true},--重击---龙渊泽
     {dwID=2636,col="#FF00FFFF",szReminder="金",nPriority=4,bAttention=true,bCaution=true},--金刚---龙渊泽
     {dwID=6451,col="#FF3232FF",szReminder="叶",nPriority=7},--叶落飞花---神剑冢
@@ -433,5 +433,5 @@ data = {
     {dwID=9395,col="#00FF00FF",szReminder="风",nPriority=7},--风入松---长歌
     {dwID=9299,col="#FF8000FF",szReminder="杯",nPriority=7},--杯水留影---长歌
     {dwID=13771},--疾电叱羽---蓬莱
-    --【南宫伯是帅咩】更新日期0122
+    --【南宫伯是帅咩】更新日期0126
 }

@@ -112,8 +112,8 @@ data = {
     {dwID=3877,col="#FFFF00FF",szReminder="原",nPriority=5,bCaution=true},--原罪縛穴術點名---荻花聖殿
     {dwID=2631,col="#00FFFF00",szReminder="逐",nPriority=8},--逐蓮升華---荻花聖殿
     {dwID=2973,col="#FF323200",nPriority=8},--黑影瞬刀---荻花聖殿
-    {dwID=3093,col="#FF3232FF",szReminder="灼",nPriority=7},--(3093)(1)龍淵澤_南詔雙雄_刺客_陽性易傷---龍淵澤
-    {dwID=3092,col="#00FFFFFF",szReminder="冰",nPriority=7},--(3092)(1)龍淵澤_南詔雙雄_刺客_陰性易傷---龍淵澤
+    {dwID=3093,col="#FF3232FF",szReminder="灼",nPriority=7},--灼燒---龍淵澤
+    {dwID=3092,col="#00FFFFFF",szReminder="冰",nPriority=7},--冰魄---龍淵澤
     {dwID=2676,col="#FFFF00FF",szReminder="重",nPriority=4,bAttention=true,bCaution=true},--重擊---龍淵澤
     {dwID=2636,col="#FF00FFFF",szReminder="金",nPriority=4,bAttention=true,bCaution=true},--金剛---龍淵澤
     {dwID=6451,col="#FF3232FF",szReminder="葉",nPriority=7},--葉落飛花---神劍冢
@@ -433,5 +433,5 @@ data = {
     {dwID=9395,col="#00FF00FF",szReminder="風",nPriority=7},--風入松---長歌
     {dwID=9299,col="#FF8000FF",szReminder="杯",nPriority=7},--杯水留影---長歌
     {dwID=13771},--疾電叱羽---蓬萊
-    --【南宮伯是帥咩】更新日期0122
+    --【南宮伯是帥咩】更新日期0126
 }
