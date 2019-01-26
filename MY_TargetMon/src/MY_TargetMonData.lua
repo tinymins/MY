@@ -286,8 +286,24 @@ local function Buff_MonToView(mon, buff, item, KObject, nIcon, config, tMonExist
 		item.nTimeLeft = nTimeLeft
 		item.szStackNum = buff.nStackNum > 1 and buff.nStackNum or ''
 		item.nTimeTotal = nTimeTotal
-		item.szLongName = (not D.IsShielded()) and mon.longAlias or buff.szName
-		item.szShortName = (not D.IsShielded()) and mon.shortAlias or buff.szName
+		if not D.IsShielded() then
+			if mon.longAlias then
+				item.szLongName = mon.longAlias
+			elseif mon.nameAlias then
+				item.szLongName = mon.name
+			end
+			if mon.shortAlias then
+				item.szShortName = mon.shortAlias
+			elseif mon.nameAlias then
+				item.szShortName = mon.name
+			end
+		end
+		if not item.szLongName then
+			item.szLongName = buff.szName
+		end
+		if not item.szShortName then
+			item.szShortName = buff.szName
+		end
 	else
 		item.bCd = true
 		item.fCd = 0

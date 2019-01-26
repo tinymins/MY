@@ -159,8 +159,10 @@ local function DrawDetail(ui)
 			szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
 			if szVal ~= '' then
 				local mon = D.CreateMonitor(l_config, szVal)
-				D.ModifyMonitor(mon, 'ignoreId', not tonumber(szVal))
-				if not mon.ignoreId then
+				local id = tonumber(szVal)
+				if id then -- 直接添加ID特殊处理
+					D.ModifyMonitor(mon, 'ignoreId', false)
+					D.ModifyMonitor(mon, 'nameAlias', false)
 					local monid = D.CreateMonitorId(mon, tonumber(szVal))
 					D.ModifyMonitorId(monid, 'enable', true)
 				end
@@ -277,6 +279,13 @@ local function DrawDetail(ui)
 				end,
 			},
 			{ bDevide = true },
+			{
+				szOption = _L['Display origin name when no alias'],
+				bCheck = true, bChecked = not mon.nameAlias,
+				fnAction = function()
+					D.ModifyMonitor(mon, 'nameAlias', not mon.nameAlias)
+				end,
+			},
 			{
 				szOption = _L('Long alias: %s', mon.longAlias or _L['Not set']),
 				fnAction = function()

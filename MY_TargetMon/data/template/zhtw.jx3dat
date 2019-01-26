@@ -38,6 +38,7 @@ return {
 				name = "",
 				uuid = {__META__, {"nil", "string"}, nil},
 				capture = true,
+				nameAlias = true,
 				longAlias = {__META__, {"nil", "string"}, nil},
 				rgbLongAlias = {255, 255, 0},
 				shortAlias = {__META__, {"nil", "string"}, nil},
