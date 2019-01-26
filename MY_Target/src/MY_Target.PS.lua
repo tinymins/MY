@@ -155,6 +155,19 @@ function PS.OnPanelActive(wnd)
 		onchange = function(val) MY_TargetLine.nLineWidth = val end,
 		autoenable = function() return not MY_TargetLine.bTargetRL or not MY_TargetLine.bTTargetRL end,
 	})
+	x = x + 180
+	x = x + ui:append('WndRadioBox', {
+		x = x, y = y, w = 100, h = 25, group = 'line postype',
+		text = _L['From head to head'],
+		checked = MY_TargetLine.bAtHead,
+		oncheck = function(bChecked)
+			if not bChecked then
+				return
+			end
+			MY_TargetLine.bAtHead = true
+		end,
+	}, true):autoWidth():width() + 10
+
 
 	x, y = X + 37, y + deltaY
 	x = x + ui:append('Text', {
@@ -170,6 +183,18 @@ function PS.OnPanelActive(wnd)
 		onchange = function(val) MY_TargetLine.nLineAlpha = val end,
 		autoenable = function() return not MY_TargetLine.bTargetRL or not MY_TargetLine.bTTargetRL end,
 	})
+	x = x + 180
+	x = x + ui:append('WndRadioBox', {
+		x = x, y = y, w = 100, h = 25, group = 'line postype',
+		text = _L['From foot to foot'],
+		checked = not MY_TargetLine.bAtHead,
+		oncheck = function(bChecked)
+			if not bChecked then
+				return
+			end
+			MY_TargetLine.bAtHead = false
+		end,
+	}, true):autoWidth():width() + 10
 
 	if MY.IsShieldedVersion() then
 		return

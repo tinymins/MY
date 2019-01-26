@@ -42,6 +42,7 @@ local O = {
 	bTargetRL     = true,          -- 启用新版连线
 	bTTarget      = false,         -- 显示目标与目标的目标连接线
 	bTTargetRL    = true,          -- 启用新版连线
+	bAtHead       = true,          -- 连接线从头部开始
 	nLineWidth    = 3,             -- 连接线宽度
 	nLineAlpha    = 150,           -- 连接线不透明度
 	tTargetColor  = { 0, 255, 0 }, -- 颜色
@@ -67,8 +68,8 @@ local function DrawShadowLine(sha, dwSrcID, dwDstID, aCol, nAlpha, nWidth)
 	local r, g, b = unpack(aCol)
 	sha:SetTriangleFan(GEOMETRY_TYPE.LINE, nWidth)
 	sha:ClearTriangleFanPoint()
-	sha:AppendCharacterID(dwSrcID, true, r, g, b, nAlpha)
-	sha:AppendCharacterID(dwDstID, true, r, g, b, nAlpha)
+	sha:AppendCharacterID(dwSrcID, MY_TargetLine.bAtHead, r, g, b, nAlpha)
+	sha:AppendCharacterID(dwDstID, MY_TargetLine.bAtHead, r, g, b, nAlpha)
 	sha:Show()
 end
 local function GetShadow(szName)
@@ -193,6 +194,7 @@ local settings = {
 				bTargetRL     = true,
 				bTTarget      = true,
 				bTTargetRL    = true,
+				bAtHead       = true,
 				nLineWidth    = true,
 				nLineAlpha    = true,
 				tTargetColor  = true,
@@ -208,6 +210,7 @@ local settings = {
 				bTargetRL     = true,
 				bTTarget      = true,
 				bTTargetRL    = true,
+				bAtHead       = true,
 				nLineWidth    = true,
 				nLineAlpha    = true,
 				tTargetColor  = true,
@@ -218,6 +221,7 @@ local settings = {
 				bTargetRL     = D.RequireRerender,
 				bTTarget      = D.CheckEnable,
 				bTTargetRL    = D.RequireRerender,
+				bAtHead       = D.RequireRerender,
 				nLineWidth    = D.RequireRerender,
 				nLineAlpha    = D.RequireRerender,
 				tTargetColor  = D.RequireRerender,
