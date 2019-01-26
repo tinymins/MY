@@ -239,21 +239,19 @@ local function Buff_ShowMon(mon, dwKungfuID, dwTarKungfuID)
 	return Base_ShowMon(mon, dwKungfuID, dwTarKungfuID)
 end
 local function Buff_MatchMon(tBuff, mon, config)
+	-- ids={[13942]={enable=true,iconid=7237,ignoreLevel=false,levels={[2]={enable=true,iconid=7237}}}}
 	for dwID, tMonId in pairs(mon.ids) do
-		local buff = tBuff[dwID]
-		if buff and buff.bCool then
-			if (
-				not config.hideOthers
-				or buff.dwSkillSrcID == UI_GetClientPlayerID()
-				or buff.dwSkillSrcID == GetControlPlayerID()
-			) and (not D.IsShieldedBuff(dwID, buff.nLevel)) then
-				if mon.iconid then
-					return buff, mon.iconid
-				elseif tMonId.enable then
-					if tMonId.iconid then
-						return buff, tMonId.iconid
-					elseif tMonId.levels[buff.nLevel] and tMonId.levels[buff.nLevel].enable then
-						return buff, tMonId.levels[buff.nLevel].iconid
+		if tMonId.enable or mon.ignoreId then
+			local buff = tBuff[dwID]
+			if buff and buff.bCool then
+				if (
+					not config.hideOthers
+					or buff.dwSkillSrcID == UI_GetClientPlayerID()
+					or buff.dwSkillSrcID == GetControlPlayerID()
+				) and (not D.IsShieldedBuff(dwID, buff.nLevel)) then
+					local tMonLevel = tMonId.levels[buff.nLevel] or EMPTY_TABLE
+					if tMonLevel.enable or tMonId.ignoreLevel then
+						return buff, tMonLevel.iconid or tMonId.iconid or mon.iconid or buff.nIcon or 13
 					end
 				end
 			end
@@ -342,23 +340,20 @@ local function Skill_CaptureMon(mon)
 	end
 end
 local function Skill_ShowMon(mon, dwKungfuID, dwTarKungfuID)
-	return Skill_ShowMon(mon, dwKungfuID, dwTarKungfuID)
+	return Base_ShowMon(mon, dwKungfuID, dwTarKungfuID)
 end
 local function Skill_MatchMon(tSkill, mon, config)
 	for dwID, tMonId in pairs(mon.ids) do
-		local skill = tSkill[dwID]
-		if skill and skill.bCool then
-			-- if Base_MatchMon(mon) then
-				if mon.iconid then
-					return skill, mon.iconid
-				elseif tMonId.enable then
-					if tMonId.iconid then
-						return skill, tMonId.iconid
-					elseif tMonId.levels[skill.nLevel] and tMonId.levels[skill.nLevel].enable then
-						return skill, tMonId.levels[skill.nLevel].iconid
+		if tMonId.enable or mon.ignoreId then
+			local skill = tSkill[dwID]
+			if skill and skill.bCool then
+				-- if Base_MatchMon(mon) then
+					local tMonLevel = tMonId.levels[skill.nLevel] or EMPTY_TABLE
+					if tMonLevel.enable or tMonId.ignoreLevel then
+						return skill, tMonLevel.iconid or tMonId.iconid or mon.iconid or skill.nIcon or 13
 					end
-				end
-			-- end
+				-- end
+			end
 		end
 	end
 	return nil, mon.iconid
