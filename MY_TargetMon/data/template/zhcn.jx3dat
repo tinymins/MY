@@ -44,6 +44,7 @@ return {
 				shortAlias = {__META__, {"nil", "string"}, nil},
 				rgbShortAlias = {255, 255, 0},
 				hideVoid = true, -- 当和主配置hideVoid字段不一致时则一定显示
+				extentAnimate = {__META__, {"nil", "string"}, nil}, -- BOX特效
 				soundAppear = {
 					__META__,
 					__VALUE__ = {},

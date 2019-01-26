@@ -136,9 +136,9 @@ end
 -- 更新BUFF数据 更新监控条
 do
 local EXTENT_ANIMATE = {
-	['[0.7,0.9)'] = {'ui\\Image\\Common\\Box.UITex', 17},
-	['[0.9,1]'] = {'ui\\Image\\Common\\Box.UITex', 20},
-	NONE = {},
+	['[0.7,0.9)'] = 'ui\\Image\\Common\\Box.UITex|17',
+	['[0.9,1]'] = 'ui\\Image\\Common\\Box.UITex|20',
+	NONE = '',
 }
 local MON_EXIST_CACHE = {}
 local function Base_ShowMon(mon, dwKungfuID, dwTarKungfuID)
@@ -187,16 +187,19 @@ local function Base_MonToView(mon, info, item, KObject, nIcon, config, tMonExist
 	end
 	if config.cdFlash and item.bCd then
 		if item.fProgress >= 0.9 then
-			item.aExtentAnimate = EXTENT_ANIMATE['[0.9,1]']
+			item.szExtentAnimate = EXTENT_ANIMATE['[0.9,1]']
 		elseif item.fProgress >= 0.7 then
-			item.aExtentAnimate = EXTENT_ANIMATE['[0.7,0.9)']
+			item.szExtentAnimate = EXTENT_ANIMATE['[0.7,0.9)']
 		else
-			item.aExtentAnimate = EXTENT_ANIMATE.NONE
+			item.szExtentAnimate = EXTENT_ANIMATE.NONE
 		end
 		item.bStaring = item.fProgress > 0.5
 	else
 		item.bStaring = false
-		item.aExtentAnimate = EXTENT_ANIMATE.NONE
+		item.szExtentAnimate = EXTENT_ANIMATE.NONE
+	end
+	if item.szExtentAnimate == EXTENT_ANIMATE.NONE and item.bActive and mon.extentAnimate then
+		item.szExtentAnimate = mon.extentAnimate
 	end
 	if not config.cdCircle then
 		item.bCd = false
@@ -275,6 +278,7 @@ local function Buff_MonToView(mon, buff, item, KObject, nIcon, config, tMonExist
 			BUFF_TIME[KObject.dwID][buff.szKey] = nTimeLeft
 		end
 		local nTimeTotal = BUFF_TIME[KObject.dwID][buff.szKey]
+		item.bActive = true
 		item.bCd = true
 		item.fCd = nTimeLeft / nTimeTotal
 		item.fProgress = 1 - item.fCd
@@ -303,6 +307,7 @@ local function Buff_MonToView(mon, buff, item, KObject, nIcon, config, tMonExist
 			item.szShortName = buff.szName
 		end
 	else
+		item.bActive = false
 		item.bCd = true
 		item.fCd = 0
 		item.fProgress = 0
@@ -369,6 +374,7 @@ local function Skill_MonToView(mon, skill, item, KObject, nIcon, config, tMonExi
 		local nTimeLeft = skill.nCdLeft * 0.0625
 		local nTimeTotal = skill.nCdTotal * 0.0625
 		local nStackNum = skill.nCdMaxCount - skill.nCdCount
+		item.bActive = false
 		item.bCd = true
 		item.fCd = 1 - nTimeLeft / nTimeTotal
 		item.fProgress = item.fCd
@@ -381,6 +387,7 @@ local function Skill_MonToView(mon, skill, item, KObject, nIcon, config, tMonExi
 		item.szLongName = mon.longAlias or skill.szName
 		item.szShortName = mon.shortAlias or skill.szName
 	else
+		item.bActive = true
 		item.bCd = false
 		item.fCd = 1
 		item.fProgress = 0

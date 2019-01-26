@@ -220,14 +220,14 @@ function D.UpdateFrame(frame)
 			hItem.box:SetObjectSparking(item.bSparking)
 			hItem.bSparking = item.bSparking
 		end
-		if hItem.szBoxExtentAnimate ~= item.aExtentAnimate[1]
-		or hItem.nBoxExtentAnimate ~= item.aExtentAnimate[2] then
-			if item.aExtentAnimate[1] then
-				hItem.box:SetExtentAnimate(unpack(item.aExtentAnimate))
+		if hItem.szBoxExtentAnimate ~= item.szExtentAnimate then
+			if item.szExtentAnimate and item.szExtentAnimate ~= '' then
+				local szPath, nFrame = unpack(MY.SplitString(item.szExtentAnimate, '|'))
+				hItem.box:SetExtentAnimate(szPath, nFrame)
 			else
 				hItem.box:ClearExtentAnimate()
 			end
-			hItem.szBoxExtentAnimate, hItem.nBoxExtentAnimate = unpack(item.aExtentAnimate)
+			hItem.szBoxExtentAnimate = item.szExtentAnimate
 		end
 		if hItem.szTimeLeft ~= item.szTimeLeft then
 			hItem.txtTime:SetText(item.szTimeLeft)

@@ -101,6 +101,7 @@ data = {
     ['Short alias: %s'] = '短别名：%s',
     ['Please input short alias:'] = '请输入短别名：',
     ['Display origin name when no alias'] = '无别名时显示原始名称',
+    ['Active extent animate'] = '设置激活特效框',
     ['Play sound when appear'] = '设置出现提示音',
     ['Play sound when disappear'] = '设置消失提示音',
     ['Default alert sound'] = '默认提示音',

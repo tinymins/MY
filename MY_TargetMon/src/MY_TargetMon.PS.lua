@@ -84,6 +84,11 @@ local CUSTOM_BOXBG_STYLES = {
 	{'UI/Image/Common/Box.UITex|77'},
 	{'UI/Image/Common/Box.UITex|78'},
 }
+local CUSTOM_BOX_EXTENT_ANIMATE = {
+	{nil, _L['None']},
+	{'ui/Image/Common/Box.UITex|17'},
+	{'ui/Image/Common/Box.UITex|20'},
+}
 local CUSTOM_CDBAR_STYLES = {
 	MY.GetAddonInfo().szUITexST .. '|' .. 0,
 	MY.GetAddonInfo().szUITexST .. '|' .. 1,
@@ -410,6 +415,27 @@ local function DrawDetail(ui)
 			D.ModifyMonitor(mon, 'soundDisappear', mon.soundDisappear)
 		end, MY.ArrayToObject(mon.soundDisappear), true)
 		t2.szOption = _L['Play sound when disappear']
+		insert(t1, t2)
+		-- 显示特效框
+		local t2 = { szOption = _L['Active extent animate'] }
+		for _, p in ipairs(CUSTOM_BOX_EXTENT_ANIMATE) do
+			local t3 = {
+				szOption = p[2] or p[1],
+				fnAction = function()
+					D.ModifyMonitor(mon, 'extentAnimate', p[1])
+				end,
+				nIconMarginLeft = -3,
+				nIconMarginRight = -3,
+				szLayer = 'ICON_RIGHTMOST',
+			}
+			if p[1] then
+				t3.szIcon, t3.nFrame = unpack(p[1]:split('|'))
+			end
+			if p[1] == mon.extentAnimate then
+				t3.rgb = {255, 255, 0}
+			end
+			insert(t2, t3)
+		end
 		insert(t1, t2)
 		-- ID设置
 		if not empty(mon.ids) then
