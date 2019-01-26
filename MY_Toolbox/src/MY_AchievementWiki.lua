@@ -113,7 +113,7 @@ end
 
 do
 local function OnFrameCreate()
-	if arg0:GetName() ~= 'AchievementPanel' then
+	if MY.IsShieldedVersion() or arg0:GetName() ~= 'AchievementPanel' then
 		return
 	end
 	HookFrame(arg0)
