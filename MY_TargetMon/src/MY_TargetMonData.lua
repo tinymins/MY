@@ -143,18 +143,35 @@ function D.GetTarget(eTarType, eMonType)
 end
 end
 
+do
+local SHIELDED
 function D.IsShielded()
-	return MY.IsShieldedVersion() and MY.IsInArena()
+	if SHIELDED == nil then
+		SHIELDED = MY.IsShieldedVersion() and MY.IsInArena()
+	end
+	return SHIELDED
 end
 
+local function onShieldedReset()
+	SHIELDED = nil
+end
+MY.RegisterEvent('LOADING_END.MY_TargetMonData_Shield', onShieldedReset)
+MY.RegisterEvent('MY_SHIELDED_VERSION.MY_TargetMonData_Shield', onShieldedReset)
+end
+
+do
+local SHIELDED_BUFF = {}
 function D.IsShieldedBuff(dwID, nLevel)
 	if D.IsShielded() then
-		local info = Table_GetBuff(dwID, nLevel)
-		if not info or info.bShow == 0 then
-			return true
+		local szKey = dwID .. ',' .. nLevel
+		if SHIELDED_BUFF[szKey] == nil then
+			local info = Table_GetBuff(dwID, nLevel)
+			SHIELDED_BUFF[szKey] = not info or info.bShow == 0
 		end
+		return SHIELDED_BUFF[szKey]
 	end
 	return false
+end
 end
 
 do
