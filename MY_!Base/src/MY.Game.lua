@@ -2221,6 +2221,34 @@ function MY.GetTargetSkillIDs(tar)
 	return aSkillID
 end
 
+do
+local LIST, LIST_ALL
+function MY.GetSkillMountList(bIncludePassive)
+	if not LIST then
+		LIST, LIST_ALL = {}, {}
+		local me = GetClientPlayer()
+		local aList = MY.GetTargetSkillIDs(me)
+		for _, dwID in ipairs(aList) do
+			local nLevel = me.GetSkillLevel(dwID)
+			if nLevel > 0 then
+				local KSkill = GetSkill(dwID, nLevel)
+				if not KSkill.bIsPassiveSkill then
+					insert(LIST, dwID)
+				end
+				insert(LIST_ALL, dwID)
+			end
+		end
+	end
+	return bIncludePassive and LIST_ALL or LIST
+end
+
+local function onKungfuChange()
+	LIST, LIST_ALL = nil
+end
+MY.RegisterEvent('SKILL_MOUNT_KUNG_FU', onKungfuChange)
+MY.RegisterEvent('SKILL_UNMOUNT_KUNG_FU', onKungfuChange)
+end
+
 function MY.GetSkill(dwID, nLevel)
 	local KSkill = GetSkill(dwID, nLevel)
 	if not KSkill then

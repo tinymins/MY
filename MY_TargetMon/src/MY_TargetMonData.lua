@@ -543,7 +543,7 @@ local function OnBreathe()
 	local me = GetClientPlayer()
 	if me then
 		local tSkill = {}
-		local aSkill = MY.GetTargetSkillIDs(me)
+		local aSkill = MY.GetSkillMountList()
 		-- 遍历所有技能 生成反向索引
 		for _, dwID in spairs(aSkill, SKILL_EXTRA) do
 			if not tSkill[dwID] then
