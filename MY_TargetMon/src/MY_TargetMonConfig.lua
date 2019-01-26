@@ -432,6 +432,7 @@ function D.CreateMonitor(config, name)
 	}, MON_TEMPLATE)
 	insert(config.monitors, mon)
 	D.MarkConfigChanged()
+	FireUIEvent('MY_TARGET_MON_MONITOR_CHANGE')
 	return mon
 end
 
@@ -444,6 +445,7 @@ function D.MoveMonitor(config, mon, offset)
 				insert(config.monitors, j, mon)
 			end
 			D.MarkConfigChanged()
+			FireUIEvent('MY_TARGET_MON_MONITOR_CHANGE')
 			break
 		end
 	end
@@ -454,6 +456,7 @@ function D.ModifyMonitor(mon, szKey, oVal)
 		return
 	end
 	D.MarkConfigChanged()
+	FireUIEvent('MY_TARGET_MON_MONITOR_CHANGE')
 end
 
 function D.DeleteMonitor(config, mon)
@@ -461,6 +464,7 @@ function D.DeleteMonitor(config, mon)
 		if v == mon then
 			remove(config.monitors, i)
 			D.MarkConfigChanged()
+			FireUIEvent('MY_TARGET_MON_MONITOR_CHANGE')
 			break
 		end
 	end

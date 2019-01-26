@@ -386,6 +386,23 @@ local function DrawDetail(ui)
 			end
 		end
 		insert(t1, t2)
+		-- 地图要求
+		local t2 = MY.GetDungeonMenu(function(p)
+			D.ModifyMonitor(mon, {'maps', p.dwID}, not mon.maps[p.dwID])
+		end, false, mon.maps)
+		for i, p in ipairs(t2) do
+			p.fnDisable = function() return mon.maps.all or IsEmpty(mon.maps) end
+		end
+		t2.szOption = _L['Map filter']
+		insert(t2, 1, {
+			szOption = _L['All maps'],
+			bCheck = true,
+			bChecked = mon.maps.all or IsEmpty(mon.maps),
+			fnAction = function(_, bChecked)
+				D.ModifyMonitor(mon, 'maps.all', bChecked)
+			end,
+		})
+		insert(t1, t2)
 		-- 出现声音
 		local t2 = MY.GetSoundMenu(function(dwID, bCheck)
 			if not bCheck then

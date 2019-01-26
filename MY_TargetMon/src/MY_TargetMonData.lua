@@ -39,7 +39,6 @@ if not MY.AssertVersion('MY_TargetMon', _L['MY_TargetMon'], 0x2011800) then
 end
 local C, D = {}, {
 	GetTargetTypeList = MY_TargetMonConfig.GetTargetTypeList,
-	GetConfig = MY_TargetMonConfig.GetConfig,
 	ModifyMonitor = MY_TargetMonConfig.ModifyMonitor,
 	CreateMonitorId = MY_TargetMonConfig.CreateMonitorId,
 	ModifyMonitorId = MY_TargetMonConfig.ModifyMonitorId,
@@ -54,6 +53,56 @@ local SKILL_CACHE = {} -- ÏÂ±êÎªÄ¿±êIDµÄÄ¿±ê¼¼ÄÜ»º´æÊý×é ·´ÕýID²»¿ÉÄÜÊÇdoodad²»»
 local SKILL_INFO = {} -- ¼¼ÄÜ·´ÏòË÷Òý
 local VIEW_LIST = {}
 local BOX_SPARKING_FRAME = GLOBAL.GAME_FPS * 2 / 3
+
+do
+local function FilterMonitors(monitors, dwMapID, dwKungfuID)
+	local ret = {}
+	for i, mon in ipairs(monitors) do
+		if mon.enable
+		and (not next(mon.maps) or mon.maps.all or mon.maps[dwMapID])
+		and (not next(mon.kungfus) or mon.kungfus.all or mon.kungfus[dwKungfuID]) then
+			insert(ret, mon)
+		end
+	end
+	return ret
+end
+local CACHE_CONFIG
+function D.GetConfig(nIndex)
+	if not CACHE_CONFIG then
+		local me = GetClientPlayer()
+		if not me then
+			return MY_TargetMonConfig.GetConfig(nIndex)
+		end
+		local aConfig = {}
+		local dwMapID = me.GetMapID() or 0
+		local dwKungfuID = me.GetKungfuMountID() or 0
+		for i, config in ipairs(MY_TargetMonConfig.GetConfig()) do
+			aConfig[i] = setmetatable({
+				monitors = FilterMonitors(config.monitors, dwMapID, dwKungfuID),
+			}, { __index = config })
+		end
+		CACHE_CONFIG = aConfig
+	end
+	if nIndex then
+		return CACHE_CONFIG[nIndex]
+	end
+	return CACHE_CONFIG
+end
+
+local function onFilterChange()
+	CACHE_CONFIG = nil
+end
+MY.RegisterEvent('LOADING_END.MY_TargetMonData', onFilterChange)
+MY.RegisterEvent('SKILL_MOUNT_KUNG_FU.MY_TargetMonData', onFilterChange)
+MY.RegisterEvent('SKILL_UNMOUNT_KUNG_FU.MY_TargetMonData', onFilterChange)
+MY.RegisterEvent('MY_TARGET_MON_MONITOR_CHANGE.MY_TargetMonData', onFilterChange)
+
+local function onTargetMonReload()
+	onFilterChange()
+	D.OnTargetMonReload()
+end
+MY.RegisterEvent('MY_TARGET_MON_CONFIG_INIT.MY_TargetMonData', onTargetMonReload)
+end
 
 do
 local TEAM_MARK = {
@@ -141,13 +190,7 @@ local EXTENT_ANIMATE = {
 	NONE = '',
 }
 local MON_EXIST_CACHE = {}
-local function Base_ShowMon(mon, dwKungfuID, dwTarKungfuID)
-	if not mon.enable then
-		return
-	end
-	if next(mon.kungfus) and not mon.kungfus.all and not mon.kungfus[dwKungfuID] then
-		return
-	end
+local function Base_ShowMon(mon, dwTarKungfuID)
 	if next(mon.tarkungfus) and not mon.tarkungfus.all and not mon.tarkungfus[dwTarKungfuID] then
 		return
 	end
@@ -238,8 +281,8 @@ local function Buff_CaptureMon(mon)
 		end
 	end
 end
-local function Buff_ShowMon(mon, dwKungfuID, dwTarKungfuID)
-	return Base_ShowMon(mon, dwKungfuID, dwTarKungfuID)
+local function Buff_ShowMon(mon, dwTarKungfuID)
+	return Base_ShowMon(mon, dwTarKungfuID)
 end
 local function Buff_MatchMon(tBuff, mon, config)
 	-- ids={[13942]={enable=true,iconid=7237,ignoreLevel=false,levels={[2]={enable=true,iconid=7237}}}}
@@ -344,8 +387,8 @@ local function Skill_CaptureMon(mon)
 		end
 	end
 end
-local function Skill_ShowMon(mon, dwKungfuID, dwTarKungfuID)
-	return Base_ShowMon(mon, dwKungfuID, dwTarKungfuID)
+local function Skill_ShowMon(mon, dwTarKungfuID)
+	return Base_ShowMon(mon, dwTarKungfuID)
 end
 local function Skill_MatchMon(tSkill, mon, config)
 	for dwID, tMonId in pairs(mon.ids) do
@@ -404,7 +447,6 @@ local function Skill_MonToView(mon, skill, item, KObject, nIcon, config, tMonExi
 end
 local function UpdateView()
 	local me = GetClientPlayer()
-	local dwKungfuID = me.GetKungfuMountID() or 0
 	local nViewIndex, nViewCount = 1, #VIEW_LIST
 	for _, config in ipairs(D.GetConfig()) do
 		if config.enable then
@@ -446,7 +488,7 @@ local function UpdateView()
 			if config.type == 'BUFF' then
 				local tBuff = KObject and BUFF_CACHE[KObject.dwID] or EMPTY_TABLE
 				for _, mon in ipairs(config.monitors) do
-					if Buff_ShowMon(mon, dwKungfuID, dwTarKungfuID) then
+					if Buff_ShowMon(mon, dwTarKungfuID) then
 						-- Èç¹û¿ªÆôÁË²¶»ñ ´ÓBUFFË÷ÒýÖÐ²¶»ñÐÂµÄBUFF
 						if mon.capture then
 							Buff_CaptureMon(mon)
@@ -467,7 +509,7 @@ local function UpdateView()
 			elseif config.type == 'SKILL' then
 				local tSkill = KObject and SKILL_CACHE[KObject.dwID] or EMPTY_TABLE
 				for _, mon in ipairs(config.monitors) do
-					if Skill_ShowMon(mon, dwKungfuID, dwTarKungfuID) then
+					if Skill_ShowMon(mon, dwTarKungfuID) then
 						-- Èç¹û¿ªÆôÁË²¶»ñ ´ÓBUFFË÷ÒýÖÐ²¶»ñÐÂµÄBUFF
 						if mon.capture then
 							Skill_CaptureMon(mon)
@@ -602,12 +644,11 @@ local function OnBreathe()
 	UpdateView()
 end
 
-local function onTargetMonReload()
+function D.OnTargetMonReload()
 	OnBreathe()
 	FireUIEvent('MY_TARGET_MON_DATA_INIT')
 	MY.BreatheCall('MY_TargetMonData', OnBreathe)
 end
-MY.RegisterEvent('MY_TARGET_MON_CONFIG_INIT.MY_TargetMonData', onTargetMonReload)
 end
 
 function D.GetViewData(nIndex)

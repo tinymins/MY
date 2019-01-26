@@ -90,6 +90,11 @@ return {
 					__VALUE__ = {},
 					__CHILD_TEMPLATE__ = true,
 				},
+				maps = {
+					__META__,
+					__VALUE__ = {},
+					__CHILD_TEMPLATE__ = true,
+				},
 				ignoreId = true,
 			},
 		},
