@@ -1565,6 +1565,41 @@ function MY.IsParty(dwID)
 	return GetClientPlayer().IsPlayerInMyParty(dwID)
 end
 
+-- 判断关系
+function MY.GetRelation(dwSelfID, dwPeerID)
+	if not dwPeerID then
+		dwPeerID = dwSelfID
+		dwSelfID = GetControlPlayerID()
+	end
+	if IsSelf(dwSelfID, dwPeerID) then
+		return 'Self'
+	end
+	local dwSrcID, dwTarID = dwSelfID, dwPeerID
+	if not IsPlayer(dwTarID) then
+		dwSrcID, dwTarID = dwTarID, dwSrcID
+	end
+	if IsParty(dwSrcID, dwTarID) then
+		return 'Party'
+	elseif IsNeutrality(dwSrcID, dwTarID) then
+		return 'Neutrality'
+	elseif IsEnemy(dwSrcID, dwTarID) then -- 敌对关系
+		if MY.GetFoe(dwPeerID) then
+			return 'Foe'
+		else
+			return 'Enemy'
+		end
+	elseif IsAlly(dwSrcID, dwTarID) then -- 相同阵营
+		return 'Ally'
+	else
+		return 'Enemy' -- 'Other'
+	end
+end
+
+-- 判断是不是红名
+function MY.IsEnemy(dwSelfID, dwPeerID)
+	return MY.GetRelation(dwSelfID, dwPeerID) == 'Enemy'
+end
+
 -------------------------------------------------------------------------------------------------------
 --       #         #   #                   #             #         #                   #             --
 --       #         #     #         #       #             #         #   #               #             --
@@ -1680,7 +1715,7 @@ function MY.IsFighting()
 		end
 		if bPlayerFighting then
 			for _, p in ipairs(MY.GetNearNpc()) do
-				if IsEnemy(me.dwID, p.dwID) and p.bFightState then
+				if IsEnemy(p.dwID, me.dwID) and p.bFightState then
 					bNpcFighting = true
 					break
 				end
