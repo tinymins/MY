@@ -434,6 +434,17 @@ function Class(className, super)
 	return classPrototype
 end
 end
+local function GetTraceback(str)
+	local traceback = debug and debug.traceback and debug.traceback():gsub('traceback:.*MY%.lua:%d+:%sin%sfunction%s\'GetTraceback\'[^\n]*', 'traceback:')
+	if traceback then
+		if str then
+			str = str .. '\n' .. traceback
+		else
+			str = traceback
+		end
+	end
+	return str or ''
+end
 ---------------------------------------------------------------------------------------------
 MY = {
 	spairs       = spairs      ,
@@ -457,6 +468,7 @@ MY = {
 	Class        = Class       ,
 	ApplyPatch   = ApplyPatch  ,
 	RandomChild  = RandomChild ,
+	GetTraceback = GetTraceback,
 }
 ---------------------------------------------------------------------------------------------
 -- 本地函数变量
