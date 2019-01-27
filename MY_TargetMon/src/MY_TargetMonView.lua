@@ -175,7 +175,9 @@ function D.UpdateFrame(frame)
 			else
 				hItem.hCDBar:Hide()
 				hItem.txtShortName:Show()
-				hItem:SetSize(hItem.nBoxW, hItem.nBoxH + hItem.txtShortName:GetH() * tViewData.fFontScale)
+				hItem:SetSize(hItem.nBoxW, hItem.nBoxH
+					+ (hItem.txtShortName:GetRelY() - hItem.nBoxH) * 2
+					+ hItem.txtShortName:GetH() * tViewData.fFontScale / tViewData.fUIScale)
 			end
 			hItem.txtTime:SetFontScale(tViewData.fFontScale * 1.2)
 			hItem.txtHotkey:SetFontScale(tViewData.fFontScale)
