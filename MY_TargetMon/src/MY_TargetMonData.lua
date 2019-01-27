@@ -341,7 +341,8 @@ local function Buff_MonToView(mon, buff, item, KObject, nIcon, config, tMonExist
 		item.bActive = true
 		item.bCd = true
 		item.fCd = nTimeLeft / nTimeTotal
-		item.fProgress = item.fCd
+		item.fCdBar = item.fCd
+		item.fProgress = 1 - item.fCd
 		item.bSparking = false
 		item.dwID = buff.dwID
 		item.nLevel = buff.nLevel
@@ -370,7 +371,8 @@ local function Buff_MonToView(mon, buff, item, KObject, nIcon, config, tMonExist
 		item.bActive = false
 		item.bCd = true
 		item.fCd = 0
-		item.fProgress = 0
+		item.fCdBar = 0
+		item.fProgress = 1
 		item.nTimeLeft = -1
 		item.bSparking = true
 		item.dwID = next(mon.ids) or -1
@@ -437,6 +439,7 @@ local function Skill_MonToView(mon, skill, item, KObject, nIcon, config, tMonExi
 		item.bActive = false
 		item.bCd = true
 		item.fCd = 1 - nTimeLeft / nTimeTotal
+		item.fCdBar = item.fCd
 		item.fProgress = item.fCd
 		item.bSparking = false
 		item.dwID = skill.dwID
@@ -450,6 +453,7 @@ local function Skill_MonToView(mon, skill, item, KObject, nIcon, config, tMonExi
 		item.bActive = true
 		item.bCd = false
 		item.fCd = 1
+		item.fCdBar = 1
 		item.fProgress = 1
 		item.bSparking = true
 		item.dwID = next(mon.ids) or -1

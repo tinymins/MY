@@ -200,9 +200,9 @@ function D.UpdateFrame(frame)
 			hItem.box:SetCoolDownPercentage(item.fCd)
 			hItem.fCd = item.fCd
 		end
-		if hItem.fProgress ~= item.fProgress and tViewData.bCdBar then
-			hItem.imgProcess:SetPercentage(item.fProgress)
-			hItem.fProgress = item.fProgress
+		if hItem.fCdBar ~= item.fCdBar and tViewData.bCdBar then
+			hItem.imgProcess:SetPercentage(item.fCdBar)
+			hItem.fCdBar = item.fCdBar
 		end
 		if hItem.szCdBarUITex ~= tViewData.szCdBarUITex and tViewData.bCdBar then
 			UI(hItem.imgProcess):image(tViewData.szCdBarUITex)
