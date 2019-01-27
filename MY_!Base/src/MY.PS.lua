@@ -28,7 +28,7 @@ local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer,
 local MY, UI = MY, MY.UI
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
-local Get, Set, RandomChild = MY.Get, MY.Set, MY.RandomChild
+local Get, Set, RandomChild, GetTraceback = MY.Get, MY.Set, MY.RandomChild, MY.GetTraceback
 local IsArray, IsDictionary, IsEquals = MY.IsArray, MY.IsDictionary, MY.IsEquals
 local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
@@ -369,7 +369,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 	if wnd.OnPanelDeactive then
 		local res, err = pcall(wnd.OnPanelDeactive, wnd)
 		if not res then
-			MY.Debug({err}, 'MY#OnPanelDeactive', MY_DEBUG.ERROR)
+			MY.Debug({GetTraceback(err)}, 'MY#OnPanelDeactive', MY_DEBUG.ERROR)
 		end
 	end
 	-- clear all events
@@ -550,7 +550,7 @@ function MY.SwitchTab(szID, bForceUpdate)
 		if tab.fn.OnPanelActive then
 			local res, err = pcall(tab.fn.OnPanelActive, wnd)
 			if not res then
-				MY.Debug({err}, 'MY#OnPanelActive', MY_DEBUG.ERROR)
+				MY.Debug({GetTraceback(err)}, 'MY#OnPanelActive', MY_DEBUG.ERROR)
 			end
 			wnd:FormatAllContentPos()
 		end
@@ -692,21 +692,21 @@ local function OnSizeChanged()
 	if hWndMainPanel.OnPanelResize then
 		local res, err = pcall(hWndMainPanel.OnPanelResize, hWndMainPanel)
 		if not res then
-			MY.Debug({err}, 'MY#OnPanelResize', MY_DEBUG.ERROR)
+			MY.Debug({GetTraceback(err)}, 'MY#OnPanelResize', MY_DEBUG.ERROR)
 		end
 		hWndMainPanel:FormatAllContentPos()
 	elseif hWndMainPanel.OnPanelActive then
 		if hWndMainPanel.OnPanelDeactive then
 			local res, err = pcall(hWndMainPanel.OnPanelDeactive, hWndMainPanel)
 			if not res then
-				MY.Debug({err}, 'MY#OnPanelResize->OnPanelDeactive', MY_DEBUG.ERROR)
+				MY.Debug({GetTraceback(err)}, 'MY#OnPanelResize->OnPanelDeactive', MY_DEBUG.ERROR)
 			end
 		end
 		hWndMainPanel:Clear()
 		hWndMainPanel:Lookup('', ''):Clear()
 		local res, err = pcall(hWndMainPanel.OnPanelActive, hWndMainPanel)
 		if not res then
-			MY.Debug({err}, 'MY#OnPanelResize->OnPanelActive', MY_DEBUG.ERROR)
+			MY.Debug({GetTraceback(err)}, 'MY#OnPanelResize->OnPanelActive', MY_DEBUG.ERROR)
 		end
 		hWndMainPanel:FormatAllContentPos()
 	end

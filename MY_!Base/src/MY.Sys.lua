@@ -15,7 +15,7 @@ local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
 local sub, len, format, rep = string.sub, string.len, string.format, string.rep
 local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
 local type, tonumber, tostring = type, tonumber, tostring
-local huge, pi, random = math.huge, math.pi, math.random
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
 local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
 local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
 local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
@@ -23,11 +23,15 @@ local pack, unpack = table.pack or function(...) return {...} end, table.unpack 
 -- jx3 apis caching
 local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
-local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
-local Get = MY.Get
-local IsNil, IsBoolean, IsEmpty, RandomChild = MY.IsNil, MY.IsBoolean, MY.IsEmpty, MY.RandomChild
-local IsNumber, IsString, IsTable, IsFunction = MY.IsNumber, MY.IsString, MY.IsTable, MY.IsFunction
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local MY, UI = MY, MY.UI
+local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
+local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
+local Get, Set, RandomChild, GetTraceback = MY.Get, MY.Set, MY.RandomChild, MY.GetTraceback
+local IsArray, IsDictionary, IsEquals = MY.IsArray, MY.IsDictionary, MY.IsEquals
+local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
 MY = MY or {}
 local _L, _C = MY.LoadLangPack(), {}
@@ -1077,7 +1081,7 @@ local function OnCurlRequestResult()
 		if settings.complete then
 			local status, err = pcall(settings.complete, html, status, bSuccess or dwBufferSize > 0)
 			if not status then
-				MY.Debug({'CURL # ' .. settings.url .. ' - complete - PCALL ERROR - ' .. err}, MY_DEBUG.ERROR)
+				MY.Debug({GetTraceback('CURL # ' .. settings.url .. ' - complete - PCALL ERROR - ' .. err)}, MY_DEBUG.ERROR)
 			end
 		end
 		if bSuccess then
@@ -1089,12 +1093,12 @@ local function OnCurlRequestResult()
 			-- end
 			local status, err = pcall(settings.success, html, status)
 			if not status then
-				MY.Debug({'CURL # ' .. settings.url .. ' - success - PCALL ERROR - ' .. err}, MY_DEBUG.ERROR)
+				MY.Debug({GetTraceback('CURL # ' .. settings.url .. ' - success - PCALL ERROR - ' .. err)}, MY_DEBUG.ERROR)
 			end
 		else
 			local status, err = pcall(settings.error, html, status, dwBufferSize ~= 0)
 			if not status then
-				MY.Debug({'CURL # ' .. settings.url .. ' - error - PCALL ERROR - ' .. err}, MY_DEBUG.ERROR)
+				MY.Debug({GetTraceback('CURL # ' .. settings.url .. ' - error - PCALL ERROR - ' .. err)}, MY_DEBUG.ERROR)
 			end
 		end
 		MY_CALL_AJAX[szKey] = nil
@@ -1323,7 +1327,7 @@ local function OnInit()
 	for szKey, fnAction in pairs(INIT_FUNC_LIST) do
 		local status, err = pcall(fnAction)
 		if not status then
-			MY.Debug({err}, 'STORAGE_INIT_FUNC_LIST#' .. szKey)
+			MY.Debug({GetTraceback(err)}, 'STORAGE_INIT_FUNC_LIST#' .. szKey)
 		end
 	end
 	INIT_FUNC_LIST = {}

@@ -25,7 +25,7 @@ local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
 local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
-local UI, Get, RandomChild = MY.UI, MY.Get, MY.RandomChild
+local UI, Get, RandomChild, GetTraceback = MY.UI, MY.Get, MY.RandomChild, MY.GetTraceback
 local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 ---------------------------------------------------------------------------------------------------
@@ -1828,7 +1828,7 @@ local function WithTargetHandle()
 	MY.SetTempTarget(r.dwType, r.dwID)
 	local status, err = pcall(r.callback)
 	if not status then
-		MY.Debug({err}, 'MYLIB#WithTarget', MY_DEBUG.ERROR)
+		MY.Debug({GetTraceback(err)}, 'MYLIB#WithTarget', MY_DEBUG.ERROR)
 	end
 	MY.ResumeTarget()
 

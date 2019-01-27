@@ -28,7 +28,7 @@ local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer,
 local MY, UI = MY, MY.UI
 local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
 local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
-local Get, Set, RandomChild = MY.Get, MY.Set, MY.RandomChild
+local Get, Set, RandomChild, GetTraceback = MY.Get, MY.Set, MY.RandomChild, MY.GetTraceback
 local IsArray, IsDictionary, IsEquals = MY.IsArray, MY.IsDictionary, MY.IsEquals
 local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
@@ -50,7 +50,7 @@ local function EventHandler(szEvent, ...)
 		for k, v in pairs(tEvent) do
 			local res, err = pcall(v, szEvent, ...)
 			if not res then
-				MY.Debug({err}, 'OnEvent#' .. szEvent .. '.' .. k, MY_DEBUG.ERROR)
+				MY.Debug({GetTraceback(err)}, 'OnEvent#' .. szEvent .. '.' .. k, MY_DEBUG.ERROR)
 			end
 		end
 	end
@@ -104,7 +104,7 @@ local function OnInit()
 		local nStartTick = GetTickCount()
 		local status, err = pcall(fnAction)
 		if not status then
-			MY.Debug({err}, 'INIT_FUNC_LIST#' .. szKey)
+			MY.Debug({GetTraceback(err)}, 'INIT_FUNC_LIST#' .. szKey)
 		end
 		MY.Debug({_L('Initial function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], MY_DEBUG.LOG)
 	end
@@ -148,7 +148,7 @@ local function OnExit()
 		local nStartTick = GetTickCount()
 		local status, err = pcall(fnAction)
 		if not status then
-			MY.Debug({err}, 'EXIT_FUNC_LIST#' .. szKey)
+			MY.Debug({GetTraceback(err)}, 'EXIT_FUNC_LIST#' .. szKey)
 		end
 		MY.Debug({_L('Exit function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], MY_DEBUG.LOG)
 	end
@@ -188,7 +188,7 @@ local function OnReload()
 		local nStartTick = GetTickCount()
 		local status, err = pcall(fnAction)
 		if not status then
-			MY.Debug({err}, 'RELOAD_FUNC_LIST#' .. szKey)
+			MY.Debug({GetTraceback(err)}, 'RELOAD_FUNC_LIST#' .. szKey)
 		end
 		MY.Debug({_L('Reload function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], MY_DEBUG.LOG)
 	end
@@ -230,7 +230,7 @@ local function OnIdle()
 		local nStartTick = GetTickCount()
 		local status, err = pcall(fnAction)
 		if not status then
-			MY.Debug({err}, 'IDLE_FUNC_LIST#' .. szKey)
+			MY.Debug({GetTraceback(err)}, 'IDLE_FUNC_LIST#' .. szKey)
 		end
 		MY.Debug({_L('Idle function <%s> executed in %dms.', szKey, GetTickCount() - nStartTick)}, _L['PMTool'], MY_DEBUG.LOG)
 	end
@@ -440,7 +440,7 @@ local function OnBgMsg()
 		for szKey, fnAction in pairs(BG_MSG_LIST[szMsgID]) do
 			local status, err = pcall(fnAction, szMsgID, nChannel, dwID, szName, bSelf, unpack(aParam))
 			if not status then
-				MY.Debug({err}, 'BG_EVENT#' .. szMsgID .. '.' .. szKey, MY_DEBUG.ERROR)
+				MY.Debug({GetTraceback(err)}, 'BG_EVENT#' .. szMsgID .. '.' .. szKey, MY_DEBUG.ERROR)
 			end
 		end
 	end
