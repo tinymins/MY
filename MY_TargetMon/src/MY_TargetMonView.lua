@@ -271,8 +271,8 @@ function D.UpdateFrame(frame)
 		frame.nHeight = 50
 		hItem = hList:Lookup(0)
 		if hItem then
-			frame.nWidth = max(frame.nWidth, hItem:GetW() * min(tViewData.nMaxLineCount, nIndex))
-			frame.nHeight = max(frame.nHeight, ceil(nIndex / tViewData.nMaxLineCount) * hItem:GetH())
+			frame.nWidth = hItem:GetW() * min(tViewData.nMaxLineCount, nIndex)
+			frame.nHeight = ceil(nIndex / tViewData.nMaxLineCount) * hItem:GetH()
 		end
 		hList:SetW(frame.nWidth)
 		hList:FormatAllItemPosExt()
