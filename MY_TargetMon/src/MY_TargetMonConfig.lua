@@ -405,6 +405,7 @@ function D.CreateConfig()
 		uuid = D.GeneUUID(),
 	}, CONFIG_TEMPLATE)
 	insert(CONFIG, config)
+	D.UpdateTargetList()
 	D.MarkConfigChanged()
 	FireUIEvent('MY_TARGET_MON_CONFIG_INIT')
 	return config
