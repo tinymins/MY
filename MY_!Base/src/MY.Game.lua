@@ -2283,22 +2283,31 @@ MY.RegisterEvent('SKILL_MOUNT_KUNG_FU', onKungfuChange)
 MY.RegisterEvent('SKILL_UNMOUNT_KUNG_FU', onKungfuChange)
 end
 
+do
+local SKILL_CACHE = setmetatable({}, { __mode = 'v' })
+local SKILL_PROXY = setmetatable({}, { __mode = 'v' })
+local function reject() assert(false, 'Modify skill info from MY.GetSkill is forbidden!') end
 function MY.GetSkill(dwID, nLevel)
 	local KSkill = GetSkill(dwID, nLevel)
 	if not KSkill then
 		return
 	end
-	local info = {
-		szKey = dwID .. '#' .. nLevel,
-		szName = MY.GetSkillName(dwID, nLevel),
-		dwID = dwID,
-		nLevel = nLevel,
-		bLearned = nLevel > 0,
-		nIcon = Table_GetSkillIconID(dwID, nLevel),
-		dwExtID = Table_GetSkillExtCDID(dwID),
-		bFormation = Table_IsSkillFormation(dwID, nLevel),
-	}
-	return KSkill, info
+	local szKey = dwID .. '#' .. nLevel
+	if not SKILL_CACHE[szKey] or not SKILL_PROXY[szKey] then
+		SKILL_CACHE[szKey] = {
+			szKey = szKey,
+			szName = MY.GetSkillName(dwID, nLevel),
+			dwID = dwID,
+			nLevel = nLevel,
+			bLearned = nLevel > 0,
+			nIcon = Table_GetSkillIconID(dwID, nLevel),
+			dwExtID = Table_GetSkillExtCDID(dwID),
+			bFormation = Table_IsSkillFormation(dwID, nLevel),
+		}
+		SKILL_PROXY[szKey] = setmetatable({}, { __index = SKILL_CACHE[szKey], __newindex = reject })
+	end
+	return KSkill, SKILL_PROXY[szKey]
+end
 end
 
 do
