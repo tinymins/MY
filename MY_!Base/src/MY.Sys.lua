@@ -967,7 +967,7 @@ function MY.Ajax(settings)
 			MY.DelayCall('MYRRWC_TO_' .. RequestID, false)
 			-- 成功回调函数
 			-- if settings.success then
-			-- 	local status, err = pcall_this(settings.context, settings.success, settings, szContent)
+			-- 	local status, err = pcall_this(settings.context, settings.success, szContent, 200, settings)
 			-- 	if not status then
 			-- 		MY.Debug({err}, 'MYRRWC::OnDocumentComplete::Callback', MY_DEBUG.ERROR)
 			-- 	end
@@ -983,7 +983,7 @@ function MY.Ajax(settings)
 				MY.Debug({settings.url}, 'MYRRWC::Timeout', MY_DEBUG.WARNING) -- log
 				-- request timeout, call timeout function.
 				if settings.error then
-					local status, err = pcall_this(settings.context, settings.error, settings, 'timeout')
+					local status, err = pcall_this(settings.context, settings.error, 'timeout', settings)
 					if not status then
 						MY.Debug({err}, 'MYRRWC::TIMEOUT', MY_DEBUG.ERROR)
 					end
@@ -1020,7 +1020,7 @@ function MY.Ajax(settings)
 				MY.DelayCall('MYRRWP_TO_' .. RequestID, false)
 				-- 成功回调函数
 				if settings.success then
-					local status, err = pcall_this(settings.context, settings.success, settings, szContent)
+					local status, err = pcall_this(settings.context, settings.success, szContent, 200, settings)
 					if not status then
 						MY.Debug({err}, 'MYRRWP::OnDocumentComplete::Callback', MY_DEBUG.ERROR)
 					end
@@ -1037,7 +1037,7 @@ function MY.Ajax(settings)
 				MY.Debug({settings.url}, 'MYRRWP::Timeout', MY_DEBUG.WARNING) -- log
 				-- request timeout, call timeout function.
 				if settings.error then
-					local status, err = pcall_this(settings.context, settings.error, settings, 'timeout')
+					local status, err = pcall_this(settings.context, settings.error, 'timeout', settings)
 					if not status then
 						MY.Debug({err}, 'MYRRWP::TIMEOUT', MY_DEBUG.ERROR)
 					end
