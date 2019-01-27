@@ -209,26 +209,7 @@ function D.GetRelation(dwID)
 		return 'Neutrality'
 	end
 	if Config.nCamp == -1 or not IsPlayer(dwID) then
-		if dwID == me.dwID then
-			return 'Self'
-		elseif IsParty(me.dwID, dwID) then
-			return 'Party'
-		elseif IsNeutrality(me.dwID, dwID) then
-			return 'Neutrality'
-		elseif IsEnemy(me.dwID, dwID) then -- 敌对关系
-			local r, g, b = GetHeadTextForceFontColor(dwID, me.dwID) -- 我看他的颜色
-			if MY.GetFoe(dwID) then
-				return 'Foe'
-			elseif r == 255 and g == 255 and b == 0 then
-				return 'Neutrality'
-			else
-				return 'Enemy'
-			end
-		elseif IsAlly(me.dwID, dwID) then -- 相同阵营
-			return 'Ally'
-		else
-			return 'Neutrality' -- 'Other'
-		end
+		return MY.GetRelation(me.dwID, dwID)
 	else
 		local tar = MY.GetObject(TARGET.PLAYER, dwID)
 		if not tar then
