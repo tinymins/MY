@@ -811,7 +811,7 @@ function MY_Recount_Detail.OnFrameBreathe()
 		for id, p in pairs(tData.Target) do
 			local rec = {
 				szKey  = id                              ,
-				szName = MY_Recount.Data.GetNameAusID(id),
+				szName = MY_Recount.Data.GetNameAusID(id, DataDisplay),
 				nCount = not MY_Recount.bShowZeroVal and p.nNzCount or p.nCount,
 				nTotal = MY_Recount.bShowEffect and p.nTotalEffect or p.nTotal,
 			}

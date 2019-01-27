@@ -514,11 +514,8 @@ function MY_Recount.Data.OnSkillEffect(dwCaster, dwTarget, nEffectType, dwEffect
 end
 
 function MY_Recount.Data.GetNameAusID(id, data)
-	if not id then
+	if not id or not data then
 		return
-	end
-	if not data then
-		data = DataDisplay
 	end
 
 	local dwID = tonumber(id)
