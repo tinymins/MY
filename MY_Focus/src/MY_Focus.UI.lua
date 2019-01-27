@@ -207,7 +207,7 @@ function D.UpdateItem(hItem, p)
 		hItem:Lookup('Handle_Compass/Image_PointGreen'):Hide()
 		if player and nDistance > 0 then
 			local h
-			if IsEnemy(UI_GetClientPlayerID(), dwID) then
+			if MY.IsEnemy(UI_GetClientPlayerID(), dwID) then
 				h = hItem:Lookup('Handle_Compass/Image_PointRed')
 			else
 				h = hItem:Lookup('Handle_Compass/Image_PointGreen')

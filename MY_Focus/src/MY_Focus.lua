@@ -534,7 +534,7 @@ function MY_Focus.GetDisplayList()
 					bFocus = false
 				end
 				if bFocus and not p.tRule.tRelation.bAll then
-					if IsEnemy(me.dwID, KObject.dwID) then
+					if MY.IsEnemy(me.dwID, KObject.dwID) then
 						bFocus = p.tRule.tRelation.bEnemy
 					else
 						bFocus = p.tRule.tRelation.bAlly
