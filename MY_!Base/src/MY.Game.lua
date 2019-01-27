@@ -1906,6 +1906,10 @@ function MY.Equip(szName)
 	end
 end
 
+do
+local BUFF_LIST_CACHE = setmetatable({}, { __mode = 'v' })
+local BUFF_LIST_PROXY = setmetatable({}, { __mode = 'v' })
+local function reject() assert(false, 'Modify buff list from MY.GetBuffList is forbidden!') end
 -- 获取对象的buff列表
 -- (table) MY.GetBuffList(KObject)
 function MY.GetBuffList(...)
@@ -1917,31 +1921,51 @@ function MY.GetBuffList(...)
 	end
 	local aBuffTable = {}
 	if KObject then
-		local nCount = KObject.GetBuffCount() or 0
-		for i = 1, nCount do
+		if not BUFF_LIST_CACHE[KObject] or not BUFF_LIST_PROXY[KObject] then
+			BUFF_LIST_CACHE[KObject] = setmetatable({}, { __mode = 'v' })
+			BUFF_LIST_PROXY[KObject] = setmetatable({}, { __mode = 'v' })
+		end
+		local nCount, raw = 0
+		for i = 1, KObject.GetBuffCount() or 0 do
 			local dwID, nLevel, bCanCancel, nEndFrame, nIndex, nStackNum, dwSkillSrcID, bValid = KObject.GetBuff(i - 1)
 			if dwID then
-				local szName, nIcon = MY.GetBuffName(dwID, nLevel)
-				table.insert(aBuffTable, {
-					szKey        = dwID .. ',' .. nLevel,
-					dwID         = dwID        ,
-					nLevel       = nLevel      ,
-					szName       = szName      ,
-					nIcon        = nIcon       ,
-					bCanCancel   = bCanCancel  ,
-					nEndFrame    = nEndFrame   ,
-					nIndex       = nIndex      ,
-					nStackNum    = nStackNum   ,
-					dwSkillSrcID = dwSkillSrcID,
-					bValid       = bValid      ,
-					nCount       = i           ,
-				})
+				nCount = nCount + 1
+				if not BUFF_LIST_CACHE[KObject][nCount] or not BUFF_LIST_PROXY[KObject][nCount] then
+					BUFF_LIST_CACHE[KObject][nCount] = {}
+					BUFF_LIST_PROXY[KObject][nCount] = setmetatable({}, { __index = BUFF_LIST_CACHE[KObject][nCount], __newindex = reject })
+				end
+				raw = BUFF_LIST_CACHE[KObject][nCount]
+				raw.szKey        = dwID .. ',' .. nLevel
+				raw.dwID         = dwID
+				raw.nLevel       = nLevel
+				raw.szName       = szName
+				raw.nIcon        = nIcon
+				raw.bCanCancel   = bCanCancel
+				raw.nEndFrame    = nEndFrame
+				raw.nIndex       = nIndex
+				raw.nStackNum    = nStackNum
+				raw.dwSkillSrcID = dwSkillSrcID
+				raw.bValid       = bValid
+				raw.nCount       = i
+				raw.szName, raw.nIcon = MY.GetBuffName(dwID, nLevel)
 			end
 		end
+		for i = nCount + 1, #BUFF_LIST_CACHE[KObject] do
+			BUFF_LIST_CACHE[KObject][i] = nil
+		end
+		for i = nCount + 1, #BUFF_LIST_PROXY[KObject] do
+			BUFF_LIST_PROXY[KObject][i] = nil
+		end
+		return BUFF_LIST_PROXY[KObject]
 	end
-	return aBuffTable
+	return EMPTY_TABLE
+end
 end
 
+do
+local BUFF_CACHE = setmetatable({}, { __mode = 'v' })
+local BUFF_PROXY = setmetatable({}, { __mode = 'v' })
+local function reject() assert(false, 'Modify buff from MY.GetBuff is forbidden!') end
 -- 获取对象的buff
 -- tBuff: {[dwID1] = nLevel1, [dwID2] = nLevel2}
 -- (table) MY.GetBuff(dwID[, nLevel[, dwSkillSrcID]])
@@ -1976,18 +2000,26 @@ function MY.GetBuff(KObject, dwID, nLevel, dwSkillSrcID)
 			end
 			for _, buff in ipairs(MY.GetBuffList(KObject)) do
 				if (tBuff[buff.dwID] == buff.nLevel or tBuff[buff.dwID] == 0) and buff.dwSkillSrcID == dwSkillSrcID then
-					return {
-						dwID         = buff.dwID        ,
-						nLevel       = buff.nLevel      ,
-						bCanCancel   = buff.bCanCancel  ,
-						nEndFrame    = buff.nEndFrame   ,
-						nIndex       = buff.nIndex      ,
-						nStackNum    = buff.nStackNum   ,
-						dwSkillSrcID = buff.dwSkillSrcID,
-						bValid       = buff.bValid      ,
-						nCount       = buff.nCount      ,
-						GetEndTime = function() return buff.nEndFrame end,
-					}
+					if not BUFF_CACHE[KObject] or not BUFF_PROXY[KObject] then
+						BUFF_CACHE[KObject] = setmetatable({}, { __mode = 'v' })
+						BUFF_PROXY[KObject] = setmetatable({}, { __mode = 'v' })
+					end
+					if not BUFF_CACHE[KObject][buff.szKey] or not BUFF_PROXY[KObject][buff.szKey] then
+						BUFF_CACHE[KObject][buff.szKey] = {}
+						BUFF_PROXY[KObject][buff.szKey] = setmetatable({}, { __index = BUFF_CACHE[KObject][buff.szKey], __newindex = reject })
+					end
+					local raw = BUFF_CACHE[KObject][buff.szKey]
+					raw.dwID         = buff.dwID
+					raw.nLevel       = buff.nLevel
+					raw.bCanCancel   = buff.bCanCancel
+					raw.nEndFrame    = buff.nEndFrame
+					raw.nIndex       = buff.nIndex
+					raw.nStackNum    = buff.nStackNum
+					raw.dwSkillSrcID = buff.dwSkillSrcID
+					raw.bValid       = buff.bValid
+					raw.nCount       = buff.nCount
+					raw.GetEndTime = function() return buff.nEndFrame end
+					return BUFF_CACHE[KObject][buff.szKey]
 				end
 			end
 			-- return MY.Debug({'KObject do not have a function named GetBuffByOwner.'}, 'MY.GetBuff', MY_DEBUG.ERROR)
@@ -2003,6 +2035,7 @@ function MY.GetBuff(KObject, dwID, nLevel, dwSkillSrcID)
 			end
 		end
 	end
+end
 end
 
 -- 点掉自己的buff
