@@ -165,7 +165,7 @@ function D.OnFrameBreathe()
 		local nFrame = 4
 		if me.IsInParty() and MY.IsParty(tar.dwID) then
 			nFrame = 3
-		elseif IsEnemy(me.dwID, tar.dwID) then
+		elseif MY.IsEnemy(me.dwID, tar.dwID) then
 			nFrame = 1
 		elseif IsAlly(me.dwID, tar.dwID) then
 			nFrame = 2
