@@ -576,30 +576,32 @@ local function OnBreathe()
 	for _, eType in ipairs(D.GetTargetTypeList('BUFF')) do
 		local KObject = MY.GetObject(D.GetTarget(eType, 'BUFF'))
 		if KObject then
+			local tLastBuff = BUFF_CACHE[KObject.dwID]
 			local tBuff = {}
 			local aBuff = MY.GetBuffList(KObject)
 			-- 当前身上的buff
+			local info
 			for _, buff in ipairs(aBuff) do
-				buff.nLeft = max(buff.nEndFrame - nLogicFrame, 0)
-				buff.bCool = true
-				tBuff[buff.szName] = buff
-				tBuff[buff.dwID] = buff
-				tBuff[buff.szKey] = buff
+				info = setmetatable(tLastBuff and tLastBuff[buff.szKey] or {}, { __index = buff })
+				info.nLeft = max(buff.nEndFrame - nLogicFrame, 0)
+				info.bCool = true
+				tBuff[buff.szName] = info
+				tBuff[buff.dwID] = info
+				tBuff[buff.szKey] = info
 				if not BUFF_INFO[buff.szName] then
 					BUFF_INFO[buff.szName] = {}
 				end
 				BUFF_INFO[buff.szName][buff.szKey] = buff
 			end
 			-- 处理消失的buff
-			local tLastBuff = BUFF_CACHE[KObject.dwID]
 			if tLastBuff then
-				for k, buff in pairs(tLastBuff) do
+				for k, info in pairs(tLastBuff) do
 					if not tBuff[k] then
-						if buff.bCool then
-							buff.nLeft = 0
-							buff.bCool = false
+						if info.bCool then
+							info.nLeft = 0
+							info.bCool = false
 						end
-						tBuff[k] = buff
+						tBuff[k] = info
 					end
 				end
 			end
@@ -617,29 +619,31 @@ local function OnBreathe()
 					local nLevel = KObject.GetSkillLevel(dwID)
 					local KSkill, info = MY.GetSkill(dwID, nLevel)
 					if KSkill and info then
-						local bCool, szType, nLeft, nInterval, nTotal, nCount, nMaxCount, nSurfaceNum = MY.GetSkillCDProgress(KObject, dwID, nLevel, true)
-						local skill = {
-							dwID = dwID,
-							nLevel = info.nLevel,
-							szKey = dwID,
-							bCool = bCool or nCount > 0,
-							szCdType = szType,
-							nCdLeft = nLeft,
-							nCdInterval = nInterval,
-							nCdTotal = nTotal,
-							nCdCount = nCount,
-							nCdMaxCount = nMaxCount,
-							nSurfaceNum = nSurfaceNum,
-							nIcon = info.nIcon,
-							szName = MY.GetSkillName(dwID),
-						}
-						tSkill[skill.szName] = skill
-						tSkill[skill.dwID] = skill
-						tSkill[skill.szKey] = skill
-						if not SKILL_INFO[skill.szName] then
-							SKILL_INFO[skill.szName] = {}
+						local szKey, szName = dwID, MY.GetSkillName(dwID)
+						if not SKILL_INFO[szName] then
+							SKILL_INFO[szName] = {}
 						end
-						SKILL_INFO[skill.szName][skill.szKey] = skill
+						if not SKILL_INFO[szName][szKey] then
+							SKILL_INFO[szName][szKey] = {}
+						end
+						local skill = SKILL_INFO[szName][szKey]
+						local bCool, szType, nLeft, nInterval, nTotal, nCount, nMaxCount, nSurfaceNum = MY.GetSkillCDProgress(KObject, dwID, nLevel, true)
+						skill.szKey = szKey
+						skill.dwID = dwID
+						skill.nLevel = info.nLevel
+						skill.bCool = bCool or nCount > 0
+						skill.szCdType = szType
+						skill.nCdLeft = nLeft
+						skill.nCdInterval = nInterval
+						skill.nCdTotal = nTotal
+						skill.nCdCount = nCount
+						skill.nCdMaxCount = nMaxCount
+						skill.nSurfaceNum = nSurfaceNum
+						skill.nIcon = info.nIcon
+						skill.szName = MY.GetSkillName(dwID)
+						tSkill[szKey] = skill
+						tSkill[dwID] = skill
+						tSkill[szName] = skill
 					end
 				end
 			end
