@@ -842,7 +842,7 @@ local function DrawPreview(ui, config, OpenDetail)
 				subt = {
 					szOption = p[2] or p[1],
 					fnAction = function()
-						D.ModifyConfig(config, 'boxBgUITex', text)
+						D.ModifyConfig(config, 'boxBgUITex', p[1])
 					end,
 					szIcon = szIcon,
 					nFrame = nFrame,
