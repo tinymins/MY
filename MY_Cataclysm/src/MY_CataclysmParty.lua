@@ -826,7 +826,7 @@ function CTM:RefreshBossTarget()
 	local tKeep = {}
 	if CFG.bShowBossTarget then
 		for dwNpcID, npc in pairs(CTM_BOSS_CACHE) do
-			local dwTarID = (IsEnemy(UI_GetClientPlayerID(), dwNpcID) and npc.bFightState)
+			local dwTarID = (MY.IsEnemy(UI_GetClientPlayerID(), dwNpcID) and npc.bFightState)
 				and (CTM_THREAT_NPC_ID == dwNpcID and CTM_THREAT_TARGET_ID or select(2, npc.GetTarget()))
 				or nil
 			if dwTarID then
