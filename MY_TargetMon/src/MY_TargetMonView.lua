@@ -201,7 +201,7 @@ function D.UpdateFrame(frame)
 			hItem.fCd = item.fCd
 		end
 		if hItem.fProgress ~= item.fProgress and tViewData.bCdBar then
-			hItem.imgProcess:SetPercentage(1 - item.fProgress)
+			hItem.imgProcess:SetPercentage(item.fProgress)
 			hItem.fProgress = item.fProgress
 		end
 		if hItem.szCdBarUITex ~= tViewData.szCdBarUITex and tViewData.bCdBar then
