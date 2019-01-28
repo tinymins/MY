@@ -308,7 +308,7 @@ local function Buff_MatchMon(tBuff, mon, config)
 			local buff = tBuff[dwID]
 			if buff and buff.bCool then
 				if (
-					not config.hideOthers
+					config.hideOthers ~= mon.hideOthers
 					or buff.dwSkillSrcID == UI_GetClientPlayerID()
 					or buff.dwSkillSrcID == GetControlPlayerID()
 				) and (not D.IsShieldedBuff(dwID, buff.nLevel)) then

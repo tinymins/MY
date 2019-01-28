@@ -412,6 +412,17 @@ local function DrawDetail(ui)
 				D.ModifyMonitor(mon, 'hideVoid', not mon.hideVoid)
 			end,
 		})
+		-- 隐藏他人的
+		if l_config.type == 'BUFF' then
+			insert(t1, {
+				szOption = l_config.hideOthers and _L['Show even others'] or _L['Hide if others'],
+				bCheck = true,
+				bChecked = not mon.hideOthers,
+				fnAction = function()
+					D.ModifyMonitor(mon, 'hideOthers', not mon.hideOthers)
+				end,
+			})
+		end
 		-- 出现声音
 		local t2 = MY.GetSoundMenu(function(dwID, bCheck)
 			if not bCheck then
