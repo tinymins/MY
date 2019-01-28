@@ -744,6 +744,15 @@ function MY_ChatLog.OnLButtonClick()
 			wnd:Lookup('CheckBox_ChatChannel'):Check(false, WNDEVENT_FIRETYPE.PREVENT)
 		end
 		wnd:Lookup('CheckBox_ChatChannel'):Check(true)
+	elseif name == 'Btn_ChatChannelAll' then
+		local parent = this:GetParent():Lookup('WndScroll_ChatChanel/WndContainer_ChatChanel')
+		for i = 0, parent:GetAllContentCount() - 1 do
+			local wnd = parent:LookupContent(i)
+			wnd:Lookup('CheckBox_ChatChannel'):Check(true, WNDEVENT_FIRETYPE.PREVENT)
+		end
+		this:GetRoot().nCurrentPage = nil
+		this:GetRoot().nLastClickIndex = nil
+		MY_ChatLog.UpdatePage(this:GetRoot())
 	end
 end
 
