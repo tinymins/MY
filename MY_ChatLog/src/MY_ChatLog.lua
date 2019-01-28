@@ -109,7 +109,7 @@ local MSGTYPE_COLOR = setmetatable({
 	['MSG_MY_MONITOR'] = {255, 255, 0},
 }, {__index = function(t, k) return GetMsgFontColor(k, true) end})
 
-local DB, ConnectDB, InsertMsg, DeleteMsg, PushDB, GetChatLogCount, GetChatLog, OptimizeDB, FixSearchDB, ImportDB
+local DB, ConnectDB, InsertMsg, DeleteMsg, GetUnsavedMsg, PushDB, GetChatLogCount, GetChatLog, OptimizeDB, FixSearchDB, ImportDB
 do
 local STMT = {}
 local l_globalid
@@ -142,6 +142,20 @@ function DeleteMsg(hash, time)
 		return
 	end
 	table.insert(aDelQueue, {hash, time})
+end
+
+function GetUnsavedMsg(channels, search)
+	local aUnsaved, tChannelCount = {}, {}
+	for _, p in ipairs(aInsQueue) do
+		if channels[p.channel] and (search == '' or wfind(p.talker, search) or wfind(p.text, search)) then
+			if not tChannelCount[p.channel] then
+				tChannelCount[p.channel] = 0
+			end
+			insert(aUnsaved, p)
+			tChannelCount[p.channel] = tChannelCount[p.channel] + 1
+		end
+	end
+	return aUnsaved, tChannelCount
 end
 
 local function CreateTable()
@@ -452,7 +466,7 @@ function PushDB()
 	FireUIEvent('ON_MY_CHATLOG_PUSHDB')
 end
 
-local function GetChatLogTableCount(channels, search)
+local function GetChatLogTableCount(channels, search, unsaved)
 	local stmtUpd
 	local usearch = AnsiToUTF8('%' .. search .. '%')
 	local tables  = DB:Execute('SELECT * FROM ChatLogIndex ORDER BY stime ASC')
@@ -492,12 +506,25 @@ local function GetChatLogTableCount(channels, search)
 			stmtUpd:Execute()
 		end
 	end
+	if unsaved and #aInsQueue > 0 then
+		local aUnsaved, tChannelCount = GetUnsavedMsg(channels, search)
+		if #aUnsaved > 0 then
+			insert(tables, {
+				name = 'Unsaved',
+				stime = aUnsaved[1].time,
+				etime = aUnsaved[#aUnsaved].time,
+				count = #aUnsaved,
+				list = aUnsaved,
+				detailcountcache = {cache = {[search] = tChannelCount}},
+			})
+		end
+	end
 	return tables
 end
 
 function GetChatLogCount(channels, search)
 	local count   = 0
-	local tables  = GetChatLogTableCount(channels, search)
+	local tables  = GetChatLogTableCount(channels, search, true)
 	for _, info in ipairs(tables) do
 		for _, channel in ipairs(channels) do
 			if info.detailcountcache.cache[search][channel] then
@@ -537,7 +564,7 @@ function GetChatLog(channels, search, offset, limit)
 	sql = sql .. ' ORDER BY time ASC LIMIT ? OFFSET ?'
 
 	local index, count, result, data = 0, 0, {}, nil
-	local tables  = GetChatLogTableCount(channels, search)
+	local tables  = GetChatLogTableCount(channels, search, true)
 	for _, info in ipairs(tables) do
 		if limit == 0 then
 			break
@@ -549,12 +576,19 @@ function GetChatLog(channels, search, offset, limit)
 			end
 		end
 		if index + count >= offset and count > 0 then
-			DB_R = DB:Prepare('SELECT * FROM ' .. info.name .. sql)
-			DB_R:ClearBindings()
-			values[#values - 1] = limit
-			values[#values] = offset - index
-			DB_R:BindAll(unpack(values))
-			data = DB_R:GetAll()
+			if info.name == 'Unsaved' then
+				data = {}
+				for i = 1, min(limit, #info.list) do
+					insert(data, info.list[i])
+				end
+			else
+				DB_R = DB:Prepare('SELECT * FROM ' .. info.name .. sql)
+				DB_R:ClearBindings()
+				values[#values - 1] = limit
+				values[#values] = offset - index
+				DB_R:BindAll(unpack(values))
+				data = DB_R:GetAll()
+			end
 			for _, rec in ipairs(data) do
 				if rec.hash == GetStringCRC(rec.msg) then
 					insert(result, rec)
@@ -605,9 +639,13 @@ local function InitMsgMon()
 			PushDB()
 		end
 	end
+	MY.RegisterIdle('MY_ChatLog_Save', function()
+		if not MY.IsShieldedVersion() then
+			PushDB()
+		end
+	end)
 	MY.RegisterMsgMonitor('MY_ChatLog', OnMsg, aChannels)
 	MY.RegisterEvent('LOADING_ENDING.MY_ChatLog_Save', PushDB)
-	MY.RegisterIdle('MY_ChatLog_Save', PushDB)
 end
 MY.RegisterInit('MY_ChatLog_InitMon', InitMsgMon)
 
@@ -690,7 +728,7 @@ function MY_ChatLog.OnEvent(event)
 	if event == 'ON_MY_MOSAICS_RESET' then
 		MY_ChatLog.UpdatePage(this, true)
 	elseif event == 'ON_MY_CHATLOG_PUSHDB' then
-		MY_ChatLog.UpdatePage(this, true, true)
+		MY_ChatLog.UpdatePage(this, true)
 	end
 end
 
@@ -821,10 +859,7 @@ function MY_ChatLog.OnItemRButtonClick()
 	end
 end
 
-function MY_ChatLog.UpdatePage(frame, noscroll, nopushdb)
-	if not nopushdb then
-		PushDB()
-	end
+function MY_ChatLog.UpdatePage(frame, noscroll)
 	local container = frame:Lookup('Window_Main/WndScroll_ChatChanel/WndContainer_ChatChanel')
 	local channels = {}
 	for i = 0, container:GetAllContentCount() - 1 do
