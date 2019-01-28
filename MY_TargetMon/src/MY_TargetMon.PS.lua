@@ -296,6 +296,9 @@ local function DrawDetail(ui)
 				fnAction = function()
 					GetUserInput(_L['Please input long alias:'], function(szVal)
 						szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
+						if szVal == '' then
+							szVal = nil
+						end
 						D.ModifyMonitor(mon, 'longAlias', szVal)
 					end, function() end, function() end, nil, mon.longAlias or mon.name)
 				end,
@@ -310,6 +313,9 @@ local function DrawDetail(ui)
 				fnAction = function()
 					GetUserInput(_L['Please input short alias:'], function(szVal)
 						szVal = (string.gsub(szVal, '^%s*(.-)%s*$', '%1'))
+						if szVal == '' then
+							szVal = nil
+						end
 						D.ModifyMonitor(mon, 'shortAlias', szVal)
 					end, function() end, function() end, nil, mon.shortAlias or mon.name)
 				end,
