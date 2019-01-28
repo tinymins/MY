@@ -305,16 +305,20 @@ local function Buff_MatchMon(tBuff, mon, config)
 	-- ids={[13942]={enable=true,iconid=7237,ignoreLevel=false,levels={[2]={enable=true,iconid=7237}}}}
 	for dwID, tMonId in pairs(mon.ids) do
 		if tMonId.enable or mon.ignoreId then
-			local buff = tBuff[dwID]
-			if buff and buff.bCool then
-				if (
-					config.hideOthers == mon.hideOthers
-					or buff.dwSkillSrcID == UI_GetClientPlayerID()
-					or buff.dwSkillSrcID == GetControlPlayerID()
-				) and (not D.IsShieldedBuff(dwID, buff.nLevel)) then
-					local tMonLevel = tMonId.levels[buff.nLevel] or EMPTY_TABLE
-					if tMonLevel.enable or tMonId.ignoreLevel then
-						return buff, tMonLevel.iconid or tMonId.iconid or mon.iconid or buff.nIcon or 13
+			local tInfo = tBuff[dwID]
+			if tInfo then
+				for _, info in pairs(tInfo) do
+					if info and info.bCool then
+						if (
+							config.hideOthers == mon.hideOthers
+							or info.dwSkillSrcID == UI_GetClientPlayerID()
+							or info.dwSkillSrcID == GetControlPlayerID()
+						) and (not D.IsShieldedBuff(dwID, info.nLevel)) then
+							local tMonLevel = tMonId.levels[info.nLevel] or EMPTY_TABLE
+							if tMonLevel.enable or tMonId.ignoreLevel then
+								return info, tMonLevel.iconid or tMonId.iconid or mon.iconid or info.nIcon or 13
+							end
+						end
 					end
 				end
 			end
@@ -580,36 +584,45 @@ local function OnBreathe()
 	for _, eType in ipairs(D.GetTargetTypeList('BUFF')) do
 		local KObject = MY.GetObject(D.GetTarget(eType, 'BUFF'))
 		if KObject then
-			local tLastBuff = BUFF_CACHE[KObject.dwID]
-			local tBuff = {}
-			local aBuff = MY.GetBuffList(KObject)
+			local tCache = BUFF_CACHE[KObject.dwID]
+			if not tCache then
+				tCache = {}
+				BUFF_CACHE[KObject.dwID] = tCache
+			end
 			-- 当前身上的buff
-			local info
+			local aBuff, info = MY.GetBuffList(KObject)
 			for _, buff in ipairs(aBuff) do
-				info = setmetatable(tLastBuff and tLastBuff[buff.szKey] or {}, { __index = buff })
+				-- 正向索引用于监控
+				if not tCache[buff.dwID] then
+					tCache[buff.dwID] = {}
+				end
+				info = tCache[buff.dwID][buff.szKey]
+				if not info then
+					info = {}
+					tCache[buff.dwID][buff.szKey] = info
+				end
+				info = setmetatable(info, { __index = buff })
 				info.nLeft = max(buff.nEndFrame - nLogicFrame, 0)
 				info.bCool = true
-				tBuff[buff.szName] = info
-				tBuff[buff.dwID] = info
-				tBuff[buff.szKey] = info
+				info.nRenderFrame = nLogicFrame
+				-- 反向索引用于捕获
 				if not BUFF_INFO[buff.szName] then
 					BUFF_INFO[buff.szName] = {}
 				end
 				BUFF_INFO[buff.szName][buff.szKey] = buff
 			end
 			-- 处理消失的buff
-			if tLastBuff then
-				for k, info in pairs(tLastBuff) do
-					if not tBuff[k] then
+			for _, tBuff in pairs(tCache) do
+				for k, info in pairs(tBuff) do
+					if info.nRenderFrame ~= nLogicFrame then
 						if info.bCool then
 							info.nLeft = 0
 							info.bCool = false
 						end
-						tBuff[k] = info
+						info.nRenderFrame = nLogicFrame
 					end
 				end
 			end
-			BUFF_CACHE[KObject.dwID] = tBuff
 		end
 	end
 	for _, eType in ipairs(D.GetTargetTypeList('SKILL')) do
