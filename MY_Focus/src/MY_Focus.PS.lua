@@ -153,6 +153,7 @@ function PS.OnPanelActive(wnd)
 				end,
 			})
 		end
+		insert(t, t1)
 		-- 目标关系
 		local t1 = {
 			szOption = _L['Target relation'], {
