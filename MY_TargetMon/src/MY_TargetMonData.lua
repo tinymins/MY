@@ -308,7 +308,7 @@ local function Buff_MatchMon(tBuff, mon, config)
 			local buff = tBuff[dwID]
 			if buff and buff.bCool then
 				if (
-					config.hideOthers ~= mon.hideOthers
+					config.hideOthers == mon.hideOthers
 					or buff.dwSkillSrcID == UI_GetClientPlayerID()
 					or buff.dwSkillSrcID == GetControlPlayerID()
 				) and (not D.IsShieldedBuff(dwID, buff.nLevel)) then
@@ -516,7 +516,7 @@ local function UpdateView()
 						end
 						-- 通过监控项生成视图列表
 						local buff, nIcon = Buff_MatchMon(tBuff, mon, config)
-						if buff or config.hideVoid ~= mon.hideVoid then
+						if buff or config.hideVoid == mon.hideVoid then
 							local item = aItem[nItemIndex]
 							if not item then
 								item = {}
@@ -537,7 +537,7 @@ local function UpdateView()
 						end
 						-- 通过监控项生成视图列表
 						local skill, nIcon = Skill_MatchMon(tSkill, mon, config)
-						if skill or config.hideVoid ~= mon.hideVoid then
+						if skill or config.hideVoid == mon.hideVoid then
 							local item = aItem[nItemIndex]
 							if not item then
 								item = {}
