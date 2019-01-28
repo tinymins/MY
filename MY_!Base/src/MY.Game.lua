@@ -1970,7 +1970,7 @@ function MY.GetBuffList(...)
 					BUFF_LIST_PROXY[KObject][nCount] = setmetatable({}, { __index = BUFF_LIST_CACHE[KObject][nCount], __newindex = reject })
 				end
 				raw = BUFF_LIST_CACHE[KObject][nCount]
-				raw.szKey        = dwID .. ',' .. nLevel
+				raw.szKey        = dwSkillSrcID .. ':' .. dwID .. ',' .. nLevel
 				raw.dwID         = dwID
 				raw.nLevel       = nLevel
 				raw.szName       = szName
