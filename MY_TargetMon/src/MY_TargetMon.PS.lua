@@ -403,6 +403,15 @@ local function DrawDetail(ui)
 			end,
 		})
 		insert(t1, t2)
+		-- 隐藏消失的
+		insert(t1, {
+			szOption = l_config.hideVoid and _L['Show even void'] or _L['Hide if void'],
+			bCheck = true,
+			bChecked = not mon.hideVoid,
+			fnAction = function()
+				D.ModifyMonitor(mon, 'hideVoid', not mon.hideVoid)
+			end,
+		})
 		-- 出现声音
 		local t2 = MY.GetSoundMenu(function(dwID, bCheck)
 			if not bCheck then
