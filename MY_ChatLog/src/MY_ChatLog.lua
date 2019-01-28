@@ -122,7 +122,7 @@ local aDelQueue = {}
 -- local hash = GetStringCRC(msg)
 -- local channel = CHANNELS_R['MSG_WORLD']
 -- for i = 1, 60000 do
--- 	table.insert(aInsQueue, {hash, channel, GetCurrentTime() - i * 30, 'tester', text, msg})
+-- 	table.insert(aInsQueue, {hash = hash, channel = channel, time = GetCurrentTime() - i * 30, talker = 'tester', text = text, msg = msg})
 -- end
 
 function InsertMsg(channel, text, msg, talker, time)
@@ -134,7 +134,7 @@ function InsertMsg(channel, text, msg, talker, time)
 	if not channel or not time or empty(msg) or not text or empty(hash) then
 		return
 	end
-	insert(aInsQueue, {hash, channel, time, talker, text, msg})
+	insert(aInsQueue, {hash = hash, channel = channel, time = time, talker = talker, text = text, msg = msg})
 end
 
 function DeleteMsg(hash, time)
@@ -283,7 +283,7 @@ function ImportDB(file)
 		for index = 0, count, 100000 do
 			local result = DBI:Execute('SELECT * FROM ' .. rec.name .. ' ORDER BY time ASC LIMIT 100000 OFFSET ' .. index)
 			for _, rec in ipairs(result) do
-				insert(aInsQueue, {rec.hash, rec.channel, rec.time, rec.talker, rec.text, rec.msg})
+				insert(aInsQueue, { hash = rec.hash, channel = rec.channel, time = rec.time, talker = rec.talker, text = rec.text, msg = rec.msg })
 			end
 			amount = amount + #result
 			PushDB()
@@ -413,12 +413,12 @@ function PushDB()
 	-- ²åÈë¼ÇÂ¼
 	for _, data in ipairs(aInsQueue) do
 		for _, info in ipairs(tables) do
-			if data[3] >= info.stime and (info.etime == -1 or data[3] <= info.etime) then
+			if data.time >= info.stime and (info.etime == -1 or data.time <= info.etime) then
 				if not info.stmtIns then
 					info.stmtIns = DB:Prepare('REPLACE INTO ' .. info.name .. ' (hash, channel, time, talker, text, msg) VALUES (?, ?, ?, ?, ?, ?)')
 				end
 				info.stmtIns:ClearBindings()
-				info.stmtIns:BindAll(unpack(data))
+				info.stmtIns:BindAll(data.hash, data.channel, data.time, data.talker, data.text, data.msg)
 				info.stmtIns:Execute()
 				break
 			end
