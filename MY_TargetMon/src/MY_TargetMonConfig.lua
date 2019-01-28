@@ -134,7 +134,7 @@ local SHIELDED_UUID = MY.ArrayToObject({
 -- 通过内嵌数据将监控项转为Patch
 function D.PatchToConfig(patch)
 	-- 处理用户删除的内建数据和不合法的数据
-	if patch.delete or not patch.uuid or SHIELDED_UUID[patch.uuid] then
+	if patch.delete or not patch.uuid or (MY.IsShieldedVersion() and not IsDebugClient() and SHIELDED_UUID[patch.uuid]) then
 		return
 	end
 	-- 合并未修改的内嵌数据
