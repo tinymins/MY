@@ -173,7 +173,7 @@ end
 end
 
 function D.CheckEnable()
-	if O.bTarget or O.bTTarget then
+	if (O.bTarget or O.bTTarget) and not MY.IsShieldedVersion() then
 		MY.BreatheCall('MY_TargetLine', D.UpdateLine)
 	else
 		MY.BreatheCall('MY_TargetLine', false)

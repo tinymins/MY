@@ -63,6 +63,10 @@ function PS.OnPanelActive(wnd)
 		end,
 	}, true):autoWidth()
 
+	if MY.IsShieldedVersion() then
+		return
+	end
+
 	-- target line
 	x, y = X + 10, y + deltaY
 	x = x + ui:append('WndCheckBox', {
@@ -195,10 +199,6 @@ function PS.OnPanelActive(wnd)
 			MY_TargetLine.bAtHead = false
 		end,
 	}, true):autoWidth():width() + 10
-
-	if MY.IsShieldedVersion() then
-		return
-	end
 
 	-- target face
 	x, y = X + 10, y + deltaY
