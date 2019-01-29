@@ -11,5 +11,6 @@ MY_ArchHUD
 7zip.bat
 7zipignore.txt
 changelog.html
+header.tpl.lua
 *.py
 *.pyc
