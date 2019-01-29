@@ -328,7 +328,7 @@ function MY.RegisterModuleEvent(arg0, arg1)
 			nCount = nCount + 1
 			tEvent[szKey] = { szEvent = szEvent }
 		end
-		MY.Debug({"Init # "  .. szModule .. " # Events Added # " .. nCount}, MY_DEBUG.LOG)
+		MY.Debug({"Init # "  .. szModule .. " # Events Added # " .. nCount}, 'MY#EVENT', MY_DEBUG.LOG)
 	end
 end
 end
