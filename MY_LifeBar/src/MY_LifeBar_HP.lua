@@ -43,9 +43,13 @@ function HP:ctor(dwType, dwID) -- KGobject
 	return self
 end
 
+function HP:IsHandleValid()
+	return self.handle and self.handle:IsValid()
+end
+
 -- 创建
 function HP:Create()
-	if not self.handle then
+	if not self:IsHandleValid() then
 		local hList = UI.GetShadowHandle('MY_LifeBar')
 		hList:AppendItemFromString(FormatHandle(string.format('name="%s"', self.szName)))
 		local hItem = hList:Lookup(self.szName)
@@ -63,7 +67,7 @@ end
 
 -- 删除
 function HP:Remove()
-	if self.handle then
+	if self:IsHandleValid() then
 		local hList = UI.GetShadowHandle('MY_LifeBar')
 		hList:RemoveItem(self.handle)
 		self.handle = nil
@@ -72,7 +76,7 @@ function HP:Remove()
 end
 
 function HP:SetPriority(nPriority)
-	if self.handle then
+	if self:IsHandleValid() then
 		self.handle:SetUserData(nPriority)
 		REQUIRE_SORT = true
 	end
@@ -80,7 +84,7 @@ function HP:SetPriority(nPriority)
 end
 
 function HP:ClearShadow(szShadowName)
-	if self.handle then
+	if self:IsHandleValid() then
 		local sha = self.handle:Lookup(szShadowName)
 		if sha then
 			sha:ClearTriangleFanPoint()
@@ -91,7 +95,7 @@ end
 
 -- 绘制名字/帮会/称号 等等 行文字
 function HP:DrawTexts(aTexts, nY, nLineHeight, r, g, b, a, f, spacing, scale)
-	if self.handle then
+	if self:IsHandleValid() then
 		local sha = self.handle:Lookup('lines')
 		sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
 		sha:ClearTriangleFanPoint()
@@ -108,7 +112,7 @@ end
 
 -- 绘制血量百分比文字（减少重绘次数所以和Wordlines分离）
 function HP:DrawLifeText(text, x, y, r, g, b, a, f, spacing, scale)
-	if self.handle then
+	if self:IsHandleValid() then
 		local sha = self.handle:Lookup('hp_title')
 		sha:SetTriangleFan(GEOMETRY_TYPE.TEXT)
 		sha:ClearTriangleFanPoint()
@@ -123,7 +127,7 @@ end
 
 -- 填充边框 默认200的nAlpha
 function HP:DrawBorder(szShadowName, szShadowName2, nWidth, nHeight, nOffsetX, nOffsetY, nBorder, nR, nG, nB, nAlpha)
-	if self.handle then
+	if self:IsHandleValid() then
 		nAlpha = nAlpha or 200
 		local handle = self.handle
 
@@ -167,7 +171,7 @@ end
 -- 填充矩形（进度条/血条）
 -- rgbap: 红,绿,蓝,透明度,进度,绘制方向
 function HP:DrawRect(szShadowName, nWidth, nHeight, nOffsetX, nOffsetY, nPadding, r, g, b, a, p, d)
-	if self.handle then
+	if self:IsHandleValid() then
 		nWidth = max(0, nWidth - nPadding * 2)
 		nHeight = max(0, nHeight - nPadding * 2)
 		if not p or p > 1 then
@@ -222,7 +226,7 @@ end
 -- nWidth 缩放后的特效UI宽度
 -- nHeight 缩放后的特效UI高度
 function HP:SetSFX(szFile, fScale, nWidth, nHeight, nOffsetY)
-	if self.handle then
+	if self:IsHandleValid() then
 		local sfx = self.handle:Lookup('sfx')
 		local szKey = 'MY_LIFEBAR_HP_SFX_' .. self.dwType .. '_' .. self.dwID
 		local dwCtcType = self.dwType == TARGET.DOODAD and CTCT.DOODAD_POS_2_SCREEN_POS or CTCT.CHARACTER_TOP_2_SCREEN_POS
