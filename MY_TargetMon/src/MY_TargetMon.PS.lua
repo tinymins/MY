@@ -928,7 +928,7 @@ local function DrawPreview(ui, config, OpenDetail)
 						return config.type == 'SKILL' and eType ~= 'CONTROL_PLAYER'
 					end,
 					fnAction = function()
-						config.target = eType
+						D.ModifyConfig(config, 'target', eType)
 					end,
 				})
 			end
@@ -938,7 +938,7 @@ local function DrawPreview(ui, config, OpenDetail)
 					szOption = _L.TYPE[eType],
 					bCheck = true, bMCheck = true, bChecked = eType == config.type,
 					fnAction = function()
-						config.type = eType
+						D.ModifyConfig(config, 'type', eType)
 					end,
 				})
 			end
@@ -948,7 +948,7 @@ local function DrawPreview(ui, config, OpenDetail)
 					szOption = _L.ALIGNMENT[eType],
 					bCheck = true, bMCheck = true, bChecked = eType == config.alignment,
 					fnAction = function()
-						config.alignment = eType
+						D.ModifyConfig(config, 'alignment', eType)
 					end,
 				})
 			end
