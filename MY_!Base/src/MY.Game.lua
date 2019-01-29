@@ -1997,6 +1997,27 @@ function MY.GetBuffList(...)
 end
 end
 
+function MY.CloneBuff(buff, dst)
+	if not dst then
+		dst = {}
+	end
+	dst.szKey = buff.szKey
+	dst.dwID = buff.dwID
+	dst.nLevel = buff.nLevel
+	dst.szName = buff.szName
+	dst.nIcon = buff.nIcon
+	dst.bCanCancel = buff.bCanCancel
+	dst.nEndFrame = buff.nEndFrame
+	dst.nIndex = buff.nIndex
+	dst.nStackNum = buff.nStackNum
+	dst.dwSkillSrcID = buff.dwSkillSrcID
+	dst.bValid = buff.bValid
+	dst.nCount = buff.nCount
+	dst.szName = buff.szName
+	dst.nIcon = buff.nIcon
+	return dst
+end
+
 do
 local BUFF_CACHE = setmetatable({}, { __mode = 'v' })
 local BUFF_PROXY = setmetatable({}, { __mode = 'v' })
