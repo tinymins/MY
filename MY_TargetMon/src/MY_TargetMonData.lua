@@ -600,7 +600,7 @@ local function OnBreathe()
 			end
 			-- 当前身上的buff
 			local aBuff, info = MY.GetBuffList(KObject)
-			for _, buff in ipairs(aBuff) do
+			for _, buff in ipairs(aBuff) do -- 缓存时必须复制buff表 否则buff过期后表会被回收导致显示错误的BUFF
 				-- 正向索引用于监控
 				if not tCache[buff.dwID] then
 					tCache[buff.dwID] = {}
@@ -610,7 +610,7 @@ local function OnBreathe()
 					info = {}
 					tCache[buff.dwID][buff.szKey] = info
 				end
-				info = setmetatable(info, { __index = buff })
+				MY.CloneBuff(buff, info)
 				info.nLeft = max(buff.nEndFrame - nLogicFrame, 0)
 				info.bCool = true
 				info.nRenderFrame = nLogicFrame
@@ -618,7 +618,15 @@ local function OnBreathe()
 				if not BUFF_INFO[buff.szName] then
 					BUFF_INFO[buff.szName] = {}
 				end
-				BUFF_INFO[buff.szName][buff.szKey] = buff
+				if not BUFF_INFO[buff.szName][buff.szKey] then
+					BUFF_INFO[buff.szName][buff.szKey] = {
+						szName = buff.szName,
+						dwID = buff.dwID,
+						nLevel = buff.nLevel,
+						szKey = buff.szKey,
+						nIcon = buff.nIcon,
+					}
+				end
 			end
 			-- 处理消失的buff
 			for _, tBuff in pairs(tCache) do
