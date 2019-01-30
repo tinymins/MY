@@ -705,6 +705,19 @@ function EditBox_AppendLinkItem(dwID)
 end
 end
 
+if not FORMAT_WMSG_RET then
+function FORMAT_WMSG_RET(stop, callFrame)
+	local ret = 0
+	if stop then
+		ret = ret + 1 --01
+	end
+
+	if callFrame then
+		ret = ret + 2 --10
+	end
+	return ret
+end
+end
 -------------------------------------------
 -- 语音相关API兼容防止枚举以及接口没有导致报错
 -------------------------------------------
