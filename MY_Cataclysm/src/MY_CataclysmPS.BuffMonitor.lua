@@ -664,6 +664,7 @@ function PS.OnPanelActive(frame)
 			MY_Cataclysm.UpdateBuffListCache()
 			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
+		autoenable = function() return MY_Resource and true end,
 	}, true):autoWidth():width() + 5
 	y = y + 30
 
@@ -678,7 +679,7 @@ function PS.OnPanelActive(frame)
 			MY_Cataclysm.UpdateBuffListCache()
 			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
-		autoenable = function() return CFG.bBuffDataNangongbo end,
+		autoenable = function() return MY_Resource and CFG.bBuffDataNangongbo end,
 	}, true):autoWidth():width() + 5
 	x = x + ui:append('WndCheckBox', {
 		x = x, y = y,
@@ -690,7 +691,7 @@ function PS.OnPanelActive(frame)
 			MY_Cataclysm.UpdateBuffListCache()
 			MY.DelayCall('MY_Cataclysm_Reload', 300, ReloadCataclysmPanel)
 		end,
-		autoenable = function() return CFG.bBuffDataNangongbo end,
+		autoenable = function() return MY_Resource and CFG.bBuffDataNangongbo end,
 	}, true):autoWidth():width() + 5
 
 	x = X
