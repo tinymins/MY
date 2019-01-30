@@ -438,7 +438,7 @@ function D.ModifyConfig(config, szKey, oVal)
 	if not Set(config, szKey, oVal) then
 		return
 	end
-	if szKey == 'enable' or szKey == 'target' then
+	if szKey == 'enable' or szKey == 'target' or szKey == 'type' then
 		D.UpdateTargetList()
 	end
 	if szKey == 'enable' and oVal then
