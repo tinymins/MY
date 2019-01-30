@@ -12,9 +12,9 @@ return {
 	penetrable          = true  , -- 是否穿透
 	dragable            = false , -- 是否可拖拽
 	alignment           = "LEFT", -- 對齊方式
+	hideVoid            = false , -- 隱藏消失的BUFF
 	hideOthers          = false , -- 只顯示自己的BUFF
 	maxLineCount        = 16    , -- 單行最大數量
-	hideVoid            = false , -- 隱藏消失的BUFF
 	showName            = true  , -- 顯示名字
 	showTime            = true  , -- 顯示時間
 	cdCircle            = true  , -- 倒計時圈
@@ -43,8 +43,8 @@ return {
 				rgbLongAlias = {255, 255, 0},
 				shortAlias = {__META__, {"nil", "string"}, nil},
 				rgbShortAlias = {255, 255, 0},
-				rHideOthers = false, -- 翻轉當和主配置hideOthers字段
 				rHideVoid = false, -- 翻轉主配置hideVoid字段
+				rHideOthers = false, -- 翻轉當和主配置hideOthers字段
 				extentAnimate = {__META__, {"nil", "string"}, nil}, -- BOX特效
 				soundAppear = {
 					__META__,
