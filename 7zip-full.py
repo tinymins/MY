@@ -10,8 +10,8 @@ for name in name_list:
 		branch_name = name[2:]
 
 # 判断是否忘记切换分支
-if branch_name != 'publish':
-	print('Error: current branch(%s) is not on git publish!' % (branch_name))
+if branch_name != 'stable':
+	print('Error: current branch(%s) is not on git stable!' % (branch_name))
 	exit()
 
 # 读取MY.lua文件中的插件版本号
