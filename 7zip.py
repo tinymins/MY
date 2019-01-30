@@ -41,8 +41,13 @@ print('File change list:')
 if git_tag != '':
 	filelist = os.popen('git diff ' + git_tag + ' --name-status').read().strip().split("\n")
 	for file in filelist:
+		lst = file.split("\t")
+		if lst[0] == "M":
+			paths[re.sub('["/].*$', '', lst[1])] = True
+		elif lst[0][0] == "R":
+			paths[re.sub('["/].*$', '', lst[1])] = True
+			paths[re.sub('["/].*$', '', lst[2])] = True
 		print(file)
-		paths[re.sub('["/].*$', '', re.sub('^[^\t]\t"*', '', file))] = True
 print('')
 
 # 输出修改的子目录列表
