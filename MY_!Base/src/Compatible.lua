@@ -505,6 +505,12 @@ function IsSameData(data1, data2)
 end
 end
 
+if not IsSelf then
+function IsSelf(dwSrcID, dwTarID)
+	return dwSrcID ~= 0 and dwSrcID == dwTarID and IsPlayer(dwSrcID) and IsPlayer(dwTarID)
+end
+end
+
 ------------------------------------
 --            ±³¾°Í¨Ñ¶            --
 ------------------------------------
