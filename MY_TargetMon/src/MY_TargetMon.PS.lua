@@ -413,9 +413,9 @@ local function DrawDetail(ui)
 		insert(t1, {
 			szOption = l_config.hideVoid and _L['Show even void'] or _L['Hide if void'],
 			bCheck = true,
-			bChecked = mon.hideVoid,
+			bChecked = mon.rHideVoid,
 			fnAction = function()
-				D.ModifyMonitor(mon, 'hideVoid', not mon.hideVoid)
+				D.ModifyMonitor(mon, 'rHideVoid', not mon.rHideVoid)
 			end,
 		})
 		-- Òþ²ØËûÈËµÄ
@@ -423,9 +423,9 @@ local function DrawDetail(ui)
 			insert(t1, {
 				szOption = l_config.hideOthers and _L['Show even others'] or _L['Hide if others'],
 				bCheck = true,
-				bChecked = mon.hideOthers,
+				bChecked = mon.rHideOthers,
 				fnAction = function()
-					D.ModifyMonitor(mon, 'hideOthers', not mon.hideOthers)
+					D.ModifyMonitor(mon, 'rHideOthers', not mon.rHideOthers)
 				end,
 			})
 		end

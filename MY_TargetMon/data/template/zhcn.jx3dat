@@ -43,8 +43,8 @@ return {
 				rgbLongAlias = {255, 255, 0},
 				shortAlias = {__META__, {"nil", "string"}, nil},
 				rgbShortAlias = {255, 255, 0},
-				hideOthers = false, -- 当和主配置hideOthers字段一致时则只显示自己的
-				hideVoid = false, -- 当和主配置hideVoid字段一致时则一定显示
+				rHideOthers = false, -- 翻转当和主配置hideOthers字段
+				rHideVoid = false, -- 翻转主配置hideVoid字段
 				extentAnimate = {__META__, {"nil", "string"}, nil}, -- BOX特效
 				soundAppear = {
 					__META__,
