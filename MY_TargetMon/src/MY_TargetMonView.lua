@@ -127,6 +127,10 @@ function D.UpdateFrame(frame)
 		bRequireFormatPos = true
 		frame.nMaxLineCount = tViewData.nMaxLineCount
 	end
+	if frame.szAlignment ~= tViewData.szAlignment then
+		bRequireFormatPos = true
+		frame.szAlignment = tViewData.szAlignment
+	end
 	local hTotal, hList, nIndex, hItem = frame.hTotal, frame.hList, 0
 	for _, item in ipairs(tViewData.aItem) do
 		hItem = hList:Lookup(nIndex)
@@ -274,10 +278,15 @@ function D.UpdateFrame(frame)
 		hItem = hList:Lookup(0)
 		if hItem then
 			local nCount = hList:GetItemCount()
-			frame.nWidth = ceil(hItem:GetW()) * min(tViewData.nMaxLineCount, nCount)
+			if tViewData.szAlignment == 'LEFT' then
+				frame.nWidth = ceil(hItem:GetW()) * min(tViewData.nMaxLineCount, nCount)
+			else
+				frame.nWidth = ceil(hItem:GetW()) * tViewData.nMaxLineCount
+			end
 			frame.nHeight = ceil(nCount / tViewData.nMaxLineCount) * ceil(hItem:GetH())
 		end
 		hList:SetW(frame.nWidth)
+		hList:SetHAlign(ALIGNMENT[tViewData.szAlignment] or ALIGNMENT.LEFT)
 		hList:FormatAllItemPosExt()
 		hList:SetSize(frame.nWidth, frame.nHeight)
 		hTotal:SetSize(frame.nWidth, frame.nHeight)
