@@ -190,7 +190,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 end
 
 function D.OnSerendipity(szName, szSerendipity, nMethod, nStatus, dwTime)
-	if MY.IsInDevMode() then
+	if MY.IsInDevServer() then
 		return
 	end
 	local szKey = szName .. '_' .. szSerendipity .. '_' .. dwTime
@@ -289,6 +289,7 @@ MY.RegisterMsgMonitor('QIYU', function(szMsg, nFont, bRich, r, g, b, szChannel)
 	if not StringLowerW(szMsg):find('ui/image/minimap/minimap.uitex') then
 		return
 	end
+	-- OutputMessage('MSG_SYS', "<image>path=\"UI/Image/Minimap/Minimap.UITex\" frame=184</image><text>text=\"“一只蠢盾盾”侠士正在为人传功，不经意间触发奇遇【雪山恩仇】！正是：侠心义行，偏遭奇症缠身；雪峰疗伤，却逢绝世奇缘。\" font=10 r=255 g=255 b=0 </text><text>text=\"\\\n\"</text>")
 	-- “醉戈止战”侠士福缘非浅，触发奇遇【阴阳两界】，此千古奇缘将开启怎样的奇妙际遇，令人神往！
 	if bRich then
 		szMsg = GetPureText(szMsg)
