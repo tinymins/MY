@@ -787,6 +787,33 @@ function Table_IsTreasureBattleFieldMap()
 end
 end
 
+if not Table_GetTeamRecruit then
+function Table_GetTeamRecruit()
+	local res = {}
+	local nCount = g_tTable.TeamRecruit:GetRowCount()
+	for i = 2, nCount do
+		local tLine = g_tTable.TeamRecruit:GetRow(i)
+		local dwType = tLine.dwType
+		local szTypeName = tLine.szTypeName
+
+		if dwType > 0 then
+			res[dwType] = res[dwType] or {Type=dwType, TypeName=szTypeName}
+			res[dwType].bParent = true
+			local dwSubType = tLine.dwSubType
+			local szSubTypeName = tLine.szSubTypeName
+			if dwSubType > 0 then
+				res[dwType][dwSubType] = res[dwType][dwSubType] or {SubType=dwSubType, SubTypeName=szSubTypeName}
+				res[dwType][dwSubType].bParent = true
+				table.insert(res[dwType][dwSubType], tLine)
+			else
+				table.insert(res[dwType], tLine)
+			end
+		end
+	end
+	return res
+end
+end
+
 if not Table_IsSimplePlayer then
 function Table_IsSimplePlayer(dwTemplateID)
 	local tLine = g_tTable.SimplePlayer:Search(dwTemplateID)
