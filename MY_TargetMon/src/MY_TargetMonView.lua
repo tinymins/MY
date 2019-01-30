@@ -412,9 +412,6 @@ function MY_TargetMonView.OnItemRButtonClick()
 		if not KTarget then
 			return
 		end
-		if MY.IsShieldedVersion() and not Table_GetBuff(hItem.dwID, hItem.nLevel) then
-			return
-		end
 		MY.CancelBuff(KTarget, hItem.dwID, hItem.nLevel)
 	end
 end

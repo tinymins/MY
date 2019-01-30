@@ -726,25 +726,22 @@ for i = 1, 5 do
 			i == 1 and j == 1 and _L['MY Buff Monitor'] or '',
 			function()
 				if MY.IsShieldedVersion() and not MY.IsInDungeon() then
-					if not IsDebugClient() then
-						OutputMessage('MSG_ANNOUNCE_YELLOW', _L['Cancel buff is disabled outside dungeon.'])
-					end
+					OutputMessage('MSG_ANNOUNCE_RED', _L['Cancel buff is disabled outside dungeon.'])
 					return
 				end
-				local config = D.GetConfig(i)
-				local view = VIEW_LIST[i]
-				if not config or not view or config.type ~= 'BUFF' then
+				local tViewData = D.GetViewData(i)
+				if not tViewData or tViewData.szType ~= 'BUFF' then
+					OutputMessage('MSG_ANNOUNCE_RED', _L['Hotkey cancel is only allowed for buff.'])
 					return
 				end
-				local item = view.aItem[j]
-				if not item then
-					return
-				end
-				local KObject = MY.GetObject(D.GetTarget(config.target, config.type))
+				local KTarget = MY.GetObject(D.GetTarget(tViewData.szTarget, tViewData.szType))
 				if not KTarget then
+					OutputMessage('MSG_ANNOUNCE_RED', _L['Cannot find target to cancel buff.'])
 					return
 				end
-				if D.IsShieldedBuff(item.dwID, item.nLevel) then
+				local item = tViewData.aItem[j]
+				if not item or not item.bActive then
+					OutputMessage('MSG_ANNOUNCE_RED', _L['Cannot find buff to cancel.'])
 					return
 				end
 				MY.CancelBuff(KTarget, item.dwID, item.nLevel)
