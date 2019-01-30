@@ -1111,6 +1111,13 @@ function MY.IsInDevMode()
 	if IsDebugClient() then
 		return true
 	end
+	if MY.IsInDevServer() then
+		return true
+	end
+	return false
+end
+
+function MY.IsInDevServer()
 	local ip = select(7, GetUserServer())
 	if ip:find('^192%.') or ip:find('^10%.') then
 		return true
