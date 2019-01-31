@@ -303,6 +303,10 @@ function D.LoadConfig(bDefault, bOriginal, bReloadEmbedded)
 			tLoaded[config.uuid] = true
 		end
 	end
+	if #EMBEDDED_CONFIG_LIST == 0 then
+		OutputMessage('MSG_ANNOUNCE_RED', _L['Empty embedded config detected, did you forgot to load MY_Resource plugin?'])
+		MY.Sysmsg(_L['Empty embedded config detected, please logout and check if MY_Resource has been downloaded and loaded.'])
+	end
 	CONFIG = aConfig
 	CONFIG_CHANGED = bDefault and true or false
 	D.UpdateTargetList()
