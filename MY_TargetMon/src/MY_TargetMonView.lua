@@ -56,12 +56,18 @@ end
 function D.SaveAnchor(frame)
 	local szAnchorBase = frame.tViewData.szAnchorBase
 	local tAnchor = GetFrameAnchor(frame, szAnchorBase)
+	if frame.tViewData.bIgnoreSystemUIScale then
+		local fRelativeScale = Station.GetUIScale()
+		tAnchor.x = tAnchor.x * fRelativeScale
+		tAnchor.y = tAnchor.y * fRelativeScale
+	end
 	D.ModifyConfig(frame.tViewData.szUuid, 'anchor', tAnchor)
 end
 
 function D.UpdateAnchor(frame)
 	local anchor = frame.tViewData.tAnchor
-	frame:SetPoint(anchor.s, 0, 0, anchor.r, anchor.x, anchor.y)
+	local fRelativeScale = frame.tViewData.bIgnoreSystemUIScale and (1 / Station.GetUIScale()) or 1
+	frame:SetPoint(anchor.s, 0, 0, anchor.r, anchor.x * fRelativeScale, anchor.y * fRelativeScale)
 	local x, y = frame:GetAbsPos()
 	local w, h = frame:GetSize()
 	local cw, ch = Station.GetClientSize()
@@ -71,38 +77,15 @@ function D.UpdateAnchor(frame)
 	frame:CorrectPos()
 end
 
-function D.UpdateScale(frame)
-	-- 禁止系统UI缩放
-	local fCurrUIScale = Station.GetUIScale()
-	if not frame.fCurrUIScale then
-		frame.fCurrUIScale = 1
+function D.ResetScale(frame)
+	-- 界面缩放重置为1.0
+	local fUIScale = Station.GetUIScale()
+	if frame.fUIScale ~= fUIScale then
+		local fRelativeScale = (frame.fUIScale or 1) / fUIScale
+		frame:Scale(fRelativeScale, fRelativeScale)
+		frame.fUIScale = fUIScale
 	end
-	if frame.fCurrUIScale ~= fCurrUIScale then
-		if frame.bIgnoreSystemUIScale and frame.fCurrUIScale then
-			local hList, hItem, txt = frame:Lookup('', 'Handle_List')
-			for i = 0, hList:GetItemCount() - 1 do
-				hItem = hList:Lookup(i)
-				txt = hItem:Lookup('Handle_Box/Text_ShortName')
-				txt:SetFontScale(txt:GetFontScale() * frame.fCurrUIScale / fCurrUIScale)
-				txt = hItem:Lookup('Handle_Bar/Text_Name')
-				txt:SetFontScale(txt:GetFontScale() * frame.fCurrUIScale / fCurrUIScale)
-				txt = hItem:Lookup('Handle_Bar/Text_Process')
-				txt:SetFontScale(txt:GetFontScale() * frame.fCurrUIScale / fCurrUIScale)
-			end
-			frame:Scale(frame.fCurrUIScale / fCurrUIScale, frame.fCurrUIScale / fCurrUIScale)
-		end
-		frame.fCurrUIScale = fCurrUIScale
-	end
-	-- 界面自定义缩放
-	if not frame.fCurrScale then
-		frame.fCurrScale = 1
-	end
-	local fUIScale = frame.tViewData.fUIScale
-	if fUIScale ~= frame.fCurrScale then
-		local relScale = fUIScale / frame.fCurrScale
-		frame:Scale(relScale, relScale)
-		frame.fCurrScale = fUIScale
-	end
+	this.bScaleReset = true
 end
 
 function D.UpdateFrame(frame)
@@ -121,7 +104,11 @@ function D.UpdateFrame(frame)
 		frame.nWidth = 200
 		frame.nHeight = 50
 		D.UpdateHotkey(frame)
-		D.UpdateScale(frame)
+	end
+	local bScaleReset = frame.bScaleReset
+	if bScaleReset then
+		bRequireFormatPos = true
+		frame.bScaleReset = nil
 	end
 	if frame.nMaxLineCount ~= tViewData.nMaxLineCount then
 		bRequireFormatPos = true
@@ -153,21 +140,23 @@ function D.UpdateFrame(frame)
 			hItem.imgProcess:SetPercentage(0)
 			hItem.fUIScale = 1
 			hItem.fFontScale = MY.GetFontScale()
+			local fRelativeScale = 1 / Station.GetUIScale()
+			hItem:Scale(fRelativeScale, fRelativeScale)
 			D.UpdateItemHotkey(hItem, frame.nIndex, nIndex)
 			bRequireFormatPos = true
 		end
-		if hItem.fUIScale ~= tViewData.fUIScale then
+		if hItem.fUIScale ~= tViewData.fUIScale
+		or bScaleReset then
 			local fRelativeScale = tViewData.fUIScale / hItem.fUIScale
-			hItem:EnableScale(true)
 			hItem:Scale(fRelativeScale, fRelativeScale)
-			hItem:EnableScale(false)
 			hItem.nBoxW = hItem.imgBoxBg:GetW()
 			hItem.nBoxH = hItem.imgBoxBg:GetH()
 			hItem.fUIScale = tViewData.fUIScale
 		end
 		if hItem.bCdBar ~= tViewData.bCdBar
 		or hItem.nCdBarWidth ~= tViewData.nCdBarWidth
-		or hItem.fFontScale ~= tViewData.fFontScale then
+		or hItem.fFontScale ~= tViewData.fFontScale
+		or bScaleReset then
 			if tViewData.bCdBar then
 				hItem.hCDBar:Show()
 				hItem.txtShortName:Hide()
@@ -181,14 +170,14 @@ function D.UpdateFrame(frame)
 				hItem.txtShortName:Show()
 				hItem:SetSize(hItem.nBoxW, hItem.nBoxH
 					+ (hItem.txtShortName:GetRelY() - hItem.nBoxH) * 2
-					+ hItem.txtShortName:GetH() * tViewData.fFontScale / tViewData.fUIScale)
+					+ hItem.txtShortName:GetH() * tViewData.fFontScale * 0.85 / tViewData.fUIScale * Station.GetUIScale())
 			end
 			hItem.txtTime:SetFontScale(tViewData.fFontScale * 1.2)
 			hItem.txtHotkey:SetFontScale(tViewData.fFontScale)
 			hItem.txtStackNum:SetFontScale(tViewData.fFontScale)
 			hItem.txtProcess:SetFontScale(tViewData.fFontScale)
 			hItem.txtLongName:SetFontScale(tViewData.fFontScale)
-			hItem.txtShortName:SetFontScale(tViewData.fFontScale)
+			hItem.txtShortName:SetFontScale(tViewData.fFontScale * 0.85)
 			hItem.bCdBar = tViewData.bCdBar
 			hItem.nCdBarWidth = tViewData.nCdBarWidth
 			hItem.fFontScale = tViewData.fFontScale
@@ -352,6 +341,7 @@ function MY_TargetMonView.OnFrameCreate()
 	this:RegisterEvent('SKILL_MOUNT_KUNG_FU')
 	this:RegisterEvent('ON_ENTER_CUSTOM_UI_MODE')
 	this:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
+	D.ResetScale(this)
 	D.UpdateFrame(this)
 end
 end
@@ -439,7 +429,7 @@ function MY_TargetMonView.OnEvent(event)
 		end
 		D.SaveAnchor(this)
 	elseif event == 'UI_SCALED' then
-		D.UpdateScale(this)
+		D.ResetScale(this)
 		D.UpdateAnchor(this)
 	end
 end
