@@ -609,7 +609,7 @@ MY.RegisterEvent({'TEAM_AUTHORITY_CHANGED', 'PARTY_SET_FORMATION_LEADER', 'TEAM_
 end
 
 -- 进入JJC自动显示所有人物
-do local l_bHideNpc, l_bHidePlayer, l_lock
+do local l_bHideNpc, l_bHidePlayer, l_bShowParty, l_lock
 MY.RegisterEvent('ON_REPRESENT_CMD', function()
 	if l_lock then
 		return
@@ -618,6 +618,8 @@ MY.RegisterEvent('ON_REPRESENT_CMD', function()
 		l_bHideNpc = arg0 == 'hide npc'
 	elseif arg0 == 'show player' or arg0 == 'hide player' then
 		l_bHidePlayer = arg0 == 'hide player'
+	elseif arg0 == 'show or hide party player 0' or 'show or hide party player 1' then
+		l_bShowParty = arg0 == 'show or hide party player 1'
 	end
 end)
 MY.RegisterEvent('LOADING_END', function()
@@ -628,6 +630,7 @@ MY.RegisterEvent('LOADING_END', function()
 		l_lock = true
 		rlcmd('show npc')
 		rlcmd('show player')
+		rlcmd('show or hide party player 0')
 	else
 		l_lock = true
 		if l_bHideNpc then
@@ -639,6 +642,11 @@ MY.RegisterEvent('LOADING_END', function()
 			rlcmd('hide player')
 		else
 			rlcmd('show player')
+		end
+		if l_bShowParty then
+			rlcmd('show or hide party player 1')
+		else
+			rlcmd('show or hide party player 0')
 		end
 		l_lock = false
 	end
