@@ -124,18 +124,29 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 			szName = ''
 		end
 		local function DoUpload()
-			MY.Ajax({
-				driver = 'auto',
-				type = 'post',
-				url = 'http://data.jx3.derzh.com/serendipity/?l='
-				.. MY.GetLang() .. '&m=' .. nMethod
-				.. '&data=' .. MY.EncryptString(MY.JsonEncode({
-					n = szName, N = szNameCRC, R = szReporter,
-					S = MY.GetRealServer(1), s = MY.GetRealServer(2),
-					a = szSerendipity, f = nStatus, t = dwTime,
-				})),
-				success = function(html, status) end,
-			})
+			local configs, i, dc = {{'auto', 'post'}, {'auto', 'get'}, {'webcef', 'get'}, {'webbrowser', 'get'}}, 1
+			local function TryUploadWithNextDriver()
+				local config = configs[i]
+				if not config then
+					return
+				end
+				MY.Ajax({
+					driver = config[1],
+					type = config[2],
+					url = 'http://data.jx3.derzh.com/serendipity/?l='
+					.. MY.GetLang() .. '&m=' .. nMethod
+					.. '&data=' .. MY.EncryptString(MY.JsonEncode({
+						n = szName, N = szNameCRC, R = szReporter,
+						S = MY.GetRealServer(1), s = MY.GetRealServer(2),
+						a = szSerendipity, f = nStatus, t = dwTime,
+					})),
+					success = function() MY.DelayCall(dc, false) end,
+					error = function() TryUploadWithNextDriver() end,
+				})
+				i = i + 1
+				dc = MY.DelayCall(3000, TryUploadWithNextDriver)
+			end
+			TryUploadWithNextDriver()
 		end
 		if szMode == 'manual' or nMethod ~= 1 then
 			DoUpload()
@@ -289,7 +300,7 @@ MY.RegisterMsgMonitor('QIYU', function(szMsg, nFont, bRich, r, g, b, szChannel)
 	if not StringLowerW(szMsg):find('ui/image/minimap/minimap.uitex') then
 		return
 	end
-	-- OutputMessage('MSG_SYS', "<image>path=\"UI/Image/Minimap/Minimap.UITex\" frame=184</image><text>text=\"“一只蠢盾盾”侠士正在为人传功，不经意间触发奇遇【雪山恩仇】！正是：侠心义行，偏遭奇症缠身；雪峰疗伤，却逢绝世奇缘。\" font=10 r=255 g=255 b=0 </text><text>text=\"\\\n\"</text>")
+	-- OutputMessage('MSG_SYS', "<image>path=\"UI/Image/Minimap/Minimap.UITex\" frame=184</image><text>text=\"“一只蠢盾盾”侠士正在为人传功，不经意间触发奇遇【雪山恩仇】！正是：侠心义行，偏遭奇症缠身；雪峰疗伤，却逢绝世奇缘。\" font=10 r=255 g=255 b=0 </text><text>text=\"\\\n\"</text>", true)
 	-- “醉戈止战”侠士福缘非浅，触发奇遇【阴阳两界】，此千古奇缘将开启怎样的奇妙际遇，令人神往！
 	if bRich then
 		szMsg = GetPureText(szMsg)
