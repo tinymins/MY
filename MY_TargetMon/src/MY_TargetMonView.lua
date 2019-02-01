@@ -258,6 +258,9 @@ function D.UpdateFrame(frame)
 		hItem.nLevel = item.nLevel
 	end
 	for i = nIndex, hList:GetItemCount() - 1 do
+		if tViewData.szAlignment == 'CENTER' then
+			bRequireFormatPos = true
+		end
 		hList:Lookup(i):Hide()
 	end
 	-- 检查是否需要重绘界面坐标
@@ -275,6 +278,7 @@ function D.UpdateFrame(frame)
 			frame.nHeight = ceil(nCount / tViewData.nMaxLineCount) * ceil(hItem:GetH())
 		end
 		hList:SetW(frame.nWidth)
+		hList:SetIgnoreInvisibleChild(true)
 		hList:SetHAlign(ALIGNMENT[tViewData.szAlignment] or ALIGNMENT.LEFT)
 		hList:FormatAllItemPosExt()
 		hList:SetSize(frame.nWidth, frame.nHeight)
