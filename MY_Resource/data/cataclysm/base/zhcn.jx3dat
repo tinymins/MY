@@ -124,7 +124,7 @@ data = {
     {dwID=3984,col="#00FFFFFF",szReminder="万",nPriority=7},--万毒噬骨---烛龙殿
     {dwID=3971,col="#FFFF00FF",szReminder="噬",nPriority=6,bAttention=true},--噬脉蛊---烛龙殿
     {dwID=3769},--破裂---烛龙殿
-    {dwID=3974,szStackOp=">=",nStackNum=5},--腐蚀---烛龙殿
+    {dwID=3974,szStackOp=">=",nStackNum=3},--腐蚀---烛龙殿
     {dwID=3978},--淬毒---烛龙殿
     {dwID=4008,col="#FF323200",szReminder="封",nPriority=8},--封锁---烛龙殿
     {dwID=3976,col="#FF00FFFF",szReminder="吸",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--吸魂功---烛龙殿
@@ -155,7 +155,7 @@ data = {
     {dwID=5096,nLevel=2,col="#FF3232FF",szReminder="精",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--精确射杀---南诏皇宫
     {dwID=5096,nLevel=1,col="#00FFFFFF",szReminder="散",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#00FFFF"},--致死散射---南诏皇宫
     {dwID=4378,col="#FFFF00FF",szReminder="钟",nPriority=5,bCaution=true},--点名撞钟---南诏皇宫
-    {dwID=4314,col="#00FFFFFF",szReminder="霜",nPriority=7,szStackOp=">=",nStackNum=6},--冰霜---南诏皇宫
+    {dwID=4314,col="#00FFFFFF",szReminder="霜",nPriority=7,szStackOp=">=",nStackNum=4},--冰霜---南诏皇宫
     {dwID=4637,col="#FF3232FF",szReminder="追",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--追击---南诏皇宫
     {dwID=4310},--龙象波诺---南诏皇宫
     {dwID=4899,col="#FF00FF00",szReminder="盾",nPriority=8},--封魔盾---南诏皇宫
@@ -433,5 +433,5 @@ data = {
     {dwID=9395,col="#00FF00FF",szReminder="风",nPriority=7},--风入松---长歌
     {dwID=9299,col="#FF8000FF",szReminder="杯",nPriority=7},--杯水留影---长歌
     {dwID=13771},--疾电叱羽---蓬莱
-    --【南宫伯是帅咩】更新日期0131
+    --【南宫伯是帅咩】更新日期0132
 }

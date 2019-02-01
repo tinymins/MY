@@ -41,7 +41,7 @@ data = {
     {dwID=10547,col="#FFFFFFFF",szReminder="箭",nPriority=7},--箭氣---上陽宮·觀風殿
     {dwID=10940,col="#FF3232FF",szReminder="碧",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--碧落斬---上陽宮·觀風殿
     {dwID=10770,nPriority=5,bCaution=true},--被墩---上陽宮·觀風殿
-    {dwID=10585,col="#FF00FFFF",szReminder="花",nPriority=3,szStackOp=">=",nStackNum=1,bScreenHead=true,colScreenHead="#FF00FF"},--花毒---上陽宮·雙曜亭
+    {dwID=10585,col="#FF00FFFF",szReminder="花",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--花毒---上陽宮·雙曜亭
     {dwID=10584,col="#8055FFFF",szReminder="蛛",nPriority=7,szStackOp=">=",nStackNum=3},--蛛毒---上陽宮·雙曜亭
     {dwID=11230},--裂足---上陽宮·雙曜亭
     {dwID=11215,col="#00FFFFFF",szReminder="穿",nPriority=3,bScreenHead=true,colScreenHead="#00FFFF"},--穿體---上陽宮·雙曜亭
@@ -151,5 +151,5 @@ data = {
     {dwID=9336,bOnlyMine=true,col="#00FF0000",szReminder="寒",nPriority=9},--寒梅---長歌
     {dwID=9337,bOnlyMine=true,col="#00FF0000",szReminder="寒",nPriority=9},--寒梅---長歌
     {dwID=9335,bOnlyMine=true,col="#FF323200",szReminder="落",nPriority=9},--落梅---長歌
-    --【南宮伯是帥咩】更新日期0131
+    --【南宮伯是帥咩】更新日期0132
 }

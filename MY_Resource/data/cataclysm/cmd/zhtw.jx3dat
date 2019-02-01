@@ -55,7 +55,7 @@ data = {
     {dwID=10950},--青薔墜---上陽宮·觀風殿
     {dwID=10956},--壯志凌雲---上陽宮·觀風殿
     {dwID=10770,nPriority=5,bCaution=true},--被墩---上陽宮·觀風殿
-    {dwID=10585,col="#FF00FFFF",szReminder="花",nPriority=3,szStackOp=">=",nStackNum=1,bScreenHead=true,colScreenHead="#FF00FF"},--花毒---上陽宮·雙曜亭
+    {dwID=10585,col="#FF00FFFF",szReminder="花",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--花毒---上陽宮·雙曜亭
     {dwID=10584,col="#8055FFFF",szReminder="蛛",nPriority=7,szStackOp=">=",nStackNum=3},--蛛毒---上陽宮·雙曜亭
     {dwID=11063},--格擋---上陽宮·雙曜亭
     {dwID=11230},--裂足---上陽宮·雙曜亭
@@ -187,5 +187,5 @@ data = {
     {dwID=9933,col="#00FF00FF",szReminder="籠",nPriority=7},--籠花---萬花
     {dwID=9544,col="#00FF00FF",szReminder="笑",nPriority=7},--笑傲光陰---長歌
     {dwID=9265,col="#00FF00FF",szReminder="雲",nPriority=7},--雲生結海---長歌
-    --【南宮伯是帥咩】更新日期0131
+    --【南宮伯是帥咩】更新日期0132
 }
