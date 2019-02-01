@@ -167,7 +167,7 @@ function D.PatchToConfig(patch)
 						else
 							insert(monitors, clone(monEmbedded))
 						end
-					elseif not mon.patch and mon.manually ~= false then -- 删除当前版本不存在的内嵌数据
+					elseif not mon.embedded and not mon.patch and mon.manually ~= false then -- 删除当前版本不存在的内嵌数据
 						insert(monitors, clone(mon))
 					end
 				end
@@ -183,6 +183,10 @@ function D.PatchToConfig(patch)
 		end
 		config.monitors = monitors
 	else
+		-- 不再存在的内嵌数据
+		if patch.embedded then
+			return
+		end
 		for k, v in pairs(patch) do
 			config[k] = clone(v)
 		end
@@ -213,6 +217,7 @@ function D.ConfigToPatch(config)
 			if monEmbedded then
 				-- 内嵌的监控计算Patch
 				insert(monitors, {
+					embedded = true,
 					uuid = monEmbedded.uuid,
 					patch = GetPatch(monEmbedded, mon),
 				})
@@ -230,6 +235,7 @@ function D.ConfigToPatch(config)
 			existMon[monEmbedded.uuid] = true
 		end
 		patch.uuid = config.uuid
+		patch.embedded = true
 		patch.monitors = monitors
 	else
 		for k, v in pairs(config) do
