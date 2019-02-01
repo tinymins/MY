@@ -253,14 +253,15 @@ function D.UpdateFrame(frame)
 			hItem.txtShortName:SetText(item.szShortName)
 			hItem.szShortName = item.szShortName
 		end
-		hItem:Show()
+		if not hItem:IsVisible() then
+			bRequireFormatPos = true
+			hItem:Show()
+		end
 		hItem.dwID = item.dwID
 		hItem.nLevel = item.nLevel
 	end
 	for i = nIndex, hList:GetItemCount() - 1 do
-		if tViewData.szAlignment == 'CENTER' then
-			bRequireFormatPos = true
-		end
+		bRequireFormatPos = true
 		hList:Lookup(i):Hide()
 	end
 	-- 检查是否需要重绘界面坐标
