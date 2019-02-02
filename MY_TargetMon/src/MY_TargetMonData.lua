@@ -586,6 +586,7 @@ local function UpdateView()
 	for i = nViewIndex, nViewCount do
 		VIEW_LIST[i] = nil
 	end
+	FireUIEvent('MY_TARGET_MON_VIEW_DATA_UPDATE')
 end
 
 local function OnBreathe()

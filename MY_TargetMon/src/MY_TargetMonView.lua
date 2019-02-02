@@ -342,6 +342,7 @@ function MY_TargetMonView.OnFrameCreate()
 	this.hList:Clear()
 	this.hList.FormatAllItemPosExt = FormatAllItemPosExt
 	this:RegisterEvent('UI_SCALED')
+	this:RegisterEvent('MY_TARGET_MON_VIEW_DATA_UPDATE')
 	this:RegisterEvent('HOT_KEY_RELOADED')
 	this:RegisterEvent('SKILL_MOUNT_KUNG_FU')
 	this:RegisterEvent('ON_ENTER_CUSTOM_UI_MODE')
@@ -349,10 +350,6 @@ function MY_TargetMonView.OnFrameCreate()
 	D.ResetScale(this)
 	D.UpdateFrame(this)
 end
-end
-
-function MY_TargetMonView.OnFrameBreathe()
-	D.UpdateFrame(this)
 end
 
 function MY_TargetMonView.OnFrameDragEnd()
@@ -421,7 +418,9 @@ function MY_TargetMonView.OnItemRButtonClick()
 end
 
 function MY_TargetMonView.OnEvent(event)
-	if event == 'HOT_KEY_RELOADED' then
+	if event == 'MY_TARGET_MON_VIEW_DATA_UPDATE' then
+		D.UpdateFrame(this)
+	elseif event == 'HOT_KEY_RELOADED' then
 		D.UpdateHotkey(this)
 	elseif event == 'ON_ENTER_CUSTOM_UI_MODE' then
 		this:Lookup('', 'Handle_List'):SetAlpha(90)
