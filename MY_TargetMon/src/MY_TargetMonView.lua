@@ -33,9 +33,10 @@ local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTab
 local Get, GetPatch, ApplyPatch, RandomChild = MY.Get, MY.GetPatch, MY.ApplyPatch, MY.RandomChild
 ---------------------------------------------------------------------------------------------------
 local D = {
+	ModifyConfig = MY_TargetMonConfig.ModifyConfig,
 	GetTarget = MY_TargetMonData.GetTarget,
 	GetViewData = MY_TargetMonData.GetViewData,
-	ModifyConfig = MY_TargetMonConfig.ModifyConfig,
+	RegisterDataUpdateEvent = MY_TargetMonData.RegisterDataUpdateEvent,
 }
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/ui/MY_TargetMon.ini'
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TargetMon/lang/')
@@ -342,14 +343,18 @@ function MY_TargetMonView.OnFrameCreate()
 	this.hList:Clear()
 	this.hList.FormatAllItemPosExt = FormatAllItemPosExt
 	this:RegisterEvent('UI_SCALED')
-	this:RegisterEvent('MY_TARGET_MON_VIEW_DATA_UPDATE')
 	this:RegisterEvent('HOT_KEY_RELOADED')
 	this:RegisterEvent('SKILL_MOUNT_KUNG_FU')
 	this:RegisterEvent('ON_ENTER_CUSTOM_UI_MODE')
 	this:RegisterEvent('ON_LEAVE_CUSTOM_UI_MODE')
 	D.ResetScale(this)
 	D.UpdateFrame(this)
+	D.RegisterDataUpdateEvent(this, D.UpdateFrame)
 end
+end
+
+function MY_TargetMonView.OnFrameDestroy()
+	D.RegisterDataUpdateEvent(this, false)
 end
 
 function MY_TargetMonView.OnFrameDragEnd()
@@ -418,9 +423,7 @@ function MY_TargetMonView.OnItemRButtonClick()
 end
 
 function MY_TargetMonView.OnEvent(event)
-	if event == 'MY_TARGET_MON_VIEW_DATA_UPDATE' then
-		D.UpdateFrame(this)
-	elseif event == 'HOT_KEY_RELOADED' then
+	if event == 'HOT_KEY_RELOADED' then
 		D.UpdateHotkey(this)
 	elseif event == 'ON_ENTER_CUSTOM_UI_MODE' then
 		this:Lookup('', 'Handle_List'):SetAlpha(90)

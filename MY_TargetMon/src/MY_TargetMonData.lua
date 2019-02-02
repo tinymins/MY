@@ -144,6 +144,23 @@ end
 end
 
 do
+local EVENT_UPDATE = {}
+function D.RegisterDataUpdateEvent(frame, fnAction)
+	if fnAction then
+		EVENT_UPDATE[frame] = fnAction
+	else
+		EVENT_UPDATE[frame] = nil
+	end
+end
+
+function D.FireDataUpdateEvent()
+	for frame, fnAction in pairs(EVENT_UPDATE) do
+		fnAction(frame)
+	end
+end
+end
+
+do
 local SHIELDED
 function D.IsShielded()
 	if SHIELDED == nil then
@@ -586,7 +603,7 @@ local function UpdateView()
 	for i = nViewIndex, nViewCount do
 		VIEW_LIST[i] = nil
 	end
-	FireUIEvent('MY_TARGET_MON_VIEW_DATA_UPDATE')
+	D.FireDataUpdateEvent()
 end
 
 local function OnBreathe()
@@ -760,6 +777,7 @@ local settings = {
 			fields = {
 				GetTarget = D.GetTarget,
 				GetViewData = D.GetViewData,
+				RegisterDataUpdateEvent = D.RegisterDataUpdateEvent,
 			},
 		},
 	},
