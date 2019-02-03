@@ -372,12 +372,14 @@ MY.RegisterEvent('LOADING_END', D.AutoSwitchSysHeadTop)
 MY.RegisterEvent('COINSHOP_ON_CLOSE', D.AutoSwitchSysHeadTop)
 
 do
+local CheckInvalidRect
+do
 local function fxTarget(r, g, b, a) return 255 - (255 - r) * 0.3, 255 - (255 - g) * 0.3, 255 - (255 - b) * 0.3, a end
 local function fxDeath(r, g, b, a) return ceil(r * 0.4), ceil(g * 0.4), ceil(b * 0.4), a end
 local function fxDeathTarget(r, g, b, a) return ceil(r * 0.45), ceil(g * 0.45), ceil(b * 0.45), a end
 local lb, info, bVisible, nDisX, nDisY, nDisZ, fTextScale, dwTarType, dwTarID, relation, force, nPriority, szName, r, g, b
 local aCountDown, szCountDown, bShowName, bShowKungfu, kunfu, bShowTong, bShowTitle, bShowLife, bShowLifePercent, tEffect
-local function CheckInvalidRect(dwType, dwID, me, object)
+function CheckInvalidRect(dwType, dwID, me, object)
 	lb = LB_CACHE[dwID]
 	info = dwType == TARGET.PLAYER and me.IsPlayerInMyParty(dwID) and GetClientTeam().GetMemberInfo(dwID) or nil
 	if not object then
@@ -548,6 +550,7 @@ local function CheckInvalidRect(dwType, dwID, me, object)
 		OVERWRITE_TITLE_EFFECT[dwID] = nil
 	end
 end
+end
 
 local function onBreathe()
 	if not D.IsMapEnabled() then
@@ -567,7 +570,7 @@ local function onBreathe()
 		CheckInvalidRect(TARGET.PLAYER, k, me, v)
 	end
 end
-MY.BreatheCall('MY_LifeBar', onBreathe)
+MY.FrameCall('MY_LifeBar', onBreathe)
 end
 
 MY.RegisterEvent('NPC_ENTER_SCENE',function()
