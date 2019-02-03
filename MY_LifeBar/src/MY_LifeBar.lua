@@ -552,25 +552,48 @@ function CheckInvalidRect(dwType, dwID, me, object)
 end
 end
 
+do
+local nRoundLeft, nRoundLimit = 0, 50 -- 每帧最大重绘血条数量
+local dwLastType, dwLastID
+local dwType, dwID, me, KTar = TARGET.PLAYER
 local function onBreathe()
 	if not D.IsMapEnabled() then
 		return
 	end
-	local me = GetClientPlayer()
+	me = GetClientPlayer()
 	if not me then
 		return
 	end
-
 	-- local _, _, fPitch = Camera_GetRTParams()
-	for k, v in pairs(NPC_CACHE) do
-		CheckInvalidRect(TARGET.NPC, k, me, v)
+	nRoundLeft = nRoundLimit
+	while nRoundLeft > 0 do
+		if dwType == TARGET.NPC then
+			dwID = next(NPC_CACHE, dwID)
+			if dwID then
+				KTar = NPC_CACHE[dwID]
+			else
+				dwType, dwID = TARGET.PLAYER, nil
+			end
+		elseif dwType == TARGET.PLAYER then
+			dwID = next(PLAYER_CACHE, dwID)
+			if dwID then
+				KTar = PLAYER_CACHE[dwID]
+			else
+				dwType, dwID = TARGET.NPC, nil
+			end
+		end
+		if dwType == dwLastType and dwID == dwLastID then
+			return
+		end
+		if dwID then
+			CheckInvalidRect(dwType, dwID, me, KTar)
+		end
+		nRoundLeft = nRoundLeft - 1
 	end
-
-	for k, v in pairs(PLAYER_CACHE) do
-		CheckInvalidRect(TARGET.PLAYER, k, me, v)
-	end
+	dwLastType, dwLastID = dwType, dwID
 end
 MY.FrameCall('MY_LifeBar', onBreathe)
+end
 end
 
 MY.RegisterEvent('NPC_ENTER_SCENE',function()
