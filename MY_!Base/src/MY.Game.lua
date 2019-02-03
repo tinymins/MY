@@ -757,8 +757,8 @@ end
 
 function MY.SetForceColor(dwForce, szType, tCol)
 	if dwForce == 'reset' then
-		MY_FORCE_COLOR_BG_CUSTOM[dwForce] = {}
-		MY_FORCE_COLOR_FG_CUSTOM[dwForce] = {}
+		MY_FORCE_COLOR_BG_CUSTOM = {}
+		MY_FORCE_COLOR_FG_CUSTOM = {}
 		MY.SaveLUAData({SZ_FORCE_COLOR_BG, MY_DATA_PATH.ROLE}, MY_FORCE_COLOR_BG_CUSTOM)
 		MY.SaveLUAData({SZ_FORCE_COLOR_FG, MY_DATA_PATH.ROLE}, MY_FORCE_COLOR_FG_CUSTOM)
 	elseif szType == 'background' then
