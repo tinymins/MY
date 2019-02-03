@@ -34,8 +34,10 @@ if not Config then
     return
 end
 
-local function GetConfigValue(key, relation, force)
-	local cfg, value = Config[key][relation]
+local GetConfigValue
+do local cfg, value
+function GetConfigValue(key, relation, force)
+	cfg, value = Config[key][relation]
 	if force == 'Npc' or force == 'Player' then
 		value = cfg[force]
 	else
@@ -47,6 +49,7 @@ local function GetConfigValue(key, relation, force)
 		end
 	end
 	return value
+end
 end
 -----------------------------------------------------------------------------------------
 
@@ -203,29 +206,24 @@ function D.GetNz(nZ,nZ2)
 	return math.floor(((nZ/8 - nZ2/8) ^ 2) ^ 0.5)/64
 end
 
-function D.GetRelation(dwID)
-	local me = GetClientPlayer()
-	if not me then
-		return 'Neutrality'
-	end
-	if Config.nCamp == -1 or not IsPlayer(dwID) then
-		return MY.GetRelation(me.dwID, dwID)
+function D.GetRelation(dwSrcID, dwTarID, KSrc, KTar)
+	if Config.nCamp == -1 or not IsPlayer(dwTarID) then
+		return MY.GetRelation(dwSrcID, dwTarID)
 	else
-		local tar = MY.GetObject(TARGET.PLAYER, dwID)
-		if not tar then
+		if not KTar then
 			return 'Neutrality'
-		elseif dwID == me.dwID then
+		elseif dwTarID == dwSrcID then
 			return 'Self'
-		elseif IsParty(me.dwID, dwID) then
+		elseif IsParty(dwSrcID, dwTarID) then
 			return 'Party'
-		elseif MY.GetFoe(dwID) then
+		elseif MY.GetFoe(dwTarID) then
 			return 'Foe'
-		elseif tar.nCamp == Config.nCamp then
+		elseif KTar.nCamp == Config.nCamp then
 			return 'Ally'
-		elseif not tar.bCampFlag        -- 没开阵营
-		or tar.nCamp == CAMP.NEUTRAL    -- 目标中立
+		elseif not KTar.bCampFlag        -- 没开阵营
+		or KTar.nCamp == CAMP.NEUTRAL    -- 目标中立
 		or Config.nCamp == CAMP.NEUTRAL -- 自己中立
-		or me.GetScene().nCampType == MAP_CAMP_TYPE.ALL_PROTECT then -- 停战地图
+		or KSrc.GetScene().nCampType == MAP_CAMP_TYPE.ALL_PROTECT then -- 停战地图
 			return 'Neutrality'
 		else
 			return 'Enemy'
@@ -233,16 +231,11 @@ function D.GetRelation(dwID)
 	end
 end
 
-function D.GetForce(dwID)
-	if not IsPlayer(dwID) then
-		return 'Npc'
+function D.GetForce(dwType, dwID, KObject)
+	if dwType == TARGET.PLAYER then
+		return KObject and KObject.dwForceID or 0
 	else
-		local tar = MY.GetObject(TARGET.PLAYER, dwID)
-		if not tar then
-			return 0
-		else
-			return tar.dwForceID
-		end
+		return 'Npc'
 	end
 end
 
@@ -382,9 +375,11 @@ do
 local function fxTarget(r, g, b, a) return 255 - (255 - r) * 0.3, 255 - (255 - g) * 0.3, 255 - (255 - b) * 0.3, a end
 local function fxDeath(r, g, b, a) return ceil(r * 0.4), ceil(g * 0.4), ceil(b * 0.4), a end
 local function fxDeathTarget(r, g, b, a) return ceil(r * 0.45), ceil(g * 0.45), ceil(b * 0.45), a end
-local function CheckInvalidRect(dwType, dwID, me)
-	local lb = LB_CACHE[dwID]
-	local object, info = MY.GetObject(dwType, dwID)
+local lb, info, bVisible, nDisX, nDisY, nDisZ, fTextScale, dwTarType, dwTarID, relation, force, nPriority, szName, r, g, b
+local aCountDown, szCountDown, bShowName, bShowKungfu, kunfu, bShowTong, bShowTitle, bShowLife, bShowLifePercent, tEffect
+local function CheckInvalidRect(dwType, dwID, me, object)
+	lb = LB_CACHE[dwID]
+	info = dwType == TARGET.PLAYER and me.IsPlayerInMyParty(dwID) and GetClientTeam().GetMemberInfo(dwID) or nil
 	if not object then
 		if lb then
 			lb:Remove()
@@ -392,10 +387,10 @@ local function CheckInvalidRect(dwType, dwID, me)
 		end
 		return
 	end
-	local bVisible = true
+	bVisible = true
 	-- 距离判断
 	if bVisible and Config.nDistance > 0 then
-		local nDisX, nDisY, nDisZ = me.nX - object.nX, me.nY - object.nY, (me.nZ - object.nZ) * 0.125
+		nDisX, nDisY, nDisZ = me.nX - object.nX, me.nY - object.nY, (me.nZ - object.nZ) * 0.125
 		bVisible = nDisX * nDisX + nDisY * nDisY + nDisZ * nDisZ < Config.nDistance
 	end
 	-- 高度差判断
@@ -420,21 +415,22 @@ local function CheckInvalidRect(dwType, dwID, me)
 			-- 创建和设置不会改变的东西
 			lb = LB(dwType, dwID)
 			lb:SetDistanceFmt('%d' .. g_tStrings.STR_METER)
+			lb:SetDistance(0)
 			LB_CACHE[dwID] = lb
 		end
-		local fTextScale = Config.fTextScale
-		local dwTarType, dwTarID = me.GetTarget()
-		local relation = D.GetRelation(dwID)
-		local force = D.GetForce(dwID)
-		local nPriority = OBJECT_SCREEN_POS_Y_CACHE[dwID] or 0 -- 默认根据屏幕坐标排序
+		fTextScale = Config.fTextScale
+		dwTarType, dwTarID = me.GetTarget()
+		relation = D.GetRelation(me.dwID, dwID, me, object)
+		force = D.GetForce(dwType, dwID, KObject)
+		nPriority = OBJECT_SCREEN_POS_Y_CACHE[dwID] or 0 -- 默认根据屏幕坐标排序
 		if Config.bMineOnTop and dwType == TARGET.PLAYER and dwID == me.dwID then -- 自身永远最前
 			nPriority = nPriority + 10000
 		end
-		local szName = MY.GetObjectName(object, (Config.bShowObjectID and (Config.bShowObjectIDOnlyUnnamed and 'auto' or 'always') or 'never'))
+		szName = MY.GetObjectName(object, (Config.bShowObjectID and (Config.bShowObjectIDOnlyUnnamed and 'auto' or 'always') or 'never'))
 		-- 常规配色
-		local r, g, b = unpack(GetConfigValue('Color', relation, force))
+		r, g, b = unpack(GetConfigValue('Color', relation, force))
 		-- 倒计时/名字/帮会/称号部分
-		local aCountDown, szCountDown = COUNTDOWN_CACHE[dwID], ''
+		aCountDown, szCountDown = COUNTDOWN_CACHE[dwID], ''
 		while aCountDown and #aCountDown > 0 do
 			local tData, szText, nSec = aCountDown[1]
 			if tData.szType == 'BUFF' then
@@ -465,15 +461,15 @@ local function CheckInvalidRect(dwType, dwID, me)
 		end
 		lb:SetCD(szCountDown)
 		-- 名字
-		local bShowName = GetConfigValue('ShowName', relation, force)
+		bShowName = GetConfigValue('ShowName', relation, force)
 		if bShowName then
 			lb:SetName(szName)
 		end
 		lb:SetNameVisible(bShowName)
 		-- 心法
-		local bShowKungfu = Config.bShowKungfu and dwType == TARGET.PLAYER and dwID ~= me.dwID
+		bShowKungfu = Config.bShowKungfu and dwType == TARGET.PLAYER and dwID ~= me.dwID
 		if bShowKungfu then
-			local kunfu = object.GetKungfuMount()
+			kunfu = object.GetKungfuMount()
 			if kunfu and kunfu.dwSkillID and kunfu.dwSkillID ~= 0 then
 				lb:SetKungfu(MY.GetKungfuName(kunfu.dwSkillID, 'short'))
 			else
@@ -487,33 +483,37 @@ local function CheckInvalidRect(dwType, dwID, me)
 		end
 		lb:SetDistanceVisible(Config.bShowDistance)
 		-- 帮会
-		local bShowTong = GetConfigValue('ShowTong', relation, force)
+		bShowTong = GetConfigValue('ShowTong', relation, force)
 		if bShowTong then
 			lb:SetTong(D.GetTongName(object.dwTongID) or '')
 		end
 		lb:SetTongVisible(bShowTong)
 		-- 称号
-		local bShowTitle = GetConfigValue('ShowTitle', relation, force)
+		bShowTitle = GetConfigValue('ShowTitle', relation, force)
 		if bShowTitle then
 			lb:SetTitle(object.szTitle or '')
 		end
 		lb:SetTitleVisible(bShowTitle)
 		-- 血条部分
-		lb:SetLife(info.nCurrentLife, info.nMaxLife)
-		local bShowLife = szName ~= '' and GetConfigValue('ShowLife', relation, force)
+		if info then
+			lb:SetLife(info.nCurrentLife, info.nMaxLife)
+		else
+			lb:SetLife(object.nCurrentLife, object.nMaxLife)
+		end
+		bShowLife = szName ~= '' and GetConfigValue('ShowLife', relation, force)
 		if bShowLife then
 			lb:SetLifeBar(Config.nLifeOffsetX, Config.nLifeOffsetY, Config.nLifeWidth, Config.nLifeHeight, Config.nLifePadding)
 			lb:SetLifeBarBorder(Config.nLifeBorder, Config.nLifeBorderR, Config.nLifeBorderG, Config.nLifeBorderB)
 		end
 		lb:SetLifeBarVisible(bShowLife)
 		-- 血量数值部分
-		local bShowLifePercent = GetConfigValue('ShowLifePer', relation, force) and (not Config.bHideLifePercentageWhenFight or me.bFightState)
+		bShowLifePercent = GetConfigValue('ShowLifePer', relation, force) and (not Config.bHideLifePercentageWhenFight or me.bFightState)
 		if bShowLifePercent then
 			lb:SetLifeText(Config.nLifePerOffsetX, Config.nLifePerOffsetY, Config.bHideLifePercentageDecimal and '%.0f' or '%.1f')
 		end
 		lb:SetLifeTextVisible(bShowLifePercent)
 		-- 头顶特效
-		local tEffect = OBJECT_TITLE_EFFECT[dwID]
+		tEffect = OBJECT_TITLE_EFFECT[dwID]
 		if tEffect then
 			lb:SetSFX(tEffect.szFilePath, tEffect.fScale * Config.fTitleEffectScale, Config.nTitleEffectOffsetY, tEffect.nWidth, tEffect.nHeight)
 		else
@@ -521,7 +521,7 @@ local function CheckInvalidRect(dwType, dwID, me)
 		end
 		-- 各种数据生效
 		lb:SetScale((Config.bSystemUIScale and MY.GetUIScale() or 1) * Config.fGlobalUIScale)
-		lb:SetColor(r, g, b, Config.nAlpha, Config.nFont)
+		lb:SetColor(r, g, b, Config.nAlpha)
 		lb:SetColorFx(
 			object.nMoveState == MOVE_STATE.ON_DEATH
 			and (dwID == dwTarID and fxDeathTarget or fxDeath)
@@ -559,19 +559,19 @@ local function onBreathe()
 	end
 
 	-- local _, _, fPitch = Camera_GetRTParams()
-	for k , v in pairs(NPC_CACHE) do
-		CheckInvalidRect(TARGET.NPC, k, me)
+	for k, v in pairs(NPC_CACHE) do
+		CheckInvalidRect(TARGET.NPC, k, me, v)
 	end
 
-	for k , v in pairs(PLAYER_CACHE) do
-		CheckInvalidRect(TARGET.PLAYER, k, me)
+	for k, v in pairs(PLAYER_CACHE) do
+		CheckInvalidRect(TARGET.PLAYER, k, me, v)
 	end
 end
 MY.BreatheCall('MY_LifeBar', onBreathe)
 end
 
 MY.RegisterEvent('NPC_ENTER_SCENE',function()
-	NPC_CACHE[arg0] = true
+	NPC_CACHE[arg0] = GetNpc(arg0)
 end)
 
 MY.RegisterEvent('NPC_LEAVE_SCENE',function()
@@ -584,7 +584,7 @@ MY.RegisterEvent('NPC_LEAVE_SCENE',function()
 end)
 
 MY.RegisterEvent('PLAYER_ENTER_SCENE',function()
-	PLAYER_CACHE[arg0] = true
+	PLAYER_CACHE[arg0] = GetPlayer(arg0)
 end)
 
 MY.RegisterEvent('PLAYER_LEAVE_SCENE',function()
