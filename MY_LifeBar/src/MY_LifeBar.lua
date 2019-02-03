@@ -423,7 +423,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		fTextScale = Config.fTextScale
 		dwTarType, dwTarID = me.GetTarget()
 		relation = D.GetRelation(me.dwID, dwID, me, object)
-		force = D.GetForce(dwType, dwID, KObject)
+		force = D.GetForce(dwType, dwID, object)
 		nPriority = OBJECT_SCREEN_POS_Y_CACHE[dwID] or 0 -- 默认根据屏幕坐标排序
 		if Config.bMineOnTop and dwType == TARGET.PLAYER and dwID == me.dwID then -- 自身永远最前
 			nPriority = nPriority + 10000
