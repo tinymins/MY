@@ -485,7 +485,7 @@ end
 function D.MoveMonitor(config, mon, offset)
 	for i, v in ipairs(config.monitors) do
 		if v == mon then
-			local j = min(max(i + offset, 1), #CONFIG)
+			local j = min(max(i + offset, 1), #config.monitors)
 			if j ~= i then
 				remove(config.monitors, i)
 				insert(config.monitors, j, mon)
