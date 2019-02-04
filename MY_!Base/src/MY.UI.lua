@@ -3306,6 +3306,7 @@ function UI:menu(lmenu, rmenu, bNoAutoBind)
 		menu.nMiniWidth = nW
 		menu.x = nX
 		menu.y = nY + nH
+		menu.bVisibleWhenHideUI = true
 		PopupMenu(menu)
 	end
 	-- bind left click
