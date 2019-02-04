@@ -197,7 +197,22 @@ MY_ToolBox.ApplyConfig = function()
 	-- 玩家名字变成link方便组队
 	do
 		MY.RegisterEvent('OPEN_WINDOW.NAMELINKER', function(event)
-			local h = Station.Lookup('Normal/DialoguePanel', 'Handle_Message')
+			local h
+			for _, p in ipairs({
+				{'Normal/DialoguePanel', '', 'Handle_Message'},
+				{'Lowest2/PlotDialoguePanel', 'Wnd_Dialogue', 'Handle_Dialogue'},
+			}) do
+				local frame = Station.Lookup(p[1])
+				if frame and frame:IsVisible() then
+					h = frame:Lookup(p[2], p[3])
+					if h then
+						break
+					end
+				end
+			end
+			if not h then
+				return
+			end
 			for i = 0, h:GetItemCount() - 1 do
 				local hItem = h:Lookup(i)
 				if hItem:GetType() == 'Text' then
