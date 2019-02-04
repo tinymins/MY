@@ -6,7 +6,8 @@ return {
 	type                = "BUFF",
 	target              = "CLIENT_PLAYER",
 	scale               = 0.8   , -- 界面缩放比
-	fontScale           = 1     , -- 文字缩放比
+	iconFontScale       = 1     , -- 图标文字缩放比
+	otherFontScale      = 1     , -- 其他文字缩放比
 	ignoreSystemUIScale = false , -- 禁止系统缩放
 	enable              = false , -- 启用标记
 	penetrable          = true  , -- 是否穿透

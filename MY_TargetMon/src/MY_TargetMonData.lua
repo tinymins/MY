@@ -496,7 +496,9 @@ local function Skill_MonToView(mon, skill, item, KObject, nIcon, config, tMonExi
 	item.aShortAliasRGB = mon.rgbShortAlias
 	Base_MonToView(mon, skill, item, KObject, nIcon, config, tMonExist, tMonLast)
 end
-local function UpdateView()
+local UpdateView
+do local fUIScale, fFontScaleBase
+function UpdateView()
 	local me = GetClientPlayer()
 	local nViewIndex, nViewCount = 1, #VIEW_LIST
 	for _, config in ipairs(D.GetConfig()) do
@@ -509,14 +511,17 @@ local function UpdateView()
 				view = {}
 				VIEW_LIST[nViewIndex] = view
 			end
+			fUIScale = (config.ignoreSystemUIScale and 1 or Station.GetUIScale()) * config.scale
+			fFontScaleBase = fUIScale * MY.GetFontScale() * config.scale
 			view.szUuid               = config.uuid
 			view.szType               = config.type
 			view.szTarget             = config.target
 			view.szCaption            = config.caption
 			view.tAnchor              = config.anchor
 			view.bIgnoreSystemUIScale = config.ignoreSystemUIScale
-			view.fUIScale             = (config.ignoreSystemUIScale and 1 or Station.GetUIScale()) * config.scale
-			view.fFontScale           = (config.ignoreSystemUIScale and 1 or Station.GetUIScale()) * MY.GetFontScale() * config.scale * config.fontScale
+			view.fUIScale             = fUIScale
+			view.fIconFontScale       = fFontScaleBase * config.iconFontScale
+			view.fOtherFontScale      = fFontScaleBase * config.otherFontScale
 			view.bPenetrable          = config.penetrable
 			view.bDragable            = config.dragable
 			view.szAlignment          = config.alignment
@@ -603,6 +608,7 @@ local function UpdateView()
 		VIEW_LIST[i] = nil
 	end
 	D.FireDataUpdateEvent()
+end
 end
 
 local function OnBreathe()

@@ -113,7 +113,8 @@ local function DrawItem(hList, hItem, nGroup, nIndex, tViewData, item, bScaleRes
 		hItem.txtLongName  = hItem.hCDBar:Lookup('Text_Name')
 		hItem.imgProcess:SetPercentage(0)
 		hItem.fUIScale = 1
-		hItem.fFontScale = MY.GetFontScale()
+		hItem.fIconFontScale = MY.GetFontScale()
+		hItem.fOtherFontScale = MY.GetFontScale()
 		local fRelativeScale = 1 / Station.GetUIScale()
 		hItem:Scale(fRelativeScale, fRelativeScale)
 		hItem:Hide()
@@ -130,7 +131,8 @@ local function DrawItem(hList, hItem, nGroup, nIndex, tViewData, item, bScaleRes
 	end
 	if hItem.bCdBar ~= tViewData.bCdBar
 	or hItem.nCdBarWidth ~= tViewData.nCdBarWidth
-	or hItem.fFontScale ~= tViewData.fFontScale
+	or hItem.fIconFontScale ~= tViewData.fIconFontScale
+	or hItem.fOtherFontScale ~= tViewData.fOtherFontScale
 	or bScaleReset then
 		if tViewData.bCdBar then
 			hItem.hCDBar:Show()
@@ -145,17 +147,18 @@ local function DrawItem(hList, hItem, nGroup, nIndex, tViewData, item, bScaleRes
 			hItem.txtShortName:Show()
 			hItem:SetSize(hItem.nBoxW, hItem.nBoxH
 				+ (hItem.txtShortName:GetRelY() - hItem.nBoxH) * 2
-				+ hItem.txtShortName:GetH() * tViewData.fFontScale * 0.85 / tViewData.fUIScale * Station.GetUIScale())
+				+ hItem.txtShortName:GetH() * tViewData.fOtherFontScale / tViewData.fUIScale * Station.GetUIScale())
 		end
-		hItem.txtTime:SetFontScale(tViewData.fFontScale * 1.2)
-		hItem.txtHotkey:SetFontScale(tViewData.fFontScale)
-		hItem.txtStackNum:SetFontScale(tViewData.fFontScale)
-		hItem.txtProcess:SetFontScale(tViewData.fFontScale)
-		hItem.txtLongName:SetFontScale(tViewData.fFontScale)
-		hItem.txtShortName:SetFontScale(tViewData.fFontScale * 0.85)
+		hItem.txtTime:SetFontScale(tViewData.fIconFontScale * 1.2)
+		hItem.txtHotkey:SetFontScale(tViewData.fIconFontScale)
+		hItem.txtStackNum:SetFontScale(tViewData.fIconFontScale)
+		hItem.txtProcess:SetFontScale(tViewData.fOtherFontScale)
+		hItem.txtLongName:SetFontScale(tViewData.fOtherFontScale)
+		hItem.txtShortName:SetFontScale(tViewData.fOtherFontScale)
 		hItem.bCdBar = tViewData.bCdBar
 		hItem.nCdBarWidth = tViewData.nCdBarWidth
-		hItem.fFontScale = tViewData.fFontScale
+		hItem.fIconFontScale = tViewData.fIconFontScale
+		hItem.fOtherFontScale = tViewData.fOtherFontScale
 		bRequireFormatPos = true
 	end
 	if hItem.szCdBarUITex ~= tViewData.szCdBarUITex and tViewData.bCdBar then

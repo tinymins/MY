@@ -716,6 +716,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	})
 	y = y + 30
 
+	local deltaY = 31
 	x = X + 20
 	uiWnd:append('WndCheckBox', {
 		x = x, y = y,
@@ -749,7 +750,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		end,
 		autoenable = function() return config.enable end,
 	})
-	y = y + 30
+	y = y + deltaY
 
 	x = X + 20
 	uiWnd:append('WndCheckBox', {
@@ -781,7 +782,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		end,
 		autoenable = function() return config.enable end,
 	})
-	y = y + 30
+	y = y + deltaY
 
 	x = X + 20
 	uiWnd:append('WndCheckBox', {
@@ -813,7 +814,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		end,
 		autoenable = function() return config.enable and not config.hideVoid end,
 	})
-	y = y + 30
+	y = y + deltaY
 
 	x = X + 20
 	uiWnd:append('WndCheckBox', {
@@ -845,7 +846,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		end,
 		autoenable = function() return config.enable end,
 	})
-	y = y + 30
+	y = y + deltaY
 
 	x = X + 20
 	uiWnd:append('WndCheckBox', {
@@ -913,7 +914,7 @@ local function DrawPreview(ui, config, OpenDetail)
 	y = y + 30
 
 	y = Y + 30
-	local deltaY = 24
+	local deltaY = 21
 	uiWnd:append('WndComboBox', {
 		x = w - 250, y = y, w = 135,
 		text = _L['Set target'],
@@ -962,7 +963,7 @@ local function DrawPreview(ui, config, OpenDetail)
 		onclick = function() OpenDetail(config) end,
 		autoenable = function() return config.enable end,
 	})
-	y = y + deltaY
+	y = y + 24
 
 	uiWnd:append('WndSliderBox', {
 		x = w - 250, y = y,
@@ -994,10 +995,23 @@ local function DrawPreview(ui, config, OpenDetail)
 		x = w - 250, y = y,
 		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		range = {1, 300},
-		value = config.fontScale * 100,
-		textfmt = function(val) return _L('Font scale %d%%.', val) end,
+		value = config.iconFontScale * 100,
+		textfmt = function(val) return _L('Icon font scale %d%%.', val) end,
 		onchange = function(val)
-			D.ModifyConfig(config, 'fontScale', val / 100)
+			D.ModifyConfig(config, 'iconFontScale', val / 100)
+		end,
+		autoenable = function() return config.enable end,
+	})
+	y = y + deltaY
+
+	uiWnd:append('WndSliderBox', {
+		x = w - 250, y = y,
+		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
+		range = {1, 300},
+		value = config.otherFontScale * 100,
+		textfmt = function(val) return _L('Other font scale %d%%.', val) end,
+		onchange = function(val)
+			D.ModifyConfig(config, 'otherFontScale', val / 100)
 		end,
 		autoenable = function() return config.enable end,
 	})
