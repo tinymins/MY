@@ -262,8 +262,11 @@ function D.UpdateFrame(frame)
 		hItem.nLevel = item.nLevel
 	end
 	for i = nIndex, hList:GetItemCount() - 1 do
-		bRequireFormatPos = true
-		hList:Lookup(i):Hide()
+		hItem = hList:Lookup(i)
+		if hItem:IsVisible() then
+			bRequireFormatPos = true
+			hItem:Hide()
+		end
 	end
 	-- 检查是否需要重绘界面坐标
 	if bRequireFormatPos then
