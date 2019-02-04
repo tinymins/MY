@@ -55,8 +55,10 @@ function D.UpdateHotkey(frame)
 end
 
 function D.SaveAnchor(frame)
-	local szAnchorBase = frame.tViewData.szAnchorBase
-	local tAnchor = GetFrameAnchor(frame, szAnchorBase)
+	local nHeight = frame:GetH()
+	frame:SetH(frame.nRowHeight)
+	local tAnchor = GetFrameAnchor(frame)
+	frame:SetH(nHeight)
 	if frame.tViewData.bIgnoreSystemUIScale then
 		local fRelativeScale = Station.GetUIScale()
 		tAnchor.x = tAnchor.x * fRelativeScale
@@ -68,7 +70,10 @@ end
 function D.UpdateAnchor(frame)
 	local anchor = frame.tViewData.tAnchor
 	local fRelativeScale = frame.tViewData.bIgnoreSystemUIScale and (1 / Station.GetUIScale()) or 1
+	local nHeight = frame:GetH()
+	frame:SetH(frame.nRowHeight)
 	frame:SetPoint(anchor.s, 0, 0, anchor.r, anchor.x * fRelativeScale, anchor.y * fRelativeScale)
+	frame:SetH(nHeight)
 	local x, y = frame:GetAbsPos()
 	local w, h = frame:GetSize()
 	local cw, ch = Station.GetClientSize()
@@ -89,6 +94,7 @@ function D.ResetScale(frame)
 	this.bScaleReset = true
 end
 
+do
 function D.UpdateFrame(frame)
 	local me = GetClientPlayer()
 	if not me then
@@ -119,147 +125,11 @@ function D.UpdateFrame(frame)
 		bRequireFormatPos = true
 		frame.szAlignment = tViewData.szAlignment
 	end
-	local hTotal, hList, nIndex, hItem = frame.hTotal, frame.hList, 0
+	local hTotal, hList, nGroup, nIndex, hItem = frame.hTotal, frame.hList, frame.nIndex, 0
 	for _, item in ipairs(tViewData.aItem) do
 		hItem = hList:Lookup(nIndex)
 		nIndex = nIndex + 1
-		if not hItem then
-			hItem = hList:AppendItemFromIni(INI_PATH, 'Handle_Item')
-			hItem.hBox         = hItem:Lookup('Handle_Box')
-			hItem.box          = hItem.hBox:Lookup('Box_Default')
-			hItem.imgBoxBg     = hItem.hBox:Lookup('Image_BoxBg')
-			hItem.nBoxW        = hItem.imgBoxBg:GetW()
-			hItem.nBoxH        = hItem.imgBoxBg:GetH()
-			hItem.txtTime      = hItem.hBox:Lookup('Text_Time')
-			hItem.txtHotkey    = hItem.hBox:Lookup('Text_Hotkey')
-			hItem.txtStackNum  = hItem.hBox:Lookup('Text_StackNum')
-			hItem.txtShortName = hItem.hBox:Lookup('Text_ShortName')
-			hItem.hCDBar       = hItem:Lookup('Handle_Bar')
-			hItem.txtProcess   = hItem.hCDBar:Lookup('Text_Process')
-			hItem.imgProcess   = hItem.hCDBar:Lookup('Image_Process')
-			hItem.txtLongName  = hItem.hCDBar:Lookup('Text_Name')
-			hItem.imgProcess:SetPercentage(0)
-			hItem.fUIScale = 1
-			hItem.fFontScale = MY.GetFontScale()
-			local fRelativeScale = 1 / Station.GetUIScale()
-			hItem:Scale(fRelativeScale, fRelativeScale)
-			D.UpdateItemHotkey(hItem, frame.nIndex, nIndex)
-			bRequireFormatPos = true
-		end
-		if hItem.fUIScale ~= tViewData.fUIScale
-		or bScaleReset then
-			local fRelativeScale = tViewData.fUIScale / hItem.fUIScale
-			hItem:Scale(fRelativeScale, fRelativeScale)
-			hItem.nBoxW = hItem.imgBoxBg:GetW()
-			hItem.nBoxH = hItem.imgBoxBg:GetH()
-			hItem.fUIScale = tViewData.fUIScale
-		end
-		if hItem.bCdBar ~= tViewData.bCdBar
-		or hItem.nCdBarWidth ~= tViewData.nCdBarWidth
-		or hItem.fFontScale ~= tViewData.fFontScale
-		or bScaleReset then
-			if tViewData.bCdBar then
-				hItem.hCDBar:Show()
-				hItem.txtShortName:Hide()
-				hItem.hCDBar:SetW(tViewData.nCdBarWidth)
-				hItem.imgProcess:SetW(tViewData.nCdBarWidth)
-				hItem.txtProcess:SetW(tViewData.nCdBarWidth - 10)
-				hItem.txtLongName:SetW(tViewData.nCdBarWidth - 10)
-				hItem:SetSize(hItem.nBoxW + tViewData.nCdBarWidth, hItem.nBoxH)
-			else
-				hItem.hCDBar:Hide()
-				hItem.txtShortName:Show()
-				hItem:SetSize(hItem.nBoxW, hItem.nBoxH
-					+ (hItem.txtShortName:GetRelY() - hItem.nBoxH) * 2
-					+ hItem.txtShortName:GetH() * tViewData.fFontScale * 0.85 / tViewData.fUIScale * Station.GetUIScale())
-			end
-			hItem.txtTime:SetFontScale(tViewData.fFontScale * 1.2)
-			hItem.txtHotkey:SetFontScale(tViewData.fFontScale)
-			hItem.txtStackNum:SetFontScale(tViewData.fFontScale)
-			hItem.txtProcess:SetFontScale(tViewData.fFontScale)
-			hItem.txtLongName:SetFontScale(tViewData.fFontScale)
-			hItem.txtShortName:SetFontScale(tViewData.fFontScale * 0.85)
-			hItem.bCdBar = tViewData.bCdBar
-			hItem.nCdBarWidth = tViewData.nCdBarWidth
-			hItem.fFontScale = tViewData.fFontScale
-			bRequireFormatPos = true
-		end
-		if hItem.nIcon ~= item.nIcon then
-			hItem.box:SetObjectIcon(item.nIcon)
-			hItem.nIcon = item.nIcon
-		end
-		if hItem.bCd ~= item.bCd then
-			hItem.box:SetObjectCoolDown(item.bCd)
-			hItem.bCd = item.bCd
-		end
-		if hItem.fCd ~= item.fCd and item.bCd then
-			hItem.box:SetCoolDownPercentage(item.fCd)
-			hItem.fCd = item.fCd
-		end
-		if hItem.fCdBar ~= item.fCdBar and tViewData.bCdBar then
-			hItem.imgProcess:SetPercentage(item.fCdBar)
-			hItem.fCdBar = item.fCdBar
-		end
-		if hItem.szCdBarUITex ~= tViewData.szCdBarUITex and tViewData.bCdBar then
-			UI(hItem.imgProcess):image(tViewData.szCdBarUITex)
-			hItem.szCdBarUITex = tViewData.szCdBarUITex
-		end
-		if hItem.szBoxBgUITex ~= tViewData.szBoxBgUITex then
-			UI(hItem.imgBoxBg):image(tViewData.szBoxBgUITex)
-			hItem.szBoxBgUITex = tViewData.szBoxBgUITex
-		end
-		if hItem.bStaring ~= item.bStaring then
-			hItem.box:SetObjectStaring(item.bStaring)
-			hItem.bStaring = item.bStaring
-		end
-		if hItem.bSparking ~= item.bSparking then
-			hItem.box:SetObjectSparking(item.bSparking)
-			hItem.bSparking = item.bSparking
-		end
-		if hItem.szBoxExtentAnimate ~= item.szExtentAnimate then
-			if item.szExtentAnimate and item.szExtentAnimate ~= '' then
-				local szPath, nFrame = unpack(MY.SplitString(item.szExtentAnimate, '|'))
-				hItem.box:SetExtentAnimate(szPath, nFrame)
-			else
-				hItem.box:ClearExtentAnimate()
-			end
-			hItem.szBoxExtentAnimate = item.szExtentAnimate
-		end
-		if hItem.szTimeLeft ~= item.szTimeLeft then
-			hItem.txtTime:SetText(item.szTimeLeft)
-			hItem.txtProcess:SetText(item.szTimeLeft)
-			hItem.szTimeLeft = item.szTimeLeft
-		end
-		if hItem.szStackNum ~= item.szStackNum then
-			hItem.txtStackNum:SetText(item.szStackNum)
-			hItem.szStackNum = item.szStackNum
-		end
-		if hItem.nLongAliasR ~= item.aLongAliasRGB[1]
-		or hItem.nLongAliasG ~= item.aLongAliasRGB[2]
-		or hItem.nLongAliasB ~= item.aLongAliasRGB[3] then
-			hItem.txtLongName:SetFontColor(unpack(item.aLongAliasRGB))
-			hItem.nLongAliasR, hItem.nLongAliasG, hItem.nLongAliasB = unpack(item.aLongAliasRGB)
-		end
-		if hItem.szLongName ~= item.szLongName then
-			hItem.txtLongName:SetText(item.szLongName)
-			hItem.szLongName = item.szLongName
-		end
-		if hItem.nShortAliasR ~= item.aShortAliasRGB[1]
-		or hItem.nShortAliasG ~= item.aShortAliasRGB[2]
-		or hItem.nShortAliasB ~= item.aShortAliasRGB[3] then
-			hItem.txtShortName:SetFontColor(unpack(item.aShortAliasRGB))
-			hItem.nShortAliasR, hItem.nShortAliasG, hItem.nShortAliasB = unpack(item.aShortAliasRGB)
-		end
-		if hItem.szShortName ~= item.szShortName then
-			hItem.txtShortName:SetText(item.szShortName)
-			hItem.szShortName = item.szShortName
-		end
-		if not hItem:IsVisible() then
-			bRequireFormatPos = true
-			hItem:Show()
-		end
-		hItem.dwID = item.dwID
-		hItem.nLevel = item.nLevel
+		hItem, bRequireFormatPos = DrawItem(hList, hItem, nGroup, nIndex, tViewData, item, bScaleReset, bRequireFormatPos)
 	end
 	for i = nIndex, hList:GetItemCount() - 1 do
 		hItem = hList:Lookup(i)
@@ -270,18 +140,12 @@ function D.UpdateFrame(frame)
 	end
 	-- 检查是否需要重绘界面坐标
 	if bRequireFormatPos then
-		frame.nWidth = 200
-		frame.nHeight = 50
-		hItem = hList:Lookup(0)
-		if hItem then
-			local nCount = hList:GetItemCount()
-			if tViewData.szAlignment == 'LEFT' then
-				frame.nWidth = ceil(hItem:GetW()) * min(tViewData.nMaxLineCount, nCount)
-			else
-				frame.nWidth = ceil(hItem:GetW()) * tViewData.nMaxLineCount
-			end
-			frame.nHeight = ceil(nCount / tViewData.nMaxLineCount) * ceil(hItem:GetH())
-		end
+		frame.hTemplateItem = DrawItem(hList, frame.hTemplateItem, nGroup, 0, tViewData, nil, bScaleReset, bRequireFormatPos)
+		hItem = frame.hTemplateItem
+		local nCount = hList:GetItemCount()
+		frame.nWidth = ceil(hItem:GetW()) * tViewData.nMaxLineCount
+		frame.nHeight = ceil(nCount / tViewData.nMaxLineCount) * ceil(hItem:GetH())
+		frame.nRowHeight = ceil(hItem:GetH())
 		hList:SetW(frame.nWidth)
 		hList:SetIgnoreInvisibleChild(true)
 		hList:SetHAlign(ALIGNMENT[tViewData.szAlignment] or ALIGNMENT.LEFT)
@@ -299,6 +163,7 @@ function D.UpdateFrame(frame)
 		frame:EnableDrag(not tViewData.bPenetrable and tViewData.bDragable)
 		frame:SetMousePenetrable(tViewData.bPenetrable)
 	end
+end
 end
 
 MY_TargetMonView = class()

@@ -515,7 +515,6 @@ local function UpdateView()
 			view.szCaption            = config.caption
 			view.tAnchor              = config.anchor
 			view.bIgnoreSystemUIScale = config.ignoreSystemUIScale
-			view.szAnchorBase         = 'TOPLEFT'
 			view.fUIScale             = (config.ignoreSystemUIScale and 1 or Station.GetUIScale()) * config.scale
 			view.fFontScale           = (config.ignoreSystemUIScale and 1 or Station.GetUIScale()) * MY.GetFontScale() * config.scale * config.fontScale
 			view.bPenetrable          = config.penetrable
