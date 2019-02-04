@@ -105,6 +105,19 @@ function MY_AutoChat.DelData(szMap, szName, szKey)
 	MY_AutoChat.SaveData()
 end
 
+local HOOK_LIST = {
+	{ root = 'Normal/DialoguePanel', x = 53, y = 4 },
+	{ root = 'Lowest2/PlotDialoguePanel', path = 'WndScroll_Options', x = 340, y = 10 },
+}
+local function GetActiveDialoguePanel()
+	for _, p in ipairs(HOOK_LIST) do
+		local frame = Station.Lookup(p.root)
+		if frame and frame:IsVisible() then
+			return frame
+		end
+	end
+end
+
 local function WindowSelect(dwIndex, dwID)
 	MY.Debug({'WindowSelect ' .. dwIndex .. ',' .. dwID}, 'AUTO_CHAT', MY_DEBUG.LOG)
 	return GetClientPlayer().WindowSelect(dwIndex, dwID)
@@ -186,7 +199,7 @@ function MY_AutoChat.DoSomething()
 		MY.Sysmsg({_L['Auto interact disabled due to SHIFT key pressed.']})
 		return
 	end
-	local frame = Station.Lookup('Normal/DialoguePanel')
+	local frame = GetActiveDialoguePanel()
 	if frame and frame:IsVisible() then
 		if MY_AutoChat.Choose(frame.dwTargetType, frame.dwTargetId, frame.dwIndex, frame.aInfo)
 		and MY_AutoChat.bAutoClose then
@@ -282,11 +295,7 @@ local function GetDialoguePanelMenuItem(szMap, szName, dialogueInfo)
 	}
 end
 
-local function GetDialoguePanelMenu()
-	local frame = Station.Lookup('Normal/DialoguePanel')
-	if not frame then
-		return
-	end
+local function GetDialoguePanelMenu(frame)
 	local dwType, dwID, dwIdx = frame.dwTargetType, frame.dwTargetId, frame.dwIndex
 	local szName, szMap = MY_AutoChat.GetName(dwType, dwID)
 	if szName and szMap then
@@ -319,17 +328,23 @@ local function HookDialoguePanel()
 	if MY.IsShieldedVersion() then
 		return
 	end
-	local frame = Station.Lookup('Normal/DialoguePanel')
-	if frame and frame:IsVisible() and not frame.bMYHooked then
-		UI(frame):append('WndButton', {
-			name = 'WndButton_AutoChat',
-			x = 53, y = 4, w = 80, text = _L['autochat'],
-			tip = _L['Left click to config autochat.\nRight click to edit global config.'],
-			tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
-			lmenu = GetDialoguePanelMenu,
-			rmenu = GetSettingMenu,
-		})
-		frame.bMYHooked = true
+	for _, p in ipairs(HOOK_LIST) do
+		local frame = Station.Lookup(p.root)
+		if frame and frame:IsVisible() and not frame.bMYHooked then
+			local wnd = frame
+			if p.path then
+				wnd = frame:Lookup(p.path)
+			end
+			UI(wnd):append('WndButton', {
+				name = 'WndButton_AutoChat',
+				x = p.x, y = p.y, w = 80, text = _L['autochat'],
+				tip = _L['Left click to config autochat.\nRight click to edit global config.'],
+				tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
+				lmenu = function() return GetDialoguePanelMenu(frame) end,
+				rmenu = GetSettingMenu,
+			})
+			frame.bMYHooked = true
+		end
 	end
 end
 MY.RegisterInit('MY_AutoChat', HookDialoguePanel)
@@ -352,10 +367,18 @@ end
 MY.RegisterEvent('OPEN_WINDOW.MY_AutoChat', onOpenWindow)
 
 local function UnhookDialoguePanel()
-	local frame = Station.Lookup('Normal/DialoguePanel')
-	if frame and frame.bMYHooked then
-		UI(frame):children('#WndButton_AutoChat'):remove()
-		frame.bMYHooked = false
+	for _, p in ipairs(HOOK_LIST) do
+		local frame = Station.Lookup(p.root)
+		if frame and frame.bMYHooked then
+			local wnd = frame
+			if p.path then
+				wnd = frame:Lookup(p.path)
+			end
+			if wnd then
+				UI(wnd):children('#WndButton_AutoChat'):remove()
+			end
+			frame.bMYHooked = false
+		end
 	end
 end
 MY.RegisterReload('MY_AutoChat', UnhookDialoguePanel)
