@@ -568,6 +568,9 @@ local function onBreathe()
 	nRoundLeft = nRoundLimit
 	while nRoundLeft > 0 do
 		if dwType == TARGET.NPC then
+			if NPC_CACHE[dwID] == nil then
+				dwID = nil
+			end
 			dwID = next(NPC_CACHE, dwID)
 			if dwID then
 				KTar = NPC_CACHE[dwID]
@@ -575,6 +578,9 @@ local function onBreathe()
 				dwType, dwID = TARGET.PLAYER, nil
 			end
 		elseif dwType == TARGET.PLAYER then
+			if PLAYER_CACHE[dwID] == nil then
+				dwID = nil
+			end
 			dwID = next(PLAYER_CACHE, dwID)
 			if dwID then
 				KTar = PLAYER_CACHE[dwID]
