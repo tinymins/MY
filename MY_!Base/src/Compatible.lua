@@ -184,14 +184,18 @@ UI_OBJECT = SetmetaReadonly({
 })
 end
 
-if not GLOBAL_HEAD_CLIENTPLAYER then GLOBAL_HEAD_CLIENTPLAYER = 0 end
-if not GLOBAL_HEAD_OTHERPLAYER  then GLOBAL_HEAD_OTHERPLAYER  = 1 end
-if not GLOBAL_HEAD_NPC          then GLOBAL_HEAD_NPC          = 2 end
-if not GLOBAL_HEAD_LIFE         then GLOBAL_HEAD_LIFE         = 0 end
-if not GLOBAL_HEAD_GUILD        then GLOBAL_HEAD_GUILD        = 1 end
-if not GLOBAL_HEAD_TITLE        then GLOBAL_HEAD_TITLE        = 2 end
-if not GLOBAL_HEAD_NAME         then GLOBAL_HEAD_NAME         = 3 end
-if not GLOBAL_HEAD_MARK         then GLOBAL_HEAD_MARK         = 4 end
+if not GLOBAL_HEAD then
+GLOBAL_HEAD = {
+	CLIENTPLAYER = 0,
+	OTHERPLAYER  = 1,
+	NPC          = 2,
+	LIFE         = 0,
+	GUILD        = 1,
+	TITLE        = 2,
+	NAME         = 3,
+	MARK         = 4,
+}
+end
 
 if not EQUIPMENT_SUIT_COUNT then EQUIPMENT_SUIT_COUNT = 4  end
 if not PET_COUT_PER_PAGE    then PET_COUT_PER_PAGE    = 16 end
