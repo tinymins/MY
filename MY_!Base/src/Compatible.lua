@@ -26,9 +26,6 @@ local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
 ---------------------------------------------------------------------------------------------------
-MENU_DIVIDER = { bDevide = true }
-EMPTY_TABLE = SetmetaReadonly({})
-XML_LINE_BREAKER = GetFormatText('\n')
 
 if not GetCampImageFrame then
 	function GetCampImageFrame(eCamp, bFight)	-- ui\Image\UICommon\CommonPanel2.UITex
@@ -102,144 +99,6 @@ end
 -- 	return ipairs(t, ...)
 -- end
 -- end
-
-if not clone then
-function clone(var)
-	local szType = type(var)
-	if szType == 'nil'
-	or szType == 'boolean'
-	or szType == 'number'
-	or szType == 'string' then
-		return var
-	elseif szType == 'table' then
-		local t = {}
-		for key, val in pairs(var) do
-			key = clone(key)
-			val = clone(val)
-			t[key] = val
-		end
-		return t
-	elseif szType == 'function'
-	or szType == 'userdata' then
-		return nil
-	else
-		return nil
-	end
-end
-end
-
-if not empty then
-function empty(var)
-	local szType = type(var)
-	if szType == 'nil' then
-		return true
-	elseif szType == 'boolean' then
-		return var
-	elseif szType == 'number' then
-		return var == 0
-	elseif szType == 'string' then
-		return var == ''
-	elseif szType == 'function' then
-		return false
-	elseif szType == 'table' then
-		for _, _ in pairs(var) do
-			return false
-		end
-		return true
-	else
-		return false
-	end
-end
-end
-
-if not var2str then
-local function table_r(var, level, indent)
-	local t = {}
-	local szType = type(var)
-	if szType == 'nil' then
-		insert(t, 'nil')
-	elseif szType == 'number' then
-		insert(t, tostring(var))
-	elseif szType == 'string' then
-		insert(t, string.format('%q', var))
-	elseif szType == 'function' then
-		local s = string.dump(var)
-		insert(t, 'loadstring("')
-		-- 'string slice too long'
-		for i = 1, #s, 2000 do
-			insert(t, concat({'', byte(s, i, i + 2000 - 1)}, '\\'))
-		end
-		insert(t, '")')
-	elseif szType == 'boolean' then
-		insert(t, tostring(var))
-	elseif szType == 'table' then
-		insert(t, '{')
-		local s_tab_equ = '='
-		if indent then
-			s_tab_equ = ' = '
-			if not empty(var) then
-				insert(t, '\n')
-			end
-		end
-		local nohash = true
-		local key, val, lastkey, lastval, hasval
-		local tlist, thash = {}, {}
-		repeat
-			key, val = next(var, lastkey)
-			if key then
-				-- judge if this is a pure list table
-				if nohash and (
-					type(key) ~= 'number'
-					or (lastval == nil and key ~= 1) -- first loop and index is not 1 : hash table
-					or (lastkey and lastkey + 1 ~= key)
-				) then
-					nohash = false
-				end
-				-- process to insert to table
-				-- insert indent
-				if indent then
-					insert(t, rep(indent, level + 1))
-				end
-				-- insert key
-				if nohash then -- pure list: do not need a key
-				elseif type(key) == 'string' and key:find('^[a-zA-Z_][a-zA-Z0-9_]*$') then -- a = val
-					insert(t, key)
-					insert(t, s_tab_equ)
-				else -- [10010] = val -- ['.start with or contains special char'] = val
-					insert(t, '[')
-					insert(t, table_r(key, level + 1, indent))
-					insert(t, ']')
-					insert(t, s_tab_equ)
-				end
-				-- insert value
-				insert(t, table_r(val, level + 1, indent))
-				insert(t, ',')
-				if indent then
-					insert(t, '\n')
-				end
-				lastkey, lastval, hasval = key, val, true
-			end
-		until not key
-		-- remove last `,` if no indent
-		if not indent and hasval then
-			remove(t)
-		end
-		-- insert `}` with indent
-		if indent and not empty(var) then
-			insert(t, rep(indent, level))
-		end
-		insert(t, '}')
-	else --if (szType == 'userdata') then
-		insert(t, '"')
-		insert(t, tostring(var))
-		insert(t, '"')
-	end
-	return concat(t)
-end
-function var2str(var, indent, level)
-	return table_r(var, level or 0, indent)
-end
-end
 
 local _RoleName
 if not GetUserRoleName then
@@ -325,18 +184,18 @@ UI_OBJECT = SetmetaReadonly({
 })
 end
 
-GLOBAL_HEAD_CLIENTPLAYER = GLOBAL_HEAD_CLIENTPLAYER or 0
-GLOBAL_HEAD_OTHERPLAYER  = GLOBAL_HEAD_OTHERPLAYER  or 1
-GLOBAL_HEAD_NPC          = GLOBAL_HEAD_NPC          or 2
-GLOBAL_HEAD_LIFE         = GLOBAL_HEAD_LIFE         or 0
-GLOBAL_HEAD_GUILD        = GLOBAL_HEAD_GUILD        or 1
-GLOBAL_HEAD_TITLE        = GLOBAL_HEAD_TITLE        or 2
-GLOBAL_HEAD_NAME         = GLOBAL_HEAD_NAME         or 3
-GLOBAL_HEAD_MARK         = GLOBAL_HEAD_MARK         or 4
+if not GLOBAL_HEAD_CLIENTPLAYER then GLOBAL_HEAD_CLIENTPLAYER = 0 end
+if not GLOBAL_HEAD_OTHERPLAYER  then GLOBAL_HEAD_OTHERPLAYER  = 1 end
+if not GLOBAL_HEAD_NPC          then GLOBAL_HEAD_NPC          = 2 end
+if not GLOBAL_HEAD_LIFE         then GLOBAL_HEAD_LIFE         = 0 end
+if not GLOBAL_HEAD_GUILD        then GLOBAL_HEAD_GUILD        = 1 end
+if not GLOBAL_HEAD_TITLE        then GLOBAL_HEAD_TITLE        = 2 end
+if not GLOBAL_HEAD_NAME         then GLOBAL_HEAD_NAME         = 3 end
+if not GLOBAL_HEAD_MARK         then GLOBAL_HEAD_MARK         = 4 end
 
-EQUIPMENT_SUIT_COUNT = 4
-PET_COUT_PER_PAGE    = 16
-PET_MAX_COUNT        = 64
+if not EQUIPMENT_SUIT_COUNT then EQUIPMENT_SUIT_COUNT = 4  end
+if not PET_COUT_PER_PAGE    then PET_COUT_PER_PAGE    = 16 end
+if not PET_MAX_COUNT        then PET_MAX_COUNT        = 64 end
 
 if not EQUIPMENT_SUB then
 EQUIPMENT_SUB = {
@@ -451,20 +310,17 @@ WND_CONTAINER_STYLE = {
 }
 end
 
-INVENTORY_GUILD_BANK      = INVENTORY_GUILD_BANK or (INVENTORY_INDEX.TOTAL + 1) --帮会仓库界面虚拟一个背包位置
-INVENTORY_GUILD_PAGE_SIZE = INVENTORY_GUILD_PAGE_SIZE or 100
+if not INVENTORY_GUILD_BANK then
+INVENTORY_GUILD_BANK = INVENTORY_INDEX.TOTAL + 1 --帮会仓库界面虚拟一个背包位置
+end
+if not INVENTORY_GUILD_PAGE_SIZE then
+INVENTORY_GUILD_PAGE_SIZE = 100
+end
 if not GetGuildBankBagPos then
 function GetGuildBankBagPos(nPage, nIndex)
 	return INVENTORY_GUILD_BANK, nPage * INVENTORY_GUILD_PAGE_SIZE + nIndex
 end
 end
-
-MY_DEBUG = SetmetaReadonly({
-	LOG     = 0,
-	PMLOG   = 0,
-	WARNING = 1,
-	ERROR   = 2,
-})
 
 if not IsPhoneLock then
 function IsPhoneLock()
@@ -616,32 +472,6 @@ end
 RegisterEvent('GAME_EXIT', resumegsound)
 RegisterEvent('PLAYER_EXIT_GAME', resumegsound)
 RegisterEvent('RELOAD_UI_ADDON_BEGIN', resumegsound)
-end
-
--- 选代器 倒序
-if not ipairs_r then
-local function fnBpairs(tab, nIndex)
-	nIndex = nIndex - 1
-	if nIndex > 0 then
-		return nIndex, tab[nIndex]
-	end
-end
-
-function ipairs_r(tab)
-	return fnBpairs, tab, #tab + 1
-end
-end
-
-if not str2var then
-local szTempLog = 'interface/temp.log'
-local szTempJx3dat = 'interface/temp.jx3dat'
-function str2var(szText)
-	Log(szTempLog, szText, 'clear close')
-	CPath.Move(szTempLog, szTempJx3dat)
-	local data = LoadLUAData(szTempJx3dat)
-	CPath.DelFile(szTempJx3dat)
-	return data
-end
 end
 
 if not GVoiceBase_GetSaying then

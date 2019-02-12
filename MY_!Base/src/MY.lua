@@ -117,6 +117,147 @@ local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
 local GetClientPlayer, GetPlayer, GetNpc = GetClientPlayer, GetPlayer, GetNpc
 local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
 ---------------------------------------------------------------------------------------------
+local function clone(var)
+	local szType = type(var)
+	if szType == 'nil'
+	or szType == 'boolean'
+	or szType == 'number'
+	or szType == 'string' then
+		return var
+	elseif szType == 'table' then
+		local t = {}
+		for key, val in pairs(var) do
+			key = clone(key)
+			val = clone(val)
+			t[key] = val
+		end
+		return t
+	elseif szType == 'function'
+	or szType == 'userdata' then
+		return nil
+	else
+		return nil
+	end
+end
+local function empty(var)
+	local szType = type(var)
+	if szType == 'nil' then
+		return true
+	elseif szType == 'boolean' then
+		return var
+	elseif szType == 'number' then
+		return var == 0
+	elseif szType == 'string' then
+		return var == ''
+	elseif szType == 'function' then
+		return false
+	elseif szType == 'table' then
+		for _, _ in pairs(var) do
+			return false
+		end
+		return true
+	else
+		return false
+	end
+end
+local function table_r(var, level, indent)
+	local t = {}
+	local szType = type(var)
+	if szType == 'nil' then
+		insert(t, 'nil')
+	elseif szType == 'number' then
+		insert(t, tostring(var))
+	elseif szType == 'string' then
+		insert(t, string.format('%q', var))
+	elseif szType == 'function' then
+		local s = string.dump(var)
+		insert(t, 'loadstring("')
+		-- 'string slice too long'
+		for i = 1, #s, 2000 do
+			insert(t, concat({'', byte(s, i, i + 2000 - 1)}, '\\'))
+		end
+		insert(t, '")')
+	elseif szType == 'boolean' then
+		insert(t, tostring(var))
+	elseif szType == 'table' then
+		insert(t, '{')
+		local s_tab_equ = '='
+		if indent then
+			s_tab_equ = ' = '
+			if not empty(var) then
+				insert(t, '\n')
+			end
+		end
+		local nohash = true
+		local key, val, lastkey, lastval, hasval
+		local tlist, thash = {}, {}
+		repeat
+			key, val = next(var, lastkey)
+			if key then
+				-- judge if this is a pure list table
+				if nohash and (
+					type(key) ~= 'number'
+					or (lastval == nil and key ~= 1) -- first loop and index is not 1 : hash table
+					or (lastkey and lastkey + 1 ~= key)
+				) then
+					nohash = false
+				end
+				-- process to insert to table
+				-- insert indent
+				if indent then
+					insert(t, rep(indent, level + 1))
+				end
+				-- insert key
+				if nohash then -- pure list: do not need a key
+				elseif type(key) == 'string' and key:find('^[a-zA-Z_][a-zA-Z0-9_]*$') then -- a = val
+					insert(t, key)
+					insert(t, s_tab_equ)
+				else -- [10010] = val -- ['.start with or contains special char'] = val
+					insert(t, '[')
+					insert(t, table_r(key, level + 1, indent))
+					insert(t, ']')
+					insert(t, s_tab_equ)
+				end
+				-- insert value
+				insert(t, table_r(val, level + 1, indent))
+				insert(t, ',')
+				if indent then
+					insert(t, '\n')
+				end
+				lastkey, lastval, hasval = key, val, true
+			end
+		until not key
+		-- remove last `,` if no indent
+		if not indent and hasval then
+			remove(t)
+		end
+		-- insert `}` with indent
+		if indent and not empty(var) then
+			insert(t, rep(indent, level))
+		end
+		insert(t, '}')
+	else --if (szType == 'userdata') then
+		insert(t, '"')
+		insert(t, tostring(var))
+		insert(t, '"')
+	end
+	return concat(t)
+end
+local function var2str(var, indent, level)
+	return table_r(var, level or 0, indent)
+end
+local str2var = str2var
+if not str2var then
+local szTempLog = 'interface/temp.log'
+local szTempJx3dat = 'interface/temp.jx3dat'
+function str2var(szText)
+	Log(szTempLog, szText, 'clear close')
+	CPath.Move(szTempLog, szTempJx3dat)
+	local data = LoadLUAData(szTempJx3dat)
+	CPath.DelFile(szTempJx3dat)
+	return data
+end
+end
 local function Get(var, keys, dft)
 	local res = false
 	if type(keys) == 'string' then
@@ -329,6 +470,18 @@ local function ApplyPatch(oBase, oPatch, bNew)
 	-- other patch value
 	return oPatch
 end
+local ipairs_r
+do -- 选代器 倒序
+local function fnBpairs(tab, nIndex)
+	nIndex = nIndex - 1
+	if nIndex > 0 then
+		return nIndex, tab[nIndex]
+	end
+end
+function ipairs_r(tab)
+	return fnBpairs, tab, #tab + 1
+end
+end
 local spairs, sipairs, spairs_r, sipairs_r
 do -- 类型安全选代器
 local function SafeIter(a, i)
@@ -445,8 +598,16 @@ local function GetTraceback(str)
 	end
 	return str or ''
 end
+local MENU_DIVIDER = { bDevide = true }
+local EMPTY_TABLE = SetmetaReadonly({})
+local XML_LINE_BREAKER = GetFormatText('\n')
 ---------------------------------------------------------------------------------------------
 MY = {
+	clone        = clone       ,
+	empty        = empty       ,
+	var2str      = var2str     ,
+	str2var      = str2var     ,
+	ipairs_r     = ipairs_r    ,
 	spairs       = spairs      ,
 	spairs_r     = spairs_r    ,
 	sipairs      = sipairs     ,
@@ -469,7 +630,16 @@ MY = {
 	ApplyPatch   = ApplyPatch  ,
 	RandomChild  = RandomChild ,
 	GetTraceback = GetTraceback,
+	MENU_DIVIDER     = MENU_DIVIDER    ,
+	EMPTY_TABLE      = EMPTY_TABLE     ,
+	XML_LINE_BREAKER = XML_LINE_BREAKER,
 }
+MY_DEBUG = SetmetaReadonly({
+	LOG     = 0,
+	PMLOG   = 0,
+	WARNING = 1,
+	ERROR   = 2,
+})
 ---------------------------------------------------------------------------------------------
 -- 本地函数变量
 ---------------------------------------------------------------------------------------------
