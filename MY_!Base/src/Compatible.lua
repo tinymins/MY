@@ -197,10 +197,6 @@ GLOBAL_HEAD = {
 }
 end
 
-if not EQUIPMENT_SUIT_COUNT then EQUIPMENT_SUIT_COUNT = 4  end
-if not PET_COUT_PER_PAGE    then PET_COUT_PER_PAGE    = 16 end
-if not PET_MAX_COUNT        then PET_MAX_COUNT        = 64 end
-
 if not EQUIPMENT_SUB then
 EQUIPMENT_SUB = {
 	MELEE_WEAPON      = 0 , -- ½üÕ½ÎäÆ÷

@@ -35,6 +35,8 @@ local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumb
 local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = MY.MENU_DIVIDER, MY.EMPTY_TABLE, MY.XML_LINE_BREAKER
 --------------------------------------------------------------------------------------------------------
+local EQUIPMENT_SUIT_COUNT = MY.EQUIPMENT_SUIT_COUNT
+------------------------------------------------------------------------------
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_EquipView/lang/')
 if not MY.AssertVersion('MY_EquipView', _L['MY_EquipView'], 0x2011800) then
 	return
