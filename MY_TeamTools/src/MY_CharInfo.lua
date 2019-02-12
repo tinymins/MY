@@ -196,7 +196,7 @@ MY.RegisterBgMsg('CHAR_INFO', function(_, nChannel, dwID, szName, bIsSelf, ...)
 end)
 
 -- public API
-function ViewCharInfoToPlayer(dwID)
+function MY_CharInfo.ViewCharInfoToPlayer(dwID)
 	if MY.IsParty(dwID) then
 		local team = GetClientTeam()
 		local info = team.GetMemberInfo(dwID)

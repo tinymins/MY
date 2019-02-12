@@ -420,7 +420,9 @@ function MY_CataclysmParty_Base.OnItemLButtonClick()
 			)
 		elseif this.bRole and CFG.bAltView and (CFG.bAltViewInFight or not me.bFightState) then
 			if IsCtrlKeyDown() then
-				ViewCharInfoToPlayer(dwID)
+				if MY_CharInfo and MY_CharInfo.ViewCharInfoToPlayer then
+					MY_CharInfo.ViewCharInfoToPlayer(dwID)
+				end
 			else
 				ViewInviteToPlayer(dwID)
 			end
@@ -563,10 +565,10 @@ function MY_CataclysmParty_Base.OnItemRButtonClick()
 		table.insert(menu, { szOption = g_tStrings.STR_LOOKUP, bDisable = not info.bIsOnLine, fnAction = function()
 			ViewInviteToPlayer(dwID)
 		end })
-		if ViewCharInfoToPlayer then
+		if MY_CharInfo and MY_CharInfo.ViewCharInfoToPlayer then
 			table.insert(menu, {
 				szOption = g_tStrings.STR_LOOK .. g_tStrings.STR_EQUIP_ATTR, bDisable = not info.bIsOnLine, fnAction = function()
-					ViewCharInfoToPlayer(dwID)
+					MY_CharInfo.ViewCharInfoToPlayer(dwID)
 				end
 			})
 		end

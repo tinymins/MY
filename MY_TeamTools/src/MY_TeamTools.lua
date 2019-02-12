@@ -472,10 +472,10 @@ function RaidTools.OnItemRButtonClick()
 				break
 			end
 		end
-		if ViewCharInfoToPlayer then
+		if MY_CharInfo and MY_CharInfo.ViewCharInfoToPlayer then
 			menu[#menu + 1] = {
 				szOption = g_tStrings.STR_LOOK .. g_tStrings.STR_EQUIP_ATTR, fnAction = function()
-					ViewCharInfoToPlayer(dwID)
+					MY_CharInfo.ViewCharInfoToPlayer(dwID)
 				end
 			}
 		end
