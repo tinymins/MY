@@ -62,7 +62,7 @@ MY.RegisterBgMsg('MY_VERSION_CHECK', function(_, nChannel, dwTalkerID, szTalkerN
 	MY.SendBgMsg(szTalkerName, 'MY_VERSION_REPLY', MY.GetVersion())
 end)
 
--- 查看属性
+-- 进组查看属性
 MY.RegisterBgMsg('RL', function(_, nChannel, dwID, szName, bIsSelf, ...)
 	local data = {...}
 	if not bIsSelf then
@@ -73,6 +73,20 @@ MY.RegisterBgMsg('RL', function(_, nChannel, dwID, szName, bIsSelf, ...)
 				local bEx = MY.GetAddonInfo().tAuthor[me.dwID] == me.szName and 'Author' or 'Player'
 				MY.SendBgMsg(szName, 'RL', 'Feedback', me.dwID, UI_GetPlayerMountKungfuID(), nGongZhan, bEx)
 			end)
+		end
+	end
+end)
+
+-- 查看完整属性
+MY.RegisterBgMsg('CHAR_INFO', function(_, nChannel, dwID, szName, bIsSelf, ...)
+	local data = {...}
+	if not bIsSelf and data[2] == UI_GetClientPlayerID() then
+		if data[1] == 'ASK'  then
+			if not MY_CharInfo or MY_CharInfo.bEnable or data[3] == 'DEBUG' then
+				MY.SendBgMsg(MY.IsParty(dwID) and PLAYER_TALK_CHANNEL.RAID or szName, 'CHAR_INFO', 'ACCEPT', dwID, MY.GetCharInfo())
+			else
+				MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'CHAR_INFO', 'REFUSE', dwID)
+			end
 		end
 	end
 end)
