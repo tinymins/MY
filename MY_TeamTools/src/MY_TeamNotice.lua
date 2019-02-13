@@ -227,7 +227,6 @@ function TI.OpenFrame()
 			TI.CreateFrame()
 		else
 			MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'ASK')
-			MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'LR_TeamNotice', 'ASK')
 			MY.Sysmsg({_L['Asking..., If no response in longtime, team leader not enable plug-in.']})
 		end
 	end
@@ -262,10 +261,15 @@ MY.RegisterEvent('LOADING_END.TEAM_NOTICE', function()
 	end
 end)
 
-MY.RegisterBgMsg('LR_TeamNotice', function(_, nChannel, dwID, szName, bIsSelf, szCmd, szText)
+MY.RegisterEvent('ON_BG_CHANNEL_MSG.LR_TeamNotice', function()
 	if not MY_TeamNotice.bEnable then
 		return
 	end
+	local szMsgID, nChannel, dwID, szName, aMsg, bSelf = arg0, arg1, arg2, arg3, arg4, arg2 == UI_GetClientPlayerID()
+	if szMsgID ~= 'LR_TeamNotice' or bSelf then
+		return
+	end
+	local szCmd, szText = aMsg[1], aMsg[2]
 	if szCmd == 'SEND' then
 		TI.CreateFrame('', szText)
 	end
