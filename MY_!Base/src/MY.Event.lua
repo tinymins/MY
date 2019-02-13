@@ -425,7 +425,11 @@ function MY.CheckTutorial()
 end
 end
 
-do local BG_MSG_LIST = {}
+do
+local BG_MSG_ID_PREFIX = 'MY:'
+local BG_MSG_ID_SUFFIX = ':V1'
+do
+local BG_MSG_LIST = {}
 ------------------------------------
 --            背景通讯             --
 ------------------------------------
@@ -436,24 +440,57 @@ do local BG_MSG_LIST = {}
 -- arg3: 消息发布者名字
 -- arg4: 不定长参数数组数据
 ------------------------------------
+do
+local BG_MSG_PART = {}
 local function OnBgMsg()
-	local szMsgID, nChannel, dwID, szName, aParam, bSelf = arg0, arg1, arg2, arg3, arg4, arg2 == UI_GetClientPlayerID()
-	if szMsgID and BG_MSG_LIST[szMsgID] then
-		for szKey, fnAction in pairs(BG_MSG_LIST[szMsgID]) do
-			local status, err = pcall(fnAction, szMsgID, nChannel, dwID, szName, bSelf, unpack(aParam))
+	local szMsgSID, nChannel, dwID, szName, aMsg, bSelf = arg0, arg1, arg2, arg3, arg4, arg2 == UI_GetClientPlayerID()
+	if not szMsgSID or szMsgSID:sub(1, #BG_MSG_ID_PREFIX) ~= BG_MSG_ID_PREFIX or szMsgSID:sub(-#BG_MSG_ID_SUFFIX) ~= BG_MSG_ID_SUFFIX then
+		return
+	end
+	local szMsgID = szMsgSID:sub(#BG_MSG_ID_PREFIX + 1, -#BG_MSG_ID_SUFFIX - 1)
+	if not BG_MSG_LIST[szMsgID] then
+		return
+	end
+	-- pagination
+	local szMsgUUID, nSegCount, nSegIndex, szPart = aMsg[1].u, aMsg[1].c, aMsg[1].i, aMsg[2]
+	if not BG_MSG_PART[szMsgUUID] then
+		BG_MSG_PART[szMsgUUID] = {}
+	end
+	BG_MSG_PART[szMsgUUID][nSegIndex] = szPart
+	-- fire progress event
+	for szKey, p in pairs(BG_MSG_LIST[szMsgID]) do
+		if p.fnProgress then
+			local status, err = pcall(p.fnProgress, szMsgID, nChannel, dwID, szName, bSelf, nSegCount, #BG_MSG_PART[szMsgUUID], nSegIndex)
 			if not status then
-				MY.Debug({GetTraceback(err)}, 'BG_EVENT#' .. szMsgID .. '.' .. szKey, MY_DEBUG.ERROR)
+				MY.Debug({GetTraceback(err)}, 'BG_EVENT_PROGRESS#' .. szMsgID .. '.' .. szKey, MY_DEBUG.ERROR)
 			end
 		end
 	end
+	-- concat and decode data
+	if #BG_MSG_PART[szMsgUUID] == nSegCount then
+		local szParam = concat(BG_MSG_PART[szMsgUUID])
+		local aParam = str2var(szParam)
+		if aParam then
+			for szKey, p in pairs(BG_MSG_LIST[szMsgID]) do
+				local status, err = pcall(p.fnAction, szMsgID, nChannel, dwID, szName, bSelf, unpack(aParam))
+				if not status then
+					MY.Debug({GetTraceback(err)}, 'BG_EVENT#' .. szMsgID .. '.' .. szKey, MY_DEBUG.ERROR)
+				end
+			end
+		else
+			MY.Debug({GetTraceback('Cannot decode bgmsg')}, 'BG_EVENT#' .. szMsgID .. '.' .. szKey, MY_DEBUG.ERROR)
+		end
+		BG_MSG_PART[szMsgUUID] = nil
+	end
 end
 MY.RegisterEvent('ON_BG_CHANNEL_MSG', OnBgMsg)
+end
 
 -- MY.RegisterBgMsg('MY_CHECK_INSTALL', function(szMsgID, nChannel, dwTalkerID, szTalkerName, bSelf, oDatas...) MY.BgTalk(szTalkerName, 'MY_CHECK_INSTALL_REPLY', oData) end) -- 注册
 -- MY.RegisterBgMsg('MY_CHECK_INSTALL') -- 注销
 -- MY.RegisterBgMsg('MY_CHECK_INSTALL.RECEIVER_01', function(szMsgID, nChannel, dwTalkerID, szTalkerName, bSelf, oDatas...) MY.BgTalk(szTalkerName, 'MY_CHECK_INSTALL_REPLY', oData) end) -- 注册
 -- MY.RegisterBgMsg('MY_CHECK_INSTALL.RECEIVER_01') -- 注销
-function MY.RegisterBgMsg(szMsgID, fnAction)
+function MY.RegisterBgMsg(szMsgID, fnAction, fnProgress)
 	if type(szMsgID) == 'table' then
 		for _, szMsgID in ipairs(szMsgID) do
 			MY.RegisterBgMsg(szMsgID, fnAction)
@@ -470,21 +507,30 @@ function MY.RegisterBgMsg(szMsgID, fnAction)
 		if not BG_MSG_LIST[szMsgID] then
 			BG_MSG_LIST[szMsgID] = {}
 		end
-		if szKey then
-			BG_MSG_LIST[szMsgID][szKey] = fnAction
-		else
-			table.insert(BG_MSG_LIST[szMsgID], fnAction)
+		if not szKey then
+			szKey = GetTickCount()
+			while BG_MSG_LIST[szMsgID][tostring(szKey)] do
+				szKey = szKey + 0.1
+			end
+			szKey = tostring(szKey)
 		end
-	else
+		BG_MSG_LIST[szMsgID][szKey] = { fnAction = fnAction, fnProgress = fnProgress }
+	elseif BG_MSG_LIST[szMsgID] then
 		if szKey then
 			BG_MSG_LIST[szMsgID][szKey] = nil
 		else
 			BG_MSG_LIST[szMsgID] = nil
 		end
 	end
+	return szKey
 end
 end
 
+do
+local MAX_CHANNEL_LEN = setmetatable({
+	[PLAYER_TALK_CHANNEL.RAID] = 500,
+	[PLAYER_TALK_CHANNEL.BATTLE_FIELD] = 500,
+}, { __index = function() return 300 end })
 -- MY.BgTalk(szName, szMsgID, ...)
 -- MY.BgTalk(nChannel, szMsgID, ...)
 function MY.BgTalk(nChannel, szMsgID, ...)
@@ -502,12 +548,22 @@ function MY.BgTalk(nChannel, szMsgID, ...)
 	and me.GetScene().nType == MAP_TYPE.BATTLE_FIELD then
 		nChannel = PLAYER_TALK_CHANNEL.BATTLE_FIELD
 	end
-	-- talk
-	local tSay = {{ type = 'eventlink', name = 'BG_CHANNEL_MSG', linkinfo = szMsgID }}
-	local tArg = {...}
-	local nCount = select('#', ...) -- 这里有个坑 如果直接ipairs({...})可能会掉进坑： for遇到nil就中断了导致后续参数丢失
-	for i = 1, nCount do
-		table.insert(tSay, { type = 'eventlink', name = '', linkinfo = var2str(tArg[i]) })
+	-- encode and pagination
+	local szMsgSID = BG_MSG_ID_PREFIX .. szMsgID .. BG_MSG_ID_SUFFIX
+	local szMsgUUID = MY.GetUUID():gsub('-', '')
+	local szArg = var2str({...})
+	local nMsgLen = wlen(szArg)
+	local nSegLen = MAX_CHANNEL_LEN[nChannel]
+	local nSegCount = ceil(nMsgLen / nSegLen)
+	-- send msg
+	for nSegIndex = 1, nSegCount do
+		local aSay = {
+			{ type = 'eventlink', name = 'BG_CHANNEL_MSG', linkinfo = szMsgSID },
+			{ type = 'eventlink', name = '', linkinfo = var2str({ u = szMsgUUID, c = nSegCount, i = nSegIndex }) },
+			{ type = 'eventlink', name = '', linkinfo = var2str(wsub(szArg, (nSegIndex - 1) * nSegLen + 1, nSegIndex * nSegLen)) },
+		}
+		me.Talk(nChannel, szTarget, aSay)
 	end
-	me.Talk(nChannel, szTarget, tSay)
+end
+end
 end
