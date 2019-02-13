@@ -107,6 +107,26 @@ function MY.EncryptString(szText)
 	return szText:gsub('.', function (c) return format ('%02X', (byte(c) + 13) % 256) end):gsub(' ', '+')
 end
 
+function MY.SimpleEncryptString(szText)
+	local a = {szText:byte(1, #szText)}
+	for i, v in ipairs(a) do
+		a[i] = char((v + 13) % 256)
+	end
+	return (MY.Base64Encode(concat(a)):gsub('/', '-'):gsub('+', '_'):gsub('=', '.'))
+end
+
+function MY.SimpleDecryptString(szCipher)
+	local szBin = MY.Base64Decode((szCipher:gsub('-', '/'):gsub('_', '+'):gsub('%.', '=')))
+	if not szBin then
+		return
+	end
+	local a = {szBin:byte(1, #szBin)}
+	for i, v in ipairs(a) do
+		a[i] = char((v - 13 + 256) % 256)
+	end
+	return concat(a)
+end
+
 local function EncodePostData(data, t, prefix)
 	if type(data) == 'table' then
 		local first = true

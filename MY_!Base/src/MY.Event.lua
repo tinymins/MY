@@ -469,7 +469,8 @@ local function OnBgMsg()
 	-- concat and decode data
 	if #BG_MSG_PART[szMsgUUID] == nSegCount then
 		local szParam = concat(BG_MSG_PART[szMsgUUID])
-		local aParam = str2var(szParam)
+		local szPlain = szParam and MY.SimpleDecryptString(szParam)
+		local aParam = szPlain and str2var(szPlain)
 		if aParam then
 			for szKey, p in pairs(BG_MSG_LIST[szMsgID]) do
 				local status, err = pcall(p.fnAction, szMsgID, nChannel, dwID, szName, bSelf, unpack(aParam))
@@ -478,7 +479,7 @@ local function OnBgMsg()
 				end
 			end
 		else
-			MY.Debug({GetTraceback('Cannot decode bgmsg')}, 'BG_EVENT#' .. szMsgID .. '.' .. szKey, MY_DEBUG.ERROR)
+			MY.Debug({GetTraceback('Cannot decode bgmsg')}, 'BG_EVENT#' .. szMsgID, MY_DEBUG.ERROR)
 		end
 		BG_MSG_PART[szMsgUUID] = nil
 	end
@@ -551,7 +552,7 @@ function MY.SendBgMsg(nChannel, szMsgID, ...)
 	-- encode and pagination
 	local szMsgSID = BG_MSG_ID_PREFIX .. szMsgID .. BG_MSG_ID_SUFFIX
 	local szMsgUUID = MY.GetUUID():gsub('-', '')
-	local szArg = var2str({...})
+	local szArg = MY.SimpleEncryptString(var2str({...}))
 	local nMsgLen = wlen(szArg)
 	local nSegLen = MAX_CHANNEL_LEN[nChannel]
 	local nSegCount = ceil(nMsgLen / nSegLen)
