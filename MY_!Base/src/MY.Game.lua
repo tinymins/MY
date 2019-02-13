@@ -2839,3 +2839,33 @@ function MY.GetGlobalEffect(nID)
 	return tLine
 end
 end
+
+function MY.GetCharInfo()
+	local me = GetClientPlayer()
+	local kungfu = GetClientPlayer().GetKungfuMount()
+	local data = {
+		dwID = me.dwID,
+		szName = me.szName,
+		dwForceID = me.dwForceID,
+		nEquipScore = me.GetTotalEquipScore() or 0,
+		dwMountKungfuID = kungfu and kungfu.dwSkillID or 0,
+	}
+	local frame = Station.Lookup('Normal/CharInfo')
+	if not frame or not frame:IsVisible() then
+		if frame then
+			Wnd.CloseWindow('CharInfo') -- Ç¿ÖÆkill
+		end
+		Wnd.OpenWindow('CharInfo'):Hide()
+	end
+	local hCharInfo = Station.Lookup('Normal/CharInfo')
+	local handle = hCharInfo:Lookup('WndScroll_Property', '')
+	for i = 0, handle:GetVisibleItemCount() -1 do
+		local h = handle:Lookup(i)
+		table.insert(data, {
+			szTip = h.szTip,
+			label = h:Lookup(0):GetText(),
+			value = h:Lookup(1):GetText(),
+		})
+	end
+	return data
+end
