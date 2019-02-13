@@ -1365,23 +1365,75 @@ local function menuSorter(m1, m2)
 	return #m1 < #m2
 end
 
-local function GetMainMenu()
-	return {
-		szOption = _L['mingyi plugins'],
-		fnAction = MY.TogglePanel,
-		rgb = MY.GetAddonInfo().tMenuColor,
-		bCheck = true,
-		bChecked = MY.IsPanelVisible(),
+local function RegisterMenu(aList, tKey, arg0, arg1)
+	local szKey, oMenu
+	if IsString(arg0) then
+		szKey = arg0
+		if IsTable(arg1) or IsFunction(arg1) then
+			oMenu = arg1
+		end
+	elseif IsTable(arg0) or IsFunction(arg0) then
+		oMenu = arg0
+	end
+	if szKey then
+		for i, v in ipairs_r(aList) do
+			if v.szKey == szKey then
+				remove(aList, i)
+			end
+		end
+		tKey[szKey] = nil
+	end
+	if oMenu then
+		if not szKey then
+			szKey = GetTickCount()
+			while tKey[tostring(szKey)] do
+				szKey = szKey + 0.1
+			end
+			szKey = tostring(szKey)
+		end
+		tKey[szKey] = true
+		insert(aList, { szKey = szKey, oMenu = oMenu })
+	end
+	return szKey
+end
 
-		szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
-		nFrame = 105, nMouseOverFrame = 106,
-		szLayer = 'ICON_RIGHT',
-		fnClickIcon = MY.TogglePanel,
-	}
+local function GenerateMenu(aList, bMainMenu)
+	local menu = {}
+	if bMainMenu then
+		menu = {
+			szOption = _L['mingyi plugins'],
+			fnAction = MY.TogglePanel,
+			rgb = MY.GetAddonInfo().tMenuColor,
+			bCheck = true,
+			bChecked = MY.IsPanelVisible(),
+
+			szIcon = 'ui/Image/UICommon/CommonPanel2.UITex',
+			nFrame = 105, nMouseOverFrame = 106,
+			szLayer = 'ICON_RIGHT',
+			fnClickIcon = MY.TogglePanel,
+		}
+	end
+	for _, p in ipairs(aList) do
+		local m = p.oMenu
+		if IsFunction(m) then
+			m = m()
+		end
+		if not m or m.szOption then
+			m = {m}
+		end
+		for _, v in ipairs(m) do
+			if not v.rgb and not bMainMenu then
+				v.rgb = MY.GetAddonInfo().tMenuColor
+			end
+			insert(menu, v)
+		end
+	end
+	sort(menu, menuSorter)
+	return bMainMenu and {menu} or menu
 end
 
 do
-local PLAYER_MENU = {} -- 玩家头像菜单
+local PLAYER_MENU, PLAYER_MENU_HASH = {}, {} -- 玩家头像菜单
 -- 注册玩家头像菜单
 -- 注册
 -- (void) MY.RegisterPlayerAddonMenu(Menu)
@@ -1390,50 +1442,16 @@ local PLAYER_MENU = {} -- 玩家头像菜单
 -- 注销
 -- (void) MY.RegisterPlayerAddonMenu(szName, false)
 function MY.RegisterPlayerAddonMenu(arg0, arg1)
-	local szKey, oMenu
-	if IsString(arg0) then
-		szKey = arg0
-		if IsTable(arg1) or IsFunction(arg1) then
-			oMenu = arg1
-		end
-	elseif IsTable(arg0) or IsFunction(arg0) then
-		oMenu = arg0
-	end
-	if szKey then
-		PLAYER_MENU[szKey] = nil
-	end
-	if oMenu then
-		if not szKey then
-			szKey = GetTickCount()
-			while PLAYER_MENU[tostring(szKey)] do
-				szKey = szKey + 0.1
-			end
-			szKey = tostring(szKey)
-		end
-		PLAYER_MENU[szKey] = oMenu
-	end
+	return RegisterMenu(PLAYER_MENU, PLAYER_MENU_HASH, arg0, arg1)
 end
 local function GetPlayerAddonMenu()
-	local menu = GetMainMenu()
-	for _, m in pairs(PLAYER_MENU) do
-		if IsFunction(m) then
-			m = m()
-		end
-		if not m or m.szOption then
-			m = {m}
-		end
-		for _, v in ipairs(m) do
-			insert(menu, v)
-		end
-	end
-	sort(menu, menuSorter)
-	return {menu}
+	return GenerateMenu(PLAYER_MENU, true)
 end
 Player_AppendAddonMenu({GetPlayerAddonMenu})
 end
 
 do
-local TRACE_MENU = {} -- 工具栏菜单
+local TRACE_MENU, TRACE_MENU_HASH = {}, {} -- 工具栏菜单
 -- 注册工具栏菜单
 -- 注册
 -- (void) MY.RegisterTraceButtonAddonMenu(Menu)
@@ -1442,50 +1460,16 @@ local TRACE_MENU = {} -- 工具栏菜单
 -- 注销
 -- (void) MY.RegisterTraceButtonAddonMenu(szName, false)
 function MY.RegisterTraceButtonAddonMenu(arg0, arg1)
-	local szKey, oMenu
-	if IsString(arg0) then
-		szKey = arg0
-		if IsTable(arg1) or IsFunction(arg1) then
-			oMenu = arg1
-		end
-	elseif IsTable(arg0) or IsFunction(arg0) then
-		oMenu = arg0
-	end
-	if szKey then
-		TRACE_MENU[szKey] = nil
-	end
-	if oMenu then
-		if not szKey then
-			szKey = GetTickCount()
-			while TRACE_MENU[tostring(szKey)] do
-				szKey = szKey + 0.1
-			end
-			szKey = tostring(szKey)
-		end
-		TRACE_MENU[szKey] = oMenu
-	end
+	return RegisterMenu(TRACE_MENU, TRACE_MENU_HASH, arg0, arg1)
 end
 local function GetTraceButtonAddonMenu()
-	local menu = GetMainMenu()
-	for _, m in pairs(TRACE_MENU) do
-		if IsFunction(m) then
-			m = m()
-		end
-		if not m or m.szOption then
-			m = {m}
-		end
-		for _, v in ipairs(m) do
-			insert(menu, v)
-		end
-	end
-	sort(menu, menuSorter)
-	return {menu}
+	return GenerateMenu(TRACE_MENU, true)
 end
 TraceButton_AppendAddonMenu({GetTraceButtonAddonMenu})
 end
 
 do
-local TARGET_MENU = {} -- 目标头像菜单
+local TARGET_MENU, TARGET_MENU_HASH = {}, {} -- 目标头像菜单
 -- 注册目标头像菜单
 -- 注册
 -- (void) MY.RegisterTargetAddonMenu(Menu)
@@ -1494,47 +1478,10 @@ local TARGET_MENU = {} -- 目标头像菜单
 -- 注销
 -- (void) MY.RegisterTargetAddonMenu(szName, false)
 function MY.RegisterTargetAddonMenu(arg0, arg1)
-	local szKey, oMenu
-	if IsString(arg0) then
-		szKey = arg0
-		if IsTable(arg1) or IsFunction(arg1) then
-			oMenu = arg1
-		end
-	elseif IsTable(arg0) or IsFunction(arg0) then
-		oMenu = arg0
-	end
-	if szKey then
-		TARGET_MENU[szKey] = nil
-	end
-	if oMenu then
-		if not szKey then
-			szKey = GetTickCount()
-			while TARGET_MENU[tostring(szKey)] do
-				szKey = szKey + 0.1
-			end
-			szKey = tostring(szKey)
-		end
-		TARGET_MENU[szKey] = oMenu
-	end
+	return RegisterMenu(TARGET_MENU, TARGET_MENU_HASH, arg0, arg1)
 end
 local function GetTargetAddonMenu()
-	local menu = {}
-	for _, m in pairs(TARGET_MENU) do
-		if IsFunction(m) then
-			m = m()
-		end
-		if not m or m.szOption then
-			m = {m}
-		end
-		for _, v in ipairs(m) do
-			if not v.rgb then
-				v.rgb = MY.GetAddonInfo().tMenuColor
-			end
-			insert(menu, v)
-		end
-	end
-	sort(menu, menuSorter)
-	return menu
+	return GenerateMenu(TARGET_MENU, false)
 end
 Target_AppendAddonMenu({GetTargetAddonMenu})
 end
