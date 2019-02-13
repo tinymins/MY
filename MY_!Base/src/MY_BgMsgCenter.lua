@@ -45,7 +45,7 @@ MY.RegisterBgMsg('ASK_CURRENT_LOC', function(_, nChannel, dwTalkerID, szTalkerNa
 		szMessage = _L('[%s] wants to get your location, would you like to share?', szTalkerName), {
 			szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function()
 				local me = GetClientPlayer()
-				MY.BgTalk(szTalkerName, 'REPLY_CURRENT_LOC', { me.GetMapID(), me.nX, me.nY, me.nZ })
+				MY.SendBgMsg(szTalkerName, 'REPLY_CURRENT_LOC', { me.GetMapID(), me.nX, me.nY, me.nZ })
 			end
 		}, { szOption = g_tStrings.STR_HOTKEY_CANCEL },
 	})
@@ -59,7 +59,7 @@ MY.RegisterBgMsg('MY_VERSION_CHECK', function(_, nChannel, dwTalkerID, szTalkerN
 	if not bSilent and MY.IsInParty() then
 		MY.Talk(PLAYER_TALK_CHANNEL.RAID, _L('I\'ve installed MY plugins v%s', MY.GetVersion()))
 	end
-	MY.BgTalk(szTalkerName, 'MY_VERSION_REPLY', MY.GetVersion())
+	MY.SendBgMsg(szTalkerName, 'MY_VERSION_REPLY', MY.GetVersion())
 end)
 
 -- ≤Èø¥ Ù–‘
@@ -71,7 +71,7 @@ MY.RegisterBgMsg('RL', function(_, nChannel, dwID, szName, bIsSelf, ...)
 				local me = GetClientPlayer()
 				local nGongZhan = MY.GetBuff(3219) and 1 or 0
 				local bEx = MY.GetAddonInfo().tAuthor[me.dwID] == me.szName and 'Author' or 'Player'
-				MY.BgTalk(szName, 'RL', 'Feedback', me.dwID, UI_GetPlayerMountKungfuID(), nGongZhan, bEx)
+				MY.SendBgMsg(szName, 'RL', 'Feedback', me.dwID, UI_GetPlayerMountKungfuID(), nGongZhan, bEx)
 			end)
 		end
 	end
@@ -86,7 +86,7 @@ MY.RegisterBgMsg('MY_ABOUT', function(_, nChannel, dwID, szName, bIsSelf, ...)
 			szTong = GetTongClient().ApplyGetTongName(me.dwTongID) or 'Failed'
 		end
 		local szServer = select(2, GetUserServer())
-		MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', 'info',
+		MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_ABOUT', 'info',
 			me.GetTotalEquipScore(),
 			me.GetMapID(),
 			szTong,
@@ -128,7 +128,7 @@ MY.RegisterBgMsg('MY_MAP_COPY_ID_REQUEST', function(_, nChannel, dwID, szName, b
 		end
 	end
 	local function fnAction(tMapID)
-		MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID', dwMapID, tMapID[dwMapID] or -1)
+		MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_MAP_COPY_ID', dwMapID, tMapID[dwMapID] or -1)
 	end
 	MY.GetMapSaveCopy(fnAction)
 	LAST_TIME[dwMapID] = GetCurrentTime()
@@ -142,7 +142,7 @@ local function OnSwitchMap(dwMapID, dwID, dwCopyID)
 		return
 	end
 	MY.Debug({'Switch dungeon :' .. dwMapID}, 'MYLIB', MY_DEBUG.LOG)
-	MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_SWITCH_MAP', dwMapID, dwID, dwCopyID)
+	MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_SWITCH_MAP', dwMapID, dwID, dwCopyID)
 end
 
 local function OnCrossMapGoFB()

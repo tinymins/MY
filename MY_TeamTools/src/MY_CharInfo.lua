@@ -175,13 +175,13 @@ MY.RegisterBgMsg('CHAR_INFO', function(_, nChannel, dwID, szName, bIsSelf, ...)
 				local szJson = MY.JsonEncode(CharInfo.GetInfo())
 				local nMax = 500
 				local nTotal = math.ceil(#szJson / nMax)
-				MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'CHAR_INFO', 'START', dwID)
+				MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'CHAR_INFO', 'START', dwID)
 				for i = 1, nTotal do
-					MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'CHAR_INFO', 'CONTENT', dwID, string.sub(szJson, (i-1) * nMax + 1, i * nMax))
+					MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'CHAR_INFO', 'CONTENT', dwID, string.sub(szJson, (i-1) * nMax + 1, i * nMax))
 				end
-				MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'CHAR_INFO', 'STOP', dwID)
+				MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'CHAR_INFO', 'STOP', dwID)
 			else
-				MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'CHAR_INFO', 'REFUSE', dwID)
+				MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'CHAR_INFO', 'REFUSE', dwID)
 			end
 		elseif data[1] == 'REFUSE' then
 			CharInfo.RefuseFrame(dwID)
@@ -201,7 +201,7 @@ function MY_CharInfo.ViewCharInfoToPlayer(dwID)
 		local team = GetClientTeam()
 		local info = team.GetMemberInfo(dwID)
 		if info then
-			MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'CHAR_INFO', 'ASK', dwID, MY_CharInfo.bDebug and 'DEBUG')
+			MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'CHAR_INFO', 'ASK', dwID, MY_CharInfo.bDebug and 'DEBUG')
 			CharInfo.CreateFrame(dwID, info.szName, info)
 		end
 	else

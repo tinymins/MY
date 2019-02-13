@@ -486,9 +486,9 @@ end
 MY.RegisterEvent('ON_BG_CHANNEL_MSG', OnBgMsg)
 end
 
--- MY.RegisterBgMsg('MY_CHECK_INSTALL', function(szMsgID, nChannel, dwTalkerID, szTalkerName, bSelf, oDatas...) MY.BgTalk(szTalkerName, 'MY_CHECK_INSTALL_REPLY', oData) end) -- ×¢²á
+-- MY.RegisterBgMsg('MY_CHECK_INSTALL', function(szMsgID, nChannel, dwTalkerID, szTalkerName, bSelf, oDatas...) MY.SendBgMsg(szTalkerName, 'MY_CHECK_INSTALL_REPLY', oData) end) -- ×¢²á
 -- MY.RegisterBgMsg('MY_CHECK_INSTALL') -- ×¢Ïú
--- MY.RegisterBgMsg('MY_CHECK_INSTALL.RECEIVER_01', function(szMsgID, nChannel, dwTalkerID, szTalkerName, bSelf, oDatas...) MY.BgTalk(szTalkerName, 'MY_CHECK_INSTALL_REPLY', oData) end) -- ×¢²á
+-- MY.RegisterBgMsg('MY_CHECK_INSTALL.RECEIVER_01', function(szMsgID, nChannel, dwTalkerID, szTalkerName, bSelf, oDatas...) MY.SendBgMsg(szTalkerName, 'MY_CHECK_INSTALL_REPLY', oData) end) -- ×¢²á
 -- MY.RegisterBgMsg('MY_CHECK_INSTALL.RECEIVER_01') -- ×¢Ïú
 function MY.RegisterBgMsg(szMsgID, fnAction, fnProgress)
 	if type(szMsgID) == 'table' then
@@ -531,9 +531,9 @@ local MAX_CHANNEL_LEN = setmetatable({
 	[PLAYER_TALK_CHANNEL.RAID] = 500,
 	[PLAYER_TALK_CHANNEL.BATTLE_FIELD] = 500,
 }, { __index = function() return 300 end })
--- MY.BgTalk(szName, szMsgID, ...)
--- MY.BgTalk(nChannel, szMsgID, ...)
-function MY.BgTalk(nChannel, szMsgID, ...)
+-- MY.SendBgMsg(szName, szMsgID, ...)
+-- MY.SendBgMsg(nChannel, szMsgID, ...)
+function MY.SendBgMsg(nChannel, szMsgID, ...)
 	local szTarget, me = '', GetClientPlayer()
 	if not (me and nChannel) then
 		return

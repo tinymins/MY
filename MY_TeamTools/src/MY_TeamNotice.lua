@@ -99,7 +99,7 @@ function TI.CreateFrame(a, b)
 				end
 				if MY.IsLeader() then
 					TI.szYY = szText
-					MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'TI', 'Edit', szText, ui:children('#Message'):text())
+					MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'Edit', szText, ui:children('#Message'):text())
 				else
 					ui:children('#YY'):text(TI.szYY, WNDEVENT_FIRETYPE.PREVENT)
 				end
@@ -162,7 +162,7 @@ function TI.CreateFrame(a, b)
 				end
 				if MY.IsLeader() then
 					TI.szNote = szText
-					MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'TI', 'Edit', ui:children('#YY'):text(), szText)
+					MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'Edit', ui:children('#YY'):text(), szText)
 				else
 					ui:children('#Message'):text(TI.szNote, WNDEVENT_FIRETYPE.PREVENT)
 				end
@@ -200,7 +200,7 @@ function TI.CreateFrame(a, b)
 				end
 			elseif szEvent == 'PARTY_ADD_MEMBER' then
 				if MY.IsLeader() then
-					MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'TI', 'reply', arg1, TI.szYY, TI.szNote)
+					MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'reply', arg1, TI.szYY, TI.szNote)
 				end
 			elseif szEvent == 'UI_SCALED' then
 				ui:anchor(MY_TeamNotice.anchor)
@@ -226,8 +226,8 @@ function TI.OpenFrame()
 		if MY.IsLeader() then
 			TI.CreateFrame()
 		else
-			MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'TI', 'ASK')
-			MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'LR_TeamNotice', 'ASK')
+			MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'ASK')
+			MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'LR_TeamNotice', 'ASK')
 			MY.Sysmsg({_L['Asking..., If no response in longtime, team leader not enable plug-in.']})
 		end
 	end
@@ -251,7 +251,7 @@ MY.RegisterEvent('FIRST_LOADING_END.TEAM_NOTICE', function()
 	-- 不存在队长不队长的问题了
 	local me = GetClientPlayer()
 	if me.IsInRaid() then
-		MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'TI', 'ASK')
+		MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'ASK')
 	end
 end)
 MY.RegisterEvent('LOADING_END.TEAM_NOTICE', function()
@@ -282,7 +282,7 @@ MY.RegisterBgMsg('TI', function(_, nChannel, dwID, szName, bIsSelf, ...)
 		if team then
 			if data[1] == 'ASK' and MY.IsLeader() then
 				if TI.GetFrame() then
-					MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'TI', 'reply', szName, TI.szYY, TI.szNote)
+					MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'TI', 'reply', szName, TI.szYY, TI.szNote)
 				end
 			elseif data[1] == 'Edit' then
 				TI.CreateFrame(data[2], data[3])

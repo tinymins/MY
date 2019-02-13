@@ -114,7 +114,7 @@ function MY_PartyRequest.OnLButtonClick()
 	elseif name == 'Btn_Lookup' then
 		local info = this:GetParent().info
 		if not info.dwID or (not info.bDetail and IsCtrlKeyDown()) then
-			MY.BgTalk(info.szName, 'RL', 'ASK')
+			MY.SendBgMsg(info.szName, 'RL', 'ASK')
 			this:Enable(false)
 			this:Lookup('', 'Text_Lookup'):SetText(_L['loading...'])
 			MY.Sysmsg({_L['If it is always loading, the target may not install plugin or refuse.']})

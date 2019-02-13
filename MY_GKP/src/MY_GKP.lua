@@ -829,7 +829,7 @@ function _GKP.DrawRecord(key, sort)
 				end
 				local tab = MY_GKP('GKP_Record', 'del', k)
 				if MY.IsDistributer() then
-					MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'del', tab)
+					MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'del', tab)
 				end
 			end
 			-- tip
@@ -910,7 +910,7 @@ function _GKP.OnSyncFromMenu()
 		local menu = MY_GKP.GetTeamMemberMenu(function(v)
 			MY.Confirm(_L('Wheater replace the current record with the synchronization [%s]\'s record?\n Please notice, this means you are going to lose the information of current record.', v.szName), function()
 				MY.Alert(_L('Asking for the sychoronization information...\n If no response in longtime, it may because [%s] is not using MY_GKP plugin or not responding.', v.szName))
-				MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_Sync', v.szName) -- 请求同步信息
+				MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_Sync', v.szName) -- 请求同步信息
 			end)
 		end, true)
 		table.insert(menu, 1, { bDevide = true })
@@ -957,11 +957,11 @@ function _GKP.SyncSend(dwID)
 	local nMax = 500
 	local nTotle = math.ceil(#str / nMax)
 	-- 密聊频道限制了字数 发起来太慢了
-	MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_Sync_Start', dwID, nTotle)
+	MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_Sync_Start', dwID, nTotle)
 	for i = 1, nTotle do
-		MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_Sync_Content', dwID, string.sub(str ,(i-1) * nMax + 1, i * nMax))
+		MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_Sync_Content', dwID, string.sub(str ,(i-1) * nMax + 1, i * nMax))
 	end
-	MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_Sync_Stop', dwID)
+	MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_Sync_Stop', dwID)
 end
 
 local SYNC_LENG = 0
@@ -1409,14 +1409,14 @@ function _GKP.OweList()
 
 	table.sort(tMember2, function(a,b) return a.nGold < b.nGold end)
 	MY.Talk(PLAYER_TALK_CHANNEL.RAID, _L['Information on Debt'])
-	MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'Start', 'Information on Debt')
+	MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'Start', 'Information on Debt')
 	for k,v in pairs(tMember2) do
 		if v.nGold < 0 then
 			MY.Talk(PLAYER_TALK_CHANNEL.RAID, { _GKP.GetFormatLink(v.szName, true), _GKP.GetFormatLink(g_tStrings.STR_TALK_HEAD_SAY1 .. v.nGold .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP) })
-			MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'Info', v.szName, v.nGold, '-')
+			MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'Info', v.szName, v.nGold, '-')
 		else
 			MY.Talk(PLAYER_TALK_CHANNEL.RAID, { _GKP.GetFormatLink(v.szName, true), _GKP.GetFormatLink(g_tStrings.STR_TALK_HEAD_SAY1 .. '+' .. v.nGold .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP) })
-			MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'Info', v.szName, v.nGold, '+')
+			MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'Info', v.szName, v.nGold, '+')
 		end
 	end
 	local nGold, nGold2 = 0, 0
@@ -1437,7 +1437,7 @@ function _GKP.OweList()
 	if nGold2 ~= 0 then
 		MY.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Spending: %d Gold.', nGold2 * -1))
 	end
-	MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'End', _L('Received: %d Gold.', nGold))
+	MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'End', _L('Received: %d Gold.', nGold))
 end
 ---------------------------------------------------------------------->
 -- 获取工资总额
@@ -1510,7 +1510,7 @@ function _GKP.SpendingList()
 	local nTime = tTime[#tTime].nTime - tTime[1].nTime -- 所花费的时间
 
 	MY.Talk(PLAYER_TALK_CHANNEL.RAID, _L['--- Consumption ---'])
-	MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'Start', '--- Consumption ---')
+	MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'Start', '--- Consumption ---')
 	local sort = {}
 	for k,v in pairs(tMember) do
 		table.insert(sort,{ szName = k, nGold = v })
@@ -1521,10 +1521,10 @@ function _GKP.SpendingList()
 		if v.nGold > 0 then
 			MY.Talk(PLAYER_TALK_CHANNEL.RAID, { _GKP.GetFormatLink(v.szName, true), _GKP.GetFormatLink(g_tStrings.STR_TALK_HEAD_SAY1 .. v.nGold .. g_tStrings.STR_GOLD .. g_tStrings.STR_FULL_STOP) })
 		end
-		MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'Info', v.szName, v.nGold)
+		MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'Info', v.szName, v.nGold)
 	end
 	MY.Talk(PLAYER_TALK_CHANNEL.RAID, _L('Total Auction: %d Gold.', _GKP.GetRecordSum()))
-	MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'End', _L('Total Auction: %d Gold.', _GKP.GetRecordSum()), _GKP.GetRecordSum(), nTime)
+	MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'GKP_INFO', 'End', _L('Total Auction: %d Gold.', _GKP.GetRecordSum()), _GKP.GetRecordSum(), nTime)
 end
 ---------------------------------------------------------------------->
 -- 结算工资按钮
@@ -1729,7 +1729,7 @@ function _GKP.Record(tab, item, bEnter)
 					_GKP.GetFormatLink(_L[' Distribute to ']),
 					_GKP.GetFormatLink(tab.szPlayer, true)
 				})
-				MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'add', tab)
+				MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'add', tab)
 			end
 		elseif tab and type(item) == 'number' then
 			tab.szName = hName:text()
@@ -1742,7 +1742,7 @@ function _GKP.Record(tab, item, bEnter)
 					_GKP.GetFormatLink(' '.. nMoney ..g_tStrings.STR_GOLD),
 					_GKP.GetFormatLink(_L['Make changes to the record.']),
 				})
-				MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'edit', tab)
+				MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'edit', tab)
 			end
 		else
 			if MY.IsDistributer() then
@@ -1752,7 +1752,7 @@ function _GKP.Record(tab, item, bEnter)
 					_GKP.GetFormatLink(_L['Manually make record to']),
 					_GKP.GetFormatLink(tab.szPlayer, true)
 				})
-				MY.BgTalk(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'add', tab)
+				MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'MY_GKP', 'add', tab)
 			end
 		end
 		if ui:children('#WndCheckBox'):check() then
