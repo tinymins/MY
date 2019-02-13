@@ -59,7 +59,7 @@ data = {
     {dwID=11119,col="#FF00FFFF",nPriority=7},--媚眼鎮魂---上陽宮·觀風殿
     {dwID=11371,col="#FFFFFFFF",szReminder="墩",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFFFF"},--破甲---上陽宮·觀風殿
     {dwID=10552,col="#FFFFFFFF",szReminder="鉤",nPriority=6,bAttention=true},--鉤吻---上陽宮·觀風殿
-    {dwID=10562,col="#8055FFFF",nPriority=3,bScreenHead=true,colScreenHead="#8055FF"},--紅顏---上陽宮·觀風殿
+    {dwID=10562,col="#8055FFFF",szReminder="紅",nPriority=3,bScreenHead=true,colScreenHead="#8055FF"},--紅顏---上陽宮·觀風殿
     {dwID=11290,col="#FFFF00FF",szReminder="擾",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFF00"},--擾心---上陽宮·觀風殿
     {dwID=11292,col="#FFFF00FF",szReminder="擾",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFF00"},--擾心---上陽宮·觀風殿
     {dwID=11293,col="#FFFF00FF",szReminder="擾",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFF00"},--擾心---上陽宮·觀風殿
@@ -110,6 +110,7 @@ data = {
     {dwID=2632,col="#FF323200",szReminder="千",nPriority=8},--千針暗沼---荻花聖殿
     {dwID=2628,col="#FF00FFFF",szReminder="誅",nPriority=4,bAttention=true,bCaution=true},--誅心咒---荻花聖殿
     {dwID=3877,col="#FFFF00FF",szReminder="原",nPriority=5,bCaution=true},--原罪縛穴術點名---荻花聖殿
+    {dwID=2580,col="#FF00FFFF",szReminder="原",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--原罪縛穴術---荻花聖殿
     {dwID=2631,col="#00FFFF00",szReminder="逐",nPriority=8},--逐蓮升華---荻花聖殿
     {dwID=2973,col="#FF323200",nPriority=8},--黑影瞬刀---荻花聖殿
     {dwID=3093,col="#FF3232FF",szReminder="灼",nPriority=7},--灼燒---龍淵澤
@@ -121,8 +122,8 @@ data = {
     {dwID=3416,col="#00FFFFFF",szReminder="凝",nPriority=3,bScreenHead=true,colScreenHead="#00FFFF"},--凝視---荻花洞窟
     {dwID=3773,col="#FF00FFFF",szReminder="蛛",nPriority=4,bAttention=true,bCaution=true},--引火蛛---燭龍殿
     {dwID=4001,col="#FF3232FF",szReminder="拉",nPriority=6,bAttention=true},--拉人判定---燭龍殿
-    {dwID=3984,col="#00FFFFFF",szReminder="萬",nPriority=7},--萬毒噬骨---燭龍殿
-    {dwID=3971,col="#FFFF00FF",szReminder="噬",nPriority=6,bAttention=true},--噬脈蠱---燭龍殿
+    {dwID=3984,col="#00FFFFFF",szReminder="萬",nPriority=3,bScreenHead=true,colScreenHead="#00FFFF"},--萬毒噬骨---燭龍殿
+    {dwID=3971,col="#FFFF00FF",szReminder="噬",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--噬脈蠱---燭龍殿
     {dwID=3769},--破裂---燭龍殿
     {dwID=3974,szStackOp=">=",nStackNum=3},--腐蝕---燭龍殿
     {dwID=3978},--淬毒---燭龍殿
@@ -165,12 +166,12 @@ data = {
     {dwID=4249,col="#FF3232FF",szReminder="點",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF3232"},--點燃---南詔皇宮
     {dwID=6976},--穿心劫---血戰天策
     {dwID=6975},--穿心劫---血戰天策
-    {dwID=6564},--天罰·紅雷---血戰天策
+    {dwID=6564,szReminder="天",nPriority=3,bScreenHead=true,colScreenHead="#FF3232"},--天罰·紅雷---血戰天策
     {dwID=6566},--天行漫---血戰天策
     {dwID=6869,col="#00FFFFFF",szReminder="幻",nPriority=6,bAttention=true},--幻身---血戰天策
     {dwID=6861},--噬魄---血戰天策
-    {dwID=6860,col="#FFFFFFFF",szReminder="真",nPriority=3,bScreenHead=true,colScreenHead="#FFFFFF"},--幻真·真---血戰天策
-    {dwID=6859,col="#8055FFFF",szReminder="幻",nPriority=3,bScreenHead=true,colScreenHead="#8055FF"},--幻真·幻---血戰天策
+    {dwID=6860,col="#FFFFFFFF",szReminder="真",nPriority=7},--幻真·真---血戰天策
+    {dwID=6859,col="#8055FFFF",szReminder="幻",nPriority=7},--幻真·幻---血戰天策
     {dwID=7110,col="#FF3232FF",szReminder="折",nPriority=6,bAttention=true},--黑齒折磨---血戰天策
     {dwID=6917},--月下夜影---血戰天策
     {dwID=8083},--骨折---太原之戰·夜守孤城
@@ -231,8 +232,8 @@ data = {
     {dwID=7583,col="#FF00FFFF",szReminder="魅",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--魅惑---秦皇陵
     {dwID=7472,col="#FFFF00FF",szReminder="種",nPriority=7},--火種---秦皇陵
     {dwID=7639,col="#FF00FFFF",szReminder="優",nPriority=7},--優艷火花---秦皇陵
-    {dwID=7720,col="#FFFF0000",szReminder="虛",nPriority=8},--虛實---秦皇陵
-    {dwID=7721,col="#FFFF00FF",szReminder="虛",nPriority=7},--虛實---秦皇陵
+    {dwID=7720,col="#FF00FFFF",szReminder="虛",nPriority=7},--虛實---秦皇陵
+    {dwID=7721,col="#FF00FFFF",szReminder="虛",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--虛實---秦皇陵
     {dwID=6940},--秘劍·金蛇---秦皇陵
     {dwID=7456,col="#00FF0000",szReminder="庇",nPriority=8},--庇護---秦皇陵
     {dwID=6929,col="#FF3232FF",szReminder="暴",nPriority=3,bScreenHead=true,colScreenHead="#FF3232"},--暴露---直城門
@@ -243,7 +244,7 @@ data = {
     {dwID=7874,col="#00FFFFFF",szReminder="牢",nPriority=7},--畫地為牢---春明門
     {dwID=7972,col="#FF3232FF",szReminder="刺",nPriority=7},--地刺---藏寶洞·野人谷
     {dwID=7962},--怒天刀---藏寶洞·夜狼山
-    {dwID=7973,col="#FF3232FF",nPriority=7,bScreenHead=true,colScreenHead="#FF3232"},--火引---藏寶洞·夜狼山
+    {dwID=7973,col="#FF3232FF",szReminder="火",nPriority=3,bScreenHead=true,colScreenHead="#FF3232"},--火引---藏寶洞·夜狼山
     {dwID=8322,col="#8055FF00",szReminder="毒",nPriority=8},--中毒---雁門關之役
     {dwID=8332},--繳械---雁門關之役
     {dwID=8308},--音波·眩暈---雁門關之役
@@ -330,42 +331,12 @@ data = {
     {dwID=13502,col="#FF00FFFF",szReminder="目",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--目標---大衍盤絲洞
     {dwID=13505,col="#8055FFFF",szReminder="噪",nPriority=6,bAttention=true},--噪音---大衍盤絲洞
     {dwID=13518,col="#FF3232FF",szReminder="失",nPriority=6,bAttention=true},--失智---大衍盤絲洞
-    {dwID=13650,col="#00FFFFFF",szReminder="靜",nPriority=7},--靜謐---冰火島·荒血路
     {dwID=13497,col="#FF3232FF",szReminder="破",nPriority=7},--破---冰火島·荒血路
     {dwID=13574,col="#FF3232FF",szReminder="殘",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF3232"},--殘火---冰火島·荒血路
-    {dwID=13649,col="#FF00FFFF",szReminder="裂",nPriority=7},--裂傷---冰火島·荒血路
-    {dwID=13757,col="#FF3232FF",szReminder="沉",nPriority=7},--樂器沉默---冰火島·荒血路
     {dwID=13543,col="#FF323200",szReminder="陰",nPriority=8},--陰火---冰火島·荒血路
     {dwID=13498,col="#FFFF00FF",szReminder="火",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--火焰掌---冰火島·荒血路
-    {dwID=13606,col="#00FF0000",szReminder="守",nPriority=8},--信仰守護---冰火島·荒血路
     {dwID=13570,col="#FF00FFFF",szReminder="標",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--標記---冰火島·荒血路
-    {dwID=13604,nLevel=1,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考驗---冰火島·荒血路
-    {dwID=13604,nLevel=2,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考驗---冰火島·荒血路
-    {dwID=13604,nLevel=3,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考驗---冰火島·荒血路
-    {dwID=13604,nLevel=4,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考驗---冰火島·荒血路
-    {dwID=13604,nLevel=5,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考驗---冰火島·荒血路
-    {dwID=13604,nLevel=6,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考驗---冰火島·荒血路
-    {dwID=13604,nLevel=7,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考驗---冰火島·荒血路
-    {dwID=13604,nLevel=8,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考驗---冰火島·荒血路
-    {dwID=13604,nLevel=9,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考驗---冰火島·荒血路
-    {dwID=13604,nLevel=10,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考驗---冰火島·荒血路
-    {dwID=13604,nLevel=11,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考驗---冰火島·荒血路
-    {dwID=13604,nLevel=12,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考驗---冰火島·荒血路
-    {dwID=13572,nLevel=1,col="#FFFF00FF",szReminder="灼",nPriority=7},--信仰灼燒---冰火島·荒血路
-    {dwID=13572,nLevel=2,col="#00FF00FF",szReminder="灼",nPriority=7},--信仰灼燒---冰火島·荒血路
-    {dwID=13572,nLevel=3,col="#8055FFFF",szReminder="灼",nPriority=7},--信仰灼燒---冰火島·荒血路
-    {dwID=13572,nLevel=4,col="#8055FFFF",szReminder="灼",nPriority=7},--信仰灼燒---冰火島·荒血路
-    {dwID=13572,nLevel=5,col="#8055FFFF",szReminder="灼",nPriority=7},--信仰灼燒---冰火島·荒血路
-    {dwID=13572,nLevel=6,col="#8055FFFF",szReminder="灼",nPriority=7},--信仰灼燒---冰火島·荒血路
-    {dwID=13572,nLevel=7,col="#8055FFFF",szReminder="灼",nPriority=7},--信仰灼燒---冰火島·荒血路
-    {dwID=13572,nLevel=8,col="#8055FFFF",szReminder="灼",nPriority=7},--信仰灼燒---冰火島·荒血路
-    {dwID=13572,nLevel=9,col="#8055FFFF",szReminder="灼",nPriority=7},--信仰灼燒---冰火島·荒血路
-    {dwID=13572,nLevel=10,col="#8055FFFF",szReminder="灼",nPriority=7},--信仰灼燒---冰火島·荒血路
-    {dwID=13572,nLevel=11,col="#8055FFFF",szReminder="灼",nPriority=7},--信仰灼燒---冰火島·荒血路
-    {dwID=13572,nLevel=12,col="#8055FFFF",szReminder="灼",nPriority=7},--信仰灼燒---冰火島·荒血路
     {dwID=13536,col="#FFFF00FF",szReminder="燒",nPriority=6,bAttention=true},--燃石灼燒---冰火島·荒血路
-    {dwID=13537,col="#FF3232FF",szReminder="耀",nPriority=7},--烈日光耀---冰火島·荒血路
-    {dwID=13538,col="#00FF0000",szReminder="蔽",nPriority=8},--石塊的陰影遮蔽---冰火島·荒血路
     {dwID=13552,col="#FF00FFFF",szReminder="網",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--火網---冰火島·荒血路
     {dwID=14281,col="#FFFF00FF",szReminder="躁",nPriority=6,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--內力躁動---冰火島·荒血路
     {dwID=13902,col="#FF3232FF",szReminder="重",nPriority=7},--重巒劍氣---冰火島·荒血路
@@ -385,7 +356,6 @@ data = {
     {dwID=13639,col="#FF00FFFF",szReminder="惑",nPriority=6,bAttention=true},--幻惑---冰火島·荒血路
     {dwID=13896,col="#00FF00FF",szReminder="夢",nPriority=7},--夢境同調---冰火島·荒血路
     {dwID=13835,col="#FF3232FF",szReminder="傷",nPriority=7},--受傷---冰火島·荒血路
-    {dwID=13782,col="#00FF0000",nPriority=8},--勇猛---冰火島·荒血路
     {dwID=14233,col="#8055FFFF",szReminder="錯",nPriority=7},--月下對決·經脈錯亂---冰火島·荒血路
     {dwID=13645,col="#8055FF00",szReminder="祭",nPriority=5,bCaution=true},--祭祀---冰火島·荒血路
     {dwID=13713,col="#8055FF00",szReminder="祭",nPriority=5,bCaution=true},--祭祀---冰火島·荒血路
@@ -394,7 +364,6 @@ data = {
     {dwID=14529,col="#FF8000FF",szReminder="灼",nPriority=7},--灼傷---冰火島·荒血路
     {dwID=13819,col="#FF3232FF",szReminder="裂",nPriority=7},--傷口裂開---冰火島·荒血路
     {dwID=13800,col="#FFFF0000",szReminder="摧",nPriority=8},--摧形元火---冰火島·青蓮獄
-    {dwID=13959,col="#FF3232FF",szReminder="熱",nPriority=7},--永燃之火·熱度---冰火島·青蓮獄
     {dwID=13960,col="#00FFFFFF",szReminder="寒",nPriority=7},--寒玉裂片·寒意---冰火島·青蓮獄
     {dwID=14123,col="#FF800000",szReminder="流",nPriority=8},--游刃流火---冰火島·青蓮獄
     {dwID=14345,col="#FF8000FF",nPriority=7},--斷火餘溫---冰火島·青蓮獄
@@ -433,5 +402,5 @@ data = {
     {dwID=9395,col="#00FF00FF",szReminder="風",nPriority=7},--風入松---長歌
     {dwID=9299,col="#FF8000FF",szReminder="杯",nPriority=7},--杯水留影---長歌
     {dwID=13771},--疾電叱羽---蓬萊
-    --【南宮伯是帥咩】更新日期0132
+    --【南宮伯是帥咩】更新日期0212
 }

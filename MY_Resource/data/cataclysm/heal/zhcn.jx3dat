@@ -60,7 +60,7 @@ data = {
     {dwID=9122},--盾击---永王行宫·仙侣庭园
     {dwID=9239,col="#FF00FFFF",szReminder="破",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--破敌---永王行宫·仙侣庭园
     {dwID=9429},--锁定---永王行宫·仙侣庭园
-    {dwID=9189,col="#FF00FFFF",szReminder="绝",nPriority=3,szStackOp=">=",nStackNum=4,bScreenHead=true,colScreenHead="#FF00FF"},--绝脉劲---永王行宫·仙侣庭园
+    {dwID=9189,col="#FF00FFFF",szReminder="绝",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--绝脉劲---永王行宫·仙侣庭园
     {dwID=9661},--落英锁定---永王行宫·花月别院
     {dwID=9664},--幻魔附体---永王行宫·花月别院
     {dwID=8885},--错筋---永王行宫·花月别院
@@ -91,7 +91,8 @@ data = {
     {dwID=8029,col="#FF323200",szReminder="流",nPriority=8,szStackOp=">=",nStackNum=2},--流血---太原之战·逐虎驱狼
     {dwID=8010},--战斗标记---太原之战·逐虎驱狼
     {dwID=7554,col="#00FFFFFF",szReminder="转",nPriority=7},--阴阳易转---风雪稻香村
-    {dwID=6927,szStackOp=">=",nStackNum=2},--金蛇毒---秦皇陵
+    {dwID=7578,col="#8055FFFF",szReminder="铁",nPriority=7},--铁毒锈---秦皇陵
+    {dwID=6927},--金蛇毒---秦皇陵
     {dwID=7486,col="#0050FF00",szReminder="迟",nPriority=8,szStackOp=">=",nStackNum=6},--步迟---秦皇陵
     {dwID=7488},--火灵---秦皇陵
     {dwID=12911,nLevel=1,nPriority=6,bAttention=true},--肉体枯竭---狼牙堡·辉天堑
@@ -105,6 +106,20 @@ data = {
     {dwID=13443,col="#FFFF00FF",szReminder="弓",nPriority=7},--弓狼的凝视---狼牙堡·狼神殿
     {dwID=13363,col="#00FFFF00",szReminder="粘",nPriority=8},--粘液---狼牙堡·狼神殿
     {dwID=13378,col="#FF3232FF",szReminder="黏",nPriority=6,bAttention=true},--黏液---狼牙堡·狼神殿
+    {dwID=13604,nLevel=1,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考验---冰火岛·荒血路
+    {dwID=13604,nLevel=2,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考验---冰火岛·荒血路
+    {dwID=13604,nLevel=3,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考验---冰火岛·荒血路
+    {dwID=13604,nLevel=4,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考验---冰火岛·荒血路
+    {dwID=13604,nLevel=5,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考验---冰火岛·荒血路
+    {dwID=13604,nLevel=6,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考验---冰火岛·荒血路
+    {dwID=13604,nLevel=7,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考验---冰火岛·荒血路
+    {dwID=13604,nLevel=8,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考验---冰火岛·荒血路
+    {dwID=13604,nLevel=9,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考验---冰火岛·荒血路
+    {dwID=13604,nLevel=10,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考验---冰火岛·荒血路
+    {dwID=13604,nLevel=11,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考验---冰火岛·荒血路
+    {dwID=13604,nLevel=12,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考验---冰火岛·荒血路
+    {dwID=13537,col="#FF3232FF",szReminder="耀",nPriority=7},--烈日光耀---冰火岛·荒血路
+    {dwID=13538,col="#00FF0000",szReminder="蔽",nPriority=8},--石块的阴影遮蔽---冰火岛·荒血路
     {dwID=2313},--凤凰蛊---五毒
     {dwID=377},--镇山河---纯阳
     {dwID=4439},--贪魔体---明教
@@ -151,5 +166,5 @@ data = {
     {dwID=9336,bOnlyMine=true,col="#00FF0000",szReminder="寒",nPriority=9},--寒梅---长歌
     {dwID=9337,bOnlyMine=true,col="#00FF0000",szReminder="寒",nPriority=9},--寒梅---长歌
     {dwID=9335,bOnlyMine=true,col="#FF323200",szReminder="落",nPriority=9},--落梅---长歌
-    --【南宫伯是帅咩】更新日期0132
+    --【南宫伯是帅咩】更新日期0212
 }

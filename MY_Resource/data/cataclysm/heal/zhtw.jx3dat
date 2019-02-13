@@ -60,7 +60,7 @@ data = {
     {dwID=9122},--盾擊---永王行宮·仙侶庭園
     {dwID=9239,col="#FF00FFFF",szReminder="破",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--破敵---永王行宮·仙侶庭園
     {dwID=9429},--鎖定---永王行宮·仙侶庭園
-    {dwID=9189,col="#FF00FFFF",szReminder="絕",nPriority=3,szStackOp=">=",nStackNum=4,bScreenHead=true,colScreenHead="#FF00FF"},--絕脈勁---永王行宮·仙侶庭園
+    {dwID=9189,col="#FF00FFFF",szReminder="絕",nPriority=3,bScreenHead=true,colScreenHead="#FF00FF"},--絕脈勁---永王行宮·仙侶庭園
     {dwID=9661},--落英鎖定---永王行宮·花月別院
     {dwID=9664},--幻魔附體---永王行宮·花月別院
     {dwID=8885},--錯筋---永王行宮·花月別院
@@ -91,7 +91,8 @@ data = {
     {dwID=8029,col="#FF323200",szReminder="流",nPriority=8,szStackOp=">=",nStackNum=2},--流血---太原之戰·逐虎驅狼
     {dwID=8010},--戰鬥標記---太原之戰·逐虎驅狼
     {dwID=7554,col="#00FFFFFF",szReminder="轉",nPriority=7},--陰陽易轉---風雪稻香村
-    {dwID=6927,szStackOp=">=",nStackNum=2},--金蛇毒---秦皇陵
+    {dwID=7578,col="#8055FFFF",szReminder="鐵",nPriority=7},--鐵毒銹---秦皇陵
+    {dwID=6927},--金蛇毒---秦皇陵
     {dwID=7486,col="#0050FF00",szReminder="遲",nPriority=8,szStackOp=">=",nStackNum=6},--步遲---秦皇陵
     {dwID=7488},--火靈---秦皇陵
     {dwID=12911,nLevel=1,nPriority=6,bAttention=true},--肉體枯竭---狼牙堡·輝天塹
@@ -105,6 +106,20 @@ data = {
     {dwID=13443,col="#FFFF00FF",szReminder="弓",nPriority=7},--弓狼的凝視---狼牙堡·狼神殿
     {dwID=13363,col="#00FFFF00",szReminder="粘",nPriority=8},--粘液---狼牙堡·狼神殿
     {dwID=13378,col="#FF3232FF",szReminder="黏",nPriority=6,bAttention=true},--黏液---狼牙堡·狼神殿
+    {dwID=13604,nLevel=1,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考驗---冰火島·荒血路
+    {dwID=13604,nLevel=2,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考驗---冰火島·荒血路
+    {dwID=13604,nLevel=3,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考驗---冰火島·荒血路
+    {dwID=13604,nLevel=4,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考驗---冰火島·荒血路
+    {dwID=13604,nLevel=5,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考驗---冰火島·荒血路
+    {dwID=13604,nLevel=6,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考驗---冰火島·荒血路
+    {dwID=13604,nLevel=7,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考驗---冰火島·荒血路
+    {dwID=13604,nLevel=8,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考驗---冰火島·荒血路
+    {dwID=13604,nLevel=9,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考驗---冰火島·荒血路
+    {dwID=13604,nLevel=10,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考驗---冰火島·荒血路
+    {dwID=13604,nLevel=11,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考驗---冰火島·荒血路
+    {dwID=13604,nLevel=12,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考驗---冰火島·荒血路
+    {dwID=13537,col="#FF3232FF",szReminder="耀",nPriority=7},--烈日光耀---冰火島·荒血路
+    {dwID=13538,col="#00FF0000",szReminder="蔽",nPriority=8},--石塊的陰影遮蔽---冰火島·荒血路
     {dwID=2313},--鳳凰蠱---五毒
     {dwID=377},--鎮山河---純陽
     {dwID=4439},--貪魔體---明教
@@ -151,5 +166,5 @@ data = {
     {dwID=9336,bOnlyMine=true,col="#00FF0000",szReminder="寒",nPriority=9},--寒梅---長歌
     {dwID=9337,bOnlyMine=true,col="#00FF0000",szReminder="寒",nPriority=9},--寒梅---長歌
     {dwID=9335,bOnlyMine=true,col="#FF323200",szReminder="落",nPriority=9},--落梅---長歌
-    --【南宮伯是帥咩】更新日期0132
+    --【南宮伯是帥咩】更新日期0212
 }
