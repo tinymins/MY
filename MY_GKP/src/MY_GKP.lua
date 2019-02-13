@@ -966,8 +966,11 @@ end
 
 local SYNC_LENG = 0
 
-MY.RegisterBgMsg('LR_GKP', function(szMsgID, nChannel, dwID, szName, bIsSelf, ...)
-	local data = {...}
+MY.RegisterEvent('ON_BG_CHANNEL_MSG.LR_GKP', function()
+	local szMsgID, nChannel, dwID, szName, data, bSelf = arg0, arg1, arg2, arg3, arg4, arg2 == UI_GetClientPlayerID()
+	if szMsgID ~= 'LR_GKP' or bSelf then
+		return
+	end
 	if (data[1] == 'SYNC' or data[1] == 'DEL') and MY_GKP.bAutoSync then
 		local rawData = data[2]
 		local tab = {
