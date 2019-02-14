@@ -388,3 +388,13 @@ local function UnhookDialoguePanel()
 	end
 end
 MY.RegisterReload('MY_AutoChat', UnhookDialoguePanel)
+
+
+local function OnShieldedVersion()
+	if MY.IsShieldedVersion() then
+		UnhookDialoguePanel()
+	else
+		HookDialoguePanel()
+	end
+end
+MY.RegisterEvent('MY_SHIELDED_VERSION.MY_AutoChat', OnShieldedVersion)

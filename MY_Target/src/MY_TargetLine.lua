@@ -94,13 +94,15 @@ function D.UpdateLine()
 	local tar = MY.GetObject(MY.GetTarget(me))
 	local ttar = MY.GetObject(MY.GetTarget(tar))
 	local dwTarLineSrcID, dwTarLineDstID, dwTTarLineSrcID, dwTTarLineDstID
-	if me and tar and (not ttar or ttar.dwID ~= me.dwID) then
-		dwTarLineSrcID = me.dwID
-		dwTarLineDstID = tar.dwID
-	end
-	if me and tar and ttar then
-		dwTTarLineSrcID = tar.dwID
-		dwTTarLineDstID = ttar.dwID
+	if not C.bShielded then
+		if me and tar and (not ttar or ttar.dwID ~= me.dwID) then
+			dwTarLineSrcID = me.dwID
+			dwTarLineDstID = tar.dwID
+		end
+		if me and tar and ttar then
+			dwTTarLineSrcID = tar.dwID
+			dwTTarLineDstID = ttar.dwID
+		end
 	end
 
 	-- show connect
@@ -179,7 +181,8 @@ end
 end
 
 function D.CheckEnable()
-	if (O.bTarget or O.bTTarget) and not MY.IsShieldedVersion() then
+	C.bShielded = MY.IsShieldedVersion()
+	if (O.bTarget or O.bTTarget) and not bShielded then
 		MY.BreatheCall('MY_TargetLine', D.UpdateLine)
 	else
 		MY.BreatheCall('MY_TargetLine', false)

@@ -52,7 +52,7 @@ function MY.IsShieldedVersion(bShieldedVersion)
 		return SHIELDED_VERSION
 	else
 		SHIELDED_VERSION = bShieldedVersion
-		if not bShieldedVersion and MY.IsPanelOpened() then
+		if MY.IsPanelOpened() then
 			MY.ReopenPanel()
 		end
 		FireUIEvent('MY_SHIELDED_VERSION')
