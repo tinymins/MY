@@ -302,7 +302,7 @@ function MY.RegisterModuleEvent(arg0, arg1)
 				nCount = nCount + 1
 			end
 			MODULE_LIST[szModule] = nil
-			MY.Debug({"Uninit # "  .. szModule .. " # Events Removed # " .. nCount}, MY_DEBUG.LOG)
+			MY.Debug({"Uninit # "  .. szModule .. " # Events Removed # " .. nCount}, 'MY#EVENT', MY_DEBUG.LOG)
 		end
 	elseif IsTable(arg1) then
 		local nCount = 0
