@@ -923,5 +923,5 @@ data = {
 	{szMethod="TEMPLATE_ID",szPattern="63312",szDisplay="拓跋思羽",dwMapID=361,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
 	{szMethod="TEMPLATE_ID",szPattern="63319",szDisplay="火網",dwMapID=361,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
 	{szMethod="TEMPLATE_ID",szPattern="63334",szDisplay="熊",dwMapID=361,tType={bAll=false,[TARGET.NPC]=true,[TARGET.PLAYER]=false,[TARGET.DOODAD]=false},nMaxDistance=80,tRelation = {bAll = true}},
-	--【南宮伯是帥咩】更新日期0212
+	--【南宮伯是帥咩】更新日期0214
 }

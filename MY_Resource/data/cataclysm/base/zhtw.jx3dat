@@ -155,15 +155,18 @@ data = {
     {dwID=5081},--魁龍氣---南詔皇宮
     {dwID=5096,nLevel=2,col="#FF3232FF",szReminder="精",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--精確射殺---南詔皇宮
     {dwID=5096,nLevel=1,col="#00FFFFFF",szReminder="散",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#00FFFF"},--致死散射---南詔皇宮
+    {dwID=4460,col="#FF3232FF",nPriority=7},--化骨之筆---南詔皇宮
     {dwID=4378,col="#FFFF00FF",szReminder="鐘",nPriority=5,bCaution=true},--點名撞鐘---南詔皇宮
     {dwID=4314,col="#00FFFFFF",szReminder="霜",nPriority=7,szStackOp=">=",nStackNum=4},--冰霜---南詔皇宮
     {dwID=4637,col="#FF3232FF",szReminder="追",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FF3232"},--追擊---南詔皇宮
-    {dwID=4310},--龍象波諾---南詔皇宮
+    {dwID=4310,col="#FFFF00FF",szReminder="龍",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFF00"},--龍象波諾---南詔皇宮
     {dwID=4899,col="#FF00FF00",szReminder="盾",nPriority=8},--封魔盾---南詔皇宮
     {dwID=4318,col="#FFFF0000",szReminder="無",nPriority=8},--無盡折磨---南詔皇宮
-    {dwID=4658,col="#00FFFFFF",szReminder="冰",nPriority=7},--冰棺---南詔皇宮
-    {dwID=4250,col="#00FFFFFF",szReminder="冰",nPriority=3,bScreenHead=true,colScreenHead="#00FFFF"},--冰棺---南詔皇宮
+    {dwID=4338,col="#FFFF00FF",szReminder="躁",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--躁動的能量---南詔皇宮
+    {dwID=4658,col="#00FFFFFF",szReminder="冰",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#00FFFF"},--冰棺---南詔皇宮
+    {dwID=4250,col="#FFFFFFFF",szReminder="冰",nPriority=3,bScreenHead=true,colScreenHead="#FFFFFF"},--冰棺---南詔皇宮
     {dwID=4249,col="#FF3232FF",szReminder="點",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF3232"},--點燃---南詔皇宮
+    {dwID=4942,col="#FF8000FF",szReminder="內",nPriority=3,bScreenHead=true,colScreenHead="#FF8000"},--內燃---南詔皇宮
     {dwID=6976},--穿心劫---血戰天策
     {dwID=6975},--穿心劫---血戰天策
     {dwID=6564,szReminder="天",nPriority=3,bScreenHead=true,colScreenHead="#FF3232"},--天罰·紅雷---血戰天策
@@ -402,5 +405,5 @@ data = {
     {dwID=9395,col="#00FF00FF",szReminder="風",nPriority=7},--風入松---長歌
     {dwID=9299,col="#FF8000FF",szReminder="杯",nPriority=7},--杯水留影---長歌
     {dwID=13771},--疾電叱羽---蓬萊
-    --【南宮伯是帥咩】更新日期0212
+    --【南宮伯是帥咩】更新日期0214
 }
