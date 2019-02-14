@@ -334,30 +334,46 @@ end
 local function Buff_ShowMon(mon, dwTarKungfuID)
 	return Base_ShowMon(mon, dwTarKungfuID)
 end
-local function Buff_MatchMon(tBuff, mon, config)
+local function Buff_MatchMon(tAllBuff, mon, config)
+	local info, nIconID, dwClientID, dwControlID = nil, nil, UI_GetClientPlayerID(), GetControlPlayerID()
 	-- ids={[13942]={enable=true,iconid=7237,ignoreLevel=false,levels={[2]={enable=true,iconid=7237}}}}
 	for dwID, tMonId in pairs(mon.ids) do
 		if tMonId.enable or mon.ignoreId then
-			local tInfo = tBuff[dwID]
-			if tInfo then
-				for _, info in pairs(tInfo) do
-					if info and info.bCool then
+			local tBuff = tAllBuff[dwID]
+			if tBuff then
+				for _, buff in pairs(tBuff) do
+					if buff and buff.bCool then
 						if (
 							config.hideOthers == mon.rHideOthers
-							or info.dwSkillSrcID == UI_GetClientPlayerID()
-							or info.dwSkillSrcID == GetControlPlayerID()
-						) and (not D.IsShieldedBuff(dwID, info.nLevel)) then
-							local tMonLevel = tMonId.levels[info.nLevel] or EMPTY_TABLE
+							or buff.dwSkillSrcID == dwClientID
+							or buff.dwSkillSrcID == dwControlID
+						) and (not D.IsShieldedBuff(dwID, buff.nLevel)) then
+							local tMonLevel = tMonId.levels[buff.nLevel] or EMPTY_TABLE
 							if tMonLevel.enable or tMonId.ignoreLevel then
-								return info, tMonLevel.iconid or tMonId.iconid or mon.iconid or info.nIcon or 13
+								info = buff
+								if not mon.ignoreId then
+									if not tMonId.ignoreLevel then
+										nIconID = tMonLevel.iconid
+									end
+									if not nIconID then
+										nIconID = tMonId.iconid
+									end
+								end
+								if not nIconID then
+									nIconID = mon.iconid or buff.nIcon or 13
+								end
+								break
 							end
 						end
 					end
 				end
 			end
 		end
+		if info then
+			break
+		end
 	end
-	return nil, mon.iconid
+	return info, nIconID or mon.iconid
 end
 local function Buff_MonToView(mon, buff, item, KObject, nIcon, config, tMonExist, tMonLast)
 	if nIcon then
@@ -443,6 +459,7 @@ local function Skill_ShowMon(mon, dwTarKungfuID)
 	return Base_ShowMon(mon, dwTarKungfuID)
 end
 local function Skill_MatchMon(tSkill, mon, config)
+	local info, nIconID = nil, nil
 	for dwID, tMonId in pairs(mon.ids) do
 		if tMonId.enable or mon.ignoreId then
 			local skill = tSkill[dwID]
@@ -450,13 +467,28 @@ local function Skill_MatchMon(tSkill, mon, config)
 				-- if Base_MatchMon(mon) then
 					local tMonLevel = tMonId.levels[skill.nLevel] or EMPTY_TABLE
 					if tMonLevel.enable or tMonId.ignoreLevel then
-						return skill, tMonLevel.iconid or tMonId.iconid or mon.iconid or skill.nIcon or 13
+						info = skill
+						if not mon.ignoreId then
+							if not tMonId.ignoreLevel then
+								nIconID = tMonLevel.iconid
+							end
+							if not nIconID then
+								nIconID = tMonId.iconid
+							end
+						end
+						if not nIconID then
+							nIconID = mon.iconid or skill.nIcon or 13
+						end
+						break
 					end
 				-- end
 			end
 		end
+		if info then
+			break
+		end
 	end
-	return nil, mon.iconid
+	return info, nIconID or mon.iconid
 end
 local function Skill_MonToView(mon, skill, item, KObject, nIcon, config, tMonExist, tMonLast)
 	if nIcon then
