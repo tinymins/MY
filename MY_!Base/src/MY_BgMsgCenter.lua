@@ -83,7 +83,13 @@ MY.RegisterBgMsg('CHAR_INFO', function(_, nChannel, dwID, szName, bIsSelf, ...)
 	if not bIsSelf and data[2] == UI_GetClientPlayerID() then
 		if data[1] == 'ASK'  then
 			if not MY_CharInfo or MY_CharInfo.bEnable or data[3] == 'DEBUG' then
-				MY.SendBgMsg(MY.IsParty(dwID) and PLAYER_TALK_CHANNEL.RAID or szName, 'CHAR_INFO', 'ACCEPT', dwID, MY.GetCharInfo())
+				local aInfo = MY.GetCharInfo()
+				if not MY.IsParty(dwID) and not data[3] == 'DEBUG' then
+					for _, v in ipairs(aInfo) do
+						v.tip = nil
+					end
+				end
+				MY.SendBgMsg(MY.IsParty(dwID) and PLAYER_TALK_CHANNEL.RAID or szName, 'CHAR_INFO', 'ACCEPT', dwID, aInfo)
 			else
 				MY.SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'CHAR_INFO', 'REFUSE', dwID)
 			end

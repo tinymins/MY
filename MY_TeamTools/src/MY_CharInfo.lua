@@ -86,8 +86,8 @@ function CharInfo.UpdateFrame(frame, status, data)
 			for i = 1, #self_data do
 				local v = self_data[i]
 				if v.label == label then
-					local sc = tonumber(clone(v.value:gsub('%%', '')))
-					local tc = tonumber(clone(value:gsub('%%', '')))
+					local sc = tonumber((tostring(v.value):gsub('%%', '')))
+					local tc = tonumber((tostring(value):gsub('%%', '')))
 					if sc and tc then
 						return tc > sc and { 200, 255, 200 } or tc < sc and { 255, 200, 200 } or { 255, 255, 255 }
 					end
@@ -103,22 +103,30 @@ function CharInfo.UpdateFrame(frame, status, data)
 		ui:children('#LOOKUP'):pos(70, 85 + #data * 25)
 		for i = 1, #data do
 			local v = data[i]
-			ui:append('Text', { x = 20, y = i * 25 + 50, w = 200, h = 25, halign = 0, text = v.label })
-			ui:append('Text', {
-				x = 20, y = i * 25 + 50, w = 200, h = 25,
-				halign = 2, text = v.value,
-				color = GetSelfValue(v.label, v.value),
-				onhover = function(bHover)
-					if bHover then
-						local x, y = this:GetAbsPos()
-						local w, h = this:GetSize()
-						OutputTip(v.szTip, 550, { x, y, w, h })
-					else
-						HideTip()
-					end
-				end,
-			})
+			if v.category then
+				ui:append('Text', { x = 20, y = i * 25 + 50, w = 200, h = 25, halign = 1, text = v.label })
+			else
+				ui:append('Text', { x = 20, y = i * 25 + 50, w = 200, h = 25, halign = 0, text = v.label })
+				ui:append('Text', {
+					x = 20, y = i * 25 + 50, w = 200, h = 25,
+					halign = 2, text = v.value,
+					color = GetSelfValue(v.label, v.value),
+					onhover = function(bHover)
+						if not v.tip or v.szTip then
+							return
+						end
+						if bHover then
+							local x, y = this:GetAbsPos()
+							local w, h = this:GetSize()
+							OutputTip(v.tip or v.szTip, 550, { x, y, w, h })
+						else
+							HideTip()
+						end
+					end,
+				})
+			end
 		end
+		ui:anchor('CENTER')
 		ui:children('#Text_Info'):hide()
 	else
 		ui:children('#Text_Info'):text('Json Decode Error'):show()
