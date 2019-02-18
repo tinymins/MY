@@ -73,7 +73,7 @@ data = {
 	['Auto tong member friend %s(%s %d%s) party request, go to MY/raid/teamtools panel if you want to turn off this feature.'] =
 		'自动通过了帮会成员 %s(%s %d%s) 的组队请求，如需关闭该功能请前往茗伊插件/团队/团队工具取消勾选对应项。',
 	['Asking...'] = '正在征询对方意见\n如果长时间未响应可能是对方没有安装插件。',
-	['Syncing...'] = '正在同步数据...',
+	['Syncing: %.2f%%.'] = '正在同步数据(%.2f%%)...',
 	['Refuse request'] = '对方拒绝了您的请求！',
 	['Party limit'] = '必须和对方组队',
 
