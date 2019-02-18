@@ -69,15 +69,17 @@ function CharInfo.CreateFrame(dwID, szName)
 		end,
 	})
 	ui:append('Text', { name = 'Text_Info', x = 20, y = 72, text = _L['Asking...'], w = 200, h = 70, font = 27, multiline = true })
+	frame.pending = true
 end
 
 function CharInfo.UpdateFrame(frame, status, data)
-	if not frame then
+	if not frame or not frame.pending then
 		return
 	end
 	local ui = UI(frame)
 	if status == 'REFUSE' then
 		ui:children('#Text_Info'):text(_L['Refuse request']):show()
+		frame.pending = false
 	elseif status == 'PROGRESS' then
 		ui:children('#Text_Info'):text(_L('Syncing: %.2f%%.', data)):show()
 	elseif status == 'ACCEPT' and data and type(data) == 'table' then
@@ -130,8 +132,7 @@ function CharInfo.UpdateFrame(frame, status, data)
 		ui:children('#LOOKUP'):pos(70, y0 + 35 + #data * 25)
 		ui:anchor('CENTER')
 		ui:children('#Text_Info'):hide()
-	else
-		ui:children('#Text_Info'):text('Json Decode Error'):show()
+		frame.pending = false
 	end
 end
 
