@@ -71,6 +71,7 @@ local LB = MY_LifeBar_LB
 local CHANGGE_REAL_SHADOW_TPLID = 46140 -- 清绝歌影 的主体影子
 local OBJECT_SCREEN_POS_Y_CACHE = {}
 local OBJECT_TITLE_EFFECT, OVERWRITE_TITLE_EFFECT = {}, {}
+local DRAW_TARGET_TYPE, DRAW_TARGET_ID, LB_ADJUST_INDEX_ID = TARGET.PLAYER, nil, nil
 do -- 头顶特效数据刷新
 local QUEST_TITLE_EFFECT = {
 	['normal_unaccept_proper'] = 1,
@@ -349,23 +350,23 @@ function D.Reset()
 	OVERWRITE_TITLE_EFFECT = {}
 	-- 自适应遮挡顺序
 	if MY_LifeBar.bEnabled and Config.bScreenPosSort then
-		local dwID, dwLastID, nCount
+		local dwLastID, nCount
 		local function onGetCharacterTopScreenPos(dwID, xScreen, yScreen)
 			OBJECT_SCREEN_POS_Y_CACHE[dwID] = yScreen or 0
 		end
 		local function onBreathe()
 			nCount = 0
 			repeat
-				if LB_CACHE[dwID] == nil then
-					dwID = nil
+				if LB_ADJUST_INDEX_ID and LB_CACHE[LB_ADJUST_INDEX_ID] == nil then
+					LB_ADJUST_INDEX_ID = nil
 				end
-				dwID = next(LB_CACHE, dwID)
-				if dwID then
-					PostThreadCall(onGetCharacterTopScreenPos, dwID, 'Scene_GetCharacterTopScreenPos', dwID)
+				LB_ADJUST_INDEX_ID = next(LB_CACHE, LB_ADJUST_INDEX_ID)
+				if LB_ADJUST_INDEX_ID then
+					PostThreadCall(onGetCharacterTopScreenPos, LB_ADJUST_INDEX_ID, 'Scene_GetCharacterTopScreenPos', LB_ADJUST_INDEX_ID)
 				end
 				nCount = nCount + 1
-			until nCount > 30 or dwID == dwLastID
-			dwLastID = dwID
+			until nCount > 30 or LB_ADJUST_INDEX_ID == dwLastID
+			dwLastID = LB_ADJUST_INDEX_ID
 		end
 		MY.BreatheCall('MY_LifeBar_ScreenPosSort', onBreathe)
 	else
@@ -560,8 +561,7 @@ end
 
 do
 local nRoundLeft, nRoundLimit = 0, 50 -- 每帧最大重绘血条数量
-local dwLastType, dwLastID
-local dwType, dwID, me, KTar = TARGET.PLAYER
+local dwLastType, dwLastID, me, KTar
 local function onBreathe()
 	if not D.IsMapEnabled() then
 		return
@@ -573,36 +573,36 @@ local function onBreathe()
 	-- local _, _, fPitch = Camera_GetRTParams()
 	nRoundLeft = nRoundLimit
 	while nRoundLeft > 0 do
-		if dwType == TARGET.NPC then
-			if dwID and NPC_CACHE[dwID] == nil then
-				dwID = nil
+		if DRAW_TARGET_TYPE == TARGET.NPC then
+			if DRAW_TARGET_ID and NPC_CACHE[DRAW_TARGET_ID] == nil then
+				DRAW_TARGET_ID = nil
 			end
-			dwID = next(NPC_CACHE, dwID)
-			if dwID then
-				KTar = NPC_CACHE[dwID]
+			DRAW_TARGET_ID = next(NPC_CACHE, DRAW_TARGET_ID)
+			if DRAW_TARGET_ID then
+				KTar = NPC_CACHE[DRAW_TARGET_ID]
 			else
-				dwType, dwID = TARGET.PLAYER, nil
+				DRAW_TARGET_TYPE, DRAW_TARGET_ID = TARGET.PLAYER, nil
 			end
-		elseif dwType == TARGET.PLAYER then
-			if dwID and PLAYER_CACHE[dwID] == nil then
-				dwID = nil
+		elseif DRAW_TARGET_TYPE == TARGET.PLAYER then
+			if DRAW_TARGET_ID and PLAYER_CACHE[DRAW_TARGET_ID] == nil then
+				DRAW_TARGET_ID = nil
 			end
-			dwID = next(PLAYER_CACHE, dwID)
-			if dwID then
-				KTar = PLAYER_CACHE[dwID]
+			DRAW_TARGET_ID = next(PLAYER_CACHE, DRAW_TARGET_ID)
+			if DRAW_TARGET_ID then
+				KTar = PLAYER_CACHE[DRAW_TARGET_ID]
 			else
-				dwType, dwID = TARGET.NPC, nil
+				DRAW_TARGET_TYPE, DRAW_TARGET_ID = TARGET.NPC, nil
 			end
 		end
-		if dwType == dwLastType and dwID == dwLastID then
+		if DRAW_TARGET_TYPE == dwLastType and DRAW_TARGET_ID == dwLastID then
 			return
 		end
-		if dwID then
-			CheckInvalidRect(dwType, dwID, me, KTar)
+		if DRAW_TARGET_ID then
+			CheckInvalidRect(DRAW_TARGET_TYPE, DRAW_TARGET_ID, me, KTar)
 		end
 		nRoundLeft = nRoundLeft - 1
 	end
-	dwLastType, dwLastID = dwType, dwID
+	dwLastType, dwLastID = DRAW_TARGET_TYPE, DRAW_TARGET_ID
 end
 MY.FrameCall('MY_LifeBar', onBreathe)
 end
@@ -615,8 +615,17 @@ end)
 MY.RegisterEvent('NPC_LEAVE_SCENE',function()
 	local lb = LB_CACHE[arg0]
 	if lb then
+		if LB_ADJUST_INDEX_ID == arg0 then
+			LB_ADJUST_INDEX_ID = next(LB_CACHE, LB_ADJUST_INDEX_ID)
+		end
 		lb:Remove()
 		LB_CACHE[arg0] = nil
+	end
+	if DRAW_TARGET_TYPE == TARGET.NPC and DRAW_TARGET_ID == arg0 then
+		DRAW_TARGET_ID = next(NPC_CACHE, DRAW_TARGET_ID)
+		if not DRAW_TARGET_ID then
+			DRAW_TARGET_TYPE = TARGET.PLAYER
+		end
 	end
 	NPC_CACHE[arg0] = nil
 end)
@@ -628,8 +637,17 @@ end)
 MY.RegisterEvent('PLAYER_LEAVE_SCENE',function()
 	local lb = LB_CACHE[arg0]
 	if lb then
+		if LB_ADJUST_INDEX_ID == arg0 then
+			LB_ADJUST_INDEX_ID = next(LB_CACHE, LB_ADJUST_INDEX_ID)
+		end
 		lb:Remove()
 		LB_CACHE[arg0] = nil
+	end
+	if DRAW_TARGET_TYPE == TARGET.PLAYER and DRAW_TARGET_ID == arg0 then
+		DRAW_TARGET_ID = next(PLAYER_CACHE, DRAW_TARGET_ID)
+		if not DRAW_TARGET_ID then
+			DRAW_TARGET_TYPE = TARGET.NPC
+		end
 	end
 	PLAYER_CACHE[arg0] = nil
 end)
