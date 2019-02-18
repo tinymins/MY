@@ -55,6 +55,7 @@ data = {
 		Self = { -- 自己
 			DifferentiateForce = false,
 			Player = { 30 , 140, 220 },
+			Npc = { 30 , 140, 220 },
 			[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
 			[FORCE_TYPE.SHAO_LIN ] = { 210, 180, 0   }, -- 少林
 			[FORCE_TYPE.WAN_HUA  ] = { 127, 31 , 223 }, -- 萬花
@@ -167,7 +168,7 @@ data = {
 	},
 	ShowName = {
 		Party = { Npc = true, Player = true },
-		Self = { Player = true },
+		Self = { Npc = true, Player = true },
 		Neutrality = { Npc = true, Player = true },
 		Ally = { Npc = true, Player = true },
 		Foe = { Player = true },
@@ -175,7 +176,7 @@ data = {
 	},
 	ShowTong = {
 		Party = { Player = false },
-		Self = { Player = false },
+		Self = { Npc = false, Player = false },
 		Neutrality = { Player = false },
 		Ally = { Player = false },
 		Enemy = { Player = false },
@@ -183,7 +184,7 @@ data = {
 	},
 	ShowTitle = {
 		Party = { Npc = false, Player = false },
-		Self = { Player = false },
+		Self = { Npc = false, Player = false },
 		Neutrality = { Npc = false, Player = false },
 		Ally = { Npc = false, Player = false },
 		Foe = { Player = false },
@@ -191,7 +192,7 @@ data = {
 	},
 	ShowLifePer = {
 		Party = { Npc = false, Player = false },
-		Self = { Player = true },
+		Self = { Npc = true, Player = true },
 		Neutrality = { Npc = false, Player = false },
 		Ally = { Npc = false, Player = false },
 		Foe = { Player = false },
@@ -199,7 +200,7 @@ data = {
 	},
 	ShowLife = {
 		Party = { Npc = false, Player = false },
-		Self = { Player = true },
+		Self = { Npc = true, Player = true },
 		Neutrality = { Npc = false, Player = false },
 		Ally = { Npc = false, Player = false },
 		Foe = { Player = false },
