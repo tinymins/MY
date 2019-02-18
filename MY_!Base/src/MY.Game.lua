@@ -1577,6 +1577,12 @@ function MY.GetRelation(dwSelfID, dwPeerID)
 		dwPeerID = dwSelfID
 		dwSelfID = GetControlPlayerID()
 	end
+	if not IsPlayer(dwPeerID) then
+		local npc = GetNpc(dwPeerID)
+		if npc and npc.dwEmployer ~= 0 and GetPlayer(npc.dwEmployer) then
+			dwPeerID = npc.dwEmployer
+		end
+	end
 	if IsSelf(dwSelfID, dwPeerID) then
 		return 'Self'
 	end
