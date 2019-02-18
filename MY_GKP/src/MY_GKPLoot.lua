@@ -368,9 +368,9 @@ function MY_GKP_Loot.OnItemMouseLeave()
 	local szName = this:GetName()
 	if szName == 'Handle_Item' or szName == 'Box_Item' then
 		if szName == 'Handle_Item' then
-			this = this:Lookup('Box_Item')
-			if this then
-				this.OnItemMouseLeave()
+			local box = this:Lookup('Box_Item')
+			if box and box.OnItemMouseLeave then
+				MY.ExecuteWithThis(box, box.OnItemMouseLeave)
 			end
 		end
 		-- if this and this:IsValid() and this.SetOverText then
