@@ -145,6 +145,9 @@ MY.RegisterBgMsg('CHAR_INFO', function(szMsgID, nChannel, dwID, szName, bIsSelf,
 		CharInfo.UpdateFrame(frame, szAction, oData)
 	end
 end, function(szMsgID, nChannel, dwID, szName, bIsSelf, nSegCount, nSegIndex)
+	if bIsSelf then
+		return
+	end
 	local frame = CharInfo.GetFrame(dwID)
 	if not frame then
 		return
