@@ -184,7 +184,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 		if szMode ~= 'silent' then
 			local w, h = 270, 180
 			local ui = UI.CreateFrame('MY_Serendipity#' .. szKey, {
-				w = w, h = h, close = true, text = '', anchor = {},
+				w = w, h = h, close = true, text = '', anchor = 'CENTER',
 			})
 			if szMode == 'auto' then
 				ui:alpha(200)

@@ -2208,12 +2208,17 @@ end
 
 -- (anchor) Instance:anchor()
 -- (self) Instance:anchor(anchor)
+do
+local CENTER = { s = 'CENTER', r = 'CENTER',  x = 0, y = 0 }
 function UI:anchor(anchor)
 	self:_checksum()
+	if anchor == 'CENTER' then
+		anchor = CENTER
+	end
 	if IsTable(anchor) then
 		for _, raw in ipairs(self.raws) do
 			if raw:GetType() == 'WndFrame' then
-				raw:SetPoint(anchor.s or 'CENTER', 0, 0, anchor.r or 'CENTER', anchor.x or 0, anchor.y or 0)
+				raw:SetPoint(anchor.s, 0, 0, anchor.r, anchor.x, anchor.y)
 				raw:CorrectPos()
 			end
 		end
@@ -2224,6 +2229,7 @@ function UI:anchor(anchor)
 			return GetFrameAnchor(raw, anchor)
 		end
 	end
+end
 end
 
 -- (number) Instance:width()

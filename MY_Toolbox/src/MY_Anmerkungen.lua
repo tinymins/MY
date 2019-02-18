@@ -56,7 +56,7 @@ function MY_Anmerkungen.OpenPlayerNoteEditPanel(dwID, szName)
 
 	local w, h = 340, 300
 	local ui = UI.CreateFrame('MY_Anmerkungen_PlayerNoteEdit_' .. (dwID or 0), {
-		w = w, h = h, anchor = {},
+		w = w, h = h, anchor = 'CENTER',
 		text = _L['my anmerkungen - player note edit'],
 	})
 

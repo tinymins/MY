@@ -390,7 +390,7 @@ function MY_GKP.OnFrameCreate()
 	_GKP.hRecordContainer = this:Lookup('PageSet_Menu/Page_GKP_Record/WndScroll_GKP_Record/WndContainer_Record_List')
 	_GKP.hAccountContainer = this:Lookup('PageSet_Menu/Page_GKP_Account/WndScroll_GKP_Account/WndContainer_Account_List')
 	local ui = UI(this)
-	ui:text(_L['GKP Golden Team Record']):anchor({})
+	ui:text(_L['GKP Golden Team Record']):anchor('CENTER')
 	ui:append('WndButton', {
 		x = 875, y = 48, w = 100, h = 35,
 		text = g_tStrings.STR_LOG_SET,
@@ -1079,7 +1079,7 @@ MY.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 				if data[3] == 'Information on Debt' and szName ~= me.szName then -- 欠债记录只自己看
 					return
 				end
-				local ui = UI.CreateFrame(szFrameName, { w = 800, h = 400, text = _L['GKP Golden Team Record'], close = true, anchor = {} })
+				local ui = UI.CreateFrame(szFrameName, { w = 800, h = 400, text = _L['GKP Golden Team Record'], close = true, anchor = 'CENTER' })
 				local x, y = 20, 50
 				ui:append('Text', { x = x, y = y, w = 760, h = 30, text = _L[data[3]], halign = 1, font = 236, color = { 255, 255, 0 } })
 				ui:append('WndButton3', { name = 'ScreenShot', x = x + 590, y = y, text = _L['Print Ticket'] }, true):toggle(false):click(function()
@@ -1164,7 +1164,7 @@ MY.RegisterBgMsg('MY_GKP', function(_, nChannel, dwID, szName, bIsSelf, ...)
 						end
 					end
 					if frm.n > 5 then
-						ui:size(800, 30 * frm.n + 250):anchor({})
+						ui:size(800, 30 * frm.n + 250):anchor('CENTER')
 					end
 					frm.n = frm.n + 1
 				end

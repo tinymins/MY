@@ -171,7 +171,7 @@ function OpenBuffEditPanel(rec)
 	local ui = UI.CreateFrame('MY_Cataclysm_BuffConfig', {
 		w = w, h = h,
 		text = _L['Edit buff'],
-		close = true, anchor = {},
+		close = true, anchor = 'CENTER',
 	}):remove(function()
 		if not rec.dwID and (not rec.szName or rec.szName == '') then
 			for i, p in ipairs(CFG.aBuffList) do
@@ -507,7 +507,7 @@ function PS.OnPanelActive(frame)
 			local ui = UI.CreateFrame('MY_Cataclysm_BuffConfig', {
 				w = 350, h = 550,
 				text = _L['Edit buff'],
-				close = true, anchor = {},
+				close = true, anchor = 'CENTER',
 			})
 			local X, Y = 20, 60
 			local x, y = X, Y

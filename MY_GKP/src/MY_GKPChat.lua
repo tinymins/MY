@@ -110,7 +110,7 @@ function Chat.OpenFrame(item, menu, data)
 	local frame = Chat.GetFrame()
 	if not frame then
 		frame = Wnd.OpenWindow(MY.GetAddonInfo().szRoot .. 'MY_GKP/ui/MY_GKP_Chat.ini', 'MY_GKP_Chat')
-		UI(frame):anchor({})
+		UI(frame):anchor('CENTER')
 			:append('WndButton2', {
 				x = 380, y = 38, text = _L['Stop Bidding'],
 				onclick = function()
