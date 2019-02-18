@@ -2850,22 +2850,46 @@ function MY.GetCharInfo()
 		nEquipScore = me.GetTotalEquipScore() or 0,
 		dwMountKungfuID = kungfu and kungfu.dwSkillID or 0,
 	}
-	local frame = Station.Lookup('Normal/CharInfo')
-	if not frame or not frame:IsVisible() then
-		if frame then
-			Wnd.CloseWindow('CharInfo') -- 强制kill
+	if CharInfoMore_GetShowValue then
+		local aCategory, aContent, tTip = CharInfoMore_GetShowValue()
+		local nCategoryIndex, nSubLen, nSubIndex = 0, -1, 0
+		for _, content in ipairs(aContent) do
+			if nSubIndex > nSubLen then
+				nCategoryIndex = nCategoryIndex + 1
+				local category = aCategory[nCategoryIndex]
+				if category then
+					insert(data, {
+						category = true,
+						label = category[1],
+					})
+					nSubLen, nSubIndex = category[2], 1
+				end
+			end
+			insert(data, {
+				label = content[1],
+				value = content[2],
+				tip = tTip[content[3]],
+			})
+			nSubIndex = nSubIndex + 1
 		end
-		Wnd.OpenWindow('CharInfo'):Hide()
-	end
-	local hCharInfo = Station.Lookup('Normal/CharInfo')
-	local handle = hCharInfo:Lookup('WndScroll_Property', '')
-	for i = 0, handle:GetVisibleItemCount() -1 do
-		local h = handle:Lookup(i)
-		table.insert(data, {
-			szTip = h.szTip,
-			label = h:Lookup(0):GetText(),
-			value = h:Lookup(1):GetText(),
-		})
+	else
+		local frame = Station.Lookup('Normal/CharInfo')
+		if not frame or not frame:IsVisible() then
+			if frame then
+				Wnd.CloseWindow('CharInfo') -- 强制kill
+			end
+			Wnd.OpenWindow('CharInfo'):Hide()
+		end
+		local hCharInfo = Station.Lookup('Normal/CharInfo')
+		local handle = hCharInfo:Lookup('WndScroll_Property', '')
+		for i = 0, handle:GetVisibleItemCount() -1 do
+			local h = handle:Lookup(i)
+			table.insert(data, {
+				szTip = h.szTip,
+				label = h:Lookup(0):GetText(),
+				value = h:Lookup(1):GetText(),
+			})
+		end
 	end
 	return data
 end
