@@ -20,6 +20,7 @@ data = {
 	['FadeOut time'] = '淡出時間',
 	['Frame'] = '幀',
 	['Font edit'] = '字體修改',
+	['Current font: %d'] = '當前字體：%d',
 	['Enable Render'] = '使用渲染幀（平滑）',
 	['Color edit'] = '顏色修改',
 	['CombatText Color BUFF'] = '增益',

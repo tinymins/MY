@@ -1150,6 +1150,8 @@ function PS.OnPanelActive(frame)
 				MY_CombatText.nFont = nFont
 			end)
 		end,
+		tip = function() return _L('Current font: %d', MY_CombatText.nFont) end,
+		tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
 		autoenable = IsEnabled,
 	})
 	y = y + deltaY
