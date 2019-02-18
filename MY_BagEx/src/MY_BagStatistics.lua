@@ -6,19 +6,36 @@
 -- @modifier : Emil Zhai (root@derzh.com)
 -- @copyright: Copyright (c) 2013 EMZ Kingsoft Co., Ltd.
 --------------------------------------------------------
+--------------------------------------------------------------------------------------------------------
 -- these global functions are accessed all the time by the event handler
 -- so caching them is worth the effort
-MY.CreateDataRoot(MY_DATA_PATH.GLOBAL)
-local XML_LINE_BREAKER = XML_LINE_BREAKER
-local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
-local tinsert, tremove, tconcat = table.insert, table.remove, table.concat
-local ssub, slen, schar, srep, sbyte, sformat, sgsub =
-	  string.sub, string.len, string.char, string.rep, string.byte, string.format, string.gsub
-local type, tonumber, tostring = type, tonumber, tostring
-local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
-local floor, mmin, mmax, mceil = math.floor, math.min, math.max, math.ceil
-local GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID = GetClientPlayer, GetPlayer, GetNpc, GetClientTeam, UI_GetClientPlayerID
+--------------------------------------------------------------------------------------------------------
 local setmetatable = setmetatable
+local ipairs, pairs, next, pcall = ipairs, pairs, next, pcall
+local sub, len, format, rep = string.sub, string.len, string.format, string.rep
+local find, byte, char, gsub = string.find, string.byte, string.char, string.gsub
+local type, tonumber, tostring = type, tonumber, tostring
+local huge, pi, random, abs = math.huge, math.pi, math.random, math.abs
+local min, max, floor, ceil = math.min, math.max, math.floor, math.ceil
+local pow, sqrt, sin, cos, tan = math.pow, math.sqrt, math.sin, math.cos, math.tan
+local insert, remove, concat, sort = table.insert, table.remove, table.concat, table.sort
+local pack, unpack = table.pack or function(...) return {...} end, table.unpack or unpack
+-- jx3 apis caching
+local wsub, wlen, wfind = wstring.sub, wstring.len, wstring.find
+local GetTime, GetLogicFrameCount = GetTime, GetLogicFrameCount
+local GetClientTeam, UI_GetClientPlayerID = GetClientTeam, UI_GetClientPlayerID
+local GetClientPlayer, GetPlayer, GetNpc, IsPlayer = GetClientPlayer, GetPlayer, GetNpc, IsPlayer
+local MY, UI = MY, MY.UI
+local var2str, str2var, clone, empty, ipairs_r = MY.var2str, MY.str2var, MY.clone, MY.empty, MY.ipairs_r
+local spairs, spairs_r, sipairs, sipairs_r = MY.spairs, MY.spairs_r, MY.sipairs, MY.sipairs_r
+local GetPatch, ApplyPatch = MY.GetPatch, MY.ApplyPatch
+local Get, Set, RandomChild, GetTraceback = MY.Get, MY.Set, MY.RandomChild, MY.GetTraceback
+local IsArray, IsDictionary, IsEquals = MY.IsArray, MY.IsDictionary, MY.IsEquals
+local IsNil, IsBoolean, IsNumber, IsFunction = MY.IsNil, MY.IsBoolean, MY.IsNumber, MY.IsFunction
+local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTable, MY.IsUserdata
+local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = MY.MENU_DIVIDER, MY.EMPTY_TABLE, MY.XML_LINE_BREAKER
+--------------------------------------------------------------------------------------------------------
+MY.CreateDataRoot(MY_DATA_PATH.GLOBAL)
 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_BagEx/lang/')
 local DB = MY.ConnectDatabase(_L['MY_BagStatistics'], {'userdata/bagstatistics.db', MY_DATA_PATH.GLOBAL})
@@ -228,11 +245,11 @@ function MY_BagStatistics.UpdateItems(frame)
 	for i = 0, container:GetAllContentCount() - 1 do
 		local wnd = container:LookupContent(i)
 		if wnd:Lookup('CheckBox_Name'):IsCheckBoxChecked() then
-			tinsert(wheres, 'O.ownerkey = ?')
-			tinsert(ownerkeys, wnd.ownerkey)
+			insert(wheres, 'O.ownerkey = ?')
+			insert(ownerkeys, wnd.ownerkey)
 		end
 	end
-	local sqlwhere = ((#wheres == 0 and ' 1 = 0 ') or ('(' .. tconcat(wheres, ' OR ') .. ')'))
+	local sqlwhere = ((#wheres == 0 and ' 1 = 0 ') or ('(' .. concat(wheres, ' OR ') .. ')'))
 	local sqlgroup = ' GROUP BY C.tabtype, C.tabindex'
 	sql  = sql  .. sqlwhere .. sqlgroup .. ' LIMIT ' .. nPageSize .. ' OFFSET ' .. ((frame.nCurrentPage - 1) * nPageSize)
 	sqlc = sqlc .. sqlwhere .. sqlgroup
@@ -264,12 +281,12 @@ function MY_BagStatistics.UpdateItems(frame)
 		hItem:Lookup('Text_IndexUnderline'):SetVisible(1 == frame.nCurrentPage)
 
 		local nStartPage
-		if frame.nCurrentPage + mceil((PAGE_DISPLAY - 2) / 2) > nPageCount then
+		if frame.nCurrentPage + ceil((PAGE_DISPLAY - 2) / 2) > nPageCount then
 			nStartPage = nPageCount - (PAGE_DISPLAY - 2)
-		elseif frame.nCurrentPage - mceil((PAGE_DISPLAY - 2) / 2) < 2 then
+		elseif frame.nCurrentPage - ceil((PAGE_DISPLAY - 2) / 2) < 2 then
 			nStartPage = 2
 		else
-			nStartPage = frame.nCurrentPage - mceil((PAGE_DISPLAY - 2) / 2)
+			nStartPage = frame.nCurrentPage - ceil((PAGE_DISPLAY - 2) / 2)
 		end
 		for i = 1, PAGE_DISPLAY - 2 do
 			local hItem = handle:AppendItemFromIni(SZ_INI, 'Handle_Index')
@@ -295,7 +312,7 @@ function MY_BagStatistics.UpdateItems(frame)
 	local result = DB_ItemInfoR:GetAll()
 
 	local sqlbelongs = 'SELECT * FROM (SELECT ownerkey, SUM(bagcount) AS bagcount, SUM(bankcount) AS bankcount FROM BagItems WHERE tabtype = ? AND tabindex = ? AND tabsubindex = ? GROUP BY ownerkey) AS B LEFT JOIN OwnerInfo AS O ON B.ownerkey = O.ownerkey WHERE '
-	sqlbelongs = sqlbelongs .. ((#wheres == 0 and ' 1 = 0 ') or ('(' .. tconcat(wheres, ' OR ') .. ')'))
+	sqlbelongs = sqlbelongs .. ((#wheres == 0 and ' 1 = 0 ') or ('(' .. concat(wheres, ' OR ') .. ')'))
 	local DB_BelongsR = DB:Prepare(sqlbelongs)
 
 	local handle = frame:Lookup('Window_Main/WndScroll_Item', 'Handle_Items')
@@ -315,10 +332,10 @@ function MY_BagStatistics.UpdateItems(frame)
 				local aTip = {}
 				for _, rec in ipairs(result) do
 					count = count + rec.bankcount + rec.bagcount
-					tinsert(aTip, _L('%s (%s)\tBankx%d Bagx%d Totalx%d\n', UTF8ToAnsi(rec.ownername), UTF8ToAnsi(rec.servername), rec.bankcount, rec.bagcount, rec.bankcount + rec.bagcount))
+					insert(aTip, _L('%s (%s)\tBankx%d Bagx%d Totalx%d\n', UTF8ToAnsi(rec.ownername), UTF8ToAnsi(rec.servername), rec.bankcount, rec.bagcount, rec.bankcount + rec.bagcount))
 				end
 				UpdateItemInfoBoxObject(box, nil, rec.tabtype, rec.tabindex, count, rec.tabsubindex)
-				box.tip = GetItemInfoTip(nil, rec.tabtype, rec.tabindex, nil, nil, rec.tabsubindex) .. GetFormatText(tconcat(aTip))
+				box.tip = GetItemInfoTip(nil, rec.tabtype, rec.tabindex, nil, nil, rec.tabsubindex) .. GetFormatText(concat(aTip))
 			else
 				local hItem = handle:AppendItemFromIni(SZ_INI, 'Handle_Item')
 				UpdateItemInfoBoxObject(hItem:Lookup('Box_Item'), nil, rec.tabtype, rec.tabindex, 1, rec.tabsubindex)
