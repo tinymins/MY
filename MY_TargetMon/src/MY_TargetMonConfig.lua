@@ -294,7 +294,7 @@ function D.LoadConfig(bDefault, bOriginal, bReloadEmbedded)
 	end
 	local aConfig, tLoaded = {}, {}
 	for i, patch in ipairs(aPatch) do
-		if not tLoaded[patch.uuid] then
+		if patch.uuid and not tLoaded[patch.uuid] then
 			local config = D.PatchToConfig(patch)
 			if config then
 				insert(aConfig, config)
@@ -303,7 +303,7 @@ function D.LoadConfig(bDefault, bOriginal, bReloadEmbedded)
 		end
 	end
 	for i, embedded in ipairs(EMBEDDED_CONFIG_LIST) do
-		if not tLoaded[embedded.uuid] then
+		if embedded.uuid and not tLoaded[embedded.uuid] then
 			local config = D.FormatConfig(embedded)
 			if config then
 				insert(aConfig, config)
