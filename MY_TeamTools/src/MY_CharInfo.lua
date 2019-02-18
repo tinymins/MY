@@ -49,9 +49,9 @@ function CharInfo.GetFrame(dwID)
 end
 
 function CharInfo.CreateFrame(dwID, szName)
-	local ui = UI.CreateFrame('MY_CharInfo' .. dwID, { w = 240, h = 400, text = g_tStrings.STR_EQUIP_ATTR, close = true })
+	local ui = UI.CreateFrame('MY_CharInfo' .. dwID, { w = 240, h = 400, text = '', close = true })
 	local frame = CharInfo.GetFrame(dwID)
-	local x, y = 20, 40
+	local x, y = 20, 10
 	x = x + ui:append('Image', {
 		name = 'Image_Kungfu',
 		x = x, y = y, w = 30, h = 30,
@@ -98,17 +98,16 @@ function CharInfo.UpdateFrame(frame, status, data)
 		-- 设置基础属性
 		ui:children('#Image_Kungfu'):icon((select(2, MY.GetSkillName(data.dwMountKungfuID, 1))))
 		ui:children('#Text_Name'):color({ MY.GetForceColor(data.dwForceID) })
-		-- 避免大小不够
-		ui:size(240, 60 + 65 + #data * 25)
-		ui:children('#LOOKUP'):pos(70, 85 + #data * 25)
+		-- 绘制属性条
+		local y0 = 20
 		for i = 1, #data do
 			local v = data[i]
 			if v.category then
-				ui:append('Text', { x = 20, y = i * 25 + 50, w = 200, h = 25, halign = 1, text = v.label })
+				ui:append('Text', { x = 20, y = y0 + i * 25, w = 200, h = 25, halign = 1, text = v.label })
 			else
-				ui:append('Text', { x = 20, y = i * 25 + 50, w = 200, h = 25, halign = 0, text = v.label })
+				ui:append('Text', { x = 20, y = y0 + i * 25, w = 200, h = 25, halign = 0, text = v.label })
 				ui:append('Text', {
-					x = 20, y = i * 25 + 50, w = 200, h = 25,
+					x = 20, y = y0 + i * 25, w = 200, h = 25,
 					halign = 2, text = v.value,
 					color = GetSelfValue(v.label, v.value),
 					onhover = function(bHover)
@@ -126,6 +125,9 @@ function CharInfo.UpdateFrame(frame, status, data)
 				})
 			end
 		end
+		-- 避免大小不够
+		ui:size(240, y0 + 75 + #data * 25)
+		ui:children('#LOOKUP'):pos(70, y0 + 35 + #data * 25)
 		ui:anchor('CENTER')
 		ui:children('#Text_Info'):hide()
 	else
