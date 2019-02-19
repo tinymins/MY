@@ -561,7 +561,7 @@ end
 
 do
 local nRoundLeft, nRoundLimit = 0, 50 -- 每帧最大重绘血条数量
-local dwLastType, dwLastID, me, KTar
+local dwLastType, dwLastID, me, KTar, dwTarType, dwTarID
 local function onBreathe()
 	if not D.IsMapEnabled() then
 		return
@@ -571,6 +571,16 @@ local function onBreathe()
 		return
 	end
 	-- local _, _, fPitch = Camera_GetRTParams()
+	-- 自己和目标最重要 每次都要绘制
+	CheckInvalidRect(TARGET.PLAYER, me.dwID, me, me)
+	dwTarType, dwTarID = me.GetTarget()
+	if dwTarType == TARGET.PLAYER or dwTarType == TARGET.NPC then
+		KTar = MY.GetObject(dwTarType, dwTarID)
+		if KTar then
+			CheckInvalidRect(dwTarType, dwTarID, me, KTar)
+		end
+	end
+	-- 轮流绘制其他目标
 	nRoundLeft = nRoundLimit
 	while nRoundLeft > 0 do
 		if DRAW_TARGET_TYPE == TARGET.NPC then
