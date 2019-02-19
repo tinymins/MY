@@ -504,7 +504,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		end
 		lb:SetTitleVisible(bShowTitle)
 		-- ÑªÌõ²¿·Ö
-		if info then
+		if info and info.nMaxLife and info.nMaxLife ~= 0 then
 			lb:SetLife(info.nCurrentLife, info.nMaxLife)
 		else
 			lb:SetLife(object.nCurrentLife, object.nMaxLife)
