@@ -286,8 +286,8 @@ function D.GetGroupTotal()
 	local nGroup = 0
 	if me.IsInRaid() then
 		for i = 0, team.nGroupNum - 1 do
-			local tGropu = team.GetGroupInfo(i)
-			if #tGropu.MemberList > 0 then
+			local tGroup = team.GetGroupInfo(i)
+			if #tGroup.MemberList > 0 then
 				nGroup = nGroup + 1
 			end
 		end
@@ -645,8 +645,8 @@ function MY_CataclysmMain.OnEvent(szEvent)
 			D.CloseCataclysmPanel()
 		else
 			local team = GetClientTeam()
-			local tGropu = team.GetGroupInfo(arg3)
-			if #tGropu.MemberList == 0 then
+			local tGroup = team.GetGroupInfo(arg3)
+			if #tGroup.MemberList == 0 then
 				MY_CataclysmParty:CloseParty(arg3)
 				MY_CataclysmParty:AutoLinkAllPanel()
 			else
