@@ -1,4 +1,3 @@
-(function()
 local __META__ = "__META__"
 return {
 	uuid                = {__META__, {"nil", "string"}, nil},
@@ -102,4 +101,3 @@ return {
 		},
 	},
 }
-end)()
