@@ -70,7 +70,6 @@ MY_Focus.bHealHelper        = false -- 辅助治疗模式
 MY_Focus.bEnableSceneNavi   = false -- 场景追踪点
 MY_Focus.fScaleX            = 1     -- 缩放比例
 MY_Focus.fScaleY            = 1     -- 缩放比例
-MY_Focus.tEmbeddedFocus = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Resource/data/focus/$lang.jx3dat') or {}
 MY_Focus.tAutoFocus = {}    -- 默认焦点
 MY_Focus.tFocusList = {     -- 永久焦点
 	[TARGET.PLAYER] = {},   -- dwID
@@ -104,6 +103,22 @@ RegisterCustomData('MY_Focus.tFocusList')
 RegisterCustomData('MY_Focus.anchor')
 RegisterCustomData('MY_Focus.fScaleX')
 RegisterCustomData('MY_Focus.fScaleY')
+
+local EMBEDDED_FOCUS
+do
+local function LoadConfigData(szPath)
+	local a, b = {111, 198, 5}, 31
+	for i = 0, 50 do
+		for j, v in ipairs({ 23, 112, 234, 156 }) do
+			insert(a, (i * j * ((b * v) % 256)) % 256)
+		end
+	end
+	local szPassphrase = char(unpack(a))
+	local szPath = MY.GetAddonInfo().szRoot .. szPath
+	return MY.LoadLUAData(szPath, { passphrase = szPassphrase }) or MY.LoadLUAData(szPath) or {}
+end
+EMBEDDED_FOCUS = LoadConfigData('MY_Resource/data/focus/$lang.jx3dat')
+end
 
 local function FormatAutoFocusData(data)
 	local ds = {
@@ -345,7 +360,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		end
 		-- 判断内嵌默认焦点
 		if not bFocus and MY_Focus.bEmbeddedFocus then
-			tRule = D.GetEligibleRule(MY_Focus.tEmbeddedFocus, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
+			tRule = D.GetEligibleRule(EMBEDDED_FOCUS, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
 			if tRule then
 				bFocus = true
 				bDeletable = false
@@ -581,11 +596,11 @@ end
 do
 local function onInit()
 	-- 内嵌默认焦点
-	if not MY_Focus.tEmbeddedFocus then
-		MY_Focus.tEmbeddedFocus = {}
+	if not EMBEDDED_FOCUS then
+		EMBEDDED_FOCUS = {}
 	end
-	for i, v in ipairs(MY_Focus.tEmbeddedFocus) do
-		MY_Focus.tEmbeddedFocus[i] = FormatAutoFocusData(v)
+	for i, v in ipairs(EMBEDDED_FOCUS) do
+		EMBEDDED_FOCUS[i] = FormatAutoFocusData(v)
 	end
 	-- 用户自定义默认焦点
 	if not MY_Focus.tAutoFocus then
