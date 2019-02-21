@@ -191,8 +191,7 @@ end
 do
 local function GetInfoPanelMenu()
 	local dwType, dwID = MY.GetTarget()
-	infopanel = dwType == TARGET.PLAYER and dwID ~= UI_GetClientPlayerID()
-	if infopanel then
+	if dwType == TARGET.PLAYER and dwID ~= UI_GetClientPlayerID() then
 		return {
 			szOption = g_tStrings.STR_LOOK .. g_tStrings.STR_EQUIP_ATTR,
 			fnAction = function()

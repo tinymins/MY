@@ -437,8 +437,7 @@ function D.CreateItemData()
 end
 
 function D.OpenCataclysmPanel()
-	CreateWindow = not D.GetFrame()
-	if CreateWindow then
+	if not D.GetFrame() then
 		if CFG.eCss == '' then
 			D.ConfirmRestoreConfig()
 		end
