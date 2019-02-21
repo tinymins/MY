@@ -89,6 +89,8 @@ data = {
     },
     ['Export'] = '導出',
     ['Ensure export'] = '確認導出',
+    ['Ensure export (with indent)'] = '確認導出（格式化輸出）',
+    ['Ensure export (as embedded)'] = '確認導出（保存為默認數據）',
     ['Data exported, file saved at %s.'] = '數據導出成功，文件存放在目錄：%s。',
     ['Import successed, %d imported and %d replaced.'] = '成功導入數據%d條，其中覆蓋同名數據%d條。',
     ['Insert'] = '插入',

@@ -44,9 +44,9 @@ local C, D = {}, {
 	GetTargetTypeList  = MY_TargetMonConfig.GetTargetTypeList ,
 	LoadConfig         = MY_TargetMonConfig.LoadConfig        ,
 	SaveConfig         = MY_TargetMonConfig.SaveConfig        ,
-	ImportPatches      = MY_TargetMonConfig.ImportPatches     ,
-	ExportPatches      = MY_TargetMonConfig.ExportPatches     ,
-	GetConfig          = MY_TargetMonConfig.GetConfig         ,
+	ImportPatchFile    = MY_TargetMonConfig.ImportPatchFile   ,
+	ExportPatchFile    = MY_TargetMonConfig.ExportPatchFile   ,
+	GetConfigList      = MY_TargetMonConfig.GetConfigList     ,
 	CreateConfig       = MY_TargetMonConfig.CreateConfig      ,
 	MoveConfig         = MY_TargetMonConfig.MoveConfig        ,
 	ModifyConfig       = MY_TargetMonConfig.ModifyConfig      ,
@@ -1088,16 +1088,18 @@ local function DrawControls(ui, OpenDetail)
 			if file == '' then
 				return
 			end
-			local aPatch = MY.LoadLUAData(file)
-			if not aPatch then
-				return
+			local nImportCount, nReplaceCount = D.ImportPatchFile(file)
+			local szTip
+			if nImportCount then
+				if nImportCount > 0 then
+					MY.SwitchTab('MY_TargetMon', true)
+				end
+				szTip = _L('Import successed, %d imported and %d replaced.', nImportCount, nReplaceCount)
+			else
+				szTip = _L['Import failed, cannot decode file.']
 			end
-			local importCount, replaceCount = D.ImportPatches(aPatch)
-			if importCount > 0 then
-				MY.SwitchTab('MY_TargetMon', true)
-			end
-			MY.Sysmsg({ _L('Import successed, %d imported and %d replaced.', importCount, replaceCount) })
-			OutputMessage('MSG_ANNOUNCE_YELLOW', _L('Import successed, %d imported and %d replaced.', importCount, replaceCount))
+			MY.Sysmsg({ szTip })
+			OutputMessage('MSG_ANNOUNCE_YELLOW', szTip)
 		end,
 	})
 	x = x + 70
@@ -1108,8 +1110,9 @@ local function DrawControls(ui, OpenDetail)
 		menu = function()
 			local aUUID = {}
 			local menu = {}
-			local indent = IsCtrlKeyDown() and '\t' or nil
-			for _, config in ipairs(D.GetConfig()) do
+			local bAsEmbedded = IsAltKeyDown()
+			local szIndent = not bAsEmbedded and IsCtrlKeyDown() and '\t' or nil
+			for _, config in ipairs(D.GetConfigList(bAsEmbedded)) do
 				insert(menu, {
 					bCheck = true,
 					szOption = config.caption,
@@ -1128,16 +1131,20 @@ local function DrawControls(ui, OpenDetail)
 				insert(menu, MENU_DIVIDER)
 			end
 			insert(menu, {
-				szOption = _L['Ensure export'],
+				szOption = bAsEmbedded
+					and _L['Ensure export (as embedded)']
+					or (szIndent and _L['Ensure export (with indent)'] or _L['Ensure export']),
 				fnAction = function()
 					local file = MY.FormatPath({
-						'export/TargetMon/$name@$server@'
+						'export/TargetMon/'
+							.. (bAsEmbedded and 'embedded/' or '')
+							.. '$name@$server@'
 							.. MY.FormatTime('yyyyMMddhhmmss')
+							.. (bAsEmbedded and '.$lang' or '')
 							.. '.jx3dat',
 						MY_DATA_PATH.GLOBAL,
 					})
-					local aPatch = D.ExportPatches(aUUID)
-					MY.SaveLUAData(file, aPatch, indent)
+					D.ExportPatchFile(file, aUUID, szIndent, bAsEmbedded)
 					MY.Sysmsg({ _L('Data exported, file saved at %s.', file) })
 					OutputMessage('MSG_ANNOUNCE_YELLOW', _L('Data exported, file saved at %s.', file))
 				end,
@@ -1197,7 +1204,7 @@ function PS.OnPanelActive(wnd)
 	ui:containerType(WND_CONTAINER_STYLE.WND_CONTAINER_STYLE_LEFT_TOP)
 
 	local OpenDetail = DrawDetail(ui)
-	for _, config in ipairs(D.GetConfig()) do
+	for _, config in ipairs(D.GetConfigList()) do
 		DrawPreview(ui, config, OpenDetail)
 	end
 	DrawControls(ui, OpenDetail)

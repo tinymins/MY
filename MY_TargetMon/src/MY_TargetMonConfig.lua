@@ -69,6 +69,20 @@ local MONID_TEMPLATE = CONFIG_TEMPLATE.monitors.__CHILD_TEMPLATE__.__VALUE__.ids
 local MONLEVEL_TEMPLATE = CONFIG_TEMPLATE.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__.levels.__CHILD_TEMPLATE__
 local EMBEDDED_CONFIG_LIST, EMBEDDED_CONFIG_HASH, EMBEDDED_MONITOR_HASH = {}, {}, {}
 
+local PASSPHRASE, PASSPHRASE_EMBEDDED
+do
+local function GetPassphrase(a, b)
+	for i = 0, 50 do
+		for j, v in ipairs({ 253, 12, 34, 56 }) do
+			insert(a, (i * j * ((b * v) % 256)) % 256)
+		end
+	end
+	return char(unpack(a))
+end
+PASSPHRASE = GetPassphrase({213, 166, 13}, 3)
+PASSPHRASE_EMBEDDED = GetPassphrase({211, 98, 5}, 15)
+end
+
 function D.GetTargetTypeList(szType)
 	if szType == 'BUFF' then
 		return CONFIG_BUFF_TARGET_LIST
@@ -92,7 +106,11 @@ function D.LoadEmbeddedConfig()
 	local aEmbedded, tEmbedded, tEmbeddedMon = {}, {}, {}
 	for _, szFile in ipairs(CPath.GetFileList(EMBEDDED_CONFIG_ROOT)) do
 		if wfind(szFile, MY.GetLang() .. '.jx3dat') then
-			for _, config in ipairs(MY.LoadLUAData(EMBEDDED_CONFIG_ROOT .. szFile) or {}) do
+			for _, config in ipairs(
+				MY.LoadLUAData(EMBEDDED_CONFIG_ROOT .. szFile, { passphrase = PASSPHRASE_EMBEDDED })
+				or MY.LoadLUAData(EMBEDDED_CONFIG_ROOT .. szFile)
+				or {}
+			) do
 				if config and config.uuid and config.monitors then
 					local embedded = D.FormatConfig(config)
 					if embedded then
@@ -284,10 +302,10 @@ function D.LoadConfig(bDefault, bOriginal, bReloadEmbedded)
 	end
 	local aPatch
 	if not bDefault then
-		aPatch = MY.LoadLUAData(ROLE_CONFIG_FILE)
+		aPatch = MY.LoadLUAData(ROLE_CONFIG_FILE, { passphrase = PASSPHRASE }) or MY.LoadLUAData(ROLE_CONFIG_FILE)
 	end
 	if not aPatch and not bOriginal then
-		aPatch = MY.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE)
+		aPatch = MY.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE, { passphrase = PASSPHRASE }) or MY.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE)
 	end
 	if not aPatch then
 		aPatch = {}
@@ -340,9 +358,9 @@ function D.SaveConfig(bDefault)
 		end
 	end
 	if bDefault then
-		MY.SaveLUAData(CUSTOM_DEFAULT_CONFIG_FILE, aPatch)
+		MY.SaveLUAData(CUSTOM_DEFAULT_CONFIG_FILE, aPatch, { passphrase = PASSPHRASE })
 	else
-		MY.SaveLUAData(ROLE_CONFIG_FILE, aPatch)
+		MY.SaveLUAData(ROLE_CONFIG_FILE, aPatch, { passphrase = PASSPHRASE })
 		CONFIG_CHANGED = false
 	end
 end
@@ -371,17 +389,42 @@ function D.ImportPatches(aPatch)
 	return nImportCount, nReplaceCount
 end
 
-function D.ExportPatches(aUUID)
+function D.ExportPatches(aUUID, bNoEmbedded)
 	local aPatch = {}
 	for i, uuid in ipairs(aUUID) do
 		for i, config in ipairs(CONFIG) do
 			local patch = config.uuid == uuid and D.ConfigToPatch(config)
-			if patch then
+			if patch and (not bNoEmbedded or not patch.embedded) then
+				if bNoEmbedded then
+					patch.uuid = 'DT' .. patch.uuid
+				end
 				insert(aPatch, patch)
 			end
 		end
 	end
 	return aPatch
+end
+
+function D.ImportPatchFile(oFilePath)
+	local aPatch = MY.LoadLUAData(oFilePath, { passphrase = PASSPHRASE }) or MY.LoadLUAData(oFilePath)
+	if not aPatch then
+		return
+	end
+	return D.ImportPatches(aPatch)
+end
+
+function D.ExportPatchFile(oFilePath, aUUID, szIndent, bAsEmbedded)
+	if bAsEmbedded then
+		szIndent = nil
+	end
+	local szPassphrase
+	if bAsEmbedded then
+		szPassphrase = PASSPHRASE_EMBEDDED
+	elseif not szIndent then
+		szPassphrase = PASSPHRASE
+	end
+	local aPatch = D.ExportPatches(aUUID, bAsEmbedded)
+	MY.SaveLUAData(oFilePath, aPatch, { indent = szIndent, crc = not szIndent, passphrase = szPassphrase })
 end
 
 do
@@ -402,9 +445,19 @@ end
 MY.RegisterExit('MY_TargetMonConfig', onExit)
 end
 
-function D.GetConfig(nIndex)
-	if nIndex then
-		return CONFIG[nIndex]
+function D.GetConfig()
+	return CONFIG[nIndex]
+end
+
+function D.GetConfigList(bNoEmbedded)
+	if bNoEmbedded then
+		local a = {}
+		for _, config in ipairs(CONFIG) do
+			if not EMBEDDED_CONFIG_HASH[config.uuid] then
+				insert(a, config)
+			end
+		end
+		return a
 	end
 	return CONFIG
 end
@@ -570,10 +623,13 @@ local settings = {
 			fields = {
 				GetTargetTypeList  = D.GetTargetTypeList ,
 				GetConfig          = D.GetConfig         ,
+				GetConfigList      = D.GetConfigList     ,
 				LoadConfig         = D.LoadConfig        ,
 				SaveConfig         = D.SaveConfig        ,
 				ImportPatches      = D.ImportPatches     ,
 				ExportPatches      = D.ExportPatches     ,
+				ImportPatchFile    = D.ImportPatchFile   ,
+				ExportPatchFile    = D.ExportPatchFile   ,
 				MarkConfigChanged  = D.MarkConfigChanged ,
 				CreateConfig       = D.CreateConfig      ,
 				MoveConfig         = D.MoveConfig        ,

@@ -70,24 +70,21 @@ local function FilterMonitors(monitors, dwMapID, dwKungfuID)
 	return ret
 end
 local CACHE_CONFIG
-function D.GetConfig(nIndex)
+function D.GetConfigList()
 	if not CACHE_CONFIG then
 		local me = GetClientPlayer()
 		if not me then
-			return MY_TargetMonConfig.GetConfig(nIndex)
+			return MY_TargetMonConfig.GetConfigList()
 		end
 		local aConfig = {}
 		local dwMapID = me.GetMapID() or 0
 		local dwKungfuID = me.GetKungfuMountID() or 0
-		for i, config in ipairs(MY_TargetMonConfig.GetConfig()) do
+		for i, config in ipairs(MY_TargetMonConfig.GetConfigList()) do
 			aConfig[i] = setmetatable({
 				monitors = FilterMonitors(config.monitors, dwMapID, dwKungfuID),
 			}, { __index = config })
 		end
 		CACHE_CONFIG = aConfig
-	end
-	if nIndex then
-		return CACHE_CONFIG[nIndex]
 	end
 	return CACHE_CONFIG
 end
@@ -536,7 +533,7 @@ do local fUIScale, fFontScaleBase
 function UpdateView()
 	local me = GetClientPlayer()
 	local nViewIndex, nViewCount = 1, #VIEW_LIST
-	for _, config in ipairs(D.GetConfig()) do
+	for _, config in ipairs(D.GetConfigList()) do
 		if config.enable then
 			local dwTarType, dwTarID = D.GetTarget(config.target, config.type)
 			local KObject = MY.GetObject(dwTarType, dwTarID)
