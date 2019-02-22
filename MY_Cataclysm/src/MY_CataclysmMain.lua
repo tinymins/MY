@@ -811,6 +811,31 @@ function MY_CataclysmMain.OnEvent(szEvent)
 	end
 end
 
+do
+local i = 1
+function D.FrameBuffRefreshCall()
+	local team = GetClientTeam()
+	if not team then
+		return
+	end
+	local aList = team.GetTeamMemberList()
+	local nCount = #aList
+	if i > nCount then
+		i = 1
+	end
+	local tar = GetPlayer(aList[i])
+	if tar then
+		local aBuff = MY.GetBuffList(tar)
+		if aBuff then
+			for _, buff in ipairs(aBuff) do
+				OnBuffUpdate(tar.dwID, buff.dwID, buff.nLevel, buff.nStackNum, buff.dwSkillSrcID)
+			end
+		end
+	end
+	i = i + 1
+end
+end
+
 function MY_CataclysmMain.OnFrameBreathe()
 	local me = GetClientPlayer()
 	if not me then
@@ -867,6 +892,7 @@ function MY_CataclysmMain.OnFrameBreathe()
 	-- kill System Panel
 	D.RaidPanel_Switch(DEBUG)
 	D.TeammatePanel_Switch(false)
+	D.FrameBuffRefreshCall()
 	-- 官方代码太容易报错 放最后
 	if not this.nBreatheTime or GetTime() - this.nBreatheTime >= 300 then -- 语音最短刷新间隔300ms
 		MY_CataclysmParty:RefreshGVoice()
