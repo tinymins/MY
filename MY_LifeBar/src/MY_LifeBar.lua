@@ -604,10 +604,10 @@ local function onBreathe()
 				DRAW_TARGET_TYPE, DRAW_TARGET_ID = TARGET.NPC, nil
 			end
 		end
-		if DRAW_TARGET_TYPE == dwLastType and DRAW_TARGET_ID == dwLastID then
-			return
-		end
 		if DRAW_TARGET_ID then
+			if DRAW_TARGET_TYPE == dwLastType and DRAW_TARGET_ID == dwLastID then
+				return
+			end
 			CheckInvalidRect(DRAW_TARGET_TYPE, DRAW_TARGET_ID, me, KTar)
 		end
 		nRoundLeft = nRoundLeft - 1
