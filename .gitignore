@@ -7,3 +7,6 @@
 /__pycache__
 \!src-dist/releases/
 \!src-dist/tools/targetmon-format/*.jx3dat
+MY_Resource/data/focus/*.jx3dat
+MY_Resource/data/targetmon/*.jx3dat
+MY_Resource/data/cataclysm/*/*.jx3dat
