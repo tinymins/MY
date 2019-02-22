@@ -104,18 +104,39 @@ RegisterCustomData('MY_Focus.anchor')
 RegisterCustomData('MY_Focus.fScaleX')
 RegisterCustomData('MY_Focus.fScaleY')
 
-local EMBEDDED_FOCUS
+local PASSPHRASE
 do
-local function LoadConfigData(szPath)
-	local a, b = {111, 198, 5}, 31
+local function GetPassphrase(a, b)
 	for i = 0, 50 do
 		for j, v in ipairs({ 23, 112, 234, 156 }) do
 			insert(a, (i * j * ((b * v) % 256)) % 256)
 		end
 	end
-	local szPassphrase = char(unpack(a))
+	return char(unpack(a))
+end
+PASSPHRASE = GetPassphrase({111, 198, 5}, 31)
+end
+
+do -- auto generate embedded data
+local DAT_ROOT = 'MY_Resource/data/focus/'
+local SRC_ROOT = MY.FormatPath(MY.GetAddonInfo().szRoot .. '!src-dist/dat/' .. DAT_ROOT)
+local DST_ROOT = MY.FormatPath(MY.GetAddonInfo().szRoot .. DAT_ROOT)
+for _, szFile in ipairs(CPath.GetFileList(SRC_ROOT)) do
+	MY.Sysmsg(_L['Encrypt and compressing: '] .. DAT_ROOT .. szFile)
+	local data = LoadDataFromFile(SRC_ROOT .. szFile)
+	if IsEncodedData(data) then
+		data = DecodeData(data)
+	end
+	data = EncodeData(data, true, false)
+	SaveDataToFile(data, DST_ROOT .. szFile, PASSPHRASE)
+end
+end
+
+local EMBEDDED_FOCUS
+do
+local function LoadConfigData(szPath)
 	local szPath = MY.GetAddonInfo().szRoot .. szPath
-	return MY.LoadLUAData(szPath, { passphrase = szPassphrase }) or MY.LoadLUAData(szPath) or {}
+	return MY.LoadLUAData(szPath, { passphrase = PASSPHRASE }) or MY.LoadLUAData(szPath) or {}
 end
 EMBEDDED_FOCUS = LoadConfigData('MY_Resource/data/focus/$lang.jx3dat')
 end

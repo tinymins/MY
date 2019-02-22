@@ -44,19 +44,42 @@ local CTM_CONFIG_DEFAULT = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Catacl
 local CTM_CONFIG_OFFICIAL = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/config/official/$lang.jx3dat')
 local CTM_CONFIG_CATACLYSM = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_Cataclysm/config/cataclysm/$lang.jx3dat')
 
+local PASSPHRASE
+do
+local a, b = {111, 198, 5}, 31
+for i = 0, 50 do
+	for j, v in ipairs({ 23, 112, 234, 156 }) do
+		insert(a, (i * j * ((b * v) % 256)) % 256)
+	end
+end
+PASSPHRASE = char(unpack(a))
+end
+
+do -- auto generate embedded data
+for _, DAT_ROOT in ipairs({
+	'MY_Resource/data/cataclysm/base/',
+	'MY_Resource/data/cataclysm/cmd/',
+	'MY_Resource/data/cataclysm/heal/',
+}) do
+	local SRC_ROOT = MY.FormatPath(MY.GetAddonInfo().szRoot .. '!src-dist/dat/' .. DAT_ROOT)
+	local DST_ROOT = MY.FormatPath(MY.GetAddonInfo().szRoot .. DAT_ROOT)
+	for _, szFile in ipairs(CPath.GetFileList(SRC_ROOT)) do
+		MY.Sysmsg(_L['Encrypt and compressing: '] .. DAT_ROOT .. szFile)
+		local data = LoadDataFromFile(SRC_ROOT .. szFile)
+		if IsEncodedData(data) then
+			data = DecodeData(data)
+		end
+		data = EncodeData(data, true, false)
+		SaveDataToFile(data, DST_ROOT .. szFile, PASSPHRASE)
+	end
+end
+end
 
 local CTM_BUFF_NGB_BASE, CTM_BUFF_NGB_CMD, CTM_BUFF_NGB_HEAL
 do
 local function LoadConfigData(szPath)
-	local a, b = {111, 198, 5}, 31
-	for i = 0, 50 do
-		for j, v in ipairs({ 23, 112, 234, 156 }) do
-			insert(a, (i * j * ((b * v) % 256)) % 256)
-		end
-	end
-	local szPassphrase = char(unpack(a))
 	local szPath = MY.GetAddonInfo().szRoot .. szPath
-	return MY.LoadLUAData(szPath, { passphrase = szPassphrase }) or MY.LoadLUAData(szPath) or {}
+	return MY.LoadLUAData(szPath, { passphrase = PASSPHRASE }) or MY.LoadLUAData(szPath) or {}
 end
 CTM_BUFF_NGB_BASE = LoadConfigData('MY_Resource/data/cataclysm/base/$lang.jx3dat')
 CTM_BUFF_NGB_CMD = LoadConfigData('MY_Resource/data/cataclysm/cmd/$lang.jx3dat')

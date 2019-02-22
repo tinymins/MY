@@ -83,6 +83,21 @@ PASSPHRASE = GetPassphrase({213, 166, 13}, 3)
 PASSPHRASE_EMBEDDED = GetPassphrase({211, 98, 5}, 15)
 end
 
+do -- auto generate embedded data
+local DAT_ROOT = 'MY_Resource/data/targetmon/'
+local SRC_ROOT = MY.GetAddonInfo().szRoot .. '!src-dist/dat/' .. DAT_ROOT
+local DST_ROOT = EMBEDDED_CONFIG_ROOT
+for _, szFile in ipairs(CPath.GetFileList(SRC_ROOT)) do
+	MY.Sysmsg(_L['Encrypt and compressing: '] .. DAT_ROOT .. szFile)
+	local data = LoadDataFromFile(SRC_ROOT .. szFile)
+	if IsEncodedData(data) then
+		data = DecodeData(data)
+	end
+	data = EncodeData(data, true, false)
+	SaveDataToFile(data, DST_ROOT .. szFile, PASSPHRASE_EMBEDDED)
+end
+end
+
 function D.GetTargetTypeList(szType)
 	if szType == 'BUFF' then
 		return CONFIG_BUFF_TARGET_LIST

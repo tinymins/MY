@@ -399,4 +399,6 @@ data = {
 		['plane'] = '平面距离',
 		['global'] = '全局默认',
 	},
+
+	['Encrypt and compressing: '] = '正在加密压缩：',
 }
