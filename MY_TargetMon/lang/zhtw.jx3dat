@@ -148,4 +148,5 @@ data = {
     ['None'] = '無',
     ['Empty embedded config detected, did you forgot to load MY_Resource plugin?'] = '未檢測到默認數據，請檢查是否已下載並啟用茗伊"資源包"',
     ['Empty embedded config detected, please logout and check if MY_Resource has been downloaded and loaded.'] = '未檢測到默認數據，請返回角色選擇進入插件下載界面檢查是否已下載並啟用茗伊"資源包"子插件。',
+    ['(Embedded caption cannot be changed)'] = '（內置數據標題不可更改）',
 }

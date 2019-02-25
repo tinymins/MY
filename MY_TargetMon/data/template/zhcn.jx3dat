@@ -1,6 +1,7 @@
 local __META__ = "__META__"
 return {
 	uuid                = {__META__, {"nil", "string"}, nil},
+	embedded            = false,
 	caption             = "新建目标监控",
 	type                = "BUFF",
 	target              = "CLIENT_PLAYER",

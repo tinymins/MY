@@ -217,6 +217,8 @@ function D.PatchToConfig(patch)
 			existMon[monEmbedded.uuid] = true
 		end
 		config.monitors = monitors
+		config.caption = embedded.caption
+		config.embedded = true
 	else
 		-- 不再存在的内嵌数据
 		if patch.embedded then
@@ -339,6 +341,7 @@ function D.LoadConfig(bDefault, bOriginal, bReloadEmbedded)
 		if embedded.uuid and not tLoaded[embedded.uuid] then
 			local config = D.FormatConfig(embedded)
 			if config then
+				config.embedded = true
 				insert(aConfig, config)
 			end
 			tLoaded[config.uuid] = true

@@ -686,11 +686,20 @@ local function DrawPreview(ui, config, OpenDetail)
 		r = 255, g = 255, b = 0,
 		text = _L['*'],
 	})
-	uiWnd:append('WndEditBox', {
-		x = x + 20, y = y, w = w - 290, h = 22,
-		r = 255, g = 255, b = 0, text = config.caption,
-		onchange = function(val) D.ModifyConfig(config, 'caption', val) end,
-	})
+	if config.embedded then
+		uiWnd:append('Text', {
+			x = x + 20, y = y - 3, w = w - 290,
+			r = 255, g = 255, b = 0, text = config.caption,
+			tip = config.caption .. '\n' .. _L['(Embedded caption cannot be changed)'],
+			tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
+		})
+	else
+		uiWnd:append('WndEditBox', {
+			x = x + 20, y = y, w = w - 290, h = 22,
+			r = 255, g = 255, b = 0, text = config.caption,
+			onchange = function(val) D.ModifyConfig(config, 'caption', val) end,
+		})
+	end
 	uiWnd:append('WndButton2', {
 		x = w - 180, y = y,
 		w = 50, h = 25,
