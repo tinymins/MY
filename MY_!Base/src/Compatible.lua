@@ -322,119 +322,11 @@ function GetGuildBankBagPos(nPage, nIndex)
 end
 end
 
-if not IsPhoneLock then
-function IsPhoneLock()
-	return GetClientPlayer() and GetClientPlayer().IsTradingMibaoSwitchOpen()
-end
-end
-
-if not FormatDataStructure then
-function FormatDataStructure(data, struct)
-	local szType = type(struct)
-	if szType == type(data) then
-		if szType == 'table' then
-			local t = {}
-			for k, v in pairs(struct) do
-				t[k] = FormatDataStructure(data[k], v)
-			end
-			return t
-		end
-	else
-		data = clone(struct)
-	end
-	return data
-end
-end
-
-if not IsSameData then
-function IsSameData(data1, data2)
-	if type(data1) == 'table' and type(data2) == 'table' then
-		for k, v in pairs(data1) do
-			if not IsSameData(data1[k], data2[k]) then
-				return false
-			end
-		end
-		return true
-	else
-		return data1 == data2
-	end
-end
-end
-
 if not IsSelf then
 function IsSelf(dwSrcID, dwTarID)
 	return dwSrcID ~= 0 and dwSrcID == dwTarID and IsPlayer(dwSrcID) and IsPlayer(dwTarID)
 end
 end
-
-------------------------------------
---            背景通讯            --
-------------------------------------
--- ON_BG_CHANNEL_MSG
--- arg0: 消息szKey
--- arg1: 消息来源频道
--- arg2: 消息发布者ID
--- arg3: 消息发布者名字
--- arg4: 不定长参数数组数据
-------------------------------------
--- 判断一个tSay结构是不是背景通讯
-if not IsBgMsg then
-function IsBgMsg(t)
-	return type(t) == 'table' and t[1] and t[1].type == 'eventlink' and t[1].name == 'BG_CHANNEL_MSG'
-end
-end
-
--- 处理背景通讯
--- if not ProcessBgMsg then
--- function ProcessBgMsg(t, nChannel, dwTalkerID, szName, bEcho)
--- 	if IsBgMsg(t) and not bEcho and not (
--- 		nChannel == PLAYER_TALK_CHANNEL.NEARBY
--- 	 	or nChannel == PLAYER_TALK_CHANNEL.WORLD
--- 	 	or nChannel == PLAYER_TALK_CHANNEL.FORCE
--- 	 	or nChannel == PLAYER_TALK_CHANNEL.CAMP
--- 	 	or nChannel == PLAYER_TALK_CHANNEL.FRIENDS
--- 	 	or nChannel == PLAYER_TALK_CHANNEL.MENTOR
--- 	) then
--- 		local szKey, aParam = t[1].linkinfo or '', {}
--- 		if #t > 1 then
--- 			for i = 2, #t do
--- 				if t[i].type == 'text' then
--- 					table.insert(aParam, (t[i].text))
--- 				elseif t[i].type == 'eventlink' and t[i].name == '' then
--- 					table.insert(aParam, (str2var(t[i].linkinfo)))
--- 				end
--- 			end
--- 		end
--- 		FireUIEvent('ON_BG_CHANNEL_MSG', szKey, nChannel, dwTalkerID, szName, aParam)
--- 	end
--- end
--- end
-
--- 发送背景通讯
--- SendBgMsg('茗伊', 'RAID_READY_CONFIRM') -- 单人背景通讯
--- SendBgMsg(PLAYER_TALK_CHANNEL.RAID, 'RAID_READY_CONFIRM') -- 频道背景通讯
-if not SendBgMsg then
-function SendBgMsg(nChannel, szKey, ...)
-	local tSay ={{ type = 'eventlink', name = 'BG_CHANNEL_MSG', linkinfo = szKey }}
-	local szTarget = ''
-	if type(nChannel) == 'string' then
-		szTarget = nChannel
-		nChannel = PLAYER_TALK_CHANNEL.WHISPER
-	end
-	for _, v in ipairs({...}) do
-		table.insert(tSay, { type = 'eventlink', name = '', linkinfo = var2str(v) })
-	end
-	GetClientPlayer().Talk(nChannel, szTarget, tSay)
-end
-end
-------------------------------------
--- 有种可能背景通讯数据太大 需要分次发送
--- 懒得写了先马克在这里 以后有时间再说吧
--- 在_SendBgMsg和ProcessBgMsg做拆分重组就好
--- 记得每次重组数据时发送接收数据百分比的事件
-------------------------------------
---           背景通讯END           --
-------------------------------------
 
 if not HookSound then
 local hook = {}

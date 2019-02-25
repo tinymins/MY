@@ -2899,3 +2899,8 @@ function MY.GetCharInfo()
 	end
 	return data
 end
+
+function MY.IsPhoneLock()
+	local me = GetClientPlayer()
+	return me and me.IsTradingMibaoSwitchOpen()
+end

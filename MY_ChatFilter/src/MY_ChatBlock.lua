@@ -184,7 +184,7 @@ local function LoadBlockWords()
 	local data = MY.LoadLUAData({'config/chatblockwords.jx3dat', MY_DATA_PATH.GLOBAL})
 	if data and data.blockwords then
 		for i, bw in ipairs(data.blockwords) do
-			bw = FormatDataStructure(bw, DEFAULT_KW_CONFIG)
+			bw = MY.FormatDataStructure(bw, DEFAULT_KW_CONFIG)
 			if bw.keyword ~= '' and not tKeys[bw.keyword] then
 				table.insert(MY_ChatBlock.tBlockWords, bw)
 				tKeys[bw.keyword] = true

@@ -460,7 +460,7 @@ MY.RegisterInit('MY_TOOLBOX', MY_ToolBox.ApplyConfig)
 MY.RegisterInit('MY_LOCK_TIP', function()
 	-- 刚进游戏好像获取不到锁状态 20秒之后再说吧
 	MY.DelayCall('MY_LOCK_TIP_DELAY', 20000, function()
-		if not IsPhoneLock() then -- 手机密保还提示个鸡
+		if not MY.IsPhoneLock() then -- 手机密保还提示个鸡
 			local state, nResetTime = Lock_State()
 			if state == 'PASSWORD_LOCK' then
 				MY.DelayCall('MY_LOCK_TIP', 100000, function()
