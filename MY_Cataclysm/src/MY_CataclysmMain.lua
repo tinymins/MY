@@ -69,7 +69,7 @@ for _, DAT_ROOT in ipairs({
 		if IsEncodedData(data) then
 			data = DecodeData(data)
 		end
-		data = EncodeData(data, true, false)
+		data = EncodeData(data, true, true)
 		SaveDataToFile(data, DST_ROOT .. szFile, PASSPHRASE)
 	end
 end

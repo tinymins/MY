@@ -127,7 +127,7 @@ for _, szFile in ipairs(CPath.GetFileList(SRC_ROOT)) do
 	if IsEncodedData(data) then
 		data = DecodeData(data)
 	end
-	data = EncodeData(data, true, false)
+	data = EncodeData(data, true, true)
 	SaveDataToFile(data, DST_ROOT .. szFile, PASSPHRASE)
 end
 end
