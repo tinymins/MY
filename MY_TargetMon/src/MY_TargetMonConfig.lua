@@ -210,11 +210,24 @@ function D.PatchToConfig(patch)
 			end
 		end
 		-- 插入新的内嵌数据
-		for _, monEmbedded in ipairs(embedded.monitors) do
+		for i, monEmbedded in ipairs(embedded.monitors) do
 			if not existMon[monEmbedded.uuid] then
-				insert(monitors, clone(monEmbedded))
+				local prevUuid, nIndex = monitors[i - 1] and monitors[i - 1].uuid, nil
+				if prevUuid then
+					for j, mon in ipairs(monitors) do
+						if mon.uuid == prevUuid then
+							nIndex = j + 1
+							break
+						end
+					end
+				end
+				if nIndex then
+					insert(monitors, nIndex, clone(monEmbedded))
+				else
+					insert(monitors, clone(monEmbedded))
+				end
+				existMon[monEmbedded.uuid] = true
 			end
-			existMon[monEmbedded.uuid] = true
 		end
 		config.monitors = monitors
 		config.caption = embedded.caption
