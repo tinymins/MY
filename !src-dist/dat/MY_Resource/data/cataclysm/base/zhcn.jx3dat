@@ -341,7 +341,7 @@ data = {
     {dwID=13570,col="#FF00FFFF",szReminder="标",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--标记---冰火岛·荒血路
     {dwID=13536,col="#FFFF00FF",szReminder="烧",nPriority=6,bAttention=true},--燃石灼烧---冰火岛·荒血路
     {dwID=13552,col="#FF00FFFF",szReminder="网",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--火网---冰火岛·荒血路
-    {dwID=14281,col="#FFFF00FF",szReminder="躁",nPriority=6,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--内力躁动---冰火岛·荒血路
+    {dwID=14281,col="#FFFF00FF",szReminder="躁",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--内力躁动---冰火岛·荒血路
     {dwID=13902,col="#FF3232FF",szReminder="重",nPriority=7},--重峦剑气---冰火岛·荒血路
     {dwID=13627,col="#00FFFFFF",szReminder="月",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#00FFFF"},--月下对决---冰火岛·荒血路
     {dwID=13625,col="#FF00FFFF",szReminder="缠",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF00FF"},--强风缠足---冰火岛·荒血路
@@ -366,6 +366,9 @@ data = {
     {dwID=14031,col="#FF3232FF",szReminder="搬",nPriority=7},--搬运负重---冰火岛·荒血路
     {dwID=14529,col="#FF8000FF",szReminder="灼",nPriority=7},--灼伤---冰火岛·荒血路
     {dwID=13819,col="#FF3232FF",szReminder="裂",nPriority=7},--伤口裂开---冰火岛·荒血路
+    {dwID=14528,col="#FFFF00FF",szReminder="狂",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFF00"},--青羽狂沙---冰火岛·荒血路
+    {dwID=14554,col="#FF3232FF",szReminder="仇",nPriority=3,bScreenHead=true,colScreenHead="#FF3232"},--仇恨---冰火岛·荒血路
+    {dwID=14557,col="#FF00FFFF",szReminder="追",nPriority=1,bCaution=true,bScreenHead=true,colScreenHead="#FF00FF"},--追逐---冰火岛·荒血路
     {dwID=13800,col="#FFFF0000",szReminder="摧",nPriority=8},--摧形元火---冰火岛·青莲狱
     {dwID=13960,col="#00FFFFFF",szReminder="寒",nPriority=7},--寒玉裂片·寒意---冰火岛·青莲狱
     {dwID=14123,col="#FF800000",szReminder="流",nPriority=8},--游刃流火---冰火岛·青莲狱
@@ -381,6 +384,7 @@ data = {
     {dwID=12788,col="#FFFF00FF",szReminder="图",nPriority=7},--图兰的挑唆---龙门绝境
     {dwID=12724},--狂沙---龙门绝境
     {dwID=12787},--追命---龙门绝境
+    {dwID=14502,col="#FF3232FF",nPriority=7},--窥影---龙门绝境
     {dwID=11594},--背负物资---其他
     {dwID=10229},--大背篓---其他
     {dwID=7868,col="#FF3232FF",szReminder="箱",nPriority=3,bScreenHead=true,colScreenHead="#FF3232"},--恶人谷菌箱---其他
@@ -405,5 +409,5 @@ data = {
     {dwID=9395,col="#00FF00FF",szReminder="风",nPriority=7},--风入松---长歌
     {dwID=9299,col="#FF8000FF",szReminder="杯",nPriority=7},--杯水留影---长歌
     {dwID=13771},--疾电叱羽---蓬莱
-    --【南宫伯是帅咩】更新日期0214
+    --【南宫伯是帅咩】更新日期0223
 }
