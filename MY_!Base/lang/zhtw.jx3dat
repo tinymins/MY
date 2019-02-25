@@ -400,5 +400,5 @@ data = {
 		['global'] = '全局默認',
 	},
 
-	['Encrypt and compressing: '] = '正在加密壓縮：',
+	['Encrypt and compressing: '] = '更新加密壓縮：',
 }
