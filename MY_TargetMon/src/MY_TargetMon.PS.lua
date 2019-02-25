@@ -176,7 +176,7 @@ local function DrawDetail(ui)
 					D.ModifyMonitorId(monid, 'enable', true)
 				end
 				if index then
-					D.MoveMonitor(l_config, mon, #l_config.monitors - index)
+					D.MoveMonitor(l_config, mon, index - #l_config.monitors)
 				end
 				list:listbox(
 					'insert',
