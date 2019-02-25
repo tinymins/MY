@@ -692,7 +692,7 @@ local function DrawPreview(ui, config, OpenDetail)
 			r = 255, g = 255, b = 0, text = config.caption,
 			tip = config.caption .. '\n' .. _L['(Embedded caption cannot be changed)'],
 			tippostype = MY_TIP_POSTYPE.BOTTOM_TOP,
-		})
+		}, true):autoWidth()
 	else
 		uiWnd:append('WndEditBox', {
 			x = x + 20, y = y, w = w - 290, h = 22,
