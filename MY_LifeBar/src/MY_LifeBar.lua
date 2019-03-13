@@ -37,7 +37,7 @@ local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = MY.MENU_DIVIDER, MY.EMPTY_TA
 --------------------------------------------------------------------------------------------------------
 local Config = MY_LifeBar_Config
 if not Config then
-    return
+	return
 end
 
 local GetConfigValue
