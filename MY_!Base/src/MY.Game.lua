@@ -1968,20 +1968,22 @@ function MY.GetBuffList(...)
 	end
 	local aBuffTable = {}
 	if KObject then
-		if not BUFF_LIST_CACHE[KObject] or not BUFF_LIST_PROXY[KObject] then
-			BUFF_LIST_CACHE[KObject] = setmetatable({}, { __mode = 'v' })
-			BUFF_LIST_PROXY[KObject] = setmetatable({}, { __mode = 'v' })
+		local aCache, aProxy = BUFF_LIST_CACHE[KObject], BUFF_LIST_PROXY[KObject]
+		if not aCache or not aProxy then
+			aCache, aProxy = {}, {}
+			BUFF_LIST_CACHE[KObject] = aCache
+			BUFF_LIST_PROXY[KObject] = aProxy
 		end
 		local nCount, raw = 0
 		for i = 1, KObject.GetBuffCount() or 0 do
 			local dwID, nLevel, bCanCancel, nEndFrame, nIndex, nStackNum, dwSkillSrcID, bValid = KObject.GetBuff(i - 1)
 			if dwID then
 				nCount = nCount + 1
-				if not BUFF_LIST_CACHE[KObject][nCount] or not BUFF_LIST_PROXY[KObject][nCount] then
-					BUFF_LIST_CACHE[KObject][nCount] = {}
-					BUFF_LIST_PROXY[KObject][nCount] = setmetatable({}, { __index = BUFF_LIST_CACHE[KObject][nCount], __newindex = reject })
+				if not aCache[nCount] or not aProxy[nCount] then
+					aCache[nCount] = {}
+					aProxy[nCount] = setmetatable({}, { __index = aCache[nCount], __newindex = reject })
 				end
-				raw = BUFF_LIST_CACHE[KObject][nCount]
+				raw = aCache[nCount]
 				raw.szKey        = dwSkillSrcID .. ':' .. dwID .. ',' .. nLevel
 				raw.dwID         = dwID
 				raw.nLevel       = nLevel
@@ -1997,13 +1999,13 @@ function MY.GetBuffList(...)
 				raw.szName, raw.nIcon = MY.GetBuffName(dwID, nLevel)
 			end
 		end
-		for i = nCount + 1, #BUFF_LIST_CACHE[KObject] do
-			BUFF_LIST_CACHE[KObject][i] = nil
+		for i = nCount + 1, #aCache do
+			aCache[i] = nil
 		end
-		for i = nCount + 1, #BUFF_LIST_PROXY[KObject] do
-			BUFF_LIST_PROXY[KObject][i] = nil
+		for i = nCount + 1, #aProxy do
+			aProxy[i] = nil
 		end
-		return BUFF_LIST_PROXY[KObject]
+		return aProxy
 	end
 	return EMPTY_TABLE
 end
@@ -2068,15 +2070,17 @@ function MY.GetBuff(KObject, dwID, nLevel, dwSkillSrcID)
 			end
 			for _, buff in ipairs(MY.GetBuffList(KObject)) do
 				if (tBuff[buff.dwID] == buff.nLevel or tBuff[buff.dwID] == 0) and buff.dwSkillSrcID == dwSkillSrcID then
-					if not BUFF_CACHE[KObject] or not BUFF_PROXY[KObject] then
-						BUFF_CACHE[KObject] = setmetatable({}, { __mode = 'v' })
-						BUFF_PROXY[KObject] = setmetatable({}, { __mode = 'v' })
+					local tCache, tProxy = BUFF_CACHE[KObject], BUFF_PROXY[KObject]
+					if not tCache or not tProxy then
+						tCache, tProxy = {}, {}
+						BUFF_CACHE[KObject] = tCache
+						BUFF_PROXY[KObject] = tProxy
 					end
-					if not BUFF_CACHE[KObject][buff.szKey] or not BUFF_PROXY[KObject][buff.szKey] then
-						BUFF_CACHE[KObject][buff.szKey] = {}
-						BUFF_PROXY[KObject][buff.szKey] = setmetatable({}, { __index = BUFF_CACHE[KObject][buff.szKey], __newindex = reject })
+					if not tCache[buff.szKey] or not tProxy[buff.szKey] then
+						tCache[buff.szKey] = {}
+						tProxy[buff.szKey] = setmetatable({}, { __index = tCache[buff.szKey], __newindex = reject })
 					end
-					local raw = BUFF_CACHE[KObject][buff.szKey]
+					local raw = tCache[buff.szKey]
 					raw.dwID         = buff.dwID
 					raw.nLevel       = buff.nLevel
 					raw.bCanCancel   = buff.bCanCancel
@@ -2087,7 +2091,7 @@ function MY.GetBuff(KObject, dwID, nLevel, dwSkillSrcID)
 					raw.bValid       = buff.bValid
 					raw.nCount       = buff.nCount
 					raw.GetEndTime = function() return buff.nEndFrame end
-					return BUFF_CACHE[KObject][buff.szKey]
+					return tProxy[buff.szKey]
 				end
 			end
 			-- return MY.Debug({'KObject do not have a function named GetBuffByOwner.'}, 'MY.GetBuff', MY_DEBUG.ERROR)
