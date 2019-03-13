@@ -698,7 +698,7 @@ local MY_FORCE_COLOR_FG_DEFAULT = setmetatable({
 	[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- ≤‘‘∆
 	[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- ≥§∏Ë
 	[FORCE_TYPE.BA_DAO   ] = { 106 ,108, 189 }, -- ∞‘µ∂
-	[FORCE_TYPE.PENG_LAI ] = { 195 ,210, 225 }, -- ≈Ó¿≥
+	[FORCE_TYPE.PENG_LAI ] = { 171 ,227, 250 }, -- ≈Ó¿≥
 }, {
 	__index = function(t, k)
 		return { 225, 225, 225 }
@@ -729,7 +729,7 @@ local MY_FORCE_COLOR_BG_DEFAULT = setmetatable({
 	[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- ≤‘‘∆
 	[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- ≥§∏Ë
 	[FORCE_TYPE.BA_DAO   ] = { 106 ,108, 189 }, -- ∞‘µ∂
-	[FORCE_TYPE.PENG_LAI ] = { 195 ,210, 225 }, -- ≈Ó¿≥
+	[FORCE_TYPE.PENG_LAI ] = { 171 ,227, 250 }, -- ≈Ó¿≥
 }, {
 	__index = function(t, k)
 		return { 225, 225, 225 }

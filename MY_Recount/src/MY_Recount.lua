@@ -109,7 +109,7 @@ local _C = {
 				[FORCE_TYPE.CANG_YUN ] = { r = 180, g = 60 , b = 0  , a = 255 }, -- ≤‘‘∆
 				[FORCE_TYPE.CHANG_GE ] = { r = 100, g = 250, b = 180, a = 100 }, -- ≥§∏Ë
 				[FORCE_TYPE.BA_DAO   ] = { r = 71 , g = 73 , b = 166, a = 128 }, -- ∞‘µ∂
-				[FORCE_TYPE.PENG_LAI ] = { r = 195, g = 210, b = 225, a = 128 }, -- ≈Ó¿≥
+				[FORCE_TYPE.PENG_LAI ] = { r = 195, g = 171, b = 227, a = 250 }, -- ≈Ó¿≥
 			},
 		}, {
 			['Bar'] = {
@@ -128,7 +128,7 @@ local _C = {
 				[FORCE_TYPE.CANG_YUN ] = { r = 180, g = 60 , b = 0  , a = 255 }, -- ≤‘‘∆
 				[FORCE_TYPE.CHANG_GE ] = { r = 100, g = 250, b = 180, a = 150 }, -- ≥§∏Ë
 				[FORCE_TYPE.BA_DAO   ] = { r = 71 , g = 73 , b = 166, a = 128 }, -- ∞‘µ∂
-				[FORCE_TYPE.PENG_LAI ] = { r = 195, g = 210, b = 225, a = 128 }, -- ≈Ó¿≥
+				[FORCE_TYPE.PENG_LAI ] = { r = 195, g = 171, b = 227, a = 250 }, -- ≈Ó¿≥
 			},
 		}, {
 			['Bar'] = {
