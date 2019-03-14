@@ -36,17 +36,27 @@ local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTab
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = MY.MENU_DIVIDER, MY.EMPTY_TABLE, MY.XML_LINE_BREAKER
 --------------------------------------------------------------------------------------------------------
 local _L, D = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/lang/'), {}
+if not MY.AssertVersion('MY_LifeBar', _L['MY_LifeBar'], 0x2012400) then
+	return
+end
+
 local CONFIG_DEFAULTS = setmetatable({
 	DEFAULT  = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/config/default/$lang.jx3dat'),
 	OFFICIAL = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/config/official/$lang.jx3dat'),
 	CLEAR    = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/config/clear/$lang.jx3dat'),
 	XLIFEBAR = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/config/xlifebar/$lang.jx3dat'),
-}, { __index = function(t, k) return t.DEFAULT end })
+}, {
+	__call = function(t, k, d)
+		local template = t[k]
+		return MY.FormatDataStructure(d, template[1], true, template[2])
+	end,
+	__index = function(t, k) return t.DEFAULT end,
+})
 
 if not CONFIG_DEFAULTS.DEFAULT then
-    return MY.Debug({_L['Default config cannot be loaded, please reinstall!!!']}, _L['x lifebar'], MY_DEBUG.ERROR)
+	return MY.Debug({_L['Default config cannot be loaded, please reinstall!!!']}, _L['MY_LifeBar'], MY_DEBUG.ERROR)
 end
-local Config, ConfigLoaded = clone(CONFIG_DEFAULTS.DEFAULT), false
+local Config, ConfigLoaded = CONFIG_DEFAULTS('DEFAULT'), false
 local CONFIG_PATH = 'config/xlifebar/%s.jx3dat'
 
 function D.GetConfigPath()
@@ -93,10 +103,19 @@ function D.LoadConfig(szConfig)
 		Config = MY.LoadLUAData({ D.GetConfigPath(), MY_DATA_PATH.GLOBAL })
 	end
 	if Config and not Config.fDesignUIScale then -- ºÊ»›¿œ ˝æ›
+		for _, key in ipairs({'ShowName', 'ShowTong', 'ShowTitle', 'ShowLife', 'ShowLifePer'}) do
+			for _, relation in ipairs({'Self', 'Party', 'Enemy', 'Neutrality', 'Ally', 'Foe'}) do
+				for _, tartype in ipairs({'Npc', 'Player'}) do
+					if Config[key] and IsTable(Config[key][relation]) and IsBoolean(Config[key][relation][tartype]) then
+						Config[key][relation][tartype] = { bEnable = Config[key][relation][tartype] }
+					end
+				end
+			end
+		end
 		Config.fDesignUIScale = MY.GetOriginUIScale()
 		Config.fMatchedFontOffset = Font.GetOffset()
 	end
-	Config = MY.FormatDataStructure(Config, CONFIG_DEFAULTS[Config and Config.eCss or ''], true)
+	Config = CONFIG_DEFAULTS('DEFAULT', Config)
 	D.AutoAdjustScale()
 	ConfigLoaded = true
 	FireUIEvent('MY_LIFEBAR_CONFIG_LOADED')
@@ -145,19 +164,19 @@ MY_LifeBar_Config = setmetatable({}, {
 					{
 						szOption = _L['Official default style'],
 						fnAction = function()
-							D.LoadConfig(clone(CONFIG_DEFAULTS.OFFICIAL))
+							D.LoadConfig(CONFIG_DEFAULTS('OFFICIAL'))
 						end,
 					},
 					{
 						szOption = _L['Official clear style'],
 						fnAction = function()
-							D.LoadConfig(clone(CONFIG_DEFAULTS.CLEAR))
+							D.LoadConfig(CONFIG_DEFAULTS('CLEAR'))
 						end,
 					},
 					{
 						szOption = _L['XLifeBar style'],
 						fnAction = function()
-							D.LoadConfig(clone(CONFIG_DEFAULTS.XLIFEBAR))
+							D.LoadConfig(CONFIG_DEFAULTS('XLIFEBAR'))
 						end,
 					},
 					{
@@ -170,7 +189,7 @@ MY_LifeBar_Config = setmetatable({}, {
 					},
 				})
 			else
-				D.LoadConfig(clone(CONFIG_DEFAULTS[argv[1]]))
+				D.LoadConfig(CONFIG_DEFAULTS(argv[1]))
 			end
 		elseif op == 'save' then
 			return D.SaveConfig(...)

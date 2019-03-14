@@ -1,8 +1,8 @@
 -- language data (zhcn) updated at 2014-4-10 03:38:11
 data = {
-    ['MY_LifeBar'] = '扁平血条',
+    ['MY_LifeBar'] = '头顶血条',
 
-	['Enable'] = '启用',
+    ['Enable'] = '启用',
     ['Configure name'] = '配置文件名称',
 
     ['only enable in those maps below'] = '√ 仅在以下地图启用扁平血条',

@@ -40,8 +40,9 @@ if not Config then
 	return
 end
 
-local GetConfigValue
-do local cfg, value
+local GetConfigValue, GetConfigComputeValue
+do
+local cfg, value
 function GetConfigValue(key, relation, force)
 	cfg, value = Config[key][relation]
 	if force == 'Npc' or force == 'Player' then
@@ -55,6 +56,14 @@ function GetConfigValue(key, relation, force)
 		end
 	end
 	return value
+end
+function GetConfigComputeValue(key, relation, force, fighting)
+	cfg = GetConfigValue(key, relation, force)
+	if cfg and cfg.bEnable and (not cfg.bOnlyFighting or fighting) then
+		return true
+	else
+		return false
+	end
 end
 end
 -----------------------------------------------------------------------------------------
@@ -470,7 +479,7 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		end
 		lb:SetCD(szCountDown)
 		-- 名字
-		bShowName = GetConfigValue('ShowName', relation, force)
+		bShowName = GetConfigComputeValue('ShowName', relation, force, me.bFightState)
 		if bShowName then
 			lb:SetName(szName)
 		end
@@ -492,13 +501,13 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		end
 		lb:SetDistanceVisible(Config.bShowDistance)
 		-- 帮会
-		bShowTong = GetConfigValue('ShowTong', relation, force)
+		bShowTong = GetConfigComputeValue('ShowTong', relation, force, me.bFightState)
 		if bShowTong then
 			lb:SetTong(D.GetTongName(object.dwTongID) or '')
 		end
 		lb:SetTongVisible(bShowTong)
 		-- 称号
-		bShowTitle = GetConfigValue('ShowTitle', relation, force)
+		bShowTitle = GetConfigComputeValue('ShowTitle', relation, force, me.bFightState)
 		if bShowTitle then
 			lb:SetTitle(object.szTitle or '')
 		end
@@ -509,14 +518,14 @@ function CheckInvalidRect(dwType, dwID, me, object)
 		else
 			lb:SetLife(object.nCurrentLife, object.nMaxLife)
 		end
-		bShowLife = szName ~= '' and GetConfigValue('ShowLife', relation, force)
+		bShowLife = szName ~= '' and GetConfigComputeValue('ShowLife', relation, force, me.bFightState)
 		if bShowLife then
 			lb:SetLifeBar(Config.nLifeOffsetX, Config.nLifeOffsetY, Config.nLifeWidth, Config.nLifeHeight, Config.nLifePadding)
 			lb:SetLifeBarBorder(Config.nLifeBorder, Config.nLifeBorderR, Config.nLifeBorderG, Config.nLifeBorderB)
 		end
 		lb:SetLifeBarVisible(bShowLife)
 		-- 血量数值部分
-		bShowLifePercent = GetConfigValue('ShowLifePer', relation, force) and (not Config.bHideLifePercentageWhenFight or me.bFightState)
+		bShowLifePercent = GetConfigComputeValue('ShowLifePer', relation, force, me.bFightState)
 		if bShowLifePercent then
 			lb:SetLifeText(Config.nLifePerOffsetX, Config.nLifePerOffsetY, Config.bHideLifePercentageDecimal and '%.0f' or '%.1f')
 		end

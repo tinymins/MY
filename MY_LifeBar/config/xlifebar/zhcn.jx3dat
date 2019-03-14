@@ -1,4 +1,5 @@
-data = {
+local __META__ = {}
+local __TEMPLATE__ = {
 	eCss = 'XLIFEBAR',
 	fDesignUIScale = 0.9,
 	nDesignFontOffset = 0,
@@ -15,8 +16,8 @@ data = {
 
 	bShowSpecialNpc = false,
 	bShowSpecialNpcOnlyEnemy = true,
-	bShowUnnamedObjectID = false,
-	bShowAllObjectID = false,
+	bShowObjectID = false,
+	bShowObjectIDOnlyUnnamed = false,
 	bShowKungfu = false,
 	bShowDistance = false,
 
@@ -53,157 +54,245 @@ data = {
 
 	Color = {
 		Self = { -- 自己
-			DifferentiateForce = false,
-			Player = { 30 , 140, 220 },
-			Npc    = { 30 , 140, 220 },
-			[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
-			[FORCE_TYPE.SHAO_LIN ] = { 210, 180, 0   }, -- 少林
-			[FORCE_TYPE.WAN_HUA  ] = { 127, 31 , 223 }, -- 万花
-			[FORCE_TYPE.TIAN_CE  ] = { 160, 0  , 0   }, -- 天策
-			[FORCE_TYPE.CHUN_YANG] = { 56 , 175, 255 }, -- 纯阳 56,175,255
-			[FORCE_TYPE.QI_XIU   ] = { 255, 127, 255 }, -- 七秀
-			[FORCE_TYPE.WU_DU    ] = { 63 , 31 , 159 }, -- 五毒
-			[FORCE_TYPE.TANG_MEN ] = { 0  , 133, 144 }, -- 唐门
-			[FORCE_TYPE.CANG_JIAN] = { 255, 255, 0   }, -- 藏剑
-			[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐帮
-			[FORCE_TYPE.MING_JIAO] = { 253, 84 , 0   }, -- 明教
-			[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 苍云
-			[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 长歌
-			[FORCE_TYPE.BA_DAO   ] = { 71 , 73 , 166 }, -- 霸刀
+			__META__,
+			__VALUE__ = {
+				DifferentiateForce = false,
+				Player = { 30, 140, 220 },
+				Npc    = { 30, 140, 220 },
+				[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
+				[FORCE_TYPE.SHAO_LIN ] = { 210, 180, 0   }, -- 少林
+				[FORCE_TYPE.WAN_HUA  ] = { 127, 31 , 223 }, -- 万花
+				[FORCE_TYPE.TIAN_CE  ] = { 160, 0  , 0   }, -- 天策
+				[FORCE_TYPE.CHUN_YANG] = { 56 , 175, 255 }, -- 纯阳 56,175,255
+				[FORCE_TYPE.QI_XIU   ] = { 255, 127, 255 }, -- 七秀
+				[FORCE_TYPE.WU_DU    ] = { 63 , 31 , 159 }, -- 五毒
+				[FORCE_TYPE.TANG_MEN ] = { 0  , 133, 144 }, -- 唐门
+				[FORCE_TYPE.CANG_JIAN] = { 255, 255, 0   }, -- 藏剑
+				[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐帮
+				[FORCE_TYPE.MING_JIAO] = { 253, 84 , 0   }, -- 明教
+				[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 苍云
+				[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 长歌
+				[FORCE_TYPE.BA_DAO   ] = { 71 , 73 , 166 }, -- 霸刀
+			},
+			__ARRAY_TEMPLATE__ = { 30, 140, 220 },
 		},
 		Party = { -- 团队
-			DifferentiateForce = false,
-			Player = { 30, 140, 220 },
-			Npc    = { 30, 140, 220 },
-			[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
-			[FORCE_TYPE.SHAO_LIN ] = { 210, 180, 0   }, -- 少林
-			[FORCE_TYPE.WAN_HUA  ] = { 127, 31 , 223 }, -- 万花
-			[FORCE_TYPE.TIAN_CE  ] = { 160, 0  , 0   }, -- 天策
-			[FORCE_TYPE.CHUN_YANG] = { 56 , 175, 255 }, -- 纯阳 56,175,255
-			[FORCE_TYPE.QI_XIU   ] = { 255, 127, 255 }, -- 七秀
-			[FORCE_TYPE.WU_DU    ] = { 63 , 31 , 159 }, -- 五毒
-			[FORCE_TYPE.TANG_MEN ] = { 0  , 133, 144 }, -- 唐门
-			[FORCE_TYPE.CANG_JIAN] = { 255, 255, 0   }, -- 藏剑
-			[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐帮
-			[FORCE_TYPE.MING_JIAO] = { 253, 84 , 0   }, -- 明教
-			[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 苍云
-			[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 长歌
-			[FORCE_TYPE.BA_DAO   ] = { 71 , 73 , 166 }, -- 霸刀
+			__META__,
+			__VALUE__ = {
+				DifferentiateForce = false,
+				Player = { 30, 140, 220 },
+				Npc    = { 30, 140, 220 },
+				[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
+				[FORCE_TYPE.SHAO_LIN ] = { 210, 180, 0   }, -- 少林
+				[FORCE_TYPE.WAN_HUA  ] = { 127, 31 , 223 }, -- 万花
+				[FORCE_TYPE.TIAN_CE  ] = { 160, 0  , 0   }, -- 天策
+				[FORCE_TYPE.CHUN_YANG] = { 56 , 175, 255 }, -- 纯阳 56,175,255
+				[FORCE_TYPE.QI_XIU   ] = { 255, 127, 255 }, -- 七秀
+				[FORCE_TYPE.WU_DU    ] = { 63 , 31 , 159 }, -- 五毒
+				[FORCE_TYPE.TANG_MEN ] = { 0  , 133, 144 }, -- 唐门
+				[FORCE_TYPE.CANG_JIAN] = { 255, 255, 0   }, -- 藏剑
+				[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐帮
+				[FORCE_TYPE.MING_JIAO] = { 253, 84 , 0   }, -- 明教
+				[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 苍云
+				[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 长歌
+				[FORCE_TYPE.BA_DAO   ] = { 71 , 73 , 166 }, -- 霸刀
+			},
+			__ARRAY_TEMPLATE__ = { 30, 140, 220 },
 		},
 		Enemy = { -- 敌对
-			DifferentiateForce = false,
-			Player = { 255, 30, 30 },
-			Npc    = { 255, 30, 30 },
-			[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
-			[FORCE_TYPE.SHAO_LIN ] = { 210, 180, 0   }, -- 少林
-			[FORCE_TYPE.WAN_HUA  ] = { 127, 31 , 223 }, -- 万花
-			[FORCE_TYPE.TIAN_CE  ] = { 160, 0  , 0   }, -- 天策
-			[FORCE_TYPE.CHUN_YANG] = { 56 , 175, 255 }, -- 纯阳 56,175,255
-			[FORCE_TYPE.QI_XIU   ] = { 255, 127, 255 }, -- 七秀
-			[FORCE_TYPE.WU_DU    ] = { 63 , 31 , 159 }, -- 五毒
-			[FORCE_TYPE.TANG_MEN ] = { 0  , 133, 144 }, -- 唐门
-			[FORCE_TYPE.CANG_JIAN] = { 255, 255, 0   }, -- 藏剑
-			[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐帮
-			[FORCE_TYPE.MING_JIAO] = { 253, 84 , 0   }, -- 明教
-			[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 苍云
-			[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 长歌
-			[FORCE_TYPE.BA_DAO   ] = { 71 , 73 , 166 }, -- 霸刀
+			__META__,
+			__VALUE__ = {
+				DifferentiateForce = false,
+				Player = { 255, 30, 30 },
+				Npc    = { 255, 30, 30 },
+				[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
+				[FORCE_TYPE.SHAO_LIN ] = { 210, 180, 0   }, -- 少林
+				[FORCE_TYPE.WAN_HUA  ] = { 127, 31 , 223 }, -- 万花
+				[FORCE_TYPE.TIAN_CE  ] = { 160, 0  , 0   }, -- 天策
+				[FORCE_TYPE.CHUN_YANG] = { 56 , 175, 255 }, -- 纯阳 56,175,255
+				[FORCE_TYPE.QI_XIU   ] = { 255, 127, 255 }, -- 七秀
+				[FORCE_TYPE.WU_DU    ] = { 63 , 31 , 159 }, -- 五毒
+				[FORCE_TYPE.TANG_MEN ] = { 0  , 133, 144 }, -- 唐门
+				[FORCE_TYPE.CANG_JIAN] = { 255, 255, 0   }, -- 藏剑
+				[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐帮
+				[FORCE_TYPE.MING_JIAO] = { 253, 84 , 0   }, -- 明教
+				[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 苍云
+				[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 长歌
+				[FORCE_TYPE.BA_DAO   ] = { 71 , 73 , 166 }, -- 霸刀
+			},
+			__ARRAY_TEMPLATE__ = { 255, 30, 30 },
 		},
 		Neutrality = { -- 中立
-			DifferentiateForce = false,
-			Player = { 255, 255, 0 },
-			Npc    = { 255, 255, 0 },
-			[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
-			[FORCE_TYPE.SHAO_LIN ] = { 210, 180, 0   }, -- 少林
-			[FORCE_TYPE.WAN_HUA  ] = { 127, 31 , 223 }, -- 万花
-			[FORCE_TYPE.TIAN_CE  ] = { 160, 0  , 0   }, -- 天策
-			[FORCE_TYPE.CHUN_YANG] = { 56 , 175, 255 }, -- 纯阳 56,175,255
-			[FORCE_TYPE.QI_XIU   ] = { 255, 127, 255 }, -- 七秀
-			[FORCE_TYPE.WU_DU    ] = { 63 , 31 , 159 }, -- 五毒
-			[FORCE_TYPE.TANG_MEN ] = { 0  , 133, 144 }, -- 唐门
-			[FORCE_TYPE.CANG_JIAN] = { 255, 255, 0   }, -- 藏剑
-			[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐帮
-			[FORCE_TYPE.MING_JIAO] = { 253, 84 , 0   }, -- 明教
-			[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 苍云
-			[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 长歌
-			[FORCE_TYPE.BA_DAO   ] = { 71 , 73 , 166 }, -- 霸刀
+			__META__,
+			__VALUE__ = {
+				DifferentiateForce = false,
+				Player = { 255, 255, 0 },
+				Npc    = { 255, 255, 0 },
+				[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
+				[FORCE_TYPE.SHAO_LIN ] = { 210, 180, 0   }, -- 少林
+				[FORCE_TYPE.WAN_HUA  ] = { 127, 31 , 223 }, -- 万花
+				[FORCE_TYPE.TIAN_CE  ] = { 160, 0  , 0   }, -- 天策
+				[FORCE_TYPE.CHUN_YANG] = { 56 , 175, 255 }, -- 纯阳 56,175,255
+				[FORCE_TYPE.QI_XIU   ] = { 255, 127, 255 }, -- 七秀
+				[FORCE_TYPE.WU_DU    ] = { 63 , 31 , 159 }, -- 五毒
+				[FORCE_TYPE.TANG_MEN ] = { 0  , 133, 144 }, -- 唐门
+				[FORCE_TYPE.CANG_JIAN] = { 255, 255, 0   }, -- 藏剑
+				[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐帮
+				[FORCE_TYPE.MING_JIAO] = { 253, 84 , 0   }, -- 明教
+				[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 苍云
+				[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 长歌
+				[FORCE_TYPE.BA_DAO   ] = { 71 , 73 , 166 }, -- 霸刀
+			},
+			__ARRAY_TEMPLATE__ = { 255, 255, 0 },
 		},
 		Ally = { -- 相同阵营
-			DifferentiateForce = false,
-			Player = { 30 , 255, 30 },
-			Npc    = { 30 , 255, 30 },
-			[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
-			[FORCE_TYPE.SHAO_LIN ] = { 210, 180, 0   }, -- 少林
-			[FORCE_TYPE.WAN_HUA  ] = { 127, 31 , 223 }, -- 万花
-			[FORCE_TYPE.TIAN_CE  ] = { 160, 0  , 0   }, -- 天策
-			[FORCE_TYPE.CHUN_YANG] = { 56 , 175, 255 }, -- 纯阳 56,175,255
-			[FORCE_TYPE.QI_XIU   ] = { 255, 127, 255 }, -- 七秀
-			[FORCE_TYPE.WU_DU    ] = { 63 , 31 , 159 }, -- 五毒
-			[FORCE_TYPE.TANG_MEN ] = { 0  , 133, 144 }, -- 唐门
-			[FORCE_TYPE.CANG_JIAN] = { 255, 255, 0   }, -- 藏剑
-			[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐帮
-			[FORCE_TYPE.MING_JIAO] = { 253, 84 , 0   }, -- 明教
-			[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 苍云
-			[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 长歌
-			[FORCE_TYPE.BA_DAO   ] = { 71 , 73 , 166 }, -- 霸刀
+			__META__,
+			__VALUE__ = {
+				DifferentiateForce = false,
+				Player = { 30, 255, 30 },
+				Npc    = { 30, 255, 30 },
+				[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
+				[FORCE_TYPE.SHAO_LIN ] = { 210, 180, 0   }, -- 少林
+				[FORCE_TYPE.WAN_HUA  ] = { 127, 31 , 223 }, -- 万花
+				[FORCE_TYPE.TIAN_CE  ] = { 160, 0  , 0   }, -- 天策
+				[FORCE_TYPE.CHUN_YANG] = { 56 , 175, 255 }, -- 纯阳 56,175,255
+				[FORCE_TYPE.QI_XIU   ] = { 255, 127, 255 }, -- 七秀
+				[FORCE_TYPE.WU_DU    ] = { 63 , 31 , 159 }, -- 五毒
+				[FORCE_TYPE.TANG_MEN ] = { 0  , 133, 144 }, -- 唐门
+				[FORCE_TYPE.CANG_JIAN] = { 255, 255, 0   }, -- 藏剑
+				[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐帮
+				[FORCE_TYPE.MING_JIAO] = { 253, 84 , 0   }, -- 明教
+				[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 苍云
+				[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 长歌
+				[FORCE_TYPE.BA_DAO   ] = { 71 , 73 , 166 }, -- 霸刀
+			},
+			__ARRAY_TEMPLATE__ = { 30, 255, 30 },
 		},
 		Foe = { -- 仇人
-			DifferentiateForce = false,
-			Player = { 255, 128, 255 },
-			[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
-			[FORCE_TYPE.SHAO_LIN ] = { 210, 180, 0   }, -- 少林
-			[FORCE_TYPE.WAN_HUA  ] = { 127, 31 , 223 }, -- 万花
-			[FORCE_TYPE.TIAN_CE  ] = { 160, 0  , 0   }, -- 天策
-			[FORCE_TYPE.CHUN_YANG] = { 56 , 175, 255 }, -- 纯阳 56,175,255
-			[FORCE_TYPE.QI_XIU   ] = { 255, 127, 255 }, -- 七秀
-			[FORCE_TYPE.WU_DU    ] = { 63 , 31 , 159 }, -- 五毒
-			[FORCE_TYPE.TANG_MEN ] = { 0  , 133, 144 }, -- 唐门
-			[FORCE_TYPE.CANG_JIAN] = { 255, 255, 0   }, -- 藏剑
-			[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐帮
-			[FORCE_TYPE.MING_JIAO] = { 253, 84 , 0   }, -- 明教
-			[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 苍云
-			[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 长歌
-			[FORCE_TYPE.BA_DAO   ] = { 71 , 73 , 166 }, -- 霸刀
+			__META__,
+			__VALUE__ = {
+				DifferentiateForce = false,
+				Player = { 255, 128, 255 },
+				[FORCE_TYPE.JIANG_HU ] = { 255, 255, 255 }, -- 江湖
+				[FORCE_TYPE.SHAO_LIN ] = { 210, 180, 0   }, -- 少林
+				[FORCE_TYPE.WAN_HUA  ] = { 127, 31 , 223 }, -- 万花
+				[FORCE_TYPE.TIAN_CE  ] = { 160, 0  , 0   }, -- 天策
+				[FORCE_TYPE.CHUN_YANG] = { 56 , 175, 255 }, -- 纯阳 56,175,255
+				[FORCE_TYPE.QI_XIU   ] = { 255, 127, 255 }, -- 七秀
+				[FORCE_TYPE.WU_DU    ] = { 63 , 31 , 159 }, -- 五毒
+				[FORCE_TYPE.TANG_MEN ] = { 0  , 133, 144 }, -- 唐门
+				[FORCE_TYPE.CANG_JIAN] = { 255, 255, 0   }, -- 藏剑
+				[FORCE_TYPE.GAI_BANG ] = { 205, 133, 63  }, -- 丐帮
+				[FORCE_TYPE.MING_JIAO] = { 253, 84 , 0   }, -- 明教
+				[FORCE_TYPE.CANG_YUN ] = { 180, 60 , 0   }, -- 苍云
+				[FORCE_TYPE.CHANG_GE ] = { 100, 250, 180 }, -- 长歌
+				[FORCE_TYPE.BA_DAO   ] = { 71 , 73 , 166 }, -- 霸刀
+			},
+			__ARRAY_TEMPLATE__ = { 255, 128, 255 },
 		},
 	},
 	ShowName = {
-		Party = { Npc = true, Player = true },
-		Self = { Npc = true, Player = true },
-		Neutrality = { Npc = true, Player = true },
-		Ally = { Npc = true, Player = true },
-		Foe = { Player = true },
-		Enemy = { Npc = true, Player = true },
+		Self = {
+			Npc = { bEnable = true, bOnlyFighting = false },
+			Player = { bEnable = true, bOnlyFighting = false },
+		},
+		Party = {
+			Npc = { bEnable = true, bOnlyFighting = false },
+			Player = { bEnable = true, bOnlyFighting = false },
+		},
+		Enemy = {
+			Npc = { bEnable = true, bOnlyFighting = false },
+			Player = { bEnable = true, bOnlyFighting = false },
+		},
+		Neutrality = {
+			Npc = { bEnable = true, bOnlyFighting = false },
+			Player = { bEnable = true, bOnlyFighting = false },
+		},
+		Ally = {
+			Npc = { bEnable = true, bOnlyFighting = false },
+			Player = { bEnable = true, bOnlyFighting = false },
+		},
+		Foe = { Player = { bEnable = true, bOnlyFighting = false } },
 	},
 	ShowTong = {
-		Party = { Player = true },
-		Self = { Npc = true, Player = true },
-		Neutrality = { Player = true },
-		Ally = { Player = true },
-		Enemy = { Player = true },
-		Foe = { Player = true },
+		Self = {
+			Npc = { bEnable = true, bOnlyFighting = false },
+			Player = { bEnable = true, bOnlyFighting = false },
+		},
+		Party = { Player = { bEnable = true, bOnlyFighting = false } },
+		Enemy = { Player = { bEnable = true, bOnlyFighting = false } },
+		Neutrality = { Player = { bEnable = true, bOnlyFighting = false } },
+		Ally = { Player = { bEnable = true, bOnlyFighting = false } },
+		Foe = { Player = { bEnable = true, bOnlyFighting = false } },
 	},
 	ShowTitle = {
-		Party = { Npc = true, Player = true },
-		Self = { Npc = true, Player = true },
-		Neutrality = { Npc = true, Player = true },
-		Ally = { Npc = true, Player = true },
-		Foe = { Player = true },
-		Enemy = { Npc = true, Player = true },
-	},
-	ShowLifePer = {
-		Party = { Npc = false, Player = false },
-		Self = { Npc = false, Player = false },
-		Neutrality = { Npc = false, Player = false },
-		Ally = { Npc = false, Player = false },
-		Foe = { Player = false },
-		Enemy = { Npc = false, Player = false },
+		Self = {
+			Npc = { bEnable = true, bOnlyFighting = false },
+			Player = { bEnable = true, bOnlyFighting = false },
+		},
+		Party = {
+			Npc = { bEnable = true, bOnlyFighting = false },
+			Player = { bEnable = true, bOnlyFighting = false },
+		},
+		Enemy = {
+			Npc = { bEnable = true, bOnlyFighting = false },
+			Player = { bEnable = true, bOnlyFighting = false },
+		},
+		Neutrality = {
+			Npc = { bEnable = true, bOnlyFighting = false },
+			Player = { bEnable = true, bOnlyFighting = false },
+		},
+		Ally = {
+			Npc = { bEnable = true, bOnlyFighting = false },
+			Player = { bEnable = true, bOnlyFighting = false },
+		},
+		Foe = { Player = { bEnable = true, bOnlyFighting = false } },
 	},
 	ShowLife = {
-		Party = { Npc = false, Player = true },
-		Self = { Npc = true, Player = true },
-		Neutrality = { Npc = true, Player = true },
-		Ally = { Npc = true, Player = true },
-		Foe = { Player = true },
-		Enemy = { Npc = true, Player = true },
+		Self = {
+			Npc = { bEnable = true, bOnlyFighting = false },
+			Player = { bEnable = true, bOnlyFighting = false },
+		},
+		Party = {
+			Npc = { bEnable = false, bOnlyFighting = false },
+			Player = { bEnable = true, bOnlyFighting = false },
+		},
+		Enemy = {
+			Npc = { bEnable = true, bOnlyFighting = false },
+			Player = { bEnable = true, bOnlyFighting = false },
+		},
+		Neutrality = {
+			Npc = { bEnable = true, bOnlyFighting = false },
+			Player = { bEnable = true, bOnlyFighting = false },
+		},
+		Ally = {
+			Npc = { bEnable = true, bOnlyFighting = false },
+			Player = { bEnable = true, bOnlyFighting = false },
+		},
+		Foe = { Player = { bEnable = true, bOnlyFighting = false } },
+	},
+	ShowLifePer = {
+		Self = {
+			Npc = { bEnable = false, bOnlyFighting = false },
+			Player = { bEnable = false, bOnlyFighting = false },
+		},
+		Party = {
+			Npc = { bEnable = false, bOnlyFighting = false },
+			Player = { bEnable = false, bOnlyFighting = false },
+		},
+		Enemy = {
+			Npc = { bEnable = false, bOnlyFighting = false },
+			Player = { bEnable = false, bOnlyFighting = false },
+		},
+		Neutrality = {
+			Npc = { bEnable = false, bOnlyFighting = false },
+			Player = { bEnable = false, bOnlyFighting = false },
+		},
+		Ally = {
+			Npc = { bEnable = false, bOnlyFighting = false },
+			Player = { bEnable = false, bOnlyFighting = false },
+		},
+		Foe = { Player = { bEnable = false, bOnlyFighting = false } },
 	},
 }
+return { __TEMPLATE__, __META__ }

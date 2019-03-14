@@ -42,7 +42,7 @@ end
 
 local Config = MY_LifeBar_Config
 if not Config then
-    return
+	return
 end
 
 local D = {
@@ -450,15 +450,23 @@ function PS.OnPanelActive(wnd)
 		if szPlayerTip then
 			table.insert(t, { szOption = szPlayerTip, bDisable = true } )
 			for relation, cfg in pairs(cfgs) do
-				if cfg.Player ~= nil then
+				if cfg.Player then
 					table.insert(t, FillColorTable({
 						szOption = _L[relation],
 						bCheck = true,
-						bChecked = cfg.Player,
+						bChecked = cfg.Player.bEnable,
 						fnAction = function()
-							cfg.Player = not cfg.Player
+							cfg.Player.bEnable = not cfg.Player.bEnable
 							D.Reset()
 						end,
+						{
+							szOption = _L['hide when unfight'],
+							bCheck = true,
+							bChecked = cfg.Player.bOnlyFighting,
+							fnAction = function()
+								cfg.Player.bOnlyFighting = not cfg.Player.bOnlyFighting
+							end,
+						}
 					}, relation, 'Player'))
 				end
 			end
@@ -469,15 +477,23 @@ function PS.OnPanelActive(wnd)
 		if szNpcTip then
 			table.insert(t,{ szOption = szNpcTip, bDisable = true } )
 			for relation, cfg in pairs(cfgs) do
-				if cfg.Npc ~= nil then
+				if cfg.Npc then
 					table.insert(t, FillColorTable({
 						szOption = _L[relation],
 						bCheck = true,
-						bChecked = cfg.Npc,
+						bChecked = cfg.Npc.bEnable,
 						fnAction = function()
-							cfg.Npc = not cfg.Npc
+							cfg.Npc.bEnable = not cfg.Npc.bEnable
 							D.Reset()
 						end,
+						{
+							szOption = _L['hide when unfight'],
+							bCheck = true,
+							bChecked = cfg.Npc.bOnlyFighting,
+							fnAction = function()
+								cfg.Npc.bOnlyFighting = not cfg.Npc.bOnlyFighting
+							end,
+						}
 					}, relation, 'Npc'))
 				end
 			end
@@ -546,14 +562,6 @@ function PS.OnPanelActive(wnd)
 		menu = function()
 			local t = GeneBooleanPopupMenu(Config.ShowLifePer, _L['player lifepercentage display'], _L['npc lifepercentage display'])
 			table.insert(t, { bDevide = true })
-			table.insert(t, {
-				szOption = _L['hide when unfight'],
-				bCheck = true,
-				bChecked = Config.bHideLifePercentageWhenFight,
-				fnAction = function()
-					Config.bHideLifePercentageWhenFight = not Config.bHideLifePercentageWhenFight
-				end,
-			})
 			table.insert(t, {
 				szOption = _L['hide decimal'],
 				bCheck = true,
