@@ -441,15 +441,15 @@ end
 MY.FullClone = clone
 
 local defaultParams = { keepNewChild = false }
-local function FormatDataStructure(data, struct, assign, metaFlag)
-	if metaFlag == nil then
-		metaFlag = '__META__'
+local function FormatDataStructure(data, struct, assign, metaSymbol)
+	if metaSymbol == nil then
+		metaSymbol = '__META__'
 	end
 	-- 标准化参数
 	local params = setmetatable({}, defaultParams)
 	local structTypes, defaultData, defaultDataType
 	local keyTemplate, childTemplate, arrayTemplate, dictionaryTemplate
-	if type(struct) == 'table' and struct[1] == metaFlag then
+	if type(struct) == 'table' and struct[1] == metaSymbol then
 		-- 处理有META标记的数据项
 		-- 允许类型和默认值
 		structTypes = struct[2] or { type(struct.__VALUE__) }
@@ -490,52 +490,64 @@ local function FormatDataStructure(data, struct, assign, metaFlag)
 		if not assign then
 			data = clone(data)
 		end
-		local keys = {}
+		local keys, skipKeys = {}, {}
+		-- 数据类型是表且默认数据也是表 则递归检查子元素与默认子元素
+		if dataType == 'table' and defaultDataType == 'table' then
+			for k, v in pairs(defaultData) do
+				keys[k], skipKeys[k] = true, true
+				data[k] = FormatDataStructure(data[k], defaultData[k], true, metaSymbol)
+			end
+		end
 		-- 数据类型是表且META信息中定义了子元素KEY模板 则递归检查子元素KEY与子元素KEY模板
 		if dataType == 'table' and keyTemplate then
 			for k, v in pairs(data) do
-				local k1 = FormatDataStructure(k, keyTemplate)
-				if k1 ~= k then
-					if k1 ~= nil then
-						data[k1] = data[k]
+				if not skipKeys[k] then
+					local k1 = FormatDataStructure(k, keyTemplate, true, metaSymbol)
+					if k1 ~= k then
+						if k1 ~= nil then
+							data[k1] = data[k]
+						end
+						data[k] = nil
 					end
-					data[k] = nil
 				end
 			end
 		end
 		-- 数据类型是表且META信息中定义了子元素模板 则递归检查子元素与子元素模板
 		if dataType == 'table' and childTemplate then
-			for i, v in pairs(data) do
-				keys[i] = true
-				data[i] = FormatDataStructure(data[i], childTemplate)
+			for k, v in pairs(data) do
+				if not skipKeys[k] then
+					keys[k] = true
+					data[k] = FormatDataStructure(data[k], childTemplate, true, metaSymbol)
+				end
 			end
 		end
 		-- 数据类型是表且META信息中定义了列表子元素模板 则递归检查子元素与列表子元素模板
 		if dataType == 'table' and arrayTemplate then
 			for i, v in pairs(data) do
 				if type(i) == 'number' then
-					keys[i] = true
-					data[i] = FormatDataStructure(data[i], arrayTemplate)
+					if not skipKeys[k] then
+						keys[i] = true
+						data[i] = FormatDataStructure(data[i], arrayTemplate, true, metaSymbol)
+					end
 				end
 			end
 		end
 		-- 数据类型是表且META信息中定义了哈希子元素模板 则递归检查子元素与哈希子元素模板
 		if dataType == 'table' and dictionaryTemplate then
-			for i, v in pairs(data) do
-				if type(i) ~= 'number' then
-					keys[i] = true
-					data[i] = FormatDataStructure(data[i], dictionaryTemplate)
+			for k, v in pairs(data) do
+				if type(k) ~= 'number' then
+					if not skipKeys[k] then
+						keys[k] = true
+						data[k] = FormatDataStructure(data[k], dictionaryTemplate, true, metaSymbol)
+					end
 				end
 			end
 		end
-		-- 数据类型是表且默认数据也是表 则递归检查子元素与默认子元素
+		-- 数据类型是表且默认数据也是表 则递归检查子元素是否需要保留
 		if dataType == 'table' and defaultDataType == 'table' then
-			for k, v in pairs(defaultData) do
-				data[k] = FormatDataStructure(data[k], defaultData[k])
-			end
 			if not params.keepNewChild then
 				for k, v in pairs(data) do
-					if defaultData[k] == nil and not keys[k] then
+					if defaultData[k] == nil and not keys[k] then -- 默认中没有且没有通过过滤器函数的则删除
 						data[k] = nil
 					end
 				end
@@ -546,7 +558,7 @@ local function FormatDataStructure(data, struct, assign, metaFlag)
 			-- 默认值为表 需要递归检查子元素
 			data = {}
 			for k, v in pairs(defaultData) do
-				data[k] = FormatDataStructure(nil, v)
+				data[k] = FormatDataStructure(nil, v, true, metaSymbol)
 			end
 		else -- 默认值不是表 直接克隆数据
 			data = clone(defaultData)
