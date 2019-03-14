@@ -40,6 +40,27 @@ if not MY.AssertVersion('MY_LifeBar', _L['MY_LifeBar'], 0x2012400) then
 	return
 end
 
+do -- auto generate embedded data
+for _, DAT_ROOT in ipairs({
+	'MY_LifeBar/config/default/',
+	'MY_LifeBar/config/official/',
+	'MY_LifeBar/config/clear/',
+	'MY_LifeBar/config/xlifebar/',
+}) do
+	local SRC_ROOT = MY.FormatPath(MY.GetAddonInfo().szRoot .. '!src-dist/dat/' .. DAT_ROOT)
+	local DST_ROOT = MY.FormatPath(MY.GetAddonInfo().szRoot .. DAT_ROOT)
+	for _, szFile in ipairs(CPath.GetFileList(SRC_ROOT)) do
+		MY.Sysmsg(_L['Compressing: '] .. DAT_ROOT .. szFile)
+		local data = LoadDataFromFile(SRC_ROOT .. szFile)
+		if IsEncodedData(data) then
+			data = DecodeData(data)
+		end
+		data = EncodeData(data, true, true)
+		SaveDataToFile(data, DST_ROOT .. szFile)
+	end
+end
+end
+
 local CONFIG_DEFAULTS = setmetatable({
 	DEFAULT  = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/config/default/$lang.jx3dat'),
 	OFFICIAL = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/config/official/$lang.jx3dat'),
