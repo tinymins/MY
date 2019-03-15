@@ -34,6 +34,8 @@ if int(str_version) <= max_version:
 	exit()
 
 # 读取Git中最大的版本号 到最新版修改文件
+def pathToModule(path):
+	return re.sub('(?:^\\!src-dist/dat/|["/].*$)', '', path)
 paths = {
 	'package.ini': True,
 }
@@ -42,11 +44,11 @@ if git_tag != '':
 	filelist = os.popen('git diff ' + git_tag + ' --name-status').read().strip().split("\n")
 	for file in filelist:
 		lst = file.split("\t")
-		if lst[0] == "M":
-			paths[re.sub('["/].*$', '', lst[1])] = True
+		if lst[0] == "A" or lst[0] == "M" or lst[0] == "D":
+			paths[pathToModule(lst[1])] = True
 		elif lst[0][0] == "R":
-			paths[re.sub('["/].*$', '', lst[1])] = True
-			paths[re.sub('["/].*$', '', lst[2])] = True
+			paths[pathToModule(lst[1])] = True
+			paths[pathToModule(lst[2])] = True
 		print(file)
 print('')
 
