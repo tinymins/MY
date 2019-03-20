@@ -67,6 +67,7 @@ data = {
     ['Memo (Global)'] = '随身便笺 (公共)',
     ['MY Memo (Role)'] = '茗伊随身便笺 (角色)',
     ['MY Memo (Global)'] = '茗伊随身便笺 (公共)',
+    ['Font'] = '字体',
     ['player note'] = '管理小本本',
     ['Create'] = '添加',
     ['View anmerkungen'] = '管理本本',

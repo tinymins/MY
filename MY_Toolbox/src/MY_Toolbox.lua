@@ -971,12 +971,32 @@ function PS.OnPanelActive(wnd)
 		end,
 	}, true):autoWidth():width() + 5
 
+	x = x + ui:append('WndButton', {
+		x = x, y = y,
+		text = _L['Font'],
+		onclick = function()
+			UI.OpenFontPicker(function(nFont)
+				MY_Memo.SetFont(false, nFont)
+			end)
+		end,
+	}, true):autoWidth():width() + 5
+
 	x = x + ui:append('WndCheckBox', {
 		x = x, y = y,
 		text = _L['Memo (Global)'],
 		checked = MY_Memo.IsEnable(true),
 		oncheck = function(bChecked)
 			MY_Memo.Toggle(true, bChecked)
+		end,
+	}, true):autoWidth():width() + 5
+
+	x = x + ui:append('WndButton', {
+		x = x, y = y,
+		text = _L['Font'],
+		onclick = function()
+			UI.OpenFontPicker(function(nFont)
+				MY_Memo.SetFont(true, nFont)
+			end)
 		end,
 	}, true):autoWidth():width() + 5
 	y = y + 30

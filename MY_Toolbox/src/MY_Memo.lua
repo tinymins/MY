@@ -41,6 +41,7 @@ local ROLE_MEMO = {
 	nWidth = 200,
 	nHeight = 200,
 	szContent = '',
+	nFont = 0,
 	anchor = { s = 'TOPRIGHT', r = 'TOPRIGHT', x = -310, y = 135 },
 }
 local GLOBAL_MEMO = {
@@ -48,6 +49,7 @@ local GLOBAL_MEMO = {
 	nWidth = 200,
 	nHeight = 200,
 	szContent = '',
+	nFont = 0,
 	anchor = { s = 'TOPRIGHT', r = 'TOPRIGHT', x = -310, y = 335 },
 }
 local D = {}
@@ -102,6 +104,7 @@ function D.Reload(bGlobal)
 			name = 'WndEditBox_Memo',
 			x = 0, y = 0, w = CFG.nWidth, h = CFG.nHeight - 30,
 			text = CFG.szContent, multiline = true,
+			font = CFG.nFont,
 			onchange = function(text) CFG.szContent = text end,
 		})
 	end
@@ -150,6 +153,19 @@ end
 
 function MY_Memo.Toggle(bGlobal, bEnable)
 	(bGlobal and GLOBAL_MEMO or ROLE_MEMO).bEnable = bEnable
+	D.SaveConfig()
+	D.Reload(bGlobal)
+end
+
+function MY_Memo.GetFont(bGlobal)
+	if bGlobal then
+		return GLOBAL_MEMO.nFont
+	end
+	return ROLE_MEMO.nFont
+end
+
+function MY_Memo.SetFont(bGlobal, nFont)
+	(bGlobal and GLOBAL_MEMO or ROLE_MEMO).nFont = nFont
 	D.SaveConfig()
 	D.Reload(bGlobal)
 end
