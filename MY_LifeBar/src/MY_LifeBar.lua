@@ -390,6 +390,10 @@ MY.RegisterEvent('COINSHOP_ON_CLOSE', D.AutoSwitchSysHeadTop)
 do
 local CheckInvalidRect
 do
+local bShieldedVersion = MY.IsShieldedVersion()
+MY.RegisterEvent('MY_SHIELDED_VERSION', function()
+	bShieldedVersion = MY.IsShieldedVersion()
+end)
 local function fxTarget(r, g, b, a) return 255 - (255 - r) * 0.3, 255 - (255 - g) * 0.3, 255 - (255 - b) * 0.3, a end
 local function fxDeath(r, g, b, a) return ceil(r * 0.4), ceil(g * 0.4), ceil(b * 0.4), a end
 local function fxDeathTarget(r, g, b, a) return ceil(r * 0.45), ceil(g * 0.45), ceil(b * 0.45), a end
@@ -424,8 +428,11 @@ function CheckInvalidRect(dwType, dwID, me, object)
 	and not object.CanSeeName()
 	and (
 		object.dwTemplateID ~= CHANGGE_REAL_SHADOW_TPLID
-		or (IsEnemy(me.dwID, dwID) and MY.IsShieldedVersion())
-	) and not (Config.bShowSpecialNpc and (not Config.bShowSpecialNpcOnlyEnemy or IsEnemy(me.dwID, dwID))) then
+		or (IsEnemy(me.dwID, dwID) and bShieldedVersion)
+	) and not (
+		Config.bShowSpecialNpc and (not bShieldedVersion or MY.IsInDungeon())
+		and (not (Config.bShowSpecialNpcOnlyEnemy or bShieldedVersion) or IsEnemy(me.dwID, dwID))
+	) then
 		bVisible = false
 	end
 	if bVisible then

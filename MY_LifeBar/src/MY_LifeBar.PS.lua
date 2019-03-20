@@ -691,6 +691,8 @@ function PS.OnPanelActive(wnd)
 			Config.bShowSpecialNpc = bChecked
 			D.Reset()
 		end,
+		tip = _L['This function has been shielded by official'],
+		tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
 		autoenable = function() return D.IsEnabled() end,
 	}, true):autoWidth():width() + 5
 	ui:append('WndCheckBox', {
@@ -702,6 +704,8 @@ function PS.OnPanelActive(wnd)
 			Config.bShowSpecialNpcOnlyEnemy = bChecked
 			D.Reset()
 		end,
+		tip = _L['This function has been shielded by official'],
+		tippostype = MY_TIP_POSTYPE.TOP_BOTTOM,
 		autoenable = function() return D.IsEnabled() and Config.bShowSpecialNpc end,
 	})
 
