@@ -83,7 +83,6 @@ local SZ_SKILL_RESULT = {
 }
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Recount/lang/')
 local _C = {
-	szCssFile   = 'config/MY_RECOUNT/style.jx3dat',
 	szIniRoot   = MY.GetAddonInfo().szRoot .. 'MY_Recount/ui/',
 	szIniFile   = MY.GetAddonInfo().szRoot .. 'MY_Recount/ui/MY_Recount.ini',
 	szIniDetail = MY.GetAddonInfo().szRoot .. 'MY_Recount/ui/MY_Recount_Detail.ini',
@@ -91,87 +90,101 @@ local _C = {
 		169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182,
 		183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193
 	},
-	tDefaultCss = {
-		{
-			['Bar'] = {
-				[-1                  ] = { r = 255, g = 255, b = 255, a = 150 }, -- NPC
-				[FORCE_TYPE.JIANG_HU ] = { r = 255, g = 255, b = 255, a = 255 }, -- 江湖
-				[FORCE_TYPE.SHAO_LIN ] = { r = 210, g = 180, b = 0  , a = 144 }, -- 少林
-				[FORCE_TYPE.WAN_HUA  ] = { r = 127, g = 31 , b = 223, a = 180 }, -- 万花
-				[FORCE_TYPE.TIAN_CE  ] = { r = 160, g = 0  , b = 0  , a = 200 }, -- 天策
-				[FORCE_TYPE.CHUN_YANG] = { r = 56 , g = 175, b = 255, a = 144 }, -- 纯阳 56,175,255,232
-				[FORCE_TYPE.QI_XIU   ] = { r = 255, g = 127, b = 255, a = 128 }, -- 七秀
-				[FORCE_TYPE.WU_DU    ] = { r = 63 , g = 31 , b = 159, a = 128 }, -- 五毒
-				[FORCE_TYPE.TANG_MEN ] = { r = 0  , g = 133, b = 144, a = 180 }, -- 唐门
-				[FORCE_TYPE.CANG_JIAN] = { r = 255, g = 255, b = 0  , a = 144 }, -- 藏剑
-				[FORCE_TYPE.GAI_BANG ] = { r = 205, g = 133, b = 63 , a = 180 }, -- 丐帮
-				[FORCE_TYPE.MING_JIAO] = { r = 253, g = 84 , b = 0  , a = 144 }, -- 明教
-				[FORCE_TYPE.CANG_YUN ] = { r = 180, g = 60 , b = 0  , a = 255 }, -- 苍云
-				[FORCE_TYPE.CHANG_GE ] = { r = 100, g = 250, b = 180, a = 100 }, -- 长歌
-				[FORCE_TYPE.BA_DAO   ] = { r = 71 , g = 73 , b = 166, a = 128 }, -- 霸刀
-				[FORCE_TYPE.PENG_LAI ] = { r = 195, g = 171, b = 227, a = 250 }, -- 蓬莱
-			},
-		}, {
-			['Bar'] = {
-				[-1                  ] = { r = 255, g = 255, b = 255, a = 150 }, -- NPC
-				[FORCE_TYPE.JIANG_HU ] = { r = 255, g = 255, b = 255, a = 255 }, -- 江湖
-				[FORCE_TYPE.SHAO_LIN ] = { r = 210, g = 180, b = 0  , a = 144 }, -- 少林
-				[FORCE_TYPE.WAN_HUA  ] = { r = 100, g = 0  , b = 150, a = 96  }, -- 万花
-				[FORCE_TYPE.TIAN_CE  ] = { r = 0  , g = 128, b = 0  , a = 255 }, -- 天策
-				[FORCE_TYPE.CHUN_YANG] = { r = 0  , g = 175, b = 230, a = 112 }, -- 纯阳
-				[FORCE_TYPE.QI_XIU   ] = { r = 240, g = 80 , b = 240, a = 96  }, -- 七秀
-				[FORCE_TYPE.WU_DU    ] = { r = 0  , g = 128, b = 255, a = 144 }, -- 五毒
-				[FORCE_TYPE.TANG_MEN ] = { r = 121, g = 183, b = 54 , a = 144 }, -- 唐门
-				[FORCE_TYPE.CANG_JIAN] = { r = 215, g = 241, b = 74 , a = 144 }, -- 藏剑
-				[FORCE_TYPE.GAI_BANG ] = { r = 205, g = 133, b = 63 , a = 180 }, -- 丐帮
-				[FORCE_TYPE.MING_JIAO] = { r = 240, g = 70 , b = 96 , a = 180 }, -- 明教
-				[FORCE_TYPE.CANG_YUN ] = { r = 180, g = 60 , b = 0  , a = 255 }, -- 苍云
-				[FORCE_TYPE.CHANG_GE ] = { r = 100, g = 250, b = 180, a = 150 }, -- 长歌
-				[FORCE_TYPE.BA_DAO   ] = { r = 71 , g = 73 , b = 166, a = 128 }, -- 霸刀
-				[FORCE_TYPE.PENG_LAI ] = { r = 195, g = 171, b = 227, a = 250 }, -- 蓬莱
-			},
-		}, {
-			['Bar'] = {
-				[-1                  ] = { image = 'ui/Image/Common/Money.UITex', frame = 215 }, -- NPC
-				[FORCE_TYPE.JIANG_HU ] = { image = 'ui/Image/Common/Money.UITex', frame = 210 }, -- 大侠
-				[FORCE_TYPE.SHAO_LIN ] = { image = 'ui/Image/Common/Money.UITex', frame = 203 }, -- 少林
-				[FORCE_TYPE.WAN_HUA  ] = { image = 'ui/Image/Common/Money.UITex', frame = 205 }, -- 万花
-				[FORCE_TYPE.TIAN_CE  ] = { image = 'ui/Image/Common/Money.UITex', frame = 206 }, -- 天策
-				[FORCE_TYPE.CHUN_YANG] = { image = 'ui/Image/Common/Money.UITex', frame = 209 }, -- 纯阳
-				[FORCE_TYPE.QI_XIU   ] = { image = 'ui/Image/Common/Money.UITex', frame = 204 }, -- 七秀
-				[FORCE_TYPE.WU_DU    ] = { image = 'ui/Image/Common/Money.UITex', frame = 208 }, -- 五毒
-				[FORCE_TYPE.TANG_MEN ] = { image = 'ui/Image/Common/Money.UITex', frame = 207 }, -- 唐门
-				[FORCE_TYPE.CANG_JIAN] = { image = 'ui/Image/Common/Money.UITex', frame = 168 }, -- 藏剑
-				[FORCE_TYPE.GAI_BANG ] = { image = 'ui/Image/Common/Money.UITex', frame = 234 }, -- 丐帮
-				[FORCE_TYPE.MING_JIAO] = { image = 'ui/Image/Common/Money.UITex', frame = 232 }, -- 明教
-				[FORCE_TYPE.CANG_YUN ] = { image = 'ui/Image/Common/Money.UITex', frame = 26  }, -- 苍云
-				[FORCE_TYPE.CHANG_GE ] = { image = 'ui/Image/Common/Money.UITex', frame = 30  }, -- 长歌
-				[FORCE_TYPE.BA_DAO   ] = { image = 'ui/Image/Common/Money.UITex', frame = 35  }, -- 霸刀
-				[FORCE_TYPE.PENG_LAI ] = { image = 'ui/Image/Common/Money.UITex', frame = 42  }, -- 蓬莱
-			},
-		}, {
-			['Bar'] = {
-				[-1                  ] = { image = 'ui/Image/Common/Money.UITex', frame = 220 }, -- NPC
-				[FORCE_TYPE.JIANG_HU ] = { image = 'ui/Image/Common/Money.UITex', frame = 220 }, -- 大侠
-				[FORCE_TYPE.SHAO_LIN ] = { image = 'ui/Image/Common/Money.UITex', frame = 216 }, -- 少林
-				[FORCE_TYPE.WAN_HUA  ] = { image = 'ui/Image/Common/Money.UITex', frame = 212 }, -- 万花
-				[FORCE_TYPE.TIAN_CE  ] = { image = 'ui/Image/Common/Money.UITex', frame = 215 }, -- 天策
-				[FORCE_TYPE.CHUN_YANG] = { image = 'ui/Image/Common/Money.UITex', frame = 218 }, -- 纯阳
-				[FORCE_TYPE.QI_XIU   ] = { image = 'ui/Image/Common/Money.UITex', frame = 211 }, -- 七秀
-				[FORCE_TYPE.WU_DU    ] = { image = 'ui/Image/Common/Money.UITex', frame = 213 }, -- 五毒
-				[FORCE_TYPE.TANG_MEN ] = { image = 'ui/Image/Common/Money.UITex', frame = 214 }, -- 唐门
-				[FORCE_TYPE.CANG_JIAN] = { image = 'ui/Image/Common/Money.UITex', frame = 217 }, -- 藏剑
-				[FORCE_TYPE.GAI_BANG ] = { image = 'ui/Image/Common/Money.UITex', frame = 233 }, -- 丐帮
-				[FORCE_TYPE.MING_JIAO] = { image = 'ui/Image/Common/Money.UITex', frame = 228 }, -- 明教
-				[FORCE_TYPE.CANG_YUN ] = { image = 'ui/Image/Common/Money.UITex', frame = 219 }, -- 苍云
-				[FORCE_TYPE.CHANG_GE ] = { image = 'ui/Image/Common/Money.UITex', frame = 30  }, -- 长歌
-				[FORCE_TYPE.BA_DAO   ] = { image = 'ui/Image/Common/Money.UITex', frame = 35  }, -- 霸刀
-				[FORCE_TYPE.PENG_LAI ] = { image = 'ui/Image/Common/Money.UITex', frame = 42  }, -- 蓬莱
-			},
-		},
+}
+local FORCE_BAR_CSS = {
+	{}, -- GLOBAL
+	{
+		[-1                  ] = { r = 255, g = 255, b = 255, a = 150 }, -- NPC
+		[FORCE_TYPE.JIANG_HU ] = { r = 255, g = 255, b = 255, a = 255 }, -- 江湖
+		[FORCE_TYPE.SHAO_LIN ] = { r = 210, g = 180, b = 0  , a = 144 }, -- 少林
+		[FORCE_TYPE.WAN_HUA  ] = { r = 127, g = 31 , b = 223, a = 180 }, -- 万花
+		[FORCE_TYPE.TIAN_CE  ] = { r = 160, g = 0  , b = 0  , a = 200 }, -- 天策
+		[FORCE_TYPE.CHUN_YANG] = { r = 56 , g = 175, b = 255, a = 144 }, -- 纯阳 56,175,255,232
+		[FORCE_TYPE.QI_XIU   ] = { r = 255, g = 127, b = 255, a = 128 }, -- 七秀
+		[FORCE_TYPE.WU_DU    ] = { r = 63 , g = 31 , b = 159, a = 128 }, -- 五毒
+		[FORCE_TYPE.TANG_MEN ] = { r = 0  , g = 133, b = 144, a = 180 }, -- 唐门
+		[FORCE_TYPE.CANG_JIAN] = { r = 255, g = 255, b = 0  , a = 144 }, -- 藏剑
+		[FORCE_TYPE.GAI_BANG ] = { r = 205, g = 133, b = 63 , a = 180 }, -- 丐帮
+		[FORCE_TYPE.MING_JIAO] = { r = 253, g = 84 , b = 0  , a = 144 }, -- 明教
+		[FORCE_TYPE.CANG_YUN ] = { r = 180, g = 60 , b = 0  , a = 255 }, -- 苍云
+		[FORCE_TYPE.CHANG_GE ] = { r = 100, g = 250, b = 180, a = 100 }, -- 长歌
+		[FORCE_TYPE.BA_DAO   ] = { r = 71 , g = 73 , b = 166, a = 128 }, -- 霸刀
+		[FORCE_TYPE.PENG_LAI ] = { r = 195, g = 171, b = 227, a = 250 }, -- 蓬莱
+	},
+	{
+		[-1                  ] = { r = 255, g = 255, b = 255, a = 150 }, -- NPC
+		[FORCE_TYPE.JIANG_HU ] = { r = 255, g = 255, b = 255, a = 255 }, -- 江湖
+		[FORCE_TYPE.SHAO_LIN ] = { r = 210, g = 180, b = 0  , a = 144 }, -- 少林
+		[FORCE_TYPE.WAN_HUA  ] = { r = 100, g = 0  , b = 150, a = 96  }, -- 万花
+		[FORCE_TYPE.TIAN_CE  ] = { r = 0  , g = 128, b = 0  , a = 255 }, -- 天策
+		[FORCE_TYPE.CHUN_YANG] = { r = 0  , g = 175, b = 230, a = 112 }, -- 纯阳
+		[FORCE_TYPE.QI_XIU   ] = { r = 240, g = 80 , b = 240, a = 96  }, -- 七秀
+		[FORCE_TYPE.WU_DU    ] = { r = 0  , g = 128, b = 255, a = 144 }, -- 五毒
+		[FORCE_TYPE.TANG_MEN ] = { r = 121, g = 183, b = 54 , a = 144 }, -- 唐门
+		[FORCE_TYPE.CANG_JIAN] = { r = 215, g = 241, b = 74 , a = 144 }, -- 藏剑
+		[FORCE_TYPE.GAI_BANG ] = { r = 205, g = 133, b = 63 , a = 180 }, -- 丐帮
+		[FORCE_TYPE.MING_JIAO] = { r = 240, g = 70 , b = 96 , a = 180 }, -- 明教
+		[FORCE_TYPE.CANG_YUN ] = { r = 180, g = 60 , b = 0  , a = 255 }, -- 苍云
+		[FORCE_TYPE.CHANG_GE ] = { r = 100, g = 250, b = 180, a = 150 }, -- 长歌
+		[FORCE_TYPE.BA_DAO   ] = { r = 71 , g = 73 , b = 166, a = 128 }, -- 霸刀
+		[FORCE_TYPE.PENG_LAI ] = { r = 195, g = 171, b = 227, a = 250 }, -- 蓬莱
+	},
+	{
+		[-1                  ] = { image = 'ui/Image/Common/Money.UITex', frame = 215 }, -- NPC
+		[FORCE_TYPE.JIANG_HU ] = { image = 'ui/Image/Common/Money.UITex', frame = 210 }, -- 大侠
+		[FORCE_TYPE.SHAO_LIN ] = { image = 'ui/Image/Common/Money.UITex', frame = 203 }, -- 少林
+		[FORCE_TYPE.WAN_HUA  ] = { image = 'ui/Image/Common/Money.UITex', frame = 205 }, -- 万花
+		[FORCE_TYPE.TIAN_CE  ] = { image = 'ui/Image/Common/Money.UITex', frame = 206 }, -- 天策
+		[FORCE_TYPE.CHUN_YANG] = { image = 'ui/Image/Common/Money.UITex', frame = 209 }, -- 纯阳
+		[FORCE_TYPE.QI_XIU   ] = { image = 'ui/Image/Common/Money.UITex', frame = 204 }, -- 七秀
+		[FORCE_TYPE.WU_DU    ] = { image = 'ui/Image/Common/Money.UITex', frame = 208 }, -- 五毒
+		[FORCE_TYPE.TANG_MEN ] = { image = 'ui/Image/Common/Money.UITex', frame = 207 }, -- 唐门
+		[FORCE_TYPE.CANG_JIAN] = { image = 'ui/Image/Common/Money.UITex', frame = 168 }, -- 藏剑
+		[FORCE_TYPE.GAI_BANG ] = { image = 'ui/Image/Common/Money.UITex', frame = 234 }, -- 丐帮
+		[FORCE_TYPE.MING_JIAO] = { image = 'ui/Image/Common/Money.UITex', frame = 232 }, -- 明教
+		[FORCE_TYPE.CANG_YUN ] = { image = 'ui/Image/Common/Money.UITex', frame = 26  }, -- 苍云
+		[FORCE_TYPE.CHANG_GE ] = { image = 'ui/Image/Common/Money.UITex', frame = 30  }, -- 长歌
+		[FORCE_TYPE.BA_DAO   ] = { image = 'ui/Image/Common/Money.UITex', frame = 35  }, -- 霸刀
+		[FORCE_TYPE.PENG_LAI ] = { image = 'ui/Image/Common/Money.UITex', frame = 42  }, -- 蓬莱
+	},
+	{
+		[-1                  ] = { image = 'ui/Image/Common/Money.UITex', frame = 220 }, -- NPC
+		[FORCE_TYPE.JIANG_HU ] = { image = 'ui/Image/Common/Money.UITex', frame = 220 }, -- 大侠
+		[FORCE_TYPE.SHAO_LIN ] = { image = 'ui/Image/Common/Money.UITex', frame = 216 }, -- 少林
+		[FORCE_TYPE.WAN_HUA  ] = { image = 'ui/Image/Common/Money.UITex', frame = 212 }, -- 万花
+		[FORCE_TYPE.TIAN_CE  ] = { image = 'ui/Image/Common/Money.UITex', frame = 215 }, -- 天策
+		[FORCE_TYPE.CHUN_YANG] = { image = 'ui/Image/Common/Money.UITex', frame = 218 }, -- 纯阳
+		[FORCE_TYPE.QI_XIU   ] = { image = 'ui/Image/Common/Money.UITex', frame = 211 }, -- 七秀
+		[FORCE_TYPE.WU_DU    ] = { image = 'ui/Image/Common/Money.UITex', frame = 213 }, -- 五毒
+		[FORCE_TYPE.TANG_MEN ] = { image = 'ui/Image/Common/Money.UITex', frame = 214 }, -- 唐门
+		[FORCE_TYPE.CANG_JIAN] = { image = 'ui/Image/Common/Money.UITex', frame = 217 }, -- 藏剑
+		[FORCE_TYPE.GAI_BANG ] = { image = 'ui/Image/Common/Money.UITex', frame = 233 }, -- 丐帮
+		[FORCE_TYPE.MING_JIAO] = { image = 'ui/Image/Common/Money.UITex', frame = 228 }, -- 明教
+		[FORCE_TYPE.CANG_YUN ] = { image = 'ui/Image/Common/Money.UITex', frame = 219 }, -- 苍云
+		[FORCE_TYPE.CHANG_GE ] = { image = 'ui/Image/Common/Money.UITex', frame = 30  }, -- 长歌
+		[FORCE_TYPE.BA_DAO   ] = { image = 'ui/Image/Common/Money.UITex', frame = 35  }, -- 霸刀
+		[FORCE_TYPE.PENG_LAI ] = { image = 'ui/Image/Common/Money.UITex', frame = 42  }, -- 蓬莱
 	},
 }
-_C.tCustomCss = MY.LoadLUAData(_C.szCssFile) or _C.tDefaultCss
+
+do
+local function CalcGlobalCss()
+	local tCss = FORCE_BAR_CSS[1]
+	for _, dwForceID in pairs_c(FORCE_TYPE) do
+		local r, g, b = MY.GetForceColor(dwForceID, 'background')
+		tCss[dwForceID] = { r = r, g = g, b = b, a = 150 }
+	end
+	local r, g, b = MY.GetForceColor(-1, 'background')
+	tCss[-1] = { r = r, g = g, b = b, a = 150 }
+end
+CalcGlobalCss()
+
+local function onForceColorUpdate()
+	CalcGlobalCss()
+	MY_Recount.DrawUI()
+end
+MY.RegisterEvent('MY_FORCE_COLOR_UPDATE', onForceColorUpdate)
+end
 
 -- 新的战斗数据时
 MY.RegisterEvent('MY_RECOUNT_NEW_FIGHT', function()
@@ -268,7 +281,7 @@ function MY_Recount.LoadCustomCss(nCss)
 	else
 		MY_Recount.nCss = nCss
 	end
-	_C.Css = _C.tCustomCss[nCss] or _C.tDefaultCss[1]
+	_C.tCss = FORCE_BAR_CSS[nCss] or FORCE_BAR_CSS[1]
 end
 
 -- 切换绑定显示记录
@@ -415,7 +428,7 @@ function MY_Recount.UpdateUI(data)
 			hItem = hList:AppendItemFromIni(_C.szIniFile, 'Handle_Item')
 			hItem.OnItemRefreshTip = MY_Recount.OnItemRefreshTip
 			hItem:SetName('Handle_LI_' .. (p.szMD5 or p.id))
-			local css = _C.Css.Bar[p.dwForceID] or {}
+			local css = _C.tCss[p.dwForceID] or {}
 			if css.image and css.frame then -- uitex, frame
 				hItem:Lookup('Image_PerFore'):FromUITex(css.image, css.frame)
 				hItem:Lookup('Image_PerBack'):FromUITex(css.image, css.frame)
@@ -501,7 +514,7 @@ function MY_Recount.UpdateUI(data)
 		hItem.OnItemRefreshTip = MY_Recount.OnItemRefreshTip
 		local dwForceID = (MY.GetClientInfo() or {}).dwForceID
 		if dwForceID then
-			local css = _C.Css.Bar[dwForceID] or {}
+			local css = _C.tCss[dwForceID] or {}
 			if css.image and css.frame then -- uitex, frame
 				hItem:Lookup('Image_Me_PerFore'):FromUITex(css.image, css.frame)
 				hItem:Lookup('Image_Me_PerBack'):FromUITex(css.image, css.frame)
@@ -1251,8 +1264,8 @@ function MY_Recount.GetMenu()
 			return not MY.GetStorage('BoolValues.MY_Recount_Enable')
 		end,
 	}
-	for i, _ in ipairs(_C.tCustomCss) do
-		table.insert(t1, {
+	for i, _ in ipairs(FORCE_BAR_CSS) do
+		local t2 = {
 			szOption = i,
 			bCheck = true, bMCheck = true,
 			bChecked = MY_Recount.nCss == i,
@@ -1263,7 +1276,22 @@ function MY_Recount.GetMenu()
 			fnDisable = function()
 				return not MY.GetStorage('BoolValues.MY_Recount_Enable')
 			end,
-		})
+		}
+		if i == 1 then
+			local function OpenGlobalColor()
+				MY.ShowPanel()
+				MY.FocusPanel()
+				MY.SwitchTab('GlobalColor')
+			end
+			t1.szOption = _L['Global Color']
+			t1.fnAction = OpenGlobalColor
+			t1.szIcon = 'ui/Image/UICommon/CommonPanel2.UITex'
+			t1.nFrame = 105
+			t1.nMouseOverFrame = 106
+			t1.szLayer = 'ICON_RIGHT'
+			t1.fnClickIcon = OpenGlobalColor
+		end
+		table.insert(t1, t2)
 	end
 	table.insert(t, t1)
 
