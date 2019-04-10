@@ -130,7 +130,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 			szName = ''
 		end
 		local function DoUpload()
-			local configs, i, dc = {{'auto', 'post'}, {'auto', 'get'}, {'webcef', 'get'}, {'webbrowser', 'get'}}, 1
+			local configs, i, dc = {{'auto', 'post'}, {'auto', 'get'}, {'webcef', 'get'}}, 1
 			local function TryUploadWithNextDriver()
 				local config = configs[i]
 				if not config then
@@ -150,7 +150,7 @@ function D.SerendipityShareConfirm(szName, szSerendipity, nMethod, nStatus, dwTi
 					error = function() TryUploadWithNextDriver() end,
 				})
 				i = i + 1
-				dc = MY.DelayCall(3000, TryUploadWithNextDriver)
+				dc = MY.DelayCall(6000, TryUploadWithNextDriver)
 			end
 			TryUploadWithNextDriver()
 		end
