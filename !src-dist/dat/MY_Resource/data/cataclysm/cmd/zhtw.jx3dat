@@ -101,6 +101,7 @@ data = {
     {dwID=2677},--脅迫---龍淵澤
     {dwID=3771},--摧地---燭龍殿
     {dwID=5580,col="#8055FF00",szReminder="纏",nPriority=8},--百生·纏---大明宮
+    {dwID=5500,col="#FF3232FF",szReminder="崩",nPriority=6,bAttention=true},--血崩---大明宮
     {dwID=5195},--虛弱---南詔皇宮
     {dwID=5157},--絞喉---南詔皇宮
     {dwID=7184,szStackOp=">=",nStackNum=10},--風暴之眼---血戰天策
@@ -187,10 +188,16 @@ data = {
     {dwID=13572,nLevel=10,col="#8055FFFF",szReminder="灼",nPriority=7},--信仰灼燒---冰火島·荒血路
     {dwID=13572,nLevel=11,col="#8055FFFF",szReminder="灼",nPriority=7},--信仰灼燒---冰火島·荒血路
     {dwID=13572,nLevel=12,col="#8055FFFF",szReminder="灼",nPriority=7},--信仰灼燒---冰火島·荒血路
+    {dwID=14641,col="#00FF0000",szReminder="怒",nPriority=8},--神怒---冰火島·荒血路
     {dwID=13537,col="#FF3232FF",szReminder="耀",nPriority=7},--烈日光耀---冰火島·荒血路
     {dwID=13538,col="#00FF0000",szReminder="蔽",nPriority=8},--石塊的陰影遮蔽---冰火島·荒血路
     {dwID=14098,col="#00FF00FF",szReminder="勛",nPriority=7},--血色勛章---冰火島·荒血路
+    {dwID=13624,col="#FF3232FF",szReminder="律",nPriority=6,bAttention=true},--紅衣律制---冰火島·荒血路
+    {dwID=14294,col="#00FFFFFF",szReminder="秘",nPriority=7},--秘法門標記---冰火島·荒血路
+    {dwID=14035,col="#FFFF00FF",szReminder="暴",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FFFF00"},--身份暴露---冰火島·荒血路
+    {dwID=13639,col="#FF00FFFF",szReminder="惑",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF00FF"},--幻惑---冰火島·荒血路
     {dwID=13782,col="#00FF0000",nPriority=8},--勇猛---冰火島·荒血路
+    {dwID=14389,col="#FFFF0000",szReminder="痕",nPriority=8},--火流星痕---冰火島·青蓮獄
     {dwID=4398,col="#FFFF00FF",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--點名測試1---測試
     {dwID=12674,col="#FFFF00FF",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--點名測試2---測試
     {dwID=13167,col="#FFFF00FF",nPriority=0,bAttention=true,bCaution=true,bScreenHead=true,colScreenHead="#FFFF00"},--命運的糾纏---測試
@@ -221,5 +228,5 @@ data = {
     {dwID=9933,col="#00FF00FF",szReminder="籠",nPriority=7},--籠花---萬花
     {dwID=9544,col="#00FF00FF",szReminder="笑",nPriority=7},--笑傲光陰---長歌
     {dwID=9265,col="#00FF00FF",szReminder="雲",nPriority=7},--雲生結海---長歌
-    --【南宮伯是帥咩】更新日期0223
+    --【南宮伯是帥咩】更新日期0411
 }

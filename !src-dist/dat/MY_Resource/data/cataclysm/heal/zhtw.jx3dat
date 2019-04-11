@@ -69,6 +69,7 @@ data = {
     {dwID=8975,col="#FF3232FF",szReminder="烈",nPriority=3,bScreenHead=true,colScreenHead="#FF3232"},--烈明---永王行宮·花月別院
     {dwID=8896},--灼君---永王行宮·花月別院
     {dwID=1866},--碎星辰---宮中神武遺跡
+    {dwID=5500,col="#FF3232FF",szReminder="崩",nPriority=6,bAttention=true},--血崩---大明宮
     {dwID=5195},--虛弱---南詔皇宮
     {dwID=5157},--絞喉---南詔皇宮
     {dwID=7184,szStackOp=">=",nStackNum=10},--風暴之眼---血戰天策
@@ -120,6 +121,8 @@ data = {
     {dwID=13604,nLevel=12,col="#FF3232FF",szReminder="考",nPriority=7},--信仰考驗---冰火島·荒血路
     {dwID=13537,col="#FF3232FF",szReminder="耀",nPriority=7},--烈日光耀---冰火島·荒血路
     {dwID=13538,col="#00FF0000",szReminder="蔽",nPriority=8},--石塊的陰影遮蔽---冰火島·荒血路
+    {dwID=13624,col="#FF3232FF",szReminder="律",nPriority=6,bAttention=true},--紅衣律制---冰火島·荒血路
+    {dwID=13639,col="#FF00FFFF",szReminder="惑",nPriority=2,bAttention=true,bScreenHead=true,colScreenHead="#FF00FF"},--幻惑---冰火島·荒血路
     {dwID=2313},--鳳凰蠱---五毒
     {dwID=377},--鎮山河---純陽
     {dwID=4439},--貪魔體---明教
@@ -166,5 +169,5 @@ data = {
     {dwID=9336,bOnlyMine=true,col="#00FF0000",szReminder="寒",nPriority=9},--寒梅---長歌
     {dwID=9337,bOnlyMine=true,col="#00FF0000",szReminder="寒",nPriority=9},--寒梅---長歌
     {dwID=9335,bOnlyMine=true,col="#FF323200",szReminder="落",nPriority=9},--落梅---長歌
-    --【南宮伯是帥咩】更新日期0223
+    --【南宮伯是帥咩】更新日期0411
 }
