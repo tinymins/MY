@@ -266,18 +266,19 @@ end
 
 -- 当有玩家进队时
 do
-local function OnPartyAddMember()
-	local dwID = arg1
+local function CheckPartyPlayer(dwID)
 	local team = GetClientTeam()
 	local szName = team.GetClientTeamMemberName(dwID)
-	-- local dwLeaderID = team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER)
+	local dwLeaderID = team.GetAuthorityInfo(TEAM_AUTHORITY_TYPE.LEADER)
 	-- local szLeaderName = team.GetClientTeamMemberName(dwLeader)
 	local t = MY_Anmerkungen.GetPlayerNote(dwID)
 	if t then
 		if t.bAlertWhenGroup then
 			MessageBox({
-				szName = 'MY_Anmerkungen_PlayerNotes_'..t.dwID,
-				szMessage = _L('Tip: [%s] is in your team.\nNote: %s\n', t.szName, t.szContent),
+				szName = 'MY_Anmerkungen_PlayerNotes_' .. t.dwID,
+				szMessage = dwID == dwLeaderID
+					and _L('Tip: [%s](Leader) is in your team.\nNote: %s', t.szName, t.szContent)
+					or _L('Tip: [%s] is in your team.\nNote: %s', t.szName, t.szContent),
 				{szOption = g_tStrings.STR_HOTKEY_SURE, fnAction = function() end},
 			})
 		end
@@ -286,8 +287,28 @@ local function OnPartyAddMember()
 		end
 	end
 end
+
+do
+local function OnPartyAddMember()
+	CheckPartyPlayer(arg1)
+end
 MY.RegisterEvent('PARTY_ADD_MEMBER', OnPartyAddMember)
 -- MY.RegisterEvent('PARTY_SYNC_MEMBER_DATA', OnPartyAddMember)
+end
+
+-- 当进队时
+do
+local function OnEnterParty()
+	local team = GetClientTeam()
+	if not team then
+		return
+	end
+	for _, dwID in ipairs(team.GetTeamMemberList()) do
+		CheckPartyPlayer(dwID)
+	end
+end
+MY.RegisterEvent('PARTY_UPDATE_BASE_INFO.MY_Anmerkungen', OnEnterParty)
+end
 end
 
 -- 读取公共数据
