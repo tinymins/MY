@@ -40,7 +40,7 @@ local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_TargetMon/lang/')
 if not MY.AssertVersion('MY_TargetMon', _L['MY_TargetMon'], 0x2011800) then
 	return
 end
-local C, D = {}, {}
+local C, D = { PASSPHRASE = {213, 166, 13}, PASSPHRASE_EMBEDDED = {211, 98, 5} }, {}
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/ui/MY_TargetMon.ini'
 local ROLE_CONFIG_FILE = {'config/my_targetmon.jx3dat', MY_DATA_PATH.ROLE}
 local TEMPLATE_CONFIG_FILE = MY.GetAddonInfo().szRoot .. 'MY_TargetMon/data/template/$lang.jx3dat'
@@ -69,35 +69,6 @@ local MONID_TEMPLATE = CONFIG_TEMPLATE.monitors.__CHILD_TEMPLATE__.__VALUE__.ids
 local MONLEVEL_TEMPLATE = CONFIG_TEMPLATE.monitors.__CHILD_TEMPLATE__.__VALUE__.ids.__CHILD_TEMPLATE__.levels.__CHILD_TEMPLATE__
 local EMBEDDED_CONFIG_LIST, EMBEDDED_CONFIG_HASH, EMBEDDED_MONITOR_HASH = {}, {}, {}
 
-local PASSPHRASE, PASSPHRASE_EMBEDDED
-do
-local function GetPassphrase(a, b)
-	for i = 0, 50 do
-		for j, v in ipairs({ 253, 12, 34, 56 }) do
-			insert(a, (i * j * ((b * v) % 256)) % 256)
-		end
-	end
-	return char(unpack(a))
-end
-PASSPHRASE = GetPassphrase({213, 166, 13}, 3)
-PASSPHRASE_EMBEDDED = GetPassphrase({211, 98, 5}, 15)
-end
-
-do -- auto generate embedded data
-local DAT_ROOT = 'MY_Resource/data/targetmon/'
-local SRC_ROOT = MY.GetAddonInfo().szRoot .. '!src-dist/dat/' .. DAT_ROOT
-local DST_ROOT = EMBEDDED_CONFIG_ROOT
-for _, szFile in ipairs(CPath.GetFileList(SRC_ROOT)) do
-	MY.Sysmsg(_L['Encrypt and compressing: '] .. DAT_ROOT .. szFile)
-	local data = LoadDataFromFile(SRC_ROOT .. szFile)
-	if IsEncodedData(data) then
-		data = DecodeData(data)
-	end
-	data = EncodeData(data, true, true)
-	SaveDataToFile(data, DST_ROOT .. szFile, PASSPHRASE_EMBEDDED)
-end
-end
-
 function D.GetTargetTypeList(szType)
 	if szType == 'BUFF' then
 		return CONFIG_BUFF_TARGET_LIST
@@ -118,11 +89,28 @@ function D.FormatConfig(config)
 end
 
 function D.LoadEmbeddedConfig()
+	if not IsString(C.PASSPHRASE) or not IsString(C.PASSPHRASE_EMBEDDED) then
+		return MY.Debug({'Passphrase cannot be empty!'}, 'MY_TargetMonConfig', MY_DEBUG.ERROR)
+	end
+	do -- auto generate embedded data
+		local DAT_ROOT = 'MY_Resource/data/targetmon/'
+		local SRC_ROOT = MY.GetAddonInfo().szRoot .. '!src-dist/dat/' .. DAT_ROOT
+		local DST_ROOT = EMBEDDED_CONFIG_ROOT
+		for _, szFile in ipairs(CPath.GetFileList(SRC_ROOT)) do
+			MY.Sysmsg(_L['Encrypt and compressing: '] .. DAT_ROOT .. szFile)
+			local data = LoadDataFromFile(SRC_ROOT .. szFile)
+			if IsEncodedData(data) then
+				data = DecodeData(data)
+			end
+			data = EncodeData(data, true, true)
+			SaveDataToFile(data, DST_ROOT .. szFile, C.PASSPHRASE_EMBEDDED)
+		end
+	end
 	local aEmbedded, tEmbedded, tEmbeddedMon = {}, {}, {}
 	for _, szFile in ipairs(CPath.GetFileList(EMBEDDED_CONFIG_ROOT)) do
 		if wfind(szFile, MY.GetLang() .. '.jx3dat') then
 			for _, config in ipairs(
-				MY.LoadLUAData(EMBEDDED_CONFIG_ROOT .. szFile, { passphrase = PASSPHRASE_EMBEDDED })
+				MY.LoadLUAData(EMBEDDED_CONFIG_ROOT .. szFile, { passphrase = C.PASSPHRASE_EMBEDDED })
 				or MY.LoadLUAData(EMBEDDED_CONFIG_ROOT .. szFile)
 				or {}
 			) do
@@ -148,7 +136,6 @@ function D.LoadEmbeddedConfig()
 	end
 	EMBEDDED_CONFIG_LIST, EMBEDDED_CONFIG_HASH, EMBEDDED_MONITOR_HASH = aEmbedded, tEmbedded, tEmbeddedMon
 end
-D.LoadEmbeddedConfig()
 
 local SHIELDED_UUID = MY.ArrayToObject({
 	'00000223B5B291D0',
@@ -326,16 +313,13 @@ function D.UpdateTargetList()
 	CONFIG_BUFF_TARGET_LIST, CONFIG_SKILL_TARGET_LIST = aBuffTarget, aSkillTarget
 end
 
-function D.LoadConfig(bDefault, bOriginal, bReloadEmbedded)
-	if bReloadEmbedded then
-		D.LoadEmbeddedConfig()
-	end
+function D.LoadConfig(bDefault, bOriginal)
 	local aPatch
 	if not bDefault then
-		aPatch = MY.LoadLUAData(ROLE_CONFIG_FILE, { passphrase = PASSPHRASE }) or MY.LoadLUAData(ROLE_CONFIG_FILE)
+		aPatch = MY.LoadLUAData(ROLE_CONFIG_FILE, { passphrase = C.PASSPHRASE }) or MY.LoadLUAData(ROLE_CONFIG_FILE)
 	end
 	if not aPatch and not bOriginal then
-		aPatch = MY.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE, { passphrase = PASSPHRASE }) or MY.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE)
+		aPatch = MY.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE, { passphrase = C.PASSPHRASE }) or MY.LoadLUAData(CUSTOM_DEFAULT_CONFIG_FILE)
 	end
 	if not aPatch then
 		aPatch = {}
@@ -389,9 +373,9 @@ function D.SaveConfig(bDefault)
 		end
 	end
 	if bDefault then
-		MY.SaveLUAData(CUSTOM_DEFAULT_CONFIG_FILE, aPatch, { passphrase = PASSPHRASE })
+		MY.SaveLUAData(CUSTOM_DEFAULT_CONFIG_FILE, aPatch, { passphrase = C.PASSPHRASE })
 	else
-		MY.SaveLUAData(ROLE_CONFIG_FILE, aPatch, { passphrase = PASSPHRASE })
+		MY.SaveLUAData(ROLE_CONFIG_FILE, aPatch, { passphrase = C.PASSPHRASE })
 		CONFIG_CHANGED = false
 	end
 end
@@ -437,7 +421,7 @@ function D.ExportPatches(aUUID, bNoEmbedded)
 end
 
 function D.ImportPatchFile(oFilePath)
-	local aPatch = MY.LoadLUAData(oFilePath, { passphrase = PASSPHRASE }) or MY.LoadLUAData(oFilePath)
+	local aPatch = MY.LoadLUAData(oFilePath, { passphrase = C.PASSPHRASE }) or MY.LoadLUAData(oFilePath)
 	if not aPatch then
 		return
 	end
@@ -450,9 +434,9 @@ function D.ExportPatchFile(oFilePath, aUUID, szIndent, bAsEmbedded)
 	end
 	local szPassphrase
 	if bAsEmbedded then
-		szPassphrase = PASSPHRASE_EMBEDDED
+		szPassphrase = C.PASSPHRASE_EMBEDDED
 	elseif not szIndent then
-		szPassphrase = PASSPHRASE
+		szPassphrase = C.PASSPHRASE
 	end
 	local aPatch = D.ExportPatches(aUUID, bAsEmbedded)
 	MY.SaveLUAData(oFilePath, aPatch, { indent = szIndent, crc = not szIndent, passphrase = szPassphrase })
@@ -460,9 +444,28 @@ end
 
 do
 local function onInit()
+	local k = char(80, 65, 83, 83, 80, 72, 82, 65, 83, 69)
+	if IsTable(C[k]) then
+		for i = 0, 50 do
+			for j, v in ipairs({ 253, 12, 34, 56 }) do
+				insert(C[k], (i * j * ((3 * v) % 256)) % 256)
+			end
+		end
+		C[k] = char(unpack(C[k]))
+	end
+	local k = char(80, 65, 83, 83, 80, 72, 82, 65, 83, 69, 95, 69, 77, 66, 69, 68, 68, 69, 68)
+	if IsTable(C[k]) then
+		for i = 0, 50 do
+			for j, v in ipairs({ 253, 12, 34, 56 }) do
+				insert(C[k], (i * j * ((15 * v) % 256)) % 256)
+			end
+		end
+		C[k] = char(unpack(C[k]))
+	end
 	if CONFIG then
 		return
 	end
+	D.LoadEmbeddedConfig()
 	D.LoadConfig()
 end
 MY.RegisterInit('MY_TargetMonConfig', onInit)
