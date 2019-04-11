@@ -2,6 +2,7 @@
 .gitignore
 .gitattributes
 .vscode
+__pycache__
 !src-dist
 patches
 @Data
@@ -12,5 +13,6 @@ MY_ArchHUD
 7zipignore.txt
 changelog.html
 header.tpl.lua
+README.md
 *.py
 *.pyc
