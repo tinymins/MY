@@ -1966,6 +1966,7 @@ function MY.OutputPlayerTip(dwID, Rect, szExtraXml)
 	insert(t, GetFormatText(g_tStrings.STR_GUILD_CAMP_NAME[player.nCamp], 82))
 	-- 自定义项
 	if szExtraXml then
+		insert(t, XML_LINE_BREAKER)
 		insert(t, szExtraXml)
 	end
 	-- 调试信息
