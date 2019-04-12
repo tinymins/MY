@@ -176,6 +176,8 @@ function D.UpdateItem(hItem, p)
 			end
 		end
 	end
+	-- 小本本
+	hInfoList:Lookup('Handle_Anmerkungen'):SetVisible(szVia == _L['Anmerkungen'])
 	hInfoList:FormatAllItemPos()
 
 	-- 目标距离
