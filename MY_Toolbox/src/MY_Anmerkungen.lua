@@ -40,6 +40,7 @@ if not MY.AssertVersion('MY_Anmerkungen', _L['MY_Anmerkungen'], 0x2011800) then
 	return
 end
 local _C = {}
+local LOADED = false
 local PUBLIC_PLAYER_IDS = {}
 local PUBLIC_PLAYER_NOTES = {}
 local PRIVATE_PLAYER_IDS = {}
@@ -206,6 +207,9 @@ end
 -- MY_Anmerkungen.GetPlayerNote(dwID)
 -- MY_Anmerkungen.GetPlayerNote(szName)
 function MY_Anmerkungen.GetPlayerNote(dwID)
+	if not LOADED then
+		MY_Anmerkungen.LoadConfig()
+	end
 	local t
 	local rec = PRIVATE_PLAYER_NOTES[PRIVATE_PLAYER_IDS[dwID] or dwID]
 	if rec then
@@ -313,6 +317,9 @@ end
 
 -- 读取公共数据
 function MY_Anmerkungen.LoadConfig()
+	if not GetClientPlayer() then
+		return MY.Debug({'Client player not exist! Cannot load config!'}, 'MY_Anmerkungen.LoadConfig', MY_DEBUG.ERROR)
+	end
 	local data = MY.LoadLUAData({'config/anmerkungen.jx3dat', MY_DATA_PATH.SERVER})
 	if data then
 		PUBLIC_PLAYER_IDS = data.ids or {}
@@ -368,6 +375,7 @@ function MY_Anmerkungen.LoadConfig()
 		CPath.DelFile(szFilePath)
 		MY_Anmerkungen.SaveConfig()
 	end
+	LOADED = true
 end
 -- 保存公共数据
 function MY_Anmerkungen.SaveConfig()

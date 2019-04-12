@@ -55,6 +55,7 @@ MY_Focus.bFocusTong         = false -- 焦点帮会成员
 MY_Focus.bOnlyPublicMap     = true  -- 仅在公共地图焦点好友帮会成员
 MY_Focus.bSortByDistance    = false -- 优先焦点近距离目标
 MY_Focus.bFocusEnemy        = false -- 焦点敌对玩家
+MY_Focus.bFocusAnmerkungen  = true  -- 焦点记在小本本里的玩家
 MY_Focus.bAutoHide          = true  -- 无焦点时隐藏
 MY_Focus.nMaxDisplay        = 5     -- 最大显示数量
 MY_Focus.bAutoFocus         = true  -- 启用默认焦点
@@ -85,6 +86,7 @@ RegisterCustomData('MY_Focus.bFocusTong')
 RegisterCustomData('MY_Focus.bOnlyPublicMap')
 RegisterCustomData('MY_Focus.bSortByDistance')
 RegisterCustomData('MY_Focus.bFocusEnemy')
+RegisterCustomData('MY_Focus.bFocusAnmerkungen')
 RegisterCustomData('MY_Focus.bAutoHide')
 RegisterCustomData('MY_Focus.nMaxDisplay')
 RegisterCustomData('MY_Focus.bAutoFocus')
@@ -451,6 +453,15 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 			bFocus = true
 			bDeletable = false
 			szVia = _L['Important npc focus']
+		end
+
+		-- 判断小本本
+		if not bFocus and MY_Focus.bFocusAnmerkungen
+		and dwType == TARGET.PLAYER
+		and MY_Anmerkungen.GetPlayerNote(dwID) then
+			bFocus = true
+			bDeletable = false
+			szVia = _L['Anmerkungen']
 		end
 
 		-- 判断屏蔽的NPC

@@ -1964,6 +1964,14 @@ function MY.OutputPlayerTip(dwID, Rect, szExtraXml)
 		insert(t, GetFormatText(g_tStrings.STR_TIP_CAMP_FLAG .. '\n', 163))
 	end
 	insert(t, GetFormatText(g_tStrings.STR_GUILD_CAMP_NAME[player.nCamp], 82))
+	-- 小本本
+	if MY_Anmerkungen and MY_Anmerkungen.GetPlayerNote then
+		local note = MY_Anmerkungen.GetPlayerNote(player.dwID)
+		if note and note.szContent ~= '' then
+			insert(t, XML_LINE_BREAKER)
+			insert(t, GetFormatText(note.szContent, 0))
+		end
+	end
 	-- 自定义项
 	if szExtraXml then
 		insert(t, XML_LINE_BREAKER)

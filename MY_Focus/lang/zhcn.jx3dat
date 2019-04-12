@@ -14,6 +14,7 @@ data = {
     ['auto focus enemy'] = '焦点附近敌对玩家',
     ['jjc auto focus party'] = '焦点竞技场友方队员',
     ['jjc auto focus enemy'] = '焦点竞技场敌方队员',
+    ['Anmerkungen auto focus'] = '焦点记在小本本里的玩家',
     ['traversal object'] = '获取信息时设置临时目标',
     ['may cause some problem in dungeon map'] = '获取信息更加精准但是可能造成性能和其他问题（建议副本中不要开启）',
     ['show focus\'s target'] = '显示目标的目标',
@@ -85,6 +86,7 @@ data = {
     ['Tong member focus'] = '帮会自动焦点',
     ['Enemy focus'] = '敌对玩家自动焦点',
     ['Important npc focus'] = '重要NPC自动焦点',
+    ['Anmerkungen'] = '小本本自动焦点',
 
     ['Would you like to use MY focus?'] = '是否启用焦点列表？',
     ['Use'] = '使用',
