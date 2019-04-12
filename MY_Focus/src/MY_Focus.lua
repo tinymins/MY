@@ -45,7 +45,7 @@ local l_tTempFocusList = {
 	[TARGET.DOODAD] = {},   -- dwTemplateID
 }
 local l_dwLockType, l_dwLockID, l_lockInDisplay
-local D = {}
+local D = { PASSPHRASE = {111, 198, 5} }
 MY_Focus = {}
 MY_Focus.bEnable            = false -- 是否启用
 MY_Focus.bMinimize          = false -- 是否最小化
@@ -103,43 +103,6 @@ RegisterCustomData('MY_Focus.tFocusList')
 RegisterCustomData('MY_Focus.anchor')
 RegisterCustomData('MY_Focus.fScaleX')
 RegisterCustomData('MY_Focus.fScaleY')
-
-local PASSPHRASE
-do
-local function GetPassphrase(a, b)
-	for i = 0, 50 do
-		for j, v in ipairs({ 23, 112, 234, 156 }) do
-			insert(a, (i * j * ((b * v) % 256)) % 256)
-		end
-	end
-	return char(unpack(a))
-end
-PASSPHRASE = GetPassphrase({111, 198, 5}, 31)
-end
-
-do -- auto generate embedded data
-local DAT_ROOT = 'MY_Resource/data/focus/'
-local SRC_ROOT = MY.FormatPath(MY.GetAddonInfo().szRoot .. '!src-dist/dat/' .. DAT_ROOT)
-local DST_ROOT = MY.FormatPath(MY.GetAddonInfo().szRoot .. DAT_ROOT)
-for _, szFile in ipairs(CPath.GetFileList(SRC_ROOT)) do
-	MY.Sysmsg(_L['Encrypt and compressing: '] .. DAT_ROOT .. szFile)
-	local data = LoadDataFromFile(SRC_ROOT .. szFile)
-	if IsEncodedData(data) then
-		data = DecodeData(data)
-	end
-	data = EncodeData(data, true, true)
-	SaveDataToFile(data, DST_ROOT .. szFile, PASSPHRASE)
-end
-end
-
-local EMBEDDED_FOCUS
-do
-local function LoadConfigData(szPath)
-	local szPath = MY.GetAddonInfo().szRoot .. szPath
-	return MY.LoadLUAData(szPath, { passphrase = PASSPHRASE }) or MY.LoadLUAData(szPath) or {}
-end
-EMBEDDED_FOCUS = LoadConfigData('MY_Resource/data/focus/$lang.jx3dat')
-end
 
 local function FormatAutoFocusData(data)
 	local ds = {
@@ -312,10 +275,40 @@ function D.GetEligibleRule(tRules, dwMapID, dwType, dwID, dwTemplateID, szName, 
 	end
 end
 
+function D.LoadEmbeddedRule()
+	-- auto generate embedded data
+	local DAT_ROOT = 'MY_Resource/data/focus/'
+	local SRC_ROOT = MY.FormatPath(MY.GetAddonInfo().szRoot .. '!src-dist/dat/' .. DAT_ROOT)
+	local DST_ROOT = MY.FormatPath(MY.GetAddonInfo().szRoot .. DAT_ROOT)
+	for _, szFile in ipairs(CPath.GetFileList(SRC_ROOT)) do
+		MY.Sysmsg(_L['Encrypt and compressing: '] .. DAT_ROOT .. szFile)
+		local data = LoadDataFromFile(SRC_ROOT .. szFile)
+		if IsEncodedData(data) then
+			data = DecodeData(data)
+		end
+		data = EncodeData(data, true, true)
+		SaveDataToFile(data, DST_ROOT .. szFile, PASSPHRASE)
+	end
+	-- load embedded data
+	local function LoadConfigData(szPath)
+		local szPath = MY.GetAddonInfo().szRoot .. szPath
+		return MY.LoadLUAData(szPath, { passphrase = PASSPHRASE }) or MY.LoadLUAData(szPath) or {}
+	end
+	-- load and format data
+	local data = LoadConfigData('MY_Resource/data/focus/$lang.jx3dat') or {}
+	for i, v in ipairs(data) do
+		data[i] = FormatAutoFocusData(v)
+	end
+	D.EMBEDDED_FOCUS = data
+end
+
 -- 对象进入视野
 function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 	if nRetryCount and nRetryCount > 5 then
 		return
+	end
+	if not D.EMBEDDED_FOCUS then
+		return MY.DelayCall(5000, function() MY_Focus.OnObjectEnterScene(dwType, dwID) end)
 	end
 	local me = GetClientPlayer()
 	local KObject = MY.GetObject(dwType, dwID)
@@ -381,7 +374,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		end
 		-- 判断内嵌默认焦点
 		if not bFocus and MY_Focus.bEmbeddedFocus then
-			tRule = D.GetEligibleRule(EMBEDDED_FOCUS, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
+			tRule = D.GetEligibleRule(D.EMBEDDED_FOCUS, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
 			if tRule then
 				bFocus = true
 				bDeletable = false
@@ -616,12 +609,15 @@ end
 
 do
 local function onInit()
-	-- 内嵌默认焦点
-	if not EMBEDDED_FOCUS then
-		EMBEDDED_FOCUS = {}
-	end
-	for i, v in ipairs(EMBEDDED_FOCUS) do
-		EMBEDDED_FOCUS[i] = FormatAutoFocusData(v)
+	-- 密码生成
+	local k = char(80, 65, 83, 83, 80, 72, 82, 65, 83, 69)
+	if IsTable(D[k]) then
+		for i = 0, 50 do
+			for j, v in ipairs({ 23, 112, 234, 156 }) do
+				insert(D[k], (i * j * ((31 * v) % 256)) % 256)
+			end
+		end
+		D[k] = char(unpack(D[k]))
 	end
 	-- 用户自定义默认焦点
 	if not MY_Focus.tAutoFocus then
@@ -642,6 +638,8 @@ local function onInit()
 			MY_Focus.tFocusList[dwType] = {}
 		end
 	end
+	-- 内嵌默认焦点
+	D.LoadEmbeddedRule()
 end
 MY.RegisterInit('MY_Focus', onInit)
 MY.RegisterEvent('CUSTOM_DATA_LOADED', onInit)
