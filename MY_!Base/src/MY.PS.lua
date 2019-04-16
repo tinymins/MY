@@ -965,7 +965,7 @@ function PS.OnPanelActive(wnd)
 		end,
 	})
 end
-MY.RegisterPanel('GlobalColor', _L['GlobalColor'], _L['System'], 2673, PS)
+MY.RegisterPanel('GlobalColor', _L['GlobalColor'], _L['System'], 'ui\\Image\\button\\CommonButton_1.UITex|70', PS)
 end
 
 -- 全局杂项设置
@@ -998,5 +998,5 @@ function PS.OnPanelActive(wnd)
 		}, true):autoWidth():width() + 10
 	end
 end
-MY.RegisterPanel('GlobalConfig', _L['GlobalConfig'], _L['System'], 164, PS)
+MY.RegisterPanel('GlobalConfig', _L['GlobalConfig'], _L['System'], 'ui\\Image\\Minimap\\Minimap.UITex|181', PS)
 end
