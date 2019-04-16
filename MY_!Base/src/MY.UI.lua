@@ -4611,6 +4611,7 @@ end
 
 MY_Shadows = {}
 function MY_Shadows.OnFrameCreate()
+	this:RegisterEvent('LOADING_END')
 	this:RegisterEvent('COINSHOP_ON_OPEN')
 	this:RegisterEvent('COINSHOP_ON_CLOSE')
 	this:RegisterEvent('ON_FRAME_CREATE')
@@ -4642,7 +4643,9 @@ end
 end
 
 function MY_Shadows.OnEvent(event)
-	if event == 'COINSHOP_ON_OPEN' then
+	if event == 'LOADING_END' then
+		this:Show()
+	elseif event == 'COINSHOP_ON_OPEN' then
 		this:Hide()
 	elseif event == 'COINSHOP_ON_CLOSE' then
 		this:Show()
