@@ -871,6 +871,22 @@ local function serialize(data)
 	return text
 end
 
+local function CreateWebPageFrame()
+	local szRequestID, hFrame
+	repeat
+		szRequestID = ('%X%X'):format(GetTickCount(), math.floor(math.random() * 0xEFFF) + 0x1000)
+	until not Station.Lookup('Lowest/MYRRWP_' .. szRequestID)
+	hFrame = Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. 'ui/WndWebPage.ini', 'MYRRWP_' .. szRequestID)
+	hFrame:Hide()
+	return szRequestID, hFrame
+end
+
+-- 先开几个常驻防止创建时抢焦点
+for i = 1, 5 do
+	local szRequestID = CreateWebPageFrame()
+	insert(MY_RRWP_FREE, szRequestID)
+end
+
 local CURL_HttpPost = CURL_HttpPostEx or CURL_HttpPost
 function MY.Ajax(settings)
 	assert(settings and settings.url)
@@ -1008,9 +1024,10 @@ function MY.Ajax(settings)
 		end
 		-- create page
 		if not hFrame then
-			RequestID = ('%X_%X'):format(GetTickCount(), math.floor(math.random() * 65536))
-			hFrame = Wnd.OpenWindow(MY.GetAddonInfo().szFrameworkRoot .. 'ui/WndWebPage.ini', 'MYRRWP_' .. RequestID)
-			hFrame:Hide()
+			if MY.IsFighting() or not Cursor.IsVisible() then
+				return MY.DelayCall(1, MY.Ajax, settings)
+			end
+			RequestID, hFrame = CreateWebPageFrame()
 		end
 		local wWebPage = hFrame:Lookup('WndWebPage')
 
@@ -1028,6 +1045,12 @@ function MY.Ajax(settings)
 						MY.Debug({err}, 'MYRRWP::OnDocumentComplete::Callback', MY_DEBUG.ERROR)
 					end
 				end
+				if settings.complete then
+					local status, err = pcall_this(settings.context, settings.complete, szContent, 200, true)
+					if not status then
+						MY.Debug({err}, 'MYRRWP::OnDocumentComplete::Callback::Complete', MY_DEBUG.ERROR)
+					end
+				end
 				table.insert(MY_RRWP_FREE, RequestID)
 			end
 		end
@@ -1043,6 +1066,12 @@ function MY.Ajax(settings)
 					local status, err = pcall_this(settings.context, settings.error, 'timeout', settings)
 					if not status then
 						MY.Debug({err}, 'MYRRWP::TIMEOUT', MY_DEBUG.ERROR)
+					end
+				end
+				if settings.complete then
+					local status, err = pcall_this(settings.context, settings.complete, '', 500, false)
+					if not status then
+						MY.Debug({err}, 'MYRRWP::TIMEOUT::Callback::Complete', MY_DEBUG.ERROR)
 					end
 				end
 				table.insert(MY_RRWP_FREE, RequestID)
