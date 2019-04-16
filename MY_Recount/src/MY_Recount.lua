@@ -1278,18 +1278,16 @@ function MY_Recount.GetMenu()
 			end,
 		}
 		if i == 1 then
-			local function OpenGlobalColor()
-				MY.ShowPanel()
-				MY.FocusPanel()
-				MY.SwitchTab('GlobalColor')
-			end
 			t2.szOption = _L['Global Color']
-			t2.fnAction = OpenGlobalColor
 			t2.szIcon = 'ui/Image/UICommon/CommonPanel2.UITex'
 			t2.nFrame = 105
 			t2.nMouseOverFrame = 106
 			t2.szLayer = 'ICON_RIGHT'
-			t2.fnClickIcon = OpenGlobalColor
+			t2.fnClickIcon = function()
+				MY.ShowPanel()
+				MY.FocusPanel()
+				MY.SwitchTab('GlobalColor')
+			end
 		end
 		table.insert(t1, t2)
 	end
