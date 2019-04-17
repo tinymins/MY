@@ -289,12 +289,12 @@ function D.LoadEmbeddedRule()
 			data = DecodeData(data)
 		end
 		data = EncodeData(data, true, true)
-		SaveDataToFile(data, DST_ROOT .. szFile, PASSPHRASE)
+		SaveDataToFile(data, DST_ROOT .. szFile, D.PASSPHRASE)
 	end
 	-- load embedded data
 	local function LoadConfigData(szPath)
 		local szPath = MY.GetAddonInfo().szRoot .. szPath
-		return MY.LoadLUAData(szPath, { passphrase = PASSPHRASE }) or MY.LoadLUAData(szPath) or {}
+		return MY.LoadLUAData(szPath, { passphrase = D.PASSPHRASE }) or MY.LoadLUAData(szPath) or {}
 	end
 	-- load and format data
 	local data = LoadConfigData('MY_Resource/data/focus/$lang.jx3dat') or {}
