@@ -61,11 +61,26 @@ for _, DAT_ROOT in ipairs({
 end
 end
 
+local function LoadDefaultTemplate(szStyle)
+	local template = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/config/' .. szStyle .. '/$lang.jx3dat')
+	if not template then
+		return
+	end
+	for _, dwForceID in pairs_c(FORCE_TYPE) do
+		for _, szRelation in ipairs({ 'Self', 'Party', 'Enemy', 'Neutrality', 'Ally', 'Foe' }) do
+			if not template[1].Color[szRelation].__VALUE__[dwForceID] then
+				template[1].Color[szRelation].__VALUE__[dwForceID] = { MY.GetForceColor(dwForceID, 'foreground') }
+			end
+		end
+	end
+	return template
+end
+
 local CONFIG_DEFAULTS = setmetatable({
-	DEFAULT  = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/config/default/$lang.jx3dat'),
-	OFFICIAL = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/config/official/$lang.jx3dat'),
-	CLEAR    = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/config/clear/$lang.jx3dat'),
-	XLIFEBAR = MY.LoadLUAData(MY.GetAddonInfo().szRoot .. 'MY_LifeBar/config/xlifebar/$lang.jx3dat'),
+	DEFAULT  = LoadDefaultTemplate('default'),
+	OFFICIAL = LoadDefaultTemplate('official'),
+	CLEAR    = LoadDefaultTemplate('clear'),
+	XLIFEBAR = LoadDefaultTemplate('xlifebar'),
 }, {
 	__call = function(t, k, d)
 		local template = t[k]
