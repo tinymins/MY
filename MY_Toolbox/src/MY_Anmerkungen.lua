@@ -41,6 +41,8 @@ if not MY.AssertVersion('MY_Anmerkungen', _L['MY_Anmerkungen'], 0x2011800) then
 end
 local _C = {}
 local LOADED = false
+local STATIC_PLAYER_IDS = {}
+local STATIC_PLAYER_NOTES = {}
 local PUBLIC_PLAYER_IDS = {}
 local PUBLIC_PLAYER_NOTES = {}
 local PRIVATE_PLAYER_IDS = {}
@@ -210,19 +212,25 @@ function MY_Anmerkungen.GetPlayerNote(dwID)
 	if not LOADED then
 		MY_Anmerkungen.LoadConfig()
 	end
-	local t
-	local rec = PRIVATE_PLAYER_NOTES[PRIVATE_PLAYER_IDS[dwID] or dwID]
+	local t, rec
+	rec = PRIVATE_PLAYER_NOTES[PRIVATE_PLAYER_IDS[dwID] or dwID]
 	if rec then
 		t = clone(rec)
 		t.bPrivate = true
-	else
-		rec = PUBLIC_PLAYER_NOTES[PUBLIC_PLAYER_IDS[dwID] or dwID]
-		if rec then
-			t = clone(rec)
-			t.bPrivate = false
-		end
+		return t
 	end
-	return t
+	rec = PUBLIC_PLAYER_NOTES[PUBLIC_PLAYER_IDS[dwID] or dwID]
+	if rec then
+		t = clone(rec)
+		t.bPrivate = false
+		return t
+	end
+	rec = STATIC_PLAYER_NOTES[STATIC_PLAYER_IDS[dwID] or dwID]
+	if rec then
+		t = clone(rec)
+		t.bPrivate = false
+		return t
+	end
 end
 
 -- 设置一个玩家的记录
@@ -320,6 +328,12 @@ function MY_Anmerkungen.LoadConfig()
 	if not GetClientPlayer() then
 		return MY.Debug({'Client player not exist! Cannot load config!'}, 'MY_Anmerkungen.LoadConfig', MY_DEBUG.ERROR)
 	end
+	local data = MY.LoadLUAData({'config/anmerkungen_static.jx3dat', MY_DATA_PATH.SERVER})
+	if data then
+		STATIC_PLAYER_IDS = data.ids or {}
+		STATIC_PLAYER_NOTES = data.data or {}
+	end
+
 	local data = MY.LoadLUAData({'config/anmerkungen.jx3dat', MY_DATA_PATH.SERVER})
 	if data then
 		PUBLIC_PLAYER_IDS = data.ids or {}
