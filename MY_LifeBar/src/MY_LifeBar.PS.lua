@@ -55,7 +55,7 @@ local D = {
 
 local PS = {}
 local function LoadUI(ui)
-	ui:children('#WndSliderBox_GlobalUIScale'):value(Config.fGlobalUIScale * 100)
+	ui:children('#WndSliderBox_GlobalUIScale'):value(Config.fGlobalUIScale * 100 * MY.GetOriginUIScale())
 	ui:children('#WndSliderBox_LifeBarWidth'):value(Config.nLifeWidth)
 	ui:children('#WndSliderBox_LifeBarHeight'):value(Config.nLifeHeight)
 	ui:children('#WndSliderBox_LifeBarOffsetX'):value(Config.nLifeOffsetX)
@@ -374,9 +374,9 @@ function PS.OnPanelActive(wnd)
 		name = 'WndSliderBox_GlobalUIScale',
 		x = x, y = y, sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE, range = { 1, 200 },
 		text = function(value) return _L('Global UI scale: %.2f.', value / 100) end, -- ×ÖËõ·Å
-		value = Config.fGlobalUIScale * 100,
+		value = Config.fGlobalUIScale * 100 * MY.GetOriginUIScale(),
 		onchange = function(value)
-			Config.fGlobalUIScale = value / 100
+			Config.fGlobalUIScale = value / 100 / MY.GetOriginUIScale()
 		end,
 		autoenable = function() return D.IsEnabled() end,
 	})
