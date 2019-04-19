@@ -124,6 +124,17 @@ end
 function D.IsShielded() return MY.IsShieldedVersion() and MY.IsInShieldedMap() end
 function D.IsEnabled() return O.bEnable and not D.IsShielded() end
 
+function D.CheckFrameOpen(bForceReload)
+	if D.IsEnabled() then
+		if bForceReload then
+			MY_FocusUI.Close()
+		end
+		MY_FocusUI.Open()
+	else
+		MY_FocusUI.Close()
+	end
+end
+
 function D.LoadStyleConfig()
 	if STYLE_CONFIG_CHANGED then
 		D.SaveConfig()
@@ -191,12 +202,9 @@ function D.OnConfigChange(k)
 	end
 	if k == 'szStyle' then
 		D.LoadStyleConfig()
+		D.CheckFrameOpen(true)
 	elseif k == 'bEnable' then
-		if D.IsEnabled() then
-			MY_FocusUI.Open()
-		else
-			MY_FocusUI.Close()
-		end
+		D.CheckFrameOpen()
 	elseif k == 'fScaleX' or k == 'fScaleY' then
 		FireUIEvent('MY_FOCUS_SCALE_UPDATE')
 	elseif k == 'nMaxDisplay' then
@@ -754,11 +762,7 @@ local function onInit()
 	end
 	-- ÄÚÇ¶Ä¬ÈÏ½¹µã
 	D.LoadEmbeddedRule()
-	if D.IsEnabled() then
-		MY_FocusUI.Open()
-	else
-		MY_FocusUI.Close()
-	end
+	D.CheckFrameOpen()
 	D.RescanNearby()
 end
 MY.RegisterInit('MY_Focus', onInit)

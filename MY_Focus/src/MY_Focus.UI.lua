@@ -49,14 +49,40 @@ local D = {
 local TEMP_TARGET_TYPE, TEMP_TARGET_ID
 local l_dwLockType, l_dwLockID, l_lockInDisplay
 
+function D.AdjustListScale(frame, hList)
+	for i = 0, hList:GetItemCount() - 1 do
+		local hItem = hList:Lookup(i)
+		-- 导航保持比例
+		local hL = hItem:Lookup('Handle_L')
+		local nDeltaX = hL:GetH() / 70 * 50 - hL:GetW()
+		local fScaleL = 1 + nDeltaX / hL:GetW()
+		hL:Scale(fScaleL, 1)
+		local hR = hItem:Lookup('Handle_R')
+		local fScaleR = (hItem:GetW() - hL:GetW()) / hR:GetW()
+		hR:Scale(fScaleR, 1)
+		hR:SetRelX(hL:GetW())
+		hItem:FormatAllItemPos()
+		-- 图标保持比例
+		local hInfoList = hItem:Lookup('Handle_R/Handle_InfoList')
+		for i = 0, hInfoList:GetItemCount() - 1 do
+			local hInfo = hInfoList:Lookup(i)
+			hInfo:Scale(hInfo:GetH() / hInfo:GetW(), 1)
+		end
+		hInfoList:FormatAllItemPos()
+		-- 字体大小
+		UI(hItem):find('.Text'):fontScale(frame.fScaleY)
+	end
+end
+
 function D.Scale(frame)
 	if frame.fScaleX and frame.fScaleY then
 		frame:Scale(1 / frame.fScaleX, 1 / frame.fScaleY)
 	end
 	frame.fScaleX = MY_Focus.fScaleX
 	frame.fScaleY = MY_Focus.fScaleY
-	frame:Scale(MY_Focus.fScaleX, MY_Focus.fScaleY)
-	UI(frame):find('.Text'):fontScale((MY_Focus.fScaleX + MY_Focus.fScaleY) / 2)
+	frame:Scale(frame.fScaleX, frame.fScaleY)
+	UI(frame):find('.Text'):fontScale(frame.fScaleY)
+	D.AdjustListScale(frame, frame:Lookup('', 'Handle_List'))
 end
 
 function D.CreateList(frame)
@@ -66,11 +92,11 @@ function D.CreateList(frame)
 		local hItem = hList:AppendItemFromIni(INI_PATH, 'Handle_Info')
 		if frame.fScaleX and frame.fScaleY then
 			hItem:Scale(frame.fScaleX, frame.fScaleY)
-			UI(hItem):find('.Text'):fontScale((frame.fScaleX + frame.fScaleY) / 2)
 		end
 		hItem:Hide()
 	end
 	hList:FormatAllItemPos()
+	D.AdjustListScale(frame, hList)
 end
 
 function D.Open()
@@ -144,17 +170,17 @@ function D.UpdateItem(hItem, p)
 	hInfoList:Lookup('Handle_Kungfu'):Hide()
 	if dwType == TARGET.PLAYER then
 		if bInfo and info.dwMountKungfuID then
-			hItem:Lookup('Handle_R/Handle_LMN/Text_Kungfu'):SetText(MY.GetKungfuName(info.dwMountKungfuID))
+			hItem:Lookup('Handle_L/Handle_KungfuName/Text_Kungfu'):SetText(MY.GetKungfuName(info.dwMountKungfuID))
 			hInfoList:Lookup('Handle_Kungfu'):Show()
 			hInfoList:Lookup('Handle_Kungfu/Image_Kungfu'):FromIconID(Table_GetSkillIconID(info.dwMountKungfuID, 1))
 		else
 			local kungfu = KObject.GetKungfuMount()
 			if kungfu then
-				hItem:Lookup('Handle_R/Handle_LMN/Text_Kungfu'):SetText(MY.GetKungfuName(kungfu.dwSkillID))
+				hItem:Lookup('Handle_L/Handle_KungfuName/Text_Kungfu'):SetText(MY.GetKungfuName(kungfu.dwSkillID))
 				hInfoList:Lookup('Handle_Kungfu'):Show()
 				hInfoList:Lookup('Handle_Kungfu/Image_Kungfu'):FromIconID(Table_GetSkillIconID(kungfu.dwSkillID, 1))
 			else
-				hItem:Lookup('Handle_R/Handle_LMN/Text_Kungfu'):SetText(g_tStrings.tForceTitle[KObject.dwForceID])
+				hItem:Lookup('Handle_L/Handle_KungfuName/Text_Kungfu'):SetText(g_tStrings.tForceTitle[KObject.dwForceID])
 				hInfoList:Lookup('Handle_Kungfu'):Show()
 				hInfoList:Lookup('Handle_Kungfu/Image_Kungfu'):FromUITex(GetForceImage(KObject.dwForceID))
 			end
@@ -243,7 +269,7 @@ function D.UpdateItem(hItem, p)
 				nRotate = math.pi + nRotate
 			end
 			local nRadius = 13.5
-			h:SetRelPos((nRadius + nRadius * math.cos(nRotate) + 2) * MY_Focus.fScaleX, (nRadius - 3 - 13.5 * math.sin(nRotate)) * MY_Focus.fScaleY)
+			h:SetRelPos((nRadius + nRadius * math.cos(nRotate) + 2) * MY_Focus.fScaleY, (nRadius - 3 - 13.5 * math.sin(nRotate)) * MY_Focus.fScaleY)
 			h:GetParent():FormatAllItemPos()
 		end
 	end
