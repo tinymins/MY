@@ -331,6 +331,7 @@ function D.RescanNearby()
 	D.ClearFocus()
 	D.ScanNearby()
 end
+MY.RegisterEvent('MY_ANMERKUNGEN_UPDATE.MY_Focus', D.RescanNearby)
 
 function D.GetEligibleRule(tRules, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
 	for _, v in ipairs(tRules) do

@@ -273,6 +273,7 @@ function MY_Anmerkungen.SetPlayerNote(dwID, szName, szContent, bTipWhenGroup, bA
 	elseif _C.list then
 		_C.list:listbox('delete', 'id', dwID)
 	end
+	FireUIEvent('MY_ANMERKUNGEN_UPDATE')
 	MY_Anmerkungen.SaveConfig()
 end
 
