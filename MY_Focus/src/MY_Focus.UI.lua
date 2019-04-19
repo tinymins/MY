@@ -49,7 +49,9 @@ local D = {
 local TEMP_TARGET_TYPE, TEMP_TARGET_ID
 local l_dwLockType, l_dwLockID, l_lockInDisplay
 
-function D.AdjustListScale(frame, hList)
+function D.AdjustScaleRatio(frame, hList)
+	local hTotal = frame:Lookup('', '')
+	local hList = hTotal:Lookup('Handle_List')
 	for i = 0, hList:GetItemCount() - 1 do
 		local hItem = hList:Lookup(i)
 		-- 导航保持比例
@@ -72,6 +74,18 @@ function D.AdjustListScale(frame, hList)
 		-- 字体大小
 		UI(hItem):find('.Text'):fontScale(frame.fScaleY)
 	end
+	local nW, nH = hTotal:Lookup('Image_Title'):GetSize()
+	hTotal:Lookup('Text_Title'):SetRelX(nH * 1.1)
+	local btnSetting = frame:Lookup('Btn_Setting')
+	btnSetting:SetRelX(nH * 0.2)
+	btnSetting:Scale(btnSetting:GetH() / btnSetting:GetW(), 1)
+	local btnClose = frame:Lookup('Btn_Close')
+	btnClose:SetRelX(nW - nH)
+	btnClose:Scale(btnClose:GetH() / btnClose:GetW(), 1)
+	local chkMinimize = frame:Lookup('CheckBox_Minimize')
+	chkMinimize:Scale(chkMinimize:GetH() / chkMinimize:GetW(), 1)
+	chkMinimize:SetRelX(btnClose:GetRelX() - chkMinimize:GetW() - nH * 0.1)
+	hTotal:FormatAllItemPos()
 end
 
 function D.Scale(frame)
@@ -82,7 +96,7 @@ function D.Scale(frame)
 	frame.fScaleY = MY_Focus.fScaleY
 	frame:Scale(frame.fScaleX, frame.fScaleY)
 	UI(frame):find('.Text'):fontScale(frame.fScaleY)
-	D.AdjustListScale(frame, frame:Lookup('', 'Handle_List'))
+	D.AdjustScaleRatio(frame)
 end
 
 function D.CreateList(frame)
@@ -96,7 +110,7 @@ function D.CreateList(frame)
 		hItem:Hide()
 	end
 	hList:FormatAllItemPos()
-	D.AdjustListScale(frame, hList)
+	D.AdjustScaleRatio(frame)
 end
 
 function D.Open()
@@ -437,6 +451,7 @@ function D.OnFrameCreate()
 	this:RegisterEvent('MY_FOCUS_MAX_DISPLAY_UPDATE')
 	this:RegisterEvent('MY_FOCUS_AUTO_HIDE_UPDATE')
 	this:RegisterEvent('MY_FOCUS_MINIMIZE_UPDATE')
+	this:Lookup('', 'Text_Title'):SetText(_L['focus list'])
 
 	D.Scale(this)
 	D.CreateList(this)
