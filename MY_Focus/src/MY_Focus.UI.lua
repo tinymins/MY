@@ -133,7 +133,7 @@ function D.UpdateItem(hItem, p)
 
 	---------- 左侧 ----------
 	-- 小图标列表
-	local hInfoList = hItem:Lookup('Handle_InfoList')
+	local hInfoList = hItem:Lookup('Handle_R/Handle_InfoList')
 	-- 锁定
 	hInfoList:Lookup('Handle_Lock'):Hide()
 	if dwType == l_dwLockType and dwID == l_dwLockID then
@@ -144,17 +144,17 @@ function D.UpdateItem(hItem, p)
 	hInfoList:Lookup('Handle_Kungfu'):Hide()
 	if dwType == TARGET.PLAYER then
 		if bInfo and info.dwMountKungfuID then
-			hItem:Lookup('Handle_LMN/Text_Kungfu'):SetText(MY.GetKungfuName(info.dwMountKungfuID))
+			hItem:Lookup('Handle_R/Handle_LMN/Text_Kungfu'):SetText(MY.GetKungfuName(info.dwMountKungfuID))
 			hInfoList:Lookup('Handle_Kungfu'):Show()
 			hInfoList:Lookup('Handle_Kungfu/Image_Kungfu'):FromIconID(Table_GetSkillIconID(info.dwMountKungfuID, 1))
 		else
 			local kungfu = KObject.GetKungfuMount()
 			if kungfu then
-				hItem:Lookup('Handle_LMN/Text_Kungfu'):SetText(MY.GetKungfuName(kungfu.dwSkillID))
+				hItem:Lookup('Handle_R/Handle_LMN/Text_Kungfu'):SetText(MY.GetKungfuName(kungfu.dwSkillID))
 				hInfoList:Lookup('Handle_Kungfu'):Show()
 				hInfoList:Lookup('Handle_Kungfu/Image_Kungfu'):FromIconID(Table_GetSkillIconID(kungfu.dwSkillID, 1))
 			else
-				hItem:Lookup('Handle_LMN/Text_Kungfu'):SetText(g_tStrings.tForceTitle[KObject.dwForceID])
+				hItem:Lookup('Handle_R/Handle_LMN/Text_Kungfu'):SetText(g_tStrings.tForceTitle[KObject.dwForceID])
 				hInfoList:Lookup('Handle_Kungfu'):Show()
 				hInfoList:Lookup('Handle_Kungfu/Image_Kungfu'):FromUITex(GetForceImage(KObject.dwForceID))
 			end
@@ -189,40 +189,40 @@ function D.UpdateItem(hItem, p)
 	if player then
 		nDistance = floor(MY.GetDistance(player, KObject, MY_Focus.szDistanceType) * 10) / 10
 	end
-	hItem:Lookup('Handle_Compass/Compass_Distance'):SetText(nDistance)
-	hItem:Lookup('Handle_School/School_Distance'):SetText(nDistance)
+	hItem:Lookup('Handle_L/Handle_Compass/Compass_Distance'):SetText(nDistance)
+	hItem:Lookup('Handle_L/Handle_School/School_Distance'):SetText(nDistance)
 	-- 自身面向
 	if player then
-		hItem:Lookup('Handle_Compass/Image_Player'):Show()
-		hItem:Lookup('Handle_Compass/Image_Player'):SetRotate( - player.nFaceDirection / 128 * math.pi)
+		hItem:Lookup('Handle_L/Handle_Compass/Image_Player'):Show()
+		hItem:Lookup('Handle_L/Handle_Compass/Image_Player'):SetRotate( - player.nFaceDirection / 128 * math.pi)
 	end
 	-- 左侧主要部分
 	if MY_Focus.bDisplayKungfuIcon and dwType == TARGET.PLAYER then
-		hItem:Lookup('Handle_Compass'):Hide()
-		hItem:Lookup('Handle_School'):Show()
+		hItem:Lookup('Handle_L/Handle_Compass'):Hide()
+		hItem:Lookup('Handle_L/Handle_School'):Show()
 		-- 心法图标
 		if bInfo and info.dwMountKungfuID then
-			hItem:Lookup('Handle_School/Image_School'):FromIconID(Table_GetSkillIconID(info.dwMountKungfuID, 1))
+			hItem:Lookup('Handle_L/Handle_School/Image_School'):FromIconID(Table_GetSkillIconID(info.dwMountKungfuID, 1))
 		else
 			local kungfu = KObject.GetKungfuMount()
 			if kungfu then
-				hItem:Lookup('Handle_School/Image_School'):FromIconID(Table_GetSkillIconID(kungfu.dwSkillID, 1))
+				hItem:Lookup('Handle_L/Handle_School/Image_School'):FromIconID(Table_GetSkillIconID(kungfu.dwSkillID, 1))
 			else
-				hItem:Lookup('Handle_School/Image_School'):FromUITex(GetForceImage(KObject.dwForceID))
+				hItem:Lookup('Handle_L/Handle_School/Image_School'):FromUITex(GetForceImage(KObject.dwForceID))
 			end
 		end
 	else
-		hItem:Lookup('Handle_School'):Hide()
-		hItem:Lookup('Handle_Compass'):Show()
+		hItem:Lookup('Handle_L/Handle_School'):Hide()
+		hItem:Lookup('Handle_L/Handle_Compass'):Show()
 		-- 相对位置
-		hItem:Lookup('Handle_Compass/Image_PointRed'):Hide()
-		hItem:Lookup('Handle_Compass/Image_PointGreen'):Hide()
+		hItem:Lookup('Handle_L/Handle_Compass/Image_PointRed'):Hide()
+		hItem:Lookup('Handle_L/Handle_Compass/Image_PointGreen'):Hide()
 		if player and nDistance > 0 then
 			local h
 			if MY.IsEnemy(UI_GetClientPlayerID(), dwID) then
-				h = hItem:Lookup('Handle_Compass/Image_PointRed')
+				h = hItem:Lookup('Handle_L/Handle_Compass/Image_PointRed')
 			else
-				h = hItem:Lookup('Handle_Compass/Image_PointGreen')
+				h = hItem:Lookup('Handle_L/Handle_Compass/Image_PointGreen')
 			end
 			h:Show()
 			local nRotate = 0
@@ -249,7 +249,7 @@ function D.UpdateItem(hItem, p)
 	end
 	---------- 右侧 ----------
 	-- 名字
-	hItem:Lookup('Handle_LMN/Text_Name'):SetText(szName or KObject.dwID)
+	hItem:Lookup('Handle_R/Handle_LMN/Text_Name'):SetText(szName or KObject.dwID)
 	-- 血量
 	if dwType ~= TARGET.DOODAD then
 		local nCurrentLife, nMaxLife = info.nCurrentLife, info.nMaxLife
@@ -261,12 +261,12 @@ function D.UpdateItem(hItem, p)
 				nPercent = 100
 			end
 			szLife = szLife .. '(' .. nPercent .. '%)'
-			hItem:Lookup('Handle_LMN/Image_Health'):SetPercentage(nCurrentLife / nMaxLife)
-			hItem:Lookup('Handle_LMN/Text_Health'):SetText(szLife)
+			hItem:Lookup('Handle_R/Handle_LMN/Image_Health'):SetPercentage(nCurrentLife / nMaxLife)
+			hItem:Lookup('Handle_R/Handle_LMN/Text_Health'):SetText(szLife)
 		end
 		if nMaxMana > 0 then
-			hItem:Lookup('Handle_LMN/Image_Mana'):SetPercentage(nCurrentMana / nMaxMana)
-			hItem:Lookup('Handle_LMN/Text_Mana'):SetText(MY.FormatNumberDot(nCurrentMana, 1, false, true) .. '/' .. MY.FormatNumberDot(nMaxMana, 1, false, true))
+			hItem:Lookup('Handle_R/Handle_LMN/Image_Mana'):SetPercentage(nCurrentMana / nMaxMana)
+			hItem:Lookup('Handle_R/Handle_LMN/Text_Mana'):SetText(MY.FormatNumberDot(nCurrentMana, 1, false, true) .. '/' .. MY.FormatNumberDot(nMaxMana, 1, false, true))
 		end
 	end
 	-- 读条
@@ -282,21 +282,21 @@ function D.UpdateItem(hItem, p)
 				local nType, dwSkillID, dwSkillLevel, fProgress = KObject.GetSkillOTActionState()
 				if nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
 				or nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL then
-					hItem:Lookup('Handle_Progress/Image_Progress'):SetPercentage(fProgress)
-					hItem:Lookup('Handle_Progress/Text_Progress'):SetText((MY.GetSkillName(dwSkillID, dwSkillLevel)))
+					hItem:Lookup('Handle_R/Handle_Progress/Image_Progress'):SetPercentage(fProgress)
+					hItem:Lookup('Handle_R/Handle_Progress/Text_Progress'):SetText((MY.GetSkillName(dwSkillID, dwSkillLevel)))
 				else
-					hItem:Lookup('Handle_Progress/Image_Progress'):SetPercentage(0)
-					hItem:Lookup('Handle_Progress/Text_Progress'):SetText('')
+					hItem:Lookup('Handle_R/Handle_Progress/Image_Progress'):SetPercentage(0)
+					hItem:Lookup('Handle_R/Handle_Progress/Text_Progress'):SetText('')
 				end
 			end)
 		else
 			if nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_PREPARE
 			or nType == CHARACTER_OTACTION_TYPE.ACTION_SKILL_CHANNEL then
-				hItem:Lookup('Handle_Progress/Image_Progress'):SetPercentage(fProgress)
-				hItem:Lookup('Handle_Progress/Text_Progress'):SetText((MY.GetSkillName(dwSkillID, dwSkillLevel)))
+				hItem:Lookup('Handle_R/Handle_Progress/Image_Progress'):SetPercentage(fProgress)
+				hItem:Lookup('Handle_R/Handle_Progress/Text_Progress'):SetText((MY.GetSkillName(dwSkillID, dwSkillLevel)))
 			else
-				hItem:Lookup('Handle_Progress/Image_Progress'):SetPercentage(0)
-				hItem:Lookup('Handle_Progress/Text_Progress'):SetText('')
+				hItem:Lookup('Handle_R/Handle_Progress/Image_Progress'):SetPercentage(0)
+				hItem:Lookup('Handle_R/Handle_Progress/Text_Progress'):SetText('')
 			end
 		end
 	end
@@ -305,9 +305,9 @@ function D.UpdateItem(hItem, p)
 		local tp, id = KObject.GetTarget()
 		local tar = MY.GetObject(tp, id)
 		if tar then
-			hItem:Lookup('Handle_Progress/Text_Target'):SetText(MY.GetObjectName(tar))
+			hItem:Lookup('Handle_R/Handle_Progress/Text_Target'):SetText(MY.GetObjectName(tar))
 		else
-			hItem:Lookup('Handle_Progress/Text_Target'):SetText('')
+			hItem:Lookup('Handle_R/Handle_Progress/Text_Target'):SetText('')
 		end
 	end
 	-- 选中状态
@@ -508,7 +508,7 @@ function D.OnItemRButtonClick()
 	local name = this:GetName()
 	if name == 'Handle_Info' then
 		local dwType, dwID = this.dwType, this.dwID
-		local t = MY.GetTargetContextMenu(dwType, this:Lookup('Handle_LMN/Text_Name'):GetText(), dwID)
+		local t = MY.GetTargetContextMenu(dwType, this:Lookup('Handle_R/Handle_LMN/Text_Name'):GetText(), dwID)
 		if this.bDeletable then
 			table.insert(t, 1, {
 				szOption = _L['delete focus'],
