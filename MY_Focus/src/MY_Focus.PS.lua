@@ -50,16 +50,11 @@ function PS.OnPanelActive(wnd)
 
 	-- ×ó²à
 	local x, y = xl, yl
-	ui:append('WndCheckBox', {
+	x = x + ui:append('WndCheckBox', {
 		x = x, y = y, w = 250, text = _L['enable'],
 		r = 255, g = 255, b = 0, checked = MY_Focus.bEnable,
 		oncheck = function(bChecked)
 			MY_Focus.bEnable = bChecked
-			if MY_Focus.bEnable then
-				MY_FocusUI.Open()
-			else
-				MY_FocusUI.Close()
-			end
 		end,
 		tip = function()
 			if MY_Focus.IsShielded() then
@@ -67,8 +62,22 @@ function PS.OnPanelActive(wnd)
 			end
 		end,
 		autoenable = function() return not MY_Focus.IsShielded() end,
+	}, true):autoWidth():width() + 10
+
+	ui:append('WndEditBox', {
+		x = x, y = y, w = wl - x, h = 25,
+		placeholder = _L['Style'],
+		text = MY_Focus.szStyle,
+		onblur = function()
+			local szStyle = UI(this):text():gsub('%s', '')
+			if szStyle == '' then
+				return
+			end
+			MY_Focus.szStyle = szStyle
+			MY.SwitchTab('MY_Focus', true)
+		end,
 	})
-	y = y + 25
+	x, y = xl, y + 25
 
 	-- <hr />
 	ui:append('Image', {x = x, y = y, w = wl, h = 1, image = 'UI/Image/UICommon/ScienceTreeNode.UITex', imageframe = 62})
@@ -277,7 +286,7 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = wr, text = _L['hide when empty'],
 		checked = MY_Focus.bAutoHide,
 		oncheck = function(bChecked)
-			MY_Focus.SetAutoHide(bChecked)
+			MY_Focus.bAutoHide = bChecked
 		end,
 		autoenable = function() return MY_Focus.IsEnabled() end,
 	})
@@ -504,7 +513,7 @@ function PS.OnPanelActive(wnd)
 		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		value = MY_Focus.nMaxDisplay,
 		onchange = function(val)
-			MY_Focus.SetMaxDisplay(val)
+			MY_Focus.nMaxDisplay = val
 		end,
 		autoenable = function() return MY_Focus.IsEnabled() end,
 	})
@@ -517,7 +526,7 @@ function PS.OnPanelActive(wnd)
 		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		value = MY_Focus.fScaleX * 100,
 		onchange = function(val)
-			MY_Focus.SetScale(val / 100, MY_Focus.fScaleY)
+			MY_Focus.fScaleX = val / 100
 		end,
 		autoenable = function() return MY_Focus.IsEnabled() end,
 	})
@@ -530,7 +539,7 @@ function PS.OnPanelActive(wnd)
 		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		value = MY_Focus.fScaleY * 100,
 		onchange = function(val)
-			MY_Focus.SetScale(MY_Focus.fScaleX, val / 100)
+			MY_Focus.fScaleY = MY_Focus.fScaleX, val / 100
 		end,
 		autoenable = function() return MY_Focus.IsEnabled() end,
 	})

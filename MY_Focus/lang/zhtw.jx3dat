@@ -91,4 +91,5 @@ data = {
     ['Would you like to use MY focus?'] = '是否啟用焦點列表？',
     ['Use'] = '使用',
     ['Not use'] = '不使用',
+    ['Style'] = '樣式',
 }
