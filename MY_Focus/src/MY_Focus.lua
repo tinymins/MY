@@ -70,13 +70,17 @@ O.bHealHelper        = false -- 辅助治疗模式
 O.bEnableSceneNavi   = false -- 场景追踪点
 O.fScaleX            = 1     -- 缩放比例
 O.fScaleY            = 1     -- 缩放比例
-O.tAutoFocus = {}    -- 默认焦点
-O.tFocusList = {     -- 永久焦点
-	[TARGET.PLAYER] = {},   -- dwID
-	[TARGET.NPC]    = {},   -- dwTemplateID
-	[TARGET.DOODAD] = {},   -- dwTemplateID
+O.tAutoFocus         = nil   -- 旧版默认焦点数据
+O.tFocusList         = nil   -- 旧版永久焦点数据
+O.aPatternFocus      = {}    -- 默认焦点
+O.tStaticFocus       = {     -- 永久焦点
+	[TARGET.PLAYER] = {},    -- dwID
+	[TARGET.NPC]    = {},    -- dwTemplateID
+	[TARGET.DOODAD] = {},    -- dwTemplateID
 }
 O.anchor = { x=-300, y=220, s='TOPRIGHT', r='TOPRIGHT' } -- 默认坐标
+RegisterCustomData('MY_Focus.tAutoFocus')
+RegisterCustomData('MY_Focus.tFocusList')
 
 local function FormatAutoFocusData(data)
 	local ds = {
@@ -135,17 +139,17 @@ function D.SetAutoHide(bAutoHide)
 end
 
 function D.GetAllFocusPattern()
-	return clone(O.tAutoFocus)
+	return clone(O.aPatternFocus)
 end
 
 -- 添加、修改默认焦点
 function D.SetFocusPattern(szPattern, tData)
 	local nIndex
 	szPattern = MY.TrimString(szPattern)
-	for i, v in ipairs_r(O.tAutoFocus) do
+	for i, v in ipairs_r(O.aPatternFocus) do
 		if v.szPattern == szPattern then
 			nIndex = i
-			remove(O.tAutoFocus, i)
+			remove(O.aPatternFocus, i)
 		end
 	end
 	-- 格式化数据
@@ -155,9 +159,9 @@ function D.SetFocusPattern(szPattern, tData)
 	tData = FormatAutoFocusData(tData)
 	-- 更新焦点列表
 	if nIndex then
-		insert(O.tAutoFocus, nIndex, tData)
+		insert(O.aPatternFocus, nIndex, tData)
 	else
-		insert(O.tAutoFocus, tData)
+		insert(O.aPatternFocus, tData)
 	end
 	D.RescanNearby()
 	return tData
@@ -166,10 +170,10 @@ end
 -- 删除默认焦点
 function D.RemoveFocusPattern(szPattern)
 	local p
-	for i = #O.tAutoFocus, 1, -1 do
-		if O.tAutoFocus[i].szPattern == szPattern then
-			p = O.tAutoFocus[i]
-			remove(O.tAutoFocus, i)
+	for i = #O.aPatternFocus, 1, -1 do
+		if O.aPatternFocus[i].szPattern == szPattern then
+			p = O.aPatternFocus[i]
+			remove(O.aPatternFocus, i)
 			break
 		end
 	end
@@ -185,7 +189,7 @@ function D.RemoveFocusPattern(szPattern)
 			local dwTemplateID = p.dwType == TARGET.PLAYER and p.dwID or KObject.dwTemplateID
 			if KObject and MY.GetObjectName(KObject, 'never') == szPattern
 			and not l_tTempFocusList[p.dwType][p.dwID]
-			and not O.tFocusList[p.dwType][dwTemplateID] then
+			and not O.tStaticFocus[p.dwType][dwTemplateID] then
 				D.OnObjectLeaveScene(p.dwType, p.dwID)
 			end
 		end
@@ -201,10 +205,10 @@ function D.SetFocusID(dwType, dwID, bSave)
 	if bSave then
 		local KObject = MY.GetObject(dwType, dwID)
 		local dwTemplateID = dwType == TARGET.PLAYER and dwID or KObject.dwTemplateID
-		if O.tFocusList[dwType][dwTemplateID] then
+		if O.tStaticFocus[dwType][dwTemplateID] then
 			return
 		end
-		O.tFocusList[dwType][dwTemplateID] = true
+		O.tStaticFocus[dwType][dwTemplateID] = true
 		D.RescanNearby()
 	else
 		if l_tTempFocusList[dwType][dwID] then
@@ -224,8 +228,8 @@ function D.RemoveFocusID(dwType, dwID)
 	end
 	local KObject = MY.GetObject(dwType, dwID)
 	local dwTemplateID = dwType == TARGET.PLAYER and dwID or KObject.dwTemplateID
-	if O.tFocusList[dwType][dwTemplateID] then
-		O.tFocusList[dwType][dwTemplateID] = nil
+	if O.tStaticFocus[dwType][dwTemplateID] then
+		O.tStaticFocus[dwType][dwTemplateID] = nil
 		D.RescanNearby()
 	end
 end
@@ -348,7 +352,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		-- 判断永久焦点
 		if not bFocus then
 			local dwTemplateID = dwType == TARGET.PLAYER and dwID or KObject.dwTemplateID
-			if O.tFocusList[dwType][dwTemplateID]
+			if O.tStaticFocus[dwType][dwTemplateID]
 			and not (
 				dwType == TARGET.NPC
 				and dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
@@ -362,7 +366,7 @@ function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		end
 		-- 判断默认焦点
 		if not bFocus and O.bAutoFocus then
-			tRule = D.GetEligibleRule(O.tAutoFocus, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
+			tRule = D.GetEligibleRule(O.aPatternFocus, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
 			if tRule then
 				bFocus = true
 				bDeletable = false
@@ -613,6 +617,30 @@ function D.GetTargetMenu(dwType, dwID)
 	}}
 end
 
+function D.OnSetOldConfig()
+	if O.tAutoFocus then
+		if IsTable(O.tAutoFocus) then
+			for _, v in ipairs(O.tAutoFocus) do
+				insert(O.aPatternFocus, FormatAutoFocusData(v))
+			end
+		end
+		O.tAutoFocus = nil
+	end
+	if O.tFocusList then
+		if IsTable(O.tAutoFocus) then
+			for dwType, tFocus in pairs(O.tFocusList) do
+				if O.tStaticFocus[dwType] then
+					for dwID, bFocus in pairs(tFocus) do
+						O.tStaticFocus[dwType][dwID] = bFocus
+					end
+				end
+			end
+		end
+		O.tFocusList = nil
+	end
+	D.SaveConfig()
+end
+
 do
 local function onInit()
 	-- 加载设置项数据
@@ -628,22 +656,22 @@ local function onInit()
 		D[k] = char(unpack(D[k]))
 	end
 	-- 用户自定义默认焦点
-	if not O.tAutoFocus then
-		O.tAutoFocus = {}
+	if not O.aPatternFocus then
+		O.aPatternFocus = {}
 	end
-	for i, v in ipairs(O.tAutoFocus) do
+	for i, v in ipairs(O.aPatternFocus) do
 		if IsString(v) then
 			v = { szPattern = v }
 		end
-		O.tAutoFocus[i] = FormatAutoFocusData(v)
+		O.aPatternFocus[i] = FormatAutoFocusData(v)
 	end
 	-- 永久焦点
-	if not O.tFocusList then
-		O.tFocusList = {}
+	if not O.tStaticFocus then
+		O.tStaticFocus = {}
 	end
 	for _, dwType in ipairs({TARGET.PLAYER, TARGET.NPC, TARGET.DOODAD}) do
-		if not O.tFocusList[dwType] then
-			O.tFocusList[dwType] = {}
+		if not O.tStaticFocus[dwType] then
+			O.tStaticFocus[dwType] = {}
 		end
 	end
 	-- 内嵌默认焦点
@@ -815,8 +843,8 @@ local settings = {
 				anchor = D.SaveConfig,
 				fScaleX = D.SaveConfig,
 				fScaleY = D.SaveConfig,
-				tAutoFocus = D.SaveConfig,
-				tFocusList = D.SaveConfig,
+				tAutoFocus = D.OnSetOldConfig,
+				tFocusList = D.OnSetOldConfig,
 			},
 			root = O,
 		},
