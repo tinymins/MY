@@ -1,0 +1,8 @@
+[MYDev_UITexViewer]
+name=圖片瀏覽器
+desc=[開發者工具] Mission Accomplished!
+default=1
+version=1.0
+dependence=MY_!Base
+lua_0=src\MYDev_UITexViewer.lua
+package=MY

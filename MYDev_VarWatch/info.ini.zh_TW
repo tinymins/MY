@@ -1,0 +1,8 @@
+[MYDev_VarWatch]
+name=變量監控
+desc=[開發者工具] Mission Accomplished!
+default=1
+version=1.0
+dependence=MY_!Base
+lua_0=src\MYDev_VarWatch.lua
+package=MY

@@ -1,0 +1,8 @@
+[MY_Resource]
+name=資源包
+desc=焦點、目標、團隊監控等默認數據以及圖像等資源文件
+default=1
+version=1.0
+dependence=MY_!Base
+package=MY
+lua_0=src/MY_Resource.lua

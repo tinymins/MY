@@ -1,0 +1,8 @@
+[MY_Font]
+name=字體管理
+desc=自由設置你的游戲字體
+default=1
+version=1.0
+dependence=MY_!Base
+lua_0=src\MY_Font.lua
+package=MY

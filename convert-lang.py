@@ -10,8 +10,6 @@ import sys, os, codecs, re, time, json, zlib
 from l_convert import zhcn2zhtw
 
 root = os.path.dirname(os.path.abspath(__file__))
-excludes = ['.git', '@DATA']
-extnames = ['.jx3dat', '.lang']
 crc_file = os.path.join(root, '__pycache__/lang.crc.json')
 
 def crc(fileName):
@@ -28,7 +26,7 @@ if os.path.isfile(crc_file):
         print('crc cache loaded: ' + crc_file)
 
 for cwd, dirs, files in os.walk(root):
-    dirs[:] = [d for d in dirs if d not in excludes]
+    dirs[:] = [d for d in dirs if d not in ['.git', '@DATA']]
 
     #for dirname in  dirs:
     #    print("cwd is:" + cwd)
@@ -36,7 +34,9 @@ for cwd, dirs, files in os.walk(root):
 
     for filename in files:
         basename, extname = os.path.splitext(filename)
-        if basename == 'zhcn' and extname in extnames:
+        is_lang_file = basename == 'zhcn' and extname in ['.jx3dat', '.lang']
+        is_info_file = filename in ['info.ini', 'package.ini']
+        if is_lang_file or is_info_file:
             filepath = os.path.join(cwd, filename)
             print('file loading: ' + filepath)
 
@@ -48,7 +48,7 @@ for cwd, dirs, files in os.walk(root):
                     # all_the_text = "-- language data (zhtw) updated at " + time.strftime('%Y-%m-%d %H:%I:%M',time.localtime(time.time())) + "\r\n"
                     all_the_text = ""
                     for count, line in enumerate(codecs.open(filepath,'r',encoding='gbk')):
-                        if count == 0 and line.find('-- language data') == 0:
+                        if is_lang_file and count == 0 and line.find('-- language data') == 0:
                             all_the_text = line.replace('zhcn', 'zhtw')
                         else:
                             all_the_text = all_the_text + line
@@ -58,9 +58,10 @@ for cwd, dirs, files in os.walk(root):
                     all_the_text = zhcn2zhtw(all_the_text)
 
                     print('file saving...')
-                    with codecs.open(os.path.join(cwd, "zhtw" + extname),'w',encoding='utf8') as f:
+                    destfile =  ('zhtw' + extname) if is_lang_file else (filename + '.zh_TW')
+                    with codecs.open(os.path.join(cwd, destfile),'w',encoding='utf8') as f:
                         f.write(all_the_text)
-                        print('file saved: zhtw' + extname)
+                        print('file saved: ' + destfile)
                 except:
                     pass
 

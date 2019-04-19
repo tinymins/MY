@@ -1,0 +1,14 @@
+[MY_TeamTools]
+name=團隊工具
+desc=組隊優化，隊友屬性，重傷記錄，小吃小藥附魔檢查，團隊評分。
+package=MY
+version=1.0
+default=1
+dependence=MY_!Base
+lua_0=src/MY_TeamTools.lua
+lua_1=src/MY_TeamLog.lua
+lua_2=src/MY_CharInfo.lua
+lua_3=src/MY_TeamNotice.lua
+lua_4=src/MY_PartyRequest.lua
+lua_5=src/MY_WorldMark.lua
+lua_6=src/MY_TeamTools.PS.lua

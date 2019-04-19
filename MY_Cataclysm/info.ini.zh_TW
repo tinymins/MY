@@ -1,0 +1,15 @@
+[MY_Cataclysm]
+name=團隊面板
+desc=團隊框架，治療以及指揮首選的團隊面板。
+package=MY
+version=1.0
+default=1
+dependence=MY_!Base
+lua_0=src/MY_Cataclysm.lua
+lua_1=src/MY_CataclysmMain.lua
+lua_2=src/MY_CataclysmParty.lua
+lua_3=src/MY_CataclysmPS.Main.lua
+lua_4=src/MY_CataclysmPS.GridStyle.lua
+lua_5=src/MY_CataclysmPS.GridColor.lua
+lua_6=src/MY_CataclysmPS.Interface.lua
+lua_7=src/MY_CataclysmPS.BuffMonitor.lua

@@ -1,0 +1,11 @@
+[MY_GKP]
+name=金團記錄
+desc=(感謝菊花) 團隊拍賣記賬，好團長必備。
+package=MY
+version=1.0
+default=1
+dependence=MY_!Base
+lua_0=src/MY_GKP.lua
+lua_1=src/MY_GKPLoot.lua
+lua_2=src/MY_GKPChat.lua
+lua_3=src/MY_GKPVote.lua

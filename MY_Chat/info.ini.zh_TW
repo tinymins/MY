@@ -1,0 +1,11 @@
+[MY_Chat]
+name=聊天輔助
+desc=快速切換頻道和聊天打碼複製以及顯示隊伍泡泡
+default=1
+version=1.0
+dependence=MY_!Base
+lua_0=src\MY_ChatCopy.lua
+lua_1=src\MY_ChatSwitch.lua
+lua_2=src\MY_ChatMosaics.lua
+lua_3=src\MY_TeamBalloon.lua
+package=MY

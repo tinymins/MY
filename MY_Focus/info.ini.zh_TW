@@ -1,0 +1,10 @@
+[MY_Focus]
+name=焦點列表
+desc=提供多種條件的焦點列表
+default=1
+version=1.0
+dependence=MY_!Base
+lua_0=src\MY_Focus.lua
+lua_1=src\MY_Focus.UI.lua
+lua_2=src\MY_Focus.PS.lua
+package=MY

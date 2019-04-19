@@ -1,0 +1,8 @@
+[MY_CombatText]
+name=戰鬥文字
+desc=(感謝菊花) 漂亮的戰鬥浮動文字。
+package=MY
+version=1.0
+default=1
+dependence=MY_!Base
+lua_0=src/MY_CombatText.lua

@@ -1,0 +1,17 @@
+[MY_Toolbox]
+name=常用工具
+desc=各種小功能
+default=1
+version=1.0
+dependence=MY_!Base
+lua_0=src\MY_InfoTip.lua
+lua_1=src\MY_VisualSkill.lua
+lua_2=src\MY_Memo.lua
+lua_3=src\MY_Anmerkungen.lua
+lua_4=src\MY_AutoHideChat.lua
+lua_5=src\MY_Toolbox.lua
+lua_6=src\MY_ExamTip.lua
+lua_7=src\MY_AutoChat.lua
+lua_8=src\MY_PlayerViewMagnifier.lua
+lua_9=src\MY_AchievementWiki.lua
+package=MY
