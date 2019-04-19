@@ -25,6 +25,9 @@ if os.path.isfile(crc_file):
         crcs = json.load(f)
         print('crc cache loaded: ' + crc_file)
 
+cpkg = ''
+cpkg_path = '?'
+
 for cwd, dirs, files in os.walk(root):
     dirs[:] = [d for d in dirs if d not in ['.git', '@DATA']]
 
@@ -38,6 +41,9 @@ for cwd, dirs, files in os.walk(root):
         is_info_file = filename in ['info.ini', 'package.ini']
         if is_lang_file or is_info_file:
             filepath = os.path.join(cwd, filename)
+            if filename == 'package.ini':
+                cpkg = cwd[cwd.rfind('\\') + 1:]
+                cpkg_path = cwd
             print('file loading: ' + filepath)
 
             crc_text = crc(filepath)
@@ -52,8 +58,15 @@ for cwd, dirs, files in os.walk(root):
                             all_the_text = line.replace('zhcn', 'zhtw')
                         else:
                             all_the_text = all_the_text + line
-
                     print('file converting...')
+
+                    # fill missing package
+                    if filename == 'info.ini' and cwd.find(cpkg_path) == 0 and all_the_text.find('package=') == -1:
+                        all_the_text = all_the_text.rstrip() + '\npackage=' + cpkg + '\n'
+                        with codecs.open(filepath,'w',encoding='gbk') as f:
+                            f.write(all_the_text)
+                            print('file saved: ' + filepath)
+
                     # all_the_text = all_the_text.decode('gbk')
                     all_the_text = zhcn2zhtw(all_the_text)
 
