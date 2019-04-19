@@ -185,6 +185,8 @@ function D.UpdateItem(hItem, p)
 				hInfoList:Lookup('Handle_Kungfu/Image_Kungfu'):FromUITex(GetForceImage(KObject.dwForceID))
 			end
 		end
+	else
+		hItem:Lookup('Handle_L/Handle_KungfuName/Text_Kungfu'):SetText('')
 	end
 	-- ÕóÓª
 	hInfoList:Lookup('Handle_Camp'):Hide()
