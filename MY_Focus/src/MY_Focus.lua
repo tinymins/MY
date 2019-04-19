@@ -44,6 +44,7 @@ local l_tTempFocusList = {
 	[TARGET.NPC]    = {},   -- dwTemplateID
 	[TARGET.DOODAD] = {},   -- dwTemplateID
 }
+local CONFIG_CHANGED = false
 local l_dwLockType, l_dwLockID, l_lockInDisplay
 local O, D = {}, { PASSPHRASE = {111, 198, 5} }
 O.bEnable            = false -- 是否启用
@@ -116,25 +117,34 @@ function D.LoadConfig()
 	for k, v in pairs(config) do
 		O[k] = v
 	end
+	CONFIG_CHANGED = false
 end
 
 function D.SaveConfig()
+	if not CONFIG_CHANGED then
+		return
+	end
 	MY.SaveLUAData({'config/focus.jx3dat', MY_DATA_PATH.ROLE}, O)
+	CONFIG_CHANGED = false
 end
+MY.RegisterIdle('MY_Focus_Save', D.SaveConfig)
 
 function D.SetScale(fScaleX, fScaleY)
 	O.fScaleX = fScaleX
 	O.fScaleY = fScaleY
+	CONFIG_CHANGED = true
 	FireUIEvent('MY_FOCUS_SCALE_UPDATE')
 end
 
 function D.SetMaxDisplay(nMaxDisplay)
 	O.nMaxDisplay = nMaxDisplay
+	CONFIG_CHANGED = true
 	FireUIEvent('MY_FOCUS_MAX_DISPLAY_UPDATE')
 end
 
 function D.SetAutoHide(bAutoHide)
 	O.bAutoHide = bAutoHide
+	CONFIG_CHANGED = true
 	FireUIEvent('MY_FOCUS_AUTO_HIDE_UPDATE')
 end
 
@@ -150,6 +160,7 @@ function D.SetFocusPattern(szPattern, tData)
 		if v.szPattern == szPattern then
 			nIndex = i
 			remove(O.aPatternFocus, i)
+			CONFIG_CHANGED = true
 		end
 	end
 	-- 格式化数据
@@ -160,8 +171,10 @@ function D.SetFocusPattern(szPattern, tData)
 	-- 更新焦点列表
 	if nIndex then
 		insert(O.aPatternFocus, nIndex, tData)
+		CONFIG_CHANGED = true
 	else
 		insert(O.aPatternFocus, tData)
+		CONFIG_CHANGED = true
 	end
 	D.RescanNearby()
 	return tData
@@ -174,7 +187,7 @@ function D.RemoveFocusPattern(szPattern)
 		if O.aPatternFocus[i].szPattern == szPattern then
 			p = O.aPatternFocus[i]
 			remove(O.aPatternFocus, i)
-			break
+			CONFIG_CHANGED = true
 		end
 	end
 	if not p then
@@ -209,6 +222,7 @@ function D.SetFocusID(dwType, dwID, bSave)
 			return
 		end
 		O.tStaticFocus[dwType][dwTemplateID] = true
+		CONFIG_CHANGED = true
 		D.RescanNearby()
 	else
 		if l_tTempFocusList[dwType][dwID] then
@@ -230,6 +244,7 @@ function D.RemoveFocusID(dwType, dwID)
 	local dwTemplateID = dwType == TARGET.PLAYER and dwID or KObject.dwTemplateID
 	if O.tStaticFocus[dwType][dwTemplateID] then
 		O.tStaticFocus[dwType][dwTemplateID] = nil
+		CONFIG_CHANGED = true
 		D.RescanNearby()
 	end
 end
@@ -617,7 +632,14 @@ function D.GetTargetMenu(dwType, dwID)
 	}}
 end
 
+function D.OnSetConfig()
+	CONFIG_CHANGED = true
+end
+
 function D.OnSetOldConfig()
+	if not O.tAutoFocus and not O.tFocusList then
+		return
+	end
 	if O.tAutoFocus then
 		if IsTable(O.tAutoFocus) then
 			for _, v in ipairs(O.tAutoFocus) do
@@ -638,7 +660,7 @@ function D.OnSetOldConfig()
 		end
 		O.tFocusList = nil
 	end
-	D.SaveConfig()
+	D.OnSetConfig()
 end
 
 do
@@ -721,6 +743,7 @@ MY.RegisterTutorial({
 		bDefault = true,
 		fnAction = function()
 			O.bEnable = true
+			CONFIG_CHANGED = true
 			MY_Focus.Open()
 			MY.RedrawTab('MY_Focus')
 		end,
@@ -729,6 +752,7 @@ MY.RegisterTutorial({
 		szOption = _L['Not use'],
 		fnAction = function()
 			O.bEnable = false
+			CONFIG_CHANGED = true
 			MY_Focus.Close()
 			MY.RedrawTab('MY_Focus')
 		end,
@@ -818,31 +842,31 @@ local settings = {
 				tFocusList = true,
 			},
 			triggers = {
-				bEnable = D.SaveConfig,
-				bMinimize = D.SaveConfig,
-				bFocusINpc = D.SaveConfig,
-				bFocusFriend = D.SaveConfig,
-				bFocusTong = D.SaveConfig,
-				bOnlyPublicMap = D.SaveConfig,
-				bSortByDistance = D.SaveConfig,
-				bFocusEnemy = D.SaveConfig,
-				bFocusAnmerkungen = D.SaveConfig,
-				bAutoHide = D.SaveConfig,
-				nMaxDisplay = D.SaveConfig,
-				bAutoFocus = D.SaveConfig,
-				bEmbeddedFocus = D.SaveConfig,
-				bHideDeath = D.SaveConfig,
-				bDisplayKungfuIcon = D.SaveConfig,
-				bFocusJJCParty = D.SaveConfig,
-				bFocusJJCEnemy = D.SaveConfig,
-				bShowTarget = D.SaveConfig,
-				szDistanceType = D.SaveConfig,
-				bTraversal = D.SaveConfig,
-				bHealHelper = D.SaveConfig,
-				bEnableSceneNavi = D.SaveConfig,
-				anchor = D.SaveConfig,
-				fScaleX = D.SaveConfig,
-				fScaleY = D.SaveConfig,
+				bEnable = D.OnSetConfig,
+				bMinimize = D.OnSetConfig,
+				bFocusINpc = D.OnSetConfig,
+				bFocusFriend = D.OnSetConfig,
+				bFocusTong = D.OnSetConfig,
+				bOnlyPublicMap = D.OnSetConfig,
+				bSortByDistance = D.OnSetConfig,
+				bFocusEnemy = D.OnSetConfig,
+				bFocusAnmerkungen = D.OnSetConfig,
+				bAutoHide = D.OnSetConfig,
+				nMaxDisplay = D.OnSetConfig,
+				bAutoFocus = D.OnSetConfig,
+				bEmbeddedFocus = D.OnSetConfig,
+				bHideDeath = D.OnSetConfig,
+				bDisplayKungfuIcon = D.OnSetConfig,
+				bFocusJJCParty = D.OnSetConfig,
+				bFocusJJCEnemy = D.OnSetConfig,
+				bShowTarget = D.OnSetConfig,
+				szDistanceType = D.OnSetConfig,
+				bTraversal = D.OnSetConfig,
+				bHealHelper = D.OnSetConfig,
+				bEnableSceneNavi = D.OnSetConfig,
+				anchor = D.OnSetConfig,
+				fScaleX = D.OnSetConfig,
+				fScaleY = D.OnSetConfig,
 				tAutoFocus = D.OnSetOldConfig,
 				tFocusList = D.OnSetOldConfig,
 			},
