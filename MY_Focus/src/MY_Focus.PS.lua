@@ -539,7 +539,7 @@ function PS.OnPanelActive(wnd)
 		sliderstyle = MY_SLIDER_DISPTYPE.SHOW_VALUE,
 		value = MY_Focus.fScaleY * 100,
 		onchange = function(val)
-			MY_Focus.fScaleY = MY_Focus.fScaleX, val / 100
+			MY_Focus.fScaleY = val / 100
 		end,
 		autoenable = function() return MY_Focus.IsEnabled() end,
 	})
