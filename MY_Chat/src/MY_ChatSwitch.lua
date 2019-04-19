@@ -186,9 +186,9 @@ local function OnWhisperCheck()
 				local today = MY.FormatTime('yyyyMMdd')
 				local r, g, b = GetMsgFontColor('MSG_WHISPER')
 				for _, v in ipairs(whisper[2]) do
-					if type(v) == 'string' then
+					if IsString(v) then
 						table.insert(t, v)
-					elseif type(v) == 'table' then
+					elseif IsTable(v) and IsString(v[1]) then
 						if today == MY.FormatTime('yyyyMMdd', v[2]) then
 							table.insert(t, MY.GetTimeLinkText({r = r, g = g, b = b, s = '[hh:mm:ss]'}, v[2]) .. v[1])
 						else
@@ -339,7 +339,7 @@ end
 
 function MY_ChatSwitch.OnEvent(event)
 	if event == 'PLAYER_SAY' then
-		local szContent, dwTalkerID, nChannel, szName, szMsg = arg0, arg1, arg2, arg3, arg11
+		local szContent, dwTalkerID, nChannel, szName, szMsg = arg0, arg1, arg2, arg3, arg9
 		if nChannel == PLAYER_TALK_CHANNEL.WHISPER then
 			local t
 			for i = #MY_ChatSwitch.aWhisper, 1, -1 do
