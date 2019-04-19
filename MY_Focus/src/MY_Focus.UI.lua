@@ -36,7 +36,16 @@ local IsEmpty, IsString, IsTable, IsUserdata = MY.IsEmpty, MY.IsString, MY.IsTab
 local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = MY.MENU_DIVIDER, MY.EMPTY_TABLE, MY.XML_LINE_BREAKER
 --------------------------------------------------------------------------------------------------------
 local INI_PATH = MY.GetAddonInfo().szRoot .. 'MY_Focus/ui/MY_Focus.ini'
-local _L, D = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Focus/lang/'), {}
+local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Focus/lang/')
+local D = {
+	GetDisplayList     = MY_Focus.GetDisplayList    ,
+	IsShielded         = MY_Focus.IsShielded        ,
+	SortFocus          = MY_Focus.SortFocus         ,
+	RescanNearby       = MY_Focus.RescanNearby      ,
+	RemoveFocusID      = MY_Focus.RemoveFocusID     ,
+	OnObjectEnterScene = MY_Focus.OnObjectEnterScene,
+	OnObjectLeaveScene = MY_Focus.OnObjectLeaveScene,
+}
 local TEMP_TARGET_TYPE, TEMP_TARGET_ID
 local l_dwLockType, l_dwLockID, l_lockInDisplay
 
@@ -64,32 +73,27 @@ function D.CreateList(frame)
 	hList:FormatAllItemPos()
 end
 
-function MY_Focus.Open()
-	Wnd.OpenWindow(INI_PATH, 'MY_Focus')
+function D.Open()
+	Wnd.OpenWindow(INI_PATH, 'MY_FocusUI')
 end
 
-function MY_Focus.Close()
-	local hFrame = MY_Focus.GetFrame()
+function D.Close()
+	local hFrame = D.GetFrame()
 	if hFrame then
 		Wnd.CloseWindow(hFrame)
 	end
 end
 
-function MY_Focus.GetFrame(szWnd, szItem)
+function D.GetFrame(szWnd, szItem)
 	if szWnd then
 		if szItem then
-			return Station.Lookup('Normal/MY_Focus/' .. szWnd, szItem)
+			return Station.Lookup('Normal/MY_FocusUI/' .. szWnd, szItem)
 		else
-			return Station.Lookup('Normal/MY_Focus/' .. szWnd)
+			return Station.Lookup('Normal/MY_FocusUI/' .. szWnd)
 		end
 	else
-		return Station.Lookup('Normal/MY_Focus')
+		return Station.Lookup('Normal/MY_FocusUI')
 	end
-end
-
--- 获取指定焦点的Handle 没有返回nil
-function MY_Focus.GetHandle(dwType, dwID)
-	return Station.Lookup('Normal/MY_Focus', 'Handle_List/HI_'..dwType..'_'..dwID)
 end
 
 -- 自适应调整界面大小
@@ -324,7 +328,7 @@ function D.UpdateList(frame)
 	local nCount = 0
 	local tKeep = {}
 	local hList = frame:Lookup('', 'Handle_List')
-	local aList = MY_Focus.GetDisplayList()
+	local aList = D.GetDisplayList()
 	for i = 1, hList:GetItemCount() do
 		local p = aList[i]
 		local hItem = hList:Lookup(i - 1)
@@ -375,8 +379,8 @@ end
 --                                   # #               #           #          --
 -- ########################################################################## --
 -- 周期重绘
-function MY_Focus.OnFrameBreathe()
-	if not MY_Focus.IsShielded() then
+function D.OnFrameBreathe()
+	if not D.IsShielded() then
 		if l_dwLockType and l_dwLockID and l_lockInDisplay then
 			local dwType, dwID = MY.GetTarget()
 			if dwType ~= l_dwLockType or dwID ~= l_dwLockID then
@@ -384,13 +388,13 @@ function MY_Focus.OnFrameBreathe()
 			end
 		end
 		if MY_Focus.bSortByDistance then
-			MY_Focus.SortFocus()
+			D.SortFocus()
 		end
 	end
 	D.UpdateList(this)
 end
 
-function MY_Focus.OnFrameCreate()
+function D.OnFrameCreate()
 	this:RegisterEvent('PARTY_SET_MARK')
 	this:RegisterEvent('UI_SCALED')
 	this:RegisterEvent('PLAYER_ENTER_SCENE')
@@ -408,11 +412,11 @@ function MY_Focus.OnFrameCreate()
 
 	D.Scale(this)
 	D.CreateList(this)
-	MY_Focus.OnEvent('UI_SCALED')
-	MY_Focus.RescanNearby()
+	D.OnEvent('UI_SCALED')
+	D.RescanNearby()
 end
 
-function MY_Focus.OnFrameDestroy()
+function D.OnFrameDestroy()
 	if Navigator_Remove then
 		for szKey, _ in pairs(NAVIGATOR_CACHE) do
 			Navigator_Remove(szKey)
@@ -421,25 +425,25 @@ function MY_Focus.OnFrameDestroy()
 	end
 end
 
-function MY_Focus.OnEvent(event)
+function D.OnEvent(event)
 	if event == 'PARTY_SET_MARK' then
 		D.UpdateList(this)
 	elseif event == 'UI_SCALED' then
 		UI(this):anchor(MY_Focus.anchor)
 	elseif event == 'PLAYER_ENTER_SCENE' then
-		MY_Focus.OnObjectEnterScene(TARGET.PLAYER, arg0)
+		D.OnObjectEnterScene(TARGET.PLAYER, arg0)
 	elseif event == 'NPC_ENTER_SCENE' then
-		MY_Focus.OnObjectEnterScene(TARGET.NPC, arg0)
+		D.OnObjectEnterScene(TARGET.NPC, arg0)
 	elseif event == 'DOODAD_ENTER_SCENE' then
-		MY_Focus.OnObjectEnterScene(TARGET.DOODAD, arg0)
+		D.OnObjectEnterScene(TARGET.DOODAD, arg0)
 	elseif event == 'PLAYER_LEAVE_SCENE' then
-		MY_Focus.OnObjectLeaveScene(TARGET.PLAYER, arg0)
+		D.OnObjectLeaveScene(TARGET.PLAYER, arg0)
 	elseif event == 'NPC_LEAVE_SCENE' then
-		MY_Focus.OnObjectLeaveScene(TARGET.NPC, arg0)
+		D.OnObjectLeaveScene(TARGET.NPC, arg0)
 	elseif event == 'DOODAD_LEAVE_SCENE' then
-		MY_Focus.OnObjectLeaveScene(TARGET.DOODAD, arg0)
+		D.OnObjectLeaveScene(TARGET.DOODAD, arg0)
 	elseif event == 'MY_SET_IMPORTANT_NPC' then
-		MY_Focus.RescanNearby()
+		D.RescanNearby()
 	elseif event == 'MY_FOCUS_LOCK_UPDATE' then
 		D.UpdateList(this)
 	elseif event == 'MY_FOCUS_SCALE_UPDATE' then
@@ -453,12 +457,12 @@ function MY_Focus.OnEvent(event)
 	end
 end
 
-function MY_Focus.OnFrameDragSetPosEnd()
+function D.OnFrameDragSetPosEnd()
 	this:CorrectPos()
 	MY_Focus.anchor = UI(this):anchor('TOPRIGHT')
 end
 
-function MY_Focus.OnItemMouseEnter()
+function D.OnItemMouseEnter()
 	local name = this:GetName()
 	if name == 'Handle_Info' then
 		this:Lookup('Image_Hover'):Show()
@@ -466,18 +470,18 @@ function MY_Focus.OnItemMouseEnter()
 			TEMP_TARGET_TYPE, TEMP_TARGET_ID = MY.GetTarget()
 			SetTarget(this.dwType, this.dwID)
 		end
-		MY_Focus.OnItemRefreshTip()
+		D.OnItemRefreshTip()
 	end
 end
 
-function MY_Focus.OnItemRefreshTip()
+function D.OnItemRefreshTip()
 	local name = this:GetName()
 	if name == 'Handle_Info' then
 		MY.OutputObjectTip(this.dwType, this.dwID, nil, GetFormatText(_L['Via:'] .. this.szVia .. '\n', 82))
 	end
 end
 
-function MY_Focus.OnItemMouseLeave()
+function D.OnItemMouseLeave()
 	local name = this:GetName()
 	if name == 'Handle_Info' then
 		if this:Lookup('Image_Hover') then
@@ -490,7 +494,7 @@ function MY_Focus.OnItemMouseLeave()
 	end
 end
 
-function MY_Focus.OnItemLButtonClick()
+function D.OnItemLButtonClick()
 	local name = this:GetName()
 	if name == 'Handle_Info' then
 		if MY_Focus.bHealHelper then
@@ -500,7 +504,7 @@ function MY_Focus.OnItemLButtonClick()
 	end
 end
 
-function MY_Focus.OnItemRButtonClick()
+function D.OnItemRButtonClick()
 	local name = this:GetName()
 	if name == 'Handle_Info' then
 		local dwType, dwID = this.dwType, this.dwID
@@ -513,7 +517,7 @@ function MY_Focus.OnItemRButtonClick()
 						l_dwLockType = nil
 						l_dwLockID = nil
 					end
-					MY_Focus.RemoveFocusID(dwType, dwID)
+					D.RemoveFocusID(dwType, dwID)
 				end,
 			})
 		else
@@ -545,18 +549,18 @@ function MY_Focus.OnItemRButtonClick()
 	end
 end
 
-function MY_Focus.OnLButtonClick()
+function D.OnLButtonClick()
 	local name = this:GetName()
 	if name == 'Btn_Setting' then
 		MY.ShowPanel()
 		MY.FocusPanel()
 		MY.SwitchTab('MY_Focus')
 	elseif name == 'Btn_Close' then
-		MY_Focus.Close()
+		D.Close()
 	end
 end
 
-function MY_Focus.OnCheckBoxCheck()
+function D.OnCheckBoxCheck()
 	local name = this:GetName()
 	if name == 'CheckBox_Minimize' then
 		MY_Focus.bMinimize = true
@@ -564,7 +568,7 @@ function MY_Focus.OnCheckBoxCheck()
 	end
 end
 
-function MY_Focus.OnCheckBoxUncheck()
+function D.OnCheckBoxUncheck()
 	local name = this:GetName()
 	if name == 'CheckBox_Minimize' then
 		MY_Focus.bMinimize = false
@@ -574,8 +578,36 @@ end
 
 MY.RegisterInit('MY_FOCUS', function()
 	if MY_Focus.bEnable then
-		MY_Focus.Open()
+		D.Open()
 	else
-		MY_Focus.Close()
+		D.Close()
 	end
 end)
+
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				Open                 = D.Open                ,
+				Close                = D.Close               ,
+				OnFrameBreathe       = D.OnFrameBreathe      ,
+				OnFrameCreate        = D.OnFrameCreate       ,
+				OnFrameDestroy       = D.OnFrameDestroy      ,
+				OnEvent              = D.OnEvent             ,
+				OnFrameDragSetPosEnd = D.OnFrameDragSetPosEnd,
+				OnItemMouseEnter     = D.OnItemMouseEnter    ,
+				OnItemRefreshTip     = D.OnItemRefreshTip    ,
+				OnItemMouseLeave     = D.OnItemMouseLeave    ,
+				OnItemLButtonClick   = D.OnItemLButtonClick  ,
+				OnItemRButtonClick   = D.OnItemRButtonClick  ,
+				OnLButtonClick       = D.OnLButtonClick      ,
+				OnCheckBoxCheck      = D.OnCheckBoxCheck     ,
+				OnCheckBoxUncheck    = D.OnCheckBoxUncheck   ,
+			},
+		},
+	},
+}
+MY_FocusUI = MY.GeneGlobalNS(settings)
+end

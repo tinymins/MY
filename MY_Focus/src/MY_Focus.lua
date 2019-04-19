@@ -45,66 +45,38 @@ local l_tTempFocusList = {
 	[TARGET.DOODAD] = {},   -- dwTemplateID
 }
 local l_dwLockType, l_dwLockID, l_lockInDisplay
-local D = { PASSPHRASE = {111, 198, 5} }
-MY_Focus = {}
-MY_Focus.bEnable            = false -- 是否启用
-MY_Focus.bMinimize          = false -- 是否最小化
-MY_Focus.bFocusINpc         = true  -- 焦点重要NPC
-MY_Focus.bFocusFriend       = false -- 焦点附近好友
-MY_Focus.bFocusTong         = false -- 焦点帮会成员
-MY_Focus.bOnlyPublicMap     = true  -- 仅在公共地图焦点好友帮会成员
-MY_Focus.bSortByDistance    = false -- 优先焦点近距离目标
-MY_Focus.bFocusEnemy        = false -- 焦点敌对玩家
-MY_Focus.bFocusAnmerkungen  = true  -- 焦点记在小本本里的玩家
-MY_Focus.bAutoHide          = true  -- 无焦点时隐藏
-MY_Focus.nMaxDisplay        = 5     -- 最大显示数量
-MY_Focus.bAutoFocus         = true  -- 启用默认焦点
-MY_Focus.bEmbeddedFocus     = true  -- 启用内嵌默认焦点
-MY_Focus.bHideDeath         = false -- 隐藏死亡目标
-MY_Focus.bDisplayKungfuIcon = false -- 显示心法图标
-MY_Focus.bFocusJJCParty     = false -- 焦竞技场队友
-MY_Focus.bFocusJJCEnemy     = true  -- 焦竞技场敌队
-MY_Focus.bShowTarget        = false -- 显示目标目标
-MY_Focus.szDistanceType     = 'global' -- 坐标距离计算方式
-MY_Focus.bTraversal         = false -- 遍历焦点列表
-MY_Focus.bHealHelper        = false -- 辅助治疗模式
-MY_Focus.bEnableSceneNavi   = false -- 场景追踪点
-MY_Focus.fScaleX            = 1     -- 缩放比例
-MY_Focus.fScaleY            = 1     -- 缩放比例
-MY_Focus.tAutoFocus = {}    -- 默认焦点
-MY_Focus.tFocusList = {     -- 永久焦点
+local O, D = {}, { PASSPHRASE = {111, 198, 5} }
+O.bEnable            = false -- 是否启用
+O.bMinimize          = false -- 是否最小化
+O.bFocusINpc         = true  -- 焦点重要NPC
+O.bFocusFriend       = false -- 焦点附近好友
+O.bFocusTong         = false -- 焦点帮会成员
+O.bOnlyPublicMap     = true  -- 仅在公共地图焦点好友帮会成员
+O.bSortByDistance    = false -- 优先焦点近距离目标
+O.bFocusEnemy        = false -- 焦点敌对玩家
+O.bFocusAnmerkungen  = true  -- 焦点记在小本本里的玩家
+O.bAutoHide          = true  -- 无焦点时隐藏
+O.nMaxDisplay        = 5     -- 最大显示数量
+O.bAutoFocus         = true  -- 启用默认焦点
+O.bEmbeddedFocus     = true  -- 启用内嵌默认焦点
+O.bHideDeath         = false -- 隐藏死亡目标
+O.bDisplayKungfuIcon = false -- 显示心法图标
+O.bFocusJJCParty     = false -- 焦竞技场队友
+O.bFocusJJCEnemy     = true  -- 焦竞技场敌队
+O.bShowTarget        = false -- 显示目标目标
+O.szDistanceType     = 'global' -- 坐标距离计算方式
+O.bTraversal         = false -- 遍历焦点列表
+O.bHealHelper        = false -- 辅助治疗模式
+O.bEnableSceneNavi   = false -- 场景追踪点
+O.fScaleX            = 1     -- 缩放比例
+O.fScaleY            = 1     -- 缩放比例
+O.tAutoFocus = {}    -- 默认焦点
+O.tFocusList = {     -- 永久焦点
 	[TARGET.PLAYER] = {},   -- dwID
 	[TARGET.NPC]    = {},   -- dwTemplateID
 	[TARGET.DOODAD] = {},   -- dwTemplateID
 }
-MY_Focus.anchor = { x=-300, y=220, s='TOPRIGHT', r='TOPRIGHT' } -- 默认坐标
-RegisterCustomData('MY_Focus.bEnable', 1)
-RegisterCustomData('MY_Focus.bMinimize')
-RegisterCustomData('MY_Focus.bFocusINpc')
-RegisterCustomData('MY_Focus.bFocusFriend')
-RegisterCustomData('MY_Focus.bFocusTong')
-RegisterCustomData('MY_Focus.bOnlyPublicMap')
-RegisterCustomData('MY_Focus.bSortByDistance')
-RegisterCustomData('MY_Focus.bFocusEnemy')
-RegisterCustomData('MY_Focus.bFocusAnmerkungen')
-RegisterCustomData('MY_Focus.bAutoHide')
-RegisterCustomData('MY_Focus.nMaxDisplay')
-RegisterCustomData('MY_Focus.bAutoFocus')
-RegisterCustomData('MY_Focus.bEmbeddedFocus')
-RegisterCustomData('MY_Focus.bHideDeath')
-RegisterCustomData('MY_Focus.bDisplayKungfuIcon')
-RegisterCustomData('MY_Focus.bFocusJJCParty')
-RegisterCustomData('MY_Focus.bFocusJJCEnemy')
-RegisterCustomData('MY_Focus.bShowTarget')
-RegisterCustomData('MY_Focus.szDistanceType')
-RegisterCustomData('MY_Focus.bTraversal')
-RegisterCustomData('MY_Focus.bHealHelper')
-RegisterCustomData('MY_Focus.bEnableSceneNavi')
-RegisterCustomData('MY_Focus.tAutoFocus')
-RegisterCustomData('MY_Focus.tFocusList')
-RegisterCustomData('MY_Focus.anchor')
-RegisterCustomData('MY_Focus.fScaleX')
-RegisterCustomData('MY_Focus.fScaleY')
+O.anchor = { x=-300, y=220, s='TOPRIGHT', r='TOPRIGHT' } -- 默认坐标
 
 local function FormatAutoFocusData(data)
 	local ds = {
@@ -132,49 +104,72 @@ local function FormatAutoFocusData(data)
 	}
 	return MY.FormatDataStructure(data, ds)
 end
-function MY_Focus.IsShielded() return MY.IsShieldedVersion() and MY.IsInShieldedMap() end
-function MY_Focus.IsEnabled() return MY_Focus.bEnable and not MY_Focus.IsShielded() end
+function D.IsShielded() return MY.IsShieldedVersion() and MY.IsInShieldedMap() end
+function D.IsEnabled() return O.bEnable and not D.IsShielded() end
 
-function MY_Focus.SetScale(fScaleX, fScaleY)
-	MY_Focus.fScaleX = fScaleX
-	MY_Focus.fScaleY = fScaleY
+function D.LoadConfig()
+	local config = MY.LoadLUAData({'config/focus.jx3dat', MY_DATA_PATH.ROLE}) or {}
+	for k, v in pairs(config) do
+		O[k] = v
+	end
+end
+
+function D.SaveConfig()
+	MY.SaveLUAData({'config/focus.jx3dat', MY_DATA_PATH.ROLE}, O)
+end
+
+function D.SetScale(fScaleX, fScaleY)
+	O.fScaleX = fScaleX
+	O.fScaleY = fScaleY
 	FireUIEvent('MY_FOCUS_SCALE_UPDATE')
 end
 
-function MY_Focus.SetMaxDisplay(nMaxDisplay)
-	MY_Focus.nMaxDisplay = nMaxDisplay
+function D.SetMaxDisplay(nMaxDisplay)
+	O.nMaxDisplay = nMaxDisplay
 	FireUIEvent('MY_FOCUS_MAX_DISPLAY_UPDATE')
 end
 
-function MY_Focus.SetAutoHide(bAutoHide)
-	MY_Focus.bAutoHide = bAutoHide
+function D.SetAutoHide(bAutoHide)
+	O.bAutoHide = bAutoHide
 	FireUIEvent('MY_FOCUS_AUTO_HIDE_UPDATE')
 end
 
--- 添加默认焦点
-function MY_Focus.SetFocusPattern(szName)
-	szName = MY.TrimString(szName)
-	for _, v in ipairs(MY_Focus.tAutoFocus) do
-		if v.szPattern == szName then
-			return
+function D.GetAllFocusPattern()
+	return clone(O.tAutoFocus)
+end
+
+-- 添加、修改默认焦点
+function D.SetFocusPattern(szPattern, tData)
+	local nIndex
+	szPattern = MY.TrimString(szPattern)
+	for i, v in ipairs_r(O.tAutoFocus) do
+		if v.szPattern == szPattern then
+			nIndex = i
+			remove(O.tAutoFocus, i)
 		end
 	end
-	local tData = FormatAutoFocusData({
-		szPattern = szName,
-	})
-	insert(MY_Focus.tAutoFocus, tData)
+	-- 格式化数据
+	if not IsTable(tData) then
+		tData = { szPattern = szPattern }
+	end
+	tData = FormatAutoFocusData(tData)
 	-- 更新焦点列表
-	MY_Focus.ScanNearby()
+	if nIndex then
+		insert(O.tAutoFocus, nIndex, tData)
+	else
+		insert(O.tAutoFocus, tData)
+	end
+	D.RescanNearby()
 	return tData
 end
 
 -- 删除默认焦点
-function MY_Focus.RemoveFocusPattern(szPattern)
+function D.RemoveFocusPattern(szPattern)
 	local p
-	for i = #MY_Focus.tAutoFocus, 1, -1 do
-		if MY_Focus.tAutoFocus[i].szPattern == szPattern then
-			p = MY_Focus.tAutoFocus[i]
-			remove(MY_Focus.tAutoFocus, i)
+	for i = #O.tAutoFocus, 1, -1 do
+		if O.tAutoFocus[i].szPattern == szPattern then
+			p = O.tAutoFocus[i]
+			remove(O.tAutoFocus, i)
 			break
 		end
 	end
@@ -190,74 +185,74 @@ function MY_Focus.RemoveFocusPattern(szPattern)
 			local dwTemplateID = p.dwType == TARGET.PLAYER and p.dwID or KObject.dwTemplateID
 			if KObject and MY.GetObjectName(KObject, 'never') == szPattern
 			and not l_tTempFocusList[p.dwType][p.dwID]
-			and not MY_Focus.tFocusList[p.dwType][dwTemplateID] then
-				MY_Focus.OnObjectLeaveScene(p.dwType, p.dwID)
+			and not O.tFocusList[p.dwType][dwTemplateID] then
+				D.OnObjectLeaveScene(p.dwType, p.dwID)
 			end
 		end
 	else
 		-- 其他模式：重绘焦点列表
-		MY_Focus.RescanNearby()
+		D.RescanNearby()
 	end
 end
 
 -- 添加ID焦点
-function MY_Focus.SetFocusID(dwType, dwID, bSave)
+function D.SetFocusID(dwType, dwID, bSave)
 	dwType, dwID = tonumber(dwType), tonumber(dwID)
 	if bSave then
 		local KObject = MY.GetObject(dwType, dwID)
 		local dwTemplateID = dwType == TARGET.PLAYER and dwID or KObject.dwTemplateID
-		if MY_Focus.tFocusList[dwType][dwTemplateID] then
+		if O.tFocusList[dwType][dwTemplateID] then
 			return
 		end
-		MY_Focus.tFocusList[dwType][dwTemplateID] = true
-		MY_Focus.RescanNearby()
+		O.tFocusList[dwType][dwTemplateID] = true
+		D.RescanNearby()
 	else
 		if l_tTempFocusList[dwType][dwID] then
 			return
 		end
 		l_tTempFocusList[dwType][dwID] = true
-		MY_Focus.OnObjectEnterScene(dwType, dwID)
+		D.OnObjectEnterScene(dwType, dwID)
 	end
 end
 
 -- 删除ID焦点
-function MY_Focus.RemoveFocusID(dwType, dwID)
+function D.RemoveFocusID(dwType, dwID)
 	dwType, dwID = tonumber(dwType), tonumber(dwID)
 	if l_tTempFocusList[dwType][dwID] then
 		l_tTempFocusList[dwType][dwID] = nil
-		MY_Focus.OnObjectLeaveScene(dwType, dwID)
+		D.OnObjectLeaveScene(dwType, dwID)
 	end
 	local KObject = MY.GetObject(dwType, dwID)
 	local dwTemplateID = dwType == TARGET.PLAYER and dwID or KObject.dwTemplateID
-	if MY_Focus.tFocusList[dwType][dwTemplateID] then
-		MY_Focus.tFocusList[dwType][dwTemplateID] = nil
-		MY_Focus.RescanNearby()
+	if O.tFocusList[dwType][dwTemplateID] then
+		O.tFocusList[dwType][dwTemplateID] = nil
+		D.RescanNearby()
 	end
 end
 
 -- 清空焦点列表
-function MY_Focus.ClearFocus()
+function D.ClearFocus()
 	FOCUS_LIST = {}
 	FireUIEvent('MY_FOCUS_UPDATE')
 end
 
 -- 重新扫描附近对象更新焦点列表（只增不减）
-function MY_Focus.ScanNearby()
+function D.ScanNearby()
 	for _, dwID in ipairs(MY.GetNearPlayerID()) do
-		MY_Focus.OnObjectEnterScene(TARGET.PLAYER, dwID)
+		D.OnObjectEnterScene(TARGET.PLAYER, dwID)
 	end
 	for _, dwID in ipairs(MY.GetNearNpcID()) do
-		MY_Focus.OnObjectEnterScene(TARGET.NPC, dwID)
+		D.OnObjectEnterScene(TARGET.NPC, dwID)
 	end
 	for _, dwID in ipairs(MY.GetNearDoodadID()) do
-		MY_Focus.OnObjectEnterScene(TARGET.DOODAD, dwID)
+		D.OnObjectEnterScene(TARGET.DOODAD, dwID)
 	end
 end
 
 -- 重新扫描附近焦点
-function MY_Focus.RescanNearby()
-	MY_Focus.ClearFocus()
-	MY_Focus.ScanNearby()
+function D.RescanNearby()
+	D.ClearFocus()
+	D.ScanNearby()
 end
 
 function D.GetEligibleRule(tRules, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
@@ -305,12 +300,12 @@ function D.LoadEmbeddedRule()
 end
 
 -- 对象进入视野
-function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
+function D.OnObjectEnterScene(dwType, dwID, nRetryCount)
 	if nRetryCount and nRetryCount > 5 then
 		return
 	end
 	if not D.EMBEDDED_FOCUS then
-		return MY.DelayCall(5000, function() MY_Focus.OnObjectEnterScene(dwType, dwID) end)
+		return MY.DelayCall(5000, function() D.OnObjectEnterScene(dwType, dwID) end)
 	end
 	local me = GetClientPlayer()
 	local KObject = MY.GetObject(dwType, dwID)
@@ -322,7 +317,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 	-- 解决玩家刚进入视野时名字为空的问题
 	if (dwType == TARGET.PLAYER and not szName) or not me then -- 解决自身刚进入场景的时候的问题
 		MY.DelayCall(300, function()
-			MY_Focus.OnObjectEnterScene(dwType, dwID, (nRetryCount or 0) + 1)
+			D.OnObjectEnterScene(dwType, dwID, (nRetryCount or 0) + 1)
 		end)
 	else-- if szName then -- 判断是否需要焦点
 		if not szName then
@@ -337,7 +332,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 				szTong = GetTongClient().ApplyGetTongName(KObject.dwTongID, 253)
 				if not szTong or szTong == '' then -- 解决目标刚进入场景的时候帮会获取不到的问题
 					MY.DelayCall(300, function()
-						MY_Focus.OnObjectEnterScene(dwType, dwID, (nRetryCount or 0) + 1)
+						D.OnObjectEnterScene(dwType, dwID, (nRetryCount or 0) + 1)
 					end)
 				end
 			end
@@ -353,7 +348,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		-- 判断永久焦点
 		if not bFocus then
 			local dwTemplateID = dwType == TARGET.PLAYER and dwID or KObject.dwTemplateID
-			if MY_Focus.tFocusList[dwType][dwTemplateID]
+			if O.tFocusList[dwType][dwTemplateID]
 			and not (
 				dwType == TARGET.NPC
 				and dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
@@ -366,8 +361,8 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 			end
 		end
 		-- 判断默认焦点
-		if not bFocus and MY_Focus.bAutoFocus then
-			tRule = D.GetEligibleRule(MY_Focus.tAutoFocus, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
+		if not bFocus and O.bAutoFocus then
+			tRule = D.GetEligibleRule(O.tAutoFocus, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
 			if tRule then
 				bFocus = true
 				bDeletable = false
@@ -375,7 +370,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 			end
 		end
 		-- 判断内嵌默认焦点
-		if not bFocus and MY_Focus.bEmbeddedFocus then
+		if not bFocus and O.bEmbeddedFocus then
 			tRule = D.GetEligibleRule(D.EMBEDDED_FOCUS, dwMapID, dwType, dwID, dwTemplateID, szName, szTong)
 			if tRule then
 				bFocus = true
@@ -388,17 +383,17 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		if not bFocus then
 			if MY.IsInArena() or MY.IsInPubg() or MY.IsInZombieMap() then
 				if dwType == TARGET.PLAYER then
-					if MY_Focus.bFocusJJCEnemy and MY_Focus.bFocusJJCParty then
+					if O.bFocusJJCEnemy and O.bFocusJJCParty then
 						bFocus = true
 						bDeletable = false
 						szVia = _L['JJC focus']
-					elseif MY_Focus.bFocusJJCParty then
+					elseif O.bFocusJJCParty then
 						if not IsEnemy(UI_GetClientPlayerID(), dwID) then
 							bFocus = true
 							bDeletable = false
 							szVia = _L['JJC focus party']
 						end
-					elseif MY_Focus.bFocusJJCEnemy then
+					elseif O.bFocusJJCEnemy then
 						if IsEnemy(UI_GetClientPlayerID(), dwID) then
 							bFocus = true
 							bDeletable = false
@@ -406,7 +401,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 						end
 					end
 				elseif dwType == TARGET.NPC then
-					if MY_Focus.bFocusJJCParty
+					if O.bFocusJJCParty
 					and KObject.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
 					and not (IsEnemy(UI_GetClientPlayerID(), dwID) and MY.IsShieldedVersion()) then
 						D.OnRemoveFocus(TARGET.PLAYER, KObject.dwEmployer)
@@ -416,10 +411,10 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 					end
 				end
 			else
-				if not MY_Focus.bOnlyPublicMap or (not MY.IsInBattleField() and not MY.IsInDungeon() and not MY.IsInArena()) then
+				if not O.bOnlyPublicMap or (not MY.IsInBattleField() and not MY.IsInDungeon() and not MY.IsInArena()) then
 					-- 判断好友
 					if dwType == TARGET.PLAYER
-					and MY_Focus.bFocusFriend
+					and O.bFocusFriend
 					and MY.GetFriend(dwID) then
 						bFocus = true
 						bDeletable = false
@@ -427,7 +422,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 					end
 					-- 判断同帮会
 					if dwType == TARGET.PLAYER
-					and MY_Focus.bFocusTong
+					and O.bFocusTong
 					and dwID ~= MY.GetClientInfo().dwID
 					and MY.GetTongMember(dwID) then
 						bFocus = true
@@ -437,7 +432,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 				end
 				-- 判断敌对玩家
 				if dwType == TARGET.PLAYER
-				and MY_Focus.bFocusEnemy
+				and O.bFocusEnemy
 				and IsEnemy(UI_GetClientPlayerID(), dwID) then
 					bFocus = true
 					bDeletable = false
@@ -447,7 +442,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		end
 
 		-- 判断重要NPC
-		if not bFocus and MY_Focus.bFocusINpc
+		if not bFocus and O.bFocusINpc
 		and dwType == TARGET.NPC
 		and MY.IsImportantNpc(me.GetMapID(), KObject.dwTemplateID) then
 			bFocus = true
@@ -456,7 +451,7 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 		end
 
 		-- 判断小本本
-		if not bFocus and MY_Focus.bFocusAnmerkungen
+		if not bFocus and O.bFocusAnmerkungen
 		and dwType == TARGET.PLAYER
 		and MY_Anmerkungen.GetPlayerNote(dwID) then
 			bFocus = true
@@ -478,11 +473,11 @@ function MY_Focus.OnObjectEnterScene(dwType, dwID, nRetryCount)
 end
 
 -- 对象离开视野
-function MY_Focus.OnObjectLeaveScene(dwType, dwID)
+function D.OnObjectLeaveScene(dwType, dwID)
 	local KObject = MY.GetObject(dwType, dwID)
 	if KObject then
 		if dwType == TARGET.NPC then
-			if MY_Focus.bFocusJJCParty
+			if O.bFocusJJCParty
 			and KObject.dwTemplateID == CHANGGE_REAL_SHADOW_TPLID
 			and MY.IsInArena() and not (IsEnemy(UI_GetClientPlayerID(), dwID) and MY.IsShieldedVersion()) then
 				D.OnSetFocus(TARGET.PLAYER, KObject.dwEmployer, MY.GetObjectName(KObject, 'never'), false, _L['JJC focus party'])
@@ -529,7 +524,7 @@ function D.OnRemoveFocus(dwType, dwID)
 end
 
 -- 排序
-function MY_Focus.SortFocus(fn)
+function D.SortFocus(fn)
 	local p = GetClientPlayer()
 	fn = fn or function(p1, p2)
 		p1 = MY.GetObject(p1.dwType, p1.dwID)
@@ -543,7 +538,7 @@ function MY_Focus.SortFocus(fn)
 end
 
 -- 获取焦点列表
-function MY_Focus.GetFocusList()
+function D.GetFocusList()
 	local t = {}
 	for _, v in ipairs(FOCUS_LIST) do
 		table.insert(t, v)
@@ -552,19 +547,19 @@ function MY_Focus.GetFocusList()
 end
 
 -- 获取当前显示的焦点列表
-function MY_Focus.GetDisplayList()
+function D.GetDisplayList()
 	local t = {}
 	local me = GetClientPlayer()
-	if not MY_Focus.IsShielded() and me then
+	if not D.IsShielded() and me then
 		for _, p in ipairs(FOCUS_LIST) do
-			if #t >= MY_Focus.nMaxDisplay then
+			if #t >= O.nMaxDisplay then
 				break
 			end
 			local KObject, bFocus = MY.GetObject(p.dwType, p.dwID), true
 			if not KObject then
 				bFocus = false
 			end
-			if bFocus and MY_Focus.bHideDeath then
+			if bFocus and O.bHideDeath then
 				if p.dwType == TARGET.NPC or p.dwType == TARGET.PLAYER then
 					bFocus = KObject.nMoveState ~= MOVE_STATE.ON_DEATH
 				else--if p.dwType == TARGET.DOODAD then
@@ -577,7 +572,7 @@ function MY_Focus.GetDisplayList()
 					bFocus = false
 				end
 				if bFocus and p.tRule.nMaxDistance ~= 0
-				and MY.GetDistance(me, KObject, MY_Focus.szDistanceType) > p.tRule.nMaxDistance then
+				and MY.GetDistance(me, KObject, O.szDistanceType) > p.tRule.nMaxDistance then
 					bFocus = false
 				end
 				if bFocus and not p.tRule.tRelation.bAll then
@@ -596,30 +591,32 @@ function MY_Focus.GetDisplayList()
 	return t
 end
 
-function MY_Focus.GetTargetMenu(dwType, dwID)
+function D.GetTargetMenu(dwType, dwID)
 	return {{
 		szOption = _L['add to temp focus list'],
 		fnAction = function()
-			if not MY_Focus.bEnable then
-				MY_Focus.bEnable = true
+			if not O.bEnable then
+				O.bEnable = true
 				MY_Focus.Open()
 			end
-			MY_Focus.SetFocusID(dwType, dwID)
+			D.SetFocusID(dwType, dwID)
 		end,
 	}, {
 		szOption = _L['add to static focus list'],
 		fnAction = function()
-			if not MY_Focus.bEnable then
-				MY_Focus.bEnable = true
+			if not O.bEnable then
+				O.bEnable = true
 				MY_Focus.Open()
 			end
-			MY_Focus.SetFocusID(dwType, dwID, true)
+			D.SetFocusID(dwType, dwID, true)
 		end,
 	}}
 end
 
 do
 local function onInit()
+	-- 加载设置项数据
+	D.LoadConfig()
 	-- 密码生成
 	local k = char(80, 65, 83, 83, 80, 72, 82, 65, 83, 69)
 	if IsTable(D[k]) then
@@ -631,35 +628,40 @@ local function onInit()
 		D[k] = char(unpack(D[k]))
 	end
 	-- 用户自定义默认焦点
-	if not MY_Focus.tAutoFocus then
-		MY_Focus.tAutoFocus = {}
+	if not O.tAutoFocus then
+		O.tAutoFocus = {}
 	end
-	for i, v in ipairs(MY_Focus.tAutoFocus) do
+	for i, v in ipairs(O.tAutoFocus) do
 		if IsString(v) then
 			v = { szPattern = v }
 		end
-		MY_Focus.tAutoFocus[i] = FormatAutoFocusData(v)
+		O.tAutoFocus[i] = FormatAutoFocusData(v)
 	end
 	-- 永久焦点
-	if not MY_Focus.tFocusList then
-		MY_Focus.tFocusList = {}
+	if not O.tFocusList then
+		O.tFocusList = {}
 	end
 	for _, dwType in ipairs({TARGET.PLAYER, TARGET.NPC, TARGET.DOODAD}) do
-		if not MY_Focus.tFocusList[dwType] then
-			MY_Focus.tFocusList[dwType] = {}
+		if not O.tFocusList[dwType] then
+			O.tFocusList[dwType] = {}
 		end
 	end
 	-- 内嵌默认焦点
 	D.LoadEmbeddedRule()
+	D.RescanNearby()
 end
 MY.RegisterInit('MY_Focus', onInit)
-MY.RegisterEvent('CUSTOM_DATA_LOADED', onInit)
+
+local function onExit()
+	D.SaveConfig()
+end
+MY.RegisterExit('MY_Focus', onExit)
 end
 
 do
 local function onMenu()
 	local dwType, dwID = GetClientPlayer().GetTarget()
-	return MY_Focus.GetTargetMenu(dwType, dwID)
+	return D.GetTargetMenu(dwType, dwID)
 end
 MY.RegisterTargetAddonMenu('MY_Focus', onMenu)
 end
@@ -667,7 +669,7 @@ end
 do
 local function onHotKey()
 	local dwType, dwID = MY.GetTarget()
-	local aList = MY_Focus.GetDisplayList()
+	local aList = D.GetDisplayList()
 	local t = aList[1]
 	if not t then
 		return
@@ -685,12 +687,12 @@ end
 MY.RegisterTutorial({
 	szKey = 'MY_Focus',
 	szMessage = _L['Would you like to use MY focus?'],
-	fnRequire = function() return not MY_Focus.bEnable end,
+	fnRequire = function() return not O.bEnable end,
 	{
 		szOption = _L['Use'],
 		bDefault = true,
 		fnAction = function()
-			MY_Focus.bEnable = true
+			O.bEnable = true
 			MY_Focus.Open()
 			MY.RedrawTab('MY_Focus')
 		end,
@@ -698,9 +700,127 @@ MY.RegisterTutorial({
 	{
 		szOption = _L['Not use'],
 		fnAction = function()
-			MY_Focus.bEnable = false
+			O.bEnable = false
 			MY_Focus.Close()
 			MY.RedrawTab('MY_Focus')
 		end,
 	},
 })
+
+-- Global exports
+do
+local settings = {
+	exports = {
+		{
+			fields = {
+				bEnable = true,
+				bMinimize = true,
+				bFocusINpc = true,
+				bFocusFriend = true,
+				bFocusTong = true,
+				bOnlyPublicMap = true,
+				bSortByDistance = true,
+				bFocusEnemy = true,
+				bFocusAnmerkungen = true,
+				bAutoHide = true,
+				nMaxDisplay = true,
+				bAutoFocus = true,
+				bEmbeddedFocus = true,
+				bHideDeath = true,
+				bDisplayKungfuIcon = true,
+				bFocusJJCParty = true,
+				bFocusJJCEnemy = true,
+				bShowTarget = true,
+				szDistanceType = true,
+				bTraversal = true,
+				bHealHelper = true,
+				bEnableSceneNavi = true,
+				anchor = true,
+				fScaleX = true,
+				fScaleY = true,
+			},
+			root = O,
+		},
+		{
+			fields = {
+				GetTargetMenu      = D.GetTargetMenu     ,
+				IsShielded         = D.IsShielded        ,
+				RescanNearby       = D.RescanNearby      ,
+				IsEnabled          = D.IsEnabled         ,
+				GetAllFocusPattern = D.GetAllFocusPattern,
+				SetFocusPattern    = D.SetFocusPattern   ,
+				SetAutoHide        = D.SetAutoHide       ,
+				GetDisplayList     = D.GetDisplayList    ,
+				OnObjectEnterScene = D.OnObjectEnterScene,
+				OnObjectLeaveScene = D.OnObjectLeaveScene,
+				RemoveFocusID      = D.RemoveFocusID     ,
+				SortFocus          = D.SortFocus         ,
+			},
+		},
+	},
+	imports = {
+		{
+			fields = {
+				bEnable = true,
+				bMinimize = true,
+				bFocusINpc = true,
+				bFocusFriend = true,
+				bFocusTong = true,
+				bOnlyPublicMap = true,
+				bSortByDistance = true,
+				bFocusEnemy = true,
+				bFocusAnmerkungen = true,
+				bAutoHide = true,
+				nMaxDisplay = true,
+				bAutoFocus = true,
+				bEmbeddedFocus = true,
+				bHideDeath = true,
+				bDisplayKungfuIcon = true,
+				bFocusJJCParty = true,
+				bFocusJJCEnemy = true,
+				bShowTarget = true,
+				szDistanceType = true,
+				bTraversal = true,
+				bHealHelper = true,
+				bEnableSceneNavi = true,
+				anchor = true,
+				fScaleX = true,
+				fScaleY = true,
+				tAutoFocus = true,
+				tFocusList = true,
+			},
+			triggers = {
+				bEnable = D.SaveConfig,
+				bMinimize = D.SaveConfig,
+				bFocusINpc = D.SaveConfig,
+				bFocusFriend = D.SaveConfig,
+				bFocusTong = D.SaveConfig,
+				bOnlyPublicMap = D.SaveConfig,
+				bSortByDistance = D.SaveConfig,
+				bFocusEnemy = D.SaveConfig,
+				bFocusAnmerkungen = D.SaveConfig,
+				bAutoHide = D.SaveConfig,
+				nMaxDisplay = D.SaveConfig,
+				bAutoFocus = D.SaveConfig,
+				bEmbeddedFocus = D.SaveConfig,
+				bHideDeath = D.SaveConfig,
+				bDisplayKungfuIcon = D.SaveConfig,
+				bFocusJJCParty = D.SaveConfig,
+				bFocusJJCEnemy = D.SaveConfig,
+				bShowTarget = D.SaveConfig,
+				szDistanceType = D.SaveConfig,
+				bTraversal = D.SaveConfig,
+				bHealHelper = D.SaveConfig,
+				bEnableSceneNavi = D.SaveConfig,
+				anchor = D.SaveConfig,
+				fScaleX = D.SaveConfig,
+				fScaleY = D.SaveConfig,
+				tAutoFocus = D.SaveConfig,
+				tFocusList = D.SaveConfig,
+			},
+			root = O,
+		},
+	},
+}
+MY_Focus = MY.GeneGlobalNS(settings)
+end

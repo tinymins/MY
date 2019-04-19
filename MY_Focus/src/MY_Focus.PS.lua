@@ -56,9 +56,9 @@ function PS.OnPanelActive(wnd)
 		oncheck = function(bChecked)
 			MY_Focus.bEnable = bChecked
 			if MY_Focus.bEnable then
-				MY_Focus.Open()
+				MY_FocusUI.Open()
 			else
-				MY_Focus.Close()
+				MY_FocusUI.Close()
 			end
 		end,
 		tip = function()
@@ -108,7 +108,7 @@ function PS.OnPanelActive(wnd)
 		autoenable = function() return MY_Focus.IsEnabled() end,
 	}, true)
 	-- ³õÊ¼»¯list¿Ø¼þ
-	for _, v in ipairs(MY_Focus.tAutoFocus) do
+	for _, v in ipairs(MY_Focus.GetAllFocusPattern()) do
 		list:listbox('insert', GeneItemText(v), v, v)
 	end
 	list:listbox('onmenu', function(hItem, szText, oID, tData)
@@ -128,7 +128,7 @@ function PS.OnPanelActive(wnd)
 				bChecked = tData.szMethod == eType,
 				fnAction = function()
 					tData.szMethod = eType
-					MY_Focus.RescanNearby()
+					MY_Focus.SetFocusPattern(tData.szPattern, tData)
 				end,
 			})
 		end
@@ -140,7 +140,7 @@ function PS.OnPanelActive(wnd)
 				bCheck = true, bChecked = tData.tType.bAll,
 				fnAction = function()
 					tData.tType.bAll = not tData.tType.bAll
-					MY_Focus.RescanNearby()
+					MY_Focus.SetFocusPattern(tData.szPattern, tData)
 					list:listbox('update', 'id', oID, {'text'}, {GeneItemText(tData)})
 				end,
 			}
@@ -151,7 +151,7 @@ function PS.OnPanelActive(wnd)
 				bCheck = true, bChecked = tData.tType[eType],
 				fnAction = function()
 					tData.tType[eType] = not tData.tType[eType]
-					MY_Focus.RescanNearby()
+					MY_Focus.SetFocusPattern(tData.szPattern, tData)
 					list:listbox('update', 'id', oID, {'text'}, {GeneItemText(tData)})
 				end,
 				fnDisable = function()
@@ -167,7 +167,7 @@ function PS.OnPanelActive(wnd)
 				bCheck = true, bChecked = tData.tRelation.bAll,
 				fnAction = function()
 					tData.tRelation.bAll = not tData.tRelation.bAll
-					MY_Focus.RescanNearby()
+					MY_Focus.SetFocusPattern(tData.szPattern, tData)
 					list:listbox('update', 'id', oID, {'text'}, {GeneItemText(tData)})
 				end,
 			}
@@ -178,7 +178,7 @@ function PS.OnPanelActive(wnd)
 				bCheck = true, bChecked = tData.tRelation['b' .. szRelation],
 				fnAction = function()
 					tData.tRelation['b' .. szRelation] = not tData.tRelation['b' .. szRelation]
-					MY_Focus.RescanNearby()
+					MY_Focus.SetFocusPattern(tData.szPattern, tData)
 					list:listbox('update', 'id', oID, {'text'}, {GeneItemText(tData)})
 				end,
 				fnDisable = function()
@@ -201,7 +201,7 @@ function PS.OnPanelActive(wnd)
 				fnDisable = function() return not tData.tLife.bEnable end,
 			}, tData.tLife.szOperator, function(op)
 				tData.tLife.szOperator = op
-				MY_Focus.RescanNearby()
+				MY_Focus.SetFocusPattern(tData.szPattern, tData)
 			end), {
 				szOption = _L['Value'],
 				fnMouseEnter = function()
@@ -210,7 +210,7 @@ function PS.OnPanelActive(wnd)
 				fnAction = function()
 					GetUserInputNumber(tData.tLife.nValue, 100, nil, function(val)
 						tData.tLife.nValue = val
-						MY_Focus.RescanNearby()
+						MY_Focus.SetFocusPattern(tData.szPattern, tData)
 					end, nil, function() return not MY.IsPanelVisible() end)
 				end,
 				fnDisable = function() return not tData.tLife.bEnable end,
@@ -229,8 +229,8 @@ function PS.OnPanelActive(wnd)
 			fnAction = function()
 				GetUserInput(_L['Please input max distance, leave blank to disable:'], function(val)
 					tData.nMaxDistance = tonumber(val) or 0
-					MY_Focus.RescanNearby()
-				end, nil, function() return not MY.IsPanelVisible() end, nil, tData.szDisplay)
+					MY_Focus.SetFocusPattern(tData.szPattern, tData)
+				end, nil, function() return not MY.IsPanelVisible() end, nil, tData.nMaxDistance)
 			end,
 		}
 		insert(t, t1)
@@ -246,7 +246,7 @@ function PS.OnPanelActive(wnd)
 			fnAction = function()
 				GetUserInput(_L['Please input display name, leave blank to use its own name:'], function(val)
 					tData.szDisplay = val
-					MY_Focus.RescanNearby()
+					MY_Focus.SetFocusPattern(tData.szPattern, tData)
 				end, nil, function() return not MY.IsPanelVisible() end, nil, tData.szDisplay)
 			end,
 		}
