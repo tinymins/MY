@@ -2619,6 +2619,10 @@ function MY.GeneGlobalNS(options)
 	local function setter(_, k, v)
 		local found, trigger, setter, res = false
 		for _, import in ipairs(imports) do
+			trigger = Get(import, {'triggers', k})
+			if IsTable(trigger) and IsFunction(trigger[1]) then
+				trigger[1](k, v)
+			end
 			if not found then
 				setter, found = Get(import, {'setters', k})
 				if setter then
@@ -2632,8 +2636,9 @@ function MY.GeneGlobalNS(options)
 					import.root[k] = v
 				end
 			end
-			trigger = Get(import, {'triggers', k})
-			if trigger then
+			if IsTable(trigger) and IsFunction(trigger[2]) then
+				trigger[2](k, v)
+			elseif IsFunction(trigger) then
 				trigger(k, v)
 			end
 			if found then
