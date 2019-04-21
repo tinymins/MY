@@ -98,7 +98,7 @@ local function DrawList()
 	for _, item in ipairs(RESULT) do
 		local opt = {}
 		opt.r, opt.g, opt.b = GetItemFontColorByQuality(item.itemInfo.nQuality, false)
-		UI_LIST:listbox('insert', item.itemInfo.szName, item, item, opt)
+		UI_LIST:listbox('insert', ' [' .. GetItemNameByItemInfo(item.itemInfo, item.dwRecipeID) .. '] - ' .. item.itemInfo.szName, item, item, opt)
 	end
 	if SEARCH ~= '' then
 		UI_LIST:listbox('insert', _L('Max display count %d, current %d.', MAX_DISP, #RESULT), 'count', nil, { r = 100, g = 100, b = 100 })
@@ -121,11 +121,37 @@ local function Search(szSearch)
 	for dwTabType, nMaxIndex in pairs(ITEM_TYPE_MAX) do
 		for dwIndex = 1, nMaxIndex do
 			local itemInfo = GetItemInfo(dwTabType, dwIndex)
-			if itemInfo and (wfind(itemInfo.szName, szSearch) or dwIndex == dwID) then
+			if itemInfo and (
+				dwIndex == dwID
+				or (itemInfo.nGenre ~= ITEM_GENRE.BOOK and wfind(GetItemNameByItemInfo(itemInfo), szSearch))
+				or wfind(itemInfo.szName, szSearch)
+			) then
 				insert(RESULT, {
 					dwTabType = dwTabType,
 					dwIndex = dwIndex,
 					itemInfo = itemInfo,
+				})
+				if #RESULT >= MAX_DISP then
+					return
+				end
+			end
+		end
+	end
+	for i = 1, g_tTable.BookSegment:GetRowCount() do
+		local row = g_tTable.BookSegment:GetRow(i)
+		if row then
+			local dwRecipeID = BookID2GlobelRecipeID(row.dwBookID, row.dwSegmentID)
+			local itemInfo = GetItemInfo(5, row.dwBookItemIndex)
+			if itemInfo and (
+				dwID == itemInfo.dwID or dwID == dwRecipeID
+				or dwID == row.dwBookID or dwID == row.dwSegmentID
+				or wfind(GetItemNameByItemInfo(itemInfo, dwRecipeID), szSearch)
+			) then
+				insert(RESULT, {
+					dwTabType = 5,
+					dwIndex = row.dwBookItemIndex,
+					itemInfo = itemInfo,
+					dwRecipeID = dwRecipeID,
 				})
 				if #RESULT >= MAX_DISP then
 					return
@@ -166,15 +192,15 @@ function PS.OnPanelActive(wnd)
 		if id == 'count' then
 			return false
 		end
-		if data and bIn then
-			MY.OutputItemInfoTip(data.dwTabType, data.dwIndex)
+		if data and bIn and (data.itemInfo.nGenre ~= ITEM_GENRE.BOOK or data.dwRecipeID) then
+			MY.OutputItemInfoTip(data.dwTabType, data.dwIndex, data.dwRecipeID)
 		else
 			HideTip()
 		end
 	end)
 	UI_LIST:listbox('onlclick', function(list, text, id, data)
 		if data and IsCtrlKeyDown() then
-			MY.EditBoxInsertItemInfo(data.dwTabType, data.dwIndex)
+			MY.EditBoxInsertItemInfo(data.dwTabType, data.dwIndex, data.dwRecipeID)
 		end
 		return false
 	end)
