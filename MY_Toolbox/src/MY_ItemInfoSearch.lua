@@ -29,7 +29,7 @@ local MENU_DIVIDER, EMPTY_TABLE, XML_LINE_BREAKER = MY.MENU_DIVIDER, MY.EMPTY_TA
 --------------------------------------------------------------------------------------------------------
 
 local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Toolbox/lang/')
-if not MY.AssertVersion('MY_ItemTabSearch', _L['MY_ItemTabSearch'], 0x2011800) then
+if not MY.AssertVersion('MY_ItemInfoSearch', _L['MY_ItemInfoSearch'], 0x2012700) then
 	return
 end
 local ITEM_TYPE_MAX, UI_LIST
@@ -141,8 +141,10 @@ function PS.OnPanelActive(wnd)
 		text = SEARCH,
 		placeholder = _L['Please input item name or item index number'],
 		onchange = function(szSearch)
-			Search(szSearch)
-			DrawList()
+			MY.DelayCall('MY_ItemInfoSearch', 300, function()
+				Search(szSearch)
+				DrawList()
+			end)
 		end,
 	}, true):height()
 
@@ -173,4 +175,4 @@ function PS.OnPanelDeactive()
 	UI_LIST = nil
 end
 
-MY.RegisterPanel('MY_ItemTabSearch', _L['MY_ItemTabSearch'], _L['General'], 'ui/Image/UICommon/ActivePopularize2.UITex|30', PS)
+MY.RegisterPanel('MY_ItemInfoSearch', _L['MY_ItemInfoSearch'], _L['General'], 'ui/Image/UICommon/ActivePopularize2.UITex|30', PS)
