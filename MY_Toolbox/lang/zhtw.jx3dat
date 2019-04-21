@@ -139,5 +139,6 @@ data = {
     ['Click for achievement wiki'] = '點擊查看成就百科',
 
     ['MY_ItemTabSearch'] = '物品搜索',
+    ['Please input item name or item index number'] = '請輸入物品名稱或物品ID',
     ['Max display count %d, current %d.'] = '最大顯示%d條，當前結果%d條。',
 }

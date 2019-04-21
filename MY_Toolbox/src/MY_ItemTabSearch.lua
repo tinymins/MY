@@ -139,6 +139,7 @@ function PS.OnPanelActive(wnd)
 	y = y + ui:append('WndEditBox', {
 		x = x, y = y, w = w - x, h = 25,
 		text = SEARCH,
+		placeholder = _L['Please input item name or item index number'],
 		onchange = function(szSearch)
 			Search(szSearch)
 			DrawList()
