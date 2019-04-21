@@ -475,6 +475,10 @@ local function InitComponent(raw, szType)
 		end)
 		SetComponentProp(raw, 'OnListItemHandleRButtonClick', function()
 			local data = GetComponentProp(this, 'listboxItemData')
+			local onItemClick = GetComponentProp(raw, 'OnListItemHandleCustomRButtonClick')
+			if onItemClick and onItemClick(this, data.text, data.id, data.data, not data.selected) == false then
+				return
+			end
 			if not data.selected then
 				local opt = GetComponentProp(raw, 'listboxOptions')
 				if not opt.multiSelect then
@@ -1764,6 +1768,14 @@ function UI:listbox(method, arg1, arg2, arg3, arg4)
 				for _, raw in ipairs(self.raws) do
 					if GetComponentType(raw) == 'WndListBox' then
 						SetComponentProp(raw, 'OnListItemHandleCustomLButtonClick', arg1)
+					end
+				end
+			end
+		elseif method == 'onrclick' then
+			if IsFunction(arg1) then
+				for _, raw in ipairs(self.raws) do
+					if GetComponentType(raw) == 'WndListBox' then
+						SetComponentProp(raw, 'OnListItemHandleCustomRButtonClick', arg1)
 					end
 				end
 			end
