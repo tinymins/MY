@@ -32,6 +32,7 @@ local _L = MY.LoadLangPack(MY.GetAddonInfo().szRoot .. 'MY_Toolbox/lang/')
 if not MY.AssertVersion('MY_ItemInfoSearch', _L['MY_ItemInfoSearch'], 0x2012700) then
 	return
 end
+local CACHE = {}
 local ITEM_TYPE_MAX, UI_LIST
 local SEARCH, RESULT, MAX_DISP = '', {}, 500
 
@@ -106,6 +107,12 @@ end
 
 local function Search(szSearch)
 	SEARCH = szSearch
+	for _, v in ipairs(CACHE) do
+		if v.szSearch == szSearch then
+			RESULT = v.aResult
+			return
+		end
+	end
 	RESULT = {}
 	local dwID = tonumber(szSearch)
 	if szSearch == '' then
@@ -126,6 +133,10 @@ local function Search(szSearch)
 			end
 		end
 	end
+	if #CACHE > 20 then
+		remove(CACHE, 1)
+	end
+	insert(CACHE, { szSearch = szSearch, aResult = RESULT })
 end
 
 local PS = {}
@@ -141,7 +152,7 @@ function PS.OnPanelActive(wnd)
 		text = SEARCH,
 		placeholder = _L['Please input item name or item index number'],
 		onchange = function(szSearch)
-			MY.DelayCall('MY_ItemInfoSearch', 300, function()
+			MY.DelayCall('MY_ItemInfoSearch', 200, function()
 				Search(szSearch)
 				DrawList()
 			end)
