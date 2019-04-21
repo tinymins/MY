@@ -189,4 +189,4 @@ function PS.OnPanelDeactive()
 	UI_LIST = nil
 end
 
-MY.RegisterPanel('MY_ItemInfoSearch', _L['MY_ItemInfoSearch'], _L['General'], 'ui/Image/UICommon/ActivePopularize2.UITex|30', PS)
+MY.RegisterPanel('MY_ItemInfoSearch', _L['MY_ItemInfoSearch'], _L['System'], 'ui/Image/UICommon/ActivePopularize2.UITex|30', PS)
