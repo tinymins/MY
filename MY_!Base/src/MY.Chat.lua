@@ -833,6 +833,44 @@ function MY.Talk(nChannel, szText, szUUID, bNoEscape, bSaveDeny, bPushToChatBox)
 end
 end
 
+function MY.EditBoxInsertItemInfo(dwTabType, dwIndex, nBookInfo, nVersion)
+	local itemInfo = GetItemInfo(dwTabType, dwIndex)
+	if not itemInfo then
+		return false
+	end
+	if not nVersion then
+		nVersion = GLOBAL.CURRENT_ITEM_VERSION
+	end
+	local edit = Station.Lookup('Lowest2/EditBox/Edit_Input')
+	if itemInfo.nGenre == ITEM_GENRE.BOOK then
+		if not nBookInfo then
+			return false
+		end
+		local nBookID, nSegmentID = GlobelRecipeID2BookID(nBookInfo)
+		local szName = '[' .. Table_GetSegmentName(nBookID, nSegmentID) .. ']'
+		edit:InsertObj(szName, {
+			type = 'book',
+			text = szName,
+			version = nVersion,
+			tabtype = dwTabType,
+			index = dwIndex,
+			bookinfo = nBookInfo,
+		})
+		Station.SetFocusWindow(edit)
+	else
+		local szName = '[' .. GetItemNameByItemInfo(itemInfo) .. ']'
+		edit:InsertObj(szName, {
+			type = 'iteminfo',
+			text = szName,
+			version = nVersion,
+			tabtype = dwTabType,
+			index = dwIndex,
+		})
+		Station.SetFocusWindow(edit)
+	end
+	return true
+end
+
 do
 local SPACE = ' '
 local W_SPACE = g_tStrings.STR_ONE_CHINESE_SPACE
