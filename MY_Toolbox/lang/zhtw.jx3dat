@@ -137,4 +137,7 @@ data = {
     ['Click to disable MY player view magnifier'] = '點擊關閉茗伊試衣間',
 
     ['Click for achievement wiki'] = '點擊查看成就百科',
+
+    ['MY_ItemTabSearch'] = '物品搜索',
+    ['Max display count %d, current %d.'] = '最大顯示%d條，當前結果%d條。',
 }
