@@ -49,6 +49,7 @@ for cwd, dirs, files in os.walk(root):
         if filename in FILE_MAPPING:
             info = FILE_MAPPING[filename]
             filepath = os.path.join(cwd, filename)
+            relpath = filepath.replace(root, '')
 
             if filename == 'package.ini':
                 cpkg = cwd[cwd.rfind('\\') + 1:]
@@ -56,7 +57,7 @@ for cwd, dirs, files in os.walk(root):
             print('file loading: ' + filepath)
 
             crc_text = crc(filepath)
-            if crc_text == crcs.get(filepath):
+            if crc_text == crcs.get(relpath):
                 print('file not changed.')
             else:
                 try:
@@ -88,7 +89,7 @@ for cwd, dirs, files in os.walk(root):
                 except:
                     pass
 
-                crcs[filepath] = crc_text
+                crcs[relpath] = crc_text
             print('-----------------------')
 
 with open(crc_file, 'w') as file:
