@@ -340,6 +340,11 @@ end
 function MY_ChatSwitch.OnEvent(event)
 	if event == 'PLAYER_SAY' then
 		local szContent, dwTalkerID, nChannel, szName, szMsg = arg0, arg1, arg2, arg3, arg9
+		if not IsString(arg9) then
+			szMsg = arg11
+		elseif IsString(arg11) then
+			szMsg = #arg9 > #arg11 and arg9 or arg11
+		end
 		if nChannel == PLAYER_TALK_CHANNEL.WHISPER then
 			local t
 			for i = #MY_ChatSwitch.aWhisper, 1, -1 do
