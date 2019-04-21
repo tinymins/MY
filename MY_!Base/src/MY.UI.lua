@@ -434,9 +434,19 @@ local function InitComponent(raw, szType)
 	elseif szType == 'WndListBox' then
 		local scroll = raw:Lookup('', 'Handle_Scroll')
 		SetComponentProp(raw, 'OnListItemHandleMouseEnter', function()
+			local data = GetComponentProp(this, 'listboxItemData')
+			local onHover = GetComponentProp(raw, 'OnListItemHandleCustomHover')
+			if onHover and onHover(this, true, data.text, data.id, data.data, not data.selected) == false then
+				return
+			end
 			UI(this:Lookup('Image_Bg')):fadeIn(100)
 		end)
 		SetComponentProp(raw, 'OnListItemHandleMouseLeave', function()
+			local data = GetComponentProp(this, 'listboxItemData')
+			local onHover = GetComponentProp(raw, 'OnListItemHandleCustomHover')
+			if onHover and onHover(this, false, data.text, data.id, data.data, not data.selected) == false then
+				return
+			end
 			UI(this:Lookup('Image_Bg')):fadeTo(500,0)
 		end)
 		SetComponentProp(raw, 'OnListItemHandleLButtonClick', function()
@@ -1623,7 +1633,12 @@ function UI:listbox(method, arg1, arg2, arg3, arg4)
 			end
 			return tData
 		elseif method == 'insert' then
-			local text, id, data, pos = arg1, arg2, arg3, tonumber(arg4)
+			local text, id, data, pos, r, g, b = arg1, arg2, arg3
+			if IsTable(arg4) then
+				pos, r, g, b = arg4.pos, arg4.r, arg4.g, arg4.b
+			else
+				pos = tonumber(arg4)
+			end
 			for _, raw in ipairs(self.raws) do
 				if GetComponentType(raw) == 'WndListBox' then
 					local hList = raw:Lookup('', 'Handle_Scroll')
@@ -1653,6 +1668,9 @@ function UI:listbox(method, arg1, arg2, arg3, arg4)
 							data = data,
 						})
 						hItem:Lookup('Text_Default'):SetText(text)
+						if r and g and b then
+							hItem:Lookup('Text_Default'):SetFontColor(r, g, b)
+						end
 						hItem.OnItemMouseEnter = GetComponentProp(raw, 'OnListItemHandleMouseEnter')
 						hItem.OnItemMouseLeave = GetComponentProp(raw, 'OnListItemHandleMouseLeave')
 						hItem.OnItemLButtonClick = GetComponentProp(raw, 'OnListItemHandleLButtonClick')
@@ -1746,6 +1764,14 @@ function UI:listbox(method, arg1, arg2, arg3, arg4)
 				for _, raw in ipairs(self.raws) do
 					if GetComponentType(raw) == 'WndListBox' then
 						SetComponentProp(raw, 'OnListItemHandleCustomLButtonClick', arg1)
+					end
+				end
+			end
+		elseif method == 'onhover' then
+			if IsFunction(arg1) then
+				for _, raw in ipairs(self.raws) do
+					if GetComponentType(raw) == 'WndListBox' then
+						SetComponentProp(raw, 'OnListItemHandleCustomHover', arg1)
 					end
 				end
 			end
