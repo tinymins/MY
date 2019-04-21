@@ -2185,6 +2185,16 @@ function MY.OutputObjectTip(dwType, dwID, Rect, szExtraXml)
 	end
 end
 
+function MY.OutputItemInfoTip(dwTabType, dwIndex, nBookInfo, Rect)
+	local szXml = GetItemInfoTip(0, dwTabType, dwIndex, nil, nil, nBookInfo)
+	if not Rect then
+		local x, y = Cursor.GetPos()
+		local w, h = 40, 40
+		Rect = {x, y, w, h}
+	end
+	OutputTip(szXml, 345, Rect)
+end
+
 function MY.Alert(szMsg, fnAction, szSure, fnCancelAction)
 	local nW, nH = Station.GetClientSize()
 	local tMsg = {
