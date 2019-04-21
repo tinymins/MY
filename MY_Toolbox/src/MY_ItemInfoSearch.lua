@@ -101,7 +101,7 @@ local function DrawList()
 		UI_LIST:listbox('insert', item.itemInfo.szName, item, item, opt)
 	end
 	if SEARCH ~= '' then
-		UI_LIST:listbox('insert', _L('Max display count %d, current %d.', MAX_DISP, #RESULT), { r = 100, g = 100, b = 100 })
+		UI_LIST:listbox('insert', _L('Max display count %d, current %d.', MAX_DISP, #RESULT), 'count', nil, { r = 100, g = 100, b = 100 })
 	end
 end
 
@@ -163,6 +163,9 @@ function PS.OnPanelActive(wnd)
 		x = x, y = y, w = w - x, h = h - y,
 	}, true)
 	UI_LIST:listbox('onhover', function(list, bIn, text, id, data)
+		if id == 'count' then
+			return false
+		end
 		if data and bIn then
 			MY.OutputItemInfoTip(data.dwTabType, data.dwIndex)
 		else
