@@ -271,12 +271,6 @@ end
 --       # #       #   #         #   #   # # # # #       #         #                 #     #   #
 --   # #     #   #       #     # # #     #       #       #       # #                 #   #       #
 -- ##################################################################################################
-MY_DATA_PATH = SetmetaReadonly({
-	NORMAL = 0,
-	ROLE   = 1,
-	GLOBAL = 2,
-	SERVER = 3,
-})
 if IsLocalFileExist(MY.GetAddonInfo().szRoot .. '@DATA/') then
 	CPath.Move(MY.GetAddonInfo().szRoot .. '@DATA/', MY.GetAddonInfo().szInterfaceRoot .. 'MY#DATA/')
 end
